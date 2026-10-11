@@ -5,8 +5,8 @@ import { integrationDatabaseUrl } from '../integration/integration-env'
 import { createDraft,getDraft,updateDraft } from '../../modules/survey/builder.service'
 import { createWave,getWave,updateWave } from '../../modules/survey/waves.service'
 import { transitionResearchProject } from '../../modules/survey/project-lifecycle'
-import { prepareWave,openWave,updateWaveEntryToken } from '../../modules/survey/waves.publish'
-import { joinLinkedStudy,startLinkedWave,getPublicResearchInfo } from '../../modules/survey/admission.service'
+import { prepareWave,openWave,updateWaveEntryToken,transitionWave } from '../../modules/survey/waves.publish'
+import { joinLinkedStudy,startLinkedWave,getPublicResearchInfo,listOwnLinkedWaves } from '../../modules/survey/admission.service'
 import { submitResearchFinal,readGeneralForOwnAttempt } from '../../modules/survey/final.service'
 import { getOwnResearchTask } from '../../modules/survey/task.public'
 import { matchedWaveCounts,waveOverview } from '../../modules/survey/analytics.read'
@@ -313,6 +313,31 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
       .rejects.toThrow(/关联|告知/)
     expect((await getWave(ownerId,projectId,pending.id)).publicationId).toBeNull()
   })
+  it('does not reveal frozen or future-scheduled T2 content before participant admission opens',async()=>{
+    const draft=await createWave(ownerId,projectId,{
+      requestId:randomUUID(),title:'未开放的后测内容不能提前显示',
+      consentText:consent,instrumentIds:[toolIds.scale],linkageNoticeConfirmed:true,
+    })
+    await prepareWave(ownerId,projectId,draft.id,draft.revision)
+    const frozenList=await listOwnLinkedWaves({publicId,...link})
+    expect(frozenList.waves.some(w=>w.id===draft.id)).toBe(false)
+    const starting=new Date(Date.now()+600_000).toISOString()
+    const closing=new Date(Date.now()+3_600_000).toISOString()
+    const scheduled=await createWave(ownerId,projectId,{
+      requestId:randomUUID(),title:'未来时窗的后测尚不可显示',
+      consentText:consent,instrumentIds:[toolIds.scale],
+      linkageNoticeConfirmed:true,opensAt:starting,closesAt:closing,
+    })
+    await prepareWave(ownerId,projectId,scheduled.id,scheduled.revision)
+    const current=await getWave(ownerId,projectId,scheduled.id)
+    await openWave(ownerId,projectId,scheduled.id,current.revision)
+    const futureList=await listOwnLinkedWaves({publicId,...link})
+    expect(futureList.waves.some(w=>w.id===scheduled.id)).toBe(false)
+    const publicInfo=await getPublicResearchInfo(publicId)
+    expect(publicInfo.waves.some(w=>w.id===scheduled.id)).toBe(false)
+    expect(publicInfo.waves.some(w=>w.id===draft.id)).toBe(false)
+    expect(futureList.waves.some(w=>w.id===wave1)).toBe(true)
+  })
   it('requires fresh Survey TOTP for bounded raw exports and verifies encrypted tickets on download',async()=>{
     const token=(secondsOld:number)=>generateToken({
       userId:ownerId,username:'synthetic-researcher',role:'STUDENT',
@@ -487,6 +512,35 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
       where:{id:person.attemptId},
     })).status).toBe('STARTED')
   })
+  it('can HARD_STOP after ordinary CLOSE while in-flight FINAL remains possible',async()=>{
+    const w=await wave('关闭后再紧急终止',[toolIds.scale],true)
+    const participant=await joinLinkedStudy({
+      publicId:w.publicId,waveId:w.id,entryToken:w.entrySecret,
+      consent:true,consentVersion:1,
+    })
+    const task=await getOwnResearchTask({
+      publicId:w.publicId,attemptId:participant.attemptId,
+      researchCode:participant.researchCode,accessCredential:participant.accessCredential,
+    })
+    const current=await getWave(ownerId,projectId,w.id)
+    const closed=await transitionWave(ownerId,projectId,w.id,current.revision,'CLOSE')
+    expect(closed.status).toBe('CLOSED')
+    const withinGrace=await getWave(ownerId,projectId,w.id)
+    expect(withinGrace.finishUntil!.getTime()).toBeGreaterThan(Date.now())
+    const stopped=await transitionWave(ownerId,projectId,w.id,withinGrace.revision,'HARD_STOP')
+    expect(stopped.status).toBe('CLOSED')
+    const latest=await getWave(ownerId,projectId,w.id)
+    expect(latest.hardStopAt).not.toBeNull()
+    await expect(transitionWave(ownerId,projectId,w.id,latest.revision,'HARD_STOP'))
+      .rejects.toThrow()
+    await expect(submitResearchFinal({
+      publicId:w.publicId,attemptId:participant.attemptId,
+      researchCode:participant.researchCode,accessCredential:participant.accessCredential,
+      submissionId:randomUUID(),
+      answers:{[task.units[0].instrumentKey]:{itemone:'o4',itemtwo:'o4'}},
+    })).rejects.toThrow()
+    expect(await db.surveyWaveFinal.count({where:{attemptId:participant.attemptId}})).toBe(0)
+  })
   it('derives raw and score Wide variables from a frozen Wave with zero FINALs',async()=>{
     const w=await wave('冻结变量但没有完成答卷',[toolIds.scale],true)
     const person=await joinLinkedStudy({
@@ -621,6 +675,45 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
   })
 
 
+  it('retains valid FINAL and linked code after REVOKE_ACCESS, not after WITHDRAW_DATA',async()=>{
+    const w=await wave('访问撤销但保留有效样本',[toolIds.scale],true)
+    const participant=await joinLinkedStudy({
+      publicId:w.publicId,waveId:w.id,entryToken:w.entrySecret,
+      consent:true,consentVersion:1,
+    })
+    const task=await getOwnResearchTask({
+      publicId:w.publicId,attemptId:participant.attemptId,
+      researchCode:participant.researchCode,accessCredential:participant.accessCredential,
+    })
+    await submitResearchFinal({
+      publicId:w.publicId,attemptId:participant.attemptId,
+      researchCode:participant.researchCode,accessCredential:participant.accessCredential,
+      submissionId:randomUUID(),
+      answers:{[task.units[0].instrumentKey]:{itemone:'o4',itemtwo:'o4'}},
+    })
+    const before=(await waveOverview(ownerId,projectId)).waves.find(x=>x.id===w.id)
+    expect(before).toMatchObject({finalCompleted:1,uniqueLinkedCodes:1})
+    await revokeLinkedResearchAccess({
+      projectId,researchCode:participant.researchCode,
+      accessCredential:participant.accessCredential,
+    })
+    const kept=(await waveOverview(ownerId,projectId)).waves.find(x=>x.id===w.id)
+    expect(kept).toMatchObject({finalCompleted:1,uniqueLinkedCodes:1})
+    expect((await loadSurveySource({
+      actorUserId:ownerId,projectId,waveIds:[w.id],
+    })).completeAttempts).toBe(1)
+    await withdrawLinkedResearchData({
+      projectId,researchCode:participant.researchCode,
+      accessCredential:participant.accessCredential,
+    })
+    const excluded=(await waveOverview(ownerId,projectId)).waves.find(x=>x.id===w.id)
+    expect(excluded).toMatchObject({finalCompleted:0,uniqueLinkedCodes:0,excluded:1})
+    expect((await loadSurveySource({
+      actorUserId:ownerId,projectId,waveIds:[w.id],
+    })).completeAttempts).toBe(0)
+    // Immutable source remains auditable; withdrawal excludes without deleting FINAL.
+    expect(await db.surveyWaveFinal.count({where:{attemptId:participant.attemptId}})).toBe(1)
+  })
   it('bounds one-Wave FINAL exports by half-open completion window and records selection',async()=>{
     const w=await wave('单波次分段导出',[toolIds.scale],true)
     const participant=await joinLinkedStudy({

@@ -75,12 +75,15 @@ export async function getPublicResearchInfo(publicId:string){
   enabled()
   return prisma.$transaction(async tx=>{
     const project=await projectPublic(tx,publicId)
-    const waves=await tx.surveyWave.findMany({where:{projectId:project.id,
-      status:'OPEN',publicationId:{not:null}},
+    const now=new Date()
+    const waves=project.status==='ACTIVE'?await tx.surveyWave.findMany({where:{projectId:project.id,
+      status:'OPEN',publicationId:{not:null},hardStopAt:null,
+      OR:[{opensAt:null},{opensAt:{lte:now}}],
+      AND:[{OR:[{closesAt:null},{closesAt:{gt:now}}]}]},
       orderBy:{ordinal:'asc'},take:100,select:{
         id:true,title:true,ordinal:true,status:true,consentText:true,consentVersion:true,
         opensAt:true,closesAt:true,allowNewParticipants:true,
-      }})
+      }}):[]
     return {project:{name:project.title,description:project.description,
       collectionMode:project.collectionMode,status:project.status},
       waves}
@@ -115,6 +118,7 @@ export async function listOwnLinkedWaves(input:{
   })
   const waves=await prisma.surveyWave.findMany({where:{
     projectId:project.id,publicationId:{not:null},
+    status:{in:['OPEN','PAUSED','CLOSED']},
   },take:100,orderBy:{ordinal:'asc'},select:{
     id:true,title:true,ordinal:true,status:true,opensAt:true,closesAt:true,
     consentText:true,consentVersion:true,allowNewParticipants:true,
@@ -123,7 +127,13 @@ export async function listOwnLinkedWaves(input:{
     projectId:project.id,participantId:identity.participantId,
   },select:{id:true,waveId:true,status:true,completedAt:true}})
   const state=new Map(attempts.map(a=>[a.waveId,a]))
-  return {collectionMode:'LINKED_WAVES',waves:waves.map(w=>({
+  const now=new Date()
+  // Freezing a T2/T3 Publication is not consent to reveal future-wave
+  // titles or disclosures. Only the current open Wave or own history appears.
+  const visible=waves.filter(w=>state.has(w.id)||
+    (project.status==='ACTIVE'&&w.status==='OPEN'
+      &&(!w.opensAt||w.opensAt<=now)&&(!w.closesAt||w.closesAt>now)))
+  return {collectionMode:'LINKED_WAVES',waves:visible.map(w=>({
     ...w,attempt:state.get(w.id)||null,
   }))}
 }

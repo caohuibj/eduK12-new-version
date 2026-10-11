@@ -1,15 +1,27 @@
 import { useEffect, useState } from 'react'
 import type { ResearchDraft, FormDraft, ScaleDraft, SjtDraft, FormQuestion, SurveyImage } from './builder.types'
+import { visibleFormKeys } from './form-visibility'
 
-type Answer=string|number|string[]
+type Refusal={_surveyRefusal:true}
+type Answer=string|number|string[]|Refusal|null
+const refusal=():Refusal=>({_surveyRefusal:true})
+const isRefusal=(value:Answer|undefined):value is Refusal=>
+  !!value&&typeof value==='object'&&!Array.isArray(value)&&'_surveyRefusal' in value
+    &&value._surveyRefusal===true
 export function ResearchPreview({draft,onSimulate}:{draft:ResearchDraft;onSimulate:(answers:Record<string,string|number|string[]>)=>void}){
   const [answers,setAnswers]=useState<Record<string,Answer>>({})
   useEffect(()=>{setAnswers({})},[draft.id])
   const choose=(key:string,value:Answer)=>setAnswers(old=>({...old,[key]:value}))
-  const visible=(q:FormQuestion)=>{
-    if(!q.displayIf)return true
-    const selection=answers[q.displayIf.itemKey]
-    return Array.isArray(selection)?selection.includes(q.displayIf.optionKey):selection===q.displayIf.optionKey
+  const visible=draft.kind==='FORM'
+    ?visibleFormKeys((draft.definition as FormDraft).pages.flatMap(p=>p.questions),answers)
+    :null
+  const simulate=()=>{
+    // Score simulation is only offered for SCALE / SJT, not Form refusal answers.
+    const scoreAnswers:Record<string,string|number|string[]>={}
+    for(const [key,value] of Object.entries(answers))
+      if(typeof value==='string'||typeof value==='number'||Array.isArray(value))
+        scoreAnswers[key]=value
+    onSimulate(scoreAnswers)
   }
   const picture=(image?:SurveyImage)=>image&&<figure className="my-3">
     <img className="max-h-72 object-contain max-w-full rounded border"
@@ -18,7 +30,7 @@ export function ResearchPreview({draft,onSimulate}:{draft:ResearchDraft;onSimula
     {image.caption&&<figcaption className="text-xs mt-1">{image.caption}</figcaption>}
   </figure>
   const question=(q:FormQuestion)=>{
-    if(!visible(q))return null
+    if(visible&&!visible.has(q.itemKey))return null
     return <fieldset key={q.itemKey} className="border rounded-lg p-3 my-3 bg-white">
       <legend className="font-medium text-sm">{q.prompt||'未填写题干'} {q.required?'*':''}</legend>
       {picture(q.image)}
@@ -33,21 +45,29 @@ export function ResearchPreview({draft,onSimulate}:{draft:ResearchDraft;onSimula
           {o.label||'未填写选项'}</label>
       })}
       {q.type==='MATRIX'&&<div className="overflow-x-auto"><table className="w-full border-collapse text-sm">
-        <thead><tr><th scope="col">题目行</th>{q.options.map(o=><th scope="col" key={o.optionKey}>{o.label}</th>)}</tr></thead>
+        <thead><tr><th scope="col">题目行</th>{q.options.map(o=><th scope="col" key={o.optionKey}>{o.label}</th>)}{q.allowRefusal&&<th scope="col">不愿回答</th>}</tr></thead>
         <tbody>{q.rows.map(row=><tr key={row.rowKey}><th scope="row" className="text-left">{row.label}</th>
           {q.options.map(o=><td className="text-center" key={o.optionKey}><input type="radio"
             name={q.itemKey+':'+row.rowKey} checked={answers[q.itemKey+':'+row.rowKey]===o.optionKey}
-            onChange={()=>choose(q.itemKey+':'+row.rowKey,o.optionKey)}/></td>)}</tr>)}</tbody></table></div>}
+            onChange={()=>choose(q.itemKey+':'+row.rowKey,o.optionKey)}/></td>)}
+          {q.allowRefusal&&<td className="text-center"><input type="radio"
+            aria-label={'不愿回答：'+row.label} name={q.itemKey+':'+row.rowKey}
+            checked={isRefusal(answers[q.itemKey+':'+row.rowKey])}
+            onChange={()=>choose(q.itemKey+':'+row.rowKey,refusal())}/></td>}</tr>)}</tbody></table></div>}
       {['SHORT_TEXT','LONG_TEXT'].includes(q.type)&&<textarea className="input block w-full"
         aria-label={q.prompt||'文本回答'} rows={q.type==='SHORT_TEXT'?1:4}
-        value={String(answers[q.itemKey]||'')} onChange={e=>choose(q.itemKey,e.target.value)}/>}
-      {q.allowRefusal&&<label className="flex gap-2 items-center text-sm">
-        <input type="checkbox" checked={answers[q.itemKey]==='REFUSED'}
-          onChange={e=>choose(q.itemKey,e.target.checked?'REFUSED':'')}/>不愿回答（独立于未作答）
+        value={isRefusal(answers[q.itemKey])?'':String(answers[q.itemKey]??'')}
+        disabled={isRefusal(answers[q.itemKey])}
+        onChange={e=>choose(q.itemKey,e.target.value)}/>}
+      {q.allowRefusal&&q.type!=='MATRIX'&&<label className="flex gap-2 items-center text-sm">
+        <input type="checkbox" checked={isRefusal(answers[q.itemKey])}
+          onChange={e=>choose(q.itemKey,e.target.checked?refusal():null)}/>不愿回答（独立于未作答）
       </label>}
       {q.type==='NUMBER'&&<input className="input block" aria-label={q.prompt||'数值回答'}
         type="number" min={q.min} max={q.max}
-        value={answers[q.itemKey]??''} onChange={e=>choose(q.itemKey,e.target.value===''?'':Number(e.target.value))}/>}
+        value={isRefusal(answers[q.itemKey])?'':String(answers[q.itemKey]??'')}
+        disabled={isRefusal(answers[q.itemKey])}
+        onChange={e=>choose(q.itemKey,e.target.value===''?null:Number(e.target.value))}/>}
     </fieldset>
   }
   return <section className="border rounded-xl p-4 bg-slate-50 space-y-3" aria-label="研究工具试答预览">
@@ -78,7 +98,7 @@ export function ResearchPreview({draft,onSimulate}:{draft:ResearchDraft;onSimula
                 o.optionKey)}/> {o.label}</label>
         })}</fieldset>)}</>}
     {draft.kind!=='FORM'&&<button type="button" className="btn-secondary"
-      onClick={()=>onSimulate({...answers})}>
+      onClick={simulate}>
       计算当前研究性模拟得分</button>}
     {draft.kind==='FORM'&&<p className="text-xs">表单不自动诊断或计分。后续 PR3 的真实作答会由服务端严格验证分支与 FINAL。</p>}
   </section>

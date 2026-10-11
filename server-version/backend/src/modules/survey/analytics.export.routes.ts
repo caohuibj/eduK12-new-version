@@ -13,8 +13,8 @@ const create=z.object({
   waveId:pid.optional(),includeFreeText:z.boolean().optional(),
   completedFrom:z.string().datetime().optional(),completedBefore:z.string().datetime().optional(),
 }).strict()
-surveyExportsRouter.use(authenticateSurvey)
-surveyExportsRouter.use((req,res,next)=>{
+surveyExportsRouter.use('/:projectId/exports',authenticateSurvey)
+surveyExportsRouter.use('/:projectId/exports',(req,res,next)=>{
   if(process.env.SURVEY_ANALYTICS_ENABLED!=='true'){
     return res.status(404).json({code:-1,message:'研究分析仍未完成正式验收',data:null})
   }

@@ -7,7 +7,7 @@ import * as service from './builder.service'
 import { bulkInputSchema, BulkImportError } from './builder.import'
 
 export const surveyBuilderRouter=Router()
-surveyBuilderRouter.use(authenticateSurvey)
+surveyBuilderRouter.use('/:pid/instruments',authenticateSurvey)
 const id=z.string().uuid()
 const create=z.object({
   requestId:id,kind:surveyKindSchema,instrumentKey:surveyKeySchema,

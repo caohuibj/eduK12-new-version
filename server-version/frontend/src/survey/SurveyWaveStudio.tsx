@@ -9,7 +9,8 @@ type Wave={
   revision:number;instrumentIds:string[];publicationId:string|null;
   consentText:string;generalText:string;consentVersion:number;linkageNoticeConfirmed:boolean;
   opensAt:string|null;closesAt:string|null;finishUntil:string|null;
-  quotaStarts:number|null;startsCount:number;allowNewParticipants:boolean
+  quotaStarts:number|null;startsCount:number;allowNewParticipants:boolean;
+  hardStopAt:string|null
 }
 type Preflight={ok:boolean;publicationReady:boolean;reason:string;checks:{
   key:string;ok:boolean;issues:string[];digest?:string}[]}
@@ -258,6 +259,10 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
               <button type="button" className="btn-primary" disabled={busy} onClick={()=>lifecycle('open')}>正式开放本轮</button>}
             {editing.status==='OPEN'&&<button type="button" className="btn-secondary" disabled={busy} onClick={()=>lifecycle('pause')}>暂停新参与</button>}
             {editing.status==='PAUSED'&&<button type="button" className="btn-secondary" disabled={busy} onClick={()=>lifecycle('resume')}>恢复开放</button>}
+            {editing.status==='CLOSED'&&!editing.hardStopAt&&editing.finishUntil
+              &&new Date(editing.finishUntil).getTime()>Date.now()&&
+              <button type="button" className="btn-secondary" disabled={busy}
+                onClick={()=>lifecycle('hard-stop')}>紧急终止剩余在途作答</button>}
             {['OPEN','PAUSED'].includes(editing.status)&&<>
               <button type="button" className="btn-secondary" disabled={busy}
                 onClick={()=>entryToken('rotate')}>轮换招募链接</button>

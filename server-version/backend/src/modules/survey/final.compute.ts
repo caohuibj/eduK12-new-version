@@ -51,7 +51,9 @@ const optionValue=(value:unknown,choices:string[],path:string,required:boolean):
   return value as string
 }
 const formResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
-  const d=assertSurveyDraft('FORM',unit.displayDefinition,true) as FormDraft
+  // Preserve legacy frozen Form branching semantics; current Builder and
+  // newly frozen Publications still reject incompatible condition operators.
+  const d=assertSurveyDraft('FORM',unit.displayDefinition,true,true) as FormDraft
   const valid=new Set(d.pages.flatMap(p=>p.questions.map(q=>q.itemKey)))
   const matrixSubkeys=new Set(d.pages.flatMap(p=>p.questions
     .filter(q=>q.type==='MATRIX')

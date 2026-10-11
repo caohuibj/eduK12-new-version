@@ -18,7 +18,7 @@ const types=surveyMimeTypes
 const fail=(statusCode:number,message:string):never=>{throw new SurveyMediaError(statusCode,message)}
 const id=z.string().uuid()
 const router=Router()
-router.use(authenticateSurvey)
+router.use('/:pid/assets',authenticateSurvey)
 const handle=(fn:(req:Request,res:Response)=>Promise<unknown>)=>async(req:Request,res:Response,next:NextFunction)=>{
   try{const result=await fn(req,res);if(!res.headersSent)success(res,result)}
   catch(e){

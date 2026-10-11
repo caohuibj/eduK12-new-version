@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import {
-  initialSurveyDefinition, validateSurveyDraft, type FormDraft, type ScaleDraft, type SjtDraft,
+  initialSurveyDefinition, validateSurveyDraft, assertSurveyDraft, type FormDraft, type ScaleDraft, type SjtDraft,
 } from '../../modules/survey/builder.definition'
 import { compileResearchScale, compileResearchSjt, previewResearchInstrument } from '../../modules/survey/builder.compiler'
 import { previewBulk, applyBulk, BulkImportError } from '../../modules/survey/builder.import'
+import { computeSurveyFinal } from '../../modules/survey/final.compute'
+import type { ResearchFrozenPublication } from '../../modules/survey/publication.service'
 
 const scale=():ScaleDraft=>({
   schemaVersion:1,respondentType:'participant_self_report',aggregation:'mean',
@@ -62,6 +64,55 @@ describe('Survey research builder contracts without formal publication authority
     changed.pages[0].questions[1].displayIf=undefined
     changed.pages[1].questions[0].itemKey='school'
     expect(validateSurveyDraft('FORM',changed,true).issues.some(i=>i.message.includes('重复'))).toBe(true)
+  })
+  it('rejects invalid conditional operator combinations while allowing valid nested branches',()=>{
+    const form:FormDraft={schemaVersion:1,pages:[{pageKey:'main',title:'多层条件',questions:[
+      {itemKey:'source',type:'MULTIPLE',prompt:'多选来源',required:true,
+        options:[{optionKey:'yes',label:'是'},{optionKey:'no',label:'否'}],rows:[]},
+      {itemKey:'middle',type:'SINGLE',prompt:'第二层',required:true,
+        options:[{optionKey:'go',label:'继续'},{optionKey:'stop',label:'停止'}],rows:[],
+        displayIf:{itemKey:'source',operator:'INCLUDES',optionKey:'yes'}},
+      {itemKey:'last',type:'SHORT_TEXT',prompt:'第三层',required:false,
+        options:[],rows:[],displayIf:{itemKey:'middle',operator:'EQUALS',optionKey:'go'}},
+    ]}]}
+    expect(validateSurveyDraft('FORM',form,true).issues).toHaveLength(0)
+    const invalidMultiple=structuredClone(form)
+    invalidMultiple.pages[0].questions[1].displayIf!.operator='EQUALS'
+    expect(validateSurveyDraft('FORM',invalidMultiple,true).issues.some(x=>
+      x.path.includes('displayIf.operator'))).toBe(true)
+    const invalidSingle=structuredClone(form)
+    invalidSingle.pages[0].questions[2].displayIf!.operator='INCLUDES'
+    expect(validateSurveyDraft('FORM',invalidSingle,true).issues.some(x=>
+      x.path.includes('displayIf.operator'))).toBe(true)
+  })
+  it('preserves pre-v1.1 immutable Form FINAL without allowing new invalid publications',()=>{
+    const legacy:FormDraft={schemaVersion:1,pages:[{pageKey:'page',title:'历史已冻结问卷',questions:[
+      {itemKey:'source',type:'MULTIPLE',prompt:'已经冻结的多选题',required:true,rows:[],
+        options:[{optionKey:'one',label:'选项一'},{optionKey:'two',label:'选项二'}]},
+      {itemKey:'next',type:'SHORT_TEXT',prompt:'旧规则条件题',required:false,rows:[],options:[],
+        // Before v1.1 this combination compiled, but could never match an array.
+        displayIf:{itemKey:'source',operator:'EQUALS',optionKey:'one'}},
+    ]}]}
+    expect(validateSurveyDraft('FORM',legacy,true).issues.some(x=>
+      x.path.includes('displayIf.operator'))).toBe(true)
+    expect(()=>assertSurveyDraft('FORM',legacy,true)).toThrow()
+    expect(assertSurveyDraft('FORM',legacy,true,true)).toEqual(legacy)
+    const snapshot:ResearchFrozenPublication={
+      schemaVersion:1,purpose:'RESEARCH_ONLY',projectId:'existing-project',
+      waveId:'existing-wave',collectionMode:'SINGLE_UNLINKED',
+      consentVersion:1,linkageNoticeConfirmed:false,consentDigest:'old-consent',
+      runtimeStatus:'SURVEY_FINAL_V1',units:[{
+        draftId:'frozen-form',instrumentKey:'legacyform',kind:'FORM',title:'历史问卷',
+        draftRevision:1,sourceDigest:canonicalHash({kind:'FORM',definition:legacy}),
+        scoringDigest:null,compiledDefinition:legacy,displayDefinition:legacy,
+      }],
+    }
+    const final=computeSurveyFinal(snapshot,{legacyform:{source:['one']}})
+    expect(final.units[0].rawAnswers).toEqual({source:['one']})
+    expect(final.units[0].missing).toContainEqual({itemKey:'next',reason:'NOT_SHOWN'})
+    const broken=structuredClone(legacy)
+    broken.pages[0].questions[1].displayIf!.optionKey='does-not-exist'
+    expect(()=>assertSurveyDraft('FORM',broken,true,true)).toThrow()
   })
   it('uses existing ScaleDefinitionV2 scoring for reversal and distinct dimensions',()=>{
     const definition=compileResearchScale('学习动机',scale())

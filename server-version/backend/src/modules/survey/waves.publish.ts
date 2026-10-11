@@ -148,12 +148,15 @@ export async function transitionWave(userId:string,projectId:string,waveId:strin
     const project=await lockOwner(tx,userId,projectId)
     const wave=await lockWave(tx,projectId,waveId)
     if(wave.revision!==revision||!wave.publicationId)fail('波次版本已经变化')
+    const now=new Date()
     const allowed=action==='PAUSE'?wave.status==='OPEN':
       action==='RESUME'?wave.status==='PAUSED':
-      ['OPEN','PAUSED'].includes(wave.status)
+      action==='CLOSE'?['OPEN','PAUSED'].includes(wave.status):
+      ['OPEN','PAUSED'].includes(wave.status)||
+        (wave.status==='CLOSED'&&!wave.hardStopAt
+          &&!!wave.finishUntil&&wave.finishUntil>now)
     if(!allowed)fail('当前波次状态不允许此操作')
     if(action==='RESUME'&&project.status!=='ACTIVE')fail('项目尚未恢复采集资格')
-    const now=new Date()
     const nextStatus=action==='PAUSE'?'PAUSED':action==='RESUME'?'OPEN':'CLOSED'
     const changes:Prisma.SurveyWaveUpdateManyMutationInput={
       status:nextStatus,revision:{increment:1},updatedAt:now,
