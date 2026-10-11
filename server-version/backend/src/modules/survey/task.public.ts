@@ -17,7 +17,7 @@ export async function getOwnResearchTask(input:{
       return {kind:'FORM',instrumentKey:unit.instrumentKey,title:unit.title,
         pages:d.pages.map(page=>({pageKey:page.pageKey,title:page.title,
           questions:page.questions.map(q=>({
-            itemKey:q.itemKey,type:q.type,prompt:q.prompt,required:q.required,
+            itemKey:q.itemKey,type:q.type,prompt:q.prompt,image:q.image,required:q.required,
             options:q.options.map(o=>({optionKey:o.optionKey,label:o.label})),
             rows:q.rows.map(row=>({rowKey:row.rowKey,label:row.label})),
             min:q.min,max:q.max,maxLength:q.maxLength,displayIf:q.displayIf,
@@ -31,7 +31,7 @@ export async function getOwnResearchTask(input:{
     }
     const d=assertSurveyDraft('SJT',unit.displayDefinition,true) as SjtDraft
     return {kind:'SJT',instrumentKey:unit.instrumentKey,title:unit.title,
-      stimulus:d.stimulus,scenarioTitle:d.title,
+      stimulus:d.stimulus,scenarioTitle:d.title,image:d.image,
       questions:d.questions.map(q=>({questionKey:q.questionKey,prompt:q.prompt,
         responseType:q.responseType??'SINGLE',
         minSelections:q.responseType==='MULTIPLE'?(q.minSelections??1):undefined,

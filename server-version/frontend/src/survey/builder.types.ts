@@ -1,9 +1,13 @@
 export type Kind='FORM'|'SCALE'|'SJT'
 export type Option={optionKey:string;label:string;score?:number}
 export type Condition={itemKey:string;operator:'EQUALS'|'INCLUDES';optionKey:string}
+export type SurveyImage={
+  asset:{assetId:string;contentHash:string;mimeType:'image/png'|'image/jpeg'|'image/webp'};
+  altText:string;caption?:string
+}
 export type FormQuestion={
   itemKey:string;type:'SINGLE'|'MULTIPLE'|'SHORT_TEXT'|'LONG_TEXT'|'NUMBER'|'LIKERT'|'MATRIX';
-  prompt:string;required:boolean;allowRefusal?:boolean;options:Option[];rows:{rowKey:string;label:string}[];
+  prompt:string;image?:SurveyImage;required:boolean;allowRefusal?:boolean;options:Option[];rows:{rowKey:string;label:string}[];
   min?:number;max?:number;maxLength?:number;displayIf?:Condition
 }
 export type FormDraft={schemaVersion:1;pages:{pageKey:string;title:string;questions:FormQuestion[]}[]}
@@ -16,7 +20,7 @@ export type ScaleDraft={
 }
 export type SjtDraft={
   schemaVersion:1;respondentType:'student_self_report'|'teacher_self_report';
-  scenarioKey:string;title:string;stimulus:string;author:string;sourceNote:string;
+  scenarioKey:string;title:string;stimulus:string;image?:SurveyImage;author:string;sourceNote:string;
   licenseStatus?:'self_authored'|'authorized'|'unknown';
   redistribution:'allowed'|'restricted'|'unknown';
   metrics:{metricKey:string;label:string;direction:'descriptive'}[];

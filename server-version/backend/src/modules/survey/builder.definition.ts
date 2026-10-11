@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { expandedSurveySjtOptions } from './sjt-selection'
+import { assessmentStaticImageAssetIdentitySchema } from '../assessment-media/assessment-image'
 
 /** Survey-only research drafts, never platform scientific publication definitions. */
 export const surveyKindSchema = z.enum(['FORM','SCALE','SJT'])
@@ -12,6 +13,11 @@ const key = surveyKeySchema
 const option = z.object({
   optionKey: key, label, score: z.number().finite().min(-10000).max(10000).optional(),
 }).strict()
+export const surveyImageSchema=z.object({
+  asset:assessmentStaticImageAssetIdentitySchema,
+  altText:z.string().trim().min(1).max(300),
+  caption:z.string().trim().max(1000).optional(),
+}).strict()
 const condition = z.object({
   itemKey:key, operator:z.enum(['EQUALS','INCLUDES']), optionKey:key,
 }).strict()
@@ -19,6 +25,7 @@ export const formQuestionSchema=z.object({
   itemKey:key,
   type:z.enum(['SINGLE','MULTIPLE','SHORT_TEXT','LONG_TEXT','NUMBER','LIKERT','MATRIX']),
   prompt:note,
+  image:surveyImageSchema.optional(),
   required:z.boolean(),
   allowRefusal:z.boolean().optional(),
   options:z.array(option).max(30).default([]),
@@ -54,6 +61,7 @@ export const sjtDraftSchema=z.object({
   schemaVersion:z.literal(1),
   respondentType:z.enum(['student_self_report','teacher_self_report']),
   scenarioKey:key, title:label,stimulus:note,
+  image:surveyImageSchema.optional(),
   author:label,
   sourceNote:label,
   licenseStatus:z.enum(['self_authored','authorized','unknown']).optional(),
