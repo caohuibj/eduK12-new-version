@@ -9,7 +9,8 @@ export type SurveyPublicImage=Pick<SurveyImage,'asset'|'altText'|'caption'>
 export type FormQuestion={
   itemKey:string;type:'SINGLE'|'MULTIPLE'|'SHORT_TEXT'|'LONG_TEXT'|'NUMBER'|'LIKERT'|'MATRIX';
   prompt:string;image?:SurveyImage;required:boolean;allowRefusal?:boolean;options:Option[];rows:{rowKey:string;label:string}[];
-  min?:number;max?:number;maxLength?:number;displayIf?:Condition
+  min?:number;max?:number;integerOnly?:boolean;step?:number;precision?:number;
+  maxLength?:number;displayIf?:Condition
 }
 export type FormDraft={schemaVersion:1;pages:{pageKey:string;title:string;questions:FormQuestion[]}[]}
 export type ScaleDraft={
