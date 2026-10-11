@@ -24,8 +24,8 @@ beforeEach(() => {
 describe('training presentation and course-first entry', () => {
   it('presents unified login and registration and preserves safe return links', () => {
     render(<MemoryRouter initialEntries={['/?returnTo=%2Fstudent%2Fcourses%2Fcourse-1']}><TrainingPortal /></MemoryRouter>)
-    expect(screen.getByRole('link', { name: '登录', exact: true })).toHaveAttribute('href', '/login?returnTo=%2Fstudent%2Fcourses%2Fcourse-1')
-    expect(screen.getByRole('link', { name: '注册', exact: true })).toHaveAttribute('href', '/register?returnTo=%2Fstudent%2Fcourses%2Fcourse-1')
+    expect(screen.getByRole('link', { name: '登录' })).toHaveAttribute('href', '/login?returnTo=%2Fstudent%2Fcourses%2Fcourse-1')
+    expect(screen.getByRole('link', { name: '注册' })).toHaveAttribute('href', '/register?returnTo=%2Fstudent%2Fcourses%2Fcourse-1')
     expect(screen.getAllByRole('link')).toHaveLength(2)
     expect(screen.queryByRole('navigation', { name: '培训账号入口' })).toBeNull()
     expect(screen.queryByText('登录账号')).toBeNull()
@@ -39,8 +39,8 @@ describe('training presentation and course-first entry', () => {
 
   it('does not carry an external return link into either entrance', () => {
     render(<MemoryRouter initialEntries={['/?returnTo=https%3A%2F%2Fexample.invalid']}><TrainingPortal /></MemoryRouter>)
-    expect(screen.getByRole('link', { name: '登录', exact: true })).toHaveAttribute('href', '/login')
-    expect(screen.getByRole('link', { name: '注册', exact: true })).toHaveAttribute('href', '/register')
+    expect(screen.getByRole('link', { name: '登录' })).toHaveAttribute('href', '/login')
+    expect(screen.getByRole('link', { name: '注册' })).toHaveAttribute('href', '/register')
   })
 
   it('learner home presents only enrolled courses with real course links', async () => {
