@@ -58,6 +58,17 @@ export async function addTeacherRunTrack(input:Key&{
   const link=await activeLink(input)
   if(link.eventStatus!=='DRAFT'||link.runStatus!=='DRAFT')
     fail('HUITEACHER_RUN_NOT_DRAFT')
+  // A normal School diagnosis must invite the whole current Teacher cohort.
+  // Narrow actor selectors are an independently trusted disclosure workflow,
+  // not a knob in the ordinary group Form task API.
+  if(input.resource.family==='FORM'){
+    const whole=(selection:unknown)=>
+      !!selection&&typeof selection==='object'&&!Array.isArray(selection)
+      &&Object.keys(selection as Record<string,unknown>).length===1
+      &&(selection as Record<string,unknown>).kind==='ALL_CURRENT'
+    if(!whole(input.subjectSelector)||!whole(input.respondentSelector))
+      fail('HUITEACHER_FORM_REQUIRES_WHOLE_COHORT',403)
+  }
   const policy=await productionRunResourceAuthorityRegistry.resolveExact(input.resource)
   productionRunResourceAuthorityRegistry.assertStartSupported(input.resource.family)
   // Teacher products cannot silently recruit School psychological self-assessments.

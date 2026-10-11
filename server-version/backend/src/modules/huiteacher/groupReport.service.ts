@@ -118,6 +118,36 @@ export async function readTeacherFormGroupReport(input:{
     `
     if((pending[0]?.count??0)>0)
       reject('HUITEACHER_GROUP_PENDING_FINALS',409)
+    // Release only the complete exact frozen Run cohort, not a 10-of-11
+    // self-selected or attrited subset. Exact counts on partially responding
+    // groups can permit cross-wave differencing and identification.
+    const population=await tx.$queryRaw<Array<{
+      assigned:number;respondents:number;completed:number;
+    }>>`
+      SELECT COUNT(*)::int AS "assigned",
+        COUNT(DISTINCT respondent."user_id")::int AS "respondents",
+        COUNT(*) FILTER(WHERE execution."status"='COMPLETED')::int AS "completed"
+      FROM "assessment_run_executions" execution
+      JOIN "assessment_run_actor_snapshots" respondent
+        ON respondent."organization_id"=execution."organization_id"
+        AND respondent."run_id"=execution."run_id"
+        AND respondent."id"=execution."respondent_actor_snapshot_id"
+        AND respondent."actor_role"='TEACHER'
+      JOIN "assessment_run_tracks" track
+        ON track."organization_id"=execution."organization_id"
+        AND track."run_id"=execution."run_id"
+        AND track."id"=execution."track_id"
+      WHERE execution."organization_id"=${input.organizationId}
+        AND execution."run_id"=${source.runId}
+        AND track."resource_family"='FORM'
+        AND track."resource_key"='huiteacher-form:'||${input.formId}
+        AND track."resource_version"=${source.definitionDigest}
+    `
+    const eligible=population[0]
+    if(!eligible||eligible.assigned<TEACHER_FORM_MIN_RESPONDENTS
+      ||eligible.assigned!==eligible.respondents
+      ||eligible.completed!==eligible.assigned)
+      reject('HUITEACHER_GROUP_INCOMPLETE_COHORT',403)
     const totals=await tx.$queryRaw<Array<{uniqueRespondents:number;finals:number}>>`
       SELECT COUNT(DISTINCT attempt."respondent_user_id")::int AS "uniqueRespondents",
         COUNT(*)::int AS "finals"
@@ -128,7 +158,11 @@ export async function readTeacherFormGroupReport(input:{
         AND attempt."status"='COMPLETED'
       JOIN "assessment_run_executions" execution
         ON execution."id"=attempt."run_execution_id"
+        AND execution."organization_id"=attempt."organization_id"
+        AND execution."run_id"=attempt."run_id"
         AND execution."status"='COMPLETED'
+        AND execution."runtime_binding_kind"='HUITEACHER_FORM_V2'
+        AND execution."runtime_binding_ref"=attempt."id"
       WHERE final."organization_id"=${input.organizationId}
         AND attempt."run_id"=${source.runId}
         AND attempt."form_id"=${input.formId}
@@ -140,6 +174,8 @@ export async function readTeacherFormGroupReport(input:{
     if(n<TEACHER_FORM_MIN_RESPONDENTS)
       reject('HUITEACHER_GROUP_MINIMUM_N_NOT_MET',403)
     if(count!==n)reject('HUITEACHER_GROUP_DUPLICATE_RESPONDENTS',409)
+    if(count!==eligible.assigned)
+      reject('HUITEACHER_GROUP_INCOMPLETE_COHORT',403)
     if(count>MAX_REPORT_FINALS)
       reject('HUITEACHER_GROUP_CAPACITY_LIMIT',409)
     const items=expectedItems(form.definition as FormDraft)
@@ -161,6 +197,13 @@ export async function readTeacherFormGroupReport(input:{
           AND attempt."run_id"=${source.runId}
           AND attempt."form_id"=${input.formId}
           AND attempt."definition_digest"=${source.definitionDigest}
+        JOIN "assessment_run_executions" execution
+          ON execution."id"=attempt."run_execution_id"
+          AND execution."organization_id"=attempt."organization_id"
+          AND execution."run_id"=attempt."run_id"
+          AND execution."status"='COMPLETED'
+          AND execution."runtime_binding_kind"='HUITEACHER_FORM_V2'
+          AND execution."runtime_binding_ref"=attempt."id"
         WHERE final."organization_id"=${input.organizationId}
           AND final."definition_digest"=${source.definitionDigest}
           AND final."id" > ${cursor}
