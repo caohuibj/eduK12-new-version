@@ -1,4 +1,5 @@
 import apiClient from './client'
+import { isTrainingHost } from '../training/context'
 import type { User } from '../types'
 
 export interface LoginRequest {
@@ -12,7 +13,7 @@ export interface LoginData {
 }
 
 export const authApi = {
-  login: (data: LoginRequest) => apiClient.post<LoginData>('/auth/login', data),
+  login: (data: LoginRequest) => apiClient.post<LoginData>(isTrainingHost() ? '/auth/training-login' : '/auth/login', data),
   me: () => apiClient.get<User>('/auth/me'),
   csrf: () => apiClient.get<{ csrfToken: string }>('/auth/csrf'),
   logout: () => apiClient.post<void>('/auth/logout'),

@@ -11,6 +11,8 @@ describe('API session invalidation boundary', () => {
   it('does not treat login, registration, CSRF, or public access failures as session expiry', () => {
     for (const url of [
       '/auth/login',
+      '/auth/training-login',
+      '/auth/training-resolve-code',
       '/auth/register',
       '/auth/csrf',
       '/auth/student-register',

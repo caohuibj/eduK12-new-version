@@ -99,6 +99,7 @@ export function routeTitle(pathname: string, active?: NavigationItem): string {
   if (pathname.endsWith('/history')) return '测评历史'
   if (pathname === '/teacher/login') return '教师邀请码注册'
   if (pathname.endsWith('/register')) return '注册账户'
+  if (pathname === '/login') return '登录'
   if (pathname.endsWith('login')) return '登录 Huisurvey'
   if (pathname.startsWith('/public/')) return '公开测评'
   return active?.label || 'Huisurvey'

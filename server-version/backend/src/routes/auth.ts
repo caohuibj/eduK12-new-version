@@ -7,6 +7,8 @@ import { loginRateLimit, withLoginAccountFailureThrottle } from '../middleware/l
 import { requirePositiveAccountExtension } from '../middleware/accountExtensionValidation'
 import { registrationRateLimit, withRegistrationAdmission } from '../middleware/registrationAdmission'
 
+import { trainingLogin, trainingCodeRateLimit, resolveTrainingCode } from '../modules/training/auth'
+
 const router = Router()
 // A school-origin browser must not create legacy training sessions on the
 // Huischool hostname. Product authority still comes from accountDomain/JWT.
@@ -23,6 +25,8 @@ router.use((req,res,next)=>{
 
 // 公开接口
 router.post('/login', loginRateLimit, withLoginAccountFailureThrottle(authController.login))
+router.post('/training-login', loginRateLimit, withLoginAccountFailureThrottle(trainingLogin))
+router.post('/training-resolve-code', trainingCodeRateLimit, withRegistrationAdmission(resolveTrainingCode, false))
 router.post('/register', registrationRateLimit, withRegistrationAdmission(authController.register))
 router.post('/student-register', registrationRateLimit, withRegistrationAdmission(authController.studentRegister))
 router.post('/verify-teacher-code', registrationRateLimit, withRegistrationAdmission(authController.verifyTeacherCode, false))

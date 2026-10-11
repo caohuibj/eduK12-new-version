@@ -89,7 +89,7 @@ export const shouldInvalidateSession = (error: {
     .replace(/^\/api(?=\/|$)/, '')
     .split('?')[0]
 
-  if (/^\/auth\/(login|csrf|register|student-register|verify-teacher-code|teacher-register)$/.test(pathname)) {
+  if (/^\/auth\/(login|training-login|training-resolve-code|csrf|register|student-register|verify-teacher-code|teacher-register)$/.test(pathname)) {
     return false
   }
   if (pathname.startsWith('/public/') || pathname.startsWith('/checkins/public/')) return false

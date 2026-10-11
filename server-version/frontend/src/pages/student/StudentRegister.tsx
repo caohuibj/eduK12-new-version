@@ -312,7 +312,7 @@ const StudentRegister: React.FC = () => {
 
       <div className={training ? "training-auth-register-entry" : "mt-6 pt-6 border-t text-center"}>
         <p className={training ? "text-sm text-gray-500" : "text-sm text-gray-500 mb-3"}>已经有账号？</p>
-        <Link to={authLink("/student/login")} className={training ? "text-action hover:underline font-medium" : "inline-flex justify-center w-full btn-secondary"}>
+        <Link to={authLink(training ? "/login" : "/student/login")} className={training ? "text-action hover:underline font-medium" : "inline-flex justify-center w-full btn-secondary"}>
           已有账号，去登录
         </Link>
       </div>
