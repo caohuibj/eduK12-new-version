@@ -560,6 +560,14 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
       revision:open.revision,action:'ROTATE',
     })
     expect(rotated.entrySecret).toMatch(/^[A-Za-z0-9_-]{43}$/)
+    await expect(updateWaveEntryToken({
+      actorUserId:randomUUID(),projectId,waveId:current.id,
+      revision:rotated.revision,action:'ROTATE',
+    })).rejects.toThrow()
+    await expect(updateWaveEntryToken({
+      actorUserId:ownerId,projectId,waveId:current.id,
+      revision:open.revision,action:'ROTATE',
+    })).rejects.toThrow()
     expect(rotated.researchUrl).toContain('#entry='+rotated.entrySecret)
     expect(rotated.entrySecret).not.toBe(current.entrySecret)
     await expect(joinLinkedStudy({
