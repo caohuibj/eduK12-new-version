@@ -60,8 +60,31 @@ const strictKeys=(values:string[],path:string,issues:SurveyFlowError['issues'])=
     seen.add(values[i])
   }
 }
+/** Guard recursive AST input before Zod's lazy parser recurses. Bounded even
+ * for malicious deeply nested JSON or cyclic values passed by internal code.
+ * No research answers or persistent state are touched by this preflight. */
+function guardFlowShape(input:unknown){
+  let nodes=0
+  const active=new WeakSet<object>()
+  const visit=(node:unknown,depth:number):void=>{
+    if(node===null||typeof node!=='object')return
+    if(depth>14||++nodes>1500)
+      throw new SurveyFlowError([{path:'flow',message:'流程条件嵌套深度或节点数超过输入预算'}])
+    if(active.has(node))
+      throw new SurveyFlowError([{path:'flow',message:'流程定义不能包含循环结构'}])
+    active.add(node)
+    if(Array.isArray(node)){
+      for(const value of node)visit(value,depth+1)
+    }else{
+      for(const value of Object.values(node))visit(value,depth+1)
+    }
+    active.delete(node)
+  }
+  visit(input,0)
+}
 export function compileSurveyFlow(input:unknown,units:readonly ResearchFrozenUnit[],
   collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES'):FrozenSurveyFlow{
+  guardFlowShape(input)
   const parsed=surveyFlowDraftSchema.safeParse(input)
   if(!parsed.success)throw new SurveyFlowError(parsed.error.issues.map(issue=>({
     path:issue.path.join('.')||'flow',message:issue.message,
@@ -90,6 +113,7 @@ export function compileSurveyFlow(input:unknown,units:readonly ResearchFrozenUni
   }
   const visited=new Set<string>()
   let terminalFound=false
+  let guaranteedStarted=false
   let totalPredicates=0
   const checkText=(raw:string|undefined,path:string)=>{
     if(!raw)return
@@ -165,6 +189,7 @@ export function compileSurveyFlow(input:unknown,units:readonly ResearchFrozenUni
       if(b.instrumentKey&&visited.has(b.instrumentKey))
         error(issues,path+'.instrumentKey','同一个工具不能重复执行')
       if(b.instrumentKey)visited.add(b.instrumentKey)
+      if(!b.when&&b.instrumentKey&&unitMap.has(b.instrumentKey))guaranteedStarted=true
       if(b.title!==undefined||b.body!==undefined||b.termination!==undefined)
         error(issues,path,'工具块不允许携带素材或结束参数')
     }else if(b.kind==='MATERIAL'){
@@ -175,6 +200,8 @@ export function compileSurveyFlow(input:unknown,units:readonly ResearchFrozenUni
       if(!b.termination||b.instrumentKey!==undefined||b.body!==undefined)
         error(issues,path,'END 必须声明终止类别，且不可执行工具或素材')
       if(!b.when)error(issues,path+'.when','END 必须包含明确条件，避免意外终止全部被试')
+      if(!guaranteedStarted)
+        error(issues,path,'提前结束或资格筛除前必须有至少一个无条件执行的研究工具')
       if(b.termination==='SCREEN_OUT'&&![...visited].some(key=>unitMap.get(key)?.kind==='FORM'))
         error(issues,path,'筛除必须依据先前已收集的 Form 条件')
       terminalFound=!b.when // conditional END can be followed by another block
