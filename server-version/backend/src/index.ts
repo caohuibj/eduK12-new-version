@@ -12,6 +12,7 @@ import { surveyProjectsRouter } from './modules/survey/projects.routes'
 import { surveyBuilderRouter } from './modules/survey/builder.routes'
 import { surveyWavesRouter } from './modules/survey/waves.routes'
 import { surveyAnalyticsRouter } from './modules/survey/analytics.routes'
+import { surveyExportsRouter } from './modules/survey/analytics.export.routes'
 import { publicSurveyRouter } from './modules/survey/public.routes'
 import { surveyPlatformRouter } from './modules/survey/platform.routes'
 import assessmentInboxRoutes from './modules/assessment-policy/inbox.routes'
@@ -259,6 +260,7 @@ app.use('/api/survey/auth', surveyAuthRouter)
 app.use('/api/survey/projects', surveyBuilderRouter)
 app.use('/api/survey/projects', surveyWavesRouter)
 app.use('/api/survey/projects', surveyAnalyticsRouter)
+app.use('/api/survey/projects', surveyExportsRouter)
 const publicSurveyFeatureGuard: express.RequestHandler = (_req,res,next)=>{
   if(process.env.SURVEY_WORKSPACE_ENABLED!=='true'||process.env.SURVEY_PUBLICATION_ENABLED!=='true')
     return res.status(404).json({code:-1,message:'Survey 研究采集尚未启用',data:null})
