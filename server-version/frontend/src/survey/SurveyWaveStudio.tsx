@@ -141,8 +141,11 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
   }))
   return <section className="border rounded-xl bg-white p-4 sm:p-6 my-5 space-y-5" aria-label="研究波次">
     <header><h2 className="text-xl font-semibold">研究波次 · T1 / T2 / T3</h2>
-      <p className="text-sm text-slate-600">一个项目可以设置多个采集时间点，同一研究编号会在本项目内跨波次关联。
-        波次正式发布后不能修改其题目、评分和同意内容，只能建立下一份冻结版本。</p></header>
+      <p className="text-sm text-slate-600">
+        {project?.collectionMode==='LINKED_WAVES'
+          ?'本项目用同一随机研究编号关联 T1、T2、T3 等波次；被试需保存私密恢复凭证。'
+          :'本项目每轮均为独立匿名作答，不生成跨波次关联研究编号，也不允许个人纵向匹配。'}
+        波次正式发布后，题目、评分和知情同意即被冻结；改变测量内容应建立新波次。</p></header>
     {error&&<p role="alert" className="bg-red-50 border-l-4 border-red-600 p-3">{error}</p>}
     {notice&&<p role="status" className="bg-teal-50 border-l-4 border-teal-600 p-3">{notice}</p>}
     {project&&<div className="border rounded-lg bg-slate-50 p-3 space-y-3">
