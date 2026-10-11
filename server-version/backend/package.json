@@ -61,7 +61,8 @@
     "bundle:package:install": "tsx src/scripts/bundle-onboarding.ts install",
     "bundle:package:publish": "tsx src/scripts/bundle-onboarding.ts publish",
     "bundle:package:hold": "tsx src/scripts/bundle-onboarding.ts hold",
-    "bundle:package:retire": "tsx src/scripts/bundle-onboarding.ts retire"
+    "bundle:package:retire": "tsx src/scripts/bundle-onboarding.ts retire",
+    "education:teacher-bootstrap": "tsx src/scripts/education-teacher-bootstrap.ts"
   },
   "dependencies": {
     "@node-rs/jieba": "^2.0.1",
