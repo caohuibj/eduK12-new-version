@@ -67,6 +67,11 @@ export function rawWideExport(projectId:string,source:SurveySourceProjection):Su
   if(columnIds.length>255)throw new Error('Wide export exceeds 255 value/absence pairs; use Raw Long')
   const byCode=new Map<string,Map<string,{value:string|number|null;missingReason:string|null}>>()
   const attendance=new Map(source.attendance.map(x=>[x.researchCode+':'+x.waveId,x.status]))
+  // A participant who started but has no FINAL must remain represented as
+  // ABANDONED, not vanish from the cohort's research-code rows.
+  for(const entry of source.attendance)
+    if(!byCode.has(entry.researchCode))
+      byCode.set(entry.researchCode,new Map())
   for(const r of rows){
     const participant=r.researchCode!
     const values=byCode.get(participant)||new Map<string,{value:string|number|null;missingReason:string|null}>()

@@ -133,19 +133,20 @@ export function exportWide(projectId:string,observations:readonly FrozenScoreObs
   const codebook=[...mapped.values()].sort((a,b)=>a.ordinal-b.ordinal||a.column.localeCompare(b.column))
   const columns=['research_code',...codebook.flatMap(x=>[x.column,x.column+'__missing'])]
   if(columns.length>512)throw new Error('Wide format would produce too many columns; use LONG')
-  const byCode=new Map<string,Map<string,number|null>>()
+  const byCode=new Map<string,Map<string,{value:number|null;missingReason:MissingReason|null}>>()
   for(const o of source){
     const participant=o.researchCode!
-    const record=byCode.get(participant)||new Map<string,number|null>()
+    const record=byCode.get(participant)||new Map<string,{value:number|null;missingReason:MissingReason|null}>()
     const column=columnId(o)
     if(record.has(column))throw new Error('Duplicate project code × wave × measurement result')
-    record.set(column,o.missingReason?null:o.value)
+    record.set(column,{value:o.missingReason?null:o.value,missingReason:o.missingReason})
     byCode.set(participant,record)
   }
   const participation=new Map(attendance.map(x=>[x.researchCode+':'+x.waveId,x.status]))
   const rows=[...byCode].sort(([a],[b])=>a.localeCompare(b)).map(([code,record])=>
     [code,...codebook.flatMap(c=>{
-      if(record.has(c.column))return [record.get(c.column),record.get(c.column)===null?'SHOWN_MISSING':null]
+      const value=record.get(c.column)
+      if(value)return [value.value,value.missingReason??(value.value===null?'SHOWN_MISSING':null)]
       const state=participation.get(code+':'+c.waveId)
       return [null,state&&state!=='COMPLETED'?'ABANDONED':'NO_WAVE']
     })])
