@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { authenticateSurvey } from '../../middleware/auth'
 import { success,error } from '../../utils/response'
 import * as service from './analytics.read'
+import {listSampleQuality,setSampleQuality} from './sample-quality.service'
 import { loadSurveySource } from './analytics.source'
 import { describeWave,describePairedScores,describeWaveGroups } from './analytics.descriptive'
 
@@ -25,6 +26,20 @@ const wrap=(fn:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Response,
     next(e)
   }
 }
+// Researcher review is an analysis policy: never update immutable FINAL rows.
+const review=z.object({
+  revision:z.number().int().nonnegative(),
+  verdict:z.enum(['INCLUDED','EXCLUDED']),
+  reason:z.string().trim().min(2).max(1000),
+}).strict()
+surveyAnalyticsRouter.get('/:pid/analytics/quality/attempts',wrap(req=>
+  listSampleQuality(req.user!.userId,id.parse(req.params.pid),
+    Math.min(1000,Math.max(1,Number(req.query.page)||1)))))
+surveyAnalyticsRouter.post('/:pid/analytics/quality/attempts/:attemptId',wrap(req=>
+  setSampleQuality({actorUserId:req.user!.userId,
+    projectId:id.parse(req.params.pid),attemptId:id.parse(req.params.attemptId),
+    ...review.parse(req.body)})))
+
 surveyAnalyticsRouter.get('/:pid/analytics/overview',wrap(req=>
   service.waveOverview(req.user!.userId,id.parse(req.params.pid))))
 surveyAnalyticsRouter.post('/:pid/analytics/paired-counts',wrap(req=>{
