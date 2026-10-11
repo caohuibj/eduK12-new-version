@@ -18,6 +18,7 @@ const payload = { userId: 'user-1', username: 'u1', role: UserRole.STUDENT, toke
 const activePrincipal = {
   userId: 'user-1',
   username: 'u1',
+  accountDomain: 'LEGACY',
   isActive: true,
   isFrozen: false,
   expiresAt: null,
@@ -31,6 +32,7 @@ const activePrincipal = {
 const dbRow = (overrides: Record<string, unknown> = {}) => [{
   id: 'user-1',
   username: 'u1',
+  accountDomain: 'LEGACY',
   isActive: true,
   isFrozen: false,
   expiresAt: null,
@@ -108,6 +110,7 @@ describe('authenticate account status and current authority', () => {
     expect(req.user).toEqual({
       userId: activePrincipal.userId,
       username: activePrincipal.username,
+      accountDomain: activePrincipal.accountDomain,
       role: activePrincipal.role,
       platformRole: activePrincipal.platformRole,
       tokenVersion: activePrincipal.tokenVersion,
