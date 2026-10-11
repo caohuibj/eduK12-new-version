@@ -27,6 +27,12 @@ suite('Survey authorized project-scoped image references — PostgreSQL',()=>{
       accountDomain:'SURVEY',role:'STUDENT',
     }})
     owner=user.id;pid=randomUUID();otherPid=randomUUID();assetId=randomUUID()
+    // SurveyProject.owner_user_id references survey_accounts.user_id,
+    // not users.id. Establish the same independent realm identity as production.
+    const loginName='smedia_'+randomUUID().slice(0,12)
+    await db.surveyAccount.create({data:{
+      userId:owner,loginName,normalizedLogin:loginName,
+    }})
     await db.surveyProject.createMany({data:[
       {id:pid,ownerUserId:owner,title:'素材项目甲',description:'',collectionMode:'SINGLE_UNLINKED'},
       {id:otherPid,ownerUserId:owner,title:'素材项目乙',description:'',collectionMode:'SINGLE_UNLINKED'},
