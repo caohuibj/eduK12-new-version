@@ -10,7 +10,7 @@ import { success } from '../../utils/response'
 import { hashPassword, isValidPassword, PASSWORD_MAX_LENGTH } from '../../utils/password'
 import {
   CampusAdmissionError, replaceCampusRoster, issueCampusActivationCodes,
-  registerCampusStudent, setCampusRegistrationWindow, readCampusClassSummary,
+  registerCampusStudent, claimExistingCampusStudent, setCampusRegistrationWindow, readCampusClassSummary,
   approveCampusClass, readCampusStudentStatus,
   createCampusAdmissionIncident, resolveCampusAdmissionIncident,
   listCampusAdmissionIncidents,
@@ -58,6 +58,20 @@ router.post('/register',registrationRateLimit,withRegistrationAdmission(wrap(asy
   const result=await registerCampusStudent(data)
   return success(res,result,'注册成功，请等待班级统一审批')
 })))
+ 
+// Teacher-only schools can later activate School psychology without issuing a
+// second account. Existing students use their School identity and go through
+// the SAME independent School roster/counselor approval.
+router.post('/claim-existing-student',authenticateSchool,registrationRateLimit,
+  withRegistrationAdmission(wrap(async(req,res)=>{
+    const input=z.object({
+      organizationId:ids,classUnitId:ids,
+      studentNumber:z.string().min(2).max(40),
+      activationCode:z.string().min(24).max(64),
+    }).strict().parse(req.body)
+    return success(res,await claimExistingCampusStudent({actor:req.user!,...input}),
+      '同一教育账号已提交心理健康业务准入，等待班级审批')
+  }),false))
 
 router.get('/my-status',authenticateSchool,wrap(async(req,res)=>
   success(res,await readCampusStudentStatus(req.user!))

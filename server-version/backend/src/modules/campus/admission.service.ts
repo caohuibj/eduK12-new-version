@@ -324,6 +324,84 @@ export async function registerCampusStudent(input: {
   }
 }
 
+// An already-registered education student may separately request Huischool
+// psychology admission when their Teacher-only school later enables it.
+// The same SCHOOL User/campusAccount is retained; School enrollment still
+// requires the independent whole-class psychology-staff approval.
+export async function claimExistingCampusStudent(input:{
+  actor:AuthenticatedPrincipal
+  organizationId:string;classUnitId:string;studentNumber:string;activationCode:string
+}){
+  if(input.actor.accountDomain!=='SCHOOL'||input.actor.role!=='STUDENT')
+    fail('CAMPUS_STUDENT_REQUIRED',403)
+  const studentNoDigest=digestCampusStudentNumber(input.organizationId,input.studentNumber)
+  const codeDigest=digestCode(input.activationCode)
+  if(input.activationCode.length<24||input.activationCode.length>64)
+    fail('CAMPUS_REGISTRATION_INVALID',400)
+  try{return await prisma.$transaction(async tx=>{
+    const user=await tx.user.findFirst({where:{
+      id:input.actor.userId,accountDomain:'SCHOOL',role:UserRole.STUDENT,
+      isActive:true,isFrozen:false,mustChangePassword:false,
+    },select:{id:true,expiresAt:true}})
+    if(!user||(user.expiresAt&&user.expiresAt<=new Date()))
+      fail('CAMPUS_ACCOUNT_REQUIRED',403)
+    const row=await admissionForUpdate(tx,input.organizationId,input.classUnitId)
+    if(row.status!=='OPEN'||!row.windowClosesAt||row.windowClosesAt<=new Date())
+      fail('CAMPUS_REGISTRATION_UNAVAILABLE')
+    const valid=await tx.$queryRaw<Array<{eligibilityId:string;rosterVersion:number;codeId:string}>>`
+      SELECT e."id" AS "eligibilityId",e."roster_version" AS "rosterVersion",
+        code."id" AS "codeId"
+      FROM "campus_student_eligibilities" e
+      JOIN "campus_activation_codes" code
+        ON code."organization_id"=e."organization_id"
+        AND code."class_unit_id"=e."class_unit_id"
+        AND code."roster_version"=e."roster_version"
+      WHERE e."organization_id"=${input.organizationId}
+        AND e."class_unit_id"=${input.classUnitId}
+        AND e."student_no_digest"=${studentNoDigest}
+        AND e."key_version"=1 AND e."status"='VALID'
+        AND e."claimed_user_id" IS NULL
+        AND e."roster_version"=${row.rosterVersion}
+        AND code."code_digest"=${codeDigest}
+        AND code."expires_at">statement_timestamp()
+        AND code."revoked_at" IS NULL AND code."consumed_at" IS NULL
+      FOR UPDATE OF e,code
+    `
+    const credential=valid[0]
+    if(!credential)fail('CAMPUS_REGISTRATION_UNAVAILABLE')
+    const prior=await tx.campusStudentEnrollment.findUnique({
+      where:{userId:user.id},select:{userId:true},
+    })
+    if(prior)fail('CAMPUS_ALREADY_ENROLLED')
+    // Reuse the same User but do not presume its existing Teacher membership
+    // is a psychology-authorized School student enrollment.
+    const affected=await tx.$executeRaw`
+      UPDATE "campus_student_eligibilities" SET "claimed_user_id"=${user.id}
+      WHERE "id"=${credential.eligibilityId} AND "claimed_user_id" IS NULL
+    `
+    if(Number(affected)!==1)fail('CAMPUS_REGISTRATION_UNAVAILABLE')
+    const used=await tx.$executeRaw`
+      UPDATE "campus_activation_codes"
+      SET "consumed_at"=statement_timestamp(),"consumed_user_id"=${user.id}
+      WHERE "id"=${credential.codeId} AND "consumed_at" IS NULL
+    `
+    if(Number(used)!==1)fail('CAMPUS_REGISTRATION_UNAVAILABLE')
+    await tx.campusStudentEnrollment.create({data:{
+      userId:user.id,organizationId:input.organizationId,
+      classUnitId:input.classUnitId,
+      eligibilityId:credential.eligibilityId,rosterVersion:row.rosterVersion,
+    }})
+    return {userId:user.id,status:'PENDING_CLASS_APPROVAL' as const,
+      reusedEducationIdentity:true}
+  })}
+  catch(e:any){
+    if(e instanceof CampusAdmissionError)throw e
+    if(['P2002','23505'].includes(e?.code)||e?.meta?.code==='23505')
+      fail('CAMPUS_REGISTRATION_UNAVAILABLE')
+    throw e
+  }
+}
+
 export async function readCampusClassSummary(input: {
   actor: AuthenticatedPrincipal; organizationId: string; classUnitId: string
 }) {
@@ -374,22 +452,63 @@ export async function approveCampusClass(input: {
     const v=numbers[0]
     if(!v || v.expected===0 || v.eligible!==v.expected
       || v.eligible!==v.registered || v.unresolved!==0) fail('CLASS_NOT_READY')
-    const members=await tx.$queryRaw<Array<{ id:string; userId:string }>>`
+    // Teacher-only students already own an education Membership and class
+    // assignment. Never recreate either identity while approving School's
+    // separate psychology participation. New School students are inserted.
+    await tx.$executeRaw`
       INSERT INTO "organization_memberships" ("id","organization_id","user_id","org_role")
       SELECT gen_random_uuid()::text,s."organization_id",s."user_id",'MEMBER'
       FROM "campus_student_enrollments" s
       WHERE s."class_unit_id"=${input.classUnitId}
+        AND s."roster_version"=${row.rosterVersion}
         AND s."status"='PENDING_CLASS_APPROVAL'
-      RETURNING "id","user_id" AS "userId"
+        AND NOT EXISTS(
+          SELECT 1 FROM "organization_memberships" existing
+          WHERE existing."organization_id"=s."organization_id"
+            AND existing."user_id"=s."user_id"
+            AND existing."valid_from"<=statement_timestamp()
+            AND (existing."valid_until" IS NULL OR existing."valid_until">statement_timestamp())
+        )
+    `
+    const members=await tx.$queryRaw<Array<{ id:string; userId:string }>>`
+      SELECT member."id",member."user_id" AS "userId"
+      FROM "campus_student_enrollments" enrollment
+      JOIN "organization_memberships" member
+        ON member."organization_id"=enrollment."organization_id"
+        AND member."user_id"=enrollment."user_id"
+        AND member."valid_from"<=statement_timestamp()
+        AND (member."valid_until" IS NULL OR member."valid_until">statement_timestamp())
+      JOIN "users" user_row ON user_row."id"=enrollment."user_id"
+        AND user_row."role"='STUDENT' AND user_row."account_domain"='SCHOOL'
+        AND user_row."is_active"=TRUE AND user_row."is_frozen"=FALSE
+      WHERE enrollment."organization_id"=${input.organizationId}
+        AND enrollment."class_unit_id"=${input.classUnitId}
+        AND enrollment."roster_version"=${row.rosterVersion}
+        AND enrollment."status"='PENDING_CLASS_APPROVAL'
     `
     if(members.length!==v.registered) fail('APPROVAL_MEMBERSHIP_MISMATCH')
     const ids=members.map(m=>m.id)
+    const mismatches=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`
+      SELECT a."id" FROM "organization_student_class_assignments" a
+      WHERE a."organization_id"=${input.organizationId}
+        AND a."membership_id" IN (${Prisma.join(ids)})
+        AND a."valid_until" IS NULL
+        AND a."is_primary"=TRUE AND a."class_unit_id"<>${input.classUnitId}
+      LIMIT 1
+    `)
+    if(mismatches.length)fail('CAMPUS_EXISTING_CLASS_MISMATCH')
     await tx.$executeRaw(Prisma.sql`
       INSERT INTO "organization_persona_grants" (
         "id","organization_id","membership_id","persona","granted_by_user_id"
       )
       SELECT gen_random_uuid()::text,${input.organizationId},m."id",'STUDENT',${input.actor.userId}
       FROM "organization_memberships" m WHERE m."id" IN (${Prisma.join(ids)})
+        AND NOT EXISTS(
+          SELECT 1 FROM "organization_persona_grants" p
+          WHERE p."organization_id"=${input.organizationId}
+            AND p."membership_id"=m."id" AND p."persona"='STUDENT'
+            AND p."revoked_at" IS NULL
+        )
     `)
     await tx.$executeRaw(Prisma.sql`
       INSERT INTO "organization_student_class_assignments" (
@@ -397,6 +516,13 @@ export async function approveCampusClass(input: {
       )
       SELECT gen_random_uuid()::text,${input.organizationId},m."id",${input.classUnitId},TRUE
       FROM "organization_memberships" m WHERE m."id" IN (${Prisma.join(ids)})
+        AND NOT EXISTS(
+          SELECT 1 FROM "organization_student_class_assignments" a
+          WHERE a."organization_id"=${input.organizationId}
+            AND a."membership_id"=m."id"
+            AND a."class_unit_id"=${input.classUnitId}
+            AND a."valid_until" IS NULL
+        )
     `)
     await tx.$executeRaw`
       UPDATE "campus_student_enrollments" SET "status"='APPROVED',
