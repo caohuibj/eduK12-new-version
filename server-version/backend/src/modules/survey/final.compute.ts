@@ -14,7 +14,12 @@ export class SurveyFinalValidationError extends Error {
   constructor(readonly path:string,message:string){super(message)}
 }
 function invalid(path:string,message:string): never {throw new SurveyFinalValidationError(path,message)}
-export type AnswerPrimitive=string|number|string[]|Record<string,string>|null
+/** Explicit refusal must not collide with participant-provided free text. */
+export type ExplicitSurveyRefusal={_surveyRefusal:true}
+export type AnswerPrimitive=string|number|string[]|Record<string,string>|ExplicitSurveyRefusal|null
+const isRefusal=(value:unknown):value is ExplicitSurveyRefusal=>
+  !!value&&typeof value==='object'&&!Array.isArray(value)
+  &&Object.keys(value).length===1&&(value as ExplicitSurveyRefusal)._surveyRefusal===true
 export type AnswerMap=Record<string,AnswerPrimitive>
 export interface MissingItem {itemKey:string;reason:'NOT_SHOWN'|'SHOWN_MISSING'|'REFUSED'}
 export interface FrozenUnitResult {
@@ -73,7 +78,7 @@ const formResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
       continue
     }
     const value=answers[q.itemKey]
-    if(q.type!=='MATRIX'&&value==='REFUSED'){
+    if(q.type!=='MATRIX'&&isRefusal(value)){
       if(!q.allowRefusal)invalid(path,'此题未声明允许明确拒答')
       missing.push({itemKey:q.itemKey,reason:'REFUSED'})
       previous[q.itemKey]=null
@@ -99,7 +104,7 @@ const formResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
       const rows:Record<string,string>={}
       for(const row of q.rows){
         const rowKey=q.itemKey+':'+row.rowKey
-        if(answers[rowKey]==='REFUSED'){
+        if(isRefusal(answers[rowKey])){
           if(!q.allowRefusal)invalid(path+'.'+row.rowKey,'此矩阵行未声明允许明确拒答')
           missing.push({itemKey:rowKey,reason:'REFUSED'})
           continue
