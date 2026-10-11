@@ -109,9 +109,6 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
     setQualityRows(data.list);setQualityPage(page);setQualityHistory(null)
   }
   const openQualityHistory=(row:QualityRow,page=1)=>void execute(async()=>{
-    if(qualityHistory?.attemptId===row.attemptId&&qualityHistory.page===page){
-      setQualityHistory(null);return
-    }
     const data=await api<{list:QualityAudit[];page:number}>(
       base+'/analytics/quality/attempts/'+row.attemptId+'/history?page='+page)
     setQualityHistory({attemptId:row.attemptId,page:data.page,list:data.list})
@@ -220,7 +217,8 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
           </div>
           <div className="flex flex-wrap gap-2">
             <button type="button" className="btn-secondary" disabled={busy}
-              onClick={()=>openQualityHistory(row)}>
+              onClick={()=>qualityHistory?.attemptId===row.attemptId
+                ?setQualityHistory(null):openQualityHistory(row)}>
               {qualityHistory?.attemptId===row.attemptId?'收起审核历史':'查看审核历史'}</button>
             <button type="button" className="btn-secondary"
               disabled={busy||qualityReason.trim().length<2}
