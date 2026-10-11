@@ -1,17 +1,19 @@
 # Frontend route inventory
 
-Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx` by `npm run inventory:product-ui`. 136 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
+Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx` by `npm run inventory:product-ui`. 138 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
 
 | Path | Page | Route access | Registration | Current shell | Target mode | Owner | Evidence/status |
 |---|---|---|---|---|---|---|---|
 | / | TrainingPortal | Guest; signed-in redirect | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
+| /login | TrainingLogin | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
+| /register | TrainingRegister | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
 | /admin/login | AdminLogin | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
-| /teacher/login | TeacherLogin | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
+| /teacher/login | TrainingAuthRedirect | Public / unguarded | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /teacher/register | TeacherRegister | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
-| /teacher/account-login | TeacherAccountLogin | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
+| /teacher/account-login | TrainingAuthRedirect | Public / unguarded | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /parent/login | ParentLogin | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
-| /student/login | StudentLogin | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
-| /student/course-login | StudentCourseLogin | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
+| /student/login | TrainingAuthRedirect | Public / unguarded | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /student/course-login | TrainingAuthRedirect | Public / unguarded | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /student/register | StudentRegister | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
 | /parent | ParentHome | PARENT | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /parent/links | ParentLinksPage | PARENT | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
