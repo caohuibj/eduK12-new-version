@@ -115,3 +115,65 @@ export function freshUnlinkedSession(){
 /** Deterministic login/audit digest; passwords and actual bearer tokens must
  * never be emitted in researcher lists, CSV or application logs. */
 export const hashResearchCredential=(secret:string)=>sha256(secret)
+
+/** Data withdrawal is separate from merely revoking future access. Frozen
+ * FINAL rows remain immutable; all future valid-sample stats/exports exclude
+ * attempts marked withdrawn, with an audit trail and retention review.
+ */
+export async function withdrawLinkedResearchData(input:{
+  projectId:string;researchCode:string;accessCredential:string
+}):Promise<{excludedAttempts:number;status:'WITHDRAWN';retention:'PENDING_REVIEW'}>{
+  const participant=await recoverLinkedResearchIdentity(input)
+  return prisma.$transaction(async tx=>{
+    await tx.$queryRaw`
+      SELECT id FROM "survey_participants"
+      WHERE "id"=${participant.participantId} AND "project_id"=${input.projectId}
+      FOR UPDATE
+    `
+    const current=await tx.surveyParticipant.findFirst({where:{
+      id:participant.participantId,projectId:input.projectId,status:'ACTIVE',
+      credentialHash:sha256(input.accessCredential),credentialRevokedAt:null,
+    }})
+    if(!current)fail()
+    const when=new Date()
+    await tx.surveyParticipant.update({where:{id:participant.participantId},data:{
+      status:'WITHDRAWN',credentialRevokedAt:when,
+    }})
+    const excluded=await tx.surveyWaveAttempt.updateMany({where:{
+      projectId:input.projectId,participantId:participant.participantId,
+      excludedAt:null,status:{in:['STARTED','COMPLETED']},
+    },data:{excludedAt:when,status:'WITHDRAWN'}})
+    await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:null,
+      projectId:input.projectId,action:'PARTICIPANT_DATA_WITHDRAWAL',
+      metadata:{excludedAttempts:excluded.count,retention:'PENDING_REVIEW'}}})
+    return {excludedAttempts:excluded.count,status:'WITHDRAWN',retention:'PENDING_REVIEW'}
+  })
+}
+export async function withdrawSingleResearchAttempt(input:{
+  publicId:string;attemptId:string;accessCredential:string
+}):Promise<{excludedAttempts:1;status:'WITHDRAWN';retention:'PENDING_REVIEW'}>{
+  if(!/^[A-Za-z0-9_-]{43}$/.test(input.accessCredential))fail()
+  const proof=sha256(input.accessCredential)
+  return prisma.$transaction(async tx=>{
+    const project=await tx.surveyProject.findFirst({where:{
+      publicId:input.publicId,collectionMode:'SINGLE_UNLINKED',
+    },select:{id:true}})
+    if(!project)fail()
+    await tx.$queryRaw`
+      SELECT id FROM survey_wave_attempts WHERE id=${input.attemptId}
+        AND project_id=${project.id} FOR UPDATE
+    `
+    const attempt=await tx.surveyWaveAttempt.findFirst({where:{
+      id:input.attemptId,projectId:project.id,participantId:null,sessionHash:proof,
+      status:{in:['STARTED','COMPLETED']},excludedAt:null,
+    }})
+    if(!attempt)fail()
+    await tx.surveyWaveAttempt.update({where:{id:attempt.id},data:{
+      status:'WITHDRAWN',excludedAt:new Date(),
+    }})
+    await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:null,
+      projectId:project.id,action:'SINGLE_ATTEMPT_DATA_WITHDRAWAL',
+      metadata:{waveId:attempt.waveId,retention:'PENDING_REVIEW'}}})
+    return {excludedAttempts:1,status:'WITHDRAWN',retention:'PENDING_REVIEW'}
+  })
+}

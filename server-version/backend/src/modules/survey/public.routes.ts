@@ -5,7 +5,7 @@ import { createRedisRateLimiter } from '../../middleware/redisRateLimit'
 import { success,error } from '../../utils/response'
 import { SurveyWaveError } from './waves.service'
 import { SurveyFinalError,submitResearchFinal,readGeneralForOwnAttempt } from './final.service'
-import { ResearchIdentityError,revokeLinkedResearchAccess } from './identity.service'
+import { ResearchIdentityError,revokeLinkedResearchAccess,withdrawLinkedResearchData,withdrawSingleResearchAttempt } from './identity.service'
 import { SurveyFinalValidationError } from './final.compute'
 import { getOwnResearchTask } from './task.public'
 import { resolveSurveyPublicId } from './public-project'
@@ -63,4 +63,17 @@ publicSurveyRouter.post('/r/:publicId/revoke-access',handle(async req=>{
   const params=identity.parse(req.body)
   const projectId=await resolveSurveyPublicId(id.parse(req.params.publicId))
   return revokeLinkedResearchAccess({projectId,...params})
+}))
+
+publicSurveyRouter.post('/r/:publicId/withdraw-linked',handle(async req=>{
+  const params=identity.parse(req.body)
+  const projectId=await resolveSurveyPublicId(id.parse(req.params.publicId))
+  return withdrawLinkedResearchData({projectId,...params})
+}))
+publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/withdraw-data',handle(req=>{
+  const params=z.object({accessCredential:secret}).strict().parse(req.body)
+  return withdrawSingleResearchAttempt({
+    publicId:id.parse(req.params.publicId),
+    attemptId:id.parse(req.params.attemptId),accessCredential:params.accessCredential,
+  })
 }))
