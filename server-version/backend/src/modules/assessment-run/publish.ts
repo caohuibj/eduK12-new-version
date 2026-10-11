@@ -636,7 +636,7 @@ const resolvePairs = async (tx: Tx, organizationId: string, track: PreparedTrack
   return candidates.filter((_, index) => allowed.has(index))
 }
 
-const loadPublisherAuthority = async (tx: Tx, organizationId: string, actorUserId: string): Promise<PublisherAuthority> => {
+const loadPublisherAuthority = async (tx: Tx, organizationId: string, actorUserId: string, runId: string): Promise<PublisherAuthority> => {
   const accountRows = await tx.$queryRaw<Array<{ usable: boolean }>>`
     SELECT (
       u."is_active" = TRUE AND u."is_frozen" = FALSE AND u."must_change_password" = FALSE
@@ -646,11 +646,38 @@ const loadPublisherAuthority = async (tx: Tx, organizationId: string, actorUserI
     FROM "users" u WHERE u."id" = ${actorUserId}
   `
   if (!accountRows[0]?.usable) throw new RunPublishError('AUTHORITY_REVOKED', 'publisher account is not usable', 403)
+  // In a shared education Organization, an ORG_ADMIN fact must never
+  // authorize another product's Run. Determine the owning product by exact
+  // Teacher Run binding, not by user/organization IDs or caller hostname.
+  const ownership=await tx.$queryRaw<Array<{
+    productDomain:string;isTeacherRun:boolean;productEnabled:boolean
+  }>>`
+    SELECT o."product_domain" AS "productDomain",
+      EXISTS(
+        SELECT 1 FROM "huiteacher_evaluation_run_links" link
+        WHERE link."organization_id"=o."id" AND link."run_id"=${runId}
+      ) AS "isTeacherRun",
+      EXISTS(
+        SELECT 1 FROM "education_product_entitlements" e
+        WHERE e."organization_id"=o."id" AND e."status"='ACTIVE'
+          AND e."product"=CASE WHEN EXISTS(
+            SELECT 1 FROM "huiteacher_evaluation_run_links" link
+            WHERE link."organization_id"=o."id" AND link."run_id"=${runId}
+          ) THEN 'HUITEACHER' ELSE 'HUISCHOOL' END
+      ) AS "productEnabled"
+    FROM "organizations" o WHERE o."id"=${organizationId}
+  `
+  const owner=ownership[0]
+  if(!owner)throw new RunPublishError('ORG_NOT_FOUND','Organization unavailable',404)
+  if(owner.productDomain==='SCHOOL'&&!owner.productEnabled)
+    throw new RunPublishError('RUN_PUBLISH_FORBIDDEN','Owning education product is not enabled',403)
   const deny = await tx.$queryRaw<Array<{ permission: string }>>`
     SELECT "permission" FROM "organization_access_denies"
     WHERE "organization_id" = ${organizationId} AND "user_id" = ${actorUserId} AND "lifted_at" IS NULL
   `
-  if (deny.some((row) => ['*', 'ORGANIZATION_GOVERNANCE', 'ASSESSMENT_DELIVERY', 'ASSESSMENT_RUN_PUBLISH', 'RUN_PUBLISH'].includes(row.permission))) {
+  const owningProductDeny=owner.isTeacherRun?'HUITEACHER_ACCESS':'HUISCHOOL_ACCESS'
+  if (deny.some((row) => ['*', 'ORGANIZATION_GOVERNANCE', 'ASSESSMENT_DELIVERY', 'ASSESSMENT_RUN_PUBLISH', 'RUN_PUBLISH',
+    'EDUCATION_ACCESS',...(owner.productDomain==='SCHOOL'?[owningProductDeny]:[])].includes(row.permission))) {
     throw new RunPublishError('AUTHORITY_REVOKED', 'publisher is explicitly denied', 403)
   }
   const memberships = await tx.$queryRaw<Array<{ id: string; orgRole: string }>>`
@@ -680,9 +707,20 @@ const loadPublisherAuthority = async (tx: Tx, organizationId: string, actorUserI
     FROM "organization_counselor_client_relationships"
     WHERE "organization_id" = ${organizationId} AND "counselor_membership_id" = ${membership.id} AND "valid_from" <= statement_timestamp() AND ("valid_until" IS NULL OR "valid_until" > statement_timestamp())
   ` : []
+  const productAdmins=owner.productDomain==='SCHOOL'
+    ?await tx.$queryRaw<Array<{id:string}>>`
+      SELECT "id" FROM "education_product_role_grants"
+      WHERE "organization_id"=${organizationId}
+        AND "membership_id"=${membership.id}
+        AND "product"=${owner.isTeacherRun?'HUITEACHER':'HUISCHOOL'}
+        AND "role"='PRODUCT_ADMIN' AND "revoked_at" IS NULL
+      LIMIT 1
+    `:[]
   const authority = {
     membershipId: membership.id,
-    isOrgAdmin: membership.orgRole === 'ORG_ADMIN',
+    isOrgAdmin: owner.productDomain==='SCHOOL'
+      ?productAdmins.length>0
+      :membership.orgRole === 'ORG_ADMIN',
     teacherPersona: teacherPersona && teacherRows.length > 0,
     counselorPersona: counselorPersona && clientRows.length > 0,
     teacherClassIds: new Set(teacherRows.map((row) => row.classUnitId)),
@@ -845,7 +883,7 @@ export const publishAssessmentRun = async (input: {
         AND "permission" IN ('*', 'ORGANIZATION_GOVERNANCE', 'ASSESSMENT_DELIVERY', 'ASSESSMENT_RUN_PUBLISH', 'RUN_PUBLISH')
     `
     if (denies.length) throw new RunPublishError('RUN_PUBLISH_FORBIDDEN', 'explicit deny prevents Run publication', 403)
-    const authority = await loadPublisherAuthority(tx, input.organizationId, input.actorUserId)
+    const authority = await loadPublisherAuthority(tx, input.organizationId, input.actorUserId, input.runId)
     if (!authority.isOrgAdmin && run.createdByUserId !== input.actorUserId) {
       throw new RunPublishError('RUN_PUBLISH_FORBIDDEN', 'scoped professionals may publish only their own assessment campaigns', 403)
     }
@@ -1002,7 +1040,7 @@ export const previewAssessmentRun = async (input: {
         AND "permission" IN ('*', 'ORGANIZATION_GOVERNANCE', 'ASSESSMENT_DELIVERY', 'ASSESSMENT_RUN_PUBLISH', 'RUN_PUBLISH')
     `
     if (denies.length) throw new RunPublishError('RUN_PUBLISH_FORBIDDEN', 'explicit deny prevents Run preview', 403)
-    const authority = await loadPublisherAuthority(tx, input.organizationId, input.actorUserId)
+    const authority = await loadPublisherAuthority(tx, input.organizationId, input.actorUserId, input.runId)
     if (!authority.isOrgAdmin && runs[0].createdByUserId !== input.actorUserId) {
       throw new RunPublishError('RUN_PUBLISH_FORBIDDEN', 'scoped professionals may preview only their own assessment campaigns', 403)
     }
