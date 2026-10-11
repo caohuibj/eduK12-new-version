@@ -55,6 +55,8 @@ import { effectiveRuntimeResourceConfig } from './config/runtimeResources'
 import legacyArchiveRoutes from './modules/legacy-archive/routes'
 import authRoutes from './routes/auth'
 import campusAuthRoutes from './modules/campus/auth.routes'
+import huiteacherAuthRoutes from './modules/huiteacher/auth.routes'
+import { huiteacherOriginGuard } from './modules/huiteacher/originGuard'
 import campusAdmissionRoutes from './modules/campus/admission.routes'
 import campusStaffRoutes from './modules/campus/staff.routes'
 import { schoolOriginGuard } from './modules/campus/originGuard'
@@ -274,6 +276,13 @@ const publicSurveyFeatureGuard: express.RequestHandler = (_req,res,next)=>{
 app.use('/api/public/survey', publicSurveyFeatureGuard, surveyOriginGuard, publicSurveyRouter)
 app.use('/api/survey/projects', surveyProjectsRouter)
 app.use('/api/platform/survey', surveyFeatureGuard, platformSurveyOriginGuard, surveyPlatformRouter)
+const huiteacherFeatureGuard: express.RequestHandler = (_req,res,next)=>{
+  if(process.env.HUITEACHER_WORKSPACE_ENABLED!=='true')
+    return res.status(404).json({code:-1,message:'Huiteacher 尚未启用',data:null})
+  next()
+}
+app.use('/api/huiteacher',huiteacherFeatureGuard,huiteacherOriginGuard)
+app.use('/api/huiteacher/auth',huiteacherAuthRoutes)
 app.use('/api/campus', schoolOriginGuard)
 app.use('/api/campus/auth', campusAuthRoutes)
 app.use('/api/campus', campusAdmissionRoutes)

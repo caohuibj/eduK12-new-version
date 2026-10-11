@@ -5,7 +5,7 @@ import { prisma } from '../../config/database'
 import { getCookie } from '../../utils/authCookies'
 import { generateToken } from '../../utils/jwt'
 import type { JwtPayload } from '../../types'
-import { setSchoolSessionCookie } from '../../utils/authCookies'
+import { setSchoolSessionCookie, setHuiteacherSessionCookie } from '../../utils/authCookies'
 
 const MFA_PENDING_COOKIE = 'huischool_mfa_pending'
 const PENDING_MAX_AGE_SECONDS = 300
@@ -69,6 +69,20 @@ export async function schoolAccountNeedsMfa(userId:string):Promise<boolean> {
         WHERE m."user_id"=u."id" AND m."valid_from"<=statement_timestamp()
           AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
           AND m."org_role"='ORG_ADMIN'
+      )
+      OR EXISTS (
+        SELECT 1 FROM "education_product_role_grants" r
+        JOIN "organization_memberships" member ON member."id"=r."membership_id"
+          AND member."organization_id"=r."organization_id"
+          AND member."valid_from"<=statement_timestamp()
+          AND (member."valid_until" IS NULL OR member."valid_until">statement_timestamp())
+        JOIN "education_product_entitlements" entitlement
+          ON entitlement."organization_id"=r."organization_id"
+          AND entitlement."product"=r."product" AND entitlement."status"='ACTIVE'
+        JOIN "organizations" organization ON organization."id"=r."organization_id"
+          AND organization."status"='ACTIVE'
+        WHERE member."user_id"=u."id"
+          AND r."role"='PRODUCT_ADMIN' AND r."revoked_at" IS NULL
       )
       OR EXISTS (
         SELECT 1 FROM "organization_capability_grants" c
@@ -154,13 +168,14 @@ async function lockedCredential(tx:Prisma.TransactionClient,userId:string):Promi
 }
 async function issueSchoolFullSession(req:Request,res:Response,user: {
   id:string;username:string;role:JwtPayload['role'];tokenVersion:number;mustChangePassword:boolean
-}) {
+}, product:'HUISCHOOL'|'HUITEACHER'='HUISCHOOL') {
   const token=generateToken({
     userId:user.id,username:user.username,role:user.role,accountDomain:'SCHOOL',
-    tokenVersion:user.tokenVersion,mustChangePassword:user.mustChangePassword,
+    sessionProduct: product, tokenVersion:user.tokenVersion,mustChangePassword:user.mustChangePassword,
     mfaVerifiedAt:Math.floor(Date.now()/1000),
   })
-  setSchoolSessionCookie(req,res,token)
+  if(product==='HUITEACHER')setHuiteacherSessionCookie(req,res,token)
+  else setSchoolSessionCookie(req,res,token)
   clearPendingChallenge(req,res)
 }
 export async function startSchoolMfaEnrollment(raw:string) {
@@ -238,10 +253,10 @@ export async function completeSchoolMfa(raw:string,otp:string,kind:'VERIFY'|'ENR
   })
   return result?{user:result,recoveryCodes}:null
 }
-export async function finishSchoolMfa(req:Request,res:Response,raw:string,otp:string,kind:'VERIFY'|'ENROLL'|'RECOVERY') {
+export async function finishSchoolMfa(req:Request,res:Response,raw:string,otp:string,kind:'VERIFY'|'ENROLL'|'RECOVERY',product:'HUISCHOOL'|'HUITEACHER'='HUISCHOOL') {
   const result=await completeSchoolMfa(raw,otp,kind)
   if(!result)return null
-  await issueSchoolFullSession(req,res,result.user)
+  await issueSchoolFullSession(req,res,result.user,product)
   return { authenticated:true, ...(result.recoveryCodes.length?{recoveryCodes:result.recoveryCodes}:{}) }
 }
 export async function verifySchoolTotpStepUp(userId:string,otp:string):Promise<boolean> {
