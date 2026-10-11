@@ -7,11 +7,10 @@ import { asyncHandler } from '../../middleware/asyncHandler'
 import { success,notFound } from '../../utils/response'
 import { currentRunPopulationAuthoritySql } from '../assessment-run/currentPopulationAuthority'
 import { startAssessmentRunExecution } from '../assessment-run/startExecution'
-import { readRespondentRunSummary } from '../reporting/respondentSummary'
+import { readTeacherPersonalScaleReport } from './scalePersonalReport.service'
 import { compositeController } from '../composite/composite.controller'
 import { relationalRuntimeConsentAuthority } from '../assessment-relational/runtime-consent'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
-import { teacherScaleResource } from './scaleLicense.service'
 
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
@@ -201,6 +200,8 @@ router.get('/run-executions/:executionId/personal-summary',
     if(!scope)return {mode:'NONE',state:'WITHHELD'}
     // Reuse the authoritative score/source-disclosure engine, not an
     // ad-hoc re-score of Form options or a manager-owned artifact.
-    return readRespondentRunSummary(req.user!.userId,executionId)
+    return readTeacherPersonalScaleReport({
+      actorUserId:req.user!.userId,executionId,
+    })
   }))
 export default router
