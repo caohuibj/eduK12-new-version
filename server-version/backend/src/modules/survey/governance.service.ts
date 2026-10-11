@@ -157,6 +157,30 @@ export async function updateResearcherStatus(actorId:string,targetId:string,stat
     return {id:targetId,status:nextStatus}
   })
 }
+/** Irreversible researcher entitlement revoke; no restore path accepts REVOKED.
+ * Retain projects, completed FINALs and auditable history unchanged.
+ */
+export async function revokeResearcherPermanently(actorId:string,targetId:string){
+  return prisma.$transaction(async tx=>{
+    await assertCurrentSystemAdmin(tx,actorId)
+    const account=await tx.surveyAccount.findUnique({where:{userId:targetId}})
+    const grant=await tx.surveyResearcherGrant.findUnique({where:{userId:targetId}})
+    if(!account||!grant||grant.status==='REVOKED')
+      throw new SurveyGovernanceError(404,'研究者不存在或已永久撤销')
+    await tx.surveyResearcherGrant.update({
+      where:{userId:targetId},data:{status:'REVOKED',updatedAt:new Date()},
+    })
+    // Invalidate every existing Survey session and pending MFA challenge.
+    await tx.user.update({where:{id:targetId},data:{tokenVersion:{increment:1}}})
+    await tx.surveyMfaChallenge.deleteMany({where:{userId:targetId}})
+    await tx.surveyInvitation.updateMany({
+      where:{targetUserId:targetId,claimedAt:null,revokedAt:null},
+      data:{revokedAt:new Date()},
+    })
+    await event(tx,actorId,'RESEARCHER_PERMANENTLY_REVOKED',targetId)
+    return {id:targetId,status:'REVOKED' as const}
+  })
+}
 export async function resetResearcherMfa(actorId:string,targetId:string){
   return prisma.$transaction(async tx=>{
     await assertCurrentSystemAdmin(tx,actorId)
