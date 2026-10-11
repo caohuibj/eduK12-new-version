@@ -94,6 +94,53 @@ export async function openWave(userId:string,projectId:string,waveId:string,revi
       entrySecret,expiresAt}
   })
 }
+/** Authoritative token rotation does not mutate immutable research content.
+ * It invalidates previous recruitment capabilities in the same transaction.
+ * Personal recovery credentials are separate and never returned to the owner.
+ */
+export async function updateWaveEntryToken(input:{
+  actorUserId:string;projectId:string;waveId:string;revision:number;
+  action:'ROTATE'|'REVOKE'
+}){
+  enabled()
+  const secret=input.action==='ROTATE'?token():null
+  return prisma.$transaction(async tx=>{
+    const project=await lockOwner(tx,input.actorUserId,input.projectId)
+    const wave=await lockWave(tx,input.projectId,input.waveId)
+    if(!['ACTIVE','PAUSED'].includes(project.status)
+      ||!['OPEN','PAUSED'].includes(wave.status)||!wave.publicationId
+      ||wave.hardStopAt||wave.revision!==input.revision)
+      fail('只有当前活动研究的开放或暂停波次可以管理招募凭证')
+    const now=new Date()
+    if(input.action==='ROTATE'&&(!wave.closesAt||wave.closesAt<=now))
+      fail('采集时间已经结束，不能签发新的招募链接')
+    await tx.surveyEntryToken.updateMany({
+      where:{projectId:input.projectId,waveId:input.waveId,revokedAt:null},
+      data:{revokedAt:now},
+    })
+    if(secret){
+      await tx.surveyEntryToken.create({data:{
+        id:randomUUID(),projectId:input.projectId,waveId:input.waveId,
+        tokenHash:hash(secret),expiresAt:wave.closesAt!,
+      }})
+    }
+    const changed=await tx.surveyWave.updateMany({
+      where:{id:wave.id,projectId:input.projectId,revision:input.revision,status:wave.status},
+      data:{revision:{increment:1},updatedAt:now},
+    })
+    if(changed.count!==1)fail('招募链接管理发生并发冲突')
+    await tx.surveyEvent.create({data:{
+      id:randomUUID(),actorUserId:input.actorUserId,projectId:input.projectId,
+      action:input.action==='ROTATE'?'WAVE_ENTRY_TOKEN_ROTATED':'WAVE_ENTRY_TOKEN_REVOKED',
+      metadata:{waveId:wave.id},
+    }})
+    return {waveId:wave.id,revision:input.revision+1,
+      ...(secret?{
+        researchUrl:'https://survey.eduk12.top/r/'+project.publicId+'#entry='+secret,
+        entrySecret:secret,expiresAt:wave.closesAt,
+      }:{revoked:true})}
+  })
+}
 type WaveTransition='PAUSE'|'RESUME'|'CLOSE'|'HARD_STOP'
 export async function transitionWave(userId:string,projectId:string,waveId:string,revision:number,action:WaveTransition){
   enabled()
