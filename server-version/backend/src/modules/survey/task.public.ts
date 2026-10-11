@@ -1,6 +1,13 @@
 import { assertSurveyDraft, type FormDraft, type ScaleDraft, type SjtDraft } from './builder.definition'
 import { verifiedSurveyAttempt } from './admission.service'
 import { SurveyWaveError } from './waves.service'
+type SurveyFrozenImage=NonNullable<FormDraft['pages'][number]['questions'][number]['image']>
+export function projectPublicSurveyImage(image:SurveyFrozenImage|undefined){
+  if(!image)return undefined
+  return {asset:{assetId:image.asset.assetId,contentHash:image.asset.contentHash,
+    mimeType:image.asset.mimeType},altText:image.altText,
+    ...(image.caption?{caption:image.caption}:{})}
+}
 
 /** No public API may return authored score rules, dimension contributions or
  * frozen private result snapshots. Only the participant's task projection.
@@ -17,7 +24,7 @@ export async function getOwnResearchTask(input:{
       return {kind:'FORM',instrumentKey:unit.instrumentKey,title:unit.title,
         pages:d.pages.map(page=>({pageKey:page.pageKey,title:page.title,
           questions:page.questions.map(q=>({
-            itemKey:q.itemKey,type:q.type,prompt:q.prompt,image:q.image,required:q.required,
+            itemKey:q.itemKey,type:q.type,prompt:q.prompt,image:projectPublicSurveyImage(q.image),required:q.required,allowRefusal:q.allowRefusal===true,
             options:q.options.map(o=>({optionKey:o.optionKey,label:o.label})),
             rows:q.rows.map(row=>({rowKey:row.rowKey,label:row.label})),
             min:q.min,max:q.max,maxLength:q.maxLength,displayIf:q.displayIf,
@@ -31,7 +38,7 @@ export async function getOwnResearchTask(input:{
     }
     const d=assertSurveyDraft('SJT',unit.displayDefinition,true) as SjtDraft
     return {kind:'SJT',instrumentKey:unit.instrumentKey,title:unit.title,
-      stimulus:d.stimulus,scenarioTitle:d.title,image:d.image,
+      stimulus:d.stimulus,scenarioTitle:d.title,image:projectPublicSurveyImage(d.image),
       questions:d.questions.map(q=>({questionKey:q.questionKey,prompt:q.prompt,
         responseType:q.responseType??'SINGLE',
         minSelections:q.responseType==='MULTIPLE'?(q.minSelections??1):undefined,
