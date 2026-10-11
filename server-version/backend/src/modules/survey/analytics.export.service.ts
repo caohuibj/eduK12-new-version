@@ -81,7 +81,8 @@ export async function createSurveyExport(req:Request,input:{
     includeWideSchema:true,completedFrom:from,completedBefore:before,
     ...(paged?{pageMode:true,includeAttendance:!prior}:{}),
     ...(prior?{afterFinal:{id:prior.after.id,completedAt:new Date(prior.after.completedAt)},
-      snapshotCutOff:new Date(prior.cutOff),expectedSourceRevision:prior.sourceRevision}:{}),
+      snapshotCutOff:new Date(prior.cutOff),expectedSourceRevision:prior.sourceRevision,
+      expectedFinalCount:prior.finalCount}:{}),
   })
   if(sources.nextFinalCursor&&prior?.page===100)
     fail(413,'本次受控分批导出超过 25000 个 FINAL，请缩小采集范围')
@@ -89,6 +90,7 @@ export async function createSurveyExport(req:Request,input:{
     v:1,projectId:input.projectId,waveId:input.waveId!,
     format:input.format as SurveyExportCursor['format'],after:sources.nextFinalCursor,
     cutOff:sources.cutOff,sourceRevision:sources.sourceRevision,
+    finalCount:sources.sourceFinalCount??0,
     page:(prior?.page??0)+1,issuedAt:Date.now(),
     completedFrom:input.completedFrom??null,completedBefore:input.completedBefore??null,
     freeTextIncluded:input.includeFreeText===true,
