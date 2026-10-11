@@ -2731,6 +2731,7 @@ model SurveyMfaRecoveryCode {
   @@map("survey_mfa_recovery_codes")
 }
 model SurveyProject {
+  instruments    SurveyInstrumentDraft[]
   id             String   @id
   ownerUserId    String   @map("owner_user_id")
   title          String
@@ -2754,4 +2755,24 @@ model SurveyEvent {
   @@index([actorUserId, createdAt], map: "survey_events_actor_idx")
   @@index([projectId, createdAt], map: "survey_events_project_idx")
   @@map("survey_events")
+}
+
+
+// Project-scoped research-only authoring. Freezing occurs in PR3; never
+// grant access to the legacy scale/SJT publication registry through this row.
+model SurveyInstrumentDraft {
+  id           String        @id
+  projectId    String        @map("project_id")
+  project      SurveyProject @relation(fields:[projectId], references:[id], onDelete:Restrict)
+  instrumentKey String       @map("instrument_key")
+  kind         String
+  title        String
+  definition   Json
+  revision     Int           @default(0)
+  status       String        @default("DRAFT")
+  createdAt    DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime      @default(now()) @map("updated_at") @db.Timestamptz(6)
+  @@unique([projectId, instrumentKey], map:"survey_instruments_project_key_uniq")
+  @@index([projectId, status, updatedAt, id], map:"survey_instruments_project_status_idx")
+  @@map("survey_instrument_drafts")
 }
