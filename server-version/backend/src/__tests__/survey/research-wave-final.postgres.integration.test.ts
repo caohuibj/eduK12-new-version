@@ -510,5 +510,34 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     }
   })
 
+  it('projects multiple verified FINALs from one frozen Publication without duplicated schema columns',async()=>{
+    const w=await wave('同一冻结定义下的多份 FINAL',[toolIds.scale],true)
+    const attempts:string[]=[]
+    for(let i=0;i<2;i++){
+      const person=await joinLinkedStudy({
+        publicId:w.publicId,waveId:w.id,entryToken:w.entrySecret,
+        consent:true,consentVersion:1,
+      })
+      attempts.push(person.attemptId)
+      const task=await getOwnResearchTask({publicId:w.publicId,attemptId:person.attemptId,
+        researchCode:person.researchCode,accessCredential:person.accessCredential})
+      await submitResearchFinal({
+        publicId:w.publicId,attemptId:person.attemptId,
+        researchCode:person.researchCode,accessCredential:person.accessCredential,
+        submissionId:randomUUID(),
+        answers:{[task.units[0].instrumentKey]:{itemone:'o4',itemtwo:'o4'}},
+      })
+    }
+    const source=await loadSurveySource({
+      actorUserId:ownerId,projectId,waveIds:[w.id],includeWideSchema:true,
+    })
+    expect(source.completeAttempts).toBe(2)
+    expect(new Set(source.scores.map(s=>s.attemptId))).toEqual(new Set(attempts))
+    expect(source.codebook).toHaveLength(2)
+    expect(source.scoreColumns).toHaveLength(2)
+    expect(rawWideExport(projectId,source).manifest.rowCount).toBe(2)
+    expect(exportWide(projectId,source.scores,source.attendance,source.scoreColumns).manifest.rowCount).toBe(2)
+  })
+
 
 })
