@@ -352,6 +352,24 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     expect(remaining.scores).toHaveLength(0)
   })
 
+  it('rejects unbounded in-flight completion windows and mismatched replay payloads',async()=>{
+    const id=randomUUID()
+    const closesAt=new Date(Date.now()+86400000).toISOString()
+    await expect(createWave(ownerId,projectId,{
+      requestId:id,title:'不合法超长在途完成窗口',
+      consentText:consent,instrumentIds:[toolIds.scale],
+      closesAt,finishUntil:new Date(Date.now()+4*86400000).toISOString(),
+    })).rejects.toThrow(/两小时/)
+    const good=await createWave(ownerId,projectId,{
+      requestId:id,title:'合法创建',
+      consentText:consent,instrumentIds:[toolIds.scale],
+    })
+    expect(good.id).toBe(id)
+    await expect(createWave(ownerId,projectId,{
+      requestId:id,title:'同一ID却修改同意资料',
+      consentText:consent,instrumentIds:[toolIds.form],
+    })).rejects.toThrow(/冲突|不同内容/)
+  })
   it('atomically reserves exactly one T4 parent Attempt when last research slot is contested',async()=>{
     const created=await createWave(ownerId,projectId,{
       requestId:randomUUID(),title:'T4 有限名额',
@@ -388,13 +406,13 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
   })
   it('serializes project PAUSE before linked recruitment and rejects expired publisher access',async()=>{
     const fresh=await wave('T5 项目状态并发验证',[toolIds.scale],true)
-    let racing:ReturnType<typeof joinLinkedStudy>|undefined
+    let racing:Promise<boolean>|undefined
     await db.$transaction(async tx=>{
       await tx.$queryRaw`SELECT id FROM survey_projects WHERE id=${projectId} FOR UPDATE`
       racing=joinLinkedStudy({
         publicId:fresh.publicId,waveId:fresh.id,entryToken:fresh.entrySecret,
         consentVersion:1,consent:true,
-      })
+      }).then(()=>true,()=>false)
       // Recruitment waits for the project lock and cannot commit a new Attempt
       // after PAUSED was committed.
       await new Promise(resolve=>setTimeout(resolve,75))
@@ -403,7 +421,7 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
       }})
     })
     if(!racing)throw new Error('Recruitment admission task not started')
-    await expect(racing).rejects.toThrow()
+    expect(await racing).toBe(false)
     expect(await db.surveyWaveAttempt.count({where:{waveId:fresh.id}})).toBe(0)
     const current=await db.surveyProject.findUniqueOrThrow({where:{id:projectId}})
     await transitionResearchProject({
