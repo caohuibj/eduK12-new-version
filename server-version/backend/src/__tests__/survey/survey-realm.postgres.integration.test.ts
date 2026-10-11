@@ -158,4 +158,43 @@ suite('Survey realm, TOTP and project ACL — isolated PostgreSQL',()=>{
     await expect(invitePasswordReset(adminId,a.userId)).resolves.toMatchObject({kind:'PASSWORD_RESET'})
   })
 
+  it('archives completed research without allowing an old participant study to be reopened',async()=>{
+    const csrf=await http('/api/survey/auth/csrf')
+    const token=csrf.data.data.csrfToken as string
+    const headers={Cookie:'huisurvey_research_session='+jwt(userId)+'; huisurvey_research_csrf='+token,
+      'X-CSRF-Token':token,'Content-Type':'application/json'}
+    const projectId=randomUUID()
+    await db.surveyProject.create({data:{
+      id:projectId,ownerUserId:userId,title:'研究采集已永久结束',
+      description:'归档不可重开',collectionMode:'LINKED_WAVES',
+      status:'CLOSED',firstPublishedAt:new Date(),
+    }})
+    const archived=await http('/api/survey/projects/'+projectId+'/archive',{
+      method:'POST',headers,body:JSON.stringify({revision:0}),
+    })
+    expect(archived.status).toBe(200)
+    expect(archived.data.data).toMatchObject({status:'ARCHIVED',revision:1})
+    const restored=await http('/api/survey/projects/'+projectId+'/restore',{
+      method:'POST',headers,body:JSON.stringify({revision:1}),
+    })
+    expect(restored.status).toBe(409)
+    expect((await db.surveyProject.findUniqueOrThrow({where:{id:projectId}})).status).toBe('ARCHIVED')
+    expect(await db.surveyEvent.count({where:{projectId,action:'PROJECT_ARCHIVED'}})).toBe(1)
+    const draftId=randomUUID()
+    await db.surveyProject.create({data:{
+      id:draftId,ownerUserId:userId,title:'尚未发布的草稿',
+      description:'',collectionMode:'SINGLE_UNLINKED',status:'DRAFT',
+    }})
+    const archivedDraft=await http('/api/survey/projects/'+draftId+'/archive',{
+      method:'POST',headers,body:JSON.stringify({revision:0}),
+    })
+    expect(archivedDraft.status).toBe(200)
+    const recoveredDraft=await http('/api/survey/projects/'+draftId+'/restore',{
+      method:'POST',headers,body:JSON.stringify({revision:1}),
+    })
+    expect(recoveredDraft.status).toBe(200)
+    expect(recoveredDraft.data.data).toMatchObject({status:'DRAFT',revision:2})
+  })
+
+
 })
