@@ -156,6 +156,7 @@
     "survey_projects": "RUNTIME_RW",
     "survey_publications": "RUNTIME_RW",
     "survey_researcher_grants": "RUNTIME_RW",
+    "survey_sample_reviews": "RUNTIME_RW",
     "survey_wave_attempts": "RUNTIME_RW",
     "survey_wave_finals": "RUNTIME_RW",
     "survey_waves": "RUNTIME_RW",
