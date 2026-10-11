@@ -153,7 +153,7 @@ export function exportWide(projectId:string,observations:readonly FrozenScoreObs
   }
   const participation=new Map(attendance.map(x=>[x.researchCode+':'+x.waveId,x.status]))
   const rows=[...byCode].sort(([a],[b])=>a.localeCompare(b)).map(([code,record])=>
-    [code,...codebook.flatMap(c=>{
+    [code,...codebook.flatMap<string|number|null>(c=>{
       const value=record.get(c.column)
       if(value)return [value.value,value.missingReason??(value.value===null?'SHOWN_MISSING':null)]
       const state=participation.get(code+':'+c.waveId)
