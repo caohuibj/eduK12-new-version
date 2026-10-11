@@ -11,7 +11,7 @@ import { csrfProtection } from '../../middleware/csrf'
 import { surveyProjectsRouter } from '../../modules/survey/projects.routes'
 import { issueSurveyCsrfToken } from '../../utils/authCookies'
 import { isActiveResearcher } from '../../modules/survey/authority'
-import { inviteResearcher, redeemResearcherInvite, authorizeAdmin, invitePasswordReset, resetResearcherMfa, updateResearcherStatus } from '../../modules/survey/governance.service'
+import { inviteResearcher, redeemResearcherInvite, authorizeAdmin, invitePasswordReset, resetResearcherMfa, updateResearcherStatus, revokeResearcherPermanently } from '../../modules/survey/governance.service'
 import {
   startSurveyMfaEnrollment, completeSurveyMfa, totpAt, verifySurveyTotpStepUp,
 } from '../../modules/survey/mfa.service'
@@ -158,6 +158,25 @@ suite('Survey realm, TOTP and project ACL — isolated PostgreSQL',()=>{
     await expect(invitePasswordReset(adminId,a.userId)).resolves.toMatchObject({kind:'PASSWORD_RESET'})
   })
 
+  it('permanently revokes the researcher grant, records audit and forbids restore',async()=>{
+    const invitation=await inviteResearcher(adminId)
+    const login='svdead_'+randomUUID().slice(0,8)
+    await redeemResearcherInvite(requestStub().req,requestStub().res,
+      invitation.token,login,asPassword)
+    const account=await db.surveyAccount.findUniqueOrThrow({where:{normalizedLogin:login}})
+    const v0=(await db.user.findUniqueOrThrow({where:{id:account.userId}})).tokenVersion
+    const revoked=await revokeResearcherPermanently(adminId,account.userId)
+    expect(revoked.status).toBe('REVOKED')
+    expect((await db.user.findUniqueOrThrow({where:{id:account.userId}})).tokenVersion).toBe(v0+1)
+    expect((await db.surveyResearcherGrant.findUniqueOrThrow({where:{userId:account.userId}})).status)
+      .toBe('REVOKED')
+    await expect(updateResearcherStatus(adminId,account.userId,'ACTIVE')).rejects.toThrow()
+    await expect(invitePasswordReset(adminId,account.userId)).rejects.toThrow()
+    await expect(revokeResearcherPermanently(adminId,account.userId)).rejects.toThrow()
+    expect(await db.surveyEvent.count({where:{
+      action:'RESEARCHER_PERMANENTLY_REVOKED',targetUserId:account.userId,
+    }})).toBe(1)
+  })
   it('archives completed research without allowing an old participant study to be reopened',async()=>{
     const csrf=await http('/api/survey/auth/csrf')
     const token=csrf.data.data.csrfToken as string
