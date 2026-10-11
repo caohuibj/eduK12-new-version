@@ -79,9 +79,16 @@ test('copy route is exclusive with all backend, database and unrelated consumers
  assert.doesNotMatch(candidate,/server-version\/backend|prisma|postgres|redis|vitest/);
  assert.equal((candidate.match(/'--target','build'/g)||[]).length,1);
  assert.match(candidate,/RepoDigests/);
+ assert.match(candidate,/'docker','save'/);
+ assert.match(candidate,/imageTarSha256/);
  assert.match(workflow,/--severity HIGH,CRITICAL/);
  assert.match(workflow,/recheck exact diff/);
  assert.match(browser,/checks.image/);
+ assert.match(browser,/MAP training.eduk12.top 127.0.0.1/);
+ assert.match(browser,/MAP school.eduk12.top 127.0.0.1/);
+ assert.match(browser,/route.abort/);
+ assert.match(browser,/browser-failure.png/);
+ assert.match(job('scope'),/homepage-copy' && github.event_name == 'pull_request'/);
  assert.match(browser,/actual scanned Nginx image/);
  assert.match(browser,/finally/);
 });

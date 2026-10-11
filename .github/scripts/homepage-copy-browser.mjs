@@ -12,17 +12,23 @@ assert.equal(run('image','inspect','--format','{{.Id}}',tag),checks.image);
 // The actual scanned Nginx image serves its compiled assets. API calls are
 // anonymous UI-only fixtures; this is never account/permission evidence.
 const container='homepage-copy-browser-'+p.head.slice(0,12);
-let browser;
+let browser, lastPage;
 mkdirSync('homepage-copy-evidence/screenshots',{recursive:true});
 const records=[];
 try {
  run('run','-d','--name',container,'-p','127.0.0.1:3189:80',tag);
- browser=await chromium.launch({headless:true,args:['--host-resolver-rules=MAP training.localhost 127.0.0.1, MAP school.localhost 127.0.0.1']});
+ browser=await chromium.launch({headless:true,args:['--host-resolver-rules=MAP training.eduk12.top 127.0.0.1, MAP school.eduk12.top 127.0.0.1']});
  for(const copy of p.pages) for(const [width,height] of [[1440,900],[390,844]]) {
   const page=await browser.newPage({viewport:{width,height}}), errors=[];
+  lastPage=page;
   page.on('pageerror',error=>errors.push(error.message));
+  // Canonical hosts are resolved to this runner only; block all external traffic.
+  await page.route('**/*',route=>{
+   const url=new URL(route.request().url());
+   return url.port==='3189' && ['training.eduk12.top','school.eduk12.top'].includes(url.hostname) ? route.continue() : route.abort();
+  });
   await page.route('**/api/**',route=>route.fulfill({status:401,contentType:'application/json',body:'{"code":"UNAUTHENTICATED","data":null,"message":"请登录"}'}));
-  const response=await page.goto(`http://${copy.page}.localhost:3189/`);
+  const response=await page.goto(`http://${copy.page}.eduk12.top:3189/`);
   assert.equal(response.status(),200);
   if(copy.page==='training') {
    await page.locator('#training-title').waitFor();
@@ -41,4 +47,10 @@ try {
   records.push({page:copy.page,width,height,status:'success'});await page.close();
  }
  writeFileSync('homepage-copy-evidence/browser.json',JSON.stringify({head:p.head,frontendTree:p.frontendTree,image:checks.image,records,api:'anonymous UI-only fixture; no account or permission claim'},null,2));
+} catch(error) {
+ if(lastPage && !lastPage.isClosed()) {
+  await lastPage.screenshot({path:'homepage-copy-evidence/browser-failure.png',fullPage:true});
+  writeFileSync('homepage-copy-evidence/browser-failure.json',JSON.stringify({url:lastPage.url(),text:await lastPage.locator('body').innerText(),error:String(error)},null,2));
+ }
+ throw error;
 } finally {if(browser)await browser.close();run('rm','-f',container);}

@@ -1,5 +1,5 @@
 """Build only the frontend once; checks and runtime reuse its frozen stages."""
-import json, subprocess, tempfile, time
+import hashlib, json, subprocess, tempfile, time
 from pathlib import Path
 p = json.loads(Path('homepage-copy-plan.json').read_text())
 assert p['route'] == 'homepage-copy' and p['changed'] == ['frontend']
@@ -34,4 +34,8 @@ with tempfile.TemporaryDirectory(prefix='homepage-copy-') as temp:
     phase('changed-source-lint-types-and-frontend-audit', lambda: run(['docker','run','--rm','-v',str(config)+':/app/tsconfig.homepage-copy.json:ro',builder,'sh','-ec',cmd]))
     phase('runtime-from-same-cached-build', lambda: run(args+['--target','runtime','-t',tag,'server-version/frontend']))
 results['image'] = output(['docker','image','inspect','--format','{{.Id}}',tag])
+# Preserve the exact runtime even when a subsequent scan/browser fails.
+image_tar = evidence/'frontend-image.tar'
+run(['docker','save','-o',str(image_tar),tag],300)
+results['imageTarSha256'] = hashlib.sha256(image_tar.read_bytes()).hexdigest()
 (evidence/'checks.json').write_text(json.dumps(results,indent=2))
