@@ -179,7 +179,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
         <h3 className="font-semibold">逐题与描述性统计</h3>
         <div className="flex flex-wrap gap-3 items-end">
           <label className="text-sm">波次
-            <select className="input block" value={waveId} onChange={e=>{setWaveId(e.target.value);setItemStats(null)}}>
+            <select className="input block" value={waveId} onChange={e=>{setWaveId(e.target.value);setItemStats(null);setGroupResult(null);setGroupItem('');setGroupScore('')}}>
               {overview.waves.map(w=><option key={w.id} value={w.id}>T{w.ordinal} {w.title}</option>)}
             </select></label>
           <button type="button" className="btn-secondary" disabled={busy||!waveId} onClick={loadItems}>
