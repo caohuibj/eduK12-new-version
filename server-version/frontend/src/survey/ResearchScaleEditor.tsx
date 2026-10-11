@@ -48,7 +48,8 @@ export function ResearchScaleEditor({value,onChange}:{value:ScaleDraft;onChange:
           ...value.items,{itemKey:researchKey('q'),prompt:'',required:true,reverse:false,
             dimensionKeys:value.dimensions.length?[value.dimensions[0].dimensionKey]:[]},
         ]})}>增加 Likert 题目</button></div>
-      {value.items.map((q,i)=><article className="border bg-slate-50 rounded-lg p-3 space-y-3" key={q.itemKey}>
+      {value.items.map((q,i)=><article className="border bg-slate-50 rounded-lg p-3 space-y-3 scroll-mt-4"
+          id={'survey-scale-'+q.itemKey} tabIndex={-1} key={q.itemKey}>
         <div className="flex gap-2 items-center"><strong className="text-sm">题 {i+1}</strong>
           <button type="button" className="btn-secondary" disabled={i===0}
             onClick={()=>{const items=value.items.slice();[items[i],items[i-1]]=[items[i-1],items[i]];onChange({...value,items})}}>↑</button>

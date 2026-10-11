@@ -37,7 +37,8 @@ export function ResearchFormEditor({value,onChange,projectId}:{value:FormDraft;
       {page.questions.map((q,qi)=>{
         const previous=[...value.pages.slice(0,pi).flatMap(p=>p.questions),...page.questions.slice(0,qi)]
           .filter(q=>['SINGLE','MULTIPLE','LIKERT'].includes(q.type))
-        return <article key={q.itemKey} className="border rounded-lg p-3 bg-slate-50 space-y-3">
+        return <article key={q.itemKey} id={'survey-form-'+q.itemKey} tabIndex={-1}
+          className="border rounded-lg p-3 bg-slate-50 space-y-3 scroll-mt-4">
           <div className="flex flex-wrap gap-2 items-center">
             <strong className="text-sm">题目 {qi+1}</strong>
             <select className="input" aria-label="选择题型" value={q.type} onChange={e=>{

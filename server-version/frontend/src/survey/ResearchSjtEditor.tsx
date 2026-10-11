@@ -69,9 +69,15 @@ export function ResearchSjtEditor({value,onChange,projectId}:{value:SjtDraft;
             {optionKey:researchKey('o'),label:'新选项 1',contributions:newContributions()},
             {optionKey:researchKey('o'),label:'新选项 2',contributions:newContributions()},
           ]}]})}>增加问题</button></div>
-      {value.questions.map((q,i)=><article className="border rounded-lg p-3 bg-slate-50 space-y-3" key={q.questionKey}>
-        <div className="flex gap-3 justify-between"><strong>问题 {i+1}</strong>
-          <button type="button" className="btn-secondary" onClick={()=>onChange({...value,questions:value.questions.filter(x=>x.questionKey!==q.questionKey)})}>删除问题</button></div>
+      {value.questions.map((q,i)=><article className="border rounded-lg p-3 bg-slate-50 space-y-3 scroll-mt-4"
+          id={'survey-sjt-'+q.questionKey} tabIndex={-1} key={q.questionKey}>
+        <div className="flex flex-wrap gap-2 items-center"><strong>问题 {i+1}</strong>
+          <button type="button" className="btn-secondary" disabled={i===0}
+            onClick={()=>{const xs=value.questions.slice();[xs[i],xs[i-1]]=[xs[i-1],xs[i]];onChange({...value,questions:xs})}}>上移</button>
+          <button type="button" className="btn-secondary" disabled={i===value.questions.length-1}
+            onClick={()=>{const xs=value.questions.slice();[xs[i],xs[i+1]]=[xs[i+1],xs[i]];onChange({...value,questions:xs})}}>下移</button>
+          <button type="button" className="btn-secondary"
+            onClick={()=>onChange({...value,questions:value.questions.filter(x=>x.questionKey!==q.questionKey)})}>删除问题</button></div>
         <div className="grid sm:grid-cols-3 gap-3">
           <label className="text-sm">作答方式
             <select className="input block w-full" value={q.responseType??'SINGLE'}

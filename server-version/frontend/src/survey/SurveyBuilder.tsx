@@ -142,7 +142,7 @@ export function SurveyBuilder({projectId}:{projectId:string}){
           onChange={e=>setNewTitle(e.target.value)} placeholder="如：学习动机前测"/></label>
       <button disabled={busy||!newTitle.trim()} className="btn-primary">创建草稿</button>
     </form>
-    <div className="grid md:grid-cols-[220px_minmax(0,1fr)] gap-5">
+    <div className="grid md:grid-cols-[220px_minmax(0,1fr)] xl:grid-cols-[200px_minmax(0,1fr)_250px] gap-5">
       <nav aria-label="当前项目研究工具" className="space-y-2">
         <h3 className="font-semibold text-sm">工具列表</h3>
         {!instruments.length&&<p className="text-xs text-slate-500">暂无工具草稿</p>}
@@ -208,6 +208,54 @@ export function SurveyBuilder({projectId}:{projectId:string}){
       </div>}
       </>}
       </div>
+      <aside aria-label="研究工具属性与题目导航"
+        className="hidden xl:block min-w-0 self-start sticky top-4 max-h-[85vh] overflow-auto rounded-xl bg-slate-50 border p-4 space-y-3">
+        <h3 className="font-semibold">属性与题目导航</h3>
+        {!active&&<p className="text-xs text-slate-600">选择工具后显示其内容结构和保存状态。</p>}
+        {active&&<>
+          <p className="text-sm break-words font-medium">{active.title}</p>
+          <dl className="text-xs space-y-2">
+            <div><dt className="inline">类型：</dt><dd className="inline">{displayKind[active.kind]}</dd></div>
+            <div><dt className="inline">修订：</dt><dd className="inline">v{active.revision}{dirty?'（未保存）':''}</dd></div>
+            <div><dt className="inline">状态：</dt><dd className="inline">{active.status}</dd></div>
+            <div><dt className="inline">工具编码：</dt><dd className="break-all">{active.instrumentKey}</dd></div>
+          </dl>
+          <div className="flex flex-col gap-2">
+            <button type="button" className="btn-primary" disabled={busy||!dirty} onClick={save}>
+              保存当前修订</button>
+            <button type="button" className="btn-secondary" disabled={busy||dirty}
+              onClick={validate}>验证冻结结构</button>
+          </div>
+          {active.kind==='FORM'&&(active.definition as FormDraft).pages.map(page=>
+            <div key={page.pageKey} className="border-t pt-2">
+              <p className="text-sm font-semibold">{page.title||page.pageKey}</p>
+              <nav className="grid gap-1 text-xs mt-2" aria-label="本页题目导航">
+                {page.questions.map(q=><a key={q.itemKey} className="underline break-words"
+                  href={'#survey-form-'+q.itemKey}>{q.prompt.slice(0,36)||'未填写题干'}</a>)}
+              </nav>
+            </div>)}
+          {active.kind==='SCALE'&&<>
+            <h4 className="text-sm font-semibold">维度与问题</h4>
+            {(active.definition as ScaleDraft).dimensions.map(dim=>
+              <p className="text-xs" key={dim.dimensionKey}>{dim.label||dim.dimensionKey} · {dim.direction}</p>)}
+            {(active.definition as ScaleDraft).items.map(q=><a className="block text-xs underline break-words"
+              href={'#survey-scale-'+q.itemKey} key={q.itemKey}>{q.prompt.slice(0,35)||'未填写题干'}</a>)}
+          </>}
+          {active.kind==='SJT'&&<>
+            <h4 className="text-sm font-semibold">共享场景与构念</h4>
+            {(active.definition as SjtDraft).metrics.map(m=><p className="text-xs" key={m.metricKey}>
+              {m.label||m.metricKey}</p>)}
+            {(active.definition as SjtDraft).questions.map(q=><a key={q.questionKey}
+              className="block text-xs underline break-words"
+              href={'#survey-sjt-'+q.questionKey}>{q.prompt.slice(0,35)||'未填写问题'}</a>)}
+          </>}
+          {preview&&!preview.ok&&<p role="alert" className="text-xs text-red-700">
+            结构未通过，先处理 {preview.issues.length} 项错误。目录不代表研究科学效度验证。
+          </p>}
+          <p className="text-xs text-slate-600">左列切换研究工具；中列编辑题目；本列查看属性和快速定位。
+            手机端全部设置保持在题目内可访问，不依赖拖拽。</p>
+        </>}
+      </aside>
     </div>
   </section>
 }
