@@ -197,8 +197,8 @@ export async function withdrawLinkedResearchData(input:{
     }})
     const excluded=await tx.surveyWaveAttempt.updateMany({where:{
       projectId:input.projectId,participantId:participant.participantId,
-      excludedAt:null,status:{in:['STARTED','COMPLETED']},
-    },data:{excludedAt:when,status:'WITHDRAWN'}})
+      excludedAt:null,status:{in:['STARTED','COMPLETED','SCREENED_OUT']},
+    },data:{excludedAt:when,status:'WITHDRAWN',flowAssignmentCipher:null}})
     // An already-created export may still contain withdrawn responses.
     // Revoke future downloads atomically with the participant exclusion.
     await tx.surveyExportTicket.updateMany({where:{
@@ -230,11 +230,11 @@ export async function withdrawSingleResearchAttempt(input:{
     `
     const attempt=await tx.surveyWaveAttempt.findFirst({where:{
       id:input.attemptId,projectId:project.id,participantId:null,sessionHash:proof,
-      status:{in:['STARTED','COMPLETED']},excludedAt:null,
+      status:{in:['STARTED','COMPLETED','SCREENED_OUT']},excludedAt:null,
     }})
     if(!attempt)fail()
     await tx.surveyWaveAttempt.update({where:{id:attempt.id},data:{
-      status:'WITHDRAWN',excludedAt:new Date(),
+      status:'WITHDRAWN',excludedAt:new Date(),flowAssignmentCipher:null,
     }})
     await tx.surveyExportTicket.updateMany({where:{
       projectId:project.id,status:'READY',

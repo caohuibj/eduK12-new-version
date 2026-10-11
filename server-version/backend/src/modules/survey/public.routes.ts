@@ -6,6 +6,7 @@ import { surveyPublicRateLimits } from './public-rate.config'
 import { success,error } from '../../utils/response'
 import { SurveyWaveError } from './waves.service'
 import { SurveyFinalError,submitResearchFinal,readGeneralForOwnAttempt } from './final.service'
+import { screenOutResearchAttempt } from './flow.screen-out.service'
 import { ResearchIdentityError,revokeLinkedResearchAccess,withdrawLinkedResearchData,withdrawSingleResearchAttempt } from './identity.service'
 import { SurveyFinalValidationError } from './final.compute'
 import { getOwnResearchTask } from './task.public'
@@ -35,7 +36,8 @@ const linked=consent.extend({researchCode:code,accessCredential:secret}).strict(
 const identity=z.object({researchCode:code,accessCredential:secret}).strict()
 const proof=z.object({researchCode:code.optional(),accessCredential:secret}).strict()
 const submission=proof.extend({submissionId:z.string().min(16).max(200),
-  answers:z.record(z.record(z.unknown()))}).strict()
+  answers:z.record(z.record(z.unknown())),
+  presentation:z.object({shownBlocks:z.array(z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/)).max(70)}).strict().optional()}).strict()
 const handle=(action:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Response,next:NextFunction)=>{
   try{return success(res,await action(req))}
   catch(e){
@@ -64,6 +66,9 @@ publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/task',handle(req=>
     attemptId:id.parse(req.params.attemptId),...proof.parse(req.body)})))
 publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/final',handle(req=>
   submitResearchFinal({publicId:id.parse(req.params.publicId),
+    attemptId:id.parse(req.params.attemptId),...submission.parse(req.body)})))
+publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/screen-out',handle(req=>
+  screenOutResearchAttempt({publicId:id.parse(req.params.publicId),
     attemptId:id.parse(req.params.attemptId),...submission.parse(req.body)})))
 publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/general',handle(req=>
   readGeneralForOwnAttempt({publicId:id.parse(req.params.publicId),
