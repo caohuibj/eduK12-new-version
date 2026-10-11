@@ -10,7 +10,7 @@ type Wave={
   consentText:string;generalText:string;consentVersion:number;linkageNoticeConfirmed:boolean;
   opensAt:string|null;closesAt:string|null;finishUntil:string|null;
   quotaStarts:number|null;startsCount:number;allowNewParticipants:boolean;
-  finishUntil:string|null;hardStopAt:string|null
+  hardStopAt:string|null
 }
 type Preflight={ok:boolean;publicationReady:boolean;reason:string;checks:{
   key:string;ok:boolean;issues:string[];digest?:string}[]}
