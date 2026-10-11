@@ -3086,3 +3086,16 @@ model HuiteacherFormInstrument {
   @@index([organizationId,status,createdAt(sort:Desc)],map:"huiteacher_forms_org_status_idx")
   @@map("huiteacher_form_instruments")
 }
+
+// Assessment Run remains the single execution authority. Link creation
+// is atomic with draft Run insertion, not an arbitrary cross-product bind.
+model HuiteacherEvaluationRunLink {
+  organizationId String @map("organization_id")
+  eventId        String @map("event_id")
+  runId          String @unique(map:"huiteacher_evaluation_run_links_run_key") @map("run_id")
+  boundByUserId  String @map("bound_by_user_id")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@id([organizationId,eventId])
+  @@index([organizationId,runId],map:"huiteacher_run_links_run_idx")
+  @@map("huiteacher_evaluation_run_links")
+}
