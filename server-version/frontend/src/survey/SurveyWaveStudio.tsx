@@ -38,8 +38,11 @@ const initial=()=>({
   opensAt:'',closesAt:'',quotaStarts:'',allowNewParticipants:false,
 })
 type FormState=ReturnType<typeof initial>
-const time=(raw:string)=>raw?new Date(raw).toISOString():null
-const localTime=(raw:string|null)=>raw?new Date(raw).toISOString().slice(0,16):''
+const localTime=(raw:string|null)=>{
+  if(!raw)return ''
+  const date=new Date(raw)
+  return new Date(date.getTime()-date.getTimezoneOffset()*60000).toISOString().slice(0,16)
+}
 export function SurveyWaveStudio({projectId}:{projectId:string}){
   const path='/projects/'+projectId
   const [waves,setWaves]=useState<Wave[]>([]),[tools,setTools]=useState<Instrument[]>([])

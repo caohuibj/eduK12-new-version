@@ -62,7 +62,7 @@ export async function getPublicResearchInfo(publicId:string){
   return prisma.$transaction(async tx=>{
     const project=await projectPublic(tx,publicId)
     const waves=await tx.surveyWave.findMany({where:{projectId:project.id,
-      status:{in:['OPEN','PAUSED','CLOSED']},publicationId:{not:null}},
+      status:'OPEN',publicationId:{not:null}},
       orderBy:{ordinal:'asc'},take:100,select:{
         id:true,title:true,ordinal:true,status:true,consentText:true,consentVersion:true,
         opensAt:true,closesAt:true,allowNewParticipants:true,
@@ -103,6 +103,7 @@ export async function listOwnLinkedWaves(input:{
     projectId:project.id,publicationId:{not:null},
   },take:100,orderBy:{ordinal:'asc'},select:{
     id:true,title:true,ordinal:true,status:true,opensAt:true,closesAt:true,
+    consentText:true,consentVersion:true,allowNewParticipants:true,
   }})
   const attempts=await prisma.surveyWaveAttempt.findMany({where:{
     projectId:project.id,participantId:identity.participantId,

@@ -136,6 +136,10 @@ export default function SurveyPublicApp(){
   }
   const start=()=>{if(!selectedWave||!agreed)return;void run(async()=>{
     const wave=selectedWave
+    if(info?.project.collectionMode==='LINKED_WAVES'&&wave.attempt){
+      await loadTask(wave.attempt.id,researchCode.trim().toUpperCase(),accessCredential.trim())
+      return
+    }
     if(info?.project.collectionMode==='LINKED_WAVES'){
       if(!researchCode||!accessCredential)throw new Error('请先获取或输入研究编号及私密恢复凭证')
       const started=await publicApi<{attemptId:string}>(base+'/waves/'+wave.id+'/start','POST',{
@@ -215,8 +219,8 @@ export default function SurveyPublicApp(){
             <p className="text-sm text-slate-500">{wave.status==='OPEN'?'开放采集中':wave.status==='CLOSED'?'已结束':'尚未开放'}
               {wave.attempt?' · '+(wave.attempt.status==='COMPLETED'?'已完成':'进行中'):''}</p>
           </div>
-          <button className="btn-secondary" disabled={busy||wave.status!=='OPEN'}
-            onClick={()=>chooseWave(wave)}>选择本轮</button>
+          <button className="btn-secondary" disabled={busy||(wave.status!=='OPEN'&&!wave.attempt)}
+            onClick={()=>chooseWave(wave)}>{wave.attempt?.status==='COMPLETED'?'查看回执':'选择本轮'}</button>
         </div>)}
         {selectedWave&&<div className="bg-slate-50 border rounded-lg p-4 mt-4 space-y-3">
           <h4 className="font-semibold">本轮知情同意 · {selectedWave.title}</h4>
