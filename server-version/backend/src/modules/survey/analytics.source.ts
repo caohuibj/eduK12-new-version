@@ -48,8 +48,8 @@ export interface SurveySourceProjection {
   codebook:ResearchRawCodebook[]
   attendance:{researchCode:string;waveId:string;status:string}[]
 }
-const denied=():never=>{throw new SurveyAnalyticsError(404,'研究数据不可访问')}
-const invalid=(message:string):never=>{throw new SurveyAnalyticsError(409,message)}
+function denied():never{throw new SurveyAnalyticsError(404,'研究数据不可访问')}
+function invalid(message:string):never{throw new SurveyAnalyticsError(409,message)}
 const cleanValue=(v:AnswerPrimitive):string|number|null=>{
   if(v===null||v===undefined)return null
   if(typeof v==='number'||typeof v==='string')return v

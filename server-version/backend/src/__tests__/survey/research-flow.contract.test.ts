@@ -72,6 +72,7 @@ describe('Survey Flow V1 — immutable randomized research execution',()=>{
     expect(()=>chooseSurveyGroup(flow,()=>3)).toThrow()
     const projected=buildSurveyFlowPublicProjection(flow,assigned)
     expect(projected.selectedMaterial?.body).toContain('2026')
+    expect(projected).not.toHaveProperty('planDigest')
     const json=JSON.stringify(projected)
     expect(json).not.toContain('groupKey')
     expect(json).not.toContain('linkedPolicy')
@@ -148,6 +149,10 @@ describe('Survey Flow V1 — immutable randomized research execution',()=>{
     expect(()=>compileSurveyFlow(wrongGroup,units,'LINKED_WAVES')).toThrow(SurveyFlowError)
     const badText=draft();badText.blocks[2].body='{{private_secret}}'
     expect(()=>compileSurveyFlow(badText,units,'LINKED_WAVES')).toThrow(SurveyFlowError)
+    const leakedText=draft();leakedText.experiment!.groups[0].materialBody='{{private_secret}}'
+    expect(()=>compileSurveyFlow(leakedText,units,'LINKED_WAVES')).toThrow(SurveyFlowError)
+    const collision=draft();collision.blocks[2].blockKey='assigned_material'
+    expect(()=>compileSurveyFlow(collision,units,'LINKED_WAVES')).toThrow(SurveyFlowError)
   })
   it('treats absence, null and negative numeric comparisons deterministically',()=>{
     expect(evaluateFlowCondition({op:'IS_MISSING',

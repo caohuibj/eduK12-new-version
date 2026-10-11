@@ -23,7 +23,7 @@ export type FlowDraft={
   blocks:FlowBlock[]
 }
 export type PublicFlow={
-  schemaVersion:1;flowDigest:string;planDigest:string;
+  schemaVersion:1;flowDigest:string;
   selectedMaterial?:{blockKey:'assigned_material';title:string;body:string}
   embeddedData:{key:string;type:'STRING'|'NUMBER'|'BOOLEAN';value:string|number|boolean}[]
   blocks:FlowBlock[]

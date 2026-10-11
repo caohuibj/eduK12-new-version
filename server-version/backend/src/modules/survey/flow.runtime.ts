@@ -7,7 +7,7 @@ import type { FrozenUnitResult,MissingItem } from './final.compute'
 export class SurveyFlowExecutionError extends Error{
   constructor(readonly path:string,message:string){super(message)}
 }
-const fail=(path:string,message:string):never=>{throw new SurveyFlowExecutionError(path,message)}
+function fail(path:string,message:string):never{throw new SurveyFlowExecutionError(path,message)}
 export type FlowPresentationBlock={
   blockKey:string;kind:'INSTRUMENT'|'MATERIAL'|'END';
   instrumentKey?:string;title?:string;body?:string;
@@ -94,7 +94,8 @@ export function executeSurveyFlow(input:{
       break
     }else{
       const unit=byKey.get(block.instrumentKey!)
-      if(!unit||seen.has(unit.instrumentKey))fail('flow.blocks','不存在或重复执行的冻结研究工具')
+      if(!unit)fail('flow.blocks','不存在的冻结研究工具')
+      if(seen.has(unit.instrumentKey))fail('flow.blocks','重复执行的冻结研究工具')
       seen.add(unit.instrumentKey)
       if(!Object.prototype.hasOwnProperty.call(input.answers,unit.instrumentKey))
         fail('answers.'+unit.instrumentKey,'缺少此流程必须完成的研究工具')
@@ -128,7 +129,6 @@ export const buildSurveyFlowPublicProjection=(flow:FrozenSurveyFlow,assignment:S
   const group=flow.experiment?.groups.find(g=>g.groupKey===assignment.groupKey)
   return {
     schemaVersion:1 as const,flowDigest:flow.flowDigest,
-    planDigest:canonicalHash({flowDigest:flow.flowDigest,groupKey:assignment.groupKey}),
     ...(group?{selectedMaterial:{blockKey:'assigned_material',
       title:safeFlowText(group.materialTitle,flow),
       body:safeFlowText(group.materialBody,flow)}}:{}),
