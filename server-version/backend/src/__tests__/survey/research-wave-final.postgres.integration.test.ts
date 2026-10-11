@@ -11,7 +11,7 @@ import { submitResearchFinal,readGeneralForOwnAttempt } from '../../modules/surv
 import { getOwnResearchTask } from '../../modules/survey/task.public'
 import { matchedWaveCounts,waveOverview } from '../../modules/survey/analytics.read'
 import { loadSurveySource } from '../../modules/survey/analytics.source'
-import {listSampleQuality,setSampleQuality} from '../../modules/survey/sample-quality.service'
+import {listSampleQuality,listSampleQualityHistory,setSampleQuality} from '../../modules/survey/sample-quality.service'
 import { rawLongExport,rawWideExport } from '../../modules/survey/analytics.raw-export'
 import { exportWide,exportLong } from '../../modules/survey/analytics.export-format'
 import { describePairedScores } from '../../modules/survey/analytics.descriptive'
@@ -780,6 +780,13 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
       projectId,action:'RESEARCH_SAMPLE_QUALITY_REVIEWED',
       metadata:{path:['attemptId'],equals:person.attemptId},
     }})).toBe(2)
+    const history=await listSampleQualityHistory(ownerId,projectId,person.attemptId,1)
+    expect(history.list).toMatchObject([
+      {revision:2,previousVerdict:'EXCLUDED',verdict:'INCLUDED',reason:'复核后满足纳入标准'},
+      {revision:1,previousVerdict:'INCLUDED',verdict:'EXCLUDED',reason:'预定质量标准未通过'},
+    ])
+    await expect(listSampleQualityHistory(randomUUID(),projectId,person.attemptId,1))
+      .rejects.toThrow()
     expect(await db.surveyWaveFinal.count({where:{attemptId:person.attemptId}})).toBe(1)
   })
   it('bounds one-Wave FINAL exports by half-open completion window and records selection',async()=>{
