@@ -97,6 +97,7 @@ export function describePairedScores(source:SurveySourceProjection,input:{
 }){
   if(source.collectionMode!=='LINKED_WAVES')throw new Error('无法关联匿名研究，不可计算个体配对统计')
   return pairedDescriptive({
-    projectId:source.projectId,observations:source.scores,...input,
+    projectId:source.projectId,observations:source.scores,
+    expectedColumns:source.scoreColumns,...input,
   })
 }
