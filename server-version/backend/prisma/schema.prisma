@@ -2919,3 +2919,23 @@ model SurveyWaveFinal {
   @@index([projectId,waveId,completedAt],map:"survey_finals_project_wave_time_idx")
   @@map("survey_wave_finals")
 }
+
+
+
+// Short-lived encrypted research exports. The platform admin cannot inherit
+// Owner raw-data permissions; every download revalidates current grant + MFA.
+model SurveyExportTicket {
+  id               String   @id
+  projectId        String   @map("project_id")
+  actorUserId      String   @map("actor_user_id")
+  format           String
+  status           String   @default("READY")
+  sourceDigest     String   @map("source_digest")
+  artifactCipher   String   @map("artifact_cipher")
+  artifactHash     String   @map("artifact_hash")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  expiresAt        DateTime @map("expires_at") @db.Timestamptz(6)
+  @@index([projectId,actorUserId,createdAt],map:"survey_exports_project_actor_idx")
+  @@index([expiresAt],map:"survey_exports_expires_idx")
+  @@map("survey_export_tickets")
+}
