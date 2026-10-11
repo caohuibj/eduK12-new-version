@@ -11,6 +11,7 @@ import { surveyAuthRouter } from './modules/survey/auth.routes'
 import { surveyProjectsRouter } from './modules/survey/projects.routes'
 import { surveyBuilderRouter } from './modules/survey/builder.routes'
 import { surveyWavesRouter } from './modules/survey/waves.routes'
+import { surveyAnalyticsRouter } from './modules/survey/analytics.routes'
 import { surveyPlatformRouter } from './modules/survey/platform.routes'
 import assessmentInboxRoutes from './modules/assessment-policy/inbox.routes'
 import { recordCspReport, cspMetricLines } from './services/cspReports'
@@ -256,6 +257,7 @@ app.use('/api/survey', surveyFeatureGuard, surveyOriginGuard)
 app.use('/api/survey/auth', surveyAuthRouter)
 app.use('/api/survey/projects', surveyBuilderRouter)
 app.use('/api/survey/projects', surveyWavesRouter)
+app.use('/api/survey/projects', surveyAnalyticsRouter)
 app.use('/api/survey/projects', surveyProjectsRouter)
 app.use('/api/platform/survey', surveyFeatureGuard, surveyPlatformRouter)
 app.use('/api/campus', schoolOriginGuard)
