@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 import { PrismaClient } from '@prisma/client'
 import { beforeAll,afterAll,describe,expect,it } from 'vitest'
 import { integrationDatabaseUrl } from '../integration/integration-env'
-import { createDraft,updateDraft } from '../../modules/survey/builder.service'
+import { createDraft,getDraft,updateDraft } from '../../modules/survey/builder.service'
 import { createWave,getWave } from '../../modules/survey/waves.service'
 import { prepareWave,openWave } from '../../modules/survey/waves.publish'
 import { joinLinkedStudy,startLinkedWave,getPublicResearchInfo } from '../../modules/survey/admission.service'
@@ -11,6 +11,7 @@ import { getOwnResearchTask } from '../../modules/survey/task.public'
 import { matchedWaveCounts,waveOverview } from '../../modules/survey/analytics.read'
 import { loadSurveySource } from '../../modules/survey/analytics.source'
 import { rawLongExport,rawWideExport } from '../../modules/survey/analytics.raw-export'
+import { describePairedScores } from '../../modules/survey/analytics.descriptive'
 import { createSurveyExport,downloadSurveyExport } from '../../modules/survey/analytics.export.service'
 import { generateToken } from '../../utils/jwt'
 import type { Request } from 'express'
@@ -225,6 +226,66 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     }})
     await db.surveyMfaCredential.create({data:{userId:foreign.id,enabled:true,secretCipher:'synthetic'}})
     await expect(loadSurveySource({actorUserId:foreign.id,projectId})).rejects.toThrow()
+  })
+  it('supports T3 draft revisions under ACTIVE project without mutating old FINAL; marks incompatible scoring',async()=>{
+    const earlier=await db.surveyWaveFinal.findMany({where:{projectId},select:{
+      id:true,definitionDigest:true,resultsHash:true,
+    }})
+    expect(earlier.length).toBe(2)
+    const scaleBefore=await getDraft(ownerId,projectId,toolIds.scale)
+    const revised=structuredClone(scaleBefore.definition) as unknown as ScaleDraft
+    revised.items[1].reverse=false
+    await updateDraft(ownerId,projectId,toolIds.scale,{
+      revision:scaleBefore.revision,title:scaleBefore.title,definition:revised,
+    })
+    const formBefore=await getDraft(ownerId,projectId,toolIds.form)
+    const withRefusal=structuredClone(formBefore.definition) as unknown as FormDraft
+    withRefusal.pages[0].questions[1].allowRefusal=true
+    await updateDraft(ownerId,projectId,toolIds.form,{
+      revision:formBefore.revision,title:formBefore.title,definition:withRefusal,
+    })
+    const w3=await wave('T3 再测',[toolIds.form,toolIds.scale])
+    const started=await startLinkedWave({
+      publicId,waveId:w3.id,...link,consent:true,consentVersion:1,
+    })
+    const task=await getOwnResearchTask({publicId,attemptId:started.attemptId,...link})
+    expect(task.units.map(u=>u.kind)).toEqual(['FORM','SCALE'])
+    const general=await submitResearchFinal({
+      publicId,attemptId:started.attemptId,...link,submissionId:randomUUID(),
+      answers:{
+        [task.units[0].instrumentKey]:{subject:'math',reflection:'REFUSED'},
+        [task.units[1].instrumentKey]:{itemone:'o5',itemtwo:'o5'},
+      },
+    })
+    expect(general.status).toBe('COMPLETED')
+    const source=await loadSurveySource({actorUserId:ownerId,projectId})
+    expect(source.completeAttempts).toBe(3)
+    const explicitRefusal=source.raw.find(r=>r.waveId===w3.id&&r.itemKey==='reflection')
+    expect(explicitRefusal?.missingReason).toBe('REFUSED')
+    const allCode=new Set(source.raw.map(r=>r.researchCode).filter(Boolean))
+    expect([...allCode]).toEqual([link.researchCode])
+    const dimension=source.scores.find(r=>r.waveId===wave1&&r.measurement.scoreKey==='strategy')
+    expect(dimension).toBeDefined()
+    const incompatible=describePairedScores(source,{
+      baselineWaveId:wave1,followupWaveId:w3.id,
+      instrumentKey:dimension!.measurement.instrumentKey,scoreKey:'strategy',
+    })
+    expect(incompatible).toMatchObject({
+      matchedN:1,comparability:'NOT_COMPARABLE',meanPairedChange:null,
+    })
+    const after=await db.surveyWaveFinal.findMany({where:{
+      id:{in:earlier.map(x=>x.id)},
+    },select:{id:true,definitionDigest:true,resultsHash:true}})
+    expect(after).toEqual(earlier)
+  })
+  it('refuses frozen LINKED publication unless explicit linkage disclosure is confirmed',async()=>{
+    const pending=await createWave(ownerId,projectId,{
+      requestId:randomUUID(),title:'未确认关联告知的草稿',
+      consentText:consent,instrumentIds:[toolIds.form],linkageNoticeConfirmed:false,
+    })
+    await expect(prepareWave(ownerId,projectId,pending.id,pending.revision))
+      .rejects.toThrow(/关联|告知/)
+    expect((await getWave(ownerId,projectId,pending.id)).publicationId).toBeNull()
   })
   it('requires fresh Survey TOTP for bounded raw exports and verifies encrypted tickets on download',async()=>{
     const token=(secondsOld:number)=>generateToken({
