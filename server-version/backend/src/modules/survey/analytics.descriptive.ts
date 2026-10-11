@@ -142,7 +142,7 @@ export function describeWaveGroups(source:SurveySourceProjection,input:{
     buckets.set(code,bucket)
   }
   const minGroupN=5
-  const groups=[...buckets].filter(([,b])=>b.attempts.size>=minGroupN)
+  const groups=[...buckets].filter(([,b])=>b.attempts.size>=minGroupN&&b.numbers.length>=minGroupN)
     .sort(([a],[b])=>a.localeCompare(b))
     .map(([code,b])=>({
       optionCode:code,optionLabel:allowed.get(code)!,
