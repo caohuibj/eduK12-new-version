@@ -176,7 +176,8 @@ export async function loadSurveySource(input:{
         ...(input.completedFrom?{gte:input.completedFrom}:{}),
         ...(input.completedBefore?{lt:input.completedBefore}:{}),
       }}:{}),
-      attempt:{status:'COMPLETED' as const,excludedAt:null},
+      attempt:{status:'COMPLETED' as const,excludedAt:null,
+        OR:[{sampleReview:{is:null}},{sampleReview:{is:{verdict:'INCLUDED'}}}]},
     }
     const headers=await tx.surveyWaveFinal.findMany({
       where:finalWhere,select:{id:true,publicationId:true},
@@ -249,6 +250,7 @@ export async function loadSurveySource(input:{
         participantId:{not:null},
       },
       select:{waveId:true,status:true,excludedAt:true,
+        sampleReview:{select:{verdict:true}},
         participant:{select:{researchCode:true,status:true}}},
       take:5001,
     })
@@ -256,7 +258,7 @@ export async function loadSurveySource(input:{
       throw new SurveyAnalyticsError(413,'研究进度数据超出单次读取上限，请缩小波次范围')
     const attendance=attendanceRows.filter(row=>
       row.participant?.status!=='WITHDRAWN'&&row.excludedAt===null)
-      .map(row=>({researchCode:row.participant!.researchCode,waveId:row.waveId,status:row.status}))
+      .map(row=>({researchCode:row.participant!.researchCode,waveId:row.waveId,status:row.sampleReview?.verdict==='EXCLUDED'?'QUALITY_EXCLUDED':row.status}))
     // Row projection remains bounded independently from the ciphertext budget.
     const codebook=new Map<string,ResearchRawCodebook>()
     const scoreColumns:SurveySourceProjection['scoreColumns']=[]
