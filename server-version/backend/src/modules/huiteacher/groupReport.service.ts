@@ -284,6 +284,52 @@ export async function readTeacherFormGroupReport(input:{
         ...(multi?{selectionMode:'NON_EXCLUSIVE' as const}:{}),
       }
     })
+    // Disclosure is also a WRITE event: for a given school and immutable
+    // Form definition, all released waves must use EXACTLY the same frozen
+    // respondent population, preventing 10-of-11 / 11-of-12 differencing.
+    // A mismatch refuses the entire next report. IDs remain internal.
+    const contributors=await tx.$queryRaw<Array<{userId:string}>>`
+      SELECT DISTINCT respondent."user_id" AS "userId"
+      FROM "assessment_run_executions" execution
+      JOIN "assessment_run_tracks" track
+        ON track."organization_id"=execution."organization_id"
+        AND track."run_id"=execution."run_id"
+        AND track."id"=execution."track_id"
+        AND track."resource_family"='FORM'
+        AND track."resource_key"='huiteacher-form:'||${input.formId}
+        AND track."resource_version"=${source.definitionDigest}
+      JOIN "assessment_run_actor_snapshots" respondent
+        ON respondent."id"=execution."respondent_actor_snapshot_id"
+        AND respondent."organization_id"=execution."organization_id"
+        AND respondent."run_id"=execution."run_id"
+        AND respondent."actor_role"='TEACHER'
+      WHERE execution."organization_id"=${input.organizationId}
+        AND execution."run_id"=${source.runId}
+        AND execution."status"='COMPLETED'
+      ORDER BY respondent."user_id"
+    `
+    if(contributors.length!==eligible.assigned)
+      reject('HUITEACHER_GROUP_INCOMPLETE_COHORT',403)
+    const populationDigest=canonicalHash({
+      schemaVersion:1,product:'HUITEACHER',organizationId:input.organizationId,
+      definitionDigest:source.definitionDigest,
+      users:contributors.map(row=>row.userId),
+    })
+    const fence=await tx.$queryRaw<Array<{firstRunId:string}>>`
+      INSERT INTO "huiteacher_group_disclosure_ledgers"
+        ("organization_id","definition_digest","population_digest","first_run_id")
+      VALUES (${input.organizationId},${source.definitionDigest},
+        ${populationDigest},${source.runId})
+      ON CONFLICT ("organization_id","definition_digest")
+      DO UPDATE SET "population_digest"=
+        "huiteacher_group_disclosure_ledgers"."population_digest"
+      WHERE "huiteacher_group_disclosure_ledgers"."population_digest"=
+        EXCLUDED."population_digest"
+      RETURNING "first_run_id" AS "firstRunId"
+    `
+    if(fence.length!==1)
+      reject('HUITEACHER_GROUP_POPULATION_DIFFERENCING_BLOCKED',403)
+
     return {
       source:'VERIFIED_HUITEACHER_FORM_FINAL' as const,
       organizationId:input.organizationId,eventId:input.eventId,

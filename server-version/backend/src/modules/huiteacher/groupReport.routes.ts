@@ -28,6 +28,7 @@ router.get('/organizations/:organizationId/evaluation-events/:eventId/forms/:for
           HUITEACHER_GROUP_NOT_FROZEN:'评价活动和任务均关闭后才能查看固定样本报告',
           HUITEACHER_GROUP_PENDING_FINALS:'仍有未完成作答，不能建立稳定的群体报告',
           HUITEACHER_GROUP_INCOMPLETE_COHORT:'当前群体未全部完成评价，无法披露可推断个体的统计结果',
+          HUITEACHER_GROUP_POPULATION_DIFFERENCING_BLOCKED:'本工具已发布过不同成员构成的报告；为避免跨轮差分识别，本次群体统计被抑制',
           HUITEACHER_GROUP_CAPACITY_LIMIT:'样本规模超出当前受控分析上限',
         } as Record<string,string>)[e.code]||'报告来源、授权或隐私条件不满足',
         data:null,
