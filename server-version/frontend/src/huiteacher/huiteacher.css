@@ -42,3 +42,8 @@
 .ht-app .ht-task fieldset{min-width:0;max-width:100%}
 .ht-app .ht-task table{min-width:480px}
 .ht-app .ht-task .overflow-x-auto{overflow-x:auto;max-width:100%}
+
+.ht-app .ht-personal-report{padding:1rem;border-top:1px solid var(--ht-line);margin-top:1rem}
+.ht-app .ht-personal-metric{margin:1rem 0;padding:1rem;border:1px solid var(--ht-line);border-radius:10px;background:var(--ht-paper)}
+.ht-app .ht-personal-metric strong{font-size:1.6rem;color:var(--ht-copper)}
+.ht-app .ht-personal-metric h5{font-size:1rem;margin:.2rem 0 .8rem}

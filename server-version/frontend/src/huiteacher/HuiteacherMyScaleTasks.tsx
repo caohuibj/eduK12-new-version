@@ -9,8 +9,14 @@ type Task={
   resourceKey:string;title:string;runStatus:string
 }
 type Summary={
-  mode:string;state:'WITHHELD'|'COMPLETED'|'READY';
-  metrics?:Record<string,number|null>
+  state:'WITHHELD'|'COMPLETED'|'READY';mode?:string;
+  title?:string;scientificMaturity?:'PILOT';
+  metrics?:Array<{
+    key:string;label:string;value:number|null;precision:number;
+    headline?:string;summary?:string;direction:string;
+    guidance?:Array<{category:string;text:string}>
+  }>
+  disclaimer?:string;limitations?:string[];explanation?:string
 }
 type Start={state:'STARTED'|'IN_PROGRESS'|'WITHHELD';
   runtimeBindingKind?:string;runtimeBindingRef?:string}
@@ -96,11 +102,24 @@ export function HuiteacherMyScaleTasks({api}:{api:Api}){
           <h4>本人描述性反馈</h4>
           {reports[item.executionId].state!=='READY'
             ?<p>当前报告尚未获准显示。</p>
-            :<><p>以下结果由冻结版本的正式计分规则生成；非诊断、非教师绩效排名。</p>
-              <div className="ht-units">{Object.entries(reports[item.executionId].metrics??{})
-                .map(([key,value])=><span className="ht-tag" key={key}>
-                  {key}：{typeof value==='number'?value:'不可计算'}
-                </span>)}</div></>}
+            :<>
+              <p className="ht-muted">{reports[item.executionId].explanation}</p>
+              <p>科学成熟度：描述性 Pilot，尚无适用常模或临床临界值。</p>
+              {(reports[item.executionId].metrics??[]).map(metric=>
+                <article key={metric.key} className="ht-personal-metric">
+                  <h5>{metric.label}</h5>
+                  <strong>{typeof metric.value==='number'
+                    ?metric.value.toFixed(Math.min(6,Math.max(0,metric.precision)))
+                    :'当前数据不足，不能计算'}</strong>
+                  {metric.headline&&<p>{metric.headline}</p>}
+                  {metric.summary&&<p>{metric.summary}</p>}
+                  {metric.guidance?.map((guide,i)=><p key={i}>{guide.text}</p>)}
+                </article>)}
+              {reports[item.executionId].limitations?.map((t,i)=>
+                <p key={i} className="ht-muted">说明：{t}</p>)}
+              {reports[item.executionId].disclaimer&&<p className="ht-muted">
+                {reports[item.executionId].disclaimer}</p>}
+            </>}
         </div>}
       </article>)}</div>}
     {selected&&attempt&&attempt.status!=='COMPLETED'&&<div className="ht-task">
