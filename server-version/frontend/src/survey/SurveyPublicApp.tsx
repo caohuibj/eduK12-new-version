@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import type { SurveyPublicImage } from './builder.types'
 import { visibleFormKeys,sanitizeFormAnswers } from './form-visibility'
 import { ProfessionalFormAnswer,type ProfessionalAnswer } from './ProfessionalFormAnswer'
@@ -57,11 +57,49 @@ const publicApi=async <T,>(path:string,method='GET',body?:unknown):Promise<T>=>{
   if(!result.ok||envelope.code!==0||!envelope.data)throw new Error(envelope.message||'操作未完成')
   return envelope.data
 }
-function TaskForm({unit,answer,onChange,proof}:{unit:Unit;answer:Record<string,Answer>;
-  onChange:(name:string,value:Answer)=>void;proof:SurveyImageProof}){
+function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange}:{unit:Unit;answer:Record<string,Answer>;
+  onChange:(name:string,value:Answer)=>void;proof:SurveyImageProof;
+  pageIndex:number;onPageChange:(next:number)=>void}){
+  const [pageError,setPageError]=useState('')
+
   const shownFormKeys=unit.kind==='FORM'
     ?visibleFormKeys(unit.pages?.flatMap(p=>p.questions)||[],answer)
     :null
+  const visiblePages=unit.kind==='FORM'?(unit.pages||[])
+    .filter(p=>p.questions.some(q=>shownFormKeys?.has(q.itemKey))):[]
+  const currentIndex=Math.min(pageIndex,Math.max(0,visiblePages.length-1))
+  const activePage=visiblePages[currentIndex]
+  const nextPage=()=>{
+    if(!activePage||currentIndex>=visiblePages.length-1)return
+    for(const q of activePage.questions){
+      if(!shownFormKeys?.has(q.itemKey)||!q.required)continue
+      const keys=['MATRIX','MATRIX_MULTIPLE'].includes(q.type)
+        ?(q.rows||[]).map(row=>q.itemKey+':'+row.rowKey):[q.itemKey]
+      const empty=keys.some(key=>{
+        const value=answer[key]
+        return !isRefusal(value)&&(value===null||value===undefined||value===''||
+          (Array.isArray(value)&&value.length===0))
+      })
+      const rankInvalid=q.type==='RANK_ORDER'&&
+        (!Array.isArray(answer[q.itemKey])||(answer[q.itemKey] as string[]).length!==q.options.length)
+      const totalInvalid=q.type==='CONSTANT_SUM'&&(()=>{
+        const v=answer[q.itemKey]
+        if(!v||typeof v!=='object'||Array.isArray(v)||isRefusal(v))return true
+        const numbers=v as Record<string,number>
+        return q.options.some(opt=>!Number.isFinite(numbers[opt.optionKey]))||
+          Math.abs(q.options.reduce((n,opt)=>n+numbers[opt.optionKey],0)-(q.total??0))>1e-7
+      })()
+      if(empty||rankInvalid||totalInvalid){
+        setPageError('请先完成当前页的必答题：'+q.prompt)
+        document.getElementById('survey-answer-'+unit.instrumentKey+'-'+q.itemKey)?.focus()
+        return
+      }
+    }
+    setPageError('')
+    onPageChange(currentIndex+1)
+    window.requestAnimationFrame(()=>document.getElementById(
+      'survey-page-'+unit.instrumentKey)?.focus())
+  }
   const choice=(q:Question,options:Choice[],kind:'SINGLE'|'MULTIPLE'|'MATRIX'|'LIKERT')=>
     kind==='MULTIPLE'?options.map(o=>{
       const selected=Array.isArray(answer[q.itemKey])?answer[q.itemKey] as string[]:[]
@@ -117,8 +155,24 @@ function TaskForm({unit,answer,onChange,proof}:{unit:Unit;answer:Record<string,A
   }
   return <section className="border rounded-xl bg-slate-50 p-4 my-5">
     <h3 className="text-lg font-semibold">{unit.title}</h3>
-    {unit.kind==='FORM'&&unit.pages?.map(page=><div key={page.pageKey}>
-      <h4 className="mt-4 font-medium">{page.title}</h4>{page.questions.map(item)}</div>)}
+    {unit.kind==='FORM'&&<div>
+      <p className="text-sm mt-3" role="status">第 {activePage?currentIndex+1:0} / {visiblePages.length} 页
+        （本研究所有页面完成后只提交一次正式答卷）</p>
+      <progress className="w-full" max={Math.max(1,visiblePages.length)}
+        value={activePage?currentIndex+1:0} aria-label="本工具作答进度"/>
+      {activePage&&<div key={activePage.pageKey}>
+        <h4 className="mt-4 font-medium scroll-mt-5" id={'survey-page-'+unit.instrumentKey}
+          tabIndex={-1}>{activePage.title}</h4>
+        {activePage.questions.map(item)}
+      </div>}
+      {pageError&&<p role="alert" className="text-sm text-red-700 my-2">{pageError}</p>}
+      <nav aria-label="问卷分页" className="flex justify-between gap-3 mt-4">
+        <button type="button" className="btn-secondary" disabled={currentIndex===0}
+          onClick={()=>{setPageError('');onPageChange(Math.max(0,currentIndex-1))}}>上一页</button>
+        <button type="button" className="btn-secondary"
+          disabled={!activePage||currentIndex>=visiblePages.length-1} onClick={nextPage}>下一页</button>
+      </nav>
+    </div>}
     {unit.kind==='SCALE'&&unit.items?.map(q=>item({...q,type:'LIKERT',options:unit.responseOptions||[]}))}
     {unit.kind==='SJT'&&<><p className="mt-2 font-medium">{unit.scenarioTitle}</p>
       <p className="whitespace-pre-wrap mb-4 text-sm">{unit.stimulus}</p>
@@ -141,11 +195,14 @@ export default function SurveyPublicApp(){
   const [proofReceived,setProofReceived]=useState(false),[home,setHome]=useState<Wave[]|null>(null)
   const [selectedWave,setSelectedWave]=useState<Wave|null>(null),[agreed,setAgreed]=useState(false)
   const [task,setTask]=useState<Task|null>(null),[answers,setAnswers]=useState<Record<string,Record<string,Answer>>>({})
+  const [formPages,setFormPages]=useState<Record<string,number>>({})
   const [attemptId,setAttemptId]=useState(''),[submissionId,setSubmissionId]=useState('')
   const [general,setGeneral]=useState<General|null>(null),[notice,setNotice]=useState('')
   const [withdrawn,setWithdrawn]=useState(false),[revoked,setRevoked]=useState(false)
   // SHORT-LIVED same-tab recovery only. Never shared across waves or devices.
   const [singleResume,setSingleResume]=useState<SingleResume|null>(()=>readSingleResume(publicId))
+  const taskState=useRef<Task|null>(null)
+  taskState.current=task
   const base='/r/'+publicId
   // Only the already-authorized local browser tab may recover unfinished answers.
   useEffect(()=>{
@@ -169,10 +226,21 @@ export default function SurveyPublicApp(){
       const message=parseError(e);setError(message)
       // The server returns answers.<itemKey>[.<matrixRow>] on FINAL failure.
       const itemKey=message.match(/answers\.([a-z][a-z0-9_-]*)/i)?.[1]
-      if(itemKey)window.requestAnimationFrame(()=>{
+      if(itemKey&&taskState.current){
+        const match=taskState.current.units.find(unit=>unit.kind==='FORM'&&unit.pages?.some(
+          page=>page.questions.some(q=>q.itemKey===itemKey)))
+        if(match){
+          const current=answers[match.instrumentKey]||{}
+          const visible=visibleFormKeys(match.pages?.flatMap(p=>p.questions)||[],current)
+          const pages=match.pages?.filter(p=>p.questions.some(q=>visible.has(q.itemKey)))||[]
+          const index=pages.findIndex(p=>p.questions.some(q=>q.itemKey===itemKey))
+          if(index>=0)setFormPages(prev=>({...prev,[match.instrumentKey]:index}))
+        }
+      }
+      if(itemKey)window.setTimeout(()=>{
         const target=document.querySelector<HTMLElement>('[id$="-'+itemKey+'"]')
         target?.focus();target?.scrollIntoView({block:'center'})
-      })
+      },0)
     }finally{setBusy(false)}
   }
   const recover=(e:FormEvent)=>{e.preventDefault();void run(async()=>{
@@ -195,7 +263,7 @@ export default function SurveyPublicApp(){
     })
     setAttemptId(id)
     setSubmissionId(crypto.randomUUID())
-    setTask(data)
+    setTask(data);setFormPages({})
     if(data.status==='COMPLETED'){
       clearLocalSurveyDraft(publicId,id)
       setAnswers({})
@@ -400,13 +468,21 @@ export default function SurveyPublicApp(){
           <p className="text-xs text-slate-500 mt-2">未提交答案仅在当前浏览器标签页暂存，至多两小时；
             关闭标签、使用其他设备或清理浏览器数据后无法恢复。公共电脑建议完成后立即退出。</p></div>
         {task.units.map(unit=><TaskForm key={unit.instrumentKey} unit={unit}
+          pageIndex={formPages[unit.instrumentKey]??0}
+          onPageChange={next=>setFormPages(current=>({...current,[unit.instrumentKey]:next}))}
           proof={{publicId,attemptId,accessCredential,
             ...(info.project.collectionMode==='LINKED_WAVES'?{researchCode}:{}),
           }}
           answer={answers[unit.instrumentKey]||{}} onChange={(key,value)=>setAnswers(previous=>({
             ...previous,[unit.instrumentKey]:{...(previous[unit.instrumentKey]||{}),[key]:value},
           }))}/>)}
-        <button className="btn-primary" disabled={busy}>提交本轮正式回答</button>
+        <button className="btn-primary" disabled={busy||!task.units.every(unit=>{
+          if(unit.kind!=='FORM')return true
+          const vis=visibleFormKeys(unit.pages?.flatMap(p=>p.questions)||[],
+            answers[unit.instrumentKey]||{})
+          const pages=(unit.pages||[]).filter(p=>p.questions.some(q=>vis.has(q.itemKey)))
+          return (formPages[unit.instrumentKey]??0)>=pages.length-1
+        })}>提交本轮正式回答</button>
       </form>}
       {general&&<section className="bg-white border rounded-xl p-5 space-y-3">
         <h2 className="text-xl font-semibold">本轮回答已完成</h2>
