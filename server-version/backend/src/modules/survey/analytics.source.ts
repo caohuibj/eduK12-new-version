@@ -10,7 +10,7 @@ import { SurveyAnalyticsError } from './analytics.read'
 
 export interface ResearchRawCodebook {
   columnKey:string;waveId:string;waveOrdinal:number;instrumentKey:string;
-  itemKey:string;kind:'FORM'|'SCALE'|'SJT';title:string;prompt:string;
+  itemKey:string;kind:'FORM'|'SCALE'|'SJT';responseType:string;title:string;prompt:string;
   options:{code:string;label:string}[];
   definitionDigest:string;scoringDigest:string|null
   publicationVersion:number
@@ -19,7 +19,7 @@ export interface ResearchRawCodebook {
 export interface ResearchRawObservation {
   projectId:string;waveId:string;waveOrdinal:number;attemptId:string;
   researchCode:string|null;sourceFinalHash:string;
-  instrumentKey:string;kind:'FORM'|'SCALE'|'SJT';
+  instrumentKey:string;kind:'FORM'|'SCALE'|'SJT';responseType:string;
   itemKey:string;columnKey:string;publicationVersion:number;value:string|number|null;
   missingReason:MissingReason|null;completedAt:string;sourceVerified:true
 }
@@ -46,13 +46,13 @@ const missingFrom=(unit:FrozenUnitResult,key:string):MissingReason|null=>{
   return row?.reason??null
 }
 const rawItems=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult):Array<{
-  itemKey:string;prompt:string;options:{code:string;label:string}[];value:string|number|null;missingReason:MissingReason|null
+  itemKey:string;prompt:string;responseType:string;options:{code:string;label:string}[];value:string|number|null;missingReason:MissingReason|null
 }>=>{
   const values=unit.rawAnswers
-  const output:Array<{itemKey:string;prompt:string;options:{code:string;label:string}[];value:string|number|null;missingReason:MissingReason|null}>=[]
-  const add=(key:string,prompt:string,options:{code:string;label:string}[])=>{
+  const output:Array<{itemKey:string;prompt:string;responseType:string;options:{code:string;label:string}[];value:string|number|null;missingReason:MissingReason|null}>=[]
+  const add=(key:string,prompt:string,responseType:string,options:{code:string;label:string}[])=>{
     const value=cleanValue(values[key]??null)
-    output.push({itemKey:key,prompt,options,value,missingReason:missingFrom(unit,key)})
+    output.push({itemKey:key,prompt,responseType,options,value,missingReason:missingFrom(unit,key)})
   }
   if(frozen.kind==='FORM'){
     const draft=frozen.displayDefinition as FormDraft
@@ -63,17 +63,17 @@ const rawItems=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult):Array<{
         const normalized=value&&typeof value==='object'&&!Array.isArray(value)?value as Record<string,string>:{}
         for(const row of q.rows){
           const key=q.itemKey+':'+row.rowKey
-          output.push({itemKey:key,prompt:q.prompt+'／'+row.label,options,
+          output.push({itemKey:key,prompt:q.prompt+'／'+row.label,responseType:'MATRIX',options,
             value:normalized[row.rowKey]??null,missingReason:missingFrom(unit,key)||missingFrom(unit,q.itemKey)})
         }
-      }else add(q.itemKey,q.prompt,options)
+      }else add(q.itemKey,q.prompt,q.type,options)
     }
   }else if(frozen.kind==='SCALE'){
     const draft=frozen.displayDefinition as ScaleDraft
-    for(const q of draft.items)add(q.itemKey,q.prompt,draft.responseOptions.map(o=>({code:o.optionKey,label:o.label})))
+    for(const q of draft.items)add(q.itemKey,q.prompt,'LIKERT',draft.responseOptions.map(o=>({code:o.optionKey,label:o.label})))
   }else {
     const draft=frozen.displayDefinition as SjtDraft
-    for(const q of draft.questions)add(q.questionKey,q.prompt,q.options.map(o=>({code:o.optionKey,label:o.label})))
+    for(const q of draft.questions)add(q.questionKey,q.prompt,'SJT_SINGLE',q.options.map(o=>({code:o.optionKey,label:o.label})))
   }
   return output
 }
@@ -195,12 +195,13 @@ export async function loadSurveySource(input:{
         for(const r of rawItems(frozen,unit)){
           const columnKey=codeKey(wave.ordinal,frozen.instrumentKey,r.itemKey,frozen.sourceDigest)
           raw.push({...meta,sourceVerified:true,kind:frozen.kind,
-            instrumentKey:frozen.instrumentKey,itemKey:r.itemKey,columnKey,
+            instrumentKey:frozen.instrumentKey,itemKey:r.itemKey,columnKey,responseType:r.responseType,
             publicationVersion:publication.version,
             value:r.value,missingReason:r.missingReason})
           if(!codebook.has(columnKey))
             codebook.set(columnKey,{columnKey,waveId:wave.id,waveOrdinal:wave.ordinal,
               instrumentKey:frozen.instrumentKey,itemKey:r.itemKey,kind:frozen.kind,
+              responseType:r.responseType,
               title:frozen.title,prompt:r.prompt,options:r.options,
               definitionDigest:frozen.sourceDigest,scoringDigest:frozen.scoringDigest,
               publicationVersion:publication.version,
