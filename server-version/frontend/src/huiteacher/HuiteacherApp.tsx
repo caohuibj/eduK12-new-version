@@ -55,7 +55,6 @@ export default function HuiteacherApp(){
   const [password,setPassword]=useState('')
   const [inviteCode,setInviteCode]=useState('')
   const [studentNumber,setStudentNumber]=useState('')
-  const [schoolId,setSchoolId]=useState('')
   const [classId,setClassId]=useState('')
   const [mfaCode,setMfaCode]=useState('')
   const [mfaUri,setMfaUri]=useState('')
@@ -69,11 +68,7 @@ export default function HuiteacherApp(){
   const [newUnitParent,setNewUnitParent]=useState('')
   const [issuedInvite,setIssuedInvite]=useState('')
   const [roster,setRoster]=useState('')
-  const [codeCount,setCodeCount]=useState('1')
-  const [issuedCodes,setIssuedCodes]=useState<string[]>([])
-  const [windowClose,setWindowClose]=useState('')
-  const [admissionVersion,setAdmissionVersion]=useState<number|null>(null)
-  const [admissionStatus,setAdmissionStatus]=useState('')
+  const [issuedStudentInvites,setIssuedStudentInvites]=useState<Array<{studentNumber:string;inviteCode:string}>>([])
 
   const reload=async()=>{
     const user=await teacherApi<Me>('/auth/me')
@@ -152,10 +147,9 @@ export default function HuiteacherApp(){
   })
   const studentRegistration=()=>run(async()=>{
     await teacherApi('/education/register-student','POST',{
-      username,password,studentNumber,activationCode:inviteCode,
-      organizationId:schoolId,classUnitId:classId,
+      username,password,studentNumber,inviteCode,
     })
-    setPassword('');setMessage('注册成功，等待学校完成班级审批')
+    setPassword('');setMessage('注册成功，已加入 Teacher 学校；心理健康业务仍需另行授权')
   })
   const staffRegistration=()=>run(async()=>{
     await teacherApi('/education/register-staff','POST',{
@@ -168,38 +162,21 @@ export default function HuiteacherApp(){
     await teacherApi('/education/join-staff','POST',{inviteCode})
     setInviteCode('');await reload();setMessage('已使用现有教育账号加入学校')
   })
-  const enroll= (action:'roster'|'codes'|'window'|'approve')=>run(async()=>{
-    if(!org||!classId)throw new Error('请先选择班级')
-    const url=`/organizations/${org.organizationId}/classes/${classId}`
-    let result:unknown
-    if(action==='roster'){
-      const studentNumbers=roster.split(/[\s,，]+/).map(x=>x.trim()).filter(Boolean)
-      result=await teacherApi(url+'/roster','POST',{studentNumbers})
-      setMessage('名册已登记，需要发放代码并开放注册')
-    }else if(action==='codes'){
-      result=await teacherApi(url+'/codes','POST',{count:Number(codeCount),ttlMinutes:120})
-      const r=result as {codes?:string[]}
-      setIssuedCodes(r.codes??[]);setMessage('注册码仅在本次操作显示，请安全交付学生')
-    }else if(action==='window'){
-      const closesAt=new Date(windowClose).toISOString()
-      result=await teacherApi(url+'/window','POST',{action:'OPEN',closesAt})
-      setMessage('学生注册窗口已开放')
-    }else{
-      const s=await teacherApi<{status:string;rosterVersion:number}>(url+'/summary')
-      result=await teacherApi(url+'/approve','POST',{expectedRosterVersion:s.rosterVersion})
-      setMessage('班级学生资格已审批')
-    }
-    const data=await teacherApi<{status:string;rosterVersion:number}>(url+'/summary')
-    setAdmissionVersion(data.rosterVersion);setAdmissionStatus(data.status)
-    void result
+  const joinStudent=()=>run(async()=>{
+    await teacherApi('/education/join-student','POST',{inviteCode,studentNumber})
+    setInviteCode('');await reload()
+    setMessage('已使用原学生账号加入 Teacher 学校，心理健康权限不变')
   })
-  const closeWindow=()=>run(async()=>{
-    if(!org||!classId)return
-    await teacherApi(`/organizations/${org.organizationId}/classes/${classId}/window`,
-      'POST',{action:'CLOSE'})
-    const data=await teacherApi<{status:string;rosterVersion:number}>(
-      `/organizations/${org.organizationId}/classes/${classId}/summary`)
-    setAdmissionVersion(data.rosterVersion);setAdmissionStatus(data.status)
+  const issueStudentCodes=()=>run(async()=>{
+    if(!org||!classId)throw new Error('请先选择班级')
+    const studentNumbers=roster.split(/[\\s,，]+/).map(x=>x.trim()).filter(Boolean)
+    if(!studentNumbers.length)throw new Error('请填写已核验学号')
+    const result=await teacherApi<{list:Array<{studentNumber:string;inviteCode:string}>}>(
+      `/organizations/${org.organizationId}/classes/${classId}/student-invitations`,
+      'POST',{studentNumbers},
+    )
+    setIssuedStudentInvites(result.list)
+    setMessage('Teacher 学生邀请已生成，须按学号逐一安全交付；不会自动开通 School 心理健康业务')
   })
   const logout=()=>run(async()=>{
     await teacherApi('/auth/logout','POST',{})
@@ -241,11 +218,10 @@ export default function HuiteacherApp(){
     </section>:
     !me&&(screen==='register'||screen==='student')?<section className="ht-panel ht-form-panel">
       <h1>{screen==='register'?'教师邀请注册':'学生评教身份注册'}</h1>
-      <p>{screen==='register'?'已有教育账号请直接登录后使用邀请加入学校，不要重复注册。':'仅供首次创建教育学生账号。已注册 Huischool 的学生直接使用原账号登录。'}</p>
-      {screen==='student'&&<><Field label="学校 ID" value={schoolId} set={setSchoolId}/><Field label="班级 ID" value={classId} set={setClassId}/>
-        <Field label="学校核验的学号" value={studentNumber} set={setStudentNumber}/></>}
+      <p>{screen==='register'?'已有教育账号请直接登录后使用邀请加入学校，不要重复注册。':'仅供首次创建教育学生账号。已有教育账号的学生请登录后输入邀请代码和学号加入，不需要重复注册。'}</p>
+      {screen==='student'&&<Field label="学校核验的学号" value={studentNumber} set={setStudentNumber}/>}
       <form onSubmit={e=>{e.preventDefault();screen==='student'?studentRegistration():staffRegistration()}}>
-        <Field label={screen==='student'?'学生激活码':'教师邀请代码'} value={inviteCode} set={setInviteCode}/>
+        <Field label={screen==='student'?'Teacher 学生邀请代码':'教师邀请代码'} value={inviteCode} set={setInviteCode}/>
         <Field label="教育账号登录名" value={username} set={setUsername}/>
         <Field label="设置密码" value={password} set={setPassword} type="password"/>
         <button className="ht-primary" disabled={working}>注册统一教育账号</button></form>
@@ -253,8 +229,10 @@ export default function HuiteacherApp(){
     me&&screen==='workspace'?<div className="ht-workspace">
       <section className="ht-panel"><h1>我的教育发展空间</h1>
         <p>欢迎，{me.username}。Teacher 学校业务必须经学校开通及本人授权；Huischool 数据不在此显示。</p>
-        <div className="ht-inline"><Field label="已收到的教师邀请代码" value={inviteCode} set={setInviteCode}/>
-          <button onClick={joinStaff} disabled={working||!inviteCode}>使用已有账号加入学校</button></div>
+        <div className="ht-inline"><Field label="已收到的学校邀请代码" value={inviteCode} set={setInviteCode}/>
+          {me.role==='STUDENT'?<><Field label="学校核验学号" value={studentNumber} set={setStudentNumber}/>
+            <button onClick={joinStudent} disabled={working||!inviteCode||!studentNumber}>使用原学生账号加入</button></>
+           :<button onClick={joinStaff} disabled={working||!inviteCode}>使用已有教师账号加入</button>}</div>
         {me.organizations.length===0?<p className="ht-empty">目前没有已开通 Huiteacher 的学校授权。教师个人发展能力将在后续阶段接入。</p>:
           <label className="ht-field"><span>当前学校</span><select value={selectedOrg} onChange={e=>setSelectedOrg(e.target.value)}>
             {me.organizations.map(o=><option key={o.organizationId} value={o.organizationId}>{o.organizationName}</option>)}
@@ -277,21 +255,18 @@ export default function HuiteacherApp(){
               <option value="">请选择</option>{units.filter(u=>u.unitKind==='GRADE').map(g=><option key={g.id} value={g.id}>{g.name}</option>)}
             </select></label>}
             <button disabled={working||!newUnitName||newUnitType==='CLASS'&&!newUnitParent} onClick={createUnit}>创建</button></div>
-          <h3>学生班级准入</h3>
-          <p>该流程仅核验共享教育学生身份，不会开通 Huischool 心理健康业务。</p>
+          <h3>学生身份与班级关系</h3>
+          <p>Teacher 学生加入是共享教育身份的基础成员授权；不会产生 Huischool 心理健康的班级审批。</p>
           <label className="ht-field"><span>班级</span><select value={classId} onChange={e=>setClassId(e.target.value)}>
             <option value="">请选择班级</option>{units.filter(u=>u.unitKind==='CLASS').map(u=><option key={u.id} value={u.id}>{u.name}</option>)}
           </select></label>
-          <label className="ht-field"><span>学生学号清单（空格／换行分隔）</span><textarea value={roster} onChange={e=>setRoster(e.target.value)}/></label>
-          <button disabled={working||!roster||!classId} onClick={()=>enroll('roster')}>登记名册</button>
-          <div className="ht-inline"><Field label="发放激活码数量" value={codeCount} set={setCodeCount} type="number"/>
-            <button disabled={working||!classId} onClick={()=>enroll('codes')}>生成学生激活码</button></div>
-          {issuedCodes.length>0&&<div className="ht-secret">本次激活码（请安全分发）：<pre>{issuedCodes.join('\n')}</pre></div>}
-          <div className="ht-inline"><Field label="学生注册截止时间" type="datetime-local" value={windowClose} set={setWindowClose}/>
-            <button disabled={working||!classId||!windowClose} onClick={()=>enroll('window')}>开放注册</button>
-            <button disabled={working||!classId} onClick={closeWindow}>关闭注册</button>
-            <button disabled={working||!classId} onClick={()=>enroll('approve')}>完成班级审批</button></div>
-          <p>{admissionStatus?('班级准入：'+admissionStatus+'；名册版本 '+admissionVersion):'班级准入尚未查询'}</p>
+          <label className="ht-field"><span>已核验学生学号（以空格／换行分隔）</span><textarea value={roster} onChange={e=>setRoster(e.target.value)}/></label>
+          <button disabled={working||!roster||!classId} onClick={issueStudentCodes}>按学号签发 Teacher 学生邀请</button>
+          {issuedStudentInvites.length>0&&<div className="ht-secret">
+            <strong>本次邀请码仅显示一次，请按对应学号安全交付</strong>
+            <div className="ht-members">{issuedStudentInvites.map(item=><p key={item.inviteCode}>
+              学号 {item.studentNumber}：<code className="ht-wrap">{item.inviteCode}</code>
+            </p>)}</div></div>}
           <h3>当前学校成员</h3><div className="ht-members">{members.map(m=><span key={m.membershipId} className="ht-tag">{m.loginName} · {m.role}</span>)}</div>
           <button onClick={refreshOrg} disabled={working}>刷新学校信息</button>
         </div>}
