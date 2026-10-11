@@ -62,7 +62,10 @@ describe('Survey longitudinal export and matched descriptive contracts',()=>{
     expect(withAbandoned.csv).toContain('"R-NEW"')
     expect(withAbandoned.csv).toContain('"ABANDONED"')
     // The C T2 and D T1 fields remain explicit blanks, NEVER numeric zero.
-    expect(wide.csv.split('\r\n').some(row=>row.startsWith('"R-C",')&&row.endsWith(',""'))).toBe(true)
+    const noT2=wide.csv.split('\r\n').find(row=>row.startsWith('"R-C",'))
+    const noT1=wide.csv.split('\r\n').find(row=>row.startsWith('"R-D",'))
+    expect(noT2).toContain(',"","NO_WAVE"')
+    expect(noT1).toContain(',"","NO_WAVE"')
   })
   it('protects quoted text and dangerous spreadsheet formulas',()=>{
     expect(protectCsvCell('=HYPERLINK("https://evil.example")')).toMatch(/^'/)
