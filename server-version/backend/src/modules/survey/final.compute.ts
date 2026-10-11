@@ -60,7 +60,9 @@ const formResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
   const matrixSubkeys=new Set(d.pages.flatMap(p=>p.questions
     .filter(q=>q.type==='MATRIX'||q.type==='MATRIX_MULTIPLE')
     .flatMap(q=>q.rows.map(r=>q.itemKey+':'+r.rowKey))))
-  const permitted=new Set([...valid,...matrixSubkeys])
+  const otherSubkeys=new Set(d.pages.flatMap(p=>p.questions
+    .filter(q=>q.otherOptionKey!==undefined).map(q=>q.itemKey+':other')))
+  const permitted=new Set([...valid,...matrixSubkeys,...otherSubkeys])
   for(const answerKey of Object.keys(answers))if(!permitted.has(answerKey))
     invalid('answers.'+answerKey,'提交包含不存在的或未授权题目')
   const normalized:AnswerMap={},missing:MissingItem[]=[]
@@ -76,14 +78,21 @@ const formResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
     }
     if(!shown){
       if(Object.prototype.hasOwnProperty.call(answers,q.itemKey)||
-        q.rows.some(row=>Object.prototype.hasOwnProperty.call(answers,q.itemKey+':'+row.rowKey)))
+        q.rows.some(row=>Object.prototype.hasOwnProperty.call(answers,q.itemKey+':'+row.rowKey))||
+        (q.otherOptionKey!==undefined&&Object.prototype.hasOwnProperty.call(answers,q.itemKey+':other')))
         invalid(path,'隐藏的题目不能提交回答')
       missing.push({itemKey:q.itemKey,reason:'NOT_SHOWN'})
+      if(q.otherOptionKey)missing.push({itemKey:q.itemKey+':other',reason:'NOT_SHOWN'})
       continue
     }
     const value=answers[q.itemKey]
     if(q.type!=='MATRIX'&&q.type!=='MATRIX_MULTIPLE'&&isRefusal(value)){
       if(!q.allowRefusal)invalid(path,'此题未声明允许明确拒答')
+      if(q.otherOptionKey){
+        if(Object.prototype.hasOwnProperty.call(answers,q.itemKey+':other'))
+          invalid(path+'.other','明确拒答时不能同时提交其他填写内容')
+        missing.push({itemKey:q.itemKey+':other',reason:'NOT_SHOWN'})
+      }
       missing.push({itemKey:q.itemKey,reason:'REFUSED'})
       previous[q.itemKey]=null
       continue
@@ -101,6 +110,8 @@ const formResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
           new Set(value).size!==value.length||value.some(x=>!q.options.some(o=>o.optionKey===x)))
           invalid(path,'多选内容必须为无重复的有效选项')
         if(q.required&&!value.length)invalid(path,'必答多选题没有选择')
+        if(value.length>1&&value.some(key=>q.exclusiveOptionKeys?.includes(key)))
+          invalid(path,'互斥选项不能与其他选项同时选择')
         if(value.length&&((q.minSelections!==undefined&&value.length<q.minSelections)||
           (q.maxSelections!==undefined&&value.length>q.maxSelections)))
           invalid(path,'多选题选择数量不在规定范围内')
@@ -224,6 +235,21 @@ const formResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
         if(q.textValidation==='ALPHANUMERIC'&&!/^[a-z0-9]+$/i.test(value))
           invalid(path,'文本只能包含英文字母及数字')
         normalized[q.itemKey]=value
+      }
+    }
+    if(q.otherOptionKey){
+      const otherKey=q.itemKey+':other'
+      const chosen=typeof value==='string'?value===q.otherOptionKey:
+        Array.isArray(value)&&value.includes(q.otherOptionKey)
+      const provided=Object.prototype.hasOwnProperty.call(answers,otherKey)
+      if(chosen){
+        const text=answers[otherKey]
+        if(typeof text!=='string'||!text.trim()||text.length>(q.otherMaxLength??300))
+          invalid('answers.'+otherKey,'请选择其他选项后填写非空文本，并遵守字数限制')
+        normalized[otherKey]=text
+      }else{
+        if(provided)invalid('answers.'+otherKey,'未选择其他选项时不能提交其他填写内容')
+        missing.push({itemKey:otherKey,reason:'NOT_SHOWN'})
       }
     }
     // Display conditions must be evaluated from previously verified answers,
