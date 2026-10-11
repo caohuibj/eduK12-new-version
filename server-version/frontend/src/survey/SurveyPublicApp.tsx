@@ -7,13 +7,14 @@ type StudyInfo={project:{name:string;description:string;collectionMode:'SINGLE_U
 type Choice={optionKey:string;label:string}
 type Question={itemKey:string;questionKey?:string;type:string;prompt:string;required:boolean;
   options:Choice[];rows?:{rowKey:string;label:string}[];allowRefusal?:boolean;displayIf?:{itemKey:string;operator:'EQUALS'|'INCLUDES';optionKey:string};
-  min?:number;max?:number;maxLength?:number}
+  min?:number;max?:number;maxLength?:number;minSelections?:number;maxSelections?:number}
 type Unit={kind:'FORM'|'SCALE'|'SJT';instrumentKey:string;title:string;
   stimulus?:string;scenarioTitle?:string;
   pages?:{pageKey:string;title:string;questions:Question[]}[];
   responseOptions?:Choice[];
   items?:Question[];
-  questions?:{questionKey:string;prompt:string;options:Choice[]}[]}
+  questions?:{questionKey:string;prompt:string;responseType?:'SINGLE'|'MULTIPLE';
+    minSelections?:number;maxSelections?:number;options:Choice[]}[]}
 type Task={attemptId:string;waveId:string;status:string;definitionDigest:string;units:Unit[];reportMode:'GENERAL_ONLY'}
 type General={kind:'GENERAL_ONLY';text:string;disclaimer:string;completedAt:string}
 type SingleResume={attemptId:string;accessCredential:string;createdAt:number}
@@ -59,6 +60,8 @@ function TaskForm({unit,answer,onChange}:{unit:Unit;answer:Record<string,Answer>
       const selected=Array.isArray(answer[q.itemKey])?answer[q.itemKey] as string[]:[]
       return <label className="block my-2 text-sm" key={o.optionKey}>
         <input type="checkbox" checked={selected.includes(o.optionKey)}
+          disabled={!selected.includes(o.optionKey)&&q.maxSelections!==undefined
+            &&selected.length>=q.maxSelections}
           onChange={e=>onChange(q.itemKey,e.target.checked?[...selected,o.optionKey]:
             selected.filter(s=>s!==o.optionKey))}/> {o.label}</label>
     }):options.map(o=><label className="block my-2 text-sm" key={o.optionKey}>
@@ -69,6 +72,8 @@ function TaskForm({unit,answer,onChange}:{unit:Unit;answer:Record<string,Answer>
     if(!visible(q))return null
     return <fieldset className="border rounded-lg p-4 my-4 bg-white" key={q.itemKey}>
       <legend className="font-medium text-sm">{q.prompt}{q.required?' *':''}</legend>
+      {q.type==='MULTIPLE'&&q.maxSelections!==undefined&&<p className="text-xs mb-2">
+        请选 {q.minSelections??1} 至 {q.maxSelections} 项。</p>}
       {['SINGLE','LIKERT','MULTIPLE'].includes(q.type)&&choice(q,q.options,q.type as 'SINGLE'|'LIKERT'|'MULTIPLE')}
       {q.type==='MATRIX'&&<div className="overflow-x-auto"><table className="w-full text-sm">
         <thead><tr><th scope="col">项目</th>{q.options.map(o=><th scope="col" key={o.optionKey}>{o.label}</th>)}
@@ -106,8 +111,10 @@ function TaskForm({unit,answer,onChange}:{unit:Unit;answer:Record<string,Answer>
     {unit.kind==='SCALE'&&unit.items?.map(q=>item({...q,type:'LIKERT',options:unit.responseOptions||[]}))}
     {unit.kind==='SJT'&&<><p className="mt-2 font-medium">{unit.scenarioTitle}</p>
       <p className="whitespace-pre-wrap mb-4 text-sm">{unit.stimulus}</p>
-      {unit.questions?.map(q=>item({itemKey:q.questionKey,type:'SINGLE',
-        prompt:q.prompt,options:q.options,required:true}))}</>}
+      {unit.questions?.map(q=>item({itemKey:q.questionKey,
+        type:q.responseType==='MULTIPLE'?'MULTIPLE':'SINGLE',
+        prompt:q.prompt,options:q.options,required:true,
+        minSelections:q.minSelections,maxSelections:q.maxSelections}))}</>}
   </section>
 }
 /** Research participants have NO platform account or Student/Teacher session.

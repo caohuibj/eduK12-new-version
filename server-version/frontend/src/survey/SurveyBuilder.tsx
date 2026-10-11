@@ -89,7 +89,7 @@ export function SurveyBuilder({projectId}:{projectId:string}){
     setPreview(result);setShowPreview(result.ok)
     setNotice(result.ok?'结构与研究性计分编译已通过；这是非正式试答预览':'请先修正提示的结构问题')
   })}
-  const simulate=(answers:Record<string,string|number>)=>{if(!active||dirty)return;void run(async()=>{
+  const simulate=(answers:Record<string,string|number|string[]>)=>{if(!active||dirty)return;void run(async()=>{
     const r=await api<Preview>(prefix+'/'+active.id+'/preview','POST',{answers})
     setPreview(r);setNotice(r.ok?'已根据后台现有计分器模拟计算，不会生成正式答卷':'模拟未通过，请检查作答和规则')
   })}

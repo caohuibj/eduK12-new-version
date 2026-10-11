@@ -20,7 +20,9 @@ export type SjtDraft={
   licenseStatus?:'self_authored'|'authorized'|'unknown';
   redistribution:'allowed'|'restricted'|'unknown';
   metrics:{metricKey:string;label:string;direction:'descriptive'}[];
-  questions:{questionKey:string;prompt:string;options:{
+  questions:{questionKey:string;prompt:string;
+    responseType?:'SINGLE'|'MULTIPLE';minSelections?:number;maxSelections?:number;
+    options:{
     optionKey:string;label:string;contributions:Record<string,number>
   }[]}[]
 }

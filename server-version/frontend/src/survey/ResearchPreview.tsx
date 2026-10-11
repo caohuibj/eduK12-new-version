@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import type { ResearchDraft, FormDraft, ScaleDraft, SjtDraft, FormQuestion } from './builder.types'
 
 type Answer=string|number|string[]
-export function ResearchPreview({draft,onSimulate}:{draft:ResearchDraft;onSimulate:(answers:Record<string,string|number>)=>void}){
+export function ResearchPreview({draft,onSimulate}:{draft:ResearchDraft;onSimulate:(answers:Record<string,string|number|string[]>)=>void}){
   const [answers,setAnswers]=useState<Record<string,Answer>>({})
   useEffect(()=>{setAnswers({})},[draft.id])
   const choose=(key:string,value:Answer)=>setAnswers(old=>({...old,[key]:value}))
@@ -56,11 +56,21 @@ export function ResearchPreview({draft,onSimulate}:{draft:ResearchDraft;onSimula
     </fieldset>)}
     {draft.kind==='SJT'&&<><div className="font-semibold">{(draft.definition as SjtDraft).stimulus}</div>
       {(draft.definition as SjtDraft).questions.map(q=><fieldset key={q.questionKey} className="border bg-white rounded-lg p-3">
-        <legend>{q.prompt||'未填写题干'}</legend>{q.options.map(o=><label key={o.optionKey} className="block my-2">
-          <input type="radio" name={q.questionKey} checked={answers[q.questionKey]===o.optionKey}
-            onChange={()=>choose(q.questionKey,o.optionKey)}/> {o.label}</label>)}</fieldset>)}</>}
+        <legend>{q.prompt||'未填写题干'} {q.responseType==='MULTIPLE'?'（可多选）':''}</legend>
+        {q.responseType==='MULTIPLE'&&<p className="text-xs">
+          至少选择 {q.minSelections??1} 项，最多选择 {q.maxSelections??q.options.length} 项。</p>}
+        {q.options.map(o=>{
+          const multiple=q.responseType==='MULTIPLE'
+          const selected=Array.isArray(answers[q.questionKey])?answers[q.questionKey] as string[]:[]
+          return <label key={o.optionKey} className="block my-2">
+            <input type={multiple?'checkbox':'radio'} name={q.questionKey}
+              checked={multiple?selected.includes(o.optionKey):answers[q.questionKey]===o.optionKey}
+              onChange={e=>choose(q.questionKey,multiple?
+                (e.target.checked?[...selected,o.optionKey]:selected.filter(x=>x!==o.optionKey)):
+                o.optionKey)}/> {o.label}</label>
+        })}</fieldset>)}</>}
     {draft.kind!=='FORM'&&<button type="button" className="btn-secondary"
-      onClick={()=>onSimulate(Object.fromEntries(Object.entries(answers).filter((entry):entry is [string,string|number]=>typeof entry[1]!=='object')))}>
+      onClick={()=>onSimulate({...answers})}>
       计算当前研究性模拟得分</button>}
     {draft.kind==='FORM'&&<p className="text-xs">表单不自动诊断或计分。后续 PR3 的真实作答会由服务端严格验证分支与 FINAL。</p>}
   </section>

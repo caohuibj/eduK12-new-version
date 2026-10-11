@@ -148,7 +148,14 @@ export function previewResearchInstrument(input:{
     }
     if(input.kind==='SCALE'){
       const compiled=compileResearchScale(input.title,input.definition)
-      const score=input.answers?scoreScale(compiled,input.answers):null
+      const scoreAnswers:Record<string,string|number>={}
+      for(const [key,answer] of Object.entries(input.answers||{})){
+        if(typeof answer!=='string'&&typeof answer!=='number')
+          throw new SurveyDraftError([{path:'answers.'+key,
+            message:'量表预览只接受合法单选编码',severity:'error'}])
+        scoreAnswers[key]=answer
+      }
+      const score=input.answers?scoreScale(compiled,scoreAnswers):null
       return {ok:true,issues:[],kind:'SCALE',definitionDigest:hash,
         scoringDigest:canonicalHash(compiled.scoring),compiledDefinition:compiled,
         score,participantReport:'GENERAL_ONLY'}

@@ -68,6 +68,35 @@ export function ResearchSjtEditor({value,onChange}:{value:SjtDraft;onChange:(nex
       {value.questions.map((q,i)=><article className="border rounded-lg p-3 bg-slate-50 space-y-3" key={q.questionKey}>
         <div className="flex gap-3 justify-between"><strong>问题 {i+1}</strong>
           <button type="button" className="btn-secondary" onClick={()=>onChange({...value,questions:value.questions.filter(x=>x.questionKey!==q.questionKey)})}>删除问题</button></div>
+        <div className="grid sm:grid-cols-3 gap-3">
+          <label className="text-sm">作答方式
+            <select className="input block w-full" value={q.responseType??'SINGLE'}
+              onChange={e=>changeQuestion(i,x=>({
+                ...x,
+                responseType:e.target.value as 'SINGLE'|'MULTIPLE',
+                minSelections:e.target.value==='MULTIPLE'?1:undefined,
+                maxSelections:e.target.value==='MULTIPLE'?Math.min(2,x.options.length):undefined,
+              }))}>
+              <option value="SINGLE">单选（正式核心单选执行）</option>
+              <option value="MULTIPLE">多选（研究专用受控组合编译）</option>
+            </select></label>
+          {q.responseType==='MULTIPLE'&&<>
+            <label className="text-sm">最少选择
+              <input className="input block w-full" type="number" min={1} max={6}
+                value={q.minSelections??1}
+                onChange={e=>changeQuestion(i,x=>({...x,minSelections:Number(e.target.value)}))}/>
+            </label>
+            <label className="text-sm">最多选择
+              <input className="input block w-full" type="number" min={1} max={6}
+                value={q.maxSelections??2}
+                onChange={e=>changeQuestion(i,x=>({...x,maxSelections:Number(e.target.value)}))}/>
+            </label>
+          </>}
+        </div>
+        {q.responseType==='MULTIPLE'&&<p className="text-xs text-slate-600">
+          每个选项可同时贡献多个构念。系统只编译不超过 24 个合法选择组合，
+          根据所选原选项的贡献求和，再交由既有 SJT AUTHOR_KEY_SUM 评分模型处理；
+          超出上限会阻止正式发布，不修改历史评分算法。</p>}
         <textarea className="input w-full" aria-label={'情境问题 '+(i+1)} rows={2} value={q.prompt}
           onChange={e=>changeQuestion(i,x=>({...x,prompt:e.target.value}))}/>
         {q.options.map((o,j)=><div className="p-2 bg-white border rounded-lg" key={o.optionKey}>
