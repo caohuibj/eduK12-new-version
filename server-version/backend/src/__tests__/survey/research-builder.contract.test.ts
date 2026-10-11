@@ -100,7 +100,7 @@ describe('Survey research builder contracts without formal publication authority
     const result=applyBulk('FORM',form,batch,preview.digest)
     const parsed=validateSurveyDraft('FORM',result,true)
     expect(parsed.issues).toHaveLength(0)
-    expect(applyBulk('FORM',result,batch,preview.digest)).toThrowError()
+    expect(()=>applyBulk('FORM',result,batch,preview.digest)).toThrow(BulkImportError)
     expect(()=>applyBulk('FORM',form,{...batch,content:batch.content+'变更'},preview.digest)).toThrow(BulkImportError)
     const csv=previewBulk({...batch,format:'CSV',content:
       'type,prompt,required,options\nSINGLE,我喜欢科学课,true,不同意||同意'},'FORM')
