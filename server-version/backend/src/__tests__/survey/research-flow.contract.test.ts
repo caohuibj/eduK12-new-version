@@ -1,7 +1,7 @@
 import { describe,expect,it } from 'vitest'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { compileFrozenResearchUnit,type ResearchFrozenPublication } from '../../modules/survey/publication.service'
-import { compileSurveyFlow,SurveyFlowError,evaluateFlowCondition } from '../../modules/survey/flow.definition'
+import { compileSurveyFlow,parseSurveyFlowDraft,SurveyFlowError,evaluateFlowCondition } from '../../modules/survey/flow.definition'
 import { chooseSurveyGroup,type SurveyFlowAssignment } from '../../modules/survey/flow.assignment'
 import { buildSurveyFlowPublicProjection } from '../../modules/survey/flow.runtime'
 import { computeSurveyFinal,SurveyFinalValidationError } from '../../modules/survey/final.compute'
@@ -119,6 +119,15 @@ describe('Survey Flow V1 — immutable randomized research execution',()=>{
     expect(outcome.units[1].notExecuted).toBe(true)
     expect(()=>computeSurveyFinal(snapshot,{screen:teacher,follow:{attitude:'通过'}},
       assigned,['assigned_material','baseline','attitude','closing'],'SCREEN_OUT')).toThrow()
+  })
+  it('prevents recursively nested untrusted Wave input from reaching Zod without a budget',()=>{
+    const nested=draft()
+    let condition:unknown={op:'EQUALS',
+      field:{source:'EMBEDDED',key:'year'},value:2026}
+    for(let i=0;i<40;i++)condition={op:'NOT',term:condition}
+    nested.blocks[1].when=condition as NonNullable<SurveyFlowDraft['blocks'][number]['when']>
+    expect(()=>parseSurveyFlowDraft(nested)).toThrow(SurveyFlowError)
+    expect(()=>compileSurveyFlow(nested,units,'LINKED_WAVES')).toThrow(SurveyFlowError)
   })
   it('refuses future, circular, wrong-typed, deeply nested and unauthorized Flow rules',()=>{
     const notEarlier=draft()
