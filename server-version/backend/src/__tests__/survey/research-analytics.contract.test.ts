@@ -56,6 +56,11 @@ describe('Survey longitudinal export and matched descriptive contracts',()=>{
     missing[0]={...missing[0],value:null,missingReason:'NOT_COMPARABLE'}
     const wideMissing=exportWide(project,missing)
     expect(wideMissing.csv).toContain('"NOT_COMPARABLE"')
+    const withAbandoned=exportWide(project,data(),[
+      {researchCode:'R-NEW',waveId:'T1',status:'STARTED'},
+    ])
+    expect(withAbandoned.csv).toContain('"R-NEW"')
+    expect(withAbandoned.csv).toContain('"ABANDONED"')
     // The C T2 and D T1 fields remain explicit blanks, NEVER numeric zero.
     expect(wide.csv.split('\r\n').some(row=>row.startsWith('"R-C",')&&row.endsWith(',""'))).toBe(true)
   })

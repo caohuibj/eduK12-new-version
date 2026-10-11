@@ -134,6 +134,9 @@ export function exportWide(projectId:string,observations:readonly FrozenScoreObs
   const columns=['research_code',...codebook.flatMap(x=>[x.column,x.column+'__missing'])]
   if(columns.length>512)throw new Error('Wide format would produce too many columns; use LONG')
   const byCode=new Map<string,Map<string,{value:number|null;missingReason:MissingReason|null}>>()
+  for(const entry of attendance)
+    if(!byCode.has(entry.researchCode))
+      byCode.set(entry.researchCode,new Map())
   for(const o of source){
     const participant=o.researchCode!
     const record=byCode.get(participant)||new Map<string,{value:number|null;missingReason:MissingReason|null}>()
