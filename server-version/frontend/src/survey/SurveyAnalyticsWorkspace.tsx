@@ -20,6 +20,8 @@ type GroupResult={minGroupN:number;suppressedGroups:number;note:string;groups:Ar
 }>}
 type QualityRow={attemptId:string;attemptCode:string;researchCode:string|null;waveId:string;
   completedAt:string;verdict:'INCLUDED'|'EXCLUDED';reason:string|null;revision:number}
+type QualityAudit={reviewedAt:string;reviewerId:string|null;previousVerdict:'INCLUDED'|'EXCLUDED';
+  verdict:'INCLUDED'|'EXCLUDED';reason:string;revision:number}
 type ExportFormat='RAW_WAVE'|'RAW_LONG'|'RAW_WIDE'|'SCORE_LONG'|'SCORE_WIDE'
 type Ticket={id:string;status:'READY';format:ExportFormat;expiresAt:string;
   nextCursor:string|null;pageNumber:number|null;
@@ -80,6 +82,9 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
   const [qualityRows,setQualityRows]=useState<QualityRow[]>([])
   const [qualityPage,setQualityPage]=useState(1)
   const [qualityReason,setQualityReason]=useState('')
+  const [qualityHistory,setQualityHistory]=useState<{
+    attemptId:string;page:number;list:QualityAudit[]
+  }|null>(null)
   const base='/projects/'+projectId
   const reload=async()=>{
     const res=await api<Overview>(base+'/analytics/overview')
@@ -101,8 +106,16 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
   }
   const loadQuality=async(page=qualityPage)=>{
     const data=await api<{list:QualityRow[]}>(base+'/analytics/quality/attempts?page='+page)
-    setQualityRows(data.list);setQualityPage(page)
+    setQualityRows(data.list);setQualityPage(page);setQualityHistory(null)
   }
+  const openQualityHistory=(row:QualityRow,page=1)=>void execute(async()=>{
+    if(qualityHistory?.attemptId===row.attemptId&&qualityHistory.page===page){
+      setQualityHistory(null);return
+    }
+    const data=await api<{list:QualityAudit[];page:number}>(
+      base+'/analytics/quality/attempts/'+row.attemptId+'/history?page='+page)
+    setQualityHistory({attemptId:row.attemptId,page:data.page,list:data.list})
+  })
   const markQuality=(row:QualityRow,verdict:'INCLUDED'|'EXCLUDED')=>{
     if(qualityReason.trim().length<2)return
     if(!window.confirm(verdict==='EXCLUDED'
@@ -205,10 +218,35 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
             <p>{row.researchCode??'独立匿名作答'} · {row.verdict==='EXCLUDED'?'当前排除':'当前纳入'}</p>
             <p>{row.reason??'尚无人工质量复核'} · {new Date(row.completedAt).toLocaleString('zh-CN')}</p>
           </div>
-          <button type="button" className="btn-secondary"
-            disabled={busy||qualityReason.trim().length<2}
-            onClick={()=>markQuality(row,row.verdict==='EXCLUDED'?'INCLUDED':'EXCLUDED')}>
-            {row.verdict==='EXCLUDED'?'恢复纳入':'排除有效样本'}</button>
+          <div className="flex flex-wrap gap-2">
+            <button type="button" className="btn-secondary" disabled={busy}
+              onClick={()=>openQualityHistory(row)}>
+              {qualityHistory?.attemptId===row.attemptId?'收起审核历史':'查看审核历史'}</button>
+            <button type="button" className="btn-secondary"
+              disabled={busy||qualityReason.trim().length<2}
+              onClick={()=>markQuality(row,row.verdict==='EXCLUDED'?'INCLUDED':'EXCLUDED')}>
+              {row.verdict==='EXCLUDED'?'恢复纳入':'排除有效样本'}</button>
+          </div>
+          {qualityHistory?.attemptId===row.attemptId&&<div className="w-full text-xs bg-slate-50 p-3 space-y-2">
+            <strong>按时间倒序的质量审核记录（不展示原始回答）</strong>
+            {qualityHistory.list.length===0&&<p>无更多审核记录。</p>}
+            {qualityHistory.list.map(event=><p key={event.revision}>
+              {new Date(event.reviewedAt).toLocaleString('zh-CN')} ·
+              第 {event.revision} 次审核：
+              {event.previousVerdict==='INCLUDED'?'纳入':'排除'} →
+              {event.verdict==='INCLUDED'?'纳入':'排除'}；
+              理由：{event.reason}
+            </p>)}
+            <div className="flex flex-wrap gap-2">
+              <button className="btn-secondary" type="button"
+                disabled={busy||qualityHistory.page<=1}
+                onClick={()=>openQualityHistory(row,qualityHistory.page-1)}>上一页</button>
+              <span>第 {qualityHistory.page} 页</span>
+              <button className="btn-secondary" type="button"
+                disabled={busy||qualityHistory.list.length<25}
+                onClick={()=>openQualityHistory(row,qualityHistory.page+1)}>下一页</button>
+            </div>
+          </div>}
         </div>)}
         <div className="flex gap-3 items-center text-sm">
           <button className="btn-secondary" disabled={busy||qualityPage<=1}
