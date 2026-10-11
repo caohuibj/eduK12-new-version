@@ -73,7 +73,8 @@ export async function createSurveyExport(req:Request,input:{
     input.cursor,input.projectId,input.format as SurveyExportCursor['format'],input.waveId!,
   ):null
   if(prior&&(prior.completedFrom!==(input.completedFrom??null)
-    ||prior.completedBefore!==(input.completedBefore??null)))
+    ||prior.completedBefore!==(input.completedBefore??null)
+    ||prior.freeTextIncluded!==(input.includeFreeText===true)))
     fail(400,'分批导出的时间筛选条件不能修改')
   const sources=await loadSurveySource({actorUserId:uid,projectId:input.projectId,
     ...(input.waveId?{waveIds:[input.waveId]}:{}),maxFinals:250,
@@ -90,6 +91,7 @@ export async function createSurveyExport(req:Request,input:{
     cutOff:sources.cutOff,sourceRevision:sources.sourceRevision,
     page:(prior?.page??0)+1,issuedAt:Date.now(),
     completedFrom:input.completedFrom??null,completedBefore:input.completedBefore??null,
+    freeTextIncluded:input.includeFreeText===true,
   }):null
   const pageNumber=paged?(prior?.page??0)+1:null
   if(input.format.includes('WIDE')&&sources.collectionMode!=='LINKED_WAVES')
