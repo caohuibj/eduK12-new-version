@@ -6,13 +6,17 @@ type WaveSummary={id:string;ordinal:number;title:string;status:string;
 type Overview={projectId:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';source:string;note:string;waves:WaveSummary[]}
 type Matched={baselineN:number;followupN:number;matchedN:number;attritionN:number;lateJoinN:number;note:string}
 type ScoreStat={instrumentKey:string;scoreKey:string;validN:number;mean:number|null;sampleSd:number|null}
-type ItemStat={itemKey:string;instrumentKey:string;prompt:string;respondentN:number;
+type ItemStat={itemKey:string;instrumentKey:string;prompt:string;kind:string;respondentN:number;
   missingByReason:Record<string,number>;frequencies:{value:string;count:number}[];
   combinationFrequencies?:{value:string;count:number}[];responseType?:string;
   numericMean:number|null;numericSampleSd:number|null}
 type WaveItems={waveId:string;items:ItemStat[];descriptiveScores:ScoreStat[];note:string}
 type PairedScore={baselineN:number;followupN:number;matchedN:number;attritionN:number;lateJoinN:number;
   meanPairedChange:number|null;comparability:'COMPARABLE'|'NOT_COMPARABLE';reason?:string}
+type GroupResult={minGroupN:number;suppressedGroups:number;note:string;groups:Array<{
+  optionCode:string;optionLabel:string;respondentN:number;scoreValidN:number;
+  mean:number|null;sampleSd:number|null
+}>}
 type ExportFormat='RAW_WAVE'|'RAW_LONG'|'RAW_WIDE'|'SCORE_LONG'|'SCORE_WIDE'
 type Ticket={id:string;status:'READY';format:ExportFormat;expiresAt:string;
   manifest:{rowCount:number;columnCount:number}}
@@ -61,6 +65,8 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
   const [itemStats,setItemStats]=useState<WaveItems|null>(null)
   const [metricKey,setMetricKey]=useState(''),[metricInstrument,setMetricInstrument]=useState('')
   const [pairedScore,setPairedScore]=useState<PairedScore|null>(null)
+  const [groupItem,setGroupItem]=useState(''),[groupScore,setGroupScore]=useState('')
+  const [groupResult,setGroupResult]=useState<GroupResult|null>(null)
   const [format,setFormat]=useState<ExportFormat>('RAW_WAVE'),[waveId,setWaveId]=useState('')
   const [otp,setOtp]=useState(''),[busy,setBusy]=useState(false)
   const [includeFreeText,setIncludeFreeText]=useState(false),[message,setMessage]=useState('')
@@ -72,7 +78,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
     const ordered=res.waves
     if(ordered[0]){setWaveId(ordered[0].id);setBaseline(ordered[0].id)}
     if(ordered[1])setFollowup(ordered[1].id)
-    setItemStats(null);setPairedScore(null)
+    setItemStats(null);setPairedScore(null);setGroupResult(null);setGroupItem('');setGroupScore('')
   }
   useEffect(()=>{
     setOverview(null);setError('');setTicket(null);setPaired(null)
@@ -89,7 +95,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
   })
   const loadItems=()=>void execute(async()=>{
     const result=await api<WaveItems>(base+'/analytics/waves/'+waveId+'/items')
-    setItemStats(result);setPairedScore(null)
+    setItemStats(result);setPairedScore(null);setGroupResult(null)
     if(result.descriptiveScores[0]){
       setMetricKey(result.descriptiveScores[0].scoreKey)
       setMetricInstrument(result.descriptiveScores[0].instrumentKey)
@@ -101,6 +107,14 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
       instrumentKey:metricInstrument,scoreKey:metricKey,
     })
     setPairedScore(score)
+  })
+  const compareGroups=()=>void execute(async()=>{
+    const [groupInstrumentKey,groupItemKey]=groupItem.split(':')
+    const [scoreInstrumentKey,scoreKey]=groupScore.split(':')
+    const result=await api<GroupResult>(base+'/analytics/waves/'+waveId+'/group-scores','POST',{
+      groupInstrumentKey,groupItemKey,scoreInstrumentKey,scoreKey,
+    })
+    setGroupResult(result)
   })
   const stepUp=(e:FormEvent)=>{e.preventDefault();void execute(async()=>{
     await api('/auth/mfa/step-up','POST',{code:otp.trim()})
@@ -189,6 +203,34 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
             </p>)}
           </div>}
         </div>}
+        {itemStats&&itemStats.items.some(q=>q.kind==='FORM'&&['SINGLE','LIKERT'].includes(q.responseType||''))
+          &&itemStats.descriptiveScores.length>0&&
+          <div className="border-t pt-3 space-y-3">
+            <h4 className="font-medium">Form 分组变量 · 描述性量表得分比较</h4>
+            <p className="text-xs">仅使用本项目冻结的单选/量表回答，不展示少于 5 份完成回答的分组。</p>
+            <select className="input block w-full" aria-label="选择 Form 分组题"
+              value={groupItem} onChange={e=>{setGroupItem(e.target.value);setGroupResult(null)}}>
+              <option value="">选择 Form 分组题</option>
+              {itemStats.items.filter(q=>q.kind==='FORM'&&['SINGLE','LIKERT'].includes(q.responseType||''))
+                .map(q=><option key={q.instrumentKey+':'+q.itemKey}
+                  value={q.instrumentKey+':'+q.itemKey}>{q.prompt}</option>)}
+            </select>
+            <select className="input block w-full" aria-label="选择组内描述性计分"
+              value={groupScore} onChange={e=>{setGroupScore(e.target.value);setGroupResult(null)}}>
+              <option value="">选择需要比较的研究性得分</option>
+              {itemStats.descriptiveScores.map(q=><option key={q.instrumentKey+':'+q.scoreKey}
+                value={q.instrumentKey+':'+q.scoreKey}>{q.instrumentKey} / {q.scoreKey}</option>)}
+            </select>
+            <button type="button" className="btn-secondary" disabled={busy||!groupItem||!groupScore}
+              onClick={compareGroups}>计算受控分组描述</button>
+            {groupResult&&<div className="text-sm space-y-2">
+              {groupResult.groups.map(g=><p key={g.optionCode}>{g.optionLabel}：
+                N={g.respondentN}，得分有效 N={g.scoreValidN}，
+                M={g.mean?.toFixed(2)??'—'}，SD={g.sampleSd?.toFixed(2)??'—'}</p>)}
+              <p>未展示的小样本组：{groupResult.suppressedGroups}；最低单组样本数：{groupResult.minGroupN}</p>
+              <p className="text-xs">{groupResult.note}</p>
+            </div>}
+          </div>}
         {itemStats&&overview.collectionMode==='LINKED_WAVES'&&itemStats.descriptiveScores.length>0&&
         <div className="border-t pt-3 space-y-3">
           <h4 className="font-medium">可比较指标的配对平均变化</h4>
