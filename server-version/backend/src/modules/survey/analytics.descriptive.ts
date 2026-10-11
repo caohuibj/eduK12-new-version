@@ -12,12 +12,14 @@ export interface ItemSummary {
   numericMean:number|null
   numericSampleSd:number|null
 }
-const numeric=(values:number[])=>({
-  mean:values.length?values.reduce((a,b)=>a+b,0)/values.length:null,
-  sd:values.length>1?Math.sqrt(
-    values.reduce((sum,x)=>sum+(x-values.reduce((a,b)=>a+b,0)/values.length)**2,0)/(values.length-1),
-  ):null,
-})
+const numeric=(values:number[])=>{
+  if(!values.length)return {mean:null,sd:null}
+  const mean=values.reduce((a,b)=>a+b,0)/values.length
+  const sd=values.length>1
+    ?Math.sqrt(values.reduce((sum,x)=>sum+(x-mean)**2,0)/(values.length-1))
+    :null
+  return {mean,sd}
+}
 /** Aggregate in memory only from an already bounded, verified FINAL source.
  * Raw free-text values must never leak via descriptive frequency charts.
  */
