@@ -15,60 +15,86 @@ const code=()=>('R-'+randomBytes(8).toString('hex').toUpperCase())
 
 /** A bearer of a public-entry capability can start recruitment; it is NEVER a
  * participant identity or a way to view previous answers. */
-async function activePublicWave(tx:Tx,projectId:string,waveId:string,rawEntry:string,forJoin:boolean){
+/** Project -> Wave -> owner/token guards are ordered consistently with
+ * public START, PAUSE/CLOSE and the finalization lifecycle.
+ */
+async function activePublicWave(tx:Tx,projectId:string,waveId:string,rawEntry:string){
   if(!/^[A-Za-z0-9_-]{43}$/.test(rawEntry))return fail()
+  const projects=await tx.$queryRaw<Array<{id:string;collectionMode:string}>>`
+    SELECT id,collection_mode AS "collectionMode" FROM "survey_projects"
+    WHERE id=${projectId} AND status='ACTIVE' FOR SHARE
+  `
+  if(!projects.length||projects[0].collectionMode!=='LINKED_WAVES')
+    return fail('研究项目当前不接受新的多波次参与者')
   const rows=await tx.$queryRaw<Array<{
-    projectId:string;waveId:string;collectionMode:string;ordinal:number;
-    allowNewParticipants:boolean;consentVersion:number;
+    waveId:string;ordinal:number;allowNewParticipants:boolean;
+    consentVersion:number;startsCount:number;quotaStarts:number|null
   }>>`
-    SELECT p.id AS "projectId",w.id AS "waveId",
-      p.collection_mode AS "collectionMode",w.ordinal,
+    SELECT w.id AS "waveId",w.ordinal,
       w.allow_new_participants AS "allowNewParticipants",
-      w.consent_version AS "consentVersion"
-    FROM "survey_projects" p
-    JOIN "survey_waves" w ON w.project_id=p.id
-    JOIN "survey_entry_tokens" t ON t.wave_id=w.id AND t.project_id=p.id
+      w.consent_version AS "consentVersion",
+      w.starts_count AS "startsCount",w.quota_starts AS "quotaStarts"
+    FROM "survey_waves" w
+    JOIN "survey_entry_tokens" t ON t.wave_id=w.id AND t.project_id=w.project_id
+    JOIN "survey_projects" p ON p.id=w.project_id
     JOIN "users" u ON u.id=p.owner_user_id
     JOIN "survey_researcher_grants" g ON g.user_id=u.id
-    WHERE p.id=${projectId} AND w.id=${waveId}
+    JOIN "survey_mfa_credentials" m ON m.user_id=u.id
+    WHERE w.id=${waveId} AND w.project_id=${projectId}
       AND p.status='ACTIVE' AND w.status='OPEN'
-      AND w.publication_id IS NOT NULL
+      AND w.publication_id IS NOT NULL AND w.hard_stop_at IS NULL
       AND (w.opens_at IS NULL OR w.opens_at<=statement_timestamp())
       AND (w.closes_at IS NULL OR w.closes_at>statement_timestamp())
       AND u.account_domain='SURVEY' AND u.is_active AND NOT u.is_frozen
-      AND g.status='ACTIVE'
+      AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp())
+      AND g.status='ACTIVE' AND m.enabled=TRUE
       AND t.token_hash=${sha256(rawEntry)} AND t.revoked_at IS NULL
       AND t.expires_at>statement_timestamp()
-    FOR SHARE OF p,w,t,u,g
+    FOR UPDATE OF w FOR SHARE OF t,u,g,m
   `
-  const row=rows[0]
-  if(!row)return fail('研究目前未开放参加')
-  if(forJoin&&row.collectionMode==='LINKED_WAVES'&&row.ordinal>1&&!row.allowNewParticipants)
+  const wave=rows[0]
+  if(!wave)return fail('研究目前未开放参加')
+  if(wave.ordinal>1&&!wave.allowNewParticipants)
     return fail('此波次暂不接受新的研究编号')
-  return row
+  if(wave.quotaStarts!==null&&wave.startsCount>=wave.quotaStarts)
+    return fail('研究名额已用尽，请勿领取无法启动的研究编号')
+  return wave
 }
 
-/** Single stable project-local pseudonym, backed by a separate 256-bit proof. */
+/** Initial LINKED enrollment atomically claims exactly one Wave Attempt.
+ * The first subsequent START recovers it; issuing unstartable identities is
+ * prohibited. This follows the contract that quota counts parent Attempts.
+ */
 export async function createLinkedResearchIdentity(input:{
   projectId:string;waveId:string;entryToken:string;consentVersion:number;consent:boolean
-}):Promise<{researchCode:string;accessCredential:string}>{
+}):Promise<{researchCode:string;accessCredential:string;attemptId:string}>{
   if(!input.consent)return fail('需要先同意研究内跨波次关联说明')
-  const secret=opaque(),participantId=randomUUID(),researchCode=code()
+  const secret=opaque(),participantId=randomUUID(),researchCode=code(),attemptId=randomUUID()
   await prisma.$transaction(async tx=>{
-    const wave=await activePublicWave(tx,input.projectId,input.waveId,input.entryToken,true)
-    if(wave.collectionMode!=='LINKED_WAVES')return fail('当前研究不支持跨波次编号')
-    if(input.consentVersion!==wave.consentVersion)return fail('研究说明已经更新，请重新确认')
+    const wave=await activePublicWave(tx,input.projectId,input.waveId,input.entryToken)
+    if(input.consentVersion!==wave.consentVersion)
+      return fail('研究说明已经更新，请重新确认')
+    const claimed=await tx.surveyWave.updateMany({
+      where:{id:input.waveId,projectId:input.projectId,status:'OPEN',
+        startsCount:wave.startsCount},
+      data:{startsCount:{increment:1}},
+    })
+    if(claimed.count!==1)return fail('研究名额出现并发竞争，请重新领取')
     await tx.surveyParticipant.create({data:{
       id:participantId,projectId:input.projectId,researchCode,
       credentialHash:sha256(secret),consentVersion:input.consentVersion,
       status:'ACTIVE',
     }})
+    await tx.surveyWaveAttempt.create({data:{
+      id:attemptId,projectId:input.projectId,waveId:input.waveId,
+      participantId,status:'STARTED',
+    }})
     await tx.surveyConsent.create({data:{
       id:randomUUID(),projectId:input.projectId,waveId:input.waveId,
-      participantId,consentVersion:input.consentVersion,accepted:true,
+      participantId,attemptId,consentVersion:input.consentVersion,accepted:true,
     }})
   })
-  return {researchCode,accessCredential:secret}
+  return {researchCode,accessCredential:secret,attemptId}
 }
 
 /** Recovery never accepts the publicly displayable research code alone. */
