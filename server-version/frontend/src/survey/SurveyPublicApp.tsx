@@ -139,7 +139,7 @@ export default function SurveyPublicApp(){
   const [task,setTask]=useState<Task|null>(null),[answers,setAnswers]=useState<Record<string,Record<string,Answer>>>({})
   const [attemptId,setAttemptId]=useState(''),[submissionId,setSubmissionId]=useState('')
   const [general,setGeneral]=useState<General|null>(null),[notice,setNotice]=useState('')
-  const [withdrawn,setWithdrawn]=useState(false)
+  const [withdrawn,setWithdrawn]=useState(false),[revoked,setRevoked]=useState(false)
   // SHORT-LIVED same-tab recovery only. Never shared across waves or devices.
   const [singleResume,setSingleResume]=useState<SingleResume|null>(()=>readSingleResume(publicId))
   const base='/r/'+publicId
@@ -168,7 +168,7 @@ export default function SurveyPublicApp(){
     setResearchCode(result.researchCode);setAccessCredential(result.accessCredential)
     setProofReceived(true);setNotice('此研究编号与私密恢复凭证只显示在当前设备页面，请分别妥善保存。')
   })
-  const chooseWave=(wave:Wave)=>{setSelectedWave(wave);setAgreed(false);setTask(null);setGeneral(null);setWithdrawn(false)}
+  const chooseWave=(wave:Wave)=>{setSelectedWave(wave);setAgreed(false);setTask(null);setGeneral(null);setWithdrawn(false);setRevoked(false)}
   const loadTask=async(id:string,code:string,secret:string)=>{
     const data=await publicApi<Task>(base+'/attempts/'+id+'/task','POST',{
       ...(code?{researchCode:code}:{}),accessCredential:secret,
@@ -253,7 +253,18 @@ export default function SurveyPublicApp(){
     setTask(null)
     setNotice('提交成功。系统不会提供未经验证的诊断或常模等级。')
   })}
-  const withdraw=()=>{if(!general)return
+  const revokeAccess=()=>{if(!general||info?.project.collectionMode!=='LINKED_WAVES')return
+    if(!window.confirm('确认撤销此研究编号的未来访问权限？撤销后无法读取波次或回执，但凭编号和原始密钥仍可申请撤回历史研究数据。'))return
+    void run(async()=>{
+      await publicApi(base+'/revoke-access','POST',{
+        researchCode:researchCode.trim().toUpperCase(),accessCredential:accessCredential.trim(),
+      })
+      setRevoked(true);setHome(null);setTask(null);setGeneral(null)
+      setNotice('已终止未来访问，仍可凭原始研究身份申请撤回数据。')
+    })
+  }
+  const withdraw=()=>{if(!general&&!revoked
+    &&!(info?.project.collectionMode==='LINKED_WAVES'&&researchCode&&accessCredential))return
     if(!window.confirm(
       '确认申请撤回本研究可定位的数据吗？后续统计和新导出将排除这些记录；此前合法保存的研究资料仍须按研究说明处理，已下载的外部副本无法自动追回。'
     ))return
@@ -290,6 +301,10 @@ export default function SurveyPublicApp(){
       {loading&&<p role="status">正在读取研究说明…</p>}
       {error&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{error}</p>}
       {notice&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{notice}</p>}
+      {revoked&&!withdrawn&&<section className="border p-4 rounded-lg bg-white">
+        <p role="status">访问已撤销；仍可申请撤回研究数据。</p>
+        <button type="button" className="btn-secondary" disabled={busy} onClick={withdraw}>申请排除历史研究数据</button>
+      </section>}
       {withdrawn&&<p role="status" className="border-l-4 border-teal-600 p-4">
         您的研究数据撤回请求已被记录。后续统计和新导出将排除可定位回答。
       </p>}
@@ -310,6 +325,8 @@ export default function SurveyPublicApp(){
             value={accessCredential} onChange={e=>setAccessCredential(e.target.value)}/></label>
           <button className="btn-primary" disabled={busy||!researchCode||!accessCredential}>读取我的波次任务</button>
         </form>
+        <button type="button" className="btn-secondary mt-3" disabled={busy||!researchCode||!accessCredential}
+          onClick={withdraw}>持原有研究凭证申请数据撤回（包括已撤销访问者）</button>
       </section>}
       {info.project.collectionMode==='LINKED_WAVES'&&proofReceived&&<section className="bg-white rounded-xl border-2 border-teal-600 p-5">
         <h3 className="font-semibold text-lg">请保存研究身份</h3>
@@ -370,8 +387,11 @@ export default function SurveyPublicApp(){
         <p className="text-sm text-slate-600">{general.disclaimer}</p>
         <p className="text-xs">完成时间：{new Date(general.completedAt).toLocaleString('zh-CN')}</p>
         <div className="flex flex-wrap gap-3">
-          {info.project.collectionMode==='LINKED_WAVES'&&<button className="btn-secondary"
-            disabled={busy} onClick={returnHome}>返回我的研究波次</button>}
+          {info.project.collectionMode==='LINKED_WAVES'&&<>
+            <button className="btn-secondary" disabled={busy} onClick={returnHome}>返回我的研究波次</button>
+            <button type="button" className="btn-secondary" disabled={busy} onClick={revokeAccess}>
+              只撤销未来访问（保留研究数据）</button>
+          </>}
           <button className="btn-secondary" type="button" disabled={busy} onClick={withdraw}>
             申请撤回本研究数据（排除未来统计）</button>
         </div>
