@@ -5,6 +5,7 @@ export interface SurveyExportCursor {
   v:1;projectId:string;waveId:string;format:'RAW_WAVE'|'RAW_LONG'|'SCORE_LONG'
   after:{id:string;completedAt:string}
   cutOff:string;sourceRevision:number;page:number;issuedAt:number
+  completedFrom:string|null;completedBefore:string|null
 }
 const signer=()=>{
   const key=process.env.ASSET_SIGNING_SECRET
