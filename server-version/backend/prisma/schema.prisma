@@ -3026,3 +3026,43 @@ model EducationTeacherStudentInvitation {
   @@index([organizationId, classUnitId, expiresAt], map: "education_teacher_student_invites_class_idx")
   @@map("education_teacher_student_invitations")
 }
+
+// Huiteacher-only evaluation facts; no School, Training or Survey result source
+// is promoted by sharing a User or Organization key.
+model HuiteacherEvaluationTarget {
+  id              String   @id
+  organizationId  String   @map("organization_id")
+  kind            String
+  subjectUserId   String?  @map("subject_user_id")
+  name            String
+  status          String   @default("ACTIVE")
+  createdByUserId String   @map("created_by_user_id")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([organizationId,id],map:"huiteacher_evaluation_targets_org_id_key")
+  @@index([organizationId,status,kind,createdAt(sort:Desc)],map:"huiteacher_evaluation_targets_list_idx")
+  @@map("huiteacher_evaluation_targets")
+}
+
+model HuiteacherEvaluationEvent {
+  id              String   @id
+  organizationId  String   @map("organization_id")
+  targetId        String   @map("target_id")
+  kind            String
+  title           String
+  notes           String?
+  status          String   @default("DRAFT")
+  version         Int      @default(1)
+  scheduledAt     DateTime? @map("scheduled_at") @db.Timestamptz(6)
+  openedAt        DateTime? @map("opened_at") @db.Timestamptz(6)
+  closedAt        DateTime? @map("closed_at") @db.Timestamptz(6)
+  createdByUserId String   @map("created_by_user_id")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([organizationId,id],map:"huiteacher_evaluation_events_org_id_key")
+  @@index([organizationId,status,createdAt(sort:Desc)],map:"huiteacher_evaluation_events_list_idx")
+  @@index([organizationId,targetId,createdAt(sort:Desc)],map:"huiteacher_evaluation_events_target_idx")
+  @@map("huiteacher_evaluation_events")
+}
