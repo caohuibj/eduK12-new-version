@@ -112,6 +112,7 @@ export const validateSurveyDraft=(kind:SurveyKind,input:unknown,forPreview=false
   if(kind==='FORM'){
     const d=definition as FormDraft
     const items=d.pages.flatMap(p=>p.questions)
+    if(items.length>300)err(issues,'pages','单份 Form 最多包含 300 道题目')
     unique(d.pages.map(p=>p.pageKey),'pages',issues)
     unique(items.map(q=>q.itemKey),'items',issues)
     if(forPreview&&!items.length)err(issues,'pages','至少添加一道题目')
@@ -197,7 +198,10 @@ export const validateSurveyDraft=(kind:SurveyKind,input:unknown,forPreview=false
       })
     })
   }
-  return {definition,issues,digest:canonicalHash(JSON.parse(JSON.stringify({kind,definition})))}
+  const canonical=JSON.parse(JSON.stringify({kind,definition}))
+  if(Buffer.byteLength(JSON.stringify(canonical),'utf8')>480000)
+    err(issues,'definition','单份研究工具数据体积不能超过 480 KB')
+  return {definition,issues,digest:canonicalHash(canonical)}
 }
 export const assertSurveyDraft=(kind:SurveyKind,input:unknown,forPreview=false):SurveyDraft=>{
   const result=validateSurveyDraft(kind,input,forPreview)

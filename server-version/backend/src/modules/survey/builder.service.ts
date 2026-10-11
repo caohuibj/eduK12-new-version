@@ -31,7 +31,7 @@ async function authorizedProject(tx:Tx,userId:string,projectId:string,write:bool
       AND u.account_domain='SURVEY' AND u.is_active=TRUE AND u.is_frozen=FALSE
       AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp())
       AND g.status='ACTIVE' AND m.enabled=TRUE
-    LIMIT 1
+    LIMIT 1 FOR SHARE OF p,u,g,m
   `
   const project=rows[0]
   if(!project)fail(404,'研究项目不存在')
