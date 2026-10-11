@@ -27,6 +27,34 @@ export const SURVEY_FORM_MAX_ANSWER_FIELDS=500
 /** Count wire-level keys; each MATRIX row is one key before FINAL normalization. */
 export const formAnswerFieldCount=(form:FormDraft)=>form.pages.reduce((sum,page)=>
   sum+page.questions.reduce((n,q)=>n+(q.type==='MATRIX'?q.rows.length:1),0),0)
+/** Conservative maximum serialized answer bytes before an instrument is published.
+ * JSON may expand control characters to 6 ASCII bytes per UTF-16 code unit.
+ * This protects both simple large free-text forms and dense matrix multi-select.
+ */
+export const formWorstCaseAnswerBytes=(form:FormDraft)=>{
+  const quote=(value:string)=>Buffer.byteLength(JSON.stringify(value),'utf8')
+  let bytes=2 // root JSON object
+  for(const page of form.pages)for(const q of page.questions){
+    const option= Math.max(4,...q.options.map(o=>quote(o.optionKey)),
+      q.allowRefusal?23:0)
+    const allOptions=2+q.options.reduce((n,o)=>n+quote(o.optionKey)+1,0)
+    const valueBytes=()=>{
+      if(q.type==='SHORT_TEXT'||q.type==='LONG_TEXT')
+        return 2+6*(q.maxLength??(q.type==='SHORT_TEXT'?300:10000))
+      if(q.type==='MULTIPLE'||q.type==='RANK_ORDER')return allOptions
+      if(q.type==='CONSTANT_SUM')return 2+q.options.reduce((n,o)=>n+quote(o.optionKey)+32,0)
+      if(q.type==='DATE')return 12
+      if(q.type==='TIME')return 7
+      if(q.type==='NUMBER'||q.type==='SLIDER')return 30
+      return option
+    }
+    if(q.type==='MATRIX'||q.type==='MATRIX_MULTIPLE'){
+      for(const row of q.rows)bytes+=quote(q.itemKey+':'+row.rowKey)+
+        (q.type==='MATRIX_MULTIPLE'?allOptions:option)+2
+    }else bytes+=quote(q.itemKey)+valueBytes()+2
+  }
+  return bytes
+}
 export const formQuestionSchema=z.object({
   itemKey:key,
   type:z.enum(['SINGLE','MULTIPLE','SHORT_TEXT','LONG_TEXT','NUMBER','LIKERT','MATRIX']),
@@ -146,6 +174,8 @@ export const validateSurveyDraft=(
     // Runtime still checks its actual submitted key count independently.
     if(!allowLegacyFrozenConditionOperators&&formAnswerFieldCount(d)>SURVEY_FORM_MAX_ANSWER_FIELDS)
       err(issues,'pages',`问卷最多允许 ${SURVEY_FORM_MAX_ANSWER_FIELDS} 个作答字段；矩阵每行占一个字段。请删减矩阵行后再保存或发布`)
+    if(!allowLegacyFrozenConditionOperators&&formWorstCaseAnswerBytes(d)>480000)
+      err(issues,'pages','问卷答案的理论最大体积超过 480 KB 提交预算；请减少文本字数或矩阵选项数量')
     unique(d.pages.map(p=>p.pageKey),'pages',issues)
     unique(items.map(q=>q.itemKey),'items',issues)
     if(forPreview&&!items.length)err(issues,'pages','至少添加一道题目')
