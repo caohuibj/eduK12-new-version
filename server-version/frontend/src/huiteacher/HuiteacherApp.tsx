@@ -169,7 +169,7 @@ export default function HuiteacherApp(){
   })
   const issueStudentCodes=()=>run(async()=>{
     if(!org||!classId)throw new Error('请先选择班级')
-    const studentNumbers=roster.split(/[\\s,，]+/).map(x=>x.trim()).filter(Boolean)
+    const studentNumbers=roster.split(/[\s,，]+/).map(x=>x.trim()).filter(Boolean)
     if(!studentNumbers.length)throw new Error('请填写已核验学号')
     const result=await teacherApi<{list:Array<{studentNumber:string;inviteCode:string}>}>(
       `/organizations/${org.organizationId}/classes/${classId}/student-invitations`,

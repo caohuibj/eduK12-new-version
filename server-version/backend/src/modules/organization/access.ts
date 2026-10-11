@@ -102,6 +102,9 @@ export async function resolveOrganizationAccessContext(input: {
     : [[], []]
 
   const explicitDenies = denyRows.map((row) => row.permission)
+  // A School-specific deny still applies inside the shared education realm.
+  if (organization.productDomain === 'SCHOOL' && explicitDenies.some(x =>
+    ['*', 'EDUCATION_ACCESS', 'HUISCHOOL_ACCESS'].includes(x))) return null
   const basis: OrganizationAccessContext['basis'] = []
   if (input.principal.platformRole === 'SYSTEM_ADMIN') basis.push('SYSTEM_ADMIN')
   if (membership?.orgRole === 'ORG_ADMIN') basis.push('ORG_ADMIN')

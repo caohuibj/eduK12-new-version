@@ -41,7 +41,9 @@ const memberScopes = async (input:{
                  AND grant_row."product"=${input.product}
                  AND grant_row."role"='PRODUCT_ADMIN'
                  AND grant_row."revoked_at" IS NULL
-             ) AND NOT EXISTS (
+             ) AND u."role" IN ('ADMIN','TEACHER')
+               AND u."teacher_approved"=TRUE
+               AND NOT EXISTS (
                SELECT 1 FROM "organization_access_denies" denied_admin
                WHERE denied_admin."organization_id"=o."id"
                  AND denied_admin."user_id"=u."id"
