@@ -1,49 +1,58 @@
-# Huiteacher single-branch development checkpoint
+# Huiteacher｜single-branch implementation checkpoint · 2026-10-12
 
-Baseline: `main@2c3b9ed518a7652108b19b2ffbace2308678ca56`
-Branch: `feat/huiteacher-pr1-education-identity`
-Checkpoint: `0463e94ca0fb1d0d4f56ce5473635c718a95f0ba`
-Authoritative specification: [Notion Huiteacher v1.2](https://app.notion.com/p/3f6d27635a38818d9bbddaf9ec8a48fa).
+**Repository:** `caohuibj/eduK12-new-version`  
+**Base:** `main@2c3b9ed518a7652108b19b2ffbace2308678ca56`  
+**Feature branch:** `feat/huiteacher-pr1-education-identity`  
+**Checkpoint code:** `ef2c7dd7b0b556633811c2b588938d0fe093b115`  
+**Design:** [Notion Huiteacher implementation v1.2](https://app.notion.com/p/3f6d27635a38818d9bbddaf9ec8a48fa)
 
-**This is a development checkpoint, not a release, merge or CI acceptance record.**
-The user explicitly paused CI; no official PR, CI activation, merge or production deployment is authorized by this checkpoint.
-Changes for PR1 and PR2 currently share one stacked branch; PR1 security amendments after early PR2 commits are part of the *same final cumulative diff*, not separate reviewed PRs.
+**STATUS: DEVELOPMENT SOURCE COMMITTED ONLY — UNTESTED.** User requested no GitHub PR creation, no CI activation, no merge, no deployment. The code is not accepted, running in production, or validated by any official gate. PR1 and PR2 are logical phases on the same branch, not independent pull requests.
 
-## Phase status
+## Current cumulative development state
 
-| Scope | Implemented on feature branch | Still required before claiming complete |
+| Phase | Source implemented on feature branch | Outstanding before acceptance |
 | --- | --- | --- |
-| PR1: shared education identity | Separate School/Teacher host-only sessions and CSRF, shared User/campusAccount, school entitlements, per-product admin grants, Teacher-only bootstrap, staff/student invites, product-specific School psychology admission, basic Teacher landing and school admin UI | Exhaustive shared-route authority audit; actual isolated DB migration/contract tests; role/registration/backward-compatibility checks; production auth/config review |
-| PR2: evaluation foundation | Stable person/team/org/activity/artifact/project targets, event lifecycle, Teacher-owned immutable Survey Form V2 authoring, shared ResearchFormEditor without researcher-media access, atomic canonical Run draft binding, track/preview/publish/lifecycle endpoints, Teacher-vs-School Run authority hardening, manager UIs | **Blocker:** Teacher Form V2 must be a formally authorized canonical Run resource with a real START/FINAL adapter. Existing Composite Form launch semantics and Survey RESEARCH_ONLY publications cannot be silently treated as Teacher's release. Permission-filtered task inbox and recipient/subject event linking also outstanding. |
-| PR3: teacher development and school diagnosis | Shared user, organization, activity and draft content foundations only | Teacher personal/self assessment participation, authorized instrument catalogs and scientific qualification, schools surveys, source-specific aggregate reporting, small-cell/differencing protection and personal report separation |
-| PR4: field/expert/multi-rater | Event kinds include classroom, meeting, teaching research and field visit | Evidence/drafts, scoped expert projects, private reflection, independent evaluation and deliberated consensus |
-| PR5: student evaluation of teaching | Reusable education student ID and class relations | Teacher-linked evaluation task eligibility, student's restricted Teacher session, repeat/identity protections, safe cohort feedback, text disclosure review |
-| PR6: follow-up and release | Branding shell and target/event keys | Stable cross-event comparison, action tracking, full workspace/nav, responsive QA, TLS/Nginx/Compose feature flags, release/rollback evidence |
+| **PR1: shared School/Teacher education identity** | Common School ID/credential and school/org units, separate Teacher/School login sessions, product entitlements and explicit product admin grants, Teacher-only initial school, school staff/student invitations, psychology enrollment separated, host landing + scoped workspace, School access boundaries partly audited | Exhaustive review of existing School APIs and shared Organization/Assessment Run semantics; isolated migration/auth/role/expiry/CSRF/MFA/posture checks. Cannot claim complete before this. |
+| **PR2: Teacher Form V2 canonical runtime** | Stable targets/events; Teacher-owned Survey Form V2 drafts + immutable publication; explicit product-scoped released FORM resource; atomic event ↔ canonical Assessment Run; normal Run Track/preview/publish/lifecycle; current Teacher-only SELF population and START admission; transactional Run START via `HUITEACHER_FORM_V2` binding; authoritative encrypted single FINAL with idempotency; completion reconciler; personal Teacher task inbox and Survey V2 renderer; manager Run and Form Studio | Code review + official type/schema/migration/integration tests not run. No proof of full runtime science/content eligibility. Cross-track Form + scored Scale packaging and licensed teacher Scale catalog **not complete**; distinct paid/professional personal reporting pending. |
+| **PR3: Teacher development + school organization** | Teacher Form-only school-survey diagnostic path using same Run/FINAL; protected, sealed group report with `n>=10` independent full frozen respondent cohort; requires all assigned respondents completed; small-cell and complementary multi-option protection; explicit suppression for raw text/unreleased numeric summaries; Teacher-specific manager & recent MFA; redacted aggregate Run progress and report UI | Personal formally-scored Scale report and self-service content rights; exact audience report/teacher target policies and further differencing protections across **multiple waves**; tests not run. No claim that whole PR3 is complete. |
+| **PR4: observation/expert/multi-rater** | Event kinds and draft target/event foundation only | Evidence, experts, private reflections, consensus, usable multi-evaluator workflows |
+| **PR5: student evaluation of teaching** | Shared School student identity/organization relationship foundation only | Student–teacher actual pairing, released student evaluator content, restricted Teacher participation, privacy-safe aggregate reports |
+| **PR6: longitudinal/actions/production** | Target/event identity and initial Teacher visual shell | Multi-wave comparability, action tracking, four full workspaces, B3 fire Logo, proper Host/TLS/Compose, release and rollback |
 
-## Scope and security invariants
+## PR2 authoritative processing sequence
 
-1. Scheme A: shared education identity, **separate logins**, no SSO; School-only, Teacher-only, dual-product schools.
-2. Student and teacher accounts never duplicated merely because the school opens the other product; School psychology enrollment is a separate authorization decision.
-3. A shared `ORG_ADMIN` membership **does not** grant either product's protected business authority. Existing School administrators are backfilled into explicit HUISCHOOL product-admin grants. Teacher rights are separately granted.
-4. Teacher-linked Assessment Run is created transactionally; School Activity cannot bind that Run. Run management and publisher checks distinguish the exact Teacher event binding.
-5. Teacher Form is **unscored**, reuses Survey V2 definition checks, and is immutable after publication. This authoring completion **does not** imply a usable FINAL runtime.
-6. Student academic grades/exams/matching, full School/Teacher SSO, full educational timetable/OA, and AI scoring are not in the current release scope.
-7. No test result has been reported as PASS. Integration tests committed to `huiteacherSharedIdentity.postgres.integration.test.ts` and `huiteacherEvaluation.postgres.integration.test.ts` are **not executed**.
+1. Teacher manager publishes **product-owned** `HuiteacherFormInstrument` with Survey V2 structural validator; media proof from Survey Researcher project **not** accepted. `huiteacher-form:<uuid>` + exact immutable digest is a Teacher-specific Form resource, not a Survey `RESEARCH_ONLY` publication.
+2. Manager creates target and event, creates canonical Assessment Run **transactionally linked** to that event; adds released Teacher Form Track, previews, opens event after at least one Track, publishes Run. Teacher and School current product ACLs are checked independently. Run is the assignment and current-participant truth.
+3. TEACHER subject+respondent SELF gets a frozen Run Execution. START uses existing Run claim and relational assignment; a transactional Form adapter binds precisely one `HuiteacherFormAttempt` to that Run Execution, without a parallel assessment task authority.
+4. Respondent opens own Teacher task, uses Survey V2 participant form UI (conditional/MATRIX/MULTIPLE/professional questions; no research media), keeps only same-tab short lived drafts, and submits once.
+5. FINAL reuses Survey's Form V2 normalization, platform canonical payload hash, existing runtime encryption; one immutable `HuiteacherFormFinal` per attempt; commit also updates the original Run and relational assignment. Exact replay returns prior receipt; altered replay is denied. Form never produces a fictitious Scale score.
+6. Run completion reconciliation recognizes `HUITEACHER_FORM_V2`. Teacher management and report APIs never send raw individual results or identifiers to organization admins.
 
-## PR2 release-blocking adapter decision
+**Testing coverage committed but NOT EXECUTED:** `src/__tests__/integration/huiteacherSharedIdentity.postgres.integration.test.ts`; `huiteacherEvaluation.postgres.integration.test.ts`; `huiteacherFormRuntime.postgres.integration.test.ts`. The latter includes end-to-end Form START/FINAL/replay and protected group output with intentional below-threshold category and safely released balanced multiselect.
 
-- A published `HuiteacherFormInstrument` is presently *only* a Teacher-owned frozen authoring record, not a `registered_assessment_resources` release or a Composite launch target.
-- `productionRunResourceAuthorityRegistry` supports `FORM` only when its authoritative release resolves to the existing canonical Composite launch contract. It cannot launch the richer Survey Form V2 by pretending the content is a Composite form section.
-- The next development task must implement and validate an explicit supported Survey Form V2 → canonical Run START/FINAL bridge (with idempotency and protected result source), or extend an existing officially supported Form runtime to preserve all V2 semantics. Do not publish fake scores, fake qualified research content, or parallel mutable answer stores.
-- Only after a real Teacher-form respondent FINAL can PR3's school group report adapter safely consume a product-scoped verified source.
+## PR3 privacy constraints and remaining review
 
-## Future checks — deferred under user's no-CI instruction
+- Ordinary Form group reports require a finished assessment Run **and** closed Teacher event. Every frozen independent respondent must have FINAL; `n>=10`, no partial-denominator or arbitrary respondent selectors, no person/time filters. Server checks the exact binding and decrypts/integrity-verifies encrypted Huiteacher FINAL.
+- Single/Likert/Matrix and Multiple/Matrix Multiple categorical option counts are subject to item-level withholding if either a nonzero cell or a multiple-choice complement is below 5. Raw free text is **never** disclosed; numerical/ranking summaries without an approved method are explicitly WITHHELD. No non-scored Form totals, student score rankings, clinical diagnoses or causal improvement claims.
+- **Future controls needed:** repeated reports with strongly overlapping but nonidentical respondent populations can still cause cross-wave differencing. Do not enable matched group longitudinal or flexible subgroups without a proven trusted disclosure policy. Current report mode is narrow first-wave whole-cohort only.
+- First official candidate must validate deliberately adversarial cases: 10/11 FINAL with one attrited, repeated waves, role revocation after login, School session attempting Teacher report, Other-domain Run or research tool referenced as Teacher FORM, same attempt FINAL twice with changed payload, School-only org trying Teacher API, service outage and rollback.
 
-| Change | Fault detected by required check | Single primary location | Reusable evidence | Budget |
+## Exact review scope → necessary check → unique execution place → evidence → budget
+
+| Change | Fault target | Check's intended single execution place | Reusable formal evidence | Budget |
 | --- | --- | --- | --- | --- |
-| Prisma migrations, scoped grants, reused School admissions | Old school regression, product escalation, destructive migration, invalid DDL | Official GitHub isolated Postgres / migration contract | None yet; per frozen input only | Size after final diff freeze |
-| Shared Assessment Run and Teacher product boundaries | Wrong run attribution, unsafe release, unauthorized FINAL | Official GitHub affected backend integration | None yet | Freeze after runtime adapter |
-| Form V2 authoring & UI | Schema/preview inconsistency, TS errors, responsive editor | GitHub affected frontend checks | None yet | Freeze after frontend completion |
-| Deployment config | Wrong host, cookies, feature gate or artifact | GitHub selected candidate, then server only version/readiness/one flow/rollback | Only same candidate digest | Production time-limited |
+| PR1 migrations/shared education identity/role grants | Invalid DDL, duplicate accounts, unauthorized psychology/Teacher access | GitHub official isolated PostgreSQL + affected auth contracts | **None yet** | Freeze actual selected jobs before CI |
+| PR2 Form policy/START/FINAL/reconcile | Frozen identity mismatch, duplicate/corrupted FINAL, runtime status drift | GitHub affected backend integration and type checks | **None yet** | Freeze full changed inputs before CI |
+| PR2/PR3 frontends | Missing route, incorrect Form V2 renderer, privacy UI, 390/768/1440 interactions | GitHub affected frontend build/typed browser checks | **None yet** | Freeze selected jobs |
+| PR3 protected group service | Failing n/N, small-cell, multi, wrong source, free-text leak, cross-product report escalation | GitHub affected privacy integration | **None yet** | Freeze selected jobs |
+| Any production change | Wrong source/version, unavailable Host, invalid certificate, rollback failure | GitHub qualified immutable candidate; server only version/readiness/ONE affected short flow/rollback | Only same digest accepted | Only after separate deploy authorization |
 
-**Do not initiate CI or any full test battery for this checkpoint.** Before a real PR/merge/release, re-read exact `AGENTS.md` and `docs/release/README.md`, classify full diff and use only official, verifiable evidence.
+Respect actual `AGENTS.md` and `docs/release/README.md`, read current HEAD and full diff again before eventual PR/CI. Only formal same-input evidence can be reused. The repository's application local→CI accepted-signature channel is NOT implemented; do not fabricate acceptance or run CI despite current user hold. Build each affected product artifact once and leave unrelated components untested.
+
+## Latest developer next actions (no CI yet)
+
+- PR2: static audit and corrections of new migrations/Prisma types, runtime schema and Run atomic lifecycle; explicit review of `HUITEACHER_FORM_V2` START idempotency and all new tests. **Actual green test evidence absent.** Freeze and execute tests only when user lifts CI hold.
+- PR3: extend teacher personal scored evaluations only with a properly licensed and independently qualified published Scale; do not turn pilot Form choice codes into score interpretations. Formal reporting template and report audience matrix, protected student-teacher opinions and longitudinal privacy are not yet delivered.
+- Continue remaining PR4–PR6 on the **same branch only if authorized**; no formal PR, Actions trigger, CI, merge, server write until the user's next explicit permission for each relevant action.
+
+_Last historical checkpoint (before Form runtime) was superseded by this document. Git commits preserve the exact source chronology._
