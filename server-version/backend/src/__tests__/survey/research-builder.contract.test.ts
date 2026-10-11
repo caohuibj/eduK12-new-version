@@ -63,6 +63,26 @@ describe('Survey research builder contracts without formal publication authority
     changed.pages[1].questions[0].itemKey='school'
     expect(validateSurveyDraft('FORM',changed,true).issues.some(i=>i.message.includes('重复'))).toBe(true)
   })
+  it('rejects invalid conditional operator combinations while allowing valid nested branches',()=>{
+    const form:FormDraft={schemaVersion:1,pages:[{pageKey:'main',title:'多层条件',questions:[
+      {itemKey:'source',type:'MULTIPLE',prompt:'多选来源',required:true,
+        options:[{optionKey:'yes',label:'是'},{optionKey:'no',label:'否'}],rows:[]},
+      {itemKey:'middle',type:'SINGLE',prompt:'第二层',required:true,
+        options:[{optionKey:'go',label:'继续'},{optionKey:'stop',label:'停止'}],rows:[],
+        displayIf:{itemKey:'source',operator:'INCLUDES',optionKey:'yes'}},
+      {itemKey:'last',type:'SHORT_TEXT',prompt:'第三层',required:false,
+        options:[],rows:[],displayIf:{itemKey:'middle',operator:'EQUALS',optionKey:'go'}},
+    ]}]}
+    expect(validateSurveyDraft('FORM',form,true).issues).toHaveLength(0)
+    const invalidMultiple=structuredClone(form)
+    invalidMultiple.pages[0].questions[1].displayIf!.operator='EQUALS'
+    expect(validateSurveyDraft('FORM',invalidMultiple,true).issues.some(x=>
+      x.path.includes('displayIf.operator'))).toBe(true)
+    const invalidSingle=structuredClone(form)
+    invalidSingle.pages[0].questions[2].displayIf!.operator='INCLUDES'
+    expect(validateSurveyDraft('FORM',invalidSingle,true).issues.some(x=>
+      x.path.includes('displayIf.operator'))).toBe(true)
+  })
   it('uses existing ScaleDefinitionV2 scoring for reversal and distinct dimensions',()=>{
     const definition=compileResearchScale('学习动机',scale())
     expect(definition.license.status).toBe('self_authored')
