@@ -15,3 +15,9 @@
 ## 同输入官方证据复用
 
 `campus-reuse.py` 只接纳本 PR 明确选择、三小时内且未过期的 GitHub Actions 官方 artifact。校验 ZIP SHA-256、仓库/事件/workflow/run/合成 merge SHA 与 PR head 的关系、base、组件 tree、固定构建/测试程序及 workflow 命令、实际成功步骤、完整零跳过测试和同一 image ID 的既有阈值扫描。任一不符停止，不能伪造成功或静默全量重跑。复用保留旧 image/source 证据及新 head 的绑定，未通过的浏览器必须重新执行。该请求只对编号匹配的 PR 生效；其他 PR 按自身差异执行。它没有扩展本地签名接纳，也不授权部署。
+
+## 非生产校园来源守卫的精确扩展
+
+`src/routes/auth.ts` 仅允许在原校园来源拒绝条件前添加 `NODE_ENV !== production` 的 `school.localhost` Host／严格 Origin 判断，并把该布尔量加入原拒绝条件。分类器以 base/head 的完整文件比较，除这段确切替换外任何其他字节变化均拒绝校园路线；不会对白名单中的整份认证文件放宽登录、密码、角色、会话、cookie、CSRF、限流或 MFA。该文件变化还必须携带 `local-auth-origin.test.ts` 契约，并由候选检查实际运行。
+
+来源契约检查真实 Express 路由守卫，对其后的认证控制器使用明确的合成替身；覆盖非生产本地域、生产既有校园域、培训入口与近似域名，并确认被拒绝请求未进入登录控制器且没有 Set-Cookie。账号域、数据库角色、注册和 MFA 仍由既有真实隔离 PostgreSQL 契约验证。该扩展不触发全平台媒体、性能、灾备或小程序消费者，保留候选编译、相关契约、浏览器、实际镜像扫描、CodeQL 及失败关闭的合并汇总。

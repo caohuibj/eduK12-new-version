@@ -10,7 +10,9 @@ describe('campus page navigation boundaries',()=>{
   expect(ids('TEACHER',teacher)).toContain('tasks')
   expect(ids('TEACHER',teacher)).not.toEqual(expect.arrayContaining(['protected-reports']))
   expect(ids('TEACHER',teacher)).not.toContain('staff')
+  expect(ids('TEACHER',teacher)).not.toContain('classes')
   expect(ids('TEACHER',counselor)).toContain('protected-reports')
+  expect(ids('TEACHER',counselor)).toContain('classes')
   expect(ids('TEACHER',counselor)).not.toContain('staff')
   const admin={...teacher,personas:[],orgRole:'ORG_ADMIN',canGovern:true}
   expect(ids('ADMIN',admin)).toContain('staff')
@@ -19,6 +21,7 @@ describe('campus page navigation boundaries',()=>{
  it('honors explicit denies, approval and parent-report availability',()=>{
   expect(ids('TEACHER',{...counselor,explicitDenies:['ORG_PROTECTED_FEEDBACK_V1']})).not.toContain('protected-reports')
   expect(ids('TEACHER',{...counselor,explicitDenies:['*']})).not.toContain('report-review')
+  expect(ids('TEACHER',{...counselor,explicitDenies:['CLASS_APPROVE']})).not.toContain('classes')
   expect(ids('STUDENT',null,'PENDING_CLASS_APPROVAL')).toEqual(['overview','account'])
   expect(ids('PARENT',null,'APPROVED',false)).not.toContain('parent-reports')
  })
