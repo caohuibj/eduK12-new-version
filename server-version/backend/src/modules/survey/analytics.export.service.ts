@@ -6,6 +6,7 @@ import { verifyToken } from '../../utils/jwt'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { decryptUnifiedRuntimePayload,encryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { loadSurveySource } from './analytics.source'
+import { isResearchFreeTextType } from './analytics.response-privacy'
 import { rawLongExport,rawWideExport } from './analytics.raw-export'
 import { exportLong,exportWide } from './analytics.export-format'
 import { SurveyAnalyticsError } from './analytics.read'
@@ -102,12 +103,12 @@ export async function createSurveyExport(req:Request,input:{
     fail(400,'纯分数导出不适用自由文本选项')
   const included=input.format.startsWith('RAW')&&input.includeFreeText===true
   const omittedFreeText=input.format.startsWith('RAW')&&!included
-    ?sources.raw.filter(r=>['SHORT_TEXT','LONG_TEXT'].includes(r.responseType)).length
+    ?sources.raw.filter(r=>isResearchFreeTextType(r.responseType)).length
     :0
   const projected=included||input.format.startsWith('SCORE')?sources:{
     ...sources,
-    raw:sources.raw.filter(r=>!['SHORT_TEXT','LONG_TEXT'].includes(r.responseType)),
-    codebook:sources.codebook.filter(r=>!['SHORT_TEXT','LONG_TEXT'].includes(r.responseType)),
+    raw:sources.raw.filter(r=>!isResearchFreeTextType(r.responseType)),
+    codebook:sources.codebook.filter(r=>!isResearchFreeTextType(r.responseType)),
   }
   let artifact:SurveyRawExport|BoundedResearchExport
   try{artifact=artifactFor(input.format,input.projectId,projected,input.waveId)}
