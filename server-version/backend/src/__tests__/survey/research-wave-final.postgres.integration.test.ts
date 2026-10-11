@@ -11,6 +11,7 @@ import { submitResearchFinal,readGeneralForOwnAttempt } from '../../modules/surv
 import { getOwnResearchTask } from '../../modules/survey/task.public'
 import { matchedWaveCounts,waveOverview } from '../../modules/survey/analytics.read'
 import { loadSurveySource } from '../../modules/survey/analytics.source'
+import {listSampleQuality,setSampleQuality} from '../../modules/survey/sample-quality.service'
 import { rawLongExport,rawWideExport } from '../../modules/survey/analytics.raw-export'
 import { exportWide,exportLong } from '../../modules/survey/analytics.export-format'
 import { describePairedScores } from '../../modules/survey/analytics.descriptive'
@@ -713,6 +714,52 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     })).completeAttempts).toBe(0)
     // Immutable source remains auditable; withdrawal excludes without deleting FINAL.
     expect(await db.surveyWaveFinal.count({where:{attemptId:participant.attemptId}})).toBe(1)
+  })
+  it('reviews sample quality with durable reasons, exact cohort exclusion and immutable FINAL',async()=>{
+    const w=await wave('研究样本质量可审计复核',[toolIds.scale],true)
+    const person=await joinLinkedStudy({
+      publicId:w.publicId,waveId:w.id,entryToken:w.entrySecret,
+      consentVersion:1,consent:true,
+    })
+    const task=await getOwnResearchTask({
+      publicId:w.publicId,attemptId:person.attemptId,
+      researchCode:person.researchCode,accessCredential:person.accessCredential,
+    })
+    await submitResearchFinal({
+      publicId:w.publicId,attemptId:person.attemptId,
+      researchCode:person.researchCode,accessCredential:person.accessCredential,
+      submissionId:randomUUID(),
+      answers:{[task.units[0].instrumentKey]:{itemone:'o3',itemtwo:'o4'}},
+    })
+    const before=(await waveOverview(ownerId,projectId)).waves.find(x=>x.id===w.id)!
+    expect(before).toMatchObject({finalCompleted:1,analysisIncluded:1,qualityExcluded:0})
+    const initial=await listSampleQuality(ownerId,projectId,1)
+    expect(initial.list.find(x=>x.attemptId===person.attemptId))
+      .toMatchObject({verdict:'INCLUDED',revision:0})
+    await expect(setSampleQuality({actorUserId:randomUUID(),projectId,
+      attemptId:person.attemptId,revision:0,verdict:'EXCLUDED',reason:'资格不符'}))
+      .rejects.toThrow()
+    const excluded=await setSampleQuality({actorUserId:ownerId,projectId,
+      attemptId:person.attemptId,revision:0,verdict:'EXCLUDED',reason:'预定质量标准未通过'})
+    expect(excluded.revision).toBe(1)
+    const after=(await waveOverview(ownerId,projectId)).waves.find(x=>x.id===w.id)!
+    expect(after).toMatchObject({finalCompleted:1,analysisIncluded:0,qualityExcluded:1,uniqueLinkedCodes:0})
+    const filtered=await loadSurveySource({actorUserId:ownerId,projectId,
+      waveIds:[w.id],includeWideSchema:true})
+    expect(filtered.completeAttempts).toBe(0)
+    expect(rawWideExport(projectId,filtered).csv).toContain('QUALITY_EXCLUDED')
+    await expect(setSampleQuality({actorUserId:ownerId,projectId,
+      attemptId:person.attemptId,revision:0,verdict:'INCLUDED',reason:'旧版本冲突'}))
+      .rejects.toThrow()
+    await setSampleQuality({actorUserId:ownerId,projectId,
+      attemptId:person.attemptId,revision:1,verdict:'INCLUDED',reason:'复核后满足纳入标准'})
+    expect((await waveOverview(ownerId,projectId)).waves.find(x=>x.id===w.id))
+      .toMatchObject({finalCompleted:1,analysisIncluded:1,qualityExcluded:0})
+    expect(await db.surveyEvent.count({where:{
+      projectId,action:'RESEARCH_SAMPLE_QUALITY_REVIEWED',
+      metadata:{path:['attemptId'],equals:person.attemptId},
+    }})).toBe(2)
+    expect(await db.surveyWaveFinal.count({where:{attemptId:person.attemptId}})).toBe(1)
   })
   it('bounds one-Wave FINAL exports by half-open completion window and records selection',async()=>{
     const w=await wave('单波次分段导出',[toolIds.scale],true)
