@@ -10,7 +10,7 @@ import { SurveyFinalValidationError } from './final.compute'
 import { getOwnResearchTask } from './task.public'
 import { resolveSurveyPublicId } from './public-project'
 import * as admission from './admission.service'
-import { surveyImageRefs } from './media.routes'
+import { surveyImageRefs } from './media.references'
 import { serveAssessmentImageContent,AssessmentImageDeliveryError } from '../assessment-media/assessment-image-delivery'
 import type { AssessmentStaticImageAssetIdentityV1 } from '../assessment-media/assessment-image'
 

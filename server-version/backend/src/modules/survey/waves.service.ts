@@ -3,7 +3,7 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { surveyKindSchema } from './builder.definition'
 import { previewResearchInstrument } from './builder.compiler'
-import { assertSurveyMediaOwned } from './media.routes'
+import { assertSurveyMediaOwned } from './media.references'
 import { canonicalHash } from '../assessment-runtime/canonical'
 
 type Tx=Prisma.TransactionClient
