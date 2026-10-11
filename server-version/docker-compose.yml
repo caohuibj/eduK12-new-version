@@ -44,12 +44,6 @@ x-app-environment: &app-environment
   CREDENTIAL_HANDOFF_TTL_HOURS: ${CREDENTIAL_HANDOFF_TTL_HOURS:-24}
   CORS_ORIGIN: ${CORS_ORIGIN:?CORS_ORIGIN must be set to an explicit frontend origin}
   TRUST_PROXY_HOPS: ${TRUST_PROXY_HOPS:-2}
-  # OFF by default; explicitly enable at a separately approved Survey cutover.
-  SURVEY_WORKSPACE_ENABLED: ${SURVEY_WORKSPACE_ENABLED:-false}
-  SURVEY_PUBLICATION_ENABLED: ${SURVEY_PUBLICATION_ENABLED:-false}
-  SURVEY_ANALYTICS_ENABLED: ${SURVEY_ANALYTICS_ENABLED:-false}
-  # Only configured on the host, never committed; required when Survey is enabled.
-  SURVEY_MFA_ENCRYPTION_KEY: ${SURVEY_MFA_ENCRYPTION_KEY:-}
   SURVEY_PUBLIC_IP_LIMIT: ${SURVEY_PUBLIC_IP_LIMIT:-5000}
   SURVEY_PUBLIC_WINDOW_SECONDS: ${SURVEY_PUBLIC_WINDOW_SECONDS:-900}
   # Conservative pre-measurement defaults. Final 4C4G pool/admission values
@@ -172,6 +166,11 @@ services:
     container_name: ptool-backend
     environment:
       <<: *app-environment
+      # Survey-only secrets should not enter worker/migrate/seed containers.
+      SURVEY_WORKSPACE_ENABLED: ${SURVEY_WORKSPACE_ENABLED:-false}
+      SURVEY_PUBLICATION_ENABLED: ${SURVEY_PUBLICATION_ENABLED:-false}
+      SURVEY_ANALYTICS_ENABLED: ${SURVEY_ANALYTICS_ENABLED:-false}
+      SURVEY_MFA_ENCRYPTION_KEY: ${SURVEY_MFA_ENCRYPTION_KEY:-}
       DATABASE_URL_LEGACY: ${DATABASE_URL_LEGACY:-}
       LEGACY_DATA_ENCRYPTION_KEY: ${LEGACY_DATA_ENCRYPTION_KEY:-}
       NODE_OPTIONS: --max-old-space-size=${BACKEND_NODE_HEAP_MB:-640}
