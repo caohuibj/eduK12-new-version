@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto'
+import { createHash,randomUUID } from 'node:crypto'
 import { PrismaClient } from '@prisma/client'
 import { beforeAll,afterAll,describe,expect,it } from 'vitest'
 import { integrationDatabaseUrl } from '../integration/integration-env'
@@ -622,7 +622,7 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     const participants=Array.from({length:5001},(_,index)=>({
       id:randomUUID(),projectId,
       researchCode:'R-'+String(index).padStart(10,'0'),
-      credentialHash:'synthetic-5001-'+w.id+'-'+index,
+      credentialHash:createHash('sha256').update('synthetic-5001-'+w.id+'-'+index).digest('hex'),
       status:'ACTIVE',
     }))
     const attempts=participants.map(person=>({
