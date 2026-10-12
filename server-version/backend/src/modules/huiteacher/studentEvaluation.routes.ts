@@ -109,6 +109,10 @@ router.post(path+'/run/publish',requireTeacherProductAdmin,requireRecentTeacherM
     ...runVersion.parse(req.body),
   })))
 
+router.post(path+'/report/release',requireTeacherProductAdmin,requireRecentTeacherMfa,
+  reportLimiter,wrap(req=>readHuiteacherStudentFeedbackReport({
+    ...params.parse(req.params),actorUserId:req.user!.userId,publishV2:true,
+  })))
 router.get(path+'/report',reportLimiter,wrap(req=>
   readHuiteacherStudentFeedbackReport({
     ...params.parse(req.params),actorUserId:req.user!.userId,

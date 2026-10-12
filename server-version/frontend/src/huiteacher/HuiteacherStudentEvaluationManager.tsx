@@ -114,7 +114,13 @@ export function HuiteacherStudentEvaluationManager({organizationId,eventId,event
   })
   const readReport=()=>run(async()=>{
     setReport(await api<StudentFeedbackReport>(base+'/report'))
-    setNotice('仅显示满足人数下限、补集和小单元抑制的合法群体结果。')
+    setNotice('已读取符合该 Run 正式披露策略的群体报告。')
+  })
+  const releaseReport=()=>run(async()=>{
+    if(!window.confirm('确认正式发布本次学生评教群体报告？该报告将固定快照供授权教师读取。'))return
+    const released=await api<StudentFeedbackReport>(base+'/report/release','POST',{})
+    setReport(released)
+    setNotice('群体报告已正式发布并冻结；之后读取不会重新统计或修改披露策略。')
   })
   return <section className="ht-admin" aria-label="学生评教受控管理">
     <h4>学生评教 · 正式任务</h4>
@@ -172,15 +178,18 @@ export function HuiteacherStudentEvaluationManager({organizationId,eventId,event
           </>}
           {eventStatus==='OPEN'&&assignedRun.status==='CLOSED'&&
             <button disabled={busy} onClick={close}>完成活动关闭</button>}
-          {eventStatus==='CLOSED'&&assignedRun.status==='CLOSED'&&
-            <button disabled={busy} onClick={readReport}>查看受保护群体反馈</button>}
+          {eventStatus==='CLOSED'&&assignedRun.status==='CLOSED'&&<>
+            {import.meta.env.VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'
+              &&<button disabled={busy} onClick={releaseReport}>正式发布新版群体报告</button>}
+            <button disabled={busy} onClick={readReport}>查看群体反馈</button>
+          </>}
         </div>
         {progress&&<p>已完成 {progress.counts.COMPLETED??0} / {progress.total}
           {' · '}进行中 {progress.counts.STARTED??0}</p>}
       </div>}
       {report&&<HuiteacherStudentFeedbackView report={report}/>}
     </div>}
-    <p className="ht-muted">未满足 10 人披露下限或小单元及补集要求时，
-      教师反馈将被抑制。跨轮差分风险由独立披露台账阻断；开放意见默认不公开。</p>
+    <p className="ht-muted">新发布的评教任务自动沿用本校已保存的隐私偏好。
+      旧任务继续执行原有规则。个人答案、身份映射、响应时间与开放文本始终不通过群体报告公开。</p>
   </section>
 }
