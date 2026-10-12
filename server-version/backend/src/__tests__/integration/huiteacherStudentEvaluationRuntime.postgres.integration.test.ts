@@ -16,6 +16,7 @@ import {closeAssessmentRun} from '../../modules/assessment-run/lifecycle'
 import {readOwnHuiteacherFormTask,
   submitOwnHuiteacherFormFinal} from '../../modules/huiteacher/formFinal.service'
 import {readHuiteacherStudentFeedbackReport} from '../../modules/huiteacher/studentReport.service'
+import {createHuiteacherImprovement} from '../../modules/huiteacher/improvement.service'
 
 /** Real, disposable PostgreSQL; all service transactions, FK/unique keys,
  * encrypted FINAL and release-ledger triggers are verified on the SAME DB.
@@ -296,6 +297,15 @@ suite('Huiteacher PR5 canonical student feedback (isolated PostgreSQL)',()=>{
     const report=await readHuiteacherStudentFeedbackReport({
       ...campaign,actorUserId:teacher.id,
     })
+    // A threshold-controlled student feedback report is NOT a raw PR6
+    // improvement provenance shortcut. No alternative narrative backdoor:
+    // only formally authorized report disclosure can describe this wave.
+    await expect(createHuiteacherImprovement({
+      organizationId:org.id,targetId:target.id,
+      actorUserId:admin.id,audience:'SCHOOL_SHARED',
+      sourceEventId:event.id,goal:'基于学生评教改进',
+      plan:'本来源不得通过普通学校纵向改进行动绕过学生群体披露。',
+    })).rejects.toThrow()
     expect(report.reportMode).toBe('FORM_DESCRIPTIVE_AGGREGATE')
     expect(report.frozenPopulation).toBe(15)
     expect(report.independentRespondents).toBe(10)
