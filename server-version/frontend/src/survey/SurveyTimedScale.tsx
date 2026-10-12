@@ -44,7 +44,8 @@ export function SurveyTimedScale({unit,answer,onAnswer,tracker,onTiming,index,on
   if(!current)return <section className="rounded border p-4">
     <h3>{unit.title}</h3><p role="alert">此量表没有可作答的冻结题目。</p>
   </section>
-  const selected=answer[current.itemKey]
+  const selected=Object.prototype.hasOwnProperty.call(answer,current.itemKey)
+    ?answer[current.itemKey]:undefined
   return <section className="rounded-xl border bg-slate-50 p-4 my-5 space-y-4"
     aria-label={'逐题施测：'+unit.title}>
     <h3 className="text-lg font-semibold">{unit.title}</h3>

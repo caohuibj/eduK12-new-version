@@ -57,6 +57,15 @@ describe('Survey frozen one-by-one response timing',()=>{
     expect(sealSurveyScaleTimings(['qone','qtwo'],{qone:'o5',qtwo:'o1'},
       {qone:entry}).qtwo).toEqual(emptyRecoveredTiming())
   })
+  it('supports valid item keys matching Object.prototype properties',()=>{
+    const tracker=new SurveyScaleTimingTracker()
+    tracker.enter('constructor',true,100)
+    tracker.answer('constructor',undefined,'o2',350)
+    const observed=tracker.snapshot()
+    expect(observed.constructor.firstResponseMs).toBe(250)
+    expect(sealSurveyScaleTimings(['constructor'],{constructor:'o2'},observed).constructor.firstResponseMs).toBe(250)
+    expect(Object.keys(sealSurveyScaleTimings(['constructor'],{},{}))).toHaveLength(0)
+  })
   it('keeps same final snapshot as a stable rounded, nonnegative integer payload',()=>{
     const t=new SurveyScaleTimingTracker()
     t.enter('q',true,10.2)

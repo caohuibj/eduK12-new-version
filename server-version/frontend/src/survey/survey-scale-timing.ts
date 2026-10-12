@@ -38,7 +38,7 @@ export class SurveyScaleTimingTracker {
     ]))
   }
   private row(key:string):SurveyScaleItemTimingV1{
-    if(!this.rows[key]){
+    if(!Object.prototype.hasOwnProperty.call(this.rows,key)){
       this.rows[key]=this.initialAnswers[key]===undefined
         ?fresh():emptyRecoveredTiming()
     }
@@ -101,7 +101,8 @@ export class SurveyScaleTimingTracker {
 export function sealSurveyScaleTimings(
   itemKeys:readonly string[],answers:Record<string,unknown>,records:SurveyScaleTimings,
 ):SurveyScaleTimings{
-  return Object.fromEntries(itemKeys.filter(key=>answers[key]!==undefined).map(key=>[
-    key,records[key]??emptyRecoveredTiming(),
+  return Object.fromEntries(itemKeys.filter(key=>
+    Object.prototype.hasOwnProperty.call(answers,key)&&answers[key]!==undefined).map(key=>[
+    key,Object.prototype.hasOwnProperty.call(records,key)?records[key]:emptyRecoveredTiming(),
   ]))
 }
