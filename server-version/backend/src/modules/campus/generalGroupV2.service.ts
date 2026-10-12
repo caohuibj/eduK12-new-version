@@ -5,7 +5,7 @@ import {canonicalHash} from '../assessment-runtime/canonical'
 import type {AuthenticatedPrincipal} from '../../types'
 import type {PrivacyOptions} from '../report-privacy/schema'
 import {readFrozenPrivacyForRun} from '../report-privacy/snapshot.service'
-import {requireCampusGroupManager,assertCampusNoGroupDifferencing} from './group-reports'
+import {requireCampusGroupManager} from './group-reports'
 import {withCampusReportReleaseLock} from './report-release-lock'
 import {schoolPrivacyV2Enabled,reviewedGeneralResources,
   generalRunApproved,parseFrozenSchoolOptions,reviewedMinimumFloor,
@@ -14,6 +14,9 @@ import {projectCampusGeneralGroupV2} from './generalGroupV2.projection'
 import {generateOrganizationGroupAnalysis} from '../reporting/service'
 import {readOrganizationReportingArtifact} from '../reporting/pr4Service'
 import {getPublishedReportingSpec} from '../reporting/spec'
+import {readReportingArtifactRecord} from '../reporting/artifact'
+import {exactGeneralContributors,unsafeComparableGeneralOverlap}
+  from './generalGroupV2.differencing'
 import {listOrganizationReportingSources,listPublishedReportingSpecs} from '../reporting/discovery'
 import {reportingFail} from '../reporting/types'
 
@@ -22,6 +25,7 @@ type Scope={actor:AuthenticatedPrincipal;organizationId:string;
 type DB=Prisma.TransactionClient
 type Frozen={
   snapshotId:string;options:PrivacyOptions;resourceMinimumN:number;
+  resourceFamily:string;resourceKey:string;resourceVersion:string;
   runClosedAt:Date;activityClosedAt:Date
 }
 type TrackRow={
@@ -129,6 +133,7 @@ async function frozenGeneralSource(db:DB,input:Scope):Promise<Frozen>{
     ||totals[0].respondents!==totals[0].total||!totals[0].selfStudent)
     hidden('CAMPUS_GENERAL_FROZEN_POPULATION_INVALID')
   return {snapshotId:frozen.policySnapshotId,options,resourceMinimumN:resourceFloor,
+    resourceFamily:track.family,resourceKey:track.key,resourceVersion:track.version,
     runClosedAt:tracks[0].runClosedAt,activityClosedAt:tracks[0].activityClosedAt}
 }
 
@@ -155,6 +160,68 @@ async function readRelease(db:DB,input:Scope,snapshotId:string){
     hidden('CAMPUS_GENERAL_RELEASE_INTEGRITY')
   return row.reportProjection
 }
+type ComparableHistory={id:string;manifest:unknown;resolvedN:number|null}
+
+/** Only comparable exact resource versions are checked. Old School GROUP and
+ * published longitudinal artifacts are included so V2 cannot subtract an
+ * earlier legacy aggregate. No user IDs are retained in the release ledger.
+ * The same School disclosure lock covers these reads and the release write.
+ */
+async function assertGeneralContributorOverlap(input:{
+  organizationId:string;artifactId:string;source:Frozen;contributors:readonly string[]
+}):Promise<void>{
+  const history=await prisma.$queryRaw<ComparableHistory[]>(Prisma.sql`
+    SELECT history.id,history.manifest,history."resolvedN"
+    FROM (
+      SELECT a.id,a.artifact_payload->'inputManifest' AS manifest,
+        CASE WHEN jsonb_typeof(a.artifact_payload->'inputManifest')='array'
+          THEN jsonb_array_length(a.artifact_payload->'inputManifest')
+          ELSE NULL END AS "resolvedN",
+        a.generated_at AS "generatedAt"
+      FROM reporting_analysis_artifacts a
+      JOIN assessment_run_tracks track
+        ON track.organization_id=a.organization_id
+        AND track.run_id=(a.artifact_payload->'source'->>'runId')
+        AND track.id=(a.artifact_payload->'source'->>'trackId')
+      WHERE a.organization_id=${input.organizationId}
+        AND a.analysis_kind='GROUP'
+        AND a.id<>${input.artifactId}
+        AND a.artifact_payload->'projection'->>'state'='present'
+        AND track.resource_family=${input.source.resourceFamily}
+        AND track.resource_key=${input.source.resourceKey}
+        AND track.resource_version=${input.source.resourceVersion}
+      UNION ALL
+      SELECT wave.id AS id,wave.input_manifest->'resolved' AS manifest,
+        CASE WHEN jsonb_typeof(wave.input_manifest->'resolved')='array'
+          THEN jsonb_array_length(wave.input_manifest->'resolved')
+          ELSE NULL END AS "resolvedN",
+        artifact.generated_at AS "generatedAt"
+      FROM reporting_analysis_artifacts artifact
+      JOIN reporting_analysis_artifact_waves binding
+        ON binding.organization_id=artifact.organization_id
+        AND binding.artifact_id=artifact.id
+      JOIN reporting_series_waves wave
+        ON wave.organization_id=binding.organization_id
+        AND wave.series_id=binding.series_id AND wave.id=binding.wave_id
+      WHERE artifact.organization_id=${input.organizationId}
+        AND artifact.analysis_kind IN ('REPEATED_COHORT','MATCHED_LONGITUDINAL')
+        AND wave.input_manifest->'resource'->>'family'=${input.source.resourceFamily}
+        AND wave.input_manifest->'resource'->>'key'=${input.source.resourceKey}
+        AND wave.input_manifest->'resource'->>'version'=${input.source.resourceVersion}
+    ) history
+    ORDER BY history."generatedAt" DESC,history.id DESC
+    LIMIT 101
+  `)
+  if(history.length>100)hidden('CAMPUS_GENERAL_COMPARABLE_HISTORY_LIMIT')
+  for(const previous of history){
+    let ids:string[]
+    try{ids=exactGeneralContributors(previous.manifest,previous.resolvedN)}
+    catch{return hidden('CAMPUS_GENERAL_COMPARABLE_SOURCE_INVALID')}
+    if(unsafeComparableGeneralOverlap(input.contributors,ids))
+      hidden('CAMPUS_GENERAL_EFFECTIVE_DIFFERENCING_BLOCKED')
+  }
+}
+
 export async function readCampusGeneralGroupV2(input:Scope){
   await requireCampusGroupManager(input.actor,input.organizationId)
   const projection=await prisma.$transaction(async tx=>{
@@ -182,8 +249,6 @@ export async function publishCampusGeneralGroupV2(input:Scope){
       &&(Date.now()-source.runClosedAt.getTime()<86_400_000
         ||Date.now()-source.activityClosedAt.getTime()<86_400_000))
       hidden('CAMPUS_GENERAL_RELEASE_DELAY')
-    if(source.options.crossReleaseOverlapGuard)
-      await assertCampusNoGroupDifferencing(input)
     const analysis=await generateOrganizationGroupAnalysis({
       principal,organizationId:input.organizationId,
       runId:input.runId,trackId:input.trackId,specId:input.specId,
@@ -197,6 +262,26 @@ export async function publishCampusGeneralGroupV2(input:Scope){
       options:source.options,minimumN:min,metricMinimums,
     })
     if(projected.state!=='READY')hidden('CAMPUS_GENERAL_GROUP_WITHHELD')
+    // The trusted, immutable analysis manifest identifies only actual FINAL
+    // contributors. No second scoring pass or full-Run roster approximation.
+    const artifact=await readReportingArtifactRecord(analysis.artifactId)
+    if(artifact.analysisKind!=='GROUP'
+      ||artifact.organizationId!==input.organizationId
+      ||artifact.specId!==input.specId
+      ||artifact.artifactPayload.source.runId!==input.runId
+      ||artifact.artifactPayload.source.trackId!==input.trackId)
+      hidden('CAMPUS_GENERAL_ARTIFACT_SOURCE_INVALID')
+    let contributors:string[]
+    try{
+      const published=approved.projection as {resultContributorN?:unknown}
+      contributors=exactGeneralContributors(
+        artifact.artifactPayload.inputManifest,published.resultContributorN)
+    }catch{return hidden('CAMPUS_GENERAL_ARTIFACT_CONTRIBUTORS_INVALID')}
+    const contributorDigest=canonicalHash({
+      kind:'SCHOOL_GENERAL_EFFECTIVE_FINAL_V2',organizationId:input.organizationId,
+      resource:[source.resourceFamily,source.resourceKey,source.resourceVersion],
+      contributors,
+    })
     // The group lock covers canonical artifact generation, source revalidation,
     // final write and response. The repository never stores user IDs here.
     await prisma.$transaction(async tx=>{
@@ -205,7 +290,10 @@ export async function publishCampusGeneralGroupV2(input:Scope){
         hidden('CAMPUS_GENERAL_POLICY_CHANGED')
       if(await readRelease(tx,input,source.snapshotId))return
       if(source.options.crossReleaseOverlapGuard)
-        await assertCampusNoGroupDifferencing(input)
+        await assertGeneralContributorOverlap({
+          organizationId:input.organizationId,artifactId:analysis.artifactId,
+          source,contributors,
+        })
       await requireCampusGroupManager(input.actor,input.organizationId)
       await tx.educationReportReleaseRecord.create({data:{
         id:randomUUID(),organizationId:input.organizationId,
@@ -214,9 +302,9 @@ export async function publishCampusGeneralGroupV2(input:Scope){
         reportKind:'SCHOOL_GENERAL_EDUCATION_GROUP',
         audience:'AUTHORIZED_HUISCHOOL_GENERAL_AGGREGATE',
         reportDigest:canonicalHash(projected),
-        // The effective FINAL-submitter set is deliberately not faked with
-        // a digest of the invited frozen Run. No per-person identities stored.
-        effectivePopulationDigest:null,
+        // Actual resolved FINAL contributors, never the invited population.
+        // The ledger persists only their digest, not user IDs.
+        effectivePopulationDigest:contributorDigest,
         reportProjection:projected as Prisma.InputJsonValue,
         releasedByUserId:input.actor.userId,
       }})
