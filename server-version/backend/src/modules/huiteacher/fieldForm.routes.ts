@@ -6,6 +6,7 @@ import {createRedisRateLimiter} from '../../middleware/redisRateLimit'
 import {success} from '../../utils/response'
 import {requireTeacherProductAdmin,requireRecentTeacherMfa} from './authority'
 import {bindHuiteacherFieldForm,readInvitedHuiteacherFieldForm,readManagerHuiteacherFieldForm,
+  readSubmittedHuiteacherFieldFormEvidence,
   HuiteacherFieldFormError} from './fieldForm.service'
 
 const router=Router()
@@ -45,4 +46,12 @@ router.get('/field-invitations/:invitationId/form',wrap(req=>
     invitationId:uuid.parse(req.params.invitationId),
     actorUserId:req.user!.userId,
   })))
+router.get('/organizations/:organizationId/evaluation-events/:eventId/field-notes/:recordId/form-evidence',
+  requireTeacherProductAdmin,requireRecentTeacherMfa,wrap(req=>
+    readSubmittedHuiteacherFieldFormEvidence({
+      actorUserId:req.user!.userId,
+      organizationId:uuid.parse(req.params.organizationId),
+      eventId:uuid.parse(req.params.eventId),
+      recordId:uuid.parse(req.params.recordId),
+    })))
 export default router

@@ -19,6 +19,7 @@ export function HuiteacherFieldManager({organizationId,eventId,eventStatus,api}:
   const [boundForm,setBoundForm]=useState<{formId:string;title:string}|null>(null)
   const [grants,setGrants]=useState<Grant[]>([])
   const [formal,setFormal]=useState<FormalNote[]>([])
+  const [evidence,setEvidence]=useState<Record<string,{formId:string;answers:Record<string,unknown>;missing:unknown}>>({})
   const [showGrants,setShowGrants]=useState(false)
   const [showFormal,setShowFormal]=useState(false)
   const [busy,setBusy]=useState(false)
@@ -76,6 +77,13 @@ export function HuiteacherFieldManager({organizationId,eventId,eventStatus,api}:
   const readFormal=()=>run(async()=>{
     const result=await api<{list:FormalNote[]}>(base+'/formal-notes')
     setFormal(result.list);setShowFormal(true)
+  })
+  const readFieldEvidence=(note:FormalNote)=>run(async()=>{
+    if(note.kind!=='FORMAL_FEEDBACK')return
+    const source=await api<{formId:string;answers:Record<string,unknown>;missing:unknown}>(
+      base+'/field-notes/'+note.id+'/form-evidence')
+    setEvidence(prev=>({...prev,[note.id]:source}))
+    setNotice('已核验正式反馈附带的冻结 Form 证据。私人反思和未提交草稿仍不可读取。')
   })
   return <section className="ht-field-manager" aria-label="受控现场观察管理">
     <h4>现场观察 · 专家／同行授权</h4>
@@ -142,6 +150,13 @@ export function HuiteacherFieldManager({organizationId,eventId,eventStatus,api}:
         <strong>{note.kind==='FACT'?'事实观察记录':'正式专业反馈'}</strong>
         <span className="ht-tag">已提交 · {new Date(note.submittedAt).toLocaleString()}</span>
         <p className="ht-field-content">{note.content}</p>
+        {note.kind==='FORMAL_FEEDBACK'&&<button type="button" disabled={busy}
+          onClick={()=>readFieldEvidence(note)}>按授权核验结构化观察证据</button>}
+        {evidence[note.id]&&<div className="ht-field-evidence">
+          <strong>已提交的 Form 观察答案（不计分）</strong>
+          <dl>{Object.entries(evidence[note.id].answers).map(([key,value])=>
+            <div key={key}><dt>{key}</dt><dd>{JSON.stringify(value)}</dd></div>)}</dl>
+        </div>}
       </article>):<p>尚无正式提交的观察反馈。私人反思不进入学校反馈。</p>}</div>}
     {eventStatus==='CLOSED'&&<HuiteacherConsensusManager
       organizationId={organizationId} eventId={eventId} api={api}/>}

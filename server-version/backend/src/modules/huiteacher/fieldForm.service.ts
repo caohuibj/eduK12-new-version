@@ -1,6 +1,8 @@
 import {randomUUID} from 'node:crypto'
 import {Prisma} from '@prisma/client'
 import {prisma} from '../../config/database'
+import {canonicalHash} from '../assessment-runtime/canonical'
+import {decryptUnifiedRuntimePayload} from '../assessment-runtime/security'
 import {appendAudit} from '../organization/service'
 import {resolveEducationProductMemberScope} from '../organization/educationProductAccess'
 import {resolvePublishedTeacherForm,teacherFormResourceRef} from './formRunResource'
@@ -135,5 +137,80 @@ export async function readManagerHuiteacherFieldForm(input:{
     })
     return bound?{formId:bound.formId,title:bound.title,
       definitionDigest:bound.definitionDigest}:null
+  })
+}
+
+/**
+ * Explicitly submitted FORMAL_FEEDBACK may carry frozen Form V2 evidence.
+ * This audited manager read is not a research export, an unrestricted
+ * respondent report, or an observer's PRIVATE_REFLECTION.
+ */
+export async function readSubmittedHuiteacherFieldFormEvidence(input:{
+  actorUserId:string;organizationId:string;eventId:string;recordId:string
+}){
+  return prisma.$transaction(async tx=>{
+    const access=await resolveEducationProductMemberScope({
+      actorUserId:input.actorUserId,organizationId:input.organizationId,
+      product:'HUITEACHER',
+    },tx)
+    if(!access?.productAdmin)deny('HUITEACHER_FIELD_EVIDENCE_MANAGER_REQUIRED',403)
+    const records=await tx.$queryRaw<Array<{
+      recordId:string;formId:string;definitionDigest:string;
+      answersCipher:string;answersHash:string
+    }>>`
+      SELECT note."id" AS "recordId",evidence."form_id" AS "formId",
+        evidence."definition_digest" AS "definitionDigest",
+        evidence."answers_cipher" AS "answersCipher",
+        evidence."answers_hash" AS "answersHash"
+      FROM "huiteacher_observation_records" note
+      JOIN "huiteacher_field_form_evidence" evidence
+        ON evidence."organization_id"=note."organization_id"
+        AND evidence."event_id"=note."event_id"
+        AND evidence."record_id"=note."id"
+      JOIN "huiteacher_evaluation_events" event
+        ON event."organization_id"=note."organization_id"
+        AND event."id"=note."event_id"
+        AND event."status" IN ('OPEN','CLOSED')
+      JOIN "organizations" org
+        ON org."id"=note."organization_id"
+        AND org."product_domain"='SCHOOL' AND org."status"='ACTIVE'
+      JOIN "education_product_entitlements" entitlement
+        ON entitlement."organization_id"=org."id"
+        AND entitlement."product"='HUITEACHER' AND entitlement."status"='ACTIVE'
+      WHERE note."organization_id"=${input.organizationId}
+        AND note."event_id"=${input.eventId}
+        AND note."id"=${input.recordId}
+        AND note."kind"='FORMAL_FEEDBACK' AND note."status"='SUBMITTED'
+      FOR SHARE OF note,evidence,event,entitlement
+    `
+    if(records.length!==1)deny('HUITEACHER_FIELD_EVIDENCE_NOT_FOUND',404)
+    const row=records[0]
+    const frozen=await readBoundHuiteacherFieldForm(tx,{
+      organizationId:input.organizationId,eventId:input.eventId,
+    })
+    if(!frozen||frozen.formId!==row.formId
+      ||frozen.definitionDigest!==row.definitionDigest)
+      deny('HUITEACHER_FIELD_EVIDENCE_FROZEN_SOURCE_MISMATCH')
+    const data=decryptUnifiedRuntimePayload<{
+      schemaVersion:number;kind:string;product:string;
+      recordId:string;eventId:string;formId:string;definitionDigest:string;
+      rawAnswers:Record<string,unknown>;missing:unknown;privateScoring:null
+    }>(row.answersCipher)
+    if(!data||data.schemaVersion!==1||data.kind!=='FIELD_FORM_OBSERVATION'
+      ||data.product!=='HUITEACHER'||data.recordId!==row.recordId
+      ||data.eventId!==input.eventId||data.formId!==row.formId
+      ||data.definitionDigest!==row.definitionDigest
+      ||data.privateScoring!==null||canonicalHash(data)!==row.answersHash)
+      deny('HUITEACHER_FIELD_EVIDENCE_INTEGRITY')
+    await appendAudit(tx,{organizationId:input.organizationId,
+      actorUserId:input.actorUserId,action:'HUITEACHER_SUBMITTED_FIELD_FORM_EVIDENCE_READ',
+      targetType:'EVALUATION_EVENT',targetId:input.eventId,
+      domainEventId:randomUUID(),
+      payload:{recordId:input.recordId,formId:row.formId,definitionDigest:row.definitionDigest},
+    })
+    // No observer identity, invitation credential or private reflection.
+    return {recordId:row.recordId,formId:row.formId,
+      definitionDigest:row.definitionDigest,
+      answers:data.rawAnswers,missing:data.missing}
   })
 }
