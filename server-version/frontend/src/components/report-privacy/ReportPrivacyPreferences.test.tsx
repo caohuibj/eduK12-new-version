@@ -1,5 +1,5 @@
 import {describe,it,expect,vi} from 'vitest'
-import {fireEvent,render,screen,waitFor} from '@testing-library/react'
+import {act,fireEvent,render,screen,waitFor} from '@testing-library/react'
 import {ReportPrivacyPreferences} from './ReportPrivacyPreferences'
 
 const org='00000000-0000-4000-8000-000000000011'
@@ -67,5 +67,48 @@ describe('Cookie-like ReportPrivacyPreferences PR1 panel',()=>{
     await screen.findByText(/仅偏好保存阶段/)
     expect(screen.getByRole('option',{name:'我的默认偏好'})).toBeInTheDocument()
     expect(screen.queryByRole('option',{name:'学校强制保护底线'})).not.toBeInTheDocument()
+  })
+
+  it('never applies a delayed old-scenario response to the selected new scenario',async()=>{
+    let finishOld!: (value:any)=>void
+    const active={...data,catalog:{...data.catalog,reportConsumerActive:true,
+      baselineNote:'只有新的正式 Run 使用冻结策略。'}}
+    const api=vi.fn((path:string)=>{
+      if(path.endsWith('scenario=TEACHER_STUDENT_EVALUATION'))
+        return new Promise(resolve=>{finishOld=resolve})
+      if(path.endsWith('scenario=TEACHER_ADULT_FORM_GROUP'))
+        return Promise.resolve(active)
+      throw Error('Unexpected '+path)
+    })
+    render(<ReportPrivacyPreferences api={api as any} organizationId={org}
+      scenarios={['TEACHER_STUDENT_EVALUATION','TEACHER_ADULT_FORM_GROUP']}/>)
+    fireEvent.change(screen.getByRole('combobox',{name:'评价类型'}),{
+      target:{value:'TEACHER_ADULT_FORM_GROUP'},
+    })
+    expect(await screen.findByText(/适用新任务的偏好已生效/)).toBeInTheDocument()
+    await act(async()=>{finishOld(data)})
+    expect(screen.getByText(/适用新任务的偏好已生效/)).toBeInTheDocument()
+    expect(screen.queryByText(/仅偏好保存阶段/)).not.toBeInTheDocument()
+  })
+  it('locks scenario switching during a write and explains new vs historical policies',async()=>{
+    let finishSave!: (value:any)=>void
+    const active={...data,catalog:{...data.catalog,reportConsumerActive:true,
+      baselineNote:'新 Run 自动冻结策略。'}}
+    const api=vi.fn((path:string,method='GET')=>{
+      if(method==='PUT')return new Promise(resolve=>{finishSave=resolve})
+      if(path.endsWith('scenario=TEACHER_STUDENT_EVALUATION'))
+        return Promise.resolve(active)
+      throw Error('Unexpected '+method+' '+path)
+    })
+    render(<ReportPrivacyPreferences api={api as any} organizationId={org}
+      scenarios={['TEACHER_STUDENT_EVALUATION','TEACHER_ADULT_FORM_GROUP']}/>)
+    await screen.findByText(/适用新任务的偏好已生效/)
+    fireEvent.click(screen.getByRole('button',{name:'保存为今后默认偏好'}))
+    const select=screen.getByRole('combobox',{name:'评价类型'})
+    expect(select).toBeDisabled()
+    await act(async()=>{finishSave({saved:true,revision:1})})
+    expect(await screen.findByText(/仅对后续正式发布并冻结策略的受支持新任务生效/))
+      .toBeInTheDocument()
+    expect(select).not.toBeDisabled()
   })
 })
