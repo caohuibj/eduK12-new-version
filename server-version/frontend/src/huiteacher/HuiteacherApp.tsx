@@ -341,9 +341,9 @@ export default function HuiteacherApp(){
         <h2>平台级教育产品治理</h2>
         <p>学校 Teacher 产品管理与平台治理相互独立。
           当前 Teacher 教育会话不能开通产品或授权其他学校，
-          平台管理员请从既有 Training 管理入口以正式管理员账号单独登录。</p>
-        <a href="https://training.eduk12.top" rel="noopener noreferrer">
-          前往独立平台治理入口</a>
+          平台管理员请从主域管理员入口独立登录，School／Teacher 产品会话不可代用。</p>
+        <a href="https://eduk12.top/admin/education-products" rel="noopener noreferrer">
+          前往平台教育产品治理</a>
         <p className="ht-muted">当前不复制已有平台授权、审计或量表许可逻辑到 Teacher 工作台。</p>
       </section>}
       </>}
