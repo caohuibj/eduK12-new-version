@@ -3433,3 +3433,66 @@ model HuiteacherImprovementReassessment {
   @@index([organizationId,targetId,createdAt(sort:Desc)],map:"huiteacher_improvement_reassessments_target_idx")
   @@map("huiteacher_improvement_reassessments")
 }
+
+// PR1 report privacy preferences: additive configuration, not report authority.
+// Historical Runs without a separately frozen snapshot always use LEGACY_STRICT.
+model EducationReportPrivacyPreference {
+  id             String   @id
+  organizationId String   @map("organization_id")
+  product        String
+  scenario       String
+  ownerScopeKind String   @map("owner_scope_kind")
+  ownerUserId    String?  @map("owner_user_id")
+  schemaVersion  Int      @default(1) @map("schema_version")
+  preset         String?
+  options        Json
+  revision       Int      @default(1)
+  updatedByUserId String  @map("updated_by_user_id")
+  updatedAt      DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([organizationId,product,scenario,ownerScopeKind,ownerUserId],map:"education_report_privacy_preferences_read_idx")
+  @@map("education_report_privacy_preferences")
+}
+
+model EducationReportPolicySnapshot {
+  id                      String   @id
+  organizationId          String   @map("organization_id")
+  product                 String
+  scenario                String
+  runId                   String   @map("run_id")
+  policyVersion           Int      @default(1) @map("policy_version")
+  effective               Json     @map("effective_json")
+  effectiveHash           String   @map("effective_hash")
+  fingerprint             String
+  origin                  String
+  schoolDefaultRevision   Int      @map("school_default_revision")
+  schoolMinimumRevision   Int      @map("school_minimum_revision")
+  publisherRevision       Int      @map("publisher_revision")
+  publishedByUserId       String   @map("published_by_user_id")
+  publishedAt             DateTime @map("published_at") @db.Timestamptz(6)
+
+  @@unique([organizationId,runId],map:"education_report_policy_snapshots_run_unique")
+  @@unique([organizationId,id],map:"education_report_policy_snapshots_org_id_unique")
+  @@map("education_report_policy_snapshots")
+}
+
+model EducationReportReleaseRecord {
+  id                       String   @id
+  organizationId           String   @map("organization_id")
+  reportScopeKey           String   @map("report_scope_key")
+  policySnapshotId         String   @map("policy_snapshot_id")
+  sourceRunId              String   @map("source_run_id")
+  sourceSpecId             String?  @map("source_spec_id")
+  reportKind               String   @map("report_kind")
+  audience                 String
+  reportDigest             String   @map("report_digest")
+  effectivePopulationDigest String? @map("effective_population_digest")
+  legacySource             String?  @map("legacy_source")
+  releasedByUserId         String   @map("released_by_user_id")
+  releasedAt               DateTime @default(now()) @map("released_at") @db.Timestamptz(6)
+
+  @@unique([organizationId,reportScopeKey],map:"education_report_release_records_org_scope_unique")
+  @@index([organizationId,sourceRunId,reportKind],map:"education_report_release_records_source_idx")
+  @@map("education_report_release_records")
+}
