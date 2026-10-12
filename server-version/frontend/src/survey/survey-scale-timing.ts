@@ -61,10 +61,18 @@ export class SurveyScaleTimingTracker {
   }
   answer(key:string,previous:unknown,next:unknown,now=readScaleTimingNow()){
     if(this.current!==key)return
+    const wasRecording=this.start!==null
     this.flush(now)
     const row=this.row(key)
-    if(previous===undefined&&row.firstResponseMs===null&&!row.recoveredWithoutClock)
-      row.firstResponseMs=row.activeTimeMs
+    if(previous===undefined&&row.firstResponseMs===null&&!row.recoveredWithoutClock){
+      if(wasRecording)row.firstResponseMs=row.activeTimeMs
+      else{
+        // An answer when the page is hidden/unfocused has no defensible
+        // measured reaction interval. Never manufacture a 0ms observation.
+        row.recoveredWithoutClock=true
+        row.interrupted=true
+      }
+    }
     if(previous!==undefined&&previous!==next)
       row.changeCount=Math.min(MAX_COUNT,row.changeCount+1)
   }
