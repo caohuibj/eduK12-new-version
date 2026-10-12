@@ -15,7 +15,7 @@ export class TeacherFormResourceError extends Error{
     super(code);this.name='TeacherFormResourceError'
   }
 }
-const deny=(code:string,status=409):never=>{throw new TeacherFormResourceError(code,status)}
+function deny(code:string,status=409):never {throw new TeacherFormResourceError(code,status)}
 
 export const teacherFormResourceRef=(id:string,digest:string):RunResourceRef=>({
   family:'FORM',key:TEACHER_FORM_RESOURCE_PREFIX+id,version:digest,

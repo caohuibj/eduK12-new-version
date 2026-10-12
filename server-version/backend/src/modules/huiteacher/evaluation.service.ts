@@ -14,7 +14,7 @@ export class HuiteacherEvaluationError extends Error {
     super(code);this.name='HuiteacherEvaluationError'
   }
 }
-const fail=(code:string,status=409):never=>{throw new HuiteacherEvaluationError(code,status)}
+function fail(code:string,status=409):never {throw new HuiteacherEvaluationError(code,status)}
 async function scope(tx:Tx,input:{actorUserId:string;organizationId:string;admin:boolean}){
   const current=await resolveEducationProductMemberScope({
     actorUserId:input.actorUserId,organizationId:input.organizationId,product:'HUITEACHER',

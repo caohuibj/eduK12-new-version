@@ -13,7 +13,7 @@ export class HuiteacherFormError extends Error {
     super(code);this.name='HuiteacherFormError'
   }
 }
-const fail=(code:string,status=409,issues:Issue[]=[]):never=>{
+function fail(code:string,status=409,issues:Issue[]=[]):never {
   throw new HuiteacherFormError(code,status,issues)
 }
 type Tx=Prisma.TransactionClient

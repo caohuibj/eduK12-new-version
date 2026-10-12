@@ -21,7 +21,7 @@ export class CampusAdmissionError extends Error {
     this.name = 'CampusAdmissionError'
   }
 }
-const fail = (code: string, statusCode = 409): never => { throw new CampusAdmissionError(code, statusCode) }
+function fail(code: string, statusCode = 409):never { throw new CampusAdmissionError(code, statusCode) }
 const scoped = (value: string) => value.trim()
 const normalizeNo = (value: string) => {
   const normalized = scoped(value).toUpperCase()

@@ -15,7 +15,7 @@ export class StudentFeedbackReportError extends Error{
     super(code);this.name='StudentFeedbackReportError'
   }
 }
-const deny=(code:string,status=403):never=>{throw new StudentFeedbackReportError(code,status)}
+function deny(code:string,status=403):never {throw new StudentFeedbackReportError(code,status)}
 const MAX_FINALS=2500
 const PAGE_SIZE=50
 const COMPLEMENT_FLOOR=5

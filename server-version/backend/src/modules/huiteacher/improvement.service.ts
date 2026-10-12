@@ -14,7 +14,7 @@ export class HuiteacherImprovementError extends Error {
     super(code);this.name='HuiteacherImprovementError'
   }
 }
-const deny=(code:string,statusCode=403):never=>{
+function deny(code:string,statusCode=403):never {
   throw new HuiteacherImprovementError(code,statusCode)
 }
 const encrypted=(kind:'GOAL'|'PLAN'|'EVIDENCE'|'REASSESSMENT',text:string)=>{

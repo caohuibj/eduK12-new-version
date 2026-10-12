@@ -15,7 +15,7 @@ export class HuiteacherStudentEvaluationError extends Error {
     super(code);this.name='HuiteacherStudentEvaluationError'
   }
 }
-const deny=(code:string,statusCode=409):never=>{
+function deny(code:string,statusCode=409):never {
   throw new HuiteacherStudentEvaluationError(code,statusCode)
 }
 type StaffCandidate={

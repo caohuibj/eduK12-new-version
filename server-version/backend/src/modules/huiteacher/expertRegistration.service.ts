@@ -10,7 +10,7 @@ export class HuiteacherExpertError extends Error{
     super(code);this.name='HuiteacherExpertError'
   }
 }
-const deny=(code:string,status=409):never=>{throw new HuiteacherExpertError(code,status)}
+function deny(code:string,status=409):never {throw new HuiteacherExpertError(code,status)}
 const codeHash=(value:string)=>createHash('sha256')
   .update('huiteacher-event-expert-registration:v1:'+value).digest('hex')
 async function activeManager(tx:Tx,organizationId:string,userId:string){

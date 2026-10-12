@@ -14,7 +14,7 @@ export class HuiteacherFieldFormError extends Error{
     super(code);this.name='HuiteacherFieldFormError'
   }
 }
-const deny=(code:string,status=409):never=>{throw new HuiteacherFieldFormError(code,status)}
+function deny(code:string,status=409):never {throw new HuiteacherFieldFormError(code,status)}
 const FIELD_KINDS=['CLASSROOM','MEETING','TEACHING_RESEARCH','FIELD_VISIT']
 export async function bindHuiteacherFieldForm(input:{
   actorUserId:string;organizationId:string;eventId:string;formId:string

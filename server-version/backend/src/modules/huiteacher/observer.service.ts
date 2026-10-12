@@ -16,7 +16,7 @@ export class HuiteacherObserverError extends Error {
     super(code);this.name='HuiteacherObserverError'
   }
 }
-const denied=(code:string,status=409):never=>{throw new HuiteacherObserverError(code,status)}
+function denied(code:string,status=409):never {throw new HuiteacherObserverError(code,status)}
 async function validEducationActor(tx:Tx,userId:string){
   const rows=await tx.$queryRaw<Array<{id:string}>>`
     SELECT "id" FROM "users" WHERE "id"=${userId}

@@ -13,7 +13,7 @@ export class TeacherPersonalAssessmentError extends Error{
     super(code);this.name='TeacherPersonalAssessmentError'
   }
 }
-const reject=(code:string,status=409):never=>{throw new TeacherPersonalAssessmentError(code,status)}
+function reject(code:string,status=409):never {throw new TeacherPersonalAssessmentError(code,status)}
 type Tx=Prisma.TransactionClient
 type CurrentResource={resourceId:string;key:string;version:string;scaleId:string;
   definitionHash:string;title:string}

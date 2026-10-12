@@ -179,7 +179,7 @@ export async function listReleasedRegisteredResourcePage(userId: string, role: U
 
 export async function assertRegisteredResourceUse(ref: { family: string; key: string; version: string }, userId: string, db: Prisma.TransactionClient | typeof prisma = prisma, lock = false, teacherRunScope?:{ organizationId:string;runId:string }) {
   if (ref.family==='SCALE'&&ref.key.startsWith('teacher-scale:')){
-    if(!teacherRunScope) reportingFail('RESOURCE_TEACHER_RUN_SCOPE_REQUIRED',
+    if(!teacherRunScope) return reportingFail('RESOURCE_TEACHER_RUN_SCOPE_REQUIRED',
       '教师自评量表只能用于经授权的 Teacher 评价任务',403)
     await assertTeacherScaleRunUse(db,{
       organizationId:teacherRunScope.organizationId,runId:teacherRunScope.runId,

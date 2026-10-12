@@ -11,7 +11,7 @@ export class HuiteacherStudentInviteError extends Error {
     super(code);this.name='HuiteacherStudentInviteError'
   }
 }
-const fail=(code:string,status=409):never=>{throw new HuiteacherStudentInviteError(code,status)}
+function fail(code:string,status=409):never {throw new HuiteacherStudentInviteError(code,status)}
 type Tx=Prisma.TransactionClient
 const tokenHash=(raw:string)=>createHash('sha256')
   .update('huiteacher-student-invite:v1:').update(raw).digest('hex')

@@ -13,7 +13,7 @@ export class EducationProductGovernanceError extends Error {
     super(message);this.name='EducationProductGovernanceError'
   }
 }
-const refuse=(code:string,message='教育产品授权不可用',statusCode=409):never=>{
+function refuse(code:string,message='教育产品授权不可用',statusCode=409):never {
   throw new EducationProductGovernanceError(code,message,statusCode)
 }
 const currentSchool=async(tx:Transaction,organizationId:string)=>{

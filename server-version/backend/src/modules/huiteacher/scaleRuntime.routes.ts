@@ -1,4 +1,4 @@
-import { Router,type Request,type Response,type NextFunction } from 'express'
+import { Router,type Request,type Response,type NextFunction,type RequestHandler } from 'express'
 import { z,ZodError } from 'zod'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -199,15 +199,15 @@ router.post('/run-executions/:executionId/start-scale',
   }))
 router.get('/composite-attempts/:attemptId',
   authenticateHuiteacher,requireScaleAttempt,compositeController.getAttempt)
+const requireTeacherCompositeFinalConsent: RequestHandler=(req,_res,next)=>{
+  // Explicit Express middleware: preserve next() and fail closed on consent.
+  void Promise.resolve()
+    .then(()=>relationalRuntimeConsentAuthority.assertCompositeFinal(
+      req.params.attemptId,req.user!.userId))
+    .then(()=>next()).catch(next)
+}
 router.post('/composite-attempts/:attemptId/items/:itemId/scale/submit',
-  authenticateHuiteacher,requireScaleAttempt,
-  asyncHandler(async(req,res,next)=>{
-    try{
-      await relationalRuntimeConsentAuthority.assertCompositeFinal(
-        req.params.attemptId,req.user!.userId)
-      next()
-    }catch(e){next(e)}
-  }),
+  authenticateHuiteacher,requireScaleAttempt,requireTeacherCompositeFinalConsent,
   compositeController.submitFinalScale)
 router.get('/run-executions/:executionId/personal-summary',
   authenticateHuiteacher,wrap(async req=>{

@@ -21,7 +21,7 @@ export class HuiteacherFinalError extends Error{
     super(code);this.name='HuiteacherFinalError'
   }
 }
-const fail=(code:string,status=409):never=>{throw new HuiteacherFinalError(code,status)}
+function fail(code:string,status=409):never {throw new HuiteacherFinalError(code,status)}
 type Tx=Prisma.TransactionClient
 
 type TeacherAttemptScope={

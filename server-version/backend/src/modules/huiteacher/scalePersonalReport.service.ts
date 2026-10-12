@@ -10,7 +10,7 @@ export class TeacherScaleReportError extends Error{
     super(code);this.name='TeacherScaleReportError'
   }
 }
-const denied=():never=>{throw new TeacherScaleReportError('HUITEACHER_PERSONAL_REPORT_NOT_FOUND')}
+function denied():never {throw new TeacherScaleReportError('HUITEACHER_PERSONAL_REPORT_NOT_FOUND')}
 
 /** The canonical Reporting source owns scoring and audience disclosure.
  * This projector may provide only authored, scientifically reviewed wording
