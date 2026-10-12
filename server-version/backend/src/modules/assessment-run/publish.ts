@@ -1,5 +1,7 @@
 import { matchesClassTarget } from '../assessment-policy/target'
 import { campusRunParticipantScope } from '../campus/activity.runScope'
+import {schoolPrivacyV2Enabled,reviewedGeneralResources,generalRunApproved,
+  type SchoolActivityPurpose} from '../campus/privacyV2'
 import { teacherFormResourceId,assertTeacherFormRunUse } from '../huiteacher/formRunResource'
 import {studentFormResourceId,assertStudentFormRunUse} from '../huiteacher/studentFormResource'
 import {teacherPrivacyV2Enabled,teacherResourceMinimum} from '../huiteacher/privacyV2'
@@ -1130,6 +1132,56 @@ export const publishAssessmentRun = async (input: {
         product:'HUITEACHER',
         scenario:hasStudentForm?'TEACHER_STUDENT_EVALUATION':'TEACHER_ADULT_FORM_GROUP',
       })
+    }
+    // Same locked Serializable publish transaction as frozen participant membership.
+    // User-defined activity purpose cannot alone upgrade a sensitive tool.
+    if(schoolPrivacyV2Enabled()&&!hasStudentForm&&!hasAdultForm){
+      const activities=await tx.$queryRaw<Array<{purpose:SchoolActivityPurpose}>>`
+        SELECT activity.purpose FROM campus_activity_runs binding
+        JOIN campus_activities activity
+          ON activity.organization_id=binding.organization_id
+          AND activity.course_id=binding.course_id
+        WHERE binding.organization_id=${input.organizationId}
+          AND binding.run_id=${input.runId}
+        LIMIT 2
+      `
+      let reviewed
+      try{reviewed=reviewedGeneralResources()}
+      catch{
+        throw new RunPublishError('CAMPUS_GENERAL_RESOURCES_INVALID',
+          'Operator-reviewed School resource registry invalid',503)
+      }
+      if(activities.length===1&&generalRunApproved({
+        purpose:activities[0].purpose,
+        tracks:preparedTracks.map(t=>({
+          family:t.resourceFamily,key:t.resourceKey,version:t.resourceVersion,
+          subjectRoles:t.requestedPolicy.subjectRoles,
+          respondentRoles:t.requestedPolicy.respondentRoles,
+          relationshipKinds:t.requestedPolicy.relationshipKinds,
+          perspectives:t.requestedPolicy.perspectives,
+          analysisMode:t.requestedPolicy.analysisMode,
+        })),
+        approved:reviewed,
+      })){
+        const user=await tx.user.findUnique({
+          where:{id:input.actorUserId},
+          select:{id:true,username:true,role:true,platformRole:true,accountDomain:true,
+            tokenVersion:true,mustChangePassword:true},
+        })
+        if(!user||user.accountDomain!=='SCHOOL')
+          throw new RunPublishError('CAMPUS_GENERAL_PUBLISHER_UNAVAILABLE',
+            'School publisher is unavailable',403)
+        const actor:AuthenticatedPrincipal={
+          userId:user.id,username:user.username,role:user.role,
+          platformRole:user.platformRole as AuthenticatedPrincipal['platformRole'],
+          accountDomain:'SCHOOL',tokenVersion:user.tokenVersion,
+          mustChangePassword:user.mustChangePassword,
+        }
+        await freezePrivacyForRunPublication(tx,{
+          organizationId:input.organizationId,runId:input.runId,actor,
+          product:'HUISCHOOL',scenario:'SCHOOL_GENERAL_EDUCATION_GROUP',
+        })
+      }
     }
     const version = run.version + 1
     await tx.$executeRaw`

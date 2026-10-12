@@ -37,7 +37,7 @@ export function reviewedGeneralResources(raw=process.env.CAMPUS_GENERAL_REPORT_A
 }
 export const generalPurpose=(purpose:SchoolActivityPurpose):boolean=>
   purpose==='SCHOOL_CLIMATE'||purpose==='LEARNING_ADAPTATION'
-type TrackRef=SchoolGeneralResource &{
+type TrackRef={family:string;key:string;version:string;
   subjectRoles:readonly string[];respondentRoles:readonly string[];
   relationshipKinds:readonly string[];perspectives:readonly string[];
   analysisMode:string
