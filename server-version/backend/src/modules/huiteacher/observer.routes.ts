@@ -26,7 +26,11 @@ const note=z.object({
 }).strict()
 const change=z.object({expectedRevision:z.number().int().min(1),
   content:z.string().trim().min(1).max(12000)}).strict()
-const submit=z.object({expectedRevision:z.number().int().min(1)}).strict()
+const submit=z.object({
+  expectedRevision:z.number().int().min(1),
+  fieldFormId:uuid.optional(),
+  answers:z.record(z.unknown()).optional(),
+}).strict()
 const limiter=createRedisRateLimiter({
   name:'huiteacher-observation-writes',limit:90,windowSeconds:900,
   key:req=>req.user?.userId||req.ip||'unknown',
