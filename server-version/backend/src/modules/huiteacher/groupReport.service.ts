@@ -52,10 +52,36 @@ export const createProtectedFormItems=(form:FormDraft)=>{
  * surveys and student feedback. Never returns raw texts/IDs or respondent times.
  */
 export const recordProtectedFormAnswers=(items:ItemAccumulator[],
-  rawAnswers:Record<string,unknown>):void=>{
+  rawAnswers:Record<string,unknown>,
+  missing:readonly {itemKey:string;reason:string}[]):void=>{
+  // Survey FINAL stores MATRIX and MATRIX_MULTIPLE as a parent-key object
+  // with row keys, not wire-level 'question:row' flat keys. The authoritative
+  // missing[] vector also preserves REFUSED vs SHOWN_MISSING vs NOT_SHOWN.
+  const reasons=new Map<string,string>()
+  for(const row of missing){
+    if(reasons.has(row.itemKey))
+      reject('HUITEACHER_REPORT_FINAL_INTEGRITY_FAILURE',409)
+    reasons.set(row.itemKey,row.reason)
+  }
   for(const item of items){
     if(!reportableChoices.has(item.type))continue
-    const value=rawAnswers[item.itemKey]
+    const matrix=item.type==='MATRIX'||item.type==='MATRIX_MULTIPLE'
+    const colon=matrix?item.itemKey.indexOf(':'):-1
+    if(matrix&&colon<1)
+      reject('HUITEACHER_REPORT_FINAL_INTEGRITY_FAILURE',409)
+    const questionKey=matrix?item.itemKey.slice(0,colon):item.itemKey
+    const rowKey=matrix?item.itemKey.slice(colon+1):null
+    const nested=rawAnswers[questionKey]
+    if(matrix&&nested!==undefined&&
+      (!nested||typeof nested!=='object'||Array.isArray(nested)))
+      reject('HUITEACHER_REPORT_FINAL_INTEGRITY_FAILURE',409)
+    const value=matrix
+      ?nested?(nested as Record<string,unknown>)[rowKey!]:undefined
+      :rawAnswers[item.itemKey]
+    const reason=reasons.get(item.itemKey)
+      ??(matrix?reasons.get(questionKey):undefined)
+    if(reason&&value!==undefined)
+      reject('HUITEACHER_REPORT_FINAL_INTEGRITY_FAILURE',409)
     const permitted=new Set(item.categories.map(o=>o.optionKey))
     if(multipleChoices.has(item.type)&&Array.isArray(value)){
       if(new Set(value).size!==value.length
@@ -66,11 +92,9 @@ export const recordProtectedFormAnswers=(items:ItemAccumulator[],
     }else if(!multipleChoices.has(item.type)&&typeof value==='string'
       &&permitted.has(value)){
       add(item.counts,value)
-    }else if(value&&typeof value==='object'&&!Array.isArray(value)
-      &&Object.keys(value).length===1
-      &&(value as Record<string,unknown>)._surveyRefusal===true){
+    }else if(value===undefined&&(reason==='REFUSED')){
       add(item.counts,'REFUSED')
-    }else if(value===undefined||value===null){
+    }else if(value===undefined&&(reason==='SHOWN_MISSING'||reason==='NOT_SHOWN')){
       add(item.counts,'MISSING')
     }else{
       reject('HUITEACHER_REPORT_FINAL_INTEGRITY_FAILURE',409)
@@ -286,7 +310,7 @@ export async function readTeacherFormGroupReport(input:{
           ||data.privateScoring!==null
           ||canonicalHash(data)!==final.resultsHash)
           reject('HUITEACHER_REPORT_FINAL_INTEGRITY_FAILURE',409)
-        recordProtectedFormAnswers(items,data.rawAnswers)
+        recordProtectedFormAnswers(items,data.rawAnswers,data.missing)
       }
       seen+=finals.length
       if(seen>count)reject('HUITEACHER_GROUP_SOURCE_CHANGED',409)

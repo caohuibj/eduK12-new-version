@@ -197,7 +197,7 @@ export async function readHuiteacherStudentFeedbackReport(input:{
           ||data.privateScoring!==null
           ||canonicalHash(data)!==row.resultsHash)
           deny('STUDENT_REPORT_FINAL_INTEGRITY',409)
-        recordProtectedFormAnswers(items,data.rawAnswers)
+        recordProtectedFormAnswers(items,data.rawAnswers,data.missing)
       }
       seen+=rows.length
       if(seen>n)deny('STUDENT_REPORT_UNEXPECTED_FINAL',409)
