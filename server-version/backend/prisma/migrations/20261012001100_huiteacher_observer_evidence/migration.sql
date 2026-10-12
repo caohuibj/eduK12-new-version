@@ -78,3 +78,37 @@ END $$;
 CREATE TRIGGER "huiteacher_observation_records_insert_guard"
  BEFORE INSERT ON "huiteacher_observation_records"
  FOR EACH ROW EXECUTE FUNCTION guard_huiteacher_observation_insert();
+
+-- A submitted observation is an immutable evidentiary record. Its author,
+-- event, kind and organization cannot be moved even while it is a draft.
+ALTER TABLE "huiteacher_observation_records" ADD CONSTRAINT "huiteacher_cipher_format_check"
+  CHECK ("body_cipher" ~ '^[0-9a-f]+:[0-9a-f]+:[0-9a-f]+$');
+CREATE OR REPLACE FUNCTION protect_huiteacher_observation() RETURNS trigger
+LANGUAGE plpgsql AS $$
+BEGIN
+  IF TG_OP='DELETE' THEN
+    RAISE EXCEPTION 'Observation records cannot be deleted'
+      USING ERRCODE='23514';
+  END IF;
+  IF OLD."status"='SUBMITTED' THEN
+    RAISE EXCEPTION 'Submitted observation records are immutable'
+      USING ERRCODE='23514';
+  END IF;
+  IF NEW."id"<>OLD."id"
+     OR NEW."organization_id"<>OLD."organization_id"
+     OR NEW."event_id"<>OLD."event_id"
+     OR NEW."observer_user_id"<>OLD."observer_user_id"
+     OR NEW."kind"<>OLD."kind"
+     OR NEW."created_at"<>OLD."created_at" THEN
+    RAISE EXCEPTION 'Observation ownership and provenance cannot change'
+      USING ERRCODE='23514';
+  END IF;
+  IF NEW."revision"<>OLD."revision"+1 THEN
+    RAISE EXCEPTION 'Observation revision must advance exactly once'
+      USING ERRCODE='23514';
+  END IF;
+  RETURN NEW;
+END $$;
+CREATE TRIGGER "huiteacher_observation_record_immutable"
+  BEFORE UPDATE OR DELETE ON "huiteacher_observation_records"
+  FOR EACH ROW EXECUTE FUNCTION protect_huiteacher_observation();

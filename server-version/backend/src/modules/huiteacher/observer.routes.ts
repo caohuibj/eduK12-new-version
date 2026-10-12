@@ -87,7 +87,7 @@ router.post('/organizations/:organizationId/evaluation-events/:eventId/field-not
     })
   }))
 router.get('/organizations/:organizationId/evaluation-events/:eventId/formal-notes',
-  requireTeacherProductAdmin,wrap(req=>
+  requireTeacherProductAdmin,requireRecentTeacherMfa,wrap(req=>
     readFormalHuiteacherObservations({
       ...eventParams.parse(req.params),actorUserId:req.user!.userId,
     })))
