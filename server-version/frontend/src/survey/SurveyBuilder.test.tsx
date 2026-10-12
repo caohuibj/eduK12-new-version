@@ -59,6 +59,27 @@ describe('Survey Research Builder editing widgets',()=>{
     expect(state.items[0].reverse).toBe(true)
     expect(state.items[0].dimensionKeys).toEqual([state.dimensions[0].dimensionKey])
   })
+  it('freezes author-selected Scale one-by-one mode and previews a single question',()=>{
+    render(<ScaleHost/>)
+    fireEvent.change(screen.getByLabelText('量表施测呈现模式'),
+      {target:{value:'ONE_BY_ONE'}})
+    const selected=JSON.parse(screen.getByTestId('scale-state').textContent||'{}') as ScaleDraft
+    expect(selected.presentationMode).toBe('ONE_BY_ONE')
+    const draft:ResearchDraft={
+      id:'preview-timed',projectId:'test',instrumentKey:'scale',kind:'SCALE',
+      title:'计时预览',revision:0,status:'DRAFT',createdAt:'',updatedAt:'',
+      definition:{...scale(),presentationMode:'ONE_BY_ONE',items:[
+        {itemKey:'a',prompt:'第一题内容',required:true,reverse:false,dimensionKeys:[]},
+        {itemKey:'b',prompt:'第二题内容',required:true,reverse:false,dimensionKeys:[]},
+      ]},
+    }
+    render(<ResearchPreview draft={draft} onSimulate={()=>{}}/>)
+    expect(screen.getByText('第一题内容')).toBeInTheDocument()
+    expect(screen.queryByText('第二题内容')).toBeNull()
+    fireEvent.click(screen.getByRole('button',{name:'下一题'}))
+    expect(screen.queryByText('第一题内容')).toBeNull()
+    expect(screen.getByText('第二题内容')).toBeInTheDocument()
+  })
   it('configures a research-only SJT question as bounded multi-select without writing JSON',()=>{
     render(<SjtHost/>)
     fireEvent.click(screen.getByRole('button',{name:'增加构念'}))
