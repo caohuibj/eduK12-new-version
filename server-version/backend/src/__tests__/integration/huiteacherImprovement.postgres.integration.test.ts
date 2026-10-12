@@ -2,11 +2,15 @@ import {randomUUID} from 'node:crypto'
 import {PrismaClient} from '@prisma/client'
 import {beforeAll,afterAll,describe,expect,it} from 'vitest'
 import {integrationDatabaseUrl,requireIsolatedReleaseDatabase} from './integration-env'
-import {createHuiteacherTarget,createHuiteacherEvent} from '../../modules/huiteacher/evaluation.service'
+import {createHuiteacherTarget,createHuiteacherEvent,
+  transitionHuiteacherEvent} from '../../modules/huiteacher/evaluation.service'
+import {inviteHuiteacherObserver,acceptHuiteacherObserver,
+  createHuiteacherObservation,submitHuiteacherObservation} from '../../modules/huiteacher/observer.service'
 import {readHuiteacherTargetTimeline} from '../../modules/huiteacher/timeline.service'
 import {
   createHuiteacherImprovement,listHuiteacherImprovements,
   transitionHuiteacherImprovement,listMyHuiteacherImprovementTargets,
+  listHuiteacherReassessmentCandidates,attachHuiteacherReassessment,
 } from '../../modules/huiteacher/improvement.service'
 
 /** PR6 only: disposal-grade PostgreSQL with real FKs, locks, encryption,
@@ -163,6 +167,81 @@ suite('Huiteacher PR6 longitudinal metadata and confidential improvement (isolat
       actorUserId:admin.id,organizationId:org.id,targetId:target.id,
     })
     expect(JSON.stringify(adminAfter)).not.toContain('经过四次课堂实践')
+    // Real PR4 closed observation is a legitimate follow-up, not an empty
+    // card or fake score. The second event uses the SAME immutable target ID.
+    const field=await createHuiteacherEvent({
+      organizationId:org.id,actorUserId:admin.id,targetId:target.id,
+      kind:'CLASSROOM',title:'Follow-up classroom observation',
+    })
+    const invite=await inviteHuiteacherObserver({
+      organizationId:org.id,eventId:field.id,actorUserId:admin.id,
+      observerUserId:other.id,role:'PEER',
+      expiresAt:new Date(Date.now()+86400000),
+    })
+    await acceptHuiteacherObserver({userId:other.id,invitationId:invite.id})
+    await transitionHuiteacherEvent({
+      organizationId:org.id,eventId:field.id,actorUserId:admin.id,
+      action:'OPEN',expectedVersion:field.version,
+    })
+    const note=await createHuiteacherObservation({
+      organizationId:org.id,eventId:field.id,actorUserId:other.id,
+      kind:'FACT',content:'经授权的复评事实记录，不含学生姓名或任何个体成绩。',
+    })
+    await submitHuiteacherObservation({
+      id:note.id,actorUserId:other.id,expectedRevision:note.revision,
+    })
+    await transitionHuiteacherEvent({
+      organizationId:org.id,eventId:field.id,actorUserId:admin.id,
+      action:'CLOSE',expectedVersion:field.version+1,
+    })
+    const reassessmentKey={
+      organizationId:org.id,targetId:target.id,
+      actionId:privateAction.id,audience:'PRIVATE_PERSONAL' as const,
+    }
+    const eligible=await listHuiteacherReassessmentCandidates({
+      ...reassessmentKey,actorUserId:teacher.id,
+    })
+    expect(eligible.list.some(x=>x.id===field.id)).toBe(true)
+    await expect(listHuiteacherReassessmentCandidates({
+      ...reassessmentKey,actorUserId:admin.id,
+    })).rejects.toThrow()
+    await expect(attachHuiteacherReassessment({
+      ...reassessmentKey,actorUserId:student.id,eventId:field.id,
+      feedback:'学生不能替教师添加一次私人发展复评反馈。',
+    })).rejects.toThrow()
+    await expect(attachHuiteacherReassessment({
+      ...reassessmentKey,actorUserId:teacher.id,eventId:event.id,
+      feedback:'尚未正式结束且没有评价证据的旧活动，不能被当成复评。',
+    })).rejects.toThrow()
+    const feedback='行动后的课堂观察发现更多追问与证据记录，但不能据此声称存在因果效果。'
+    const linked=await attachHuiteacherReassessment({
+      ...reassessmentKey,actorUserId:teacher.id,eventId:field.id,feedback,
+    })
+    expect(linked.comparisonPolicy).toBe('NARRATIVE_ONLY_NO_CAUSAL_INFERENCE')
+    await expect(attachHuiteacherReassessment({
+      ...reassessmentKey,actorUserId:teacher.id,eventId:field.id,feedback,
+    })).rejects.toThrow()
+    const withReview=await listHuiteacherImprovements({
+      actorUserId:teacher.id,organizationId:org.id,targetId:target.id,
+    })
+    expect(withReview.list.find(row=>row.id===privateAction.id)
+      ?.reassessment?.feedback).toBe(feedback)
+    const noPrivateReview=await listHuiteacherImprovements({
+      actorUserId:admin.id,organizationId:org.id,targetId:target.id,
+    })
+    expect(JSON.stringify(noPrivateReview)).not.toContain(feedback)
+    const persisted=await db.huiteacherImprovementReassessment.findUniqueOrThrow({
+      where:{organizationId_actionId:{
+        organizationId:org.id,actionId:privateAction.id,
+      }},
+    })
+    expect(persisted.feedbackCipher).not.toContain(feedback)
+    await expect(db.huiteacherImprovementReassessment.delete({
+      where:{id:persisted.id},
+    })).rejects.toThrow()
+    await expect(db.huiteacherImprovementReassessment.update({
+      where:{id:persisted.id},data:{eventId:event.id},
+    })).rejects.toThrow()
     // Actual database trigger, not mocked authorization:
     await expect(db.huiteacherImprovementAction.update({
       where:{id:privateAction.id},data:{audience:'SCHOOL_SHARED'},
@@ -174,7 +253,7 @@ suite('Huiteacher PR6 longitudinal metadata and confidential improvement (isolat
       organizationId:org.id,targetType:'IMPROVEMENT_ACTION',
       targetId:privateAction.id,
     }})
-    expect(audits).toBe(3) // create -> start -> complete
+    expect(audits).toBe(4) // create -> start -> complete -> follow-up
     // Revoking Teacher-only access removes BOTH school-shared and own reads.
     await db.educationProductEntitlement.update({
       where:{organizationId_product:{organizationId:org.id,product:'HUITEACHER'}},
