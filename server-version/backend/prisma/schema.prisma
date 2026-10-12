@@ -3315,3 +3315,21 @@ model HuiteacherFieldFeedbackRelease {
   @@index([recipientUserId,releasedAt(sort:Desc)],map:"huiteacher_feedback_release_person_idx")
   @@map("huiteacher_field_feedback_releases")
 }
+
+// Frozen PR5 business linkage. The canonical Run, not this table, is the
+// authoritative eligible student roster and any future START/FINAL.
+model HuiteacherStudentEvaluationConfig {
+  id               String   @id
+  organizationId   String   @map("organization_id")
+  eventId          String   @map("event_id")
+  classUnitId      String   @map("class_unit_id")
+  staffAssignmentId String  @map("staff_assignment_id")
+  formId           String   @map("form_id")
+  definitionDigest String   @map("definition_digest")
+  configuredByUserId String @map("configured_by_user_id")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@unique([organizationId,eventId],map:"huiteacher_student_eval_configs_event_key")
+  @@index([organizationId,classUnitId,createdAt(sort:Desc)],map:"huiteacher_student_eval_configs_org_class_idx")
+  @@map("huiteacher_student_eval_configs")
+}
