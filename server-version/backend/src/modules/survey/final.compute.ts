@@ -4,6 +4,7 @@ import { scoreSituationalModel } from '../situational/situation-model-resolver'
 import { deriveAuthoritativeSituationalTrajectory } from '../situational/situation-trajectory'
 import { asLinearSituationDefinition } from '../situational/situation-runtime-definition'
 import { resolveSurveySjtAnswer } from './sjt-selection'
+import {validateSurveyScaleTimings,type SurveyScaleTimings} from './timing.definition'
 import { executeSurveyFlow,SurveyFlowExecutionError,type SurveyExecutionTrace } from './flow.runtime'
 import type { SurveyFlowAssignment } from './flow.assignment'
 import { assertSurveyDraft, type FormDraft, type ScaleDraft, type SjtDraft } from './builder.definition'
@@ -40,6 +41,8 @@ export interface SurveyComputedFinal {
   definitionDigest:string
   units:FrozenUnitResult[]
   executionTrace?:SurveyExecutionTrace
+  /** Optional browser-observed timing metadata; never used by scoring. */
+  itemTimings?:SurveyScaleTimings
 }
 const safeObject=(value:unknown,path:string):AnswerMap=>{
   if(!value||typeof value!=='object'||Array.isArray(value))invalid(path,'回答必须是题目到值的对象')
@@ -316,7 +319,7 @@ const sjtResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
 }
 export function computeSurveyFinal(snapshot:ResearchFrozenPublication,input:Record<string,unknown>,
   assignment?:SurveyFlowAssignment|null,clientObservedBlocks?:readonly string[],
-  mode:'FINAL'|'SCREEN_OUT'='FINAL'):SurveyComputedFinal{
+  mode:'FINAL'|'SCREEN_OUT'='FINAL',itemTimings?:unknown):SurveyComputedFinal{
   if(snapshot.schemaVersion!==1||snapshot.purpose!=='RESEARCH_ONLY'||
      snapshot.runtimeStatus!=='SURVEY_FINAL_V1'||!snapshot.units.length)
     invalid('publication','尚未提供可执行的 Survey 专用冻结定义')
@@ -347,9 +350,11 @@ export function computeSurveyFinal(snapshot:ResearchFrozenPublication,input:Reco
       invalid('flow','本研究路径为资格筛除，不能生成有效 FINAL')
     if(result.trace.termination!=='SCREEN_OUT'&&mode==='SCREEN_OUT')
       invalid('flow','当前路径不能标记为资格筛除')
+    const verifiedTimings=validateSurveyScaleTimings(snapshot,input,itemTimings,mode==='FINAL')
     return {schemaVersion:1,
       definitionDigest:canonicalHash(JSON.parse(JSON.stringify(snapshot))),
-      units:result.units,executionTrace:result.trace}
+      units:result.units,executionTrace:result.trace,
+      ...(verifiedTimings?{itemTimings:verifiedTimings}:{})}
   }
   if(mode==='SCREEN_OUT')invalid('flow','旧研究定义不支持资格筛除')
   if(Object.keys(input).length!==snapshot.units.length)
@@ -371,5 +376,7 @@ export function computeSurveyFinal(snapshot:ResearchFrozenPublication,input:Reco
     return invalid('publication','未知研究内容类型')
   })
   const definitionDigest=canonicalHash(JSON.parse(JSON.stringify(snapshot)))
-  return {schemaVersion:1,definitionDigest,units}
+  const verifiedTimings=validateSurveyScaleTimings(snapshot,input,itemTimings,true)
+  return {schemaVersion:1,definitionDigest,units,
+    ...(verifiedTimings?{itemTimings:verifiedTimings}:{})}
 }
