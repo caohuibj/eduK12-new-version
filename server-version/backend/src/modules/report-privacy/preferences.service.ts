@@ -40,9 +40,10 @@ export async function assertCurrentPrivacyPublisher(input:ScopeInput,tx?:Tx){
   const ctx=await resolveOrganizationAccessContext({
     principal:input.actor,organizationId:input.organizationId,
   },tx)
-  if(!ctx||ctx.productDomain!=='SCHOOL'||ctx.organizationStatus!=='ACTIVE'
+  if(!ctx)throw new ReportPrivacyError('PRIVACY_CAMPUS_PUBLISHER_REQUIRED',403)
+  if(ctx.productDomain!=='SCHOOL'||ctx.organizationStatus!=='ACTIVE'
     ||!ctx.membershipId||ctx.explicitDenies.some(x=>forbiddenDenies.includes(x)))
-    deny('PRIVACY_CAMPUS_PUBLISHER_REQUIRED')
+    throw new ReportPrivacyError('PRIVACY_CAMPUS_PUBLISHER_REQUIRED',403)
   const schoolAdmin=ctx.orgRole==='ORG_ADMIN'&&ctx.canGovern
   if(schoolAdmin)return {schoolAdmin:true}
   const counselor=ctx.personas.includes('COUNSELOR')

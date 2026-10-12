@@ -26,7 +26,7 @@ const data={
 }
 describe('Cookie-like ReportPrivacyPreferences PR1 panel',()=>{
   it('groups options with accessible mixed state and saves a single custom preference',async()=>{
-    let current={...data}
+    let current: Record<string,unknown>={...data}
     const api=vi.fn(async(path:string,method='GET',body?:any)=>{
       if(path.endsWith('/preferences?scenario=TEACHER_STUDENT_EVALUATION')){
         return current
