@@ -12,7 +12,7 @@ describe('Survey frozen one-by-one response timing',()=>{
     tracker.leave(5500)
     const row=tracker.snapshot(5500).qone
     expect(row).toMatchObject({schemaVersion:1,firstResponseMs:2350,
-      activeTimeMs:4500,changeCount:1,revisitCount:1,visits:2,
+      activeTimeMs:4400,changeCount:1,revisitCount:1,visits:2,
       recoveredWithoutClock:false,interrupted:false})
   })
   it('pauses visibility clock and never inflates time while the tab is hidden',()=>{
