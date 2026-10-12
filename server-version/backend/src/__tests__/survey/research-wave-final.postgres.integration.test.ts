@@ -960,6 +960,63 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     const permitted=await downloadSurveyExport(req,{projectId,exportId:explicitTicket.id})
     expect(permitted.csv).toContain('个人敏感自由文字')
   })
+  it('persists frozen per-item Scale timing and exports real millisecond columns',async()=>{
+    const timed:ScaleDraft={...structuredClone(scale),presentationMode:'ONE_BY_ONE'}
+    const draftId=await instrument('SCALE',timed)
+    const w=await wave('逐题计时量表真实 FINAL',[draftId],true)
+    const linked=await joinLinkedStudy({publicId:w.publicId,waveId:w.id,
+      entryToken:w.entrySecret,consent:true,consentVersion:1})
+    const task=await getOwnResearchTask({publicId:w.publicId,attemptId:linked.attemptId,
+      researchCode:linked.researchCode,accessCredential:linked.accessCredential})
+    expect(task.units[0]).toMatchObject({kind:'SCALE',presentationMode:'ONE_BY_ONE'})
+    const instrumentKey=task.units[0].instrumentKey
+    const answers={[instrumentKey]:{itemone:'o4',itemtwo:'o3'}}
+    const rows={
+      [instrumentKey]:{
+        itemone:{schemaVersion:1 as const,firstResponseMs:1234,activeTimeMs:2234,
+          changeCount:1,revisitCount:1,visits:2,
+          interrupted:false,recoveredWithoutClock:false},
+        itemtwo:{schemaVersion:1 as const,firstResponseMs:null,activeTimeMs:640,
+          changeCount:0,revisitCount:0,visits:1,
+          interrupted:true,recoveredWithoutClock:true},
+      },
+    }
+    const final=await submitResearchFinal({publicId:w.publicId,attemptId:linked.attemptId,
+      researchCode:linked.researchCode,accessCredential:linked.accessCredential,
+      submissionId:randomUUID(),answers,itemTimings:rows})
+    expect(final.status).toBe('COMPLETED')
+    const verified=await loadSurveySource({actorUserId:ownerId,projectId,
+      waveIds:[w.id],includeWideSchema:true})
+    const one=verified.raw.find(x=>x.itemKey==='itemone')
+    const two=verified.raw.find(x=>x.itemKey==='itemtwo')
+    expect(one?.itemTiming).toEqual(rows[instrumentKey].itemone)
+    expect(two?.itemTiming).toEqual(rows[instrumentKey].itemtwo)
+    expect(one?.attemptStartedAt).toMatch(/^20\\d{2}-/)
+    const dictionary=verified.codebook.filter(c=>c.instrumentKey===instrumentKey)
+    expect(dictionary.every(c=>c.scalePresentationMode==='ONE_BY_ONE'
+      &&c.timingContract==='SURVEY_SCALE_ITEM_TIMING_V1')).toBe(true)
+    const raw=rawLongExport(projectId,verified,w.id)
+    expect(raw.csv).toContain('first_response_ms')
+    expect(raw.csv).toContain('"1234"')
+    expect(raw.csv).toContain('RECOVERED_NO_FIRST_RESPONSE')
+    const wide=rawWideExport(projectId,verified)
+    expect(wide.csv).toContain('__first_response_ms')
+    expect(wide.csv).toContain('"1234"')
+    expect(wide.manifest.rowCount).toBe(1)
+    const ticketToken=generateToken({
+      userId:ownerId,username:'synthetic-researcher',role:'STUDENT',
+      accountDomain:'SURVEY',tokenVersion:0,mfaVerifiedAt:Math.floor(Date.now()/1000),
+    })
+    const req={headers:{cookie:'huisurvey_research_session='+ticketToken},
+      user:{userId:ownerId,tokenVersion:0,username:'synthetic-researcher',
+        role:'STUDENT',platformRole:'STANDARD',mustChangePassword:false,
+        accountDomain:'SURVEY'}} as unknown as Request
+    const grant=await createSurveyExport(req,{projectId,format:'RAW_WAVE',waveId:w.id})
+    expect(grant.manifest.timingProvenance).toContain('BROWSER_OBSERVED')
+    const downloaded=await downloadSurveyExport(req,{projectId,exportId:grant.id})
+    expect(downloaded.csv).toContain('1234')
+    expect(JSON.stringify(downloaded.codebook)).toContain('SURVEY_SCALE_ITEM_TIMING_V1')
+  })
   it('does not commit a FINAL against a credential revoked during the transaction',async()=>{
     const w=await wave('撤销凭证与提交串行验证',[toolIds.scale],true)
     const participant=await joinLinkedStudy({
