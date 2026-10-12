@@ -10,6 +10,8 @@ import type { FormDraft, ScaleDraft, SjtDraft } from './builder.definition'
 import type { ScaleDefinitionV2 } from '../scale/scale-definition'
 import type { SituationDefinitionV2 } from '../situational/situation-branching'
 import { SurveyAnalyticsError } from './analytics.read'
+import {validateSurveyScaleTimings,SurveyScaleTimingError,
+  type SurveyScaleItemTimingV1} from './timing.definition'
 
 export interface ResearchRawCodebook {
   columnKey:string;waveId:string;waveOrdinal:number;instrumentKey:string;
@@ -22,6 +24,8 @@ export interface ResearchRawCodebook {
   valueEncoding?:'TEXT'|'NUMBER'|'JSON_STRING_ARRAY'|'JSON_NUMBER_OBJECT'
   formSchemaVersion?:1|2
   flowDigest?:string
+  scalePresentationMode?:'ONE_BY_ONE'|'ALL_AT_ONCE'
+  timingContract?:'SURVEY_SCALE_ITEM_TIMING_V1'|'NOT_COLLECTED'
 }
 export interface ResearchRawObservation {
   projectId:string;waveId:string;waveOrdinal:number;attemptId:string;
@@ -29,6 +33,8 @@ export interface ResearchRawObservation {
   instrumentKey:string;kind:'FORM'|'SCALE'|'SJT';responseType:string;
   itemKey:string;columnKey:string;publicationVersion:number;value:string|number|null;
   missingReason:MissingReason|null;completedAt:string;sourceVerified:true
+  attemptStartedAt?:string
+  itemTiming?:SurveyScaleItemTimingV1
   flowDigest?:string|null;experimentGroup?:string|null;
   shownBlocks?:string|null;flowTermination?:string|null
 }
@@ -386,6 +392,11 @@ export async function loadSurveySource(input:{
             ...(item.timeZone?{timeZone:item.timeZone}:{}),
             valueEncoding:answerValueEncoding(item.responseType),
             ...(frozen.kind==='FORM'?{formSchemaVersion:(frozen.displayDefinition as FormDraft).schemaVersion}:{}),
+            ...(frozen.kind==='SCALE'?{
+              scalePresentationMode:(frozen.displayDefinition as ScaleDraft).presentationMode??'ALL_AT_ONCE',
+              timingContract:(frozen.displayDefinition as ScaleDraft).presentationMode==='ONE_BY_ONE'
+                ?'SURVEY_SCALE_ITEM_TIMING_V1':'NOT_COLLECTED',
+            } as const:{}),
             ...(snapshot.flow?{flowDigest:snapshot.flow.flowDigest}:{}),
           })
         }
@@ -462,9 +473,19 @@ export async function loadSurveySource(input:{
           trace.groupKey!==assigned.groupKey||trace.experimentKey!==assigned.experimentKey)
           invalid('研究流程实际执行轨迹与 Attempt 分组不一致')
       }else if(result.executionTrace)invalid('旧版 FINAL 不允许伪造 Flow 审计数据')
+      try{
+        validateSurveyScaleTimings(snapshot,Object.fromEntries(
+          result.units.filter(u=>!u.notExecuted).map(u=>[u.instrumentKey,u.rawAnswers])
+        ),result.itemTimings,true)
+      }catch(e){
+        if(e instanceof SurveyScaleTimingError)
+          invalid('冻结 Survey Scale 计时来源未通过校验：'+e.path)
+        throw e
+      }
       const meta={
         projectId:input.projectId,waveId:wave.id,waveOrdinal:wave.ordinal,
         attemptId:attempt.id,researchCode:attempt.participant?.researchCode??null,
+        attemptStartedAt:attempt.startedAt.toISOString(),
         completedAt:final.completedAt.toISOString(),sourceFinalHash:final.resultsHash,
       }
       const flowTrace=result.executionTrace
@@ -488,10 +509,13 @@ export async function loadSurveySource(input:{
           const columnKey=codeKey(wave.ordinal,frozen.instrumentKey,r.itemKey,frozen.sourceDigest)
           if(raw.length>=25000)
             throw new SurveyAnalyticsError(413,'逐题投影超过 25000 行上限，请缩小波次范围')
+          const itemTiming=frozen.kind==='SCALE'
+            ?result.itemTimings?.[frozen.instrumentKey]?.[r.itemKey]:undefined
           raw.push({...meta,...flowData,sourceVerified:true,kind:frozen.kind,
             instrumentKey:frozen.instrumentKey,itemKey:r.itemKey,columnKey,responseType:r.responseType,
             publicationVersion:publication.version,
-            value:r.value,missingReason:r.missingReason})
+            value:r.value,missingReason:r.missingReason,
+            ...(itemTiming?{itemTiming}:{})})
           if(!codebook.has(columnKey))
             codebook.set(columnKey,{columnKey,waveId:wave.id,waveOrdinal:wave.ordinal,
               instrumentKey:frozen.instrumentKey,itemKey:r.itemKey,kind:frozen.kind,
@@ -503,6 +527,11 @@ export async function loadSurveySource(input:{
               ...(r.timeZone?{timeZone:r.timeZone}:{}),
               valueEncoding:answerValueEncoding(r.responseType),
               ...(frozen.kind==='FORM'?{formSchemaVersion:(frozen.displayDefinition as FormDraft).schemaVersion}:{}),
+              ...(frozen.kind==='SCALE'?{
+                scalePresentationMode:(frozen.displayDefinition as ScaleDraft).presentationMode??'ALL_AT_ONCE',
+                timingContract:(frozen.displayDefinition as ScaleDraft).presentationMode==='ONE_BY_ONE'
+                  ?'SURVEY_SCALE_ITEM_TIMING_V1':'NOT_COLLECTED',
+              } as const:{}),
               ...(snapshot.flow?{flowDigest:snapshot.flow.flowDigest}:{}),
             })
           }
