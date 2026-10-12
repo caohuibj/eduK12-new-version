@@ -77,6 +77,28 @@ export async function recordTeacherReportRelease(tx:Tx,input:{
   return input.projection
 }
 
+
+/** Comparing aggregates of different Form definitions is not a valid
+ * subtraction attack. In enhanced mode, guard only another release of the
+ * exact same immutable Form definition; keep the legacy same-Form fence.
+ */
+export async function hasConflictingComparableTeacherFormHistory(
+  tx:Tx,input:{organizationId:string;runId:string;definitionDigest:string;
+    populationDigest:string},
+):Promise<boolean>{
+  const rows=await tx.$queryRaw<Array<{conflict:boolean}>>`
+    SELECT EXISTS(
+      SELECT 1 FROM education_report_release_records release
+      WHERE release.organization_id=${input.organizationId}
+        AND release.report_kind='TEACHER_ADULT_FORM_GROUP'
+        AND release.source_run_id<>${input.runId}
+        AND release.report_projection->>'definitionDigest'=${input.definitionDigest}
+        AND release.effective_population_digest IS DISTINCT FROM ${input.populationDigest}
+    ) AS "conflict"
+  `
+  return rows[0]?.conflict===true
+}
+
 /** Serialize immutable disclosures by organization, not by Run, because
  * enhanced privacy guards compare across Runs, Forms and past disclosures. */
 export async function lockTeacherDisclosure(tx:Tx,organizationId:string){
