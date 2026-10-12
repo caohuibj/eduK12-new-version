@@ -7,7 +7,7 @@ import { requireTeacherProductAdmin,requireRecentTeacherMfa } from './authority'
 import { createRedisRateLimiter } from '../../middleware/redisRateLimit'
 import {
   HuiteacherObserverError,inviteHuiteacherObserver,
-  acceptHuiteacherObserver,revokeHuiteacherObserver,
+  acceptHuiteacherObserver,revokeHuiteacherObserver,listHuiteacherObserverGrants,
   myHuiteacherFieldAssignments,createHuiteacherObservation,
   updateHuiteacherObservation,submitHuiteacherObservation,
   readOwnHuiteacherObservations,readFormalHuiteacherObservations,
@@ -63,6 +63,11 @@ router.put('/field-notes/:noteId',limiter,wrap(req=>
     id:uuid.parse(req.params.noteId),
     actorUserId:req.user!.userId,...change.parse(req.body),
   })))
+router.get('/organizations/:organizationId/evaluation-events/:eventId/observer-grants',
+  requireTeacherProductAdmin,requireRecentTeacherMfa,wrap(req=>
+    listHuiteacherObserverGrants({
+      ...eventParams.parse(req.params),actorUserId:req.user!.userId,
+    })))
 router.post('/organizations/:organizationId/evaluation-events/:eventId/observer-grants',
   requireTeacherProductAdmin,requireRecentTeacherMfa,limiter,wrap(req=>{
     const params=eventParams.parse(req.params),v=invitation.parse(req.body)

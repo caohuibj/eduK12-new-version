@@ -152,6 +152,24 @@ export async function acceptHuiteacherObserver(input:{userId:string;invitationId
   })
 }
 
+/** Manager-readable role/expiry list, not evaluator raw responses or notes. */
+export async function listHuiteacherObserverGrants(input:{
+  organizationId:string;eventId:string;actorUserId:string
+}){
+  return prisma.$transaction(async tx=>{
+    await manager(tx,input.organizationId,input.actorUserId)
+    await schoolEvent(tx,{organizationId:input.organizationId,
+      eventId:input.eventId,allowDraft:true})
+    const list=await tx.huiteacherObserverGrant.findMany({
+      where:{organizationId:input.organizationId,eventId:input.eventId},
+      orderBy:{createdAt:'desc'},take:101,
+      select:{id:true,observerUserId:true,role:true,status:true,
+        expiresAt:true,acceptedAt:true,revokedAt:true,revision:true},
+    })
+    return {list:list.slice(0,100),truncated:list.length>100}
+  })
+}
+
 export async function revokeHuiteacherObserver(input:{
   organizationId:string;eventId:string;actorUserId:string;observerUserId:string
 }){
