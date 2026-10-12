@@ -120,10 +120,11 @@ export async function configureHuiteacherStudentEvaluation(input:{
   })
 }
 
-export async function readHuiteacherStudentEvaluation(input:{
-  actorUserId:string;organizationId:string;eventId:string
-}){
-  return prisma.$transaction(async tx=>{
+type StudentConfigReadInput={actorUserId:string;organizationId:string;eventId:string}
+async function readStudentConfigInTransaction(
+  tx: import('@prisma/client').Prisma.TransactionClient,
+  input:StudentConfigReadInput,
+){
     const scope=await resolveEducationProductMemberScope({
       actorUserId:input.actorUserId,organizationId:input.organizationId,
       product:'HUITEACHER',
@@ -138,7 +139,10 @@ export async function readHuiteacherStudentEvaluation(input:{
     })
     if(!row)deny('HUITEACHER_STUDENT_EVAL_NOT_FOUND',404)
     return row
-  })
+}
+
+export async function readHuiteacherStudentEvaluation(input:StudentConfigReadInput){
+  return prisma.$transaction(tx=>readStudentConfigInTransaction(tx,input))
 }
 
 /** Read-only eligibility count, not a student roster and not an admission.
@@ -148,7 +152,7 @@ export async function previewHuiteacherStudentEvaluation(input:{
   actorUserId:string;organizationId:string;eventId:string
 }){
   return prisma.$transaction(async tx=>{
-    const config=await readHuiteacherStudentEvaluation(input)
+    const config=await readStudentConfigInTransaction(tx,input)
     const rows=await tx.$queryRaw<Array<{n:number;staffCurrent:boolean}>>`
       SELECT COUNT(DISTINCT student_user."id")::int AS "n",
         EXISTS(

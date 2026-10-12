@@ -71,6 +71,7 @@ import huiteacherConsensusRoutes from './modules/huiteacher/consensus.routes'
 import huiteacherFieldFormRoutes from './modules/huiteacher/fieldForm.routes'
 import huiteacherExpertRegistrationRoutes from './modules/huiteacher/expertRegistration.routes'
 import huiteacherFieldFeedbackRoutes from './modules/huiteacher/fieldFeedback.routes'
+import huiteacherStudentEvaluationRoutes from './modules/huiteacher/studentEvaluation.routes'
 import platformEducationRoutes from './modules/huiteacher/platform.routes'
 import { huiteacherOriginGuard } from './modules/huiteacher/originGuard'
 import campusAdmissionRoutes from './modules/campus/admission.routes'
@@ -314,6 +315,7 @@ app.use('/api/huiteacher',huiteacherConsensusRoutes)
 app.use('/api/huiteacher',huiteacherFieldFormRoutes)
 app.use('/api/huiteacher',huiteacherExpertRegistrationRoutes)
 app.use('/api/huiteacher',huiteacherFieldFeedbackRoutes)
+app.use('/api/huiteacher',huiteacherStudentEvaluationRoutes)
 app.use('/api/platform/education',platformEducationRoutes)
 app.use('/api/campus', schoolOriginGuard)
 app.use('/api/campus/auth', campusAuthRoutes)
