@@ -140,6 +140,52 @@ export async function createHuiteacherImprovement(input:{
   })
 }
 
+
+/** Teacher self targets are looked up by the exact shared education User ID,
+ * current teacher persona, HUITEACHER entitlement and deny guard. No teacher
+ * can browse the school's full roster from this participant endpoint.
+ */
+export async function listMyHuiteacherImprovementTargets(actorUserId:string){
+  const rows=await prisma.$queryRaw<Array<{
+    organizationId:string;organizationName:string;targetId:string;targetName:string
+  }>>`
+    SELECT target."organization_id" AS "organizationId",
+      org."name" AS "organizationName",target."id" AS "targetId",
+      target."name" AS "targetName"
+    FROM "huiteacher_evaluation_targets" target
+    JOIN "organizations" org ON org."id"=target."organization_id"
+      AND org."product_domain"='SCHOOL' AND org."status"='ACTIVE'
+    JOIN "education_product_entitlements" product
+      ON product."organization_id"=org."id"
+      AND product."product"='HUITEACHER' AND product."status"='ACTIVE'
+    JOIN "organization_memberships" member
+      ON member."organization_id"=org."id"
+      AND member."user_id"=${actorUserId}
+      AND member."valid_from"<=statement_timestamp()
+      AND (member."valid_until" IS NULL OR member."valid_until">statement_timestamp())
+    JOIN "organization_persona_grants" persona
+      ON persona."organization_id"=member."organization_id"
+      AND persona."membership_id"=member."id"
+      AND persona."persona"='TEACHER' AND persona."revoked_at" IS NULL
+    JOIN "users" user_row ON user_row."id"=${actorUserId}
+      AND user_row."account_domain"='SCHOOL'
+      AND user_row."role" IN ('TEACHER','ADMIN')
+      AND user_row."teacher_approved"=TRUE
+      AND user_row."is_active"=TRUE AND user_row."is_frozen"=FALSE
+      AND user_row."must_change_password"=FALSE
+      AND (user_row."expires_at" IS NULL OR user_row."expires_at">statement_timestamp())
+    WHERE target."kind"='PERSON' AND target."status"='ACTIVE'
+      AND target."subject_user_id"=${actorUserId}
+      AND NOT EXISTS(SELECT 1 FROM "organization_access_denies" deny
+        WHERE deny."organization_id"=org."id"
+          AND deny."user_id"=${actorUserId}
+          AND deny."lifted_at" IS NULL
+          AND deny."permission" IN ('*','EDUCATION_ACCESS','HUITEACHER_ACCESS'))
+    ORDER BY target."organization_id",target."id" LIMIT 101
+  `
+  return {list:rows.slice(0,100),truncated:rows.length>100}
+}
+
 export async function listHuiteacherImprovements(input:{
   actorUserId:string;organizationId:string;targetId:string;cursor?:string
 }){
@@ -147,22 +193,20 @@ export async function listHuiteacherImprovements(input:{
     const scope=await currentScope(tx,input)
     if(!scope.membership.productAdmin&&!scope.teacher)
       deny('HUITEACHER_ACTION_TARGET_FORBIDDEN')
+    const allowed={
+      organizationId:input.organizationId,targetId:input.targetId,
+      OR:[{audience:'SCHOOL_SHARED'},
+        ...(scope.teacher?[{audience:'PRIVATE_PERSONAL',
+          ownerUserId:input.actorUserId}]:[])],
+    }
     if(input.cursor){
       const anchor=await tx.huiteacherImprovementAction.findFirst({
-        where:{id:input.cursor,organizationId:input.organizationId,
-          targetId:input.targetId},
-        select:{id:true},
+        where:{...allowed,id:input.cursor},select:{id:true},
       })
       if(!anchor)deny('HUITEACHER_ACTION_CURSOR_INVALID',400)
     }
     const rows=await tx.huiteacherImprovementAction.findMany({
-      where:{organizationId:input.organizationId,targetId:input.targetId,
-        ...(scope.teacher?{}:{audience:'SCHOOL_SHARED'}),
-        // Even a Teacher product admin cannot read someone else's
-        // PRIVATE_PERSONAL journal without a separate explicit right.
-        OR:[{audience:'SCHOOL_SHARED'},
-          {audience:'PRIVATE_PERSONAL',ownerUserId:input.actorUserId}],
-      },
+      where:allowed,
       orderBy:[{createdAt:'desc'},{id:'desc'}],
       ...(input.cursor?{cursor:{id:input.cursor},skip:1}:{}),
       take:51,

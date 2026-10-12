@@ -6,7 +6,7 @@ import {authenticateHuiteacher} from '../../middleware/auth'
 import {success} from '../../utils/response'
 import {requireTeacherProductAdmin,requireRecentTeacherMfa} from './authority'
 import {HuiteacherImprovementError,createHuiteacherImprovement,
-  listHuiteacherImprovements,transitionHuiteacherImprovement} from './improvement.service'
+  listHuiteacherImprovements,listMyHuiteacherImprovementTargets,transitionHuiteacherImprovement} from './improvement.service'
 
 const router=Router()
 const id=z.string().uuid()
@@ -47,6 +47,8 @@ router.use((_,res,next)=>{
   next()
 })
 router.use(authenticateHuiteacher)
+router.get('/my-improvement-targets',wrap(req=>
+  listMyHuiteacherImprovementTargets(req.user!.userId)))
 const base='/organizations/:organizationId/evaluation-targets/:targetId/improvement-actions'
 router.get(base,wrap(req=>listHuiteacherImprovements({
   ...targetParams.parse(req.params),...cursor.parse(req.query),
