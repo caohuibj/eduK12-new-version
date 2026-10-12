@@ -310,7 +310,8 @@ export default function SurveyPublicApp(){
         restoredAnswers=plan.answers
         restoredRevision=plan.revision
         overwritePending=conflict&&!useRemote
-        restoredTimings=useRemote?(remote.checkpoint?.itemTimings??{}):restoredTimings
+        restoredTimings=useRemote&&remote.checkpoint
+          ?(remote.checkpoint.itemTimings??{}):restoredTimings
         if(conflict)setNotice(useRemote
           ?'已选用服务器版本的答案与逐题计时，未自动覆盖较新的存档。'
           :'保留了本地答案及计时；若要覆盖服务器存档，保存前需要再次确认。')
@@ -364,9 +365,16 @@ export default function SurveyPublicApp(){
   })}
   const currentFlow=task?.flow?resolveClientSurveyFlow(task.flow,task.units,answers):null
   const flowBlock=currentFlow?.blocks[Math.min(flowStep,Math.max(0,currentFlow.blocks.length-1))]
+  // One-by-one studies must not render multiple Scale timers simultaneously.
+  // Keep historical all-at-once Waves on their original multi-tool layout.
+  const timedSequence=!!task&&!task.flow&&task.units.some(u=>
+    u.kind==='SCALE'&&u.presentationMode==='ONE_BY_ONE')
+  const activeTool=timedSequence?task!.units[Math.min(toolStep,task!.units.length-1)]:undefined
   const flowUnit=flowBlock?.kind==='INSTRUMENT'
-    ?task?.units.find(u=>u.instrumentKey===flowBlock.instrumentKey):undefined
-  const finalFlowStep=!currentFlow||flowStep>=currentFlow.blocks.length-1
+    ?task?.units.find(u=>u.instrumentKey===flowBlock.instrumentKey):activeTool
+  const finalFlowStep=currentFlow
+    ?flowStep>=currentFlow.blocks.length-1
+    :!timedSequence||toolStep>=task!.units.length-1
   const canAdvanceFlow=():boolean=>{
     if(!flowUnit)return true
     const existing=answers[flowUnit.instrumentKey]||{}
@@ -398,23 +406,51 @@ export default function SurveyPublicApp(){
     if(!canAdvanceFlow()){setError('请完成当前工具的必答内容和全部页，再进入下一步骤');return}
     setError('')
     if(currentFlow)setFlowStep(i=>Math.min(i+1,currentFlow.blocks.length-1))
+    else if(timedSequence)setToolStep(i=>Math.min(i+1,task!.units.length-1))
   }
-  const renderSurveyTask=(unit:Unit)=><TaskForm key={unit.instrumentKey} unit={unit}
-    pageIndex={formPages[unit.instrumentKey]??0}
-    onPageChange={next=>setFormPages(current=>({...current,[unit.instrumentKey]:next}))}
-    proof={{publicId,attemptId,accessCredential,
-      ...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode}:{}),
-    }}
-    answer={answers[unit.instrumentKey]||{}} onChange={(key,value)=>setAnswers(previous=>{
-      const next={...(previous[unit.instrumentKey]||{}),[key]:value}
-      const question=unit.kind==='FORM'?unit.pages?.flatMap(page=>page.questions)
-        .find(q=>q.itemKey===key&&q.otherOptionKey):undefined
-      if(question&&!hasSelectedOther(question,value))delete next[question.itemKey+':other']
-      return {...previous,[unit.instrumentKey]:next}
-    })}/>
+  const updateAnswer=(unit:Unit,key:string,value:Answer)=>setAnswers(previous=>{
+    const next={...(previous[unit.instrumentKey]||{}),[key]:value}
+    const question=unit.kind==='FORM'?unit.pages?.flatMap(page=>page.questions)
+      .find(q=>q.itemKey===key&&q.otherOptionKey):undefined
+    if(question&&!hasSelectedOther(question,value))delete next[question.itemKey+':other']
+    return {...previous,[unit.instrumentKey]:next}
+  })
+  const recordTiming=(instrumentKey:string,next:import('./survey-scale-timing').SurveyScaleTimings)=>
+    setItemTimings(prev=>({...prev,[instrumentKey]:next}))
+  const timingFor=(unit:Unit)=>{
+    const current=timingTrackers.current[unit.instrumentKey]
+    if(current)return current
+    const tracker=new SurveyScaleTimingTracker(itemTimings[unit.instrumentKey]??{},
+      answers[unit.instrumentKey]??{})
+    timingTrackers.current[unit.instrumentKey]=tracker
+    return tracker
+  }
+  const renderSurveyTask=(unit:Unit)=>{
+    if(unit.kind==='SCALE'&&unit.presentationMode==='ONE_BY_ONE')
+      return <SurveyTimedScale key={unit.instrumentKey}
+        unit={{instrumentKey:unit.instrumentKey,title:unit.title,
+          items:(unit.items??[]).map(q=>({itemKey:q.itemKey,prompt:q.prompt,required:q.required})),
+          responseOptions:unit.responseOptions??[]}}
+        answer={answers[unit.instrumentKey]||{}}
+        tracker={timingFor(unit)}
+        onAnswer={(key,value)=>updateAnswer(unit,key,value)}
+        onTiming={next=>recordTiming(unit.instrumentKey,next)}/>
+    return <TaskForm key={unit.instrumentKey} unit={unit}
+      pageIndex={formPages[unit.instrumentKey]??0}
+      onPageChange={next=>setFormPages(current=>({...current,[unit.instrumentKey]:next}))}
+      proof={{publicId,attemptId,accessCredential,
+        ...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode}:{}),
+      }}
+      answer={answers[unit.instrumentKey]||{}}
+      onChange={(key,value)=>updateAnswer(unit,key,value)}/>
+  }
   const submit=(e:FormEvent)=>{e.preventDefault();if(!task||!attemptId)return;
-    if(currentFlow&&!finalFlowStep){setError('请按顺序完成当前研究步骤');return}
-    if(currentFlow&&!canAdvanceFlow()){setError('请完成当前工具后再提交');return}
+    if((currentFlow||timedSequence)&&!finalFlowStep){
+      setError('请按顺序完成当前研究步骤');return
+    }
+    if((currentFlow||timedSequence)&&!canAdvanceFlow()){
+      setError('请完成当前工具后再提交');return
+    }
     void run(async()=>{
     // Match the frozen conditional form. An earlier selection change must
     // clear fields that are now hidden; the server repeats this validation.
@@ -426,11 +462,22 @@ export default function SurveyPublicApp(){
         ?sanitizeFormAnswers(unit.pages?.flatMap(p=>p.questions)||[],original)
         :original]
     }))
+    const timedUnits=task.units.filter(unit=>
+      unit.kind==='SCALE'&&unit.presentationMode==='ONE_BY_ONE'&&
+      (eligible===null||eligible.has(unit.instrumentKey)))
+    const sealedTimings=Object.fromEntries(timedUnits.map(unit=>[
+      unit.instrumentKey,sealSurveyScaleTimings(
+        (unit.items??[]).map(item=>item.itemKey),payload[unit.instrumentKey]??{},
+        timingTrackers.current[unit.instrumentKey]?.snapshot()??
+          itemTimings[unit.instrumentKey]??{},
+      ),
+    ]))
     const screened=currentFlow?.termination==='SCREEN_OUT'
     const final=await publicApi<{status:string}>(
       base+'/attempts/'+attemptId+(screened?'/screen-out':'/final'),'POST',{
       ...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode:researchCode.trim().toUpperCase()}:{}),
       accessCredential:accessCredential.trim(),submissionId,answers:payload,
+      ...(timedUnits.length?{itemTimings:sealedTimings}:{}),
       ...(currentFlow?{presentation:{shownBlocks:currentFlow.shownBlocks}}:{}),
     })
     if(screened){
@@ -466,11 +513,21 @@ export default function SurveyPublicApp(){
         return [unit.instrumentKey,unit.kind==='FORM'
           ?sanitizeFormAnswers(unit.pages?.flatMap(p=>p.questions)??[],answer):answer]
       }))
+      const timedUnits=task.units.filter(unit=>
+        unit.kind==='SCALE'&&unit.presentationMode==='ONE_BY_ONE'&&
+        (enabled===null||enabled.has(unit.instrumentKey)))
+      const partialTimings=Object.fromEntries(timedUnits.map(unit=>[
+        unit.instrumentKey,sealSurveyScaleTimings((unit.items??[]).map(q=>q.itemKey),
+          partial[unit.instrumentKey]??{},
+          timingTrackers.current[unit.instrumentKey]?.snapshot()??
+            itemTimings[unit.instrumentKey]??{}),
+      ]))
       const saved=await publicApi<{revision:number;expiresAt:string}>(
         base+'/attempts/'+attemptId+'/checkpoint/save','POST',{
         ...(info?.project.collectionMode==='LINKED_WAVES'
           ?{researchCode:researchCode.trim().toUpperCase()}:{}),
         accessCredential:accessCredential.trim(),revision:checkpointRevision,answers:partial,
+        ...(timedUnits.length?{itemTimings:partialTimings}:{}),
       })
       setCheckpointRevision(saved.revision)
       setCheckpointOverwritePending(false)
@@ -629,7 +686,16 @@ export default function SurveyPublicApp(){
           </section>}
           {!finalFlowStep&&<button type="button" className="btn-secondary" disabled={busy}
             onClick={advanceFlow}>确认当前步骤，继续研究</button>}
-        </>:task.units.map(renderSurveyTask)}
+        </>:timedSequence&&flowUnit?<section className="space-y-3">
+          <p className="text-xs text-slate-600" role="status">研究工具 {toolStep+1} / {task.units.length}</p>
+          {renderSurveyTask(flowUnit)}
+          <nav aria-label="研究工具导航" className="flex flex-wrap gap-3">
+            <button type="button" className="btn-secondary" disabled={toolStep===0}
+              onClick={()=>{setError('');setToolStep(i=>Math.max(0,i-1))}}>上一工具</button>
+            {!finalFlowStep&&<button type="button" className="btn-secondary"
+              onClick={advanceFlow}>确认当前工具，继续</button>}
+          </nav>
+        </section>:task.units.map(renderSurveyTask)}
         {finalFlowStep&&<button className="btn-primary" disabled={busy||(!task.flow&&!task.units.every(unit=>{
           if(unit.kind!=='FORM')return true
           const vis=visibleFormKeys(unit.pages?.flatMap(p=>p.questions)||[],
