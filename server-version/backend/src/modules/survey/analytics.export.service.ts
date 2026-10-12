@@ -225,8 +225,9 @@ export async function createSurveyExport(req:Request,input:{
               :'COMPLETED_AT_AND_ID',
           participationRowsAreSeparate:!!(paged&&phased&&sources.collectionMode==='LINKED_WAVES'),
           ...(attendanceOnly&&compact?{
-            joinKeys:['research_code','wave_id'],
-            joinInstruction:'JOIN_WITH_LINKED_FINAL_BY_RESEARCH_CODE_AND_WAVE_ID_DO_NOT_CONCATENATE_CSV',
+            attendanceJoinKeys:['research_code','wave_id'],
+            finalJoinKeys:['research_code_or_attempt','wave_id'],
+            joinInstruction:'MATCH_ATTENDANCE_RESEARCH_CODE_TO_FINAL_RESEARCH_CODE_OR_ATTEMPT_AND_WAVE_ID_NEVER_CONCATENATE_CSV',
             missingSemantics:{QUALITY_EXCLUDED:'Audited exclusion; not an included FINAL',
               ABANDONED:'Started or screened-out without an included FINAL',
               NO_WAVE:'No participation in this wave; derive only from the wider linked cohort'},

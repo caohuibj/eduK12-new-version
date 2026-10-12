@@ -215,7 +215,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
     downloadBlob(baseName+'_manifest.json',JSON.stringify(artifact.manifest,null,2),'application/json;charset=utf-8')
     setBatchDownloaded(true)
     setMessage(ticket.manifest.batch?.representation==='ATTENDANCE_COMPACT_V1'
-      ?'已下载参与状态 CSV 和 Manifest；按 research_code + wave_id 与 FINAL 关联，不能直接拼接行。'
+      ?'已下载参与状态 CSV 和 Manifest；按状态表 research_code / wave_id 对应 FINAL 的 research_code_or_attempt / wave_id 关联，不能直接拼接行。'
       :'已下载当前批次 CSV、变量编码字典和 Manifest，请保管敏感数据。')
   })}
   return <section className="border rounded-xl bg-white p-4 sm:p-6 my-5 space-y-4" aria-label="研究数据">
