@@ -14,7 +14,8 @@ import {
 } from '../../modules/huiteacher/observer.service'
 import {createHuiteacherForm,updateHuiteacherForm,publishHuiteacherForm}
   from '../../modules/huiteacher/forms.service'
-import {bindHuiteacherFieldForm,readInvitedHuiteacherFieldForm}
+import {bindHuiteacherFieldForm,readInvitedHuiteacherFieldForm,
+  readSubmittedHuiteacherFieldFormEvidence}
   from '../../modules/huiteacher/fieldForm.service'
 
 const dbUrl=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL',
@@ -174,6 +175,22 @@ suite('Huiteacher PR4 event-scoped expert access and encrypted field records',()
       where:{recordId:raw.id},
     })).rejects.toThrow()
     expect(submitted.status).toBe('SUBMITTED')
+    const evidence=await readSubmittedHuiteacherFieldFormEvidence({
+      organizationId:school.id,eventId:event.id,recordId:raw.id,
+      actorUserId:manager.id,
+    })
+    expect(evidence.formId).toBe(draft.id)
+    expect(evidence.answers.q1).toBe('high')
+    expect(JSON.stringify(evidence)).not.toContain('独立反思')
+    expect(JSON.stringify(evidence)).not.toContain(expert.id)
+    await expect(readSubmittedHuiteacherFieldFormEvidence({
+      organizationId:school.id,eventId:event.id,recordId:raw.id,
+      actorUserId:expert.id,
+    })).rejects.toThrow()
+    await expect(readSubmittedHuiteacherFieldFormEvidence({
+      organizationId:school.id,eventId:event.id,recordId:privateNote.id,
+      actorUserId:manager.id,
+    })).rejects.toThrow()
     await submitHuiteacherObservation({
       id:privateNote.id,actorUserId:expert.id,expectedRevision:1,
     })
