@@ -14,7 +14,8 @@ import { matchedWaveCounts,waveOverview } from '../../modules/survey/analytics.r
 import { loadSurveySource } from '../../modules/survey/analytics.source'
 import { describeSurveyWaveItemPaged } from '../../modules/survey/analytics.paged'
 import {listSampleQuality,listSampleQualityHistory,setSampleQuality} from '../../modules/survey/sample-quality.service'
-import { rawLongExport,rawWideExport } from '../../modules/survey/analytics.raw-export'
+import { rawLongExport,rawWideExport,compactSurveyAttendanceExport } from '../../modules/survey/analytics.raw-export'
+import {encodeSurveyExportCursor,decodeSurveyExportCursor} from '../../modules/survey/analytics.export-cursor'
 import { exportWide,exportLong } from '../../modules/survey/analytics.export-format'
 import { describePairedScores } from '../../modules/survey/analytics.descriptive'
 import { createSurveyExport,downloadSurveyExport } from '../../modules/survey/analytics.export.service'
@@ -593,16 +594,21 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     try{
       const initial=await createSurveyExport(req,{projectId,format:'RAW_WAVE',waveId:w.id})
       expect(initial.manifest.batch.phase).toBe('VERIFIED_FINAL')
+      expect(initial.manifest.batch.representation).toBe('FINAL_ITEM_OR_SCORE_ROWS')
       expect(initial.nextCursor).toBeTruthy()
       const missing=await createSurveyExport(req,{
         projectId,format:'RAW_WAVE',waveId:w.id,cursor:initial.nextCursor!,
       })
       expect(missing.manifest.batch.phase).toBe('NON_FINAL_PARTICIPATION')
+      expect(missing.manifest.batch.representation).toBe('ATTENDANCE_COMPACT_V1')
       expect(missing.nextCursor).toBeNull()
       const artifact=await downloadSurveyExport(req,{projectId,exportId:missing.id})
       expect(artifact.csv).toContain(person.researchCode)
       expect(artifact.csv).toContain('ABANDONED')
-      expect(missing.manifest.rowCount).toBe(2)
+      expect(missing.manifest.rowCount).toBe(1)
+      expect(missing.manifest.schemaVersion).toBe(2)
+      expect(artifact.csv).toContain('"research_code"')
+      expect(artifact.csv).not.toContain('"item_key"')
       // SCORE_LONG follows the same signed non-FINAL participation phase.
       const score=await createSurveyExport(req,{projectId,format:'SCORE_LONG',waveId:w.id})
       expect(score.nextCursor).toBeTruthy()
@@ -611,6 +617,25 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
       const scoreCsv=await downloadSurveyExport(req,{projectId,exportId:scoreMissing.id})
       expect(scoreCsv.csv).toContain('ABANDONED')
       expect(scoreCsv.csv).toContain(person.researchCode)
+      expect(scoreMissing.manifest.rowCount).toBe(1)
+      // A previously issued signed V3 continuation still returns its original
+      // expanded per-item missing rows; V4 must not reinterpret old CSV layouts.
+      const legacyV3=encodeSurveyExportCursor({
+        v:3 as const,projectId,waveId:w.id,format:'RAW_WAVE' as const,
+        phase:'ATTENDANCE' as const,attendanceCount:1,afterAttemptId:null,
+        after:{id:'00000000-0000-0000-0000-000000000000',
+          completedAt:source.cutOff},
+        cutOff:source.cutOff,sourceRevision:source.sourceRevision,
+        finalCount:0,page:1,issuedAt:Date.now(),completedFrom:null,
+        completedBefore:null,freeTextIncluded:false,
+      })
+      const legacy=await createSurveyExport(req,{
+        projectId,format:'RAW_WAVE',waveId:w.id,cursor:legacyV3,
+      })
+      expect(legacy.manifest.batch.representation).toBe('LEGACY_EXPANDED_ATTENDANCE_V3')
+      expect(legacy.manifest.rowCount).toBe(2)
+      const legacyCsv=await downloadSurveyExport(req,{projectId,exportId:legacy.id})
+      expect(legacyCsv.csv).toContain('"item_key"')
     }finally{
       if(originalSigningKey===undefined)delete process.env.ASSET_SIGNING_SECRET
       else process.env.ASSET_SIGNING_SECRET=originalSigningKey
@@ -618,7 +643,13 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
   })
 
   it('pages 5001 linked non-FINAL attempts without the legacy 5000-row ceiling',async()=>{
-    const w=await wave('研究参与分页容量边界',[toolIds.scale],true)
+    const longScaleId=await instrument('SCALE',{...structuredClone(scale),
+      items:Array.from({length:240},(_,i)=>({
+        itemKey:'item'+String(i+1).padStart(3,'0'),
+        prompt:'第 '+(i+1)+' 题',required:true,reverse:false,
+        dimensionKeys:['motivation','strategy'],
+      }))})
+    const w=await wave('研究参与分页容量边界',[longScaleId],true)
     const participants=Array.from({length:5001},(_,index)=>({
       id:randomUUID(),projectId,
       researchCode:'R-'+String(index).padStart(10,'0'),
@@ -637,33 +668,40 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
       expect(snapshot.completeAttempts).toBe(0)
       expect(snapshot.sourceAttendanceCount).toBe(5001)
       expect(snapshot.attendance).toHaveLength(0)
-      const first=await loadSurveySource({actorUserId:ownerId,projectId,
-        waveIds:[w.id],includeWideSchema:true,includeAttendance:false,
-        includeAttendanceCount:true,attendanceOnly:true,pageMode:true,
-        expectedAttendanceCount:5001,expectedFinalCount:0,
-        expectedSourceRevision:snapshot.sourceRevision,
-        snapshotCutOff:new Date(snapshot.cutOff)})
-      expect(first.attendance).toHaveLength(250)
-      expect(first.nextAttendanceCursor).toBeTruthy()
-      const second=await loadSurveySource({actorUserId:ownerId,projectId,
-        waveIds:[w.id],includeWideSchema:true,includeAttendance:false,
-        includeAttendanceCount:true,attendanceOnly:true,pageMode:true,
-        attendanceAfterId:first.nextAttendanceCursor!,
-        expectedAttendanceCount:5001,expectedFinalCount:0,
-        expectedSourceRevision:snapshot.sourceRevision,
-        snapshotCutOff:new Date(snapshot.cutOff)})
-      expect(second.attendance).toHaveLength(250)
-      expect(new Set([...first.attendance,...second.attendance]
-        .map(x=>x.researchCode)).size).toBe(500)
-      expect(rawLongExport(projectId,first,w.id).manifest.rowCount).toBe(500)
-      expect(rawLongExport(projectId,second,w.id).manifest.rowCount).toBe(500)
+      expect(snapshot.codebook).toHaveLength(240)
+      let cursor:string|undefined
+      let pages=0,rows=0
+      const codes=new Set<string>()
+      do{
+        const chunk=await loadSurveySource({actorUserId:ownerId,projectId,
+          waveIds:[w.id],includeWideSchema:false,includeAttendance:false,
+          includeAttendanceCount:true,attendanceOnly:true,pageMode:true,
+          ...(cursor?{attendanceAfterId:cursor}:{}),
+          expectedAttendanceCount:5001,expectedFinalCount:0,
+          expectedSourceRevision:snapshot.sourceRevision,
+          snapshotCutOff:new Date(snapshot.cutOff)})
+        const artifact=compactSurveyAttendanceExport(projectId,chunk,w.id)
+        expect(artifact.manifest.rowCount).toBe(chunk.attendance.length)
+        expect(artifact.manifest.columnCount).toBe(4)
+        expect(artifact.csv).not.toContain('item001')
+        for(const row of chunk.attendance){
+          expect(codes.has(row.researchCode)).toBe(false)
+          codes.add(row.researchCode)
+        }
+        rows+=chunk.attendance.length
+        pages++
+        cursor=chunk.nextAttendanceCursor??undefined
+      }while(cursor&&pages<30)
+      expect(pages).toBe(21)
+      expect(rows).toBe(5001)
+      expect(codes.size).toBe(5001)
     }finally{
       await db.surveyWaveAttempt.deleteMany({where:{
         waveId:w.id,participantId:{in:participants.map(p=>p.id)},
       }})
       await db.surveyParticipant.deleteMany({where:{id:{in:participants.map(p=>p.id)}}})
     }
-  },20000)
+  },30000)
 
   it('projects multiple verified FINALs from one frozen Publication without duplicated schema columns',async()=>{
     const w=await wave('同一冻结定义下的多份 FINAL',[toolIds.scale],true)
@@ -1144,6 +1182,143 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     expect(await pending).toBe(false)
     expect(await db.surveyWaveFinal.count({where:{attemptId:participant.attemptId}})).toBe(0)
   })
+
+  it('adapts 240-item timed FINAL pages and skips raw projection for SCORE_LONG',async()=>{
+    const itemKeys=Array.from({length:240},(_,i)=>'item'+String(i+1).padStart(3,'0'))
+    const timedScale:ScaleDraft={...structuredClone(scale),presentationMode:'ONE_BY_ONE',
+      items:itemKeys.map((itemKey,i)=>({
+        itemKey,prompt:'第 '+(i+1)+' 题',required:true,reverse:false,
+        dimensionKeys:['motivation','strategy'],
+      }))}
+    const draftId=await instrument('SCALE',timedScale)
+    const w=await wave('复杂量表动态 FINAL 分批',[draftId],true)
+    const linked=await joinLinkedStudy({
+      publicId:w.publicId,waveId:w.id,entryToken:w.entrySecret,
+      consent:true,consentVersion:1,
+    })
+    const task=await getOwnResearchTask({
+      publicId:w.publicId,attemptId:linked.attemptId,
+      researchCode:linked.researchCode,accessCredential:linked.accessCredential,
+    })
+    const instrumentKey=task.units[0].instrumentKey
+    const rawAnswers=Object.fromEntries(itemKeys.map(itemKey=>[itemKey,'o4']))
+    const timingRows=Object.fromEntries(itemKeys.map(itemKey=>[itemKey,{
+      schemaVersion:1 as const,firstResponseMs:500,activeTimeMs:700,
+      visits:1,revisitCount:0,changeCount:0,
+      interrupted:false,recoveredWithoutClock:false,
+    }]))
+    await submitResearchFinal({
+      publicId:w.publicId,attemptId:linked.attemptId,
+      researchCode:linked.researchCode,accessCredential:linked.accessCredential,
+      submissionId:randomUUID(),answers:{[instrumentKey]:rawAnswers},
+      itemTimings:{[instrumentKey]:timingRows},
+    })
+    const exemplar=await db.surveyWaveFinal.findUniqueOrThrow({
+      where:{attemptId:linked.attemptId},
+    })
+    const synthetic=Array.from({length:104},(_,i)=>({
+      id:randomUUID(),projectId,
+      researchCode:'R-8'+String(i).padStart(9,'0'),
+      credentialHash:createHash('sha256').update('dynamic-pagination-'+w.id+'-'+i).digest('hex'),
+      status:'ACTIVE' as const,
+    }))
+    const attempts=synthetic.map(p=>({
+      id:randomUUID(),projectId,waveId:w.id,participantId:p.id,
+      status:'COMPLETED' as const,completedAt:new Date(),
+    }))
+    await db.surveyParticipant.createMany({data:synthetic})
+    const oldSigning=process.env.ASSET_SIGNING_SECRET
+    process.env.ASSET_SIGNING_SECRET='ci-survey-dynamic-v4-export-signature-key'
+    try{
+      await db.surveyWaveAttempt.createMany({data:attempts})
+      await db.surveyWaveFinal.createMany({data:attempts.map(a=>({
+        id:randomUUID(),attemptId:a.id,projectId,waveId:w.id,
+        publicationId:exemplar.publicationId,submissionId:randomUUID(),
+        definitionDigest:exemplar.definitionDigest,
+        payloadHash:exemplar.payloadHash,resultsCipher:exemplar.resultsCipher,
+        resultsHash:exemplar.resultsHash,
+      }))})
+      const token=generateToken({
+        userId:ownerId,username:'synthetic-researcher',role:'STUDENT',
+        accountDomain:'SURVEY',tokenVersion:0,mfaVerifiedAt:Math.floor(Date.now()/1000),
+      })
+      const req={headers:{cookie:'huisurvey_research_session='+token},
+        user:{userId:ownerId,tokenVersion:0,username:'synthetic-researcher',
+          role:'STUDENT',platformRole:'STANDARD',mustChangePassword:false,
+          accountDomain:'SURVEY'}} as unknown as Request
+      // Previously 105 × 240 = 25,200 rows was rejected at the first page.
+      let cursor:string|undefined,rows=0,pages=0
+      const seenCodes=new Set<string>(),seenAfter=new Set<string>()
+      do{
+        const page=await createSurveyExport(req,{
+          projectId,format:'RAW_WAVE',waveId:w.id,...(cursor?{cursor}:{})})
+        expect(page.manifest.batch.representation).toBe('FINAL_ITEM_OR_SCORE_ROWS')
+        expect(page.manifest.rowCount).toBeLessThanOrEqual(25000)
+        expect(page.manifest.batch.totalIncludedFinals).toBe(105)
+        const csv=await downloadSurveyExport(req,{projectId,exportId:page.id})
+        const pageCodes=new Set(csv.csv.split('\r\n').slice(1)
+          .filter(Boolean).map(line=>line.match(/^\"([^\"]+)\"/)?.[1]))
+        expect(pageCodes.has(undefined)).toBe(false)
+        for(const code of pageCodes){
+          expect(seenCodes.has(code!)).toBe(false)
+          seenCodes.add(code!)
+        }
+        rows+=page.manifest.rowCount
+        pages++
+        cursor=page.nextCursor??undefined
+        if(cursor){
+          const after=decodeSurveyExportCursor(cursor,projectId,'RAW_WAVE',w.id).after.id
+          expect(seenAfter.has(after)).toBe(false)
+          seenAfter.add(after)
+        }
+      }while(cursor&&pages<30)
+      expect(pages).toBeGreaterThan(1)
+      expect(cursor).toBeUndefined()
+      expect(rows).toBe(105*240)
+      expect(seenCodes.size).toBe(105)
+      // SCORE_LONG only projects numeric scoring, but still decrypts verified
+      // FINAL envelopes under the same 8 MiB page budget. It can therefore
+      // require multiple pages even for just two descriptive score columns.
+      let scoreCursor:string|undefined,scoreRows=0,scorePages=0
+      const scoreCodes=new Set<string>(),scoreAfter=new Set<string>()
+      do{
+        const score=await createSurveyExport(req,{
+          projectId,format:'SCORE_LONG',waveId:w.id,
+          ...(scoreCursor?{cursor:scoreCursor}:{}),
+        })
+        expect(score.manifest.batch.totalIncludedFinals).toBe(105)
+        const result=await downloadSurveyExport(req,{projectId,exportId:score.id})
+        expect(result.csv).not.toContain('item001')
+        const currentCodes=new Set(result.csv.split('\r\n').slice(1)
+          .filter(Boolean).map(line=>line.match(/^"([^"]+)"/)?.[1]))
+        expect(currentCodes.has(undefined)).toBe(false)
+        for(const code of currentCodes){
+          expect(scoreCodes.has(code!)).toBe(false)
+          scoreCodes.add(code!)
+        }
+        scoreRows+=score.manifest.rowCount
+        scorePages++
+        scoreCursor=score.nextCursor??undefined
+        if(scoreCursor){
+          const after=decodeSurveyExportCursor(scoreCursor,
+            projectId,'SCORE_LONG',w.id).after.id
+          expect(scoreAfter.has(after)).toBe(false)
+          scoreAfter.add(after)
+        }
+      }while(scoreCursor&&scorePages<30)
+      expect(scoreCursor).toBeUndefined()
+      expect(scorePages).toBeGreaterThan(1)
+      expect(scoreRows).toBe(105*2)
+      expect(scoreCodes.size).toBe(105)
+    }finally{
+      if(oldSigning===undefined)delete process.env.ASSET_SIGNING_SECRET
+      else process.env.ASSET_SIGNING_SECRET=oldSigning
+      // FINALs are append-only by database trigger. Keep the synthetic FINALs
+      // and their required Attempt/Participant parents in this isolated CI DB;
+      // the test database is discarded after the regression job finishes.
+      // Never disable that trigger merely for fixture cleanup.
+    }
+  },30000)
 
 
 })

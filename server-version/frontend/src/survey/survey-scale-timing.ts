@@ -38,9 +38,11 @@ export class SurveyScaleTimingTracker {
     ]))
   }
   private row(key:string):SurveyScaleItemTimingV1{
-    if(!this.rows[key]){
-      this.rows[key]=this.initialAnswers[key]===undefined
-        ?fresh():emptyRecoveredTiming()
+    if(!Object.prototype.hasOwnProperty.call(this.rows,key)){
+      // A key such as `constructor` is legal, but {}[key] is inherited.
+      // Only an actual saved choice means the first-response clock was lost.
+      this.rows[key]=Object.prototype.hasOwnProperty.call(this.initialAnswers,key)
+        &&this.initialAnswers[key]!==undefined?emptyRecoveredTiming():fresh()
     }
     return this.rows[key]
   }
@@ -101,7 +103,8 @@ export class SurveyScaleTimingTracker {
 export function sealSurveyScaleTimings(
   itemKeys:readonly string[],answers:Record<string,unknown>,records:SurveyScaleTimings,
 ):SurveyScaleTimings{
-  return Object.fromEntries(itemKeys.filter(key=>answers[key]!==undefined).map(key=>[
-    key,records[key]??emptyRecoveredTiming(),
+  return Object.fromEntries(itemKeys.filter(key=>
+    Object.prototype.hasOwnProperty.call(answers,key)&&answers[key]!==undefined).map(key=>[
+    key,Object.prototype.hasOwnProperty.call(records,key)?records[key]:emptyRecoveredTiming(),
   ]))
 }

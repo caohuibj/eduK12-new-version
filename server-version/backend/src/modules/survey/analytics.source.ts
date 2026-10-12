@@ -406,7 +406,8 @@ export async function loadSurveySource(input:{
     let sourceAttendanceCount:number|null=null
     let nextAttendanceCursor:string|null=null
     if(input.includeAttendanceCount||input.attendanceOnly){
-      if(!input.pageMode||input.waveIds?.length!==1||!input.includeWideSchema)
+      if(!input.pageMode||input.waveIds?.length!==1||
+          (!input.attendanceOnly&&!input.includeWideSchema))
         throw new SurveyAnalyticsError(400,'参与状态游标只允许已冻结的单波次分页数据')
       // Only incomplete / quality-excluded linked attempts need synthetic Long
       // rows. COMPLETED included FINALs are already emitted by the FINAL pass.
@@ -428,7 +429,11 @@ export async function loadSurveySource(input:{
         // Bound synthetic rows to ~6000 item/score cells per response page.
         // Never materialize the whole participant matrix in memory.
         const variableCount=Math.max(1,codebook.size,scoreColumns.length)
-        const pageSize=Math.max(1,Math.min(250,Math.floor(6000/variableCount)))
+        // V4 compact attendance needs one row per participant rather than one
+        // synthetic row per frozen variable. V3 retains its prior row bound.
+        const pageSize=input.includeWideSchema
+          ?Math.max(1,Math.min(250,Math.floor(6000/variableCount)))
+          :250
         const page=await tx.surveyWaveAttempt.findMany({
           where:{...candidates,...(input.attendanceAfterId
             ?{id:{gt:input.attendanceAfterId}}:{})},

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import {useRef,useState} from 'react'
 import {fireEvent,render,screen} from '@testing-library/react'
-import {describe,expect,it} from 'vitest'
+import {describe,expect,it,vi} from 'vitest'
 import {SurveyTimedScale} from './SurveyTimedScale'
 import {SurveyScaleTimingTracker} from './survey-scale-timing'
 const unit={instrumentKey:'scale',title:'学习状态',
@@ -21,6 +21,19 @@ function Harness(){
   </>
 }
 describe('Survey Scale participant one-by-one delivery',()=>{
+  it('handles an item key that matches a built-in Object property',()=>{
+    const answer=vi.fn()
+    const tracker=new SurveyScaleTimingTracker()
+    render(<SurveyTimedScale
+      unit={{...unit,instrumentKey:'constructor',items:[{itemKey:'constructor',prompt:'特殊编码题',required:true}]}}
+      answer={{}} tracker={tracker} index={0} onIndexChange={()=>{}}
+      onAnswer={answer} onTiming={()=>{}}/>)
+    const option=screen.getByRole('radio',{name:'同意'})
+    expect(option).not.toBeChecked()
+    fireEvent.click(option)
+    expect(answer).toHaveBeenCalledWith('constructor','o2')
+    expect(Object.prototype.hasOwnProperty.call(tracker.snapshot(),'constructor')).toBe(true)
+  })
   it('shows only one question at a time, allows backtracking and preserves choices',()=>{
     render(<Harness/>)
     expect(screen.getByText(/第一题/)).toBeInTheDocument()

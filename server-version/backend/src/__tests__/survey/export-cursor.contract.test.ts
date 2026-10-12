@@ -25,6 +25,21 @@ describe('Survey bounded export continuation proof',()=>{
         afterAttemptId:'22222222-2222-4222-8222-222222222222',page:3}
       expect(decodeSurveyExportCursor(encodeSurveyExportCursor(attendance),'a','RAW_WAVE','b'))
         .toEqual(attendance)
+      const v4={...v3,v:4 as const,pageLimit:25}
+      expect(decodeSurveyExportCursor(encodeSurveyExportCursor(v4),'a','RAW_WAVE','b'))
+        .toEqual(v4)
+      const v4attendance={...v4,phase:'ATTENDANCE' as const,
+        afterAttemptId:'22222222-2222-4222-8222-222222222222',page:37}
+      expect(decodeSurveyExportCursor(encodeSurveyExportCursor(v4attendance),
+        'a','RAW_WAVE','b')).toEqual(v4attendance)
+      for(const illegal of [0,251,-5,1.2]){
+        expect(()=>decodeSurveyExportCursor(encodeSurveyExportCursor({
+          ...v4,pageLimit:illegal,
+        }),'a','RAW_WAVE','b')).toThrow()
+      }
+      expect(()=>decodeSurveyExportCursor(encodeSurveyExportCursor({
+        ...v4,page:501,
+      }),'a','RAW_WAVE','b')).toThrow()
       expect(()=>decodeSurveyExportCursor(encodeSurveyExportCursor({
         ...attendance,attendanceCount:-1,
       }),'a','RAW_WAVE','b')).toThrow()

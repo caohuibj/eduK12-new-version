@@ -56,6 +56,9 @@ const isRefusal=(answer:Answer|undefined):answer is {_surveyRefusal:true}=>
   &&answer._surveyRefusal===true
 const refusal=():{_surveyRefusal:true}=>({_surveyRefusal:true})
 const safePattern=/^[a-f0-9-]{36}$/i
+// A valid research key can equal a property inherited from Object.prototype.
+const own=<T,>(values:Record<string,T>,key:string):T|undefined=>
+  Object.prototype.hasOwnProperty.call(values,key)?values[key]:undefined
 const parseError=(e:unknown)=>e instanceof Error?e.message:'研究访问失败，请重试'
 const publicApi=async <T,>(path:string,method='GET',body?:unknown):Promise<T>=>{
   const result=await fetch('/api/public/survey'+path,{method,credentials:'omit',
@@ -254,7 +257,7 @@ export default function SurveyPublicApp(){
         (!instrumentKey||unit.instrumentKey===instrumentKey)&&unit.pages?.some(
           page=>page.questions.some(q=>q.itemKey===itemKey))):undefined
       if(targetUnit&&itemKey){
-        const current=answers[targetUnit.instrumentKey]||{}
+        const current=own(answers,targetUnit.instrumentKey)??{}
         const visible=visibleFormKeys(targetUnit.pages?.flatMap(p=>p.questions)||[],current)
         const pages=targetUnit.pages?.filter(p=>p.questions.some(q=>visible.has(q.itemKey)))||[]
         const index=pages.findIndex(p=>p.questions.some(q=>q.itemKey===itemKey))
@@ -379,11 +382,11 @@ export default function SurveyPublicApp(){
     :!timedSequence||toolStep>=task!.units.length-1
   const canAdvanceFlow=():boolean=>{
     if(!flowUnit)return true
-    const existing=answers[flowUnit.instrumentKey]||{}
+    const existing=own(answers,flowUnit.instrumentKey)??{}
     if(flowUnit.kind==='FORM'){
       const visible=visibleFormKeys(flowUnit.pages?.flatMap(page=>page.questions)??[],existing)
       const pages=flowUnit.pages?.filter(page=>page.questions.some(q=>visible.has(q.itemKey)))??[]
-      if((formPages[flowUnit.instrumentKey]??0)<pages.length-1)return false
+      if((own(formPages,flowUnit.instrumentKey)??0)<pages.length-1)return false
       for(const page of pages)for(const question of page.questions){
         if(!visible.has(question.itemKey)||!question.required)continue
         const keys=['MATRIX','MATRIX_MULTIPLE'].includes(question.type)
@@ -411,7 +414,7 @@ export default function SurveyPublicApp(){
     else if(timedSequence)setToolStep(i=>Math.min(i+1,task!.units.length-1))
   }
   const updateAnswer=(unit:Unit,key:string,value:Answer)=>setAnswers(previous=>{
-    const next={...(previous[unit.instrumentKey]||{}),[key]:value}
+    const next={...(own(previous,unit.instrumentKey)??{}),[key]:value}
     const question=unit.kind==='FORM'?unit.pages?.flatMap(page=>page.questions)
       .find(q=>q.itemKey===key&&q.otherOptionKey):undefined
     if(question&&!hasSelectedOther(question,value))delete next[question.itemKey+':other']
@@ -420,10 +423,10 @@ export default function SurveyPublicApp(){
   const recordTiming=(instrumentKey:string,next:import('./survey-scale-timing').SurveyScaleTimings)=>
     setItemTimings(prev=>({...prev,[instrumentKey]:next}))
   const timingFor=(unit:Unit)=>{
-    const current=timingTrackers.current[unit.instrumentKey]
+    const current=own(timingTrackers.current,unit.instrumentKey)
     if(current)return current
-    const tracker=new SurveyScaleTimingTracker(itemTimings[unit.instrumentKey]??{},
-      answers[unit.instrumentKey]??{})
+    const tracker=new SurveyScaleTimingTracker(own(itemTimings,unit.instrumentKey)??{},
+      own(answers,unit.instrumentKey)??{})
     timingTrackers.current[unit.instrumentKey]=tracker
     return tracker
   }
@@ -433,14 +436,14 @@ export default function SurveyPublicApp(){
         unit={{instrumentKey:unit.instrumentKey,title:unit.title,
           items:(unit.items??[]).map(q=>({itemKey:q.itemKey,prompt:q.prompt,required:q.required})),
           responseOptions:unit.responseOptions??[]}}
-        answer={answers[unit.instrumentKey]||{}}
+        answer={own(answers,unit.instrumentKey)??{}}
         tracker={timingFor(unit)}
-        index={scalePages[unit.instrumentKey]??0}
+        index={own(scalePages,unit.instrumentKey)??0}
         onIndexChange={next=>setScalePages(prev=>({...prev,[unit.instrumentKey]:next}))}
         onAnswer={(key,value)=>updateAnswer(unit,key,value)}
         onTiming={next=>recordTiming(unit.instrumentKey,next)}/>
     return <TaskForm key={unit.instrumentKey} unit={unit}
-      pageIndex={formPages[unit.instrumentKey]??0}
+      pageIndex={own(formPages,unit.instrumentKey)??0}
       onPageChange={next=>setFormPages(current=>({...current,[unit.instrumentKey]:next}))}
       proof={{publicId,attemptId,accessCredential,
         ...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode}:{}),
@@ -461,7 +464,7 @@ export default function SurveyPublicApp(){
     const eligible=task.flow?new Set(currentFlow?.visibleUnitKeys??[]):null
     const payload=Object.fromEntries(task.units.filter(unit=>
       eligible===null||eligible.has(unit.instrumentKey)).map(unit=>{
-      const original=answers[unit.instrumentKey]||{}
+      const original=own(answers,unit.instrumentKey)??{}
       return [unit.instrumentKey,unit.kind==='FORM'
         ?sanitizeFormAnswers(unit.pages?.flatMap(p=>p.questions)||[],original)
         :original]
@@ -472,8 +475,8 @@ export default function SurveyPublicApp(){
     const sealedTimings=Object.fromEntries(timedUnits.map(unit=>[
       unit.instrumentKey,sealSurveyScaleTimings(
         (unit.items??[]).map(item=>item.itemKey),payload[unit.instrumentKey]??{},
-        timingTrackers.current[unit.instrumentKey]?.snapshot()??
-          itemTimings[unit.instrumentKey]??{},
+        own(timingTrackers.current,unit.instrumentKey)?.snapshot()??
+          own(itemTimings,unit.instrumentKey)??{},
       ),
     ]))
     const screened=currentFlow?.termination==='SCREEN_OUT'
@@ -513,7 +516,7 @@ export default function SurveyPublicApp(){
       const enabled=task.flow?new Set(currentFlow?.visibleUnitKeys??[]):null
       const partial=Object.fromEntries(task.units.filter(unit=>
         enabled===null||enabled.has(unit.instrumentKey)).map(unit=>{
-        const answer=answers[unit.instrumentKey]||{}
+        const answer=own(answers,unit.instrumentKey)??{}
         return [unit.instrumentKey,unit.kind==='FORM'
           ?sanitizeFormAnswers(unit.pages?.flatMap(p=>p.questions)??[],answer):answer]
       }))
@@ -523,7 +526,7 @@ export default function SurveyPublicApp(){
       const partialTimings=Object.fromEntries(timedUnits.map(unit=>[
         unit.instrumentKey,sealSurveyScaleTimings((unit.items??[]).map(q=>q.itemKey),
           partial[unit.instrumentKey]??{},
-          timingTrackers.current[unit.instrumentKey]?.snapshot()??
+          own(timingTrackers.current,unit.instrumentKey)?.snapshot()??
             itemTimings[unit.instrumentKey]??{}),
       ]))
       const saved=await publicApi<{revision:number;expiresAt:string}>(
@@ -703,9 +706,9 @@ export default function SurveyPublicApp(){
         {finalFlowStep&&<button className="btn-primary" disabled={busy||(!task.flow&&!task.units.every(unit=>{
           if(unit.kind!=='FORM')return true
           const vis=visibleFormKeys(unit.pages?.flatMap(p=>p.questions)||[],
-            answers[unit.instrumentKey]||{})
+            own(answers,unit.instrumentKey)??{})
           const pages=(unit.pages||[]).filter(p=>p.questions.some(q=>vis.has(q.itemKey)))
-          return (formPages[unit.instrumentKey]??0)>=pages.length-1
+          return (own(formPages,unit.instrumentKey)??0)>=pages.length-1
         }))}>{currentFlow?.termination==='SCREEN_OUT'?'完成资格筛选':'提交本轮正式回答'}</button>}
       </form>}
       {screenedOut&&!task&&<section className="bg-white border rounded-xl p-5 space-y-3">
