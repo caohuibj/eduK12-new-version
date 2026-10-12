@@ -150,9 +150,17 @@ export async function transitionHuiteacherEvent(input:{
     fail('HUITEACHER_EVENT_VERSION_REQUIRED',400)
   return prisma.$transaction(async tx=>{
     await scope(tx,{actorUserId:input.actorUserId,organizationId:input.organizationId,admin:true})
-    const event=await tx.huiteacherEvaluationEvent.findFirst({where:{
-      id:input.eventId,organizationId:input.organizationId,
-    },select:{id:true,status:true,version:true,targetId:true}})
+    // Serialize activity transitions with observer invitation acceptance and
+    // canonical Run updates. Validity is checked under the event lock.
+    const events=await tx.$queryRaw<Array<{
+      id:string;status:string;version:number;kind:string;targetId:string
+    }>>`
+      SELECT "id","status","version","kind","target_id" AS "targetId"
+      FROM "huiteacher_evaluation_events"
+      WHERE "organization_id"=${input.organizationId}
+        AND "id"=${input.eventId} FOR UPDATE
+    `
+    const event=events[0]
     if(!event)fail('HUITEACHER_EVENT_NOT_FOUND',404)
     if(event.version!==input.expectedVersion)fail('HUITEACHER_EVENT_VERSION_CHANGED')
     const from=input.action==='OPEN'?'DRAFT':input.action==='CLOSE'?'OPEN':null
@@ -169,15 +177,38 @@ export async function transitionHuiteacherEvent(input:{
     `
     const run=relatedRun[0]
     if(input.action==='OPEN'){
-      if(!run||run.status!=='DRAFT')
-        fail('HUITEACHER_EVENT_RUN_DRAFT_REQUIRED')
-      const tracks=await tx.$queryRaw<Array<{n:number}>>`
-        SELECT COUNT(*)::int AS n FROM "assessment_run_tracks"
-        WHERE "organization_id"=${input.organizationId}
-          AND "run_id"=${run.id}
-      `
-      if((tracks[0]?.n??0)<1)
-        fail('HUITEACHER_EVENT_TRACK_REQUIRED')
+      if(run){
+        // Form/Scale activities must never bypass the frozen Run contract.
+        if(run.status!=='DRAFT')fail('HUITEACHER_EVENT_RUN_DRAFT_REQUIRED')
+        const tracks=await tx.$queryRaw<Array<{n:number}>>`
+          SELECT COUNT(*)::int AS n FROM "assessment_run_tracks"
+          WHERE "organization_id"=${input.organizationId}
+            AND "run_id"=${run.id}
+        `
+        if((tracks[0]?.n??0)<1)fail('HUITEACHER_EVENT_TRACK_REQUIRED')
+      }else{
+        // Field-only events do not create empty/fake Assessment Runs.
+        // At least one independently ACCEPTED, unexpired expert/peer grant
+        // proves the field event is ready. Generic ASSESSMENT cannot use this.
+        if(!['CLASSROOM','MEETING','TEACHING_RESEARCH','FIELD_VISIT'].includes(event.kind))
+          fail('HUITEACHER_EVENT_RUN_DRAFT_REQUIRED')
+        const accepted=await tx.$queryRaw<Array<{n:number}>>`
+          SELECT COUNT(*)::int AS n
+          FROM "huiteacher_observer_grants" g
+          JOIN "users" u ON u."id"=g."observer_user_id"
+            AND u."account_domain"='SCHOOL'
+            AND u."role" IN ('TEACHER','ADMIN')
+            AND u."teacher_approved"=TRUE AND u."is_active"=TRUE
+            AND u."is_frozen"=FALSE AND u."must_change_password"=FALSE
+            AND (u."expires_at" IS NULL OR u."expires_at">statement_timestamp())
+          WHERE g."organization_id"=${input.organizationId}
+            AND g."event_id"=${input.eventId}
+            AND g."status"='ACCEPTED' AND g."accepted_at" IS NOT NULL
+            AND g."revoked_at" IS NULL AND g."expires_at">statement_timestamp()
+        `
+        if((accepted[0]?.n??0)<1)
+          fail('HUITEACHER_FIELD_ACCEPTED_OBSERVER_REQUIRED')
+      }
     }
     if(input.action==='CLOSE'&&run&&run.status!=='CLOSED')
       fail('HUITEACHER_RUN_MUST_CLOSE_FIRST')

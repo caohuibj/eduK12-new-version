@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client'
 import { describe,it,expect,beforeAll,afterAll } from 'vitest'
 import { integrationDatabaseUrl,requireIsolatedReleaseDatabase } from './integration-env'
 import {
-  createHuiteacherTarget,createHuiteacherEvent,
+  createHuiteacherTarget,createHuiteacherEvent,transitionHuiteacherEvent,
 } from '../../modules/huiteacher/evaluation.service'
 import {
   inviteHuiteacherObserver,acceptHuiteacherObserver,
@@ -62,6 +62,10 @@ suite('Huiteacher PR4 event-scoped expert access and encrypted field records',()
       organizationId:school.id,actorUserId:manager.id,
       targetId:target.id,kind:'CLASSROOM',title:'受控观察',
     })
+    await expect(transitionHuiteacherEvent({
+      organizationId:school.id,eventId:event.id,actorUserId:manager.id,
+      action:'OPEN',expectedVersion:1,
+    })).rejects.toThrow()
     const invitation=await inviteHuiteacherObserver({
       organizationId:school.id,eventId:event.id,
       actorUserId:manager.id,observerUserId:expert.id,
@@ -81,11 +85,11 @@ suite('Huiteacher PR4 event-scoped expert access and encrypted field records',()
       organizationId:school.id,eventId:event.id,
       actorUserId:expert.id,kind:'FACT',content:'event still draft',
     })).rejects.toThrow()
-    // Isolated event fixture opens only once. The canonical Run
-    // publish lifecycle is separately specified/tested by PR2.
-    await db.huiteacherEvaluationEvent.update({where:{id:event.id},
-      data:{status:'OPEN',version:2,openedAt:new Date()},
+    const opened=await transitionHuiteacherEvent({
+      organizationId:school.id,eventId:event.id,actorUserId:manager.id,
+      action:'OPEN',expectedVersion:1,
     })
+    expect(opened.status).toBe('OPEN')
     await expect(createHuiteacherObservation({
       organizationId:school.id,eventId:event.id,
       actorUserId:stranger.id,kind:'FACT',content:'should be forbidden',

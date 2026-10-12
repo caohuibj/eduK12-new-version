@@ -237,10 +237,16 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
         <button onClick={()=>inspectRun(event)} disabled={working}>查看 Run 关联</button>
         {event.status==='DRAFT'&&<button onClick={()=>createRun(event)} disabled={working||!!runMap[event.id]}>创建标准 Run 草稿</button>}
         {event.status==='DRAFT'&&<button onClick={()=>transition(event,'OPEN')}
-          disabled={working||runMap[event.id]?.status!=='DRAFT'
-            ||(runMap[event.id]?.trackCount??0)<1}>
+          disabled={working||(
+            runMap[event.id]
+              ?runMap[event.id].status!=='DRAFT'||(runMap[event.id].trackCount??0)<1
+              :!['CLASSROOM','MEETING','TEACHING_RESEARCH','FIELD_VISIT'].includes(event.kind)
+          )}>
           开放评价活动
         </button>}
+        {event.status==='DRAFT'&&!runMap[event.id]
+          &&['CLASSROOM','MEETING','TEACHING_RESEARCH','FIELD_VISIT'].includes(event.kind)
+          &&<p className="ht-muted">纯现场观察无需创建测评 Run；需先邀请至少一位专家／同行并由其接受，再开放活动。</p>}
         {event.status==='DRAFT'&&<button onClick={()=>transition(event,'CANCEL')} disabled={working}>取消草稿</button>}
         {event.status==='OPEN'&&<button onClick={()=>transition(event,'CLOSE')}
           disabled={working||(runMap[event.id]&&runMap[event.id].status!=='CLOSED')}>
