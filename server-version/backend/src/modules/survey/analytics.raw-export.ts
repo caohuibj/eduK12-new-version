@@ -20,6 +20,10 @@ const check=(projectId:string,source:SurveySourceProjection)=>{
     throw new Error('Raw export must use verified scoped Survey FINAL')
 }
 const displayCode=(row:ResearchRawObservation)=>row.researchCode||attemptCode(row.attemptId)
+const timingStatus=(timing:ResearchRawObservation['itemTiming'])=>
+  !timing?'NOT_RECORDED':
+    timing.recoveredWithoutClock?'RECOVERED_NO_FIRST_RESPONSE':
+      timing.interrupted?'INTERRUPTED':'RECORDED'
 const ordered=(source:SurveySourceProjection,waveId?:string):ResearchRawObservation[]=>
   source.raw.filter(r=>waveId===undefined||r.waveId===waveId)
     .sort((a,b)=>a.waveOrdinal-b.waveOrdinal
@@ -52,10 +56,16 @@ export function rawLongExport(projectId:string,source:SurveySourceProjection,wav
   const hasFlow=source.codebook.some(c=>c.flowDigest&&(!waveId||c.waveId===waveId))
   const cols=['research_code_or_attempt','wave_id','wave_ordinal','publication_version',
     'instrument_key','item_key','variable_code','value','missing_reason','source_final_hash',
+    'attempt_started_at_utc','final_completed_at_utc',
+    'first_response_ms','active_time_ms','answer_change_count','item_revisit_count','timing_status',
     ...(hasFlow?['flow_digest','experiment_group','shown_blocks','flow_termination']:[])]
   const mapped=rows.map(r=>[
     displayCode(r),r.waveId,r.waveOrdinal,r.publicationVersion,r.instrumentKey,r.itemKey,r.columnKey,
     r.value,r.missingReason,r.sourceFinalHash,
+    r.attemptStartedAt??null,r.completedAt,
+    r.itemTiming?.firstResponseMs??null,r.itemTiming?.activeTimeMs??null,
+    r.itemTiming?.changeCount??null,r.itemTiming?.revisitCount??null,
+    r.kind==='SCALE'?(r.missingReason==='NOT_SHOWN'?'NOT_SHOWN':timingStatus(r.itemTiming)):'NOT_APPLICABLE',
     ...(hasFlow?[r.flowDigest??null,r.experimentGroup??null,
       r.shownBlocks??null,r.flowTermination??null]:[]),
   ])
@@ -77,6 +87,7 @@ export function rawLongExport(projectId:string,source:SurveySourceProjection,wav
       mapped.push([code,variable.waveId,variable.waveOrdinal,variable.publicationVersion,
         variable.instrumentKey,variable.itemKey,variable.columnKey,null,
         status==='QUALITY_EXCLUDED'?'QUALITY_EXCLUDED':status?'ABANDONED':'NO_WAVE',null,
+        null,null,null,null,null,null,'NON_FINAL',
         ...(hasFlow?[variable.flowDigest??null,null,null,null]:[])])
     }
   }
@@ -104,8 +115,12 @@ export function rawWideExport(projectId:string,source:SurveySourceProjection):Su
       throw new Error('Conflicting participant Flow traces within one immutable Wave')
     perWaveFlow.set(id,value)
   }
-  if(columnIds.length>255)throw new Error('Wide export exceeds 255 value/absence pairs; use Raw Long')
-  const byCode=new Map<string,Map<string,{value:string|number|null;missingReason:string|null}>>()
+  const timedColumns=columnIds.filter(col=>byColumn.get(col)?.timingContract==='SURVEY_SCALE_ITEM_TIMING_V1')
+  if(1+columnIds.length*2+timedColumns.length*5+flowWaves.length*4>512)
+    throw new Error('Wide export plus Scale response-time columns exceeds 512 fields; use Raw Long')
+  type WideValue={value:string|number|null;missingReason:string|null;
+    itemTiming?:ResearchRawObservation['itemTiming']}
+  const byCode=new Map<string,Map<string,WideValue>>()
   const attendance=new Map(source.attendance.map(x=>[x.researchCode+':'+x.waveId,x.status]))
   // A participant who started but has no FINAL must remain represented as
   // ABANDONED, not vanish from the cohort's research-code rows.
@@ -114,9 +129,10 @@ export function rawWideExport(projectId:string,source:SurveySourceProjection):Su
       byCode.set(entry.researchCode,new Map())
   for(const r of rows){
     const participant=r.researchCode!
-    const values=byCode.get(participant)||new Map<string,{value:string|number|null;missingReason:string|null}>()
+    const values=byCode.get(participant)||new Map<string,WideValue>()
     if(values.has(r.columnKey))throw new Error('Duplicate participant/wave/variable in frozen FINAL')
-    values.set(r.columnKey,{value:r.missingReason?null:r.value,missingReason:r.missingReason})
+    values.set(r.columnKey,{value:r.missingReason?null:r.value,missingReason:r.missingReason,
+      ...(r.itemTiming?{itemTiming:r.itemTiming}:{})})
     byCode.set(participant,values)
   }
   // Every value is paired with an explicit missing-reason field. A missing
@@ -129,11 +145,19 @@ export function rawWideExport(projectId:string,source:SurveySourceProjection):Su
       const status=attendance.get(code+':'+waveId)
       return [null,status==='QUALITY_EXCLUDED'?'QUALITY_EXCLUDED':
         status&&status!=='COMPLETED'?'ABANDONED':'NO_WAVE']
+    }),...timedColumns.flatMap(col=>{
+      const source=values.get(col),timing=source?.itemTiming
+      return [timing?.firstResponseMs??null,timing?.activeTimeMs??null,
+        timing?.changeCount??null,timing?.revisitCount??null,
+        source?.missingReason==='NOT_SHOWN'?'NOT_SHOWN':
+          timing?timingStatus(timing):source?'NOT_RECORDED':'NON_FINAL_OR_NO_WAVE']
     }),...flowWaves.flatMap(w=>{
       const row=perWaveFlow.get(code+':'+w.waveId)
       return [row?.digest??null,row?.group??null,row?.shown??null,row?.termination??null]
     })])
   const wideHeaders=['research_code',...columnIds.flatMap(col=>[col,col+'__missing']),
+    ...timedColumns.flatMap(col=>[col+'__first_response_ms',col+'__active_time_ms',
+      col+'__answer_change_count',col+'__item_revisit_count',col+'__timing_status']),
     ...flowWaves.flatMap(w=>{
       const prefix='W'+String(w.ordinal).padStart(3,'0')+'__FLOW__'
       return [prefix+'digest',prefix+'group',prefix+'shown_blocks',prefix+'termination']
