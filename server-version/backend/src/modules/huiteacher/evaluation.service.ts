@@ -266,6 +266,15 @@ export async function createHuiteacherEventRunDraft(input:{
       select:{runId:true},
     })
     if(existing)fail('HUITEACHER_EVENT_RUN_EXISTS')
+    const studentFeedback=await tx.huiteacherStudentEvaluationConfig.findUnique({
+      where:{organizationId_eventId:{
+        organizationId:input.organizationId,eventId:input.eventId,
+      }},select:{id:true},
+    })
+    // A student→teacher Run requires an exact role/relationship policy and
+    // new START/FINAL/report disclosure adapters. Do not silently publish an
+    // ordinary Teacher SELF Form for the same configured event.
+    if(studentFeedback)fail('HUITEACHER_STUDENT_EVAL_RUN_ADAPTER_NOT_RELEASED',403)
     const run=await createAssessmentRunDraft({
       tx,organizationId:input.organizationId,createdByUserId:input.actorUserId,
       name,intakeDeadline:input.intakeDeadline??null,

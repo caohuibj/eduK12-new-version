@@ -98,6 +98,14 @@ export async function configureHuiteacherStudentEvaluation(input:{
       select:{id:true},
     })
     if(configured)deny('HUITEACHER_STUDENT_EVAL_ALREADY_CONFIGURED')
+    // A previously created generic SELF Run cannot be retroactively
+    // reinterpreted as student evaluation of a teacher.
+    const existingRun=await tx.huiteacherEvaluationRunLink.findUnique({
+      where:{organizationId_eventId:{
+        organizationId:input.organizationId,eventId:input.eventId,
+      }},select:{runId:true},
+    })
+    if(existingRun)deny('HUITEACHER_STUDENT_EVAL_PREEXISTING_RUN_FORBIDDEN',403)
     const released=await tx.huiteacherFormInstrument.findFirst({
       where:{id:input.formId,organizationId:input.organizationId,status:'PUBLISHED'},
       select:{id:true,definitionDigest:true},
@@ -210,9 +218,29 @@ export async function previewHuiteacherStudentEvaluation(input:{
       SELECT COUNT(DISTINCT student_user."id")::int AS "n",
         EXISTS(
           SELECT 1 FROM "organization_staff_class_assignments" staff
+          JOIN "organization_memberships" teacher_member
+            ON teacher_member."organization_id"=staff."organization_id"
+            AND teacher_member."id"=staff."membership_id"
+            AND teacher_member."valid_from"<=statement_timestamp()
+            AND (teacher_member."valid_until" IS NULL
+              OR teacher_member."valid_until">statement_timestamp())
+          JOIN "organization_persona_grants" teacher_persona
+            ON teacher_persona."organization_id"=teacher_member."organization_id"
+            AND teacher_persona."membership_id"=teacher_member."id"
+            AND teacher_persona."persona"='TEACHER'
+            AND teacher_persona."revoked_at" IS NULL
+          JOIN "huiteacher_evaluation_events" event
+            ON event."organization_id"=staff."organization_id"
+            AND event."id"=${config.eventId}
+          JOIN "huiteacher_evaluation_targets" target
+            ON target."organization_id"=event."organization_id"
+            AND target."id"=event."target_id" AND target."kind"='PERSON'
+            AND target."status"='ACTIVE'
+            AND target."subject_user_id"=teacher_member."user_id"
           WHERE staff."id"=${config.staffAssignmentId}
             AND staff."organization_id"=${config.organizationId}
             AND staff."class_unit_id"=${config.classUnitId}
+            AND staff."staff_role" IN ('TEACHING','HOMEROOM')
             AND staff."valid_from"<=statement_timestamp()
             AND (staff."valid_until" IS NULL OR staff."valid_until">statement_timestamp())
         ) AS "staffCurrent"
