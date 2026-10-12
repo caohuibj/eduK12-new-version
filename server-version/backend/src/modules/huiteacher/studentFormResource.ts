@@ -3,6 +3,7 @@ import {prisma} from '../../config/database'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import type {RunResourceRef,RunResourcePolicy} from '../assessment-run/resourceAuthority'
 import type {ResultDisclosureContractV1} from '../assessment-policy/result-disclosure'
+import {teacherResourceMinimum} from './privacyV2'
 import {resolvePublishedTeacherForm,teacherFormResourceRef,
   TEACHER_FORM_RUNTIME_KIND} from './formRunResource'
 
@@ -51,8 +52,8 @@ export async function resolveStudentFormResourcePolicy(ref:RunResourceRef)
     subjectRoles:['TEACHER'],respondentRoles:['STUDENT'],
     relationshipKinds:['CLASS_TEACHER_STUDENT'],perspectives:['OBSERVER_REPORT'],
     analysisMode:'COHORT_AGGREGATE',visibilityPolicyKey:'HUITEACHER_STUDENT_FEEDBACK_PROTECTED_V1',
-    minimumRespondents:STUDENT_FORM_PRIVACY_FLOOR,
-    resultDisclosure:disclosure,initiationModes:['ORG_ASSIGN'],
+    minimumRespondents:teacherResourceMinimum(),
+    resultDisclosure:{...disclosure,minimumRespondents:teacherResourceMinimum()},initiationModes:['ORG_ASSIGN'],
     allowedTargetModes:['SELECTED_CLASS_TEACHERS'],
     runtimeLaunchTarget:{kind:TEACHER_FORM_RUNTIME_KIND,ref:form.id},
   }

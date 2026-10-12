@@ -10,7 +10,7 @@ import type {AuthenticatedPrincipal} from '../../types'
 export async function freezePrivacyForRunPublication(tx:Prisma.TransactionClient,input:{
   organizationId:string;runId:string;product:EducationProduct;
   scenario:PrivacyScenario;actor:AuthenticatedPrincipal;
-  expectedPrivacyFingerprint:string;
+  expectedPrivacyFingerprint?:string;
 }){
   // Mirror canonical publish's lock order: organization, then Run.
   // Preference saves acquire the same organization lock before modifying defaults.
@@ -32,7 +32,8 @@ export async function freezePrivacyForRunPublication(tx:Prisma.TransactionClient
     organizationId:input.organizationId,product:input.product,
     scenario:input.scenario,actorUserId:input.actor.userId,
   },tx)
-  if(effective.fingerprint!==input.expectedPrivacyFingerprint)
+  if(input.expectedPrivacyFingerprint!==undefined
+    &&effective.fingerprint!==input.expectedPrivacyFingerprint)
     throw new ReportPrivacyError('PRIVACY_PREFERENCE_CHANGED',409)
   const proof={
     schemaVersion:1,product:input.product,scenario:input.scenario,

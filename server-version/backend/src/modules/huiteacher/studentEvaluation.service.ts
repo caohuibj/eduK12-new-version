@@ -7,6 +7,7 @@ import {createAssessmentRunDraft,addAssessmentRunTrackDraft} from '../assessment
 import {publishAssessmentRun,previewAssessmentRun} from '../assessment-run/publish'
 import {assertCurrentRunPublisherBoundary} from '../assessment-run/resourceBoundary'
 import {studentFormResourceRef,STUDENT_FORM_PRIVACY_FLOOR} from './studentFormResource'
+import {teacherResourceMinimum,teacherStudentPrivacyNotice} from './privacyV2'
 
 export const STUDENT_FEEDBACK_MIN_RESPONDENTS = 10 as const
 
@@ -272,9 +273,9 @@ export async function previewHuiteacherStudentEvaluation(input:{
     const count=rows[0]?.n??0
     return {eventId:config.eventId,formId:config.formId,
       classUnitId:config.classUnitId,teacherAssigned:rows[0]?.staffCurrent===true,
-      eligibleStudentCount:count,privacyFloor:STUDENT_FEEDBACK_MIN_RESPONDENTS,
+      eligibleStudentCount:count,privacyFloor:teacherResourceMinimum(),
       readyForPrivacyProtectedFeedback:rows[0]?.staffCurrent===true
-        &&count>=STUDENT_FEEDBACK_MIN_RESPONDENTS,
+        &&count>=teacherResourceMinimum(),
       note:'当前只计算正式教育学生资格；不使用校园心理测评/审批/成绩。此预览不发布任务，正式资格需在标准 Run 发布时冻结。',
     }
   })
@@ -371,7 +372,7 @@ export async function createHuiteacherStudentEvaluationRun(input:{
         relationshipKinds:['CLASS_TEACHER_STUDENT'],
         perspectives:['OBSERVER_REPORT'],analysisMode:'COHORT_AGGREGATE',
         visibilityPolicyKey:'HUITEACHER_STUDENT_FEEDBACK_PROTECTED_V1',
-        minimumRespondents:STUDENT_FORM_PRIVACY_FLOOR,
+        minimumRespondents:teacherResourceMinimum(),
       },
     })
     await appendAudit(tx,{
