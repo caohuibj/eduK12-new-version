@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto'
+import { createHash,randomUUID } from 'node:crypto'
 import { PrismaClient } from '@prisma/client'
 import { beforeAll,afterAll,describe,expect,it } from 'vitest'
 import { integrationDatabaseUrl } from '../integration/integration-env'
@@ -576,7 +576,92 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
       expect(result.csv).toContain('"ABANDONED"')
       expect(result.csv).not.toContain('"NO_WAVE"')
     }
+    // A Wave with zero FINALs must still export the participant's incomplete
+    // status in a separate, signed attendance page; it cannot vanish at page 1.
+    const token=generateToken({
+      userId:ownerId,username:'synthetic-researcher',role:'STUDENT',
+      accountDomain:'SURVEY',tokenVersion:0,mfaVerifiedAt:Math.floor(Date.now()/1000),
+    })
+    const req={headers:{cookie:'huisurvey_research_session='+token},
+      user:{userId:ownerId,tokenVersion:0,username:'synthetic-researcher',
+        role:'STUDENT',platformRole:'STANDARD',mustChangePassword:false,
+        accountDomain:'SURVEY'}} as unknown as Request
+    const originalSigningKey=process.env.ASSET_SIGNING_SECRET
+    process.env.ASSET_SIGNING_SECRET='ci-survey-export-cursor-signing-fixture-key-v3'
+    try{
+      const initial=await createSurveyExport(req,{projectId,format:'RAW_WAVE',waveId:w.id})
+      expect(initial.manifest.batch.phase).toBe('VERIFIED_FINAL')
+      expect(initial.nextCursor).toBeTruthy()
+      const missing=await createSurveyExport(req,{
+        projectId,format:'RAW_WAVE',waveId:w.id,cursor:initial.nextCursor!,
+      })
+      expect(missing.manifest.batch.phase).toBe('NON_FINAL_PARTICIPATION')
+      expect(missing.nextCursor).toBeNull()
+      const artifact=await downloadSurveyExport(req,{projectId,exportId:missing.id})
+      expect(artifact.csv).toContain(person.researchCode)
+      expect(artifact.csv).toContain('ABANDONED')
+      expect(missing.manifest.rowCount).toBe(2)
+      // SCORE_LONG follows the same signed non-FINAL participation phase.
+      const score=await createSurveyExport(req,{projectId,format:'SCORE_LONG',waveId:w.id})
+      expect(score.nextCursor).toBeTruthy()
+      const scoreMissing=await createSurveyExport(req,{projectId,
+        format:'SCORE_LONG',waveId:w.id,cursor:score.nextCursor!})
+      const scoreCsv=await downloadSurveyExport(req,{projectId,exportId:scoreMissing.id})
+      expect(scoreCsv.csv).toContain('ABANDONED')
+      expect(scoreCsv.csv).toContain(person.researchCode)
+    }finally{
+      if(originalSigningKey===undefined)delete process.env.ASSET_SIGNING_SECRET
+      else process.env.ASSET_SIGNING_SECRET=originalSigningKey
+    }
   })
+
+  it('pages 5001 linked non-FINAL attempts without the legacy 5000-row ceiling',async()=>{
+    const w=await wave('研究参与分页容量边界',[toolIds.scale],true)
+    const participants=Array.from({length:5001},(_,index)=>({
+      id:randomUUID(),projectId,
+      researchCode:'R-'+String(index).padStart(10,'0'),
+      credentialHash:createHash('sha256').update('synthetic-5001-'+w.id+'-'+index).digest('hex'),
+      status:'ACTIVE',
+    }))
+    const attempts=participants.map(person=>({
+      id:randomUUID(),projectId,waveId:w.id,participantId:person.id,status:'STARTED',
+    }))
+    await db.surveyParticipant.createMany({data:participants})
+    try{
+      await db.surveyWaveAttempt.createMany({data:attempts})
+      const snapshot=await loadSurveySource({actorUserId:ownerId,projectId,
+        waveIds:[w.id],includeWideSchema:true,includeAttendance:false,
+        includeAttendanceCount:true,pageMode:true})
+      expect(snapshot.completeAttempts).toBe(0)
+      expect(snapshot.sourceAttendanceCount).toBe(5001)
+      expect(snapshot.attendance).toHaveLength(0)
+      const first=await loadSurveySource({actorUserId:ownerId,projectId,
+        waveIds:[w.id],includeWideSchema:true,includeAttendance:false,
+        includeAttendanceCount:true,attendanceOnly:true,pageMode:true,
+        expectedAttendanceCount:5001,expectedFinalCount:0,
+        expectedSourceRevision:snapshot.sourceRevision,
+        snapshotCutOff:new Date(snapshot.cutOff)})
+      expect(first.attendance).toHaveLength(250)
+      expect(first.nextAttendanceCursor).toBeTruthy()
+      const second=await loadSurveySource({actorUserId:ownerId,projectId,
+        waveIds:[w.id],includeWideSchema:true,includeAttendance:false,
+        includeAttendanceCount:true,attendanceOnly:true,pageMode:true,
+        attendanceAfterId:first.nextAttendanceCursor!,
+        expectedAttendanceCount:5001,expectedFinalCount:0,
+        expectedSourceRevision:snapshot.sourceRevision,
+        snapshotCutOff:new Date(snapshot.cutOff)})
+      expect(second.attendance).toHaveLength(250)
+      expect(new Set([...first.attendance,...second.attendance]
+        .map(x=>x.researchCode)).size).toBe(500)
+      expect(rawLongExport(projectId,first,w.id).manifest.rowCount).toBe(500)
+      expect(rawLongExport(projectId,second,w.id).manifest.rowCount).toBe(500)
+    }finally{
+      await db.surveyWaveAttempt.deleteMany({where:{
+        waveId:w.id,participantId:{in:participants.map(p=>p.id)},
+      }})
+      await db.surveyParticipant.deleteMany({where:{id:{in:participants.map(p=>p.id)}}})
+    }
+  },20000)
 
   it('projects multiple verified FINALs from one frozen Publication without duplicated schema columns',async()=>{
     const w=await wave('同一冻结定义下的多份 FINAL',[toolIds.scale],true)
