@@ -154,7 +154,9 @@ export async function createSurveyExport(req:Request,input:{
   const manifest={...artifact.manifest,sourceCutOff:sources.cutOff,
     generatedAt:new Date().toISOString(),timeZone:'UTC',
     sourceProjectRevision:sources.sourceRevision,
-    analysisPopulation:'COMPLETED_FINAL_NOT_WITHDRAWN_AND_NOT_QUALITY_EXCLUDED',
+    analysisPopulation:attendanceOnly
+      ?'LINKED_NON_FINAL_ATTENDANCE_AND_QUALITY_EXCLUDED'
+      :'COMPLETED_FINAL_NOT_WITHDRAWN_AND_NOT_QUALITY_EXCLUDED',
     batch:{pageNumber,hasNext:!!nextCursor,
       phase:attendanceOnly?'NON_FINAL_PARTICIPATION':'VERIFIED_FINAL',
       completionRowsOnlyAfterFirstPage:!!prior&&!attendanceOnly,
