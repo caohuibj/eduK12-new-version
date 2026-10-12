@@ -99,10 +99,9 @@ export async function teacherTrackMinimum(tx:Tx,input:{
       AND track.resource_key=${input.resourceKey}
       AND track.resource_version=${input.resourceVersion}
   `
-  if(rows.length!==1)reject('TEACHER_REPORT_TRACK_INTEGRITY')
-  const minimum=rows[0].minimum
-  if(typeof minimum!=='number')reject('TEACHER_REPORT_TRACK_INTEGRITY')
-  return minimum
+  const minimum=rows.length===1?rows[0].minimum:null
+  if(typeof minimum==='number')return minimum
+  return reject('TEACHER_REPORT_TRACK_INTEGRITY')
 }
 export async function teacherReportFloor(tx:Tx,input:{
   organizationId:string;runId:string;resourceKey:string;resourceVersion:string;
