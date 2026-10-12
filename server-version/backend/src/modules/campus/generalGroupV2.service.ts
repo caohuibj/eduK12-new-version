@@ -265,18 +265,22 @@ export async function publishCampusGeneralGroupV2(input:Scope){
     // The trusted, immutable analysis manifest identifies only actual FINAL
     // contributors. No second scoring pass or full-Run roster approximation.
     const artifact=await readReportingArtifactRecord(analysis.artifactId)
-    const payload=artifact.artifactPayload
     if(artifact.analysisKind!=='GROUP'
       ||artifact.organizationId!==input.organizationId
-      ||artifact.specId!==input.specId
-      ||payload.source.runId!==input.runId
-      ||payload.source.trackId!==input.trackId)
-      hidden('CAMPUS_GENERAL_ARTIFACT_SOURCE_INVALID')
-    // A distinct expression is needed: the artifact return type contains
-    // non-GROUP variants, and TS cannot narrow the payload via artifact.kind.
-    const manifest:unknown='inputManifest' in payload
-      ?payload.inputManifest
-      :hidden('CAMPUS_GENERAL_ARTIFACT_SOURCE_INVALID')
+      ||artifact.specId!==input.specId)
+      return hidden('CAMPUS_GENERAL_ARTIFACT_SOURCE_INVALID')
+    // The stored artifact API exposes a union of GROUP, longitudinal and
+    // protected payloads. Validate each structural field independently so
+    // TypeScript and the release gate use the same source checks.
+    const payload=artifact.artifactPayload
+    if(!('inputManifest' in payload))
+      return hidden('CAMPUS_GENERAL_ARTIFACT_SOURCE_INVALID')
+    const sourceRef=payload.source
+    if(!('runId' in sourceRef)||!('trackId' in sourceRef))
+      return hidden('CAMPUS_GENERAL_ARTIFACT_SOURCE_INVALID')
+    if(sourceRef.runId!==input.runId||sourceRef.trackId!==input.trackId)
+      return hidden('CAMPUS_GENERAL_ARTIFACT_SOURCE_INVALID')
+    const manifest:unknown=payload.inputManifest
     let contributors:string[]
     try{
       const published=approved.projection as {resultContributorN?:unknown}
