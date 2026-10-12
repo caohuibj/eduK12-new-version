@@ -8,6 +8,7 @@ import { schoolFeatures } from './school-features'
 import { SchoolLanding, SchoolPublicHeader, SchoolCodeRegistration, type SchoolRegistrationEntry } from './SchoolLanding'
 import { SchoolStudentRecovery, SchoolRecoveryOfficer } from './SchoolRecovery'
 import { SchoolActivityManager } from './SchoolActivityManager'
+import { ReportPrivacyPreferences } from '../components/report-privacy/ReportPrivacyPreferences'
 import { SchoolStudentTasks } from './SchoolStudentTasks'
 import { SchoolTeacherTasks } from './SchoolTeacherTasks'
 import { SchoolRelationships } from './SchoolRelationships'
@@ -439,6 +440,13 @@ export default function SchoolApp(){
             <SchoolRecoveryOfficer key={classPath} api={api} classPath={classPath}/>}
           {page==='tasks'&&(user.role==='TEACHER'||user.role==='ADMIN')&&schoolId&&access?.personas.includes('TEACHER')&&<SchoolTeacherTasks key={'SchoolTeacherTasks:'+schoolId} api={api} organizationId={schoolId}/>}
           {page==='relationships'&&schoolAdmin&&schoolId&&<SchoolRelationships key={'SchoolRelationships:'+schoolId} api={api} organizationId={schoolId} classes={units}/>}
+          {import.meta.env.VITE_REPORT_PRIVACY_PREFERENCES_V1_ENABLED==='true'
+            &&page==='activities'&&schoolId
+            &&(schoolAdmin||psychologyStaff||access?.personas.includes('TEACHER'))
+            &&<details className="hs-panel"><summary>评价与报告隐私偏好（只需设置一次）</summary>
+              <ReportPrivacyPreferences key={schoolId} organizationId={schoolId} api={api}
+                scenarios={['SCHOOL_GENERAL_EDUCATION_GROUP','SCHOOL_SENSITIVE_WELLBEING_GROUP']}/>
+            </details>}
           {page==='activities'&&schoolId&&access&&<SchoolActivityManager
             key={'SchoolActivityManager:'+schoolId} api={api} organizationId={schoolId}
             isAdmin={schoolAdmin} classes={units}/>}
