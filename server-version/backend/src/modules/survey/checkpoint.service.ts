@@ -7,6 +7,8 @@ import { hashResearchCredential } from './identity.service'
 import { verifiedSurveyAttempt } from './admission.service'
 import type { ResearchFrozenPublication } from './publication.service'
 import type { FormDraft,ScaleDraft,SjtDraft } from './builder.definition'
+import { validateSurveyScaleTimings,SurveyScaleTimingError,
+  type SurveyScaleTimings } from './timing.definition'
 
 export class SurveyCheckpointError extends Error{
   constructor(readonly statusCode:number,message:string){super(message)}
@@ -14,6 +16,8 @@ export class SurveyCheckpointError extends Error{
 function fail(status:number,message:string):never{throw new SurveyCheckpointError(status,message)}
 type Proof={publicId:string;attemptId:string;accessCredential:string;researchCode?:string}
 type CheckpointAnswers=Record<string,Record<string,unknown>>
+type TimedCheckpointV2={schemaVersion:2;answers:CheckpointAnswers;
+  itemTimings?:SurveyScaleTimings}
 const MAX_CHECKPOINT_BYTES=65536
 /** Partial drafts are never graded on save, but their JSON shape must be shallow
  * and valid. Unbounded nested values could overflow JSON.stringify or restore
@@ -123,19 +127,44 @@ export async function readSurveyCheckpoint(proof:Proof){
     }
     if(checkpoint.definitionDigest!==known.definitionDigest)
       fail(409,'临时存档冻结版本不一致，不得恢复')
-    const answers=decryptUnifiedRuntimePayload<CheckpointAnswers>(checkpoint.contentCipher)
-    if(canonicalHash(answers)!==checkpoint.contentHash)
+    const stored=decryptUnifiedRuntimePayload<CheckpointAnswers|TimedCheckpointV2>(checkpoint.contentCipher)
+    if(canonicalHash(stored)!==checkpoint.contentHash)
       fail(409,'临时密文校验失败')
+    const envelope='schemaVersion' in stored&&stored.schemaVersion===2
+      ?stored as TimedCheckpointV2:null
+    const answers=envelope?.answers??stored as CheckpointAnswers
+    let itemTimings:SurveyScaleTimings|undefined
+    if(envelope){
+      try{
+        validCheckpointAnswers(known.compiledSnapshot,answers)
+        itemTimings=validateSurveyScaleTimings(known.compiledSnapshot,answers,
+          envelope.itemTimings,false)
+      }catch{fail(409,'服务器临时计时存档与冻结工具不匹配')}
+    }
     return {enabled:true as const,revision:checkpoint.version,
-      checkpoint:{answers,expiresAt:checkpoint.expiresAt,updatedAt:checkpoint.updatedAt,
+      checkpoint:{answers,...(itemTimings?{itemTimings}:{}),
+        expiresAt:checkpoint.expiresAt,updatedAt:checkpoint.updatedAt,
         source:'ENCRYPTED_PARTIAL_NOT_FINAL' as const}}
   })
 }
 export async function saveSurveyCheckpoint(proof:Proof,input:{
-  revision:number;answers:unknown;
+  revision:number;answers:unknown;itemTimings?:unknown;
 }){
   const known=await context(proof)
   const answers=validCheckpointAnswers(known.compiledSnapshot,input.answers)
+  let itemTimings:SurveyScaleTimings|undefined
+  try{
+    itemTimings=validateSurveyScaleTimings(known.compiledSnapshot,answers,
+      input.itemTimings,false)
+  }catch(e){
+    if(e instanceof SurveyScaleTimingError)fail(400,e.path+'：'+e.message)
+    throw e
+  }
+  const content= itemTimings?{
+    schemaVersion:2 as const,answers,itemTimings,
+  }:answers
+  if(Buffer.byteLength(JSON.stringify(content),'utf8')>MAX_CHECKPOINT_BYTES)
+    fail(413,'临时作答和计时记录合计超过 64KB，无法安全暂存')
   return prisma.$transaction(async tx=>{
     const {policy,wave}=await access(tx,proof,known)
     const now=new Date()
@@ -149,8 +178,8 @@ export async function saveSurveyCheckpoint(proof:Proof,input:{
     if(input.revision!==(live?.version??0))
       fail(409,'另一设备已修改临时存档，请先读取最新内容，不自动覆盖')
     if(input.revision>=100)fail(413,'单次 Attempt 最多允许 100 次服务器 Checkpoint 保存')
-    const contentHash=canonicalHash(answers)
-    const contentCipher=encryptUnifiedRuntimePayload(answers)
+    const contentHash=canonicalHash(content)
+    const contentCipher=encryptUnifiedRuntimePayload(content)
     if(Buffer.byteLength(contentCipher,'utf8')>130000)
       fail(413,'加密临时答案体积超限')
     if(live){
