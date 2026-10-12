@@ -203,6 +203,27 @@ suite('Teacher-only Survey Form V2 released resource → Run START → encrypted
       })
       expect(value.status).toBe('COMPLETED')
     }
+    // The frozen population has 10 TEACHERs: nine participants PLUS this
+    // Teaching administrator (who has a current TEACHER persona). It would
+    // breach the group-report privacy contract to disclose a 9/10 cohort.
+    const adminRows=await db.$queryRaw<Array<{id:string}>>`
+      SELECT execution."id" FROM "assessment_run_executions" execution
+      JOIN "assessment_run_actor_snapshots" respondent
+        ON respondent."organization_id"=execution."organization_id"
+        AND respondent."run_id"=execution."run_id"
+        AND respondent."id"=execution."respondent_actor_snapshot_id"
+      WHERE execution."run_id"=${created.runId}
+        AND respondent."user_id"=${admin.id} LIMIT 1
+    `
+    expect(adminRows).toHaveLength(1)
+    const adminStart=await startAssessmentRunExecution({
+      executionId:adminRows[0].id,actorUserId:admin.id,
+    })
+    if(adminStart.state!=='STARTED')throw Error('Admin Teacher Run START failed')
+    expect((await submitOwnHuiteacherFormFinal({
+      actorUserId:admin.id,attemptId:adminStart.runtimeBindingRef,
+      submissionId:randomUUID(),answers:{q1:'a',q3:'b',q4:['b']},
+    })).status).toBe('COMPLETED')
     const closed=await closeTeacherRun(key)
     expect(closed.status).toBe('CLOSED')
     await transitionHuiteacherEvent({
