@@ -1,3 +1,4 @@
+import {HuiteacherMyGrowth} from './HuiteacherMyGrowth'
 import React, { useEffect, useState } from 'react'
 import './huiteacher.css'
 import { HuiteacherFormStudio } from './HuiteacherFormStudio'
@@ -15,6 +16,7 @@ type Me={id:string;username:string;role:string;organizations:Scope[];product:'HU
 type Unit={id:string;unitKind:'GRADE'|'CLASS';name:string;parentUnitId:string|null}
 type Mfa={mfaRequired:true;enrolled:boolean}
 type Screen='home'|'login'|'mfa'|'register'|'student'|'expert'|'workspace'
+type WorkspaceTab='teacher'|'school'|'expert'|'platform'
 
 function cookie(name:string){
   const part=document.cookie.split('; ').find(x=>x.startsWith(name+'='))
@@ -54,6 +56,7 @@ function Brand(){return <div className="ht-brand">
 </div>}
 
 export default function HuiteacherApp(){
+  const [workspaceTab,setWorkspaceTab]=useState<WorkspaceTab>('teacher')
   const [screen,setScreen]=useState<Screen>(()=>window.location.pathname==='/participate'?'login':'home')
   const [me,setMe]=useState<Me|null>(null)
   const [loading,setLoading]=useState(true)
@@ -266,6 +269,29 @@ export default function HuiteacherApp(){
             {me.organizations.map(o=><option key={o.organizationId} value={o.organizationId}>{o.organizationName}</option>)}
           </select></label>}
       </section>
+      {me.role==='STUDENT'?<HuiteacherMyFormTasks student api={teacherApi}/>:
+      <>
+      <nav className="ht-workspace-tabs" aria-label="Huiteacher 工作台">
+        <button type="button" aria-pressed={workspaceTab==='teacher'}
+          onClick={()=>setWorkspaceTab('teacher')}>教师成长</button>
+        {me.organizations.some(o=>o.productAdmin)&&<button type="button"
+          aria-pressed={workspaceTab==='school'}
+          onClick={()=>setWorkspaceTab('school')}>学校改进</button>}
+        <button type="button" aria-pressed={workspaceTab==='expert'}
+          onClick={()=>setWorkspaceTab('expert')}>专家实践</button>
+        <button type="button" aria-pressed={workspaceTab==='platform'}
+          onClick={()=>setWorkspaceTab('platform')}>平台治理入口</button>
+      </nav>
+      {workspaceTab==='teacher'&&<>
+        <HuiteacherPersonalSelf api={teacherApi}/>
+        <HuiteacherMyFormTasks api={teacherApi}/>
+        <HuiteacherMyScaleTasks api={teacherApi}/>
+        {import.meta.env.VITE_HUITEACHER_STUDENT_FEEDBACK_ENABLED==='true'
+          &&<HuiteacherMyStudentFeedback api={teacherApi}/>}
+        {import.meta.env.VITE_HUITEACHER_IMPROVEMENT_ENABLED==='true'
+          &&<HuiteacherMyGrowth api={teacherApi}/>}
+      </>}
+      {workspaceTab==='school'&&org?.productAdmin&&<>
       {org&&<section className="ht-panel">
         <h2>{org.organizationName}</h2><p>{org.productAdmin?'已获得本校 Huiteacher 管理权限':'已获得本校 Huiteacher 参与权限'}</p>
         {me.role!=='STUDENT'&&<><h3>年级与班级</h3><div className="ht-units">{units.map(u=><span key={u.id} className="ht-tag">{u.unitKind==='GRADE'?'年级':'班级'} · {u.name}</span>)}</div></>}
@@ -299,21 +325,25 @@ export default function HuiteacherApp(){
           <button onClick={refreshOrg} disabled={working}>刷新学校信息</button>
         </div>}
       </section>}
-      {me.role!=='STUDENT'&&org?.productAdmin&&<HuiteacherEvaluationStudio
-        key={'targets:'+org.organizationId} organizationId={org.organizationId} api={teacherApi}/>}
-      {me.role!=='STUDENT'&&org?.productAdmin&&<HuiteacherFormStudio
-        key={org.organizationId} organizationId={org.organizationId} api={teacherApi}/>}
-      {me.role!=='STUDENT'&&<HuiteacherPersonalSelf api={teacherApi}/>}
-      {me.role!=='STUDENT'&&<HuiteacherFieldWorkspace api={teacherApi}/>}
-      {me.role!=='STUDENT'&&<HuiteacherConsensusReviews api={teacherApi}/>} 
-      <HuiteacherMyFormTasks key={me.role==='STUDENT'?'student':'teacher'}
-        student={me.role==='STUDENT'} api={teacherApi}/>
-      {me.role!=='STUDENT'&&import.meta.env.VITE_HUITEACHER_STUDENT_FEEDBACK_ENABLED==='true'&&<HuiteacherMyStudentFeedback api={teacherApi}/>}
-      {me.role!=='STUDENT'&&<HuiteacherMyScaleTasks api={teacherApi}/>}
-      {me.role!=='STUDENT'&&<section className="ht-panel"><h2>后续功能模块</h2>
-        <p>教师自主测评、组织调查、课堂与教研观察、学生评教及纵向改进将按 PR2—PR6 的顺序接入。</p>
-        <a href="https://school.eduk12.top" rel="noopener noreferrer">前往 Huischool（使用同一账号，需分别登录）</a>
+        <HuiteacherEvaluationStudio key={'targets:'+org.organizationId}
+          organizationId={org.organizationId} api={teacherApi}/>
+        <HuiteacherFormStudio key={'forms:'+org.organizationId}
+          organizationId={org.organizationId} api={teacherApi}/>
+      </>}
+      {workspaceTab==='expert'&&<>
+        <HuiteacherFieldWorkspace api={teacherApi}/>
+        <HuiteacherConsensusReviews api={teacherApi}/>
+      </>}
+      {workspaceTab==='platform'&&<section className="ht-panel">
+        <h2>平台级教育产品治理</h2>
+        <p>学校 Teacher 产品管理与平台治理相互独立。
+          当前 Teacher 教育会话不能开通产品或授权其他学校，
+          平台管理员请从既有 Training 管理入口以正式管理员账号单独登录。</p>
+        <a href="https://training.eduk12.top" rel="noopener noreferrer">
+          前往独立平台治理入口</a>
+        <p className="ht-muted">当前不复制已有平台授权、审计或量表许可逻辑到 Teacher 工作台。</p>
       </section>}
+      </>}
     </div>:null}
     <footer className="ht-footer">Huiteacher · 教师发展与学校改进</footer>
   </main>
