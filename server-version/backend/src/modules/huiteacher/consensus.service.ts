@@ -113,7 +113,6 @@ async function readSources(tx:Tx,input:{
   if(authors.size<2)deny('HUITEACHER_CONSENSUS_INDEPENDENCE_LOST')
   return {rows,authors}
 }
-type Draft=Awaited<ReturnType<Tx['huiteacherFieldConsensus']['findUnique']>>
 async function load(tx:Tx,id:string){
   const drafts=await tx.$queryRaw<Array<{
     id:string;organizationId:string;eventId:string;title:string;
@@ -129,10 +128,12 @@ async function load(tx:Tx,id:string){
   if(!drafts[0])deny('HUITEACHER_CONSENSUS_NOT_FOUND',404)
   return drafts[0]
 }
-const digest=(record:{id:string;revision:number;title:string;bodyCipher:string},
+const digest=(record:{id:string;revision:number;title:string;bodyCipher:string;status?:string},
   src:Array<{recordId:string;sourceCipherHash:string}>)=>canonicalHash({
   schemaVersion:1,product:'HUITEACHER',kind:'HUMAN_REVIEWED_CONSENSUS',
-  consensusId:record.id,revision:record.revision,title:record.title,
+  consensusId:record.id,
+  revision:record.status==='SUBMITTED'?record.revision-1:record.revision,
+  title:record.title,
   bodyCipherHash:digestCipher(record.bodyCipher),
   evidence:src.map(x=>({id:x.recordId,digest:x.sourceCipherHash})),
 })
@@ -147,7 +148,9 @@ const payload=(r:Awaited<ReturnType<typeof load>>,src:Awaited<ReturnType<typeof 
 async function approvalCount(tx:Tx,r:Awaited<ReturnType<typeof load>>,
   src:Awaited<ReturnType<typeof readSources>>){
   const approvals=await tx.huiteacherFieldConsensusApproval.findMany({
-    where:{consensusId:r.id,revision:r.revision,contentHash:digest(r,src.rows)},
+    where:{consensusId:r.id,
+      revision:r.status==='SUBMITTED'?r.revision-1:r.revision,
+      contentHash:digest(r,src.rows)},
     select:{observerUserId:true},
   })
   return new Set(approvals.filter(x=>src.authors.has(x.observerUserId))
