@@ -47,8 +47,11 @@ export function projectCampusGeneralGroupV2(input:{
     &&n!==N&&N-n<5)return withheld('NONRESPONDENT_COMPLEMENT_SMALL')
   const metrics:CampusGeneralProjection['metrics']={}
   for(const [key,m] of Object.entries(p.metrics)){
+    // Only metric IDs explicitly included in the independently PUBLISHED
+    // GROUP science spec can leave the internal reporting artifact.
+    if(!Object.prototype.hasOwnProperty.call(input.metricMinimums,key))continue
     if(m?.state!=='present')continue
-    const floor=Math.max(input.minimumN,input.metricMinimums[key]??input.minimumN)
+    const floor=Math.max(input.minimumN,input.metricMinimums[key])
     const v=m.validN??0,missing=m.missingN??-1
     if(!Number.isInteger(v)||!Number.isInteger(missing)||v>n
       ||missing!==N-v||v<floor)continue

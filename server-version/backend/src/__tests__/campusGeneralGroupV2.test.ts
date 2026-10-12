@@ -37,6 +37,17 @@ describe('Huischool PR3 approved general group aggregate V2 projection',()=>{
     expect(p.metrics.participation).not.toHaveProperty('validN')
     expect(p.metrics.participation).not.toHaveProperty('median')
   })
+  it('never exposes metrics outside the published scientific spec',()=>{
+    const compromised={...source,metrics:{...source.metrics,
+      unreviewedSensitiveResult:{state:'present',validN:5,missingN:1,
+        aggregations:{mean:99.5,median:99.5}},
+    }}
+    const p=calc(compromised)
+    expect(p.state).toBe('READY')
+    expect(Object.keys(p.metrics)).toEqual(['participation'])
+    expect(JSON.stringify(p)).not.toContain('unreviewedSensitiveResult')
+    expect(JSON.stringify(p)).not.toContain('99.5')
+  })
   it('incomplete or inconsistent numbers and unapproved metrics are withheld',()=>{
     expect(calc({...source,resultContributorN:4}).state).toBe('WITHHELD')
     expect(calc({...source,kind:'STUDENT_PERSONAL'}).state).toBe('WITHHELD')
