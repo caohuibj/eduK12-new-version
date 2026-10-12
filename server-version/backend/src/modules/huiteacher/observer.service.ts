@@ -89,7 +89,7 @@ export async function inviteHuiteacherObserver(input:{
     denied('HUITEACHER_OBSERVER_EXPIRY_INVALID',400)
   return prisma.$transaction(async tx=>{
     await manager(tx,input.organizationId,input.actorUserId)
-    await schoolEvent(tx,{organizationId:input.organizationId,
+    const event=await schoolEvent(tx,{organizationId:input.organizationId,
       eventId:input.eventId,allowDraft:true,allowClosed:true})
     await validEducationActor(tx,input.observerUserId)
     const where={organizationId_eventId_observerUserId:{
@@ -97,6 +97,17 @@ export async function inviteHuiteacherObserver(input:{
       observerUserId:input.observerUserId,
     }}
     const previous=await tx.huiteacherObserverGrant.findUnique({where})
+    // Once a field visit closes, this is strictly a renewal for authors of
+    // existing submitted formal evidence; it must not create new reviewers.
+    if(event.status==='CLOSED'){
+      if(!previous)denied('HUITEACHER_CLOSED_EVENT_NEW_INVITEE_FORBIDDEN',403)
+      const authored=await tx.huiteacherObservationRecord.count({where:{
+        organizationId:input.organizationId,eventId:input.eventId,
+        observerUserId:input.observerUserId,kind:'FORMAL_FEEDBACK',
+        status:'SUBMITTED',
+      }})
+      if(authored<1)denied('HUITEACHER_CLOSED_EVENT_REVIEWER_NOT_SOURCED',403)
+    }
     if(previous?.status==='ACCEPTED'&&previous.expiresAt>now)
       denied('HUITEACHER_OBSERVER_ALREADY_ACTIVE')
     const changed=previous
