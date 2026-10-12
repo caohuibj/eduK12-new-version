@@ -21,6 +21,7 @@ export function HuiteacherFieldWorkspace({api}:{api:Api}){
   const [formAnswers,setFormAnswers]=useState<Record<string,Record<string,ProfessionalAnswer>>>({})
   const [formPages,setFormPages]=useState<Record<string,number>>({})
   const [newEvent,setNewEvent]=useState('')
+  const [expertInviteCode,setExpertInviteCode]=useState('')
   const [kind,setKind]=useState<Kind>('FACT')
   const [content,setContent]=useState('')
   const [busy,setBusy]=useState(false)
@@ -67,6 +68,11 @@ export function HuiteacherFieldWorkspace({api}:{api:Api}){
     void fn().catch(e=>setNotice(e instanceof Error?e.message:'现场观察操作失败'))
       .finally(()=>setBusy(false))
   }
+  const joinExpert=()=>action(async()=>{
+    await api('/education/join-expert','POST',{inviteCode:expertInviteCode.trim()})
+    setExpertInviteCode('');await refresh()
+    setNotice('已使用当前统一教育账号领取外部专家活动授权；未增加学校成员或心理业务权限。')
+  })
   const accept=(inv:Invite)=>action(async()=>{
     await api('/field-invitations/'+inv.invitationId+'/accept','POST',{})
     await refresh()
@@ -113,6 +119,15 @@ export function HuiteacherFieldWorkspace({api}:{api:Api}){
     <h2>我的现场观察与专家反思</h2>
     <p>课堂、会议和教研观察使用限定活动授权。私人反思与正式提交给学校的专业意见严格分离。</p>
     {notice&&<p className="ht-notice" role="status">{notice}</p>}
+    <div className="ht-inline">
+      <label className="ht-field"><span>外部专家活动邀请码（已有教育账号）</span>
+        <input value={expertInviteCode} maxLength={60}
+          onChange={e=>setExpertInviteCode(e.target.value)}
+          placeholder="受控邀请码，勿公开分享" autoComplete="off"/>
+      </label>
+      <button disabled={busy||!/^[A-Za-z0-9_-]{43}$/.test(expertInviteCode.trim())}
+        onClick={joinExpert}>使用当前账号领取专家任务</button>
+    </div>
     <h3>受邀任务</h3>
     {!invitations.length?<p className="ht-empty">尚未收到现场评价邀请。</p>:
       <div className="ht-event-list">{invitations.map(inv=><article key={inv.invitationId}
