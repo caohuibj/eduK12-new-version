@@ -601,6 +601,14 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
       expect(artifact.csv).toContain(person.researchCode)
       expect(artifact.csv).toContain('ABANDONED')
       expect(missing.manifest.rowCount).toBe(2)
+      // SCORE_LONG follows the same signed non-FINAL participation phase.
+      const score=await createSurveyExport(req,{projectId,format:'SCORE_LONG',waveId:w.id})
+      expect(score.nextCursor).toBeTruthy()
+      const scoreMissing=await createSurveyExport(req,{projectId,
+        format:'SCORE_LONG',waveId:w.id,cursor:score.nextCursor!})
+      const scoreCsv=await downloadSurveyExport(req,{projectId,exportId:scoreMissing.id})
+      expect(scoreCsv.csv).toContain('ABANDONED')
+      expect(scoreCsv.csv).toContain(person.researchCode)
     }finally{
       if(originalSigningKey===undefined)delete process.env.ASSET_SIGNING_SECRET
       else process.env.ASSET_SIGNING_SECRET=originalSigningKey
