@@ -9,6 +9,9 @@ import {STUDENT_FORM_PRIVACY_FLOOR} from './studentFormResource'
 import {createProtectedFormItems,recordProtectedFormAnswers,
   discloseProtectedFormItems} from './groupReport.service'
 import type {FormDraft} from '../survey/builder.definition'
+import {teacherFrozenPolicy,teacherScopeKey,teacherReportFloor,
+  readReleasedTeacherReport,recordTeacherReportRelease,lockTeacherDisclosure}
+  from './privacyReleaseV2.service'
 
 export class StudentFeedbackReportError extends Error{
   constructor(public readonly code:string,public readonly statusCode=403){
@@ -28,7 +31,8 @@ type Source={
   runId:string;eventStatus:string;runStatus:string;
   targetUserId:string;targetName:string;eventTitle:string;
   formId:string;formTitle:string;definitionDigest:string;
-  classUnitId:string;deadline:Date|null
+  classUnitId:string;deadline:Date|null;
+  eventClosedAt:Date|null;runClosedAt:Date|null
 }
 
 /** Fixed, unfiltered, read-closed disclosure only.
@@ -42,9 +46,11 @@ type Source={
  * subtraction/differencing until a reviewed PR6 longitudinal policy exists.
  */
 export async function readHuiteacherStudentFeedbackReport(input:{
-  organizationId:string;eventId:string;actorUserId:string
+  organizationId:string;eventId:string;actorUserId:string;
+  publishV2?:boolean
 }){
   return prisma.$transaction(async tx=>{
+    if(input.publishV2)await lockTeacherDisclosure(tx,input.organizationId)
     const member=await resolveEducationProductMemberScope({
       organizationId:input.organizationId,actorUserId:input.actorUserId,
       product:'HUITEACHER',
@@ -56,7 +62,8 @@ export async function readHuiteacherStudentFeedbackReport(input:{
         target."name" AS "targetName",event."title" AS "eventTitle",
         form."id" AS "formId",form."title" AS "formTitle",
         form."definition_digest" AS "definitionDigest",
-        cfg."class_unit_id" AS "classUnitId",run."intake_deadline" AS "deadline"
+        cfg."class_unit_id" AS "classUnitId",run."intake_deadline" AS "deadline",
+        event."closed_at" AS "eventClosedAt",run."closed_at" AS "runClosedAt"
       FROM "huiteacher_evaluation_run_links" link
       JOIN "huiteacher_student_eval_configs" cfg
         ON cfg."organization_id"=link."organization_id"
@@ -109,6 +116,31 @@ export async function readHuiteacherStudentFeedbackReport(input:{
       teacherFormResourceRef(source.formId,source.definitionDigest),tx)
     if(form.organizationId!==input.organizationId)
       deny('STUDENT_REPORT_FORM_MISMATCH')
+    const frozen=await teacherFrozenPolicy(tx,{
+      organizationId:input.organizationId,runId:source.runId,
+      scenario:'TEACHER_STUDENT_EVALUATION'})
+    const scopeKey=frozen?teacherScopeKey({
+      organizationId:input.organizationId,runId:source.runId,eventId:input.eventId,
+      formId:source.formId,scenario:'TEACHER_STUDENT_EVALUATION'}):null
+    if(frozen&&scopeKey){
+      const prior=await readReleasedTeacherReport(tx,{
+        organizationId:input.organizationId,runId:source.runId,scopeKey,
+        policySnapshotId:frozen.policySnapshotId,
+        reportKind:'TEACHER_STUDENT_EVALUATION'})
+      if(prior)return prior
+      if(!input.publishV2)deny('STUDENT_REPORT_AWAITING_RELEASE',409)
+      if(!member.productAdmin)deny('STUDENT_REPORT_RELEASE_ADMIN_REQUIRED',403)
+      if(frozen.options.releaseDelayHours===24&&(!source.eventClosedAt||!source.runClosedAt
+        ||Date.now()-source.eventClosedAt.getTime()<86_400_000
+        ||Date.now()-source.runClosedAt.getTime()<86_400_000))
+        deny('STUDENT_REPORT_RELEASE_DELAY',409)
+    }else if(input.publishV2)deny('STUDENT_REPORT_V2_RUN_REQUIRED',409)
+    const minimumN=frozen
+      ?await teacherReportFloor(tx,{
+        organizationId:input.organizationId,runId:source.runId,
+        resourceKey:'huiteacher-student-form:'+source.formId,
+        resourceVersion:source.definitionDigest,options:frozen.options})
+      :STUDENT_FORM_PRIVACY_FLOOR
     const totals=await tx.$queryRaw<Array<{
       assigned:number;students:number;completed:number
     }>>`
@@ -138,12 +170,15 @@ export async function readHuiteacherStudentFeedbackReport(input:{
     `
     const assigned=totals[0]?.assigned??0
     const n=totals[0]?.completed??0
-    if(assigned<STUDENT_FORM_PRIVACY_FLOOR||assigned>MAX_FINALS
-      ||totals[0]?.students!==assigned)
+    if(assigned<minimumN||assigned>MAX_FINALS
+      ||totals[0]?.students!==assigned||n>assigned)
       deny('STUDENT_REPORT_INVALID_FROZEN_POPULATION')
-    if(n<STUDENT_FORM_PRIVACY_FLOOR)
+    if(n<minimumN)
       deny('STUDENT_REPORT_MINIMUM_N_NOT_MET')
-    if(assigned!==n&&assigned-n<COMPLEMENT_FLOOR)
+    if(frozen?.options.requireAllCompleted&&n!==assigned)
+      deny('STUDENT_REPORT_INCOMPLETE_COHORT')
+    if(assigned!==n&&assigned-n<COMPLEMENT_FLOOR
+      &&(!frozen||frozen.options.protectSmallNonrespondentComplement))
       deny('STUDENT_REPORT_ATTRITION_COMPLEMENT_SMALL')
     const items=createProtectedFormItems(form.definition as FormDraft)
     let cursor='',seen=0
@@ -226,8 +261,12 @@ export async function readHuiteacherStudentFeedbackReport(input:{
       classUnitId:source.classUnitId,
       respondents:population.map(x=>x.userId),
     })
-    // One release per teacher/class, including across different Forms.
-    // Repeat reads of the SAME closed immutable Run are safe.
+    const effectiveDigest=canonicalHash({
+      product:'HUITEACHER',purpose:'STUDENT_FEEDBACK_FINAL_CONTRIBUTORS_V2',
+      organizationId:input.organizationId,teacherUserId:source.targetUserId,
+      respondents:[...distinct].sort(),
+    })
+    if(!frozen){
     const rows=await tx.$queryRaw<Array<{firstRunId:string;releasedAt:Date}>>`
       INSERT INTO "huiteacher_student_disclosure_ledgers"
         ("organization_id","teacher_user_id","class_unit_id","first_run_id",
@@ -260,18 +299,67 @@ export async function readHuiteacherStudentFeedbackReport(input:{
         'EVALUATION_EVENT',${input.eventId},${randomUUID()},
         ${JSON.stringify({runId:source.runId,minimum:STUDENT_FORM_PRIVACY_FLOOR})}::jsonb)
     `
-    return {
+
+      return {
+        source:'VERIFIED_HUITEACHER_STUDENT_FORM_FINAL' as const,
+        eventId:input.eventId,teacherName:source.targetName,
+        formTitle:source.formTitle,definitionDigest:source.definitionDigest,
+        frozenPopulation:assigned,independentRespondents:n,
+        participationRate:Number((n/assigned).toFixed(3)),
+        minimumRespondents:STUDENT_FORM_PRIVACY_FLOOR,
+        releasedAt:rows[0].releasedAt,
+        distributions:discloseProtectedFormItems(items,n),
+        withheldFreeText:true,reportMode:'FORM_DESCRIPTIVE_AGGREGATE' as const,
+        note:'身份受保护的学生评教。每题按符合披露规则的选项频数汇总；不足最低样本数、小单元、拒答及开放意见受到抑制。不构成经科学验证的教学能力分数。',
+      }
+    }
+    if(frozen.options.crossReleaseOverlapGuard){
+      const legacy=await tx.huiteacherStudentDisclosureLedger.findFirst({
+        where:{organizationId:input.organizationId,
+          teacherUserId:source.targetUserId},
+        select:{firstRunId:true},
+      })
+      if(legacy&&legacy.firstRunId!==source.runId)
+        deny('STUDENT_REPORT_CROSS_WAVE_DIFFERENCING_BLOCKED',403)
+      const previous=await tx.$queryRaw<Array<{sourceRunId:string}>>`
+        SELECT release.source_run_id AS "sourceRunId"
+        FROM education_report_release_records release
+        JOIN huiteacher_evaluation_run_links link
+          ON link.organization_id=release.organization_id
+          AND link.run_id=release.source_run_id
+        JOIN huiteacher_evaluation_events event
+          ON event.organization_id=link.organization_id AND event.id=link.event_id
+        JOIN huiteacher_evaluation_targets target
+          ON target.organization_id=event.organization_id AND target.id=event.target_id
+        WHERE release.organization_id=${input.organizationId}
+          AND release.report_kind='TEACHER_STUDENT_EVALUATION'
+          AND target.subject_user_id=${source.targetUserId}
+          AND release.source_run_id<>${source.runId}
+        LIMIT 1
+      `
+      if(previous.length)
+        deny('STUDENT_REPORT_CROSS_WAVE_DIFFERENCING_BLOCKED',403)
+    }
+    const projection={
       source:'VERIFIED_HUITEACHER_STUDENT_FORM_FINAL' as const,
       eventId:input.eventId,teacherName:source.targetName,
       formTitle:source.formTitle,definitionDigest:source.definitionDigest,
-      frozenPopulation:assigned,independentRespondents:n,
-      participationRate:Number((n/assigned).toFixed(3)),
-      minimumRespondents:STUDENT_FORM_PRIVACY_FLOOR,
-      releasedAt:rows[0].releasedAt,
-      distributions:discloseProtectedFormItems(items,n),
+      frozenPopulation:frozen.options.restrictedStatisticsProjection?null:assigned,
+      independentRespondents:frozen.options.restrictedStatisticsProjection?null:n,
+      participationRate:frozen.options.restrictedStatisticsProjection
+        ?null:Number((n/assigned).toFixed(3)),
+      minimumRespondents:minimumN,
+      releasedAt:new Date().toISOString(),
+      distributions:discloseProtectedFormItems(items,n,frozen.options),
       withheldFreeText:true,reportMode:'FORM_DESCRIPTIVE_AGGREGATE' as const,
-      note:'身份受保护的学生评教。每题按符合披露规则的选项频数汇总；不足最低样本数、小单元、拒答及开放意见受到抑制。不构成经科学验证的教学能力分数。',
+      privacyPolicy:'FROZEN_TEACHER_V2' as const,
+      note:'授权的教学反馈群体统计快照；不包含学生姓名、个人原始作答、响应时间或开放意见。此结果不构成个人绩效或因果判断。',
     }
+    return recordTeacherReportRelease(tx,{
+      organizationId:input.organizationId,runId:source.runId,scopeKey:scopeKey!,
+      policySnapshotId:frozen.policySnapshotId,scenario:'TEACHER_STUDENT_EVALUATION',
+      actorUserId:input.actorUserId,populationDigest:effectiveDigest,projection,
+    })
   },{
     isolationLevel:Prisma.TransactionIsolationLevel.Serializable,
     maxWait:2000,timeout:30000,
