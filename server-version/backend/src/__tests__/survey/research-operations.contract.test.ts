@@ -3,7 +3,9 @@ import { compileGroupQuotaPolicy,compileCheckpointPolicy,SurveyOperationsDefinit
   groupQuotaPolicySchema } from '../../modules/survey/operations.definition'
 import { compileSurveyFlow,SurveyFlowError,type SurveyFlowDraft } from '../../modules/survey/flow.definition'
 import { compileFrozenResearchUnit } from '../../modules/survey/publication.service'
-import type { FormDraft } from '../../modules/survey/builder.definition'
+import type { ResearchFrozenPublication } from '../../modules/survey/publication.service'
+import { computeSurveyFinal } from '../../modules/survey/final.compute'
+import type { FormDraft,ScaleDraft } from '../../modules/survey/builder.definition'
 
 const form:FormDraft={schemaVersion:1,pages:[{
   pageKey:'baseline',title:'筛选',questions:[{
@@ -71,5 +73,53 @@ describe('Survey PR4 operations authoring and bounded Flow contracts',()=>{
     nested.embeddedData=[{key:'fixed',source:'STATIC',type:'NUMBER',value:0}]
     nested.blocks[1].when=rule
     expect(()=>compileSurveyFlow(nested,[frozen],'SINGLE_UNLINKED')).toThrow(SurveyFlowError)
+  })
+})
+
+describe('Survey Scale timed FINAL contract and historical compatibility',()=>{
+  const scale:ScaleDraft={
+    schemaVersion:1,presentationMode:'ONE_BY_ONE',respondentType:'participant_self_report',
+    responseOptions:[{optionKey:'o1',label:'少',score:1},{optionKey:'o2',label:'多',score:2}],
+    dimensions:[{dimensionKey:'d',label:'研究维度',direction:'descriptive'}],
+    aggregation:'mean',items:[{itemKey:'q',prompt:'态度',required:true,
+      reverse:false,dimensionKeys:['d']}],
+  }
+  const unit=compileFrozenResearchUnit({id:'timed-draft',instrumentKey:'timed',
+    kind:'SCALE',title:'研究计时量表',revision:0,definition:scale})
+  const snapshot:ResearchFrozenPublication={
+    schemaVersion:1,purpose:'RESEARCH_ONLY',projectId:'p',waveId:'w',
+    collectionMode:'SINGLE_UNLINKED',consentVersion:1,linkageNoticeConfirmed:false,
+    consentDigest:'frozen',units:[unit],runtimeStatus:'SURVEY_FINAL_V1',
+  }
+  const rows={timed:{q:{schemaVersion:1 as const,firstResponseMs:1520,
+    activeTimeMs:2250,changeCount:1,revisitCount:1,visits:2,
+    interrupted:false,recoveredWithoutClock:false}}}
+  it('stores verified timing separately from frozen scorer results',()=>{
+    const first=computeSurveyFinal(snapshot,{timed:{q:'o2'}},null,undefined,'FINAL',rows)
+    const changed=computeSurveyFinal(snapshot,{timed:{q:'o2'}},null,undefined,'FINAL',{
+      timed:{q:{...rows.timed.q,firstResponseMs:1450}},
+    })
+    expect(first.itemTimings).toEqual(rows)
+    expect(first.units[0].privateScoring).toEqual(changed.units[0].privateScoring)
+    expect(first.units[0].rawAnswers).toEqual({q:'o2'})
+  })
+  it('rejects unrecognized items and impossible or absent timing evidence',()=>{
+    expect(()=>computeSurveyFinal(snapshot,{timed:{q:'o2'}}))
+      .toThrow(/逐题施测/)
+    expect(()=>computeSurveyFinal(snapshot,{timed:{q:'o2'}},null,undefined,'FINAL',{
+      timed:{q:{...rows.timed.q,firstResponseMs:999999}},
+    })).toThrow(/首次反应时间/)
+    expect(()=>computeSurveyFinal(snapshot,{timed:{q:'o2'}},null,undefined,'FINAL',{
+      timed:{wrong:rows.timed.q},
+    })).toThrow(/未知/)
+  })
+  it('keeps already frozen no-mode Scale answers valid without fabricated times',()=>{
+    const historical={...unit,displayDefinition:{
+      ...scale,presentationMode:undefined,
+    }}
+    const result=computeSurveyFinal({...snapshot,units:[historical]},
+      {timed:{q:'o1'}})
+    expect(result.itemTimings).toBeUndefined()
+    expect(result.units[0].rawAnswers).toEqual({q:'o1'})
   })
 })
