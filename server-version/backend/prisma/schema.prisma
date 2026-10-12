@@ -3487,6 +3487,7 @@ model EducationReportReleaseRecord {
   reportKind               String   @map("report_kind")
   audience                 String
   reportDigest             String   @map("report_digest")
+  reportProjection         Json?    @map("report_projection")
   effectivePopulationDigest String? @map("effective_population_digest")
   legacySource             String?  @map("legacy_source")
   releasedByUserId         String   @map("released_by_user_id")
