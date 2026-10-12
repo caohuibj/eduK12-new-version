@@ -53,3 +53,8 @@
 .ht-app .ht-scale-item legend{font-weight:600;max-width:100%;padding:0 .5rem}
 .ht-app .ht-scale-item label{display:flex;gap:.55rem;align-items:center;margin:.7rem 0}
 .ht-app .ht-personal-report{padding:1rem;margin-top:1rem;border-top:1px solid var(--ht-line);line-height:1.7}
+
+/* Field observation: evidence remains distinct from private reflective notes. */
+.ht-app .ht-field-manager{margin:1.2rem 0 0;border-top:1px solid var(--ht-line);padding-top:1rem}
+.ht-app .ht-field-content{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.75;max-width:76ch}
+.ht-app .ht-field-manager h4{margin-top:.3rem;color:var(--ht-copper)}

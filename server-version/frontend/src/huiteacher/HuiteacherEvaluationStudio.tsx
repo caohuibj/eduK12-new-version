@@ -1,4 +1,5 @@
 import { useEffect,useState } from 'react'
+import { HuiteacherFieldManager } from './HuiteacherFieldManager'
 type Api=<T>(path:string,method?:string,data?:unknown)=>Promise<T>
 type Target={id:string;name:string;kind:string;status:string;subjectUserId:string|null}
 type Event={id:string;targetId:string;kind:string;title:string;status:string;version:number}
@@ -305,6 +306,10 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
         {progress[event.id]&&<p>已完成 {progress[event.id].counts.COMPLETED??0} /
           {progress[event.id].total} · 进行中 {progress[event.id].counts.IN_PROGRESS??0}</p>}
       </div>}
+      {['CLASSROOM','MEETING','TEACHING_RESEARCH','FIELD_VISIT'].includes(event.kind)&&
+        <HuiteacherFieldManager key={'field:'+event.id}
+          organizationId={organizationId} eventId={event.id}
+          eventStatus={event.status} api={api}/>}
       {reports[event.id]&&<div className="ht-report" aria-label="学校调查群体报告">
         <p><strong>不同有效参与者：{reports[event.id].independentRespondents}</strong>
           （隐私下限 {reports[event.id].minimumRespondents}）</p>
