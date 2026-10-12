@@ -609,6 +609,54 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     }
   })
 
+  it('pages 5001 linked non-FINAL attempts without the legacy 5000-row ceiling',async()=>{
+    const w=await wave('研究参与分页容量边界',[toolIds.scale],true)
+    const participants=Array.from({length:5001},(_,index)=>({
+      id:randomUUID(),projectId,
+      researchCode:'R-'+String(index).padStart(10,'0'),
+      credentialHash:'synthetic-5001-'+w.id+'-'+index,
+      status:'ACTIVE',
+    }))
+    const attempts=participants.map(person=>({
+      id:randomUUID(),projectId,waveId:w.id,participantId:person.id,status:'STARTED',
+    }))
+    await db.surveyParticipant.createMany({data:participants})
+    try{
+      await db.surveyWaveAttempt.createMany({data:attempts})
+      const snapshot=await loadSurveySource({actorUserId:ownerId,projectId,
+        waveIds:[w.id],includeWideSchema:true,includeAttendance:false,
+        includeAttendanceCount:true,pageMode:true})
+      expect(snapshot.completeAttempts).toBe(0)
+      expect(snapshot.sourceAttendanceCount).toBe(5001)
+      expect(snapshot.attendance).toHaveLength(0)
+      const first=await loadSurveySource({actorUserId:ownerId,projectId,
+        waveIds:[w.id],includeWideSchema:true,includeAttendance:false,
+        includeAttendanceCount:true,attendanceOnly:true,pageMode:true,
+        expectedAttendanceCount:5001,expectedFinalCount:0,
+        expectedSourceRevision:snapshot.sourceRevision,
+        snapshotCutOff:new Date(snapshot.cutOff)})
+      expect(first.attendance).toHaveLength(250)
+      expect(first.nextAttendanceCursor).toBeTruthy()
+      const second=await loadSurveySource({actorUserId:ownerId,projectId,
+        waveIds:[w.id],includeWideSchema:true,includeAttendance:false,
+        includeAttendanceCount:true,attendanceOnly:true,pageMode:true,
+        attendanceAfterId:first.nextAttendanceCursor!,
+        expectedAttendanceCount:5001,expectedFinalCount:0,
+        expectedSourceRevision:snapshot.sourceRevision,
+        snapshotCutOff:new Date(snapshot.cutOff)})
+      expect(second.attendance).toHaveLength(250)
+      expect(new Set([...first.attendance,...second.attendance]
+        .map(x=>x.researchCode)).size).toBe(500)
+      expect(rawLongExport(projectId,first,w.id).manifest.rowCount).toBe(500)
+      expect(rawLongExport(projectId,second,w.id).manifest.rowCount).toBe(500)
+    }finally{
+      await db.surveyWaveAttempt.deleteMany({where:{
+        waveId:w.id,participantId:{in:participants.map(p=>p.id)},
+      }})
+      await db.surveyParticipant.deleteMany({where:{id:{in:participants.map(p=>p.id)}}})
+    }
+  })
+
   it('projects multiple verified FINALs from one frozen Publication without duplicated schema columns',async()=>{
     const w=await wave('同一冻结定义下的多份 FINAL',[toolIds.scale],true)
     const attempts:string[]=[]
