@@ -1027,6 +1027,10 @@ export const publishAssessmentRun = async (input: {
       const pairs = await resolvePairs(tx, input.organizationId, track, campusSelected)
       if (pairs.length === 0) throw new RunPublishError('RUN_EMPTY_POPULATION', `Track ${track.id} resolved no eligible actor pairs`, 409)
       if(studentFormResourceId({family:track.resourceFamily,
+        key:track.resourceKey,version:track.resourceVersion})&&pairs.length<10)
+        throw new RunPublishError('STUDENT_FEEDBACK_MINIMUM_POPULATION',
+          'Student feedback may only publish with at least ten distinct eligible students',409)
+      if(studentFormResourceId({family:track.resourceFamily,
         key:track.resourceKey,version:track.resourceVersion})
         &&pairs.length!==new Set(pairs.map(pair=>pair.respondent.userId)).size)
         throw new RunPublishError('STUDENT_EVAL_DUPLICATE_RESPONDENT','each eligible student must have exactly one execution',409)

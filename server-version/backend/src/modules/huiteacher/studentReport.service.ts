@@ -37,8 +37,8 @@ type Source={
  * large enough. No per-student status, filters, respondent IDs, text, dates
  * or timestamps are returned.
  *
- * V1 deliberately allows at most ONE RELEASED run per target teacher/class
- * across form changes or waves. This conservative ledger prevents
+ * V1 deliberately allows at most ONE RELEASED run per target teacher/school
+ * across classes, form changes or waves. This conservative ledger prevents
  * subtraction/differencing until a reviewed PR6 longitudinal policy exists.
  */
 export async function readHuiteacherStudentFeedbackReport(input:{
@@ -235,11 +235,13 @@ export async function readHuiteacherStudentFeedbackReport(input:{
       VALUES (${input.organizationId},${source.targetUserId},
         ${source.classUnitId},${source.runId},
         ${source.definitionDigest},${populationDigest})
-      ON CONFLICT ("organization_id","teacher_user_id","class_unit_id")
+      ON CONFLICT ("organization_id","teacher_user_id")
       DO UPDATE SET "first_run_id"=
         "huiteacher_student_disclosure_ledgers"."first_run_id"
-      WHERE "huiteacher_student_disclosure_ledgers"."first_run_id"=
-        EXCLUDED."first_run_id"
+      WHERE "huiteacher_student_disclosure_ledgers"."class_unit_id"=
+        EXCLUDED."class_unit_id"
+        AND "huiteacher_student_disclosure_ledgers"."first_run_id"=
+          EXCLUDED."first_run_id"
         AND "huiteacher_student_disclosure_ledgers"."population_digest"=
           EXCLUDED."population_digest"
         AND "huiteacher_student_disclosure_ledgers"."form_digest"=

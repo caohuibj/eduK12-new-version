@@ -319,7 +319,7 @@ suite('Huiteacher PR5 canonical student feedback (isolated PostgreSQL)',()=>{
       'WITH blocked AS (INSERT INTO "huiteacher_student_disclosure_ledgers"'+
       ' ("organization_id","teacher_user_id","class_unit_id","first_run_id","form_digest","population_digest")'+
       ' VALUES ($1,$2,$3,$4,$5,$6)'+
-      ' ON CONFLICT ("organization_id","teacher_user_id","class_unit_id")'+
+      ' ON CONFLICT ("organization_id","teacher_user_id")'+
       ' DO UPDATE SET "first_run_id"="huiteacher_student_disclosure_ledgers"."first_run_id"'+
       ' WHERE "huiteacher_student_disclosure_ledgers"."first_run_id"=EXCLUDED."first_run_id"'+
       ' RETURNING 1) SELECT COUNT(*)::int AS n FROM blocked',
@@ -327,6 +327,22 @@ suite('Huiteacher PR5 canonical student feedback (isolated PostgreSQL)',()=>{
       ledger.populationDigest,
     )
     expect(changed[0].n).toBe(0)
+    const otherClassId=randomUUID()
+    await db.$executeRawUnsafe(
+      'INSERT INTO "organization_units"("id","organization_id","unit_kind","name","parent_unit_id") VALUES ($1,$2,$3,$4,$5)',
+      otherClassId,org.id,'CLASS','Overlapping class',gradeId)
+    const crossClass=await db.$queryRawUnsafe<Array<{n:number}>>(
+      'WITH blocked AS (INSERT INTO "huiteacher_student_disclosure_ledgers"'+
+      ' ("organization_id","teacher_user_id","class_unit_id","first_run_id","form_digest","population_digest")'+
+      ' VALUES ($1,$2,$3,$4,$5,$6)'+
+      ' ON CONFLICT ("organization_id","teacher_user_id")'+
+      ' DO UPDATE SET "first_run_id"="huiteacher_student_disclosure_ledgers"."first_run_id"'+
+      ' WHERE "huiteacher_student_disclosure_ledgers"."class_unit_id"=EXCLUDED."class_unit_id"'+
+      ' RETURNING 1) SELECT COUNT(*)::int AS n FROM blocked',
+      org.id,teacher.id,otherClassId,alternateRunId,
+      ledger.formDigest,ledger.populationDigest,
+    )
+    expect(crossClass[0].n).toBe(0)
     // Verify real database immutability, rather than a mocked permission.
     await expect(db.huiteacherStudentDisclosureLedger.delete({
       where:{organizationId_teacherUserId_classUnitId:{

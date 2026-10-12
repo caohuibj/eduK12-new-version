@@ -3345,5 +3345,6 @@ model HuiteacherStudentDisclosureLedger {
   populationDigest  String   @map("population_digest")
   releasedAt        DateTime @default(now()) @map("released_at") @db.Timestamptz(6)
   @@id([organizationId,teacherUserId,classUnitId],map:"huiteacher_student_disclosure_ledgers_pkey")
+  @@unique([organizationId,teacherUserId],map:"huiteacher_student_disclosure_org_teacher_unique")
   @@map("huiteacher_student_disclosure_ledgers")
 }
