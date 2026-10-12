@@ -981,10 +981,23 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
           interrupted:true,recoveredWithoutClock:true},
       },
     }
+    const submissionId=randomUUID()
     const final=await submitResearchFinal({publicId:w.publicId,attemptId:linked.attemptId,
       researchCode:linked.researchCode,accessCredential:linked.accessCredential,
-      submissionId:randomUUID(),answers,itemTimings:rows})
+      submissionId,answers,itemTimings:rows})
     expect(final.status).toBe('COMPLETED')
+    const replay=await submitResearchFinal({publicId:w.publicId,attemptId:linked.attemptId,
+      researchCode:linked.researchCode,accessCredential:linked.accessCredential,
+      submissionId,answers,itemTimings:rows})
+    expect(replay).toMatchObject({idempotent:true,receiptId:final.receiptId})
+    await expect(submitResearchFinal({
+      publicId:w.publicId,attemptId:linked.attemptId,
+      researchCode:linked.researchCode,accessCredential:linked.accessCredential,
+      submissionId,answers,itemTimings:{
+        [instrumentKey]:{...rows[instrumentKey],
+          itemone:{...rows[instrumentKey].itemone,firstResponseMs:1235}},
+      },
+    })).rejects.toThrow(/不同|覆盖/)
     const verified=await loadSurveySource({actorUserId:ownerId,projectId,
       waveIds:[w.id],includeWideSchema:true})
     const one=verified.raw.find(x=>x.itemKey==='itemone')
