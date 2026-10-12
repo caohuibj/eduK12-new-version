@@ -18,6 +18,22 @@ describe('Survey bounded export continuation proof',()=>{
       const v2={...cursor,v:2 as const}
       const upgraded=encodeSurveyExportCursor(v2)
       expect(decodeSurveyExportCursor(upgraded,'a','RAW_WAVE','b')).toEqual(v2)
+      const v3={...cursor,v:3 as const,phase:'FINALS' as const,attendanceCount:2}
+      expect(decodeSurveyExportCursor(encodeSurveyExportCursor(v3),'a','RAW_WAVE','b'))
+        .toEqual(v3)
+      const attendance={...v3,phase:'ATTENDANCE' as const,
+        afterAttemptId:'22222222-2222-4222-8222-222222222222',page:3}
+      expect(decodeSurveyExportCursor(encodeSurveyExportCursor(attendance),'a','RAW_WAVE','b'))
+        .toEqual(attendance)
+      expect(()=>decodeSurveyExportCursor(encodeSurveyExportCursor({
+        ...attendance,attendanceCount:-1,
+      }),'a','RAW_WAVE','b')).toThrow()
+      expect(()=>decodeSurveyExportCursor(encodeSurveyExportCursor({
+        ...attendance,afterAttemptId:'not-a-uuid',
+      }),'a','RAW_WAVE','b')).toThrow()
+      expect(()=>decodeSurveyExportCursor(encodeSurveyExportCursor({
+        ...v3,phase:'UNKNOWN' as 'FINALS',
+      }),'a','RAW_WAVE','b')).toThrow()
       expect(()=>decodeSurveyExportCursor(upgraded,'a','RAW_LONG','b')).toThrow()
       expect(()=>decodeSurveyExportCursor(encodeSurveyExportCursor({
         ...cursor,v:3 as unknown as 2,
