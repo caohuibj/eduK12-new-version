@@ -80,9 +80,18 @@ export async function recordTeacherReportRelease(tx:Tx,input:{
 /** Serialize immutable disclosures by organization, not by Run, because
  * enhanced privacy guards compare across Runs, Forms and past disclosures. */
 export async function lockTeacherDisclosure(tx:Tx,organizationId:string){
+  // Transaction-scoped advisory lock serializes only Teacher report releases.
+  // Do not hold the Organization FOR UPDATE row for up to 2,500 decrypted
+  // FINALS: that would unnecessarily block ordinary student/teacher writes.
+  const lock=await tx.$queryRaw<Array<{locked:boolean}>>`
+    SELECT pg_try_advisory_xact_lock(
+      hashtextextended('TEACHER_REPORT_V2:'||${organizationId},0)
+    ) AS "locked"
+  `
+  if(lock[0]?.locked!==true)reject('TEACHER_REPORT_RELEASE_BUSY',409)
   const rows=await tx.$queryRaw<Array<{id:string}>>`
     SELECT id FROM organizations WHERE id=${organizationId}
-      AND status='ACTIVE' AND product_domain='SCHOOL' FOR UPDATE
+      AND status='ACTIVE' AND product_domain='SCHOOL'
   `
   if(rows.length!==1)reject('TEACHER_REPORT_SCHOOL_INACTIVE',403)
 }
