@@ -26,6 +26,17 @@ describe('Survey frozen one-by-one response timing',()=>{
     expect(item.activeTimeMs).toBe(2000)
     expect(item.interrupted).toBe(true)
   })
+  it('does not flag every completed item interrupted after a draft reload',()=>{
+    const previous={qone:{schemaVersion:1 as const,firstResponseMs:850,
+      activeTimeMs:1200,changeCount:0,revisitCount:0,visits:1,
+      interrupted:false,recoveredWithoutClock:false},
+      qtwo:{schemaVersion:1 as const,firstResponseMs:null,
+      activeTimeMs:300,changeCount:0,revisitCount:0,visits:1,
+      interrupted:false,recoveredWithoutClock:true}}
+    const tracker=new SurveyScaleTimingTracker(previous,{qone:'o2',qtwo:'o4'})
+    expect(tracker.snapshot().qone.interrupted).toBe(false)
+    expect(tracker.snapshot().qtwo.interrupted).toBe(true)
+  })
   it('does not fabricate 0 ms when the first selection occurred while hidden',()=>{
     const tracker=new SurveyScaleTimingTracker()
     tracker.enter('qone',false,200)
