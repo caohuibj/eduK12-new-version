@@ -34,6 +34,23 @@ describe('Survey short-lived local-only answer recovery',()=>{
       .toEqual({answers,itemTimings})
     expect(restoreLocalSurveyDraftEnvelope(project,attempt,'different')).toBeNull()
   })
+  it('keeps a realistic large timed Wave recoverable beyond legacy draft limit',()=>{
+    const answers=Object.fromEntries(Array.from({length:10},(_,i)=>[
+      'scale'+i,Object.fromEntries(Array.from({length:200},(_,j)=>['q'+j,'o4'])),
+    ]))
+    const itemTimings=Object.fromEntries(Array.from({length:10},(_,i)=>[
+      'scale'+i,Object.fromEntries(Array.from({length:200},(_,j)=>['q'+j,{
+        schemaVersion:1,firstResponseMs:1500,activeTimeMs:2500,
+        changeCount:1,revisitCount:0,visits:1,interrupted:false,
+        recoveredWithoutClock:false,
+      }])),
+    ]))
+    expect(JSON.stringify({answers,itemTimings}).length).toBeGreaterThan(256*1024)
+    expect(saveLocalSurveyDraft(project,attempt,digest,answers,itemTimings)).toBe(true)
+    const saved=restoreLocalSurveyDraftEnvelope<typeof answers>(project,attempt,digest)
+    expect(saved?.answers.scale0.q0).toBe('o4')
+    expect((saved?.itemTimings?.scale9 as Record<string,unknown>)?.q199).toBeTruthy()
+  })
   it('returns no invented timing when recovering an older answer-only draft',()=>{
     const answers={scale:{qone:'o3'}}
     expect(saveLocalSurveyDraft(project,attempt,digest,answers)).toBe(true)
