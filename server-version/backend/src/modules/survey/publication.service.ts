@@ -3,7 +3,8 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { retainSurveyMedia } from './media.references'
-import { assertSurveyDraft, surveyKindSchema } from './builder.definition'
+import {assertSurveyDraft,surveyKindSchema,formWorstCaseAnswerBytes,
+  type FormDraft,type ScaleDraft,type SjtDraft} from './builder.definition'
 import { compileResearchScale, compileResearchSjt } from './builder.compiler'
 import { SurveyWaveError } from './waves.service'
 import { compileSurveyFlow,SurveyFlowError,type FrozenSurveyFlow } from './flow.definition'
@@ -123,6 +124,58 @@ export async function freezeResearchWaveDraft(input:{
       if(!draft)stop('研究工具来源已发生变化')
       return compileFrozenResearchUnit(draft!)
     })
+    // Freeze-time budget must guarantee eventual FINAL can carry both answers
+    // and the optional timing records; never publish an unfinishable study.
+    const timedItems=units.reduce((total,u)=>total+(u.kind==='SCALE'&&
+      (u.displayDefinition as ScaleDraft).presentationMode==='ONE_BY_ONE'
+      ?(u.displayDefinition as ScaleDraft).items.length:0),0)
+    if(timedItems>3000)stop('逐题计时量表超过单次 FINAL 3000 题的安全提交预算')
+    if(timedItems){
+      // Worst-case answer + timing JSON must fit the one-MiB FINAL budget.
+      // A count-only budget (e.g. 3000 max-length option keys) is insufficient.
+      // Reserve explicit envelope, metadata, escaping and future-format headroom.
+      const timingBytes=Buffer.byteLength(JSON.stringify({
+        schemaVersion:1,firstResponseMs:86400000,activeTimeMs:86400000,
+        changeCount:10000,revisitCount:10000,visits:10000,
+        interrupted:true,recoveredWithoutClock:true,
+      }),'utf8')
+      const quote=(raw:string)=>Buffer.byteLength(JSON.stringify(raw),'utf8')
+      let worst=4096
+      let worstTiming=2
+      for(const unit of units){
+        worst+=quote(unit.instrumentKey)+8
+        if(unit.kind==='SCALE'&&
+          (unit.displayDefinition as ScaleDraft).presentationMode==='ONE_BY_ONE')
+          worstTiming+=quote(unit.instrumentKey)+4
+        if(unit.kind==='FORM'){
+          worst+=formWorstCaseAnswerBytes(unit.displayDefinition as FormDraft)
+        }else if(unit.kind==='SCALE'){
+          const d=unit.displayDefinition as ScaleDraft
+          const maxOption=Math.max(4,...d.responseOptions.map(o=>quote(o.optionKey)))
+          for(const item of d.items){
+            worst+=quote(item.itemKey)+maxOption+4
+            if(d.presentationMode==='ONE_BY_ONE'){
+              const itemBytes=quote(item.itemKey)+timingBytes+4
+              worst+=itemBytes
+              worstTiming+=itemBytes
+            }
+          }
+        }else{
+          const d=unit.displayDefinition as SjtDraft
+          for(const item of d.questions){
+            const options=item.options.map(o=>quote(o.optionKey))
+            worst+=quote(item.questionKey)+4+(item.responseType==='MULTIPLE'
+              ?2+options.reduce((n,v)=>n+v+1,0):Math.max(4,...options))
+          }
+        }
+      }
+      // The timing validator has its own 400 KB cap, independent of the
+      // combined one-MiB FINAL. Keep margin for envelope serialization.
+      if(worstTiming>390000)
+        stop('逐题计时元数据最大体积超过 390 KB 发布预算，请减少量表题目')
+      if(worst>900000)
+        stop('量表逐题计时与其他工具组合的最大 FINAL 超过 900 KB 发布预算，请缩短内容或拆分波次')
+    }
     let frozenFlow:FrozenSurveyFlow|undefined
     if(wave.flowDefinition){
       try{

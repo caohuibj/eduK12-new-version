@@ -5,6 +5,19 @@ export function ResearchScaleEditor({value,onChange}:{value:ScaleDraft;onChange:
     onChange({...value,items:value.items.map((x,i)=>i===index?fn(x):x)})
   return <div className="space-y-5">
     <section className="border rounded-xl p-4 space-y-3 bg-white">
+      <h3 className="font-semibold">施测呈现方式（随冻结 Publication 固定）</h3>
+      <label className="block text-sm">题目呈现
+        <select className="input block w-full" aria-label="量表施测呈现模式"
+          value={value.presentationMode??'ALL_AT_ONCE'}
+          onChange={e=>onChange({...value,
+            presentationMode:e.target.value as 'ONE_BY_ONE'|'ALL_AT_ONCE'})}>
+          <option value="ONE_BY_ONE">逐题呈现 · 记录浏览器逐题时间</option>
+          <option value="ALL_AT_ONCE">整份呈现 · 不推定逐题反应时间</option>
+        </select>
+      </label>
+      <p className="text-xs text-slate-600">新建量表默认逐题；此前未声明的历史草稿和已冻结量表仍按整份呈现。改变模式将生成新的冻结来源版本，可能影响纵向可比性。</p>
+    </section>
+    <section className="border rounded-xl p-4 space-y-3 bg-white">
       <h3 className="font-semibold">量表响应选项（共享选项组）</h3>
       <div className="grid sm:grid-cols-2 gap-3">
         {value.responseOptions.map((option,i)=><div className="flex gap-2 items-center" key={option.optionKey}>

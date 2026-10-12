@@ -5,6 +5,7 @@ import { withFinalOnlyCompletionTransaction } from '../../services/questionnaire
 import { encryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { computeSurveyFinal, SurveyFinalValidationError } from './final.compute'
+import { SurveyScaleTimingError } from './timing.definition'
 import { ensureSurveyFlowAssignment } from './flow.assignment'
 import { hashResearchCredential } from './identity.service'
 import { verifiedSurveyAttempt } from './admission.service'
@@ -24,6 +25,7 @@ export interface FinalInput {
   researchCode?:string
   submissionId:string
   answers:Record<string,unknown>
+  itemTimings?:unknown
   presentation?:{shownBlocks:string[]}
 }
 /** No per-item network scoring or database writes; a complete attempt makes
@@ -43,6 +45,7 @@ export async function submitResearchFinal(input:FinalInput){
   const canonical=prepareCanonicalSubmission({
     publicationId:known.publicationId,definitionDigest:known.definitionDigest,
     answers:input.answers,
+    ...(input.itemTimings!==undefined?{itemTimings:input.itemTimings}:{}),
   })
   assertCanonicalSubmissionPayloadSize(canonical,1024*1024,'研究 FINAL 作答')
   return withFinalOnlyCompletionTransaction(async tx=>{
@@ -111,9 +114,10 @@ export async function submitResearchFinal(input:FinalInput){
     if(!consent)blocked('当前研究缺少有效的知情同意记录')
     let calculated
     try{
-      calculated=computeSurveyFinal(snapshot,input.answers,assignment,input.presentation?.shownBlocks)
+      calculated=computeSurveyFinal(snapshot,input.answers,assignment,
+        input.presentation?.shownBlocks,'FINAL',input.itemTimings)
     }catch(e){
-      if(e instanceof SurveyFinalValidationError)
+      if(e instanceof SurveyFinalValidationError||e instanceof SurveyScaleTimingError)
         throw new SurveyFinalError(400,e.path+'：'+e.message)
       throw e
     }

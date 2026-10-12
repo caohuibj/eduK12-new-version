@@ -104,6 +104,8 @@ export const formDraftSchema=z.object({
 export type FormDraft=z.infer<typeof formDraftSchema>
 export const scaleDraftSchema=z.object({
   schemaVersion:z.literal(1),
+  /** Missing on historical immutable Scale publications means ALL_AT_ONCE. */
+  presentationMode:z.enum(['ONE_BY_ONE','ALL_AT_ONCE']).optional(),
   respondentType:z.enum(['participant_self_report','teacher_self_report','student_self_report']),
   responseOptions:z.array(option.extend({score:z.number().finite().min(-10000).max(10000)})).max(15),
   dimensions:z.array(z.object({
@@ -147,7 +149,8 @@ export type Issue={path:string;message:string;severity:'error'|'warning'}
 export const initialSurveyDefinition=(kind:SurveyKind):SurveyDraft=>{
   if(kind==='FORM')return {schemaVersion:1,pages:[]}
   if(kind==='SCALE')return {
-    schemaVersion:1,respondentType:'participant_self_report',responseOptions:[
+    schemaVersion:1,presentationMode:'ONE_BY_ONE',
+    respondentType:'participant_self_report',responseOptions:[
       {optionKey:'o1',label:'非常不同意',score:1},
       {optionKey:'o2',label:'不同意',score:2},
       {optionKey:'o3',label:'一般',score:3},

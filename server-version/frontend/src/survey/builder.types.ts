@@ -18,7 +18,7 @@ export type FormQuestion={
 }
 export type FormDraft={schemaVersion:1|2;pages:{pageKey:string;title:string;questions:FormQuestion[]}[]}
 export type ScaleDraft={
-  schemaVersion:1;respondentType:'participant_self_report'|'student_self_report'|'teacher_self_report';
+  schemaVersion:1;presentationMode?:'ONE_BY_ONE'|'ALL_AT_ONCE';respondentType:'participant_self_report'|'student_self_report'|'teacher_self_report';
   responseOptions:{optionKey:string;label:string;score:number}[];
   dimensions:{dimensionKey:string;label:string;direction:'descriptive'|'higher_is_more'|'higher_is_better'|'higher_is_worse'|'bipolar'}[];
   aggregation:'sum'|'mean';

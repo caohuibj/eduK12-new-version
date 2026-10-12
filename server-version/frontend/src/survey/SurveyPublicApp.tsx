@@ -3,7 +3,10 @@ import type { SurveyPublicImage } from './builder.types'
 import { visibleFormKeys,sanitizeFormAnswers } from './form-visibility'
 import { ProfessionalFormAnswer,type ProfessionalAnswer } from './ProfessionalFormAnswer'
 import { FormChoiceExtras,hasSelectedOther,toggleFormMultiple } from './FormChoiceExtras'
-import {saveLocalSurveyDraft,restoreLocalSurveyDraft,clearLocalSurveyDraft} from './local-answer-draft'
+import {saveLocalSurveyDraft,restoreLocalSurveyDraftEnvelope,clearLocalSurveyDraft} from './local-answer-draft'
+import {SurveyTimedScale} from './SurveyTimedScale'
+import {SurveyScaleTimingTracker,sealSurveyScaleTimings,
+  type SurveyWaveScaleTimings} from './survey-scale-timing'
 import { SurveyParticipantImage,type SurveyImageProof } from './SurveyParticipantImage'
 import { resolveClientSurveyFlow,type PublicFlow } from './flow.client'
 import { resolveSurveyCheckpointDraft,sameSurveyCheckpointAnswers } from './checkpoint-recovery'
@@ -20,6 +23,7 @@ type Question={itemKey:string;questionKey?:string;type:string;prompt:string;imag
   total?:number;timeZone?:string;textValidation?:'EMAIL'|'DIGITS'|'ALPHANUMERIC';
   otherOptionKey?:string;otherMaxLength?:number;exclusiveOptionKeys?:string[]}
 type Unit={kind:'FORM'|'SCALE'|'SJT';instrumentKey:string;title:string;image?:SurveyPublicImage;
+  presentationMode?:'ONE_BY_ONE'|'ALL_AT_ONCE';
   stimulus?:string;scenarioTitle?:string;
   pages?:{pageKey:string;title:string;questions:Question[]}[];
   responseOptions?:Choice[];
@@ -205,6 +209,10 @@ export default function SurveyPublicApp(){
   const [selectedWave,setSelectedWave]=useState<Wave|null>(null),[agreed,setAgreed]=useState(false)
   const [task,setTask]=useState<Task|null>(null),[answers,setAnswers]=useState<Record<string,Record<string,Answer>>>({})
   const [formPages,setFormPages]=useState<Record<string,number>>({})
+  const [scalePages,setScalePages]=useState<Record<string,number>>({})
+  const [toolStep,setToolStep]=useState(0)
+  const [itemTimings,setItemTimings]=useState<SurveyWaveScaleTimings>({})
+  const timingTrackers=useRef<Record<string,SurveyScaleTimingTracker>>({})
   const [flowStep,setFlowStep]=useState(0),[screenedOut,setScreenedOut]=useState(false)
   const [checkpointRevision,setCheckpointRevision]=useState(0)
   const [checkpointOverwritePending,setCheckpointOverwritePending]=useState(false)
@@ -220,10 +228,11 @@ export default function SurveyPublicApp(){
   useEffect(()=>{
     if(!task||task.status!=='STARTED'||!attemptId)return
     const timeout=window.setTimeout(()=>{
-      saveLocalSurveyDraft(publicId,attemptId,task.definitionDigest,answers)
+      if(!saveLocalSurveyDraft(publicId,attemptId,task.definitionDigest,answers,itemTimings))
+        setNotice('本标签页临时保存失败（空间或权限不足）。刷新、关闭页面可能丢失未提交答案；如已开放服务器加密暂存，请主动保存，或完成本次 FINAL。')
     },450)
     return ()=>window.clearTimeout(timeout)
-  },[publicId,attemptId,task,answers])
+  },[publicId,attemptId,task,answers,itemTimings])
   useEffect(()=>{
     document.title='Huisurvey · 研究参与'
     // Recruitment capability stays in memory, not browser history/Referrer.
@@ -275,43 +284,47 @@ export default function SurveyPublicApp(){
     const data=await publicApi<Task>(base+'/attempts/'+id+'/task','POST',{
       ...(code?{researchCode:code}:{}),accessCredential:secret,
     })
-    setAttemptId(id)
-    setSubmissionId(crypto.randomUUID())
-    setTask(data);setFormPages({});setFlowStep(0);setScreenedOut(false)
-    setCheckpointRevision(0);setCheckpointOverwritePending(false)
-    if(data.status==='COMPLETED'){
-      clearLocalSurveyDraft(publicId,id)
-      setAnswers({})
-    }else{
-      const saved=restoreLocalSurveyDraft<Record<string,Record<string,Answer>>>(
-        publicId,id,data.definitionDigest,
-      )
-      setAnswers(saved||{})
-      if(saved)setNotice('已恢复本标签页暂存的未提交答案。请复核后再提交。')
-      if(data.checkpointPolicy?.enabled){
-        try{
-          const remote=await publicApi<{revision:number;checkpoint:{
-            answers:Record<string,Record<string,Answer>>;updatedAt:string;expiresAt:string
-          }|null}>(base+'/attempts/'+id+'/checkpoint/read','POST',{
-            ...(code?{researchCode:code}:{}),accessCredential:secret,
-          })
-          const clash=!!saved&&!!remote.checkpoint&&
-            !sameSurveyCheckpointAnswers(saved,remote.checkpoint.answers)
-          const useRemote=!clash||window.confirm(
-            '检测到本标签页草稿与服务器加密存档不同。确定：读取服务器版本；取消：保留本地版本（若想写回服务器，保存前还需明确确认覆盖）。',
-          )
-          const plan=resolveSurveyCheckpointDraft(saved,remote,useRemote)
-          setCheckpointRevision(plan.revision)
-          setCheckpointOverwritePending(plan.requiresOverwriteConfirmation)
-          setAnswers(plan.answers)
-          if(plan.conflict)setNotice(useRemote
-            ?'已选用服务器上最新的加密草稿；本地旧答案将不再自动覆盖它。'
-            :'已保留本地答案；若稍后需要覆盖服务器存档，必须再次明确确认。')
-          else if(remote.checkpoint&&!saved)setNotice(
-            '已使用研究私密凭证恢复加密服务器存档；该暂存内容仍不是正式提交。')
-        }catch(e){setNotice('无法恢复服务器临时存档：'+parseError(e))}
-      }
+    // Reconcile complete local+remote envelopes before mounting any timed
+    // Scale runner. An older local revision can never silently replace remote.
+    const saved=data.status==='COMPLETED'?null:
+      restoreLocalSurveyDraftEnvelope<Record<string,Record<string,Answer>>>(
+        publicId,id,data.definitionDigest)
+    let restoredAnswers=saved?.answers??{}
+    let restoredTimings=(saved?.itemTimings??{}) as SurveyWaveScaleTimings
+    let restoredRevision=0,overwritePending=false
+    if(data.status==='COMPLETED')clearLocalSurveyDraft(publicId,id)
+    else if(saved)setNotice('已恢复本标签页暂存的未提交答案。请复核后再提交。')
+    if(data.status==='STARTED'&&data.checkpointPolicy?.enabled){
+      try{
+        const remote=await publicApi<{revision:number;checkpoint:{
+          answers:Record<string,Record<string,Answer>>;
+          itemTimings?:SurveyWaveScaleTimings;updatedAt:string;expiresAt:string
+        }|null}>(base+'/attempts/'+id+'/checkpoint/read','POST',{
+          ...(code?{researchCode:code}:{}),accessCredential:secret,
+        })
+        const conflict=!!saved&&!!remote.checkpoint&&(
+          !sameSurveyCheckpointAnswers(saved.answers,remote.checkpoint.answers)||
+          !sameSurveyCheckpointAnswers(restoredTimings,remote.checkpoint.itemTimings??{}))
+        const useRemote=!conflict||window.confirm(
+          '本标签页草稿与服务器加密存档的答案或逐题时间不同。确定：选用服务器版本；取消：保留本地版本，覆盖服务器前须再次明确确认。',
+        )
+        const plan=resolveSurveyCheckpointDraft(saved?.answers??null,remote,useRemote)
+        restoredAnswers=plan.answers
+        restoredRevision=plan.revision
+        overwritePending=conflict&&!useRemote
+        restoredTimings=useRemote&&remote.checkpoint
+          ?(remote.checkpoint.itemTimings??{}):restoredTimings
+        if(conflict)setNotice(useRemote
+          ?'已选用服务器版本的答案与逐题计时，未自动覆盖较新的存档。'
+          :'保留了本地答案及计时；若要覆盖服务器存档，保存前需要再次确认。')
+        else if(remote.checkpoint&&!saved)setNotice('已恢复服务器上的加密答案及已有计时记录。')
+      }catch(e){setNotice('无法恢复服务器临时存档：'+parseError(e))}
     }
+    timingTrackers.current={}
+    setAttemptId(id);setSubmissionId(crypto.randomUUID())
+    setTask(data);setFormPages({});setScalePages({});setFlowStep(0);setToolStep(0);setScreenedOut(false)
+    setCheckpointRevision(restoredRevision);setCheckpointOverwritePending(overwritePending)
+    setAnswers(restoredAnswers);setItemTimings(restoredTimings)
     if(data.status==='COMPLETED'){
       const result=await publicApi<General>(base+'/attempts/'+id+'/general','POST',{
         ...(code?{researchCode:code}:{}),accessCredential:secret,
@@ -354,9 +367,16 @@ export default function SurveyPublicApp(){
   })}
   const currentFlow=task?.flow?resolveClientSurveyFlow(task.flow,task.units,answers):null
   const flowBlock=currentFlow?.blocks[Math.min(flowStep,Math.max(0,currentFlow.blocks.length-1))]
+  // One-by-one studies must not render multiple Scale timers simultaneously.
+  // Keep historical all-at-once Waves on their original multi-tool layout.
+  const timedSequence=!!task&&!task.flow&&task.units.some(u=>
+    u.kind==='SCALE'&&u.presentationMode==='ONE_BY_ONE')
+  const activeTool=timedSequence?task!.units[Math.min(toolStep,task!.units.length-1)]:undefined
   const flowUnit=flowBlock?.kind==='INSTRUMENT'
-    ?task?.units.find(u=>u.instrumentKey===flowBlock.instrumentKey):undefined
-  const finalFlowStep=!currentFlow||flowStep>=currentFlow.blocks.length-1
+    ?task?.units.find(u=>u.instrumentKey===flowBlock.instrumentKey):activeTool
+  const finalFlowStep=currentFlow
+    ?flowStep>=currentFlow.blocks.length-1
+    :!timedSequence||toolStep>=task!.units.length-1
   const canAdvanceFlow=():boolean=>{
     if(!flowUnit)return true
     const existing=answers[flowUnit.instrumentKey]||{}
@@ -388,23 +408,53 @@ export default function SurveyPublicApp(){
     if(!canAdvanceFlow()){setError('请完成当前工具的必答内容和全部页，再进入下一步骤');return}
     setError('')
     if(currentFlow)setFlowStep(i=>Math.min(i+1,currentFlow.blocks.length-1))
+    else if(timedSequence)setToolStep(i=>Math.min(i+1,task!.units.length-1))
   }
-  const renderSurveyTask=(unit:Unit)=><TaskForm key={unit.instrumentKey} unit={unit}
-    pageIndex={formPages[unit.instrumentKey]??0}
-    onPageChange={next=>setFormPages(current=>({...current,[unit.instrumentKey]:next}))}
-    proof={{publicId,attemptId,accessCredential,
-      ...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode}:{}),
-    }}
-    answer={answers[unit.instrumentKey]||{}} onChange={(key,value)=>setAnswers(previous=>{
-      const next={...(previous[unit.instrumentKey]||{}),[key]:value}
-      const question=unit.kind==='FORM'?unit.pages?.flatMap(page=>page.questions)
-        .find(q=>q.itemKey===key&&q.otherOptionKey):undefined
-      if(question&&!hasSelectedOther(question,value))delete next[question.itemKey+':other']
-      return {...previous,[unit.instrumentKey]:next}
-    })}/>
+  const updateAnswer=(unit:Unit,key:string,value:Answer)=>setAnswers(previous=>{
+    const next={...(previous[unit.instrumentKey]||{}),[key]:value}
+    const question=unit.kind==='FORM'?unit.pages?.flatMap(page=>page.questions)
+      .find(q=>q.itemKey===key&&q.otherOptionKey):undefined
+    if(question&&!hasSelectedOther(question,value))delete next[question.itemKey+':other']
+    return {...previous,[unit.instrumentKey]:next}
+  })
+  const recordTiming=(instrumentKey:string,next:import('./survey-scale-timing').SurveyScaleTimings)=>
+    setItemTimings(prev=>({...prev,[instrumentKey]:next}))
+  const timingFor=(unit:Unit)=>{
+    const current=timingTrackers.current[unit.instrumentKey]
+    if(current)return current
+    const tracker=new SurveyScaleTimingTracker(itemTimings[unit.instrumentKey]??{},
+      answers[unit.instrumentKey]??{})
+    timingTrackers.current[unit.instrumentKey]=tracker
+    return tracker
+  }
+  const renderSurveyTask=(unit:Unit)=>{
+    if(unit.kind==='SCALE'&&unit.presentationMode==='ONE_BY_ONE')
+      return <SurveyTimedScale key={unit.instrumentKey}
+        unit={{instrumentKey:unit.instrumentKey,title:unit.title,
+          items:(unit.items??[]).map(q=>({itemKey:q.itemKey,prompt:q.prompt,required:q.required})),
+          responseOptions:unit.responseOptions??[]}}
+        answer={answers[unit.instrumentKey]||{}}
+        tracker={timingFor(unit)}
+        index={scalePages[unit.instrumentKey]??0}
+        onIndexChange={next=>setScalePages(prev=>({...prev,[unit.instrumentKey]:next}))}
+        onAnswer={(key,value)=>updateAnswer(unit,key,value)}
+        onTiming={next=>recordTiming(unit.instrumentKey,next)}/>
+    return <TaskForm key={unit.instrumentKey} unit={unit}
+      pageIndex={formPages[unit.instrumentKey]??0}
+      onPageChange={next=>setFormPages(current=>({...current,[unit.instrumentKey]:next}))}
+      proof={{publicId,attemptId,accessCredential,
+        ...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode}:{}),
+      }}
+      answer={answers[unit.instrumentKey]||{}}
+      onChange={(key,value)=>updateAnswer(unit,key,value)}/>
+  }
   const submit=(e:FormEvent)=>{e.preventDefault();if(!task||!attemptId)return;
-    if(currentFlow&&!finalFlowStep){setError('请按顺序完成当前研究步骤');return}
-    if(currentFlow&&!canAdvanceFlow()){setError('请完成当前工具后再提交');return}
+    if((currentFlow||timedSequence)&&!finalFlowStep){
+      setError('请按顺序完成当前研究步骤');return
+    }
+    if((currentFlow||timedSequence)&&!canAdvanceFlow()){
+      setError('请完成当前工具后再提交');return
+    }
     void run(async()=>{
     // Match the frozen conditional form. An earlier selection change must
     // clear fields that are now hidden; the server repeats this validation.
@@ -416,11 +466,22 @@ export default function SurveyPublicApp(){
         ?sanitizeFormAnswers(unit.pages?.flatMap(p=>p.questions)||[],original)
         :original]
     }))
+    const timedUnits=task.units.filter(unit=>
+      unit.kind==='SCALE'&&unit.presentationMode==='ONE_BY_ONE'&&
+      (eligible===null||eligible.has(unit.instrumentKey)))
+    const sealedTimings=Object.fromEntries(timedUnits.map(unit=>[
+      unit.instrumentKey,sealSurveyScaleTimings(
+        (unit.items??[]).map(item=>item.itemKey),payload[unit.instrumentKey]??{},
+        timingTrackers.current[unit.instrumentKey]?.snapshot()??
+          itemTimings[unit.instrumentKey]??{},
+      ),
+    ]))
     const screened=currentFlow?.termination==='SCREEN_OUT'
     const final=await publicApi<{status:string}>(
       base+'/attempts/'+attemptId+(screened?'/screen-out':'/final'),'POST',{
       ...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode:researchCode.trim().toUpperCase()}:{}),
       accessCredential:accessCredential.trim(),submissionId,answers:payload,
+      ...(timedUnits.length?{itemTimings:sealedTimings}:{}),
       ...(currentFlow?{presentation:{shownBlocks:currentFlow.shownBlocks}}:{}),
     })
     if(screened){
@@ -456,11 +517,21 @@ export default function SurveyPublicApp(){
         return [unit.instrumentKey,unit.kind==='FORM'
           ?sanitizeFormAnswers(unit.pages?.flatMap(p=>p.questions)??[],answer):answer]
       }))
+      const timedUnits=task.units.filter(unit=>
+        unit.kind==='SCALE'&&unit.presentationMode==='ONE_BY_ONE'&&
+        (enabled===null||enabled.has(unit.instrumentKey)))
+      const partialTimings=Object.fromEntries(timedUnits.map(unit=>[
+        unit.instrumentKey,sealSurveyScaleTimings((unit.items??[]).map(q=>q.itemKey),
+          partial[unit.instrumentKey]??{},
+          timingTrackers.current[unit.instrumentKey]?.snapshot()??
+            itemTimings[unit.instrumentKey]??{}),
+      ]))
       const saved=await publicApi<{revision:number;expiresAt:string}>(
         base+'/attempts/'+attemptId+'/checkpoint/save','POST',{
         ...(info?.project.collectionMode==='LINKED_WAVES'
           ?{researchCode:researchCode.trim().toUpperCase()}:{}),
         accessCredential:accessCredential.trim(),revision:checkpointRevision,answers:partial,
+        ...(timedUnits.length?{itemTimings:partialTimings}:{}),
       })
       setCheckpointRevision(saved.revision)
       setCheckpointOverwritePending(false)
@@ -619,7 +690,16 @@ export default function SurveyPublicApp(){
           </section>}
           {!finalFlowStep&&<button type="button" className="btn-secondary" disabled={busy}
             onClick={advanceFlow}>确认当前步骤，继续研究</button>}
-        </>:task.units.map(renderSurveyTask)}
+        </>:timedSequence&&flowUnit?<section className="space-y-3">
+          <p className="text-xs text-slate-600" role="status">研究工具 {toolStep+1} / {task.units.length}</p>
+          {renderSurveyTask(flowUnit)}
+          <nav aria-label="研究工具导航" className="flex flex-wrap gap-3">
+            <button type="button" className="btn-secondary" disabled={toolStep===0}
+              onClick={()=>{setError('');setToolStep(i=>Math.max(0,i-1))}}>上一工具</button>
+            {!finalFlowStep&&<button type="button" className="btn-secondary"
+              onClick={advanceFlow}>确认当前工具，继续</button>}
+          </nav>
+        </section>:task.units.map(renderSurveyTask)}
         {finalFlowStep&&<button className="btn-primary" disabled={busy||(!task.flow&&!task.units.every(unit=>{
           if(unit.kind!=='FORM')return true
           const vis=visibleFormKeys(unit.pages?.flatMap(p=>p.questions)||[],

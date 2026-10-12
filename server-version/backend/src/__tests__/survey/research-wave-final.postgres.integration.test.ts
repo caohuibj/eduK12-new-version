@@ -8,6 +8,7 @@ import { transitionResearchProject } from '../../modules/survey/project-lifecycl
 import { prepareWave,openWave,updateWaveEntryToken,transitionWave } from '../../modules/survey/waves.publish'
 import { joinLinkedStudy,startLinkedWave,getPublicResearchInfo,listOwnLinkedWaves } from '../../modules/survey/admission.service'
 import { submitResearchFinal,readGeneralForOwnAttempt } from '../../modules/survey/final.service'
+import {saveSurveyCheckpoint,readSurveyCheckpoint} from '../../modules/survey/checkpoint.service'
 import { getOwnResearchTask } from '../../modules/survey/task.public'
 import { matchedWaveCounts,waveOverview } from '../../modules/survey/analytics.read'
 import { loadSurveySource } from '../../modules/survey/analytics.source'
@@ -71,12 +72,13 @@ async function instrument(kind:'FORM'|'SCALE'|'SJT',definition:FormDraft|ScaleDr
   await updateDraft(ownerId,projectId,id,{revision:0,title:kind+' 自编研究',definition})
   return id
 }
-async function wave(title:string,ids:string[],allowNewParticipants=false){
+async function wave(title:string,ids:string[],allowNewParticipants=false,checkpoint=false){
   const w=await createWave(ownerId,projectId,{
     requestId:randomUUID(),title,consentText:consent,
     generalText:'感谢完成本轮研究。本研究结果将汇总分析，不提供个人诊断。',
     linkageNoticeConfirmed:true,
     instrumentIds:ids,allowNewParticipants,
+    ...(checkpoint?{checkpointPolicy:{schemaVersion:1 as const,enabled:true as const,ttlHours:2}}:{}),
   })
   const prepared=await prepareWave(ownerId,projectId,w.id,w.revision)
   expect(prepared.runtimeReady).toBe(true)
@@ -1022,6 +1024,94 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     })
     const permitted=await downloadSurveyExport(req,{projectId,exportId:explicitTicket.id})
     expect(permitted.csv).toContain('个人敏感自由文字')
+  })
+  it('persists frozen per-item Scale timing and exports real millisecond columns',async()=>{
+    const timed:ScaleDraft={...structuredClone(scale),presentationMode:'ONE_BY_ONE'}
+    const draftId=await instrument('SCALE',timed)
+    const w=await wave('逐题计时量表真实 FINAL',[draftId],true,true)
+    const linked=await joinLinkedStudy({publicId:w.publicId,waveId:w.id,
+      entryToken:w.entrySecret,consent:true,consentVersion:1})
+    const task=await getOwnResearchTask({publicId:w.publicId,attemptId:linked.attemptId,
+      researchCode:linked.researchCode,accessCredential:linked.accessCredential})
+    expect(task.units[0]).toMatchObject({kind:'SCALE',presentationMode:'ONE_BY_ONE'})
+    const instrumentKey=task.units[0].instrumentKey
+    const answers={[instrumentKey]:{itemone:'o4',itemtwo:'o3'}}
+    const rows={
+      [instrumentKey]:{
+        itemone:{schemaVersion:1 as const,firstResponseMs:1234,activeTimeMs:2234,
+          changeCount:1,revisitCount:1,visits:2,
+          interrupted:false,recoveredWithoutClock:false},
+        itemtwo:{schemaVersion:1 as const,firstResponseMs:null,activeTimeMs:640,
+          changeCount:0,revisitCount:0,visits:1,
+          interrupted:true,recoveredWithoutClock:true},
+      },
+    }
+    const proof={publicId:w.publicId,attemptId:linked.attemptId,
+      researchCode:linked.researchCode,accessCredential:linked.accessCredential}
+    const checkpoint=await saveSurveyCheckpoint(proof,{
+      revision:0,answers:{[instrumentKey]:{itemone:'o4'}},
+      itemTimings:{[instrumentKey]:{itemone:rows[instrumentKey].itemone}},
+    })
+    expect(checkpoint.revision).toBe(1)
+    const restored=await readSurveyCheckpoint(proof)
+    expect(restored.checkpoint?.answers).toEqual({[instrumentKey]:{itemone:'o4'}})
+    expect(restored.checkpoint?.itemTimings).toEqual({
+      [instrumentKey]:{itemone:rows[instrumentKey].itemone},
+    })
+    const cipher=await db.surveyAttemptCheckpoint.findFirstOrThrow({
+      where:{attemptId:linked.attemptId},
+    })
+    expect(cipher.contentCipher).not.toContain('1234')
+    const submissionId=randomUUID()
+    const final=await submitResearchFinal({publicId:w.publicId,attemptId:linked.attemptId,
+      researchCode:linked.researchCode,accessCredential:linked.accessCredential,
+      submissionId,answers,itemTimings:rows})
+    expect(final.status).toBe('COMPLETED')
+    expect(await db.surveyAttemptCheckpoint.count({where:{attemptId:linked.attemptId}}))
+      .toBe(0)
+    const replay=await submitResearchFinal({publicId:w.publicId,attemptId:linked.attemptId,
+      researchCode:linked.researchCode,accessCredential:linked.accessCredential,
+      submissionId,answers,itemTimings:rows})
+    expect(replay).toMatchObject({idempotent:true,receiptId:final.receiptId})
+    await expect(submitResearchFinal({
+      publicId:w.publicId,attemptId:linked.attemptId,
+      researchCode:linked.researchCode,accessCredential:linked.accessCredential,
+      submissionId,answers,itemTimings:{
+        [instrumentKey]:{...rows[instrumentKey],
+          itemone:{...rows[instrumentKey].itemone,firstResponseMs:1235}},
+      },
+    })).rejects.toThrow(/不同|覆盖/)
+    const verified=await loadSurveySource({actorUserId:ownerId,projectId,
+      waveIds:[w.id],includeWideSchema:true})
+    const one=verified.raw.find(x=>x.itemKey==='itemone')
+    const two=verified.raw.find(x=>x.itemKey==='itemtwo')
+    expect(one?.itemTiming).toEqual(rows[instrumentKey].itemone)
+    expect(two?.itemTiming).toEqual(rows[instrumentKey].itemtwo)
+    expect(one?.attemptStartedAt).toMatch(/^20\d{2}-/)
+    const dictionary=verified.codebook.filter(c=>c.instrumentKey===instrumentKey)
+    expect(dictionary.every(c=>c.scalePresentationMode==='ONE_BY_ONE'
+      &&c.timingContract==='SURVEY_SCALE_ITEM_TIMING_V1')).toBe(true)
+    const raw=rawLongExport(projectId,verified,w.id)
+    expect(raw.csv).toContain('first_response_ms')
+    expect(raw.csv).toContain('"1234"')
+    expect(raw.csv).toContain('RECOVERED_NO_FIRST_RESPONSE')
+    const wide=rawWideExport(projectId,verified)
+    expect(wide.csv).toContain('__first_response_ms')
+    expect(wide.csv).toContain('"1234"')
+    expect(wide.manifest.rowCount).toBe(1)
+    const ticketToken=generateToken({
+      userId:ownerId,username:'synthetic-researcher',role:'STUDENT',
+      accountDomain:'SURVEY',tokenVersion:0,mfaVerifiedAt:Math.floor(Date.now()/1000),
+    })
+    const req={headers:{cookie:'huisurvey_research_session='+ticketToken},
+      user:{userId:ownerId,tokenVersion:0,username:'synthetic-researcher',
+        role:'STUDENT',platformRole:'STANDARD',mustChangePassword:false,
+        accountDomain:'SURVEY'}} as unknown as Request
+    const grant=await createSurveyExport(req,{projectId,format:'RAW_WAVE',waveId:w.id})
+    expect(grant.manifest.timingProvenance).toContain('BROWSER_OBSERVED')
+    const downloaded=await downloadSurveyExport(req,{projectId,exportId:grant.id})
+    expect(downloaded.csv).toContain('1234')
+    expect(JSON.stringify(downloaded.codebook)).toContain('SURVEY_SCALE_ITEM_TIMING_V1')
   })
   it('does not commit a FINAL against a credential revoked during the transaction',async()=>{
     const w=await wave('撤销凭证与提交串行验证',[toolIds.scale],true)
