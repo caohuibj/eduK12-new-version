@@ -1,6 +1,7 @@
 import { useCallback,useEffect,useRef,useState } from 'react'
 import { TaskForm } from '../survey/SurveyPublicApp'
-import { sanitizeFormAnswers,visibleFormKeys } from '../survey/form-visibility'
+import { sanitizeFormAnswers } from '../survey/form-visibility'
+import {lastVisibleHuiteacherFormPageIndex} from './formTaskPagination'
 import type { FormDraft } from '../survey/builder.types'
 import type { ProfessionalAnswer } from '../survey/ProfessionalFormAnswer'
 
@@ -102,13 +103,7 @@ export function HuiteacherMyFormTasks({api,student=false}: {api:Api;student?:boo
       return next
     })
   }
-  // UI page indices are ORIGINAL Form page positions. Counting only visible
-  // pages changes their indices and permits early FINAL when an earlier page
-  // is hidden while a later, required page remains visible.
-  const visible=active?visibleFormKeys(active.pages.flatMap(p=>p.questions),answers):new Set<string>()
-  const lastVisiblePage=active?active.pages.reduce((latest,p,index)=>
-    p.questions.some(q=>visible.has(q.itemKey))?index:latest,-1):-1
-  const last=page>=Math.max(0,lastVisiblePage)
+  const last=page>=lastVisibleHuiteacherFormPageIndex(active?.pages??[],answers)
   const submit=()=>{
     if(!active||!last)return
     const source=active
