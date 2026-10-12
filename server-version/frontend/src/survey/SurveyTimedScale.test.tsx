@@ -23,12 +23,12 @@ function Harness(){
 describe('Survey Scale participant one-by-one delivery',()=>{
   it('shows only one question at a time, allows backtracking and preserves choices',()=>{
     render(<Harness/>)
-    expect(screen.getByText('第一题')).toBeInTheDocument()
-    expect(screen.queryByText('第二题')).toBeNull()
+    expect(screen.getByText(/第一题/)).toBeInTheDocument()
+    expect(screen.queryByText(/第二题/)).toBeNull()
     fireEvent.click(screen.getByRole('radio',{name:'同意'}))
     fireEvent.click(screen.getByRole('button',{name:'下一题'}))
-    expect(screen.getByText('第二题')).toBeInTheDocument()
-    expect(screen.queryByText('第一题')).toBeNull()
+    expect(screen.getByText(/第二题/)).toBeInTheDocument()
+    expect(screen.queryByText(/第一题/)).toBeNull()
     fireEvent.click(screen.getByRole('button',{name:'上一题'}))
     expect(screen.getByRole('radio',{name:'同意'})).toBeChecked()
     expect(screen.getByTestId('answers').textContent).toContain('"first":"o2"')
