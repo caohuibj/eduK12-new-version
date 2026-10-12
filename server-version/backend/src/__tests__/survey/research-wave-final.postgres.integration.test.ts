@@ -991,7 +991,7 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     const two=verified.raw.find(x=>x.itemKey==='itemtwo')
     expect(one?.itemTiming).toEqual(rows[instrumentKey].itemone)
     expect(two?.itemTiming).toEqual(rows[instrumentKey].itemtwo)
-    expect(one?.attemptStartedAt).toMatch(/^20\\d{2}-/)
+    expect(one?.attemptStartedAt).toMatch(/^20\d{2}-/)
     const dictionary=verified.codebook.filter(c=>c.instrumentKey===instrumentKey)
     expect(dictionary.every(c=>c.scalePresentationMode==='ONE_BY_ONE'
       &&c.timingContract==='SURVEY_SCALE_ITEM_TIMING_V1')).toBe(true)
