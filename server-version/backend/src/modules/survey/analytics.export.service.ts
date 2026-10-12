@@ -149,10 +149,14 @@ export async function createSurveyExport(req:Request,input:{
       publicationVersion:x.publicationVersion,
       instrumentRevision:x.instrumentRevision,
       definitionDigest:x.definitionDigest,scoringDigest:x.scoringDigest,
-      formSchemaVersion:x.formSchemaVersion??null,flowDigest:x.flowDigest??null},
+      formSchemaVersion:x.formSchemaVersion??null,flowDigest:x.flowDigest??null,
+      scalePresentationMode:x.scalePresentationMode??null,
+      scaleTimingContract:x.timingContract??null},
   ] as const)).values()]
   const manifest={...artifact.manifest,sourceCutOff:sources.cutOff,
     generatedAt:new Date().toISOString(),timeZone:'UTC',
+    timingProvenance:'BROWSER_OBSERVED_FOREGROUND_MS_NOT_ATTESTED_ATTENTION',
+    timingMissingPolicy:'NULL_NOT_ZERO_FOR_HISTORICAL_OR_NON_TIMED_SCALES',
     sourceProjectRevision:sources.sourceRevision,
     analysisPopulation:attendanceOnly
       ?'LINKED_NON_FINAL_ATTENDANCE_AND_QUALITY_EXCLUDED'
