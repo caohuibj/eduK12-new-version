@@ -12,6 +12,10 @@ import {
   readOwnHuiteacherObservations,readFormalHuiteacherObservations,
   updateHuiteacherObservation,submitHuiteacherObservation,
 } from '../../modules/huiteacher/observer.service'
+import {createHuiteacherForm,updateHuiteacherForm,publishHuiteacherForm}
+  from '../../modules/huiteacher/forms.service'
+import {bindHuiteacherFieldForm,readInvitedHuiteacherFieldForm}
+  from '../../modules/huiteacher/fieldForm.service'
 
 const dbUrl=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL',
   'PR26_INTEGRATION_DATABASE_URL','COGNITIVE_INTEGRATION_DB_URL')
@@ -66,6 +70,33 @@ suite('Huiteacher PR4 event-scoped expert access and encrypted field records',()
       organizationId:school.id,eventId:event.id,actorUserId:manager.id,
       action:'OPEN',expectedVersion:1,
     })).rejects.toThrow()
+    const draft=await createHuiteacherForm({
+      organizationId:school.id,actorUserId:manager.id,
+      title:'课堂观察指标',
+    })
+    await updateHuiteacherForm({
+      organizationId:school.id,actorUserId:manager.id,formId:draft.id,
+      expectedRevision:draft.revision,title:'课堂观察指标',
+      definition:{schemaVersion:2,pages:[{pageKey:'p1',title:'课堂观察',
+        questions:[{itemKey:'q1',type:'LIKERT',prompt:'课堂讨论证据',
+          required:true,options:[{optionKey:'low',label:'不足'},
+            {optionKey:'high',label:'充分'}],rows:[]}]}]},
+    })
+    const published=await db.huiteacherFormInstrument.findUniqueOrThrow({
+      where:{id:draft.id},
+    })
+    await publishHuiteacherForm({
+      organizationId:school.id,actorUserId:manager.id,formId:draft.id,
+      expectedRevision:published.revision,
+    })
+    await bindHuiteacherFieldForm({
+      actorUserId:manager.id,organizationId:school.id,
+      eventId:event.id,formId:draft.id,
+    })
+    await expect(bindHuiteacherFieldForm({
+      actorUserId:manager.id,organizationId:school.id,
+      eventId:event.id,formId:draft.id,
+    })).rejects.toThrow()
     const invitation=await inviteHuiteacherObserver({
       organizationId:school.id,eventId:event.id,
       actorUserId:manager.id,observerUserId:expert.id,
@@ -90,6 +121,14 @@ suite('Huiteacher PR4 event-scoped expert access and encrypted field records',()
       action:'OPEN',expectedVersion:1,
     })
     expect(opened.status).toBe('OPEN')
+    const fieldForm=await readInvitedHuiteacherFieldForm({
+      invitationId:invitation.id,actorUserId:expert.id,
+    })
+    expect(fieldForm?.formId).toBe(draft.id)
+    expect(fieldForm?.pages).toHaveLength(1)
+    await expect(readInvitedHuiteacherFieldForm({
+      invitationId:invitation.id,actorUserId:stranger.id,
+    })).rejects.toThrow()
     await expect(createHuiteacherObservation({
       organizationId:school.id,eventId:event.id,
       actorUserId:stranger.id,kind:'FACT',content:'should be forbidden',
@@ -115,9 +154,25 @@ suite('Huiteacher PR4 event-scoped expert access and encrypted field records',()
       content:'事实基础的反馈：教学讨论较充分。',
     })
     expect(updated.revision).toBe(2)
+    await expect(submitHuiteacherObservation({
+      id:raw.id,actorUserId:expert.id,expectedRevision:2,
+    })).rejects.toThrow()
+    await expect(submitHuiteacherObservation({
+      id:raw.id,actorUserId:expert.id,expectedRevision:2,
+      fieldFormId:draft.id,answers:{q1:'unknown'},
+    })).rejects.toThrow()
     const submitted=await submitHuiteacherObservation({
       id:raw.id,actorUserId:expert.id,expectedRevision:2,
+      fieldFormId:draft.id,answers:{q1:'high'},
     })
+    const structured=await db.huiteacherFieldFormEvidence.findUniqueOrThrow({
+      where:{recordId:raw.id},
+    })
+    expect(structured.definitionDigest).toBe(published.definitionDigest)
+    expect(structured.answersCipher).not.toContain('high')
+    await expect(db.huiteacherFieldFormEvidence.delete({
+      where:{recordId:raw.id},
+    })).rejects.toThrow()
     expect(submitted.status).toBe('SUBMITTED')
     await submitHuiteacherObservation({
       id:privateNote.id,actorUserId:expert.id,expectedRevision:1,
