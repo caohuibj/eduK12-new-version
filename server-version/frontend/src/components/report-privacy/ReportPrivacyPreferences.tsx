@@ -93,7 +93,7 @@ export function ReportPrivacyPreferences({organizationId,scenarios,api}:{
   useEffect(()=>{
     const requested=path+'?scenario='+scenario
     const ticket=++requestSerial.current
-    setData(null);setError('');setMessage('')
+    setBusy(false);setData(null);setError('');setMessage('')
     void api<Data>(path+'/preferences?scenario='+encodeURIComponent(scenario))
       .then(d=>{
         if(ticket===requestSerial.current&&currentView.current===requested){
@@ -104,6 +104,7 @@ export function ReportPrivacyPreferences({organizationId,scenarios,api}:{
         if(ticket===requestSerial.current&&currentView.current===requested)
           setError(e instanceof Error?e.message:'无法读取隐私偏好')
       })
+    return ()=>{requestSerial.current+=1}
   },[api,path,scenario])
   const selectScope=(next:Scope)=>{
     if(!data||!data.editableScopes.includes(next))return
