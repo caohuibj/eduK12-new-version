@@ -106,7 +106,7 @@ suite('ReportPrivacy PR1 persistence / uniqueness / immutable snapshot — real 
       scenario:'SCHOOL_GENERAL_EDUCATION_GROUP'}))
       .rejects.toMatchObject({code:'PRIVACY_CAMPUS_PUBLISHER_REQUIRED'})
     await db.educationProductRoleGrant.update({where:{id:grant.id},
-      data:{revokedAt:new Date()}})
+      data:{revokedAt:new Date(),revokedByUserId:admin.id}})
     await expect(saveReportPrivacyPreferences({...input,request:firstRequest}))
       .rejects.toMatchObject({code:'PRIVACY_TEACHER_PUBLISHER_REQUIRED'})
   })
