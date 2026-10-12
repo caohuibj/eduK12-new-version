@@ -19,6 +19,59 @@ type StaffCandidate={
   classUnitId:string;formDigest:string
 }
 
+
+/**
+ * Preview only appointments attached to the exact verified PERSON target.
+ * Return no student identity or Huischool psychology relationship.
+ */
+export async function listHuiteacherStudentEvaluationCandidates(input:{
+  actorUserId:string;organizationId:string;eventId:string
+}){
+  return prisma.$transaction(async tx=>{
+    const scope=await resolveEducationProductMemberScope({
+      actorUserId:input.actorUserId,organizationId:input.organizationId,
+      product:'HUITEACHER',
+    },tx)
+    if(!scope?.productAdmin)deny('HUITEACHER_STUDENT_EVAL_ADMIN_REQUIRED',403)
+    const rows=await tx.$queryRaw<Array<{
+      staffAssignmentId:string;classUnitId:string;className:string;
+      staffRole:string;targetUserId:string
+    }>>`
+      SELECT staff."id" AS "staffAssignmentId",unit."id" AS "classUnitId",
+        unit."name" AS "className",staff."staff_role" AS "staffRole",
+        target."subject_user_id" AS "targetUserId"
+      FROM "huiteacher_evaluation_events" event
+      JOIN "huiteacher_evaluation_targets" target
+        ON target."organization_id"=event."organization_id"
+        AND target."id"=event."target_id"
+        AND target."kind"='PERSON' AND target."status"='ACTIVE'
+        AND target."subject_user_id" IS NOT NULL
+      JOIN "organization_memberships" teacher
+        ON teacher."organization_id"=event."organization_id"
+        AND teacher."user_id"=target."subject_user_id"
+        AND teacher."valid_from"<=statement_timestamp()
+        AND (teacher."valid_until" IS NULL OR teacher."valid_until">statement_timestamp())
+      JOIN "organization_persona_grants" persona
+        ON persona."organization_id"=teacher."organization_id"
+        AND persona."membership_id"=teacher."id"
+        AND persona."persona"='TEACHER' AND persona."revoked_at" IS NULL
+      JOIN "organization_staff_class_assignments" staff
+        ON staff."organization_id"=teacher."organization_id"
+        AND staff."membership_id"=teacher."id"
+        AND staff."valid_from"<=statement_timestamp()
+        AND (staff."valid_until" IS NULL OR staff."valid_until">statement_timestamp())
+      JOIN "organization_units" unit
+        ON unit."organization_id"=staff."organization_id"
+        AND unit."id"=staff."class_unit_id" AND unit."unit_kind"='CLASS'
+      WHERE event."organization_id"=${input.organizationId}
+        AND event."id"=${input.eventId}
+        AND event."kind"='ASSESSMENT' AND event."status"='DRAFT'
+      ORDER BY unit."name",staff."id" LIMIT 101
+    `
+    return {list:rows.slice(0,100),truncated:rows.length>100}
+  })
+}
+
 /**
  * A student's Teacher evaluation is about exactly one school-verified
  * educator in exactly one active CLASS. This configuration does not permit

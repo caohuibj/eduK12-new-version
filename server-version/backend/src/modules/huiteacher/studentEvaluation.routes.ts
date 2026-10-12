@@ -7,7 +7,8 @@ import { requireRecentTeacherMfa,requireTeacherProductAdmin } from './authority'
 import { createRedisRateLimiter } from '../../middleware/redisRateLimit'
 import {
   configureHuiteacherStudentEvaluation,readHuiteacherStudentEvaluation,
-  previewHuiteacherStudentEvaluation,HuiteacherStudentEvaluationError,
+  previewHuiteacherStudentEvaluation,listHuiteacherStudentEvaluationCandidates,
+  HuiteacherStudentEvaluationError,
 } from './studentEvaluation.service'
 
 const router=Router()
@@ -49,6 +50,10 @@ router.use((_req,res,next)=>{
 })
 router.use(authenticateHuiteacher)
 const path='/organizations/:organizationId/evaluation-events/:eventId/student-evaluation'
+router.get(path+'/candidates',requireTeacherProductAdmin,requireRecentTeacherMfa,
+  wrap(req=>listHuiteacherStudentEvaluationCandidates({
+    ...params.parse(req.params),actorUserId:req.user!.userId,
+  })))
 router.get(path,requireTeacherProductAdmin,wrap(req=>
   readHuiteacherStudentEvaluation({
     ...params.parse(req.params),actorUserId:req.user!.userId,
