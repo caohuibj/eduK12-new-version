@@ -41,7 +41,7 @@ export function validateSurveyScaleTimings(
     return undefined
   }
   if(!isRecord(raw)||Object.keys(raw).length>30)
-    reject('itemTimings','逐题时间必须按研究量表分组')
+    throw new SurveyScaleTimingError('itemTimings','逐题时间必须按研究量表分组')
   if(Buffer.byteLength(JSON.stringify(raw),'utf8')>400000)
     reject('itemTimings','逐题计时元数据超过 400KB 安全预算')
   const validated:SurveyScaleTimings={}
@@ -51,8 +51,10 @@ export function validateSurveyScaleTimings(
     if(!unit||unit.kind!=='SCALE'||
       (unit.displayDefinition as ScaleDraft).presentationMode!=='ONE_BY_ONE'||
       !isRecord(answers[instrumentKey]))
-      reject('itemTimings.'+instrumentKey,'只有本次实际作答的逐题 Scale 可以提交计时')
-    if(!isRecord(items))reject('itemTimings.'+instrumentKey,'量表时间必须以题目编码索引')
+      throw new SurveyScaleTimingError('itemTimings.'+instrumentKey,
+        '只有本次实际作答的逐题 Scale 可以提交计时')
+    if(!isRecord(items))
+      throw new SurveyScaleTimingError('itemTimings.'+instrumentKey,'量表时间必须以题目编码索引')
     const frozen=new Set((unit.displayDefinition as ScaleDraft).items.map(q=>q.itemKey))
     const answered=answers[instrumentKey] as Record<string,unknown>
     const projected:Record<string,SurveyScaleItemTimingV1>={}
@@ -63,7 +65,8 @@ export function validateSurveyScaleTimings(
         reject('itemTimings.'+instrumentKey+'.'+itemKey,'未知、未答或未展示题目不允许计时')
       const parsed=surveyScaleTimingItemSchema.safeParse(timing)
       if(!parsed.success)
-        reject('itemTimings.'+instrumentKey+'.'+itemKey,'逐题时间字段不符合整数毫秒与质量标记契约')
+        throw new SurveyScaleTimingError('itemTimings.'+instrumentKey+'.'+itemKey,
+          '逐题时间字段不符合整数毫秒与质量标记契约')
       const row=parsed.data
       if(row.firstResponseMs!==null&&
         (row.activeTimeMs<row.firstResponseMs||row.visits<1))
