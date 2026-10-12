@@ -26,7 +26,7 @@ async function validEducationActor(tx:Tx,userId:string){
   if(!rows.length)denied('HUITEACHER_OBSERVER_ACCOUNT_REQUIRED',403)
 }
 async function schoolEvent(tx:Tx,input:{
-  organizationId:string;eventId:string;allowDraft?:boolean
+  organizationId:string;eventId:string;allowDraft?:boolean;allowClosed?:boolean
 }){
   const rows=await tx.$queryRaw<Array<{id:string;status:string;kind:string}>>`
     SELECT event."id",event."status",event."kind"
@@ -43,7 +43,9 @@ async function schoolEvent(tx:Tx,input:{
   const e=rows[0]
   if(!e||!['CLASSROOM','MEETING','TEACHING_RESEARCH','FIELD_VISIT'].includes(e.kind))
     denied('HUITEACHER_FIELD_EVENT_UNAVAILABLE',404)
-  if(e.status!=='OPEN'&&!(input.allowDraft&&e.status==='DRAFT'))
+  if(e.status!=='OPEN'
+    &&!(input.allowDraft&&e.status==='DRAFT')
+    &&!(input.allowClosed&&e.status==='CLOSED'))
     denied('HUITEACHER_FIELD_EVENT_NOT_OPEN')
   return e
 }
@@ -88,7 +90,7 @@ export async function inviteHuiteacherObserver(input:{
   return prisma.$transaction(async tx=>{
     await manager(tx,input.organizationId,input.actorUserId)
     await schoolEvent(tx,{organizationId:input.organizationId,
-      eventId:input.eventId,allowDraft:true})
+      eventId:input.eventId,allowDraft:true,allowClosed:true})
     await validEducationActor(tx,input.observerUserId)
     const where={organizationId_eventId_observerUserId:{
       organizationId:input.organizationId,eventId:input.eventId,
@@ -138,7 +140,7 @@ export async function acceptHuiteacherObserver(input:{userId:string;invitationId
     if(!grant||grant.status!=='INVITED')
       denied('HUITEACHER_OBSERVER_INVITATION_UNAVAILABLE',404)
     await schoolEvent(tx,{organizationId:grant.organizationId,
-      eventId:grant.eventId,allowDraft:true})
+      eventId:grant.eventId,allowDraft:true,allowClosed:true})
     const changed=await tx.huiteacherObserverGrant.update({
       where:{id:input.invitationId},
       data:{status:'ACCEPTED',acceptedAt:new Date(),revision:{increment:1}},
@@ -159,7 +161,7 @@ export async function listHuiteacherObserverGrants(input:{
   return prisma.$transaction(async tx=>{
     await manager(tx,input.organizationId,input.actorUserId)
     await schoolEvent(tx,{organizationId:input.organizationId,
-      eventId:input.eventId,allowDraft:true})
+      eventId:input.eventId,allowDraft:true,allowClosed:true})
     const list=await tx.huiteacherObserverGrant.findMany({
       where:{organizationId:input.organizationId,eventId:input.eventId},
       orderBy:{createdAt:'desc'},take:101,

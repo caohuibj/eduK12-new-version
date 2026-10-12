@@ -51,7 +51,7 @@ export function HuiteacherFieldManager({organizationId,eventId,eventStatus,api}:
     <h4>现场观察 · 专家／同行授权</h4>
     <p className="ht-muted">仅适用于这一次活动。邀请、撤销及查看正式反馈需要近期 Teacher MFA；私人反思永不在此显示。</p>
     {notice&&<p role="status" className="ht-notice">{notice}</p>}
-    {['DRAFT','OPEN'].includes(eventStatus)&&<div className="ht-inline">
+    {['DRAFT','OPEN','CLOSED'].includes(eventStatus)&&<div className="ht-inline">
       <label className="ht-field"><span>观察者教育账号 ID</span>
         <input value={observerId} onChange={e=>setObserverId(e.target.value)}
           placeholder="已核验 User ID" autoComplete="off"/></label>
@@ -61,10 +61,15 @@ export function HuiteacherFieldManager({organizationId,eventId,eventStatus,api}:
         </select></label>
       <label className="ht-field"><span>授权到期</span>
         <input type="datetime-local" value={expiresAt} onChange={e=>setExpiresAt(e.target.value)}/></label>
-      <button type="button" disabled={busy||!observerId||!expiresAt} onClick={invite}>发送任务邀请</button>
+      <button type="button" disabled={busy||!observerId||!expiresAt} onClick={invite}>
+        {eventStatus==='CLOSED'?'续期协商确认授权':'发送任务邀请'}
+      </button>
+      {eventStatus==='CLOSED'&&<p className="ht-muted">
+        活动已关闭，仅允许延长既有专家的共识确认资格；不可新建现场观察或修改已提交的原稿。
+      </p>}
     </div>}
     <div className="ht-inline">
-      {['DRAFT','OPEN'].includes(eventStatus)&&
+      {['DRAFT','OPEN','CLOSED'].includes(eventStatus)&&
         <button type="button" disabled={busy} onClick={()=>run(readGrants)}>查看／管理邀请名单</button>}
       <button type="button" disabled={busy} onClick={readFormal}>查看已提交的正式观察反馈</button>
     </div>
