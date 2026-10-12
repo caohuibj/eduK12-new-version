@@ -3,7 +3,10 @@ import type { SurveyPublicImage } from './builder.types'
 import { visibleFormKeys,sanitizeFormAnswers } from './form-visibility'
 import { ProfessionalFormAnswer,type ProfessionalAnswer } from './ProfessionalFormAnswer'
 import { FormChoiceExtras,hasSelectedOther,toggleFormMultiple } from './FormChoiceExtras'
-import {saveLocalSurveyDraft,restoreLocalSurveyDraft,clearLocalSurveyDraft} from './local-answer-draft'
+import {saveLocalSurveyDraft,restoreLocalSurveyDraftEnvelope,clearLocalSurveyDraft} from './local-answer-draft'
+import {SurveyTimedScale} from './SurveyTimedScale'
+import {SurveyScaleTimingTracker,sealSurveyScaleTimings,
+  type SurveyWaveScaleTimings} from './survey-scale-timing'
 import { SurveyParticipantImage,type SurveyImageProof } from './SurveyParticipantImage'
 import { resolveClientSurveyFlow,type PublicFlow } from './flow.client'
 import { resolveSurveyCheckpointDraft,sameSurveyCheckpointAnswers } from './checkpoint-recovery'
@@ -20,6 +23,7 @@ type Question={itemKey:string;questionKey?:string;type:string;prompt:string;imag
   total?:number;timeZone?:string;textValidation?:'EMAIL'|'DIGITS'|'ALPHANUMERIC';
   otherOptionKey?:string;otherMaxLength?:number;exclusiveOptionKeys?:string[]}
 type Unit={kind:'FORM'|'SCALE'|'SJT';instrumentKey:string;title:string;image?:SurveyPublicImage;
+  presentationMode?:'ONE_BY_ONE'|'ALL_AT_ONCE';
   stimulus?:string;scenarioTitle?:string;
   pages?:{pageKey:string;title:string;questions:Question[]}[];
   responseOptions?:Choice[];
@@ -205,6 +209,9 @@ export default function SurveyPublicApp(){
   const [selectedWave,setSelectedWave]=useState<Wave|null>(null),[agreed,setAgreed]=useState(false)
   const [task,setTask]=useState<Task|null>(null),[answers,setAnswers]=useState<Record<string,Record<string,Answer>>>({})
   const [formPages,setFormPages]=useState<Record<string,number>>({})
+  const [toolStep,setToolStep]=useState(0)
+  const [itemTimings,setItemTimings]=useState<SurveyWaveScaleTimings>({})
+  const timingTrackers=useRef<Record<string,SurveyScaleTimingTracker>>({})
   const [flowStep,setFlowStep]=useState(0),[screenedOut,setScreenedOut]=useState(false)
   const [checkpointRevision,setCheckpointRevision]=useState(0)
   const [checkpointOverwritePending,setCheckpointOverwritePending]=useState(false)
@@ -220,10 +227,10 @@ export default function SurveyPublicApp(){
   useEffect(()=>{
     if(!task||task.status!=='STARTED'||!attemptId)return
     const timeout=window.setTimeout(()=>{
-      saveLocalSurveyDraft(publicId,attemptId,task.definitionDigest,answers)
+      saveLocalSurveyDraft(publicId,attemptId,task.definitionDigest,answers,itemTimings)
     },450)
     return ()=>window.clearTimeout(timeout)
-  },[publicId,attemptId,task,answers])
+  },[publicId,attemptId,task,answers,itemTimings])
   useEffect(()=>{
     document.title='Huisurvey · 研究参与'
     // Recruitment capability stays in memory, not browser history/Referrer.
@@ -275,43 +282,46 @@ export default function SurveyPublicApp(){
     const data=await publicApi<Task>(base+'/attempts/'+id+'/task','POST',{
       ...(code?{researchCode:code}:{}),accessCredential:secret,
     })
-    setAttemptId(id)
-    setSubmissionId(crypto.randomUUID())
-    setTask(data);setFormPages({});setFlowStep(0);setScreenedOut(false)
-    setCheckpointRevision(0);setCheckpointOverwritePending(false)
-    if(data.status==='COMPLETED'){
-      clearLocalSurveyDraft(publicId,id)
-      setAnswers({})
-    }else{
-      const saved=restoreLocalSurveyDraft<Record<string,Record<string,Answer>>>(
-        publicId,id,data.definitionDigest,
-      )
-      setAnswers(saved||{})
-      if(saved)setNotice('已恢复本标签页暂存的未提交答案。请复核后再提交。')
-      if(data.checkpointPolicy?.enabled){
-        try{
-          const remote=await publicApi<{revision:number;checkpoint:{
-            answers:Record<string,Record<string,Answer>>;updatedAt:string;expiresAt:string
-          }|null}>(base+'/attempts/'+id+'/checkpoint/read','POST',{
-            ...(code?{researchCode:code}:{}),accessCredential:secret,
-          })
-          const clash=!!saved&&!!remote.checkpoint&&
-            !sameSurveyCheckpointAnswers(saved,remote.checkpoint.answers)
-          const useRemote=!clash||window.confirm(
-            '检测到本标签页草稿与服务器加密存档不同。确定：读取服务器版本；取消：保留本地版本（若想写回服务器，保存前还需明确确认覆盖）。',
-          )
-          const plan=resolveSurveyCheckpointDraft(saved,remote,useRemote)
-          setCheckpointRevision(plan.revision)
-          setCheckpointOverwritePending(plan.requiresOverwriteConfirmation)
-          setAnswers(plan.answers)
-          if(plan.conflict)setNotice(useRemote
-            ?'已选用服务器上最新的加密草稿；本地旧答案将不再自动覆盖它。'
-            :'已保留本地答案；若稍后需要覆盖服务器存档，必须再次明确确认。')
-          else if(remote.checkpoint&&!saved)setNotice(
-            '已使用研究私密凭证恢复加密服务器存档；该暂存内容仍不是正式提交。')
-        }catch(e){setNotice('无法恢复服务器临时存档：'+parseError(e))}
-      }
+    // Reconcile complete local+remote envelopes before mounting any timed
+    // Scale runner. An older local revision can never silently replace remote.
+    const saved=data.status==='COMPLETED'?null:
+      restoreLocalSurveyDraftEnvelope<Record<string,Record<string,Answer>>>(
+        publicId,id,data.definitionDigest)
+    let restoredAnswers=saved?.answers??{}
+    let restoredTimings=(saved?.itemTimings??{}) as SurveyWaveScaleTimings
+    let restoredRevision=0,overwritePending=false
+    if(data.status==='COMPLETED')clearLocalSurveyDraft(publicId,id)
+    else if(saved)setNotice('已恢复本标签页暂存的未提交答案。请复核后再提交。')
+    if(data.status==='STARTED'&&data.checkpointPolicy?.enabled){
+      try{
+        const remote=await publicApi<{revision:number;checkpoint:{
+          answers:Record<string,Record<string,Answer>>;
+          itemTimings?:SurveyWaveScaleTimings;updatedAt:string;expiresAt:string
+        }|null}>(base+'/attempts/'+id+'/checkpoint/read','POST',{
+          ...(code?{researchCode:code}:{}),accessCredential:secret,
+        })
+        const conflict=!!saved&&!!remote.checkpoint&&(
+          !sameSurveyCheckpointAnswers(saved.answers,remote.checkpoint.answers)||
+          !sameSurveyCheckpointAnswers(restoredTimings,remote.checkpoint.itemTimings??{}))
+        const useRemote=!conflict||window.confirm(
+          '本标签页草稿与服务器加密存档的答案或逐题时间不同。确定：选用服务器版本；取消：保留本地版本，覆盖服务器前须再次明确确认。',
+        )
+        const plan=resolveSurveyCheckpointDraft(saved?.answers??null,remote,useRemote)
+        restoredAnswers=plan.answers
+        restoredRevision=plan.revision
+        overwritePending=conflict&&!useRemote
+        restoredTimings=useRemote?(remote.checkpoint?.itemTimings??{}):restoredTimings
+        if(conflict)setNotice(useRemote
+          ?'已选用服务器版本的答案与逐题计时，未自动覆盖较新的存档。'
+          :'保留了本地答案及计时；若要覆盖服务器存档，保存前需要再次确认。')
+        else if(remote.checkpoint&&!saved)setNotice('已恢复服务器上的加密答案及已有计时记录。')
+      }catch(e){setNotice('无法恢复服务器临时存档：'+parseError(e))}
     }
+    timingTrackers.current={}
+    setAttemptId(id);setSubmissionId(crypto.randomUUID())
+    setTask(data);setFormPages({});setFlowStep(0);setToolStep(0);setScreenedOut(false)
+    setCheckpointRevision(restoredRevision);setCheckpointOverwritePending(overwritePending)
+    setAnswers(restoredAnswers);setItemTimings(restoredTimings)
     if(data.status==='COMPLETED'){
       const result=await publicApi<General>(base+'/attempts/'+id+'/general','POST',{
         ...(code?{researchCode:code}:{}),accessCredential:secret,
