@@ -8,6 +8,7 @@ import { transitionResearchProject } from '../../modules/survey/project-lifecycl
 import { prepareWave,openWave,updateWaveEntryToken,transitionWave } from '../../modules/survey/waves.publish'
 import { joinLinkedStudy,startLinkedWave,getPublicResearchInfo,listOwnLinkedWaves } from '../../modules/survey/admission.service'
 import { submitResearchFinal,readGeneralForOwnAttempt } from '../../modules/survey/final.service'
+import {saveSurveyCheckpoint,readSurveyCheckpoint} from '../../modules/survey/checkpoint.service'
 import { getOwnResearchTask } from '../../modules/survey/task.public'
 import { matchedWaveCounts,waveOverview } from '../../modules/survey/analytics.read'
 import { loadSurveySource } from '../../modules/survey/analytics.source'
@@ -71,12 +72,13 @@ async function instrument(kind:'FORM'|'SCALE'|'SJT',definition:FormDraft|ScaleDr
   await updateDraft(ownerId,projectId,id,{revision:0,title:kind+' 自编研究',definition})
   return id
 }
-async function wave(title:string,ids:string[],allowNewParticipants=false){
+async function wave(title:string,ids:string[],allowNewParticipants=false,checkpoint=false){
   const w=await createWave(ownerId,projectId,{
     requestId:randomUUID(),title,consentText:consent,
     generalText:'感谢完成本轮研究。本研究结果将汇总分析，不提供个人诊断。',
     linkageNoticeConfirmed:true,
     instrumentIds:ids,allowNewParticipants,
+    ...(checkpoint?{checkpointPolicy:{schemaVersion:1 as const,enabled:true as const,ttlHours:2}}:{}),
   })
   const prepared=await prepareWave(ownerId,projectId,w.id,w.revision)
   expect(prepared.runtimeReady).toBe(true)
@@ -963,7 +965,7 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
   it('persists frozen per-item Scale timing and exports real millisecond columns',async()=>{
     const timed:ScaleDraft={...structuredClone(scale),presentationMode:'ONE_BY_ONE'}
     const draftId=await instrument('SCALE',timed)
-    const w=await wave('逐题计时量表真实 FINAL',[draftId],true)
+    const w=await wave('逐题计时量表真实 FINAL',[draftId],true,true)
     const linked=await joinLinkedStudy({publicId:w.publicId,waveId:w.id,
       entryToken:w.entrySecret,consent:true,consentVersion:1})
     const task=await getOwnResearchTask({publicId:w.publicId,attemptId:linked.attemptId,
@@ -981,11 +983,29 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
           interrupted:true,recoveredWithoutClock:true},
       },
     }
+    const proof={publicId:w.publicId,attemptId:linked.attemptId,
+      researchCode:linked.researchCode,accessCredential:linked.accessCredential}
+    const checkpoint=await saveSurveyCheckpoint(proof,{
+      revision:0,answers:{[instrumentKey]:{itemone:'o4'}},
+      itemTimings:{[instrumentKey]:{itemone:rows[instrumentKey].itemone}},
+    })
+    expect(checkpoint.revision).toBe(1)
+    const restored=await readSurveyCheckpoint(proof)
+    expect(restored.checkpoint?.answers).toEqual({[instrumentKey]:{itemone:'o4'}})
+    expect(restored.checkpoint?.itemTimings).toEqual({
+      [instrumentKey]:{itemone:rows[instrumentKey].itemone},
+    })
+    const cipher=await db.surveyAttemptCheckpoint.findFirstOrThrow({
+      where:{attemptId:linked.attemptId},
+    })
+    expect(cipher.contentCipher).not.toContain('1234')
     const submissionId=randomUUID()
     const final=await submitResearchFinal({publicId:w.publicId,attemptId:linked.attemptId,
       researchCode:linked.researchCode,accessCredential:linked.accessCredential,
       submissionId,answers,itemTimings:rows})
     expect(final.status).toBe('COMPLETED')
+    expect(await db.surveyAttemptCheckpoint.count({where:{attemptId:linked.attemptId}}))
+      .toBe(0)
     const replay=await submitResearchFinal({publicId:w.publicId,attemptId:linked.attemptId,
       researchCode:linked.researchCode,accessCredential:linked.accessCredential,
       submissionId,answers,itemTimings:rows})
