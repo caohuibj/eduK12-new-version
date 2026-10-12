@@ -62,8 +62,9 @@ describe('Survey frozen one-by-one response timing',()=>{
     tracker.enter('constructor',true,100)
     tracker.answer('constructor',undefined,'o2',350)
     const observed=tracker.snapshot()
-    expect(observed.constructor.firstResponseMs).toBe(250)
-    expect(sealSurveyScaleTimings(['constructor'],{constructor:'o2'},observed).constructor.firstResponseMs).toBe(250)
+    expect(Object.values(observed)[0]?.firstResponseMs).toBe(250)
+    const sealed=sealSurveyScaleTimings(['constructor'],{constructor:'o2'},observed)
+    expect(Object.values(sealed)[0]?.firstResponseMs).toBe(250)
     expect(Object.keys(sealSurveyScaleTimings(['constructor'],{},{}))).toHaveLength(0)
   })
   it('keeps same final snapshot as a stable rounded, nonnegative integer payload',()=>{
