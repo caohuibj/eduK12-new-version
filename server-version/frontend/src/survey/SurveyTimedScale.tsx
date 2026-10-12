@@ -1,4 +1,4 @@
-import {useEffect,useRef,useState} from 'react'
+import {useEffect,useRef} from 'react'
 import {SurveyScaleTimingTracker,type SurveyScaleTimings} from './survey-scale-timing'
 
 export type SurveyTimedScaleUnit={
@@ -8,13 +8,14 @@ export type SurveyTimedScaleUnit={
 }
 /** One active Scale item at a time; answers and telemetry stay in local memory
  * until the same authoritative Survey FINAL. No per-question HTTP traffic. */
-export function SurveyTimedScale({unit,answer,onAnswer,tracker,onTiming}:{
+export function SurveyTimedScale({unit,answer,onAnswer,tracker,onTiming,index,onIndexChange}:{
   unit:SurveyTimedScaleUnit;answer:Record<string,unknown>
   onAnswer:(itemKey:string,optionKey:string)=>void
   tracker:SurveyScaleTimingTracker
   onTiming:(next:SurveyScaleTimings)=>void
+  index:number
+  onIndexChange:(index:number)=>void
 }){
-  const [index,setIndex]=useState(0)
   const current=unit.items[Math.min(index,unit.items.length-1)]
   const timingCallback=useRef(onTiming)
   timingCallback.current=onTiming
@@ -68,9 +69,9 @@ export function SurveyTimedScale({unit,answer,onAnswer,tracker,onTiming}:{
     </fieldset>
     <nav aria-label="量表题目导航" className="flex justify-between gap-3">
       <button type="button" className="btn-secondary" disabled={index===0}
-        onClick={()=>setIndex(i=>Math.max(0,i-1))}>上一题</button>
+        onClick={()=>onIndexChange(Math.max(0,index-1))}>上一题</button>
       <button type="button" className="btn-secondary" disabled={index>=unit.items.length-1}
-        onClick={()=>setIndex(i=>Math.min(unit.items.length-1,i+1))}>下一题</button>
+        onClick={()=>onIndexChange(Math.min(unit.items.length-1,index+1))}>下一题</button>
     </nav>
     <p className="text-xs text-slate-600">返回修改答案会独立记录修改次数与重访时间；切换后台会标记计时中断。逐题时间不会用于诊断或自动评分。</p>
   </section>
