@@ -4,6 +4,7 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { validateSurveyDraft,type FormDraft } from '../survey/builder.definition'
 import type { RunResourcePolicy,RunResourceRef } from '../assessment-run/resourceAuthority'
 import type { ResultDisclosureContractV1 } from '../assessment-policy/result-disclosure'
+import {teacherResourceMinimum} from './privacyV2'
 
 export const TEACHER_FORM_RESOURCE_PREFIX='huiteacher-form:' as const
 export const TEACHER_FORM_RUNTIME_KIND='HUITEACHER_FORM_V2' as const
@@ -75,8 +76,8 @@ export async function resolveTeacherFormResourcePolicy(ref:RunResourceRef,db:Db=
     relationshipKinds:['SELF'],perspectives:['SELF_REPORT'],
     analysisMode:'COHORT_AGGREGATE',
     visibilityPolicyKey:'HUITEACHER_FORM_GROUP_V1',
-    minimumRespondents:TEACHER_FORM_MIN_RESPONDENTS,
-    resultDisclosure:disclosure,
+    minimumRespondents:teacherResourceMinimum(),
+    resultDisclosure:{...disclosure,minimumRespondents:teacherResourceMinimum()},
     initiationModes:['ORG_ASSIGN'],
     runtimeLaunchTarget:{kind:TEACHER_FORM_RUNTIME_KIND,ref:form.id},
   }

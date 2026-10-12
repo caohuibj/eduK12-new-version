@@ -10,6 +10,7 @@ import {
 } from '../assessment-run/resourceAuthority'
 import { assertRegisteredResourceUse } from '../assessment-run/registeredResources'
 import { teacherFormResourceId } from './formRunResource'
+import {teacherResourceMinimum,teacherPrivacyV2Enabled} from './privacyV2'
 import { teacherScaleResource,listTeacherScaleCatalog } from './scaleLicense.service'
 import { assertCurrentRunManagerBoundary,assertCurrentRunPublisherBoundary } from '../assessment-run/resourceBoundary'
 
@@ -92,12 +93,16 @@ export async function addTeacherRunTrack(input:Key&{
   if(!policy.subjectRoles.includes('TEACHER')
     ||!input.requestedPolicy.subjectRoles.includes('TEACHER'))
     fail('HUITEACHER_RESOURCE_TARGET_UNSUPPORTED',403)
-  assertRunTrackNarrowing(policy,input.requestedPolicy)
+  const requestedPolicy=input.resource.family==='FORM'
+    &&teacherFormResourceId(input.resource)&&teacherPrivacyV2Enabled()
+    ?{...input.requestedPolicy,minimumRespondents:teacherResourceMinimum()}
+    :input.requestedPolicy
+  assertRunTrackNarrowing(policy,requestedPolicy)
   await assertRegisteredResourceUse(input.resource,input.actorUserId,prisma,false,{organizationId:input.organizationId,runId:link.runId})
   return addAssessmentRunTrackDraft({
     organizationId:input.organizationId,runId:link.runId,
     resource:input.resource,subjectSelector:input.subjectSelector,
-    respondentSelector:input.respondentSelector,requestedPolicy:input.requestedPolicy,
+    respondentSelector:input.respondentSelector,requestedPolicy,
   })
 }
 export async function previewTeacherRun(input:Key&{expectedVersion:number}){

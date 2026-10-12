@@ -65,9 +65,18 @@ export function reportPrivacyCatalog(product:EducationProduct, scenario:PrivacyS
       '工具科学许可、参与者告知和审计',
     ],
     // PR1 saves future preferences; PR2/PR3 alone activate the reporting consumers.
-    reportConsumerActive:false as const,
-    status:'PREFERENCES_ONLY' as const,
+    reportConsumerActive:product==='HUITEACHER'
+      &&process.env.REPORT_PRIVACY_PREFERENCES_V1_ENABLED==='true'
+      &&process.env.REPORT_PRIVACY_TEACHER_V2_ENABLED==='true',
+    status:product==='HUITEACHER'
+      &&process.env.REPORT_PRIVACY_PREFERENCES_V1_ENABLED==='true'
+      &&process.env.REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'
+        ?'TEACHER_V2_ACTIVE' as const:'PREFERENCES_ONLY' as const,
     sensitiveEnforced:sensitive,
-    baselineNote:'此版本仅提供默认偏好保存与预览。现有报告门禁未改变。',
+    baselineNote:product==='HUITEACHER'
+      &&process.env.REPORT_PRIVACY_PREFERENCES_V1_ENABLED==='true'
+      &&process.env.REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'
+        ?'新发布的 Teacher Form Run 自动冻结当前偏好；旧 Run 继续执行严格策略。'
+        :'当前仅提供默认偏好保存与预览。现有报告门禁未改变。',
   }
 }

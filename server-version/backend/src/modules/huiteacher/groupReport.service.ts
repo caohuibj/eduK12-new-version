@@ -6,6 +6,10 @@ import { resolveEducationProductMemberScope } from '../organization/educationPro
 import { resolvePublishedTeacherForm,teacherFormResourceRef,
   TEACHER_FORM_MIN_RESPONDENTS } from './formRunResource'
 import type { FormDraft } from '../survey/builder.definition'
+import type {PrivacyOptions} from '../report-privacy/schema'
+import {teacherFrozenPolicy,teacherScopeKey,teacherReportFloor,
+  readReleasedTeacherReport,recordTeacherReportRelease,lockTeacherDisclosure}
+  from './privacyReleaseV2.service'
 
 export class HuiteacherGroupReportError extends Error{
   constructor(public readonly code:string,public readonly statusCode=409){
@@ -101,7 +105,7 @@ export const recordProtectedFormAnswers=(items:ItemAccumulator[],
     }
   }
 }
-export const discloseProtectedFormItems=(items:ItemAccumulator[],count:number)=>{
+export const discloseProtectedFormItems=(items:ItemAccumulator[],count:number,options?:PrivacyOptions)=>{
   return items.map(item=>{
     if(!reportableChoices.has(item.type))
       return {itemKey:item.itemKey,prompt:item.prompt,type:item.type,
@@ -122,13 +126,24 @@ export const discloseProtectedFormItems=(items:ItemAccumulator[],count:number)=>
     if(respondentN!==count)
       return {itemKey:item.itemKey,prompt:item.prompt,type:item.type,
         status:'WITHHELD' as const,reason:'SOURCE_INTEGRITY' as const}
-    // Exact category counts or their complements below five permit a
-    // membership-differencing attack. Suppress the WHOLE question, not only
-    // one cell, for both one-choice and multiple-choice questions.
-    if(cells.some(x=>x.count>0&&x.count<SMALL_CELL_FLOOR
-      ||multi&&x.count<count&&count-x.count<SMALL_CELL_FLOOR))
+    const small=cells.some(x=>x.count>0&&x.count<SMALL_CELL_FLOOR
+      ||multi&&x.count<count&&count-x.count<SMALL_CELL_FLOOR)
+    if(options?.restrictItemDistributions)
+      return {itemKey:item.itemKey,prompt:item.prompt,type:item.type,
+        status:'WITHHELD' as const,reason:'POLICY_ITEM_DISTRIBUTION' as const}
+    // Legacy has the original fail-closed threshold. New V2 may opt out of
+    // these EXTRA aggregate restrictions, never of source integrity.
+    if((options?.withholdSmallCells??true)&&small)
       return {itemKey:item.itemKey,prompt:item.prompt,type:item.type,
         status:'WITHHELD' as const,reason:'SMALL_CELL' as const}
+    if(options?.restrictedStatisticsProjection)
+      return {itemKey:item.itemKey,prompt:item.prompt,type:item.type,
+        status:'READY' as const,
+        cells:cells.map(x=>({key:x.key,label:x.label,
+          percentage:Math.round(x.count*10/count)*10})),
+        precision:'ROUNDED_10_PERCENT' as const,
+        ...(multi?{selectionMode:'NON_EXCLUSIVE' as const}:{}),
+      }
     return {itemKey:item.itemKey,prompt:item.prompt,type:item.type,
       status:'READY' as const,cells,
       ...(multi?{selectionMode:'NON_EXCLUSIVE' as const}:{}),
@@ -141,9 +156,11 @@ export const discloseProtectedFormItems=(items:ItemAccumulator[],count:number)=>
  * The Run/Event must be fully CLOSED with no STARTED or ASSIGNED work.
  */
 export async function readTeacherFormGroupReport(input:{
-  organizationId:string;eventId:string;formId:string;actorUserId:string
+  organizationId:string;eventId:string;formId:string;actorUserId:string;
+  publishV2?:boolean
 }){
   return prisma.$transaction(async tx=>{
+    if(input.publishV2)await lockTeacherDisclosure(tx,input.organizationId)
     // Serialize product suspension: a valid School ORG_ADMIN is not enough.
     const scope=await resolveEducationProductMemberScope({
       organizationId:input.organizationId,actorUserId:input.actorUserId,
@@ -163,9 +180,11 @@ export async function readTeacherFormGroupReport(input:{
     if(!entitled.length)reject('HUITEACHER_GROUP_PRODUCT_INACTIVE',403)
     const linkage=await tx.$queryRaw<Array<{
       runId:string;eventStatus:string;runStatus:string;definitionDigest:string;
+      eventClosedAt:Date|null;runClosedAt:Date|null
     }>>`
       SELECT link."run_id" AS "runId",event."status" AS "eventStatus",
-        run."status" AS "runStatus",
+        run."status" AS "runStatus",event."closed_at" AS "eventClosedAt",
+        run."closed_at" AS "runClosedAt",
         form."definition_digest" AS "definitionDigest"
       FROM "huiteacher_evaluation_run_links" link
       JOIN "huiteacher_evaluation_events" event
@@ -195,6 +214,29 @@ export async function readTeacherFormGroupReport(input:{
       teacherFormResourceRef(input.formId,source.definitionDigest),tx)
     if(form.organizationId!==input.organizationId)
       reject('HUITEACHER_REPORT_SOURCE_UNAVAILABLE',403)
+    const frozen=await teacherFrozenPolicy(tx,{
+      organizationId:input.organizationId,runId:source.runId,
+      scenario:'TEACHER_ADULT_FORM_GROUP'})
+    const scopeKey=frozen?teacherScopeKey({
+      organizationId:input.organizationId,runId:source.runId,eventId:input.eventId,
+      formId:input.formId,scenario:'TEACHER_ADULT_FORM_GROUP'}):null
+    if(frozen&&scopeKey){
+      const released=await readReleasedTeacherReport(tx,{
+        organizationId:input.organizationId,runId:source.runId,
+        policySnapshotId:frozen.policySnapshotId,scopeKey,
+        reportKind:'TEACHER_ADULT_FORM_GROUP'})
+      if(released)return released
+      if(!input.publishV2)reject('HUITEACHER_REPORT_AWAITING_RELEASE',409)
+      if(frozen.options.releaseDelayHours===24&&(!source.eventClosedAt||!source.runClosedAt
+        ||Date.now()-source.eventClosedAt.getTime()<86_400_000
+        ||Date.now()-source.runClosedAt.getTime()<86_400_000))
+        reject('HUITEACHER_REPORT_RELEASE_DELAY',409)
+    }else if(input.publishV2)reject('HUITEACHER_REPORT_V2_RUN_REQUIRED',409)
+    const requiredN=frozen
+      ?await teacherReportFloor(tx,{organizationId:input.organizationId,
+        runId:source.runId,resourceKey:'huiteacher-form:'+input.formId,
+        resourceVersion:source.definitionDigest,options:frozen.options})
+      :TEACHER_FORM_MIN_RESPONDENTS
     const pending=await tx.$queryRaw<Array<{count:number}>>`
       SELECT COUNT(*)::int AS "count" FROM "assessment_run_executions" execution
       JOIN "assessment_run_tracks" track
@@ -207,7 +249,8 @@ export async function readTeacherFormGroupReport(input:{
         AND execution."run_id"=${source.runId}
         AND execution."status" IN ('ASSIGNED','STARTED')
     `
-    if((pending[0]?.count??0)>0)
+    if((pending[0]?.count??0)>0
+      &&(!frozen||frozen.options.requireAllCompleted))
       reject('HUITEACHER_GROUP_PENDING_FINALS',409)
     // Release only the complete exact frozen Run cohort, not a 10-of-11
     // self-selected or attrited subset. Exact counts on partially responding
@@ -235,10 +278,16 @@ export async function readTeacherFormGroupReport(input:{
         AND track."resource_version"=${source.definitionDigest}
     `
     const eligible=population[0]
-    if(!eligible||eligible.assigned<TEACHER_FORM_MIN_RESPONDENTS
+    if(!eligible||eligible.assigned<requiredN
       ||eligible.assigned!==eligible.respondents
-      ||eligible.completed!==eligible.assigned)
+      ||eligible.completed>eligible.assigned
+      ||((!frozen||frozen.options.requireAllCompleted)
+        &&eligible.completed!==eligible.assigned))
       reject('HUITEACHER_GROUP_INCOMPLETE_COHORT',403)
+    if(frozen?.options.protectSmallNonrespondentComplement
+      &&eligible.completed!==eligible.assigned
+      &&eligible.assigned-eligible.completed<5)
+      reject('HUITEACHER_GROUP_ATTRITION_COMPLEMENT_SMALL',403)
     const totals=await tx.$queryRaw<Array<{uniqueRespondents:number;finals:number}>>`
       SELECT COUNT(DISTINCT attempt."respondent_user_id")::int AS "uniqueRespondents",
         COUNT(*)::int AS "finals"
@@ -262,10 +311,11 @@ export async function readTeacherFormGroupReport(input:{
     `
     const n=totals[0]?.uniqueRespondents??0
     const count=totals[0]?.finals??0
-    if(n<TEACHER_FORM_MIN_RESPONDENTS)
+    if(n<requiredN)
       reject('HUITEACHER_GROUP_MINIMUM_N_NOT_MET',403)
     if(count!==n)reject('HUITEACHER_GROUP_DUPLICATE_RESPONDENTS',409)
-    if(count!==eligible.assigned)
+    if(count!==eligible.completed
+      ||(!frozen&&count!==eligible.assigned))
       reject('HUITEACHER_GROUP_INCOMPLETE_COHORT',403)
     if(count>MAX_REPORT_FINALS)
       reject('HUITEACHER_GROUP_CAPACITY_LIMIT',409)
@@ -318,7 +368,7 @@ export async function readTeacherFormGroupReport(input:{
       if(finals.length<PAGE_SIZE)break
     }
     if(seen!==count)reject('HUITEACHER_GROUP_SOURCE_CHANGED',409)
-    const distributions=discloseProtectedFormItems(items,count)
+    const distributions=discloseProtectedFormItems(items,count,frozen?.options)
     // Disclosure is also a WRITE event: for a given school and immutable
     // Form definition, all released waves must use EXACTLY the same frozen
     // respondent population, preventing 10-of-11 / 11-of-12 differencing.
@@ -343,13 +393,14 @@ export async function readTeacherFormGroupReport(input:{
         AND execution."status"='COMPLETED'
       ORDER BY respondent."user_id"
     `
-    if(contributors.length!==eligible.assigned)
+    if(contributors.length!==count)
       reject('HUITEACHER_GROUP_INCOMPLETE_COHORT',403)
     const populationDigest=canonicalHash({
       schemaVersion:1,product:'HUITEACHER',organizationId:input.organizationId,
       definitionDigest:source.definitionDigest,
       users:contributors.map(row=>row.userId),
     })
+    if(!frozen){
     const fence=await tx.$queryRaw<Array<{firstRunId:string}>>`
       INSERT INTO "huiteacher_group_disclosure_ledgers"
         ("organization_id","definition_digest","population_digest","first_run_id")
@@ -364,17 +415,50 @@ export async function readTeacherFormGroupReport(input:{
     `
     if(fence.length!==1)
       reject('HUITEACHER_GROUP_POPULATION_DIFFERENCING_BLOCKED',403)
-
-    return {
+      return {
+        source:'VERIFIED_HUITEACHER_FORM_FINAL' as const,
+        organizationId:input.organizationId,eventId:input.eventId,
+        formId:input.formId,definitionDigest:source.definitionDigest,
+        independentRespondents:n,minimumRespondents:TEACHER_FORM_MIN_RESPONDENTS,
+        reportMode:'FORM_DESCRIPTIVE_AGGREGATE' as const,
+        distributions,withheldFreeText:true,
+        note:'单选/Likert/矩阵/多选按保密条件报告频数；多选为非互斥选择，不将其简单相加为人数。文本与数值／排序题未获正式汇总许可时明确隐藏；不构成诊断或因果解释。',
+      }
+    }
+    if(frozen.options.crossReleaseOverlapGuard){
+      const legacy=await tx.huiteacherGroupDisclosureLedger.findFirst({
+        where:{organizationId:input.organizationId,definitionDigest:source.definitionDigest},
+      })
+      if(legacy&&legacy.populationDigest!==populationDigest)
+        reject('HUITEACHER_GROUP_POPULATION_DIFFERENCING_BLOCKED',403)
+      const earlier=await tx.educationReportReleaseRecord.findMany({
+        where:{organizationId:input.organizationId,
+          reportKind:'TEACHER_ADULT_FORM_GROUP',
+          sourceRunId:{not:source.runId}},
+        select:{effectivePopulationDigest:true},
+      })
+      // Unknown or different digest fails closed in enhanced mode.
+      if(earlier.some(x=>x.effectivePopulationDigest!==populationDigest))
+        reject('HUITEACHER_GROUP_POPULATION_DIFFERENCING_BLOCKED',403)
+    }
+    const projection={
       source:'VERIFIED_HUITEACHER_FORM_FINAL' as const,
       organizationId:input.organizationId,eventId:input.eventId,
       formId:input.formId,definitionDigest:source.definitionDigest,
-      independentRespondents:n,minimumRespondents:TEACHER_FORM_MIN_RESPONDENTS,
+      independentRespondents:frozen.options.restrictedStatisticsProjection?null:n,
+      minimumRespondents:requiredN,
       reportMode:'FORM_DESCRIPTIVE_AGGREGATE' as const,
-      distributions,
-      withheldFreeText:true,
-      note:'单选/Likert/矩阵/多选按保密条件报告频数；多选为非互斥选择，不将其简单相加为人数。文本与数值／排序题未获正式汇总许可时明确隐藏；不构成诊断或因果解释。',
+      distributions,withheldFreeText:true,
+      releasedAt:new Date().toISOString(),
+      privacyPolicy:'FROZEN_TEACHER_V2' as const,
+      note:'正式发布的群体统计快照，不包含个人原始作答、响应时间或开放文本。不构成教师个人绩效或因果结论。',
     }
+    return recordTeacherReportRelease(tx,{
+      organizationId:input.organizationId,runId:source.runId,
+      scopeKey:scopeKey!,policySnapshotId:frozen.policySnapshotId,
+      scenario:'TEACHER_ADULT_FORM_GROUP',actorUserId:input.actorUserId,
+      populationDigest,projection,
+    })
   },{
     isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead,
     maxWait:2000,timeout:30000,

@@ -26,8 +26,8 @@ export function HuiteacherMyStudentFeedback({api}:{api:Api}){
   }
   return <section className="ht-panel" aria-label="被评价教师的学生群体反馈">
     <h2>我的学生群体反馈</h2>
-    <p>仅展示本人被评价且已经关闭的合法活动。评教使用原有学生教育账号，
-      不提供学生的原始答案、自由文本或个人作答时间。</p>
+    <p>仅展示本人被评价且已经关闭的合法活动。新版群体报告由有权学校管理员正式发布后可读；
+      历史评教保持原有披露条件。不提供学生的原始答案、自由文本或个人作答时间。</p>
     {notice&&<p role="status" className="ht-notice">{notice}</p>}
     {sources.length===0?<p className="ht-empty">暂无已关闭、可以申请披露的学生评教活动。</p>:
       <div className="ht-event-list">{sources.map(source=><article className="ht-event"

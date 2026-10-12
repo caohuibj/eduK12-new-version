@@ -2,6 +2,9 @@ import { matchesClassTarget } from '../assessment-policy/target'
 import { campusRunParticipantScope } from '../campus/activity.runScope'
 import { teacherFormResourceId,assertTeacherFormRunUse } from '../huiteacher/formRunResource'
 import {studentFormResourceId,assertStudentFormRunUse} from '../huiteacher/studentFormResource'
+import {teacherPrivacyV2Enabled,teacherResourceMinimum} from '../huiteacher/privacyV2'
+import {freezePrivacyForRunPublication} from '../report-privacy/snapshot.service'
+import type {AuthenticatedPrincipal} from '../../types'
 import { currentClassDeliverySql } from '../organization/deliveryPolicy'
 import { createRunPendingConsent } from './consent'
 import { randomUUID } from 'node:crypto'
@@ -1035,9 +1038,9 @@ export const publishAssessmentRun = async (input: {
       const pairs = await resolvePairs(tx, input.organizationId, track, campusSelected)
       if (pairs.length === 0) throw new RunPublishError('RUN_EMPTY_POPULATION', `Track ${track.id} resolved no eligible actor pairs`, 409)
       if(studentFormResourceId({family:track.resourceFamily,
-        key:track.resourceKey,version:track.resourceVersion})&&pairs.length<10)
+        key:track.resourceKey,version:track.resourceVersion})&&pairs.length<teacherResourceMinimum())
         throw new RunPublishError('STUDENT_FEEDBACK_MINIMUM_POPULATION',
-          'Student feedback may only publish with at least ten distinct eligible students',409)
+          'Student feedback does not meet the protected publication floor',409)
       if(studentFormResourceId({family:track.resourceFamily,
         key:track.resourceKey,version:track.resourceVersion})
         &&pairs.length!==new Set(pairs.map(pair=>pair.respondent.userId)).size)
@@ -1100,6 +1103,34 @@ export const publishAssessmentRun = async (input: {
       }
     }
 
+    // This belongs INSIDE the existing organization/run-locked Serializable
+    // publication transaction: read the current saved preference once and
+    // freeze precisely that decision. Generic publisher entrypoints cannot
+    // bypass a Teacher-bound Form by skipping the Teacher UI.
+    const hasStudentForm=preparedTracks.some(track=>!!studentFormResourceId({
+      family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion}))
+    const hasAdultForm=preparedTracks.some(track=>!!teacherFormResourceId({
+      family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion}))
+    if(hasStudentForm&&hasAdultForm)
+      throw new RunPublishError('TEACHER_REPORT_MIXED_SCENARIO','student/adult Form tracks cannot mix',409)
+    if(teacherPrivacyV2Enabled()&&(hasStudentForm||hasAdultForm)){
+      const teacherActor=await tx.user.findUnique({where:{id:input.actorUserId},
+        select:{id:true,username:true,role:true,platformRole:true,accountDomain:true,
+          tokenVersion:true,mustChangePassword:true}})
+      if(!teacherActor||teacherActor.accountDomain!=='SCHOOL')
+        throw new RunPublishError('TEACHER_PRIVACY_PUBLISHER_INVALID','Teacher publisher unavailable',403)
+      const actor:AuthenticatedPrincipal={
+        userId:teacherActor.id,username:teacherActor.username,
+        role:teacherActor.role,platformRole:teacherActor.platformRole as AuthenticatedPrincipal['platformRole'],
+        accountDomain:'SCHOOL',tokenVersion:teacherActor.tokenVersion,
+        mustChangePassword:teacherActor.mustChangePassword,
+      }
+      await freezePrivacyForRunPublication(tx,{
+        organizationId:input.organizationId,runId:input.runId,actor,
+        product:'HUITEACHER',
+        scenario:hasStudentForm?'TEACHER_STUDENT_EVALUATION':'TEACHER_ADULT_FORM_GROUP',
+      })
+    }
     const version = run.version + 1
     await tx.$executeRaw`
       UPDATE "assessment_runs"

@@ -9,9 +9,9 @@ type Run={eventId:string;runId:string;status:string;version:number;name?:string;
 type Form={id:string;title:string;definitionDigest:string;status:'PUBLISHED'|'DRAFT'}
 type TeacherScale={id:string;key:string;version:string;title:string;hash:string}
 type Progress={runId:string;total:number;counts:Record<string,number>}
-type GroupReport={independentRespondents:number;minimumRespondents:number;
+type GroupReport={independentRespondents:number|null;minimumRespondents:number;
   distributions:Array<{itemKey:string;prompt:string;status:'READY'|'WITHHELD';
-    reason?:string;cells?:Array<{key:string;label:string;count:number}>}>}
+    reason?:string;cells?:Array<{key:string;label:string;count?:number;percentage?:number}>}>}
 const targetLabels:Record<string,string>={
   PERSON:'教师或学校人员',TEAM:'教研组／管理团队',ORGANIZATION:'学校',
   ACTIVITY:'其他活动',ARTIFACT:'教学成果或方案',PROJECT:'改进项目',
@@ -178,6 +178,16 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
     await api(base+'/evaluation-events/'+event.id+'/run/cancel','POST',{})
     await fetchRun(event);setNotice('Run 已取消。')
   })
+  const releaseGroup=(event:Event)=>perform(async()=>{
+    const formId=formChoice[event.id]
+    if(!formId)throw new Error('请先选择报告对应的正式 Form')
+    if(!window.confirm('确认正式发布冻结后的教师群体调查报告？后续读取将使用同一快照。'))return
+    const report=await api<GroupReport>(
+      base+'/evaluation-events/'+event.id+'/forms/'+formId+'/group-report/release',
+      'POST',{})
+    setReports(previous=>({...previous,[event.id]:report}))
+    setNotice('群体报告已正式发布，后续授权访问只读取同一份快照。')
+  })
   const readGroup=(event:Event)=>perform(async()=>{
     const formId=formChoice[event.id]||releasedForms[0]?.id
     if(!formId)throw new Error('请先选择报告对应的发布表单')
@@ -307,6 +317,10 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
               <option value="">选择已发布表单</option>
               {releasedForms.map(form=><option key={form.id} value={form.id}>{form.title}</option>)}
             </select></label>
+            {import.meta.env.VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'&&
+              <button onClick={()=>releaseGroup(event)} disabled={working||!formChoice[event.id]}>
+                正式发布群体报告
+              </button>}
             <button onClick={()=>readGroup(event)} disabled={working||!formChoice[event.id]}>
               查看受保护的学校群体报告
             </button>
@@ -328,7 +342,7 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
           organizationId={organizationId} eventId={event.id}
           eventStatus={event.status} api={api}/>}
       {reports[event.id]&&<div className="ht-report" aria-label="学校调查群体报告">
-        <p><strong>不同有效参与者：{reports[event.id].independentRespondents}</strong>
+        <p><strong>不同有效参与者：{reports[event.id].independentRespondents??'受限展示'}</strong>
           （隐私下限 {reports[event.id].minimumRespondents}）</p>
         <p>仅提供满足隐私保护的选项分布；个人答案、原始文本和作答身份不可见。</p>
         {reports[event.id].distributions.map(item=><article key={item.itemKey}>
@@ -340,7 +354,7 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
             '该题因数据来源或权限保护暂不显示。'
           }</p>:
             <div className="ht-units">{item.cells?.map(cell=>
-              <span className="ht-tag" key={cell.key}>{cell.label}：{cell.count}</span>)}</div>}
+              <span className="ht-tag" key={cell.key}>{cell.label}：{cell.count??(cell.percentage===undefined?'受限':cell.percentage+'%')}</span>)}</div>}
         </article>)}
       </div>}
     </article>)}</div>
