@@ -20,18 +20,22 @@ export function SurveyTimedScale({unit,answer,onAnswer,tracker,onTiming}:{
   timingCallback.current=onTiming
   useEffect(()=>{
     if(!current)return
-    tracker.enter(current.itemKey,document.visibilityState!=='hidden')
-    const visibility=()=>{
-      if(document.visibilityState==='hidden')tracker.suspend()
-      else tracker.resume()
+    tracker.enter(current.itemKey,document.visibilityState!=='hidden'&&document.hasFocus())
+    const suspend=()=>{tracker.suspend();timingCallback.current(tracker.snapshot())}
+    const resume=()=>{
+      if(document.visibilityState!=='hidden'&&document.hasFocus())tracker.resume()
       timingCallback.current(tracker.snapshot())
     }
-    const pageHide=()=>{tracker.suspend();timingCallback.current(tracker.snapshot())}
+    const visibility=()=>document.visibilityState==='hidden'?suspend():resume()
     document.addEventListener('visibilitychange',visibility)
-    window.addEventListener('pagehide',pageHide)
+    window.addEventListener('pagehide',suspend)
+    window.addEventListener('blur',suspend)
+    window.addEventListener('focus',resume)
     return ()=>{
       document.removeEventListener('visibilitychange',visibility)
-      window.removeEventListener('pagehide',pageHide)
+      window.removeEventListener('pagehide',suspend)
+      window.removeEventListener('blur',suspend)
+      window.removeEventListener('focus',resume)
       tracker.leave()
       timingCallback.current(tracker.snapshot())
     }
