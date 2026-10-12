@@ -1269,9 +1269,10 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     }finally{
       if(oldSigning===undefined)delete process.env.ASSET_SIGNING_SECRET
       else process.env.ASSET_SIGNING_SECRET=oldSigning
-      await db.surveyWaveFinal.deleteMany({where:{attemptId:{in:attempts.map(a=>a.id)}}})
-      await db.surveyWaveAttempt.deleteMany({where:{id:{in:attempts.map(a=>a.id)}}})
-      await db.surveyParticipant.deleteMany({where:{id:{in:synthetic.map(p=>p.id)}}})
+      // FINALs are append-only by database trigger. Keep the synthetic FINALs
+      // and their required Attempt/Participant parents in this isolated CI DB;
+      // the test database is discarded after the regression job finishes.
+      // Never disable that trigger merely for fixture cleanup.
     }
   },30000)
 
