@@ -10,6 +10,9 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { dryRunSurveyForm,SurveyFinalValidationError } from '../survey/final.compute'
 import type { FormDraft } from '../survey/builder.definition'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
+import {studentFormResourceId,studentFormResourceRef,
+  assertStudentFormRunUse} from './studentFormResource'
+import {assertCurrentRunStartAuthority} from '../assessment-run/startAuthority'
 import { resolvePublishedTeacherForm,teacherFormResourceRef,
   TEACHER_FORM_RUNTIME_KIND } from './formRunResource'
 
@@ -29,6 +32,7 @@ type TeacherAttemptScope={
 type Scope={
   attempt:TeacherAttemptScope;form:FormDraft;title:string;
   relationalAssignmentId:string;executionStatus:string;
+  studentFeedback:boolean;eventStatus:string;runStatus:string;
 }
 
 /** Shared Teacher identity is required, but Session/cookie and Form rights are
@@ -58,22 +62,22 @@ async function exactFormScope(tx:Tx,input:{
     product:'HUITEACHER',
   },tx)
   if(!membership)fail('HUITEACHER_ATTEMPT_ACTOR_FORBIDDEN',403)
-  const actor=await tx.$queryRaw<Array<{id:string}>>`
-    SELECT u."id" FROM "users" u
+  const actor=await tx.$queryRaw<Array<{id:string;role:string;persona:string}>>`
+    SELECT u."id",u."role",pg."persona" FROM "users" u
     JOIN "organization_memberships" m ON m."user_id"=u."id"
       AND m."organization_id"=${first.organizationId}
       AND m."valid_from"<=statement_timestamp()
       AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
     JOIN "organization_persona_grants" pg ON pg."membership_id"=m."id"
       AND pg."organization_id"=m."organization_id"
-      AND pg."persona"='TEACHER' AND pg."revoked_at" IS NULL
+      AND pg."persona" IN ('TEACHER','STUDENT') AND pg."revoked_at" IS NULL
     WHERE u."id"=${input.actorUserId}
       AND u."account_domain"='SCHOOL'
-      AND u."role" IN ('TEACHER','ADMIN')
+      AND u."role" IN ('TEACHER','ADMIN','STUDENT')
       AND u."is_active"=TRUE AND u."is_frozen"=FALSE
       AND u."must_change_password"=FALSE
       AND (u."expires_at" IS NULL OR u."expires_at">statement_timestamp())
-    LIMIT 1
+    LIMIT 5
   `
   if(!actor.length)fail('HUITEACHER_FORM_RESPONDENT_INELIGIBLE',403)
   const runs=await tx.$queryRaw<Array<{status:string}>>`
@@ -141,9 +145,16 @@ async function exactFormScope(tx:Tx,input:{
   if(!attempt||attempt.respondentUserId!==input.actorUserId
     ||attempt.organizationId!==first.organizationId||attempt.runId!==first.runId)
     fail('HUITEACHER_FORM_ATTEMPT_IDENTITY',403)
-  if(exe.resourceKey!=='huiteacher-form:'+attempt.formId
+  const frozen={family:'FORM' as const,key:exe.resourceKey,version:exe.resourceVersion}
+  const studentFeedback=studentFormResourceId(frozen)===attempt.formId
+  const teacherSelf=exe.resourceKey==='huiteacher-form:'+attempt.formId
+  if((!studentFeedback&&!teacherSelf)
     ||exe.resourceVersion!==attempt.definitionDigest)
     fail('HUITEACHER_FORM_FROZEN_RESOURCE_MISMATCH',409)
+  const principalValid=studentFeedback
+    ?actor.some(a=>a.role==='STUDENT'&&a.persona==='STUDENT')
+    :actor.some(a=>['TEACHER','ADMIN'].includes(a.role)&&a.persona==='TEACHER')
+  if(!principalValid)fail('HUITEACHER_FORM_RESPONDENT_INELIGIBLE',403)
   const form=await resolvePublishedTeacherForm(
     teacherFormResourceRef(attempt.formId,attempt.definitionDigest),tx)
   if(form.organizationId!==attempt.organizationId)
@@ -151,7 +162,8 @@ async function exactFormScope(tx:Tx,input:{
   return {
     attempt,form:form.definition as FormDraft,title:form.title,
     relationalAssignmentId:exe.relationalAssignmentId,
-    executionStatus:exe.status,
+    executionStatus:exe.status,studentFeedback,
+    eventStatus:events[0].status,runStatus:runs[0].status,
   }
 }
 
@@ -217,13 +229,26 @@ export async function submitOwnHuiteacherFormFinal(input:{
     }
     if(scope.attempt.status!=='STARTED'||scope.executionStatus!=='STARTED')
       fail('HUITEACHER_FORM_ATTEMPT_NOT_STARTABLE')
+    if(scope.studentFeedback){
+      // Student eligibility is revalidated at FINAL, not just frozen on START.
+      // A closed campaign never accepts a new student FINAL; exact completed
+      // duplicate receipts are already handled above.
+      if(scope.eventStatus!=='OPEN'||scope.runStatus!=='PUBLISHED')
+        fail('HUITEACHER_STUDENT_EVAL_CLOSED',409)
+      await assertStudentFormRunUse(tx,{
+        organizationId:scope.attempt.organizationId,runId:scope.attempt.runId,
+        ref:studentFormResourceRef(scope.attempt.formId,scope.attempt.definitionDigest),
+      })
+      await assertCurrentRunStartAuthority(tx,scope.attempt.runExecutionId)
+    }
     const status=await tx.$queryRaw<Array<{status:string;respondentUserId:string}>>`
       SELECT "status","respondent_user_id" AS "respondentUserId"
       FROM "relational_assessment_assignments"
       WHERE "id"=${scope.relationalAssignmentId}
         AND "policy_domain"='ORGANIZATION_RUN'
-        AND "relationship_kind"='SELF'
-        AND "subject_user_id"=${input.actorUserId}
+        AND "relationship_kind"=${scope.studentFeedback?'CLASS_TEACHER_STUDENT':'SELF'}
+        AND ( ${scope.studentFeedback}
+          OR "subject_user_id"=${input.actorUserId})
         AND "respondent_user_id"=${input.actorUserId}
       FOR UPDATE
     `
