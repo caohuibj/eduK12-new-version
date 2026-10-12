@@ -6,6 +6,7 @@ import {resolveEducationProductMemberScope} from '../organization/educationProdu
 import {resolveOrganizationAccessContext,resolveAssessmentDeliveryAuthority,
   contextHasCapability} from '../organization/access'
 import {appendAudit,executeCommand} from '../organization/service'
+import {currentClassDeliverySql} from '../organization/deliveryPolicy'
 import {reportPrivacyCatalog,recognizePreset} from './registry'
 import {resolveEffectiveReportPrivacy,requestedOptions} from './effective.service'
 import {policyFingerprint,type EducationProduct,type PrivacyScenario,
@@ -60,11 +61,10 @@ export async function assertCurrentPrivacyPublisher(input:ScopeInput,tx?:Tx){
   }
   const hasClass=ctx.personas.includes('TEACHER')
     &&(await tx.$queryRaw<Array<{allowed:boolean}>>(Prisma.sql`
-      SELECT EXISTS(SELECT 1 FROM organization_staff_class_assignments staff
-      WHERE staff.organization_id=${input.organizationId}
-        AND staff.membership_id=${ctx.membershipId}
-        AND staff.valid_from<=statement_timestamp()
-        AND (staff.valid_until IS NULL OR staff.valid_until>statement_timestamp())
+      SELECT EXISTS(SELECT 1 FROM organization_staff_class_assignments sa
+      WHERE sa.organization_id=${input.organizationId}
+        AND sa.membership_id=${ctx.membershipId}
+        AND ${currentClassDeliverySql}
       ) AS "allowed"
     `))[0]?.allowed===true
   if(!counselor&&!hasClass)deny('PRIVACY_CAMPUS_PUBLISHER_REQUIRED')

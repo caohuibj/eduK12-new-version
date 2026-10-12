@@ -12,6 +12,10 @@ export async function freezePrivacyForRunPublication(tx:Prisma.TransactionClient
   scenario:PrivacyScenario;actor:AuthenticatedPrincipal;
   expectedPrivacyFingerprint:string;
 }){
+  // Mirror canonical publish's lock order: organization, then Run.
+  // Preference saves acquire the same organization lock before modifying defaults.
+  await tx.$queryRaw(Prisma.sql`SELECT id FROM organizations
+    WHERE id=${input.organizationId} FOR UPDATE`)
   await assertCurrentPrivacyPublisher(input,tx)
   const runs=await tx.$queryRaw<Array<{status:string}>>(Prisma.sql`
     SELECT status FROM assessment_runs

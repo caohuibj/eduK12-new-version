@@ -51,7 +51,7 @@ describe('Cookie-like ReportPrivacyPreferences PR1 panel',()=>{
     fireEvent.click(screen.getByText('群体统计附加保护'))
     const group=screen.getByRole('checkbox',{name:'群体统计附加保护整组切换'})
     expect(group).toHaveAttribute('aria-checked','false')
-    fireEvent.click(screen.getByLabelText('隐藏小单元整题'))
+    fireEvent.click(screen.getByRole('checkbox',{name:/隐藏小单元整题/}))
     expect(group).toHaveAttribute('aria-checked','mixed')
     fireEvent.click(screen.getByRole('button',{name:'保存为今后默认偏好'}))
     await waitFor(()=>expect(api).toHaveBeenCalledWith(

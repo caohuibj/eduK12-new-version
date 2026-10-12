@@ -69,11 +69,12 @@ export function ReportPrivacyPreferences({organizationId,scenarios,api}:{
   const [error,setError]=useState('')
   const [message,setMessage]=useState('')
   const path='/organizations/'+organizationId+'/report-privacy'
-  const load=useCallback(async()=>{
+  const load=useCallback(async(preferredScope:Scope='MY')=>{
     setBusy(true);setError('')
     try{
       const result=await api<Data>(path+'/preferences?scenario='+encodeURIComponent(scenario))
-      setData(result);setDraft(defaults(result,'MY'));setScope('MY')
+      const next=result.editableScopes.includes(preferredScope)?preferredScope:'MY'
+      setData(result);setDraft(defaults(result,next));setScope(next)
     }catch(e){setError(e instanceof Error?e.message:'无法读取隐私偏好')}
     finally{setBusy(false)}
   },[api,path,scenario])
@@ -135,7 +136,7 @@ export function ReportPrivacyPreferences({organizationId,scenarios,api}:{
     setBusy(true);setError('');setMessage('')
     try{
       await api(path+'/preferences/'+scenario,'PUT',request)
-      await load()
+      await load(scope)
       setMessage('偏好已保存，并将在后续支持的任务发布中自动沿用。现有报告仍按原保护策略执行。')
     }catch(e){setError(e instanceof Error?e.message:'保存失败，请刷新后重试')}
     finally{setBusy(false)}
