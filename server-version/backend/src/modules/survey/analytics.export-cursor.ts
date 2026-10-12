@@ -44,8 +44,9 @@ export function decodeSurveyExportCursor(raw:string,projectId:string,
       ||!Number.isSafeInteger(token.page)||token.page<1||token.page>(token.v===3?200:100)
       ||(token.v===3&&(
         (token.phase!=='FINALS'&&token.phase!=='ATTENDANCE')
-        ||!Number.isSafeInteger(token.attendanceCount)||token.attendanceCount!<0
-        ||token.attendanceCount!>25000
+        ||typeof token.attendanceCount!=='number'
+        ||!Number.isSafeInteger(token.attendanceCount)
+        ||token.attendanceCount<0||token.attendanceCount>25000
         ||(token.phase==='FINALS'&&token.afterAttemptId!==undefined)
         ||(token.phase==='ATTENDANCE'&&token.afterAttemptId!==null
           &&token.afterAttemptId!==undefined
