@@ -1,5 +1,6 @@
 import type { PrivacyOptions, PrivacyScenario, PrivacyPreset, EducationProduct } from './schema'
 import { requireScenarioProduct } from './schema'
+import {schoolPrivacyV2Enabled} from '../campus/privacyV2'
 
 export type OptionKey = keyof PrivacyOptions
 export type OptionGroup = 'COHORT' | 'DIFFERENCING' | 'CONTENT' | 'RELEASE'
@@ -56,6 +57,8 @@ export function recognizePreset(options: PrivacyOptions): PrivacyPreset {
 export function reportPrivacyCatalog(product:EducationProduct, scenario:PrivacyScenario) {
   requireScenarioProduct(product,scenario)
   const sensitive=scenario==='SCHOOL_SENSITIVE_WELLBEING_GROUP'
+  const schoolGeneralActive=product==='HUISCHOOL'
+    &&scenario==='SCHOOL_GENERAL_EDUCATION_GROUP'&&schoolPrivacyV2Enabled()
   return {
     schemaVersion:1 as const,product,scenario,title:scenarioNames[scenario],
     groups:optionGroups,options:optionsCatalog,
@@ -65,17 +68,20 @@ export function reportPrivacyCatalog(product:EducationProduct, scenario:PrivacyS
       '工具科学许可、参与者告知和审计',
     ],
     // PR1 saves future preferences; PR2/PR3 alone activate the reporting consumers.
-    reportConsumerActive:product==='HUITEACHER'
+    reportConsumerActive:schoolGeneralActive||(product==='HUITEACHER'
       &&process.env.REPORT_PRIVACY_PREFERENCES_V1_ENABLED==='true'
-      &&process.env.REPORT_PRIVACY_TEACHER_V2_ENABLED==='true',
-    status:product==='HUITEACHER'
-      &&process.env.REPORT_PRIVACY_PREFERENCES_V1_ENABLED==='true'
-      &&process.env.REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'
+      &&process.env.REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'),
+    status:schoolGeneralActive?'SCHOOL_GENERAL_V2_ACTIVE' as const
+      :product==='HUITEACHER'
+        &&process.env.REPORT_PRIVACY_PREFERENCES_V1_ENABLED==='true'
+        &&process.env.REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'
         ?'TEACHER_V2_ACTIVE' as const:'PREFERENCES_ONLY' as const,
     sensitiveEnforced:sensitive,
-    baselineNote:product==='HUITEACHER'
-      &&process.env.REPORT_PRIVACY_PREFERENCES_V1_ENABLED==='true'
-      &&process.env.REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'
+    baselineNote:schoolGeneralActive
+      ?'仅平台明确核准的非敏感资源及一般教育活动，在新发布 Run 时自动冻结偏好；旧 Run 及敏感心理测评保持原有规则。'
+      :product==='HUITEACHER'
+        &&process.env.REPORT_PRIVACY_PREFERENCES_V1_ENABLED==='true'
+        &&process.env.REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'
         ?'新发布的 Teacher Form Run 自动冻结当前偏好；旧 Run 继续执行严格策略。'
         :'当前仅提供默认偏好保存与预览。现有报告门禁未改变。',
   }
