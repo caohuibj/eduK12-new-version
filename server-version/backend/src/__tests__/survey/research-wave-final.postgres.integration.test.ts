@@ -14,7 +14,7 @@ import { matchedWaveCounts,waveOverview } from '../../modules/survey/analytics.r
 import { loadSurveySource } from '../../modules/survey/analytics.source'
 import { describeSurveyWaveItemPaged } from '../../modules/survey/analytics.paged'
 import {listSampleQuality,listSampleQualityHistory,setSampleQuality} from '../../modules/survey/sample-quality.service'
-import { rawLongExport,rawWideExport } from '../../modules/survey/analytics.raw-export'
+import { rawLongExport,rawWideExport,compactSurveyAttendanceExport } from '../../modules/survey/analytics.raw-export'
 import { exportWide,exportLong } from '../../modules/survey/analytics.export-format'
 import { describePairedScores } from '../../modules/survey/analytics.descriptive'
 import { createSurveyExport,downloadSurveyExport } from '../../modules/survey/analytics.export.service'
@@ -593,16 +593,21 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     try{
       const initial=await createSurveyExport(req,{projectId,format:'RAW_WAVE',waveId:w.id})
       expect(initial.manifest.batch.phase).toBe('VERIFIED_FINAL')
+      expect(initial.manifest.batch.representation).toBe('FINAL_ITEM_OR_SCORE_ROWS')
       expect(initial.nextCursor).toBeTruthy()
       const missing=await createSurveyExport(req,{
         projectId,format:'RAW_WAVE',waveId:w.id,cursor:initial.nextCursor!,
       })
       expect(missing.manifest.batch.phase).toBe('NON_FINAL_PARTICIPATION')
+      expect(missing.manifest.batch.representation).toBe('ATTENDANCE_COMPACT_V1')
       expect(missing.nextCursor).toBeNull()
       const artifact=await downloadSurveyExport(req,{projectId,exportId:missing.id})
       expect(artifact.csv).toContain(person.researchCode)
       expect(artifact.csv).toContain('ABANDONED')
-      expect(missing.manifest.rowCount).toBe(2)
+      expect(missing.manifest.rowCount).toBe(1)
+      expect(missing.manifest.schemaVersion).toBe(2)
+      expect(artifact.csv).toContain('"research_code"')
+      expect(artifact.csv).not.toContain('"item_key"')
       // SCORE_LONG follows the same signed non-FINAL participation phase.
       const score=await createSurveyExport(req,{projectId,format:'SCORE_LONG',waveId:w.id})
       expect(score.nextCursor).toBeTruthy()
@@ -611,6 +616,7 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
       const scoreCsv=await downloadSurveyExport(req,{projectId,exportId:scoreMissing.id})
       expect(scoreCsv.csv).toContain('ABANDONED')
       expect(scoreCsv.csv).toContain(person.researchCode)
+      expect(scoreMissing.manifest.rowCount).toBe(1)
     }finally{
       if(originalSigningKey===undefined)delete process.env.ASSET_SIGNING_SECRET
       else process.env.ASSET_SIGNING_SECRET=originalSigningKey
@@ -618,7 +624,13 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
   })
 
   it('pages 5001 linked non-FINAL attempts without the legacy 5000-row ceiling',async()=>{
-    const w=await wave('研究参与分页容量边界',[toolIds.scale],true)
+    const longScaleId=await instrument('SCALE',{...structuredClone(scale),
+      items:Array.from({length:240},(_,i)=>({
+        itemKey:'item'+String(i+1).padStart(3,'0'),
+        prompt:'第 '+(i+1)+' 题',required:true,reverse:false,
+        dimensionKeys:['motivation','strategy'],
+      }))})
+    const w=await wave('研究参与分页容量边界',[longScaleId],true)
     const participants=Array.from({length:5001},(_,index)=>({
       id:randomUUID(),projectId,
       researchCode:'R-'+String(index).padStart(10,'0'),
@@ -637,33 +649,40 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
       expect(snapshot.completeAttempts).toBe(0)
       expect(snapshot.sourceAttendanceCount).toBe(5001)
       expect(snapshot.attendance).toHaveLength(0)
-      const first=await loadSurveySource({actorUserId:ownerId,projectId,
-        waveIds:[w.id],includeWideSchema:true,includeAttendance:false,
-        includeAttendanceCount:true,attendanceOnly:true,pageMode:true,
-        expectedAttendanceCount:5001,expectedFinalCount:0,
-        expectedSourceRevision:snapshot.sourceRevision,
-        snapshotCutOff:new Date(snapshot.cutOff)})
-      expect(first.attendance).toHaveLength(250)
-      expect(first.nextAttendanceCursor).toBeTruthy()
-      const second=await loadSurveySource({actorUserId:ownerId,projectId,
-        waveIds:[w.id],includeWideSchema:true,includeAttendance:false,
-        includeAttendanceCount:true,attendanceOnly:true,pageMode:true,
-        attendanceAfterId:first.nextAttendanceCursor!,
-        expectedAttendanceCount:5001,expectedFinalCount:0,
-        expectedSourceRevision:snapshot.sourceRevision,
-        snapshotCutOff:new Date(snapshot.cutOff)})
-      expect(second.attendance).toHaveLength(250)
-      expect(new Set([...first.attendance,...second.attendance]
-        .map(x=>x.researchCode)).size).toBe(500)
-      expect(rawLongExport(projectId,first,w.id).manifest.rowCount).toBe(500)
-      expect(rawLongExport(projectId,second,w.id).manifest.rowCount).toBe(500)
+      expect(snapshot.codebook).toHaveLength(240)
+      let cursor:string|undefined
+      let pages=0,rows=0
+      const codes=new Set<string>()
+      do{
+        const chunk=await loadSurveySource({actorUserId:ownerId,projectId,
+          waveIds:[w.id],includeWideSchema:false,includeAttendance:false,
+          includeAttendanceCount:true,attendanceOnly:true,pageMode:true,
+          ...(cursor?{attendanceAfterId:cursor}:{}),
+          expectedAttendanceCount:5001,expectedFinalCount:0,
+          expectedSourceRevision:snapshot.sourceRevision,
+          snapshotCutOff:new Date(snapshot.cutOff)})
+        const artifact=compactSurveyAttendanceExport(projectId,chunk,w.id)
+        expect(artifact.manifest.rowCount).toBe(chunk.attendance.length)
+        expect(artifact.manifest.columnCount).toBe(4)
+        expect(artifact.csv).not.toContain('item001')
+        for(const row of chunk.attendance){
+          expect(codes.has(row.researchCode)).toBe(false)
+          codes.add(row.researchCode)
+        }
+        rows+=chunk.attendance.length
+        pages++
+        cursor=chunk.nextAttendanceCursor??undefined
+      }while(cursor&&pages<30)
+      expect(pages).toBe(21)
+      expect(rows).toBe(5001)
+      expect(codes.size).toBe(5001)
     }finally{
       await db.surveyWaveAttempt.deleteMany({where:{
         waveId:w.id,participantId:{in:participants.map(p=>p.id)},
       }})
       await db.surveyParticipant.deleteMany({where:{id:{in:participants.map(p=>p.id)}}})
     }
-  },20000)
+  },30000)
 
   it('projects multiple verified FINALs from one frozen Publication without duplicated schema columns',async()=>{
     const w=await wave('同一冻结定义下的多份 FINAL',[toolIds.scale],true)
