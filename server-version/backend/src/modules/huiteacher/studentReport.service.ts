@@ -88,7 +88,7 @@ export async function readHuiteacherStudentFeedbackReport(input:{
     const source=sources[0]
     if(sources.length!==1||!source)deny('STUDENT_REPORT_SOURCE_UNAVAILABLE',404)
     const entitledTeacher=source.targetUserId===input.actorUserId
-      &&!!(await tx.$queryRaw<Array<{id:string}>>`
+      &&(await tx.$queryRaw<Array<{id:string}>>`
         SELECT persona."id" FROM "organization_persona_grants" persona
         JOIN "organization_memberships" membership
           ON membership."id"=persona."membership_id"
@@ -101,7 +101,7 @@ export async function readHuiteacherStudentFeedbackReport(input:{
           AND teacher."teacher_approved"=TRUE
         WHERE persona."organization_id"=${input.organizationId}
           AND persona."persona"='TEACHER' AND persona."revoked_at" IS NULL
-      `).length)
+      `).length>0
     if(!member.productAdmin&&!entitledTeacher)deny('STUDENT_REPORT_AUDIENCE_FORBIDDEN')
     if(source.eventStatus!=='CLOSED'||source.runStatus!=='CLOSED')
       deny('STUDENT_REPORT_NOT_CLOSED',409)
