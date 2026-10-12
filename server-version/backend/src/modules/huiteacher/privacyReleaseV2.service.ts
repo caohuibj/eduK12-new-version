@@ -26,9 +26,10 @@ export async function teacherFrozenPolicy(tx:Tx,input:{
   // If the reporting gate is subsequently disabled, do not reinterpret new
   // V2 Runs under legacy-only rules or convert them to old ledgers.
   if(!teacherPrivacyV2Enabled())reject('TEACHER_REPORT_V2_DISABLED',503)
-  let options:PrivacyOptions
-  try{options=parseFrozenTeacherOptions(frozen.effective,input.scenario)}
-  catch{reject('TEACHER_REPORT_V2_POLICY_INVALID')}
+  const options=(()=>{
+    try{return parseFrozenTeacherOptions(frozen.effective,input.scenario)}
+    catch{return reject('TEACHER_REPORT_V2_POLICY_INVALID')}
+  })()
   return {options,policySnapshotId:frozen.policySnapshotId,
     fingerprint:frozen.fingerprint}
 }
@@ -98,8 +99,10 @@ export async function teacherTrackMinimum(tx:Tx,input:{
       AND track.resource_key=${input.resourceKey}
       AND track.resource_version=${input.resourceVersion}
   `
-  if(rows.length!==1||rows[0].minimum===null)reject('TEACHER_REPORT_TRACK_INTEGRITY')
-  return rows[0].minimum
+  if(rows.length!==1)reject('TEACHER_REPORT_TRACK_INTEGRITY')
+  const minimum=rows[0].minimum
+  if(typeof minimum!=='number')reject('TEACHER_REPORT_TRACK_INTEGRITY')
+  return minimum
 }
 export async function teacherReportFloor(tx:Tx,input:{
   organizationId:string;runId:string;resourceKey:string;resourceVersion:string;
