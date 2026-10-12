@@ -8,7 +8,8 @@ import { resolvePublishedTeacherForm,teacherFormResourceRef,
 import type { FormDraft } from '../survey/builder.definition'
 import type {PrivacyOptions} from '../report-privacy/schema'
 import {teacherFrozenPolicy,teacherScopeKey,teacherReportFloor,
-  readReleasedTeacherReport,recordTeacherReportRelease,lockTeacherDisclosure}
+  readReleasedTeacherReport,recordTeacherReportRelease,lockTeacherDisclosure,
+  hasConflictingComparableTeacherFormHistory}
   from './privacyReleaseV2.service'
 
 export class HuiteacherGroupReportError extends Error{
@@ -431,22 +432,12 @@ export async function readTeacherFormGroupReport(input:{
       })
       if(legacy&&legacy.populationDigest!==populationDigest)
         reject('HUITEACHER_GROUP_POPULATION_DIFFERENCING_BLOCKED',403)
-      // Only statistically comparable versions of the SAME published Form
-      // can be subtracted. Different questionnaires may have independent
-      // contributors; their separate aggregates are not repeated disclosures
-      // of this instrument. Keep the historic exact-Form ledger above.
-      const incompatible=await tx.$queryRaw<Array<{conflict:boolean}>>`
-        SELECT EXISTS(
-          SELECT 1 FROM education_report_release_records release
-          WHERE release.organization_id=${input.organizationId}
-            AND release.report_kind='TEACHER_ADULT_FORM_GROUP'
-            AND release.source_run_id<>${source.runId}
-            AND release.report_projection->>'definitionDigest'=${source.definitionDigest}
-            AND release.effective_population_digest IS DISTINCT FROM ${populationDigest}
-        ) AS "conflict"
-      `
-      if(incompatible[0]?.conflict)
-        reject('HUITEACHER_GROUP_POPULATION_DIFFERENCING_BLOCKED',403)
+      // Different questionnaire definitions no longer block one another.
+      // Only a changed contributor population for the exact same Form does.
+      if(await hasConflictingComparableTeacherFormHistory(tx,{
+        organizationId:input.organizationId,runId:source.runId,
+        definitionDigest:source.definitionDigest,populationDigest,
+      }))reject('HUITEACHER_GROUP_POPULATION_DIFFERENCING_BLOCKED',403)
     }
     const projection={
       source:'VERIFIED_HUITEACHER_FORM_FINAL' as const,
