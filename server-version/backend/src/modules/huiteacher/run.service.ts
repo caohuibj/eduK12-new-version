@@ -59,6 +59,13 @@ export async function addTeacherRunTrack(input:Key&{
   const link=await activeLink(input)
   if(link.eventStatus!=='DRAFT'||link.runStatus!=='DRAFT')
     fail('HUITEACHER_RUN_NOT_DRAFT')
+  // A configured STUDENT->TEACHER Run can only receive the exact immutable
+  // student Form track created by the protected student evaluation adapter.
+  const studentConfig=await prisma.huiteacherStudentEvaluationConfig.findUnique({
+    where:{organizationId_eventId:{organizationId:input.organizationId,eventId:input.eventId}},
+    select:{id:true},
+  })
+  if(studentConfig)fail('HUITEACHER_STUDENT_EVAL_TRACK_READONLY',403)
   // A normal School diagnosis must invite the whole current Teacher cohort.
   // Narrow actor selectors are an independently trusted disclosure workflow,
   // not a knob in the ordinary group Form task API.

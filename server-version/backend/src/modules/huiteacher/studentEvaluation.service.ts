@@ -3,6 +3,10 @@ import { prisma } from '../../config/database'
 import { appendAudit } from '../organization/service'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
 import { resolvePublishedTeacherForm, teacherFormResourceRef } from './formRunResource'
+import {createAssessmentRunDraft,addAssessmentRunTrackDraft} from '../assessment-run/repository'
+import {publishAssessmentRun,previewAssessmentRun} from '../assessment-run/publish'
+import {assertCurrentRunPublisherBoundary} from '../assessment-run/resourceBoundary'
+import {studentFormResourceRef,STUDENT_FORM_PRIVACY_FLOOR} from './studentFormResource'
 
 export const STUDENT_FEEDBACK_MIN_RESPONDENTS = 10 as const
 
@@ -274,4 +278,167 @@ export async function previewHuiteacherStudentEvaluation(input:{
       note:'当前只计算正式教育学生资格；不使用校园心理测评/审批/成绩。此预览不发布任务，正式资格需在标准 Run 发布时冻结。',
     }
   })
+}
+
+
+/** Single-school atomic draft + exactly one canonical FORM Track.
+ * No impersonation of a generic Teacher self-assessment or a School Run.
+ */
+export async function createHuiteacherStudentEvaluationRun(input:{
+  actorUserId:string;organizationId:string;eventId:string;
+  intakeDeadline?:Date|null
+}){
+  if(input.intakeDeadline&&(!Number.isFinite(input.intakeDeadline.getTime())
+    ||input.intakeDeadline<=new Date()))
+    deny('HUITEACHER_STUDENT_EVAL_DEADLINE_INVALID',400)
+  return prisma.$transaction(async tx=>{
+    const scope=await resolveEducationProductMemberScope({
+      actorUserId:input.actorUserId,organizationId:input.organizationId,
+      product:'HUITEACHER',
+    },tx)
+    if(!scope?.productAdmin)deny('HUITEACHER_STUDENT_EVAL_ADMIN_REQUIRED',403)
+    const cfg=await tx.$queryRaw<Array<{
+      eventId:string;eventTitle:string;formId:string;definitionDigest:string;
+      classUnitId:string;teacherMembershipId:string;teacherUserId:string
+    }>>`
+      SELECT config."event_id" AS "eventId",event."title" AS "eventTitle",
+        config."form_id" AS "formId",
+        config."definition_digest" AS "definitionDigest",
+        config."class_unit_id" AS "classUnitId",
+        teacher."id" AS "teacherMembershipId",teacher."user_id" AS "teacherUserId"
+      FROM "huiteacher_student_eval_configs" config
+      JOIN "huiteacher_evaluation_events" event
+        ON event."organization_id"=config."organization_id"
+        AND event."id"=config."event_id"
+        AND event."kind"='ASSESSMENT' AND event."status"='DRAFT'
+      JOIN "huiteacher_evaluation_targets" target
+        ON target."organization_id"=event."organization_id"
+        AND target."id"=event."target_id" AND target."kind"='PERSON'
+        AND target."status"='ACTIVE'
+      JOIN "organization_staff_class_assignments" staff
+        ON staff."id"=config."staff_assignment_id"
+        AND staff."organization_id"=config."organization_id"
+        AND staff."class_unit_id"=config."class_unit_id"
+        AND staff."staff_role" IN ('TEACHING','HOMEROOM')
+        AND staff."valid_from"<=statement_timestamp()
+        AND (staff."valid_until" IS NULL OR staff."valid_until">statement_timestamp())
+      JOIN "organization_memberships" teacher
+        ON teacher."id"=staff."membership_id"
+        AND teacher."organization_id"=staff."organization_id"
+        AND teacher."user_id"=target."subject_user_id"
+        AND teacher."valid_from"<=statement_timestamp()
+        AND (teacher."valid_until" IS NULL OR teacher."valid_until">statement_timestamp())
+      JOIN "organization_persona_grants" persona
+        ON persona."membership_id"=teacher."id"
+        AND persona."organization_id"=teacher."organization_id"
+        AND persona."persona"='TEACHER' AND persona."revoked_at" IS NULL
+      JOIN "huiteacher_form_instruments" form
+        ON form."id"=config."form_id"
+        AND form."organization_id"=config."organization_id"
+        AND form."definition_digest"=config."definition_digest"
+        AND form."status"='PUBLISHED'
+      WHERE config."organization_id"=${input.organizationId}
+        AND config."event_id"=${input.eventId}
+      FOR UPDATE OF event
+    `
+    if(cfg.length!==1)deny('HUITEACHER_STUDENT_EVAL_SOURCE_REVOKED',403)
+    const existing=await tx.huiteacherEvaluationRunLink.findUnique({
+      where:{organizationId_eventId:{
+        organizationId:input.organizationId,eventId:input.eventId,
+      }},select:{runId:true},
+    })
+    if(existing)deny('HUITEACHER_STUDENT_EVAL_RUN_EXISTS')
+    const current=cfg[0]
+    await resolvePublishedTeacherForm(
+      teacherFormResourceRef(current.formId,current.definitionDigest),tx)
+    const run=await createAssessmentRunDraft({
+      tx,organizationId:input.organizationId,createdByUserId:input.actorUserId,
+      name:current.eventTitle,intakeDeadline:input.intakeDeadline??null,
+    })
+    await tx.huiteacherEvaluationRunLink.create({data:{
+      organizationId:input.organizationId,eventId:input.eventId,
+      runId:run.id,boundByUserId:input.actorUserId,
+    }})
+    await addAssessmentRunTrackDraft({
+      tx,organizationId:input.organizationId,runId:run.id,
+      resource:studentFormResourceRef(current.formId,current.definitionDigest),
+      subjectSelector:{kind:'CLASS_UNITS',classUnitIds:[current.classUnitId]},
+      respondentSelector:{kind:'CLASS_UNITS',classUnitIds:[current.classUnitId]},
+      requestedPolicy:{
+        targetPolicy:{mode:'SELECTED_CLASS_TEACHERS',
+          teacherMembershipIds:[current.teacherMembershipId]},
+        subjectRoles:['TEACHER'],respondentRoles:['STUDENT'],
+        relationshipKinds:['CLASS_TEACHER_STUDENT'],
+        perspectives:['OBSERVER_REPORT'],analysisMode:'COHORT_AGGREGATE',
+        visibilityPolicyKey:'HUITEACHER_STUDENT_FEEDBACK_PROTECTED_V1',
+        minimumRespondents:STUDENT_FORM_PRIVACY_FLOOR,
+      },
+    })
+    await appendAudit(tx,{
+      organizationId:input.organizationId,actorUserId:input.actorUserId,
+      action:'HUITEACHER_STUDENT_EVAL_RUN_DRAFT',
+      targetType:'EVALUATION_EVENT',targetId:input.eventId,
+      domainEventId:randomUUID(),
+      payload:{runId:run.id,formId:current.formId,
+        classUnitId:current.classUnitId,studentPrivacyFloor:STUDENT_FORM_PRIVACY_FLOOR},
+    })
+    return {runId:run.id,eventId:input.eventId,status:'DRAFT' as const,
+      version:run.version+1,trackCount:1}
+  })
+}
+
+/** Publication uses the SAME serializable frozen-population transaction as
+ * other Assessment Runs. The student source/relationship is reverified there.
+ */
+export async function previewHuiteacherStudentEvaluationRun(input:{
+  actorUserId:string;organizationId:string;eventId:string;expectedVersion:number
+}){
+  const link=await checkedStudentRun(input)
+  if(link.eventStatus!=='DRAFT'&&link.eventStatus!=='OPEN')
+    deny('HUITEACHER_STUDENT_EVAL_EVENT_UNAVAILABLE')
+  if(link.runStatus!=='DRAFT')deny('HUITEACHER_STUDENT_EVAL_RUN_NOT_DRAFT')
+  return previewAssessmentRun({organizationId:input.organizationId,
+    runId:link.runId,actorUserId:input.actorUserId,
+    expectedVersion:input.expectedVersion})
+}
+export async function publishHuiteacherStudentEvaluationRun(input:{
+  actorUserId:string;organizationId:string;eventId:string;expectedVersion:number
+}){
+  const link=await checkedStudentRun(input)
+  if(link.eventStatus!=='OPEN'||link.runStatus!=='DRAFT')
+    deny('HUITEACHER_STUDENT_EVAL_MUST_OPEN_FIRST')
+  await assertCurrentRunPublisherBoundary({actorUserId:input.actorUserId,
+    organizationId:input.organizationId,runId:link.runId})
+  return publishAssessmentRun({organizationId:input.organizationId,
+    runId:link.runId,actorUserId:input.actorUserId,
+    expectedVersion:input.expectedVersion})
+}
+async function checkedStudentRun(input:{
+  actorUserId:string;organizationId:string;eventId:string
+}){
+  const scope=await resolveEducationProductMemberScope({
+    actorUserId:input.actorUserId,organizationId:input.organizationId,
+    product:'HUITEACHER',
+  })
+  if(!scope?.productAdmin)deny('HUITEACHER_STUDENT_EVAL_ADMIN_REQUIRED',403)
+  const rows=await prisma.$queryRaw<Array<{
+    runId:string;eventStatus:string;runStatus:string
+  }>>`
+    SELECT link."run_id" AS "runId",event."status" AS "eventStatus",
+      run."status" AS "runStatus"
+    FROM "huiteacher_evaluation_run_links" link
+    JOIN "huiteacher_student_eval_configs" config
+      ON config."organization_id"=link."organization_id"
+      AND config."event_id"=link."event_id"
+    JOIN "huiteacher_evaluation_events" event
+      ON event."organization_id"=link."organization_id"
+      AND event."id"=link."event_id"
+    JOIN "assessment_runs" run
+      ON run."organization_id"=link."organization_id"
+      AND run."id"=link."run_id"
+    WHERE link."organization_id"=${input.organizationId}
+      AND link."event_id"=${input.eventId}
+  `
+  if(rows.length!==1)deny('HUITEACHER_STUDENT_EVAL_RUN_NOT_FOUND',404)
+  return rows[0]
 }

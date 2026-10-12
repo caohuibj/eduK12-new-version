@@ -8,6 +8,8 @@ import { createRedisRateLimiter } from '../../middleware/redisRateLimit'
 import {
   configureHuiteacherStudentEvaluation,readHuiteacherStudentEvaluation,
   previewHuiteacherStudentEvaluation,listHuiteacherStudentEvaluationCandidates,
+  createHuiteacherStudentEvaluationRun,previewHuiteacherStudentEvaluationRun,
+  publishHuiteacherStudentEvaluationRun,
   HuiteacherStudentEvaluationError,
 } from './studentEvaluation.service'
 
@@ -61,6 +63,27 @@ router.get(path,requireTeacherProductAdmin,wrap(req=>
 router.get(path+'/eligibility',requireTeacherProductAdmin,requireRecentTeacherMfa,
   wrap(req=>previewHuiteacherStudentEvaluation({
     ...params.parse(req.params),actorUserId:req.user!.userId,
+  })))
+
+const runVersion=z.object({expectedVersion:z.number().int().positive()}).strict()
+const runDraft=z.object({intakeDeadline:z.string().datetime().nullable().optional()}).strict()
+router.post(path+'/run',requireTeacherProductAdmin,requireRecentTeacherMfa,limiter,
+  wrap(req=>{
+    const body=runDraft.parse(req.body)
+    return createHuiteacherStudentEvaluationRun({
+      ...params.parse(req.params),actorUserId:req.user!.userId,
+      intakeDeadline:body.intakeDeadline?new Date(body.intakeDeadline):null,
+    })
+  }))
+router.post(path+'/run/preview',requireTeacherProductAdmin,requireRecentTeacherMfa,limiter,
+  wrap(req=>previewHuiteacherStudentEvaluationRun({
+    ...params.parse(req.params),actorUserId:req.user!.userId,
+    ...runVersion.parse(req.body),
+  })))
+router.post(path+'/run/publish',requireTeacherProductAdmin,requireRecentTeacherMfa,limiter,
+  wrap(req=>publishHuiteacherStudentEvaluationRun({
+    ...params.parse(req.params),actorUserId:req.user!.userId,
+    ...runVersion.parse(req.body),
   })))
 router.post(path,requireTeacherProductAdmin,requireRecentTeacherMfa,limiter,
   wrap(req=>configureHuiteacherStudentEvaluation({

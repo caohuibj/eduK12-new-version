@@ -94,8 +94,10 @@ export async function addAssessmentRunTrackDraft(input: {
   subjectSelector?: unknown
   respondentSelector?: unknown
   requestedPolicy: RunTrackNarrowingRequest
+  // Trusted product adapter can bind draft + track in the same transaction.
+  tx?: Tx
 }): Promise<AssessmentRunTrackRecord> {
-  return prisma.$transaction(async (tx) => {
+  const work=async (tx:Tx) => {
     const runs = await tx.$queryRaw<Array<{ status: AssessmentRunStatus }>>`
       SELECT "status" FROM "assessment_runs"
       WHERE "organization_id" = ${input.organizationId} AND "id" = ${input.runId}
@@ -129,7 +131,8 @@ export async function addAssessmentRunTrackDraft(input: {
       WHERE "id" = ${input.runId}
     `
     return rows[0]
-  })
+  }
+  return input.tx?work(input.tx):prisma.$transaction(work)
 }
 
 export async function lockRun(tx: Tx, organizationId: string, runId: string): Promise<AssessmentRunRecord> {
