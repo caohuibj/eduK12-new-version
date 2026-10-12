@@ -3409,17 +3409,14 @@ model HuiteacherImprovementAction {
   createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt        DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
   @@unique([organizationId,id],map:"huiteacher_improvement_actions_org_id_key")
-  @@index([organizationId,targetId,audience,createdAt(sort:Desc),id(sort:Desc)],
-    map:"huiteacher_improvement_actions_target_idx")
-  @@index([ownerUserId,audience,createdAt(sort:Desc)],
-    map:"huiteacher_improvement_actions_owner_idx")
+  @@index([organizationId,targetId,audience,createdAt(sort:Desc),id(sort:Desc)],map:"huiteacher_improvement_actions_target_idx")
+  @@index([ownerUserId,audience,createdAt(sort:Desc)],map:"huiteacher_improvement_actions_owner_idx")
   @@map("huiteacher_improvement_actions")
 }
 
 
-/** One immutable, separately authorized reassessment after an action closes.
- * This table records provenance and encrypted HUMAN feedback, never scores.
- */
+/// One immutable, separately authorized reassessment after an action closes.
+/// This table records provenance and encrypted HUMAN feedback, never scores.
 model HuiteacherImprovementReassessment {
   id               String   @id
   organizationId   String   @map("organization_id")

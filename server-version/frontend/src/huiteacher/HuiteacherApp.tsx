@@ -250,7 +250,9 @@ export default function HuiteacherApp(){
           :'仅供首次创建教育学生账号。已有教育账号的学生请登录后输入邀请代码和学号加入，不需要重复注册。'}</p>
       {screen==='student'&&<Field label="学校核验的学号" value={studentNumber} set={setStudentNumber}/>}
       <form onSubmit={e=>{e.preventDefault();
-        screen==='student'?studentRegistration():screen==='expert'?expertRegistration():staffRegistration()
+        if(screen==='student')studentRegistration()
+        else if(screen==='expert')expertRegistration()
+        else staffRegistration()
       }}>
         <Field label={screen==='student'?'Teacher 学生邀请代码':screen==='expert'?'限定活动的专家邀请码':'教师邀请代码'}
           value={inviteCode} set={setInviteCode}/>
