@@ -51,6 +51,7 @@ export async function getOwnResearchTask(input:{
     if(unit.kind==='SCALE'){
       const d=assertSurveyDraft('SCALE',unit.displayDefinition,true) as ScaleDraft
       return {kind:'SCALE',instrumentKey:unit.instrumentKey,title:unit.title,
+        presentationMode:d.presentationMode??'ALL_AT_ONCE',
         responseOptions:d.responseOptions.map(o=>({optionKey:o.optionKey,label:o.label})),
         items:d.items.map(q=>({itemKey:q.itemKey,prompt:q.prompt,required:q.required}))}
     }
