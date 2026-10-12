@@ -15,8 +15,9 @@ WORKDIR /app
 ARG npm_config_jobs
 ENV npm_config_jobs=${npm_config_jobs:-}
 
-# Optional regional mirrors for deployment hosts far from the default
-# endpoints. Empty/official defaults keep hosted CI builds unchanged;
+# Optional regional mirrors. HTTPS first, signed official Debian fallback on
+# mirror failure; apt signature validation, upgrades and scanning stay enabled.
+# Empty/official defaults keep hosted CI builds unchanged;
 # release-verify-local.sh forwards them from RELEASE_VERIFY_* env vars.
 ARG DEBIAN_MIRROR=
 ARG NPM_REGISTRY=https://registry.npmjs.org
@@ -24,10 +25,19 @@ ARG NPM_REGISTRY=https://registry.npmjs.org
 # 编译期系统依赖（canvas 等 native module 需要）
 RUN if [ -n "$DEBIAN_MIRROR" ]; then \
       for f in /etc/apt/sources.list /etc/apt/sources.list.d/debian.sources; do \
-        if [ -f "$f" ]; then sed -i "s|http://deb.debian.org|http://$DEBIAN_MIRROR|g" "$f"; fi; \
+        if [ -f "$f" ]; then sed -i "s|http://deb.debian.org|https://$DEBIAN_MIRROR|g" "$f"; fi; \
       done; \
     fi \
-    && apt-get update && apt-get install -y --no-install-recommends \
+    && { apt-get update || { \
+      if [ -z "$DEBIAN_MIRROR" ]; then exit 1; fi; \
+      echo "Configured HTTPS Debian mirror unavailable; retrying signed official Debian archives"; \
+      for f in /etc/apt/sources.list /etc/apt/sources.list.d/debian.sources; do \
+        if [ -f "$f" ]; then sed -i "s|https://$DEBIAN_MIRROR|https://deb.debian.org|g" "$f"; fi; \
+      done; \
+      rm -rf /var/lib/apt/lists/*; \
+      apt-get update; \
+    }; } \
+    && apt-get install -y --no-install-recommends \
     build-essential \
     python3 \
     pkg-config \
@@ -79,10 +89,19 @@ ARG DEBIAN_MIRROR=
 # 运行时系统库（无编译器）；ffmpeg 由 fluent-ffmpeg 直接调用
 RUN if [ -n "$DEBIAN_MIRROR" ]; then \
       for f in /etc/apt/sources.list /etc/apt/sources.list.d/debian.sources; do \
-        if [ -f "$f" ]; then sed -i "s|http://deb.debian.org|http://$DEBIAN_MIRROR|g" "$f"; fi; \
+        if [ -f "$f" ]; then sed -i "s|http://deb.debian.org|https://$DEBIAN_MIRROR|g" "$f"; fi; \
       done; \
     fi \
-    && apt-get update && apt-get install -y --no-install-recommends \
+    && { apt-get update || { \
+      if [ -z "$DEBIAN_MIRROR" ]; then exit 1; fi; \
+      echo "Configured HTTPS Debian mirror unavailable; retrying signed official Debian archives"; \
+      for f in /etc/apt/sources.list /etc/apt/sources.list.d/debian.sources; do \
+        if [ -f "$f" ]; then sed -i "s|https://$DEBIAN_MIRROR|https://deb.debian.org|g" "$f"; fi; \
+      done; \
+      rm -rf /var/lib/apt/lists/*; \
+      apt-get update; \
+    }; } \
+    && apt-get install -y --no-install-recommends \
     ffmpeg \
     libcairo2 \
     libpango-1.0-0 \
