@@ -41,6 +41,9 @@ export interface SurveySourceProjection {
   nextFinalCursor?:{id:string;completedAt:string}|null
   /** Whole filtered cohort count, pinned for cross-request paging consistency. */
   sourceFinalCount?:number|null
+  /** Only single-wave v3 exports enumerate non-final participation separately. */
+  nextAttendanceCursor?:string|null
+  sourceAttendanceCount?:number|null
   scores:FrozenScoreObservation[]
   /** Wave-specific columns derived from immutable Publications, even with zero FINALs. */
   scoreColumns:Pick<FrozenScoreObservation,'projectId'|'waveId'|'waveOrdinal'|'measurement'>[]
@@ -199,6 +202,11 @@ export async function loadSurveySource(input:{
   snapshotCutOff?:Date
   expectedSourceRevision?:number
   expectedFinalCount?:number
+  /** V3 export separates valid FINALs from non-final attendance rows. */
+  attendanceOnly?:boolean
+  includeAttendanceCount?:boolean
+  attendanceAfterId?:string
+  expectedAttendanceCount?:number
 }):Promise<SurveySourceProjection>{
   const max=Math.min(500,Math.max(1,input.maxFinals??250))
   return prisma.$transaction(async tx=>{
@@ -261,7 +269,7 @@ export async function loadSurveySource(input:{
           {completedAt:input.afterFinal.completedAt,id:{gt:input.afterFinal.id}},
         ]}]}:{}),
     }
-    const headers=await tx.surveyWaveFinal.findMany({
+    const headers=input.attendanceOnly?[]:await tx.surveyWaveFinal.findMany({
       where:finalWhere,select:{id:true,publicationId:true,completedAt:true},
       orderBy:input.stableIdCursor
         ?[{id:'asc' as const}]
@@ -332,7 +340,7 @@ export async function loadSurveySource(input:{
     }
     // A linked participant may have STARTED but not FINAL at T2. Preserve
     // that distinction from NO_WAVE without decrypting incomplete answers.
-    const attendanceRows=input.includeAttendance===false?[]:await tx.surveyWaveAttempt.findMany({
+    const attendanceRows=input.includeAttendance===false||input.attendanceOnly?[]:await tx.surveyWaveAttempt.findMany({
       where:{
         projectId:input.projectId,
         ...(input.waveIds?.length?{waveId:{in:input.waveIds}}:{}),
@@ -345,7 +353,7 @@ export async function loadSurveySource(input:{
     })
     if(attendanceRows.length>5000)
       throw new SurveyAnalyticsError(413,'研究进度数据超出单次读取上限，请缩小波次范围')
-    const attendance=attendanceRows.filter(row=>
+    let attendance:SurveySourceProjection['attendance']=attendanceRows.filter(row=>
       row.participant?.status!=='WITHDRAWN'&&row.excludedAt===null)
       .map(row=>({researchCode:row.participant!.researchCode,waveId:row.waveId,status:row.sampleReview?.verdict==='EXCLUDED'?'QUALITY_EXCLUDED':row.status}))
     // Row projection remains bounded independently from the ciphertext budget.
@@ -382,6 +390,48 @@ export async function loadSurveySource(input:{
           })
         }
         scoreColumns.push(...frozenScoreColumns(input.projectId,wave.id,wave.ordinal,frozen))
+      }
+    }
+    let sourceAttendanceCount:number|null=null
+    let nextAttendanceCursor:string|null=null
+    if(input.includeAttendanceCount||input.attendanceOnly){
+      if(!input.pageMode||input.waveIds?.length!==1||!input.includeWideSchema)
+        throw new SurveyAnalyticsError(400,'参与状态游标只允许已冻结的单波次分页数据')
+      // Only incomplete / quality-excluded linked attempts need synthetic Long
+      // rows. COMPLETED included FINALs are already emitted by the FINAL pass.
+      // Pin the candidate set to the first page's exclusive time watermark.
+      const candidates:Prisma.SurveyWaveAttemptWhereInput={
+        projectId:input.projectId,waveId:input.waveIds[0],
+        participantId:{not:null},excludedAt:null,startedAt:{lt:cutOff},
+        participant:{is:{status:{not:'WITHDRAWN'}}},
+        OR:[{status:{not:'COMPLETED'}},
+          {sampleReview:{is:{verdict:'EXCLUDED'}}}],
+      }
+      sourceAttendanceCount=await tx.surveyWaveAttempt.count({where:candidates})
+      if(sourceAttendanceCount>25000)
+        throw new SurveyAnalyticsError(413,'单波次非 FINAL 参与记录超过 25000 条分页预算')
+      if(input.expectedAttendanceCount!==undefined&&
+        input.expectedAttendanceCount!==sourceAttendanceCount)
+        throw new SurveyAnalyticsError(409,'分批期间未完成参与样本数量已变化，请重新开始')
+      if(input.attendanceOnly){
+        // Bound synthetic rows to ~9000 item/score cells per response page.
+        // Never materialize the whole participant matrix in memory.
+        const variableCount=Math.max(1,codebook.size,scoreColumns.length)
+        const pageSize=Math.max(1,Math.min(250,Math.floor(9000/variableCount)))
+        const page=await tx.surveyWaveAttempt.findMany({
+          where:{...candidates,...(input.attendanceAfterId
+            ?{id:{gt:input.attendanceAfterId}}:{})},
+          orderBy:{id:'asc'},take:pageSize+1,
+          select:{id:true,waveId:true,status:true,
+            sampleReview:{select:{verdict:true}},
+            participant:{select:{researchCode:true}}},
+        })
+        const selected=page.slice(0,pageSize)
+        attendance=selected.map(row=>({
+          researchCode:row.participant!.researchCode,waveId:row.waveId,
+          status:row.sampleReview?.verdict==='EXCLUDED'?'QUALITY_EXCLUDED':row.status,
+        }))
+        nextAttendanceCursor=page.length>pageSize?selected.at(-1)!.id:null
       }
     }
     for(const final of finals){
@@ -464,6 +514,7 @@ export async function loadSurveySource(input:{
       completeAttempts:input.pageMode?finals.length:
         new Set(scores.map(s=>s.attemptId).concat(raw.map(r=>r.attemptId))).size,
       cutOff:cutOff.toISOString(),nextFinalCursor,sourceFinalCount,
+      sourceAttendanceCount,nextAttendanceCursor,
       scores,scoreColumns,raw,codebook:[...codebook.values()],attendance}
   },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead})
 }
