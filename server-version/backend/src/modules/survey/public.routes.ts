@@ -38,9 +38,11 @@ const linked=consent.extend({researchCode:code,accessCredential:secret}).strict(
 const identity=z.object({researchCode:code,accessCredential:secret}).strict()
 const proof=z.object({researchCode:code.optional(),accessCredential:secret}).strict()
 const checkpointWrite=proof.extend({revision:z.number().int().min(0).max(100),
-  answers:z.record(z.record(z.unknown()))}).strict()
+  answers:z.record(z.record(z.unknown())),
+  itemTimings:z.record(z.record(z.unknown())).optional()}).strict()
 const submission=proof.extend({submissionId:z.string().min(16).max(200),
   answers:z.record(z.record(z.unknown())),
+  itemTimings:z.record(z.record(z.unknown())).optional(),
   presentation:z.object({shownBlocks:z.array(z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/)).max(70)}).strict().optional()}).strict()
 const handle=(action:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Response,next:NextFunction)=>{
   try{return success(res,await action(req))}
@@ -77,7 +79,9 @@ publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/checkpoint/read',handl
   readSurveyCheckpoint(checkProof(req,proof.parse(req.body)))))
 publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/checkpoint/save',handle(req=>{
   const body=checkpointWrite.parse(req.body)
-  return saveSurveyCheckpoint(checkProof(req,body),{revision:body.revision,answers:body.answers})
+  return saveSurveyCheckpoint(checkProof(req,body),{
+    revision:body.revision,answers:body.answers,itemTimings:body.itemTimings,
+  })
 }))
 publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/checkpoint/clear',handle(req=>
   clearSurveyCheckpoint(checkProof(req,proof.parse(req.body)))))
