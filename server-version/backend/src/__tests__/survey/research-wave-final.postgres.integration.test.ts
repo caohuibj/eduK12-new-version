@@ -1276,11 +1276,40 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
       expect(cursor).toBeUndefined()
       expect(rows).toBe(105*240)
       expect(seenCodes.size).toBe(105)
-      const score=await createSurveyExport(req,{
-        projectId,format:'SCORE_LONG',waveId:w.id,
-      })
-      expect(score.manifest.rowCount).toBe(105*2)
-      expect(score.nextCursor).toBeNull()
+      // SCORE_LONG only projects numeric scoring, but still decrypts verified
+      // FINAL envelopes under the same 8 MiB page budget. It can therefore
+      // require multiple pages even for just two descriptive score columns.
+      let scoreCursor:string|undefined,scoreRows=0,scorePages=0
+      const scoreCodes=new Set<string>(),scoreAfter=new Set<string>()
+      do{
+        const score=await createSurveyExport(req,{
+          projectId,format:'SCORE_LONG',waveId:w.id,
+          ...(scoreCursor?{cursor:scoreCursor}:{}),
+        })
+        expect(score.manifest.batch.totalIncludedFinals).toBe(105)
+        const result=await downloadSurveyExport(req,{projectId,exportId:score.id})
+        expect(result.csv).not.toContain('item001')
+        const currentCodes=new Set(result.csv.split('\r\n').slice(1)
+          .filter(Boolean).map(line=>line.match(/^"([^"]+)"/)?.[1]))
+        expect(currentCodes.has(undefined)).toBe(false)
+        for(const code of currentCodes){
+          expect(scoreCodes.has(code!)).toBe(false)
+          scoreCodes.add(code!)
+        }
+        scoreRows+=score.manifest.rowCount
+        scorePages++
+        scoreCursor=score.nextCursor??undefined
+        if(scoreCursor){
+          const after=decodeSurveyExportCursor(scoreCursor,
+            projectId,'SCORE_LONG',w.id).after.id
+          expect(scoreAfter.has(after)).toBe(false)
+          scoreAfter.add(after)
+        }
+      }while(scoreCursor&&scorePages<30)
+      expect(scoreCursor).toBeUndefined()
+      expect(scorePages).toBeGreaterThan(1)
+      expect(scoreRows).toBe(105*2)
+      expect(scoreCodes.size).toBe(105)
     }finally{
       if(oldSigning===undefined)delete process.env.ASSET_SIGNING_SECRET
       else process.env.ASSET_SIGNING_SECRET=oldSigning
