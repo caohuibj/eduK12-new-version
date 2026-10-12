@@ -112,14 +112,45 @@ export async function createHuiteacherImprovement(input:{
     if(input.audience==='SCHOOL_SHARED'&&!scope.membership.productAdmin)
       deny('HUITEACHER_ACTION_SCHOOL_ADMIN_REQUIRED')
     if(input.sourceEventId){
+      // A closed title is NOT evidence. Only this Teacher product's formal
+      // completed Run or submitted non-private observation may justify a
+      // longitudinal plan. Student feedback remains excluded until a
+      // specific, reviewed aggregate disclosure/longitudinal policy exists.
       const source=await tx.$queryRaw<Array<{id:string}>>`
-        SELECT "id" FROM "huiteacher_evaluation_events"
-        WHERE "organization_id"=${input.organizationId}
-          AND "id"=${input.sourceEventId}
-          AND "target_id"=${input.targetId}
-          AND "status"='CLOSED' FOR SHARE
+        SELECT e."id" FROM "huiteacher_evaluation_events" e
+        WHERE e."organization_id"=${input.organizationId}
+          AND e."id"=${input.sourceEventId}
+          AND e."target_id"=${input.targetId}
+          AND e."status"='CLOSED'
+          AND NOT EXISTS(
+            SELECT 1 FROM "huiteacher_student_eval_configs" student
+            WHERE student."organization_id"=e."organization_id"
+              AND student."event_id"=e."id"
+          )
+          AND (
+            EXISTS(
+              SELECT 1 FROM "huiteacher_evaluation_run_links" link
+              JOIN "assessment_runs" run
+                ON run."organization_id"=link."organization_id"
+                AND run."id"=link."run_id"
+                AND run."status"='CLOSED'
+              JOIN "assessment_run_executions" x
+                ON x."organization_id"=run."organization_id"
+                AND x."run_id"=run."id"
+                AND x."status"='COMPLETED'
+              WHERE link."organization_id"=e."organization_id"
+                AND link."event_id"=e."id"
+            )
+            OR EXISTS(
+              SELECT 1 FROM "huiteacher_observation_records" note
+              WHERE note."organization_id"=e."organization_id"
+                AND note."event_id"=e."id"
+                AND note."status"='SUBMITTED'
+                AND note."kind" IN ('FACT','FORMAL_FEEDBACK')
+            )
+          ) FOR SHARE OF e
       `
-      if(source.length!==1)deny('HUITEACHER_ACTION_SOURCE_NOT_CLOSED',409)
+      if(source.length!==1)deny('HUITEACHER_ACTION_SOURCE_NOT_RELEASABLE',409)
     }
     const goalData=encrypted('GOAL',goal),planData=encrypted('PLAN',plan)
     const row=await tx.huiteacherImprovementAction.create({data:{
@@ -330,6 +361,13 @@ async function reassessmentCandidates(tx:Tx,action:{
     WHERE event."organization_id"=${action.organizationId}
       AND event."target_id"=${action.targetId}
       AND event."status"='CLOSED'
+      -- A teacher cannot use an unpublished/small student feedback group
+      -- as an alternative narrative backdoor or longitudinal comparator.
+      AND NOT EXISTS(
+        SELECT 1 FROM "huiteacher_student_eval_configs" student
+        WHERE student."organization_id"=event."organization_id"
+          AND student."event_id"=event."id"
+      )
       AND event."opened_at">${action.completedAt}
       AND event."closed_at">${action.completedAt}
       AND (${action.sourceEventId}::text IS NULL
