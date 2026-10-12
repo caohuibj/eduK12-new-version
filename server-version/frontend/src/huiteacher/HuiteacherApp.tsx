@@ -6,6 +6,7 @@ import { HuiteacherMyFormTasks } from './HuiteacherMyFormTasks'
 import { HuiteacherMyScaleTasks } from './HuiteacherMyScaleTasks'
 import { HuiteacherPersonalSelf } from './HuiteacherPersonalSelf'
 import { HuiteacherFieldWorkspace } from './HuiteacherFieldWorkspace'
+import { HuiteacherConsensusReviews } from './HuiteacherConsensus'
 
 type Envelope<T>={code:string|number;message:string;data:T}
 type Scope={organizationId:string;organizationName:string;membershipId:string;orgRole:string;productAdmin:boolean}
@@ -282,7 +283,8 @@ export default function HuiteacherApp(){
       {org?.productAdmin&&<HuiteacherFormStudio
         key={org.organizationId} organizationId={org.organizationId} api={teacherApi}/>}
       {me.role!=='STUDENT'&&<HuiteacherPersonalSelf api={teacherApi}/>}
-      {me.role!=='STUDENT'&&<HuiteacherFieldWorkspace api={teacherApi}/>}
+      {me.role!=='STUDENT'&&<HuiteacherFieldWorkspace api={teacherApi}/>
+      {me.role!=='STUDENT'&&<HuiteacherConsensusReviews api={teacherApi}/>}}
       {me.role!=='STUDENT'&&<HuiteacherMyFormTasks api={teacherApi}/>}
       {me.role!=='STUDENT'&&<HuiteacherMyScaleTasks api={teacherApi}/>}
       <section className="ht-panel"><h2>后续功能模块</h2>

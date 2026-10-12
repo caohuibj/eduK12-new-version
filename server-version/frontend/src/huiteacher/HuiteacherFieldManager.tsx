@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { HuiteacherConsensusManager } from './HuiteacherConsensus'
 type Api=<T>(path:string,method?:string,payload?:unknown)=>Promise<T>
 type Role='EXPERT'|'PEER'
 type Grant={id:string;observerUserId:string;role:Role;status:'INVITED'|'ACCEPTED'|'REVOKED';
@@ -86,5 +87,7 @@ export function HuiteacherFieldManager({organizationId,eventId,eventStatus,api}:
         <span className="ht-tag">已提交 · {new Date(note.submittedAt).toLocaleString()}</span>
         <p className="ht-field-content">{note.content}</p>
       </article>):<p>尚无正式提交的观察反馈。私人反思不进入学校反馈。</p>}</div>}
+    {eventStatus==='CLOSED'&&<HuiteacherConsensusManager
+      organizationId={organizationId} eventId={eventId} api={api}/>}
   </section>
 }
