@@ -6,7 +6,9 @@ import {authenticateHuiteacher} from '../../middleware/auth'
 import {success} from '../../utils/response'
 import {requireTeacherProductAdmin,requireRecentTeacherMfa} from './authority'
 import {HuiteacherImprovementError,createHuiteacherImprovement,
-  listHuiteacherImprovements,listMyHuiteacherImprovementTargets,transitionHuiteacherImprovement} from './improvement.service'
+  listHuiteacherImprovements,listMyHuiteacherImprovementTargets,
+  transitionHuiteacherImprovement,listHuiteacherReassessmentCandidates,
+  attachHuiteacherReassessment} from './improvement.service'
 
 const router=Router()
 const id=z.string().uuid()
@@ -80,4 +82,32 @@ const update=(audience:'PRIVATE_PERSONAL'|'SCHOOL_SHARED')=>
 router.post(base+'/private/:actionId/transition',limiter,update('PRIVATE_PERSONAL'))
 router.post(base+'/school/:actionId/transition',
   requireTeacherProductAdmin,requireRecentTeacherMfa,limiter,update('SCHOOL_SHARED'))
+
+const reassessment=z.object({
+  eventId:id,feedback:z.string().trim().min(15).max(2500),
+}).strict()
+const candidateRate=createRedisRateLimiter({
+  name:'huiteacher-reassessment-provenance-reads',
+  limit:30,windowSeconds:900,
+  key:req=>req.user?.userId||req.ip||'unknown',
+})
+const candidates=(audience:'PRIVATE_PERSONAL'|'SCHOOL_SHARED')=>
+  wrap(req=>listHuiteacherReassessmentCandidates({
+    ...actionParams.parse(req.params),
+    actorUserId:req.user!.userId,audience,
+  }))
+const link=(audience:'PRIVATE_PERSONAL'|'SCHOOL_SHARED')=>
+  wrap(req=>attachHuiteacherReassessment({
+    ...actionParams.parse(req.params),
+    actorUserId:req.user!.userId,audience,
+    ...reassessment.parse(req.body),
+  }))
+router.get(base+'/private/:actionId/reassessment-candidates',candidateRate,
+  candidates('PRIVATE_PERSONAL'))
+router.get(base+'/school/:actionId/reassessment-candidates',
+  requireTeacherProductAdmin,candidateRate,candidates('SCHOOL_SHARED'))
+router.post(base+'/private/:actionId/reassessment',limiter,
+  link('PRIVATE_PERSONAL'))
+router.post(base+'/school/:actionId/reassessment',
+  requireTeacherProductAdmin,requireRecentTeacherMfa,limiter,link('SCHOOL_SHARED'))
 export default router
