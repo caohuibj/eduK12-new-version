@@ -1,4 +1,4 @@
-import {afterEach,describe,expect,it} from 'vitest'
+import {afterEach,describe,expect,it,vi} from 'vitest'
 import {STANDARD,ENHANCED} from '../modules/report-privacy/registry'
 import {
   teacherPrivacyV2Enabled,teacherReportMinimum,
@@ -8,6 +8,8 @@ import {
   createProtectedFormItems,recordProtectedFormAnswers,discloseProtectedFormItems,
 } from '../modules/huiteacher/groupReport.service'
 import type {FormDraft} from '../modules/survey/builder.definition'
+import {hasConflictingComparableTeacherFormHistory}
+  from '../modules/huiteacher/privacyReleaseV2.service'
 
 const saved={a:process.env.REPORT_PRIVACY_TEACHER_V2_ENABLED,
   b:process.env.REPORT_PRIVACY_PREFERENCES_V1_ENABLED}
@@ -86,5 +88,23 @@ describe('Teacher V2 report/privacy policy and output projection',()=>{
     expect(blocked[0]).toMatchObject({
       status:'WITHHELD',reason:'POLICY_ITEM_DISTRIBUTION',
     })
+  })
+
+  it('protects only comparable identical Form versions, not unrelated school questionnaires',async()=>{
+    const query=vi.fn(async()=>[{conflict:false}])
+    const input={organizationId:'school-a',runId:'run-new',
+      definitionDigest:'only-this-published-definition',populationDigest:'p-new'}
+    expect(await hasConflictingComparableTeacherFormHistory({$queryRaw:query} as any,input))
+      .toBe(false)
+    const [segments,...values]=query.mock.calls[0] as unknown as [readonly string[],...string[]]
+    const sql=segments.join('?')
+    expect(sql).toContain("release.report_kind='TEACHER_ADULT_FORM_GROUP'")
+    expect(sql).toContain("release.report_projection->>'definitionDigest'=?")
+    expect(sql).toContain('release.source_run_id<>?')
+    expect(values).toEqual([input.organizationId,input.runId,
+      input.definitionDigest,input.populationDigest])
+    query.mockResolvedValueOnce([{conflict:true}])
+    expect(await hasConflictingComparableTeacherFormHistory({$queryRaw:query} as any,input))
+      .toBe(true)
   })
 })
