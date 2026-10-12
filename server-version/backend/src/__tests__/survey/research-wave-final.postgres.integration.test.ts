@@ -1164,5 +1164,97 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     expect(await db.surveyWaveFinal.count({where:{attemptId:participant.attemptId}})).toBe(0)
   })
 
+  it('adapts 240-item timed FINAL pages and skips raw projection for SCORE_LONG',async()=>{
+    const itemKeys=Array.from({length:240},(_,i)=>'item'+String(i+1).padStart(3,'0'))
+    const timedScale:ScaleDraft={...structuredClone(scale),presentationMode:'ONE_BY_ONE',
+      items:itemKeys.map((itemKey,i)=>({
+        itemKey,prompt:'第 '+(i+1)+' 题',required:true,reverse:false,
+        dimensionKeys:['motivation','strategy'],
+      }))}
+    const draftId=await instrument('SCALE',timedScale)
+    const w=await wave('复杂量表动态 FINAL 分批',[draftId],true)
+    const linked=await joinLinkedStudy({
+      publicId:w.publicId,waveId:w.id,entryToken:w.entrySecret,
+      consent:true,consentVersion:1,
+    })
+    const task=await getOwnResearchTask({
+      publicId:w.publicId,attemptId:linked.attemptId,
+      researchCode:linked.researchCode,accessCredential:linked.accessCredential,
+    })
+    const instrumentKey=task.units[0].instrumentKey
+    const rawAnswers=Object.fromEntries(itemKeys.map(itemKey=>[itemKey,'o4']))
+    const timingRows=Object.fromEntries(itemKeys.map(itemKey=>[itemKey,{
+      schemaVersion:1 as const,firstResponseMs:500,activeTimeMs:700,
+      visits:1,revisitCount:0,changeCount:0,
+      interrupted:false,recoveredWithoutClock:false,
+    }]))
+    await submitResearchFinal({
+      publicId:w.publicId,attemptId:linked.attemptId,
+      researchCode:linked.researchCode,accessCredential:linked.accessCredential,
+      submissionId:randomUUID(),answers:{[instrumentKey]:rawAnswers},
+      itemTimings:{[instrumentKey]:timingRows},
+    })
+    const exemplar=await db.surveyWaveFinal.findUniqueOrThrow({
+      where:{attemptId:linked.attemptId},
+    })
+    const synthetic=Array.from({length:104},(_,i)=>({
+      id:randomUUID(),projectId,
+      researchCode:'R-8'+String(i).padStart(9,'0'),
+      credentialHash:createHash('sha256').update('dynamic-pagination-'+w.id+'-'+i).digest('hex'),
+      status:'ACTIVE' as const,
+    }))
+    const attempts=synthetic.map(p=>({
+      id:randomUUID(),projectId,waveId:w.id,participantId:p.id,
+      status:'COMPLETED' as const,completedAt:new Date(),
+    }))
+    await db.surveyParticipant.createMany({data:synthetic})
+    const oldSigning=process.env.ASSET_SIGNING_SECRET
+    process.env.ASSET_SIGNING_SECRET='ci-survey-dynamic-v4-export-signature-key'
+    try{
+      await db.surveyWaveAttempt.createMany({data:attempts})
+      await db.surveyWaveFinal.createMany({data:attempts.map(a=>({
+        id:randomUUID(),attemptId:a.id,projectId,waveId:w.id,
+        publicationId:exemplar.publicationId,submissionId:randomUUID(),
+        definitionDigest:exemplar.definitionDigest,
+        payloadHash:exemplar.payloadHash,resultsCipher:exemplar.resultsCipher,
+        resultsHash:exemplar.resultsHash,
+      }))})
+      const token=generateToken({
+        userId:ownerId,username:'synthetic-researcher',role:'STUDENT',
+        accountDomain:'SURVEY',tokenVersion:0,mfaVerifiedAt:Math.floor(Date.now()/1000),
+      })
+      const req={headers:{cookie:'huisurvey_research_session='+token},
+        user:{userId:ownerId,tokenVersion:0,username:'synthetic-researcher',
+          role:'STUDENT',platformRole:'STANDARD',mustChangePassword:false,
+          accountDomain:'SURVEY'}} as unknown as Request
+      // Previously 105 × 240 = 25,200 rows was rejected at the first page.
+      let cursor:string|undefined,rows=0,pages=0
+      do{
+        const page=await createSurveyExport(req,{
+          projectId,format:'RAW_WAVE',waveId:w.id,...(cursor?{cursor}:{})})
+        expect(page.manifest.batch.representation).toBe('FINAL_ITEM_OR_SCORE_ROWS')
+        expect(page.manifest.rowCount).toBeLessThanOrEqual(25000)
+        expect(page.manifest.batch.totalIncludedFinals).toBe(105)
+        rows+=page.manifest.rowCount
+        pages++
+        cursor=page.nextCursor??undefined
+      }while(cursor&&pages<30)
+      expect(pages).toBeGreaterThan(1)
+      expect(cursor).toBeUndefined()
+      expect(rows).toBe(105*240)
+      const score=await createSurveyExport(req,{
+        projectId,format:'SCORE_LONG',waveId:w.id,
+      })
+      expect(score.manifest.rowCount).toBe(105*2)
+      expect(score.nextCursor).toBeNull()
+    }finally{
+      if(oldSigning===undefined)delete process.env.ASSET_SIGNING_SECRET
+      else process.env.ASSET_SIGNING_SECRET=oldSigning
+      await db.surveyWaveFinal.deleteMany({where:{attemptId:{in:attempts.map(a=>a.id)}}})
+      await db.surveyWaveAttempt.deleteMany({where:{id:{in:attempts.map(a=>a.id)}}})
+      await db.surveyParticipant.deleteMany({where:{id:{in:synthetic.map(p=>p.id)}}})
+    }
+  },30000)
+
 
 })
