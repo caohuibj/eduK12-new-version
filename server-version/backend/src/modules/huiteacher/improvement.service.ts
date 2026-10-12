@@ -1,5 +1,5 @@
 import {randomUUID} from 'node:crypto'
-import type {Prisma} from '@prisma/client'
+import {Prisma} from '@prisma/client'
 import {prisma} from '../../config/database'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {encryptUnifiedRuntimePayload,decryptUnifiedRuntimePayload} from '../assessment-runtime/security'
@@ -17,12 +17,12 @@ export class HuiteacherImprovementError extends Error {
 const deny=(code:string,statusCode=403):never=>{
   throw new HuiteacherImprovementError(code,statusCode)
 }
-const encrypted=(kind:'GOAL'|'PLAN'|'EVIDENCE',text:string)=>{
+const encrypted=(kind:'GOAL'|'PLAN'|'EVIDENCE'|'REASSESSMENT',text:string)=>{
   const payload={schemaVersion:1 as const,
     purpose:'HUITEACHER_IMPROVEMENT' as const,kind,text}
   return {cipher:encryptUnifiedRuntimePayload(payload),hash:canonicalHash(payload)}
 }
-const decrypted=(kind:'GOAL'|'PLAN'|'EVIDENCE',cipher:string,hash:string)=>{
+const decrypted=(kind:'GOAL'|'PLAN'|'EVIDENCE'|'REASSESSMENT',cipher:string,hash:string)=>{
   const value=decryptUnifiedRuntimePayload<{
     schemaVersion:number;purpose:string;kind:string;text:string
   }>(cipher)
@@ -213,7 +213,24 @@ export async function listHuiteacherImprovements(input:{
     })
     const visible=rows.filter(row=>canRead(scope,row.audience as Audience,
       row.ownerUserId,input.actorUserId))
-    return {targetId:input.targetId,list:visible.slice(0,50).map(projected),
+    // Single scoped read for 50 actions, not one query per participant.
+    const ids=visible.slice(0,50).map(row=>row.id)
+    const reassessments=ids.length?await tx.huiteacherImprovementReassessment.findMany({
+      where:{organizationId:input.organizationId,actionId:{in:ids}},
+      select:{actionId:true,eventId:true,createdAt:true,
+        feedbackCipher:true,feedbackHash:true},
+    }):[]
+    const byAction=new Map(reassessments.map(row=>[row.actionId,row]))
+    return {targetId:input.targetId,list:visible.slice(0,50).map(row=>{
+      const review=byAction.get(row.id)
+      return {...projected(row),reassessment:review?{
+        eventId:review.eventId,
+        feedback:decrypted('REASSESSMENT',
+          review.feedbackCipher,review.feedbackHash),
+        recordedAt:review.createdAt,
+        comparisonPolicy:'NARRATIVE_ONLY_NO_CAUSAL_INFERENCE' as const,
+      }:null}
+    }),
       nextCursor:rows.length>50?rows[49].id:null,
       disclosure:'SCHOOL_SHARED_OR_OWN_PRIVATE' as const}
   })
@@ -278,4 +295,121 @@ export async function transitionHuiteacherImprovement(input:{
     })
     return {actionId:row.id,status:next,version:row.version+1}
   })
+}
+
+
+type ReassessmentAccess={
+  actorUserId:string;organizationId:string;targetId:string;
+  actionId:string;audience:Audience
+}
+async function verifiedReviewAction(tx:Tx,input:ReassessmentAccess,write:boolean){
+  const scope=await currentScope(tx,input)
+  const action=await tx.huiteacherImprovementAction.findFirst({
+    where:{id:input.actionId,organizationId:input.organizationId,
+      targetId:input.targetId,audience:input.audience},
+  })
+  if(!action)deny('HUITEACHER_REASSESSMENT_ACTION_NOT_FOUND',404)
+  if(!canRead(scope,action.audience as Audience,action.ownerUserId,input.actorUserId))
+    deny('HUITEACHER_REASSESSMENT_AUDIENCE_FORBIDDEN')
+  if(write&&input.audience==='SCHOOL_SHARED'&&!scope.membership.productAdmin)
+    deny('HUITEACHER_REASSESSMENT_ADMIN_REQUIRED')
+  if(action.status!=='COMPLETED'||!action.completedAt)
+    deny('HUITEACHER_REASSESSMENT_ACTION_INCOMPLETE',409)
+  return action
+}
+
+async function reassessmentCandidates(tx:Tx,action:{
+  organizationId:string;targetId:string;completedAt:Date|null;
+  sourceEventId:string|null
+},eventId?:string){
+  if(!action.completedAt)deny('HUITEACHER_REASSESSMENT_ACTION_INCOMPLETE',409)
+  return tx.$queryRaw<Array<{id:string;title:string;kind:string;closedAt:Date}>>`
+    SELECT event."id",event."title",event."kind",
+      event."closed_at" AS "closedAt"
+    FROM "huiteacher_evaluation_events" event
+    WHERE event."organization_id"=${action.organizationId}
+      AND event."target_id"=${action.targetId}
+      AND event."status"='CLOSED'
+      AND event."closed_at">${action.completedAt}
+      AND (${action.sourceEventId}::text IS NULL
+        OR event."id"<>${action.sourceEventId})
+      AND (${eventId??null}::text IS NULL OR event."id"=${eventId??null})
+      AND (
+        EXISTS(
+          SELECT 1 FROM "huiteacher_evaluation_run_links" link
+          JOIN "assessment_runs" run
+            ON run."organization_id"=link."organization_id"
+            AND run."id"=link."run_id" AND run."status"='CLOSED'
+          JOIN "assessment_run_executions" execution
+            ON execution."organization_id"=run."organization_id"
+            AND execution."run_id"=run."id"
+            AND execution."status"='COMPLETED'
+          WHERE link."organization_id"=event."organization_id"
+            AND link."event_id"=event."id"
+        )
+        OR EXISTS(
+          SELECT 1 FROM "huiteacher_observation_records" record
+          WHERE record."organization_id"=event."organization_id"
+            AND record."event_id"=event."id"
+            AND record."status"='SUBMITTED'
+            AND record."kind" IN ('FACT','FORMAL_FEEDBACK')
+        )
+      )
+    ORDER BY event."closed_at" DESC,event."id" DESC LIMIT 51
+  `
+}
+/** A completed action can point to only one LATER, evidence-bearing event.
+ * Listing is metadata-only, never a second, unsafe route to raw reports.
+ */
+export async function listHuiteacherReassessmentCandidates(input:ReassessmentAccess){
+  return prisma.$transaction(async tx=>{
+    const action=await verifiedReviewAction(tx,input,false)
+    const rows=await reassessmentCandidates(tx,action)
+    return {list:rows.slice(0,50),truncated:rows.length>50,
+      note:'只列出行动完成后正式关闭、具有提交证据的同对象活动；不代表量尺可比或具有因果效果。'}
+  })
+}
+export async function attachHuiteacherReassessment(input:ReassessmentAccess&{
+  eventId:string;feedback:string
+}){
+  const feedback=input.feedback.trim()
+  if(feedback.length<15||feedback.length>2500)
+    deny('HUITEACHER_REASSESSMENT_FEEDBACK_INVALID',400)
+  try{
+    return await prisma.$transaction(async tx=>{
+      const action=await verifiedReviewAction(tx,input,true)
+      const source=await reassessmentCandidates(tx,action,input.eventId)
+      if(source.length!==1||source[0].id!==input.eventId)
+        deny('HUITEACHER_REASSESSMENT_SOURCE_INVALID',409)
+      const existing=await tx.huiteacherImprovementReassessment.findUnique({
+        where:{organizationId_actionId:{
+          organizationId:input.organizationId,actionId:input.actionId,
+        }},select:{id:true},
+      })
+      if(existing)deny('HUITEACHER_REASSESSMENT_ALREADY_LINKED',409)
+      const encryptedNote=encrypted('REASSESSMENT',feedback)
+      const record=await tx.huiteacherImprovementReassessment.create({data:{
+        id:randomUUID(),organizationId:input.organizationId,
+        actionId:input.actionId,targetId:input.targetId,
+        eventId:input.eventId,reviewedByUserId:input.actorUserId,
+        feedbackCipher:encryptedNote.cipher,feedbackHash:encryptedNote.hash,
+      }})
+      await appendAudit(tx,{
+        organizationId:input.organizationId,actorUserId:input.actorUserId,
+        action:'HUITEACHER_IMPROVEMENT_REASSESSED',
+        targetType:'IMPROVEMENT_ACTION',targetId:input.actionId,
+        domainEventId:randomUUID(),payload:{
+          reassessmentEventId:input.eventId,audience:input.audience,
+          comparisonPolicy:'NARRATIVE_ONLY',
+        },
+      })
+      return {actionId:input.actionId,eventId:record.eventId,
+        feedback,recordedAt:record.createdAt,
+        comparisonPolicy:'NARRATIVE_ONLY_NO_CAUSAL_INFERENCE' as const}
+    })
+  }catch(error){
+    if(error instanceof Prisma.PrismaClientKnownRequestError&&error.code==='P2002')
+      deny('HUITEACHER_REASSESSMENT_ALREADY_LINKED',409)
+    throw error
+  }
 }
