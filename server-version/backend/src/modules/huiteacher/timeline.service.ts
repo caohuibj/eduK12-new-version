@@ -99,10 +99,40 @@ export async function readHuiteacherTargetTimeline(input:{
         compared:false as const,
       }
     })
+    // Pair only events for the SAME stable target and the same activity
+    // kind, newest to oldest within this page. Version identity alone never
+    // grants numeric comparability, respondent overlap or causality.
+    const priorClosedByKind=new Map<string,typeof list[number]>()
+    const annotated=Array.from({length:list.length},(_,index)=>list[index])
+    for(let index=list.length-1;index>=0;index--){
+      const current=list[index]
+      const previous=priorClosedByKind.get(current.kind)
+      const privateStudent=current.sourceKind==='STUDENT_FEEDBACK'
+        ||previous?.sourceKind==='STUDENT_FEEDBACK'
+      const currentVersions=current.instrumentVersions.map(v=>
+        [v.family,v.key,v.version].join(':')).sort()
+      const oldVersions=previous?.instrumentVersions.map(v=>
+        [v.family,v.key,v.version].join(':')).sort()??[]
+      const exactVersions=previous&&currentVersions.length>0
+        &&currentVersions.length===oldVersions.length
+        &&currentVersions.every((value,i)=>value===oldVersions[i])
+      const reason=!previous?'NO_CLOSED_BASELINE':
+        privateStudent?'STUDENT_POPULATION_DIFFERENCING_BLOCKED':
+        !exactVersions?'RESOURCE_SET_OR_VERSION_DIFFERENT':
+        'RATERS_CONTEXT_AND_MEASUREMENT_INVARIANCE_UNVERIFIED'
+      annotated[index]={...current,comparisonEvidence:{
+        previousEventId:previous?.eventId??null,
+        sourceMatch:Boolean(previous&&exactVersions&&!privateStudent),
+        reason,
+        numericTrendAllowed:false as const,
+        evidenceGrade:'PROVENANCE_ONLY' as const,
+      }} as typeof list[number]
+      if(current.status==='CLOSED')priorClosedByKind.set(current.kind,current)
+    }
     return {
-      target,list,nextCursor:events.length>100?page[99].id:null,
+      target,list:annotated,nextCursor:events.length>100?page[99].id:null,
       interpretation:'SOURCE_METADATA_ONLY' as const,
-      note:'仅按稳定对象排列评价事件和冻结工具版本。不展示未授权成绩、学生评教作答或纵向趋势。需要相同指标、受众及抽样证据的正式验证才能做数值比较。',
+      note:'同一稳定对象的事件按类型显示相邻正式来源。即使工具版本相同，也只证明部分来源一致；评分者、情境、测量等值性及隐私须另审查。本页绝不展示未授权成绩或计算跨期数字趋势；分页边界不作为完整历史比较证据。',
     }
   })
 }
