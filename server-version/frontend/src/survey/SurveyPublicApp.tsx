@@ -209,6 +209,7 @@ export default function SurveyPublicApp(){
   const [selectedWave,setSelectedWave]=useState<Wave|null>(null),[agreed,setAgreed]=useState(false)
   const [task,setTask]=useState<Task|null>(null),[answers,setAnswers]=useState<Record<string,Record<string,Answer>>>({})
   const [formPages,setFormPages]=useState<Record<string,number>>({})
+  const [scalePages,setScalePages]=useState<Record<string,number>>({})
   const [toolStep,setToolStep]=useState(0)
   const [itemTimings,setItemTimings]=useState<SurveyWaveScaleTimings>({})
   const timingTrackers=useRef<Record<string,SurveyScaleTimingTracker>>({})
@@ -320,7 +321,7 @@ export default function SurveyPublicApp(){
     }
     timingTrackers.current={}
     setAttemptId(id);setSubmissionId(crypto.randomUUID())
-    setTask(data);setFormPages({});setFlowStep(0);setToolStep(0);setScreenedOut(false)
+    setTask(data);setFormPages({});setScalePages({});setFlowStep(0);setToolStep(0);setScreenedOut(false)
     setCheckpointRevision(restoredRevision);setCheckpointOverwritePending(overwritePending)
     setAnswers(restoredAnswers);setItemTimings(restoredTimings)
     if(data.status==='COMPLETED'){
@@ -433,6 +434,8 @@ export default function SurveyPublicApp(){
           responseOptions:unit.responseOptions??[]}}
         answer={answers[unit.instrumentKey]||{}}
         tracker={timingFor(unit)}
+        index={scalePages[unit.instrumentKey]??0}
+        onIndexChange={next=>setScalePages(prev=>({...prev,[unit.instrumentKey]:next}))}
         onAnswer={(key,value)=>updateAnswer(unit,key,value)}
         onTiming={next=>recordTiming(unit.instrumentKey,next)}/>
     return <TaskForm key={unit.instrumentKey} unit={unit}
