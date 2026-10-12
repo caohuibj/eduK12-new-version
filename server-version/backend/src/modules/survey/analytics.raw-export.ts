@@ -54,6 +54,7 @@ export function rawLongExport(projectId:string,source:SurveySourceProjection,wav
   check(projectId,source)
   const rows=ordered(source,waveId)
   const hasFlow=source.codebook.some(c=>c.flowDigest&&(!waveId||c.waveId===waveId))
+  const timingByColumn=new Map(source.codebook.map(c=>[c.columnKey,c.timingContract]))
   const cols=['research_code_or_attempt','wave_id','wave_ordinal','publication_version',
     'instrument_key','item_key','variable_code','value','missing_reason','source_final_hash',
     'attempt_started_at_utc','final_completed_at_utc',
@@ -65,7 +66,10 @@ export function rawLongExport(projectId:string,source:SurveySourceProjection,wav
     r.attemptStartedAt??null,r.completedAt,
     r.itemTiming?.firstResponseMs??null,r.itemTiming?.activeTimeMs??null,
     r.itemTiming?.changeCount??null,r.itemTiming?.revisitCount??null,
-    r.kind==='SCALE'?(r.missingReason==='NOT_SHOWN'?'NOT_SHOWN':timingStatus(r.itemTiming)):'NOT_APPLICABLE',
+    r.kind!=='SCALE'?'NOT_APPLICABLE'
+      :r.missingReason==='NOT_SHOWN'?'NOT_SHOWN'
+        :timingByColumn.get(r.columnKey)==='NOT_COLLECTED'?'NOT_COLLECTED'
+          :timingStatus(r.itemTiming),
     ...(hasFlow?[r.flowDigest??null,r.experimentGroup??null,
       r.shownBlocks??null,r.flowTermination??null]:[]),
   ])
