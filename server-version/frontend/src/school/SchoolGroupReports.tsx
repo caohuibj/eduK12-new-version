@@ -1,5 +1,6 @@
 import { useEffect,useRef,useState } from 'react'
 import type { SchoolApi } from './SchoolRecovery'
+import {SchoolGeneralGroupV2} from './SchoolGeneralGroupV2'
 
 type GroupSource={
   runId:string;trackId:string;name:string
@@ -71,6 +72,9 @@ export function SchoolGroupReports({api,organizationId}:{
   }
   return <section className="hs-panel">
     <h2>学校内部 · 受控群体报告</h2>
+    {import.meta.env.VITE_REPORT_PRIVACY_SCHOOL_V2_ENABLED==='true'&&
+      <SchoolGeneralGroupV2 api={api} organizationId={organizationId}/>}
+    <h3>原有校园心理群体报告（保留完整保护）</h3>
     <p>仅使用已发布的正式科学方案和整组学生自评 Run，须在活动与 Run 结束后经过释放等待期。
       学生人数、作答时间、成员名单和原始答案不会进入此页面；不会向被评价教师或家长自动发布。</p>
     <p>现阶段只供校内授权人员开展支持性分析。群体均值不能证明某种教育措施产生了因果效果，也不能用于个人诊断、排名或绩效考核。</p>

@@ -154,12 +154,12 @@ export function ReportPrivacyPreferences({organizationId,scenarios,api}:{
     {error&&<p role="alert" className="rp-error">{error}</p>}
     {!data?<p aria-live="polite">正在读取此学校的偏好设置…</p>:<>
       <div className="rp-status" role="status">
-        <strong>{data.catalog.reportConsumerActive?'Teacher 新任务偏好已生效':'仅偏好保存阶段'}</strong>
+        <strong>{data.catalog.reportConsumerActive?'适用新任务的偏好已生效':'仅偏好保存阶段'}</strong>
         {' · '}{data.catalog.reportConsumerActive
-          ?'新建 Teacher Form 任务发布时将自动冻结当前偏好。'
+          ?data.catalog.baselineNote
           :'当前报告仍按原有严格规则执行。'}
         <span>{data.catalog.reportConsumerActive
-          ?'历史任务仍按旧规则；报告需由有权管理员首次正式发布。'
+          ?'历史任务与敏感个人报告仍按原有规则；只有授权人员可首次发布审核后的群体报告。'
           :'后续产品适配才会接入正式发布与报告计算。'}</span>
       </div>
       <label className="rp-field">设置层级
