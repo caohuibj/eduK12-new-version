@@ -1,7 +1,8 @@
 import {afterEach,describe,expect,it} from 'vitest'
 import {STANDARD} from '../modules/report-privacy/registry'
 import {
-  schoolPrivacyV2Enabled,reviewedGeneralResources,generalRunApproved,parseFrozenSchoolOptions
+  schoolPrivacyV2Enabled,reviewedGeneralResources,generalRunApproved,parseFrozenSchoolOptions,
+  reviewedMinimumFloor
 } from '../modules/campus/privacyV2'
 
 const old={prefs:process.env.REPORT_PRIVACY_PREFERENCES_V1_ENABLED,
@@ -40,6 +41,14 @@ describe('Huischool PR3 general reporting admission',()=>{
     expect(generalRunApproved({...opts,tracks:[track,{...track,key:'depression'}]})).toBe(false)
     expect(generalRunApproved({...opts,tracks:[{...track,respondentRoles:['TEACHER']}]})).toBe(false)
     expect(generalRunApproved({...opts,tracks:[{...track,analysisMode:'INDIVIDUAL_ONLY'}]})).toBe(false)
+  })
+  it('rejects corrupt or oversized frozen tool minima rather than lowering the floor',()=>{
+    expect(reviewedMinimumFloor(null)).toBe(0)
+    expect(reviewedMinimumFloor(5)).toBe(5)
+    expect(reviewedMinimumFloor(10)).toBe(10)
+    expect(()=>reviewedMinimumFloor(0)).toThrow()
+    expect(()=>reviewedMinimumFloor('10')).toThrow()
+    expect(()=>reviewedMinimumFloor(10_001)).toThrow()
   })
   it('rejects malformed or cross-product policy snapshots',()=>{
     const frozen={schemaVersion:1,product:'HUISCHOOL',scenario:'SCHOOL_GENERAL_EDUCATION_GROUP',

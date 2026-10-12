@@ -8,7 +8,8 @@ import {readFrozenPrivacyForRun} from '../report-privacy/snapshot.service'
 import {requireCampusGroupManager,assertCampusNoGroupDifferencing} from './group-reports'
 import {withCampusReportReleaseLock} from './report-release-lock'
 import {schoolPrivacyV2Enabled,reviewedGeneralResources,
-  generalRunApproved,parseFrozenSchoolOptions,type SchoolActivityPurpose} from './privacyV2'
+  generalRunApproved,parseFrozenSchoolOptions,reviewedMinimumFloor,
+  type SchoolActivityPurpose} from './privacyV2'
 import {projectCampusGeneralGroupV2} from './generalGroupV2.projection'
 import {generateOrganizationGroupAnalysis} from '../reporting/service'
 import {readOrganizationReportingArtifact} from '../reporting/pr4Service'
@@ -32,8 +33,6 @@ type TotalRow={total:number;respondents:number;selfStudent:boolean}
 
 const hidden=(code='CAMPUS_GENERAL_REPORT_UNAVAILABLE',status=409):never=>
   reportingFail(code,'当前校园一般教育群体报告不满足受控披露条件',status)
-const minPositive=(x:unknown)=>typeof x==='number'&&Number.isInteger(x)
-  &&x>=3&&x<=10000?x:0
 
 export const generalScopeKey=(input:Pick<Scope,'organizationId'|'runId'|'trackId'|'specId'>)=>
   canonicalHash({kind:'CAMPUS_GENERAL_GROUP_V2',...input})
@@ -100,8 +99,10 @@ async function frozenGeneralSource(db:DB,input:Scope):Promise<Frozen>{
   const resource=track.frozenPolicy as Record<string,unknown>|null
   if(!resource||!track.policyHash||canonicalHash(resource)!==track.policyHash)
     return hidden('CAMPUS_GENERAL_TRACK_POLICY_INTEGRITY')
-  const resourceFloor=Math.max(minPositive(resource.minimumRespondents),
-    minPositive((track.requestedPolicy as Record<string,unknown>).minimumRespondents),5)
+  let resourceFloor:number
+  try{resourceFloor=Math.max(reviewedMinimumFloor(resource.minimumRespondents),
+      reviewedMinimumFloor((track.requestedPolicy as Record<string,unknown>).minimumRespondents),5)}
+  catch{return hidden('CAMPUS_GENERAL_RESOURCE_FLOOR_INVALID')}
   const totals=await db.$queryRaw<TotalRow[]>(Prisma.sql`
     SELECT COUNT(*)::int AS total,
       COUNT(DISTINCT subject.user_id)::int AS respondents,

@@ -16,6 +16,14 @@ const manifestSchema=z.array(resourceSchema).max(100)
 export type SchoolActivityPurpose=
   'STUDENT_WELLBEING'|'LEARNING_ADAPTATION'|'SCHOOL_CLIMATE'|'FAMILY_SUPPORT'
 
+/** Optional floors may be absent, but malformed or oversized ceilings
+ * must not silently fall back to the permissive five-person baseline. */
+export function reviewedMinimumFloor(value:unknown):number {
+  if(value===null||value===undefined)return 0
+  if(typeof value!=='number'||!Number.isInteger(value)||value<3||value>10000)
+    throw new Error('CAMPUS_GENERAL_RESOURCE_FLOOR_INVALID')
+  return value
+}
 export const schoolPrivacyV2Enabled=()=>(
   process.env.REPORT_PRIVACY_PREFERENCES_V1_ENABLED==='true'
   &&process.env.REPORT_PRIVACY_SCHOOL_V2_ENABLED==='true'
