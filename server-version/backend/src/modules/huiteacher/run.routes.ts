@@ -60,15 +60,15 @@ router.get(base+'/released-scales',authenticateHuiteacher,requireTeacherProductA
   wrap(async(req,res)=>success(res,await listTeacherAvailableScales({
     ...keys.parse(req.params),actorUserId:req.user!.userId,
   }))))
-router.post(base+'/tracks',authenticateHuiteacher,requireTeacherProductAdmin,requireRecentTeacherMfa,
+router.post(base+'/tracks',authenticateHuiteacher,requireTeacherProductAdmin,
   wrap(async(req,res)=>success(res,await addTeacherRunTrack({
     ...keys.parse(req.params),actorUserId:req.user!.userId,...track.parse(req.body),
   }))))
-router.post(base+'/preview',authenticateHuiteacher,requireTeacherProductAdmin,requireRecentTeacherMfa,
+router.post(base+'/preview',authenticateHuiteacher,requireTeacherProductAdmin,
   wrap(async(req,res)=>success(res,await previewTeacherRun({
     ...keys.parse(req.params),actorUserId:req.user!.userId,...version.parse(req.body),
   }))))
-router.post(base+'/publish',authenticateHuiteacher,requireTeacherProductAdmin,requireRecentTeacherMfa,
+router.post(base+'/publish',authenticateHuiteacher,requireTeacherProductAdmin,
   wrap(async(req,res)=>success(res,await publishTeacherRun({
     ...keys.parse(req.params),actorUserId:req.user!.userId,...version.parse(req.body),
   }))))
@@ -76,7 +76,7 @@ router.get(base+'/progress',authenticateHuiteacher,requireTeacherProductAdmin,
   wrap(async(req,res)=>success(res,await progressTeacherRun({
     ...keys.parse(req.params),actorUserId:req.user!.userId,
   }))))
-router.post(base+'/close',authenticateHuiteacher,requireTeacherProductAdmin,requireRecentTeacherMfa,
+router.post(base+'/close',authenticateHuiteacher,requireTeacherProductAdmin,
   wrap(async(req,res)=>success(res,await closeTeacherRun({
     ...keys.parse(req.params),actorUserId:req.user!.userId,
   }))))

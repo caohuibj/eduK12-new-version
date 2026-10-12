@@ -45,7 +45,7 @@ router.get('/organizations/:organizationId/forms',
     }))
   }))
 router.post('/organizations/:organizationId/forms',
-  authenticateHuiteacher,requireTeacherProductAdmin,requireRecentTeacherMfa,
+  authenticateHuiteacher,requireTeacherProductAdmin,
   wrap(async(req,res)=>success(res,await createHuiteacherForm({
     organizationId:id.parse(req.params.organizationId),
     actorUserId:req.user!.userId,...create.parse(req.body),
@@ -57,7 +57,7 @@ router.get('/organizations/:organizationId/forms/:formId',
     actorUserId:req.user!.userId,formId:id.parse(req.params.formId),
   }))))
 router.put('/organizations/:organizationId/forms/:formId',
-  authenticateHuiteacher,requireTeacherProductAdmin,requireRecentTeacherMfa,
+  authenticateHuiteacher,requireTeacherProductAdmin,
   wrap(async(req,res)=>success(res,await updateHuiteacherForm({
     organizationId:id.parse(req.params.organizationId),
     actorUserId:req.user!.userId,formId:id.parse(req.params.formId),

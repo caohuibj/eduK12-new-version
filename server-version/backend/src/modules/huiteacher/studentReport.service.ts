@@ -4,6 +4,7 @@ import {prisma} from '../../config/database'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {decryptUnifiedRuntimePayload} from '../assessment-runtime/security'
 import {resolveEducationProductMemberScope} from '../organization/educationProductAccess'
+import {assertTeacherComparableDisclosure} from './disclosureOverlap.service'
 import {resolvePublishedTeacherForm,teacherFormResourceRef} from './formRunResource'
 import {STUDENT_FORM_PRIVACY_FLOOR} from './studentFormResource'
 import {createProtectedFormItems,recordProtectedFormAnswers,
@@ -267,6 +268,21 @@ export async function readHuiteacherStudentFeedbackReport(input:{
       respondents:[...distinct].sort(),
     })
     if(!frozen){
+      // Legacy GET is a first disclosure write. Join the same organization
+      // lock as V2 so concurrent policy versions cannot bypass each other.
+      await lockTeacherDisclosure(tx,input.organizationId)
+      const legacyRelease=await tx.huiteacherStudentDisclosureLedger.findFirst({
+        where:{organizationId:input.organizationId,teacherUserId:source.targetUserId},
+        select:{firstRunId:true},
+      })
+      // A repeat GET of this already-released V1 Run is read-only in policy
+      // terms; never retroactively deny its historical disclosure.
+      if(legacyRelease?.firstRunId!==source.runId)
+        await assertTeacherComparableDisclosure(tx,{
+          organizationId:input.organizationId,runId:source.runId,
+          definitionDigest:source.definitionDigest,scenario:'TEACHER_STUDENT_EVALUATION',
+          respondents:[...distinct],teacherUserId:source.targetUserId,enhanced:false,
+        })
     const rows=await tx.$queryRaw<Array<{firstRunId:string;releasedAt:Date}>>`
       INSERT INTO "huiteacher_student_disclosure_ledgers"
         ("organization_id","teacher_user_id","class_unit_id","first_run_id",
@@ -313,33 +329,12 @@ export async function readHuiteacherStudentFeedbackReport(input:{
         note:'身份受保护的学生评教。每题按符合披露规则的选项频数汇总；不足最低样本数、小单元、拒答及开放意见受到抑制。不构成经科学验证的教学能力分数。',
       }
     }
-    if(frozen.options.crossReleaseOverlapGuard){
-      const legacy=await tx.huiteacherStudentDisclosureLedger.findFirst({
-        where:{organizationId:input.organizationId,
-          teacherUserId:source.targetUserId},
-        select:{firstRunId:true},
-      })
-      if(legacy&&legacy.firstRunId!==source.runId)
-        deny('STUDENT_REPORT_CROSS_WAVE_DIFFERENCING_BLOCKED',403)
-      const previous=await tx.$queryRaw<Array<{sourceRunId:string}>>`
-        SELECT release.source_run_id AS "sourceRunId"
-        FROM education_report_release_records release
-        JOIN huiteacher_evaluation_run_links link
-          ON link.organization_id=release.organization_id
-          AND link.run_id=release.source_run_id
-        JOIN huiteacher_evaluation_events event
-          ON event.organization_id=link.organization_id AND event.id=link.event_id
-        JOIN huiteacher_evaluation_targets target
-          ON target.organization_id=event.organization_id AND target.id=event.target_id
-        WHERE release.organization_id=${input.organizationId}
-          AND release.report_kind='TEACHER_STUDENT_EVALUATION'
-          AND target.subject_user_id=${source.targetUserId}
-          AND release.source_run_id<>${source.runId}
-        LIMIT 1
-      `
-      if(previous.length)
-        deny('STUDENT_REPORT_CROSS_WAVE_DIFFERENCING_BLOCKED',403)
-    }
+    await assertTeacherComparableDisclosure(tx,{
+      organizationId:input.organizationId,runId:source.runId,
+      definitionDigest:source.definitionDigest,scenario:'TEACHER_STUDENT_EVALUATION',
+      respondents:[...distinct],teacherUserId:source.targetUserId,
+      enhanced:frozen.options.crossReleaseOverlapGuard,
+    })
     const projection={
       source:'VERIFIED_HUITEACHER_STUDENT_FORM_FINAL' as const,
       eventId:input.eventId,teacherName:source.targetName,
@@ -361,7 +356,11 @@ export async function readHuiteacherStudentFeedbackReport(input:{
       actorUserId:input.actorUserId,populationDigest:effectiveDigest,projection,
     })
   },{
-    isolationLevel:Prisma.TransactionIsolationLevel.Serializable,
+    // Legacy GET acquires a late first-disclosure lock; ReadCommitted must
+    // observe any V2 release committed while waiting on that advisory lock.
+    isolationLevel:input.publishV2
+      ?Prisma.TransactionIsolationLevel.Serializable
+      :Prisma.TransactionIsolationLevel.ReadCommitted,
     maxWait:2000,timeout:30000,
   })
 }

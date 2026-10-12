@@ -8,6 +8,7 @@ import {
 } from '../../modules/organization/educationProductAccess'
 import { resolveOrganizationAccessContext } from '../../modules/organization/access'
 import { authenticateHuiteacher,authenticateSchool } from '../../middleware/auth'
+import { requireTeacherProductAdmin } from '../../modules/huiteacher/authority'
 import { generateToken } from '../../utils/jwt'
 import {
   issueTeacherStudentInvitations,registerInvitedTeacherStudent,
@@ -82,6 +83,24 @@ suite('Huiteacher shared education identity with independent School boundaries',
     const teacher=await principal()
     const onlyTeacher=await school(teacher.id,'HUITEACHER')
     await makeProductAdmin(onlyTeacher.organization.id,onlyTeacher.membership.id,teacher.id)
+    const session=(mfaVerifiedAt?:number)=>generateToken({
+      userId:teacher.id,username:teacher.username,role:teacher.role,
+      tokenVersion:teacher.tokenVersion,accountDomain:'SCHOOL',
+      sessionProduct:'HUITEACHER',...(mfaVerifiedAt?{mfaVerifiedAt}:{}),
+    })
+    const adminRequest=(jwt:string)=>({
+      params:{organizationId:onlyTeacher.organization.id},
+      headers:{cookie:'huiteacher_session='+encodeURIComponent(jwt)},
+      user:{userId:teacher.id,accountDomain:'SCHOOL'},
+    }) as unknown as Request
+    const denied=response(),deniedNext=vi.fn()
+    await requireTeacherProductAdmin(adminRequest(session()),denied.res,deniedNext)
+    expect(denied.state.status).toBe(403)
+    expect(deniedNext).not.toHaveBeenCalled()
+    const verified=response(),verifiedNext=vi.fn()
+    await requireTeacherProductAdmin(adminRequest(session(Math.floor(Date.now()/1000))),
+      verified.res,verifiedNext)
+    expect(verifiedNext).toHaveBeenCalledTimes(1)
     expect((await resolveEducationProductMemberScope({
       actorUserId:teacher.id,organizationId:onlyTeacher.organization.id,
       product:'HUITEACHER',

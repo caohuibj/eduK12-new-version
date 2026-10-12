@@ -75,7 +75,7 @@ router.use(authenticateHuiteacher)
 router.get('/my-student-feedback',wrap(req=>
   listMyHuiteacherStudentFeedback(req.user!.userId)))
 const path='/organizations/:organizationId/evaluation-events/:eventId/student-evaluation'
-router.get(path+'/candidates',requireTeacherProductAdmin,requireRecentTeacherMfa,
+router.get(path+'/candidates',requireTeacherProductAdmin,
   wrap(req=>listHuiteacherStudentEvaluationCandidates({
     ...params.parse(req.params),actorUserId:req.user!.userId,
   })))
@@ -83,14 +83,14 @@ router.get(path,requireTeacherProductAdmin,wrap(req=>
   readHuiteacherStudentEvaluation({
     ...params.parse(req.params),actorUserId:req.user!.userId,
   })))
-router.get(path+'/eligibility',requireTeacherProductAdmin,requireRecentTeacherMfa,
+router.get(path+'/eligibility',requireTeacherProductAdmin,
   wrap(req=>previewHuiteacherStudentEvaluation({
     ...params.parse(req.params),actorUserId:req.user!.userId,
   })))
 
 const runVersion=z.object({expectedVersion:z.number().int().positive()}).strict()
 const runDraft=z.object({intakeDeadline:z.string().datetime().nullable().optional()}).strict()
-router.post(path+'/run',requireTeacherProductAdmin,requireRecentTeacherMfa,limiter,
+router.post(path+'/run',requireTeacherProductAdmin,limiter,
   wrap(req=>{
     const body=runDraft.parse(req.body)
     return createHuiteacherStudentEvaluationRun({
@@ -98,12 +98,12 @@ router.post(path+'/run',requireTeacherProductAdmin,requireRecentTeacherMfa,limit
       intakeDeadline:body.intakeDeadline?new Date(body.intakeDeadline):null,
     })
   }))
-router.post(path+'/run/preview',requireTeacherProductAdmin,requireRecentTeacherMfa,limiter,
+router.post(path+'/run/preview',requireTeacherProductAdmin,limiter,
   wrap(req=>previewHuiteacherStudentEvaluationRun({
     ...params.parse(req.params),actorUserId:req.user!.userId,
     ...runVersion.parse(req.body),
   })))
-router.post(path+'/run/publish',requireTeacherProductAdmin,requireRecentTeacherMfa,limiter,
+router.post(path+'/run/publish',requireTeacherProductAdmin,limiter,
   wrap(req=>publishHuiteacherStudentEvaluationRun({
     ...params.parse(req.params),actorUserId:req.user!.userId,
     ...runVersion.parse(req.body),
@@ -117,7 +117,7 @@ router.get(path+'/report',reportLimiter,wrap(req=>
   readHuiteacherStudentFeedbackReport({
     ...params.parse(req.params),actorUserId:req.user!.userId,
   })))
-router.post(path,requireTeacherProductAdmin,requireRecentTeacherMfa,limiter,
+router.post(path,requireTeacherProductAdmin,limiter,
   wrap(req=>configureHuiteacherStudentEvaluation({
     ...params.parse(req.params),actorUserId:req.user!.userId,
     ...create.parse(req.body),

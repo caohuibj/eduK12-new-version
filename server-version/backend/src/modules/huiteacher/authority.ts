@@ -28,6 +28,14 @@ export async function requireTeacherProductAdmin(req:Request,res:Response,next:N
       actorUserId:req.user.userId,organizationId,product:'HUITEACHER',
     })
     if(!scope?.productAdmin)return forbidden(res,'缺少本校 Teacher 管理授权')
+    // A product-admin grant may be added after an ordinary session was issued.
+    // Routine writes no longer require a fresh 5-minute TOTP, but they must
+    // never turn a password-only session into an administrative session.
+    const token=getHuiteacherSessionToken(req)
+    const claims=token?verifyToken(token):null
+    if(claims?.sessionProduct!=='HUITEACHER'||claims.accountDomain!=='SCHOOL'
+      ||claims.userId!==req.user.userId||!claims.mfaVerifiedAt)
+      return forbidden(res,'管理权限需要先完成双因素登录，请重新登录')
     next()
   }catch(e){next(e)}
 }
