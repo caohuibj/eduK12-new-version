@@ -167,10 +167,10 @@ type ComparableHistory={id:string;manifest:unknown;resolvedN:number|null}
  * earlier legacy aggregate. No user IDs are retained in the release ledger.
  * The same School disclosure lock covers these reads and the release write.
  */
-async function assertGeneralContributorOverlap(input:{
+async function assertGeneralContributorOverlap(db:DB,input:{
   organizationId:string;artifactId:string;source:Frozen;contributors:readonly string[]
 }):Promise<void>{
-  const history=await prisma.$queryRaw<ComparableHistory[]>(Prisma.sql`
+  const history=await db.$queryRaw<ComparableHistory[]>(Prisma.sql`
     SELECT history.id,history.manifest,history."resolvedN"
     FROM (
       SELECT a.id,a.artifact_payload->'inputManifest' AS manifest,
@@ -290,7 +290,7 @@ export async function publishCampusGeneralGroupV2(input:Scope){
         hidden('CAMPUS_GENERAL_POLICY_CHANGED')
       if(await readRelease(tx,input,source.snapshotId))return
       if(source.options.crossReleaseOverlapGuard)
-        await assertGeneralContributorOverlap({
+        await assertGeneralContributorOverlap(tx,{
           organizationId:input.organizationId,artifactId:analysis.artifactId,
           source,contributors,
         })
