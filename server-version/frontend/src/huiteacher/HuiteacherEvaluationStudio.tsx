@@ -1,3 +1,4 @@
+import {HuiteacherGrowthManager} from './HuiteacherGrowthManager'
 import { useEffect,useState } from 'react'
 import { HuiteacherFieldManager } from './HuiteacherFieldManager'
 import { HuiteacherStudentEvaluationManager } from './HuiteacherStudentEvaluationManager'
@@ -343,6 +344,8 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
         </article>)}
       </div>}
     </article>)}</div>
+{import.meta.env.VITE_HUITEACHER_IMPROVEMENT_ENABLED==='true'
+  &&<HuiteacherGrowthManager api={api} organizationId={organizationId} targets={targets}/>}
 <p className="ht-muted">Form-only 使用正式发布版本、标准 Run 和加密 FINAL；没有计分规则，不产生 Scale 得分。低于最小样本量的群体报告保持抑制。</p>
   </section>
 }

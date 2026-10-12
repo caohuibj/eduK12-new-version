@@ -65,3 +65,12 @@
 .ht-app .ht-consensus-citation input{flex-shrink:0;margin-top:.3rem}
 .ht-app .ht-consensus-citation span{display:block;min-width:0}
 .ht-app .ht-consensus-citation .ht-field-content{font-weight:400;white-space:pre-wrap}
+
+/* PR6: responsive and keyboard-accessible improvement cycle. */
+.ht-app .ht-growth{margin:1.2rem 0;padding:1rem;border:1px solid var(--ht-line);border-radius:10px;background:var(--ht-paper)}
+.ht-app .ht-growth h3{margin:.1rem 0 .6rem}
+.ht-app .ht-growth-form{display:grid;gap:.85rem;margin:1rem 0}
+.ht-app .ht-growth .ht-field{min-width:0}
+.ht-app .ht-growth textarea{max-width:100%}
+.ht-app .ht-growth .ht-event{overflow-wrap:anywhere}
+.ht-app .ht-growth .ht-event .ht-field-content{white-space:pre-wrap}
