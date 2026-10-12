@@ -3180,3 +3180,39 @@ model HuiteacherGroupDisclosureLedger {
   @@id([organizationId, definitionDigest])
   @@map("huiteacher_group_disclosure_ledgers")
 }
+
+// PR4 event-scoped external observer; no membership in School psychology.
+model HuiteacherObserverGrant {
+  id               String    @id
+  organizationId   String    @map("organization_id")
+  eventId          String    @map("event_id")
+  observerUserId   String    @map("observer_user_id")
+  role             String
+  status           String    @default("INVITED")
+  invitedByUserId  String    @map("invited_by_user_id")
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  expiresAt        DateTime  @map("expires_at") @db.Timestamptz(6)
+  acceptedAt       DateTime? @map("accepted_at") @db.Timestamptz(6)
+  revokedAt        DateTime? @map("revoked_at") @db.Timestamptz(6)
+  revision         Int       @default(1)
+  @@unique([organizationId,eventId,observerUserId])
+  @@index([observerUserId,status,expiresAt], map:"huiteacher_observer_grants_user_idx")
+  @@map("huiteacher_observer_grants")
+}
+
+model HuiteacherObservationRecord {
+  id               String    @id
+  organizationId   String    @map("organization_id")
+  eventId          String    @map("event_id")
+  observerUserId   String    @map("observer_user_id")
+  kind             String
+  status           String    @default("DRAFT")
+  bodyCipher       String    @map("body_cipher")
+  revision         Int       @default(1)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  submittedAt      DateTime? @map("submitted_at") @db.Timestamptz(6)
+  @@index([organizationId,eventId,status,kind],map:"huiteacher_observation_records_event_idx")
+  @@index([observerUserId,createdAt(sort:Desc)],map:"huiteacher_observation_records_observer_idx")
+  @@map("huiteacher_observation_records")
+}
