@@ -15,7 +15,7 @@ import { loadSurveySource } from '../../modules/survey/analytics.source'
 import { describeSurveyWaveItemPaged } from '../../modules/survey/analytics.paged'
 import {listSampleQuality,listSampleQualityHistory,setSampleQuality} from '../../modules/survey/sample-quality.service'
 import { rawLongExport,rawWideExport,compactSurveyAttendanceExport } from '../../modules/survey/analytics.raw-export'
-import {encodeSurveyExportCursor} from '../../modules/survey/analytics.export-cursor'
+import {encodeSurveyExportCursor,decodeSurveyExportCursor} from '../../modules/survey/analytics.export-cursor'
 import { exportWide,exportLong } from '../../modules/survey/analytics.export-format'
 import { describePairedScores } from '../../modules/survey/analytics.descriptive'
 import { createSurveyExport,downloadSurveyExport } from '../../modules/survey/analytics.export.service'
@@ -1248,19 +1248,34 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
           accountDomain:'SURVEY'}} as unknown as Request
       // Previously 105 × 240 = 25,200 rows was rejected at the first page.
       let cursor:string|undefined,rows=0,pages=0
+      const seenCodes=new Set<string>(),seenAfter=new Set<string>()
       do{
         const page=await createSurveyExport(req,{
           projectId,format:'RAW_WAVE',waveId:w.id,...(cursor?{cursor}:{})})
         expect(page.manifest.batch.representation).toBe('FINAL_ITEM_OR_SCORE_ROWS')
         expect(page.manifest.rowCount).toBeLessThanOrEqual(25000)
         expect(page.manifest.batch.totalIncludedFinals).toBe(105)
+        const csv=await downloadSurveyExport(req,{projectId,exportId:page.id})
+        const pageCodes=new Set(csv.csv.split('\r\n').slice(1)
+          .filter(Boolean).map(line=>line.match(/^\"([^\"]+)\"/)?.[1]))
+        expect(pageCodes.has(undefined)).toBe(false)
+        for(const code of pageCodes){
+          expect(seenCodes.has(code!)).toBe(false)
+          seenCodes.add(code!)
+        }
         rows+=page.manifest.rowCount
         pages++
         cursor=page.nextCursor??undefined
+        if(cursor){
+          const after=decodeSurveyExportCursor(cursor,projectId,'RAW_WAVE',w.id).after.id
+          expect(seenAfter.has(after)).toBe(false)
+          seenAfter.add(after)
+        }
       }while(cursor&&pages<30)
       expect(pages).toBeGreaterThan(1)
       expect(cursor).toBeUndefined()
       expect(rows).toBe(105*240)
+      expect(seenCodes.size).toBe(105)
       const score=await createSurveyExport(req,{
         projectId,format:'SCORE_LONG',waveId:w.id,
       })

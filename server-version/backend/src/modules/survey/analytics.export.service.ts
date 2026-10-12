@@ -108,6 +108,10 @@ export async function createSurveyExport(req:Request,input:{
   for(;;){
     try{
       const fence=prior?{
+        // Every FINAL continuation must advance the exact signed keyset.
+        // Without afterFinal, V4 keeps exporting the first batch forever.
+        ...(!attendanceOnly?{afterFinal:{id:prior.after.id,
+          completedAt:new Date(prior.after.completedAt)}}:{}),
         snapshotCutOff:new Date(prior.cutOff),
         expectedSourceRevision:prior.sourceRevision,
         expectedFinalCount:prior.finalCount,
