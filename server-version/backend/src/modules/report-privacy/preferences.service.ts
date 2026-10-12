@@ -170,11 +170,15 @@ export async function readReportPrivacyPolicyState(input:ScopeInput&{runId?:stri
   await assertCurrentPrivacyPublisher(input)
   const current=await resolveEffectiveReportPrivacy({...input,actorUserId:input.actor.userId})
   if(!input.runId)return current
-  const source=await prisma.$queryRaw<Array<{id:string}>>(Prisma.sql`
-    SELECT id FROM assessment_runs
+  const source=await prisma.$queryRaw<Array<{id:string;createdByUserId:string}>>(Prisma.sql`
+    SELECT id, created_by_user_id AS "createdByUserId" FROM assessment_runs
     WHERE id=${input.runId} AND organization_id=${input.organizationId} LIMIT 1
   `)
   if(!source.length)deny('PRIVACY_RUN_NOT_FOUND',404)
+  const reader=await assertCurrentPrivacyPublisher(input)
+  if(input.product==='HUISCHOOL'&&!reader.schoolAdmin
+    &&source[0].createdByUserId!==input.actor.userId)
+    deny('PRIVACY_RUN_NOT_FOUND',404)
   const snapshot=await prisma.educationReportPolicySnapshot.findUnique({
     where:{organizationId_runId:{organizationId:input.organizationId,runId:input.runId}},
   })

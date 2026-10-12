@@ -30,6 +30,9 @@ export function createReportPrivacyRoutes(product:EducationProduct){
     catch(e){
       if(e instanceof ZodError)return res.status(400).json({
         code:'PRIVACY_REQUEST_INVALID',message:'偏好设置参数无效',data:null})
+      if(e instanceof Error&&e.message==='PRIVACY_SCENARIO_PRODUCT_MISMATCH')
+        return res.status(400).json({
+          code:'PRIVACY_SCENARIO_PRODUCT_MISMATCH',message:'场景与产品不匹配',data:null})
       if(e instanceof ReportPrivacyError)return res.status(e.statusCode).json({
         code:e.code,message:'当前报告偏好未获授权或版本已改变',data:null})
       const err=e as {statusCode?:number;code?:string}
