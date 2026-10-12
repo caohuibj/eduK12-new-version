@@ -3348,3 +3348,33 @@ model HuiteacherStudentDisclosureLedger {
   @@unique([organizationId,teacherUserId],map:"huiteacher_student_disclosure_org_teacher_unique")
   @@map("huiteacher_student_disclosure_ledgers")
 }
+
+
+// PR6 optional improvement cycle, private teacher goals vs explicitly
+// school-shared actions. Ciphertext lives only in Teacher product tables.
+model HuiteacherImprovementAction {
+  id               String    @id
+  organizationId   String    @map("organization_id")
+  targetId         String    @map("target_id")
+  sourceEventId    String?   @map("source_event_id")
+  ownerUserId      String    @map("owner_user_id")
+  audience         String
+  goalCipher       String    @map("goal_cipher")
+  goalHash         String    @map("goal_hash")
+  planCipher       String    @map("plan_cipher")
+  planHash         String    @map("plan_hash")
+  evidenceCipher   String?   @map("evidence_cipher")
+  evidenceHash     String?   @map("evidence_hash")
+  status           String    @default("PLANNED")
+  version          Int       @default(1)
+  dueAt            DateTime? @map("due_at") @db.Timestamptz(6)
+  completedAt      DateTime? @map("completed_at") @db.Timestamptz(6)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  @@unique([organizationId,id],map:"huiteacher_improvement_actions_org_id_key")
+  @@index([organizationId,targetId,audience,createdAt(sort:Desc),id(sort:Desc)],
+    map:"huiteacher_improvement_actions_target_idx")
+  @@index([ownerUserId,audience,createdAt(sort:Desc)],
+    map:"huiteacher_improvement_actions_owner_idx")
+  @@map("huiteacher_improvement_actions")
+}
