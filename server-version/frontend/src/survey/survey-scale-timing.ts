@@ -30,8 +30,11 @@ export class SurveyScaleTimingTracker {
   private current:string|null=null
   private start:number|null=null
   constructor(restored:SurveyScaleTimings={},private readonly initialAnswers:Record<string,unknown>={}){
+    // A reload interrupts only an unknown *in-progress* first response.
+    // Finished historical questions were not active at reload; marking every
+    // restored answer interrupted would contaminate the research export.
     this.rows=Object.fromEntries(Object.entries(restored).map(([key,value])=>[
-      key,{...value,interrupted:true},
+      key,{...value,interrupted:value.interrupted||value.firstResponseMs===null},
     ]))
   }
   private row(key:string):SurveyScaleItemTimingV1{
