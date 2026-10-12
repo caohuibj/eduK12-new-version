@@ -68,7 +68,7 @@ export function rawLongExport(projectId:string,source:SurveySourceProjection,wav
     r.itemTiming?.changeCount??null,r.itemTiming?.revisitCount??null,
     r.kind!=='SCALE'?'NOT_APPLICABLE'
       :r.missingReason==='NOT_SHOWN'?'NOT_SHOWN'
-        :timingByColumn.get(r.columnKey)==='NOT_COLLECTED'?'NOT_COLLECTED'
+        :timingByColumn.get(r.columnKey)!=='SURVEY_SCALE_ITEM_TIMING_V1'?'NOT_COLLECTED'
           :timingStatus(r.itemTiming),
     ...(hasFlow?[r.flowDigest??null,r.experimentGroup??null,
       r.shownBlocks??null,r.flowTermination??null]:[]),
