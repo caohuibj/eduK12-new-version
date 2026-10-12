@@ -74,6 +74,7 @@ import huiteacherExpertRegistrationRoutes from './modules/huiteacher/expertRegis
 import huiteacherFieldFeedbackRoutes from './modules/huiteacher/fieldFeedback.routes'
 import huiteacherStudentEvaluationRoutes from './modules/huiteacher/studentEvaluation.routes'
 import huiteacherImprovementRoutes from './modules/huiteacher/improvement.routes'
+import {campusReportPrivacyRoutes,teacherReportPrivacyRoutes} from './modules/report-privacy/routes'
 import platformEducationRoutes from './modules/huiteacher/platform.routes'
 import { huiteacherOriginGuard } from './modules/huiteacher/originGuard'
 import campusAdmissionRoutes from './modules/campus/admission.routes'
@@ -319,6 +320,7 @@ app.use('/api/huiteacher',huiteacherExpertRegistrationRoutes)
 app.use('/api/huiteacher',huiteacherFieldFeedbackRoutes)
 app.use('/api/huiteacher',huiteacherStudentEvaluationRoutes)
 app.use('/api/huiteacher',huiteacherImprovementRoutes)
+app.use('/api/huiteacher',teacherReportPrivacyRoutes)
 app.use('/api/platform/education',platformEducationRoutes)
 app.use('/api/campus', schoolOriginGuard)
 app.use('/api/campus/auth', campusAuthRoutes)
@@ -330,6 +332,7 @@ app.use('/api/campus', campusActivityRoutes)
 app.use('/api/campus', campusActivityRunRoutes)
 app.use('/api/campus', campusParentRoutes)
 app.use('/api/campus', campusReportRoutes)
+app.use('/api/campus', campusReportPrivacyRoutes)
 app.use('/api/campus', campusPeerRoutes)
 app.use('/api/campus', campusCompositeRoutes)
 app.use('/api/parent-links', parentLinksRouter)

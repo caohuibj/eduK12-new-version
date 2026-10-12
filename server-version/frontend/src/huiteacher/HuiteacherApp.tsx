@@ -9,6 +9,7 @@ import { HuiteacherMyScaleTasks } from './HuiteacherMyScaleTasks'
 import { HuiteacherPersonalSelf } from './HuiteacherPersonalSelf'
 import { HuiteacherFieldWorkspace } from './HuiteacherFieldWorkspace'
 import { HuiteacherConsensusReviews } from './HuiteacherConsensus'
+import { ReportPrivacyPreferences } from '../components/report-privacy/ReportPrivacyPreferences'
 
 type Envelope<T>={code:string|number;message:string;data:T}
 type Scope={organizationId:string;organizationName:string;membershipId:string;orgRole:string;productAdmin:boolean}
@@ -297,6 +298,11 @@ export default function HuiteacherApp(){
           &&<HuiteacherMyGrowth api={teacherApi}/>}
       </>}
       {workspaceTab==='school'&&org?.productAdmin&&<>
+      {import.meta.env.VITE_REPORT_PRIVACY_PREFERENCES_V1_ENABLED==='true'&&<details className="ht-panel">
+        <summary>评价与报告隐私偏好（只需设置一次）</summary>
+        <ReportPrivacyPreferences key={org.organizationId} organizationId={org.organizationId}
+          scenarios={['TEACHER_STUDENT_EVALUATION','TEACHER_ADULT_FORM_GROUP']} api={teacherApi}/>
+      </details>}
       {org&&<section className="ht-panel">
         <h2>{org.organizationName}</h2><p>{org.productAdmin?'已获得本校 Huiteacher 管理权限':'已获得本校 Huiteacher 参与权限'}</p>
         {me.role!=='STUDENT'&&<><h3>年级与班级</h3><div className="ht-units">{units.map(u=><span key={u.id} className="ht-tag">{u.unitKind==='GRADE'?'年级':'班级'} · {u.name}</span>)}</div></>}
