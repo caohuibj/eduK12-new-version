@@ -1,3 +1,4 @@
+import {grantSyntheticHuischoolProduct} from './educationProductFixture'
 import { randomUUID } from 'node:crypto'
 import { describe,it,expect,beforeAll,afterAll } from 'vitest'
 import { PrismaClient, UserRole } from '@prisma/client'
@@ -38,9 +39,12 @@ async function setupSchool(count=5){
   const org=await db.organization.create({data:{
     id:randomUUID(),name:label('School_'),productDomain:'SCHOOL',createdByUserId:admin.id,
   }})
-  await db.organizationMembership.create({data:{
+  const adminMember=await db.organizationMembership.create({data:{
     id:randomUUID(),organizationId:org.id,userId:admin.id,orgRole:'ORG_ADMIN',
   }})
+  await grantSyntheticHuischoolProduct(db,{
+    organizationId:org.id,adminUserId:admin.id,adminMembershipId:adminMember.id,
+  })
   const grade=await createOrganizationUnit({
     organizationId:org.id,unitKind:'GRADE',name:'初一年级',
   })

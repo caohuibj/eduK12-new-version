@@ -1,3 +1,4 @@
+import {grantSyntheticHuischoolProduct} from './educationProductFixture'
 import { randomUUID } from 'node:crypto'
 import type { Request, Response, NextFunction } from 'express'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
@@ -117,6 +118,13 @@ suite('Huischool product sessions use database account realm and live role eleva
      {id:randomUUID(),organizationId:a.id,userId:target.id,orgRole:'MEMBER',validUntil:future},
      {id:randomUUID(),organizationId:b.id,userId:target.id,orgRole:'MEMBER',validUntil:future},
    ]})
+   // A School membership alone does not activate its psychology product.
+   // Explicitly grant the synthetic actor School-product admin authority.
+   const adminMembership=await db.organizationMembership.findFirstOrThrow({
+     where:{organizationId:a.id,userId:admin.id},
+   })
+   await grantSyntheticHuischoolProduct(db,{organizationId:a.id,
+     adminUserId:admin.id,adminMembershipId:adminMembership.id})
    await db.campusMfaCredential.create({data:{
      userId:target.id,secretCipher:'synthetic-unused-secret',enabled:true,
    }})

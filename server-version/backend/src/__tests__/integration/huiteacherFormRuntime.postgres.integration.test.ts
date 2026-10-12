@@ -209,6 +209,32 @@ suite('Teacher-only Survey Form V2 released resource → Run START → encrypted
       organizationId:organization.id,actorUserId:admin.id,eventId:event.id,
       action:'CLOSE',expectedVersion:2,
     })
+    // Source-of-truth cohort sanity: keep a separate real-SQL assertion in
+    // this disposable test so a failed protected report cannot be 'fixed'
+    // by weakening the n>=10 / all-completed privacy policy.
+    const cohort=await db.$queryRaw<Array<{
+      assigned:number;respondents:number;completed:number
+    }>>`
+      SELECT COUNT(*)::int AS "assigned",
+        COUNT(DISTINCT respondent."user_id")::int AS "respondents",
+        COUNT(*) FILTER(WHERE execution."status"='COMPLETED')::int AS "completed"
+      FROM "assessment_run_executions" execution
+      JOIN "assessment_run_actor_snapshots" respondent
+        ON respondent."organization_id"=execution."organization_id"
+        AND respondent."run_id"=execution."run_id"
+        AND respondent."id"=execution."respondent_actor_snapshot_id"
+        AND respondent."actor_role"='TEACHER'
+      JOIN "assessment_run_tracks" track
+        ON track."organization_id"=execution."organization_id"
+        AND track."run_id"=execution."run_id"
+        AND track."id"=execution."track_id"
+      WHERE execution."organization_id"=${organization.id}
+        AND execution."run_id"=${created.runId}
+        AND track."resource_family"='FORM'
+        AND track."resource_key"=${'huiteacher-form:'+draft.id}
+        AND track."resource_version"=${form.definitionDigest}
+    `
+    expect(cohort[0]).toEqual({assigned:10,respondents:10,completed:10})
     const report=await readTeacherFormGroupReport({...key,formId:draft.id})
     expect(report.independentRespondents).toBe(10)
     expect(report.reportMode).toBe('FORM_DESCRIPTIVE_AGGREGATE')

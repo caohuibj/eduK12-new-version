@@ -1,3 +1,4 @@
+import {grantSyntheticHuischoolProduct} from './educationProductFixture'
 import { randomUUID } from 'node:crypto'
 import { PrismaClient, UserRole } from '@prisma/client'
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
@@ -44,6 +45,9 @@ async function fixture(){
   const adminMember=await db.organizationMembership.create({data:{
     id:randomUUID(),organizationId:organization.id,userId:admin.id,orgRole:'ORG_ADMIN',
   }})
+  await grantSyntheticHuischoolProduct(db,{
+    organizationId:organization.id,adminUserId:admin.id,adminMembershipId:adminMember.id,
+  })
   const grade=await createOrganizationUnit({
     organizationId:organization.id,unitKind:'GRADE',name:'五年级',
   })

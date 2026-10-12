@@ -1,3 +1,4 @@
+import {grantSyntheticHuischoolProduct} from './educationProductFixture'
 import {randomUUID} from 'node:crypto'
 import {beforeAll,afterAll,describe,it,expect} from 'vitest'
 import {PrismaClient} from '@prisma/client'
@@ -19,7 +20,11 @@ suite('campus registration discovery on real isolated PostgreSQL',()=>{
  it('discovers all five persisted forms read-only; refuses consumed, denied and expired invitations',async()=>{
   const admin=await db.user.create({data:{username:name(),passwordHash:'synthetic',accountDomain:'SCHOOL',role:'ADMIN'}})
   const org=await db.organization.create({data:{id:randomUUID(),name:name(),productDomain:'SCHOOL',createdByUserId:admin.id}})
-  await db.organizationMembership.create({data:{id:randomUUID(),organizationId:org.id,userId:admin.id,orgRole:'ORG_ADMIN'}})
+  const adminMembership=await db.organizationMembership.create({data:{
+   id:randomUUID(),organizationId:org.id,userId:admin.id,orgRole:'ORG_ADMIN',
+  }})
+  await grantSyntheticHuischoolProduct(db,{organizationId:org.id,
+   adminUserId:admin.id,adminMembershipId:adminMembership.id})
   const principal=actor(admin)
   for(const [persona,adminRole,expected] of [['TEACHER',false,'TEACHER'],['COUNSELOR',false,'COUNSELOR'],['COUNSELOR',true,'ADMIN']] as const){
    const invitation=await createCampusStaffInvitation({actor:principal,organizationId:org.id,persona,adminRole,psychologyStaff:persona==='COUNSELOR'})

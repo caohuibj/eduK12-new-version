@@ -1,3 +1,4 @@
+import {grantSyntheticHuischoolProduct} from './educationProductFixture'
 import { randomUUID } from 'node:crypto'
 import { UserRole, PrismaClient } from '@prisma/client'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
@@ -31,6 +32,8 @@ suite('Huischool staff invitation revocation / re-grant — isolated PostgreSQL'
     const membership=await db.organizationMembership.create({data:{
       id:randomUUID(),organizationId:org.id,userId:user.id,orgRole:'ORG_ADMIN',
     }})
+    await grantSyntheticHuischoolProduct(db,{organizationId:org.id,
+      adminUserId:user.id,adminMembershipId:membership.id})
     const actor={
       userId:user.id,username:user.username,accountDomain:'SCHOOL' as const,
       role:UserRole.ADMIN,platformRole:'STANDARD' as const,

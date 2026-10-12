@@ -1,9 +1,9 @@
 import {describe,expect,it} from 'vitest'
-import {dryRunSurveyForm} from '../../modules/survey/final.compute'
-import type {FormDraft} from '../../modules/survey/builder.definition'
+import {dryRunSurveyForm} from '../modules/survey/final.compute'
+import type {FormDraft} from '../modules/survey/builder.definition'
 import {
   createProtectedFormItems,recordProtectedFormAnswers,discloseProtectedFormItems,
-} from '../../modules/huiteacher/groupReport.service'
+} from '../modules/huiteacher/groupReport.service'
 
 /** Deterministic reducer contracts share the REAL Survey V2 final
  * normalizer used at Teacher FINAL. This test has no mock scorer nor DB.

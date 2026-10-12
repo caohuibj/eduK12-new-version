@@ -37,6 +37,12 @@ const campusNonFinalSubmit = new Map([
     'server-version/backend/src/modules/campus/activity.routes.ts'],
   ['/api/campus/activities/:courseId/checkins/:id/submit',
     'server-version/backend/src/modules/campus/activity.routes.ts'],
+  // Human observation/consensus submissions are governance state transitions,
+  // not assessment FINAL. Exclude only their exact source-bound routes.
+  ['/api/huiteacher/field-notes/:noteId/submit',
+    'server-version/backend/src/modules/huiteacher/observer.routes.ts'],
+  ['/api/huiteacher/consensuses/:consensusId/submit',
+    'server-version/backend/src/modules/huiteacher/consensus.routes.ts'],
 ])
 const trackedNonFinal=new Set()
 const actual = new Map()
@@ -69,5 +75,5 @@ if (missing.length || stale.length) {
 }
 if(trackedNonFinal.size!==campusNonFinalSubmit.size)
   throw new Error('Non-FINAL campus submit declaration changed; review the caller and update the explicit source-bound map')
-if (expected.size !== 18) throw new Error(`Expected 18 reviewed FINAL routes, found ${expected.size}`)
+if (expected.size !== 19) throw new Error(`Expected 19 reviewed FINAL routes, found ${expected.size}`)
 process.stdout.write(`FINAL route inventory: ${actual.size} registered templates matched\n`)

@@ -257,7 +257,8 @@ suite('Huiteacher PR6 longitudinal metadata and confidential improvement (isolat
     // Revoking Teacher-only access removes BOTH school-shared and own reads.
     await db.educationProductEntitlement.update({
       where:{organizationId_product:{organizationId:org.id,product:'HUITEACHER'}},
-      data:{status:'SUSPENDED'},
+      data:{status:'SUSPENDED',suspendedAt:new Date(),
+        changedByUserId:admin.id,revision:{increment:1}},
     })
     await expect(listHuiteacherImprovements({
       actorUserId:teacher.id,organizationId:org.id,targetId:target.id,
