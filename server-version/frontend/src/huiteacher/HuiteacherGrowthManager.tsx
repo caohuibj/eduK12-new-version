@@ -4,7 +4,12 @@ type Timeline={
   target:{id:string;name:string;kind:string};
   list:Array<{eventId:string;title:string;kind:string;status:string;
     createdAt:string;closedAt:string|null;sourceKind:string;
-    instrumentVersions:Array<{family:string;key:string;version:string}>}>;
+    instrumentVersions:Array<{family:string;key:string;version:string}>;
+    comparisonEvidence?:{previousEventId:string|null;sourceMatch:boolean;
+      reason:'NO_CLOSED_BASELINE'|'STUDENT_POPULATION_DIFFERENCING_BLOCKED'
+        |'RESOURCE_SET_OR_VERSION_DIFFERENT'
+        |'RATERS_CONTEXT_AND_MEASUREMENT_INVARIANCE_UNVERIFIED';
+      numericTrendAllowed:false;evidenceGrade:'PROVENANCE_ONLY'}}>;
   nextCursor:string|null;note:string
 }
 export function HuiteacherGrowthManager({organizationId,targets,api}:{
@@ -60,6 +65,15 @@ export function HuiteacherGrowthManager({organizationId,targets,api}:{
           工具版本 {entry.instrumentVersions.length} 项；不代表科学可比。</p>
         {entry.instrumentVersions.map((v,i)=><p key={i} className="ht-muted">
           {v.family} · {v.version}</p>)}
+        <p className="ht-muted">纵向对照：{entry.comparisonEvidence?.reason==='NO_CLOSED_BASELINE'
+          ?'当前没有同类型的上一轮正式来源。':
+          entry.comparisonEvidence?.reason==='STUDENT_POPULATION_DIFFERENCING_BLOCKED'
+          ?'学生评教存在跨轮差分风险；禁止数字趋势。':
+          entry.comparisonEvidence?.reason==='RESOURCE_SET_OR_VERSION_DIFFERENT'
+          ?'工具或版本不同，不建立数值比较。':
+          entry.comparisonEvidence?.sourceMatch
+          ?'工具与版本一致，但评价者、情境、量尺等值性未验证。':
+          '尚未证明具有科学可比性。'}</p>
         {entry.status==='CLOSED'&&<button type="button"
           onClick={()=>setSourceEventId(entry.eventId)}>
           以本次评价建立改进行动</button>}
