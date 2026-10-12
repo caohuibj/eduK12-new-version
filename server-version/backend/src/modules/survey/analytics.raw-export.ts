@@ -61,7 +61,7 @@ export function compactSurveyAttendanceExport(
      source.raw.length||source.scores.length||
      source.attendance.some(row=>row.waveId!==waveId))
     throw new Error('Compact attendance requires scoped non-FINAL linked participation')
-  const columns=['research_code','wave_id','attempt_status','missing_reason']
+  const columns=['research_code','wave_id','participation_status','missing_reason']
   const records=source.attendance.map(row=>[
     row.researchCode,row.waveId,row.status,
     row.status==='QUALITY_EXCLUDED'?'QUALITY_EXCLUDED':'ABANDONED',
