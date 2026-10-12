@@ -230,5 +230,27 @@ suite('Teacher-only Survey Form V2 released resource → Run START → encrypted
     await expect(readTeacherFormGroupReport({
       ...key,actorUserId:participants[0].id,formId:draft.id,
     })).rejects.toThrow()
+    // First report records only the digest of the exact frozen respondent
+    // population, not its IDs or any individual's raw answers.
+    const ledger=await db.huiteacherGroupDisclosureLedger.findUniqueOrThrow({
+      where:{organizationId_definitionDigest:{
+        organizationId:organization.id,definitionDigest:form.definitionDigest,
+      }},
+    })
+    expect(ledger.populationDigest).toMatch(/^[a-f0-9]{64}$/)
+    expect(ledger.firstRunId).toBe(created.runId)
+    // Simulate another released same-form cohort with a different digest.
+    // A privacy ledger collision must fail closed, not return another
+    // differencing-compatible set of exact option counts.
+    await db.huiteacherGroupDisclosureLedger.update({
+      where:{organizationId_definitionDigest:{
+        organizationId:organization.id,definitionDigest:form.definitionDigest,
+      }},
+      data:{populationDigest:'b'.repeat(64)},
+    })
+    await expect(readTeacherFormGroupReport({...key,formId:draft.id}))
+      .rejects.toMatchObject({
+        code:'HUITEACHER_GROUP_POPULATION_DIFFERENCING_BLOCKED',
+      })
   })
 })
