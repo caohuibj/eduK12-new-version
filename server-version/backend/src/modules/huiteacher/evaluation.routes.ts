@@ -1,3 +1,4 @@
+import {readHuiteacherTargetTimeline,HuiteacherTimelineError} from './timeline.service'
 import { Router } from 'express'
 import { z,ZodError } from 'zod'
 import { asyncHandler } from '../../middleware/asyncHandler'
@@ -27,6 +28,9 @@ const handler=(fn:(req:any,res:any)=>Promise<unknown>)=>asyncHandler(async(req,r
   try{return await fn(req,res)}
   catch(e){
     if(e instanceof ZodError)return res.status(400).json({code:'BAD_REQUEST',message:'评价对象／活动参数不合法',data:null})
+    if(e instanceof HuiteacherTimelineError)return res.status(e.statusCode).json({
+      code:e.code,message:'没有权限查看此对象的纵向记录或游标已失效',data:null,
+    })
     if(e instanceof HuiteacherEvaluationError)
       return res.status(e.statusCode).json({code:e.code,message:'评价对象或活动状态不可用',data:null})
     throw e
@@ -46,6 +50,14 @@ router.post('/organizations/:organizationId/evaluation-targets',
     actorUserId:req.user!.userId,organizationId:id.parse(req.params.organizationId),
     ...targetCreate.parse(req.body),
   }))))
+router.get('/organizations/:organizationId/evaluation-targets/:targetId/timeline',
+  authenticateHuiteacher,requireTeacherProductAdmin,handler(async(req,res)=>{
+    const params=z.object({organizationId:id,targetId:id}).strict().parse(req.params)
+    const query=z.object({cursor:id.optional()}).strict().parse(req.query)
+    return success(res,await readHuiteacherTargetTimeline({
+      ...params,...query,actorUserId:req.user!.userId,
+    }))
+  }))
 router.post('/organizations/:organizationId/evaluation-targets/:targetId/archive',
   authenticateHuiteacher,requireTeacherProductAdmin,requireRecentTeacherMfa,
   handler(async(req,res)=>success(res,await archiveHuiteacherTarget({
