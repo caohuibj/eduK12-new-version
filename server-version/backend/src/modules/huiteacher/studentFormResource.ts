@@ -37,6 +37,8 @@ const deny=(code:string):never=>{throw new StudentFormResourceError(code)}
 
 export async function resolveStudentFormResourcePolicy(ref:RunResourceRef)
   :Promise<RunResourcePolicy>{
+  if(process.env.HUITEACHER_STUDENT_FEEDBACK_ENABLED!=='true')
+    deny('STUDENT_FEEDBACK_NOT_ENABLED')
   const formId=studentFormResourceId(ref)
   if(!formId)deny('STUDENT_FORM_IDENTITY_INVALID')
   const form=await resolvePublishedTeacherForm(teacherFormResourceRef(formId!,ref.version))

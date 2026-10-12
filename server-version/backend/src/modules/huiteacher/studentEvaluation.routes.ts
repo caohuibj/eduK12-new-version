@@ -1,5 +1,6 @@
-import {listMyHuiteacherStudentFeedback} from './studentReport.service'
-import {readHuiteacherStudentFeedbackReport,StudentFeedbackReportError} from './studentReport.service'
+import {listMyHuiteacherStudentFeedback,readHuiteacherStudentFeedbackReport,
+  StudentFeedbackReportError} from './studentReport.service'
+import {HuiteacherGroupReportError} from './groupReport.service'
 import { Router } from 'express'
 import { z,ZodError } from 'zod'
 import { asyncHandler } from '../../middleware/asyncHandler'
@@ -37,11 +38,20 @@ const wrap=(fn:(req:any)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
       code:e.code,message:'学生评教结果未达到当前的披露人数、受众或跨轮隐私条件',
       data:null,
     })
+    if(e instanceof HuiteacherGroupReportError)return res.status(e.statusCode).json({
+      code:e.code,message:'评价结果未通过群体统计来源或隐私一致性核验',data:null,
+    })
     if(e instanceof HuiteacherStudentEvaluationError)
       return res.status(e.statusCode).json({
         code:e.code,
         message:'学校评教配置未获授权，或教师任教关系与班级不匹配',
         data:null,
+      })
+    const known=e as {statusCode?:number;code?:string}
+    if(typeof known?.statusCode==='number'&&known.statusCode>=400&&known.statusCode<500)
+      return res.status(known.statusCode).json({
+        code:known.code??'HUITEACHER_STUDENT_EVAL_DENIED',
+        message:'请求未获授权或任务状态已改变',data:null,
       })
     throw e
   }

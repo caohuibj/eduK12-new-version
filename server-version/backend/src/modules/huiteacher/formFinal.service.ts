@@ -32,7 +32,7 @@ type TeacherAttemptScope={
 type Scope={
   attempt:TeacherAttemptScope;form:FormDraft;title:string;
   relationalAssignmentId:string;executionStatus:string;
-  studentFeedback:boolean;eventStatus:string;runStatus:string;
+  studentFeedback:boolean;eventStatus:string;runStatus:string;intakeDeadline:Date|null;
 }
 
 /** Shared Teacher identity is required, but Session/cookie and Form rights are
@@ -80,8 +80,8 @@ async function exactFormScope(tx:Tx,input:{
     LIMIT 5
   `
   if(!actor.length)fail('HUITEACHER_FORM_RESPONDENT_INELIGIBLE',403)
-  const runs=await tx.$queryRaw<Array<{status:string}>>`
-    SELECT "status" FROM "assessment_runs"
+  const runs=await tx.$queryRaw<Array<{status:string;intakeDeadline:Date|null}>>`
+    SELECT "status","intake_deadline" AS "intakeDeadline" FROM "assessment_runs"
     WHERE "organization_id"=${first.organizationId} AND "id"=${first.runId}
     FOR SHARE
   `
@@ -151,6 +151,8 @@ async function exactFormScope(tx:Tx,input:{
   if((!studentFeedback&&!teacherSelf)
     ||exe.resourceVersion!==attempt.definitionDigest)
     fail('HUITEACHER_FORM_FROZEN_RESOURCE_MISMATCH',409)
+  if(studentFeedback&&process.env.HUITEACHER_STUDENT_FEEDBACK_ENABLED!=='true')
+    fail('HUITEACHER_STUDENT_FEEDBACK_DISABLED',404)
   const principalValid=studentFeedback
     ?actor.some(a=>a.role==='STUDENT'&&a.persona==='STUDENT')
     :actor.some(a=>['TEACHER','ADMIN'].includes(a.role)&&a.persona==='TEACHER')
@@ -164,6 +166,7 @@ async function exactFormScope(tx:Tx,input:{
     relationalAssignmentId:exe.relationalAssignmentId,
     executionStatus:exe.status,studentFeedback,
     eventStatus:events[0].status,runStatus:runs[0].status,
+    intakeDeadline:runs[0].intakeDeadline,
   }
 }
 
@@ -235,6 +238,8 @@ export async function submitOwnHuiteacherFormFinal(input:{
       // duplicate receipts are already handled above.
       if(scope.eventStatus!=='OPEN'||scope.runStatus!=='PUBLISHED')
         fail('HUITEACHER_STUDENT_EVAL_CLOSED',409)
+      if(scope.intakeDeadline&&scope.intakeDeadline.getTime()<=Date.now())
+        fail('HUITEACHER_STUDENT_EVAL_DEADLINE_EXPIRED',409)
       await assertStudentFormRunUse(tx,{
         organizationId:scope.attempt.organizationId,runId:scope.attempt.runId,
         ref:studentFormResourceRef(scope.attempt.formId,scope.attempt.definitionDigest),

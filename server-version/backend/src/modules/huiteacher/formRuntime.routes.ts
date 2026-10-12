@@ -108,6 +108,8 @@ router.get('/my-form-tasks',authenticateHuiteacher,respond(async req=>{
  * dashboard. Expose only the teacher's display name, deadlines and own state.
  */
 router.get('/my-student-evaluations',authenticateHuiteacher,respond(async req=>{
+  if(process.env.HUITEACHER_STUDENT_FEEDBACK_ENABLED!=='true')
+    throw new HuiteacherFinalError('HUITEACHER_STUDENT_FEEDBACK_DISABLED',404)
   if(req.user!.role!=='STUDENT')throw new HuiteacherFinalError('HUITEACHER_STUDENT_ONLY',403)
   const actorId=req.user!.userId
   const rows=await prisma.$queryRaw<Array<{
@@ -183,6 +185,24 @@ router.get('/my-student-evaluations',authenticateHuiteacher,respond(async req=>{
       AND persona."membership_id"=member."id"
       AND persona."persona"='STUDENT' AND persona."revoked_at" IS NULL
     WHERE execution."status" IN ('ASSIGNED','STARTED','COMPLETED')
+      AND (
+        execution."status"='COMPLETED'
+        OR EXISTS (
+          SELECT 1 FROM "organization_student_class_assignments" placement
+          JOIN "organization_staff_class_assignments" staff
+            ON staff."organization_id"=placement."organization_id"
+            AND staff."class_unit_id"=placement."class_unit_id"
+          WHERE placement."id"=relation."snapshot_payload"->'facts'->>'studentClassAssignmentId'
+            AND staff."id"=cfg."staff_assignment_id"
+            AND placement."organization_id"=org."id"
+            AND placement."membership_id"=respondent."membership_id"
+            AND placement."class_unit_id"=cfg."class_unit_id"
+            AND placement."valid_from"<=statement_timestamp()
+            AND (placement."valid_until" IS NULL OR placement."valid_until">statement_timestamp())
+            AND staff."valid_from"<=statement_timestamp()
+            AND (staff."valid_until" IS NULL OR staff."valid_until">statement_timestamp())
+        )
+      )
       AND NOT EXISTS(SELECT 1 FROM "organization_access_denies" deny
         WHERE deny."organization_id"=org."id"
           AND deny."user_id"=${actorId}
@@ -225,6 +245,8 @@ router.post('/run-executions/:executionId/start',authenticateHuiteacher,
       throw new HuiteacherFinalError('HUITEACHER_TASK_NOT_FOUND',404)
     const student=studentFormResourceId({family:'FORM',
       key:scope[0].resourceKey,version:'frozen'})
+    if(student&&process.env.HUITEACHER_STUDENT_FEEDBACK_ENABLED!=='true')
+      throw new HuiteacherFinalError('HUITEACHER_STUDENT_FEEDBACK_DISABLED',404)
     if(student&&req.user!.role!=='STUDENT')
       throw new HuiteacherFinalError('HUITEACHER_STUDENT_ONLY',403)
     if(!student&&req.user!.role==='STUDENT')

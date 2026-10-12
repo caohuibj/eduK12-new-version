@@ -57,7 +57,7 @@ export function HuiteacherMyFormTasks({api,student=false}: {api:Api;student?:boo
   },[api,taskEndpoint])
   useEffect(()=>{
     let live=true
-    void api<{list:Summary[]}>('/my-form-tasks').then(x=>{
+    void api<{list:Summary[]}>(taskEndpoint).then(x=>{
       if(live)setTasks(x.list)
     }).catch(e=>{if(live)setNotice(e instanceof Error?e.message:'待办评价读取失败')})
     return ()=>{live=false}
