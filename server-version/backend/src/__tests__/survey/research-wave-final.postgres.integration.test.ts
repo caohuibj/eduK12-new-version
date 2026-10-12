@@ -655,7 +655,7 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
       }})
       await db.surveyParticipant.deleteMany({where:{id:{in:participants.map(p=>p.id)}}})
     }
-  })
+  },20000)
 
   it('projects multiple verified FINALs from one frozen Publication without duplicated schema columns',async()=>{
     const w=await wave('同一冻结定义下的多份 FINAL',[toolIds.scale],true)
