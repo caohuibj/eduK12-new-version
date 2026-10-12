@@ -1,5 +1,6 @@
 import { useEffect,useState } from 'react'
 import { HuiteacherFieldManager } from './HuiteacherFieldManager'
+import { HuiteacherStudentEvaluationManager } from './HuiteacherStudentEvaluationManager'
 type Api=<T>(path:string,method?:string,data?:unknown)=>Promise<T>
 type Target={id:string;name:string;kind:string;status:string;subjectUserId:string|null}
 type Event={id:string;targetId:string;kind:string;title:string;status:string;version:number}
@@ -312,6 +313,14 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
         {progress[event.id]&&<p>已完成 {progress[event.id].counts.COMPLETED??0} /
           {progress[event.id].total} · 进行中 {progress[event.id].counts.IN_PROGRESS??0}</p>}
       </div>}
+      {import.meta.env.VITE_HUITEACHER_STUDENT_FEEDBACK_ENABLED==='true'
+        &&event.kind==='ASSESSMENT'
+        &&targets.some(x=>x.id===event.targetId&&x.kind==='PERSON'&&x.subjectUserId)
+        &&<HuiteacherStudentEvaluationManager
+          key={'student-feedback:'+event.id} organizationId={organizationId}
+          eventId={event.id} eventStatus={event.status}
+          teacherName={targets.find(x=>x.id===event.targetId)?.name??'已核验教师'}
+          forms={releasedForms} api={api}/>}
       {['CLASSROOM','MEETING','TEACHING_RESEARCH','FIELD_VISIT'].includes(event.kind)&&
         <HuiteacherFieldManager key={'field:'+event.id}
           organizationId={organizationId} eventId={event.id}
