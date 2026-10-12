@@ -265,17 +265,19 @@ export async function publishCampusGeneralGroupV2(input:Scope){
     // The trusted, immutable analysis manifest identifies only actual FINAL
     // contributors. No second scoring pass or full-Run roster approximation.
     const artifact=await readReportingArtifactRecord(analysis.artifactId)
+    const payload=artifact.artifactPayload
     if(artifact.analysisKind!=='GROUP'
       ||artifact.organizationId!==input.organizationId
       ||artifact.specId!==input.specId
-      ||artifact.artifactPayload.source.runId!==input.runId
-      ||artifact.artifactPayload.source.trackId!==input.trackId)
+      ||!('inputManifest' in payload)
+      ||payload.source.runId!==input.runId
+      ||payload.source.trackId!==input.trackId)
       hidden('CAMPUS_GENERAL_ARTIFACT_SOURCE_INVALID')
     let contributors:string[]
     try{
       const published=approved.projection as {resultContributorN?:unknown}
       contributors=exactGeneralContributors(
-        artifact.artifactPayload.inputManifest,published.resultContributorN)
+        payload.inputManifest,published.resultContributorN)
     }catch{return hidden('CAMPUS_GENERAL_ARTIFACT_CONTRIBUTORS_INVALID')}
     const contributorDigest=canonicalHash({
       kind:'SCHOOL_GENERAL_EFFECTIVE_FINAL_V2',organizationId:input.organizationId,
