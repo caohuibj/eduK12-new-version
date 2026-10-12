@@ -294,10 +294,10 @@ suite('Huiteacher PR5 canonical student feedback (isolated PostgreSQL)',()=>{
     expect(ledger.firstRunId).toBe(run.runId)
     // A second Run for the same school/teacher/class cannot overwrite the
     // first protected release even when its frozen population differs.
-    const alternateRun=await db.assessmentRun.create({data:{
-      id:randomUUID(),organizationId:org.id,name:'Cross-wave differencing guard',
-      createdByUserId:admin.id,
-    }})
+    const alternateRunId=randomUUID()
+    await db.$executeRawUnsafe(
+      'INSERT INTO "assessment_runs"("id","organization_id","name","created_by_user_id") VALUES ($1,$2,$3,$4)',
+      alternateRunId,org.id,'Cross-wave differencing guard',admin.id)
     const changed=await db.$queryRawUnsafe<Array<{n:number}>>(
       'WITH blocked AS (INSERT INTO "huiteacher_student_disclosure_ledgers"'+
       ' ("organization_id","teacher_user_id","class_unit_id","first_run_id","form_digest","population_digest")'+
@@ -306,7 +306,7 @@ suite('Huiteacher PR5 canonical student feedback (isolated PostgreSQL)',()=>{
       ' DO UPDATE SET "first_run_id"="huiteacher_student_disclosure_ledgers"."first_run_id"'+
       ' WHERE "huiteacher_student_disclosure_ledgers"."first_run_id"=EXCLUDED."first_run_id"'+
       ' RETURNING 1) SELECT COUNT(*)::int AS n FROM blocked',
-      org.id,teacher.id,classId,alternateRun.id,ledger.formDigest,
+      org.id,teacher.id,classId,alternateRunId,ledger.formDigest,
       ledger.populationDigest,
     )
     expect(changed[0].n).toBe(0)
