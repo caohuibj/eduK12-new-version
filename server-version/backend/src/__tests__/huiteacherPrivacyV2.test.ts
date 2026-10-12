@@ -57,7 +57,13 @@ describe('Teacher V2 report/privacy policy and output projection',()=>{
     expect(legacy[0]).toMatchObject({status:'WITHHELD',reason:'SMALL_CELL'})
     expect(normal[0]).toMatchObject({status:'READY'})
     expect(normal[0].cells?.find(x=>x.key==='negative')).toMatchObject({count:1})
-    expect(strict[0]).toMatchObject({status:'WITHHELD',reason:'SMALL_CELL'})
+    // ENHANCED disables all per-item distributions before small-cell checks;
+    // a separate custom mode proves SMALL_CELL suppression independently.
+    expect(strict[0]).toMatchObject({status:'WITHHELD',reason:'POLICY_ITEM_DISTRIBUTION'})
+    const smallCellOnly=discloseProtectedFormItems(items,10,{
+      ...STANDARD,withholdSmallCells:true,
+    })
+    expect(smallCellOnly[0]).toMatchObject({status:'WITHHELD',reason:'SMALL_CELL'})
     for(const projection of [legacy,normal,strict]){
       expect(projection[1]).toMatchObject({status:'WITHHELD',reason:'PRIVATE_FREE_TEXT'})
       expect(JSON.stringify(projection)).not.toContain('personal raw comment')
