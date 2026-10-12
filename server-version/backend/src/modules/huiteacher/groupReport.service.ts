@@ -431,14 +431,21 @@ export async function readTeacherFormGroupReport(input:{
       })
       if(legacy&&legacy.populationDigest!==populationDigest)
         reject('HUITEACHER_GROUP_POPULATION_DIFFERENCING_BLOCKED',403)
-      const earlier=await tx.educationReportReleaseRecord.findMany({
-        where:{organizationId:input.organizationId,
-          reportKind:'TEACHER_ADULT_FORM_GROUP',
-          sourceRunId:{not:source.runId}},
-        select:{effectivePopulationDigest:true},
-      })
-      // Unknown or different digest fails closed in enhanced mode.
-      if(earlier.some(x=>x.effectivePopulationDigest!==populationDigest))
+      // Only statistically comparable versions of the SAME published Form
+      // can be subtracted. Different questionnaires may have independent
+      // contributors; their separate aggregates are not repeated disclosures
+      // of this instrument. Keep the historic exact-Form ledger above.
+      const incompatible=await tx.$queryRaw<Array<{conflict:boolean}>>`
+        SELECT EXISTS(
+          SELECT 1 FROM education_report_release_records release
+          WHERE release.organization_id=${input.organizationId}
+            AND release.report_kind='TEACHER_ADULT_FORM_GROUP'
+            AND release.source_run_id<>${source.runId}
+            AND release.report_projection->>'definitionDigest'=${source.definitionDigest}
+            AND release.effective_population_digest IS DISTINCT FROM ${populationDigest}
+        ) AS "conflict"
+      `
+      if(incompatible[0]?.conflict)
         reject('HUITEACHER_GROUP_POPULATION_DIFFERENCING_BLOCKED',403)
     }
     const projection={
