@@ -2,12 +2,12 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { protectCsvCell,tableToCsv,surveyAttemptCode } from './analytics.export-format'
 import type { SurveySourceProjection,ResearchRawObservation,ResearchRawCodebook } from './analytics.source'
 
-export type SurveyRawFormat='WAVE'|'RAW_LONG'|'RAW_WIDE'
+export type SurveyRawFormat='WAVE'|'RAW_LONG'|'RAW_WIDE'|'ATTENDANCE_COMPACT_V1'
 export interface SurveyRawExport {
   csv:string
   codebook:ResearchRawCodebook[]
   manifest:{
-    schemaVersion:1;format:SurveyRawFormat;projectId:string;waveIds:string[];
+    schemaVersion:1|2;format:SurveyRawFormat;projectId:string;waveIds:string[];
     sourceDigest:string;codebookDigest:string;rowCount:number;
     columnCount:number;cutOff:string;dataDigest:string
     formulaGuard:'EXCEL_APOSTROPHE_PREFIX';flowDigests?:string[]
@@ -48,6 +48,30 @@ function prepare(projectId:string,source:SurveySourceProjection,format:SurveyRaw
     rowCount:rows.length,columnCount:columns.length,
     dataDigest:canonicalHash(csv),formulaGuard:'EXCEL_APOSTROPHE_PREFIX',
     ...(flowDigests.length?{flowDigests}:{}),
+  }}
+}
+/** V4 non-FINAL participation is a normalized relation, not a fabricated
+ * item-level response matrix. Never expose internal Attempt IDs or free text.
+ * The signed continuation links this dataset to the corresponding FINAL pages.
+ */
+export function compactSurveyAttendanceExport(
+  projectId:string,source:SurveySourceProjection,waveId:string,
+):SurveyRawExport{
+  if(source.projectId!==projectId||source.collectionMode!=='LINKED_WAVES'||
+     source.raw.length||source.scores.length||
+     source.attendance.some(row=>row.waveId!==waveId))
+    throw new Error('Compact attendance requires scoped non-FINAL linked participation')
+  const columns=['research_code','wave_id','attempt_status','missing_reason']
+  const records=source.attendance.map(row=>[
+    row.researchCode,row.waveId,row.status,
+    row.status==='QUALITY_EXCLUDED'?'QUALITY_EXCLUDED':'ABANDONED',
+  ])
+  const csv=tableToCsv(columns,records,250)
+  return {csv,codebook:[],manifest:{
+    schemaVersion:2,format:'ATTENDANCE_COMPACT_V1',projectId,waveIds:[waveId],
+    sourceDigest:canonicalHash(records),codebookDigest:canonicalHash([]),
+    rowCount:records.length,columnCount:columns.length,cutOff:source.cutOff,
+    dataDigest:canonicalHash(csv),formulaGuard:'EXCEL_APOSTROPHE_PREFIX',
   }}
 }
 export function rawLongExport(projectId:string,source:SurveySourceProjection,waveId?:string):SurveyRawExport{
