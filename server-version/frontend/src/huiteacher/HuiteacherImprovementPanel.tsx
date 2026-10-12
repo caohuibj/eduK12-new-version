@@ -1,12 +1,16 @@
 import {useEffect,useState} from 'react'
 export type ImprovementApi=<T>(path:string,method?:string,payload?:unknown)=>Promise<T>
 export type ImprovementTarget={id:string;name:string;kind:string;status:string}
+type Reassessment={eventId:string;feedback:string;recordedAt:string;
+  comparisonPolicy:'NARRATIVE_ONLY_NO_CAUSAL_INFERENCE'}
+type Candidate={id:string;title:string;kind:string;closedAt:string}
 type Action={
   id:string;targetId:string;sourceEventId:string|null;
   audience:'PRIVATE_PERSONAL'|'SCHOOL_SHARED';
   goal:string;plan:string;evidence:string|null;
   status:'PLANNED'|'IN_PROGRESS'|'COMPLETED'|'CANCELLED';
-  version:number;dueAt:string|null;completedAt:string|null;createdAt:string
+  version:number;dueAt:string|null;completedAt:string|null;createdAt:string;
+  reassessment:Reassessment|null
 }
 type Audience=Action['audience']
 export function HuiteacherImprovementPanel({api,organizationId,targetId,targetName,
@@ -21,10 +25,15 @@ export function HuiteacherImprovementPanel({api,organizationId,targetId,targetNa
   const [busy,setBusy]=useState(false)
   const [error,setError]=useState('')
   const [cursor,setCursor]=useState<string|null>(null)
+  const [reviewing,setReviewing]=useState<string|null>(null)
+  const [reviewOptions,setReviewOptions]=useState<Candidate[]>([])
+  const [selectedReviewEvent,setSelectedReviewEvent]=useState('')
+  const [reviewFeedback,setReviewFeedback]=useState('')
+  const [reviewNotice,setReviewNotice]=useState('')
   const isPrivate=audience==='PRIVATE_PERSONAL'
   useEffect(()=>{
     let current=true
-    setActions([]);setCursor(null);setError('')
+    setActions([]);setCursor(null);setError('');setReviewing(null);setReviewOptions([])
     void api<{list:Action[];nextCursor:string|null}>(base).then(value=>{
       if(current){setActions(value.list.filter(a=>a.audience===audience));setCursor(value.nextCursor)}
     }).catch(e=>{if(current)setError(e instanceof Error?e.message:'改进行动不可用')})
@@ -56,6 +65,25 @@ export function HuiteacherImprovementPanel({api,organizationId,targetId,targetNa
       ...(action==='COMPLETE'?{evidence:(evidence[item.id]??'').trim()}:{}),
     })
     setEvidence(old=>({...old,[item.id]:''}))
+    await refresh()
+  })
+  const loadReviews=(item:Action)=>go(async()=>{
+    setReviewing(item.id);setReviewOptions([]);setSelectedReviewEvent('')
+    setReviewFeedback('');setReviewNotice('')
+    const response=await api<{list:Candidate[];truncated:boolean;note:string}>(
+      base+'/'+(isPrivate?'private':'school')+'/'+item.id+'/reassessment-candidates')
+    setReviewOptions(response.list)
+    setReviewNotice(response.list.length
+      ?response.note
+      :'尚无行动完成后具有正式证据并已关闭的同对象评价；请先开展一次新评价。')
+  })
+  const attachReview=(item:Action)=>go(async()=>{
+    if(!selectedReviewEvent||reviewFeedback.trim().length<15)
+      throw new Error('请选择合法后续评价并填写至少15字的发展性反馈')
+    if(!window.confirm('确定关联本次正式后续评价？关联及反馈将不可修改，且不会生成未经验证的趋势分数。'))return
+    await api(base+'/'+(isPrivate?'private':'school')+'/'+item.id+'/reassessment',
+      'POST',{eventId:selectedReviewEvent,feedback:reviewFeedback.trim()})
+    setReviewing(null);setReviewOptions([]);setReviewFeedback('');setReviewNotice('')
     await refresh()
   })
   const next=()=>go(async()=>{
@@ -93,6 +121,35 @@ export function HuiteacherImprovementPanel({api,organizationId,targetId,targetNa
           <button disabled={busy} onClick={()=>move(item,'START')}>开始行动</button>
           <button disabled={busy} onClick={()=>move(item,'CANCEL')}>取消</button>
         </div>}
+        {item.status==='COMPLETED'&&item.reassessment&&
+          <section className="ht-growth-review" aria-label="已关联的阶段复评">
+            <h4>行动后的正式复评 · 已冻结</h4>
+            <p>关联事件：<code>{item.reassessment.eventId.slice(0,8)}…</code>
+              {' · '}记录日期：{new Date(item.reassessment.recordedAt).toLocaleDateString('zh-CN')}</p>
+            <p className="ht-field-content">{item.reassessment.feedback}</p>
+            <p className="ht-muted">仅为受控的人工发展反馈，不代表经验证的量化进步或因果效果。</p>
+          </section>}
+        {item.status==='COMPLETED'&&!item.reassessment&&<>
+          <button disabled={busy} type="button" onClick={()=>loadReviews(item)}>
+            关联行动完成后的正式复评</button>
+          {reviewing===item.id&&<div className="ht-growth-review">
+            {reviewNotice&&<p role="status" className="ht-muted">{reviewNotice}</p>}
+            {reviewOptions.length>0&&<>
+              <label className="ht-field"><span>同一评价对象的后续正式评价</span>
+                <select value={selectedReviewEvent} onChange={e=>setSelectedReviewEvent(e.target.value)}>
+                  <option value="">请选择已结束且有提交依据的后续评价</option>
+                  {reviewOptions.map(event=><option key={event.id} value={event.id}>
+                    {event.title} · {new Date(event.closedAt).toLocaleDateString('zh-CN')}</option>)}
+                </select></label>
+              <label className="ht-field"><span>复评反馈与下一步建议（15–2500字）</span>
+                <textarea rows={4} maxLength={2500} value={reviewFeedback}
+                  onChange={e=>setReviewFeedback(e.target.value)}
+                  placeholder="描述观察到的实践与变化证据、尚待改进处及其他可能解释；禁止记录学生个人信息"/></label>
+              <button disabled={busy||!selectedReviewEvent||reviewFeedback.trim().length<15}
+                type="button" onClick={()=>attachReview(item)}>完成受控复评关联</button>
+            </>}
+          </div>}
+        </>}
         {item.status==='IN_PROGRESS'&&<>
           <label className="ht-field"><span>完成证据与反思（至少 10 字）</span>
             <textarea rows={3} maxLength={6000} value={evidence[item.id]??''}
