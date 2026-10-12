@@ -59,27 +59,44 @@ suite('School general V2: exact resource + immutable release/read in isolated Po
     set('DATA_ENCRYPTION_KEY',old.encryption)
   })
   it('publishes only a reviewed complete SELF/STUDENT source, then GET reads identical projection',async()=>{
-    const f=await buildReportingFixture(db,5)
+    const ownerId=randomUUID(),organizationId=randomUUID()
+    const admin=await db.user.create({data:{
+      id:ownerId,username:'v2admin_'+ownerId.replace(/-/g,'').slice(0,23),
+      passwordHash:'synthetic',accountDomain:'SCHOOL',
+      role:'ADMIN',teacherApproved:true,
+    }})
+    await db.organization.create({data:{
+      id:organizationId,name:'School general privacy '+randomUUID(),
+      productDomain:'SCHOOL',createdByUserId:admin.id,
+    }})
+    const ownerMember=await db.organizationMembership.create({data:{
+      id:randomUUID(),organizationId,userId:admin.id,orgRole:'ORG_ADMIN',
+    }})
+    await grantSyntheticHuischoolProduct(db,{
+      organizationId,adminUserId:admin.id,adminMembershipId:ownerMember.id,
+    })
+    const members:Array<{userId:string;membershipId:string}>=[]
+    for(let i=0;i<5;i++){
+      const personId=randomUUID()
+      await db.user.create({data:{
+        id:personId,username:'v2student_'+personId.replace(/-/g,'').slice(0,21),
+        passwordHash:'synthetic',accountDomain:'SCHOOL',role:'STUDENT',
+      }})
+      const member=await db.organizationMembership.create({data:{
+        id:randomUUID(),organizationId,userId:personId,orgRole:'MEMBER',
+      }})
+      members.push({userId:personId,membershipId:member.id})
+    }
+    const f=await buildReportingFixture(db,5,false,{
+      ownerId:admin.id,organizationId,members,
+      resourceKey:'school-general-review-'+randomUUID(),
+      resourceVersion:'1.0.0',at:new Date('2026-10-08T00:00:00Z'),
+    })
     const actor:AuthenticatedPrincipal={
-      userId:f.ownerId,username:'school-v2-admin',role:'ADMIN',
+      userId:admin.id,username:admin.username,role:'ADMIN',
       accountDomain:'SCHOOL',platformRole:'STANDARD',
       tokenVersion:0,mustChangePassword:false,
     }
-    await db.user.update({where:{id:f.ownerId},data:{
-      accountDomain:'SCHOOL',role:'ADMIN',teacherApproved:true,
-    }})
-    await db.user.updateMany({where:{id:{in:f.members.map(m=>m.userId)}},
-      data:{accountDomain:'SCHOOL'}})
-    await db.organization.update({where:{id:f.organizationId},
-      data:{productDomain:'SCHOOL'}})
-    const ownerMember=await db.organizationMembership.create({data:{
-      id:randomUUID(),organizationId:f.organizationId,userId:f.ownerId,
-      orgRole:'ORG_ADMIN',
-    }})
-    await grantSyntheticHuischoolProduct(db,{
-      organizationId:f.organizationId,adminUserId:f.ownerId,
-      adminMembershipId:ownerMember.id,
-    })
     const ref=await db.$queryRaw<Array<{key:string;version:string}>>`
       SELECT resource_key AS key,resource_version AS version
       FROM assessment_run_tracks WHERE id=${f.trackId}
