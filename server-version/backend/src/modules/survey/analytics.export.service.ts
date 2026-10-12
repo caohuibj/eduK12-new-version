@@ -77,21 +77,49 @@ export async function createSurveyExport(req:Request,input:{
     ||prior.completedBefore!==(input.completedBefore??null)
     ||prior.freeTextIncluded!==(input.includeFreeText===true)))
     fail(400,'分批导出的时间筛选条件不能修改')
+  // V3 keeps included FINALs and non-final participant rows in separate
+  // bounded, resumable phases. Legacy V1/V2 continuation tokens remain readable.
+  const v3=!prior||prior.v===3
+  const attendanceOnly=prior?.v===3&&prior.phase==='ATTENDANCE'
   const sources=await loadSurveySource({actorUserId:uid,projectId:input.projectId,
     ...(input.waveId?{waveIds:[input.waveId]}:{}),maxFinals:250,
     includeWideSchema:true,completedFrom:from,completedBefore:before,
     ...(paged?{pageMode:true,
-      stableIdCursor:!prior||prior.v===2,
-      includeAttendance:!prior}:{}),
-    ...(prior?{afterFinal:{id:prior.after.id,completedAt:new Date(prior.after.completedAt)},
+      stableIdCursor:!prior||prior.v!==1,
+      includeAttendance:false,
+      ...(v3?{includeAttendanceCount:true}:{}),
+      ...(attendanceOnly?{
+        attendanceOnly:true,attendanceAfterId:prior.afterAttemptId??undefined,
+      }:{}),
+    }:{}),
+    ...(prior?{
+      ...(!attendanceOnly?{afterFinal:{id:prior.after.id,
+        completedAt:new Date(prior.after.completedAt)}}:{}),
       snapshotCutOff:new Date(prior.cutOff),expectedSourceRevision:prior.sourceRevision,
-      expectedFinalCount:prior.finalCount}:{}),
+      expectedFinalCount:prior.finalCount,
+      ...(prior.v===3?{expectedAttendanceCount:prior.attendanceCount}:{}),
+    }:{}),
   })
-  if(sources.nextFinalCursor&&prior?.page===100)
-    fail(413,'本次受控分批导出超过 25000 个 FINAL，请缩小采集范围')
-  const nextCursor=paged&&sources.nextFinalCursor?encodeSurveyExportCursor({
-    v:prior?.v??2,projectId:input.projectId,waveId:input.waveId!,
-    format:input.format as SurveyExportCursor['format'],after:sources.nextFinalCursor,
+  const nextPhase=attendanceOnly
+    ?(sources.nextAttendanceCursor?'ATTENDANCE':null)
+    :sources.nextFinalCursor?'FINALS'
+      :v3&&sources.collectionMode==='LINKED_WAVES'&&(sources.sourceAttendanceCount??0)>0
+        ?'ATTENDANCE':null
+  if(nextPhase&&prior?.page===(v3?200:100))
+    fail(413,'研究数据超出受控导出页数上限；请缩小波次或采集范围')
+  const dummyAfter={id:'00000000-0000-0000-0000-000000000000',
+    completedAt:sources.cutOff}
+  const after=nextPhase==='FINALS'?sources.nextFinalCursor!:
+    prior?.after??dummyAfter
+  const nextCursor=paged&&nextPhase?encodeSurveyExportCursor({
+    v:prior?.v??3,projectId:input.projectId,waveId:input.waveId!,
+    format:input.format as SurveyExportCursor['format'],after,
+    ...(v3?{
+      phase:nextPhase,attendanceCount:sources.sourceAttendanceCount??0,
+      ...(nextPhase==='ATTENDANCE'?{
+        afterAttemptId:attendanceOnly?sources.nextAttendanceCursor:null,
+      }:{}),
+    }:{}),
     cutOff:sources.cutOff,sourceRevision:sources.sourceRevision,
     finalCount:sources.sourceFinalCount??0,
     page:(prior?.page??0)+1,issuedAt:Date.now(),
@@ -127,9 +155,13 @@ export async function createSurveyExport(req:Request,input:{
     generatedAt:new Date().toISOString(),timeZone:'UTC',
     sourceProjectRevision:sources.sourceRevision,
     analysisPopulation:'COMPLETED_FINAL_NOT_WITHDRAWN_AND_NOT_QUALITY_EXCLUDED',
-    batch:{pageNumber,hasNext:!!nextCursor,completionRowsOnlyAfterFirstPage:!!prior,
-      sourceOrdering:paged?(prior?.v===1?'COMPLETED_AT_AND_ID_V1':'FINAL_UUID_ID_V2')
-        :'COMPLETED_AT_AND_ID',
+    batch:{pageNumber,hasNext:!!nextCursor,
+      phase:attendanceOnly?'NON_FINAL_PARTICIPATION':'VERIFIED_FINAL',
+      completionRowsOnlyAfterFirstPage:!!prior&&!attendanceOnly,
+      sourceOrdering:attendanceOnly?'ATTEMPT_UUID_ID_V3'
+        :paged?(prior?.v===1?'COMPLETED_AT_AND_ID_V1':'FINAL_UUID_ID_V2')
+          :'COMPLETED_AT_AND_ID',
+      participationRowsAreSeparate:!!(paged&&v3&&sources.collectionMode==='LINKED_WAVES'),
     },
     completedFinalCount:sources.completeAttempts,selectedVersions,
     selection:{format:input.format,waveIds:input.waveId?[input.waveId]:null,
