@@ -8,6 +8,7 @@ import { createHuiteacherTarget,createHuiteacherEvent,
 } from '../../modules/huiteacher/evaluation.service'
 import { addTeacherRunTrack,previewTeacherRun,publishTeacherRun,closeTeacherRun } from '../../modules/huiteacher/run.service'
 import { readTeacherFormGroupReport } from '../../modules/huiteacher/groupReport.service'
+import {assertTeacherComparableDisclosure} from '../../modules/huiteacher/disclosureOverlap.service'
 import { saveReportPrivacyPreferences } from '../../modules/report-privacy/preferences.service'
 import type { AuthenticatedPrincipal } from '../../types'
 import { startAssessmentRunExecution } from '../../modules/assessment-run/startExecution'
@@ -295,6 +296,17 @@ suite('Teacher V2 per-Run saved disclosure preferences — actual isolated Postg
       where:{organizationId:organization.id,sourceRunId:created.runId},
     })
     expect(record.reportDigest).toMatch(/^[a-f0-9]{64}$/)
+    // Real PostgreSQL proof: retrieve historical FINAL contributors from
+    // the immutable source, not a projected invited roster or fake digest.
+    const comparable={organizationId:organization.id,runId:randomUUID(),
+      definitionDigest:form.definitionDigest,
+      scenario:'TEACHER_ADULT_FORM_GROUP' as const,enhanced:true}
+    await expect(assertTeacherComparableDisclosure(db as any,{
+      ...comparable,respondents:participants.map(x=>x.id),
+    })).resolves.toBeUndefined()
+    await expect(assertTeacherComparableDisclosure(db as any,{
+      ...comparable,respondents:[...participants.slice(0,4).map(x=>x.id),randomUUID()],
+    })).rejects.toMatchObject({code:'TEACHER_REPORT_EFFECTIVE_DIFFERENCING_BLOCKED'})
     await expect(db.educationReportReleaseRecord.delete({where:{id:record.id}}))
       .rejects.toThrow()
     await expect(readTeacherFormGroupReport({

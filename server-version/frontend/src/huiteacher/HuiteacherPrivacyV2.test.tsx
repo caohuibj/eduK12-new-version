@@ -51,3 +51,64 @@ describe('Huiteacher PR2 student feedback admin materialized release',()=>{
     expect(api).not.toHaveBeenCalledWith(expect.stringContaining('/report/release'),'GET',expect.anything())
   })
 })
+
+describe('Huiteacher streamlined three-stage student evaluation',()=>{
+  it('prepares config and Run with one action, opens + publishes once, and resumes from saved states',async()=>{
+    const eventBase='/organizations/'+org+'/evaluation-events/'+event
+    const calls:string[]=[]
+    let currentStatus='DRAFT'
+    const api=vi.fn(async(path:string,method='GET',body?:unknown)=>{
+      calls.push(method+' '+path)
+      if(path===base&&method==='GET')throw Error('NO_CONFIG')
+      if(path===base+'/candidates')return {list:[{
+        staffAssignmentId:'staff-record',classUnitId:'class-record',
+        className:'六年级一班',staffRole:'TEACHING',
+      }],truncated:false}
+      if(path===base&&method==='POST')return {id:'configuration',
+        eventId:event,classUnitId:'class-record',staffAssignmentId:'staff-record',
+        formId:form,definitionDigest:'a'.repeat(64)}
+      if(path===base+'/run'&&method==='POST')return {
+        runId:run,status:'DRAFT',version:2,trackCount:1,
+      }
+      if(path===base+'/eligibility')return {eventId:event,teacherAssigned:true,
+        eligibleStudentCount:10,privacyFloor:5,readyForPrivacyProtectedFeedback:true,
+        note:'Test-only eligibility'}
+      if(path===eventBase+'/transition'&&method==='POST'){
+        expect(body).toEqual({action:'OPEN',expectedVersion:1})
+        return {status:'OPEN',version:2}
+      }
+      if(path===base+'/run/publish'&&method==='POST'){
+        expect(body).toEqual({expectedVersion:2})
+        currentStatus='PUBLISHED'
+        return {executionCount:10}
+      }
+      if(path===eventBase+'/run'&&method==='GET')return {
+        runId:run,status:currentStatus,version:3,trackCount:1,
+      }
+      throw Error('Unexpected '+method+' '+path)
+    })
+    const confirm=vi.spyOn(window,'confirm').mockReturnValue(true)
+    render(<HuiteacherStudentEvaluationManager
+      organizationId={org} eventId={event} eventStatus="DRAFT"
+      eventVersion={1} teacherName="王教师"
+      forms={[{id:form,title:'课堂反馈',definitionDigest:'a'.repeat(64),
+        status:'PUBLISHED'}]}
+      api={api as any}/>)
+    fireEvent.click(await screen.findByRole('button',{name:'选择学校核验的任教关系'}))
+    await screen.findByRole('button',{name:'准备评价草稿'})
+    fireEvent.change(screen.getByLabelText('本教师合法任教的班级'),{
+      target:{value:'staff-record'}})
+    fireEvent.change(screen.getByLabelText('已发布 Form V2（不计分）'),{
+      target:{value:form}})
+    fireEvent.click(screen.getByRole('button',{name:'准备评价草稿'}))
+    await screen.findByRole('button',{name:'发布评价'})
+    expect(confirm).not.toHaveBeenCalled()
+    expect(calls).toContain('POST '+base+'/run')
+    fireEvent.click(screen.getByRole('button',{name:'发布评价'}))
+    await waitFor(()=>expect(calls).toContain('POST '+base+'/run/publish'))
+    expect(confirm).toHaveBeenCalledTimes(1)
+    expect(calls.indexOf('POST '+eventBase+'/transition'))
+      .toBeLessThan(calls.indexOf('POST '+base+'/run/publish'))
+    expect(await screen.findByText(/已分配 10 份正式任务/)).toBeInTheDocument()
+  })
+})

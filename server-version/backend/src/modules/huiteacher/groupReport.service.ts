@@ -7,9 +7,9 @@ import { resolvePublishedTeacherForm,teacherFormResourceRef,
   TEACHER_FORM_MIN_RESPONDENTS } from './formRunResource'
 import type { FormDraft } from '../survey/builder.definition'
 import type {PrivacyOptions} from '../report-privacy/schema'
+import {assertTeacherComparableDisclosure} from './disclosureOverlap.service'
 import {teacherFrozenPolicy,teacherScopeKey,teacherReportFloor,
-  readReleasedTeacherReport,recordTeacherReportRelease,lockTeacherDisclosure,
-  hasConflictingComparableTeacherFormHistory}
+  readReleasedTeacherReport,recordTeacherReportRelease,lockTeacherDisclosure}
   from './privacyReleaseV2.service'
 
 export class HuiteacherGroupReportError extends Error{
@@ -404,6 +404,21 @@ export async function readTeacherFormGroupReport(input:{
       users:contributors.map(row=>row.userId),
     })
     if(!frozen){
+      // V1 GET creates the first legacy disclosure. Serialize it with V2
+      // release and check any earlier protected comparable report.
+      await lockTeacherDisclosure(tx,input.organizationId)
+      const legacyRelease=await tx.huiteacherGroupDisclosureLedger.findFirst({
+        where:{organizationId:input.organizationId,definitionDigest:source.definitionDigest},
+        select:{firstRunId:true},
+      })
+      // Re-reading an already-disclosed legacy Run does not create a new
+      // cross-version disclosure even if a newer release exists.
+      if(legacyRelease?.firstRunId!==source.runId)
+        await assertTeacherComparableDisclosure(tx,{
+          organizationId:input.organizationId,runId:source.runId,
+          definitionDigest:source.definitionDigest,scenario:'TEACHER_ADULT_FORM_GROUP',
+          respondents:contributors.map(row=>row.userId),enhanced:false,
+        })
     const fence=await tx.$queryRaw<Array<{firstRunId:string}>>`
       INSERT INTO "huiteacher_group_disclosure_ledgers"
         ("organization_id","definition_digest","population_digest","first_run_id")
@@ -428,19 +443,12 @@ export async function readTeacherFormGroupReport(input:{
         note:'单选/Likert/矩阵/多选按保密条件报告频数；多选为非互斥选择，不将其简单相加为人数。文本与数值／排序题未获正式汇总许可时明确隐藏；不构成诊断或因果解释。',
       }
     }
-    if(frozen.options.crossReleaseOverlapGuard){
-      const legacy=await tx.huiteacherGroupDisclosureLedger.findFirst({
-        where:{organizationId:input.organizationId,definitionDigest:source.definitionDigest},
-      })
-      if(legacy&&legacy.populationDigest!==populationDigest)
-        reject('HUITEACHER_GROUP_POPULATION_DIFFERENCING_BLOCKED',403)
-      // Different questionnaire definitions no longer block one another.
-      // Only a changed contributor population for the exact same Form does.
-      if(await hasConflictingComparableTeacherFormHistory(tx,{
-        organizationId:input.organizationId,runId:source.runId,
-        definitionDigest:source.definitionDigest,populationDigest,
-      }))reject('HUITEACHER_GROUP_POPULATION_DIFFERENCING_BLOCKED',403)
-    }
+    await assertTeacherComparableDisclosure(tx,{
+      organizationId:input.organizationId,runId:source.runId,
+      definitionDigest:source.definitionDigest,scenario:'TEACHER_ADULT_FORM_GROUP',
+      respondents:contributors.map(row=>row.userId),
+      enhanced:frozen.options.crossReleaseOverlapGuard,
+    })
     const projection={
       source:'VERIFIED_HUITEACHER_FORM_FINAL' as const,
       organizationId:input.organizationId,eventId:input.eventId,
@@ -460,7 +468,9 @@ export async function readTeacherFormGroupReport(input:{
       populationDigest,projection,
     })
   },{
-    isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead,
+    // Legacy first reads acquire the disclosure lock after source resolution.
+    // READ COMMITTED makes a just-committed V2 release visible after waiting.
+    isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,
     maxWait:2000,timeout:30000,
   })
 }

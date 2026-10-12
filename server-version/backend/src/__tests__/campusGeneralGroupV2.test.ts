@@ -1,5 +1,8 @@
 import {describe,expect,it} from 'vitest'
 import {STANDARD,ENHANCED} from '../modules/report-privacy/registry'
+import {buildReportingArtifact} from '../modules/reporting/engine'
+import type {ReportingAnalysisSpecRecord,ReportingCohortSnapshotRecord,
+  ReportingResultBatchV1,ReportingGroupSpecV1} from '../modules/reporting/types'
 import {projectCampusGeneralGroupV2} from '../modules/campus/generalGroupV2.projection'
 import {exactGeneralContributors,unsafeComparableGeneralOverlap}
   from '../modules/campus/generalGroupV2.differencing'
@@ -85,5 +88,65 @@ describe('Huischool V2 opt-in actual-contributor differencing',()=>{
     expect(unsafeComparableGeneralOverlap(ids(1,5),ids(1,10))).toBe(false)
     expect(unsafeComparableGeneralOverlap(ids(1,10),ids(11,20))).toBe(false)
     expect(unsafeComparableGeneralOverlap(ids(1,5),ids(2,6))).toBe(true)
+  })
+})
+
+describe('School V2 actual canonical scientific engine (without a mock scorer)',()=>{
+  it('projects only approved metrics from real GROUP computation and exact FINAL manifest',()=>{
+    const definition:ReportingGroupSpecV1={
+      schemaVersion:1,analysisKind:'GROUP',engineKey:'ORG_GROUP_V1',
+      engineVersion:'1.0.0',privacyUnit:'SUBJECT',
+      selectionPolicy:'UNIQUE_OR_REJECT',minimumCohortN:5,
+      minimumContributorN:5,reportEvidenceCeiling:'PILOT',
+      metricRules:[{metricId:'score',sourceMetricKey:'score',
+        acceptedResultQuality:['interpretable'],
+        acceptedMetricQuality:'IGNORE_METRIC_QUALITY',
+        aggregations:['MEAN','MEDIAN'],missingnessRule:'EXCLUDE',
+        minimumMetricN:5,observationUnit:'SUBJECT',selectionPolicy:'UNIQUE_OR_REJECT'}],
+    }
+    const spec:ReportingAnalysisSpecRecord={
+      id:'published-scientific-spec',specKey:'school-test',version:1,
+      status:'PUBLISHED',definition,specHash:'signed-test-definition',
+      createdByUserId:'review-author',createdAt:new Date(),
+      reviewedByUserId:'independent-reviewer',reviewedAt:new Date(),
+      publishedAt:new Date(),
+    }
+    const members=Array.from({length:5},(_,i)=>({
+      userId:'student-'+i,membershipId:'member-'+i,
+      actorSnapshotId:'actor-'+i,executionId:'execution-'+i,
+    }))
+    const cohort:ReportingCohortSnapshotRecord={
+      id:'frozen-cohort',organizationId:'school-review',
+      sourceRunId:'closed-school-run',sourceTrackId:'self-report-track',
+      selector:{kind:'RUN_TRACK_SUBJECTS',runId:'closed-school-run',trackId:'self-report-track'},
+      members,eligibleN:5,cohortIdentityHash:'signed-cohort',
+      snapshotHash:'frozen-source',generatedByUserId:'school-reviewer',generatedAt:new Date(),
+    }
+    const batch:ReportingResultBatchV1={
+      resourceFamily:'BUNDLE',resourceKey:'approved-education-resource',
+      resourceVersion:'1.0.0',resourceMinimumN:5,unresolved:[],
+      resolved:members.map((member,i)=>({
+        executionId:member.executionId,subjectUserId:member.userId,
+        membershipId:member.membershipId,trackId:'self-report-track',
+        canonicalResultHash:'official-final-'+i,
+        metrics:[{key:'score',value:i+1,resultQuality:'interpretable',metricQuality:null},
+          {key:'unreviewed-secret',value:99,resultQuality:'interpretable',metricQuality:null}],
+        scientificMaturity:'PILOT',provenanceState:'FROZEN',
+        scientificProvenanceHash:'source-proof-'+i,
+      })),
+    }
+    const output=buildReportingArtifact({
+      artifactId:'immutable-analysis',generatedByUserId:'school-reviewer',
+      generatedAt:new Date().toISOString(),spec,cohort,batch,
+    })
+    const safe=projectCampusGeneralGroupV2({
+      artifactId:'immutable-analysis',projection:output.payload.projection,
+      options:STANDARD,minimumN:5,metricMinimums:{score:5},
+    })
+    expect(safe).toMatchObject({state:'READY',participantN:5,completedN:5,
+      metrics:{score:{mean:3}}})
+    expect(JSON.stringify(safe)).not.toContain('unreviewed-secret')
+    expect(exactGeneralContributors(output.payload.inputManifest,5))
+      .toEqual(members.map(x=>x.userId).sort())
   })
 })

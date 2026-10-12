@@ -1,5 +1,7 @@
 import {afterEach,describe,expect,it,vi} from 'vitest'
 import {STANDARD,ENHANCED} from '../modules/report-privacy/registry'
+import {unsafeTeacherDisclosureOverlap,assertTeacherComparableDisclosure}
+  from '../modules/huiteacher/disclosureOverlap.service'
 import {
   teacherPrivacyV2Enabled,teacherReportMinimum,
   parseFrozenTeacherOptions,
@@ -106,5 +108,57 @@ describe('Teacher V2 report/privacy policy and output projection',()=>{
     query.mockResolvedValueOnce([{conflict:true}])
     expect(await hasConflictingComparableTeacherFormHistory({$queryRaw:query} as any,input))
       .toBe(true)
+  })
+})
+
+describe('Teacher comparable disclosure overlap: opt-in, same-definition history',()=>{
+  const ids=(a:number,b:number)=>Array.from({length:b-a+1},(_,i)=>'user-'+(a+i))
+  it('permits identical, disjoint, or sufficiently distinct populations',()=>{
+    expect(unsafeTeacherDisclosureOverlap(ids(1,10),ids(1,10))).toBe(false)
+    expect(unsafeTeacherDisclosureOverlap(ids(1,10),ids(11,20))).toBe(false)
+    expect(unsafeTeacherDisclosureOverlap(ids(1,10),ids(6,15))).toBe(false)
+    expect(unsafeTeacherDisclosureOverlap(ids(1,5),ids(1,10))).toBe(false)
+  })
+  it('blocks a newly identifiable one-to-four-person change in either order',()=>{
+    expect(unsafeTeacherDisclosureOverlap(ids(1,10),ids(1,9))).toBe(true)
+    expect(unsafeTeacherDisclosureOverlap(ids(1,9),ids(1,10))).toBe(true)
+    expect(unsafeTeacherDisclosureOverlap(ids(2,11),ids(1,10))).toBe(true)
+    expect(unsafeTeacherDisclosureOverlap(ids(1,10),ids(2,11))).toBe(true)
+  })
+})
+
+describe('Cross-version disclosure admission: only comparable effective populations',()=>{
+  const base={organizationId:'school-1',runId:'new-run',definitionDigest:'form-digest',
+    scenario:'TEACHER_ADULT_FORM_GROUP' as const,
+    respondents:Array.from({length:10},(_,i)=>'user-'+i)}
+  it('a previous enhanced release protects even when the new Run is Standard',async()=>{
+    const prior=base.respondents.slice(0,9).map(userId=>({runId:'old-run',userId}))
+    const query=vi.fn()
+      .mockResolvedValueOnce([{runId:'old-run',enhanced:true}])
+      .mockResolvedValueOnce(prior)
+    await expect(assertTeacherComparableDisclosure({$queryRaw:query} as any,{
+      ...base,enhanced:false,
+    })).rejects.toMatchObject({code:'TEACHER_REPORT_EFFECTIVE_DIFFERENCING_BLOCKED'})
+    expect(query).toHaveBeenCalledTimes(2)
+  })
+  it('standard-to-standard does not enable expensive history expansion',async()=>{
+    const query=vi.fn().mockResolvedValueOnce([{runId:'older',enhanced:false}])
+    await expect(assertTeacherComparableDisclosure({$queryRaw:query} as any,{
+      ...base,enhanced:false,
+    })).resolves.toBeUndefined()
+    expect(query).toHaveBeenCalledTimes(1)
+  })
+  it('student feedback compares exact teacher and Form while allowing disjoint classes',async()=>{
+    const prior=Array.from({length:10},(_,i)=>({runId:'other-run',userId:'other-'+i}))
+    const query=vi.fn()
+      .mockResolvedValueOnce([{runId:'other-run',enhanced:true}])
+      .mockResolvedValueOnce(prior)
+    await expect(assertTeacherComparableDisclosure({$queryRaw:query} as any,{
+      ...base,scenario:'TEACHER_STUDENT_EVALUATION',
+      teacherUserId:'evaluated-teacher',enhanced:true,
+    })).resolves.toBeUndefined()
+    const first=query.mock.calls[0][0] as {strings:readonly string[];values:unknown[]}
+    expect(first.strings.join(' ')).toContain('target.subject_user_id')
+    expect(first.values).toContain('evaluated-teacher')
   })
 })
