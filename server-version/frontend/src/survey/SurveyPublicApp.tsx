@@ -6,6 +6,7 @@ import { FormChoiceExtras,hasSelectedOther,toggleFormMultiple } from './FormChoi
 import {saveLocalSurveyDraft,restoreLocalSurveyDraft,clearLocalSurveyDraft} from './local-answer-draft'
 import { SurveyParticipantImage,type SurveyImageProof } from './SurveyParticipantImage'
 import { resolveClientSurveyFlow,type PublicFlow } from './flow.client'
+import { resolveSurveyCheckpointDraft,sameSurveyCheckpointAnswers } from './checkpoint-recovery'
 
 type ApiResult<T>={code:number|string;message:string;data:T|null}
 type Wave={id:string;title:string;ordinal:number;status:string;consentText:string;consentVersion:number;
@@ -206,6 +207,7 @@ export default function SurveyPublicApp(){
   const [formPages,setFormPages]=useState<Record<string,number>>({})
   const [flowStep,setFlowStep]=useState(0),[screenedOut,setScreenedOut]=useState(false)
   const [checkpointRevision,setCheckpointRevision]=useState(0)
+  const [checkpointOverwritePending,setCheckpointOverwritePending]=useState(false)
   const [attemptId,setAttemptId]=useState(''),[submissionId,setSubmissionId]=useState('')
   const [general,setGeneral]=useState<General|null>(null),[notice,setNotice]=useState('')
   const [withdrawn,setWithdrawn]=useState(false),[revoked,setRevoked]=useState(false)
@@ -275,7 +277,8 @@ export default function SurveyPublicApp(){
     })
     setAttemptId(id)
     setSubmissionId(crypto.randomUUID())
-    setTask(data);setFormPages({});setFlowStep(0);setScreenedOut(false);setCheckpointRevision(0)
+    setTask(data);setFormPages({});setFlowStep(0);setScreenedOut(false)
+    setCheckpointRevision(0);setCheckpointOverwritePending(false)
     if(data.status==='COMPLETED'){
       clearLocalSurveyDraft(publicId,id)
       setAnswers({})
@@ -292,11 +295,20 @@ export default function SurveyPublicApp(){
           }|null}>(base+'/attempts/'+id+'/checkpoint/read','POST',{
             ...(code?{researchCode:code}:{}),accessCredential:secret,
           })
-          setCheckpointRevision(remote.revision)
-          if(!saved&&remote.checkpoint){
-            setAnswers(remote.checkpoint.answers)
-            setNotice('已使用研究私密凭证恢复加密服务器存档；该暂存内容仍不是正式提交。')
-          }
+          const clash=!!saved&&!!remote.checkpoint&&
+            !sameSurveyCheckpointAnswers(saved,remote.checkpoint.answers)
+          const useRemote=!clash||window.confirm(
+            '检测到本标签页草稿与服务器加密存档不同。确定：读取服务器版本；取消：保留本地版本（若想写回服务器，保存前还需明确确认覆盖）。',
+          )
+          const plan=resolveSurveyCheckpointDraft(saved,remote,useRemote)
+          setCheckpointRevision(plan.revision)
+          setCheckpointOverwritePending(plan.requiresOverwriteConfirmation)
+          setAnswers(plan.answers)
+          if(plan.conflict)setNotice(useRemote
+            ?'已选用服务器上最新的加密草稿；本地旧答案将不再自动覆盖它。'
+            :'已保留本地答案；若稍后需要覆盖服务器存档，必须再次明确确认。')
+          else if(remote.checkpoint&&!saved)setNotice(
+            '已使用研究私密凭证恢复加密服务器存档；该暂存内容仍不是正式提交。')
         }catch(e){setNotice('无法恢复服务器临时存档：'+parseError(e))}
       }
     }
@@ -432,6 +444,9 @@ export default function SurveyPublicApp(){
     setNotice('提交成功。系统不会提供未经验证的诊断或常模等级。')
   })}
   const saveCheckpoint=()=>{if(!task?.checkpointPolicy?.enabled||!attemptId)return
+    if(checkpointOverwritePending&&!window.confirm(
+      '确认用当前本地答案替换另一设备保存的服务器 Checkpoint？此操作不能恢复被覆盖的未提交草稿。',
+    ))return
     void run(async()=>{
       // Only the current route is eligible for a voluntary server checkpoint.
       const enabled=task.flow?new Set(currentFlow?.visibleUnitKeys??[]):null
@@ -448,6 +463,7 @@ export default function SurveyPublicApp(){
         accessCredential:accessCredential.trim(),revision:checkpointRevision,answers:partial,
       })
       setCheckpointRevision(saved.revision)
+      setCheckpointOverwritePending(false)
       setNotice('已加密暂存未完成答案，至 '+new Date(saved.expiresAt).toLocaleString('zh-CN')+
         ' 有效。这不是正式 FINAL；另一设备更改后须重新读取以避免覆盖。')
     })
