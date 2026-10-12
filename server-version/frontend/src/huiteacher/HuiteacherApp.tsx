@@ -51,7 +51,8 @@ const Field=({label,value,set,type='text',required=true}:{
   autoComplete={type==='password'?'off':'off'}/></label>
 
 function Brand(){return <div className="ht-brand">
-  <div className="ht-brand-symbol" aria-hidden="true">火</div>
+  <span className="ht-brand-symbol ht-brand-b3" role="img"
+    aria-label="Huiteacher 火形 B3 星火相传 Logo（用户确认原稿）"/>
   <div><strong>Huiteacher</strong><span>教师发展与学校改进平台</span></div>
 </div>}
 

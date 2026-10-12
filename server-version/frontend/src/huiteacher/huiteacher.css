@@ -85,3 +85,17 @@
  .ht-app .ht-workspace-tabs button{min-width:0;padding:.6rem .35rem}
  .ht-app .ht-growth{padding:.75rem}
 }
+
+/* B3「星火相传」：exact user-approved original strip, CSS clips the central
+ * flame/H-negative-space icon. Do NOT substitute an invented vector mark.
+ * Original artwork: Google Drive 11EgH4bYHlooDgx_hlqBxXEomIpzc-6uD.
+ * Source 1180x470; center icon ~x486..664,y60..259.
+ */
+.ht-app .ht-brand-b3{
+  display:block;flex:0 0 auto;width:54px;height:55px;border-radius:5px;
+  background-image:url('/huiteacher/b3-approved-original-20261010.png');
+  background-repeat:no-repeat;background-size:313px 125px;
+  background-position:-126px -16px;background-color:#fcf3ec;
+  box-shadow:none;overflow:hidden;
+}
+.ht-app .ht-brand strong{letter-spacing:.045em}
