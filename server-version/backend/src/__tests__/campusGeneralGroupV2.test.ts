@@ -1,6 +1,8 @@
 import {describe,expect,it} from 'vitest'
 import {STANDARD,ENHANCED} from '../modules/report-privacy/registry'
 import {projectCampusGeneralGroupV2} from '../modules/campus/generalGroupV2.projection'
+import {exactGeneralContributors,unsafeComparableGeneralOverlap}
+  from '../modules/campus/generalGroupV2.differencing'
 
 const source={
   kind:'GROUP',state:'present',eligibleN:6,resultContributorN:5,
@@ -55,5 +57,33 @@ describe('Huischool PR3 approved general group aggregate V2 projection',()=>{
       missingN:0,aggregations:{mean:1}}}}).state).toBe('WITHHELD')
     expect(calc({...source,metrics:{participation:{state:'suppressed'}}}).state)
       .toBe('WITHHELD')
+  })
+})
+
+
+describe('Huischool V2 opt-in actual-contributor differencing',()=>{
+  const ids=(from:number,to:number)=>Array.from({length:to-from+1},(_,i)=>'student-'+(from+i))
+  const manifest=(users:readonly string[])=>users.map(subjectUserId=>({subjectUserId}))
+  it('binds only valid unique canonical FINAL contributors, never invited roster size',()=>{
+    const actual=ids(1,5)
+    expect(exactGeneralContributors(manifest(actual),5)).toEqual(actual)
+    expect(()=>exactGeneralContributors(manifest(actual),6)).toThrow('CAMPUS_GENERAL_CONTRIBUTORS_INVALID')
+    expect(()=>exactGeneralContributors(manifest(['student-1','student-1',...ids(2,4)]),5))
+      .toThrow('CAMPUS_GENERAL_CONTRIBUTORS_INVALID')
+    expect(()=>exactGeneralContributors([{subjectUserId:'student-1'},...Array(4).fill({})],5))
+      .toThrow('CAMPUS_GENERAL_CONTRIBUTORS_INVALID')
+  })
+  it('blocks 5/6 and changed partial contributors despite the same six invited students',()=>{
+    const first=ids(1,5)
+    expect(unsafeComparableGeneralOverlap(first,ids(1,6))).toBe(true)
+    expect(unsafeComparableGeneralOverlap(ids(2,6),first)).toBe(true)
+    expect(unsafeComparableGeneralOverlap(first,first)).toBe(false)
+  })
+  it('permits disjoint or sufficiently large changes, rather than a lifetime one-report cap',()=>{
+    expect(unsafeComparableGeneralOverlap(ids(1,5),ids(6,10))).toBe(false)
+    expect(unsafeComparableGeneralOverlap(ids(1,10),ids(6,15))).toBe(false)
+    expect(unsafeComparableGeneralOverlap(ids(1,5),ids(1,10))).toBe(false)
+    expect(unsafeComparableGeneralOverlap(ids(1,10),ids(11,20))).toBe(false)
+    expect(unsafeComparableGeneralOverlap(ids(1,5),ids(2,6))).toBe(true)
   })
 })
