@@ -13,7 +13,7 @@ type Scope={organizationId:string;organizationName:string;membershipId:string;or
 type Me={id:string;username:string;role:string;organizations:Scope[];product:'HUITEACHER'}
 type Unit={id:string;unitKind:'GRADE'|'CLASS';name:string;parentUnitId:string|null}
 type Mfa={mfaRequired:true;enrolled:boolean}
-type Screen='home'|'login'|'mfa'|'register'|'student'|'workspace'
+type Screen='home'|'login'|'mfa'|'register'|'student'|'expert'|'workspace'
 
 function cookie(name:string){
   const part=document.cookie.split('; ').find(x=>x.startsWith(name+'='))
@@ -158,6 +158,14 @@ export default function HuiteacherApp(){
     })
     setPassword('');setMessage('注册成功，已加入 Teacher 学校；心理健康业务仍需另行授权')
   })
+  const expertRegistration=()=>run(async()=>{
+    await teacherApi('/education/register-expert','POST',{
+      username,password,inviteCode,
+    })
+    setPassword('');setInviteCode('')
+    setScreen('login')
+    setMessage('外部专家教育账号已建立，无需加入学校即可领取本次受控观察任务。请登录。')
+  })
   const staffRegistration=()=>run(async()=>{
     await teacherApi('/education/register-staff','POST',{
       username,password,inviteCode,
@@ -192,7 +200,9 @@ export default function HuiteacherApp(){
   return <main className="ht-app">
     <header className="ht-topbar"><Brand/><nav aria-label="产品导航">
       {!me&&<><button onClick={()=>changeScreen('home')}>首页</button><button onClick={()=>changeScreen('login')}>登录</button>
-        <button onClick={()=>changeScreen('register')}>教师注册</button><button onClick={()=>changeScreen('student')}>学生评教入口</button></>}
+        <button onClick={()=>changeScreen('register')}>教师注册</button>
+        <button onClick={()=>changeScreen('expert')}>外部专家注册</button>
+        <button onClick={()=>changeScreen('student')}>学生评教入口</button></>}
       {me&&<><span className="ht-welcome">{me.username}</span><button onClick={()=>void logout()} disabled={working}>退出</button></>}
     </nav></header>
     {message&&<p role="status" className="ht-notice">{message}</p>}
@@ -223,12 +233,19 @@ export default function HuiteacherApp(){
       {recoveryCodes.length>0&&<div className="ht-secret"><strong>请离线保存恢复码；仅此时展示</strong>
         <pre>{recoveryCodes.join('\n')}</pre><button onClick={()=>{setRecoveryCodes([]);void reload()}}>我已保存</button></div>}
     </section>:
-    !me&&(screen==='register'||screen==='student')?<section className="ht-panel ht-form-panel">
-      <h1>{screen==='register'?'教师邀请注册':'学生评教身份注册'}</h1>
-      <p>{screen==='register'?'已有教育账号请直接登录后使用邀请加入学校，不要重复注册。':'仅供首次创建教育学生账号。已有教育账号的学生请登录后输入邀请代码和学号加入，不需要重复注册。'}</p>
+    !me&&(screen==='register'||screen==='student'||screen==='expert')?<section className="ht-panel ht-form-panel">
+      <h1>{screen==='register'?'教师邀请注册':screen==='expert'?'外部专家受控注册':'学生评教身份注册'}</h1>
+      <p>{screen==='expert'
+        ?'由学校获得一次性邀请码后，可创建统一教育账号；已有教育账号者请直接登录，在专家工作台领取邀请。此操作不创建 School 学校成员或心理健康权限。'
+        :screen==='register'
+          ?'已有教育账号请直接登录后使用邀请加入学校，不要重复注册。'
+          :'仅供首次创建教育学生账号。已有教育账号的学生请登录后输入邀请代码和学号加入，不需要重复注册。'}</p>
       {screen==='student'&&<Field label="学校核验的学号" value={studentNumber} set={setStudentNumber}/>}
-      <form onSubmit={e=>{e.preventDefault();screen==='student'?studentRegistration():staffRegistration()}}>
-        <Field label={screen==='student'?'Teacher 学生邀请代码':'教师邀请代码'} value={inviteCode} set={setInviteCode}/>
+      <form onSubmit={e=>{e.preventDefault();
+        screen==='student'?studentRegistration():screen==='expert'?expertRegistration():staffRegistration()
+      }}>
+        <Field label={screen==='student'?'Teacher 学生邀请代码':screen==='expert'?'限定活动的专家邀请码':'教师邀请代码'}
+          value={inviteCode} set={setInviteCode}/>
         <Field label="教育账号登录名" value={username} set={setUsername}/>
         <Field label="设置密码" value={password} set={setPassword} type="password"/>
         <button className="ht-primary" disabled={working}>注册统一教育账号</button></form>
