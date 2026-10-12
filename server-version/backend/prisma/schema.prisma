@@ -3302,3 +3302,16 @@ model HuiteacherExternalExpertInvite {
   @@index([organizationId,eventId,expiresAt],map:"huiteacher_external_expert_invites_event")
   @@map("huiteacher_external_expert_invites")
 }
+
+model HuiteacherFieldFeedbackRelease {
+  id               String   @id
+  organizationId   String   @map("organization_id")
+  eventId          String   @map("event_id")
+  recipientUserId  String   @map("recipient_user_id")
+  noteId           String?  @map("note_id")
+  consensusId      String?  @map("consensus_id")
+  releasedByUserId String   @map("released_by_user_id")
+  releasedAt       DateTime @default(now()) @map("released_at") @db.Timestamptz(6)
+  @@index([recipientUserId,releasedAt(sort:Desc)],map:"huiteacher_feedback_release_person_idx")
+  @@map("huiteacher_field_feedback_releases")
+}
