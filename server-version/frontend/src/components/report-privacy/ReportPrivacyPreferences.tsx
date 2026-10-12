@@ -89,7 +89,8 @@ export function ReportPrivacyPreferences({organizationId,scenarios,api}:{
     setScope(next);setDraft(defaults(data,next));setMessage('');setError('')
   }
   const locked=(key:OptionKey)=>scope!=='SCHOOL_MINIMUM'&&!!data?.locks[key]
-  const isOn=(key:OptionKey)=>draft[key]===enhanced[key]
+  const isOn=(key:OptionKey)=>locked(key)
+    ?data?.effective[key]===enhanced[key]:draft[key]===enhanced[key]
   const change=(key:OptionKey,on:boolean)=>{
     if(locked(key))return
     const next={...draft}
@@ -105,10 +106,7 @@ export function ReportPrivacyPreferences({organizationId,scenarios,api}:{
     return !count?'false':count===relevant.length?'true':'mixed'
   }
   const changeGroup=(group:string,on:boolean)=>{
-    for(const option of data?.catalog.options.filter(o=>o.group===group)??[]){
-      if(locked(option.key))continue
-      // One React state update for an entire group.
-    }
+    // One React state update for an entire group.
     const next={...draft}
     for(const option of data?.catalog.options.filter(o=>o.group===group)??[]){
       if(locked(option.key))continue

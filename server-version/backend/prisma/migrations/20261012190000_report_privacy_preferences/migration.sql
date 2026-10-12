@@ -78,7 +78,47 @@ CREATE TABLE "education_report_policy_snapshots" (
 CREATE TABLE "education_report_release_records" (
   "id" TEXT PRIMARY KEY,
   "organization_id" TEXT NOT NULL,
-  "report_scope_key" TEXT NOT NULL,
+  "report_scope_key" TEXT NOT NULL CHECK ("report_scope_key" ~ '^[a-f0-9]{64}
+  "policy_snapshot_id" TEXT NOT NULL,
+  "source_run_id" TEXT NOT NULL,
+  "source_spec_id" TEXT,
+  "report_kind" TEXT NOT NULL,
+  "audience" TEXT NOT NULL,
+  "report_digest" TEXT NOT NULL,
+  "effective_population_digest" TEXT,
+  "legacy_source" TEXT,
+  "released_by_user_id" TEXT NOT NULL REFERENCES "users"("id") ON DELETE RESTRICT,
+  "released_at" TIMESTAMPTZ(6) NOT NULL DEFAULT now(),
+  CONSTRAINT "education_report_release_records_org_scope_unique"
+    UNIQUE("organization_id","report_scope_key"),
+  CONSTRAINT "education_report_release_records_snapshot_fk"
+    FOREIGN KEY ("organization_id","policy_snapshot_id")
+    REFERENCES "education_report_policy_snapshots"("organization_id","id") ON DELETE RESTRICT,
+  CONSTRAINT "education_report_release_records_run_fk"
+    FOREIGN KEY ("organization_id","source_run_id")
+    REFERENCES "assessment_runs"("organization_id","id") ON DELETE RESTRICT,
+  CONSTRAINT "education_report_release_records_hash_check"
+    CHECK ("report_digest" ~ '^[a-f0-9]{64}$'
+      AND ("effective_population_digest" IS NULL
+        OR "effective_population_digest" ~ '^[a-f0-9]{64}$'))
+);
+CREATE INDEX "education_report_release_records_source_idx"
+  ON "education_report_release_records"("organization_id","source_run_id","report_kind");
+
+-- A report and its binding to a frozen policy cannot be silently changed or deleted.
+CREATE OR REPLACE FUNCTION protect_education_report_evidence()
+RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  RAISE EXCEPTION 'report privacy snapshot/release history is immutable'
+    USING ERRCODE='23514';
+END $$;
+CREATE TRIGGER "education_report_policy_snapshots_immutable"
+  BEFORE UPDATE OR DELETE ON "education_report_policy_snapshots"
+  FOR EACH ROW EXECUTE FUNCTION protect_education_report_evidence();
+CREATE TRIGGER "education_report_release_records_immutable"
+  BEFORE UPDATE OR DELETE ON "education_report_release_records"
+  FOR EACH ROW EXECUTE FUNCTION protect_education_report_evidence();
+),
   "policy_snapshot_id" TEXT NOT NULL,
   "source_run_id" TEXT NOT NULL,
   "source_spec_id" TEXT,

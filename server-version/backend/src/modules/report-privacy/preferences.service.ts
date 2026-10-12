@@ -9,7 +9,7 @@ import {appendAudit,executeCommand} from '../organization/service'
 import {reportPrivacyCatalog,recognizePreset} from './registry'
 import {resolveEffectiveReportPrivacy,requestedOptions} from './effective.service'
 import {policyFingerprint,type EducationProduct,type PrivacyScenario,
-  type SavePreferenceRequest,type PreferenceScope} from './schema'
+  type SavePreferenceRequest} from './schema'
 
 type Tx=Prisma.TransactionClient
 export class ReportPrivacyError extends Error {
@@ -104,6 +104,10 @@ export async function saveReportPrivacyPreferences(input:ScopeInput&{
   const ownerUserId=ownerScopeKind==='PUBLISHER'?input.actor.userId:null
   const preset=ownerScopeKind==='SCHOOL_MINIMUM'?null:
     recognizePreset(normalized as Parameters<typeof recognizePreset>[0])
+  // A revoked publisher cannot replay a previously successful command receipt.
+  const before=await assertCurrentPrivacyPublisher(input)
+  if(ownerScopeKind!=='PUBLISHER'&&!before.schoolAdmin)
+    deny('PRIVACY_SCHOOL_DEFAULT_ADMIN_REQUIRED')
   return executeCommand({
     organizationId:input.organizationId,
     meta:{actorUserId:input.actor.userId,commandKey:input.request.requestKey},
@@ -112,6 +116,10 @@ export async function saveReportPrivacyPreferences(input:ScopeInput&{
       ownerUserId,expectedRevision:input.request.expectedRevision,preset,
       options:normalized},
     work:async(tx,domainEventId)=>{
+      // Serialize with the canonical Run publisher (which locks this organization).
+      // A preference saved during publish must be ordered before or after its snapshot.
+      await tx.$queryRaw(Prisma.sql`SELECT id FROM organizations
+        WHERE id=${input.organizationId} FOR UPDATE`)
       const authorization=await assertCurrentPrivacyPublisher(input,tx)
       if(ownerScopeKind!=='PUBLISHER'&&!authorization.schoolAdmin)
         deny('PRIVACY_SCHOOL_DEFAULT_ADMIN_REQUIRED')
@@ -162,6 +170,11 @@ export async function readReportPrivacyPolicyState(input:ScopeInput&{runId?:stri
   await assertCurrentPrivacyPublisher(input)
   const current=await resolveEffectiveReportPrivacy({...input,actorUserId:input.actor.userId})
   if(!input.runId)return current
+  const source=await prisma.$queryRaw<Array<{id:string}>>(Prisma.sql`
+    SELECT id FROM assessment_runs
+    WHERE id=${input.runId} AND organization_id=${input.organizationId} LIMIT 1
+  `)
+  if(!source.length)deny('PRIVACY_RUN_NOT_FOUND',404)
   const snapshot=await prisma.educationReportPolicySnapshot.findUnique({
     where:{organizationId_runId:{organizationId:input.organizationId,runId:input.runId}},
   })
