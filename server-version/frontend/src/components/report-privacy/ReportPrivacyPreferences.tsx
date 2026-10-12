@@ -1,4 +1,4 @@
-import React,{useCallback,useEffect,useState} from 'react'
+import React,{useCallback,useEffect,useRef,useState} from 'react'
 import './report-privacy.css'
 
 export type PrivacyScenario=
@@ -69,21 +69,42 @@ export function ReportPrivacyPreferences({organizationId,scenarios,api}:{
   const [error,setError]=useState('')
   const [message,setMessage]=useState('')
   const path='/organizations/'+organizationId+'/report-privacy'
+  const viewKey=path+'?scenario='+scenario
+  const currentView=useRef(viewKey)
+  currentView.current=viewKey
+  const requestSerial=useRef(0)
   const load=useCallback(async(preferredScope:Scope='MY')=>{
+    const requested=path+'?scenario='+scenario
+    if(currentView.current!==requested)return
+    const ticket=++requestSerial.current
     setBusy(true);setError('')
     try{
       const result=await api<Data>(path+'/preferences?scenario='+encodeURIComponent(scenario))
+      if(ticket!==requestSerial.current||currentView.current!==requested)return
       const next=result.editableScopes.includes(preferredScope)?preferredScope:'MY'
       setData(result);setDraft(defaults(result,next));setScope(next)
-    }catch(e){setError(e instanceof Error?e.message:'无法读取隐私偏好')}
-    finally{setBusy(false)}
+    }catch(e){
+      if(ticket===requestSerial.current&&currentView.current===requested)
+        setError(e instanceof Error?e.message:'无法读取隐私偏好')
+    }finally{
+      if(ticket===requestSerial.current&&currentView.current===requested)setBusy(false)
+    }
   },[api,path,scenario])
-  useEffect(()=>{let mounted=true
-    setData(null);setError('');setMessage('')
+  useEffect(()=>{
+    const requested=path+'?scenario='+scenario
+    const ticket=++requestSerial.current
+    setBusy(false);setData(null);setError('');setMessage('')
     void api<Data>(path+'/preferences?scenario='+encodeURIComponent(scenario))
-      .then(d=>{if(mounted){setData(d);setDraft(defaults(d,'MY'));setScope('MY')}})
-      .catch(e=>{if(mounted)setError(e instanceof Error?e.message:'无法读取隐私偏好')})
-    return ()=>{mounted=false}
+      .then(d=>{
+        if(ticket===requestSerial.current&&currentView.current===requested){
+          setData(d);setDraft(defaults(d,'MY'));setScope('MY')
+        }
+      })
+      .catch(e=>{
+        if(ticket===requestSerial.current&&currentView.current===requested)
+          setError(e instanceof Error?e.message:'无法读取隐私偏好')
+      })
+    return ()=>{requestSerial.current+=1}
   },[api,path,scenario])
   const selectScope=(next:Scope)=>{
     if(!data||!data.editableScopes.includes(next))return
@@ -133,19 +154,28 @@ export function ReportPrivacyPreferences({organizationId,scenarios,api}:{
       ...(preset===undefined?{}:{preset}),
       ...(scope==='SCHOOL_MINIMUM'||preset==='CUSTOM'?{options:draft}:{}),
       requestKey:crypto.randomUUID()}
+    const savingView=viewKey
     setBusy(true);setError('');setMessage('')
     try{
       await api(path+'/preferences/'+scenario,'PUT',request)
+      if(currentView.current!==savingView)return
       await load(scope)
-      setMessage('偏好已保存，并将在后续支持的任务发布中自动沿用。现有报告仍按原保护策略执行。')
-    }catch(e){setError(e instanceof Error?e.message:'保存失败，请刷新后重试')}
-    finally{setBusy(false)}
+      if(currentView.current===savingView)setMessage(data.catalog.reportConsumerActive
+        ?'偏好已保存；仅对后续正式发布并冻结策略的受支持新任务生效。历史任务和敏感报告保持原规则。'
+        :'偏好已保存，将在后续受支持的任务发布中沿用；当前报告仍按原保护策略执行。')
+    }catch(e){
+      if(currentView.current===savingView)
+        setError(e instanceof Error?e.message:'保存失败，请刷新后重试')
+    }finally{
+      if(currentView.current===savingView)setBusy(false)
+    }
   }
   return <section className="rp-root" aria-label="评价与报告隐私偏好">
     <h3>评价与报告隐私偏好</h3>
     <p className="rp-intro">只需设置一次，后续同类任务自动沿用。必要的身份与个人数据保护不可关闭。</p>
     <label className="rp-field">评价类型
-      <select aria-label="评价类型" value={scenario} onChange={e=>setScenario(e.target.value as PrivacyScenario)}>
+      <select aria-label="评价类型" value={scenario} disabled={busy}
+        onChange={e=>setScenario(e.target.value as PrivacyScenario)}>
         {scenarios.map(s=><option value={s} key={s}>{s==='TEACHER_STUDENT_EVALUATION'?'学生评教教师':
           s==='TEACHER_ADULT_FORM_GROUP'?'教师问卷与学校发展调查':
           s==='SCHOOL_GENERAL_EDUCATION_GROUP'?'学校氛围与一般教育调查':'学生心理健康与敏感测评'}</option>)}

@@ -8,7 +8,8 @@ import { resolvePublishedTeacherForm,teacherFormResourceRef,
 import type { FormDraft } from '../survey/builder.definition'
 import type {PrivacyOptions} from '../report-privacy/schema'
 import {teacherFrozenPolicy,teacherScopeKey,teacherReportFloor,
-  readReleasedTeacherReport,recordTeacherReportRelease,lockTeacherDisclosure}
+  readReleasedTeacherReport,recordTeacherReportRelease,lockTeacherDisclosure,
+  hasConflictingComparableTeacherFormHistory}
   from './privacyReleaseV2.service'
 
 export class HuiteacherGroupReportError extends Error{
@@ -431,15 +432,12 @@ export async function readTeacherFormGroupReport(input:{
       })
       if(legacy&&legacy.populationDigest!==populationDigest)
         reject('HUITEACHER_GROUP_POPULATION_DIFFERENCING_BLOCKED',403)
-      const earlier=await tx.educationReportReleaseRecord.findMany({
-        where:{organizationId:input.organizationId,
-          reportKind:'TEACHER_ADULT_FORM_GROUP',
-          sourceRunId:{not:source.runId}},
-        select:{effectivePopulationDigest:true},
-      })
-      // Unknown or different digest fails closed in enhanced mode.
-      if(earlier.some(x=>x.effectivePopulationDigest!==populationDigest))
-        reject('HUITEACHER_GROUP_POPULATION_DIFFERENCING_BLOCKED',403)
+      // Different questionnaire definitions no longer block one another.
+      // Only a changed contributor population for the exact same Form does.
+      if(await hasConflictingComparableTeacherFormHistory(tx,{
+        organizationId:input.organizationId,runId:source.runId,
+        definitionDigest:source.definitionDigest,populationDigest,
+      }))reject('HUITEACHER_GROUP_POPULATION_DIFFERENCING_BLOCKED',403)
     }
     const projection={
       source:'VERIFIED_HUITEACHER_FORM_FINAL' as const,
