@@ -13,6 +13,8 @@ import { requireRecentSchoolMfa } from './mfa.middleware'
 import { listCampusProfessionalReports, readCampusProfessionalReport } from './professional-reports'
 import { readCampusStudentFeedback } from './student-feedback'
 import { listCampusGroupReportCatalog, generateCampusGroupReport, readCampusGroupReport } from './group-reports'
+import {listCampusGeneralGroupV2Catalog,publishCampusGeneralGroupV2,
+  readCampusGeneralGroupV2} from './generalGroupV2.service'
 import { listCampusProtectedReportCatalog, generateCampusProtectedReport } from './protected-report-studio'
 import { listCampusIndividualLongitudinalCatalog, listCampusIndividualLongitudinalSources, generateCampusIndividualLongitudinal } from './individual-longitudinal-studio'
 import { listCampusGroupLongitudinalCatalog,generateCampusFixedGroupLongitudinal } from './group-longitudinal-studio'
@@ -59,6 +61,28 @@ router.use((_req, res, next) => { res.setHeader('Cache-Control', 'no-store'); ne
 router.get('/reports/availability', guarded(async () => ({
   parentReportsEnabled: config.campusParentReportEnabled,
 })))
+
+// PR3 School general education V2 is a SEPARATE, opt-in reporting surface.
+// Older GROUP and psychology routes remain unchanged and LEGACY_STRICT.
+// Publication is POST+recent School MFA; GET reads only an immutable safe
+// projection, never recomputes or generates a new disclosure.
+router.get('/reports/groups/general-v2/catalog',guarded(req=>{
+  const q=z.object({organizationId:id}).strict().parse(req.query)
+  return listCampusGeneralGroupV2Catalog({actor:req.user!,
+    organizationId:q.organizationId})
+}))
+router.post('/reports/groups/general-v2/release',
+  requireRecentSchoolMfa,mutationBudget,guarded(req=>{
+    const body=z.object({organizationId:id,runId:id,trackId:id,specId:id})
+      .strict().parse(req.body)
+    return publishCampusGeneralGroupV2({actor:req.user!,...body})
+  }))
+router.get('/reports/groups/general-v2/:organizationId/:runId/:trackId/:specId',
+  guarded(req=>{
+    const v=z.object({organizationId:id,runId:id,trackId:id,specId:id})
+      .strict().parse(req.params)
+    return readCampusGeneralGroupV2({actor:req.user!,...v})
+  }))
 
 // Internal school GROUP workbench: never teacher-rating release, raw rows or
 // arbitrary subgroup selectors. School governance or current psychology staff
