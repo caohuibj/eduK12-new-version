@@ -3,6 +3,9 @@
  */
 const TTL_MS=2*60*60*1000
 const MAX_CHARACTERS=256*1024
+// Timed FINALs can be larger than historical answer-only drafts. Keep the
+// higher budget exclusive to same-tab Scale timing envelopes, still bounded.
+const MAX_TIMED_CHARACTERS=1024*1024
 const key=(publicId:string,attemptId:string)=>
   'huisurvey:v1:unfinished:'+publicId+':'+attemptId
 export function clearLocalSurveyDraft(publicId:string,attemptId:string):void{
@@ -14,7 +17,8 @@ export function saveLocalSurveyDraft(publicId:string,attemptId:string,definition
   try{
     const payload=JSON.stringify({attemptId,definitionDigest,savedAt:Date.now(),answers,
       ...(itemTimings?{itemTimings}:{})})
-    if(payload.length>MAX_CHARACTERS)return false
+    if(payload.length>(itemTimings?MAX_TIMED_CHARACTERS:MAX_CHARACTERS))
+      return false
     sessionStorage.setItem(key(publicId,attemptId),payload)
     return true
   }catch{return false}
@@ -25,10 +29,13 @@ export function restoreLocalSurveyDraftEnvelope<T extends Record<string,unknown>
   try{
     const value=sessionStorage.getItem(key(publicId,attemptId))
     if(!value)return null
-    if(value.length>MAX_CHARACTERS){clearLocalSurveyDraft(publicId,attemptId);return null}
+    if(value.length>MAX_TIMED_CHARACTERS){
+      clearLocalSurveyDraft(publicId,attemptId);return null
+    }
     const parsed=JSON.parse(value) as {attemptId?:string;definitionDigest?:string;
       savedAt?:number;answers?:unknown;itemTimings?:unknown}
-    if(parsed.attemptId!==attemptId||parsed.definitionDigest!==definitionDigest||
+    if((parsed.itemTimings===undefined&&value.length>MAX_CHARACTERS)||
+      parsed.attemptId!==attemptId||parsed.definitionDigest!==definitionDigest||
       typeof parsed.savedAt!=='number'||!Number.isFinite(parsed.savedAt)||
       parsed.savedAt>Date.now()||Date.now()-parsed.savedAt>TTL_MS||
       !parsed.answers||typeof parsed.answers!=='object'||Array.isArray(parsed.answers)){
