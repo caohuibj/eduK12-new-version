@@ -93,6 +93,11 @@ export async function createSurveyExport(req:Request,input:{
     sources:Source;artifact:SurveyRawExport|BoundedResearchExport;
     nextCursor:string|null;pageNumber:number|null;
     digest:string;cipher:string;value:SurveyExportArtifact
+    manifest:{rowCount:number;columnCount:number;
+      batch:{phase:string;representation:string;hasNext:boolean;
+        totalIncludedFinals:number|null;totalNonFinalAttempts:number|null};
+      selection:{format:Format;completedBefore:string|null;completedFrom:string|null};
+      timingProvenance:string}
   }|null=null
 
   // A batch limit on people alone cannot bound a 240-item Scale or encrypted
@@ -233,7 +238,7 @@ export async function createSurveyExport(req:Request,input:{
       const cipher=encryptUnifiedRuntimePayload(value)
       if(Buffer.byteLength(cipher,'utf8')>3900000)
         fail(413,'加密数据超过安全持久化预算')
-      ready={sources,artifact,nextCursor,pageNumber,digest,cipher,value}
+      ready={sources,artifact,nextCursor,pageNumber,digest,cipher,value,manifest}
       break
     }catch(e){
       if(paged&&compact&&!attendanceOnly&&pageLimit>1
@@ -245,7 +250,7 @@ export async function createSurveyExport(req:Request,input:{
     }
   }
   if(!ready)fail(503,'导出页构建未完成')
-  const {sources,artifact,nextCursor,pageNumber,digest,cipher,value}=ready
+  const {sources,artifact,nextCursor,pageNumber,digest,cipher,value,manifest}=ready
   const id=randomUUID(),expiresAt=new Date(Date.now()+10*60000)
   await prisma.$transaction(async tx=>{
     const current=await guardedOwner(tx,uid,input.projectId)
@@ -255,7 +260,10 @@ export async function createSurveyExport(req:Request,input:{
       fail(409,'研究数据授权或项目状态在导出期间发生变化，请重新生成')
     await tx.surveyExportTicket.create({data:{
       id,projectId:input.projectId,actorUserId:uid,format:input.format,status:'READY',
-      sourceDigest:artifact.manifest.sourceDigest,
+      sourceDigest:'sourceDigest' in artifact.manifest
+        ?artifact.manifest.sourceDigest
+        :canonicalHash(sources.scores.map(s=>s.sourceFinalHash).concat(
+          sources.raw.map(r=>r.sourceFinalHash))),
       artifactHash:digest,artifactCipher:cipher,expiresAt,
     }})
     await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:uid,projectId:input.projectId,
@@ -263,7 +271,7 @@ export async function createSurveyExport(req:Request,input:{
         rowCount:artifact.manifest.rowCount,expiresAt:expiresAt.toISOString()}}})
   })
   return {id,status:'READY' as const,format:input.format,expiresAt,
-    manifest:value.manifest,nextCursor,pageNumber}
+    manifest,nextCursor,pageNumber}
 }
 export async function downloadSurveyExport(req:Request,input:{projectId:string;exportId:string}){
   assertRecentSurveyMfa(req)
