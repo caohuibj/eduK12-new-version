@@ -13,6 +13,9 @@ export function HuiteacherFieldManager({organizationId,eventId,eventStatus,api}:
   const [observerId,setObserverId]=useState('')
   const [role,setRole]=useState<Role>('EXPERT')
   const [expiresAt,setExpiresAt]=useState('')
+  const [formList,setFormList]=useState<Array<{id:string;title:string;status:string}>>([])
+  const [fieldFormId,setFieldFormId]=useState('')
+  const [boundForm,setBoundForm]=useState<{formId:string;title:string}|null>(null)
   const [grants,setGrants]=useState<Grant[]>([])
   const [formal,setFormal]=useState<FormalNote[]>([])
   const [showGrants,setShowGrants]=useState(false)
@@ -24,6 +27,23 @@ export function HuiteacherFieldManager({organizationId,eventId,eventStatus,api}:
     void job().catch(e=>setNotice(e instanceof Error?e.message:'活动协作操作失败'))
       .finally(()=>setBusy(false))
   }
+  const loadFormBinding=()=>run(async()=>{
+    const [forms,binding]=await Promise.all([
+      api<{list:Array<{id:string;title:string;status:string}>}>(
+        '/organizations/'+organizationId+'/forms'),
+      api<{formId:string;title:string}|null>(base+'/field-form'),
+    ])
+    setFormList(forms.list.filter(x=>x.status==='PUBLISHED'))
+    setBoundForm(binding)
+  })
+  const bindForm=()=>run(async()=>{
+    if(eventStatus!=='DRAFT'||!fieldFormId)throw Error('只能为草稿现场活动绑定已发布表单')
+    const binding=await api<{formId:string;title:string}>(base+'/field-form','POST',{
+      formId:fieldFormId,
+    })
+    setBoundForm(binding)
+    setNotice('本次现场 Form V2 已冻结；正式专家反馈必须随附该表单的受控答案。')
+  })
   const readGrants=async()=>{
     const result=await api<{list:Grant[]}>(base+'/observer-grants')
     setGrants(result.list);setShowGrants(true)
@@ -52,6 +72,25 @@ export function HuiteacherFieldManager({organizationId,eventId,eventStatus,api}:
     <h4>现场观察 · 专家／同行授权</h4>
     <p className="ht-muted">仅适用于这一次活动。邀请、撤销及查看正式反馈需要近期 Teacher MFA；私人反思永不在此显示。</p>
     {notice&&<p role="status" className="ht-notice">{notice}</p>}
+    <div className="ht-admin">
+      <h5>现场 Form V2（不计分）</h5>
+      <button disabled={busy} type="button" onClick={loadFormBinding}>
+        查看本次表单绑定与可用目录
+      </button>
+      {boundForm?<p className="ht-tag">已绑定：{boundForm.title}（提交后不可改写）</p>
+        :eventStatus==='DRAFT'&&formList.length>0?
+          <div className="ht-inline">
+            <label className="ht-field"><span>选择本校已发布 Form</span>
+              <select value={fieldFormId} onChange={e=>setFieldFormId(e.target.value)}>
+                <option value="">可不绑定，使用纯文字现场观察</option>
+                {formList.map(form=><option key={form.id} value={form.id}>{form.title}</option>)}
+              </select>
+            </label>
+            <button disabled={busy||!fieldFormId} type="button" onClick={bindForm}>
+              冻结本活动的观察表单
+            </button>
+          </div>:<p className="ht-muted">未绑定结构化 Form 时，本次活动仅收集授权观察者的加密文字证据。</p>}
+    </div>
     {['DRAFT','OPEN','CLOSED'].includes(eventStatus)&&<div className="ht-inline">
       <label className="ht-field"><span>观察者教育账号 ID</span>
         <input value={observerId} onChange={e=>setObserverId(e.target.value)}
