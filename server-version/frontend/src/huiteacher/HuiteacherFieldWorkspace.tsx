@@ -1,10 +1,15 @@
 import { useCallback,useEffect,useState } from 'react'
+import { TaskForm } from '../survey/SurveyPublicApp'
+import { sanitizeFormAnswers,visibleFormKeys } from '../survey/form-visibility'
+import type {FormDraft} from '../survey/builder.types'
+import type {ProfessionalAnswer} from '../survey/ProfessionalFormAnswer'
 type Api=<T>(path:string,method?:string,payload?:unknown)=>Promise<T>
 type Invite={invitationId:string;organizationId:string;eventId:string;title:string;
   kind:string;role:'EXPERT'|'PEER';expiresAt:string;status:'INVITED'|'ACCEPTED'}
 type Note={id:string;eventId:string;kind:'FACT'|'FORMAL_FEEDBACK'|'PRIVATE_REFLECTION';
   status:'DRAFT'|'SUBMITTED';revision:number;content:string;createdAt:string;submittedAt:string|null}
 type Kind=Note['kind']
+type FieldForm={formId:string;title:string;definitionDigest:string;pages:FormDraft['pages']}
 const labels:Record<Kind,string>={
   FACT:'事实观察依据',FORMAL_FEEDBACK:'正式专业反馈',PRIVATE_REFLECTION:'私人反思日志',
 }
@@ -12,6 +17,9 @@ export function HuiteacherFieldWorkspace({api}:{api:Api}){
   const [invitations,setInvitations]=useState<Invite[]>([])
   const [notes,setNotes]=useState<Note[]>([])
   const [text,setText]=useState<Record<string,string>>({})
+  const [fieldForms,setFieldForms]=useState<Record<string,FieldForm|null>>({})
+  const [formAnswers,setFormAnswers]=useState<Record<string,Record<string,ProfessionalAnswer>>>({})
+  const [formPages,setFormPages]=useState<Record<string,number>>({})
   const [newEvent,setNewEvent]=useState('')
   const [kind,setKind]=useState<Kind>('FACT')
   const [content,setContent]=useState('')
@@ -41,6 +49,19 @@ export function HuiteacherFieldWorkspace({api}:{api:Api}){
     }).catch(e=>{if(mounted)setNotice(e instanceof Error?e.message:'受邀观察记录读取失败')})
     return()=>{mounted=false}
   },[api])
+  useEffect(()=>{
+    let active=true
+    void Promise.all(invitations.filter(i=>i.status==='ACCEPTED').map(async invite=>{
+      const form=await api<FieldForm|null>(
+        '/field-invitations/'+invite.invitationId+'/form')
+      return [invite.eventId,form] as const
+    })).then(entries=>{
+      if(active)setFieldForms(Object.fromEntries(entries))
+    }).catch(e=>{
+      if(active)setNotice(e instanceof Error?e.message:'现场表单资格读取失败')
+    })
+    return()=>{active=false}
+  },[invitations,api])
   const action=(fn:()=>Promise<void>)=>{
     setBusy(true);setNotice('')
     void fn().catch(e=>setNotice(e instanceof Error?e.message:'现场观察操作失败'))
@@ -76,9 +97,14 @@ export function HuiteacherFieldWorkspace({api}:{api:Api}){
       :'确认将本记录作为正式观察材料提交吗？提交后不可修改。'))return
     if((text[note.id]??note.content)!==note.content)
       throw new Error('请先保存当前修改，再正式提交。')
-    await api('/field-notes/'+note.id+'/submit','POST',{
-      expectedRevision:note.revision,
-    })
+    const bound=fieldForms[note.eventId]
+    const input:Record<string,unknown>={expectedRevision:note.revision}
+    if(note.kind==='FORMAL_FEEDBACK'&&bound){
+      const answers=formAnswers[note.id]??{}
+      input.fieldFormId=bound.formId
+      input.answers=sanitizeFormAnswers(bound.pages.flatMap(p=>p.questions),answers)
+    }
+    await api('/field-notes/'+note.id+'/submit','POST',input)
     await refresh();setNotice(note.kind==='PRIVATE_REFLECTION'?
       '私人反思已归档，未向学校披露。':'正式观察记录已提交，原稿将保持不可改写。')
   })
@@ -124,10 +150,33 @@ export function HuiteacherFieldWorkspace({api}:{api:Api}){
           <label className="ht-field"><span>记录正文</span><textarea
             value={text[note.id]??note.content} rows={5} maxLength={12000}
             onChange={e=>setText(old=>({...old,[note.id]:e.target.value}))}/></label>
+          {note.kind==='FORMAL_FEEDBACK'&&fieldForms[note.eventId]&&
+            <div className="ht-task">
+              <h4>本次课堂／教研结构化 Form</h4>
+              <p className="ht-muted">不计分。正式提交时与专业意见一起加密冻结，不能将表单视为诊断量表。</p>
+              <TaskForm purpose="HUITEACHER"
+                unit={{kind:'FORM',instrumentKey:fieldForms[note.eventId]!.formId,
+                  title:fieldForms[note.eventId]!.title,pages:fieldForms[note.eventId]!.pages}}
+                answer={formAnswers[note.id]??{}}
+                onChange={(key,value)=>setFormAnswers(old=>({
+                  ...old,[note.id]:{...(old[note.id]??{}),[key]:value},
+                }))}
+                pageIndex={formPages[note.id]??0}
+                onPageChange={next=>setFormPages(old=>({...old,[note.id]:next}))}/>
+            </div>}
           <div className="ht-inline">
             <button disabled={busy||!(text[note.id]??note.content).trim()}
               onClick={()=>save(note)}>保存修订</button>
-            <button disabled={busy} onClick={()=>submit(note)}>
+            <button disabled={busy||(
+              note.kind==='FORMAL_FEEDBACK'&&!!fieldForms[note.eventId]&&
+              (formPages[note.id]??0)<
+              fieldForms[note.eventId]!.pages.filter(page=>
+                page.questions.some(q=>visibleFormKeys(
+                  fieldForms[note.eventId]!.pages.flatMap(p=>p.questions),
+                  formAnswers[note.id]??{},
+                ).has(q.itemKey)),
+              ).length-1
+            )} onClick={()=>submit(note)}>
               {note.kind==='PRIVATE_REFLECTION'?'归档私人反思':'正式提交'}
             </button>
           </div>
