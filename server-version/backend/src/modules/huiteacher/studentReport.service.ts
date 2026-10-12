@@ -275,3 +275,64 @@ export async function readHuiteacherStudentFeedbackReport(input:{
     maxWait:2000,timeout:30000,
   })
 }
+
+
+/** For an evaluated teacher, the inbox contains event metadata only;
+ * actual aggregate release must pass the independent report transaction.
+ */
+export async function listMyHuiteacherStudentFeedback(actorUserId:string){
+  const account=await prisma.user.findUnique({
+    where:{id:actorUserId},select:{role:true,accountDomain:true,isActive:true,isFrozen:true},
+  })
+  if(!account||account.accountDomain!=='SCHOOL'
+    ||!['TEACHER','ADMIN'].includes(account.role)
+    ||!account.isActive||account.isFrozen)
+    deny('STUDENT_REPORT_TEACHER_REQUIRED')
+  const rows=await prisma.$queryRaw<Array<{
+    organizationId:string;organizationName:string;eventId:string;
+    eventTitle:string;teacherName:string;formTitle:string
+  }>>`
+    SELECT org."id" AS "organizationId",org."name" AS "organizationName",
+      event."id" AS "eventId",event."title" AS "eventTitle",
+      target."name" AS "teacherName",form."title" AS "formTitle"
+    FROM "huiteacher_student_eval_configs" cfg
+    JOIN "huiteacher_evaluation_events" event
+      ON event."id"=cfg."event_id" AND event."organization_id"=cfg."organization_id"
+      AND event."status"='CLOSED'
+    JOIN "huiteacher_evaluation_targets" target
+      ON target."id"=event."target_id" AND target."organization_id"=event."organization_id"
+      AND target."kind"='PERSON'
+      AND target."subject_user_id"=${actorUserId}
+    JOIN "huiteacher_evaluation_run_links" link
+      ON link."event_id"=event."id" AND link."organization_id"=event."organization_id"
+    JOIN "assessment_runs" run
+      ON run."id"=link."run_id" AND run."organization_id"=link."organization_id"
+      AND run."status"='CLOSED'
+    JOIN "huiteacher_form_instruments" form
+      ON form."organization_id"=cfg."organization_id"
+      AND form."id"=cfg."form_id"
+      AND form."definition_digest"=cfg."definition_digest"
+    JOIN "organizations" org
+      ON org."id"=event."organization_id"
+      AND org."product_domain"='SCHOOL' AND org."status"='ACTIVE'
+    JOIN "education_product_entitlements" entitlement
+      ON entitlement."organization_id"=org."id"
+      AND entitlement."product"='HUITEACHER' AND entitlement."status"='ACTIVE'
+    JOIN "organization_memberships" member
+      ON member."organization_id"=org."id"
+      AND member."user_id"=${actorUserId}
+      AND member."valid_from"<=statement_timestamp()
+      AND (member."valid_until" IS NULL OR member."valid_until">statement_timestamp())
+    JOIN "organization_persona_grants" persona
+      ON persona."organization_id"=member."organization_id"
+      AND persona."membership_id"=member."id"
+      AND persona."persona"='TEACHER' AND persona."revoked_at" IS NULL
+    WHERE NOT EXISTS(SELECT 1 FROM "organization_access_denies" deny
+      WHERE deny."organization_id"=org."id"
+        AND deny."user_id"=${actorUserId}
+        AND deny."lifted_at" IS NULL
+        AND deny."permission" IN ('*','EDUCATION_ACCESS','HUITEACHER_ACCESS'))
+    ORDER BY event."created_at" DESC LIMIT 100
+  `
+  return {list:rows}
+}

@@ -1,3 +1,4 @@
+import {listMyHuiteacherStudentFeedback} from './studentReport.service'
 import {readHuiteacherStudentFeedbackReport,StudentFeedbackReportError} from './studentReport.service'
 import { Router } from 'express'
 import { z,ZodError } from 'zod'
@@ -56,6 +57,8 @@ router.use((_req,res,next)=>{
   next()
 })
 router.use(authenticateHuiteacher)
+router.get('/my-student-feedback',wrap(req=>
+  listMyHuiteacherStudentFeedback(req.user!.userId)))
 const path='/organizations/:organizationId/evaluation-events/:eventId/student-evaluation'
 router.get(path+'/candidates',requireTeacherProductAdmin,requireRecentTeacherMfa,
   wrap(req=>listHuiteacherStudentEvaluationCandidates({

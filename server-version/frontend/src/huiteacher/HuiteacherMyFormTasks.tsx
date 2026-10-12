@@ -8,6 +8,7 @@ type Api=<T>(path:string,method?:string,payload?:unknown)=>Promise<T>
 type Summary={
   executionId:string;runId:string;organizationId:string;eventId:string;
   eventTitle:string;formId:string;formTitle:string;
+  teacherName?:string;deadline?:string|null;
   status:string;runtimeBindingKind:string|null;runtimeBindingRef:string|null
 }
 type Task={attemptId:string;formId:string;status:string;title:string;
@@ -41,7 +42,8 @@ const storeDraft=(task:Task,answers:Record<string,ProfessionalAnswer>)=>{
 const clearDraft=(task:Task)=>{
   try{sessionStorage.removeItem(storageKey(task.attemptId))}catch{/* private mode */}
 }
-export function HuiteacherMyFormTasks({api}: {api:Api}){
+export function HuiteacherMyFormTasks({api,student=false}: {api:Api;student?:boolean}){
+  const taskEndpoint=student?'/my-student-evaluations':'/my-form-tasks'
   const [tasks,setTasks]=useState<Summary[]>([])
   const [active,setActive]=useState<Task|null>(null)
   const [answers,setAnswers]=useState<Record<string,ProfessionalAnswer>>({})
@@ -50,16 +52,16 @@ export function HuiteacherMyFormTasks({api}: {api:Api}){
   const [notice,setNotice]=useState('')
   const pendingSubmission=useRef<string>('')
   const refresh=useCallback(async()=>{
-    const result=await api<{list:Summary[]}>('/my-form-tasks')
+    const result=await api<{list:Summary[]}>(taskEndpoint)
     setTasks(result.list)
-  },[api])
+  },[api,taskEndpoint])
   useEffect(()=>{
     let live=true
     void api<{list:Summary[]}>('/my-form-tasks').then(x=>{
       if(live)setTasks(x.list)
     }).catch(e=>{if(live)setNotice(e instanceof Error?e.message:'待办评价读取失败')})
     return ()=>{live=false}
-  },[api])
+  },[api,taskEndpoint])
   useEffect(()=>{
     if(active&&active.status==='STARTED')storeDraft(active,answers)
   },[active,answers])
@@ -123,17 +125,20 @@ export function HuiteacherMyFormTasks({api}: {api:Api}){
       try{sessionStorage.removeItem('huiteacher:submission:'+source.attemptId)}catch{/* private mode */}
       setActive({...source,status:'COMPLETED'});setAnswers({})
       await refresh()
-      setNotice('评价已完成正式 FINAL；个人界面仅提供完成确认，未显示未经授权的评分。')
+      setNotice('评价已完成正式 FINAL；教师只能在满足隐私条件后查看群体反馈。')
     })
   }
-  return <section className="ht-panel" aria-label="我的教师发展评价任务">
-    <h2>我的评价任务</h2>
-    <p>使用统一教育账号完成本人获授权的评价；与 Huischool 心理数据及 Survey 研究作答隔离。</p>
+  return <section className="ht-panel" aria-label={student?'我的学生评教':'我的教师发展评价任务'}>
+    <h2>{student?'我的学生评教':'我的评价任务'}</h2>
+    <p>{student
+      ?'使用原有教育账号参与已获授权的教师评教。身份用于确认资格，教师不能查看逐人作答；这属于身份受保护评价，不是绝对匿名。'
+      :'使用统一教育账号完成本人获授权的评价；与 Huischool 心理数据及 Survey 研究作答隔离。'}</p>
     {notice&&<p role="status" className="ht-notice">{notice}</p>}
-    {tasks.length===0?<p className="ht-empty">暂无已分配的 Teacher Form 评价任务。</p>:
+    {tasks.length===0?<p className="ht-empty">暂无已分配的学生评教任务。</p>:
       <div className="ht-event-list">{tasks.map(item=><article className="ht-event" key={item.executionId}>
         <strong>{item.formTitle}</strong> <span className="ht-tag">{item.status}</span>
-        <p>{item.eventTitle}</p>
+        <p>{item.eventTitle}{student&&item.teacherName?' · '+item.teacherName:''}</p>
+        {student&&item.deadline&&<p>截止：{new Date(item.deadline).toLocaleString('zh-CN')}</p>}
         <button disabled={busy||item.status==='COMPLETED'}
           onClick={()=>void open(item)}>
           {item.status==='ASSIGNED'?'开始评价':'继续评价'}

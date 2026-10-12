@@ -3,6 +3,7 @@ import './huiteacher.css'
 import { HuiteacherFormStudio } from './HuiteacherFormStudio'
 import { HuiteacherEvaluationStudio } from './HuiteacherEvaluationStudio'
 import { HuiteacherMyFormTasks } from './HuiteacherMyFormTasks'
+import {HuiteacherMyStudentFeedback} from './HuiteacherMyStudentFeedback'
 import { HuiteacherMyScaleTasks } from './HuiteacherMyScaleTasks'
 import { HuiteacherPersonalSelf } from './HuiteacherPersonalSelf'
 import { HuiteacherFieldWorkspace } from './HuiteacherFieldWorkspace'
@@ -202,7 +203,7 @@ export default function HuiteacherApp(){
       {!me&&<><button onClick={()=>changeScreen('home')}>首页</button><button onClick={()=>changeScreen('login')}>登录</button>
         <button onClick={()=>changeScreen('register')}>教师注册</button>
         <button onClick={()=>changeScreen('expert')}>外部专家注册</button>
-        <button onClick={()=>changeScreen('student')}>学生评教入口</button></>}
+        <button onClick={()=>changeScreen('login')}>学生评教入口</button></>}
       {me&&<><span className="ht-welcome">{me.username}</span><button onClick={()=>void logout()} disabled={working}>退出</button></>}
     </nav></header>
     {message&&<p role="status" className="ht-notice">{message}</p>}
@@ -222,6 +223,9 @@ export default function HuiteacherApp(){
         <Field label="教育账号" value={username} set={setUsername}/>
         <Field label="密码" value={password} set={setPassword} type="password"/>
         <button className="ht-primary" disabled={working}>登录</button></form>
+      <p className="ht-muted">学生使用原有教育账号直接登录；无需为评教重复注册。
+        如尚未持有教育账号，可使用学校的正式邀请
+        <button type="button" onClick={()=>changeScreen('student')}>首次注册学生账号</button>。</p>
     </section>:
     !me&&screen==='mfa'?<section className="ht-panel ht-form-panel"><h1>双因素验证</h1>
       <p>敏感权限要求身份验证器。School 和 Teacher 共用教育身份，但签发独立会话。</p>
@@ -302,12 +306,14 @@ export default function HuiteacherApp(){
       {me.role!=='STUDENT'&&<HuiteacherPersonalSelf api={teacherApi}/>}
       {me.role!=='STUDENT'&&<HuiteacherFieldWorkspace api={teacherApi}/>
       {me.role!=='STUDENT'&&<HuiteacherConsensusReviews api={teacherApi}/>}}
-      {me.role!=='STUDENT'&&<HuiteacherMyFormTasks api={teacherApi}/>}
+      <HuiteacherMyFormTasks key={me.role==='STUDENT'?'student':'teacher'}
+        student={me.role==='STUDENT'} api={teacherApi}/>
+      {me.role!=='STUDENT'&&<HuiteacherMyStudentFeedback api={teacherApi}/>}
       {me.role!=='STUDENT'&&<HuiteacherMyScaleTasks api={teacherApi}/>}
-      <section className="ht-panel"><h2>后续功能模块</h2>
+      {me.role!=='STUDENT'&&<section className="ht-panel"><h2>后续功能模块</h2>
         <p>教师自主测评、组织调查、课堂与教研观察、学生评教及纵向改进将按 PR2—PR6 的顺序接入。</p>
         <a href="https://school.eduk12.top" rel="noopener noreferrer">前往 Huischool（使用同一账号，需分别登录）</a>
-      </section>
+      </section>}
     </div>:null}
     <footer className="ht-footer">Huiteacher · 教师发展与学校改进</footer>
   </main>

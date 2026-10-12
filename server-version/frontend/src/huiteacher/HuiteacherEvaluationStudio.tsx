@@ -319,6 +319,7 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
         &&<HuiteacherStudentEvaluationManager
           key={'student-feedback:'+event.id} organizationId={organizationId}
           eventId={event.id} eventStatus={event.status}
+          eventVersion={event.version} onChanged={()=>{void refresh()}}
           teacherName={targets.find(x=>x.id===event.targetId)?.name??'已核验教师'}
           forms={releasedForms} api={api}/>}
       {['CLASSROOM','MEETING','TEACHING_RESEARCH','FIELD_VISIT'].includes(event.kind)&&
