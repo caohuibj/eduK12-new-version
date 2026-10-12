@@ -784,6 +784,14 @@ const loadPublisherAuthority = async (tx: Tx, organizationId: string, actorUserI
     teacherStudentMembershipIds: new Set(teacherRows.map((row) => row.studentMembershipId).filter(Boolean)),
     counselorClientMembershipIds: new Set(clientRows.map((row) => row.clientMembershipId)),
   }
+  // A bound Huiteacher Evaluation Run is a PRODUCT-managed campaign, not
+  // a generic course-teacher delivery. Revoking the Teacher product-admin
+  // grant must immediately prevent a former creator from publishing a draft
+  // through the generic Organization Run endpoint.
+  if(owner.productDomain==='SCHOOL'&&owner.isTeacherRun&&!authority.isOrgAdmin){
+    throw new RunPublishError('HUITEACHER_PUBLISH_ADMIN_REVOKED',
+      'current Teacher product administrator grant is required',403)
+  }
   if (!authority.isOrgAdmin && !authority.teacherPersona && !authority.counselorPersona) {
     throw new RunPublishError('RUN_PUBLISH_FORBIDDEN', 'publisher requires ORG_ADMIN, TEACHER, or COUNSELOR authority', 403)
   }
