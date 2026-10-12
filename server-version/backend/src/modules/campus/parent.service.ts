@@ -29,6 +29,8 @@ const childEligibleSql=(org:string,student:string)=>Prisma.sql`
     AND pg."revoked_at" IS NULL
   JOIN "organizations" o ON o."id"=e."organization_id"
     AND o."product_domain"='SCHOOL' AND o."status"='ACTIVE'
+  JOIN "education_product_entitlements" ent ON ent."organization_id"=o."id"
+    AND ent."product"='HUISCHOOL' AND ent."status"='ACTIVE'
   JOIN "users" u ON u."id"=e."user_id" AND u."role"='STUDENT'
     AND u."account_domain"='SCHOOL'
     AND u."is_active"=TRUE AND u."is_frozen"=FALSE

@@ -87,6 +87,27 @@ export const lockExecutionEnvelope = async (tx: Tx, executionId: string): Promis
       AND ar."run_id"=${identity[0].runId}
     FOR SHARE OF a
   `
+  // Teacher event/policy suspension must serialize with an admitted START
+  // under the same Organization/Run/Execution lock order.
+  await tx.$queryRaw`
+    SELECT event."id" FROM "huiteacher_evaluation_run_links" link
+    JOIN "huiteacher_evaluation_events" event
+      ON event."organization_id"=link."organization_id"
+      AND event."id"=link."event_id"
+    WHERE link."organization_id"=${identity[0].organizationId}
+      AND link."run_id"=${identity[0].runId}
+    FOR SHARE OF event
+  `
+  await tx.$queryRaw`
+    SELECT entitlement."organization_id"
+    FROM "huiteacher_evaluation_run_links" link
+    JOIN "education_product_entitlements" entitlement
+      ON entitlement."organization_id"=link."organization_id"
+      AND entitlement."product"='HUITEACHER'
+    WHERE link."organization_id"=${identity[0].organizationId}
+      AND link."run_id"=${identity[0].runId}
+    FOR SHARE OF entitlement
+  `
   const rows = await tx.$queryRaw<ExecutionLockRow[]>`
     SELECT e."organization_id" AS "organizationId", e."run_id" AS "runId",
       e."runtime_binding_kind" AS "runtimeBindingKind", e."runtime_binding_ref" AS "runtimeBindingRef",

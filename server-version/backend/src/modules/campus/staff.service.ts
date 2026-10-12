@@ -63,6 +63,8 @@ export async function registerCampusStaff(input:{
         FROM "campus_staff_invitations" i
         JOIN "organizations" o ON o."id"=i."organization_id" AND o."product_domain"='SCHOOL'
           AND o."status"='ACTIVE'
+        JOIN "education_product_entitlements" ent ON ent."organization_id"=o."id"
+          AND ent."product"='HUISCHOOL' AND ent."status"='ACTIVE'
         WHERE i."token_hash"=${digest(input.inviteCode)}
           AND i."consumed_at" IS NULL AND i."expires_at">statement_timestamp()
         FOR UPDATE OF i
@@ -133,6 +135,13 @@ export async function registerCampusStaff(input:{
         membershipId:membership.id,persona:invitation.persona,
         grantedByUserId:invitation.invitedByUserId,
       }})
+      if (invitation.adminRole) {
+        await tx.educationProductRoleGrant.create({data:{
+          id:randomUUID(),organizationId:invitation.organizationId,
+          membershipId:membership.id,product:'HUISCHOOL',role:'PRODUCT_ADMIN',
+          grantedByUserId:invitation.invitedByUserId,
+        }})
+      }
       if(invitation.psychologyStaff) {
         await tx.organizationCapabilityGrant.create({data:{
           id:randomUUID(),organizationId:invitation.organizationId,

@@ -53,6 +53,8 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
       AND a."organization_id"=p."organization_id" AND a."status"='OPEN'
     JOIN "courses" course ON course."id"=a."course_id" AND course."course_type"='CAMPUS_ACTIVITY'
     JOIN "organizations" o ON o."id"=a."organization_id" AND o."status"='ACTIVE' AND o."product_domain"='SCHOOL'
+    JOIN "education_product_entitlements" ent ON ent."organization_id"=o."id"
+      AND ent."product"='HUISCHOOL' AND ent."status"='ACTIVE'
     JOIN "organization_memberships" m ON m."id"=p."membership_id"
       AND m."organization_id"=p."organization_id"
       AND m."user_id"=${actor.userId}

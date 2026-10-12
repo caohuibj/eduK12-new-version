@@ -43,6 +43,7 @@ const MaterialGrants = React.lazy(() => import('./pages/admin/MaterialGrants'))
 const AdminTrainingWorkspace = React.lazy(() => import('./pages/admin/AdminTrainingWorkspace'))
 const SurveyResearchersAdmin = React.lazy(() => import('./pages/admin/SurveyResearchersAdmin'))
 const InstrumentAuthorization = React.lazy(() => import('./pages/admin/InstrumentAuthorization'))
+const EducationProductGovernance = React.lazy(() => import('./pages/admin/EducationProductGovernance'))
 const TeacherProfile = React.lazy(() => import('./pages/teacher/TeacherProfile'))
 const ScaleList = React.lazy(() => import('./pages/ScaleList'))
 const ScaleEdit = React.lazy(() => import('./pages/ScaleEdit'))
@@ -550,6 +551,10 @@ function AppRoutes() {
             }
           />
           <Route path="/admin/training" element={<ProtectedRoute roles={['ADMIN']}><AdminTrainingWorkspace /></ProtectedRoute>} />
+          <Route path="/admin/education-products"
+            element={!isTrainingHost()?<ProtectedRoute roles={['ADMIN']}>
+              <EducationProductGovernance/>
+            </ProtectedRoute>:<Navigate to="/" replace/>}/>
           <Route path="/admin/reporting-content" element={<ProtectedRoute roles={['ADMIN']}><ReportingContent /></ProtectedRoute>} />
           <Route path="/admin/legacy-archive" element={<ProtectedRoute roles={['ADMIN']}><LegacyArchive /></ProtectedRoute>} />
           <Route path="/admin/legacy-archive/:kind/:id" element={<ProtectedRoute roles={['ADMIN']}><LegacyArchive /></ProtectedRoute>} />

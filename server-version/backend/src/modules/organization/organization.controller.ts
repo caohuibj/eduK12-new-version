@@ -130,7 +130,17 @@ export const organizationController = {
               o."name",
               o."status",
               m."id" AS "membershipId",
-              m."org_role" AS "orgRole",
+              CASE WHEN o."product_domain"='SCHOOL'
+                AND m."org_role"='ORG_ADMIN'
+                AND NOT EXISTS(
+                  SELECT 1 FROM "education_product_role_grants" epa
+                  WHERE epa."organization_id"=o."id"
+                    AND epa."membership_id"=m."id"
+                    AND epa."product"='HUISCHOOL'
+                    AND epa."role"='PRODUCT_ADMIN'
+                    AND epa."revoked_at" IS NULL
+                ) THEN 'MEMBER'
+              ELSE m."org_role" END AS "orgRole",
               o."created_at" AS "createdAt"
             FROM "organizations" o
             LEFT JOIN "organization_memberships" m
@@ -139,11 +149,21 @@ export const organizationController = {
              AND m."valid_from" <= statement_timestamp()
              AND (m."valid_until" IS NULL OR statement_timestamp() < m."valid_until")
             WHERE o."product_domain" = ${viewerDomain}
+            AND (o."product_domain"<>'SCHOOL' OR EXISTS (
+      SELECT 1 FROM "education_product_entitlements" ent
+      WHERE ent."organization_id"=o."id"
+        AND ent."product"='HUISCHOOL' AND ent."status"='ACTIVE'
+    ))
             ORDER BY o."name", o."id"
             LIMIT ${pageSize} OFFSET ${offset}
           `,
           prisma.$queryRaw<Array<{ count: number }>>`
-            SELECT COUNT(*)::int AS "count" FROM "organizations" WHERE "product_domain" = ${viewerDomain}
+            SELECT COUNT(*)::int AS "count" FROM "organizations" o WHERE o."product_domain" = ${viewerDomain}
+              AND (o."product_domain"<>'SCHOOL' OR EXISTS (
+      SELECT 1 FROM "education_product_entitlements" ent
+      WHERE ent."organization_id"=o."id"
+        AND ent."product"='HUISCHOOL' AND ent."status"='ACTIVE'
+    ))
           `,
         ])
       } else {
@@ -154,12 +174,27 @@ export const organizationController = {
               o."name",
               o."status",
               m."id" AS "membershipId",
-              m."org_role" AS "orgRole",
+              CASE WHEN o."product_domain"='SCHOOL'
+                AND m."org_role"='ORG_ADMIN'
+                AND NOT EXISTS(
+                  SELECT 1 FROM "education_product_role_grants" epa
+                  WHERE epa."organization_id"=o."id"
+                    AND epa."membership_id"=m."id"
+                    AND epa."product"='HUISCHOOL'
+                    AND epa."role"='PRODUCT_ADMIN'
+                    AND epa."revoked_at" IS NULL
+                ) THEN 'MEMBER'
+              ELSE m."org_role" END AS "orgRole",
               o."created_at" AS "createdAt"
             FROM "organization_memberships" m
             JOIN "organizations" o ON o."id" = m."organization_id"
             WHERE m."user_id" = ${userId}
               AND o."product_domain" = ${viewerDomain}
+              AND (o."product_domain"<>'SCHOOL' OR EXISTS (
+      SELECT 1 FROM "education_product_entitlements" ent
+      WHERE ent."organization_id"=o."id"
+        AND ent."product"='HUISCHOOL' AND ent."status"='ACTIVE'
+    ))
               AND m."valid_from" <= statement_timestamp()
               AND (m."valid_until" IS NULL OR statement_timestamp() < m."valid_until")
             ORDER BY o."name", o."id"
@@ -171,6 +206,11 @@ export const organizationController = {
             JOIN "organizations" o ON o."id" = m."organization_id"
             WHERE m."user_id" = ${userId}
               AND o."product_domain" = ${viewerDomain}
+              AND (o."product_domain"<>'SCHOOL' OR EXISTS (
+      SELECT 1 FROM "education_product_entitlements" ent
+      WHERE ent."organization_id"=o."id"
+        AND ent."product"='HUISCHOOL' AND ent."status"='ACTIVE'
+    ))
               AND m."valid_from" <= statement_timestamp()
               AND (m."valid_until" IS NULL OR statement_timestamp() < m."valid_until")
           `,

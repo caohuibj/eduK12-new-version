@@ -3,7 +3,7 @@ import { verifyToken } from '../utils/jwt'
 import { AuthenticatedPrincipal, UserRole } from '../types'
 import { unauthorized, forbidden } from '../utils/response'
 import { inactiveAccountMessage } from '../utils/accountStatus'
-import { getSessionToken, getSchoolSessionToken, getSurveySessionToken } from '../utils/authCookies'
+import { getSessionToken, getSchoolSessionToken, getSurveySessionToken, getHuiteacherSessionToken } from '../utils/authCookies'
 import { measureRequestPhase } from '../services/runtimeObservability'
 import { loadCurrentPrincipal, toRequestPrincipal } from '../modules/organization/principal'
 import { schoolAccountNeedsMfa } from '../modules/campus/mfa.service'
@@ -21,9 +21,9 @@ const loadPrincipal = async (userId: string) => {
   return measureRequestPhase('auth_account_lookup', () => loadCurrentPrincipal(userId))
 }
 
-const authenticateProduct = async (req: Request, res: Response, next: NextFunction, product: 'LEGACY' | 'SCHOOL' | 'SURVEY') => {
+const authenticateProduct = async (req: Request, res: Response, next: NextFunction, product: 'LEGACY' | 'SCHOOL' | 'SURVEY' | 'HUITEACHER') => {
   try {
-    const token = product === 'SCHOOL' ? getSchoolSessionToken(req) : product === 'SURVEY' ? getSurveySessionToken(req) : getSessionToken(req)
+    const token = product === 'SCHOOL' ? getSchoolSessionToken(req) : product === 'HUITEACHER' ? getHuiteacherSessionToken(req) : product === 'SURVEY' ? getSurveySessionToken(req) : getSessionToken(req)
     if (!token) {
       return unauthorized(res, '缺少认证令牌')
     }
@@ -47,7 +47,9 @@ const authenticateProduct = async (req: Request, res: Response, next: NextFuncti
     // A domain mismatch cannot be fixed by a client-supplied hostname or
     // JWT role. Historical JWTs without an audience remain legacy-only.
     if (product === 'SCHOOL'
-      ? principal!.accountDomain !== 'SCHOOL' || payload.accountDomain !== 'SCHOOL'
+      ? principal!.accountDomain !== 'SCHOOL' || payload.accountDomain !== 'SCHOOL' || payload.sessionProduct === 'HUITEACHER'
+      : product === 'HUITEACHER'
+        ? principal!.accountDomain !== 'SCHOOL' || payload.accountDomain !== 'SCHOOL' || payload.sessionProduct !== 'HUITEACHER'
       : product === 'SURVEY'
         ? principal!.accountDomain !== 'SURVEY' || payload.accountDomain !== 'SURVEY'
         : !['LEGACY', 'TRAINING'].includes(principal!.accountDomain)
@@ -56,7 +58,7 @@ const authenticateProduct = async (req: Request, res: Response, next: NextFuncti
     }
 
     // Role elevation invalidates password-only SCHOOL sessions immediately.
-    if (product === 'SCHOOL' && await schoolAccountNeedsMfa(principal!.userId)
+    if ((product === 'SCHOOL' || product === 'HUITEACHER') && await schoolAccountNeedsMfa(principal!.userId)
       && (!payload.mfaVerifiedAt || payload.mfaVerifiedAt > Date.now()/1000)) {
       return unauthorized(res, '需要完成双因素认证')
     }
@@ -85,6 +87,7 @@ const authenticateProduct = async (req: Request, res: Response, next: NextFuncti
       '/api/auth/csrf',
       '/api/campus/auth/change-password',
       '/api/survey/auth/change-password',
+      '/api/huiteacher/auth/change-password',
     ])
     if (
       principal!.mustChangePassword &&
@@ -101,6 +104,7 @@ const authenticateProduct = async (req: Request, res: Response, next: NextFuncti
 export const authenticate = (req: Request, res: Response, next: NextFunction) => authenticateProduct(req, res, next, 'LEGACY')
 export const authenticateSurvey = (req: Request, res: Response, next: NextFunction) => authenticateProduct(req, res, next, 'SURVEY')
 export const authenticateSchool = (req: Request, res: Response, next: NextFunction) => authenticateProduct(req, res, next, 'SCHOOL')
+export const authenticateHuiteacher = (req: Request, res: Response, next: NextFunction) => authenticateProduct(req, res, next, 'HUITEACHER')
 
 // 可选认证中间件 - 有有效且未停用的 token 才挂上当前数据库 principal；公开入口不因冻结账号 401。
 export const optionalAuthenticate = async (req: Request, res: Response, next: NextFunction) => {

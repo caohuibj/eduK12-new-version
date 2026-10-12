@@ -1,4 +1,6 @@
 import type { ResultDisclosureContractV1 } from '../assessment-policy/result-disclosure'
+import { teacherFormResourceId,resolveTeacherFormResourcePolicy } from '../huiteacher/formRunResource'
+import {studentFormResourceId,resolveStudentFormResourcePolicy} from '../huiteacher/studentFormResource'
 import type { AssessmentInitiationModeV1 } from '../assessment-policy/journey'
 import type { EvaluationTargetMode, EvaluationTargetRequest } from '../assessment-policy/target'
 import { resolveReleasedRelationalEntry } from './registeredResources'
@@ -250,6 +252,19 @@ const transactionalCompositeCapabilities: Partial<RunResourceAdapterCapabilities
 export const productionRunResourceAuthorityRegistry = new RunResourceAuthorityRegistry([
   createRelationalRunResourceAdapter({ family: 'BUNDLE', capabilities: transactionalCompositeCapabilities }),
   createRelationalRunResourceAdapter({ family: 'SCALE', capabilities: transactionalCompositeCapabilities }),
-  createRelationalRunResourceAdapter({ family: 'FORM', capabilities: transactionalCompositeCapabilities }),
+  // FORM V2 has a dedicated transactional Teacher runtime. Exact released
+  // Teacher content uses a product-scoped policy; other FORM resources remain
+  // on the existing Composite adapter, unchanged.
+  (() => {
+    const original=createRelationalRunResourceAdapter({
+      family:'FORM',capabilities:transactionalCompositeCapabilities,
+    })
+    return {...original,resolveExact:(ref:RunResourceRef)=>
+      studentFormResourceId(ref)
+        ?resolveStudentFormResourcePolicy(ref)
+        :teacherFormResourceId(ref)
+          ?resolveTeacherFormResourcePolicy(ref)
+          :original.resolveExact(ref)}
+  })(),
   createRelationalRunResourceAdapter({ family: 'SITUATIONAL', capabilities: transactionalCompositeCapabilities }),
 ])

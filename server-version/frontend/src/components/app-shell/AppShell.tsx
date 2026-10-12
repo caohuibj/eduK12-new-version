@@ -46,6 +46,8 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const displayOrganization=!routeOrganizationId||routeOrganizationId==='new'||activeOrganization?.organization.id===routeOrganizationId?activeOrganization:null
   const items=training?trainingNavigation(user?.role):[...navigationFor(user?.role,cognitive,relational.status==='available'),...(user?organizationNavigation(displayOrganization?.organization.id,displayOrganization?.allowedActions,platformRole,directoryActions):[])]
   if(!training&&user?.role==='ADMIN'&&platformRole==='SYSTEM_ADMIN') items.push({path:'/admin/legacy-archive',label:'历史归档（只读）',section:'system'})
+  if(!training&&user?.role==='ADMIN'&&platformRole==='SYSTEM_ADMIN')
+    items.push({path:'/admin/education-products',label:'教育产品治理',section:'system'})
   if(!training&&parentPortalEnabled&&user?.role==='PARENT')items.push({path:'/parent/children',label:'我的孩子'},{path:'/parent/links',label:'家长关联'})
   if(!training&&parentPortalEnabled&&user?.role==='STUDENT')items.push({path:'/student/parent-links',label:'家长关联',section:'account'})
   if(!training&&(platformRole??user?.platformRole)==='SYSTEM_ADMIN')items.push({path:'/parent-accounts',label:'家长账号管理',section:'system'})

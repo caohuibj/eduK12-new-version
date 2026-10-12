@@ -2996,3 +2996,440 @@ model SurveyExportTicket {
   @@index([expiresAt],map:"survey_exports_expires_idx")
   @@map("survey_export_tickets")
 }
+
+//// Shared education identity: one SCHOOL account and Organization can opt
+//// into either product. The SQL migration owns restrictive FKs and audit
+//// constraints, including product-domain guards and active-role uniqueness.
+model EducationProductEntitlement {
+  organizationId  String   @map("organization_id")
+  product         String
+  status          String   @default("ACTIVE")
+  grantedByUserId String   @map("granted_by_user_id")
+  grantedAt       DateTime @default(now()) @map("granted_at") @db.Timestamptz(6)
+  suspendedAt     DateTime? @map("suspended_at") @db.Timestamptz(6)
+  changedByUserId String?  @map("changed_by_user_id")
+  revision        Int      @default(1)
+
+  @@id([organizationId, product])
+  @@index([product, status, organizationId], map: "education_product_entitlements_product_status_idx")
+  @@map("education_product_entitlements")
+}
+
+model EducationProductRoleGrant {
+  id              String   @id
+  organizationId  String   @map("organization_id")
+  membershipId    String   @map("membership_id")
+  product         String
+  role            String
+  grantedByUserId String   @map("granted_by_user_id")
+  grantedAt       DateTime @default(now()) @map("granted_at") @db.Timestamptz(6)
+  revokedByUserId String?  @map("revoked_by_user_id")
+  revokedAt       DateTime? @map("revoked_at") @db.Timestamptz(6)
+
+  @@index([membershipId, product, revokedAt], map: "education_product_role_grants_membership_idx")
+  @@map("education_product_role_grants")
+}
+
+// One-use Teacher school invitation: reuses users/campus_accounts, no new
+// credentials realm. Handwritten SQL governs FKs, expiry and consume pair.
+model EducationTeacherStaffInvitation {
+  id               String    @id
+  organizationId   String    @map("organization_id")
+  tokenHash        String    @unique(map: "education_teacher_staff_invitations_token_hash_key") @map("token_hash")
+  invitedByUserId  String    @map("invited_by_user_id")
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  expiresAt        DateTime  @map("expires_at") @db.Timestamptz(6)
+  consumedAt       DateTime? @map("consumed_at") @db.Timestamptz(6)
+  consumedByUserId String?   @map("consumed_by_user_id")
+  @@index([organizationId, expiresAt], map: "education_teacher_staff_invitations_org_idx")
+  @@map("education_teacher_staff_invitations")
+}
+
+// Only a Teacher school membership invitation, NOT a Huischool psychology
+// enrollment. A later Huischool rollout needs its own approved admission.
+model EducationTeacherStudentInvitation {
+  id               String    @id
+  organizationId   String    @map("organization_id")
+  classUnitId      String    @map("class_unit_id")
+  studentNoDigest  String    @map("student_no_digest")
+  tokenHash        String    @unique(map: "education_teacher_student_invites_token_key") @map("token_hash")
+  invitedByUserId  String    @map("invited_by_user_id")
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  expiresAt        DateTime  @map("expires_at") @db.Timestamptz(6)
+  consumedAt       DateTime? @map("consumed_at") @db.Timestamptz(6)
+  consumedByUserId String?   @map("consumed_by_user_id")
+  revokedAt        DateTime? @map("revoked_at") @db.Timestamptz(6)
+
+  @@index([organizationId, classUnitId, expiresAt], map: "education_teacher_student_invites_class_idx")
+  @@map("education_teacher_student_invitations")
+}
+
+// Huiteacher-only evaluation facts; no School, Training or Survey result source
+// is promoted by sharing a User or Organization key.
+model HuiteacherEvaluationTarget {
+  id              String   @id
+  organizationId  String   @map("organization_id")
+  kind            String
+  subjectUserId   String?  @map("subject_user_id")
+  name            String
+  status          String   @default("ACTIVE")
+  createdByUserId String   @map("created_by_user_id")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([organizationId,id],map:"huiteacher_evaluation_targets_org_id_key")
+  @@index([organizationId,status,kind,createdAt(sort:Desc)],map:"huiteacher_evaluation_targets_list_idx")
+  @@map("huiteacher_evaluation_targets")
+}
+
+model HuiteacherEvaluationEvent {
+  id              String   @id
+  organizationId  String   @map("organization_id")
+  targetId        String   @map("target_id")
+  kind            String
+  title           String
+  notes           String?
+  status          String   @default("DRAFT")
+  version         Int      @default(1)
+  scheduledAt     DateTime? @map("scheduled_at") @db.Timestamptz(6)
+  openedAt        DateTime? @map("opened_at") @db.Timestamptz(6)
+  closedAt        DateTime? @map("closed_at") @db.Timestamptz(6)
+  createdByUserId String   @map("created_by_user_id")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([organizationId,id],map:"huiteacher_evaluation_events_org_id_key")
+  @@index([organizationId,status,createdAt(sort:Desc)],map:"huiteacher_evaluation_events_list_idx")
+  @@index([organizationId,targetId,createdAt(sort:Desc)],map:"huiteacher_evaluation_events_target_idx")
+  @@map("huiteacher_evaluation_events")
+}
+
+// Teacher-owned, unscored V2 Form versions; published definitions are frozen
+// in PostgreSQL. Existing Survey validators own the definition semantics.
+model HuiteacherFormInstrument {
+  id              String   @id
+  organizationId  String   @map("organization_id")
+  title           String
+  status          String   @default("DRAFT")
+  revision        Int      @default(1)
+  definition      Json
+  definitionDigest String  @map("definition_digest")
+  createdByUserId String   @map("created_by_user_id")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  publishedAt     DateTime? @map("published_at") @db.Timestamptz(6)
+
+  @@unique([organizationId,id],map:"huiteacher_form_instruments_org_id_key")
+  @@index([organizationId,status,createdAt(sort:Desc)],map:"huiteacher_forms_org_status_idx")
+  @@map("huiteacher_form_instruments")
+}
+
+// Assessment Run remains the single execution authority. Link creation
+// is atomic with draft Run insertion, not an arbitrary cross-product bind.
+model HuiteacherEvaluationRunLink {
+  organizationId String @map("organization_id")
+  eventId        String @map("event_id")
+  runId          String @unique(map:"huiteacher_evaluation_run_links_run_key") @map("run_id")
+  boundByUserId  String @map("bound_by_user_id")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@id([organizationId,eventId])
+  @@index([organizationId,runId],map:"huiteacher_run_links_run_idx")
+  @@map("huiteacher_evaluation_run_links")
+}
+
+// Product-owned runtime identity is frozen by a canonical Run Execution.
+model HuiteacherFormAttempt {
+  id               String   @id
+  organizationId   String   @map("organization_id")
+  runId            String   @map("run_id")
+  runExecutionId   String   @unique(map:"huiteacher_form_attempts_execution_unique") @map("run_execution_id")
+  formId           String   @map("form_id")
+  respondentUserId String   @map("respondent_user_id")
+  definitionDigest String   @map("definition_digest")
+  status           String   @default("STARTED")
+  startedAt        DateTime @default(now()) @map("started_at") @db.Timestamptz(6)
+  completedAt      DateTime? @map("completed_at") @db.Timestamptz(6)
+  @@unique([organizationId,id],map:"huiteacher_form_attempts_org_id_unique")
+  @@index([organizationId,formId,status,startedAt],map:"huiteacher_form_attempts_org_form_idx")
+  @@map("huiteacher_form_attempts")
+}
+
+// Exactly one encrypted immutable FINAL; no secondary plaintext answers table.
+model HuiteacherFormFinal {
+  id               String   @id
+  organizationId   String   @map("organization_id")
+  attemptId        String   @unique(map:"huiteacher_form_finals_attempt_unique") @map("attempt_id")
+  submissionId     String   @map("submission_id")
+  definitionDigest String   @map("definition_digest")
+  payloadHash      String   @map("payload_hash")
+  resultsCipher    String   @map("results_cipher")
+  resultsHash      String   @map("results_hash")
+  completedAt      DateTime @default(now()) @map("completed_at") @db.Timestamptz(6)
+  @@index([organizationId,completedAt,id],map:"huiteacher_form_finals_org_time_idx")
+  @@map("huiteacher_form_finals")
+}
+
+model EducationTeacherScaleLicense {
+  organizationId  String    @map("organization_id")
+  resourceId      String    @map("resource_id")
+  status          String    @default("ACTIVE")
+  grantedByUserId String    @map("granted_by_user_id")
+  grantedAt       DateTime  @default(now()) @map("granted_at") @db.Timestamptz(6)
+  revokedAt       DateTime? @map("revoked_at") @db.Timestamptz(6)
+  revision        Int       @default(1)
+  @@id([organizationId,resourceId])
+  @@index([resourceId,status,organizationId],map:"education_teacher_scale_licenses_active_resources_idx")
+  @@map("education_teacher_scale_licenses")
+}
+
+// PR3 Teacher personal credential: one SCHOOL education account with a
+// product-scoped personal license, no synthetic Organization.
+model HuiteacherPersonalScaleGrant {
+  userId          String    @map("user_id")
+  resourceId      String    @map("resource_id")
+  status          String    @default("ACTIVE")
+  grantedByUserId String    @map("granted_by_user_id")
+  grantedAt       DateTime  @default(now()) @map("granted_at") @db.Timestamptz(6)
+  revokedAt       DateTime? @map("revoked_at") @db.Timestamptz(6)
+  revision        Int       @default(1)
+  @@id([userId, resourceId])
+  @@index([resourceId, status], map: "huiteacher_personal_scale_grants_resource_idx")
+  @@map("huiteacher_personal_scale_grants")
+}
+
+model HuiteacherPersonalScaleAttempt {
+  assessmentId   String    @id @map("assessment_id")
+  userId         String    @map("user_id")
+  resourceId     String    @map("resource_id")
+  definitionHash String    @map("definition_hash")
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([userId, createdAt(sort: Desc)], map: "huiteacher_personal_scale_attempts_user_time_idx")
+  @@map("huiteacher_personal_scale_attempts")
+}
+
+// Prevent repeated exact Form report releases to changing respondent sets.
+model HuiteacherGroupDisclosureLedger {
+  organizationId   String   @map("organization_id")
+  definitionDigest String   @map("definition_digest")
+  populationDigest String   @map("population_digest")
+  firstRunId       String   @map("first_run_id")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@id([organizationId, definitionDigest])
+  @@map("huiteacher_group_disclosure_ledgers")
+}
+
+// PR4 event-scoped external observer; no membership in School psychology.
+model HuiteacherObserverGrant {
+  id               String    @id
+  organizationId   String    @map("organization_id")
+  eventId          String    @map("event_id")
+  observerUserId   String    @map("observer_user_id")
+  role             String
+  status           String    @default("INVITED")
+  invitedByUserId  String    @map("invited_by_user_id")
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  expiresAt        DateTime  @map("expires_at") @db.Timestamptz(6)
+  acceptedAt       DateTime? @map("accepted_at") @db.Timestamptz(6)
+  revokedAt        DateTime? @map("revoked_at") @db.Timestamptz(6)
+  revision         Int       @default(1)
+  @@unique([organizationId,eventId,observerUserId])
+  @@index([observerUserId,status,expiresAt], map:"huiteacher_observer_grants_user_idx")
+  @@map("huiteacher_observer_grants")
+}
+
+model HuiteacherObservationRecord {
+  id               String    @id
+  organizationId   String    @map("organization_id")
+  eventId          String    @map("event_id")
+  observerUserId   String    @map("observer_user_id")
+  kind             String
+  status           String    @default("DRAFT")
+  bodyCipher       String    @map("body_cipher")
+  revision         Int       @default(1)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  submittedAt      DateTime? @map("submitted_at") @db.Timestamptz(6)
+  @@index([organizationId,eventId,status,kind],map:"huiteacher_observation_records_event_idx")
+  @@index([observerUserId,createdAt(sort:Desc)],map:"huiteacher_observation_records_observer_idx")
+  @@map("huiteacher_observation_records")
+}
+
+
+// Manual consensus is a human-authored narrative based on immutable field
+// observations. It is not an automatically synthesized rater score.
+model HuiteacherFieldConsensus {
+  id              String    @id
+  organizationId  String    @map("organization_id")
+  eventId         String    @map("event_id")
+  title           String
+  bodyCipher      String    @map("body_cipher")
+  createdByUserId String    @map("created_by_user_id")
+  status          String    @default("DRAFT")
+  revision        Int       @default(1)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  submittedAt     DateTime? @map("submitted_at") @db.Timestamptz(6)
+  @@unique([organizationId,eventId,id],map:"huiteacher_field_consensuses_scope_key")
+  @@index([organizationId,eventId,status,createdAt(sort:Desc)],map:"huiteacher_field_consensuses_event_idx")
+  @@map("huiteacher_field_consensuses")
+}
+
+model HuiteacherFieldConsensusSource {
+  organizationId  String   @map("organization_id")
+  eventId         String   @map("event_id")
+  consensusId     String   @map("consensus_id")
+  recordId        String   @map("record_id")
+  sourceCipherHash String  @map("source_cipher_hash")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@id([consensusId,recordId])
+  @@index([organizationId,eventId,consensusId],map:"huiteacher_field_consensus_sources_scope_idx")
+  @@map("huiteacher_field_consensus_sources")
+}
+
+model HuiteacherFieldConsensusApproval {
+  id             String   @id
+  organizationId String   @map("organization_id")
+  eventId        String   @map("event_id")
+  consensusId    String   @map("consensus_id")
+  observerUserId String   @map("observer_user_id")
+  revision       Int
+  contentHash    String   @map("content_hash")
+  approvedAt     DateTime @default(now()) @map("approved_at") @db.Timestamptz(6)
+  @@unique([consensusId,observerUserId,revision],map:"huiteacher_field_consensus_approvals_once_revision")
+  @@index([organizationId,eventId,consensusId,revision],map:"huiteacher_field_consensus_approvals_revision_idx")
+  @@map("huiteacher_field_consensus_approvals")
+}
+
+model HuiteacherFieldEventForm {
+  organizationId  String   @map("organization_id")
+  eventId         String   @map("event_id")
+  formId          String   @map("form_id")
+  definitionDigest String  @map("definition_digest")
+  assignedByUserId String  @map("assigned_by_user_id")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@id([organizationId,eventId])
+  @@unique([organizationId,eventId,formId],map:"huiteacher_field_event_forms_exact_key")
+  @@map("huiteacher_field_event_forms")
+}
+model HuiteacherFieldFormEvidence {
+  id              String    @id
+  organizationId  String    @map("organization_id")
+  eventId         String    @map("event_id")
+  recordId        String    @unique @map("record_id")
+  formId          String    @map("form_id")
+  definitionDigest String   @map("definition_digest")
+  answersCipher   String    @map("answers_cipher")
+  answersHash     String    @map("answers_hash")
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([organizationId,eventId,formId],map:"huiteacher_field_form_evidence_scope")
+  @@map("huiteacher_field_form_evidence")
+}
+
+model HuiteacherExternalExpertInvite {
+  id               String @id
+  organizationId   String @map("organization_id")
+  eventId          String @map("event_id")
+  tokenHash        String @unique @map("token_hash")
+  issuedByUserId   String @map("issued_by_user_id")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  expiresAt        DateTime @map("expires_at") @db.Timestamptz(6)
+  consumedAt       DateTime? @map("consumed_at") @db.Timestamptz(6)
+  consumedByUserId String? @map("consumed_by_user_id")
+  revokedAt        DateTime? @map("revoked_at") @db.Timestamptz(6)
+  @@index([organizationId,eventId,expiresAt],map:"huiteacher_external_expert_invites_event")
+  @@map("huiteacher_external_expert_invites")
+}
+
+model HuiteacherFieldFeedbackRelease {
+  id               String   @id
+  organizationId   String   @map("organization_id")
+  eventId          String   @map("event_id")
+  recipientUserId  String   @map("recipient_user_id")
+  noteId           String?  @map("note_id")
+  consensusId      String?  @map("consensus_id")
+  releasedByUserId String   @map("released_by_user_id")
+  releasedAt       DateTime @default(now()) @map("released_at") @db.Timestamptz(6)
+  @@index([recipientUserId,releasedAt(sort:Desc)],map:"huiteacher_feedback_release_person_idx")
+  @@map("huiteacher_field_feedback_releases")
+}
+
+// Frozen PR5 business linkage. The canonical Run, not this table, is the
+// authoritative eligible student roster and any future START/FINAL.
+model HuiteacherStudentEvaluationConfig {
+  id               String   @id
+  organizationId   String   @map("organization_id")
+  eventId          String   @map("event_id")
+  classUnitId      String   @map("class_unit_id")
+  staffAssignmentId String  @map("staff_assignment_id")
+  formId           String   @map("form_id")
+  definitionDigest String   @map("definition_digest")
+  configuredByUserId String @map("configured_by_user_id")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@unique([organizationId,eventId],map:"huiteacher_student_eval_configs_event_key")
+  @@index([organizationId,classUnitId,createdAt(sort:Desc)],map:"huiteacher_student_eval_configs_org_class_idx")
+  @@map("huiteacher_student_eval_configs")
+}
+
+// PR5 disclosure ledger: frozen-only, one read-releasable Run per
+// Teacher/class to prevent longitudinal differencing without PR6 review.
+model HuiteacherStudentDisclosureLedger {
+  organizationId   String   @map("organization_id")
+  teacherUserId     String   @map("teacher_user_id")
+  classUnitId       String   @map("class_unit_id")
+  firstRunId        String   @map("first_run_id")
+  formDigest        String   @map("form_digest")
+  populationDigest  String   @map("population_digest")
+  releasedAt        DateTime @default(now()) @map("released_at") @db.Timestamptz(6)
+  @@id([organizationId,teacherUserId,classUnitId],map:"huiteacher_student_disclosure_ledgers_pkey")
+  @@unique([organizationId,teacherUserId],map:"huiteacher_student_disclosure_org_teacher_unique")
+  @@map("huiteacher_student_disclosure_ledgers")
+}
+
+
+// PR6 optional improvement cycle, private teacher goals vs explicitly
+// school-shared actions. Ciphertext lives only in Teacher product tables.
+model HuiteacherImprovementAction {
+  id               String    @id
+  organizationId   String    @map("organization_id")
+  targetId         String    @map("target_id")
+  sourceEventId    String?   @map("source_event_id")
+  ownerUserId      String    @map("owner_user_id")
+  audience         String
+  goalCipher       String    @map("goal_cipher")
+  goalHash         String    @map("goal_hash")
+  planCipher       String    @map("plan_cipher")
+  planHash         String    @map("plan_hash")
+  evidenceCipher   String?   @map("evidence_cipher")
+  evidenceHash     String?   @map("evidence_hash")
+  status           String    @default("PLANNED")
+  version          Int       @default(1)
+  dueAt            DateTime? @map("due_at") @db.Timestamptz(6)
+  completedAt      DateTime? @map("completed_at") @db.Timestamptz(6)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  @@unique([organizationId,id],map:"huiteacher_improvement_actions_org_id_key")
+  @@index([organizationId,targetId,audience,createdAt(sort:Desc),id(sort:Desc)],map:"huiteacher_improvement_actions_target_idx")
+  @@index([ownerUserId,audience,createdAt(sort:Desc)],map:"huiteacher_improvement_actions_owner_idx")
+  @@map("huiteacher_improvement_actions")
+}
+
+
+/// One immutable, separately authorized reassessment after an action closes.
+/// This table records provenance and encrypted HUMAN feedback, never scores.
+model HuiteacherImprovementReassessment {
+  id               String   @id
+  organizationId   String   @map("organization_id")
+  actionId         String   @map("action_id")
+  targetId         String   @map("target_id")
+  eventId          String   @map("event_id")
+  reviewedByUserId String   @map("reviewed_by_user_id")
+  feedbackCipher   String   @map("feedback_cipher")
+  feedbackHash     String   @map("feedback_hash")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@unique([organizationId,actionId],map:"huiteacher_improvement_reassessments_action_key")
+  @@unique([organizationId,id],map:"huiteacher_improvement_reassessments_org_id_key")
+  @@index([organizationId,targetId,createdAt(sort:Desc)],map:"huiteacher_improvement_reassessments_target_idx")
+  @@map("huiteacher_improvement_reassessments")
+}

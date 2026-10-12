@@ -1,5 +1,7 @@
 import { matchesClassTarget } from '../assessment-policy/target'
 import { campusRunParticipantScope } from '../campus/activity.runScope'
+import { teacherFormResourceId,assertTeacherFormRunUse } from '../huiteacher/formRunResource'
+import {studentFormResourceId,assertStudentFormRunUse} from '../huiteacher/studentFormResource'
 import { currentClassDeliverySql } from '../organization/deliveryPolicy'
 import { createRunPendingConsent } from './consent'
 import { randomUUID } from 'node:crypto'
@@ -160,7 +162,23 @@ const prepareTracks = async (
   const tracks = await readDraftTracks(runId, organizationId)
   if (tracks.length === 0) throw new RunPublishError('RUN_TRACK_REQUIRED', 'Run requires at least one Track', 409)
   return Promise.all(tracks.map(async (track) => {
-    await assertRegisteredResourceUse({ family: track.resourceFamily, key: track.resourceKey, version: track.resourceVersion }, actorUserId)
+    await assertRegisteredResourceUse({ family: track.resourceFamily, key: track.resourceKey, version: track.resourceVersion }, actorUserId, prisma, false, {organizationId,runId})
+    if(teacherFormResourceId({
+      family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion,
+    })){
+      await prisma.$transaction(tx=>assertTeacherFormRunUse(tx,{
+        organizationId,runId,
+        ref:{family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion},
+      }))
+    }
+    if(studentFormResourceId({
+      family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion,
+    })){
+      await prisma.$transaction(tx=>assertStudentFormRunUse(tx,{
+        organizationId,runId,
+        ref:{family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion},
+      }))
+    }
     registry.assertStartSupported(track.resourceFamily)
     const resourcePolicy = await registry.resolveExact({ family: track.resourceFamily, key: track.resourceKey, version: track.resourceVersion })
     assertRunTrackNarrowing(resourcePolicy, track.requestedPolicy)
@@ -545,6 +563,45 @@ const resolvePairs = async (tx: Tx, organizationId: string, track: PreparedTrack
         && teacher.provenanceKind === 'ORG_MEMBER'
         && matchesClassTarget(target, teacher.membershipId, String(pair.facts.staffRole))
     })
+    // Student feedback has a uniquely school-verified teaching appointment.
+    // A class's other teachers MUST NOT leak into this Run's frozen cohort.
+    if(studentFormResourceId({family:track.resourceFamily,
+      key:track.resourceKey,version:track.resourceVersion})){
+      if(relationshipKind!=='CLASS_TEACHER_STUDENT'
+        ||subjectRole!=='TEACHER'||respondentRole!=='STUDENT')
+        throw new RunPublishError('STUDENT_EVAL_ROLE_MISMATCH','student evaluation requires student->teacher relationship',403)
+      const cfg=await tx.$queryRaw<Array<{
+        teacherUserId:string;classUnitId:string;staffAssignmentId:string
+      }>>`
+        SELECT target."subject_user_id" AS "teacherUserId",
+          config."class_unit_id" AS "classUnitId",
+          config."staff_assignment_id" AS "staffAssignmentId"
+        FROM "huiteacher_student_eval_configs" config
+        JOIN "huiteacher_evaluation_run_links" link
+          ON link."organization_id"=config."organization_id"
+          AND link."event_id"=config."event_id"
+        JOIN "huiteacher_evaluation_events" event
+          ON event."id"=config."event_id" AND event."organization_id"=config."organization_id"
+          AND event."status" IN ('DRAFT','OPEN')
+        JOIN "huiteacher_evaluation_targets" target
+          ON target."id"=event."target_id" AND target."organization_id"=event."organization_id"
+          AND target."kind"='PERSON' AND target."status"='ACTIVE'
+        WHERE config."organization_id"=${organizationId}
+          AND link."run_id"=${track.runId}
+          AND config."form_id"=${track.resourceKey.slice('huiteacher-student-form:'.length)}
+          AND config."definition_digest"=${track.resourceVersion}
+      `
+      if(cfg.length!==1)throw new RunPublishError('STUDENT_EVAL_SCOPE_INVALID','evaluation configuration is missing',403)
+      pairs=pairs.filter(pair=>pair.subject.userId===cfg[0].teacherUserId
+        &&pair.respondent.actorRole==='STUDENT'
+        &&pair.facts.staffClassAssignmentId===cfg[0].staffAssignmentId
+        &&pair.facts.classUnitId===cfg[0].classUnitId)
+      const accounts=await tx.user.findMany({where:{id:{in:pairs.map(p=>p.respondent.userId)},
+        accountDomain:'SCHOOL',role:'STUDENT',isActive:true,isFrozen:false,
+        mustChangePassword:false},select:{id:true}})
+      const current=new Set(accounts.map(row=>row.id))
+      pairs=pairs.filter(pair=>current.has(pair.respondent.userId))
+    }
     if (relationshipKind === 'COURSE_TEACHER_STUDENT') {
       const courses = await tx.course.findMany({ where: { status: 'PUBLISHED', endedAt: null, isLibrary: false, courseType: { not: 'CAMPUS_ACTIVITY' },
         ...(target?.mode === 'COURSE_TEACHER' ? { id: target.courseId } : {}) },
@@ -636,7 +693,7 @@ const resolvePairs = async (tx: Tx, organizationId: string, track: PreparedTrack
   return candidates.filter((_, index) => allowed.has(index))
 }
 
-const loadPublisherAuthority = async (tx: Tx, organizationId: string, actorUserId: string): Promise<PublisherAuthority> => {
+const loadPublisherAuthority = async (tx: Tx, organizationId: string, actorUserId: string, runId: string): Promise<PublisherAuthority> => {
   const accountRows = await tx.$queryRaw<Array<{ usable: boolean }>>`
     SELECT (
       u."is_active" = TRUE AND u."is_frozen" = FALSE AND u."must_change_password" = FALSE
@@ -646,11 +703,38 @@ const loadPublisherAuthority = async (tx: Tx, organizationId: string, actorUserI
     FROM "users" u WHERE u."id" = ${actorUserId}
   `
   if (!accountRows[0]?.usable) throw new RunPublishError('AUTHORITY_REVOKED', 'publisher account is not usable', 403)
+  // In a shared education Organization, an ORG_ADMIN fact must never
+  // authorize another product's Run. Determine the owning product by exact
+  // Teacher Run binding, not by user/organization IDs or caller hostname.
+  const ownership=await tx.$queryRaw<Array<{
+    productDomain:string;isTeacherRun:boolean;productEnabled:boolean
+  }>>`
+    SELECT o."product_domain" AS "productDomain",
+      EXISTS(
+        SELECT 1 FROM "huiteacher_evaluation_run_links" link
+        WHERE link."organization_id"=o."id" AND link."run_id"=${runId}
+      ) AS "isTeacherRun",
+      EXISTS(
+        SELECT 1 FROM "education_product_entitlements" e
+        WHERE e."organization_id"=o."id" AND e."status"='ACTIVE'
+          AND e."product"=CASE WHEN EXISTS(
+            SELECT 1 FROM "huiteacher_evaluation_run_links" link
+            WHERE link."organization_id"=o."id" AND link."run_id"=${runId}
+          ) THEN 'HUITEACHER' ELSE 'HUISCHOOL' END
+      ) AS "productEnabled"
+    FROM "organizations" o WHERE o."id"=${organizationId}
+  `
+  const owner=ownership[0]
+  if(!owner)throw new RunPublishError('ORG_NOT_FOUND','Organization unavailable',404)
+  if(owner.productDomain==='SCHOOL'&&!owner.productEnabled)
+    throw new RunPublishError('RUN_PUBLISH_FORBIDDEN','Owning education product is not enabled',403)
   const deny = await tx.$queryRaw<Array<{ permission: string }>>`
     SELECT "permission" FROM "organization_access_denies"
     WHERE "organization_id" = ${organizationId} AND "user_id" = ${actorUserId} AND "lifted_at" IS NULL
   `
-  if (deny.some((row) => ['*', 'ORGANIZATION_GOVERNANCE', 'ASSESSMENT_DELIVERY', 'ASSESSMENT_RUN_PUBLISH', 'RUN_PUBLISH'].includes(row.permission))) {
+  const owningProductDeny=owner.isTeacherRun?'HUITEACHER_ACCESS':'HUISCHOOL_ACCESS'
+  if (deny.some((row) => ['*', 'ORGANIZATION_GOVERNANCE', 'ASSESSMENT_DELIVERY', 'ASSESSMENT_RUN_PUBLISH', 'RUN_PUBLISH',
+    'EDUCATION_ACCESS',...(owner.productDomain==='SCHOOL'?[owningProductDeny]:[])].includes(row.permission))) {
     throw new RunPublishError('AUTHORITY_REVOKED', 'publisher is explicitly denied', 403)
   }
   const memberships = await tx.$queryRaw<Array<{ id: string; orgRole: string }>>`
@@ -680,14 +764,33 @@ const loadPublisherAuthority = async (tx: Tx, organizationId: string, actorUserI
     FROM "organization_counselor_client_relationships"
     WHERE "organization_id" = ${organizationId} AND "counselor_membership_id" = ${membership.id} AND "valid_from" <= statement_timestamp() AND ("valid_until" IS NULL OR "valid_until" > statement_timestamp())
   ` : []
+  const productAdmins=owner.productDomain==='SCHOOL'
+    ?await tx.$queryRaw<Array<{id:string}>>`
+      SELECT "id" FROM "education_product_role_grants"
+      WHERE "organization_id"=${organizationId}
+        AND "membership_id"=${membership.id}
+        AND "product"=${owner.isTeacherRun?'HUITEACHER':'HUISCHOOL'}
+        AND "role"='PRODUCT_ADMIN' AND "revoked_at" IS NULL
+      LIMIT 1
+    `:[]
   const authority = {
     membershipId: membership.id,
-    isOrgAdmin: membership.orgRole === 'ORG_ADMIN',
+    isOrgAdmin: owner.productDomain==='SCHOOL'
+      ?productAdmins.length>0
+      :membership.orgRole === 'ORG_ADMIN',
     teacherPersona: teacherPersona && teacherRows.length > 0,
     counselorPersona: counselorPersona && clientRows.length > 0,
     teacherClassIds: new Set(teacherRows.map((row) => row.classUnitId)),
     teacherStudentMembershipIds: new Set(teacherRows.map((row) => row.studentMembershipId).filter(Boolean)),
     counselorClientMembershipIds: new Set(clientRows.map((row) => row.clientMembershipId)),
+  }
+  // A bound Huiteacher Evaluation Run is a PRODUCT-managed campaign, not
+  // a generic course-teacher delivery. Revoking the Teacher product-admin
+  // grant must immediately prevent a former creator from publishing a draft
+  // through the generic Organization Run endpoint.
+  if(owner.productDomain==='SCHOOL'&&owner.isTeacherRun&&!authority.isOrgAdmin){
+    throw new RunPublishError('HUITEACHER_PUBLISH_ADMIN_REVOKED',
+      'current Teacher product administrator grant is required',403)
   }
   if (!authority.isOrgAdmin && !authority.teacherPersona && !authority.counselorPersona) {
     throw new RunPublishError('RUN_PUBLISH_FORBIDDEN', 'publisher requires ORG_ADMIN, TEACHER, or COUNSELOR authority', 403)
@@ -845,7 +948,7 @@ export const publishAssessmentRun = async (input: {
         AND "permission" IN ('*', 'ORGANIZATION_GOVERNANCE', 'ASSESSMENT_DELIVERY', 'ASSESSMENT_RUN_PUBLISH', 'RUN_PUBLISH')
     `
     if (denies.length) throw new RunPublishError('RUN_PUBLISH_FORBIDDEN', 'explicit deny prevents Run publication', 403)
-    const authority = await loadPublisherAuthority(tx, input.organizationId, input.actorUserId)
+    const authority = await loadPublisherAuthority(tx, input.organizationId, input.actorUserId, input.runId)
     if (!authority.isOrgAdmin && run.createdByUserId !== input.actorUserId) {
       throw new RunPublishError('RUN_PUBLISH_FORBIDDEN', 'scoped professionals may publish only their own assessment campaigns', 403)
     }
@@ -883,6 +986,18 @@ export const publishAssessmentRun = async (input: {
       throw new RunPublishError('RUN_STATE_CONFLICT', 'Run Tracks changed while resource authority was being resolved', 409)
     }
 
+    const configured=await tx.huiteacherStudentEvaluationConfig.findFirst({
+      where:{organizationId:input.organizationId,
+        eventId:{in:(await tx.huiteacherEvaluationRunLink.findMany({
+          where:{organizationId:input.organizationId,runId:input.runId},
+          select:{eventId:true},
+        })).map(link=>link.eventId)}},
+      select:{formId:true,definitionDigest:true},
+    })
+    if(configured&&(preparedTracks.length!==1
+      ||preparedTracks[0].resourceKey!=='huiteacher-student-form:'+configured.formId
+      ||preparedTracks[0].resourceVersion!==configured.definitionDigest))
+      throw new RunPublishError('STUDENT_EVAL_TRACK_SCOPE','student feedback requires one exact frozen Form track',403)
     const timeRows = await tx.$queryRaw<Array<{ now: Date }>>`SELECT transaction_timestamp() AS "now"`
     const verifiedAt = timeRows[0].now.toISOString()
     const campusSelected=await campusRunParticipantScope(tx,{
@@ -893,7 +1008,23 @@ export const publishAssessmentRun = async (input: {
     let executionCount = 0
 
     for (const track of preparedTracks) {
-      await assertRegisteredResourceUse({ family: track.resourceFamily, key: track.resourceKey, version: track.resourceVersion }, input.actorUserId, tx, true)
+      await assertRegisteredResourceUse({ family: track.resourceFamily, key: track.resourceKey, version: track.resourceVersion }, input.actorUserId, tx, true, {organizationId:input.organizationId,runId:input.runId})
+      if(teacherFormResourceId({
+        family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion,
+      })){
+        await assertTeacherFormRunUse(tx,{
+          organizationId:input.organizationId,runId:input.runId,
+          ref:{family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion},
+        })
+      }
+      if(studentFormResourceId({
+        family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion,
+      })){
+        await assertStudentFormRunUse(tx,{
+          organizationId:input.organizationId,runId:input.runId,
+          ref:{family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion},
+        })
+      }
       const frozenPolicyJson = JSON.stringify(track.resourcePolicy)
       const policyHash = canonicalHash(track.resourcePolicy)
       await tx.$executeRaw`
@@ -903,6 +1034,14 @@ export const publishAssessmentRun = async (input: {
       `
       const pairs = await resolvePairs(tx, input.organizationId, track, campusSelected)
       if (pairs.length === 0) throw new RunPublishError('RUN_EMPTY_POPULATION', `Track ${track.id} resolved no eligible actor pairs`, 409)
+      if(studentFormResourceId({family:track.resourceFamily,
+        key:track.resourceKey,version:track.resourceVersion})&&pairs.length<10)
+        throw new RunPublishError('STUDENT_FEEDBACK_MINIMUM_POPULATION',
+          'Student feedback may only publish with at least ten distinct eligible students',409)
+      if(studentFormResourceId({family:track.resourceFamily,
+        key:track.resourceKey,version:track.resourceVersion})
+        &&pairs.length!==new Set(pairs.map(pair=>pair.respondent.userId)).size)
+        throw new RunPublishError('STUDENT_EVAL_DUPLICATE_RESPONDENT','each eligible student must have exactly one execution',409)
       const perspective = requireSingle(track.requestedPolicy.perspectives, 'perspectives')
       for (const pair of pairs) {
         assertPublisherScope(authority, input.actorUserId, pair, track.resourcePolicy)
@@ -1002,7 +1141,7 @@ export const previewAssessmentRun = async (input: {
         AND "permission" IN ('*', 'ORGANIZATION_GOVERNANCE', 'ASSESSMENT_DELIVERY', 'ASSESSMENT_RUN_PUBLISH', 'RUN_PUBLISH')
     `
     if (denies.length) throw new RunPublishError('RUN_PUBLISH_FORBIDDEN', 'explicit deny prevents Run preview', 403)
-    const authority = await loadPublisherAuthority(tx, input.organizationId, input.actorUserId)
+    const authority = await loadPublisherAuthority(tx, input.organizationId, input.actorUserId, input.runId)
     if (!authority.isOrgAdmin && runs[0].createdByUserId !== input.actorUserId) {
       throw new RunPublishError('RUN_PUBLISH_FORBIDDEN', 'scoped professionals may preview only their own assessment campaigns', 403)
     }

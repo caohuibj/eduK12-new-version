@@ -8,37 +8,45 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { createRelationalProductRegistry, relationalProductRegistry, type RelationalProductEntryV1 } from '../assessment-relational/product-registry'
 import { hashScaleDefinition, validateScaleDefinition, type ScaleDefinitionV2 } from '../scale/scale-definition'
 import { reportingFail } from '../reporting/types'
+import { assertTeacherScaleRunUse } from '../huiteacher/scaleLicense.service'
+import { teacherPilotContentIssues } from '../huiteacher/teacherPilotContent'
 
 type Actor = { userId: string; platformRole: string }
 type Row = { id: string; resource_key: string; resource_version: string; scale_id: string; definition_hash: string; composite_id: string; entry: RelationalProductEntryV1; entry_hash: string; status: string; created_by_user_id: string; reviewed_by_user_id: string | null }
 const admin = (actor: Actor) => { if (actor.platformRole !== 'SYSTEM_ADMIN') reportingFail('RESOURCE_AUTHORITY', '只有平台管理员可以注册、审核和发布测量资源', 403) }
 
-export function validateDescriptiveResourceScale(scale: { status: string; instrumentClass: string; definition: unknown; definitionHash: string | null }): ScaleDefinitionV2 {
+export function validateDescriptiveResourceScale(scale: { status: string; instrumentClass: string; definition: unknown; definitionHash: string | null }, expectedRespondent: 'participant_self_report' | 'teacher_self_report' = 'participant_self_report'): ScaleDefinitionV2 {
   if (scale.status !== 'PUBLISHED' || scale.instrumentClass !== 'CUSTOM_DESCRIPTIVE') reportingFail('RESOURCE_SCALE_INVALID', '请先发布原创描述性量表；标准或受限量表需走原有内容审核流程', 409)
   const parsed = validateScaleDefinition(scale.definition, { instrumentClass: 'CUSTOM_DESCRIPTIVE', forPublish: true })
   if (!parsed.definition || parsed.issues.some(issue => issue.severity === 'error')) reportingFail('RESOURCE_SCALE_INVALID', '量表定义未通过发布检查', 409)
   const definition = parsed.definition!
-  if (definition.license.status !== 'self_authored' || definition.license.redistribution !== 'allowed' || definition.respondentType !== 'participant_self_report' || !definition.scoring.scores.length) {
+  if (definition.license.status !== 'self_authored' || definition.license.redistribution !== 'allowed' || definition.respondentType !== expectedRespondent || !definition.scoring.scores.length) {
     reportingFail('RESOURCE_SCALE_INVALID', '当前注册入口仅支持允许再分发的原创自评计分量表', 409)
   }
+  if(expectedRespondent==='teacher_self_report'&&teacherPilotContentIssues(definition).length)
+    reportingFail('HUITEACHER_PILOT_CONTENT_UNQUALIFIED',
+      '教师自评资源缺少完整版本摘要、受众报告审核或必要的反思指导文案',409)
   if (hashScaleDefinition(definition) !== scale.definitionHash) reportingFail('RESOURCE_INTEGRITY', '量表定义与发布指纹不一致', 409)
   return definition
 }
 
-export function descriptiveResourceEntry(input: { scaleId: string; name: string; definition: ScaleDefinitionV2; definitionHash: string; compositeId: string; version: string; mode: 'INDIVIDUAL' | 'GROUP' }): RelationalProductEntryV1 {
-  const key = `custom-scale:${input.scaleId}:${input.mode}`
+export function descriptiveResourceEntry(input: { scaleId: string; name: string; definition: ScaleDefinitionV2; definitionHash: string; compositeId: string; version: string; mode: 'INDIVIDUAL' | 'GROUP' | 'TEACHER_INDIVIDUAL' }): RelationalProductEntryV1 {
+  const isTeacher = input.mode === 'TEACHER_INDIVIDUAL'
+  const isIndividual = input.mode !== 'GROUP'
+  const key = isTeacher ? `teacher-scale:${input.scaleId}:INDIVIDUAL` : `custom-scale:${input.scaleId}:${input.mode}`
   const metricKeys = input.definition.scoring.scores.map(score => score.key)
   const individual = { mode: 'INDIVIDUAL_SUMMARY' as const, metricKeys, longitudinalMetricKeys: metricKeys }
   const none = { mode: 'NONE' as const, metricKeys: [], longitudinalMetricKeys: [] }
+  const adultIndividual = {RESPONDENT:individual,SUBJECT:individual,TEACHER:none,PROFESSIONAL:none,PARENT:none,RESEARCH:none,ORGANIZATION:none}
   const entry: RelationalProductEntryV1 = {
-    title: `${input.name}（${input.mode === 'INDIVIDUAL' ? '个人自评' : '群体汇总'}）`, description: '原创描述性自评；仅用于描述回答及其变化，不作诊断或科学效度声明。',
-    releaseStatus: 'PUBLISHED', scienceMaturity: 'PILOT', initiationModes: ['ORG_ASSIGN', 'CLASS_ASSIGN'], subjectReportMode: input.mode === 'INDIVIDUAL' ? 'INDIVIDUAL_SUMMARY' : 'AGGREGATE_ONLY',
+    title: `${input.name}（${isTeacher ? '教师个人描述性自评' : input.mode === 'INDIVIDUAL' ? '个人自评' : '群体汇总'}）`, description: '经独立授权的原创描述性自评；只反映题目及既定计分规则，不作诊断、常模或科学效度声明。',
+    releaseStatus: 'PUBLISHED', scienceMaturity: 'PILOT', initiationModes: ['ORG_ASSIGN', 'CLASS_ASSIGN'], subjectReportMode: isIndividual ? 'INDIVIDUAL_SUMMARY' : 'AGGREGATE_ONLY',
     applicability: { schemaVersion: 1, resourceKind: 'SCALE', resourceKey: key, resourceVersion: input.version,
-      subjectRoles: ['STUDENT'], respondentRoles: ['STUDENT'], relationshipKinds: ['SELF'], perspectives: ['SELF_REPORT'],
-      analysisMode: input.mode === 'INDIVIDUAL' ? 'INDIVIDUAL_ONLY' : 'COHORT_AGGREGATE', visibilityPolicyKey: 'ORG_CUSTOM_SELF_V1', minimumRespondents: input.mode === 'INDIVIDUAL' ? null : 3 },
-    cohortAnalysisPolicy: input.mode === 'INDIVIDUAL' ? null : { schemaVersion: 1, policyKey: 'ORG_CUSTOM_GROUP_V1', policyVersion: '1.0.0', minimumRespondents: 3, metricKeys }, launchTarget: { runtime: 'COMPOSITE', compositeAssessmentId: input.compositeId },
-    resultDisclosure: { schemaVersion: 1, policyKey: 'ORG_CUSTOM_SELF_V1', minimumRespondents: input.mode === 'INDIVIDUAL' ? null : 3,
-      audiences: input.mode === 'INDIVIDUAL' ? { RESPONDENT: individual, SUBJECT: individual, TEACHER: individual, PROFESSIONAL: individual, PARENT: none, RESEARCH: none, ORGANIZATION: none } : {
+      subjectRoles: [isTeacher?'TEACHER':'STUDENT'], respondentRoles: [isTeacher?'TEACHER':'STUDENT'], relationshipKinds: ['SELF'], perspectives: ['SELF_REPORT'],
+      analysisMode: isIndividual ? 'INDIVIDUAL_ONLY' : 'COHORT_AGGREGATE', visibilityPolicyKey: isTeacher?'HUITEACHER_ADULT_SELF_PILOT_V1':'ORG_CUSTOM_SELF_V1', minimumRespondents: isIndividual ? null : 3 },
+    cohortAnalysisPolicy: isIndividual ? null : { schemaVersion: 1, policyKey: 'ORG_CUSTOM_GROUP_V1', policyVersion: '1.0.0', minimumRespondents: 3, metricKeys }, launchTarget: { runtime: 'COMPOSITE', compositeAssessmentId: input.compositeId },
+    resultDisclosure: { schemaVersion: 1, policyKey: isTeacher?'HUITEACHER_ADULT_SELF_PILOT_V1':'ORG_CUSTOM_SELF_V1', minimumRespondents: isIndividual ? null : 3,
+      audiences: isTeacher ? adultIndividual : input.mode === 'INDIVIDUAL' ? { RESPONDENT: individual, SUBJECT: individual, TEACHER: individual, PROFESSIONAL: individual, PARENT: none, RESEARCH: none, ORGANIZATION: none } : {
         RESPONDENT: { mode: 'AGGREGATE_ONLY', metricKeys, longitudinalMetricKeys: [] }, SUBJECT: { mode: 'AGGREGATE_ONLY', metricKeys, longitudinalMetricKeys: [] },
         TEACHER: { mode: 'CLASS_AGGREGATE', metricKeys, longitudinalMetricKeys: [] }, PROFESSIONAL: { mode: 'ORGANIZATION_AGGREGATE', metricKeys, longitudinalMetricKeys: [] },
         ORGANIZATION: { mode: 'ORGANIZATION_AGGREGATE', metricKeys, longitudinalMetricKeys: [] }, PARENT: none, RESEARCH: none } },
@@ -56,14 +64,19 @@ const checkedEntry = (row: Row): RelationalProductEntryV1 => {
   return row.entry
 }
 
-export async function registerDescriptiveResource(actor: Actor, scaleId: string, mode: 'INDIVIDUAL' | 'GROUP' = 'INDIVIDUAL') {
+export async function registerDescriptiveResource(actor: Actor, scaleId: string, mode: 'INDIVIDUAL' | 'GROUP' | 'TEACHER_INDIVIDUAL' = 'INDIVIDUAL') {
   admin(actor)
   return prisma.$transaction(async tx => {
     await tx.$queryRaw`SELECT id FROM scales WHERE id=${scaleId} FOR UPDATE`
     const scale = await tx.scale.findUnique({ where: { id: scaleId } })
     if (!scale) return reportingFail('RESOURCE_NOT_FOUND', '量表不存在', 404)
-    const definition = validateDescriptiveResourceScale(scale)
-    const hash = hashScaleDefinition(definition), key = `custom-scale:${scale.id}:${mode}`
+    const isTeacher=mode==='TEACHER_INDIVIDUAL'
+    const definition=validateDescriptiveResourceScale(scale,
+      isTeacher?'teacher_self_report':'participant_self_report')
+    if(isTeacher && definition.items.some(x=>Boolean(x.images)||Boolean(x.video)))
+      reportingFail('RESOURCE_MEDIA_BRIDGE_NOT_RELEASED','教师版量表暂不支持没有独立跨域授权的图片或视频',409)
+    const hash = hashScaleDefinition(definition)
+    const key = isTeacher?`teacher-scale:${scale.id}:INDIVIDUAL`:`custom-scale:${scale.id}:${mode}`
     const existing = await tx.$queryRaw<Row[]>`SELECT * FROM registered_assessment_resources WHERE resource_key=${key} AND definition_hash=${hash} ORDER BY created_at DESC,id DESC`
     if (existing[0]) {
       const prior = existing[0]; checkedEntry(prior)
@@ -99,7 +112,7 @@ export async function transitionDescriptiveResource(actor: Actor, id: string, ac
     if (action !== 'retire') {
       await tx.$queryRaw`SELECT id FROM scales WHERE id=${row.scale_id} FOR UPDATE`
       const scale = await tx.scale.findUniqueOrThrow({ where: { id: row.scale_id } })
-      validateDescriptiveResourceScale(scale)
+      validateDescriptiveResourceScale(scale, row.resource_key.startsWith('teacher-scale:') ? 'teacher_self_report' : 'participant_self_report')
       if (scale.definitionHash !== row.definition_hash) reportingFail('RESOURCE_INTEGRITY', '量表已变化，请重新注册当前版本', 409)
       if (action === 'review' && [row.created_by_user_id, scale.creatorId].includes(actor.userId)) reportingFail('RESOURCE_INDEPENDENT_REVIEW_REQUIRED', '资源注册者和量表作者不能自审，请交由另一位平台管理员审核', 403)
       if (action === 'publish' && (!row.reviewed_by_user_id || [row.created_by_user_id, scale.creatorId].includes(row.reviewed_by_user_id))) reportingFail('RESOURCE_INDEPENDENT_REVIEW_REQUIRED', '发布需要独立审核记录，请重新登记新版本并独立审核', 409)
@@ -133,7 +146,7 @@ export async function readPublishedRegisteredResource(actor: Actor, id: string) 
 export async function resolveReleasedRelationalEntry(ref: { resourceKind: string; resourceKey: string; resourceVersion: string }, db: Prisma.TransactionClient | typeof prisma = prisma) {
   const staticEntry = relationalProductRegistry.findExact(ref as Parameters<typeof relationalProductRegistry.findExact>[0])
   if (staticEntry) return staticEntry
-  if (ref.resourceKind !== 'SCALE' || !ref.resourceKey.startsWith('custom-scale:')) return null
+  if (ref.resourceKind !== 'SCALE' || !(ref.resourceKey.startsWith('custom-scale:') || ref.resourceKey.startsWith('teacher-scale:'))) return null
   const row = (await db.$queryRaw<Row[]>`SELECT * FROM registered_assessment_resources WHERE resource_key=${ref.resourceKey} AND resource_version=${ref.resourceVersion} AND status='PUBLISHED' LIMIT 1`)[0]
   return row ? checkedEntry(row) : null
 }
@@ -142,7 +155,7 @@ export async function resolveReleasedRelationalEntry(ref: { resourceKind: string
 export async function resolveHistoricalRelationalEntry(ref: { resourceKind: string; resourceKey: string; resourceVersion: string }, db: Prisma.TransactionClient | typeof prisma = prisma) {
   const staticEntry = relationalProductRegistry.findExact(ref as Parameters<typeof relationalProductRegistry.findExact>[0])
   if (staticEntry) return staticEntry
-  if (ref.resourceKind !== 'SCALE' || !ref.resourceKey.startsWith('custom-scale:')) return null
+  if (ref.resourceKind !== 'SCALE' || !(ref.resourceKey.startsWith('custom-scale:') || ref.resourceKey.startsWith('teacher-scale:'))) return null
   const row = (await db.$queryRaw<Row[]>`SELECT * FROM registered_assessment_resources WHERE resource_key=${ref.resourceKey} AND resource_version=${ref.resourceVersion} AND status IN ('PUBLISHED','RETIRED') LIMIT 1`)[0]
   return row ? checkedEntry(row) : null
 }
@@ -164,7 +177,16 @@ export async function listReleasedRegisteredResourcePage(userId: string, role: U
   return { entries: rows.slice(0, 100).map(checkedEntry), nextPage: rows.length > 100 ? page + 1 : null }
 }
 
-export async function assertRegisteredResourceUse(ref: { family: string; key: string; version: string }, userId: string, db: Prisma.TransactionClient | typeof prisma = prisma, lock = false) {
+export async function assertRegisteredResourceUse(ref: { family: string; key: string; version: string }, userId: string, db: Prisma.TransactionClient | typeof prisma = prisma, lock = false, teacherRunScope?:{ organizationId:string;runId:string }) {
+  if (ref.family==='SCALE'&&ref.key.startsWith('teacher-scale:')){
+    if(!teacherRunScope) return reportingFail('RESOURCE_TEACHER_RUN_SCOPE_REQUIRED',
+      '教师自评量表只能用于经授权的 Teacher 评价任务',403)
+    await assertTeacherScaleRunUse(db,{
+      organizationId:teacherRunScope.organizationId,runId:teacherRunScope.runId,
+      resource:ref,
+    })
+    return
+  }
   if (ref.family !== 'SCALE' || !ref.key.startsWith('custom-scale:')) return
   const row = (await db.$queryRaw<Row[]>(Prisma.sql`SELECT * FROM registered_assessment_resources WHERE resource_key=${ref.key} AND resource_version=${ref.version} ${lock ? Prisma.sql`FOR SHARE` : Prisma.empty}`))[0]
   if (lock && row) {

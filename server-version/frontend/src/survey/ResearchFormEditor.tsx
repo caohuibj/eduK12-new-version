@@ -9,7 +9,7 @@ const types:Record<FormQuestion['type'],string>={
   CONSTANT_SUM:'恒定总和',MATRIX_MULTIPLE:'矩阵多选',
 }
 export function ResearchFormEditor({value,onChange,projectId}:{value:FormDraft;
-  onChange:(next:FormDraft)=>void;projectId:string}){
+  onChange:(next:FormDraft)=>void;projectId?:string}){
   const setPage=(index:number,update:(p:FormDraft['pages'][number])=>FormDraft['pages'][number])=>{
     const pages=value.pages.map((p,i)=>i===index?update(p):p)
     onChange({...value,pages})
@@ -85,8 +85,13 @@ export function ResearchFormEditor({value,onChange,projectId}:{value:FormDraft;
               允许明确选择「不愿回答」（单独记为 REFUSED）
             </label>
           </div>
-          <SurveyImageField projectId={projectId} image={q.image}
+          {projectId ? <SurveyImageField projectId={projectId} image={q.image}
             onChange={image=>setQuestion(pi,qi,x=>({...x,image}))}/>
+            : q.image ? <p className="text-sm" role="status">
+              此图片来自研究项目，Huiteacher 暂不复用研究者媒体权限。
+              <button type="button" className="btn-secondary" onClick={()=>setQuestion(pi,qi,x=>({...x,image:undefined}))}>
+                移除图片
+              </button></p> : null}
           {choiceTypes.has(q.type)&&<div className="space-y-2">
             <p className="text-sm font-medium">选项</p>
             {q.options.map((o,oi)=><div className="flex gap-2" key={o.optionKey}>

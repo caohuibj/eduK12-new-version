@@ -10,6 +10,7 @@ export type AccountDomain = 'LEGACY' | 'TRAINING' | 'SCHOOL' | 'SURVEY'
 // database principal hydrated by auth middleware.
 export interface JwtPayload {
   accountDomain?: AccountDomain // Historical legacy tokens omit this claim.
+  sessionProduct?: 'HUISCHOOL' | 'HUITEACHER' // Distinct signed browser audience within shared SCHOOL identity.
   mfaVerifiedAt?: number // Server-signed, only after verified TOTP/recovery
   userId: string
   username: string

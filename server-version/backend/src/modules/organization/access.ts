@@ -30,8 +30,8 @@ declare global {
   }
 }
 
-type OrgRow = { id: string; status: OrganizationStatus; productDomain: 'LEGACY' | 'SCHOOL'; viewerDomain: string }
-type MembershipRow = { id: string; orgRole: OrganizationRole }
+type OrgRow = { id: string; status: OrganizationStatus; productDomain: 'LEGACY' | 'SCHOOL'; viewerDomain: string; huischoolEntitled: boolean }
+type MembershipRow = { id: string; orgRole: OrganizationRole; schoolProductAdmin: boolean }
 type PersonaRow = { persona: OrganizationPersona }
 type CapabilityRow = { capability: OrganizationCapability }
 type DenyRow = { permission: string }
@@ -43,7 +43,11 @@ export async function resolveOrganizationAccessContext(input: {
   const db=tx??prisma
   const organizations = await db.$queryRaw<OrgRow[]>`
     SELECT o."id", o."status", o."product_domain" AS "productDomain",
-           u."account_domain" AS "viewerDomain"
+           u."account_domain" AS "viewerDomain",
+           EXISTS (SELECT 1 FROM "education_product_entitlements" entitlement
+             WHERE entitlement."organization_id"=o."id"
+               AND entitlement."product"='HUISCHOOL'
+               AND entitlement."status"='ACTIVE') AS "huischoolEntitled"
     FROM "organizations" o
     JOIN "users" u ON u."id" = ${input.principal.userId}
     WHERE o."id" = ${input.organizationId}
@@ -54,16 +58,26 @@ export async function resolveOrganizationAccessContext(input: {
   // Fail closed even for legacy SYSTEM_ADMIN: bootstrap is a separate
   // audited operation, not an implicit right to SCHOOL member/report data.
   if ((organization.productDomain === 'SCHOOL') !== (organization.viewerDomain === 'SCHOOL')) return null
+  // The SCHOOL identity realm no longer implies Huischool psychology access.
+  if (organization.productDomain === 'SCHOOL' && !organization.huischoolEntitled) return null
 
   const [memberships, denyRows] = await Promise.all([
     db.$queryRaw<MembershipRow[]>`
-      SELECT "id", "org_role" AS "orgRole"
-      FROM "organization_memberships"
-      WHERE "organization_id" = ${input.organizationId}
-        AND "user_id" = ${input.principal.userId}
-        AND "valid_from" <= statement_timestamp()
-        AND ("valid_until" IS NULL OR statement_timestamp() < "valid_until")
-      ORDER BY "valid_from" DESC
+      SELECT m."id", m."org_role" AS "orgRole",
+        EXISTS(
+          SELECT 1 FROM "education_product_role_grants" product_admin
+          WHERE product_admin."organization_id"=m."organization_id"
+            AND product_admin."membership_id"=m."id"
+            AND product_admin."product"='HUISCHOOL'
+            AND product_admin."role"='PRODUCT_ADMIN'
+            AND product_admin."revoked_at" IS NULL
+        ) AS "schoolProductAdmin"
+      FROM "organization_memberships" m
+      WHERE m."organization_id" = ${input.organizationId}
+        AND m."user_id" = ${input.principal.userId}
+        AND m."valid_from" <= statement_timestamp()
+        AND (m."valid_until" IS NULL OR statement_timestamp() < m."valid_until")
+      ORDER BY m."valid_from" DESC
       LIMIT 1
     `,
     db.$queryRaw<DenyRow[]>`
@@ -76,6 +90,14 @@ export async function resolveOrganizationAccessContext(input: {
   ])
 
   const membership = memberships[0] ?? null
+  // ORG_ADMIN is a shared organization fact. It is not a grant to inspect
+  // psychology operations of a Teacher-only admin when School later opens.
+  // Existing School admins are backfilled into HUISCHOOL PRODUCT_ADMIN.
+  const schoolOrgRole:OrganizationRole|null = membership
+    ? (organization.productDomain === 'SCHOOL'
+      && membership.orgRole === 'ORG_ADMIN' && !membership.schoolProductAdmin
+        ? 'MEMBER' : membership.orgRole)
+    : null
   const [personaRows, capabilityRows] = membership
     ? await Promise.all([
         db.$queryRaw<PersonaRow[]>`
@@ -96,15 +118,18 @@ export async function resolveOrganizationAccessContext(input: {
     : [[], []]
 
   const explicitDenies = denyRows.map((row) => row.permission)
+  // A School-specific deny still applies inside the shared education realm.
+  if (organization.productDomain === 'SCHOOL' && explicitDenies.some(x =>
+    ['*', 'EDUCATION_ACCESS', 'HUISCHOOL_ACCESS'].includes(x))) return null
   const basis: OrganizationAccessContext['basis'] = []
   if (input.principal.platformRole === 'SYSTEM_ADMIN') basis.push('SYSTEM_ADMIN')
-  if (membership?.orgRole === 'ORG_ADMIN') basis.push('ORG_ADMIN')
+  if (schoolOrgRole === 'ORG_ADMIN') basis.push('ORG_ADMIN')
   if (membership) basis.push('MEMBERSHIP')
   if (capabilityRows.length > 0) basis.push('CAPABILITY')
 
   const deniedAll = explicitDenies.includes('*') || explicitDenies.includes('ORGANIZATION_GOVERNANCE')
   const canGovern = !deniedAll && (organization.status === 'ACTIVE' || input.principal.platformRole === 'SYSTEM_ADMIN') && (
-    input.principal.platformRole === 'SYSTEM_ADMIN' || membership?.orgRole === 'ORG_ADMIN'
+    input.principal.platformRole === 'SYSTEM_ADMIN' || schoolOrgRole === 'ORG_ADMIN'
   )
 
   return {
@@ -114,7 +139,7 @@ export async function resolveOrganizationAccessContext(input: {
     userId: input.principal.userId,
     platformRole: input.principal.platformRole,
     membershipId: membership?.id ?? null,
-    orgRole: membership?.orgRole ?? null,
+    orgRole: schoolOrgRole,
     personas: personaRows.map((row) => row.persona),
     capabilities: capabilityRows.map((row) => row.capability),
     explicitDenies,

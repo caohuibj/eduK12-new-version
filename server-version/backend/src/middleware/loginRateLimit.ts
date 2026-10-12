@@ -52,7 +52,7 @@ export const getLoginRateLimitContext = (req: Request, username?: string): Login
   // Preserve pre-existing training/account Redis buckets across the release.
   // School logins use an independent realm prefix. Unit-test Request shims
   // and some internal callers legitimately have no originalUrl.
-  const normalizedUsername = (req.originalUrl?.startsWith('/api/campus/') ? 'school:' : '') + (username || '').trim().toLowerCase()
+  const normalizedUsername = ((req.originalUrl?.startsWith('/api/campus/') || req.originalUrl?.startsWith('/api/huiteacher/')) ? 'school:' : '') + (username || '').trim().toLowerCase()
   const accountKey = `auth:login:account:${digest(normalizedUsername || 'invalid')}`
   return {
     accountKey,

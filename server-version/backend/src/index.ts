@@ -56,6 +56,26 @@ import { effectiveRuntimeResourceConfig } from './config/runtimeResources'
 import legacyArchiveRoutes from './modules/legacy-archive/routes'
 import authRoutes from './routes/auth'
 import campusAuthRoutes from './modules/campus/auth.routes'
+import huiteacherAuthRoutes from './modules/huiteacher/auth.routes'
+import huiteacherAdmissionRoutes from './modules/huiteacher/admission.routes'
+import huiteacherStaffInviteRoutes from './modules/huiteacher/staffInvitation.routes'
+import huiteacherOrganizationRoutes from './modules/huiteacher/organization.routes'
+import huiteacherEvaluationRoutes from './modules/huiteacher/evaluation.routes'
+import huiteacherFormsRoutes from './modules/huiteacher/forms.routes'
+import huiteacherRunRoutes from './modules/huiteacher/run.routes'
+import huiteacherFormRuntimeRoutes from './modules/huiteacher/formRuntime.routes'
+import huiteacherGroupReportRoutes from './modules/huiteacher/groupReport.routes'
+import huiteacherScaleRuntimeRoutes from './modules/huiteacher/scaleRuntime.routes'
+import huiteacherPersonalScaleRoutes from './modules/huiteacher/personalScale.routes'
+import huiteacherObserverRoutes from './modules/huiteacher/observer.routes'
+import huiteacherConsensusRoutes from './modules/huiteacher/consensus.routes'
+import huiteacherFieldFormRoutes from './modules/huiteacher/fieldForm.routes'
+import huiteacherExpertRegistrationRoutes from './modules/huiteacher/expertRegistration.routes'
+import huiteacherFieldFeedbackRoutes from './modules/huiteacher/fieldFeedback.routes'
+import huiteacherStudentEvaluationRoutes from './modules/huiteacher/studentEvaluation.routes'
+import huiteacherImprovementRoutes from './modules/huiteacher/improvement.routes'
+import platformEducationRoutes from './modules/huiteacher/platform.routes'
+import { huiteacherOriginGuard } from './modules/huiteacher/originGuard'
 import campusAdmissionRoutes from './modules/campus/admission.routes'
 import campusStaffRoutes from './modules/campus/staff.routes'
 import { schoolOriginGuard } from './modules/campus/originGuard'
@@ -275,6 +295,31 @@ const publicSurveyFeatureGuard: express.RequestHandler = (_req,res,next)=>{
 app.use('/api/public/survey', publicSurveyFeatureGuard, surveyOriginGuard, publicSurveyRouter)
 app.use('/api/survey/projects', surveyProjectsRouter)
 app.use('/api/platform/survey', surveyFeatureGuard, platformSurveyOriginGuard, surveyPlatformRouter)
+const huiteacherFeatureGuard: express.RequestHandler = (_req,res,next)=>{
+  if(process.env.HUITEACHER_WORKSPACE_ENABLED!=='true')
+    return res.status(404).json({code:-1,message:'Huiteacher 尚未启用',data:null})
+  next()
+}
+app.use('/api/huiteacher',huiteacherFeatureGuard,huiteacherOriginGuard)
+app.use('/api/huiteacher/auth',huiteacherAuthRoutes)
+app.use('/api/huiteacher',huiteacherAdmissionRoutes)
+app.use('/api/huiteacher',huiteacherStaffInviteRoutes)
+app.use('/api/huiteacher',huiteacherOrganizationRoutes)
+app.use('/api/huiteacher',huiteacherEvaluationRoutes)
+app.use('/api/huiteacher',huiteacherFormsRoutes)
+app.use('/api/huiteacher',huiteacherRunRoutes)
+app.use('/api/huiteacher',huiteacherFormRuntimeRoutes)
+app.use('/api/huiteacher',huiteacherGroupReportRoutes)
+app.use('/api/huiteacher',huiteacherScaleRuntimeRoutes)
+app.use('/api/huiteacher',huiteacherPersonalScaleRoutes)
+app.use('/api/huiteacher',huiteacherObserverRoutes)
+app.use('/api/huiteacher',huiteacherConsensusRoutes)
+app.use('/api/huiteacher',huiteacherFieldFormRoutes)
+app.use('/api/huiteacher',huiteacherExpertRegistrationRoutes)
+app.use('/api/huiteacher',huiteacherFieldFeedbackRoutes)
+app.use('/api/huiteacher',huiteacherStudentEvaluationRoutes)
+app.use('/api/huiteacher',huiteacherImprovementRoutes)
+app.use('/api/platform/education',platformEducationRoutes)
 app.use('/api/campus', schoolOriginGuard)
 app.use('/api/campus/auth', campusAuthRoutes)
 app.use('/api/campus', campusAdmissionRoutes)

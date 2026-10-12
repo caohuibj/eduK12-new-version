@@ -68,9 +68,10 @@ const publicApi=async <T,>(path:string,method='GET',body?:unknown):Promise<T>=>{
   if(!result.ok||envelope.code!==0||!envelope.data)throw new Error(envelope.message||'操作未完成')
   return envelope.data
 }
-export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange}:{unit:Unit;answer:Record<string,Answer>;
-  onChange:(name:string,value:Answer)=>void;proof:SurveyImageProof;
-  pageIndex:number;onPageChange:(next:number)=>void}){
+export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purpose='SURVEY'}:{unit:Unit;answer:Record<string,Answer>;
+  onChange:(name:string,value:Answer)=>void;proof?:SurveyImageProof;
+  pageIndex:number;onPageChange:(next:number)=>void;
+  purpose?:'SURVEY'|'HUITEACHER'}){
   const [pageError,setPageError]=useState('')
 
   const shownFormKeys=unit.kind==='FORM'
@@ -132,7 +133,7 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange}:{un
     return <fieldset className="border rounded-lg p-4 my-4 bg-white scroll-mt-4"
       id={'survey-answer-'+unit.instrumentKey+'-'+q.itemKey} tabIndex={-1} key={q.itemKey}>
       <legend className="font-medium text-sm">{q.prompt}{q.required?' *':''}</legend>
-      {q.image&&<SurveyParticipantImage image={q.image} proof={proof}/>}
+      {q.image&&proof&&<SurveyParticipantImage image={q.image} proof={proof}/>}
       {q.type==='MULTIPLE'&&q.maxSelections!==undefined&&<p className="text-xs mb-2">
         请选 {q.minSelections??1} 至 {q.maxSelections} 项。</p>}
       {['SINGLE','LIKERT','MULTIPLE'].includes(q.type)&&choice(q,q.options,q.type as 'SINGLE'|'LIKERT'|'MULTIPLE')}
@@ -173,7 +174,7 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange}:{un
     <h3 className="text-lg font-semibold">{unit.title}</h3>
     {unit.kind==='FORM'&&<div>
       <p className="text-sm mt-3" role="status">第 {activePage?currentIndex+1:0} / {visiblePages.length} 页
-        （本研究所有页面完成后只提交一次正式答卷）</p>
+        （{purpose==='HUITEACHER'?'所有页面完成后一次性提交正式评价':'本研究所有页面完成后只提交一次正式答卷'}）</p>
       <progress className="w-full" max={Math.max(1,visiblePages.length)}
         value={activePage?currentIndex+1:0} aria-label="本工具作答进度"/>
       {activePage&&<div key={activePage.pageKey}>
@@ -192,7 +193,7 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange}:{un
     {unit.kind==='SCALE'&&unit.items?.map(q=>item({...q,type:'LIKERT',options:unit.responseOptions||[]}))}
     {unit.kind==='SJT'&&<><p className="mt-2 font-medium">{unit.scenarioTitle}</p>
       <p className="whitespace-pre-wrap mb-4 text-sm">{unit.stimulus}</p>
-      {unit.image&&<SurveyParticipantImage image={unit.image} proof={proof}/>}
+      {unit.image&&proof&&<SurveyParticipantImage image={unit.image} proof={proof}/>}
       {unit.questions?.map(q=>item({itemKey:q.questionKey,
         type:q.responseType==='MULTIPLE'?'MULTIPLE':'SINGLE',
         prompt:q.prompt,options:q.options,required:true,

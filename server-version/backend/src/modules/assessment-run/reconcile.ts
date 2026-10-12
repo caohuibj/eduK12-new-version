@@ -38,20 +38,37 @@ export const reconcileRunExecutionFromRuntimeInTransaction = async (
     return { state: 'COMPLETED', completedAt: execution.completedAt, replayed: true }
   }
   if (!execution.runtimeBindingKind || !execution.runtimeBindingRef) return { state: 'NOT_STARTED' }
-  if (execution.runtimeBindingKind !== 'COMPOSITE') {
+  if (!['COMPOSITE','HUITEACHER_FORM_V2'].includes(execution.runtimeBindingKind)) {
     throw new RunReconciliationError('RUN_RUNTIME_RECONCILER_UNAVAILABLE', `no authoritative reconciler for ${execution.runtimeBindingKind}`, 409)
   }
-
-  const attempts = await tx.$queryRaw<Array<{
-    status: string
-    completedAt: Date | null
-    assignmentRef: string | null
-  }>>`
-    SELECT "status", "completed_at" AS "completedAt", "assignment_ref" AS "assignmentRef"
-    FROM "composite_assessment_attempts"
-    WHERE "id" = ${execution.runtimeBindingRef}
-    FOR UPDATE
-  `
+  // Teacher Form FINAL is committed atomically to the canonical Run and
+  // relational assignment; this adapter remains available for read-side
+  // reconciliation when a caller sees an in-progress execution.
+  const attempts=execution.runtimeBindingKind==='HUITEACHER_FORM_V2'
+    ? await tx.$queryRaw<Array<{
+      status:string;completedAt:Date|null;assignmentRef:string|null
+    }>>`
+        SELECT form."status",form."completed_at" AS "completedAt",
+          e."relational_assignment_id" AS "assignmentRef"
+        FROM "huiteacher_form_attempts" form
+        JOIN "assessment_run_executions" e
+          ON e."id"=form."run_execution_id"
+          AND e."organization_id"=form."organization_id"
+          AND e."run_id"=form."run_id"
+          AND e."runtime_binding_kind"='HUITEACHER_FORM_V2'
+          AND e."runtime_binding_ref"=form."id"
+        WHERE form."id"=${execution.runtimeBindingRef}
+          AND e."id"=${executionId}
+        FOR UPDATE OF form
+      `
+    : await tx.$queryRaw<Array<{
+        status:string;completedAt:Date|null;assignmentRef:string|null
+      }>>`
+        SELECT "status", "completed_at" AS "completedAt", "assignment_ref" AS "assignmentRef"
+        FROM "composite_assessment_attempts"
+        WHERE "id" = ${execution.runtimeBindingRef}
+        FOR UPDATE
+      `
   const attempt = attempts[0]
   if (!attempt) throw new RunReconciliationError('RUN_RUNTIME_BINDING_MISSING', 'bound Composite runtime attempt no longer exists', 409)
   if (attempt.assignmentRef !== execution.relationalAssignmentId) {

@@ -5,9 +5,11 @@ import { config } from '../config'
 export const AUTH_COOKIE_NAME = 'ptool_session'
 export const SCHOOL_AUTH_COOKIE_NAME = 'huischool_session'
 export const SURVEY_AUTH_COOKIE_NAME = 'huisurvey_research_session'
+export const HUITEACHER_AUTH_COOKIE_NAME = 'huiteacher_session'
 export const CSRF_COOKIE_NAME = 'ptool_csrf'
 export const SCHOOL_CSRF_COOKIE_NAME = 'huischool_csrf'
 export const SURVEY_CSRF_COOKIE_NAME = 'huisurvey_research_csrf'
+export const HUITEACHER_CSRF_COOKIE_NAME = 'huiteacher_csrf'
 export const CSRF_HEADER_NAME = 'x-csrf-token'
 
 const COOKIE_MAX_AGE_SECONDS = 7 * 24 * 60 * 60
@@ -151,6 +153,28 @@ export const getSurveyCsrfCookie = (req: Request): string | null => getCookie(re
 export const issueSurveyCsrfToken = (req: Request, res: Response): string => {
   const token = randomBytes(32).toString('base64url')
   appendSetCookie(res, serializeCookie(SURVEY_CSRF_COOKIE_NAME, token, {
+    maxAge: COOKIE_MAX_AGE_SECONDS, secure: isSecureRequest(req),
+  }))
+  return token
+}
+
+// Same education credentials, a separate host-only Teacher browser session.
+// No Domain=.eduk12.top attribute: School and Teacher sessions are never shared.
+export const getHuiteacherSessionToken = (req: Request): string | null => getCookie(req, HUITEACHER_AUTH_COOKIE_NAME)
+export const setHuiteacherSessionCookie = (req: Request, res: Response, token: string): void => {
+  appendSetCookie(res, serializeCookie(HUITEACHER_AUTH_COOKIE_NAME, token, {
+    httpOnly: true, maxAge: COOKIE_MAX_AGE_SECONDS, secure: isSecureRequest(req),
+  }))
+}
+export const clearHuiteacherSessionCookie = (req: Request, res: Response): void => {
+  appendSetCookie(res, serializeCookie(HUITEACHER_AUTH_COOKIE_NAME, '', {
+    httpOnly: true, maxAge: 0, secure: isSecureRequest(req),
+  }))
+}
+export const getHuiteacherCsrfCookie = (req: Request): string | null => getCookie(req, HUITEACHER_CSRF_COOKIE_NAME)
+export const issueHuiteacherCsrfToken = (req: Request, res: Response): string => {
+  const token = randomBytes(32).toString('base64url')
+  appendSetCookie(res, serializeCookie(HUITEACHER_CSRF_COOKIE_NAME, token, {
     maxAge: COOKIE_MAX_AGE_SECONDS, secure: isSecureRequest(req),
   }))
   return token

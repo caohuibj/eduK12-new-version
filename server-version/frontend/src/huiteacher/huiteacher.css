@@ -1,0 +1,101 @@
+:root{--ht-bg:#fbf4ed;--ht-copper:#944638;--ht-ink:#362925;--ht-quiet:#76665e;--ht-line:#e5d5ca;--ht-paper:#fffdf9}
+.ht-app{min-height:100vh;background:var(--ht-bg);color:var(--ht-ink);font-family:system-ui,-apple-system,"PingFang SC","Microsoft Yahei",sans-serif}
+.ht-app *{box-sizing:border-box}.ht-topbar{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;padding:1rem max(5vw,20px);border-bottom:1px solid var(--ht-line);background:var(--ht-paper)}
+.ht-brand{display:flex;gap:.7rem;align-items:center}.ht-brand-symbol{display:grid;place-items:center;color:#f4dbc2;background:var(--ht-copper);width:48px;height:48px;border-radius:13px;font-size:24px}
+.ht-brand strong{display:block;font-size:1.3rem;letter-spacing:.025em}.ht-brand span{display:block;font-size:.73rem;color:var(--ht-quiet)}
+.ht-topbar nav{display:flex;align-items:center;gap:.65rem;flex-wrap:wrap}
+.ht-app button,.ht-app input,.ht-app textarea,.ht-app select{font:inherit}
+.ht-app button{border:1px solid var(--ht-line);background:var(--ht-paper);padding:.65rem .9rem;border-radius:8px;cursor:pointer;color:var(--ht-ink);font-weight:560}
+.ht-app button:hover{border-color:var(--ht-copper)}.ht-app button:focus-visible,.ht-app input:focus-visible,.ht-app select:focus-visible,.ht-app textarea:focus-visible{outline:3px solid #d8874a;outline-offset:2px}
+.ht-app button:disabled{opacity:.55;cursor:not-allowed}.ht-app .ht-primary{background:var(--ht-copper);color:white;border-color:var(--ht-copper)}
+.ht-hero{max-width:1200px;padding:clamp(3rem,8vw,7rem) 6vw 5rem;margin:auto}
+.ht-eyebrow{font-size:.9rem;letter-spacing:.16em;color:var(--ht-copper)}
+.ht-hero h1{font-size:clamp(2.2rem,5vw,4.4rem);line-height:1.25;letter-spacing:-.025em;margin:1.4rem 0}
+.ht-hero p{max-width:680px;line-height:1.85;color:var(--ht-quiet)}.ht-actions{display:flex;gap:.9rem;margin:2rem 0 3rem;flex-wrap:wrap}
+.ht-four{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.9rem}.ht-four article{padding:1.6rem 1rem;border:1px solid var(--ht-line);background:var(--ht-paper);border-radius:12px;text-align:center}
+.ht-panel{border:1px solid var(--ht-line);border-radius:14px;padding:clamp(1rem,3vw,2rem);background:var(--ht-paper);box-shadow:0 10px 30px #6e392008}
+.ht-form-panel{width:min(530px,calc(100% - 2rem));margin:3rem auto}.ht-form-panel h1{margin-top:0}
+.ht-field{display:flex;flex-direction:column;gap:.4rem;min-width:min(100%,180px);margin:.8rem 0}.ht-field span{font-size:.85rem;color:var(--ht-quiet)}
+.ht-field input,.ht-field textarea,.ht-field select{border:1px solid #d9c9bf;border-radius:7px;background:white;color:var(--ht-ink);padding:.65rem;max-width:100%;width:100%}
+.ht-field textarea{min-height:90px}.ht-form-panel .ht-field{margin:1rem 0}.ht-form-panel button{margin-top:.6rem}
+.ht-workspace{display:grid;gap:1rem;max-width:1240px;padding:2rem max(5vw,20px);margin:auto}.ht-workspace h1,.ht-workspace h2{margin-top:0}
+.ht-inline{display:flex;flex-wrap:wrap;align-items:end;gap:.8rem;margin:1rem 0}.ht-inline button{margin-bottom:.8rem}
+.ht-units,.ht-members{display:flex;flex-wrap:wrap;gap:.5rem}.ht-tag{border-radius:30px;border:1px solid var(--ht-line);padding:.45rem .8rem;font-size:.88rem;background:#fff9f3}
+.ht-admin{border-top:1px solid var(--ht-line);margin-top:1.4rem;padding-top:1rem}
+.ht-empty{color:var(--ht-quiet)}.ht-secret{background:#fff1df;border:1px solid #e7c6a4;border-radius:8px;padding:1rem;max-width:100%;overflow-wrap:anywhere}.ht-wrap{overflow-wrap:anywhere}
+.ht-welcome{font-size:.9rem}.ht-notice{background:var(--ht-paper);max-width:850px;margin:1rem auto;padding:1rem;border-left:3px solid var(--ht-copper);border-radius:5px}.ht-footer{padding:2rem;text-align:center;color:var(--ht-quiet);font-size:.82rem}
+@media(max-width:900px){.ht-four{grid-template-columns:repeat(2,1fr)}}@media(max-width:640px){.ht-topbar{align-items:flex-start;flex-direction:column}.ht-topbar nav{width:100%}.ht-four{grid-template-columns:1fr}.ht-hero{padding:3rem 1rem}.ht-form-panel{margin:1.5rem auto}}
+
+/* Shared Survey Form V2 authoring controls inside Teacher's distinct theme. */
+.ht-app .input{border:1px solid #d9c9bf;border-radius:7px;background:#fff;color:var(--ht-ink);padding:.5rem;font:inherit;max-width:100%}
+.ht-app .btn-secondary{background:#fffdf9;color:var(--ht-ink);border:1px solid var(--ht-line);border-radius:7px;padding:.45rem .75rem}
+.ht-app .space-y-5>*+*{margin-top:1.25rem}
+.ht-app .space-y-4>*+*{margin-top:1rem}
+.ht-app .space-y-3>*+*{margin-top:.75rem}
+.ht-app .space-y-2>*+*{margin-top:.5rem}
+.ht-app .ht-muted{font-size:.88rem;color:var(--ht-quiet);line-height:1.7}
+.ht-app .ht-panel article{max-width:100%}
+.ht-app .ht-event-list{display:grid;gap:.7rem}
+.ht-app .ht-event{padding:1.15rem;background:#fffaf6;border:1px solid var(--ht-line);border-radius:10px}
+.ht-app .ht-event strong{display:inline-block;margin-right:.8rem}
+.ht-app .ht-task{border-top:1px solid var(--ht-line);margin-top:1.3rem;padding-top:1.5rem}
+.ht-app .ht-task fieldset{min-width:0;max-width:100%}
+.ht-app .ht-task table{min-width:480px}
+.ht-app .ht-task .overflow-x-auto{overflow-x:auto;max-width:100%}
+
+.ht-app .ht-personal-report{padding:1rem;border-top:1px solid var(--ht-line);margin-top:1rem}
+.ht-app .ht-personal-metric{margin:1rem 0;padding:1rem;border:1px solid var(--ht-line);border-radius:10px;background:var(--ht-paper)}
+.ht-app .ht-personal-metric strong{font-size:1.6rem;color:var(--ht-copper)}
+.ht-app .ht-personal-metric h5{font-size:1rem;margin:.2rem 0 .8rem}
+
+/* Personal teacher Scale: same education account, no personal school. */
+.ht-app .ht-scale-item{padding:1rem;margin:1rem 0;border:1px solid var(--ht-line);border-radius:9px}
+.ht-app .ht-scale-item legend{font-weight:600;max-width:100%;padding:0 .5rem}
+.ht-app .ht-scale-item label{display:flex;gap:.55rem;align-items:center;margin:.7rem 0}
+.ht-app .ht-personal-report{padding:1rem;margin-top:1rem;border-top:1px solid var(--ht-line);line-height:1.7}
+
+/* Field observation: evidence remains distinct from private reflective notes. */
+.ht-app .ht-field-manager{margin:1.2rem 0 0;border-top:1px solid var(--ht-line);padding-top:1rem}
+.ht-app .ht-field-content{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.75;max-width:76ch}
+.ht-app .ht-field-manager h4{margin-top:.3rem;color:var(--ht-copper)}
+
+.ht-app .ht-field-consensus{border-top:1px solid var(--ht-line);margin-top:1rem;padding-top:1rem}
+.ht-app .ht-consensus-citation{display:flex;gap:.7rem;align-items:flex-start;border:1px solid var(--ht-line);
+  border-radius:8px;padding:.7rem;background:var(--ht-paper);max-width:100%;overflow-wrap:anywhere}
+.ht-app .ht-consensus-citation input{flex-shrink:0;margin-top:.3rem}
+.ht-app .ht-consensus-citation span{display:block;min-width:0}
+.ht-app .ht-consensus-citation .ht-field-content{font-weight:400;white-space:pre-wrap}
+
+/* PR6: responsive and keyboard-accessible improvement cycle. */
+.ht-app .ht-growth{margin:1.2rem 0;padding:1rem;border:1px solid var(--ht-line);border-radius:10px;background:var(--ht-paper)}
+.ht-app .ht-growth h3{margin:.1rem 0 .6rem}
+.ht-app .ht-growth-form{display:grid;gap:.85rem;margin:1rem 0}
+.ht-app .ht-growth .ht-field{min-width:0}
+.ht-app .ht-growth textarea{max-width:100%}
+.ht-app .ht-growth .ht-event{overflow-wrap:anywhere}
+.ht-app .ht-growth .ht-event .ht-field-content{white-space:pre-wrap}
+
+/* PR6: role-restricted workbench navigation. Product authority remains API-side. */
+.ht-app .ht-workspace-tabs{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:1rem 0;padding:.45rem;
+  border:1px solid var(--ht-line);border-radius:12px;background:var(--ht-paper)}
+.ht-app .ht-workspace-tabs button[aria-pressed="true"]{background:var(--ht-copper);color:#fff;border-color:var(--ht-copper)}
+.ht-app .ht-workspace-tabs button{min-width:7.5rem}
+@media(max-width:560px){
+ .ht-app .ht-workspace-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.45rem}
+ .ht-app .ht-workspace-tabs button{min-width:0;padding:.6rem .35rem}
+ .ht-app .ht-growth{padding:.75rem}
+}
+
+/* B3「星火相传」：exact user-approved original strip, CSS clips the central
+ * flame/H-negative-space icon. Do NOT substitute an invented vector mark.
+ * Original artwork: Google Drive 11EgH4bYHlooDgx_hlqBxXEomIpzc-6uD.
+ * Source 1180x470; center icon ~x486..664,y60..259.
+ */
+.ht-app .ht-brand-b3{
+  display:block;flex:0 0 auto;width:54px;height:55px;border-radius:5px;
+  background-image:url('/huiteacher/b3-approved-original-20261010.png');
+  background-repeat:no-repeat;background-size:313px 125px;
+  background-position:-126px -16px;background-color:#fcf3ec;
+  box-shadow:none;overflow:hidden;
+}
+.ht-app .ht-brand strong{letter-spacing:.045em}
