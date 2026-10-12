@@ -228,7 +228,8 @@ export default function SurveyPublicApp(){
   useEffect(()=>{
     if(!task||task.status!=='STARTED'||!attemptId)return
     const timeout=window.setTimeout(()=>{
-      saveLocalSurveyDraft(publicId,attemptId,task.definitionDigest,answers,itemTimings)
+      if(!saveLocalSurveyDraft(publicId,attemptId,task.definitionDigest,answers,itemTimings))
+        setNotice('本标签页临时保存失败（空间或权限不足）。刷新、关闭页面可能丢失未提交答案；如已开放服务器加密暂存，请主动保存，或完成本次 FINAL。')
     },450)
     return ()=>window.clearTimeout(timeout)
   },[publicId,attemptId,task,answers,itemTimings])
