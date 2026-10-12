@@ -10,12 +10,12 @@ const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
 const uuid=z.string().uuid()
 const base='/organizations/:organizationId/evaluation-events/:eventId/forms/:formId/group-report'
-const handler=(publishV2:boolean)=>asyncHandler(async(req,res)=>{
+const handler=(publishV2:boolean,releasedOnly=false)=>asyncHandler(async(req,res)=>{
   try{
     const result=await readTeacherFormGroupReport({
       organizationId:uuid.parse(req.params.organizationId),
       eventId:uuid.parse(req.params.eventId),formId:uuid.parse(req.params.formId),
-      actorUserId:req.user!.userId,publishV2,
+      actorUserId:req.user!.userId,publishV2,releasedOnly,
     })
     return success(res,result)
   }catch(e){
@@ -44,6 +44,10 @@ const handler=(publishV2:boolean)=>asyncHandler(async(req,res)=>{
     throw e
   }
 })
+// The V2 released-only GET cannot create a disclosure or write a legacy
+// ledger; current product admin authority and immutable digest remain required.
+router.get(base+'/released',authenticateHuiteacher,
+  requireTeacherProductAdmin,handler(false,true))
 router.get(base,authenticateHuiteacher,
   requireTeacherProductAdmin,requireRecentTeacherMfa,handler(false))
 router.post(base+'/release',authenticateHuiteacher,

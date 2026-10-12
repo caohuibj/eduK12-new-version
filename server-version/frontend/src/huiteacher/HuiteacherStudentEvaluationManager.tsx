@@ -37,8 +37,10 @@ export function HuiteacherStudentEvaluationManager({organizationId,eventId,event
   const available=forms.filter(f=>f.status==='PUBLISHED')
   const loadRun=useCallback(async()=>{
     try{
-      setAssignedRun(await api<Run>(eventBase+'/run'))
-    }catch{setAssignedRun(null)}
+      const current=await api<Run>(eventBase+'/run')
+      setAssignedRun(current)
+      return current
+    }catch{setAssignedRun(null);return null}
   },[api,eventBase])
   useEffect(()=>{
     let current=true
@@ -62,13 +64,20 @@ export function HuiteacherStudentEvaluationManager({organizationId,eventId,event
   const configure=()=>run(async()=>{
     const appointment=appointments.find(c=>c.staffAssignmentId===staffId)
     if(!appointment||!formId)throw new Error('请先选择正式任教关系与发布版本')
-    if(!window.confirm('本次评教教师、班级及表单版本将不可改写。确认冻结？'))return
     const result=await api<Config>(base,'POST',{
       staffAssignmentId:appointment.staffAssignmentId,
       classUnitId:appointment.classUnitId,formId,
     })
     setConfigured(result)
-    setNotice('教师、班级及发布 Form 已冻结。请建立受控评教任务。')
+    // Configuration and Run remain independent immutable services. If the
+    // second request fails, the resume button continues the saved draft.
+    const draft=await api<Run>(base+'/run','POST',{
+      intakeDeadline:deadline?new Date(deadline).toISOString():null,
+    })
+    setAssignedRun(draft)
+    setPreview(await api<Preview>(base+'/eligibility'))
+    onChanged?.()
+    setNotice('评价与任务草稿已准备好。核对参与资格后即可直接发布。')
   })
   const count=()=>run(async()=>{
     const result=await api<Preview>(base+'/eligibility')
@@ -77,29 +86,28 @@ export function HuiteacherStudentEvaluationManager({organizationId,eventId,event
   })
   const create=()=>run(async()=>{
     if(!configured)throw new Error('请先冻结评价配置')
-    if(!window.confirm('确认在本校创建单个学生评教 Run？'))return
     const iso=deadline?new Date(deadline).toISOString():null
-    await api(base+'/run','POST',{intakeDeadline:iso})
-    await loadRun();onChanged?.()
-    setNotice('已建立唯一受控 Run 草稿和 Form Track，尚未通知学生。')
-  })
-  const previewRun=()=>run(async()=>{
-    if(!assignedRun)throw new Error('尚未建立 Run')
-    await api(base+'/run/preview','POST',{expectedVersion:assignedRun.version})
-    setNotice('已预览合法师生任务；发布仍会重新核查。')
-  })
-  const openEvent=()=>run(async()=>{
-    if(!assignedRun)throw new Error('请先创建正式 Run 草稿')
-    await api(eventBase+'/transition','POST',{action:'OPEN',expectedVersion:eventVersion})
-    onChanged?.();setNotice('评价活动已开放；下一步确认并发布学生任务。')
+    const draft=await api<Run>(base+'/run','POST',{intakeDeadline:iso})
+    setAssignedRun(draft);onChanged?.()
+    setNotice('已恢复评教任务草稿；尚未通知学生。')
   })
   const publish=()=>run(async()=>{
-    if(!assignedRun||eventStatus!=='OPEN')throw new Error('活动必须先开放')
-    if(!window.confirm('确认向冻结班级的合法学生发布本教师评教吗？'))return
+    if(!assignedRun||assignedRun.status!=='DRAFT'
+      ||!['DRAFT','OPEN'].includes(eventStatus))throw new Error('当前没有待发布的评价草稿')
+    if(!window.confirm('确认向本校核验的班级发布学生评教？发布后会冻结教师、问卷与参与资格。'))return
+    const eligibility=await api<Preview>(base+'/eligibility')
+    setPreview(eligibility)
+    if(!eligibility.teacherAssigned)throw new Error('教师任教关系已变化，请先核实')
+    // Two existing audited transitions are composed into one user action.
+    // After an interrupted OPEN, the same button resumes publishing the Run.
+    if(eventStatus==='DRAFT'){
+      await api(eventBase+'/transition','POST',{action:'OPEN',expectedVersion:eventVersion})
+      onChanged?.()
+    }
     const result=await api<{executionCount:number}>(
       base+'/run/publish','POST',{expectedVersion:assignedRun.version})
     await loadRun();onChanged?.()
-    setNotice('已冻结并发布 '+result.executionCount+' 份正式学生评教任务。')
+    setNotice('评价已发布，已分配 '+result.executionCount+' 份正式任务。')
   })
   const loadProgress=()=>run(async()=>{
     setProgress(await api<Progress>(eventBase+'/run/progress'))
@@ -123,7 +131,7 @@ export function HuiteacherStudentEvaluationManager({organizationId,eventId,event
     setNotice('群体报告已正式发布并冻结；之后读取不会重新统计或修改披露策略。')
   })
   return <section className="ht-admin" aria-label="学生评教受控管理">
-    <h4>学生评教 · 正式任务</h4>
+    <h4>学生评教 · 配置 → 发布 → 结束</h4>
     <p>被评价教师：{teacherName}。学生使用原有教育账号分别登录 Teacher，
       本功能不读取 School 心理资料或导出学生个人答案。</p>
     {notice&&<p role="status" className="ht-notice">{notice}</p>}
@@ -143,7 +151,10 @@ export function HuiteacherStudentEvaluationManager({organizationId,eventId,event
           <option value="">请选择</option>
           {available.map(f=><option key={f.id} value={f.id}>{f.title}</option>)}
         </select></label>
-      <button disabled={busy||!staffId||!formId} onClick={configure}>冻结评教配置</button>
+      <label className="ht-field"><span>截止时间（选填，本地时间）</span>
+        <input type="datetime-local" value={deadline}
+          onChange={e=>setDeadline(e.target.value)}/></label>
+      <button disabled={busy||!staffId||!formId} onClick={configure}>准备评价草稿</button>
     </div>}
     {configured&&<div className="ht-field-evidence">
       <p>冻结班级：<code>{configured.classUnitId}</code>
@@ -160,21 +171,17 @@ export function HuiteacherStudentEvaluationManager({organizationId,eventId,event
         <label className="ht-field"><span>截止时间（选填，本地时间）</span>
           <input type="datetime-local" value={deadline}
             onChange={e=>setDeadline(e.target.value)}/></label>
-        <button disabled={busy} onClick={create}>建立评教任务草稿</button>
+        <button disabled={busy} onClick={create}>继续准备已保存的评价</button>
       </div>}
       {assignedRun&&<div className="ht-event">
         <p>标准 Run · {assignedRun.status} · {assignedRun.runId}</p>
         <div className="ht-inline">
-          {eventStatus==='DRAFT'&&assignedRun.status==='DRAFT'&&<>
-            <button disabled={busy} onClick={previewRun}>预览冻结资格</button>
-            <button disabled={busy} onClick={openEvent}>开放评价活动</button>
-          </>}
-          {eventStatus==='OPEN'&&assignedRun.status==='DRAFT'&&
-            <button disabled={busy} onClick={publish}>发布学生评教任务</button>}
+          {['DRAFT','OPEN'].includes(eventStatus)&&assignedRun.status==='DRAFT'&&
+            <button disabled={busy} onClick={publish}>发布评价</button>}
           {assignedRun.status==='PUBLISHED'&&<>
             <button disabled={busy} onClick={loadProgress}>查看参与进度</button>
             {eventStatus==='OPEN'&&<button disabled={busy} onClick={close}>
-              关闭任务并结束活动</button>}
+              结束评价并准备群体反馈</button>}
           </>}
           {eventStatus==='OPEN'&&assignedRun.status==='CLOSED'&&
             <button disabled={busy} onClick={close}>完成活动关闭</button>}
@@ -190,6 +197,7 @@ export function HuiteacherStudentEvaluationManager({organizationId,eventId,event
       {report&&<HuiteacherStudentFeedbackView report={report}/>}
     </div>}
     <p className="ht-muted">新发布的评教任务自动沿用本校已保存的隐私偏好。
-      旧任务继续执行原有规则。个人答案、身份映射、响应时间与开放文本始终不通过群体报告公开。</p>
+      旧任务继续执行原有规则。结束评价不会自动向教师披露：首次群体报告仍须按授权正式发布。
+      个人答案、身份映射、响应时间与开放文本始终不通过群体报告公开。</p>
   </section>
 }

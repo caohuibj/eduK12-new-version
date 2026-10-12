@@ -158,7 +158,7 @@ export const discloseProtectedFormItems=(items:ItemAccumulator[],count:number,op
  */
 export async function readTeacherFormGroupReport(input:{
   organizationId:string;eventId:string;formId:string;actorUserId:string;
-  publishV2?:boolean
+  publishV2?:boolean;releasedOnly?:boolean
 }){
   return prisma.$transaction(async tx=>{
     if(input.publishV2)await lockTeacherDisclosure(tx,input.organizationId)
@@ -233,6 +233,8 @@ export async function readTeacherFormGroupReport(input:{
         ||Date.now()-source.runClosedAt.getTime()<86_400_000))
         reject('HUITEACHER_REPORT_RELEASE_DELAY',409)
     }else if(input.publishV2)reject('HUITEACHER_REPORT_V2_RUN_REQUIRED',409)
+    if(!frozen&&input.releasedOnly)
+      reject('HUITEACHER_REPORT_LEGACY_REQUIRES_AUTHORIZED_READ',409)
     const requiredN=frozen
       ?await teacherReportFloor(tx,{organizationId:input.organizationId,
         runId:source.runId,resourceKey:'huiteacher-form:'+input.formId,

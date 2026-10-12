@@ -188,11 +188,16 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
     setReports(previous=>({...previous,[event.id]:report}))
     setNotice('群体报告已正式发布，后续授权访问只读取同一份快照。')
   })
-  const readGroup=(event:Event)=>perform(async()=>{
+  const readGroup=(event:Event,historical=false)=>perform(async()=>{
     const formId=formChoice[event.id]||releasedForms[0]?.id
     if(!formId)throw new Error('请先选择报告对应的发布表单')
+    // New immutable releases are read-only without fresh TOTP; legacy GET
+    // may write the first disclosure ledger, so it retains its own step-up.
+    const releasedOnly=import.meta.env.VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'
+      &&!historical
     const report=await api<GroupReport>(
-      base+'/evaluation-events/'+event.id+'/forms/'+formId+'/group-report')
+      base+'/evaluation-events/'+event.id+'/forms/'+formId
+        +'/group-report'+(releasedOnly?'/released':''))
     setReports(previous=>({...previous,[event.id]:report}))
   })
   const transition=(event:Event,action:'OPEN'|'CLOSE'|'CANCEL')=>perform(async()=>{
@@ -322,8 +327,13 @@ export function HuiteacherEvaluationStudio({organizationId,api}:{
                 正式发布群体报告
               </button>}
             <button onClick={()=>readGroup(event)} disabled={working||!formChoice[event.id]}>
-              查看受保护的学校群体报告
+              {import.meta.env.VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'
+                ?'查看已发布群体报告':'查看学校群体报告'}
             </button>
+            {import.meta.env.VITE_REPORT_PRIVACY_TEACHER_V2_ENABLED==='true'&&
+              <button onClick={()=>readGroup(event,true)} disabled={working||!formChoice[event.id]}>
+                查看历史规则报告（首次读取需近期验证）
+              </button>}
           </div>}
         {progress[event.id]&&<p>已完成 {progress[event.id].counts.COMPLETED??0} /
           {progress[event.id].total} · 进行中 {progress[event.id].counts.IN_PROGRESS??0}</p>}
