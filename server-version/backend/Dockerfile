@@ -24,9 +24,9 @@ ARG DEBIAN_MIRROR=
 ARG NPM_REGISTRY=https://registry.npmjs.org
 
 # 编译期系统依赖（canvas 等 native module 需要）
+# The slim base cannot verify an HTTPS mirror before ca-certificates exists.
+# Bootstrap CA from Debian's APT-signed default archives, then switch to HTTPS.
 RUN set -eu; \
-    # Bootstrap CA trust from the image's official, APT-signed Debian archive. \
-    # The slim base cannot verify an HTTPS mirror before ca-certificates exists. \
     apt-get -o APT::Update::Error-Mode=any update \
     && apt-get install -y --no-install-recommends ca-certificates \
     && if [ -n "$DEBIAN_MIRROR" ]; then \
@@ -94,9 +94,9 @@ WORKDIR /app
 ARG DEBIAN_MIRROR=
 
 # 运行时系统库（无编译器）；ffmpeg 由 fluent-ffmpeg 直接调用
+# The slim base cannot verify an HTTPS mirror before ca-certificates exists.
+# Bootstrap CA from Debian's APT-signed default archives, then switch to HTTPS.
 RUN set -eu; \
-    # Bootstrap CA trust from the image's official, APT-signed Debian archive. \
-    # The slim base cannot verify an HTTPS mirror before ca-certificates exists. \
     apt-get -o APT::Update::Error-Mode=any update \
     && apt-get install -y --no-install-recommends ca-certificates \
     && if [ -n "$DEBIAN_MIRROR" ]; then \
