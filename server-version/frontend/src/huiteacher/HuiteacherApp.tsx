@@ -308,7 +308,7 @@ export default function HuiteacherApp(){
       {me.role!=='STUDENT'&&<HuiteacherConsensusReviews api={teacherApi}/>} 
       <HuiteacherMyFormTasks key={me.role==='STUDENT'?'student':'teacher'}
         student={me.role==='STUDENT'} api={teacherApi}/>
-      {me.role!=='STUDENT'&&<HuiteacherMyStudentFeedback api={teacherApi}/>}
+      {me.role!=='STUDENT'&&import.meta.env.VITE_HUITEACHER_STUDENT_FEEDBACK_ENABLED==='true'&&<HuiteacherMyStudentFeedback api={teacherApi}/>}
       {me.role!=='STUDENT'&&<HuiteacherMyScaleTasks api={teacherApi}/>}
       {me.role!=='STUDENT'&&<section className="ht-panel"><h2>后续功能模块</h2>
         <p>教师自主测评、组织调查、课堂与教研观察、学生评教及纵向改进将按 PR2—PR6 的顺序接入。</p>

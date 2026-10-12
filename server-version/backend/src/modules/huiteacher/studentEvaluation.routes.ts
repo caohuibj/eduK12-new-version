@@ -27,6 +27,11 @@ const limiter=createRedisRateLimiter({
   limit:30,windowSeconds:900,
   key:req=>req.user?.userId||req.ip||'unknown',
 })
+const reportLimiter=createRedisRateLimiter({
+  name:'huiteacher-student-feedback-group-release',
+  limit:8,windowSeconds:900,
+  key:req=>req.user?.userId||req.ip||'unknown',
+})
 const wrap=(fn:(req:any)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
   try{return success(res,await fn(req))}
   catch(e){
@@ -104,7 +109,7 @@ router.post(path+'/run/publish',requireTeacherProductAdmin,requireRecentTeacherM
     ...runVersion.parse(req.body),
   })))
 
-router.get(path+'/report',wrap(req=>
+router.get(path+'/report',reportLimiter,wrap(req=>
   readHuiteacherStudentFeedbackReport({
     ...params.parse(req.params),actorUserId:req.user!.userId,
   })))

@@ -216,6 +216,23 @@ suite('Huiteacher PR5 canonical student feedback (isolated PostgreSQL)',()=>{
       const answers={q1:i<5?'yes':'no',q2:i===0?'no':'yes',
         ...(i<5?{q3:'具体建议不应出现在报告中'}:{})}
       const submissionId=randomUUID()
+      if(i===1){
+        // Two tabs race with the same logical command. At most one
+        // authoritative FINAL can be stored even if one caller must retry.
+        const attempts=await Promise.allSettled([
+          submitOwnHuiteacherFormFinal({
+            actorUserId:execution.studentId,attemptId,submissionId,answers,
+          }),
+          submitOwnHuiteacherFormFinal({
+            actorUserId:execution.studentId,attemptId,submissionId,answers,
+          }),
+        ])
+        expect(attempts.some(result=>result.status==='fulfilled')).toBe(true)
+        expect(await db.huiteacherFormFinal.count({
+          where:{organizationId:org.id,attemptId},
+        })).toBe(1)
+        continue
+      }
       const final=await submitOwnHuiteacherFormFinal({
         actorUserId:execution.studentId,attemptId,submissionId,answers,
       })
