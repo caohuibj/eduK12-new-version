@@ -26,6 +26,15 @@ describe('Survey frozen one-by-one response timing',()=>{
     expect(item.activeTimeMs).toBe(2000)
     expect(item.interrupted).toBe(true)
   })
+  it('does not fabricate 0 ms when the first selection occurred while hidden',()=>{
+    const tracker=new SurveyScaleTimingTracker()
+    tracker.enter('qone',false,200)
+    tracker.answer('qone',undefined,'o4',900)
+    expect(tracker.snapshot(900).qone).toMatchObject({
+      firstResponseMs:null,activeTimeMs:0,
+      recoveredWithoutClock:true,interrupted:true,
+    })
+  })
   it('never invents an old first reaction time after cross-device recovery',()=>{
     const tracker=new SurveyScaleTimingTracker({}, {qone:'o4'})
     tracker.enter('qone',true,0)
