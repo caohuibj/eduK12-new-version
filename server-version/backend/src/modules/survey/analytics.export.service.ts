@@ -93,7 +93,8 @@ export async function createSurveyExport(req:Request,input:{
     sources:Source;artifact:SurveyRawExport|BoundedResearchExport;
     nextCursor:string|null;pageNumber:number|null;
     digest:string;cipher:string;value:SurveyExportArtifact
-    manifest:{rowCount:number;columnCount:number;
+    manifest:{schemaVersion:1|2;format:string;rowCount:number;columnCount:number;
+      completedFinalCount:number;
       batch:{phase:string;representation:string;hasNext:boolean;
         totalIncludedFinals:number|null;totalNonFinalAttempts:number|null};
       selection:{format:Format;completedBefore:string|null;completedFrom:string|null};
@@ -250,7 +251,7 @@ export async function createSurveyExport(req:Request,input:{
     }
   }
   if(!ready)fail(503,'导出页构建未完成')
-  const {sources,artifact,nextCursor,pageNumber,digest,cipher,value,manifest}=ready
+  const {sources,artifact,nextCursor,pageNumber,digest,cipher,manifest}=ready
   const id=randomUUID(),expiresAt=new Date(Date.now()+10*60000)
   await prisma.$transaction(async tx=>{
     const current=await guardedOwner(tx,uid,input.projectId)
