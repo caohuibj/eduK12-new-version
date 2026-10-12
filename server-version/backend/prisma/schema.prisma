@@ -3248,3 +3248,17 @@ model HuiteacherFieldConsensusSource {
   @@index([organizationId,eventId,consensusId],map:"huiteacher_field_consensus_sources_scope_idx")
   @@map("huiteacher_field_consensus_sources")
 }
+
+model HuiteacherFieldConsensusApproval {
+  id             String   @id
+  organizationId String   @map("organization_id")
+  eventId        String   @map("event_id")
+  consensusId    String   @map("consensus_id")
+  observerUserId String   @map("observer_user_id")
+  revision       Int
+  contentHash    String   @map("content_hash")
+  approvedAt     DateTime @default(now()) @map("approved_at") @db.Timestamptz(6)
+  @@unique([consensusId,observerUserId,revision],map:"huiteacher_field_consensus_approvals_once_revision")
+  @@index([organizationId,eventId,consensusId,revision],map:"huiteacher_field_consensus_approvals_revision_idx")
+  @@map("huiteacher_field_consensus_approvals")
+}
