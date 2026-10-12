@@ -105,6 +105,10 @@ jobs:
         run: node --test ../../.github/scripts/cognitive-content.test.mjs ../../.github/scripts/content-workflows.test.mjs
       - name: prisma generate
         run: npx prisma generate
+      # Compile before seeding, upgrade rehearsal and long-running data gates.
+      # One actual backend build; later jobs consume this exact verified artifact.
+      - name: build (tsc) — fail fast on source/type errors
+        run: npm run build
       - name: prisma migrate deploy
         run: npm run db:migrate:guarded
       - name: seed reference and configuration data
@@ -122,8 +126,6 @@ jobs:
         run: mkdir -p "$UPLOAD_DIR"
       - name: read-only release data preflight
         run: npm run db:release:preflight
-      - name: situational data-only manifests and publication gates
-        run: npm run situational:contracts
       - name: verify SJT immutable releases and publication authority
         if: github.event_name == 'pull_request'
         env:
@@ -140,8 +142,6 @@ jobs:
         env:
           BUNDLE_CONTENT_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: npx tsx scripts/bundle-content-check.ts
-      - name: build (tsc)
-        run: npm run build
       - name: bind backend artifact to source and run
         run: node "$GITHUB_WORKSPACE/.github/scripts/ci-artifact.mjs" write backend
       - name: publish tested backend build

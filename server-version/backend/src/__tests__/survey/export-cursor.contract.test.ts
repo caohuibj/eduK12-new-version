@@ -15,6 +15,44 @@ describe('Survey bounded export continuation proof',()=>{
         freeTextIncluded:false,finalCount:22}
       const serialized=encodeSurveyExportCursor(cursor)
       expect(decodeSurveyExportCursor(serialized,'a','RAW_WAVE','b')).toEqual(cursor)
+      const v2={...cursor,v:2 as const}
+      const upgraded=encodeSurveyExportCursor(v2)
+      expect(decodeSurveyExportCursor(upgraded,'a','RAW_WAVE','b')).toEqual(v2)
+      const v3={...cursor,v:3 as const,phase:'FINALS' as const,attendanceCount:2}
+      expect(decodeSurveyExportCursor(encodeSurveyExportCursor(v3),'a','RAW_WAVE','b'))
+        .toEqual(v3)
+      const attendance={...v3,phase:'ATTENDANCE' as const,
+        afterAttemptId:'22222222-2222-4222-8222-222222222222',page:3}
+      expect(decodeSurveyExportCursor(encodeSurveyExportCursor(attendance),'a','RAW_WAVE','b'))
+        .toEqual(attendance)
+      const v4={...v3,v:4 as const,pageLimit:25}
+      expect(decodeSurveyExportCursor(encodeSurveyExportCursor(v4),'a','RAW_WAVE','b'))
+        .toEqual(v4)
+      const v4attendance={...v4,phase:'ATTENDANCE' as const,
+        afterAttemptId:'22222222-2222-4222-8222-222222222222',page:37}
+      expect(decodeSurveyExportCursor(encodeSurveyExportCursor(v4attendance),
+        'a','RAW_WAVE','b')).toEqual(v4attendance)
+      for(const illegal of [0,251,-5,1.2]){
+        expect(()=>decodeSurveyExportCursor(encodeSurveyExportCursor({
+          ...v4,pageLimit:illegal,
+        }),'a','RAW_WAVE','b')).toThrow()
+      }
+      expect(()=>decodeSurveyExportCursor(encodeSurveyExportCursor({
+        ...v4,page:501,
+      }),'a','RAW_WAVE','b')).toThrow()
+      expect(()=>decodeSurveyExportCursor(encodeSurveyExportCursor({
+        ...attendance,attendanceCount:-1,
+      }),'a','RAW_WAVE','b')).toThrow()
+      expect(()=>decodeSurveyExportCursor(encodeSurveyExportCursor({
+        ...attendance,afterAttemptId:'not-a-uuid',
+      }),'a','RAW_WAVE','b')).toThrow()
+      expect(()=>decodeSurveyExportCursor(encodeSurveyExportCursor({
+        ...v3,phase:'UNKNOWN' as 'FINALS',
+      }),'a','RAW_WAVE','b')).toThrow()
+      expect(()=>decodeSurveyExportCursor(upgraded,'a','RAW_LONG','b')).toThrow()
+      expect(()=>decodeSurveyExportCursor(encodeSurveyExportCursor({
+        ...cursor,v:3 as unknown as 2,
+      }),'a','RAW_WAVE','b')).toThrow()
       expect(()=>decodeSurveyExportCursor(serialized,'wrong','RAW_WAVE','b')).toThrow()
       expect(()=>decodeSurveyExportCursor(serialized,'a','SCORE_LONG','b')).toThrow()
       expect(()=>decodeSurveyExportCursor(serialized.slice(0,-3)+'zzz','a','RAW_WAVE','b')).toThrow()

@@ -2819,6 +2819,9 @@ model SurveyWave {
   generalText     String        @default("") @map("general_text")
   hardStopAt      DateTime?     @map("hard_stop_at") @db.Timestamptz(6)
   instrumentIds   Json          @default("[]") @map("instrument_ids")
+  flowDefinition  Json?         @map("flow_definition")
+  quotaPolicy     Json?         @map("quota_policy")
+  checkpointPolicy Json?        @map("checkpoint_policy")
   opensAt         DateTime?     @map("opens_at") @db.Timestamptz(6)
   closesAt        DateTime?     @map("closes_at") @db.Timestamptz(6)
   finishUntil     DateTime?     @map("finish_until") @db.Timestamptz(6)
@@ -2828,6 +2831,7 @@ model SurveyWave {
   createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt       DateTime      @default(now()) @map("updated_at") @db.Timestamptz(6)
   attempts        SurveyWaveAttempt[]
+  quotaBuckets    SurveyExperimentQuotaBucket[]
   finals          SurveyWaveFinal[]
   entryTokens     SurveyEntryToken[]
   consents        SurveyConsent[]
@@ -2860,18 +2864,51 @@ model SurveyWaveAttempt {
   participant    SurveyParticipant? @relation(fields:[participantId],references:[id],onDelete:Restrict)
   sessionHash    String?       @map("session_hash")
   runtimeAttemptId String?     @unique @map("runtime_attempt_id")
+  flowAssignmentCipher String?  @map("flow_assignment_cipher")
   status         String        @default("STARTED")
   startedAt      DateTime      @default(now()) @map("started_at") @db.Timestamptz(6)
   completedAt    DateTime?     @map("completed_at") @db.Timestamptz(6)
   excludedAt     DateTime?     @map("excluded_at") @db.Timestamptz(6)
   consents       SurveyConsent[]
   final          SurveyWaveFinal?
+  checkpoint     SurveyAttemptCheckpoint?
   sampleReview   SurveySampleReview?
   @@unique([id,projectId,waveId],map:"survey_attempts_id_project_wave_uniq")
   @@unique([waveId,participantId],map:"survey_attempts_wave_participant_key")
   @@unique([waveId,sessionHash],map:"survey_attempts_wave_session_key")
   @@index([projectId,waveId,status],map:"survey_attempts_project_wave_status_idx")
   @@map("survey_wave_attempts")
+}
+model SurveyExperimentQuotaBucket {
+  id            String      @id
+  projectId     String      @map("project_id")
+  waveId        String      @map("wave_id")
+  wave          SurveyWave  @relation(fields:[waveId],references:[id],onDelete:Restrict)
+  groupKey      String      @map("group_key")
+  maxAssigned   Int         @map("max_assigned")
+  assignedCount Int         @default(0) @map("assigned_count")
+  createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@unique([waveId,groupKey],map:"survey_quota_bucket_wave_group_uniq")
+  @@index([projectId,waveId],map:"survey_quota_bucket_project_wave_idx")
+  @@map("survey_experiment_quota_buckets")
+}
+model SurveyAttemptCheckpoint {
+  id           String            @id
+  projectId    String            @map("project_id")
+  waveId       String            @map("wave_id")
+  attemptId    String            @unique @map("attempt_id")
+  attempt      SurveyWaveAttempt @relation(fields:[attemptId,projectId,waveId],references:[id,projectId,waveId],onDelete:Cascade)
+  definitionDigest String        @map("definition_digest")
+  contentCipher String          @map("content_cipher")
+  contentHash  String            @map("content_hash")
+  version      Int               @default(0)
+  expiresAt    DateTime          @map("expires_at") @db.Timestamptz(6)
+  createdAt    DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  @@unique([attemptId,projectId,waveId],map:"survey_checkpoint_attempt_project_wave_uniq")
+  @@index([expiresAt],map:"survey_checkpoint_expiry_idx")
+  @@index([projectId,waveId],map:"survey_checkpoint_project_wave_idx")
+  @@map("survey_attempt_checkpoints")
 }
 model SurveyEntryToken {
   id           String        @id

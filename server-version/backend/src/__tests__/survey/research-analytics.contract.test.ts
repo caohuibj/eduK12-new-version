@@ -118,6 +118,10 @@ describe('Survey longitudinal export and matched descriptive contracts',()=>{
     const raw=rawWideExport(project,source)
     const score=exportWide(project,source.scores,source.attendance,source.scoreColumns)
     const longRaw=rawLongExport(project,source)
+    // Historical frozen Scale had no timing protocol: NULL ms is deliberately
+    // NOT_COLLECTED, not a zero millisecond response or a failed timer.
+    expect(longRaw.csv).toContain('"NOT_COLLECTED"')
+    expect(longRaw.csv).toContain('"first_response_ms"')
     const longScore=exportLong(project,source.scores,source.attendance,source.scoreColumns)
     for(const long of [longRaw,longScore]){
       expect(long.manifest.rowCount).toBe(4)

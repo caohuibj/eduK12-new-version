@@ -1,5 +1,8 @@
 import { assertSurveyDraft, type FormDraft, type ScaleDraft, type SjtDraft } from './builder.definition'
 import { verifiedSurveyAttempt } from './admission.service'
+import { prisma } from '../../config/database'
+import { ensureSurveyFlowAssignment } from './flow.assignment'
+import { buildSurveyFlowPublicProjection } from './flow.runtime'
 import { SurveyWaveError } from './waves.service'
 type SurveyFrozenImage=NonNullable<FormDraft['pages'][number]['questions'][number]['image']>
 export function projectPublicSurveyImage(image:SurveyFrozenImage|undefined){
@@ -18,6 +21,14 @@ export async function getOwnResearchTask(input:{
   const own=await verifiedSurveyAttempt(input)
   if(!['STARTED','COMPLETED'].includes(own.status))
     throw new SurveyWaveError(403,'研究作答已经关闭')
+  // Recheck current identity under Attempt/participant locks; this persists
+  // cryptographic assignment before revealing any selected stimulus.
+  const assignment=own.compiledSnapshot.flow
+    ?await prisma.$transaction(tx=>ensureSurveyFlowAssignment(tx,{
+      projectId:own.projectId,waveId:own.waveId,attemptId:own.attemptId,
+      participantId:own.participantId,researchCode:input.researchCode,
+      accessCredential:input.accessCredential,snapshot:own.compiledSnapshot,
+    })):null
   const units=own.compiledSnapshot.units.map(unit=>{
     if(unit.kind==='FORM'){
       // Published definitions are immutable; do not retroactively invalidate an
@@ -40,6 +51,7 @@ export async function getOwnResearchTask(input:{
     if(unit.kind==='SCALE'){
       const d=assertSurveyDraft('SCALE',unit.displayDefinition,true) as ScaleDraft
       return {kind:'SCALE',instrumentKey:unit.instrumentKey,title:unit.title,
+        presentationMode:d.presentationMode??'ALL_AT_ONCE',
         responseOptions:d.responseOptions.map(o=>({optionKey:o.optionKey,label:o.label})),
         items:d.items.map(q=>({itemKey:q.itemKey,prompt:q.prompt,required:q.required}))}
     }
@@ -53,5 +65,11 @@ export async function getOwnResearchTask(input:{
         options:q.options.map(o=>({optionKey:o.optionKey,label:o.label}))}))}
   })
   return {attemptId:own.attemptId,waveId:own.waveId,status:own.status,
-    definitionDigest:own.definitionDigest,reportMode:'GENERAL_ONLY',units}
+    definitionDigest:own.definitionDigest,reportMode:'GENERAL_ONLY',units,
+    ...(own.compiledSnapshot.checkpointPolicy?{
+      checkpointPolicy:{enabled:true,ttlHours:own.compiledSnapshot.checkpointPolicy.ttlHours},
+    }:{}),
+    ...(assignment&&own.compiledSnapshot.flow?{
+      flow:buildSurveyFlowPublicProjection(own.compiledSnapshot.flow,assignment),
+    }:{}),}
 }

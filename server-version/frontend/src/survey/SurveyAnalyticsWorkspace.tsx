@@ -12,6 +12,13 @@ type ItemStat={itemKey:string;instrumentKey:string;prompt:string;kind:string;res
   combinationFrequencies?:{value:string;count:number}[];responseType?:string;
   numericMean:number|null;numericSampleSd:number|null}
 type WaveItems={waveId:string;items:ItemStat[];descriptiveScores:ScoreStat[];note:string}
+type BoundedVariable={instrumentKey:string;itemKey:string;prompt:string;
+  responseType:string;columnKey:string;kind:string}
+type BoundedItem={analysisFinalCount:number;respondentN:number;prompt:string;
+  itemKey:string;instrumentKey:string;responseType:string;
+  frequencies:{value:string;count:number}[];missingByReason:Record<string,number>;
+  numericMean:number|null;numericSampleSd:number|null;
+  complete:true;sourceCutOff:string;note:string}
 type PairedScore={baselineN:number;followupN:number;matchedN:number;attritionN:number;lateJoinN:number;
   meanPairedChange:number|null;comparability:'COMPARABLE'|'NOT_COMPARABLE';reason?:string}
 type GroupResult={minGroupN:number;suppressedGroups:number;note:string;groups:Array<{
@@ -25,7 +32,8 @@ type QualityAudit={reviewedAt:string;reviewerId:string|null;previousVerdict:'INC
 type ExportFormat='RAW_WAVE'|'RAW_LONG'|'RAW_WIDE'|'SCORE_LONG'|'SCORE_WIDE'
 type Ticket={id:string;status:'READY';format:ExportFormat;expiresAt:string;
   nextCursor:string|null;pageNumber:number|null;
-  manifest:{rowCount:number;columnCount:number}}
+  manifest:{rowCount:number;columnCount:number;
+    batch?:{phase?:'VERIFIED_FINAL'|'NON_FINAL_PARTICIPATION';representation?:string}}}
 type Artifact={id:string;format:ExportFormat;csv:string;codebook:unknown;manifest:unknown}
 const kindOptions:Record<ExportFormat,string>={
   RAW_WAVE:'单波次逐题原始数据',
@@ -69,6 +77,9 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
   const [baseline,setBaseline]=useState(''),[followup,setFollowup]=useState('')
   const [paired,setPaired]=useState<Matched|null>(null)
   const [itemStats,setItemStats]=useState<WaveItems|null>(null)
+  const [boundedVariables,setBoundedVariables]=useState<BoundedVariable[]>([])
+  const [boundedItemKey,setBoundedItemKey]=useState('')
+  const [boundedItem,setBoundedItem]=useState<BoundedItem|null>(null)
   const [metricKey,setMetricKey]=useState(''),[metricInstrument,setMetricInstrument]=useState('')
   const [pairedScore,setPairedScore]=useState<PairedScore|null>(null)
   const [groupItem,setGroupItem]=useState(''),[groupScore,setGroupScore]=useState('')
@@ -93,6 +104,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
     if(ordered[0]){setWaveId(ordered[0].id);setBaseline(ordered[0].id)}
     if(ordered[1])setFollowup(ordered[1].id)
     setItemStats(null);setPairedScore(null);setGroupResult(null);setGroupItem('');setGroupScore('')
+    setBoundedVariables([]);setBoundedItemKey('');setBoundedItem(null)
   }
   useEffect(()=>{
     setOverview(null);setError('');setTicket(null);setPaired(null)
@@ -140,6 +152,23 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
       setMetricInstrument(result.descriptiveScores[0].instrumentKey)
     }
   })
+  const openBoundedDictionary=()=>void execute(async()=>{
+    const result=await api<{variables:BoundedVariable[]}>(
+      base+'/analytics/waves/'+waveId+'/items/dictionary')
+    setBoundedVariables(result.variables)
+    setBoundedItemKey(result.variables[0]?.columnKey??'')
+    setBoundedItem(null)
+    setMessage('已读取该波次冻结的变量字典。单题可处理最多 6000 份有效 FINAL，超过会明确报错。')
+  })
+  const loadBoundedItem=()=>void execute(async()=>{
+    const variable=boundedVariables.find(v=>v.columnKey===boundedItemKey)
+    if(!variable)throw new Error('请先选择一个冻结研究变量')
+    const result=await api<BoundedItem>(
+      base+'/analytics/waves/'+waveId+'/items/paged','POST',{
+        instrumentKey:variable.instrumentKey,itemKey:variable.itemKey,
+      })
+    setBoundedItem(result)
+  })
   const compareScore=()=>void execute(async()=>{
     const score=await api<PairedScore>(base+'/analytics/paired-scores','POST',{
       baselineWaveId:baseline,followupWaveId:followup,
@@ -171,18 +200,23 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
       ...(cursor?{cursor}:{}),
     })
     setTicket(result);setBatchDownloaded(false)
-    setMessage('第 '+(result.pageNumber||1)+' 批加密数据已生成；逐批下载并保留 Manifest。')
+    setMessage(result.manifest.batch?.representation==='ATTENDANCE_COMPACT_V1'
+      ?'已生成紧凑参与状态表；每人每波次一行。按研究编号及波次关联 FINAL CSV，切勿直接拼接两种 CSV。'
+      :'第 '+(result.pageNumber||1)+' 批有效 FINAL 已生成；逐批下载并保留 Manifest。')
   })
   const download=()=>{if(!ticket)return;void execute(async()=>{
     const artifact=await api<Artifact>(base+'/exports/'+ticket.id+'/download')
     const batchLabel=String(ticket.pageNumber??1).padStart(3,'0')
     const baseName='survey_'+projectId.slice(0,8)+'_'+artifact.format.toLowerCase()
-      +'_batch'+batchLabel+'_'+ticket.id.slice(0,8)
+      +'_batch'+batchLabel+(ticket.manifest.batch?.representation==='ATTENDANCE_COMPACT_V1'
+        ?'_attendance':'')+'_'+ticket.id.slice(0,8)
     downloadBlob(baseName+'.csv','\uFEFF'+artifact.csv,'text/csv;charset=utf-8')
     downloadBlob(baseName+'_codebook.json',JSON.stringify(artifact.codebook,null,2),'application/json;charset=utf-8')
     downloadBlob(baseName+'_manifest.json',JSON.stringify(artifact.manifest,null,2),'application/json;charset=utf-8')
     setBatchDownloaded(true)
-    setMessage('已下载当前批次 CSV、变量编码字典和 Manifest，请保管敏感数据。')
+    setMessage(ticket.manifest.batch?.representation==='ATTENDANCE_COMPACT_V1'
+      ?'已下载参与状态 CSV 和 Manifest；按状态表 research_code / wave_id 对应 FINAL 的 research_code_or_attempt / wave_id 关联，不能直接拼接行。'
+      :'已下载当前批次 CSV、变量编码字典和 Manifest，请保管敏感数据。')
   })}
   return <section className="border rounded-xl bg-white p-4 sm:p-6 my-5 space-y-4" aria-label="研究数据">
     <header><h2 className="text-xl font-semibold">研究数据 · Wave Analytics</h2>
@@ -276,11 +310,42 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
         <h3 className="font-semibold">逐题与描述性统计</h3>
         <div className="flex flex-wrap gap-3 items-end">
           <label className="text-sm">波次
-            <select className="input block" value={waveId} onChange={e=>{setWaveId(e.target.value);setTicket(null);setItemStats(null);setGroupResult(null);setGroupItem('');setGroupScore('')}}>
+            <select className="input block" value={waveId} onChange={e=>{setWaveId(e.target.value);setTicket(null);setItemStats(null);setGroupResult(null);setGroupItem('');setGroupScore('');setBoundedVariables([]);setBoundedItem(null)}}>
               {overview.waves.map(w=><option key={w.id} value={w.id}>T{w.ordinal} {w.title}</option>)}
             </select></label>
           <button type="button" className="btn-secondary" disabled={busy||!waveId} onClick={loadItems}>
             查看此波次题目频数与探索性得分</button>
+        </div>
+        <div className="border-t pt-4 space-y-3">
+          <h4 className="font-medium text-sm">大样本单题统计（至多 6000 份有效 FINAL）</h4>
+          <p className="text-xs text-slate-600">先读取冻结变量字典，再选择一个非敏感题目。
+            后台按 200 份分页，仅累积受控频数、缺失和数值统计；全部页校验通过后才返回结果。
+            本入口不自动展示敏感自由文本。</p>
+          <button type="button" className="btn-secondary" disabled={busy||!waveId}
+            onClick={openBoundedDictionary}>读取当前波次变量字典</button>
+          {boundedVariables.length>0&&<div className="flex flex-wrap gap-2 items-end">
+            <label className="block text-sm flex-1 min-w-[180px]">选择冻结变量
+              <select className="input block w-full" aria-label="大样本题目" value={boundedItemKey}
+                onChange={e=>{setBoundedItemKey(e.target.value);setBoundedItem(null)}}>
+                {boundedVariables.map(q=><option key={q.columnKey} value={q.columnKey}>
+                  {q.instrumentKey} · {q.prompt}（{q.itemKey}）</option>)}
+              </select>
+            </label>
+            <button type="button" className="btn-secondary" disabled={busy||!boundedItemKey}
+              onClick={loadBoundedItem}>计算本题完整分批统计</button>
+          </div>}
+          {boundedItem&&<div className="border rounded-lg p-3 text-sm space-y-2">
+            <p className="font-medium">{boundedItem.prompt}</p>
+            <p>有效分析 FINAL N={boundedItem.analysisFinalCount}，本题有效回答 N={boundedItem.respondentN}，
+              均值={boundedItem.numericMean?.toFixed(2)??'—'}，
+              SD={boundedItem.numericSampleSd?.toFixed(2)??'—'}</p>
+            {boundedItem.frequencies.length>0&&<p>选项频数：
+              {boundedItem.frequencies.map(row=>row.value+'：'+row.count).join('；')}</p>}
+            {Object.keys(boundedItem.missingByReason).length>0&&<p>缺失：
+              {Object.entries(boundedItem.missingByReason).map(([why,count])=>why+'：'+count).join('；')}</p>}
+            <p className="text-xs text-slate-500">已核对全部有效 FINAL ·
+              数据截止 {new Date(boundedItem.sourceCutOff).toLocaleString('zh-CN')} · {boundedItem.note}</p>
+          </div>}
         </div>
         {itemStats&&<div className="space-y-4">
           <p className="text-xs">{itemStats.note}</p>
@@ -357,7 +422,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
       </div>
       <div className="border rounded-xl p-4 space-y-4">
         <h3 className="font-semibold">匿名科研数据导出</h3>
-        <p className="text-sm">导出可能包含自由文本或研究编号，请确认研究用途与数据保存规定。每批导出最多处理 250 份 FINAL、2MB；RAW_WAVE 以及选定单波次的 RAW_LONG / SCORE_LONG 可按签名游标连续分批。全部波次 Wide 与未限定波次的 Long 仍适用 250 FINAL 上限；分批时请保留全部 CSV、Codebook、Manifest。</p>
+        <p className="text-sm">导出可能包含自由文本或研究编号，请确认研究用途与数据保存规定。每批至多 250 份 FINAL、2MB，复杂量表会按安全预算自动缩小批次；RAW_WAVE 以及选定单波次的 RAW_LONG / SCORE_LONG 可按签名游标连续分批。全部波次 Wide 与未限定波次的 Long 仍适用 250 FINAL 上限；新单波次分页的有效 FINAL 与非 FINAL 参与状态使用不同 CSV 结构，后者每人每波次一行，按研究编号和波次关联而非直接拼接。分批时请保留全部 CSV、Codebook、Manifest。</p>
         <form className="flex flex-wrap gap-3 items-end" onSubmit={stepUp}>
           <label className="text-sm">最新 TOTP 动态验证码
             <input className="input block" inputMode="numeric" type="password" autoComplete="off"
@@ -402,13 +467,15 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
           <p className="text-sm">导出 {ticket.format} · 第 {ticket.pageNumber||1} 批 · {ticket.manifest.rowCount} 行 ·
             {ticket.manifest.columnCount} 列</p>
           <p className="text-xs">到期：{new Date(ticket.expiresAt).toLocaleString('zh-CN')}</p>
+          {ticket.manifest.batch?.representation==='ATTENDANCE_COMPACT_V1'&&
+            <p className="text-xs text-amber-800">本批为独立参与状态表，不是逐题答案；请保留 Manifest 的关联说明。</p>}
           <button type="button" className="btn-secondary" disabled={busy} onClick={download}>
             下载当前批次 CSV、Codebook 与 Manifest</button>
           {ticket.nextCursor&&<button className="btn-secondary" type="button"
             disabled={busy||!batchDownloaded} onClick={()=>createExport(ticket.nextCursor!)}>
             当前批次已下载，生成下一批</button>}
           {ticket.nextCursor&&<p className="text-xs">分批数据以同一时间水位和研究修订版本固定样本范围；
-            逐批合并同名字段，不将不同批次作为独立研究波次。</p>}
+            FINAL 页可合并，独立参与状态页按研究编号与波次关联；不要将两类 CSV 直接拼接。</p>}
         </div>}
       </div>
     </>}

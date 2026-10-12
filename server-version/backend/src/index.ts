@@ -46,6 +46,7 @@ import { closeQueues, exportQueue, imageQueue, videoQueue } from './config/queue
 import { prismaPoolMetricLines, createQueueMetricSampler } from './services/resourceMetrics'
 import { cleanupExpiredExportArtifacts } from './services/exportStorage'
 import { cleanupExpiredSurveyExportTickets } from './modules/survey/analytics.export.service'
+import { cleanupExpiredSurveyCheckpoints } from './modules/survey/checkpoint.service'
 import { cleanupExpiredSubmissionIdempotencyReceipts } from './utils/submissionIdempotency'
 import { recordRequestPhase, requestObservabilityMiddleware, runtimeMetricLines } from './services/runtimeObservability'
 import { postgresActivityMetricLines } from './services/postgresActivityMetrics'
@@ -473,6 +474,9 @@ const startServer = async (): Promise<void> => {
   exportCleanupTimer = setInterval(() => {
     void cleanupStaleUploadDirectories()
     void cleanupStalePublicUploadAssets().catch(err => logger.warn('过期上传暂存清理失败', err))
+    void cleanupExpiredSurveyCheckpoints().then(removed=>{
+      if(removed)logger.info('过期 Survey 加密临时存档已清除',{removed})
+    }).catch(e=>logger.warn('Survey 临时存档清理失败',e))
     void cleanupExpiredSurveyExportTickets().then((removed)=>{
       if(removed)logger.info('过期 Survey 加密数据导出凭据已清除',{removed})
     }).catch(e=>logger.warn('Survey 导出凭据清理失败',e))

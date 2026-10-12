@@ -173,6 +173,8 @@ export async function transitionWave(userId:string,projectId:string,waveId:strin
       where:{id:waveId,projectId,status:wave.status,revision},data:changes,
     })
     if(row.count!==1)fail('波次状态变更并发冲突')
+    if(action==='HARD_STOP')
+      await tx.surveyAttemptCheckpoint.deleteMany({where:{projectId,waveId}})
     if(action==='HARD_STOP'||action==='CLOSE')
       await tx.surveyEntryToken.updateMany({
         where:{projectId,waveId,revokedAt:null},data:{revokedAt:now},

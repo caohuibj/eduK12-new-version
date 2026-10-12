@@ -6,6 +6,9 @@ import { surveyPublicRateLimits } from './public-rate.config'
 import { success,error } from '../../utils/response'
 import { SurveyWaveError } from './waves.service'
 import { SurveyFinalError,submitResearchFinal,readGeneralForOwnAttempt } from './final.service'
+import { screenOutResearchAttempt } from './flow.screen-out.service'
+import { SurveyAssignmentError } from './flow.assignment'
+import { readSurveyCheckpoint,saveSurveyCheckpoint,clearSurveyCheckpoint,SurveyCheckpointError } from './checkpoint.service'
 import { ResearchIdentityError,revokeLinkedResearchAccess,withdrawLinkedResearchData,withdrawSingleResearchAttempt } from './identity.service'
 import { SurveyFinalValidationError } from './final.compute'
 import { getOwnResearchTask } from './task.public'
@@ -34,8 +37,13 @@ const entry=consent.extend({entryToken:secret}).strict()
 const linked=consent.extend({researchCode:code,accessCredential:secret}).strict()
 const identity=z.object({researchCode:code,accessCredential:secret}).strict()
 const proof=z.object({researchCode:code.optional(),accessCredential:secret}).strict()
+const checkpointWrite=proof.extend({revision:z.number().int().min(0).max(100),
+  answers:z.record(z.record(z.unknown())),
+  itemTimings:z.record(z.record(z.unknown())).optional()}).strict()
 const submission=proof.extend({submissionId:z.string().min(16).max(200),
-  answers:z.record(z.record(z.unknown()))}).strict()
+  answers:z.record(z.record(z.unknown())),
+  itemTimings:z.record(z.record(z.unknown())).optional(),
+  presentation:z.object({shownBlocks:z.array(z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/)).max(70)}).strict().optional()}).strict()
 const handle=(action:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Response,next:NextFunction)=>{
   try{return success(res,await action(req))}
   catch(e){
@@ -43,6 +51,8 @@ const handle=(action:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Res
     if(e instanceof SurveyWaveError||e instanceof SurveyFinalError||e instanceof ResearchIdentityError)
       return error(res,e.message,-1,e.statusCode)
     if(e instanceof SurveyFinalValidationError)return error(res,e.path+'：'+e.message,-1,400)
+    if(e instanceof SurveyAssignmentError)return error(res,e.message,-1,409)
+    if(e instanceof SurveyCheckpointError)return error(res,e.message,-1,e.statusCode)
     next(e)
   }
 }
@@ -62,8 +72,24 @@ publicSurveyRouter.post('/r/:publicId/waves/:waveId/start-unlinked',handle(req=>
 publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/task',handle(req=>
   getOwnResearchTask({publicId:id.parse(req.params.publicId),
     attemptId:id.parse(req.params.attemptId),...proof.parse(req.body)})))
+const checkProof=(req:Request,params:{accessCredential:string;researchCode?:string})=>({
+  publicId:id.parse(req.params.publicId),attemptId:id.parse(req.params.attemptId),...params,
+})
+publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/checkpoint/read',handle(req=>
+  readSurveyCheckpoint(checkProof(req,proof.parse(req.body)))))
+publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/checkpoint/save',handle(req=>{
+  const body=checkpointWrite.parse(req.body)
+  return saveSurveyCheckpoint(checkProof(req,body),{
+    revision:body.revision,answers:body.answers,itemTimings:body.itemTimings,
+  })
+}))
+publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/checkpoint/clear',handle(req=>
+  clearSurveyCheckpoint(checkProof(req,proof.parse(req.body)))))
 publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/final',handle(req=>
   submitResearchFinal({publicId:id.parse(req.params.publicId),
+    attemptId:id.parse(req.params.attemptId),...submission.parse(req.body)})))
+publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/screen-out',handle(req=>
+  screenOutResearchAttempt({publicId:id.parse(req.params.publicId),
     attemptId:id.parse(req.params.attemptId),...submission.parse(req.body)})))
 publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/general',handle(req=>
   readGeneralForOwnAttempt({publicId:id.parse(req.params.publicId),

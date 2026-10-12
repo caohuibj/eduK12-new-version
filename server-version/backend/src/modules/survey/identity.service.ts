@@ -1,6 +1,7 @@
 import { createHash, randomBytes, randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
+import { allocateResearchFlowOnAdmission } from './flow.assignment'
 
 type Tx=Prisma.TransactionClient
 export class ResearchIdentityError extends Error {
@@ -28,11 +29,12 @@ async function activePublicWave(tx:Tx,projectId:string,waveId:string,rawEntry:st
     return fail('研究项目当前不接受新的多波次参与者')
   const rows=await tx.$queryRaw<Array<{
     waveId:string;ordinal:number;allowNewParticipants:boolean;
-    consentVersion:number;startsCount:number;quotaStarts:number|null
+    consentVersion:number;startsCount:number;quotaStarts:number|null;publicationId:string|null
   }>>`
     SELECT w.id AS "waveId",w.ordinal,
       w.allow_new_participants AS "allowNewParticipants",
       w.consent_version AS "consentVersion",
+      w.publication_id AS "publicationId",
       w.starts_count AS "startsCount",w.quota_starts AS "quotaStarts"
     FROM "survey_waves" w
     JOIN "survey_entry_tokens" t ON t.wave_id=w.id AND t.project_id=w.project_id
@@ -93,6 +95,10 @@ export async function createLinkedResearchIdentity(input:{
       id:randomUUID(),projectId:input.projectId,waveId:input.waveId,
       participantId,attemptId,consentVersion:input.consentVersion,accepted:true,
     }})
+    await allocateResearchFlowOnAdmission(tx,{
+      publicationId:wave.publicationId!,projectId:input.projectId,waveId:input.waveId,
+      attemptId,participantId,researchCode,accessCredential:secret,
+    })
   })
   return {researchCode,accessCredential:secret,attemptId}
 }
@@ -125,12 +131,17 @@ export async function revokeLinkedResearchAccess(input:{
 }):Promise<{revoked:true}>{
   const identity=await recoverLinkedResearchIdentity(input)
   return prisma.$transaction(async tx=>{
-    await tx.$queryRaw`SELECT id FROM survey_projects WHERE id=${input.projectId} FOR SHARE`
+    // Revocation takes the same project-wide serialization lock as withdrawal
+    // to avoid an Attempt -> participant checkpoint save lock inversion.
+    await tx.$queryRaw`SELECT id FROM survey_projects WHERE id=${input.projectId} FOR UPDATE`
     const changed=await tx.surveyParticipant.updateMany({where:{
       id:identity.participantId,projectId:input.projectId,status:'ACTIVE',
       credentialHash:sha256(input.accessCredential),credentialRevokedAt:null,
     },data:{status:'REVOKED',credentialRevokedAt:new Date()}})
     if(changed.count!==1)return fail()
+    // Partial answers must not outlive credential revocation.
+    await tx.surveyAttemptCheckpoint.deleteMany({where:{projectId:input.projectId,
+      attempt:{participantId:identity.participantId}}})
     // Retain a withdrawal-only proof. The prior secret can no longer read
     // any task, General or history, but still proves data-withdrawal authority.
     await tx.surveyEvent.create({data:{
@@ -197,8 +208,10 @@ export async function withdrawLinkedResearchData(input:{
     }})
     const excluded=await tx.surveyWaveAttempt.updateMany({where:{
       projectId:input.projectId,participantId:participant.participantId,
-      excludedAt:null,status:{in:['STARTED','COMPLETED']},
-    },data:{excludedAt:when,status:'WITHDRAWN'}})
+      excludedAt:null,status:{in:['STARTED','COMPLETED','SCREENED_OUT']},
+    },data:{excludedAt:when,status:'WITHDRAWN',flowAssignmentCipher:null}})
+    await tx.surveyAttemptCheckpoint.deleteMany({where:{projectId:input.projectId,
+      attempt:{participantId:participant.participantId}}})
     // An already-created export may still contain withdrawn responses.
     // Revoke future downloads atomically with the participant exclusion.
     await tx.surveyExportTicket.updateMany({where:{
@@ -230,12 +243,13 @@ export async function withdrawSingleResearchAttempt(input:{
     `
     const attempt=await tx.surveyWaveAttempt.findFirst({where:{
       id:input.attemptId,projectId:project.id,participantId:null,sessionHash:proof,
-      status:{in:['STARTED','COMPLETED']},excludedAt:null,
+      status:{in:['STARTED','COMPLETED','SCREENED_OUT']},excludedAt:null,
     }})
     if(!attempt)fail()
     await tx.surveyWaveAttempt.update({where:{id:attempt.id},data:{
-      status:'WITHDRAWN',excludedAt:new Date(),
+      status:'WITHDRAWN',excludedAt:new Date(),flowAssignmentCipher:null,
     }})
+    await tx.surveyAttemptCheckpoint.deleteMany({where:{attemptId:attempt.id}})
     await tx.surveyExportTicket.updateMany({where:{
       projectId:project.id,status:'READY',
     },data:{status:'REVOKED'}})

@@ -5,6 +5,8 @@ import { withFinalOnlyCompletionTransaction } from '../../services/questionnaire
 import { encryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { computeSurveyFinal, SurveyFinalValidationError } from './final.compute'
+import { SurveyScaleTimingError } from './timing.definition'
+import { ensureSurveyFlowAssignment } from './flow.assignment'
 import { hashResearchCredential } from './identity.service'
 import { verifiedSurveyAttempt } from './admission.service'
 import { SurveyWaveError } from './waves.service'
@@ -23,6 +25,8 @@ export interface FinalInput {
   researchCode?:string
   submissionId:string
   answers:Record<string,unknown>
+  itemTimings?:unknown
+  presentation?:{shownBlocks:string[]}
 }
 /** No per-item network scoring or database writes; a complete attempt makes
  * one atomic encrypted FINAL with the same canonical submit utilities used
@@ -41,6 +45,7 @@ export async function submitResearchFinal(input:FinalInput){
   const canonical=prepareCanonicalSubmission({
     publicationId:known.publicationId,definitionDigest:known.definitionDigest,
     answers:input.answers,
+    ...(input.itemTimings!==undefined?{itemTimings:input.itemTimings}:{}),
   })
   assertCanonicalSubmissionPayloadSize(canonical,1024*1024,'研究 FINAL 作答')
   return withFinalOnlyCompletionTransaction(async tx=>{
@@ -65,7 +70,17 @@ export async function submitResearchFinal(input:FinalInput){
     if(publication.id!==known.publicationId||
       publication.definitionDigest!==known.definitionDigest)
       invalid('提交时研究冻结版本已经发生变化')
-    if(attempt.participantId){
+    const snapshot=publication.compiledSnapshot as unknown as ResearchFrozenPublication
+    if(canonicalHash(JSON.parse(JSON.stringify(snapshot)))!==publication.definitionDigest)
+      blocked('冻结研究定义校验失败')
+    // Flow assignment is fixed to this Attempt while serialized with the
+    // Wave/Attempt and participant's current credential and revocation locks.
+    const assignment=snapshot.flow?await ensureSurveyFlowAssignment(tx,{
+      projectId:known.projectId,waveId:known.waveId,attemptId:input.attemptId,
+      participantId:known.participantId,researchCode:input.researchCode,
+      accessCredential:input.accessCredential,snapshot,
+    }):null
+    if(!snapshot.flow&&attempt.participantId){
       if(!input.researchCode)blocked('需再次提供本人研究编号与私密凭证')
       // Serialize this committed FINAL decision against REVOKE_ACCESS and
       // WITHDRAW_DATA. A cached pre-transaction credential check is insufficient.
@@ -77,7 +92,7 @@ export async function submitResearchFinal(input:FinalInput){
         credentialHash:hashResearchCredential(input.accessCredential),credentialRevokedAt:null,
       }})
       if(!person)blocked('研究身份已失效')
-    }else if(attempt.sessionHash!==hashResearchCredential(input.accessCredential))
+    }else if(!snapshot.flow&&attempt.sessionHash!==hashResearchCredential(input.accessCredential))
       blocked('单次研究作答凭证已失效')
     const existing=await tx.surveyWaveFinal.findUnique({where:{attemptId:attempt.id}})
     if(existing){
@@ -97,14 +112,12 @@ export async function submitResearchFinal(input:FinalInput){
       accepted:true,consentVersion:wave.consentVersion,
     },select:{id:true}})
     if(!consent)blocked('当前研究缺少有效的知情同意记录')
-    const snapshot=publication.compiledSnapshot as unknown as ResearchFrozenPublication
-    if(canonicalHash(JSON.parse(JSON.stringify(snapshot)))!==publication.definitionDigest)
-      blocked('冻结研究定义校验失败')
     let calculated
     try{
-      calculated=computeSurveyFinal(snapshot,input.answers)
+      calculated=computeSurveyFinal(snapshot,input.answers,assignment,
+        input.presentation?.shownBlocks,'FINAL',input.itemTimings)
     }catch(e){
-      if(e instanceof SurveyFinalValidationError)
+      if(e instanceof SurveyFinalValidationError||e instanceof SurveyScaleTimingError)
         throw new SurveyFinalError(400,e.path+'：'+e.message)
       throw e
     }
@@ -123,6 +136,7 @@ export async function submitResearchFinal(input:FinalInput){
       data:{status:'COMPLETED',completedAt:receipt.completedAt},
     })
     if(updated.count!==1)invalid('作答状态变更发生冲突')
+    await tx.surveyAttemptCheckpoint.deleteMany({where:{attemptId:attempt.id}})
     return {attemptId:attempt.id,receiptId:receipt.id,completedAt:receipt.completedAt,
       status:'COMPLETED' as const,idempotent:false,
       generalText:wave.generalText||'感谢参与研究，您的回答已完整提交。'}

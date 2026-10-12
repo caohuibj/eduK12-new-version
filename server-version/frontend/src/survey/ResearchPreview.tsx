@@ -16,7 +16,8 @@ export function ResearchPreview({draft,onSimulate,onValidateForm,errorPath}:{dra
   errorPath?:string}){
   const [answers,setAnswers]=useState<Record<string,Answer>>({})
   const [pageIndex,setPageIndex]=useState(0)
-  useEffect(()=>{setAnswers({});setPageIndex(0)},[draft.id,draft.revision])
+  const [scaleIndex,setScaleIndex]=useState(0)
+  useEffect(()=>{setAnswers({});setPageIndex(0);setScaleIndex(0)},[draft.id,draft.revision])
   useEffect(()=>{
     if(draft.kind!=='FORM'||!errorPath)return
     const key=errorPath.match(/^answers\.([a-z][a-z0-9_-]*)/i)?.[1]
@@ -121,12 +122,32 @@ export function ResearchPreview({draft,onSimulate,onValidateForm,errorPath}:{dra
           onClick={()=>setPageIndex(currentIndex+1)}>下一页</button>
       </nav>
     </div>}
-    {draft.kind==='SCALE'&&(draft.definition as ScaleDraft).items.map(q=><fieldset className="border rounded-lg bg-white p-3" key={q.itemKey}>
-      <legend>{q.prompt||'未填写题干'}</legend>
-      {(draft.definition as ScaleDraft).responseOptions.map(o=><label key={o.optionKey} className="block my-1">
-        <input type="radio" name={q.itemKey} checked={answers[q.itemKey]===o.optionKey}
-          onChange={()=>choose(q.itemKey,o.optionKey)}/> {o.label}</label>)}
-    </fieldset>)}
+    {draft.kind==='SCALE'&&(()=>{
+      const definition=draft.definition as ScaleDraft
+      const oneByOne=definition.presentationMode==='ONE_BY_ONE'
+      const index=Math.min(scaleIndex,Math.max(0,definition.items.length-1))
+      const items=oneByOne?definition.items.slice(index,index+1):definition.items
+      return <div className="space-y-3">
+        <p role="status" className="text-xs text-slate-600">
+          {oneByOne?`逐题预览 · 第 ${index+1} / ${definition.items.length} 题`
+            :'整份量表预览（历史默认呈现方式）'}
+        </p>
+        {items.map(q=><fieldset className="border rounded-lg bg-white p-3" key={q.itemKey}>
+          <legend>{q.prompt||'未填写题干'}</legend>
+          {definition.responseOptions.map(o=><label key={o.optionKey} className="block my-1">
+            <input type="radio" name={q.itemKey} checked={answers[q.itemKey]===o.optionKey}
+              onChange={()=>choose(q.itemKey,o.optionKey)}/> {o.label}</label>)}
+        </fieldset>)}
+        {oneByOne&&<nav className="flex justify-between gap-2" aria-label="研究量表逐题预览导航">
+          <button type="button" className="btn-secondary" disabled={index===0}
+            onClick={()=>setScaleIndex(v=>Math.max(0,v-1))}>上一题</button>
+          <button type="button" className="btn-secondary" disabled={index>=definition.items.length-1}
+            onClick={()=>setScaleIndex(v=>Math.min(definition.items.length-1,v+1))}>下一题</button>
+        </nav>}
+        {oneByOne&&<p className="text-xs text-slate-600">
+          预览用于核对题目呈现，不产生研究者或被试的正式反应时。</p>}
+      </div>
+    })()}
     {draft.kind==='SJT'&&<><div className="font-semibold">{(draft.definition as SjtDraft).stimulus}</div>
       {picture((draft.definition as SjtDraft).image)}
       {(draft.definition as SjtDraft).questions.map(q=><fieldset key={q.questionKey} className="border bg-white rounded-lg p-3">

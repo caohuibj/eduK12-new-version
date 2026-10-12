@@ -4,9 +4,11 @@ import { authenticateSurvey } from '../../middleware/auth'
 import { success,error } from '../../utils/response'
 import * as service from './analytics.read'
 import {listSampleQuality,listSampleQualityHistory,setSampleQuality} from './sample-quality.service'
-import {describeSurveyPairedScoresPaged} from './analytics.paged'
+import {describeSurveyPairedScoresPaged,describeSurveyWaveItemPaged,describeSurveyWaveGroupsPaged} from './analytics.paged'
 import { loadSurveySource } from './analytics.source'
-import { describeWave,describeWaveGroups } from './analytics.descriptive'
+import { describeWave } from './analytics.descriptive'
+import { describeSurveyFlowOperations } from './analytics.flow-operations'
+import { assertRecentSurveyMfa } from './analytics.export.service'
 
 
 export const surveyAnalyticsRouter=Router()
@@ -45,6 +47,18 @@ surveyAnalyticsRouter.post('/:pid/analytics/quality/attempts/:attemptId',wrap(re
     projectId:id.parse(req.params.pid),attemptId:id.parse(req.params.attemptId),
     ...review.parse(req.body)})))
 
+const key=z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/)
+const flowCohortInput=z.object({
+  category:z.object({instrumentKey:key,itemKey:key}).strict().optional(),
+  score:z.object({instrumentKey:key,scoreKey:key}).strict().optional(),
+}).strict()
+surveyAnalyticsRouter.post('/:pid/analytics/waves/:wid/flow-cohort',wrap(req=>{
+  const details=flowCohortInput.parse(req.body)
+  return describeSurveyFlowOperations(req,{
+    projectId:id.parse(req.params.pid),waveId:id.parse(req.params.wid),
+    ...details,
+  })
+}))
 surveyAnalyticsRouter.get('/:pid/analytics/overview',wrap(req=>
   service.waveOverview(req.user!.userId,id.parse(req.params.pid))))
 surveyAnalyticsRouter.post('/:pid/analytics/paired-counts',wrap(req=>{
@@ -59,6 +73,30 @@ const measurement=z.object({
   instrumentKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),
   scoreKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),
 }).strict()
+const itemRequest=z.object({
+  instrumentKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),
+  itemKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),
+}).strict()
+surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/items/dictionary',wrap(async req=>{
+  assertRecentSurveyMfa(req)
+  const projectId=id.parse(req.params.pid),waveId=id.parse(req.params.wid)
+  const source=await loadSurveySource({actorUserId:req.user!.userId,projectId,
+    waveIds:[waveId],maxFinals:1,pageMode:true,includeWideSchema:true,
+    includeAttendance:false})
+  return {waveId,source:'FROZEN_CODEBOOK',variables:source.codebook
+    .filter(c=>c.waveId===waveId&&!['SHORT_TEXT','LONG_TEXT','OTHER_TEXT'].includes(c.responseType))
+    .map(c=>({instrumentKey:c.instrumentKey,itemKey:c.itemKey,
+      prompt:c.prompt,responseType:c.responseType,kind:c.kind,
+      columnKey:c.columnKey,definitionDigest:c.definitionDigest})),
+  }
+}))
+surveyAnalyticsRouter.post('/:pid/analytics/waves/:wid/items/paged',wrap(req=>{
+  assertRecentSurveyMfa(req)
+  return describeSurveyWaveItemPaged({
+    actorUserId:req.user!.userId,projectId:id.parse(req.params.pid),
+    waveId:id.parse(req.params.wid),...itemRequest.parse(req.body),
+  })
+}))
 surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/items',wrap(async req=>{
   const projectId=id.parse(req.params.pid),waveId=id.parse(req.params.wid)
   const source=await loadSurveySource({actorUserId:req.user!.userId,projectId,
@@ -72,17 +110,23 @@ const groupRequest=z.object({
   scoreKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),
 }).strict()
 surveyAnalyticsRouter.post('/:pid/analytics/waves/:wid/group-scores',wrap(async req=>{
+  assertRecentSurveyMfa(req)
   const projectId=id.parse(req.params.pid),waveId=id.parse(req.params.wid)
   const input=groupRequest.parse(req.body)
-  const source=await loadSurveySource({
-    actorUserId:req.user!.userId,projectId,waveIds:[waveId],maxFinals:250,
-  })
-  try{return describeWaveGroups(source,{waveId,...input})}
-  catch(e){throw new service.SurveyAnalyticsError(409,
-    e instanceof Error?e.message:'此分组无法计算')}
+  try{
+    return await describeSurveyWaveGroupsPaged({
+      actorUserId:req.user!.userId,projectId,waveId,...input,
+    })
+  }catch(e){
+    if(e instanceof service.SurveyAnalyticsError)throw e
+    throw new service.SurveyAnalyticsError(409,
+      e instanceof Error?e.message:'此分组无法计算')
+  }
 }))
-surveyAnalyticsRouter.post('/:pid/analytics/paired-scores',wrap(async req=>
-  describeSurveyPairedScoresPaged({
+surveyAnalyticsRouter.post('/:pid/analytics/paired-scores',wrap(async req=>{
+  assertRecentSurveyMfa(req)
+  return describeSurveyPairedScoresPaged({
     actorUserId:req.user!.userId,
     projectId:id.parse(req.params.pid),...measurement.parse(req.body),
-  })))
+  })
+}))
