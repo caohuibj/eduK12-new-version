@@ -269,15 +269,19 @@ export async function publishCampusGeneralGroupV2(input:Scope){
     if(artifact.analysisKind!=='GROUP'
       ||artifact.organizationId!==input.organizationId
       ||artifact.specId!==input.specId
-      ||!('inputManifest' in payload)
       ||payload.source.runId!==input.runId
       ||payload.source.trackId!==input.trackId)
       hidden('CAMPUS_GENERAL_ARTIFACT_SOURCE_INVALID')
+    // A distinct expression is needed: the artifact return type contains
+    // non-GROUP variants, and TS cannot narrow the payload via artifact.kind.
+    const manifest:unknown='inputManifest' in payload
+      ?payload.inputManifest
+      :hidden('CAMPUS_GENERAL_ARTIFACT_SOURCE_INVALID')
     let contributors:string[]
     try{
       const published=approved.projection as {resultContributorN?:unknown}
       contributors=exactGeneralContributors(
-        payload.inputManifest,published.resultContributorN)
+        manifest,published.resultContributorN)
     }catch{return hidden('CAMPUS_GENERAL_ARTIFACT_CONTRIBUTORS_INVALID')}
     const contributorDigest=canonicalHash({
       kind:'SCHOOL_GENERAL_EFFECTIVE_FINAL_V2',organizationId:input.organizationId,
