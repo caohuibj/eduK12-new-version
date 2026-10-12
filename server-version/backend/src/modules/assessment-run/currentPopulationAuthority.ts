@@ -84,7 +84,8 @@ export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql): Prism
         AND teacher_subject.account_domain='SCHOOL'
         AND teacher_subject.is_active=TRUE AND teacher_subject.is_frozen=FALSE
       WHERE h.organization_id=org.id AND h.run_id=x.run_id
-        AND relation.relationship_kind='SELF'
+        AND (
+        (relation.relationship_kind='SELF'
         AND subject.actor_role='TEACHER' AND respondent.actor_role='TEACHER'
         AND subject.user_id=respondent.user_id
         -- A scored Teacher Scale needs an ACTIVE exact tenant license for
@@ -117,6 +118,51 @@ export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql): Prism
           WHERE deny.organization_id=org.id
             AND deny.user_id=respondent.user_id AND deny.lifted_at IS NULL
             AND deny.permission IN ('*','EDUCATION_ACCESS','HUITEACHER_ACCESS','RUN_START')
+        )
+        )
+        OR (
+          relation.relationship_kind='CLASS_TEACHER_STUDENT'
+          AND subject.actor_role='TEACHER' AND respondent.actor_role='STUDENT'
+          AND teacher_subject.role IN ('TEACHER','ADMIN')
+          AND teacher_respondent.role='STUDENT'
+          AND EXISTS(
+            SELECT 1 FROM huiteacher_student_eval_configs cfg
+            JOIN assessment_run_tracks track
+              ON track.organization_id=h.organization_id AND track.run_id=h.run_id
+              AND track.id=x.track_id
+              AND track.resource_family='FORM'
+              AND track.resource_key='huiteacher-student-form:'||cfg.form_id
+              AND track.resource_version=cfg.definition_digest
+            JOIN huiteacher_evaluation_targets target
+              ON target.organization_id=cfg.organization_id
+              AND target.id=event.target_id AND target.kind='PERSON'
+              AND target.subject_user_id=subject.user_id
+            JOIN organization_staff_class_assignments staff
+              ON staff.id=cfg.staff_assignment_id
+              AND staff.organization_id=cfg.organization_id
+              AND staff.class_unit_id=cfg.class_unit_id
+              AND staff.staff_role IN ('TEACHING','HOMEROOM')
+              AND staff.valid_from<=statement_timestamp()
+              AND (staff.valid_until IS NULL OR staff.valid_until>statement_timestamp())
+            JOIN organization_student_class_assignments placement
+              ON placement.id=relation.snapshot_payload->'facts'->>'studentClassAssignmentId'
+              AND placement.organization_id=cfg.organization_id
+              AND placement.class_unit_id=cfg.class_unit_id
+              AND placement.membership_id=respondent.membership_id
+              AND placement.valid_from<=statement_timestamp()
+              AND (placement.valid_until IS NULL OR placement.valid_until>statement_timestamp())
+            WHERE cfg.organization_id=h.organization_id
+              AND cfg.event_id=h.event_id
+              AND staff.id=relation.snapshot_payload->'facts'->>'staffClassAssignmentId'
+              AND relation.snapshot_payload->'facts'->>'classUnitId'=cfg.class_unit_id
+          )
+          AND NOT EXISTS(
+            SELECT 1 FROM organization_access_denies deny
+            WHERE deny.organization_id=org.id
+              AND deny.user_id=respondent.user_id AND deny.lifted_at IS NULL
+              AND deny.permission IN ('*','EDUCATION_ACCESS','HUITEACHER_ACCESS','RUN_START')
+          )
+        )
         )
     )
    ) OR (

@@ -2,7 +2,9 @@ import { Prisma } from '@prisma/client'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
 import { startRelationalCompositeAttemptInTransaction } from '../composite/composite.service'
-import { resolvePublishedTeacherForm,teacherFormResourceRef,TEACHER_FORM_RUNTIME_KIND } from '../huiteacher/formRunResource'
+import {resolvePublishedTeacherForm,teacherFormResourceRef,
+  TEACHER_FORM_RUNTIME_KIND} from '../huiteacher/formRunResource'
+import {studentFormResourceId,assertStudentFormRunUse} from '../huiteacher/studentFormResource'
 import { createSqlRelationalAssignmentRepository } from '../assessment-relational/repository'
 import { createRelationalAssessmentService } from '../assessment-relational/service'
 import {
@@ -263,17 +265,27 @@ const startTransactionalTeacherForm = async (input:{
   const existing=await tx.huiteacherFormAttempt.findUnique({
     where:{runExecutionId:input.executionId},
   })
-  const expectedRef=teacherFormResourceRef(
-    input.launch.runtimeTargetRef,
-    (await tx.$queryRaw<Array<{version:string}>>`
-      SELECT track."resource_version" AS "version"
-      FROM "assessment_run_executions" e
-      JOIN "assessment_run_tracks" track
-        ON track."organization_id"=e."organization_id"
-        AND track."run_id"=e."run_id" AND track."id"=e."track_id"
-      WHERE e."id"=${input.executionId} LIMIT 1
-    `)[0]?.version??'',
-  )
+  const frozen=(await tx.$queryRaw<Array<{key:string;version:string}>>`
+    SELECT track."resource_key" AS "key",track."resource_version" AS "version"
+    FROM "assessment_run_executions" execution
+    JOIN "assessment_run_tracks" track
+      ON track."organization_id"=execution."organization_id"
+      AND track."run_id"=execution."run_id"
+      AND track."id"=execution."track_id"
+    WHERE execution."id"=${input.executionId} LIMIT 1
+  `)[0]
+  if(!frozen)throw new RunStartExecutionError('RUN_FROZEN_FORM_MISSING','form track not available',409)
+  const studentRef={family:'FORM' as const,key:frozen.key,version:frozen.version}
+  const studentFormId=studentFormResourceId(studentRef)
+  if(studentFormId){
+    if(studentFormId!==input.launch.runtimeTargetRef)
+      throw new RunStartExecutionError('RUN_FROZEN_FORM_MISMATCH','student form launch mismatch',409)
+    await assertStudentFormRunUse(tx,{organizationId:admission.execution.organizationId,
+      runId:admission.execution.runId,ref:studentRef})
+  }else if(frozen.key!=='huiteacher-form:'+input.launch.runtimeTargetRef){
+    throw new RunStartExecutionError('RUN_FROZEN_FORM_MISMATCH','teacher form launch mismatch',409)
+  }
+  const expectedRef=teacherFormResourceRef(input.launch.runtimeTargetRef,frozen.version)
   const form=await resolvePublishedTeacherForm(expectedRef,tx)
   if(form.organizationId!==admission.execution.organizationId)
     throw new RunStartExecutionError('RUN_CROSS_PRODUCT_FORM','Teacher Form does not belong to current school',403)
