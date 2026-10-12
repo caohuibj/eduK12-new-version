@@ -102,9 +102,13 @@ export function HuiteacherMyFormTasks({api,student=false}: {api:Api;student?:boo
       return next
     })
   }
-  const visiblePages=active?active.pages.filter(p=>p.questions.some(q=>
-    visibleFormKeys(active.pages.flatMap(page=>page.questions),answers).has(q.itemKey))):[]
-  const last=page>=Math.max(0,visiblePages.length-1)
+  // UI page indices are ORIGINAL Form page positions. Counting only visible
+  // pages changes their indices and permits early FINAL when an earlier page
+  // is hidden while a later, required page remains visible.
+  const visible=active?visibleFormKeys(active.pages.flatMap(p=>p.questions),answers):new Set<string>()
+  const lastVisiblePage=active?active.pages.reduce((latest,p,index)=>
+    p.questions.some(q=>visible.has(q.itemKey))?index:latest,-1):-1
+  const last=page>=Math.max(0,lastVisiblePage)
   const submit=()=>{
     if(!active||!last)return
     const source=active
@@ -134,7 +138,7 @@ export function HuiteacherMyFormTasks({api,student=false}: {api:Api;student?:boo
       ?'使用原有教育账号参与已获授权的教师评教。身份用于确认资格，教师不能查看逐人作答；这属于身份受保护评价，不是绝对匿名。'
       :'使用统一教育账号完成本人获授权的评价；与 Huischool 心理数据及 Survey 研究作答隔离。'}</p>
     {notice&&<p role="status" className="ht-notice">{notice}</p>}
-    {tasks.length===0?<p className="ht-empty">暂无已分配的学生评教任务。</p>:
+    {tasks.length===0?<p className="ht-empty">{student?'暂无已分配的学生评教任务。':'暂无已分配的教师发展评价任务。'}</p>:
       <div className="ht-event-list">{tasks.map(item=><article className="ht-event" key={item.executionId}>
         <strong>{item.formTitle}</strong> <span className="ht-tag">{item.status}</span>
         <p>{item.eventTitle}{student&&item.teacherName?' · '+item.teacherName:''}</p>
