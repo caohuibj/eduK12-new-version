@@ -264,7 +264,9 @@ export default function HuiteacherApp(){
           {me.role==='STUDENT'?<><Field label="学校核验学号" value={studentNumber} set={setStudentNumber}/>
             <button onClick={joinStudent} disabled={working||!inviteCode||!studentNumber}>使用原学生账号加入</button></>
            :<button onClick={joinStaff} disabled={working||!inviteCode}>使用已有教师账号加入</button>}</div>
-        {me.organizations.length===0?<p className="ht-empty">当前没有开通 Huiteacher 的学校任务授权。具有个人测评许可时，仍可使用下方个人自主测评工作台。</p>:
+        {me.organizations.length===0?<p className="ht-empty">{me.role==='STUDENT'
+          ?'当前没有开通 Huiteacher 的学生评教任务；请使用本校正式邀请补齐学生资格。'
+          :'当前没有开通 Huiteacher 的学校任务授权。若拥有个人 Scale 许可，可前往教师成长工作台。'}</p>:
           <label className="ht-field"><span>当前学校</span><select value={selectedOrg} onChange={e=>setSelectedOrg(e.target.value)}>
             {me.organizations.map(o=><option key={o.organizationId} value={o.organizationId}>{o.organizationName}</option>)}
           </select></label>}

@@ -271,10 +271,9 @@ export async function createHuiteacherEventRunDraft(input:{
         organizationId:input.organizationId,eventId:input.eventId,
       }},select:{id:true},
     })
-    // A student→teacher Run requires an exact role/relationship policy and
-    // new START/FINAL/report disclosure adapters. Do not silently publish an
-    // ordinary Teacher SELF Form for the same configured event.
-    if(studentFeedback)fail('HUITEACHER_STUDENT_EVAL_RUN_ADAPTER_NOT_RELEASED',403)
+    // PR5 student->teacher Run now uses a dedicated atomic config-bound
+    // endpoint. Generic SELF Run creation still cannot reinterpret this event.
+    if(studentFeedback)fail('HUITEACHER_STUDENT_EVAL_USE_DEDICATED_RUN',403)
     const run=await createAssessmentRunDraft({
       tx,organizationId:input.organizationId,createdByUserId:input.actorUserId,
       name,intakeDeadline:input.intakeDeadline??null,

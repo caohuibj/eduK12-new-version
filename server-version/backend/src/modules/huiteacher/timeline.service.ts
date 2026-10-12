@@ -88,7 +88,9 @@ export async function readHuiteacherTargetTimeline(input:{
         createdAt:event.createdAt,openedAt:event.openedAt,
         closedAt:event.closedAt,scheduledAt:event.scheduledAt,
         sourceKind:studentIds.has(event.id)?'STUDENT_FEEDBACK'
-          :byEvent.has(event.id)?'ASSESSMENT_RUN':'FIELD_ACTIVITY',
+          :byEvent.has(event.id)?'ASSESSMENT_RUN'
+          :['CLASSROOM','MEETING','TEACHING_RESEARCH','FIELD_VISIT'].includes(event.kind)
+            ?'FIELD_ACTIVITY':'UNLINKED_DRAFT',
         instrumentVersions:resources,
         // Similar title, participants, or raw Likert options are NEVER
         // sufficient to claim numeric comparability or causal change.
