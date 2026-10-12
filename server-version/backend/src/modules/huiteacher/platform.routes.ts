@@ -12,7 +12,7 @@ import { changeTeacherScaleLicense,TeacherScaleLicenseError } from './scaleLicen
 import { changeTeacherPersonalGrant,TeacherPersonalGrantError } from './personalScaleGrant.service'
 import {
   EducationProductGovernanceError, setEducationProductEntitlement,
-  readEducationProductEntitlements, grantEducationProductAdmin, revokeEducationProductAdmin,
+  readEducationProductEntitlements,listEducationTeacherAdmins, grantEducationProductAdmin, revokeEducationProductAdmin,
 } from '../organization/educationProductGovernance'
 
 const router=Router()
@@ -38,7 +38,8 @@ function platformEducationOrigin(req:Request,res:Response,next:NextFunction){
   if(origin){
     try{
       const url=new URL(origin)
-      const allowed=url.origin==='https://training.eduk12.top'
+      const allowed=url.origin==='https://eduk12.top'
+        ||url.origin==='https://training.eduk12.top'
       const local=process.env.NODE_ENV!=='production'
         && ['localhost','127.0.0.1'].includes(url.hostname)
         && ['http:','https:'].includes(url.protocol)
@@ -72,6 +73,8 @@ const handle=(work:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Respo
 router.use(authenticate,platformEducationOrigin,limiter)
 router.get('/organizations/:organizationId/products',handle(req=>
   readEducationProductEntitlements(req.user!.userId,uuid.parse(req.params.organizationId))))
+router.get('/organizations/:organizationId/teacher-admins',handle(req=>
+  listEducationTeacherAdmins(req.user!.userId,uuid.parse(req.params.organizationId))))
 router.put('/organizations/:organizationId/products/:product',handle(async req=>{
   const id=uuid.parse(req.params.organizationId)
   const p=product.parse(req.params.product) as EducationProduct

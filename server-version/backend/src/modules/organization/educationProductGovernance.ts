@@ -130,6 +130,38 @@ export async function readEducationProductEntitlements(actorUserId:string,organi
     orderBy:{product:'asc'}})
 }
 
+/** Read-only tenant-scoped product-admin roster for the platform operator.
+ * This is not the School or Teacher organization-member listing endpoint.
+ * Only the existing LEGACY/TRAINING SYSTEM_ADMIN can call it.
+ */
+export async function listEducationTeacherAdmins(actorUserId:string,organizationId:string){
+  await assertCurrentSystemAdmin(prisma,actorUserId)
+  const school=await prisma.organization.findFirst({
+    where:{id:organizationId,productDomain:'SCHOOL'},
+    select:{id:true},
+  })
+  if(!school)refuse('EDUCATION_SCHOOL_NOT_FOUND','学校不存在',404)
+  const rows=await prisma.$queryRaw<Array<{
+    grantId:string;membershipId:string;loginName:string;grantedAt:Date
+  }>>`
+    SELECT g."id" AS "grantId",g."membership_id" AS "membershipId",
+      COALESCE(account."login_name",u."username") AS "loginName",
+      g."granted_at" AS "grantedAt"
+    FROM "education_product_role_grants" g
+    JOIN "organization_memberships" m
+      ON m."id"=g."membership_id" AND m."organization_id"=g."organization_id"
+    JOIN "users" u ON u."id"=m."user_id" AND u."account_domain"='SCHOOL'
+    LEFT JOIN "campus_accounts" account ON account."user_id"=u."id"
+    WHERE g."organization_id"=${organizationId}
+      AND g."product"='HUITEACHER'
+      AND g."role"='PRODUCT_ADMIN' AND g."revoked_at" IS NULL
+      AND m."valid_from"<=statement_timestamp()
+      AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())
+    ORDER BY g."granted_at" DESC,g."id" DESC LIMIT 101
+  `
+  return {list:rows.slice(0,100),truncated:rows.length>100}
+}
+
 /** Explicit product admin, never inferred from School ORG_ADMIN or UserRole. */
 export async function grantEducationProductAdmin(input:{
   actorUserId:string;organizationId:string;membershipId:string
