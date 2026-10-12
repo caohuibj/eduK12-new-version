@@ -1,3 +1,4 @@
+import {readHuiteacherStudentFeedbackReport,StudentFeedbackReportError} from './studentReport.service'
 import { Router } from 'express'
 import { z,ZodError } from 'zod'
 import { asyncHandler } from '../../middleware/asyncHandler'
@@ -30,6 +31,10 @@ const wrap=(fn:(req:any)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
     if(e instanceof ZodError)return res.status(400).json({
       code:'HUITEACHER_STUDENT_EVAL_ARGUMENT',
       message:'评教目标、班级或 Form 参数无效',data:null,
+    })
+    if(e instanceof StudentFeedbackReportError)return res.status(e.statusCode).json({
+      code:e.code,message:'学生评教结果未达到当前的披露人数、受众或跨轮隐私条件',
+      data:null,
     })
     if(e instanceof HuiteacherStudentEvaluationError)
       return res.status(e.statusCode).json({
@@ -84,6 +89,11 @@ router.post(path+'/run/publish',requireTeacherProductAdmin,requireRecentTeacherM
   wrap(req=>publishHuiteacherStudentEvaluationRun({
     ...params.parse(req.params),actorUserId:req.user!.userId,
     ...runVersion.parse(req.body),
+  })))
+
+router.get(path+'/report',wrap(req=>
+  readHuiteacherStudentFeedbackReport({
+    ...params.parse(req.params),actorUserId:req.user!.userId,
   })))
 router.post(path,requireTeacherProductAdmin,requireRecentTeacherMfa,limiter,
   wrap(req=>configureHuiteacherStudentEvaluation({

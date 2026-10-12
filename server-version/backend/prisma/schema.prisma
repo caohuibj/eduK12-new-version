@@ -3333,3 +3333,17 @@ model HuiteacherStudentEvaluationConfig {
   @@index([organizationId,classUnitId,createdAt(sort:Desc)],map:"huiteacher_student_eval_configs_org_class_idx")
   @@map("huiteacher_student_eval_configs")
 }
+
+// PR5 disclosure ledger: frozen-only, one read-releasable Run per
+// Teacher/class to prevent longitudinal differencing without PR6 review.
+model HuiteacherStudentDisclosureLedger {
+  organizationId   String   @map("organization_id")
+  teacherUserId     String   @map("teacher_user_id")
+  classUnitId       String   @map("class_unit_id")
+  firstRunId        String   @map("first_run_id")
+  formDigest        String   @map("form_digest")
+  populationDigest  String   @map("population_digest")
+  releasedAt        DateTime @default(now()) @map("released_at") @db.Timestamptz(6)
+  @@id([organizationId,teacherUserId,classUnitId],map:"huiteacher_student_disclosure_ledgers_pkey")
+  @@map("huiteacher_student_disclosure_ledgers")
+}

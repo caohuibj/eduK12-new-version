@@ -31,7 +31,7 @@ type ItemAccumulator={
 const add=(counts:CountMap,key:string)=>counts.set(key,(counts.get(key)??0)+1)
 const reportableChoices=new Set(['SINGLE','LIKERT','MATRIX','MULTIPLE','MATRIX_MULTIPLE'])
 const multipleChoices=new Set(['MULTIPLE','MATRIX_MULTIPLE'])
-const expectedItems=(form:FormDraft)=>{
+export const createProtectedFormItems=(form:FormDraft)=>{
   const items:ItemAccumulator[]=[]
   for(const page of form.pages)for(const q of page.questions){
     // Never silently omit unsupported content: disclosure is explicit.
@@ -46,6 +46,70 @@ const expectedItems=(form:FormDraft)=>{
     })
   }
   return items
+}
+
+/** Identical data reduction and whole-question disclosure for adult School
+ * surveys and student feedback. Never returns raw texts/IDs or respondent times.
+ */
+export const recordProtectedFormAnswers=(items:ItemAccumulator[],
+  rawAnswers:Record<string,unknown>):void=>{
+  for(const item of items){
+    if(!reportableChoices.has(item.type))continue
+    const value=rawAnswers[item.itemKey]
+    const permitted=new Set(item.categories.map(o=>o.optionKey))
+    if(multipleChoices.has(item.type)&&Array.isArray(value)){
+      if(new Set(value).size!==value.length
+        ||value.some(selected=>typeof selected!=='string'||!permitted.has(selected)))
+        reject('HUITEACHER_REPORT_FINAL_INTEGRITY_FAILURE',409)
+      add(item.counts,'ANSWERED')
+      for(const selected of value)add(item.counts,selected)
+    }else if(!multipleChoices.has(item.type)&&typeof value==='string'
+      &&permitted.has(value)){
+      add(item.counts,value)
+    }else if(value&&typeof value==='object'&&!Array.isArray(value)
+      &&Object.keys(value).length===1
+      &&(value as Record<string,unknown>)._surveyRefusal===true){
+      add(item.counts,'REFUSED')
+    }else if(value===undefined||value===null){
+      add(item.counts,'MISSING')
+    }else{
+      reject('HUITEACHER_REPORT_FINAL_INTEGRITY_FAILURE',409)
+    }
+  }
+}
+export const discloseProtectedFormItems=(items:ItemAccumulator[],count:number)=>{
+  return items.map(item=>{
+    if(!reportableChoices.has(item.type))
+      return {itemKey:item.itemKey,prompt:item.prompt,type:item.type,
+        status:'WITHHELD' as const,
+        reason:['SHORT_TEXT','LONG_TEXT'].includes(item.type)
+          ?'PRIVATE_FREE_TEXT' as const:'AGGREGATION_NOT_RELEASED' as const}
+    const multi=multipleChoices.has(item.type)
+    const cells=[
+      ...item.categories.map(opt=>({key:opt.optionKey,label:opt.label,
+        count:item.counts.get(opt.optionKey)??0})),
+      {key:'REFUSED',label:'明确拒答',count:item.counts.get('REFUSED')??0},
+      {key:'MISSING',label:'未提供有效回答',count:item.counts.get('MISSING')??0},
+    ]
+    const respondentN=multi
+      ?(item.counts.get('ANSWERED')??0)
+        +(item.counts.get('REFUSED')??0)+(item.counts.get('MISSING')??0)
+      :cells.reduce((a,x)=>a+x.count,0)
+    if(respondentN!==count)
+      return {itemKey:item.itemKey,prompt:item.prompt,type:item.type,
+        status:'WITHHELD' as const,reason:'SOURCE_INTEGRITY' as const}
+    // Exact category counts or their complements below five permit a
+    // membership-differencing attack. Suppress the WHOLE question, not only
+    // one cell, for both one-choice and multiple-choice questions.
+    if(cells.some(x=>x.count>0&&x.count<SMALL_CELL_FLOOR
+      ||multi&&x.count<count&&count-x.count<SMALL_CELL_FLOOR))
+      return {itemKey:item.itemKey,prompt:item.prompt,type:item.type,
+        status:'WITHHELD' as const,reason:'SMALL_CELL' as const}
+    return {itemKey:item.itemKey,prompt:item.prompt,type:item.type,
+      status:'READY' as const,cells,
+      ...(multi?{selectionMode:'NON_EXCLUSIVE' as const}:{}),
+    }
+  })
 }
 
 /** Adult Teacher group report, intentionally narrower than research export.
@@ -181,7 +245,7 @@ export async function readTeacherFormGroupReport(input:{
       reject('HUITEACHER_GROUP_INCOMPLETE_COHORT',403)
     if(count>MAX_REPORT_FINALS)
       reject('HUITEACHER_GROUP_CAPACITY_LIMIT',409)
-    const items=expectedItems(form.definition as FormDraft)
+    const items=createProtectedFormItems(form.definition as FormDraft)
     let cursor=''
     let seen=0
     for(;;){
@@ -222,29 +286,7 @@ export async function readTeacherFormGroupReport(input:{
           ||data.privateScoring!==null
           ||canonicalHash(data)!==final.resultsHash)
           reject('HUITEACHER_REPORT_FINAL_INTEGRITY_FAILURE',409)
-        for(const item of items){
-          if(!reportableChoices.has(item.type))continue
-          const value=data.rawAnswers[item.itemKey]
-          const permitted=new Set(item.categories.map(o=>o.optionKey))
-          if(multipleChoices.has(item.type)&&Array.isArray(value)){
-            if(new Set(value).size!==value.length
-              ||value.some(selected=>typeof selected!=='string'||!permitted.has(selected)))
-              reject('HUITEACHER_REPORT_FINAL_INTEGRITY_FAILURE',409)
-            add(item.counts,'ANSWERED')
-            for(const selected of value)add(item.counts,selected)
-          }else if(!multipleChoices.has(item.type)&&typeof value==='string'
-            &&permitted.has(value)){
-            add(item.counts,value)
-          }else if(value&&typeof value==='object'&&!Array.isArray(value)
-            &&Object.keys(value).length===1
-            &&(value as Record<string,unknown>)._surveyRefusal===true){
-            add(item.counts,'REFUSED')
-          }else if(value===undefined||value===null){
-            add(item.counts,'MISSING')
-          }else{
-            reject('HUITEACHER_REPORT_FINAL_INTEGRITY_FAILURE',409)
-          }
-        }
+        recordProtectedFormAnswers(items,data.rawAnswers)
       }
       seen+=finals.length
       if(seen>count)reject('HUITEACHER_GROUP_SOURCE_CHANGED',409)
@@ -252,38 +294,7 @@ export async function readTeacherFormGroupReport(input:{
       if(finals.length<PAGE_SIZE)break
     }
     if(seen!==count)reject('HUITEACHER_GROUP_SOURCE_CHANGED',409)
-    const distributions=items.map(item=>{
-      if(!reportableChoices.has(item.type))
-        return {itemKey:item.itemKey,prompt:item.prompt,type:item.type,
-          status:'WITHHELD' as const,
-          reason:['SHORT_TEXT','LONG_TEXT'].includes(item.type)
-            ?'PRIVATE_FREE_TEXT' as const:'AGGREGATION_NOT_RELEASED' as const}
-      const multi=multipleChoices.has(item.type)
-      const cells=[
-        ...item.categories.map(opt=>({key:opt.optionKey,label:opt.label,
-          count:item.counts.get(opt.optionKey)??0})),
-        {key:'REFUSED',label:'明确拒答',count:item.counts.get('REFUSED')??0},
-        {key:'MISSING',label:'未提供有效回答',count:item.counts.get('MISSING')??0},
-      ]
-      const respondentN=multi
-        ?(item.counts.get('ANSWERED')??0)
-          +(item.counts.get('REFUSED')??0)+(item.counts.get('MISSING')??0)
-        :cells.reduce((a,x)=>a+x.count,0)
-      if(respondentN!==count)
-        return {itemKey:item.itemKey,prompt:item.prompt,type:item.type,
-          status:'WITHHELD' as const,reason:'SOURCE_INTEGRITY' as const}
-      // Exact category counts or their complements below five permit a
-      // membership-differencing attack. Suppress the WHOLE question, not only
-      // one cell, for both one-choice and multiple-choice questions.
-      if(cells.some(x=>x.count>0&&x.count<SMALL_CELL_FLOOR
-        ||multi&&x.count<count&&count-x.count<SMALL_CELL_FLOOR))
-        return {itemKey:item.itemKey,prompt:item.prompt,type:item.type,
-          status:'WITHHELD' as const,reason:'SMALL_CELL' as const}
-      return {itemKey:item.itemKey,prompt:item.prompt,type:item.type,
-        status:'READY' as const,cells,
-        ...(multi?{selectionMode:'NON_EXCLUSIVE' as const}:{}),
-      }
-    })
+    const distributions=discloseProtectedFormItems(items,count)
     // Disclosure is also a WRITE event: for a given school and immutable
     // Form definition, all released waves must use EXACTLY the same frozen
     // respondent population, preventing 10-of-11 / 11-of-12 differencing.
