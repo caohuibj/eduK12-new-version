@@ -1,6 +1,7 @@
 import { matchesClassTarget } from '../assessment-policy/target'
 import { campusRunParticipantScope } from '../campus/activity.runScope'
 import { teacherFormResourceId,assertTeacherFormRunUse } from '../huiteacher/formRunResource'
+import {studentFormResourceId,assertStudentFormRunUse} from '../huiteacher/studentFormResource'
 import { currentClassDeliverySql } from '../organization/deliveryPolicy'
 import { createRunPendingConsent } from './consent'
 import { randomUUID } from 'node:crypto'
@@ -166,6 +167,14 @@ const prepareTracks = async (
       family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion,
     })){
       await prisma.$transaction(tx=>assertTeacherFormRunUse(tx,{
+        organizationId,runId,
+        ref:{family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion},
+      }))
+    }
+    if(studentFormResourceId({
+      family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion,
+    })){
+      await prisma.$transaction(tx=>assertStudentFormRunUse(tx,{
         organizationId,runId,
         ref:{family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion},
       }))
@@ -554,6 +563,45 @@ const resolvePairs = async (tx: Tx, organizationId: string, track: PreparedTrack
         && teacher.provenanceKind === 'ORG_MEMBER'
         && matchesClassTarget(target, teacher.membershipId, String(pair.facts.staffRole))
     })
+    // Student feedback has a uniquely school-verified teaching appointment.
+    // A class's other teachers MUST NOT leak into this Run's frozen cohort.
+    if(studentFormResourceId({family:track.resourceFamily,
+      key:track.resourceKey,version:track.resourceVersion})){
+      if(relationshipKind!=='CLASS_TEACHER_STUDENT'
+        ||subjectRole!=='TEACHER'||respondentRole!=='STUDENT')
+        throw new RunPublishError('STUDENT_EVAL_ROLE_MISMATCH','student evaluation requires student->teacher relationship',403)
+      const cfg=await tx.$queryRaw<Array<{
+        teacherUserId:string;classUnitId:string;staffAssignmentId:string
+      }>>`
+        SELECT target."subject_user_id" AS "teacherUserId",
+          config."class_unit_id" AS "classUnitId",
+          config."staff_assignment_id" AS "staffAssignmentId"
+        FROM "huiteacher_student_eval_configs" config
+        JOIN "huiteacher_evaluation_run_links" link
+          ON link."organization_id"=config."organization_id"
+          AND link."event_id"=config."event_id"
+        JOIN "huiteacher_evaluation_events" event
+          ON event."id"=config."event_id" AND event."organization_id"=config."organization_id"
+          AND event."status" IN ('DRAFT','OPEN')
+        JOIN "huiteacher_evaluation_targets" target
+          ON target."id"=event."target_id" AND target."organization_id"=event."organization_id"
+          AND target."kind"='PERSON' AND target."status"='ACTIVE'
+        WHERE config."organization_id"=${organizationId}
+          AND link."run_id"=${track.runId}
+          AND config."form_id"=${track.resourceKey.slice('huiteacher-student-form:'.length)}
+          AND config."definition_digest"=${track.resourceVersion}
+      `
+      if(cfg.length!==1)throw new RunPublishError('STUDENT_EVAL_SCOPE_INVALID','evaluation configuration is missing',403)
+      pairs=pairs.filter(pair=>pair.subject.userId===cfg[0].teacherUserId
+        &&pair.respondent.actorRole==='STUDENT'
+        &&pair.facts.staffClassAssignmentId===cfg[0].staffAssignmentId
+        &&pair.facts.classUnitId===cfg[0].classUnitId)
+      const accounts=await tx.user.findMany({where:{id:{in:pairs.map(p=>p.respondent.userId)},
+        accountDomain:'SCHOOL',role:'STUDENT',isActive:true,isFrozen:false,
+        mustChangePassword:false},select:{id:true}})
+      const current=new Set(accounts.map(row=>row.id))
+      pairs=pairs.filter(pair=>current.has(pair.respondent.userId))
+    }
     if (relationshipKind === 'COURSE_TEACHER_STUDENT') {
       const courses = await tx.course.findMany({ where: { status: 'PUBLISHED', endedAt: null, isLibrary: false, courseType: { not: 'CAMPUS_ACTIVITY' },
         ...(target?.mode === 'COURSE_TEACHER' ? { id: target.courseId } : {}) },
@@ -930,6 +978,18 @@ export const publishAssessmentRun = async (input: {
       throw new RunPublishError('RUN_STATE_CONFLICT', 'Run Tracks changed while resource authority was being resolved', 409)
     }
 
+    const configured=await tx.huiteacherStudentEvaluationConfig.findFirst({
+      where:{organizationId:input.organizationId,
+        eventId:{in:(await tx.huiteacherEvaluationRunLink.findMany({
+          where:{organizationId:input.organizationId,runId:input.runId},
+          select:{eventId:true},
+        })).map(link=>link.eventId)}},
+      select:{formId:true,definitionDigest:true},
+    })
+    if(configured&&(preparedTracks.length!==1
+      ||preparedTracks[0].resourceKey!=='huiteacher-student-form:'+configured.formId
+      ||preparedTracks[0].resourceVersion!==configured.definitionDigest))
+      throw new RunPublishError('STUDENT_EVAL_TRACK_SCOPE','student feedback requires one exact frozen Form track',403)
     const timeRows = await tx.$queryRaw<Array<{ now: Date }>>`SELECT transaction_timestamp() AS "now"`
     const verifiedAt = timeRows[0].now.toISOString()
     const campusSelected=await campusRunParticipantScope(tx,{
@@ -949,6 +1009,14 @@ export const publishAssessmentRun = async (input: {
           ref:{family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion},
         })
       }
+      if(studentFormResourceId({
+        family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion,
+      })){
+        await assertStudentFormRunUse(tx,{
+          organizationId:input.organizationId,runId:input.runId,
+          ref:{family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion},
+        })
+      }
       const frozenPolicyJson = JSON.stringify(track.resourcePolicy)
       const policyHash = canonicalHash(track.resourcePolicy)
       await tx.$executeRaw`
@@ -958,6 +1026,10 @@ export const publishAssessmentRun = async (input: {
       `
       const pairs = await resolvePairs(tx, input.organizationId, track, campusSelected)
       if (pairs.length === 0) throw new RunPublishError('RUN_EMPTY_POPULATION', `Track ${track.id} resolved no eligible actor pairs`, 409)
+      if(studentFormResourceId({family:track.resourceFamily,
+        key:track.resourceKey,version:track.resourceVersion})
+        &&pairs.length!==new Set(pairs.map(pair=>pair.respondent.userId)).size)
+        throw new RunPublishError('STUDENT_EVAL_DUPLICATE_RESPONDENT','each eligible student must have exactly one execution',409)
       const perspective = requireSingle(track.requestedPolicy.perspectives, 'perspectives')
       for (const pair of pairs) {
         assertPublisherScope(authority, input.actorUserId, pair, track.resourcePolicy)

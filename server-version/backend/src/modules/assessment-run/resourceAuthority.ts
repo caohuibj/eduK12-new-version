@@ -1,5 +1,6 @@
 import type { ResultDisclosureContractV1 } from '../assessment-policy/result-disclosure'
 import { teacherFormResourceId,resolveTeacherFormResourcePolicy } from '../huiteacher/formRunResource'
+import {studentFormResourceId,resolveStudentFormResourcePolicy} from '../huiteacher/studentFormResource'
 import type { AssessmentInitiationModeV1 } from '../assessment-policy/journey'
 import type { EvaluationTargetMode, EvaluationTargetRequest } from '../assessment-policy/target'
 import { resolveReleasedRelationalEntry } from './registeredResources'
@@ -259,9 +260,11 @@ export const productionRunResourceAuthorityRegistry = new RunResourceAuthorityRe
       family:'FORM',capabilities:transactionalCompositeCapabilities,
     })
     return {...original,resolveExact:(ref:RunResourceRef)=>
-      teacherFormResourceId(ref)
-        ?resolveTeacherFormResourcePolicy(ref)
-        :original.resolveExact(ref)}
+      studentFormResourceId(ref)
+        ?resolveStudentFormResourcePolicy(ref)
+        :teacherFormResourceId(ref)
+          ?resolveTeacherFormResourcePolicy(ref)
+          :original.resolveExact(ref)}
   })(),
   createRelationalRunResourceAdapter({ family: 'SITUATIONAL', capabilities: transactionalCompositeCapabilities }),
 ])
