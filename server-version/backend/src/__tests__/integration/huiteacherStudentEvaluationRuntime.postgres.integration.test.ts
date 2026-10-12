@@ -188,9 +188,13 @@ suite('Huiteacher PR5 canonical student feedback (isolated PostgreSQL)',()=>{
       executionId:executions[0].id,actorUserId:otherTeacher.id,
     })).rejects.toThrow()
     const positions=new Map(students.map((s,i)=>[s.userId,i]))
+    // UUID primary keys are deliberately unordered. Validate a known sample
+    // of ten respondents and the eleventh revoked responder deterministically.
+    const ordered=executions.slice().sort((a,b)=>
+      positions.get(a.studentId)!-positions.get(b.studentId)!)
     let privateAttempt=''
     let revokedAttempt=''
-    for(const execution of executions.slice(0,11)){
+    for(const execution of ordered.slice(0,11)){
       const i=positions.get(execution.studentId)!
       const started=await startAssessmentRunExecution({
         executionId:execution.id,actorUserId:execution.studentId,
@@ -229,6 +233,12 @@ suite('Huiteacher PR5 canonical student feedback (isolated PostgreSQL)',()=>{
       }
     }
     expect(await db.huiteacherFormFinal.count({where:{organizationId:org.id}})).toBe(10)
+    // Runtime feature opt-in is enforced even for an otherwise valid task.
+    process.env.HUITEACHER_STUDENT_FEEDBACK_ENABLED='false'
+    await expect(readOwnHuiteacherFormTask({
+      actorUserId:students[0].userId,attemptId:privateAttempt,
+    })).rejects.toThrow()
+    process.env.HUITEACHER_STUDENT_FEEDBACK_ENABLED='true'
     await expect(readOwnHuiteacherFormTask({
       actorUserId:teacher.id,attemptId:privateAttempt,
     })).rejects.toThrow()
@@ -282,6 +292,24 @@ suite('Huiteacher PR5 canonical student feedback (isolated PostgreSQL)',()=>{
       }},
     })
     expect(ledger.firstRunId).toBe(run.runId)
+    // A second Run for the same school/teacher/class cannot overwrite the
+    // first protected release even when its frozen population differs.
+    const alternateRun=await db.assessmentRun.create({data:{
+      id:randomUUID(),organizationId:org.id,name:'Cross-wave differencing guard',
+      createdByUserId:admin.id,
+    }})
+    const changed=await db.$queryRawUnsafe<Array<{n:number}>>(
+      'WITH blocked AS (INSERT INTO "huiteacher_student_disclosure_ledgers"'+
+      ' ("organization_id","teacher_user_id","class_unit_id","first_run_id","form_digest","population_digest")'+
+      ' VALUES ($1,$2,$3,$4,$5,$6)'+
+      ' ON CONFLICT ("organization_id","teacher_user_id","class_unit_id")'+
+      ' DO UPDATE SET "first_run_id"="huiteacher_student_disclosure_ledgers"."first_run_id"'+
+      ' WHERE "huiteacher_student_disclosure_ledgers"."first_run_id"=EXCLUDED."first_run_id"'+
+      ' RETURNING 1) SELECT COUNT(*)::int AS n FROM blocked',
+      org.id,teacher.id,classId,alternateRun.id,ledger.formDigest,
+      ledger.populationDigest,
+    )
+    expect(changed[0].n).toBe(0)
     // Verify real database immutability, rather than a mocked permission.
     await expect(db.huiteacherStudentDisclosureLedger.delete({
       where:{organizationId_teacherUserId_classUnitId:{
