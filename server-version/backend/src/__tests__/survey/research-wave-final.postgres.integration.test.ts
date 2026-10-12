@@ -576,6 +576,28 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
       expect(result.csv).toContain('"ABANDONED"')
       expect(result.csv).not.toContain('"NO_WAVE"')
     }
+    // A Wave with zero FINALs must still export the participant's incomplete
+    // status in a separate, signed attendance page; it cannot vanish at page 1.
+    const token=generateToken({
+      userId:ownerId,username:'synthetic-researcher',role:'STUDENT',
+      accountDomain:'SURVEY',tokenVersion:0,mfaVerifiedAt:Math.floor(Date.now()/1000),
+    })
+    const req={headers:{cookie:'huisurvey_research_session='+token},
+      user:{userId:ownerId,tokenVersion:0,username:'synthetic-researcher',
+        role:'STUDENT',platformRole:'STANDARD',mustChangePassword:false,
+        accountDomain:'SURVEY'}} as unknown as Request
+    const initial=await createSurveyExport(req,{projectId,format:'RAW_WAVE',waveId:w.id})
+    expect(initial.manifest.batch.phase).toBe('VERIFIED_FINAL')
+    expect(initial.nextCursor).toBeTruthy()
+    const missing=await createSurveyExport(req,{
+      projectId,format:'RAW_WAVE',waveId:w.id,cursor:initial.nextCursor!,
+    })
+    expect(missing.manifest.batch.phase).toBe('NON_FINAL_PARTICIPATION')
+    expect(missing.nextCursor).toBeNull()
+    const artifact=await downloadSurveyExport(req,{projectId,exportId:missing.id})
+    expect(artifact.csv).toContain(person.researchCode)
+    expect(artifact.csv).toContain('ABANDONED')
+    expect(missing.manifest.rowCount).toBe(2)
   })
 
   it('projects multiple verified FINALs from one frozen Publication without duplicated schema columns',async()=>{
