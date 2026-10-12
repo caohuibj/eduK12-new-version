@@ -47,7 +47,7 @@ describe('Cookie-like ReportPrivacyPreferences PR1 panel',()=>{
     render(<ReportPrivacyPreferences api={api as any} organizationId={org}
       scenarios={['TEACHER_STUDENT_EVALUATION']}/>)
     expect(await screen.findByText(/仅偏好保存阶段/)).toBeInTheDocument()
-    expect(screen.getByText(/现有报告仍按原有严格规则执行/)).toBeInTheDocument()
+    expect(screen.getByText(/当前报告仍按原有严格规则执行/)).toBeInTheDocument()
     fireEvent.click(screen.getByText('群体统计附加保护'))
     const group=screen.getByRole('checkbox',{name:'群体统计附加保护整组切换'})
     expect(group).toHaveAttribute('aria-checked','false')
