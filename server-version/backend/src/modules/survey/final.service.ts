@@ -45,6 +45,7 @@ export async function submitResearchFinal(input:FinalInput){
   const canonical=prepareCanonicalSubmission({
     publicationId:known.publicationId,definitionDigest:known.definitionDigest,
     answers:input.answers,
+    ...(input.itemTimings!==undefined?{itemTimings:input.itemTimings}:{}),
   })
   assertCanonicalSubmissionPayloadSize(canonical,1024*1024,'研究 FINAL 作答')
   return withFinalOnlyCompletionTransaction(async tx=>{
