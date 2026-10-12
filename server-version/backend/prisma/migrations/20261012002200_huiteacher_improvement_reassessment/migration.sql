@@ -52,6 +52,7 @@ BEGIN
     AND event."id"=NEW."event_id"
     AND event."target_id"=action."target_id"
     AND event."status"='CLOSED'
+    AND event."opened_at">action."completed_at"
     AND event."closed_at">action."completed_at"
   WHERE action."organization_id"=NEW."organization_id"
     AND action."id"=NEW."action_id"

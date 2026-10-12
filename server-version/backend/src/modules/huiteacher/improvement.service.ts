@@ -330,6 +330,7 @@ async function reassessmentCandidates(tx:Tx,action:{
     WHERE event."organization_id"=${action.organizationId}
       AND event."target_id"=${action.targetId}
       AND event."status"='CLOSED'
+      AND event."opened_at">${action.completedAt}
       AND event."closed_at">${action.completedAt}
       AND (${action.sourceEventId}::text IS NULL
         OR event."id"<>${action.sourceEventId})
