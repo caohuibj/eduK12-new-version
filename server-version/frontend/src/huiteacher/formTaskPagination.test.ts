@@ -18,11 +18,15 @@ const pages:FormDraft['pages']=[
   ]},
 ]
 describe('Huiteacher conditional page FINAL gating',()=>{
-  it('prevents submission at a hidden middle page if the final page is visible',()=>{
-    expect(lastVisibleHuiteacherFormPageIndex(pages,{first:'skip'})).toBe(2)
+  it('matches TaskForm visible-page indices and blocks early FINAL',()=>{
+    // first+last visible -> visible index 1, not original index 2.
+    const hiddenMiddle=lastVisibleHuiteacherFormPageIndex(pages,{first:'skip'})
+    expect(hiddenMiddle).toBe(1)
+    expect(0>=hiddenMiddle).toBe(false)
+    expect(1>=hiddenMiddle).toBe(true)
     expect(lastVisibleHuiteacherFormPageIndex(pages,{first:'show'})).toBe(2)
   })
-  it('permits submission at the last original visible page if trailing page is hidden',()=>{
+  it('permits submission at the final visible page if a trailing page is hidden',()=>{
     const shortened:FormDraft['pages']=[pages[0],{
       ...pages[1],questions:[{...pages[1].questions[0],required:false}],
     }]
