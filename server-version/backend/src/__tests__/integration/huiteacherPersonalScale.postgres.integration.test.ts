@@ -15,6 +15,10 @@ import {
 import {
   changeTeacherScaleLicense,assertTeacherScaleRunUse,
 } from '../../modules/huiteacher/scaleLicense.service'
+import { changeTeacherPersonalGrant } from '../../modules/huiteacher/personalScaleGrant.service'
+import {listPersonalTeacherScales,startPersonalTeacherScale,readOwnPersonalTeacherScale,
+  submitOwnPersonalTeacherScale,readOwnPersonalTeacherScaleReport,
+} from '../../modules/huiteacher/personalScale.service'
 import {
   createHuiteacherTarget,createHuiteacherEvent,
   createHuiteacherEventRunDraft,transitionHuiteacherEvent,
@@ -282,6 +286,72 @@ suite('Huiteacher PR3: independently released adult self Scale and respondent-on
     })).toBeNull()
     await expect(readTeacherPersonalScaleReport({
       actorUserId:other.id,executionId:execution.id,
+    })).rejects.toThrow()
+
+    // Independent personal measurement: no school Organization or member
+    // relationship is created. Original teacher account is reused.
+    const independent=await edu()
+    expect((await listPersonalTeacherScales(independent.id)).list).toHaveLength(0)
+    await expect(startPersonalTeacherScale({
+      userId:independent.id,resourceId:resource.id,
+    })).rejects.toThrow()
+    await changeTeacherPersonalGrant({
+      actorUserId:admin.id,teacherUserId:independent.id,
+      resourceId:resource.id,action:'GRANT',
+    })
+    const listed=await listPersonalTeacherScales(independent.id)
+    expect(listed.list.some(x=>x.resourceId===resource.id)).toBe(true)
+    const startedPersonal=await startPersonalTeacherScale({
+      userId:independent.id,resourceId:resource.id,
+    })
+    const duplicate=await startPersonalTeacherScale({
+      userId:independent.id,resourceId:resource.id,
+    })
+    expect(duplicate.assessmentId).toBe(startedPersonal.assessmentId)
+    expect(duplicate.replayed).toBe(true)
+    const personal=await readOwnPersonalTeacherScale({
+      userId:independent.id,assessmentId:startedPersonal.assessmentId,
+    })
+    expect(personal.runner.items).toHaveLength(3)
+    const row=await db.assessment.findUniqueOrThrow({
+      where:{id:startedPersonal.assessmentId},
+    })
+    expect(row.userId).toBe(independent.id)
+    expect(row.runtimeGeneration).toBe('UNIFIED_V1')
+    expect(row.compositeAttemptId).toBeNull()
+    expect(row.questionnaireAssessmentId).toBeNull()
+    await expect(readOwnPersonalTeacherScale({
+      userId:manager.id,assessmentId:startedPersonal.assessmentId,
+    })).rejects.toThrow()
+    const payload={userId:independent.id,
+      assessmentId:startedPersonal.assessmentId,
+      submissionId:randomUUID(),attemptEpoch:personal.attemptEpoch,
+      definitionHash:personal.definitionHash,
+      answers:[1,3,5].map((v,i)=>({
+        itemCode:'Q'+(i+1),responseValue:'option_'+v,
+      })),
+    }
+    const completed=await submitOwnPersonalTeacherScale(payload)
+    expect(completed.status).toBe('COMPLETED')
+    expect((await submitOwnPersonalTeacherScale(payload)).status).toBe('COMPLETED')
+    await expect(submitOwnPersonalTeacherScale({
+      ...payload,answers:[{itemCode:'Q1',responseValue:'option_1'}],
+    })).rejects.toThrow()
+    const feedback=await readOwnPersonalTeacherScaleReport({
+      userId:independent.id,assessmentId:startedPersonal.assessmentId,
+    })
+    expect(feedback.state).toBe('READY')
+    if(feedback.state!=='READY')throw Error('Personal report was withheld')
+    expect(feedback.scores.find(score=>score.key==='support')?.value).toBe(9)
+    await expect(readOwnPersonalTeacherScaleReport({
+      userId:manager.id,assessmentId:startedPersonal.assessmentId,
+    })).rejects.toThrow()
+    await changeTeacherPersonalGrant({
+      actorUserId:admin.id,teacherUserId:independent.id,
+      resourceId:resource.id,action:'REVOKE',
+    })
+    await expect(startPersonalTeacherScale({
+      userId:independent.id,resourceId:resource.id,
     })).rejects.toThrow()
   })
 })
