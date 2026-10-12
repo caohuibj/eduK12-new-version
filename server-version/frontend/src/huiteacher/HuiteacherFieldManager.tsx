@@ -11,6 +11,7 @@ export function HuiteacherFieldManager({organizationId,eventId,eventStatus,api}:
 }){
   const base='/organizations/'+organizationId+'/evaluation-events/'+eventId
   const [observerId,setObserverId]=useState('')
+  const [expertInviteCode,setExpertInviteCode]=useState('')
   const [role,setRole]=useState<Role>('EXPERT')
   const [expiresAt,setExpiresAt]=useState('')
   const [formList,setFormList]=useState<Array<{id:string;title:string;status:string}>>([])
@@ -59,6 +60,14 @@ export function HuiteacherFieldManager({organizationId,eventId,eventStatus,api}:
     setObserverId('');await readGrants()
     setNotice('观察者已收到限定活动的邀请。不授予任何心理健康或全校报告权限。')
   })
+  const inviteNewExpert=()=>run(async()=>{
+    if(!['DRAFT','OPEN'].includes(eventStatus))
+      throw Error('已结束活动不接受新的专家注册')
+    const token=await api<{inviteCode:string}>(
+      base+'/expert-registration-invites','POST',{})
+    setExpertInviteCode(token.inviteCode)
+    setNotice('受限专家邀请码已生成。只通过可信渠道交付；邀请码不赋予学校或心理健康管理权限。')
+  })
   const revoke=(grant:Grant)=>run(async()=>{
     if(!window.confirm('确认撤销该观察者在本次活动中的参与资格？'))return
     await api(base+'/observer-grants/'+grant.observerUserId+'/revoke','POST',{})
@@ -91,6 +100,14 @@ export function HuiteacherFieldManager({organizationId,eventId,eventStatus,api}:
             </button>
           </div>:<p className="ht-muted">未绑定结构化 Form 时，本次活动仅收集授权观察者的加密文字证据。</p>}
     </div>
+    {['DRAFT','OPEN'].includes(eventStatus)&&<div className="ht-inline">
+      <button type="button" onClick={inviteNewExpert} disabled={busy}>
+        为尚无教育账号的外部专家生成受控邀请码
+      </button>
+      {expertInviteCode&&<p className="ht-secret">
+        一次性专家邀请码（请安全交付）：<code className="ht-wrap">{expertInviteCode}</code>
+      </p>}
+    </div>}
     {['DRAFT','OPEN','CLOSED'].includes(eventStatus)&&<div className="ht-inline">
       <label className="ht-field"><span>观察者教育账号 ID</span>
         <input value={observerId} onChange={e=>setObserverId(e.target.value)}
