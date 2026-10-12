@@ -3378,3 +3378,24 @@ model HuiteacherImprovementAction {
     map:"huiteacher_improvement_actions_owner_idx")
   @@map("huiteacher_improvement_actions")
 }
+
+
+/** One immutable, separately authorized reassessment after an action closes.
+ * This table records provenance and encrypted HUMAN feedback, never scores.
+ */
+model HuiteacherImprovementReassessment {
+  id               String   @id
+  organizationId   String   @map("organization_id")
+  actionId         String   @map("action_id")
+  targetId         String   @map("target_id")
+  eventId          String   @map("event_id")
+  reviewedByUserId String   @map("reviewed_by_user_id")
+  feedbackCipher   String   @map("feedback_cipher")
+  feedbackHash     String   @map("feedback_hash")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@unique([organizationId,actionId],map:"huiteacher_improvement_reassessments_action_key")
+  @@unique([organizationId,id],map:"huiteacher_improvement_reassessments_org_id_key")
+  @@index([organizationId,targetId,createdAt(sort:Desc)],map:"huiteacher_improvement_reassessments_target_idx")
+  @@map("huiteacher_improvement_reassessments")
+}
