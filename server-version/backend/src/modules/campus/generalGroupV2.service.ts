@@ -49,7 +49,7 @@ async function frozenGeneralSource(db:DB,input:Scope):Promise<Frozen>{
     organizationId:input.organizationId,runId:input.runId,
     product:'HUISCHOOL',scenario:'SCHOOL_GENERAL_EDUCATION_GROUP',
   })
-  if(frozen.mode!=='FROZEN_V1')hidden('CAMPUS_GENERAL_RUN_NOT_APPROVED',404)
+  if(frozen.mode!=='FROZEN_V1')return hidden('CAMPUS_GENERAL_RUN_NOT_APPROVED',404)
   let options:PrivacyOptions
   try{options=parseFrozenSchoolOptions(frozen.effective)}
   catch{return hidden('CAMPUS_GENERAL_POLICY_INVALID')}
@@ -96,10 +96,10 @@ async function frozenGeneralSource(db:DB,input:Scope):Promise<Frozen>{
     tracks:shapes,approved})||tracks.some(row=>row.activityPurpose!==tracks[0].activityPurpose))
     hidden('CAMPUS_GENERAL_RESOURCE_NOT_REVIEWED')
   const track=tracks.find(x=>x.id===input.trackId)
-  if(!track)hidden('CAMPUS_GENERAL_TRACK_NOT_FOUND',404)
+  if(!track)return hidden('CAMPUS_GENERAL_TRACK_NOT_FOUND',404)
   const resource=track.frozenPolicy as Record<string,unknown>|null
   if(!resource||!track.policyHash||canonicalHash(resource)!==track.policyHash)
-    hidden('CAMPUS_GENERAL_TRACK_POLICY_INTEGRITY')
+    return hidden('CAMPUS_GENERAL_TRACK_POLICY_INTEGRITY')
   const resourceFloor=Math.max(minPositive(resource.minimumRespondents),
     minPositive((track.requestedPolicy as Record<string,unknown>).minimumRespondents),5)
   const totals=await db.$queryRaw<TotalRow[]>(Prisma.sql`
@@ -134,10 +134,10 @@ async function frozenGeneralSource(db:DB,input:Scope):Promise<Frozen>{
 async function publishedScience(specId:string){
   const spec=await getPublishedReportingSpec(specId)
   const def=spec.definition
-  if(def.analysisKind!=='GROUP'||def.minimumCohortN<5
-    ||def.minimumContributorN<5||!def.metricRules.length
+  if(def.analysisKind!=='GROUP')return hidden('CAMPUS_GENERAL_SCIENCE_REVIEW_REQUIRED')
+  if(def.minimumCohortN<5||def.minimumContributorN<5||!def.metricRules.length
     ||def.metricRules.some(r=>r.minimumMetricN<5))
-    hidden('CAMPUS_GENERAL_SCIENCE_REVIEW_REQUIRED')
+    return hidden('CAMPUS_GENERAL_SCIENCE_REVIEW_REQUIRED')
   return def
 }
 async function readRelease(db:DB,input:Scope,snapshotId:string){
