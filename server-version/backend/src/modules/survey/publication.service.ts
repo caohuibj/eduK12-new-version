@@ -123,6 +123,12 @@ export async function freezeResearchWaveDraft(input:{
       if(!draft)stop('研究工具来源已发生变化')
       return compileFrozenResearchUnit(draft!)
     })
+    // Freeze-time budget must guarantee eventual FINAL can carry both answers
+    // and the optional timing records; never publish an unfinishable study.
+    const timedItems=units.reduce((total,u)=>total+(u.kind==='SCALE'&&
+      (u.displayDefinition as import('./builder.definition').ScaleDraft).presentationMode==='ONE_BY_ONE'
+      ?(u.displayDefinition as import('./builder.definition').ScaleDraft).items.length:0),0)
+    if(timedItems>3000)stop('逐题计时量表超过单次 FINAL 3000 题的安全提交预算')
     let frozenFlow:FrozenSurveyFlow|undefined
     if(wave.flowDefinition){
       try{
