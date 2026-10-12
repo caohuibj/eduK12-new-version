@@ -1,0 +1,50 @@
+import {describe,expect,it} from 'vitest'
+import {SurveyScaleTimingTracker,emptyRecoveredTiming,sealSurveyScaleTimings} from './survey-scale-timing'
+
+describe('Survey frozen one-by-one response timing',()=>{
+  it('records first choice, multi-visit foreground time, revisions and re-entry',()=>{
+    const tracker=new SurveyScaleTimingTracker()
+    tracker.enter('qone',true,100)
+    tracker.answer('qone',undefined,'o2',2450)
+    tracker.leave(3000)
+    tracker.enter('qone',true,4000)
+    tracker.answer('qone','o2','o4',4450)
+    tracker.leave(5500)
+    const row=tracker.snapshot(5500).qone
+    expect(row).toMatchObject({schemaVersion:1,firstResponseMs:2350,
+      activeTimeMs:4500,changeCount:1,revisitCount:1,visits:2,
+      recoveredWithoutClock:false,interrupted:false})
+  })
+  it('pauses visibility clock and never inflates time while the tab is hidden',()=>{
+    const tracker=new SurveyScaleTimingTracker()
+    tracker.enter('qone',true,100)
+    tracker.suspend(1100)
+    tracker.resume(101100)
+    tracker.answer('qone',undefined,'o1',102100)
+    const item=tracker.snapshot(102100).qone
+    expect(item.firstResponseMs).toBe(2000)
+    expect(item.activeTimeMs).toBe(2000)
+    expect(item.interrupted).toBe(true)
+  })
+  it('never invents an old first reaction time after cross-device recovery',()=>{
+    const tracker=new SurveyScaleTimingTracker({}, {qone:'o4'})
+    tracker.enter('qone',true,0)
+    tracker.answer('qone','o4','o5',1000)
+    const entry=tracker.snapshot(1000).qone
+    expect(entry.firstResponseMs).toBeNull()
+    expect(entry.recoveredWithoutClock).toBe(true)
+    expect(entry.changeCount).toBe(1)
+    expect(sealSurveyScaleTimings(['qone','qtwo'],{qone:'o5',qtwo:'o1'},
+      {qone:entry}).qtwo).toEqual(emptyRecoveredTiming())
+  })
+  it('keeps same final snapshot as a stable rounded, nonnegative integer payload',()=>{
+    const t=new SurveyScaleTimingTracker()
+    t.enter('q',true,10.2)
+    t.answer('q',undefined,'yes',123.8)
+    const a=t.snapshot(123.8)
+    const b=t.snapshot(123.8)
+    expect(a).toEqual(b)
+    expect(a.q.firstResponseMs).toBe(114)
+    expect(a.q.activeTimeMs).toBe(114)
+  })
+})
