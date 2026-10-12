@@ -1,5 +1,5 @@
 import {readHuiteacherTargetTimeline,HuiteacherTimelineError} from './timeline.service'
-import { Router } from 'express'
+import { Router, type RequestHandler } from 'express'
 import { z,ZodError } from 'zod'
 import { asyncHandler } from '../../middleware/asyncHandler'
 import { authenticateHuiteacher } from '../../middleware/auth'
@@ -45,7 +45,7 @@ router.get('/organizations/:organizationId/evaluation-targets',
     }))
   }))
 router.post('/organizations/:organizationId/evaluation-targets',
-  authenticateHuiteacher,requireTeacherProductAdmin,requireRecentTeacherMfa,
+  authenticateHuiteacher,requireTeacherProductAdmin,
   handler(async(req,res)=>success(res,await createHuiteacherTarget({
     actorUserId:req.user!.userId,organizationId:id.parse(req.params.organizationId),
     ...targetCreate.parse(req.body),
@@ -73,7 +73,7 @@ router.get('/organizations/:organizationId/evaluation-events',
     }))
   }))
 router.post('/organizations/:organizationId/evaluation-events',
-  authenticateHuiteacher,requireTeacherProductAdmin,requireRecentTeacherMfa,
+  authenticateHuiteacher,requireTeacherProductAdmin,
   handler(async(req,res)=>{
     const data=eventCreate.parse(req.body)
     return success(res,await createHuiteacherEvent({
@@ -81,8 +81,12 @@ router.post('/organizations/:organizationId/evaluation-events',
       ...data,scheduledAt:data.scheduledAt?new Date(data.scheduledAt):undefined,
     }))
   }))
+// Ordinary OPEN/CLOSE are lifecycle operations. Cancellation remains a
+// separately verified destructive action; the service still checks versions.
+const requireEventCancellationStepUp:RequestHandler=(req,res,next)=>
+  req.body?.action==='CANCEL'?requireRecentTeacherMfa(req,res,next):next()
 router.post('/organizations/:organizationId/evaluation-events/:eventId/transition',
-  authenticateHuiteacher,requireTeacherProductAdmin,requireRecentTeacherMfa,
+  authenticateHuiteacher,requireTeacherProductAdmin,requireEventCancellationStepUp,
   handler(async(req,res)=>{
     const body=z.object({
       action:z.enum(['OPEN','CLOSE','CANCEL']),expectedVersion:z.number().int().min(1),
@@ -93,7 +97,7 @@ router.post('/organizations/:organizationId/evaluation-events/:eventId/transitio
     }))
   }))
 router.post('/organizations/:organizationId/evaluation-events/:eventId/run',
-  authenticateHuiteacher,requireTeacherProductAdmin,requireRecentTeacherMfa,
+  authenticateHuiteacher,requireTeacherProductAdmin,
   handler(async(req,res)=>{
     const data=z.object({
       name:z.string().trim().min(1).max(200),
