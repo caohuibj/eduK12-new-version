@@ -15,6 +15,7 @@ import { loadSurveySource } from '../../modules/survey/analytics.source'
 import { describeSurveyWaveItemPaged } from '../../modules/survey/analytics.paged'
 import {listSampleQuality,listSampleQualityHistory,setSampleQuality} from '../../modules/survey/sample-quality.service'
 import { rawLongExport,rawWideExport,compactSurveyAttendanceExport } from '../../modules/survey/analytics.raw-export'
+import {encodeSurveyExportCursor} from '../../modules/survey/analytics.export-cursor'
 import { exportWide,exportLong } from '../../modules/survey/analytics.export-format'
 import { describePairedScores } from '../../modules/survey/analytics.descriptive'
 import { createSurveyExport,downloadSurveyExport } from '../../modules/survey/analytics.export.service'
@@ -617,6 +618,24 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
       expect(scoreCsv.csv).toContain('ABANDONED')
       expect(scoreCsv.csv).toContain(person.researchCode)
       expect(scoreMissing.manifest.rowCount).toBe(1)
+      // A previously issued signed V3 continuation still returns its original
+      // expanded per-item missing rows; V4 must not reinterpret old CSV layouts.
+      const legacyV3=encodeSurveyExportCursor({
+        v:3 as const,projectId,waveId:w.id,format:'RAW_WAVE' as const,
+        phase:'ATTENDANCE' as const,attendanceCount:1,afterAttemptId:null,
+        after:{id:'00000000-0000-0000-0000-000000000000',
+          completedAt:source.cutOff},
+        cutOff:source.cutOff,sourceRevision:source.sourceRevision,
+        finalCount:0,page:1,issuedAt:Date.now(),completedFrom:null,
+        completedBefore:null,freeTextIncluded:false,
+      })
+      const legacy=await createSurveyExport(req,{
+        projectId,format:'RAW_WAVE',waveId:w.id,cursor:legacyV3,
+      })
+      expect(legacy.manifest.batch.representation).toBe('LEGACY_EXPANDED_ATTENDANCE_V3')
+      expect(legacy.manifest.rowCount).toBe(2)
+      const legacyCsv=await downloadSurveyExport(req,{projectId,exportId:legacy.id})
+      expect(legacyCsv.csv).toContain('"item_key"')
     }finally{
       if(originalSigningKey===undefined)delete process.env.ASSET_SIGNING_SECRET
       else process.env.ASSET_SIGNING_SECRET=originalSigningKey

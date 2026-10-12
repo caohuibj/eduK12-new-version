@@ -186,7 +186,13 @@ export async function createSurveyExport(req:Request,input:{
         artifact=attendanceOnly&&compact
           ?compactSurveyAttendanceExport(input.projectId,sources,input.waveId!)
           :artifactFor(input.format,input.projectId,projected,input.waveId)
-      }catch(e){fail(413,e instanceof Error?e.message:'研究数据超过安全导出上限')}
+      }catch(e){
+        const detail=e instanceof Error?e.message:'研究导出来源不可核验'
+        // Only resource/format budgets justify reducing a page. A corrupt or
+        // mis-scoped FINAL must not turn into a seemingly successful smaller page.
+        if(/exceeds?|too many|too large|oversiz|bounded rows/i.test(detail))fail(413,detail)
+        fail(409,'导出来源不完整或不一致，请先核验研究数据')
+      }
       const selectedVersions=[...new Map(sources.codebook.map(x=>[
         x.waveId+':'+x.instrumentKey+':'+x.definitionDigest,
         {waveId:x.waveId,instrumentKey:x.instrumentKey,
@@ -207,7 +213,8 @@ export async function createSurveyExport(req:Request,input:{
           :'COMPLETED_FINAL_NOT_WITHDRAWN_AND_NOT_QUALITY_EXCLUDED',
         batch:{pageNumber,hasNext:!!nextCursor,
           phase:attendanceOnly?'NON_FINAL_PARTICIPATION':'VERIFIED_FINAL',
-          representation:attendanceOnly&&compact?'ATTENDANCE_COMPACT_V1':'FINAL_ITEM_OR_SCORE_ROWS',
+          representation:attendanceOnly?(compact?'ATTENDANCE_COMPACT_V1':'LEGACY_EXPANDED_ATTENDANCE_V3')
+            :'FINAL_ITEM_OR_SCORE_ROWS',
           ...(compact?{maxFinalsPerPage:pageLimit}:{}),
           totalIncludedFinals:sources.sourceFinalCount??null,
           totalNonFinalAttempts:sources.sourceAttendanceCount??null,
