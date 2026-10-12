@@ -401,7 +401,7 @@ export async function loadSurveySource(input:{
       // rows. COMPLETED included FINALs are already emitted by the FINAL pass.
       // Pin the candidate set to the first page's exclusive time watermark.
       const candidates:Prisma.SurveyWaveAttemptWhereInput={
-        projectId:input.projectId,waveId:input.waveIds[0],
+        projectId:input.projectId,waveId:input.waveIds![0],
         participantId:{not:null},excludedAt:null,startedAt:{lt:cutOff},
         participant:{is:{status:{not:'WITHDRAWN'}}},
         OR:[{status:{not:'COMPLETED'}},
@@ -414,10 +414,10 @@ export async function loadSurveySource(input:{
         input.expectedAttendanceCount!==sourceAttendanceCount)
         throw new SurveyAnalyticsError(409,'分批期间未完成参与样本数量已变化，请重新开始')
       if(input.attendanceOnly){
-        // Bound synthetic rows to ~9000 item/score cells per response page.
+        // Bound synthetic rows to ~6000 item/score cells per response page.
         // Never materialize the whole participant matrix in memory.
         const variableCount=Math.max(1,codebook.size,scoreColumns.length)
-        const pageSize=Math.max(1,Math.min(250,Math.floor(9000/variableCount)))
+        const pageSize=Math.max(1,Math.min(250,Math.floor(6000/variableCount)))
         const page=await tx.surveyWaveAttempt.findMany({
           where:{...candidates,...(input.attendanceAfterId
             ?{id:{gt:input.attendanceAfterId}}:{})},
