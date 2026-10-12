@@ -120,7 +120,7 @@ export default function HuiteacherApp(){
   const changeScreen=(next:Screen)=>{setMessage('');setScreen(next)}
   const org=me?.organizations.find(o=>o.organizationId===selectedOrg)??null
   useEffect(()=>{
-    if(!me||!org){setUnits([]);setMembers([]);return}
+    if(!me||!org||me.role==='STUDENT'){setUnits([]);setMembers([]);return}
     let active=true
     teacherApi<{list:Unit[]}>(`/organizations/${org.organizationId}/units`).then(v=>{
       if(active)setUnits(v.list)
@@ -268,8 +268,8 @@ export default function HuiteacherApp(){
       </section>
       {org&&<section className="ht-panel">
         <h2>{org.organizationName}</h2><p>{org.productAdmin?'已获得本校 Huiteacher 管理权限':'已获得本校 Huiteacher 参与权限'}</p>
-        <h3>年级与班级</h3><div className="ht-units">{units.map(u=><span key={u.id} className="ht-tag">{u.unitKind==='GRADE'?'年级':'班级'} · {u.name}</span>)}</div>
-        {org.productAdmin&&<div className="ht-admin">
+        {me.role!=='STUDENT'&&<><h3>年级与班级</h3><div className="ht-units">{units.map(u=><span key={u.id} className="ht-tag">{u.unitKind==='GRADE'?'年级':'班级'} · {u.name}</span>)}</div></>}
+        {me.role!=='STUDENT'&&org.productAdmin&&<div className="ht-admin">
           <div className="ht-inline"><Field label="近期 MFA 验证码" value={mfaCode} set={setMfaCode}/>
             <button disabled={working||!mfaCode} onClick={stepUp}>重新验证敏感操作</button></div>
           <h3>学校成员邀请</h3>
@@ -299,13 +299,13 @@ export default function HuiteacherApp(){
           <button onClick={refreshOrg} disabled={working}>刷新学校信息</button>
         </div>}
       </section>}
-      {org?.productAdmin&&<HuiteacherEvaluationStudio
+      {me.role!=='STUDENT'&&org?.productAdmin&&<HuiteacherEvaluationStudio
         key={'targets:'+org.organizationId} organizationId={org.organizationId} api={teacherApi}/>}
-      {org?.productAdmin&&<HuiteacherFormStudio
+      {me.role!=='STUDENT'&&org?.productAdmin&&<HuiteacherFormStudio
         key={org.organizationId} organizationId={org.organizationId} api={teacherApi}/>}
       {me.role!=='STUDENT'&&<HuiteacherPersonalSelf api={teacherApi}/>}
-      {me.role!=='STUDENT'&&<HuiteacherFieldWorkspace api={teacherApi}/>
-      {me.role!=='STUDENT'&&<HuiteacherConsensusReviews api={teacherApi}/>}}
+      {me.role!=='STUDENT'&&<HuiteacherFieldWorkspace api={teacherApi}/>}
+      {me.role!=='STUDENT'&&<HuiteacherConsensusReviews api={teacherApi}/>} 
       <HuiteacherMyFormTasks key={me.role==='STUDENT'?'student':'teacher'}
         student={me.role==='STUDENT'} api={teacherApi}/>
       {me.role!=='STUDENT'&&<HuiteacherMyStudentFeedback api={teacherApi}/>}
