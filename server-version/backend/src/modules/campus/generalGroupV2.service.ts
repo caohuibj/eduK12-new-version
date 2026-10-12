@@ -13,6 +13,7 @@ import {projectCampusGeneralGroupV2} from './generalGroupV2.projection'
 import {generateOrganizationGroupAnalysis} from '../reporting/service'
 import {readOrganizationReportingArtifact} from '../reporting/pr4Service'
 import {getPublishedReportingSpec} from '../reporting/spec'
+import {listOrganizationReportingSources,listPublishedReportingSpecs} from '../reporting/discovery'
 import {reportingFail} from '../reporting/types'
 
 type Scope={actor:AuthenticatedPrincipal;organizationId:string;
@@ -155,8 +156,6 @@ async function readRelease(db:DB,input:Scope,snapshotId:string){
 }
 export async function readCampusGeneralGroupV2(input:Scope){
   await requireCampusGroupManager(input.actor,input.organizationId)
-  const principal=await requireCampusGroupManager(input.actor,input.organizationId)
-  void principal
   const projection=await prisma.$transaction(async tx=>{
     const source=await frozenGeneralSource(tx,input)
     await publishedScience(input.specId)
@@ -214,10 +213,9 @@ export async function publishCampusGeneralGroupV2(input:Scope){
         reportKind:'SCHOOL_GENERAL_EDUCATION_GROUP',
         audience:'AUTHORIZED_HUISCHOOL_GENERAL_AGGREGATE',
         reportDigest:canonicalHash(projected),
-        effectivePopulationDigest:canonicalHash({
-          schemaVersion:1,organizationId:input.organizationId,
-          runId:input.runId,trackId:input.trackId,scope:'FROZEN_RUN_TRACK',
-        }),
+        // The effective FINAL-submitter set is deliberately not faked with
+        // a digest of the invited frozen Run. No per-person identities stored.
+        effectivePopulationDigest:null,
         reportProjection:projected as Prisma.InputJsonValue,
         releasedByUserId:input.actor.userId,
       }})
@@ -225,4 +223,53 @@ export async function publishCampusGeneralGroupV2(input:Scope){
     await requireCampusGroupManager(input.actor,input.organizationId)
     return projected
   })
+}
+
+/** Controlled catalog: one read for metadata, one for frozen-snapshot state.
+ * It does not reveal a student's participation, answer, score or respondent ID.
+ * An operator-absent allowlist yields NO V2 sources rather than an unsafe
+ * fallback to sensitive psychology records.
+ */
+export async function listCampusGeneralGroupV2Catalog(input:{
+  actor:AuthenticatedPrincipal;organizationId:string
+}){
+  if(!schoolPrivacyV2Enabled())hidden('CAMPUS_GENERAL_REPORT_DISABLED',404)
+  const principal=await requireCampusGroupManager(input.actor,input.organizationId)
+  let approved
+  try{approved=reviewedGeneralResources()}
+  catch{return hidden('CAMPUS_GENERAL_RESOURCE_AUTHORITY_INVALID',503)}
+  if(!approved.length)return {specs:[],sources:[],truncated:false,
+    note:'尚未配置平台独立审核的非敏感一般教育测评资源；不会自动放宽任何心理测评。'}
+  const [specs,sources]=await Promise.all([
+    listPublishedReportingSpecs({
+      principal,organizationId:input.organizationId,analysisKind:'GROUP',
+      page:1,pageSize:50,
+    }),
+    listOrganizationReportingSources({
+      principal,organizationId:input.organizationId,page:1,pageSize:100,
+    }),
+  ])
+  const candidates=sources.list.filter(source=>approved.some(x=>
+    x.family===source.resource.family&&x.key===source.resource.key
+    &&x.version===source.resource.version))
+  const snapshots=await prisma.educationReportPolicySnapshot.findMany({
+    where:{organizationId:input.organizationId,product:'HUISCHOOL',
+      scenario:'SCHOOL_GENERAL_EDUCATION_GROUP',
+      runId:{in:[...new Set(candidates.map(x=>x.runId))]}},
+    select:{runId:true},
+  })
+  const allowedRuns=new Set(snapshots.map(x=>x.runId))
+  return {
+    sources:candidates.filter(x=>allowedRuns.has(x.runId)).map(source=>({
+      runId:source.runId,trackId:source.trackId,name:source.runName,
+      resource:source.resource,
+    })),
+    specs:specs.list.filter(x=>x.analysisKind==='GROUP'
+      &&(x.privacy.minimumCohortN??0)>=5
+      &&(x.privacy.minimumContributorN??0)>=5)
+      .map(x=>({specId:x.specId,title:x.specKey,version:x.version,
+        privacy:x.privacy,metricIds:x.metricIds})),
+    truncated:!!sources.truncated||specs.total>50,
+    note:'仅显示已审核资源及具有正式 V2 冻结快照的 School Run；正式报告还需审核科学指标与样本完整性。',
+  }
 }
