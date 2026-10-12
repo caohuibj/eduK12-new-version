@@ -11,6 +11,7 @@ import {configureHuiteacherStudentEvaluation,
   publishHuiteacherStudentEvaluationRun} from '../../modules/huiteacher/studentEvaluation.service'
 import {resolveEducationProductMemberScope} from '../../modules/organization/educationProductAccess'
 import {startAssessmentRunExecution} from '../../modules/assessment-run/startExecution'
+import {publishAssessmentRun} from '../../modules/assessment-run/publish'
 import {closeAssessmentRun} from '../../modules/assessment-run/lifecycle'
 import {readOwnHuiteacherFormTask,
   submitOwnHuiteacherFormFinal} from '../../modules/huiteacher/formFinal.service'
@@ -77,6 +78,12 @@ suite('Huiteacher PR5 canonical student feedback (isolated PostgreSQL)',()=>{
     await db.educationProductRoleGrant.create({data:{
       id:randomUUID(),organizationId:org.id,membershipId:adminMember.id,
       product:'HUITEACHER',role:'PRODUCT_ADMIN',grantedByUserId:admin.id,
+    }})
+    // Even after manager grant revocation, a teaching persona is not itself
+    // authority to publish a Teacher-bound Run through generic school APIs.
+    await db.organizationPersonaGrant.create({data:{
+      id:randomUUID(),organizationId:org.id,membershipId:adminMember.id,
+      persona:'TEACHER',grantedByUserId:admin.id,
     }})
     const teacherMembers=[]
     for(const t of [teacher,otherTeacher]){
@@ -168,6 +175,19 @@ suite('Huiteacher PR5 canonical student feedback (isolated PostgreSQL)',()=>{
       ...campaign,expectedVersion:run.version,
     })
     await transitionHuiteacherEvent({...campaign,action:'OPEN',expectedVersion:event.version})
+    await db.educationProductRoleGrant.updateMany({
+      where:{organizationId:org.id,membershipId:adminMember.id,
+        product:'HUITEACHER',role:'PRODUCT_ADMIN',revokedAt:null},
+      data:{revokedAt:new Date(),revokedByUserId:admin.id},
+    })
+    await expect(publishAssessmentRun({
+      organizationId:org.id,runId:run.runId,
+      actorUserId:admin.id,expectedVersion:run.version,
+    })).rejects.toThrow()
+    await db.educationProductRoleGrant.create({data:{
+      id:randomUUID(),organizationId:org.id,membershipId:adminMember.id,
+      product:'HUITEACHER',role:'PRODUCT_ADMIN',grantedByUserId:admin.id,
+    }})
     await publishHuiteacherStudentEvaluationRun({...campaign,expectedVersion:run.version})
     const executions=await db.$queryRawUnsafe<Array<{
       id:string;studentId:string;teacherId:string;classUnitId:string
