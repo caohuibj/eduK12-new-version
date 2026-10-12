@@ -5,7 +5,7 @@ import {asyncHandler} from '../../middleware/asyncHandler'
 import {createRedisRateLimiter} from '../../middleware/redisRateLimit'
 import {success} from '../../utils/response'
 import {requireTeacherProductAdmin,requireRecentTeacherMfa} from './authority'
-import {bindHuiteacherFieldForm,readInvitedHuiteacherFieldForm,
+import {bindHuiteacherFieldForm,readInvitedHuiteacherFieldForm,readManagerHuiteacherFieldForm,
   HuiteacherFieldFormError} from './fieldForm.service'
 
 const router=Router()
@@ -26,6 +26,12 @@ const wrap=(task:(req:any)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
   }
 })
 router.use(authenticateHuiteacher)
+router.get('/organizations/:organizationId/evaluation-events/:eventId/field-form',
+  requireTeacherProductAdmin,wrap(req=>readManagerHuiteacherFieldForm({
+    actorUserId:req.user!.userId,
+    organizationId:uuid.parse(req.params.organizationId),
+    eventId:uuid.parse(req.params.eventId),
+  })))
 router.post('/organizations/:organizationId/evaluation-events/:eventId/field-form',
   requireTeacherProductAdmin,requireRecentTeacherMfa,limit,wrap(req=>
     bindHuiteacherFieldForm({

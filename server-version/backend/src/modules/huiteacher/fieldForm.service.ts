@@ -118,3 +118,22 @@ export async function readInvitedHuiteacherFieldForm(input:{
       definitionDigest:released.definitionDigest,pages:released.definition.pages}
   })
 }
+
+/** Product manager can inspect only the frozen binding metadata, not an
+ * observer's individual answers. */
+export async function readManagerHuiteacherFieldForm(input:{
+  actorUserId:string;organizationId:string;eventId:string
+}){
+  return prisma.$transaction(async tx=>{
+    const scope=await resolveEducationProductMemberScope({
+      actorUserId:input.actorUserId,organizationId:input.organizationId,
+      product:'HUITEACHER',
+    },tx)
+    if(!scope?.productAdmin)deny('HUITEACHER_FIELD_FORM_MANAGER_REQUIRED',403)
+    const bound=await readBoundHuiteacherFieldForm(tx,{
+      organizationId:input.organizationId,eventId:input.eventId,
+    })
+    return bound?{formId:bound.formId,title:bound.title,
+      definitionDigest:bound.definitionDigest}:null
+  })
+}
