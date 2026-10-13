@@ -303,5 +303,9 @@
       "before": "f8735d637f36979b61a7523a9d901562164f7eb0",
       "after": "84f5fff91c4915c5eef8e7fd43b3259c7ca704a1"
     }
+  },
+  "verifierOrderTransition": {
+    "before": "cd0e2ea27cbeb41e40f87490e79409bf7f4f7acc",
+    "after": "70bd8410d7b2d13079e5858de0300b2de0e2117c"
   }
 }

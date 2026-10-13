@@ -49,6 +49,7 @@ try{
    else if(path==='/api/capabilities')data={cognitive:false,parentPortal:false};
    else if(path==='/api/courses')data={list:[course],total:1};
    else if(path==='/api/checkins')data={list:[checkin],total:1};
+   else if(path==='/api/checkins/tags')data={tags:[]};
    else if(path==='/api/checkins/task-1')data=checkin;
    else if(path==='/api/checkins/task-1/my-submission')data=null;
    else if(path===variant.endpoint){

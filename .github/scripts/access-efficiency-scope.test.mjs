@@ -1,7 +1,8 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
 import {readFileSync} from 'node:fs';
-import {admitsAccessEfficiency,accessEfficiencySources,accessEfficiencyRequired} from './access-efficiency-scope.mjs';
+import {admitsAccessEfficiency,accessEfficiencySources,accessEfficiencyRequired,verifierOrderOnly} from './access-efficiency-scope.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const sources=[...accessEfficiencySources],approved={schema:1,files:Object.fromEntries(sources.map(file=>[file,{before:'1'.repeat(40),after:'2'.repeat(40)}]))};
 const entry=file=>({file,status:'M',oldMode:'100644',newMode:'100644'});
@@ -14,7 +15,7 @@ test('complete immutable source boundary rejects unknown, dependencies, schema, 
  for(const update of [{status:'D',newMode:'000000'},{status:'T'},{oldMode:'120000'},{newMode:'100755'}])assert.equal(admitsAccessEfficiency([{...entries[0],...update},...entries.slice(1)],read,approved),false);
  for(const ref of ['base','head'])assert.equal(admitsAccessEfficiency(entries,(r,f)=>r===ref&&f===sources[0]?'3'.repeat(40):read(r,f),approved),false);
 });
-const plan={schema:1,route:'access-efficiency',base:'a'.repeat(40),head:'b'.repeat(40),changed:['frontend','backend'],tests:['test'],frontendTests:['test'],focusedTests:['test'],required:accessEfficiencyRequired};
+const plan={schema:1,route:'access-efficiency',base:'a'.repeat(40),head:'b'.repeat(40),changed:['frontend','backend'],tests:['test'],frontendTests:['test'],focusedTests:['test'],required:accessEfficiencyRequired,verifierOrderOnly};
 const outputs={application_route:plan.route,scenario:plan.route,access_efficiency_plan:JSON.stringify(plan),codeql:'true',frontend_build:'true',ui_required:'false',media_selection:'[]',media_groups:'[]',
  ...Object.fromEntries(['media2','media7','situational_video','situational_branching','video_core','app_shell','canonical_visual','perf_smoke','ops'].map(k=>[k,'false']))};
 const needs={scope:{result:'success',outputs},'access-efficiency':{result:'success'},codeql:{result:'success'}};
@@ -34,4 +35,13 @@ test('exact candidate preserves old homepage routes and full-platform isolation 
  for(const text of ['--exit-code','HIGH,CRITICAL','--no-file-parallelism','capture_tests','require_tests','--target','images.tar.zst','Isolated PostgreSQL readiness timeout'])assert.ok(candidate.includes(text),text);
  const workflow=readFileSync(new URL('../workflows/ci-access-efficiency.yml',import.meta.url),'utf8');
  for(const text of ['assert.deepEqual(p,accessEfficiencyPlan','access-efficiency-browser.mjs',"c['runtime'][component]['status']=='success'",'failure()'])assert.ok(workflow.includes(text),text);
+});
+
+test('only the two reviewed verifier ordering/fingerprint changes preserve producer proof',()=>{
+ const root=new URL('./',import.meta.url),binding=JSON.parse(readFileSync(new URL('./access-efficiency-bindings.json',root),'utf8')).verifierOrderTransition;
+ const after=readFileSync(new URL('./access-efficiency-reuse.py',root),'utf8');
+ assert.equal(verifierOrderOnly(after,binding.before),true);
+ for(const bad of [after+'unknown change',after.replace("run.get('event')=='pull_request'","True"),after.replace("artifact.get('digest')!='sha256:'","False and artifact.get('digest')!='sha256:'")])assert.equal(verifierOrderOnly(bad,binding.before),false);
+ const reconstructed=after.replace("    artifacts=sorted(api('/actions/artifacts?per_page=40')['artifacts'],key=lambda item:item['created_at'],reverse=True)","    artifacts=api('/actions/artifacts?per_page=40')['artifacts']").replace("(tool_refs or {}).get(f) or (plan.get('reuseVerifierFingerprint') if f==tools[1] else None) or subprocess.check_output","(tool_refs or {}).get(f) or subprocess.check_output");
+ assert.equal(execFileSync('git',['hash-object','--stdin'],{input:reconstructed,encoding:'utf8'}).trim(),binding.before);
 });

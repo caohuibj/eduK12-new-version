@@ -8,7 +8,7 @@ def objects(ref, prefix):
     return [(line.split(b'\t',1)[1].decode(),line.split(b'\t',1)[0].decode()) for line in data.split(b'\0') if line]
 def fingerprint(plan, tool_refs=None, allow_transition=True):
     tools=['.github/scripts/access-efficiency-candidate.py','.github/scripts/access-efficiency-reuse.py','.github/workflows/ci-access-efficiency.yml']
-    tool=sha(json.dumps([(f,(tool_refs or {}).get(f) or subprocess.check_output(['git','rev-parse',plan['head']+':'+f],text=True).strip()) for f in tools]).encode())
+    tool=sha(json.dumps([(f,(tool_refs or {}).get(f) or (plan.get('reuseVerifierFingerprint') if f==tools[1] else None) or subprocess.check_output(['git','rev-parse',plan['head']+':'+f],text=True).strip()) for f in tools]).encode())
     builds={}; tests={}
     candidate_source=subprocess.check_output(['git','show',plan['head']+':'+tools[0]])
     backend_mirror='deb.debian.org' if b'DEBIAN_MIRROR=deb.debian.org' in candidate_source else 'mirrors.tuna.tsinghua.edu.cn'
@@ -95,7 +95,7 @@ def prepare(plan,evidence,environment=None):
     current=fingerprint(plan);evidence.mkdir(exist_ok=True)
     token=os.environ.get('GH_TOKEN');pr=int(os.environ.get('PR_NUMBER') or 0)
     if not token or not pr:return None
-    artifacts=api('/actions/artifacts?per_page=40')['artifacts']
+    artifacts=sorted(api('/actions/artifacts?per_page=40')['artifacts'],key=lambda item:item['created_at'],reverse=True)
     for artifact in artifacts:
         if not artifact['name'].startswith('access-efficiency-') or artifact['expired'] or not recent(artifact['created_at']):continue
         run=api('/actions/runs/'+str(artifact['workflow_run']['id']))

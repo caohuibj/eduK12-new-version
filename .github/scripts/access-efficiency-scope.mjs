@@ -143,13 +143,29 @@ export function admitsAccessEfficiency(entries,read,approved=bindings){
  }
  return true;
 }
+export function verifierOrderOnly(after,beforeBlob) {
+ if(!/^[a-f0-9]{40}$/.test(beforeBlob||''))return false;
+ const replacements=[["    artifacts=api('/actions/artifacts?per_page=40')['artifacts']", "    artifacts=sorted(api('/actions/artifacts?per_page=40')['artifacts'],key=lambda item:item['created_at'],reverse=True)"], ["(tool_refs or {}).get(f) or subprocess.check_output", "(tool_refs or {}).get(f) or (plan.get('reuseVerifierFingerprint') if f==tools[1] else None) or subprocess.check_output"]];
+ for(const [before,current] of replacements){
+  if(after.split(current).length!==2)return false;
+  after=after.replace(current,before);
+ }
+ return execFileSync('git',['hash-object','--stdin'],{input:after,encoding:'utf8'}).trim()===beforeBlob;
+}
 export const accessEfficiencyRequired=['frozen-boundary','affected-components-compile','focused-access-contracts','mobile-contracts','compose-overrides','runtime-scans','pagination-browser','sast'];
 export function accessEfficiencyPlan(entries,base,head){
  if(!/^[a-f0-9]{40}$/.test(base)||!/^[a-f0-9]{40}$/.test(head))throw Error('Full source SHAs required');
  if(!admitsAccessEfficiency(entries,(ref,file)=>blob(ref==='base'?base:head,file)))return null;
  for(const path of ['server-version/frontend/src/survey','server-version/frontend/src/huiteacher','server-version/frontend/src/App.tsx','server-version/backend/src/index.ts'])
   if(blob(base,path)!==blob(head,path))return null;
- return {schema:1,route:'access-efficiency',base,head,changes:entries,changed:['frontend','backend'],
+ let reuseVerifierFingerprint;
+ const transition=bindings.verifierOrderTransition;
+ if(transition){
+  const file='.github/scripts/access-efficiency-reuse.py';
+  if(blob(head,file)!==transition.after||!verifierOrderOnly(execFileSync('git',['show',head+':'+file],{encoding:'utf8'}),transition.before))return null;
+  reuseVerifierFingerprint=transition.before;
+ }
+ return {schema:1,route:'access-efficiency',base,head,...(reuseVerifierFingerprint?{reuseVerifierFingerprint}:{}),changes:entries,changed:['frontend','backend'],
   components:{frontend:blob(head,'server-version/frontend'),backend:blob(head,'server-version/backend')},
   tests:accessEfficiencyTests,focusedTests:accessEfficiencyFocusedTests,frontendTests:accessEfficiencyFrontendTests,
   mobileTests:['tests/access-paging.test.cjs','tests/operations.test.cjs'],required:accessEfficiencyRequired};

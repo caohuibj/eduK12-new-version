@@ -207,3 +207,5 @@ GitHub 是唯一正式验证位置：前后端各编译一次，定向真实隔�
 GitHub Debian 使用签名官方源，npm 固定 `https://registry.npmjs.org` 且 `replace-registry-host=always`，覆盖锁文件保留的历史镜像 URL；Docker npm 安装按显式 `NPM_REGISTRY` 替换历史 host。版本与 integrity 不变，保留 TLS、签名及镜像扫描阈值。前后端 Dockerfile 本次只增加该 npm host 选择设置，其他新增下载策略文件绑定完整前后 blob；未知 Dockerfile/依赖或 CI 编辑不能借此缩减门禁。
 
 本 PR 的 access-efficiency 路线同时验证这条新增铁律：所有工作流官方 npm 环境、实际 npm 对历史 host 的替换及 integrity 失败拒绝、CI 镜像计划/发布脚本官方参数、完整冻结 blob 和对应拒绝/汇总契约。该下载策略改变了构建输入，需要生成对应新产物；以后正式同输入阶段继续复用。诊断报告与大型镜像传输分开保存，报告不充当镜像资格或编译成功。
+
+产物复用按官方 artifact 的实际 created_at 降序选择，不按 ID/接口返回顺序猜测新旧。该校验器过渡的前后 blob 明确绑定，仅允许排序语句和显式证据指纹版本选择两处差异；反向还原后必须等于完整旧 blob，否则拒绝。资格校验、来源、ZIP/tar/镜像哈希、源码/参数、24 小时和真实成功状态条件字节不变，编译/测试执行器未改，不重复相同输入的已合格产物。
