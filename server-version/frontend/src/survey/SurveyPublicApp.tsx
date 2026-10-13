@@ -231,11 +231,18 @@ export default function SurveyPublicApp(){
   // Only the already-authorized local browser tab may recover unfinished answers.
   useEffect(()=>{
     if(!task||task.status!=='STARTED'||!attemptId)return
-    const timeout=window.setTimeout(()=>{
+    const flush=()=>{
       if(!saveLocalSurveyDraft(publicId,attemptId,task.definitionDigest,answers,itemTimings))
         setNotice('本标签页临时保存失败（空间或权限不足）。刷新、关闭页面可能丢失未提交答案；如已开放服务器加密暂存，请主动保存，或完成本次 FINAL。')
-    },450)
-    return ()=>window.clearTimeout(timeout)
+    }
+    const timeout=window.setTimeout(flush,450)
+    window.addEventListener('pagehide',flush)
+    window.addEventListener('beforeunload',flush)
+    return ()=>{
+      window.clearTimeout(timeout)
+      window.removeEventListener('pagehide',flush)
+      window.removeEventListener('beforeunload',flush)
+    }
   },[publicId,attemptId,task,answers,itemTimings])
   useEffect(()=>{
     document.title='Huisurvey · 研究参与'
@@ -623,7 +630,7 @@ export default function SurveyPublicApp(){
       </section>}
       {info.project.collectionMode==='LINKED_WAVES'&&proofReceived&&<section className="bg-white rounded-xl border-2 border-teal-600 p-5">
         <h3 className="font-semibold text-lg">请保存研究身份</h3>
-        <p className="text-sm">研究编号可供本项目数据匹配；**私密恢复凭证不可交给研究者或其他人**。页面关闭后不再显示原始密钥。</p>
+        <p className="text-sm">研究编号可供本项目数据匹配；<strong>私密恢复凭证不可交给研究者或其他人</strong>。页面关闭后不再显示原始密钥。</p>
         <p className="mt-3">研究编号</p><code className="block bg-slate-100 p-3 break-all">{researchCode}</code>
         <p className="mt-3">私密恢复凭证</p><code className="block bg-slate-100 p-3 break-all">{accessCredential}</code>
         <button className="btn-secondary mt-3" type="button" onClick={()=>setProofReceived(false)}>

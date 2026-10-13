@@ -98,6 +98,8 @@ export function HuiteacherStudentEvaluationManager({organizationId,eventId,event
     const eligibility=await api<Preview>(base+'/eligibility')
     setPreview(eligibility)
     if(!eligibility.teacherAssigned)throw new Error('教师任教关系已变化，请先核实')
+    if(eligibility.eligibleStudentCount<eligibility.privacyFloor)
+      throw new Error('当前符合资格学生 '+eligibility.eligibleStudentCount+' 人，少于发布要求的 '+eligibility.privacyFloor+' 人。请先补齐学校核验的学生班级关系，再发布。')
     // Two existing audited transitions are composed into one user action.
     // After an interrupted OPEN, the same button resumes publishing the Run.
     if(eventStatus==='DRAFT'){

@@ -134,7 +134,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
       await api(base+'/analytics/quality/attempts/'+row.attemptId,'POST',{
         revision:row.revision,verdict,reason:qualityReason.trim(),
       })
-      setQualityReason('')
+      setQualityReason('');setTicket(null);setBatchDownloaded(false)
       await Promise.all([reload(),loadQuality(qualityPage)])
       setMessage('样本质量决定已记录审计，旧的未下载导出已失效。')
     })

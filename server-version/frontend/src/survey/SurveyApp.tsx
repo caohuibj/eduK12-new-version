@@ -49,6 +49,10 @@ export default function SurveyApp(){
   const [available,setAvailable]=useState<{analytics:boolean;publication:boolean}|null>(null)
   const [instrumentsRevision,setInstrumentsRevision]=useState(0)
   const instrumentsChanged=useCallback(()=>setInstrumentsRevision(value=>value+1),[])
+  const projectChanged=useCallback((project:Pick<Project,'id'|'status'|'revision'|'collectionMode'>)=>{
+    setSelected(current=>current?.id===project.id?{...current,...project}:current)
+    setProjects(current=>current.map(row=>row.id===project.id?{...row,...project}:row))
+  },[])
   const [title,setTitle]=useState(''),[description,setDescription]=useState('')
   const [mode,setMode]=useState<Project['collectionMode']>('SINGLE_UNLINKED')
   const work=async(fn:()=>Promise<void>)=>{setBusy(true);setError('');setNotice('')
@@ -57,11 +61,11 @@ export default function SurveyApp(){
     const r=await api<{list:Project[]}>('/projects?page='+page)
     setProjects(r.list);setProjectPage(page)
   },[])
-  const refresh=useCallback(async()=>{
+  const refresh=useCallback(async(openWorkspace=false)=>{
     try{
       const me=await api<Researcher>('/auth/me')
       setUser(me)
-      if(initial==='home'||initial==='feature')setScreen(initial)
+      if(!openWorkspace&&['home','feature','claim','reset'].includes(initial))setScreen(initial)
       else {await loadProjects();setScreen('work')}
     }catch{setUser(null);if(initial==='login')setScreen('login')}
     finally{setLoading(false)}
@@ -92,7 +96,7 @@ export default function SurveyApp(){
     const r=await api<{recoveryCodes?:string[]}>('/auth/mfa/'+kind,'POST',{code})
     setCode('')
     if(r.recoveryCodes?.length){setRecovery(r.recoveryCodes);setNotice('恢复码仅显示一次，请安全保存')}
-    else await refresh()
+    else await refresh(true)
   })
   const logout=()=>void work(async()=>{
     await api('/auth/logout','POST',{})
@@ -158,7 +162,7 @@ export default function SurveyApp(){
         <h2 className="text-xl font-semibold">一次性恢复码</h2>
         <p>请离线保存，恢复码每个只能使用一次，关闭本页后无法再次查看。</p>
         <code className="block whitespace-pre-wrap break-all bg-slate-100 p-4 my-3">{recovery.join('\n')}</code>
-        <button className="btn-primary" onClick={()=>{setRecovery([]);void refresh()}}>我已保存，进入工作台</button>
+        <button className="btn-primary" onClick={()=>{setRecovery([]);void refresh(true)}}>我已保存，进入工作台</button>
       </section>}
       {!loading&&user&&screen==='work'&&<><section className="bg-white rounded-xl border p-6 my-4">
         <h2 className="text-xl font-semibold">我的研究</h2><p className="text-sm text-slate-500">Researcher：{user.username}</p>
@@ -188,7 +192,7 @@ export default function SurveyApp(){
           <div className="flex flex-wrap gap-3 mt-4"><button className="btn-primary" disabled={busy||(selected!==null&&selected.status!=='DRAFT')}>{selected?'保存修改':'创建研究'}</button>
             {selected&&<button type="button" className="btn-secondary" onClick={()=>{setSelected(null);setTitle('');setDescription('')}}>新建其他项目</button>}</div>
         </form><p className="text-sm text-slate-500 mt-4">研究工具编辑、研究专用发布、匿名参与与科研分析可按功能开关使用；正式生产开通须完成独立部署验收。</p>
-      </section>{selected&&<><SurveyBuilder key={'builder-'+selected.id} projectId={selected.id} onInstrumentsChanged={instrumentsChanged}/><SurveyWaveStudio key={'waves-'+selected.id} projectId={selected.id} instrumentsRevision={instrumentsRevision}/>
+      </section>{selected&&<><SurveyBuilder key={'builder-'+selected.id} projectId={selected.id} onInstrumentsChanged={instrumentsChanged}/><SurveyWaveStudio key={'waves-'+selected.id} projectId={selected.id} instrumentsRevision={instrumentsRevision} onProjectChanged={projectChanged}/>
           {available?.analytics
             ?<SurveyAnalyticsWorkspace key={'analysis-'+selected.id} projectId={selected.id}/>
             :<section className="rounded-xl border bg-white p-4" aria-label="研究数据状态">
