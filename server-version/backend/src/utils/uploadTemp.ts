@@ -1,12 +1,14 @@
 import crypto from 'node:crypto'
 import fs from 'node:fs'
 import { promises as fsPromises } from 'node:fs'
-import os from 'node:os'
+import { configuredInteger } from '../services/boundedAdmissionGate'
+import { config } from '../config'
 import path from 'node:path'
 import multer from 'multer'
 import type { Request, Response, NextFunction, RequestHandler } from 'express'
 
-const TEMP_ROOT = path.join(os.tmpdir(), 'eduk12-upload-staging')
+export const UPLOAD_STAGING_ROOT = path.join(path.resolve(config.uploadDir), '.upload-staging')
+const TEMP_ROOT = UPLOAD_STAGING_ROOT
 
 const isInsideTempRoot = (candidate: string): boolean => {
   const resolved = path.resolve(candidate)
@@ -93,4 +95,13 @@ export async function cleanupStaleUploadDirectories(now = Date.now()): Promise<n
     }
   } catch { /* Cleanup must not affect request admission. */ }
   return removed
+}
+
+/** Private disk staging shares the persistent upload volume. Reserve room for
+ * two full local uploads beyond the 5 GiB operational floor before parsing. */
+export async function assertUploadStagingCapacity(maximumBytes: number): Promise<void> {
+  await fsPromises.mkdir(TEMP_ROOT, { recursive: true, mode: 0o700 })
+  const disk = await fsPromises.statfs(TEMP_ROOT, { bigint: true })
+  if (disk.bavail * disk.bsize < BigInt(5 * 1024 ** 3 + Math.max(maximumBytes * configuredInteger('UPLOAD_MAX_CONCURRENT', 2), 1024 ** 3)))
+    throw Object.assign(new Error('Upload staging capacity unavailable'), { statusCode: 503, retryAfterSeconds: 2 })
 }

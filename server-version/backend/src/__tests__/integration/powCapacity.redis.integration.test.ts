@@ -43,11 +43,11 @@ suite('PoW real Redis atomic inventory capacity',()=>{
     service=(await import('../../services/powService')).powService
   })
   beforeEach(async()=>{
-    await redis.del([inventory,...issued]);issued.clear()
+    await redis.del([inventory,...issued,...await redis.keys('pow-issue:*')]);issued.clear()
     vi.stubEnv('POW_MAX_ACTIVE_CHALLENGES','3')
   })
   afterAll(async()=>{
-    if(ownsFixture&&redis?.isOpen)await redis.del([inventory,...issued])
+    if(ownsFixture&&redis?.isOpen)await redis.del([inventory,...issued,...await redis.keys('pow-issue:*')])
     await Promise.all(clients.filter(client=>client.isOpen).map(client=>client.quit()))
     vi.unstubAllEnvs()
   })
@@ -105,13 +105,22 @@ suite('PoW real Redis atomic inventory capacity',()=>{
   it('fails closed on a Redis script error without issuing an untracked key',async()=>{
     await redis.set(inventory,'isolated corrupt inventory fixture')
     await expect(issue()).rejects.toThrow()
-    expect(await redis.dbSize()).toBe(1)
+    expect(await redis.dbSize()).toBe(3)
     expect(service.getStats().totalChallenges).toBe(0)
+  })
+  it('limits per-IP issuance separately and rejects without allocating more keys', async () => {
+    vi.stubEnv('POW_MAX_ACTIVE_CHALLENGES', '12000')
+    const allowed = await Promise.allSettled(Array.from({ length: 1250 }, () => issue()))
+    expect(allowed.filter(result => result.status === 'fulfilled')).toHaveLength(1200)
+    expect(await redis.zCard(inventory)).toBe(1200)
+    const size = await redis.dbSize()
+    await expect(issue()).rejects.toMatchObject({ name: 'POWCapacityError', retryAfterSeconds: 60 })
+    expect(await redis.dbSize()).toBe(size)
   })
   it('accepts a classroom burst within the default global budget without per-IP keys',async()=>{
     vi.stubEnv('POW_MAX_ACTIVE_CHALLENGES','12000')
     await Promise.all(Array.from({length:200},()=>issue()))
     expect(await redis.zCard(inventory)).toBe(200)
-    expect(await redis.dbSize()).toBe(201)
+    expect(await redis.dbSize()).toBe(203)
   })
 })

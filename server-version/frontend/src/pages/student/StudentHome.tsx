@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react'
+import { useCursorList } from '../../hooks/useCursorList'
+import React, { useState, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { BookOpen, Brain, Clock, Keyboard, Plus, Users } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
@@ -13,19 +14,13 @@ const StudentHome: React.FC = () => {
   const { user } = useAuth()
   const location = useLocation()
   const cognitiveModuleEnabled = useCognitiveEnabled()
-  const [courses, setCourses] = useState<Course[]>([])
-  const [loading, setLoading] = useState(true)
-  const [loadError, setLoadError] = useState<string | null>(null)
+  const { list: courses, loading, error: loadError, refresh: fetchCourses, more, hasMore } = useCursorList<Course>('/courses/my')
   const [showJoinModal, setShowJoinModal] = useState(false)
   const [courseCode, setCourseCode] = useState('')
   const [joining, setJoining] = useState(false)
   const [taskRefresh, setTaskRefresh] = useState(0)
   const [joinError, setJoinError] = useState<string | null>(null)
   const joinInputRef = useRef<HTMLInputElement | null>(null)
-
-  useEffect(() => {
-    void fetchCourses()
-  }, [])
 
   const openJoinModal = () => {
     setJoinError(null)
@@ -35,21 +30,6 @@ const StudentHome: React.FC = () => {
   const closeJoinModal = () => {
     setShowJoinModal(false)
     setJoinError(null)
-  }
-
-  const fetchCourses = async () => {
-    try {
-      setLoading(true)
-      setLoadError(null)
-      const response = await apiClient.get('/courses/my')
-      if (response.code !== 0) throw new Error(response.message || '获取课程列表失败')
-      setCourses(response.data.list)
-    } catch (error) {
-      console.error('获取课程列表失败:', error)
-      setLoadError(error instanceof Error ? error.message : '获取课程列表失败')
-    } finally {
-      setLoading(false)
-    }
   }
 
   const handleJoinCourse = async (event: React.FormEvent) => {
@@ -105,9 +85,9 @@ const StudentHome: React.FC = () => {
 
       <StudentTasks refreshKey={taskRefresh} />
 
-      {loading ? (
+      {loading && courses.length === 0 ? (
         <ProductStatus kind="pending" title="正在加载课程" announce="polite" />
-      ) : loadError ? (
+      ) : loadError && courses.length === 0 ? (
         <ProductStatus kind="error" title="课程列表加载失败" announce="assertive" actions={<ProductButton onClick={() => void fetchCourses()}>重试</ProductButton>}>{loadError}</ProductStatus>
       ) : courses.length === 0 ? (
         <ProductStatus kind="info" title="还没有加入任何课程" actions={<ProductButton variant="primary" onClick={openJoinModal}>加入课程</ProductButton>}>
@@ -133,6 +113,9 @@ const StudentHome: React.FC = () => {
           ))}
         </div>
       )}
+
+      {courses.length > 0 && loadError && <p role="alert">{loadError}</p>}
+      {hasMore && <ProductButton disabled={loading} onClick={() => void more()}>{loading ? '加载中…' : '加载更多课程'}</ProductButton>}
 
       {showJoinModal ? (
         <ModalSurface open={showJoinModal} onClose={closeJoinModal} initialFocusRef={joinInputRef} className="hui-student-modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">

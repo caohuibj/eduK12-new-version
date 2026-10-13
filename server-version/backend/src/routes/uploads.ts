@@ -19,16 +19,9 @@ import { detectMimeType } from '../utils/fileValidator'
 const router = Router()
 router.use(authenticate, requireTeacher)
 
-// 图片处理状态存储（内存缓存，重启后清空）
-// 生产环境应使用 Redis 存储
-const imageStatusCache = new Map<string, {
-  status: 'pending' | 'processing' | 'completed' | 'failed'
-  filename?: string
-  url?: string
-  size?: number
-  originalSize?: number
-  error?: string
-}>()
+// Cache only transient historical statuses; the queue remains authoritative.
+import NodeCache from 'node-cache'
+const imageStatusCache = new NodeCache({ stdTTL: 300, checkperiod: 60, maxKeys: 500, useClones: false })
 
 // 确保上传目录存在（使用绝对路径）
 const imagesDir = path.resolve(config.uploadDir, 'images')
@@ -375,13 +368,18 @@ router.post('/image', uploadPrincipalRateLimit, boundedUpload('image', 10 * 1024
   }
 }))
 
+function cacheImageStatus(id: string, value: unknown) {
+  if (imageStatusCache.keys().length >= 500) imageStatusCache.del(imageStatusCache.keys()[0])
+  imageStatusCache.set(id, value)
+}
+
 // 查询图片处理状态
 router.get('/image/status/:imageId', async (req, res) => {
   try {
     const { imageId } = req.params
 
     // 先检查内存缓存
-    const cached = imageStatusCache.get(imageId)
+    const cached = imageStatusCache.get<{ status: string }>(imageId)
     if (cached && cached.status === 'completed') {
       return success(res, cached)
     }
@@ -432,7 +430,7 @@ router.get('/image/status/:imageId', async (req, res) => {
             storage: result.storage,
           }
           // 缓存结果
-          imageStatusCache.set(imageId, completedData)
+          cacheImageStatus(imageId, completedData)
           return success(res, completedData)
         case 'failed':
           status = 'failed'
@@ -446,7 +444,7 @@ router.get('/image/status/:imageId', async (req, res) => {
             // response.
             error: '图片处理失败，请稍后重试或联系管理员',
           }
-          imageStatusCache.set(imageId, failedData)
+          cacheImageStatus(imageId, failedData)
           return success(res, failedData)
       }
     }

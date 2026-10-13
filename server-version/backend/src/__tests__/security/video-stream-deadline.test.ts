@@ -31,7 +31,7 @@ describe('remote video lifetime covers DNS, redirects and stream body', () => {
  it('keeps a normal completed body and exact bytes', async () => {
    m.get.mockResolvedValue({ status: 200, headers: { 'content-type': 'video/mp4' }, data: Readable.from([Buffer.from('synthetic-video')]) })
    const result = await downloadVideo('https://public.example/video', { tempDir: dir, timeout: 500 })
-   expect(result.success).toBe(true); expect(await readFile(result.localPath!, 'utf8')).toBe('synthetic-video')
+   expect(result.success).toBe(true); expect(m.lookup).toHaveBeenCalledTimes(1); expect(await readFile(result.localPath!, 'utf8')).toBe('synthetic-video')
  })
  it('destroys redirected responses and applies one deadline to the chain', async () => {
    const first = body(), second = body()

@@ -53,6 +53,16 @@ end
 redis.call('EXPIRE', KEYS[2], ttl)
 return { 1, 0 }
 `
+const EMISSION_SCRIPT = `
+local global = tonumber(redis.call('GET', KEYS[1]) or '0')
+local ip = tonumber(redis.call('GET', KEYS[2]) or '0')
+if global >= 12000 or ip >= 1200 then return 0 end
+local g = redis.call('INCR', KEYS[1])
+if g == 1 then redis.call('EXPIRE', KEYS[1], 60) end
+local i = redis.call('INCR', KEYS[2])
+if i == 1 then redis.call('EXPIRE', KEYS[2], 60) end
+return 1
+`
 const CONSUME_SCRIPT = `
 local value = redis.call('GET', KEYS[1])
 if value then redis.call('DEL', KEYS[1]) end
@@ -92,11 +102,17 @@ async function getRedis(): Promise<RedisClientType | null> {
 const keyFor = (challenge: string) => `pow:${challenge}`
 
 export const powService = {
-  async generateChallenge(difficulty: number = 4): Promise<POWChallenge> {
+  async generateChallenge(difficulty: number = 4, issuer = 'unspecified'): Promise<POWChallenge> {
     const limit = activeChallengeLimit()
     const challenge: POWChallenge = { challenge: nanoid(), difficulty, timestamp: Date.now() }
     const redis = await getRedis()
     if (redis) {
+      // Global admission bounds both issuance rate and the number of IP counter
+      // keys. Rejected requests never allocate a new IP or challenge key.
+      const emitted = await redis.eval(EMISSION_SCRIPT, {
+        keys: ['pow-issue:global:v1', `pow-issue:ip:${crypto.createHash('sha256').update(issuer).digest('hex')}`], arguments: [],
+      })
+      if (Number(emitted) !== 1) throw new POWCapacityError(60)
       // One fixed inventory key bounds cardinality across backend processes;
       // unsuccessful requests create no per-request or per-IP budget keys.
       const result = await redis.eval(ISSUE_SCRIPT, {

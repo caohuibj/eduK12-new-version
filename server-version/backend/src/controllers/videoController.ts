@@ -9,7 +9,7 @@ import { logger } from '../utils/logger'
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { z } from 'zod'
 import { validateRemoteUrl } from '../utils/videoDownloader'
-import { attachAssetReference, discardUnreferencedAsset, getLocalAssetPath, getSignedAssetUrl, getSignedAssetUrls, storeAssetFromFile } from '../services/assetStorage'
+import { attachAssetReference, discardUnreferencedAsset, getLocalAssetPath, getSignedAssetUrl, getSignedAssetUrls, signKnownAsset, storeAssetFromFile } from '../services/assetStorage'
 import { randomUUID } from 'node:crypto'
 import { retryVideo, VideoRetryError } from '../services/videoRetry'
 
@@ -234,7 +234,7 @@ export const videoController = {
         id: video.id,
         title: video.title,
         status: 'PENDING',
-        originalUrl: await getSignedAssetUrl(originalAsset.id),
+        originalUrl: signKnownAsset(originalAsset),
         message: '视频上传成功，正在后台处理中...',
       }, '视频上传成功，转码处理中')
     } catch (err) {
@@ -417,19 +417,20 @@ export const videoController = {
         }
       }
 
+      const urls = await getSignedAssetUrls([video.originalAssetId, video.processedAssetId, video.thumbnailAssetId])
       return success(res, {
         id: video.id,
         title: video.title,
         status: video.status,
         progress,
         originalUrl: video.originalAssetId
-          ? await getSignedAssetUrl(video.originalAssetId)
+          ? urls.get(video.originalAssetId) || null
           : (video.originalUrl ? `/uploads/videos/${video.fileName}` : null),
         processedUrl: video.processedAssetId
-          ? await getSignedAssetUrl(video.processedAssetId)
+          ? urls.get(video.processedAssetId) || null
           : video.processedUrl,
         thumbnailUrl: video.thumbnailAssetId
-          ? await getSignedAssetUrl(video.thumbnailAssetId)
+          ? urls.get(video.thumbnailAssetId) || null
           : video.thumbnailUrl,
         resolution: video.resolution,
         duration: video.duration,

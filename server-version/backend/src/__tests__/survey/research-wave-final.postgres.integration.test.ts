@@ -1,6 +1,8 @@
+import { prisma } from '../../config/database'
+import * as runtimeSecurity from '../../modules/assessment-runtime/security'
 import { createHash,randomUUID } from 'node:crypto'
 import { PrismaClient } from '@prisma/client'
-import { beforeAll,afterAll,describe,expect,it } from 'vitest'
+import { beforeAll,afterAll,describe,expect,it,vi } from 'vitest'
 import { integrationDatabaseUrl } from '../integration/integration-env'
 import { createDraft,getDraft,updateDraft } from '../../modules/survey/builder.service'
 import { createWave,getWave,updateWave } from '../../modules/survey/waves.service'
@@ -130,6 +132,39 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     process.env.SURVEY_PUBLICATION_ENABLED=previousFlags.publication
     process.env.SURVEY_WORKSPACE_ENABLED=previousFlags.workspace
     await db?.$disconnect()
+  })
+  it('computes Survey sources outside business transactions and rechecks current authority before returning', async () => {
+    const w = await wave('source calculation isolation', [toolIds.scale])
+    const enrolled = await joinLinkedStudy({ publicId: w.publicId, waveId: w.id, entryToken: w.entrySecret, consentVersion: 1, consent: true })
+    const credential = { researchCode: enrolled.researchCode, accessCredential: enrolled.accessCredential }
+    const task = await getOwnResearchTask({ publicId: w.publicId, attemptId: enrolled.attemptId, ...credential })
+    await submitResearchFinal({ publicId: w.publicId, attemptId: enrolled.attemptId, ...credential, submissionId: randomUUID(),
+      answers: { [task.units[0].instrumentKey]: { itemone: 'o4', itemtwo: 'o4' } } })
+    let inTransaction = false
+    const originalTransaction = prisma.$transaction.bind(prisma)
+    const transaction = vi.spyOn(prisma, '$transaction').mockImplementation((async (fn: any, options: any) => originalTransaction(async tx => {
+      inTransaction = true
+      try { return await fn(tx) } finally { inTransaction = false }
+    }, options)) as any)
+    const originalDecrypt = runtimeSecurity.decryptUnifiedRuntimePayload
+    const decrypt = vi.spyOn(runtimeSecurity, 'decryptUnifiedRuntimePayload').mockImplementation((cipher: string) => {
+      expect(inTransaction).toBe(false)
+      return originalDecrypt(cipher)
+    })
+    try {
+      const result = await loadSurveySource({ actorUserId: ownerId, projectId, waveIds: [w.id], includeAttendance: false })
+      expect(result.completeAttempts).toBe(1)
+      expect(transaction).toHaveBeenCalledTimes(2)
+      expect(decrypt).toHaveBeenCalledTimes(1)
+    } finally { transaction.mockRestore(); decrypt.mockRestore() }
+    let calls = 0
+    const race = vi.spyOn(prisma, '$transaction').mockImplementation((async (fn: any, options: any) => {
+      const result = await originalTransaction(fn, options)
+      if (++calls === 1) await db.user.update({ where: { id: ownerId }, data: { isFrozen: true } })
+      return result
+    }) as any)
+    try { await expect(loadSurveySource({ actorUserId: ownerId, projectId, waveIds: [w.id], includeAttendance: false })).rejects.toThrow() }
+    finally { race.mockRestore(); await db.user.update({ where: { id: ownerId }, data: { isFrozen: false } }) }
   })
   it('publishes a real immutable ResearchOnly Form/Scale/SJT wave and issues separate linked proof',async()=>{
     const w=await wave('T1 前测',[toolIds.form,toolIds.scale,toolIds.sjt])

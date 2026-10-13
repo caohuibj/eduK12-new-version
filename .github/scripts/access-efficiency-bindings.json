@@ -1,0 +1,125 @@
+{
+  "schema": 1,
+  "files": {
+    "server-version/backend/src/controllers/checkinController.ts": {
+      "before": "4b354eb2c07512fa8d0d214d74daa4f69e24d2b9",
+      "after": "66016031262e13094c15ab6cdf33662da049537c"
+    },
+    "server-version/backend/src/controllers/courseController.ts": {
+      "before": "671595ed1562155d7eae8805223692777176c323",
+      "after": "ebe73afbe96621538e674705ccd4685261f612f3"
+    },
+    "server-version/backend/src/controllers/publicQuestionnaireController.ts": {
+      "before": "02b1de21425a3139e82aa402cb29ac1a47b31619",
+      "after": "a6a839e4052bd67a6b55d1bea8986b1647a56a9a"
+    },
+    "server-version/backend/src/controllers/videoController.ts": {
+      "before": "42cada3946f15510f7ec23e5579c64353282f499",
+      "after": "ada249206d19fd8c4b43311a95271abbd2fc9782"
+    },
+    "server-version/backend/src/middleware/publicAssessmentRateLimit.ts": {
+      "before": "82c26cb2b11addff80803ce45135770aac4bd49a",
+      "after": "d1f650fc9200e2653227809527c1a2e52f14911c"
+    },
+    "server-version/backend/src/middleware/uploadAdmission.ts": {
+      "before": "5e7727d8617857d96bcbc190c91f87c4c6c364e0",
+      "after": "c1c90112b5ab169a661bb9eae78ccc72a5c34ab1"
+    },
+    "server-version/backend/src/modules/huiteacher/groupReport.service.ts": {
+      "before": "5598976f187ed2397b972b0d3f714b37fb34c0f7",
+      "after": "81d392c5a5258a10114669390a7806d4738b8b4c"
+    },
+    "server-version/backend/src/modules/survey/analytics.source.ts": {
+      "before": "5d066e05d8c89bf7642ed663fd9e65c9bfc7c326",
+      "after": "aff92985c3f725308f81b54f5043b1437ed00781"
+    },
+    "server-version/backend/src/routes/uploads.ts": {
+      "before": "d6848fba2be62a16724bc2f8ec019d509028526a",
+      "after": "9c1cd1b66aa57061ebb9d89e28c6c5abb1326412"
+    },
+    "server-version/backend/src/services/powService.ts": {
+      "before": "43f92be4b7e6a1b70dad0b476882fa4e7c855786",
+      "after": "beb0fd94d16c5b5581d94ab556e7362f2a5a0869"
+    },
+    "server-version/backend/src/utils/listCursor.ts": {
+      "before": null,
+      "after": "3c06e3e1358551bdedfed156a4a5e09288f0513c"
+    },
+    "server-version/backend/src/utils/uploadTemp.ts": {
+      "before": "f240fa17fcb2f26d86fdcba74aaa1d72d9e06371",
+      "after": "de4cccf56da7fb37c076ffb1edf327090395b095"
+    },
+    "server-version/backend/src/utils/videoDownloader.ts": {
+      "before": "a96161352c01c45fc891fd5a5da40c8fdba02f85",
+      "after": "9326b190bb30395adc2c0c40826d2887fdb6e9c3"
+    },
+    "server-version/backend/src/utils/videoProbe.ts": {
+      "before": null,
+      "after": "d00db48f5ce0a3a7723e1ccfc829e03966637f6f"
+    },
+    "server-version/backend/src/workers/videoProcessorOptimized.ts": {
+      "before": "079fa1a32df220cc1852bcbbf6236ffa37f03f8f",
+      "after": "c3b1df14dfd11bbebd7f4cff0426c88cf7b47398"
+    },
+    "server-version/docker-compose.yml": {
+      "before": "86df296a5acee6eaa2b708fbd7c9cd377f6362b0",
+      "after": "4b3691c6d276df6fe87968c72229f2542b962153"
+    },
+    "server-version/frontend/src/hooks/useCursorList.ts": {
+      "before": null,
+      "after": "bb86ee77de6ee9f8e181011820e5a4ac218d7ba6"
+    },
+    "server-version/frontend/src/pages/CheckinList.tsx": {
+      "before": "bf236baf8e06bb3bb6c5f759a05b0d736398cbfb",
+      "after": "0aa97073bb604f2d98d3c06fc207d30900895ddd"
+    },
+    "server-version/frontend/src/pages/student/CheckinSubmit.tsx": {
+      "before": "598031c8ec934c87968a70ae47c5aa0e5e5045b8",
+      "after": "1bccf57362bbf16821832dd5830f617b82d05751"
+    },
+    "server-version/frontend/src/pages/student/StudentCheckins.tsx": {
+      "before": "4fa3d15bd13c501fdfef2f18e05fb12429396777",
+      "after": "fe6f54778b57fa1a153d51276a3e3a8ebabf24b6"
+    },
+    "server-version/frontend/src/pages/student/StudentHome.tsx": {
+      "before": "040bc08346e4e6358cb6dc5efba2757d3751928c",
+      "after": "2363fe528ae5cdc54cc3e9a728f19c7f0a1b93b2"
+    },
+    "server-version/frontend/src/training/TrainingLearnerHome.tsx": {
+      "before": "f7674a00cceeca48e3d7c03cfb10d12e945f5d41",
+      "after": "3b1d2dd88f735f29732d99fc11ba6ccb7a9fe8d9"
+    },
+    "server-version/miniprogram-v2/domains/operations/service.js": {
+      "before": "8479009982e191a34e530a8b07a6497a31e3046e",
+      "after": "8a7b77857846b9ace3cc09f4dd3fa2131210969b"
+    },
+    "server-version/miniprogram-v2/domains/shared/service.js": {
+      "before": "6f7a64e0c3de63b20c740a3889fa2b5e0036609d",
+      "after": "cab7c7871592b30f47952d0c4ee9b9dbe347aaf3"
+    },
+    "server-version/miniprogram/api/checkins.js": {
+      "before": "5b43d7d19197c6580ff9cf94723972d04102bc8d",
+      "after": "612c822ac81f95f89dc6f66e91001fd15d99510e"
+    },
+    "server-version/miniprogram/api/courses.js": {
+      "before": "627a37be84c518b18c131014a6c4bed02ab73729",
+      "after": "eb075314b08ef953c6b3f5d287605fd32957f394"
+    },
+    "server-version/miniprogram/pages/checkin/list/index.js": {
+      "before": "bebe177ee03e0489eca1330814296da0aebd0058",
+      "after": "9d7a1f50fd9f9746191a444a193116f372d02647"
+    },
+    "server-version/miniprogram/pages/checkin/submit/submit.js": {
+      "before": "31b168e1a93a274a59c136991708a0de41736dd8",
+      "after": "95231ee708f921fa41e4d486dcf778db8b698ed6"
+    },
+    "server-version/miniprogram/pages/checkin/submit/submit.wxml": {
+      "before": "658ba6148422e51190f1713025d8e84e904b8385",
+      "after": "d4a60c0b91fada763917b33e805b4ddfb837c482"
+    },
+    "server-version/miniprogram/pages/index/index.js": {
+      "before": "057f3e002ccd1e7c6120ab5bd90274aa7998e6c9",
+      "after": "54852e02b8c12166753f28221f0960a5518f2547"
+    }
+  }
+}

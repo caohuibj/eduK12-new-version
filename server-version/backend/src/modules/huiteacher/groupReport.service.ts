@@ -156,10 +156,30 @@ export const discloseProtectedFormItems=(items:ItemAccumulator[],count:number,op
  * No filters, no raw texts, no respondent IDs/attempt IDs, and no time slices.
  * The Run/Event must be fully CLOSED with no STARTED or ASSIGNED work.
  */
+type PreparedTeacherReport = {
+  binding: string
+  rows: Array<{ id: string; attemptId: string; definitionDigest: string; resultsCipher: string; resultsHash: string }>
+  distributions: ReturnType<typeof discloseProtectedFormItems>
+}
+
 export async function readTeacherFormGroupReport(input:{
   organizationId:string;eventId:string;formId:string;actorUserId:string;
   publishV2?:boolean;releasedOnly?:boolean
-}){
+}) {
+  const first = await readTeacherFormGroupReportStage(input)
+  if (!('deferredCompute' in first)) return first
+  const prepared = await first.deferredCompute()
+  // Reacquire current authorization/source/disclosure locks; nothing from the
+  // calculation phase is a reusable grant or a released privacy projection.
+  const second = await readTeacherFormGroupReportStage(input, prepared)
+  if ('deferredCompute' in second) throw new Error('Unexpected report stage')
+  return second
+}
+
+async function readTeacherFormGroupReportStage(input:{
+  organizationId:string;eventId:string;formId:string;actorUserId:string;
+  publishV2?:boolean;releasedOnly?:boolean
+}, prepared?: PreparedTeacherReport) {
   return prisma.$transaction(async tx=>{
     if(input.publishV2)await lockTeacherDisclosure(tx,input.organizationId)
     // Serialize product suspension: a valid School ORG_ADMIN is not enough.
@@ -322,7 +342,23 @@ export async function readTeacherFormGroupReport(input:{
       reject('HUITEACHER_GROUP_INCOMPLETE_COHORT',403)
     if(count>MAX_REPORT_FINALS)
       reject('HUITEACHER_GROUP_CAPACITY_LIMIT',409)
-    const items=createProtectedFormItems(form.definition as FormDraft)
+    const [budget] = await tx.$queryRaw<Array<{ bytes: bigint }>>`
+      SELECT COALESCE(SUM(octet_length(final.results_cipher)), 0)::bigint AS bytes
+      FROM huiteacher_form_finals final
+      JOIN huiteacher_form_attempts attempt ON attempt.id=final.attempt_id AND attempt.organization_id=final.organization_id
+      JOIN assessment_run_executions execution ON execution.id=attempt.run_execution_id
+        AND execution.organization_id=attempt.organization_id AND execution.run_id=attempt.run_id
+        AND execution.status='COMPLETED' AND execution.runtime_binding_kind='HUITEACHER_FORM_V2'
+        AND execution.runtime_binding_ref=attempt.id
+      WHERE final.organization_id=${input.organizationId} AND attempt.run_id=${source.runId}
+        AND attempt.form_id=${input.formId} AND attempt.definition_digest=${source.definitionDigest}
+        AND final.definition_digest=${source.definitionDigest}
+    `
+    if ((budget?.bytes ?? 0n) > 16n * 1024n * 1024n) reject('HUITEACHER_GROUP_CAPACITY_LIMIT', 409)
+    const rows: PreparedTeacherReport['rows'] = []
+    let cipherBytes = 0
+    const binding = canonicalHash(JSON.parse(JSON.stringify({ runId: source.runId, definitionDigest: source.definitionDigest,
+      n, count, requiredN, frozen, formDefinition: form.definition })))
     let cursor=''
     let seen=0
     for(;;){
@@ -354,16 +390,10 @@ export async function readTeacherFormGroupReport(input:{
         ORDER BY final."id" ASC LIMIT ${PAGE_SIZE}
       `
       if(!finals.length)break
-      for(const final of finals){
-        const data=decryptUnifiedRuntimePayload<FinalPayload>(final.resultsCipher)
-        if(data.schemaVersion!==1||data.kind!=='FORM'||data.product!=='HUITEACHER'
-          ||data.formId!==input.formId||data.attemptId!==final.attemptId
-          ||data.definitionDigest!==source.definitionDigest
-          ||final.definitionDigest!==source.definitionDigest
-          ||data.privateScoring!==null
-          ||canonicalHash(data)!==final.resultsHash)
-          reject('HUITEACHER_REPORT_FINAL_INTEGRITY_FAILURE',409)
-        recordProtectedFormAnswers(items,data.rawAnswers,data.missing)
+      for (const final of finals) {
+        cipherBytes += Buffer.byteLength(final.resultsCipher)
+        if (cipherBytes > 16 * 1024 * 1024) reject('HUITEACHER_GROUP_CAPACITY_LIMIT', 409)
+        rows.push(final)
       }
       seen+=finals.length
       if(seen>count)reject('HUITEACHER_GROUP_SOURCE_CHANGED',409)
@@ -371,7 +401,28 @@ export async function readTeacherFormGroupReport(input:{
       if(finals.length<PAGE_SIZE)break
     }
     if(seen!==count)reject('HUITEACHER_GROUP_SOURCE_CHANGED',409)
-    const distributions=discloseProtectedFormItems(items,count,frozen?.options)
+    if (!prepared) return { deferredCompute: async (): Promise<PreparedTeacherReport> => {
+      const items = createProtectedFormItems(form.definition as FormDraft)
+      for (let index = 0; index < rows.length; index++) {
+        const final = rows[index]
+        const data = decryptUnifiedRuntimePayload<FinalPayload>(final.resultsCipher)
+        if (data.schemaVersion !== 1 || data.kind !== 'FORM' || data.product !== 'HUITEACHER'
+          || data.formId !== input.formId || data.attemptId !== final.attemptId
+          || data.definitionDigest !== source.definitionDigest || final.definitionDigest !== source.definitionDigest
+          || data.privateScoring !== null || canonicalHash(data) !== final.resultsHash)
+          reject('HUITEACHER_REPORT_FINAL_INTEGRITY_FAILURE', 409)
+        recordProtectedFormAnswers(items, data.rawAnswers, data.missing)
+        if (index % PAGE_SIZE === 0) await new Promise<void>(resolve => setImmediate(resolve))
+      }
+      return { binding, rows, distributions: discloseProtectedFormItems(items, count, frozen?.options) }
+    } }
+    if (prepared.binding !== binding || prepared.rows.length !== rows.length
+      || rows.some((row, index) => {
+        const old = prepared.rows[index]
+        return row.id !== old.id || row.attemptId !== old.attemptId || row.definitionDigest !== old.definitionDigest
+          || row.resultsCipher !== old.resultsCipher || row.resultsHash !== old.resultsHash
+      })) reject('HUITEACHER_GROUP_SOURCE_CHANGED', 409)
+    const distributions = prepared.distributions
     // Disclosure is also a WRITE event: for a given school and immutable
     // Form definition, all released waves must use EXACTLY the same frozen
     // respondent population, preventing 10-of-11 / 11-of-12 differencing.

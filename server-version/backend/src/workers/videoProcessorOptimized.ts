@@ -1,3 +1,4 @@
+import { probeVideo } from '../utils/videoProbe'
 /**
  * 视频处理 Worker - 统一版本（优化并发）
  * 优化：统一处理队列，限制全局并发为 1，避免 CPU 占满
@@ -20,7 +21,7 @@ import { config } from '../config'
 import { prisma } from '../config/database'
 import { logger } from '../utils/logger'
 import { downloadVideo, validateVideoFile, VideoValidationResult } from '../utils/videoDownloader'
-import { attachAssetReference, discardUnreferencedAsset, getSignedAssetUrl, storeAssetFromFile } from '../services/assetStorage'
+import { attachAssetReference, discardUnreferencedAsset, signKnownAsset, storeAssetFromFile } from '../services/assetStorage'
 import { associateVideoRetryJob, markVideoFailed, markVideoProcessing, releaseVideoProcessingForRetry } from '../services/videoProcessingState'
 import { isFinalVideoAttempt, reconcileStaleProcessingVideos, registerVideoProcessingRecovery, stopVideoProcessingRecovery } from '../services/videoProcessingRecovery'
 import { isWorkerShutdownCancellationError, registerWorkerSubprocess, WorkerShutdownCancellationError, workerShutdownCancellationRequested } from './workerSubprocessRegistry'
@@ -198,7 +199,7 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
 
     // 步骤4：转码 + 添加水印 (核心步骤)
     logger.info(`[${videoId}] 步骤 4/6: 转码 (${strategy.resolution}, preset: ${strategy.preset}, crf: ${strategy.crf})...`)
-    await transcodeVideoOptimized(inputPath, outputPath, watermarkAvailable ? cornerWatermarkPath : null, strategy, outputMaxBytes, (progress) => {
+    await transcodeVideoOptimized(inputPath, outputPath, watermarkAvailable ? cornerWatermarkPath : null, strategy, outputMaxBytes, videoInfo.duration || 0, (progress) => {
       const jobProgress = 30 + Math.floor(progress * 0.4)
       job.progress(jobProgress).catch(() => { })
     })
@@ -215,7 +216,7 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
         resolution: strategy.resolution,
         reason: '压缩后文件变大，改用仅水印模式'
       }
-      await transcodeVideoOptimized(inputPath, outputPath, watermarkAvailable ? cornerWatermarkPath : null, watermarkOnlyStrategy, outputMaxBytes, (progress) => {
+      await transcodeVideoOptimized(inputPath, outputPath, watermarkAvailable ? cornerWatermarkPath : null, watermarkOnlyStrategy, outputMaxBytes, videoInfo.duration || 0, (progress) => {
         const jobProgress = 70 + Math.floor(progress * 0.1)
         job.progress(jobProgress).catch(() => { })
       })
@@ -228,7 +229,7 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
 
     // 步骤5：生成缩略图
     logger.info(`[${videoId}] 步骤 5/6: 生成缩略图...`)
-    await generateThumbnailOptimized(inputPath, thumbnailPath)
+    await generateThumbnailOptimized(inputPath, thumbnailPath, videoInfo.duration || 0)
     await job.progress(85)
 
     // 步骤6：上传存储
@@ -250,8 +251,8 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
       ownerId: teacherId,
     })
     derivativeAssets.push(thumbnailAsset)
-    const processedUrl = await getSignedAssetUrl(processedAsset.id)
-    const thumbnailUrl = await getSignedAssetUrl(thumbnailAsset.id)
+    const processedUrl = signKnownAsset(processedAsset)
+    const thumbnailUrl = signKnownAsset(thumbnailAsset)
 
     await job.progress(95)
 
@@ -425,19 +426,15 @@ function transcodeVideoOptimized(
   cornerWatermark: string | null,
   strategy: ProcessingStrategy,
   maxOutputBytes: number,
+  totalTime: number,
   onProgress?: (progress: number) => void
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    let totalTime = 0
     let settled = false
     let timedOut = false
     let hardKillTimer: ReturnType<typeof setTimeout> | undefined
     let settleTracked!: () => void
     const tracked = new Promise<void>((done) => { settleTracked = done })
-
-    ffmpeg(input).ffprobe((err, data) => {
-      if (!err && data.format?.duration) totalTime = data.format.duration
-    })
 
     const baseResolution = RESOLUTION_MAP[strategy.resolution] || RESOLUTION_MAP['480p']
     const resConfig = { ...baseResolution, bitrate: PROCESSING_CONFIG.videoBitrate }
@@ -459,6 +456,14 @@ function transcodeVideoOptimized(
         `-fs ${outputSoftLimit}`,
         ...(strategy.mode === 'transcode' ? ['-tune fastdecode', '-profile:v baseline', '-level 3.0'] : []),
       ])
+
+    // fluent-ffmpeg starts its own untracked ffprobe when progress listeners
+    // attach. Reuse the already validated input duration for this command.
+    cmd.ffprobe = ((...args: unknown[]) => {
+      const callback = args.at(-1) as (error: Error | null, data: unknown) => void
+      queueMicrotask(() => callback(null, { streams: [], format: { duration: totalTime } }))
+      return cmd
+    }) as typeof cmd.ffprobe
 
     const [targetWidth, targetHeight] = resConfig.size.split('x').map(Number)
     if (cornerWatermark) {
@@ -527,7 +532,7 @@ function transcodeVideoOptimized(
   })
 }
 
-function generateThumbnailOptimized(input: string, output: string): Promise<void> {
+function generateThumbnailOptimized(input: string, output: string, duration: number): Promise<void> {
   return new Promise((resolve, reject) => {
     let settled = false
     let timedOut = false
@@ -573,7 +578,7 @@ function generateThumbnailOptimized(input: string, output: string): Promise<void
       })
       .on('error', (err) => finish(err))
       .screenshots({
-        timestamps: ['10%'],
+        timestamps: [Math.max(0, duration * 0.1)],
         filename: path.basename(output),
         folder: path.dirname(output),
         size: '640x360',
@@ -581,16 +586,10 @@ function generateThumbnailOptimized(input: string, output: string): Promise<void
   })
 }
 
-function getVideoDuration(input: string): Promise<number> {
-  return new Promise((resolve, reject) => {
-    ffmpeg.ffprobe(input, (err, metadata) => {
-      if (err) {
-        reject(new Error(`获取视频信息失败: ${err.message}`))
-      } else {
-        resolve(Math.floor(metadata.format.duration || 0))
-      }
-    })
-  })
+async function getVideoDuration(input: string): Promise<number> {
+  const data = await probeVideo(input)
+  const duration = Number(data.format?.duration || 0)
+  return Number.isFinite(duration) && duration > 0 ? Math.floor(duration) : 0
 }
 
 // 队列监控

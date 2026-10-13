@@ -1,6 +1,8 @@
+import { prisma } from '../../config/database'
+import * as runtimeSecurity from '../../modules/assessment-runtime/security'
 import { randomUUID } from 'node:crypto'
 import { PrismaClient } from '@prisma/client'
-import { beforeAll,afterAll,describe,it,expect } from 'vitest'
+import { beforeAll,afterAll,describe,it,expect,vi } from 'vitest'
 import { integrationDatabaseUrl,requireIsolatedReleaseDatabase } from './integration-env'
 import { createHuiteacherForm,updateHuiteacherForm,publishHuiteacherForm } from '../../modules/huiteacher/forms.service'
 import { createHuiteacherTarget,createHuiteacherEvent,
@@ -256,7 +258,24 @@ suite('Teacher-only Survey Form V2 released resource → Run START → encrypted
         AND track."resource_version"=${form.definitionDigest}
     `
     expect(cohort[0]).toEqual({assigned:10,respondents:10,completed:10})
-    const report=await readTeacherFormGroupReport({...key,formId:draft.id})
+    let inTransaction = false
+    const originalTransaction = prisma.$transaction.bind(prisma)
+    const transaction = vi.spyOn(prisma, '$transaction').mockImplementation((async (fn: any, options: any) => originalTransaction(async tx => {
+      inTransaction = true
+      try { return await fn(tx) } finally { inTransaction = false }
+    }, options)) as any)
+    const originalDecrypt = runtimeSecurity.decryptUnifiedRuntimePayload
+    const decrypt = vi.spyOn(runtimeSecurity, 'decryptUnifiedRuntimePayload').mockImplementation((cipher: string) => {
+      expect(inTransaction).toBe(false)
+      return originalDecrypt(cipher)
+    })
+    let report
+    try {
+      report=await readTeacherFormGroupReport({...key,formId:draft.id})
+      expect(transaction).toHaveBeenCalledTimes(2)
+      expect(decrypt).toHaveBeenCalledTimes(10)
+    } finally { transaction.mockRestore(); decrypt.mockRestore() }
+
     expect(report.independentRespondents).toBe(10)
     expect(report.reportMode).toBe('FORM_DESCRIPTIVE_AGGREGATE')
     const smallCell=report.distributions.find(x=>x.itemKey==='q1')

@@ -191,3 +191,11 @@ Teacher 候选现保存前后端 runtime、必要的迁移 builder 与 SHA-256�
 正式验收唯一位置为 GitHub：路由拒绝/汇总契约、冻结基础镜像下同一后端 build stage 的一次类型编译、定向权限/媒体/Huiteacher/Survey 查询契约（真实隔离 PostgreSQL 与 Redis，选中测试不得跳过）、同一实际 backend/worker runtime 的 HIGH/CRITICAL 镜像扫描及后端/路由 CodeQL。未改变的前端、小程序、UI、全平台生命周期、灾备和定期性能不进入本次门禁。稳定 `merge gate / ready PR` 重算完整计划并要求所有选中作业真实成功；draft 分类成功不等于 ready 合格，不伪造跳过成功，不使用未实现的应用本地签名接纳。
 
 构建/依赖安装/测试/扫描在同一候选作业内留存阶段证据；约 5 分钟仍未结束时报告具体阶段，失败先定位受影响项。服务器不参与本次 PR 验证；后续部署仍须另有授权。
+
+## 后续访问效率优化的精确 C 合并路线（access-efficiency v1）
+
+仅接纳 2026-10-13 审阅的有界列表及其 Web/两代小程序适配、视频签发/探测/DNS、共享公开限流/PoW 发行预算、磁盘 staging、首次报告分段计算和重新核验，以及 Compose 显式限额注入。完整 raw diff 必须匹配 access-efficiency-bindings.json 的前后 Git blob 与确切测试/工具名单；依赖、Prisma、Dockerfile、未知文件、删除或模式变化仍返回原 C 分类。Survey/Teacher 首页目录、App 和后端 index.ts 必须与 base 字节相同。
+
+GitHub 是唯一正式验证位置：前后端各编译一次，定向真实隔离 PostgreSQL/Redis 契约、报告撤权/来源/披露保护、对应小程序适配与 Compose 有效参数、同一 runtime 的 HIGH/CRITICAL 扫描、受影响分页页面的 390/768/1440 浏览器与 WCAG，以及 CodeQL。固定合成数据记录分页响应、SQL 调用和并发延迟，不冒充生产性能认证或生产池调优。未受影响的登录、首页、测评生命周期、灾备和全平台验收不重复；共享路由修改只执行路由拒绝/汇总契约。
+
+正式复用只限同 PR、24 小时内的官方候选 artifact；校验 Actions 来源、ZIP digest、工具/命令、各检查所消费的 Git 对象/模式、冻结基础镜像和实际镜像 tar/ID。编译不消费测试文件；只改测试时挂载最新测试，复用确切生产输入的 builder/runtime，不伪称旧测试已验证新文件。成功测试文件仅在其完整文件和共享夹具/配置及生产输入一致时复用；失败、跳过或缺失结果必须重验，来源/哈希异常停止。合并门禁重算冻结完整计划，所选候选与 SAST 全部真实成功才合并。此路线不授权部署，不删除历史 token/图片队列兼容；生产证据仅只读核查。
