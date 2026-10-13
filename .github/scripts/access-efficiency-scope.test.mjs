@@ -49,10 +49,19 @@ test('only the two reviewed verifier ordering/fingerprint changes preserve produ
 
 test('actual merge gate CLI recomputes the frozen plan and rejects a different head',()=>{
  const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
- const base=execFileSync('git',['merge-base','HEAD','origin/main'],{encoding:'utf8'}).trim();
+ const event=process.env.GITHUB_EVENT_PATH?JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH,'utf8')):null;
+ // Scope intentionally fetches only this exact object, without a main ref.
+ const base=event?.pull_request?.base?.sha||process.env.CI_BASE_SHA||execFileSync('git',['merge-base','HEAD','origin/main'],{encoding:'utf8'}).trim();
  const actual=accessEfficiencyPlan(changedEntries(base,head),base,head);
  assert.ok(actual,'The current frozen PR must produce a real plan');
- const invoke=p=>spawnSync(process.execPath,['.github/scripts/merge-gate.mjs'],{encoding:'utf8',env:{...process.env,IS_DRAFT:'false',NEEDS_JSON:JSON.stringify({...needs,scope:{result:'success',outputs:{...outputs,access_efficiency_plan:JSON.stringify(p)}}})}});
+ const classified=spawnSync(process.execPath,['.github/scripts/content-scope.mjs'],{encoding:'utf8',env:{...process.env,GITHUB_OUTPUT:'',CI_BASE_SHA:base,CI_EVENT:'pull_request',CI_FORCE_FULL:'false',CI_PR_REPOSITORY:'caohuibj/eduK12-new-version',GITHUB_REPOSITORY:'caohuibj/eduK12-new-version'}});
+ assert.equal(classified.status,0,classified.stderr);
+ const projection=JSON.parse(classified.stdout);
+ assert.equal(projection.application_route,'access-efficiency');
+ assert.equal(projection.frontend_build,true,'The real classifier and merge gate must agree');
+ assert.deepEqual(JSON.parse(projection.access_efficiency_plan),actual);
+ const realOutputs=Object.fromEntries(Object.entries(projection).map(([key,value])=>[key,typeof value==='boolean'?String(value):value]));
+ const invoke=p=>spawnSync(process.execPath,['.github/scripts/merge-gate.mjs'],{encoding:'utf8',env:{...process.env,IS_DRAFT:'false',NEEDS_JSON:JSON.stringify({...needs,scope:{result:'success',outputs:{...realOutputs,access_efficiency_plan:JSON.stringify(p)}}})}});
  const valid=invoke(actual);assert.equal(valid.status,0,valid.stderr);
  assert.deepEqual(JSON.parse(valid.stdout),{required:['scope','access-efficiency','codeql'],failed:[]});
  const stale=invoke({...actual,head:'0'.repeat(40)});assert.equal(stale.status,1,stale.stderr);
