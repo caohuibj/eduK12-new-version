@@ -224,7 +224,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
     {error&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{error}</p>}
     {message&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{message}</p>}
     <button className="btn-secondary" disabled={busy} onClick={()=>void execute(reload)}>刷新完成进度</button>
-    {overview&&<><div className="overflow-x-auto"><table className="w-full text-sm border-collapse">
+    {overview&&<><div className="overflow-x-auto" tabIndex={0} role="region" aria-label="研究波次完成统计"><table className="w-full text-sm border-collapse">
       <thead><tr className="bg-slate-100"><th className="p-2 text-left">波次</th><th className="p-2">状态</th>
         <th className="p-2">已启动</th><th className="p-2">完成 FINAL</th>
         <th className="p-2">有效分析</th><th className="p-2">质量排除</th>

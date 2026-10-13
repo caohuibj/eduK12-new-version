@@ -22,7 +22,7 @@
     },
     "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.tsx": {
       "before": "d5264d9811f46cfb9260ea49b8522a1afb1ccb07",
-      "after": "92ef5d2730800f844a0e488672ab7586fb1ec46f"
+      "after": "9235eac19aed950e2d2bad38b4b09deccfcd96e4"
     },
     "server-version/frontend/src/survey/SurveyApp.tsx": {
       "before": "99f8d9bb69992b2f7ebc728c69a597e0a8e9e37e",
@@ -44,7 +44,8 @@
   "lintTypes": {
     "run": 38383999501,
     "job": 115251216791,
-    "source": "22765fc8647834394411769a88c56cea42ace68d"
+    "source": "22765fc8647834394411769a88c56cea42ace68d",
+    "accessibleTableDelta": "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.tsx"
   },
   "backend": {
     "artifact": 11801647310,

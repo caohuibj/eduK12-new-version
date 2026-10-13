@@ -26,7 +26,15 @@ def evidence():
  for name in ['npm ci','lint','typecheck']:
   assert any(x['name']==name and x['conclusion']=='success' for x in job['steps'])
  run(['git','fetch','origin',ref['source']],60)
- assert output(['git','rev-parse',ref['source']+':server-version/frontend'])==p['frontendTree']
+ oldtree=output(['git','rev-parse',ref['source']+':server-version/frontend'])
+ if oldtree!=p['frontendTree']:
+  delta=ref['accessibleTableDelta'];assert delta=='server-version/frontend/src/survey/SurveyAnalyticsWorkspace.tsx'
+  assert output(['git','diff','--name-only',ref['source'],p['head'],'--','server-version/frontend'])==delta
+  before=git('show',ref['source']+':'+delta);after=Path(delta).read_bytes()
+  attrs=b' tabIndex={0} role="region" aria-label="'+bytes.fromhex('e7a094e7a9b6e6b3a2e6aca1e5ae8ce68890e7bb9fe8aea1')+b'"'
+  assert after.count(attrs)==1 and after.replace(attrs,b'')==before
+  c['typeDeltaFile']=delta
+
  def block(text):return text.split(b'  pr-light-frontend:\n',1)[1].split(b'  post-merge-smoke:\n',1)[0]
  before=block(git('show',ref['source']+':.github/workflows/ci.yml'));after=block(Path('.github/workflows/ci.yml').read_bytes());assert before==after
  assert b"node-version: '24.21.0'" in after and b'ubuntu-24.04' in after
@@ -115,6 +123,10 @@ with tempfile.TemporaryDirectory(prefix='teacher-survey-') as temp:
   run(['docker','tag',reuse['builder'],builder]);c['phases'].append({'name':'frontend-build-once','status':'success','reusedFrom':c['proof']['candidatePhases']})
  else:phase('frontend-build-once',lambda:run(args+['--target','build','-t',builder,'server-version/frontend']))
  c['builder']=output(['docker','image','inspect','--format','{{.Id}}',builder]);archive_images()
+ if c.get('typeDeltaFile'):
+  config=Path(temp)/'tsconfig.review-delta.json';config.write_text(json.dumps({'extends':'./tsconfig.app.json','include':['src/survey/SurveyAnalyticsWorkspace.tsx','src/vite-env.d.ts'],'references':[]}))
+  phase('only-accessible-table-delta-lint-types',lambda:run(['docker','run','--rm','-v',str(config)+':/app/tsconfig.review-delta.json:ro',builder,'sh','-ec','npx eslint src/survey/SurveyAnalyticsWorkspace.tsx && npx tsc -p tsconfig.review-delta.json --noEmit']))
+
  if reuse and reuse.get('contractDigest')==c['contractDigest'] and any(x['name']=='affected-ui-contracts' and x['status']=='success' for x in reuse['phases']):c['phases'].append({'name':'affected-ui-contracts','status':'success','reusedFrom':c['proof']['candidatePhases']})
  else:phase('affected-ui-contracts',lambda:run(['docker','run','--rm','-v',str(Path('.github/scripts/teacher-survey-contracts.test.tsx').resolve())+':/app/src/review-contracts.test.tsx:ro','-v',str(e.resolve())+':/evidence',builder,'npx','vitest','run','src/review-contracts.test.tsx','--maxWorkers=2','--reporter=json','--outputFile=/evidence/contracts.json']))
  # Audit consumes dependency/config/build base inputs, not unrelated JSX text.
