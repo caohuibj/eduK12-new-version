@@ -60,6 +60,13 @@ def evidence():
 phase('bound-official-input-proof',evidence)
 c['candidateBlob']=output(['git','rev-parse','HEAD:.github/scripts/teacher-survey-candidate.py'])
 c['contractDigest']=sha(Path('.github/scripts/teacher-survey-contracts.test.tsx').read_bytes())
+
+def compiler_fingerprint(source):
+ # Test-phase revisions do not consume the compiler. Bind its exact helpers,
+ # frozen Dockerfile transformation, command, configuration and archive code.
+ fragments=[source.split('def run(',1)[1].split('def api(',1)[0],source.split('def archive_images():',1)[1].split("tag='eduk12-teacher-survey:'",1)[0],source.split("tag='eduk12-teacher-survey:'",1)[1].split(" c['builder']=output",1)[0]]
+ return sha(''.join(fragments).encode())
+c['compilerFingerprint']=compiler_fingerprint(Path('.github/scripts/teacher-survey-candidate.py').read_text())
 reuse=None
 # Only this same PR's official artifact with matching consumed inputs qualifies.
 for meta in sorted(api('/actions/artifacts?per_page=30')['artifacts'],key=lambda x:x['created_at'],reverse=True):
@@ -82,8 +89,10 @@ for meta in sorted(api('/actions/artifacts?per_page=30')['artifacts'],key=lambda
  with zipfile.ZipFile(archive) as zipped:
   old=json.loads(zipped.read('teacher-survey-evidence/checks.json'))
   assert old['repository']==os.environ['GITHUB_REPOSITORY'] and old['prNumber']==c['prNumber'] and meta['name']=='teacher-survey-'+old['head']
-  if old.get('frontendTree')!=c['frontendTree'] or old.get('candidateBlob')!=c['candidateBlob'] or not old.get('builder'):continue
+  if old.get('frontendTree')!=c['frontendTree'] or not old.get('builder'):continue
   run(['git','fetch','origin',old['head']],60)
+  producer_source=git('show',old['head']+':.github/scripts/teacher-survey-candidate.py').decode()
+  if compiler_fingerprint(producer_source)!=c['compilerFingerprint']:continue
   assert output(['git','rev-parse',old['head']+':server-version/frontend'])==c['frontendTree']
   if not any(x['name']=='frontend-build-once' and x['status']=='success' for x in old['phases']):continue
   member='teacher-survey-evidence/images.tar.zst';assert member in zipped.namelist();zipped.extract(member,e/'previous')
@@ -97,6 +106,10 @@ for meta in sorted(api('/actions/artifacts?per_page=30')['artifacts'],key=lambda
  assert decoder.wait()==0
  assert output(['docker','image','inspect','--format','{{.Id}}',old['builder']])==old['builder']
  if old.get('image'):assert output(['docker','image','inspect','--format','{{.Id}}',old['image']])==old['image']
+ 
+ old_test=git('show',old['head']+':.github/scripts/teacher-survey-contracts.test.tsx').decode();(e/'previous-contract.tsx').write_text(old_test)
+ with zipfile.ZipFile(archive) as zipped:
+  if 'teacher-survey-evidence/contracts.json' in zipped.namelist():(e/'previous-contracts.json').write_bytes(zipped.read('teacher-survey-evidence/contracts.json'))
  reuse=old;c['proof']['candidatePhases']={'artifactId':meta['id'],'runId':producer['id'],'digest':meta['digest'],'source':old['head']};break
 
 def archive_images():
@@ -125,10 +138,26 @@ with tempfile.TemporaryDirectory(prefix='teacher-survey-') as temp:
  c['builder']=output(['docker','image','inspect','--format','{{.Id}}',builder]);archive_images()
  if c.get('typeDeltaFile'):
   config=Path(temp)/'tsconfig.review-delta.json';config.write_text(json.dumps({'extends':'./tsconfig.app.json','include':['src/survey/SurveyAnalyticsWorkspace.tsx','src/vite-env.d.ts'],'references':[]}))
-  phase('only-accessible-table-delta-lint-types',lambda:run(['docker','run','--rm','-v',str(config)+':/app/tsconfig.review-delta.json:ro',builder,'sh','-ec','npx eslint src/survey/SurveyAnalyticsWorkspace.tsx && npx tsc -p tsconfig.review-delta.json --noEmit']))
+  if reuse and any(x['name']=='only-accessible-table-delta-lint-types' and x['status']=='success' for x in reuse['phases']):c['phases'].append({'name':'only-accessible-table-delta-lint-types','status':'success','reusedFrom':c['proof']['candidatePhases']})
+  else:phase('only-accessible-table-delta-lint-types',lambda:run(['docker','run','--rm','-v',str(config)+':/app/tsconfig.review-delta.json:ro',builder,'sh','-ec','npx eslint src/survey/SurveyAnalyticsWorkspace.tsx && npx tsc -p tsconfig.review-delta.json --noEmit']))
 
  if reuse and reuse.get('contractDigest')==c['contractDigest'] and any(x['name']=='affected-ui-contracts' and x['status']=='success' for x in reuse['phases']):c['phases'].append({'name':'affected-ui-contracts','status':'success','reusedFrom':c['proof']['candidatePhases']})
- else:phase('affected-ui-contracts',lambda:run(['docker','run','--rm','-v',str(Path('.github/scripts/teacher-survey-contracts.test.tsx').resolve())+':/app/src/review-contracts.test.tsx:ro','-v',str(e.resolve())+':/evidence',builder,'npx','vitest','run','src/review-contracts.test.tsx','--maxWorkers=2','--reporter=json','--outputFile=/evidence/contracts.json']))
+ else:
+  missing=[]
+  if reuse and (e/'previous-contracts.json').is_file():
+   # TypeScript AST identifies exact test bodies and a shared fixture context.
+   program="""import ts from './.github/release-tools/node_modules/typescript/lib/typescript.js';import{readFileSync}from'node:fs';import{createHash}from'node:crypto';const hash=x=>createHash('sha256').update(x).digest('hex');const parse=path=>{const text=readFileSync(path,'utf8'),source=ts.createSourceFile(path,text,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);if(source.parseDiagnostics.length)throw Error('invalid contract source');let cases={},ranges=[];const walk=n=>{if(ts.isCallExpression(n)&&n.expression.getText(source)==='it'&&ts.isStringLiteral(n.arguments[0])){cases[n.arguments[0].text]=n.getText(source);ranges.push([n.getStart(source),n.end]);return}ts.forEachChild(n,walk)};walk(source);let shared=text;for(const[a,b]of ranges.sort((x,y)=>y[0]-x[0]))shared=shared.slice(0,a)+shared.slice(b);return{shared:hash(shared),cases:Object.fromEntries(Object.entries(cases).map(([k,v])=>[k,hash(v)]))}};const old=parse('teacher-survey-evidence/previous-contract.tsx'),now=parse('.github/scripts/teacher-survey-contracts.test.tsx');console.log(JSON.stringify({old,now}));"""
+   parts=json.loads(subprocess.check_output(['node','--input-type=module','-e',program],text=True));report=json.loads((e/'previous-contracts.json').read_text());passed={a['title'] for suite in report['testResults'] for a in suite.get('assertionResults',[]) if a['status']=='passed'}
+   for title,digest in parts['now']['cases'].items():
+    if parts['old']['shared']!=parts['now']['shared'] or parts['old']['cases'].get(title)!=digest or title not in passed:missing.append(title)
+   c['proof']['contractCases']={'reused':[t for t in parts['now']['cases'] if t not in missing],'rerun':missing,'sharedFixtureDigest':parts['now']['shared'],'source':c['proof']['candidatePhases']}
+  command=['docker','run','--rm','-v',str(Path('.github/scripts/teacher-survey-contracts.test.tsx').resolve())+':/app/src/review-contracts.test.tsx:ro','-v',str(e.resolve())+':/evidence',builder,'npx','vitest','run','src/review-contracts.test.tsx','--maxWorkers=2','--reporter=json','--outputFile=/evidence/contracts.json']
+  if missing:
+   import re
+   command+=['-t','|'.join('^'+re.escape(t)+'$' for t in missing)]
+  if reuse and not missing and c['proof'].get('contractCases'):c['phases'].append({'name':'affected-ui-contracts','status':'success','reusedFrom':c['proof']['candidatePhases']})
+  else:phase('affected-ui-contracts',lambda:run(command))
+
  # Audit consumes dependency/config/build base inputs, not unrelated JSX text.
  for file in ['package.json','package-lock.json','Dockerfile']:
   assert git('show',p['proof']['backend']['source']+':server-version/frontend/'+file)==Path('server-version/frontend/'+file).read_bytes()
@@ -138,5 +167,7 @@ with tempfile.TemporaryDirectory(prefix='teacher-survey-') as temp:
 
  if reuse and reuse.get('image'):
   run(['docker','tag',reuse['image'],tag]);c['phases'].append({'name':'runtime-from-same-build-cache','status':'success','reusedFrom':c['proof']['candidatePhases']})
- else:phase('runtime-from-same-build-cache',lambda:run(args+['--target','runtime','-t',tag,'server-version/frontend']))
+ else:
+  runtime_file=Path(temp)/'Dockerfile.runtime';runtime_file.write_text('FROM '+c['builder']+' AS build\n'+dockerfile.read_text().split('FROM nginx',1)[1].join(['FROM nginx','']) if False else 'FROM '+c['builder']+' AS build\nFROM nginx'+dockerfile.read_text().split('FROM nginx',1)[1])
+  phase('runtime-from-same-build-cache',lambda:run(['docker','buildx','build','--builder','default','--load','-f',str(runtime_file),'--label','org.opencontainers.image.revision='+p['head'],'--target','runtime','-t',tag,'server-version/frontend']))
 c['image']=output(['docker','image','inspect','--format','{{.Id}}',tag]);archive_images()
