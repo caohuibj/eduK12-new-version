@@ -8,6 +8,7 @@ vi.mock('../../config/queue',()=>({videoQueue:{process:mocks.process,on:vi.fn(),
 vi.mock('../../config/database',()=>({prisma:{video:{updateMany:mocks.update},$transaction:async(fn:any)=>fn({video:{updateMany:mocks.update}})}}))
 vi.mock('../../utils/logger',()=>({logger:{debug:vi.fn(),info:vi.fn(),warn:vi.fn(),error:vi.fn()}}))
 vi.mock('../../utils/videoDownloader',()=>({downloadVideo:vi.fn(),validateVideoFile:mocks.validate}))
+vi.mock('../../utils/videoProbe',()=>({probeVideo:async()=>({streams:[{codec_type:'video',codec_name:'h264',width:640,height:360}],format:{duration:2}})}))
 vi.mock('../../services/assetStorage',()=>({storeAssetFromFile:mocks.store,attachAssetReference:mocks.attach,discardUnreferencedAsset:mocks.discard,getSignedAssetUrl:async()=>'/signed',signKnownAsset:()=>'/signed'}))
 vi.mock('../../services/videoProcessingState',()=>({markVideoProcessing:async()=>7,markVideoFailed:mocks.failed,releaseVideoProcessingForRetry:vi.fn(),associateVideoRetryJob:vi.fn()}))
 vi.mock('../../services/videoProcessingRecovery',()=>({isFinalVideoAttempt:()=>true,registerVideoProcessingRecovery:vi.fn(),stopVideoProcessingRecovery:vi.fn(),reconcileStaleProcessingVideos:vi.fn()}))
