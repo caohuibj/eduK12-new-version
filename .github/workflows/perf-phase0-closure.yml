@@ -27,6 +27,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
   NODE_ENV: test
   DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
   REDIS_URL: redis://localhost:6379

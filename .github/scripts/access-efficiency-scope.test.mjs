@@ -9,7 +9,7 @@ const entries=sources.map(entry);const read=(ref,file)=>approved.files[file][ref
 test('complete immutable source boundary rejects unknown, dependencies, schema, homepage and deletion changes',()=>{
  assert.equal(admitsAccessEfficiency(entries,read,approved),true);
  assert.equal(admitsAccessEfficiency(entries.slice(1),read,approved),false);
- for(const file of ['server-version/backend/prisma/schema.prisma','server-version/backend/package-lock.json','server-version/backend/Dockerfile','server-version/backend/src/controllers/authController.ts','server-version/frontend/src/survey/SurveyLanding.tsx','server-version/frontend/src/huiteacher/HuiteacherLanding.tsx','server-version/backend/src/index.ts','unknown'])
+ for(const file of ['server-version/backend/prisma/schema.prisma','server-version/backend/package-lock.json','server-version/backend/Dockerfile.unknown','server-version/backend/src/controllers/authController.ts','server-version/frontend/src/survey/SurveyLanding.tsx','server-version/frontend/src/huiteacher/HuiteacherLanding.tsx','server-version/backend/src/index.ts','unknown'])
   assert.equal(admitsAccessEfficiency([...entries,entry(file)],read,approved),false,file);
  for(const update of [{status:'D',newMode:'000000'},{status:'T'},{oldMode:'120000'},{newMode:'100755'}])assert.equal(admitsAccessEfficiency([{...entries[0],...update},...entries.slice(1)],read,approved),false);
  for(const ref of ['base','head'])assert.equal(admitsAccessEfficiency(entries,(r,f)=>r===ref&&f===sources[0]?'3'.repeat(40):read(r,f),approved),false);

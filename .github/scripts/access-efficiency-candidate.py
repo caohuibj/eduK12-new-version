@@ -13,6 +13,7 @@ def output(args):return subprocess.check_output(args,text=True).strip()
 def run(args,timeout=1800,env=None):subprocess.run(args,check=True,timeout=timeout,env=env)
 def persist(): (evidence/'checks.json').write_text(json.dumps(checks,indent=2))
 def phase(name,fn):
+    print('START '+name,flush=True)
     start=time.monotonic()
     try:fn();status='success'
     except Exception:status='failure';raise
@@ -26,6 +27,12 @@ def capture_tests(report,selected):
         suites=[s for s in data.get('testResults',[]) if s['name'].endswith(file)]
         assertions=[a for s in suites for a in s.get('assertionResults',[]) if title is None or a['title']==title]
         passed=len(suites)==1 and bool(assertions) and all(a['status']=='passed' for a in assertions)
+        if not passed:
+            print('FAILED '+key,flush=True)
+            for suite in suites:
+                if suite.get('message'):print(suite['message'][:6000],flush=True)
+            for assertion in assertions:
+                if assertion['status']!='passed':print(assertion['title']+': '+'\n'.join(assertion.get('failureMessages',[]))[:6000],flush=True)
         checks['tests'][key]={'status':'success' if passed else 'failure','at':now(),'assertions':len(assertions)}
     persist()
 def require_tests(keys):

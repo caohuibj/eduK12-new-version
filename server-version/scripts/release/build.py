@@ -31,7 +31,7 @@ with tempfile.TemporaryDirectory(prefix='eduk12-release-build-') as temp:
         frozen.append(line)
     dockerfile=Path(temp)/(component+'.Dockerfile');dockerfile.write_text('\n'.join(frozen)+'\n')
     args=['docker','buildx','build','--load','-f',str(dockerfile),'--label','org.opencontainers.image.revision='+p['head'],'--label','eduk12.component='+p['components'][component]['candidate']]
-    args+=['--build-arg','VITE_COGNITIVE_MODULE_ENABLED=true'] if component=='frontend' else ['--build-arg','DEBIAN_MIRROR=mirrors.tuna.tsinghua.edu.cn']
+    args+=['--build-arg','VITE_COGNITIVE_MODULE_ENABLED=true'] if component=='frontend' else ['--build-arg','DEBIAN_MIRROR=deb.debian.org']
     phase(component+'-compile',lambda:run(args+['--target','build','-t',builder,context]))
     if component=='frontend':
         commands='npm run lint && npx tsc -p tsconfig.app.json --noEmit && npx tsc -p tsconfig.cognitive.json --noEmit && npm audit --audit-level=high'

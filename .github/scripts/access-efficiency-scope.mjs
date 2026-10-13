@@ -2,6 +2,8 @@ import {execFileSync} from 'node:child_process';
 import {readFileSync} from 'node:fs';
 const bindings=JSON.parse(readFileSync(new URL('./access-efficiency-bindings.json',import.meta.url),'utf8'));
 export const accessEfficiencySources=new Set([
+ "server-version/backend/Dockerfile",
+ "server-version/frontend/Dockerfile",
  "server-version/backend/src/controllers/checkinController.ts",
  "server-version/backend/src/controllers/courseController.ts",
  "server-version/backend/src/controllers/publicQuestionnaireController.ts",
@@ -73,6 +75,51 @@ export const accessEfficiencyTools=new Set([
  '.github/scripts/access-efficiency-browser.mjs','.github/workflows/ci-access-efficiency.yml',
  '.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs','.github/workflows/ci.yml',
  'docs/release/README.md',
+ ".github/workflows/assessment-video-core-acceptance.yml",
+ ".github/workflows/ci-access-efficiency.yml",
+ ".github/workflows/ci-backend-browser-build.yml",
+ ".github/workflows/ci-backend-regression.yml",
+ ".github/workflows/ci-backend-security-efficiency.yml",
+ ".github/workflows/ci-backend.yml",
+ ".github/workflows/ci-browser.yml",
+ ".github/workflows/ci-campus.yml",
+ ".github/workflows/ci-cognitive-step.yml",
+ ".github/workflows/ci-frontend-build.yml",
+ ".github/workflows/ci-frontend.yml",
+ ".github/workflows/ci-homepage-copy.yml",
+ ".github/workflows/ci-images.yml",
+ ".github/workflows/ci-maintenance.yml",
+ ".github/workflows/ci-media.yml",
+ ".github/workflows/ci-release-tools.yml",
+ ".github/workflows/ci-scoped-release.yml",
+ ".github/workflows/ci-survey-home.yml",
+ ".github/workflows/ci-survey-pr1.yml",
+ ".github/workflows/ci-teacher-home.yml",
+ ".github/workflows/ci-ui.yml",
+ ".github/workflows/ci.yml",
+ ".github/workflows/fe-11-app-shell-acceptance.yml",
+ ".github/workflows/media-2-acceptance.yml",
+ ".github/workflows/media-7-cross-runtime-acceptance.yml",
+ ".github/workflows/ops-prelaunch.yml",
+ ".github/workflows/perf-phase0-closure.yml",
+ ".github/workflows/perf-phase0-exploratory.yml",
+ ".github/workflows/perf-phase0-smoke.yml",
+ ".github/workflows/scale-onboarding-boundary.yml",
+ ".github/workflows/situational-branching-acceptance.yml",
+ ".github/workflows/situational-browser-debug.yml",
+ ".github/workflows/situational-publication.yml",
+ ".github/workflows/situational-video-acceptance.yml",
+ ".github/workflows/visual-canonical-qa.yml",
+ ".github/scripts/ci-image-plan.mjs",
+ ".github/scripts/ci-image-plan.test.mjs",
+ ".github/scripts/dependency-scope.mjs",
+ ".github/scripts/dependency-routing.test.mjs",
+ ".github/scripts/campus-candidate.py",
+ "server-version/scripts/release/build.py",
+ "server-version/scripts/release/package.py",
+ "AGENTS.md",
+ "docs/ci-runner-policy.md",
+ ".github/scripts/github-official-source.test.mjs",
 ]);
 const ordinaryTests=new Set([...accessEfficiencyTests,...accessEfficiencyFocusedTests.map(t=>t.file)].map(f=>'server-version/backend/'+f)
  .concat(accessEfficiencyFrontendTests.map(f=>'server-version/frontend/'+f),['server-version/miniprogram-v2/tests/access-paging.test.cjs']));
@@ -80,6 +127,10 @@ const blob=(ref,file)=>execFileSync('git',['rev-parse',ref+':'+file],{encoding:'
 export function admitsAccessEfficiency(entries,read,approved=bindings){
  if(approved?.schema!==1||!approved.files||!Object.keys(approved.files).length||!entries.length)return false;
  const sources=new Set(Object.keys(approved.files));
+ const policy=approved.officialSourceBindings||{};
+ for(const [file,b] of Object.entries(policy)){
+  if(!accessEfficiencyTools.has(file)||!entries.some(e=>e.file===file)||!/^[a-f0-9]{40}$/.test(b.before||'')||!/^[a-f0-9]{40}$/.test(b.after||'')||read('base',file)!==b.before||read('head',file)!==b.after)return false;
+ }
  if(![...sources].every(file=>entries.some(e=>e.file===file)))return false;
  for(const e of entries){
   if(e.newMode!=='100644'||!((e.status==='A'&&e.oldMode==='000000')||(e.status==='M'&&e.oldMode==='100644')))return false;

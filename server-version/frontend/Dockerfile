@@ -13,7 +13,7 @@ WORKDIR /app
 # hosted CI builds are unchanged.
 ARG NPM_REGISTRY=https://registry.npmjs.org
 COPY package*.json ./
-RUN npm config set registry "$NPM_REGISTRY" && npm ci
+RUN npm config set registry "$NPM_REGISTRY" && npm config set replace-registry-host always && npm ci
 COPY . .
 # Release v1：构建期 Feature Flag（Vite 静态替换，值固化进产物）
 ARG VITE_COGNITIVE_MODULE_ENABLED

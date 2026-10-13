@@ -112,6 +112,13 @@ def prepare(plan,evidence,environment=None):
         archive.unlink()
         source=dest/'access-efficiency-evidence';old=json.loads((source/'checks.json').read_text())
         original=json.loads((dest/'access-efficiency-plan.json').read_text())
+        for report in source.glob('*tests*.json'):
+            data=json.loads(report.read_text())
+            for suite in data.get('testResults',[]):
+                if suite.get('status')=='failed':
+                    print('PRIOR DIAGNOSTIC '+suite['name']+': '+suite.get('message','')[:6000],flush=True)
+                    for assertion in suite.get('assertionResults',[]):
+                        if assertion.get('status')=='failed':print(assertion['title']+': '+'\n'.join(assertion.get('failureMessages',[]))[:6000],flush=True)
         if old.get('head')!=original['head'] or artifact['name']!='access-efficiency-'+old['head'] or old.get('prNumber')!=pr or old.get('repository')!=os.environ['GITHUB_REPOSITORY']:
             raise ValueError('Official source binding mismatch')
         # Verify fingerprints against the exact uploaded Git source. GitHub

@@ -25,7 +25,7 @@ export function runtimeRefreshPlan(input, frontendOnly) {
   const plan = structuredClone(input);
   for (const name of validateTargets(plan, frontendOnly)) {
     if (name === 'backend' || name === 'worker')
-      plan.target[name].args = { ...plan.target[name].args, DEBIAN_MIRROR: 'mirrors.tuna.tsinghua.edu.cn' };
+      plan.target[name].args = { ...plan.target[name].args, DEBIAN_MIRROR: 'deb.debian.org' };
     plan.target[name]['no-cache-filter'] = ['runtime'];
     plan.target[name]['no-cache'] = false;
   }
@@ -35,7 +35,7 @@ export function verifyResolvedPlan(plan, frontendOnly) {
   for (const name of validateTargets(plan, frontendOnly)) {
     const target = plan.target[name];
     if (name === 'backend' || name === 'worker')
-      assert.equal(target.args?.DEBIAN_MIRROR, 'mirrors.tuna.tsinghua.edu.cn', 'CI Debian mirror was lost');
+      assert.equal(target.args?.DEBIAN_MIRROR, 'deb.debian.org', 'CI official Debian source was lost');
     assert.deepEqual(target['no-cache-filter'], ['runtime'], 'Runtime security refresh was lost');
     assert.ok(!target['no-cache'], 'Dependency/build caches must remain reusable');
     assert.equal(target.pull, true, 'Base image refresh must be enabled');

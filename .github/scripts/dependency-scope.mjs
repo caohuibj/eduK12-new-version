@@ -10,7 +10,7 @@ const policy = new Set(['AGENTS.md','docs/ci-runner-policy.md',
   '.github/scripts/dependency-scope.mjs','.github/scripts/dependency-routing.test.mjs',
   '.github/scripts/ci-image-plan.test.mjs']);
 const imagePlanFile = '.github/scripts/ci-image-plan.mjs';
-const imageMirrorAdditions = ["    if (name === 'backend' || name === 'worker')\n      plan.target[name].args = { ...plan.target[name].args, DEBIAN_MIRROR: 'mirrors.tuna.tsinghua.edu.cn' };\n", "    if (name === 'backend' || name === 'worker')\n      assert.equal(target.args?.DEBIAN_MIRROR, 'mirrors.tuna.tsinghua.edu.cn', 'CI Debian mirror was lost');\n"];
+const imageMirrorAdditions = ["    if (name === 'backend' || name === 'worker')\n      plan.target[name].args = { ...plan.target[name].args, DEBIAN_MIRROR: 'deb.debian.org' };\n", "    if (name === 'backend' || name === 'worker')\n      assert.equal(target.args?.DEBIAN_MIRROR, 'deb.debian.org', 'CI official Debian source was lost');\n"];
 
 // Only these two mirror argument insertions may accompany a dependency upgrade.
 // Any other build-plan edit retains platform classification.

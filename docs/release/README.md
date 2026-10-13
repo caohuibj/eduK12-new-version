@@ -194,10 +194,16 @@ Teacher 候选现保存前后端 runtime、必要的迁移 builder 与 SHA-256�
 
 ## 后续访问效率优化的精确 C 合并路线（access-efficiency v1）
 
-仅接纳 2026-10-13 审阅的有界列表及其 Web/两代小程序适配、视频签发/探测/DNS、共享公开限流/PoW 发行预算、磁盘 staging、首次报告分段计算和重新核验，以及 Compose 显式限额注入。完整 raw diff 必须匹配 access-efficiency-bindings.json 的前后 Git blob 与确切测试/工具名单；依赖、Prisma、Dockerfile、未知文件、删除或模式变化仍返回原 C 分类。Survey/Teacher 首页目录、App 和后端 index.ts 必须与 base 字节相同。
+仅接纳 2026-10-13 审阅的有界列表及其 Web/两代小程序适配、视频签发/探测/DNS、共享公开限流/PoW 发行预算、磁盘 staging、首次报告分段计算和重新核验，以及 Compose 显式限额注入。完整 raw diff 必须匹配 access-efficiency-bindings.json 的前后 Git blob 与确切测试/工具名单；依赖、Prisma、未获下方下载铁律精确绑定的 Dockerfile、未知文件、删除或模式变化仍返回原 C 分类。Survey/Teacher 首页目录、App 和后端 index.ts 必须与 base 字节相同。
 
 GitHub 是唯一正式验证位置：前后端各编译一次，定向真实隔离 PostgreSQL/Redis 契约、报告撤权/来源/披露保护、对应小程序适配与 Compose 有效参数、同一 runtime 的 HIGH/CRITICAL 扫描、受影响分页页面的 390/768/1440 浏览器与 WCAG，以及 CodeQL。固定合成数据记录分页响应、SQL 调用和并发延迟，不冒充生产性能认证或生产池调优。未受影响的登录、首页、测评生命周期、灾备和全平台验收不重复；共享路由修改只执行路由拒绝/汇总契约。
 
 正式复用只限同 PR、24 小时内的官方候选 artifact；校验 Actions 来源、ZIP digest、工具/命令、各检查所消费的 Git 对象/模式、冻结基础镜像和实际镜像 tar/ID。编译不消费测试文件；只改测试时挂载最新测试，复用确切生产输入的 builder/runtime，不伪称旧测试已验证新文件。成功测试文件仅在其完整文件和共享夹具/配置及生产输入一致时复用；失败、跳过或缺失结果必须重验，来源/哈希异常停止。合并门禁重算冻结完整计划，所选候选与 SAST 全部真实成功才合并。此路线不授权部署，不删除历史 token/图片队列兼容；生产证据仅只读核查。
 
-本 PR 的海外 GitHub runner 实测清华 Debian 依赖下载约 20 分钟，超过验证预算，因此仅这条候选执行器使用签名官方 HTTPS 源兜底；生产 Dockerfile/大陆部署下载约定不变。旧候选到本次修正的执行器前后 blob 明确绑定，仅允许两处后端镜像下载参数替换，其余候选代码必须字节一致；这次过渡只可接纳同输入的前端及小程序/Compose 成功证据，不能接纳后端编译、契约、审计或扫描。未知工具变化仍使消费证据失效。
+## 下载来源铁律（2026-10-13）
+
+用户确认：**只有生产服务器使用清华或可信大陆镜像；GitHub Actions 一律使用官方源。** 这覆盖 GitHub 托管/自托管 runner、所有工作流和执行脚本、Docker build stage、浏览器、工具及基础镜像；不因构建的是生产产物而使用大陆源。本机开发也使用官方源。生产服务器继续按当次授权优先可信大陆镜像，不可用时记录原因再使用官方源；不改变同一产物只构建一次、生产不复验/不构建的要求。
+
+GitHub Debian 使用签名官方源，npm 固定 `https://registry.npmjs.org` 且 `replace-registry-host=always`，覆盖锁文件保留的历史镜像 URL；Docker npm 安装按显式 `NPM_REGISTRY` 替换历史 host。版本与 integrity 不变，保留 TLS、签名及镜像扫描阈值。前后端 Dockerfile 本次只增加该 npm host 选择设置，其他新增下载策略文件绑定完整前后 blob；未知 Dockerfile/依赖或 CI 编辑不能借此缩减门禁。
+
+本 PR 的 access-efficiency 路线同时验证这条新增铁律：所有工作流官方 npm 环境、实际 npm 对历史 host 的替换及 integrity 失败拒绝、CI 镜像计划/发布脚本官方参数、完整冻结 blob 和对应拒绝/汇总契约。该下载策略改变了构建输入，需要生成对应新产物；以后正式同输入阶段继续复用。诊断报告与大型镜像传输分开保存，报告不充当镜像资格或编译成功。

@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
   actions: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+
 jobs:
   candidate:
     runs-on: ubuntu-24.04
@@ -70,5 +74,16 @@ jobs:
             access-efficiency-plan.json
             access-efficiency-evidence/
             !access-efficiency-evidence/prerequisite/**
+          if-no-files-found: error
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: access-diagnostics-${{ github.sha }}
+          path: |
+            access-efficiency-plan.json
+            access-efficiency-evidence/*.json
+            access-efficiency-evidence/browser/*.json
+            access-efficiency-evidence/browser/failure.png
           if-no-files-found: error
           retention-days: 3

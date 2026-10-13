@@ -81,6 +81,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ inputs.step_probe || 'none' }}-${{ inputs.step_probe == 'images' && inputs.probe_frontend_only && 'frontend' || 'all' }}
   cancel-in-progress: true
 
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+
 jobs:
   probe-frontend-build:
     if: github.event_name == 'workflow_dispatch' && contains(fromJSON('["frontend","browser","media","ui","ui-chromium","qa-ui"]'), inputs.step_probe)
@@ -303,7 +307,7 @@ jobs:
       - name: frozen efficiency routing, prerequisite refusal and homepage preservation
         if: steps.scope.outputs.application_route == 'access-efficiency' && github.event_name == 'pull_request'
         run: |
-          node --test .github/scripts/access-efficiency-scope.test.mjs .github/scripts/survey-home.test.mjs .github/scripts/teacher-home.test.mjs
+          node --test .github/scripts/access-efficiency-scope.test.mjs .github/scripts/github-official-source.test.mjs .github/scripts/ci-image-plan.test.mjs .github/scripts/dependency-routing.test.mjs .github/scripts/survey-home.test.mjs .github/scripts/teacher-home.test.mjs
           python3 -B -m unittest discover -s .github/scripts -p test_access_efficiency_reuse.py
 
       - name: frozen backend repair routing and fail-closed merge contracts
@@ -627,7 +631,7 @@ jobs:
         with:
           languages: javascript-typescript
           config: >-
-            ${{ needs.scope.outputs.application_route == 'access-efficiency' && 'paths: [server-version/backend/src, server-version/frontend/src/hooks, server-version/frontend/src/pages/student, server-version/frontend/src/pages/CheckinList.tsx, server-version/frontend/src/training/TrainingLearnerHome.tsx, server-version/miniprogram, server-version/miniprogram-v2/domains, .github/scripts/access-efficiency-scope.mjs, .github/scripts/access-efficiency-browser.mjs, .github/scripts/access-efficiency-candidate.py, .github/scripts/access-efficiency-reuse.py, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'backend-security-efficiency' && 'paths: [server-version/backend/src, .github/scripts/backend-security-efficiency-scope.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs, .github/scripts/campus-candidate.py]' || needs.scope.outputs.application_route == 'teacher-home' && 'paths: [server-version/frontend/src/huiteacher, server-version/backend/src/index.ts, server-version/backend/src/modules/huiteacher, server-version/backend/src/modules/campus, server-version/backend/src/middleware, server-version/backend/src/utils, .github/scripts/teacher-home-scope.mjs, .github/scripts/teacher-home-browser.mjs, .github/scripts/teacher-home-fixture.cjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'survey-home' && 'paths: [server-version/frontend/src/survey, .github/scripts/survey-home-scope.mjs, .github/scripts/survey-home-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'homepage-copy' && 'paths: [.github/scripts/homepage-copy-scope.mjs, .github/scripts/homepage-copy-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.scenario == 'release-tooling' && 'paths: [.github/scripts, server-version/scripts/release]' || '' }}
+            ${{ needs.scope.outputs.application_route == 'access-efficiency' && 'paths: [server-version/backend/src, server-version/frontend/src/hooks, server-version/frontend/src/pages/student, server-version/frontend/src/pages/CheckinList.tsx, server-version/frontend/src/training/TrainingLearnerHome.tsx, server-version/miniprogram, server-version/miniprogram-v2/domains, .github/scripts/github-official-source.test.mjs, .github/scripts/ci-image-plan.mjs, .github/scripts/dependency-scope.mjs, .github/scripts/access-efficiency-scope.mjs, .github/scripts/access-efficiency-browser.mjs, .github/scripts/access-efficiency-candidate.py, .github/scripts/access-efficiency-reuse.py, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'backend-security-efficiency' && 'paths: [server-version/backend/src, .github/scripts/backend-security-efficiency-scope.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs, .github/scripts/campus-candidate.py]' || needs.scope.outputs.application_route == 'teacher-home' && 'paths: [server-version/frontend/src/huiteacher, server-version/backend/src/index.ts, server-version/backend/src/modules/huiteacher, server-version/backend/src/modules/campus, server-version/backend/src/middleware, server-version/backend/src/utils, .github/scripts/teacher-home-scope.mjs, .github/scripts/teacher-home-browser.mjs, .github/scripts/teacher-home-fixture.cjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'survey-home' && 'paths: [server-version/frontend/src/survey, .github/scripts/survey-home-scope.mjs, .github/scripts/survey-home-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'homepage-copy' && 'paths: [.github/scripts/homepage-copy-scope.mjs, .github/scripts/homepage-copy-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.scenario == 'release-tooling' && 'paths: [.github/scripts, server-version/scripts/release]' || '' }}
           # Bound analysis resources on the hosted Ubuntu VM.
           ram: 3500
           threads: 2

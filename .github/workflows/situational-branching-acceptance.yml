@@ -20,6 +20,10 @@ permissions:
 concurrency:
   group: situational-branching-acceptance-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+
 jobs:
   acceptance:
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false || vars.CI_FORCE_FULL == 'true'
