@@ -20,6 +20,7 @@ class CycleTests(unittest.TestCase):
         self.assertFalse(m.database_ready({**r,'at':(now-dt.timedelta(days=1)).isoformat()},now,'a'*40))
         self.assertFalse(m.database_ready(r,now,'b'*40))
         self.assertFalse(m.verification_ready({**c,'verifyCursor':{'complete':False}},now))
+        self.assertFalse(m.verification_ready({**c,'lastFullVerificationAt':(now-dt.timedelta(hours=23)).isoformat()},now))
         self.assertFalse(m.recovery_ready(p,r,c,'changed-verifier',now))
         q=copy.deepcopy(p);q['bindings'][0]['databaseVersionId']='changed-version';self.assertFalse(m.recovery_ready(q,r,c,'verifier',now))
     def test_skip_or_failed_stage_never_updates_last_success(self):

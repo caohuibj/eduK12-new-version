@@ -89,13 +89,13 @@ jobs:
           python3 - <<'PY'
           import json,os,subprocess,urllib.request
           repository=os.environ['REPOSITORY'];run=os.environ['PRIOR_RUN']
-          assert repository=='caohuibj/eduK12-new-version' and run=='38347724147'
+          assert repository=='caohuibj/eduK12-new-version' and run in ['38347724147','38352435608']
           def api(path):
             request=urllib.request.Request('https://api.github.com/repos/'+repository+'/'+path,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
             return json.load(urllib.request.urlopen(request,timeout=30))
           prior=api('actions/runs/'+run)
           assert prior['conclusion']=='success' and prior['event']=='workflow_dispatch' and prior['path']=='.github/workflows/ci-maintenance.yml'
-          assert prior['head_sha']=='ec593e7be764523c1f57490338efbe29c29b20a2'
+          assert prior['head_sha']=={'38347724147':'ec593e7be764523c1f57490338efbe29c29b20a2','38352435608':'a6eaa3abb91473b60124e9ef26c65731f672308b'}[run]
           original=api('actions/runs/38347265525')
           assert original['conclusion']=='success' and original['event']=='pull_request' and original['head_sha']=='b8969a064f04ed923692eb8b02f7ce9f989e2aa4'
           jobs=api('actions/runs/38347265525/jobs?per_page=100')['jobs']
@@ -110,17 +110,24 @@ jobs:
             assert path in allowed and fields[-1] in ['M','A']
             assert fields[1] in ['100644','100755'] and (fields[0] in [':100644',':100755'] or fields[0]==':000000')
             paths.append(path)
-          assert paths and host+'cycle.py' in paths and host+'capacity.py' in paths
+          assert paths and host+'cycle.py' in paths
+          if run=='38347724147':assert host+'capacity.py' in paths
+          else:
+            assert set(paths)=={host+'cycle.py',host+'test_cycle.py','.github/workflows/ci-maintenance.yml'}
+            before_cycle=git('show',prior['head_sha']+':'+host+'cycle.py')
+            assert git('show','HEAD:'+host+'cycle.py')==before_cycle.replace(b"fresh(catalog.get('lastFullVerificationAt'),now,24)",b"fresh(catalog.get('lastFullVerificationAt'),now,22)",1)
           # This model edit only preserves observations while blocked; protected graph/retention/deletion logic is byte-identical.
           model='server-version/scripts/cos-cleanup/model.mjs'
           before=git('show',prior['head_sha']+':'+model)
           after=git('show','HEAD:'+model)
           assert after==before.replace(b'const candidates = [], observations = {};',b'// A temporary protection block preserves quarantine history without refreshing observation age.\n  const candidates = [], observations = graph.blocked.length ? structuredClone(previous?.observations || {}) : {};',1)
-          with open(os.environ['GITHUB_OUTPUT'],'a') as output:output.write('reused=true\n')
+          with open(os.environ['GITHUB_OUTPUT'],'a') as output:
+            output.write('reused=true\n')
+            output.write('cycle_only='+str(run=='38352435608').lower()+'\n')
           print('Qualified successful foundation run 38347265525 and exact cache follow-up '+run+'; unchanged DB/crypto/launcher/attachment verifier inputs retained.')
           PY
       - name: Verify affected backup cycle, capacity, image protection and quarantine
-        if: steps.opsqualified.outputs.reused == 'true'
+        if: steps.opsqualified.outputs.reused == 'true' && steps.opsqualified.outputs.cycle_only != 'true'
         run: |
           for name in test_cycle.py test_capacity.py test_storage.py test_monitor.py; do
             python3 -B -m unittest discover -s server-version/scripts/host-ops -p "$name" -v
@@ -131,6 +138,11 @@ jobs:
           sudo install -D -m 644 server-version/scripts/host-ops/cycle.py /opt/eduk12-ops/current/cycle.py
           sudo install -D -m 644 server-version/scripts/host-ops/storage.py /opt/eduk12-ops/current/storage.py
           sudo systemd-analyze verify server-version/scripts/host-ops/systemd/eduk12-backup-cycle.* server-version/scripts/host-ops/systemd/eduk12-storage-maintenance.*
+      - name: Verify daily verification safety margin only
+        if: steps.opsqualified.outputs.cycle_only == 'true'
+        run: |
+          python3 -B -m unittest discover -s server-version/scripts/host-ops -p 'test_cycle.py' -v
+          node --test .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs
       - name: CI routing and attachment invariants
         if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true'
         run: node --test .github/scripts/runner-preflight.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/api-response.test.mjs .github/scripts/mac-ci-cleanup.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-image-plan.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs .github/scripts/dependency-routing.test.mjs server-version/scripts/attachment-backup/core.test.mjs server-version/scripts/backup/cleanup-restore-container.test.mjs

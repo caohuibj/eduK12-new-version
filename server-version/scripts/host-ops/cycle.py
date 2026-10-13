@@ -28,7 +28,7 @@ def snapshot_ready(catalog,receipt,now):
     latest=catalog.get('snapshots',[])[-1] if catalog.get('snapshots') else {}
     return not catalog.get('pending') and not catalog.get('lastFailure') and latest.get('complete') is True and fresh(latest.get('at'),now,1.5) and dt.datetime.fromisoformat(latest['at'].replace('Z','+00:00'))>=dt.datetime.fromisoformat(receipt['at'].replace('Z','+00:00'))
 def verification_ready(catalog,now):
-    return not catalog.get('lastFailure') and fresh(catalog.get('lastFullVerificationAt'),now,24) and not (catalog.get('verifyCursor') and not catalog['verifyCursor'].get('complete'))
+    return not catalog.get('lastFailure') and fresh(catalog.get('lastFullVerificationAt'),now,22) and not (catalog.get('verifyCursor') and not catalog['verifyCursor'].get('complete'))
 def recovery_ready(proof,receipt,catalog,verifier,now):
     binding=next((b for b in proof.get('bindings',[]) if b.get('hostPointId')==receipt.get('id')),None)
     return proof.get('status')=='VERIFIED' and fresh(proof.get('at'),now,24) and proof.get('referenceVerifierSha256')==verifier and all(proof.get('checks',{}).get(k) is True for k in ['databaseRestore','attachmentDecrypt','databaseReferences']) and binding is not None and binding.get('databaseVersionId')==receipt['objects'][0]['versionId'] and any(s['id']==binding.get('attachmentSnapshotId') and s.get('remote',{}).get('versionId')==binding.get('snapshotVersionId') for s in catalog.get('snapshots',[]))
