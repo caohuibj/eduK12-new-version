@@ -67,7 +67,7 @@
     },
     "server-version/frontend/src/hooks/useCursorList.ts": {
       "before": null,
-      "after": "bb86ee77de6ee9f8e181011820e5a4ac218d7ba6"
+      "after": "afc1bbe43c73424eee5e6386ae64b0a279a94d28"
     },
     "server-version/frontend/src/pages/CheckinList.tsx": {
       "before": "bf236baf8e06bb3bb6c5f759a05b0d736398cbfb",

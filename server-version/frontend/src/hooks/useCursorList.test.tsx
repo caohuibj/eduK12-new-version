@@ -24,9 +24,9 @@ describe('visible cursor list continuation', () => {
     expect(get).toHaveBeenCalledWith(path+'?cursor=next')
     expect(screen.queryByRole('button', { name: button })).toBeNull()
   })
-  it('retains rows and a retryable cursor on next-page failure, deduplicating only successful pages', async () => {
+  it.each([new Error('Offline'), { name: 'ApiClientError', message: 'Offline', status: 503, retryable: true }])('retains rows and a retryable cursor for normalized and native errors, deduplicating only successful pages', async (reason) => {
     get.mockResolvedValueOnce({ code: 0, data: { list: [{ id: 'a', title: 'A' }], nextCursor: 'next' } })
-      .mockRejectedValueOnce(new Error('Offline'))
+      .mockRejectedValueOnce(reason)
       .mockResolvedValueOnce({ code: 0, data: { list: [{ id: 'a', title: 'A' }, { id: 'b', title: 'B' }], nextCursor: null } })
     render(<Harness path="/list" />)
     await screen.findByText('A'); fireEvent.click(screen.getByText('更多'))

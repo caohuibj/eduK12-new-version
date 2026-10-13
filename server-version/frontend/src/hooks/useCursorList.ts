@@ -23,7 +23,10 @@ export function useCursorList<T extends { id: string }>(path: string | null) {
       setCursor(response.data.nextCursor || null)
       if (typeof response.data.total === 'number') setTotal(response.data.total)
     } catch (reason) {
-      if (request === sequence.current) setError(reason instanceof Error ? reason.message : '无法读取列表')
+      if (request === sequence.current) {
+        const message = reason !== null && typeof reason === 'object' ? (reason as { message?: unknown }).message : undefined
+        setError(typeof message === 'string' && message ? message : '无法读取列表')
+      }
     } finally {
       if (request === sequence.current) { active.current = false; setLoading(false) }
     }
