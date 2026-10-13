@@ -15,7 +15,7 @@ import uuid
 DEPLOY=Path('/opt/eduk12-new/deploy')
 STATE=Path('/var/lib/eduk12-ops')
 CONFIG=Path('/etc/eduk12-ops/storage.json')
-CACHE_FILES={'db/trivy.db','db/metadata.json','java-db/trivy-java.db','java-db/metadata.json'}
+CACHE_FILES={'fanal/fanal.db','db/trivy.db','db/metadata.json','java-db/trivy-java.db','java-db/metadata.json'}
 ROLES=('frontend','backend','ops')
 
 def require(ok,code):

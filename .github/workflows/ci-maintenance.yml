@@ -7,9 +7,16 @@ on:
         type: string
         default: '["ubuntu-24.04"]'
   workflow_dispatch:
+    inputs:
+      cache_policy_followup:
+        description: 'Successful same-repository CI run for the exact fanal cache whitelist follow-up'
+        required: false
+        type: string
+        default: ''
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   attachment-safety:
@@ -23,12 +30,54 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+      - name: Qualify unchanged maintenance evidence for exact cache follow-up
+        id: qualified
+        if: inputs.cache_policy_followup != ''
+        env:
+          PRIOR_RUN: ${{ inputs.cache_policy_followup }}
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          python3 - <<'PY'
+          import json,os,subprocess,urllib.request
+          repository=os.environ['REPOSITORY'];run=os.environ['PRIOR_RUN']
+          assert repository=='caohuibj/eduK12-new-version' and run.isdigit()
+          def api(path):
+            request=urllib.request.Request('https://api.github.com/repos/'+repository+'/'+path,
+              headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+            return json.load(urllib.request.urlopen(request,timeout=30))
+          evidence=api('actions/runs/'+run)
+          assert evidence['conclusion']=='success' and evidence['event']=='pull_request' and evidence['path']=='.github/workflows/ci.yml'
+          jobs=api('actions/runs/'+run+'/jobs?per_page=100')['jobs']
+          assert any(j['name']=='maintenance / attachment deduplication, indexes and protected cleanup' and j['conclusion']=='success' for j in jobs)
+          base=evidence['head_sha']
+          def git(*args):return subprocess.check_output(['git',*args])
+          paths=[]
+          for entry in git('diff','--raw','--no-renames',base,'HEAD').decode().splitlines():
+            meta,path=entry.split('\t');fields=meta.split()
+            assert fields[0]==':100644' and fields[1]=='100644' and fields[-1]=='M'
+            paths.append(path)
+          storage='server-version/scripts/host-ops/storage.py'
+          assert set(paths)=={storage,'.github/workflows/ci-maintenance.yml'}
+          old=git('show',base+':'+storage)
+          assert git('show','HEAD:'+storage)==old.replace(b"CACHE_FILES={'db/trivy.db'",b"CACHE_FILES={'fanal/fanal.db','db/trivy.db'",1)
+          with open(os.environ['GITHUB_OUTPUT'],'a') as output:output.write('reused=true\n')
+          print('Qualified original successful maintenance run '+run+'; only the exact cache whitelist input changed.')
+          PY
+      - name: Verify affected cache policy only
+        if: steps.qualified.outputs.reused == 'true'
+        run: |
+          python3 -B -m unittest discover -s server-version/scripts/host-ops -p 'test_storage.py' -v
+          node --test .github/scripts/maintenance-routing.test.mjs
       - name: CI routing and attachment invariants
+        if: steps.qualified.outputs.reused != 'true'
         run: node --test .github/scripts/runner-preflight.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/api-response.test.mjs .github/scripts/mac-ci-cleanup.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-image-plan.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs .github/scripts/dependency-routing.test.mjs server-version/scripts/attachment-backup/core.test.mjs server-version/scripts/backup/cleanup-restore-container.test.mjs
       - name: Host launcher and existing monitoring guards
+        if: steps.qualified.outputs.reused != 'true'
         run: |
           python3 -B -m unittest discover -s server-version/scripts/attachment-backup -p 'test_*.py' -v
           python3 -B -m unittest discover -s server-version/scripts/host-ops -p 'test_*.py' -v
@@ -41,6 +90,7 @@ jobs:
           node --check server-version/scripts/cos-cleanup/recovery.mjs
           node --check server-version/scripts/cos-cleanup/recovery-smoke.mjs
       - name: Check shell and systemd units without starting production services
+        if: steps.qualified.outputs.reused != 'true'
         run: |
           bash -n server-version/scripts/attachment-backup/install.sh
           bash -n server-version/scripts/host-ops/install.sh
@@ -56,11 +106,13 @@ jobs:
           sudo install -D -m 644 server-version/scripts/cos-cleanup/recovery.py /opt/eduk12-cos-cleanup/current/recovery.py
           sudo systemd-analyze verify server-version/scripts/cos-cleanup/systemd/*
       - name: Real isolated Docker launcher and failed-task cleanup
+        if: steps.qualified.outputs.reused != 'true'
         run: |
           docker pull node:24.21.0-bookworm-slim
           sudo env CI=true GITHUB_ACTIONS=true NODE_ENV=test python3 -B server-version/scripts/attachment-backup/ci-container-smoke.py
           sudo env CI=true GITHUB_ACTIONS=true NODE_ENV=test python3 -B server-version/scripts/cos-cleanup/ci-container-smoke.py
       - name: Actual encrypted database restore and failure-volume cleanup
+        if: steps.qualified.outputs.reused != 'true'
         run: |
           docker pull postgres:16.15-bookworm
           sudo env PATH="$PATH" CI=true GITHUB_ACTIONS=true NODE_ENV=test python3 -B server-version/scripts/host-ops/ci-backup-smoke.py
