@@ -174,6 +174,6 @@ with tempfile.TemporaryDirectory(prefix='teacher-survey-') as temp:
  if reuse and reuse.get('image'):
   run(['docker','tag',reuse['image'],tag]);c['phases'].append({'name':'runtime-from-same-build-cache','status':'success','reusedFrom':c['proof']['candidatePhases']})
  else:
-  runtime_file=Path(temp)/'Dockerfile.runtime';runtime_file.write_text('FROM '+c['builder']+' AS build\nFROM nginx'+dockerfile.read_text().split('FROM nginx',1)[1])
+  runtime_file=Path(temp)/'Dockerfile.runtime';runtime_file.write_text('FROM '+builder+' AS build\nFROM nginx'+dockerfile.read_text().split('FROM nginx',1)[1])
   phase('runtime-from-same-build-cache',lambda:run(['docker','buildx','build','--builder','default','--load','-f',str(runtime_file),'--label','org.opencontainers.image.revision='+p['head'],'--target','runtime','-t',tag,'server-version/frontend']))
 c['image']=output(['docker','image','inspect','--format','{{.Id}}',tag]);archive_images()
