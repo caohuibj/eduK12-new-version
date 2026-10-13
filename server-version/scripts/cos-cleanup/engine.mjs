@@ -109,7 +109,31 @@ export class Cleanup {
     }
     cp.complete=true;await this.saveJournal(j);
   }
-  async executionGuards(j) {
+  completedActions(j) {
+    const actions=j.plan?.actions||[],done=new Set(j.deleted||[]);
+    return j.status==='DETACHED'&&actions.length>0&&j.deleteIntent===null
+      &&done.size===actions.length&&actions.every(r=>done.has(id(r)))
+      &&j.checkpoints?.length===2&&j.checkpoints.every(cp=>cp.complete);
+  }
+  async verifyCompletion(j) {
+    need(this.completedActions(j),'COMPLETION_NOT_READY');
+    await this.executionGuards(j,true);await this.sync(j);
+    const local=await this.local();
+    for(const [name,file] of [['host',this.paths.host],['attachment',this.paths.attachment]])
+      need(local.sourceHashes[file]===hash(JSON.stringify(seal(j.desired[name],this.secret))+'\n'),'COMPLETION_CATALOG_NOT_DETACHED');
+    for(const cp of j.checkpoints) {
+      const owned=j.owned.filter(r=>r.key===cp.key);
+      need(owned.length===1,'COMPLETION_CHECKPOINT_REQUIRED');await this.api.check(owned[0]);
+      const file=path.join(this.paths.work,crypto.randomUUID()+'.gcm');
+      try {await fsp.writeFile(file,await this.api.buffer(owned[0],METADATA_CIPHER_LIMIT),{mode:0o600,flag:'wx'});
+        await verifyEncrypted(file,cp.crypto,this.secret,j.desired.attachment.identity.keyId);}
+      finally {await fsp.rm(file,{force:true});}
+    }
+    const latest=(await this.api.versions()).find(r=>r.key==='attachments/v1/catalog-latest.json'&&r.latest);
+    need(latest?.versionId===j.checkpoints.at(-1).pointerVersion,'CURRENT_POINTER_CHANGED');
+  }
+  async executionGuards(j,completion=false) {
+    need(!completion||this.completedActions(j),'COMPLETION_NOT_READY');
     need(j.schema===1&&j.configHash===hash(this.c)&&j.plan.actions.length<=this.c.maxDeleteObjects
       &&j.plan.actions.reduce((n,r)=>n+r.bytes,0)<=this.c.maxDeleteBytes,'JOURNAL_CONFIGURATION_CHANGED');
     for(const r of j.plan.actions)validRecord(r);
@@ -117,8 +141,8 @@ export class Cleanup {
     const proof=local.proof;
     need(proof?.status==='VERIFIED'&&proof.bucket===this.c.backupBucket&&proof.region===this.c.region
       &&proof.checks?.databaseRestore===true&&proof.checks?.attachmentDecrypt===true&&proof.checks?.databaseReferences===true
-      &&age(proof.at,this.clock())<=36*3600000,'JOINT_RECOVERY_PROOF_STALE');
-    need(!local.launcherFailure&&!local.attachment.pending&&!local.attachment.lastFailure
+      &&(completion||age(proof.at,this.clock())<=36*3600000),'JOINT_RECOVERY_PROOF_STALE');
+    if(!completion)need(!local.launcherFailure&&!local.attachment.pending&&!local.attachment.lastFailure
       &&local.hostStatus.status==='VERIFIED'&&age(local.attachment.lastFullVerificationAt,this.clock())<=36*3600000
       &&age(local.attachment.snapshots.at(-1).at,this.clock())<=90*60000
       &&age(local.host.points.filter(p=>p.status==='VERIFIED').at(-1).at,this.clock())<=36*3600000,'BACKUP_HEALTH_CHANGED');
@@ -131,7 +155,11 @@ export class Cleanup {
   }
   async execute(j) {
     need(this.c.mode==='execute'&&this.api.deleteClient,'EXECUTION_NOT_ENABLED');
-    await this.api.privateVersioned();await this.executionGuards(j);await this.sync(j);
+    await this.api.privateVersioned();
+    // A completion-only resume cannot upload indexes or issue another DELETE.
+    // All exact actions must already be durably recorded and independently absent.
+    if(this.completedActions(j)){await this.verifyCompletion(j);return this.finish(j);}
+    await this.executionGuards(j);await this.sync(j);
     if(j.status==='PREPARED') {
       await atomicJson(this.paths.host,seal(j.desired.host,this.secret));
       await atomicJson(this.paths.attachment,seal(j.desired.attachment,this.secret));
@@ -150,7 +178,9 @@ export class Cleanup {
       await this.api.deleteVersion(r);
       j.deleted.push(id(r));j.deleteIntent=null;await this.saveJournal(j);
     }
-    await this.sync(j);await this.executionGuards(j);
+    await this.verifyCompletion(j);return this.finish(j);
+  }
+  async finish(j) {
     j.status='COMPLETE';j.completedAt=new Date(this.clock()).toISOString();await this.saveJournal(j);
     for(const cp of j.checkpoints) {
       need(path.dirname(cp.file)===this.paths.state&&/^checkpoint-[a-f0-9-]{36}\.gcm$/.test(path.basename(cp.file)),'CHECKPOINT_LOCAL_PATH_REFUSED');

@@ -7,7 +7,7 @@
 
 每五分钟检查：系统盘容量/inode、可用内存、每 CPU 的五分钟负载；五个生产容器的状态/健康与重启变化；backend/worker 镜像一致性；特权容器、host 网络及 PostgreSQL/Redis 公网映射；两个 HTTPS `/ready`；证书有效期；未引用卷数量；指定本地备份文件/校验文件的新鲜度；历史 COS 转存验证回执的新鲜度；指定非凭据文件的完整性变化。
 
-容量 80% 警告、90% 严重、剩余空间低于 2 GiB 严重；容量严重立即记录。
+容量 80% 警告、90% 严重、剩余空间低于 6 GiB 严重；容量严重立即记录。
 服务故障连续两次确认；恢复也连续两次确认。未恢复告警每六小时提醒一次，恢复生成事件。
 告警只输出状态、数量和异常类型，不采集生产环境变量、业务内容、认证信息或应用日志正文。
 
@@ -53,3 +53,36 @@ https://cloud.tencent.com/document/product/248/50414
 
 `backup/smoke-restore.mjs` 使用新 cleanup helper，在 finally 删除本次生成的 `eduk12-restore-<12 hex>` 容器和匿名卷，清理失败返回失败。
 该修复不删除已有历史卷、命名生产卷或备份。必须发布修复后才能影响后续真实恢复验证；安装宿主机巡检不会修改当前应用源码。
+
+## 2026-10-13 capacity and backup operations
+
+Task attempts and last successful recovery evidence are separate records. A pending
+cleanup or failed attempt alerts independently; a recent task trigger is not a backup.
+The finalization-only cleanup path verifies exact deleted-version absence, protected
+versions, unchanged authenticated indexes and both remote checkpoints before completing
+an expired transaction. It never issues a new object upload or deletion.
+
+storage.py defaults to a plan. Daily --apply removes only aged, exact Trivy cache
+contents and unused BuildKit cache beyond the reviewed 2 GB budget. It protects the
+actual current frontend cache, production and rollback images, all container references,
+and installed tool/config references. It never prunes volumes or release directories.
+Daily --apply --images uses repository OCI labels, matching revision tags, age >= 48h,
+and current/rollback/container/tool/staging references. It never uses force or volume prune.
+Source identity and live references determine future eligibility; historical revision lists remain recorded for audit.
+
+Daily cos-inventory.py uses two read-only SDK operations with complete pagination.
+It records current bytes, all-version bytes, storage classes, prefixes, growth and
+ETag/size duplicate candidates for both Beijing buckets. Candidates are not verified
+content duplicates or safe deletion targets. Records and alerts stay local and private.
+Existing retention remains 48 hourly attachment snapshots, 30 daily, 12 weekly and
+12 monthly recovery points, plus the protected baseline and two verified local DB copies.
+
+## 日常维护与增长预期
+
+每日 02:20（Asia/Shanghai）运行数据库/配置备份 → 附件快照 → 续跑附件完整校验 → 联合恢复。03:20、04:20 为同日重试窗口：只有认证通过、同日/新鲜、对象版本与验证源码匹配的步骤可复用。失败、锁跳过和未完成都不会更新最近成功时间。三个原独立 timer 停用，原 service 和启用状态保留用于回退；附件小时快照、受保护 COS 小时清理和五分钟监控继续运行。
+
+本地数据库保留两份，必须新备份指定远端版本回读、认证解密、隔离恢复成功后才轮换。远端保留 30 日、12 周、12 月、最近两点和受保护基线；附件还保留 48 小时快照以及数据库引用的快照/数据版本。过期对象经过 48 小时隔离观察，再由小时清理分批执行（每批最多 20 个、512 MiB）。临时等待新备份的联合恢复保留旧隔离起点，不更新 lastSeen；超过 36 小时无有效观察仍重新计时。所有保护门禁继续生效，不删业务媒体原件或未核实的重复候选。
+
+容量历史每天一条、最多 31 条。至少三个完整观测日后计算约七日增长；分钟内新增备份不年化为增长趋势。预计 14 日内侵入 6 GiB 余量、COS 超过 50 GiB/64 GiB、日增长超过 2 GiB 或整备份点无法装入清理批次均记录本地告警。容量包络使用当前数据库大小和实际保护点数；默认一份基线时保守上界约 60 份，包含隔离/重试缓冲。该预测假定业务附件和归档大小不变，不能作为桶配额或费用保证。
+
+监控记录备份最近实际成功、当前尝试、附件校验、联合恢复、清理事务、容量与服务健康；告警按故障、持续提醒和恢复分开保存，保留滚动日志，不向外部发送消息。空间清理保留最近 30 次审计。恢复和清理失败时保持保护并记录原因，不绕过门禁。
