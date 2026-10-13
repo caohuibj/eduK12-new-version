@@ -418,7 +418,6 @@ const CheckinList: React.FC = () => {
   const closeSubmissions = () => {
     setShowSubmissionsModal(false)
     setSelectedCheckin(null)
-    setSubmissions([])
   }
 
   const editorGuard = useEditorGuard({ open: showModal, value: formData, onClose: closeEditor })
