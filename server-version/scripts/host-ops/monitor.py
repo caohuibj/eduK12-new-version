@@ -251,7 +251,7 @@ def collect(config):
             stamp=dt.datetime.fromisoformat(value['at'].replace('Z','+00:00'))
             if stamp.tzinfo is None or stamp.timestamp()>time.time()+300:raise ValueError('maintenance timestamp invalid')
             age=max(0,int(time.time()-stamp.timestamp()))
-            level='critical' if value.get('status')=='FAILED' else 'warning' if age>max_age else 'ok'
+            level='critical' if value.get('status')=='FAILED' else 'warning' if age>max_age or value.get('status')=='SKIPPED' else 'ok'
             checks.append(finding(key,level,{'status':value.get('status'),'age_seconds':age}))
         probe('collector:'+key,maintenance_status)
 

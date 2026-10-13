@@ -47,4 +47,21 @@ class CycleTests(unittest.TestCase):
             with patch.object(m.subprocess,'run') as run:result=m.run_cycle(Backup(),'synthetic','a'*40)
             self.assertEqual(result['status'],'COMPLETE');run.assert_not_called()
             self.assertEqual(set(result['stages'].values()),{'REUSED'})
+    def test_large_snapshot_resumes_more_than_sixteen_bounded_batches(self):
+        now,r,c,p=self.fixtures();c['lastFullVerificationAt']=(now-dt.timedelta(hours=23)).isoformat();c['verifyCursor']['complete']=False
+        class Backup:
+            def unseal(self,v,s):return v
+            def cleanup_pending(self,s):return False
+            def atomic(self,path,value):path.write_text(json.dumps(value))
+            def sha(self,path):return 'verifier'
+        with tempfile.TemporaryDirectory() as t,patch.object(m,'STATE',Path(t)),patch.object(m,'HOST',Path(t)),patch.object(m,'ATT',Path(t)),patch.object(m,'PROOF',Path(t,'proof.json')):
+            for name,value in [('latest.json',r),('catalog.json',c),('proof.json',p)]:Path(t,name).write_text(json.dumps(value))
+            calls=[]
+            def complete_after_eighteen(args,**kwargs):
+                calls.append(args);self.assertEqual(args[-1],'eduk12-attachments-verify.service')
+                if len(calls)==18:
+                    c['verifyCursor']['complete']=True;c['lastFullVerificationAt']=now.isoformat();Path(t,'catalog.json').write_text(json.dumps(c))
+            with patch.object(m.subprocess,'run',side_effect=complete_after_eighteen):result=m.run_cycle(Backup(),'synthetic','a'*40)
+            self.assertEqual(result['status'],'COMPLETE');self.assertEqual(len(calls),18)
+
 if __name__=='__main__':unittest.main()

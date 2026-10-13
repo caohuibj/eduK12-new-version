@@ -57,7 +57,7 @@ def run_cycle(b,secret,revision):
         db=lambda:signed(HOST/'latest.json');cat=lambda:signed(ATT/'catalog.json')
         stage('database','eduk12-database-backup.service',lambda:database_ready(db(),now(),revision))
         stage('attachment_snapshot','eduk12-attachments-backup.service',lambda:snapshot_ready(cat(),db(),now()))
-        stage('attachment_verification','eduk12-attachments-verify.service',lambda:verification_ready(cat(),now()),16)
+        stage('attachment_verification','eduk12-attachments-verify.service',lambda:verification_ready(cat(),now()),32)
         verifier=b.sha(Path('/opt/eduk12-cos-cleanup/current/recovery.mjs'))
         stage('joint_recovery','eduk12-cos-recovery.service',lambda:recovery_ready(signed(PROOF),db(),cat(),verifier,now()))
         result.update(status='COMPLETE',completedAt=now().isoformat(),databasePointId=db()['id'])

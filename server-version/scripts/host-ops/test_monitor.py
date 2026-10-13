@@ -50,6 +50,16 @@ class MonitoringSafetyTests(unittest.TestCase):
             self.assertEqual(levels['cos_joint_recovery_health'],'critical')
             self.assertEqual(data['database_backup_attempt']['status'],'SKIPPED')
 
+    def test_space_maintenance_skip_is_not_a_fresh_success(self):
+        import datetime as dt
+        config=copy.deepcopy(CONFIG);config.update(tls_hosts=[],ready_urls=[],backup_roots=[])
+        with tempfile.TemporaryDirectory() as tmp:
+            p=Path(tmp,'storage.json');config['storage_status']=str(p)
+            for status,level in [('COMPLETE','ok'),('SKIPPED','warning'),('FAILED','critical')]:
+                p.write_text(json.dumps({'at':dt.datetime.now(dt.timezone.utc).isoformat(),'status':status}))
+                with patch.object(m,'command',side_effect=RuntimeError('isolated')):_,checks=m.collect(config)
+                self.assertEqual(next(x['level'] for x in checks if x['key']=='storage_maintenance'),level)
+
     def test_failure_debounce_recovery_and_reminder(self):
         bad = [m.finding('http:api', 'critical', {'status': 503})]
         good = [m.finding('http:api', 'ok', {'status': 200})]
