@@ -64,7 +64,7 @@ c['contractDigest']=sha(Path('.github/scripts/teacher-survey-contracts.test.tsx'
 def compiler_fingerprint(source):
  # Test-phase revisions do not consume the compiler. Bind its exact helpers,
  # frozen Dockerfile transformation, command, configuration and archive code.
- fragments=[source.split('def run(',1)[1].split('def api(',1)[0],source.split('def archive_images():',1)[1].split("tag='eduk12-teacher-survey:'",1)[0],source.split("tag='eduk12-teacher-survey:'",1)[1].split(" c['builder']=output",1)[0]]
+ fragments=[source.split('def run(',1)[1].split('def api(',1)[0],source.split('\ndef archive_images():',1)[1].split("\ntag='eduk12-teacher-survey:'",1)[0],source.split("\ntag='eduk12-teacher-survey:'",1)[1].split(" c['builder']=output",1)[0]]
  return sha(''.join(fragments).encode())
 c['compilerFingerprint']=compiler_fingerprint(Path('.github/scripts/teacher-survey-candidate.py').read_text())
 reuse=None
@@ -154,9 +154,15 @@ with tempfile.TemporaryDirectory(prefix='teacher-survey-') as temp:
   command=['docker','run','--rm','-v',str(Path('.github/scripts/teacher-survey-contracts.test.tsx').resolve())+':/app/src/review-contracts.test.tsx:ro','-v',str(e.resolve())+':/evidence',builder,'npx','vitest','run','src/review-contracts.test.tsx','--maxWorkers=2','--reporter=json','--outputFile=/evidence/contracts.json']
   if missing:
    import re
-   command+=['-t','|'.join('^'+re.escape(t)+'$' for t in missing)]
+   command+=['-t','|'.join(re.escape(t)+'$' for t in missing)]
   if reuse and not missing and c['proof'].get('contractCases'):c['phases'].append({'name':'affected-ui-contracts','status':'success','reusedFrom':c['proof']['candidatePhases']})
-  else:phase('affected-ui-contracts',lambda:run(command))
+  else:
+   def verify_contracts():
+    run(command)
+    report=json.loads((e/'contracts.json').read_text());assert report['success'] and report['numFailedTests']==0
+    executed={a['title'] for suite in report['testResults'] for a in suite.get('assertionResults',[]) if a['status']=='passed'}
+    assert executed and (set(missing).issubset(executed) if missing else len(executed)==5),'required contracts not actually executed'
+   phase('affected-ui-contracts',verify_contracts)
 
  # Audit consumes dependency/config/build base inputs, not unrelated JSX text.
  for file in ['package.json','package-lock.json','Dockerfile']:
@@ -168,6 +174,6 @@ with tempfile.TemporaryDirectory(prefix='teacher-survey-') as temp:
  if reuse and reuse.get('image'):
   run(['docker','tag',reuse['image'],tag]);c['phases'].append({'name':'runtime-from-same-build-cache','status':'success','reusedFrom':c['proof']['candidatePhases']})
  else:
-  runtime_file=Path(temp)/'Dockerfile.runtime';runtime_file.write_text('FROM '+c['builder']+' AS build\n'+dockerfile.read_text().split('FROM nginx',1)[1].join(['FROM nginx','']) if False else 'FROM '+c['builder']+' AS build\nFROM nginx'+dockerfile.read_text().split('FROM nginx',1)[1])
+  runtime_file=Path(temp)/'Dockerfile.runtime';runtime_file.write_text('FROM '+c['builder']+' AS build\nFROM nginx'+dockerfile.read_text().split('FROM nginx',1)[1])
   phase('runtime-from-same-build-cache',lambda:run(['docker','buildx','build','--builder','default','--load','-f',str(runtime_file),'--label','org.opencontainers.image.revision='+p['head'],'--target','runtime','-t',tag,'server-version/frontend']))
 c['image']=output(['docker','image','inspect','--format','{{.Id}}',tag]);archive_images()
