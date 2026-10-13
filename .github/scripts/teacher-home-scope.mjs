@@ -45,7 +45,7 @@ export const reviewedTeacherFiles=Object.freeze({
 const tooling=new Set([
  '.github/scripts/teacher-home-scope.mjs','.github/scripts/teacher-home.test.mjs',
  '.github/scripts/teacher-home-candidate.py','.github/scripts/teacher-home-browser.mjs',
- '.github/scripts/teacher-home-fixture.cjs','.github/workflows/ci-teacher-home.yml',
+ '.github/scripts/teacher-home-fixture.cjs','.github/scripts/teacher-home-reuse.py','.github/workflows/ci-teacher-home.yml',
  '.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs',
  '.github/workflows/ci.yml','docs/release/README.md',
 ]);

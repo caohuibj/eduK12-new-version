@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import {execFileSync} from 'node:child_process';
 import {reviewedTeacherFiles,teacherHomePlan,teacherRequired,expertMountBoundary} from './teacher-home-scope.mjs';
 import {failedChecks,requiredChecks} from './merge-gate.mjs';
 const base='a'.repeat(40),head='b'.repeat(40),tree='c'.repeat(40);
@@ -64,4 +65,8 @@ test('workflow preserves same-head recomputation, runtime scans, existing auth c
  const candidate=source('./teacher-home-candidate.py');
  for(const file of ['login-admission','authLibrary','auth.test','csrf.test','loginRateLimit','authCookies'])assert.ok(candidate.includes(file));
  const browser=source('./teacher-home-browser.mjs');assert.match(browser,/real-guest-expert-registration/);assert.doesNotMatch(browser,/\/api\/\*\*.*route\.fulfill/);
+});
+
+test('official prerequisite reuse refuses changed commands, inputs and incomplete phases',()=>{
+ execFileSync('python3',['-B','.github/scripts/teacher-home-reuse.py','--self-test'],{stdio:'inherit'});
 });

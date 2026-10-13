@@ -7,6 +7,7 @@ on:
         required: true
 permissions:
   contents: read
+  actions: read
 jobs:
   candidate:
     runs-on: ubuntu-24.04
@@ -36,13 +37,21 @@ jobs:
           writeFileSync('teacher-home-plan.json',JSON.stringify(p,null,2));
           JS
       - uses: docker/setup-buildx-action@v3
+      - name: verify and restore qualified prerequisites
+        id: reuse
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: python3 -B .github/scripts/teacher-home-reuse.py
       - name: compile changed components once and run affected contracts
+        if: steps.reuse.outputs.reuse_runtime != 'true'
         run: python3 -B .github/scripts/teacher-home-candidate.py
       - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
         with:
           version: v0.70.0
           cache: false
       - name: scan the two actual runtime images at existing thresholds
+        if: steps.reuse.outputs.reuse_runtime != 'true'
         run: |
           trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output teacher-home-evidence/frontend-scan.json eduk12-teacher-home-frontend:${{ github.sha }}
           trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output teacher-home-evidence/backend-scan.json eduk12-teacher-home-backend:${{ github.sha }}
@@ -57,5 +66,7 @@ jobs:
           path: |
             teacher-home-plan.json
             teacher-home-evidence/
+            teacher-home-reuse.json
           if-no-files-found: error
           retention-days: 3
+          compression-level: 0

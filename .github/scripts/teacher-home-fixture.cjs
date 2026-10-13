@@ -11,12 +11,14 @@ async function main(){
  const password='TeacherSynthetic!2026',passwordHash=await hashPassword(password);
  async function user(login,accountDomain='SCHOOL'){
   const id=randomUUID();
-  await prisma.user.create({data:{id,username:'synthetic_'+id.replaceAll('-',''),passwordHash,accountDomain,role:'TEACHER',teacherApproved:true}});
-  await prisma.campusAccount.create({data:{userId:id,loginName:login,normalizedLogin:login}});
+  await prisma.user.create({data:{id,username:accountDomain==='SCHOOL'?'synthetic_'+id.replaceAll('-',''):login,passwordHash,accountDomain,role:'TEACHER',teacherApproved:true}});
+  if(accountDomain==='SCHOOL')await prisma.campusAccount.create({data:{userId:id,loginName:login,normalizedLogin:login}});
   return id;
  }
  const admin=await user('teacher_ci_admin'),teacher=await user('teacher_ci_member');
- await user('teacher_ci_wrong_domain','TRAINING');
+ const trainingUser=await user('teacher_ci_wrong_domain','TRAINING');
+ const wrongDomain=await prisma.user.findUniqueOrThrow({where:{id:trainingUser}});
+ if(wrongDomain.accountDomain!=='TRAINING'||await prisma.campusAccount.findUnique({where:{userId:trainingUser}}))throw Error('wrong-domain fixture must be a valid Training identity without an education account');
  const org=randomUUID();
  await prisma.organization.create({data:{id:org,name:'Synthetic Teacher CI school',productDomain:'SCHOOL',createdByUserId:admin}});
  await prisma.educationProductEntitlement.create({data:{organizationId:org,product:'HUITEACHER',status:'ACTIVE',grantedByUserId:admin}});
