@@ -31,7 +31,7 @@ class CycleTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as t,patch.object(m,'STATE',Path(t)),patch.object(m,'HOST',Path(t)),patch.object(m,'ATT',Path(t)),patch.object(m,'PROOF',Path(t,'proof.json')):
             Path(t,'latest.json').write_text(json.dumps({**r,'status':'FAILED'}))
             with patch.object(m.subprocess,'run') as run:
-                result=m.run_cycle(Backup(),'synthetic','a'*40')
+                result=m.run_cycle(Backup(),'synthetic','a'*40)
             self.assertEqual(result['status'],'FAILED');self.assertFalse(Path(t,'cycle-last-success.json').exists())
             self.assertEqual(run.call_count,1);self.assertEqual(result['stage'],'database')
     def test_all_good_stages_are_reused_without_restarting_services(self):
@@ -43,7 +43,7 @@ class CycleTests(unittest.TestCase):
             def sha(self,path):return 'verifier'
         with tempfile.TemporaryDirectory() as t,patch.object(m,'STATE',Path(t)),patch.object(m,'HOST',Path(t)),patch.object(m,'ATT',Path(t)),patch.object(m,'PROOF',Path(t,'proof.json')):
             for name,value in [('latest.json',r),('catalog.json',c),('proof.json',p)]:Path(t,name).write_text(json.dumps(value))
-            with patch.object(m.subprocess,'run') as run:result=m.run_cycle(Backup(),'synthetic','a'*40')
+            with patch.object(m.subprocess,'run') as run:result=m.run_cycle(Backup(),'synthetic','a'*40)
             self.assertEqual(result['status'],'COMPLETE');run.assert_not_called()
             self.assertEqual(set(result['stages'].values()),{'REUSED'})
 if __name__=='__main__':unittest.main()
