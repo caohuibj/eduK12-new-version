@@ -41,6 +41,7 @@ try{
   await page.route('**/*',async route=>{
    const url=new URL(route.request().url());
    if(!['eduk12.top','training.eduk12.top'].includes(url.hostname))return route.abort();
+   if(url.pathname==='/access-ci-axe.js')return route.fulfill({contentType:'application/javascript',body:readFileSync('.github/release-tools/node_modules/axe-core/axe.min.js','utf8')});
    if(!url.pathname.startsWith('/api/'))return route.continue();
    const path=url.pathname;calls.push(url.pathname+url.search);
    let data={list:[],total:0,pageSize:20,counts:{ACTIONABLE:0,UPCOMING:0,EXPIRED:0,COMPLETED:0}};
@@ -67,7 +68,7 @@ try{
   await page.getByText('第一页',{exact:true}).waitFor();
   const button=page.getByRole('button',{name:variant.button,exact:true});await button.waitFor();
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
-  await page.addScriptTag({content:readFileSync('.github/release-tools/node_modules/axe-core/axe.min.js','utf8')});
+  await page.addScriptTag({url:`http://${variant.host}:3189/access-ci-axe.js`});
   // Limit WCAG to the affected list/dialog surface. Existing application-wide
   // navigation is not a newly changed component or an extra regression gate.
   const scope=await page.locator(variant.scope).count()?variant.scope:variant.peers?'.student-submit-page':variant.scope;

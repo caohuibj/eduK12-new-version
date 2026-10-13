@@ -7,8 +7,12 @@ import { courseController } from '../../controllers/courseController'
 import { checkinController } from '../../controllers/checkinController'
 import { integrationDatabaseUrl, requireIsolatedReleaseDatabase } from './integration-env'
 import { runtimeMetricLines, resetRuntimeObservabilityForTests } from '../../services/runtimeObservability'
+import uploads from '../../routes/uploads'
 import { writeFile } from 'node:fs/promises'
-vi.mock('../../config/queue', () => ({ videoQueue: { getJobs: vi.fn() }, exportQueue: { add: vi.fn() } }))
+const queueMocks = vi.hoisted(() => ({ images: vi.fn(async (..._args: any[]) => [] as any[]) }))
+vi.mock('../../config/queue', () => ({ imageQueue: { getJobs: queueMocks.images }, videoQueue: { getJobs: vi.fn() }, exportQueue: { add: vi.fn() } }))
+// Authentication itself is unchanged; these fixtures inject a synthetic principal.
+vi.mock('../../middleware/auth', () => ({ authenticate: (_req: any, _res: any, next: any) => next(), requireTeacher: (req: any, res: any, next: any) => req.user.role === 'TEACHER' ? next() : res.sendStatus(403) }))
 const url = integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL')
 const suite = url ? describe : describe.skip
 const student = randomUUID(), teacher = randomUUID(), foreign = randomUUID(), course = randomUUID()
@@ -29,6 +33,7 @@ suite('bounded authenticated list pages in real PostgreSQL', () => {
     await prisma.checkinSubmission.createMany({ data: peers.map(studentId => ({ checkinId: crowdedTask, studentId, content: 'peer-body', images: [] })) })
     const app = express()
     app.use((req: any, _res, next) => { req.user = { ...identity }; next() })
+    app.use('/uploads', uploads)
     app.get('/courses/my', courseController.myCourses)
     app.get('/checkins/my', checkinController.myCheckins)
     if (process.env.CI) {
@@ -87,6 +92,22 @@ suite('bounded authenticated list pages in real PostgreSQL', () => {
     identity.userId = student
     const own = await (await fetch(endpoint+`/checkins/${task.id}/others-submissions`)).json() as any
     expect(own.data.list).toEqual([])
+  })
+  it('bounds historical image status scans and caches terminal results without declaring unscanned jobs absent', async () => {
+    identity.userId = teacher; identity.role = 'TEACHER'
+    queueMocks.images.mockImplementation(async (states: string[], start: number, end: number) => {
+      expect(start).toBe(0); expect(end).toBeLessThanOrEqual(199)
+      return Array.from({ length: end + 1 }, (_, index) => ({ data: { imageId: states[0] === 'completed' && index === 0 ? 'synthetic-old-image' : 'other-'+index }, getState: async () => 'completed', returnvalue: { filename: 'old.jpg', url: '/uploads/images/old.jpg', size: 1, compressed: false, originalSize: 1, storage: 'local' } }))
+    })
+    const first = await fetch(endpoint+'/uploads/image/status/synthetic-old-image')
+    expect(first.status).toBe(200); expect((await first.json() as any).data.status).toBe('completed')
+    const calls = queueMocks.images.mock.calls.length
+    expect((await fetch(endpoint+'/uploads/image/status/synthetic-old-image')).status).toBe(200)
+    expect(queueMocks.images.mock.calls.length).toBe(calls)
+    const older = await fetch(endpoint+'/uploads/image/status/older-than-window')
+    expect(older.status).toBe(503); expect(older.headers.get('retry-after')).toBe('2')
+    queueMocks.images.mockImplementation(async () => [])
+    identity.userId = student; identity.role = 'STUDENT'
   })
   it('records before/after fixed synthetic concurrency latency and real SQL counts without touching production', async () => {
     const measurements = []

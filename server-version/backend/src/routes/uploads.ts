@@ -15,6 +15,7 @@ import { discardUnreferencedAsset, getLocalAssetPath, legacyAssetOwnerIds, signK
 import { prisma } from '../config/database'
 import { UserRole } from '../types'
 import { detectMimeType } from '../utils/fileValidator'
+import { BoundedAdmissionGate, isBoundedAdmissionBusyError } from '../services/boundedAdmissionGate'
 
 const router = Router()
 router.use(authenticate, requireTeacher)
@@ -22,6 +23,7 @@ router.use(authenticate, requireTeacher)
 // Cache only transient historical statuses; the queue remains authoritative.
 import NodeCache from 'node-cache'
 const imageStatusCache = new NodeCache({ stdTTL: 300, checkperiod: 60, maxKeys: 500, useClones: false })
+const imageStatusLookup = new BoundedAdmissionGate({ name: 'legacy_image_status', maxConcurrent: 1, maxQueue: 0, maxWaitMs: 1000, retryAfterSeconds: 2 })
 
 // 确保上传目录存在（使用绝对路径）
 const imagesDir = path.resolve(config.uploadDir, 'images')
@@ -377,6 +379,7 @@ function cacheImageStatus(id: string, value: unknown) {
 router.get('/image/status/:imageId', async (req, res) => {
   try {
     const { imageId } = req.params
+    if (!/^[A-Za-z0-9_-]{1,128}$/.test(imageId)) return error(res, '非法图片任务编号', -1, 400)
 
     // 先检查内存缓存
     const cached = imageStatusCache.get<{ status: string }>(imageId)
@@ -389,8 +392,22 @@ router.get('/image/status/:imageId', async (req, res) => {
     }
 
     // 查询队列状态
-    const jobs = await imageQueue.getJobs(['active', 'waiting', 'completed', 'failed'])
-    const job = jobs.find((j) => j.data.imageId === imageId)
+    const lookup = await imageStatusLookup.run(async () => {
+      let truncated = false
+      for (const [state, limit] of [['active', 100], ['waiting', 100], ['completed', 200], ['failed', 100]] as const) {
+        const jobs = await imageQueue.getJobs([state], 0, limit - 1)
+        const job = jobs.find(candidate => candidate?.data.imageId === imageId)
+        if (job) return { job, truncated: false }
+        if (jobs.length === limit) truncated = true
+      }
+      return { job: null, truncated }
+    })
+    const job = lookup.job
+    // An unscanned historical task is busy, never falsely reported absent.
+    if (!job && lookup.truncated) {
+      res.setHeader('Retry-After', '2')
+      return error(res, '历史图片任务查询繁忙，请稍后重试', -1, 503)
+    }
 
     if (!job && !cached) {
       return error(res, '图片任务不存在')
@@ -454,6 +471,10 @@ router.get('/image/status/:imageId', async (req, res) => {
       status,
     })
   } catch (err) {
+    if (isBoundedAdmissionBusyError(err)) {
+      res.setHeader('Retry-After', String(err.retryAfterSeconds))
+      return error(res, '历史图片任务查询繁忙，请稍后重试', -1, 503)
+    }
     logger.error('查询图片状态错误', err)
     return error(res, '查询失败')
   }
