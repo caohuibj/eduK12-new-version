@@ -27,7 +27,7 @@ export const reviewedTeacherFiles=Object.freeze({
   },
   "server-version/frontend/src/huiteacher/HuiteacherApp.tsx": {
     "before": "6f6e7f5a1dec522ba33501599468dcd4306ca09f",
-    "after": "1b5137dd787570db219044abf4ae5f1cb8d66eef"
+    "after": "4c55c38ed387fb11599d705075be436266aa16f3"
   },
   "server-version/frontend/src/huiteacher/HuiteacherLanding.tsx": {
     "before": null,
@@ -35,7 +35,7 @@ export const reviewedTeacherFiles=Object.freeze({
   },
   "server-version/frontend/src/huiteacher/huiteacher-landing.css": {
     "before": null,
-    "after": "8779a34a19def9486d44724d0392377849e54df5"
+    "after": "297cdae85e58a95dc722bf1fcf069b13a5417451"
   },
   "server-version/frontend/src/huiteacher/huiteacher.css": {
     "before": "0b326ed785f3bc155c3b42549d4ea1016f36c31d",

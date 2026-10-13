@@ -251,7 +251,7 @@ export default function HuiteacherApp(){
     !me&&screen==='join'?<section className="ht-panel ht-form-panel">
       <h1>受邀创建教育账号</h1>
       <p>选择与你收到的邀请相符的身份，<br/>我们会引导你完成注册。</p>
-      <div className="ht-invite-choices" aria-label="邀请身份">
+      <div className="ht-invite-choices" role="group" aria-label="邀请身份">
         <button type="button" onClick={()=>changeScreen('register')}>教师／学校成员<span aria-hidden="true">→</span></button>
         <button type="button" onClick={()=>changeScreen('student')}>学生<span aria-hidden="true">→</span></button>
         <button type="button" onClick={()=>changeScreen('expert')}>外部专家<span aria-hidden="true">→</span></button>

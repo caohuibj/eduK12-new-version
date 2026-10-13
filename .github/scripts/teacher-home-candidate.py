@@ -6,7 +6,9 @@ assert plan['route']=='teacher-home' and plan['changed']==['frontend','backend']
 evidence=Path('teacher-home-evidence');evidence.mkdir(exist_ok=True)
 reuse=json.loads(Path('teacher-home-reuse.json').read_text()) if Path('teacher-home-reuse.json').exists() else {'mode':'none'}
 results={'head':plan['head'],'components':plan['components'],'phases':[],'images':{},'bases':{}}
-reuse_checks=reuse.get('mode')=='checks-only'
+reuse_checks=reuse.get('mode') in ['checks-only','partial']
+reuse_components=reuse.get('runtimeComponents',[])
+reuse_check_components=reuse.get('checkComponents',[])
 if reuse_checks:
  assert reuse['head']==plan['head'] and reuse['components']==plan['components']
  results['reusedFrom']={'runId':reuse['runId'],'artifactId':reuse['artifactId'],'sourceHead':reuse['sourceHead']}
@@ -21,6 +23,13 @@ def phase(name,fn):
 tests=['src/__tests__/controllers/login-admission.test.ts','src/__tests__/controllers/authLibrary.test.ts','src/__tests__/middleware/auth.test.ts','src/__tests__/middleware/csrf.test.ts','src/__tests__/middleware/loginRateLimit.test.ts','src/__tests__/utils/authCookies.test.ts']
 with tempfile.TemporaryDirectory(prefix='teacher-home-') as temp:
  for component in plan['changed']:
+  if component in reuse_components:
+   names=[component+'-compile-once',('affected-frontend-checks' if component=='frontend' else 'six-existing-auth-contracts'),component+'-runtime-from-cached-build']
+   results['phases'] += [{'name':name,'status':'success','reusedFrom':reuse['runId']} for name in names]
+   results['images'][component]=reuse['checks']['images'][component]
+   results['bases'].update(reuse['checks']['bases'])
+   print('REUSED immutable '+component+' image from official run',reuse['runId'])
+   continue
   context='server-version/'+component;tag='eduk12-teacher-home-'+component+':'+plan['head'];builder=tag+'-build'
   frozen=[]
   for line in Path(context+'/Dockerfile').read_text().splitlines():
@@ -44,14 +53,14 @@ with tempfile.TemporaryDirectory(prefix='teacher-home-') as temp:
    config=Path(temp)/'tsconfig.teacher-home.json'
    config.write_text(json.dumps({'extends':'./tsconfig.app.json','include':changed+['src/vite-env.d.ts'],'references':[]}))
    cmd='npx eslint '+' '.join(changed)+' && npx tsc -p tsconfig.teacher-home.json --noEmit && npm audit --audit-level=high'
-   if reuse_checks:
+   if reuse_checks and component in reuse_check_components:
     results['phases'].append({'name':'affected-frontend-checks','status':'success','reusedFrom':reuse['runId']})
     print('REUSED affected-frontend-checks from official run',reuse['runId'])
    else:
     phase('affected-frontend-checks',lambda:run(['docker','run','--rm','-v',str(config)+':/app/tsconfig.teacher-home.json:ro',builder,'sh','-ec',cmd],600))
   else:
    cmd='npm audit --audit-level=high && npx vitest run '+' '.join(tests)+' --maxWorkers=2 --reporter=json --outputFile=/evidence/auth-tests.json && node scripts/assert-release-test-report.mjs /evidence/auth-tests.json '+' '.join(tests)
-   if reuse_checks:
+   if reuse_checks and component in reuse_check_components:
     import shutil
     shutil.copy2('teacher-home-prerequisites/teacher-home-evidence/auth-tests.json',evidence/'auth-tests.json')
     results['phases'].append({'name':'six-existing-auth-contracts','status':'success','reusedFrom':reuse['runId']})

@@ -50,11 +50,12 @@ jobs:
         with:
           version: v0.70.0
           cache: false
-      - name: scan the two actual runtime images at existing thresholds
-        if: steps.reuse.outputs.reuse_runtime != 'true'
-        run: |
-          trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output teacher-home-evidence/frontend-scan.json eduk12-teacher-home-frontend:${{ github.sha }}
-          trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output teacher-home-evidence/backend-scan.json eduk12-teacher-home-backend:${{ github.sha }}
+      - name: scan the actual frontend runtime image at existing thresholds
+        if: steps.reuse.outputs.reuse_frontend_runtime != 'true'
+        run: trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output teacher-home-evidence/frontend-scan.json eduk12-teacher-home-frontend:${{ github.sha }}
+      - name: scan the actual backend runtime image at existing thresholds
+        if: steps.reuse.outputs.reuse_backend_runtime != 'true'
+        run: trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output teacher-home-evidence/backend-scan.json eduk12-teacher-home-backend:${{ github.sha }}
       - name: install pinned Chromium
         run: node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
       - name: Teacher responsive UI and real isolated registration boundaries on the same runtime images
