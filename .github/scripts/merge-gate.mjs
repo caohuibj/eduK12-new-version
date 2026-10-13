@@ -10,6 +10,7 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if (scope.application_route === 'teacher-home') return ['scope','teacher-home','codeql'];
   if (scope.application_route === 'survey-home') return ['scope','survey-home','codeql'];
   if (scope.application_route === 'homepage-copy') {
     let p; try { p=JSON.parse(scope.homepage_copy_plan); } catch {}
@@ -52,6 +53,16 @@ export function requiredChecks(needs, draft) {
 export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if (scope.application_route === 'teacher-home') {
+    let p;try{p=JSON.parse(scope.teacher_home_plan);}catch{}
+    if(draft||!p||p.schema!==1||p.route!=='teacher-home'||scope.scenario!=='teacher-home'||scope.codeql!=='true'
+      ||JSON.stringify(p.changed)!==JSON.stringify(['frontend','backend'])||!/^[a-f0-9]{40}$/.test(p.base||'')
+      ||!/^[a-f0-9]{40}$/.test(p.head||'')||!['frontend','backend'].every(c=>/^[a-f0-9]{40}$/.test(p.components?.[c]||''))
+      ||!Array.isArray(p.changes)||!p.changes.length
+      ||JSON.stringify(p.required)!==JSON.stringify(['teacher-auth-contracts','frontend-candidate','backend-candidate','runtime-scans','teacher-browser','sast'])
+      ||Object.keys(acceptanceJobs).some(k=>scope[k]!=='false'))failed.push('scope');
+    return [...new Set(failed)];
+  }
   if (scope.application_route === 'survey-home') {
     let p;try{p=JSON.parse(scope.survey_home_plan);}catch{}
     if(draft||!p||p.schema!==1||p.route!=='survey-home'||scope.scenario!=='survey-home'||scope.codeql!=='true'
@@ -124,6 +135,13 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     const actual=plan(p.base,p.head);
     if (JSON.stringify(actual) !== JSON.stringify(p)) failed.push('recomputed-plan');
     if (needs.scope.outputs.scenario==='release-tooling' && (actual.route!=='C' || actual.changed.length || !toolingOnly(actual.changes))) failed.push('mixed-or-unknown-tooling');
+  }
+  if(needs.scope?.outputs?.application_route==='teacher-home'){
+    const {teacherHomePlan}=await import('./teacher-home-scope.mjs');
+    const {changedEntries}=await import('./content-scope.mjs');
+    const {execFileSync}=await import('node:child_process');
+    const p=JSON.parse(needs.scope.outputs.teacher_home_plan),head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+    if(p.head!==head||JSON.stringify(teacherHomePlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-teacher-home-plan');
   }
   if(needs.scope?.outputs?.application_route==='survey-home'){
     const {surveyHomePlan}=await import('./survey-home-scope.mjs');
