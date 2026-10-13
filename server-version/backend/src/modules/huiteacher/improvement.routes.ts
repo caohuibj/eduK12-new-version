@@ -1,4 +1,4 @@
-import {Router} from 'express'
+import {Router,type RequestHandler} from 'express'
 import {z,ZodError} from 'zod'
 import {asyncHandler} from '../../middleware/asyncHandler'
 import {createRedisRateLimiter} from '../../middleware/redisRateLimit'
@@ -40,23 +40,22 @@ const wrap=(work:(req:any)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
     throw e
   }
 })
-router.use((_,res,next)=>{
-  res.setHeader('Cache-Control','no-store')
+router.use((_,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
+const improvementGuard:RequestHandler=(_,res,next)=>{
   if(process.env.HUITEACHER_IMPROVEMENT_ENABLED!=='true')
     return res.status(404).json({
       code:'HUITEACHER_IMPROVEMENT_DISABLED',message:'改进行动功能暂未开放',data:null,
     })
   next()
-})
-router.use(authenticateHuiteacher)
-router.get('/my-improvement-targets',wrap(req=>
+}
+router.get('/my-improvement-targets',improvementGuard,authenticateHuiteacher,wrap(req=>
   listMyHuiteacherImprovementTargets(req.user!.userId)))
 const base='/organizations/:organizationId/evaluation-targets/:targetId/improvement-actions'
-router.get(base,wrap(req=>listHuiteacherImprovements({
+router.get(base,improvementGuard,authenticateHuiteacher,wrap(req=>listHuiteacherImprovements({
   ...targetParams.parse(req.params),...cursor.parse(req.query),
   actorUserId:req.user!.userId,
 })))
-router.post(base+'/private',limiter,wrap(req=>{
+router.post(base+'/private',improvementGuard,authenticateHuiteacher,limiter,wrap(req=>{
   const body=create.parse(req.body)
   return createHuiteacherImprovement({
     ...targetParams.parse(req.params),actorUserId:req.user!.userId,
@@ -64,7 +63,7 @@ router.post(base+'/private',limiter,wrap(req=>{
     dueAt:body.dueAt?new Date(body.dueAt):null,
   })
 }))
-router.post(base+'/school',requireTeacherProductAdmin,requireRecentTeacherMfa,
+router.post(base+'/school',improvementGuard,authenticateHuiteacher,requireTeacherProductAdmin,requireRecentTeacherMfa,
   limiter,wrap(req=>{
     const body=create.parse(req.body)
     return createHuiteacherImprovement({
@@ -79,8 +78,8 @@ const update=(audience:'PRIVATE_PERSONAL'|'SCHOOL_SHARED')=>
     actorUserId:req.user!.userId,expectedAudience:audience,
     ...transition.parse(req.body),
   }))
-router.post(base+'/private/:actionId/transition',limiter,update('PRIVATE_PERSONAL'))
-router.post(base+'/school/:actionId/transition',
+router.post(base+'/private/:actionId/transition',improvementGuard,authenticateHuiteacher,limiter,update('PRIVATE_PERSONAL'))
+router.post(base+'/school/:actionId/transition',improvementGuard,authenticateHuiteacher,
   requireTeacherProductAdmin,requireRecentTeacherMfa,limiter,update('SCHOOL_SHARED'))
 
 const reassessment=z.object({
@@ -102,12 +101,12 @@ const link=(audience:'PRIVATE_PERSONAL'|'SCHOOL_SHARED')=>
     actorUserId:req.user!.userId,audience,
     ...reassessment.parse(req.body),
   }))
-router.get(base+'/private/:actionId/reassessment-candidates',candidateRate,
+router.get(base+'/private/:actionId/reassessment-candidates',improvementGuard,authenticateHuiteacher,candidateRate,
   candidates('PRIVATE_PERSONAL'))
-router.get(base+'/school/:actionId/reassessment-candidates',
+router.get(base+'/school/:actionId/reassessment-candidates',improvementGuard,authenticateHuiteacher,
   requireTeacherProductAdmin,candidateRate,candidates('SCHOOL_SHARED'))
-router.post(base+'/private/:actionId/reassessment',limiter,
+router.post(base+'/private/:actionId/reassessment',improvementGuard,authenticateHuiteacher,limiter,
   link('PRIVATE_PERSONAL'))
-router.post(base+'/school/:actionId/reassessment',
+router.post(base+'/school/:actionId/reassessment',improvementGuard,authenticateHuiteacher,
   requireTeacherProductAdmin,requireRecentTeacherMfa,limiter,link('SCHOOL_SHARED'))
 export default router

@@ -14,7 +14,7 @@ import { Request, Response } from 'express'
 import { prisma } from '../config/database'
 import { success, error, notFound, unauthorized, completionBusy, assessmentSubmitBusy, instrumentError } from '../utils/response'
 import { tokenService } from '../services/tokenService'
-import { powService } from '../services/powService'
+import { powService, POWCapacityError } from '../services/powService'
 import { logger } from '../utils/logger'
 import { v4 as uuidv4 } from 'uuid'
 import { buildQuestionnaireCollectionReport } from '../modules/reporting/questionnaire-collection-report'
@@ -97,8 +97,12 @@ export const publicQuestionnaireController = {
         timestamp: challenge.timestamp,
       })
     } catch (err) {
+      if (err instanceof POWCapacityError) {
+        res.setHeader('Retry-After', String(err.retryAfterSeconds))
+        return error(res, '挑战请求繁忙，请稍后再试', -1, 429)
+      }
       logger.error('获取 POW 挑战错误', err)
-      return error(res, '获取挑战失败')
+      return error(res, '获取挑战失败', -1, 503)
     }
   },
 

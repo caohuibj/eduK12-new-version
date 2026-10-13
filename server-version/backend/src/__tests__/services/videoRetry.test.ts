@@ -1,28 +1,31 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const mocks = vi.hoisted(() => ({ find: vi.fn(), update: vi.fn(), add: vi.fn(), getJob: vi.fn(), access: vi.fn() }))
-vi.mock('../../config/database', () => ({ prisma: { video: { findUnique: mocks.find, updateMany: mocks.update } } }))
+const mocks = vi.hoisted(() => ({ find: vi.fn(), update: vi.fn(), add: vi.fn(), getJob: vi.fn(), stat: vi.fn(), capacity: vi.fn(), budget: vi.fn() }))
+vi.mock('../../config/database', () => ({ prisma: { video: { findUnique: mocks.find, updateMany: mocks.update }, $transaction: async(fn:any)=>fn({video:{updateMany:mocks.update}}) } }))
 vi.mock('../../config/queue', () => ({ videoQueue: { add: mocks.add, getJob: mocks.getJob } }))
-vi.mock('node:fs/promises', () => ({ access: mocks.access }))
+vi.mock('node:fs/promises', async importOriginal => ({ ...await importOriginal<any>(), stat: mocks.stat }))
+vi.mock('../../services/remoteVideoAdmission', async importOriginal => ({ ...await importOriginal<any>(), assertVideoCapacity:mocks.capacity, reserveRemoteVideoBudget:mocks.budget }))
 vi.mock('../../services/assetStorage', () => ({ getLocalAssetPath: (key: string) => `/safe/${key}` }))
 import { retryVideo } from '../../services/videoRetry'
 
 const actor = { userId: 'owner', role: 'TEACHER' }
 const row = { id: 'video', teacherId: 'owner', status: 'FAILED', isDeleted: false, processingGeneration: 4,
-  filePath: 'legacy.mp4', originalUrl: null, originalAsset: { objectKey: 'original.mp4', provider: 'local', deletedAt: null } }
+  filePath: 'legacy.mp4', originalUrl: null, originalAssetId:'asset', originalAsset: { objectKey: 'original.mp4', sizeBytes:123, provider: 'local', deletedAt: null } }
 describe('manual failed video recovery', () => {
   beforeEach(() => {
     vi.resetAllMocks()
     mocks.find.mockResolvedValue(row)
     mocks.update.mockResolvedValue({ count: 1 })
-    mocks.access.mockResolvedValue(undefined)
+    mocks.stat.mockResolvedValue({size:123,isFile:()=>true})
     mocks.add.mockResolvedValue({ id: 'job' })
     mocks.getJob.mockResolvedValue(null)
   })
   it('reuses the retained original asset and reserves a fenced job before enqueue', async () => {
     await expect(retryVideo('video', actor)).resolves.toEqual({ id: 'video', status: 'PENDING' })
-    expect(mocks.access).toHaveBeenCalledWith('/safe/original.mp4')
-    expect(mocks.update).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 'video', isDeleted: false, status: 'FAILED', processingGeneration: 4, teacherId: 'owner' } }))
+    expect(mocks.stat).toHaveBeenCalledWith('/safe/original.mp4')
+    expect(mocks.update).toHaveBeenCalledWith(expect.objectContaining({ where: expect.objectContaining({ id: 'video', isDeleted: false, status: 'FAILED', processingGeneration: 4, teacherId: 'owner' }) }))
+    expect(mocks.capacity).toHaveBeenCalledWith(expect.anything(),'owner',{inputBytes:123,originalRetained:true},'video')
+    expect(mocks.budget).not.toHaveBeenCalled()
     const reservation = mocks.update.mock.calls[0][0].data.processingJobId
     expect(mocks.add).toHaveBeenCalledWith('transcode', { videoId: 'video', originalUrl: 'file:///safe/original.mp4', teacherId: 'owner' }, expect.objectContaining({ jobId: reservation }))
     expect(mocks.update.mock.invocationCallOrder[0]).toBeLessThan(mocks.add.mock.invocationCallOrder[0])
@@ -37,12 +40,27 @@ describe('manual failed video recovery', () => {
     expect(mocks.add).not.toHaveBeenCalled()
   })
   it('permits an administrator and rejects missing local source files', async () => {
-    mocks.access.mockRejectedValue(new Error('ENOENT'))
+    mocks.stat.mockRejectedValue(new Error('ENOENT'))
     await expect(retryVideo('video', { userId: 'admin', role: 'ADMIN' })).rejects.toMatchObject({ status: 409 })
     expect(mocks.add).not.toHaveBeenCalled()
-    mocks.access.mockResolvedValue(undefined)
+    mocks.stat.mockResolvedValue({size:123,isFile:()=>true})
     await retryVideo('video', { userId: 'admin', role: 'ADMIN' })
     expect(mocks.add).toHaveBeenCalledTimes(1)
+  })
+  it('rejects local capacity or source size failure before a FAILED row can become PENDING',async()=>{
+    mocks.capacity.mockRejectedValue(Object.assign(new Error('busy'),{status:503}))
+    await expect(retryVideo('video',actor)).rejects.toMatchObject({status:503})
+    expect(mocks.update).not.toHaveBeenCalled();expect(mocks.add).not.toHaveBeenCalled()
+    mocks.capacity.mockClear();mocks.stat.mockResolvedValue({size:0,isFile:()=>true})
+    await expect(retryVideo('video',actor)).rejects.toMatchObject({status:409})
+    expect(mocks.capacity).not.toHaveBeenCalled()
+  })
+  it('keeps remote download charging and reserves remote size through the shared capacity lock',async()=>{
+    mocks.find.mockResolvedValue({...row,originalAsset:null,originalAssetId:null,originalUrl:'https://example.com/video.mp4'})
+    await retryVideo('video',actor)
+    expect(mocks.budget).toHaveBeenCalledWith('owner')
+    expect(mocks.stat).not.toHaveBeenCalled()
+    expect(mocks.capacity).toHaveBeenCalledWith(expect.anything(),'owner',expect.objectContaining({inputBytes:2*1024**3-1,originalRetained:false}),'video')
   })
   it('enqueues only the CAS winner when requests race', async () => {
     mocks.update.mockResolvedValueOnce({ count: 1 }).mockResolvedValueOnce({ count: 0 })

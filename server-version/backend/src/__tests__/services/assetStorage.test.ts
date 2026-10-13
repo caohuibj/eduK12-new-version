@@ -7,6 +7,7 @@ const { mockPrisma, mockCheckinValidate, mockCheckinVerifySession } = vi.hoisted
   mockPrisma: {
     storedAsset: { findUnique: vi.fn(), findMany: vi.fn() },
     course: { findUnique: vi.fn() },
+    user: { findMany: vi.fn() },
     assetReference: { findMany: vi.fn(), findFirst: vi.fn() },
   },
   mockCheckinValidate: vi.fn(),
@@ -39,6 +40,8 @@ import {
   issuePublicAssetUrl,
   serveAsset,
   hydrateAssetReferences,
+  hydrateAssetReferenceBatch,
+  validateAssetReferencesForCourse,
 } from '../../services/assetStorage'
 
 const makeRes = () => {
@@ -106,6 +109,7 @@ describe('stored asset access boundary', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockPrisma.storedAsset.findUnique.mockResolvedValue(privateAsset())
+    mockPrisma.user.findMany.mockResolvedValue([{ id: 'teacher-1' }])
     mockPrisma.course.findUnique.mockResolvedValue(null)
     mockPrisma.assetReference.findFirst.mockResolvedValue(null)
     mockCheckinVerifySession.mockReturnValue(true)
@@ -137,7 +141,7 @@ describe('stored asset access boundary', () => {
       accessScope: 'COURSE',
       scopeId: 'course-1',
     }))
-    mockPrisma.course.findUnique.mockResolvedValue({ creatorId: 'teacher-1', students: [] })
+    mockPrisma.course.findUnique.mockResolvedValue({ creatorId: 'teacher-1', creator: { accountDomain: 'TRAINING' }, students: [] })
     const ownerResponse = makeRes()
 
     await issuePrivateAssetUrl(request(), ownerResponse)
@@ -222,6 +226,7 @@ describe('stored asset access boundary', () => {
     mockPrisma.storedAsset.findUnique.mockResolvedValue(privateAsset({
       ownerId: 'teacher-1',
       accessScope: 'COURSE',
+      ownerId: 'teacher-1',
       scopeId: 'course-1',
     }))
     mockCheckinValidate.mockResolvedValue({
@@ -291,6 +296,7 @@ describe('stored asset access boundary', () => {
     mockPrisma.storedAsset.findMany.mockResolvedValue([{
       id: 'asset-1',
       accessScope: 'COURSE',
+      ownerId: 'teacher-1',
       scopeId: 'course-1',
     }])
     mockPrisma.assetReference.findMany.mockResolvedValue([{ assetId: 'asset-1' }])
@@ -370,6 +376,7 @@ describe('stored asset access boundary', () => {
     mockPrisma.storedAsset.findMany.mockResolvedValue([{
       id: 'asset-1',
       accessScope: 'PRIVATE',
+      ownerId: 'teacher-1',
       scopeId: null,
     }])
     mockPrisma.assetReference.findMany.mockResolvedValue([{ assetId: 'asset-1' }])
@@ -408,11 +415,75 @@ describe('stored asset access boundary', () => {
 
 it('signs a library page with one projected lookup and no per-asset reads', async () => {
   const { getSignedAssetUrls } = await import('../../services/assetStorage')
-  mockPrisma.storedAsset.findMany.mockResolvedValue(Array.from({ length: 40 }, (_, n) => ({ id: `page-${n}`, deletedAt: null, accessScope: 'PRIVATE' })))
+  mockPrisma.user.findMany.mockResolvedValue([{ id: 'teacher-1' }])
+  mockPrisma.storedAsset.findMany.mockResolvedValue(Array.from({ length: 40 }, (_, n) => ({ id: `page-${n}`, ownerId: 'teacher-1', deletedAt: null, accessScope: 'PRIVATE' })))
   mockPrisma.storedAsset.findMany.mockClear(); mockPrisma.storedAsset.findUnique.mockClear()
   const urls = await getSignedAssetUrls(Array.from({ length: 40 }, (_, n) => `page-${n}`))
   expect(urls.size).toBe(40)
   expect(mockPrisma.storedAsset.findMany).toHaveBeenCalledOnce()
   expect(mockPrisma.storedAsset.findUnique).not.toHaveBeenCalled()
   await expect(getSignedAssetUrls(Array.from({ length: 301 }, (_, n) => `large-${n}`))).rejects.toThrow('page budget')
+})
+
+
+describe('legacy target domain and batch hydration', () => {
+  beforeEach(() => { vi.clearAllMocks(); mockPrisma.user.findMany.mockResolvedValue([{ id: 'teacher-1' }]) })
+  it('denies ADMIN private URLs and Course references for foreign or unknown owners', async () => {
+    mockPrisma.user.findMany.mockResolvedValue([])
+    mockPrisma.storedAsset.findUnique.mockResolvedValue(privateAsset({ ownerId: 'survey-owner' }))
+    const res = makeRes()
+    await issuePrivateAssetUrl(request({ user: { userId: 'legacy-admin', role: UserRole.ADMIN } }), res)
+    expect(res.statusCode).toBe(403)
+    mockPrisma.storedAsset.findMany.mockResolvedValue([privateAsset({ ownerId: 'survey-owner' })])
+    await expect(validateAssetReferencesForCourse({ values: { images: [{ assetId: 'asset-1' }] }, courseId: 'course-1', ownerId: 'legacy-admin', role: UserRole.ADMIN })).rejects.toThrow('附件凭据')
+    mockPrisma.storedAsset.findUnique.mockResolvedValue(privateAsset({ ownerId: null }))
+    const unknown = makeRes()
+    await issuePrivateAssetUrl(request({ user: { userId: 'legacy-admin', role: UserRole.ADMIN } }), unknown)
+    expect(unknown.statusCode).toBe(403)
+  })
+  it('keeps same-product ADMIN management and signs an authorized row without re-reading it', async () => {
+    mockPrisma.user.findMany.mockResolvedValue([{ id: 'teacher-1' }])
+    mockPrisma.storedAsset.findUnique.mockResolvedValue(privateAsset())
+    const res = makeRes()
+    await issuePrivateAssetUrl(request({ user: { userId: 'legacy-admin', role: UserRole.ADMIN } }), res)
+    expect(res.statusCode).toBe(200)
+    expect(mockPrisma.storedAsset.findUnique).toHaveBeenCalledOnce()
+    mockPrisma.storedAsset.findMany.mockResolvedValue([privateAsset()])
+    await expect(validateAssetReferencesForCourse({ values: { images: [{ assetId: 'asset-1' }] }, courseId: 'course-1', ownerId: 'legacy-admin', role: UserRole.ADMIN })).resolves.toHaveLength(1)
+    expect(mockPrisma.user.findMany).toHaveBeenCalledTimes(2)
+  })
+  it('hydrates forty parents with two resource reads and one owner batch while rejecting cross-parent and wrong-course references', async () => {
+    const items = Array.from({ length: 40 }, (_, n) => ({ value: { images: [{ assetId: `asset-${n}` }, { assetId: 'foreign' }] }, context: {
+      entityType: 'CheckinSubmission', entityId: `submission-${n}`, courseId: 'course-1', checkinId: 'checkin-1', parentAccess: true,
+    } }))
+    mockPrisma.storedAsset.findMany.mockResolvedValue([
+      ...items.map((_, n) => ({ id: `asset-${n}`, ownerId: 'teacher-1', accessScope: 'PRIVATE', scopeId: null })),
+      { id: 'foreign', accessScope: 'COURSE', scopeId: 'other-course' },
+    ])
+    mockPrisma.assetReference.findMany.mockResolvedValue([
+      ...items.map((_, n) => ({ assetId: `asset-${n}`, entityType: 'CheckinSubmission', entityId: `submission-${n}` })),
+      { assetId: 'foreign', entityType: 'CheckinSubmission', entityId: 'submission-0' },
+    ])
+    const hydrated = await hydrateAssetReferenceBatch(items) as Array<{ images: Array<{ url: string | null }> }>
+    expect(mockPrisma.storedAsset.findMany).toHaveBeenCalledOnce()
+    expect(mockPrisma.assetReference.findMany).toHaveBeenCalledOnce()
+    expect(mockPrisma.user.findMany).toHaveBeenCalledOnce()
+    expect(hydrated.every(item => item.images[0].url?.startsWith('/api/assets/') && item.images[1].url === null)).toBe(true)
+    // The same existing asset cannot borrow another parent's binding.
+    const denied = await hydrateAssetReferenceBatch([{ value: { images: [{ assetId: 'asset-0' }] }, context: { ...items[0].context, entityId: 'unrelated' } }]) as typeof hydrated
+    expect(denied[0].images[0].url).toBeNull()
+    const noAccess = await hydrateAssetReferenceBatch([{ ...items[0], context: { ...items[0].context, parentAccess: false } }]) as typeof hydrated
+    expect(noAccess[0].images[0].url).toBeNull()
+    expect(mockPrisma.storedAsset.findMany).toHaveBeenCalledTimes(2)
+  })
+  it('chunks large legacy lists without dropping records or creating unbounded SQL inputs', async () => {
+    mockPrisma.storedAsset.findMany.mockImplementation(async ({ where }) => where.id.in.map((id: string) => ({ id, ownerId: 'teacher-1', accessScope: 'PRIVATE', scopeId: null })))
+    mockPrisma.assetReference.findMany.mockImplementation(async ({ where }) => where.OR.flatMap((parent: { entityType: string; entityId: string }) => where.assetId.in.map((assetId: string) => ({ ...parent, assetId }))))
+    const items = Array.from({ length: 101 }, (_, n) => ({ value: { images: [{ assetId: `large-${n}` }] }, context: { entityType: 'Assignment', entityId: `assignment-${n}`, parentAccess: true } }))
+    const values = await hydrateAssetReferenceBatch(items) as Array<{ images: Array<{ url: string | null }> }>
+    expect(values).toHaveLength(101)
+    expect(values.every(item => !!item.images[0].url)).toBe(true)
+    expect(mockPrisma.storedAsset.findMany).toHaveBeenCalledTimes(2)
+    expect(mockPrisma.assetReference.findMany).toHaveBeenCalledTimes(2)
+  })
 })

@@ -307,6 +307,19 @@ export const syncAssetReferences = async (params: {
   }
 }
 
+/** Generic legacy asset endpoints must authorize the target product, even for ADMIN.
+ * ownerId is intentionally not a Prisma relation; resolve owners once per batch.
+ */
+export const legacyAssetOwnerIds = async (ownerIds: Array<string | null>, db: AssetDatabase = prisma): Promise<Set<string>> => {
+  const ids = [...new Set(ownerIds.filter((id): id is string => Boolean(id)))]
+  if (!ids.length) return new Set()
+  const owners = await db.user.findMany({
+    where: { id: { in: ids }, accountDomain: { in: ['LEGACY', 'TRAINING'] } },
+    select: { id: true },
+  })
+  return new Set(owners.map(owner => owner.id))
+}
+
 export const validateAssetReferencesForCourse = async (params: {
   values: Record<string, unknown>
   courseId: string
@@ -330,6 +343,8 @@ export const validateAssetReferencesForCourse = async (params: {
       deletedAt: true,
     },
   })
+  const legacyOwners = params.role === UserRole.ADMIN
+    ? await legacyAssetOwnerIds(assets.map(asset => asset.ownerId), db) : new Set([params.ownerId])
   const assetsById = new Map(assets.map((asset) => [asset.id, asset]))
   if (assetsById.size !== assetIds.length) throw new AssetReferenceValidationError()
 
@@ -338,6 +353,7 @@ export const validateAssetReferencesForCourse = async (params: {
     if (!asset || asset.deletedAt) throw new AssetReferenceValidationError()
 
     const isAdmin = params.role === UserRole.ADMIN
+    if (!asset.ownerId || !legacyOwners.has(asset.ownerId)) throw new AssetReferenceValidationError()
     if (!isAdmin && asset.ownerId !== params.ownerId) {
       throw new AssetReferenceValidationError('只能引用自己上传的附件')
     }
@@ -403,8 +419,9 @@ export const getSignedAssetUrls = async (ids: Array<string | null | undefined>):
   const unique = [...new Set(ids.filter((id): id is string => Boolean(id)))]
   if (!unique.length) return new Map()
   if (unique.length > 300) throw new Error('Asset signing batch exceeds page budget')
-  const assets = await prisma.storedAsset.findMany({ where: { id: { in: unique } }, select: { id: true, deletedAt: true, accessScope: true } })
-  return new Map(assets.map(asset => [asset.id, signKnownAsset(asset)]))
+  const assets = await prisma.storedAsset.findMany({ where: { id: { in: unique } }, select: { id: true, ownerId: true, deletedAt: true, accessScope: true } })
+  const owners = await legacyAssetOwnerIds(assets.filter(hydrationNeedsLegacyOwner).map(asset => asset.ownerId))
+  return new Map(assets.map(asset => [asset.id, hydrationNeedsLegacyOwner(asset) && (!asset.ownerId || !owners.has(asset.ownerId)) ? null : signKnownAsset(asset)]))
 }
 
 const isExpectedAssetScope = (
@@ -434,6 +451,9 @@ const isExpectedAssetScope = (
   return true
 }
 
+const hydrationNeedsLegacyOwner = (asset: { accessScope: string; ownerId: string | null }): boolean =>
+  asset.accessScope === 'PRIVATE' || (asset.accessScope === 'COURSE' && Boolean(asset.ownerId))
+
 const getHydratableAssets = async (
   assetIds: string[],
   publicRoute: boolean,
@@ -444,7 +464,7 @@ const getHydratableAssets = async (
   const [assets, references] = await Promise.all([
     prisma.storedAsset.findMany({
       where: { id: { in: assetIds }, deletedAt: null },
-      select: { id: true, accessScope: true, scopeId: true },
+      select: { id: true, ownerId: true, accessScope: true, scopeId: true },
     }),
     prisma.assetReference.findMany({
       where: {
@@ -455,10 +475,12 @@ const getHydratableAssets = async (
       select: { assetId: true },
     }),
   ])
+  const legacyOwners = await legacyAssetOwnerIds(assets.filter(hydrationNeedsLegacyOwner).map(asset => asset.ownerId))
   const referencedIds = new Set(references.map((reference) => reference.assetId))
   const result = new Map<string, { id: string }>()
 
   for (const asset of assets) {
+    if (hydrationNeedsLegacyOwner(asset) && (!asset.ownerId || !legacyOwners.has(asset.ownerId))) continue
     if (!referencedIds.has(asset.id)) continue
     if (!isExpectedAssetScope(asset, context, publicRoute)) continue
     result.set(asset.id, { id: asset.id })
@@ -482,22 +504,64 @@ export const hydrateAssetReferences = async (
   const hydratableAssets = await getHydratableAssets(assetIds, publicRoute, context)
   const expiresAt = Math.floor(Date.now() / 1000) + ASSET_URL_TTL_SECONDS
 
-  const visit = (current: unknown): unknown => {
-    if (Array.isArray(current)) return current.map((item) => visit(item))
-    if (!current || typeof current !== 'object') return current
-    if (current instanceof Date || Buffer.isBuffer(current)) return current
+  return hydrateKnownAssetReferences(value, hydratableAssets, expiresAt, publicRoute)
+}
 
+const hydrateKnownAssetReferences = (value: unknown, assets: Map<string, { id: string }>, expiresAt: number, publicRoute: boolean): unknown => {
+  const visit = (current: unknown): unknown => {
+    if (Array.isArray(current)) return current.map(visit)
+    if (!current || typeof current !== 'object' || current instanceof Date || Buffer.isBuffer(current)) return current
     const record = current as Record<string, unknown>
     if (typeof record.assetId === 'string' && record.assetId) {
-      const url = hydratableAssets.has(record.assetId)
-        ? signedPath(record.assetId, expiresAt, publicRoute)
-        : null
-      return { ...record, url }
+      return { ...record, url: assets.has(record.assetId) ? signedPath(record.assetId, expiresAt, publicRoute) : null }
     }
     return Object.fromEntries(Object.entries(record).map(([key, item]) => [key, visit(item)]))
   }
-
   return visit(value)
+}
+
+/** Batch only the reads, never the parent authorization decision. Each item
+ * retains its exact (entityType, entityId, assetId) binding and scope check.
+ * Chunk budgets also preserve legacy callers that still request a full list.
+ */
+export const hydrateAssetReferenceBatch = async (
+  items: Array<{ value: unknown; context: AssetHydrationContext }>,
+  publicRoute = false,
+): Promise<unknown[]> => {
+  const result: unknown[] = []
+  const expiresAt = Math.floor(Date.now() / 1000) + ASSET_URL_TTL_SECONDS
+  for (let offset = 0; offset < items.length; offset += 100) {
+    const page = items.slice(offset, offset + 100)
+    const permitted = page.filter(item => item.context.parentAccess)
+    const ids = [...new Set(permitted.flatMap(item => collectAssetReferences(item.value).map(ref => ref.assetId)))]
+    const assets = new Map<string, { id: string; ownerId: string | null; accessScope: string; scopeId: string | null }>()
+    const bindings = new Set<string>()
+    const parents = [...new Map(permitted.map(({ context }) => [JSON.stringify([context.entityType, context.entityId]), {
+      entityType: context.entityType, entityId: context.entityId,
+    }])).values()]
+    for (let index = 0; index < ids.length; index += 300) {
+      const assetIds = ids.slice(index, index + 300)
+      const [rows, refs] = await Promise.all([
+        prisma.storedAsset.findMany({ where: { id: { in: assetIds }, deletedAt: null }, select: { id: true, ownerId: true, accessScope: true, scopeId: true } }),
+        prisma.assetReference.findMany({ where: { assetId: { in: assetIds }, OR: parents }, select: { assetId: true, entityType: true, entityId: true } }),
+      ])
+      for (const row of rows) assets.set(row.id, row)
+      for (const ref of refs) bindings.add(JSON.stringify([ref.entityType, ref.entityId, ref.assetId]))
+    }
+    const legacyOwners = await legacyAssetOwnerIds([...assets.values()].filter(hydrationNeedsLegacyOwner).map(asset => asset.ownerId))
+    for (const item of page) {
+      const allowed = new Map<string, { id: string }>()
+      if (item.context.parentAccess) {
+        for (const ref of collectAssetReferences(item.value)) {
+          const asset = assets.get(ref.assetId)
+          if (asset && (!hydrationNeedsLegacyOwner(asset) || (asset.ownerId && legacyOwners.has(asset.ownerId))) && bindings.has(JSON.stringify([item.context.entityType, item.context.entityId, asset.id]))
+            && isExpectedAssetScope(asset, item.context, publicRoute)) allowed.set(asset.id, asset)
+        }
+      }
+      result.push(hydrateKnownAssetReferences(item.value, allowed, expiresAt, publicRoute))
+    }
+  }
+  return result
 }
 
 export const canReadPrivateAsset = async (asset: {
@@ -509,15 +573,21 @@ export const canReadPrivateAsset = async (asset: {
   // capability may still be issued by an authorized parent hydration (for
   // example, an authenticated CheckinSubmission response).
   if (asset.accessScope === 'PUBLIC_CHECKIN') return false
-  if (actor.role === UserRole.ADMIN) return true
-  if (asset.ownerId && asset.ownerId === actor.userId) return true
   if (asset.accessScope === 'PUBLIC') return true
+  if (asset.ownerId && asset.ownerId === actor.userId) return true
+  if (asset.accessScope === 'PRIVATE' && actor.role !== UserRole.ADMIN) return false
+  if (asset.ownerId) {
+    const owners = await legacyAssetOwnerIds([asset.ownerId])
+    if (!owners.has(asset.ownerId)) return false
+    if (actor.role === UserRole.ADMIN) return true
+  }
   if (asset.accessScope !== 'COURSE' || !asset.scopeId || !actor.userId) return false
 
   const course = await prisma.course.findUnique({
     where: { id: asset.scopeId },
     select: {
       creatorId: true,
+      creator: { select: { accountDomain: true } },
       shares: { select: { sharedTo: true } },
       students: {
         where: {
@@ -528,8 +598,9 @@ export const canReadPrivateAsset = async (asset: {
       },
     },
   })
-  return !!course && (
-    course.creatorId === actor.userId
+  return !!course && ['LEGACY', 'TRAINING'].includes(course.creator.accountDomain) && (
+    actor.role === UserRole.ADMIN
+    || course.creatorId === actor.userId
     || (course.shares || []).some((share) => share.sharedTo === actor.userId)
     || course.students.length > 0
   )
@@ -539,7 +610,7 @@ export const issuePrivateAssetUrl = async (req: Request, res: Response) => {
   const asset = await prisma.storedAsset.findUnique({ where: { id: req.params.id } })
   if (!asset || asset.deletedAt) return notFound(res, '文件不存在')
   if (!(await canReadPrivateAsset(asset, req.user))) return forbidden(res, '无权限访问此文件')
-  const url = await getSignedAssetUrl(asset.id)
+  const url = signKnownAsset(asset)
   if (!url) return notFound(res, '文件不存在')
   return res.json({ code: 0, message: '操作成功', data: { assetId: asset.id, url, expiresIn: ASSET_URL_TTL_SECONDS } })
 }

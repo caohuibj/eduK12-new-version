@@ -26,14 +26,13 @@ const wrap=(task:(req:any)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
     throw e
   }
 })
-router.use(authenticateHuiteacher)
-router.get('/organizations/:organizationId/evaluation-events/:eventId/field-form',
+router.get('/organizations/:organizationId/evaluation-events/:eventId/field-form',authenticateHuiteacher,
   requireTeacherProductAdmin,wrap(req=>readManagerHuiteacherFieldForm({
     actorUserId:req.user!.userId,
     organizationId:uuid.parse(req.params.organizationId),
     eventId:uuid.parse(req.params.eventId),
   })))
-router.post('/organizations/:organizationId/evaluation-events/:eventId/field-form',
+router.post('/organizations/:organizationId/evaluation-events/:eventId/field-form',authenticateHuiteacher,
   requireTeacherProductAdmin,requireRecentTeacherMfa,limit,wrap(req=>
     bindHuiteacherFieldForm({
       actorUserId:req.user!.userId,
@@ -41,12 +40,12 @@ router.post('/organizations/:organizationId/evaluation-events/:eventId/field-for
       eventId:uuid.parse(req.params.eventId),
       formId:z.object({formId:uuid}).strict().parse(req.body).formId,
     })))
-router.get('/field-invitations/:invitationId/form',wrap(req=>
+router.get('/field-invitations/:invitationId/form',authenticateHuiteacher,wrap(req=>
   readInvitedHuiteacherFieldForm({
     invitationId:uuid.parse(req.params.invitationId),
     actorUserId:req.user!.userId,
   })))
-router.get('/organizations/:organizationId/evaluation-events/:eventId/field-notes/:recordId/form-evidence',
+router.get('/organizations/:organizationId/evaluation-events/:eventId/field-notes/:recordId/form-evidence',authenticateHuiteacher,
   requireTeacherProductAdmin,requireRecentTeacherMfa,wrap(req=>
     readSubmittedHuiteacherFieldFormEvidence({
       actorUserId:req.user!.userId,

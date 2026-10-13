@@ -55,26 +55,25 @@ const wrap=(fn:(req:any)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
 })
 // Independent of Organization membership: a per-person explicit grant and
 // Teacher browser session are both required for each action.
-router.use(authenticateHuiteacher)
-router.get('/personal-scale/catalog',wrap(req=>
+router.get('/personal-scale/catalog',authenticateHuiteacher,wrap(req=>
   listPersonalTeacherScales(req.user!.userId)))
-router.get('/personal-scale/assessments',wrap(req=>
+router.get('/personal-scale/assessments',authenticateHuiteacher,wrap(req=>
   listOwnPersonalTeacherScales(req.user!.userId)))
-router.post('/personal-scale/assessments',admissionLimiter,wrap(req=>
+router.post('/personal-scale/assessments',authenticateHuiteacher,admissionLimiter,wrap(req=>
   startPersonalTeacherScale({
     userId:req.user!.userId,
     resourceId:z.object({resourceId:id}).strict().parse(req.body).resourceId,
   })))
-router.get('/personal-scale/assessments/:assessmentId',wrap(req=>
+router.get('/personal-scale/assessments/:assessmentId',authenticateHuiteacher,wrap(req=>
   readOwnPersonalTeacherScale({
     userId:req.user!.userId,assessmentId:id.parse(req.params.assessmentId),
   })))
-router.post('/personal-scale/assessments/:assessmentId/final',finalLimiter,wrap(req=>
+router.post('/personal-scale/assessments/:assessmentId/final',authenticateHuiteacher,finalLimiter,wrap(req=>
   submitOwnPersonalTeacherScale({
     userId:req.user!.userId,assessmentId:id.parse(req.params.assessmentId),
     ...finalPayload.parse(req.body),
   })))
-router.get('/personal-scale/assessments/:assessmentId/report',wrap(req=>
+router.get('/personal-scale/assessments/:assessmentId/report',authenticateHuiteacher,wrap(req=>
   readOwnPersonalTeacherScaleReport({
     userId:req.user!.userId,assessmentId:id.parse(req.params.assessmentId),
   })))

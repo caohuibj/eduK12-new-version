@@ -17,8 +17,9 @@ import {
   AssetReferenceValidationError,
   attachAssetReference,
   discardUnreferencedAsset,
-  getSignedAssetUrl,
+  signKnownAsset,
   hydrateAssetReferences,
+  hydrateAssetReferenceBatch,
   storeAsset,
   syncAssetReferences,
   validateAssetReferencesForCourse,
@@ -493,13 +494,11 @@ export const checkinController = {
         prisma.checkin.count({ where })
       ])
 
-      const hydratedCheckins = await Promise.all(
-        checkins.map((checkin) => hydrateAssetReferences(checkin, false, {
-          entityType: 'Checkin',
-          entityId: checkin.id,
-          courseId: checkin.courseId,
-          parentAccess: true,
-        })),
+      const hydratedCheckins = await hydrateAssetReferenceBatch(
+        checkins.map((checkin) => ({ value: checkin, context: {
+          entityType: 'Checkin', entityId: checkin.id,
+          courseId: checkin.courseId, parentAccess: true,
+        } })),
       )
       return success(res, buildPaginatedResult(hydratedCheckins, total, pagination))
     } catch (err) {
@@ -1083,7 +1082,7 @@ export const checkinController = {
       })
       uploadedAsset = asset
       await prisma.$transaction(tx => stageStudentUploadAsset(tx, id, userId, asset.id))
-      const url = await getSignedAssetUrl(asset.id)
+      const url = signKnownAsset(asset)
       if (!url) throw new Error('图片上传失败')
 
       logger.info('学生上传打卡图片', {
@@ -1200,23 +1199,17 @@ export const checkinController = {
         submission: checkin.submissions.length > 0 ? checkin.submissions[0] : undefined
       }))
 
-      const hydratedCheckins = await Promise.all(formattedCheckins.map(async (checkin) => {
-        const hydrated = await hydrateAssetReferences(checkin, false, {
-          entityType: 'Checkin',
-          entityId: checkin.id,
-          courseId: checkin.courseId,
-          parentAccess: true,
-        })
-        if (!checkin.submission) return hydrated
-        const hydratedSubmission = await hydrateAssetReferences(checkin.submission, false, {
-          entityType: 'CheckinSubmission',
-          entityId: checkin.submission.id,
-          courseId: checkin.courseId,
-          checkinId: checkin.id,
-          parentAccess: true,
-        })
-        return { ...(hydrated as Record<string, unknown>), submission: hydratedSubmission }
-      }))
+      const parentItems = formattedCheckins.map(checkin => ({ value: checkin, context: {
+        entityType: 'Checkin', entityId: checkin.id, courseId: checkin.courseId, parentAccess: true,
+      } }))
+      const submissionItems = formattedCheckins.flatMap(checkin => checkin.submission ? [{ value: checkin.submission, context: {
+        entityType: 'CheckinSubmission', entityId: checkin.submission.id, courseId: checkin.courseId, checkinId: checkin.id, parentAccess: true,
+      } }] : [])
+      const hydrated = await hydrateAssetReferenceBatch([...parentItems, ...submissionItems])
+      let submissionIndex = parentItems.length
+      const hydratedCheckins = formattedCheckins.map((checkin, index) => checkin.submission
+        ? { ...(hydrated[index] as Record<string, unknown>), submission: hydrated[submissionIndex++] }
+        : hydrated[index])
 
       return success(res, {
         list: hydratedCheckins,
@@ -1275,14 +1268,11 @@ export const checkinController = {
       })
 
       // 格式化返回数据，确保 images 是字符串数组
-      const hydratedSubmissions = await Promise.all(
-        submissions.map((submission) => hydrateAssetReferences(submission, false, {
-          entityType: 'CheckinSubmission',
-          entityId: submission.id,
-          courseId: checkin.courseId,
-          checkinId: id,
-          parentAccess: true,
-        })),
+      const hydratedSubmissions = await hydrateAssetReferenceBatch(
+        submissions.map(submission => ({ value: submission, context: {
+          entityType: 'CheckinSubmission', entityId: submission.id,
+          courseId: checkin.courseId, checkinId: id, parentAccess: true,
+        } })),
       )
       const formattedSubmissions = (hydratedSubmissions as any[]).map(sub => {
         let imageUrls: string[] = []
@@ -1383,14 +1373,11 @@ export const checkinController = {
       })
 
       // 格式化返回数据，确保 images 是字符串数组
-      const hydratedSubmissions = await Promise.all(
-        submissions.map((submission) => hydrateAssetReferences(submission, false, {
-          entityType: 'CheckinSubmission',
-          entityId: submission.id,
-          courseId: checkin.course.id,
-          checkinId: id,
-          parentAccess: true,
-        })),
+      const hydratedSubmissions = await hydrateAssetReferenceBatch(
+        submissions.map(submission => ({ value: submission, context: {
+          entityType: 'CheckinSubmission', entityId: submission.id,
+          courseId: checkin.course.id, checkinId: id, parentAccess: true,
+        } })),
       )
       const formattedSubmissions = (hydratedSubmissions as any[]).map(sub => {
         let imageUrls: string[] = []
@@ -1859,7 +1846,7 @@ export const checkinController = {
         throw referenceError
       }
 
-      const publicUrl = await getSignedAssetUrl(asset.id, true)
+      const publicUrl = signKnownAsset(asset, true)
       if (!publicUrl) {
         throw new Error('公开资产签名 URL 生成失败')
       }

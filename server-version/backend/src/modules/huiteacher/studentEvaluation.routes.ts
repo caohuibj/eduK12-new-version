@@ -1,7 +1,7 @@
 import {listMyHuiteacherStudentFeedback,readHuiteacherStudentFeedbackReport,
   StudentFeedbackReportError} from './studentReport.service'
 import {HuiteacherGroupReportError} from './groupReport.service'
-import { Router } from 'express'
+import { Router,type RequestHandler } from 'express'
 import { z,ZodError } from 'zod'
 import { asyncHandler } from '../../middleware/asyncHandler'
 import { authenticateHuiteacher } from '../../middleware/auth'
@@ -64,33 +64,32 @@ const wrap=(fn:(req:any)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
 // PR5 remains opt-in until canonical class→teacher Run/FINAL and protected
 // disclosure contracts are reviewed. Code deployment alone opens no tasks.
-router.use((_req,res,next)=>{
+const studentFeedbackGuard:RequestHandler=(_req,res,next)=>{
   if(process.env.HUITEACHER_STUDENT_FEEDBACK_ENABLED!=='true')
     return res.status(404).json({
       code:'HUITEACHER_STUDENT_FEEDBACK_DISABLED',message:'学生评教暂未开放',data:null,
     })
   next()
-})
-router.use(authenticateHuiteacher)
-router.get('/my-student-feedback',wrap(req=>
+}
+router.get('/my-student-feedback',studentFeedbackGuard,authenticateHuiteacher,wrap(req=>
   listMyHuiteacherStudentFeedback(req.user!.userId)))
 const path='/organizations/:organizationId/evaluation-events/:eventId/student-evaluation'
-router.get(path+'/candidates',requireTeacherProductAdmin,
+router.get(path+'/candidates',studentFeedbackGuard,authenticateHuiteacher,requireTeacherProductAdmin,
   wrap(req=>listHuiteacherStudentEvaluationCandidates({
     ...params.parse(req.params),actorUserId:req.user!.userId,
   })))
-router.get(path,requireTeacherProductAdmin,wrap(req=>
+router.get(path,studentFeedbackGuard,authenticateHuiteacher,requireTeacherProductAdmin,wrap(req=>
   readHuiteacherStudentEvaluation({
     ...params.parse(req.params),actorUserId:req.user!.userId,
   })))
-router.get(path+'/eligibility',requireTeacherProductAdmin,
+router.get(path+'/eligibility',studentFeedbackGuard,authenticateHuiteacher,requireTeacherProductAdmin,
   wrap(req=>previewHuiteacherStudentEvaluation({
     ...params.parse(req.params),actorUserId:req.user!.userId,
   })))
 
 const runVersion=z.object({expectedVersion:z.number().int().positive()}).strict()
 const runDraft=z.object({intakeDeadline:z.string().datetime().nullable().optional()}).strict()
-router.post(path+'/run',requireTeacherProductAdmin,limiter,
+router.post(path+'/run',studentFeedbackGuard,authenticateHuiteacher,requireTeacherProductAdmin,limiter,
   wrap(req=>{
     const body=runDraft.parse(req.body)
     return createHuiteacherStudentEvaluationRun({
@@ -98,26 +97,26 @@ router.post(path+'/run',requireTeacherProductAdmin,limiter,
       intakeDeadline:body.intakeDeadline?new Date(body.intakeDeadline):null,
     })
   }))
-router.post(path+'/run/preview',requireTeacherProductAdmin,limiter,
+router.post(path+'/run/preview',studentFeedbackGuard,authenticateHuiteacher,requireTeacherProductAdmin,limiter,
   wrap(req=>previewHuiteacherStudentEvaluationRun({
     ...params.parse(req.params),actorUserId:req.user!.userId,
     ...runVersion.parse(req.body),
   })))
-router.post(path+'/run/publish',requireTeacherProductAdmin,limiter,
+router.post(path+'/run/publish',studentFeedbackGuard,authenticateHuiteacher,requireTeacherProductAdmin,limiter,
   wrap(req=>publishHuiteacherStudentEvaluationRun({
     ...params.parse(req.params),actorUserId:req.user!.userId,
     ...runVersion.parse(req.body),
   })))
 
-router.post(path+'/report/release',requireTeacherProductAdmin,requireRecentTeacherMfa,
+router.post(path+'/report/release',studentFeedbackGuard,authenticateHuiteacher,requireTeacherProductAdmin,requireRecentTeacherMfa,
   reportLimiter,wrap(req=>readHuiteacherStudentFeedbackReport({
     ...params.parse(req.params),actorUserId:req.user!.userId,publishV2:true,
   })))
-router.get(path+'/report',reportLimiter,wrap(req=>
+router.get(path+'/report',studentFeedbackGuard,authenticateHuiteacher,reportLimiter,wrap(req=>
   readHuiteacherStudentFeedbackReport({
     ...params.parse(req.params),actorUserId:req.user!.userId,
   })))
-router.post(path,requireTeacherProductAdmin,limiter,
+router.post(path,studentFeedbackGuard,authenticateHuiteacher,requireTeacherProductAdmin,limiter,
   wrap(req=>configureHuiteacherStudentEvaluation({
     ...params.parse(req.params),actorUserId:req.user!.userId,
     ...create.parse(req.body),
