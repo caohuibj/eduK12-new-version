@@ -207,3 +207,14 @@ test('completion-only resume rejects changed producer catalogs and checkpoint po
     await assert.rejects(task.run(),change==='catalog'?/LOCAL_CATALOG_CHANGED/:/UNEXPECTED_REMOTE_VERSION/);
   }
 });
+
+test('different read and delete clients route only exact version deletes to the dedicated identity',async()=>{
+ const r={key:'host-backups/v1/'+'a'.repeat(32)+'/database.edubackup.enc',versionId:'immutable-v1',bytes:8,sha256:hash('content!')};
+ let present=true;const calls=[];
+ const reader={headObject(p,cb){calls.push('reader:head');if(!present)return cb({statusCode:404});cb(null,{headers:{'x-cos-version-id':r.versionId,'content-length':'8','x-cos-meta-sha256':r.sha256}});},deleteObject(){throw Error('WRITER_DELETE_FORBIDDEN');}};
+ const deleter={deleteObject(p,cb){calls.push('deleter:delete');assert.equal(p.VersionId,r.versionId);present=false;cb(null,{headers:{'x-cos-version-id':r.versionId,'x-cos-delete-marker':'false'}});}};
+ await new CosApi(c,reader,deleter).deleteVersion(r);
+ assert.equal(calls.filter(x=>x==='deleter:delete').length,1);assert.ok(calls.filter(x=>x==='reader:head').length>=3);
+ const probe=await fs.readFile(new URL('./sdk-smoke.mjs',import.meta.url),'utf8');
+ assert.match(probe,/new CosApi\(c,client,deleter\)/);assert.match(probe,/input[.]deleteCredentials/);
+});

@@ -89,20 +89,20 @@ jobs:
           python3 - <<'PY'
           import json,os,subprocess,urllib.request
           repository=os.environ['REPOSITORY'];run=os.environ['PRIOR_RUN']
-          assert repository=='caohuibj/eduK12-new-version' and run in ['38347724147','38352435608','38352891452']
+          assert repository=='caohuibj/eduK12-new-version' and run in ['38347724147','38352435608','38352891452','38354070158']
           def api(path):
             request=urllib.request.Request('https://api.github.com/repos/'+repository+'/'+path,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
             return json.load(urllib.request.urlopen(request,timeout=30))
           prior=api('actions/runs/'+run)
           assert prior['conclusion']=='success' and prior['event']=='workflow_dispatch' and prior['path']=='.github/workflows/ci-maintenance.yml'
-          assert prior['head_sha']=={'38347724147':'ec593e7be764523c1f57490338efbe29c29b20a2','38352435608':'a6eaa3abb91473b60124e9ef26c65731f672308b','38352891452':'5c1e73e23426e8b8a9977c99823385aa97132db7'}[run]
+          assert prior['head_sha']=={'38347724147':'ec593e7be764523c1f57490338efbe29c29b20a2','38352435608':'a6eaa3abb91473b60124e9ef26c65731f672308b','38352891452':'5c1e73e23426e8b8a9977c99823385aa97132db7','38354070158':'6feac11f67a6b5d687ad90fac84d1fdb1f8f66f4'}[run]
           original=api('actions/runs/38347265525')
           assert original['conclusion']=='success' and original['event']=='pull_request' and original['head_sha']=='b8969a064f04ed923692eb8b02f7ce9f989e2aa4'
           jobs=api('actions/runs/38347265525/jobs?per_page=100')['jobs']
           assert any(j['name']=='maintenance / attachment deduplication, indexes and protected cleanup' and j['conclusion']=='success' for j in jobs)
           host='server-version/scripts/host-ops/'
           allowed={host+p for p in ['capacity.py','test_capacity.py','cycle.py','test_cycle.py','storage.py','test_storage.py','storage-config.example.json','monitor.py','config.example.json','install.sh','README.md','test_monitor.py','systemd/eduk12-backup-cycle.service','systemd/eduk12-backup-cycle.timer','systemd/eduk12-storage-maintenance.service']}
-          allowed|={'.github/workflows/ci-maintenance.yml','.github/scripts/content-scope.mjs','.github/scripts/maintenance-routing.test.mjs','server-version/scripts/cos-cleanup/model.mjs','server-version/scripts/cos-cleanup/cleanup.test.mjs'}
+          allowed|={'.github/workflows/ci-maintenance.yml','.github/scripts/content-scope.mjs','.github/scripts/maintenance-routing.test.mjs','server-version/scripts/cos-cleanup/model.mjs','server-version/scripts/cos-cleanup/cleanup.test.mjs','server-version/scripts/cos-cleanup/sdk-smoke.mjs'}
           def git(*args):return subprocess.check_output(['git',*args])
           paths=[]
           for entry in git('diff','--raw','--no-renames',prior['head_sha'],'HEAD').decode().splitlines():
@@ -110,18 +110,24 @@ jobs:
             assert path in allowed and fields[-1] in ['M','A']
             assert fields[1] in ['100644','100755'] and (fields[0] in [':100644',':100755'] or fields[0]==':000000')
             paths.append(path)
-          assert paths and host+'cycle.py' in paths
+          assert paths
           if run=='38347724147':assert host+'capacity.py' in paths
           elif run=='38352435608':
             assert set(paths)=={host+'cycle.py',host+'test_cycle.py','.github/workflows/ci-maintenance.yml'}
             before_cycle=git('show',prior['head_sha']+':'+host+'cycle.py')
             assert git('show','HEAD:'+host+'cycle.py')==before_cycle.replace(b"fresh(catalog.get('lastFullVerificationAt'),now,24)",b"fresh(catalog.get('lastFullVerificationAt'),now,22)",1)
-          else:
+          elif run=='38352891452':
             assert set(paths)=={host+'cycle.py',host+'test_cycle.py',host+'monitor.py',host+'test_monitor.py','.github/workflows/ci-maintenance.yml'}
             before_cycle=git('show',prior['head_sha']+':'+host+'cycle.py')
             assert git('show','HEAD:'+host+'cycle.py')==before_cycle.replace(b"verification_ready(cat(),now()),16)",b"verification_ready(cat(),now()),32)",1)
             before_monitor=git('show',prior['head_sha']+':'+host+'monitor.py')
             assert git('show','HEAD:'+host+'monitor.py')==before_monitor.replace(b"else 'warning' if age>max_age else 'ok'",b"else 'warning' if age>max_age or value.get('status')=='SKIPPED' else 'ok'",1)
+          else:
+            assert set(paths)=={host+'storage.py',host+'test_storage.py','server-version/scripts/cos-cleanup/sdk-smoke.mjs','server-version/scripts/cos-cleanup/cleanup.test.mjs','.github/workflows/ci-maintenance.yml'}
+            before_storage=git('show',prior['head_sha']+':'+host+'storage.py')
+            old=b"created=dt.datetime.fromisoformat(item['Created'].replace('Z','+00:00')).timestamp()"
+            new=b"created=dt.datetime.fromisoformat(re.sub(r'(\\.\\d{6})\\d+',r'\\1',item['Created']).replace('Z','+00:00')).timestamp()"
+            assert git('show','HEAD:'+host+'storage.py')==before_storage.replace(old,new,1)
           # This model edit only preserves observations while blocked; protected graph/retention/deletion logic is byte-identical.
           model='server-version/scripts/cos-cleanup/model.mjs'
           before=git('show',prior['head_sha']+':'+model)
@@ -131,10 +137,11 @@ jobs:
             output.write('reused=true\n')
             output.write('cycle_only='+str(run=='38352435608').lower()+'\n')
             output.write('tail_only='+str(run=='38352891452').lower()+'\n')
+            output.write('runtime_only='+str(run=='38354070158').lower()+'\n')
           print('Qualified successful foundation run 38347265525 and exact cache follow-up '+run+'; unchanged DB/crypto/launcher/attachment verifier inputs retained.')
           PY
       - name: Verify affected backup cycle, capacity, image protection and quarantine
-        if: steps.opsqualified.outputs.reused == 'true' && steps.opsqualified.outputs.cycle_only != 'true' && steps.opsqualified.outputs.tail_only != 'true'
+        if: steps.opsqualified.outputs.reused == 'true' && steps.opsqualified.outputs.cycle_only != 'true' && steps.opsqualified.outputs.tail_only != 'true' && steps.opsqualified.outputs.runtime_only != 'true'
         run: |
           for name in test_cycle.py test_capacity.py test_storage.py test_monitor.py; do
             python3 -B -m unittest discover -s server-version/scripts/host-ops -p "$name" -v
@@ -155,6 +162,18 @@ jobs:
         run: |
           python3 -B -m unittest discover -s server-version/scripts/host-ops -p 'test_cycle.py' -v
           python3 -B -m unittest discover -s server-version/scripts/host-ops -p 'test_monitor.py' -v
+          node --test .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs
+      - name: Match production Python major and minor for the timestamp fix
+        if: steps.opsqualified.outputs.runtime_only == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Verify production timestamp and operator identity separation only
+        if: steps.opsqualified.outputs.runtime_only == 'true'
+        run: |
+          python3 -B -m unittest discover -s server-version/scripts/host-ops -p 'test_storage.py' -v
+          node --test --test-name-pattern='different read and delete clients' server-version/scripts/cos-cleanup/cleanup.test.mjs
+          node --check server-version/scripts/cos-cleanup/sdk-smoke.mjs
           node --test .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs
       - name: CI routing and attachment invariants
         if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true'

@@ -61,3 +61,8 @@ class AutomaticImageSafetyTests(unittest.TestCase):
             stage=Path(tmp,'candidate');stage.mkdir();Path(stage,'images.json').write_text(json.dumps({'image':'eduk12-backend:87654321'}))
             refs=m.protected_refs(CONFIG)
             self.assertIn('eduk12-backend:12345678',refs);self.assertIn('sha256:'+'a'*64,refs);self.assertIn('eduk12-backend:87654321',refs)
+
+    def test_docker_nanosecond_timestamp_is_valid_on_production_python_310(self):
+        import datetime as dt
+        item={'RepoTags':['eduk12-backend:12345678'],'Created':'2026-10-01T12:00:00.123456789Z','Config':{'Labels':{'org.opencontainers.image.source':'https://github.com/caohuibj/eduK12-new-version','org.opencontainers.image.revision':'12345678'+'a'*32}}}
+        self.assertTrue(m.eligible_project_image(item,CONFIG,dt.datetime(2026,10,13,tzinfo=dt.timezone.utc).timestamp()))

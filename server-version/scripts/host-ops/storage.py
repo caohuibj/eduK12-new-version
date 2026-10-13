@@ -97,7 +97,7 @@ def eligible_project_image(item,c,now):
     if labels.get('org.opencontainers.image.source')!='https://github.com/caohuibj/eduK12-new-version' or not re.fullmatch('[a-f0-9]{40}',revision):return False
     tags=item.get('RepoTags') or [];allowed={f'eduk12-{role}:{revision[:8]}' for role in ROLES}
     if not tags or not set(tags)<=allowed:return False
-    created=dt.datetime.fromisoformat(item['Created'].replace('Z','+00:00')).timestamp()
+    created=dt.datetime.fromisoformat(re.sub(r'(\.\d{6})\d+',r'\1',item['Created']).replace('Z','+00:00')).timestamp()
     return created<=now-c['cacheMinAgeHours']*3600
 
 def image_plan(c):
