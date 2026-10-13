@@ -1,0 +1,58 @@
+{
+  "brand": "Huiteacher",
+  "selection": "B3 星火相传",
+  "sourceUrl": "https://drive.google.com/file/d/11EgH4bYHlooDgx_hlqBxXEomIpzc-6uD/view",
+  "sourceFile": "b3-approved-original-20261010.png",
+  "sourceSize": [
+    1180,
+    470
+  ],
+  "sourceSha256": "3897fada79dd77eed9bd39f3146b1bd85c3da100f879c5c56ec70dc721337453",
+  "extraction": {
+    "crop": [
+      484,
+      52,
+      667,
+      260
+    ],
+    "labelExcluded": {
+      "x": [
+        484,
+        567
+      ],
+      "y": [
+        52,
+        83
+      ]
+    },
+    "alpha": "clamp((R-B-20)/12,0,1); original RGB retained",
+    "output": "huiteacher-b3-emblem.png",
+    "outputSha256": "16521a3137fe8e29fda7557c44d1e746338b43230f8301533614aebca6c9d341"
+  },
+  "status": "Traceable raster extraction from selected concept PNG. No editable SVG master delivered. No AI redrawing.",
+  "journal": {
+    "generator": "built-in image_gen",
+    "original": "/Users/Qiang/.codex/generated_images/01a13307-e465-7a00-a4f1-e6cb77a40f45/exec-8e283651-ca4f-4ded-95e4-75122761747c.png",
+    "originalSha256": "743028abebff03a1fa3947e31347b30008a2b31e18eb4d61a97d0521966e7fd7",
+    "outputs": [
+      "educator-journal.webp",
+      "educator-journal-small.webp"
+    ],
+    "contents": "Sunlit educator working journal, pencil and observation sketches; no text, UI or logo."
+  },
+  "vector": {
+    "output": "huiteacher-b3-emblem.svg",
+    "sha256": "507c7d6203a5ecc6055378edcc312de0cdd2929b55c4778e514a33f1ae7e7b22",
+    "method": "Reused local spline trace; source crop verified pixel-for-pixel against the approved original. Pure SVG paths, no generative redrawing.",
+    "pathCount": 121,
+    "traceSourceCrop": [
+      482,
+      50,
+      670,
+      262
+    ],
+    "traceCropSha256": "05ae88b9c53a8bd9518217617782cfa7f5051657b1049d41220d9a3679f24fef",
+    "localTraceSha256": "664b6e8aef9b70ac89fbb7b310e2e8cc4c1d44475881ffcd78117b691ae11d29",
+    "status": "Local editable trace for review; not a formally approved professional master"
+  }
+}

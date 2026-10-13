@@ -8,11 +8,6 @@
 .ht-app button{border:1px solid var(--ht-line);background:var(--ht-paper);padding:.65rem .9rem;border-radius:8px;cursor:pointer;color:var(--ht-ink);font-weight:560}
 .ht-app button:hover{border-color:var(--ht-copper)}.ht-app button:focus-visible,.ht-app input:focus-visible,.ht-app select:focus-visible,.ht-app textarea:focus-visible{outline:3px solid #d8874a;outline-offset:2px}
 .ht-app button:disabled{opacity:.55;cursor:not-allowed}.ht-app .ht-primary{background:var(--ht-copper);color:white;border-color:var(--ht-copper)}
-.ht-hero{max-width:1200px;padding:clamp(3rem,8vw,7rem) 6vw 5rem;margin:auto}
-.ht-eyebrow{font-size:.9rem;letter-spacing:.16em;color:var(--ht-copper)}
-.ht-hero h1{font-size:clamp(2.2rem,5vw,4.4rem);line-height:1.25;letter-spacing:-.025em;margin:1.4rem 0}
-.ht-hero p{max-width:680px;line-height:1.85;color:var(--ht-quiet)}.ht-actions{display:flex;gap:.9rem;margin:2rem 0 3rem;flex-wrap:wrap}
-.ht-four{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.9rem}.ht-four article{padding:1.6rem 1rem;border:1px solid var(--ht-line);background:var(--ht-paper);border-radius:12px;text-align:center}
 .ht-panel{border:1px solid var(--ht-line);border-radius:14px;padding:clamp(1rem,3vw,2rem);background:var(--ht-paper);box-shadow:0 10px 30px #6e392008}
 .ht-form-panel{width:min(530px,calc(100% - 2rem));margin:3rem auto}.ht-form-panel h1{margin-top:0}
 .ht-field{display:flex;flex-direction:column;gap:.4rem;min-width:min(100%,180px);margin:.8rem 0}.ht-field span{font-size:.85rem;color:var(--ht-quiet)}
@@ -24,7 +19,7 @@
 .ht-admin{border-top:1px solid var(--ht-line);margin-top:1.4rem;padding-top:1rem}
 .ht-empty{color:var(--ht-quiet)}.ht-secret{background:#fff1df;border:1px solid #e7c6a4;border-radius:8px;padding:1rem;max-width:100%;overflow-wrap:anywhere}.ht-wrap{overflow-wrap:anywhere}
 .ht-welcome{font-size:.9rem}.ht-notice{background:var(--ht-paper);max-width:850px;margin:1rem auto;padding:1rem;border-left:3px solid var(--ht-copper);border-radius:5px}.ht-footer{padding:2rem;text-align:center;color:var(--ht-quiet);font-size:.82rem}
-@media(max-width:900px){.ht-four{grid-template-columns:repeat(2,1fr)}}@media(max-width:640px){.ht-topbar{align-items:flex-start;flex-direction:column}.ht-topbar nav{width:100%}.ht-four{grid-template-columns:1fr}.ht-hero{padding:3rem 1rem}.ht-form-panel{margin:1.5rem auto}}
+@media(max-width:640px){.ht-topbar{align-items:flex-start;flex-direction:column}.ht-topbar nav{width:100%}.ht-form-panel{margin:1.5rem auto}}
 
 /* Shared Survey Form V2 authoring controls inside Teacher's distinct theme. */
 .ht-app .input{border:1px solid #d9c9bf;border-radius:7px;background:#fff;color:var(--ht-ink);padding:.5rem;font:inherit;max-width:100%}
@@ -86,16 +81,14 @@
  .ht-app .ht-growth{padding:.75rem}
 }
 
-/* B3「星火相传」：exact user-approved original strip, CSS clips the central
- * flame/H-negative-space icon. Do NOT substitute an invented vector mark.
- * Original artwork: Google Drive 11EgH4bYHlooDgx_hlqBxXEomIpzc-6uD.
- * Source 1180x470; center icon ~x486..664,y60..259.
- */
-.ht-app .ht-brand-b3{
-  display:block;flex:0 0 auto;width:54px;height:55px;border-radius:5px;
-  background-image:url('/huiteacher/b3-approved-original-20261010.png');
-  background-repeat:no-repeat;background-size:313px 125px;
-  background-position:-126px -16px;background-color:#fcf3ec;
-  box-shadow:none;overflow:hidden;
-}
-.ht-app .ht-brand strong{letter-spacing:.045em}
+/* Selected B3 original, extracted without redrawing; see public/huiteacher/asset-provenance.json. */
+.ht-app .ht-brand-b3{display:block;flex:0 0 auto;width:56px;height:64px;object-fit:contain;border-radius:0;background:transparent;box-shadow:none}
+.ht-app .ht-brand strong{letter-spacing:.01em;font-family:Georgia,"Times New Roman",serif;font-size:27px;font-weight:600}
+.ht-app .ht-brand-home{padding:0;border:0;background:transparent;text-align:left;border-radius:4px}
+.ht-app .ht-brand-home:hover{background:transparent}
+.ht-app .ht-account-guide{margin-top:24px;padding-top:18px;border-top:1px solid var(--ht-line);font-size:14px;line-height:1.8;color:var(--ht-quiet)}
+.ht-account-guide summary{cursor:pointer;min-height:44px;display:flex;align-items:center;list-style:revert}
+.ht-account-guide summary:focus-visible{outline:3px solid #d8874a;outline-offset:3px}
+.ht-app .ht-invited-entries{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 10px}
+.ht-app .ht-invited-entries button{margin:0;font-size:13px;min-height:44px}
+.ht-app .ht-session-loading{margin:36px auto;max-width:530px;width:calc(100% - 32px)}
