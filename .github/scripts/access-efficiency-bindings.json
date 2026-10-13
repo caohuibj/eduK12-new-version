@@ -27,7 +27,7 @@
     },
     "server-version/backend/src/modules/huiteacher/groupReport.service.ts": {
       "before": "5598976f187ed2397b972b0d3f714b37fb34c0f7",
-      "after": "81d392c5a5258a10114669390a7806d4738b8b4c"
+      "after": "a39603dfe98e58b828ede3a661b3cd1cbd2d3fe9"
     },
     "server-version/backend/src/modules/survey/analytics.source.ts": {
       "before": "5d066e05d8c89bf7642ed663fd9e65c9bfc7c326",
@@ -120,6 +120,16 @@
     "server-version/miniprogram/pages/index/index.js": {
       "before": "057f3e002ccd1e7c6120ab5bd90274aa7998e6c9",
       "after": "54852e02b8c12166753f28221f0960a5518f2547"
+    }
+  },
+  "backendMirrorTransition": {
+    "before": {
+      "candidate": "4d9ee56ac5e0a7f6439a64303e4576c489f72058",
+      "reuse": "72da5186ac99a8ad83b475bfab3eeefb63d2e2ff"
+    },
+    "after": {
+      "candidate": "8118726b2a064a84edf0fc0dc10ba066aca42679",
+      "reuse": "2960859bc5b48c36fb8f68bd5b59609a8cf2de71"
     }
   }
 }

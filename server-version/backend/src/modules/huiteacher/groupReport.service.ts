@@ -162,17 +162,21 @@ type PreparedTeacherReport = {
   distributions: ReturnType<typeof discloseProtectedFormItems>
 }
 
+function isDeferredTeacherReport(value: unknown): value is { deferredCompute: () => Promise<PreparedTeacherReport> } {
+  return value !== null && typeof value === 'object' && 'deferredCompute' in value && typeof value.deferredCompute === 'function'
+}
+
 export async function readTeacherFormGroupReport(input:{
   organizationId:string;eventId:string;formId:string;actorUserId:string;
   publishV2?:boolean;releasedOnly?:boolean
 }) {
   const first = await readTeacherFormGroupReportStage(input)
-  if (!('deferredCompute' in first)) return first
+  if (!isDeferredTeacherReport(first)) return first
   const prepared = await first.deferredCompute()
   // Reacquire current authorization/source/disclosure locks; nothing from the
   // calculation phase is a reusable grant or a released privacy projection.
   const second = await readTeacherFormGroupReportStage(input, prepared)
-  if ('deferredCompute' in second) throw new Error('Unexpected report stage')
+  if (isDeferredTeacherReport(second)) throw new Error('Unexpected report stage')
   return second
 }
 

@@ -6,9 +6,9 @@ def sha(value): return hashlib.sha256(value).hexdigest()
 def objects(ref, prefix):
     data=subprocess.check_output(['git','ls-tree','-rz','--full-tree',ref,prefix])
     return [(line.split(b'\t',1)[1].decode(),line.split(b'\t',1)[0].decode()) for line in data.split(b'\0') if line]
-def fingerprint(plan):
+def fingerprint(plan, tool_refs=None, allow_transition=True):
     tools=['.github/scripts/access-efficiency-candidate.py','.github/scripts/access-efficiency-reuse.py','.github/workflows/ci-access-efficiency.yml']
-    tool=sha(json.dumps([(f,subprocess.check_output(['git','rev-parse',plan['head']+':'+f],text=True).strip()) for f in tools]).encode())
+    tool=sha(json.dumps([(f,(tool_refs or {}).get(f) or subprocess.check_output(['git','rev-parse',plan['head']+':'+f],text=True).strip()) for f in tools]).encode())
     builds={}; tests={}
     for component in ['frontend','backend']:
         entries=objects(plan['head'],'server-version/'+component)
@@ -26,7 +26,25 @@ def fingerprint(plan):
                 item=next(entry for entry in entries if entry[0]=='server-version/backend/'+target['file'])
                 tests[target['file']+'::'+target['title']]=sha(json.dumps([builds[component],shared,item,target['title']]).encode())
     extra=[entry for path in ['server-version/miniprogram','server-version/miniprogram-v2','server-version/docker-compose.yml','server-version/docker-compose.hardened.yml'] for entry in objects(plan['head'],path)]
-    return {'tool':tool,'builds':builds,'tests':tests,'extra':sha(json.dumps([tool,extra]).encode())}
+    result={'tool':tool,'builds':builds,'tests':tests,'extra':sha(json.dumps([tool,extra]).encode())}
+    if allow_transition:
+        transition=json.loads(subprocess.check_output(['git','show',plan['head']+':.github/scripts/access-efficiency-bindings.json'])).get('backendMirrorTransition')
+        if transition:
+            paths={'candidate':tools[0],'reuse':tools[1]}
+            actual={key:subprocess.check_output(['git','rev-parse',plan['head']+':'+file],text=True).strip() for key,file in paths.items()}
+            if actual!=transition['after']:raise ValueError('Reviewed mirror transition tool binding mismatch')
+            previous=subprocess.check_output(['git','cat-file','blob',transition['before']['candidate']])
+            current=subprocess.check_output(['git','show',plan['head']+':'+tools[0]])
+            old_arg=b'DEBIAN_MIRROR=mirrors.tuna.tsinghua.edu.cn';new_arg=b'DEBIAN_MIRROR=deb.debian.org'
+            if previous.count(old_arg)!=2 or previous.replace(old_arg,new_arg)!=current:
+                raise ValueError('Mirror transition changed more than two backend-only arguments')
+            # Only frontend and mobile/Compose consumers are equivalent. No
+            # backend compilation, test, audit or scan can cross this transition.
+            refs={paths[key]:value for key,value in transition['before'].items()}
+            compatible=fingerprint(plan,refs,False)
+            result['frontendCompatibleInputs']={'tool':compatible['tool'],'builds':{'frontend':compatible['builds']['frontend']},
+                'tests':{key:compatible['tests'][key] for key in plan['frontendTests']},'extra':compatible['extra']}
+    return result
 
 def recent(value, now=None):
     if not isinstance(value,str): return False
@@ -35,8 +53,13 @@ def recent(value, now=None):
     return datetime.timedelta(0)<=age<datetime.timedelta(hours=24)
 
 def eligible(old,current,environment=None):
-    if old.get('inputs',{}).get('tool')!=current['tool']:return {'builds':[], 'tests':[], 'extra':False}
-    builds=[c for c in ['frontend','backend'] if old['inputs']['builds'].get(c)==current['builds'][c]
+    if old.get('inputs',{}).get('tool')!=current['tool']:
+        compatible=current.get('frontendCompatibleInputs',{})
+        if compatible.get('tool')!=old.get('inputs',{}).get('tool'):return {'builds':[], 'tests':[], 'extra':False}
+        current=compatible
+        components=['frontend']
+    else:components=['frontend','backend']
+    builds=[c for c in components if old['inputs']['builds'].get(c)==current['builds'][c]
         and old.get('compile',{}).get(c,{}).get('status')=='success' and recent(old['compile'][c].get('at'))]
     if environment and old.get('environment',{}).get('node')!=environment.get('node'):builds=[]
     tests=[key for key,value in current['tests'].items() if old['inputs']['tests'].get(key)==value

@@ -79,7 +79,7 @@ with tempfile.TemporaryDirectory(prefix='access-efficiency-') as temporary:
         for component in p['changed']:
             context='server-version/'+component;tag='eduk12-access-efficiency-'+component+':'+p['head'];builder=tag+'-build'
             args=['docker','buildx','build','--load','-f',str(dockerfiles[component]),'--label','org.opencontainers.image.revision='+p['head']]
-            args+=['--build-arg','VITE_COGNITIVE_MODULE_ENABLED=true'] if component=='frontend' else ['--build-arg','DEBIAN_MIRROR=mirrors.tuna.tsinghua.edu.cn']
+            args+=['--build-arg','VITE_COGNITIVE_MODULE_ENABLED=true'] if component=='frontend' else ['--build-arg','DEBIAN_MIRROR=deb.debian.org']
             if component in matches['builds']:
                 builder=receipt['checks']['builders'][component]['id'];checks['compile'][component]=inherited(receipt['checks']['compile'][component],receipt)
                 print('REUSED official '+component+' compilation',flush=True)
@@ -156,7 +156,7 @@ with tempfile.TemporaryDirectory(prefix='access-efficiency-') as temporary:
                 runtime_file=temp/(component+'-runtime.Dockerfile')
                 runtime_file.write_text('FROM '+alias+' AS build\n'+tail)
                 runtime_args=['docker','buildx','build','--builder','default','--load','-f',str(runtime_file),'--label','org.opencontainers.image.revision='+p['head']]
-                runtime_args+=['--build-arg','DEBIAN_MIRROR=mirrors.tuna.tsinghua.edu.cn'] if component=='backend' else []
+                runtime_args+=['--build-arg','DEBIAN_MIRROR=deb.debian.org'] if component=='backend' else []
                 phase(component+'-runtime-from-cache',lambda:run(runtime_args+['--target','runtime','-t',tag,context]))
                 image=output(['docker','image','inspect','--format','{{.Id}}',tag])
                 scan=component+'-scan.json'
