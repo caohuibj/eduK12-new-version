@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import './huiteacher.css'
 import { HuiteacherFormStudio } from './HuiteacherFormStudio'
+import { HuiteacherClassRelationships } from './HuiteacherClassRelationships'
 import { HuiteacherEvaluationStudio } from './HuiteacherEvaluationStudio'
 import { HuiteacherMyFormTasks } from './HuiteacherMyFormTasks'
 import {HuiteacherMyStudentFeedback} from './HuiteacherMyStudentFeedback'
@@ -64,7 +65,7 @@ function Brand(){return <div className="ht-brand">
 export default function HuiteacherApp(){
   const appRoot=useRef<HTMLElement>(null)
   const [workspaceTab,setWorkspaceTab]=useState<WorkspaceTab>('teacher')
-  const [screen,setScreen]=useState<Screen>(()=>window.location.pathname==='/participate'?'login':'home')
+  const [screen,setScreen]=useState<Screen>(()=>['/login','/participate'].includes(window.location.pathname)?'login':'home')
   const [me,setMe]=useState<Me|null>(null)
   const [loading,setLoading]=useState(true)
   const [working,setWorking]=useState(false)
@@ -382,6 +383,8 @@ export default function HuiteacherApp(){
           <button onClick={refreshOrg} disabled={working}>刷新学校信息</button>
         </div>}
       </section>}
+        <HuiteacherClassRelationships key={'relations:'+org.organizationId}
+          organizationId={org.organizationId} members={members} units={units} api={teacherApi}/>
         <HuiteacherEvaluationStudio key={'targets:'+org.organizationId}
           organizationId={org.organizationId} api={teacherApi}/>
         <HuiteacherFormStudio key={'forms:'+org.organizationId}

@@ -64,19 +64,23 @@ export function SurveyBuilder({projectId,onInstrumentsChanged}:{projectId:string
     try{await task()}catch(e){setError(e instanceof Error?e.message:'操作失败')}
     finally{setBusy(false)}
   }
+  const clearReview=()=>{
+    setPreview(null);setShowPreview(false);setAnswerReview(null)
+    setBulk(null);setUndo(null);setBulkTargetPageKey('')
+  }
   const select=async(id:string)=>{
     await run(async()=>{
       if(dirty&&!window.confirm('当前草稿存在未保存内容。确定放弃并切换研究工具？'))return
       const r=await api<ResearchDraft>(prefix+'/'+id)
-      setActive(r);setDirty(false);setBulk(null);setPreview(null);setShowPreview(false);setUndo(null)
-      setBulkTargetPageKey('')
+      setActive(r);setDirty(false);clearReview()
     })
   }
   const create=(event:FormEvent)=>{event.preventDefault();void run(async()=>{
+    if(dirty&&!window.confirm('当前草稿存在未保存内容。确定放弃并创建另一份研究工具？'))return
     const item=await api<ResearchDraft>(prefix,'POST',{
       requestId:crypto.randomUUID(),instrumentKey:researchKey('i'),kind:newKind,title:newTitle.trim(),
     })
-    await refreshList(1,true);setActive(item);setDirty(false);setPreview(null);setBulk(null);setNewTitle('')
+    await refreshList(1,true);setActive(item);setDirty(false);clearReview();setNewTitle('')
     setNotice('已创建研究专用草稿，尚未进入正式测评目录')
   })}
   const change=(definition:Definition)=>{
@@ -114,12 +118,12 @@ export function SurveyBuilder({projectId,onInstrumentsChanged}:{projectId:string
     const r=await api<ResearchDraft>(prefix+'/'+active.id+'/copy','POST',{
       requestId:crypto.randomUUID(),instrumentKey:researchKey('i'),title:active.title+'（副本）',
     })
-    await refreshList(1,true);setActive(r);setDirty(false);setPreview(null);setBulk(null)
+    await refreshList(1,true);setActive(r);setDirty(false);clearReview()
     setNotice('已复制为新的独立研究工具，不能仅凭同名假定纵向可比')
   })}
   const archive=()=>{if(!active)return;void run(async()=>{
     await api(prefix+'/'+active.id+'/archive','POST',{revision:active.revision})
-    setActive(null);setDirty(false);setPreview(null);setBulk(null)
+    setActive(null);setDirty(false);clearReview()
     await refreshList(instrumentPage,true);setNotice('草稿已归档')
   })}
   const bulkPreview=()=>{if(!active||dirty)return;void run(async()=>{
@@ -179,7 +183,7 @@ export function SurveyBuilder({projectId,onInstrumentsChanged}:{projectId:string
         </button>)}
       </nav>
       <div className="min-w-0 space-y-4">
-      {!active&&<div className="border border-dashed rounded-xl p-6 text-sm text-slate-600">选择左侧草稿，或创建新的研究工具。完整作答和报告将在 PR3 阶段开放。</div>}
+      {!active&&<div className="border border-dashed rounded-xl p-6 text-sm text-slate-600">选择工具后可编辑题目、检查结构并预览作答。正式发布在下方研究波次中进行。</div>}
       {active&&<><div className="rounded-xl bg-slate-50 border p-4 space-y-3">
         <p className="text-xs">{displayKind[active.kind]} · 工具标识 <code>{active.instrumentKey}</code> · 修订 {active.revision} {dirty?'· 未保存':''}</p>
         <label className="text-sm block">研究工具名称
@@ -202,7 +206,7 @@ export function SurveyBuilder({projectId,onInstrumentsChanged}:{projectId:string
       </>}
       {active.kind!=='SJT'&&active.status==='DRAFT'&&<div className="border rounded-xl p-4 space-y-3">
         <h3 className="font-semibold">批量录入</h3>
-        <p className="text-xs text-slate-600">文本：每道题用空行分隔，第一行是题干，后续行是选项。CSV：type,prompt,required,options,rows,dimension,reverse；Form V2 可导入 DATE/TIME/RANK_ORDER/SLIDER/CONSTANT_SUM/MATRIX_MULTIPLE，数值列 min,max,step,precision,total,min_selections,max_selections,integer_only,time_zone；选项与矩阵行用 || 分隔。</p>
+        <p className="text-xs text-slate-600 break-words">文本：每道题用空行分隔，第一行是题干，后续行是选项。CSV：type,prompt,required,options,rows,dimension,reverse；Form V2 可导入 DATE/TIME/RANK_ORDER/SLIDER/CONSTANT_SUM/MATRIX_MULTIPLE，数值列 min,max,step,precision,total,min_selections,max_selections,integer_only,time_zone；选项与矩阵行用 || 分隔。</p>
         <label className="text-sm">输入格式<select className="input block" value={bulkFormat} onChange={e=>{
           setBulkFormat(e.target.value as 'TEXT'|'CSV');setBulk(null)}}>
           <option value="TEXT">多行文本</option><option value="CSV">标准 CSV</option></select></label>

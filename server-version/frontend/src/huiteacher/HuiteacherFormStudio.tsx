@@ -81,7 +81,7 @@ export function HuiteacherFormStudio({organizationId,api}:{
       }
       const value=await api<Full>(base+'/'+active.id)
       setActive(value);setDraft(value.definition);setDirty(false)
-      await refresh();setNotice('表单已发布并冻结。下一阶段接入授权任务与正式 FINAL。')
+      await refresh();setNotice('表单已发布并冻结。请在评价活动中配置并发布正式任务。')
     })
   }
   return <section className="ht-panel" aria-label="Huiteacher Form 工具编制">

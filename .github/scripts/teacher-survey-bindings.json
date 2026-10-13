@@ -1,0 +1,55 @@
+{
+  "application": {
+    "server-version/frontend/src/huiteacher/HuiteacherApp.tsx": {
+      "before": "4c55c38ed387fb11599d705075be436266aa16f3",
+      "after": "cff31df6e3e04b17cd386a1982eb1d85698c8da5"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherClassRelationships.tsx": {
+      "before": null,
+      "after": "554c721cdd412d94325238f352a173315ad5a68d"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherFormStudio.tsx": {
+      "before": "af9b6fff0e7cdec016701f3f7cf20cd3bfb11d17",
+      "after": "b6058ac943ebc93cd97b238d726dff5a6deacb58"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherStudentEvaluationManager.tsx": {
+      "before": "c5f312b1d0409953ab5f2d4c6bca61c11c332d30",
+      "after": "cca7bb42b75e58eccaab73ad0587ca5d32734f13"
+    },
+    "server-version/frontend/src/huiteacher/huiteacher.css": {
+      "before": "99965c8d8e0424baaa3d7e54c5e0cbbc244915ba",
+      "after": "50ff4ab82b92356aef094d189c4f78caf9d309fe"
+    },
+    "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.tsx": {
+      "before": "d5264d9811f46cfb9260ea49b8522a1afb1ccb07",
+      "after": "9235eac19aed950e2d2bad38b4b09deccfcd96e4"
+    },
+    "server-version/frontend/src/survey/SurveyApp.tsx": {
+      "before": "99f8d9bb69992b2f7ebc728c69a597e0a8e9e37e",
+      "after": "a2bc5827982560d46c4069e095c687aaa69fe4c2"
+    },
+    "server-version/frontend/src/survey/SurveyBuilder.tsx": {
+      "before": "987950dbde39c5ccd9b037aa46af7edf16dd4216",
+      "after": "18ae2035a333d9e5a1ba67faf3b24b1c1a396bbd"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.tsx": {
+      "before": "a8cc6ef7845021f4b78ea857c21fae7470a4c51e",
+      "after": "acd2025728f495b41ae030364d5eef93ecf85ab9"
+    },
+    "server-version/frontend/src/survey/SurveyWaveStudio.tsx": {
+      "before": "d1eafb2495705bdafbbb68982c842a16c5102652",
+      "after": "7a44cc036fc4d419a109b78fef3f069aecb6ea00"
+    }
+  },
+  "lintTypes": {
+    "run": 38383999501,
+    "job": 115251216791,
+    "source": "22765fc8647834394411769a88c56cea42ace68d",
+    "accessibleTableDelta": "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.tsx"
+  },
+  "backend": {
+    "artifact": 11801647310,
+    "run": 38376597323,
+    "source": "b5fe9ec40b6fcbafe4f6b51f156779bd2408a0f0"
+  }
+}

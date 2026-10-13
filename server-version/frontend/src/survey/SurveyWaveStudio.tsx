@@ -66,7 +66,9 @@ const localTime=(raw:string|null)=>{
   const date=new Date(raw)
   return new Date(date.getTime()-date.getTimezoneOffset()*60000).toISOString().slice(0,16)
 }
-export function SurveyWaveStudio({projectId,instrumentsRevision=0}:{projectId:string;instrumentsRevision?:number}){
+export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChanged}:{
+  projectId:string;instrumentsRevision?:number;onProjectChanged?:(project:Project)=>void
+}){
   const path='/projects/'+projectId
   const [waves,setWaves]=useState<Wave[]>([]),[tools,setTools]=useState<Instrument[]>([])
   const [details,setDetails]=useState<Record<string,InstrumentDetails>>({})
@@ -86,6 +88,7 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0}:{projectId:st
       surveyApi<Project>(path),
     ])
     setWaves(waveList.list);setTools(instrumentList.list);setProject(projectDetails)
+    onProjectChanged?.(projectDetails)
     setWavePage(nextWavePage);setToolPage(nextToolPage)
   }
   useEffect(()=>{setEditing(null);setReady(null);setShareLink('');setForm(initial());setDetails({})
@@ -375,7 +378,7 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0}:{projectId:st
           <h3 className="font-semibold">T{editing.ordinal} · {editing.title}</h3>
           <p className="text-sm">状态：{editing.status} · revision {editing.revision} · 已启动 {editing.startsCount}
             {editing.quotaStarts!==null?'/'+editing.quotaStarts:''}</p>
-          <p className="text-sm">公开发布使用独立 Research Only 权限及不可变定义。此功能在最终 CI/上线批准前由后台开关关闭。</p>
+          <p className="text-sm">公开发布使用独立研究权限和冻结定义；是否可发布由当前环境的权限与配置决定。</p>
           <div className="flex flex-wrap gap-2">
             {editing.status==='DRAFT'&&!editing.publicationId&&<>
               <button type="button" className="btn-secondary" disabled={busy} onClick={preflight}>检查知情同意与所有工具</button>
