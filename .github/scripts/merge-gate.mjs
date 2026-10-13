@@ -163,6 +163,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   }
   if(needs.scope?.outputs?.application_route==='access-efficiency'){
     const {accessEfficiencyPlan}=await import('./access-efficiency-scope.mjs');
+    const {execFileSync}=await import('node:child_process');
     const {changedEntries}=await import('./content-scope.mjs');
     const p=JSON.parse(needs.scope.outputs.access_efficiency_plan);
     const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();

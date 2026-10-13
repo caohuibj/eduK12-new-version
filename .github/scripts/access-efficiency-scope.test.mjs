@@ -1,8 +1,9 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {execFileSync} from 'node:child_process';
+import {execFileSync,spawnSync} from 'node:child_process';
 import {readFileSync} from 'node:fs';
-import {admitsAccessEfficiency,accessEfficiencySources,accessEfficiencyRequired,verifierOrderOnly} from './access-efficiency-scope.mjs';
+import {admitsAccessEfficiency,accessEfficiencySources,accessEfficiencyRequired,verifierOrderOnly,accessEfficiencyPlan} from './access-efficiency-scope.mjs';
+import {changedEntries} from './content-scope.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const sources=[...accessEfficiencySources],approved={schema:1,files:Object.fromEntries(sources.map(file=>[file,{before:'1'.repeat(40),after:'2'.repeat(40)}]))};
 const entry=file=>({file,status:'M',oldMode:'100644',newMode:'100644'});
@@ -15,7 +16,7 @@ test('complete immutable source boundary rejects unknown, dependencies, schema, 
  for(const update of [{status:'D',newMode:'000000'},{status:'T'},{oldMode:'120000'},{newMode:'100755'}])assert.equal(admitsAccessEfficiency([{...entries[0],...update},...entries.slice(1)],read,approved),false);
  for(const ref of ['base','head'])assert.equal(admitsAccessEfficiency(entries,(r,f)=>r===ref&&f===sources[0]?'3'.repeat(40):read(r,f),approved),false);
 });
-const plan={schema:1,route:'access-efficiency',base:'a'.repeat(40),head:'b'.repeat(40),changed:['frontend','backend'],tests:['test'],frontendTests:['test'],focusedTests:['test'],required:accessEfficiencyRequired,verifierOrderOnly};
+const plan={schema:1,route:'access-efficiency',base:'a'.repeat(40),head:'b'.repeat(40),changed:['frontend','backend'],tests:['test'],frontendTests:['test'],focusedTests:['test'],required:accessEfficiencyRequired,verifierOrderOnly,accessEfficiencyPlan};
 const outputs={application_route:plan.route,scenario:plan.route,access_efficiency_plan:JSON.stringify(plan),codeql:'true',frontend_build:'true',ui_required:'false',media_selection:'[]',media_groups:'[]',
  ...Object.fromEntries(['media2','media7','situational_video','situational_branching','video_core','app_shell','canonical_visual','perf_smoke','ops'].map(k=>[k,'false']))};
 const needs={scope:{result:'success',outputs},'access-efficiency':{result:'success'},codeql:{result:'success'}};
@@ -44,4 +45,16 @@ test('only the two reviewed verifier ordering/fingerprint changes preserve produ
  for(const bad of [after+'unknown change',after.replace("run.get('event')=='pull_request'","True"),after.replace("artifact.get('digest')!='sha256:'","False and artifact.get('digest')!='sha256:'")])assert.equal(verifierOrderOnly(bad,binding.before),false);
  const reconstructed=after.replace("    artifacts=sorted(api('/actions/artifacts?per_page=40')['artifacts'],key=lambda item:item['created_at'],reverse=True)","    artifacts=api('/actions/artifacts?per_page=40')['artifacts']").replace("(tool_refs or {}).get(f) or (plan.get('reuseVerifierFingerprint') if f==tools[1] else None) or subprocess.check_output","(tool_refs or {}).get(f) or subprocess.check_output");
  assert.equal(execFileSync('git',['hash-object','--stdin'],{input:reconstructed,encoding:'utf8'}).trim(),binding.before);
+});
+
+test('actual merge gate CLI recomputes the frozen plan and rejects a different head',()=>{
+ const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+ const base=execFileSync('git',['merge-base','HEAD','origin/main'],{encoding:'utf8'}).trim();
+ const actual=accessEfficiencyPlan(changedEntries(base,head),base,head);
+ assert.ok(actual,'The current frozen PR must produce a real plan');
+ const invoke=p=>spawnSync(process.execPath,['.github/scripts/merge-gate.mjs'],{encoding:'utf8',env:{...process.env,IS_DRAFT:'false',NEEDS_JSON:JSON.stringify({...needs,scope:{result:'success',outputs:{...outputs,access_efficiency_plan:JSON.stringify(p)}}})}});
+ const valid=invoke(actual);assert.equal(valid.status,0,valid.stderr);
+ assert.deepEqual(JSON.parse(valid.stdout),{required:['scope','access-efficiency','codeql'],failed:[]});
+ const stale=invoke({...actual,head:'0'.repeat(40)});assert.equal(stale.status,1,stale.stderr);
+ assert.ok(JSON.parse(stale.stdout).failed.includes('recomputed-access-efficiency-plan'));
 });
