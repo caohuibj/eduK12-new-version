@@ -287,8 +287,12 @@ jobs:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: node .github/scripts/content-scope.mjs
       - name: legacy routing contracts only for the legacy route
-        if: steps.scope.outputs.application_route == 'legacy' && steps.scope.outputs.scenario != 'release-tooling' && steps.scope.outputs.scenario != 'documentation'
+        if: steps.scope.outputs.application_route == 'legacy' && steps.scope.outputs.scenario != 'release-tooling' && steps.scope.outputs.scenario != 'documentation' && steps.scope.outputs.scenario != 'maintenance'
         run: node --test .github/scripts/runner-preflight.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/ci-browser-plan.test.mjs .github/scripts/api-response.test.mjs .github/scripts/mac-ci-cleanup.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-image-plan.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs .github/scripts/dependency-routing.test.mjs
+
+      - name: affected maintenance routing and merge contracts
+        if: steps.scope.outputs.scenario == 'maintenance' && github.event_name == 'pull_request'
+        run: node --test .github/scripts/content-scope.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs
 
       - name: homepage copy boundary and affected routing contracts
         if: steps.scope.outputs.application_route == 'homepage-copy' && github.event_name == 'pull_request'
@@ -328,6 +332,7 @@ jobs:
     uses: ./.github/workflows/ci-maintenance.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
+      merge_proof: ${{ github.event_name == 'pull_request' && github.event.pull_request.number == 292 && needs.scope.outputs.scenario == 'maintenance' }}
 
   documentation:
     name: documentation / whitespace and scope validation

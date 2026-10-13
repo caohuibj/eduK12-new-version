@@ -92,6 +92,7 @@ const maintenanceRoutingFiles = new Set([
   '.github/scripts/content-scope.mjs','.github/scripts/content-scope.test.mjs',
   '.github/scripts/merge-gate.mjs','.github/scripts/maintenance-routing.test.mjs',
   '.github/scripts/content-workflows.test.mjs',
+  '.github/scripts/maintenance-merge.py','.github/scripts/test_maintenance_merge.py',
 ]);
 const monitorRoot = 'server-version/scripts/host-ops/';
 const cleanupRoot = 'server-version/scripts/cos-cleanup/';
@@ -101,6 +102,10 @@ const cleanupFiles = new Set(['README.md','config.example.json','model.mjs','sto
   'recovery.mjs','recovery.py','recovery.test.mjs','test_recovery.py','recovery-smoke.mjs','ci-recovery-smoke.py',
   'systemd/eduk12-cos-recovery.service','systemd/eduk12-cos-recovery.timer'].map(file=>cleanupRoot+file));
 const monitorFiles = new Set(['README.md','config.example.json','monitor.py','test_monitor.py','install.sh',
+  'capacity.py','test_capacity.py','cycle.py','test_cycle.py','systemd/eduk12-backup-cycle.service','systemd/eduk12-backup-cycle.timer',
+  'storage.py','test_storage.py','storage-config.example.json','cos-inventory.py','cos-inventory.cjs','cos-inventory.test.mjs',
+  'systemd/eduk12-storage-maintenance.service','systemd/eduk12-storage-maintenance.timer',
+  'systemd/eduk12-cos-inventory.service','systemd/eduk12-cos-inventory.timer',
   'backup.py','backup-cos.cjs','backup-cos.test.mjs','backup-crypto.mjs','backup-config.example.json',
   'test_backup.py','ci-backup-smoke.py','install-backup.sh','BACKUP-AUTOMATION.md',
   'systemd/eduk12-database-backup.service','systemd/eduk12-database-backup.timer',

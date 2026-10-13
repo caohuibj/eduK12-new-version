@@ -13,6 +13,7 @@ import socket
 import ssl
 import subprocess
 import time
+import capacity
 
 
 def command(args, timeout=12):
@@ -195,10 +196,75 @@ def collect(config):
             if timestamp.tzinfo is None or timestamp.timestamp() > time.time() + 300:
                 raise ValueError('joint recovery timestamp invalid')
             age = max(0, int(time.time() - timestamp.timestamp()))
-            level = 'critical' if status.get('status') == 'FAILED' else 'warning' if age > 3 * 3600 else 'ok'
+            level = 'critical' if status.get('status') == 'FAILED' or status.get('reason') == 'pending_cleanup_requires_resume' else 'warning' if age > config.get('cos_recovery_max_age_hours',3) * 3600 else 'ok'
             data['cos_recovery'] = {k: status.get(k) for k in ['status','retainedPoints','newIsolatedRestores','immutableBindingsRechecked','cleanupActivated','blocked']}
             checks.append(finding('cos_joint_recovery_health', level, {'status': status.get('status'), 'age_seconds': age}))
         probe('collector:cos_joint_recovery', recovery_status)
+
+    for field,key in [('periodic_backup_attempt','database_backup_attempt'),('attachment_backup_attempt','attachment_backup_attempt'),('attachment_verify_attempt','attachment_verify_attempt')]:
+        if not config.get(field):continue
+        def task_attempt(field=field,key=key):
+            p=Path(config[field])
+            if not p.exists():
+                data[key]={'status':'NOT_RECORDED'}
+                checks.append(finding(key,'warning',{'status':'NOT_RECORDED'}));return
+            value=json.loads(p.read_text())
+            timestamp=dt.datetime.fromisoformat(value['at'].replace('Z','+00:00'))
+            if timestamp.tzinfo is None or timestamp.timestamp()>time.time()+300:raise ValueError('attempt timestamp invalid')
+            age=max(0,int(time.time()-timestamp.timestamp()))
+            status=value.get('status')
+            level='critical' if status=='FAILED' or value.get('reason')=='COS_CLEANUP_TRANSACTION_PENDING' else 'warning' if status=='SKIPPED' or (status=='RUNNING' and age>3600) else 'ok'
+            data[key]={'status':status,'age_seconds':age,'reason':value.get('reason')}
+            checks.append(finding(key,level,data[key]))
+        probe('collector:'+key,task_attempt)
+
+    if config.get('attachment_status'):
+        def attachment_health():
+            value=json.loads(Path(config['attachment_status']).read_text())
+            def age_of(name):
+                raw=value.get(name)
+                if not raw:return None
+                stamp=dt.datetime.fromisoformat(raw.replace('Z','+00:00'))
+                if stamp.tzinfo is None or stamp.timestamp()>time.time()+300:raise ValueError('attachment timestamp invalid')
+                return max(0,int(time.time()-stamp.timestamp()))
+            snapshot_age=age_of('lastSnapshotAt');verify_age=age_of('lastFullVerificationAt')
+            data['attachments']={'snapshot_age_seconds':snapshot_age,'verification_age_seconds':verify_age,'pending':bool(value.get('pending'))}
+            healthy=not value.get('failed') and snapshot_age is not None and snapshot_age<=90*60 and verify_age is not None and verify_age<=36*3600
+            checks.append(finding('attachment_backup_freshness','ok' if healthy else 'critical',data['attachments']))
+        probe('collector:attachment_health',attachment_health)
+
+    if config.get('cos_capacity_status'):
+        def capacity_health():
+            value=json.loads(Path(config['cos_capacity_status']).read_text())
+            stamp=dt.datetime.fromisoformat(value['at'].replace('Z','+00:00'))
+            if stamp.tzinfo is None or stamp.timestamp()>time.time()+300:raise ValueError('inventory timestamp invalid')
+            age=max(0,int(time.time()-stamp.timestamp()))
+            checks.append(finding('cos_capacity_freshness','ok' if value.get('status')=='COMPLETE' and age<=48*3600 else 'warning',{'age_seconds':age}))
+            data['cos_capacity']=[{k:b.get(k) for k in ['bucket','currentBytes','allVersionBytes','noncurrentBytes','byStorageClass','growthBytes','duplicateGroups','extraCopyCandidateBytes']} for b in value['buckets']]
+            for b in data['cos_capacity']:
+                checks.append(finding('cos_capacity_growth:'+b['bucket'],'warning' if (b.get('growthBytes') or 0)>config.get('cos_growth_warning_bytes',2*1024**3) else 'ok',{'growth_bytes':b.get('growthBytes')}))
+        probe('collector:cos_capacity',capacity_health)
+    for field,key,max_age in [('storage_status','storage_maintenance',48*3600),('cos_inventory_status','cos_inventory_task',48*3600)]:
+        if not config.get(field):continue
+        def maintenance_status(field=field,key=key,max_age=max_age):
+            value=json.loads(Path(config[field]).read_text())
+            stamp=dt.datetime.fromisoformat(value['at'].replace('Z','+00:00'))
+            if stamp.tzinfo is None or stamp.timestamp()>time.time()+300:raise ValueError('maintenance timestamp invalid')
+            age=max(0,int(time.time()-stamp.timestamp()))
+            level='critical' if value.get('status')=='FAILED' else 'warning' if age>max_age or value.get('status')=='SKIPPED' else 'ok'
+            checks.append(finding(key,level,{'status':value.get('status'),'age_seconds':age}))
+        probe('collector:'+key,maintenance_status)
+
+    if config.get('backup_cycle_status'):
+        def cycle_health():
+            value=json.loads(Path(config['backup_cycle_status']).read_text())
+            latest=json.loads(Path(config['backup_cycle_success']).read_text())
+            stamp=dt.datetime.fromisoformat(latest['completedAt'])
+            if stamp.tzinfo is None or stamp.timestamp()>time.time()+300:raise ValueError('cycle timestamp invalid')
+            age=max(0,int(time.time()-stamp.timestamp()))
+            level='critical' if value.get('status')=='FAILED' or age>36*3600 else 'warning' if value.get('status')=='RUNNING' and time.time()-dt.datetime.fromisoformat(value['at']).timestamp()>7200 else 'ok'
+            checks.append(finding('backup_cycle_health',level,{'status':value.get('status'),'last_success_age_seconds':age,'stage':value.get('stage')}))
+        probe('collector:backup_cycle',cycle_health)
 
     def retention():
         names = command(["/usr/bin/docker", "volume", "ls", "--filter", "dangling=true", "--format", "{{.Name}}"])
@@ -267,6 +333,24 @@ def main():
         logger.addHandler(RotatingFileHandler(log_dir / "events.jsonl", maxBytes=1024*1024, backupCount=4))
         started = time.time()
         data, checks = collect(config)
+        if config.get('capacity_planning'):
+            try:
+                inventory=json.loads(Path(config['cos_capacity_status']).read_text())
+                receipt=json.loads(Path(config['cos_backup_receipt']).read_text())
+                policy=json.loads(Path(config['cleanup_config']).read_text())
+                v=os.statvfs('/');buckets=inventory['buckets']
+                current={'at':dt.datetime.now(dt.timezone.utc).isoformat(),'disk_used_bytes':(v.f_blocks-v.f_bfree)*v.f_frsize,
+                         'disk_free_bytes':v.f_bavail*v.f_frsize,'cos_bytes':sum(b['allVersionBytes'] for b in buckets),
+                         'host_backup_bytes':sum(b.get('prefixes',{}).get('host-backups/',0) for b in buckets)}
+                history_file=state_dir/'capacity-history.json'
+                history=capacity.retain_history(json.loads(history_file.read_text()) if history_file.exists() else [],current)
+                hosts=json.loads(Path('/var/lib/eduk12-backups/catalog.json').read_text())
+                protected=max(1,sum(p.get('protected') is True and p.get('status')!='RETIRED' for p in hosts['points']))
+                budget=capacity.assess(history,current,receipt,policy,protected)
+                atomic_json(history_file,history);atomic_json(state_dir/'capacity-budget.json',budget)
+                data['capacity_planning']={k:v for k,v in budget.items() if k!='checks'};checks.extend(budget['checks'])
+            except Exception as exc:
+                checks.append(finding('collector:capacity_planning','critical',{'error_type':type(exc).__name__}))
         previous_file = state_dir / "state.json"
         previous = json.loads(previous_file.read_text()) if previous_file.exists() else {}
         # Restart deltas refer to the same immutable container image, avoiding release resets.

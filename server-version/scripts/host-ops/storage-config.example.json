@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "deployRoot": "/opt/eduk12-new/deploy",
+  "protectedRevisions": [
+    "5f2c67a5",
+    "c8483290"
+  ],
+  "builder": "default",
+  "buildCacheLimit": "2gb",
+  "cacheMinAgeHours": 48,
+  "oldImageRevisions": [
+    "50200b2d",
+    "e257af40",
+    "480a8e91",
+    "60e01ad8",
+    "e90ef82f",
+    "1f4fe153"
+  ]
+}

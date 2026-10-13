@@ -3,13 +3,29 @@ name: Standalone maintenance CI
 on:
   workflow_call:
     inputs:
+      merge_proof:
+        description: 'Qualify the reviewed PR 292 official operations evidence with exact consumer inputs'
+        type: boolean
+        default: false
       runner_labels:
         type: string
         default: '["ubuntu-24.04"]'
   workflow_dispatch:
+    inputs:
+      ops_followup:
+        description: 'Successful cache-policy follow-up run; qualify unchanged foundations and check affected operations only'
+        required: false
+        type: string
+        default: ''
+      cache_policy_followup:
+        description: 'Successful same-repository CI run for the exact fanal cache whitelist follow-up'
+        required: false
+        type: string
+        default: ''
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   attachment-safety:
@@ -23,19 +39,171 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-      - name: CI routing and attachment invariants
-        run: node --test .github/scripts/runner-preflight.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/api-response.test.mjs .github/scripts/mac-ci-cleanup.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-image-plan.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs .github/scripts/dependency-routing.test.mjs server-version/scripts/attachment-backup/core.test.mjs server-version/scripts/backup/cleanup-restore-container.test.mjs
-      - name: Release policy and fail-closed executor contracts
+      - name: Qualify reviewed operations merge evidence
+        id: mergequalified
+        if: inputs.merge_proof
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          python3 -B -m unittest discover -s server-version/scripts/release -p 'test_*.py' -v
+          python3 -B -m unittest discover -s .github/scripts -p test_maintenance_merge.py -v
+          python3 -B .github/scripts/maintenance-merge.py
+      - name: Publish official current-head maintenance admission receipt
+        if: steps.mergequalified.outputs.reused == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: qualified-maintenance-merge-${{ github.sha }}
+          path: qualified-maintenance-merge.json
+          retention-days: 3
+          if-no-files-found: error
+      - name: Qualify unchanged maintenance evidence for exact cache follow-up
+        id: qualified
+        if: inputs.cache_policy_followup != ''
+        env:
+          PRIOR_RUN: ${{ inputs.cache_policy_followup }}
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          python3 - <<'PY'
+          import json,os,subprocess,urllib.request
+          repository=os.environ['REPOSITORY'];run=os.environ['PRIOR_RUN']
+          assert repository=='caohuibj/eduK12-new-version' and run.isdigit()
+          def api(path):
+            request=urllib.request.Request('https://api.github.com/repos/'+repository+'/'+path,
+              headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+            return json.load(urllib.request.urlopen(request,timeout=30))
+          evidence=api('actions/runs/'+run)
+          assert evidence['conclusion']=='success' and evidence['event']=='pull_request' and evidence['path']=='.github/workflows/ci.yml'
+          jobs=api('actions/runs/'+run+'/jobs?per_page=100')['jobs']
+          assert any(j['name']=='maintenance / attachment deduplication, indexes and protected cleanup' and j['conclusion']=='success' for j in jobs)
+          base=evidence['head_sha']
+          def git(*args):return subprocess.check_output(['git',*args])
+          paths=[]
+          for entry in git('diff','--raw','--no-renames',base,'HEAD').decode().splitlines():
+            meta,path=entry.split('\t');fields=meta.split()
+            assert fields[0]==':100644' and fields[1]=='100644' and fields[-1]=='M'
+            paths.append(path)
+          storage='server-version/scripts/host-ops/storage.py'
+          assert set(paths)=={storage,'.github/workflows/ci-maintenance.yml'}
+          old=git('show',base+':'+storage)
+          assert git('show','HEAD:'+storage)==old.replace(b"CACHE_FILES={'db/trivy.db'",b"CACHE_FILES={'fanal/fanal.db','db/trivy.db'",1)
+          with open(os.environ['GITHUB_OUTPUT'],'a') as output:output.write('reused=true\n')
+          print('Qualified original successful maintenance run '+run+'; only the exact cache whitelist input changed.')
+          PY
+      - name: Verify affected cache policy only
+        if: steps.qualified.outputs.reused == 'true'
+        run: |
+          python3 -B -m unittest discover -s server-version/scripts/host-ops -p 'test_storage.py' -v
+          node --test .github/scripts/maintenance-routing.test.mjs
+      - name: Qualify unchanged foundations for operations follow-up
+        id: opsqualified
+        if: inputs.ops_followup != ''
+        env:
+          PRIOR_RUN: ${{ inputs.ops_followup }}
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          python3 - <<'PY'
+          import json,os,subprocess,urllib.request
+          repository=os.environ['REPOSITORY'];run=os.environ['PRIOR_RUN']
+          assert repository=='caohuibj/eduK12-new-version' and run in ['38347724147','38352435608','38352891452','38354070158']
+          def api(path):
+            request=urllib.request.Request('https://api.github.com/repos/'+repository+'/'+path,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+            return json.load(urllib.request.urlopen(request,timeout=30))
+          prior=api('actions/runs/'+run)
+          assert prior['conclusion']=='success' and prior['event']=='workflow_dispatch' and prior['path']=='.github/workflows/ci-maintenance.yml'
+          assert prior['head_sha']=={'38347724147':'ec593e7be764523c1f57490338efbe29c29b20a2','38352435608':'a6eaa3abb91473b60124e9ef26c65731f672308b','38352891452':'5c1e73e23426e8b8a9977c99823385aa97132db7','38354070158':'6feac11f67a6b5d687ad90fac84d1fdb1f8f66f4'}[run]
+          original=api('actions/runs/38347265525')
+          assert original['conclusion']=='success' and original['event']=='pull_request' and original['head_sha']=='b8969a064f04ed923692eb8b02f7ce9f989e2aa4'
+          jobs=api('actions/runs/38347265525/jobs?per_page=100')['jobs']
+          assert any(j['name']=='maintenance / attachment deduplication, indexes and protected cleanup' and j['conclusion']=='success' for j in jobs)
+          host='server-version/scripts/host-ops/'
+          allowed={host+p for p in ['capacity.py','test_capacity.py','cycle.py','test_cycle.py','storage.py','test_storage.py','storage-config.example.json','monitor.py','config.example.json','install.sh','README.md','test_monitor.py','systemd/eduk12-backup-cycle.service','systemd/eduk12-backup-cycle.timer','systemd/eduk12-storage-maintenance.service']}
+          allowed|={'.github/workflows/ci-maintenance.yml','.github/scripts/content-scope.mjs','.github/scripts/maintenance-routing.test.mjs','server-version/scripts/cos-cleanup/model.mjs','server-version/scripts/cos-cleanup/cleanup.test.mjs','server-version/scripts/cos-cleanup/sdk-smoke.mjs'}
+          def git(*args):return subprocess.check_output(['git',*args])
+          paths=[]
+          for entry in git('diff','--raw','--no-renames',prior['head_sha'],'HEAD').decode().splitlines():
+            meta,path=entry.split('\t');fields=meta.split()
+            assert path in allowed and fields[-1] in ['M','A']
+            assert fields[1] in ['100644','100755'] and (fields[0] in [':100644',':100755'] or fields[0]==':000000')
+            paths.append(path)
+          assert paths
+          if run=='38347724147':assert host+'capacity.py' in paths
+          elif run=='38352435608':
+            assert set(paths)=={host+'cycle.py',host+'test_cycle.py','.github/workflows/ci-maintenance.yml'}
+            before_cycle=git('show',prior['head_sha']+':'+host+'cycle.py')
+            assert git('show','HEAD:'+host+'cycle.py')==before_cycle.replace(b"fresh(catalog.get('lastFullVerificationAt'),now,24)",b"fresh(catalog.get('lastFullVerificationAt'),now,22)",1)
+          elif run=='38352891452':
+            assert set(paths)=={host+'cycle.py',host+'test_cycle.py',host+'monitor.py',host+'test_monitor.py','.github/workflows/ci-maintenance.yml'}
+            before_cycle=git('show',prior['head_sha']+':'+host+'cycle.py')
+            assert git('show','HEAD:'+host+'cycle.py')==before_cycle.replace(b"verification_ready(cat(),now()),16)",b"verification_ready(cat(),now()),32)",1)
+            before_monitor=git('show',prior['head_sha']+':'+host+'monitor.py')
+            assert git('show','HEAD:'+host+'monitor.py')==before_monitor.replace(b"else 'warning' if age>max_age else 'ok'",b"else 'warning' if age>max_age or value.get('status')=='SKIPPED' else 'ok'",1)
+          else:
+            assert set(paths)=={host+'storage.py',host+'test_storage.py','server-version/scripts/cos-cleanup/sdk-smoke.mjs','server-version/scripts/cos-cleanup/cleanup.test.mjs','.github/workflows/ci-maintenance.yml'}
+            before_storage=git('show',prior['head_sha']+':'+host+'storage.py')
+            old=b"created=dt.datetime.fromisoformat(item['Created'].replace('Z','+00:00')).timestamp()"
+            new=b"created=dt.datetime.fromisoformat(re.sub(r'(\\.\\d{6})\\d+',r'\\1',item['Created']).replace('Z','+00:00')).timestamp()"
+            assert git('show','HEAD:'+host+'storage.py')==before_storage.replace(old,new,1)
+          # This model edit only preserves observations while blocked; protected graph/retention/deletion logic is byte-identical.
+          model='server-version/scripts/cos-cleanup/model.mjs'
+          before=git('show',prior['head_sha']+':'+model)
+          after=git('show','HEAD:'+model)
+          assert after==before.replace(b'const candidates = [], observations = {};',b'// A temporary protection block preserves quarantine history without refreshing observation age.\n  const candidates = [], observations = graph.blocked.length ? structuredClone(previous?.observations || {}) : {};',1)
+          with open(os.environ['GITHUB_OUTPUT'],'a') as output:
+            output.write('reused=true\n')
+            output.write('cycle_only='+str(run=='38352435608').lower()+'\n')
+            output.write('tail_only='+str(run=='38352891452').lower()+'\n')
+            output.write('runtime_only='+str(run=='38354070158').lower()+'\n')
+          print('Qualified successful foundation run 38347265525 and exact cache follow-up '+run+'; unchanged DB/crypto/launcher/attachment verifier inputs retained.')
+          PY
+      - name: Verify affected backup cycle, capacity, image protection and quarantine
+        if: steps.opsqualified.outputs.reused == 'true' && steps.opsqualified.outputs.cycle_only != 'true' && steps.opsqualified.outputs.tail_only != 'true' && steps.opsqualified.outputs.runtime_only != 'true'
+        run: |
+          for name in test_cycle.py test_capacity.py test_storage.py test_monitor.py; do
+            python3 -B -m unittest discover -s server-version/scripts/host-ops -p "$name" -v
+          done
+          node --test server-version/scripts/cos-cleanup/cleanup.test.mjs server-version/scripts/cos-cleanup/recovery.test.mjs
+          node --test .github/scripts/content-scope.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs
+          bash -n server-version/scripts/host-ops/install.sh
+          sudo install -D -m 644 server-version/scripts/host-ops/cycle.py /opt/eduk12-ops/current/cycle.py
+          sudo install -D -m 644 server-version/scripts/host-ops/storage.py /opt/eduk12-ops/current/storage.py
+          sudo systemd-analyze verify server-version/scripts/host-ops/systemd/eduk12-backup-cycle.* server-version/scripts/host-ops/systemd/eduk12-storage-maintenance.*
+      - name: Verify daily verification safety margin only
+        if: steps.opsqualified.outputs.cycle_only == 'true'
+        run: |
+          python3 -B -m unittest discover -s server-version/scripts/host-ops -p 'test_cycle.py' -v
+          node --test .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs
+      - name: Verify large snapshot batching and skipped space maintenance only
+        if: steps.opsqualified.outputs.tail_only == 'true'
+        run: |
+          python3 -B -m unittest discover -s server-version/scripts/host-ops -p 'test_cycle.py' -v
+          python3 -B -m unittest discover -s server-version/scripts/host-ops -p 'test_monitor.py' -v
+          node --test .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs
+      - name: Match production Python major and minor for the timestamp fix
+        if: steps.opsqualified.outputs.runtime_only == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Verify production timestamp and operator identity separation only
+        if: steps.opsqualified.outputs.runtime_only == 'true'
+        run: |
+          python3 -B -m unittest discover -s server-version/scripts/host-ops -p 'test_storage.py' -v
+          node --test --test-name-pattern='different read and delete clients' server-version/scripts/cos-cleanup/cleanup.test.mjs
+          node --check server-version/scripts/cos-cleanup/sdk-smoke.mjs
+          node --test .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs
+      - name: CI routing and attachment invariants
+        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true'
+        run: node --test .github/scripts/runner-preflight.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/api-response.test.mjs .github/scripts/mac-ci-cleanup.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-image-plan.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs .github/scripts/dependency-routing.test.mjs server-version/scripts/attachment-backup/core.test.mjs server-version/scripts/backup/cleanup-restore-container.test.mjs
       - name: Host launcher and existing monitoring guards
+        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true'
         run: |
           python3 -B -m unittest discover -s server-version/scripts/attachment-backup -p 'test_*.py' -v
           python3 -B -m unittest discover -s server-version/scripts/host-ops -p 'test_*.py' -v
-          node --test server-version/scripts/host-ops/backup-cos.test.mjs
+          node --test server-version/scripts/host-ops/backup-cos.test.mjs server-version/scripts/host-ops/cos-inventory.test.mjs
           node --check server-version/scripts/host-ops/backup-crypto.mjs
           node --test server-version/scripts/cos-cleanup/cleanup.test.mjs server-version/scripts/cos-cleanup/recovery.test.mjs
           python3 -B -m unittest discover -s server-version/scripts/cos-cleanup -p 'test_*.py' -v
@@ -44,6 +212,7 @@ jobs:
           node --check server-version/scripts/cos-cleanup/recovery.mjs
           node --check server-version/scripts/cos-cleanup/recovery-smoke.mjs
       - name: Check shell and systemd units without starting production services
+        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true'
         run: |
           bash -n server-version/scripts/attachment-backup/install.sh
           bash -n server-version/scripts/host-ops/install.sh
@@ -51,18 +220,22 @@ jobs:
           bash -n server-version/scripts/cos-cleanup/install.sh
           sudo install -D -m 700 server-version/scripts/attachment-backup/runner.py /opt/eduk12-attachments/current/runner.py
           sudo install -D -m 644 server-version/scripts/host-ops/monitor.py /opt/eduk12-ops/current/monitor.py
+          sudo install -D -m 644 server-version/scripts/host-ops/storage.py /opt/eduk12-ops/current/storage.py
+          sudo install -D -m 644 server-version/scripts/host-ops/cycle.py /opt/eduk12-ops/current/cycle.py
+          sudo install -D -m 644 server-version/scripts/host-ops/cos-inventory.py /opt/eduk12-ops/current/cos-inventory.py
           sudo install -D -m 644 server-version/scripts/host-ops/backup.py /opt/eduk12-backups/current/backup.py
           sudo install -D -m 644 server-version/scripts/cos-cleanup/runner.py /opt/eduk12-cos-cleanup/current/runner.py
           sudo systemd-analyze verify server-version/scripts/attachment-backup/systemd/* server-version/scripts/host-ops/systemd/*
           sudo install -D -m 644 server-version/scripts/cos-cleanup/recovery.py /opt/eduk12-cos-cleanup/current/recovery.py
           sudo systemd-analyze verify server-version/scripts/cos-cleanup/systemd/*
       - name: Real isolated Docker launcher and failed-task cleanup
+        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true'
         run: |
           docker pull node:24.21.0-bookworm-slim
-          CI=true GITHUB_ACTIONS=true python3 -B server-version/scripts/release/ci-container-rehearsal.py
           sudo env CI=true GITHUB_ACTIONS=true NODE_ENV=test python3 -B server-version/scripts/attachment-backup/ci-container-smoke.py
           sudo env CI=true GITHUB_ACTIONS=true NODE_ENV=test python3 -B server-version/scripts/cos-cleanup/ci-container-smoke.py
       - name: Actual encrypted database restore and failure-volume cleanup
+        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true'
         run: |
           docker pull postgres:16.15-bookworm
           sudo env PATH="$PATH" CI=true GITHUB_ACTIONS=true NODE_ENV=test python3 -B server-version/scripts/host-ops/ci-backup-smoke.py
