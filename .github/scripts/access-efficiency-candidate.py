@@ -64,7 +64,7 @@ with tempfile.TemporaryDirectory(prefix='access-efficiency-') as temporary:
                     if file['file'].startswith(tuple(path+'/' for path in mini)) and file['file'].endswith('.js'):run(['node','--check',file['file']],30)
                 run(['node','--test']+['server-version/miniprogram-v2/'+f for f in p['mobileTests']],120)
                 env=dict(os.environ)
-                env.update({key:'synthetic-only' for key in ['DB_USER','DB_PASSWORD','JWT_SECRET','DATA_ENCRYPTION_KEY','ASSET_SIGNING_SECRET','DATA_PSEUDONYM_KEY']})
+                env.update({key:'synthetic-only' for key in ['DB_NAME','DB_USER','DB_PASSWORD','ADMIN_USERNAME','ADMIN_PASSWORD','JWT_SECRET','DATA_ENCRYPTION_KEY','ASSET_SIGNING_SECRET','DATA_PSEUDONYM_KEY']})
                 env.update({'DATABASE_URL':'postgresql://synthetic:synthetic@postgres/isolated','DATABASE_URL_RUNTIME':'postgresql://synthetic:synthetic@postgres/isolated','COOKIE_SECURE':'true','ASSET_MIGRATION_COMPLETE':'true','CORS_ORIGIN':'https://fixture.invalid'})
                 for index,key in enumerate(['IP_GET','IP_FINAL','TOKEN_GET','TOKEN_FINAL','RECOVERY_GET','RECOVERY_FINAL']):env['PUBLIC_ASSESSMENT_'+key+'_LIMIT']=str(100+index)
                 env['POW_MAX_ACTIVE_CHALLENGES']='1000'
