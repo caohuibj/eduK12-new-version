@@ -1,3 +1,4 @@
+import { listPage, cursorWhere, listPageResult, ListCursorError } from '../utils/listCursor'
 import { Request, Response } from 'express'
 import { canReadLegacyContent } from '../utils/legacyContentRoles'
 import { prisma } from '../config/database'
@@ -596,48 +597,25 @@ export const courseController = {
   async myCourses(req: Request, res: Response) {
     try {
       const userId = req.user?.userId
-
-      const courseStudents = await prisma.courseStudent.findMany({
-        where: {
-          studentId: userId,
-          status: {
-            in: [CourseStudentStatus.ACTIVE, CourseStudentStatus.APPROVED]
-          },
-          course: { isLibrary: false, courseType: { not: 'CAMPUS_ACTIVITY' } },
-        },
-        include: {
-          course: {
-            include: {
-              creator: {
-                select: {
-                  id: true,
-                  nickname: true,
-                  username: true,
-                }
-              },
-              _count: {
-                select: {
-                  students: true
-                }
-              }
-            }
-          }
-        },
-        orderBy: {
-          joinedAt: 'desc'
-        }
+      if (!userId) return error(res, '未登录', -1, 401)
+      const { size, cursor, offset } = listPage(req.query)
+      const where = { studentId: userId, status: { in: [CourseStudentStatus.ACTIVE, CourseStudentStatus.APPROVED] },
+        course: { isLibrary: false, courseType: { not: 'CAMPUS_ACTIVITY' as const } } }
+      const rows = await prisma.courseStudent.findMany({
+        where: { ...where, ...cursorWhere('joinedAt', cursor) },
+        select: { id: true, joinedAt: true, course: { select: {
+          id: true, title: true, description: true, createdAt: true, courseCode: true, status: true,
+          _count: { select: { students: true } },
+        } } },
+        orderBy: [{ joinedAt: 'desc' }, { id: 'desc' }], take: size + 1, skip: offset,
       })
-
-      const courses = courseStudents.map(cs => ({
-        ...cs.course,
-        studentCount: cs.course._count.students
-      }))
-
-      return success(res, {
-        list: courses,
-        total: courses.length,
-      })
+      const page = listPageResult(rows, size, 'joinedAt', cursor ? undefined : await prisma.courseStudent.count({ where }))
+      return success(res, { ...page, list: page.list.map(({ course }) => ({
+        id: course.id, title: course.title, description: course.description?.slice(0, 300),
+        createdAt: course.createdAt, courseCode: course.courseCode, status: course.status, studentCount: course._count.students,
+      })) })
     } catch (err) {
+      if (err instanceof ListCursorError) return error(res, err.message, 400)
       logger.error('获取我的课程错误', err)
       return error(res, '获取我的课程失败')
     }
@@ -671,7 +649,7 @@ export const courseController = {
 
       return success(res, {
         courseId: course.id,
-        courseName: course.title,
+        courseName: course.title, course,
         teacherName: course.creator?.nickname,
         isRecruiting: course.isRecruiting,
       }, '课程码有效')

@@ -1,3 +1,5 @@
+import { isWorkerShutdownCancellationError } from '../workers/workerSubprocessRegistry';
+import { probeVideo } from './videoProbe';
 /**
  * 视频下载工具
  * 支持从URL下载视频到本地服务器
@@ -90,7 +92,7 @@ async function resolvePublicAddresses(hostname: string, signal?: AbortSignal): P
 }
 
 /** Validate a user-supplied URL before it is persisted or queued. */
-export async function validateRemoteUrl(rawUrl: string, signal?: AbortSignal): Promise<URL> {
+async function resolveRemoteUrl(rawUrl: string, signal?: AbortSignal): Promise<{ url: URL; addresses: ResolvedAddress[] }> {
   let parsed: URL;
   try {
     parsed = new URL(rawUrl);
@@ -108,8 +110,12 @@ export async function validateRemoteUrl(rawUrl: string, signal?: AbortSignal): P
     throw new Error('视频链接端口不受支持');
   }
 
-  await resolvePublicAddresses(parsed.hostname, signal);
-  return parsed;
+  const addresses = await resolvePublicAddresses(parsed.hostname, signal);
+  return { url: parsed, addresses };
+}
+
+export async function validateRemoteUrl(rawUrl: string, signal?: AbortSignal): Promise<URL> {
+  return (await resolveRemoteUrl(rawUrl, signal)).url;
 }
 
 const createPinnedAgent = (parsed: URL, addresses: ResolvedAddress[]) => {
@@ -129,8 +135,7 @@ async function requestWithSafeRedirects(rawUrl: string, deadline: number, signal
 
   for (let redirectCount = 0; redirectCount <= MAX_REDIRECTS; redirectCount += 1) {
     signal.throwIfAborted();
-    const parsed = await validateRemoteUrl(currentUrl, signal);
-    const addresses = await resolvePublicAddresses(parsed.hostname, signal);
+    const { url: parsed, addresses } = await resolveRemoteUrl(currentUrl, signal);
     const agents = createPinnedAgent(parsed, addresses);
     ownedAgents.add(agents.httpAgent);
     ownedAgents.add(agents.httpsAgent);
@@ -290,35 +295,17 @@ export interface VideoValidationResult {
  * 验证视频文件并获取编码信息
  */
 export async function validateVideoFile(filePath: string): Promise<VideoValidationResult> {
-  return new Promise((resolve) => {
-    const ffmpeg = require('fluent-ffmpeg');
-
-    ffmpeg.ffprobe(filePath, (err: any, metadata: any) => {
-      if (err) {
-        resolve({ valid: false, error: err.message });
-        return;
-      }
-
-      const videoStream = metadata.streams.find((s: any) => s.codec_type === 'video');
-      if (!videoStream) {
-        resolve({ valid: false, error: '不是有效的视频文件' });
-        return;
-      }
-
-      const codec = videoStream.codec_name || 'unknown';
-      const isH264 = ['h264', 'libx264'].includes(codec.toLowerCase());
-      const height = videoStream.height || 0;
-      const is480pOrLower = height <= 480;
-
-      resolve({
-        valid: true,
-        codec,
-        isH264,
-        width: videoStream.width,
-        height,
-        is480pOrLower,
-        duration: metadata.format?.duration
-      });
-    });
-  });
+  try {
+    const metadata = await probeVideo(filePath);
+    const videoStream = metadata.streams.find(stream => stream.codec_type === 'video');
+    if (!videoStream) return { valid: false, error: '不是有效的视频文件' };
+    const codec = videoStream.codec_name || 'unknown', height = videoStream.height || 0;
+    const duration = Number(metadata.format?.duration || 0);
+    return { valid: true, codec, isH264: ['h264', 'libx264'].includes(codec.toLowerCase()),
+      width: videoStream.width, height, is480pOrLower: height <= 480,
+      duration: Number.isFinite(duration) && duration > 0 ? duration : 0 };
+  } catch (error) {
+    if (isWorkerShutdownCancellationError(error)) throw error;
+    return { valid: false, error: error instanceof Error ? error.message : '视频探测失败' };
+  }
 }

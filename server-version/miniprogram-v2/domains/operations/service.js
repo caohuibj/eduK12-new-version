@@ -61,7 +61,7 @@ function createOperations(api,session) {
   if(!Array.isArray(items))throw new ApiError('invalidResponse','列表响应无效')
   // Older unpaged endpoints return a complete list. Do not pretend pagination.
   const paged=data.pageSize!==undefined&&data.page!==undefined
-  return {title:d.title,list:listRows(domain,items,view).map(row=>Object.assign(row,{sourcePage:page})),total:data.total||items.length,page,hasMore:paged&&page*20<data.total,
+  return {title:d.title,list:listRows(domain,items,view).map(row=>Object.assign(row,{sourcePage:page})),total:data.total||items.length,page,hasMore:typeof data.hasMore==='boolean'?data.hasMore:paged&&page*20<data.total,
    actions:actionRows(allowed),commandKey:data.commandKey||(result[1]&&result[1].commandKey),view,parent}
  }
  async function detail(domain,resourceId) {

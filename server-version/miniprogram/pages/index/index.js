@@ -4,6 +4,8 @@ const { isLoggedIn } = require('../../utils/auth')
 Page({
   data: {
     courses: [],
+    nextCursor: null,
+    hasMore: false,
     loading: true,
     showJoinModal: false,
     courseCode: '',
@@ -30,15 +32,22 @@ Page({
     })
   },
 
-  async loadCourses() {
+  onUnload() { this.loadSequence = (this.loadSequence || 0) + 1 },
+
+  onReachBottom() { if (this.data.hasMore && !this.data.loading) return this.loadCourses(true) },
+
+  async loadCourses(append = false) {
+    if (append && (this.data.loading || !this.data.nextCursor)) return
+    const sequence = this.loadSequence = (this.loadSequence || 0) + 1
     this.setData({ loading: true })
     try {
-      const res = await coursesApi.getMyCourses()
-      this.setData({ courses: res.data.list || [] })
+      const res = await coursesApi.getMyCourses(append ? this.data.nextCursor : null)
+      if (sequence !== this.loadSequence) return
+      this.setData({ courses: append ? this.data.courses.concat(res.data.list || []) : res.data.list || [], nextCursor: res.data.nextCursor || null, hasMore: res.data.hasMore === true })
     } catch (error) {
       console.error('加载课程失败:', error)
     } finally {
-      this.setData({ loading: false })
+      if (sequence === this.loadSequence) this.setData({ loading: false })
     }
   },
 

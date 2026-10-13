@@ -1,0 +1,311 @@
+{
+  "schema": 1,
+  "files": {
+    "server-version/backend/src/controllers/checkinController.ts": {
+      "before": "4b354eb2c07512fa8d0d214d74daa4f69e24d2b9",
+      "after": "66016031262e13094c15ab6cdf33662da049537c"
+    },
+    "server-version/backend/src/controllers/courseController.ts": {
+      "before": "671595ed1562155d7eae8805223692777176c323",
+      "after": "ebe73afbe96621538e674705ccd4685261f612f3"
+    },
+    "server-version/backend/src/controllers/publicQuestionnaireController.ts": {
+      "before": "02b1de21425a3139e82aa402cb29ac1a47b31619",
+      "after": "a6a839e4052bd67a6b55d1bea8986b1647a56a9a"
+    },
+    "server-version/backend/src/controllers/videoController.ts": {
+      "before": "42cada3946f15510f7ec23e5579c64353282f499",
+      "after": "ada249206d19fd8c4b43311a95271abbd2fc9782"
+    },
+    "server-version/backend/src/middleware/publicAssessmentRateLimit.ts": {
+      "before": "82c26cb2b11addff80803ce45135770aac4bd49a",
+      "after": "d1f650fc9200e2653227809527c1a2e52f14911c"
+    },
+    "server-version/backend/src/middleware/uploadAdmission.ts": {
+      "before": "5e7727d8617857d96bcbc190c91f87c4c6c364e0",
+      "after": "c1c90112b5ab169a661bb9eae78ccc72a5c34ab1"
+    },
+    "server-version/backend/src/modules/huiteacher/groupReport.service.ts": {
+      "before": "5598976f187ed2397b972b0d3f714b37fb34c0f7",
+      "after": "a39603dfe98e58b828ede3a661b3cd1cbd2d3fe9"
+    },
+    "server-version/backend/src/modules/survey/analytics.source.ts": {
+      "before": "5d066e05d8c89bf7642ed663fd9e65c9bfc7c326",
+      "after": "aff92985c3f725308f81b54f5043b1437ed00781"
+    },
+    "server-version/backend/src/routes/uploads.ts": {
+      "before": "d6848fba2be62a16724bc2f8ec019d509028526a",
+      "after": "aae7fbc2da78f6f9888c8d6b02112ac0f527e06c"
+    },
+    "server-version/backend/src/services/powService.ts": {
+      "before": "43f92be4b7e6a1b70dad0b476882fa4e7c855786",
+      "after": "beb0fd94d16c5b5581d94ab556e7362f2a5a0869"
+    },
+    "server-version/backend/src/utils/listCursor.ts": {
+      "before": null,
+      "after": "3c06e3e1358551bdedfed156a4a5e09288f0513c"
+    },
+    "server-version/backend/src/utils/uploadTemp.ts": {
+      "before": "f240fa17fcb2f26d86fdcba74aaa1d72d9e06371",
+      "after": "de4cccf56da7fb37c076ffb1edf327090395b095"
+    },
+    "server-version/backend/src/utils/videoDownloader.ts": {
+      "before": "a96161352c01c45fc891fd5a5da40c8fdba02f85",
+      "after": "9326b190bb30395adc2c0c40826d2887fdb6e9c3"
+    },
+    "server-version/backend/src/utils/videoProbe.ts": {
+      "before": null,
+      "after": "d00db48f5ce0a3a7723e1ccfc829e03966637f6f"
+    },
+    "server-version/backend/src/workers/videoProcessorOptimized.ts": {
+      "before": "079fa1a32df220cc1852bcbbf6236ffa37f03f8f",
+      "after": "c3b1df14dfd11bbebd7f4cff0426c88cf7b47398"
+    },
+    "server-version/docker-compose.yml": {
+      "before": "86df296a5acee6eaa2b708fbd7c9cd377f6362b0",
+      "after": "4b3691c6d276df6fe87968c72229f2542b962153"
+    },
+    "server-version/frontend/src/hooks/useCursorList.ts": {
+      "before": null,
+      "after": "afc1bbe43c73424eee5e6386ae64b0a279a94d28"
+    },
+    "server-version/frontend/src/pages/CheckinList.tsx": {
+      "before": "bf236baf8e06bb3bb6c5f759a05b0d736398cbfb",
+      "after": "59b076d1c6adb1732012fa7d2284bc7e8beafb91"
+    },
+    "server-version/frontend/src/pages/student/CheckinSubmit.tsx": {
+      "before": "598031c8ec934c87968a70ae47c5aa0e5e5045b8",
+      "after": "2de50e9448bab2faf49da16c61eb7ac9f942ecaf"
+    },
+    "server-version/frontend/src/pages/student/StudentCheckins.tsx": {
+      "before": "4fa3d15bd13c501fdfef2f18e05fb12429396777",
+      "after": "fe6f54778b57fa1a153d51276a3e3a8ebabf24b6"
+    },
+    "server-version/frontend/src/pages/student/StudentHome.tsx": {
+      "before": "040bc08346e4e6358cb6dc5efba2757d3751928c",
+      "after": "2363fe528ae5cdc54cc3e9a728f19c7f0a1b93b2"
+    },
+    "server-version/frontend/src/training/TrainingLearnerHome.tsx": {
+      "before": "f7674a00cceeca48e3d7c03cfb10d12e945f5d41",
+      "after": "3b1d2dd88f735f29732d99fc11ba6ccb7a9fe8d9"
+    },
+    "server-version/miniprogram-v2/domains/operations/service.js": {
+      "before": "8479009982e191a34e530a8b07a6497a31e3046e",
+      "after": "8a7b77857846b9ace3cc09f4dd3fa2131210969b"
+    },
+    "server-version/miniprogram-v2/domains/shared/service.js": {
+      "before": "6f7a64e0c3de63b20c740a3889fa2b5e0036609d",
+      "after": "cab7c7871592b30f47952d0c4ee9b9dbe347aaf3"
+    },
+    "server-version/miniprogram/api/checkins.js": {
+      "before": "5b43d7d19197c6580ff9cf94723972d04102bc8d",
+      "after": "612c822ac81f95f89dc6f66e91001fd15d99510e"
+    },
+    "server-version/miniprogram/api/courses.js": {
+      "before": "627a37be84c518b18c131014a6c4bed02ab73729",
+      "after": "eb075314b08ef953c6b3f5d287605fd32957f394"
+    },
+    "server-version/miniprogram/pages/checkin/list/index.js": {
+      "before": "bebe177ee03e0489eca1330814296da0aebd0058",
+      "after": "9d7a1f50fd9f9746191a444a193116f372d02647"
+    },
+    "server-version/miniprogram/pages/checkin/submit/submit.js": {
+      "before": "31b168e1a93a274a59c136991708a0de41736dd8",
+      "after": "95231ee708f921fa41e4d486dcf778db8b698ed6"
+    },
+    "server-version/miniprogram/pages/checkin/submit/submit.wxml": {
+      "before": "658ba6148422e51190f1713025d8e84e904b8385",
+      "after": "d4a60c0b91fada763917b33e805b4ddfb837c482"
+    },
+    "server-version/miniprogram/pages/index/index.js": {
+      "before": "057f3e002ccd1e7c6120ab5bd90274aa7998e6c9",
+      "after": "54852e02b8c12166753f28221f0960a5518f2547"
+    },
+    "server-version/backend/Dockerfile": {
+      "before": "8a30962087668ef5c2131b42d51835489db066b7",
+      "after": "8dfd85f6e843d964eb192cfdf52addffdc3c4132"
+    },
+    "server-version/frontend/Dockerfile": {
+      "before": "fc13274ae6af59b827c422ab812c7650b081bf06",
+      "after": "45dd87f6a8ed5a5bf45d3ea1e4126ce5e8d9f8b4"
+    }
+  },
+  "officialSourceBindings": {
+    ".github/workflows/ci-backend-regression.yml": {
+      "before": "5b6ac4e36c6a345ba614ee07febd7fb77cb0b8a4",
+      "after": "852e2eeaf7649051b6e320cdf45ebea49722fd28"
+    },
+    ".github/workflows/ci-cognitive-step.yml": {
+      "before": "1f72b67e1fb39aef0df5b57f16a42324a3468292",
+      "after": "8fdbeebc3ec28eb9ec96dfee0f50a9c9100b4e24"
+    },
+    ".github/workflows/ci-backend-browser-build.yml": {
+      "before": "303b27615397efd143aa3c862560f5071c16bcaf",
+      "after": "95dbd06d847f0053950bd3b1f1d8c319b39bd005"
+    },
+    ".github/workflows/assessment-video-core-acceptance.yml": {
+      "before": "8275e93413e62ceee4d89e2caff645d327d6cf5d",
+      "after": "f8e361c9b665222d83d430ac84fbca4b4402e09d"
+    },
+    ".github/workflows/situational-video-acceptance.yml": {
+      "before": "69cc9abf0f7daa7900ff20d91675b28bd0a16d12",
+      "after": "6d622065d045b29f4085c5b4d46f5caf6af7d68a"
+    },
+    ".github/workflows/ops-prelaunch.yml": {
+      "before": "6c9be5f5907adeb048ce599931d9ce093f8a2ec5",
+      "after": "7f1f2d031b8e405ada1732541cfa8006659a9e38"
+    },
+    ".github/workflows/ci-browser.yml": {
+      "before": "9cc033074f0e6ec9c4d8e93d4fa6af0f8cef5fed",
+      "after": "55ef2e1b356bf9069521f56226245dbb12675e08"
+    },
+    ".github/workflows/ci-homepage-copy.yml": {
+      "before": "741f0e9bf0a4704da2f257dd834e5a922b1708e4",
+      "after": "750c220f8c8d29fdabcc4cbca606c2d47aacd89a"
+    },
+    ".github/workflows/perf-phase0-closure.yml": {
+      "before": "0cc57e7d55db7fd2ab60383f7f914756f2fd6d5c",
+      "after": "1312a56dc806ff645a1bfc3095f4bdc62de79dfa"
+    },
+    ".github/workflows/situational-branching-acceptance.yml": {
+      "before": "e16ece8d6f1fddfb49c7740c94ea84331a45e6d3",
+      "after": "8fa301feff0c7189a76fcfcebe96a68ad8316e20"
+    },
+    ".github/workflows/ci-backend.yml": {
+      "before": "67d73b709cfb35444bdb9c54af4bbc2851190593",
+      "after": "7df9f4cad74899d63e8fc57bc7018569f3350b2e"
+    },
+    ".github/workflows/ci-survey-pr1.yml": {
+      "before": "6bcba1444b18ddfadc2e3489e931f5c6ebe6be8a",
+      "after": "a5a3eae307b42833e21dd246fb62742513ac7091"
+    },
+    ".github/workflows/ci-frontend-build.yml": {
+      "before": "7a570043686e2bda4ddff1322dad0fd2b6be9ea4",
+      "after": "5e6ea87d3ce527680825d32b46ca5eb9ea7adc1a"
+    },
+    ".github/workflows/ci-campus.yml": {
+      "before": "c596c18a667866b870ec935778e177609a5fb0cc",
+      "after": "7b2e8e7d935250a7f21e765b82d22ec46726c1dc"
+    },
+    ".github/workflows/ci-ui.yml": {
+      "before": "480606d7e6d85ead1ec182c396d7fd3ff4f35261",
+      "after": "84a1e042fe289537767bdec33ca6c24c6bcbfff9"
+    },
+    ".github/workflows/fe-11-app-shell-acceptance.yml": {
+      "before": "395339f009a3e7aae199f8f2c389b0faf6f83fdb",
+      "after": "9d4876a0e96c79701c17a316321d0aa9825b7ce5"
+    },
+    ".github/workflows/scale-onboarding-boundary.yml": {
+      "before": "6e741279ae7e761b1521e2ca8a048846efd9737e",
+      "after": "b6a6cda386f50c5341392e46ae35c00404a88e0d"
+    },
+    ".github/workflows/media-7-cross-runtime-acceptance.yml": {
+      "before": "0ac8e3236c9ac6757016fd234133a52951d62d5a",
+      "after": "6afb4e749bcf3108f4b44edc8f50583d756ea2ef"
+    },
+    ".github/workflows/ci-frontend.yml": {
+      "before": "0a9fdf4b9d4441b52c96c7f88083dd46b3a9d68f",
+      "after": "2cfa23f85c6eca78feb2875313f9326af7ffde4e"
+    },
+    ".github/workflows/media-2-acceptance.yml": {
+      "before": "23da99c93a4ebb3f07116fbe5c315870862b7aa9",
+      "after": "270b6fbc7fb94ce396c87af13334d3d43867b5b6"
+    },
+    ".github/workflows/ci-survey-home.yml": {
+      "before": "85f149a1110ca202ee965d433e7ff3c079dfe757",
+      "after": "6b70f57340ff010a1477bc87d0a806ca3b0ee209"
+    },
+    ".github/workflows/perf-phase0-smoke.yml": {
+      "before": "24612d2c1fb90a18f02621f628bb1623dc20203d",
+      "after": "880c8b965bfcdd2f8d3ec4c42d4815781aa9d3d4"
+    },
+    ".github/workflows/ci-release-tools.yml": {
+      "before": "2d3b15af0b494f0ea13005e4ad22e7f2bc483c2c",
+      "after": "a057f6a4676484153a7c535927a6beaa40dbd7ce"
+    },
+    ".github/workflows/situational-browser-debug.yml": {
+      "before": "2313f156f023825a063f903831e3092fe143e565",
+      "after": "ae4e228992974d3f542bc7d4f512c91b2a97b7c4"
+    },
+    ".github/workflows/situational-publication.yml": {
+      "before": "871f753669c3cb0f298c1084f79915d2754a1f1f",
+      "after": "43b8dad960a713b4f2a221599c116586f9ddbd29"
+    },
+    ".github/workflows/perf-phase0-exploratory.yml": {
+      "before": "32f22c7e1179d9e5193ba3f7ad20719e845f5efa",
+      "after": "7402388066f3006b69032ecc42fc220123954e1a"
+    },
+    ".github/workflows/visual-canonical-qa.yml": {
+      "before": "b570d71162ab29ff35bbb0e154fd00f2e29d26f6",
+      "after": "4d6b029913013fe74ce22e5701a1bbbda0e9e9e3"
+    },
+    ".github/workflows/ci-scoped-release.yml": {
+      "before": "2b2f1a2dedadd493d8f3e388b5ff559f742057fb",
+      "after": "c0ff3109b31bd945640fd2567bffde09bcf742b7"
+    },
+    ".github/workflows/ci-teacher-home.yml": {
+      "before": "0e87ba23dcb230e44a0b6a3fb466b75bb1c0e6d5",
+      "after": "f01f779a777d7b6ff94492fc78a9cf1dc5fe193a"
+    },
+    ".github/workflows/ci-backend-security-efficiency.yml": {
+      "before": "975ff7c2db882af99adfbdb95b05826ae6a20e88",
+      "after": "69b508da65744123716cca09fa8dc2691edceffa"
+    },
+    ".github/workflows/ci-maintenance.yml": {
+      "before": "04420a31fa2a3e1137b927fdc0653b13b36ac9fc",
+      "after": "871017f5b537d15a867f3b65114468ef08489a77"
+    },
+    ".github/workflows/ci-images.yml": {
+      "before": "7a1abc542f0a1b179fea76293e68b0a4d8b8eca3",
+      "after": "681858ea33c14b48de08b365b5a7476a9d4c45f6"
+    },
+    ".github/workflows/ci.yml": {
+      "before": "dfe2a09215d2aa6836877590f4a6ba98dd706d41",
+      "after": "6b56818b75eaeb97dd1e20d6cf2e0c16175d4bbd"
+    },
+    ".github/workflows/ci-media.yml": {
+      "before": "92b40bad5d4eb0ca7b76c1af03dae48f1f1eebbb",
+      "after": "98190eee90cc36615706dde8cca5d8bafb741920"
+    },
+    ".github/scripts/ci-image-plan.mjs": {
+      "before": "d74e8ecc2f272a9f59d62b34590500450d646a1d",
+      "after": "e16e07bbe7b31ef0c10b1e770fbb3b2def0f3a97"
+    },
+    ".github/scripts/ci-image-plan.test.mjs": {
+      "before": "7492c202585fd79afee4c5b558e764e6df3cb239",
+      "after": "d23e550fc817e6204cf2b28398b6082e71f8169f"
+    },
+    ".github/scripts/dependency-scope.mjs": {
+      "before": "5425effb38fe6e58ee806f016d948b089edcf6c0",
+      "after": "2aa6f5b2434ca3845440b7d2d5eb99685517f58e"
+    },
+    ".github/scripts/dependency-routing.test.mjs": {
+      "before": "7576c29f6a16247291631a9dcd92bdf6fc585548",
+      "after": "b2e65cf05dc5c6f6eb565039527d83aa3dc17d30"
+    },
+    ".github/scripts/campus-candidate.py": {
+      "before": "3fcf9cccb0cb51949adf92f3eb016b7e29df3cbf",
+      "after": "22c7069caf14b28b178b4f384d0c0471eb9ab292"
+    },
+    "server-version/scripts/release/build.py": {
+      "before": "3731bee7df181b8cab0c03a7a16f0dca4fac4976",
+      "after": "d258975cd73cc6696fdba4647907fe33f6858014"
+    },
+    "server-version/scripts/release/package.py": {
+      "before": "302ed9170f69b2a26626fc8f2709a0a38933fe96",
+      "after": "6b19df556c942cfbaebb1fb275282293da9c1508"
+    },
+    "AGENTS.md": {
+      "before": "914dee3d71c278ec303a07021abfa6b1ec18a9b3",
+      "after": "8a4a566855780fe4d349e1cf0f1b73911ec23294"
+    },
+    "docs/ci-runner-policy.md": {
+      "before": "f8735d637f36979b61a7523a9d901562164f7eb0",
+      "after": "84f5fff91c4915c5eef8e7fd43b3259c7ca704a1"
+    }
+  },
+  "verifierOrderTransition": {
+    "before": "cd0e2ea27cbeb41e40f87490e79409bf7f4f7acc",
+    "after": "70bd8410d7b2d13079e5858de0300b2de0e2117c"
+  }
+}

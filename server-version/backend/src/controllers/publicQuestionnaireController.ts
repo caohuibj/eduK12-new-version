@@ -89,7 +89,7 @@ export const publicQuestionnaireController = {
    */
   async getPOWChallenge(req: Request, res: Response) {
     try {
-      const challenge = await powService.generateChallenge(4) // 难度4
+      const challenge = await powService.generateChallenge(4, req.ip || req.socket.remoteAddress || 'unknown') // 难度4
       
       return success(res, {
         challenge: challenge.challenge,

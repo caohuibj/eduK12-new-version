@@ -12,7 +12,7 @@ beforeEach(()=>{
   vi.stubEnv('POW_MAX_ACTIVE_CHALLENGES','3')
   state.client.isReady=true
   state.client.connect.mockResolvedValue(undefined)
-  state.client.eval.mockResolvedValue([1,0])
+  state.client.eval.mockImplementation(async (_script, options) => options.keys[0] === 'pow-issue:global:v1' ? 1 : [1,0])
 })
 afterEach(()=>{vi.useRealTimers();vi.unstubAllEnvs()})
 describe('PoW bounded issuance and fail-closed errors',()=>{
@@ -28,7 +28,7 @@ describe('PoW bounded issuance and fail-closed errors',()=>{
     expect(state.client.setEx).not.toHaveBeenCalled()
   })
   it('reports capacity backpressure without a fallback or an extra key write',async()=>{
-    state.client.eval.mockResolvedValue([0,72])
+    state.client.eval.mockImplementation(async (_script, options) => options.keys[0] === 'pow-issue:global:v1' ? 1 : [0,72])
     const {powService,POWCapacityError}=await import('../../services/powService')
     await expect(powService.generateChallenge()).rejects.toBeInstanceOf(POWCapacityError)
     await expect(powService.generateChallenge()).rejects.toMatchObject({retryAfterSeconds:72})
@@ -46,7 +46,7 @@ describe('PoW bounded issuance and fail-closed errors',()=>{
     expect(powService.getStats().totalChallenges).toBe(0)
   })
   it.each([[1],[0,0],[0,301],[-1,0]])('rejects an invalid or failed atomic result %j',async(...result)=>{
-    state.client.eval.mockResolvedValue(result)
+    state.client.eval.mockImplementation(async (_script, options) => options.keys[0] === 'pow-issue:global:v1' ? 1 : result)
     const {powService}=await import('../../services/powService')
     await expect(powService.generateChallenge()).rejects.toThrow('POW 服务暂不可用')
     expect(powService.getStats().totalChallenges).toBe(0)

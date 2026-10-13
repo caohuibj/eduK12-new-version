@@ -6,7 +6,7 @@ import { promises as fs } from 'node:fs'
 import sharp from 'sharp'
 import { BoundedAdmissionGate, configuredInteger, isBoundedAdmissionBusyError } from '../services/boundedAdmissionGate'
 import { createRedisRateLimiter } from './redisRateLimit'
-import { createTemporaryUploadStorage, cleanupRequestUploads } from '../utils/uploadTemp'
+import { createTemporaryUploadStorage, cleanupRequestUploads, assertUploadStagingCapacity } from '../utils/uploadTemp'
 import { detectMimeType } from '../utils/fileValidator'
 
 export const uploadAdmission = new BoundedAdmissionGate({
@@ -92,6 +92,7 @@ export const boundedUpload = (field: string, maxBytes: number, allowedTypes: str
   }
   const parse = multer(options).single(field)
   return withUploadAdmission(async (req: Request, res: Response, next) => {
+    await assertUploadStagingCapacity(maxBytes)
     await new Promise<void>((resolve, reject) => parse(req, res, error => error ? reject(error) : resolve()))
     await readTemporaryUpload(req, allowedTypes, materialize)
     if (!res.destroyed) await handler(req, res, next)

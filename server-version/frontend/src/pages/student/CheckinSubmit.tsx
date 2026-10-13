@@ -1,3 +1,4 @@
+import { useCursorList } from '../../hooks/useCursorList'
 import { isTrainingHost } from '../../training/context'
 import ModalSurface from '../../components/shared-ui/ModalSurface'
 import React, { useState, useEffect, useRef } from 'react'
@@ -53,8 +54,8 @@ const CheckinSubmit: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [uploading, setUploading] = useState(false)
-  const [othersSubmissions, setOthersSubmissions] = useState<OtherSubmission[]>([])
   const [showOthers, setShowOthers] = useState(false)
+  const { list: othersSubmissions, loading: othersLoading, error: othersError, more: moreOthers, refresh: refreshOthers, hasMore: hasMoreOthers } = useCursorList<OtherSubmission>(showOthers && checkin?.allowViewOthers ? `/checkins/${checkinId}/others-submissions` : null)
   const [playingVideo, setPlayingVideo] = useState<MediaItem | null>(null)
   const [previewImage, setPreviewImage] = useState<{url: string, name: string} | null>(null)
   const [selectedDocument, setSelectedDocument] = useState<DocumentItem | null>(null)
@@ -87,9 +88,6 @@ const CheckinSubmit: React.FC = () => {
       if (checkinRes.code === 0) {
         setCheckin(checkinRes.data)
         // 如果允许查看他人打卡，获取他人提交
-        if (checkinRes.data.allowViewOthers) {
-          fetchOthersSubmissions()
-        }
       }
 
       if (submissionRes.code === 0 && submissionRes.data) {
@@ -101,17 +99,6 @@ const CheckinSubmit: React.FC = () => {
       console.error('获取打卡详情失败:', error)
     } finally {
       setLoading(false)
-    }
-  }
-
-  const fetchOthersSubmissions = async () => {
-    try {
-      const response = await apiClient.get(`/checkins/${checkinId}/others-submissions`)
-      if (response.code === 0) {
-        setOthersSubmissions(response.data.list)
-      }
-    } catch (error) {
-      console.error('获取他人打卡失败:', error)
     }
   }
 
@@ -335,24 +322,28 @@ const CheckinSubmit: React.FC = () => {
       </section>
 
       {/* Others Submissions */}
-      {checkin.allowViewOthers && othersSubmissions.length > 0 && (
-        <section className="card student-submit-panel">
+      {checkin.allowViewOthers && (
+        <section className="card student-submit-panel" aria-labelledby="checkin-others-title">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+            <h3 id="checkin-others-title" className="text-lg font-semibold text-gray-800 flex items-center">
               <Users className="w-5 h-5 mr-2" />
               其他同学的打卡
             </h3>
             <button
               onClick={() => setShowOthers(!showOthers)}
               className="student-submit-inline-action"
+              style={{ color: '#1e40af' }}
             >
               <Eye className="w-4 h-4 mr-1" />
-              {showOthers ? '收起' : `查看 (${othersSubmissions.length})`}
+              {showOthers ? '收起' : '查看'}
             </button>
           </div>
           
           {showOthers && (
             <div className="space-y-4 max-h-96 overflow-y-auto">
+              {othersLoading && <p role="status">加载中…</p>}
+              {othersError && <p role="alert">{othersError}<button type="button" onClick={() => void refreshOthers()}>重试</button></p>}
+              {hasMoreOthers && <button type="button" disabled={othersLoading} onClick={() => void moreOthers()}>加载更多提交</button>}
               {othersSubmissions.map((other) => (
                 <div key={other.id} className="border rounded-lg p-4 bg-gray-50">
                   <div className="flex items-center space-x-3 mb-3">

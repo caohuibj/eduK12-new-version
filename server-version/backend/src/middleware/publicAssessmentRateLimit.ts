@@ -1,6 +1,7 @@
 import crypto from 'node:crypto'
 import type { Request, RequestHandler } from 'express'
 import { rateLimit } from 'express-rate-limit'
+import { cacheService } from '../services/cacheService'
 import { config } from '../config'
 import { isValidRecoveryToken } from '../services/anonymousAccess'
 
@@ -55,12 +56,13 @@ export const extractPublicAssessmentRecoveryToken = (req: Request): string | nul
   return isValidRecoveryToken(fromBody) ? fromBody : null
 }
 
-const createBudgetLimiter = (options: {
+export const createBudgetLimiter = (options: {
   name: string
   budget: PublicAssessmentBudget
   limit: number
   key: (req: Request) => string | null
-}): RequestHandler => rateLimit({
+}): RequestHandler => {
+  const local = rateLimit({
   windowMs: config.publicAssessmentWindowMs,
   limit: options.limit,
   standardHeaders: 'draft-7',
@@ -77,7 +79,29 @@ const createBudgetLimiter = (options: {
     // skip() already filtered nulls; keep a stable fallback for the type checker.
     return raw ? `${options.name}:${digest(raw)}` : `${options.name}:missing`
   },
-})
+  })
+  return async (req, res, next) => {
+    if (classifyPublicAssessmentBudget(req) !== options.budget) return next()
+    const raw = options.key(req)
+    if (raw === null) return next()
+    if (process.env.NODE_ENV !== 'production') return local(req, res, next)
+    const windowSeconds = Math.ceil(config.publicAssessmentWindowMs / 1000)
+    const result = await cacheService.consumeRateLimit(`ratelimit:${options.name}:${digest(raw)}`, options.limit, windowSeconds)
+    if (!result) {
+      res.setHeader('Retry-After', '2')
+      res.status(503).json({ code: -1, message: '服务暂时不可用，请稍后再试' })
+      return
+    }
+    res.setHeader('RateLimit-Policy', `${options.limit};w=${windowSeconds}`)
+    res.setHeader('RateLimit', `limit=${options.limit}, remaining=${result.remaining}, reset=${result.retryAfterSeconds}`)
+    if (!result.allowed) {
+      res.setHeader('Retry-After', String(result.retryAfterSeconds))
+      res.status(429).json({ code: -1, message: '请求过于频繁，请稍后再试' })
+      return
+    }
+    next()
+  }
+}
 
 const ipKey = (req: Request): string => req.ip || req.socket.remoteAddress || 'unknown'
 

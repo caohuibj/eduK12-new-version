@@ -6,7 +6,7 @@ vi.mock('../../config/queue',()=>({videoQueue:{process:mocks.process,on:vi.fn(),
 vi.mock('../../config/database',()=>({prisma:{video:{updateMany:mocks.update},$transaction:vi.fn()}}))
 vi.mock('../../utils/logger',()=>({logger:{debug:vi.fn(),info:vi.fn(),warn:vi.fn(),error:vi.fn()}}))
 vi.mock('../../utils/videoDownloader',()=>({downloadVideo:mocks.download,validateVideoFile:mocks.validate}))
-vi.mock('../../services/assetStorage',()=>({storeAssetFromFile:mocks.store,attachAssetReference:mocks.attach,discardUnreferencedAsset:mocks.discard,getSignedAssetUrl:vi.fn()}))
+vi.mock('../../services/assetStorage',()=>({storeAssetFromFile:mocks.store,attachAssetReference:mocks.attach,discardUnreferencedAsset:mocks.discard,getSignedAssetUrl:vi.fn(),signKnownAsset:()=>'/signed'}))
 vi.mock('../../services/videoProcessingState',()=>({markVideoProcessing:async()=>1,markVideoFailed:mocks.failed,releaseVideoProcessingForRetry:mocks.release,associateVideoRetryJob:vi.fn()}))
 vi.mock('../../services/videoProcessingRecovery',()=>({isFinalVideoAttempt:(job:any)=>job.attemptsMade===2,registerVideoProcessingRecovery:vi.fn(),stopVideoProcessingRecovery:vi.fn(),reconcileStaleProcessingVideos:vi.fn()}))
 vi.mock('fluent-ffmpeg',()=>{const ff:any=()=>{throw new Error('synthetic-transcode-failure')};ff.getAvailableCodecs=(cb:any)=>cb(null,{});return{default:ff}})

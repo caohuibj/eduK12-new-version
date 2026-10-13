@@ -5,7 +5,7 @@ vi.mock('../../config/database', () => ({ prisma: { video: { create: mocks.creat
 vi.mock('../../config/queue', () => ({ videoQueue: { add: mocks.queue, getJob: mocks.getJob } }))
 vi.mock('node:fs/promises', async importOriginal => ({ ...await importOriginal<any>(), stat: mocks.stat }))
 vi.mock('../../services/remoteVideoAdmission', async importOriginal => ({ ...await importOriginal<any>(), assertVideoCapacity: mocks.capacity }))
-vi.mock('../../services/assetStorage', () => ({ storeAssetFromFile: mocks.store, attachAssetReference: mocks.attach, getLocalAssetPath: (key: string) => `/safe/${key}`, getSignedAssetUrl: async () => '/signed', discardUnreferencedAsset: mocks.discard }))
+vi.mock('../../services/assetStorage', () => ({ storeAssetFromFile: mocks.store, attachAssetReference: mocks.attach, getLocalAssetPath: (key: string) => `/safe/${key}`, getSignedAssetUrl: async () => '/signed', signKnownAsset: () => '/signed', discardUnreferencedAsset: mocks.discard }))
 vi.mock('../../services/videoRetry', () => ({ retryVideo: vi.fn(), VideoRetryError: class extends Error {} }))
 import { videoController } from '../../controllers/videoController'
 import { LOCAL_VIDEO_UPLOAD_SENTINEL, RemoteVideoAdmissionError } from '../../services/remoteVideoAdmission'

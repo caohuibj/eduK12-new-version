@@ -5,6 +5,8 @@ const { formatStatus } = require('../../../utils/format')
 Page({
   data: {
     checkins: [],
+    nextCursor: null,
+    hasMore: false,
     loading: true
   },
 
@@ -26,10 +28,17 @@ Page({
     })
   },
 
-  async loadCheckins() {
+  onUnload() { this.loadSequence = (this.loadSequence || 0) + 1 },
+
+  onReachBottom() { if (this.data.hasMore && !this.data.loading) return this.loadCheckins(true) },
+
+  async loadCheckins(append = false) {
+    if (append && (this.data.loading || !this.data.nextCursor)) return
+    const sequence = this.loadSequence = (this.loadSequence || 0) + 1
     this.setData({ loading: true })
     try {
-      const res = await checkinsApi.getMyCheckins()
+      const res = await checkinsApi.getMyCheckins(append ? this.data.nextCursor : null)
+      if (sequence !== this.loadSequence) return
       const list = res.data?.list || []
       const checkins = list.map(item => {
         // 确保 submitted 是布尔值
@@ -40,11 +49,11 @@ Page({
           statusInfo: formatStatus(item.endTime, submitted)
         }
       })
-      this.setData({ checkins })
+      this.setData({ checkins: append ? this.data.checkins.concat(checkins) : checkins, nextCursor: res.data.nextCursor || null, hasMore: res.data.hasMore === true })
     } catch (error) {
       console.error('加载打卡失败:', error)
     } finally {
-      this.setData({ loading: false })
+      if (sequence === this.loadSequence) this.setData({ loading: false })
     }
   },
 

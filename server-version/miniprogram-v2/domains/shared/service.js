@@ -37,7 +37,7 @@ function createDomainService(api, session) {
       const path = domain === 'courses' && session.get().capabilities.canReadStudentTasks ? spec.studentPath : spec.path
       const data = await api.get(path + '?page=' + page + '&pageSize=20')
       return {title: spec.title, list: rows(domain,data), total: typeof data.total === 'number' ? data.total : null, page, truncated: data.truncated === true,
-        hasMore: domain !== 'assessments' && typeof data.total === 'number' && page * 20 < data.total && !(domain === 'courses' && path === spec.studentPath)}
+        hasMore: typeof data.hasMore === 'boolean' ? data.hasMore : domain !== 'assessments' && typeof data.total === 'number' && page * 20 < data.total && !(domain === 'courses' && path === spec.studentPath)}
     },
     async detail(domain, id) {
       authorize(domain)

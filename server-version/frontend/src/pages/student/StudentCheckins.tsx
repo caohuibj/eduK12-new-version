@@ -1,32 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { Calendar, CheckCircle, Clock, XCircle } from 'lucide-react'
-import apiClient from '../../api/client'
+import { useCursorList } from '../../hooks/useCursorList'
 import { DiscoveryCard, PageHeader, ProductPage, ProductStatus } from '../../components/product-ui'
 import type { Checkin, CheckinSubmission } from '../../types'
 
 const StudentCheckins: React.FC = () => {
-  const [checkins, setCheckins] = useState<(Checkin & { submission?: CheckinSubmission })[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    void fetchCheckins()
-  }, [])
-
-  const fetchCheckins = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      const response = await apiClient.get('/checkins/my')
-      if (response.code !== 0) throw new Error(response.message || '获取打卡列表失败')
-      setCheckins(response.data.list)
-    } catch (reason) {
-      console.error('获取打卡列表失败:', reason)
-      setError(reason instanceof Error ? reason.message : '获取打卡列表失败')
-    } finally {
-      setLoading(false)
-    }
-  }
+  const { list: checkins, loading, error, more, refresh, hasMore } = useCursorList<Checkin & { submission?: CheckinSubmission }>('/checkins/my')
 
   const formatDate = (dateString?: string) => dateString ? new Date(dateString).toLocaleString('zh-CN') : '无截止日期'
   const isOverdue = (endTime?: string) => Boolean(endTime && new Date(endTime) < new Date())
@@ -41,10 +20,10 @@ const StudentCheckins: React.FC = () => {
     <ProductPage width="assessment" className="hui-student-page hui-student-tasks">
       <PageHeader title="我的打卡" description="查看打卡任务与已经提交的记录。" />
 
-      {loading ? (
+      {loading && checkins.length === 0 ? (
         <ProductStatus kind="pending" title="正在加载打卡" announce="polite" />
-      ) : error ? (
-        <ProductStatus kind="error" title="打卡列表加载失败" announce="assertive">{error}</ProductStatus>
+      ) : error && checkins.length === 0 ? (
+        <ProductStatus kind="error" title="打卡列表加载失败" announce="assertive">{error}<button type="button" onClick={() => void refresh()}>重试</button></ProductStatus>
       ) : checkins.length === 0 ? (
         <ProductStatus kind="info" title="暂无打卡">你还没有需要打卡的任务。</ProductStatus>
       ) : (
@@ -72,6 +51,8 @@ const StudentCheckins: React.FC = () => {
           })}
         </div>
       )}
+      {checkins.length > 0 && error && <p role="alert">{error}</p>}
+      {hasMore && <button type="button" disabled={loading} onClick={() => void more()}>{loading ? '加载中…' : '加载更多打卡'}</button>}
     </ProductPage>
   )
 }

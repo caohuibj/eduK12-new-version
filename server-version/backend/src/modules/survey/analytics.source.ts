@@ -178,15 +178,15 @@ const codeKey=(waveOrdinal:number,instrumentKey:string,itemKey:string,hash:strin
     +(instrumentKey.replace(/[^a-z0-9_]/gi,'_').slice(0,38))
     +'__'+(itemKey.replace(/[^a-z0-9_]/gi,'_').slice(0,38))
     +'__'+hash.slice(0,16)
-/** A single transaction locks current User/Grant/Owner, reads exactly finalized
- * Survey records, verifies the encrypted FINAL hash, and projects minimum data.
+/** Bounded transactions read authorized immutable material and recheck its
+ * complete version after hash/decryption/projection outside business locks.
  * No arbitrary project administrator inherits the raw-data grant.
  */
 /** Exclusive safe upper bound after PostgreSQL microseconds round-trip through JS Date. */
 export function surveyExclusiveSnapshotCutOff(timestamp:Date):Date {
   return new Date(timestamp.getTime()+1)
 }
-export async function loadSurveySource(input:{
+type SurveySourceInput = {
   actorUserId:string;projectId:string;waveIds?:string[];maxFinals?:number;
   /** Only Wide exports need the schema of Waves with no completed FINAL. */
   includeWideSchema?:boolean
@@ -213,7 +213,24 @@ export async function loadSurveySource(input:{
   includeAttendanceCount?:boolean
   attendanceAfterId?:string
   expectedAttendanceCount?:number
-}):Promise<SurveySourceProjection>{
+}
+
+export async function loadSurveySource(input: SurveySourceInput): Promise<SurveySourceProjection> {
+  const first = await readSurveySourceMaterial(input)
+  const signature = first.signature()
+  const result = await first.compute()
+  // Authorization, revision, exact FINALs, attendance and frozen publications
+  // are read again after computation. No old grant or snapshot is a release.
+  const current = await readSurveySourceMaterial({ ...input, snapshotCutOff: new Date(result.cutOff),
+    expectedSourceRevision: result.sourceRevision,
+    ...(input.pageMode ? { expectedFinalCount: result.sourceFinalCount ?? undefined } : {}),
+  })
+  if (signature !== current.signature()) throw new SurveyAnalyticsError(409, '研究来源在计算期间变化，请重新开始')
+  return result
+}
+
+async function readSurveySourceMaterial(input: SurveySourceInput) {
+
   const max=Math.min(500,Math.max(1,input.maxFinals??250))
   return prisma.$transaction(async tx=>{
     const [project]=await tx.$queryRaw<Array<{collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';sourceCutOff:Date;sourceRevision:number}>>`
@@ -328,9 +345,69 @@ export async function loadSurveySource(input:{
       include:{attempt:{include:{participant:true}},wave:true},
     }):[]
     const publications=publicationIds.length?await tx.surveyPublication.findMany({
-      where:{id:{in:publicationIds}},
+      where:{id:{in:publicationIds}}, orderBy: { id: 'asc' },
     }):[]
     const publicationById=new Map(publications.map(row=>[row.id,row]))
+    // A linked participant may have STARTED but not FINAL at T2. Preserve
+    // that distinction from NO_WAVE without decrypting incomplete answers.
+    const attendanceRows=input.includeAttendance===false||input.attendanceOnly?[]:await tx.surveyWaveAttempt.findMany({
+      where:{
+        projectId:input.projectId,
+        ...(input.waveIds?.length?{waveId:{in:input.waveIds}}:{}),
+        participantId:{not:null},
+      },
+      select:{waveId:true,status:true,excludedAt:true,
+        sampleReview:{select:{verdict:true}},
+        participant:{select:{researchCode:true,status:true}}},
+      orderBy: { id: 'asc' }, take:5001,
+    })
+    let attendanceSlice: Array<{ id: string; waveId: string; status: string; sampleReview: { verdict: string } | null; participant: { researchCode: string } | null }> = []
+    let sourceAttendanceCount:number|null=null
+    if(input.includeAttendanceCount||input.attendanceOnly){
+      if(!input.pageMode||input.waveIds?.length!==1||
+          (!input.attendanceOnly&&!input.includeWideSchema))
+        throw new SurveyAnalyticsError(400,'参与状态游标只允许已冻结的单波次分页数据')
+      // Only incomplete / quality-excluded linked attempts need synthetic Long
+      // rows. COMPLETED included FINALs are already emitted by the FINAL pass.
+      // Pin the candidate set to the first page's exclusive time watermark.
+      const candidates:Prisma.SurveyWaveAttemptWhereInput={
+        projectId:input.projectId,waveId:input.waveIds![0],
+        participantId:{not:null},excludedAt:null,startedAt:{lt:cutOff},
+        participant:{is:{status:{not:'WITHDRAWN'}}},
+        OR:[{status:{not:'COMPLETED'}},
+          {sampleReview:{is:{verdict:'EXCLUDED'}}}],
+      }
+      sourceAttendanceCount=await tx.surveyWaveAttempt.count({where:candidates})
+      if(sourceAttendanceCount>25000)
+        throw new SurveyAnalyticsError(413,'单波次非 FINAL 参与记录超过 25000 条分页预算')
+      if(input.expectedAttendanceCount!==undefined&&
+        input.expectedAttendanceCount!==sourceAttendanceCount)
+        throw new SurveyAnalyticsError(409,'分批期间未完成参与样本数量已变化，请重新开始')
+      if(input.attendanceOnly){
+        // Bound synthetic rows to ~6000 item/score cells per response page.
+        // Never materialize the whole participant matrix in memory.
+        attendanceSlice=await tx.surveyWaveAttempt.findMany({
+          where:{...candidates,...(input.attendanceAfterId
+            ?{id:{gt:input.attendanceAfterId}}:{})},
+          orderBy:{id:'asc'},take:251,
+          select:{id:true,waveId:true,status:true,
+            sampleReview:{select:{verdict:true}},
+            participant:{select:{researchCode:true}}},
+        })
+      }
+    }
+    return {
+      signature: () => canonicalHash(JSON.parse(JSON.stringify({ project: { collectionMode: project.collectionMode, sourceRevision: project.sourceRevision },
+        cutOff: cutOff.toISOString(), headers: selectedHeaders, frozenWaves,
+        finals: finals.map(final => ({ id: final.id, completedAt: final.completedAt, publicationId: final.publicationId,
+          definitionDigest: final.definitionDigest, resultsHash: final.resultsHash, resultsCipher: final.resultsCipher,
+          wave: { id: final.wave.id, projectId: final.wave.projectId, ordinal: final.wave.ordinal, publicationId: final.wave.publicationId },
+          attempt: { id: final.attempt.id, projectId: final.attempt.projectId, waveId: final.attempt.waveId,
+            startedAt: final.attempt.startedAt, flowAssignmentCipher: final.attempt.flowAssignmentCipher,
+            participant: final.attempt.participant ? { status: final.attempt.participant.status, researchCode: final.attempt.participant.researchCode } : null } })),
+        publications,
+        attendanceRows, attendanceSlice, sourceFinalCount, sourceAttendanceCount }))),
+      compute: async (): Promise<SurveySourceProjection> => {
     // Validate each immutable Publication once per RepeatableRead snapshot.
     // Never reserialize its entire frozen JSON for every participant FINAL.
     const verifiedSnapshots=new Map<string,ResearchFrozenPublication>()
@@ -344,19 +421,6 @@ export async function loadSurveySource(input:{
         invalid('冻结研究发布定义摘要不匹配')
       verifiedSnapshots.set(publication.id,snapshot)
     }
-    // A linked participant may have STARTED but not FINAL at T2. Preserve
-    // that distinction from NO_WAVE without decrypting incomplete answers.
-    const attendanceRows=input.includeAttendance===false||input.attendanceOnly?[]:await tx.surveyWaveAttempt.findMany({
-      where:{
-        projectId:input.projectId,
-        ...(input.waveIds?.length?{waveId:{in:input.waveIds}}:{}),
-        participantId:{not:null},
-      },
-      select:{waveId:true,status:true,excludedAt:true,
-        sampleReview:{select:{verdict:true}},
-        participant:{select:{researchCode:true,status:true}}},
-      take:5001,
-    })
     if(attendanceRows.length>5000)
       throw new SurveyAnalyticsError(413,'研究进度数据超出单次读取上限，请缩小波次范围')
     let attendance:SurveySourceProjection['attendance']=attendanceRows.filter(row=>
@@ -403,54 +467,17 @@ export async function loadSurveySource(input:{
         scoreColumns.push(...frozenScoreColumns(input.projectId,wave.id,wave.ordinal,frozen))
       }
     }
-    let sourceAttendanceCount:number|null=null
-    let nextAttendanceCursor:string|null=null
-    if(input.includeAttendanceCount||input.attendanceOnly){
-      if(!input.pageMode||input.waveIds?.length!==1||
-          (!input.attendanceOnly&&!input.includeWideSchema))
-        throw new SurveyAnalyticsError(400,'参与状态游标只允许已冻结的单波次分页数据')
-      // Only incomplete / quality-excluded linked attempts need synthetic Long
-      // rows. COMPLETED included FINALs are already emitted by the FINAL pass.
-      // Pin the candidate set to the first page's exclusive time watermark.
-      const candidates:Prisma.SurveyWaveAttemptWhereInput={
-        projectId:input.projectId,waveId:input.waveIds![0],
-        participantId:{not:null},excludedAt:null,startedAt:{lt:cutOff},
-        participant:{is:{status:{not:'WITHDRAWN'}}},
-        OR:[{status:{not:'COMPLETED'}},
-          {sampleReview:{is:{verdict:'EXCLUDED'}}}],
-      }
-      sourceAttendanceCount=await tx.surveyWaveAttempt.count({where:candidates})
-      if(sourceAttendanceCount>25000)
-        throw new SurveyAnalyticsError(413,'单波次非 FINAL 参与记录超过 25000 条分页预算')
-      if(input.expectedAttendanceCount!==undefined&&
-        input.expectedAttendanceCount!==sourceAttendanceCount)
-        throw new SurveyAnalyticsError(409,'分批期间未完成参与样本数量已变化，请重新开始')
-      if(input.attendanceOnly){
-        // Bound synthetic rows to ~6000 item/score cells per response page.
-        // Never materialize the whole participant matrix in memory.
-        const variableCount=Math.max(1,codebook.size,scoreColumns.length)
-        // V4 compact attendance needs one row per participant rather than one
-        // synthetic row per frozen variable. V3 retains its prior row bound.
-        const pageSize=input.includeWideSchema
-          ?Math.max(1,Math.min(250,Math.floor(6000/variableCount)))
-          :250
-        const page=await tx.surveyWaveAttempt.findMany({
-          where:{...candidates,...(input.attendanceAfterId
-            ?{id:{gt:input.attendanceAfterId}}:{})},
-          orderBy:{id:'asc'},take:pageSize+1,
-          select:{id:true,waveId:true,status:true,
-            sampleReview:{select:{verdict:true}},
-            participant:{select:{researchCode:true}}},
-        })
-        const selected=page.slice(0,pageSize)
-        attendance=selected.map(row=>({
-          researchCode:row.participant!.researchCode,waveId:row.waveId,
-          status:row.sampleReview?.verdict==='EXCLUDED'?'QUALITY_EXCLUDED':row.status,
-        }))
-        nextAttendanceCursor=page.length>pageSize?selected.at(-1)!.id:null
-      }
+    let nextAttendanceCursor: string | null = null
+    if (input.attendanceOnly) {
+      const variableCount = Math.max(1, codebook.size, scoreColumns.length)
+      const pageSize = input.includeWideSchema ? Math.max(1, Math.min(250, Math.floor(6000 / variableCount))) : 250
+      const selected = attendanceSlice.slice(0, pageSize)
+      attendance = selected.map(row => ({ researchCode: row.participant!.researchCode, waveId: row.waveId,
+        status: row.sampleReview?.verdict === 'EXCLUDED' ? 'QUALITY_EXCLUDED' : row.status }))
+      nextAttendanceCursor = attendanceSlice.length > pageSize ? selected.at(-1)!.id : null
     }
     for(const final of finals){
+      await new Promise<void>(resolve => setImmediate(resolve))
       const wave=final.wave,attempt=final.attempt
       const publication=publicationById.get(final.publicationId)
       if(!publication)throw new SurveyAnalyticsError(409,'研究 FINAL 的不可变发布来源缺失')
@@ -550,5 +577,7 @@ export async function loadSurveySource(input:{
       cutOff:cutOff.toISOString(),nextFinalCursor,sourceFinalCount,
       sourceAttendanceCount,nextAttendanceCursor,
       scores,scoreColumns,raw,codebook:[...codebook.values()],attendance}
+      },
+    }
   },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead})
 }

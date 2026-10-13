@@ -41,7 +41,7 @@ with tempfile.TemporaryDirectory(prefix='campus-ci-') as temp:
    frozen.append(line)
   dockerfile=Path(temp)/(component+'.Dockerfile');dockerfile.write_text('\n'.join(frozen)+'\n')
   args=['docker','buildx','build','--load','-f',str(dockerfile),'--label','org.opencontainers.image.revision='+p['head']]
-  args+=['--build-arg','VITE_COGNITIVE_MODULE_ENABLED=true'] if component=='frontend' else ['--build-arg','DEBIAN_MIRROR=mirrors.tuna.tsinghua.edu.cn']
+  args+=['--build-arg','VITE_COGNITIVE_MODULE_ENABLED=true'] if component=='frontend' else ['--build-arg','DEBIAN_MIRROR=deb.debian.org']
   phase(component+'-compile',lambda:run(args+['--target','build','-t',builder,context]))
   if component=='frontend':
    changed=[e['file'].removeprefix(context+'/') for e in p['changes'] if e['file'].startswith(context+'/') and e['file'].endswith(('.ts','.tsx'))]

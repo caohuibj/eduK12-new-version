@@ -162,14 +162,7 @@ on those machines after this change.
 
 ### Beijing production host: download and maintenance notes
 
-The production server is in Beijing. Server maintenance, release builds and local
-runner downloads must default to verified mainland mirrors or the existing
-controlled acceleration path. Use the configured Tencent container registry
-accelerator, `https://registry.npmmirror.com` for npm/native binaries, Tsinghua
-`debian`/`debian-security` for Debian, and the verified
-`https://mirrors.aliyun.com/alpine` source for Alpine security updates. The official
-Alpine CDN was slow inside the release builder; the Tsinghua Alpine endpoint
-returned HTTP 403 in that same container, while Aliyun served the signed index.
+Only the Beijing production server uses verified mainland mirrors or the existing controlled acceleration path: trusted container acceleration, npm/native mirrors, Tsinghua Debian and verified Alpine mirrors. GitHub Actions always uses official sources, including self-hosted runners and production image build stages. Local development also uses official sources. The maintained iron rule is in docs/release/README.md.
 
 Keep package/base-image versions, lockfile integrity, official package signing
 keys, TLS verification and HIGH/CRITICAL scan thresholds. Continue runtime security
@@ -308,10 +301,12 @@ component regression. Repeated ready events are unnecessary: publish the frozen 
 and make it ready before the initial classification starts when local scoped checks
 have already passed.
 
-Production image CI passes the existing `DEBIAN_MIRROR` build argument for API and
-worker to `mirrors.tuna.tsinghua.edu.cn`; Debian archive signatures and the existing
-runtime refresh/security scans remain required. Frontend/npm sources are unchanged.
+GitHub image CI passes the existing `DEBIAN_MIRROR` build argument for API and
+worker to official `deb.debian.org`; Debian archive signatures and the existing
+runtime refresh/security scans remain required. GitHub npm uses the official registry with explicit lockfile-host replacement; dependency versions and integrity stay unchanged.
 The exact two mirror argument/verification insertions in `ci-image-plan.mjs` and its
 existing tests may accompany dependencies CI. The router compares the complete
 executable file against the PR base after removing only those exact insertions;
 other image-plan edits still select platform checks. Validate image-only first.
+
+Download source iron rule (2026-10-13): only the production server uses trusted mainland mirrors. Every GitHub runner/workflow/build stage uses official sources. npm registry and lockfile host replacement are explicit; versions, integrity, TLS and signatures remain mandatory. The complete maintained rule is docs/release/README.md.

@@ -1,7 +1,7 @@
 const { get, post } = require('../utils/request')
 
-function getMyCourses() {
-  return get('/api/courses/my')
+function getMyCourses(cursor) {
+  return get('/api/courses/my' + (cursor ? '?cursor=' + encodeURIComponent(cursor) : ''))
 }
 
 function getCourseDetail(id) {
