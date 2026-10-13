@@ -110,7 +110,14 @@ for meta in sorted(api('/actions/artifacts?per_page=30')['artifacts'],key=lambda
  old_test=git('show',old['head']+':.github/scripts/teacher-survey-contracts.test.tsx').decode();(e/'previous-contract.tsx').write_text(old_test)
  with zipfile.ZipFile(archive) as zipped:
   if 'teacher-survey-evidence/contracts.json' in zipped.namelist():(e/'previous-contracts.json').write_bytes(zipped.read('teacher-survey-evidence/contracts.json'))
- reuse=old;c['proof']['candidatePhases']={'artifactId':meta['id'],'runId':producer['id'],'digest':meta['digest'],'source':old['head']};break
+ reuse=old;c['proof']['candidatePhases']={'artifactId':meta['id'],'runId':producer['id'],'digest':meta['digest'],'source':old['head']}
+ if old.get('image'):
+  with zipfile.ZipFile(archive) as zipped:
+   if 'teacher-survey-evidence/scan.json' in zipped.namelist():
+    raw=zipped.read('teacher-survey-evidence/scan.json');scan=json.loads(raw);assert scan['Metadata']['ImageID']==old['image']
+    assert not [v for result in scan.get('Results',[]) for v in result.get('Vulnerabilities',[]) if v['Severity'] in ['HIGH','CRITICAL'] and v.get('FixedVersion')]
+    (e/'scan.json').write_bytes(raw);c['proof']['scan']={'status':'REUSED','imageId':old['image'],'scanSha256':sha(raw),'source':c['proof']['candidatePhases']}
+ break
 
 def archive_images():
  ids=[c['builder']]+([c['image']] if c.get('image') else [])
