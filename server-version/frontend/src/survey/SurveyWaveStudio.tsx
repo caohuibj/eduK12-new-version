@@ -66,7 +66,7 @@ const localTime=(raw:string|null)=>{
   const date=new Date(raw)
   return new Date(date.getTime()-date.getTimezoneOffset()*60000).toISOString().slice(0,16)
 }
-export function SurveyWaveStudio({projectId}:{projectId:string}){
+export function SurveyWaveStudio({projectId,instrumentsRevision=0}:{projectId:string;instrumentsRevision?:number}){
   const path='/projects/'+projectId
   const [waves,setWaves]=useState<Wave[]>([]),[tools,setTools]=useState<Instrument[]>([])
   const [details,setDetails]=useState<Record<string,InstrumentDetails>>({})
@@ -91,6 +91,15 @@ export function SurveyWaveStudio({projectId}:{projectId:string}){
   useEffect(()=>{setEditing(null);setReady(null);setShareLink('');setForm(initial());setDetails({})
     void refresh().catch(e=>setError(message(e)))
   },[projectId])
+  useEffect(()=>{
+    if(instrumentsRevision===0)return
+    let current=true
+    // Update the library without discarding the user's unsaved wave settings.
+    void surveyApi<{list:Instrument[]}>(path+'/instruments?page='+toolPage)
+      .then(result=>{if(current)setTools(result.list)})
+      .catch(e=>{if(current)setError(message(e))})
+    return()=>{current=false}
+  },[path,instrumentsRevision,toolPage])
   const act=async(action:()=>Promise<void>)=>{
     setError('');setNotice('');setBusy(true)
     try{await action()}catch(e){setError(message(e))}finally{setBusy(false)}

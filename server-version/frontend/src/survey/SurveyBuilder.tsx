@@ -38,7 +38,7 @@ async function api<T>(path:string,method='GET',payload?:unknown):Promise<T>{
   return data.data as T
 }
 const displayKind:Record<Kind,string>={FORM:'Form · 表单',SCALE:'Scale · 量表',SJT:'SJT · 情境判断'}
-export function SurveyBuilder({projectId}:{projectId:string}){
+export function SurveyBuilder({projectId,onInstrumentsChanged}:{projectId:string;onInstrumentsChanged?:()=>void}){
   const prefix='/projects/'+encodeURIComponent(projectId)+'/instruments'
   const [instruments,setInstruments]=useState<Summary[]>([])
   const [instrumentPage,setInstrumentPage]=useState(1)
@@ -52,10 +52,11 @@ export function SurveyBuilder({projectId}:{projectId:string}){
   const [bulkTargetPageKey,setBulkTargetPageKey]=useState('')
   const [bulk,setBulk]=useState<{batch:BulkBatch;result:BulkResult}|null>(null)
   const [undo,setUndo]=useState<{definition:Definition;title:string}|null>(null)
-  const refreshList=useCallback(async(page=1)=>{
+  const refreshList=useCallback(async(page=1,notify=false)=>{
     const r=await api<{list:Summary[]}>(prefix+'?page='+page)
     setInstruments(r.list);setInstrumentPage(page)
-  },[prefix])
+    if(notify)onInstrumentsChanged?.()
+  },[prefix,onInstrumentsChanged])
   useEffect(()=>{setActive(null);setPreview(null);setError('');setBulk(null);void refreshList().catch(e=>{
     setError(e instanceof Error?e.message:'研究工具列表无法加载')})},[refreshList])
   const run=async(task:()=>Promise<void>)=>{
@@ -75,7 +76,7 @@ export function SurveyBuilder({projectId}:{projectId:string}){
     const item=await api<ResearchDraft>(prefix,'POST',{
       requestId:crypto.randomUUID(),instrumentKey:researchKey('i'),kind:newKind,title:newTitle.trim(),
     })
-    await refreshList(1);setActive(item);setDirty(false);setPreview(null);setBulk(null);setNewTitle('')
+    await refreshList(1,true);setActive(item);setDirty(false);setPreview(null);setBulk(null);setNewTitle('')
     setNotice('已创建研究专用草稿，尚未进入正式测评目录')
   })}
   const change=(definition:Definition)=>{
@@ -87,7 +88,7 @@ export function SurveyBuilder({projectId}:{projectId:string}){
       revision:snapshot.revision,title:snapshot.title,definition:snapshot.definition,
     })
     setActive(updated);setDirty(false);setPreview(null);setBulk(null);setUndo(null)
-    await refreshList(instrumentPage);setNotice('草稿已保存；发布冻结将在研究波次阶段执行')
+    await refreshList(instrumentPage,true);setNotice('草稿已保存；发布冻结将在研究波次阶段执行')
   })}
   const validate=()=>{if(!active||dirty)return;void run(async()=>{
     const result=await api<Preview>(prefix+'/'+active.id+'/validate','POST',{})
@@ -113,13 +114,13 @@ export function SurveyBuilder({projectId}:{projectId:string}){
     const r=await api<ResearchDraft>(prefix+'/'+active.id+'/copy','POST',{
       requestId:crypto.randomUUID(),instrumentKey:researchKey('i'),title:active.title+'（副本）',
     })
-    await refreshList();setActive(r);setDirty(false);setPreview(null);setBulk(null)
+    await refreshList(1,true);setActive(r);setDirty(false);setPreview(null);setBulk(null)
     setNotice('已复制为新的独立研究工具，不能仅凭同名假定纵向可比')
   })}
   const archive=()=>{if(!active)return;void run(async()=>{
     await api(prefix+'/'+active.id+'/archive','POST',{revision:active.revision})
     setActive(null);setDirty(false);setPreview(null);setBulk(null)
-    await refreshList(instrumentPage);setNotice('草稿已归档')
+    await refreshList(instrumentPage,true);setNotice('草稿已归档')
   })}
   const bulkPreview=()=>{if(!active||dirty)return;void run(async()=>{
     const batch:BulkBatch={batchId:crypto.randomUUID(),format:bulkFormat,content:bulkText,
@@ -134,14 +135,14 @@ export function SurveyBuilder({projectId}:{projectId:string}){
       revision:active.revision,digest:bulk.result.digest,batch:bulk.batch,
     })
     setUndo(before);setActive(updated);setDirty(false);setBulk(null);setPreview(null)
-    await refreshList(instrumentPage);setNotice('整批题目已导入。若需撤销，可使用撤销本次导入。')
+    await refreshList(instrumentPage,true);setNotice('整批题目已导入。若需撤销，可使用撤销本次导入。')
   })}
   const undoImport=()=>{if(!active||!undo)return;void run(async()=>{
     const updated=await api<ResearchDraft>(prefix+'/'+active.id,'PATCH',{
       revision:active.revision,title:undo.title,definition:undo.definition,
     })
     setUndo(null);setActive(updated);setPreview(null);setDirty(false)
-    await refreshList(instrumentPage);setNotice('已撤销上一批导入')
+    await refreshList(instrumentPage,true);setNotice('已撤销上一批导入')
   })}
   return <section className="bg-white border rounded-xl p-4 sm:p-6 my-5 space-y-5" aria-label="Survey Research Builder">
     <header><h2 className="text-xl font-semibold">研究工具 · Builder</h2>

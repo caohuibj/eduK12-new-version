@@ -1,0 +1,78 @@
+{
+  "baseHead": "31394768036b02cba3e5f8b097ad72bddf9908e1",
+  "logo": {
+    "selection": "W2 数据之风",
+    "source": "https://drive.google.com/file/d/11EgH4bYHlooDgx_hlqBxXEomIpzc-6uD/view",
+    "authority": "https://app.notion.com/p/3f4d27635a38813a89a0e9740467da1d",
+    "sourceSha256": "3897fada79dd77eed9bd39f3146b1bd85c3da100f879c5c56ec70dc721337453",
+    "sourceDimensions": [
+      1180,
+      470
+    ],
+    "cropBox": [
+      891,
+      79,
+      1107,
+      263
+    ],
+    "processing": "Exact pixel crop, original colors and background preserved",
+    "vectorMaster": false,
+    "rasterCrop": {
+      "filename": "huisurvey-w2-emblem.png",
+      "width": 216,
+      "height": 184,
+      "bytes": 46298,
+      "sha256": "758f412f397a0142f236e0f9de50cb24942175081d7f556a51058ae0889868f2"
+    },
+    "asset": {
+      "filename": "huisurvey-w2-emblem.svg",
+      "bytes": 131232,
+      "sha256": "7c9582bb49f465d7a48191c47034b6feb730007f88ee6d7f05a83c38dfb21455",
+      "viewBox": "0 0 216 184",
+      "pathCount": 330,
+      "embeddedRaster": false
+    },
+    "conversion": {
+      "method": "vtracer 0.6.15, isolated Python 3.11, color spline paths",
+      "backgroundMask": "Only pale background RGB > (224,231,239) made transparent",
+      "preserved": "Original W2 outline, airflow paths, observation dots, data bars and H negative space",
+      "status": "Working vector trace derived from the authoritative concept raster; not an independently authored original vector master",
+      "parameters": {
+        "filterSpeckle": 1,
+        "colorPrecision": 8,
+        "layerDifference": 6,
+        "cornerThreshold": 90,
+        "lengthThreshold": 3,
+        "maxIterations": 15,
+        "spliceThreshold": 45,
+        "pathPrecision": 4
+      }
+    }
+  },
+  "hero": {
+    "method": "Built-in image_gen generation; independent artwork without UI, logo or text",
+    "original": {
+      "filename": "wind-observation-original.png",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 1700783,
+      "sha256": "3eaf77fcaf0fbbf5978834d721a8b594df4819cae913bd887d1bc1da2064ebc6"
+    },
+    "exports": [
+      {
+        "filename": "wind-observation.webp",
+        "width": 1536,
+        "height": 1024,
+        "bytes": 91862,
+        "sha256": "0aa01932c58140afc0d51df469144ddff6dd1593e8158d85fadb34e1792f4ef6"
+      },
+      {
+        "filename": "wind-observation-small.webp",
+        "width": 768,
+        "height": 512,
+        "bytes": 24592,
+        "sha256": "a2e95e6a83293305270d5b777cf8c78617b5c08406072c5fd4ff08da367edacc"
+      }
+    ]
+  }
+}
