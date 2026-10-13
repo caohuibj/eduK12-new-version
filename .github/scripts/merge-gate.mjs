@@ -10,6 +10,7 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if (scope.application_route === 'survey-home') return ['scope','survey-home','codeql'];
   if (scope.application_route === 'homepage-copy') {
     let p; try { p=JSON.parse(scope.homepage_copy_plan); } catch {}
     return ['scope',...(!draft ? ['homepage-copy',...(p?.toolsChanged ? ['codeql'] : [])] : [])];
@@ -51,6 +52,16 @@ export function requiredChecks(needs, draft) {
 export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if (scope.application_route === 'survey-home') {
+    let p;try{p=JSON.parse(scope.survey_home_plan);}catch{}
+    if(draft||!p||p.schema!==1||p.route!=='survey-home'||scope.scenario!=='survey-home'||scope.codeql!=='true'
+      ||JSON.stringify(p.changed)!==JSON.stringify(['frontend'])||!/^[a-f0-9]{40}$/.test(p.base||'')
+      ||!/^[a-f0-9]{40}$/.test(p.head||'')||!/^[a-f0-9]{40}$/.test(p.frontendTree||'')
+      ||!Array.isArray(p.changes)||!p.changes.length
+      ||JSON.stringify(p.required)!==JSON.stringify(['survey-entry-contracts','frontend-candidate','runtime-scan','survey-browser','sast'])
+      ||Object.keys(acceptanceJobs).some(k=>scope[k]!=='false'))failed.push('scope');
+    return [...new Set(failed)];
+  }
   if (scope.application_route === 'homepage-copy') {
     let p; try { p=JSON.parse(scope.homepage_copy_plan); } catch {}
     if (!p || p.schema!==1 || p.route!=='homepage-copy' || scope.scenario!=='homepage-copy'
@@ -113,6 +124,13 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     const actual=plan(p.base,p.head);
     if (JSON.stringify(actual) !== JSON.stringify(p)) failed.push('recomputed-plan');
     if (needs.scope.outputs.scenario==='release-tooling' && (actual.route!=='C' || actual.changed.length || !toolingOnly(actual.changes))) failed.push('mixed-or-unknown-tooling');
+  }
+  if(needs.scope?.outputs?.application_route==='survey-home'){
+    const {surveyHomePlan}=await import('./survey-home-scope.mjs');
+    const {changedEntries}=await import('./content-scope.mjs');
+    const {execFileSync}=await import('node:child_process');
+    const p=JSON.parse(needs.scope.outputs.survey_home_plan),head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+    if(p.head!==head||JSON.stringify(surveyHomePlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-survey-home-plan');
   }
   if(needs.scope?.outputs?.application_route==='campus'){
     const {campusPlan}=await import('./campus-scope.mjs');const {changedEntries}=await import('./content-scope.mjs');

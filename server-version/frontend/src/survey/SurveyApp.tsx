@@ -3,6 +3,10 @@ import { QRCodeSVG } from 'qrcode.react'
 import { SurveyBuilder } from './SurveyBuilder'
 import { SurveyWaveStudio } from './SurveyWaveStudio'
 import { SurveyAnalyticsWorkspace } from './SurveyAnalyticsWorkspace'
+import { SurveyBrand } from './SurveyBrand'
+import { SurveyLanding } from './SurveyLanding'
+import { SurveyFeaturePage } from './SurveyFeaturePage'
+import { surveyFeatures } from './survey-features'
 
 type Envelope<T>={code:number|string;message:string;data:T}
 type Researcher={id:string;username:string}
@@ -29,8 +33,12 @@ async function api<T>(path:string,method='GET',body?:unknown):Promise<T>{
 }
 const readInvite=()=>new URLSearchParams(window.location.hash.slice(1)).get('token')||''
 export default function SurveyApp(){
-  const initial=window.location.pathname==='/claim'?'claim':window.location.pathname==='/reset-password'?'reset':'login'
-  const [screen,setScreen]=useState<'claim'|'reset'|'login'|'mfa'|'work'>(initial)
+  // Keep the entry stable when activation removes its one-time token from the URL.
+  const [initial]=useState<'home'|'feature'|'claim'|'reset'|'login'>(()=>
+    window.location.pathname==='/'?'home':window.location.pathname==='/claim'?'claim':window.location.pathname==='/reset-password'?'reset':
+      surveyFeatures.some(feature=>feature.path===window.location.pathname)?'feature':'login')
+  const activeFeature=surveyFeatures.find(feature=>feature.path===window.location.pathname)
+  const [screen,setScreen]=useState<'home'|'feature'|'claim'|'reset'|'login'|'mfa'|'work'>(initial)
   const [loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[enrolled,setEnrolled]=useState(true)
   const [user,setUser]=useState<Researcher|null>(null)
   const [username,setUsername]=useState(''),[password,setPassword]=useState(''),[code,setCode]=useState('')
@@ -39,6 +47,8 @@ export default function SurveyApp(){
   const [projects,setProjects]=useState<Project[]>([]),[selected,setSelected]=useState<Project|null>(null)
   const [projectPage,setProjectPage]=useState(1)
   const [available,setAvailable]=useState<{analytics:boolean;publication:boolean}|null>(null)
+  const [instrumentsRevision,setInstrumentsRevision]=useState(0)
+  const instrumentsChanged=useCallback(()=>setInstrumentsRevision(value=>value+1),[])
   const [title,setTitle]=useState(''),[description,setDescription]=useState('')
   const [mode,setMode]=useState<Project['collectionMode']>('SINGLE_UNLINKED')
   const work=async(fn:()=>Promise<void>)=>{setBusy(true);setError('');setNotice('')
@@ -50,15 +60,18 @@ export default function SurveyApp(){
   const refresh=useCallback(async()=>{
     try{
       const me=await api<Researcher>('/auth/me')
-      setUser(me);await loadProjects();setScreen('work')
+      setUser(me)
+      if(initial==='home'||initial==='feature')setScreen(initial)
+      else {await loadProjects();setScreen('work')}
     }catch{setUser(null);if(initial==='login')setScreen('login')}
     finally{setLoading(false)}
   },[initial,loadProjects])
-  useEffect(()=>{document.title='Huisurvey · 观风知微';void refresh()},[refresh])
+  useEffect(()=>{document.title=activeFeature?activeFeature.title+' | Huisurvey':'Huisurvey · 观风知微';void refresh()},[refresh,activeFeature])
   useEffect(()=>{
+    if(initial==='home'||initial==='feature')return
     void api<{analytics:boolean;publication:boolean}>('/auth/capabilities')
       .then(setAvailable).catch(()=>setAvailable(null))
-  },[])
+  },[initial])
   const login=(e:FormEvent)=>{e.preventDefault();void work(async()=>{
     const r=await api<{enrolled:boolean}>('/auth/login','POST',{username,password})
     setEnrolled(r.enrolled);setScreen('mfa');setPassword('');setUri('');setCode('')
@@ -89,7 +102,7 @@ export default function SurveyApp(){
     const p=await api<Project>('/projects','POST',{requestId:crypto.randomUUID(),title,description,collectionMode:mode})
     await loadProjects(1);choose(p);setNotice('研究草稿已创建')
   })}
-  const choose=(p:Project)=>{setSelected(p);setTitle(p.title);setDescription(p.description);setMode(p.collectionMode)}
+  const choose=(p:Project)=>{setSelected(p);setTitle(p.title);setDescription(p.description);setMode(p.collectionMode);setInstrumentsRevision(0)}
   const save=(e:FormEvent)=>{e.preventDefault();if(!selected)return;void work(async()=>{
     const p=await api<Project>('/projects/'+selected.id,'PATCH',
       {revision:selected.revision,title,description,collectionMode:mode})
@@ -103,10 +116,11 @@ export default function SurveyApp(){
   const field=(label:string,value:string,change:(value:string)=>void,type='text')=>
     <label className="block my-3 text-sm">{label}<input className="input block mt-1 w-full" required
       type={type} autoComplete={type==='password'?'off':'on'} value={value} onChange={e=>change(e.target.value)}/></label>
+  if(screen==='home')return <SurveyLanding signedIn={user!==null}/>
+  if(screen==='feature'&&activeFeature)return <SurveyFeaturePage feature={activeFeature} signedIn={user!==null}/>
   return <div className="min-h-screen bg-slate-50 text-slate-800">
     <header className="border-b border-slate-200 bg-white"><div className="max-w-5xl mx-auto p-5 flex justify-between items-center">
-      <div><h1 className="text-2xl font-semibold">Huisurvey</h1>
-        <p className="text-sm text-slate-500">观风知微 · 心理与教育研究平台</p></div>
+      <SurveyBrand/>
       {user&&<button className="btn-secondary" disabled={busy} onClick={logout}>退出</button>}
     </div></header>
     <main className="max-w-4xl mx-auto px-4 py-8">
@@ -121,6 +135,7 @@ export default function SurveyApp(){
           <button className="btn-primary" disabled={busy}>确认并绑定验证器</button></form>
       </section>}
       {!loading&&screen==='login'&&<section className="bg-white rounded-xl border p-6 my-4 max-w-xl mx-auto">
+        <a className="text-sm underline underline-offset-4" href="/">返回首页</a>
         <h2 className="text-xl font-semibold">Researcher 登录</h2>
         <p>研究者仅由系统管理员邀请开通，账户与培训和校园系统相互独立。</p>
         <form onSubmit={login}>{field('研究者登录名',username,setUsername)}
@@ -173,7 +188,7 @@ export default function SurveyApp(){
           <div className="flex flex-wrap gap-3 mt-4"><button className="btn-primary" disabled={busy||(selected!==null&&selected.status!=='DRAFT')}>{selected?'保存修改':'创建研究'}</button>
             {selected&&<button type="button" className="btn-secondary" onClick={()=>{setSelected(null);setTitle('');setDescription('')}}>新建其他项目</button>}</div>
         </form><p className="text-sm text-slate-500 mt-4">研究工具编辑、研究专用发布、匿名参与与科研分析可按功能开关使用；正式生产开通须完成独立部署验收。</p>
-      </section>{selected&&<><SurveyBuilder key={'builder-'+selected.id} projectId={selected.id}/><SurveyWaveStudio key={'waves-'+selected.id} projectId={selected.id}/>
+      </section>{selected&&<><SurveyBuilder key={'builder-'+selected.id} projectId={selected.id} onInstrumentsChanged={instrumentsChanged}/><SurveyWaveStudio key={'waves-'+selected.id} projectId={selected.id} instrumentsRevision={instrumentsRevision}/>
           {available?.analytics
             ?<SurveyAnalyticsWorkspace key={'analysis-'+selected.id} projectId={selected.id}/>
             :<section className="rounded-xl border bg-white p-4" aria-label="研究数据状态">

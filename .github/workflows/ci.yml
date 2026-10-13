@@ -217,6 +217,7 @@ jobs:
       release_plan: ${{ steps.scope.outputs.release_plan }}
       campus_plan: ${{ steps.scope.outputs.campus_plan }}
       homepage_copy_plan: ${{ steps.scope.outputs.homepage_copy_plan }}
+      survey_home_plan: ${{ steps.scope.outputs.survey_home_plan }}
       frontend: ${{ steps.scope.outputs.frontend }}
       frontend_test: ${{ steps.scope.outputs.frontend_test }}
       documentation: ${{ steps.scope.outputs.documentation }}
@@ -291,6 +292,10 @@ jobs:
         env:
           CI_BASE_SHA: ${{ fromJSON(steps.scope.outputs.homepage_copy_plan).base }}
         run: node --test .github/scripts/homepage-copy.test.mjs .github/scripts/campus-scope.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/maintenance-routing.test.mjs .github/scripts/dependency-routing.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs
+
+      - name: Survey exact patch routing and fail-closed merge contracts
+        if: steps.scope.outputs.application_route == 'survey-home' && github.event_name == 'pull_request'
+        run: node --test .github/scripts/survey-home.test.mjs
 
       - name: campus routing and fail-closed merge contracts
         if: steps.scope.outputs.application_route == 'campus' && github.event_name == 'pull_request'
@@ -579,7 +584,7 @@ jobs:
     name: codeql (javascript/typescript SAST)
     # Static analysis runs independently; the aggregate gate still requires frontend.
     needs: scope
-    if: ${{ !cancelled() && ((((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.codeql == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) && needs.scope.outputs.application_route == 'legacy') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'homepage-copy' && fromJSON(needs.scope.outputs.homepage_copy_plan).toolsChanged) || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'campus') || (github.event_name == 'pull_request' && (needs.scope.outputs.application_route == 'A' || needs.scope.outputs.application_route == 'B') && contains(fromJSON(needs.scope.outputs.release_plan).required, 'sast'))) }}
+    if: ${{ !cancelled() && ((((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.codeql == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) && needs.scope.outputs.application_route == 'legacy') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'homepage-copy' && fromJSON(needs.scope.outputs.homepage_copy_plan).toolsChanged) || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'survey-home') || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'campus') || (github.event_name == 'pull_request' && (needs.scope.outputs.application_route == 'A' || needs.scope.outputs.application_route == 'B') && contains(fromJSON(needs.scope.outputs.release_plan).required, 'sast'))) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     permissions:
@@ -598,7 +603,7 @@ jobs:
         with:
           languages: javascript-typescript
           config: >-
-            ${{ needs.scope.outputs.application_route == 'homepage-copy' && 'paths: [.github/scripts/homepage-copy-scope.mjs, .github/scripts/homepage-copy-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.scenario == 'release-tooling' && 'paths: [.github/scripts, server-version/scripts/release]' || '' }}
+            ${{ needs.scope.outputs.application_route == 'survey-home' && 'paths: [server-version/frontend/src/survey, .github/scripts/survey-home-scope.mjs, .github/scripts/survey-home-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'homepage-copy' && 'paths: [.github/scripts/homepage-copy-scope.mjs, .github/scripts/homepage-copy-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.scenario == 'release-tooling' && 'paths: [.github/scripts, server-version/scripts/release]' || '' }}
           # Bound analysis resources on the hosted Ubuntu VM.
           ram: 3500
           threads: 2
@@ -735,9 +740,16 @@ jobs:
     with:
       plan: ${{ needs.scope.outputs.homepage_copy_plan }}
 
+  survey-home:
+    needs: scope
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-home'
+    uses: ./.github/workflows/ci-survey-home.yml
+    with:
+      plan: ${{ needs.scope.outputs.survey_home_plan }}
+
   merge-gate:
     name: merge gate / ready PR
-    needs: [scope, maintenance, documentation, content, visual, pr-light-backend, pr-light-frontend, backend, backend-browser-build, backend-regression, frontend-build, frontend, browser, docker, codeql, miniprogram, accept-media, accept-ui, accept-visual, accept-perf, accept-ops, scoped-release, homepage-copy, release-tools, campus]
+    needs: [scope, maintenance, documentation, content, visual, pr-light-backend, pr-light-frontend, backend, backend-browser-build, backend-regression, frontend-build, frontend, browser, docker, codeql, miniprogram, accept-media, accept-ui, accept-visual, accept-perf, accept-ops, scoped-release, homepage-copy, release-tools, campus, survey-home]
     if: ${{ always() && (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 8

@@ -1,0 +1,59 @@
+name: Survey frontend candidate
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+jobs:
+  candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      CI: 'true'
+      PLAN: ${{ inputs.plan }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --prefix .github/release-tools
+      - name: recheck exact diff and frontend-only plan
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {writeFileSync} from 'node:fs';
+          import {execFileSync} from 'node:child_process';
+          import {surveyHomePlan} from './.github/scripts/survey-home-scope.mjs';
+          import {changedEntries} from './.github/scripts/content-scope.mjs';
+          const p=JSON.parse(process.env.PLAN),head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+          assert.equal(p.head,head);
+          assert.deepEqual(p,surveyHomePlan(changedEntries(p.base,head),p.base,head));
+          writeFileSync('survey-home-plan.json',JSON.stringify(p,null,2));
+          JS
+      - uses: docker/setup-buildx-action@v3
+      - name: build changed frontend once and check only affected source
+        run: python3 -B .github/scripts/survey-home-candidate.py
+      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        with:
+          version: v0.70.0
+          cache: false
+      - name: scan the actual frontend runtime image at existing thresholds
+        run: trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output survey-home-evidence/scan.json eduk12-survey-home:${{ github.sha }}
+      - name: install pinned Chromium
+        run: node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
+      - name: Survey responsive layout, introductions and login links on the same scanned image
+        run: node .github/scripts/survey-home-browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: survey-home-${{ github.sha }}
+          path: |
+            survey-home-plan.json
+            survey-home-evidence/
+          if-no-files-found: error
+          retention-days: 3
