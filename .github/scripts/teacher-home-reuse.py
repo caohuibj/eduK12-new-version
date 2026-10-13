@@ -13,7 +13,7 @@ def fingerprint(text):
    if isinstance(n.func,ast.Attribute) and isinstance(n.func.value,ast.Name) and n.func.value.id=='config' and n.func.attr=='write_text':items.append(ast.dump(n,include_attributes=False))
    if isinstance(n.func,ast.Name) and n.func.id=='phase' and n.args and isinstance(n.args[0],ast.Constant) and n.args[0].value in ['affected-frontend-checks','six-existing-auth-contracts']:items.append(ast.dump(n,include_attributes=False))
  return hashlib.sha256('\n'.join(sorted(items)).encode()).hexdigest()
-def prerequisites(original_plan,checks,original,current):
+def prerequisites(plan,checks,original,current):
  if checks.get('components')!=plan['components']:return False
  phases=checks.get('phases',[])
  if any(len([p for p in phases if p.get('name')==name and p.get('status')=='success'])!=1 for name in EXPECTED):raise ValueError('missing or ambiguous prerequisite success')
