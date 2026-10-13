@@ -92,7 +92,7 @@ for meta in sorted(api('/actions/artifacts?per_page=30')['artifacts'],key=lambda
   if old.get('frontendTree')!=c['frontendTree'] or not old.get('builder'):continue
   run(['git','fetch','origin',old['head']],60)
   producer_source=git('show',old['head']+':.github/scripts/teacher-survey-candidate.py').decode()
-  if compiler_fingerprint(producer_source)!=c['compilerFingerprint']:continue
+  if compiler_fingerprint(producer_source)!=c['compilerFingerprint']:raise ValueError('Eligible same-source compiler proof mismatch; refusing a silent rebuild')
   assert output(['git','rev-parse',old['head']+':server-version/frontend'])==c['frontendTree']
   if not any(x['name']=='frontend-build-once' and x['status']=='success' for x in old['phases']):continue
   member='teacher-survey-evidence/images.tar.zst';assert member in zipped.namelist();zipped.extract(member,e/'previous')
