@@ -1,0 +1,68 @@
+name: Teacher Survey frozen frontend candidate
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+  actions: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+jobs:
+  candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      CI: 'true'
+      PLAN: ${{ inputs.plan }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - run: npm ci --ignore-scripts --prefix .github/release-tools
+      - name: frozen routing refusal and gate contracts
+        run: node --test .github/scripts/teacher-survey-scope.test.mjs
+      - name: recheck complete frozen diff
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {writeFileSync} from 'node:fs';
+          import {execFileSync} from 'node:child_process';
+          import {teacherSurveyPlan} from './.github/scripts/teacher-survey-scope.mjs';
+          import {changedEntries} from './.github/scripts/content-scope.mjs';
+          const p=JSON.parse(process.env.PLAN),head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+          assert.equal(p.head,head);assert.deepEqual(p,teacherSurveyPlan(changedEntries(p.base,head),p.base,head));
+          writeFileSync('teacher-survey-plan.json',JSON.stringify(p,null,2));
+          JS
+      - uses: docker/setup-buildx-action@v3
+      - name: official proof, frontend build once and affected contracts
+        run: python3 -B .github/scripts/teacher-survey-candidate.py
+      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        with:
+          version: v0.70.0
+          cache: false
+      - name: scan actual frontend image
+        run: trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output teacher-survey-evidence/scan.json eduk12-teacher-survey:${{ github.sha }}
+      - name: install pinned Chromium
+        run: node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
+      - name: affected runtime UI and WCAG
+        run: node .github/scripts/teacher-survey-browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: teacher-survey-${{ github.sha }}
+          path: |
+            teacher-survey-plan.json
+            teacher-survey-evidence/
+            !teacher-survey-evidence/previous/**
+            !teacher-survey-evidence/previous.zip
+          if-no-files-found: error
+          retention-days: 3
