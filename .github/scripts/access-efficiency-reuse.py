@@ -10,10 +10,12 @@ def fingerprint(plan, tool_refs=None, allow_transition=True):
     tools=['.github/scripts/access-efficiency-candidate.py','.github/scripts/access-efficiency-reuse.py','.github/workflows/ci-access-efficiency.yml']
     tool=sha(json.dumps([(f,(tool_refs or {}).get(f) or subprocess.check_output(['git','rev-parse',plan['head']+':'+f],text=True).strip()) for f in tools]).encode())
     builds={}; tests={}
+    candidate_source=subprocess.check_output(['git','show',plan['head']+':'+tools[0]])
+    backend_mirror='deb.debian.org' if b'DEBIAN_MIRROR=deb.debian.org' in candidate_source else 'mirrors.tuna.tsinghua.edu.cn'
     for component in ['frontend','backend']:
         entries=objects(plan['head'],'server-version/'+component)
         production=[entry for entry in entries if '/__tests__/' not in entry[0] and '.test.' not in entry[0] and '/src/test/' not in entry[0]]
-        builds[component]=sha(json.dumps([tool,production,{'node':'24.21.0','debianMirror':'mirrors.tuna.tsinghua.edu.cn','cognitiveBuild':'true'}]).encode())
+        builds[component]=sha(json.dumps([tool,production,{'node':'24.21.0','debianMirror':backend_mirror if component=='backend' else 'mirrors.tuna.tsinghua.edu.cn','cognitiveBuild':'true'}]).encode())
         shared=[entry for entry in entries if ('/__tests__/' in entry[0] or '/src/test/' in entry[0]) and '.test.' not in entry[0]]
         selected=plan['tests'] if component=='backend' else plan['frontendTests']
         for file in selected:
