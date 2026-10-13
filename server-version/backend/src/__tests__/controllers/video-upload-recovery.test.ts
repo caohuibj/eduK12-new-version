@@ -22,6 +22,7 @@ describe('persisted video survives an enqueue failure', () => {
     mocks.find.mockResolvedValue({ status: 'FAILED' })
     mocks.queue.mockRejectedValue(new Error('redis offline'))
     mocks.getJob.mockResolvedValue(null)
+    mocks.discard.mockResolvedValue(true)
     mocks.stat.mockResolvedValue({ size: 123, isFile: () => true })
   })
   afterEach(() => { vi.useRealTimers() })

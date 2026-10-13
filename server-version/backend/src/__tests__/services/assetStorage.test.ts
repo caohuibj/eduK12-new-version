@@ -226,7 +226,6 @@ describe('stored asset access boundary', () => {
     mockPrisma.storedAsset.findUnique.mockResolvedValue(privateAsset({
       ownerId: 'teacher-1',
       accessScope: 'COURSE',
-      ownerId: 'teacher-1',
       scopeId: 'course-1',
     }))
     mockCheckinValidate.mockResolvedValue({
