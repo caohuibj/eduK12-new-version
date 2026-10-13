@@ -425,8 +425,8 @@ export const authController = {
         return error(res, '请提供用户ID')
       }
 
-      const user = await prisma.user.findUnique({
-        where: { id: userId }
+      const user = await prisma.user.findFirst({
+        where: { id: userId, accountDomain: { in: ['LEGACY', 'TRAINING'] } },
       })
 
       if (!user) {
@@ -442,10 +442,14 @@ export const authController = {
       const newExpiresAt = new Date(currentExpiresAt)
       newExpiresAt.setMonth(newExpiresAt.getMonth() + months)
 
-      await prisma.user.update({
-        where: { id: userId },
-        data: { expiresAt: newExpiresAt }
+      const updated = await prisma.user.updateMany({
+        where: {
+          id: userId, accountDomain: { in: ['LEGACY', 'TRAINING'] },
+          role: UserRole.TEACHER, expiresAt: user.expiresAt,
+        },
+        data: { expiresAt: newExpiresAt },
       })
+      if (updated.count !== 1) return error(res, '账号状态已改变，请刷新后重试', -1, 409)
 
       return success(res, {
         userId,

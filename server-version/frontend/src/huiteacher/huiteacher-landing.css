@@ -1,0 +1,144 @@
+/* Public Teacher pages: a working journal in the Hui family of paper, light and quiet typography. */
+.ht-app-public{--ht-bg:#fcfaf6;--ht-paper:#fffefb;--ht-ink:#493d34;--ht-quiet:#73675e;--ht-copper:#a34f2e;--ht-line:#e5dbd0;display:flex;flex-direction:column;min-height:100svh;background:var(--ht-bg)}
+.ht-app-public .ht-topbar{position:relative;z-index:2;flex-direction:row;align-items:center;width:100%;padding:14px max(32px,calc((100vw - 1240px)/2));border:0;background:transparent;gap:20px;flex:none}
+.ht-app-public .ht-brand{gap:12px}
+.ht-app-public .ht-brand-b3{width:52px;height:60px}
+.ht-app-public .ht-brand strong{font-size:27px;color:#593b30}
+.ht-app-public .ht-topbar nav{width:auto;flex-wrap:nowrap;gap:14px}
+.ht-app-public .ht-topbar nav button{min-height:44px;min-width:66px;padding:9px 18px;border:0;border-radius:24px;background:transparent;font-size:14px;font-weight:500}
+.ht-app-public .ht-topbar nav .ht-register-entry{border:1px solid #cfac91;background:#fffaf3}
+.ht-app-public .ht-topbar nav button:hover{background:#f4e9dc}
+.ht-app-public .ht-topbar nav button[aria-current=page]{color:var(--ht-copper);text-decoration:underline;text-underline-offset:5px}
+.ht-app-public .ht-footer{margin-top:auto;padding:20px 24px 24px;font-size:12px;color:#655648;background:transparent}
+.ht-app-public .ht-primary{background:#a34f2e;border:1px solid #a34f2e;color:#fffaf6;box-shadow:0 6px 18px #ad673b14;transition:background .16s,transform .16s}
+.ht-app-public .ht-primary:hover{background:#873f26;border-color:#873f26}
+.ht-app-public button:focus-visible,.ht-app-public a:focus-visible,.ht-app-public summary:focus-visible{outline:2px solid #9d4d2e;outline-offset:5px}
+/* Copy and artwork form one scene, with a translucent reading surface. */
+.ht-journal{position:relative;isolation:isolate;display:flex;align-items:center;width:100%;min-height:calc(100svh - 150px);margin:0;padding:64px max(48px,calc((100vw - 1240px)/2));overflow:hidden;background:#f8efdf}
+.ht-journal-copy{position:relative;z-index:1;min-width:0;width:fit-content;max-width:100%;padding:36px 42px 40px;border:1px solid #fffefbd9;border-radius:16px;background:rgba(255,253,246,.66);backdrop-filter:blur(3px);box-shadow:0 14px 50px #9c774b0d}
+.ht-journal-rule{display:block;width:44px;height:2px;margin-bottom:22px;background:#d6a56c}
+.ht-journal h1{margin:0;color:#49382e;font-family:'Songti SC','STSong','Noto Serif CJK SC',serif;font-weight:500;font-size:clamp(36px,3.8vw,55px);line-height:1.5;letter-spacing:.015em}
+.ht-journal h1 span{display:block;white-space:nowrap}
+.ht-journal-copy>p{margin:20px 0 30px;color:#6c5f54;font-size:16px;line-height:1.8;letter-spacing:.025em}
+.ht-journal-actions{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.ht-app .ht-journal-actions button{display:inline-flex;align-items:center;justify-content:center;gap:15px;min-height:54px;border-radius:8px;padding:12px 22px;font-size:15px;font-weight:500}
+.ht-app .ht-journal-actions .ht-primary{min-width:214px}
+.ht-app .ht-journal-actions .ht-learn{gap:8px;padding:12px 2px;border:0;background:transparent;color:#6d5949;font-size:14px}
+.ht-app .ht-journal-actions .ht-learn:hover{color:#9d4d2e}
+.ht-journal-actions svg{flex:none;transition:transform .16s}
+.ht-journal-actions button:hover svg{transform:translateX(3px)}
+.ht-journal-art{position:absolute;z-index:-2;inset:0;margin:0;width:100%;height:100%;pointer-events:none}
+.ht-journal-image{display:block;width:100%;height:100%;object-fit:cover;object-position:center 58%}
+.ht-journal:after{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(90deg,#fffdf312,transparent 65%)}
+.ht-about{width:min(500px,calc(100% - 40px));max-height:calc(100svh - 48px);margin:auto;padding:0;overflow:auto;border:1px solid #e5d3c0;border-radius:16px;background:#fffdf8;color:#493d34;box-shadow:0 24px 80px #49372b30}
+.ht-about::backdrop{background:#4b382958;backdrop-filter:blur(4px)}
+.ht-about-inner{position:relative;padding:48px 40px 40px}
+.ht-app .ht-about-close{position:absolute;top:10px;right:10px;width:44px;height:44px;padding:0;border:0;background:transparent;font-size:27px;font-weight:400}
+.ht-about h2{margin:0 0 24px;font-family:Georgia,'Songti SC',serif;font-size:27px;font-weight:500;line-height:1.5}
+.ht-about h2:focus{outline:none}
+.ht-about p{margin:0 0 22px;font-family:'Songti SC','STSong',serif;font-size:24px;line-height:1.8}
+.ht-about .ht-about-note{font-family:inherit;font-size:15px;line-height:1.9;color:#786b60}
+.ht-app .ht-about .ht-primary{display:flex;align-items:center;justify-content:center;gap:14px;min-height:50px;padding:12px 22px;margin-top:28px}
+/* Authentication follows School's centered surface and shared artwork; identity remains Teacher's. */
+.ht-auth-surface{position:relative;isolation:isolate;display:flex;align-items:center;justify-content:center;flex:1;min-height:calc(100svh - 180px);width:100%;padding:38px 24px 52px}
+.ht-auth-surface:before{content:'';position:absolute;inset:0;z-index:-2;background:url('/huiteacher/educator-journal.webp') right center / min(1150px,100vw) auto no-repeat;opacity:.28}
+.ht-auth-surface:after{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#fcfaf6d9,#fcfaf633 55%,#fcfaf670)}
+.ht-auth-surface .ht-form-panel{width:min(510px,100%);margin:0;padding:36px 40px;background:#fffdf8f5;border:1px solid #e6d8c8;border-radius:18px;box-shadow:0 16px 50px #7f563414;line-height:1.8}
+.ht-auth-surface h1{font-family:'Songti SC','STSong',serif;font-size:29px;font-weight:600;line-height:1.5;margin:0 0 12px}
+.ht-auth-surface h1:focus{outline:none}
+.ht-auth-surface .ht-form-panel>p{font-size:14px;color:#73675e;line-height:1.8;margin:0 0 20px}
+.ht-auth-surface .ht-field{gap:7px;margin:18px 0}
+.ht-auth-surface .ht-field input{min-height:50px;font-size:16px;background:#fffefa;border-color:#cbb8a5}
+.ht-auth-surface form>.ht-primary{width:100%;min-height:50px;margin:8px 0 0;border-radius:9px}
+.ht-app .ht-auth-switch{display:flex;flex-wrap:wrap;align-items:center;gap:2px;margin:20px 0 0;font-size:13px;color:#786b60}
+.ht-app .ht-auth-switch button{padding:8px 5px;margin:0;border:0;background:transparent;min-height:44px;color:#984b2b;text-decoration:underline;text-underline-offset:4px;font-size:13px}
+.ht-app .ht-invite-choices{display:grid;gap:10px;margin:24px 0}
+.ht-app .ht-invite-choices button{display:flex;align-items:center;justify-content:space-between;min-height:55px;padding:13px 17px;text-align:left;background:#fffaf2;border:1px solid #d7c4b0;border-radius:9px;font-size:15px}
+.ht-app .ht-invite-choices button:hover{background:#f6e7d4;border-color:#ac7851}
+.ht-app .ht-auth-back{display:inline-flex;align-items:center;gap:8px;min-height:44px;margin:0 0 14px;padding:8px 0;border:0;background:transparent;color:#786b60;font-size:13px;font-weight:400}
+@media(max-width:1100px){
+ .ht-app-public .ht-topbar{padding:14px 40px}
+ .ht-journal{align-items:flex-start;min-height:calc(100svh - 150px);padding:58px 40px}
+ .ht-journal-copy{padding:32px 38px}
+ .ht-journal h1{font-size:46px;line-height:1.45}
+ .ht-journal-copy>p{margin:18px 0 28px}
+ .ht-journal-rule{margin-bottom:22px}
+ .ht-journal-image{object-position:63% center}
+ .ht-auth-surface{padding:30px 24px 40px}
+}
+@media(max-width:600px){
+ .ht-app-public .ht-topbar{padding:12px 20px;gap:10px}
+ .ht-app-public .ht-brand{gap:8px}
+ .ht-app-public .ht-brand-b3{width:38px;height:44px}
+ .ht-app-public .ht-brand strong{font-size:24px}
+ .ht-app-public .ht-topbar nav{gap:3px}
+ .ht-app-public .ht-topbar nav button{min-width:44px;min-height:44px;padding:8px 5px;font-size:13px}
+ .ht-app-public .ht-topbar nav .ht-register-entry{min-width:54px;padding:8px 10px}
+ .ht-app-public .ht-topbar nav .ht-home-entry{display:none}
+ .ht-journal{width:100%;min-height:calc(100svh - 125px);padding:36px 20px 40px}
+ .ht-journal-copy{width:100%;padding:25px 20px 28px;border-radius:14px;background:rgba(255,253,246,.72)}
+ .ht-journal-image{object-position:64% center}
+ .ht-journal h1{font-size:clamp(27px,7.6vw,31px);line-height:1.5;letter-spacing:.005em}
+ .ht-journal-rule{width:35px;margin-bottom:23px}
+ .ht-journal-copy>p{font-size:13px;letter-spacing:0;margin:20px 0 28px;line-height:1.8}
+ .ht-journal-actions{gap:16px;flex-wrap:nowrap}
+ .ht-app .ht-journal-actions button{gap:12px;min-height:50px;padding:12px 16px;font-size:14px}
+ .ht-app .ht-journal-actions .ht-primary{min-width:174px;padding:12px 12px}
+ .ht-app .ht-journal-actions .ht-learn{gap:5px;padding:10px 0;font-size:13px;white-space:nowrap}
+ .ht-app-public .ht-footer{padding:20px 20px;font-size:11px}
+ .ht-about-inner{padding:44px 26px 30px}
+ .ht-about h2{font-size:24px}
+ .ht-about p{font-size:21px}
+ .ht-about .ht-about-note{font-size:14px}
+ .ht-auth-surface{padding:24px 16px 32px;min-height:calc(100svh - 125px)}
+ .ht-auth-surface .ht-form-panel{padding:28px 24px;border-radius:16px}
+ .ht-auth-surface h1{font-size:26px}
+ .ht-auth-surface:before{background-size:auto 85%;background-position:65% center}
+ .ht-auth-surface .ht-form-panel>p{font-size:13px}
+ .ht-app .ht-invited-entries{flex-direction:column}
+}
+@media(max-width:360px){.ht-app-public .ht-brand strong{font-size:21px}.ht-app-public .ht-brand-b3{width:32px;height:39px}.ht-journal{padding:28px 14px}.ht-journal-copy{padding:24px 15px}.ht-journal-actions{gap:10px}.ht-app .ht-journal-actions .ht-primary{min-width:160px;padding:12px 10px;font-size:13px}}
+@media(prefers-reduced-motion:reduce){.ht-app-public .ht-primary,.ht-journal-actions svg{transition:none}.ht-journal-actions button:hover svg{transform:none}}
+/* The same restrained module strip as School; detailed content opens on demand. */
+.ht-journal{flex-direction:column;align-items:flex-start;justify-content:center;gap:26px;padding-top:32px;padding-bottom:32px}
+.ht-app .ht-journal-actions>a{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:54px;padding:12px 2px;color:#6d5949;font-size:14px;text-decoration:none}
+.ht-app .ht-journal-actions>a:hover{color:#9d4d2e}
+.ht-app .ht-feature-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:100%;padding:6px;background:rgba(255,253,246,.66);backdrop-filter:blur(5px);border:1px solid #fffefbd9;border-radius:14px;scroll-margin-top:20px}
+.ht-app .ht-feature-strip:focus{outline:none}
+.ht-app .ht-feature{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;min-width:0;min-height:122px;border:0;border-radius:9px;padding:16px 12px;background:transparent;color:#634b3b;text-align:center;font-weight:400}
+.ht-app .ht-feature+.ht-feature{border-left:1px solid #dfcfbb94}
+.ht-feature svg{color:#a26841;flex:none}
+.ht-app .ht-feature h2{margin:0;font-size:17px;font-weight:600;line-height:1.5}
+.ht-app .ht-feature p{margin:0;color:#685849;font-size:13px;line-height:1.6}
+.ht-app .ht-feature:hover{background:#fffcf2b0}
+.ht-app .ht-feature:focus-visible{outline:2px solid #9d4d2e;outline-offset:-2px;background:#fffcf2e8}
+@media(max-width:1100px){
+ .ht-journal{gap:26px}
+ .ht-app .ht-feature-strip{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .ht-app .ht-feature+.ht-feature{border-left:0}
+ .ht-app .ht-feature:nth-child(even){border-left:1px solid #dfcfbb94}
+ .ht-app .ht-feature:nth-child(n+3){border-top:1px solid #dfcfbb94}
+}
+@media(max-width:600px){
+ .ht-journal{gap:26px;padding-top:24px;padding-bottom:24px}
+ .ht-app .ht-journal-actions>a{gap:5px;padding:10px 0;min-height:50px;font-size:13px;white-space:nowrap}
+ .ht-app .ht-feature-strip{padding:4px;border-radius:13px}
+ .ht-app .ht-feature{gap:6px;min-height:106px;padding:12px 5px}
+ .ht-app .ht-feature h2{font-size:15px}
+ .ht-app .ht-feature p{font-size:11px}
+ .ht-feature svg{width:25px;height:25px}
+}
+.ht-mfa-setup{display:flex;flex-direction:column;align-items:center;gap:18px;margin:20px 0;padding:20px 14px;border:1px solid #e7d9c9;border-radius:12px;background:#fffefb}
+.ht-mfa-setup p{margin:0;font-size:13px;line-height:1.8;color:#786b60}
+.ht-mfa-setup details{width:100%;font-size:12px;color:#73675e}
+.ht-mfa-setup summary{cursor:pointer;min-height:44px;padding:10px 0}
+.ht-mfa-setup code{display:block;padding:10px 0;font-size:11px;line-height:1.7;word-break:break-all}
+
+@media(min-width:1101px) and (max-height:820px){
+ .ht-journal{padding-top:24px;padding-bottom:24px;gap:22px}
+ .ht-journal-copy{padding:26px 36px 28px}
+ .ht-journal h1{font-size:44px;line-height:1.4}
+ .ht-journal-rule{margin-bottom:16px}
+ .ht-journal-copy>p{font-size:15px;margin:16px 0 22px}
+ .ht-app .ht-feature{min-height:108px;padding:12px}
+}

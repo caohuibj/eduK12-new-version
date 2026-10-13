@@ -5,7 +5,7 @@ import { success, error, forbidden, notFound } from '../utils/response'
 import { UserRole } from '../types'
 import { logger } from '../utils/logger'
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
-import { attachAssetReference, discardUnreferencedAsset, getSignedAssetUrl, getSignedAssetUrls, storeAsset } from '../services/assetStorage'
+import { attachAssetReference, discardUnreferencedAsset, getSignedAssetUrl, getSignedAssetUrls, signKnownAsset, storeAsset } from '../services/assetStorage'
 
 export const documentController = {
   // 获取文档列表（添加分页和缓存优化）
@@ -126,7 +126,7 @@ export const documentController = {
 
         return success(res, {
           ...document,
-          url: await getSignedAssetUrl(storedAsset.id),
+          url: signKnownAsset(storedAsset),
         }, '文档上传成功')
       } catch (uploadError) {
         if (asset) await discardUnreferencedAsset(asset).catch(() => undefined)

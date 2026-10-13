@@ -1,5 +1,6 @@
 import {HuiteacherMyGrowth} from './HuiteacherMyGrowth'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import { QRCodeSVG } from 'qrcode.react'
 import './huiteacher.css'
 import { HuiteacherFormStudio } from './HuiteacherFormStudio'
 import { HuiteacherEvaluationStudio } from './HuiteacherEvaluationStudio'
@@ -10,13 +11,15 @@ import { HuiteacherPersonalSelf } from './HuiteacherPersonalSelf'
 import { HuiteacherFieldWorkspace } from './HuiteacherFieldWorkspace'
 import { HuiteacherConsensusReviews } from './HuiteacherConsensus'
 import { ReportPrivacyPreferences } from '../components/report-privacy/ReportPrivacyPreferences'
+import { HuiteacherLanding } from './HuiteacherLanding'
+import './huiteacher-landing.css'
 
 type Envelope<T>={code:string|number;message:string;data:T}
 type Scope={organizationId:string;organizationName:string;membershipId:string;orgRole:string;productAdmin:boolean}
 type Me={id:string;username:string;role:string;organizations:Scope[];product:'HUITEACHER'}
 type Unit={id:string;unitKind:'GRADE'|'CLASS';name:string;parentUnitId:string|null}
 type Mfa={mfaRequired:true;enrolled:boolean}
-type Screen='home'|'login'|'mfa'|'register'|'student'|'expert'|'workspace'
+type Screen='home'|'join'|'login'|'mfa'|'register'|'student'|'expert'|'workspace'
 type WorkspaceTab='teacher'|'school'|'expert'|'platform'
 
 function cookie(name:string){
@@ -49,20 +52,42 @@ const Field=({label,value,set,type='text',required=true}:{
   label:string;value:string;set:(value:string)=>void;type?:string;required?:boolean
 })=><label className="ht-field"><span>{label}</span><input
   value={value} onChange={e=>set(e.target.value)} type={type} required={required}
-  autoComplete={type==='password'?'off':'off'}/></label>
+  autoCapitalize="none" spellCheck={false}
+  autoComplete={type==='password'?(label==='设置密码'?'new-password':'current-password'):label.includes('账号')?'username':'off'}/></label>
 
 function Brand(){return <div className="ht-brand">
-  <span className="ht-brand-symbol ht-brand-b3" role="img"
-    aria-label="Huiteacher 火形 B3 星火相传 Logo（用户确认原稿）"/>
-  <div><strong>Huiteacher</strong><span>教师发展与学校改进平台</span></div>
+  <img className="ht-brand-symbol ht-brand-b3" src="/huiteacher/huiteacher-b3-emblem.svg"
+    width="56" height="64" alt=""/>
+  <strong>Huiteacher</strong>
 </div>}
 
 export default function HuiteacherApp(){
+  const appRoot=useRef<HTMLElement>(null)
   const [workspaceTab,setWorkspaceTab]=useState<WorkspaceTab>('teacher')
   const [screen,setScreen]=useState<Screen>(()=>window.location.pathname==='/participate'?'login':'home')
   const [me,setMe]=useState<Me|null>(null)
   const [loading,setLoading]=useState(true)
   const [working,setWorking]=useState(false)
+  useEffect(()=>{
+    const previousTitle=document.title
+    const icon=document.querySelector<HTMLLinkElement>('link[rel="icon"]')
+    const previousIcon=icon?.getAttribute('href')
+    const previousType=icon?.getAttribute('type')
+    document.title='Huiteacher · 教师发展与学校改进'
+    if(icon){icon.href='/huiteacher/huiteacher-b3-emblem.svg';icon.type='image/svg+xml'}
+    return ()=>{
+      document.title=previousTitle
+      if(icon){
+        if(previousIcon!==null&&previousIcon!==undefined)icon.setAttribute('href',previousIcon)
+        if(previousType!==null&&previousType!==undefined)icon.setAttribute('type',previousType)
+      }
+    }
+  },[])
+  useEffect(()=>{
+    if(loading||screen==='home'||screen==='workspace')return
+    const heading=appRoot.current?.querySelector<HTMLElement>('.ht-form-panel h1')
+    if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true})}
+  },[screen,loading])
   const [message,setMessage]=useState('')
   const [username,setUsername]=useState('')
   const [password,setPassword]=useState('')
@@ -162,7 +187,7 @@ export default function HuiteacherApp(){
     await teacherApi('/education/register-student','POST',{
       username,password,studentNumber,inviteCode,
     })
-    setPassword('');setMessage('注册成功，已加入 Teacher 学校；心理健康业务仍需另行授权')
+    setPassword('');setInviteCode('');setScreen('login');setMessage('教育账号已创建，请登录。')
   })
   const expertRegistration=()=>run(async()=>{
     await teacherApi('/education/register-expert','POST',{
@@ -170,7 +195,7 @@ export default function HuiteacherApp(){
     })
     setPassword('');setInviteCode('')
     setScreen('login')
-    setMessage('外部专家教育账号已建立，无需加入学校即可领取本次受控观察任务。请登录。')
+    setMessage('教育账号已创建，请登录领取观察任务。')
   })
   const staffRegistration=()=>run(async()=>{
     await teacherApi('/education/register-staff','POST',{
@@ -203,39 +228,58 @@ export default function HuiteacherApp(){
     await teacherApi('/auth/logout','POST',{})
     setMe(null);setSelectedOrg('');setScreen('home');setMessage('')
   })
-  return <main className="ht-app">
-    <header className="ht-topbar"><Brand/><nav aria-label="产品导航">
-      {!me&&<><button onClick={()=>changeScreen('home')}>首页</button><button onClick={()=>changeScreen('login')}>登录</button>
-        <button onClick={()=>changeScreen('register')}>教师注册</button>
-        <button onClick={()=>changeScreen('expert')}>外部专家注册</button>
-        <button onClick={()=>changeScreen('login')}>学生评教入口</button></>}
-      {me&&<><span className="ht-welcome">{me.username}</span><button onClick={()=>void logout()} disabled={working}>退出</button></>}
-    </nav></header>
+  const publicHome=!me&&screen==='home'
+  const publicAuth=!me&&screen!=='home'
+  return <main ref={appRoot} className={`ht-app${!me?' ht-app-public':''}${publicHome?' ht-app-landing':''}`}>
+    <header className="ht-topbar">
+      {me?<Brand/>:<button type="button" className="ht-brand-home" aria-label="Huiteacher 首页"
+        onClick={()=>changeScreen('home')}><Brand/></button>}
+      <nav aria-label="产品导航">
+        {!me&&<>
+          {!publicHome&&<button className="ht-home-entry" type="button" onClick={()=>changeScreen('home')}>首页</button>}
+          <button type="button" aria-current={screen==='login'?'page':undefined} onClick={()=>changeScreen('login')}>登录</button>
+          <button type="button" className="ht-register-entry" aria-current={['join','register','student','expert'].includes(screen)?'page':undefined}
+            onClick={()=>changeScreen('join')}>注册</button>
+        </>}
+        {me&&<><span className="ht-welcome">{me.username}</span><button onClick={()=>void logout()} disabled={working}>退出</button></>}
+      </nav>
+    </header>
     {message&&<p role="status" className="ht-notice">{message}</p>}
-    {loading?<section className="ht-panel"><p>正在检查教育账号登录状态…</p></section>:
-    !me&&screen==='home'?<section className="ht-hero">
-      <span className="ht-eyebrow">火 · 薪火成器</span>
-      <h1>让专业成长，看得见；<br/>让学校改进，有依据。</h1>
-      <p>统一教育身份，不重复注册。教师发展与校园心理健康在各自独立的业务空间中运行。</p>
-      <div className="ht-actions"><button className="ht-primary" onClick={()=>changeScreen('login')}>进入工作台</button>
-        <button onClick={()=>changeScreen('register')}>凭学校邀请注册</button></div>
-      <div className="ht-four"><article>职业幸福与支持</article><article>专业成长与实践</article>
-        <article>同行协作与共创</article><article>更有活力的学校</article></div>
+    <div className={publicAuth?'ht-auth-surface':'ht-page-content'}>
+    {loading?<section className="ht-panel ht-session-loading" aria-live="polite"><p>正在检查教育账号登录状态…</p></section>:
+    publicHome?<HuiteacherLanding onEnter={()=>changeScreen('login')}/>:
+    !me&&screen==='join'?<section className="ht-panel ht-form-panel">
+      <h1>受邀创建教育账号</h1>
+      <p>选择与你收到的邀请相符的身份，<br/>我们会引导你完成注册。</p>
+      <div className="ht-invite-choices" role="group" aria-label="邀请身份">
+        <button type="button" onClick={()=>changeScreen('register')}>教师／学校成员<span aria-hidden="true">→</span></button>
+        <button type="button" onClick={()=>changeScreen('student')}>学生<span aria-hidden="true">→</span></button>
+        <button type="button" onClick={()=>changeScreen('expert')}>外部专家<span aria-hidden="true">→</span></button>
+      </div>
+      <p className="ht-muted">邀请码由学校或项目提供。</p>
+      <div className="ht-auth-switch">已有教育账号？<button type="button" onClick={()=>changeScreen('login')}>直接登录</button></div>
     </section>:
     !me&&screen==='login'?<section className="ht-panel ht-form-panel"><h1>登录 Huiteacher</h1>
-      <p>使用已有 Huischool 教育账号或受邀创建的教育账号。两个产品需要分别登录。</p>
+      <p>使用已有教育账号，进入你的发展空间。</p>
       <form onSubmit={e=>{e.preventDefault();login()}}>
         <Field label="教育账号" value={username} set={setUsername}/>
         <Field label="密码" value={password} set={setPassword} type="password"/>
-        <button className="ht-primary" disabled={working}>登录</button></form>
-      <p className="ht-muted">学生使用原有教育账号直接登录；无需为评教重复注册。
-        如尚未持有教育账号，可使用学校的正式邀请
-        <button type="button" onClick={()=>changeScreen('student')}>首次注册学生账号</button>。</p>
+        <button className="ht-primary" disabled={working}>{working?'正在登录…':'登录'}</button></form>
+      <div className="ht-auth-switch">还没有教育账号？<button type="button" onClick={()=>changeScreen('join')}>使用邀请注册</button></div>
+      <div className="ht-account-guide">
+        <p>教师、学校管理者、学生与专家，均使用教育账号登录。</p>
+
+      </div>
+      <p className="ht-muted">Huischool 与 Huiteacher 使用同一教育账号，需分别登录。</p>
     </section>:
     !me&&screen==='mfa'?<section className="ht-panel ht-form-panel"><h1>双因素验证</h1>
-      <p>敏感权限要求身份验证器。School 和 Teacher 共用教育身份，但签发独立会话。</p>
+      <p>为保护学校管理权限，请使用身份验证器完成登录。</p>
       {!mfaEnrolled&&<button disabled={working} onClick={()=>mfa('setup')}>设置身份验证器</button>}
-      {mfaUri&&<p>请使用验证器手动添加此 URI（勿分享）：<code className="ht-wrap">{mfaUri}</code></p>}
+      {mfaUri&&<div className="ht-mfa-setup">
+        <p>使用身份验证器扫描二维码，再输入 6 位动态验证码。</p>
+        <QRCodeSVG value={mfaUri} size={164} marginSize={2} title="身份验证器设置二维码"/>
+        <details><summary>无法扫描？手动添加</summary><code className="ht-wrap ht-mfa-uri">{mfaUri}</code></details>
+      </div>}
       <Field label="验证码或恢复码" value={mfaCode} set={setMfaCode}/>
       <button className="ht-primary" disabled={working} onClick={()=>mfa(mfaEnrolled?'verify':'confirm')}>完成验证</button>
       {mfaEnrolled&&<button disabled={working} onClick={()=>mfa('recovery')}>使用恢复码</button>}
@@ -243,23 +287,25 @@ export default function HuiteacherApp(){
         <pre>{recoveryCodes.join('\n')}</pre><button onClick={()=>{setRecoveryCodes([]);void reload()}}>我已保存</button></div>}
     </section>:
     !me&&(screen==='register'||screen==='student'||screen==='expert')?<section className="ht-panel ht-form-panel">
+      <button type="button" className="ht-auth-back" onClick={()=>changeScreen('join')}>← 选择其他邀请身份</button>
       <h1>{screen==='register'?'教师邀请注册':screen==='expert'?'外部专家受控注册':'学生评教身份注册'}</h1>
       <p>{screen==='expert'
-        ?'由学校获得一次性邀请码后，可创建统一教育账号；已有教育账号者请直接登录，在专家工作台领取邀请。此操作不创建 School 学校成员或心理健康权限。'
+        ?'使用学校或项目提供的专家邀请码，创建教育账号。'
         :screen==='register'
-          ?'已有教育账号请直接登录后使用邀请加入学校，不要重复注册。'
-          :'仅供首次创建教育学生账号。已有教育账号的学生请登录后输入邀请代码和学号加入，不需要重复注册。'}</p>
-      {screen==='student'&&<Field label="学校核验的学号" value={studentNumber} set={setStudentNumber}/>}
+          ?'使用学校提供的教师邀请码，创建教育账号。'
+          :'使用学校提供的学生邀请码和核验学号，创建教育账号。'}</p>
       <form onSubmit={e=>{e.preventDefault();
         if(screen==='student')studentRegistration()
         else if(screen==='expert')expertRegistration()
         else staffRegistration()
       }}>
+        {screen==='student'&&<Field label="学校核验的学号" value={studentNumber} set={setStudentNumber}/>}
         <Field label={screen==='student'?'Teacher 学生邀请代码':screen==='expert'?'限定活动的专家邀请码':'教师邀请代码'}
           value={inviteCode} set={setInviteCode}/>
         <Field label="教育账号登录名" value={username} set={setUsername}/>
         <Field label="设置密码" value={password} set={setPassword} type="password"/>
         <button className="ht-primary" disabled={working}>注册统一教育账号</button></form>
+      <p className="ht-muted">已有教育账号？<button type="button" onClick={()=>changeScreen('login')}>直接登录</button></p>
     </section>:
     me&&screen==='workspace'?<div className="ht-workspace">
       <section className="ht-panel"><h1>我的教育发展空间</h1>
@@ -356,6 +402,7 @@ export default function HuiteacherApp(){
       </section>}
       </>}
     </div>:null}
-    <footer className="ht-footer">Huiteacher · 教师发展与学校改进</footer>
+    </div>
+    <footer className="ht-footer">{publicHome?`© ${new Date().getFullYear()} Huiteacher`:'Huiteacher · 教师发展与学校改进'}</footer>
   </main>
 }

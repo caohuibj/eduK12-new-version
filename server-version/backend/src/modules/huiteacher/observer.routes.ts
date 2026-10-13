@@ -47,32 +47,31 @@ const wrap=(task:(req:any)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
     throw e
   }
 })
-router.use(authenticateHuiteacher)
-router.get('/my-field-invitations',wrap(req=>
+router.get('/my-field-invitations',authenticateHuiteacher,wrap(req=>
   myHuiteacherFieldAssignments(req.user!.userId)))
-router.post('/field-invitations/:invitationId/accept',limiter,wrap(req=>
+router.post('/field-invitations/:invitationId/accept',authenticateHuiteacher,limiter,wrap(req=>
   acceptHuiteacherObserver({
     userId:req.user!.userId,
     invitationId:uuid.parse(req.params.invitationId),
   })))
-router.get('/my-field-notes',wrap(req=>
+router.get('/my-field-notes',authenticateHuiteacher,wrap(req=>
   readOwnHuiteacherObservations(req.user!.userId)))
-router.post('/field-notes/:noteId/submit',limiter,wrap(req=>
+router.post('/field-notes/:noteId/submit',authenticateHuiteacher,limiter,wrap(req=>
   submitHuiteacherObservation({
     id:uuid.parse(req.params.noteId),
     actorUserId:req.user!.userId,...submit.parse(req.body),
   })))
-router.put('/field-notes/:noteId',limiter,wrap(req=>
+router.put('/field-notes/:noteId',authenticateHuiteacher,limiter,wrap(req=>
   updateHuiteacherObservation({
     id:uuid.parse(req.params.noteId),
     actorUserId:req.user!.userId,...change.parse(req.body),
   })))
-router.get('/organizations/:organizationId/evaluation-events/:eventId/observer-grants',
+router.get('/organizations/:organizationId/evaluation-events/:eventId/observer-grants',authenticateHuiteacher,
   requireTeacherProductAdmin,requireRecentTeacherMfa,wrap(req=>
     listHuiteacherObserverGrants({
       ...eventParams.parse(req.params),actorUserId:req.user!.userId,
     })))
-router.post('/organizations/:organizationId/evaluation-events/:eventId/observer-grants',
+router.post('/organizations/:organizationId/evaluation-events/:eventId/observer-grants',authenticateHuiteacher,
   requireTeacherProductAdmin,requireRecentTeacherMfa,limiter,wrap(req=>{
     const params=eventParams.parse(req.params),v=invitation.parse(req.body)
     return inviteHuiteacherObserver({
@@ -80,7 +79,7 @@ router.post('/organizations/:organizationId/evaluation-events/:eventId/observer-
       observerUserId:v.observerUserId,role:v.role,expiresAt:new Date(v.expiresAt),
     })
   }))
-router.post('/organizations/:organizationId/evaluation-events/:eventId/observer-grants/:observerUserId/revoke',
+router.post('/organizations/:organizationId/evaluation-events/:eventId/observer-grants/:observerUserId/revoke',authenticateHuiteacher,
   requireTeacherProductAdmin,requireRecentTeacherMfa,limiter,wrap(req=>{
     const params=eventParams.parse(req.params)
     return revokeHuiteacherObserver({
@@ -88,14 +87,14 @@ router.post('/organizations/:organizationId/evaluation-events/:eventId/observer-
       observerUserId:uuid.parse(req.params.observerUserId),
     })
   }))
-router.post('/organizations/:organizationId/evaluation-events/:eventId/field-notes',
+router.post('/organizations/:organizationId/evaluation-events/:eventId/field-notes',authenticateHuiteacher,
   limiter,wrap(req=>{
     const params=eventParams.parse(req.params)
     return createHuiteacherObservation({
       ...params,actorUserId:req.user!.userId,...note.parse(req.body),
     })
   }))
-router.get('/organizations/:organizationId/evaluation-events/:eventId/formal-notes',
+router.get('/organizations/:organizationId/evaluation-events/:eventId/formal-notes',authenticateHuiteacher,
   requireTeacherProductAdmin,requireRecentTeacherMfa,wrap(req=>
     readFormalHuiteacherObservations({
       ...eventParams.parse(req.params),actorUserId:req.user!.userId,

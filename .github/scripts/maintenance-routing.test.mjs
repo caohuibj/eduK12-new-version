@@ -147,3 +147,22 @@ test('daily backup chain and read-only capacity planning use exact maintenance p
  for(const file of ['cycle.py','test_cycle.py','capacity.py','test_capacity.py','systemd/eduk12-backup-cycle.service','systemd/eduk12-backup-cycle.timer'])assert.equal(classifyChanges([entry(host+file)]).maintenance,true,file);
  for(const file of ['cycle-delete-media.py','write-fake-proof.py','nested/cycle.py'])assert.equal(classifyChanges([entry(host+'cycle.py'),entry(host+file)]).maintenance,false,file);
 });
+
+
+test('reviewed merge evidence is limited to the maintenance route and exact admission files',()=>{
+ const host='server-version/scripts/host-ops/';
+ for(const path of ['.github/scripts/maintenance-merge.py','.github/scripts/test_maintenance_merge.py'])
+   assert.equal(classifyChanges([entry(host+'storage.py'),entry(path)]).maintenance,true,path);
+ assert.equal(classifyChanges([entry(host+'storage.py'),entry('.github/scripts/fake-maintenance-proof.py')]).maintenance,false);
+ const ci=source('ci'),lane=source('ci-maintenance');
+ assert.match(job(ci,'maintenance'),/merge_proof:.*pull_request.number == 292.*outputs.scenario == 'maintenance'/);
+ assert.match(job(ci,'scope'),/affected maintenance routing and merge contracts/);
+ assert.match(lane,/python3 -B .github\/scripts\/maintenance-merge.py/);
+ for(const name of ['CI routing and attachment invariants','Host launcher and existing monitoring guards',
+ 'Check shell and systemd units without starting production services','Real isolated Docker launcher and failed-task cleanup',
+ 'Actual encrypted database restore and failure-volume cleanup']) {
+  const step=lane.split('      - name: '+name+'\n')[1]?.split('      - name: ')[0]??'';
+  assert.match(step,/steps.mergequalified.outputs.reused != 'true'/,name);
+ }
+ assert.match(job(ci,'merge-gate'),/run: node .github\/scripts\/merge-gate.mjs/);
+});

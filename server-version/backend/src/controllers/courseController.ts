@@ -13,7 +13,7 @@ import {
   canAccessCourseRoster,
   hasActiveCourseMembership,
 } from '../utils/courseAccess'
-import { attachAssetReference, discardUnreferencedAsset, getSignedAssetUrl, storeAsset } from '../services/assetStorage'
+import { attachAssetReference, discardUnreferencedAsset, getSignedAssetUrl, getSignedAssetUrls, signKnownAsset, storeAsset } from '../services/assetStorage'
 import { resetPasswordForPlatformAdmin } from './platformAccountController'
 import { resetPasswordForCourseTeacher } from './courseStudentPasswordController'
 import { CourseNotJoinableError, courseJoinabilityMessage, isCourseJoinable } from '../utils/courseEnrollment'
@@ -181,13 +181,14 @@ export const courseController = {
       ])
 
       // 格式化返回数据
-      const formattedCourses = await Promise.all(courses.map(async course => ({
+      const coverUrls = await getSignedAssetUrls(courses.map(course => course.coverAssetId))
+      const formattedCourses = courses.map(course => ({
         ...course,
-        coverUrl: course.coverAssetId ? await getSignedAssetUrl(course.coverAssetId) : course.coverUrl,
+        coverUrl: course.coverAssetId ? coverUrls.get(course.coverAssetId) ?? null : course.coverUrl,
         studentCount: course._count.students,
         isRecruiting: course.isRecruiting,
         _count: undefined,
-      })))
+      }))
 
       const result = {
         list: formattedCourses,
@@ -1004,7 +1005,7 @@ export const courseController = {
         throw transactionError
       }
 
-      return success(res, { coverUrl: await getSignedAssetUrl(asset.id) }, '封面上传成功')
+      return success(res, { coverUrl: signKnownAsset(asset) }, '封面上传成功')
     } catch (err) {
       logger.error('上传封面错误', err)
       return error(res, '上传封面失败')
