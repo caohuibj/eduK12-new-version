@@ -135,3 +135,9 @@ test('joint recovery exact files stay in maintenance; unknown proof writers cann
  assert.match(source('ci-maintenance'),/cos-cleanup\/ci-recovery-smoke[.]py/);
  assert.match(source('ci-maintenance'),/cos-cleanup\/recovery[.]test[.]mjs/);
 });
+
+test('bounded host storage and read-only inventory use exact maintenance allowlists',()=>{
+ const host='server-version/scripts/host-ops/';
+ for(const file of ['storage.py','test_storage.py','storage-config.example.json','cos-inventory.py','cos-inventory.cjs','cos-inventory.test.mjs','systemd/eduk12-storage-maintenance.service','systemd/eduk12-storage-maintenance.timer','systemd/eduk12-cos-inventory.service','systemd/eduk12-cos-inventory.timer'])assert.equal(classifyChanges([entry(host+file)]).maintenance,true,file);
+ for(const file of ['delete-media.py','prune-volumes.py','nested/storage.py'])assert.equal(classifyChanges([entry(host+'storage.py'),entry(host+file)]).maintenance,false,file);
+});

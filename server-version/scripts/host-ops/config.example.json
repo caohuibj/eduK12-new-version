@@ -38,5 +38,13 @@
     "/etc/systemd/system/eduk12-ops-monitor.timer"
   ],
   "cos_backup_receipt": "/var/lib/eduk12-backups/latest.json",
-  "periodic_backup_status": "/var/lib/eduk12-backups/status.json"
+  "periodic_backup_status": "/var/lib/eduk12-backups/status.json",
+  "periodic_backup_attempt": "/var/lib/eduk12-backups/attempt.json",
+  "attachment_backup_attempt": "/var/lib/eduk12-attachments/attempt-backup.json",
+  "attachment_verify_attempt": "/var/lib/eduk12-attachments/attempt-verify.json",
+  "attachment_status": "/var/lib/eduk12-attachments/data/status.json",
+  "cos_capacity_status": "/var/lib/eduk12-ops/cos-capacity.json",
+  "cos_inventory_status": "/var/lib/eduk12-ops/cos-inventory-status.json",
+  "storage_status": "/var/lib/eduk12-ops/storage-status.json",
+  "cos_growth_warning_bytes": 2147483648
 }

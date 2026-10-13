@@ -53,3 +53,25 @@ https://cloud.tencent.com/document/product/248/50414
 
 `backup/smoke-restore.mjs` 使用新 cleanup helper，在 finally 删除本次生成的 `eduk12-restore-<12 hex>` 容器和匿名卷，清理失败返回失败。
 该修复不删除已有历史卷、命名生产卷或备份。必须发布修复后才能影响后续真实恢复验证；安装宿主机巡检不会修改当前应用源码。
+
+## 2026-10-13 capacity and backup operations
+
+Task attempts and last successful recovery evidence are separate records. A pending
+cleanup or failed attempt alerts independently; a recent task trigger is not a backup.
+The finalization-only cleanup path verifies exact deleted-version absence, protected
+versions, unchanged authenticated indexes and both remote checkpoints before completing
+an expired transaction. It never issues a new object upload or deletion.
+
+storage.py defaults to a plan. Daily --apply removes only aged, exact Trivy cache
+contents and unused BuildKit cache beyond the reviewed 2 GB budget. It protects the
+actual current frontend cache, production and rollback images, all container references,
+and installed tool/config references. It never prunes volumes or release directories.
+Old image removal additionally requires an explicit --images invocation and only
+uses the six reviewed revision tags without force.
+
+Daily cos-inventory.py uses two read-only SDK operations with complete pagination.
+It records current bytes, all-version bytes, storage classes, prefixes, growth and
+ETag/size duplicate candidates for both Beijing buckets. Candidates are not verified
+content duplicates or safe deletion targets. Records and alerts stay local and private.
+Existing retention remains 48 hourly attachment snapshots, 30 daily, 12 weekly and
+12 monthly recovery points, plus the protected baseline and two verified local DB copies.

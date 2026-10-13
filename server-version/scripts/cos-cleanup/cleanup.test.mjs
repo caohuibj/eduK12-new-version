@@ -169,3 +169,32 @@ test('detachment refuses conflicting versions for one retained deduplication key
   f.records.set(id(other),other);s.blobs=[id(other)];
   assert.throws(()=>detach(f,p),/DETACH_CONFLICTING_RETAINED_BLOB_VERSION/);
 });
+
+test('completed deletions finalize after freshness expiry without any new cloud writes or deletes',async t=>{
+  const {task,api}=await diskFixture(t);
+  const finish=task.finish.bind(task);task.finish=async()=>{throw Error('STOP_BEFORE_FINISH');};
+  await assert.rejects(task.run(),/STOP_BEFORE_FINISH/);
+  const j=await task.read(task.journalFile);assert.ok(task.completedActions(j));
+  task.clock=()=>now+72*hour;task.finish=finish;
+  const before=await api.versions(),deleted=api.deleted.length;
+  api.put=async()=>{throw Error('NO_UPLOAD_ALLOWED');};api.deleteVersion=async()=>{throw Error('NO_DELETE_ALLOWED');};
+  await task.run();assert.equal((await task.read(task.journalFile)).status,'COMPLETE');
+  assert.deepEqual(await api.versions(),before);assert.equal(api.deleted.length,deleted);
+});
+test('unfinished deletion still requires fresh joint recovery proof',async t=>{
+  const {task,api}=await diskFixture(t);api.failAfterDelete=true;await assert.rejects(task.run());
+  task.clock=()=>now+72*hour;const deleted=api.deleted.length;
+  await assert.rejects(task.run(),/JOINT_RECOVERY_PROOF_STALE/);assert.equal(api.deleted.length,deleted);
+});
+test('completion-only resume rejects changed producer catalogs and checkpoint pointer',async t=>{
+  for(const change of ['catalog','pointer']) {
+    const {task,api,paths}=await diskFixture(t);
+    task.finish=async()=>{throw Error('STOP_BEFORE_FINISH');};await assert.rejects(task.run());
+    task.clock=()=>now+72*hour;
+    if(change==='catalog'){
+      const value=unseal(JSON.parse(await fs.readFile(paths.host)),secret);value.foreign=true;
+      await fs.writeFile(paths.host,JSON.stringify(seal(value,secret))+'\n');
+    }else await api.put('attachments/v1/catalog-latest.json',Buffer.from('foreign!'));
+    await assert.rejects(task.run(),change==='catalog'?/LOCAL_CATALOG_CHANGED/:/UNEXPECTED_REMOTE_VERSION/);
+  }
+});

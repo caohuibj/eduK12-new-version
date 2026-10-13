@@ -36,6 +36,20 @@ class MonitoringSafetyTests(unittest.TestCase):
                 self.assertEqual(next(c['level'] for c in checks if c['key']=='cos_joint_recovery_health'),expected)
                 self.assertNotIn('error',data['cos_recovery'])
 
+    def test_skipped_attempt_never_refreshes_last_success_and_pending_recovery_is_critical(self):
+        import datetime as dt
+        config=copy.deepcopy(CONFIG);config.update(tls_hosts=[],ready_urls=[],backup_roots=[])
+        with tempfile.TemporaryDirectory() as tmp:
+            p=Path(tmp,'attempt.json');config['periodic_backup_attempt']=str(p)
+            p.write_text(json.dumps({'at':dt.datetime.now(dt.timezone.utc).isoformat(),'status':'SKIPPED','reason':'COS_CLEANUP_TRANSACTION_PENDING'}))
+            r=Path(tmp,'recovery.json');config['cos_recovery_status']=str(r)
+            r.write_text(json.dumps({'at':dt.datetime.now(dt.timezone.utc).isoformat(),'status':'SKIPPED','reason':'pending_cleanup_requires_resume'}))
+            with patch.object(m,'command',side_effect=RuntimeError('isolated')):data,checks=m.collect(config)
+            levels={x['key']:x['level'] for x in checks}
+            self.assertEqual(levels['database_backup_attempt'],'critical')
+            self.assertEqual(levels['cos_joint_recovery_health'],'critical')
+            self.assertEqual(data['database_backup_attempt']['status'],'SKIPPED')
+
     def test_failure_debounce_recovery_and_reminder(self):
         bad = [m.finding('http:api', 'critical', {'status': 503})]
         good = [m.finding('http:api', 'ok', {'status': 200})]

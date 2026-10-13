@@ -195,10 +195,64 @@ def collect(config):
             if timestamp.tzinfo is None or timestamp.timestamp() > time.time() + 300:
                 raise ValueError('joint recovery timestamp invalid')
             age = max(0, int(time.time() - timestamp.timestamp()))
-            level = 'critical' if status.get('status') == 'FAILED' else 'warning' if age > 3 * 3600 else 'ok'
+            level = 'critical' if status.get('status') == 'FAILED' or status.get('reason') == 'pending_cleanup_requires_resume' else 'warning' if age > 3 * 3600 else 'ok'
             data['cos_recovery'] = {k: status.get(k) for k in ['status','retainedPoints','newIsolatedRestores','immutableBindingsRechecked','cleanupActivated','blocked']}
             checks.append(finding('cos_joint_recovery_health', level, {'status': status.get('status'), 'age_seconds': age}))
         probe('collector:cos_joint_recovery', recovery_status)
+
+    for field,key in [('periodic_backup_attempt','database_backup_attempt'),('attachment_backup_attempt','attachment_backup_attempt'),('attachment_verify_attempt','attachment_verify_attempt')]:
+        if not config.get(field):continue
+        def task_attempt(field=field,key=key):
+            p=Path(config[field])
+            if not p.exists():
+                data[key]={'status':'NOT_RECORDED'}
+                checks.append(finding(key,'warning',{'status':'NOT_RECORDED'}));return
+            value=json.loads(p.read_text())
+            timestamp=dt.datetime.fromisoformat(value['at'].replace('Z','+00:00'))
+            if timestamp.tzinfo is None or timestamp.timestamp()>time.time()+300:raise ValueError('attempt timestamp invalid')
+            age=max(0,int(time.time()-timestamp.timestamp()))
+            status=value.get('status')
+            level='critical' if status=='FAILED' or value.get('reason')=='COS_CLEANUP_TRANSACTION_PENDING' else 'warning' if status=='SKIPPED' or (status=='RUNNING' and age>3600) else 'ok'
+            data[key]={'status':status,'age_seconds':age,'reason':value.get('reason')}
+            checks.append(finding(key,level,data[key]))
+        probe('collector:'+key,task_attempt)
+
+    if config.get('attachment_status'):
+        def attachment_health():
+            value=json.loads(Path(config['attachment_status']).read_text())
+            def age_of(name):
+                raw=value.get(name)
+                if not raw:return None
+                stamp=dt.datetime.fromisoformat(raw.replace('Z','+00:00'))
+                if stamp.tzinfo is None or stamp.timestamp()>time.time()+300:raise ValueError('attachment timestamp invalid')
+                return max(0,int(time.time()-stamp.timestamp()))
+            snapshot_age=age_of('lastSnapshotAt');verify_age=age_of('lastFullVerificationAt')
+            data['attachments']={'snapshot_age_seconds':snapshot_age,'verification_age_seconds':verify_age,'pending':bool(value.get('pending'))}
+            healthy=not value.get('failed') and snapshot_age is not None and snapshot_age<=90*60 and verify_age is not None and verify_age<=36*3600
+            checks.append(finding('attachment_backup_freshness','ok' if healthy else 'critical',data['attachments']))
+        probe('collector:attachment_health',attachment_health)
+
+    if config.get('cos_capacity_status'):
+        def capacity_health():
+            value=json.loads(Path(config['cos_capacity_status']).read_text())
+            stamp=dt.datetime.fromisoformat(value['at'].replace('Z','+00:00'))
+            if stamp.tzinfo is None or stamp.timestamp()>time.time()+300:raise ValueError('inventory timestamp invalid')
+            age=max(0,int(time.time()-stamp.timestamp()))
+            checks.append(finding('cos_capacity_freshness','ok' if value.get('status')=='COMPLETE' and age<=48*3600 else 'warning',{'age_seconds':age}))
+            data['cos_capacity']=[{k:b.get(k) for k in ['bucket','currentBytes','allVersionBytes','noncurrentBytes','byStorageClass','growthBytes','duplicateGroups','extraCopyCandidateBytes']} for b in value['buckets']]
+            for b in data['cos_capacity']:
+                checks.append(finding('cos_capacity_growth:'+b['bucket'],'warning' if (b.get('growthBytes') or 0)>config.get('cos_growth_warning_bytes',2*1024**3) else 'ok',{'growth_bytes':b.get('growthBytes')}))
+        probe('collector:cos_capacity',capacity_health)
+    for field,key,max_age in [('storage_status','storage_maintenance',48*3600),('cos_inventory_status','cos_inventory_task',48*3600)]:
+        if not config.get(field):continue
+        def maintenance_status(field=field,key=key,max_age=max_age):
+            value=json.loads(Path(config[field]).read_text())
+            stamp=dt.datetime.fromisoformat(value['at'].replace('Z','+00:00'))
+            if stamp.tzinfo is None or stamp.timestamp()>time.time()+300:raise ValueError('maintenance timestamp invalid')
+            age=max(0,int(time.time()-stamp.timestamp()))
+            level='critical' if value.get('status')=='FAILED' else 'warning' if age>max_age else 'ok'
+            checks.append(finding(key,level,{'status':value.get('status'),'age_seconds':age}))
+        probe('collector:'+key,maintenance_status)
 
     def retention():
         names = command(["/usr/bin/docker", "volume", "ls", "--filter", "dangling=true", "--format", "{{.Name}}"])
