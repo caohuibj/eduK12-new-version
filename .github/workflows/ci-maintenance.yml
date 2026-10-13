@@ -8,6 +8,11 @@ on:
         default: '["ubuntu-24.04"]'
   workflow_dispatch:
     inputs:
+      ops_followup:
+        description: 'Successful cache-policy follow-up run; qualify unchanged foundations and check affected operations only'
+        required: false
+        type: string
+        default: ''
       cache_policy_followup:
         description: 'Successful same-repository CI run for the exact fanal cache whitelist follow-up'
         required: false
@@ -73,11 +78,64 @@ jobs:
         run: |
           python3 -B -m unittest discover -s server-version/scripts/host-ops -p 'test_storage.py' -v
           node --test .github/scripts/maintenance-routing.test.mjs
+      - name: Qualify unchanged foundations for operations follow-up
+        id: opsqualified
+        if: inputs.ops_followup != ''
+        env:
+          PRIOR_RUN: ${{ inputs.ops_followup }}
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          python3 - <<'PY'
+          import json,os,subprocess,urllib.request
+          repository=os.environ['REPOSITORY'];run=os.environ['PRIOR_RUN']
+          assert repository=='caohuibj/eduK12-new-version' and run=='38347724147'
+          def api(path):
+            request=urllib.request.Request('https://api.github.com/repos/'+repository+'/'+path,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+            return json.load(urllib.request.urlopen(request,timeout=30))
+          prior=api('actions/runs/'+run)
+          assert prior['conclusion']=='success' and prior['event']=='workflow_dispatch' and prior['path']=='.github/workflows/ci-maintenance.yml'
+          assert prior['head_sha']=='ec593e7be764523c1f57490338efbe29c29b20a2'
+          original=api('actions/runs/38347265525')
+          assert original['conclusion']=='success' and original['event']=='pull_request' and original['head_sha']=='b8969a064f04ed923692eb8b02f7ce9f989e2aa4'
+          jobs=api('actions/runs/38347265525/jobs?per_page=100')['jobs']
+          assert any(j['name']=='maintenance / attachment deduplication, indexes and protected cleanup' and j['conclusion']=='success' for j in jobs)
+          host='server-version/scripts/host-ops/'
+          allowed={host+p for p in ['capacity.py','test_capacity.py','cycle.py','test_cycle.py','storage.py','test_storage.py','storage-config.example.json','monitor.py','config.example.json','install.sh','README.md','test_monitor.py','systemd/eduk12-backup-cycle.service','systemd/eduk12-backup-cycle.timer','systemd/eduk12-storage-maintenance.service']}
+          allowed|={'.github/workflows/ci-maintenance.yml','.github/scripts/content-scope.mjs','.github/scripts/maintenance-routing.test.mjs','server-version/scripts/cos-cleanup/model.mjs','server-version/scripts/cos-cleanup/cleanup.test.mjs'}
+          def git(*args):return subprocess.check_output(['git',*args])
+          paths=[]
+          for entry in git('diff','--raw','--no-renames',prior['head_sha'],'HEAD').decode().splitlines():
+            meta,path=entry.split('\t');fields=meta.split()
+            assert path in allowed and fields[-1] in ['M','A']
+            assert fields[1] in ['100644','100755'] and (fields[0] in [':100644',':100755'] or fields[0]==':000000')
+            paths.append(path)
+          assert paths and host+'cycle.py' in paths and host+'capacity.py' in paths
+          # This model edit only preserves observations while blocked; protected graph/retention/deletion logic is byte-identical.
+          model='server-version/scripts/cos-cleanup/model.mjs'
+          before=git('show',prior['head_sha']+':'+model)
+          after=git('show','HEAD:'+model)
+          assert after==before.replace(b'const candidates = [], observations = {};',b'// A temporary protection block preserves quarantine history without refreshing observation age.\n  const candidates = [], observations = graph.blocked.length ? structuredClone(previous?.observations || {}) : {};',1)
+          with open(os.environ['GITHUB_OUTPUT'],'a') as output:output.write('reused=true\n')
+          print('Qualified successful foundation run 38347265525 and exact cache follow-up '+run+'; unchanged DB/crypto/launcher/attachment verifier inputs retained.')
+          PY
+      - name: Verify affected backup cycle, capacity, image protection and quarantine
+        if: steps.opsqualified.outputs.reused == 'true'
+        run: |
+          for name in test_cycle.py test_capacity.py test_storage.py test_monitor.py; do
+            python3 -B -m unittest discover -s server-version/scripts/host-ops -p "$name" -v
+          done
+          node --test server-version/scripts/cos-cleanup/cleanup.test.mjs server-version/scripts/cos-cleanup/recovery.test.mjs
+          node --test .github/scripts/content-scope.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs
+          bash -n server-version/scripts/host-ops/install.sh
+          sudo install -D -m 644 server-version/scripts/host-ops/cycle.py /opt/eduk12-ops/current/cycle.py
+          sudo install -D -m 644 server-version/scripts/host-ops/storage.py /opt/eduk12-ops/current/storage.py
+          sudo systemd-analyze verify server-version/scripts/host-ops/systemd/eduk12-backup-cycle.* server-version/scripts/host-ops/systemd/eduk12-storage-maintenance.*
       - name: CI routing and attachment invariants
-        if: steps.qualified.outputs.reused != 'true'
+        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true'
         run: node --test .github/scripts/runner-preflight.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/api-response.test.mjs .github/scripts/mac-ci-cleanup.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-image-plan.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs .github/scripts/dependency-routing.test.mjs server-version/scripts/attachment-backup/core.test.mjs server-version/scripts/backup/cleanup-restore-container.test.mjs
       - name: Host launcher and existing monitoring guards
-        if: steps.qualified.outputs.reused != 'true'
+        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true'
         run: |
           python3 -B -m unittest discover -s server-version/scripts/attachment-backup -p 'test_*.py' -v
           python3 -B -m unittest discover -s server-version/scripts/host-ops -p 'test_*.py' -v
@@ -90,7 +148,7 @@ jobs:
           node --check server-version/scripts/cos-cleanup/recovery.mjs
           node --check server-version/scripts/cos-cleanup/recovery-smoke.mjs
       - name: Check shell and systemd units without starting production services
-        if: steps.qualified.outputs.reused != 'true'
+        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true'
         run: |
           bash -n server-version/scripts/attachment-backup/install.sh
           bash -n server-version/scripts/host-ops/install.sh
@@ -99,6 +157,7 @@ jobs:
           sudo install -D -m 700 server-version/scripts/attachment-backup/runner.py /opt/eduk12-attachments/current/runner.py
           sudo install -D -m 644 server-version/scripts/host-ops/monitor.py /opt/eduk12-ops/current/monitor.py
           sudo install -D -m 644 server-version/scripts/host-ops/storage.py /opt/eduk12-ops/current/storage.py
+          sudo install -D -m 644 server-version/scripts/host-ops/cycle.py /opt/eduk12-ops/current/cycle.py
           sudo install -D -m 644 server-version/scripts/host-ops/cos-inventory.py /opt/eduk12-ops/current/cos-inventory.py
           sudo install -D -m 644 server-version/scripts/host-ops/backup.py /opt/eduk12-backups/current/backup.py
           sudo install -D -m 644 server-version/scripts/cos-cleanup/runner.py /opt/eduk12-cos-cleanup/current/runner.py
@@ -106,13 +165,13 @@ jobs:
           sudo install -D -m 644 server-version/scripts/cos-cleanup/recovery.py /opt/eduk12-cos-cleanup/current/recovery.py
           sudo systemd-analyze verify server-version/scripts/cos-cleanup/systemd/*
       - name: Real isolated Docker launcher and failed-task cleanup
-        if: steps.qualified.outputs.reused != 'true'
+        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true'
         run: |
           docker pull node:24.21.0-bookworm-slim
           sudo env CI=true GITHUB_ACTIONS=true NODE_ENV=test python3 -B server-version/scripts/attachment-backup/ci-container-smoke.py
           sudo env CI=true GITHUB_ACTIONS=true NODE_ENV=test python3 -B server-version/scripts/cos-cleanup/ci-container-smoke.py
       - name: Actual encrypted database restore and failure-volume cleanup
-        if: steps.qualified.outputs.reused != 'true'
+        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true'
         run: |
           docker pull postgres:16.15-bookworm
           sudo env PATH="$PATH" CI=true GITHUB_ACTIONS=true NODE_ENV=test python3 -B server-version/scripts/host-ops/ci-backup-smoke.py

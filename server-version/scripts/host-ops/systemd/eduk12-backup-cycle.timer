@@ -1,0 +1,8 @@
+[Unit]
+Description=eduK12 daily backup chain with two same-day retry windows
+[Timer]
+OnCalendar=*-*-* 02,03,04:20:00 Asia/Shanghai
+RandomizedDelaySec=90
+Persistent=true
+[Install]
+WantedBy=timers.target

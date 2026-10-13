@@ -29,7 +29,7 @@ class StorageSafetyTests(unittest.TestCase):
             if args[1:3]==['ps','-aq']:return 'container'
             if args[1]=='inspect':return 'sha256:inuse'
             if args[1:3]==['image','ls']:return tag+'|sha256:inuse\n'+tag+'|sha256:unaliased\n'
-            return json.dumps([tag,'operator:keep'])
+            return json.dumps([{'RepoTags':[tag,'operator:keep'],'Config':{'Labels':{}}}])
         with patch.object(m,'command',side_effect=docker),patch.object(m,'protected_refs',return_value=set()):
             self.assertEqual(m.image_plan(CONFIG),[])
         for edit in [{'protectedRevisions':[]},{'buildCacheLimit':'0gb'},{'oldImageRevisions':['5f2c67a5']}]:
@@ -41,3 +41,23 @@ class StorageSafetyTests(unittest.TestCase):
             self.assertTrue(any(x[1:3]==['buildx','prune'] and '--max-used-space=2gb' in x for x in calls))
             self.assertFalse(any('volume' in x or ('image' in x and 'rm' in x) for x in calls))
             self.assertFalse(result['imageDeletionAutomatic'])
+
+class AutomaticImageSafetyTests(unittest.TestCase):
+    def test_only_old_correctly_labelled_exact_project_images_qualify(self):
+        import copy,datetime as dt
+        rev='12345678'+'a'*32
+        item={'RepoTags':['eduk12-backend:12345678'],'Created':(dt.datetime.now(dt.timezone.utc)-dt.timedelta(hours=72)).isoformat(),'Config':{'Labels':{'org.opencontainers.image.source':'https://github.com/caohuibj/eduK12-new-version','org.opencontainers.image.revision':rev}}}
+        self.assertTrue(m.eligible_project_image(item,CONFIG,time.time()))
+        for edit in ['unknown-source','unknown-alias','recent','wrong-revision']:
+            q=copy.deepcopy(item)
+            if edit=='unknown-source':q['Config']['Labels']['org.opencontainers.image.source']='other'
+            elif edit=='unknown-alias':q['RepoTags'].append('operator:keep')
+            elif edit=='recent':q['Created']=dt.datetime.now(dt.timezone.utc).isoformat()
+            else:q['Config']['Labels']['org.opencontainers.image.revision']='b'*40
+            self.assertFalse(m.eligible_project_image(q,CONFIG,time.time()))
+    def test_declared_rollback_and_recent_staging_receipt_are_protected(self):
+        with tempfile.TemporaryDirectory() as tmp,patch.object(m,'DEPLOY',Path(tmp)):
+            Path(tmp,'current-release.json').write_text(json.dumps({'rollbackSha':'12345678'+'a'*32,'images':{'backend':'sha256:'+'a'*64}}))
+            stage=Path(tmp,'candidate');stage.mkdir();Path(stage,'images.json').write_text(json.dumps({'image':'eduk12-backend:87654321'}))
+            refs=m.protected_refs(CONFIG)
+            self.assertIn('eduk12-backend:12345678',refs);self.assertIn('sha256:'+'a'*64,refs);self.assertIn('eduk12-backend:87654321',refs)

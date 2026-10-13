@@ -141,3 +141,9 @@ test('bounded host storage and read-only inventory use exact maintenance allowli
  for(const file of ['storage.py','test_storage.py','storage-config.example.json','cos-inventory.py','cos-inventory.cjs','cos-inventory.test.mjs','systemd/eduk12-storage-maintenance.service','systemd/eduk12-storage-maintenance.timer','systemd/eduk12-cos-inventory.service','systemd/eduk12-cos-inventory.timer'])assert.equal(classifyChanges([entry(host+file)]).maintenance,true,file);
  for(const file of ['delete-media.py','prune-volumes.py','nested/storage.py'])assert.equal(classifyChanges([entry(host+'storage.py'),entry(host+file)]).maintenance,false,file);
 });
+
+test('daily backup chain and read-only capacity planning use exact maintenance paths',()=>{
+ const host='server-version/scripts/host-ops/';
+ for(const file of ['cycle.py','test_cycle.py','capacity.py','test_capacity.py','systemd/eduk12-backup-cycle.service','systemd/eduk12-backup-cycle.timer'])assert.equal(classifyChanges([entry(host+file)]).maintenance,true,file);
+ for(const file of ['cycle-delete-media.py','write-fake-proof.py','nested/cycle.py'])assert.equal(classifyChanges([entry(host+'cycle.py'),entry(host+file)]).maintenance,false,file);
+});

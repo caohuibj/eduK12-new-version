@@ -4,7 +4,7 @@
   ],
   "disk_warning_percent": 80,
   "disk_critical_percent": 90,
-  "minimum_free_bytes": 2147483648,
+  "minimum_free_bytes": 6442450944,
   "failure_samples": 2,
   "recovery_samples": 2,
   "repeat_seconds": 21600,
@@ -46,5 +46,9 @@
   "cos_capacity_status": "/var/lib/eduk12-ops/cos-capacity.json",
   "cos_inventory_status": "/var/lib/eduk12-ops/cos-inventory-status.json",
   "storage_status": "/var/lib/eduk12-ops/storage-status.json",
-  "cos_growth_warning_bytes": 2147483648
+  "cos_growth_warning_bytes": 2147483648,
+  "capacity_planning": true,
+  "cleanup_config": "/etc/eduk12-cos-cleanup/config.json",
+  "backup_cycle_status": "/var/lib/eduk12-ops/cycle-status.json",
+  "backup_cycle_success": "/var/lib/eduk12-ops/cycle-last-success.json"
 }

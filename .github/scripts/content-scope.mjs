@@ -98,6 +98,7 @@ const cleanupFiles = new Set(['README.md','config.example.json','model.mjs','sto
   'recovery.mjs','recovery.py','recovery.test.mjs','test_recovery.py','recovery-smoke.mjs','ci-recovery-smoke.py',
   'systemd/eduk12-cos-recovery.service','systemd/eduk12-cos-recovery.timer'].map(file=>cleanupRoot+file));
 const monitorFiles = new Set(['README.md','config.example.json','monitor.py','test_monitor.py','install.sh',
+  'capacity.py','test_capacity.py','cycle.py','test_cycle.py','systemd/eduk12-backup-cycle.service','systemd/eduk12-backup-cycle.timer',
   'storage.py','test_storage.py','storage-config.example.json','cos-inventory.py','cos-inventory.cjs','cos-inventory.test.mjs',
   'systemd/eduk12-storage-maintenance.service','systemd/eduk12-storage-maintenance.timer',
   'systemd/eduk12-cos-inventory.service','systemd/eduk12-cos-inventory.timer',

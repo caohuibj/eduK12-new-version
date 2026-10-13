@@ -1,4 +1,4 @@
-"""Bounded host cache maintenance. Exact old image tags require an explicit --images run."""
+"""Bounded labelled project-image and cache maintenance; live/rollback references are protected."""
 import argparse
 import datetime as dt
 import fcntl
@@ -37,8 +37,8 @@ def atomic(path,value):
 
 def validate(c):
     require(c.get('schema')==1 and c.get('deployRoot')==str(DEPLOY),'STORAGE_ROOT_REFUSED')
-    require(c.get('protectedRevisions')==['5f2c67a5','c8483290'],'PROTECTED_RELEASES_REQUIRED')
-    require(c.get('builder')=='eduk12-release243' and c.get('buildCacheLimit')=='2gb'
+    require(2<=len(c.get('protectedRevisions',[]))<=8 and all(re.fullmatch('[a-f0-9]{8}',x) for x in c['protectedRevisions']),'PROTECTED_RELEASES_REQUIRED')
+    require(c.get('builder') in {'eduk12-release243','default'} and c.get('buildCacheLimit')=='2gb'
             and c.get('cacheMinAgeHours',0)>=48,'CACHE_POLICY_REFUSED')
     revisions=c.get('oldImageRevisions',[])
     require(len(revisions)<=6 and all(re.fullmatch('[a-f0-9]{8}',x) for x in revisions)
@@ -69,28 +69,49 @@ def cache_plan(c,now=None):
 
 def protected_refs(c):
     protected={f'eduk12-{role}:{rev}' for rev in [*c['protectedRevisions'],c.get('observedCurrentRevision',c['protectedRevisions'][0])] for role in ROLES}
+    current=DEPLOY/'current-release.json'
+    if current.exists():
+        require(not current.is_symlink(),'RELEASE_RECEIPT_SYMLINK_REFUSED')
+        receipt=json.loads(current.read_text());rollback=receipt.get('rollbackSha','')
+        require(re.fullmatch('[a-f0-9]{40}',rollback) is not None,'ROLLBACK_RECEIPT_REQUIRED')
+        protected.update(f'eduk12-{role}:{rollback[:8]}' for role in ROLES)
+        protected.update(receipt.get('images',{}).values())
     roots=['/etc/eduk12-ops','/etc/eduk12-backups','/etc/eduk12-attachments','/etc/eduk12-cos-cleanup',
            '/etc/systemd/system',str(DEPLOY)]
     roots += [str(Path('/opt',name,'current').resolve()) for name in
               ['eduk12-ops','eduk12-backups','eduk12-attachments','eduk12-cos-cleanup']]
-    for root in roots:
-        for p in Path(root).glob('*'):
-            if p.is_file() and p.suffix in {'.py','.mjs','.cjs','.json','.sh','.env','.service','.yml'} and p.stat().st_size<1024**2:
-                protected.update(re.findall(r'eduk12-(?:frontend|backend|ops):[a-zA-Z0-9_.-]+',p.read_text(errors='ignore')))
+    files=[]
+    for root in roots:files.extend(Path(root).glob('*'))
+    for pattern in ['*/*.json','*/*/*.json']:
+        files.extend(p for p in DEPLOY.glob(pattern) if time.time()-p.stat().st_mtime<48*3600)
+    for p in files:
+        if p.name.startswith(('test_','ci-')) or p.name.endswith(('.test.mjs','.example.json')):continue
+        if p.is_file() and not p.is_symlink() and p.suffix in {'.py','.mjs','.cjs','.json','.sh','.env','.service','.yml'} and p.stat().st_size<1024**2:
+            value=p.read_text(errors='ignore')
+            protected.update(re.findall(r'eduk12-(?:frontend|backend|ops):[a-zA-Z0-9_.-]+',value))
+            protected.update(re.findall(r'sha256:[a-f0-9]{64}',value))
     return protected
 
+def eligible_project_image(item,c,now):
+    labels=item.get('Config',{}).get('Labels') or {};revision=labels.get('org.opencontainers.image.revision','')
+    if labels.get('org.opencontainers.image.source')!='https://github.com/caohuibj/eduK12-new-version' or not re.fullmatch('[a-f0-9]{40}',revision):return False
+    tags=item.get('RepoTags') or [];allowed={f'eduk12-{role}:{revision[:8]}' for role in ROLES}
+    if not tags or not set(tags)<=allowed:return False
+    created=dt.datetime.fromisoformat(item['Created'].replace('Z','+00:00')).timestamp()
+    return created<=now-c['cacheMinAgeHours']*3600
+
 def image_plan(c):
-    container_ids=command(['docker','ps','-aq']).split()
-    used=set()
+    container_ids=command(['docker','ps','-aq']).split();used=set()
     if container_ids:used.update(command(['docker','inspect','--format','{{.Image}}',*container_ids]).split())
-    protected=protected_refs(c);candidates=[]
+    protected=protected_refs(c);candidates=[];seen=set()
     for row in command(['docker','image','ls','--no-trunc','--format','{{.Repository}}:{{.Tag}}|{{.ID}}']).splitlines():
         tag,ident=row.split('|')
-        allowed={f'eduk12-{role}:{rev}' for role in ROLES for rev in c['oldImageRevisions']}
-        if tag not in allowed or tag in protected or ident in used:continue
-        # Refuse an ID that also has any unreviewed alias.
-        tags=json.loads(command(['docker','image','inspect','--format','{{json .RepoTags}}',ident])) or []
-        if set(tags)<=allowed and not set(tags)&protected:candidates.append({'tag':tag,'id':ident})
+        if not re.fullmatch(r'eduk12-(?:frontend|backend|ops):[a-f0-9]{8}',tag) or ident in seen:continue
+        seen.add(ident)
+        if tag in protected or ident in used or ident in protected:continue
+        item=json.loads(command(['docker','image','inspect',ident]))[0]
+        if not eligible_project_image(item,c,time.time()) or set(item['RepoTags'])&protected:continue
+        for alias in item['RepoTags']:candidates.append({'tag':alias,'id':ident})
     return candidates
 
 def execute(c,images=False):
@@ -121,7 +142,7 @@ def execute(c,images=False):
             command(['docker','image','rm',item['tag']])
             removed.append(item['tag'])
     return {'status':'COMPLETE','removedCaches':[x['path'] for x in caches],'removedImageTags':removed,
-            'imageDeletionAutomatic':False,'buildCacheLimit':c['buildCacheLimit'],
+            'imageDeletionAutomatic':images,'buildCacheLimit':c['buildCacheLimit'],
             'beforeFreeBytes':before,'afterFreeBytes':shutil.disk_usage('/').free}
 
 def main():
@@ -138,7 +159,10 @@ def main():
         fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
         locks=[]
         try:
-            for p in [STATE/'deploy.lock',Path('/var/lib/eduk12-backups/backup.lock'),Path('/var/lib/eduk12-attachments/host.lock')]:
+            release_locks=sorted(DEPLOY.glob('*/release.lock'))
+            require(len(release_locks)<=32,'RELEASE_LOCK_INVENTORY_LIMIT')
+            require(DEPLOY/'scoped-release/release.lock' in release_locks,'ACTIVE_RELEASE_LOCK_REQUIRED')
+            for p in [STATE/'deploy.lock',*release_locks,Path('/var/lib/eduk12-backups/backup.lock'),Path('/var/lib/eduk12-attachments/host.lock')]:
                 require(not p.is_symlink(),'LOCK_SYMLINK_REFUSED');f=p.open('a');locks.append(f);fcntl.flock(f,fcntl.LOCK_EX|fcntl.LOCK_NB)
             result=execute(c,args.images) if args.apply else {'status':'PLAN_ONLY','caches':cache_plan(c),'images':image_plan(c)}
             record={'at':dt.datetime.now(dt.timezone.utc).isoformat(),**result}

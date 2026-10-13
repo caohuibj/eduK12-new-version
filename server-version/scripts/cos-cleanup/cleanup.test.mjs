@@ -46,6 +46,15 @@ test('candidate quarantine and observation gaps prevent premature deletion',()=>
   for(const o of Object.values(p.observations)){o.firstSeen=at(48*hour);o.lastSeen=at(37*hour);}
   assert.equal(plan(c,f,p,now).actions.length,0);
 });
+test('temporary recovery block preserves quarantine without refreshing observation age',()=>{
+  const f=fixture(),previous=mature(f);f.hostStatus.status='FAILED';
+  const blocked=plan(c,f,previous,now);assert.equal(blocked.actions.length,0);
+  assert.deepEqual(blocked.observations,previous.observations);
+  f.hostStatus.status='VERIFIED';
+  assert.ok(plan(c,f,blocked,now).actions.length>0);
+  for(const o of Object.values(blocked.observations))o.lastSeen=at(37*hour);
+  assert.equal(plan(c,f,blocked,now).actions.length,0);
+});
 test('pending scan, stale verification, failed backup, unknown metadata and missing proof block all actions',()=>{
   const changes=[f=>f.attachment.pending=true,f=>f.attachment.lastFullVerificationAt=at(37*hour),f=>f.hostStatus.status='FAILED',f=>f.unknownMetadata.push('unknown'),f=>f.proof=null,f=>f.launcherFailure=true,f=>f.proof.checks.databaseReferences=false];
   for(const change of changes){const f=fixture();change(f);const p=mature(f);assert.ok(p.blocked.length>0);assert.equal(p.actions.length,0);}

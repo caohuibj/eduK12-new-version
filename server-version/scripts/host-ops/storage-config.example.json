@@ -5,7 +5,7 @@
     "5f2c67a5",
     "c8483290"
   ],
-  "builder": "eduk12-release243",
+  "builder": "default",
   "buildCacheLimit": "2gb",
   "cacheMinAgeHours": 48,
   "oldImageRevisions": [

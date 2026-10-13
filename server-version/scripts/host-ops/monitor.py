@@ -13,6 +13,7 @@ import socket
 import ssl
 import subprocess
 import time
+import capacity
 
 
 def command(args, timeout=12):
@@ -195,7 +196,7 @@ def collect(config):
             if timestamp.tzinfo is None or timestamp.timestamp() > time.time() + 300:
                 raise ValueError('joint recovery timestamp invalid')
             age = max(0, int(time.time() - timestamp.timestamp()))
-            level = 'critical' if status.get('status') == 'FAILED' or status.get('reason') == 'pending_cleanup_requires_resume' else 'warning' if age > 3 * 3600 else 'ok'
+            level = 'critical' if status.get('status') == 'FAILED' or status.get('reason') == 'pending_cleanup_requires_resume' else 'warning' if age > config.get('cos_recovery_max_age_hours',3) * 3600 else 'ok'
             data['cos_recovery'] = {k: status.get(k) for k in ['status','retainedPoints','newIsolatedRestores','immutableBindingsRechecked','cleanupActivated','blocked']}
             checks.append(finding('cos_joint_recovery_health', level, {'status': status.get('status'), 'age_seconds': age}))
         probe('collector:cos_joint_recovery', recovery_status)
@@ -253,6 +254,17 @@ def collect(config):
             level='critical' if value.get('status')=='FAILED' else 'warning' if age>max_age else 'ok'
             checks.append(finding(key,level,{'status':value.get('status'),'age_seconds':age}))
         probe('collector:'+key,maintenance_status)
+
+    if config.get('backup_cycle_status'):
+        def cycle_health():
+            value=json.loads(Path(config['backup_cycle_status']).read_text())
+            latest=json.loads(Path(config['backup_cycle_success']).read_text())
+            stamp=dt.datetime.fromisoformat(latest['completedAt'])
+            if stamp.tzinfo is None or stamp.timestamp()>time.time()+300:raise ValueError('cycle timestamp invalid')
+            age=max(0,int(time.time()-stamp.timestamp()))
+            level='critical' if value.get('status')=='FAILED' or age>36*3600 else 'warning' if value.get('status')=='RUNNING' and time.time()-dt.datetime.fromisoformat(value['at']).timestamp()>7200 else 'ok'
+            checks.append(finding('backup_cycle_health',level,{'status':value.get('status'),'last_success_age_seconds':age,'stage':value.get('stage')}))
+        probe('collector:backup_cycle',cycle_health)
 
     def retention():
         names = command(["/usr/bin/docker", "volume", "ls", "--filter", "dangling=true", "--format", "{{.Name}}"])
@@ -321,6 +333,24 @@ def main():
         logger.addHandler(RotatingFileHandler(log_dir / "events.jsonl", maxBytes=1024*1024, backupCount=4))
         started = time.time()
         data, checks = collect(config)
+        if config.get('capacity_planning'):
+            try:
+                inventory=json.loads(Path(config['cos_capacity_status']).read_text())
+                receipt=json.loads(Path(config['cos_backup_receipt']).read_text())
+                policy=json.loads(Path(config['cleanup_config']).read_text())
+                v=os.statvfs('/');buckets=inventory['buckets']
+                current={'at':dt.datetime.now(dt.timezone.utc).isoformat(),'disk_used_bytes':(v.f_blocks-v.f_bfree)*v.f_frsize,
+                         'disk_free_bytes':v.f_bavail*v.f_frsize,'cos_bytes':sum(b['allVersionBytes'] for b in buckets),
+                         'host_backup_bytes':sum(b.get('prefixes',{}).get('host-backups/',0) for b in buckets)}
+                history_file=state_dir/'capacity-history.json'
+                history=capacity.retain_history(json.loads(history_file.read_text()) if history_file.exists() else [],current)
+                hosts=json.loads(Path('/var/lib/eduk12-backups/catalog.json').read_text())
+                protected=max(1,sum(p.get('protected') is True and p.get('status')!='RETIRED' for p in hosts['points']))
+                budget=capacity.assess(history,current,receipt,policy,protected)
+                atomic_json(history_file,history);atomic_json(state_dir/'capacity-budget.json',budget)
+                data['capacity_planning']={k:v for k,v in budget.items() if k!='checks'};checks.extend(budget['checks'])
+            except Exception as exc:
+                checks.append(finding('collector:capacity_planning','critical',{'error_type':type(exc).__name__}))
         previous_file = state_dir / "state.json"
         previous = json.loads(previous_file.read_text()) if previous_file.exists() else {}
         # Restart deltas refer to the same immutable container image, avoiding release resets.
