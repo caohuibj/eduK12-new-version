@@ -332,6 +332,7 @@ const CheckinSubmit: React.FC = () => {
             <button
               onClick={() => setShowOthers(!showOthers)}
               className="student-submit-inline-action"
+              style={{ color: '#1e40af' }}
             >
               <Eye className="w-4 h-4 mr-1" />
               {showOthers ? '收起' : '查看'}

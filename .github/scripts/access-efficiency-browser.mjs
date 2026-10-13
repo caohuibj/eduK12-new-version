@@ -25,6 +25,7 @@ run(['docker','run','-d','--name','access-ui','-p','127.0.0.1:3189:80','--add-ho
 const browser=await chromium.launch({headless:true,args:['--host-resolver-rules=MAP eduk12.top 127.0.0.1, MAP training.eduk12.top 127.0.0.1','--no-proxy-server']});
 mkdirSync(join(dir,'browser'),{recursive:true});
 const evidence=[];
+let activeCase;
 const variants=[
  {key:'training-courses',host:'training.eduk12.top',path:'/student',button:'加载更多课程',scope:'.training-course-section',endpoint:'/api/courses/my'},
  {key:'student-courses',host:'eduk12.top',path:'/student',button:'加载更多课程',scope:'.hui-student-home',endpoint:'/api/courses/my'},
@@ -33,20 +34,32 @@ const variants=[
  {key:'student-peers',host:'eduk12.top',path:'/student/checkins/task-1',button:'加载更多提交',scope:'[aria-labelledby=checkin-others-title]',endpoint:'/api/checkins/task-1/others-submissions',peers:true},
 ];
 const course={id:'course-1',title:'合成课程',description:'合成课程简介',createdAt:'2026-01-01T00:00:00.000Z',status:'PUBLISHED',courseCode:'SYNTHETIC'};
-const checkin={id:'task-1',title:'合成打卡',courseId:'course-1',course:{id:'course-1',title:'合成课程'},createdAt:'2026-01-01T00:00:00.000Z',allowViewOthers:true,content:'',images:[],videos:[],documents:[],_count:{submissions:45}};
+const checkin={id:'task-1',title:'合成打卡',courseId:'course-1',course:{id:'course-1',title:'合成课程'},createdAt:'2026-01-01T00:00:00.000Z',allowViewOthers:true,content:'',images:[],videos:[],documents:[],tags:[],_count:{submissions:45}};
 try{
  for(const variant of variants)for(const width of [390,768,1440]){
-  const page=await browser.newPage({viewport:{width,height:900}}),errors=[],calls=[];let nextFailures=0;
-  page.on('pageerror',error=>errors.push(error.message));
+  const page=await browser.newPage({viewport:{width,height:900}}),errors=[],calls=[];let nextFailures=0,rejectFatal;
+  page.setDefaultTimeout(8000);
+  const fatal=new Promise((_,reject)=>{rejectFatal=reject});fatal.catch(()=>{});
+  const fail=message=>{errors.push(message);rejectFatal(new Error(message))};
+  activeCase={view:variant.key,width,stage:'navigation',errors,calls};
+  const step=async(stage,fn)=>{activeCase.stage=stage;return Promise.race([fn(),fatal])};
+  page.on('pageerror',error=>fail(error.message));
+  page.on('console',message=>{
+   // HTTP 503 is an expected fixture. React-caught render exceptions are not
+   // pageerror events, so expose those instead of waiting on a missing button.
+   if(message.type()==='error'&&/^(TypeError:|ReferenceError:|Error:|Minified React error)/.test(message.text()))fail(message.text());
+  });
   await page.route('**/*',async route=>{
    const url=new URL(route.request().url());
    if(!['eduk12.top','training.eduk12.top'].includes(url.hostname))return route.abort();
    if(url.pathname==='/access-ci-axe.js')return route.fulfill({contentType:'application/javascript',body:readFileSync('.github/release-tools/node_modules/axe-core/axe.min.js','utf8')});
    if(!url.pathname.startsWith('/api/'))return route.continue();
-   const path=url.pathname;calls.push(url.pathname+url.search);
-   let data={list:[],total:0,pageSize:20,counts:{ACTIONABLE:0,UPCOMING:0,EXPIRED:0,COMPLETED:0}};
+   const path=url.pathname;calls.push(route.request().method()+' '+url.pathname+url.search);
+   if(route.request().method()!=='GET'){fail('Unexpected fixture method: '+calls.at(-1));return route.abort()}
+   let data;
    if(path==='/api/auth/me')data={id:'synthetic-user',username:'synthetic',nickname:'合成用户',role:variant.teacher?'TEACHER':'STUDENT',accountDomain:variant.host.startsWith('training')?'TRAINING':'LEGACY',isActive:true,mustChangePassword:false};
    else if(path==='/api/capabilities')data={cognitive:false,parentPortal:false};
+   else if(path==='/api/courses/my/tasks')data={list:[],page:1,total:0,pageSize:20,generatedAt:'2026-01-01T00:00:00.000Z',counts:{ACTIONABLE:0,PENDING:0,IN_PROGRESS:0,UPCOMING:0,EXPIRED:0,COMPLETED:0,UNAVAILABLE:0}};
    else if(path==='/api/courses')data={list:[course],total:1};
    else if(path==='/api/checkins')data={list:[checkin],total:1};
    else if(path==='/api/checkins/tags')data={tags:[]};
@@ -61,35 +74,46 @@ try{
       :{id:next?'submission-2':'submission-1',content:label,images:[],createdAt:'2026-01-01T00:00:00.000Z',student:{id:'synthetic-student',username:'synthetic',nickname:'合成同学'}};
     data={list:[row],total:45,pageSize:20,hasMore:!next,nextCursor:next?null:'synthetic-next'};
    }
+   else if(['/api/courses/my','/api/checkins/my'].includes(path))data={list:[],total:0,pageSize:20,hasMore:false,nextCursor:null};
+   else {fail('Missing explicit API fixture: '+calls.at(-1));return route.abort()}
    return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({code:0,data,message:'操作成功'})});
   });
-  await page.goto(`http://${variant.host}:3189${variant.path}`);
-  if(variant.teacher)await page.getByRole('button',{name:'查看提交',exact:true}).first().click();
-  if(variant.peers)await page.getByRole('button',{name:'查看',exact:true}).click();
-  await page.getByText('第一页',{exact:true}).waitFor();
-  const button=page.getByRole('button',{name:variant.button,exact:true});await button.waitFor();
-  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
-  await page.addScriptTag({url:`http://${variant.host}:3189/access-ci-axe.js`});
-  // Limit WCAG to the affected list/dialog surface. Existing application-wide
-  // navigation is not a newly changed component or an extra regression gate.
-  const scope=await page.locator(variant.scope).count()?variant.scope:variant.peers?'.student-submit-page':variant.scope;
-  const axe=await page.evaluate(async selector=>window.axe.run({include:[selector]},{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}}),scope);
-  assert.deepEqual(axe.violations.map(item=>({id:item.id,impact:item.impact,nodes:item.nodes.map(n=>n.target)})),[]);
+  await step('navigation',()=>page.goto(`http://${variant.host}:3189${variant.path}`));
+  if(variant.teacher)await step('open submissions',()=>page.getByRole('button',{name:'查看提交',exact:true}).first().click());
+  if(variant.peers)await step('open peers',()=>page.getByRole('button',{name:'查看',exact:true}).click());
+  await step('first page',()=>page.getByText('第一页',{exact:true}).waitFor());
+  const button=page.getByRole('button',{name:variant.button,exact:true});await step('load-more button',()=>button.waitFor());
+  await step('load WCAG tool',()=>page.addScriptTag({url:`http://${variant.host}:3189/access-ci-axe.js`}));
+  // Only the changed list/dialog. No fallback may silently broaden the scope.
+  assert.equal(await page.locator(variant.scope).count(),1,'Affected surface missing: '+variant.scope);
+  const scope=variant.scope;
+  const audit=async state=>step('WCAG '+state,async()=>{
+   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'Horizontal overflow');
+   const axe=await page.evaluate(async selector=>window.axe.run({include:[selector]},{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}}),scope);
+   const violations=axe.violations.map(item=>({id:item.id,impact:item.impact,nodes:item.nodes.map(n=>({target:n.target,summary:n.failureSummary}))}));
+   activeCase.violations=violations;
+   assert.deepEqual(violations,[],variant.key+' '+width+' '+state);
+  });
+  await audit('first');
   await page.screenshot({path:join(dir,'browser',`${variant.key}-${width}-first.png`),fullPage:true});
-  await button.click();await page.getByText('合成临时失败',{exact:false}).waitFor();
+  await step('temporary error',async()=>{await button.click();await page.getByText('合成临时失败',{exact:false}).waitFor()});
   assert.equal(await page.getByText('第一页',{exact:true}).count(),1);
-  await button.click();await page.getByText('第二页',{exact:true}).waitFor();
+  await audit('error');
+  await step('retry next page',async()=>{await button.click();await page.getByText('第二页',{exact:true}).waitFor()});
   assert.equal(await page.getByText('第一页',{exact:true}).count(),1);assert.equal(await button.count(),0);
-  assert.equal(calls.filter(call=>call.startsWith(variant.endpoint+'?cursor=')).length,2);
+  assert.equal(calls.filter(call=>call.startsWith('GET '+variant.endpoint+'?cursor=')).length,2);
   assert.deepEqual(errors,[]);
+  await audit('next');
   await page.screenshot({path:join(dir,'browser',`${variant.key}-${width}-next.png`),fullPage:true});
-  evidence.push({view:variant.key,width,status:'success',calls,scope,wcagViolations:0});await page.close();
+  evidence.push({view:variant.key,width,status:'success',calls,scope,wcagStates:['first','error','next'],wcagViolations:0});
+  writeFileSync(join(dir,'browser','progress.json'),JSON.stringify({head:plan.head,image:runtime.id,evidence},null,2));
+  console.log('PASS pagination '+variant.key+' '+width+' first/error/retry and WCAG');await page.close();
  }
  checks.browser={status:'success',at:new Date().toISOString(),key:browserKey,sourceHead:plan.head,image:runtime.id};
  writeFileSync(join(dir,'browser','browser.json'),JSON.stringify({head:plan.head,image:runtime.id,evidence,authority:'Synthetic UI fixtures; PostgreSQL/Redis authority and privacy tested independently.'},null,2));
  writeFileSync(join(dir,'checks.json'),JSON.stringify(checks,null,2));
 }catch(error){
  const page=browser.contexts().flatMap(context=>context.pages()).at(-1);
- if(page){await page.screenshot({path:join(dir,'browser','failure.png'),fullPage:true});writeFileSync(join(dir,'browser','failure.json'),JSON.stringify({url:page.url(),text:await page.locator('body').innerText(),error:String(error)},null,2));}
+ if(page){await page.screenshot({path:join(dir,'browser','failure.png'),fullPage:true});writeFileSync(join(dir,'browser','failure.json'),JSON.stringify({...activeCase,completed:evidence,url:page.url(),text:await page.locator('body').innerText(),error:String(error)},null,2));}
  throw error;
 }finally{await browser.close();run(['docker','rm','-f','access-ui']);}

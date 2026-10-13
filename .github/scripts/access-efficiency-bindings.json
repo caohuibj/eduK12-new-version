@@ -75,7 +75,7 @@
     },
     "server-version/frontend/src/pages/student/CheckinSubmit.tsx": {
       "before": "598031c8ec934c87968a70ae47c5aa0e5e5045b8",
-      "after": "1bccf57362bbf16821832dd5830f617b82d05751"
+      "after": "2de50e9448bab2faf49da16c61eb7ac9f942ecaf"
     },
     "server-version/frontend/src/pages/student/StudentCheckins.tsx": {
       "before": "4fa3d15bd13c501fdfef2f18e05fb12429396777",
