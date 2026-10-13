@@ -46,6 +46,15 @@ test('candidate quarantine and observation gaps prevent premature deletion',()=>
   for(const o of Object.values(p.observations)){o.firstSeen=at(48*hour);o.lastSeen=at(37*hour);}
   assert.equal(plan(c,f,p,now).actions.length,0);
 });
+test('temporary recovery block preserves quarantine without refreshing observation age',()=>{
+  const f=fixture(),previous=mature(f);f.hostStatus.status='FAILED';
+  const blocked=plan(c,f,previous,now);assert.equal(blocked.actions.length,0);
+  assert.deepEqual(blocked.observations,previous.observations);
+  f.hostStatus.status='VERIFIED';
+  assert.ok(plan(c,f,blocked,now).actions.length>0);
+  for(const o of Object.values(blocked.observations))o.lastSeen=at(37*hour);
+  assert.equal(plan(c,f,blocked,now).actions.length,0);
+});
 test('pending scan, stale verification, failed backup, unknown metadata and missing proof block all actions',()=>{
   const changes=[f=>f.attachment.pending=true,f=>f.attachment.lastFullVerificationAt=at(37*hour),f=>f.hostStatus.status='FAILED',f=>f.unknownMetadata.push('unknown'),f=>f.proof=null,f=>f.launcherFailure=true,f=>f.proof.checks.databaseReferences=false];
   for(const change of changes){const f=fixture();change(f);const p=mature(f);assert.ok(p.blocked.length>0);assert.equal(p.actions.length,0);}
@@ -168,4 +177,44 @@ test('detachment refuses conflicting versions for one retained deduplication key
   const other={...f.baseline,versionId:'other-retained-version',receipt:{...f.baseline.receipt,versionId:'other-retained-version'}};
   f.records.set(id(other),other);s.blobs=[id(other)];
   assert.throws(()=>detach(f,p),/DETACH_CONFLICTING_RETAINED_BLOB_VERSION/);
+});
+
+test('completed deletions finalize after freshness expiry without any new cloud writes or deletes',async t=>{
+  const {task,api}=await diskFixture(t);
+  const finish=task.finish.bind(task);task.finish=async()=>{throw Error('STOP_BEFORE_FINISH');};
+  await assert.rejects(task.run(),/STOP_BEFORE_FINISH/);
+  const j=await task.read(task.journalFile);assert.ok(task.completedActions(j));
+  task.clock=()=>now+72*hour;task.finish=finish;
+  const before=await api.versions(),deleted=api.deleted.length;
+  api.put=async()=>{throw Error('NO_UPLOAD_ALLOWED');};api.deleteVersion=async()=>{throw Error('NO_DELETE_ALLOWED');};
+  await task.run();assert.equal((await task.read(task.journalFile)).status,'COMPLETE');
+  assert.deepEqual(await api.versions(),before);assert.equal(api.deleted.length,deleted);
+});
+test('unfinished deletion still requires fresh joint recovery proof',async t=>{
+  const {task,api}=await diskFixture(t);api.failAfterDelete=true;await assert.rejects(task.run());
+  task.clock=()=>now+72*hour;const deleted=api.deleted.length;
+  await assert.rejects(task.run(),/JOINT_RECOVERY_PROOF_STALE/);assert.equal(api.deleted.length,deleted);
+});
+test('completion-only resume rejects changed producer catalogs and checkpoint pointer',async t=>{
+  for(const change of ['catalog','pointer']) {
+    const {task,api,paths}=await diskFixture(t);
+    task.finish=async()=>{throw Error('STOP_BEFORE_FINISH');};await assert.rejects(task.run());
+    task.clock=()=>now+72*hour;
+    if(change==='catalog'){
+      const value=unseal(JSON.parse(await fs.readFile(paths.host)),secret);value.foreign=true;
+      await fs.writeFile(paths.host,JSON.stringify(seal(value,secret))+'\n');
+    }else await api.put('attachments/v1/catalog-latest.json',Buffer.from('foreign!'));
+    await assert.rejects(task.run(),change==='catalog'?/LOCAL_CATALOG_CHANGED/:/UNEXPECTED_REMOTE_VERSION/);
+  }
+});
+
+test('different read and delete clients route only exact version deletes to the dedicated identity',async()=>{
+ const r={key:'host-backups/v1/'+'a'.repeat(32)+'/database.edubackup.enc',versionId:'immutable-v1',bytes:8,sha256:hash('content!')};
+ let present=true;const calls=[];
+ const reader={headObject(p,cb){calls.push('reader:head');if(!present)return cb({statusCode:404});cb(null,{headers:{'x-cos-version-id':r.versionId,'content-length':'8','x-cos-meta-sha256':r.sha256}});},deleteObject(){throw Error('WRITER_DELETE_FORBIDDEN');}};
+ const deleter={deleteObject(p,cb){calls.push('deleter:delete');assert.equal(p.VersionId,r.versionId);present=false;cb(null,{headers:{'x-cos-version-id':r.versionId,'x-cos-delete-marker':'false'}});}};
+ await new CosApi(c,reader,deleter).deleteVersion(r);
+ assert.equal(calls.filter(x=>x==='deleter:delete').length,1);assert.ok(calls.filter(x=>x==='reader:head').length>=3);
+ const probe=await fs.readFile(new URL('./sdk-smoke.mjs',import.meta.url),'utf8');
+ assert.match(probe,/new CosApi\(c,client,deleter\)/);assert.match(probe,/input[.]deleteCredentials/);
 });

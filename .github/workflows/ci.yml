@@ -81,6 +81,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ inputs.step_probe || 'none' }}-${{ inputs.step_probe == 'images' && inputs.probe_frontend_only && 'frontend' || 'all' }}
   cancel-in-progress: true
 
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+
 jobs:
   probe-frontend-build:
     if: github.event_name == 'workflow_dispatch' && contains(fromJSON('["frontend","browser","media","ui","ui-chromium","qa-ui"]'), inputs.step_probe)
@@ -217,6 +221,8 @@ jobs:
       release_plan: ${{ steps.scope.outputs.release_plan }}
       campus_plan: ${{ steps.scope.outputs.campus_plan }}
       homepage_copy_plan: ${{ steps.scope.outputs.homepage_copy_plan }}
+      access_efficiency_plan: ${{ steps.scope.outputs.access_efficiency_plan }}
+      backend_security_efficiency_plan: ${{ steps.scope.outputs.backend_security_efficiency_plan }}
       teacher_home_plan: ${{ steps.scope.outputs.teacher_home_plan }}
       survey_home_plan: ${{ steps.scope.outputs.survey_home_plan }}
       frontend: ${{ steps.scope.outputs.frontend }}
@@ -285,14 +291,30 @@ jobs:
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: node .github/scripts/content-scope.mjs
       - name: legacy routing contracts only for the legacy route
-        if: steps.scope.outputs.application_route == 'legacy' && steps.scope.outputs.scenario != 'release-tooling' && steps.scope.outputs.scenario != 'documentation'
+        if: steps.scope.outputs.application_route == 'legacy' && steps.scope.outputs.scenario != 'release-tooling' && steps.scope.outputs.scenario != 'documentation' && steps.scope.outputs.scenario != 'maintenance'
         run: node --test .github/scripts/runner-preflight.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/ci-browser-plan.test.mjs .github/scripts/api-response.test.mjs .github/scripts/mac-ci-cleanup.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-image-plan.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs .github/scripts/dependency-routing.test.mjs
+
+      - name: affected maintenance routing and merge contracts
+        if: steps.scope.outputs.scenario == 'maintenance' && github.event_name == 'pull_request'
+        run: node --test .github/scripts/content-scope.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs
 
       - name: homepage copy boundary and affected routing contracts
         if: steps.scope.outputs.application_route == 'homepage-copy' && github.event_name == 'pull_request'
         env:
           CI_BASE_SHA: ${{ fromJSON(steps.scope.outputs.homepage_copy_plan).base }}
         run: node --test .github/scripts/homepage-copy.test.mjs .github/scripts/campus-scope.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/maintenance-routing.test.mjs .github/scripts/dependency-routing.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs
+
+      - name: frozen efficiency routing, prerequisite refusal and homepage preservation
+        if: steps.scope.outputs.application_route == 'access-efficiency' && github.event_name == 'pull_request'
+        run: |
+          node --test .github/scripts/access-efficiency-scope.test.mjs .github/scripts/github-official-source.test.mjs .github/scripts/ci-image-plan.test.mjs .github/scripts/dependency-routing.test.mjs .github/scripts/survey-home.test.mjs .github/scripts/teacher-home.test.mjs
+          python3 -B -m unittest discover -s .github/scripts -p test_access_efficiency_reuse.py
+
+      - name: frozen backend repair routing and fail-closed merge contracts
+        if: steps.scope.outputs.application_route == 'backend-security-efficiency' && github.event_name == 'pull_request'
+        env:
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: node --test .github/scripts/backend-security-efficiency-scope.test.mjs .github/scripts/survey-home.test.mjs .github/scripts/teacher-home.test.mjs
 
       - name: Teacher exact patch routing and fail-closed merge contracts
         if: steps.scope.outputs.application_route == 'teacher-home' && github.event_name == 'pull_request'
@@ -314,6 +336,7 @@ jobs:
     uses: ./.github/workflows/ci-maintenance.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
+      merge_proof: ${{ github.event_name == 'pull_request' && github.event.pull_request.number == 292 && needs.scope.outputs.scenario == 'maintenance' }}
 
   documentation:
     name: documentation / whitespace and scope validation
@@ -589,7 +612,7 @@ jobs:
     name: codeql (javascript/typescript SAST)
     # Static analysis runs independently; the aggregate gate still requires frontend.
     needs: scope
-    if: ${{ !cancelled() && ((((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.codeql == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) && needs.scope.outputs.application_route == 'legacy') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'homepage-copy' && fromJSON(needs.scope.outputs.homepage_copy_plan).toolsChanged) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'teacher-home') || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'survey-home') || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'campus') || (github.event_name == 'pull_request' && (needs.scope.outputs.application_route == 'A' || needs.scope.outputs.application_route == 'B') && contains(fromJSON(needs.scope.outputs.release_plan).required, 'sast'))) }}
+    if: ${{ !cancelled() && ((((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.codeql == 'true' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)))) && needs.scope.outputs.application_route == 'legacy') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'homepage-copy' && fromJSON(needs.scope.outputs.homepage_copy_plan).toolsChanged) || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'access-efficiency') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'backend-security-efficiency') || (github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'teacher-home') || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'survey-home') || (github.event_name == 'pull_request' && needs.scope.outputs.application_route == 'campus') || (github.event_name == 'pull_request' && (needs.scope.outputs.application_route == 'A' || needs.scope.outputs.application_route == 'B') && contains(fromJSON(needs.scope.outputs.release_plan).required, 'sast'))) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     permissions:
@@ -608,7 +631,7 @@ jobs:
         with:
           languages: javascript-typescript
           config: >-
-            ${{ needs.scope.outputs.application_route == 'teacher-home' && 'paths: [server-version/frontend/src/huiteacher, server-version/backend/src/index.ts, server-version/backend/src/modules/huiteacher, server-version/backend/src/modules/campus, server-version/backend/src/middleware, server-version/backend/src/utils, .github/scripts/teacher-home-scope.mjs, .github/scripts/teacher-home-browser.mjs, .github/scripts/teacher-home-fixture.cjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'survey-home' && 'paths: [server-version/frontend/src/survey, .github/scripts/survey-home-scope.mjs, .github/scripts/survey-home-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'homepage-copy' && 'paths: [.github/scripts/homepage-copy-scope.mjs, .github/scripts/homepage-copy-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.scenario == 'release-tooling' && 'paths: [.github/scripts, server-version/scripts/release]' || '' }}
+            ${{ needs.scope.outputs.application_route == 'access-efficiency' && 'paths: [server-version/backend/src, server-version/frontend/src/hooks, server-version/frontend/src/pages/student, server-version/frontend/src/pages/CheckinList.tsx, server-version/frontend/src/training/TrainingLearnerHome.tsx, server-version/miniprogram, server-version/miniprogram-v2/domains, .github/scripts/github-official-source.test.mjs, .github/scripts/ci-image-plan.mjs, .github/scripts/dependency-scope.mjs, .github/scripts/access-efficiency-scope.mjs, .github/scripts/access-efficiency-browser.mjs, .github/scripts/access-efficiency-candidate.py, .github/scripts/access-efficiency-reuse.py, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'backend-security-efficiency' && 'paths: [server-version/backend/src, .github/scripts/backend-security-efficiency-scope.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs, .github/scripts/campus-candidate.py]' || needs.scope.outputs.application_route == 'teacher-home' && 'paths: [server-version/frontend/src/huiteacher, server-version/backend/src/index.ts, server-version/backend/src/modules/huiteacher, server-version/backend/src/modules/campus, server-version/backend/src/middleware, server-version/backend/src/utils, .github/scripts/teacher-home-scope.mjs, .github/scripts/teacher-home-browser.mjs, .github/scripts/teacher-home-fixture.cjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'survey-home' && 'paths: [server-version/frontend/src/survey, .github/scripts/survey-home-scope.mjs, .github/scripts/survey-home-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.application_route == 'homepage-copy' && 'paths: [.github/scripts/homepage-copy-scope.mjs, .github/scripts/homepage-copy-browser.mjs, .github/scripts/content-scope.mjs, .github/scripts/merge-gate.mjs]' || needs.scope.outputs.scenario == 'release-tooling' && 'paths: [.github/scripts, server-version/scripts/release]' || '' }}
           # Bound analysis resources on the hosted Ubuntu VM.
           ram: 3500
           threads: 2
@@ -745,6 +768,20 @@ jobs:
     with:
       plan: ${{ needs.scope.outputs.homepage_copy_plan }}
 
+  access-efficiency:
+    needs: scope
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'access-efficiency'
+    uses: ./.github/workflows/ci-access-efficiency.yml
+    with:
+      plan: ${{ needs.scope.outputs.access_efficiency_plan }}
+
+  backend-security-efficiency:
+    needs: scope
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'backend-security-efficiency'
+    uses: ./.github/workflows/ci-backend-security-efficiency.yml
+    with:
+      plan: ${{ needs.scope.outputs.backend_security_efficiency_plan }}
+
   teacher-home:
     needs: scope
     if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'teacher-home'
@@ -761,7 +798,7 @@ jobs:
 
   merge-gate:
     name: merge gate / ready PR
-    needs: [scope, maintenance, documentation, content, visual, pr-light-backend, pr-light-frontend, backend, backend-browser-build, backend-regression, frontend-build, frontend, browser, docker, codeql, miniprogram, accept-media, accept-ui, accept-visual, accept-perf, accept-ops, scoped-release, homepage-copy, release-tools, campus, teacher-home, survey-home]
+    needs: [scope, maintenance, documentation, content, visual, pr-light-backend, pr-light-frontend, backend, backend-browser-build, backend-regression, frontend-build, frontend, browser, docker, codeql, miniprogram, accept-media, accept-ui, accept-visual, accept-perf, accept-ops, scoped-release, homepage-copy, access-efficiency, backend-security-efficiency, release-tools, campus, teacher-home, survey-home]
     if: ${{ always() && (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 8

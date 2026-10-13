@@ -1,3 +1,4 @@
+import { probeVideo } from '../utils/videoProbe'
 /**
  * 视频处理 Worker - 统一版本（优化并发）
  * 优化：统一处理队列，限制全局并发为 1，避免 CPU 占满
@@ -20,10 +21,11 @@ import { config } from '../config'
 import { prisma } from '../config/database'
 import { logger } from '../utils/logger'
 import { downloadVideo, validateVideoFile, VideoValidationResult } from '../utils/videoDownloader'
-import { attachAssetReference, discardUnreferencedAsset, getSignedAssetUrl, storeAssetFromFile } from '../services/assetStorage'
+import { attachAssetReference, discardUnreferencedAsset, signKnownAsset, storeAssetFromFile } from '../services/assetStorage'
 import { associateVideoRetryJob, markVideoFailed, markVideoProcessing, releaseVideoProcessingForRetry } from '../services/videoProcessingState'
 import { isFinalVideoAttempt, reconcileStaleProcessingVideos, registerVideoProcessingRecovery, stopVideoProcessingRecovery } from '../services/videoProcessingRecovery'
 import { isWorkerShutdownCancellationError, registerWorkerSubprocess, WorkerShutdownCancellationError, workerShutdownCancellationRequested } from './workerSubprocessRegistry'
+import { videoOutputMaxBytes, VIDEO_THUMBNAIL_MAX_BYTES } from '../services/remoteVideoAdmission'
 
 // 处理策略类型
 interface ProcessingStrategy {
@@ -168,6 +170,10 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
       originalFileSize = stat.size
       logger.info(`[${videoId}] 文件大小: ${(originalFileSize / 1024 / 1024).toFixed(2)}MB`)
     }
+    const inputStat = await fs.stat(inputPath)
+    if (!inputStat.isFile()) throw new Error('视频输入文件无效')
+    originalFileSize = inputStat.size
+    const outputMaxBytes = videoOutputMaxBytes(originalFileSize)
 
     await job.progress(10)
 
@@ -193,7 +199,7 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
 
     // 步骤4：转码 + 添加水印 (核心步骤)
     logger.info(`[${videoId}] 步骤 4/6: 转码 (${strategy.resolution}, preset: ${strategy.preset}, crf: ${strategy.crf})...`)
-    await transcodeVideoOptimized(inputPath, outputPath, watermarkAvailable ? cornerWatermarkPath : null, strategy, (progress) => {
+    await transcodeVideoOptimized(inputPath, outputPath, watermarkAvailable ? cornerWatermarkPath : null, strategy, outputMaxBytes, videoInfo.duration || 0, (progress) => {
       const jobProgress = 30 + Math.floor(progress * 0.4)
       job.progress(jobProgress).catch(() => { })
     })
@@ -210,7 +216,7 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
         resolution: strategy.resolution,
         reason: '压缩后文件变大，改用仅水印模式'
       }
-      await transcodeVideoOptimized(inputPath, outputPath, watermarkAvailable ? cornerWatermarkPath : null, watermarkOnlyStrategy, (progress) => {
+      await transcodeVideoOptimized(inputPath, outputPath, watermarkAvailable ? cornerWatermarkPath : null, watermarkOnlyStrategy, outputMaxBytes, videoInfo.duration || 0, (progress) => {
         const jobProgress = 70 + Math.floor(progress * 0.1)
         job.progress(jobProgress).catch(() => { })
       })
@@ -223,7 +229,7 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
 
     // 步骤5：生成缩略图
     logger.info(`[${videoId}] 步骤 5/6: 生成缩略图...`)
-    await generateThumbnailOptimized(inputPath, thumbnailPath)
+    await generateThumbnailOptimized(inputPath, thumbnailPath, videoInfo.duration || 0)
     await job.progress(85)
 
     // 步骤6：上传存储
@@ -245,8 +251,8 @@ videoQueue.process('transcode', PROCESSING_CONFIG.concurrency, async (job) => {
       ownerId: teacherId,
     })
     derivativeAssets.push(thumbnailAsset)
-    const processedUrl = await getSignedAssetUrl(processedAsset.id)
-    const thumbnailUrl = await getSignedAssetUrl(thumbnailAsset.id)
+    const processedUrl = signKnownAsset(processedAsset)
+    const thumbnailUrl = signKnownAsset(thumbnailAsset)
 
     await job.progress(95)
 
@@ -419,22 +425,23 @@ function transcodeVideoOptimized(
   output: string,
   cornerWatermark: string | null,
   strategy: ProcessingStrategy,
+  maxOutputBytes: number,
+  totalTime: number,
   onProgress?: (progress: number) => void
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    let totalTime = 0
     let settled = false
     let timedOut = false
     let hardKillTimer: ReturnType<typeof setTimeout> | undefined
     let settleTracked!: () => void
     const tracked = new Promise<void>((done) => { settleTracked = done })
 
-    ffmpeg(input).ffprobe((err, data) => {
-      if (!err && data.format?.duration) totalTime = data.format.duration
-    })
-
     const baseResolution = RESOLUTION_MAP[strategy.resolution] || RESOLUTION_MAP['480p']
     const resConfig = { ...baseResolution, bitrate: PROCESSING_CONFIG.videoBitrate }
+    // Leave muxing/packet headroom inside the admitted bound. FFmpeg -fs can
+    // exit successfully with a truncated stream, so reaching its soft limit
+    // is a failure even when the subprocess reports a normal exit.
+    const outputSoftLimit = maxOutputBytes - 1024 * 1024
     const cmd = ffmpeg(input)
       .videoCodec('libx264')
       .videoBitrate(resConfig.bitrate)
@@ -446,8 +453,17 @@ function transcodeVideoOptimized(
         '-movflags +faststart',
         '-threads 1',
         '-pix_fmt yuv420p',
+        `-fs ${outputSoftLimit}`,
         ...(strategy.mode === 'transcode' ? ['-tune fastdecode', '-profile:v baseline', '-level 3.0'] : []),
       ])
+
+    // fluent-ffmpeg starts its own untracked ffprobe when progress listeners
+    // attach. Reuse the already validated input duration for this command.
+    cmd.ffprobe = ((...args: unknown[]) => {
+      const callback = args.at(-1) as (error: Error | null, data: unknown) => void
+      queueMicrotask(() => callback(null, { streams: [], format: { duration: totalTime } }))
+      return cmd
+    }) as typeof cmd.ffprobe
 
     const [targetWidth, targetHeight] = resConfig.size.split('x').map(Number)
     if (cornerWatermark) {
@@ -505,20 +521,25 @@ function transcodeVideoOptimized(
           onProgress(Math.min(100, Math.round((time / totalTime) * 100)))
         }
       })
-      .on('end', () => finish())
+      .on('end', () => {
+        void fs.stat(output).then(result => {
+          if (!result.isFile() || result.size <= 0 || result.size >= outputSoftLimit) finish(new Error('视频转码输出超过存储限制'))
+          else finish()
+        }, () => finish(new Error('无法核实视频转码输出大小')))
+      })
       .on('error', (err) => finish(new Error(`FFmpeg 转码失败: ${err.message}`)))
       .save(output)
   })
 }
 
-function generateThumbnailOptimized(input: string, output: string): Promise<void> {
+function generateThumbnailOptimized(input: string, output: string, duration: number): Promise<void> {
   return new Promise((resolve, reject) => {
     let settled = false
     let timedOut = false
     let hardKillTimer: ReturnType<typeof setTimeout> | undefined
     let settleTracked!: () => void
     const tracked = new Promise<void>((done) => { settleTracked = done })
-    const cmd = ffmpeg(input)
+    const cmd = ffmpeg(input).outputOptions([`-fs ${VIDEO_THUMBNAIL_MAX_BYTES - 1024 * 1024}`])
 
     const unregister = registerWorkerSubprocess(
       `video-thumbnail:${path.basename(output)}`,
@@ -549,10 +570,15 @@ function generateThumbnailOptimized(input: string, output: string): Promise<void
     }
 
     cmd
-      .on('end', () => finish())
+      .on('end', () => {
+        void fs.stat(output).then(result => {
+          if (!result.isFile() || result.size <= 0 || result.size >= VIDEO_THUMBNAIL_MAX_BYTES - 1024 * 1024) finish(new Error('视频缩略图输出超过存储限制'))
+          else finish()
+        }, () => finish(new Error('无法核实视频缩略图输出大小')))
+      })
       .on('error', (err) => finish(err))
       .screenshots({
-        timestamps: ['10%'],
+        timestamps: [Math.max(0, duration * 0.1)],
         filename: path.basename(output),
         folder: path.dirname(output),
         size: '640x360',
@@ -560,16 +586,10 @@ function generateThumbnailOptimized(input: string, output: string): Promise<void
   })
 }
 
-function getVideoDuration(input: string): Promise<number> {
-  return new Promise((resolve, reject) => {
-    ffmpeg.ffprobe(input, (err, metadata) => {
-      if (err) {
-        reject(new Error(`获取视频信息失败: ${err.message}`))
-      } else {
-        resolve(Math.floor(metadata.format.duration || 0))
-      }
-    })
-  })
+async function getVideoDuration(input: string): Promise<number> {
+  const data = await probeVideo(input)
+  const duration = Number(data.format?.duration || 0)
+  return Number.isFinite(duration) && duration > 0 ? Math.floor(duration) : 0
 }
 
 // 队列监控

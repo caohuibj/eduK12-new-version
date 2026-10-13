@@ -22,6 +22,10 @@ concurrency:
   group: perf-phase0-smoke-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+
 jobs:
   smoke:
     name: Scale + Cognitive + SJT fresh accounting

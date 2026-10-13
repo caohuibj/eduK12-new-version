@@ -11,6 +11,10 @@ permissions:
 concurrency:
   group: situational-publication-${{ github.event.pull_request.number }}
   cancel-in-progress: true
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+
 jobs:
   publication:
     if: github.event.pull_request.head.repo.full_name == github.repository

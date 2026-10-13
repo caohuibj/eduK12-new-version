@@ -1,0 +1,8 @@
+[Unit]
+Description=eduK12 daily eduk12-storage-maintenance
+[Timer]
+OnCalendar=*-*-* 03:30:00 Asia/Shanghai
+RandomizedDelaySec=180
+Persistent=true
+[Install]
+WantedBy=timers.target

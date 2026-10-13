@@ -8,9 +8,11 @@ import { need, hash, id } from './model.mjs';
 const input=JSON.parse(fs.readFileSync(0,'utf8'));
 need(input.command==='synthetic_version_delete','SYNTHETIC_PROBE_REQUIRED');
 const require=createRequire(import.meta.url),COS=require('/app/node_modules/cos-nodejs-sdk-v5');
-const client=new COS({SecretId:input.credentials.COS_SECRET_ID,SecretKey:input.credentials.COS_SECRET_KEY,...(input.credentials.COS_SECURITY_TOKEN?{SecurityToken:input.credentials.COS_SECURITY_TOKEN}:{}),Timeout:60000});
+need(input.deleteCredentials?.COS_SECRET_ID && input.deleteCredentials.COS_SECRET_ID !== input.credentials.COS_SECRET_ID,'DEDICATED_DELETE_IDENTITY_REQUIRED');
+const make=credentials=>new COS({SecretId:credentials.COS_SECRET_ID,SecretKey:credentials.COS_SECRET_KEY,...(credentials.COS_SECURITY_TOKEN?{SecurityToken:credentials.COS_SECURITY_TOKEN}:{}),Timeout:60000});
+const client=make(input.credentials),deleter=make(input.deleteCredentials);
 const c={backupBucket:'eduk12-backups-1393949445',region:'ap-beijing',maxInventoryVersions:10000};
-const api=new CosApi(c,client,client),key='host-backups/v1/'+crypto.randomUUID().replaceAll('-','')+'/database.edubackup.enc';
+const api=new CosApi(c,client,deleter),key='host-backups/v1/'+crypto.randomUUID().replaceAll('-','')+'/database.edubackup.enc';
 const bodies=[Buffer.from('synthetic-old-'+crypto.randomUUID()),Buffer.from('synthetic-retained-'+crypto.randomUUID())];
 const owned=[];
 try {

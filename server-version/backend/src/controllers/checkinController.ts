@@ -1,3 +1,4 @@
+import { listPage, cursorWhere, listPageResult, ListCursorError } from '../utils/listCursor'
 import { checkinExportImages } from '../utils/checkinExportImages'
 import { readTemporaryUpload, acceptedImageTypes } from '../middleware/uploadAdmission'
 import { createTemporaryUploadStorage } from '../utils/uploadTemp'
@@ -17,8 +18,9 @@ import {
   AssetReferenceValidationError,
   attachAssetReference,
   discardUnreferencedAsset,
-  getSignedAssetUrl,
+  signKnownAsset,
   hydrateAssetReferences,
+  hydrateAssetReferenceBatch,
   storeAsset,
   syncAssetReferences,
   validateAssetReferencesForCourse,
@@ -493,13 +495,11 @@ export const checkinController = {
         prisma.checkin.count({ where })
       ])
 
-      const hydratedCheckins = await Promise.all(
-        checkins.map((checkin) => hydrateAssetReferences(checkin, false, {
-          entityType: 'Checkin',
-          entityId: checkin.id,
-          courseId: checkin.courseId,
-          parentAccess: true,
-        })),
+      const hydratedCheckins = await hydrateAssetReferenceBatch(
+        checkins.map((checkin) => ({ value: checkin, context: {
+          entityType: 'Checkin', entityId: checkin.id,
+          courseId: checkin.courseId, parentAccess: true,
+        } })),
       )
       return success(res, buildPaginatedResult(hydratedCheckins, total, pagination))
     } catch (err) {
@@ -1083,7 +1083,7 @@ export const checkinController = {
       })
       uploadedAsset = asset
       await prisma.$transaction(tx => stageStudentUploadAsset(tx, id, userId, asset.id))
-      const url = await getSignedAssetUrl(asset.id)
+      const url = signKnownAsset(asset)
       if (!url) throw new Error('图片上传失败')
 
       logger.info('学生上传打卡图片', {
@@ -1161,68 +1161,23 @@ export const checkinController = {
         return error(res, '未登录')
       }
 
-      // 获取学生加入的所有课程ID
-      const courseStudents = await prisma.courseStudent.findMany({
-        where: {
-          studentId: userId,
-          status: { in: ['ACTIVE', 'APPROVED'] }
-        },
-        select: { courseId: true }
-      })
-      const courseIds = courseStudents.map(cs => cs.courseId)
-
-      // 获取这些课程的所有打卡
+      const { size, cursor, offset } = listPage(req.query)
+      const where = { course: { students: { some: { studentId: userId, status: { in: [CourseStudentStatus.ACTIVE, CourseStudentStatus.APPROVED] } } } } }
       const checkins = await prisma.checkin.findMany({
-        where: {
-          courseId: { in: courseIds }
+        where: { ...where, ...cursorWhere('createdAt', cursor) },
+        select: { id: true, title: true, description: true, endTime: true, createdAt: true,
+          course: { select: { id: true, title: true } },
+          submissions: { where: { studentId: userId }, select: { id: true }, take: 1 },
         },
-        include: {
-          course: {
-            select: {
-              id: true,
-              title: true,
-            }
-          },
-          submissions: {
-            where: {
-              studentId: userId
-            }
-          }
-        },
-        orderBy: {
-          createdAt: 'desc'
-        }
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], take: size + 1, skip: offset,
       })
-
-      // 格式化返回数据
-      const formattedCheckins = checkins.map(checkin => ({
-        ...checkin,
-        submission: checkin.submissions.length > 0 ? checkin.submissions[0] : undefined
-      }))
-
-      const hydratedCheckins = await Promise.all(formattedCheckins.map(async (checkin) => {
-        const hydrated = await hydrateAssetReferences(checkin, false, {
-          entityType: 'Checkin',
-          entityId: checkin.id,
-          courseId: checkin.courseId,
-          parentAccess: true,
-        })
-        if (!checkin.submission) return hydrated
-        const hydratedSubmission = await hydrateAssetReferences(checkin.submission, false, {
-          entityType: 'CheckinSubmission',
-          entityId: checkin.submission.id,
-          courseId: checkin.courseId,
-          checkinId: checkin.id,
-          parentAccess: true,
-        })
-        return { ...(hydrated as Record<string, unknown>), submission: hydratedSubmission }
-      }))
-
-      return success(res, {
-        list: hydratedCheckins,
-        total: hydratedCheckins.length,
-      })
+      const page = listPageResult(checkins, size, 'createdAt', cursor ? undefined : await prisma.checkin.count({ where }))
+      return success(res, { ...page, list: page.list.map(({ submissions, description, course, ...checkin }) => ({
+        ...checkin, description: description?.slice(0, 300), courseName: course.title, course,
+        submission: submissions[0],
+      })) })
     } catch (err) {
+      if (err instanceof ListCursorError) return error(res, err.message, 400)
       logger.error('获取我的打卡错误', err)
       return error(res, Messages.COMMON.FAILED)
     }
@@ -1234,6 +1189,7 @@ export const checkinController = {
       const userId = req.user?.userId
       const userRole = req.user?.role
       const { id } = req.params
+      const { size, cursor, offset } = listPage(req.query)
 
       const checkin = await prisma.checkin.findUnique({
         where: { id },
@@ -1258,7 +1214,7 @@ export const checkinController = {
       }
 
       const submissions = await prisma.checkinSubmission.findMany({
-        where: { checkinId: id },
+        where: { checkinId: id, ...cursorWhere('createdAt', cursor) },
         include: {
           student: {
             select: {
@@ -1269,20 +1225,16 @@ export const checkinController = {
             }
           }
         },
-        orderBy: {
-          createdAt: 'desc'
-        }
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], take: size + 1, skip: offset
       })
 
+      const page = listPageResult(submissions, size, 'createdAt', cursor ? undefined : await prisma.checkinSubmission.count({ where: { checkinId: id } }))
       // 格式化返回数据，确保 images 是字符串数组
-      const hydratedSubmissions = await Promise.all(
-        submissions.map((submission) => hydrateAssetReferences(submission, false, {
-          entityType: 'CheckinSubmission',
-          entityId: submission.id,
-          courseId: checkin.courseId,
-          checkinId: id,
-          parentAccess: true,
-        })),
+      const hydratedSubmissions = await hydrateAssetReferenceBatch(
+        page.list.map(submission => ({ value: submission, context: {
+          entityType: 'CheckinSubmission', entityId: submission.id,
+          courseId: checkin.courseId, checkinId: id, parentAccess: true,
+        } })),
       )
       const formattedSubmissions = (hydratedSubmissions as any[]).map(sub => {
         let imageUrls: string[] = []
@@ -1321,10 +1273,10 @@ export const checkinController = {
       })
 
       return success(res, {
-        list: formattedSubmissions,
-        total: submissions.length,
+        ...page, list: formattedSubmissions,
       })
     } catch (err) {
+      if (err instanceof ListCursorError) return error(res, err.message, 400)
       logger.error('获取打卡提交列表错误', err)
       return error(res, Messages.COMMON.FAILED)
     }
@@ -1335,6 +1287,7 @@ export const checkinController = {
     try {
       const userId = req.user?.userId
       const { id } = req.params
+      const { size, cursor, offset } = listPage(req.query)
 
       const checkin = await prisma.checkin.findUnique({
         where: { id },
@@ -1365,7 +1318,8 @@ export const checkinController = {
       const submissions = await prisma.checkinSubmission.findMany({
         where: { 
           checkinId: id,
-          studentId: { not: userId }
+          studentId: { not: userId },
+          ...cursorWhere('createdAt', cursor)
         },
         include: {
           student: {
@@ -1377,20 +1331,16 @@ export const checkinController = {
             }
           }
         },
-        orderBy: {
-          createdAt: 'desc'
-        }
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], take: size + 1, skip: offset
       })
 
+      const page = listPageResult(submissions, size, 'createdAt', cursor ? undefined : await prisma.checkinSubmission.count({ where: { checkinId: id, studentId: { not: userId } } }))
       // 格式化返回数据，确保 images 是字符串数组
-      const hydratedSubmissions = await Promise.all(
-        submissions.map((submission) => hydrateAssetReferences(submission, false, {
-          entityType: 'CheckinSubmission',
-          entityId: submission.id,
-          courseId: checkin.course.id,
-          checkinId: id,
-          parentAccess: true,
-        })),
+      const hydratedSubmissions = await hydrateAssetReferenceBatch(
+        page.list.map(submission => ({ value: submission, context: {
+          entityType: 'CheckinSubmission', entityId: submission.id,
+          courseId: checkin.course.id, checkinId: id, parentAccess: true,
+        } })),
       )
       const formattedSubmissions = (hydratedSubmissions as any[]).map(sub => {
         let imageUrls: string[] = []
@@ -1429,10 +1379,10 @@ export const checkinController = {
       })
 
       return success(res, {
-        list: formattedSubmissions,
-        total: submissions.length,
+        ...page, list: formattedSubmissions,
       })
     } catch (err) {
+      if (err instanceof ListCursorError) return error(res, err.message, 400)
       logger.error('获取他人打卡提交列表错误', err)
       return error(res, Messages.COMMON.FAILED)
     }
@@ -1859,7 +1809,7 @@ export const checkinController = {
         throw referenceError
       }
 
-      const publicUrl = await getSignedAssetUrl(asset.id, true)
+      const publicUrl = signKnownAsset(asset, true)
       if (!publicUrl) {
         throw new Error('公开资产签名 URL 生成失败')
       }

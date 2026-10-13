@@ -1,0 +1,89 @@
+name: Frozen access efficiency candidate
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+  actions: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+
+jobs:
+  candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      CI: 'true'
+      PLAN: ${{ inputs.plan }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: recheck exact full diff and preserved homepages
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {writeFileSync} from 'node:fs';
+          import {execFileSync} from 'node:child_process';
+          import {accessEfficiencyPlan} from './.github/scripts/access-efficiency-scope.mjs';
+          import {changedEntries} from './.github/scripts/content-scope.mjs';
+          const p=JSON.parse(process.env.PLAN),head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+          assert.equal(p.head,head);
+          assert.deepEqual(p,accessEfficiencyPlan(changedEntries(p.base,head),p.base,head));
+          writeFileSync('access-efficiency-plan.json',JSON.stringify(p,null,2));
+          JS
+      - uses: docker/setup-buildx-action@v3
+      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        with:
+          version: v0.70.0
+          cache: false
+      - name: compile affected components once and verify exact isolated contracts
+        run: python3 -B .github/scripts/access-efficiency-candidate.py
+      - name: install only pinned browser tools
+        run: |
+          npm ci --ignore-scripts --prefix .github/release-tools
+          node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
+      - name: verify affected pagination on the actual scanned runtime
+        run: node .github/scripts/access-efficiency-browser.mjs
+      - name: require all selected proof to be complete
+        run: |
+          python3 -B - <<'PY'
+          import json
+          p=json.load(open('access-efficiency-plan.json'));c=json.load(open('access-efficiency-evidence/checks.json'))
+          assert c['head']==p['head'] and c['components']==p['components']
+          for component in p['changed']:
+              assert c['compile'][component]['status']=='success' and c['runtime'][component]['status']=='success' and c['audit'][component]['status']=='success'
+          assert c['contracts']['frontend']['status']=='success' and c['extra']['status']=='success' and c['browser']['status']=='success'
+          keys=p['tests']+p['frontendTests']+[item['file']+'::'+item['title'] for item in p['focusedTests']]
+          assert all(c['tests'][key]['status']=='success' for key in keys)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: access-efficiency-${{ github.sha }}
+          path: |
+            access-efficiency-plan.json
+            access-efficiency-evidence/
+            !access-efficiency-evidence/prerequisite/**
+          if-no-files-found: error
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: access-diagnostics-${{ github.sha }}
+          path: |
+            access-efficiency-plan.json
+            access-efficiency-evidence/*.json
+            access-efficiency-evidence/browser/*.json
+            access-efficiency-evidence/browser/failure.png
+          if-no-files-found: error
+          retention-days: 3

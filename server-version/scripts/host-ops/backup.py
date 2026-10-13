@@ -246,10 +246,12 @@ def config_archive(work):
     files = [deploy / f for f in ['compose.sh', 'eduk12-prod.env', 'docker-compose.prod-override.yml',
                                   'docker-compose.login-workers.yml', 'docker-compose.pdf-worker-mime.yml', 'current-release.json']]
     files += [Path('/etc/nginx/nginx.conf'), Path('/etc/ssh/sshd_config'), CONFIG]
-    for directory in ['/etc/eduk12-ops', '/etc/eduk12-attachments']:
+    for directory in ['/etc/eduk12-ops', '/etc/eduk12-attachments', '/etc/eduk12-cos-cleanup']:
         p = Path(directory) / 'config.json'
         if p.exists():
             files.append(p)
+    storage = Path('/etc/eduk12-ops/storage.json')
+    if storage.exists(): files.append(storage)
     for p in Path('/etc/systemd/system').glob('eduk12-*'):
         if p.suffix in ['.timer', '.service'] and not p.is_symlink():
             files.append(p)
@@ -399,12 +401,18 @@ def main():
     signal.signal(signal.SIGTERM, interrupted); signal.signal(signal.SIGINT, interrupted)
     try:
         require(len(sys.argv) == 2 and sys.argv[1] == 'backup', 'COMMAND_REFUSED')
-        print(json.dumps(backup()))
+        if os.geteuid() == 0 and STATE.is_dir() and not STATE.is_symlink():
+            atomic(STATE / 'attempt.json', {'at':dt.datetime.now(dt.timezone.utc).isoformat(), 'status':'RUNNING'})
+        result=backup()
+        atomic(STATE / 'attempt.json', {'at':dt.datetime.now(dt.timezone.utc).isoformat(), **result})
+        print(json.dumps(result))
         return 0
     except Exception as e:
         code = str(e) if re.fullmatch('[A-Z][A-Z0-9_]{2,80}', str(e)) else 'BACKUP_FAILED'
         if STATE.is_dir() and not STATE.is_symlink():
-            atomic(STATE / 'status.json', {'status': 'FAILED', 'at': dt.datetime.now(dt.timezone.utc).isoformat(), 'error': code})
+            failed={'status':'FAILED','at':dt.datetime.now(dt.timezone.utc).isoformat(),'error':code}
+            atomic(STATE / 'status.json', failed)
+            atomic(STATE / 'attempt.json', failed)
         print(json.dumps({'status': 'FAILED', 'error': code}), file=sys.stderr)
         return 1
 

@@ -1,3 +1,4 @@
+import { useCursorList } from '../hooks/useCursorList'
 import { isTrainingHost } from '../training/context'
 import { useEditorGuard } from '../components/shared-ui/useEditorGuard'
 import ModalSurface from '../components/shared-ui/ModalSurface'
@@ -100,8 +101,7 @@ const CheckinList: React.FC = () => {
   // 提交列表弹窗状态
   const [showSubmissionsModal, setShowSubmissionsModal] = useState(false)
   const [selectedCheckin, setSelectedCheckin] = useState<Checkin | null>(null)
-  const [submissions, setSubmissions] = useState<CheckinSubmission[]>([])
-  const [submissionsLoading, setSubmissionsLoading] = useState(false)
+  const { list: submissions, loading: submissionsLoading, error: submissionsError, total: submissionsTotal, more: moreSubmissions, refresh: refreshSubmissions, hasMore: moreSubmissionsAvailable } = useCursorList<CheckinSubmission>(showSubmissionsModal && selectedCheckin ? `/checkins/${selectedCheckin.id}/submissions` : null)
 
   useEffect(() => {
     fetchCheckins()
@@ -317,22 +317,6 @@ const CheckinList: React.FC = () => {
   const openSubmissionsModal = (checkin: Checkin) => {
     setSelectedCheckin(checkin)
     setShowSubmissionsModal(true)
-    fetchSubmissions(checkin.id)
-  }
-
-  const fetchSubmissions = async (checkinId: string) => {
-    try {
-      setSubmissionsLoading(true)
-      const response = await apiClient.get(`/checkins/${checkinId}/submissions`)
-      if (response.code === 0) {
-        setSubmissions(response.data.list)
-      }
-    } catch (error) {
-      console.error('获取提交列表失败:', error)
-      showMessage('获取提交列表失败')
-    } finally {
-      setSubmissionsLoading(false)
-    }
   }
 
   const openCreateModal = () => {
@@ -434,7 +418,6 @@ const CheckinList: React.FC = () => {
   const closeSubmissions = () => {
     setShowSubmissionsModal(false)
     setSelectedCheckin(null)
-    setSubmissions([])
   }
 
   const editorGuard = useEditorGuard({ open: showModal, value: formData, onClose: closeEditor })
@@ -717,11 +700,11 @@ const CheckinList: React.FC = () => {
               {/* Stats */}
               <div className="staff-toolbar staff-submission-toolbar">
                 <span className="text-sm text-gray-500">
-                  共 {submissions.length} 人提交
+                  共 {submissionsTotal ?? submissions.length} 人提交
                 </span>
               </div>
 
-              {submissionsLoading ? (
+              {submissionsLoading && submissions.length === 0 ? (
                 <div className="flex items-center justify-center h-64">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-action"></div>
                 </div>
@@ -792,6 +775,8 @@ const CheckinList: React.FC = () => {
                 </div>
               )}
             </div>
+            {submissionsError && <p role="alert">{submissionsError}<button type="button" onClick={() => void refreshSubmissions()}>重试</button></p>}
+            {moreSubmissionsAvailable && <ProductButton disabled={submissionsLoading} onClick={() => void moreSubmissions()}>{submissionsLoading ? '加载中…' : '加载更多提交'}</ProductButton>}
           </div>
         </ModalSurface>
       )}

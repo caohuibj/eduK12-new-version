@@ -75,6 +75,19 @@ def cleanup_pending():
         raise RuntimeError('CLEANUP_JOURNAL_AUTHENTICATION_FAILED')
     return value.get('status') != 'COMPLETE'
 
+def attempt(command, value):
+    if command not in {'backup','verify','plan'}: raise RuntimeError('ATTEMPT_COMMAND_REFUSED')
+    target=STATE / ('attempt-'+command+'.json')
+    if target.is_symlink(): raise RuntimeError('ATTEMPT_SYMLINK_REFUSED')
+    temp=STATE / ('.attempt-'+uuid.uuid4().hex)
+    try:
+        with temp.open('x') as stream:
+            os.chmod(temp,0o600)
+            json.dump({'at':datetime.datetime.now(datetime.timezone.utc).isoformat(), 'command':command,**value},stream)
+            stream.write('\n');stream.flush();os.fsync(stream.fileno())
+        temp.replace(target)
+    finally: temp.unlink(missing_ok=True)
+
 def run(command):
     if os.geteuid() != 0 or command not in {"backup", "verify", "plan"}:
         raise RuntimeError("ROOT_AND_SUPPORTED_COMMAND_REQUIRED")
@@ -91,10 +104,13 @@ def run(command):
         try:
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
+            attempt(command,{'status':'SKIPPED','reason':'another_attachment_task_running'})
             print(json.dumps({"command": command, "skipped": "another_attachment_task_running"}))
             return 0
         if cleanup_pending():
+            attempt(command,{'status':'SKIPPED','reason':'COS_CLEANUP_TRANSACTION_PENDING'})
             print(json.dumps({'command': command, 'skipped': 'COS_CLEANUP_TRANSACTION_PENDING'})); return 0
+        attempt(command,{'status':'RUNNING'})
         source = docker_json(["inspect", SOURCE_CONTAINER])[0]
         env = dict(s.split("=", 1) for s in source["Config"].get("Env", []) if "=" in s)
         if config["sourceBucket"] != env.get("COS_BUCKET") or config["region"] != env.get("COS_REGION"):
@@ -144,6 +160,8 @@ def run(command):
                 previous = json.loads(failure.read_text())
                 if previous.get("command") == command or (command == "backup" and previous.get("command") == "plan"):
                     failure.unlink()
+            attempt(command,{'status':'COMPLETE' if output.get('complete') else 'IN_PROGRESS',
+                'complete':bool(output.get('complete'))})
             print(json.dumps(output))
             return 0
         finally:
@@ -167,6 +185,10 @@ def main():
     except Exception as e:
         code = str(e) if re.fullmatch(r"[A-Z][A-Z0-9_]{2,80}", str(e)) else "ATTACHMENT_LAUNCH_FAILED"
         if STATE.exists() and not STATE.is_symlink():
+            command=sys.argv[1] if len(sys.argv)==2 else ''
+            if command in {'backup','verify','plan'}:
+                try: attempt(command,{'status':'FAILED','error':code})
+                except OSError: pass
             temp = STATE / (".launcher-" + uuid.uuid4().hex)
             try:
                 temp.write_text(json.dumps({"at": datetime.datetime.now(datetime.timezone.utc).isoformat(), "failed": True, "error": code}) + "\n")

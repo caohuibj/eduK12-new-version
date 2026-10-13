@@ -15,6 +15,7 @@ import { createAttachmentSchema } from '../utils/attachmentSchema'
 import {
   AssetReferenceValidationError,
   hydrateAssetReferences,
+  hydrateAssetReferenceBatch,
   syncAssetReferences,
   validateAssetReferencesForCourse,
 } from '../services/assetStorage'
@@ -267,13 +268,11 @@ export const assignmentController = {
         }))
       }
 
-      const hydratedAssignments = await Promise.all(
-        formattedAssignments.map((assignment) => hydrateAssetReferences(assignment, false, {
-          entityType: 'Assignment',
-          entityId: assignment.id,
-          courseId: assignment.courseId,
-          parentAccess: true,
-        })),
+      const hydratedAssignments = await hydrateAssetReferenceBatch(
+        formattedAssignments.map((assignment) => ({ value: assignment, context: {
+          entityType: 'Assignment', entityId: assignment.id,
+          courseId: assignment.courseId, parentAccess: true,
+        } })),
       )
       return success(res, buildPaginatedResult(hydratedAssignments, total, pagination))
     } catch (err) {

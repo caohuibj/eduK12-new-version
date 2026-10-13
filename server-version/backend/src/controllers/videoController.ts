@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
-import { assertRemoteVideoCapacity, reserveRemoteVideoBudget, RemoteVideoAdmissionError, REMOTE_VIDEO_MAX_BYTES, REMOTE_VIDEO_TIMEOUT_MS } from '../services/remoteVideoAdmission'
+import { assertRemoteVideoCapacity, assertVideoCapacity, reserveRemoteVideoBudget, RemoteVideoAdmissionError, REMOTE_VIDEO_MAX_BYTES, REMOTE_VIDEO_TIMEOUT_MS, LOCAL_VIDEO_MAX_BYTES, LOCAL_VIDEO_UPLOAD_SENTINEL } from '../services/remoteVideoAdmission'
+import { stat } from 'node:fs/promises'
 import { prisma } from '../config/database'
 import { success, error, forbidden, notFound } from '../utils/response'
 import { UserRole } from '../types'
@@ -8,39 +9,13 @@ import { logger } from '../utils/logger'
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { z } from 'zod'
 import { validateRemoteUrl } from '../utils/videoDownloader'
-import { attachAssetReference, discardUnreferencedAsset, getLocalAssetPath, getSignedAssetUrl, getSignedAssetUrls, storeAssetFromFile } from '../services/assetStorage'
+import { attachAssetReference, discardUnreferencedAsset, getLocalAssetPath, getSignedAssetUrl, getSignedAssetUrls, signKnownAsset, storeAssetFromFile } from '../services/assetStorage'
 import { randomUUID } from 'node:crypto'
 import { retryVideo, VideoRetryError } from '../services/videoRetry'
 
 const updateVideoSchema = z.object({
   title: z.string().min(1, '视频标题不能为空'),
 })
-
-/**
- * Associate a freshly-created video with its Bull job. The worker has a
- * short startup delay, but a busy event loop or a fast queue can still let it
- * claim the row first. Treat that same-job claim (and an already terminal
- * result) as success instead of falsely marking a valid upload failed.
- */
-const associateProcessingJob = async (videoId: string, jobId: string): Promise<void> => {
-  const associated = await prisma.video.updateMany({
-    where: { id: videoId, status: 'PENDING', processingJobId: null },
-    data: { processingJobId: jobId },
-  })
-  if (associated.count === 1) return
-
-  const current = await prisma.video.findUnique({
-    where: { id: videoId },
-    select: { status: true, processingJobId: true },
-  })
-  if (
-    current?.processingJobId === jobId
-    || current?.status === 'COMPLETED'
-    || current?.status === 'FAILED'
-  ) return
-
-  throw new Error('视频处理任务关联失败')
-}
 
 export const videoController = {
   async retry(req: Request, res: Response) {
@@ -143,6 +118,10 @@ export const videoController = {
   async upload(req: Request, res: Response) {
     let originalAsset: Awaited<ReturnType<typeof storeAssetFromFile>> | undefined
     let originalAssetLinked = false
+    let reservation: { id: string; title: string; processingGeneration: number } | undefined
+    const jobId = `video-upload-${randomUUID()}`
+    let heartbeat: ReturnType<typeof setInterval> | undefined
+    let heartbeatInFlight: Promise<void> | undefined
     try {
       const userId = req.user?.userId
       if (!userId) {
@@ -168,6 +147,36 @@ export const videoController = {
         return error(res, '无法读取上传文件')
       }
 
+      const sourceStat = await stat(file.path)
+      if (!sourceStat.isFile() || sourceStat.size !== file.size || sourceStat.size <= 0 || sourceStat.size > LOCAL_VIDEO_MAX_BYTES) {
+        return error(res, '视频文件大小无效或超过限制', -1, 400)
+      }
+      // Reserve before copying any persistent original. Recovery recognizes
+      // this sentinel and cannot enqueue an incomplete source file.
+      const video = await prisma.$transaction(async tx => {
+        await assertVideoCapacity(tx, userId, { inputBytes: sourceStat.size })
+        return tx.video.create({ data: {
+          title, filePath: LOCAL_VIDEO_UPLOAD_SENTINEL, fileName: file.originalname,
+          fileSize: sourceStat.size, mimeType: detectedMimeType, teacherId: userId,
+          status: 'PENDING', processingJobId: jobId, processingStartedAt: new Date(),
+        } })
+      })
+      reservation = video
+      // Request timeout/disconnect does not terminate filesystem operations.
+      // Renew ownership until persistence/compensation has actually finished;
+      // never age a still-running copy out based on its creation timestamp.
+      heartbeat = setInterval(() => {
+        if (heartbeatInFlight) return
+        heartbeatInFlight = prisma.video.updateMany({
+          where: { id: video.id, status: 'PENDING', filePath: LOCAL_VIDEO_UPLOAD_SENTINEL, originalAssetId: null,
+            processingJobId: jobId, processingGeneration: video.processingGeneration },
+          data: { processingStartedAt: new Date() },
+        }).then(() => undefined).catch(() => {
+          logger.error('视频上传持久化 reservation 续期失败', { videoId: video.id })
+        }).finally(() => { heartbeatInFlight = undefined })
+      }, 30_000)
+      heartbeat.unref?.()
+
       const storedOriginalAsset = await storeAssetFromFile({
         filePath: file.path,
         originalName: file.originalname,
@@ -176,45 +185,28 @@ export const videoController = {
         provider: 'local',
       })
       originalAsset = storedOriginalAsset
+      if (storedOriginalAsset.sizeBytes !== sourceStat.size) throw new RemoteVideoAdmissionError('视频文件在上传期间发生变化', 409)
       const processingInput = `file://${getLocalAssetPath(storedOriginalAsset.objectKey)}`
 
-      // Keep the video pointer and asset reference atomic. The asset itself
-      // is already stored, so a failed transaction leaves only an unreachable
-      // asset for later garbage collection, never a half-linked video.
-      const video = await prisma.$transaction(async (tx) => {
-        const created = await tx.video.create({
-          data: {
-            title,
-            filePath: storedOriginalAsset.objectKey,
-            fileName: file.originalname,
-            fileSize: file.size,
-            mimeType: detectedMimeType,
-            teacherId: userId,
-            originalAssetId: storedOriginalAsset.id,
-            status: 'PENDING',
-          },
-          include: {
-            teacher: {
-              select: {
-                id: true,
-                nickname: true,
-                username: true,
-              }
-            }
-          }
+      await prisma.$transaction(async (tx) => {
+        const linked = await tx.video.updateMany({
+          where: { id: video.id, isDeleted: false, status: 'PENDING', filePath: LOCAL_VIDEO_UPLOAD_SENTINEL,
+            originalAssetId: null, processingJobId: jobId, processingGeneration: video.processingGeneration },
+          data: { filePath: storedOriginalAsset.objectKey, originalAssetId: storedOriginalAsset.id, processingStartedAt: null },
         })
-        await attachAssetReference({ assetId: storedOriginalAsset.id, entityType: 'Video', entityId: created.id, field: 'original' }, tx)
-        return created
+        if (linked.count !== 1) throw new RemoteVideoAdmissionError('视频上传状态已改变，请重新上传', 409)
+        await attachAssetReference({ assetId: storedOriginalAsset.id, entityType: 'Video', entityId: video.id, field: 'original' }, tx)
       })
       originalAssetLinked = true
 
       // 添加到视频处理队列
       try {
-        const job = await videoQueue.add('transcode', {
+        await videoQueue.add('transcode', {
           videoId: video.id,
           originalUrl: processingInput,
           teacherId: userId,
         }, {
+          jobId,
           delay: 1000, // 延迟1秒确保文件写入完成
           priority: 1,
           attempts: 3,
@@ -223,13 +215,13 @@ export const videoController = {
             delay: 5000,
           },
         })
-        await associateProcessingJob(video.id, String(job.id))
       } catch (queueError) {
-        // Only fail this upload's unclaimed row. A worker or a newer manual
-        // retry may already own it; preserve its generation and return the ID.
-        await prisma.video.updateMany({
-          where: { id: video.id, status: 'PENDING', processingJobId: null, processingGeneration: video.processingGeneration },
-          data: { status: 'FAILED', errorMessage: '视频处理失败，请稍后重试或联系管理员' },
+        // Unknown acknowledgements retain the durable reservation. Release
+        // only a proven absent queue job and this exact unclaimed generation.
+        const accepted = await videoQueue.getJob(jobId).catch(() => undefined)
+        if (accepted === null) await prisma.video.updateMany({
+          where: { id: video.id, status: 'PENDING', processingJobId: jobId, processingGeneration: video.processingGeneration },
+          data: { status: 'FAILED', processingJobId: null, processingStartedAt: null, errorMessage: '视频处理失败，请稍后重试或联系管理员' },
         }).catch(() => undefined)
         const retained = await prisma.video.findUnique({ where: { id: video.id }, select: { status: true } }).catch(() => null)
         logger.error('视频已保存，但转码入队失败', { videoId: video.id })
@@ -242,15 +234,29 @@ export const videoController = {
         id: video.id,
         title: video.title,
         status: 'PENDING',
-        originalUrl: await getSignedAssetUrl(originalAsset.id),
+        originalUrl: signKnownAsset(originalAsset),
         message: '视频上传成功，正在后台处理中...',
       }, '视频上传成功，转码处理中')
     } catch (err) {
       if (originalAsset && !originalAssetLinked) {
         await discardUnreferencedAsset(originalAsset).catch(() => undefined)
       }
+      if (reservation && !originalAssetLinked) {
+        await prisma.video.updateMany({
+          where: { id: reservation.id, status: 'PENDING', filePath: LOCAL_VIDEO_UPLOAD_SENTINEL, originalAssetId: null,
+            processingJobId: jobId, processingGeneration: reservation.processingGeneration },
+          data: { status: 'FAILED', processingJobId: null, processingStartedAt: null, errorMessage: '视频处理失败，请稍后重试或联系管理员' },
+        }).catch(() => undefined)
+      }
+      if (err instanceof RemoteVideoAdmissionError) {
+        res.setHeader('Retry-After', String(err.retryAfterSeconds))
+        return error(res, err.message, -1, err.status)
+      }
       logger.error('上传视频错误', err)
       return error(res, '上传视频失败')
+    } finally {
+      if (heartbeat) clearInterval(heartbeat)
+      await heartbeatInFlight
     }
   },
 
@@ -411,19 +417,20 @@ export const videoController = {
         }
       }
 
+      const urls = await getSignedAssetUrls([video.originalAssetId, video.processedAssetId, video.thumbnailAssetId])
       return success(res, {
         id: video.id,
         title: video.title,
         status: video.status,
         progress,
         originalUrl: video.originalAssetId
-          ? await getSignedAssetUrl(video.originalAssetId)
+          ? urls.get(video.originalAssetId) || null
           : (video.originalUrl ? `/uploads/videos/${video.fileName}` : null),
         processedUrl: video.processedAssetId
-          ? await getSignedAssetUrl(video.processedAssetId)
+          ? urls.get(video.processedAssetId) || null
           : video.processedUrl,
         thumbnailUrl: video.thumbnailAssetId
-          ? await getSignedAssetUrl(video.thumbnailAssetId)
+          ? urls.get(video.thumbnailAssetId) || null
           : video.thumbnailUrl,
         resolution: video.resolution,
         duration: video.duration,

@@ -1,6 +1,7 @@
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { boundedUpload, uploadPrincipalRateLimit, acceptedImageTypes } from '../middleware/uploadAdmission'
 import { Router, Request } from 'express'
+import { Prisma } from '@prisma/client'
 import { success, error } from '../utils/response'
 import { authenticate, requireTeacher } from '../middleware/auth'
 import path from 'path'
@@ -10,24 +11,19 @@ import { config } from '../config'
 import { imageQueue } from '../config/queue'
 import { isCOSEnabled, uploadToCOS, deleteFromCOS } from '../utils/cos'
 import { logger } from '../utils/logger'
-import { discardUnreferencedAsset, getLocalAssetPath, getSignedAssetUrl, signKnownAsset, storeAsset } from '../services/assetStorage'
+import { discardUnreferencedAsset, getLocalAssetPath, legacyAssetOwnerIds, signKnownAsset, storeAsset } from '../services/assetStorage'
 import { prisma } from '../config/database'
 import { UserRole } from '../types'
 import { detectMimeType } from '../utils/fileValidator'
+import { BoundedAdmissionGate, isBoundedAdmissionBusyError } from '../services/boundedAdmissionGate'
 
 const router = Router()
 router.use(authenticate, requireTeacher)
 
-// 图片处理状态存储（内存缓存，重启后清空）
-// 生产环境应使用 Redis 存储
-const imageStatusCache = new Map<string, {
-  status: 'pending' | 'processing' | 'completed' | 'failed'
-  filename?: string
-  url?: string
-  size?: number
-  originalSize?: number
-  error?: string
-}>()
+// Cache only transient historical statuses; the queue remains authoritative.
+import NodeCache from 'node-cache'
+const imageStatusCache = new NodeCache({ stdTTL: 300, checkperiod: 60, maxKeys: 500, useClones: false })
+const imageStatusLookup = new BoundedAdmissionGate({ name: 'legacy_image_status', maxConcurrent: 1, maxQueue: 0, maxWaitMs: 1000, retryAfterSeconds: 2 })
 
 // 确保上传目录存在（使用绝对路径）
 const imagesDir = path.resolve(config.uploadDir, 'images')
@@ -65,8 +61,11 @@ const resolveImagePath = (filename: string): string | null => {
 // 配置图片存储
 
 
-const canManageAsset = (req: Request, ownerId: string | null): boolean =>
-  req.user?.role === UserRole.ADMIN || ownerId === req.user?.userId
+const canManageAsset = async (req: Request, ownerId: string | null): Promise<boolean> => {
+  if (!ownerId) return false
+  if (ownerId === req.user?.userId) return true
+  return req.user?.role === UserRole.ADMIN && (await legacyAssetOwnerIds([ownerId])).has(ownerId)
+}
 
 // 获取图片列表
 router.get('/images', async (req, res) => {
@@ -75,19 +74,29 @@ router.get('/images', async (req, res) => {
     const pagination = getPaginationParams(req)
     const keyword = typeof req.query.keyword === 'string' ? req.query.keyword.slice(0, 200) : ''
 
-    const assetWhere = {
-      mimeType: { startsWith: 'image/' },
-      deletedAt: null,
-      ...(keyword ? { originalName: { contains: keyword, mode: 'insensitive' as const } } : {}),
-      // Anonymous check-in uploads are temporary/submission-scoped assets,
-      // not part of a teacher's reusable media library.
-      accessScope: { not: 'PUBLIC_CHECKIN' },
-      ...(req.user?.role === UserRole.TEACHER ? { ownerId: req.user.userId } : {}),
-    }
-    const [assets, total] = await Promise.all([
-      prisma.storedAsset.findMany({ where: assetWhere, orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], skip: pagination.skip, take: pagination.take, select: { id: true, originalName: true, sizeBytes: true, createdAt: true, provider: true, accessScope: true, deletedAt: true } }),
-      prisma.storedAsset.count({ where: assetWhere }),
+    // Product filtering happens inside PostgreSQL before LIMIT/count, never
+    // after pagination and never by loading every owner's ID into the API.
+    const libraryFilter = Prisma.sql`
+      a.mime_type LIKE 'image/%' AND a.deleted_at IS NULL
+      AND a.access_scope <> 'PUBLIC_CHECKIN'
+      AND u.account_domain IN ('LEGACY', 'TRAINING')
+      AND (${req.user?.role === UserRole.ADMIN} OR a.owner_id = ${req.user?.userId ?? ''})
+      AND POSITION(LOWER(${keyword}) IN LOWER(COALESCE(a.original_name, ''))) > 0
+    `
+    const [assets, counts] = await Promise.all([
+      prisma.$queryRaw<Array<{ id: string; originalName: string | null; sizeBytes: number; createdAt: Date; provider: string; accessScope: string; deletedAt: Date | null }>>(Prisma.sql`
+        SELECT a.id, a.original_name AS "originalName", a.size_bytes AS "sizeBytes",
+          a.created_at AS "createdAt", a.provider, a.access_scope AS "accessScope", a.deleted_at AS "deletedAt"
+        FROM stored_assets a JOIN users u ON u.id = a.owner_id
+        WHERE ${libraryFilter} ORDER BY a.created_at DESC, a.id DESC
+        LIMIT ${pagination.take} OFFSET ${pagination.skip}
+      `),
+      prisma.$queryRaw<Array<{ total: bigint }>>(Prisma.sql`
+        SELECT COUNT(*)::bigint AS total FROM stored_assets a JOIN users u ON u.id = a.owner_id
+        WHERE ${libraryFilter}
+      `),
     ])
+    const total = Number(counts[0]?.total ?? 0)
     images.push(...await Promise.all(assets.map(async (asset) => ({
       id: asset.id,
       assetId: asset.id,
@@ -173,7 +182,7 @@ router.delete('/images/:filename', async (req, res) => {
 
     const asset = await prisma.storedAsset.findUnique({ where: { id: filename } })
     if (asset) {
-      if (!canManageAsset(req, asset.ownerId)) return error(res, '无权限删除此图片', -1, 403)
+      if (!(await canManageAsset(req, asset.ownerId))) return error(res, '无权限删除此图片', -1, 403)
       const deleted = await prisma.storedAsset.updateMany({
         where: {
           id: asset.id,
@@ -239,7 +248,7 @@ router.put('/images/:filename', async (req, res) => {
 
     const asset = await prisma.storedAsset.findUnique({ where: { id: filename } })
     if (asset) {
-      if (!canManageAsset(req, asset.ownerId)) return error(res, '无权限修改此图片', -1, 403)
+      if (!(await canManageAsset(req, asset.ownerId))) return error(res, '无权限修改此图片', -1, 403)
       const extension = path.extname(asset.originalName || '')
       const updated = await prisma.storedAsset.update({
         where: { id: asset.id },
@@ -248,7 +257,7 @@ router.put('/images/:filename', async (req, res) => {
       return success(res, {
         oldFilename: asset.id,
         newFilename: updated.id,
-        url: await getSignedAssetUrl(updated.id),
+        url: signKnownAsset(updated),
       }, '重命名成功')
     }
 
@@ -340,7 +349,7 @@ router.post('/image', uploadPrincipalRateLimit, boundedUpload('image', 10 * 1024
     })
     asset = storedAsset
 
-    const url = await getSignedAssetUrl(storedAsset.id)
+    const url = signKnownAsset(storedAsset)
     if (!url) throw new Error('图片签名 URL 生成失败')
 
     return success(res, {
@@ -361,13 +370,19 @@ router.post('/image', uploadPrincipalRateLimit, boundedUpload('image', 10 * 1024
   }
 }))
 
+function cacheImageStatus(id: string, value: unknown) {
+  if (imageStatusCache.keys().length >= 500) imageStatusCache.del(imageStatusCache.keys()[0])
+  imageStatusCache.set(id, value)
+}
+
 // 查询图片处理状态
 router.get('/image/status/:imageId', async (req, res) => {
   try {
     const { imageId } = req.params
+    if (!/^[A-Za-z0-9_-]{1,128}$/.test(imageId)) return error(res, '非法图片任务编号', -1, 400)
 
     // 先检查内存缓存
-    const cached = imageStatusCache.get(imageId)
+    const cached = imageStatusCache.get<{ status: string }>(imageId)
     if (cached && cached.status === 'completed') {
       return success(res, cached)
     }
@@ -377,8 +392,22 @@ router.get('/image/status/:imageId', async (req, res) => {
     }
 
     // 查询队列状态
-    const jobs = await imageQueue.getJobs(['active', 'waiting', 'completed', 'failed'])
-    const job = jobs.find((j) => j.data.imageId === imageId)
+    const lookup = await imageStatusLookup.run(async () => {
+      let truncated = false
+      for (const [state, limit] of [['active', 100], ['waiting', 100], ['completed', 200], ['failed', 100]] as const) {
+        const jobs = await imageQueue.getJobs([state], 0, limit - 1)
+        const job = jobs.find(candidate => candidate?.data.imageId === imageId)
+        if (job) return { job, truncated: false }
+        if (jobs.length === limit) truncated = true
+      }
+      return { job: null, truncated }
+    })
+    const job = lookup.job
+    // An unscanned historical task is busy, never falsely reported absent.
+    if (!job && lookup.truncated) {
+      res.setHeader('Retry-After', '2')
+      return error(res, '历史图片任务查询繁忙，请稍后重试', -1, 503)
+    }
 
     if (!job && !cached) {
       return error(res, '图片任务不存在')
@@ -418,7 +447,7 @@ router.get('/image/status/:imageId', async (req, res) => {
             storage: result.storage,
           }
           // 缓存结果
-          imageStatusCache.set(imageId, completedData)
+          cacheImageStatus(imageId, completedData)
           return success(res, completedData)
         case 'failed':
           status = 'failed'
@@ -432,7 +461,7 @@ router.get('/image/status/:imageId', async (req, res) => {
             // response.
             error: '图片处理失败，请稍后重试或联系管理员',
           }
-          imageStatusCache.set(imageId, failedData)
+          cacheImageStatus(imageId, failedData)
           return success(res, failedData)
       }
     }
@@ -442,6 +471,10 @@ router.get('/image/status/:imageId', async (req, res) => {
       status,
     })
   } catch (err) {
+    if (isBoundedAdmissionBusyError(err)) {
+      res.setHeader('Retry-After', String(err.retryAfterSeconds))
+      return error(res, '历史图片任务查询繁忙，请稍后重试', -1, 503)
+    }
     logger.error('查询图片状态错误', err)
     return error(res, '查询失败')
   }

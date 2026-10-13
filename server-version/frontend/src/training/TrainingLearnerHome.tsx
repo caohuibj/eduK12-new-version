@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent } from 'react'
 import { ArrowRight, Plus } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { useCursorList } from '../hooks/useCursorList'
 import apiClient from '../api/client'
 import ModalSurface from '../components/shared-ui/ModalSurface'
 import type { Course } from '../types'
@@ -9,31 +10,13 @@ import type { Course } from '../types'
 /** Course-first training home. The generic STUDENT homepage is unchanged. */
 export default function TrainingLearnerHome() {
   const { user } = useAuth()
-  const [courses, setCourses] = useState<Course[]>([])
-  const [loading, setLoading] = useState(true)
-  const [loadError, setLoadError] = useState('')
+  const { list: courses, loading, error: loadError, refresh, more, hasMore } = useCursorList<Course>('/courses/my')
   const [mutationNotice, setMutationNotice] = useState('')
   const [joinOpen, setJoinOpen] = useState(false)
   const [courseCode, setCourseCode] = useState('')
   const [joinError, setJoinError] = useState('')
   const [joining, setJoining] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
-
-  async function refresh() {
-    setLoading(true)
-    setLoadError('')
-    try {
-      const result = await apiClient.get<{ list: Course[] }>('/courses/my')
-      if (result.code !== 0) throw new Error(result.message || '无法读取课程')
-      setCourses(result.data.list)
-    } catch (error) {
-      setLoadError(error instanceof Error ? error.message : '无法读取课程')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => { void refresh() }, [])
 
   async function joinCourse(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -68,14 +51,16 @@ export default function TrainingLearnerHome() {
     {mutationNotice && <p className="training-message" role="status">{mutationNotice}</p>}
     <section className="training-course-section" aria-labelledby="learner-courses">
       <div className="training-section-header"><h2 id="learner-courses">我的课程</h2><span className="training-small-label">慢慢学 · 认真做</span></div>
-      {loading ? <p role="status" className="training-status">正在读取课程…</p>
-        : loadError ? <div className="training-message" role="alert">课程暂时无法显示：{loadError}<button type="button" onClick={() => void refresh()}>重试</button></div>
+      {loading && courses.length === 0 ? <p role="status" className="training-status">正在读取课程…</p>
+        : loadError && courses.length === 0 ? <div className="training-message" role="alert">课程暂时无法显示：{loadError}<button type="button" onClick={() => void refresh()}>重试</button></div>
         : courses.length === 0 ? <div className="training-empty"><p>还没有加入课程。</p><button type="button" onClick={() => setJoinOpen(true)}>输入培训师提供的课程码 →</button></div>
         : <div className={`training-course-list ${courses.length === 1 ? 'training-course-list--single' : ''}`}>{courses.map(course =>
           <Link key={course.id} to={`/student/courses/${encodeURIComponent(course.id)}`} className="training-course-item">
             <span className="training-course-cover" aria-hidden="true"><span>课</span></span>
             <span className="training-course-text"><strong>{course.title}</strong>{course.description ? <small>{course.description}</small> : <small>进入课程，查看作业、打卡与测评</small>}<span className="training-course-card-bottom"><span>已加入</span><span>进入学习 <ArrowRight size={16} aria-hidden="true" /></span></span></span>
           </Link>)}</div>}
+      {courses.length > 0 && loadError && <p role="alert">{loadError}</p>}
+      {hasMore && <button type="button" className="training-action" disabled={loading} onClick={() => void more()}>{loading ? '加载中…' : '加载更多课程'}</button>}
     </section>
 
     <p className="training-bottom-line">日日有所学，终将有所见。</p>

@@ -131,11 +131,11 @@ test('dependency allowlist rejects unknown files, path traversal, deletions and 
   assert.throws(()=>dependencyScope([e],{base:'$(invalid)'}),/Exact dependency/);
 });
 
-test('exact mainland mirror companion is admitted; unrelated build edits cannot use dependencies CI',()=>fixture(({base,put,commit})=>{
-  const additions=["    if (name === 'backend' || name === 'worker')\n      plan.target[name].args = { ...plan.target[name].args, DEBIAN_MIRROR: 'mirrors.tuna.tsinghua.edu.cn' };\n", "    if (name === 'backend' || name === 'worker')\n      assert.equal(target.args?.DEBIAN_MIRROR, 'mirrors.tuna.tsinghua.edu.cn', 'CI Debian mirror was lost');\n"];
+test('exact official source companion is admitted; unrelated build edits cannot use dependencies CI',()=>fixture(({base,put,commit})=>{
+  const additions=["    if (name === 'backend' || name === 'worker')\n      plan.target[name].args = { ...plan.target[name].args, DEBIAN_MIRROR: 'deb.debian.org' };\n", "    if (name === 'backend' || name === 'worker')\n      assert.equal(target.args?.DEBIAN_MIRROR, 'deb.debian.org', 'CI official Debian source was lost');\n"];
   const after='original'+additions.join('');
   assert.equal(imageMirrorOnly('original',after),true);
-  for(const bad of [after+'changed tag',after.replace("mirrors.tuna.tsinghua.edu.cn","untrusted.invalid"),after+additions[0],after.replace(additions[1],'')])
+  for(const bad of [after+'changed tag',after.replace("deb.debian.org","untrusted.invalid"),after+additions[0],after.replace(additions[1],'')])
     assert.equal(imageMirrorOnly('original',bad),false);
   put(root+'/package.json',nextManifest());put(root+'/package-lock.json',lock(nextManifest()));
   put('.github/scripts/ci-image-plan.mjs',after);commit();

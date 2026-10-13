@@ -80,7 +80,8 @@ export function protectedGraph(c, input, now) {
 }
 export function plan(c, input, previous, now) {
   const graph = protectedGraph(c, input, now), { records, snapshots, catalogs, host } = input;
-  const candidates = [], observations = {};
+  // A temporary protection block preserves quarantine history without refreshing observation age.
+  const candidates = [], observations = graph.blocked.length ? structuredClone(previous?.observations || {}) : {};
   const observe = (r, reason) => {
     validRecord(r); const key = id(r), digest = hash(r);
     const old = previous?.observations?.[key];

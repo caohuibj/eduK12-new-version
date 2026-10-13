@@ -57,7 +57,7 @@ RUN set -eu; \
     && rm -rf /var/lib/apt/lists/*
 
 COPY package*.json ./
-RUN npm config set registry "$NPM_REGISTRY" && npm ci
+RUN npm config set registry "$NPM_REGISTRY" && npm config set replace-registry-host always && npm ci
 
 # ---------- Stage 2: build ----------
 FROM deps AS build

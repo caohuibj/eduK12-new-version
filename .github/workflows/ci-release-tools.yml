@@ -3,6 +3,10 @@ on:
   workflow_call:
 permissions:
   contents: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+
 jobs:
   tools:
     runs-on: ubuntu-24.04

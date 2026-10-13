@@ -17,6 +17,8 @@ Page({
     submitting: false,
     othersSubmissions: [],
     showOthers: false,
+    nextOthersCursor: null,
+    hasMoreOthers: false,
     loadingOthers: false
   },
 
@@ -242,27 +244,20 @@ Page({
   },
 
   async onViewOthers() {
-    const { showOthers, loadingOthers } = this.data
-    if (loadingOthers) return
-    
-    if (showOthers) {
-      this.setData({ showOthers: false })
-      return
-    }
-    
+    if (this.data.loadingOthers) return
+    if (this.data.showOthers) { this.setData({ showOthers: false }); return }
+    return this.loadOthersSubmissions()
+  },
+
+  async loadOthersSubmissions(append = false) {
+    if (this.data.loadingOthers || (append && !this.data.nextOthersCursor)) return
     this.setData({ loadingOthers: true })
     try {
-      const res = await checkinsApi.getOthersSubmissions(this.checkinId)
-      this.setData({
-        othersSubmissions: res.data?.list || [],
-        showOthers: true
-      })
-    } catch (error) {
-      console.error('获取他人打卡失败:', error)
-      wx.showToast({ title: '获取失败', icon: 'none' })
-    } finally {
-      this.setData({ loadingOthers: false })
-    }
+      const res = await checkinsApi.getOthersSubmissions(this.checkinId, append ? this.data.nextOthersCursor : null)
+      this.setData({ othersSubmissions: append ? this.data.othersSubmissions.concat(res.data?.list || []) : res.data?.list || [],
+        nextOthersCursor: res.data.nextCursor || null, hasMoreOthers: res.data.hasMore === true, showOthers: true })
+    } catch (error) { console.error('获取他人打卡失败:', error); wx.showToast({ title: '获取失败', icon: 'none' }) }
+    finally { this.setData({ loadingOthers: false }) }
   },
 
   onPreviewOthersImage(e) {
@@ -276,6 +271,8 @@ Page({
       urls: fullUrls
     })
   },
+
+  moreOthers() { if (this.data.hasMoreOthers && !this.data.loadingOthers) return this.loadOthersSubmissions(true) },
 
   async onSubmit() {
     const { content, images, submitting, submission, checkin } = this.data

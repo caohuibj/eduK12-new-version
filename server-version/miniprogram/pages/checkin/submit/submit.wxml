@@ -177,4 +177,5 @@
       </button>
     </view>
   </block>
+  <button wx:if="{{showOthers && hasMoreOthers}}" disabled="{{loadingOthers}}" bindtap="moreOthers">加载更多提交</button>
 </view>

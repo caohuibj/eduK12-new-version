@@ -1,6 +1,8 @@
+import { prisma } from '../../config/database'
+import * as runtimeSecurity from '../../modules/assessment-runtime/security'
 import { createHash,randomUUID } from 'node:crypto'
 import { PrismaClient } from '@prisma/client'
-import { beforeAll,afterAll,describe,expect,it } from 'vitest'
+import { beforeAll,afterAll,describe,expect,it,vi } from 'vitest'
 import { integrationDatabaseUrl } from '../integration/integration-env'
 import { createDraft,getDraft,updateDraft } from '../../modules/survey/builder.service'
 import { createWave,getWave,updateWave } from '../../modules/survey/waves.service'
@@ -130,6 +132,39 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     process.env.SURVEY_PUBLICATION_ENABLED=previousFlags.publication
     process.env.SURVEY_WORKSPACE_ENABLED=previousFlags.workspace
     await db?.$disconnect()
+  })
+  it('computes Survey sources outside business transactions and rechecks current authority before returning', async () => {
+    const w = await wave('source calculation isolation', [toolIds.scale])
+    const enrolled = await joinLinkedStudy({ publicId: w.publicId, waveId: w.id, entryToken: w.entrySecret, consentVersion: 1, consent: true })
+    const credential = { researchCode: enrolled.researchCode, accessCredential: enrolled.accessCredential }
+    const task = await getOwnResearchTask({ publicId: w.publicId, attemptId: enrolled.attemptId, ...credential })
+    await submitResearchFinal({ publicId: w.publicId, attemptId: enrolled.attemptId, ...credential, submissionId: randomUUID(),
+      answers: { [task.units[0].instrumentKey]: { itemone: 'o4', itemtwo: 'o4' } } })
+    let inTransaction = false
+    const originalTransaction = prisma.$transaction.bind(prisma)
+    const transaction = vi.spyOn(prisma, '$transaction').mockImplementation((async (fn: any, options: any) => originalTransaction(async tx => {
+      inTransaction = true
+      try { return await fn(tx) } finally { inTransaction = false }
+    }, options)) as any)
+    const originalDecrypt = runtimeSecurity.decryptUnifiedRuntimePayload
+    const decrypt = vi.spyOn(runtimeSecurity, 'decryptUnifiedRuntimePayload').mockImplementation((cipher: string) => {
+      expect(inTransaction).toBe(false)
+      return originalDecrypt(cipher)
+    })
+    try {
+      const result = await loadSurveySource({ actorUserId: ownerId, projectId, waveIds: [w.id], includeAttendance: false })
+      expect(result.completeAttempts).toBe(1)
+      expect(transaction).toHaveBeenCalledTimes(2)
+      expect(decrypt).toHaveBeenCalledTimes(1)
+    } finally { transaction.mockRestore(); decrypt.mockRestore() }
+    let calls = 0
+    const race = vi.spyOn(prisma, '$transaction').mockImplementation((async (fn: any, options: any) => {
+      const result = await originalTransaction(fn, options)
+      if (++calls === 1) await db.user.update({ where: { id: ownerId }, data: { isFrozen: true } })
+      return result
+    }) as any)
+    try { await expect(loadSurveySource({ actorUserId: ownerId, projectId, waveIds: [w.id], includeAttendance: false })).rejects.toThrow() }
+    finally { race.mockRestore(); await db.user.update({ where: { id: ownerId }, data: { isFrozen: false } }) }
   })
   it('publishes a real immutable ResearchOnly Form/Scale/SJT wave and issues separate linked proof',async()=>{
     const w=await wave('T1 前测',[toolIds.form,toolIds.scale,toolIds.sjt])
@@ -861,6 +896,70 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     })).completeAttempts).toBe(0)
     // Immutable source remains auditable; withdrawal excludes without deleting FINAL.
     expect(await db.surveyWaveFinal.count({where:{attemptId:participant.attemptId}})).toBe(1)
+  })
+  it('aggregates paired Wave counts from FINALs while retaining exclusions, quality and empty cohorts',async()=>{
+    const baseline=await wave('数据库配对计数基线',[toolIds.scale],true)
+    const followup=await wave('数据库配对计数后测',[toolIds.scale],true)
+    const counts=()=>matchedWaveCounts({actorUserId:ownerId,projectId,
+      baselineWaveId:baseline.id,followupWaveId:followup.id})
+    expect(await counts()).toMatchObject({baselineN:0,followupN:0,matchedN:0,attritionN:0,lateJoinN:0})
+    const enroll=(w:typeof baseline)=>joinLinkedStudy({
+      publicId:w.publicId,waveId:w.id,entryToken:w.entrySecret,
+      consent:true,consentVersion:1,
+    })
+    const finalize=async(w:typeof baseline,person:Awaited<ReturnType<typeof enroll>>)=>{
+      const started=await startLinkedWave({publicId:w.publicId,waveId:w.id,
+        researchCode:person.researchCode,accessCredential:person.accessCredential,
+        consent:true,consentVersion:1})
+      const task=await getOwnResearchTask({publicId:w.publicId,attemptId:started.attemptId,
+        researchCode:person.researchCode,accessCredential:person.accessCredential})
+      const submission={publicId:w.publicId,attemptId:started.attemptId,
+        researchCode:person.researchCode,accessCredential:person.accessCredential,
+        submissionId:randomUUID(),answers:{
+          [task.units[0].instrumentKey]:{itemone:'o4',itemtwo:'o4'},
+        }}
+      await submitResearchFinal(submission)
+      // Idempotent resubmission must not duplicate a participant in the counts.
+      await submitResearchFinal(submission)
+      return started.attemptId
+    }
+    const paired=await enroll(baseline)
+    await finalize(baseline,paired);await finalize(followup,paired)
+    const baselineOnly=await enroll(baseline)
+    await finalize(baseline,baselineOnly)
+    const followupOnly=await enroll(followup)
+    await finalize(followup,followupOnly)
+    // A started parent without authoritative FINAL is never completed evidence.
+    const incomplete=await enroll(baseline)
+    await startLinkedWave({publicId:followup.publicId,waveId:followup.id,
+      researchCode:incomplete.researchCode,accessCredential:incomplete.accessCredential,
+      consent:true,consentVersion:1})
+    const withdrawn=await enroll(baseline)
+    await finalize(baseline,withdrawn);await finalize(followup,withdrawn)
+    await withdrawLinkedResearchData({projectId,researchCode:withdrawn.researchCode,
+      accessCredential:withdrawn.accessCredential})
+    const quality=await enroll(baseline)
+    const reviewedAttempt=await finalize(baseline,quality)
+    await finalize(followup,quality)
+    await setSampleQuality({actorUserId:ownerId,projectId,attemptId:reviewedAttempt,
+      revision:0,verdict:'EXCLUDED',reason:'预定质量标准未通过'})
+    const expected={baselineN:2,followupN:3,matchedN:1,attritionN:1,lateJoinN:2}
+    expect(await counts()).toMatchObject(expected)
+    // Access revocation preserves valid scientific evidence; withdrawal does not.
+    await revokeLinkedResearchAccess({projectId,researchCode:paired.researchCode,
+      accessCredential:paired.accessCredential})
+    expect(await counts()).toMatchObject(expected)
+    await setSampleQuality({actorUserId:ownerId,projectId,attemptId:reviewedAttempt,
+      revision:1,verdict:'INCLUDED',reason:'复核后满足纳入标准'})
+    expect(await counts()).toMatchObject({baselineN:3,followupN:3,matchedN:2,attritionN:1,lateJoinN:1})
+    await expect(matchedWaveCounts({actorUserId:randomUUID(),projectId,
+      baselineWaveId:baseline.id,followupWaveId:followup.id})).rejects.toThrow()
+    await expect(matchedWaveCounts({actorUserId:ownerId,projectId,
+      baselineWaveId:baseline.id,followupWaveId:randomUUID()})).rejects.toThrow()
+    const anonymous=await db.surveyProject.create({data:{id:randomUUID(),ownerUserId:ownerId,
+      title:'保持单次独立匿名边界',collectionMode:'SINGLE_UNLINKED',status:'DRAFT'}})
+    await expect(matchedWaveCounts({actorUserId:ownerId,projectId:anonymous.id,
+      baselineWaveId:baseline.id,followupWaveId:followup.id})).rejects.toMatchObject({statusCode:409})
   })
   it('reviews sample quality with durable reasons, exact cohort exclusion and immutable FINAL',async()=>{
     const w=await wave('研究样本质量可审计复核',[toolIds.scale],true)

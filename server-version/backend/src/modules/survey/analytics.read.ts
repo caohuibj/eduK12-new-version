@@ -85,8 +85,13 @@ export async function matchedWaveCounts(input:{
       select:{id:true},
     })
     if(waveRows.length!==2)throw new SurveyAnalyticsError(404,'研究波次不属于当前项目')
-    const rows=await tx.$queryRaw<Array<{participantId:string;waveId:string}>>`
-      SELECT a.participant_id AS "participantId",a.wave_id AS "waveId"
+    // Keep the participant set in PostgreSQL; the API needs one count row,
+    // regardless of the number of completed answers in either Wave.
+    const rows=await tx.$queryRaw<Array<{baselineN:number;followupN:number;matchedN:number}>>`
+      WITH cohort AS (
+      SELECT a.participant_id,
+        BOOL_OR(a.wave_id=${input.baselineWaveId}) AS baseline,
+        BOOL_OR(a.wave_id=${input.followupWaveId}) AS followup
       FROM "survey_wave_attempts" a
       JOIN "survey_waves" w ON w.id=a.wave_id AND w.project_id=a.project_id
       JOIN "survey_publications" publication
@@ -100,13 +105,17 @@ export async function matchedWaveCounts(input:{
         AND a.wave_id IN (${Prisma.join([input.baselineWaveId,input.followupWaveId])})
         AND a.participant_id IS NOT NULL AND a.excluded_at IS NULL
         AND a.status='COMPLETED' AND (review.verdict IS NULL OR review.verdict='INCLUDED')
+      GROUP BY a.participant_id
+      )
+      SELECT COUNT(*) FILTER (WHERE baseline)::int AS "baselineN",
+        COUNT(*) FILTER (WHERE followup)::int AS "followupN",
+        COUNT(*) FILTER (WHERE baseline AND followup)::int AS "matchedN"
+      FROM cohort
     `
-    const early=new Set(rows.filter(x=>x.waveId===input.baselineWaveId).map(x=>x.participantId))
-    const later=new Set(rows.filter(x=>x.waveId===input.followupWaveId).map(x=>x.participantId))
-    const matched=[...early].filter(x=>later.has(x)).length
+    const {baselineN,followupN,matchedN}=rows[0]
     return {baselineWaveId:input.baselineWaveId,followupWaveId:input.followupWaveId,
-      baselineN:early.size,followupN:later.size,matchedN:matched,
-      attritionN:early.size-matched,lateJoinN:later.size-matched,
+      baselineN,followupN,matchedN,
+      attritionN:baselineN-matchedN,lateJoinN:followupN-matchedN,
       note:'仅统计两个波次均具有真实 FINAL 的项目内研究编号，不能解释成因果或独立自然人数。',
     }
   })

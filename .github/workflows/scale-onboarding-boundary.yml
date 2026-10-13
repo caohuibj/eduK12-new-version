@@ -24,6 +24,10 @@ on:
 permissions:
   contents: read
   pull-requests: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+
 jobs:
   boundary:
     timeout-minutes: 30

@@ -14,6 +14,10 @@ permissions:
   contents: read
   actions: read
 
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+
 jobs:
   browser:
     name: ${{ matrix.group }} / seeded browser acceptance
