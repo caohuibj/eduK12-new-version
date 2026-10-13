@@ -31,10 +31,9 @@ const wrap=(fn:(req:any)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
     throw e
   }
 })
-router.use(authenticateHuiteacher)
-router.get('/my-field-feedback',wrap(req=>
+router.get('/my-field-feedback',authenticateHuiteacher,wrap(req=>
   readOwnHuiteacherFieldFeedback(req.user!.userId)))
-router.post('/organizations/:organizationId/evaluation-events/:eventId/field-feedback-release',
+router.post('/organizations/:organizationId/evaluation-events/:eventId/field-feedback-release',authenticateHuiteacher,
   requireTeacherProductAdmin,requireRecentTeacherMfa,rate,wrap(req=>
     releaseHuiteacherFieldFeedback({
       actorUserId:req.user!.userId,

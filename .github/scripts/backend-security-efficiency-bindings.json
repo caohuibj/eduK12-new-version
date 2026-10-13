@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "files": {
+    "server-version/backend/src/controllers/assignmentController.ts": {
+      "before": "3ece296d2f5c74b2fb9981fdc9b13e3f1e3994d4",
+      "after": "71a121e82be1dca2c6b6f3840799f3cc37cd8424"
+    },
+    "server-version/backend/src/controllers/authController.ts": {
+      "before": "cc549534e745488783ac2b8c99cd470ec5d0460e",
+      "after": "8723b59f34dcbd6d68abe13f058ec889ca001af5"
+    },
+    "server-version/backend/src/controllers/checkinController.ts": {
+      "before": "787d9a988a87af68a1864242db931af8a1881f1f",
+      "after": "4b354eb2c07512fa8d0d214d74daa4f69e24d2b9"
+    },
+    "server-version/backend/src/controllers/courseController.ts": {
+      "before": "035752b6f767d3e843a6ef425d4b7533042d2595",
+      "after": "671595ed1562155d7eae8805223692777176c323"
+    },
+    "server-version/backend/src/controllers/documentController.ts": {
+      "before": "9505596fa236dc377d60784733ce7d5d3f17f6ba",
+      "after": "69a1622f06af362ba489a96ecca6775a20004397"
+    },
+    "server-version/backend/src/controllers/publicQuestionnaireController.ts": {
+      "before": "7eab4578d6044d7714c677a1cb8c99a70a7a9f7a",
+      "after": "02b1de21425a3139e82aa402cb29ac1a47b31619"
+    },
+    "server-version/backend/src/controllers/videoController.ts": {
+      "before": "9375100514f4dcaa6041dd5c9cd05361eb211049",
+      "after": "42cada3946f15510f7ec23e5579c64353282f499"
+    },
+    "server-version/backend/src/modules/huiteacher/consensus.routes.ts": {
+      "before": "d28748f3d1ac3849bb8658999d4ea013652c6ddd",
+      "after": "d155a1befb91e76cf9c8384173c33725051762b5"
+    },
+    "server-version/backend/src/modules/huiteacher/fieldFeedback.routes.ts": {
+      "before": "27ed724de9a24e0b187b2b5fc5d5c78725512586",
+      "after": "76cb62554b45fa8d1dc588a595bb0ba1361db4ce"
+    },
+    "server-version/backend/src/modules/huiteacher/fieldForm.routes.ts": {
+      "before": "78e9aa88f0b5d46ae158ec3bf78a6cf03cf9bf1b",
+      "after": "c6baab97377d7e4a294138e4f98d5594523e4cd5"
+    },
+    "server-version/backend/src/modules/huiteacher/improvement.routes.ts": {
+      "before": "86138d2b18d7ae4febef9317878125eaffc578b3",
+      "after": "a8ca81831cb9f2b70b3dac685b93b38b006735c6"
+    },
+    "server-version/backend/src/modules/huiteacher/observer.routes.ts": {
+      "before": "aa6d9c6d6a3c71e24340e21cfb354a31f52888df",
+      "after": "8326c10bfd3d1b17f2fa626f55e5c468cde3a8e0"
+    },
+    "server-version/backend/src/modules/huiteacher/personalScale.routes.ts": {
+      "before": "7f5996868308346bd4d53349392aedf599294722",
+      "after": "e51f175b656b92c539c3e336937d6f6c6006c383"
+    },
+    "server-version/backend/src/modules/huiteacher/studentEvaluation.routes.ts": {
+      "before": "98f71a94214436204a863a6d135859c6950fba7a",
+      "after": "88f81e4b47208d0db97a1bc0736fb3e9808f3617"
+    },
+    "server-version/backend/src/modules/report-privacy/routes.ts": {
+      "before": "d411a396ab8c2bd04e5de61f3d9b05123d870397",
+      "after": "45ec84cc57e9f52ea6b469b51c3fcb0dd190bf7a"
+    },
+    "server-version/backend/src/modules/survey/analytics.read.ts": {
+      "before": "25a57f5a3692b5fa03e001e5d67142799036c200",
+      "after": "dc3a4001a8d3409966851520e2d2f21f1d083093"
+    },
+    "server-version/backend/src/routes/uploads.ts": {
+      "before": "97470d5223f4f1692f7bbcbca96558d947e0440f",
+      "after": "d6848fba2be62a16724bc2f8ec019d509028526a"
+    },
+    "server-version/backend/src/services/assetStorage.ts": {
+      "before": "0bf24b603364c5b7853479145917e690e74a7844",
+      "after": "27f906e21a0b85f992c4d433d1e75b1758fd4028"
+    },
+    "server-version/backend/src/services/powService.ts": {
+      "before": "727167a1673236de5b7198c739d57765dfb0e36c",
+      "after": "43f92be4b7e6a1b70dad0b476882fa4e7c855786"
+    },
+    "server-version/backend/src/services/remoteVideoAdmission.ts": {
+      "before": "6a506b532457695041b75d26a127ddf96fe8b03f",
+      "after": "6931755cdf531f9e872f6ad0a017788014cb2587"
+    },
+    "server-version/backend/src/services/videoProcessingRecovery.ts": {
+      "before": "50c400c2b0ee6837db83099614c56ace514f6b0d",
+      "after": "f8ec0bd37ccc6f21fef144abc8a207e5eb82c6a3"
+    },
+    "server-version/backend/src/services/videoRetry.ts": {
+      "before": "3e130a70eb8688329c53c290beb01c11ffee581f",
+      "after": "8b24a04f72bce18405d45d3eed50358dbd027a9d"
+    },
+    "server-version/backend/src/workers/videoProcessorOptimized.ts": {
+      "before": "476b3f6561d64b76fdf1ef4bd8ccd5e330bdb0da",
+      "after": "079fa1a32df220cc1852bcbbf6236ffa37f03f8f"
+    }
+  }
+}

@@ -17,14 +17,14 @@ const rate=createRedisRateLimiter({name:'report-privacy-preference-v1',
 
 export function createReportPrivacyRoutes(product:EducationProduct){
   const router=Router()
-  router.use((_req,res,next)=>{
+  const featureGuard=(req:Request,res:Response,next:NextFunction)=>{
     res.setHeader('Cache-Control','no-store')
     if(process.env.REPORT_PRIVACY_PREFERENCES_V1_ENABLED!=='true')
       return res.status(404).json({
         code:'REPORT_PRIVACY_NOT_ENABLED',message:'报告偏好设置尚未启用',data:null})
     next()
-  })
-  router.use(product==='HUISCHOOL'?authenticateSchool:authenticateHuiteacher)
+  }
+  const authenticate=product==='HUISCHOOL'?authenticateSchool:authenticateHuiteacher
   const wrap=(work:(req:Request)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
     try{return success(res,await work(req))}
     catch(e){
@@ -48,8 +48,8 @@ export function createReportPrivacyRoutes(product:EducationProduct){
     actor:req.user!,organizationId:id.parse(req.params.organizationId),
     product,scenario:privacyScenarioSchema.parse(req.query.scenario),
   })
-  router.get(root+'/preferences',wrap(req=>readReportPrivacyPreferences(common(req))))
-  router.get(root+'/effective',wrap(req=>{
+  router.get(root+'/preferences',featureGuard,authenticate,wrap(req=>readReportPrivacyPreferences(common(req))))
+  router.get(root+'/effective',featureGuard,authenticate,wrap(req=>{
     const query=z.object({scenario:privacyScenarioSchema,runId:id.optional()})
       .strict().parse(req.query)
     return readReportPrivacyPolicyState({
@@ -63,7 +63,7 @@ export function createReportPrivacyRoutes(product:EducationProduct){
     if(body.data.scope==='MY')return next()
     return (product==='HUISCHOOL'?requireRecentSchoolMfa:requireRecentTeacherMfa)(req,res,next)
   }
-  router.put(root+'/preferences/:scenario',rate,stepUp,wrap(req=>{
+  router.put(root+'/preferences/:scenario',featureGuard,authenticate,rate,stepUp,wrap(req=>{
     const scenario=privacyScenarioSchema.parse(req.params.scenario)
     return saveReportPrivacyPreferences({
       actor:req.user!,organizationId:id.parse(req.params.organizationId),

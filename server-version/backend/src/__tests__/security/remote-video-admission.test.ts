@@ -1,11 +1,12 @@
 import { randomUUID } from 'node:crypto'
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { PrismaClient } from '@prisma/client'
-import { integrationDatabaseUrl } from '../integration/integration-env'
+import { integrationDatabaseUrl, requireIsolatedReleaseDatabase } from '../integration/integration-env'
 const mocks = vi.hoisted(() => ({ consume: vi.fn(), statfs: vi.fn() }))
 vi.mock('../../services/cacheService', () => ({ cacheService: { consumeWeightedRateLimit: mocks.consume } }))
 vi.mock('node:fs/promises', () => ({ statfs: mocks.statfs }))
-import { assertRemoteVideoCapacity, reserveRemoteVideoBudget, REMOTE_VIDEO_MAX_BYTES } from '../../services/remoteVideoAdmission'
+import { assertRemoteVideoCapacity, assertVideoCapacity, reserveRemoteVideoBudget, REMOTE_VIDEO_MAX_BYTES, videoOutputMaxBytes, VIDEO_THUMBNAIL_MAX_BYTES } from '../../services/remoteVideoAdmission'
+const pending = (extra: Record<string, bigint> = {}) => [{ total:0n, principal:0n, stored:0n, principalStored:0n, disk:0n, ...extra }]
 describe('remote video charges remote transfer, fails closed and protects disk', () => {
  beforeEach(() => { vi.restoreAllMocks(); mocks.consume.mockReset(); mocks.statfs.mockResolvedValue({ bavail: 100 * 1024 ** 3, bsize: 1 }) })
  it('charges all three maximum transfers, with a pseudonymous principal', async () => {
@@ -24,16 +25,42 @@ describe('remote video charges remote transfer, fails closed and protects disk',
   } finally { vi.unstubAllEnvs() }
  })
  it('rejects absent disk proof and insufficient headroom before admission', async () => {
-  const tx = { $executeRaw:vi.fn().mockResolvedValue(0), $queryRaw: vi.fn().mockResolvedValueOnce([{ total:0n,principal:0n }]).mockResolvedValueOnce([{ total:0n,principal:0n }]) }
+  const tx = { $executeRaw:vi.fn().mockResolvedValue(0), $queryRaw: vi.fn().mockResolvedValueOnce(pending()).mockResolvedValueOnce([{ total:0n,principal:0n }]) }
   mocks.statfs.mockRejectedValue(new Error('unavailable'))
   await expect(assertRemoteVideoCapacity(tx as any,'owner')).rejects.toMatchObject({ status:503 })
-  tx.$queryRaw.mockResolvedValueOnce([{ total:0n,principal:0n }]).mockResolvedValueOnce([{ total:0n,principal:0n }])
+  tx.$queryRaw.mockResolvedValueOnce(pending()).mockResolvedValueOnce([{ total:0n,principal:0n }])
   mocks.statfs.mockResolvedValue({ bavail:10*1024**3,bsize:1 })
   await expect(assertRemoteVideoCapacity(tx as any,'owner')).rejects.toMatchObject({ status:503 })
  })
  it('includes other pending jobs in the owner storage reservation', async () => {
-  const tx = { $executeRaw:vi.fn().mockResolvedValue(0), $queryRaw:vi.fn().mockResolvedValueOnce([{ total:1n,principal:1n }]).mockResolvedValueOnce([{ total:0n,principal:0n }]) }
+  const tx = { $executeRaw:vi.fn().mockResolvedValue(0), $queryRaw:vi.fn().mockResolvedValueOnce(pending({ total:1n,principal:1n,stored:BigInt(REMOTE_VIDEO_MAX_BYTES*2+VIDEO_THUMBNAIL_MAX_BYTES),principalStored:BigInt(REMOTE_VIDEO_MAX_BYTES*2+VIDEO_THUMBNAIL_MAX_BYTES) })).mockResolvedValueOnce([{ total:0n,principal:0n }]) }
   await expect(assertRemoteVideoCapacity(tx as any,'owner')).rejects.toMatchObject({ status:429 })
+ })
+ it('admits a small local file without charging the remote maximum and still enforces cumulative quota', async () => {
+  const inputBytes=10*1024*1024
+  const demand=inputBytes+videoOutputMaxBytes(inputBytes)+VIDEO_THUMBNAIL_MAX_BYTES
+  const tx={ $executeRaw:vi.fn().mockResolvedValue(0),$queryRaw:vi.fn().mockResolvedValueOnce(pending()).mockResolvedValueOnce([{total:0n,principal:0n}]) }
+  mocks.statfs.mockResolvedValue({bavail:6*1024**3,bsize:1})
+  await expect(assertVideoCapacity(tx as any,'owner',{inputBytes})).resolves.toBeUndefined()
+  tx.$queryRaw.mockResolvedValueOnce(pending()).mockResolvedValueOnce([{total:0n,principal:BigInt(8*1024**3-demand+1)}])
+  await expect(assertVideoCapacity(tx as any,'owner',{inputBytes})).rejects.toMatchObject({status:429})
+ })
+ it('accounts for retained originals once and rechecks an existing reservation without charging a second slot', async () => {
+  const inputBytes=500*1024*1024,derivatives=videoOutputMaxBytes(inputBytes)+VIDEO_THUMBNAIL_MAX_BYTES
+  const tx={ $executeRaw:vi.fn().mockResolvedValue(0),$queryRaw:vi.fn().mockResolvedValueOnce(pending({total:1n,principal:1n})).mockResolvedValueOnce([{total:0n,principal:BigInt(8*1024**3-derivatives)}]) }
+  await expect(assertVideoCapacity(tx as any,'owner',{inputBytes,originalRetained:true},'existing-video')).resolves.toBeUndefined()
+  expect(tx.$queryRaw.mock.calls[0]).toContain('existing-video')
+  tx.$queryRaw.mockResolvedValueOnce(pending()).mockResolvedValueOnce([{total:0n,principal:BigInt(8*1024**3-derivatives)}])
+  await expect(assertVideoCapacity(tx as any,'owner',{inputBytes})).rejects.toMatchObject({status:429})
+ })
+ it('fails closed on invalid source size, capacity proof, disk or pending limits', async () => {
+  const tx={ $executeRaw:vi.fn().mockResolvedValue(0),$queryRaw:vi.fn() }
+  await expect(assertVideoCapacity(tx as any,'owner',{inputBytes:0})).rejects.toMatchObject({status:400})
+  expect(tx.$executeRaw).not.toHaveBeenCalled()
+  tx.$queryRaw.mockResolvedValueOnce(pending({total:4n}));await expect(assertVideoCapacity(tx as any,'owner',{inputBytes:1})).rejects.toMatchObject({status:503})
+  tx.$queryRaw.mockResolvedValueOnce(pending()).mockResolvedValueOnce([]);await expect(assertVideoCapacity(tx as any,'owner',{inputBytes:1})).rejects.toMatchObject({status:503})
+  tx.$queryRaw.mockResolvedValueOnce(pending()).mockResolvedValueOnce([{total:0n,principal:0n}]);mocks.statfs.mockResolvedValue({bavail:5*1024**3,bsize:1})
+  await expect(assertVideoCapacity(tx as any,'owner',{inputBytes:1})).rejects.toMatchObject({status:503})
  })
 })
 const url=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL','PARENT_PORTAL_TEST_DB_URL')
@@ -43,10 +70,11 @@ suite('remote video admission is atomic in PostgreSQL',()=>{
  let db:PrismaClient
  const schema='security_video_'+randomUUID().replace(/-/g,'')
  beforeAll(async()=>{
+  requireIsolatedReleaseDatabase(url!)
   db=new PrismaClient({datasources:{db:{url:url!}}});await db.$connect()
   await db.$executeRawUnsafe('CREATE SCHEMA "'+schema+'"')
-  await db.$executeRawUnsafe('CREATE TABLE "'+schema+'".videos (id text PRIMARY KEY,teacher_id text,status text,is_deleted boolean DEFAULT false)')
-  await db.$executeRawUnsafe('CREATE TABLE "'+schema+'".stored_assets (owner_id text,size_bytes bigint,deleted_at timestamptz)')
+  await db.$executeRawUnsafe('CREATE TABLE "'+schema+'".videos (id text PRIMARY KEY,teacher_id text,status text,is_deleted boolean DEFAULT false,original_asset_id text,file_size bigint DEFAULT 0,file_path text DEFAULT \'pending_download\',original_url text)')
+  await db.$executeRawUnsafe('CREATE TABLE "'+schema+'".stored_assets (id text PRIMARY KEY,owner_id text,size_bytes bigint,deleted_at timestamptz)')
   mocks.statfs.mockResolvedValue({ bavail:100*1024**3,bsize:1 })
  })
  afterAll(async()=>{await db.$executeRawUnsafe('DROP SCHEMA "'+schema+'" CASCADE');await db.$disconnect()})
@@ -66,5 +94,39 @@ suite('remote video admission is atomic in PostgreSQL',()=>{
    await assertRemoteVideoCapacity(tx,'new-owner')
   })).rejects.toMatchObject({status:503})
 
+ })
+ it('local and remote concurrent creates share the same durable slot limit',async()=>{
+  await db.$executeRawUnsafe('TRUNCATE "'+schema+'".videos')
+  const result=await Promise.allSettled(Array.from({length:5},(_,n)=>db.$transaction(async tx=>{
+   await tx.$executeRawUnsafe('SET LOCAL search_path TO "'+schema+'"')
+   const local=n%2===0,inputBytes=local?10*1024*1024:REMOTE_VIDEO_MAX_BYTES
+   await assertVideoCapacity(tx,'mixed-owner-'+n,{inputBytes})
+   await tx.$executeRaw`INSERT INTO videos(id,teacher_id,status,file_size,file_path,original_url) VALUES (${'mixed-'+n},${'mixed-owner-'+n},'PENDING',${local?inputBytes:0},${local?'pending_upload':'pending_download'},${local?null:'https://example.com/synthetic.mp4'})`
+  },{timeout:10000})))
+  expect(result.filter(r=>r.status==='fulfilled')).toHaveLength(4)
+  expect(result.filter(r=>r.status==='rejected')).toHaveLength(1)
+ })
+ it('small local jobs use actual bytes while the same owner cannot overbook two slots',async()=>{
+  await db.$executeRawUnsafe('TRUNCATE "'+schema+'".videos')
+  const inputBytes=10*1024*1024
+  const result=await Promise.allSettled(Array.from({length:3},(_,n)=>db.$transaction(async tx=>{
+   await tx.$executeRawUnsafe('SET LOCAL search_path TO "'+schema+'"')
+   await assertVideoCapacity(tx,'same-owner',{inputBytes})
+   await tx.$executeRaw`INSERT INTO videos(id,teacher_id,status,file_size,file_path) VALUES (${'same-'+n},'same-owner','PENDING',${inputBytes},'pending_upload')`
+  },{timeout:10000})))
+  expect(result.filter(r=>r.status==='fulfilled')).toHaveLength(2)
+  expect(result.filter(r=>r.status==='rejected')).toHaveLength(1)
+ })
+ it('retained failed originals continue to consume cumulative storage after their queue reservation is released',async()=>{
+  await db.$executeRawUnsafe('TRUNCATE "'+schema+'".videos')
+  await db.$transaction(async tx=>{
+   await tx.$executeRawUnsafe('SET LOCAL search_path TO "'+schema+'"')
+   await tx.$executeRaw`INSERT INTO videos(id,teacher_id,status,original_asset_id,file_size,file_path) VALUES ('failed','failed-owner','FAILED','failed-original-0',${REMOTE_VIDEO_MAX_BYTES},'assets/failed.mp4')`
+   await tx.$executeRaw`INSERT INTO stored_assets(id,owner_id,size_bytes) SELECT 'failed-original-'||n::text,'failed-owner',${REMOTE_VIDEO_MAX_BYTES} FROM generate_series(0,3) AS entries(n)`
+  })
+  await expect(db.$transaction(async tx=>{
+   await tx.$executeRawUnsafe('SET LOCAL search_path TO "'+schema+'"')
+   await assertVideoCapacity(tx,'failed-owner',{inputBytes:1024*1024})
+  })).rejects.toMatchObject({status:429})
  })
 })

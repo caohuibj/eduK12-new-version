@@ -5,7 +5,7 @@ const { mockPrisma } = vi.hoisted(() => ({
     $transaction: vi.fn(),
     $executeRaw: vi.fn(),
     course: { findUnique: vi.fn() },
-    user: { findUnique: vi.fn(), create: vi.fn() },
+    user: { findUnique: vi.fn(), findFirst: vi.fn(), updateMany: vi.fn(), create: vi.fn() },
     courseStudent: { create: vi.fn() },
   },
 }))
@@ -93,5 +93,33 @@ describe('current user mobile bootstrap contract', () => {
     expect(res.body.data.mobile.capabilities.canReadChildReports).toBe(false)
     expect(res.body.data).not.toHaveProperty('token')
     expect(res.body.data).not.toHaveProperty('passwordHash')
+  })
+})
+
+
+describe('legacy account extension target boundary', () => {
+  beforeEach(() => { vi.clearAllMocks() })
+  it('only queries teachers inside the legacy products and rejects absent foreign targets without mutation', async () => {
+    mockPrisma.user.findFirst.mockResolvedValue(null)
+    const res = makeRes()
+    await authController.extendAccount({ body: { userId: 'school-teacher', months: 12 } } as any, res)
+    expect(res.statusCode).toBe(400)
+    expect(mockPrisma.user.findFirst).toHaveBeenCalledWith({ where: { id: 'school-teacher', accountDomain: { in: ['LEGACY', 'TRAINING'] } } })
+    expect(mockPrisma.user.updateMany).not.toHaveBeenCalled()
+  })
+  it('extends an ordinary legacy teacher and prevents lost updates or target-domain changes with CAS', async () => {
+    const expiresAt = new Date('2026-12-01T00:00:00Z')
+    mockPrisma.user.findFirst.mockResolvedValue({ id: 'teacher', role: 'TEACHER', accountDomain: 'TRAINING', expiresAt })
+    mockPrisma.user.updateMany.mockResolvedValue({ count: 1 })
+    const res = makeRes()
+    await authController.extendAccount({ body: { userId: 'teacher', months: 12 } } as any, res)
+    expect(res.statusCode).toBe(200)
+    expect(res.body.data.expiresAt.toISOString()).toBe('2027-12-01T00:00:00.000Z')
+    expect(mockPrisma.user.updateMany.mock.calls[0][0].where).toEqual({ id: 'teacher', accountDomain: { in: ['LEGACY', 'TRAINING'] }, role: 'TEACHER', expiresAt })
+    mockPrisma.user.updateMany.mockResolvedValue({ count: 0 })
+    const raced = makeRes()
+    await authController.extendAccount({ body: { userId: 'teacher', months: 12 } } as any, raced)
+    expect(raced.statusCode).toBe(409)
+    expect(raced.body).not.toHaveProperty('data.expiresAt')
   })
 })

@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
-import { assertRemoteVideoCapacity, reserveRemoteVideoBudget } from './remoteVideoAdmission'
-import { access } from 'node:fs/promises'
+import { assertVideoCapacity, REMOTE_VIDEO_MAX_BYTES, reserveRemoteVideoBudget } from './remoteVideoAdmission'
+import { stat } from 'node:fs/promises'
 import { prisma } from '../config/database'
 import { videoQueue } from '../config/queue'
 import { getLocalAssetPath } from './assetStorage'
@@ -23,22 +23,31 @@ export async function retryVideo(id: string, actor: { userId: string; role: stri
   const source = row.originalAsset
     ? { ...row, filePath: row.originalAsset.objectKey, originalUrl: null }
     : row
-  if (!source.originalUrl || !/^https?:\/\//i.test(source.originalUrl)) {
-    try { await access(getLocalAssetPath(source.filePath)) }
+  const isRemote = !!source.originalUrl && /^https?:\/\//i.test(source.originalUrl)
+  let inputBytes = REMOTE_VIDEO_MAX_BYTES
+  if (!isRemote) {
+    let sourceStat
+    try { sourceStat = await stat(getLocalAssetPath(source.filePath)) }
     catch { throw new VideoRetryError('原始文件已不可用，请重新上传视频', 409) }
+    if (!sourceStat.isFile() || sourceStat.size <= 0 || sourceStat.size > REMOTE_VIDEO_MAX_BYTES
+      || (row.originalAsset && sourceStat.size !== row.originalAsset.sizeBytes)) {
+      throw new VideoRetryError('原始文件大小无效，请重新上传视频', 409)
+    }
+    inputBytes = sourceStat.size
   }
   const jobId = `video-manual-retry-${randomUUID()}`
   // Reserve the job identity before enqueueing: an old worker generation can
   // neither claim nor publish over this retry, and concurrent requests lose CAS.
-  const isRemote = !!source.originalUrl && /^https?:\/\//i.test(source.originalUrl)
   if (isRemote) await reserveRemoteVideoBudget(row.teacherId)
   const claim = (db: Pick<typeof prisma, 'video'>) => db.video.updateMany({
-    where: { id, isDeleted: false, status: 'FAILED', processingGeneration: row.processingGeneration, teacherId: row.teacherId },
-    data: { status: 'PENDING', processingJobId: jobId, processingStartedAt: null, errorMessage: null },
+    where: { id, isDeleted: false, status: 'FAILED', processingGeneration: row.processingGeneration, teacherId: row.teacherId,
+      originalAssetId: row.originalAssetId, filePath: row.filePath, originalUrl: row.originalUrl },
+    data: { status: 'PENDING', fileSize: inputBytes, processingJobId: jobId, processingStartedAt: null, errorMessage: null },
   })
-  const claimed = isRemote
-    ? await prisma.$transaction(async tx => { await assertRemoteVideoCapacity(tx, row.teacherId, id); return claim(tx) })
-    : await claim(prisma)
+  const claimed = await prisma.$transaction(async tx => {
+    await assertVideoCapacity(tx, row.teacherId, { inputBytes, originalRetained: !!row.originalAsset }, id)
+    return claim(tx)
+  })
   if (claimed.count !== 1) throw new VideoRetryError('视频状态已改变，请刷新后重试', 409)
   try {
     await videoQueue.add('transcode', recoveryPayload(source), { jobId, attempts: 3, backoff: { type: 'exponential', delay: 5000 } })
