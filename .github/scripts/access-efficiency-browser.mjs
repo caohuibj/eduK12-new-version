@@ -59,6 +59,12 @@ try{
    let data;
    if(path==='/api/auth/me')data={id:'synthetic-user',username:'synthetic',nickname:'合成用户',role:variant.teacher?'TEACHER':'STUDENT',accountDomain:variant.host.startsWith('training')?'TRAINING':'LEGACY',isActive:true,mustChangePassword:false};
    else if(path==='/api/capabilities')data={cognitive:false,parentPortal:false};
+   // Shared shell discovery is explicitly empty for this synthetic principal.
+   // These DTOs come from AssessmentTaskShortcut, OrganizationProvider and
+   // RelationalAvailabilityProvider; unknown calls still fail immediately.
+   else if(path==='/api/my-assessments')data={list:[],pendingCount:0};
+   else if(path==='/api/organizations')data={list:[],total:0,page:1,pageSize:100,platformRole:'STANDARD',allowedActions:[]};
+   else if(['/api/relational-assessments/catalog','/api/relational-assessments/tasks'].includes(path))data={list:[]};
    else if(path==='/api/courses/my/tasks')data={list:[],page:1,total:0,pageSize:20,generatedAt:'2026-01-01T00:00:00.000Z',counts:{ACTIONABLE:0,PENDING:0,IN_PROGRESS:0,UPCOMING:0,EXPIRED:0,COMPLETED:0,UNAVAILABLE:0}};
    else if(path==='/api/courses')data={list:[course],total:1};
    else if(path==='/api/checkins')data={list:[checkin],total:1};
