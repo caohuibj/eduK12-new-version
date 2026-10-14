@@ -10,6 +10,7 @@ import {SurveyScaleTimingTracker,sealSurveyScaleTimings,
 import { SurveyParticipantImage,type SurveyImageProof } from './SurveyParticipantImage'
 import { resolveClientSurveyFlow,type PublicFlow } from './flow.client'
 import { resolveSurveyCheckpointDraft,sameSurveyCheckpointAnswers } from './checkpoint-recovery'
+import { readRecruitmentEntry, rememberRecruitmentEntry, clearRecruitmentEntry, isRecruitmentEntryToken } from './recruitment-entry'
 
 type ApiResult<T>={code:number|string;message:string;data:T|null}
 type Wave={id:string;title:string;ordinal:number;status:string;consentText:string;consentVersion:number;
@@ -205,7 +206,10 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purp
  */
 export default function SurveyPublicApp(){
   const publicId=useMemo(()=>window.location.pathname.match(/^\/r\/([a-f0-9-]{36})$/i)?.[1]||'',[])
-  const [entryToken]=useState(()=>new URLSearchParams(window.location.hash.replace(/^#/,'' )).get('entry')||'')
+  const [entryToken,setEntryToken]=useState(()=>{
+    try{return readRecruitmentEntry(publicId,window.location.hash,sessionStorage)}
+    catch{return readRecruitmentEntry(publicId,window.location.hash,null)}
+  })
   const [info,setInfo]=useState<StudyInfo|null>(null),[loading,setLoading]=useState(true)
   const [error,setError]=useState(''),[busy,setBusy]=useState(false)
   const [researchCode,setResearchCode]=useState(''),[accessCredential,setAccessCredential]=useState('')
@@ -228,6 +232,17 @@ export default function SurveyPublicApp(){
   const taskState=useRef<Task|null>(null)
   taskState.current=task
   const base='/r/'+publicId
+  const validEntry=isRecruitmentEntryToken(entryToken)
+  const discardEntry=()=>{
+    try{clearRecruitmentEntry(publicId,sessionStorage)}catch{/* private storage unavailable */}
+    setEntryToken('')
+  }
+  // A valid recruitment bearer can survive an accidental same-tab refresh.
+  // Never refresh its absolute 30-minute deadline simply by reloading.
+  useEffect(()=>{
+    if(!validEntry)return
+    try{rememberRecruitmentEntry(publicId,entryToken,sessionStorage)}catch{/* ephemeral fallback */}
+  },[publicId,entryToken,validEntry])
   // Only the already-authorized local browser tab may recover unfinished answers.
   useEffect(()=>{
     if(!task||task.status!=='STARTED'||!attemptId)return
@@ -288,6 +303,7 @@ export default function SurveyPublicApp(){
     const result=await publicApi<{researchCode:string;accessCredential:string}>(
       base+'/waves/'+wave.id+'/join','POST',{entryToken,consent:true,consentVersion:wave.consentVersion})
     setResearchCode(result.researchCode);setAccessCredential(result.accessCredential)
+    discardEntry()
     setProofReceived(true);setNotice('此研究编号与私密恢复凭证只显示在当前设备页面，请分别妥善保存。')
   })
   const chooseWave=(wave:Wave)=>{setSelectedWave(wave);setAgreed(false);setTask(null);setGeneral(null);setWithdrawn(false);setRevoked(false)}
@@ -367,6 +383,7 @@ export default function SurveyPublicApp(){
           entryToken,consent:true,consentVersion:wave.consentVersion,
         })
       setAccessCredential(started.accessCredential)
+      discardEntry()
       const temp:SingleResume={attemptId:started.attemptId,
         accessCredential:started.accessCredential,createdAt:Date.now()}
       setSingleResume(temp)
@@ -559,6 +576,7 @@ export default function SurveyPublicApp(){
       if(attemptId)clearLocalSurveyDraft(publicId,attemptId)
       setRevoked(true);setHome(null);setTask(null);setGeneral(null)
       setSelectedWave(null);setAgreed(false);setProofReceived(false)
+      discardEntry()
       setNotice('已终止未来访问，仍可凭原始研究身份申请撤回数据。')
     })
   }
@@ -583,6 +601,7 @@ export default function SurveyPublicApp(){
       setSingleResume(null)
       try{sessionStorage.removeItem(singleStorageKey(publicId))}catch{/* storage unavailable */}
       setResearchCode('');setAccessCredential('')
+      discardEntry()
       setNotice('已记录撤回请求。相关回答将从后续统计和新导出排除；物理删除与历史留存按研究说明处理。')
     })
   }
@@ -649,6 +668,12 @@ export default function SurveyPublicApp(){
         </button>}
       {!task&&!general&&!revoked&&<section className="bg-white rounded-xl border p-5">
         <h3 className="font-semibold text-lg">研究波次</h3>
+        {!validEntry&&<label className="block text-sm my-3">缺少有效邀请凭证？从原研究邀请中复制 43 位凭证到这里。
+          <input className="input block w-full mt-2" autoComplete="off"
+            aria-label="重新输入研究邀请凭证" value={entryToken}
+            onChange={event=>setEntryToken(event.target.value.trim())}
+            placeholder="输入研究邀请凭证"/>
+        </label>}
         {(home||info.waves).map(wave=><div key={wave.id} className="border-b py-3 flex items-center justify-between gap-3">
           <div><strong>第 {wave.ordinal} 轮 · {wave.title}</strong>
             <p className="text-sm text-slate-500">{wave.status==='OPEN'?'开放采集中':wave.status==='CLOSED'?'已结束':'尚未开放'}
@@ -666,10 +691,10 @@ export default function SurveyPublicApp(){
             onChange={e=>setAgreed(e.target.checked)}/>
             我已阅读并同意本轮研究说明及相应的数据关联范围。</label>
           {info.project.collectionMode==='LINKED_WAVES'&&!researchCode&&<button
-            className="btn-secondary" disabled={busy||!agreed||!entryToken}
+            className="btn-secondary" disabled={busy||!agreed||!validEntry}
             onClick={()=>join(selectedWave)}>首次参加 · 领取随机研究编号</button>}
           <button className="btn-primary" disabled={busy||!agreed||
-            (info.project.collectionMode==='LINKED_WAVES'?(!researchCode||!accessCredential):!entryToken)}
+            (info.project.collectionMode==='LINKED_WAVES'?(!researchCode||!accessCredential):!validEntry)}
             onClick={start}>{selectedWave.attempt?.status==='COMPLETED'?'查看完成情况':'开始或恢复本轮作答'}</button>
         </div>}
       </section>}
