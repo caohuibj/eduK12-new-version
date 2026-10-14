@@ -4,8 +4,9 @@ import { prisma } from '../../config/database'
 import { comparePassword, hashPassword, isValidPassword, PASSWORD_MAX_LENGTH } from '../../utils/password'
 import { generateToken } from '../../utils/jwt'
 import { success, unauthorized, forbidden } from '../../utils/response'
-import { issueSchoolCsrfToken, setSchoolSessionCookie, clearSchoolSessionCookie } from '../../utils/authCookies'
+import { issueSchoolCsrfToken, setSchoolSessionCookie, clearSchoolSessionCookie, getSchoolSessionToken } from '../../utils/authCookies'
 import { authenticateSchool } from '../../middleware/auth'
+import { revokeCurrentSession } from '../../utils/sessionRevocation'
 import { createRedisRateLimiter } from '../../middleware/redisRateLimit'
 import { passwordChangeRateLimit, withPasswordChangeAdmission } from '../../middleware/passwordChangeAdmission'
 import { schoolAccountNeedsMfa, beginSchoolMfaChallenge, getPendingChallenge, startSchoolMfaEnrollment, finishSchoolMfa, verifySchoolTotpStepUp } from './mfa.service'
@@ -54,7 +55,7 @@ router.post('/login', loginRateLimit, withLoginAccountFailureThrottle(async (req
       })
       const user = account?.user
       const usable = !!user && user.accountDomain === 'SCHOOL'
-        && user.isActive && !user.isFrozen && !user.mustChangePassword
+        && user.isActive && !user.isFrozen
         && (!user.expiresAt || user.expiresAt > new Date())
       const matches = await comparePassword(parsed.data.password, usable ? user!.passwordHash : DUMMY_HASH)
       return usable && matches ? account : null
@@ -152,10 +153,14 @@ router.get('/me', authenticateSchool, async (req, res) => {
   return success(res, {
     id: req.user!.userId, username: account.loginName,
     role: req.user!.role, accountDomain: 'SCHOOL',
+    mustChangePassword: req.user!.mustChangePassword,
   })
 })
 
-router.post('/logout', authenticateSchool, (req, res) => {
+router.post('/logout', authenticateSchool, async (req, res) => {
+  if (!await revokeCurrentSession(getSchoolSessionToken(req))) {
+    return res.status(503).json({ code: -1, message: '退出暂不可用，请稍后重试' })
+  }
   clearSchoolSessionCookie(req, res)
   return success(res, null, '退出成功')
 })

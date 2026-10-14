@@ -4,7 +4,8 @@ import { prisma } from '../../config/database'
 import { comparePassword, hashPassword, isValidPassword, PASSWORD_MAX_LENGTH } from '../../utils/password'
 import { success, unauthorized, forbidden } from '../../utils/response'
 import { authenticateSurvey } from '../../middleware/auth'
-import { issueSurveyCsrfToken, clearSurveySessionCookie, setSurveySessionCookie } from '../../utils/authCookies'
+import { revokeCurrentSession } from '../../utils/sessionRevocation'
+import { issueSurveyCsrfToken, clearSurveySessionCookie, setSurveySessionCookie, getSurveySessionToken } from '../../utils/authCookies'
 import {
   loginRateLimit, withLoginAccountFailureThrottle, withLoginPasswordVerification,
   recordLoginFailure, clearLoginFailures,
@@ -91,9 +92,11 @@ for(const [route,kind] of [['setup','SETUP'],['confirm','ENROLL'],['verify','VER
 }
 surveyAuthRouter.get('/me',authenticateSurvey,async(req,res)=>{
   const account=await prisma.surveyAccount.findUnique({where:{userId:req.user!.userId}})
-  return account?success(res,{id:account.userId,username:account.loginName,accountDomain:'SURVEY',role:'RESEARCHER'}):unauthorized(res)
+  return account?success(res,{id:account.userId,username:account.loginName,accountDomain:'SURVEY',role:'RESEARCHER',mustChangePassword:req.user!.mustChangePassword}):unauthorized(res)
 })
-surveyAuthRouter.post('/logout',authenticateSurvey,(req,res)=>{
+surveyAuthRouter.post('/logout',authenticateSurvey,async(req,res)=>{
+  if(!await revokeCurrentSession(getSurveySessionToken(req)))
+    return res.status(503).json({code:-1,message:'退出暂不可用，请稍后重试',data:null})
   clearSurveySessionCookie(req,res)
   return success(res,null,'退出成功')
 })
