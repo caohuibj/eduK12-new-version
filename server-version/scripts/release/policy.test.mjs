@@ -25,3 +25,10 @@ test('tooling-only C never implies application builds or data recovery; mixed fi
  for(const extra of [regular(css),regular('server-version/backend/prisma/schema.prisma'),regular('server-version/scripts/release/unknown.py'),{...files[0],status:'D',newMode:'000000'},{...files[0],newMode:'100755'}])assert.equal(toolingOnly([...files,extra]),false);
  const needs={scope:{result:'success',outputs:{scenario:'release-tooling'}}};assert.deepEqual(requiredChecks(needs,true),['scope','release-tools']);assert.deepEqual(requiredChecks(needs,false),['scope','release-tools','codeql']);
 });
+
+
+test('exact ingress bundle uses tools gate; unknown vhosts, app files, deletions and modes still escalate',()=>{
+ const known=['server-version/ops/nginx/nginx.production.conf','server-version/ops/nginx/eduk12-products.conf','server-version/ops/nginx/eduk12-school.conf','server-version/ops/nginx/renew-school.sh','server-version/scripts/release/ingress.py','server-version/scripts/release/test_ingress.py'].map(regular);
+ assert.equal(toolingOnly(known),true);
+ for(const extra of [regular('server-version/ops/nginx/unknown.conf'),regular('server-version/frontend/src/main.tsx'),{...known[0],newMode:'120000'},{...known[0],status:'D',newMode:'000000'}])assert.equal(toolingOnly([...known,extra]),false);
+});

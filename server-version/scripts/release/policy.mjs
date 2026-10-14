@@ -81,13 +81,14 @@ export function classify(changes,read){
 // Tooling-only C is not an application release. Its exact diff must leave both
 // component trees unchanged; unknown files/modes and mixed app changes escalate.
 const releaseToolFiles=new Set([
+ 'server-version/ops/nginx/nginx.production.conf','server-version/ops/nginx/eduk12-products.conf','server-version/ops/nginx/eduk12-school.conf','server-version/ops/nginx/renew-school.sh',
  '.github/PULL_REQUEST_TEMPLATE.md','.github/release-tools/package.json','.github/release-tools/package-lock.json',
  '.github/workflows/ci.yml','.github/workflows/ci-scoped-release.yml','.github/workflows/ci-release-tools.yml','.github/workflows/ci-maintenance.yml',
  '.github/scripts/content-scope.mjs','.github/scripts/content-scope.test.mjs','.github/scripts/merge-gate.mjs',
  '.github/scripts/local-validation.mjs','.github/scripts/local-validation.test.mjs','.github/scripts/local-validation.integration.test.mjs',
  '.gitignore','AGENTS.md','docs/ci-runner-policy.md','docs/release/README.md','docs/release/audit-20261009.md','docs/release/validation-20261009.md',
  'server-version/docs/release-candidate-checklist-v1.md','server-version/docs/release-verify-local.md',
- ...['policy.mjs','policy.test.mjs','evidence.py','executor.py','test_executor.py','qualify.py','test_qualify.py','browser.cjs','candidate.py','fixture-server.cjs','build.py','scan.py','package.py','ci-container-rehearsal.py','compose-overlay.example.sh'].map(f=>'server-version/scripts/release/'+f),
+ ...['ingress.py','test_ingress.py','policy.mjs','policy.test.mjs','evidence.py','executor.py','test_executor.py','qualify.py','test_qualify.py','browser.cjs','candidate.py','fixture-server.cjs','build.py','scan.py','package.py','ci-container-rehearsal.py','compose-overlay.example.sh'].map(f=>'server-version/scripts/release/'+f),
 ]);
 export function toolingOnly(entries){return entries.length>0&&entries.every(e=>releaseToolFiles.has(e.file)&&e.newMode==='100644'&&((e.status==='A'&&e.oldMode==='000000')||(e.status==='M'&&e.oldMode==='100644')));}
 export function componentFingerprint(sha,component){

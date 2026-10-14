@@ -35,5 +35,17 @@ jobs:
       - name: install tools only for missing checks
         if: steps.local.outputs.reused != 'true'
         run: npm ci --ignore-scripts --prefix .github/release-tools
+      - name: prepare native nginx only for missing ingress checks (official Ubuntu sources)
+        if: steps.local.outputs.reused != 'true'
+        run: |
+          if git diff --name-only "$CI_BASE_SHA" "$GITHUB_SHA" -- server-version/ops/nginx server-version/scripts/release/ingress.py server-version/scripts/release/test_ingress.py | grep -q .; then
+            cat > "$RUNNER_TEMP/ingress-official.list" <<'EOF'
+          deb [signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg] https://archive.ubuntu.com/ubuntu noble main universe
+          deb [signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg] https://archive.ubuntu.com/ubuntu noble-updates main universe
+          deb [signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg] https://security.ubuntu.com/ubuntu noble-security main universe
+          EOF
+            sudo apt-get -o Dir::Etc::sourcelist="$RUNNER_TEMP/ingress-official.list" -o Dir::Etc::sourceparts="-" -o APT::Get::List-Cleanup=0 update
+            sudo apt-get -o Dir::Etc::sourcelist="$RUNNER_TEMP/ingress-official.list" -o Dir::Etc::sourceparts="-" install -y --no-install-recommends nginx-core
+          fi
       - name: consume local success or execute missing tooling checks
         run: node .github/scripts/local-validation.mjs ci release-tools
