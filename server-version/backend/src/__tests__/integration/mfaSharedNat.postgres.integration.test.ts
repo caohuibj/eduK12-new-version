@@ -3,11 +3,18 @@ import { beforeAll, afterAll, describe, expect, it, vi } from 'vitest'
 import { prisma } from '../../config/database'
 import { cacheService } from '../../services/cacheService'
 import { createMfaAttemptRateLimiter } from '../../middleware/mfaAttemptRateLimit'
-import { integrationDatabaseUrl } from './integration-env'
+import { integrationDatabaseUrl, isActionsServiceDatabase } from './integration-env'
 
+const localIsolated=(selected:string):boolean=>{
+  const candidate=new URL(selected)
+  return process.env.NODE_ENV==='test' && candidate.hostname==='127.0.0.1'
+    && candidate.pathname.includes('_ci') && process.env.DATABASE_URL===selected
+}
 const url = integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL')
-if (!url || !new URL(url).pathname.includes('_ci') || new URL(url).hostname !== '127.0.0.1') throw new Error('Explicit isolated loopback database required')
-if (!process.env.REDIS_URL || new URL(process.env.REDIS_URL).hostname !== '127.0.0.1') throw new Error('Explicit isolated loopback Redis required')
+if (!url || !(localIsolated(url) || isActionsServiceDatabase(url))) throw new Error('Explicit isolated loopback database required')
+const redis = process.env.REDIS_URL ? new URL(process.env.REDIS_URL) : null
+if (!redis || redis.protocol !== 'redis:' || !['localhost','127.0.0.1'].includes(redis.hostname))
+  throw new Error('Explicit isolated loopback Redis required')
 const previousNodeEnv = process.env.NODE_ENV
 const ip = 'isolated-mfa-' + randomUUID()
 const digest = (text: string) => createHash('sha256').update(text).digest('hex')

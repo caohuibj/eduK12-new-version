@@ -3,13 +3,16 @@ import { beforeAll, afterAll, describe, expect, it } from 'vitest'
 import { prisma } from '../../config/database'
 import { resolveOrganizationAccessContext } from '../../modules/organization/access'
 import { organizationController } from '../../modules/organization/organization.controller'
-import { integrationDatabaseUrl } from './integration-env'
+import { integrationDatabaseUrl, isActionsServiceDatabase } from './integration-env'
 
-const url = integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL')
-if (!url) throw new Error('Preload access query test requires an explicit isolated PostgreSQL URL')
-if (new URL(url).hostname !== '127.0.0.1' || !new URL(url).pathname.includes('_ci')) {
-  throw new Error('Only the explicitly isolated loopback CI database is supported')
+const localIsolated=(selected:string):boolean=>{
+  const candidate=new URL(selected)
+  return process.env.NODE_ENV==='test' && candidate.hostname==='127.0.0.1'
+    && candidate.pathname.includes('_ci') && process.env.DATABASE_URL===selected
 }
+const url = integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL')
+if (!url || !(localIsolated(url) || isActionsServiceDatabase(url)))
+  throw new Error('Only the explicitly isolated loopback CI database is supported')
 let rawCalls = 0
 beforeAll(() => {
   prisma.$use(async (params, next) => {
