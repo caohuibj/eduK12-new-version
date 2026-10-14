@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { resolveOrganizationAccessContext } from '../organization/access'
@@ -30,17 +31,34 @@ export async function readParticipantLongitudinal(userId: string, artifactId: st
   const spec = await getPublishedReportingSpec(artifact.specId)
   if (spec.definition.analysisKind !== 'INDIVIDUAL_LONGITUDINAL') return hidden()
   const definition = spec.definition
-  let allowedMetricIds = definition.metricRules.map(r => r.metricId)
+  // Check the exact SELF population before reading any bound source.
   for (const wave of waves) {
     const observations = [...wave.inputManifest.resolved, ...wave.inputManifest.unresolved]
     if (observations.length !== 1 || observations[0].subjectUserId !== userId) return hidden()
-    const tracks = await prisma.$queryRaw<Array<{ family: string; key: string; version: string; policy: any; hash: string }>>`
-      SELECT t.resource_family AS family, t.resource_key AS key, t.resource_version AS version,
-        t.frozen_resource_policy AS policy, t.resource_policy_hash AS hash
-      FROM assessment_run_tracks t JOIN assessment_runs r ON r.organization_id=t.organization_id AND r.id=t.run_id
-      WHERE t.organization_id=${organizationId} AND t.run_id=${wave.sourceRunId} AND t.id=${wave.sourceTrackId} AND r.status IN ('PUBLISHED','CLOSED')
-    `
-    const track = tracks[0]
+  }
+  if (!waves.length) return hidden()
+  const sourceKey = (runId: string, trackId: string) => JSON.stringify([runId, trackId])
+  const sources = [...new Map(waves.map(wave => [
+    sourceKey(wave.sourceRunId, wave.sourceTrackId),
+    { runId: wave.sourceRunId, trackId: wave.sourceTrackId },
+  ])).values()]
+  const sourcePairs = Prisma.join(sources.map(source =>
+    Prisma.sql`(${source.runId}, ${source.trackId})`))
+  const tracks = await prisma.$queryRaw<Array<{
+    runId: string; trackId: string; family: string; key: string; version: string; policy: any; hash: string
+  }>>(Prisma.sql`
+    SELECT t.run_id AS "runId", t.id AS "trackId",
+      t.resource_family AS family, t.resource_key AS key, t.resource_version AS version,
+      t.frozen_resource_policy AS policy, t.resource_policy_hash AS hash
+    FROM assessment_run_tracks t
+    JOIN assessment_runs r ON r.organization_id=t.organization_id AND r.id=t.run_id
+    WHERE t.organization_id=${organizationId}
+      AND (t.run_id, t.id) IN (${sourcePairs}) AND r.status IN ('PUBLISHED','CLOSED')
+  `)
+  const bySource = new Map(tracks.map(track => [sourceKey(track.runId, track.trackId), track]))
+  let allowedMetricIds = definition.metricRules.map(r => r.metricId)
+  for (const wave of waves) {
+    const track = bySource.get(sourceKey(wave.sourceRunId, wave.sourceTrackId))
     if (!track?.policy || canonicalHash(track.policy) !== track.hash || !track.policy.resultDisclosure) return hidden()
     // Current content may revoke access; an unknown or changed contract cannot grant visibility.
     const entry = await resolveHistoricalRelationalEntry({ resourceKind: track.family as any, resourceKey: track.key, resourceVersion: track.version })
@@ -48,20 +66,41 @@ export async function readParticipantLongitudinal(userId: string, artifactId: st
     const contract = validateResultDisclosureContract(track.policy.resultDisclosure)
     const rule = contract.audiences.RESPONDENT
     if (rule.mode !== 'INDIVIDUAL_SUMMARY' || !rule.longitudinalMetricKeys.length) return hidden()
-    // This participant route is SELF only; observer results cannot become subject disclosure.
-    const executions = await prisma.$queryRaw<Array<{ id: string }>>`
-      SELECT e.id FROM assessment_run_executions e
-      JOIN assessment_run_actor_snapshots s ON s.organization_id=e.organization_id AND s.run_id=e.run_id AND s.id=e.subject_actor_snapshot_id
-      JOIN assessment_run_actor_snapshots r ON r.organization_id=e.organization_id AND r.run_id=e.run_id AND r.id=e.respondent_actor_snapshot_id
-      WHERE e.organization_id=${organizationId} AND e.run_id=${wave.sourceRunId} AND e.track_id=${wave.sourceTrackId}
-        AND s.user_id=${userId} AND r.user_id=${userId}
-        AND e.status NOT IN ('REVOKED','CANCELLED') LIMIT 2
-    `
-    if (executions.length !== 1 || executions[0].id !== observations[0].executionId) return hidden()
     allowedMetricIds = allowedMetricIds.filter(id => definition.metricRules.some(r => r.metricId === id
       && r.sourceFamily === track.family && r.sourceResourceKey === track.key && rule.longitudinalMetricKeys.includes(r.sourceMetricKey)))
   }
   if (!allowedMetricIds.length) return hidden()
+  // Verify current execution authority after all registry checks. LIMIT 2
+  // applies independently to each exact source, preserving ambiguity rejection
+  // without reading unbounded executions or one query per wave.
+  const executions = await prisma.$queryRaw<Array<{
+    runId: string; trackId: string; id: string
+  }>>(Prisma.sql`
+    SELECT source."runId", source."trackId", own_execution.id
+    FROM (VALUES ${sourcePairs}) AS source("runId", "trackId")
+    JOIN LATERAL (
+      SELECT e.id FROM assessment_run_executions e
+      JOIN assessment_run_actor_snapshots s ON s.organization_id=e.organization_id
+        AND s.run_id=e.run_id AND s.id=e.subject_actor_snapshot_id
+      JOIN assessment_run_actor_snapshots r ON r.organization_id=e.organization_id
+        AND r.run_id=e.run_id AND r.id=e.respondent_actor_snapshot_id
+      WHERE e.organization_id=${organizationId} AND e.run_id=source."runId"
+        AND e.track_id=source."trackId" AND s.user_id=${userId} AND r.user_id=${userId}
+        AND e.status NOT IN ('REVOKED','CANCELLED') LIMIT 2
+    ) own_execution ON TRUE
+  `)
+  const executionIds = new Map<string, string[]>()
+  for (const execution of executions) {
+    const key = sourceKey(execution.runId, execution.trackId)
+    const ids = executionIds.get(key) ?? []
+    ids.push(execution.id)
+    executionIds.set(key, ids)
+  }
+  for (const wave of waves) {
+    const observations = [...wave.inputManifest.resolved, ...wave.inputManifest.unresolved]
+    const ids = executionIds.get(sourceKey(wave.sourceRunId, wave.sourceTrackId)) ?? []
+    if (ids.length !== 1 || ids[0] !== observations[0].executionId) return hidden()
+  }
   await currentAccess()
   return projectParticipantLongitudinal(artifact.artifactPayload.projection, allowedMetricIds)
 }

@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { UserRole } from '@prisma/client'
 
-const { mockPrisma, mockVerifyToken } = vi.hoisted(() => ({
+const { mockPrisma, mockVerifyToken, mockRevoked } = vi.hoisted(() => ({
   mockPrisma: {
     $queryRaw: vi.fn(),
   },

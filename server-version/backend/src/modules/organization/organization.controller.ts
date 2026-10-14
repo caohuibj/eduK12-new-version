@@ -4,7 +4,7 @@ import { prisma } from '../../config/database'
 import { Prisma } from '@prisma/client'
 import { error, notFound, success, unauthorized, forbidden } from '../../utils/response'
 import {
-  resolveAssessmentDeliveryAuthority,
+  resolveAssessmentDeliveryAuthorityFromContext,
   resolveOrganizationAccessContext,
   type AssessmentDeliveryScope,
   type OrganizationAccessContext,
@@ -260,10 +260,7 @@ export const organizationController = {
       const organization = organizations[0]
       if (!organization) return notFound(res, '组织不存在')
 
-      const delivery = await resolveAssessmentDeliveryAuthority({
-        principal: req.user,
-        organizationId,
-      })
+      const delivery = await resolveAssessmentDeliveryAuthorityFromContext(access)
       return success(res, {
         organization,
         access,

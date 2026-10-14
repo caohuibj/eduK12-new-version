@@ -7,7 +7,7 @@ import { success, unauthorized, forbidden } from '../../utils/response'
 import { issueHuiteacherCsrfToken, setHuiteacherSessionCookie, clearHuiteacherSessionCookie, getHuiteacherSessionToken } from '../../utils/authCookies'
 import { authenticateHuiteacher } from '../../middleware/auth'
 import { revokeCurrentSession } from '../../utils/sessionRevocation'
-import { createRedisRateLimiter } from '../../middleware/redisRateLimit'
+import { createMfaAttemptRateLimiter } from '../../middleware/mfaAttemptRateLimit'
 import { passwordChangeRateLimit, withPasswordChangeAdmission } from '../../middleware/passwordChangeAdmission'
 import {
   schoolAccountNeedsMfa, beginSchoolMfaChallenge, getPendingChallenge,
@@ -80,7 +80,7 @@ router.post('/login',loginRateLimit,withLoginAccountFailureThrottle(async(req,re
   }
 }))
 
-const mfaLimiter=createRedisRateLimiter({name:'huiteacher-mfa-challenge',limit:25,windowSeconds:900})
+const mfaLimiter=createMfaAttemptRateLimiter({realm:'SCHOOL',ipName:'huiteacher-mfa-challenge',pendingCookieName:'huischool_mfa_pending'})
 const mfaCode=z.object({code:z.string().min(6).max(80)}).strict()
 router.post('/mfa/setup',mfaLimiter,async(req,res)=>{
   try{

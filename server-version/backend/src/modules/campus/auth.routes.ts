@@ -7,7 +7,7 @@ import { success, unauthorized, forbidden } from '../../utils/response'
 import { issueSchoolCsrfToken, setSchoolSessionCookie, clearSchoolSessionCookie, getSchoolSessionToken } from '../../utils/authCookies'
 import { authenticateSchool } from '../../middleware/auth'
 import { revokeCurrentSession } from '../../utils/sessionRevocation'
-import { createRedisRateLimiter } from '../../middleware/redisRateLimit'
+import { createMfaAttemptRateLimiter } from '../../middleware/mfaAttemptRateLimit'
 import { passwordChangeRateLimit, withPasswordChangeAdmission } from '../../middleware/passwordChangeAdmission'
 import { schoolAccountNeedsMfa, beginSchoolMfaChallenge, getPendingChallenge, startSchoolMfaEnrollment, finishSchoolMfa, verifySchoolTotpStepUp } from './mfa.service'
 import {
@@ -88,7 +88,7 @@ router.post('/login', loginRateLimit, withLoginAccountFailureThrottle(async (req
   }
 }))
 
-const mfaLimiter=createRedisRateLimiter({name:'campus-mfa-challenge',limit:25,windowSeconds:900})
+const mfaLimiter=createMfaAttemptRateLimiter({realm:'SCHOOL',ipName:'campus-mfa-challenge',pendingCookieName:'huischool_mfa_pending'})
 const mfaCode=z.object({code:z.string().min(6).max(80)}).strict()
 const pending=(req:Request)=>getPendingChallenge(req)
 
