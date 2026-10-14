@@ -43,3 +43,10 @@
 - 普通应用上线与独立灾备验收分开报告。备份安全、真实新 DB 恢复、轮换、附件引用保护和清理授权保持既有规则；涉及迁移/恢复程序的 C 仍要求相关恢复门禁。
 
 - 严格最小验证：CI 已通过的相同不可变产物，部署仅作版本/就绪/短关键流程/回退确认，不重跑 CI、页面全验收或工具单元测试。仅发布工具且两业务组件 tree 未变时走 `release-tooling`，不运行应用构建、数据库或附件恢复；混合/未知差异不适用。
+
+
+## 所有已上线域名的 HTTPS 入口保护（2026-10-14）
+
+- 完整约定见 `docs/release/README.md` 的“HTTPS 入口防遗漏”。school、training、teacher、survey、主站/www 和 API 的入口、独立证书绑定及原 Host 转发均须保留；首页源码未变化时不构建或重新验收首页。
+- nginx 总模板必须连同明确 include 的 `eduk12-products.conf`、`eduk12-school.conf` 一起准备。禁止仅覆盖总模板或使用遗漏产品域名的历史配置。先运行只读 `server-version/scripts/release/ingress.py`，对比现行完整 `nginx -T` 输出，丢失任何原有 HTTPS 域名/证书绑定即停止；候选在独立位置解析通过后才可切换。
+- school 已上线的独立证书、ACME webroot 和续期 reload hook 必须保留。reload 后最多等待约 20 秒让新 TLS 工作进程就绪；禁止绕过证书校验、为了消除警告关闭 HTTPS、重启无关应用或用镜像重建替代配置修复。

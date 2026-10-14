@@ -34,6 +34,10 @@ export function recipe(check,base,head) {
  const commands=check==='release-tools'&&adapterOnly(base,head)?[['node','--test','.github/scripts/local-validation.integration.test.mjs']]:structuredClone(recipes[check]);
  if(check==='release-tools') {
   const files=git('diff','--name-only','--no-renames',base,head).split('\n');
+  if(files.some(f=>f.startsWith('server-version/ops/nginx/')||f.endsWith('/ingress.py')||f.endsWith('/test_ingress.py'))) {
+   commands.push(['python3','-B','-m','unittest','discover','-s','server-version/scripts/release','-p','test_ingress.py']);
+   commands.push(['python3','-B','server-version/scripts/release/ingress.py','--syntax']);
+  }
   for(const name of ['executor','qualify']) if(files.some(f=>f.endsWith('/'+name+'.py')||f.endsWith('/test_'+name+'.py')||(name==='executor'&&f.endsWith('/evidence.py'))))
    commands.push(['python3','-B','-m','unittest','discover','-s','server-version/scripts/release','-p','test_'+name+'.py']);
  }
@@ -41,7 +45,7 @@ export function recipe(check,base,head) {
 }
 export function binding(check,base,head) {
  const paths=check==='documentation'?[script,'.github/scripts/documentation-check.mjs','.github/scripts/content-scope.mjs','server-version/scripts/release/policy.mjs',...git('diff','--name-only','--no-renames',base,head).split('\n')]:
-  check==='release-tools'?['.github/scripts','.github/workflows','.github/config','.github/release-tools','server-version/scripts/release']:
+  check==='release-tools'?['.github/scripts','.github/workflows','.github/config','.github/release-tools','server-version/scripts/release','server-version/ops/nginx']:
   ['server-version/frontend','server-version/backend','server-version/scripts/release','.github/scripts','.github/workflows','.github/release-tools'];
  const tree=git('ls-tree','-r',head,'--',...paths.filter(Boolean));
  const diff=check==='documentation'?git('diff','--no-ext-diff','--no-textconv','--no-renames','--raw','--abbrev=40',base,head):'';

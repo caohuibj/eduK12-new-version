@@ -218,3 +218,14 @@ GitHub Debian 使用签名官方源，npm 固定 `https://registry.npmjs.org` �
 用户批准按此次 10 个前端源文件的确切前后 Git blob 接入 `teacher-survey` 路线。仅允许绑定名单及本路线工具；后端、依赖、配置、未知文件、删除、重命名或模式变化拒绝。merge gate 在真实 checkout 重算计划；正式 ready 必须候选和定向 CodeQL 均成功，草稿不代替资格。
 
 正式位置为 GitHub：核验同 PR 官方草稿作业的源码 tree、原检查命令/工作流、Node 24.21.0、Linux runner、精确成功步骤和 24 小时时效，输入完全一致才接纳 lint/types；否则停止，不暗中复测。后端 tree 与已成功官方候选相同，核对来源和摘要后保留后端资格，不重构建。前端 build stage 构建一次，新增交互契约在该阶段运行，runtime 复用同一阶段缓存，实际镜像保留 HIGH/CRITICAL 扫描与受影响 Teacher/Survey 390/768/1440 页面和 WCAG。页面 DTO 桩明确只证明前端交互，不伪称后端账号授权证明；既有真实本地 MFA、参与及权限记录仍仅作审查证据。生产部署另需授权。
+
+
+## HTTPS 入口防遗漏（2026-10-14）
+
+仓库 `server-version/ops/nginx/nginx.production.conf`、`eduk12-products.conf`、`eduk12-school.conf` 对应已上线的主站/www、API、training、teacher、survey、school。总模板与所有明确 include 文件是一个配置包，不能只覆盖总模板。独立 Certbot lineage 保持现状：school 使用 `school.eduk12.top`，teacher/survey 使用 `eduk12-products`，training 使用 `training.eduk12.top`，主站/www 使用 `eduk12.top`，API 使用 `api.eduk12.top`。私钥和生产证书不提交仓库。
+
+部署准备时保存当前完整 `nginx -T` 输出并运行 `python3 server-version/scripts/release/ingress.py --existing <当前完整配置快照>`，校验候选包必须包含所有已知及现行额外 HTTPS 域名、保留证书绑定和原 Host 转发、保留 school 的 ACME 路由。未知现行入口不能静默删除；应先将其正式纳入候选。该程序只读，不写线上配置、申请证书或 reload。独立候选解析完成、回退文件及下载/证书路径就绪后，按当次部署授权提交配置；nginx 原生检查通过后只做平滑 reload，并最多等待 20 秒让新 TLS 工作进程就绪。
+
+school 续期使用 `/var/www/eduk12-school-acme`，仓库 `renew-school.sh` 安装到 `/opt/eduk12-new/deploy/tls-school/renew-school.sh`（root 持有、0755），绑定 school 的 Certbot deploy hook。续期先检查配置再 reload；不重启应用或数据库。用户已验收的线上结果保存在 `/opt/eduk12-new/deploy/tls-school/20261013T235636Z/result.json`：school 及现有四站 HTTPS 首页 200，school 静态资源 200、匿名校园 API 401；应用版本仍为 `47893b10`。这些是现场验收，不冒充 GitHub 门禁。
+
+本次配置同步使用现有 release-tooling 路线的精确文件名单，新增契约、完整候选包的原生 nginx 语法检查及既有路由/证据契约在 GitHub 执行一次，保留 CodeQL 和稳定 merge gate。GitHub 测试工具仅使用 Ubuntu 官方源，模拟证书只用于隔离语法检查，不发往生产。两业务组件 tree 必须相同；未知文件、删除、模式变化或混入业务改动仍按原规则升级。合并不会再次部署或切换应用；各站首页及现行兼容入口不变。

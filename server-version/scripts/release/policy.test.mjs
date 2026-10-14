@@ -9,7 +9,14 @@ test('login entrance is B with auth surface, byte exact surrounding authority',(
 test('mixed known A+B retains auth and workspace requirements',()=>{const p=classify([regular(css),regular(auth)],e=>e.file===css?['a','b']:[source,source]);assert.equal(p.route,'B');assert.deepEqual(p.surfaces,['auth','workspace'])});
 test('unknown, delete, rename sides, executable and symlink escalate C',()=>{for(const changes of [[regular(css),regular('server-version/backend/prisma/schema.prisma')],[{...regular(css),status:'D',newMode:'000000'}],[{...regular(css),newMode:'100755'}],[{...regular(css),newMode:'120000'}],[regular(css),regular(css+'.renamed')]])assert.equal(classify(changes,()=>['','x']).route,'C')});
 test('broad frontend prefix cannot admit API or persistent code',()=>{for(const path of ['src/api/auth.ts','src/contexts/AuthContext.tsx','src/pages/NewPage.tsx'])assert.equal(classify([regular('server-version/frontend/'+path)],()=>['','']).route,'C')});
-test('public portal local state is admitted, new calls/imports/authority access is not',()=>{const s=fs.readFileSync(new URL('frontend/src/training/TrainingPortal.tsx',root),'utf8');assert.ok(portalBoundary(s,s.replace('让学习，','学习启程，')));for(const unsafe of [s.replace('const authLink = useAuthLinks()','const authLink = fetch("/api")'),s.replace("useAuthLinks()","localStorage.getItem('token')"),s.replace("'/student/login'","'/admin/login'")])assert.ok(!portalBoundary(s,unsafe))});
+test('public portal local state is admitted, new calls/imports/authority access is not',()=>{
+ // Fixed classifier input: live homepage copy/navigation must not turn a negative mutation into a no-op.
+ const s="import {useAuthLinks} from './links'; export default function Portal(){const authLink = useAuthLinks(); return <a href='/student/login'>让学习，</a>}";
+ assert.ok(portalBoundary(s,s.replace('让学习，','学习启程，')));
+ for(const unsafe of [s.replace('const authLink = useAuthLinks()','const authLink = fetch(\"/api\")'),s.replace("useAuthLinks()","localStorage.getItem('token')"),s.replace("'/student/login'","'/admin/login'")]){
+  assert.notEqual(unsafe,s,'negative fixture mutation must be real');assert.ok(!portalBoundary(s,unsafe));
+ }
+});
 test('new external CSS fetch is not silently admitted',()=>assert.equal(classify([regular(css)],()=>['','a{background:url(https://external.test)}']).route,'C'));
 
 import {requiredChecks,failedChecks} from '../../../.github/scripts/merge-gate.mjs';
@@ -24,4 +31,11 @@ test('tooling-only C never implies application builds or data recovery; mixed fi
  const files=[regular('server-version/scripts/release/executor.py'),regular('.github/workflows/ci.yml')];assert.equal(toolingOnly(files),true);
  for(const extra of [regular(css),regular('server-version/backend/prisma/schema.prisma'),regular('server-version/scripts/release/unknown.py'),{...files[0],status:'D',newMode:'000000'},{...files[0],newMode:'100755'}])assert.equal(toolingOnly([...files,extra]),false);
  const needs={scope:{result:'success',outputs:{scenario:'release-tooling'}}};assert.deepEqual(requiredChecks(needs,true),['scope','release-tools']);assert.deepEqual(requiredChecks(needs,false),['scope','release-tools','codeql']);
+});
+
+
+test('exact ingress bundle uses tools gate; unknown vhosts, app files, deletions and modes still escalate',()=>{
+ const known=['server-version/ops/nginx/nginx.production.conf','server-version/ops/nginx/eduk12-products.conf','server-version/ops/nginx/eduk12-school.conf','server-version/ops/nginx/renew-school.sh','server-version/scripts/release/ingress.py','server-version/scripts/release/test_ingress.py'].map(regular);
+ assert.equal(toolingOnly(known),true);
+ for(const extra of [regular('server-version/ops/nginx/unknown.conf'),regular('server-version/frontend/src/main.tsx'),{...known[0],newMode:'120000'},{...known[0],status:'D',newMode:'000000'}])assert.equal(toolingOnly([...known,extra]),false);
 });
