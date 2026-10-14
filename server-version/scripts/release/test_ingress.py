@@ -2,7 +2,7 @@ import tempfile
 from pathlib import Path
 import shutil
 import unittest
-from ingress import ROOT, bundle, validate
+from ingress import ROOT, bundle, validate, synthetic_config
 
 
 class IngressTests(unittest.TestCase):
@@ -36,5 +36,12 @@ class IngressTests(unittest.TestCase):
         shutil.copyfile(ROOT/'renew-school.sh',self.root/'renew-school.sh')
         (self.root/'eduk12-products.conf').unlink();(self.root/'eduk12-products.conf').symlink_to(ROOT/'eduk12-products.conf')
         with self.assertRaises(ValueError):validate(self.root)
+
+    def test_synthetic_parser_never_uses_live_certs_or_privileged_public_ports(self):
+        text=synthetic_config(self.root,self.root,self.root/'cert.pem',self.root/'key.pem')
+        self.assertNotIn('/etc/letsencrypt/',text)
+        self.assertNotIn('listen 80;',text);self.assertNotIn('listen 443 ssl',text)
+        self.assertIn('listen 127.0.0.1:31880;',text);self.assertIn('listen 127.0.0.1:31443 ssl',text)
+        self.assertNotIn('/var/log/nginx/',text)
 
 if __name__=='__main__':unittest.main()

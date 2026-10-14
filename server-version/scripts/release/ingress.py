@@ -75,27 +75,33 @@ def validate(root, existing_text=None):
     return sorted(hosts)
 
 
+def synthetic_config(root, tmp, cert, key):
+    main = (Path(root) / 'nginx.production.conf').read_text()
+    for name in sorted(INCLUDES):
+        main = main.replace('include /etc/nginx/conf.d/' + name + ';', (Path(root) / name).read_text())
+    main = re.sub(r'/etc/letsencrypt/live/[^;\s]+/fullchain.pem', str(cert), main)
+    main = re.sub(r'/etc/letsencrypt/live/[^;\s]+/privkey.pem', str(key), main)
+    main = main.replace('/var/log/nginx/eduk12-timing.log', str(tmp / 'access.log'))
+    temps = ''.join(kind + '_temp_path ' + str(tmp / kind) + ';\n' for kind in ['client_body', 'proxy', 'fastcgi', 'uwsgi', 'scgi'])
+    main = main.replace('http {', 'http {\n' + temps, 1)
+    # nginx -t also opens listening sockets. Preserve virtual-host/SSL grammar
+    # while keeping the synthetic job away from privileged and public ports.
+    main = re.sub(r'\blisten\s+80\s*;', 'listen 127.0.0.1:31880;', main)
+    main = re.sub(r'\blisten\s+443\s+ssl\b', 'listen 127.0.0.1:31443 ssl', main)
+    return 'pid ' + str(tmp / 'nginx.pid') + ';\nerror_log stderr;\n' + main
+
+
 def syntax(root):
-    # A synthetic bundle tests repository packaging, with ephemeral certs/logs.
-    # It does not request certificates, call live hosts or reuse production private keys.
+    # No live-host requests, production private keys, or service reloads.
     validate(root)
     with tempfile.TemporaryDirectory(prefix='eduk12-ingress-') as tmp:
         tmp = Path(tmp); cert = tmp / 'cert.pem'; key = tmp / 'key.pem'
         subprocess.run(['openssl', 'req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-days', '1',
                         '-subj', '/CN=synthetic.ingress.invalid', '-keyout', str(key), '-out', str(cert)], check=True, capture_output=True)
-        main = (Path(root) / 'nginx.production.conf').read_text()
-        for name in sorted(INCLUDES):
-            main = main.replace('include /etc/nginx/conf.d/' + name + ';', (Path(root) / name).read_text())
-        main = re.sub(r'/etc/letsencrypt/live/[^;\s]+/fullchain.pem', str(cert), main)
-        main = re.sub(r'/etc/letsencrypt/live/[^;\s]+/privkey.pem', str(key), main)
-        main = main.replace('/var/log/nginx/eduk12-timing.log', str(tmp / 'access.log'))
-        temps = ''.join(kind + '_temp_path ' + str(tmp / kind) + ';\n' for kind in ['client_body', 'proxy', 'fastcgi', 'uwsgi', 'scgi'])
-        main = main.replace('http {', 'http {\n' + temps, 1)
-        path = tmp / 'nginx.conf'; path.write_text('pid ' + str(tmp / 'nginx.pid') + ';\nerror_log stderr;\n' + main)
-        # CI's nginx can otherwise open its compiled /var/log path before parsing
-        # the isolated error_log directive. Keep bootstrap diagnostics in stderr.
-        command = ['nginx', '-e', 'stderr', '-t', '-p', str(tmp) + '/', '-c', str(path)]
-        result = subprocess.run(command, capture_output=True, text=True)
+        path = tmp / 'nginx.conf'; path.write_text(synthetic_config(root, tmp, cert, key))
+        help_text = subprocess.run(['nginx', '-h'], capture_output=True).stderr
+        bootstrap = ['-e', 'stderr'] if b'-e filename' in help_text else []
+        result = subprocess.run(['nginx', *bootstrap, '-t', '-p', str(tmp) + '/', '-c', str(path)], capture_output=True, text=True)
         if result.returncode:
             raise RuntimeError('Isolated nginx configuration failed: ' + result.stderr.strip())
 
