@@ -7,6 +7,7 @@ import { getSessionToken, getSchoolSessionToken, getSurveySessionToken, getHuite
 import { measureRequestPhase } from '../services/runtimeObservability'
 import { loadCurrentPrincipal, toRequestPrincipal } from '../modules/organization/principal'
 import { schoolAccountNeedsMfa } from '../modules/campus/mfa.service'
+import { isSessionRevoked } from '../utils/sessionRevocation'
 
 // Extend Express Request
 declare global {
@@ -32,6 +33,12 @@ const authenticateProduct = async (req: Request, res: Response, next: NextFuncti
 
     if (!payload) {
       return unauthorized(res, '无效的认证令牌')
+    }
+
+    const revoked = await isSessionRevoked(token)
+    if (revoked === true) return unauthorized(res, '当前会话已退出，请重新登录')
+    if (revoked === null && process.env.NODE_ENV === 'production') {
+      return res.status(503).json({ code: -1, message: '会话状态暂不可用，请稍后重试' })
     }
 
     const principal = await loadPrincipal(payload.userId)
@@ -85,6 +92,12 @@ const authenticateProduct = async (req: Request, res: Response, next: NextFuncti
       '/api/users/change-password',
       '/api/auth/logout',
       '/api/auth/csrf',
+      '/api/campus/auth/me',
+      '/api/campus/auth/logout',
+      '/api/huiteacher/auth/me',
+      '/api/huiteacher/auth/logout',
+      '/api/survey/auth/me',
+      '/api/survey/auth/logout',
       '/api/campus/auth/change-password',
       '/api/survey/auth/change-password',
       '/api/huiteacher/auth/change-password',
@@ -114,9 +127,15 @@ export const optionalAuthenticate = async (req: Request, res: Response, next: Ne
       const payload = verifyToken(token)
 
       if (payload) {
-        const principal = await loadPrincipal(payload.userId)
-        if (!inactiveAccountMessage(principal) && payload.tokenVersion === principal!.tokenVersion && ['LEGACY','TRAINING'].includes(principal!.accountDomain) && (payload.accountDomain === undefined || ['LEGACY','TRAINING'].includes(payload.accountDomain))) {
-          req.user = toRequestPrincipal(principal!)
+        const revoked = await isSessionRevoked(token)
+        if (revoked === null && process.env.NODE_ENV === 'production') {
+          return res.status(503).json({ code: -1, message: '会话状态暂不可用，请稍后重试' })
+        }
+        if (revoked !== true) {
+          const principal = await loadPrincipal(payload.userId)
+          if (!inactiveAccountMessage(principal) && payload.tokenVersion === principal!.tokenVersion && ['LEGACY','TRAINING'].includes(principal!.accountDomain) && (payload.accountDomain === undefined || ['LEGACY','TRAINING'].includes(payload.accountDomain))) {
+            req.user = toRequestPrincipal(principal!)
+          }
         }
       }
     }

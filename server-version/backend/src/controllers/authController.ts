@@ -11,7 +11,8 @@ import { logger } from '../utils/logger'
 import { Messages } from '../constants'
 import { inactiveAccountMessage } from '../utils/accountStatus'
 import { z } from 'zod'
-import { setSessionCookie, clearSessionCookie } from '../utils/authCookies'
+import { setSessionCookie, clearSessionCookie, getSessionToken } from '../utils/authCookies'
+import { revokeCurrentSession } from '../utils/sessionRevocation'
 import { clearLoginFailures, recordLoginFailure, withLoginPasswordVerification } from '../middleware/loginRateLimit'
 import { isBoundedAdmissionBusyError } from '../services/boundedAdmissionGate'
 import { CourseNotJoinableError, courseJoinabilityMessage, isCourseJoinable } from '../utils/courseEnrollment'
@@ -412,6 +413,11 @@ export const authController = {
   changePassword: changePasswordHandler,
 
   async logout(req: Request, res: Response) {
+    // Revoke this one session before clearing its host-only cookie. Do not
+    // change the account-wide tokenVersion on an ordinary logout.
+    if (!await revokeCurrentSession(getSessionToken(req))) {
+      return res.status(503).json({ code: -1, message: '退出暂不可用，请稍后重试' })
+    }
     clearSessionCookie(req, res)
     return success(res, null, '已退出登录')
   },
