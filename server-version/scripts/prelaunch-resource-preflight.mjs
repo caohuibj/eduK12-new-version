@@ -13,6 +13,17 @@ const integer=(value,name,min=1,max=10000)=>{
  if(!Number.isSafeInteger(number)||number<min||number>max)throw new Error(`Invalid ${name}`)
  return number
 }
+// Compose intentionally renders these six optional caps as empty strings.
+// Empty means the backend derives bounded values from the class-size/token
+// audience inputs; an explicitly supplied cap still has to be a positive integer.
+const optionalAssessmentCaps = new Set([
+ 'PUBLIC_ASSESSMENT_IP_GET_LIMIT',
+ 'PUBLIC_ASSESSMENT_IP_FINAL_LIMIT',
+ 'PUBLIC_ASSESSMENT_TOKEN_GET_LIMIT',
+ 'PUBLIC_ASSESSMENT_TOKEN_FINAL_LIMIT',
+ 'PUBLIC_ASSESSMENT_RECOVERY_GET_LIMIT',
+ 'PUBLIC_ASSESSMENT_RECOVERY_FINAL_LIMIT',
+])
 export function inspectResourceContract(compose, {capacity=false}={}) {
  const services=compose.services || {};const result={capacityCertified:false,services:{}}
  let cpu=0,memory=0,pools=0
@@ -45,6 +56,7 @@ export function inspectResourceContract(compose, {capacity=false}={}) {
    result.services[name]={...result.services[name],heapMiB:heap,heapProcessesBudgeted:copies,prismaPool:pool}
    for(const [key,value] of Object.entries(env)) {
     if(/(?:_LIMIT|_QUEUE|_MAX_CONCURRENT|_MAX_WAIT_MS|_TIMEOUT_MS|_RETRY_AFTER_SECONDS|_CONCURRENCY|_TIMEOUT|_MAX_RECORDS|_MAX_TRIALS|_MAX_FIELDS|_MAX_BYTES|_BYTE_BUDGET|_RETENTION_HOURS)$/.test(key)) {
+     if(value==='' && optionalAssessmentCaps.has(key))continue
      integer(value,key,key.endsWith('_QUEUE')?0:1,Number.MAX_SAFE_INTEGER)
      result.services[name][key]=Number(value)
     }

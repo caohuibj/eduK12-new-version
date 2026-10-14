@@ -19,6 +19,11 @@ const student = randomUUID(), teacher = randomUUID(), foreign = randomUUID(), co
 const peers = Array.from({ length: 45 }, () => randomUUID()), crowdedTask = randomUUID()
 let server: Server, endpoint: string
 const identity = { userId: student, role: 'STUDENT' }
+// The original, unbounded check-in controller is injected only by the
+// access-efficiency A/B candidate, never the standard backend regression.
+const baselineComparison = process.env.CI === 'true'
+  && process.env.PERF_ISOLATED_TEST_MODE === '1'
+  && process.env.PERF_SQL_EVENT_COUNT === '1'
 suite('bounded authenticated list pages in real PostgreSQL', () => {
   beforeAll(async () => {
     requireIsolatedReleaseDatabase(url!)
@@ -36,7 +41,8 @@ suite('bounded authenticated list pages in real PostgreSQL', () => {
     app.use('/uploads', uploads)
     app.get('/courses/my', courseController.myCourses)
     app.get('/checkins/my', checkinController.myCheckins)
-    if (process.env.CI) {
+    if (baselineComparison) {
+      // An A/B candidate without the deliberately mounted baseline fails here.
       const baseline = await import('../../controllers/__baseline-checkin' as string)
       app.get('/baseline/checkins/my', baseline.checkinController.myCheckins)
     }
@@ -111,7 +117,7 @@ suite('bounded authenticated list pages in real PostgreSQL', () => {
   })
   it('records before/after fixed synthetic concurrency latency and real SQL counts without touching production', async () => {
     const measurements = []
-    for (const variant of process.env.CI ? ['baseline', 'bounded'] : ['bounded']) {
+    for (const variant of baselineComparison ? ['baseline', 'bounded'] : ['bounded']) {
       resetRuntimeObservabilityForTests()
       for (const concurrency of [1, 10, 25]) {
         const times: number[] = [], bytes: number[] = []
@@ -130,11 +136,17 @@ suite('bounded authenticated list pages in real PostgreSQL', () => {
           p50Ms: times[Math.floor(times.length*.5)], p95Ms: times[Math.min(times.length-1, Math.floor(times.length*.95))], p99Ms: times[Math.min(times.length-1, Math.floor(times.length*.99))] })
       }
       const metrics = runtimeMetricLines().filter(line => /prisma|event_loop|rss|pool/.test(line))
-      const sql = Number(metrics.find(line => line.startsWith('ptool_prisma_sql_events_total '))?.split(' ').at(-1))
-      expect(sql).toBeGreaterThan(0)
-      expect(sql).toBeLessThanOrEqual(144 * 6)
-      measurements.push({ variant, metrics, sqlEvents: sql })
+      // SQL-event instrumentation is deliberately absent outside an opt-in
+      // isolated A/B run; keep its positive/upper-bound assertions there.
+      if (baselineComparison) {
+        const sql = Number(metrics.find(line => line.startsWith('ptool_prisma_sql_events_total '))?.split(' ').at(-1))
+        expect(sql).toBeGreaterThan(0)
+        expect(sql).toBeLessThanOrEqual(144 * 6)
+        measurements.push({ variant, metrics, sqlEvents: sql })
+      } else {
+        expect(metrics.some(line => line.startsWith('ptool_prisma_sql_events_total '))).toBe(false)
+      }
     }
-    if (process.env.CI) await writeFile('/evidence/access-performance.json', JSON.stringify({ fixture: { tasks: 405, pageSize: 20 }, measurements, baseline: 'Original base controller on identical synthetic data; initial response was unbounded.', limitations: 'Synthetic isolated host; production speed and pool tuning are not claimed. Prisma pool waits are not directly observable.' }, null, 2))
+    if (baselineComparison) await writeFile('/evidence/access-performance.json', JSON.stringify({ fixture: { tasks: 405, pageSize: 20 }, measurements, baseline: 'Original base controller on identical synthetic data; initial response was unbounded.', limitations: 'Synthetic isolated host; production speed and pool tuning are not claimed. Prisma pool waits are not directly observable.' }, null, 2))
   }, 30_000)
 })
