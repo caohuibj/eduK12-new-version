@@ -67,7 +67,12 @@ export default function SurveyApp(){
       const me=await api<Researcher>('/auth/me')
       setUser(me)
       if(!openWorkspace&&['home','feature','claim','reset'].includes(initial))setScreen(initial)
-      else {await loadProjects();setScreen('work')}
+      else {
+        // A forced-password session is allowed to read /auth/me and change
+        // its password, but has no permission to list research projects.
+        if(!me.mustChangePassword)await loadProjects()
+        setScreen('work')
+      }
     }catch{setUser(null);if(initial==='login')setScreen('login')}
     finally{setLoading(false)}
   },[initial,loadProjects])

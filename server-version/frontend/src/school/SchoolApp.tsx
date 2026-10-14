@@ -136,7 +136,7 @@ export default function SchoolApp(){
 
   useEffect(()=>{const previous=document.title;document.title=screen==='feature'&&activeFeature?`${activeFeature.title} | Huischool`:'Huischool';return()=>{document.title=previous}},[screen,activeFeature])
   useEffect(()=>{
-    if(!user){setCampusParentReportEnabled(false);return}
+    if(!user||user.mustChangePassword){setCampusParentReportEnabled(false);return}
     let live=true
     void api<{parentReportsEnabled:boolean}>('/reports/availability')
       .then(status=>{if(live)setCampusParentReportEnabled(status.parentReportsEnabled===true)})
@@ -144,7 +144,7 @@ export default function SchoolApp(){
     return ()=>{live=false}
   },[user])
   useEffect(()=>{
-    if(!user)return
+    if(!user||user.mustChangePassword)return
     void api<{list:CampusOrg[]}>('/organizations').then(data=>{
       const list=data.list??[]
       setOrgs(list)
@@ -159,7 +159,7 @@ export default function SchoolApp(){
     }
   },[user])
   useEffect(()=>{
-    if(!user||!schoolId)return
+    if(!user||user.mustChangePassword||!schoolId)return
     setClassId(new URLSearchParams(window.location.search).get('organizationId')===schoolId?new URLSearchParams(window.location.search).get('classUnitId')??'':'');setUnits([]);setSummary(null);setIssuedCodes([]);setAccess(null)
     void api<{access:SchoolAccess}>(`/organizations/${schoolId}/context`)
       .then(async data=>{
@@ -393,7 +393,7 @@ export default function SchoolApp(){
         <div className="hs-secret">{recoveryCodes.map(code=><code key={code}>{code}</code>)}</div>
         <button className="hs-primary" onClick={()=>{setRecoveryCodes([]);void refresh()}}>已妥善保存，进入校园</button>
       </section>}
-      {!loading&&user&&screen==='workspace'&&user.mustChangePassword&&<section className="hs-panel hs-narrow">
+      {!loading&&user&&screen==='workspace'&&user.mustChangePassword&&recoveryCodes.length===0&&<section className="hs-panel hs-narrow">
         <h1>首次登录 · 修改密码</h1>
         <ProductPasswordChange product="school" forced busy={working} onChangePassword={changeAccountPassword}/>
       </section>}
