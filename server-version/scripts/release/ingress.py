@@ -92,7 +92,12 @@ def syntax(root):
         temps = ''.join(kind + '_temp_path ' + str(tmp / kind) + ';\n' for kind in ['client_body', 'proxy', 'fastcgi', 'uwsgi', 'scgi'])
         main = main.replace('http {', 'http {\n' + temps, 1)
         path = tmp / 'nginx.conf'; path.write_text('pid ' + str(tmp / 'nginx.pid') + ';\nerror_log stderr;\n' + main)
-        subprocess.run(['nginx', '-t', '-p', str(tmp) + '/', '-c', str(path)], check=True, capture_output=True)
+        # CI's nginx can otherwise open its compiled /var/log path before parsing
+        # the isolated error_log directive. Keep bootstrap diagnostics in stderr.
+        command = ['nginx', '-e', 'stderr', '-t', '-p', str(tmp) + '/', '-c', str(path)]
+        result = subprocess.run(command, capture_output=True, text=True)
+        if result.returncode:
+            raise RuntimeError('Isolated nginx configuration failed: ' + result.stderr.strip())
 
 
 if __name__ == '__main__':
