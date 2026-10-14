@@ -64,7 +64,7 @@ describe('campus login preserves server MFA decisions',()=>{
   fireEvent.change(screen.getByLabelText('新密码'),{target:{value:'NewPass1234'}})
   fireEvent.click(screen.getByRole('button',{name:'确认修改密码'}))
   await waitFor(()=>expect(urls.some(url=>url.endsWith('/auth/change-password'))).toBe(true))
-  expect(await screen.findByRole('heading',{name:'登录校园账号'})).toBeInTheDocument()
+  expect(await screen.findByRole('heading',{name:'校园账号登录'})).toBeInTheDocument()
  })
 
 })
