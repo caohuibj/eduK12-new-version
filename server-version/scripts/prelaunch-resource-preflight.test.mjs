@@ -23,3 +23,38 @@ test('capacity overlay may expose only localhost API; URL pool overrides are val
  assert.throws(()=>inspectResourceContract(f));assert.doesNotThrow(()=>inspectResourceContract(f,{capacity:true}))
  f.services.backend.environment.DATABASE_URL+='?connection_limit=0';assert.throws(()=>inspectResourceContract(f,{capacity:true}))
 })
+
+const optionalAssessmentCaps=[
+ 'PUBLIC_ASSESSMENT_IP_GET_LIMIT','PUBLIC_ASSESSMENT_IP_FINAL_LIMIT',
+ 'PUBLIC_ASSESSMENT_TOKEN_GET_LIMIT','PUBLIC_ASSESSMENT_TOKEN_FINAL_LIMIT',
+ 'PUBLIC_ASSESSMENT_RECOVERY_GET_LIMIT','PUBLIC_ASSESSMENT_RECOVERY_FINAL_LIMIT',
+]
+test('accepts only omitted optional assessment caps and preserves configured resource checks',()=>{
+ const f=fixture()
+ for(const service of ['backend','worker']) {
+  for(const cap of optionalAssessmentCaps)f.services[service].environment[cap]=''
+  f.services[service].environment.PUBLIC_ASSESSMENT_EXPECTED_CLASS_SIZE='60'
+ }
+ const inspected=inspectResourceContract(f)
+ assert.equal(inspected.totalCpu,4)
+ assert.equal(inspected.maximumConfiguredAppConnections,18)
+ for(const service of ['backend','worker'])for(const cap of optionalAssessmentCaps)
+  assert.equal(Object.hasOwn(inspected.services[service],cap),false)
+})
+test('rejects invalid explicit assessment caps and unrelated empty required limits',()=>{
+ for(const cap of optionalAssessmentCaps){
+  for(const value of ['0','-1','not-an-integer','1.5']){
+   const f=fixture()
+   f.services.backend.environment[cap]=value
+   assert.throws(()=>inspectResourceContract(f),new RegExp('Invalid '+cap))
+  }
+  const f=fixture()
+  f.services.backend.environment[cap]='15'
+  assert.equal(inspectResourceContract(f).services.backend[cap],15)
+ }
+ for(const key of ['REGISTRATION_ACCOUNT_LIMIT','EXPORT_CONCURRENCY','UNIT_SUBMIT_ADMISSION_LIMIT']){
+  const f=fixture()
+  f.services.backend.environment[key]=''
+  assert.throws(()=>inspectResourceContract(f),new RegExp('Invalid '+key))
+ }
+})
