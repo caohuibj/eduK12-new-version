@@ -12,12 +12,13 @@ import { HuiteacherPersonalSelf } from './HuiteacherPersonalSelf'
 import { HuiteacherFieldWorkspace } from './HuiteacherFieldWorkspace'
 import { HuiteacherConsensusReviews } from './HuiteacherConsensus'
 import { ReportPrivacyPreferences } from '../components/report-privacy/ReportPrivacyPreferences'
+import { ProductPasswordChange } from '../components/account/ProductPasswordChange'
 import { HuiteacherLanding } from './HuiteacherLanding'
 import './huiteacher-landing.css'
 
 type Envelope<T>={code:string|number;message:string;data:T}
 type Scope={organizationId:string;organizationName:string;membershipId:string;orgRole:string;productAdmin:boolean}
-type Me={id:string;username:string;role:string;organizations:Scope[];product:'HUITEACHER'}
+type Me={id:string;username:string;role:string;organizations:Scope[];product:'HUITEACHER';mustChangePassword:boolean}
 type Unit={id:string;unitKind:'GRADE'|'CLASS';name:string;parentUnitId:string|null}
 type Mfa={mfaRequired:true;enrolled:boolean}
 type Screen='home'|'join'|'login'|'mfa'|'register'|'student'|'expert'|'workspace'
@@ -225,6 +226,11 @@ export default function HuiteacherApp(){
     setIssuedStudentInvites(result.list)
     setMessage('Teacher 学生邀请已生成，须按学号逐一安全交付；不会自动开通 School 心理健康业务')
   })
+  const changeAccountPassword=(oldPassword:string,newPassword:string)=>run(async()=>{
+    await teacherApi('/auth/change-password','POST',{oldPassword,newPassword})
+    setMe(null);setSelectedOrg('');setScreen('login')
+    setMessage('教育账号密码已修改，School 和 Teacher 需要分别重新登录')
+  })
   const logout=()=>run(async()=>{
     await teacherApi('/auth/logout','POST',{})
     setMe(null);setSelectedOrg('');setScreen('home');setMessage('')
@@ -308,9 +314,16 @@ export default function HuiteacherApp(){
         <button className="ht-primary" disabled={working}>注册统一教育账号</button></form>
       <p className="ht-muted">已有教育账号？<button type="button" onClick={()=>changeScreen('login')}>直接登录</button></p>
     </section>:
+    me&&screen==='workspace'&&me.mustChangePassword?<section className="ht-panel ht-form-panel">
+      <h1>首次登录 · 修改教育账号密码</h1>
+      <ProductPasswordChange product="teacher" forced busy={working} onChangePassword={changeAccountPassword}/>
+    </section>:
     me&&screen==='workspace'?<div className="ht-workspace">
       <section className="ht-panel"><h1>我的教育发展空间</h1>
         <p>欢迎，{me.username}。Teacher 学校业务必须经学校开通及本人授权；Huischool 数据不在此显示。</p>
+        <details className="ht-panel"><summary>账号安全 · 修改密码</summary>
+          <ProductPasswordChange product="teacher" busy={working} onChangePassword={changeAccountPassword}/>
+        </details>
         <div className="ht-inline"><Field label="已收到的学校邀请代码" value={inviteCode} set={setInviteCode}/>
           {me.role==='STUDENT'?<><Field label="学校核验学号" value={studentNumber} set={setStudentNumber}/>
             <button onClick={joinStudent} disabled={working||!inviteCode||!studentNumber}>使用原学生账号加入</button></>

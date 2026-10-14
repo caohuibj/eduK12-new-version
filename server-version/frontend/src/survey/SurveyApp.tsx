@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
+import { ProductPasswordChange } from '../components/account/ProductPasswordChange'
 import { SurveyBuilder } from './SurveyBuilder'
 import { SurveyWaveStudio } from './SurveyWaveStudio'
 import { SurveyAnalyticsWorkspace } from './SurveyAnalyticsWorkspace'
@@ -9,7 +10,7 @@ import { SurveyFeaturePage } from './SurveyFeaturePage'
 import { surveyFeatures } from './survey-features'
 
 type Envelope<T>={code:number|string;message:string;data:T}
-type Researcher={id:string;username:string}
+type Researcher={id:string;username:string;mustChangePassword:boolean}
 type Project={id:string;title:string;description:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';status:'DRAFT'|'ACTIVE'|'PAUSED'|'CLOSED'|'ARCHIVED';revision:number;firstPublishedAt?:string|null}
 const cookie=(name:string)=>document.cookie.split('; ').find(x=>x.startsWith(name+'='))?.split('=').slice(1).join('=')||''
 async function api<T>(path:string,method='GET',body?:unknown):Promise<T>{
@@ -98,6 +99,11 @@ export default function SurveyApp(){
     if(r.recoveryCodes?.length){setRecovery(r.recoveryCodes);setNotice('恢复码仅显示一次，请安全保存')}
     else await refresh(true)
   })
+  const changeAccountPassword=(oldPassword:string,newPassword:string,code?:string)=>{void work(async()=>{
+    await api('/auth/change-password','POST',{oldPassword,newPassword,code})
+    setUser(null);setProjects([]);setSelected(null);setScreen('login')
+    setNotice('密码已修改，旧研究者会话已经失效，请重新登录')
+  })}
   const logout=()=>void work(async()=>{
     await api('/auth/logout','POST',{})
     setUser(null);setProjects([]);setSelected(null);setScreen('login')
@@ -164,8 +170,15 @@ export default function SurveyApp(){
         <code className="block whitespace-pre-wrap break-all bg-slate-100 p-4 my-3">{recovery.join('\n')}</code>
         <button className="btn-primary" onClick={()=>{setRecovery([]);void refresh(true)}}>我已保存，进入工作台</button>
       </section>}
-      {!loading&&user&&screen==='work'&&<><section className="bg-white rounded-xl border p-6 my-4">
+      {!loading&&user&&screen==='work'&&user.mustChangePassword&&<section className="bg-white rounded-xl border p-6 my-4">
+        <h2 className="font-semibold text-xl">首次登录 · 修改研究者密码</h2>
+        <ProductPasswordChange product="survey" forced busy={busy} onChangePassword={changeAccountPassword}/>
+      </section>}
+      {!loading&&user&&screen==='work'&&!user.mustChangePassword&&<><section className="bg-white rounded-xl border p-6 my-4">
         <h2 className="text-xl font-semibold">我的研究</h2><p className="text-sm text-slate-500">Researcher：{user.username}</p>
+        <details className="border rounded-lg p-4 my-4"><summary>账号安全 · 修改密码</summary>
+          <ProductPasswordChange product="survey" busy={busy} onChangePassword={changeAccountPassword}/>
+        </details>
         <div className="grid sm:grid-cols-2 gap-3 mt-4">{projects.map(p=><article className="rounded-lg border p-4" key={p.id}>
           <h3 className="font-semibold">{p.title}</h3><p className="text-sm">{({DRAFT:'草稿',ACTIVE:'采集中',PAUSED:'暂停',CLOSED:'已结束',ARCHIVED:'已归档'} as Record<string,string>)[p.status]||p.status} · {p.collectionMode==='LINKED_WAVES'?'多波次关联':'单次匿名'}</p>
           <div className="flex flex-wrap gap-2 mt-3"><button className="btn-secondary" onClick={()=>choose(p)}>查看/编辑</button>
