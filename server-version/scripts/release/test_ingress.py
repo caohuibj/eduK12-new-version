@@ -33,6 +33,7 @@ class IngressTests(unittest.TestCase):
         shutil.copyfile(ROOT/'eduk12-school.conf',self.root/'eduk12-school.conf')
         self.replace('renew-school.sh','systemctl reload','systemctl restart')
         with self.assertRaises(ValueError):validate(self.root)
+        shutil.copyfile(ROOT/'renew-school.sh',self.root/'renew-school.sh')
         (self.root/'eduk12-products.conf').unlink();(self.root/'eduk12-products.conf').symlink_to(ROOT/'eduk12-products.conf')
         with self.assertRaises(ValueError):validate(self.root)
 
