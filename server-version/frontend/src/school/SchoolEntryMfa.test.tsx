@@ -41,4 +41,30 @@ describe('campus login preserves server MFA decisions',()=>{
   await waitFor(()=>expect(screen.getByRole('heading',{name:'欢迎，test.teacher'})).toBeInTheDocument())
   expect(screen.queryByRole('heading',{name:'账号安全验证'})).not.toBeInTheDocument()
  })
+
+ it('opens a restricted password-change screen for forced SCHOOL accounts and never loads school data',async()=>{
+  window.history.replaceState(null,'','/workspace')
+  const urls:string[]=[]
+  vi.stubGlobal('scrollTo',vi.fn())
+  vi.stubGlobal('fetch',vi.fn(async(url:string)=>{
+    urls.push(url)
+    if(url.endsWith('/auth/me'))return reply({
+      id:'forced-student',username:'school.member',role:'STUDENT',
+      accountDomain:'SCHOOL',mustChangePassword:true,
+    })
+    if(url.endsWith('/auth/csrf'))return reply({csrfToken:'synthetic-test-csrf'})
+    if(url.endsWith('/auth/change-password'))return reply(null)
+    return reply(null,403)
+  }))
+  render(<SchoolApp/>)
+  await screen.findByRole('heading',{name:'首次登录 · 修改密码'})
+  expect(urls.some(url=>url.endsWith('/organizations'))).toBe(false)
+  expect(screen.queryByText('校园概览')).not.toBeInTheDocument()
+  fireEvent.change(screen.getByLabelText('当前密码'),{target:{value:'OldPass1234'}})
+  fireEvent.change(screen.getByLabelText('新密码'),{target:{value:'NewPass1234'}})
+  fireEvent.click(screen.getByRole('button',{name:'确认修改密码'}))
+  await waitFor(()=>expect(urls.some(url=>url.endsWith('/auth/change-password'))).toBe(true))
+  expect(await screen.findByRole('heading',{name:'登录校园账号'})).toBeInTheDocument()
+ })
+
 })

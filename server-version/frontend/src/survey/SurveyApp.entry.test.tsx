@@ -103,4 +103,31 @@ describe('Survey public entry and existing authentication transitions', () => {
       expect(screen.queryByRole('link', { name: '研究者登录' })).not.toBeInTheDocument()
     },
   )
+
+  it('allows a forced-password SURVEY researcher to change password before project reads', async () => {
+    window.history.replaceState(null, '', '/workspace')
+    const calls:Array<{url:string,body?:unknown}>=[]
+    const fetcher=vi.fn((url:string,options?:RequestInit)=>{
+      calls.push({url,body:options?.body?JSON.parse(String(options.body)):undefined})
+      if(url.endsWith('/auth/me'))return response({
+        id:'forced-researcher',username:'researcher',mustChangePassword:true,
+      })
+      if(url.endsWith('/auth/capabilities'))return response({analytics:true,publication:true})
+      if(url.endsWith('/auth/csrf'))return response({csrfToken:'test-csrf'})
+      if(url.endsWith('/auth/change-password'))return response({changed:true})
+      return response(null,false)
+    })
+    vi.stubGlobal('fetch',fetcher)
+    render(<SurveyApp/>)
+    await screen.findByRole('heading',{name:'首次登录 · 修改研究者密码'})
+    expect(calls.some(x=>x.url.includes('/projects?'))).toBe(false)
+    fireEvent.change(screen.getByLabelText('当前密码'),{target:{value:'OldPass1234'}})
+    fireEvent.change(screen.getByLabelText('新密码'),{target:{value:'NewPass1234'}})
+    fireEvent.change(screen.getByLabelText('验证器动态验证码（6 位）'),{target:{value:'123456'}})
+    fireEvent.click(screen.getByRole('button',{name:'确认修改密码'}))
+    await waitFor(()=>expect(calls.find(x=>x.url.endsWith('/auth/change-password'))?.body)
+      .toEqual({oldPassword:'OldPass1234',newPassword:'NewPass1234',code:'123456'}))
+    expect(await screen.findByRole('heading',{name:'Researcher 登录'})).toBeInTheDocument()
+  })
+
 })
