@@ -1,17 +1,19 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { UserRole } from '@prisma/client'
 
-const { mockPrisma, mockVerifyToken } = vi.hoisted(() => ({
+const { mockPrisma, mockVerifyToken, mockRevoked } = vi.hoisted(() => ({
   mockPrisma: {
     $queryRaw: vi.fn(),
   },
   mockVerifyToken: vi.fn(),
+  mockRevoked: vi.fn(),
 }))
 
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 vi.mock('../../utils/jwt', () => ({ verifyToken: mockVerifyToken }))
+vi.mock('../../utils/sessionRevocation', () => ({ isSessionRevoked: mockRevoked }))
 
-import { authenticate, optionalAuthenticate, requireSelfOrAdmin, requireStudent } from '../../middleware/auth'
+import { authenticate, authenticateSchool, authenticateHuiteacher, authenticateSurvey, optionalAuthenticate, requireSelfOrAdmin, requireStudent } from '../../middleware/auth'
 
 const payload = { userId: 'user-1', username: 'u1', role: UserRole.STUDENT, tokenVersion: 0 }
 
@@ -69,6 +71,7 @@ describe('authenticate account status and current authority', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockVerifyToken.mockReturnValue(payload)
+    mockRevoked.mockResolvedValue(false)
     mockPrisma.$queryRaw.mockResolvedValue(dbRow())
   })
 
@@ -151,6 +154,7 @@ describe('optionalAuthenticate account status and current authority', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockVerifyToken.mockReturnValue(payload)
+    mockRevoked.mockResolvedValue(false)
     mockPrisma.$queryRaw.mockResolvedValue(dbRow())
   })
 
@@ -177,6 +181,86 @@ describe('optionalAuthenticate account status and current authority', () => {
 
     expect(req.user?.platformRole).toBe('STANDARD')
     expect(next).toHaveBeenCalledOnce()
+  })
+})
+
+describe('per-browser logout and forced password realm boundaries', () => {
+  afterEach(() => vi.unstubAllEnvs())
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockVerifyToken.mockReturnValue(payload)
+    mockRevoked.mockResolvedValue(false)
+    mockPrisma.$queryRaw.mockResolvedValue(dbRow())
+  })
+
+  it('rejects an already signed-out legacy JWT before reading the user', async () => {
+    mockRevoked.mockResolvedValue(true)
+    const req = makeReq('logged-out-token'), res = makeRes(), next = vi.fn()
+    await authenticate(req,res,next)
+    expect(res.statusCode).toBe(401)
+    expect(req.user).toBeUndefined()
+    expect(mockPrisma.$queryRaw).not.toHaveBeenCalled()
+    expect(next).not.toHaveBeenCalled()
+  })
+
+  it('does not attach a revoked JWT through optional legacy authentication', async () => {
+    mockRevoked.mockResolvedValue(true)
+    const req = makeReq('logged-out-token'), next = vi.fn()
+    await optionalAuthenticate(req,makeRes(),next)
+    expect(req.user).toBeUndefined()
+    expect(next).toHaveBeenCalledOnce()
+    expect(mockPrisma.$queryRaw).not.toHaveBeenCalled()
+  })
+
+  it('fails closed when production Redis revocation evidence is unavailable', async () => {
+    vi.stubEnv('NODE_ENV','production')
+    mockRevoked.mockResolvedValue(null)
+    const next=vi.fn(),res=makeRes()
+    await authenticate(makeReq('valid-signed-token'),res,next)
+    expect(res.statusCode).toBe(503)
+    expect(next).not.toHaveBeenCalled()
+    const optionalNext=vi.fn(),optionalRes=makeRes()
+    await optionalAuthenticate(makeReq('valid-signed-token'),optionalRes,optionalNext)
+    expect(optionalRes.statusCode).toBe(503)
+    expect(optionalNext).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    ['SCHOOL','huischool_session',authenticateSchool,'/api/campus/auth/me','/api/campus/my-status',undefined],
+    ['HUITEACHER','huiteacher_session',authenticateHuiteacher,'/api/huiteacher/auth/me','/api/huiteacher/my-form-tasks','HUITEACHER'],
+  ] as const)('%s allows own /me, logout and change-password but no business work while forced', async (realm,cookieName,guard,mePath,businessPath,sessionProduct) => {
+    mockVerifyToken.mockReturnValue({...payload,accountDomain:'SCHOOL',sessionProduct})
+    mockPrisma.$queryRaw.mockResolvedValue(dbRow({accountDomain:'SCHOOL',mustChangePassword:true}))
+    const authPath=realm==='SCHOOL'?'/api/campus/auth/':'/api/huiteacher/auth/'
+    for (const path of [mePath,authPath+'logout',authPath+'change-password']) {
+      const req={headers:{cookie:cookieName+'=test-token'},originalUrl:path,params:{}} as any
+      const next=vi.fn()
+      await guard(req,makeRes(),next)
+      expect(next).toHaveBeenCalledOnce()
+    }
+    const req={headers:{cookie:cookieName+'=test-token'},originalUrl:businessPath,params:{}} as any
+    const res=makeRes(),next=vi.fn()
+    await guard(req,res,next)
+    expect(res.statusCode).toBe(403)
+    expect(next).not.toHaveBeenCalled()
+  })
+
+  it('allows Survey forced-password identity and change only after current MFA and grant', async () => {
+    mockVerifyToken.mockReturnValue({...payload,accountDomain:'SURVEY',
+      mfaVerifiedAt:Math.floor(Date.now()/1000)})
+    mockPrisma.$queryRaw.mockResolvedValue(dbRow({accountDomain:'SURVEY',mustChangePassword:true}))
+    for (const path of ['/api/survey/auth/me','/api/survey/auth/logout','/api/survey/auth/change-password']) {
+      const req={headers:{cookie:'huisurvey_research_session=test-token'},originalUrl:path,params:{}} as any
+      const next=vi.fn()
+      await authenticateSurvey(req,makeRes(),next)
+      expect(next).toHaveBeenCalledOnce()
+    }
+    const req={headers:{cookie:'huisurvey_research_session=test-token'},
+      originalUrl:'/api/survey/projects',params:{}} as any
+    const res=makeRes(),next=vi.fn()
+    await authenticateSurvey(req,res,next)
+    expect(res.statusCode).toBe(403)
+    expect(next).not.toHaveBeenCalled()
   })
 })
 

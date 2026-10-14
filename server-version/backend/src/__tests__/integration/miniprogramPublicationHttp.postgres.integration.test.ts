@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs'
 import {beforeAll,afterAll,describe,it,expect} from 'vitest'
 import {config} from '../../config'
 import {prisma} from '../../config/database'
+import {cacheService} from '../../services/cacheService'
 import {integrationDatabaseUrl} from './integration-env'
 import {miniHttpClient,nativeRequire,assertMiniTestDatabase} from './mini-http-client'
 import {buildReportingFixture} from './reporting-fixture'
@@ -30,8 +31,14 @@ const password='Synthetic-publication-test-2026'
 const meta=(actorUserId:string)=>({actorUserId,commandKey:randomUUID()})
 function client(){const c=miniHttpClient(baseUrl);c.runtime.parents=createParentService(c.runtime.api,c.runtime.session);c.runtime.parentPublications=createParentPublicationService(c.runtime.api,c.runtime.session);return c}
 suite('PR3 independent PARENT publication through real Mini Cookie/CSRF HTTP and PostgreSQL',()=>{
- beforeAll(async()=>{assertMiniTestDatabase(url!);previousFlag=config.parentPortalEnabled;config.parentPortalEnabled=true;passwordHash=await bcrypt.hash(password,4);const app=express();app.use(express.json());app.use('/api',csrfProtection);app.use('/api/auth',authRoutes);app.use('/api/capabilities',capabilitiesRoutes);app.use('/api/organizations',organizationRoutes);app.use('/api/parent-links',parentLinksRouter);app.use('/api/parents',parentsRouter);app.use('/api/parent-report-publications',parentPublicationRouter);app.use((e:any,_q:any,r:any,_n:any)=>{console.error(e);r.status(500).json({data:null,message:'fixture failure'})});server=app.listen(0,'127.0.0.1');await new Promise<void>(r=>server.once('listening',r));const address=server.address();if(!address||typeof address==='string')throw new Error('listener missing');baseUrl='http://127.0.0.1:'+address.port},90000)
- afterAll(async()=>{config.parentPortalEnabled=previousFlag;if(server){server.closeAllConnections();await new Promise<void>(r=>server.close(()=>r()))}await prisma.$disconnect()})
+ beforeAll(async()=>{assertMiniTestDatabase(url!);
+  const redis=process.env.REDIS_URL?new URL(process.env.REDIS_URL):null
+  if(!redis||redis.protocol!=='redis:'||!['localhost','127.0.0.1'].includes(redis.hostname))
+    throw new Error('Mini HTTP logout requires explicitly isolated loopback Redis')
+  await cacheService.initialize()
+  if(!cacheService.getStatus().connected)throw new Error('Mini HTTP isolated Redis unavailable')
+  previousFlag=config.parentPortalEnabled;config.parentPortalEnabled=true;passwordHash=await bcrypt.hash(password,4);const app=express();app.use(express.json());app.use('/api',csrfProtection);app.use('/api/auth',authRoutes);app.use('/api/capabilities',capabilitiesRoutes);app.use('/api/organizations',organizationRoutes);app.use('/api/parent-links',parentLinksRouter);app.use('/api/parents',parentsRouter);app.use('/api/parent-report-publications',parentPublicationRouter);app.use((e:any,_q:any,r:any,_n:any)=>{console.error(e);r.status(500).json({data:null,message:'fixture failure'})});server=app.listen(0,'127.0.0.1');await new Promise<void>(r=>server.once('listening',r));const address=server.address();if(!address||typeof address==='string')throw new Error('listener missing');baseUrl='http://127.0.0.1:'+address.port},90000)
+ afterAll(async()=>{config.parentPortalEnabled=previousFlag;if(server){server.closeAllConnections();await new Promise<void>(r=>server.close(()=>r()))}await cacheService.close();await prisma.$disconnect()})
  it('publishes immutable content; requires exact student consent and explicit officer capability; superseding, capability loss, tool withholding and unlink deny access',async()=>{
   const f=await buildReportingFixture(prisma,3,true)
   const child=await prisma.user.update({where:{id:f.ownerId},data:{role:'STUDENT',passwordHash}})

@@ -1,10 +1,13 @@
 import jwt from 'jsonwebtoken'
+import { randomUUID } from 'node:crypto'
 import { config } from '../config'
 import { JwtPayload } from '../types'
 
 export const generateToken = (payload: JwtPayload): string => {
   return jwt.sign(payload, config.jwtSecret, {
-    expiresIn: config.jwtExpiresIn as any
+    expiresIn: config.jwtExpiresIn as any,
+    // Distinct signed sessions, even from two logins during one second.
+    jwtid: randomUUID(),
   })
 }
 

@@ -17,6 +17,8 @@ export interface JwtPayload {
   role: UserRole
   tokenVersion: number
   mustChangePassword?: boolean
+  jti?: string // Newly issued session ID; old signed JWTs may omit this.
+  exp?: number // Standard JWT expiry for bounded logout revocation.
 }
 
 export interface AuthenticatedPrincipal {

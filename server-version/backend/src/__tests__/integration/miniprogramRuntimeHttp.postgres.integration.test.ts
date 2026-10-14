@@ -8,6 +8,7 @@ import bcrypt from 'bcryptjs'
 import {beforeAll,afterAll,describe,it,expect,vi} from 'vitest'
 import {config} from '../../config'
 import {prisma} from '../../config/database'
+import {cacheService} from '../../services/cacheService'
 import {integrationDatabaseUrl} from './integration-env'
 import {miniHttpClient,nativeRequire,assertMiniTestDatabase} from './mini-http-client'
 import {scaleDefinitionFor} from './mini-scale-definition'
@@ -30,8 +31,14 @@ const password='Synthetic-runtime-test-2026'
 function client(){const c=miniHttpClient(baseUrl);c.runtime.assessments=createAssessmentService(c.runtime.api,c.runtime.session,c.runtime.drafts,c.runtime.config);c.runtime.reports=createReportService(c.runtime.api,c.runtime.session);return c}
 async function account(){return prisma.user.create({data:{username:'mini-runtime-'+randomUUID(),passwordHash,role:'STUDENT'}})}
 suite('PR3 Mini FINAL runtime against canonical HTTP and real PostgreSQL',()=>{
- beforeAll(async()=>{assertMiniTestDatabase(url!);previousFlag=config.miniAssessmentEnabled;config.miniAssessmentEnabled=true;passwordHash=await bcrypt.hash(password,4);const app=express();app.use(express.json());app.use('/api',csrfProtection);app.use('/api/auth',authRoutes);app.use('/api/capabilities',capabilitiesRoutes);app.use('/api/situational',situationalRoutes);app.use('/api/scales',scalesRouter);app.use('/api/questionnaires',questionnaireRoutes);app.use('/api/composite-assessments',compositeRoutes);app.use('/api/mobile/assessment-runtime',assessmentRuntimeRouter);app.use((e:any,_q:any,r:any,_n:any)=>{console.error(e);r.status(500).json({data:null,message:'fixture failure'})});server=app.listen(0,'127.0.0.1');await new Promise<void>(r=>server.once('listening',r));const address=server.address();if(!address||typeof address==='string')throw new Error('listener missing');baseUrl='http://127.0.0.1:'+address.port},90000)
- afterAll(async()=>{config.miniAssessmentEnabled=previousFlag;if(server){server.closeAllConnections();await new Promise<void>(r=>server.close(()=>r()))}await prisma.$disconnect()})
+ beforeAll(async()=>{assertMiniTestDatabase(url!);
+  const redis=process.env.REDIS_URL?new URL(process.env.REDIS_URL):null
+  if(!redis||redis.protocol!=='redis:'||!['localhost','127.0.0.1'].includes(redis.hostname))
+    throw new Error('Mini HTTP logout requires explicitly isolated loopback Redis')
+  await cacheService.initialize()
+  if(!cacheService.getStatus().connected)throw new Error('Mini HTTP isolated Redis unavailable')
+  previousFlag=config.miniAssessmentEnabled;config.miniAssessmentEnabled=true;passwordHash=await bcrypt.hash(password,4);const app=express();app.use(express.json());app.use('/api',csrfProtection);app.use('/api/auth',authRoutes);app.use('/api/capabilities',capabilitiesRoutes);app.use('/api/situational',situationalRoutes);app.use('/api/scales',scalesRouter);app.use('/api/questionnaires',questionnaireRoutes);app.use('/api/composite-assessments',compositeRoutes);app.use('/api/mobile/assessment-runtime',assessmentRuntimeRouter);app.use((e:any,_q:any,r:any,_n:any)=>{console.error(e);r.status(500).json({data:null,message:'fixture failure'})});server=app.listen(0,'127.0.0.1');await new Promise<void>(r=>server.once('listening',r));const address=server.address();if(!address||typeof address==='string')throw new Error('listener missing');baseUrl='http://127.0.0.1:'+address.port},90000)
+ afterAll(async()=>{config.miniAssessmentEnabled=previousFlag;if(server){server.closeAllConnections();await new Promise<void>(r=>server.close(()=>r()))}await cacheService.close();await prisma.$disconnect()})
  it('starts through canonical admission, reads frozen Scale despite source edits, persists one FINAL receipt and rejects foreign/embedded/legacy reads',async()=>{
   const u=await account(),stranger=await account(),c=client(),other=client();await c.runtime.session.login({username:u.username,password});await other.runtime.session.login({username:stranger.username,password})
   const definition=scaleDefinitionFor(2,'NATIVE'),scale=await prisma.scale.create({data:{code:'MINI-'+randomUUID(),name:'HTTP scale',creatorId:u.id,status:'PUBLISHED',visibility:'PUBLIC',instrumentClass:'CUSTOM_DESCRIPTIVE',instrumentVersion:'2.0.0',definition:definition as any,definitionHash:hashScaleDefinition(definition),itemCount:2,dimensionCount:1}})

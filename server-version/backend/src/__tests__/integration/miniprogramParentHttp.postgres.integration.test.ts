@@ -7,6 +7,7 @@ import {beforeAll,afterAll,describe,it,expect} from 'vitest'
 import {UserRole} from '@prisma/client'
 import {config} from '../../config'
 import {prisma} from '../../config/database'
+import {cacheService} from '../../services/cacheService'
 import {integrationDatabaseUrl} from './integration-env'
 import authRoutes from '../../routes/auth'
 import capabilitiesRoutes from '../../routes/capabilities'
@@ -48,13 +49,18 @@ suite('Mini runtime against actual parent HTTP and database contracts',()=>{
   const releaseFixture=process.env.RELEASE_VERIFY_LOCAL==='true'&&['localhost','127.0.0.1'].includes(fixture.hostname)&&fixture.pathname==='/eduk12_release'
   const hosted=process.env.CI==='true'&&['localhost','127.0.0.1'].includes(fixture.hostname)&&fixture.pathname==='/ptool'
   if(!/test|ci/i.test(fixture.pathname)&&!hosted&&!releaseFixture)throw new Error('requires a test database')
+  const redis=process.env.REDIS_URL?new URL(process.env.REDIS_URL):null
+  if(!redis||redis.protocol!=='redis:'||!['localhost','127.0.0.1'].includes(redis.hostname))
+    throw new Error('Mini HTTP logout requires explicitly isolated loopback Redis')
+  await cacheService.initialize()
+  if(!cacheService.getStatus().connected)throw new Error('Mini HTTP isolated Redis unavailable')
   previousFlag=config.parentPortalEnabled;config.parentPortalEnabled=true
   passwordHash=await bcrypt.hash(password,4)
   const app=express();app.use(express.json());app.use('/api',csrfProtection);app.use('/api/auth',authRoutes);app.use('/api/capabilities',capabilitiesRoutes);app.use('/api/parent-links',parentLinksRouter);app.use('/api/parents',parentsRouter)
   app.use((error:any,_req:any,res:any,_next:any)=>res.status(500).json({code:'FIXTURE_ERROR',data:null,message:'fixture failure'}))
   server=app.listen(0,'127.0.0.1');await new Promise<void>(resolve=>server.once('listening',resolve));const address=server.address();if(!address||typeof address==='string')throw new Error('listener missing');baseUrl='http://127.0.0.1:'+address.port
  })
- afterAll(async()=>{config.parentPortalEnabled=previousFlag;if(server){server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()))}await prisma.$disconnect()})
+ afterAll(async()=>{config.parentPortalEnabled=previousFlag;if(server){server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()))}await cacheService.close();await prisma.$disconnect()})
  it.each([UserRole.STUDENT,UserRole.PARENT,UserRole.TEACHER,UserRole.ADMIN])('%s logs in through real Cookie/CSRF and current DB discovery, then clears local session',async role=>{
   const user=await account(role),c=client();await c.runtime.session.login({username:user.username,password})
   expect(c.runtime.session.get().activeRole).toBe(role);expect(c.runtime.session.get().capabilities.canReadChildren).toBe(role===UserRole.PARENT)

@@ -4,8 +4,9 @@ import { prisma } from '../../config/database'
 import { comparePassword, hashPassword, isValidPassword, PASSWORD_MAX_LENGTH } from '../../utils/password'
 import { generateToken } from '../../utils/jwt'
 import { success, unauthorized, forbidden } from '../../utils/response'
-import { issueHuiteacherCsrfToken, setHuiteacherSessionCookie, clearHuiteacherSessionCookie } from '../../utils/authCookies'
+import { issueHuiteacherCsrfToken, setHuiteacherSessionCookie, clearHuiteacherSessionCookie, getHuiteacherSessionToken } from '../../utils/authCookies'
 import { authenticateHuiteacher } from '../../middleware/auth'
+import { revokeCurrentSession } from '../../utils/sessionRevocation'
 import { createMfaAttemptRateLimiter } from '../../middleware/mfaAttemptRateLimit'
 import { passwordChangeRateLimit, withPasswordChangeAdmission } from '../../middleware/passwordChangeAdmission'
 import {
@@ -55,7 +56,7 @@ router.post('/login',loginRateLimit,withLoginAccountFailureThrottle(async(req,re
       })
       const u=account?.user
       const usable=!!u && u.accountDomain==='SCHOOL' && u.isActive && !u.isFrozen
-        && !u.mustChangePassword && (!u.expiresAt || u.expiresAt>new Date())
+        && (!u.expiresAt || u.expiresAt>new Date())
       const ok=await comparePassword(parsed.data.password,usable?u!.passwordHash:DUMMY_HASH)
       return usable&&ok?account:null
     })
@@ -126,10 +127,13 @@ router.get('/me',authenticateHuiteacher,async(req,res)=>{
       id:req.user!.userId,username:account.loginName,role:req.user!.role,
       organizations,
       product:'HUITEACHER',accountDomain:'SCHOOL',
+      mustChangePassword:req.user!.mustChangePassword,
     })
   }catch{return res.status(503).json({code:-1,message:'产品授权读取暂不可用',data:null})}
 })
-router.post('/logout',authenticateHuiteacher,(req,res)=>{
+router.post('/logout',authenticateHuiteacher,async(req,res)=>{
+  if(!await revokeCurrentSession(getHuiteacherSessionToken(req)))
+    return res.status(503).json({code:-1,message:'退出暂不可用，请稍后重试',data:null})
   clearHuiteacherSessionCookie(req,res)
   return success(res,null,'退出成功')
 })

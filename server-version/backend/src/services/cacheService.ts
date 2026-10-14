@@ -396,6 +396,30 @@ class CacheService {
     }
   }
 
+  /** Session logout evidence is not a best-effort cache read. null means
+   * Redis could not be checked. Keys contain only SHA-256 bearer fingerprints.
+   */
+  async readSessionRevocation(key: string): Promise<boolean | null> {
+    if (!this.isConnected || !this.client) return null
+    try {
+      return Number(await this.client.exists(key)) > 0
+    } catch {
+      logger.error('[CacheService] 会话撤销状态读取失败')
+      return null
+    }
+  }
+
+  async recordSessionRevocation(key: string, ttlSeconds: number): Promise<boolean> {
+    if (!Number.isSafeInteger(ttlSeconds) || ttlSeconds <= 0 || !this.isConnected || !this.client) return false
+    try {
+      await this.client.setEx(key, ttlSeconds, '1')
+      return true
+    } catch {
+      logger.error('[CacheService] 会话撤销标记写入失败')
+      return false
+    }
+  }
+
   /**
    * 获取缓存统计信息
    */
