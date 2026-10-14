@@ -1,0 +1,58 @@
+name: Frozen preload runtime qualification
+on:
+  push:
+    branches: [codex/preload-runtime-qualification-20261014]
+    paths:
+      - .github/workflows/preload-runtime-qualification.yml
+      - .github/scripts/preload-runtime-qualification.py
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: preload-runtime-659f1f30
+  cancel-in-progress: false
+jobs:
+  runtime:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      HUI_PRELOAD_BASE_URL: ${{ secrets.HUI_PRELOAD_BASE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: transport
+      - uses: actions/checkout@v4
+        with:
+          ref: 659f1f30664584d2f11f07bf181fe4abe86c19ac
+          fetch-depth: 0
+          path: source
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.21.0
+      - name: admit exact successful official compiled artifacts and frozen dependency layers
+        run: python3 transport/.github/scripts/preload-runtime-qualification.py prepare
+      - name: package two runtime images without dependency installation or recompilation
+        run: python3 transport/.github/scripts/preload-runtime-qualification.py package
+      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        with:
+          version: v0.70.0
+          cache: false
+      - name: scan the actual backend and frontend runtime images
+        run: |
+          trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output preload-evidence/backend-scan.json eduk12-backend:659f1f30
+          trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output preload-evidence/frontend-scan.json eduk12-frontend:659f1f30
+      - name: validate static asset MIME and headers on the actual frontend runtime
+        working-directory: source/server-version
+        run: node scripts/frontend-nginx-static-smoke.mjs eduk12-frontend:659f1f30
+      - name: prove isolated boot, basic workspace activation and return to unchanged old images
+        run: python3 transport/.github/scripts/preload-runtime-qualification.py rehearsal
+      - name: seal immutable runtime archive with exact source and phase evidence
+        run: python3 transport/.github/scripts/preload-runtime-qualification.py seal
+      - uses: actions/upload-artifact@v4
+        with:
+          name: preload-runtime-659f1f30
+          path: preload-evidence
+          retention-days: 2
+          if-no-files-found: error
+          include-hidden-files: true
