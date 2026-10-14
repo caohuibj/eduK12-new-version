@@ -7,6 +7,7 @@ CI_HEAD="5801e2eb11d79db4695ce0517476f75906390320"
 COMPILED="ffc5125f4616978222766581ad54b58ce22ee051"
 BASE_SHA="61dad222759f11daf2ad0f93c7edd17df91417c7f9966565e6bee50cd84e1e19"
 BASE_IMAGES={"backend":"sha256:d492c9b70a3cfcfc18275853a52e8ef0e9d0ec76ff6ae586dd7097e4ed9ccbee","frontend":"sha256:350cc95a91aedf4f7c7adf4a59d786624971aa625784214913ce9ef2e79f2ce1"}
+BASE_CONFIG_IDS={"backend":"sha256:4ca766a5eb8eb1c0c062ca50070ba4450beada0857efee0030b71b8cee4533a5","frontend":"sha256:9ebf58a561c0d6546c5a9d39412d218b8ecf98f65fdd8340d52ae099bcd75b16"}
 OLD={"backend":"a202d59f1993e0b1a982a4f9b12d38d193c2242a","frontend":"9323654dbdb99f38777ef3fdf81b53ebb47ca5b6"}
 ARTIFACTS={"backend":11872828590,"frontend":11872668602}
 ROOT=pathlib.Path(os.environ["GITHUB_WORKSPACE"])
@@ -46,7 +47,7 @@ def tree_digest(p):
 def persist(c):P.write_text(json.dumps(c,indent=2)+"\n")
 def prepare():
  assert git("rev-parse","HEAD")==HEAD
- c={"kind":"frozen-C-runtime-qualification","head":HEAD,"compiledSha":COMPILED,"runId":os.environ["GITHUB_RUN_ID"],"workflowSha":os.environ["GITHUB_SHA"],"status":"PREPARING","baseImages":BASE_IMAGES,"inputs":{},"runtime":{},"phases":[],"startedAt":now(),"reusedTestsFrom":CI_RUN}
+ c={"kind":"frozen-C-runtime-qualification","head":HEAD,"compiledSha":COMPILED,"runId":os.environ["GITHUB_RUN_ID"],"workflowSha":os.environ["GITHUB_SHA"],"status":"PREPARING","baseImages":BASE_IMAGES,"baseQualifiedConfigIds":BASE_CONFIG_IDS,"inputs":{},"runtime":{},"phases":[],"startedAt":now(),"reusedTestsFrom":CI_RUN}
  persist(c)
  git("fetch","--no-tags","origin",*OLD.values())
  ci=api("actions/runs/"+str(CI_RUN))
@@ -90,7 +91,7 @@ def prepare():
  a=subprocess.Popen(["zstd","-dc",str(base)],stdout=subprocess.PIPE)
  b=subprocess.run(["docker","load"],stdin=a.stdout,check=True)
  a.stdout.close();assert a.wait()==0
- for kind,ident in BASE_IMAGES.items():
+ for kind,ident in BASE_CONFIG_IDS.items():
   d=json.loads(run(["docker","image","inspect",ident]))[0]
   assert d["Id"]==ident and d["Config"]["Labels"]["org.opencontainers.image.revision"]==OLD[kind]
   run(["docker","tag",ident,"eduk12-preload-base-"+kind+":frozen"])
@@ -107,7 +108,7 @@ def package():
   tag="eduk12-"+kind+":"+HEAD[:8]
   run(["docker","buildx","build","--builder","default","--load","--network=none","--pull=false","--label","org.opencontainers.image.revision="+HEAD,"--label","org.opencontainers.image.source=https://github.com/"+REPO,"--label","eduk12.compiled.source="+COMPILED,"--label","eduk12.component.tree="+c["inputs"][kind]["sourceTree"],"-f",str(f),"-t",tag,str(E)])
   ident=run(["docker","image","inspect","--format","{{.Id}}",tag])
-  old=json.loads(run(["docker","image","inspect",BASE_IMAGES[kind]]))[0]["Config"]
+  old=json.loads(run(["docker","image","inspect",BASE_CONFIG_IDS[kind]]))[0]["Config"]
   cfg=json.loads(run(["docker","image","inspect",ident]))[0]["Config"]
   for key in ("Cmd","Entrypoint","Env","WorkingDir","ExposedPorts"):
    assert cfg.get(key)==old.get(key),"RUNTIME_CONFIGURATION_CHANGED_"+key
@@ -149,7 +150,7 @@ def rehearsal():
    return results
   run(command+["up","-d","--no-build","backend","frontend"])
   proof={"candidate":observe("CANDIDATE")}
-  compose["services"]["backend"]["image"]=BASE_IMAGES["backend"];compose["services"]["frontend"]["image"]=BASE_IMAGES["frontend"];f.write_text(json.dumps(compose))
+  compose["services"]["backend"]["image"]=BASE_CONFIG_IDS["backend"];compose["services"]["frontend"]["image"]=BASE_CONFIG_IDS["frontend"];f.write_text(json.dumps(compose))
   run(command+["up","-d","--no-build","--no-deps","backend","frontend"])
   proof["rollback"]=observe("ROLLBACK")
   (E/"rehearsal.json").write_text(json.dumps(proof,indent=2))
