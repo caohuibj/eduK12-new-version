@@ -69,24 +69,24 @@ const sjt:SjtDraft={
   ],
 }
 let toolIds:{form:string;scale:string;sjt:string}
-async function instrument(kind:'FORM'|'SCALE'|'SJT',definition:FormDraft|ScaleDraft|SjtDraft){
+async function instrument(kind:'FORM'|'SCALE'|'SJT',definition:FormDraft|ScaleDraft|SjtDraft,targetProjectId=projectId){
   const id=randomUUID()
-  await createDraft(ownerId,projectId,{requestId:id,kind,instrumentKey:key('res'),title:kind+' 自编研究'})
-  await updateDraft(ownerId,projectId,id,{revision:0,title:kind+' 自编研究',definition})
+  await createDraft(ownerId,targetProjectId,{requestId:id,kind,instrumentKey:key('res'),title:kind+' 自编研究'})
+  await updateDraft(ownerId,targetProjectId,id,{revision:0,title:kind+' 自编研究',definition})
   return id
 }
-async function wave(title:string,ids:string[],allowNewParticipants=false,checkpoint=false){
-  const w=await createWave(ownerId,projectId,{
+async function wave(title:string,ids:string[],allowNewParticipants=false,checkpoint=false,targetProjectId=projectId){
+  const w=await createWave(ownerId,targetProjectId,{
     requestId:randomUUID(),title,consentText:consent,
     generalText:'感谢完成本轮研究。本研究结果将汇总分析，不提供个人诊断。',
     linkageNoticeConfirmed:true,
     instrumentIds:ids,allowNewParticipants,
     ...(checkpoint?{checkpointPolicy:{schemaVersion:1 as const,enabled:true as const,ttlHours:2}}:{}),
   })
-  const prepared=await prepareWave(ownerId,projectId,w.id,w.revision)
+  const prepared=await prepareWave(ownerId,targetProjectId,w.id,w.revision)
   expect(prepared.runtimeReady).toBe(true)
-  const frozen=await getWave(ownerId,projectId,w.id)
-  const opened=await openWave(ownerId,projectId,w.id,frozen.revision)
+  const frozen=await getWave(ownerId,targetProjectId,w.id)
+  const opened=await openWave(ownerId,targetProjectId,w.id,frozen.revision)
   return {id:w.id,publicId:opened.publicId,entrySecret:opened.entrySecret}
 }
 const answers={
@@ -134,7 +134,16 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     await db?.$disconnect()
   })
   it('computes Survey sources outside business transactions and rechecks current authority before returning', async () => {
-    const w = await wave('source calculation isolation', [toolIds.scale])
+    // This assertion creates and completes its own recruitment Wave. Keep
+    // it in a separate research project so the main T1 truly remains ordinal 1
+    // and its paired cohort/FINAL counts are not contaminated by this fixture.
+    const sourceProjectId=randomUUID()
+    await db.surveyProject.create({data:{
+      id:sourceProjectId,ownerUserId:ownerId,title:'来源计算隔离测试项目',
+      collectionMode:'LINKED_WAVES',status:'DRAFT',description:'isolated-source-contract',
+    }})
+    const sourceScaleId=await instrument('SCALE',scale,sourceProjectId)
+    const w = await wave('source calculation isolation', [sourceScaleId], false, false, sourceProjectId)
     const enrolled = await joinLinkedStudy({ publicId: w.publicId, waveId: w.id, entryToken: w.entrySecret, consentVersion: 1, consent: true })
     const credential = { researchCode: enrolled.researchCode, accessCredential: enrolled.accessCredential }
     const task = await getOwnResearchTask({ publicId: w.publicId, attemptId: enrolled.attemptId, ...credential })
@@ -152,7 +161,7 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
       return originalDecrypt(cipher)
     })
     try {
-      const result = await loadSurveySource({ actorUserId: ownerId, projectId, waveIds: [w.id], includeAttendance: false })
+      const result = await loadSurveySource({ actorUserId: ownerId, projectId: sourceProjectId, waveIds: [w.id], includeAttendance: false })
       expect(result.completeAttempts).toBe(1)
       expect(transaction).toHaveBeenCalledTimes(2)
       expect(decrypt).toHaveBeenCalledTimes(1)
@@ -163,7 +172,7 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
       if (++calls === 1) await db.user.update({ where: { id: ownerId }, data: { isFrozen: true } })
       return result
     }) as any)
-    try { await expect(loadSurveySource({ actorUserId: ownerId, projectId, waveIds: [w.id], includeAttendance: false })).rejects.toThrow() }
+    try { await expect(loadSurveySource({ actorUserId: ownerId, projectId: sourceProjectId, waveIds: [w.id], includeAttendance: false })).rejects.toThrow() }
     finally { race.mockRestore(); await db.user.update({ where: { id: ownerId }, data: { isFrozen: false } }) }
   })
   it('publishes a real immutable ResearchOnly Form/Scale/SJT wave and issues separate linked proof',async()=>{

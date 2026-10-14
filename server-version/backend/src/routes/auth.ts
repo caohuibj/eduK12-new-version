@@ -10,16 +10,40 @@ import { registrationRateLimit, withRegistrationAdmission } from '../middleware/
 import { trainingLogin, trainingCodeRateLimit, resolveTrainingCode } from '../modules/training/auth'
 
 const router = Router()
-// A school-origin browser must not create legacy training sessions on the
-// Huischool hostname. Product authority still comes from accountDomain/JWT.
-router.use((req,res,next)=>{
-  const host=String(req.headers.host??'').split(':')[0].toLowerCase()
-  const origin=String(req.headers.origin??'').toLowerCase()
-  const localSchool=process.env.NODE_ENV!=='production'
-    && (host==='school.localhost'||/^https?:\/\/school\.localhost(?::[0-9]+)?$/.test(origin))
-  if(host==='school.eduk12.top'||origin==='https://school.eduk12.top'||localSchool) {
-    return res.status(403).json({code:-1,message:'校园版请使用独立账号入口'})
+// The shared legacy/Training authentication routes must not be usable via
+// any of the three dedicated product frontends. Preserve the main site,
+// training.eduk12.top and api.eduk12.top (including mobile/API consumers).
+// Account realm checks remain the final authorization boundary.
+const productHosts = new Map([
+  ['school.eduk12.top', '校园版'],
+  ['teacher.eduk12.top', '教师版'],
+  ['survey.eduk12.top', '研究版'],
+])
+const localProductHosts = new Map([
+  ['school.localhost', '校园版'],
+  ['teacher.localhost', '教师版'],
+  ['survey.localhost', '研究版'],
+])
+const legacyAuthDeniedProduct = (hostname: string): string | undefined => {
+  const exact = hostname.toLowerCase().replace(/\.$/, '')
+  return productHosts.get(exact)
+    ?? (process.env.NODE_ENV === 'production' ? undefined : localProductHosts.get(exact))
+}
+router.use((req, res, next) => {
+  // Inspect the wire Host, not X-Forwarded-Host supplied by a client.
+  const host = String(req.headers.host ?? '').split(':')[0]
+  const origin = req.get('Origin')
+  let originHostname = ''
+  if (origin) {
+    try {
+      const parsed = new URL(origin)
+      if (parsed.protocol === 'https:' || parsed.protocol === 'http:') {
+        originHostname = parsed.hostname
+      }
+    } catch { /* Invalid origins cannot match a product hostname. */ }
   }
+  const denied = legacyAuthDeniedProduct(host) ?? legacyAuthDeniedProduct(originHostname)
+  if (denied) return res.status(403).json({ code: -1, message: denied + '请使用独立账号入口' })
   next()
 })
 
