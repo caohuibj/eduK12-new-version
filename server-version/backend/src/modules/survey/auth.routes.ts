@@ -11,6 +11,7 @@ import {
 } from '../../middleware/loginRateLimit'
 import { passwordChangeRateLimit, withPasswordChangeAdmission } from '../../middleware/passwordChangeAdmission'
 import { createRedisRateLimiter } from '../../middleware/redisRateLimit'
+import { createMfaAttemptRateLimiter } from '../../middleware/mfaAttemptRateLimit'
 import { generateToken } from '../../utils/jwt'
 import { isActiveResearcher } from './authority'
 import {
@@ -33,7 +34,7 @@ const changeInput=z.object({
   code:z.string().regex(/^[0-9]{6}$/),
 }).strict()
 const DUMMY_HASH='$2a$10$fuhNGsB2Z5/iwZtxlw1usOIb5sbX2OzkV/cccQJRbkSpHu2ZPql.a'
-const mfaLimiter=createRedisRateLimiter({name:'survey-mfa-challenge',limit:20,windowSeconds:900})
+const mfaLimiter=createMfaAttemptRateLimiter({realm:'SURVEY',ipName:'survey-mfa-challenge',pendingCookieName:'huisurvey_mfa_pending'})
 const unavailable=(res:Response)=>res.status(503).json({code:-1,message:'Survey 身份服务暂不可用',data:null})
 async function failedLogin(req:Request,res:Response) {
   const budget=await recordLoginFailure(req)

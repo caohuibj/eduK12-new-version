@@ -38,10 +38,12 @@ const makeRes = () => {
 }
 
 function mockDeniedContext() {
-  mockPrisma.$queryRaw
-    .mockResolvedValueOnce([{ id: 'org-1', status: 'ACTIVE' }])
-    .mockResolvedValueOnce([])
-    .mockResolvedValueOnce([{ permission: 'ORGANIZATION_GOVERNANCE' }])
+  mockPrisma.$queryRaw.mockResolvedValueOnce([{
+    id: 'org-1', status: 'ACTIVE', productDomain: 'LEGACY',
+    viewerDomain: 'TRAINING', huischoolEntitled: false,
+    membershipId: null, orgRole: null, schoolProductAdmin: false,
+    personas: [], capabilities: [], explicitDenies: ['ORGANIZATION_GOVERNANCE'],
+  }])
 }
 
 describe('Organization explicit-deny break-glass guard', () => {

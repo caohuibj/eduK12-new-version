@@ -177,6 +177,7 @@ services:
       SURVEY_WORKSPACE_ENABLED: ${SURVEY_WORKSPACE_ENABLED:-false}
       SURVEY_PUBLICATION_ENABLED: ${SURVEY_PUBLICATION_ENABLED:-false}
       SURVEY_ANALYTICS_ENABLED: ${SURVEY_ANALYTICS_ENABLED:-false}
+      CAMPUS_MFA_ENCRYPTION_KEY: ${CAMPUS_MFA_ENCRYPTION_KEY:-}
       SURVEY_MFA_ENCRYPTION_KEY: ${SURVEY_MFA_ENCRYPTION_KEY:-}
       # Teacher-only feature gates. All remain CLOSED until approved host,
       # exact candidate and isolated School/Teacher security acceptance.

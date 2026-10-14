@@ -30,102 +30,88 @@ declare global {
   }
 }
 
-type OrgRow = { id: string; status: OrganizationStatus; productDomain: 'LEGACY' | 'SCHOOL'; viewerDomain: string; huischoolEntitled: boolean }
-type MembershipRow = { id: string; orgRole: OrganizationRole; schoolProductAdmin: boolean }
-type PersonaRow = { persona: OrganizationPersona }
-type CapabilityRow = { capability: OrganizationCapability }
-type DenyRow = { permission: string }
+type AccessRow = {
+  id: string
+  status: OrganizationStatus
+  productDomain: 'LEGACY' | 'SCHOOL'
+  viewerDomain: string
+  huischoolEntitled: boolean
+  membershipId: string | null
+  orgRole: OrganizationRole | null
+  schoolProductAdmin: boolean
+  personas: OrganizationPersona[]
+  capabilities: OrganizationCapability[]
+  explicitDenies: string[]
+}
 
 export async function resolveOrganizationAccessContext(input: {
   principal: Pick<AuthenticatedPrincipal, 'userId' | 'platformRole'>
   organizationId: string
 }, tx?: Prisma.TransactionClient): Promise<OrganizationAccessContext | null> {
-  const db=tx??prisma
-  const organizations = await db.$queryRaw<OrgRow[]>`
+  const db = tx ?? prisma
+  // Read mutable authority in one PostgreSQL statement. Correlated arrays keep
+  // grants independent, so multiple personas/denies cannot multiply rows.
+  // Each invocation still reads current state, including inside a transaction.
+  const rows = await db.$queryRaw<AccessRow[]>`
     SELECT o."id", o."status", o."product_domain" AS "productDomain",
            u."account_domain" AS "viewerDomain",
            EXISTS (SELECT 1 FROM "education_product_entitlements" entitlement
              WHERE entitlement."organization_id"=o."id"
                AND entitlement."product"='HUISCHOOL'
-               AND entitlement."status"='ACTIVE') AS "huischoolEntitled"
+               AND entitlement."status"='ACTIVE') AS "huischoolEntitled",
+           m."id" AS "membershipId", m."org_role" AS "orgRole",
+           COALESCE(m."schoolProductAdmin", FALSE) AS "schoolProductAdmin",
+           ARRAY(SELECT persona."persona" FROM "organization_persona_grants" persona
+             WHERE persona."organization_id"=o."id" AND persona."membership_id"=m."id"
+               AND persona."revoked_at" IS NULL) AS "personas",
+           ARRAY(SELECT capability."capability" FROM "organization_capability_grants" capability
+             WHERE capability."organization_id"=o."id" AND capability."membership_id"=m."id"
+               AND capability."revoked_at" IS NULL) AS "capabilities",
+           ARRAY(SELECT deny."permission" FROM "organization_access_denies" deny
+             WHERE deny."organization_id"=o."id" AND deny."user_id"=u."id"
+               AND deny."lifted_at" IS NULL) AS "explicitDenies"
     FROM "organizations" o
     JOIN "users" u ON u."id" = ${input.principal.userId}
+    LEFT JOIN LATERAL (
+      SELECT member."id", member."org_role",
+        EXISTS(SELECT 1 FROM "education_product_role_grants" product_admin
+          WHERE product_admin."organization_id"=member."organization_id"
+            AND product_admin."membership_id"=member."id"
+            AND product_admin."product"='HUISCHOOL'
+            AND product_admin."role"='PRODUCT_ADMIN'
+            AND product_admin."revoked_at" IS NULL) AS "schoolProductAdmin"
+      FROM "organization_memberships" member
+      WHERE member."organization_id"=o."id" AND member."user_id"=u."id"
+        AND member."valid_from"<=statement_timestamp()
+        AND (member."valid_until" IS NULL OR statement_timestamp()<member."valid_until")
+      ORDER BY member."valid_from" DESC
+      LIMIT 1
+    ) m ON TRUE
     WHERE o."id" = ${input.organizationId}
     LIMIT 1
   `
-  const organization = organizations[0]
+  const organization = rows[0]
   if (!organization) return null
-  // Fail closed even for legacy SYSTEM_ADMIN: bootstrap is a separate
-  // audited operation, not an implicit right to SCHOOL member/report data.
+  // Platform authority never crosses identity realms or product enrollment.
   if ((organization.productDomain === 'SCHOOL') !== (organization.viewerDomain === 'SCHOOL')) return null
-  // The SCHOOL identity realm no longer implies Huischool psychology access.
   if (organization.productDomain === 'SCHOOL' && !organization.huischoolEntitled) return null
 
-  const [memberships, denyRows] = await Promise.all([
-    db.$queryRaw<MembershipRow[]>`
-      SELECT m."id", m."org_role" AS "orgRole",
-        EXISTS(
-          SELECT 1 FROM "education_product_role_grants" product_admin
-          WHERE product_admin."organization_id"=m."organization_id"
-            AND product_admin."membership_id"=m."id"
-            AND product_admin."product"='HUISCHOOL'
-            AND product_admin."role"='PRODUCT_ADMIN'
-            AND product_admin."revoked_at" IS NULL
-        ) AS "schoolProductAdmin"
-      FROM "organization_memberships" m
-      WHERE m."organization_id" = ${input.organizationId}
-        AND m."user_id" = ${input.principal.userId}
-        AND m."valid_from" <= statement_timestamp()
-        AND (m."valid_until" IS NULL OR statement_timestamp() < m."valid_until")
-      ORDER BY m."valid_from" DESC
-      LIMIT 1
-    `,
-    db.$queryRaw<DenyRow[]>`
-      SELECT "permission"
-      FROM "organization_access_denies"
-      WHERE "organization_id" = ${input.organizationId}
-        AND "user_id" = ${input.principal.userId}
-        AND "lifted_at" IS NULL
-    `,
-  ])
-
-  const membership = memberships[0] ?? null
-  // ORG_ADMIN is a shared organization fact. It is not a grant to inspect
-  // psychology operations of a Teacher-only admin when School later opens.
-  // Existing School admins are backfilled into HUISCHOOL PRODUCT_ADMIN.
-  const schoolOrgRole:OrganizationRole|null = membership
+  const membership = organization.membershipId
+    ? { id: organization.membershipId, orgRole: organization.orgRole }
+    : null
+  const schoolOrgRole: OrganizationRole | null = membership
     ? (organization.productDomain === 'SCHOOL'
-      && membership.orgRole === 'ORG_ADMIN' && !membership.schoolProductAdmin
+      && membership.orgRole === 'ORG_ADMIN' && !organization.schoolProductAdmin
         ? 'MEMBER' : membership.orgRole)
     : null
-  const [personaRows, capabilityRows] = membership
-    ? await Promise.all([
-        db.$queryRaw<PersonaRow[]>`
-          SELECT "persona"
-          FROM "organization_persona_grants"
-          WHERE "organization_id" = ${input.organizationId}
-            AND "membership_id" = ${membership.id}
-            AND "revoked_at" IS NULL
-        `,
-        db.$queryRaw<CapabilityRow[]>`
-          SELECT "capability"
-          FROM "organization_capability_grants"
-          WHERE "organization_id" = ${input.organizationId}
-            AND "membership_id" = ${membership.id}
-            AND "revoked_at" IS NULL
-        `,
-      ])
-    : [[], []]
-
-  const explicitDenies = denyRows.map((row) => row.permission)
-  // A School-specific deny still applies inside the shared education realm.
+  const explicitDenies = organization.explicitDenies
   if (organization.productDomain === 'SCHOOL' && explicitDenies.some(x =>
     ['*', 'EDUCATION_ACCESS', 'HUISCHOOL_ACCESS'].includes(x))) return null
   const basis: OrganizationAccessContext['basis'] = []
   if (input.principal.platformRole === 'SYSTEM_ADMIN') basis.push('SYSTEM_ADMIN')
   if (schoolOrgRole === 'ORG_ADMIN') basis.push('ORG_ADMIN')
   if (membership) basis.push('MEMBERSHIP')
-  if (capabilityRows.length > 0) basis.push('CAPABILITY')
+  if (organization.capabilities.length > 0) basis.push('CAPABILITY')
 
   const deniedAll = explicitDenies.includes('*') || explicitDenies.includes('ORGANIZATION_GOVERNANCE')
   const canGovern = !deniedAll && (organization.status === 'ACTIVE' || input.principal.platformRole === 'SYSTEM_ADMIN') && (
@@ -140,8 +126,8 @@ export async function resolveOrganizationAccessContext(input: {
     platformRole: input.principal.platformRole,
     membershipId: membership?.id ?? null,
     orgRole: schoolOrgRole,
-    personas: personaRows.map((row) => row.persona),
-    capabilities: capabilityRows.map((row) => row.capability),
+    personas: organization.personas,
+    capabilities: organization.capabilities,
     explicitDenies,
     basis,
     canGovern,
@@ -181,7 +167,16 @@ export async function resolveAssessmentDeliveryAuthority(input: {
   organizationId: string
 }): Promise<AssessmentDeliveryAuthorityContext | null> {
   const context = await resolveOrganizationAccessContext(input)
-  if (!context?.membershipId || context.organizationStatus !== 'ACTIVE') return null
+  return context ? resolveAssessmentDeliveryAuthorityFromContext(context) : null
+}
+
+/** Derive navigation hints from the context just read by the same request.
+ * Exact resource entrypoints continue to resolve their own current authority.
+ */
+export async function resolveAssessmentDeliveryAuthorityFromContext(
+  context: OrganizationAccessContext,
+): Promise<AssessmentDeliveryAuthorityContext | null> {
+  if (!context.membershipId || context.organizationStatus !== 'ACTIVE') return null
   if (context.explicitDenies.some((permission) => [
     '*',
     'ORGANIZATION_GOVERNANCE',
@@ -196,7 +191,7 @@ export async function resolveAssessmentDeliveryAuthority(input: {
     const rows = await prisma.$queryRaw<Array<{ allowed: boolean }>>`
       SELECT EXISTS (
         SELECT 1 FROM "organization_staff_class_assignments" sa
-        WHERE sa."organization_id" = ${input.organizationId}
+        WHERE sa."organization_id" = ${context.organizationId}
           AND sa."membership_id" = ${context.membershipId}
           AND ${currentClassDeliverySql}
       ) AS "allowed"
@@ -207,7 +202,7 @@ export async function resolveAssessmentDeliveryAuthority(input: {
     const rows = await prisma.$queryRaw<Array<{ allowed: boolean }>>`
       SELECT EXISTS (
         SELECT 1 FROM "organization_counselor_client_relationships" r
-        WHERE r."organization_id" = ${input.organizationId}
+        WHERE r."organization_id" = ${context.organizationId}
           AND r."counselor_membership_id" = ${context.membershipId}
           AND r."valid_until" IS NULL
       ) AS "allowed"
