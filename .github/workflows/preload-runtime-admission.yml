@@ -1,0 +1,26 @@
+name: Frozen preload runtime admission
+on:
+  push:
+    branches: [codex/preload-runtime-qualification-20261014]
+    paths:
+      - .github/scripts/preload-runtime-admission.py
+      - .github/workflows/preload-runtime-admission.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  admission:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: verify actual passed producer phases and preserve cancelled transport status
+        run: python3 .github/scripts/preload-runtime-admission.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: preload-runtime-admission-659f1f30
+          path: preload-runtime-admission.json
+          retention-days: 2
+          if-no-files-found: error
