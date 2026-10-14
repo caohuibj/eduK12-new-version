@@ -18,6 +18,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       HUI_PRELOAD_BASE_URL: ${{ secrets.HUI_PRELOAD_BASE_URL }}
+      HUI_PRELOAD_RUNTIME_PUT_URL: ${{ secrets.HUI_PRELOAD_RUNTIME_PUT_URL }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -50,9 +51,20 @@ jobs:
       - name: seal immutable runtime archive with exact source and phase evidence
         run: python3 transport/.github/scripts/preload-runtime-qualification.py seal
       - uses: actions/upload-artifact@v4
+        id: runtime-upload
         with:
           name: preload-runtime-659f1f30
           path: preload-evidence
           retention-days: 2
           if-no-files-found: error
           include-hidden-files: true
+      - name: stage the original official ZIP in private Beijing COS
+        env:
+          RUNTIME_ARTIFACT_ID: ${{ steps.runtime-upload.outputs.artifact-id }}
+        run: python3 transport/.github/scripts/preload-runtime-qualification.py stage
+      - uses: actions/upload-artifact@v4
+        with:
+          name: preload-staging-receipt-659f1f30
+          path: stage-receipt.json
+          retention-days: 2
+          if-no-files-found: error

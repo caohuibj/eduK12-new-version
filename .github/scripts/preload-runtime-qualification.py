@@ -48,6 +48,7 @@ def prepare():
  assert git("rev-parse","HEAD")==HEAD
  c={"kind":"frozen-C-runtime-qualification","head":HEAD,"compiledSha":COMPILED,"runId":os.environ["GITHUB_RUN_ID"],"workflowSha":os.environ["GITHUB_SHA"],"status":"PREPARING","baseImages":BASE_IMAGES,"inputs":{},"runtime":{},"phases":[],"startedAt":now(),"reusedTestsFrom":CI_RUN}
  persist(c)
+ git("fetch","--no-tags","origin",*OLD.values())
  ci=api("actions/runs/"+str(CI_RUN))
  assert ci["conclusion"]=="success" and ci["head_sha"]==CI_HEAD and ci["event"]=="pull_request"
  assert ci["path"]==".github/workflows/ci.yml"
@@ -170,5 +171,23 @@ def seal():
  c["status"]="QUALIFIED";c["completedAt"]=now();persist(c)
  shutil.rmtree(E/"backend-dist");shutil.rmtree(E/"frontend-dist")
  print(json.dumps({"status":c["status"],"runtime":c["runtime"],"archive":c["archive"]}),flush=True)
+def stage():
+ c=json.loads(P.read_text());assert c["status"]=="QUALIFIED"
+ aid=int(os.environ["RUNTIME_ARTIFACT_ID"])
+ meta=api("actions/artifacts/"+str(aid));assert meta["workflow_run"]["id"]==int(os.environ["GITHUB_RUN_ID"])
+ assert meta["name"]=="preload-runtime-659f1f30" and not meta["expired"]
+ p=ROOT/"qualified-runtime.zip"
+ download(meta["archive_download_url"],p,meta["digest"].removeprefix("sha256:"),True)
+ import urllib.parse,http.client
+ u=urllib.parse.urlsplit(os.environ["HUI_PRELOAD_RUNTIME_PUT_URL"])
+ assert u.hostname=="eduk12-backups-1393949445.cos.ap-beijing.myqcloud.com" and u.path=="/deployment-artifacts/preload-659f1f30/qualified-runtime.zip"
+ assert "q-signature=" in u.query
+ conn=http.client.HTTPSConnection(u.hostname,timeout=90)
+ with p.open("rb") as f:conn.request("PUT",u.path+"?"+u.query,body=f,headers={"Content-Length":str(p.stat().st_size),"Content-Type":"application/octet-stream"})
+ response=conn.getresponse();response.read();assert response.status==200,"PRIVATE_STAGING_FAILED"
+ version=response.getheader("x-cos-version-id");assert version,"VERSION_ID_REQUIRED"
+ record={"status":"STAGED_ORIGINAL_OFFICIAL_ZIP","runId":int(os.environ["GITHUB_RUN_ID"]),"artifactId":aid,"artifactDigest":meta["digest"],"bytes":p.stat().st_size,"versionId":version,"key":u.path.lstrip("/")}
+ (ROOT/"stage-receipt.json").write_text(json.dumps(record,indent=2));print(json.dumps(record))
+
 if __name__=="__main__":
- {"prepare":prepare,"package":package,"rehearsal":rehearsal,"seal":seal}[sys.argv[1]]()
+ {"prepare":prepare,"package":package,"rehearsal":rehearsal,"seal":seal,"stage":stage}[sys.argv[1]]()
