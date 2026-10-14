@@ -41,3 +41,4 @@ export function ProductPasswordChange({product, busy, forced=false, onChangePass
       {busy?'正在提交…':'确认修改密码'}
     </button>
   </form>
+}
