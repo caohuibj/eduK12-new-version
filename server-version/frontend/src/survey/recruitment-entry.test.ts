@@ -43,7 +43,7 @@ describe('Survey same-tab recruitment capability recovery',()=>{
     expect(readRecruitmentEntry(id,'',store,100)).toBe('')
     rememberRecruitmentEntry('wrong',token,store,100)
     expect(readRecruitmentEntry('wrong','#entry='+token,store,100)).toBe('')
-    rememberRecruitmentEntry(id,token,200)
+    rememberRecruitmentEntry(id,token,store,200)
     expect(readRecruitmentEntry(id,'',store,199)).toBe('')
     expect(readRecruitmentEntry(id,'#entry=not-valid',store,201)).toBe('')
   })
