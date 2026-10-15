@@ -296,6 +296,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
       setError(`还有 ${missing.length} 个必填字段未完成`)
       return
     }
+    let accepted = false
     try {
       setSubmitting(true)
       setError(null)
@@ -327,10 +328,23 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
           return next
         },
       })
+      accepted = true
+      // Non-sensitive receipt survives navigation/report errors. The sealed
+      // answer draft is only cleared AFTER the server's durable confirmation.
+      try { sessionStorage.setItem(`composite:receipt:${state.id}:${sealed.payload.submissionId}`, JSON.stringify({
+        attemptId: state.id, attemptEpoch: sealed.payload.attemptEpoch,
+        submissionId: sealed.payload.submissionId, acceptedAt: new Date().toISOString(),
+      })) } catch { /* Storage failure cannot undo the server's confirmation. */ }
+      setMeta({ ...meta, status: 'COMPLETED' })
       await finalDraftStore.setStatus(draftKey, 'COMPLETED')
       await finalDraftStore.delete(draftKey)
       await onReload()
     } catch (cause) {
+      if (accepted) {
+        setMeta({ ...meta, status: 'COMPLETED' })
+        setError('服务器已确认保存。后续页面暂时未能加载，可重新读取进度或报告；无需再次交卷。')
+        return
+      }
       const nextMeta = await recordFinalSubmissionFailure(draftKey, cause, meta.submissionId).catch(() => finalDraftStore.get(draftKey)).catch(() => ({ ...meta, status: 'RETRY_PENDING' as const }))
       if (nextMeta) setMeta(nextMeta)
       setRequiresRestart(nextMeta?.status === 'CONFLICT')
@@ -349,6 +363,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
       setError(`还有 ${missing.length} 道必答题未作答`)
       return
     }
+    let accepted = false
     try {
       setSubmitting(true)
       setError(null)
@@ -389,10 +404,23 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
           return next
         },
       })
+      accepted = true
+      // Non-sensitive receipt survives navigation/report errors. The sealed
+      // answer draft is only cleared AFTER the server's durable confirmation.
+      try { sessionStorage.setItem(`composite:receipt:${state.id}:${sealed.payload.submissionId}`, JSON.stringify({
+        attemptId: state.id, attemptEpoch: sealed.payload.attemptEpoch,
+        submissionId: sealed.payload.submissionId, acceptedAt: new Date().toISOString(),
+      })) } catch { /* Storage failure cannot undo the server's confirmation. */ }
+      setMeta({ ...meta, status: 'COMPLETED' })
       await finalDraftStore.setStatus(draftKey, 'COMPLETED')
       await finalDraftStore.delete(draftKey)
       await onReload()
     } catch (cause) {
+      if (accepted) {
+        setMeta({ ...meta, status: 'COMPLETED' })
+        setError('服务器已确认保存。后续页面暂时未能加载，可重新读取进度或报告；无需再次交卷。')
+        return
+      }
       const nextMeta = await recordFinalSubmissionFailure(draftKey, cause, meta.submissionId).catch(() => finalDraftStore.get(draftKey)).catch(() => ({ ...meta, status: 'RETRY_PENDING' as const }))
       if (nextMeta) setMeta(nextMeta)
       setRequiresRestart(nextMeta?.status === 'CONFLICT')

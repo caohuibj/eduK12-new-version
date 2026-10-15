@@ -572,6 +572,11 @@ export const scoreScale = (
   return { itemScores: scoredItems, scores, quality: { status: qualityStatus, flags } }
 }
 
+/** Validate a sealed final submission with one item index. */
+export const validateScaleAnswers = (definition: ScaleDefinitionV2, answers: ScaleAnswer[]): void => {
+  validateAnswers(definition, answers)
+}
+
 /** Validate one answer before it is persisted by a runner. */
 export const validateScaleAnswer = (
   definition: ScaleDefinitionV2,

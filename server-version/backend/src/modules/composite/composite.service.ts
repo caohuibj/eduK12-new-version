@@ -1,3 +1,6 @@
+import { assessmentReportConfig } from '../../config/assessmentReports'
+import { assertReportJobIdentity, compositeReportJobState, readCompositeReportJob, readCompositeReportJobHeader, retryCompositeReport, REPORT_PARENT_SELECT, type ReportJobIdentity } from '../assessment-runtime/report-outbox.service'
+import { encryptCompositeCollectionReport, decryptCompositeCollectionReport } from './composite-report-cache'
 import { assertCognitiveProductEligible } from '../cognitive/product-eligibility'
 import { frozenCompositeProgress, frozenMeasurementFinalHeaders } from './frozen-progress'
 import { resolveSituationalScientificMaturity } from '../situational/scientific-maturity'
@@ -38,7 +41,7 @@ import {
 import { hashScaleDefinition, validateScaleDefinition } from '../scale/scale-definition'
 import { retainFrozenScaleAssessmentImages } from '../scale/scale-image.adapter'
 import { assertScaleContextCollectable } from '../scale/policy/context-preflight'
-import { ensureScaleAdmissionAtDelivery, UNIFIED_SCALE_CHILD_ADMISSION_SELECT } from '../scale/scale-admission.service'
+import { ensureScaleAdmissionAtDelivery, readScaleAdmissionRuntime, UNIFIED_SCALE_CHILD_ADMISSION_SELECT } from '../scale/scale-admission.service'
 import { ensureCognitiveAdmissionAtDelivery, UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT } from '../cognitive/cognitive-admission.service'
 import { admitCognitiveAttempt, cognitiveQuotaSource, lockCognitiveQuota } from '../cognitive/attempt-quota'
 import { ensureCompositeFormAdmissionAtDelivery } from '../assessment-runtime/form-admission.service'
@@ -3102,6 +3105,7 @@ const unifiedCompositeProgressSnapshot = (
 // admission.
 const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
   id: true,
+  asyncReportEpoch: true,
   assignmentRef: true,
   userId: true,
   recoveryTokenHash: true,
@@ -3380,7 +3384,7 @@ const getUnifiedCompositeAttemptState = async (
     })
     if (!child || !child.runtimeSnapshotEncrypted) throw compositeConflict('量表冻结运行时不可用，请重启测评')
     try {
-      const runtime = decryptFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted)
+      const runtime = readScaleAdmissionRuntime(child)
       if (
         runtime.instrumentKey !== item.scale?.code
         || runtime.instrumentVersion !== item.scale?.instrumentVersion
@@ -3896,15 +3900,25 @@ const finalizeCompositeAttemptFinalOnlyIfReady = async (attemptId: string) => {
   return { status: latest.status, progress: latest.progress, completedAt: latest.completedAt }
 }
 
-export const finalizeCompositeAttemptIfReady = async (attemptId: string) => {
-  const route = await prisma.compositeAssessmentAttempt.findUnique({
+export const finalizeCompositeAttemptIfReady = async (attemptId: string, options: {
+  reportJob?: ReportJobIdentity
+  preloadedParent?: any
+} = {}) => {
+  const route = options.preloadedParent ?? await prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId },
-    select: { status: true, deliveryMode: true, runtimeGeneration: true, assignmentRef: true, compositeAssessment: { select: { productKind: true } } },
+    select: { ...REPORT_PARENT_SELECT, startedAt: true, completedItems: true,
+      frozenActiveSlotSetEncrypted: true, contextSnapshotEncrypted: true, compiledBundleRuntimeHash: true },
   })
+  if (route && options.reportJob) assertReportJobIdentity(route, options.reportJob)
+  // Already enrolled attempts stay asynchronous while new enrollment is off.
+  // Their canonical snapshot transaction is the ONLY producer of report jobs.
+  if (route && route.asyncReportEpoch === route.attemptEpoch && !options.reportJob) {
+    return { status: route.status, progress: route.progress, completedAt: route.completedAt }
+  }
   let result
   if (route?.runtimeGeneration === 'UNIFIED_V1') {
     const { finalizeCompositeAttemptUnifiedIfReady } = await import('../assessment-runtime/unified-aggregate-finalizer.service')
-    result = await finalizeCompositeAttemptUnifiedIfReady(attemptId)
+    result = await finalizeCompositeAttemptUnifiedIfReady(attemptId, route, options.reportJob)
   } else if (!route || route.deliveryMode !== 'FINAL_ONLY') {
     result = await finalizeCompositeAttemptLegacyIfReady(attemptId)
   } else {
@@ -3967,7 +3981,11 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
     }
     if (state.status === 'IN_PROGRESS' && state.totalItems > 0 && state.completedItems >= state.totalItems) {
       // Reconcile-once: patch parent completion fields onto the first projection.
-      const finalized = await finalizeCompositeAttemptIfReady(attemptId)
+      if (runtime.asyncReportEpoch === runtime.attemptEpoch) {
+        const job = await readCompositeReportJobHeader(attemptId, runtime.attemptEpoch)
+        return { ...state, allUnitsSubmitted: true, reportStatus: compositeReportJobState(job) }
+      }
+      const finalized = await finalizeCompositeAttemptIfReady(attemptId, { preloadedParent: runtime })
       if (!finalized) return state
       return patchCompositeStateAfterFinalize(state, finalized)
     }
@@ -4734,7 +4752,103 @@ const packageAnalysisExportContextFor = async (
   }
 }
 
+const reportReadHeaderSelect = {
+  ...REPORT_PARENT_SELECT, compositeAssessmentId: true, userId: true, recoveryTokenHash: true,
+  compositeAssessment: { select: { id: true, productKind: true, items: { select: { type: true } } } },
+} as const
+
+const loadReportReadHeader = async (attemptId: string) => {
+  const parent = await prisma.compositeAssessmentAttempt.findUnique({ where: { id: attemptId }, select: reportReadHeaderSelect })
+  if (!parent) throw compositeNotFound('综合测评记录不存在')
+  return parent
+}
+
+const authorizeReportParticipant = (parent: any, context: { userId?: string; recoveryTokenHash?: string }) => {
+  const authorized = context.userId ? parent.userId === context.userId
+    : Boolean(context.recoveryTokenHash && parent.userId === null && parent.recoveryTokenHash === context.recoveryTokenHash)
+  if (!authorized) throw compositeForbidden('无权限查看此综合测评记录')
+  assertSupportedComposite(parent.compositeAssessment, true)
+}
+
+const reportStatusForHeader = async (parent: any) => {
+  const job = parent.asyncReportEpoch === parent.attemptEpoch
+    ? await readCompositeReportJobHeader(parent.id, parent.attemptEpoch) : null
+  return {
+    attemptId: parent.id, attemptEpoch: parent.attemptEpoch, status: parent.status,
+    hasAcceptedSubmission: Boolean(job),
+    reportStatus: job ? compositeReportJobState(job) : {
+      state: parent.status === 'COMPLETED' ? 'READY' : 'WAITING', jobId: null,
+      retryAfterSeconds: 2, errorCode: null, completedAt: parent.completedAt,
+    },
+  }
+}
+
+export const getCompositeReportStatus = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
+  const parent = await loadReportReadHeader(attemptId)
+  authorizeReportParticipant(parent, context)
+  return reportStatusForHeader(parent)
+}
+
+export const retryCompositeQuestionnaireReport = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
+  const parent = await loadReportReadHeader(attemptId)
+  authorizeReportParticipant(parent, context)
+  if (parent.asyncReportEpoch !== parent.attemptEpoch) throw compositeBadRequest('本次作答没有异步报告任务')
+  await retryCompositeReport(parent)
+  return reportStatusForHeader(parent)
+}
+
+export const getCompositeReportStatusForTeacher = async (userId: string, role: UserRole, compositeId: string, attemptId: string) => {
+  assertTeacher(role)
+  const composite = await loadComposite(compositeId)
+  assertOwner(composite, userId, role)
+  const parent = await loadReportReadHeader(attemptId)
+  if (parent.compositeAssessmentId !== compositeId) throw compositeNotFound('综合测评记录不存在')
+  await assertRelationalTeacherAttemptReadAllowed(parent, userId, role)
+  return reportStatusForHeader(parent)
+}
+
+const materializedReportForHeader = async (parent: any, audience: CompositeReportAudience) => {
+  if (parent.asyncReportEpoch !== parent.attemptEpoch) return null
+  const job = await readCompositeReportJob(parent.id, parent.attemptEpoch)
+  if (parent.status !== 'COMPLETED' || !job || job.status !== 'READY' || !job.reportEncrypted || !parent.aggregateInputHash) {
+    throw new (await import('../../services/questionnaireCompletionAdmission')).QuestionnaireCompletionAdmissionBusyError('database_busy', 2)
+  }
+  assertReportJobIdentity(parent, { attemptEpoch: job.attemptEpoch, slotSetHash: job.slotSetHash, contextHash: job.contextHash })
+  if (job.aggregateInputHash !== parent.aggregateInputHash) throw compositeConflict('报告输入版本已变化')
+  const report = decryptCompositeCollectionReport(job.reportEncrypted, {
+    attemptId: parent.id, attemptEpoch: parent.attemptEpoch, slotSetHash: job.slotSetHash,
+    contextHash: job.contextHash, aggregateInputHash: parent.aggregateInputHash,
+  })
+  // HTTP projection is applied to the CURRENT audience on every read. No
+  // participant/teacher projection or authorization decision is globally cached.
+  return projectCompositeCollectionReport(report, audience)
+}
+
+export const materializeCompositeQuestionnaireReport = async (attemptId: string, expected: ReportJobIdentity) => {
+  const attempt = await loadAttemptWithChildren(attemptId)
+  assertReportJobIdentity(attempt, expected)
+  if (attempt.status !== 'COMPLETED' || !attempt.aggregateInputHash
+    || attempt.assignmentRef || attempt.compositeAssessment.productKind !== 'QUESTIONNAIRE'
+    || attempt.compositeAssessment.reportPackageKey || attempt.compositeAssessment.analysisProtocolKey) {
+    throw compositeConflict('异步报告不支持此冻结产品或当前状态')
+  }
+  return { aggregateInputHash: attempt.aggregateInputHash, reportEncrypted: encryptCompositeCollectionReport(
+    buildCompositeReport(attempt), { attemptId, ...expected, aggregateInputHash: attempt.aggregateInputHash },
+  ) }
+}
+
 export const getReport = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
+  if (!assessmentReportConfig().enabled) {
+    // Compatible rollback reads keep the existing frozen-result path. The
+    // independent status endpoint and worker still recover enrolled jobs.
+    const attempt = await findAttempt(attemptId, context, true)
+    if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
+    return projectHttpReport(attempt, 'participant')
+  }
+  const parent = await loadReportReadHeader(attemptId)
+  authorizeReportParticipant(parent, context)
+  const cached = await materializedReportForHeader(parent, 'participant')
+  if (cached) return cached
   const attempt = await findAttempt(attemptId, context, true)
   if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
   return projectHttpReport(attempt, 'participant')
@@ -4967,6 +5081,22 @@ export const getReportForTeacher = async (
   assertTeacher(role)
   const composite = await loadComposite(compositeId)
   assertOwner(composite, userId, role)
+  if (!assessmentReportConfig().enabled) {
+    const attempt = await loadAttemptWithChildren(attemptId)
+    if (attempt.compositeAssessmentId !== compositeId) throw compositeNotFound('综合测评记录不存在')
+    await assertRelationalTeacherAttemptReadAllowed(attempt, userId, role)
+    if (partial) return projectPartialReport(attempt, role === UserRole.ADMIN ? 'researcher' : 'teacher')
+    if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
+    assertSupportedComposite(attempt.compositeAssessment, ['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(attempt.compositeAssessment.productKind))
+    return projectHttpReport(attempt, role === UserRole.ADMIN ? 'researcher' : 'teacher', snapshotId)
+  }
+  const header = await loadReportReadHeader(attemptId)
+  if (header.compositeAssessmentId !== compositeId) throw compositeNotFound('综合测评记录不存在')
+  await assertRelationalTeacherAttemptReadAllowed(header, userId, role)
+  if (!partial && header.asyncReportEpoch === header.attemptEpoch) {
+    if (snapshotId) throw compositeNotFound('分析快照不存在')
+    return materializedReportForHeader(header, role === UserRole.ADMIN ? 'researcher' : 'teacher')
+  }
   const attempt = await loadAttemptWithChildren(attemptId)
   if (attempt.compositeAssessmentId !== compositeId) throw compositeNotFound('综合测评记录不存在')
   await assertRelationalTeacherAttemptReadAllowed(attempt, userId, role)

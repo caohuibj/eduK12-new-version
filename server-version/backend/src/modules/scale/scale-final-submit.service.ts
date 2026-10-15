@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { encryptScaleAnswers, encryptScaleResult, readScaleAnswers, scaleAssessmentForResponse, scaleDefinitionFromRecord, scaleRunnerFromRecord, buildScaleResultForRecord } from './scale-workflow.service'
 import { hashScaleDefinition, type ScaleDefinitionV2 } from './scale-definition'
-import { missingRequiredScaleItemCodes, validateScaleAnswer, type ScaleAnswer } from './scale-scoring'
+import { missingRequiredScaleItemCodes, validateScaleAnswers, type ScaleAnswer } from './scale-scoring'
 import { retainFrozenScaleAssessmentImages } from './scale-image.adapter'
 import { readCompositeAttemptContext, readQuestionnaireAssessmentContext } from '../../services/assessmentContextService'
 import {
@@ -91,9 +91,9 @@ const normalizedAnswers = (definition: ScaleDefinitionV2, input: FinalScaleAnswe
       ...(answer.responseTimeMs === undefined ? {} : { responseTimeMs: answer.responseTimeMs }),
       ...(answer.changeCount === undefined ? {} : { changeCount: answer.changeCount }),
     }
-    validateScaleAnswer(definition, normalized)
     latest.set(answer.itemCode, normalized)
   })
+  validateScaleAnswers(definition, [...latest.values()])
   return definition.items.flatMap((item) => {
     const answer = latest.get(item.itemCode)
     return answer ? [answer] : []

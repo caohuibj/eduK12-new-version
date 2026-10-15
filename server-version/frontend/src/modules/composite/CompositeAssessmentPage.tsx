@@ -1,3 +1,4 @@
+import { runWithCompletionRetry } from '../../services/completionRetry'
 import { usePageSignal } from '../../hooks/usePageSignal'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
@@ -119,7 +120,7 @@ const CompositeAssessmentContent: React.FC = () => {
   const applyState = (next: CompositeAttemptState) => {
     if (pageSignal().aborted) return
     setState(next)
-    if (next.status === 'COMPLETED') {
+    if (next.status === 'COMPLETED' || next.allUnitsSubmitted) {
       goReport(next.id)
       return
     }
@@ -146,7 +147,7 @@ const CompositeAssessmentContent: React.FC = () => {
       return
     }
     try {
-      const response = await (publicMode
+      const response = await runWithCompletionRetry(() => publicMode
         ? publicCompositeApi(credential).getAttempt(id)
         : compositeApi.getAttempt(id))
       if (signal.aborted) return

@@ -2,6 +2,21 @@ import { describe, expect, it, vi } from 'vitest'
 import { shutdownWorkerRuntime } from '../../workers/workerShutdown'
 
 describe('worker shutdown orchestration', () => {
+  it('drains report jobs before disconnecting the database even when media is idle', async () => {
+    let active = 1
+    const order: string[] = []
+    const result = await shutdownWorkerRuntime({
+      pauseConsumers: async () => { order.push('pause') },
+      activeCounts: async () => ({ video: 0, image: 0, export: 0, report: active }),
+      cancelSubprocesses: async () => ({ remaining: 0 }), activeSubprocessCount: () => 0,
+      closeQueues: async () => { order.push('close') },
+      disconnectDatabase: async () => { expect(active).toBe(0); order.push('db') },
+      sleep: async () => { active = 0; order.push('report-finished') },
+    }, 1_000)
+    expect(result.activeJobs).toBe(0)
+    expect(order.indexOf('report-finished')).toBeLessThan(order.indexOf('db'))
+  })
+
   it('pauses before draining, cancels subprocesses, closes queues, then disconnects DB', async () => {
     const order: string[] = []
     let activeReads = 0

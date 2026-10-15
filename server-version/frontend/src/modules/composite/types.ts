@@ -119,7 +119,25 @@ export interface CompositeCurrentItem {
   }
 }
 
+export interface CompositeReportJobState {
+  state: 'PENDING' | 'PROCESSING' | 'WAITING' | 'READY' | 'FAILED' | 'CANCELLED'
+  jobId: string | null
+  retryAfterSeconds: number
+  errorCode: string | null
+  completedAt: string | null
+}
+
+export interface CompositeReportStatus {
+  attemptId: string
+  attemptEpoch: number
+  status: string
+  hasAcceptedSubmission: boolean
+  reportStatus: CompositeReportJobState
+}
+
 export interface CompositeAttemptState {
+  allUnitsSubmitted?: boolean
+  reportStatus?: CompositeReportJobState
   productKind?: string
   reportMode?: string
   id: string

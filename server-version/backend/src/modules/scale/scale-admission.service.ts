@@ -200,6 +200,25 @@ const readRuntime = (encrypted: string | null): VersionedFrozenScaleRuntimeSnaps
   }
 }
 
+// The authoritative child row is owned by this operation. A weak row-keyed
+// memo shares its verified immutable runtime with admission and scoring without
+// retaining participant rows or caching authorization across requests. Changing
+// the ciphertext invalidates the memo; transaction rereads use distinct rows.
+const runtimeByChild = new WeakMap<object, {
+  encrypted: string | null
+  runtime: VersionedFrozenScaleRuntimeSnapshot
+}>()
+
+export const readScaleAdmissionRuntime = (
+  row: Pick<ScaleAdmissionChildRow, 'runtimeSnapshotEncrypted'>,
+): VersionedFrozenScaleRuntimeSnapshot => {
+  const cached = runtimeByChild.get(row)
+  if (cached && cached.encrypted === row.runtimeSnapshotEncrypted) return cached.runtime
+  const runtime = readRuntime(row.runtimeSnapshotEncrypted)
+  runtimeByChild.set(row, { encrypted: row.runtimeSnapshotEncrypted, runtime })
+  return runtime
+}
+
 const availableContextKeys = (values: AssessmentContextValues | null) => (
   values
     ? assessmentContextKeys.filter((key) => values[key] !== undefined)
@@ -472,7 +491,7 @@ const validateStoredAgainstRuntime = (
     || (stored.principal.userId !== null && row.userId !== null && stored.principal.userId !== row.userId)) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结准入身份或轮次不匹配', 409)
   }
-  const runtime = readRuntime(row.runtimeSnapshotEncrypted)
+  const runtime = readScaleAdmissionRuntime(row)
   if (runtime.schemaVersion !== stored.schemaVersion) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表运行时与准入快照版本不匹配', 409)
   }
@@ -674,7 +693,7 @@ export const activateScaleAdmission = async (
   const stored = readStoredScaleAdmission(row)
   if (stored) return validateStoredAgainstRuntime(row, stored)
   assertFinalOnly(row.deliveryMode)
-  const runtime = readRuntime(row.runtimeSnapshotEncrypted)
+  const runtime = readScaleAdmissionRuntime(row)
   if (runtime.schemaVersion === 1) return activateUnstoredScaleAdmission(prisma, row, runtime, parent)
 
   return withSerializableScaleTransaction(prisma,
@@ -685,7 +704,7 @@ export const activateScaleAdmission = async (
       const winner = readStoredScaleAdmission(current)
       if (winner) return validateStoredAgainstRuntime(current, winner)
       // Load the parent inside this transaction, never use a pre-transaction context.
-      return activateUnstoredScaleAdmission(tx, current, readRuntime(current.runtimeSnapshotEncrypted))
+      return activateUnstoredScaleAdmission(tx, current, readScaleAdmissionRuntime(current))
     },
   )
 }

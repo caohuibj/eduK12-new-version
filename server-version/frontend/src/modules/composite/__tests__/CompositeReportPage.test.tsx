@@ -6,6 +6,9 @@ import CompositeReportPage from '../CompositeReportPage'
 const { mockCompositeApi, authState } = vi.hoisted(() => ({
   mockCompositeApi: {
     report: vi.fn(),
+    reportStatus: vi.fn(),
+    teacherReportStatus: vi.fn(),
+    retryReport: vi.fn(),
     partialReport: vi.fn(),
     teacherReport: vi.fn(),
     snapshots: vi.fn(),
@@ -25,6 +28,11 @@ vi.mock('../../../contexts/AuthContext', () => ({
 beforeEach(() => {
   vi.clearAllMocks()
   authState.user = null
+  const ready = { code: 0, data: { attemptId: 'attempt-1', attemptEpoch: 1, status: 'COMPLETED', hasAcceptedSubmission: true,
+    reportStatus: { state: 'READY', jobId: 'job-1', retryAfterSeconds: 2, errorCode: null, completedAt: '2026-10-15T00:00:00Z' } } }
+  mockCompositeApi.reportStatus.mockResolvedValue(ready)
+  mockCompositeApi.teacherReportStatus.mockResolvedValue(ready)
+  mockCompositeApi.retryReport.mockResolvedValue(ready)
   mockCompositeApi.snapshots.mockResolvedValue({ code: 0, data: { list: [], total: 0 } })
   mockCompositeApi.reanalyze.mockResolvedValue({ code: 0, data: { id: 'snapshot-new' } })
   mockCompositeApi.downloadAnalysisExport.mockResolvedValue({ blob: new Blob(['analysis']), fileName: 'analysis.json' })
@@ -401,4 +409,26 @@ it('renders presentation labels while the API retains raw stored choice values',
   expect(await screen.findByText('蓝色')).toBeInTheDocument()
   expect(screen.getByText('红色、绿色')).toBeInTheDocument()
   expect(screen.queryByText('blue')).toBeNull()
+})
+
+describe('asynchronous report feedback', () => {
+  it('shows saved submission while pending and avoids loading the full report prematurely', async () => {
+    mockCompositeApi.reportStatus.mockResolvedValue({ code: 0, data: { attemptId: 'pending', attemptEpoch: 1, status: 'IN_PROGRESS', hasAcceptedSubmission: true, reportStatus: { state: 'PENDING', jobId: 'job', retryAfterSeconds: 2, errorCode: null, completedAt: null } } })
+    const page = render(<MemoryRouter initialEntries={['/student/composite/attempts/pending/report']}><Routes><Route path="/student/composite/attempts/:attemptId/report" element={<CompositeReportPage />} /></Routes></MemoryRouter>)
+    expect(await screen.findByText('作答记录已保存，报告生成中')).toBeInTheDocument()
+    expect(mockCompositeApi.report).not.toHaveBeenCalled()
+    expect(mockCompositeApi.retryReport).not.toHaveBeenCalled()
+    page.unmount()
+  })
+
+  it('retries only report generation after failure and then reads the completed report', async () => {
+    mockCompositeApi.reportStatus.mockResolvedValueOnce({ code: 0, data: { attemptId: 'failed', attemptEpoch: 1, status: 'IN_PROGRESS', hasAcceptedSubmission: true, reportStatus: { state: 'FAILED', jobId: 'job', retryAfterSeconds: 2, errorCode: 'REPORT_GENERATION_FAILED', completedAt: null } } })
+    mockCompositeApi.report.mockResolvedValue({ code: 0, data: { id: 'failed', name: 'Recovered report', unitReports: [], backgroundValues: [], completedAt: '2026-10-15T00:00:00Z', totalTime: 1 } })
+    render(<MemoryRouter initialEntries={['/student/composite/attempts/failed/report']}><Routes><Route path="/student/composite/attempts/:attemptId/report" element={<CompositeReportPage />} /></Routes></MemoryRouter>)
+    expect(await screen.findByText('报告生成暂时失败')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '重新生成报告' }))
+    expect(await screen.findByText('Recovered report')).toBeInTheDocument()
+    expect(mockCompositeApi.retryReport).toHaveBeenCalledWith('failed')
+    expect(mockCompositeApi.report).toHaveBeenCalledWith('failed')
+  })
 })

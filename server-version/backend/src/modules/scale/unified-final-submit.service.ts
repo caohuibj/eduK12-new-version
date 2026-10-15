@@ -13,11 +13,10 @@ import {
   validateSubmissionId,
 } from '../../services/instrumentFinalSubmit'
 import { measureRequestPhase, measureRequestPhaseSync } from '../../services/runtimeObservability'
-import { missingRequiredScaleItemCodes, validateScaleAnswer, type ScaleAnswer } from './scale-scoring'
+import { missingRequiredScaleItemCodes, validateScaleAnswers, type ScaleAnswer } from './scale-scoring'
 import { buildScaleResult, type ScaleResultV2 } from './scale-result'
 import { encryptScaleAnswers, encryptScaleResult, readScaleAnswers, scaleAssessmentForResponse } from './scale-workflow.service'
 import {
-  decryptFrozenScaleRuntimeSnapshot,
   type VersionedFrozenScaleRuntimeSnapshot,
 } from '../assessment-runtime/runtime-snapshot'
 import { encryptUnifiedRuntimePayload } from '../assessment-runtime/security'
@@ -34,6 +33,7 @@ import { buildScaleBundleBridge } from '../assessment-bundle/sources'
 import type { DeviceInputProvenanceV1 } from './device-input-provenance'
 import {
   activateScaleAdmission,
+  readScaleAdmissionRuntime,
   assertAdmissionParentBinding,
   type ScaleAdmissionChildRow,
 } from './scale-admission.service'
@@ -87,13 +87,13 @@ const normalizeAnswers = (
       ...(answer.responseTimeMs === undefined ? {} : { responseTimeMs: answer.responseTimeMs }),
       ...(answer.changeCount === undefined ? {} : { changeCount: answer.changeCount }),
     }
-    try {
-      validateScaleAnswer(definition, normalized)
-    } catch (error) {
-      if (error instanceof Error) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', error.message, 400)
-      throw error
-    }
     byItem.set(answer.itemCode, normalized)
+  }
+  try {
+    validateScaleAnswers(definition, [...byItem.values()])
+  } catch (error) {
+    if (error instanceof Error) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', error.message, 400)
+    throw error
   }
   return definition.items.flatMap((item) => {
     const answer = byItem.get(item.itemCode)
@@ -216,7 +216,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
   const admission = await measureRequestPhase('final_submit_admission', () => activateScaleAdmission(child))
   assertFrozenAdmission(child, admission, input)
   const snapshot = measureRequestPhaseSync('final_submit_definition_prepare', () => {
-    const parsed = decryptFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted as string)
+    const parsed = readScaleAdmissionRuntime(child)
     assertRuntimeAgainstAdmission(child, admission, parsed, input)
     return parsed
   })

@@ -93,6 +93,26 @@ const sendAnalysisExport = async (
 }
 
 export const compositeController = {
+  async reportStatus(req: Request, res: Response) {
+    try { return success(res, await service.getCompositeReportStatus(req.params.attemptId, { userId: req.user!.userId })) }
+    catch (err) { return handleError(res, err) }
+  },
+  async retryReport(req: Request, res: Response) {
+    try { return success(res, await service.retryCompositeQuestionnaireReport(req.params.attemptId, { userId: req.user!.userId })) }
+    catch (err) { return handleError(res, err) }
+  },
+  async publicReportStatus(req: Request, res: Response) {
+    try { return success(res, await service.getCompositeReportStatus(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) })) }
+    catch (err) { return handleError(res, err) }
+  },
+  async publicRetryReport(req: Request, res: Response) {
+    try { return success(res, await service.retryCompositeQuestionnaireReport(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) })) }
+    catch (err) { return handleError(res, err) }
+  },
+  async teacherReportStatus(req: Request, res: Response) {
+    try { return success(res, await service.getCompositeReportStatusForTeacher(req.user!.userId, req.user!.role, req.params.id, req.params.attemptId)) }
+    catch (err) { return handleError(res, err) }
+  },
   async reportPackages(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
@@ -834,6 +854,8 @@ const recoveryFromBody = (req: Request): string => {
 }
 
 const handleError = (res: Response, err: unknown): Response => {
+  if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
+  if (isTransientCompletionDatabaseError(err)) return completionBusy(res, 1)
   if (err instanceof z.ZodError) return error(res, err.issues.map((item) => item.message).join('; '), -1, 400)
   if (service.isCompositeError(err)) {
     return err.statusCode < 500

@@ -8,7 +8,7 @@ import { isValidRecoveryToken } from '../services/anonymousAccess'
 export type PublicAssessmentBudget = 'get' | 'final'
 
 const START_TOKEN_PATH = /\/(?:questionnaires|composite-assessments|cognitive\/assignments)\/([^/?#]+)/i
-const FINAL_PATH = /(?:^|\/)(?:start|submit|restart)(?:\/|$)/i
+const FINAL_PATH = /(?:^|\/)(?:start|submit|restart|report-retry)(?:\/|$)/i
 
 const digest = (value: string): string => crypto.createHash('sha256').update(value).digest('hex')
 

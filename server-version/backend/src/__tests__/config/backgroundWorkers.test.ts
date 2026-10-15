@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
   resolveBackgroundWorkersEnabled,
+  resolveHeavyProcessingEnabled,
+  resolveVideoProcessingEnabled,
   startBackgroundWorkers,
 } from '../../config/backgroundWorkers'
 
@@ -41,5 +43,16 @@ describe('startBackgroundWorkers', () => {
     const load = vi.fn(async () => undefined)
     await expect(startBackgroundWorkers(true, load)).resolves.toBe('started')
     expect(load).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('daytime resource priority', () => {
+  it('keeps heavy and video consumers off without an explicitly confirmed idle maintenance window', () => {
+    expect(resolveHeavyProcessingEnabled({})).toBe(false)
+    expect(resolveVideoProcessingEnabled({})).toBe(false)
+    expect(resolveHeavyProcessingEnabled({ HEAVY_PROCESSING_ENABLED: 'true' })).toBe(false)
+    expect(resolveVideoProcessingEnabled({ VIDEO_PROCESSING_ENABLED: 'true' })).toBe(false)
+    expect(resolveHeavyProcessingEnabled({ HEAVY_PROCESSING_ENABLED: 'true', HEAVY_MAINTENANCE_IDLE_CONFIRMED: 'true' })).toBe(true)
+    expect(resolveVideoProcessingEnabled({ VIDEO_PROCESSING_ENABLED: 'true', VIDEO_MAINTENANCE_IDLE_CONFIRMED: 'true' })).toBe(true)
   })
 })

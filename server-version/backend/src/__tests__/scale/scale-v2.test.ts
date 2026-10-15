@@ -11,6 +11,7 @@ import {
   type ScaleDirection,
 } from '../../modules/scale/scale-definition'
 import {
+  validateScaleAnswers,
   registerScaleCustomScorer,
   missingRequiredScaleItemCodes,
   scoreScale,
@@ -90,6 +91,17 @@ const allAnswers = (responseValue: string | number = 'sometimes') => (
 const messages = (issues: Array<{ message: string }>) => issues.map((issue) => issue.message).join('\n')
 
 describe('ScaleDefinitionV2 and generic scorer', () => {
+  it('batch validation preserves duplicate, option and response metadata rejection', () => {
+    expect(() => validateScaleAnswers(makeDefinition(), allAnswers())).not.toThrow()
+    for (const invalid of [
+      [{ itemCode: 'unknown', responseValue: 'sometimes' }],
+      [{ itemCode: 'A', responseValue: 'invalid' }],
+      [{ itemCode: 'A', responseValue: 'sometimes', responseTimeMs: -1 }],
+      [{ itemCode: 'A', responseValue: 'sometimes', changeCount: 0.5 }],
+      [{ itemCode: 'A', responseValue: 'sometimes' }, { itemCode: 'A', responseValue: 'often' }],
+    ]) expect(() => validateScaleAnswers(makeDefinition(), invalid)).toThrow()
+  })
+
   afterEach(() => {
     unregisterScaleCustomScorer('scale-v2-test-scorer')
   })

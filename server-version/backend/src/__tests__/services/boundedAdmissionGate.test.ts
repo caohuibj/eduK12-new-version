@@ -1,3 +1,4 @@
+import { AsyncLocalStorage } from 'node:async_hooks'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   BoundedAdmissionBusyError,
@@ -12,6 +13,20 @@ import {
 const nextTick = () => new Promise<void>((resolve) => setImmediate(resolve))
 
 describe('BoundedAdmissionGate', () => {
+  it('keeps a queued caller context through drain and async continuations', async () => {
+    const context = new AsyncLocalStorage<string>()
+    const gate = new BoundedAdmissionGate({ name: 'context_isolation', maxConcurrent: 1, maxQueue: 2, maxWaitMs: 1_000 })
+    let release!: () => void
+    const first = context.run('request-A', () => gate.run(() => new Promise<void>(resolve => { release = resolve })))
+    const second = context.run('request-B', () => gate.run(async () => { await Promise.resolve(); return context.getStore() }))
+    const third = context.run('request-C', () => gate.run(async () => { await nextTick(); return context.getStore() }))
+    await nextTick()
+    release()
+    await first
+    expect(await second).toBe('request-B')
+    expect(await third).toBe('request-C')
+  })
+
   afterEach(() => {
     vi.useRealTimers()
     resetRuntimeObservabilityForTests()

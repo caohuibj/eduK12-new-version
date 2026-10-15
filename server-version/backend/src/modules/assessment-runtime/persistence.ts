@@ -1,3 +1,4 @@
+import { enqueueCompositeReportForUnit } from './report-outbox.service'
 import type { Prisma } from '@prisma/client'
 import { decryptUnifiedRuntimePayload } from './security'
 import { parseCanonicalUnitResultEnvelope, type CanonicalUnitResultEnvelopeV1 } from './unit-result'
@@ -38,7 +39,7 @@ export const insertCompletedUnitSnapshot = async (
   if (input.payloadKind === 'NONE' && (hasCanonicalResult || hasCollectionFacts)) {
     throw new Error('NONE snapshot must not carry an encrypted payload')
   }
-  return tx.assessmentUnitSnapshot.create({
+  const snapshot = await tx.assessmentUnitSnapshot.create({
     data: {
       questionnaireAssessmentId: input.questionnaireAssessmentId,
       compositeAttemptId: input.compositeAttemptId,
@@ -57,6 +58,8 @@ export const insertCompletedUnitSnapshot = async (
       completedAt: input.completedAt,
     },
   })
+  await enqueueCompositeReportForUnit(tx, input)
+  return snapshot
 }
 
 export const parseStoredCanonicalUnitResult = (encrypted: string): CanonicalUnitResultEnvelopeV1 => (

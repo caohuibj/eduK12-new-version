@@ -1,3 +1,4 @@
+import { assertReportJobIdentity, type ReportJobIdentity } from './report-outbox.service'
 import { compiledHashFromInstance as bundleRuntimeHash } from '../bundle-product/runtime'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -261,6 +262,7 @@ const probeUnifiedParent = async (input: {
   parentId: string
   composite: boolean
   preloadedParent?: UnifiedParentHeader
+  reportJob?: ReportJobIdentity
 }): Promise<TerminalProbe> => {
   const parent = input.preloadedParent ?? await measureRequestPhase('aggregate.parent_probe_db', async () => (
     input.composite
@@ -274,6 +276,7 @@ const probeUnifiedParent = async (input: {
         })
   )) as UnifiedParentHeader | null
   if (!parent) return { kind: 'missing' }
+  if (input.reportJob) assertReportJobIdentity(parent, input.reportJob)
   if (parent.status !== 'IN_PROGRESS') return { kind: 'terminal', result: terminalFromParent(parent) }
 
   const frozenSlots = measureRequestPhaseSync('aggregate.decrypt_parse', () => readFrozenSlotSet(parent))
@@ -962,8 +965,8 @@ export const persistObservedAggregateProgressForTests = async (input: {
       })
 }
 
-const finalizeCompositeUnifiedImpl = async (attemptId: string): Promise<CompletionResult | null> => {
-  const probe = await probeUnifiedParent({ parentId: attemptId, composite: true })
+const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?: UnifiedParentHeader, reportJob?: ReportJobIdentity): Promise<CompletionResult | null> => {
+  const probe = await probeUnifiedParent({ parentId: attemptId, composite: true, preloadedParent, reportJob })
   if (probe.kind === 'missing') return null
   if (probe.kind === 'terminal') return probe.result
   if (probe.kind === 'incomplete') return updateIncompleteComposite(probe.parent, probe.completeness)
@@ -975,6 +978,8 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string): Promise<Completi
   if (!parent) return null
   if (parent.status !== 'IN_PROGRESS') return terminalFromParent(parent)
 
+  assertReportJobIdentity(parent, reportJob ?? { attemptEpoch: probe.parent.attemptEpoch,
+    slotSetHash: probe.parent.frozenActiveSlotSetHash as string, contextHash: probe.parent.contextSnapshotHash })
   const { frozenSlots, headers } = probe
   const context = readAggregateContext(parent, true)
   const completed = await decryptCompletedPayloads({
@@ -1341,10 +1346,10 @@ const persistQuestionnaireCompletion = async (input: {
   }
 }
 
-export const finalizeCompositeAttemptUnifiedIfReady = async (attemptId: string) => (
+export const finalizeCompositeAttemptUnifiedIfReady = async (attemptId: string, preloadedParent?: UnifiedParentHeader, reportJob?: ReportJobIdentity) => (
   withAggregateFinalizationAdmission(async () => {
     try {
-      return await finalizeCompositeUnifiedImpl(attemptId)
+      return await finalizeCompositeUnifiedImpl(attemptId, preloadedParent, reportJob)
     } catch (error) {
       if (error instanceof InstrumentFinalSubmitError) throw error
       if (isTransientCompletionDatabaseError(error)) throw toCompletionAdmissionBusyError(error, 1, 'aggregate_finalization')
