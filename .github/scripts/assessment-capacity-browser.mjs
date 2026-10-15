@@ -23,7 +23,7 @@ const browser=await chromium.launch({headless:true,args:['--host-resolver-rules=
 mkdirSync(join(dir,'browser'),{recursive:true});const evidence=[];let active;
 const report={id:'attempt-ci',assessmentId:'q-ci',name:'合成多维测评结果',productKind:'QUESTIONNAIRE',reportMode:'COLLECTION_ONLY',reportState:'COMPLETED',completedAt:'2026-10-15T00:00:00Z',totalTime:120000,anonymousCode:null,backgroundValues:[],unitReports:[{
  itemId:'scale-ci',type:'SCALE',kind:'scale',scaleId:'scale-ci',scaleCode:'TEST',scaleName:'合成五维量表',
- dimensionScores:[{dimensionId:'d1',dimensionCode:'D1',dimensionName:'测试维度一',rawScore:3,normalizedScore:null,level:null,itemCount:3,minScore:0,maxScore:3},{dimensionId:'d2',dimensionCode:'D2',dimensionName:'测试维度二',rawScore:2,normalizedScore:null,level:null,itemCount:3,minScore:0,maxScore:3}],
+ scores:[{key:'D1',type:'dimension',label:'测试维度一',direction:'descriptive',canonical:true,displayPrecision:1,value:3,range:{min:0,max:3},expectedItems:['Q1','Q2','Q3'],answeredItems:['Q1','Q2','Q3'],status:'calculated',prorated:false},{key:'D2',type:'dimension',label:'测试维度二',direction:'descriptive',canonical:true,displayPrecision:1,value:2,range:{min:0,max:3},expectedItems:['Q4','Q5','Q6'],answeredItems:['Q4','Q5','Q6'],status:'calculated',prorated:false}],
  feedback:{overall:'仅用于测试',dimensions:[]},caveats:['虚拟区段，仅用于并发验证'],disclaimer:'合成测试结果，不作诊断。',completedAt:'2026-10-15T00:00:00Z',totalTime:120000,method:{scaleId:'scale-ci',scaleCode:'TEST',reportDefinitionVersion:'scale-unit-report-v1'}
 }]};
 const cases=[{name:'participant-pending',host:'training.eduk12.top',path:'/student/composite/attempts/attempt-ci/report'},
@@ -75,7 +75,7 @@ try{
   await page.addScriptTag({url:'http://'+variant.host+':3189/assessment-ci-axe.js'});await audit(variant.retry?'failed':'pending');
   if(variant.retry)await step('report-only retry',()=>page.getByRole('button',{name:'重新生成报告',exact:true}).click());
   await step('ready report',()=>page.getByText('合成多维测评结果',{exact:true}).waitFor());
-  await step('dimension report',()=>page.getByText('合成五维量表',{exact:true}).waitFor());await audit('ready');
+  await step('dimension report',async()=>{await page.getByRole('heading',{name:'合成五维量表',exact:true}).waitFor();const unit=page.getByTestId('scale-unit-report-scale-ci');await unit.getByText('测试维度一',{exact:true}).waitFor();await unit.getByText('测试维度二',{exact:true}).waitFor();assert.equal(await unit.getByText('该量表尚未形成可展示的分数。',{exact:true}).count(),0)});await audit('ready');
   assert.equal(retries,variant.retry?1:0);assert.equal(calls.filter(c=>c.path.endsWith('/report')).length,1);
   assert.ok(calls.filter(c=>c.path.endsWith('/report-status')).length<=3,'Bounded polling');assert.deepEqual(errors,[]);
   evidence.push({case:variant.name,width,status:'success',calls,wcagViolations:0});

@@ -91,7 +91,7 @@
     },
     "server-version/docker-compose.yml": {
       "before": "000e97759483e7e962526b74881d73d1fa0ca484",
-      "after": "848cbf7cad43cd2f840dcbb8db7fb2fdad0d9dad"
+      "after": "bcafa22e1b31103171298cccf2f4fb5f3df319bc"
     },
     "server-version/frontend/src/components/FinalCompositeAssessment.tsx": {
       "before": "d3ac08e0f5e1357b334bdd35294d5914bb0fd06b",
