@@ -1,6 +1,7 @@
+import { createHash } from 'node:crypto'
 import { AsyncLocalStorage } from 'node:async_hooks'
 import { monitorEventLoopDelay, PerformanceObserver, performance } from 'node:perf_hooks'
-import type { NextFunction, Request, Response } from 'express'
+import type { NextFunction, Request, Response, RequestHandler } from 'express'
 import { logger } from '../utils/logger'
 
 export type RequestObservationPhase =
@@ -64,6 +65,7 @@ type Histogram = {
 }
 
 type RequestObservation = {
+  timeline?: TechnicalTimeline
   startedAt: bigint
   phases: Array<{
     phase: RequestObservationPhase
@@ -383,9 +385,105 @@ const dominantPhaseFor = (attribution: Map<string, number>): string => {
   return dominant
 }
 
+type TechnicalTimeline = {
+  kind: 'submission' | 'report'; attemptHash: string; originNs: bigint; wallStartMs: number;
+  events: Array<{ name: string; startNs: string; endNs: string; unitHash?: string }>;
+  dropped: number; cpuStart: NodeJS.CpuUsage; gcStart: number; gcMsStart: number;
+}
+const timelineEnabled = () => process.env.PERF_ISOLATED_TEST_MODE === '1' && process.env.ASSESSMENT_TIMELINE_ENABLED === 'true'
+const technicalHash = (value: string) => createHash('sha256').update(value).digest('hex').slice(0, 24)
+const newTimeline = (kind: TechnicalTimeline['kind'], attemptId: string): TechnicalTimeline => ({
+  kind, attemptHash: technicalHash(attemptId), originNs: process.hrtime.bigint(), wallStartMs: Date.now(),
+  events: [], dropped: 0, cpuStart: process.cpuUsage(), gcStart: gcEvents, gcMsStart: gcDurationMs,
+})
+const pushTimeline = (timeline: TechnicalTimeline | undefined, name: string, start: bigint, end = start, unitId?: string): void => {
+  if (!timeline) return
+  if (timeline.events.length >= 512) { timeline.dropped++; return }
+  // Labels are server-owned technical names; all dynamic identifiers are hashed.
+  if (!/^[a-zA-Z0-9_.-]{1,100}$/.test(name)) return
+  timeline.events.push({ name, startNs: start.toString(), endNs: end.toString(), ...(unitId ? { unitHash: technicalHash(unitId) } : {}) })
+}
+const emitTimeline = (observation: RequestObservation, terminal: string): void => {
+  const timeline = observation.timeline
+  if (!timeline) return
+  try {
+    const ended = process.hrtime.bigint(), cpu = process.cpuUsage(timeline.cpuStart)
+    const record = { schemaVersion: 1, kind: timeline.kind, attemptHash: timeline.attemptHash, processId: process.pid,
+      clock: 'node-hrtime-monotonic', originNs: timeline.originNs.toString(), wallStartMs: timeline.wallStartMs,
+      endedNs: ended.toString(), wallEndMs: Date.now(), terminal,
+      processCpuMsDuringWindow: (cpu.user + cpu.system) / 1000, processGcEventsDuringWindow: gcEvents - timeline.gcStart,
+      processGcMsDuringWindow: gcDurationMs - timeline.gcMsStart, heapUsedBytes: process.memoryUsage().heapUsed,
+      events: timeline.events, dropped: timeline.dropped }
+    const encodingStart = process.hrtime.bigint(), text = JSON.stringify(record)
+    const encodingMs = Number(process.hrtime.bigint() - encodingStart) / 1e6
+    logger.info('ASSESSMENT_TIMELINE ' + text.slice(0, -1) + ',"encodingMs":' + encodingMs + '}')
+  } catch { /* Diagnostics cannot change receipt or report outcome. */ }
+}
+export const markAssessmentTimeline = (name: string, unitId?: string): void => {
+  pushTimeline(observationStorage.getStore()?.timeline, name, process.hrtime.bigint(), undefined, unitId)
+}
+export const assessmentTimelineSpan = (name: string, start: bigint, end = process.hrtime.bigint()): void => {
+  pushTimeline(observationStorage.getStore()?.timeline, name, start, end)
+}
+export const traceAssessmentPhase = async <T>(name: string, operation: () => Promise<T>, unitId?: string): Promise<T> => {
+  if (!observationStorage.getStore()?.timeline) return operation()
+  const start = process.hrtime.bigint()
+  try { return await operation() }
+  finally { pushTimeline(observationStorage.getStore()?.timeline, name, start, process.hrtime.bigint(), unitId) }
+}
+export const traceAssessmentPhaseSync = <T>(name: string, operation: () => T): T => {
+  if (!observationStorage.getStore()?.timeline) return operation()
+  const start = process.hrtime.bigint()
+  try { return operation() }
+  finally { pushTimeline(observationStorage.getStore()?.timeline, name, start, process.hrtime.bigint()) }
+}
+export const observeWholeMiddleware = (name: string, middleware: RequestHandler): RequestHandler => (req, res, next) => {
+  if (!observationStorage.getStore()?.timeline) return middleware(req, res, next)
+  const start = process.hrtime.bigint(); let done = false
+  const complete = () => { if (!done) { done = true; assessmentTimelineSpan(name, start); res.removeListener('finish', complete); res.removeListener('close', complete) } }
+  res.once('finish', complete); res.once('close', complete)
+  try { return middleware(req, res, error => { complete(); next(error) }) }
+  catch (error) { complete(); next(error) }
+}
+const reportClaims = new WeakMap<object, { start: bigint; claimed: bigint; loaded: bigint }>()
+export const recordAssessmentReportClaim = (job: object, start: bigint, claimed: bigint, loaded = process.hrtime.bigint()): void => {
+  if (timelineEnabled()) reportClaims.set(job, { start, claimed, loaded })
+}
+export const withAssessmentReportTimeline = async <T>(job: { attemptId: string }, operation: () => Promise<T>): Promise<T> => {
+  if (!timelineEnabled()) return operation()
+  const timeline = newTimeline('report', job.attemptId), claim = reportClaims.get(job)
+  if (claim) { pushTimeline(timeline, 'report.claim_update_roundtrip', claim.start, claim.claimed); pushTimeline(timeline, 'report.claim_payload_read', claim.claimed, claim.loaded) }
+  const observation: RequestObservation = { startedAt: timeline.originNs, phases: [], timeline }
+  return observationStorage.run(observation, async () => {
+    let terminal = 'returned'
+    try { markAssessmentTimeline('report.processor_enter'); return await operation() }
+    catch (error) { terminal = 'processor_error'; throw error }
+    finally { emitTimeline(observation, terminal) }
+  })
+}
+
+const wholeRequestArrival = new WeakMap<Request, { requestStartedAtMs: number; bodyReceivedAtMs?: number }>()
+export const wholeQuestionnaireArrival = (req: Request) => {
+  const arrival = wholeRequestArrival.get(req)
+  return { requestStartedAtMs: arrival?.requestStartedAtMs ?? Date.now(), bodyReceivedAtMs: arrival?.bodyReceivedAtMs ?? Date.now() }
+}
+
 /** Attach a request-scoped, non-sensitive performance context. */
 export const requestObservabilityMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+  let technicalTimeline: TechnicalTimeline | undefined
+  if (req.method === 'POST' && /\/composite-assessments\/attempts\/[^/]+\/whole\/submit(?:\?|$)/.test(req.originalUrl || req.url)) {
+    const arrival = { requestStartedAtMs: Date.now(), bodyReceivedAtMs: undefined as number | undefined }
+    if (timelineEnabled()) {
+      const match = (req.originalUrl || req.url).match(/\/attempts\/([^/]+)\/whole\/submit/)
+      if (match) technicalTimeline = newTimeline('submission', match[1])
+      pushTimeline(technicalTimeline, 'http.request_start', process.hrtime.bigint())
+    }
+    wholeRequestArrival.set(req, arrival)
+    req.once('end', () => { arrival.bodyReceivedAtMs = Date.now(); pushTimeline(technicalTimeline, 'http.payload_complete', process.hrtime.bigint()) })
+  }
+
   const observation: RequestObservation = {
+    timeline: technicalTimeline,
     startedAt: process.hrtime.bigint(),
     phases: [],
   }
@@ -428,6 +526,8 @@ export const requestObservabilityMiddleware = (req: Request, res: Response, next
         })
       }
     }
+    pushTimeline(observation.timeline, 'http.response_finish', requestEndedAt)
+    emitTimeline(observation, status)
     activeRequests = Math.max(0, activeRequests - 1)
 
     if (durationMs > 10_000) {
@@ -463,6 +563,7 @@ export const recordRequestPhase = (
 ): void => {
   const observation = observationStorage.getStore()
   if (!observation) return
+  pushTimeline(observation.timeline, phase, startedAt, endedAt)
   observation.phases.push({
     phase,
     durationMs: finiteMilliseconds(durationMs),
@@ -502,8 +603,9 @@ export const measureRequestPhaseSync = <T>(
 export const recordPrismaCall = (
   model: string | undefined,
   action: string | undefined,
-  durationMs: number,
+  durationMs: number, startedAt?: bigint, endedAt?: bigint,
 ): void => {
+  if (startedAt && endedAt) assessmentTimelineSpan(`db.${model || "raw"}.${action || "unknown"}`, startedAt, endedAt)
   observeLabeledHistogram(prismaCallHistograms, {
     model: model || 'raw',
     action: action || 'unknown',

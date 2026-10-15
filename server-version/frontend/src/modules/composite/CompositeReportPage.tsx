@@ -1,4 +1,5 @@
 import { runWithCompletionRetry } from '../../services/completionRetry'
+import { REPORT_AUTO_POLL_LIMIT, reportPollingDelayMs } from './report-polling'
 import type { CompositeReportStatus } from './types'
 import BundleReport from '../../pages/bundle/BundleReport'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
@@ -53,6 +54,8 @@ const CompositeReportPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const [generation, setGeneration] = useState<CompositeReportStatus | null>(null)
   const pollCount = useRef(0)
+  const pollingProfile = generation?.feedbackPollProfile ?? (generation?.wholeSubmissionReceived ? 'QUEUED' : 'LEGACY')
+  const automaticPollLimit = pollingProfile === 'LEGACY' ? 12 : REPORT_AUTO_POLL_LIMIT
 
   const studyReturn=attemptId?sessionStorage.getItem(`composite:study:return:${attemptId}`):null
   const ownStudyReturn=studyReturn && /^\/public\/studies\/[0-9a-f-]{36}$/.test(studyReturn)?studyReturn:null
@@ -119,23 +122,22 @@ const CompositeReportPage: React.FC = () => {
 
   useEffect(() => { pollCount.current = 0; void load(); return () => { epoch.current++ } }, [load])
   useEffect(() => {
-    if (!generation || report || !['PENDING', 'PROCESSING'].includes(generation.reportStatus.state) || pollCount.current >= 12) return
-    // 2 -> 5 -> 10 seconds, with jitter, <=12 probes per page. Hidden pages
-    // issue no requests. This fits the existing public per-person GET budget.
+    if (!generation || report || !['PENDING', 'PROCESSING'].includes(generation.reportStatus.state) || pollCount.current >= automaticPollLimit) return
+    // Bounded 2.5 -> 4 seconds with jitter and the server Retry-After floor.
+    // Hidden pages issue no requests; 24 probes leave public GET headroom.
     let waitingForVisibility = false
     const probe = () => {
       if (document.visibilityState === 'hidden') { waitingForVisibility = true; return }
       pollCount.current += 1
       void load()
     }
-    const base = pollCount.current === 0 ? 2_000 : pollCount.current < 3 ? 5_000 : 10_000
-    const timer = window.setTimeout(probe, Math.max(base, generation.reportStatus.retryAfterSeconds * 1000) + Math.floor(Math.random() * 500))
+    const timer = window.setTimeout(probe, reportPollingDelayMs(pollCount.current, generation.reportStatus.retryAfterSeconds, Math.random, pollingProfile))
     const onVisible = () => {
       if (waitingForVisibility && document.visibilityState !== 'hidden') { waitingForVisibility = false; probe() }
     }
     document.addEventListener('visibilitychange', onVisible)
     return () => { window.clearTimeout(timer); document.removeEventListener('visibilitychange', onVisible) }
-  }, [generation, load, report])
+  }, [generation, load, report, pollingProfile, automaticPollLimit])
   useEffect(() => {
     if (!shouldLoadSnapshots) {
       setSnapshots([])
@@ -231,7 +233,7 @@ const CompositeReportPage: React.FC = () => {
         description: failed ? '已保存的交卷不会丢失。可重新生成报告，无需再次提交答案。'
           : waiting ? '已提交单元保留在服务器，请先继续完成剩余作答。'
           : cancelled ? '请重新读取当前作答状态，核对测评版本。'
-          : pollCount.current >= 12 ? '报告仍在准备。已暂停自动查询，可稍后重新加载。'
+          : pollCount.current >= automaticPollLimit ? '报告仍在准备。已暂停自动查询，可稍后重新加载。'
           : '页面会自动查询报告状态；离开页面不会取消已保存的交卷或报告任务。' }}
       actions={<>
         {failed && !teacherMode && <button type="button" className="hui-button hui-button--primary" onClick={() => {

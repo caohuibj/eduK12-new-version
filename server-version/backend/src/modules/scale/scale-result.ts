@@ -305,6 +305,7 @@ export const buildScaleResult = (input: {
   participantContextHash?: string | null
 }): ScaleResultV2 => {
   const scoring = scoreScale(input.definition, input.answers)
+  const definitionHash = hashScaleDefinition(input.definition)
   const references = scoring.quality.status === 'invalid'
     ? []
     : scoring.scores.flatMap((score) => resolveScaleReference({
@@ -314,7 +315,7 @@ export const buildScaleResult = (input: {
       instrumentVersion: input.instrumentVersion,
       scoringVersion: input.definition.scoring.scoringVersion,
       score,
-      ...(input.definition.versionAxes?{measurementHash:hashScaleDefinition(input.definition)}:{}),
+      ...(input.definition.versionAxes?{measurementHash:definitionHash}:{}),
       // Governed language identifies the administered form, not a student's home language.
       context: input.definition.versionAxes ? {...input.participantContext,language:input.definition.versionAxes.locale} : input.participantContext,
     }))
@@ -344,7 +345,7 @@ export const buildScaleResult = (input: {
       reportVersion: input.definition.report.reportVersion,
       ...(input.definition.report.audienceContract ? { reportAudience: input.definition.report.audienceContract.audience } : {}),
       ...(input.definition.versionAxes ? { localizationVersion: input.definition.versionAxes.localizationVersion } : {}),
-      definitionHash: hashScaleDefinition(input.definition),
+      definitionHash,
       referenceVersions,
       assessmentContext: input.participantContextHash
         ? { schemaVersion: 1, snapshotHash: input.participantContextHash }

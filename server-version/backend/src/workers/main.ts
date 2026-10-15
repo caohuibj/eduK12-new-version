@@ -1,4 +1,5 @@
-import { activeCompositeReportJobs, startCompositeReportWorker, stopCompositeReportWorker } from './compositeReportWorker'
+import { assessmentReportConfig } from '../config/assessmentReports'
+import { activeCompositeReportJobs, startCompositeReportWorker, stopCompositeReportWorker, prepareCompositeReportRuntime } from './compositeReportWorker'
 import { config } from '../config'
 import { resolveHeavyProcessingEnabled, resolveVideoProcessingEnabled, startBackgroundWorkers } from '../config/backgroundWorkers'
 import { prisma } from '../config/database'
@@ -42,7 +43,7 @@ const gracefulShutdown = async (signal: string, exitCode = 0) => {
     cancelSubprocesses: cancelActiveWorkerSubprocesses,
     activeSubprocessCount: activeWorkerSubprocessCount,
     closeQueues,
-    disconnectDatabase: () => prisma.$disconnect(),
+    disconnectDatabase: async () => { await reportDrain; await prisma.$disconnect() },
   }, runtimeResourceConfig.workerShutdownTimeoutSeconds * 1000)
 
   await reportDrain
@@ -74,6 +75,8 @@ const startWorker = async (): Promise<void> => {
   const started = await startBackgroundWorkers(true)
   if (started !== 'started') throw new Error('worker process must start video/image/export consumers')
   workersStarted = true
+  if (assessmentReportConfig().enabled) await prepareCompositeReportRuntime()
+  if (shutdownStarted) return
   startCompositeReportWorker()
   logger.info('Report outbox worker is running', { heavyProcessingEnabled: resolveHeavyProcessingEnabled(), videoProcessingEnabled: resolveHeavyProcessingEnabled() && resolveVideoProcessingEnabled() })
 }

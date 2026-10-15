@@ -3,6 +3,8 @@ import { configuredInteger } from '../services/boundedAdmissionGate'
 export const assessmentReportConfig = (env: NodeJS.ProcessEnv = process.env) => {
   const enabled = env.ASSESSMENT_REPORT_ASYNC_ENABLED ?? 'false'
   if (!['true', 'false'].includes(enabled)) throw new Error('ASSESSMENT_REPORT_ASYNC_ENABLED must be true or false')
+  const whole = env.ASSESSMENT_WHOLE_SUBMIT_ENABLED ?? 'false'
+  if (!['true', 'false'].includes(whole)) throw new Error('ASSESSMENT_WHOLE_SUBMIT_ENABLED must be true or false')
   const integer = (key: string, fallback: number) => {
     if (env === process.env) return configuredInteger(key, fallback)
     const value = Number(env[key] ?? fallback)
@@ -11,6 +13,7 @@ export const assessmentReportConfig = (env: NodeJS.ProcessEnv = process.env) => 
   }
   return {
     enabled: enabled === 'true',
+    wholeSubmitEnabled: whole === 'true',
     courseIds: new Set((env.ASSESSMENT_REPORT_ASYNC_COURSE_IDS ?? '').split(',').map(value => value.trim()).filter(Boolean)),
     maxPending: integer('ASSESSMENT_REPORT_MAX_PENDING', 200),
     workerConcurrency: integer('ASSESSMENT_REPORT_WORKER_CONCURRENCY', 1),

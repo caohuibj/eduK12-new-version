@@ -3513,6 +3513,12 @@ enum CompositeReportJobStatus {
 }
 
 model CompositeReportJob {
+  wholeValidationEncrypted String? @map("whole_validation_encrypted")
+  wholeValidationHash String? @map("whole_validation_hash")
+  wholeSubmissionId String? @map("whole_submission_id")
+  wholePayloadHash String? @map("whole_payload_hash")
+  wholeAnswersEncrypted String? @map("whole_answers_encrypted")
+  wholeAcceptedAt DateTime? @map("whole_accepted_at")
   id                 String                   @id @default(uuid())
   attemptId          String                   @map("attempt_id")
   attemptEpoch       Int                      @map("attempt_epoch")

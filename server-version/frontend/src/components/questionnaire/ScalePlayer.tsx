@@ -27,6 +27,7 @@ export interface ScalePlayerProps {
   onPrevious: () => void | Promise<void>
   onNext?: () => void | Promise<void>
   onSubmit?: () => void | Promise<void>
+  submitLabel?: string
   submitting?: boolean
 }
 
@@ -43,6 +44,7 @@ export function ScalePlayer({
   onPrevious,
   onNext,
   onSubmit,
+  submitLabel = '提交整份量表',
   submitting = false,
 }: ScalePlayerProps) {
   const answerControlsDisabled = disabled || answerDisabled || submitting
@@ -100,7 +102,7 @@ export function ScalePlayer({
             className="btn-primary min-h-11"
           >
             <CheckCircle className="mr-1 inline h-4 w-4" />
-            {submitting ? '提交量表中...' : '提交整份量表'}
+            {submitting ? '正在提交...' : submitLabel}
           </button>
         ) : null}
       </div>

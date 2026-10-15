@@ -1,3 +1,4 @@
+import type { WholeReceiptExecution } from '../composite/whole-questionnaire.service'
 import { createHash } from 'node:crypto'
 import type { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -25,7 +26,7 @@ import {
   projectScaleCanonicalUnitResult,
 } from '../assessment-runtime/unit-result'
 import { insertCompletedUnitSnapshot } from '../assessment-runtime/persistence'
-import { loadFrozenReferenceSets } from '../assessment-runtime/reference-binding'
+import { loadFrozenReferenceSets, type FrozenReferenceDb } from '../assessment-runtime/reference-binding'
 import { withFinalOnlyCompletionTransaction } from '../../services/questionnaireProgressService'
 import { canonicalJsonBytes } from '../assessment-runtime/canonical'
 import type { VersionedFrozenUnitAdmission } from '../assessment-runtime/admission-snapshot-v2'
@@ -164,11 +165,11 @@ const buildResult = async (
   child: ScaleAdmissionChildRow,
   snapshot: VersionedFrozenScaleRuntimeSnapshot,
   answers: ScaleAnswer[],
-  admission: VersionedFrozenUnitAdmission,
+  admission: VersionedFrozenUnitAdmission, referenceDb: FrozenReferenceDb = prisma as any,
 ): Promise<ScaleResultV2> => {
   let references: Awaited<ReturnType<typeof loadFrozenReferenceSets>> = []
   if (snapshot.referenceBindings.length > 0) {
-    references = await measureRequestPhase('final_submit_db_query', () => loadFrozenReferenceSets(prisma as any, {
+    references = await measureRequestPhase('final_submit_db_query', () => loadFrozenReferenceSets(referenceDb, {
       instrumentType: 'SCALE',
       instrumentKey: snapshot.instrumentKey,
       bindings: snapshot.referenceBindings,
@@ -208,12 +209,16 @@ const txAdmissionSelect = {
   totalTime: true,
 } as const
 
-export const submitUnifiedScaleAssessmentFinal = async (
-  input: UnifiedScaleFinalSubmitInput,
-  child: ScaleAdmissionChildRow,
+export const assertUnifiedScaleDelivery = (input: UnifiedScaleFinalSubmitInput, child: ScaleAdmissionChildRow, admission: VersionedFrozenUnitAdmission, snapshot: VersionedFrozenScaleRuntimeSnapshot): void => {
+  assertFrozenAdmission(child, admission, input)
+  assertRuntimeAgainstAdmission(child, admission, snapshot, input)
+}
+
+export const prepareUnifiedScaleFinalSubmission = async (
+  input: UnifiedScaleFinalSubmitInput, child: ScaleAdmissionChildRow, referenceTimeMs = Date.now(),
 ) => {
   const submissionId = validateSubmissionId(input.submissionId)
-  const admission = await measureRequestPhase('final_submit_admission', () => activateScaleAdmission(child))
+  const admission = await measureRequestPhase('final_submit_admission', () => activateScaleAdmission(child, undefined, referenceTimeMs))
   assertFrozenAdmission(child, admission, input)
   const snapshot = measureRequestPhaseSync('final_submit_definition_prepare', () => {
     const parsed = readScaleAdmissionRuntime(child)
@@ -233,6 +238,18 @@ export const submitUnifiedScaleAssessmentFinal = async (
   assertCanonicalSubmissionPayloadSize(canonical, FINAL_SUBMISSION_MAX_BYTES.scale, '量表提交数据')
   const payloadHash = canonical.hash
 
+  if (child.status !== 'COMPLETED' && admission.schemaVersion === 2 && admission.scalePolicy?.deployment?.completionDeadline
+    && referenceTimeMs > Date.parse(admission.scalePolicy.deployment.completionDeadline)) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '本轮测评已超过冻结完成期限，请重新开始', 409)
+  }
+  return { submissionId, admission, snapshot, answers, payloadHash }
+}
+
+export const submitUnifiedScaleAssessmentFinal = async (
+  input: UnifiedScaleFinalSubmitInput, child: ScaleAdmissionChildRow, wholeReceipt?: WholeReceiptExecution, referenceDb?: FrozenReferenceDb,
+) => {
+  const { submissionId, admission, snapshot, answers, payloadHash } = await prepareUnifiedScaleFinalSubmission(input, child, wholeReceipt?.acceptedAtMs)
+
   if (child.status === 'COMPLETED') {
     const replay = assertSubmissionReplay(child, submissionId, payloadHash)
     if (replay === 'replay') {
@@ -240,15 +257,10 @@ export const submitUnifiedScaleAssessmentFinal = async (
         submissionId,
         payloadHash,
         replayed: true,
-        assessment: scaleAssessmentForResponse(child),
+        assessment: wholeReceipt ? null : scaleAssessmentForResponse(child),
         parent: null,
       }
     }
-  }
-
-  if (admission.schemaVersion === 2 && admission.scalePolicy?.deployment?.completionDeadline
-    && Date.now() > Date.parse(admission.scalePolicy.deployment.completionDeadline)) {
-    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '本轮测评已超过冻结完成期限，请重新开始', 409)
   }
 
   // The child row is already loaded by the final-submit admission path. Resolve
@@ -258,7 +270,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
   const persistedProvenance = input.deviceInputProvenance ?? storedProvenance
   const encryptedAnswers = encryptScaleAnswers(answers, persistedProvenance)
 
-  const result = await measureRequestPhase('final_submit_scoring', () => buildResult(child, snapshot, answers, admission))
+  const result = await measureRequestPhase('final_submit_scoring', () => buildResult(child, snapshot, answers, admission, referenceDb))
   const unitResult = snapshot.compiledRuntime.runtimeCapabilities.aggregateEligible
     && Boolean(child.questionnaireAssessmentId || child.compositeAttemptId)
     ? projectScaleCanonicalUnitResult({
@@ -268,7 +280,8 @@ export const submitUnifiedScaleAssessmentFinal = async (
         referenceBindings: snapshot.referenceBindings,
       })
     : null
-  const completedAt = new Date()
+  // Accepted whole answers were complete at receipt time, not at queue drain.
+  const completedAt = new Date(wholeReceipt?.acceptedAtMs ?? Date.now())
   const encrypted = await measureRequestPhase('final_submit_encryption', async () => ({
     result: encryptScaleResult(result),
     canonicalResult: unitResult
@@ -288,7 +301,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
   const committed = await withFinalOnlyCompletionTransaction(async (tx) => {
     const current = await tx.assessment.findUnique({
       where: { id: input.assessmentId },
-      select: txAdmissionSelect,
+      select: { ...txAdmissionSelect, runtimeSnapshotEncrypted: !wholeReceipt },
     })
     if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评记录不存在', 404)
     assertFinalOnly(current.deliveryMode)
@@ -339,6 +352,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
     if (encrypted.canonicalResult && current.questionnaireAssessmentId) {
       if (!slotKey) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表未绑定到当前测评单元', 409)
       await insertCompletedUnitSnapshot(tx as Prisma.TransactionClient, {
+        wholeReceipt,
         questionnaireAssessmentId: current.questionnaireAssessmentId,
         attemptEpoch: input.attemptEpoch,
         slotKey,
@@ -355,6 +369,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
     } else if (encrypted.canonicalResult && current.compositeAttemptId) {
       if (!slotKey) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表未绑定到当前测评单元', 409)
       await insertCompletedUnitSnapshot(tx as Prisma.TransactionClient, {
+        wholeReceipt,
         compositeAttemptId: current.compositeAttemptId,
         attemptEpoch: input.attemptEpoch,
         slotKey,
@@ -391,7 +406,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
     submissionId,
     payloadHash,
     replayed: committed.replayed,
-    assessment: scaleAssessmentForResponse({ ...committed.current, scale: child.scale }),
+    assessment: wholeReceipt ? null : scaleAssessmentForResponse({ ...committed.current, scale: child.scale }),
     parent: null,
   }
 }

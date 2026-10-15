@@ -484,6 +484,7 @@ export const readStoredScaleAdmission = (
 const validateStoredAgainstRuntime = (
   row: ScaleAdmissionChildRow,
   stored: VersionedFrozenUnitAdmission,
+  referenceTimeMs = Date.now(),
 ): VersionedFrozenUnitAdmission => {
   assertAdmissionParentBinding(row, stored)
   if (stored.attemptEpoch !== row.attemptEpoch || stored.scale?.id !== row.scale.id
@@ -497,7 +498,7 @@ const validateStoredAgainstRuntime = (
   }
   if (stored.schemaVersion === 2 && runtime.schemaVersion === 2) {
     if (row.status !== 'COMPLETED' && stored.scalePolicy?.deployment?.completionDeadline
-      && Date.now() > Date.parse(stored.scalePolicy.deployment.completionDeadline)) {
+      && referenceTimeMs > Date.parse(stored.scalePolicy.deployment.completionDeadline)) {
       throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '本轮测评已超过冻结完成期限，请重新开始', 409)
     }
     const identityBindingHash = canonicalHash({
@@ -689,9 +690,10 @@ const activateUnstoredScaleAdmission = async (
 export const activateScaleAdmission = async (
   row: ScaleAdmissionChildRow,
   parent?: CompositeScaleAdmissionParent,
+  referenceTimeMs = Date.now(),
 ): Promise<VersionedFrozenUnitAdmission> => {
   const stored = readStoredScaleAdmission(row)
-  if (stored) return validateStoredAgainstRuntime(row, stored)
+  if (stored) return validateStoredAgainstRuntime(row, stored, referenceTimeMs)
   assertFinalOnly(row.deliveryMode)
   const runtime = readScaleAdmissionRuntime(row)
   if (runtime.schemaVersion === 1) return activateUnstoredScaleAdmission(prisma, row, runtime, parent)
@@ -702,7 +704,7 @@ export const activateScaleAdmission = async (
       const current = await tx.assessment.findUnique({ where: { id: row.id }, select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT })
       if (!current || current.attemptEpoch !== row.attemptEpoch) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '测评轮次已改变', 409)
       const winner = readStoredScaleAdmission(current)
-      if (winner) return validateStoredAgainstRuntime(current, winner)
+      if (winner) return validateStoredAgainstRuntime(current, winner, referenceTimeMs)
       // Load the parent inside this transaction, never use a pre-transaction context.
       return activateUnstoredScaleAdmission(tx, current, readScaleAdmissionRuntime(current))
     },

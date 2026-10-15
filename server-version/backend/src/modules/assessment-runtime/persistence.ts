@@ -1,3 +1,4 @@
+import type { WholeReceiptExecution } from '../composite/whole-questionnaire.service'
 import { enqueueCompositeReportForUnit } from './report-outbox.service'
 import type { Prisma } from '@prisma/client'
 import { decryptUnifiedRuntimePayload } from './security'
@@ -6,6 +7,7 @@ import { parseCanonicalUnitResultEnvelope, type CanonicalUnitResultEnvelopeV1 } 
 export type AssessmentUnitSnapshotPayloadKind = 'UNIT_RESULT' | 'COLLECTION_FACTS' | 'NONE'
 
 export interface CompletedUnitSnapshotInput {
+  wholeReceipt?: WholeReceiptExecution
   questionnaireAssessmentId?: string
   compositeAttemptId?: string
   attemptEpoch: number

@@ -43,7 +43,8 @@ if (globalForPrisma.prismaObservabilityClient !== prisma) {
       recordPrismaError(error?.meta?.code)
       throw error
     } finally {
-      recordPrismaCall(params.model, params.action, Number(process.hrtime.bigint() - startedAt) / 1_000_000)
+      const endedAt = process.hrtime.bigint()
+      recordPrismaCall(params.model, params.action, Number(endedAt - startedAt) / 1_000_000, startedAt, endedAt)
     }
   })
   globalForPrisma.prismaObservabilityClient = prisma

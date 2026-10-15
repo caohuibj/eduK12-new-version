@@ -1,3 +1,4 @@
+import { observeWholeMiddleware } from '../../services/runtimeObservability'
 import { assessmentExportHttp } from '../../services/assessmentExportHttp'
 import { runOrLegacyRespondentAccess } from '../assessment-run/runtimeAccess'
 import { Router, type NextFunction, type Request, type Response } from 'express'
@@ -58,6 +59,8 @@ const relationalFinalConsentGuard = async (req: Request, res: Response, next: Ne
 
 router.get('/available', authenticate, requireRole(UserRole.STUDENT), compositeController.available)
 router.get('/attempts/:attemptId', authenticate, respondentAttemptAccess, compositeController.getAttempt)
+router.get('/attempts/:attemptId/whole/definition', authenticate, respondentAttemptAccess, compositeController.wholeDefinition)
+router.post('/attempts/:attemptId/whole/submit', observeWholeMiddleware('whole.identity_auth', authenticate), observeWholeMiddleware('whole.respondent_gate', respondentAttemptAccess), observeWholeMiddleware('whole.relational_consent', relationalFinalConsentGuard), compositeController.wholeSubmit)
 router.get('/attempts/:attemptId/form-sections/:sectionId/assets/:assetId/content', authenticate, respondentAttemptAccess, compositeImageController.authenticatedFormImage)
 router.get('/attempts/:attemptId/items/:itemId/scale/assets/:assetId/content', authenticate, respondentAttemptAccess, compositeImageController.authenticatedScaleImage)
 router.post('/attempts/:attemptId/form-sections/:sectionId/items/:itemId/options/:optionIndex/video-capability', authenticate, respondentAttemptAccess, compositeVideoController.authenticatedFormVideo)

@@ -2,6 +2,18 @@ import {execFileSync} from 'node:child_process';
 import {readFileSync} from 'node:fs';
 const bindings=JSON.parse(readFileSync(new URL('./assessment-capacity-bindings.json',import.meta.url),'utf8'));
 export const assessmentCapacitySources=new Set([
+ "server-version/backend/prisma/migrations/20261015020000_whole_questionnaire_receipt/migration.sql",
+ "server-version/backend/prisma/migrations/20261015030000_whole_validation_manifest/migration.sql",
+ "server-version/backend/src/config/database.ts",
+ "server-version/backend/src/modules/assessment-runtime/reference-binding.ts",
+ "server-version/backend/src/modules/composite/whole-questionnaire.service.ts",
+ "server-version/backend/src/modules/scale/scale-result.ts",
+ "server-version/backend/src/services/reportFeedbackHints.ts",
+ "server-version/backend/src/services/runtimeObservability.ts",
+ "server-version/frontend/src/components/WholeCompositeQuestionnaire.tsx",
+ "server-version/frontend/src/components/questionnaire/ScalePlayer.tsx",
+ "server-version/frontend/src/modules/composite/report-polling.ts",
+ "server-version/frontend/src/services/persistence/finalDraftStore.ts",
  "server-version/backend/prisma/migrations/20261015010000_composite_report_outbox/migration.sql",
  "server-version/backend/prisma/schema.prisma",
  "server-version/backend/scripts/runtime-table-policy.json",
@@ -32,6 +44,10 @@ export const assessmentCapacitySources=new Set([
  "server-version/frontend/src/modules/composite/types.ts"
 ]);
 export const assessmentCapacityTests=[
+ "src/__tests__/assessment-runtime/assessment-timeline.test.ts",
+ "src/__tests__/assessment-runtime/frozen-reference-batch.test.ts",
+ "src/__tests__/assessment-runtime/reportFeedbackHints.test.ts",
+ "src/__tests__/workers/compositeReportWorker.scheduler.test.ts",
  "src/__tests__/services/boundedAdmissionGate.test.ts",
  "src/__tests__/config/backgroundWorkers.test.ts",
  "src/__tests__/workers/worker-shutdown.test.ts",
@@ -47,6 +63,8 @@ export const assessmentCapacityTests=[
  "src/__tests__/scale/composite-export-projection.test.ts"
 ];
 export const assessmentCapacityFrontendTests=[
+ "src/components/__tests__/WholeCompositeQuestionnaire.test.tsx",
+ "src/modules/composite/__tests__/report-polling.test.ts",
  "src/components/__tests__/FinalCompositeAssessment.test.tsx",
  "src/modules/composite/__tests__/CompositeReportPage.test.tsx"
 ];

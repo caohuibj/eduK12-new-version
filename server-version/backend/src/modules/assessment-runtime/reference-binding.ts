@@ -141,15 +141,42 @@ export const loadFrozenReferenceSets = async (
     },
   })
   const byVersion = new Map(rows.map((row) => [row.referenceVersion, row]))
+  const loadedByVersion = new Map<string, { definition: AssessmentReferenceSetDefinition; hash: string }>()
   return input.bindings.map((binding) => {
-    const row = byVersion.get(binding.referenceVersion)
-    if (!row) throw new Error(`Reference set ${input.instrumentKey}/${binding.referenceVersion} was not found`)
-    const definition = toDefinition(row)
-    const hash = referenceSetHash(definition)
-    if (hash !== binding.referenceHash) {
+    let loaded = loadedByVersion.get(binding.referenceVersion)
+    if (!loaded) {
+      const row = byVersion.get(binding.referenceVersion)
+      if (!row) throw new Error(`Reference set ${input.instrumentKey}/${binding.referenceVersion} was not found`)
+      const definition = toDefinition(row)
+      loaded = { definition: definition.entries.some(entry => entry.governance) ? { ...definition, status: 'ACTIVE' as const } : definition,
+        hash: referenceSetHash(definition) }
+      loadedByVersion.set(binding.referenceVersion, loaded)
+    }
+    if (loaded.hash !== binding.referenceHash) {
       throw new Error(`Reference set ${input.instrumentKey}/${binding.referenceVersion} hash mismatch`)
     }
-    // A frozen binding proves the immutable payload. Lifecycle changes cannot invalidate historical attempts.
-    return definition.entries.some(entry => entry.governance) ? { ...definition, status: 'ACTIVE' as const } : definition
+    return loaded.definition
   })
+}
+
+/** One job-scoped read; no cross-user cache or lifetime beyond this task. */
+export const preloadFrozenReferenceDb = async (
+  db: FrozenReferenceDb,
+  units: Array<{ instrumentType: 'SCALE' | 'COGNITIVE'; instrumentKey: string; bindings: ReferenceBindingSnapshot[] }>,
+): Promise<FrozenReferenceDb> => {
+  const queries = new Map<string, { instrumentType: 'SCALE' | 'COGNITIVE'; instrumentKey: string; referenceVersion: { in: string[] } }>()
+  for (const unit of units) {
+    if (!unit.bindings.length) continue
+    if (unit.bindings.some(binding => binding.referenceKey !== unit.instrumentKey)) throw new Error('Frozen reference key does not match its instrument')
+    const key = `${unit.instrumentType}:${unit.instrumentKey}`
+    const prior = queries.get(key)
+    const versions = [...new Set([...(prior?.referenceVersion.in ?? []), ...unit.bindings.map(binding => binding.referenceVersion)])]
+    queries.set(key, { instrumentType: unit.instrumentType, instrumentKey: unit.instrumentKey, referenceVersion: { in: versions } })
+  }
+  const rows = queries.size ? await db.assessmentReferenceSet.findMany({ where: { OR: [...queries.values()] } }) : []
+  return { assessmentReferenceSet: { findMany: async (args: unknown) => {
+    const where = (args as { where: { instrumentType: string; instrumentKey: string; referenceVersion: { in: string[] } } }).where
+    return rows.filter(row => row.instrumentType === where.instrumentType && row.instrumentKey === where.instrumentKey
+      && where.referenceVersion.in.includes(row.referenceVersion))
+  } } }
 }

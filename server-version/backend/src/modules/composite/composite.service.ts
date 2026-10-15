@@ -1,3 +1,5 @@
+import { readWholeReportFeedbackHint } from '../../services/reportFeedbackHints'
+import { assertNoAcceptedWholeQuestionnaire } from '../assessment-runtime/report-outbox.service'
 import { assessmentReportConfig } from '../../config/assessmentReports'
 import { assertReportJobIdentity, compositeReportJobState, readCompositeReportJob, readCompositeReportJobHeader, retryCompositeReport, REPORT_PARENT_SELECT, type ReportJobIdentity } from '../assessment-runtime/report-outbox.service'
 import { encryptCompositeCollectionReport, decryptCompositeCollectionReport } from './composite-report-cache'
@@ -2615,6 +2617,9 @@ export const restartUserAttempt = async (userId: string, attemptId: string) => {
   if (!existing) throw compositeNotFound('综合测评记录不存在')
   if (existing.userId !== userId) throw compositeForbidden('无权限重启此综合测评')
 
+  // Already accepted whole answers are final; avoid loading new-start eligibility.
+  await assertNoAcceptedWholeQuestionnaire(prisma, attemptId)
+
   // Pure-read (write-time invariant): the student restart path never lazily
   // repairs sections on a published composite. loadComposite already includes
   // formSections + items, so no separate section read is needed.
@@ -2624,6 +2629,7 @@ export const restartUserAttempt = async (userId: string, attemptId: string) => {
 
   const next = await prisma.$transaction(async (tx: Db) => {
     await lockCompositeAttempt(tx, attemptId)
+    await assertNoAcceptedWholeQuestionnaire(tx as Prisma.TransactionClient, attemptId)
     const current = await tx.compositeAssessmentAttempt.findUnique({
       where: { id: attemptId },
       select: {
@@ -2831,6 +2837,9 @@ export const restartPublicAttempt = async (attemptId: string, recoveryTokenHash:
     throw compositeForbidden('公开链接已失效')
   }
 
+  // Already accepted whole answers are final; avoid loading new-start eligibility.
+  await assertNoAcceptedWholeQuestionnaire(prisma, attemptId)
+
   // Pure-read (write-time invariant): the public restart path never lazily
   // repairs sections on a published composite. loadComposite already includes
   // formSections + items, so no separate section read is needed.
@@ -2841,6 +2850,7 @@ export const restartPublicAttempt = async (attemptId: string, recoveryTokenHash:
 
   const next = await prisma.$transaction(async (tx: Db) => {
     await lockCompositeAttempt(tx, attemptId)
+    await assertNoAcceptedWholeQuestionnaire(tx as Prisma.TransactionClient, attemptId)
     const current = await tx.compositeAssessmentAttempt.findUnique({
       where: { id: attemptId },
       select: {
@@ -4773,10 +4783,13 @@ const authorizeReportParticipant = (parent: any, context: { userId?: string; rec
 const reportStatusForHeader = async (parent: any) => {
   const job = parent.asyncReportEpoch === parent.attemptEpoch
     ? await readCompositeReportJobHeader(parent.id, parent.attemptEpoch) : null
+  const feedback = job?.wholeSubmissionId ? readWholeReportFeedbackHint(parent.id, job.wholeSubmissionId) : null
   return {
+    ...(feedback ? { feedbackPollProfile: feedback.profile } : {}),
     attemptId: parent.id, attemptEpoch: parent.attemptEpoch, status: parent.status,
-    hasAcceptedSubmission: Boolean(job),
-    reportStatus: job ? compositeReportJobState(job) : {
+    hasAcceptedSubmission: Boolean(job && (job.wholeSubmissionId || job.requestedRevision > 0)),
+    wholeSubmissionReceived: Boolean(job?.wholeSubmissionId), wholeSubmissionId: job?.wholeSubmissionId ?? null,
+    reportStatus: job ? { ...compositeReportJobState(job), ...(feedback ? { retryAfterSeconds: feedback.retryAfterSeconds } : {}) } : {
       state: parent.status === 'COMPLETED' ? 'READY' : 'WAITING', jobId: null,
       retryAfterSeconds: 2, errorCode: null, completedAt: parent.completedAt,
     },

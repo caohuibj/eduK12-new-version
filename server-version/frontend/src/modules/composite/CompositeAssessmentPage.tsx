@@ -24,6 +24,7 @@ import {
   ProductStatus,
 } from '../../components/product-ui'
 import FinalCompositeAssessment from '../../components/FinalCompositeAssessment'
+import WholeCompositeQuestionnaire from '../../components/WholeCompositeQuestionnaire'
 
 const tokenKey = (token: string) => `composite:recovery:token:${token}`
 const attemptKey = (attemptId: string) =>
@@ -499,7 +500,7 @@ const CompositeAssessmentContent: React.FC = () => {
   }
 
   if (state.deliveryMode === 'FINAL_ONLY') {
-    return (
+    const unitAssessment = (
       <FinalCompositeAssessment
         state={state}
         publicMode={publicMode}
@@ -514,6 +515,11 @@ const CompositeAssessmentContent: React.FC = () => {
         onRestart={restartLegacyAttempt}
       />
     )
+    if (state.productKind === 'QUESTIONNAIRE' && !relationalMode && state.currentItem?.type === 'SCALE') {
+      return <WholeCompositeQuestionnaire state={state} api={api} publicMode={publicMode} recoveryToken={recoveryToken}
+        fallback={unitAssessment} onExit={() => void saveAndExit()} onCompleted={() => goReport(state.id)} />
+    }
+    return unitAssessment
   }
 
   const current = state.currentItem
