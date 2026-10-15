@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {execFileSync,spawnSync} from 'node:child_process';
 import {readFileSync} from 'node:fs';
-import {admitsAssessmentCapacity,assessmentCapacitySources,assessmentCapacityRequired,assessmentCapacityPlan} from './assessment-capacity-scope.mjs';
+import {admitsAssessmentCapacity,assessmentCapacitySources,assessmentCapacityRequired,assessmentCapacityPlan,isolatedCognitiveEnvironmentOnly} from './assessment-capacity-scope.mjs';
 import {changedEntries} from './content-scope.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const sources=[...assessmentCapacitySources],approved={schema:1,files:Object.fromEntries(sources.map(file=>[file,{before:'1'.repeat(40),after:'2'.repeat(40)}]))};
@@ -16,7 +16,7 @@ test('complete immutable source boundary rejects unknown, dependencies, schema, 
  for(const update of [{status:'D',newMode:'000000'},{status:'T'},{oldMode:'120000'},{newMode:'100755'}])assert.equal(admitsAssessmentCapacity([{...entries[0],...update},...entries.slice(1)],read,approved),false);
  for(const ref of ['base','head'])assert.equal(admitsAssessmentCapacity(entries,(r,f)=>r===ref&&f===sources[0]?'3'.repeat(40):read(r,f),approved),false);
 });
-const plan={schema:1,route:'assessment-capacity',base:'a'.repeat(40),head:'b'.repeat(40),changed:['frontend','backend'],components:{frontend:'c'.repeat(40),backend:'d'.repeat(40)},tests:['test'],frontendTests:['test'],focusedTests:['test'],required:assessmentCapacityRequired,assessmentCapacityPlan};
+const plan={schema:1,route:'assessment-capacity',base:'a'.repeat(40),head:'b'.repeat(40),changed:['frontend','backend'],components:{frontend:'c'.repeat(40),backend:'d'.repeat(40)},tests:['test'],frontendTests:['test'],focusedTests:['test'],required:assessmentCapacityRequired,assessmentCapacityPlan,isolatedCognitiveEnvironmentOnly};
 const outputs={application_route:plan.route,scenario:plan.route,assessment_capacity_plan:JSON.stringify(plan),codeql:'true',frontend_build:'true',ui_required:'false',media_selection:'[]',media_groups:'[]',
  ...Object.fromEntries(['media2','media7','situational_video','situational_branching','video_core','app_shell','canonical_visual','perf_smoke','ops'].map(k=>[k,'false']))};
 const needs={scope:{result:'success',outputs},'assessment-capacity':{result:'success'},codeql:{result:'success'}};
@@ -57,4 +57,11 @@ test('actual merge gate CLI recomputes the frozen plan and rejects a different h
  assert.deepEqual(JSON.parse(valid.stdout),{required:['scope','assessment-capacity','codeql'],failed:[]});
  const stale=invoke({...actual,head:'0'.repeat(40)});assert.equal(stale.status,1,stale.stderr);
  assert.ok(JSON.parse(stale.stdout).failed.includes('recomputed-assessment-capacity-plan'));
+});
+
+test('compiler reuse admits only the frozen isolated cognitive test flag correction',()=>{
+ const b=JSON.parse(readFileSync(new URL('./assessment-capacity-bindings.json',import.meta.url),'utf8')).compilationReuseTransition;
+ const after=readFileSync(new URL('./assessment-capacity-candidate.py',import.meta.url),'utf8');
+ assert.equal(isolatedCognitiveEnvironmentOnly(after,b.candidateBefore),true);
+ for(const modified of [after+'unknown',after.replace('RUN npx tsc','RUN true'),after.replace("'HIGH,CRITICAL'","'CRITICAL'")])assert.equal(isolatedCognitiveEnvironmentOnly(modified,b.candidateBefore),false);
 });

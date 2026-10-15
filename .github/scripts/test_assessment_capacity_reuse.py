@@ -25,14 +25,16 @@ class Refusal(unittest.TestCase):
   self.assertTrue(m.valid_source(run,artifact,123))
   for change in [{'event':'push'},{'path':'other.yml'},{'pull_requests':[{'number':456}]}]:self.assertFalse(m.valid_source({**run,**change},artifact,123))
   self.assertFalse(m.valid_source(run,{**artifact,'expired':True},123))
- def test_backend_only_reviewed_transition_cannot_accept_backend_proof(self):
-  inputs,old=self.fixture()
-  current={'tool':'new','builds':{'frontend':'new-front','backend':'new-back'},'tests':{},'extra':'new-extra',
-   'frontendCompatibleInputs':{'tool':'t','builds':{'frontend':'a'},'tests':{'test':'c'},'extra':'d'}}
-  self.assertEqual(m.eligible(old,current),{'builds':['frontend'],'tests':['test'],'extra':True})
-  current['frontendCompatibleInputs']['builds']['frontend']='different-production'
-  self.assertEqual(m.eligible(old,current)['builds'],[])
-  current['frontendCompatibleInputs']['tool']='unknown'
+ def test_only_frozen_test_environment_correction_reuses_builds_and_frontend(self):
+  inputs,old=self.fixture();now=datetime.datetime.now(datetime.timezone.utc).isoformat()
+  old['inputs']['tests']={'src/components/example.test.tsx':'front','src/__tests__/backend.test.ts':'back'}
+  old['tests']={k:{'status':'success','at':now} for k in old['inputs']['tests']}
+  compatible={**inputs,'tests':dict(old['inputs']['tests'])}
+  current={'tool':'new','builds':{},'tests':{},'extra':'new','compatibleCompilationInputs':compatible}
+  self.assertEqual(m.eligible(old,current),{'builds':['frontend','backend'],'tests':['src/components/example.test.tsx'],'extra':True})
+  current['compatibleCompilationInputs']={**compatible,'builds':{**compatible['builds'],'backend':'changed'}}
+  self.assertEqual(m.eligible(old,current)['builds'],['frontend'])
+  current['compatibleCompilationInputs']['tool']='unknown'
   self.assertEqual(m.eligible(old,current),{'builds':[],'tests':[],'extra':False})
  def test_zip_slip_is_rejected_before_extraction(self):
   for name in ['../escaped','assessment-capacity-evidence/../../escaped','/absolute','unknown']:

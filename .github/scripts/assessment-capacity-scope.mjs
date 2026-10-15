@@ -99,13 +99,25 @@ export function admitsAssessmentCapacity(entries,read,approved=bindings){
  }
  return true;
 }
+export function isolatedCognitiveEnvironmentOnly(after,beforeBlob){
+ if(!/^[a-f0-9]{40}$/.test(beforeBlob||''))return false;
+ const before="env=['CI=true','NODE_ENV=test'",current="env=['COGNITIVE_MODULE_ENABLED=true','CI=true','NODE_ENV=test'";
+ if(after.split(current).length!==2)return false;
+ return execFileSync('git',['hash-object','--stdin'],{input:after.replace(current,before),encoding:'utf8'}).trim()===beforeBlob;
+}
 export const assessmentCapacityRequired=['frozen-boundary','affected-components-compile','canonical-submit-scoring-authority','durable-outbox-crash-recovery','new-schema-restore','compose-overrides','runtime-scans','report-feedback-browser','sast'];
 export function assessmentCapacityPlan(entries,base,head){
  if(!/^[a-f0-9]{40}$/.test(base)||!/^[a-f0-9]{40}$/.test(head))throw Error('Full source SHAs required');
  if(!admitsAssessmentCapacity(entries,(ref,file)=>blob(ref==='base'?base:head,file)))return null;
  for(const path of ['server-version/frontend/src/survey','server-version/frontend/src/huiteacher','server-version/frontend/src/App.tsx','server-version/backend/src/index.ts','server-version/backend/package-lock.json','server-version/frontend/package-lock.json'])
   if(blob(base,path)!==blob(head,path))return null;
- return {schema:1,route:'assessment-capacity',base,head,changes:entries,changed:['frontend','backend'],
+ const transition=bindings.compilationReuseTransition;
+ if(transition){
+  if(blob(head,'.github/scripts/assessment-capacity-candidate.py')!==transition.candidateAfter
+    ||blob(head,'.github/scripts/assessment-capacity-reuse.py')!==transition.verifierAfter
+    ||!isolatedCognitiveEnvironmentOnly(execFileSync('git',['show',head+':.github/scripts/assessment-capacity-candidate.py'],{encoding:'utf8'}),transition.candidateBefore))return null;
+ }
+ return {schema:1,route:'assessment-capacity',base,head,...(transition?{compilationReuseTransition:transition}:{}),changes:entries,changed:['frontend','backend'],
   components:{frontend:blob(head,'server-version/frontend'),backend:blob(head,'server-version/backend')},
   tests:assessmentCapacityTests,focusedTests:assessmentCapacityFocusedTests,frontendTests:assessmentCapacityFrontendTests,required:assessmentCapacityRequired};
 }

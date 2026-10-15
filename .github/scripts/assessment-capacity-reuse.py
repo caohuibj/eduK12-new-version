@@ -30,6 +30,14 @@ def fingerprint(plan, tool_refs=None):
     recovery_files=['.github/scripts/assessment-capacity-recovery.py','server-version/backend/src/__tests__/integration/report-outbox-fixture.ts','server-version/backend/src/__tests__/integration/mini-scale-definition.ts']
     recovery=sha(json.dumps([builds['backend'],[(f,subprocess.check_output(['git','rev-parse',plan['head']+':'+f],text=True).strip()) for f in recovery_files]]).encode())
     result={'tool':tool,'builds':builds,'tests':tests,'extra':sha(json.dumps([tool,extra]).encode()),'recovery':recovery}
+    transition=plan.get('compilationReuseTransition')
+    if transition and tool_refs is None:
+        # A frozen one-line isolated-test environment correction consumes no
+        # compiler, runtime, frontend or Compose input. Backend test commands
+        # do consume the changed environment and are never inherited here.
+        previous={tools[0]:transition['candidateBefore'],tools[1]:transition['verifierBefore']}
+        without={k:v for k,v in plan.items() if k!='compilationReuseTransition'}
+        result['compatibleCompilationInputs']=fingerprint(without,previous)
     return result
 
 def recent(value, now=None):
@@ -39,16 +47,16 @@ def recent(value, now=None):
     return datetime.timedelta(0)<=age<datetime.timedelta(hours=24)
 
 def eligible(old,current,environment=None):
+    compatible=False
     if old.get('inputs',{}).get('tool')!=current['tool']:
-        compatible=current.get('frontendCompatibleInputs',{})
-        if compatible.get('tool')!=old.get('inputs',{}).get('tool'):return {'builds':[], 'tests':[], 'extra':False}
-        current=compatible
-        components=['frontend']
-    else:components=['frontend','backend']
-    builds=[c for c in components if old['inputs']['builds'].get(c)==current['builds'][c]
+        previous=current.get('compatibleCompilationInputs',{})
+        if previous.get('tool')!=old.get('inputs',{}).get('tool'):return {'builds':[], 'tests':[], 'extra':False}
+        current=previous;compatible=True
+    builds=[c for c in ['frontend','backend'] if old['inputs']['builds'].get(c)==current['builds'][c]
         and old.get('compile',{}).get(c,{}).get('status')=='success' and recent(old['compile'][c].get('at'))]
     if environment and old.get('environment',{}).get('node')!=environment.get('node'):builds=[]
     tests=[key for key,value in current['tests'].items() if old['inputs']['tests'].get(key)==value
+        and (not compatible or key.startswith('src/components/') or key.startswith('src/modules/'))
         and old.get('tests',{}).get(key,{}).get('status')=='success' and recent(old['tests'][key].get('at'))]
     if environment and old.get('environment')!=environment:tests=[]
     extra=old['inputs'].get('extra')==current['extra'] and old.get('extra',{}).get('status')=='success' and recent(old['extra'].get('at'))
