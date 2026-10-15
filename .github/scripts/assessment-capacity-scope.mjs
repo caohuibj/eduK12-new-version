@@ -99,11 +99,15 @@ export function admitsAssessmentCapacity(entries,read,approved=bindings){
  }
  return true;
 }
-export function isolatedCognitiveEnvironmentOnly(after,beforeBlob){
+export function isolatedTestRunnerCorrectionsOnly(after,beforeBlob){
  if(!/^[a-f0-9]{40}$/.test(beforeBlob||''))return false;
- const before="env=['CI=true','NODE_ENV=test'",current="env=['COGNITIVE_MODULE_ENABLED=true','CI=true','NODE_ENV=test'";
- if(after.split(current).length!==2)return false;
- return execFileSync('git',['hash-object','--stdin'],{input:after.replace(current,before),encoding:'utf8'}).trim()===beforeBlob;
+ const replacements=[
+  ["env=['CI=true','NODE_ENV=test'","env=['COGNITIVE_MODULE_ENABLED=true','CI=true','NODE_ENV=test'"],
+  ["passed=len(suites)==1 and bool(assertions)","passed=len(suites)==1 and suites[0].get('status')=='passed' and bool(assertions)"],
+  ["['--no-file-parallelism','--reporter=json','--outputFile=/evidence/backend-tests.json']","['--no-file-parallelism','--reporter=default','--reporter=json','--outputFile=/evidence/backend-tests.json']"],
+ ];
+ for(const [before,current] of replacements){if(after.split(current).length!==2)return false;after=after.replace(current,before)}
+ return execFileSync('git',['hash-object','--stdin'],{input:after,encoding:'utf8'}).trim()===beforeBlob;
 }
 export const assessmentCapacityRequired=['frozen-boundary','affected-components-compile','canonical-submit-scoring-authority','durable-outbox-crash-recovery','new-schema-restore','compose-overrides','runtime-scans','report-feedback-browser','sast'];
 export function assessmentCapacityPlan(entries,base,head){
@@ -115,7 +119,7 @@ export function assessmentCapacityPlan(entries,base,head){
  if(transition){
   if(blob(head,'.github/scripts/assessment-capacity-candidate.py')!==transition.candidateAfter
     ||blob(head,'.github/scripts/assessment-capacity-reuse.py')!==transition.verifierAfter
-    ||!isolatedCognitiveEnvironmentOnly(execFileSync('git',['show',head+':.github/scripts/assessment-capacity-candidate.py'],{encoding:'utf8'}),transition.candidateBefore))return null;
+    ||!isolatedTestRunnerCorrectionsOnly(execFileSync('git',['show',head+':.github/scripts/assessment-capacity-candidate.py'],{encoding:'utf8'}),transition.candidateBefore))return null;
  }
  return {schema:1,route:'assessment-capacity',base,head,...(transition?{compilationReuseTransition:transition}:{}),changes:entries,changed:['frontend','backend'],
   components:{frontend:blob(head,'server-version/frontend'),backend:blob(head,'server-version/backend')},

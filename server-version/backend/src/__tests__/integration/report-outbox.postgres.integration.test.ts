@@ -59,6 +59,8 @@ suite('durable report outbox on isolated PostgreSQL', () => {
 
   afterAll(async () => {
     if (db) {
+      // Delete attempts before definition items: the child item FK is RESTRICT.
+      await db.compositeAssessmentAttempt.deleteMany({ where: { id: { in: attempts } } })
       await db.compositeAssessment.deleteMany({ where: { id: { in: composites } } })
       await db.scale.deleteMany({ where: { id: { in: scales } } })
       await db.user.deleteMany({ where: { id: { in: users } } })

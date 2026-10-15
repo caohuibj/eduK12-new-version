@@ -26,7 +26,7 @@ def capture_tests(report,selected):
         file,title=(key.split('::',1)+[None])[:2] if '::' in key else (key,None)
         suites=[s for s in data.get('testResults',[]) if s['name'].endswith(file)]
         assertions=[a for s in suites for a in s.get('assertionResults',[]) if title is None or a['title']==title]
-        passed=len(suites)==1 and bool(assertions) and all(a['status']=='passed' for a in assertions)
+        passed=len(suites)==1 and suites[0].get('status')=='passed' and bool(assertions) and all(a['status']=='passed' for a in assertions)
         if not passed:
             print('FAILED '+key,flush=True)
             for suite in suites:
@@ -123,7 +123,7 @@ with tempfile.TemporaryDirectory(prefix='assessment-capacity-') as temporary:
                     missing=[key for key in p['tests'] if key not in matches['tests']]
                     if missing:
                         report=evidence/'backend-tests.json'
-                        try:phase('affected-backend-tests',lambda:run(docker+[builder,'npx','vitest','run']+missing+['--no-file-parallelism','--reporter=json','--outputFile=/evidence/backend-tests.json'],900))
+                        try:phase('affected-backend-tests',lambda:run(docker+[builder,'npx','vitest','run']+missing+['--no-file-parallelism','--reporter=default','--reporter=json','--outputFile=/evidence/backend-tests.json'],900))
                         finally:capture_tests(report,missing)
                     require_tests(p['tests'])
                     prior_recovery=receipt['checks'].get('recovery',{}) if receipt else {}
