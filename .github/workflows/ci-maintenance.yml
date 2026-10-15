@@ -47,6 +47,60 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+      - name: Select frozen standalone database memory repair
+        id: backupscope
+        env:
+          DIFF_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          python3 - <<'PY_SCOPE'
+          import hashlib,json,os,subprocess
+          expected={'server-version/scripts/host-ops/backup.py': '1c7a112c770fa28ed8280e5f2b7570e594e69441a883d989049f08435bc65cb5', 'server-version/scripts/host-ops/backup-crypto.mjs': 'bd33e674c6af82c4f22f135801e25bb45a6754e636dcac8b46cbe106b85a855a', 'server-version/scripts/host-ops/backup-config.example.json': '694e4ecc83d98aae9f4a2a97f866759d6b25720b325ad482fcd649254d9cfd8a', 'server-version/scripts/host-ops/backup-cos.test.mjs': '76d16b5ebf0db69a4a80c3df759a15abe01c888f809101d8d49603b48765d545', 'server-version/scripts/host-ops/ci-backup-smoke.py': '77f6ba1cf7acc1c6087ea9de4bbe787325f3e70f55f0e40dad8adb7994ff3932', 'server-version/scripts/host-ops/test_backup.py': 'c286e2c93608cb555d0c18bd8fba35fea216ed35c3ed0a54f26296c0d717fdcb', 'server-version/scripts/host-ops/BACKUP-AUTOMATION.md': '13182f925f4a4ee0fb24b215acd4f1654b2794495c07d480d8f965441deeccbd'}
+          base=os.environ.get('DIFF_BASE','')
+          selected=False
+          if len(base)==40:
+              rows=subprocess.check_output(['git','diff','--raw','--no-renames',base,'HEAD'],text=True).splitlines()
+              changes=[]
+              for row in rows:
+                  metadata,path=row.split('\t');parts=metadata.split()
+                  if parts[0]!=':100644' or parts[1]!='100644' or parts[-1]!='M':break
+                  changes.append(path)
+              else:
+                  selected=set(changes)==set(expected)|{'.github/workflows/ci-maintenance.yml'} and all(hashlib.sha256(open(path,'rb').read()).hexdigest()==digest for path,digest in expected.items())
+          with open(os.environ['GITHUB_OUTPUT'],'a') as out:out.write('backup_only='+str(selected).lower()+'\n')
+          print('Frozen database backup scope: '+str(selected))
+          PY_SCOPE
+      - name: Verify only affected encrypted backup contracts
+        if: steps.backupscope.outputs.backup_only == 'true'
+        run: |
+          git diff --check
+          python3 -B -m unittest discover -s server-version/scripts/host-ops -p test_backup.py -v
+          python3 -B -m unittest discover -s server-version/scripts/host-ops -p test_backup_fixture_environment.py -v
+          node --test server-version/scripts/host-ops/backup-cos.test.mjs
+          node --check server-version/scripts/host-ops/backup-crypto.mjs
+      - name: Verify streamed database restore and failure-volume cleanup
+        if: steps.backupscope.outputs.backup_only == 'true'
+        run: |
+          docker pull postgres:16.15-bookworm
+          sudo env PATH="$PATH" CI=true GITHUB_ACTIONS=true NODE_ENV=test python3 -B server-version/scripts/host-ops/ci-backup-smoke.py
+      - name: Save exact backup source and input receipt
+        if: steps.backupscope.outputs.backup_only == 'true'
+        run: |
+          git archive --format=tar HEAD server-version/scripts/host-ops server-version/scripts/backup server-version/scripts/attachment-backup/core.mjs > backup-memory-source.tar
+          python3 - <<'PY_RECEIPT'
+          import hashlib,json,subprocess
+          from pathlib import Path
+          paths=['server-version/scripts/host-ops','server-version/scripts/backup','server-version/scripts/attachment-backup/core.mjs','.github/workflows/ci-maintenance.yml']
+          receipt={'source':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'archiveSha256':hashlib.sha256(Path('backup-memory-source.tar').read_bytes()).hexdigest(),'inputs':{p:subprocess.check_output(['git','rev-parse','HEAD:'+p],text=True).strip() for p in paths},'node':subprocess.check_output(['node','--version'],text=True).strip(),'actualIsolatedRestore':'PASS','scope':'frozen database backup memory repair'}
+          Path('backup-memory-receipt.json').write_text(json.dumps(receipt,indent=2))
+          PY_RECEIPT
+      - uses: actions/upload-artifact@v4
+        if: steps.backupscope.outputs.backup_only == 'true'
+        with:
+          name: backup-memory-${{ github.sha }}
+          path: |
+            backup-memory-source.tar
+            backup-memory-receipt.json
+          retention-days: 3
       - name: Qualify reviewed operations merge evidence
         id: mergequalified
         if: inputs.merge_proof
@@ -200,10 +254,10 @@ jobs:
           node --check server-version/scripts/cos-cleanup/sdk-smoke.mjs
           node --test .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs
       - name: CI routing and attachment invariants
-        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true'
+        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true' && steps.backupscope.outputs.backup_only != 'true'
         run: node --test .github/scripts/runner-preflight.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/api-response.test.mjs .github/scripts/mac-ci-cleanup.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-image-plan.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs .github/scripts/dependency-routing.test.mjs server-version/scripts/attachment-backup/core.test.mjs server-version/scripts/backup/cleanup-restore-container.test.mjs
       - name: Host launcher and existing monitoring guards
-        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true'
+        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true' && steps.backupscope.outputs.backup_only != 'true'
         run: |
           python3 -B -m unittest discover -s server-version/scripts/attachment-backup -p 'test_*.py' -v
           python3 -B -m unittest discover -s server-version/scripts/host-ops -p 'test_*.py' -v
@@ -216,7 +270,7 @@ jobs:
           node --check server-version/scripts/cos-cleanup/recovery.mjs
           node --check server-version/scripts/cos-cleanup/recovery-smoke.mjs
       - name: Check shell and systemd units without starting production services
-        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true'
+        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true' && steps.backupscope.outputs.backup_only != 'true'
         run: |
           bash -n server-version/scripts/attachment-backup/install.sh
           bash -n server-version/scripts/host-ops/install.sh
@@ -233,13 +287,13 @@ jobs:
           sudo install -D -m 644 server-version/scripts/cos-cleanup/recovery.py /opt/eduk12-cos-cleanup/current/recovery.py
           sudo systemd-analyze verify server-version/scripts/cos-cleanup/systemd/*
       - name: Real isolated Docker launcher and failed-task cleanup
-        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true'
+        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true' && steps.backupscope.outputs.backup_only != 'true'
         run: |
           docker pull node:24.21.0-bookworm-slim
           sudo env CI=true GITHUB_ACTIONS=true NODE_ENV=test python3 -B server-version/scripts/attachment-backup/ci-container-smoke.py
           sudo env CI=true GITHUB_ACTIONS=true NODE_ENV=test python3 -B server-version/scripts/cos-cleanup/ci-container-smoke.py
       - name: Actual encrypted database restore and failure-volume cleanup
-        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true'
+        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true' && steps.backupscope.outputs.backup_only != 'true'
         run: |
           docker pull postgres:16.15-bookworm
           sudo env PATH="$PATH" CI=true GITHUB_ACTIONS=true NODE_ENV=test python3 -B server-version/scripts/host-ops/ci-backup-smoke.py

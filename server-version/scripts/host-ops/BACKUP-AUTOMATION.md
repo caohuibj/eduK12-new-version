@@ -2,8 +2,10 @@
 
 Standalone host maintenance; separate from application deployment and from the
 observe-only monitor installer. No business/Compose/DB schema changes and no COS
-delete operation. Uses the deployed exact-revision encrypted DB backup/restore
-scripts unchanged. A source change to those scripts retains its existing CI gates.
+delete operation. Keeps the deployed legacy backup/restore scripts pinned and unchanged as the v1
+format reference, and binds release migrations to the actual source revision. The
+host crypto helper streams the same authenticated v1 envelope and restoration
+input through bounded private-file buffers. Receipts record its exact SHA-256.
 
 Buckets: `ptool-videos-edu-1393949445` is the media source; every new host backup
 writes only to private/versioned `eduk12-backups-1393949445`, `host-backups/v1/`.
@@ -41,8 +43,9 @@ do not make the host launcher an unprivileged service.
 New local copies retain the latest two verified cloud-backed/restored points.
 Rotation verifies hashes, exact UUID paths and allowed filenames; failures retain
 all prior copies. Existing release backups are outside this rotation. At least
-6 GiB free disk required before starting; DB envelope capped at 512 MiB and config
-archive at 32 MiB. The host process is bounded to 1536 MiB/0.5 CPU/40 minutes.
+6 GiB or six times the configured envelope limit (whichever is larger) free disk
+required before starting; DB envelope defaults to a bounded 2 GiB with 12 GiB
+headroom, and config archive stays at 32 MiB. The host process is bounded to 1536 MiB/0.5 CPU/40 minutes.
 Verify future DB growth against this budget; limits stop rather than delete backups.
 
 Cloud retention remains **plan_only**: daily 30 days, weekly 12 weeks, monthly 12

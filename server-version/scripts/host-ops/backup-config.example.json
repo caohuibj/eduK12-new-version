@@ -3,8 +3,8 @@
   "sourceBucket": "ptool-videos-edu-1393949445",
   "backupBucket": "eduk12-backups-1393949445",
   "region": "ap-beijing",
-  "maxBackupBytes": 536870912,
-  "minimumFreeBytes": 6442450944,
+  "maxBackupBytes": 2147483648,
+  "minimumFreeBytes": 12884901888,
   "localCopies": 2,
   "cleanupMode": "plan_only",
   "retention": {
