@@ -17,9 +17,29 @@ export const resolveBackgroundWorkersEnabled = (
   throw new Error(`❌ BACKGROUND_WORKERS_ENABLED must be 'true' or 'false' (got '${raw}')`)
 }
 
+/** Video uploads/transcoding are a manually confirmed, idle NIGHT operation.
+ * Keep video consumers off during daytime answer/report traffic. No scheduler
+ * can infer that thinking participants are idle from an empty job queue.
+ */
+export const resolveVideoProcessingEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => {
+  const enabled = env.VIDEO_PROCESSING_ENABLED ?? 'false'
+  if (!['true', 'false'].includes(enabled)) throw new Error('VIDEO_PROCESSING_ENABLED must be true or false')
+  return enabled === 'true' && env.VIDEO_MAINTENANCE_IDLE_CONFIRMED === 'true'
+}
+
+export const resolveHeavyProcessingEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => {
+  const enabled = env.HEAVY_PROCESSING_ENABLED ?? 'false'
+  if (!['true', 'false'].includes(enabled)) throw new Error('HEAVY_PROCESSING_ENABLED must be true or false')
+  return enabled === 'true' && env.HEAVY_MAINTENANCE_IDLE_CONFIRMED === 'true'
+}
+
 const loadBackgroundWorkers = async (): Promise<void> => {
+  if (!resolveHeavyProcessingEnabled()) {
+    logger.info('Heavy media/export consumers are paused; report processing remains independent')
+    return
+  }
   await Promise.all([
-    import('../workers/videoProcessorOptimized'),
+    ...(resolveVideoProcessingEnabled() ? [import('../workers/videoProcessorOptimized')] : []),
     import('../workers/exportProcessor'),
     import('../workers/imageProcessor'),
   ])

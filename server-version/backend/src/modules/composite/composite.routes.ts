@@ -1,3 +1,4 @@
+import { observeWholeMiddleware } from '../../services/runtimeObservability'
 import { assessmentExportHttp } from '../../services/assessmentExportHttp'
 import { runOrLegacyRespondentAccess } from '../assessment-run/runtimeAccess'
 import { Router, type NextFunction, type Request, type Response } from 'express'
@@ -58,6 +59,8 @@ const relationalFinalConsentGuard = async (req: Request, res: Response, next: Ne
 
 router.get('/available', authenticate, requireRole(UserRole.STUDENT), compositeController.available)
 router.get('/attempts/:attemptId', authenticate, respondentAttemptAccess, compositeController.getAttempt)
+router.get('/attempts/:attemptId/whole/definition', authenticate, respondentAttemptAccess, compositeController.wholeDefinition)
+router.post('/attempts/:attemptId/whole/submit', observeWholeMiddleware('whole.identity_auth', authenticate), observeWholeMiddleware('whole.respondent_gate', respondentAttemptAccess), observeWholeMiddleware('whole.relational_consent', relationalFinalConsentGuard), compositeController.wholeSubmit)
 router.get('/attempts/:attemptId/form-sections/:sectionId/assets/:assetId/content', authenticate, respondentAttemptAccess, compositeImageController.authenticatedFormImage)
 router.get('/attempts/:attemptId/items/:itemId/scale/assets/:assetId/content', authenticate, respondentAttemptAccess, compositeImageController.authenticatedScaleImage)
 router.post('/attempts/:attemptId/form-sections/:sectionId/items/:itemId/options/:optionIndex/video-capability', authenticate, respondentAttemptAccess, compositeVideoController.authenticatedFormVideo)
@@ -75,6 +78,8 @@ router.post('/attempts/:attemptId/items/:itemId/scale/answer', authenticate, req
 router.post('/attempts/:attemptId/items/:itemId/scale/complete', authenticate, requireRole(UserRole.STUDENT), legacyWriteDisabled)
 router.post('/attempts/:attemptId/items/:itemId/form-answer', authenticate, requireRole(UserRole.STUDENT), legacyWriteDisabled)
 router.post('/attempts/:attemptId/bundle-retry', authenticate, respondentAttemptAccess, relationalGenericReportGuard, compositeController.retryBundle)
+router.get('/attempts/:attemptId/report-status', authenticate, respondentAttemptAccess, relationalGenericReportGuard, compositeController.reportStatus)
+router.post('/attempts/:attemptId/report-retry', authenticate, respondentAttemptAccess, relationalGenericReportGuard, compositeController.retryReport)
 router.get('/attempts/:attemptId/report', authenticate, respondentAttemptAccess, relationalGenericReportGuard, compositeController.report)
 router.get('/attempts/:attemptId/analysis-export', authenticate, requireRole(UserRole.STUDENT), relationalGenericReportGuard, compositeController.analysisExport)
 router.get('/attempts/:attemptId/snapshots', authenticate, requireTeacher, compositeController.snapshots)
@@ -114,6 +119,7 @@ router.post('/:id/export', authenticate, requireTeacher, compositeExportControll
 router.get('/:id/export/files/:fileName', authenticate, requireTeacher, compositeExportController.download)
 
 router.get('/:id/attempts', authenticate, requireTeacher, compositeController.listAttempts)
+router.get('/:id/attempts/:attemptId/report-status', authenticate, requireTeacher, relationalGenericReportGuard, compositeController.teacherReportStatus)
 router.get('/:id/attempts/:attemptId/report', authenticate, requireTeacher, relationalGenericReportGuard, compositeController.teacherReport)
 router.get('/:id/attempts/:attemptId/analysis-export', authenticate, requireTeacher, relationalGenericReportGuard, compositeController.teacherAnalysisExport)
 

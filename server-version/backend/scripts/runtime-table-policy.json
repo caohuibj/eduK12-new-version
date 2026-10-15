@@ -194,6 +194,8 @@
     "survey_waves": "RUNTIME_RW",
     "teacher_codes": "RUNTIME_RW",
     "users": "RUNTIME_RW",
-    "videos": "RUNTIME_RW"
+    "videos": "RUNTIME_RW",
+    "composite_report_jobs": "RUNTIME_RW",
+    "composite_report_queue_budget": "RUNTIME_RW"
   }
 }

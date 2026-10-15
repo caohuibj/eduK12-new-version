@@ -19,6 +19,11 @@ const req = (partial: Partial<Request> & { method?: string; path?: string; baseU
 } as Request)
 
 describe('publicAssessmentRateLimit helpers', () => {
+  it('charges report recovery to FINAL and lightweight status to GET', () => {
+    expect(classifyPublicAssessmentBudget(req({ method: 'POST', path: '/composite-assessments/attempts/a/report-retry' }))).toBe('final')
+    expect(classifyPublicAssessmentBudget(req({ method: 'GET', path: '/composite-assessments/attempts/a/report-status' }))).toBe('get')
+  })
+
   it('classifies start/submit/restart POST paths as FINAL and reads as GET', () => {
     expect(classifyPublicAssessmentBudget(req({
       method: 'POST',

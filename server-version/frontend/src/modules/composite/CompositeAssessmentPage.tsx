@@ -1,3 +1,4 @@
+import { runWithCompletionRetry } from '../../services/completionRetry'
 import { usePageSignal } from '../../hooks/usePageSignal'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
@@ -23,6 +24,7 @@ import {
   ProductStatus,
 } from '../../components/product-ui'
 import FinalCompositeAssessment from '../../components/FinalCompositeAssessment'
+import WholeCompositeQuestionnaire from '../../components/WholeCompositeQuestionnaire'
 
 const tokenKey = (token: string) => `composite:recovery:token:${token}`
 const attemptKey = (attemptId: string) =>
@@ -119,7 +121,7 @@ const CompositeAssessmentContent: React.FC = () => {
   const applyState = (next: CompositeAttemptState) => {
     if (pageSignal().aborted) return
     setState(next)
-    if (next.status === 'COMPLETED') {
+    if (next.status === 'COMPLETED' || next.allUnitsSubmitted) {
       goReport(next.id)
       return
     }
@@ -146,7 +148,7 @@ const CompositeAssessmentContent: React.FC = () => {
       return
     }
     try {
-      const response = await (publicMode
+      const response = await runWithCompletionRetry(() => publicMode
         ? publicCompositeApi(credential).getAttempt(id)
         : compositeApi.getAttempt(id))
       if (signal.aborted) return
@@ -498,7 +500,7 @@ const CompositeAssessmentContent: React.FC = () => {
   }
 
   if (state.deliveryMode === 'FINAL_ONLY') {
-    return (
+    const unitAssessment = (
       <FinalCompositeAssessment
         state={state}
         publicMode={publicMode}
@@ -513,6 +515,11 @@ const CompositeAssessmentContent: React.FC = () => {
         onRestart={restartLegacyAttempt}
       />
     )
+    if (state.productKind === 'QUESTIONNAIRE' && !relationalMode && state.currentItem?.type === 'SCALE') {
+      return <WholeCompositeQuestionnaire state={state} api={api} publicMode={publicMode} recoveryToken={recoveryToken}
+        fallback={unitAssessment} onExit={() => void saveAndExit()} onCompleted={() => goReport(state.id)} />
+    }
+    return unitAssessment
   }
 
   const current = state.currentItem

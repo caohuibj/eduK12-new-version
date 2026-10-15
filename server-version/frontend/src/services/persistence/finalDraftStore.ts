@@ -12,6 +12,7 @@ export type FinalDraftInstrument =
   | 'cognitive'
   | 'questionnaire-form-section'
   | 'composite-form-section'
+  | 'composite-whole'
   | 'situational'
 
 export type FinalDraftStatus =

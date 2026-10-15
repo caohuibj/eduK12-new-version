@@ -119,7 +119,55 @@ export interface CompositeCurrentItem {
   }
 }
 
+export interface CompositeReportJobState {
+  state: 'PENDING' | 'PROCESSING' | 'WAITING' | 'READY' | 'FAILED' | 'CANCELLED'
+  jobId: string | null
+  retryAfterSeconds: number
+  errorCode: string | null
+  completedAt: string | null
+}
+
+
+export interface WholeQuestionnaireDefinition {
+  attemptId: string
+  attemptEpoch: number
+  slotSetHash: string
+  contextSnapshotHash: string | null
+  units: Array<{ itemId: string; scaleAssessmentId: string; definitionHash: string; scale: CompositeScale }>
+}
+export interface WholeQuestionnaireInput {
+  submissionId: string
+  attemptEpoch: number
+  slotSetHash: string
+  contextSnapshotHash: string | null
+  units: Array<{ itemId: string; definitionHash: string; deviceInputProvenance?: DeviceInputProvenanceV1;
+    answers: Array<{ itemCode: string; responseValue: string | number; responseTimeMs?: number; changeCount?: number }> }>
+}
+export interface WholeQuestionnaireReceipt {
+  feedbackPollProfile?: 'FAST_START' | 'QUEUED'
+  status: 'ACCEPTED'
+  attemptId: string
+  submissionId: string
+  payloadHash: string
+  acceptedAt: string
+  committedAt: string
+  replayed: boolean
+}
+
+export interface CompositeReportStatus {
+  feedbackPollProfile?: 'FAST_START' | 'QUEUED'
+  wholeSubmissionReceived?: boolean
+  wholeSubmissionId?: string | null
+  attemptId: string
+  attemptEpoch: number
+  status: string
+  hasAcceptedSubmission: boolean
+  reportStatus: CompositeReportJobState
+}
+
 export interface CompositeAttemptState {
+  allUnitsSubmitted?: boolean
+  reportStatus?: CompositeReportJobState
   productKind?: string
   reportMode?: string
   id: string

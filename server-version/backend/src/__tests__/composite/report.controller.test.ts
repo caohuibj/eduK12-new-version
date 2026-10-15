@@ -1,3 +1,4 @@
+import { QuestionnaireCompletionAdmissionBusyError } from '../../services/questionnaireCompletionAdmission'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { UserRole } from '@prisma/client'
 
@@ -5,6 +6,9 @@ const { mockService, mockBuildExport } = vi.hoisted(() => ({
   mockService: {
     isCompositeError: vi.fn(() => false),
     getReport: vi.fn(),
+    getCompositeReportStatus: vi.fn(),
+    retryCompositeQuestionnaireReport: vi.fn(),
+    getCompositeReportStatusForTeacher: vi.fn(),
     getReportForTeacher: vi.fn(),
     getAnalysisExportForParticipant: vi.fn(),
     getAnalysisExportForTeacher: vi.fn(),
@@ -43,6 +47,27 @@ beforeEach(() => {
 })
 
 describe('PR9 composite report controller', () => {
+  it.each([
+    new QuestionnaireCompletionAdmissionBusyError('queue_full', 2),
+    { code: 'P2024' }, { code: 'P2034' }, { code: '40001' },
+  ])('returns an explicit retryable 503 for known report capacity errors', async busy => {
+    mockService.getReport.mockRejectedValueOnce(busy)
+    const res = response()
+    await compositeController.report({ params: { attemptId: 'attempt-1' }, query: {}, user: { userId: 'student-1' } } as any, res)
+    expect(res.status).toHaveBeenCalledWith(503)
+    expect(res.setHeader).toHaveBeenCalledWith('Retry-After', expect.any(String))
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'COMPLETION_BUSY' }))
+  })
+
+  it('keeps unknown errors as 500 and permission errors as 403', async () => {
+    for (const [failure, status] of [[new Error('program defect'), 500], [{ statusCode: 403, message: 'denied' }, 403]] as const) {
+      mockService.getReport.mockRejectedValueOnce(failure)
+      const res = response()
+      await compositeController.report({ params: { attemptId: 'attempt-1' }, query: {}, user: { userId: 'student-1' } } as any, res)
+      expect(res.status).toHaveBeenCalledWith(status)
+    }
+  })
+
   it('keeps student report on the participant path even when snapshotId is supplied', async () => {
     const res = response()
     await compositeController.report({ params: { attemptId: 'attempt-1' }, query: { snapshotId: 'snapshot-2' }, user: { userId: 'student-1', role: UserRole.STUDENT } } as any, res)

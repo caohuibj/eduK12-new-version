@@ -1,4 +1,4 @@
-export type WorkerActiveCounts = { video: number; image: number; export: number }
+export type WorkerActiveCounts = { video: number; image: number; export: number; report?: number }
 
 export type WorkerShutdownDeps = {
   pauseConsumers: () => Promise<void>
@@ -19,7 +19,7 @@ export type WorkerShutdownResult = {
 }
 
 const totalActive = (counts: WorkerActiveCounts): number =>
-  counts.video + counts.image + counts.export
+  counts.video + counts.image + counts.export + (counts.report ?? 0)
 
 export const shutdownWorkerRuntime = async (
   deps: WorkerShutdownDeps,

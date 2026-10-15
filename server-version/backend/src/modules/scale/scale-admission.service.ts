@@ -200,6 +200,25 @@ const readRuntime = (encrypted: string | null): VersionedFrozenScaleRuntimeSnaps
   }
 }
 
+// The authoritative child row is owned by this operation. A weak row-keyed
+// memo shares its verified immutable runtime with admission and scoring without
+// retaining participant rows or caching authorization across requests. Changing
+// the ciphertext invalidates the memo; transaction rereads use distinct rows.
+const runtimeByChild = new WeakMap<object, {
+  encrypted: string | null
+  runtime: VersionedFrozenScaleRuntimeSnapshot
+}>()
+
+export const readScaleAdmissionRuntime = (
+  row: Pick<ScaleAdmissionChildRow, 'runtimeSnapshotEncrypted'>,
+): VersionedFrozenScaleRuntimeSnapshot => {
+  const cached = runtimeByChild.get(row)
+  if (cached && cached.encrypted === row.runtimeSnapshotEncrypted) return cached.runtime
+  const runtime = readRuntime(row.runtimeSnapshotEncrypted)
+  runtimeByChild.set(row, { encrypted: row.runtimeSnapshotEncrypted, runtime })
+  return runtime
+}
+
 const availableContextKeys = (values: AssessmentContextValues | null) => (
   values
     ? assessmentContextKeys.filter((key) => values[key] !== undefined)
@@ -465,6 +484,7 @@ export const readStoredScaleAdmission = (
 const validateStoredAgainstRuntime = (
   row: ScaleAdmissionChildRow,
   stored: VersionedFrozenUnitAdmission,
+  referenceTimeMs = Date.now(),
 ): VersionedFrozenUnitAdmission => {
   assertAdmissionParentBinding(row, stored)
   if (stored.attemptEpoch !== row.attemptEpoch || stored.scale?.id !== row.scale.id
@@ -472,13 +492,13 @@ const validateStoredAgainstRuntime = (
     || (stored.principal.userId !== null && row.userId !== null && stored.principal.userId !== row.userId)) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结准入身份或轮次不匹配', 409)
   }
-  const runtime = readRuntime(row.runtimeSnapshotEncrypted)
+  const runtime = readScaleAdmissionRuntime(row)
   if (runtime.schemaVersion !== stored.schemaVersion) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表运行时与准入快照版本不匹配', 409)
   }
   if (stored.schemaVersion === 2 && runtime.schemaVersion === 2) {
     if (row.status !== 'COMPLETED' && stored.scalePolicy?.deployment?.completionDeadline
-      && Date.now() > Date.parse(stored.scalePolicy.deployment.completionDeadline)) {
+      && referenceTimeMs > Date.parse(stored.scalePolicy.deployment.completionDeadline)) {
       throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '本轮测评已超过冻结完成期限，请重新开始', 409)
     }
     const identityBindingHash = canonicalHash({
@@ -670,11 +690,12 @@ const activateUnstoredScaleAdmission = async (
 export const activateScaleAdmission = async (
   row: ScaleAdmissionChildRow,
   parent?: CompositeScaleAdmissionParent,
+  referenceTimeMs = Date.now(),
 ): Promise<VersionedFrozenUnitAdmission> => {
   const stored = readStoredScaleAdmission(row)
-  if (stored) return validateStoredAgainstRuntime(row, stored)
+  if (stored) return validateStoredAgainstRuntime(row, stored, referenceTimeMs)
   assertFinalOnly(row.deliveryMode)
-  const runtime = readRuntime(row.runtimeSnapshotEncrypted)
+  const runtime = readScaleAdmissionRuntime(row)
   if (runtime.schemaVersion === 1) return activateUnstoredScaleAdmission(prisma, row, runtime, parent)
 
   return withSerializableScaleTransaction(prisma,
@@ -683,9 +704,9 @@ export const activateScaleAdmission = async (
       const current = await tx.assessment.findUnique({ where: { id: row.id }, select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT })
       if (!current || current.attemptEpoch !== row.attemptEpoch) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '测评轮次已改变', 409)
       const winner = readStoredScaleAdmission(current)
-      if (winner) return validateStoredAgainstRuntime(current, winner)
+      if (winner) return validateStoredAgainstRuntime(current, winner, referenceTimeMs)
       // Load the parent inside this transaction, never use a pre-transaction context.
-      return activateUnstoredScaleAdmission(tx, current, readRuntime(current.runtimeSnapshotEncrypted))
+      return activateUnstoredScaleAdmission(tx, current, readScaleAdmissionRuntime(current))
     },
   )
 }

@@ -275,3 +275,17 @@ describe('FinalCompositeAssessment provenance sibling placement', () => {
     expect(input).not.toHaveProperty('deviceInputProvenance')
   })
 })
+
+describe('durable submission confirmation', () => {
+  it('does not relabel an accepted submission as failed when loading the next screen fails', async () => {
+    const user = userEvent.setup()
+    const submitScale = vi.fn().mockResolvedValue({ code: 0, data: { submissionId: 'accepted' } })
+    const onReload = vi.fn().mockRejectedValue(new Error('report unavailable'))
+    render(<FinalCompositeAssessment {...sharedProps} onReload={onReload} state={makeState(scaleItem)} submitScale={submitScale} submitFormSection={vi.fn()} />)
+    await user.click(await screen.findByRole('button', { name: '经常' }))
+    await user.click(screen.getByRole('button', { name: '提交整份量表' }))
+    expect(await screen.findByText('服务器已确认保存。后续页面暂时未能加载，可重新读取进度或报告；无需再次交卷。')).toBeInTheDocument()
+    expect(submitScale).toHaveBeenCalledTimes(1)
+    expect(await finalDraftStore.get('composite-scale:composite-scale-assessment-1')).toBeNull()
+  })
+})

@@ -8,6 +8,8 @@ import { legacyWriteDisabled } from '../../middleware/instrumentFinalOnly'
 const router = Router()
 
 router.get('/attempts/:attemptId', compositeController.publicAttempt)
+router.get('/attempts/:attemptId/whole/definition', compositeController.publicWholeDefinition)
+router.post('/attempts/:attemptId/whole/submit', compositeController.publicWholeSubmit)
 router.get('/attempts/:attemptId/form-sections/:sectionId/assets/:assetId/content', compositeImageController.publicFormImage)
 router.get('/attempts/:attemptId/items/:itemId/scale/assets/:assetId/content', compositeImageController.publicScaleImage)
 router.post('/attempts/:attemptId/form-sections/:sectionId/items/:itemId/options/:optionIndex/video-capability', compositeVideoController.publicFormVideo)
@@ -25,6 +27,8 @@ router.post('/attempts/:attemptId/items/:itemId/scale/answer', legacyWriteDisabl
 router.post('/attempts/:attemptId/items/:itemId/scale/complete', legacyWriteDisabled)
 router.post('/attempts/:attemptId/items/:itemId/form-answer', legacyWriteDisabled)
 router.post('/attempts/:attemptId/bundle-retry', compositeController.publicRetryBundle)
+router.get('/attempts/:attemptId/report-status', compositeController.publicReportStatus)
+router.post('/attempts/:attemptId/report-retry', compositeController.publicRetryReport)
 router.get('/attempts/:attemptId/report', compositeController.publicReport)
 router.get('/attempts/:attemptId/analysis-export', compositeController.publicAnalysisExport)
 router.get('/:token', compositeController.publicInfo)

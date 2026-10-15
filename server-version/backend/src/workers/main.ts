@@ -1,5 +1,7 @@
+import { assessmentReportConfig } from '../config/assessmentReports'
+import { activeCompositeReportJobs, startCompositeReportWorker, stopCompositeReportWorker, prepareCompositeReportRuntime } from './compositeReportWorker'
 import { config } from '../config'
-import { startBackgroundWorkers } from '../config/backgroundWorkers'
+import { resolveHeavyProcessingEnabled, resolveVideoProcessingEnabled, startBackgroundWorkers } from '../config/backgroundWorkers'
 import { prisma } from '../config/database'
 import { activeQueueJobCounts, closeQueues, pauseQueueConsumers } from '../config/queue'
 import { effectiveRuntimeResourceConfig, runtimeResourceConfig } from '../config/runtimeResources'
@@ -23,27 +25,28 @@ const gracefulShutdown = async (signal: string, exitCode = 0) => {
     shutdownTimeoutSeconds: runtimeResourceConfig.workerShutdownTimeoutSeconds,
   })
 
-  if (workersStarted) {
+  if (workersStarted && resolveHeavyProcessingEnabled()) {
     try {
-      const [{ stopExportProcessingRecovery }, { stopVideoProcessorLoops }] = await Promise.all([
-        import('./exportProcessor'),
-        import('./videoProcessorOptimized'),
-      ])
+      const { stopExportProcessingRecovery } = await import('./exportProcessor')
       stopExportProcessingRecovery()
-      stopVideoProcessorLoops()
+      if (resolveVideoProcessingEnabled()) (await import('./videoProcessorOptimized')).stopVideoProcessorLoops()
     } catch (error) {
       logger.warn('Unable to stop one or more worker recovery loops before drain', error)
     }
   }
 
+  const reportDrain = stopCompositeReportWorker(runtimeResourceConfig.workerShutdownTimeoutSeconds * 1000)
+
   const result = await shutdownWorkerRuntime({
     pauseConsumers: pauseQueueConsumers,
-    activeCounts: activeQueueJobCounts,
+    activeCounts: async () => ({ ...await activeQueueJobCounts(), report: activeCompositeReportJobs() }),
     cancelSubprocesses: cancelActiveWorkerSubprocesses,
     activeSubprocessCount: activeWorkerSubprocessCount,
     closeQueues,
-    disconnectDatabase: () => prisma.$disconnect(),
+    disconnectDatabase: async () => { await reportDrain; await prisma.$disconnect() },
   }, runtimeResourceConfig.workerShutdownTimeoutSeconds * 1000)
+
+  await reportDrain
 
   if (result.activeJobs > 0 || result.subprocessesRemaining > 0) {
     logger.warn('Worker shutdown reached its bounded deadline; unfinished Bull jobs will recover by retry/stall reconciliation', result)
@@ -72,7 +75,10 @@ const startWorker = async (): Promise<void> => {
   const started = await startBackgroundWorkers(true)
   if (started !== 'started') throw new Error('worker process must start video/image/export consumers')
   workersStarted = true
-  logger.info('Background worker process is consuming video/image/export jobs')
+  if (assessmentReportConfig().enabled) await prepareCompositeReportRuntime()
+  if (shutdownStarted) return
+  startCompositeReportWorker()
+  logger.info('Report outbox worker is running', { heavyProcessingEnabled: resolveHeavyProcessingEnabled(), videoProcessingEnabled: resolveHeavyProcessingEnabled() && resolveVideoProcessingEnabled() })
 }
 
 void startWorker().catch((error) => {

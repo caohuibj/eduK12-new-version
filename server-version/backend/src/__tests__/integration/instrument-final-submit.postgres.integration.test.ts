@@ -54,6 +54,7 @@ let submitCompositeFormSectionFinal: typeof import('../../modules/composite/fina
 
 let userId = ''
 let fakeConfigId = ''
+let ownsFakeConfig = false
 const createdScaleIds: string[] = []
 const createdAssessmentIds: string[] = []
 const createdQuestionnaireIds: string[] = []
@@ -484,8 +485,17 @@ suite('instrument final submit (real PostgreSQL)', () => {
       data: { username: `instrument-final-${randomUUID()}`, passwordHash: 'test-only', role: 'STUDENT' },
     })
     userId = user.id
-    const fakeConfig = await prisma.cognitiveTestConfig.findUnique({ where: { testType_configVersion: { testType: 'fake', configVersion: '1.0.0' } } })
-    if (!fakeConfig) throw new Error('seeded fake cognitive config is required')
+    let fakeConfig = await prisma.cognitiveTestConfig.findUnique({ where: { testType_configVersion: { testType: 'fake', configVersion: '1.0.0' } } })
+    if (!fakeConfig) {
+      // Keep this isolated contract self-contained instead of requiring the
+      // whole application/performance seed. Same fixture as gate47's seed.
+      fakeConfig = await prisma.cognitiveTestConfig.create({ data: {
+        testType: 'fake', configVersion: '1.0.0', name: 'Final submit synthetic config',
+        status: 'PUBLISHED', engineVersion: '1.0.0', scoringVersion: '1.0.0', accessPolicy: 'OPEN',
+        publishedAt: new Date(), config: { trialCount: 3, trialDurationMs: 1000, allowPractice: false, maxRtMs: 60000 },
+      } })
+      ownsFakeConfig = true
+    }
     fakeConfigId = fakeConfig.id
   }, 90_000) // Cold imports span all instrument runtimes; keep this outside operation budgets.
 
@@ -499,6 +509,7 @@ suite('instrument final submit (real PostgreSQL)', () => {
       if (createdAssessmentIds.length) await prisma.assessment.deleteMany({ where: { id: { in: createdAssessmentIds } } })
       if (createdScaleIds.length) await prisma.scale.deleteMany({ where: { id: { in: createdScaleIds } } })
       if (userId) await prisma.user.delete({ where: { id: userId } })
+      if (ownsFakeConfig && fakeConfigId) await prisma.cognitiveTestConfig.delete({ where: { id: fakeConfigId } })
     } finally {
       await prisma?.$disconnect()
     }

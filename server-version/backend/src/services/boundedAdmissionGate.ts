@@ -1,3 +1,4 @@
+import { AsyncResource } from 'node:async_hooks'
 import {
   recordBoundedAdmissionRejection,
   setBoundedAdmissionGateState,
@@ -142,7 +143,7 @@ export class BoundedAdmissionGate {
 
     return new Promise<T>((resolve, reject) => {
       const entry = {} as QueuedOperation<T>
-      entry.operation = operation
+      entry.operation = AsyncResource.bind(operation)
       entry.resolve = resolve
       entry.reject = reject
       entry.timer = setTimeout(() => {

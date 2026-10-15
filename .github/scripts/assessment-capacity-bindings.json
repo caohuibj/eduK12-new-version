@@ -1,0 +1,171 @@
+{
+  "schema": 1,
+  "files": {
+    "server-version/backend/prisma/migrations/20261015020000_whole_questionnaire_receipt/migration.sql": {
+      "before": null,
+      "after": "dd3215f1c64a49f1122eada22c9900230e03603a"
+    },
+    "server-version/backend/prisma/migrations/20261015030000_whole_validation_manifest/migration.sql": {
+      "before": null,
+      "after": "eb2fb5deb4d6c90eedc0be873daf41306a7afa84"
+    },
+    "server-version/backend/src/config/database.ts": {
+      "before": "2dd12fbcce90154e36cea3c779c7f5194572affc",
+      "after": "4941214bba743552274645dc084faa58372902ad"
+    },
+    "server-version/backend/src/modules/assessment-runtime/reference-binding.ts": {
+      "before": "3a1540ae5687e69457719148f449211e0aa65263",
+      "after": "eace34aaf33340f168fc44c7e887272a6c6f7a36"
+    },
+    "server-version/backend/src/modules/composite/whole-questionnaire.service.ts": {
+      "before": null,
+      "after": "8e2b63f82cb9d221b96e0b0ea148acdaf4a5537c"
+    },
+    "server-version/backend/src/modules/scale/scale-result.ts": {
+      "before": "31cbf85609f24053f89897cabeb5cf5d9390a833",
+      "after": "0767e76bd83f850820d3dcd7bcd12248ab60cc3b"
+    },
+    "server-version/backend/src/services/reportFeedbackHints.ts": {
+      "before": null,
+      "after": "69765cfd497eb6dfa10dd680fbb544c79eb82033"
+    },
+    "server-version/backend/src/services/runtimeObservability.ts": {
+      "before": "b875dba7c492e66de6a98662a9fd69823eeecd29",
+      "after": "5e020e521fee1b50a732a1cb2fe5375dc677dc06"
+    },
+    "server-version/frontend/src/components/WholeCompositeQuestionnaire.tsx": {
+      "before": null,
+      "after": "0f4ca912d234aab2ef86d47fd57861573986de26"
+    },
+    "server-version/frontend/src/components/questionnaire/ScalePlayer.tsx": {
+      "before": "225eca6ccd1760666b6f8213b9213c455db3dc1c",
+      "after": "a58f2703e6afc0b18ebfc190b5adb28b5098e5c1"
+    },
+    "server-version/frontend/src/modules/composite/report-polling.ts": {
+      "before": null,
+      "after": "62a6d5a9affa579e85a59ba0c1eb4c1a47f7d6c3"
+    },
+    "server-version/frontend/src/services/persistence/finalDraftStore.ts": {
+      "before": "ce0ea4777eda97fa28d1687aff2def89f31b1e81",
+      "after": "69bc0b67f9b29284e7378aa72e03d77d82365e2f"
+    },
+    "server-version/backend/prisma/migrations/20261015010000_composite_report_outbox/migration.sql": {
+      "before": null,
+      "after": "022aa499aa4ecc214622b21fd7b64caff94afde3"
+    },
+    "server-version/backend/prisma/schema.prisma": {
+      "before": "0dbb0516d1187a6273a731c93ba063257e6f0ba3",
+      "after": "96fbb02ad11d634d45d6f454e0d5e3ae4316ad8d"
+    },
+    "server-version/backend/scripts/runtime-table-policy.json": {
+      "before": "b36ef97e944db78aa316d1f785255156dbc2410f",
+      "after": "6dc987c9bb72651fc740940ebac09a2b473e96cf"
+    },
+    "server-version/backend/src/config/assessmentReports.ts": {
+      "before": null,
+      "after": "d3c869b3990fc5099dacd7b69e5c65828878aef1"
+    },
+    "server-version/backend/src/config/backgroundWorkers.ts": {
+      "before": "0000b1a2cb2ce9bc8ec71a9529e61910ec225ce5",
+      "after": "78c3ca788fe2bfc17c63aa58914375a4f8d8e95a"
+    },
+    "server-version/backend/src/middleware/publicAssessmentRateLimit.ts": {
+      "before": "d1f650fc9200e2653227809527c1a2e52f14911c",
+      "after": "d7a129bc2078bfca2a0fd33953c6d98777593cbe"
+    },
+    "server-version/backend/src/modules/assessment-runtime/persistence.ts": {
+      "before": "e7b87b8abc450f54ac2d64d42220490b48dce880",
+      "after": "58823ef8ddee944c0911967bb7f4ca326beb3f3c"
+    },
+    "server-version/backend/src/modules/assessment-runtime/report-outbox.service.ts": {
+      "before": null,
+      "after": "461cf9dd0c48447440c7245cc58b102fd133333e"
+    },
+    "server-version/backend/src/modules/assessment-runtime/unified-aggregate-finalizer.service.ts": {
+      "before": "7cc2f23002aa1c860a732f3b21450f220602bb19",
+      "after": "d58b845fbb5c74d4336830309dfaaa480a40e6f8"
+    },
+    "server-version/backend/src/modules/composite/composite-report-cache.ts": {
+      "before": null,
+      "after": "0a5a6b6e7d2659a7619e0f1a66109e5a0dfc0faf"
+    },
+    "server-version/backend/src/modules/composite/composite.controller.ts": {
+      "before": "72d39c5f43ffcad56c3738002560771685547b89",
+      "after": "a46a750f5accf1ac5737d6e9ad9acfe2dfb75ba0"
+    },
+    "server-version/backend/src/modules/composite/composite.public.routes.ts": {
+      "before": "3b1af41ebb6430aba654956ab5b79a415284a852",
+      "after": "2e1b17cca7d2ce222b64f960bfc1d179177e4675"
+    },
+    "server-version/backend/src/modules/composite/composite.routes.ts": {
+      "before": "aace6a8af59fc7ebde4af465e90f35f2595afa37",
+      "after": "099123a870b1e8e89580801b253c6c8ece8c38b0"
+    },
+    "server-version/backend/src/modules/composite/composite.service.ts": {
+      "before": "0ccaa2732022afdf0ff75770188d80ec8411b85f",
+      "after": "f66dfe6cb24fdcc13a1068aa0286b77dab3ff0dc"
+    },
+    "server-version/backend/src/modules/scale/scale-admission.service.ts": {
+      "before": "7f3a8b3d4b19d74d0b1a936db7987e96ad8dd789",
+      "after": "2106b01f4a5d4b8653cb2ea831a2625a855c26fd"
+    },
+    "server-version/backend/src/modules/scale/scale-final-submit.service.ts": {
+      "before": "c7b5eda9bd2c386c19fef55df8d27043a86f4920",
+      "after": "7a92b8d491ff2b1cec2d3616aa6e425bcc53b8b6"
+    },
+    "server-version/backend/src/modules/scale/scale-scoring.ts": {
+      "before": "47b9e80c0de07ca3241795fa2d6dc50eb0001c21",
+      "after": "6c9c3c2259900f75fa6c204a730d8d65f7424dc1"
+    },
+    "server-version/backend/src/modules/scale/unified-final-submit.service.ts": {
+      "before": "e3844ad3e1bff60405e9aeff17ad99e273959a7b",
+      "after": "45317d4053cbfad1c3a0b8798c12c51803b378fc"
+    },
+    "server-version/backend/src/services/boundedAdmissionGate.ts": {
+      "before": "d8d6d91e246b5dd46e3d3e864accde2d27bc99e2",
+      "after": "6eddde713bd4558dd7b88bcf29d678b7a109a795"
+    },
+    "server-version/backend/src/workers/compositeReportWorker.ts": {
+      "before": null,
+      "after": "c3e601c957c9ec66d46125326769a993512b125a"
+    },
+    "server-version/backend/src/workers/main.ts": {
+      "before": "6e668c6da064d3ba4c1a000d1e6d2fb680d2febe",
+      "after": "0b9097272b72592aedb78cd8f73286d86687ea42"
+    },
+    "server-version/backend/src/workers/workerShutdown.ts": {
+      "before": "0dde8ba6be0e12b2451d546e55f0e63460b9ed43",
+      "after": "65eb252c2aa5e365e6ad366c458039ece6834e59"
+    },
+    "server-version/docker-compose.yml": {
+      "before": "000e97759483e7e962526b74881d73d1fa0ca484",
+      "after": "b4c2409905afa48cf4b4bc4114d8895161719406"
+    },
+    "server-version/frontend/src/components/FinalCompositeAssessment.tsx": {
+      "before": "d3ac08e0f5e1357b334bdd35294d5914bb0fd06b",
+      "after": "6638328f3e7c01aebb9e99d5d2c24dfebaa3b4db"
+    },
+    "server-version/frontend/src/modules/composite/CompositeAssessmentPage.tsx": {
+      "before": "e7abf491776af06265dafc40a2c992b0b37a1b9a",
+      "after": "94ddaa5206ca63af65b21482e1e00669811d0f38"
+    },
+    "server-version/frontend/src/modules/composite/CompositeReportPage.tsx": {
+      "before": "dd3df4b12690cbdfb0d7a040a51f32b7920f1f55",
+      "after": "c0dc4d9e1ecdc4987e38d888471b9da36c223bcc"
+    },
+    "server-version/frontend/src/modules/composite/api.ts": {
+      "before": "693a838354b90d73b5c44e8ac64f273e5783e3b1",
+      "after": "5f745f2f3e927a3194b8cc530f404725412126b1"
+    },
+    "server-version/frontend/src/modules/composite/types.ts": {
+      "before": "34fa4125210438ef9eb624764258481c3eef21d4",
+      "after": "1555d6318b4b81743060b401c940a71295b034c0"
+    }
+  },
+  "compilationReuseTransition": {
+    "candidateBefore": "023a0bdcd47d5fa1fa181551e9364c7997beb2de",
+    "candidateAfter": "5b7ef9a46ec2b54cb187626afb0ee589e55b3b38",
+    "verifierBefore": "72b6229d1fa0ddebb2cf2a4702df79dda1bd2d4d",
+    "verifierAfter": "a83f68c550ca6a57e281be8dd06fe193b7260082"
+  }
+}

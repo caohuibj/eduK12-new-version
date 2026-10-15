@@ -1,3 +1,4 @@
+import { wholeQuestionnaireArrival, markAssessmentTimeline, traceAssessmentPhase, traceAssessmentPhaseSync } from '../../services/runtimeObservability'
 import { Request, Response } from 'express'
 import { UserRole } from '@prisma/client'
 import { success, error, notFound, unauthorized, completionBusy, assessmentSubmitBusy, instrumentError } from '../../utils/response'
@@ -93,6 +94,41 @@ const sendAnalysisExport = async (
 }
 
 export const compositeController = {
+  async wholeDefinition(req: Request, res: Response) {
+    try {
+      const { getWholeQuestionnaireDefinition } = await import('./whole-questionnaire.service')
+      return success(res, await getWholeQuestionnaireDefinition(req.params.attemptId, { userId: req.user!.userId }))
+    } catch (err) { return handleError(res, err) }
+  },
+  async publicWholeDefinition(req: Request, res: Response) {
+    try {
+      const { getWholeQuestionnaireDefinition } = await import('./whole-questionnaire.service')
+      return success(res, await getWholeQuestionnaireDefinition(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) }))
+    } catch (err) { return handleError(res, err) }
+  },
+  async wholeSubmit(req: Request, res: Response) { return handleWholeSubmit(req, res, false) },
+  async publicWholeSubmit(req: Request, res: Response) { return handleWholeSubmit(req, res, true) },
+
+  async reportStatus(req: Request, res: Response) {
+    try { return success(res, await service.getCompositeReportStatus(req.params.attemptId, { userId: req.user!.userId })) }
+    catch (err) { return handleError(res, err) }
+  },
+  async retryReport(req: Request, res: Response) {
+    try { return success(res, await service.retryCompositeQuestionnaireReport(req.params.attemptId, { userId: req.user!.userId })) }
+    catch (err) { return handleError(res, err) }
+  },
+  async publicReportStatus(req: Request, res: Response) {
+    try { return success(res, await service.getCompositeReportStatus(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) })) }
+    catch (err) { return handleError(res, err) }
+  },
+  async publicRetryReport(req: Request, res: Response) {
+    try { return success(res, await service.retryCompositeQuestionnaireReport(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) })) }
+    catch (err) { return handleError(res, err) }
+  },
+  async teacherReportStatus(req: Request, res: Response) {
+    try { return success(res, await service.getCompositeReportStatusForTeacher(req.user!.userId, req.user!.role, req.params.id, req.params.attemptId)) }
+    catch (err) { return handleError(res, err) }
+  },
   async reportPackages(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
@@ -834,6 +870,8 @@ const recoveryFromBody = (req: Request): string => {
 }
 
 const handleError = (res: Response, err: unknown): Response => {
+  if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
+  if (isTransientCompletionDatabaseError(err)) return completionBusy(res, 1)
   if (err instanceof z.ZodError) return error(res, err.issues.map((item) => item.message).join('; '), -1, 400)
   if (service.isCompositeError(err)) {
     return err.statusCode < 500
@@ -843,4 +881,28 @@ const handleError = (res: Response, err: unknown): Response => {
   const maybe = err as { statusCode?: unknown; message?: unknown }
   if (typeof maybe.statusCode === 'number' && maybe.statusCode >= 400 && maybe.statusCode < 500) return error(res, typeof maybe.message === 'string' ? maybe.message : 'Request failed', -1, maybe.statusCode)
   return error(res, '服务器内部错误', -1, 500)
+}
+
+async function handleWholeSubmit(req: Request, res: Response, anonymous: boolean) {
+  const arrival = wholeQuestionnaireArrival(req)
+  res.setHeader('X-Whole-Request-Started-At', String(arrival.requestStartedAtMs))
+  res.setHeader('X-Whole-Body-Received-At', String(arrival.bodyReceivedAtMs))
+  try {
+    markAssessmentTimeline('whole.controller_enter')
+    const { submitWholeQuestionnaire, wholeQuestionnaireSubmitSchema } = await traceAssessmentPhase('whole.module_import', () => import('./whole-questionnaire.service'))
+    const principal = anonymous ? { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) } : { userId: req.user!.userId }
+    const input = traceAssessmentPhaseSync('whole.schema_parse', () => wholeQuestionnaireSubmitSchema.parse(req.body))
+    const receipt = await submitWholeQuestionnaire(req.params.attemptId, input, principal, arrival.bodyReceivedAtMs)
+    markAssessmentTimeline('whole.receipt_response_send')
+    return success(res, receipt, '整份问卷已可靠保存，报告正在生成')
+  } catch (err) {
+    if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
+    if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
+    if (isTransientCompletionDatabaseError(err)) return completionBusy(res, 1)
+    if (isInstrumentFinalSubmitError(err)) {
+      if (err.code === 'INSTRUMENT_NOT_AVAILABLE' && err.statusCode === 503) res.setHeader('Retry-After', '30')
+      return instrumentError(res, err.code, err.message, err.statusCode)
+    }
+    return handleError(res, err)
+  }
 }

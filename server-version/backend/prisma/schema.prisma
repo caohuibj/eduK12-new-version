@@ -1257,6 +1257,8 @@ model CompositeFormSection {
 
 // 一次学生/匿名参与记录。recoveryTokenHash 只存哈希，原始恢复凭证只在创建时返回一次。
 model CompositeAssessmentAttempt {
+  // Set atomically with the first durable report outbox event; survives disabling new admission.
+  asyncReportEpoch Int? @map("async_report_epoch")
   deliveryCourseId String? @map("delivery_course_id")
   id                           String                           @id @default(uuid())
   compositeAssessmentId        String                           @map("composite_assessment_id")
@@ -3496,4 +3498,58 @@ model EducationReportReleaseRecord {
   @@unique([organizationId,reportScopeKey],map:"education_report_release_records_org_scope_unique")
   @@index([organizationId,sourceRunId,reportKind],map:"education_report_release_records_source_idx")
   @@map("education_report_release_records")
+}
+
+// Durable, coalesced report outbox. IDs/frozen bindings only; answers stay in
+// their existing encrypted canonical records. Parent deletion is reconciled by
+// the worker so it cannot silently leak a held queue permit through a cascade.
+enum CompositeReportJobStatus {
+  PENDING
+  PROCESSING
+  WAITING
+  READY
+  FAILED
+  CANCELLED
+}
+
+model CompositeReportJob {
+  wholeValidationEncrypted String? @map("whole_validation_encrypted")
+  wholeValidationHash String? @map("whole_validation_hash")
+  wholeSubmissionId String? @map("whole_submission_id")
+  wholePayloadHash String? @map("whole_payload_hash")
+  wholeAnswersEncrypted String? @map("whole_answers_encrypted")
+  wholeAcceptedAt DateTime? @map("whole_accepted_at")
+  id                 String                   @id @default(uuid())
+  attemptId          String                   @map("attempt_id")
+  attemptEpoch       Int                      @map("attempt_epoch")
+  slotSetHash        String                   @map("slot_set_hash")
+  contextHash        String?                  @map("context_hash")
+  status             CompositeReportJobStatus @default(WAITING)
+  requestedRevision  Int                      @default(1) @map("requested_revision")
+  claimedRevision    Int                      @default(0) @map("claimed_revision")
+  attemptCount       Int                      @default(0) @map("attempt_count")
+  budgetHeld         Boolean                  @default(false) @map("budget_held")
+  leaseToken         String?                  @map("lease_token")
+  leaseExpiresAt     DateTime?                @map("lease_expires_at")
+  nextAttemptAt      DateTime                 @default(dbgenerated("(CURRENT_TIMESTAMP AT TIME ZONE 'UTC')")) @map("next_attempt_at")
+  reportEncrypted    String?                  @map("report_encrypted")
+  aggregateInputHash String?                  @map("aggregate_input_hash")
+  errorCode          String?                  @map("error_code")
+  completedAt        DateTime?                @map("completed_at")
+  createdAt          DateTime                 @default(dbgenerated("(CURRENT_TIMESTAMP AT TIME ZONE 'UTC')")) @map("created_at")
+  updatedAt          DateTime                 @updatedAt @map("updated_at")
+
+  @@unique([attemptId, attemptEpoch], map: "composite_report_jobs_attempt_epoch_key")
+  @@index([status, nextAttemptAt], map: "composite_report_jobs_pending_idx")
+  @@index([status, leaseExpiresAt], map: "composite_report_jobs_lease_idx")
+  @@map("composite_report_jobs")
+}
+
+// Updated inside the outbox transaction. No COUNT scan or Redis durability
+// dependency on each submit; a permit is released exactly once by its job.
+model CompositeReportQueueBudget {
+  id      String @id
+  pending Int    @default(0)
+
+  @@map("composite_report_queue_budget")
 }

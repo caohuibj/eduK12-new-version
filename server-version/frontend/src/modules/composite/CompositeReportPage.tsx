@@ -1,3 +1,6 @@
+import { runWithCompletionRetry } from '../../services/completionRetry'
+import { REPORT_AUTO_POLL_LIMIT, reportPollingDelayMs } from './report-polling'
+import type { CompositeReportStatus } from './types'
 import BundleReport from '../../pages/bundle/BundleReport'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
@@ -49,6 +52,10 @@ const CompositeReportPage: React.FC = () => {
   const [exportingFormat, setExportingFormat] = useState<CompositeAnalysisExportFormat | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [generation, setGeneration] = useState<CompositeReportStatus | null>(null)
+  const pollCount = useRef(0)
+  const pollingProfile = generation?.feedbackPollProfile ?? (generation?.wholeSubmissionReceived ? 'QUEUED' : 'LEGACY')
+  const automaticPollLimit = pollingProfile === 'LEGACY' ? 12 : REPORT_AUTO_POLL_LIMIT
 
   const studyReturn=attemptId?sessionStorage.getItem(`composite:study:return:${attemptId}`):null
   const ownStudyReturn=studyReturn && /^\/public\/studies\/[0-9a-f-]{36}$/.test(studyReturn)?studyReturn:null
@@ -74,17 +81,28 @@ const CompositeReportPage: React.FC = () => {
       return
     }
     try {
-      const response = teacherMode && id
-        ? partial ? await compositeApi.teacherReport(id, attemptId, snapshotId, true) : await compositeApi.teacherReport(id, attemptId, snapshotId)
+      if (!partial && !snapshotId) {
+        const status = await runWithCompletionRetry(() => teacherMode && id
+          ? compositeApi.teacherReportStatus(id, attemptId)
+          : publicMode ? publicCompositeApi(credential).reportStatus(attemptId) : compositeApi.reportStatus(attemptId),
+        { maxAttempts: 2 })
+        if (current !== epoch.current) return
+        if (status.code !== 0 || !status.data) throw new Error(status.message || '报告状态无法读取')
+        setGeneration(status.data)
+        if (status.data.reportStatus.state !== 'READY') { setReport(null); return }
+      }
+      const response = await runWithCompletionRetry(() => teacherMode && id
+        ? partial ? compositeApi.teacherReport(id, attemptId, snapshotId, true) : compositeApi.teacherReport(id, attemptId, snapshotId)
         : publicMode
-          ? await publicCompositeApi(credential).report(attemptId)
-          : partial ? await compositeApi.partialReport(attemptId) : await compositeApi.report(attemptId)
+          ? publicCompositeApi(credential).report(attemptId)
+          : partial ? compositeApi.partialReport(attemptId) : compositeApi.report(attemptId), { maxAttempts: 2 })
       if (response.code !== 0 || !response.data) throw new Error(response.message || '报告不存在')
       if (current !== epoch.current) return
       setReport(response.data)
     } catch (err) {
       if (current !== epoch.current) return
       setError((err as { message?: string }).message || '加载报告失败')
+      setGeneration(null)
       setReport(null)
     } finally { if (current === epoch.current) setLoading(false) }
   }, [attemptId, id, publicMode, recoveryToken, selectedSnapshotId, teacherMode, partial])
@@ -102,7 +120,24 @@ const CompositeReportPage: React.FC = () => {
     } finally { setSnapshotLoading(false) }
   }, [attemptId, staffMode])
 
-  useEffect(() => { void load(); return () => { epoch.current++ } }, [load])
+  useEffect(() => { pollCount.current = 0; void load(); return () => { epoch.current++ } }, [load])
+  useEffect(() => {
+    if (!generation || report || !['PENDING', 'PROCESSING'].includes(generation.reportStatus.state) || pollCount.current >= automaticPollLimit) return
+    // Bounded 2.5 -> 4 seconds with jitter and the server Retry-After floor.
+    // Hidden pages issue no requests; 24 probes leave public GET headroom.
+    let waitingForVisibility = false
+    const probe = () => {
+      if (document.visibilityState === 'hidden') { waitingForVisibility = true; return }
+      pollCount.current += 1
+      void load()
+    }
+    const timer = window.setTimeout(probe, reportPollingDelayMs(pollCount.current, generation.reportStatus.retryAfterSeconds, Math.random, pollingProfile))
+    const onVisible = () => {
+      if (waitingForVisibility && document.visibilityState !== 'hidden') { waitingForVisibility = false; probe() }
+    }
+    document.addEventListener('visibilitychange', onVisible)
+    return () => { window.clearTimeout(timer); document.removeEventListener('visibilitychange', onVisible) }
+  }, [generation, load, report, pollingProfile, automaticPollLimit])
   useEffect(() => {
     if (!shouldLoadSnapshots) {
       setSnapshots([])
@@ -186,6 +221,33 @@ const CompositeReportPage: React.FC = () => {
   </ReportSection>
 
   if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">加载报告中...</div>
+
+  if (!report && generation && generation.reportStatus.state !== 'READY') {
+    const failed = generation.reportStatus.state === 'FAILED'
+    const waiting = generation.reportStatus.state === 'WAITING'
+    const cancelled = generation.reportStatus.state === 'CANCELLED'
+    return <ReportShell
+      title="综合测评报告"
+      status={{ kind: failed || cancelled ? 'error' : 'info',
+        title: failed ? '报告生成暂时失败' : waiting ? '作答尚未全部完成' : cancelled ? '报告任务已停止' : '作答记录已保存，报告生成中',
+        description: failed ? '已保存的交卷不会丢失。可重新生成报告，无需再次提交答案。'
+          : waiting ? '已提交单元保留在服务器，请先继续完成剩余作答。'
+          : cancelled ? '请重新读取当前作答状态，核对测评版本。'
+          : pollCount.current >= automaticPollLimit ? '报告仍在准备。已暂停自动查询，可稍后重新加载。'
+          : '页面会自动查询报告状态；离开页面不会取消已保存的交卷或报告任务。' }}
+      actions={<>
+        {failed && !teacherMode && <button type="button" className="hui-button hui-button--primary" onClick={() => {
+          setLoading(true)
+          void (publicMode ? publicCompositeApi(recoveryToken).retryReport(attemptId!) : compositeApi.retryReport(attemptId!))
+            .then(response => { if (response.code !== 0) throw new Error(response.message || '报告重试失败'); pollCount.current = 0; return load() })
+            .catch(cause => { setError((cause as Error).message); setGeneration(null); setLoading(false) })
+        }}>重新生成报告</button>}
+        <button type="button" className="hui-button hui-button--secondary" onClick={() => { pollCount.current = 0; void load() }}>重新加载报告</button>
+        {waiting && !teacherMode && <button type="button" className="hui-button hui-button--primary" onClick={() => navigate(`${publicMode ? '/public' : '/student'}/composite/attempts/${attemptId}`)}>继续作答</button>}
+        <button type="button" className="hui-button hui-button--secondary" onClick={() => navigate(backTo)}>返回</button>
+      </>}
+    />
+  }
 
   if (!report) {
     return (
