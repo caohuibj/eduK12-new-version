@@ -8,9 +8,9 @@ base='postgresql://ptool:synthetic@127.0.0.1:5432/assessment_capacity_ci_test?sc
 common=['docker','run','--rm','--network','host','-v',str(evidence)+':/evidence','-v',str(Path('server-version/backend/src/__tests__').resolve())+':/app/src/__tests__:ro',
  '-e','CI=true','-e','GITHUB_ACTIONS=true','-e','NODE_ENV=test','-e','JWT_SECRET=synthetic-report-ci-not-production','-e','ASSET_SIGNING_SECRET=synthetic-report-assets-not-production',
  '-e','DATA_ENCRYPTION_KEY='+'55'*32,'-e','DATA_PSEUDONYM_KEY='+'56'*32,'-e','ASSET_MIGRATION_COMPLETE=true','-e','ASSESSMENT_REPORT_ASYNC_ENABLED=true',
- '-e','UPLOAD_DIR=/tmp/report-ci-uploads']
+ '-e','UPLOAD_DIR=/tmp/report-ci-uploads','-e','EVIDENCE_UID='+str(os.getuid()),'-e','EVIDENCE_GID='+str(os.getgid())]
 script=evidence/'prepare-restore.ts'
-script.write_text("""import {writeFileSync} from 'node:fs';
+script.write_text("""import {writeFileSync,chownSync} from 'node:fs';
 import {PrismaClient} from '/app/node_modules/@prisma/client/index.js';
 import {createReportOutboxFixture} from '/app/src/__tests__/integration/report-outbox-fixture';
 import {requireIsolatedReleaseDatabase} from '/app/src/__tests__/integration/integration-env';
@@ -18,6 +18,7 @@ import {submitScaleAssessmentFinal} from '/app/src/modules/scale/scale-final-sub
 import {prisma as serviceDb} from '/app/src/config/database';
 (async()=>{requireIsolatedReleaseDatabase(process.env.DATABASE_URL!);const db=new PrismaClient();const f=await createReportOutboxFixture(db);const ack=await submitScaleAssessmentFinal(f.inputs[0]);
 writeFileSync('/evidence/restore-fixture.json',JSON.stringify({attemptId:f.parent.id,participantId:f.participant.id,assessmentId:f.inputs[0].assessmentId,submissionId:ack.submissionId,payloadHash:ack.payloadHash}));
+chownSync('/evidence/restore-fixture.json',Number(process.env.EVIDENCE_UID),Number(process.env.EVIDENCE_GID));
 await db.$disconnect();await serviceDb.$disconnect()})().catch(e=>{console.error(e);process.exit(1)});
 """)
 subprocess.run(common+['-e','DATABASE_URL='+base,builder,'npx','tsx','/evidence/prepare-restore.ts'],check=True,timeout=60)
@@ -49,7 +50,7 @@ const job=await outbox.claimCompositeReportJob();assert.equal(job.attemptId,expe
 const ready=await outbox.readCompositeReportJob(expected.attemptId,1);assert.equal(ready.status,'READY');
 const report=await require('/app/dist/modules/composite/composite.service').getReport(expected.attemptId,{userId:expected.participantId});assert.equal(report.unitReports[0].scores[0].value,3);
 assert.equal((await prisma.compositeReportQueueBudget.findUniqueOrThrow({where:{id:'reports'}})).pending,0);
-fs.writeFileSync('/evidence/recovery-result.json',JSON.stringify({status:'success',receiptPreserved:true,pendingReportRecovered:true,restrictedRuntimeRole:true,scoreVerified:true}));await prisma.$disconnect()})().catch(e=>{console.error(e);process.exit(1)});
+fs.writeFileSync('/evidence/recovery-result.json',JSON.stringify({status:'success',receiptPreserved:true,pendingReportRecovered:true,restrictedRuntimeRole:true,scoreVerified:true}));fs.chownSync('/evidence/recovery-result.json',Number(process.env.EVIDENCE_UID),Number(process.env.EVIDENCE_GID));await prisma.$disconnect()})().catch(e=>{console.error(e);process.exit(1)});
 """)
 subprocess.run(common+['-e','DATABASE_URL='+runtime,'-e','DATABASE_URL_RUNTIME='+runtime,builder,'node','scripts/runtime-role-contract.mjs','verify-current'],check=True,timeout=30)
 subprocess.run(common+['-e','DATABASE_URL='+runtime,builder,'node','/evidence/verify-restore.cjs'],check=True,timeout=90)
