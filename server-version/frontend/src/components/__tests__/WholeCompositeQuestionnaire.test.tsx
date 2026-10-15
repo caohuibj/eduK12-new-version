@@ -79,7 +79,9 @@ describe('whole questionnaire durable browser submission', () => {
     fireEvent.click(screen.getByRole('button', { name: '提交整份问卷' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('还有必答题')
     expect(client.submitWhole).not.toHaveBeenCalled()
-    expect(await finalDraftStore.get(key)).toMatchObject({ status: 'DRAFT', sealedSubmission: undefined })
+    const draft = await finalDraftStore.get(key)
+    expect(draft?.status).toBe('DRAFT')
+    expect(draft?.sealedSubmission).toBeUndefined()
   })
 
   it('keeps the saved receipt authoritative when opening the report fails', async () => {
