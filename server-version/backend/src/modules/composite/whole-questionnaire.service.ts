@@ -151,7 +151,8 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
 export const processWholeQuestionnaireAnswers = async (job: CompositeReportJob): Promise<boolean> => {
   const receipt = job
   if (!receipt.wholeSubmissionId) return false
-  if (receipt.leaseToken !== job.leaseToken || receipt.status !== 'PROCESSING' || !receipt.wholeAnswersEncrypted || !receipt.wholeAcceptedAt) throw failure('整份交卷处理租约已改变')
+  if (!job.leaseToken || receipt.status !== 'PROCESSING' || !receipt.wholeAnswersEncrypted || !receipt.wholeAcceptedAt) throw failure('整份交卷处理租约已改变')
+  const execution: WholeReceiptExecution = { submissionId: receipt.wholeSubmissionId, leaseToken: job.leaseToken, acceptedAtMs: receipt.wholeAcceptedAt.getTime() }
   const envelope = decryptUnifiedRuntimePayload<{ schemaVersion: number; binding: { attemptId: string; attemptEpoch: number; slotSetHash: string; contextHash: string | null };
     payloadHash: string; units: Array<Parameters<typeof submitUnifiedScaleAssessmentFinal>[0] & { itemId: string }> }>(receipt.wholeAnswersEncrypted)
   if (envelope.schemaVersion !== 1 || envelope.binding.attemptId !== job.attemptId || envelope.binding.attemptEpoch !== job.attemptEpoch
@@ -170,9 +171,7 @@ export const processWholeQuestionnaireAnswers = async (job: CompositeReportJob):
   for (const unit of envelope.units) {
     const bound = children.find(candidate => candidate.child.id === unit.assessmentId && candidate.child.compositeItemId === unit.itemId)
     if (!bound || unit.submissionId !== childSubmissionId(receipt.wholeSubmissionId, unit.itemId)) throw failure('整份交卷单元身份不匹配')
-    await traceAssessmentPhase('report.unit', () => submitUnifiedScaleAssessmentFinal(unit, bound.child, {
-      submissionId: receipt.wholeSubmissionId, leaseToken: job.leaseToken!, acceptedAtMs: receipt.wholeAcceptedAt.getTime(),
-    }, referenceDb), unit.itemId)
+    await traceAssessmentPhase('report.unit', () => submitUnifiedScaleAssessmentFinal(unit, bound.child, execution, referenceDb), unit.itemId)
   }
   return true
 }

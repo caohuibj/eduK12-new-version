@@ -19,7 +19,7 @@
     },
     "server-version/backend/src/modules/composite/whole-questionnaire.service.ts": {
       "before": null,
-      "after": "954d2c8dbeb1d4016e113055d06233b7f79b667c"
+      "after": "8e2b63f82cb9d221b96e0b0ea148acdaf4a5537c"
     },
     "server-version/backend/src/modules/scale/scale-result.ts": {
       "before": "31cbf85609f24053f89897cabeb5cf5d9390a833",
