@@ -49,3 +49,41 @@ test('media destination, traversal, public access, lifecycle expiry and missing 
   const unversioned=store();unversioned.client.getBucketVersioning=(a,done)=>done(null,{VersioningConfiguration:{Status:'Suspended'}});
   await assert.rejects(transport.transfer(input,unversioned.client,options),/VERSIONING/);
 });
+
+
+// These fixtures exercise cryptographic compatibility and refusal, independently
+// of COS transport. The large-data memory profile is measured on the server.
+import { encryptDatabaseFile, decryptDatabaseFile, verifyDatabase, validateRestoreTarget } from './backup-crypto.mjs';
+import { encryptPackage, decryptPackage } from '../backup/backup-db.mjs';
+import { mkdirSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+const databaseSecret='synthetic-database-crypto-key-0123456789012345';
+function withDatabasePackage(operation){
+ const directory=mkdtempSync(join(tmpdir(),'database-stream-contract-'));mkdirSync(join(directory,'encryption'));
+ try {
+  const dump=Buffer.from('PGDMP synthetic binary fixture\0\xff');writeFileSync(join(directory,'database.dump'),dump);
+  writeFileSync(join(directory,'manifest.json'),JSON.stringify({format:'eduk12-db-backup',version:1,components:[{name:'database.dump',bytes:dump.length,sha256:hash(dump)}]}));
+  const packed=join(directory,'package.tar'),run=spawnSync('tar',['-cf',packed,'-C',directory,'manifest.json','database.dump']);assert.equal(run.status,0);
+  return operation(directory,packed,dump);
+ }finally{rmSync(directory,{recursive:true,force:true});}
+}
+test('v1 database streaming compatibility works in both directions',()=>withDatabasePackage((d,packed,dump)=>{
+ const file=join(d,'stream.enc');encryptDatabaseFile(packed,file,databaseSecret,join(d,'encryption'));
+ assert.deepEqual(decryptPackage(JSON.parse(readFileSync(file,'utf8')),databaseSecret),readFileSync(packed));
+ const legacy=join(d,'legacy.enc');writeFileSync(legacy,JSON.stringify(encryptPackage(readFileSync(packed),databaseSecret))+'\n');writeFileSync(legacy+'.sha256',hash(readFileSync(legacy)));
+ mkdirSync(join(d,'verify'));assert.deepEqual(readFileSync(verifyDatabase(legacy,databaseSecret,join(d,'verify'))),dump);
+}));
+test('rehashed corrupt GCM data, wrong keys and missing sidecars fail before consuming plaintext',()=>withDatabasePackage((d,packed)=>{
+ const file=join(d,'stream.enc');encryptDatabaseFile(packed,file,databaseSecret,join(d,'encryption'));
+ assert.throws(()=>decryptDatabaseFile(file,join(d,'wrong.tar'),databaseSecret+'wrong'));
+ const value=JSON.parse(readFileSync(file,'utf8'));value.ciphertext=(value.ciphertext[0]==='A'?'B':'A')+value.ciphertext.slice(1);writeFileSync(file,JSON.stringify(value));writeFileSync(file+'.sha256',hash(readFileSync(file)));
+ assert.throws(()=>decryptDatabaseFile(file,join(d,'tampered.tar'),databaseSecret));
+ assert.throws(()=>readFileSync(join(d,'tampered.tar')));
+ rmSync(file+'.sha256');assert.throws(()=>decryptDatabaseFile(file,join(d,'missing.tar'),databaseSecret));
+}));
+test('streaming database helper refuses production restore and archive traversal',()=>withDatabasePackage((d,packed)=>{
+ assert.throws(()=>validateRestoreTarget({confirmation:'RESTORE',target:'eduk12-prod-postgres'}),/ISOLATED_RESTORE_REQUIRED/);
+ writeFileSync(join(d,'unexpected.txt'),'must not extract');const bad=join(d,'bad.tar');assert.equal(spawnSync('tar',['-cf',bad,'-C',d,'manifest.json','database.dump','unexpected.txt']).status,0);
+ const file=join(d,'bad.enc');encryptDatabaseFile(bad,file,databaseSecret,join(d,'encryption'));mkdirSync(join(d,'verify'));
+ assert.throws(()=>verifyDatabase(file,databaseSecret,join(d,'verify')),/ARCHIVE_ENTRIES/);
+}));

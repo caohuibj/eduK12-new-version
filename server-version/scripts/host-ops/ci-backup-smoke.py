@@ -69,7 +69,7 @@ def main():
             docker('exec',name,'psql','-v','ON_ERROR_STOP=1','-U','fixture','-d','fixture','-c',sql)
             source=Path(__file__).resolve().parent.parent/'backup'
             env={**os.environ,'BACKUP_ENCRYPTION_KEY':secret,'POSTGRES_CONTAINER':name,'DB_USER':'fixture','DB_NAME':'fixture','ENCRYPTED_DIR':str(work)}
-            subprocess.run([backup.NODE,str(source/'backup-db.mjs'),'full'],env=env,capture_output=True,check=True,timeout=120)
+            backup.database_command('full',secret,postgresContainer=name,user='fixture',database='fixture',directory=str(work))
             encrypted=list(work.glob('*.edubackup.enc'));assert len(encrypted)==1
             restored=backup.restore_check(encrypted[0],source,secret,work,ident,expected)
             assert restored['users']==1 and restored['appliedMigrations']==1 and restored['status']=='PASS'

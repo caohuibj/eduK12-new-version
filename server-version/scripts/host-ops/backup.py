@@ -83,8 +83,8 @@ def validate_config(c):
     require(c.get('schema') == 1 and c.get('sourceBucket') == 'ptool-videos-edu-1393949445'
             and c.get('backupBucket') == 'eduk12-backups-1393949445' and c.get('region') == 'ap-beijing', 'BUCKET_BINDING_REFUSED')
     require(c.get('cleanupMode') == 'plan_only' and c.get('localCopies') == 2, 'UNSAFE_RETENTION_CONFIG')
-    require(isinstance(c.get('maxBackupBytes'), int) and 0 < c['maxBackupBytes'] <= 512 * 1024 ** 2
-            and c.get('minimumFreeBytes', 0) >= 6 * 1024 ** 3, 'UNSAFE_RESOURCE_CONFIG')
+    require(isinstance(c.get('maxBackupBytes'), int) and 0 < c['maxBackupBytes'] <= 2 * 1024 ** 3
+            and c.get('minimumFreeBytes', 0) >= max(6 * 1024 ** 3, 6 * c['maxBackupBytes']), 'UNSAFE_RESOURCE_CONFIG')
     r = c.get('retention', {})
     require(r.get('dailyDays', 0) >= 30 and r.get('weeklyWeeks', 0) >= 12 and r.get('monthlyMonths', 0) >= 12, 'RETENTION_TOO_SHORT')
     hashes = c.get('backupSourceSha256', {})
@@ -100,6 +100,16 @@ def run(args, env=None, data=None, timeout=600):
         os.chmod(STATE / 'last-command.log', 0o600)
         raise RuntimeError('BACKUP_COMMAND_FAILED')
     return result.stdout
+
+
+def database_command(operation, secret, **values):
+    # The passphrase travels over private stdin, never command arguments/logs.
+    payload = {'secret': secret, **values}
+    if os.geteuid() == 0 and STATE.is_dir():
+        payload['progress'] = str(STATE / 'progress.json')
+        atomic(STATE / 'progress.json', {'stage': 'database-' + operation, 'at': time.time()})
+    return json.loads(run([NODE, str(CODE / 'backup-crypto.mjs'), 'database-' + operation],
+                          data=canonical(payload), timeout=600))
 
 
 def inspect(name):
@@ -215,7 +225,7 @@ def restore_check(file, source, secret, work, ident, expected_migrations=None):
         env = os.environ.copy()
         env.update(BACKUP_ENCRYPTION_KEY=secret, RESTORE_CONFIRMATION='RESTORE', RESTORE_TARGET_CONTAINER=name,
                    RESTORE_TARGET_DB_NAME='restore', RESTORE_TARGET_DB_USER='restore', NODE_OPTIONS='--max-old-space-size=768')
-        run([NODE, str(source / 'restore-db.mjs'), str(file)], env=env, timeout=600)
+        database_command('restore', secret, file=str(file), confirmation='RESTORE', target=name, user='restore', database='restore')
         sql = 'SELECT COALESCE(json_agg(row_to_json(m)),\'[]\'::json) FROM (SELECT migration_name AS name, checksum FROM "_prisma_migrations" WHERE finished_at IS NOT NULL AND rolled_back_at IS NULL) m; SELECT count(*) FROM "_prisma_migrations" WHERE finished_at IS NULL AND rolled_back_at IS NULL; SELECT count(*) FROM users;'
         counts = run(['docker', 'exec', name, 'psql', '-X', '-q', '-v', 'ON_ERROR_STOP=1', '-U', 'restore', '-d', 'restore', '-Atc', sql]).decode().strip().splitlines()
         require(len(counts) == 3 and counts[1] == '0' and counts[2].isdigit(), 'RESTORE_SCHEMA_CHECK_FAILED')
@@ -336,7 +346,7 @@ def backup():
             task_env.update(BACKUP_ENCRYPTION_KEY=secret, POSTGRES_CONTAINER=POSTGRES,
                             DB_USER=pg_env['POSTGRES_USER'], DB_NAME=pg_env['POSTGRES_DB'],
                             ENCRYPTED_DIR=str(work), NODE_OPTIONS='--max-old-space-size=768')
-            run([NODE, str(source / 'backup-db.mjs'), 'full'], env=task_env)
+            database_command('full', secret, postgresContainer=POSTGRES, user=pg_env['POSTGRES_USER'], database=pg_env['POSTGRES_DB'], directory=str(work), maxBytes=c['maxBackupBytes'])
             encrypted = list(work.glob('*.edubackup.enc'))
             require(len(encrypted) == 1 and encrypted[0].stat().st_size <= c['maxBackupBytes'], 'DATABASE_BACKUP_LIMIT')
             database = work / 'database.edubackup.enc'; encrypted[0].rename(database)
@@ -344,7 +354,7 @@ def backup():
             remote_db = transfer(c, credentials, backend['Image'], work, ident, file=database.name)
             downloaded = work / (database.name + '.remote')
             Path(str(downloaded) + '.sha256').write_text(remote_db['sha256'] + '  ' + downloaded.name + '\n')
-            run([NODE, str(source / 'backup-db.mjs'), 'verify', str(downloaded)], env=task_env)
+            database_command('verify', secret, file=str(downloaded))
             restoration = restore_check(downloaded, source, secret, work, ident, expected_migrations)
             remote_db.update(file=database.name, authenticatedDecryptionVerified=True)
             archive, config_count = config_archive(work)
@@ -360,6 +370,7 @@ def backup():
                        'bucket': c['backupBucket'], 'region': c['region'], 'sourceRevision': revision,
                        'expectedMigrationFingerprint': migration_fingerprint(expected_migrations), 'sourceRuntimeProof': runtime_proof,
                        'scope': 'database_and_server_configuration', 'fullServerDiskImage': False,
+                       'databaseImplementation': {'format': 'eduk12-db-backup v1', 'mode': 'bounded-streaming', 'sha256': sha(CODE / 'backup-crypto.mjs'), 'maxBackupBytes': c['maxBackupBytes']},
                        'objects': [remote_db, remote_config], 'serverConfigFiles': config_count,
                        'restore': restoration, 'attachmentAssociation': attachment_association(secret), 'protected': not catalog['points']}
             atomic(work / 'receipt.json', seal(receipt, secret))

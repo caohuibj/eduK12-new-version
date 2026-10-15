@@ -64,7 +64,7 @@ class BackupSafety(unittest.TestCase):
 
     def test_media_bucket_cannot_be_backup_destination(self):
         for edit in [{'backupBucket': self.config['sourceBucket']}, {'region': 'ap-shanghai'},
-                     {'cleanupMode': 'delete'}, {'localCopies': 1}, {'maxBackupBytes': 2 * 1024 ** 3},
+                     {'cleanupMode': 'delete'}, {'localCopies': 1}, {'maxBackupBytes': 4 * 1024 ** 3},
                      {'minimumFreeBytes': 0}, {'retention': {'dailyDays': 1}}, {'backupSourceSha256': {}}]:
             with self.assertRaises(RuntimeError): backup.validate_config({**self.config, **edit})
         backup.validate_config(self.config)
