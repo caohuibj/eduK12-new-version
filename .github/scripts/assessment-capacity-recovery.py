@@ -6,7 +6,7 @@ checks_path=evidence/'checks.json'; checks=json.loads(checks_path.read_text())
 if os.environ.get('GITHUB_ACTIONS')!='true' or os.environ.get('CI')!='true': raise RuntimeError('Official isolated CI only')
 base='postgresql://ptool:synthetic@127.0.0.1:5432/assessment_capacity_ci_test?schema=public'
 common=['docker','run','--rm','--network','host','-v',str(evidence)+':/evidence','-v',str(Path('server-version/backend/src/__tests__').resolve())+':/app/src/__tests__:ro',
- '-e','CI=true','-e','GITHUB_ACTIONS=true','-e','NODE_ENV=test','-e','JWT_SECRET=synthetic-report-ci-not-production','-e','ASSET_SIGNING_SECRET=synthetic-report-assets',
+ '-e','CI=true','-e','GITHUB_ACTIONS=true','-e','NODE_ENV=test','-e','JWT_SECRET=synthetic-report-ci-not-production','-e','ASSET_SIGNING_SECRET=synthetic-report-assets-not-production',
  '-e','DATA_ENCRYPTION_KEY='+'55'*32,'-e','DATA_PSEUDONYM_KEY='+'56'*32,'-e','ASSET_MIGRATION_COMPLETE=true','-e','ASSESSMENT_REPORT_ASYNC_ENABLED=true',
  '-e','UPLOAD_DIR=/tmp/report-ci-uploads']
 script=evidence/'prepare-restore.ts'
