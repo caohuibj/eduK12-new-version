@@ -35,7 +35,7 @@ it('validates expiry visibly and creates a link and wave through one idempotent 
  expect(await screen.findByRole('alert')).toHaveTextContent('请选择未来的波次有效期')
  expect(screen.getByLabelText('波次有效期')).toHaveFocus()
  expect(api.createWave).not.toHaveBeenCalled()
- fireEvent.change(screen.getByLabelText('波次有效期'),{target:{value:'2026-10-14T23:59'}})
+ fireEvent.change(screen.getByLabelText('波次有效期'),{target:{value:new Date(Date.now()+7*24*60*60*1000).toISOString().slice(0,16)}})
  api.createWave.mockRejectedValueOnce(new Error('网络暂不可用')).mockResolvedValueOnce({id:'w2',tokenId:'t2'})
  await user.click(screen.getByRole('button',{name:'建立波次并生成链接'}))
  expect(await screen.findByRole('alert')).toHaveTextContent('网络暂不可用')

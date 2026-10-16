@@ -1,3 +1,4 @@
+import { loadStoredUnitAdmission } from '../assessment-runtime/unit-admission'
 import { prisma } from '../../config/database'
 import { assertAttemptEpoch, assertFinalOnly, InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import { readCompositeAttemptContext } from '../../services/assessmentContextService'
@@ -9,8 +10,8 @@ import {
   persistAdmissionOnce,
   readStoredUnitAdmission,
 } from '../assessment-runtime/unit-admission'
-import { compositeItemSlotKey, getFrozenActiveSlot, type FrozenActiveSlotV1 } from '../assessment-runtime/slot-set'
-import { readCognitiveSessionConfig } from './session.service'
+import { compositeItemSlotKey, loadFrozenActiveSlot, type FrozenActiveSlotV1 } from '../assessment-runtime/slot-set'
+import { loadCognitiveSessionConfig } from './session.service'
 
 const COMPILED_RUNTIME_HASH = /^[0-9a-f]{64}$/
 const CONFIG_HASH = /^[0-9a-f]{64}$/
@@ -98,8 +99,8 @@ const compiledRuntimeHashFrom = (slot: FrozenActiveSlotV1, fallback: string | nu
   return hash
 }
 
-const configHashFrom = (encrypted: string): string => {
-  const stored = readCognitiveSessionConfig(encrypted)
+const configHashFrom = async (encrypted: string): Promise<string> => {
+  const stored = await loadCognitiveSessionConfig(encrypted)
   const hash = stored.snapshot?.configHash
   if (!hash || !CONFIG_HASH.test(hash)) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '认知运行时快照不可用，请重启后重新作答', 409)
@@ -131,6 +132,8 @@ export const readStoredCognitiveAdmission = (
 ): FrozenUnitAdmissionV1 | null => (
   readStoredUnitAdmission(row, '认知准入快照无法读取，请重启后重新作答')
 )
+export const loadStoredCognitiveAdmission = (row: { frozenAdmissionSnapshotEncrypted: string | null; frozenAdmissionSnapshotHash: string | null }): Promise<FrozenUnitAdmissionV1 | null> => loadStoredUnitAdmission(row, '认知准入快照无法读取，请重启后重新作答')
+
 
 export const ensureCognitiveAdmissionAtDelivery = async (
   sessionId: string,
@@ -165,10 +168,10 @@ export const activateCognitiveAdmission = async (
   row: CognitiveAdmissionChildRow,
   parent?: CompositeCognitiveAdmissionParent,
 ): Promise<FrozenUnitAdmissionV1> => {
-  const stored = readStoredCognitiveAdmission(row)
+  const stored = await loadStoredCognitiveAdmission(row)
   if (stored) return stored
   assertFinalOnly(row.deliveryMode)
-  const configHash = configHashFrom(row.configSnapshotEncrypted)
+  const configHash = await configHashFrom(row.configSnapshotEncrypted)
   const cognitive = {
     testType: row.testType,
     engineVersion: row.engineVersion,
@@ -201,7 +204,7 @@ export const activateCognitiveAdmission = async (
     const slotKey = compositeItemSlotKey(row.compositeItemId, 'COGNITIVE')
     let slot: FrozenActiveSlotV1
     try {
-      slot = getFrozenActiveSlot({
+      slot = await loadFrozenActiveSlot({
         encrypted: loaded.frozenActiveSlotSetEncrypted,
         storedHash: loaded.frozenActiveSlotSetHash,
         attemptEpoch: row.attemptNo,

@@ -11,7 +11,7 @@ const entries=sources.map(entry);const read=(ref,file)=>approved.files[file][ref
 test('complete immutable source boundary rejects unknown, dependencies, schema, homepage and deletion changes',()=>{
  assert.equal(admitsAssessmentCapacity(entries,read,approved),true);
  assert.equal(admitsAssessmentCapacity(entries.slice(1),read,approved),false);
- for(const file of ['server-version/backend/prisma/migrations/unreviewed/migration.sql','server-version/backend/package-lock.json','server-version/backend/Dockerfile.unknown','server-version/backend/src/controllers/authController.ts','server-version/frontend/src/survey/SurveyLanding.tsx','server-version/frontend/src/huiteacher/HuiteacherLanding.tsx','server-version/backend/src/index.ts','server-version/backend/src/modules/scale/unknown.ts','unknown'])
+ for(const file of ['server-version/backend/prisma/migrations/unreviewed/migration.sql','server-version/backend/package-lock.json','server-version/backend/Dockerfile.unknown','server-version/backend/src/controllers/authController.ts','server-version/frontend/src/survey/SurveyLanding.tsx','server-version/frontend/src/huiteacher/HuiteacherLanding.tsx','server-version/backend/src/index.unreviewed.ts','server-version/backend/src/modules/scale/unknown.ts','unknown'])
   assert.equal(admitsAssessmentCapacity([...entries,entry(file)],read,approved),false,file);
  for(const update of [{status:'D',newMode:'000000'},{status:'T'},{oldMode:'120000'},{newMode:'100755'}])assert.equal(admitsAssessmentCapacity([{...entries[0],...update},...entries.slice(1)],read,approved),false);
  for(const ref of ['base','head'])assert.equal(admitsAssessmentCapacity(entries,(r,f)=>r===ref&&f===sources[0]?'3'.repeat(40):read(r,f),approved),false);
@@ -64,4 +64,12 @@ test('compiler reuse admits only frozen isolated test environment/reporting/fail
  const after=readFileSync(new URL('./assessment-capacity-candidate.py',import.meta.url),'utf8');
  assert.equal(isolatedTestRunnerCorrectionsOnly(after,b.candidateBefore),true);
  for(const modified of [after+'unknown',after.replace('RUN npx tsc','RUN true'),after.replace("'HIGH,CRITICAL'","'CRITICAL'")])assert.equal(isolatedTestRunnerCorrectionsOnly(modified,b.candidateBefore),false);
+});
+
+
+test('container route-check fixtures are byte-identical to the maintained source checker and ledger',()=>{
+ for (const [source,fixture] of [
+  ['../../server-version/perf/current-main-v1/check-final-routes.mjs','../../server-version/backend/src/__tests__/fixtures/final-route-checker.fixture.mjs'],
+  ['../../docs/performance-optimization-v1/route-inventory.csv','../../server-version/backend/src/__tests__/fixtures/final-route-inventory.fixture.csv'],
+ ]) assert.deepEqual(readFileSync(new URL(source,import.meta.url)),readFileSync(new URL(fixture,import.meta.url)));
 });

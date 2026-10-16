@@ -11,14 +11,18 @@
     "assessment_attempt_consents": "RUNTIME_RW",
     "assessment_composition_templates": "RUNTIME_RW",
     "assessment_episodes": "RUNTIME_RW",
+    "assessment_frozen_bindings": "RUNTIME_RW",
     "assessment_management_events": "RUNTIME_RW",
+    "assessment_public_templates": "RUNTIME_RW",
     "assessment_reference_sets": "RUNTIME_RW",
+    "assessment_result_facts": "RUNTIME_RW",
     "assessment_run_actor_snapshots": "RUNTIME_RW",
     "assessment_run_execution_start_claims": "RUNTIME_RW",
     "assessment_run_executions": "RUNTIME_RW",
     "assessment_run_relationship_snapshots": "RUNTIME_RW",
     "assessment_run_tracks": "RUNTIME_RW",
     "assessment_runs": "RUNTIME_RW",
+    "assessment_runtime_artifacts": "RUNTIME_RW",
     "assessment_unit_snapshots": "RUNTIME_RW",
     "assessments": "RUNTIME_RW",
     "asset_references": "RUNTIME_RW",
@@ -69,6 +73,8 @@
     "composite_form_answers": "RUNTIME_RW",
     "composite_form_section_attempts": "RUNTIME_RW",
     "composite_form_sections": "RUNTIME_RW",
+    "composite_report_jobs": "RUNTIME_RW",
+    "composite_report_queue_budget": "RUNTIME_RW",
     "course_questionnaires": "RUNTIME_RW",
     "course_scales": "RUNTIME_RW",
     "course_shares": "RUNTIME_RW",
@@ -194,8 +200,6 @@
     "survey_waves": "RUNTIME_RW",
     "teacher_codes": "RUNTIME_RW",
     "users": "RUNTIME_RW",
-    "videos": "RUNTIME_RW",
-    "composite_report_jobs": "RUNTIME_RW",
-    "composite_report_queue_budget": "RUNTIME_RW"
+    "videos": "RUNTIME_RW"
   }
 }

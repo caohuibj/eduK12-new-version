@@ -1,3 +1,6 @@
+import { storeSharedUnitAdmission, loadSharedUnitAdmission, type SharedControlDb } from './shared-control-records'
+import { parseFrozenUnitAdmission } from './admission-snapshot'
+import { parseVersionedFrozenUnitAdmission } from './admission-snapshot-v2'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import {
   decryptFrozenUnitAdmission,
@@ -79,36 +82,53 @@ export const readStoredVersionedUnitAdmission = (
   }
 }
 
+/** New-format readers are async because a cold process reloads durable shared versions. */
+export const loadStoredVersionedUnitAdmission = async (row: StoredAdmissionRow, unreadableMessage: string, db?:SharedControlDb): Promise<VersionedFrozenUnitAdmission | null> => {
+  if (!row.frozenAdmissionSnapshotEncrypted || !row.frozenAdmissionSnapshotHash) return null
+  try {
+    const snapshot = parseVersionedFrozenUnitAdmission(await loadSharedUnitAdmission(row.frozenAdmissionSnapshotEncrypted,db))
+    if (snapshot.snapshotHash !== row.frozenAdmissionSnapshotHash) throw new Error('Frozen unit admission stored hash mismatch')
+    return snapshot
+  } catch (error) { throw new InstrumentFinalSubmitError('STALE_ATTEMPT', error instanceof Error ? error.message : unreadableMessage, 409) }
+}
+export const loadStoredUnitAdmission = async (row: StoredAdmissionRow, unreadableMessage: string, db?:SharedControlDb): Promise<FrozenUnitAdmissionV1 | null> => {
+  const snapshot = await loadStoredVersionedUnitAdmission(row, unreadableMessage,db)
+  if (snapshot && snapshot.schemaVersion !== 1) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', 'Frozen unit admission schema mismatch', 409)
+  return snapshot as FrozenUnitAdmissionV1 | null
+}
+
 export const persistAdmissionOnce = async (input: {
   snapshot: FrozenUnitAdmissionV1
+  db?:SharedControlDb
   writeIfEmpty: (persisted: ReturnType<typeof frozenAdmissionPersistence>) => Promise<{ count: number }>
   read: () => Promise<StoredAdmissionRow | null>
   missingMessage: string
   unreadableMessage: string
 }): Promise<FrozenUnitAdmissionV1> => {
-  const persisted = frozenAdmissionPersistence(input.snapshot)
+  const persisted = { frozenAdmissionSnapshotEncrypted: await storeSharedUnitAdmission(input.snapshot,input.db), frozenAdmissionSnapshotHash: input.snapshot.snapshotHash }
   const updated = await input.writeIfEmpty(persisted)
   if (updated.count === 1) return input.snapshot
   const current = await input.read()
   if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', input.missingMessage, 404)
-  const stored = readStoredUnitAdmission(current, input.unreadableMessage)
+  const stored = await loadStoredUnitAdmission(current, input.unreadableMessage,input.db)
   if (stored) return stored
   throw new InstrumentFinalSubmitError('STALE_ATTEMPT', input.unreadableMessage, 409)
 }
 
 export const persistVersionedAdmissionOnce = async <T extends VersionedFrozenUnitAdmission>(input: {
   snapshot: T
+  db?:SharedControlDb
   writeIfEmpty: (persisted: ReturnType<typeof versionedFrozenAdmissionPersistence>) => Promise<{ count: number }>
   read: () => Promise<StoredAdmissionRow | null>
   missingMessage: string
   unreadableMessage: string
 }): Promise<T> => {
-  const persisted = versionedFrozenAdmissionPersistence(input.snapshot)
+  const persisted = { frozenAdmissionSnapshotEncrypted: await storeSharedUnitAdmission(input.snapshot,input.db), frozenAdmissionSnapshotHash: input.snapshot.snapshotHash }
   const updated = await input.writeIfEmpty(persisted)
   if (updated.count === 1) return input.snapshot
   const current = await input.read()
   if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', input.missingMessage, 404)
-  const stored = readStoredVersionedUnitAdmission(current, input.unreadableMessage)
+  const stored = await loadStoredVersionedUnitAdmission(current, input.unreadableMessage,input.db)
   if (!stored) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', input.unreadableMessage, 409)
   if (stored.schemaVersion !== input.snapshot.schemaVersion) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表准入快照版本冲突', 409)

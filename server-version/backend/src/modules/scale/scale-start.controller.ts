@@ -1,3 +1,4 @@
+import { loadScaleAnswers } from './scale-workflow.service'
 import { standaloneContextSchema } from './scale-context-input'
 import { withSerializableScaleTransaction } from './deployment/transactions'
 import type { Request, Response } from 'express'
@@ -17,15 +18,15 @@ import { requiredScaleContextKeys } from './policy/context-preflight'
 import { hashScaleDefinition, runnerDefinition } from './scale-definition'
 import {
   readScaleAnswers,
-  scaleAssessmentForResponse,
+  loadScaleAssessmentForResponse,
   scaleDefinitionFromRecord,
 } from './scale-workflow.service'
-import { freezeScaleRuntimeAtAttemptStart, encryptFrozenScaleRuntimeSnapshot, decryptFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
+import { freezeScaleRuntimeAtAttemptStart, persistFrozenScaleRuntimeSnapshot, loadFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
 import { encryptField } from '../../utils/encryption'
 import { retainFrozenScaleAssessmentImages } from './scale-image-retention'
 import {
   activateScaleAdmission,
-  readStoredScaleAdmission,
+  loadStoredScaleAdmission,
   standaloneAdmissionPersistenceForRuntime,
 } from './scale-admission.service'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
@@ -51,15 +52,15 @@ const buildStandaloneContext = (
   return { context, hash: hashAssessmentContext(context) }
 }
 
-const responseEnvelope = (assessment: any, scale: any) => {
-  const admission = readStoredScaleAdmission(assessment)
+const responseEnvelope = async (assessment: any, scale: any) => {
+  const admission = await loadStoredScaleAdmission(assessment)
   const definition = assessment.runtimeSnapshotEncrypted
-    ? decryptFrozenScaleRuntimeSnapshot(assessment.runtimeSnapshotEncrypted).definition
+    ? (await loadFrozenScaleRuntimeSnapshot(assessment.runtimeSnapshotEncrypted)).definition
     : scaleDefinitionFromRecord(scale)
   const runner = runnerDefinition(definition)
   return {
     assessment: {
-      ...scaleAssessmentForResponse(assessment),
+      ...(await loadScaleAssessmentForResponse(assessment)),
       contextSnapshotHash: admission?.contextSnapshotHash ?? null,
       contextFrozenAt: admission?.schemaVersion === 2
         ? admission.scalePolicy?.eligibility.contextFrozenAt ?? admission.frozenAt
@@ -117,9 +118,9 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
       // access, deployment and grant state are new-start controls and must not
       // retroactively invalidate an in-flight attempt.
       if (existing.runtimeGeneration === 'UNIFIED_V1') await activateScaleAdmission({ ...existing, scale } as any)
-      const stored = readScaleAnswers(existing.answers)
+      const stored = (await loadScaleAnswers(existing.answers, existing))
       if (stored.decryptError) return error(res, '测评答案无法读取，请联系管理员')
-      return success(res, responseEnvelope(existing, scale), '继续未完成的测评')
+      return success(res, (await responseEnvelope(existing, scale)), '继续未完成的测评')
     }
 
     let assessment
@@ -176,7 +177,7 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
             status: 'IN_PROGRESS',
             deliveryMode: 'FINAL_ONLY',
             runtimeGeneration: 'UNIFIED_V1',
-            runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(runtimeSnapshot),
+            runtimeSnapshotEncrypted: (await persistFrozenScaleRuntimeSnapshot(runtimeSnapshot, tx)),
             compiledRuntimeHash: runtimeSnapshot.compiledRuntime.compiledRuntimeHash,
             ...admission,
             attemptEpoch: 1,
@@ -209,9 +210,9 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
     }
     if ('preflight' in assessment) return success(res, assessment, '请先补充测评所需资料')
     if (assessment.runtimeGeneration === 'UNIFIED_V1') await activateScaleAdmission({ ...assessment, scale } as any)
-    const stored = readScaleAnswers(assessment.answers)
+    const stored = (await loadScaleAnswers(assessment.answers, assessment))
     if (stored.decryptError) return error(res, '测评答案无法读取，请联系管理员')
-    return success(res, responseEnvelope(assessment, scale), '测评已开始')
+    return success(res, (await responseEnvelope(assessment, scale)), '测评已开始')
   } catch (err) {
     if (err instanceof InstrumentFinalSubmitError) return instrumentError(res, err.code, err.message, err.statusCode)
     logger.error('开始 v2 量表测评错误', err)

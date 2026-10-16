@@ -176,7 +176,7 @@ services:
     # 默认不发布 Host port
 
   backend:
-    cpus: ${BACKEND_CPUS:-2.5}
+    cpus: ${BACKEND_CPUS:-1.25}
     mem_limit: ${BACKEND_MEM_LIMIT:-1024m}
     image: server-version-backend:latest
     build:
@@ -242,7 +242,7 @@ services:
   # process's Prisma pool with transcode/export.
   worker:
     # Allow reports to borrow idle CPU; API/DB retain higher shares on contention.
-    cpus: ${WORKER_CPUS:-1.5}
+    cpus: ${WORKER_CPUS:-0.75}
     cpu_shares: ${WORKER_CPU_SHARES:-512}
     mem_limit: ${WORKER_MEM_LIMIT:-768m}
     image: server-version-backend:latest

@@ -1,3 +1,5 @@
+import { isControlReferenceField, decryptControlReference } from '../modules/assessment-runtime/control-reference-codec'
+import { decryptCompactField, isCompactEncryptedField } from '../modules/assessment-runtime/compact-field-codec'
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto'
 import { logger } from './logger'
 
@@ -38,6 +40,7 @@ const getEncryptionKey = (): Buffer => {
  */
 export const isEncrypted = (data: string): boolean => {
   if (!data || typeof data !== 'string') return false
+  if (isCompactEncryptedField(data) || isControlReferenceField(data)) return true
   const parts = data.split(':')
   if (parts.length !== 3) return false
   // 检查每部分是否为有效的十六进制字符串
@@ -49,26 +52,24 @@ export const isEncrypted = (data: string): boolean => {
  * @param data 要加密的数据对象
  * @returns 加密后的字符串 (格式: iv:authTag:encryptedData)
  */
+const encryptJsonPayload = (jsonData: string): string => {
+  const key = getEncryptionKey()
+  const iv = randomBytes(IV_LENGTH)
+  const cipher = createCipheriv(ALGORITHM, key, iv)
+  const encrypted = Buffer.concat([cipher.update(jsonData, 'utf8'), cipher.final()])
+  const authTag = cipher.getAuthTag()
+  return [iv.toString('hex'), authTag.toString('hex'), encrypted.toString('hex')].join(':')
+}
+
 export const encryptField = <T extends object>(data: T): string => {
-  try {
-    const key = getEncryptionKey()
-    const iv = randomBytes(IV_LENGTH)
-    const cipher = createCipheriv(ALGORITHM, key, iv)
-    
-    const jsonData = JSON.stringify(data)
-    const encrypted = Buffer.concat([
-      cipher.update(jsonData, 'utf8'),
-      cipher.final()
-    ])
-    
-    const authTag = cipher.getAuthTag()
-    
-    // 格式: iv:authTag:encryptedData
-    return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted.toString('hex')}`
-  } catch (error) {
-    logger.error('加密数据失败', error)
-    throw new Error('数据加密失败')
-  }
+  try { return encryptJsonPayload(JSON.stringify(data)) }
+  catch (error) { logger.error('加密数据失败', error); throw new Error('数据加密失败') }
+}
+
+/** Internal trusted JSON.stringify output only; retains the existing ciphertext format. */
+export const encryptSerializedField = (serializedJson: string): string => {
+  try { return encryptJsonPayload(serializedJson) }
+  catch (error) { logger.error('加密数据失败', error); throw new Error('数据加密失败') }
 }
 
 /**
@@ -78,6 +79,8 @@ export const encryptField = <T extends object>(data: T): string => {
  */
 export const decryptField = <T extends object>(encrypted: string): T => {
   try {
+    if (isControlReferenceField(encrypted)) return {schemaVersion:1,value:decryptControlReference(encrypted)} as unknown as T
+    if (isCompactEncryptedField(encrypted)) return decryptCompactField<T>(encrypted)
     const key = getEncryptionKey()
     const [ivHex, authTagHex, dataHex] = encrypted.split(':')
     

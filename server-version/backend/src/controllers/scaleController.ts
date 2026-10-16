@@ -1,3 +1,4 @@
+import { loadScaleAnswers } from '../modules/scale/scale-workflow.service'
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
 import { scaleExportScope } from '../services/scaleExportScope'
@@ -28,7 +29,7 @@ import {
   encryptScaleResult,
   readScaleAnswers,
   readScaleResult,
-  scaleAssessmentForResponse,
+  loadScaleAssessmentForResponse,
   scaleDefinitionFromRecord,
   scaleRunnerFromRecord,
 } from '../modules/scale/scale-workflow.service'
@@ -40,7 +41,7 @@ import { getExportArtifactStatus, resolveArtifactForDownload } from '../services
 import { enqueueExportJob } from '../services/exportJobService'
 import { utcHalfOpenDateFilter } from '../services/exportService'
 import { restartStandaloneScaleAssessment, submitScaleAssessmentFinalWithContext, isFinalScaleSubmitError } from '../modules/scale/scale-final-submit.service'
-import { encryptFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../modules/assessment-runtime/runtime-snapshot'
+import { persistFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../modules/assessment-runtime/runtime-snapshot'
 import { standaloneAdmissionPersistence } from '../modules/scale/scale-admission.service'
 import { finalScaleSubmitSchema } from '../services/scale-final-submit.schema'
 import {
@@ -800,10 +801,10 @@ export const scaleController = {
         },
       })
       if (existing) {
-        const stored = readScaleAnswers(existing.answers)
+        const stored = (await loadScaleAnswers(existing.answers, existing))
         if (stored.decryptError) return error(res, '测评答案无法读取，请联系管理员')
         return success(res, {
-          assessment: scaleAssessmentForResponse(existing),
+          assessment: (await loadScaleAssessmentForResponse(existing)),
           scale: { id: scale.id, code: scale.code, name: scale.name, description: scale.description, instruction: scale.instruction, estimatedTime: scale.estimatedTime, definition: runner, definitionHash: hashScaleDefinition(definition) },
         }, '继续未完成的测评')
       }
@@ -823,7 +824,7 @@ export const scaleController = {
               status: 'IN_PROGRESS',
               deliveryMode: 'FINAL_ONLY',
               runtimeGeneration: 'UNIFIED_V1',
-              runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(runtimeSnapshot),
+              runtimeSnapshotEncrypted: (await persistFrozenScaleRuntimeSnapshot(runtimeSnapshot, tx)),
               compiledRuntimeHash: runtimeSnapshot.compiledRuntime.compiledRuntimeHash,
               ...standaloneAdmissionPersistence({
                 attemptEpoch: 1,
@@ -858,15 +859,15 @@ export const scaleController = {
           },
         })
         if (!assessment) throw err
-        const stored = readScaleAnswers(assessment.answers)
+        const stored = (await loadScaleAnswers(assessment.answers, assessment))
         if (stored.decryptError) return error(res, '测评答案无法读取，请联系管理员')
         return success(res, {
-          assessment: scaleAssessmentForResponse(assessment),
+          assessment: (await loadScaleAssessmentForResponse(assessment)),
           scale: { id: scale.id, code: scale.code, name: scale.name, description: scale.description, instruction: scale.instruction, estimatedTime: scale.estimatedTime, definition: runner, definitionHash: hashScaleDefinition(definition) },
         }, '继续未完成的测评')
       }
       return success(res, {
-        assessment: scaleAssessmentForResponse(assessment),
+        assessment: (await loadScaleAssessmentForResponse(assessment)),
         scale: { id: scale.id, code: scale.code, name: scale.name, description: scale.description, instruction: scale.instruction, estimatedTime: scale.estimatedTime, definition: runner, definitionHash: hashScaleDefinition(definition) },
       }, '测评已开始')
     } catch (err) {
@@ -914,7 +915,7 @@ export const scaleController = {
         ) {
           await freezeQuestionnaireAssessmentContext(tx, assessment.questionnaireAssessmentId)
         }
-        const stored = readScaleAnswers(assessment.answers)
+        const stored = (await loadScaleAnswers(assessment.answers, assessment))
         if (stored.decryptError) return { kind: 'decrypt-error' as const }
         const persistedProvenance = deviceInputProvenance ?? stored.deviceInputProvenance
         const merged = mergeScaleAnswersWithRevision(stored.answers, [{ ...answer, expectedRevision }])
@@ -932,14 +933,14 @@ export const scaleController = {
         if (updated.count !== 1) return { kind: 'stale-answer' as const }
         return {
           kind: 'saved' as const,
-          assessment: scaleAssessmentForResponse({
+          assessment: (await loadScaleAssessmentForResponse({
             ...assessment,
             answers,
             deviceInputProvenance: persistedProvenance,
             answersRevision: (assessment.answersRevision ?? 0) + merged.changedCount,
             progress,
             result: null,
-          }),
+          }, undefined, tx)),
         }
       })
 
@@ -999,7 +1000,7 @@ export const scaleController = {
           await freezeQuestionnaireAssessmentContext(tx, assessment.questionnaireAssessmentId)
         }
 
-        const stored = readScaleAnswers(assessment.answers)
+        const stored = (await loadScaleAnswers(assessment.answers, assessment))
         if (stored.decryptError) return { kind: 'decrypt-error' as const }
         const persistedProvenance = parsed.data.deviceInputProvenance ?? stored.deviceInputProvenance
         const mergedResult = mergeScaleAnswersWithRevision(stored.answers, answers)
@@ -1056,13 +1057,13 @@ export const scaleController = {
         if (!assessment) return { kind: 'not-found' as const }
         if (assessment.userId !== userId) return { kind: 'forbidden' as const }
         if (assessment.status === 'COMPLETED') {
-          return { kind: 'completed' as const, assessment: scaleAssessmentForResponse(assessment) }
+          return { kind: 'completed' as const, assessment: (await loadScaleAssessmentForResponse(assessment, undefined, tx)) }
         }
         if (assessment.status !== 'IN_PROGRESS') return { kind: 'ended' as const }
         const contextSnapshot = assessment.questionnaireAssessmentId
           ? await freezeQuestionnaireAssessmentContext(tx, assessment.questionnaireAssessmentId)
           : null
-        const stored = readScaleAnswers(assessment.answers)
+        const stored = (await loadScaleAnswers(assessment.answers, assessment))
         if (stored.decryptError) return { kind: 'decrypt-error' as const }
         const definition = scaleDefinitionFromRecord(assessment.scale)
         const missingRequiredItems = missingRequiredScaleItemCodes(definition, stored.answers)
@@ -1089,14 +1090,14 @@ export const scaleController = {
         if (updated.count !== 1) {
           const current = await tx.assessment.findUnique({ where: { id: assessmentId } })
           if (current?.status === 'COMPLETED') {
-            return { kind: 'completed' as const, assessment: scaleAssessmentForResponse(current) }
+            return { kind: 'completed' as const, assessment: (await loadScaleAssessmentForResponse(current, undefined, tx)) }
           }
           return { kind: 'ended' as const }
         }
         if (assessment.questionnaireAssessmentId) await refreshQuestionnaireProgress(tx, assessment.questionnaireAssessmentId)
         return {
           kind: 'completed' as const,
-          assessment: scaleAssessmentForResponse({
+          assessment: (await loadScaleAssessmentForResponse({
             ...assessment,
             status: 'COMPLETED' as const,
             answers: stored.answers,
@@ -1105,7 +1106,7 @@ export const scaleController = {
             completedAt,
             totalTime,
             progress: 100,
-          }),
+          }, undefined, tx)),
         }
       })
 
@@ -1141,7 +1142,7 @@ export const scaleController = {
       ) {
         return forbidden(res, '关系测评个人结果仅通过群体报告提供')
       }
-      return success(res, scaleAssessmentForResponse(assessment))
+      return success(res, (await loadScaleAssessmentForResponse(assessment)))
     } catch (err) {
       logger.error('获取 v2 量表结果错误', err)
       return error(res, '获取测评结果失败')
@@ -1171,7 +1172,7 @@ export const scaleController = {
       })
 
       return success(res, {
-        list: assessments.map((assessment) => scaleAssessmentForResponse(assessment)),
+        list: (await Promise.all(assessments.map(async (assessment) => (await loadScaleAssessmentForResponse(assessment))))),
         total: assessments.length,
       })
     } catch (err) {
@@ -1223,7 +1224,7 @@ export const scaleController = {
       })
 
       return success(res, {
-        list: assessments.map((assessment) => scaleAssessmentForResponse(assessment)),
+        list: (await Promise.all(assessments.map(async (assessment) => (await loadScaleAssessmentForResponse(assessment))))),
         total: assessments.length,
       })
     } catch (err) {

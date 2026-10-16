@@ -155,6 +155,7 @@ export interface WholeQuestionnaireReceipt {
 }
 
 export interface CompositeReportStatus {
+  feedbackWaitMs?: number
   feedbackPollProfile?: 'FAST_START' | 'QUEUED'
   wholeSubmissionReceived?: boolean
   wholeSubmissionId?: string | null

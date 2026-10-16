@@ -1,3 +1,4 @@
+import { loadStoredVersionedUnitAdmission } from '../assessment-runtime/unit-admission'
 import { withSerializableScaleTransaction } from './deployment/transactions'
 import { type Prisma, type PrismaClient } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -19,8 +20,8 @@ import {
   persistVersionedAdmissionOnce,
   readStoredVersionedUnitAdmission,
 } from '../assessment-runtime/unit-admission'
-import { getFrozenActiveSlot, questionnaireScaleSlotKey, compositeItemSlotKey, type FrozenActiveSlotV1 } from '../assessment-runtime/slot-set'
-import { decryptFrozenScaleRuntimeSnapshot, type VersionedFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
+import { loadFrozenActiveSlot, questionnaireScaleSlotKey, compositeItemSlotKey, type FrozenActiveSlotV1 } from '../assessment-runtime/slot-set'
+import { decryptFrozenScaleRuntimeSnapshot, loadFrozenScaleRuntimeSnapshot, FrozenRuntimeStorageUnavailableError, type VersionedFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { ageMonthsAt, assessmentContextKeys, type AssessmentContextValues } from '../assessment-context/context'
 import { resolveScaleStartDeployment } from './deployment/service'
@@ -135,16 +136,16 @@ const compiledRuntimeHashFrom = (slot: FrozenActiveSlotV1, fallback: string | nu
   return hash
 }
 
-const readRequiredScaleSlot = (input: {
+const readRequiredScaleSlot = async (input: {
   encrypted: string | null
   storedHash: string | null
   attemptEpoch: number
   slotKey: string
   scale: ScaleAdmissionChildRow['scale']
-}): FrozenActiveSlotV1 => {
+}): Promise<FrozenActiveSlotV1> => {
   let slot: FrozenActiveSlotV1
   try {
-    slot = getFrozenActiveSlot({
+    slot = await loadFrozenActiveSlot({
       encrypted: input.encrypted,
       storedHash: input.storedHash,
       attemptEpoch: input.attemptEpoch,
@@ -217,6 +218,35 @@ export const readScaleAdmissionRuntime = (
   const runtime = readRuntime(row.runtimeSnapshotEncrypted)
   runtimeByChild.set(row, { encrypted: row.runtimeSnapshotEncrypted, runtime })
   return runtime
+}
+
+// Request-local row memo includes no shared authorization decision. Failed
+// lookups are retryable; a changed ciphertext never reuses an earlier result.
+const pendingRuntimeByChild = new WeakMap<object, { encrypted: string; promise: Promise<VersionedFrozenScaleRuntimeSnapshot> }>()
+export const loadScaleAdmissionRuntime = async (
+  row: Pick<ScaleAdmissionChildRow, 'runtimeSnapshotEncrypted'>,
+  db?: import('../assessment-runtime/shared-scale-runtime').SharedScaleArtifactDb,
+): Promise<VersionedFrozenScaleRuntimeSnapshot> => {
+  const encrypted = row.runtimeSnapshotEncrypted
+  if (!encrypted) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结运行时不可用，请联系管理员恢复', 409)
+  const known = runtimeByChild.get(row)
+  if (known?.encrypted === encrypted) return known.runtime
+  const pending = pendingRuntimeByChild.get(row)
+  if (pending?.encrypted === encrypted) return pending.promise
+  const promise = (async () => {
+    try {
+      const runtime = await loadFrozenScaleRuntimeSnapshot(encrypted, db)
+      if (row.runtimeSnapshotEncrypted === encrypted) runtimeByChild.set(row, { encrypted, runtime })
+      return runtime
+    } catch (error) {
+      if (error instanceof FrozenRuntimeStorageUnavailableError) throw error
+      throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH',
+        error instanceof Error ? error.message : '量表冻结运行时无法读取，请联系管理员恢复', 409)
+    } finally {
+      if (pendingRuntimeByChild.get(row)?.encrypted === encrypted) pendingRuntimeByChild.delete(row)
+    }
+  })()
+  pendingRuntimeByChild.set(row, { encrypted, promise }); return promise
 }
 
 const availableContextKeys = (values: AssessmentContextValues | null) => (
@@ -431,7 +461,7 @@ const persistAdmission = async <T extends VersionedFrozenUnitAdmission>(
   snapshot: T,
 ): Promise<T> => (
   persistVersionedAdmissionOnce({
-    snapshot,
+    snapshot, db,
     writeIfEmpty: (persisted) => db.assessment.updateMany({
       where: { id: assessmentId, frozenAdmissionSnapshotHash: null },
       data: persisted,
@@ -480,19 +510,23 @@ export const readStoredScaleAdmission = (
 ): VersionedFrozenUnitAdmission | null => (
   readStoredVersionedUnitAdmission(row, '量表准入快照无法读取，请重启后重新作答')
 )
+export const loadStoredScaleAdmission = (row: Pick<ScaleAdmissionChildRow, 'frozenAdmissionSnapshotEncrypted' | 'frozenAdmissionSnapshotHash'>, db?:import('../assessment-runtime/shared-control-records').SharedControlDb): Promise<VersionedFrozenUnitAdmission | null> =>
+  loadStoredVersionedUnitAdmission(row, '量表准入快照无法读取，请重启后重新作答',db)
 
-const validateStoredAgainstRuntime = (
+
+const validateStoredAgainstRuntime = async (
   row: ScaleAdmissionChildRow,
   stored: VersionedFrozenUnitAdmission,
   referenceTimeMs = Date.now(),
-): VersionedFrozenUnitAdmission => {
+  db?: import('../assessment-runtime/shared-scale-runtime').SharedScaleArtifactDb,
+): Promise<VersionedFrozenUnitAdmission> => {
   assertAdmissionParentBinding(row, stored)
   if (stored.attemptEpoch !== row.attemptEpoch || stored.scale?.id !== row.scale.id
     || stored.scale?.code !== row.scale.code || stored.scale?.instrumentVersion !== row.scale.instrumentVersion
     || (stored.principal.userId !== null && row.userId !== null && stored.principal.userId !== row.userId)) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结准入身份或轮次不匹配', 409)
   }
-  const runtime = readScaleAdmissionRuntime(row)
+  const runtime = (await loadScaleAdmissionRuntime(row, db))
   if (runtime.schemaVersion !== stored.schemaVersion) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表运行时与准入快照版本不匹配', 409)
   }
@@ -554,7 +588,7 @@ const activateUnstoredScaleAdmission = async (
     const binding = loadedParent.questionnaire.questionnaireScales.find((item) => item.scaleId === row.scale.id)
     if (!binding) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表未绑定到当前测评单元', 409)
     const slotKey = questionnaireScaleSlotKey(binding.id)
-    const slot = readRequiredScaleSlot({
+    const slot = await readRequiredScaleSlot({
       encrypted: loadedParent.frozenActiveSlotSetEncrypted,
       storedHash: loadedParent.frozenActiveSlotSetHash,
       attemptEpoch: row.attemptEpoch,
@@ -624,7 +658,7 @@ const activateUnstoredScaleAdmission = async (
     assertAttemptEpoch(loaded.attemptEpoch, row.attemptEpoch)
     if (!row.compositeItemId) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表未绑定到当前测评单元', 409)
     const slotKey = compositeItemSlotKey(row.compositeItemId, 'SCALE')
-    const slot = readRequiredScaleSlot({
+    const slot = await readRequiredScaleSlot({
       encrypted: loaded.frozenActiveSlotSetEncrypted,
       storedHash: loaded.frozenActiveSlotSetHash,
       attemptEpoch: row.attemptEpoch,
@@ -692,10 +726,10 @@ export const activateScaleAdmission = async (
   parent?: CompositeScaleAdmissionParent,
   referenceTimeMs = Date.now(),
 ): Promise<VersionedFrozenUnitAdmission> => {
-  const stored = readStoredScaleAdmission(row)
-  if (stored) return validateStoredAgainstRuntime(row, stored, referenceTimeMs)
+  const stored = await loadStoredScaleAdmission(row)
+  if (stored) return (await validateStoredAgainstRuntime(row, stored, referenceTimeMs))
   assertFinalOnly(row.deliveryMode)
-  const runtime = readScaleAdmissionRuntime(row)
+  const runtime = (await loadScaleAdmissionRuntime(row))
   if (runtime.schemaVersion === 1) return activateUnstoredScaleAdmission(prisma, row, runtime, parent)
 
   return withSerializableScaleTransaction(prisma,
@@ -703,10 +737,10 @@ export const activateScaleAdmission = async (
       await tx.$queryRaw`SELECT "id" FROM "assessments" WHERE "id" = ${row.id} FOR UPDATE`
       const current = await tx.assessment.findUnique({ where: { id: row.id }, select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT })
       if (!current || current.attemptEpoch !== row.attemptEpoch) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '测评轮次已改变', 409)
-      const winner = readStoredScaleAdmission(current)
-      if (winner) return validateStoredAgainstRuntime(current, winner, referenceTimeMs)
+      const winner = await loadStoredScaleAdmission(current,tx)
+      if (winner) return (await validateStoredAgainstRuntime(current, winner, referenceTimeMs, tx))
       // Load the parent inside this transaction, never use a pre-transaction context.
-      return activateUnstoredScaleAdmission(tx, current, readScaleAdmissionRuntime(current))
+      return activateUnstoredScaleAdmission(tx, current, (await loadScaleAdmissionRuntime(current, tx)))
     },
   )
 }

@@ -3,10 +3,10 @@ import { prisma } from '../../config/database'
 import { isValidRecoveryToken, hashRecoveryToken } from '../../services/anonymousAccess'
 import { error, notFound, success, unauthorized } from '../../utils/response'
 import { issueFrozenAssessmentVideoCapabilities } from '../assessment-media/assessment-media-capability'
-import { readStoredFormAdmission } from '../assessment-runtime/form-admission.service'
+import { loadStoredFormAdmission } from '../assessment-runtime/form-admission.service'
 import { frozenFormMediaOwnerFromAdmission } from '../assessment-runtime/form-image.adapter'
 import { frozenFormOptionVideoPresentation } from '../assessment-runtime/form-video.adapter'
-import { decryptFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
+import { loadFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
 import { frozenScaleMediaOwner } from '../scale/scale-image-retention'
 import { scaleItemVideoPresentation } from '../scale/scale-video.adapter'
 import * as service from './composite.service'
@@ -42,7 +42,7 @@ const issueFormVideo = async (req: Request, res: Response, publicMode: boolean) 
     select: { frozenAdmissionSnapshotEncrypted: true, frozenAdmissionSnapshotHash: true },
   })
   if (!child) return notFound(res, '表单区段冻结记录不存在')
-  const admission = readStoredFormAdmission(child)
+  const admission = await loadStoredFormAdmission(child)
   if (!admission) return notFound(res, '表单区段冻结内容不可用')
   const optionIndex = parseOptionIndex(req.params.optionIndex)
   if (optionIndex === null) return notFound(res, '表单选项不存在')
@@ -73,7 +73,7 @@ const issueScaleVideo = async (req: Request, res: Response, publicMode: boolean)
     select: { id: true, runtimeSnapshotEncrypted: true },
   })
   if (!child?.runtimeSnapshotEncrypted) return notFound(res, '量表冻结内容不可用')
-  const snapshot = decryptFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted)
+  const snapshot = (await loadFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted))
   const presentation = scaleItemVideoPresentation(snapshot.definition, req.params.itemCode)
   if (!presentation) return notFound(res, '当前冻结量表题目没有视频内容')
   const sources = await issueFrozenAssessmentVideoCapabilities({

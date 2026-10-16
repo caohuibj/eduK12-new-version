@@ -1,3 +1,5 @@
+import { restoreCompactQuestionnaireReport } from './compact-questionnaire-report'
+import { resolveStoredScaleResult, preloadStoredScaleResults } from '../assessment-runtime/compact-assessment-storage'
 import { buildFormBackgroundReport, buildScaleUnitReport, projectScaleUnitReport, type ScaleUnitReport } from './scale-unit-report'
 import { readContextFormAnswers } from '../assessment-context'
 import { safeDecrypt } from '../../utils/encryption'
@@ -220,4 +222,13 @@ export const buildQuestionnaireCollectionReportFromUnifiedInput = (input: {
     backgroundValues,
     unitReports,
   }
+}
+
+export const loadQuestionnaireCollectionReport = async (qa: any, options?: QuestionnaireCollectionProjectionOptions): Promise<any> => {
+  const stored = readStoredAggregate(qa)
+  if (stored?.kind === 'QUESTIONNAIRE_REPORT_FACTS') return buildQuestionnaireCollectionReport({ ...qa, aggregateReportEncrypted: null, aggregateReport: await restoreCompactQuestionnaireReport(stored, qa, buildQuestionnaireCollectionReportFromUnifiedInput) }, options)
+  await preloadStoredScaleResults(qa?.scaleAssessments ?? [])
+  const scaleAssessments = await Promise.all((qa?.scaleAssessments ?? []).map(async (row: any) => ({ ...row,
+    result: await resolveStoredScaleResult(row.result, { record: row }) })))
+  return buildQuestionnaireCollectionReport({ ...qa, scaleAssessments }, options)
 }

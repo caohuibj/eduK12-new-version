@@ -48,7 +48,7 @@ import { cleanupExpiredExportArtifacts } from './services/exportStorage'
 import { cleanupExpiredSurveyExportTickets } from './modules/survey/analytics.export.service'
 import { cleanupExpiredSurveyCheckpoints } from './modules/survey/checkpoint.service'
 import { cleanupExpiredSubmissionIdempotencyReceipts } from './utils/submissionIdempotency'
-import { recordRequestPhase, requestObservabilityMiddleware, runtimeMetricLines } from './services/runtimeObservability'
+import { recordRequestPhase, requestObservabilityMiddleware, recordNodeRequestCallback, runtimeMetricLines } from './services/runtimeObservability'
 import { postgresActivityMetricLines } from './services/postgresActivityMetrics'
 import { effectiveRuntimeResourceConfig } from './config/runtimeResources'
 
@@ -121,7 +121,10 @@ import organizationRoutes from './modules/organization/organization.routes'
 const app = express()
 
 // 创建 HTTP 服务器
-const server = createServer(app)
+const server = createServer((req, res) => {
+  recordNodeRequestCallback(req)
+  app(req, res)
+})
 
 app.use(requestObservabilityMiddleware)
 

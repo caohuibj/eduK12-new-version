@@ -8,12 +8,15 @@ import { integrationDatabaseUrl, requireIsolatedReleaseDatabase } from './integr
 
 const url = integrationDatabaseUrl('REPORT_OUTBOX_INTEGRATION_DATABASE_URL')
 const suite = url ? describe : describe.skip
+const readinessRedisUrl = process.env.REPORT_READY_INTEGRATION_REDIS_URL || process.env.REDIS_URL
+if (process.env.CI && !readinessRedisUrl) throw new Error('CI requires real Redis readiness coverage')
 let db: PrismaClient
 let outbox: typeof import('../../modules/assessment-runtime/report-outbox.service')
 let service: typeof import('../../modules/composite/composite.service')
 let submit: typeof import('../../modules/scale/scale-final-submit.service')['submitScaleAssessmentFinal']
 let processJob: typeof import('../../workers/compositeReportWorker')['processCompositeReportJob']
 const users: string[] = [], scales: string[] = [], composites: string[] = [], attempts: string[] = []
+const cognitiveConfigs: string[] = [], cognitiveAssignments: string[] = []
 
 const fixture = async (units = 1) => {
   const f = await createReportOutboxFixture(db, units)
@@ -35,7 +38,10 @@ suite('durable report outbox on isolated PostgreSQL', () => {
     requireIsolatedReleaseDatabase(url!)
     vi.stubEnv('ASSESSMENT_REPORT_ASYNC_ENABLED', 'true')
     vi.stubEnv('ASSESSMENT_WHOLE_SUBMIT_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_WHOLE_DURABLE_BACKLOG_ENABLED', 'false')
     vi.stubEnv('ASSESSMENT_REPORT_ASYNC_COURSE_IDS', '')
+    for (const name of ["ASSESSMENT_SCALE_COLLECTION_BATCH_ENABLED", "ASSESSMENT_REPORT_SNAPSHOT_BATCH_ENABLED", "ASSESSMENT_REPORT_NARROW_LOAD_ENABLED", "ASSESSMENT_REPORT_ATOMIC_FINISH_ENABLED", "ASSESSMENT_REPORT_CONTEXT_REUSE_ENABLED", "ASSESSMENT_REPORT_COMPACT_READ_ENABLED", "ASSESSMENT_REPORT_COMMITTED_CONTEXT_ENABLED", "ASSESSMENT_WHOLE_REQUEST_CONTEXT_REUSE_ENABLED"]) vi.stubEnv(name, 'true')
+    vi.stubEnv('REPORT_READY_INTEGRATION_REDIS_URL', process.env.REPORT_READY_INTEGRATION_REDIS_URL || process.env.REDIS_URL || '')
     vi.stubEnv('ASSESSMENT_REPORT_MAX_PENDING', '200')
     db = new PrismaClient({ datasources: { db: { url: url! } } })
     await db.$connect()
@@ -54,9 +60,12 @@ suite('durable report outbox on isolated PostgreSQL', () => {
       await tx.compositeReportJob.deleteMany({ where: { attemptId: { in: cleanupAttempts } } })
       if (held) await tx.compositeReportQueueBudget.update({ where: { id: 'reports' }, data: { pending: { decrement: held } } })
     })
+    for (const name of ["ASSESSMENT_SCALE_COLLECTION_BATCH_ENABLED", "ASSESSMENT_REPORT_SNAPSHOT_BATCH_ENABLED", "ASSESSMENT_REPORT_NARROW_LOAD_ENABLED", "ASSESSMENT_REPORT_ATOMIC_FINISH_ENABLED", "ASSESSMENT_REPORT_CONTEXT_REUSE_ENABLED", "ASSESSMENT_REPORT_COMPACT_READ_ENABLED", "ASSESSMENT_REPORT_COMMITTED_CONTEXT_ENABLED", "ASSESSMENT_WHOLE_REQUEST_CONTEXT_REUSE_ENABLED"]) vi.stubEnv(name, 'true')
+    vi.stubEnv('REPORT_READY_INTEGRATION_REDIS_URL', process.env.REPORT_READY_INTEGRATION_REDIS_URL || process.env.REDIS_URL || '')
     vi.stubEnv('ASSESSMENT_REPORT_MAX_PENDING', '200')
     vi.stubEnv('ASSESSMENT_REPORT_ASYNC_ENABLED', 'true')
     vi.stubEnv('ASSESSMENT_WHOLE_SUBMIT_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_WHOLE_DURABLE_BACKLOG_ENABLED', 'false')
   })
 
   afterAll(async () => {
@@ -65,6 +74,8 @@ suite('durable report outbox on isolated PostgreSQL', () => {
       await db.compositeAssessmentAttempt.deleteMany({ where: { id: { in: attempts } } })
       await db.compositeAssessment.deleteMany({ where: { id: { in: composites } } })
       await db.scale.deleteMany({ where: { id: { in: scales } } })
+      await db.cognitiveAssignment.deleteMany({ where: { id: { in: cognitiveAssignments } } })
+      await db.cognitiveTestConfig.deleteMany({ where: { id: { in: cognitiveConfigs } } })
       await db.user.deleteMany({ where: { id: { in: users } } })
     }
     await db?.$disconnect()
@@ -89,6 +100,32 @@ suite('durable report outbox on isolated PostgreSQL', () => {
     expect(report.unitReports).toHaveLength(1)
     expect(report.unitReports[0].scores[0].value).toBe(3)
     expect(await budget()).toBe(0)
+  })
+
+  it('scores and renders a real multi-scale report from shared immutable definitions', async () => {
+    const f = await fixture(3)
+    const runtime = await import('../../modules/assessment-runtime/runtime-snapshot')
+    vi.stubEnv('ASSESSMENT_SHARED_RUNTIME_STORAGE_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_COMPILED_ARTIFACT_CACHE_ENABLED', 'true')
+    try {
+      const rows = await db.assessment.findMany({ where: { compositeAttemptId: f.parent.id }, select: { id: true, runtimeSnapshotEncrypted: true } })
+      await db.$transaction(async tx => {
+        for (const row of rows) {
+          const snapshot = runtime.decryptFrozenScaleRuntimeSnapshot(row.runtimeSnapshotEncrypted!)
+          await tx.assessment.update({ where: { id: row.id }, data: { runtimeSnapshotEncrypted: await runtime.persistFrozenScaleRuntimeSnapshot(snapshot, tx) } })
+        }
+      })
+      for (const input of f.inputs) await submit(input)
+      await processJob(await claim())
+      const report = await service.getReport(f.parent.id, { userId: f.participant.id })
+      expect(report.unitReports).toHaveLength(3)
+      for (const unit of report.unitReports) expect(unit.scores[0].value).toBe(3)
+      expect((await outbox.readCompositeReportJob(f.parent.id, 1))!.status).toBe('READY')
+      expect(await budget()).toBe(0)
+    } finally {
+      vi.stubEnv('ASSESSMENT_SHARED_RUNTIME_STORAGE_ENABLED', 'false')
+      vi.stubEnv('ASSESSMENT_COMPILED_ARTIFACT_CACHE_ENABLED', 'false')
+    }
   })
 
   it('rejects overload before ACK and rolls back both answer completion and the outbox', async () => {
@@ -253,6 +290,22 @@ suite('durable report outbox on isolated PostgreSQL', () => {
     expect(await whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })).toMatchObject({ replayed: true, payloadHash: accepted.payloadHash })
   })
 
+  it('reconstructs compact validation plans from durable frozen definitions after all process-local rules are lost', async () => {
+    vi.stubEnv('ASSESSMENT_WHOLE_COMPACT_MANIFEST_ENABLED', 'true')
+    const f = await fixture(3), { whole, input } = await wholeInput(f)
+    const receipt = await outbox.readWholeQuestionnaireReceipt(f.parent.id, 1)
+    const { decryptUnifiedRuntimePayload } = await import('../../modules/assessment-runtime/security')
+    const manifest = decryptUnifiedRuntimePayload<any>(receipt!.wholeValidationEncrypted!)
+    expect(manifest.schemaVersion).toBe(2)
+    expect(manifest.units.every((unit: any) => unit.rulesHash && !unit.items)).toBe(true)
+    whole.clearWholeValidationRulesForTest()
+    const accepted = await whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })
+    expect(accepted.status).toBe('ACCEPTED')
+    await processJob((await outbox.claimCompositeReportJob())!)
+    expect(await outbox.readCompositeReportJob(f.parent.id, 1)).toMatchObject({ status: 'READY' })
+    expect(await budget()).toBe(0)
+  })
+
   it('coalesces simultaneous whole retries and rejects changed answers or a foreign principal', async () => {
     const f = await fixture(2), { whole, input } = await wholeInput(f)
     const replies = await Promise.all(Array.from({ length: 8 }, () => whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })))
@@ -330,6 +383,7 @@ suite('durable report outbox on isolated PostgreSQL', () => {
     expect((await service.getReport(a.parent.id, { userId: a.participant.id })).unitReports).toHaveLength(2)
     expect(await budget()).toBe(0)
     vi.stubEnv('ASSESSMENT_WHOLE_SUBMIT_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_WHOLE_DURABLE_BACKLOG_ENABLED', 'false')
     vi.stubEnv('ASSESSMENT_REPORT_ASYNC_ENABLED', 'true')
     expect(await wb.whole.submitWholeQuestionnaire(b.parent.id, wb.input, { userId: b.participant.id })).toMatchObject({ submissionId: wb.input.submissionId, status: 'ACCEPTED', replayed: false })
     await processJob(await claim())
@@ -363,6 +417,453 @@ suite('durable report outbox on isolated PostgreSQL', () => {
     expect(resumed.attemptCount).toBe(1)
     await processJob(resumed)
     expect(await budget()).toBe(0)
+  })
+
+  it.each([1, 5, 8])('batch saves arbitrary %i-scale collections with identical scoring and one permit', async units => {
+    const f = await fixture(units), { whole, input } = await wholeInput(f)
+    const accepted = await whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })
+    await processJob(await claim())
+    const report = await service.getReport(f.parent.id, { userId: f.participant.id })
+    expect(report.unitReports).toHaveLength(units)
+    expect(report.unitReports.every((unit: any) => !unit.decryptError && unit.scores[0].value === 3)).toBe(true)
+    expect(await db.assessmentUnitSnapshot.count({ where: { compositeAttemptId: f.parent.id } })).toBe(units)
+    expect(await db.assessment.count({ where: { compositeAttemptId: f.parent.id, status: 'COMPLETED' } })).toBe(units)
+    expect(await whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })).toMatchObject({
+      replayed: true, payloadHash: accepted.payloadHash,
+    })
+    expect(await budget()).toBe(0)
+  })
+
+  it('batch database failure rolls back every new unit and recovers the same durable answers', async () => {
+    const f = await fixture(5), { whole, input } = await wholeInput(f)
+    const accepted = await whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })
+    const old = await claim()
+    const target = f.inputs[f.inputs.length - 1].assessmentId
+    expect(target).toMatch(/^[a-f0-9-]{36}$/)
+    // Real PostgreSQL failure AFTER the bulk UPDATE, not a mocked transaction.
+    await db.$executeRawUnsafe("CREATE FUNCTION eduk12_batch_fault() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'SYNTHETIC_BATCH_WRITE_FAILURE'; END $$")
+    await db.$executeRawUnsafe("CREATE TRIGGER eduk12_batch_fault BEFORE INSERT ON assessment_unit_snapshots FOR EACH ROW WHEN (NEW.source_attempt_id = '" + target + "') EXECUTE FUNCTION eduk12_batch_fault()")
+    try {
+      await expect(whole.processWholeQuestionnaireAnswers(old)).rejects.toThrow()
+      expect(await db.assessment.count({ where: { compositeAttemptId: f.parent.id, status: 'IN_PROGRESS', submissionId: null } })).toBe(5)
+      expect(await db.assessmentUnitSnapshot.count({ where: { compositeAttemptId: f.parent.id } })).toBe(0)
+      expect((await outbox.readWholeQuestionnaireReceipt(f.parent.id, 1))!.wholePayloadHash).toBe(accepted.payloadHash)
+      expect(await budget()).toBe(1)
+    } finally {
+      await db.$executeRawUnsafe('DROP TRIGGER eduk12_batch_fault ON assessment_unit_snapshots')
+      await db.$executeRawUnsafe('DROP FUNCTION eduk12_batch_fault()')
+    }
+    await db.compositeReportJob.update({ where: { id: old.id }, data: { leaseExpiresAt: new Date(Date.now() - 1000) } })
+    await processJob(await claim())
+    expect((await outbox.readCompositeReportJob(f.parent.id, 1))!.status).toBe('READY')
+    expect((await service.getReport(f.parent.id, { userId: f.participant.id })).unitReports).toHaveLength(5)
+    expect(await budget()).toBe(0)
+  })
+
+  it('expired batch owner cannot write after a new owner has claimed the same receipt', async () => {
+    const f = await fixture(3), { whole, input } = await wholeInput(f)
+    await whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })
+    const old = await claim()
+    await db.compositeReportJob.update({ where: { id: old.id }, data: { leaseExpiresAt: new Date(Date.now() - 1000) } })
+    const current = await claim()
+    await expect(whole.processWholeQuestionnaireAnswers(old)).rejects.toThrow('REPORT_PROCESSING_LEASE_LOST')
+    expect(await db.assessmentUnitSnapshot.count({ where: { compositeAttemptId: f.parent.id } })).toBe(0)
+    expect(await db.assessment.count({ where: { compositeAttemptId: f.parent.id, status: 'IN_PROGRESS' } })).toBe(3)
+    await processJob(current)
+    expect((await outbox.readCompositeReportJob(f.parent.id, 1))!.status).toBe('READY')
+    expect(await outbox.finishCompositeReportJob(old, { kind: 'failed', errorCode: 'STALE' })).toBe(false)
+    expect(await budget()).toBe(0)
+  })
+
+  it('uses the shared optimized finalizer for real scale-plus-cognitive submissions and identical report projection', async () => {
+    const f = await fixture(2)
+    const { createUnifiedCognitiveSessionConfigSnapshot, readCognitiveSessionConfig } = await import('../../modules/cognitive/session.service')
+    const { freezeCompositeActiveSlotSet } = await import('../../modules/assessment-runtime/attempt-runtime')
+    const { encryptFrozenActiveSlotSet, decryptFrozenActiveSlotSet, createFrozenActiveSlotSet } = await import('../../modules/assessment-runtime/slot-set')
+    const { createTrialEnvelope } = await import('../../modules/cognitive/v2/trial-envelope')
+    const { ensureCognitiveAdmissionAtDelivery } = await import('../../modules/cognitive/cognitive-admission.service')
+    const { submitCognitiveSessionFinal } = await import('../../modules/cognitive/final-submit.service')
+    const configData = { trialCount: 3, trialDurationMs: 1000, allowPractice: false, maxRtMs: 60000 }
+    let config = await db.cognitiveTestConfig.findUnique({ where: { testType_configVersion: { testType: 'fake', configVersion: '1.0.0' } } })
+    if (!config) {
+      config = await db.cognitiveTestConfig.create({ data: { testType: 'fake', configVersion: '1.0.0',
+        name: 'Mixed collection synthetic cognitive task', status: 'PUBLISHED', engineVersion: '1.0.0',
+        scoringVersion: '1.0.0', accessPolicy: 'OPEN', publishedAt: new Date(), config: configData } })
+      cognitiveConfigs.push(config.id)
+    }
+    const frozen = await createUnifiedCognitiveSessionConfigSnapshot({ testType: 'fake', configVersion: '1.0.0',
+      engineVersion: '1.0.0', scoringVersion: '1.0.0', config: configData, db: db as any })
+    const snapshot = readCognitiveSessionConfig(frozen.encrypted).snapshot!
+    const assignment = await db.cognitiveAssignment.create({ data: { configId: config.id, createdBy: f.owner.id,
+      title: 'Mixed cognitive fixture', status: 'PUBLISHED', resolvedConfigSnapshotEncrypted: frozen.encrypted,
+      resolvedConfigHash: snapshot.configHash } })
+    cognitiveAssignments.push(assignment.id)
+    const item = await db.compositeAssessmentItem.create({ data: { compositeAssessmentId: f.composite.id,
+      type: 'COGNITIVE', position: 2, required: true, cognitiveAssignmentId: assignment.id } })
+    const oldSlots = decryptFrozenActiveSlotSet(f.parent.frozenActiveSlotSetEncrypted!)
+    const cognitiveSlots = freezeCompositeActiveSlotSet({ attemptEpoch: 1, scales: [], formSections: [],
+      cognitive: [{ compositeItemId: item.id, testType: 'fake', instrumentVersion: '1.0.0',
+        sourceDefinitionHash: frozen.compiledRuntime.sourceDefinitionHash,
+        compiledRuntimeHash: frozen.compiledRuntime.compiledRuntimeHash }] })
+    const slots = createFrozenActiveSlotSet({ schemaVersion: 1, runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1,
+      slots: [...oldSlots.slots, ...cognitiveSlots.slots].sort((a, b) => a.slotKey.localeCompare(b.slotKey)) })
+    await db.compositeAssessmentAttempt.update({ where: { id: f.parent.id }, data: {
+      frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(slots), frozenActiveSlotSetHash: slots.snapshotHash,
+    } })
+    const session = await db.cognitiveSession.create({ data: { userId: f.participant.id,
+      participantKey: 'mixed-' + randomUUID(), assignmentId: assignment.id, compositeAttemptId: f.parent.id,
+      compositeItemId: item.id, configId: config.id, testType: 'fake', attemptNo: 1, status: 'IN_PROGRESS',
+      deliveryMode: 'FINAL_ONLY', runtimeGeneration: 'UNIFIED_V1', configVersion: '1.0.0',
+      engineVersion: '1.0.0', scoringVersion: '1.0.0', configSnapshotEncrypted: frozen.encrypted,
+      compiledRuntimeHash: frozen.compiledRuntime.compiledRuntimeHash, randomSeed: 'mixed-' + randomUUID() } })
+    await ensureCognitiveAdmissionAtDelivery(session.id)
+    await submit(f.inputs[0]); await submit(f.inputs[1])
+    expect(await budget()).toBe(0)
+    expect((await outbox.readCompositeReportJob(f.parent.id, 1))!.status).toBe('WAITING')
+    const cognitiveInput = { sessionId: session.id, submissionId: 'mixed-cognitive-' + randomUUID(),
+      attemptEpoch: 1, definitionHash: snapshot.configHash, contextSnapshotHash: null,
+      trials: Array.from({ length: 3 }, (_, trialIndex) => createTrialEnvelope({ trialIndex, phase: 'test',
+        payload: { correct: trialIndex % 2 === 0, rtMs: 400 + trialIndex },
+        startedAtPerfMs: trialIndex * 1000, endedAtPerfMs: trialIndex * 1000 + 400 })) }
+    const finished = await submitCognitiveSessionFinal(f.participant.id, cognitiveInput)
+    expect(await db.cognitiveRawSubmission.count({ where: { sessionId: session.id } })).toBe(1)
+    expect(await db.assessmentUnitSnapshot.count({ where: { compositeAttemptId: f.parent.id } })).toBe(3)
+    expect(await budget()).toBe(1)
+    await processJob(await claim())
+    expect((await outbox.readCompositeReportJob(f.parent.id, 1))!.status).toBe('READY')
+    const narrow = await service.getReport(f.parent.id, { userId: f.participant.id })
+    expect(narrow.unitReports).toHaveLength(3)
+    expect(narrow.unitReports.every((unit: any) => !unit.decryptError)).toBe(true)
+    const cognitiveReport = narrow.unitReports.find((unit: any) => unit.kind === 'cognitive')
+    expect(cognitiveReport).toBeTruthy() // Public projection intentionally omits raw cognitive metrics.
+    // Rebuild with the prior loader and compare the complete projected report.
+    vi.stubEnv('ASSESSMENT_REPORT_NARROW_LOAD_ENABLED', 'false')
+    const wideBuilt = await service.materializeCompositeQuestionnaireReport(f.parent.id, {
+      attemptEpoch: 1, slotSetHash: slots.snapshotHash, contextHash: null,
+    })
+    vi.stubEnv('ASSESSMENT_REPORT_NARROW_LOAD_ENABLED', 'true')
+    const { decryptCompositeCollectionReport } = await import('../../modules/composite/composite-report-cache')
+    // The canonical reader checks binding; HTTP projection is tested by the service.
+    const wide = decryptCompositeCollectionReport(wideBuilt.reportEncrypted, { attemptId: f.parent.id,
+      attemptEpoch: 1, slotSetHash: slots.snapshotHash, contextHash: null, aggregateInputHash: wideBuilt.aggregateInputHash })
+    const narrowBuilt = await service.materializeCompositeQuestionnaireReport(f.parent.id, {
+      attemptEpoch: 1, slotSetHash: slots.snapshotHash, contextHash: null,
+    })
+    const narrowRaw = decryptCompositeCollectionReport(narrowBuilt.reportEncrypted, { attemptId: f.parent.id,
+      attemptEpoch: 1, slotSetHash: slots.snapshotHash, contextHash: null, aggregateInputHash: narrowBuilt.aggregateInputHash })
+    expect(narrowRaw).toEqual(wide)
+    const internalCognitive = narrowRaw.unitReports.find((unit: any) => unit.kind === 'cognitive')
+    expect(internalCognitive.metrics).toEqual((finished as any).response?.metrics ?? (finished as any).result?.metrics ?? (finished as any).metrics)
+    for (const unit of narrowRaw.unitReports) {
+      const oldUnit = wide.unitReports.find((row: any) => row.itemId === unit.itemId)
+      expect(unit.__scaleProjectionPolicy).toEqual(oldUnit.__scaleProjectionPolicy)
+      expect(unit.__frozenMetricDefinitions).toEqual(oldUnit.__frozenMetricDefinitions)
+    }
+    expect(await budget()).toBe(0)
+  })
+
+  it('expired sole owner retries durable whole answers instead of cancelling the receipt or releasing its permit', async () => {
+    const f = await fixture(2), { whole, input } = await wholeInput(f)
+    const accepted = await whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })
+    const old = await claim()
+    await db.compositeReportJob.update({ where: { id: old.id }, data: { leaseExpiresAt: new Date(Date.now() - 1000) } })
+    await processJob(old)
+    expect(await outbox.readCompositeReportJob(f.parent.id, 1)).toMatchObject({
+      status: 'PENDING', budgetHeld: true, wholePayloadHash: accepted.payloadHash,
+    })
+    expect(await budget()).toBe(1)
+    expect(await db.assessmentUnitSnapshot.count({ where: { compositeAttemptId: f.parent.id } })).toBe(0)
+    await db.compositeReportJob.update({ where: { id: old.id }, data: { nextAttemptAt: new Date(Date.now() - 1000) } })
+    await processJob(await claim())
+    expect((await outbox.readCompositeReportJob(f.parent.id, 1))!.status).toBe('READY')
+    expect((await service.getReport(f.parent.id, { userId: f.participant.id })).unitReports).toHaveLength(2)
+    expect(await budget()).toBe(0)
+  })
+
+  it('atomic finish releases a permit exactly once under simultaneous duplicate finishers', async () => {
+    const f = await fixture()
+    await submit(f.inputs[0])
+    const job = await claim()
+    const replies = await Promise.all(Array.from({ length: 16 }, () => outbox.finishCompositeReportJob(job, {
+      kind: 'failed', errorCode: 'SYNTHETIC_DUPLICATE_FINISH',
+    })))
+    expect(replies.filter(Boolean)).toHaveLength(1)
+    expect(await budget()).toBe(0)
+    expect(await outbox.readCompositeReportJob(f.parent.id, 1)).toMatchObject({ status: 'FAILED', budgetHeld: false })
+  })
+
+  it('atomic finish preserves the leased job when its budget invariant is corrupt', async () => {
+    const f = await fixture()
+    await submit(f.inputs[0])
+    const job = await claim()
+    await db.compositeReportQueueBudget.update({ where: { id: 'reports' }, data: { pending: 0 } })
+    try {
+      await expect(outbox.finishCompositeReportJob(job, { kind: 'failed', errorCode: 'SYNTHETIC' })).rejects.toThrow('budget invariant')
+      expect(await outbox.readCompositeReportJob(f.parent.id, 1)).toMatchObject({
+        status: 'PROCESSING', leaseToken: job.leaseToken, budgetHeld: true,
+      })
+    } finally {
+      await db.compositeReportQueueBudget.update({ where: { id: 'reports' }, data: { pending: 1 } })
+    }
+    await processJob(job)
+    expect(await budget()).toBe(0)
+    expect((await outbox.readCompositeReportJob(f.parent.id, 1))!.status).toBe('READY')
+  })
+
+  it('joins a fresh status snapshot and excludes sealed answers from report reads', async () => {
+    vi.stubEnv('ASSESSMENT_REPORT_COMPACT_READ_ENABLED', 'true')
+    try {
+      const f = await fixture(2), { whole, input } = await wholeInput(f)
+      await whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })
+      const shared = (await import('../../config/database')).prisma
+      const raw = vi.spyOn(shared, '$queryRaw')
+      const status = await service.getCompositeReportStatus(f.parent.id, { userId: f.participant.id })
+      expect(raw).toHaveBeenCalledTimes(1)
+      raw.mockRestore()
+      expect(status).toMatchObject({ hasAcceptedSubmission: true, wholeSubmissionReceived: true, reportStatus: { state: 'PENDING' } })
+      await processJob(await claim())
+      const small = await outbox.readCompositeReportMaterialization(f.parent.id, 1)
+      expect(small?.reportEncrypted).toBeTruthy()
+      expect(small).not.toHaveProperty('wholeAnswersEncrypted')
+      expect(small).not.toHaveProperty('wholeValidationEncrypted')
+      expect((await service.getReport(f.parent.id, { userId: f.participant.id })).unitReports).toHaveLength(2)
+      expect((await service.getCompositeReportStatus(f.parent.id, { userId: f.participant.id })).reportStatus.completedAt).toBeInstanceOf(Date)
+      await db.compositeAssessmentAttempt.update({ where: { id: f.parent.id }, data: { userId: null, recoveryTokenHash: randomUUID() } })
+      await expect(service.getCompositeReportStatus(f.parent.id, { userId: f.participant.id })).rejects.toMatchObject({ statusCode: 403 })
+      await expect(service.getCompositeReportStatus('missing-status-fixture', { userId: f.participant.id })).rejects.toMatchObject({ statusCode: 404 })
+    } finally { vi.stubEnv('ASSESSMENT_REPORT_COMPACT_READ_ENABLED', 'false') }
+  })
+
+  it('reauthorizes the joined snapshot after a ready hint before returning status', async () => {
+    vi.stubEnv('ASSESSMENT_REPORT_COMPACT_READ_ENABLED', 'true')
+    const notifications = await import('../../services/reportReadyNotifications')
+    let spy: ReturnType<typeof vi.spyOn> | undefined
+    try {
+      const f = await fixture(), { whole, input } = await wholeInput(f)
+      await whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })
+      spy = vi.spyOn(notifications, 'beginReportReadyWait').mockImplementation(() => ({
+        done: (async () => {
+          await db.compositeAssessmentAttempt.update({ where: { id: f.parent.id }, data: { userId: f.owner.id } })
+          return 'ready' as const
+        })(), cancel: () => {},
+      }))
+      await expect(service.getCompositeReportStatus(f.parent.id, { userId: f.participant.id }, { waitMs: 4000 })).rejects.toMatchObject({ statusCode: 403 })
+    } finally { spy?.mockRestore(); vi.stubEnv('ASSESSMENT_REPORT_COMPACT_READ_ENABLED', 'false') }
+  })
+
+  it.runIf(Boolean(readinessRedisUrl))('initializes readiness hints on the first ordinary compact status read', async () => {
+    const notifications = await import('../../services/reportReadyNotifications')
+    notifications.stopReportReadyNotifications()
+    vi.stubEnv('ASSESSMENT_REPORT_COMPACT_READ_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_REPORT_READY_WAIT_ENABLED', 'true')
+    vi.stubEnv('REDIS_URL', readinessRedisUrl!)
+    try {
+      const f = await fixture(), { whole, input } = await wholeInput(f)
+      await whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })
+      const status = await service.getCompositeReportStatus(f.parent.id, { userId: f.participant.id })
+      expect(status.feedbackWaitMs).toBe(4000)
+      expect(notifications.reportReadyWaitAvailable()).toBe(true)
+    } finally {
+      notifications.stopReportReadyNotifications()
+      vi.stubEnv('ASSESSMENT_REPORT_COMPACT_READ_ENABLED', 'false')
+      vi.stubEnv('ASSESSMENT_REPORT_READY_WAIT_ENABLED', 'false')
+    }
+  })
+
+  it.each([1, 5, 8])('reuses only committed results in arbitrary %i-scale reports with an equal durable fallback', async count => {
+    vi.stubEnv('ASSESSMENT_REPORT_COMMITTED_CONTEXT_ENABLED', 'true')
+    const f = await fixture(count), { whole, input } = await wholeInput(f)
+    await whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })
+    const job = await claim()
+    let context: import('../../modules/composite/whole-questionnaire.service').WholeQuestionnaireReportContext | undefined
+    await whole.processWholeQuestionnaireAnswers(job, value => { context = value })
+    expect(context?.committed?.parent.scaleAssessments).toHaveLength(count)
+    expect(await db.assessment.count({ where: { compositeAttemptId: f.parent.id, status: 'COMPLETED' } })).toBe(count)
+    const shared = (await import('../../config/database')).prisma
+    const reads = vi.spyOn(shared.compositeAssessmentAttempt, 'findUnique')
+    try {
+      const parent = context!.committed!.parent
+      const finalized = await service.finalizeCompositeAttemptIfReady(f.parent.id, {
+        reportJob: identity(job), preloadedParent: parent, committedGraph: parent,
+      })
+      expect(finalized!.status).toBe('COMPLETED')
+      expect(reads).not.toHaveBeenCalled()
+      const projected = { ...parent, ...finalized }
+      const fast = await service.materializeCompositeQuestionnaireReport(f.parent.id, identity(job), context, projected)
+      expect(reads).not.toHaveBeenCalled()
+      const fallback = await service.materializeCompositeQuestionnaireReport(f.parent.id, identity(job))
+      expect(reads).toHaveBeenCalledTimes(1)
+      const { decryptCompositeCollectionReport } = await import('../../modules/composite/composite-report-cache')
+      const binding = { attemptId: f.parent.id, ...identity(job), aggregateInputHash: fast.aggregateInputHash }
+      expect(decryptCompositeCollectionReport(fast.reportEncrypted, binding)).toEqual(decryptCompositeCollectionReport(fallback.reportEncrypted, binding))
+      expect(await outbox.finishCompositeReportJob(job, { kind: 'ready', ...fast })).toBe(true)
+      expect((await service.getReport(f.parent.id, { userId: f.participant.id })).unitReports).toHaveLength(count)
+      expect(await budget()).toBe(0)
+    } finally { reads.mockRestore() }
+  })
+
+  it('reconstructs committed units after a lost invocation without reusing a stale lease context', async () => {
+    vi.stubEnv('ASSESSMENT_REPORT_COMMITTED_CONTEXT_ENABLED', 'true')
+    const f = await fixture(5), { whole, input } = await wholeInput(f)
+    await whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })
+    const old = await claim()
+    let prior: import('../../modules/composite/whole-questionnaire.service').WholeQuestionnaireReportContext | undefined
+    await whole.processWholeQuestionnaireAnswers(old, value => { prior = value })
+    expect(prior?.committed).toBeTruthy()
+    await db.compositeReportJob.update({ where: { id: old.id }, data: { leaseExpiresAt: new Date(Date.now() - 1000) } })
+    const next = await claim()
+    expect(next.leaseToken).not.toBe(prior!.committed!.leaseToken)
+    let rebuilt: import('../../modules/composite/whole-questionnaire.service').WholeQuestionnaireReportContext | undefined
+    await whole.processWholeQuestionnaireAnswers(next, value => { rebuilt = value })
+    expect(rebuilt?.committed).toBeUndefined()
+    await processJob(next)
+    expect((await outbox.readCompositeReportJob(f.parent.id, 1))!.status).toBe('READY')
+    expect(await outbox.finishCompositeReportJob(old, { kind: 'failed', errorCode: 'STALE' })).toBe(false)
+    expect(await db.assessmentUnitSnapshot.count({ where: { compositeAttemptId: f.parent.id } })).toBe(5)
+    expect(await budget()).toBe(0)
+  })
+
+  it('reuses the admission-owned fresh header for consent without another parent query', async () => {
+    const priorAtomic = process.env.ASSESSMENT_WHOLE_ATOMIC_RECEIPT_ENABLED
+    vi.stubEnv('ASSESSMENT_WHOLE_ATOMIC_RECEIPT_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_WHOLE_REQUEST_CONTEXT_REUSE_ENABLED', 'true')
+    const f = await fixture(3), { whole, input } = await wholeInput(f)
+    const shared = (await import('../../config/database')).prisma, query = vi.spyOn(shared, '$queryRaw')
+    const parentReads = vi.spyOn(shared.compositeAssessmentAttempt, 'findUnique')
+    try {
+      await whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })
+      expect(query).toHaveBeenCalledTimes(2) // admitted owner/header + atomic save
+      expect(parentReads).not.toHaveBeenCalled()
+      await processJob(await claim()); expect((await service.getReport(f.parent.id, { userId: f.participant.id })).unitReports).toHaveLength(3)
+      expect(await budget()).toBe(0)
+    } finally { query.mockRestore(); parentReads.mockRestore(); vi.stubEnv('ASSESSMENT_WHOLE_ATOMIC_RECEIPT_ENABLED', priorAtomic || '') }
+  })
+  it('keeps the atomic fence if the parent changes after the admission-owned header read', async () => {
+    vi.stubEnv('ASSESSMENT_WHOLE_REQUEST_CONTEXT_REUSE_ENABLED', 'true')
+    const f = await fixture(1), { whole, input } = await wholeInput(f)
+    const shared = (await import('../../config/database')).prisma, original = shared.$queryRaw.bind(shared)
+    const query = vi.spyOn(shared, '$queryRaw').mockImplementationOnce((...args: any[]) => (async () => {
+      const rows = await (original as any)(...args)
+      await db.compositeAssessmentAttempt.update({ where: { id: f.parent.id }, data: { status: 'ABANDONED' } })
+      return rows
+    })() as any)
+    try {
+      await expect(whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })).rejects.toMatchObject({ code: 'STALE_ATTEMPT' })
+      expect(await budget()).toBe(0); expect((await outbox.readCompositeReportJob(f.parent.id, 1))!.wholeSubmissionId).toBeNull()
+    } finally { query.mockRestore() }
+  })
+
+  it('detached whole answers are durable while the legacy 600-counter is full and locked', async () => {
+    vi.stubEnv('ASSESSMENT_WHOLE_DURABLE_BACKLOG_ENABLED', 'true')
+    const f = await fixture(3), { whole, input } = await wholeInput(f)
+    const { recoverWholeQuestionnaireReceipt: recover } = await import('../../modules/composite/whole-receipt-recovery')
+    expect(await recover(f.parent.id, input.submissionId, 1, { userId: f.participant.id })).toMatchObject({ status: 'NOT_RECEIVED' })
+    await db.compositeReportQueueBudget.update({ where: { id: 'reports' }, data: { pending: 600 } })
+    let release!: () => void, locked!: () => void
+    const ready = new Promise<void>(resolve => { locked = resolve })
+    const held = db.$transaction(async tx => {
+      await tx.$executeRaw`UPDATE composite_report_queue_budget SET pending=pending WHERE id='reports'`
+      locked()
+      await new Promise<void>(resolve => { release = resolve })
+    }, { timeout: 10000 })
+    let accepted: Awaited<ReturnType<typeof whole.submitWholeQuestionnaire>>
+    try {
+      await ready
+      accepted = await Promise.race([
+        whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id }),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error('DETACHED_RECEIPT_WAITED_FOR_LEGACY_LOCK')), 1500)),
+      ])
+      expect(accepted.status).toBe('ACCEPTED')
+      expect(await outbox.readCompositeReportJob(f.parent.id, 1)).toMatchObject({ status: 'PENDING', budgetHeld: false })
+      expect(await db.assessmentUnitSnapshot.count({ where: { compositeAttemptId: f.parent.id } })).toBe(0)
+    } finally {
+      release?.(); await held
+      await db.compositeReportQueueBudget.update({ where: { id: 'reports' }, data: { pending: 0 } })
+    }
+    expect(await recover(f.parent.id, input.submissionId, 1, { userId: f.participant.id })).toMatchObject({ status: 'ACCEPTED', payloadHash: accepted!.payloadHash })
+    // Removing the complete receipt cannot turn an unbudgeted task into a legacy pending task.
+    await expect(db.$executeRaw`UPDATE composite_report_jobs SET whole_submission_id=NULL,
+      whole_payload_hash=NULL,whole_answers_encrypted=NULL,whole_accepted_at=NULL
+      WHERE attempt_id=${f.parent.id} AND attempt_epoch=1`).rejects.toThrow()
+
+    await expect(recover(f.parent.id, input.submissionId, 1, { userId: f.owner.id })).rejects.toMatchObject({ statusCode: 403 })
+    await expect(recover(f.parent.id, input.submissionId + '-wrong', 1, { userId: f.participant.id })).rejects.toMatchObject({ code: 'SUBMISSION_PAYLOAD_CONFLICT' })
+    await expect(recover(f.parent.id, input.submissionId, 2, { userId: f.participant.id })).rejects.toMatchObject({ code: 'STALE_ATTEMPT' })
+    expect(await whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })).toMatchObject({ replayed: true, payloadHash: accepted!.payloadHash })
+    await processJob(await claim()); expect(await budget()).toBe(0)
+    expect((await service.getReport(f.parent.id, { userId: f.participant.id })).unitReports).toHaveLength(3)
+  })
+
+  it('detached whole jobs retain their receipt through retry, lost lease and explicit failed-report recovery', async () => {
+    vi.stubEnv('ASSESSMENT_WHOLE_DURABLE_BACKLOG_ENABLED', 'true')
+    const f = await fixture(2), { whole, input } = await wholeInput(f)
+    const accepted = await whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })
+    const first = await claim()
+    expect(await outbox.finishCompositeReportJob(first, { kind: 'retry', errorCode: 'SYNTHETIC', delayMs: 0 })).toBe(true)
+    expect(await outbox.readCompositeReportJob(f.parent.id, 1)).toMatchObject({ status: 'PENDING', budgetHeld: false, wholePayloadHash: accepted.payloadHash })
+    const old = await claim()
+    await db.compositeReportJob.update({ where: { id: old.id }, data: { leaseExpiresAt: new Date(0) } })
+    const next = await claim(); expect(next.leaseToken).not.toBe(old.leaseToken)
+    expect(await outbox.finishCompositeReportJob(old, { kind: 'failed', errorCode: 'OLD' })).toBe(false)
+    expect(await outbox.finishCompositeReportJob(next, { kind: 'failed', errorCode: 'SYNTHETIC' })).toBe(true)
+    await outbox.retryCompositeReport(f.parent)
+    expect(await outbox.readCompositeReportJob(f.parent.id, 1)).toMatchObject({ status: 'PENDING', budgetHeld: false, wholePayloadHash: accepted.payloadHash })
+    await processJob(await claim())
+    expect(await outbox.readCompositeReportJob(f.parent.id, 1)).toMatchObject({ status: 'READY', budgetHeld: false, wholePayloadHash: accepted.payloadHash })
+    expect(await budget()).toBe(0)
+  })
+
+  it.each([1, 5])('retries completed-parent whole reports with %i immutable units after materialization failure', async units => {
+    vi.stubEnv('ASSESSMENT_WHOLE_DURABLE_BACKLOG_ENABLED', 'true')
+    vi.stubEnv('ASSESSMENT_REPORT_COMPRESSION_ENABLED', 'true')
+    const f = await fixture(units), { whole, input } = await wholeInput(f)
+    const accepted = await whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })
+    const prior = await claim()
+    await whole.processWholeQuestionnaireAnswers(prior)
+    expect((await service.finalizeCompositeAttemptIfReady(f.parent.id, { reportJob: identity(prior) }))?.status).toBe('COMPLETED')
+    const rows = await db.assessment.findMany({ where: { compositeAttemptId: f.parent.id }, orderBy: { id: 'asc' } })
+    const snapshots = await db.assessmentUnitSnapshot.findMany({ where: { compositeAttemptId: f.parent.id }, orderBy: { id: 'asc' } })
+    const receipt = await db.compositeReportJob.findUniqueOrThrow({ where: { id: prior.id } })
+    expect(await outbox.finishCompositeReportJob(prior, { kind: 'failed', errorCode: 'SYNTHETIC_AFTER_FINALIZE' })).toBe(true)
+    await outbox.retryCompositeReport(f.parent)
+    await processJob(await claim())
+    expect(await outbox.readCompositeReportJob(f.parent.id, 1)).toMatchObject({ status: 'READY', budgetHeld: false, wholePayloadHash: accepted.payloadHash })
+    expect((await service.getReport(f.parent.id, { userId: f.participant.id })).unitReports).toHaveLength(units)
+    expect(await db.assessment.findMany({ where: { compositeAttemptId: f.parent.id }, orderBy: { id: 'asc' } })).toEqual(rows)
+    expect(await db.assessmentUnitSnapshot.findMany({ where: { compositeAttemptId: f.parent.id }, orderBy: { id: 'asc' } })).toEqual(snapshots)
+    const after = await db.compositeReportJob.findUniqueOrThrow({ where: { id: prior.id } })
+    expect(after.wholeSubmissionId).toBe(receipt.wholeSubmissionId)
+    expect(after.wholeAnswersEncrypted).toBe(receipt.wholeAnswersEncrypted)
+    expect(after.wholeValidationEncrypted).toBe(receipt.wholeValidationEncrypted)
+    expect(await outbox.finishCompositeReportJob(prior, { kind: 'failed', errorCode: 'STALE' })).toBe(false)
+    expect(await budget()).toBe(0)
+  })
+
+  it('rejects completed-parent whole writes while any unit is still fresh', async () => {
+    vi.stubEnv('ASSESSMENT_WHOLE_DURABLE_BACKLOG_ENABLED', 'true')
+    const f = await fixture(3), { whole, input } = await wholeInput(f)
+    await whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })
+    const job = await claim()
+    await db.compositeAssessmentAttempt.update({ where: { id: f.parent.id }, data: { status: 'COMPLETED' } })
+    await expect(whole.processWholeQuestionnaireAnswers(job)).rejects.toThrow('REPORT_PROCESSING_LEASE_LOST')
+    expect(await db.assessment.count({ where: { compositeAttemptId: f.parent.id, status: 'IN_PROGRESS', submissionId: null } })).toBe(3)
+    expect(await db.assessmentUnitSnapshot.count({ where: { compositeAttemptId: f.parent.id } })).toBe(0)
+  })
+
+  it('fences expired completed-parent whole replays from the current lease owner', async () => {
+    vi.stubEnv('ASSESSMENT_WHOLE_DURABLE_BACKLOG_ENABLED', 'true')
+    const f = await fixture(3), { whole, input } = await wholeInput(f)
+    await whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })
+    const old = await claim()
+    await whole.processWholeQuestionnaireAnswers(old)
+    expect((await service.finalizeCompositeAttemptIfReady(f.parent.id, { reportJob: identity(old) }))?.status).toBe('COMPLETED')
+    await db.compositeReportJob.update({ where: { id: old.id }, data: { leaseExpiresAt: new Date(0) } })
+    const current = await claim()
+    await expect(whole.processWholeQuestionnaireAnswers(old)).rejects.toThrow('REPORT_PROCESSING_LEASE_LOST')
+    await processJob(current)
+    expect((await outbox.readCompositeReportJob(f.parent.id, 1))!.status).toBe('READY')
+    expect(await outbox.finishCompositeReportJob(old, { kind: 'failed', errorCode: 'STALE' })).toBe(false)
+    expect(await db.assessmentUnitSnapshot.count({ where: { compositeAttemptId: f.parent.id } })).toBe(3)
   })
 
 })

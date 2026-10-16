@@ -1,6 +1,7 @@
 import type { CompositeReportJob } from '@prisma/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-const h = vi.hoisted(() => ({ claim: vi.fn(), finish: vi.fn(), returned: vi.fn(), parent: vi.fn(), whole: vi.fn() }))
+const h = vi.hoisted(() => ({ claim: vi.fn(), finish: vi.fn(), returned: vi.fn(), parent: vi.fn(), whole: vi.fn(), decision: vi.fn() }))
+vi.mock('../../services/wholeSubmissionPriority', () => ({ reportClaimDecision: h.decision, reportPriorityClaimed: vi.fn(), startReportClaimPriority: vi.fn(), stopReportClaimPriority: vi.fn() }))
 vi.mock('../../config/database', () => ({ prisma: { compositeAssessmentAttempt: { findUnique: h.parent } } }))
 vi.mock('../../config/assessmentReports', () => ({ assessmentReportConfig: () => ({ workerConcurrency: 2, pollMs: 50, leaseMs: 30000, maxAttempts: 8 }) }))
 vi.mock('../../utils/logger', () => ({ logger: { warn: vi.fn(), error: vi.fn(), info: vi.fn() } }))
@@ -18,6 +19,7 @@ const flush = async () => { await vi.dynamicImportSettled(); for (let index = 0;
 beforeEach(async () => {
   vi.resetModules(); vi.useFakeTimers(); finishes = []; releaseClaim = undefined
   for (const mock of Object.values(h)) mock.mockReset()
+  h.decision.mockReturnValue({ mode: 'normal', limit: 2, delayMs: 0, sources: 0 })
   h.parent.mockResolvedValue({ status: 'ABANDONED' }); h.whole.mockResolvedValue(false); h.returned.mockResolvedValue(true)
   h.claim.mockResolvedValue(null); h.finish.mockImplementation(() => new Promise<boolean>(resolve => { let used = false; finishes.push(() => { if (!used) { used = true; resolve(true) } }) }))
   worker = await import('../../workers/compositeReportWorker')
@@ -74,4 +76,17 @@ describe('report scheduler capacity and drain', () => {
     await worker!.stopCompositeReportWorker(1000)
     await vi.advanceTimersByTimeAsync(5000); expect(h.claim).toHaveBeenCalledTimes(2)
   })
+  it('defers new claims during a burst while in-flight jobs complete, then resumes at the minimum limit', async () => {
+    const jobs = [job(1), job(2), job(3), job(4)]
+    h.claim.mockImplementation(async () => jobs.shift() ?? null)
+    worker!.startCompositeReportWorker(); await flush(); expect(finishes).toHaveLength(2)
+    h.decision.mockReturnValue({ mode: 'yield', limit: 0, delayMs: 50, sources: 1 })
+    finishes[0](); finishes[1](); await flush(); await vi.advanceTimersByTimeAsync(501)
+    expect(worker!.activeCompositeReportJobs()).toBe(0); expect(h.finish).toHaveBeenCalledTimes(2)
+    expect(h.claim).toHaveBeenCalledTimes(2)
+    h.decision.mockReturnValue({ mode: 'minimum', limit: 1, delayMs: 0, sources: 1 })
+    await vi.advanceTimersByTimeAsync(50)
+    expect(finishes).toHaveLength(3); expect(worker!.activeCompositeReportJobs()).toBe(1)
+  })
+
 })

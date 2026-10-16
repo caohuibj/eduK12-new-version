@@ -3,10 +3,10 @@ import { withSerializableScaleTransaction } from './deployment/transactions'
 import { prisma } from '../../config/database'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import { ageMonthsAt, hashAssessmentContext, type AssessmentContextV1, type AssessmentContextValues } from '../assessment-context/context'
-import { encryptFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../assessment-runtime/runtime-snapshot'
+import { persistFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../assessment-runtime/runtime-snapshot'
 import { canStudentAccessScale } from './scale-access'
 import { retainFrozenScaleAssessmentImages } from './scale-image-retention'
-import { readStoredScaleAdmission, standaloneAdmissionPersistenceForRuntime } from './scale-admission.service'
+import { loadStoredScaleAdmission, standaloneAdmissionPersistenceForRuntime } from './scale-admission.service'
 import { encryptScaleAnswers, scaleDefinitionFromRecord } from './scale-workflow.service'
 
 const refreezeStandaloneContext = (
@@ -78,7 +78,7 @@ export const restartStandaloneScaleAssessmentWithPolicy = async (assessmentId: s
       throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表当前不可用于新的测评轮次', 403)
     }
 
-    const priorAdmission = readStoredScaleAdmission(current as any)
+    const priorAdmission = await loadStoredScaleAdmission(current as any, tx)
     const frozenAt = new Date()
     const definition = scaleDefinitionFromRecord(current.scale)
     const runtimeSnapshot = await freezeScaleRuntimeAtAttemptStart(tx as any, {
@@ -125,7 +125,7 @@ export const restartStandaloneScaleAssessmentWithPolicy = async (assessmentId: s
         status: 'IN_PROGRESS',
         deliveryMode: 'FINAL_ONLY',
         runtimeGeneration: 'UNIFIED_V1',
-        runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(runtimeSnapshot),
+        runtimeSnapshotEncrypted: (await persistFrozenScaleRuntimeSnapshot(runtimeSnapshot, tx)),
         compiledRuntimeHash: runtimeSnapshot.compiledRuntime.compiledRuntimeHash,
         ...admission,
         attemptEpoch: nextEpoch,

@@ -82,7 +82,7 @@ suite('unknown data-only SJT onboarding: actual standalone and Bundle services',
     expect((await final.submitSituationalAttemptFinal(childInput)).replayed).toBe(true)
     expect((await composite.getAttemptState(parent.attempt.id, { userId })).status).toBe('COMPLETED')
     const row = await db.compositeAssessmentAttempt.findUnique({ where: { id: parent.attempt.id }, include: { compositeAssessment: { include: { items: true, formSections: { include: { items: true } } } }, scaleAssessments: { include: { scale: true } }, cognitiveSessions: true, formAnswers: true, formSectionAttempts: true, situationalAttempts: true } })
-    expect(composite.buildCompositeReport(row).unitReports[0]).toMatchObject({ type: 'SITUATIONAL', instrumentKey: id.instrumentKey })
+    expect((await composite.buildCompositeReport(row)).unitReports[0]).toMatchObject({ type: 'SITUATIONAL', instrumentKey: id.instrumentKey })
     live.releaseStatus = 'PUBLISHED'
   }, 30000)
 })

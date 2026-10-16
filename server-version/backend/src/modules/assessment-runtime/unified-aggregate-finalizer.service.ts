@@ -1,3 +1,6 @@
+import { compactAssessmentStorageEnabled } from './compact-field-codec'
+import { encryptCompactQuestionnaireReport } from '../reporting/compact-questionnaire-report'
+import { loadStoredCanonicalUnitResults } from './compact-assessment-storage'
 import { assertReportJobIdentity, type ReportJobIdentity } from './report-outbox.service'
 import { compiledHashFromInstance as bundleRuntimeHash } from '../bundle-product/runtime'
 import { Prisma } from '@prisma/client'
@@ -42,7 +45,7 @@ import {
   type AssessmentUnitSnapshotPayloadKind,
 } from './persistence'
 import {
-  decryptFrozenActiveSlotSet,
+  loadFrozenActiveSlotSet,
   formSectionSlotKey,
   type FrozenActiveSlotSetV1,
   type FrozenActiveSlotV1,
@@ -249,8 +252,8 @@ export type UnifiedParentHeader = {
 type TerminalProbe =
   | { kind: 'missing' }
   | { kind: 'terminal'; result: CompletionResult }
-  | { kind: 'incomplete'; parent: UnifiedParentHeader; frozenSlots: FrozenActiveSlotSetV1; headers: AggregateSnapshotHeader[]; completeness: ReturnType<typeof evaluateCompleteness> }
-  | { kind: 'ready'; parent: UnifiedParentHeader; frozenSlots: FrozenActiveSlotSetV1; headers: AggregateSnapshotHeader[]; completeness: ReturnType<typeof evaluateCompleteness> }
+  | { kind: 'incomplete'; parent: UnifiedParentHeader; frozenSlots: FrozenActiveSlotSetV1; headers: AggregateSnapshotHeader[]; snapshotRows?: AggregateSnapshotRow[]; completeness: ReturnType<typeof evaluateCompleteness> }
+  | { kind: 'ready'; parent: UnifiedParentHeader; frozenSlots: FrozenActiveSlotSetV1; headers: AggregateSnapshotHeader[]; snapshotRows?: AggregateSnapshotRow[]; completeness: ReturnType<typeof evaluateCompleteness> }
 
 const terminalFromParent = (parent: Pick<UnifiedParentHeader, 'status' | 'progress' | 'completedAt'>): CompletionResult => ({
   status: parent.status,
@@ -279,20 +282,24 @@ const probeUnifiedParent = async (input: {
   if (input.reportJob) assertReportJobIdentity(parent, input.reportJob)
   if (parent.status !== 'IN_PROGRESS') return { kind: 'terminal', result: terminalFromParent(parent) }
 
-  const frozenSlots = measureRequestPhaseSync('aggregate.decrypt_parse', () => readFrozenSlotSet(parent))
-  const headers = await loadSnapshotHeaders({
-    parentId: input.parentId,
-    attemptEpoch: parent.attemptEpoch,
-    composite: input.composite,
+  const frozenSlots = await measureRequestPhase('aggregate.decrypt_parse', () => readFrozenSlotSet(parent))
+  // Only background finalization, after canonical readiness, eagerly loads
+  // payloads. One invocation-local read serves both completeness and scoring.
+  const snapshotRows = input.reportJob && process.env.ASSESSMENT_REPORT_SNAPSHOT_BATCH_ENABLED === 'true'
+    ? await loadSnapshotPayloads({ parentId: input.parentId, attemptEpoch: parent.attemptEpoch, composite: input.composite })
+    : undefined
+  const headers = snapshotRows ? snapshotRows.map(headerFromRow) : await loadSnapshotHeaders({
+    parentId: input.parentId, attemptEpoch: parent.attemptEpoch, composite: input.composite,
   })
+
   const completeness = measureRequestPhaseSync('aggregate.validate', () => (
     evaluateCompleteness({ slots: frozenSlots.slots, snapshots: headers, attemptEpoch: parent.attemptEpoch })
   ))
   if (completeness.invalidSlotKeys.length > 0) {
     throw aggregateInputError(`存在非法快照槽位：${completeness.invalidSlotKeys.join(',')}`)
   }
-  if (!completeness.ready) return { kind: 'incomplete', parent, frozenSlots, headers, completeness }
-  return { kind: 'ready', parent, frozenSlots, headers, completeness }
+  if (!completeness.ready) return { kind: 'incomplete', parent, frozenSlots, headers, snapshotRows, completeness }
+  return { kind: 'ready', parent, frozenSlots, headers, snapshotRows, completeness }
 }
 
 const snapshotPayloadSelect = {
@@ -318,6 +325,8 @@ type CompletionResult = {
   progress: number
   completedAt: Date | null
   replayed?: boolean
+  aggregateInputHash?: string
+  totalTime?: number
 }
 
 class AggregateCasLost extends Error {
@@ -375,24 +384,26 @@ const withAggregateDefinitionBoundary = <T>(operation: () => T): T => {
   }
 }
 
-const readFrozenSlotSet = (
+const readFrozenSlotSet = async (
   row: {
     runtimeGeneration: string | null
     attemptEpoch: number
     frozenActiveSlotSetEncrypted: string | null
     frozenActiveSlotSetHash: string | null
   },
-): FrozenActiveSlotSetV1 => withAggregateDefinitionBoundary(() => {
+): Promise<FrozenActiveSlotSetV1> => {
+ try {
   if (row.runtimeGeneration !== unifiedRuntimeGeneration) throw new Error('parent runtimeGeneration 不是 UNIFIED_V1')
   if (!row.frozenActiveSlotSetEncrypted || !row.frozenActiveSlotSetHash) {
     throw new Error('parent 缺少 FrozenActiveSlotSet')
   }
-  const slots = decryptFrozenActiveSlotSet(row.frozenActiveSlotSetEncrypted)
+  const slots = await loadFrozenActiveSlotSet(row.frozenActiveSlotSetEncrypted)
   if (slots.snapshotHash !== row.frozenActiveSlotSetHash) throw new Error('FrozenActiveSlotSet hash 不匹配')
   if (slots.attemptEpoch !== row.attemptEpoch) throw new Error('FrozenActiveSlotSet epoch 不匹配')
   if (slots.runtimeGeneration !== unifiedRuntimeGeneration) throw new Error('FrozenActiveSlotSet runtimeGeneration 不匹配')
   return slots
-})
+ } catch (error) { return withAggregateDefinitionBoundary(() => { throw error }) }
+}
 
 const readAggregateContext = (
   row: { contextSnapshotEncrypted: string | null; contextSnapshotHash: string | null },
@@ -499,11 +510,11 @@ const loadSnapshotPayloads = async (input: {
   parentId: string
   attemptEpoch: number
   composite: boolean
-  ids: string[]
+  ids?: string[]
 }): Promise<AggregateSnapshotRow[]> => {
   const where = input.composite
-    ? { compositeAttemptId: input.parentId, attemptEpoch: input.attemptEpoch, id: { in: input.ids } }
-    : { questionnaireAssessmentId: input.parentId, attemptEpoch: input.attemptEpoch, id: { in: input.ids } }
+    ? { compositeAttemptId: input.parentId, attemptEpoch: input.attemptEpoch, ...(input.ids ? { id: { in: input.ids } } : {}) }
+    : { questionnaireAssessmentId: input.parentId, attemptEpoch: input.attemptEpoch, ...(input.ids ? { id: { in: input.ids } } : {}) }
   return measureRequestPhase('aggregate.payload_db', () => prisma.assessmentUnitSnapshot.findMany({
     where,
     select: snapshotPayloadSelect,
@@ -517,8 +528,10 @@ const decryptCompletedPayloads = async (input: {
   slots: FrozenActiveSlotV1[]
   headers: AggregateSnapshotHeader[]
   contextHash: string | null
+  snapshotRows?: AggregateSnapshotRow[]
+  committedRecords?: any[]
 }): Promise<{ payloads: CanonicalPayload[]; entries: AggregateInputHashEntry[] }> => {
-  const rows = await loadSnapshotPayloads({
+  const rows = input.snapshotRows ?? await loadSnapshotPayloads({
     parentId: input.parentId,
     attemptEpoch: input.attemptEpoch,
     composite: input.composite,
@@ -534,6 +547,9 @@ const decryptCompletedPayloads = async (input: {
     envelope?: CanonicalUnitResultEnvelopeV1
   }
 
+  const canonicalCiphers = rows.flatMap(row => row.canonicalResultEncrypted ? [row.canonicalResultEncrypted] : [])
+  const canonicalViews = await measureRequestPhase('aggregate.payload_db', () => loadStoredCanonicalUnitResults(canonicalCiphers, prisma, input.committedRecords))
+  const canonicalByCipher = new Map(canonicalCiphers.map((cipher,index) => [cipher,canonicalViews[index]]))
   const parsed = measureRequestPhaseSync('aggregate.decrypt_parse', () => {
     const headersBySlot = new Map<string, AggregateSnapshotHeader>()
     for (const header of input.headers) {
@@ -557,7 +573,9 @@ const decryptCompletedPayloads = async (input: {
       }
       const envelope = withAggregateDefinitionBoundary(() => {
         if (!row.canonicalResultEncrypted) throw new Error('canonical result 加密载荷缺失')
-        return parseStoredCanonicalUnitResult(row.canonicalResultEncrypted)
+        const result = canonicalByCipher.get(row.canonicalResultEncrypted)
+        if (!result) throw new Error('canonical result facts missing')
+        return result
       })
       out.push({ slot, row, envelope })
     }
@@ -965,15 +983,19 @@ export const persistObservedAggregateProgressForTests = async (input: {
       })
 }
 
-const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?: UnifiedParentHeader, reportJob?: ReportJobIdentity): Promise<CompletionResult | null> => {
+const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?: UnifiedParentHeader, reportJob?: ReportJobIdentity, preloadedGraph?: any): Promise<CompletionResult | null> => {
   const probe = await probeUnifiedParent({ parentId: attemptId, composite: true, preloadedParent, reportJob })
   if (probe.kind === 'missing') return null
   if (probe.kind === 'terminal') return probe.result
   if (probe.kind === 'incomplete') return updateIncompleteComposite(probe.parent, probe.completeness)
 
-  const parent = await measureRequestPhase('aggregate.definition_db', () => prisma.compositeAssessmentAttempt.findUnique({
-    where: { id: attemptId },
-    select: compositeParentGraphSelect as any,
+  const reusable = reportJob && preloadedGraph && preloadedGraph.id === attemptId
+    && preloadedGraph.attemptEpoch === reportJob.attemptEpoch
+    && preloadedGraph.frozenActiveSlotSetHash === reportJob.slotSetHash
+    && preloadedGraph.contextSnapshotHash === reportJob.contextHash
+    && preloadedGraph.status === 'IN_PROGRESS'
+  const parent = reusable ? preloadedGraph : await measureRequestPhase('aggregate.definition_db', () => prisma.compositeAssessmentAttempt.findUnique({
+    where: { id: attemptId }, select: compositeParentGraphSelect as any,
   })) as any
   if (!parent) return null
   if (parent.status !== 'IN_PROGRESS') return terminalFromParent(parent)
@@ -989,6 +1011,8 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?:
     slots: frozenSlots.slots,
     headers,
     contextHash: context.hash,
+    snapshotRows: probe.snapshotRows,
+    committedRecords: reusable ? parent.scaleAssessments : undefined,
   })
   const payloadBySlot = new Map(completed.payloads.map((payload) => [payload.header.slotKey, payload]))
   let packageSnapshot: FrozenReportPackageSnapshot | null = null
@@ -1141,7 +1165,8 @@ const persistCompositeCompletion = async (input: {
           update: {},
         })
       }
-      return { status: 'COMPLETED', progress: 100, completedAt }
+      return { status: 'COMPLETED', progress: 100, completedAt, aggregateInputHash: input.aggregateInputHash,
+        totalTime: Math.max(0, completedAt.getTime() - new Date(input.parent.startedAt).getTime()) }
     }, { isolationLevel: 'ReadCommitted' }))
   } catch (error) {
     if (error instanceof AggregateCasLost) {
@@ -1260,6 +1285,8 @@ const finalizeQuestionnaireUnifiedImpl = async (assessmentId: string, preloadedP
       ) throw aggregateInputError(`问卷量表 ${questionnaireScale.id} 的身份不匹配`)
       return {
         itemId: questionnaireScale.id,
+        sourceAttemptId: payload.envelope.persistenceProvenance.sourceAttemptId,
+        resultHash: payload.envelope.resultHash,
         scaleId: questionnaireScale.scaleId,
         scaleCode: questionnaireScale.scale.code,
         scaleName: questionnaireScale.scale.name,
@@ -1292,7 +1319,9 @@ const finalizeQuestionnaireUnifiedImpl = async (assessmentId: string, preloadedP
     scales: scaleInputs,
     formSections: formInputs,
   }))
-  const aggregateReportEncrypted = await measureRequestPhase('aggregate.encrypt', async () => (await import('../../utils/encryption')).encryptField(collectionReportForStorage(report)))
+  const aggregateReportEncrypted = await measureRequestPhase('aggregate.encrypt', async () => compactAssessmentStorageEnabled()
+    ? encryptCompactQuestionnaireReport({ parent, aggregateInputHash, scales: scaleInputs, report })
+    : (await import('../../utils/encryption')).encryptField(collectionReportForStorage(report)))
   return persistQuestionnaireCompletion({
     parent,
     frozenSlots,
@@ -1346,10 +1375,10 @@ const persistQuestionnaireCompletion = async (input: {
   }
 }
 
-export const finalizeCompositeAttemptUnifiedIfReady = async (attemptId: string, preloadedParent?: UnifiedParentHeader, reportJob?: ReportJobIdentity) => (
+export const finalizeCompositeAttemptUnifiedIfReady = async (attemptId: string, preloadedParent?: UnifiedParentHeader, reportJob?: ReportJobIdentity, preloadedGraph?: any) => (
   withAggregateFinalizationAdmission(async () => {
     try {
-      return await finalizeCompositeUnifiedImpl(attemptId, preloadedParent, reportJob)
+      return await finalizeCompositeUnifiedImpl(attemptId, preloadedParent, reportJob, preloadedGraph)
     } catch (error) {
       if (error instanceof InstrumentFinalSubmitError) throw error
       if (isTransientCompletionDatabaseError(error)) throw toCompletionAdmissionBusyError(error, 1, 'aggregate_finalization')
@@ -1376,7 +1405,7 @@ export const finalizeQuestionnaireAttemptUnifiedIfReady = async (assessmentId: s
 export async function readCompletedCompositeBundleInputs(attemptId: string) {
   const parent = await prisma.compositeAssessmentAttempt.findUnique({ where: { id: attemptId }, select: compositeParentGraphSelect as any }) as any
   if (!parent || parent.status !== 'COMPLETED' || parent.compositeAssessment.productKind !== 'ASSESSMENT_BUNDLE') throw aggregateInputError('Bundle 尚未完成')
-  const frozenSlots = readFrozenSlotSet(parent)
+  const frozenSlots = await readFrozenSlotSet(parent)
   const headers = await loadSnapshotHeaders({ parentId: attemptId, attemptEpoch: parent.attemptEpoch, composite: true })
   const completeness = evaluateCompleteness({ slots: frozenSlots.slots, snapshots: headers, attemptEpoch: parent.attemptEpoch })
   if (!completeness.ready || completeness.invalidSlotKeys.length) throw aggregateInputError('Bundle canonical 来源不完整')

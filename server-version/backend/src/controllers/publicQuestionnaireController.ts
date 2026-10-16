@@ -1,3 +1,5 @@
+import { loadQuestionnaireCollectionReport } from '../modules/reporting/questionnaire-collection-report'
+import { loadScaleAnswers } from '../modules/scale/scale-workflow.service'
 import { assertScaleContextCollectable } from '../modules/scale/policy/context-preflight'
 /**
  * 公开访问控制器
@@ -36,7 +38,7 @@ import {
   encryptScaleAnswers,
   encryptScaleResult,
   readScaleAnswers,
-  scaleAssessmentForResponse,
+  loadScaleAssessmentForResponse,
   scaleDefinitionFromRecord,
   scaleRunnerFromRecord,
 } from '../modules/scale/scale-workflow.service'
@@ -61,8 +63,8 @@ import * as formSectionService from '../services/questionnaire-form-section.serv
 import { finalQuestionnaireFormSectionSubmitSchema } from '../services/questionnaire-final-submit.schema'
 import { InstrumentFinalSubmitError, isInstrumentFinalSubmitError } from '../services/instrumentFinalSubmit'
 import { finalScaleSubmitSchema } from '../services/scale-final-submit.schema'
-import { encryptFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../modules/assessment-runtime/runtime-snapshot'
-import { encryptFrozenActiveSlotSet } from '../modules/assessment-runtime/slot-set'
+import { persistFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../modules/assessment-runtime/runtime-snapshot'
+import { storeFrozenActiveSlotSet } from '../modules/assessment-runtime/slot-set'
 import { freezeQuestionnaireActiveSlotSet, formSectionIdentityHash } from '../modules/assessment-runtime/attempt-runtime'
 import { z } from 'zod'
 import { deviceInputProvenanceV1Schema } from '../modules/scale/device-input-provenance'
@@ -537,7 +539,7 @@ export const publicQuestionnaireController = {
               currentScale: {
                 ...publicScaleRunner(currentItem.data.scale),
                 scaleAssessmentId: sa?.id,
-                assessment: sa ? scaleAssessmentForResponse(sa) : sa,
+                assessment: sa ? (await loadScaleAssessmentForResponse(sa)) : sa,
               },
               contentItems: contentItems.map((item, idx) => ({
                 type: item.type,
@@ -612,18 +614,18 @@ export const publicQuestionnaireController = {
             return { qs, snapshot }
           }))
           await tx.assessment.createMany({
-            data: scaleRuntimeSnapshots.map(({ qs, snapshot }) => ({
+            data: (await Promise.all(scaleRuntimeSnapshots.map(async ({ qs, snapshot }) => ({
               scaleId: qs.scaleId,
-              status: 'IN_PROGRESS',
-              deliveryMode: 'FINAL_ONLY',
+              status: 'IN_PROGRESS' as const,
+              deliveryMode: 'FINAL_ONLY' as const,
               runtimeGeneration: 'UNIFIED_V1' as const,
-              runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(snapshot),
+              runtimeSnapshotEncrypted: (await persistFrozenScaleRuntimeSnapshot(snapshot, tx)),
               compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
               attemptEpoch: assessment.attemptEpoch,
               progress: 0,
               answers: encryptScaleAnswers([]),
               questionnaireAssessmentId: assessment.id,
-            })),
+            })))),
           })
           await retainQuestionnaireScaleAssessmentImages({
             questionnaireAssessmentId: assessment.id,
@@ -648,7 +650,7 @@ export const publicQuestionnaireController = {
           await tx.questionnaireAssessment.update({
             where: { id: assessment.id },
             data: {
-              frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(frozenActiveSlotSet),
+              frozenActiveSlotSetEncrypted: await storeFrozenActiveSlotSet(frozenActiveSlotSet),
               frozenActiveSlotSetHash: frozenActiveSlotSet.snapshotHash,
             },
           })
@@ -1004,7 +1006,7 @@ export const publicQuestionnaireController = {
           responseData.currentScale = {
             ...publicScaleRunner(currentItem.data.scale),
             scaleAssessmentId: sa?.id,
-            assessment: sa ? scaleAssessmentForResponse(sa) : sa,
+            assessment: sa ? (await loadScaleAssessmentForResponse(sa)) : sa,
           }
         }
       }
@@ -1090,7 +1092,7 @@ export const publicQuestionnaireController = {
       }
 
       return success(res, {
-        ...scaleAssessmentForResponse(assessment),
+        ...(await loadScaleAssessmentForResponse(assessment)),
         scale: publicScaleRunner(assessment.scale),
       })
     } catch (err) {
@@ -1215,7 +1217,7 @@ export const publicQuestionnaireController = {
           await freezeQuestionnaireAssessmentContext(tx, assessment.questionnaireAssessment.id)
         }
 
-        const stored = readScaleAnswers(assessment.answers)
+        const stored = (await loadScaleAnswers(assessment.answers, assessment))
         if (stored.decryptError) return { kind: 'decrypt-error' as const }
         const persistedProvenance = deviceInputProvenance ?? stored.deviceInputProvenance
         const merged = mergeScaleAnswersWithRevision(stored.answers, [{ ...answer, expectedRevision }])
@@ -1341,7 +1343,7 @@ export const publicQuestionnaireController = {
           await freezeQuestionnaireAssessmentContext(tx, assessment.questionnaireAssessment.id)
         }
 
-        const stored = readScaleAnswers(assessment.answers)
+        const stored = (await loadScaleAnswers(assessment.answers, assessment))
         if (stored.decryptError) return { kind: 'decrypt-error' as const }
         const persistedProvenance = parsed.data.deviceInputProvenance ?? stored.deviceInputProvenance
         const mergedResult = mergeScaleAnswersWithRevision(stored.answers, normalizedAnswers)
@@ -1433,7 +1435,7 @@ export const publicQuestionnaireController = {
         }
 
         const contextSnapshot = await freezeQuestionnaireAssessmentContext(tx, assessment.questionnaireAssessment.id)
-        const stored = readScaleAnswers(assessment.answers)
+        const stored = (await loadScaleAnswers(assessment.answers, assessment))
         if (stored.decryptError) return { kind: 'decrypt-error' as const }
         const definition = scaleDefinitionFromRecord(assessment.scale)
         const missingRequiredItems = missingRequiredScaleItemCodes(definition, stored.answers)
@@ -1517,7 +1519,7 @@ export const publicQuestionnaireController = {
           questionnaireId: completed.questionnaireId,
           completedAt: completed.completedAt,
           totalTime: completed.totalTime,
-          ...buildQuestionnaireCollectionReport(completed),
+          ...(await loadQuestionnaireCollectionReport(completed)),
         }, '问卷测评已完成')
       }
 
@@ -1535,7 +1537,7 @@ export const publicQuestionnaireController = {
             questionnaireId: qa.questionnaireId,
             completedAt: qa.completedAt,
             totalTime: qa.totalTime,
-            collectionReport: buildQuestionnaireCollectionReport(qa),
+            collectionReport: (await loadQuestionnaireCollectionReport(qa)),
           }
         }
 
@@ -1558,7 +1560,7 @@ export const publicQuestionnaireController = {
           questionnaireId: qa.questionnaireId,
           completedAt: progress.completedAt || new Date(),
           totalTime: progress.totalTime ?? (Date.now() - new Date(qa.startedAt).getTime()),
-          collectionReport: progress?.collectionReport || buildQuestionnaireCollectionReport(qa),
+          collectionReport: progress?.collectionReport || (await loadQuestionnaireCollectionReport(qa)),
         }
       })
 
@@ -2013,7 +2015,7 @@ export const publicQuestionnaireController = {
         return error(res, '测评未完成')
       }
 
-      const collectionReport = buildQuestionnaireCollectionReport(qa)
+      const collectionReport = (await loadQuestionnaireCollectionReport(qa))
 
       return success(res, {
         questionnaireId: qa.questionnaireId,

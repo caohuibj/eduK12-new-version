@@ -3,9 +3,9 @@ import type { Request, Response } from 'express'
 import { forbidden, instrumentError, success, error } from '../../utils/response'
 import { logger } from '../../utils/logger'
 import { hashScaleDefinition } from './scale-definition'
-import { readStoredScaleAdmission } from './scale-admission.service'
+import { loadStoredScaleAdmission } from './scale-admission.service'
 import { restartStandaloneScaleAssessmentWithPolicy } from './scale-restart.service'
-import { scaleAssessmentForResponse, scaleDefinitionFromRecord, scaleRunnerFromRecord } from './scale-workflow.service'
+import { loadScaleAssessmentForResponse, scaleDefinitionFromRecord, scaleRunnerFromRecord } from './scale-workflow.service'
 import { isInstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 
 export const restartStandaloneScaleAssessmentWithPolicyController = async (req: Request, res: Response) => {
@@ -16,10 +16,10 @@ export const restartStandaloneScaleAssessmentWithPolicyController = async (req: 
     if (!context.success) return error(res, context.error.errors[0].message)
     const created = await restartStandaloneScaleAssessmentWithPolicy(req.params.assessmentId, userId, context.data)
     const definition = scaleDefinitionFromRecord(created.scale)
-    const admission = readStoredScaleAdmission(created as any)
+    const admission = await loadStoredScaleAdmission(created as any)
     return success(res, {
       assessment: {
-        ...scaleAssessmentForResponse(created),
+        ...(await loadScaleAssessmentForResponse(created)),
         contextSnapshotHash: admission?.contextSnapshotHash ?? null,
         contextFrozenAt: admission?.frozenAt ?? null,
       },

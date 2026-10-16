@@ -1,4 +1,5 @@
 import { createHmac } from 'crypto'
+import { encryptCompactField } from '../assessment-runtime/compact-field-codec'
 import { encryptField, decryptField, HEX_32_BYTE_KEY } from '../../utils/encryption'
 import { getParticipantKey as getSharedParticipantKey } from '../assessment-runtime/participant-key'
 
@@ -69,6 +70,9 @@ export const encryptCognitivePayload = <T>(value: T): string => {
   const envelope: CognitiveEnvelope<T> = { version: ENVELOPE_VERSION, value }
   return encryptField(envelope)
 }
+
+// The compressed wire format retains the same authenticated domain envelope.
+export const encryptCompactCognitivePayload = <T>(value: T): string => encryptCompactField({ version: ENVELOPE_VERSION, value })
 
 // 严格解密：非加密格式直接抛错，绝不回退明文。
 export const decryptCognitivePayload = <T>(field: string): T => {

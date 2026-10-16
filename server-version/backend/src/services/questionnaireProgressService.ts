@@ -1,3 +1,4 @@
+import { loadQuestionnaireCollectionReport } from '../modules/reporting/questionnaire-collection-report'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../config/database'
 import { buildQuestionnaireCollectionReport, collectionReportForStorage } from '../modules/reporting/questionnaire-collection-report'
@@ -237,7 +238,7 @@ export const refreshQuestionnaireProgress = async (
   })
 
   if (qa.status === 'COMPLETED') {
-    return resultFor(qa, true, qa.completedAt, qa.totalTime, buildQuestionnaireCollectionReport(qa))
+    return resultFor(qa, true, qa.completedAt, qa.totalTime, (await loadQuestionnaireCollectionReport(qa)))
   }
 
   // ABANDONED and any future terminal states are database facts, not states
@@ -264,11 +265,11 @@ export const refreshQuestionnaireProgress = async (
     }) as QuestionnaireProgressSnapshot | null
     if (!current) return null
     return current.status === 'COMPLETED'
-      ? resultFor(current, true, current.completedAt, current.totalTime, buildQuestionnaireCollectionReport(current))
+      ? resultFor(current, true, current.completedAt, current.totalTime, (await loadQuestionnaireCollectionReport(current)))
       : resultFor(current, false, current.completedAt, current.totalTime, null)
   }
 
-  const collectionReport = buildQuestionnaireCollectionReport(qa)
+  const collectionReport = (await loadQuestionnaireCollectionReport(qa))
   const storedCollectionReport = collectionReportForStorage(collectionReport)
   const completedAt = new Date()
   const totalTime = completedAt.getTime() - new Date(qa.startedAt).getTime()
@@ -312,7 +313,7 @@ export const refreshQuestionnaireProgress = async (
   }) as QuestionnaireProgressSnapshot | null
   if (!current) return null
   if (current.status === 'COMPLETED') {
-    return resultFor(current, true, current.completedAt, current.totalTime, buildQuestionnaireCollectionReport(current))
+    return resultFor(current, true, current.completedAt, current.totalTime, (await loadQuestionnaireCollectionReport(current)))
   }
   return resultFor(current, false, current.completedAt, current.totalTime, null)
 }

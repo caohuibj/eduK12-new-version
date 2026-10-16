@@ -1,3 +1,5 @@
+import { loadQuestionnaireCollectionReport } from '../modules/reporting/questionnaire-collection-report'
+import { loadScaleAnswers } from '../modules/scale/scale-workflow.service'
 import { Prisma } from '@prisma/client'
 import { v4 as uuidv4 } from 'uuid'
 import { legacyQuestionnaireDb as prisma } from './legacyQuestionnaireDatabase'
@@ -42,7 +44,7 @@ import { measureRequestPhase, measureRequestPhaseSync } from './runtimeObservabi
 import {
   readScaleAnswers,
   scaleDefinitionFromRecord,
-  scaleAssessmentForResponse,
+  loadScaleAssessmentForResponse,
   encryptScaleAnswers,
   scaleRunnerFromRecord,
 } from '../modules/scale/scale-workflow.service'
@@ -52,13 +54,13 @@ import { questionnaireResumeTokenService } from './questionnaireResumeTokenServi
 import { freezeQuestionnaireActiveSlotSet, formSectionIdentityHash } from '../modules/assessment-runtime/attempt-runtime'
 import type { UnifiedParentHeader } from '../modules/assessment-runtime/unified-aggregate-finalizer.service'
 import {
-  decryptFrozenScaleRuntimeSnapshot,
-  encryptFrozenScaleRuntimeSnapshot,
+  loadFrozenScaleRuntimeSnapshot,
+  persistFrozenScaleRuntimeSnapshot,
   freezeScaleRuntimeAtAttemptStart,
 } from '../modules/assessment-runtime/runtime-snapshot'
 import {
-  decryptFrozenActiveSlotSet,
-  encryptFrozenActiveSlotSet,
+  loadFrozenActiveSlotSet,
+  storeFrozenActiveSlotSet,
   formSectionSlotKey,
   questionnaireScaleSlotKey,
   type FrozenActiveSlotV1,
@@ -334,10 +336,10 @@ const getUnifiedQuestionnaireFinalAttemptState = async (assessmentId: string) =>
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷运行时版本不匹配，请重启测评', 409)
   }
 
-  let frozenSlotSet: ReturnType<typeof decryptFrozenActiveSlotSet>
+  let frozenSlotSet: Awaited<ReturnType<typeof loadFrozenActiveSlotSet>>
   try {
     if (!assessment.frozenActiveSlotSetEncrypted || !assessment.frozenActiveSlotSetHash) throw new Error('FrozenActiveSlotSet missing')
-    frozenSlotSet = decryptFrozenActiveSlotSet(assessment.frozenActiveSlotSetEncrypted)
+    frozenSlotSet = await loadFrozenActiveSlotSet(assessment.frozenActiveSlotSetEncrypted)
     if (frozenSlotSet.snapshotHash !== assessment.frozenActiveSlotSetHash || frozenSlotSet.attemptEpoch !== assessment.attemptEpoch) {
       throw new Error('FrozenActiveSlotSet identity mismatch')
     }
@@ -424,7 +426,7 @@ const getUnifiedQuestionnaireFinalAttemptState = async (assessmentId: string) =>
       throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结运行时不可用，请重启测评', 409)
     }
     try {
-      const runtime = decryptFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted)
+      const runtime = (await loadFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted))
       const slot = slotsByKey.get(questionnaireScaleSlotKey(current.item.id))
       if (
         runtime.instrumentKey !== current.item.scale.code
@@ -666,12 +668,12 @@ export const getQuestionnaireFinalAttemptState = async (assessmentId: string) =>
   if (current?.type === 'SCALE') {
     const child = scaleMap.get(current.item.scaleId)
     const definition = scaleDefinitionFromRecord(current.item.scale)
-    const stored = readScaleAnswers(child?.answers)
+    const stored = (await loadScaleAnswers(child?.answers, child))
     currentScale = {
       ...scaleRunnerFromRecord(current.item.scale),
       scaleAssessmentId: child?.id,
       definitionHash: hashScaleDefinition(definition),
-      assessment: child ? scaleAssessmentForResponse(child) : null,
+      assessment: child ? (await loadScaleAssessmentForResponse(child)) : null,
       ...(stored.decryptError ? { decryptError: true } : {}),
     }
   } else if (current?.type === 'FORM_SECTION') {
@@ -1086,7 +1088,7 @@ export const restartQuestionnaireAssessment = async (
         status: 'IN_PROGRESS',
         deliveryMode: 'FINAL_ONLY',
         runtimeGeneration: 'UNIFIED_V1',
-        frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(frozenActiveSlotSet),
+        frozenActiveSlotSetEncrypted: await storeFrozenActiveSlotSet(frozenActiveSlotSet),
         frozenActiveSlotSetHash: frozenActiveSlotSet.snapshotHash,
         attemptEpoch: nextAttemptEpoch,
         progress: 0,
@@ -1094,19 +1096,19 @@ export const restartQuestionnaireAssessment = async (
     })
     if (current.questionnaire.questionnaireScales.length > 0) {
       await tx.assessment.createMany({
-        data: scaleRuntimeSnapshots.map(({ entry, snapshot }) => ({
+        data: (await Promise.all(scaleRuntimeSnapshots.map(async ({ entry, snapshot }) => ({
           scaleId: entry.scaleId,
           userId: isPublic ? null : context.userId,
           status: 'IN_PROGRESS' as const,
           deliveryMode: 'FINAL_ONLY' as const,
           runtimeGeneration: 'UNIFIED_V1' as const,
-          runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(snapshot),
+          runtimeSnapshotEncrypted: (await persistFrozenScaleRuntimeSnapshot(snapshot, tx)),
           compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
           attemptEpoch: next.attemptEpoch,
           progress: 0,
           answers: encryptScaleAnswers([]),
           questionnaireAssessmentId: next.id,
-        })),
+        })))),
       })
       await retainQuestionnaireScaleAssessmentImages({
         questionnaireAssessmentId: next.id,
@@ -1394,7 +1396,7 @@ const finalizeQuestionnaireLegacyIfReady = async (assessmentId: string) => withQ
   }
 
   const completedAt = new Date()
-  const report = buildQuestionnaireCollectionReport(assessment as any)
+  const report = (await loadQuestionnaireCollectionReport(assessment))
   await tx.questionnaireAssessment.update({
     where: { id: assessmentId },
     data: {
@@ -1624,7 +1626,7 @@ const finalizeQuestionnaireFinalOnlyIfReady = async (assessmentId: string) => {
     // Reports and encryption are intentionally outside the parent-row lock.
     const graph = await loadQuestionnaireFinalizationGraph(assessmentId)
     if (!graph) return null
-    const report = measureRequestPhaseSync('final_submit_serialization', () => buildQuestionnaireCollectionReport(graph as any))
+    const report = await measureRequestPhase('final_submit_serialization', () => loadQuestionnaireCollectionReport(graph))
     const aggregateReportEncrypted = measureRequestPhaseSync(
       'final_submit_encryption',
       () => encryptField(collectionReportForStorage(report)),

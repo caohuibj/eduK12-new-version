@@ -1,3 +1,4 @@
+import { loadStoredCanonicalUnitResults } from '../assessment-runtime/compact-assessment-storage'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
@@ -319,7 +320,10 @@ const prepareTrackInTransaction = async (
   }
 }
 
-const materializePreparedTrack = (prepared: PreparedTrack): ReportingObservationBatchV1 => {
+const materializePreparedTrack = async (prepared: PreparedTrack): Promise<ReportingObservationBatchV1> => {
+  const ciphers = prepared.snapshots.flatMap(row => row.canonicalResultEncrypted ? [row.canonicalResultEncrypted] : [])
+  const views = await loadStoredCanonicalUnitResults(ciphers)
+  const canonicalByCipher = new Map(ciphers.map((cipher,index) => [cipher,views[index]]))
   const snapshotsByAttempt = new Map<string, SnapshotRow[]>()
   for (const snapshot of prepared.snapshots) {
     if (!snapshot.compositeAttemptId) continue
@@ -340,7 +344,7 @@ const materializePreparedTrack = (prepared: PreparedTrack): ReportingObservation
       if (!encrypted) throw new ReportingError('REPORT_RESULT_INTEGRITY', 'canonical UNIT_RESULT payload is missing', 500)
       let envelope
       payloadMaterializationObserver?.()
-      try { envelope = parseStoredCanonicalUnitResult(encrypted) }
+      try { envelope = canonicalByCipher.get(encrypted); if (!envelope) throw new Error('Missing canonical view') }
       catch { return reportingFail('REPORT_RESULT_INTEGRITY', 'canonical UNIT_RESULT payload is invalid', 500) }
       hashes.push({ slotKey: snapshot.slotKey, resultHash: envelope.resultHash })
       const resultQuality = asQuality(envelope.core.quality.status)
@@ -423,7 +427,7 @@ export const resolveAuthoritativeRunResults = async (
   // Decrypt/parse/hash happens after the repeatable-read transaction releases
   // its connection. The encrypted canonical payload is immutable and all
   // identity/epoch bindings needed to validate it were frozen in the prepared read.
-  const batch = materializePreparedTrack(prepared)
+  const batch = await materializePreparedTrack(prepared)
   const memberByExecution = new Map(cohort.members.map((member) => [member.executionId, member]))
   const executionIds = [...batch.resolved, ...batch.unresolved].map((observation) => observation.executionId)
   if (

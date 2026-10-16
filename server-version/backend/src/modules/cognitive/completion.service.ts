@@ -12,7 +12,7 @@ import { lockSession } from './session-lock'
 import { NOT_FOUND, FORBIDDEN, BAD_REQUEST, CONFLICT } from './cognitive.errors'
 import { getCognitiveV2TaskDefinition } from './v2/registry'
 import { runAuthoritativeScorer } from './v2/authoritative-scorer'
-import { readCognitiveSessionConfig } from './session.service'
+import { loadCognitiveSessionConfig } from './session.service'
 import { ensureCognitiveAssessmentContext } from './v2/assessment-context'
 import { loadCognitiveReferenceSets, resolveCognitiveMetricReferences } from './v2/reference-adapter'
 import { projectThreeLayerReport, referencesForReportReading } from './v2/report'
@@ -128,7 +128,7 @@ const buildV2CompletedPayload = (
   result: v2ResponseFromSnapshot(snapshot),
 })
 
-const completeV2Session = async (tx: any, session: any, snapshot: ReturnType<typeof readCognitiveSessionConfig>['snapshot']) => {
+const completeV2Session = async (tx: any, session: any, snapshot: Awaited<ReturnType<typeof loadCognitiveSessionConfig>>['snapshot']) => {
   if (!snapshot) throw new Error('v2 session snapshot is required')
   const definition = getCognitiveV2TaskDefinition(
     session.testType,
@@ -253,7 +253,7 @@ const completeSessionWithPrincipal = async (userId: string | null, sessionId: st
 
     // COMPLETED：幂等返回已存结果（不要求 completionKey）。
     if (session.status === 'COMPLETED') {
-      const storedConfig = readCognitiveSessionConfig(session.configSnapshotEncrypted)
+      const storedConfig = await loadCognitiveSessionConfig(session.configSnapshotEncrypted,tx)
       if (storedConfig.snapshot) {
         if (!session.resultSnapshotEncrypted) throw CONFLICT('v2 completed session result snapshot is missing')
         const snapshot = parseCognitiveResultSnapshot(
@@ -274,7 +274,7 @@ const completeSessionWithPrincipal = async (userId: string | null, sessionId: st
       throw BAD_REQUEST('统一认知测评必须通过最终提交接口完成')
     }
 
-    const storedConfig = readCognitiveSessionConfig(session.configSnapshotEncrypted)
+    const storedConfig = await loadCognitiveSessionConfig(session.configSnapshotEncrypted,tx)
     if (storedConfig.snapshot) {
       return completeV2Session(tx, session, storedConfig.snapshot)
     }

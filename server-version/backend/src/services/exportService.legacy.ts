@@ -1,3 +1,5 @@
+import { loadScaleResult } from '../modules/scale/scale-workflow.service'
+import { loadScaleAnswers } from '../modules/scale/scale-workflow.service'
 import { pinyin } from 'pinyin-pro'
 import { prisma } from '../config/database'
 import * as fs from 'fs'
@@ -289,7 +291,7 @@ export async function getScaleExportData(
 
     // Raw answers are exported for both completed and in-progress records;
     // completed scores are always read from the frozen result payload.
-    const parsedAnswers = readScaleAnswers(assessment.answers)
+    const parsedAnswers = (await loadScaleAnswers(assessment.answers, assessment))
     const answers = parsedAnswers.answers
     const device = parsedAnswers.deviceInputProvenance
     const answerMap = new Map(answers.map((answer) => [answer.itemCode, answer.responseValue]))
@@ -306,7 +308,7 @@ export async function getScaleExportData(
     row.DEVICE_PRIMARY_POINTER = device?.primaryPointer ?? null
     row.DEVICE_CAPTURED_AT = device?.capturedAt ?? null
 
-    const parsedResult = assessment.status === 'COMPLETED' ? readScaleResult(assessment.result) : { result: null, decryptError: false }
+    const parsedResult = assessment.status === 'COMPLETED' ? await loadScaleResult(assessment.result, assessment) : { result: null, decryptError: false }
     const resultValue = parsedResult.result
     const itemScores = Array.isArray(resultValue?.itemScores) ? resultValue.itemScores : []
     const itemScoreMap = new Map(itemScores.map((item: any) => [item.itemCode, item]))
@@ -768,10 +770,10 @@ async function getQuestionnaireExportDataV2(
       if (fieldName) row[fieldName] = formAnswerMap.get(formItem.id) ?? null
     })
 
-    scaleMaps.forEach((scaleMap) => {
+    for (const scaleMap of scaleMaps) {
       const child = assessment.scaleAssessments.find((candidate) => candidate.scaleId === scaleMap.scaleId)
-      const answers = child ? readScaleAnswers(child.answers) : { answers: [], decryptError: false }
-      const result = child && child.status === 'COMPLETED' ? readScaleResult(child.result) : { result: null, decryptError: false }
+      const answers = child ? (await loadScaleAnswers(child.answers, child)) : { answers: [], decryptError: false }
+      const result = child && child.status === 'COMPLETED' ? await loadScaleResult(child.result, child) : { result: null, decryptError: false }
       const answerMap = new Map(answers.answers.map((answer) => [answer.itemCode, answer]))
       const itemScoreMap = new Map((result.result?.itemScores ?? []).map((item) => [item.itemCode, item]))
       const scoreMap = new Map((result.result?.scores ?? []).map((score) => [score.key, score]))
@@ -806,7 +808,7 @@ async function getQuestionnaireExportDataV2(
       row[scaleMap.deviceMaxTouchPointsField] = device?.maxTouchPoints ?? null
       row[scaleMap.devicePrimaryPointerField] = device?.primaryPointer ?? null
       row[scaleMap.deviceCapturedAtField] = device?.capturedAt ?? null
-    })
+    }
     rows.push(row)
   }
   return { fields, rows }

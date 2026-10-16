@@ -1,3 +1,4 @@
+import { loadQuestionnaireCollectionReport } from '../modules/reporting/questionnaire-collection-report'
 import { assertScaleContextCollectable } from '../modules/scale/policy/context-preflight'
 import { Request, Response } from 'express'
 import { legacyQuestionnaireDb as prisma } from '../services/legacyQuestionnaireDatabase'
@@ -17,7 +18,7 @@ import {
   withQuestionnaireSerializableTransaction,
   type QuestionnaireProgressSnapshot,
 } from '../services/questionnaireProgressService'
-import { encryptScaleAnswers, readScaleAnswers, scaleAssessmentForResponse, scaleRunnerFromRecord, scaleDefinitionFromRecord } from '../modules/scale/scale-workflow.service'
+import { encryptScaleAnswers, readScaleAnswers, loadScaleAssessmentForResponse, scaleRunnerFromRecord, scaleDefinitionFromRecord } from '../modules/scale/scale-workflow.service'
 import { retainQuestionnaireScaleAssessmentImages } from '../modules/scale/questionnaire-scale-image-retention'
 import { readContextFormAnswer, validateContextFormItem, validateContextFormItems, writeContextFormAnswer } from '../modules/assessment-context'
 import {
@@ -46,8 +47,8 @@ import { unifiedCompletionDispatchSelect, type UnifiedParentHeader } from '../mo
 import { finalQuestionnaireFormSectionSubmitSchema } from '../services/questionnaire-final-submit.schema'
 import { InstrumentFinalSubmitError, isInstrumentFinalSubmitError } from '../services/instrumentFinalSubmit'
 import { finalScaleSubmitSchema } from '../services/scale-final-submit.schema'
-import { encryptFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../modules/assessment-runtime/runtime-snapshot'
-import { encryptFrozenActiveSlotSet } from '../modules/assessment-runtime/slot-set'
+import { persistFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../modules/assessment-runtime/runtime-snapshot'
+import { storeFrozenActiveSlotSet } from '../modules/assessment-runtime/slot-set'
 import { freezeQuestionnaireActiveSlotSet, formSectionIdentityHash } from '../modules/assessment-runtime/attempt-runtime'
 
 const actorFromRequest = (req: Request) => req.user ? { userId: req.user.userId, role: req.user.role } : null
@@ -2356,7 +2357,7 @@ export const questionnaireController = {
               currentScale: {
                 ...questionnaireScaleRunner(currentItem.data.scale),
                 scaleAssessmentId: sa?.id,
-              assessment: sa ? scaleAssessmentForResponse(sa) : sa,
+              assessment: sa ? (await loadScaleAssessmentForResponse(sa)) : sa,
               },
               totalItems: contentItems.length,
               contentItems: contentItems.map((item, idx) => ({
@@ -2438,19 +2439,19 @@ export const questionnaireController = {
           return { qs, snapshot }
         }))
         await tx.assessment.createMany({
-          data: scaleRuntimeSnapshots.map(({ qs, snapshot }) => ({
+          data: (await Promise.all(scaleRuntimeSnapshots.map(async ({ qs, snapshot }) => ({
             scaleId: qs.scaleId,
             userId: userId!,
-            status: 'IN_PROGRESS',
-            deliveryMode: 'FINAL_ONLY',
+            status: 'IN_PROGRESS' as const,
+            deliveryMode: 'FINAL_ONLY' as const,
             runtimeGeneration: 'UNIFIED_V1' as const,
-            runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(snapshot),
+            runtimeSnapshotEncrypted: (await persistFrozenScaleRuntimeSnapshot(snapshot, tx)),
             compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
             attemptEpoch: created.attemptEpoch,
             progress: 0,
             answers: encryptScaleAnswers([]),
             questionnaireAssessmentId: created.id,
-          })),
+          })))),
         })
         await retainQuestionnaireScaleAssessmentImages({
           questionnaireAssessmentId: created.id,
@@ -2475,7 +2476,7 @@ export const questionnaireController = {
         await tx.questionnaireAssessment.update({
           where: { id: created.id },
           data: {
-            frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(frozenActiveSlotSet),
+            frozenActiveSlotSetEncrypted: await storeFrozenActiveSlotSet(frozenActiveSlotSet),
             frozenActiveSlotSetHash: frozenActiveSlotSet.snapshotHash,
           },
         })
@@ -2768,7 +2769,7 @@ export const questionnaireController = {
           ...questionnaireScaleRunner(currentItem.data.scale),
           scaleAssessmentId: saMap.get(currentItem.data.scaleId)?.id,
           assessment: saMap.get(currentItem.data.scaleId)
-            ? scaleAssessmentForResponse(saMap.get(currentItem.data.scaleId))
+            ? (await loadScaleAssessmentForResponse(saMap.get(currentItem.data.scaleId)))
             : undefined,
         } : null,
         totalItems: contentItems.length,
@@ -2842,7 +2843,7 @@ export const questionnaireController = {
           questionnaireId: completed.questionnaireId,
           completedAt: completed.completedAt,
           totalTime: completed.totalTime,
-          ...buildQuestionnaireCollectionReport(completed),
+          ...(await loadQuestionnaireCollectionReport(completed)),
         }, '问卷测评已完成')
       }
 
@@ -2861,7 +2862,7 @@ export const questionnaireController = {
             questionnaireId: qa.questionnaireId,
             completedAt: qa.completedAt,
             totalTime: qa.totalTime,
-            collectionReport: buildQuestionnaireCollectionReport(qa),
+            collectionReport: (await loadQuestionnaireCollectionReport(qa)),
           }
         }
 
@@ -2883,7 +2884,7 @@ export const questionnaireController = {
           questionnaireId: qa.questionnaireId,
           completedAt: progress.completedAt || new Date(),
           totalTime: progress.totalTime ?? (Date.now() - new Date(qa.startedAt).getTime()),
-          collectionReport: progress?.collectionReport || buildQuestionnaireCollectionReport(qa),
+          collectionReport: progress?.collectionReport || (await loadQuestionnaireCollectionReport(qa)),
         }
       })
 
@@ -2957,7 +2958,7 @@ export const questionnaireController = {
         return error(res, '问卷测评未完成')
       }
 
-      const collectionReport = buildQuestionnaireCollectionReport(qa)
+      const collectionReport = (await loadQuestionnaireCollectionReport(qa))
 
       return success(res, {
         questionnaireId: qa.questionnaireId,

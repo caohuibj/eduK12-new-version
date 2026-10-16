@@ -1,3 +1,4 @@
+import { storeSharedCognitiveRuntime, loadSharedCognitiveRuntime } from '../assessment-runtime/shared-cognitive-runtime'
 import { assertCognitiveProductEligible } from './product-eligibility'
 import { randomBytes } from 'crypto'
 import { CourseStudentStatus, CognitiveSessionStatus } from '@prisma/client'
@@ -148,7 +149,7 @@ export const createUnifiedCognitiveSessionConfigSnapshot = async (input: {
       db,
     })
   }
-  return { encrypted: encryptCognitivePayload(snapshot), compiledRuntime }
+  return { encrypted: await storeSharedCognitiveRuntime(snapshot,input.db&&typeof(input.db as any).$queryRaw==='function'?input.db as any:undefined), compiledRuntime }
 }
 
 /** Decode either a v2 session snapshot or the legacy raw config snapshot. */
@@ -156,7 +157,12 @@ export const readCognitiveSessionConfig = <TConfig = Record<string, unknown>>(en
   config: TConfig
   snapshot: ReturnType<typeof sessionConfigFromStoredValue<TConfig>>['snapshot']
   compiledRuntime: ReturnType<typeof sessionConfigFromStoredValue<TConfig>>['compiledRuntime']
-} => sessionConfigFromStoredValue<TConfig>(decryptCognitivePayload<unknown>(encrypted))
+} => {
+  if (encrypted.startsWith('ekr1:')) throw new Error('Shared Cognitive runtime requires the asynchronous versioned reader')
+  return sessionConfigFromStoredValue<TConfig>(decryptCognitivePayload<unknown>(encrypted))
+}
+
+export const loadCognitiveSessionConfig = loadSharedCognitiveRuntime
 
 const v2ResultFromSnapshot = (encrypted: string) => {
   const snapshot = parseCognitiveResultSnapshot(decryptCognitivePayload<unknown>(encrypted))
@@ -263,7 +269,7 @@ const isPrismaUniqueViolation = (err: unknown): boolean =>
   typeof err === 'object' && err !== null && (err as { code?: string }).code === 'P2002'
 
 /** 组装 runner payload（D4 §12）：绝不返回 participantKey / *Encrypted / userId。 */
-const toRunnerPayload = (session: {
+const toRunnerPayload = async (session: {
   id: string
   assignmentId: string | null
   testType: string
@@ -280,7 +286,7 @@ const toRunnerPayload = (session: {
   assignment?: { resolvedReportSnapshotEncrypted?: string | null } | null
   compositeAttempt?: { contextSnapshotHash?: string | null } | null
 }, nextTrialIndex?: number, exposeAnonymousCode = false, frozenReport?: FrozenReportSnapshot | null) => {
-  const storedConfig = readCognitiveSessionConfig(session.configSnapshotEncrypted)
+  const storedConfig = await loadCognitiveSessionConfig(session.configSnapshotEncrypted)
   const validatedConfig = storedConfig.config
   const snapshot = storedConfig.snapshot
   const report = frozenReport ?? readFrozenReport(session.assignment?.resolvedReportSnapshotEncrypted)
@@ -331,7 +337,7 @@ export const createSession = async (userId: string, assignmentId: string) => {
       const course = await prisma.course.findUnique({ where: { id: assignment.courseId }, select: { isLibrary: true } })
       if (course?.isLibrary) throw FORBIDDEN('库课程上的认知任务不能单独作答')
     }
-    return toRunnerPayload(existing)
+    return await toRunnerPayload(existing)
   }
 
   // 无 existing → 这是"新 attempt"，才走完整资格链。
@@ -381,7 +387,7 @@ export const createSession = async (userId: string, assignmentId: string) => {
       },
       })
     })
-    return toRunnerPayload(session, undefined, false, ctx.frozenReport)
+    return await toRunnerPayload(session, undefined, false, ctx.frozenReport)
   } catch (err) {
     if (isPrismaUniqueViolation(err)) {
       // @@unique([assignmentId, participantKey, attemptNo]) 并发冲突 → 重读当前 session（不引 Redis lock）。
@@ -389,7 +395,7 @@ export const createSession = async (userId: string, assignmentId: string) => {
         where: { assignmentId, participantKey, status: 'IN_PROGRESS' },
         include: { assignment: { select: { resolvedReportSnapshotEncrypted: true } } },
       })
-      if (current) return toRunnerPayload(current)
+      if (current) return await toRunnerPayload(current)
       throw CONFLICT('Session already exists for this attempt')
     }
     throw err
@@ -415,7 +421,7 @@ export const getSession = async (userId: string, sessionId: string) => {
   if (session.status === 'COMPLETED') {
     // Relational cohort-only attempts expose terminal state but never an
     // individual Cognitive result. The parent cohort projection is authoritative.
-    const runnerPayload = toRunnerPayload(session)
+    const runnerPayload = await toRunnerPayload(session)
     if (session.compositeAttemptId && session.compositeAttempt?.status !== 'COMPLETED') {
       return { ...runnerPayload, status: session.status, finishedAt: session.finishedAt, feedbackDeferred: true }
     }
@@ -430,7 +436,7 @@ export const getSession = async (userId: string, sessionId: string) => {
       }
     }
     // D6 后：普通完成态返回 decrypted result。
-    const storedConfig = readCognitiveSessionConfig(session.configSnapshotEncrypted)
+    const storedConfig = await loadCognitiveSessionConfig(session.configSnapshotEncrypted)
     if (storedConfig.snapshot) {
       if (!session.resultSnapshotEncrypted) throw CONFLICT('v2 completed session result snapshot is missing')
       return {
@@ -491,7 +497,7 @@ export const getSession = async (userId: string, sessionId: string) => {
   // D4：IN_PROGRESS / ABANDONED / INVALID 只回运行信息 + decrypted config + randomSeed，不返回 score/metrics。
   // 综合测评允许登录学生跨设备续答，因此服务端提供下一个安全的试次索引。
   const nextTrialIndex = (session.trials?.[0]?.trialIndex ?? -1) + 1
-  return toRunnerPayload(session, nextTrialIndex)
+  return await toRunnerPayload(session, nextTrialIndex)
 }
 
 /**
@@ -519,13 +525,13 @@ export const getPublicSession = async (recoveryTokenHash: string, sessionId: str
   if (!allowed) throw FORBIDDEN('Recovery credential does not own this session')
 
   const nextTrialIndex = (session.trials?.[0]?.trialIndex ?? -1) + 1
-  const runnerPayload = toRunnerPayload(session, nextTrialIndex, true)
+  const runnerPayload = await toRunnerPayload(session, nextTrialIndex, true)
   if (session.status !== 'COMPLETED') return runnerPayload
   if (session.compositeAttemptId && session.compositeAttempt?.status !== 'COMPLETED') {
     return { ...runnerPayload, finishedAt: session.finishedAt, feedbackDeferred: true }
   }
 
-  const storedConfig = readCognitiveSessionConfig(session.configSnapshotEncrypted)
+  const storedConfig = await loadCognitiveSessionConfig(session.configSnapshotEncrypted)
   if (storedConfig.snapshot) {
     if (!session.resultSnapshotEncrypted) throw CONFLICT('v2 completed session result snapshot is missing')
     return {
@@ -659,7 +665,7 @@ export const restartSession = async (userId: string, sessionId: string) => {
       const current = await prisma.cognitiveSession.findFirst({
         where: { assignmentId: session.assignmentId, participantKey, status: 'IN_PROGRESS' },
       })
-      if (current) return toRunnerPayload(current)
+      if (current) return await toRunnerPayload(current)
       throw CONFLICT('Restarted session already exists')
     }
     throw err

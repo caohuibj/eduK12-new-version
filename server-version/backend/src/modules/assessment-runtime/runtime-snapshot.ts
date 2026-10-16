@@ -1,7 +1,10 @@
+import { assertAssessmentStartResources } from '../../services/assessmentResourceProtection'
 import { hashScaleDefinition, scaleDefinitionSchema, type ScaleDefinitionV2 } from '../scale/scale-definition'
 import { assertAssessmentOperationallyActive } from '../assessment-governance/operational-hold'
 import { compileScaleRuntime, parseCompiledInstrumentRuntime } from './compiler'
-import { canonicalHash } from './canonical'
+import { canonicalHash, canonicalHashObjectParts, retainImmutableCanonicalValue, hasImmutableCanonicalValue } from './canonical'
+import { BoundedArtifactCache, artifactContentKey, jsonArtifactBytes } from './bounded-artifact-cache'
+import { createHash } from 'node:crypto'
 import { decryptUnifiedRuntimePayload, encryptUnifiedRuntimePayload } from './security'
 import { freezeExactReferenceBindings } from './reference-binding'
 import type { CompiledInstrumentRuntimeV1, ReferenceBindingSnapshot } from './types'
@@ -64,6 +67,94 @@ const frozenScaleRuntimeSnapshotSchema = z.object({
   snapshotHash: z.string().regex(/^[0-9a-f]{64}$/),
 }).strict()
 
+// Cache only content-verified, immutable scientific artifacts. Per-attempt
+// dates, bindings, context, answers and authorization are never cached.
+type VerifiedScaleArtifact = {
+  definition: ScaleDefinitionV2; compiledRuntime: CompiledInstrumentRuntimeV1;
+  sourceHash: string; legacyHash: string; bytes: number;
+}
+const verifiedScaleArtifacts = new Map<string, VerifiedScaleArtifact>()
+const MAX_SCALE_ARTIFACTS = 64
+const MAX_SCALE_ARTIFACT_BYTES = 4 * 1024 * 1024
+let scaleArtifactBytes = 0
+const frozenScaleRuntimeHeaderSchema = frozenScaleRuntimeSnapshotSchema.extend({
+  definition: z.unknown(), compiledRuntime: z.unknown(),
+})
+const freezeArtifact = <T>(value: T): T => {
+  if (value && typeof value === 'object' && !Object.isFrozen(value)) {
+    for (const child of Object.values(value)) freezeArtifact(child)
+    Object.freeze(value)
+  }
+  return value
+}
+export const frozenScaleArtifactCacheStats = () => ({
+  entries: verifiedScaleArtifacts.size, bytes: scaleArtifactBytes,
+  maxEntries: MAX_SCALE_ARTIFACTS, maxBytes: MAX_SCALE_ARTIFACT_BYTES,
+})
+const retainScaleArtifact = (key: string, artifact: VerifiedScaleArtifact) => {
+  if (artifact.bytes > MAX_SCALE_ARTIFACT_BYTES) return
+  while (verifiedScaleArtifacts.size >= MAX_SCALE_ARTIFACTS || scaleArtifactBytes + artifact.bytes > MAX_SCALE_ARTIFACT_BYTES) {
+    const oldest = verifiedScaleArtifacts.keys().next().value!
+    scaleArtifactBytes -= verifiedScaleArtifacts.get(oldest)!.bytes
+    verifiedScaleArtifacts.delete(oldest)
+  }
+  retainImmutableCanonicalValue(artifact.definition); retainImmutableCanonicalValue(artifact.compiledRuntime)
+  verifiedScaleArtifacts.set(key, artifact); scaleArtifactBytes += artifact.bytes
+}
+
+type PreparedScale = { definition: ScaleDefinitionV2; compiledRuntime: CompiledInstrumentRuntimeV1; legacyHash: string }
+const preparedScales = new BoundedArtifactCache<PreparedScale>(64, 4 * 1024 * 1024)
+const preparedScaleAliases = new WeakMap<object, Map<string, string>>()
+const legacyHashes = new WeakMap<object, string>()
+export const verifiedLegacyScaleDefinitionHash = (definition: ScaleDefinitionV2): string => {
+  if (!hasImmutableCanonicalValue(definition)) return hashScaleDefinition(definition)
+  const known = legacyHashes.get(definition)
+  if (known) return known
+  const hash = hashScaleDefinition(definition); legacyHashes.set(definition, hash); return hash
+}
+export const preparedScaleArtifactCacheStats = () => preparedScales.stats()
+const prepareScale = (input: { instrumentKey: string; instrumentVersion: string; definition: ScaleDefinitionV2 }): PreparedScale => {
+  const reuseIdentity = process.env.ASSESSMENT_SHARED_CONTROL_ENABLED === 'true'
+    && process.env.ASSESSMENT_COMPILED_ARTIFACT_CACHE_ENABLED === 'true' && hasImmutableCanonicalValue(input.definition)
+  const identity = JSON.stringify([input.instrumentKey, input.instrumentVersion])
+  if (reuseIdentity) {
+    const alias = preparedScaleAliases.get(input.definition)?.get(identity)
+    const known = alias ? preparedScales.get(alias) : undefined
+    if (known) return known // Actual input object was fully verified and deeply frozen.
+  }
+  const bytes = process.env.ASSESSMENT_COMPILED_ARTIFACT_CACHE_ENABLED === 'true' ? jsonArtifactBytes({ instrumentKey: input.instrumentKey, instrumentVersion: input.instrumentVersion, definition: input.definition }) : null
+  const key = bytes ? artifactContentKey(bytes) : ''
+  const known = bytes ? preparedScales.get(key) : undefined
+  if (known) {
+    if (reuseIdentity) {
+      let aliases = preparedScaleAliases.get(input.definition)
+      if (!aliases) { aliases = new Map(); preparedScaleAliases.set(input.definition, aliases) }
+      if (aliases.size < 16) aliases.set(identity, key)
+    }
+    return known
+  }
+  const definition = scaleDefinitionSchema.parse(input.definition)
+  const compiledRuntime = compileScaleRuntime({ instrumentKey: input.instrumentKey, instrumentVersion: input.instrumentVersion,
+    definition, sourceDefinitionHash: canonicalHash(definition) })
+  const legacyHash = hashScaleDefinition(definition)
+  if (bytes) {
+    retainImmutableCanonicalValue(definition); retainImmutableCanonicalValue(compiledRuntime)
+    legacyHashes.set(definition, legacyHash)
+    // Charge for parsed objects, canonical buffers and bookkeeping. This is a
+    // bounded conservative accounting budget, not a claimed heap measurement.
+    preparedScales.set(key, { definition, compiledRuntime, legacyHash }, bytes.length * 4 + 1024)
+    if (reuseIdentity) {
+      for (const object of [input.definition, definition]) {
+        let aliases = preparedScaleAliases.get(object)
+        if (!aliases) { aliases = new Map(); preparedScaleAliases.set(object, aliases) }
+        if (aliases.size < 16) aliases.set(identity, key) // A weak alias never bypasses bounded eviction.
+      }
+    }
+
+  }
+  return { definition, compiledRuntime, legacyHash }
+}
+
 const buildFrozenScaleRuntimeSnapshot = (input: {
   instrumentKey: string
   instrumentVersion: string
@@ -81,12 +172,12 @@ const buildFrozenScaleRuntimeSnapshot = (input: {
     instrumentKey: input.instrumentKey,
     instrumentVersion: input.instrumentVersion,
     sourceDefinitionHash: input.compiledRuntime.sourceDefinitionHash,
-    legacyDefinitionHash: hashScaleDefinition(input.definition),
+    legacyDefinitionHash: verifiedLegacyScaleDefinitionHash(input.definition),
     compiledRuntime: input.compiledRuntime,
     referenceBindings: input.referenceBindings,
     definition: input.definition,
   })
-  return { ...unsigned, snapshotHash: canonicalHash(unsigned) }
+  return { ...unsigned, snapshotHash: canonicalHashObjectParts(unsigned) }
 }
 
 export const createFrozenScaleRuntimeSnapshot = (input: {
@@ -96,13 +187,7 @@ export const createFrozenScaleRuntimeSnapshot = (input: {
   referenceBindings?: ReferenceBindingSnapshot[]
   frozenAt?: Date
 }): FrozenScaleRuntimeSnapshotV1 => {
-  const definition = scaleDefinitionSchema.parse(input.definition)
-  const compiledRuntime = compileScaleRuntime({
-    instrumentKey: input.instrumentKey,
-    instrumentVersion: input.instrumentVersion,
-    definition,
-    sourceDefinitionHash: canonicalHash(definition),
-  })
+  const { definition, compiledRuntime } = prepareScale(input)
   return buildFrozenScaleRuntimeSnapshot({
     instrumentKey: input.instrumentKey,
     instrumentVersion: input.instrumentVersion,
@@ -123,6 +208,7 @@ export const freezeScaleRuntimeAtAttemptStart = async (
     requestedMode?: import('../scale/policy/deployment').ScaleDeploymentModeV1
   },
 ): Promise<VersionedFrozenScaleRuntimeSnapshot> => {
+  assertAssessmentStartResources()
   // Manual operational pause is checked before any reference-binding DB read.
   // Parsing an existing frozen snapshot never consults current operational
   // state, so already-started attempts remain completable.
@@ -132,13 +218,7 @@ export const freezeScaleRuntimeAtAttemptStart = async (
     version: input.instrumentVersion,
   })
 
-  const definition = scaleDefinitionSchema.parse(input.definition)
-  const compiledRuntime = compileScaleRuntime({
-    instrumentKey: input.instrumentKey,
-    instrumentVersion: input.instrumentVersion,
-    definition,
-    sourceDefinitionHash: canonicalHash(definition),
-  })
+  const { definition, compiledRuntime } = prepareScale(input)
   const referenceBindings = await freezeExactReferenceBindings(db, {
     instrumentType: 'SCALE',
     instrumentKey: input.instrumentKey,
@@ -175,20 +255,30 @@ export const freezeScaleRuntimeAtAttemptStart = async (
 }
 
 export const hashFrozenScaleRuntimeSnapshot = (snapshot: FrozenScaleRuntimeSnapshotV1): string => (
-  canonicalHash(unsignedSnapshot(snapshot))
+  canonicalHashObjectParts(unsignedSnapshot(snapshot))
 )
 
 export const parseFrozenScaleRuntimeSnapshot = (value: unknown): FrozenScaleRuntimeSnapshotV1 => {
-  const snapshot = frozenScaleRuntimeSnapshotSchema.parse(value) as unknown as FrozenScaleRuntimeSnapshotV1
+  const header = frozenScaleRuntimeHeaderSchema.parse(value)
+  // Hash the ACTUAL content, never trust supplied hash fields as cache keys.
+  const artifactContent = process.env.ASSESSMENT_FROZEN_ARTIFACT_CACHE_ENABLED === 'true'
+    ? jsonArtifactBytes({ definition: header.definition, compiledRuntime: header.compiledRuntime }) : null
+  const artifactKey = artifactContent ? createHash('sha256').update('frozen-scale-artifact-cache-v1:').update(artifactContent).digest('hex') : ''
+  const verified = artifactContent ? verifiedScaleArtifacts.get(artifactKey) : undefined
+  if (verified) { verifiedScaleArtifacts.delete(artifactKey); verifiedScaleArtifacts.set(artifactKey, verified) }
+  const snapshot = (verified
+    ? { ...header, definition: verified.definition, compiledRuntime: verified.compiledRuntime }
+    : frozenScaleRuntimeSnapshotSchema.parse(value)) as unknown as FrozenScaleRuntimeSnapshotV1
   const definition = snapshot.definition
-  const expectedSourceDefinitionHash = canonicalHash(definition)
+  const expectedSourceDefinitionHash = verified?.sourceHash ?? canonicalHash(definition)
   if (snapshot.sourceDefinitionHash !== expectedSourceDefinitionHash) {
     throw new Error('Frozen Scale source definition hash mismatch')
   }
-  if (snapshot.legacyDefinitionHash !== hashScaleDefinition(definition)) {
+  const expectedLegacyHash = verified?.legacyHash ?? hashScaleDefinition(definition)
+  if (snapshot.legacyDefinitionHash !== expectedLegacyHash) {
     throw new Error('Frozen Scale legacy definition hash mismatch')
   }
-  const compiledRuntime = parseCompiledInstrumentRuntime(snapshot.compiledRuntime)
+  const compiledRuntime = verified?.compiledRuntime ?? parseCompiledInstrumentRuntime(snapshot.compiledRuntime)
   if (
     compiledRuntime.instrumentType !== 'SCALE'
     || compiledRuntime.instrumentKey !== snapshot.instrumentKey
@@ -225,7 +315,9 @@ export const parseFrozenScaleRuntimeSnapshot = (value: unknown): FrozenScaleRunt
     referenceBindings: snapshot.referenceBindings,
     definition,
   })
-  if (canonicalHash(unsigned) !== snapshot.snapshotHash) throw new Error('Frozen Scale runtime snapshot hash mismatch')
+  if (canonicalHashObjectParts(unsigned) !== snapshot.snapshotHash) throw new Error('Frozen Scale runtime snapshot hash mismatch')
+  if (!verified && artifactContent) retainScaleArtifact(artifactKey, { definition, compiledRuntime,
+    sourceHash: expectedSourceDefinitionHash, legacyHash: expectedLegacyHash, bytes: artifactContent.byteLength * 4 + 1024 })
   return { ...unsigned, snapshotHash: snapshot.snapshotHash }
 }
 
@@ -244,3 +336,27 @@ export const encryptFrozenScaleRuntimeSnapshot = (snapshot: VersionedFrozenScale
 export const decryptFrozenScaleRuntimeSnapshot = (encrypted: string): VersionedFrozenScaleRuntimeSnapshot => (
   parseVersionedFrozenScaleRuntimeSnapshot(decryptUnifiedRuntimePayload<unknown>(encrypted))
 )
+
+/** New writes are opt-in; compatible reads remain unconditional for rollback. */
+export const persistFrozenScaleRuntimeSnapshot = async (snapshot: VersionedFrozenScaleRuntimeSnapshot, db?: import('./shared-scale-runtime').SharedScaleArtifactDb): Promise<string> => {
+  if (process.env.ASSESSMENT_SHARED_RUNTIME_STORAGE_ENABLED !== 'true') return encryptFrozenScaleRuntimeSnapshot(snapshot)
+  const shared = await import('./shared-scale-runtime')
+  return shared.sharedScaleRuntimeStore.save(snapshot, db ? shared.sharedScaleArtifactRepositoryForDatabase(db) : undefined)
+}
+export class FrozenRuntimeStorageUnavailableError extends Error {
+  readonly code = 'ASSESSMENT_RUNTIME_UNAVAILABLE'
+  readonly statusCode = 503
+  readonly retryAfterSeconds = 5
+  constructor(cause: unknown) {
+    super('冻结的测评内容暂时无法读取，已保存的作答会保留，请稍后重试。')
+    Object.defineProperty(this, 'cause', { value: cause })
+    this.name = 'FrozenRuntimeStorageUnavailableError'
+  }
+}
+export const loadFrozenScaleRuntimeSnapshot = async (encrypted: string, db?: import('./shared-scale-runtime').SharedScaleArtifactDb): Promise<VersionedFrozenScaleRuntimeSnapshot> => {
+  const value = decryptUnifiedRuntimePayload<unknown>(encrypted)
+  const shared = await import('./shared-scale-runtime')
+  if (!shared.isSharedScaleRuntimeReference(value)) return parseVersionedFrozenScaleRuntimeSnapshot(value)
+  try { return await shared.sharedScaleRuntimeStore.load(value, db ? shared.sharedScaleArtifactRepositoryForDatabase(db) : undefined) }
+  catch (cause) { throw new FrozenRuntimeStorageUnavailableError(cause) }
+}

@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express'
 import { prisma } from '../config/database'
 import { issueFrozenAssessmentVideoCapabilities } from '../modules/assessment-media/assessment-media-capability'
-import { decryptFrozenScaleRuntimeSnapshot } from '../modules/assessment-runtime/runtime-snapshot'
+import { loadFrozenScaleRuntimeSnapshot } from '../modules/assessment-runtime/runtime-snapshot'
 import { frozenScaleMediaOwner } from '../modules/scale/scale-image-retention'
 import { scaleItemVideoPresentation } from '../modules/scale/scale-video.adapter'
 import { error, forbidden, notFound, success } from '../utils/response'
@@ -23,7 +23,7 @@ export const scaleVideoController = {
       if (!assessment) return notFound(res, '量表测评记录不存在')
       if (!assessment.runtimeSnapshotEncrypted) return error(res, '量表冻结内容不可用')
 
-      const snapshot = decryptFrozenScaleRuntimeSnapshot(assessment.runtimeSnapshotEncrypted)
+      const snapshot = (await loadFrozenScaleRuntimeSnapshot(assessment.runtimeSnapshotEncrypted))
       const presentation = scaleItemVideoPresentation(snapshot.definition, req.params.itemCode)
       if (!presentation) return notFound(res, '当前冻结题目没有视频内容')
 

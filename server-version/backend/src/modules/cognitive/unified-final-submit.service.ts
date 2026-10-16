@@ -1,3 +1,5 @@
+import { encryptCompactCognitivePayload } from './cognitive.security'
+import { sharedControlWritesEnabled } from '../assessment-runtime/shared-control-records'
 import { createHash } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -16,7 +18,7 @@ import { measureRequestPhase, measureRequestPhaseSync } from '../../services/run
 import { withFinalOnlyCompletionTransaction } from '../../services/questionnaireProgressService'
 import { loadFrozenMeasurementContext } from './profile-freeze'
 import { decryptCognitivePayload, encryptCognitivePayload } from './cognitive.security'
-import { readCognitiveSessionConfig } from './session.service'
+import { loadCognitiveSessionConfig } from './session.service'
 import { getCognitiveV2TaskDefinition } from './v2/registry'
 import {
   CognitiveFinalSubmissionConfigError,
@@ -198,12 +200,12 @@ const normalizeSubmission = (
   }
 }
 
-const prepareRuntime = (
+const prepareRuntime = async (
   session: UnifiedCognitiveAdmission,
   admission: FrozenUnitAdmissionV1,
   input: UnifiedCognitiveFinalSubmitInput,
 ) => {
-  const stored = readCognitiveSessionConfig(session.configSnapshotEncrypted)
+  const stored = await loadCognitiveSessionConfig(session.configSnapshotEncrypted)
   if (!stored.snapshot || stored.snapshot.runtimeGeneration !== 'UNIFIED_V1' || !stored.compiledRuntime) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '认知运行时快照不可用，请重启后重新作答', 409)
   }
@@ -300,7 +302,7 @@ export const submitUnifiedCognitiveSessionFinal = async (
   const submissionId = validateSubmissionId(input.submissionId)
   const admission = await measureRequestPhase('final_submit_admission', () => activateCognitiveAdmission(child))
   assertFrozenAdmission(child, admission, input)
-  const prepared = measureRequestPhaseSync('final_submit_definition_prepare', () => prepareRuntime(child, admission, input))
+  const prepared = await measureRequestPhase('final_submit_definition_prepare', () => prepareRuntime(child, admission, input))
 
   if (child.status === 'COMPLETED') {
     const replay = assertSubmissionReplay(child, submissionId, prepared.payloadHash)
@@ -419,7 +421,7 @@ export const submitUnifiedCognitiveSessionFinal = async (
         ? { administrationProvenance: input.administrationProvenance }
         : {}),
     })),
-    resultSnapshot: encryptCognitivePayload(resultSnapshot),
+    resultSnapshot: (sharedControlWritesEnabled()?encryptCompactCognitivePayload(resultSnapshot):encryptCognitivePayload(resultSnapshot)),
     canonicalResult: canonicalResult
       ? encryptUnifiedRuntimePayload(createCanonicalUnitResultEnvelope({
           core: canonicalResult,

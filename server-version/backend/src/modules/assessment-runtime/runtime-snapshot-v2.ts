@@ -1,6 +1,8 @@
 import { z } from 'zod'
-import { canonicalHash } from './canonical'
-import { parseFrozenScaleRuntimeSnapshot } from './runtime-snapshot'
+import { createHash } from 'node:crypto'
+import { canonicalHash, canonicalHashObjectParts, retainImmutableCanonicalValue } from './canonical'
+import { BoundedArtifactCache, artifactContentKey, jsonArtifactBytes } from './bounded-artifact-cache'
+import { parseFrozenScaleRuntimeSnapshot, verifiedLegacyScaleDefinitionHash } from './runtime-snapshot'
 import { compileScaleRuntime, parseCompiledInstrumentRuntime } from './compiler'
 import { hashScaleDefinition, scaleDefinitionSchema, type ScaleDefinitionV2 } from '../scale/scale-definition'
 import {
@@ -66,6 +68,32 @@ const frozenScaleRuntimeSnapshotV2Schema = z.object({
   snapshotHash: z.string().regex(/^[0-9a-f]{64}$/),
 }).strict()
 
+// Only immutable instrument/policy content is shared, never a respondent,
+// attempt, dynamic reference binding, consent, answer or authorization result.
+type VerifiedV2Artifact = Pick<FrozenScaleRuntimeSnapshotV2, 'definition' | 'compiledRuntime' | 'compiledPolicy'>
+  & { sourceHash: string; legacyHash: string; policyHash: string; bytes: number }
+const artifacts = new Map<string, VerifiedV2Artifact>()
+const MAX_ENTRIES = 64, MAX_BYTES = 4 * 1024 * 1024
+let artifactBytes = 0
+const headerSchema = frozenScaleRuntimeSnapshotV2Schema.extend({ definition: z.unknown(), compiledRuntime: z.unknown(), compiledPolicy: z.unknown() })
+const freeze = <T>(value: T): T => {
+  if (value && typeof value === 'object' && !Object.isFrozen(value)) {
+    for (const child of Object.values(value)) freeze(child)
+    Object.freeze(value)
+  }
+  return value
+}
+export const frozenScaleV2ArtifactCacheStats = () => ({ entries: artifacts.size, bytes: artifactBytes, maxEntries: MAX_ENTRIES, maxBytes: MAX_BYTES })
+const retain = (key: string, value: VerifiedV2Artifact): void => {
+  if (value.bytes > MAX_BYTES) return
+  while (artifacts.size >= MAX_ENTRIES || artifactBytes + value.bytes > MAX_BYTES) {
+    const oldest = artifacts.keys().next().value!
+    artifactBytes -= artifacts.get(oldest)!.bytes; artifacts.delete(oldest)
+  }
+  retainImmutableCanonicalValue(value.definition); retainImmutableCanonicalValue(value.compiledRuntime); retainImmutableCanonicalValue(value.compiledPolicy)
+  artifacts.set(key, value); artifactBytes += value.bytes
+}
+
 const unsignedV2 = (input: Omit<FrozenScaleRuntimeSnapshotV2, 'snapshotHash'>) => ({
   schemaVersion: input.schemaVersion,
   runtimeGeneration: input.runtimeGeneration,
@@ -82,14 +110,14 @@ const unsignedV2 = (input: Omit<FrozenScaleRuntimeSnapshotV2, 'snapshotHash'>) =
 })
 
 export const hashFrozenScaleRuntimeSnapshotV2 = (snapshot: FrozenScaleRuntimeSnapshotV2): string => (
-  canonicalHash(unsignedV2(snapshot))
+  canonicalHashObjectParts(unsignedV2(snapshot))
 )
 
-const assertRuntimeAndReferenceIdentity = (snapshot: FrozenScaleRuntimeSnapshotV2): void => {
-  if (snapshot.sourceDefinitionHash !== canonicalHash(snapshot.definition)) {
+const assertRuntimeAndReferenceIdentity = (snapshot: FrozenScaleRuntimeSnapshotV2, verified?: VerifiedV2Artifact): void => {
+  if (snapshot.sourceDefinitionHash !== (verified?.sourceHash ?? canonicalHash(snapshot.definition))) {
     throw new Error('Frozen Scale V2 source definition hash mismatch')
   }
-  if (snapshot.legacyDefinitionHash !== hashScaleDefinition(snapshot.definition)) {
+  if (snapshot.legacyDefinitionHash !== (verified?.legacyHash ?? verifiedLegacyScaleDefinitionHash(snapshot.definition))) {
     throw new Error('Frozen Scale V2 legacy definition hash mismatch')
   }
   const compiledRuntime = snapshot.compiledRuntime
@@ -157,11 +185,23 @@ export const createFrozenScaleRuntimeSnapshotV2ForTest = (input: {
   return createFrozenScaleRuntimeSnapshotV2FromV1(base, input.compiledPolicy)
 }
 
+const preparedPolicies = new BoundedArtifactCache<CompiledScalePolicyV1>(64, 2 * 1024 * 1024)
+export const preparedScalePolicyCacheStats = () => preparedPolicies.stats()
+const preparePolicy = (input: CompiledScalePolicyV1): CompiledScalePolicyV1 => {
+  const bytes = process.env.ASSESSMENT_COMPILED_ARTIFACT_CACHE_ENABLED === 'true' ? jsonArtifactBytes(input) : null
+  const key = bytes ? artifactContentKey(bytes) : ''
+  const known = bytes ? preparedPolicies.get(key) : undefined
+  if (known) return known
+  const parsed = parseCompiledScalePolicy(input)
+  if (bytes) { retainImmutableCanonicalValue(parsed); preparedPolicies.set(key, parsed, bytes.length * 4 + 1024) }
+  return parsed
+}
+
 export const createFrozenScaleRuntimeSnapshotV2FromV1 = (
   v1: FrozenScaleRuntimeSnapshotV1Like,
   compiledPolicyInput: CompiledScalePolicyV1,
 ): FrozenScaleRuntimeSnapshotV2 => {
-  const compiledPolicy = parseCompiledScalePolicy(compiledPolicyInput)
+  const compiledPolicy = preparePolicy(compiledPolicyInput)
   if (
     compiledPolicy.instrumentKey !== v1.instrumentKey
     || compiledPolicy.instrumentVersion !== v1.instrumentVersion
@@ -183,30 +223,40 @@ export const createFrozenScaleRuntimeSnapshotV2FromV1 = (
     compiledPolicy,
     runtimePolicyHash: compiledPolicy.runtimePolicyHash,
   }
-  const snapshot: FrozenScaleRuntimeSnapshotV2 = { ...unsigned, snapshotHash: canonicalHash(unsignedV2(unsigned)) }
+  const snapshot: FrozenScaleRuntimeSnapshotV2 = { ...unsigned, snapshotHash: canonicalHashObjectParts(unsignedV2(unsigned)) }
   assertRuntimeAndReferenceIdentity(snapshot)
   return snapshot
 }
 
 export const parseFrozenScaleRuntimeSnapshotV2 = (value: unknown): FrozenScaleRuntimeSnapshotV2 => {
-  const rawSnapshot = frozenScaleRuntimeSnapshotV2Schema.parse(value)
+  const header = headerSchema.parse(value)
+  // The key hashes actual canonical content, never only supplied identity hashes.
+  const content = process.env.ASSESSMENT_FROZEN_ARTIFACT_CACHE_ENABLED === 'true'
+    ? jsonArtifactBytes({ definition: header.definition, compiledRuntime: header.compiledRuntime, compiledPolicy: header.compiledPolicy }) : null
+  const key = content ? createHash('sha256').update('verified-scale-v2:').update(content).digest('hex') : ''
+  const verified = content ? artifacts.get(key) : undefined
+  if (verified) { artifacts.delete(key); artifacts.set(key, verified) }
+  const rawSnapshot = verified ? { ...header, definition: verified.definition, compiledRuntime: verified.compiledRuntime, compiledPolicy: verified.compiledPolicy } : frozenScaleRuntimeSnapshotV2Schema.parse(value)
   const snapshot: FrozenScaleRuntimeSnapshotV2 = {
-    ...rawSnapshot,
-    compiledRuntime: parseCompiledInstrumentRuntime(rawSnapshot.compiledRuntime),
-    compiledPolicy: parseCompiledScalePolicy(rawSnapshot.compiledPolicy),
+    ...rawSnapshot, definition: verified?.definition ?? rawSnapshot.definition as ScaleDefinitionV2,
+    compiledRuntime: verified?.compiledRuntime ?? parseCompiledInstrumentRuntime(rawSnapshot.compiledRuntime),
+    compiledPolicy: verified?.compiledPolicy ?? parseCompiledScalePolicy(rawSnapshot.compiledPolicy),
   }
   if (hashFrozenScaleRuntimeSnapshotV2(snapshot) !== snapshot.snapshotHash) {
     throw new Error('Frozen Scale V2 runtime snapshot hash mismatch')
   }
   if (
-    hashCompiledScalePolicy(snapshot.compiledPolicy) !== snapshot.runtimePolicyHash
+    (verified?.policyHash ?? hashCompiledScalePolicy(snapshot.compiledPolicy)) !== snapshot.runtimePolicyHash
     || snapshot.compiledPolicy.runtimePolicyHash !== snapshot.runtimePolicyHash
   ) throw new Error('Frozen Scale V2 runtime policy hash mismatch')
   if (
     snapshot.compiledPolicy.instrumentKey !== snapshot.instrumentKey
     || snapshot.compiledPolicy.instrumentVersion !== snapshot.instrumentVersion
   ) throw new Error('Frozen Scale V2 runtime policy identity mismatch')
-  assertRuntimeAndReferenceIdentity(snapshot)
+  assertRuntimeAndReferenceIdentity(snapshot, verified)
+  if (content && !verified) retain(key, { definition: snapshot.definition, compiledRuntime: snapshot.compiledRuntime,
+    compiledPolicy: snapshot.compiledPolicy, sourceHash: snapshot.sourceDefinitionHash, legacyHash: snapshot.legacyDefinitionHash,
+    policyHash: snapshot.runtimePolicyHash, bytes: content.length * 4 + 1024 })
   return snapshot
 }
 

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { readMatchingWholeReceipt, rememberWholeReceipt, isRecoverableReceiptError, type WholeReceiptLookup } from '../modules/composite/receipt-recovery'
 import { sessionFetch } from '../api/client'
 import type { ApiResponse } from '../types'
 import type { CompositeAttemptState, CompositeReportStatus, WholeQuestionnaireDefinition, WholeQuestionnaireInput, WholeQuestionnaireReceipt } from '../modules/composite/types'
@@ -18,6 +19,7 @@ import ScalePlayer from './questionnaire/ScalePlayer'
 import { useLocalDraftSaveQueue } from './questionnaire/useLocalDraftSaveQueue'
 
 export interface WholeQuestionnaireApi {
+  wholeReceipt?: (id: string, submissionId: string, attemptEpoch: number) => Promise<ApiResponse<WholeReceiptLookup>>
   wholeDefinition: (id: string) => Promise<ApiResponse<WholeQuestionnaireDefinition>>
   submitWhole: (id: string, input: WholeQuestionnaireInput) => Promise<ApiResponse<WholeQuestionnaireReceipt>>
   reportStatus: (id: string) => Promise<ApiResponse<CompositeReportStatus>>
@@ -44,6 +46,8 @@ export default function WholeCompositeQuestionnaire({ state, api, publicMode = f
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loadRound, setLoadRound] = useState(0)
+  const [submitStartedAt, setSubmitStartedAt] = useState<number | null>(null)
+  const [submitElapsedSeconds, setSubmitElapsedSeconds] = useState(0)
   const submitting = useRef(false)
   const questionStart = useRef(Date.now())
   const local = useLocalDraftSaveQueue(draftKey)
@@ -52,6 +56,13 @@ export default function WholeCompositeQuestionnaire({ state, api, publicMode = f
   const current = questions[index]
   const locked = Boolean(meta && (meta.status !== 'DRAFT' || meta.sealedSubmission))
   useEffect(() => { questionStart.current = Date.now() }, [index, draftKey])
+  useEffect(() => {
+    if (submitStartedAt === null) { setSubmitElapsedSeconds(0); return }
+    const update = () => setSubmitElapsedSeconds(Math.max(0, Math.floor((Date.now() - submitStartedAt) / 1000)))
+    update(); const timer = window.setInterval(update, 1000)
+    return () => window.clearInterval(timer)
+  }, [submitStartedAt])
+
 
   useEffect(() => {
     let cancelled = false
@@ -61,7 +72,16 @@ export default function WholeCompositeQuestionnaire({ state, api, publicMode = f
         const existing = await finalDraftStore.get(draftKey)
         if (cancelled) return
         // A sealed request can be confirmed even with new enrollment disabled.
-        if (existing?.sealedSubmission) { setMeta(existing); return }
+        if (existing?.sealedSubmission) {
+          setMeta(existing)
+          const receipt = await readMatchingWholeReceipt(api.wholeReceipt
+            ? () => api.wholeReceipt!(state.id, existing.submissionId, existing.attemptEpoch) : undefined, state.id, existing.submissionId)
+          if (receipt) {
+            rememberWholeReceipt(receipt); setAccepted(true)
+            await finalDraftStore.setStatus(draftKey, 'COMPLETED'); await finalDraftStore.delete(draftKey)
+          }
+          return
+        }
         const status = await api.reportStatus(state.id)
         if (status.code !== 0 || !status.data) throw responseError(status)
         if (status.data.wholeSubmissionReceived) { setAccepted(true); return }
@@ -135,7 +155,7 @@ export default function WholeCompositeQuestionnaire({ state, api, publicMode = f
       const missing = questions.findIndex(({ unit, question }) => question.required && answers[wholeAnswerKey(unit.itemId, question.itemCode)]?.responseValue === undefined)
       if (missing >= 0) { setIndex(missing); setError('还有必答题未作答，请完成后提交整份问卷。'); return }
     }
-    submitting.current = true; setBusy(true); setError(null)
+    submitting.current = true; setBusy(true); setError(null); setSubmitStartedAt(Date.now())
     let confirmed = false
     try {
       await flush()
@@ -156,8 +176,22 @@ export default function WholeCompositeQuestionnaire({ state, api, publicMode = f
       if (!sealed) throw new Error('本地整卷草稿不存在，请重新加载')
       setMeta(sealed.meta)
       const result = await runFinalDraftCapacityRetry({ operation: async () => {
-        const response = await api.submitWhole(state.id, sealed.payload)
-        if (response.code !== 0 || !response.data) throw responseError(response)
+        const lookup = api.wholeReceipt ? () => api.wholeReceipt!(state.id, sealed.payload.submissionId, sealed.payload.attemptEpoch) : undefined
+        if (meta.sealedSubmission) {
+          const recovered = await readMatchingWholeReceipt(lookup, state.id, sealed.payload.submissionId)
+          if (recovered) return recovered
+        }
+        let response: ApiResponse<WholeQuestionnaireReceipt>
+        try {
+          response = await api.submitWhole(state.id, sealed.payload)
+          if (response.code !== 0 || !response.data) throw responseError(response)
+        } catch (cause) {
+          if (isRecoverableReceiptError(cause)) {
+            const recovered = await readMatchingWholeReceipt(lookup, state.id, sealed.payload.submissionId)
+            if (recovered) return recovered
+          }
+          throw cause
+        }
         const receipt = response.data
         if (receipt.status !== 'ACCEPTED' || receipt.attemptId !== state.id || receipt.submissionId !== sealed.payload.submissionId || !receipt.payloadHash) throw new Error('未收到匹配的持久化交卷回执，草稿已保留。')
         return receipt
@@ -166,7 +200,7 @@ export default function WholeCompositeQuestionnaire({ state, api, publicMode = f
         if (pending) setMeta(pending)
         setError('服务器繁忙或网络中断，正在重试同一份整卷；答案已保留。')
       } })
-      confirmed = true; setAccepted(true)
+      confirmed = true; setAccepted(true); rememberWholeReceipt(result)
       try { sessionStorage.setItem(`composite:whole-receipt:${state.id}`, JSON.stringify(result)) } catch { /* The server receipt is already durable. */ }
       await finalDraftStore.setStatus(draftKey, 'COMPLETED')
       await finalDraftStore.delete(draftKey)
@@ -176,7 +210,7 @@ export default function WholeCompositeQuestionnaire({ state, api, publicMode = f
       const next = await recordFinalSubmissionFailure(draftKey, cause, meta.submissionId).catch(() => null)
       if (next) setMeta(next)
       setError(normalizeApiError(cause).message)
-    } finally { submitting.current = false; setBusy(false) }
+    } finally { submitting.current = false; setBusy(false); setSubmitStartedAt(null) }
   }
   const unitPath = current ? `${publicMode ? '/api/public/composite-assessments' : '/api/composite-assessments'}/attempts/${encodeURIComponent(state.id)}/items/${encodeURIComponent(current.unit.itemId)}/scale` : ''
   const loadImage = useCallback(async (assetId: string) => {
@@ -190,7 +224,7 @@ export default function WholeCompositeQuestionnaire({ state, api, publicMode = f
     instructions={<div className="space-y-2">{state.instruction ? <p>{state.instruction}</p> : null}<p>整卷答案保存在当前浏览器，最后一次提交。请使用同一浏览器继续未提交的草稿。</p></div>}
     progress={definition ? { kind: 'count', completed: Object.keys(answers).length, total: questions.length, label: '整卷作答进度' } : undefined}
     saveStatus={local.status}
-    submissionStatus={accepted ? { state: 'committed', message: '整份问卷已可靠保存，正在生成报告。' } : busy ? { state: 'submitting', message: '正在确认同一份整卷提交…' } : locked ? { state: 'pending', message: '整卷已封存，重试将使用相同内容。' } : { state: 'ready' }}
+    submissionStatus={accepted ? { state: 'committed', message: '整份问卷已可靠保存，正在生成报告。' } : busy ? { state: 'submitting', message: submitElapsedSeconds >= 8 ? `已等待 ${submitElapsedSeconds} 秒，正在确认服务器保存；请勿关闭，本机草稿仍保留。` : '正在提交并确认保存…' } : locked ? { state: 'pending', message: '整卷已封存，重试将使用相同内容。' } : { state: 'ready' }}
     actions={<button type="button" className="btn-secondary min-h-11" disabled={busy} onClick={() => void saveAndExit()}>保存并退出</button>}>
     {error ? <p role="alert" className="mb-4 text-red-700">{error}</p> : null}
     {publicMode && recoveryToken ? <details className="mb-4 rounded border p-3"><summary>保存匿名恢复凭证</summary><p className="my-2 text-sm">恢复凭证用于已提交进度；未提交答案仍保存在当前浏览器。</p><code className="break-all select-all">{recoveryToken}</code></details> : null}

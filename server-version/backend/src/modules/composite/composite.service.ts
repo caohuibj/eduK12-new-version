@@ -1,10 +1,21 @@
+import { sharedControlWritesEnabled } from '../assessment-runtime/shared-control-records'
+import { readCommittedScaleFacts } from '../assessment-runtime/scale-fact-records'
+import { resolveStoredScaleResult } from '../assessment-runtime/compact-assessment-storage'
+import { preloadStoredScaleResults } from '../assessment-runtime/compact-assessment-storage'
+import { loadPackageAnalysisForAttempt } from './composite-analysis-snapshot.service'
+import { canStoreCompactCompositeReport, encryptCompactCompositeReport, decryptCompactCompositeReport } from './compact-composite-report'
+import { loadScaleUnitReport } from '../reporting/scale-unit-report'
+import { loadScaleAnswers } from '../scale/scale-workflow.service'
+import { readCompositeReportStatusContext } from './composite-report-read'
+import type { WholeQuestionnaireReportContext } from './whole-questionnaire.service'
+import { prepareReportReadyNotifications, beginReportReadyWait, reportReadyWaitAvailable, reportReadyNotificationSequence, REPORT_READY_MAX_WAIT_MS } from '../../services/reportReadyNotifications'
 import { readWholeReportFeedbackHint } from '../../services/reportFeedbackHints'
 import { assertNoAcceptedWholeQuestionnaire } from '../assessment-runtime/report-outbox.service'
 import { assessmentReportConfig } from '../../config/assessmentReports'
-import { assertReportJobIdentity, compositeReportJobState, readCompositeReportJob, readCompositeReportJobHeader, retryCompositeReport, REPORT_PARENT_SELECT, type ReportJobIdentity } from '../assessment-runtime/report-outbox.service'
+import { assertReportJobIdentity, compositeReportJobState, readCompositeReportMaterialization, readCompositeReportJobHeader, retryCompositeReport, REPORT_PARENT_SELECT, type ReportJobIdentity } from '../assessment-runtime/report-outbox.service'
 import { encryptCompositeCollectionReport, decryptCompositeCollectionReport } from './composite-report-cache'
 import { assertCognitiveProductEligible } from '../cognitive/product-eligibility'
-import { frozenCompositeProgress, frozenMeasurementFinalHeaders } from './frozen-progress'
+import { loadFrozenCompositeProgress, loadFrozenMeasurementFinalHeaders } from './frozen-progress'
 import { resolveSituationalScientificMaturity } from '../situational/scientific-maturity'
 import { frozenSituationalScientificProjection } from '../situational/onboarding/scientific-schema'
 import { decryptFrozenSituationalRuntimeSnapshot } from '../assessment-runtime/situational-runtime-snapshot'
@@ -36,14 +47,15 @@ import {
   encryptScaleAnswers,
   encryptScaleResult,
   readScaleAnswers,
-  resolveProjectionPolicyForAssessment,
+  loadProjectionPolicyForAssessment,
   scaleDefinitionFromRecord,
+  frozenDatabaseScaleDefinition,
   scaleRunnerFromRecord,
 } from '../scale/scale-workflow.service'
 import { hashScaleDefinition, validateScaleDefinition } from '../scale/scale-definition'
 import { retainFrozenScaleAssessmentImages } from '../scale/scale-image.adapter'
 import { assertScaleContextCollectable } from '../scale/policy/context-preflight'
-import { ensureScaleAdmissionAtDelivery, readScaleAdmissionRuntime, UNIFIED_SCALE_CHILD_ADMISSION_SELECT } from '../scale/scale-admission.service'
+import { ensureScaleAdmissionAtDelivery, loadScaleAdmissionRuntime, UNIFIED_SCALE_CHILD_ADMISSION_SELECT } from '../scale/scale-admission.service'
 import { ensureCognitiveAdmissionAtDelivery, UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT } from '../cognitive/cognitive-admission.service'
 import { admitCognitiveAttempt, cognitiveQuotaSource, lockCognitiveQuota } from '../cognitive/attempt-quota'
 import { ensureCompositeFormAdmissionAtDelivery } from '../assessment-runtime/form-admission.service'
@@ -118,7 +130,6 @@ import {
   resolveLibraryItemLabel,
 } from './report-package-label'
 import {
-  buildPackageAnalysisForAttempt,
   buildCompletionSnapshotExpectation,
   listPackageAnalysisSnapshotMetadata,
   persistOrGetPackageAnalysisSnapshot,
@@ -134,8 +145,8 @@ import {
   freezeCompositeActiveSlotSet,
 } from '../assessment-runtime/attempt-runtime'
 import {
-  decryptFrozenScaleRuntimeSnapshot,
-  encryptFrozenScaleRuntimeSnapshot,
+  loadFrozenScaleRuntimeSnapshot,
+  persistFrozenScaleRuntimeSnapshot,
   freezeScaleRuntimeAtAttemptStart,
 } from '../assessment-runtime/runtime-snapshot'
 import { compiledBundleRuntimeHashForSnapshot, evaluateCompleteness, type AggregateSnapshotHeader } from '../assessment-runtime/unified-aggregate'
@@ -143,8 +154,8 @@ import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { parseCanonicalUnitResultEnvelope } from '../assessment-runtime/unit-result'
 import {
   compositeItemSlotKey,
-  decryptFrozenActiveSlotSet,
-  encryptFrozenActiveSlotSet,
+  loadFrozenActiveSlotSet,
+  storeFrozenActiveSlotSet,
   formSectionSlotKey,
   type FrozenActiveSlotV1,
 } from '../assessment-runtime/slot-set'
@@ -1312,20 +1323,20 @@ export const listAttemptsForTeacher = async (
       courseId: composite.courseId,
     },
     attemptCounts: counts.get(compositeId) ?? emptyAttemptCounts(),
-    list: attempts.map(attempt => {
+    list: await Promise.all(attempts.map(async attempt => {
       const attemptHeaders = headersByAttempt.get(attempt.id) ?? []
       const ordinary = !attempt.assignmentRef && ['QUESTIONNAIRE', 'LEGACY_COMPOSITE'].includes(composite.productKind) && !composite.reportPackageKey && !composite.analysisProtocolKey
       const legacy = legacyById.get(attempt.id)
       const partialReportUnitCount = !ordinary ? 0 : attempt.runtimeGeneration === 'UNIFIED_V1'
-        ? new Set(frozenMeasurementFinalHeaders(attempt, attemptHeaders).map(header => header.sourceAttemptId)).size
+        ? new Set((await loadFrozenMeasurementFinalHeaders(attempt, attemptHeaders)).map(header => header.sourceAttemptId)).size
         : legacy ? [
           completedMeasurementChildren(legacy.scaleAssessments, attempt.attemptEpoch).filter(child => child.compositeItem?.type === 'SCALE'),
           completedMeasurementChildren(legacy.cognitiveSessions, attempt.attemptEpoch).filter(child => child.compositeItem?.type === 'COGNITIVE'),
           completedMeasurementChildren(legacy.situationalAttempts, attempt.attemptEpoch).filter(child => child.compositeItem?.type === 'SITUATIONAL'),
         ].reduce((sum, children) => sum + children.length, 0) : 0
-      return { ...mapAttemptRowForTeacher({ ...attempt, ...frozenCompositeProgress(attempt, attemptHeaders) }),
+      return { ...mapAttemptRowForTeacher({ ...attempt, ...await loadFrozenCompositeProgress(attempt, attemptHeaders) }),
         partialReportAvailable: partialReportUnitCount > 0, partialReportUnitCount }
-    }),
+    })),
     page: query.page,
     pageSize: query.pageSize,
     total,
@@ -2311,7 +2322,7 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
         ? await freezeScaleRuntimeAtAttemptStart(db, {
             instrumentKey: item.scale.code,
             instrumentVersion: item.scale.instrumentVersion,
-            definition: scaleDefinitionFromRecord(item.scale),
+            definition: frozenDatabaseScaleDefinition(item.scale),
             requestedMode: 'COMPOSITE',
           })
         : null
@@ -2332,7 +2343,7 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
           respondentType: attempt.respondentType ?? 'SELF',
           ...(frozenScale ? {
             runtimeGeneration: 'UNIFIED_V1' as const,
-            runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(frozenScale),
+            runtimeSnapshotEncrypted: (await persistFrozenScaleRuntimeSnapshot(frozenScale, db)),
             compiledRuntimeHash: frozenScale.compiledRuntime.compiledRuntimeHash,
           } : {}),
         },
@@ -2350,7 +2361,7 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
     } else if (item.type === 'COGNITIVE') {
       const session = await createCognitiveChild(db, attempt, item, userId)
       if (attempt.runtimeGeneration === 'UNIFIED_V1') {
-        const snapshot = cognitiveSessionService.readCognitiveSessionConfig(session.configSnapshotEncrypted).snapshot
+        const snapshot = (await cognitiveSessionService.loadCognitiveSessionConfig(session.configSnapshotEncrypted,db as any)).snapshot
         if (!snapshot?.compiledRuntime) throw new Error('Unified Cognitive session runtime snapshot is missing')
         runtime.cognitive.push({
           compositeItemId: item.id,
@@ -2508,7 +2519,7 @@ const createAttempt = async (
     await db.compositeAssessmentAttempt.update({
       where: { id: attempt.id },
       data: {
-        frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(frozenActiveSlotSet),
+        frozenActiveSlotSetEncrypted: await storeFrozenActiveSlotSet(frozenActiveSlotSet),
         frozenActiveSlotSetHash: frozenActiveSlotSet.snapshotHash,
       },
     })
@@ -3001,8 +3012,8 @@ export const freezeContext = async (attemptId: string, context: { userId?: strin
   })
 }
 
-const cognitiveRunnerPayload = (session: any, contextSnapshotHash?: string | null, feedbackDeferred = false) => {
-  const storedConfig = cognitiveSessionService.readCognitiveSessionConfig(session.configSnapshotEncrypted)
+const cognitiveRunnerPayload = async (session: any, contextSnapshotHash?: string | null, feedbackDeferred = false) => {
+  const storedConfig = await cognitiveSessionService.loadCognitiveSessionConfig(session.configSnapshotEncrypted)
   const config = storedConfig.config
   const resultSnapshot = !feedbackDeferred && session.status === 'COMPLETED' && session.resultSnapshotEncrypted
     ? parseCognitiveResultSnapshot(decryptCognitivePayload<unknown>(session.resultSnapshotEncrypted))
@@ -3281,7 +3292,7 @@ const getUnifiedCompositeAttemptState = async (
   let frozenSlotSet
   try {
     if (!attempt.frozenActiveSlotSetEncrypted || !attempt.frozenActiveSlotSetHash) throw new Error('FrozenActiveSlotSet missing')
-    frozenSlotSet = decryptFrozenActiveSlotSet(attempt.frozenActiveSlotSetEncrypted)
+    frozenSlotSet = await loadFrozenActiveSlotSet(attempt.frozenActiveSlotSetEncrypted)
     if (
       frozenSlotSet.snapshotHash !== attempt.frozenActiveSlotSetHash
       || frozenSlotSet.attemptEpoch !== attempt.attemptEpoch
@@ -3394,7 +3405,7 @@ const getUnifiedCompositeAttemptState = async (
     })
     if (!child || !child.runtimeSnapshotEncrypted) throw compositeConflict('量表冻结运行时不可用，请重启测评')
     try {
-      const runtime = readScaleAdmissionRuntime(child)
+      const runtime = (await loadScaleAdmissionRuntime(child))
       if (
         runtime.instrumentKey !== item.scale?.code
         || runtime.instrumentVersion !== item.scale?.instrumentVersion
@@ -3445,7 +3456,7 @@ const getUnifiedCompositeAttemptState = async (
         type: 'COGNITIVE',
         position: currentUnit.item.position,
         required: currentUnit.item.required,
-        cognitiveSession: cognitiveRunnerPayload(child, attempt.contextSnapshotHash, attempt.status !== 'COMPLETED'),
+        cognitiveSession: await cognitiveRunnerPayload(child, attempt.contextSnapshotHash, attempt.status !== 'COMPLETED'),
       }
     } catch (error) {
       if (isInstrumentFinalSubmitError(error)) throw error
@@ -3596,7 +3607,7 @@ const finalizeCompositeAttemptLegacyIfReady = async (attemptId: string) => withQ
   }
 
   if (shouldComplete && attempt.status === 'IN_PROGRESS') {
-    const packageAnalysis = buildPackageAnalysisForAttempt(attempt)
+    const packageAnalysis = await loadPackageAnalysisForAttempt(attempt, tx)
     if (packageAnalysis) {
       const persisted = await persistOrGetPackageAnalysisSnapshot(tx, {
         attemptId: attempt.id,
@@ -3835,9 +3846,9 @@ const finalizeCompositeAttemptFinalOnlyIfReady = async (attemptId: string) => {
     // Package analysis and encryption are CPU/crypto work and must not run
     // while the parent row is locked.
     const fullAttempt = await measureRequestPhase('final_submit_db_query', () => loadAttemptForFinalization(prisma, attemptId))
-    const packageAnalysis = measureRequestPhaseSync(
+    const packageAnalysis = await measureRequestPhase(
       'final_submit_serialization',
-      () => buildPackageAnalysisForAttempt(fullAttempt),
+      () => loadPackageAnalysisForAttempt(fullAttempt),
     )
     const payloadEncrypted = packageAnalysis
       ? await measureRequestPhase('final_submit_encryption', async () => encryptCognitivePayload(packageAnalysis.analysis))
@@ -3913,7 +3924,9 @@ const finalizeCompositeAttemptFinalOnlyIfReady = async (attemptId: string) => {
 export const finalizeCompositeAttemptIfReady = async (attemptId: string, options: {
   reportJob?: ReportJobIdentity
   preloadedParent?: any
-} = {}) => {
+  committedGraph?: any
+} = {}): Promise<{ status: string; progress: number; completedAt: Date | null;
+  aggregateInputHash?: string; totalTime?: number } | null | undefined> => {
   const route = options.preloadedParent ?? await prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId },
     select: { ...REPORT_PARENT_SELECT, startedAt: true, completedItems: true,
@@ -3928,7 +3941,7 @@ export const finalizeCompositeAttemptIfReady = async (attemptId: string, options
   let result
   if (route?.runtimeGeneration === 'UNIFIED_V1') {
     const { finalizeCompositeAttemptUnifiedIfReady } = await import('../assessment-runtime/unified-aggregate-finalizer.service')
-    result = await finalizeCompositeAttemptUnifiedIfReady(attemptId, route, options.reportJob)
+    result = await finalizeCompositeAttemptUnifiedIfReady(attemptId, route, options.reportJob, options.committedGraph)
   } else if (!route || route.deliveryMode !== 'FINAL_ONLY') {
     result = await finalizeCompositeAttemptLegacyIfReady(attemptId)
   } else {
@@ -4096,7 +4109,7 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
         runnerScale = { ...metadata, definition: null, definitionError: true }
       }
     }
-    const decodedAnswers = readScaleAnswers(assessment?.answers)
+    const decodedAnswers = (await loadScaleAnswers(assessment?.answers, assessment))
     currentItem = {
       id: current.id,
       type: current.type,
@@ -4111,7 +4124,7 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
     }
   } else if (current?.type === 'COGNITIVE') {
     const session = cognitiveMap.get(current.id)
-    currentItem = { id: current.id, type: current.type, position: current.position, required: current.required, cognitiveSession: session ? cognitiveRunnerPayload(session, attempt.contextSnapshotHash, attempt.status !== 'COMPLETED') : null }
+    currentItem = { id: current.id, type: current.type, position: current.position, required: current.required, cognitiveSession: session ? await cognitiveRunnerPayload(session, attempt.contextSnapshotHash, attempt.status !== 'COMPLETED') : null }
   }
   return {
     id: attempt.id,
@@ -4348,7 +4361,7 @@ export const saveScaleAnswer = async (
     if (!current.contextSnapshotEncrypted || !current.contextSnapshotHash) {
       await freezeCompositeAttemptContext(tx, attemptId)
     }
-    const decoded = readScaleAnswers(locked.answers)
+    const decoded = (await loadScaleAnswers(locked.answers, locked))
     if (decoded.decryptError) throw compositeBadRequest('量表答案无法读取，请联系管理员')
     const answers = decoded.answers
     const index = answers.findIndex((candidate) => candidate.itemCode === input.itemCode)
@@ -4398,7 +4411,7 @@ export const completeScale = async (attemptId: string, itemId: string, context: 
     if (('decryptError' in contextSnapshot && contextSnapshot.decryptError) || !contextSnapshot.context || !contextSnapshot.hash) {
       throw compositeBadRequest('人口学上下文无法读取，请联系管理员')
     }
-    const decoded = readScaleAnswers(locked.answers)
+    const decoded = (await loadScaleAnswers(locked.answers, locked))
     if (decoded.decryptError) throw compositeBadRequest('量表答案无法读取，请联系管理员')
     const answers = decoded.answers
     const definition = scaleDefinitionFromRecord(item.scale)
@@ -4428,7 +4441,8 @@ export const completeScale = async (attemptId: string, itemId: string, context: 
   return { completed: true, finalized: result.shouldFinalize }
 }
 
-export const buildCompositeReport = (attempt: any) => {
+export const buildCompositeReport = async (attempt: any, verifiedContext?: WholeQuestionnaireReportContext) => {
+  await preloadStoredScaleResults(attempt.scaleAssessments)
   const scaleMap = new Map<string, any>(attempt.scaleAssessments.map((item: any) => [item.compositeItemId, item]))
   const cognitiveMap = new Map<string, any>(attempt.cognitiveSessions.map((item: any) => [item.compositeItemId, item]))
   const situationalMap = new Map<string, any>((attempt.situationalAttempts ?? []).map((item: any) => [item.compositeItemId, item]))
@@ -4451,7 +4465,7 @@ export const buildCompositeReport = (attempt: any) => {
     if (item.type === 'SCALE') {
       try {
         const result = scaleMap.get(item.id)
-        const report = buildScaleUnitReport({
+        const report = await loadScaleUnitReport({
           itemId: item.id,
           scaleId: item.scaleId,
           scaleCode: item.scale?.code,
@@ -4459,9 +4473,19 @@ export const buildCompositeReport = (attempt: any) => {
           result: result?.result,
           completedAt: result?.completedAt,
           totalTime: result?.totalTime,
-        })
+        }, result)
         if (['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(attempt.compositeAssessment.productKind)) {
-          const policy = resolveProjectionPolicyForAssessment(result, report.result)
+          const entry = verifiedContext?.units.get(result?.id)
+          const reusable = Boolean(verifiedContext && entry && result && verifiedContext.attemptId === attempt.id
+            && verifiedContext.attemptEpoch === attempt.attemptEpoch
+            && verifiedContext.slotSetHash === attempt.frozenActiveSlotSetHash
+            && verifiedContext.contextHash === attempt.contextSnapshotHash
+            && entry?.attemptEpoch === result?.attemptEpoch
+            && entry.runtimeSnapshotEncrypted === result?.runtimeSnapshotEncrypted
+            && entry.runtime.compiledRuntime.compiledRuntimeHash === result?.compiledRuntimeHash
+            && entry.runtime.instrumentKey === result?.scale?.code
+            && entry.runtime.instrumentVersion === result?.scale?.instrumentVersion)
+          const policy = (await loadProjectionPolicyForAssessment(result, report.result, reusable ? entry!.runtime : undefined))
           Object.defineProperty(report, '__scaleProjectionPolicy', { value: policy.policy, enumerable: false })
         }
         if (report.decryptError) {
@@ -4551,12 +4575,14 @@ export const buildCompositeReport = (attempt: any) => {
     }
     try {
       const session = cognitiveMap.get(item.id)
-      const config = session
-        ? cognitiveSessionService.readCognitiveSessionConfig(session.configSnapshotEncrypted).config
-        : {}
       const resultSnapshot = session?.resultSnapshotEncrypted
         ? parseCognitiveResultSnapshot(decryptCognitivePayload<unknown>(session.resultSnapshotEncrypted))
         : null
+      // Unified completed sessions already contain their authoritative report;
+      // only historical results need to reload/decrypt the task configuration.
+      const config = session && !resultSnapshot
+        ? (await cognitiveSessionService.loadCognitiveSessionConfig(session.configSnapshotEncrypted)).config
+        : {}
       const resultReferences = resultSnapshot ? referencesForCognitiveResult(resultSnapshot) : []
       const score = resultSnapshot
         ? null
@@ -4716,7 +4742,7 @@ const projectHttpReport = async (
   audience: CompositeReportAudience,
   snapshotId?: string,
 ) => {
-  const report = buildCompositeReport(attempt)
+  const report = (await buildCompositeReport(attempt))
   if (attempt.compositeAssessment.productKind === 'ASSESSMENT_BUNDLE') {
     const projected = projectCompositeCollectionReport({ ...report, backgroundValues: [] }, audience)
     return { ...projected, productKind: 'ASSESSMENT_BUNDLE', bundleReport: await (await import('../bundle-product/analysis')).readReport(
@@ -4780,26 +4806,49 @@ const authorizeReportParticipant = (parent: any, context: { userId?: string; rec
   assertSupportedComposite(parent.compositeAssessment, true)
 }
 
-const reportStatusForHeader = async (parent: any) => {
-  const job = parent.asyncReportEpoch === parent.attemptEpoch
+const reportStatusForHeader = async (parent: any, joinedJob?: Awaited<ReturnType<typeof readCompositeReportJobHeader>>) => {
+  const job = joinedJob !== undefined ? joinedJob : parent.asyncReportEpoch === parent.attemptEpoch
     ? await readCompositeReportJobHeader(parent.id, parent.attemptEpoch) : null
   const feedback = job?.wholeSubmissionId ? readWholeReportFeedbackHint(parent.id, job.wholeSubmissionId) : null
   return {
     ...(feedback ? { feedbackPollProfile: feedback.profile } : {}),
+    feedbackWaitMs: job?.wholeSubmissionId && reportReadyWaitAvailable() ? REPORT_READY_MAX_WAIT_MS : 0,
     attemptId: parent.id, attemptEpoch: parent.attemptEpoch, status: parent.status,
     hasAcceptedSubmission: Boolean(job && (job.wholeSubmissionId || job.requestedRevision > 0)),
     wholeSubmissionReceived: Boolean(job?.wholeSubmissionId), wholeSubmissionId: job?.wholeSubmissionId ?? null,
-    reportStatus: job ? { ...compositeReportJobState(job), ...(feedback ? { retryAfterSeconds: feedback.retryAfterSeconds } : {}) } : {
+    reportStatus: job ? { ...compositeReportJobState(job), ...(feedback ? { retryAfterSeconds: job?.wholeSubmissionId && reportReadyWaitAvailable() ? 0.1 : feedback.retryAfterSeconds } : {}) } : {
       state: parent.status === 'COMPLETED' ? 'READY' : 'WAITING', jobId: null,
       retryAfterSeconds: 2, errorCode: null, completedAt: parent.completedAt,
     },
   }
 }
 
-export const getCompositeReportStatus = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
-  const parent = await loadReportReadHeader(attemptId)
+export const getCompositeReportStatus = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string },
+  options: { waitMs?: number; signal?: AbortSignal } = {}) => {
+  const compact = process.env.ASSESSMENT_REPORT_COMPACT_READ_ENABLED === 'true'
+  if (compact || options.waitMs) await prepareReportReadyNotifications()
+  const sequence = reportReadyNotificationSequence()
+  const loaded = compact ? await readCompositeReportStatusContext(attemptId) : null
+  const parent = compact ? loaded?.parent : await loadReportReadHeader(attemptId)
+  if (!parent) throw compositeNotFound('综合测评记录不存在')
   authorizeReportParticipant(parent, context)
-  return reportStatusForHeader(parent)
+  if (!compact && parent.asyncReportEpoch === parent.attemptEpoch) await prepareReportReadyNotifications()
+  const wait = beginReportReadyWait(attemptId, parent.attemptEpoch, options.waitMs ?? 0, options.signal, sequence)
+  try {
+    const status = await reportStatusForHeader(parent, compact ? loaded!.job : undefined)
+    if (!wait || !status.wholeSubmissionReceived || !['PENDING', 'PROCESSING'].includes(status.reportStatus.state)) {
+      return options.waitMs && !wait ? { ...status, feedbackWaitMs: 0 } : status
+    }
+    const result = await wait.done
+    if (options.signal?.aborted) return status
+    // Fresh authorization AND status share one DB snapshot after a hint/timeout.
+    const refreshed = compact ? await readCompositeReportStatusContext(attemptId) : null
+    const current = compact ? refreshed?.parent : await loadReportReadHeader(attemptId)
+    if (!current) throw compositeNotFound('综合测评记录不存在')
+    authorizeReportParticipant(current, context)
+    const authoritative = await reportStatusForHeader(current, compact ? refreshed!.job : undefined)
+    return result === 'unavailable' ? { ...authoritative, feedbackWaitMs: 0 } : authoritative
+  } finally { wait?.cancel() }
 }
 
 export const retryCompositeQuestionnaireReport = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
@@ -4820,34 +4869,128 @@ export const getCompositeReportStatusForTeacher = async (userId: string, role: U
   return reportStatusForHeader(parent)
 }
 
-const materializedReportForHeader = async (parent: any, audience: CompositeReportAudience) => {
+const materializedReportForHeader = async (parent: any, audience: CompositeReportAudience, joinedJob?: any) => {
   if (parent.asyncReportEpoch !== parent.attemptEpoch) return null
-  const job = await readCompositeReportJob(parent.id, parent.attemptEpoch)
+  const job = joinedJob !== undefined ? joinedJob : await readCompositeReportMaterialization(parent.id, parent.attemptEpoch)
   if (parent.status !== 'COMPLETED' || !job || job.status !== 'READY' || !job.reportEncrypted || !parent.aggregateInputHash) {
     throw new (await import('../../services/questionnaireCompletionAdmission')).QuestionnaireCompletionAdmissionBusyError('database_busy', 2)
   }
   assertReportJobIdentity(parent, { attemptEpoch: job.attemptEpoch, slotSetHash: job.slotSetHash, contextHash: job.contextHash })
   if (job.aggregateInputHash !== parent.aggregateInputHash) throw compositeConflict('报告输入版本已变化')
-  const report = decryptCompositeCollectionReport(job.reportEncrypted, {
+  const reportBinding = {
     attemptId: parent.id, attemptEpoch: parent.attemptEpoch, slotSetHash: job.slotSetHash,
     contextHash: job.contextHash, aggregateInputHash: parent.aggregateInputHash,
-  })
+  }
+  const report = await decryptCompactCompositeReport(job.reportEncrypted, reportBinding) ?? decryptCompositeCollectionReport(job.reportEncrypted, reportBinding)
   // HTTP projection is applied to the CURRENT audience on every read. No
   // participant/teacher projection or authorization decision is globally cached.
   return projectCompositeCollectionReport(report, audience)
 }
 
-export const materializeCompositeQuestionnaireReport = async (attemptId: string, expected: ReportJobIdentity) => {
-  const attempt = await loadAttemptWithChildren(attemptId)
+
+/**
+ * Collection-report projection for every instrument combination. Avoid raw
+ * answers, trial rows and live scale definitions; frozen disclosure remains.
+ */
+const loadCollectionReportAttempt = async (attemptId: string) => {
+  const attempt = await prisma.compositeAssessmentAttempt.findUnique({
+    where: { id: attemptId },
+    select: {
+      ...REPORT_PARENT_SELECT, anonymousCode: true, totalTime: true,
+      compositeAssessment: { select: {
+        id: true, name: true, productKind: true, reportPackageKey: true, analysisProtocolKey: true,
+        reportPackageSnapshotEncrypted: true,
+        items: { orderBy: { position: 'asc' }, include: {
+          scale: { select: { id: true, code: true, name: true, instrumentVersion: true, instrumentClass: true } },
+          cognitiveAssignment: { select: { id: true, title: true, profile: true,
+            resolvedReportSnapshotEncrypted: true, config: { select: { testType: true, name: true } } } },
+        } },
+      } },
+      scaleAssessments: { select: {
+        id: true, compositeItemId: true, result: true, completedAt: true, totalTime: true,
+        submissionId: true, submissionPayloadHash: true,
+        attemptEpoch: true, compiledRuntimeHash: true, runtimeSnapshotEncrypted: true,
+        scale: { select: { code: true, instrumentVersion: true, instrumentClass: true } },
+      } },
+      cognitiveSessions: { select: {
+        id: true, compositeItemId: true, attemptNo: true, testType: true, finishedAt: true,
+        resultSnapshotEncrypted: true, configSnapshotEncrypted: true,
+        scoreEncrypted: true, metricsEncrypted: true, qualityFlagsEncrypted: true,
+        engineVersion: true, scoringVersion: true, configVersion: true,
+      } },
+      situationalAttempts: { select: {
+        compositeItemId: true, canonicalResultEncrypted: true, runtimeSnapshotEncrypted: true,
+        instrumentKey: true, instrumentVersion: true, completedAt: true, totalTime: true,
+      } },
+      formAnswers: { select: { itemId: true, value: true } },
+    },
+  })
+  if (!attempt) throw compositeNotFound('综合测评记录不存在')
+  return attempt
+}
+
+/** A completed ordinary questionnaire needs source references and layout, not an expanded report tree. */
+const materializeCompactReportFromFacts = async (attempt: any, binding: ReportJobIdentity & {attemptId:string;aggregateInputHash:string}, verified?: WholeQuestionnaireReportContext): Promise<string | null> => {
+  if (!sharedControlWritesEnabled() || !attempt.compositeAssessment.items.every((item:any)=>['FORM','SCALE','COGNITIVE'].includes(item.type))) return null
+  const scaleByItem = new Map<string,any>(attempt.scaleAssessments.map((row:any)=>[row.compositeItemId,row])), cogByItem = new Map<string,any>(attempt.cognitiveSessions.map((row:any)=>[row.compositeItemId,row]))
+  const rows = attempt.compositeAssessment.items.filter((item:any)=>item.type==='SCALE').map((item:any)=>scaleByItem.get(item.id))
+  if (rows.some((row:any)=>!row || row.result?.k!=='SFF1') || attempt.compositeAssessment.items.some((item:any)=>item.type==='COGNITIVE'&&!cogByItem.get(item.id)?.resultSnapshotEncrypted)) return null
+  await preloadStoredScaleResults(rows)
+  const labels=getFrozenPackageSlotLabels(attempt.compositeAssessment),formValues=readContextFormAnswers(attempt.compositeAssessment.items.filter((item:any)=>item.type==='FORM').map((item:any)=>({id:item.id,contextKey:item.contextKey})),attempt.formAnswers)
+  const formById=new Map<string,any>(formValues.map((row:any)=>[row.itemId,row])),backgroundValues:any[]=[],unitReports:any[]=[]
+  for(const item of attempt.compositeAssessment.items){
+    if(item.type==='FORM'){
+      backgroundValues.push(buildFormBackgroundReport({itemId:item.id,label:labels.get(item.position)??item.formLabel,value:formById.get(item.id)?.value??null,formType:item.formType,options:item.formOptions}));continue
+    }
+    if(item.type==='COGNITIVE'){
+      const unit={itemId:item.id,type:'COGNITIVE',kind:'cognitive',label:resolveCompositeItemLabel(item,labels)}
+      const frozen=readFrozenReport(item.cognitiveAssignment?.resolvedReportSnapshotEncrypted)
+      if(frozen?.metricDefinitions)Object.defineProperty(unit,'__frozenMetricDefinitions',{value:frozen.metricDefinitions,enumerable:false})
+      unitReports.push(unit);continue
+    }
+    const child=scaleByItem.get(item.id),committed=readCommittedScaleFacts(child),result=committed?.result??await resolveStoredScaleResult(child.result,{record:child})
+    const entry=verified?.units.get(child.id),reuse=verified&&entry&&verified.attemptId===attempt.id&&verified.attemptEpoch===attempt.attemptEpoch
+      &&verified.slotSetHash===attempt.frozenActiveSlotSetHash&&verified.contextHash===attempt.contextSnapshotHash&&entry.attemptEpoch===child.attemptEpoch
+      &&entry.runtimeSnapshotEncrypted===child.runtimeSnapshotEncrypted&&entry.runtime.compiledRuntime.compiledRuntimeHash===child.compiledRuntimeHash
+      &&entry.runtime.instrumentKey===child.scale?.code&&entry.runtime.instrumentVersion===child.scale?.instrumentVersion
+    const policy=await loadProjectionPolicyForAssessment(child,result,reuse?entry!.runtime:undefined)
+    if(policy.snapshotError)throw new Error('Frozen report disclosure unavailable')
+    const unit={itemId:item.id,type:'SCALE',kind:'scale',scaleId:item.scaleId,scaleCode:item.scale?.code,scaleName:item.scale?.name||'未知量表',result}
+    Object.defineProperty(unit,'__scaleProjectionPolicy',{value:policy.policy,enumerable:false});unitReports.push(unit)
+  }
+  const report={id:attempt.id,assessmentId:attempt.compositeAssessment.id,name:attempt.compositeAssessment.name,productKind:'QUESTIONNAIRE',reportMode:'COLLECTION_ONLY',
+    anonymousCode:attempt.anonymousCode,completedAt:attempt.completedAt,totalTime:attempt.totalTime,backgroundValues,unitReports}
+  return canStoreCompactCompositeReport(report,attempt.scaleAssessments,attempt.cognitiveSessions)
+    ?encryptCompactCompositeReport(report,binding,attempt.scaleAssessments,undefined,attempt.cognitiveSessions):null
+}
+
+export const materializeCompositeQuestionnaireReport = async (attemptId: string, expected: ReportJobIdentity,
+  verifiedContext?: WholeQuestionnaireReportContext,
+  committedAttempt?: any,
+) => {
+  const committed = verifiedContext?.committed
+  const reusable = process.env.ASSESSMENT_REPORT_COMMITTED_CONTEXT_ENABLED === 'true'
+    && committed && committedAttempt && committedAttempt.id === attemptId
+    && committedAttempt.attemptEpoch === expected.attemptEpoch
+    && committedAttempt.frozenActiveSlotSetHash === expected.slotSetHash
+    && committedAttempt.contextSnapshotHash === expected.contextHash
+    && committedAttempt.scaleAssessments === committed.parent.scaleAssessments
+    && committedAttempt.status === 'COMPLETED' && committedAttempt.aggregateInputHash
+  const attempt = reusable ? committedAttempt : process.env.ASSESSMENT_REPORT_NARROW_LOAD_ENABLED === 'true'
+    ? await loadCollectionReportAttempt(attemptId) : await loadAttemptWithChildren(attemptId)
   assertReportJobIdentity(attempt, expected)
   if (attempt.status !== 'COMPLETED' || !attempt.aggregateInputHash
     || attempt.assignmentRef || attempt.compositeAssessment.productKind !== 'QUESTIONNAIRE'
     || attempt.compositeAssessment.reportPackageKey || attempt.compositeAssessment.analysisProtocolKey) {
     throw compositeConflict('异步报告不支持此冻结产品或当前状态')
   }
-  return { aggregateInputHash: attempt.aggregateInputHash, reportEncrypted: encryptCompositeCollectionReport(
-    buildCompositeReport(attempt), { attemptId, ...expected, aggregateInputHash: attempt.aggregateInputHash },
-  ) }
+  const binding = { attemptId, ...expected, aggregateInputHash: attempt.aggregateInputHash }
+  const compact = await materializeCompactReportFromFacts(attempt, binding, verifiedContext)
+  if (compact) return { aggregateInputHash: attempt.aggregateInputHash, reportEncrypted: compact }
+  const report = await buildCompositeReport(attempt, verifiedContext)
+  return { aggregateInputHash: attempt.aggregateInputHash, reportEncrypted: canStoreCompactCompositeReport(report, attempt.scaleAssessments, attempt.cognitiveSessions)
+    ? await encryptCompactCompositeReport(report, binding, attempt.scaleAssessments, undefined, attempt.cognitiveSessions)
+    : encryptCompositeCollectionReport(report, binding) }
 }
 
 export const getReport = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
@@ -4858,9 +5001,11 @@ export const getReport = async (attemptId: string, context: { userId?: string; r
     if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
     return projectHttpReport(attempt, 'participant')
   }
-  const parent = await loadReportReadHeader(attemptId)
+  const loaded = sharedControlWritesEnabled() ? await readCompositeReportStatusContext(attemptId, true) : null
+  const parent = sharedControlWritesEnabled() ? loaded?.parent : await loadReportReadHeader(attemptId)
+  if (!parent) throw compositeNotFound('综合测评记录不存在')
   authorizeReportParticipant(parent, context)
-  const cached = await materializedReportForHeader(parent, 'participant')
+  const cached = await materializedReportForHeader(parent, 'participant', loaded ? loaded.job : undefined)
   if (cached) return cached
   const attempt = await findAttempt(attemptId, context, true)
   if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
@@ -4875,13 +5020,13 @@ async function projectPartialReport(attempt: any, audience: CompositeReportAudie
   let finalized: Set<string> | null = null
   if (attempt.runtimeGeneration === 'UNIFIED_V1') {
     const headers = await prisma.assessmentUnitSnapshot.findMany({ where: { compositeAttemptId: attempt.id, attemptEpoch: attempt.attemptEpoch } })
-    if (frozenCompositeProgress(attempt, headers)?.progressUnavailableReason) throw compositeConflict('冻结记录需要核对，暂不能读取单项结果')
-    finalized = new Set(frozenMeasurementFinalHeaders(attempt, headers).map(row => row.sourceAttemptId))
+    if ((await loadFrozenCompositeProgress(attempt, headers))?.progressUnavailableReason) throw compositeConflict('冻结记录需要核对，暂不能读取单项结果')
+    finalized = new Set((await loadFrozenMeasurementFinalHeaders(attempt, headers)).map(row => row.sourceAttemptId))
   }
   const completed = (children: any[]) => completedMeasurementChildren(children, attempt.attemptEpoch, finalized)
   const scaleAssessments = completed(attempt.scaleAssessments), cognitiveSessions = completed(attempt.cognitiveSessions), situationalAttempts = completed(attempt.situationalAttempts ?? [])
   const itemIds = new Set([...scaleAssessments, ...cognitiveSessions, ...situationalAttempts].map(child => child.compositeItemId))
-  const projected = projectCompositeCollectionReport(buildCompositeReport({ ...attempt, scaleAssessments, cognitiveSessions, situationalAttempts, formAnswers: [], compositeAssessment: { ...definition, items: definition.items.filter((item: any) => itemIds.has(item.id) && item.type !== 'FORM') } }), audience)
+  const projected = projectCompositeCollectionReport((await buildCompositeReport({ ...attempt, scaleAssessments, cognitiveSessions, situationalAttempts, formAnswers: [], compositeAssessment: { ...definition, items: definition.items.filter((item: any) => itemIds.has(item.id) && item.type !== 'FORM') } })), audience)
   return { ...projected, reportState: 'PARTIAL' as const, completedAt: null, totalTime: null }
 }
 
@@ -4962,7 +5107,7 @@ export const reanalyzePackageAttempt = async (
     await lockCompositeAttempt(tx, attemptId)
     const attempt = await loadAttemptForFinalization(tx, attemptId)
     if (attempt.status !== 'COMPLETED') throw compositeBadRequest('只有已完成综合测评可以重新分析')
-    const packageAnalysis = buildPackageAnalysisForAttempt(attempt)
+    const packageAnalysis = await loadPackageAnalysisForAttempt(attempt, tx)
     if (!packageAnalysis) throw compositeBadRequest('综合测评不包含可分析报告包')
     const persisted = await persistOrGetPackageAnalysisSnapshot(tx, {
       attemptId: attempt.id,

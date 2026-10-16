@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import ts from 'typescript'
 
 const source = (relativePath: string): string => readFileSync(
   resolve(__dirname, '../../', relativePath),
@@ -21,7 +22,14 @@ describe('Unified runtime architecture boundaries', () => {
     const scaleFinal = source('modules/scale/scale-final-submit.service.ts')
     const form = source('modules/assessment-runtime/unified-form-section-final-submit.service.ts')
 
-    for (const submitter of [cognitive, scale, form]) {
+    const parsed = ts.createSourceFile('scale.ts', scale, ts.ScriptTarget.Latest, true)
+    const statement = parsed.statements.find(node => ts.isVariableStatement(node) && node.declarationList.declarations.some(d => ts.isIdentifier(d.name) && d.name.text === 'submitUnifiedScaleAssessmentFinal')) as ts.VariableStatement | undefined
+    const declaration = statement?.declarationList.declarations.find(d => ts.isIdentifier(d.name) && d.name.text === 'submitUnifiedScaleAssessmentFinal')
+    expect(declaration?.initializer).toBeTruthy()
+    // The single-unit path remains free of duplicate parent coordination.
+    // Separate batch persistence uses explicit child and report-lease fences.
+    const singleScale = declaration!.initializer!.getText(parsed)
+    for (const submitter of [cognitive, singleScale, form]) {
       expect(submitter).not.toMatch(/refreshCompositeFinalOnlyProgress/)
       expect(submitter).not.toMatch(/SELECT[\s\S]*FOR UPDATE/i)
       expect(submitter).not.toMatch(/finalizeQuestionnaireAttemptIfReady/)
@@ -86,8 +94,13 @@ describe('Unified runtime architecture boundaries', () => {
     expect(transactionBody).not.toContain('encryptScaleAnswers')
     expect(transactionBody).not.toContain('readScaleAnswers')
     expect(transactionBody).not.toContain('scaleAssessmentForResponse')
-    expect(scale.indexOf('const encryptedAnswers = encryptScaleAnswers')).toBeLessThan(transactionStart)
-    expect(scale).toContain('const storedProvenance = readScaleAnswers(child.answers).deviceInputProvenance')
+    const encryptedAnswers = scale.indexOf('const encryptedAnswers =')
+    expect(encryptedAnswers).toBeGreaterThan(-1)
+    expect(encryptedAnswers).toBeLessThan(transactionStart)
+    const provenance = scale.indexOf('const storedProvenance = (await loadScaleAnswers(child.answers, child)).deviceInputProvenance')
+    expect(provenance).toBeGreaterThan(-1)
+    expect(provenance).toBeLessThan(transactionStart)
+    expect(transactionBody).not.toContain('loadScaleAnswers')
   })
 
   it('keeps the unified raw submission boundary strict and encrypted', () => {

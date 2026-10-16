@@ -282,7 +282,7 @@ describe('CompositeReportPage cognitive module', () => {
     selectedView.unmount()
 
     vi.clearAllMocks()
-    mockCompositeApi.teacherReport.mockRejectedValue(new Error('Snapshot 不存在'))
+    mockCompositeApi.teacherReport.mockRejectedValue(Object.assign(new Error('Snapshot 不存在'), { status: 404 }))
     mockCompositeApi.snapshots.mockResolvedValue({
       code: 0,
       data: { list: [{ ...response.data.packageReport, id: 'snapshot-valid', attemptId: 'attempt-teacher', generationReason: 'COMPLETION', createdAt: '2026-01-01T00:00:00Z' }], total: 1 },
@@ -395,9 +395,9 @@ describe('CompositeReportPage cognitive module', () => {
   })
 })
 it('shows failure-specific reassurance only when the report read fails and offers retry', async () => {
-  mockCompositeApi.report.mockRejectedValueOnce(new Error('加载报告失败')).mockResolvedValue({ code: 0, data: { name: '测试报告', backgroundValues: [], unitReports: [] } })
+  mockCompositeApi.report.mockRejectedValueOnce(new Error('加载报告失败')).mockRejectedValueOnce(new Error('加载报告失败')).mockRejectedValueOnce(new Error('加载报告失败')).mockResolvedValue({ code: 0, data: { name: '测试报告', backgroundValues: [], unitReports: [] } })
   render(<MemoryRouter initialEntries={['/student/composite/attempts/a1/report']}><Routes><Route path="/student/composite/attempts/:attemptId/report" element={<CompositeReportPage />} /></Routes></MemoryRouter>)
-  expect(await screen.findByText(/报告读取失败不会改变/)).toBeInTheDocument()
+  expect(await screen.findByText(/报告读取失败不会改变/, {}, { timeout: 4000 })).toBeInTheDocument()
   fireEvent.click(screen.getByRole('button', { name: '重新加载报告' }))
   expect(await screen.findByText('测试报告')).toBeInTheDocument()
   expect(screen.queryByText(/报告读取失败不会改变/)).toBeNull()

@@ -75,5 +75,5 @@ if (missing.length || stale.length) {
 }
 if(trackedNonFinal.size!==campusNonFinalSubmit.size)
   throw new Error('Non-FINAL campus submit declaration changed; review the caller and update the explicit source-bound map')
-if (expected.size !== 19) throw new Error(`Expected 19 reviewed FINAL routes, found ${expected.size}`)
+if (expected.size !== 21) throw new Error(`Expected 21 reviewed FINAL routes, found ${expected.size}`)
 process.stdout.write(`FINAL route inventory: ${actual.size} registered templates matched\n`)

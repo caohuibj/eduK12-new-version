@@ -1,3 +1,4 @@
+import { sharedControlRequestContext } from '../assessment-runtime/shared-control-records'
 import { Router } from 'express'
 import { cognitiveController } from './cognitive.controller'
 import { cognitiveImageController } from './cognitive-image.controller'
@@ -5,6 +6,7 @@ import { cognitiveVideoController } from './cognitive-video.controller'
 import { legacyWriteDisabled } from '../../middleware/instrumentFinalOnly'
 
 const router = Router()
+router.use(sharedControlRequestContext)
 
 router.get('/assignments/:token', cognitiveController.getPublicAssignment)
 router.post('/assignments/:token/start', cognitiveController.startPublicSession)

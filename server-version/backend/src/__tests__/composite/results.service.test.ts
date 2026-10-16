@@ -383,8 +383,8 @@ describe('composite cognitive single-task report', () => {
     },
   }
 
-  it('hides the product index when quality is insufficient', () => {
-    const built = buildCompositeReport(completedAttemptForReport({
+  it('hides the product index when quality is insufficient', async () => {
+    const built = (await buildCompositeReport(completedAttemptForReport({
       compositeAssessment: {
         id: 'composite-1',
         name: '综合测评 1',
@@ -412,15 +412,15 @@ describe('composite cognitive single-task report', () => {
         metricsEncrypted: encryptCognitivePayload({ medianRtMs: null }),
         qualityFlagsEncrypted: encryptCognitivePayload({ interpretable: false, insufficientValidTrials: true }),
       }],
-    }))
+    })))
     const cognitive = built.modules.find((item: { type: string }) => item.type === 'COGNITIVE')
     expect(cognitive.singleTaskReport.productIndex).toBeNull()
     expect(cognitive.singleTaskReport.headline).toBeNull()
     expect(JSON.stringify(cognitive.singleTaskReport)).not.toMatch(/任务指标/)
   })
 
-  it('renders frozen Chinese labels and the experience caveat', () => {
-    const built = buildCompositeReport(completedAttemptForReport({
+  it('renders frozen Chinese labels and the experience caveat', async () => {
+    const built = (await buildCompositeReport(completedAttemptForReport({
       compositeAssessment: {
         id: 'composite-1',
         name: '综合测评 1',
@@ -448,7 +448,7 @@ describe('composite cognitive single-task report', () => {
         metricsEncrypted: encryptCognitivePayload({ medianRtMs: 320 }),
         qualityFlagsEncrypted: encryptCognitivePayload({ interpretable: true }),
       }],
-    }))
+    })))
     const report = built.modules.find((item: { type: string }) => item.type === 'COGNITIVE').singleTaskReport
     expect(report.primaryMetrics[0].label).toBe('中位反应时')
     expect(report.caveats).toContain('体验版，结果仅供体验。')
@@ -460,7 +460,7 @@ describe('composite cognitive single-task report', () => {
     ['experience', 'experience', true, { referenceMode: 'none' }],
     ['quality-failed', 'standard', false, { referenceMode: 'simulated' }],
     ['missing-reference', 'standard', true, { referenceMode: 'none' }],
-  ] as const)('%s Composite report is deep-equal to the direct frozen builder', (name, profile, interpretable, reportConfig) => {
+  ] as const)('%s Composite report is deep-equal to the direct frozen builder', async (name, profile, interpretable, reportConfig) => {
     const frozen = name === 'missing-reference' ? null : frozenReport
     const assignment = {
       title: '冻结认知任务',
@@ -490,7 +490,7 @@ describe('composite cognitive single-task report', () => {
       formAnswers: [],
     })
 
-    const composite = buildCompositeReport(attempt).unitReports.find((item: { type: string }) => item.type === 'COGNITIVE') as any
+    const composite = (await buildCompositeReport(attempt)).unitReports.find((item: { type: string }) => item.type === 'COGNITIVE') as any
     const config = { report: reportConfig }
     const score = 70
     const metrics = { medianRtMs: interpretable ? 320 : null }
@@ -523,10 +523,10 @@ describe('composite cognitive single-task report', () => {
 })
 
 describe('collection-only mixed unit reports', () => {
-  it('uses the same Scale DTO for Composite and Questionnaire/public projections', () => {
+  it('uses the same Scale DTO for Composite and Questionnaire/public projections', async () => {
     const result = makeScaleResult({ scaleId: 'scale-a', code: 'adexi_v1', name: '量表 A', scoreKey: 'A', value: 0 })
     const scale = { id: 'scale-a', code: 'adexi_v1', name: '量表 A', instrumentVersion: '2.0.0' }
-    const internalComposite = buildCompositeReport(completedAttemptForReport({
+    const internalComposite = (await buildCompositeReport(completedAttemptForReport({
       compositeAssessment: {
         id: 'composite-1',
         name: '综合测评 1',
@@ -535,7 +535,7 @@ describe('collection-only mixed unit reports', () => {
       scaleAssessments: [{ compositeItemId: 'item-scale-a', result, completedAt: new Date('2026-08-20T01:01:00Z'), totalTime: 0 }],
       cognitiveSessions: [],
       formAnswers: [],
-    }))
+    })))
     const composite = projectCompositeCollectionReport(internalComposite, 'participant').unitReports[0]
     const questionnaire = buildQuestionnaireCollectionReport({
       questionnaire: { name: '问卷', questionnaireScales: [{ id: 'item-scale-a', scaleId: 'scale-a', position: 0, scale }], formItems: [] },
@@ -546,8 +546,8 @@ describe('collection-only mixed unit reports', () => {
     expect(composite).not.toHaveProperty('result')
   })
 
-  it('keeps two Scale and two Cognitive slots ordered with zero/null values intact', () => {
-    const built = buildCompositeReport(completedAttemptForReport({
+  it('keeps two Scale and two Cognitive slots ordered with zero/null values intact', async () => {
+    const built = (await buildCompositeReport(completedAttemptForReport({
       compositeAssessment: {
         id: 'composite-1',
         name: '混合容器',
@@ -630,7 +630,7 @@ describe('collection-only mixed unit reports', () => {
         },
       ],
       formAnswers: [{ itemId: 'item-form', value: '三年级' }],
-    }))
+    })))
 
     expect(built.unitReports.map((item: { type: string }) => item.type)).toEqual(['SCALE', 'SCALE', 'COGNITIVE', 'COGNITIVE'])
     expect(built.backgroundValues).toEqual([{ itemId: 'item-form', type: 'FORM', kind: 'background', label: '年级', value: '三年级' }])
@@ -658,7 +658,7 @@ describe('buildCompositeReport decrypt degrade', () => {
       }],
     })
 
-    const built = buildCompositeReport(attempt)
+    const built = (await buildCompositeReport(attempt))
     const cognitive = built.modules.find((item: { type: string }) => item.type === 'COGNITIVE')
     expect(cognitive).toMatchObject({ decryptError: true, type: 'COGNITIVE' })
     expect(cognitive).not.toHaveProperty('score')
@@ -673,7 +673,7 @@ describe('buildCompositeReport decrypt degrade', () => {
     expect(studentReport).not.toHaveProperty('modules')
   })
 
-  it('marks a scale module decryptError when the frozen v2 result ciphertext cannot be decoded', () => {
+  it('marks a scale module decryptError when the frozen v2 result ciphertext cannot be decoded', async () => {
     const attempt = completedAttemptForReport({
       scaleAssessments: [{
         compositeItemId: 'item-scale',
@@ -683,7 +683,7 @@ describe('buildCompositeReport decrypt degrade', () => {
       }],
     })
 
-    const built = buildCompositeReport(attempt)
+    const built = (await buildCompositeReport(attempt))
     const scale = built.modules.find((item: { type: string }) => item.type === 'SCALE')
     expect(scale).toMatchObject({ decryptError: true, type: 'SCALE', scaleId: 'scale-1' })
     expect(scale).toHaveProperty('scores', [])
@@ -691,7 +691,7 @@ describe('buildCompositeReport decrypt degrade', () => {
     expect(built.backgroundValues.find((item: { type: string }) => item.type === 'FORM')).toMatchObject({ value: '三年级' })
   })
 
-  it('marks a scale module decryptError when the result is not v2', () => {
+  it('marks a scale module decryptError when the result is not v2', async () => {
     const attempt = completedAttemptForReport({
       scaleAssessments: [{
         compositeItemId: 'item-scale',
@@ -701,7 +701,7 @@ describe('buildCompositeReport decrypt degrade', () => {
       }],
     })
 
-    const scale = buildCompositeReport(attempt).modules.find((item: { type: string }) => item.type === 'SCALE')
+    const scale = (await buildCompositeReport(attempt)).modules.find((item: { type: string }) => item.type === 'SCALE')
     expect(scale).toMatchObject({ decryptError: true })
     expect(scale).toHaveProperty('scores', [])
   })

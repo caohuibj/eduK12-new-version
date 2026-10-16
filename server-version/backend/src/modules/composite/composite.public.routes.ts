@@ -1,3 +1,4 @@
+import { sharedControlRequestContext } from '../assessment-runtime/shared-control-records'
 import { Router } from 'express'
 import { compositeController } from './composite.controller'
 import { compositeImageController } from './composite-image.controller'
@@ -6,9 +7,11 @@ import { situationalVideoController } from '../situational/situational-video.con
 import { legacyWriteDisabled } from '../../middleware/instrumentFinalOnly'
 
 const router = Router()
+router.use(sharedControlRequestContext)
 
 router.get('/attempts/:attemptId', compositeController.publicAttempt)
 router.get('/attempts/:attemptId/whole/definition', compositeController.publicWholeDefinition)
+router.get('/attempts/:attemptId/whole/receipt', compositeController.publicWholeReceipt)
 router.post('/attempts/:attemptId/whole/submit', compositeController.publicWholeSubmit)
 router.get('/attempts/:attemptId/form-sections/:sectionId/assets/:assetId/content', compositeImageController.publicFormImage)
 router.get('/attempts/:attemptId/items/:itemId/scale/assets/:assetId/content', compositeImageController.publicScaleImage)

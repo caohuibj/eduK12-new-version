@@ -4,7 +4,7 @@ import { issueFrozenAssessmentVideoCapabilities } from '../modules/assessment-me
 import { ensureQuestionnaireFormAdmissionAtDelivery } from '../modules/assessment-runtime/form-admission.service'
 import { frozenFormMediaOwnerFromAdmission } from '../modules/assessment-runtime/form-image.adapter'
 import { frozenFormOptionVideoPresentation } from '../modules/assessment-runtime/form-video.adapter'
-import { decryptFrozenScaleRuntimeSnapshot } from '../modules/assessment-runtime/runtime-snapshot'
+import { loadFrozenScaleRuntimeSnapshot } from '../modules/assessment-runtime/runtime-snapshot'
 import { frozenScaleMediaOwner } from '../modules/scale/scale-image-retention'
 import { scaleItemVideoPresentation } from '../modules/scale/scale-video.adapter'
 import * as formSectionService from '../services/questionnaire-form-section.service'
@@ -72,7 +72,7 @@ const issueScaleVideo = async (input: {
     select: { id: true, runtimeSnapshotEncrypted: true },
   })
   if (!child?.runtimeSnapshotEncrypted) return notFound(input.res, '量表冻结内容不可用')
-  const snapshot = decryptFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted)
+  const snapshot = (await loadFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted))
   const presentation = scaleItemVideoPresentation(snapshot.definition, input.itemCode)
   if (!presentation) return notFound(input.res, '当前冻结量表题目没有视频内容')
   const sources = await issueFrozenAssessmentVideoCapabilities({

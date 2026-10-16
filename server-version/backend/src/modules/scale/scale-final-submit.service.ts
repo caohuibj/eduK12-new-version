@@ -1,6 +1,7 @@
+import { loadScaleAnswers } from './scale-workflow.service'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
-import { encryptScaleAnswers, encryptScaleResult, readScaleAnswers, scaleAssessmentForResponse, scaleDefinitionFromRecord, scaleRunnerFromRecord, buildScaleResultForRecord } from './scale-workflow.service'
+import { encryptScaleAnswers, encryptScaleResult, readScaleAnswers, loadScaleAssessmentForResponse, scaleDefinitionFromRecord, scaleRunnerFromRecord, buildScaleResultForRecord } from './scale-workflow.service'
 import { hashScaleDefinition, type ScaleDefinitionV2 } from './scale-definition'
 import { missingRequiredScaleItemCodes, validateScaleAnswers, type ScaleAnswer } from './scale-scoring'
 import { retainFrozenScaleAssessmentImages } from './scale-image.adapter'
@@ -26,7 +27,7 @@ import {
 import { submitUnifiedScaleAssessmentFinal } from './unified-final-submit.service'
 import { withUnitSubmitAdmission } from '../../services/unitSubmitAdmission'
 import { UNIFIED_SCALE_CHILD_ADMISSION_SELECT, standaloneAdmissionPersistence } from './scale-admission.service'
-import { encryptFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../assessment-runtime/runtime-snapshot'
+import { persistFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../assessment-runtime/runtime-snapshot'
 import type { DeviceInputProvenanceV1 } from './device-input-provenance'
 
 export type FinalScaleAnswerInput = {
@@ -321,7 +322,7 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput) => {
   if (missingRequiredItems.length > 0) {
     throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', `还有 ${missingRequiredItems.length} 道必答题未作答`, 409)
   }
-  const storedProvenance = readScaleAnswers(assessment.answers).deviceInputProvenance
+  const storedProvenance = (await loadScaleAnswers(assessment.answers, assessment)).deviceInputProvenance
   const persistedProvenance = input.deviceInputProvenance ?? storedProvenance
   const payload = {
     answers,
@@ -341,7 +342,7 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput) => {
         submissionId,
         payloadHash,
         replayed: true,
-        assessment: scaleAssessmentForResponse(assessment),
+        assessment: (await loadScaleAssessmentForResponse(assessment)),
         parent: null,
         shouldFinalize: true,
         finalizeAssessment: assessment,
@@ -421,7 +422,7 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput) => {
     if (replay === 'replay' && current.status === 'COMPLETED') {
       const parentProgress = await parentProgressUpdate(tx, assessment)
       return {
-        assessment: scaleAssessmentForResponse(current),
+        assessment: (await loadScaleAssessmentForResponse(current, undefined, tx)),
         replay: true,
         parent: parentProgress?.parent ?? null,
         shouldFinalize: parentProgress?.terminalCandidate ?? false,
@@ -447,7 +448,7 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput) => {
     if (updated.count !== 1) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评状态已变化，请重试', 409)
     const parentProgress = await parentProgressUpdate(tx, assessment)
     return {
-      assessment: scaleAssessmentForResponse({
+      assessment: (await loadScaleAssessmentForResponse({
         ...current,
         status: 'COMPLETED',
         answers,
@@ -459,7 +460,7 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput) => {
         submissionId,
         submissionPayloadHash: payloadHash,
         submissionCompletedAt: completedAt,
-      }),
+      }, undefined, tx)),
       replay: false,
       parent: parentProgress?.parent ?? null,
       shouldFinalize: parentProgress?.terminalCandidate ?? false,
@@ -662,7 +663,7 @@ export const restartStandaloneScaleAssessment = async (assessmentId: string, use
         status: 'IN_PROGRESS',
         deliveryMode: 'FINAL_ONLY',
         runtimeGeneration: 'UNIFIED_V1',
-        runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(runtimeSnapshot),
+        runtimeSnapshotEncrypted: (await persistFrozenScaleRuntimeSnapshot(runtimeSnapshot, tx)),
         compiledRuntimeHash: runtimeSnapshot.compiledRuntime.compiledRuntimeHash,
         ...standaloneAdmissionPersistence({
           attemptEpoch: current.attemptEpoch + 1,
@@ -686,7 +687,7 @@ export const restartStandaloneScaleAssessment = async (assessmentId: string, use
 
   const definition = scaleDefinitionFromRecord(created.scale)
   return {
-    assessment: scaleAssessmentForResponse(created),
+    assessment: (await loadScaleAssessmentForResponse(created)),
     scale: {
       ...scaleRunnerFromRecord(created.scale),
       id: created.scale.id,
