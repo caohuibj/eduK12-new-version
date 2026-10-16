@@ -195,7 +195,7 @@ export const assessmentCapacityTools=new Set([
  ".github/workflows/ci.yml"
 ]);
 const ordinaryTests=new Set([...assessmentCapacityTests,...assessmentCapacityFocusedTests.map(t=>t.file)].map(f=>'server-version/backend/'+f)
- .concat(assessmentCapacityFrontendTests.map(f=>'server-version/frontend/'+f),['server-version/backend/src/__tests__/integration/report-outbox-fixture.ts','server-version/backend/src/__tests__/fixtures/cognitive-storage.synthetic.json']));
+ .concat(assessmentCapacityFrontendTests.map(f=>'server-version/frontend/'+f),['server-version/backend/src/__tests__/integration/report-outbox-fixture.ts','server-version/backend/src/__tests__/fixtures/cognitive-storage.synthetic.json','server-version/backend/src/__tests__/fixtures/final-route-checker.fixture.mjs','server-version/backend/src/__tests__/fixtures/final-route-inventory.fixture.csv']));
 const blob=(ref,file)=>execFileSync('git',['rev-parse',ref+':'+file],{encoding:'utf8'}).trim();
 export function admitsAssessmentCapacity(entries,read,approved=bindings){
  if(approved?.schema!==1||!approved.files||!Object.keys(approved.files).length||!entries.length)return false;
