@@ -46,6 +46,11 @@ CREATE TABLE _legacy_import_batches(mode text,summary jsonb);INSERT INTO _legacy
    subprocess.run([backup.NODE,str(scripts/'backup-db.mjs'),'full'],env=env,capture_output=True,check=True,timeout=120)
    encrypted=list(work.glob('*.edubackup.enc'));assert len(encrypted)==1
    evidence=recovery.isolated_export(backup,encrypted[0],scripts,secret,work,uuid.uuid4().hex);assert evidence['status']=='PASS' and evidence['referenceTables']==7
+   native=work/'streamed';native.mkdir()
+   backup.database_command('full',secret,postgresContainer=name,user='fixture',database='fixture',directory=str(native),maxBytes=2*1024**3)
+   streamed=list(native.glob('*.edubackup.enc'));assert len(streamed)==1
+   streamed_evidence=recovery.isolated_export(backup,streamed[0],scripts,secret,native,uuid.uuid4().hex)
+   assert streamed_evidence['status']=='PASS' and streamed_evidence['referenceTables']==7
    (work/'restore-evidence.json').write_text(json.dumps(evidence))
    result=subprocess.run([backup.NODE,str(source/'recovery-smoke.mjs'),str(work)],env=os.environ,capture_output=True,timeout=120)
    if result.returncode:raise RuntimeError('CI_JOINT_REFERENCE_VERIFIER_FAILED: '+result.stderr.decode()[-3000:])
@@ -59,5 +64,5 @@ CREATE TABLE _legacy_import_batches(mode text,summary jsonb);INSERT INTO _legacy
    if found.returncode==0:
     item=json.loads(found.stdout)[0];assert item['Config']['Labels'][label]==ident;docker('rm','-f','-v',name)
  assert set(docker('ps','-aq').stdout.split())==containers;assert set(docker('volume','ls','-q').stdout.split())==volumes
- print(json.dumps({'actualJointRecovery':'PASS','failedRestoreAnonymousVolumeCleanup':'PASS','foreignContainersAndVolumesPreserved':True}))
+ print(json.dumps({'actualJointRecovery':'PASS','legacyAndStreamedFormats':'PASS','failedRestoreAnonymousVolumeCleanup':'PASS','foreignContainersAndVolumesPreserved':True}))
 if __name__=='__main__':main()

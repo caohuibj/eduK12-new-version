@@ -54,3 +54,38 @@ class Activation(unittest.TestCase):
     def atomic(self,*a):raise AssertionError('unexpected write')
    with patch.object(r,'ACTIVATION',p),patch.object(r,'authorize_activation'),patch.object(r,'helper',return_value={'ready':False}):
     self.assertFalse(r.activate_if_requested(Backup(),{'mode':'plan_only'},'synthetic',{},'synthetic',None))
+
+class StreamedRecovery(unittest.TestCase):
+ def test_database_transport_uses_validated_bound_without_changing_verifier(self):
+  class Backup:
+   LABEL='synthetic'
+   def canonical(self,v):return json.dumps(v).encode()
+   def run(self,args,data=None,timeout=None):
+    self.args=args;self.payload=json.loads(data);return b'{"downloadHashVerified":true}'
+   def cleanup_container(self,*a):pass
+  with tempfile.TemporaryDirectory() as d,patch.object(r,'PROOF',Path(d)/'missing'):
+   b=Backup();result=r.helper(b,'synthetic-image',Path(d),{},'synthetic-secret',{},'database',pointId='a'*32,maxDatabaseBytes=2*1024**3)
+   self.assertTrue(result['downloadHashVerified']);self.assertIn(r.DATABASE_DOWNLOAD_JS,b.args);self.assertIn('--input-type=module',b.args)
+   self.assertEqual(b.payload['maxDatabaseBytes'],2*1024**3)
+   self.assertIn('await download(api,point.objects[0]',r.DATABASE_DOWNLOAD_JS)
+   self.assertIn("'RECOVERY_POINT_NOT_RETAINED'",r.DATABASE_DOWNLOAD_JS)
+   b=Backup();r.helper(b,'synthetic-image',Path(d),{},'synthetic-secret',{},'cached',pointId='a'*32)
+   self.assertEqual(b.args[-1],'/ops/recovery.mjs');self.assertNotIn(r.DATABASE_DOWNLOAD_JS,b.args)
+ def test_transport_program_parses_without_accessing_credentials_or_network(self):
+  import subprocess
+  result=subprocess.run(['node','--input-type=module','--check'],input=r.DATABASE_DOWNLOAD_JS,text=True,capture_output=True)
+  self.assertEqual(result.returncode,0,result.stderr)
+ def test_stream_restore_failure_removes_owned_container_and_private_env(self):
+  class Backup:
+   LABEL='synthetic'
+   def run(self,*a,**k):return b'synthetic-container'
+   def wait_for_database(self,*a):self.waited=a
+   def database_command(self,*a,**k):self.operation=(a,k);raise RuntimeError('BACKUP_COMMAND_FAILED')
+   def cleanup_container(self,*a):self.cleaned=a
+  with tempfile.TemporaryDirectory() as d:
+   work=Path(d);b=Backup()
+   with self.assertRaisesRegex(RuntimeError,'BACKUP_COMMAND_FAILED'):
+    r.isolated_export(b,work/'database.enc',work,'synthetic-secret',work,'a'*32)
+   self.assertEqual(b.operation[0],('restore','synthetic-secret'));self.assertEqual(b.operation[1]['confirmation'],'RESTORE')
+   self.assertEqual(b.operation[1]['target'],'eduk12-restore-'+('a'*12));self.assertEqual(b.cleaned,('eduk12-restore-'+('a'*12),'a'*32))
+   self.assertFalse((work/'restore.env').exists())

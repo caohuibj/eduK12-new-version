@@ -61,16 +61,9 @@ def isolated_export(backup, file, source, secret, work, ident):
     try:
         backup.run(['docker', 'run', '-d', '--name', name, '--label', backup.LABEL + '=' + ident,
             '--network', 'none', '--memory', '384m', '--cpus', '0.5', '--pids-limit', '128', '--env-file', str(envfile), 'postgres:16.15-bookworm'])
-        # The image init server accepts Unix sockets before its final restart.
-        # TCP readiness waits for the actual restore server, not that temporary one.
-        for _ in range(90):
-            r = subprocess.run(['docker', 'exec', name, 'pg_isready', '-h', '127.0.0.1', '-U', 'restore', '-d', 'restore'], capture_output=True, timeout=10)
-            if r.returncode == 0: break
-            time.sleep(1)
-        else: raise RuntimeError('JOINT_DATABASE_NOT_READY')
-        env = {**os.environ, 'BACKUP_ENCRYPTION_KEY': secret, 'RESTORE_CONFIRMATION': 'RESTORE',
-            'RESTORE_TARGET_CONTAINER': name, 'RESTORE_TARGET_DB_NAME': 'restore', 'RESTORE_TARGET_DB_USER': 'restore', 'NODE_OPTIONS': '--max-old-space-size=768'}
-        backup.run([backup.NODE, str(source / 'restore-db.mjs'), str(file)], env=env, timeout=600)
+        backup.wait_for_database(name, 'restore', 'restore')
+        backup.database_command('restore', secret, file=str(file), confirmation='RESTORE',
+                                target=name, user='restore', database='restore')
         counts = sql('SELECT count(*) FROM "_prisma_migrations" WHERE finished_at IS NOT NULL AND rolled_back_at IS NULL; SELECT count(*) FROM "_prisma_migrations" WHERE finished_at IS NULL AND rolled_back_at IS NULL; SELECT count(*) FROM users;').decode().strip().splitlines()
         require(len(counts) == 3 and all(x.isdigit() for x in counts) and int(counts[0]) > 0 and counts[1] == '0', 'JOINT_RESTORE_SCHEMA_FAILED')
         tables = sql("SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY tablename;").decode().strip().splitlines()
@@ -93,6 +86,8 @@ def isolated_export(backup, file, source, secret, work, ident):
     finally:
         backup.cleanup_container(name, ident); envfile.unlink(missing_ok=True)
 
+DATABASE_DOWNLOAD_JS = "import fs from 'node:fs';\nimport {createRequire} from 'node:module';\nimport {unseal} from '/attachment-backup/core.mjs';\nimport {config,need} from '/ops/model.mjs';\nimport {CosApi} from '/ops/store.mjs';\nimport {download} from '/ops/recovery.mjs';\nconst input=JSON.parse(fs.readFileSync(0,'utf8')),c=config(input.config);\nneed(Number.isSafeInteger(input.maxDatabaseBytes)&&input.maxDatabaseBytes>0&&input.maxDatabaseBytes<=2*1024**3,'RECOVERY_DATABASE_LIMIT_INVALID');\nconst repo=unseal(JSON.parse(fs.readFileSync('/work/repository.json','utf8')),input.secret);\nconst point=repo.points.find(p=>p.id===input.pointId);need(point,'RECOVERY_POINT_NOT_RETAINED');\nconst require=createRequire('/app/package.json'),COS=require('cos-nodejs-sdk-v5');\nconst api=new CosApi(c,new COS({SecretId:input.credentials.COS_SECRET_ID,SecretKey:input.credentials.COS_SECRET_KEY,...(input.credentials.COS_SECURITY_TOKEN?{SecurityToken:input.credentials.COS_SECURITY_TOKEN}:{}),Timeout:60000}));\nawait download(api,point.objects[0],'/work/database.edubackup.enc',input.maxDatabaseBytes);\nfs.writeFileSync('/work/database.edubackup.enc.sha256',point.objects[0].sha256+'  database.edubackup.enc\\n',{mode:0o600,flag:'wx'});\nconsole.log(JSON.stringify({downloadHashVerified:true}));\n"
+
 def helper(backup, image, work, c, secret, credentials, command, **extra):
     ident = uuid.uuid4().hex; name = 'eduk12-host-backup-' + ident
     empty = work / 'empty-proof'; empty.mkdir(mode=0o700, exist_ok=True)
@@ -107,7 +102,10 @@ def helper(backup, image, work, c, secret, credentials, command, **extra):
             '--mount', 'type=bind,src=' + str(work) + ',dst=/work',
             '--mount', 'type=bind,src=/var/lib/eduk12-backups,dst=/host,readonly',
             '--mount', 'type=bind,src=/var/lib/eduk12-attachments/data,dst=/attachments,readonly', '--mount', proof_mount,
-            '--entrypoint', 'node', image, '/ops/recovery.mjs']
+            '--entrypoint', 'node', image]
+        # Keep the attachment verifier byte-identical so immutable joint bindings
+        # remain reusable; database transport follows the validated backup bound.
+        args += ['--input-type=module', '-e', DATABASE_DOWNLOAD_JS] if command == 'database' else ['/ops/recovery.mjs']
         return json.loads(backup.run(args, data=backup.canonical(payload), timeout=2400))
     finally: backup.cleanup_container(name, ident)
 
@@ -188,7 +186,7 @@ def recover():
         for point in repo['points']:
             cached = helper(backup, b['Image'], work, c, secret, credentials, 'cached', pointId=point['id'])
             if not cached.get('cached'):
-                helper(backup, b['Image'], work, c, secret, credentials, 'database', pointId=point['id'])
+                helper(backup, b['Image'], work, c, secret, credentials, 'database', pointId=point['id'], maxDatabaseBytes=bc['maxBackupBytes'])
                 database = work / 'database.edubackup.enc'; evidence = isolated_export(backup, database, source, secret, work, uuid.uuid4().hex); restored += 1
                 helper(backup, b['Image'], work, c, secret, credentials, 'attachments', pointId=point['id'], hosts=hosts, databaseRestore=evidence)
                 for name in ['database.edubackup.enc', 'database.edubackup.enc.sha256', 'assets.jsonl', 'references.jsonl']: (work / name).unlink(missing_ok=True)
