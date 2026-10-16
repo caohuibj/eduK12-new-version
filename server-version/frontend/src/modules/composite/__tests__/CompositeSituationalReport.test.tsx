@@ -6,6 +6,7 @@ import CompositeReportPage from '../CompositeReportPage'
 const { mockCompositeApi } = vi.hoisted(() => ({
   mockCompositeApi: {
     report: vi.fn(),
+    reportStatus: vi.fn(),
     teacherReport: vi.fn(),
     snapshots: vi.fn(),
     reanalyze: vi.fn(),
@@ -23,6 +24,7 @@ vi.mock('../../../contexts/AuthContext', () => ({
 
 describe('CompositeReportPage Situational projection', () => {
   it('renders frozen Situational metrics instead of an empty titled card', async () => {
+    mockCompositeApi.reportStatus.mockResolvedValue({ code: 0, data: { attemptId: 'attempt-sit', attemptEpoch: 1, status: 'COMPLETED', hasAcceptedSubmission: true, reportStatus: { state: 'READY', jobId: 'synthetic-job', retryAfterSeconds: 2, errorCode: null, completedAt: '2026-09-13T00:00:00Z' } } })
     mockCompositeApi.report.mockResolvedValue({
       code: 0,
       data: {

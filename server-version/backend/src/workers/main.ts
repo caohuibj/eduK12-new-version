@@ -78,7 +78,7 @@ const startWorker = async (): Promise<void> => {
   if (assessmentReportConfig().enabled) await prepareCompositeReportRuntime()
   if (shutdownStarted) return
   startCompositeReportWorker()
-  logger.info('Report outbox worker is running', { heavyProcessingEnabled: resolveHeavyProcessingEnabled(), videoProcessingEnabled: resolveHeavyProcessingEnabled() && resolveVideoProcessingEnabled() })
+  logger.info('Background worker process is consuming enabled queues', { heavyProcessingEnabled: resolveHeavyProcessingEnabled(), videoProcessingEnabled: resolveHeavyProcessingEnabled() && resolveVideoProcessingEnabled() })
 }
 
 void startWorker().catch((error) => {
