@@ -122,3 +122,11 @@ live probe of that exact identity. Source/config pinning detects changes while a
 long initial baseline is pending.
 
 Optional monitor `cos_recovery_status=/var/lib/eduk12-cos-recovery/status.json`: failed acceptance is critical, stale tasks over three hours warn, pending baseline/lock waits remain normal. Enable this only after the reviewed task has created its first status file. Activation requests also bind the immutable runtime image digest.
+
+### Database-size and renewal compatibility (2026-10-17)
+
+Joint recovery downloads the exact retained database VersionId using the validated host-backup `maxBackupBytes` (currently at most 2 GiB), with the existing streaming size and SHA-256 checks. It no longer applies the 512 MiB attachment bound to database archives. Restore uses the reviewed host-backup streaming decoder, including existing-format authentication, checksum rejection, isolated-network targeting and owned-volume cleanup. Attachment reference/decryption verification is unchanged, so exact immutable bindings remain reusable after remote version checks; new database versions still require a real isolated restore and reference scan.
+
+The recovery timer is disabled by default at install. Once an operator authorizes ongoing automatic cleanup and the initial joint recovery succeeds, enable the existing hourly recovery timer before relying on the cleanup timer. Proof expiry, transaction locks, dedicated deletion identity and backup retention remain enforced. This does not enable media deletion or relax retention.
+
+Reference scanning still visits every restored row. Its root-private JSONL export replaces only long text that the unchanged verifier cannot interpret as an attachment reference; ID/path fields, deletion gates and every URL/path candidate are preserved. The original backup and restored database are not modified. Raw input is bounded at 12 GiB, each row at 4 MiB, compacted output at 512 MiB and the query at its existing timeout. This prevents encrypted answer/snapshot text from exhausting the reference-export budget. The contract compares the unchanged verifier's result on full and compacted rows.

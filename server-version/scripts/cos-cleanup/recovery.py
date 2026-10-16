@@ -32,19 +32,51 @@ def host_module():
     spec = importlib.util.spec_from_file_location('joint_backup', file)
     mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod); return mod
 
-def export_rows(command, file, max_bytes=536870912, timeout=180):
+MAX_REFERENCE_INPUT_BYTES = 12 * 1024 ** 3
+MAX_REFERENCE_ROW_BYTES = 4 * 1024 ** 2
+
+def compact_reference_text(value, field=''):
+    # Only temporary reference-scan exports are compacted. Preserve all values
+    # the unchanged JS verifier can interpret as paths, IDs or row-level gates.
+    if isinstance(value, dict):
+        return {k: compact_reference_text(v, k) for k, v in value.items()}
+    if isinstance(value, list):
+        return [compact_reference_text(v, field) for v in value]
+    if not isinstance(value, str) or len(value) <= 4096:
+        return value
+    if (field in {'deleted_at', 'is_deleted', 'file_path', 'assetId', 'cos_key', 'original_cos_key', 'cosKey', 'originalCosKey'}
+            or re.search(r'(?:^|_)asset_id$|AssetId$', field)
+            or any(marker in value for marker in ['http://', 'https://', '/uploads/', '/videos/', '/api/assets/'])):
+        return value
+    return ''
+
+def export_rows(command, file, max_bytes=536870912, timeout=180, compact_json_rows=False):
     require(not file.exists() and not file.is_symlink(), 'RECOVERY_EXPORT_PATH_REFUSED')
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
-    count = 0; end = time.monotonic() + timeout
+    count = 0; raw_count = 0; pending = b''; end = time.monotonic() + timeout
     try:
         with file.open('xb') as target:
             os.chmod(file, 0o600)
+            def emit(data):
+                nonlocal count
+                count += len(data); require(count <= max_bytes, 'RECOVERY_EXPORT_LIMIT'); target.write(data)
+            def emit_row(line):
+                require(len(line) <= MAX_REFERENCE_ROW_BYTES, 'RECOVERY_REFERENCE_ROW_LIMIT')
+                if line:
+                    emit(json.dumps(compact_reference_text(json.loads(line)), ensure_ascii=False, separators=(',', ':')).encode() + b'\n')
             while True:
                 require(time.monotonic() < end, 'RECOVERY_QUERY_TIMEOUT')
                 if not select.select([process.stdout], [], [], 0.5)[0]: continue
                 chunk = os.read(process.stdout.fileno(), 1024 * 1024)
                 if not chunk: break
-                count += len(chunk); require(count <= max_bytes, 'RECOVERY_EXPORT_LIMIT'); target.write(chunk)
+                if not compact_json_rows:
+                    emit(chunk); continue
+                raw_count += len(chunk); require(raw_count <= MAX_REFERENCE_INPUT_BYTES, 'RECOVERY_REFERENCE_INPUT_LIMIT')
+                pending += chunk
+                lines = pending.split(b'\n'); pending = lines.pop()
+                for line in lines: emit_row(line)
+                require(len(pending) <= MAX_REFERENCE_ROW_BYTES, 'RECOVERY_REFERENCE_ROW_LIMIT')
+            if compact_json_rows and pending: emit_row(pending)
         process.wait(timeout=10)
         require(process.returncode == 0, 'RECOVERY_QUERY_FAILED')
         return count
@@ -61,22 +93,15 @@ def isolated_export(backup, file, source, secret, work, ident):
     try:
         backup.run(['docker', 'run', '-d', '--name', name, '--label', backup.LABEL + '=' + ident,
             '--network', 'none', '--memory', '384m', '--cpus', '0.5', '--pids-limit', '128', '--env-file', str(envfile), 'postgres:16.15-bookworm'])
-        # The image init server accepts Unix sockets before its final restart.
-        # TCP readiness waits for the actual restore server, not that temporary one.
-        for _ in range(90):
-            r = subprocess.run(['docker', 'exec', name, 'pg_isready', '-h', '127.0.0.1', '-U', 'restore', '-d', 'restore'], capture_output=True, timeout=10)
-            if r.returncode == 0: break
-            time.sleep(1)
-        else: raise RuntimeError('JOINT_DATABASE_NOT_READY')
-        env = {**os.environ, 'BACKUP_ENCRYPTION_KEY': secret, 'RESTORE_CONFIRMATION': 'RESTORE',
-            'RESTORE_TARGET_CONTAINER': name, 'RESTORE_TARGET_DB_NAME': 'restore', 'RESTORE_TARGET_DB_USER': 'restore', 'NODE_OPTIONS': '--max-old-space-size=768'}
-        backup.run([backup.NODE, str(source / 'restore-db.mjs'), str(file)], env=env, timeout=600)
+        backup.wait_for_database(name, 'restore', 'restore')
+        backup.database_command('restore', secret, file=str(file), confirmation='RESTORE',
+                                target=name, user='restore', database='restore')
         counts = sql('SELECT count(*) FROM "_prisma_migrations" WHERE finished_at IS NOT NULL AND rolled_back_at IS NULL; SELECT count(*) FROM "_prisma_migrations" WHERE finished_at IS NULL AND rolled_back_at IS NULL; SELECT count(*) FROM users;').decode().strip().splitlines()
         require(len(counts) == 3 and all(x.isdigit() for x in counts) and int(counts[0]) > 0 and counts[1] == '0', 'JOINT_RESTORE_SCHEMA_FAILED')
         tables = sql("SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY tablename;").decode().strip().splitlines()
         require('stored_assets' in tables and 'asset_references' in tables and all(re.fullmatch('[A-Za-z_][A-Za-z0-9_]{0,62}', t) for t in tables), 'JOINT_REFERENCE_SCHEMA_UNKNOWN')
-        def export(query, destination, max_bytes):
-            return export_rows(['docker', 'exec', name, 'psql', '-X', '-q', '-A', '-t', '-v', 'ON_ERROR_STOP=1', '-U', 'restore', '-d', 'restore', '-c', "SET statement_timeout='120s'; " + query], destination, max_bytes)
+        def export(query, destination, max_bytes, compact=False):
+            return export_rows(['docker', 'exec', name, 'psql', '-X', '-q', '-A', '-t', '-v', 'ON_ERROR_STOP=1', '-U', 'restore', '-d', 'restore', '-c', "SET statement_timeout='120s'; " + query], destination, max_bytes, compact_json_rows=compact)
         export('SELECT row_to_json(a) FROM public.stored_assets a;', work / 'assets.jsonl', 16777216)
         # All persistent table rows, including JSON snapshots, are scanned. They stay
         # root-private and are removed before this task returns; no rows enter logs.
@@ -86,12 +111,14 @@ def isolated_export(backup, file, source, secret, work, ident):
             for n, table in enumerate(tables):
                 part = work / ('reference-part-' + str(n)); remaining = 536870912 - total
                 require(remaining > 0, 'JOINT_REFERENCE_EXPORT_LIMIT')
-                size = export("SELECT json_build_object('table', '" + table + "', 'data', to_jsonb(t)) FROM public.\"" + table + '\" t;', part, remaining)
+                size = export("SELECT json_build_object('table', '" + table + "', 'data', to_jsonb(t)) FROM public.\"" + table + '\" t;', part, remaining, compact=True)
                 with part.open('rb') as stream: shutil.copyfileobj(stream, output, 1024 * 1024)
                 total += size; part.unlink()
-        return {'status': 'PASS', 'at': utc(), 'appliedMigrations': int(counts[0]), 'failedMigrations': 0, 'users': int(counts[2]), 'referenceTables': len(tables), 'referenceExportBytes': total, 'network': 'none'}
+        return {'status': 'PASS', 'at': utc(), 'appliedMigrations': int(counts[0]), 'failedMigrations': 0, 'users': int(counts[2]), 'referenceTables': len(tables), 'referenceExportBytes': total, 'referenceExport': 'all_rows_preserving_reference_fields_and_urls', 'network': 'none'}
     finally:
         backup.cleanup_container(name, ident); envfile.unlink(missing_ok=True)
+
+DATABASE_DOWNLOAD_JS = "import fs from 'node:fs';\nimport {createRequire} from 'node:module';\nimport {unseal} from '/attachment-backup/core.mjs';\nimport {config,need} from '/ops/model.mjs';\nimport {CosApi} from '/ops/store.mjs';\nimport {download} from '/ops/recovery.mjs';\nconst input=JSON.parse(fs.readFileSync(0,'utf8')),c=config(input.config);\nneed(Number.isSafeInteger(input.maxDatabaseBytes)&&input.maxDatabaseBytes>0&&input.maxDatabaseBytes<=2*1024**3,'RECOVERY_DATABASE_LIMIT_INVALID');\nconst repo=unseal(JSON.parse(fs.readFileSync('/work/repository.json','utf8')),input.secret);\nconst point=repo.points.find(p=>p.id===input.pointId);need(point,'RECOVERY_POINT_NOT_RETAINED');\nconst require=createRequire('/app/package.json'),COS=require('cos-nodejs-sdk-v5');\nconst api=new CosApi(c,new COS({SecretId:input.credentials.COS_SECRET_ID,SecretKey:input.credentials.COS_SECRET_KEY,...(input.credentials.COS_SECURITY_TOKEN?{SecurityToken:input.credentials.COS_SECURITY_TOKEN}:{}),Timeout:60000}));\nawait download(api,point.objects[0],'/work/database.edubackup.enc',input.maxDatabaseBytes);\nfs.writeFileSync('/work/database.edubackup.enc.sha256',point.objects[0].sha256+'  database.edubackup.enc\\n',{mode:0o600,flag:'wx'});\nconsole.log(JSON.stringify({downloadHashVerified:true}));\n"
 
 def helper(backup, image, work, c, secret, credentials, command, **extra):
     ident = uuid.uuid4().hex; name = 'eduk12-host-backup-' + ident
@@ -107,7 +134,10 @@ def helper(backup, image, work, c, secret, credentials, command, **extra):
             '--mount', 'type=bind,src=' + str(work) + ',dst=/work',
             '--mount', 'type=bind,src=/var/lib/eduk12-backups,dst=/host,readonly',
             '--mount', 'type=bind,src=/var/lib/eduk12-attachments/data,dst=/attachments,readonly', '--mount', proof_mount,
-            '--entrypoint', 'node', image, '/ops/recovery.mjs']
+            '--entrypoint', 'node', image]
+        # Keep the attachment verifier byte-identical so immutable joint bindings
+        # remain reusable; database transport follows the validated backup bound.
+        args += ['--input-type=module', '-e', DATABASE_DOWNLOAD_JS] if command == 'database' else ['/ops/recovery.mjs']
         return json.loads(backup.run(args, data=backup.canonical(payload), timeout=2400))
     finally: backup.cleanup_container(name, ident)
 
@@ -188,7 +218,7 @@ def recover():
         for point in repo['points']:
             cached = helper(backup, b['Image'], work, c, secret, credentials, 'cached', pointId=point['id'])
             if not cached.get('cached'):
-                helper(backup, b['Image'], work, c, secret, credentials, 'database', pointId=point['id'])
+                helper(backup, b['Image'], work, c, secret, credentials, 'database', pointId=point['id'], maxDatabaseBytes=bc['maxBackupBytes'])
                 database = work / 'database.edubackup.enc'; evidence = isolated_export(backup, database, source, secret, work, uuid.uuid4().hex); restored += 1
                 helper(backup, b['Image'], work, c, secret, credentials, 'attachments', pointId=point['id'], hosts=hosts, databaseRestore=evidence)
                 for name in ['database.edubackup.enc', 'database.edubackup.enc.sha256', 'assets.jsonl', 'references.jsonl']: (work / name).unlink(missing_ok=True)
