@@ -65,3 +65,11 @@ test('compiler reuse admits only frozen isolated test environment/reporting/fail
  assert.equal(isolatedTestRunnerCorrectionsOnly(after,b.candidateBefore),true);
  for(const modified of [after+'unknown',after.replace('RUN npx tsc','RUN true'),after.replace("'HIGH,CRITICAL'","'CRITICAL'")])assert.equal(isolatedTestRunnerCorrectionsOnly(modified,b.candidateBefore),false);
 });
+
+
+test('container route-check fixtures are byte-identical to the maintained source checker and ledger',()=>{
+ for (const [source,fixture] of [
+  ['../../server-version/perf/current-main-v1/check-final-routes.mjs','../../server-version/backend/src/__tests__/fixtures/final-route-checker.fixture.mjs'],
+  ['../../docs/performance-optimization-v1/route-inventory.csv','../../server-version/backend/src/__tests__/fixtures/final-route-inventory.fixture.csv'],
+ ]) assert.deepEqual(readFileSync(new URL(source,import.meta.url)),readFileSync(new URL(fixture,import.meta.url)));
+});

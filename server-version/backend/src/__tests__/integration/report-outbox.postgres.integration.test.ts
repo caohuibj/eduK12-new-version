@@ -8,6 +8,8 @@ import { integrationDatabaseUrl, requireIsolatedReleaseDatabase } from './integr
 
 const url = integrationDatabaseUrl('REPORT_OUTBOX_INTEGRATION_DATABASE_URL')
 const suite = url ? describe : describe.skip
+const readinessRedisUrl = process.env.REPORT_READY_INTEGRATION_REDIS_URL || process.env.REDIS_URL
+if (process.env.CI && !readinessRedisUrl) throw new Error('CI requires real Redis readiness coverage')
 let db: PrismaClient
 let outbox: typeof import('../../modules/assessment-runtime/report-outbox.service')
 let service: typeof import('../../modules/composite/composite.service')
@@ -649,12 +651,12 @@ suite('durable report outbox on isolated PostgreSQL', () => {
     } finally { spy?.mockRestore(); vi.stubEnv('ASSESSMENT_REPORT_COMPACT_READ_ENABLED', 'false') }
   })
 
-  it.runIf(Boolean(process.env.REPORT_READY_INTEGRATION_REDIS_URL))('initializes readiness hints on the first ordinary compact status read', async () => {
+  it.runIf(Boolean(readinessRedisUrl))('initializes readiness hints on the first ordinary compact status read', async () => {
     const notifications = await import('../../services/reportReadyNotifications')
     notifications.stopReportReadyNotifications()
     vi.stubEnv('ASSESSMENT_REPORT_COMPACT_READ_ENABLED', 'true')
     vi.stubEnv('ASSESSMENT_REPORT_READY_WAIT_ENABLED', 'true')
-    vi.stubEnv('REDIS_URL', process.env.REPORT_READY_INTEGRATION_REDIS_URL!)
+    vi.stubEnv('REDIS_URL', readinessRedisUrl!)
     try {
       const f = await fixture(), { whole, input } = await wholeInput(f)
       await whole.submitWholeQuestionnaire(f.parent.id, input, { userId: f.participant.id })
@@ -722,6 +724,8 @@ suite('durable report outbox on isolated PostgreSQL', () => {
   })
 
   it('reuses the admission-owned fresh header for consent without another parent query', async () => {
+    const priorAtomic = process.env.ASSESSMENT_WHOLE_ATOMIC_RECEIPT_ENABLED
+    vi.stubEnv('ASSESSMENT_WHOLE_ATOMIC_RECEIPT_ENABLED', 'true')
     vi.stubEnv('ASSESSMENT_WHOLE_REQUEST_CONTEXT_REUSE_ENABLED', 'true')
     const f = await fixture(3), { whole, input } = await wholeInput(f)
     const shared = (await import('../../config/database')).prisma, query = vi.spyOn(shared, '$queryRaw')
@@ -732,7 +736,7 @@ suite('durable report outbox on isolated PostgreSQL', () => {
       expect(parentReads).not.toHaveBeenCalled()
       await processJob(await claim()); expect((await service.getReport(f.parent.id, { userId: f.participant.id })).unitReports).toHaveLength(3)
       expect(await budget()).toBe(0)
-    } finally { query.mockRestore(); parentReads.mockRestore() }
+    } finally { query.mockRestore(); parentReads.mockRestore(); vi.stubEnv('ASSESSMENT_WHOLE_ATOMIC_RECEIPT_ENABLED', priorAtomic || '') }
   })
   it('keeps the atomic fence if the parent changes after the admission-owned header read', async () => {
     vi.stubEnv('ASSESSMENT_WHOLE_REQUEST_CONTEXT_REUSE_ENABLED', 'true')
