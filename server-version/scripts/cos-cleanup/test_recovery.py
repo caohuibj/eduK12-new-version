@@ -89,3 +89,23 @@ class StreamedRecovery(unittest.TestCase):
    self.assertEqual(b.operation[0],('restore','synthetic-secret'));self.assertEqual(b.operation[1]['confirmation'],'RESTORE')
    self.assertEqual(b.operation[1]['target'],'eduk12-restore-'+('a'*12));self.assertEqual(b.cleaned,('eduk12-restore-'+('a'*12),'a'*32))
    self.assertFalse((work/'restore.env').exists())
+
+class ReferenceProjection(unittest.TestCase):
+ def test_only_irrelevant_long_text_is_compacted(self):
+  value={'opaque':'x'*10000,'short':'kept','deleted_at':'x'*5000,'file_path':'uploads/'+'x'*5000,'nested':{'asset_id':'x'*5000},'urls':['x'*5000+' https://fixture.cos.test/assets/a','x'*5000+'/api/assets/a'],'number':17}
+  out=r.compact_reference_text(value)
+  self.assertEqual(out,{**value,'opaque':''})
+ def test_compacted_export_is_private_and_input_remains_bounded(self):
+  with tempfile.TemporaryDirectory() as d:
+   p=Path(d)/'rows';script="import json;print(json.dumps({'table':'snapshots','data':{'opaque':'x'*10000,'asset_id':'asset-1'}}))"
+   count=r.export_rows([sys.executable,'-c',script],p,200,compact_json_rows=True)
+   self.assertLess(count,200);self.assertEqual(json.loads(p.read_text())['data'],{'opaque':'','asset_id':'asset-1'});self.assertEqual(p.stat().st_mode&0o777,0o600)
+  with tempfile.TemporaryDirectory() as d,patch.object(r,'MAX_REFERENCE_INPUT_BYTES',20):
+   with self.assertRaisesRegex(RuntimeError,'REFERENCE_INPUT_LIMIT'):r.export_rows([sys.executable,'-c',script],Path(d)/'rows',200,compact_json_rows=True)
+ def test_unchanged_verifier_sees_identical_references_before_and_after_projection(self):
+  import subprocess
+  records=[{'table':'documents','data':{'asset_id':'asset-1','file_path':'x'*9000,'opaque':'x'*9000}}, {'table':'snapshots','data':{'payload':{'url':'x'*5000+' https://fixture.cos.test/assets/a','opaque':'x'*9000}}}, {'table':'asset_references','data':{'asset_id':'asset-1'}}, {'table':'documents','data':{'deleted_at':'x'*9000,'asset_id':'missing','opaque':'x'*9000}}]
+  module=Path(__file__).with_name('recovery.mjs').as_uri()
+  script="import fs from 'node:fs';import assert from 'node:assert/strict';import {referenceIndex,addAsset,addReferenceRow} from "+json.dumps(module)+";const input=JSON.parse(fs.readFileSync(0,'utf8'));function check(rows){const e={source:{provider:'cos',key:'assets/a'},sha256:'a'.repeat(64),bytes:1,blob:'attachments/v1/blob',versionId:'v1'};const i=referenceIndex({scope:'attachment_inventory_only',complete:true,entries:[e]});addAsset(i,{id:'asset-1',provider:'cos',object_key:'assets/a',sha256:e.sha256,size_bytes:1});for(const row of rows)addReferenceRow(i,row.table,row.data,{cos:['fixture.cos.test'],site:[]});return {rows:i.rows,references:i.references,externalUrls:i.externalUrls,needed:[...i.needed.keys()]};}assert.deepEqual(check(input.before),check(input.after));"
+  result=subprocess.run(['node','--input-type=module','-e',script],input=json.dumps({'before':records,'after':r.compact_reference_text(records)}),text=True,capture_output=True)
+  self.assertEqual(result.returncode,0,result.stderr)

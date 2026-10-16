@@ -42,10 +42,11 @@ CREATE TABLE documents(asset_id text,file_path text,cos_key text);INSERT INTO do
 CREATE TABLE snapshots(payload jsonb);INSERT INTO snapshots VALUES ('{"nested":{"url":"https://fixture.cos.test/assets/fixture.pdf"}}');
 CREATE TABLE _legacy_import_batches(mode text,summary jsonb);INSERT INTO _legacy_import_batches VALUES ('dry_run','{"preview":{"processedUrl":"/videos/old-missing.mp4","asset_id":"old-missing"}}');'''
    docker('exec',name,'psql','-v','ON_ERROR_STOP=1','-U','fixture','-d','fixture','-c',sql)
+   docker('exec',name,'psql','-v','ON_ERROR_STOP=1','-U','fixture','-d','fixture','-c',"ALTER TABLE snapshots ADD COLUMN opaque text; UPDATE snapshots SET opaque=repeat('x',65536)")
    scripts=source.parent/'backup';env={**os.environ,'BACKUP_ENCRYPTION_KEY':secret,'POSTGRES_CONTAINER':name,'DB_USER':'fixture','DB_NAME':'fixture','ENCRYPTED_DIR':str(work)}
    subprocess.run([backup.NODE,str(scripts/'backup-db.mjs'),'full'],env=env,capture_output=True,check=True,timeout=120)
    encrypted=list(work.glob('*.edubackup.enc'));assert len(encrypted)==1
-   evidence=recovery.isolated_export(backup,encrypted[0],scripts,secret,work,uuid.uuid4().hex);assert evidence['status']=='PASS' and evidence['referenceTables']==7
+   evidence=recovery.isolated_export(backup,encrypted[0],scripts,secret,work,uuid.uuid4().hex);assert evidence['status']=='PASS' and evidence['referenceTables']==7 and evidence['referenceExportBytes']<65536
    native=work/'streamed';native.mkdir()
    backup.database_command('full',secret,postgresContainer=name,user='fixture',database='fixture',directory=str(native),maxBytes=2*1024**3)
    streamed=list(native.glob('*.edubackup.enc'));assert len(streamed)==1
