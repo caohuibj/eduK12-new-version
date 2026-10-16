@@ -36,6 +36,8 @@ import {
 
 const makeState = (overrides: Record<string, unknown> = {}) => ({
   id: 'attempt-1',
+  attemptEpoch: 1,
+  asyncReportEpoch: null,
   compositeAssessmentId: 'composite-1',
   userId: 'student-1',
   recoveryTokenHash: null,
@@ -81,11 +83,7 @@ beforeEach(() => {
   mockPrisma.$queryRaw.mockResolvedValue([{ id: 'attempt-1' }])
   mockPrisma.compositeAssessmentAttempt.findUnique.mockImplementation(async (args: any) => {
     if (args.select) {
-      return {
-        status: stateRef.current.status,
-        progress: stateRef.current.progress,
-        completedAt: stateRef.current.completedAt,
-      }
+      return Object.fromEntries(Object.keys(args.select).map(key => [key, stateRef.current[key]]))
     }
     return stateRef.current
   })

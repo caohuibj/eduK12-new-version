@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ReportReadyWaitRegistry } from '../../services/reportReadyNotifications'
+const integrationRedisUrl = process.env.REPORT_READY_INTEGRATION_REDIS_URL || process.env.REDIS_URL
+if (process.env.CI === 'true' && !integrationRedisUrl) throw new Error('A real isolated Redis URL is required for readiness tests')
 afterEach(() => vi.useRealTimers())
 describe('bounded advisory report readiness waits', () => {
   it('wakes only the matching report and releases every registration', async () => {
@@ -26,10 +28,10 @@ describe('bounded advisory report readiness waits', () => {
   })
 })
 
-it.runIf(Boolean(process.env.REPORT_READY_INTEGRATION_REDIS_URL))('delivers a real Redis hint and safely releases waits on advisory connection loss', async () => {
+it.runIf(Boolean(integrationRedisUrl))('delivers a real Redis hint and safely releases waits on advisory connection loss', async () => {
   const service = await import('../../services/reportReadyNotifications')
   vi.stubEnv('ASSESSMENT_REPORT_READY_WAIT_ENABLED', 'true')
-  vi.stubEnv('REDIS_URL', process.env.REPORT_READY_INTEGRATION_REDIS_URL!)
+  vi.stubEnv('REDIS_URL', integrationRedisUrl!)
   try {
     expect(await service.prepareReportReadyNotifications()).toBe(true)
     const a = service.beginReportReadyWait('synthetic-attempt', 1, 4000)!
@@ -44,10 +46,10 @@ it.runIf(Boolean(process.env.REPORT_READY_INTEGRATION_REDIS_URL))('delivers a re
   } finally { service.stopReportReadyNotifications(); vi.unstubAllEnvs() }
 })
 
-it.runIf(Boolean(process.env.REPORT_READY_INTEGRATION_REDIS_URL))('does not lose a ready hint received between the DB snapshot and wait registration', async () => {
+it.runIf(Boolean(integrationRedisUrl))('does not lose a ready hint received between the DB snapshot and wait registration', async () => {
   const service = await import('../../services/reportReadyNotifications')
   vi.stubEnv('ASSESSMENT_REPORT_READY_WAIT_ENABLED', 'true')
-  vi.stubEnv('REDIS_URL', process.env.REPORT_READY_INTEGRATION_REDIS_URL!)
+  vi.stubEnv('REDIS_URL', integrationRedisUrl!)
   try {
     expect(await service.prepareReportReadyNotifications()).toBe(true)
     const beforeRead = service.reportReadyNotificationSequence()
@@ -60,11 +62,11 @@ it.runIf(Boolean(process.env.REPORT_READY_INTEGRATION_REDIS_URL))('does not lose
 })
 
 
-it.runIf(Boolean(process.env.REPORT_READY_INTEGRATION_REDIS_URL))('multiplexes pressure and ready hints on the existing connection and expires pressure after advisory loss', async () => {
+it.runIf(Boolean(integrationRedisUrl))('multiplexes pressure and ready hints on the existing connection and expires pressure after advisory loss', async () => {
   const service = await import('../../services/reportReadyNotifications')
   const { ReportClaimPriority } = await import('../../services/wholeSubmissionPriority')
   vi.stubEnv('ASSESSMENT_REPORT_READY_WAIT_ENABLED', 'true'); vi.stubEnv('ASSESSMENT_REPORT_SUBMISSION_PRIORITY_ENABLED', 'true')
-  vi.stubEnv('REDIS_URL', process.env.REPORT_READY_INTEGRATION_REDIS_URL!)
+  vi.stubEnv('REDIS_URL', integrationRedisUrl!)
   let at = 0; const policy = new ReportClaimPriority(() => at)
   const detach = service.onReportSchedulingHint(message => policy.receive(message))
   try {

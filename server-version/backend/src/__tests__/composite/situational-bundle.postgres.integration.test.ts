@@ -581,7 +581,7 @@ suite('Situational Bundle PostgreSQL integration', () => {
         situationalAttempts: true,
       },
     })
-    const report = compositeService.buildCompositeReport(reportRow)
+    const report = (await compositeService.buildCompositeReport(reportRow))
     expect(report.unitReports[0]).toMatchObject({
       type: 'SITUATIONAL',
       kind: 'situational',
@@ -831,7 +831,7 @@ suite('Situational Bundle PostgreSQL integration', () => {
           situationalAttempts: true,
         },
       })
-      const report = compositeService.buildCompositeReport(reportRow)
+      const report = (await compositeService.buildCompositeReport(reportRow))
       expect(report.unitReports.map((unit: { type: string }) => unit.type)).toEqual(['COGNITIVE', 'SCALE', 'SITUATIONAL'])
       expect(report.unitReports.find((unit: { type: string }) => unit.type === 'SITUATIONAL')).toMatchObject({
         kind: 'situational',

@@ -65,7 +65,7 @@ suite('scientific promotion: real standalone and Bundle frozen history', () => {
     for (const [tierIndex, tier] of (['PILOT', 'RESEARCH_READY', 'RESEARCH_GRADE', 'PILOT'] as const).entries()) {
     declareScience(source, tier, tierIndex + 3)
     if (tierIndex === 3) { source.scientific.evidence = []; source.scientific.changeReason = 'Withdraw research evidence' }
-    for (const prior of priorBundles) expect(composite.buildCompositeReport(prior.row).unitReports[0]).toMatchObject({ scientificContext: { scientificMaturity: prior.maturity, governanceRevision: prior.revision } })
+    for (const prior of priorBundles) expect((await composite.buildCompositeReport(prior.row)).unitReports[0]).toMatchObject({ scientificContext: { scientificMaturity: prior.maturity, governanceRevision: prior.revision } })
     if (pending && tierIndex === 1) {
       expect((await runtime.resumeSituationalAttempt(pending.started.attemptId, pending.userId)).instrument.scientificContext).toMatchObject({ scientificMaturity: 'PILOT', governanceRevision: 3 })
       const old = pending.started
@@ -108,7 +108,7 @@ suite('scientific promotion: real standalone and Bundle frozen history', () => {
     expect((await final.submitSituationalAttemptFinal(childInput)).replayed).toBe(true)
     expect((await composite.getAttemptState(parent.attempt.id, { userId })).status).toBe('COMPLETED')
     const row = await db.compositeAssessmentAttempt.findUnique({ where: { id: parent.attempt.id }, include: { compositeAssessment: { include: { items: true, formSections: { include: { items: true } } } }, scaleAssessments: { include: { scale: true } }, cognitiveSessions: true, formAnswers: true, formSectionAttempts: true, situationalAttempts: true } })
-    expect(composite.buildCompositeReport(row).unitReports[0]).toMatchObject({ type: 'SITUATIONAL', instrumentKey: id.instrumentKey, scientificContext: { scientificMaturity: tier, governanceRevision: tierIndex + 3, provenance: 'FROZEN' } })
+    expect((await composite.buildCompositeReport(row)).unitReports[0]).toMatchObject({ type: 'SITUATIONAL', instrumentKey: id.instrumentKey, scientificContext: { scientificMaturity: tier, governanceRevision: tierIndex + 3, provenance: 'FROZEN' } })
     priorBundles.push({ row, maturity: tier, revision: tierIndex + 3 })
     live.releaseStatus = 'PUBLISHED'
     if (tierIndex === 0) pending = { started: await runtime.startSituationalAttempt(userId, id), userId }

@@ -29,7 +29,7 @@ const { mockPrisma, buildPackageAnalysisMock, stateRef, snapshotRows } = vi.hois
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 vi.mock('../../modules/composite/composite-analysis-snapshot.service', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../../modules/composite/composite-analysis-snapshot.service')>()),
-  buildPackageAnalysisForAttempt: buildPackageAnalysisMock,
+  loadPackageAnalysisForAttempt: buildPackageAnalysisMock,
 }))
 
 import {
@@ -58,6 +58,8 @@ const analysis = {
 
 const makeState = () => ({
   id: 'attempt-1',
+  attemptEpoch: 1,
+  asyncReportEpoch: null,
   compositeAssessmentId: 'composite-1',
   userId: 'student-1',
   recoveryTokenHash: null,
@@ -115,11 +117,7 @@ beforeEach(() => {
   mockPrisma.$queryRaw.mockResolvedValue([{ id: 'attempt-1' }])
   mockPrisma.compositeAssessmentAttempt.findUnique.mockImplementation(async (args: any) => {
     if (args.select) {
-      return {
-        status: stateRef.current.status,
-        progress: stateRef.current.progress,
-        completedAt: stateRef.current.completedAt,
-      }
+      return Object.fromEntries(Object.keys(args.select).map(key => [key, stateRef.current[key]]))
     }
     return stateRef.current
   })

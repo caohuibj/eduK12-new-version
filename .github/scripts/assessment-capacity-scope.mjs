@@ -99,7 +99,8 @@ export const assessmentCapacitySources=new Set([
  "server-version/frontend/src/modules/composite/api.ts",
  "server-version/frontend/src/modules/composite/receipt-recovery.ts",
  "server-version/frontend/src/modules/composite/report-polling.ts",
- "server-version/frontend/src/modules/composite/types.ts"
+ "server-version/frontend/src/modules/composite/types.ts",
+ "server-version/perf/current-main-v1/check-final-routes.mjs"
 ]);
 export const assessmentCapacityTests=[
  "src/__tests__/assessment-relational/runtime-consent.test.ts",
@@ -115,15 +116,22 @@ export const assessmentCapacityTests=[
  "src/__tests__/assessment-runtime/report-ready-wait.test.ts",
  "src/__tests__/assessment-runtime/reportFeedbackHints.test.ts",
  "src/__tests__/assessment-runtime/shared-scale-runtime.test.ts",
+ "src/__tests__/assessment-runtime/v32-1.architecture.test.ts",
  "src/__tests__/assessment-runtime/v32-2.postgres.integration.test.ts",
  "src/__tests__/assessment-runtime/v32-3.postgres.integration.test.ts",
  "src/__tests__/assessment-runtime/whole-pressure-coalescing.test.ts",
  "src/__tests__/assessment-runtime/whole-pressure-lifecycle.test.ts",
  "src/__tests__/assessment-runtime/whole-receipt-storage.test.ts",
  "src/__tests__/assessment-runtime/whole-submission-priority.test.ts",
+ "src/__tests__/composite/composite-analysis-snapshot.completion.test.ts",
+ "src/__tests__/composite/composite-analysis-snapshot.integration.test.ts",
  "src/__tests__/composite/composite-report-cache.test.ts",
+ "src/__tests__/composite/report-package.service.test.ts",
  "src/__tests__/composite/report.controller.test.ts",
+ "src/__tests__/composite/results.service.test.ts",
+ "src/__tests__/composite/situational-bundle.postgres.integration.test.ts",
  "src/__tests__/config/backgroundWorkers.test.ts",
+ "src/__tests__/hotpath/final-route-inventory.test.ts",
  "src/__tests__/integration/compact-assessment-storage.postgres.integration.test.ts",
  "src/__tests__/integration/report-outbox.postgres.integration.test.ts",
  "src/__tests__/integration/shared-cognitive-runtime.postgres.integration.test.ts",
@@ -136,6 +144,8 @@ export const assessmentCapacityTests=[
  "src/__tests__/scale/scale-v2.test.ts",
  "src/__tests__/services/assessmentResourceProtection.test.ts",
  "src/__tests__/services/boundedAdmissionGate.test.ts",
+ "src/__tests__/situational/scientific-promotion.postgres.integration.test.ts",
+ "src/__tests__/situational/unknown-onboarding.postgres.integration.test.ts",
  "src/__tests__/workers/compositeReportWorker.scheduler.test.ts",
  "src/__tests__/workers/worker-shutdown.test.ts"
 ];
@@ -164,6 +174,7 @@ export const assessmentCapacityFocusedTests=[
 ];
 export const assessmentCapacityTools=new Set([
  "AGENTS.md",
+ "docs/performance-optimization-v1/route-inventory.csv",
  "docs/performance/2026-10-17-release-validation.md",
  "docs/performance/2026-10-17-shared-control-storage.md",
  "docs/performance/20261016-compact-assessment-facts.md",

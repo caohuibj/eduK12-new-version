@@ -434,7 +434,7 @@ describe('ReportPackage composite boundary', () => {
       .rejects.toMatchObject({ statusCode: 400 })
     expect(mockPrisma.compositeAssessment.create).not.toHaveBeenCalled()
 
-    const historical = buildCompositeReport({
+    const historical = (await buildCompositeReport({
       id: 'attempt-scale-history',
       anonymousCode: null,
       completedAt: new Date('2026-08-25T00:00:00Z'),
@@ -449,7 +449,7 @@ describe('ReportPackage composite boundary', () => {
       }],
       cognitiveSessions: [],
       formAnswers: [],
-    })
+    }))
     expect(historical.unitReports).toEqual(expect.arrayContaining([
       expect.objectContaining({ type: 'SCALE', scaleCode: 'adexi_v1' }),
     ]))
@@ -481,7 +481,7 @@ describe('ReportPackage composite boundary', () => {
   it('uses the frozen package slot label in reports after the wrapper title changes', async () => {
     const source = frozenPackageComposite('PUBLISHED')
     source.items[0].cognitiveAssignment.title = 'Changed live wrapper title'
-    const report = buildCompositeReport({
+    const report = (await buildCompositeReport({
       id: 'attempt-1',
       anonymousCode: null,
       completedAt: null,
@@ -490,7 +490,7 @@ describe('ReportPackage composite boundary', () => {
       scaleAssessments: [],
       cognitiveSessions: [],
       formAnswers: [],
-    })
+    }))
 
     expect(report.unitReports[0].label).toBe('Reaction Time')
   })

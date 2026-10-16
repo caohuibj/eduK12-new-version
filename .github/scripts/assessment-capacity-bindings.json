@@ -392,6 +392,10 @@
     "server-version/frontend/src/modules/composite/types.ts": {
       "before": "1555d6318b4b81743060b401c940a71295b034c0",
       "after": "2a7216c8ac2f52a0c828aa5285e86797f1b25ce2"
+    },
+    "server-version/perf/current-main-v1/check-final-routes.mjs": {
+      "before": "95f82013a90b651a827e4a20ab51be8a9d90efc2",
+      "after": "e89a9fca481c6509397a496c1ccd8ef88ee214e1"
     }
   },
   "compilationReuseTransition": {
