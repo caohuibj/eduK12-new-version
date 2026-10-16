@@ -17,6 +17,9 @@ const databaseUrl = buildDatabaseUrl(process.env.DATABASE_URL)
 // SQL text or parameters in production metrics.
 const collectSqlEvents = sqlEventCollectionEnabled()
 const prismaConfig = {
+  // Production requests need structured error codes, not a captured JS callsite
+  // for every successful database call. Keep development diagnostics unchanged.
+  ...(process.env.NODE_ENV === 'production' ? { errorFormat: 'minimal' as const } : {}),
   log: collectSqlEvents
     ? ([{ level: 'query', emit: 'event' }, { level: 'error', emit: 'stdout' }, { level: 'warn', emit: 'stdout' }] as const)
     : process.env.NODE_ENV === 'development'

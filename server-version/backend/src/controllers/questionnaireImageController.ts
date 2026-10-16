@@ -2,7 +2,7 @@ import type { Request, Response } from 'express'
 import { legacyQuestionnaireDb as prisma } from '../services/legacyQuestionnaireDatabase'
 import { validateContextFormItems } from '../modules/assessment-context'
 import { formSectionIdentityHash } from '../modules/assessment-runtime/attempt-runtime'
-import { decryptFrozenScaleRuntimeSnapshot } from '../modules/assessment-runtime/runtime-snapshot'
+import { loadFrozenScaleRuntimeSnapshot } from '../modules/assessment-runtime/runtime-snapshot'
 import {
   ensureQuestionnaireFormAdmissionAtDelivery,
 } from '../modules/assessment-runtime/form-admission.service'
@@ -81,7 +81,7 @@ const serveScaleImage = async (input: {
   })
   if (!child) return notFound(input.res, '量表测评记录不存在')
   if (!child.runtimeSnapshotEncrypted) return error(input.res, '量表冻结内容不可用')
-  const snapshot = decryptFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted)
+  const snapshot = (await loadFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted))
   await serveFrozenScaleAssessmentImage({ snapshot, assetId: input.assetId, res: input.res })
   return undefined
 }

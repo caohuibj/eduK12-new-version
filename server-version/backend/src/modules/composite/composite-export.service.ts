@@ -1,3 +1,5 @@
+import { loadScaleResult } from '../scale/scale-workflow.service'
+import { loadScaleAnswers } from '../scale/scale-workflow.service'
 import { compositeForbidden } from './composite.errors'
 import { wideExportPackage } from '../../services/wideExportPackage'
 import { exportRoot } from '../../services/exportArtifactService'
@@ -375,8 +377,8 @@ export const getExportData = async (
         const definition = item.scale.definition && typeof item.scale.definition === 'object' ? item.scale.definition as any : null
         const v2Items = Array.isArray(definition?.items) ? definition.items : []
         const v2Scores = Array.isArray(definition?.scoring?.scores) ? definition.scoring.scores : []
-        const scaleResult = decode<Record<string, any>>(result?.result)
-        const decodedAnswers = readScaleAnswers(result?.answers)
+        const scaleResult = (await loadScaleResult(result?.result, result)).result
+        const decodedAnswers = (await loadScaleAnswers(result?.answers, result))
         const answers = detail === 'full' ? decodedAnswers.answers : []
         const answerMap = new Map<string, any>(answers.map((answer) => [answer.itemCode, answer]))
         const itemScoreMap = new Map<string, any>((scaleResult?.itemScores || []).map((answer: any) => [answer.itemCode, answer]))

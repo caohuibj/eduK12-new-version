@@ -1,3 +1,4 @@
+import { loadStoredCanonicalUnitResult } from '../assessment-runtime/compact-assessment-storage'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { parseStoredCanonicalUnitResult } from '../assessment-runtime/persistence'
 import {
@@ -73,7 +74,7 @@ const createCompositeCanonicalResultSource = (
         }
         let envelope
         try {
-          envelope = parseStoredCanonicalUnitResult(row.canonicalResultEncrypted)
+          envelope = await loadStoredCanonicalUnitResult(row.canonicalResultEncrypted, db)
         } catch {
           return relationalFail('RELATIONAL_RUNTIME_BINDING', 'stored canonical unit result is invalid')
         }

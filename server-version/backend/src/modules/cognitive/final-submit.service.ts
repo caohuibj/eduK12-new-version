@@ -1,3 +1,5 @@
+import { encryptCompactCognitivePayload } from './cognitive.security'
+import { sharedControlWritesEnabled } from '../assessment-runtime/shared-control-records'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import {
@@ -15,7 +17,7 @@ import {
 } from '../../services/instrumentFinalSubmit'
 import { loadFrozenMeasurementContext } from './profile-freeze'
 import { decryptCognitivePayload, encryptCognitivePayload, hashTrialPayload } from './cognitive.security'
-import { readCognitiveSessionConfig } from './session.service'
+import { loadCognitiveSessionConfig } from './session.service'
 import { lockSession } from './session-lock'
 import { getCognitiveV2TaskDefinition } from './v2/registry'
 import { parseTrialEnvelope } from './v2/trial-envelope'
@@ -67,7 +69,7 @@ type FinalizedCognitiveData = {
 }
 
 type PreparedCognitivePayload = {
-  snapshot: NonNullable<ReturnType<typeof readCognitiveSessionConfig>['snapshot']>
+  snapshot: NonNullable<Awaited<ReturnType<typeof loadCognitiveSessionConfig>>['snapshot']>
   definition: any
   trials: TrialEnvelope[]
   payloadHash: string
@@ -150,13 +152,13 @@ const normalizedTrials = (definition: any, values: unknown[]): TrialEnvelope[] =
  * because it lets a completed submission be acknowledged by idempotent
  * replay before any context-dependent work is attempted.
  */
-const prepareCognitivePayload = (
+const prepareCognitivePayload = async (
   session: any,
   input: FinalCognitiveSubmitInput,
-): PreparedCognitivePayload => {
-  const storedConfig = measureRequestPhaseSync(
+): Promise<PreparedCognitivePayload> => {
+  const storedConfig = await measureRequestPhase(
     'final_submit_definition_prepare',
-    () => readCognitiveSessionConfig(session.configSnapshotEncrypted),
+    () => loadCognitiveSessionConfig(session.configSnapshotEncrypted),
   )
   if (!storedConfig.snapshot) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '该认知记录不是最终提交模式，请重启后重新作答', 409)
@@ -186,8 +188,9 @@ const prepareCognitivePayload = (
 const prepareFinalCognitiveData = async (
   session: any,
   input: FinalCognitiveSubmitInput,
-  preparedPayload: PreparedCognitivePayload = prepareCognitivePayload(session, input),
+  preparedPayload: PreparedCognitivePayload | undefined = undefined,
 ): Promise<FinalizedCognitiveData> => {
+  preparedPayload ??= await prepareCognitivePayload(session,input)
   const { snapshot, definition, trials, payloadHash } = preparedPayload
   let contextState
   try {
@@ -278,7 +281,7 @@ const prepareFinalCognitiveData = async (
       payloadEncrypted: encryptCognitivePayload(trial),
       payloadHash: hashTrialPayload(trial),
     })),
-    resultSnapshotEncrypted: encryptCognitivePayload(resultSnapshot),
+    resultSnapshotEncrypted: (sharedControlWritesEnabled()?encryptCompactCognitivePayload(resultSnapshot):encryptCognitivePayload(resultSnapshot)),
     metricsEncrypted: encryptCognitivePayload(scored.metrics),
     qualityFlagsEncrypted: encryptCognitivePayload(scored.quality.flags),
   }))
@@ -347,7 +350,7 @@ const submitWithPrincipalImpl = async (input: FinalCognitiveSubmitInput) => {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评上下文版本已变化，请重试', 409)
   }
   const sessionForPreparation = { ...session, requiresFrozenContext }
-  const payload = measureRequestPhaseSync('final_submit_non_db_compute', () => prepareCognitivePayload(sessionForPreparation, input))
+  const payload = await measureRequestPhase('final_submit_payload_validation', () => prepareCognitivePayload(sessionForPreparation, input))
   if (session.status === 'COMPLETED') {
     const replay = assertSubmissionReplay(session, submissionId, payload.payloadHash)
     if (replay === 'replay') {

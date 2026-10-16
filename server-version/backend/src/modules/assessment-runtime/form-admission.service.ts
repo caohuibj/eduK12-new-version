@@ -1,3 +1,4 @@
+import { loadStoredUnitAdmission } from './unit-admission'
 import { prisma } from '../../config/database'
 import { assertAttemptEpoch, assertFinalOnly, InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import { readCompositeAttemptContext, readQuestionnaireAssessmentContext } from '../../services/assessmentContextService'
@@ -17,7 +18,7 @@ import {
   readStoredUnitAdmission,
 } from './unit-admission'
 import { formSectionIdentityHash } from './attempt-runtime'
-import { formSectionSlotKey, getFrozenActiveSlot, type FrozenActiveSlotV1 } from './slot-set'
+import { formSectionSlotKey, loadFrozenActiveSlot, type FrozenActiveSlotV1 } from './slot-set'
 import { retainFrozenFormAdmissionImages } from './form-image.adapter'
 
 const hasContextSection = (sections: Array<{ contextSection: boolean; items: Array<{ contextKey: string | null }> }>): boolean => (
@@ -96,16 +97,16 @@ const asDefinition = (definition: SectionRow | CompositeSection): Record<string,
   JSON.parse(JSON.stringify(definition)) as Record<string, unknown>
 )
 
-const readRequiredFormSlot = (input: {
+const readRequiredFormSlot = async (input: {
   encrypted: string | null
   storedHash: string | null
   attemptEpoch: number
   sectionId: string
   identityHash: string
-}): FrozenActiveSlotV1 => {
+}): Promise<FrozenActiveSlotV1> => {
   let slot: FrozenActiveSlotV1
   try {
-    slot = getFrozenActiveSlot({
+    slot = await loadFrozenActiveSlot({
       encrypted: input.encrypted,
       storedHash: input.storedHash,
       attemptEpoch: input.attemptEpoch,
@@ -150,13 +151,15 @@ export const readStoredFormAdmission = (row: {
 }): FrozenUnitAdmissionV1 | null => (
   readStoredUnitAdmission(row, '表单区段准入快照无法读取，请重启后重新作答')
 )
+export const loadStoredFormAdmission = (row: { frozenAdmissionSnapshotEncrypted: string | null; frozenAdmissionSnapshotHash: string | null }): Promise<FrozenUnitAdmissionV1 | null> => loadStoredUnitAdmission(row, '表单区段准入快照无法读取，请重启后重新作答')
+
 
 const persistQuestionnaireFormAdmission = async (
   attemptId: string,
   snapshot: FrozenUnitAdmissionV1,
 ): Promise<FrozenUnitAdmissionV1> => prisma.$transaction(async (tx) => {
   const admission = await persistAdmissionOnce({
-    snapshot,
+    snapshot, db:tx,
     writeIfEmpty: (persisted) => tx.questionnaireFormSectionAttempt.updateMany({
       where: { id: attemptId, frozenAdmissionSnapshotHash: null },
       data: persisted,
@@ -177,7 +180,7 @@ const persistCompositeFormAdmission = async (
   snapshot: FrozenUnitAdmissionV1,
 ): Promise<FrozenUnitAdmissionV1> => prisma.$transaction(async (tx) => {
   const admission = await persistAdmissionOnce({
-    snapshot,
+    snapshot, db:tx,
     writeIfEmpty: (persisted) => tx.compositeFormSectionAttempt.updateMany({
       where: { id: attemptId, frozenAdmissionSnapshotHash: null },
       data: persisted,
@@ -252,7 +255,7 @@ export const activateQuestionnaireFormAdmission = async (input: {
     frozenAdmissionSnapshotHash: string | null
   }
 }): Promise<FrozenUnitAdmissionV1> => {
-  const stored = readStoredFormAdmission(input.child)
+  const stored = await loadStoredFormAdmission(input.child)
   if (stored) return stored
   const parent = input.parent
   if (parent.runtimeGeneration !== 'UNIFIED_V1') {
@@ -265,7 +268,7 @@ export const activateQuestionnaireFormAdmission = async (input: {
     kind: 'questionnaire',
     definition: input.definition,
   })
-  const slot = readRequiredFormSlot({
+  const slot = await readRequiredFormSlot({
     encrypted: parent.frozenActiveSlotSetEncrypted,
     storedHash: parent.frozenActiveSlotSetHash,
     attemptEpoch: parent.attemptEpoch,
@@ -310,7 +313,7 @@ export const activateCompositeFormAdmission = async (input: {
     frozenAdmissionSnapshotHash: string | null
   }
 }): Promise<FrozenUnitAdmissionV1> => {
-  const stored = readStoredFormAdmission(input.child)
+  const stored = await loadStoredFormAdmission(input.child)
   if (stored) return stored
   const parent = input.parent
   if (parent.runtimeGeneration !== 'UNIFIED_V1') {
@@ -323,7 +326,7 @@ export const activateCompositeFormAdmission = async (input: {
     kind: 'composite',
     definition: input.definition,
   })
-  const slot = readRequiredFormSlot({
+  const slot = await readRequiredFormSlot({
     encrypted: parent.frozenActiveSlotSetEncrypted,
     storedHash: parent.frozenActiveSlotSetHash,
     attemptEpoch: parent.attemptEpoch,
@@ -374,7 +377,7 @@ export const ensureQuestionnaireFormAdmissionAtDelivery = async (
     },
   })
   if (existing) {
-    const stored = readStoredFormAdmission(existing)
+    const stored = await loadStoredFormAdmission(existing)
     if (stored) return stored
   }
 
@@ -417,7 +420,7 @@ export const ensureCompositeFormAdmissionAtDelivery = async (
     },
   })
   if (existing) {
-    const stored = readStoredFormAdmission(existing)
+    const stored = await loadStoredFormAdmission(existing)
     if (stored) return stored
   }
 
@@ -473,7 +476,7 @@ export const activateStoredOrCatalogQuestionnaireFormAdmission = async (input: {
     frozenAdmissionSnapshotHash: string | null
   }
 }): Promise<FrozenUnitAdmissionV1> => {
-  const stored = readStoredFormAdmission(input.child)
+  const stored = await loadStoredFormAdmission(input.child)
   if (stored) return stored
   const parent: QuestionnaireFormAdmissionParent | null = await prisma.questionnaireAssessment.findUnique({
     where: { id: input.parentId },
@@ -503,7 +506,7 @@ export const activateStoredOrCatalogCompositeFormAdmission = async (input: {
     frozenAdmissionSnapshotHash: string | null
   }
 }): Promise<FrozenUnitAdmissionV1> => {
-  const stored = readStoredFormAdmission(input.child)
+  const stored = await loadStoredFormAdmission(input.child)
   if (stored) return stored
   const parent: CompositeFormAdmissionParent | null = await prisma.compositeAssessmentAttempt.findUnique({
     where: { id: input.parentId },

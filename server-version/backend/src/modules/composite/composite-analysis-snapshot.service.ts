@@ -1,9 +1,11 @@
+import { resolveStoredScaleResult } from '../assessment-runtime/compact-assessment-storage'
 import { createHash } from 'crypto'
 import {
   decryptCognitivePayload,
   encryptCognitivePayload,
 } from '../cognitive/cognitive.security'
 import { hashResolvedConfig, readFrozenReport } from '../cognitive/profile-freeze'
+import { loadSharedCognitiveRuntime } from '../assessment-runtime/shared-cognitive-runtime'
 import { sessionConfigFromStoredValue } from '../cognitive/v2/session-snapshot'
 import { parseCognitiveResultSnapshot } from '../cognitive/v2/result-snapshot'
 import { parseScaleResultV2, type ScaleResultV2 } from '../scale/scale-result'
@@ -715,6 +717,7 @@ const validateScaleResultProvenance = (
 const buildFrozenModuleResults = (
   attempt: PackageAnalysisAttemptInput,
   packageSnapshot: FrozenReportPackageSnapshot,
+  sharedConfigs: ReadonlyMap<string, unknown> = new Map(),
 ): FrozenCognitiveModuleResult[] => {
   const protocol = packageSnapshot.analysisProtocolSnapshot.protocolDefinition
   if (
@@ -801,10 +804,9 @@ const buildFrozenModuleResults = (
     ) {
       throw new Error(`报告包槽位 Session 版本不匹配：${slot.key}`)
     }
-    const storedSessionConfig = decryptCognitivePayload<unknown>(
+    const sessionConfig = sharedConfigs.has(session.id) ? sharedConfigs.get(session.id) : sessionConfigFromStoredValue(decryptCognitivePayload(
       requireCipher(session.configSnapshotEncrypted, `报告包槽位 Session 配置快照：${slot.key}`),
-    )
-    const sessionConfig = sessionConfigFromStoredValue(storedSessionConfig).config
+    )).config
     if (hashResolvedConfig(sessionConfig) !== measurement.resolvedConfigHash) {
       throw new Error(`报告包槽位 Session 配置 hash 不匹配：${slot.key}`)
     }
@@ -955,6 +957,7 @@ const buildFrozenScaleResults = (
  */
 export const buildPackageAnalysisForAttempt = (
   attempt: PackageAnalysisAttemptInput,
+  sharedConfigs: ReadonlyMap<string, unknown> = new Map(),
 ): BuiltPackageAnalysis | null => {
   const assessment = attempt.compositeAssessment
   const packageFields = [
@@ -985,7 +988,7 @@ export const buildPackageAnalysisForAttempt = (
   if (attempt.compositeAssessment.items.length !== expectedItemCount) {
     throw new Error('综合测评实例槽位数量与冻结报告包不匹配')
   }
-  const moduleResults = buildFrozenModuleResults(attempt, packageSnapshot)
+  const moduleResults = buildFrozenModuleResults(attempt, packageSnapshot, sharedConfigs)
   const scaleResults = buildFrozenScaleResults(attempt, packageSnapshot)
   const analysis = buildPackageCognitiveAnalysis({
     packageSnapshot,
@@ -1002,4 +1005,19 @@ export const buildPackageAnalysisForAttempt = (
     reportSchemaVersion: analysis.reportSchemaVersion,
   })
   return { packageSnapshot, moduleResults, scaleResults, analysis, inputFingerprint }
+}
+
+/** Only explicit analysis/completion needs the full source view; this never scores again. */
+export const loadPackageAnalysisForAttempt = async (attempt: PackageAnalysisAttemptInput,
+  db?: import('../assessment-runtime/shared-scale-runtime').SharedScaleArtifactDb): Promise<BuiltPackageAnalysis | null> => {
+  if (!attempt.compositeAssessment.reportPackageSnapshotEncrypted) return buildPackageAnalysisForAttempt(attempt)
+  const configs = new Map<string, unknown>()
+  const [scaleAssessments] = await Promise.all([
+    Promise.all((attempt.scaleAssessments ?? []).map(async row => ({ ...row,
+      result: await resolveStoredScaleResult(row.result, { record: row, full: true, db }) }))),
+    Promise.all(attempt.cognitiveSessions.filter(session => session.configSnapshotEncrypted?.startsWith('ekr1:')).map(async session => {
+      configs.set(session.id, (await loadSharedCognitiveRuntime(session.configSnapshotEncrypted!, db)).config)
+    })),
+  ])
+  return buildPackageAnalysisForAttempt({ ...attempt, scaleAssessments }, configs)
 }

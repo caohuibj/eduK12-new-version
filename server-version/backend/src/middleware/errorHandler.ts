@@ -1,8 +1,12 @@
 import { Request, Response, NextFunction } from 'express'
-import { error } from '../utils/response'
+import { error, instrumentError } from '../utils/response'
 import { logger } from '../utils/logger'
 
-export const errorHandler = (err: any, req: Request, res: Response, _next: NextFunction) => {
+export const errorHandler = (err: any, req: Request & { requestId?: string }, res: Response, _next: NextFunction) => {
+  if (err?.code === 'ASSESSMENT_RUNTIME_UNAVAILABLE' && err?.statusCode === 503) {
+    res.setHeader('Retry-After', '5')
+    return instrumentError(res, 'ASSESSMENT_RUNTIME_UNAVAILABLE', '测评内容暂时无法读取，作答会保留，请稍后重试。', 503)
+  }
   const rawStatusCode = Number(err?.statusCode)
   const statusCode = Number.isInteger(rawStatusCode) && rawStatusCode >= 400 && rawStatusCode < 600
     ? rawStatusCode
@@ -36,6 +40,6 @@ export const errorHandler = (err: any, req: Request, res: Response, _next: NextF
   return error(res, message, -1, statusCode)
 }
 
-export const notFoundHandler = (req: Request, res: Response) => {
+export const notFoundHandler = (req: Request & { requestId?: string }, res: Response) => {
   return error(res, '接口不存在', -1, 404)
 }

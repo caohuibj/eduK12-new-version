@@ -21,3 +21,19 @@ describe('bounded faster report feedback', () => {
   })
 
 })
+
+
+describe('bounded server readiness waits', () => {
+  it('registers the next bounded wait without another multi-second sleep', () => {
+    expect(reportPollingDelayMs(2, 0.1, () => 0, 'QUEUED', 4000)).toBe(100)
+    expect(reportPollingDelayMs(2, 0.1, () => 1, 'QUEUED', 4000)).toBe(200)
+  })
+  it('honors Retry-After even while the server offers readiness waits', () => {
+    expect(reportPollingDelayMs(2, 5, () => 0, 'QUEUED', 4000)).toBe(5000)
+    expect(reportPollingDelayMs(2, 5, () => 1, 'FAST_START', 4000)).toBe(5100)
+  })
+  it('keeps the original fallback and legacy server floors', () => {
+    expect(reportPollingDelayMs(2, 2, () => 0, 'QUEUED', 0)).toBe(2500)
+    expect(reportPollingDelayMs(2, 5, () => 0, 'LEGACY', 4000)).toBe(5000)
+  })
+})

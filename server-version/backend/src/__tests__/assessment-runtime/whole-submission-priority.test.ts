@@ -1,0 +1,81 @@
+import { describe, expect, it } from 'vitest'
+import { ReportClaimPriority, WholeSubmissionPressure } from '../../services/wholeSubmissionPriority'
+const source = 'a'.repeat(32)
+const hint = (seq = 1, busy = true, identity = source) => JSON.stringify({ v: 1, kind: 'pressure', source: identity, seq, busy, active: busy ? 20 : 0 })
+describe('bounded whole-submission priority', () => {
+  it('leaves normal and single-person work immediate, with idempotent in-flight release', () => {
+    let at = 0; const pressure = new WholeSubmissionPressure(() => at), policy = new ReportClaimPriority(() => at)
+    const end = pressure.begin(); expect(pressure.snapshot(100).busy).toBe(false)
+    at = 50; end(); end(); expect(pressure.active).toBe(0)
+    expect(policy.decision(2)).toMatchObject({ mode: 'normal', limit: 2, delayMs: 0 })
+  })
+  it('holds new claims only for a bounded burst then guarantees report progress during sustained pressure', () => {
+    let at = 0; const policy = new ReportClaimPriority(() => at)
+    policy.receive(hint()); expect(policy.decision(2)).toMatchObject({ mode: 'yield', limit: 0 })
+    at = 1000; policy.receive(hint(2)); expect(policy.decision(2).mode).toBe('yield')
+    at = 2001; policy.receive(hint(3)); expect(policy.decision(2)).toMatchObject({ mode: 'minimum', limit: 1, delayMs: 0 })
+    policy.claimed(); at = 2100; expect(policy.decision(2).delayMs).toBe(0)
+    at = 2501; policy.receive(hint(4)); expect(policy.decision(2).delayMs).toBe(0)
+    at = 20000; policy.receive(hint(5)); expect(policy.decision(2).mode).toBe('minimum')
+  })
+  it('ramps after a real quiet signal and fails open after expired or lost signals', () => {
+    let at = 0; const policy = new ReportClaimPriority(() => at)
+    policy.receive(hint()); policy.decision(2)
+    at = 100; policy.receive(hint(2, false)); expect(policy.decision(2)).toMatchObject({ mode: 'recover', limit: 1 })
+    at = 401; expect(policy.decision(2).mode).toBe('normal')
+    policy.receive(hint(3)); expect(policy.decision(2).mode).toBe('minimum')
+    at = 1902; expect(policy.decision(2)).toMatchObject({ mode: 'normal', limit: 2, sources: 0 })
+  })
+  it('bounds and validates advisory memory, rejects replay and preserves a newer quiet state', () => {
+    const policy = new ReportClaimPriority(() => 0)
+    for (let n = 0; n < 40; n++) policy.receive(hint(2, false, n.toString(16).padStart(32, '0')))
+    policy.receive(hint(1, true, '0'.repeat(32)))
+    for (const value of ['null', '[]', 'broken', '{}', 'x'.repeat(351), hint(-1), JSON.stringify({ v: 1, kind: 'pressure', source, seq: 5, active: -1, busy: true })]) policy.receive(value)
+    expect(policy.decision(2)).toMatchObject({ mode: 'normal', sources: 32 })
+  })
+  it('coalesces short gaps using quiet hysteresis and only considers authenticated active submissions', () => {
+    let at = 0; const pressure = new WholeSubmissionPressure(() => at)
+    const ends = Array.from({ length: 4 }, () => pressure.begin()); expect(pressure.snapshot().busy).toBe(true)
+    for (const end of ends) end(); at = 199; expect(pressure.snapshot().busy).toBe(true)
+    at = 201; expect(pressure.snapshot().busy).toBe(false)
+    const a = pressure.begin(), b = pressure.begin(); expect(pressure.snapshot(100).busy).toBe(true)
+    a(); b(); at += 201; expect(pressure.snapshot().busy).toBe(false)
+  })
+  it('limits private A/B overrides to explicit isolated tests and automatically restores the configured policy', () => {
+    let at = 0; const prod = new ReportClaimPriority(() => at), test = new ReportClaimPriority(() => at, true)
+    const off = JSON.stringify({ v: 1, kind: 'control', enabled: false, ttlMs: 1000 })
+    for (const p of [prod, test]) { p.receive(hint()); p.receive(off) }
+    expect(prod.decision(2).mode).toBe('yield'); expect(test.decision(2).mode).toBe('disabled')
+    at = 1001; expect(test.decision(2).mode).toBe('yield')
+  })
+  it('recovers full report capacity under a continuous light stream following a burst, then yields again for a new burst', () => {
+    let at = 0; const pressure = new WholeSubmissionPressure(() => at), policy = new ReportClaimPriority(() => at)
+    const ends = Array.from({ length: 4 }, () => pressure.begin()); policy.receive(hint(1, pressure.snapshot().busy)); expect(policy.decision(2).mode).toBe('yield')
+    for (const end of ends.slice(1)) end()
+    // One request remains throughout; there is never a zero-in-flight interval.
+    at = 201; const light = pressure.begin(); light()
+    expect(pressure.snapshot().busy).toBe(false)
+    policy.receive(hint(2, pressure.snapshot().busy)); expect(policy.decision(2).mode).toBe('recover')
+    at = 502; expect(policy.decision(2).mode).toBe('normal')
+    Array.from({ length: 3 }, () => pressure.begin())
+    policy.receive(hint(3, pressure.snapshot().busy)); expect(policy.decision(2).mode).toBe('minimum')
+  })
+
+  it('restores existing slots during sustained responsive traffic without the 500ms throughput cap', () => {
+    let at = 0; const policy = new ReportClaimPriority(() => at)
+    const send = (seq: number, lagMs: number) => policy.receive(JSON.stringify({ v: 1, kind: 'pressure', source, seq, busy: true, active: 20, lagMs }))
+    send(1, 20); expect(policy.decision(2).limit).toBe(0)
+    at = 2001; send(2, 20); expect(policy.decision(2)).toMatchObject({ mode: 'sustained', limit: 2, delayMs: 0 })
+    policy.claimed(); at += 1; expect(policy.decision(2).delayMs).toBe(0)
+    send(3, 120); expect(policy.decision(2)).toMatchObject({ mode: 'minimum', limit: 1, delayMs: 0 })
+    send(4, 20); expect(policy.decision(2).limit).toBe(2)
+  })
+  it('bounds repeated burst protection and never cancels a running task', () => {
+    let at = 0; const policy = new ReportClaimPriority(() => at)
+    policy.receive(hint()); expect(policy.decision(2).mode).toBe('yield')
+    at = 100; policy.receive(hint(2, false)); policy.decision(2)
+    at = 401; policy.receive(hint(3)); expect(policy.decision(2)).toMatchObject({ mode: 'minimum', limit: 1, delayMs: 0 })
+    at = 11000; policy.receive(hint(4, false)); policy.decision(2)
+    at = 11301; policy.receive(hint(5)); expect(policy.decision(2).mode).toBe('yield')
+  })
+})

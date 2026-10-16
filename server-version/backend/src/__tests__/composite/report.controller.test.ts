@@ -1,8 +1,9 @@
+import { RelationalAssessmentError } from '../../modules/assessment-relational/errors'
 import { QuestionnaireCompletionAdmissionBusyError } from '../../services/questionnaireCompletionAdmission'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { UserRole } from '@prisma/client'
 
-const { mockService, mockBuildExport } = vi.hoisted(() => ({
+const { mockService, mockBuildExport, mockWholeSubmit } = vi.hoisted(() => ({
   mockService: {
     isCompositeError: vi.fn(() => false),
     getReport: vi.fn(),
@@ -15,9 +16,10 @@ const { mockService, mockBuildExport } = vi.hoisted(() => ({
     listPackageAnalysisSnapshotsForTeacher: vi.fn(),
     reanalyzePackageAttempt: vi.fn(),
   },
-  mockBuildExport: vi.fn(),
+  mockBuildExport: vi.fn(), mockWholeSubmit: vi.fn(),
 }))
 
+vi.mock('../../modules/composite/whole-questionnaire.service', () => ({ submitWholeQuestionnaire: mockWholeSubmit, wholeQuestionnaireSubmitSchema: { parse: (value: unknown) => value } }))
 vi.mock('../../modules/composite/composite.service', () => mockService)
 vi.mock('../../modules/composite/composite-export.service', () => ({ buildCompositeAnalysisExport: mockBuildExport }))
 
@@ -173,4 +175,17 @@ describe('PR9 composite report controller', () => {
     expect(missing.status).toHaveBeenCalledWith(400)
     expect(mockService.getAnalysisExportForParticipant).toHaveBeenCalledTimes(1)
   })
+  it.each([['RELATIONAL_CONSENT_REQUIRED', 409], ['RELATIONAL_CONSENT_BINDING', 409], ['RELATIONAL_ASSIGNMENT_ACTOR', 403], ['RELATIONAL_RUNTIME_BINDING', 409]] as const)('preserves whole-submit consent denial %s as %i after the check moves inside admission', async (code, status) => {
+    mockWholeSubmit.mockRejectedValueOnce(new RelationalAssessmentError(code, 'synthetic denial'))
+    const res = response()
+    await compositeController.wholeSubmit({ params: { attemptId: 'attempt' }, user: { userId: 'participant' }, body: {} } as any, res)
+    expect(res.status).toHaveBeenCalledWith(status); expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code }))
+  })
+  it('still reports unexpected whole-submit defects as 500', async () => {
+    mockWholeSubmit.mockRejectedValueOnce(new Error('synthetic defect'))
+    const res = response()
+    await compositeController.wholeSubmit({ params: { attemptId: 'attempt' }, user: { userId: 'participant' }, body: {} } as any, res)
+    expect(res.status).toHaveBeenCalledWith(500)
+  })
+
 })

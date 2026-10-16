@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { RelationalAssessmentError } from '../../modules/assessment-relational/errors'
 import { createRelationalRuntimeConsentAuthority } from '../../modules/assessment-relational/runtime-consent'
 import type { RelationalAssignmentRecordV1 } from '../../modules/assessment-relational/types'
@@ -149,4 +149,17 @@ describe('relational runtime FINAL consent authority', () => {
     await expect(authority({ record: completed, resolvedConsentId: null }).assertCompositeFinal('attempt-1', 'parent-1'))
       .resolves.toBeUndefined()
   })
+  it('reuses a correctly bound fresh header without re-reading and still validates live consent', async () => {
+    const read = vi.fn().mockRejectedValue(new Error('UNEXPECTED_HEADER_REREAD'))
+    const record = assignment(), resolve = vi.fn().mockResolvedValue({ consentId: 'accepted-now', acceptedAt: '2026-10-15T00:00:00.000Z' })
+    const service = createRelationalRuntimeConsentAuthority({ db: { compositeAssessmentAttempt: { findUnique: read }, cognitiveSession: { findUnique: vi.fn() } },
+      assignments: { findById: async () => record, resolveAcceptedConsent: resolve } })
+    const header = { id: 'attempt', userId: 'parent-1', assignmentRef: record.assignmentId, consentId: 'accepted-now' }
+    await service.assertCompositeFinal('attempt', 'parent-1', header); expect(read).not.toHaveBeenCalled(); expect(resolve).toHaveBeenCalledOnce()
+    expect(await failCode(() => service.assertCompositeFinal('attempt', 'wrong-actor', header))).toBe('RELATIONAL_ASSIGNMENT_ACTOR')
+    resolve.mockResolvedValue(null)
+    expect(await failCode(() => service.assertCompositeFinal('attempt', 'parent-1', header))).toBe('RELATIONAL_CONSENT_REQUIRED')
+    expect(await failCode(() => service.assertCompositeFinal('other-attempt', 'parent-1', header))).toBe('RELATIONAL_RUNTIME_BINDING')
+  })
+
 })

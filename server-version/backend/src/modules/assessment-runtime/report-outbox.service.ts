@@ -1,7 +1,9 @@
+import { detachedWholeReceiptsEnabled } from './whole-receipt-storage'
+import { registerWholeReceiptAtomic } from './whole-receipt-atomic'
 import { markAssessmentTimeline, traceAssessmentPhase, recordAssessmentReportClaim } from '../../services/runtimeObservability'
 import type { WholeReceiptExecution } from '../composite/whole-questionnaire.service'
 import { randomUUID } from 'node:crypto'
-import { decryptFrozenActiveSlotSet } from './slot-set'
+import { loadFrozenActiveSlotSet } from './slot-set'
 import { evaluateCompleteness } from './unified-aggregate'
 import type { CompositeReportJob, Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -16,6 +18,11 @@ export const REPORT_PARENT_SELECT = {
   assignmentRef: true, deliveryCourseId: true,
   compositeAssessment: { select: { productKind: true, reportPackageKey: true, analysisProtocolKey: true } },
 } as const
+
+/** A lost processing lease never cancels an already accepted answer receipt. */
+export class ReportProcessingLeaseLostError extends Error {
+  constructor() { super('REPORT_PROCESSING_LEASE_LOST'); this.name = 'ReportProcessingLeaseLostError' }
+}
 
 export type ReportJobIdentity = {
   attemptEpoch: number
@@ -37,6 +44,13 @@ export const assertReportJobIdentity = (parent: {
 
 export const readCompositeReportJob = async (attemptId: string, attemptEpoch: number) => (
   prisma.compositeReportJob.findUnique({ where: { attemptId_attemptEpoch: { attemptId, attemptEpoch } } })
+)
+
+/** HTTP materialization never needs the sealed answers, manifest or lease. */
+export const readCompositeReportMaterialization = async (attemptId: string, attemptEpoch: number) => (
+  prisma.compositeReportJob.findUnique({ where: { attemptId_attemptEpoch: { attemptId, attemptEpoch } },
+    select: { status: true, reportEncrypted: true, attemptEpoch: true, slotSetHash: true,
+      contextHash: true, aggregateInputHash: true } })
 )
 
 export const readCompositeReportJobHeader = async (attemptId: string, attemptEpoch: number) => (
@@ -86,7 +100,7 @@ export const enqueueCompositeReportForUnit = async (
         AND job."status" = 'PROCESSING' AND job."lease_token" = ${receipt.leaseToken}
         AND job."lease_expires_at" > (CURRENT_TIMESTAMP AT TIME ZONE 'UTC') FOR UPDATE OF job
     `
-    if (!rows.length) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '整份交卷处理租约或冻结绑定已变化', 409)
+    if (!rows.length) throw new ReportProcessingLeaseLostError()
     return rows[0].id
   }
   const parent = await tx.compositeAssessmentAttempt.findUnique({
@@ -140,7 +154,7 @@ const enqueueBoundReport = async (tx: Prisma.TransactionClient, parent: BoundRep
     // no incomplete scan consumes a global permit or wakes a report worker.
     if (waitForCompletedUnits) {
       if (!parent.frozenActiveSlotSetEncrypted) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '报告冻结单元缺失', 409)
-      const slots = decryptFrozenActiveSlotSet(parent.frozenActiveSlotSetEncrypted)
+      const slots = await loadFrozenActiveSlotSet(parent.frozenActiveSlotSetEncrypted)
       if (slots.snapshotHash !== parent.frozenActiveSlotSetHash || slots.attemptEpoch !== parent.attemptEpoch) {
         throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '报告冻结单元绑定不匹配', 409)
       }
@@ -164,12 +178,23 @@ const enqueueBoundReport = async (tx: Prisma.TransactionClient, parent: BoundRep
 /** Owner authorization belongs to the caller; retry uses the current frozen binding. */
 export const retryCompositeReport = async (parent: BoundReportParent): Promise<void> => {
   await prisma.$transaction(async tx => {
-    const rows = await tx.$queryRaw<Array<{ status: string }>>`
-      SELECT "status" FROM "composite_report_jobs"
-      WHERE "attempt_id" = ${parent.id} AND "attempt_epoch" = ${parent.attemptEpoch} FOR UPDATE
+    const rows = await tx.$queryRaw<Array<{ status: string; wholeSubmissionId: string | null }>>`
+      SELECT "status", "whole_submission_id" AS "wholeSubmissionId" FROM "composite_report_jobs"
+      WHERE "attempt_id" = ${parent.id} AND "attempt_epoch" = ${parent.attemptEpoch}
+        AND "slot_set_hash" = ${parent.frozenActiveSlotSetHash}
+        AND "context_hash" IS NOT DISTINCT FROM ${parent.contextSnapshotHash} FOR UPDATE
     `
     if (!rows.length) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '没有可恢复的报告任务', 404)
     if (rows[0].status !== 'FAILED') return
+    if (rows[0].wholeSubmissionId) {
+      await tx.compositeReportJob.updateMany({
+        where: { attemptId: parent.id, attemptEpoch: parent.attemptEpoch, status: 'FAILED',
+          slotSetHash: parent.frozenActiveSlotSetHash!, contextHash: parent.contextSnapshotHash },
+        data: { status: 'PENDING', attemptCount: 0, errorCode: null, nextAttemptAt: new Date(),
+          leaseToken: null, leaseExpiresAt: null },
+      })
+      return
+    }
     await enqueueBoundReport(tx, parent)
   }, { isolationLevel: 'ReadCommitted' })
 }
@@ -178,7 +203,7 @@ export const claimCompositeReportJob = async (): Promise<CompositeReportJob | nu
   const settings = assessmentReportConfig()
   const leaseToken = randomUUID()
   const claimRequested = process.hrtime.bigint()
-  const rows = await prisma.$queryRaw<Array<{ id: string }>>`
+  const rows = await prisma.$queryRaw<Array<Omit<CompositeReportJob, 'wholeValidationEncrypted' | 'wholeValidationHash'>>>`
     UPDATE "composite_report_jobs" AS job SET
       "status" = 'PROCESSING', "lease_token" = ${leaseToken},
       "lease_expires_at" = (CURRENT_TIMESTAMP AT TIME ZONE 'UTC') + (${settings.leaseMs} * INTERVAL '1 millisecond'),
@@ -186,21 +211,16 @@ export const claimCompositeReportJob = async (): Promise<CompositeReportJob | nu
       "updated_at" = (CURRENT_TIMESTAMP AT TIME ZONE 'UTC')
     FROM (
       SELECT "id" FROM "composite_report_jobs"
-      WHERE "budget_held" = true AND (
+      WHERE ("budget_held" = true OR ("whole_submission_id" IS NOT NULL
+        AND "whole_answers_encrypted" IS NOT NULL AND "whole_accepted_at" IS NOT NULL)) AND (
         ("status" = 'PENDING' AND "next_attempt_at" <= (CURRENT_TIMESTAMP AT TIME ZONE 'UTC'))
         OR ("status" = 'PROCESSING' AND "lease_expires_at" <= (CURRENT_TIMESTAMP AT TIME ZONE 'UTC'))
       ) ORDER BY "next_attempt_at", "created_at" FOR UPDATE SKIP LOCKED LIMIT 1
-    ) AS candidate WHERE job."id" = candidate."id" RETURNING job."id"
+    ) AS candidate WHERE job."id" = candidate."id" RETURNING job."id" AS "id", job."attempt_id" AS "attemptId", job."attempt_epoch" AS "attemptEpoch", job."slot_set_hash" AS "slotSetHash", job."context_hash" AS "contextHash", job."status" AS "status", job."requested_revision" AS "requestedRevision", job."claimed_revision" AS "claimedRevision", job."attempt_count" AS "attemptCount", job."budget_held" AS "budgetHeld", job."lease_token" AS "leaseToken", job."lease_expires_at" AS "leaseExpiresAt", job."next_attempt_at" AS "nextAttemptAt", job."report_encrypted" AS "reportEncrypted", job."aggregate_input_hash" AS "aggregateInputHash", job."error_code" AS "errorCode", job."completed_at" AS "completedAt", job."created_at" AS "createdAt", job."updated_at" AS "updatedAt", job."whole_submission_id" AS "wholeSubmissionId", job."whole_payload_hash" AS "wholePayloadHash", job."whole_answers_encrypted" AS "wholeAnswersEncrypted", job."whole_accepted_at" AS "wholeAcceptedAt"
   `
   if (!rows[0]) return null
   const claimConfirmed = process.hrtime.bigint()
-  const claimed = await prisma.compositeReportJob.findFirst({ where: { id: rows[0].id, leaseToken, status: 'PROCESSING' }, select: {
-    id: true, attemptId: true, attemptEpoch: true, slotSetHash: true, contextHash: true, status: true,
-    requestedRevision: true, claimedRevision: true, attemptCount: true, budgetHeld: true, leaseToken: true,
-    leaseExpiresAt: true, nextAttemptAt: true, reportEncrypted: true, aggregateInputHash: true, errorCode: true,
-    completedAt: true, createdAt: true, updatedAt: true,
-    wholeSubmissionId: true, wholePayloadHash: true, wholeAnswersEncrypted: true, wholeAcceptedAt: true,
-  } })
+  const claimed = rows[0]
   // The delivery validation is not used during scoring or report generation.
   const result = claimed ? { ...claimed, wholeValidationEncrypted: null, wholeValidationHash: null } : null
   if (result) recordAssessmentReportClaim(result, claimRequested, claimConfirmed)
@@ -232,8 +252,65 @@ export type ReportJobOutcome =
   | { kind: 'retry'; errorCode: string; delayMs: number }
   | { kind: 'failed'; errorCode: string }
 
+
+/** One autocommit statement, with no application round trip while the global
+ * budget row is locked. The per-job lock also serializes duplicate finishers.
+ */
+const finishCompositeReportJobAtomic = async (claimed: CompositeReportJob, outcome: ReportJobOutcome): Promise<boolean> => {
+  const retry = outcome.kind === 'retry', ready = outcome.kind === 'ready'
+  const terminalStatus = ready ? 'READY' : outcome.kind === 'waiting' ? 'WAITING'
+    : outcome.kind === 'cancelled' ? 'CANCELLED' : 'FAILED'
+  const rows = await prisma.$queryRaw<Array<{ claimed: boolean; finished: boolean; needsRelease: boolean | null; released: boolean }>>`
+    WITH locked AS MATERIALIZED (
+      SELECT "id", "requested_revision", "budget_held"
+      FROM "composite_report_jobs" WHERE "id" = ${claimed.id}
+        AND "status" = 'PROCESSING' AND "lease_token" = ${claimed.leaseToken} FOR UPDATE
+    ), decision AS MATERIALIZED (
+      SELECT *, ("requested_revision" <> ${claimed.claimedRevision}) AS dirty,
+        ("requested_revision" <> ${claimed.claimedRevision} OR ${retry}) AS keep_pending,
+        ("budget_held" AND NOT ("requested_revision" <> ${claimed.claimedRevision} OR ${retry})) AS release_needed
+      FROM locked
+    ), released AS (
+      UPDATE "composite_report_queue_budget" SET "pending" = "pending" - 1
+      WHERE "id" = 'reports' AND "pending" > 0
+        AND EXISTS (SELECT 1 FROM decision WHERE release_needed)
+      RETURNING "id"
+    ), changed AS (
+      UPDATE "composite_report_jobs" job SET
+        "status" = (CASE WHEN decision.keep_pending THEN 'PENDING' ELSE ${terminalStatus} END)::"CompositeReportJobStatus",
+        "lease_token" = NULL, "lease_expires_at" = NULL, "budget_held" = (decision.keep_pending AND decision."budget_held"),
+        "next_attempt_at" = CASE WHEN decision.dirty THEN (CURRENT_TIMESTAMP AT TIME ZONE 'UTC')
+          ELSE ${new Date(Date.now() + (retry ? outcome.delayMs : 0))} END,
+        "attempt_count" = CASE WHEN decision.dirty THEN 0 ELSE job."attempt_count" END,
+        "error_code" = CASE WHEN decision.dirty OR ${ready} THEN NULL
+          WHEN ${outcome.kind === 'retry' || outcome.kind === 'failed'}
+            THEN ${outcome.kind === 'retry' || outcome.kind === 'failed' ? outcome.errorCode : null}
+          ELSE job."error_code" END,
+        "report_encrypted" = CASE WHEN NOT decision.dirty AND ${ready}
+          THEN ${ready ? outcome.reportEncrypted : null} ELSE job."report_encrypted" END,
+        "aggregate_input_hash" = CASE WHEN NOT decision.dirty AND ${ready}
+          THEN ${ready ? outcome.aggregateInputHash : null} ELSE job."aggregate_input_hash" END,
+        "completed_at" = CASE WHEN NOT decision.dirty AND ${ready}
+          THEN (CURRENT_TIMESTAMP AT TIME ZONE 'UTC') ELSE job."completed_at" END,
+        "updated_at" = (CURRENT_TIMESTAMP AT TIME ZONE 'UTC')
+      FROM decision WHERE job."id" = decision."id"
+        AND (NOT decision.release_needed OR EXISTS (SELECT 1 FROM released))
+      RETURNING job."id"
+    )
+    SELECT EXISTS(SELECT 1 FROM locked) AS claimed, EXISTS(SELECT 1 FROM changed) AS finished,
+      (SELECT release_needed FROM decision) AS "needsRelease", EXISTS(SELECT 1 FROM released) AS released
+  `
+  const row = rows[0]!
+  // A corrupt budget leaves the locked job untouched. Database failures roll
+  // back both DML CTEs; a JavaScript exception must never follow a partial ACK.
+  if (row.claimed && row.needsRelease && !row.released) throw new Error('Report queue budget invariant violated')
+  return row.finished
+}
+
 /** Lease/CAS fence covers publication AND exactly-once permit release. */
-export const finishCompositeReportJob = async (claimed: CompositeReportJob, outcome: ReportJobOutcome): Promise<boolean> => (
+export const finishCompositeReportJob = async (claimed: CompositeReportJob, outcome: ReportJobOutcome): Promise<boolean> => process.env.ASSESSMENT_REPORT_ATOMIC_FINISH_ENABLED === 'true'
+  ? finishCompositeReportJobAtomic(claimed, outcome)
+  : (
   prisma.$transaction(async tx => {
     const rows = await tx.$queryRaw<Array<{ id: string; requestedRevision: number; budgetHeld: boolean }>>`
       SELECT "id", "requested_revision" AS "requestedRevision", "budget_held" AS "budgetHeld" FROM "composite_report_jobs"
@@ -249,7 +326,7 @@ export const finishCompositeReportJob = async (claimed: CompositeReportJob, outc
       status: keepPending ? 'PENDING' : outcome.kind === 'ready' ? 'READY'
         : outcome.kind === 'waiting' ? 'WAITING' : outcome.kind === 'cancelled' ? 'CANCELLED' : 'FAILED',
       leaseToken: null, leaseExpiresAt: null,
-      budgetHeld: keepPending,
+      budgetHeld: keepPending && current.budgetHeld,
       nextAttemptAt: new Date(Date.now() + (!dirty && retry ? outcome.delayMs : 0)),
       ...(dirty ? { attemptCount: 0, errorCode: null } : {}),
       ...(!dirty && outcome.kind === 'ready' ? { reportEncrypted: outcome.reportEncrypted,
@@ -293,8 +370,10 @@ export const assertNoAcceptedWholeQuestionnaire = async (tx: Pick<Prisma.Transac
 }
 
 export const registerWholeQuestionnaireReceipt = async (parent: BoundReportParent, input: {
-  submissionId: string; payloadHash: string; answersEncrypted: string; acceptedAt: Date; requiredFormSlots: string[];
-}): Promise<{ acceptedAt: Date; replayed: boolean; queueDepth?: number }> => traceAssessmentPhase('whole.transaction_roundtrip', () => prisma.$transaction(async tx => {
+  submissionId: string; payloadHash: string; answersEncrypted: string; acceptedAt: Date; requiredFormSlots: string[]; validationHash?: string;
+}): Promise<{ acceptedAt: Date; replayed: boolean; queueDepth?: number }> => (detachedWholeReceiptsEnabled() || process.env.ASSESSMENT_WHOLE_ATOMIC_RECEIPT_ENABLED === 'true')
+  ? registerWholeReceiptAtomic(parent, input)
+  : traceAssessmentPhase('whole.transaction_roundtrip', () => prisma.$transaction(async tx => {
   markAssessmentTimeline('whole.transaction_callback_start')
   try {
   const rows = await traceAssessmentPhase('whole.tx.job_upsert_lock', () => tx.$queryRaw<Array<{ id: string; status: string; budgetHeld: boolean; wholeSubmissionId: string | null; wholePayloadHash: string | null; wholeAcceptedAt: Date | null }>>`
@@ -324,20 +403,40 @@ export const registerWholeQuestionnaireReceipt = async (parent: BoundReportParen
     || input.requiredFormSlots.some(key => !headers.some(row => row.slotKey === key && row.terminalState === 'COMPLETED'))) {
     throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '请先完成必要背景信息；已分量表交卷的作答不能改为整份交卷', 409)
   }
-  const updated = await traceAssessmentPhase('whole.tx.parent_cas', () => tx.compositeAssessmentAttempt.updateMany({
-    where: { id: parent.id, status: 'IN_PROGRESS', attemptEpoch: parent.attemptEpoch,
-      frozenActiveSlotSetHash: parent.frozenActiveSlotSetHash, contextSnapshotHash: parent.contextSnapshotHash },
-    data: { asyncReportEpoch: parent.attemptEpoch },
-  }))
-  if (updated.count !== 1) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷状态已变化，尚未确认接收', 409)
-  await traceAssessmentPhase('whole.tx.durable_envelope', () => tx.$executeRaw`UPDATE "composite_report_jobs" SET "whole_submission_id" = ${input.submissionId},
-    "whole_payload_hash" = ${input.payloadHash}, "whole_answers_encrypted" = ${input.answersEncrypted},
-    "whole_accepted_at" = ${input.acceptedAt}, "status" = 'PENDING', "budget_held" = true,
-    "attempt_count" = 0, "error_code" = NULL, "next_attempt_at" = (CURRENT_TIMESTAMP AT TIME ZONE 'UTC'),
-    "updated_at" = (CURRENT_TIMESTAMP AT TIME ZONE 'UTC') WHERE "id" = ${job.id}`)
-  // Keep the shared budget row last: the per-parent envelope remains invisible
-  // until COMMIT, and a full budget rolls back this transaction's prepared write.
-  const queueDepth = await traceAssessmentPhase('whole.tx.queue_budget', () => reserveBudget(tx))
+  // One database round trip prepares the parent, encrypted envelope and final
+  // shared reservation. SQL dependencies keep the global row last; the caller
+  // still rolls back every write if any CAS or reservation fails.
+  const persisted = await traceAssessmentPhase('whole.tx.persist_and_budget', () => tx.$queryRaw<Array<{
+    parentCount: bigint; envelopeCount: bigint; queueDepth: number | null;
+  }>>`
+    WITH parent_cas AS (
+      UPDATE "composite_assessment_attempts" SET "async_report_epoch" = ${parent.attemptEpoch}
+      WHERE "id" = ${parent.id} AND "status" = 'IN_PROGRESS' AND "attempt_epoch" = ${parent.attemptEpoch}
+        AND "frozen_active_slot_set_hash" = ${parent.frozenActiveSlotSetHash}
+        AND "context_snapshot_hash" IS NOT DISTINCT FROM ${parent.contextSnapshotHash}
+      RETURNING "id"
+    ), envelope AS (
+      UPDATE "composite_report_jobs" AS job SET "whole_submission_id" = ${input.submissionId},
+        "whole_payload_hash" = ${input.payloadHash}, "whole_answers_encrypted" = ${input.answersEncrypted},
+        "whole_accepted_at" = ${input.acceptedAt}, "status" = 'PENDING', "budget_held" = true,
+        "attempt_count" = 0, "error_code" = NULL, "next_attempt_at" = (CURRENT_TIMESTAMP AT TIME ZONE 'UTC'),
+        "updated_at" = (CURRENT_TIMESTAMP AT TIME ZONE 'UTC')
+      FROM parent_cas WHERE job."id" = ${job.id} RETURNING job."id"
+    ), reserved AS (
+      UPDATE "composite_report_queue_budget" SET "pending" = "pending" + 1
+      WHERE "id" = 'reports' AND "pending" < ${assessmentReportConfig().maxPending}
+        AND EXISTS (SELECT 1 FROM envelope) RETURNING "pending"
+    )
+    SELECT (SELECT count(*) FROM parent_cas) AS "parentCount",
+      (SELECT count(*) FROM envelope) AS "envelopeCount",
+      (SELECT "pending" FROM reserved) AS "queueDepth"
+  `)
+  const saved = persisted[0]
+  if (!saved || Number(saved.parentCount) !== 1 || Number(saved.envelopeCount) !== 1) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '问卷状态已变化，尚未确认接收', 409)
+  }
+  if (saved.queueDepth === null) throw new QuestionnaireCompletionAdmissionBusyError('queue_full', 2)
+  const queueDepth = saved.queueDepth
   return { acceptedAt: input.acceptedAt, replayed: false, queueDepth }
   } finally { markAssessmentTimeline('whole.transaction_callback_end') }
 }, { isolationLevel: 'ReadCommitted', maxWait: 2000, timeout: 10_000 })).then(receipt => {

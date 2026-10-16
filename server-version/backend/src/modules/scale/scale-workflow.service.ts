@@ -1,3 +1,11 @@
+import { BoundedArtifactCache, artifactContentKey } from '../assessment-runtime/bounded-artifact-cache'
+import { retainImmutableCanonicalValue } from '../assessment-runtime/canonical'
+import { sharedControlWritesEnabled } from '../assessment-runtime/shared-control-records'
+import { compactAssessmentStorageEnabled, encryptCompactField } from '../assessment-runtime/compact-field-codec'
+import { encodeAnswerRows } from '../assessment-runtime/compact-raw'
+import { decodeInlineScaleRaw, resolveStoredScaleAnswers, resolveStoredScaleResult } from '../assessment-runtime/compact-assessment-storage'
+import { isScaleReportFactsView } from '../assessment-runtime/compact-scale-facts'
+import type { VersionedFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
 import { decryptField, encryptField, isEncrypted, safeDecrypt } from '../../utils/encryption'
 import { prisma } from '../../config/database'
 import {
@@ -20,7 +28,7 @@ import {
 } from '../assessment-reference/reference'
 import { DISCLOSURE_PRESETS } from './policy/disclosure'
 import type { DisclosureCapabilitiesV1, ScaleDisclosureAudience } from './policy/types'
-import { decryptFrozenScaleRuntimeSnapshot, parseVersionedFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
+import { decryptFrozenScaleRuntimeSnapshot, loadFrozenScaleRuntimeSnapshot, parseVersionedFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
 import { projectScaleAttemptForResume, projectScaleCompletedResponse } from './projection/scale-attempt.projector'
 import { resolveLegacyScaleProjectionPolicy, scaleProjectionPolicyFromCompiled } from './projection/policy-resolver'
 import type { ScaleProjectionPurpose, ScaleRelationalDisposition } from './projection/types'
@@ -58,6 +66,29 @@ export const scaleDefinitionFromRecord = (scale: ScaleRecordForDefinition): Scal
   }
   return validation.definition
 }
+
+// This entry is only for JSON records loaded from the database/code package,
+// after the caller's current access/start checks. The full actual scientific
+// JSON, including declared identity, determines the cache key; no supplied hash
+// alone proves the content. Permission and participant facts are never cached.
+const databaseDefinitions = new BoundedArtifactCache<ScaleDefinitionV2>(64, 4 * 1024 * 1024)
+export const frozenDatabaseScaleDefinition = (scale: ScaleRecordForDefinition): ScaleDefinitionV2 => {
+  if (!sharedControlWritesEnabled()) return scaleDefinitionFromRecord(scale)
+  const actual = scale.instrumentClass === 'STANDARD' && scale.code && scale.instrumentVersion
+    ? getScalePackage(scale.code, scale.instrumentVersion)?.definition : scale.definition
+  if (actual === undefined || 'toJSON' in Object.prototype || 'toJSON' in Array.prototype) return scaleDefinitionFromRecord(scale)
+  const serialized = JSON.stringify({ code: scale.code ?? null, instrumentVersion: scale.instrumentVersion ?? null,
+    instrumentClass: scale.instrumentClass ?? null, declaredDefinitionHash: scale.definitionHash ?? null, definition: actual })
+  const bytes = Buffer.from(serialized)
+  if (bytes.length > 2 * 1024 * 1024) return scaleDefinitionFromRecord(scale)
+  const key = artifactContentKey(bytes), known = databaseDefinitions.get(key)
+  if (known) return known
+  // Copy once before freezing; leave editable registry/database objects alone.
+  const definition = retainImmutableCanonicalValue(structuredClone(scaleDefinitionFromRecord(scale)))
+  databaseDefinitions.set(key, definition, bytes.length * 5 + 1024)
+  return definition
+}
+export const databaseScaleDefinitionCacheStats = () => databaseDefinitions.stats()
 
 export const scaleRunnerFromRecord = (scale: ScaleRecordForDefinition) => runnerDefinition(scaleDefinitionFromRecord(scale))
 
@@ -110,6 +141,7 @@ const isScaleAnswerEnvelopeV1 = (value: unknown): value is ScaleAnswerEnvelopeV1
 
 export const readScaleAnswers = (value: unknown): ScaleAnswerReadResult => {
   const parsed = readJsonField<ScaleAnswer[] | Record<string, unknown>>(value)
+  if (!parsed.decryptError && parsed.value) { try { parsed.value = decodeInlineScaleRaw(parsed.value) } catch { return { answers: [], decryptError: true } } }
   if (parsed.decryptError || parsed.value === null) return { answers: [], decryptError: parsed.decryptError }
   if (validScaleAnswerArray(parsed.value)) return { answers: parsed.value, decryptError: false }
   if (!isScaleAnswerEnvelopeV1(parsed.value)) return { answers: [], decryptError: true }
@@ -122,18 +154,27 @@ export const readScaleAnswers = (value: unknown): ScaleAnswerReadResult => {
   }
 }
 
-export const encryptScaleAnswers = (answers: ScaleAnswer[], deviceInputProvenance?: DeviceInputProvenanceV1): string => encryptField(
-  deviceInputProvenance === undefined
-    ? answers
-    : {
-        schemaVersion: 1,
-        answers,
-        deviceInputProvenance: deviceInputProvenanceV1Schema.parse(deviceInputProvenance),
-      } satisfies ScaleAnswerEnvelopeV1,
-)
+export const encryptScaleAnswers = (answers: ScaleAnswer[], deviceInputProvenance?: DeviceInputProvenanceV1): string => {
+  if (compactAssessmentStorageEnabled() && answers.length) return encryptCompactField({ kind: 'SCALE_RAW_FACTS', version: 1,
+    answers: encodeAnswerRows(answers), ...(deviceInputProvenance ? { deviceInputProvenance: deviceInputProvenanceV1Schema.parse(deviceInputProvenance) } : {}) })
+  return encryptField(deviceInputProvenance === undefined ? answers : { schemaVersion: 1, answers,
+    deviceInputProvenance: deviceInputProvenanceV1Schema.parse(deviceInputProvenance) } satisfies ScaleAnswerEnvelopeV1)
+}
+export const loadScaleAnswers = async (value: unknown, record?: any,
+  db?: import('../assessment-runtime/shared-scale-runtime').SharedScaleArtifactDb): Promise<ScaleAnswerReadResult> => {
+  try { return readScaleAnswers(await resolveStoredScaleAnswers(value, record, db)) }
+  catch { return { answers: [], decryptError: true } }
+}
+export const loadScaleResult = async (value: unknown, record?: any, options: { full?: boolean } = {},
+  db?: import('../assessment-runtime/shared-scale-runtime').SharedScaleArtifactDb): Promise<{ result: ScaleResultV2 | null; decryptError: boolean }> => {
+  try { return readScaleResult(await resolveStoredScaleResult(value, { record, full: options.full, db })) }
+  catch { return { result: null, decryptError: true } }
+}
+
 export const encryptScaleResult = (result: ScaleResultV2): string => encryptField(result)
 
 export const readScaleResult = (value: unknown): { result: ScaleResultV2 | null; decryptError: boolean } => {
+  if (isScaleReportFactsView(value)) return { result: value as ScaleResultV2, decryptError: false }
   const parsed = readJsonField<ScaleResultV2>(value)
   if (parsed.decryptError || parsed.value === null) return { result: null, decryptError: parsed.decryptError }
   try {
@@ -153,14 +194,16 @@ export interface ScaleResponseProjectionOptions {
   includeResumeAnswers?: boolean
 }
 
-export const resolveProjectionPolicyForAssessment = (assessment: any, result: ScaleResultV2 | null) => {
+export const resolveProjectionPolicyForAssessment = (assessment: any, result: ScaleResultV2 | null,
+  verifiedRuntime?: VersionedFrozenScaleRuntimeSnapshot,
+) => {
   const storedSnapshot = assessment?.runtimeSnapshotEncrypted
   if (storedSnapshot !== null && storedSnapshot !== undefined) {
     try {
       // Runtime snapshots use the unified encrypted envelope, unlike result JSON.
-      const snapshot = typeof storedSnapshot === 'string'
+      const snapshot = verifiedRuntime ?? (typeof storedSnapshot === 'string'
         ? decryptFrozenScaleRuntimeSnapshot(storedSnapshot)
-        : parseVersionedFrozenScaleRuntimeSnapshot(storedSnapshot)
+        : parseVersionedFrozenScaleRuntimeSnapshot(storedSnapshot))
       if (snapshot.schemaVersion === 2) return { policy: scaleProjectionPolicyFromCompiled(snapshot.compiledPolicy), snapshotError: false }
     } catch {
       return { policy: resolveLegacyScaleProjectionPolicy('', ''), snapshotError: true }
@@ -174,6 +217,35 @@ export const resolveProjectionPolicyForAssessment = (assessment: any, result: Sc
     policy: resolveLegacyScaleProjectionPolicy(instrumentKey, instrumentVersion, instrumentClass),
     snapshotError: false,
   }
+}
+
+/** Load the frozen policy through either storage version; authorization stays with the caller. */
+export const loadProjectionPolicyForAssessment = async (assessment: any, result: ScaleResultV2 | null,
+  verifiedRuntime?: VersionedFrozenScaleRuntimeSnapshot,
+  db?: import('../assessment-runtime/shared-scale-runtime').SharedScaleArtifactDb,
+) => {
+  if (!verifiedRuntime && typeof assessment?.runtimeSnapshotEncrypted === 'string') {
+    try { verifiedRuntime = await loadFrozenScaleRuntimeSnapshot(assessment.runtimeSnapshotEncrypted, db) }
+    catch { return { policy: resolveLegacyScaleProjectionPolicy('', ''), snapshotError: true } }
+  }
+  return resolveProjectionPolicyForAssessment(assessment, result, verifiedRuntime)
+}
+export const loadScaleAssessmentForResponse = async (assessment: any, options: ScaleResponseProjectionOptions = {},
+  db?: import('../assessment-runtime/shared-scale-runtime').SharedScaleArtifactDb) => {
+  // A read failure after the save transaction must not undo or misreport durable acceptance.
+  // The existing allowlisted serializer emits RESULT_UNAVAILABLE for unreadable results.
+  const source = assessment
+  assessment = { ...source }
+  try { assessment.result = await resolveStoredScaleResult(source?.result, { record: source, db }) } catch { /* retain unreadable value for the failure projection */ }
+  if (assessment.status !== 'COMPLETED') {
+    try { assessment.answers = await resolveStoredScaleAnswers(source?.answers, source, db) } catch { assessment.answers = 'UNREADABLE_RAW_FACTS' }
+  }
+  let runtime: VersionedFrozenScaleRuntimeSnapshot | undefined
+  if (typeof assessment?.runtimeSnapshotEncrypted === 'string') {
+    try { runtime = await loadFrozenScaleRuntimeSnapshot(assessment.runtimeSnapshotEncrypted, db) }
+    catch { return scaleAssessmentForResponse(assessment, options) }
+  }
+  return scaleAssessmentForResponse(assessment, options, runtime)
 }
 
 const inferServerAudience = (assessment: any): ScaleDisclosureAudience => (
@@ -192,12 +264,13 @@ const inferServerAudience = (assessment: any): ScaleDisclosureAudience => (
 export const scaleAssessmentForResponse = (
   assessment: any,
   options: ScaleResponseProjectionOptions = {},
+  verifiedRuntime?: VersionedFrozenScaleRuntimeSnapshot,
 ): any => {
   const answers = readScaleAnswers(assessment?.answers)
   const result = readScaleResult(assessment?.result)
   const directProvenance = deviceInputProvenanceV1Schema.safeParse(assessment?.deviceInputProvenance)
   const full = DISCLOSURE_PRESETS.FULL_REPORT()
-  const resolved = resolveProjectionPolicyForAssessment(assessment, result.result)
+  const resolved = resolveProjectionPolicyForAssessment(assessment, result.result, verifiedRuntime)
   const audience = options.audience ?? inferServerAudience(assessment)
   const projectionContext = {
     principalId: options.principalId ?? null,

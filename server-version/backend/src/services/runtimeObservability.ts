@@ -462,6 +462,14 @@ export const withAssessmentReportTimeline = async <T>(job: { attemptId: string }
   })
 }
 
+const nodeRequestCallbacks = new WeakMap<object, bigint>()
+/** Earliest JS HTTP callback, not NIC receipt or kernel accept time. Diagnostics only. */
+export const recordNodeRequestCallback = (req: { method?: string; url?: string }): void => {
+  if (timelineEnabled() && req.method === 'POST' && /\/whole\/submit(?:\?|$)/.test(req.url ?? '')) {
+    nodeRequestCallbacks.set(req, process.hrtime.bigint())
+  }
+}
+
 const wholeRequestArrival = new WeakMap<Request, { requestStartedAtMs: number; bodyReceivedAtMs?: number }>()
 export const wholeQuestionnaireArrival = (req: Request) => {
   const arrival = wholeRequestArrival.get(req)
@@ -476,6 +484,8 @@ export const requestObservabilityMiddleware = (req: Request, res: Response, next
     if (timelineEnabled()) {
       const match = (req.originalUrl || req.url).match(/\/attempts\/([^/]+)\/whole\/submit/)
       if (match) technicalTimeline = newTimeline('submission', match[1])
+      const rawCallback = nodeRequestCallbacks.get(req)
+      if (rawCallback) pushTimeline(technicalTimeline, 'http.node_request_callback', rawCallback)
       pushTimeline(technicalTimeline, 'http.request_start', process.hrtime.bigint())
     }
     wholeRequestArrival.set(req, arrival)
@@ -649,6 +659,16 @@ const requestCounterLines = (): string[] => (
 )
 
 /** Return Prometheus-compatible process, request, phase and Prisma metrics. */
+const schedulingLoopDelay = monitorEventLoopDelay({ resolution: 20 })
+schedulingLoopDelay.enable()
+let schedulingLagMs = 0
+const schedulingLagTimer = setInterval(() => {
+  schedulingLagMs = finiteMilliseconds(schedulingLoopDelay.percentile(95) / 1_000_000)
+  schedulingLoopDelay.reset()
+}, 500)
+schedulingLagTimer.unref()
+export const runtimeEventLoopDelayMs = (): number => schedulingLagMs
+
 export const runtimeMetricLines = (): string[] => {
   const memory = safeMemoryUsage()
   const cpu = process.cpuUsage()

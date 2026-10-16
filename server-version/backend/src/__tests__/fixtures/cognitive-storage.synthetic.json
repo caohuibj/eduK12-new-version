@@ -1,0 +1,637 @@
+{
+  "syntheticFixture": {
+    "description": "Generated CPT scientific runtime and result for storage compatibility, not a real participant",
+    "schemaVersion": 1
+  },
+  "runtime": {
+    "schemaVersion": 1,
+    "frozenAt": "2026-10-16T13:40:10.860Z",
+    "testType": "cpt",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "config": {
+      "totalTrials": 180,
+      "targetRatio": 0.2,
+      "blockCount": 3,
+      "stimulusMs": 500,
+      "isiMs": 1000,
+      "validRtFloorMs": 100,
+      "perseverationRtMs": 100,
+      "report": {
+        "reportVersion": "1.0.0",
+        "referenceMode": "none"
+      }
+    },
+    "configHash": "1f7719b54912cf2da5e8a5880999aecf90aa2e5bef838aef60d745c47e399dd7",
+    "hashScheme": "CANONICAL_JSON_SHA256_V1",
+    "runtimeGeneration": "UNIFIED_V1",
+    "compiledRuntime": {
+      "schemaVersion": 1,
+      "compilerVersion": "unified-runtime-v32-unit-1",
+      "instrumentType": "COGNITIVE",
+      "instrumentKey": "cpt",
+      "instrumentVersion": "1.0.0",
+      "sourceDefinitionHash": "acd6ba811b64280e74f6d9e3cda143e81d6e79c3d5eec91ed1394b31806779b1",
+      "scorerKey": "cpt",
+      "scorerVersion": "1.0.0",
+      "metricDefinitions": {
+        "dPrime": {
+          "key": "dPrime",
+          "label": "目标辨别 d′",
+          "unit": "d-prime",
+          "valueType": "number",
+          "direction": "higher_is_better",
+          "role": "primary"
+        },
+        "omissionRate": {
+          "key": "omissionRate",
+          "label": "目标遗漏率",
+          "unit": "ratio",
+          "valueType": "number",
+          "direction": "lower_is_better",
+          "role": "primary"
+        },
+        "commissionRate": {
+          "key": "commissionRate",
+          "label": "非目标误报率",
+          "unit": "ratio",
+          "valueType": "number",
+          "direction": "lower_is_better",
+          "role": "primary"
+        },
+        "rtICV": {
+          "key": "rtICV",
+          "label": "命中RT变异系数",
+          "unit": "ratio",
+          "valueType": "number",
+          "direction": "lower_is_better",
+          "role": "primary"
+        },
+        "hitMedianRtMs": {
+          "key": "hitMedianRtMs",
+          "label": "目标命中中位RT",
+          "unit": "ms",
+          "valueType": "number",
+          "direction": "descriptive",
+          "role": "secondary"
+        },
+        "hitRtSdMs": {
+          "key": "hitRtSdMs",
+          "label": "目标RT标准差",
+          "unit": "ms",
+          "valueType": "number",
+          "direction": "lower_is_better",
+          "role": "secondary"
+        },
+        "blockSlopeRt": {
+          "key": "blockSlopeRt",
+          "label": "跨 block RT 斜率",
+          "unit": "ms",
+          "valueType": "number",
+          "direction": "descriptive",
+          "role": "research_only"
+        },
+        "blockSlopeOmission": {
+          "key": "blockSlopeOmission",
+          "label": "跨 block 遗漏斜率",
+          "unit": "ratio",
+          "valueType": "number",
+          "direction": "descriptive",
+          "role": "research_only"
+        },
+        "perseverationRate": {
+          "key": "perseverationRate",
+          "label": "极短反应比例",
+          "unit": "ratio",
+          "valueType": "number",
+          "direction": "lower_is_better",
+          "role": "secondary"
+        },
+        "targetCount": {
+          "key": "targetCount",
+          "label": "目标试次数",
+          "unit": "count",
+          "valueType": "integer",
+          "direction": "descriptive",
+          "role": "secondary"
+        },
+        "hitCount": {
+          "key": "hitCount",
+          "label": "命中次数",
+          "unit": "count",
+          "valueType": "integer",
+          "direction": "higher_is_better",
+          "role": "secondary"
+        }
+      },
+      "qualityDefinitions": {
+        "interpretable": {
+          "key": "interpretable",
+          "label": "可解释",
+          "description": "目标试次与遗漏是否达到门槛。"
+        },
+        "insufficientTargets": {
+          "key": "insufficientTargets",
+          "label": "目标试次不足",
+          "description": "目标试次过少。"
+        },
+        "highOmissionRate": {
+          "key": "highOmissionRate",
+          "label": "遗漏过高",
+          "description": "目标遗漏率达到 0.4。"
+        },
+        "highPerseverationRate": {
+          "key": "highPerseverationRate",
+          "label": "极短反应过多",
+          "description": "低于 100ms 的反应比例过高。"
+        },
+        "interrupted": {
+          "key": "interrupted",
+          "label": "作答中断",
+          "description": "存在 interrupted 试次。"
+        },
+        "legacyUninterpretable": {
+          "key": "legacyUninterpretable",
+          "label": "结果质量受限",
+          "description": "旧版计分器判定本次结果不满足完整解释条件。"
+        }
+      },
+      "reportDefinition": {
+        "schemaVersion": 1,
+        "version": "1.0.0",
+        "title": "连续执行任务 CPT-X",
+        "headlineMetrics": [
+          "dPrime"
+        ],
+        "userMetrics": [
+          "omissionRate",
+          "commissionRate",
+          "rtICV"
+        ],
+        "detailMetrics": [
+          "hitMedianRtMs",
+          "hitRtSdMs",
+          "perseverationRate"
+        ],
+        "disclaimer": "结果反映本次持续注意任务表现，不是临床诊断或常模。",
+        "practicalTips": [
+          "单一反应时不能代表持续注意，请同时看遗漏与误报。"
+        ]
+      },
+      "aggregateProjection": {
+        "allowedMetricKeys": [
+          "dPrime",
+          "omissionRate",
+          "commissionRate",
+          "rtICV",
+          "hitMedianRtMs",
+          "hitRtSdMs",
+          "blockSlopeRt",
+          "blockSlopeOmission",
+          "perseverationRate",
+          "targetCount",
+          "hitCount"
+        ],
+        "allowedFactKeys": [
+          "quality.status",
+          "quality.flag.*"
+        ],
+        "allowedReferenceClassifications": []
+      },
+      "referenceBindingDefinition": {
+        "required": false,
+        "selections": []
+      },
+      "runtimeCapabilities": {
+        "standalone": true,
+        "embedded": true,
+        "aggregateEligible": true,
+        "collectionFacts": false,
+        "supported": true
+      },
+      "compiledRuntimeHash": "7ff5b21a28e3c241f18024438f3dba15dde3e369e6aba16dc1c3259c22a80665",
+      "hashScheme": "CANONICAL_JSON_SHA256_V1"
+    },
+    "referenceBindings": [],
+    "protocol": {
+      "schemaVersion": 1,
+      "key": "cpt/1.0.0/1.0.0",
+      "version": "1.0.0",
+      "clock": "performance",
+      "randomizationAlgorithmVersion": "seq-v1.0.0",
+      "trialEnvelopeVersion": 1,
+      "phases": [
+        {
+          "key": "test",
+          "persists": true,
+          "required": true
+        }
+      ],
+      "measurementCriticalConfigPaths": [
+        "*"
+      ]
+    },
+    "protocolSignature": "93767f07a614c6e50386ae03e044fa9ff73cf39fedd10f583174a41eee6e0cb9"
+  },
+  "result": {
+    "schemaVersion": 1,
+    "completedAt": "2026-10-16T13:40:11.163Z",
+    "testType": "cpt",
+    "configVersion": "1.0.0",
+    "engineVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "protocolSignature": "93767f07a614c6e50386ae03e044fa9ff73cf39fedd10f583174a41eee6e0cb9",
+    "profile": "standard",
+    "metrics": {
+      "dPrime": 4.913,
+      "omissionRate": 0,
+      "commissionRate": 0,
+      "rtICV": 0.020109701667630805,
+      "hitMedianRtMs": 261,
+      "hitRtSdMs": 5.252,
+      "blockSlopeRt": -0.5,
+      "blockSlopeOmission": 0,
+      "perseverationRate": 0,
+      "targetCount": 36,
+      "hitCount": 36
+    },
+    "quality": {
+      "state": "interpretable",
+      "flags": {
+        "insufficientTargets": false,
+        "highOmissionRate": false,
+        "highPerseverationRate": false,
+        "interrupted": false
+      },
+      "reasons": []
+    },
+    "references": [],
+    "report": {
+      "title": "连续执行任务 CPT-X",
+      "profileLabel": "标准协议",
+      "qualityState": "interpretable",
+      "conclusion": "需要回应的目标中，有 0% 没有留下回应；不该回应的信号中，有 0% 仍发生了回应。",
+      "headline": [
+        {
+          "key": "omissionRate",
+          "presentationVersion": "1.2.0",
+          "participantLabel": "目标遗漏率",
+          "explanation": "遗漏比例：应该响应但没有响应的比例。",
+          "label": "目标遗漏率",
+          "category": "sustained_attention",
+          "direction": "lower_is_better",
+          "unit": "ratio",
+          "value": 0,
+          "formatted": "0%"
+        }
+      ],
+      "user": [
+        {
+          "key": "commissionRate",
+          "presentationVersion": "1.2.0",
+          "participantLabel": "非目标误报率",
+          "explanation": "误按比例：本来不应该按时发生按键的比例。",
+          "label": "非目标误报率",
+          "category": "response_inhibition",
+          "direction": "lower_is_better",
+          "unit": "ratio",
+          "value": 0,
+          "formatted": "0%"
+        },
+        {
+          "key": "dPrime",
+          "presentationVersion": "1.2.0",
+          "participantLabel": "目标辨别 d′",
+          "explanation": "目标辨别敏感度：区分目标与非目标表现的信号检测指标。",
+          "label": "目标辨别 d′",
+          "category": "sustained_attention",
+          "direction": "higher_is_better",
+          "unit": "d-prime",
+          "value": 4.913,
+          "formatted": "4.913"
+        }
+      ],
+      "detail": [
+        {
+          "key": "dPrime",
+          "presentationVersion": "1.2.0",
+          "participantLabel": "目标辨别 d′",
+          "explanation": "目标辨别敏感度：区分目标与非目标表现的信号检测指标。",
+          "label": "目标辨别 d′",
+          "category": "sustained_attention",
+          "direction": "higher_is_better",
+          "unit": "d-prime",
+          "value": 4.913,
+          "formatted": "4.913"
+        },
+        {
+          "key": "omissionRate",
+          "presentationVersion": "1.2.0",
+          "participantLabel": "目标遗漏率",
+          "explanation": "遗漏比例：应该响应但没有响应的比例。",
+          "label": "目标遗漏率",
+          "category": "sustained_attention",
+          "direction": "lower_is_better",
+          "unit": "ratio",
+          "value": 0,
+          "formatted": "0%"
+        },
+        {
+          "key": "commissionRate",
+          "presentationVersion": "1.2.0",
+          "participantLabel": "非目标误报率",
+          "explanation": "误按比例：本来不应该按时发生按键的比例。",
+          "label": "非目标误报率",
+          "category": "response_inhibition",
+          "direction": "lower_is_better",
+          "unit": "ratio",
+          "value": 0,
+          "formatted": "0%"
+        },
+        {
+          "key": "rtICV",
+          "presentationVersion": "1.2.0",
+          "participantLabel": "命中RT变异系数",
+          "explanation": "反应稳定性：不同试次之间反应速度的波动程度。",
+          "label": "命中RT变异系数",
+          "category": "sustained_attention",
+          "direction": "lower_is_better",
+          "unit": "ratio",
+          "value": 0.020109701667630805,
+          "formatted": "2%"
+        },
+        {
+          "key": "hitMedianRtMs",
+          "presentationVersion": "1.2.0",
+          "participantLabel": "目标命中中位RT",
+          "label": "目标命中中位RT",
+          "category": "processing_speed",
+          "direction": "descriptive",
+          "unit": "ms",
+          "value": 261,
+          "formatted": "261 毫秒"
+        },
+        {
+          "key": "hitRtSdMs",
+          "presentationVersion": "1.2.0",
+          "participantLabel": "目标RT标准差",
+          "label": "目标RT标准差",
+          "category": "sustained_attention",
+          "direction": "lower_is_better",
+          "unit": "ms",
+          "value": 5.252,
+          "formatted": "5 毫秒"
+        },
+        {
+          "key": "perseverationRate",
+          "presentationVersion": "1.2.0",
+          "participantLabel": "极短反应比例",
+          "label": "极短反应比例",
+          "category": "sustained_attention",
+          "direction": "lower_is_better",
+          "unit": "ratio",
+          "value": 0,
+          "formatted": "0%"
+        }
+      ],
+      "quality": [
+        {
+          "key": "insufficientTargets",
+          "label": "目标试次不足",
+          "active": false,
+          "effect": "limited"
+        },
+        {
+          "key": "highOmissionRate",
+          "label": "遗漏过高",
+          "active": false,
+          "effect": "limited"
+        },
+        {
+          "key": "highPerseverationRate",
+          "label": "极短反应过多",
+          "active": false,
+          "effect": "limited"
+        },
+        {
+          "key": "interrupted",
+          "label": "作答中断",
+          "active": false,
+          "effect": "limited"
+        }
+      ],
+      "method": {
+        "testType": "cpt",
+        "engineVersion": "1.0.0",
+        "scoringVersion": "1.0.0",
+        "configVersion": "1.0.0",
+        "protocolSignature": "93767f07a614c6e50386ae03e044fa9ff73cf39fedd10f583174a41eee6e0cb9",
+        "profile": "standard"
+      },
+      "disclaimer": "结果反映本次持续注意任务表现，不是临床诊断或常模。",
+      "practicalTips": [
+        "单一反应时不能代表持续注意，请同时看遗漏与误报。"
+      ],
+      "schemaVersion": 2,
+      "reading": {
+        "schemaVersion": 2,
+        "reportVersion": "1.1.0",
+        "presentationVersion": "1.2.0",
+        "title": "信号一闪而过，你有没有接住？",
+        "introduction": "从这次作答出发，读懂一个与你有关的认知过程。",
+        "illustration": "signal",
+        "interpretation": {
+          "state": "available",
+          "reasons": [],
+          "withheldMetricKeys": [
+            "blockSlopeRt",
+            "blockSlopeOmission"
+          ]
+        },
+        "feedback": {
+          "summary": "需要回应的目标中，有 0% 没有留下回应；不该回应的信号中，有 0% 仍发生了回应。",
+          "evidenceMetricKeys": [
+            "omissionRate",
+            "commissionRate"
+          ],
+          "nextStep": "先核对目标规则和作答环境。一次记录不能用于注意力障碍判断。"
+        },
+        "caveats": [
+          "标准任务须同时看 d′、遗漏、误报和 RT 变异。"
+        ],
+        "methodCaveats": [
+          "正式版须同时看 d′、遗漏、误报和 RT 变异。"
+        ],
+        "popular": {
+          "conceptTitle": "先弄懂，这个任务在看什么",
+          "concept": "在一段重复的信息流里，只对目标做出回应，需要持续观察。任务把漏掉目标与对非目标出手分开记录，帮助你看清这次作答的不同侧面。",
+          "takeaway": "持续观察，不只是一直盯着。",
+          "exampleTitle": "走出任务：生活与工作中的一个例子",
+          "example": "监控人员观察仪表、校对人员查找文本中的指定符号，都要在重复信息中识别目标。本任务的记录不能代替真实岗位考核或注意问题诊断。",
+          "scene": "signal",
+          "frames": [
+            {
+              "title": "信号出现",
+              "text": "目标发生变化，观察从此刻开始。"
+            },
+            {
+              "title": "看清再回应",
+              "text": "先识别信号，再执行任务要求。"
+            },
+            {
+              "title": "留下记录",
+              "text": "记录本次用时，而不是给人贴标签。"
+            }
+          ],
+          "boundary": "这是理解概念的场景示例，不是职业资格、职业适合度或同龄人排名。",
+          "metricHelp": {
+            "dPrime": {
+              "label": "区分目标的记录",
+              "explanation": "结合认出目标和误按计算的区分指标；可以为负，不是同龄人排名。"
+            },
+            "omissionRate": {
+              "label": "需要回应时，没有留下回应",
+              "explanation": "这是任务记录里的遗漏比例；不能说明没有回应的原因。"
+            },
+            "commissionRate": {
+              "label": "不该回应时，仍动了手",
+              "explanation": "在不需要回应的信号中，仍作出回应的比例。"
+            }
+          }
+        },
+        "professional": {
+          "construct": "持续操作范式中的目标辨别及响应维持",
+          "procedure": "按目标和非目标条件统计命中、遗漏与误报，使用信号检测指标补充目标区分表现。",
+          "interpretation": "命中率与误报率须联合阅读；还需考虑目标比例、记录量及中断，不能将一次任务表现视为长期注意能力。",
+          "confounders": [
+            "设备与输入方式、显示和响应延迟会影响用时记录。",
+            "任务理解、作答中断、阶段覆盖和试次数影响解释边界。",
+            "本报告不提供经过验证的人口常模、诊断、稳定能力等级或职业适合度结论。"
+          ],
+          "parameters": [
+            {
+              "label": "计划正式试次数",
+              "value": "180"
+            },
+            {
+              "label": "区组数",
+              "value": "3"
+            }
+          ],
+          "metrics": [
+            {
+              "key": "dPrime",
+              "label": "目标辨别 d′",
+              "formatted": "4.913",
+              "unit": "d-prime",
+              "definition": "目标辨别敏感度：区分目标与非目标表现的信号检测指标。",
+              "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+            },
+            {
+              "key": "omissionRate",
+              "label": "目标遗漏率",
+              "formatted": "0%",
+              "unit": "ratio",
+              "definition": "遗漏比例：应该响应但没有响应的比例。",
+              "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+            },
+            {
+              "key": "commissionRate",
+              "label": "非目标误报率",
+              "formatted": "0%",
+              "unit": "ratio",
+              "definition": "误按比例：本来不应该按时发生按键的比例。",
+              "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+            },
+            {
+              "key": "rtICV",
+              "label": "命中RT变异系数",
+              "formatted": "2%",
+              "unit": "ratio",
+              "definition": "有效反应时标准差除以平均反应时。",
+              "readingHint": "无量纲的相对离散度；显示百分数不意味着正确率。"
+            },
+            {
+              "key": "hitMedianRtMs",
+              "label": "目标命中中位RT",
+              "formatted": "261 毫秒",
+              "unit": "ms",
+              "definition": "按本次冻结任务定义记录“目标命中中位RT”。",
+              "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+            },
+            {
+              "key": "hitRtSdMs",
+              "label": "目标RT标准差",
+              "formatted": "5 毫秒",
+              "unit": "ms",
+              "definition": "按本次冻结任务定义记录“目标RT标准差”。",
+              "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+            },
+            {
+              "key": "perseverationRate",
+              "label": "极短反应比例",
+              "formatted": "0%",
+              "unit": "ratio",
+              "definition": "按本次冻结任务定义记录“极短反应比例”。",
+              "readingHint": "只在同一任务、相同条件及足够有效记录下作描述性比较；配合质量标记和协议限制阅读。"
+            }
+          ],
+          "quality": [
+            {
+              "key": "insufficientTargets",
+              "label": "目标试次不足",
+              "active": false,
+              "effect": "limited",
+              "description": "目标试次过少。"
+            },
+            {
+              "key": "highOmissionRate",
+              "label": "遗漏过高",
+              "active": false,
+              "effect": "limited",
+              "description": "目标遗漏率达到 0.4。"
+            },
+            {
+              "key": "highPerseverationRate",
+              "label": "极短反应过多",
+              "active": false,
+              "effect": "limited",
+              "description": "低于 100ms 的反应比例过高。"
+            },
+            {
+              "key": "interrupted",
+              "label": "作答中断",
+              "active": false,
+              "effect": "limited",
+              "description": "存在 interrupted 试次。"
+            }
+          ],
+          "withheld": []
+        },
+        "visuals": [
+          {
+            "kind": "metrics",
+            "title": "用图看懂本次记录",
+            "unit": "ratio",
+            "points": [
+              {
+                "label": "目标遗漏率",
+                "value": 0
+              },
+              {
+                "label": "非目标误报率",
+                "value": 0
+              }
+            ],
+            "caption": "只展示同一单位的本次指标。柱条用于呈现记录，不是人口排名或能力等级。"
+          }
+        ]
+      }
+    },
+    "assessmentContext": {
+      "schemaVersion": 1,
+      "snapshotHash": "3457d61bd695c1202e1c2484c09c9b081abbabec83c5f4b46ce0cf9851351f26"
+    }
+  }
+}

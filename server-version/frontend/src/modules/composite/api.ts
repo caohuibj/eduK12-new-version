@@ -1,3 +1,4 @@
+import type { WholeReceiptLookup } from './receipt-recovery'
 import type { CompositeReportStatus, WholeQuestionnaireDefinition, WholeQuestionnaireInput, WholeQuestionnaireReceipt } from './types'
 import apiClient, { sessionFetch } from '../../api/client'
 import type {
@@ -114,8 +115,9 @@ export const compositeApi = {
   submitFinalFormSection: (attemptId: string, sectionId: string, input: { submissionId: string; attemptEpoch: number; definitionHash: string; contextSnapshotHash?: string | null; answers: Array<{ formItemId: string; value: string | string[] | null }> }) => apiClient.post<any>(`/composite-assessments/attempts/${attemptId}/form-sections/${sectionId}/submit`, input),
   submitFinalScale: (attemptId: string, itemId: string, input: { submissionId: string; attemptEpoch: number; definitionHash: string; contextSnapshotHash?: string | null; answers: Array<{ itemCode: string; responseValue: string | number; responseTimeMs?: number }> }) => apiClient.post<any>(`/composite-assessments/attempts/${attemptId}/items/${itemId}/scale/submit`, input),
   wholeDefinition: (attemptId: string) => apiClient.get<WholeQuestionnaireDefinition>(`/composite-assessments/attempts/${attemptId}/whole/definition`),
+  wholeReceipt: (attemptId: string, submissionId: string, attemptEpoch: number) => apiClient.get<WholeReceiptLookup>(`/composite-assessments/attempts/${attemptId}/whole/receipt?submissionId=${encodeURIComponent(submissionId)}&attemptEpoch=${attemptEpoch}`),
   submitWhole: (attemptId: string, input: WholeQuestionnaireInput) => apiClient.post<WholeQuestionnaireReceipt>(`/composite-assessments/attempts/${attemptId}/whole/submit`, input),
-  reportStatus: (attemptId: string) => apiClient.get<CompositeReportStatus>(`/composite-assessments/attempts/${attemptId}/report-status`),
+  reportStatus: (attemptId: string, waitMs = 0, signal?: AbortSignal) => apiClient.get<CompositeReportStatus>(`/composite-assessments/attempts/${attemptId}/report-status`, { params: { waitMs }, signal }),
   retryReport: (attemptId: string) => apiClient.post<CompositeReportStatus>(`/composite-assessments/attempts/${attemptId}/report-retry`, {}),
   teacherReportStatus: (id: string, attemptId: string) => apiClient.get<CompositeReportStatus>(`/composite-assessments/${id}/attempts/${attemptId}/report-status`),
   report: (attemptId: string) => apiClient.get<CompositeReport>(`/composite-assessments/attempts/${attemptId}/report`),
@@ -164,8 +166,9 @@ export const publicCompositeApi = (recoveryToken: string) => ({
   submitFinalFormSection: (attemptId: string, sectionId: string, input: { submissionId: string; attemptEpoch: number; definitionHash: string; contextSnapshotHash?: string | null; answers: Array<{ formItemId: string; value: string | string[] | null }> }) => apiClient.post<any>(`/public/composite-assessments/attempts/${attemptId}/form-sections/${sectionId}/submit`, input, { headers: { 'X-Recovery-Token': recoveryToken } }),
   submitFinalScale: (attemptId: string, itemId: string, input: { submissionId: string; attemptEpoch: number; definitionHash: string; contextSnapshotHash?: string | null; answers: Array<{ itemCode: string; responseValue: string | number; responseTimeMs?: number }> }) => apiClient.post<any>(`/public/composite-assessments/attempts/${attemptId}/items/${itemId}/scale/submit`, input, { headers: { 'X-Recovery-Token': recoveryToken } }),
   wholeDefinition: (attemptId: string) => apiClient.get<WholeQuestionnaireDefinition>(`/public/composite-assessments/attempts/${attemptId}/whole/definition`, { headers: { 'X-Recovery-Token': recoveryToken } }),
+  wholeReceipt: (attemptId: string, submissionId: string, attemptEpoch: number) => apiClient.get<WholeReceiptLookup>(`/public/composite-assessments/attempts/${attemptId}/whole/receipt?submissionId=${encodeURIComponent(submissionId)}&attemptEpoch=${attemptEpoch}`, { headers: { 'X-Recovery-Token': recoveryToken } }),
   submitWhole: (attemptId: string, input: WholeQuestionnaireInput) => apiClient.post<WholeQuestionnaireReceipt>(`/public/composite-assessments/attempts/${attemptId}/whole/submit`, input, { headers: { 'X-Recovery-Token': recoveryToken } }),
-  reportStatus: (attemptId: string) => apiClient.get<CompositeReportStatus>(`/public/composite-assessments/attempts/${attemptId}/report-status`, { headers: { 'X-Recovery-Token': recoveryToken } }),
+  reportStatus: (attemptId: string, waitMs = 0, signal?: AbortSignal) => apiClient.get<CompositeReportStatus>(`/public/composite-assessments/attempts/${attemptId}/report-status`, { headers: { 'X-Recovery-Token': recoveryToken }, params: { waitMs }, signal }),
   retryReport: (attemptId: string) => apiClient.post<CompositeReportStatus>(`/public/composite-assessments/attempts/${attemptId}/report-retry`, {}, { headers: { 'X-Recovery-Token': recoveryToken } }),
   report: (attemptId: string) => apiClient.get<CompositeReport>(`/public/composite-assessments/attempts/${attemptId}/report`, { headers: { 'X-Recovery-Token': recoveryToken } }),
   // Kept for a future participant-facing export flow; PR11 deliberately has

@@ -1,3 +1,5 @@
+import { resolveStoredScaleResult } from '../assessment-runtime/compact-assessment-storage'
+import { isScaleReportFactsView } from '../assessment-runtime/compact-scale-facts'
 import { safeDecrypt } from '../../utils/encryption'
 import { parseScaleResultV2, type ScaleResultV2 } from '../scale/scale-result'
 import { resolveEffectiveScaleDisclosure } from '../scale/projection/context'
@@ -91,7 +93,7 @@ export const buildScaleUnitReport = (input: BuildScaleUnitReportInput): ScaleUni
   if (decoded.value === null) return emptyResultProjection(input)
   let result: ScaleResultV2
   try {
-    result = parseScaleResultV2(decoded.value)
+    result = isScaleReportFactsView(decoded.value) ? decoded.value : parseScaleResultV2(decoded.value)
   } catch {
     return { ...emptyResultProjection(input), decryptError: true }
   }
@@ -213,3 +215,5 @@ export const formatFormAnswerLabel = (value: string | null, formType?: string | 
     return Array.isArray(selected) ? selected.map(label).join('、') : value
   } catch { return value }
 }
+
+export const loadScaleUnitReport = async (input: BuildScaleUnitReportInput, record?: any): Promise<ScaleUnitReport> => buildScaleUnitReport({ ...input, result: await resolveStoredScaleResult(input.result, { record }) })

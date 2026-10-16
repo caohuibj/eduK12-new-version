@@ -63,6 +63,37 @@ export const canonicalJsonString = (value: unknown): string => {
 
 export const canonicalJsonBytes = (value: unknown): Buffer => Buffer.from(canonicalJsonString(value), 'utf8')
 
-export const canonicalHash = (value: unknown): string => (
-  createHash('sha256').update(canonicalJsonBytes(value)).digest('hex')
+// Registered values are deeply immutable and have already passed the exact
+// canonical encoder. Weak keys cannot retain an evicted artifact by themselves.
+const immutableCanonical = new WeakMap<object, Buffer>()
+export const hasImmutableCanonicalValue = (value: object): boolean => immutableCanonical.has(value)
+export const retainImmutableCanonicalValue = <T extends object>(value: T): T => {
+  if (immutableCanonical.has(value)) return value
+  const bytes = canonicalJsonBytes(value)
+  const seen = new WeakSet<object>()
+  const freeze = (node: unknown): void => {
+    if (!node || typeof node !== 'object' || seen.has(node)) return
+    seen.add(node); for (const child of Object.values(node)) freeze(child); Object.freeze(node)
+  }
+  freeze(value); immutableCanonical.set(value, bytes); return value
+}
+const encodedValue = (value: unknown): Buffer => (
+  process.env.ASSESSMENT_COMPILED_ARTIFACT_CACHE_ENABLED === 'true' && value && typeof value === 'object'
+    ? immutableCanonical.get(value) ?? canonicalJsonBytes(value) : canonicalJsonBytes(value)
 )
+export const canonicalHash = (value: unknown): string => createHash('sha256').update(encodedValue(value)).digest('hex')
+
+/** Same bytes as canonicalHash for a plain record, reusing only registered,
+ * deeply immutable child values. Dynamic attempt fields are encoded each time. */
+export const canonicalHashObjectParts = (value: Record<string, unknown>): string => {
+  if (process.env.ASSESSMENT_COMPILED_ARTIFACT_CACHE_ENABLED !== 'true') return canonicalHash(value)
+  const proto = Object.getPrototypeOf(value)
+  if ((proto !== Object.prototype && proto !== null) || Object.getOwnPropertySymbols(value).length) {
+    throw new CanonicalJsonError('value must be a plain object without symbol keys')
+  }
+  // Recreate normal object enumeration so numeric keys match normalize().
+  const keys = Object.keys(Object.fromEntries(Object.keys(value).sort(compareLexical).map(key => [key, null])))
+  const hash = createHash('sha256').update('{')
+  keys.forEach((key, index) => { hash.update((index ? ',' : '') + JSON.stringify(key) + ':'); hash.update(encodedValue(value[key])) })
+  return hash.update('}').digest('hex')
+}

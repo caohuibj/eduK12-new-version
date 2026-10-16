@@ -1,3 +1,4 @@
+import { loadStoredCanonicalUnitResult } from '../assessment-runtime/compact-assessment-storage'
 import { prisma } from '../../config/database'
 import { resolveOrganizationAccessContext } from '../organization/access'
 import { parseStoredCanonicalUnitResult } from '../assessment-runtime/persistence'
@@ -22,7 +23,7 @@ export const readOrganizationSafetyCase = async (input: {
   const attempt = await prisma.compositeAssessmentAttempt.findUnique({ where: { id: snapshot.compositeAttemptId } })
   if (!attempt || attempt.status !== 'COMPLETED' || attempt.attemptEpoch !== snapshot.attemptEpoch
     || attempt.subjectUserId !== row.subjectUserId) return hidden()
-  const canonical = parseStoredCanonicalUnitResult(snapshot.canonicalResultEncrypted)
+  const canonical = await loadStoredCanonicalUnitResult(snapshot.canonicalResultEncrypted)
   if (canonical.resultHash !== row.triggerSourceHash) return hidden()
   const bindings = await prisma.$queryRaw<Array<{ subjectUserId: string }>>`
     SELECT subject.user_id AS "subjectUserId"

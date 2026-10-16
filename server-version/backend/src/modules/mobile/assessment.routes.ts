@@ -15,6 +15,6 @@ assessmentRuntimeRouter.get('/scales/:id',asyncHandler(async(req,res)=>{
  const attempt=await prisma.assessment.findUnique({where:{id},include:{scale:true}})
  if(!attempt||attempt.userId!==req.user!.userId||attempt.questionnaireAssessmentId||attempt.compositeAttemptId)return notFound(res)
  if(attempt.deliveryMode!=='FINAL_ONLY'||!attempt.runtimeSnapshotEncrypted)return error(res,'当前记录没有可验证的冻结 Runtime',-1,409)
- return success(res,scaleRunnerResponse(attempt,attempt.scale))
+ return success(res,(await scaleRunnerResponse(attempt,attempt.scale)))
 }))
 assessmentRuntimeRouter.use((err:unknown,_q:any,res:any,next:any)=>{if(err instanceof z.ZodError)return error(res,'请求参数无效',-1,400);next(err)})

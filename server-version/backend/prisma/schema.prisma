@@ -701,6 +701,7 @@ model Scale {
 
 // 测评记录表
 model Assessment {
+  resultFacts AssessmentResultFact[]
   id                        String                 @id @default(uuid())
   scaleId                   String                 @map("scale_id")
   userId                    String?                @map("user_id") // 改为可选，支持匿名测评
@@ -711,9 +712,9 @@ model Assessment {
   submissionId              String?                @unique @map("submission_id")
   submissionPayloadHash     String?                @map("submission_payload_hash")
   submissionCompletedAt     DateTime?              @map("submission_completed_at")
-  answers                   Json? // 答案数组（加密存储）
+  answers                   Json? // 旧格式/进行中答案；新格式完成后引用唯一原始事实
   answersRevision           Int                    @default(0) @map("answers_revision") // 量表答案 OCC 版本
-  result                    Json? // 加密的完整 ScaleResultV2
+  result                    Json? // 旧格式为加密完整结果；新格式为不可变结果事实引用
   runtimeSnapshotEncrypted  String?                @map("runtime_snapshot_encrypted")
   compiledRuntimeHash       String?                @map("compiled_runtime_hash")
   frozenAdmissionSnapshotEncrypted String?         @map("frozen_admission_snapshot_encrypted")
@@ -868,6 +869,7 @@ model QuestionnaireFormSection {
 
 // 问卷测评记录表
 model QuestionnaireAssessment {
+  frozenControlBindings AssessmentFrozenBinding[]
   id                           String                 @id @default(uuid())
   questionnaireId              String                 @map("questionnaire_id")
   userId                       String?                @map("user_id") // 改为可选，支持匿名测评
@@ -1257,6 +1259,7 @@ model CompositeFormSection {
 
 // 一次学生/匿名参与记录。recoveryTokenHash 只存哈希，原始恢复凭证只在创建时返回一次。
 model CompositeAssessmentAttempt {
+  frozenControlBindings AssessmentFrozenBinding[]
   // Set atomically with the first durable report outbox event; survives disabling new admission.
   asyncReportEpoch Int? @map("async_report_epoch")
   deliveryCourseId String? @map("delivery_course_id")
@@ -3513,6 +3516,7 @@ enum CompositeReportJobStatus {
 }
 
 model CompositeReportJob {
+  scaleResultFacts AssessmentResultFact[] @relation("AssessmentResultRawReceipt")
   wholeValidationEncrypted String? @map("whole_validation_encrypted")
   wholeValidationHash String? @map("whole_validation_hash")
   wholeSubmissionId String? @map("whole_submission_id")
@@ -3552,4 +3556,61 @@ model CompositeReportQueueBudget {
   pending Int    @default(0)
 
   @@map("composite_report_queue_budget")
+}
+
+// Shared scientific content only; personal binding remains on each attempt.
+model AssessmentRuntimeArtifact {
+  artifactHash     String   @id @map("artifact_hash")
+  formatVersion    Int      @map("format_version")
+  plaintextBytes   Int      @map("plaintext_bytes")
+  payloadEncrypted String   @map("payload_encrypted")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamp(3)
+
+  @@map("assessment_runtime_artifacts")
+}
+
+// Shared public templates; personal facts stay in owned records.
+model AssessmentPublicTemplate {
+ templateHash String @id @map("template_hash")
+ templateKind String @map("template_kind")
+ plaintextBytes Int @map("plaintext_bytes")
+ payloadEncrypted String @map("payload_encrypted")
+ createdAt DateTime @default(now()) @map("created_at")
+ @@map("assessment_public_templates")
+}
+
+model AssessmentResultFact {
+ assessmentId String @map("assessment_id")
+ attemptEpoch Int @map("attempt_epoch")
+ submissionId String @unique @map("submission_id")
+ payloadHash String @map("payload_hash")
+ sourceResultHash String @map("source_result_hash")
+ canonicalResultHash String? @map("canonical_result_hash")
+ factsEncrypted String @map("facts_encrypted")
+ rawAnswersEncrypted String? @map("raw_answers_encrypted")
+ rawReceiptAttemptId String? @map("raw_receipt_attempt_id")
+ completedAt DateTime @map("completed_at")
+ totalTime Int @map("total_time")
+ createdAt DateTime @default(now()) @map("created_at")
+ assessment Assessment @relation(fields:[assessmentId], references:[id], onDelete:Cascade, onUpdate:Cascade)
+ rawReceipt CompositeReportJob? @relation("AssessmentResultRawReceipt", fields:[rawReceiptAttemptId,attemptEpoch], references:[attemptId,attemptEpoch], onDelete:NoAction, onUpdate:NoAction)
+ @@id([assessmentId,attemptEpoch])
+ @@index([rawReceiptAttemptId,attemptEpoch], map: "assessment_result_facts_raw_receipt_epoch_idx")
+ @@map("assessment_result_facts")
+}
+
+// One frozen personal context per distinct parent/context; unit plans stay shared.
+model AssessmentFrozenBinding {
+ id BigInt @id @default(autoincrement())
+ bindingHash Bytes @unique @map("binding_hash")
+ compositeAttemptId String? @map("composite_attempt_id")
+ questionnaireAssessmentId String? @map("questionnaire_assessment_id")
+ plaintextBytes Int @map("plaintext_bytes")
+ payloadEncrypted String @map("payload_encrypted")
+ createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(3)
+ compositeAttempt CompositeAssessmentAttempt? @relation(fields:[compositeAttemptId],references:[id],onDelete:Cascade,onUpdate:Cascade)
+ questionnaireAssessment QuestionnaireAssessment? @relation(fields:[questionnaireAssessmentId],references:[id],onDelete:Cascade,onUpdate:Cascade)
+ @@index([compositeAttemptId],map:"assessment_frozen_bindings_composite_idx")
+ @@index([questionnaireAssessmentId],map:"assessment_frozen_bindings_questionnaire_idx")
+ @@map("assessment_frozen_bindings")
 }

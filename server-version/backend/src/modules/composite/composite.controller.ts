@@ -1,3 +1,4 @@
+import { RelationalAssessmentError } from '../assessment-relational/errors'
 import { wholeQuestionnaireArrival, markAssessmentTimeline, traceAssessmentPhase, traceAssessmentPhaseSync } from '../../services/runtimeObservability'
 import { Request, Response } from 'express'
 import { UserRole } from '@prisma/client'
@@ -106,20 +107,28 @@ export const compositeController = {
       return success(res, await getWholeQuestionnaireDefinition(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) }))
     } catch (err) { return handleError(res, err) }
   },
+  async wholeReceipt(req: Request, res: Response) { return handleWholeReceipt(req, res, false) },
+  async publicWholeReceipt(req: Request, res: Response) { return handleWholeReceipt(req, res, true) },
   async wholeSubmit(req: Request, res: Response) { return handleWholeSubmit(req, res, false) },
   async publicWholeSubmit(req: Request, res: Response) { return handleWholeSubmit(req, res, true) },
 
   async reportStatus(req: Request, res: Response) {
-    try { return success(res, await service.getCompositeReportStatus(req.params.attemptId, { userId: req.user!.userId })) }
+    const abort = new AbortController(); const closed = () => abort.abort(); res.once('close', closed)
+    try { return success(res, await service.getCompositeReportStatus(req.params.attemptId, { userId: req.user!.userId },
+      { waitMs: Number(req.query.waitMs) || 0, signal: abort.signal })) }
     catch (err) { return handleError(res, err) }
+    finally { res.off('close', closed) }
   },
   async retryReport(req: Request, res: Response) {
     try { return success(res, await service.retryCompositeQuestionnaireReport(req.params.attemptId, { userId: req.user!.userId })) }
     catch (err) { return handleError(res, err) }
   },
   async publicReportStatus(req: Request, res: Response) {
-    try { return success(res, await service.getCompositeReportStatus(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) })) }
+    const abort = new AbortController(); const closed = () => abort.abort(); res.once('close', closed)
+    try { return success(res, await service.getCompositeReportStatus(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) },
+      { waitMs: Number(req.query.waitMs) || 0, signal: abort.signal })) }
     catch (err) { return handleError(res, err) }
+    finally { res.off('close', closed) }
   },
   async publicRetryReport(req: Request, res: Response) {
     try { return success(res, await service.retryCompositeQuestionnaireReport(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) })) }
@@ -896,6 +905,10 @@ async function handleWholeSubmit(req: Request, res: Response, anonymous: boolean
     markAssessmentTimeline('whole.receipt_response_send')
     return success(res, receipt, '整份问卷已可靠保存，报告正在生成')
   } catch (err) {
+    if (err instanceof RelationalAssessmentError) {
+      const status = err.code === 'RELATIONAL_ANALYSIS_ACCESS' || err.code === 'RELATIONAL_ASSIGNMENT_ACTOR' ? 403 : 409
+      return instrumentError(res, err.code, err.message, status)
+    }
     if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
     if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
     if (isTransientCompletionDatabaseError(err)) return completionBusy(res, 1)
@@ -905,4 +918,14 @@ async function handleWholeSubmit(req: Request, res: Response, anonymous: boolean
     }
     return handleError(res, err)
   }
+}
+
+async function handleWholeReceipt(req: Request, res: Response, publicMode: boolean) {
+  try {
+    const query = z.object({ submissionId: z.string().min(16).max(200), attemptEpoch: z.coerce.number().int().min(1).max(1000000) }).parse(req.query)
+    const { recoverWholeQuestionnaireReceipt } = await import('./whole-receipt-recovery')
+    const principal = publicMode ? { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) } : { userId: req.user!.userId }
+    res.setHeader('Cache-Control', 'no-store')
+    return success(res, await recoverWholeQuestionnaireReceipt(req.params.attemptId, query.submissionId, query.attemptEpoch, principal))
+  } catch (err) { return handleError(res, err) }
 }

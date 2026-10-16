@@ -3,7 +3,7 @@ import { encryptCognitivePayload, hashTrialPayload } from './cognitive.security'
 import { requireCognitiveRegistryEntry } from './cognitive.registry'
 import { lockSession } from './session-lock'
 import { NOT_FOUND, FORBIDDEN, BAD_REQUEST, CONFLICT } from './cognitive.errors'
-import { readCognitiveSessionConfig } from './session.service'
+import { loadCognitiveSessionConfig } from './session.service'
 import { ensureCognitiveAssessmentContext } from './v2/assessment-context'
 import { parseTrialEnvelope } from './v2/trial-envelope'
 import { isEncrypted } from '../../utils/encryption'
@@ -66,10 +66,10 @@ const appendTrialsWithPrincipal = async (
     // v2 sessions persist the complete envelope. Legacy sessions retain the
     // previous raw-payload path so old in-progress attempts remain resumable.
     let v2Snapshot = false
-    let storedConfig: ReturnType<typeof readCognitiveSessionConfig> | null = null
+    let storedConfig: Awaited<ReturnType<typeof loadCognitiveSessionConfig>> | null = null
     try {
       storedConfig = isEncrypted(session.configSnapshotEncrypted)
-        ? readCognitiveSessionConfig(session.configSnapshotEncrypted)
+        ? await loadCognitiveSessionConfig(session.configSnapshotEncrypted,tx)
         : null
       v2Snapshot = Boolean(storedConfig?.snapshot)
     } catch (err) {

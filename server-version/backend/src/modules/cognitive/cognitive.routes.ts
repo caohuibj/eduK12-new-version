@@ -1,3 +1,4 @@
+import { sharedControlRequestContext } from '../assessment-runtime/shared-control-records'
 import { assessmentExportHttp } from '../../services/assessmentExportHttp'
 import { runOrLegacyRespondentAccess } from '../assessment-run/runtimeAccess'
 import { Router, type NextFunction, type Request, type Response } from 'express'
@@ -18,6 +19,7 @@ import { relationalRuntimeConsentAuthority } from '../assessment-relational/runt
  * `/assignments/my` 必须先于 `/assignments/:id` 注册。
  */
 const router = Router()
+router.use(sharedControlRequestContext)
 const respondentAttemptAccess = runOrLegacyRespondentAccess('COGNITIVE')
 const relationalCognitiveFinalConsentGuard = async (req: Request, res: Response, next: NextFunction) => {
   try {

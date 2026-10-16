@@ -4,7 +4,7 @@ import { UserRole } from '../types'
 import { error, forbidden, notFound, success } from '../utils/response'
 import { hashScaleDefinition } from '../modules/scale/scale-definition'
 import { validateScaleProductDefinition } from '../modules/scale/product-definition-readiness'
-import { decryptFrozenScaleRuntimeSnapshot } from '../modules/assessment-runtime/runtime-snapshot'
+import { loadFrozenScaleRuntimeSnapshot } from '../modules/assessment-runtime/runtime-snapshot'
 import {
   publishedScaleMediaOwner,
   retainScaleAssessmentImages,
@@ -75,7 +75,7 @@ export const scaleImageController = {
       })
       if (!assessment) return notFound(res, '量表测评记录不存在')
       if (!assessment.runtimeSnapshotEncrypted) return error(res, '量表冻结内容不可用')
-      const snapshot = decryptFrozenScaleRuntimeSnapshot(assessment.runtimeSnapshotEncrypted)
+      const snapshot = (await loadFrozenScaleRuntimeSnapshot(assessment.runtimeSnapshotEncrypted))
       await serveFrozenScaleAssessmentImage({
         snapshot,
         assetId: req.params.assetId,

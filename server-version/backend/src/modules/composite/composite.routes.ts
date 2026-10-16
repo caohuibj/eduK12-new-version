@@ -1,3 +1,4 @@
+import { sharedControlRequestContext } from '../assessment-runtime/shared-control-records'
 import { observeWholeMiddleware } from '../../services/runtimeObservability'
 import { assessmentExportHttp } from '../../services/assessmentExportHttp'
 import { runOrLegacyRespondentAccess } from '../assessment-run/runtimeAccess'
@@ -15,7 +16,11 @@ import { RelationalAssessmentError } from '../assessment-relational/errors'
 import { relationalProductReportService } from '../assessment-relational/product-report.service'
 import { relationalRuntimeConsentAuthority } from '../assessment-relational/runtime-consent'
 
+import { authenticatedWholeSubmissionPriority, prepareWholeSubmissionPriority } from '../../services/wholeSubmissionPriority'
+
 const router = Router()
+router.use(sharedControlRequestContext)
+prepareWholeSubmissionPriority()
 // New questionnaire writes must use the revisioned product service. Runtime,
 // credential and export routes retain their original authorization.
 router.use('/:id', async (req, res, next) => {
@@ -57,10 +62,16 @@ const relationalFinalConsentGuard = async (req: Request, res: Response, next: Ne
   }
 }
 
+const relationalWholeFinalConsentGuard = (req: Request, res: Response, next: NextFunction) => {
+  if (process.env.ASSESSMENT_WHOLE_REQUEST_CONTEXT_REUSE_ENABLED === 'true') return next()
+  return relationalFinalConsentGuard(req, res, next)
+}
+
 router.get('/available', authenticate, requireRole(UserRole.STUDENT), compositeController.available)
 router.get('/attempts/:attemptId', authenticate, respondentAttemptAccess, compositeController.getAttempt)
 router.get('/attempts/:attemptId/whole/definition', authenticate, respondentAttemptAccess, compositeController.wholeDefinition)
-router.post('/attempts/:attemptId/whole/submit', observeWholeMiddleware('whole.identity_auth', authenticate), observeWholeMiddleware('whole.respondent_gate', respondentAttemptAccess), observeWholeMiddleware('whole.relational_consent', relationalFinalConsentGuard), compositeController.wholeSubmit)
+router.get('/attempts/:attemptId/whole/receipt', authenticate, respondentAttemptAccess, compositeController.wholeReceipt)
+router.post('/attempts/:attemptId/whole/submit', observeWholeMiddleware('whole.identity_auth', authenticate), authenticatedWholeSubmissionPriority, observeWholeMiddleware('whole.respondent_gate', respondentAttemptAccess), observeWholeMiddleware('whole.relational_consent', relationalWholeFinalConsentGuard), compositeController.wholeSubmit)
 router.get('/attempts/:attemptId/form-sections/:sectionId/assets/:assetId/content', authenticate, respondentAttemptAccess, compositeImageController.authenticatedFormImage)
 router.get('/attempts/:attemptId/items/:itemId/scale/assets/:assetId/content', authenticate, respondentAttemptAccess, compositeImageController.authenticatedScaleImage)
 router.post('/attempts/:attemptId/form-sections/:sectionId/items/:itemId/options/:optionIndex/video-capability', authenticate, respondentAttemptAccess, compositeVideoController.authenticatedFormVideo)

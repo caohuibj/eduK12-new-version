@@ -21,6 +21,8 @@ type RuntimeConsentDb = {
   }
 }
 
+export type RuntimeConsentHeader = { id: string; userId: string | null; assignmentRef: string | null; consentId: string | null }
+
 export const createRelationalRuntimeConsentAuthority = (input?: {
   db?: RuntimeConsentDb
   assignments?: Pick<RelationalAssignmentRepository, 'findById' | 'resolveAcceptedConsent'>
@@ -29,11 +31,12 @@ export const createRelationalRuntimeConsentAuthority = (input?: {
   const assignments = input?.assignments
     ?? createSqlRelationalAssignmentRepository(prisma as any)
 
-  const assertCompositeFinal = async (attemptId: string, actorUserId: string): Promise<void> => {
-    const attempt = await db.compositeAssessmentAttempt.findUnique({
+  const assertCompositeFinal = async (attemptId: string, actorUserId: string, preloaded?: RuntimeConsentHeader | null): Promise<void> => {
+    if (preloaded && preloaded.id !== attemptId) relationalFail('RELATIONAL_RUNTIME_BINDING', 'preloaded consent header belongs to a different attempt')
+    const attempt = preloaded === undefined ? await db.compositeAssessmentAttempt.findUnique({
       where: { id: attemptId },
       select: { userId: true, assignmentRef: true, consentId: true },
-    })
+    }) : preloaded
     // Let the existing runtime endpoint remain authoritative for missing records.
     if (!attempt || !attempt.assignmentRef) return
     if (attempt.userId !== actorUserId) {

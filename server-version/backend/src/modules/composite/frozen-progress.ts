@@ -1,4 +1,4 @@
-import { decryptFrozenActiveSlotSet } from '../assessment-runtime/slot-set'
+import { decryptFrozenActiveSlotSet, loadFrozenActiveSlotSet } from '../assessment-runtime/slot-set'
 import { evaluateCompleteness, type AggregateSnapshotHeader } from '../assessment-runtime/unified-aggregate'
 
 export const frozenCompositeProgress = (attempt: {
@@ -31,4 +31,23 @@ export function frozenMeasurementFinalHeaders(
     && header.unitType !== 'FORM_SECTION' && header.terminalState === 'COMPLETED'
     && header.payloadKind === 'UNIT_RESULT' && Boolean(header.sourceAttemptId)
     && header.sourceType === sourceTypes[header.unitType as keyof typeof sourceTypes])
+}
+
+export const loadFrozenCompositeProgress = async (attempt: Parameters<typeof frozenCompositeProgress>[0], headers: AggregateSnapshotHeader[]) => {
+  if (attempt.runtimeGeneration !== 'UNIFIED_V1') return null
+  try {
+    if (!attempt.frozenActiveSlotSetEncrypted || !attempt.frozenActiveSlotSetHash) throw new Error('missing frozen slots')
+    const frozen = await loadFrozenActiveSlotSet(attempt.frozenActiveSlotSetEncrypted)
+    if (frozen.snapshotHash !== attempt.frozenActiveSlotSetHash || frozen.attemptEpoch !== attempt.attemptEpoch) throw new Error('frozen identity mismatch')
+    const complete = evaluateCompleteness({ slots: frozen.slots, snapshots: headers.filter(h => h.attemptEpoch === attempt.attemptEpoch), attemptEpoch: frozen.attemptEpoch })
+    if (complete.invalidSlotKeys.length) throw new Error('invalid terminal headers')
+    return { progress: complete.progress, completedItems: complete.completedSlotCount, progressUnavailableReason: null }
+  } catch { return { progress: 0, completedItems: 0, progressUnavailableReason: '冻结单元进度暂不可读，请核查记录完整性。' } }
+}
+export const loadFrozenMeasurementFinalHeaders = async (attempt: Parameters<typeof frozenCompositeProgress>[0], headers: AggregateSnapshotHeader[]): Promise<AggregateSnapshotHeader[]> => {
+  const progress = await loadFrozenCompositeProgress(attempt, headers)
+  if (!progress || progress.progressUnavailableReason) return []
+  const sourceTypes = { SCALE: 'ASSESSMENT', COGNITIVE: 'COGNITIVE_SESSION', SITUATIONAL: 'SITUATIONAL_ATTEMPT' }
+  return headers.filter(h => h.attemptEpoch === attempt.attemptEpoch && h.unitType !== 'FORM_SECTION' && h.terminalState === 'COMPLETED'
+    && h.payloadKind === 'UNIT_RESULT' && Boolean(h.sourceAttemptId) && h.sourceType === sourceTypes[h.unitType as keyof typeof sourceTypes])
 }

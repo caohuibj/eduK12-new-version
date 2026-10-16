@@ -1,4 +1,4 @@
-import { decryptFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
+import { loadFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
 import { scaleProjectionPolicyFromCompiled, denyAllScaleProjectionPolicy } from '../scale/projection/policy-resolver'
 import { resolveAudienceDisclosure } from '../scale/policy/disclosure'
 import { contextValues } from './context-submission'
@@ -138,7 +138,7 @@ export async function readReport(attemptId: string, audience: BundleReportAudien
       try {
         if (!admission?.runtimeSnapshotEncrypted) policy = denyAllScaleProjectionPolicy()
         else {
-          const runtime = decryptFrozenScaleRuntimeSnapshot(admission.runtimeSnapshotEncrypted)
+          const runtime = (await loadFrozenScaleRuntimeSnapshot(admission.runtimeSnapshotEncrypted))
           if (runtime.schemaVersion === 2) policy = scaleProjectionPolicyFromCompiled(runtime.compiledPolicy)
         }
       } catch { policy = denyAllScaleProjectionPolicy() }

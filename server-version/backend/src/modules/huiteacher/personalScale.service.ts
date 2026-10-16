@@ -1,10 +1,11 @@
+import { loadScaleResult } from '../scale/scale-workflow.service'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { encryptScaleAnswers,readScaleResult,scaleDefinitionFromRecord } from '../scale/scale-workflow.service'
 import { runnerDefinition,hashScaleDefinition } from '../scale/scale-definition'
 import { standaloneAdmissionPersistence } from '../scale/scale-admission.service'
-import { freezeScaleRuntimeAtAttemptStart,encryptFrozenScaleRuntimeSnapshot,
-  decryptFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
+import { freezeScaleRuntimeAtAttemptStart,persistFrozenScaleRuntimeSnapshot,
+  loadFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
 import { submitScaleAssessmentFinal,type FinalScaleAnswerInput } from '../scale/scale-final-submit.service'
 import { releasedTeacherScaleEntry } from './scaleLicense.service'
 
@@ -120,7 +121,7 @@ export async function startPersonalTeacherScale(input:{userId:string;resourceId:
     const assessment=await tx.assessment.create({data:{
       scaleId:scale.id,userId:input.userId,status:'IN_PROGRESS',
       deliveryMode:'FINAL_ONLY',runtimeGeneration:'UNIFIED_V1',
-      runtimeSnapshotEncrypted:encryptFrozenScaleRuntimeSnapshot(snapshot),
+      runtimeSnapshotEncrypted:(await persistFrozenScaleRuntimeSnapshot(snapshot, tx)),
       compiledRuntimeHash:snapshot.compiledRuntime.compiledRuntimeHash,
       ...standaloneAdmissionPersistence({
         attemptEpoch:1,userId:input.userId,
@@ -172,7 +173,7 @@ async function ownedAttempt(tx:Tx,input:{userId:string;assessmentId:string}){
   if(row[0].scaleId!==release.scaleId
     ||row[0].definitionHash!==release.definitionHash)
     reject('HUITEACHER_PERSONAL_SOURCE_INVALID')
-  const frozen=decryptFrozenScaleRuntimeSnapshot(row[0].runtimeSnapshotEncrypted)
+  const frozen=(await loadFrozenScaleRuntimeSnapshot(row[0].runtimeSnapshotEncrypted, tx))
   if(frozen.legacyDefinitionHash!==release.definitionHash
     ||frozen.instrumentKey!==row[0].scaleCode
     ||frozen.instrumentVersion!==row[0].scaleVersion)
@@ -243,7 +244,7 @@ export async function readOwnPersonalTeacherScaleReport(input:{
   return prisma.$transaction(async tx=>{
     const {record,snapshot}=await ownedAttempt(tx,input)
     if(record.status!=='COMPLETED')reject('HUITEACHER_PERSONAL_NOT_COMPLETED',409)
-    const decoded=readScaleResult(record.result)
+    const decoded=await loadScaleResult(record.result, record, {}, tx)
     if(decoded.decryptError||!decoded.result)reject('HUITEACHER_PERSONAL_RESULT_INVALID')
     const result=decoded.result
     if(result.instrument.scaleId!==record.scaleId
