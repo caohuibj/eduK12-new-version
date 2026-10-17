@@ -22,6 +22,7 @@ def phase(name,fn):
  finally:
   results['phases'].append({'name':name,'status':status,'seconds':round(time.monotonic()-start,2)})
   (evidence/'checks.json').write_text(json.dumps(results,indent=2))
+phase('bounded-upload-cleanup-host-contracts',lambda:run(['python3','-B','server-version/scripts/asset-upload-cleanup/run_test.py'],30))
 backend_tests=['src/__tests__/campus/local-auth-origin.test.ts','src/__tests__/campus/registration-code.test.ts','src/__tests__/campus/mfa-totp.contract.test.ts','src/__tests__/integration/campusRegistrationCode.postgres.integration.test.ts','src/__tests__/integration/campusAuthRealm.postgres.integration.test.ts','src/__tests__/integration/campusTotp.postgres.integration.test.ts','src/__tests__/integration/campusAdmission.postgres.integration.test.ts','src/__tests__/integration/campusParentPeer.postgres.integration.test.ts','src/__tests__/integration/campusStaffInviteGovernance.postgres.integration.test.ts','src/__tests__/middleware/csrf.test.ts']
 if backend_repair: backend_tests=p['tests']
 frontend_tests=['src/school/'+f for f in ['SchoolMark.test.tsx','SchoolLanding.test.tsx','SchoolParentPortal.test.tsx','SchoolWorkspace.test.tsx','SchoolWorkspaceShell.test.tsx','SchoolEntryMfa.test.tsx']]
@@ -94,16 +95,18 @@ with tempfile.TemporaryDirectory(prefix='campus-ci-') as temp:
       phase('backend-focused-'+str(index),focused)
     def shared_restore():
      # Synthetic new-format rows, actual PostgreSQL dump/restore into a second DB.
-     fixture="INSERT INTO stored_assets(id,object_key,storage_object_key,provider,mime_type,size_bytes,sha256,owner_id,access_scope,created_at,updated_at) VALUES ('shared-restore-a','assets/restore-a',NULL,'cos','video/mp4',4,repeat('a',64),'restore-owner-a','PRIVATE',now(),now()),('shared-restore-b','assets/restore-b','assets/restore-a','cos','video/mp4',4,repeat('a',64),'restore-owner-b','PRIVATE',now(),now());"
+     fixture="INSERT INTO stored_assets(id,object_key,storage_object_key,provider,mime_type,size_bytes,sha256,owner_id,access_scope,duplicate_cleanup_pending,created_at,updated_at) VALUES ('shared-restore-a','assets/restore-a',NULL,'cos','video/mp4',4,repeat('a',64),'restore-owner-a','PRIVATE',false,now(),now()),('shared-restore-b','assets/restore-b','assets/restore-a','cos','video/mp4',4,repeat('a',64),'restore-owner-b','PRIVATE',true,now(),now());"
      run(['docker','exec','campus-ci-postgres','psql','-U','ptool','-d','campus_ci_test','-v','ON_ERROR_STOP=1','-c',fixture])
      dump=subprocess.check_output(['docker','exec','campus-ci-postgres','pg_dump','-U','ptool','--no-owner','--no-privileges','campus_ci_test'])
      run(['docker','exec','campus-ci-postgres','createdb','-U','ptool','shared_restore_test'])
      subprocess.run(['docker','exec','-i','campus-ci-postgres','psql','-U','ptool','-d','shared_restore_test','-v','ON_ERROR_STOP=1'],input=dump,check=True,stdout=subprocess.DEVNULL,timeout=180)
      sql="SELECT count(*)::text||':'||count(DISTINCT owner_id)::text||':'||count(DISTINCT object_key)::text FROM stored_assets WHERE coalesce(storage_object_key,object_key)='assets/restore-a';"
      assert output(['docker','exec','campus-ci-postgres','psql','-U','ptool','-d','shared_restore_test','-Atc',sql])=='2:2:2'
+     assert output(['docker','exec','campus-ci-postgres','psql','-U','ptool','-d','shared_restore_test','-Atc',"SELECT duplicate_cleanup_pending::text FROM stored_assets WHERE id='shared-restore-b'"])=='true'
+     assert output(['docker','exec','campus-ci-postgres','psql','-U','ptool','-d','shared_restore_test','-Atc',"SELECT count(*) FROM pg_indexes WHERE tablename='stored_assets' AND indexname IN ('stored_assets_content_lookup_idx','stored_assets_duplicate_cleanup_idx')"])=='2'
      failed=output(['docker','exec','campus-ci-postgres','psql','-U','ptool','-d','shared_restore_test','-Atc','SELECT count(*) FROM _prisma_migrations WHERE finished_at IS NULL AND rolled_back_at IS NULL'])
      assert failed=='0'
-     (evidence/'new-schema-restore.json').write_text(json.dumps({'status':'PASS','physicalBodies':1,'logicalAssets':2,'distinctOwners':2,'oldAliases':2,'dumpBytes':len(dump),'failedMigrations':0}))
+     (evidence/'new-schema-restore.json').write_text(json.dumps({'status':'PASS','physicalBodies':1,'logicalAssets':2,'distinctOwners':2,'oldAliases':2,'dumpBytes':len(dump),'failedMigrations':0,'pendingCleanupRestored':True,'lookupAndPendingIndexes':2}))
     phase('new-schema-restore',shared_restore)
    finally:
     for name in resources:subprocess.run(['docker','rm','-f']+(['-v'] if backend_repair else [])+[name],check=True)

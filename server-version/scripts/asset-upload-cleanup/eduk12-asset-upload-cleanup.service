@@ -1,0 +1,22 @@
+[Unit]
+Description=eduK12 bounded retry of duplicate upload cleanup
+After=docker.service network-online.target
+Wants=network-online.target
+[Service]
+Type=oneshot
+User=root
+ExecStart=/usr/bin/python3 -B /opt/eduk12-asset-upload-cleanup/current/run.py --run
+TimeoutStartSec=90
+TimeoutStopSec=15
+UMask=0077
+StateDirectory=eduk12-asset-upload-cleanup
+StateDirectoryMode=0700
+CPUQuota=10%
+MemoryMax=96M
+Nice=19
+IOSchedulingClass=idle
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+PrivateTmp=true
+ReadWritePaths=/var/lib/eduk12-asset-upload-cleanup

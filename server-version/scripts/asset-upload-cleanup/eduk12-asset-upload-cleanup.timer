@@ -1,0 +1,9 @@
+[Unit]
+Description=Retry pending duplicate upload cleanup in bounded batches
+[Timer]
+OnBootSec=5min
+OnUnitInactiveSec=5min
+RandomizedDelaySec=30
+Unit=eduk12-asset-upload-cleanup.service
+[Install]
+WantedBy=timers.target

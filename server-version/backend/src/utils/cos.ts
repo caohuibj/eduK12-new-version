@@ -1,3 +1,5 @@
+import crypto from 'node:crypto'
+import { Transform } from 'node:stream'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../config/database'
 import COS from 'cos-nodejs-sdk-v5'
@@ -53,7 +55,8 @@ export const uploadToCOS = async (
 export const uploadBufferToCOS = async (
   buffer: Buffer,
   key: string,
-  storageClass: StorageClass = 'STANDARD'
+  storageClass: StorageClass = 'STANDARD',
+  metadata?: { mimeType: string; sha256: string }
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
     cos.putObject(
@@ -63,6 +66,7 @@ export const uploadBufferToCOS = async (
         Key: key,
         Body: buffer,
         StorageClass: storageClass,
+        ...(metadata ? { ContentType: metadata.mimeType, 'x-cos-meta-sha256': metadata.sha256, ACL: 'private' } : {}),
       } as any,
       (err, data) => {
         if (err) {
@@ -129,3 +133,25 @@ export const deleteFromCOSByUrl = async (url: string): Promise<void> => {
     await deleteFromCOS(key)
   }
 }
+
+
+/** Verify the actual streamed bytes against the preflight content digest. */
+export const uploadAssetFileToCOS = (filePath: string, key: string, mimeType: string, expectedSize: number, expectedSha256: string): Promise<{ sha256: string }> => new Promise((resolve, reject) => {
+  const hash = crypto.createHash('sha256')
+  let size = 0
+  const source = fs.createReadStream(filePath)
+  const body = new Transform({ transform(chunk, _encoding, callback) { size += chunk.length; hash.update(chunk); callback(null, chunk) } })
+  const fail = (error: Error) => { source.destroy(); body.destroy(); reject(error) }
+  source.on('error', fail)
+  body.on('error', fail)
+  source.pipe(body)
+  try { cos.putObject({ Bucket: config.cosBucket!, Region: config.cosRegion!, Key: key, Body: body,
+    ContentLength: expectedSize, ContentType: mimeType, 'x-cos-meta-sha256': expectedSha256, ACL: 'private', StorageClass: 'STANDARD' } as any, error => {
+    source.destroy(); body.destroy()
+    if (error) return reject(error)
+    if (size !== expectedSize) return reject(new Error('Uploaded asset size changed'))
+    const digest = hash.digest('hex')
+    if (digest !== expectedSha256) return reject(new Error('Asset file changed during upload'))
+    resolve({ sha256: digest })
+  }) } catch (error) { fail(error as Error) }
+})

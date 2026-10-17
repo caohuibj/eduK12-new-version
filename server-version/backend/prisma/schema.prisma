@@ -1459,6 +1459,7 @@ model StoredAsset {
   id           String    @id @default(uuid())
   objectKey    String    @unique @map("object_key")
   storageObjectKey String? @map("storage_object_key")
+  duplicateCleanupPending Boolean @default(false) @map("duplicate_cleanup_pending")
   provider     String    @default("local")
   mimeType     String    @map("mime_type")
   sizeBytes    Int       @map("size_bytes")
@@ -1482,6 +1483,7 @@ model StoredAsset {
   @@index([ownerId])
   @@index([accessScope, scopeId])
   @@index([storageObjectKey])
+  @@index([provider, sha256, sizeBytes, mimeType, deletedAt, createdAt(sort: Desc), id(sort: Desc)], map: "stored_assets_content_lookup_idx")
   @@map("stored_assets")
 }
 
