@@ -101,7 +101,7 @@ def isolated_export(backup, file, source, secret, work, ident):
         tables = sql("SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY tablename;").decode().strip().splitlines()
         require('stored_assets' in tables and 'asset_references' in tables and all(re.fullmatch('[A-Za-z_][A-Za-z0-9_]{0,62}', t) for t in tables), 'JOINT_REFERENCE_SCHEMA_UNKNOWN')
         def export(query, destination, max_bytes, compact=False):
-            return export_rows(['docker', 'exec', name, 'psql', '-X', '-q', '-A', '-t', '-v', 'ON_ERROR_STOP=1', '-U', 'restore', '-d', 'restore', '-c', "SET statement_timeout='120s'; " + query], destination, max_bytes, compact_json_rows=compact)
+            return export_rows(['docker', 'exec', name, 'psql', '-X', '-q', '-A', '-t', '-v', 'ON_ERROR_STOP=1', '-v', 'FETCH_COUNT=16', '-U', 'restore', '-d', 'restore', '-c', "SET statement_timeout='120s';", '-c', query], destination, max_bytes, timeout=600 if compact else 180, compact_json_rows=compact)
         export('SELECT row_to_json(a) FROM public.stored_assets a;', work / 'assets.jsonl', 16777216)
         # All persistent table rows, including JSON snapshots, are scanned. They stay
         # root-private and are removed before this task returns; no rows enter logs.
@@ -179,6 +179,42 @@ def activate_if_requested(backup, c, secret, credentials, image, work):
  ACTIVATION.unlink()
  return True
 
+def load_completed(backup, repo, secret):
+    directory = ROOT / 'completed-bindings'
+    if not directory.exists(): return False
+    require(not directory.is_symlink() and directory.is_dir(), 'RECOVERY_CHECKPOINT_PATH_REFUSED')
+    verifier = backup.sha(CODE / 'recovery.mjs')
+    old = repo.get('previousProof') or {}
+    checks = ['databaseRestore', 'attachmentDecrypt', 'databaseReferences']
+    same = old.get('schema') == 1 and old.get('status') == 'VERIFIED' and old.get('identity') == repo['identity'] and old.get('referenceVerifierSha256') == verifier and all(old.get('checks', {}).get(k) is True for k in checks)
+    bindings = {b['hostPointId']: b for b in old.get('bindings', [])} if same else {}
+    added = False
+    for point in repo['points']:
+        require(re.fullmatch('[a-f0-9]{32}', point['id']) is not None, 'RECOVERY_POINT_ID_INVALID')
+        file = directory / (point['id'] + '.json')
+        if not file.exists(): continue
+        require(not file.is_symlink() and file.stat().st_size <= 2 * 1024 ** 2, 'RECOVERY_CHECKPOINT_PATH_REFUSED')
+        saved = backup.unseal(json.loads(backup.private_read(file)), secret)
+        require(saved.get('schema') == 1 and saved.get('purpose') == 'completed_joint_recovery_binding', 'RECOVERY_CHECKPOINT_INVALID')
+        if saved.get('identity') != repo['identity'] or saved.get('referenceVerifierSha256') != verifier: continue
+        binding = saved.get('binding', {})
+        require(binding.get('hostPointId') == point['id'], 'RECOVERY_CHECKPOINT_POINT_CHANGED')
+        if point['id'] not in bindings: bindings[point['id']] = binding; added = True
+    if added:
+        # Temporary verifier input only. Never published as the global cleanup proof.
+        # The unchanged JS cachedBinding validates restore evidence and remote HEAD.
+        repo['previousProof'] = {'schema': 1, 'status': 'VERIFIED', 'identity': repo['identity'], 'referenceVerifierSha256': verifier, 'checks': {k: True for k in checks}, 'bindings': list(bindings.values())}
+    return added
+
+def save_completed(backup, repo, binding, secret):
+    point = binding.get('hostPointId', '')
+    require(re.fullmatch('[a-f0-9]{32}', point) is not None, 'RECOVERY_POINT_ID_INVALID')
+    directory = ROOT / 'completed-bindings'; directory.mkdir(mode=0o700, exist_ok=True)
+    require(not directory.is_symlink() and directory.stat().st_uid == os.geteuid() and not directory.stat().st_mode & 0o077, 'RECOVERY_CHECKPOINT_PATH_REFUSED')
+    value = {'schema': 1, 'purpose': 'completed_joint_recovery_binding', 'identity': repo['identity'], 'referenceVerifierSha256': backup.sha(CODE / 'recovery.mjs'), 'binding': binding}
+    require(len(backup.canonical(value)) <= 2 * 1024 ** 2, 'RECOVERY_CHECKPOINT_LIMIT')
+    backup.atomic(directory / (point + '.json'), backup.seal(value, secret))
+
 def recover():
     require(os.geteuid() == 0, 'ROOT_REQUIRED')
     backup = host_module(); backup.STATE = ROOT
@@ -208,6 +244,7 @@ def recover():
         result = helper(backup, b['Image'], work, c, secret, credentials, 'repository')
         if result.get('blocked'): return {'status': 'BLOCKED', 'blocked': result['blocked']}
         repo = backup.unseal(json.loads(backup.private_read(work / 'repository.json')), secret); bindings = []; restored = 0
+        if load_completed(backup, repo, secret): backup.atomic(work / 'repository.json', backup.seal(repo, secret))
         from urllib.parse import urlparse
         cos_hosts = [c['sourceBucket'] + '.cos.' + c['region'] + '.myqcloud.com']
         if e.get('COS_DOMAIN'): cos_hosts.append(urlparse(e['COS_DOMAIN'] if '://' in e['COS_DOMAIN'] else 'https://'+e['COS_DOMAIN']).hostname)
@@ -223,6 +260,7 @@ def recover():
                 helper(backup, b['Image'], work, c, secret, credentials, 'attachments', pointId=point['id'], hosts=hosts, databaseRestore=evidence)
                 for name in ['database.edubackup.enc', 'database.edubackup.enc.sha256', 'assets.jsonl', 'references.jsonl']: (work / name).unlink(missing_ok=True)
             binding = backup.unseal(json.loads(backup.private_read(work / 'binding.json')), secret); require(binding['hostPointId'] == point['id'] and binding['databaseVersionId'] == point['objects'][0]['versionId'], 'RECOVERY_BINDING_CHANGED')
+            save_completed(backup, repo, binding, secret)
             bindings.append(binding); (work / 'binding.json').unlink()
         require(len(bindings) == len(repo['points']) and len(bindings) >= 2, 'RECOVERY_BINDINGS_INCOMPLETE')
         # Source indices must still be the exact authenticated inputs used above.
@@ -236,6 +274,11 @@ def recover():
             'identity': repo['identity'], 'referenceVerifierSha256': backup.sha(CODE / 'recovery.mjs'), 'coverage': 'managed_cos_and_upload_attachments', 'externalResourcesBackedUp': False, 'bindings': bindings,
             'immutableCachePolicy': 'exact_database_snapshot_and_blob_versions_and_hashes_rechecked'}
         backup.atomic(PROOF, backup.seal(proof, secret))
+        directory = ROOT / 'completed-bindings'
+        keep = {point['id'] + '.json' for point in repo['points']}
+        for file in directory.iterdir():
+            require(not file.is_symlink(), 'RECOVERY_CHECKPOINT_PATH_REFUSED')
+            if re.fullmatch('[a-f0-9]{32}\.json', file.name) and file.name not in keep: file.unlink()
         directory = os.open(str(PROOF.parent), os.O_RDONLY)
         try: os.fsync(directory)
         finally: os.close(directory)
