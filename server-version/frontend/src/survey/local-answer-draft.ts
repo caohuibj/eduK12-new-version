@@ -1,3 +1,4 @@
+import type { SurveyCognitiveReference } from './survey-cognitive-api'
 /** Short-lived same-tab Survey draft. Never persists in localStorage or
  * sends data during item navigation. Source+Attempt fence stale submissions.
  */
@@ -12,7 +13,7 @@ export function clearLocalSurveyDraft(publicId:string,attemptId:string):void{
   try{sessionStorage.removeItem(key(publicId,attemptId))}catch{/* private mode */}
 }
 export type SurveyFinalSubmission={submissionId:string;screenOut:boolean;
-  presentation?:{shownBlocks:string[]}}
+  presentation?:{shownBlocks:string[]};cognitiveReferences?:SurveyCognitiveReference[]}
 export type SurveyLocalDraft<T>={answers:T;itemTimings?:Record<string,unknown>;
   finalSubmission?:SurveyFinalSubmission}
 /** Keep a strict allowlist: the retry descriptor must never carry access credentials. */
@@ -24,8 +25,12 @@ const readFinalSubmission=(raw:unknown):SurveyFinalSubmission|null=>{
       !final.presentation||typeof final.presentation!=='object'||Array.isArray(final.presentation)||
       !Array.isArray(final.presentation.shownBlocks)||final.presentation.shownBlocks.length>70||
       final.presentation.shownBlocks.some(key=>typeof key!=='string'||!/^[a-z][a-z0-9_-]{0,79}$/.test(key))))return null
+  if(final.cognitiveReferences!==undefined&&(!Array.isArray(final.cognitiveReferences)||final.cognitiveReferences.length>70||final.cognitiveReferences.some(ref=>
+    !ref||typeof ref.slotKey!=='string'||!Number.isSafeInteger(ref.epoch)||ref.epoch<1||typeof ref.resultId!=='string'||
+    !/^[a-f0-9]{64}$/i.test(ref.resultHash)||!/^[a-f0-9]{64}$/i.test(ref.measurementDigest))))return null
   return {submissionId:final.submissionId,screenOut:final.screenOut,
-    ...(final.presentation?{presentation:{shownBlocks:[...final.presentation.shownBlocks]}}:{})}
+    ...(final.presentation?{presentation:{shownBlocks:[...final.presentation.shownBlocks]}}:{}),
+    ...(final.cognitiveReferences?{cognitiveReferences:final.cognitiveReferences.map(ref=>({slotKey:ref.slotKey,epoch:ref.epoch,resultId:ref.resultId,resultHash:ref.resultHash,measurementDigest:ref.measurementDigest}))}:{})}
 }
 export function saveLocalSurveyDraft(publicId:string,attemptId:string,definitionDigest:string,
   answers:Record<string,unknown>,itemTimings?:Record<string,unknown>,

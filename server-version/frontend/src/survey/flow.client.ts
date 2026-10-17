@@ -29,7 +29,7 @@ export type PublicFlow={
   blocks:FlowBlock[]
 }
 export type FlowPublicUnit={
-  kind:'FORM'|'SCALE'|'SJT';instrumentKey:string;
+  kind:'FORM'|'SCALE'|'SJT'|'COGNITIVE';instrumentKey:string;
   pages?:{questions:{itemKey:string;displayIf?:{itemKey:string;operator:'EQUALS'|'INCLUDES';optionKey:string};
     rows?:{rowKey:string}[];otherOptionKey?:string}[]}[]
 }

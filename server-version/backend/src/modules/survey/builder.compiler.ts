@@ -8,9 +8,12 @@ import type { SituationalResponse } from '../situational/situation-scoring'
 import { scoreSituationalModel } from '../situational/situation-model-resolver'
 import { asLinearSituationDefinition } from '../situational/situation-runtime-definition'
 import { expandedSurveySjtOptions,resolveSurveySjtAnswer } from './sjt-selection'
+import { compileSurveySjtV2 } from './sjt-v2.compiler'
+import { normalizeSurveySjtAnswers, scoreResearchSjtAnswers, SurveySjtAnswerError } from './sjt-runtime'
+import { previewCognitiveDraft } from './cognitive.definition'
 import {
   assertSurveyDraft, validateSurveyDraft, SurveyDraftError,
-  type SurveyKind, type ScaleDraft, type SjtDraft, type FormDraft,
+  type SurveyKind, type ScaleDraft, type SjtDraft, type SjtDraftV2, type AnySjtDraft, type FormDraft,
   type Issue,
 } from './builder.definition'
 
@@ -71,7 +74,8 @@ export function compileResearchScale(title:string,input:unknown):ScaleDefinition
 }
 
 export function compileResearchSjt(instrumentKey:string,input:unknown) {
-  const d=assertSurveyDraft('SJT',input,true) as SjtDraft
+  const d=assertSurveyDraft('SJT',input,true) as AnySjtDraft
+  if(d.schemaVersion===2)return compileSurveySjtV2(instrumentKey,d)
   const optionsByQuestion=new Map(d.questions.map(q=>[q.questionKey,expandedSurveySjtOptions(q)]))
   const scorerOptions=(q:SjtDraft['questions'][number])=>optionsByQuestion.get(q.questionKey)!
   const template={
@@ -131,7 +135,7 @@ export function compileResearchSjt(instrumentKey:string,input:unknown) {
     throw error
   }
 }
-export type PreviewAnswers=Record<string,string|number|string[]>
+export type PreviewAnswers=Record<string,string|number|string[]|{_surveyRefusal:true}|null>
 export function previewResearchInstrument(input:{
   kind:SurveyKind;instrumentKey:string;title:string;definition:unknown;answers?:PreviewAnswers
 }){
@@ -160,7 +164,18 @@ export function previewResearchInstrument(input:{
         scoringDigest:canonicalHash(compiled.scoring),compiledDefinition:compiled,
         score,participantReport:'GENERAL_ONLY'}
     }
+    if(input.kind==='COGNITIVE')return previewCognitiveDraft(validation.definition as import('./cognitive.definition').CognitiveDraft)
     const compiled=compileResearchSjt(input.instrumentKey,input.definition)
+    if(validation.definition.schemaVersion===2){
+      const authored=validation.definition as SjtDraftV2
+      const normalized=normalizeSurveySjtAnswers(authored,compiled.package.definition as import('../situational/situation-branching').SituationDefinitionV2,
+        input.answers||{},{requireComplete:false})
+      const score=input.answers?scoreResearchSjtAnswers(authored,compiled.package.definition as import('../situational/situation-branching').SituationDefinitionV2,normalized.responses):null
+      return {ok:true,issues:[],kind:'SJT',definitionDigest:hash,
+        scoringDigest:canonicalHash(compiled.package.definition.scoring),compilerDigest:compiled.contentDigest,
+        compiledDefinition:compiled.package.definition,score,missing:normalized.missing,
+        questionResults:normalized.questionResults,participantReport:'GENERAL_ONLY'}
+    }
     const answers=input.answers||{}
     const authored=input.definition as SjtDraft
     const normalizedResponses=Object.fromEntries(authored.questions
@@ -180,6 +195,7 @@ export function previewResearchInstrument(input:{
       compiledDefinition:compiled.package.definition,
       score,participantReport:'GENERAL_ONLY'}
   }catch(error){
+    if(error instanceof SurveySjtAnswerError)return {ok:false,issues:[{path:error.path,message:error.message,severity:'error' as const}],score:null}
     if(error instanceof SurveyDraftError)return {ok:false,issues:error.issues,score:null}
     const issues:Issue[]=[{path:'definition',message:'研究工具未能通过编译，请核对完整题目与计分定义',severity:'error'}]
     return {ok:false,issues,score:null}

@@ -1,3 +1,5 @@
+import { surveySjtQuestions } from './sjt-structure'
+import { assertSurveyCognitiveLockedAnswers } from './cognitive.results'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -6,7 +8,7 @@ import { encryptUnifiedRuntimePayload,decryptUnifiedRuntimePayload } from '../as
 import { hashResearchCredential } from './identity.service'
 import { verifiedSurveyAttempt } from './admission.service'
 import type { ResearchFrozenPublication } from './publication.service'
-import type { FormDraft,ScaleDraft,SjtDraft } from './builder.definition'
+import type { FormDraft,ScaleDraft,AnySjtDraft } from './builder.definition'
 import { validateSurveyScaleTimings,SurveyScaleTimingError,
   type SurveyScaleTimings } from './timing.definition'
 
@@ -58,8 +60,8 @@ const validCheckpointAnswers=(snapshot:ResearchFrozenPublication,raw:unknown):Ch
       }
     }else if(unit.kind==='SCALE'){
       for(const q of (unit.displayDefinition as ScaleDraft).items)allowed.add(q.itemKey)
-    }else{
-      for(const q of (unit.displayDefinition as SjtDraft).questions)allowed.add(q.questionKey)
+    }else if(unit.kind==='SJT'){
+      for(const q of surveySjtQuestions(unit.displayDefinition as AnySjtDraft))allowed.add(q.questionKey)
     }
     const keys=Object.keys(value as Record<string,unknown>)
     if(keys.length>500||keys.some(k=>!allowed.has(k)))
@@ -167,6 +169,8 @@ export async function saveSurveyCheckpoint(proof:Proof,input:{
     fail(413,'临时作答和计时记录合计超过 64KB，无法安全暂存')
   return prisma.$transaction(async tx=>{
     const {policy,wave}=await access(tx,proof,known)
+    if(known.compiledSnapshot.units.some(unit=>unit.kind==='COGNITIVE'))
+      await assertSurveyCognitiveLockedAnswers(tx,known.attemptId,answers)
     const now=new Date()
     const end=wave.finishUntil??wave.closesAt
     const expiresAt=new Date(Math.min(now.getTime()+policy.ttlHours*3600000,

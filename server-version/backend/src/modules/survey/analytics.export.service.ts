@@ -13,8 +13,9 @@ import { SurveyAnalyticsError } from './analytics.read'
 import {encodeSurveyExportCursor,decodeSurveyExportCursor,type SurveyExportCursor} from './analytics.export-cursor'
 import type { BoundedResearchExport } from './analytics.export-format'
 import type { SurveyRawExport } from './analytics.raw-export'
+import {cognitiveTrialLongExport,type CognitiveTrialExport} from './analytics.cognitive-export'
 
-type Format='RAW_WAVE'|'RAW_LONG'|'RAW_WIDE'|'SCORE_LONG'|'SCORE_WIDE'
+type Format='RAW_WAVE'|'RAW_LONG'|'RAW_WIDE'|'SCORE_LONG'|'SCORE_WIDE'|'COGNITIVE_TRIAL_LONG'
 export type SurveyExportArtifact={csv:string;codebook:unknown;manifest:unknown}
 function fail(status:number,message:string): never {throw new SurveyAnalyticsError(status,message)}
 const nowSeconds=()=>Math.floor(Date.now()/1000)
@@ -31,6 +32,10 @@ export function assertRecentSurveyMfa(req:Request):void{
 }
 const maxBytes=2*1024*1024
 const artifactFor=(format:Format,projectId:string,source:Awaited<ReturnType<typeof loadSurveySource>>,waveId?:string)=>{
+  if(format==='COGNITIVE_TRIAL_LONG'){
+    if(!waveId)fail(400,'认知试次导出必须指定单个波次')
+    return cognitiveTrialLongExport(projectId,source,waveId)
+  }
   if(format==='RAW_WAVE'){
     if(!waveId)fail(400,'单波次导出必须指定波次')
     return rawLongExport(projectId,source,waveId)
@@ -61,14 +66,16 @@ export async function createSurveyExport(req:Request,input:{
 }){
   assertRecentSurveyMfa(req)
   const uid=req.user!.userId
-  if((input.completedFrom||input.completedBefore)&&input.format!=='RAW_WAVE')
+  const cognitive=input.format==='COGNITIVE_TRIAL_LONG'
+  if(cognitive&&(!input.waveId||input.includeFreeText))fail(400,'认知试次导出必须选定单波次，且不适用自由文本选项')
+  if((input.completedFrom||input.completedBefore)&&input.format!=='RAW_WAVE'&&!cognitive)
     fail(400,'当前仅允许对单波次原始数据按完成时间分段下载')
   const from=input.completedFrom?new Date(input.completedFrom):undefined
   const before=input.completedBefore?new Date(input.completedBefore):undefined
   if((from&&!Number.isFinite(from.getTime()))||(before&&!Number.isFinite(before.getTime()))
     ||(from&&before&&from>=before))
     fail(400,'导出时段必须是开始早于结束的合法时间')
-  const paged=!!input.waveId&&['RAW_WAVE','RAW_LONG','SCORE_LONG'].includes(input.format)
+  const paged=!!input.waveId&&['RAW_WAVE','RAW_LONG','SCORE_LONG','COGNITIVE_TRIAL_LONG'].includes(input.format)
   if(input.cursor&&!paged)fail(400,'此格式必须选定单个波次才能继续分批导出')
   const prior=input.cursor?decodeSurveyExportCursor(
     input.cursor,input.projectId,input.format as SurveyExportCursor['format'],input.waveId!,
@@ -82,15 +89,15 @@ export async function createSurveyExport(req:Request,input:{
 
   // V4 records each non-FINAL participant once, separate from verified FINAL
   // rows. Historical V1-V3 continuation remains byte/semantics compatible.
-  const phased=!prior||prior.v>=3
-  const compact=!prior||prior.v===4
+  const phased=!cognitive&&(!prior||prior.v>=3)
+  const compact=!cognitive&&(!prior||prior.v===4)
   const attendanceOnly=!!prior&&prior.v>=3&&prior.phase==='ATTENDANCE'
-  let pageLimit=compact&&prior?.v===4?prior.pageLimit!:250
+  let pageLimit=cognitive?1:compact&&prior?.v===4?prior.pageLimit!:250
   type Source=Awaited<ReturnType<typeof loadSurveySource>>
   let pinned:{cutOff:string;sourceRevision:number;
     sourceFinalCount:number|null;sourceAttendanceCount:number|null}|null=null
   let ready:{
-    sources:Source;artifact:SurveyRawExport|BoundedResearchExport;
+    sources:Source;artifact:SurveyRawExport|BoundedResearchExport|CognitiveTrialExport;
     nextCursor:string|null;pageNumber:number|null;
     digest:string;cipher:string;value:SurveyExportArtifact
     manifest:{schemaVersion:1|2;format:string;rowCount:number;columnCount:number;
@@ -129,7 +136,9 @@ export async function createSurveyExport(req:Request,input:{
         // No frozen item matrix is needed by compact participant-status pages.
         includeWideSchema:!(attendanceOnly&&compact),
         completedFrom:from,completedBefore:before,
-        ...(input.format.startsWith('SCORE')?{selectRaw:false}:{selectScore:false}),
+        ...(cognitive?{selectRaw:false,selectScore:false,cognitiveTrials:{offset:prior?.trial?.offset??0,
+          ...(prior?.trial?{expectedFinalId:prior.trial.finalId,expectedFinalHash:prior.trial.finalHash}:{})}}
+          :input.format.startsWith('SCORE')?{selectRaw:false}:{selectScore:false}),
         ...(paged?{
           pageMode:true,stableIdCursor:!prior||prior.v!==1,
           includeAttendance:false,
@@ -147,20 +156,21 @@ export async function createSurveyExport(req:Request,input:{
       }
       if(input.format.includes('WIDE')&&sources.collectionMode!=='LINKED_WAVES')
         fail(409,'不可关联的匿名研究不支持跨波次个人宽表')
-      const nextPhase=attendanceOnly
+      const withinFinal=cognitive&&sources.cognitivePage?.nextOffset!==undefined&&sources.cognitivePage.nextOffset!==null
+      const nextPhase=withinFinal?'FINALS':attendanceOnly
         ?(sources.nextAttendanceCursor?'ATTENDANCE':null)
         :sources.nextFinalCursor?'FINALS'
           :phased&&sources.collectionMode==='LINKED_WAVES'&&
              (sources.sourceAttendanceCount??0)>0?'ATTENDANCE':null
-      const maxPages=compact?500:prior?.v===3?200:100
+      const maxPages=cognitive||compact?500:prior?.v===3?200:100
       if(nextPhase&&(prior?.page??0)+1>=maxPages)
         fail(413,'研究数据超过受控导出页数上限；请缩小波次或采集范围')
       const dummyAfter={id:'00000000-0000-0000-0000-000000000000',
         completedAt:sources.cutOff}
-      const after=nextPhase==='FINALS'?sources.nextFinalCursor!:
+      const after=withinFinal?prior?.after??dummyAfter:nextPhase==='FINALS'?sources.nextFinalCursor!:
         prior?.after??dummyAfter
       const nextCursor=paged&&nextPhase?encodeSurveyExportCursor({
-        v:prior?.v??4,projectId:input.projectId,waveId:input.waveId!,
+        v:cognitive?5:prior?.v??4,projectId:input.projectId,waveId:input.waveId!,
         format:input.format as SurveyExportCursor['format'],after,
         ...(phased?{
           phase:nextPhase,attendanceCount:sources.sourceAttendanceCount??0,
@@ -169,6 +179,9 @@ export async function createSurveyExport(req:Request,input:{
           }:{}),
         }:{}),
         ...(compact?{pageLimit}:{}),
+        ...(cognitive?{phase:'FINALS' as const,attendanceCount:0,pageLimit:1,
+          ...(withinFinal?{trial:{finalId:sources.cognitivePage!.finalId,
+            finalHash:sources.cognitivePage!.sourceFinalHash,offset:sources.cognitivePage!.nextOffset!}}:{})}:{}),
         cutOff:sources.cutOff,sourceRevision:sources.sourceRevision,
         finalCount:sources.sourceFinalCount??0,
         page:(prior?.page??0)+1,issuedAt:Date.now(),
@@ -185,7 +198,7 @@ export async function createSurveyExport(req:Request,input:{
         raw:sources.raw.filter(r=>!isResearchFreeTextType(r.responseType)),
         codebook:sources.codebook.filter(r=>!isResearchFreeTextType(r.responseType)),
       }
-      let artifact:SurveyRawExport|BoundedResearchExport
+      let artifact:SurveyRawExport|BoundedResearchExport|CognitiveTrialExport
       try{
         artifact=attendanceOnly&&compact
           ?compactSurveyAttendanceExport(input.projectId,sources,input.waveId!)
@@ -207,10 +220,15 @@ export async function createSurveyExport(req:Request,input:{
           scalePresentationMode:x.scalePresentationMode??null,
           scaleTimingContract:x.timingContract??null},
       ] as const)).values()]
+      const measurementVersions=[...new Map(sources.scoreColumns.filter(column=>column.measurement.provenance)
+        .map(column=>[canonicalHash({waveId:column.waveId,instrumentKey:column.measurement.instrumentKey,
+          provenance:column.measurement.provenance}),{waveId:column.waveId,instrumentKey:column.measurement.instrumentKey,
+          responseSignature:column.measurement.responseSignature,scoringDigest:column.measurement.scoringDigest,
+          ...column.measurement.provenance!}] as const)).values()]
       const manifest={...artifact.manifest,sourceCutOff:sources.cutOff,
         generatedAt:new Date().toISOString(),timeZone:'UTC',
-        timingProvenance:'BROWSER_OBSERVED_FOREGROUND_MS_NOT_ATTESTED_ATTENTION',
-        timingMissingPolicy:'NULL_NOT_ZERO_FOR_HISTORICAL_OR_NON_TIMED_SCALES',
+        timingProvenance:cognitive?'MONOTONIC_SOFTWARE_OBSERVED_MS_NOT_PHYSICAL_ONSET':'BROWSER_OBSERVED_FOREGROUND_MS_NOT_ATTESTED_ATTENTION',
+        timingMissingPolicy:cognitive?'NULL_WITH_NO_GO_WITHHELD_OR_GO_OMISSION_REASON':'NULL_NOT_ZERO_FOR_HISTORICAL_OR_NON_TIMED_SCALES',
         sourceProjectRevision:sources.sourceRevision,
         analysisPopulation:attendanceOnly
           ?'LINKED_NON_FINAL_ATTENDANCE_AND_QUALITY_EXCLUDED'
@@ -218,7 +236,9 @@ export async function createSurveyExport(req:Request,input:{
         batch:{pageNumber,hasNext:!!nextCursor,
           phase:attendanceOnly?'NON_FINAL_PARTICIPATION':'VERIFIED_FINAL',
           representation:attendanceOnly?(compact?'ATTENDANCE_COMPACT_V1':'LEGACY_EXPANDED_ATTENDANCE_V3')
-            :'FINAL_ITEM_OR_SCORE_ROWS',
+            :cognitive?'FINAL_BOUND_CHILD_TRIAL_ROWS':'FINAL_ITEM_OR_SCORE_ROWS',
+          ...(cognitive?{parentFinalContinued:!!prior?.trial,withinFinalHasNext:!!withinFinal,
+            parentFinalHash:sources.cognitivePage?.sourceFinalHash??null}:{}),
           ...(compact?{maxFinalsPerPage:pageLimit}:{}),
           totalIncludedFinals:sources.sourceFinalCount??null,
           totalNonFinalAttempts:sources.sourceAttendanceCount??null,
@@ -237,7 +257,10 @@ export async function createSurveyExport(req:Request,input:{
               NO_WAVE:'No participation in this wave; derive only from the wider linked cohort'},
           }:{}),
         },
-        completedFinalCount:sources.completeAttempts,selectedVersions,
+        completedFinalCount:prior?.trial?0:sources.completeAttempts,
+        fullCompletionAttempts:prior?.trial?0:sources.fullCompletionAttempts??null,
+        earlyCompletionAttempts:prior?.trial?0:sources.earlyCompletionAttempts??null,selectedVersions,
+        ...(measurementVersions.length?{measurementVersions}:{}),
         selection:{format:input.format,waveIds:input.waveId?[input.waveId]:null,
           researchOnly:true,collectionMode:sources.collectionMode,
           freeTextIncluded:included,freeTextExcludedRows:included?0:omittedFreeText,
@@ -290,7 +313,7 @@ export async function downloadSurveyExport(req:Request,input:{projectId:string;e
   assertRecentSurveyMfa(req)
   const uid=req.user!.userId
   return prisma.$transaction(async tx=>{
-    await guardedOwner(tx,uid,input.projectId)
+    const current=await guardedOwner(tx,uid,input.projectId)
     const ticket=await tx.surveyExportTicket.findFirst({where:{
       id:input.exportId,projectId:input.projectId,actorUserId:uid,
       status:'READY',expiresAt:{gt:new Date()},
@@ -299,6 +322,9 @@ export async function downloadSurveyExport(req:Request,input:{projectId:string;e
     const data=decryptUnifiedRuntimePayload<SurveyExportArtifact>(ticket.artifactCipher)
     if(canonicalHash(JSON.parse(JSON.stringify(data)))!==ticket.artifactHash)
       fail(409,'导出内容摘要校验失败')
+    const sourceRevision=(data.manifest as {sourceProjectRevision?:unknown})?.sourceProjectRevision
+    if(sourceRevision!==current.revision)
+      fail(409,'研究授权或样本状态已变化，请重新生成导出')
     await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:uid,projectId:input.projectId,
       action:'RESEARCH_EXPORT_DOWNLOADED',metadata:{exportId:ticket.id,format:ticket.format}}})
     return {id:ticket.id,format:ticket.format,...data}

@@ -6,12 +6,16 @@ type WaveSummary={id:string;ordinal:number;title:string;status:string;
   uniqueLinkedCodes:number|null;excluded:number}
 type Overview={projectId:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';source:string;note:string;waves:WaveSummary[]}
 type Matched={baselineN:number;followupN:number;matchedN:number;attritionN:number;lateJoinN:number;note:string}
-type ScoreStat={instrumentKey:string;scoreKey:string;validN:number;mean:number|null;sampleSd:number|null}
+type ScoreStat={instrumentKey:string;scoreKey:string;validN:number;mean:number|null;sampleSd:number|null;
+  scoringDigest?:string;responseSignature?:string;unit?:string|null;
+  provenance?:{kind:string;measurementDigest:string;scoringVersion:string;engineVersion?:string;timingPolicy?:string;devicePolicy?:string};
+  qualityCounts?:Record<string,number>;completionCounts?:Record<string,number>}
 type ItemStat={itemKey:string;instrumentKey:string;prompt:string;kind:string;respondentN:number;
   missingByReason:Record<string,number>;frequencies:{value:string;count:number}[];
   combinationFrequencies?:{value:string;count:number}[];responseType?:string;
   numericMean:number|null;numericSampleSd:number|null}
-type WaveItems={waveId:string;items:ItemStat[];descriptiveScores:ScoreStat[];note:string}
+type WaveItems={waveId:string;items:ItemStat[];descriptiveScores:ScoreStat[];note:string;
+  completedFinals?:number;fullCompletionAttempts?:number|null;earlyCompletionAttempts?:number|null}
 type BoundedVariable={instrumentKey:string;itemKey:string;prompt:string;
   responseType:string;columnKey:string;kind:string}
 type BoundedItem={analysisFinalCount:number;respondentN:number;prompt:string;
@@ -29,7 +33,7 @@ type QualityRow={attemptId:string;attemptCode:string;researchCode:string|null;wa
   completedAt:string;verdict:'INCLUDED'|'EXCLUDED';reason:string|null;revision:number}
 type QualityAudit={reviewedAt:string;reviewerId:string|null;previousVerdict:'INCLUDED'|'EXCLUDED';
   verdict:'INCLUDED'|'EXCLUDED';reason:string;revision:number}
-type ExportFormat='RAW_WAVE'|'RAW_LONG'|'RAW_WIDE'|'SCORE_LONG'|'SCORE_WIDE'
+type ExportFormat='RAW_WAVE'|'RAW_LONG'|'RAW_WIDE'|'SCORE_LONG'|'SCORE_WIDE'|'COGNITIVE_TRIAL_LONG'
 type Ticket={id:string;status:'READY';format:ExportFormat;expiresAt:string;
   nextCursor:string|null;pageNumber:number|null;
   manifest:{rowCount:number;columnCount:number;
@@ -41,6 +45,7 @@ const kindOptions:Record<ExportFormat,string>={
   RAW_WIDE:'同编号逐题 Wide',
   SCORE_LONG:'全部波次探索性得分 Long',
   SCORE_WIDE:'同编号探索性得分 Wide',
+  COGNITIVE_TRIAL_LONG:'单波次认知原始试次 Long',
 }
 async function api<T>(endpoint:string,method='GET',body?:unknown):Promise<T>{
   const headers:Record<string,string>={'Content-Type':'application/json'}
@@ -194,10 +199,10 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
   })}
   const createExport=(cursor?:string)=>void execute(async()=>{
     const result=await api<Ticket>(base+'/exports','POST',{
-      format,...(format==='RAW_WAVE'?{waveId}:
+      format,...(['RAW_WAVE','COGNITIVE_TRIAL_LONG'].includes(format)?{waveId}:
         (['RAW_LONG','SCORE_LONG'].includes(format)&&exportWaveId?{waveId:exportWaveId}:{})),
       ...(format.startsWith('RAW')?{includeFreeText}:{}),
-      ...(format==='RAW_WAVE'?{
+      ...(['RAW_WAVE','COGNITIVE_TRIAL_LONG'].includes(format)?{
         ...(completedFrom?{completedFrom:new Date(completedFrom).toISOString()}:{}),
         ...(completedBefore?{completedBefore:new Date(completedBefore).toISOString()}:{}),
       }:{}),
@@ -368,11 +373,16 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
           </table></div>
           {itemStats.descriptiveScores.length>0&&<div>
             <h4 className="font-semibold text-sm">研究性维度得分（非诊断）</h4>
-            {itemStats.descriptiveScores.map(m=><p key={m.instrumentKey+':'+m.scoreKey} className="text-sm my-1">
+            {itemStats.completedFinals!==undefined&&<p className="text-xs">持久 FINAL：{itemStats.completedFinals}；完整完成：{itemStats.fullCompletionAttempts??'—'}；提前结束：{itemStats.earlyCompletionAttempts??'—'}。</p>}
+            {itemStats.descriptiveScores.map((m,index)=><div key={m.instrumentKey+':'+m.scoreKey+':'+index} className="text-sm my-2"><p>
               {m.instrumentKey} · {m.scoreKey}：N={m.validN}，
               M={m.mean?.toFixed(2)??'—'}，
-              SD={m.sampleSd?.toFixed(2)??'—'}
-            </p>)}
+              SD={m.sampleSd?.toFixed(2)??'—'}{m.unit?'（单位：'+m.unit+'）':''}
+              </p>
+              {m.qualityCounts&&<p className="text-xs">质量状态：{Object.entries(m.qualityCounts).map(([k,v])=>k+' '+v).join('；')}。均值仅作描述，不能据此认定全部样本可解释。</p>}
+              {m.completionCounts&&<p className="text-xs">完成类型：{Object.entries(m.completionCounts).map(([k,v])=>k+' '+v).join('；')}</p>}
+              {m.provenance&&<p className="text-xs break-all">冻结测量：{m.provenance.measurementDigest}；评分 {m.provenance.scoringVersion}{m.provenance.engineVersion?'；引擎 '+m.provenance.engineVersion:''}{m.provenance.timingPolicy?'；计时 '+m.provenance.timingPolicy:''}</p>}
+            </div>)}
           </div>}
         </div>}
         {itemStats&&itemStats.items.some(q=>q.kind==='FORM'&&['SINGLE','LIKERT'].includes(q.responseType||''))
@@ -449,20 +459,21 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
                  {overview.waves.map(w=><option key={w.id} value={w.id}>T{w.ordinal} {w.title}</option>)}
                </select>
              </label>}
-           {format==='RAW_WAVE'&&<label className="text-sm">波次
+           {['RAW_WAVE','COGNITIVE_TRIAL_LONG'].includes(format)&&<label className="text-sm">波次
             <select className="input block" value={waveId} onChange={e=>changeWave(e.target.value)}>
               {overview.waves.map(w=><option key={w.id} value={w.id}>T{w.ordinal} {w.title}</option>)}
             </select></label>}
-          {format==='RAW_WAVE'&&<div className="grid gap-2 text-sm">
+          {['RAW_WAVE','COGNITIVE_TRIAL_LONG'].includes(format)&&<div className="grid gap-2 text-sm">
             <label>完成时间起点（含）<input type="datetime-local" className="input block w-full"
               value={completedFrom} onChange={e=>{setCompletedFrom(e.target.value);setTicket(null)}}/></label>
             <label>完成时间终点（不含）<input type="datetime-local" className="input block w-full"
               value={completedBefore} onChange={e=>{setCompletedBefore(e.target.value);setTicket(null)}}/></label>
             <p className="text-xs">留空表示不限制。按完成时间分段；未 FINAL 的记录可能重复出现，合并时请按研究编号和状态去重。</p>
           </div>}
-          <button type="button" className="btn-primary" disabled={busy||format==='RAW_WAVE'&&!waveId}
+          <button type="button" className="btn-primary" disabled={busy||['RAW_WAVE','COGNITIVE_TRIAL_LONG'].includes(format)&&!waveId}
             onClick={()=>createExport()}>创建受控导出</button>
         </div>
+        {format==='COGNITIVE_TRIAL_LONG'&&<p className="text-sm text-amber-800">认知试次按行与字节预算分批导出，只包含已被整轮 FINAL 引用的子结果；含协议、epoch、测量签名与研究授权范围内的复现信息。请保留每批 Codebook 与 Manifest，不将不同版本、输入设备的结果直接合并。</p>}
         {format.startsWith('RAW')&&<label className="flex gap-2 text-sm items-start rounded-lg border border-amber-200 bg-amber-50 p-3">
           <input type="checkbox" checked={includeFreeText}
             onChange={e=>{setIncludeFreeText(e.target.checked);setTicket(null)}}/>

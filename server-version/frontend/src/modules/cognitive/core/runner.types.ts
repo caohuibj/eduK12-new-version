@@ -7,6 +7,8 @@ import type { CognitivePresentationDefinitionV1, CognitiveResult, CognitiveSessi
 
 /** 传给 Task Runner 的冻结上下文（全部来自 Session response，不得由前端派生）。 */
 export interface CognitiveTaskContext {
+  /** An embedded, frozen device policy may restrict input without changing timing. */
+  requiredInput?: 'KEYBOARD'
   sessionId: string
   testType: string
   engineVersion: string

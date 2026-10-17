@@ -1,9 +1,10 @@
+import {canonicalHash} from '../assessment-runtime/canonical'
 /** Researcher-only deterministic longitudinal cohort algorithms. No normality,
  * causal, clinical or norm-based inference. Data must already be projected from
  * an authenticated project-scoped, frozen FINAL source (PR4 read adapter).
  */
 export type MissingReason =
-  | 'NOT_SHOWN' | 'SHOWN_MISSING' | 'REFUSED' | 'NO_WAVE'
+  | 'NOT_SHOWN' | 'SHOWN_MISSING' | 'REFUSED' | 'UNABLE_TO_JUDGE' | 'NO_WAVE'
   | 'ABANDONED' | 'NOT_COMPARABLE' | 'WITHDRAWN' | 'QUALITY_EXCLUDED'
 export interface SurveyMeasurementIdentity {
   instrumentKey:string
@@ -12,6 +13,12 @@ export interface SurveyMeasurementIdentity {
   responseSignature:string
   respondentType:string
   unit:string|null
+  /** Frozen versioned measurement identity. No subject-specific seed or data. */
+  provenance?:{
+    kind:'SJT'|'COGNITIVE';measurementDigest:string;scoringVersion:string;
+    configHash?:string;protocolSignature?:string;engineVersion?:string;
+    timingPolicy?:string;devicePolicy?:string;scoringMethod?:string
+  }
 }
 export interface FrozenScoreObservation {
   projectId:string
@@ -25,6 +32,13 @@ export interface FrozenScoreObservation {
   value:number|null
   missingReason:MissingReason|null
   completedAt:string
+  status?:string
+  quality?:{status:string;flags:Record<string,boolean>;reasons?:string[]}
+  sourceResultHash?:string
+  epoch?:number
+  completionStatus?:'COMPLETE'|'COMPLETE_EARLY'|'SCREEN_OUT'
+  metricDetails?:{range?:{min:number;max:number};coverage?:{
+    numberOfOpportunities:number;numberOfAnsweredOpportunities:number;numberOfIndependentScenes:number};maturity?:string}
 }
 export interface PairedDescriptive {
   baselineWaveId:string
@@ -43,6 +57,8 @@ const measurementMatches=(a:SurveyMeasurementIdentity,b:SurveyMeasurementIdentit
   a.instrumentKey===b.instrumentKey&&a.scoreKey===b.scoreKey
   &&a.scoringDigest===b.scoringDigest&&a.responseSignature===b.responseSignature
   &&a.respondentType===b.respondentType&&a.unit===b.unit
+  &&((a.provenance===undefined&&b.provenance===undefined)
+    ||canonicalHash(a.provenance??null)===canonicalHash(b.provenance??null))
 const distinct=(xs:string[])=>new Set(xs).size===xs.length
 
 export function pairedDescriptive(input:{

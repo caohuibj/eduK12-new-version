@@ -1,15 +1,17 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { ResearchFormEditor } from './ResearchFormEditor'
 import { ResearchScaleEditor } from './ResearchScaleEditor'
+import { ResearchCognitiveEditor } from './ResearchCognitiveEditor'
+import { ResearchCognitivePreview, type CognitivePreviewSnapshot } from './ResearchCognitivePreview'
 import { ResearchSjtEditor } from './ResearchSjtEditor'
 import { ResearchPreview } from './ResearchPreview'
-import type { ResearchDraft, Kind, Definition, FormDraft, ScaleDraft, SjtDraft, Issue } from './builder.types'
+import type { ResearchDraft, Kind, Definition, FormDraft, ScaleDraft, SjtDraft, CognitiveDraft, Issue } from './builder.types'
 import { researchKey } from './builder.types'
 
 type Envelope<T>={code:number|string;message:string;data:T|null}
 type Summary=Pick<ResearchDraft,'id'|'kind'|'title'|'instrumentKey'|'revision'|'status'|'updatedAt'>
 type Preview={revision:number;ok:boolean;issues:Issue[];definitionDigest?:string;scoringDigest?:string;
-  kind:Kind;score?:{scores?:{key:string;value:number|null;status:string}[];metrics?:{key:string;value:number|null}[]}|null}
+  kind:Kind;cognitivePreview?:CognitivePreviewSnapshot;score?:{scores?:{key:string;value:number|null;status:string}[];metrics?:{key:string;value:number|null}[]}|null}
 type BulkBatch={batchId:string;format:'TEXT'|'CSV';content:string;pageKey?:string;dimensionKey?:string}
 type BulkResult={revision:number;count:number;ok:boolean;digest:string;issues:{line:number;message:string}[];
   items:{type:string;prompt:string;options:string[]}[]}
@@ -37,7 +39,7 @@ async function api<T>(path:string,method='GET',payload?:unknown):Promise<T>{
   }
   return data.data as T
 }
-const displayKind:Record<Kind,string>={FORM:'Form · 表单',SCALE:'Scale · 量表',SJT:'SJT · 情境判断'}
+const displayKind:Record<Kind,string>={FORM:'Form · 表单',SCALE:'Scale · 量表',SJT:'SJT · 情境判断',COGNITIVE:'Cognitive · 认知任务'}
 export function SurveyBuilder({projectId,onInstrumentsChanged}:{projectId:string;onInstrumentsChanged?:()=>void}){
   const prefix='/projects/'+encodeURIComponent(projectId)+'/instruments'
   const [instruments,setInstruments]=useState<Summary[]>([])
@@ -108,7 +110,7 @@ export function SurveyBuilder({projectId,onInstrumentsChanged}:{projectId:string
     setPreview(result);setShowPreview(result.ok)
     setNotice(result.ok?'结构与研究性计分编译已通过；这是非正式试答预览':'请先修正提示的结构问题')
   })}
-  const simulate=(answers:Record<string,string|number|string[]>)=>{if(!active||dirty)return;void run(async()=>{
+  const simulate=(answers:Record<string,unknown>)=>{if(!active||dirty)return;void run(async()=>{
     const r=await api<Preview>(prefix+'/'+active.id+'/preview','POST',{answers})
     setPreview(r);setNotice(r.ok?'已根据后台现有计分器模拟计算，不会生成正式答卷':'模拟未通过，请检查作答和规则')
   })}
@@ -159,7 +161,7 @@ export function SurveyBuilder({projectId,onInstrumentsChanged}:{projectId:string
   })}
   return <section className="bg-white border rounded-xl p-4 sm:p-6 my-5 space-y-5" aria-label="Survey Research Builder">
     <header><h2 className="text-xl font-semibold">研究工具 · Builder</h2>
-      <p className="text-sm text-slate-600">创建 Form、描述性 Scale 和自编 SJT。研究工具仅限本人项目；不进入正式科学量表目录。</p>
+      <p className="text-sm text-slate-600">创建表单、心理量表、情境测验和受控认知任务。研究工具仅限本人项目；不进入正式科学量表目录。</p>
     </header>
     {error&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{error}</p>}
     {notice&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{notice}</p>}
@@ -213,9 +215,10 @@ export function SurveyBuilder({projectId,onInstrumentsChanged}:{projectId:string
       {active.status==='DRAFT'&&<>
         {active.kind==='FORM'&&<ResearchFormEditor key={active.id} value={active.definition as FormDraft} onChange={change} projectId={projectId}/>}
         {active.kind==='SCALE'&&<ResearchScaleEditor key={active.id} value={active.definition as ScaleDraft} onChange={change}/>}
+        {active.kind==='COGNITIVE'&&<ResearchCognitiveEditor value={active.definition as CognitiveDraft} onChange={change}/>}
         {active.kind==='SJT'&&<ResearchSjtEditor key={active.id} value={active.definition as SjtDraft} onChange={change} projectId={projectId}/>}
       </>}
-      {active.kind!=='SJT'&&active.status==='DRAFT'&&<div className="border rounded-xl p-4 space-y-3">
+      {(active.kind==='FORM'||active.kind==='SCALE')&&active.status==='DRAFT'&&<div className="border rounded-xl p-4 space-y-3">
         <h3 className="font-semibold">批量录入</h3>
         <p className="text-xs text-slate-600 break-words">文本：每道题用空行分隔，第一行是题干，后续行是选项。CSV：type,prompt,required,options,rows,dimension,reverse；Form V2 可导入 DATE/TIME/RANK_ORDER/SLIDER/CONSTANT_SUM/MATRIX_MULTIPLE，数值列 min,max,step,precision,total,min_selections,max_selections,integer_only,time_zone；选项与矩阵行用 || 分隔。</p>
         <label className="text-sm">输入格式<select className="input block" value={bulkFormat} onChange={e=>{
@@ -253,8 +256,8 @@ export function SurveyBuilder({projectId,onInstrumentsChanged}:{projectId:string
       {preview?.ok&&!dirty&&<div>
         <button type="button" className="btn-secondary" onClick={()=>setShowPreview(x=>!x)}>
           {showPreview?'收起模拟作答':'展开模拟作答'}</button>
-        {showPreview&&<><ResearchPreview draft={active} onSimulate={simulate} onValidateForm={validateFormAnswers}
-            errorPath={answerReview?.issues[0]?.path}/>
+        {showPreview&&<>{active.kind==='COGNITIVE'?<ResearchCognitivePreview snapshot={preview.cognitivePreview}/>:<ResearchPreview draft={active} onSimulate={simulate} onValidateForm={validateFormAnswers}
+            errorPath={answerReview?.issues[0]?.path}/>}
           {answerReview&&<div role="status" className="border rounded-lg p-3 my-3 space-y-2">
             <p className="font-medium">{answerReview.ok?'Form 试提交通过':'Form 试提交未通过'}</p>
             {answerReview.issues.map((issue,i)=><p role="alert" className="text-red-700 text-sm" key={i}>
@@ -302,7 +305,7 @@ export function SurveyBuilder({projectId,onInstrumentsChanged}:{projectId:string
             <h4 className="text-sm font-semibold">共享场景与构念</h4>
             {(active.definition as SjtDraft).metrics.map(m=><p className="text-xs" key={m.metricKey}>
               {m.label||m.metricKey}</p>)}
-            {(active.definition as SjtDraft).questions.map(q=><a key={q.questionKey}
+            {(()=>{const definition=active.definition as SjtDraft;return (definition.schemaVersion===2?definition.scenes.flatMap(scene=>scene.questions):definition.questions)})().map(q=><a key={q.questionKey}
               className="block text-xs underline break-words"
               href={'#survey-sjt-'+q.questionKey}>{q.prompt.slice(0,35)||'未填写问题'}</a>)}
           </>}

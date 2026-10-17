@@ -1,5 +1,6 @@
 import type { SurveySourceProjection, ResearchRawCodebook } from './analytics.source'
 import { pairedDescriptive } from './analytics.cohorts'
+import {canonicalHash} from '../assessment-runtime/canonical'
 export interface ItemSummary {
   columnKey:string
   itemKey:string
@@ -89,18 +90,33 @@ export function describeWave(source:SurveySourceProjection,waveId:string){
     })
   }
   const scoreGroups=new Map<string,number[]>()
+  const versionedGroups=new Map<string,{measurement:typeof source.scores[number]['measurement'];
+    qualityCounts:Record<string,number>;completionCounts:Record<string,number>}>()
   for(const score of source.scores.filter(s=>s.waveId===waveId&&s.missingReason===null&&s.value!==null)){
     const key=[score.measurement.instrumentKey,score.measurement.scoreKey,
-      score.measurement.scoringDigest,score.measurement.responseSignature].join('|')
+      score.measurement.scoringDigest,score.measurement.responseSignature,
+      ...(score.measurement.provenance?[canonicalHash(score.measurement)]:[])].join('|')
     const group=scoreGroups.get(key)||[];group.push(score.value!);scoreGroups.set(key,group)
+    if(score.measurement.provenance){
+      const metadata=versionedGroups.get(key)??{measurement:score.measurement,qualityCounts:{},completionCounts:{}}
+      const quality=score.quality?.status??'NOT_RECORDED',completion=score.completionStatus??'NOT_RECORDED'
+      metadata.qualityCounts[quality]=(metadata.qualityCounts[quality]??0)+1
+      metadata.completionCounts[completion]=(metadata.completionCounts[completion]??0)+1
+      versionedGroups.set(key,metadata)
+    }
   }
   const descriptiveScores=[...scoreGroups].map(([key,values])=>{
     const [instrumentKey,scoreKey,scoringDigest,responseSignature]=key.split('|')
+    const versioned=versionedGroups.get(key)
     return {instrumentKey,scoreKey,scoringDigest,responseSignature,
-      validN:values.length,mean:numeric(values).mean,sampleSd:numeric(values).sd}
+      validN:values.length,mean:numeric(values).mean,sampleSd:numeric(values).sd,
+      ...(versioned?{unit:versioned.measurement.unit,provenance:versioned.measurement.provenance,
+        qualityCounts:versioned.qualityCounts,completionCounts:versioned.completionCounts}:{}),}
   })
   return {projectId:source.projectId,waveId,source:'VERIFIED_ENCRYPTED_SURVEY_FINAL',
     items,descriptiveScores,
+    ...(versionedGroups.size?{completedFinals:source.completeAttempts,
+      fullCompletionAttempts:source.fullCompletionAttempts??null,earlyCompletionAttempts:source.earlyCompletionAttempts??null}:{}),
     note:'自由文本不进入自动频数公开输出；均值/SD 为描述性科研统计，不构成诊断或常模。'}
 }
 export function describePairedScores(source:SurveySourceProjection,input:{

@@ -2,7 +2,9 @@ import { useEffect,useState,type FormEvent } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { SurveyFlowStudio,type FormQuestionInfo } from './SurveyFlowStudio'
 import type { FlowDraft } from './flow.client'
-import type { FormDraft } from './builder.types'
+import { SurveyStudyPreview } from './SurveyStudyPreview'
+import type { CognitivePreviewSnapshot } from './ResearchCognitivePreview'
+import type { FormDraft, ResearchDraft } from './builder.types'
 
 type ApiResult<T>={code:number|string;message:string;data:T|null}
 type Instrument={id:string;title:string;kind:string;status:string;instrumentKey:string}
@@ -78,6 +80,7 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChang
   const [ready,setReady]=useState<Preflight|null>(null),[busy,setBusy]=useState(false)
   const [error,setError]=useState(''),[notice,setNotice]=useState('')
   const [shareLink,setShareLink]=useState('')
+  const [studyPreview,setStudyPreview]=useState<{drafts:ResearchDraft[];snapshots:Record<string,CognitivePreviewSnapshot>}|null>(null)
   const [flowAnalytics,setFlowAnalytics]=useState<FlowAnalytics|null>(null)
   const [categoryKey,setCategoryKey]=useState('')
   const [scoreSelection,setScoreSelection]=useState('')
@@ -126,6 +129,16 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChang
       quotaPolicy:detail.quotaPolicy??null,
       checkpointPolicy:detail.checkpointPolicy??null,
     })
+  })
+  const previewStudy=()=>void act(async()=>{
+    const drafts=await Promise.all(form.instrumentIds.map(id=>surveyApi<ResearchDraft>(path+'/instruments/'+id)))
+    const snapshots:Record<string,CognitivePreviewSnapshot>={}
+    for(const draft of drafts.filter(d=>d.kind==='COGNITIVE')){
+      const result=await surveyApi<{ok:boolean;cognitivePreview?:CognitivePreviewSnapshot}>(path+'/instruments/'+draft.id+'/validate','POST',{})
+      if(!result.ok||!result.cognitivePreview)throw new Error(draft.title+' 尚未通过编译，无法预览')
+      snapshots[draft.instrumentKey]=result.cognitivePreview
+    }
+    setStudyPreview({drafts,snapshots})
   })
   const payload=()=>{
     const start=form.opensAt?new Date(form.opensAt):null
@@ -292,6 +305,7 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChang
       <div className="space-y-4 min-w-0">
         {(!editing||editing.status==='DRAFT'&&!editing.publicationId)&&<form className="space-y-4" onSubmit={save}>
           <h3 className="font-semibold">{editing?'修改未发布波次':'创建波次草稿'}</h3>
+          <button type="button" className="btn-secondary" disabled={busy||!form.instrumentIds.length} onClick={previewStudy}>预览整轮研究流程</button>
           <label className="block text-sm">波次标题<input className="input block w-full" required
             value={form.title} onChange={e=>setForm({...form,title:e.target.value})}/></label>
           <label className="block text-sm">参与说明与知情同意
@@ -374,6 +388,7 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChang
           <button type="submit" className="btn-primary" disabled={busy||!form.title||form.consentText.length<20}>
             {editing?'保存波次草稿':'创建波次'}</button>
         </form>}
+        {studyPreview&&<SurveyStudyPreview drafts={studyPreview.drafts} cognitiveSnapshots={studyPreview.snapshots} flow={form.flowDefinition} consentText={form.consentText} generalText={form.generalText} onClose={()=>setStudyPreview(null)}/>}
         {editing&&<div className="rounded-lg border p-4 space-y-4">
           <h3 className="font-semibold">T{editing.ordinal} · {editing.title}</h3>
           <p className="text-sm">状态：{editing.status} · revision {editing.revision} · 已启动 {editing.startsCount}

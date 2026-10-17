@@ -1,3 +1,4 @@
+import { disclosedSurveyConsent } from './measurement.notice'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -72,22 +73,33 @@ const claimQuota=async(tx:Tx,waveId:string,startsCount:number)=>{
     data:{startsCount:{increment:1}}})
   if(updated.count!==1)blocked('研究名额出现竞争，请重新进入')
 }
+type ConsentWaveProjection={
+  id:string;title:string;ordinal:number;status:string;consentText:string;consentVersion:number;
+  opensAt:Date|null;closesAt:Date|null;allowNewParticipants:boolean;measurementNotice:unknown
+}
+// Read only the frozen public disclosure, never the full private compiled
+// snapshot. The joined projection keeps the prior single wave-list query.
+const consentWaveColumns=Prisma.sql`w.id,w.title,w.ordinal,w.status,
+  w.consent_text AS "consentText",w.consent_version AS "consentVersion",
+  w.opens_at AS "opensAt",w.closes_at AS "closesAt",
+  w.allow_new_participants AS "allowNewParticipants",
+  p.compiled_snapshot->'measurementNotice' AS "measurementNotice"`
 export async function getPublicResearchInfo(publicId:string){
   enabled()
   return prisma.$transaction(async tx=>{
     const project=await projectPublic(tx,publicId)
     const now=new Date()
-    const waves=project.status==='ACTIVE'?await tx.surveyWave.findMany({where:{projectId:project.id,
-      status:'OPEN',publicationId:{not:null},hardStopAt:null,
-      OR:[{opensAt:null},{opensAt:{lte:now}}],
-      AND:[{OR:[{closesAt:null},{closesAt:{gt:now}}]}]},
-      orderBy:{ordinal:'asc'},take:100,select:{
-        id:true,title:true,ordinal:true,status:true,consentText:true,consentVersion:true,
-        opensAt:true,closesAt:true,allowNewParticipants:true,
-      }}):[]
+    const waves=project.status==='ACTIVE'?await tx.$queryRaw<ConsentWaveProjection[]>`
+      SELECT ${consentWaveColumns} FROM survey_waves w
+      LEFT JOIN survey_publications p ON p.id=w.publication_id AND p.project_id=w.project_id
+      WHERE w.project_id=${project.id} AND w.status='OPEN' AND w.publication_id IS NOT NULL
+        AND w.hard_stop_at IS NULL AND (w.opens_at IS NULL OR w.opens_at<=${now})
+        AND (w.closes_at IS NULL OR w.closes_at>${now})
+      ORDER BY w.ordinal ASC LIMIT 100`:[]
     return {project:{name:project.title,description:project.description,
       collectionMode:project.collectionMode,status:project.status},
-      waves}
+      waves:waves.map(({measurementNotice,...wave})=>({...wave,
+        consentText:disclosedSurveyConsent(wave.consentText,{measurementNotice})}))}
   })
 }
 /** Opt-in pseudonymous T1 or late-join only, using a separate high-entropy
@@ -117,13 +129,12 @@ export async function listOwnLinkedWaves(input:{
     projectId:project.id,researchCode:input.researchCode,
     accessCredential:input.accessCredential,
   })
-  const waves=await prisma.surveyWave.findMany({where:{
-    projectId:project.id,publicationId:{not:null},
-    status:{in:['OPEN','PAUSED','CLOSED']},
-  },take:100,orderBy:{ordinal:'asc'},select:{
-    id:true,title:true,ordinal:true,status:true,opensAt:true,closesAt:true,
-    consentText:true,consentVersion:true,allowNewParticipants:true,
-  }})
+  const waves=await prisma.$queryRaw<ConsentWaveProjection[]>`
+    SELECT ${consentWaveColumns} FROM survey_waves w
+    LEFT JOIN survey_publications p ON p.id=w.publication_id AND p.project_id=w.project_id
+    WHERE w.project_id=${project.id} AND w.publication_id IS NOT NULL
+      AND w.status IN ('OPEN','PAUSED','CLOSED')
+    ORDER BY w.ordinal ASC LIMIT 100`
   const attempts=await prisma.surveyWaveAttempt.findMany({where:{
     projectId:project.id,participantId:identity.participantId,
   },select:{id:true,waveId:true,status:true,completedAt:true}})
@@ -134,8 +145,9 @@ export async function listOwnLinkedWaves(input:{
   const visible=waves.filter(w=>state.has(w.id)||
     (project.status==='ACTIVE'&&w.status==='OPEN'
       &&(!w.opensAt||w.opensAt<=now)&&(!w.closesAt||w.closesAt>now)))
-  return {collectionMode:'LINKED_WAVES',waves:visible.map(w=>({
-    ...w,attempt:state.get(w.id)||null,
+  return {collectionMode:'LINKED_WAVES',waves:visible.map(({measurementNotice,...w})=>({
+    ...w,consentText:disclosedSurveyConsent(w.consentText,{measurementNotice}),
+    attempt:state.get(w.id)||null,
   }))}
 }
 export async function startLinkedWave(input:{

@@ -19,7 +19,7 @@ export type RunnerAction =
   | { type: 'LEGACY_READ_ONLY'; session: NonNullable<RunnerState['session']> }
   | { type: 'SESSION_ERROR'; error: RunnerError }
   | { type: 'RUNNER_UNSUPPORTED' }
-  | { type: 'RECOVERY_REQUIRED' }
+  | { type: 'RECOVERY_REQUIRED'; error?: RunnerError }
   | { type: 'START_RUN' }
   | { type: 'TRIAL_SUBMIT_START' }
   | { type: 'TRIAL_SUBMIT_SUCCESS'; trialIndex: number }
@@ -97,7 +97,7 @@ export function runnerReducer(state: RunnerState, action: RunnerAction): RunnerS
       return {
         ...state,
         status: 'RECOVERY_REQUIRED',
-        error: { code: 'RECOVERY_REQUIRED', message: '检测到未完成的测评，但无法确认进度，请勿重复提交' },
+        error: action.error ?? { code: 'RECOVERY_REQUIRED', message: '检测到未完成的测评，但无法确认进度，请勿重复提交' },
       }
     case 'START_RUN':
       return state.status === 'READY' ? { ...state, status: 'RUNNING' } : state

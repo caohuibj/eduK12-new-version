@@ -14,7 +14,8 @@ export interface ResearchExportCodebookRow {
   scoringDigest:string
   responseSignature:string
   unit:string|null
-  missingMeanings:Readonly<Record<MissingReason,string>>
+  provenance?:FrozenScoreObservation['measurement']['provenance']
+  missingMeanings:Readonly<Partial<Record<MissingReason,string>>>
 }
 export interface ResearchExportManifest {
   schemaVersion:1
@@ -32,7 +33,7 @@ export interface BoundedResearchExport {
   codebook:ResearchExportCodebookRow[]
   manifest:ResearchExportManifest
 }
-const missingMeanings:Record<MissingReason,string>={
+const missingMeanings:Record<Exclude<MissingReason,'UNABLE_TO_JUDGE'>,string>={
   NOT_SHOWN:'根据冻结显示条件未呈现',
   SHOWN_MISSING:'呈现但未作答',
   REFUSED:'明确选择不回答',
@@ -84,6 +85,7 @@ const exportIdentifiers=()=>{
         instrumentKey:o.measurement.instrumentKey,scoreKey:o.measurement.scoreKey,
         scoringDigest:o.measurement.scoringDigest,responseSignature:o.measurement.responseSignature,
         respondentType:o.measurement.respondentType,unit:o.measurement.unit,
+        ...(o.measurement.provenance?{provenance:o.measurement.provenance}:{}),
       }
       // Validate every supplied identity, including shared mutable objects.
       // Only decorated IDs are reused later in this serializer invocation;
@@ -107,7 +109,9 @@ const codebookFor=(o:Pick<FrozenScoreColumn,'waveId'|'waveOrdinal'|'measurement'
   column,waveId:o.waveId,ordinal:o.waveOrdinal,
   instrumentKey:o.measurement.instrumentKey,scoreKey:o.measurement.scoreKey,
   scoringDigest:o.measurement.scoringDigest,responseSignature:o.measurement.responseSignature,
-  unit:o.measurement.unit,missingMeanings,
+  unit:o.measurement.unit,missingMeanings:o.measurement.provenance
+    ?{...missingMeanings,UNABLE_TO_JUDGE:'明确表示无法判断，不作为零分'}:missingMeanings,
+  ...(o.measurement.provenance?{provenance:o.measurement.provenance}:{}),
 })
 const decorateColumns=(source:FrozenScoreObservation[],expectedColumns:readonly FrozenScoreColumn[],
   columnId:(o:FrozenScoreColumn)=>string)=>{
@@ -156,14 +160,26 @@ export function exportLong(projectId:string,observations:readonly FrozenScoreObs
     throw new Error('Expected score columns must belong to the authorized project')
   const {columnId,attemptCode}=exportIdentifiers()
   const decorated=decorateColumns(source,expectedColumns,columnId)
+  const versioned=decorated.codebook.some(row=>row.provenance)
   const columns=['research_code_or_attempt','wave_id','wave_ordinal','attempt_code',
     'column','instrument_key','score_key','scoring_digest','response_signature',
-    'value','missing_reason','source_final_hash']
+    'value','missing_reason','source_final_hash',
+    ...(versioned?['unit','computation_status','quality_status','quality_flags','quality_reasons',
+      'source_result_hash','epoch','measurement_digest','scoring_version','config_hash',
+      'protocol_signature','engine_version','timing_policy','device_policy','scoring_method','completion_status','metric_details']:[])]
   const data=decorated.rows.map(({o,column})=>{
     return [o.researchCode||attemptCode(o.attemptId),o.waveId,o.waveOrdinal,attemptCode(o.attemptId),
       column,o.measurement.instrumentKey,o.measurement.scoreKey,
       o.measurement.scoringDigest,o.measurement.responseSignature,
-      o.value,o.missingReason,o.sourceFinalHash]
+      o.value,o.missingReason,o.sourceFinalHash,
+      ...(versioned?[o.measurement.unit,o.status??null,o.quality?.status??null,
+        o.quality?JSON.stringify(o.quality.flags):null,o.quality?.reasons?JSON.stringify(o.quality.reasons):null,
+        o.sourceResultHash??null,o.epoch??null,o.measurement.provenance?.measurementDigest??null,
+        o.measurement.provenance?.scoringVersion??null,o.measurement.provenance?.configHash??null,
+        o.measurement.provenance?.protocolSignature??null,o.measurement.provenance?.engineVersion??null,
+        o.measurement.provenance?.timingPolicy??null,o.measurement.provenance?.devicePolicy??null,
+        o.measurement.provenance?.scoringMethod??null,o.completionStatus??null,
+        o.metricDetails?JSON.stringify(o.metricDetails):null]:[])]
   })
   if(new Set(attendance.map(a=>a.researchCode)).size*expectedColumns.length
     +source.length>10000)
@@ -179,7 +195,16 @@ export function exportLong(projectId:string,observations:readonly FrozenScoreObs
       data.push([code,expected.waveId,expected.waveOrdinal,null,
         column,expected.measurement.instrumentKey,expected.measurement.scoreKey,
         expected.measurement.scoringDigest,expected.measurement.responseSignature,
-        null,status==='QUALITY_EXCLUDED'?'QUALITY_EXCLUDED':status?'ABANDONED':'NO_WAVE',null])
+        null,status==='QUALITY_EXCLUDED'?'QUALITY_EXCLUDED':status?'ABANDONED':'NO_WAVE',null,
+        ...(versioned?[expected.measurement.unit,'NON_FINAL',null,null,null,null,null,
+          expected.measurement.provenance?.measurementDigest??null,
+          expected.measurement.provenance?.scoringVersion??null,
+          expected.measurement.provenance?.configHash??null,
+          expected.measurement.provenance?.protocolSignature??null,
+          expected.measurement.provenance?.engineVersion??null,
+          expected.measurement.provenance?.timingPolicy??null,
+          expected.measurement.provenance?.devicePolicy??null,
+          expected.measurement.provenance?.scoringMethod??null,'NON_FINAL',null]:[])])
     }
   }
   return finalArtifact('LONG',projectId,columns,data,source,decorated.codebook)

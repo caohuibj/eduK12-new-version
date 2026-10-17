@@ -1,3 +1,4 @@
+import { surveySjtQuestions } from './sjt-structure'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { evaluateFlowCondition,staticFlowValues,safeFlowText,
   type FrozenSurveyFlow } from './flow.definition'
@@ -41,9 +42,9 @@ const missingUnit=(unit:ResearchFrozenUnit):FrozenUnitResult=>{
   }else if(unit.kind==='SCALE'){
     const d=unit.displayDefinition as import('./builder.definition').ScaleDraft
     for(const q of d.items)missing.push({itemKey:q.itemKey,reason:'NOT_SHOWN'})
-  }else{
-    const d=unit.displayDefinition as import('./builder.definition').SjtDraft
-    for(const q of d.questions)missing.push({itemKey:q.questionKey,reason:'NOT_SHOWN'})
+  }else if(unit.kind==='SJT'){
+    const d=unit.displayDefinition as import('./builder.definition').AnySjtDraft
+    for(const q of surveySjtQuestions(d))missing.push({itemKey:q.questionKey,reason:'NOT_SHOWN'})
   }
   return {instrumentKey:unit.instrumentKey,kind:unit.kind,sourceDigest:unit.sourceDigest,
     scoringDigest:unit.scoringDigest,rawAnswers:{},missing,

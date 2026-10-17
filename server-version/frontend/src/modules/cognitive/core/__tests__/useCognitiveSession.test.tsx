@@ -250,4 +250,20 @@ describe('useCognitiveSession checkpoint conflict propagation', () => {
     expect(mockScheduler.register).not.toHaveBeenCalled()
     expect(await finalDraftStore.get(draftKey)).toBeNull()
   })
+  it.each([true, false])('handles local trial storage failure with scoped fail-closed=%s', async failClosed => {
+    const finalSession: CognitiveSession = {...session,sessionId:'storage-failure-'+failClosed,
+      deliveryMode:'FINAL_ONLY',definitionHash:'definition-storage',contextSnapshotHash:null,attemptEpoch:1}
+    const finalApi={...api,getSession:vi.fn().mockResolvedValue({code:0,message:'ok',data:finalSession}),submitFinal:vi.fn()}
+    const {result,unmount}=renderHook(()=>useCognitiveSession(finalSession.sessionId,finalApi,{failClosedOnTrialPersistence:failClosed}))
+    await waitFor(()=>expect(result.current.state.status).toBe('READY'))
+    const spy=vi.spyOn(finalDraftStore,'putTrial').mockRejectedValueOnce(new Error('IndexedDB quota exceeded'))
+    try{
+      act(()=>result.current.start())
+      await act(async()=>{expect(await result.current.appendTrial({correct:true,rtMs:420})).toBe(false)})
+      expect(result.current.state.status).toBe(failClosed?'RECOVERY_REQUIRED':'RUNNING')
+      if(failClosed)expect(result.current.state.error?.code).toBe('LOCAL_TRIAL_PERSISTENCE_FAILED')
+      expect(result.current.state.trialIndex).toBe(0);expect(finalApi.submitFinal).not.toHaveBeenCalled()
+    }finally{spy.mockRestore();unmount();await finalDraftStore.delete('cognitive:'+finalSession.sessionId)}
+  })
+
 })

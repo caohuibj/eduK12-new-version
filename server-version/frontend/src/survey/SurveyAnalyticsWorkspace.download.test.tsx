@@ -64,6 +64,7 @@ beforeEach(()=>{
         finalCompleted:1,analysisIncluded:1,qualityExcluded:0,uniqueLinkedCodes:null,excluded:0}],
     })
     if(url===base+'/analytics/quality/attempts?page=1'&&method==='GET')return response({list:[]})
+    if(url===base+'/analytics/waves/'+waveId+'/items')return response({waveId,items:[],note:'仅为描述',completedFinals:3,fullCompletionAttempts:2,earlyCompletionAttempts:1,descriptiveScores:[{instrumentKey:'cog',scoreKey:'goMedianRtMs',validN:2,mean:320,sampleSd:20,unit:'ms',qualityCounts:{interpretable:1,limited:1},completionCounts:{COMPLETE:2},provenance:{kind:'COGNITIVE',measurementDigest:'digest-frozen',scoringVersion:'1.0.0',engineVersion:'1.0.0',timingPolicy:'software-frame-v1'}}]})
     if(url===base+'/exports'&&method==='POST')return response(ticket)
     if(url===base+'/exports/'+ticketId+'/download'&&method==='GET')return response(artifact)
     throw new Error('Unexpected request '+method+' '+url)
@@ -77,6 +78,25 @@ afterEach(()=>{
 })
 
 describe('Survey analytics artifact downloads',()=>{
+  it('renders server units, version identity, quality and full/early completion counts',async()=>{
+    render(<SurveyAnalyticsWorkspace projectId={projectId}/>)
+    fireEvent.click(await screen.findByRole('button',{name:'查看此波次题目频数与探索性得分'}))
+    expect(await screen.findByText(/单位：ms/)).toBeInTheDocument()
+    expect(screen.getByText(/质量状态：interpretable 1；limited 1/)).toBeInTheDocument()
+    expect(screen.getByText(/完整完成：2；提前结束：1/)).toBeInTheDocument()
+    expect(screen.getByText(/冻结测量：digest-frozen/)).toBeInTheDocument()
+  })
+  it('uses the bounded cognitive trial export with mandatory wave and no free-text disclosure',async()=>{
+    render(<SurveyAnalyticsWorkspace projectId={projectId}/>)
+    await screen.findByRole('button',{name:'创建受控导出'})
+    fireEvent.change(screen.getByLabelText('数据格式'),{target:{value:'COGNITIVE_TRIAL_LONG'}})
+    expect(screen.queryByRole('checkbox',{name:/包含自由文本原始回答/})).toBeNull()
+    fireEvent.click(screen.getByRole('button',{name:'创建受控导出'}))
+    await screen.findByRole('button',{name:'下载当前批次 CSV、Codebook 与 Manifest'})
+    expect(requests.filter(r=>r.url===base+'/exports')[0].body).toEqual({format:'COGNITIVE_TRIAL_LONG',waveId})
+    expect(screen.getByText(/认知试次按行与字节预算分批导出/)).toBeInTheDocument()
+  })
+
   it.each([false,true])('preserves native CSV and JSON downloads with includeFreeText=%s',async(includeFreeText)=>{
     const manifest={format:'RAW_WAVE',includeFreeText,rowCount:includeFreeText?3:2,
       columnCount:5,batch:{phase:'VERIFIED_FINAL',pageNumber:7},

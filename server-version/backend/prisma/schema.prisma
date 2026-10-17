@@ -2804,6 +2804,7 @@ model SurveyPublication {
   createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
   waves           SurveyWave[]
   finals          SurveyWaveFinal[]
+  cognitiveSessions SurveyCognitiveSession[]
   @@unique([projectId,version],map:"survey_publications_project_version_key")
   @@index([projectId,createdAt],map:"survey_publications_project_idx")
   @@map("survey_publications")
@@ -2878,6 +2879,7 @@ model SurveyWaveAttempt {
   final          SurveyWaveFinal?
   checkpoint     SurveyAttemptCheckpoint?
   sampleReview   SurveySampleReview?
+  cognitiveSessions SurveyCognitiveSession[]
   @@unique([id,projectId,waveId],map:"survey_attempts_id_project_wave_uniq")
   @@unique([waveId,participantId],map:"survey_attempts_wave_participant_key")
   @@unique([waveId,sessionHash],map:"survey_attempts_wave_session_key")
@@ -3613,4 +3615,58 @@ model AssessmentFrozenBinding {
  @@index([compositeAttemptId],map:"assessment_frozen_bindings_composite_idx")
  @@index([questionnaireAssessmentId],map:"assessment_frozen_bindings_questionnaire_idx")
  @@map("assessment_frozen_bindings")
+}
+
+
+// Survey-owned FINAL_ONLY cognitive administrations. No Training identity is used.
+model SurveyCognitiveSession {
+  id                  String @id
+  projectId           String @map("project_id")
+  waveId              String @map("wave_id")
+  attemptId           String @map("attempt_id")
+  attempt             SurveyWaveAttempt @relation(fields:[attemptId,projectId,waveId],references:[id,projectId,waveId],onDelete:Restrict)
+  publicationId       String @map("publication_id")
+  publication         SurveyPublication @relation(fields:[publicationId],references:[id],onDelete:Restrict)
+  slotKey             String @map("slot_key")
+  epoch               Int
+  status              String @default("IN_PROGRESS")
+  measurementDigest   String @map("measurement_digest")
+  randomSeedCipher    String @map("random_seed_cipher")
+  lockedAnswersCipher String @map("locked_answers_cipher")
+  lockedAnswersHash   String @map("locked_answers_hash")
+  admissionCipher     String @map("admission_cipher")
+  startedAt           DateTime @default(now()) @map("started_at") @db.Timestamptz(6)
+  interruptedAt       DateTime? @map("interrupted_at") @db.Timestamptz(6)
+  finishedAt          DateTime? @map("finished_at") @db.Timestamptz(6)
+  retentionReviewAt   DateTime @map("retention_review_at") @db.Timestamptz(6)
+  result              SurveyCognitiveResult?
+  @@unique([attemptId,slotKey,epoch],map:"survey_cognitive_attempt_slot_epoch_uniq")
+  @@unique([id,projectId,waveId,attemptId,publicationId,slotKey,epoch],map:"survey_cognitive_session_scope_uniq")
+  @@index([projectId,waveId,attemptId],map:"survey_cognitive_session_scope_idx")
+  @@index([retentionReviewAt],map:"survey_cognitive_retention_review_idx")
+  @@map("survey_cognitive_sessions")
+}
+model SurveyCognitiveResult {
+  id                  String @id
+  sessionId           String @unique @map("session_id")
+  projectId           String @map("project_id")
+  waveId              String @map("wave_id")
+  attemptId           String @map("attempt_id")
+  publicationId       String @map("publication_id")
+  slotKey             String @map("slot_key")
+  epoch               Int
+  session             SurveyCognitiveSession @relation(fields:[sessionId,projectId,waveId,attemptId,publicationId,slotKey,epoch],references:[id,projectId,waveId,attemptId,publicationId,slotKey,epoch],onDelete:Restrict)
+  measurementDigest   String @map("measurement_digest")
+  submissionId        String @map("submission_id")
+  payloadHash         String @map("payload_hash")
+  rawHash             String @map("raw_hash")
+  rawCipher           String @map("raw_cipher")
+  resultHash          String @map("result_hash")
+  resultCipher        String @map("result_cipher")
+  trialCount          Int @map("trial_count")
+  completedAt         DateTime @default(now()) @map("completed_at") @db.Timestamptz(6)
+  @@unique([sessionId,projectId,waveId,attemptId,publicationId,slotKey,epoch],map:"survey_cognitive_result_scope_uniq")
+  @@unique([attemptId,slotKey],map:"survey_cognitive_result_attempt_slot_uniq")
+  @@index([projectId,waveId,attemptId],map:"survey_cognitive_result_scope_idx")
+  @@map("survey_cognitive_results")
 }

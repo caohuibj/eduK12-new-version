@@ -180,6 +180,8 @@
     "submissions": "RUNTIME_RW",
     "survey_accounts": "RUNTIME_RW",
     "survey_attempt_checkpoints": "RUNTIME_RW",
+    "survey_cognitive_results": "RUNTIME_RW",
+    "survey_cognitive_sessions": "RUNTIME_RW",
     "survey_consents": "RUNTIME_RW",
     "survey_entry_tokens": "RUNTIME_RW",
     "survey_events": "RUNTIME_RW",

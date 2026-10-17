@@ -190,7 +190,7 @@ export async function previewSurveyImport(userId:string,projectId:string,id:stri
   return prisma.$transaction(async tx=>{
     await authorizedProject(tx,userId,projectId,false)
     const row=await findDraft(tx,projectId,id)
-    if(row.status!=='DRAFT'||row.kind==='SJT')fail(409,'只有 Form/Scale 草稿支持此批量导入')
+    if(row.status!=='DRAFT'||!['FORM','SCALE'].includes(row.kind))fail(409,'只有 Form/Scale 草稿支持此批量导入')
     const schemaVersion=row.kind==='FORM'?(row.definition as {schemaVersion:1|2}).schemaVersion:undefined
     const kind=row.kind as 'FORM'|'SCALE'
     const candidate=previewBulk(input,kind,schemaVersion)
@@ -212,7 +212,7 @@ export async function applySurveyImport(userId:string,projectId:string,id:string
   return prisma.$transaction(async tx=>{
     await authorizedProject(tx,userId,projectId,true)
     const row=await findDraft(tx,projectId,id)
-    if(row.kind==='SJT'||row.status!=='DRAFT'||row.revision!==input.revision)
+    if(!['FORM','SCALE'].includes(row.kind)||row.status!=='DRAFT'||row.revision!==input.revision)
       fail(409,'导入前草稿已变化，请重新预览')
     const definition=applyBulk(row.kind as 'FORM'|'SCALE',row.definition,input.batch,input.digest)
     const changed=await tx.surveyInstrumentDraft.updateMany({

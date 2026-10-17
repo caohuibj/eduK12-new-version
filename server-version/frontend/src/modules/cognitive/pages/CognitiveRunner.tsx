@@ -47,12 +47,18 @@ export type CampusCognitiveRunnerBinding = {
   api: CognitiveSessionApi
   onCompleted: () => void
   onExit: () => void
+  completionTitle?: string
+  completionAction?: string
+  completionNotice?: string
+  requiredInput?: 'KEYBOARD'
+  failClosedOnTrialPersistence?: boolean
 }
 
 /** Reuse the unchanged frozen trial runner while injecting a SCHOOL-only,
  * parent-slot-scoped transport. Campus never navigates to legacy auth/routes.
  */
-export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding }> = ({ campus }) => {
+export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding; embedded?: CampusCognitiveRunnerBinding }> = ({ campus: legacyCampus, embedded }) => {
+  const campus = embedded ?? legacyCampus
   const params = useParams<{ sessionId: string }>()
   const sessionId = campus?.sessionId ?? params.sessionId
   const navigate = useNavigate()
@@ -65,7 +71,7 @@ export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding }
     () => campus?.api ?? (isPublic ? publicCognitiveApi(recoveryToken) : cognitiveApi),
     [campus?.api, isPublic, recoveryToken]
   )
-  const controller = useCognitiveSession(sessionId ?? '', sessionApi, { aggregateOnly: relationalMode })
+  const controller = useCognitiveSession(sessionId ?? '', sessionApi, { aggregateOnly: relationalMode, failClosedOnTrialPersistence: embedded?.failClosedOnTrialPersistence })
   const { state } = controller
   const administrationProvenance = useAdministrationProvenance(state.session, state.status)
   const completeWithProvenance = () => controller.complete(administrationProvenance.snapshot() ?? undefined)
@@ -170,11 +176,11 @@ export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding }
   const leaveList = () => { if (campus) campus.onExit(); else navigate(cognitiveFallback) }
   const recoveryActions = (
     <div className="flex flex-wrap justify-center gap-3">
-      <button onClick={leaveParent} className="btn-secondary">
+      <button type="button" onClick={leaveParent} className="btn-secondary">
         {hasParentReturn ? '返回上层测评' : '返回列表'}
       </button>
       {!hasParentReturn ? (
-        <button onClick={() => void handleRestart()} disabled={restarting} className="btn-primary">
+        <button type="button" onClick={() => void handleRestart()} disabled={restarting} className="btn-primary">
           {restarting ? '重启中...' : '重启并继续作答'}
         </button>
       ) : null}
@@ -192,10 +198,10 @@ export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding }
     // student scores stay behind independent scientific publication gates.
     if (campus) return (
       <AssessmentShell
-        title="校园认知测评已完成"
-        actions={<button onClick={campus.onCompleted} className="btn-primary">返回校园活动</button>}
+        title={campus.completionTitle??"校园认知测评已完成"}
+        actions={<button type="button" onClick={campus.onCompleted} className="btn-primary">{campus.completionAction??"返回校园活动"}</button>}
       >
-        <p role="status" className="text-center text-slate-600">正式作答已提交并确认；是否开放解释性报告取决于独立科学审核。</p>
+        <p role="status" className="text-center text-slate-600">{campus.completionNotice??"正式作答已提交并确认；是否开放解释性报告取决于独立科学审核。"}</p>
       </AssessmentShell>
     )
     if (sessionId) {
@@ -257,7 +263,7 @@ export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding }
         <AssessmentShell
           title="认知测评"
           interactionReadiness={{ state: 'blocked', message: '该冻结任务类型或 engineVersion 没有可用的前端支持契约。' }}
-          actions={<button onClick={leaveList} className="btn-secondary">返回列表</button>}
+          actions={<button type="button" onClick={leaveList} className="btn-secondary">返回列表</button>}
         >
           <p className="text-center text-slate-600">该测评类型或版本暂不支持，请联系老师处理。</p>
         </AssessmentShell>
@@ -318,7 +324,7 @@ export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding }
         interactionReadiness={interactionReadiness}
         actions={(
           <div className="text-center">
-            <button onClick={controller.start} disabled={!mediaReady} className="btn-primary">
+            <button type="button" onClick={controller.start} disabled={!mediaReady} className="btn-primary">
               开始测评
             </button>
           </div>
@@ -379,7 +385,7 @@ export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding }
       <AssessmentShell
         title="认知测评"
         interactionReadiness={{ state: 'blocked', message: '该测评类型或版本暂不支持。' }}
-        actions={<button onClick={leaveList} className="btn-secondary">返回列表</button>}
+        actions={<button type="button" onClick={leaveList} className="btn-secondary">返回列表</button>}
       >
         <p className="text-center text-slate-600">请联系老师处理。</p>
       </AssessmentShell>
@@ -407,7 +413,7 @@ export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding }
         title={title}
         submissionStatus={pendingFinal ? { state: 'pending', title: '提交状态尚未确认', message: state.error?.message } : { state: 'idle' }}
         recoveryState={!pendingFinal ? { state: 'error', message: state.error?.message || '请稍后重试' } : { state: 'blocked', message: '不会重建或重新生成另一份 FINAL；重试仅重新读取/核对当前状态。' }}
-        actions={<button onClick={controller.reload} className="btn-secondary">重试</button>}
+        actions={<button type="button" onClick={controller.reload} className="btn-secondary">重试</button>}
       >
         {isPublic && sessionId ? <CognitiveCredentialReset sessionId={sessionId} /> : null}
       </AssessmentShell>
@@ -470,14 +476,14 @@ export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding }
           : { state: 'idle' }}
         actions={isLastTrial && state.status !== 'SUBMITTING_TRIAL' ? (
           <div className="text-center">
-            <button onClick={() => void completeWithProvenance()} className="btn-primary">完成测评</button>
+            <button type="button" onClick={() => void completeWithProvenance()} className="btn-primary">完成测评</button>
           </div>
         ) : undefined}
       >
         {publicCredentialNotice}
         <div data-cognitive-task-root="true">
           <Runner
-            taskContext={state.taskContext}
+            taskContext={campus?.requiredInput?{...state.taskContext,requiredInput:campus.requiredInput}:state.taskContext}
             imageAssetUrls={imageState.urls}
             videoSources={videoState.sources}
             refreshVideoSource={videoState.refresh}

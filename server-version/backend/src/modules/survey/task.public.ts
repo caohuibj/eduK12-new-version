@@ -1,4 +1,7 @@
-import { assertSurveyDraft, type FormDraft, type ScaleDraft, type SjtDraft } from './builder.definition'
+import { readSurveyCognitiveProgressFromVerifiedAttempt } from './cognitive.service'
+import { surveySjtScenes } from './sjt-structure'
+import { parseFrozenSurveyCognitive } from './cognitive.definition'
+import { assertSurveyDraft, type FormDraft, type ScaleDraft, type AnySjtDraft } from './builder.definition'
 import { verifiedSurveyAttempt } from './admission.service'
 import { prisma } from '../../config/database'
 import { ensureSurveyFlowAssignment } from './flow.assignment'
@@ -61,16 +64,37 @@ export async function getOwnResearchTask(input:{
         responseOptions:d.responseOptions.map(o=>({optionKey:o.optionKey,label:o.label})),
         items:d.items.map(q=>({itemKey:q.itemKey,prompt:q.prompt,required:q.required}))}
     }
-    const d=assertSurveyDraft('SJT',unit.displayDefinition,true) as SjtDraft
-    return {kind:'SJT',instrumentKey:unit.instrumentKey,title:unit.title,
-      stimulus:d.stimulus,scenarioTitle:d.title,image:projectPublicSurveyImage(d.image),
-      questions:d.questions.map(q=>({questionKey:q.questionKey,prompt:q.prompt,
-        responseType:q.responseType??'SINGLE',
+    if(unit.kind==='COGNITIVE'){
+      const frozen=parseFrozenSurveyCognitive(unit.compiledDefinition)
+      return {kind:'COGNITIVE',instrumentKey:unit.instrumentKey,title:unit.title,
+        templateKey:frozen.templateKey,measurementDigest:frozen.measurementDigest,
+        devicePolicy:frozen.devicePolicy,timingPolicy:frozen.timingPolicy,
+        maturity:frozen.maturity,restartLimit:frozen.restartLimit,
+        totalTrials:120,estimatedDurationSeconds:180,
+        feedback:{mode:frozen.feedback.mode,release:frozen.feedback.release},
+        partialRetentionDays:frozen.partialRetentionDays}
+    }
+    const d=assertSurveyDraft('SJT',unit.displayDefinition,true) as AnySjtDraft
+    const scenes=surveySjtScenes(d).map(scene=>({sceneKey:scene.sceneKey,
+      title:scene.title,stimulus:scene.stimulus,image:projectPublicSurveyImage(scene.image),
+      questions:scene.questions.map(q=>({questionKey:q.questionKey,prompt:q.prompt,
+        responseType:q.responseType??'SINGLE',required:q.required??true,
+        allowRefusal:q.allowRefusal??false,exclusiveOptionKeys:q.exclusiveOptionKeys,
         minSelections:q.responseType==='MULTIPLE'?(q.minSelections??1):undefined,
         maxSelections:q.responseType==='MULTIPLE'?(q.maxSelections??q.options.length):undefined,
-        options:q.options.map(o=>({optionKey:o.optionKey,label:o.label}))}))}
+        options:q.options.map(o=>({optionKey:o.optionKey,label:o.label,
+          ...('nonanswerReason' in o&&o.nonanswerReason?{nonanswerReason:o.nonanswerReason}:{})}))}))}))
+    if(d.schemaVersion===1)return {kind:'SJT',instrumentKey:unit.instrumentKey,title:unit.title,
+      stimulus:d.stimulus,scenarioTitle:d.title,image:projectPublicSurveyImage(d.image),
+      questions:scenes[0].questions}
+    return {kind:'SJT',schemaVersion:2,instrumentKey:unit.instrumentKey,title:unit.title,
+      orderPolicy:'FIXED',scenes}
+
   })
+  const cognitiveProgress=own.status==='STARTED'&&own.compiledSnapshot.units.some(unit=>unit.kind==='COGNITIVE')
+    ?await readSurveyCognitiveProgressFromVerifiedAttempt(input,own):null
   return {attemptId:own.attemptId,waveId:own.waveId,status:own.status,
+    ...(cognitiveProgress??{}),
     definitionDigest:own.definitionDigest,reportMode:'GENERAL_ONLY',units,
     ...(own.compiledSnapshot.checkpointPolicy?{
       checkpointPolicy:{enabled:true,ttlHours:own.compiledSnapshot.checkpointPolicy.ttlHours},

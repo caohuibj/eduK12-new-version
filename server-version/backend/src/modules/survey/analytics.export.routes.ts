@@ -9,7 +9,7 @@ import { SurveyAnalyticsError } from './analytics.read'
 export const surveyExportsRouter=Router()
 const pid=z.string().uuid(), eid=z.string().uuid()
 const create=z.object({
-  format:z.enum(['RAW_WAVE','RAW_LONG','RAW_WIDE','SCORE_LONG','SCORE_WIDE']),
+  format:z.enum(['RAW_WAVE','RAW_LONG','RAW_WIDE','SCORE_LONG','SCORE_WIDE','COGNITIVE_TRIAL_LONG']),
   waveId:pid.optional(),includeFreeText:z.boolean().optional(),cursor:z.string().max(1300).optional(),
   completedFrom:z.string().datetime().optional(),completedBefore:z.string().datetime().optional(),
 }).strict()

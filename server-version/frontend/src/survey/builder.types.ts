@@ -1,4 +1,4 @@
-export type Kind='FORM'|'SCALE'|'SJT'
+export type Kind='FORM'|'SCALE'|'SJT'|'COGNITIVE'
 export type Option={optionKey:string;label:string;score?:number}
 export type Condition={itemKey:string;operator:'EQUALS'|'INCLUDES';optionKey:string}
 export type SurveyImage={
@@ -24,7 +24,7 @@ export type ScaleDraft={
   aggregation:'sum'|'mean';
   items:{itemKey:string;prompt:string;required:boolean;reverse:boolean;dimensionKeys:string[]}[]
 }
-export type SjtDraft={
+export type SjtDraftV1={
   schemaVersion:1;respondentType:'student_self_report'|'teacher_self_report';
   scenarioKey:string;title:string;stimulus:string;image?:SurveyImage;author:string;sourceNote:string;
   licenseStatus?:'self_authored'|'authorized'|'unknown';
@@ -37,7 +37,25 @@ export type SjtDraft={
     optionKey:string;label:string;contributions:Record<string,number>
   }[]}[]
 }
-export type Definition=FormDraft|ScaleDraft|SjtDraft
+export type SjtQuestion={
+  questionKey:string;prompt:string;responseType:'SINGLE'|'MULTIPLE';required:boolean;allowRefusal:boolean;
+  minSelections?:number;maxSelections?:number;aggregationPolicy?:'SUM'|'MEAN';exclusiveOptionKeys?:string[];
+  options:{optionKey:string;label:string;contributions:Record<string,number>;
+    nonanswerReason?:'DECLINED'|'UNABLE_TO_JUDGE'}[]
+}
+export type SjtScene={sceneKey:string;title:string;stimulus:string;image?:SurveyImage;questions:SjtQuestion[]}
+export type SjtDraftV2={
+  schemaVersion:2;respondentType:'participant_self_report'|'student_self_report'|'teacher_self_report';
+  title:string;author:string;sourceNote:string;licenseStatus:'self_authored'|'authorized'|'unknown';
+  redistribution:'allowed'|'restricted'|'unknown';orderPolicy:'FIXED';
+  metrics:{metricKey:string;label:string;direction:'descriptive'}[];
+  scoring:{modelKey:'AUTHOR_KEY_SUM'|'EXPERT_KEY';modelVersion:'1';sourceNote:string};scenes:SjtScene[]
+}
+export type SjtDraft=SjtDraftV1|SjtDraftV2
+export type CognitiveDraft={schemaVersion:1;templateKey:'gonogo-software-frame-v1';
+  feedback:{mode:'GENERAL'|'DESCRIPTIVE';metricKeys:('hitRate'|'goMedianRtMs')[];
+    release:'AFTER_FINAL'|'AFTER_COLLECTION'}}
+export type Definition=FormDraft|ScaleDraft|SjtDraft|CognitiveDraft
 export type ResearchDraft={
   id:string;projectId:string;instrumentKey:string;kind:Kind;title:string;
   definition:Definition;revision:number;status:'DRAFT'|'ARCHIVED';

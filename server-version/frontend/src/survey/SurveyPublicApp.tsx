@@ -1,4 +1,7 @@
+import { clearSurveyCognitiveSessions,rememberSurveyCognitiveSession } from './survey-cognitive-local'
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
+import { SurveyCognitiveUnit } from './SurveyCognitiveUnit'
+import type { SurveyCognitiveReference,SurveyCognitiveSessionInfo } from './survey-cognitive-api'
 import type { SurveyPublicImage } from './builder.types'
 import { visibleFormKeys,sanitizeFormAnswers } from './form-visibility'
 import { ProfessionalFormAnswer,type ProfessionalAnswer } from './ProfessionalFormAnswer'
@@ -16,23 +19,25 @@ type ApiResult<T>={code:number|string;message:string;data:T|null}
 type Wave={id:string;title:string;ordinal:number;status:string;consentText:string;consentVersion:number;
   opensAt:string|null;closesAt:string|null;allowNewParticipants:boolean;attempt?:{id:string;status:string}|null}
 type StudyInfo={project:{name:string;description:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';status:string};waves:Wave[]}
-type Choice={optionKey:string;label:string}
+type Choice={optionKey:string;label:string;nonanswerReason?:'DECLINED'|'UNABLE_TO_JUDGE'}
 type Question={itemKey:string;questionKey?:string;type:string;prompt:string;image?:SurveyPublicImage;required:boolean;
   options:Choice[];rows?:{rowKey:string;label:string}[];allowRefusal?:boolean;displayIf?:{itemKey:string;operator:'EQUALS'|'INCLUDES';optionKey:string};
   min?:number;max?:number;integerOnly?:boolean;step?:number;precision?:number;
   maxLength?:number;minSelections?:number;maxSelections?:number;
   total?:number;timeZone?:string;textValidation?:'EMAIL'|'DIGITS'|'ALPHANUMERIC';
   otherOptionKey?:string;otherMaxLength?:number;exclusiveOptionKeys?:string[]}
-type Unit={kind:'FORM'|'SCALE'|'SJT';instrumentKey:string;title:string;image?:SurveyPublicImage;
+type SjtPublicQuestion={questionKey:string;prompt:string;responseType?:'SINGLE'|'MULTIPLE';required?:boolean;allowRefusal?:boolean;exclusiveOptionKeys?:string[];minSelections?:number;maxSelections?:number;options:Choice[]}
+type Unit={kind:'FORM'|'SCALE'|'SJT'|'COGNITIVE';instrumentKey:string;title:string;image?:SurveyPublicImage;
   presentationMode?:'ONE_BY_ONE'|'ALL_AT_ONCE';
   stimulus?:string;scenarioTitle?:string;
   pages?:{pageKey:string;title:string;questions:Question[]}[];
   responseOptions?:Choice[];
   items?:Question[];
-  questions?:{questionKey:string;prompt:string;responseType?:'SINGLE'|'MULTIPLE';
-    minSelections?:number;maxSelections?:number;options:Choice[]}[]}
-type Task={attemptId:string;waveId:string;status:string;definitionDigest:string;units:Unit[];reportMode:'GENERAL_ONLY';flow?:PublicFlow;checkpointPolicy?:{enabled:true;ttlHours:number}}
-type General={kind:'GENERAL_ONLY';text:string;disclaimer:string;completedAt:string}
+  feedback?:{mode:'GENERAL'|'DESCRIPTIVE';release:'AFTER_FINAL'|'AFTER_COLLECTION'};
+  scenes?:{sceneKey:string;title:string;stimulus:string;image?:SurveyPublicImage;questions:SjtPublicQuestion[]}[];
+  questions?:SjtPublicQuestion[]}
+type Task={attemptId:string;waveId:string;status:string;definitionDigest:string;units:Unit[];reportMode:'GENERAL_ONLY'|'DESCRIPTIVE';cognitiveSessions?:SurveyCognitiveSessionInfo[];lockedPriorAnswers?:Record<string,Record<string,Answer>>;flow?:PublicFlow;checkpointPolicy?:{enabled:true;ttlHours:number}}
+type General={kind:'GENERAL_ONLY'|'DESCRIPTIVE';text:string;disclaimer:string;completedAt:string;pending?:boolean;measurements?:{instrumentKey:string;title:string;measurementDigest:string;maturity:'PILOT';quality:string;metrics:{key:string;label:string;value:number|null;unit:'ratio'|'ms';status:string}[]}[]}
 type FinalResponse={status:string;attemptId?:string;receiptId?:string;completedAt?:string;
   idempotent?:boolean;generalReceipt?:unknown}
 // Only the first, unambiguous committed FINAL may supply this submission-time
@@ -143,7 +148,7 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purp
       return <label className="block my-2 text-sm" key={o.optionKey}>
         <input type="checkbox" checked={selected.includes(o.optionKey)}
           disabled={!selected.includes(o.optionKey)&&q.maxSelections!==undefined
-            &&selected.length>=q.maxSelections}
+            &&selected.length>=q.maxSelections&&!q.exclusiveOptionKeys?.includes(o.optionKey)}
           onChange={e=>onChange(q.itemKey,toggleFormMultiple(
             selected,o.optionKey,e.target.checked,q.exclusiveOptionKeys))}/> {o.label}</label>
     }):options.map(o=><label className="block my-2 text-sm" key={o.optionKey}>
@@ -213,13 +218,14 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purp
       </nav>
     </div>}
     {unit.kind==='SCALE'&&unit.items?.map(q=>item({...q,type:'LIKERT',options:unit.responseOptions||[]}))}
-    {unit.kind==='SJT'&&<><p className="mt-2 font-medium">{unit.scenarioTitle}</p>
-      <p className="whitespace-pre-wrap mb-4 text-sm">{unit.stimulus}</p>
-      {unit.image&&proof&&<SurveyParticipantImage image={unit.image} proof={proof}/>}
-      {unit.questions?.map(q=>item({itemKey:q.questionKey,
-        type:q.responseType==='MULTIPLE'?'MULTIPLE':'SINGLE',
-        prompt:q.prompt,options:q.options,required:true,
-        minSelections:q.minSelections,maxSelections:q.maxSelections}))}</>}
+    {unit.kind==='SJT'&&(unit.scenes??[{sceneKey:'legacy',title:unit.scenarioTitle,stimulus:unit.stimulus,image:unit.image,questions:unit.questions??[]}]).map(scene=><section key={scene.sceneKey} aria-label={'情境 '+scene.title} className="mt-4 space-y-3">
+      <h4 className="font-medium">{scene.title}</h4><p className="whitespace-pre-wrap text-sm">{scene.stimulus}</p>
+      {scene.image&&proof&&<SurveyParticipantImage image={scene.image} proof={proof}/>}
+      {scene.questions.map(q=>item({itemKey:q.questionKey,type:q.responseType==='MULTIPLE'?'MULTIPLE':'SINGLE',
+        prompt:q.prompt,options:q.options,required:q.required??true,allowRefusal:q.allowRefusal,
+        minSelections:q.minSelections,maxSelections:q.maxSelections,
+        exclusiveOptionKeys:[...(q.exclusiveOptionKeys??[]),...q.options.filter(o=>o.nonanswerReason).map(o=>o.optionKey)]}))}
+    </section>)}
   </section>
 }
 /** Research participants have NO platform account or Student/Teacher session.
@@ -248,9 +254,19 @@ export default function SurveyPublicApp(){
   const [attemptId,setAttemptId]=useState(''),[submissionId,setSubmissionId]=useState('')
   const [general,setGeneral]=useState<General|null>(null),[notice,setNotice]=useState('')
   const [finalSealed,setFinalSealed]=useState(false)
+  const [cognitiveRunning,setCognitiveRunning]=useState(false)
+  const [cognitiveSessions,setCognitiveSessions]=useState<SurveyCognitiveSessionInfo[]>([])
+  const knownCognitiveSessions=useRef(new Map<string,{attemptId:string;researchCode:string}>())
+  const rememberCognitive=(parentId:string,childId:string)=>{knownCognitiveSessions.current.set(childId,{attemptId:parentId,researchCode});rememberSurveyCognitiveSession(publicId,parentId,childId,researchCode)}
+  const clearCognitive=async(parentId?:string)=>{
+    const known=[...knownCognitiveSessions.current].filter(([,owner])=>parentId?owner.attemptId===parentId:owner.researchCode===researchCode).map(([id])=>id)
+    return clearSurveyCognitiveSessions(publicId,parentId,known,researchCode||undefined)
+  }
+  const [cognitiveReferences,setCognitiveReferences]=useState<SurveyCognitiveReference[]>([])
+  const [lockedAnswers,setLockedAnswers]=useState<Record<string,Record<string,Answer>>>({})
   const finalRequest=useRef<{attemptId:string;path:string;
     body:{accessCredential:string;researchCode?:string;submissionId:string;answers:Record<string,Record<string,Answer>>;
-      itemTimings?:SurveyWaveScaleTimings;presentation?:{shownBlocks:string[]}}}|null>(null)
+      itemTimings?:SurveyWaveScaleTimings;presentation?:{shownBlocks:string[]};cognitiveReferences?:SurveyCognitiveReference[]}}|null>(null)
   const finalInFlight=useRef(false)
   const completedAttempts=useRef(new Set<string>())
   const [completion,setCompletion]=useState<{attemptId:string;proof:{accessCredential:string;researchCode?:string}}|null>(null)
@@ -282,7 +298,8 @@ export default function SurveyPublicApp(){
       if(sealed){
         saveLocalSurveyDraft(publicId,attemptId,task.definitionDigest,sealed.body.answers,
           sealed.body.itemTimings,{submissionId:sealed.body.submissionId,screenOut:sealed.path.endsWith('/screen-out'),
-            ...(sealed.body.presentation?{presentation:sealed.body.presentation}:{})})
+            ...(sealed.body.presentation?{presentation:sealed.body.presentation}:{}),
+            ...(sealed.body.cognitiveReferences?{cognitiveReferences:sealed.body.cognitiveReferences}:{})})
         return
       }
       const liveTimings={...draftState.current.itemTimings}
@@ -371,13 +388,14 @@ export default function SurveyPublicApp(){
   const markCompleted=(id:string,proof:{accessCredential:string;researchCode?:string})=>{
     completedAttempts.current.add(id)
     clearLocalSurveyDraft(publicId,id)
+    void clearCognitive(id).then(ok=>{if(!ok)setError('服务器已确认完成，但本机试次清理失败，请清理本网站存储。')})
     setCheckpointRevision(0);setTask(null);setCompletion({attemptId:id,proof})
     finalRequest.current=null;setFinalSealed(false)
   }
   const markScreenedOut=(id:string)=>{
     completedAttempts.current.add(id)
     finalRequest.current=null;setFinalSealed(false)
-    clearLocalSurveyDraft(publicId,id);setCheckpointRevision(0)
+    clearLocalSurveyDraft(publicId,id);void clearCognitive(id);setCheckpointRevision(0)
     try{sessionStorage.removeItem(singleStorageKey(publicId))}catch{/* private session unavailable */}
     setAttemptId(id);setSingleResume(null);setTask(null);setCompletion(null);setGeneral(null)
     setScreenedOut(true)
@@ -389,6 +407,8 @@ export default function SurveyPublicApp(){
     })
     // The authenticated terminal projection contains no answers or task units.
     // A lost screen-out response must not reopen its sealed qualifying draft.
+    for(const session of data.cognitiveSessions??[])rememberCognitive(id,session.sessionId)
+    if(data.status==='COMPLETED')void clearCognitive(id)
     if(data.status==='SCREENED_OUT'){markScreenedOut(id);return}
     // Reconcile complete local+remote envelopes before mounting any timed
     // Scale runner. An older local revision can never silently replace remote.
@@ -426,6 +446,9 @@ export default function SurveyPublicApp(){
         else if(remote.checkpoint&&!saved)setNotice('已恢复服务器上的加密答案及已有计时记录。')
       }catch(e){setNotice('无法恢复服务器临时存档：'+parseError(e))}
     }
+    if(!saved?.finalSubmission)restoredAnswers={...restoredAnswers,...data.lockedPriorAnswers}
+    setLockedAnswers(data.lockedPriorAnswers??{});setCognitiveSessions(data.cognitiveSessions??[])
+    setCognitiveReferences((data.cognitiveSessions??[]).flatMap(s=>s.resultReference?[s.resultReference]:[]));setCognitiveRunning(false)
     timingTrackers.current={}
     const savedFinal=saved?.finalSubmission
     finalRequest.current=savedFinal?{attemptId:id,
@@ -433,7 +456,8 @@ export default function SurveyPublicApp(){
       body:{...(code?{researchCode:code}:{}),accessCredential:secret,
         submissionId:savedFinal.submissionId,answers:restoredAnswers,
         ...(saved.itemTimings?{itemTimings:restoredTimings}:{}),
-        ...(savedFinal.presentation?{presentation:savedFinal.presentation}:{})}}:null
+        ...(savedFinal.presentation?{presentation:savedFinal.presentation}:{}),
+        ...(savedFinal.cognitiveReferences?{cognitiveReferences:savedFinal.cognitiveReferences}:{})}}:null
     setFinalSealed(!!savedFinal);setCompletion(null)
     setAttemptId(id);setSubmissionId(savedFinal?.submissionId??crypto.randomUUID())
     setTask(data);setFormPages({});setScalePages({});setFlowStep(0);setToolStep(0);setScreenedOut(false)
@@ -484,7 +508,7 @@ export default function SurveyPublicApp(){
   // One-by-one studies must not render multiple Scale timers simultaneously.
   // Keep historical all-at-once Waves on their original multi-tool layout.
   const timedSequence=!!task&&!task.flow&&task.units.some(u=>
-    u.kind==='SCALE'&&u.presentationMode==='ONE_BY_ONE')
+    u.kind==='COGNITIVE'||u.kind==='SCALE'&&u.presentationMode==='ONE_BY_ONE')
   const activeTool=timedSequence?task!.units[Math.min(toolStep,task!.units.length-1)]:undefined
   const flowUnit=flowBlock?.kind==='INSTRUMENT'
     ?task?.units.find(u=>u.instrumentKey===flowBlock.instrumentKey):activeTool
@@ -492,7 +516,9 @@ export default function SurveyPublicApp(){
     ?flowStep>=currentFlow.blocks.length-1
     :!timedSequence||toolStep>=task!.units.length-1
   const canAdvanceFlow=():boolean=>{
+    if(cognitiveRunning)return false
     if(!flowUnit)return true
+    if(flowUnit.kind==='COGNITIVE')return cognitiveReferences.some(ref=>ref.slotKey===flowUnit.instrumentKey)
     const existing=own(answers,flowUnit.instrumentKey)??{}
     if(flowUnit.kind==='FORM'){
       const visible=visibleFormKeys(flowUnit.pages?.flatMap(page=>page.questions)??[],existing)
@@ -512,10 +538,12 @@ export default function SurveyPublicApp(){
     }
     if(flowUnit.kind==='SCALE')return (flowUnit.items??[]).every(q=>
       typeof existing[q.itemKey]==='string'&&(existing[q.itemKey] as string).length>0)
-    return (flowUnit.questions??[]).every(q=>{
+    return (flowUnit.scenes?.flatMap(scene=>scene.questions)??flowUnit.questions??[]).every(q=>{
+      if(q.required===false)return true
       const answer=existing[q.questionKey]
-      return typeof answer==='string'&&answer.length>0||
-        Array.isArray(answer)&&answer.length>0
+      if(q.allowRefusal&&isRefusal(answer))return true
+      if(q.responseType==='MULTIPLE'&&Array.isArray(answer))return answer.length===1&&q.options.some(o=>o.optionKey===answer[0]&&o.nonanswerReason)||answer.length>=(q.minSelections??1)&&answer.length<=(q.maxSelections??q.options.length)
+      return typeof answer==='string'&&answer.length>0
     })
   }
   const advanceFlow=()=>{
@@ -525,7 +553,7 @@ export default function SurveyPublicApp(){
     else if(timedSequence)setToolStep(i=>Math.min(i+1,task!.units.length-1))
   }
   const updateAnswer=(unit:Unit,key:string,value:Answer)=>setAnswers(previous=>{
-    if(finalRequest.current||completedAttempts.current.has(attemptId))return previous
+    if(finalRequest.current||completedAttempts.current.has(attemptId)||Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey))return previous
     const next={...(own(previous,unit.instrumentKey)??{}),[key]:value}
     const question=unit.kind==='FORM'?unit.pages?.flatMap(page=>page.questions)
       .find(q=>q.itemKey===key&&q.otherOptionKey):undefined
@@ -542,28 +570,48 @@ export default function SurveyPublicApp(){
     timingTrackers.current[unit.instrumentKey]=tracker
     return tracker
   }
+  const priorAnswersFor=(key:string)=>{
+    const order=currentFlow?.visibleUnitKeys??task?.units.map(u=>u.instrumentKey)??[]
+    const index=order.indexOf(key),prior=new Set(order.slice(0,index))
+    return Object.fromEntries((task?.units??[]).filter(u=>u.kind!=='COGNITIVE'&&prior.has(u.instrumentKey)).map(u=>{
+      const raw=own(answers,u.instrumentKey)??{}
+      return [u.instrumentKey,u.kind==='FORM'?sanitizeFormAnswers(u.pages?.flatMap(p=>p.questions)??[],raw):raw]
+    }))
+  }
   const renderSurveyTask=(unit:Unit)=>{
+    if(unit.kind==='COGNITIVE')return <SurveyCognitiveUnit key={unit.instrumentKey} publicId={publicId} attemptId={attemptId}
+      instrumentKey={unit.instrumentKey} title={unit.title} request={publicApi}
+      proof={{accessCredential,...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode}:{})}}
+      priorAnswers={priorAnswersFor(unit.instrumentKey)} existing={cognitiveSessions.find(s=>s.slotKey===unit.instrumentKey)}
+      onStarted={(session,canonical)=>{
+        rememberCognitive(attemptId,session.sessionId)
+        const locked=(canonical??priorAnswersFor(unit.instrumentKey)) as Record<string,Record<string,Answer>>
+        setLockedAnswers(old=>({...old,...locked}));if(!finalRequest.current)setAnswers(old=>({...old,...locked}))
+        setCognitiveSessions(old=>[...old.filter(s=>s.slotKey!==session.slotKey),session])
+      }}
+      onCommitted={reference=>{setCognitiveReferences(old=>[...old.filter(r=>r.slotKey!==reference.slotKey),reference]);setCognitiveRunning(false)}}
+      onRunningChange={setCognitiveRunning}/>
     if(unit.kind==='SCALE'&&unit.presentationMode==='ONE_BY_ONE')
-      return <SurveyTimedScale key={unit.instrumentKey}
+      return <fieldset key={unit.instrumentKey} disabled={Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey)} className="border-0 p-0 min-w-0"><SurveyTimedScale
         unit={{instrumentKey:unit.instrumentKey,title:unit.title,
           items:(unit.items??[]).map(q=>({itemKey:q.itemKey,prompt:q.prompt,required:q.required})),
           responseOptions:unit.responseOptions??[]}}
         answer={own(answers,unit.instrumentKey)??{}}
-        tracker={timingFor(unit)} paused={finalSealed}
+        tracker={timingFor(unit)} paused={finalSealed||Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey)}
         index={own(scalePages,unit.instrumentKey)??0}
         onIndexChange={next=>setScalePages(prev=>({...prev,[unit.instrumentKey]:next}))}
         onAnswer={(key,value)=>updateAnswer(unit,key,value)}
-        onTiming={next=>recordTiming(unit.instrumentKey,next)}/>
-    return <TaskForm key={unit.instrumentKey} unit={unit}
+        onTiming={next=>recordTiming(unit.instrumentKey,next)}/></fieldset>
+    return <fieldset key={unit.instrumentKey} disabled={Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey)} className="min-w-0 border-0 p-0"><TaskForm unit={unit}
       pageIndex={own(formPages,unit.instrumentKey)??0}
       onPageChange={next=>setFormPages(current=>({...current,[unit.instrumentKey]:next}))}
       proof={{publicId,attemptId,accessCredential,
         ...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode}:{}),
       }}
       answer={answers[unit.instrumentKey]||{}}
-      onChange={(key,value)=>updateAnswer(unit,key,value)}/>
+      onChange={(key,value)=>updateAnswer(unit,key,value)}/></fieldset>
   }
-  const submit=(e:FormEvent)=>{e.preventDefault();if(!task||!attemptId||finalInFlight.current)return;
+  const submit=(e:FormEvent)=>{e.preventDefault();if(!task||!attemptId||finalInFlight.current||cognitiveRunning)return;
     if(!finalRequest.current&&(currentFlow||timedSequence)&&!finalFlowStep){
       setError('请按顺序完成当前研究步骤');return
     }
@@ -604,10 +652,12 @@ export default function SurveyPublicApp(){
       ...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode:researchCode.trim().toUpperCase()}:{}),
       accessCredential:accessCredential.trim(),submissionId,answers:payload,
       ...(timedUnits.length?{itemTimings:sealedTimings}:{}),
+      ...(task.units.some(u=>u.kind==='COGNITIVE')?{cognitiveReferences:cognitiveReferences.filter(ref=>eligible===null||eligible.has(ref.slotKey))}:{}),
       ...(currentFlow?{presentation:{shownBlocks:currentFlow.shownBlocks}}:{}),
       }}
       setFinalSealed(true)
       const descriptor:SurveyFinalSubmission={submissionId,screenOut:!!screened,
+        ...(finalRequest.current.body.cognitiveReferences?{cognitiveReferences:finalRequest.current.body.cognitiveReferences}:{}),
         ...(currentFlow?{presentation:{shownBlocks:currentFlow.shownBlocks}}:{})}
       if(!saveLocalSurveyDraft(publicId,attemptId,task.definitionDigest,payload,
         timedUnits.length?sealedTimings:undefined,descriptor))
@@ -643,7 +693,7 @@ export default function SurveyPublicApp(){
     }
     markCompleted(attemptId,proof)
     const receipt=firstRequest?firstFinalGeneral(final,attemptId):null
-    if(receipt){
+    if(receipt&&!task.units.some(u=>u.kind==='COGNITIVE'&&u.feedback?.mode==='DESCRIPTIVE')){
       // In-memory display only. Refresh/reopen and explicit reads reauthorize.
       setGeneral(receipt)
       setNotice('提交成功。以下为本次提交时确认的完成回执。')
@@ -691,6 +741,8 @@ export default function SurveyPublicApp(){
         researchCode:researchCode.trim().toUpperCase(),accessCredential:accessCredential.trim(),
       })
       if(attemptId)clearLocalSurveyDraft(publicId,attemptId)
+      const cleared=await clearCognitive()
+      if(!cleared)setError('访问已撤销，但本机试次清理失败，请清理本网站存储。')
       setRevoked(true);setHome(null);setTask(null);setGeneral(null);setCompletion(null)
       setSelectedWave(null);setAgreed(false);setProofReceived(false)
       discardEntry()
@@ -714,6 +766,8 @@ export default function SurveyPublicApp(){
         })
       }
       if(attemptId)clearLocalSurveyDraft(publicId,attemptId)
+      const cleared=await clearCognitive(info?.project.collectionMode==='LINKED_WAVES'?undefined:attemptId)
+      if(!cleared)setError('撤回已记录，但本机试次清理失败，请清理本网站存储。')
       setWithdrawn(true);setGeneral(null);setCompletion(null);setTask(null);setHome(null)
       setSingleResume(null)
       try{sessionStorage.removeItem(singleStorageKey(publicId))}catch{/* storage unavailable */}
@@ -824,11 +878,13 @@ export default function SurveyPublicApp(){
         {task.checkpointPolicy?.enabled&&<section className="bg-white border rounded-xl p-4 space-y-2">
           <p className="text-sm">此研究启用了可选服务器加密暂存：您可主动保存尚未完成的内容。
             每次最多 64KB，保存期 {task.checkpointPolicy.ttlHours} 小时；不计入研究 FINAL。</p>
-          <button type="button" className="btn-secondary" disabled={busy} onClick={saveCheckpoint}>
+          <button type="button" className="btn-secondary" disabled={busy||cognitiveRunning} onClick={saveCheckpoint}>
             保存加密临时进度（第 {checkpointRevision+1} 版）</button>
           <p className="text-xs text-slate-500">研究者不会通过此按钮获得正式作答，取消、撤回或最终提交后将按策略清理。
             仅拥有本研究合法私密凭证的当前参与者可以恢复。</p>
         </section>}
+        {Object.keys(lockedAnswers).length>0&&<p role="status" className="text-sm text-amber-800">认知任务已经开始，前置工具答案已锁定。此任务已提交与本轮研究已提交分别确认。</p>}
+        {cognitiveRunning&&<p role="status" className="text-sm">认知任务运行／提交期间不能切换外层研究步骤。请勿刷新或离开页面。</p>}
         {task.flow&&currentFlow?<>
           <p className="text-xs text-slate-500">研究流程 · 步骤 {Math.min(flowStep+1,currentFlow.blocks.length)} / {currentFlow.blocks.length}</p>
           {flowBlock?.kind==='MATERIAL'&&<section className="bg-white border rounded-xl p-5 space-y-3">
@@ -842,21 +898,21 @@ export default function SurveyPublicApp(){
               ?'当前路径为资格筛除，不形成测量 FINAL。'
               :'后续研究工具按冻结规则不予呈现，并标记为 NOT_SHOWN。'}</p>
           </section>}
-          {!finalFlowStep&&<button type="button" className="btn-secondary" disabled={busy}
+          {!finalFlowStep&&<button type="button" className="btn-secondary" disabled={busy||cognitiveRunning}
             onClick={advanceFlow}>确认当前步骤，继续研究</button>}
         </>:timedSequence&&flowUnit?<section className="space-y-3">
           <p className="text-xs text-slate-600" role="status">研究工具 {toolStep+1} / {task.units.length}</p>
           {renderSurveyTask(flowUnit)}
           <nav aria-label="研究工具导航" className="flex flex-wrap gap-3">
-            <button type="button" className="btn-secondary" disabled={toolStep===0}
+            <button type="button" className="btn-secondary" disabled={toolStep===0||cognitiveRunning}
               onClick={()=>{setError('');setToolStep(i=>Math.max(0,i-1))}}>上一工具</button>
-            {!finalFlowStep&&<button type="button" className="btn-secondary"
+            {!finalFlowStep&&<button type="button" className="btn-secondary" disabled={cognitiveRunning}
               onClick={advanceFlow}>确认当前工具，继续</button>}
           </nav>
         </section>:task.units.map(renderSurveyTask)}
         </fieldset>
         {finalSealed&&<p role="status">本次答案已封存。结果未确认时请重试原提交，暂不能修改答案。</p>}
-        {(finalSealed||finalFlowStep)&&<button className="btn-primary" disabled={busy||(!finalSealed&&!task.flow&&!task.units.every(unit=>{
+        {(finalSealed||finalFlowStep)&&<button className="btn-primary" disabled={busy||cognitiveRunning||(!finalSealed&&!task.flow&&!task.units.every(unit=>{
           if(unit.kind!=='FORM')return true
           const vis=visibleFormKeys(unit.pages?.flatMap(p=>p.questions)||[],
             own(answers,unit.instrumentKey)??{})
@@ -874,15 +930,24 @@ export default function SurveyPublicApp(){
               onClick={withdraw}>撤回本轮筛选记录</button>}
       </section>}
       {completion&&!general&&<section className="bg-white border rounded-xl p-5 space-y-3">
-        <h2 className="text-xl font-semibold">本轮回答已完成</h2>
+        <h2 className="text-xl font-semibold">本轮研究已提交</h2>
         <p>正式回答已保存，完成回执尚未读取。</p>
         <button type="button" className="btn-secondary" disabled={busy}
           onClick={()=>void run(()=>readCompletion(completion.attemptId,completion.proof))}>重试读取完成回执</button>
       </section>}
       {general&&<section className="bg-white border rounded-xl p-5 space-y-3">
-        <h2 className="text-xl font-semibold">本轮回答已完成</h2>
+        <h2 className="text-xl font-semibold">本轮研究已提交</h2>
         <p className="whitespace-pre-wrap">{general.text}</p>
         <p className="text-sm text-slate-600">{general.disclaimer}</p>
+        {general.kind==='DESCRIPTIVE'&&<section className="border rounded-lg p-3 space-y-3" aria-label="本次表现描述性反馈">
+          <h3 className="font-semibold">本次表现反馈</h3>
+          {general.pending&&<p role="status">本轮已经提交；部分反馈将在统一收集结束后开放。</p>}
+          {general.measurements?.map(measurement=><article key={measurement.instrumentKey} className="space-y-2">
+            <h4 className="font-medium">{measurement.title}</h4>
+            <p className="text-xs">试点测量 · 质量状态：{measurement.quality}。仅反映本次条件下的表现。</p>
+            {measurement.metrics.map(metric=><p key={metric.key}>{metric.label}：{metric.value===null?'不可计算':metric.unit==='ratio'?(metric.value*100).toFixed(1)+'%':metric.value+' ms'}（{metric.status}）</p>)}
+          </article>)}
+        </section>}
         <p className="text-xs">完成时间：{new Date(general.completedAt).toLocaleString('zh-CN')}</p>
         <div className="flex flex-wrap gap-3">
           {info.project.collectionMode==='LINKED_WAVES'&&<>

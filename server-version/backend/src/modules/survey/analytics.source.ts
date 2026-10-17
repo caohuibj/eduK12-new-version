@@ -6,7 +6,12 @@ import type { ResearchFrozenPublication, ResearchFrozenUnit } from './publicatio
 import type { SurveyComputedFinal, FrozenUnitResult, AnswerPrimitive } from './final.compute'
 import type { SurveyFlowAssignment } from './flow.assignment'
 import type { FrozenScoreObservation, MissingReason } from './analytics.cohorts'
-import type { FormDraft, ScaleDraft, SjtDraft } from './builder.definition'
+import type { FormDraft, ScaleDraft, AnySjtDraft } from './builder.definition'
+import {surveySjtQuestionEntries} from './sjt-structure'
+import type {SurveySjtQuestion} from './sjt-selection'
+import {loadSurveyCognitiveResults,loadSurveyCognitiveResultGroups,SurveyCognitiveError} from './cognitive.results'
+import {cognitiveMeasurementColumns,prepareCognitiveProjection,pageCognitiveTrialRows,
+  type CognitiveTrialObservation} from './analytics.cognitive'
 import type { ScaleDefinitionV2 } from '../scale/scale-definition'
 import type { SituationDefinitionV2 } from '../situational/situation-branching'
 import { SurveyAnalyticsError } from './analytics.read'
@@ -16,8 +21,8 @@ import {validateSurveyScaleTimings,SurveyScaleTimingError,
 
 export interface ResearchRawCodebook {
   columnKey:string;waveId:string;waveOrdinal:number;instrumentKey:string;
-  itemKey:string;kind:'FORM'|'SCALE'|'SJT';responseType:string;title:string;prompt:string;
-  options:{code:string;label:string}[];
+  itemKey:string;kind:'FORM'|'SCALE'|'SJT'|'COGNITIVE';responseType:string;title:string;prompt:string;
+  options:{code:string;label:string;nonanswerReason?:string}[];
   definitionDigest:string;scoringDigest:string|null
   publicationVersion:number
   instrumentRevision:number
@@ -27,21 +32,31 @@ export interface ResearchRawCodebook {
   flowDigest?:string
   scalePresentationMode?:'ONE_BY_ONE'|'ALL_AT_ONCE'
   timingContract?:'SURVEY_SCALE_ITEM_TIMING_V1'|'NOT_COLLECTED'
+  sjtSchemaVersion?:2
+  motherSceneKey?:string;sceneTitle?:string;sceneIndex?:number;questionIndex?:number
+  selectionRules?:{required:boolean;allowRefusal:boolean;minSelections:number;maxSelections:number;
+    aggregationPolicy:string|null;exclusiveOptionKeys:string[];scoringMethod:string;
+    rawEncoding:'AUTHORED_ORDER_OPTION_SET'|'SINGLE_OPTION';
+    explicitRefusalEncoding:'JSON_SURVEY_REFUSAL_OBJECT';scorerKeyEncoding:'SINGLE_OPTION_OR_DERIVED_COMBINATION'}
 }
 export interface ResearchRawObservation {
   projectId:string;waveId:string;waveOrdinal:number;attemptId:string;
   researchCode:string|null;sourceFinalHash:string;
-  instrumentKey:string;kind:'FORM'|'SCALE'|'SJT';responseType:string;
+  instrumentKey:string;kind:'FORM'|'SCALE'|'SJT'|'COGNITIVE';responseType:string;
   itemKey:string;columnKey:string;publicationVersion:number;value:string|number|null;
   missingReason:MissingReason|null;completedAt:string;sourceVerified:true
   attemptStartedAt?:string
   itemTiming?:SurveyScaleItemTimingV1
   flowDigest?:string|null;experimentGroup?:string|null;
   shownBlocks?:string|null;flowTermination?:string|null
+  motherSceneKey?:string;scorerOptionKey?:string|null
+  completionStatus?:'COMPLETE'|'COMPLETE_EARLY'|'SCREEN_OUT'
 }
 export interface SurveySourceProjection {
   projectId:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES'
   completeAttempts:number
+  fullCompletionAttempts?:number
+  earlyCompletionAttempts?:number
   sourceRevision:number
   cutOff:string
   /** Only set on explicitly paged reads; no silent truncation on legacy reads. */
@@ -57,6 +72,8 @@ export interface SurveySourceProjection {
   raw:ResearchRawObservation[]
   codebook:ResearchRawCodebook[]
   attendance:{researchCode:string;waveId:string;status:string}[]
+  cognitiveTrials?:CognitiveTrialObservation[]
+  cognitivePage?:{finalId:string;sourceFinalHash:string;offset:number;nextOffset:number|null;estimatedBytes:number}
 }
 function denied():never{throw new SurveyAnalyticsError(404,'研究数据不可访问')}
 function invalid(message:string):never{throw new SurveyAnalyticsError(409,message)}
@@ -73,8 +90,11 @@ const answerValueEncoding=(type:string):NonNullable<ResearchRawCodebook['valueEn
     type==='SLIDER'||type==='NUMBER'?'NUMBER':'TEXT'
 type FrozenRawItem=Readonly<{
   itemKey:string;prompt:string;responseType:string;
-  options:ReadonlyArray<Readonly<{code:string;label:string}>>;
+  options:ReadonlyArray<Readonly<{code:string;label:string;nonanswerReason?:string}>>;
   answerKey:string;matrixRow?:string;timeZone?:'Asia/Shanghai'|'UTC'
+  sjtQuestion?:SurveySjtQuestion
+  sjtMetadata?:Pick<ResearchRawCodebook,'sjtSchemaVersion'|'motherSceneKey'|'sceneTitle'|
+    'sceneIndex'|'questionIndex'|'selectionRules'>
 }>
 /** Static descriptors belong to one verified publication in one request. Copy
  * and freeze their options so participant projection cannot mutate the schema.
@@ -83,8 +103,9 @@ type FrozenRawItem=Readonly<{
 const frozenRawItems=(frozen:ResearchFrozenUnit,includeOptions:boolean):readonly FrozenRawItem[]=>{
   const output:FrozenRawItem[]=[]
   const emptyOptions:FrozenRawItem['options']=Object.freeze([])
-  const optionsFor=(options:readonly {optionKey:string;label:string}[])=>includeOptions
-    ?Object.freeze(options.map(o=>Object.freeze({code:o.optionKey,label:o.label})))
+  const optionsFor=(options:readonly {optionKey:string;label:string;nonanswerReason?:string}[])=>includeOptions
+    ?Object.freeze(options.map(o=>Object.freeze({code:o.optionKey,label:o.label,
+      ...(o.nonanswerReason?{nonanswerReason:o.nonanswerReason}:{})})))
     :emptyOptions
   const add=(item:FrozenRawItem)=>output.push(Object.freeze(item))
   if(frozen.kind==='FORM'){
@@ -107,11 +128,25 @@ const frozenRawItems=(frozen:ResearchFrozenUnit,includeOptions:boolean):readonly
     const options=optionsFor(draft.responseOptions)
     for(const q of draft.items)add({itemKey:q.itemKey,prompt:q.prompt,responseType:'LIKERT',
       options,answerKey:q.itemKey})
-  }else{
-    const draft=frozen.displayDefinition as SjtDraft
-    for(const q of draft.questions)add({itemKey:q.questionKey,prompt:q.prompt,
+  }else if(frozen.kind==='SJT'){
+    const draft=frozen.displayDefinition as AnySjtDraft
+    if(draft.schemaVersion===1)for(const q of draft.questions)add({itemKey:q.questionKey,prompt:q.prompt,
       responseType:q.responseType==='MULTIPLE'?'SJT_MULTIPLE':'SJT_SINGLE',
       options:optionsFor(q.options),answerKey:q.questionKey})
+    else for(const {scene,question:q,sceneIndex,questionIndex} of surveySjtQuestionEntries(draft))
+      add({itemKey:q.questionKey,prompt:q.prompt,
+        responseType:q.responseType==='MULTIPLE'?'SJT_MULTIPLE':'SJT_SINGLE',
+        options:optionsFor(q.options),answerKey:q.questionKey,sjtQuestion:q,
+        sjtMetadata:{sjtSchemaVersion:2,motherSceneKey:scene.sceneKey,sceneTitle:scene.title,
+          sceneIndex,questionIndex,selectionRules:{required:'required' in q&&q.required===true,
+            allowRefusal:'allowRefusal' in q&&q.allowRefusal===true,
+            minSelections:q.responseType==='MULTIPLE'?(q.minSelections??1):1,
+            maxSelections:q.responseType==='MULTIPLE'?(q.maxSelections??q.options.length):1,
+            aggregationPolicy:q.aggregationPolicy??null,
+            exclusiveOptionKeys:'exclusiveOptionKeys' in q?[...(q.exclusiveOptionKeys??[])]:[],
+            scoringMethod:draft.scoring.modelKey,rawEncoding:q.responseType==='MULTIPLE'?'AUTHORED_ORDER_OPTION_SET':'SINGLE_OPTION',
+            explicitRefusalEncoding:'JSON_SURVEY_REFUSAL_OBJECT',
+            scorerKeyEncoding:'SINGLE_OPTION_OR_DERIVED_COMBINATION'}}})
   }
   return Object.freeze(output)
 }
@@ -122,7 +157,12 @@ const projectRawItems=(items:readonly FrozenRawItem[],unit:FrozenUnitResult,only
   for(const row of unit.missing)if(!missing.has(row.itemKey))
     missing.set(row.itemKey,row.reason??null)
   const values=unit.rawAnswers
-  const output:Array<{item:FrozenRawItem;value:string|number|null;missingReason:MissingReason|null}>=[]
+  const storedQuestions=(unit.privateScoring as {questionResults?:Array<{
+    questionKey:string;motherSceneKey:string;scorerOptionKey:string|null;response:unknown;status:string
+  }>}|null)?.questionResults
+  const questionResults=new Map(storedQuestions?.map(row=>[row.questionKey,row])??[])
+  const output:Array<{item:FrozenRawItem;value:string|number|null;missingReason:MissingReason|null;
+    scorerOptionKey?:string|null}>=[]
   let matrixAnswerKey:string|undefined
   let matrixAnswers:Record<string,string|string[]>={}
   for(const item of items){
@@ -138,7 +178,21 @@ const projectRawItems=(items:readonly FrozenRawItem[],unit:FrozenUnitResult,only
       value=matrixAnswers[item.matrixRow]??null
       missingReason=missingReason||(missing.get(item.answerKey)??null)
     }
-    output.push({item,value:cleanValue(value),missingReason})
+    let scorerOptionKey:string|null|undefined
+    if(item.sjtQuestion){
+      if(unit.notExecuted)scorerOptionKey=null
+      else{
+        const stored=questionResults.get(item.itemKey)
+        if(!stored||stored.motherSceneKey!==item.sjtMetadata?.motherSceneKey
+          ||canonicalHash(stored.response)!==canonicalHash(value)
+          ||(stored.status==='ANSWERED')!==(missingReason===null&&value!==null)
+          ||(stored.status==='ANSWERED'?!stored.scorerOptionKey:stored.scorerOptionKey!==null))
+          invalid('冻结 SJT 题目结果与原答或母情境不一致')
+        scorerOptionKey=stored.scorerOptionKey
+      }
+    }
+    output.push({item,value:cleanValue(value),missingReason,
+      ...(scorerOptionKey!==undefined?{scorerOptionKey}:{})})
   }
   return output
 }
@@ -149,8 +203,10 @@ const scoresFrom=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult,meta:{
     .map(column=>({...meta,sourceVerified:true,measurement:column.measurement,
       value:null,missingReason:'NOT_SHOWN' as MissingReason}))
   const privateResult=unit.privateScoring as
-    |{scores?:{key:string;value:number|null;status:string}[];metrics?:{key:string;value:number|null;status:string}[]}
+    |{scores?:{key:string;value:number|null;status:string}[];metrics?:{key:string;value:number|null;status:string}[];
+      quality?:{status:string;flags:string[]}}
     |null
+  const provenance=sjtProvenance(frozen)
   const records=privateResult?.scores||privateResult?.metrics||[]
   const values=records.filter(r=>typeof r.key==='string')
   return values.map(r=>({
@@ -165,18 +221,39 @@ const scoresFrom=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult,meta:{
       respondentType:frozen.kind==='SCALE'
         ?(frozen.displayDefinition as ScaleDraft).respondentType
         :frozen.kind==='SJT'
-          ?(frozen.displayDefinition as SjtDraft).respondentType:'research_form',
-      unit:null,
+          ?(frozen.displayDefinition as AnySjtDraft).respondentType:'research_form',
+      unit:provenance?'score':null,
+      ...(provenance?{provenance}:{}),
     },
     value:typeof r.value==='number'&&Number.isFinite(r.value)?r.value:null,
     missingReason:(typeof r.value==='number'&&Number.isFinite(r.value)?null:'SHOWN_MISSING') as MissingReason|null,
+    ...(provenance?{status:r.status,metricDetails:storedSjtMetricDetails(r),
+      ...(privateResult?.quality?{quality:{status:privateResult.quality.status,
+        flags:Object.fromEntries((privateResult.quality.flags??[]).map(flag=>[flag,true]))}}:{})}:{}),
   }))
+}
+function storedSjtMetricDetails(record:unknown):FrozenScoreObservation['metricDetails']{
+  const metric=record as NonNullable<FrozenScoreObservation['metricDetails']>
+  return {...(metric.range?{range:{...metric.range}}:{}),
+    ...(metric.coverage?{coverage:{...metric.coverage}}:{}),...(metric.maturity?{maturity:metric.maturity}:{})}
+}
+function sjtProvenance(frozen:ResearchFrozenUnit){
+  if(frozen.kind!=='SJT')return undefined
+  const draft=frozen.displayDefinition as AnySjtDraft
+  if(draft.schemaVersion!==2)return undefined
+  const compiled=frozen.compiledDefinition as SituationDefinitionV2
+  return {kind:'SJT' as const,measurementDigest:canonicalHash({sourceDigest:frozen.sourceDigest,
+    scoringDigest:frozen.scoringDigest}),scoringVersion:compiled.scoring.scoringVersion,
+    scoringMethod:draft.scoring.modelKey}
 }
 /** The authoritative score variable list is part of the frozen scorer, not
  * inferred from whichever participants happened to finish a Wave.
  */
 function frozenScoreColumns(projectId:string,waveId:string,ordinal:number,frozen:ResearchFrozenUnit):
   SurveySourceProjection['scoreColumns'] {
+  if(frozen.kind==='COGNITIVE')return cognitiveMeasurementColumns(frozen)
+    .map(measurement=>({projectId,waveId,waveOrdinal:ordinal,measurement}))
+  const provenance=sjtProvenance(frozen)
   const keys=frozen.kind==='SCALE'
     ?(frozen.compiledDefinition as ScaleDefinitionV2).scoring.scores.map(score=>score.key)
     :frozen.kind==='SJT'
@@ -189,8 +266,9 @@ function frozenScoreColumns(projectId:string,waveId:string,ordinal:number,frozen
       responseSignature:frozen.sourceDigest,
       respondentType:frozen.kind==='SCALE'
         ?(frozen.displayDefinition as ScaleDraft).respondentType
-        :(frozen.displayDefinition as SjtDraft).respondentType,
-      unit:null,
+        :(frozen.displayDefinition as AnySjtDraft).respondentType,
+      unit:provenance?'score':null,
+      ...(provenance?{provenance}:{}),
     },
   }))
 }
@@ -349,9 +427,14 @@ type SurveySourceInput = {
   includeAttendanceCount?:boolean
   attendanceAfterId?:string
   expectedAttendanceCount?:number
+  /** One FINAL at a time, with a signed within-FINAL row offset. */
+  cognitiveTrials?:{offset:number;expectedFinalId?:string;expectedFinalHash?:string;maxRows?:number;maxBytes?:number}
 }
 
 export async function loadSurveySource(input: SurveySourceInput): Promise<SurveySourceProjection> {
+  if(input.cognitiveTrials&&(!input.pageMode||!input.stableIdCursor||input.maxFinals!==1
+    ||input.waveIds?.length!==1||input.includeAttendance!==false||input.attendanceOnly))
+    throw new SurveyAnalyticsError(400,'认知试次仅允许单波次、单 FINAL 的有界分页')
   const first = await readSurveySourceMaterial(input)
   const signature = first.signature()
   const result = await first.compute()
@@ -566,6 +649,18 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
     const codebook=new Map<string,ResearchRawCodebook>()
     const scoreColumns:SurveySourceProjection['scoreColumns']=[]
     const scores:FrozenScoreObservation[]=[],raw:ResearchRawObservation[]=[]
+    let cognitiveTrials:CognitiveTrialObservation[]|undefined
+    let cognitivePage:SurveySourceProjection['cognitivePage']
+    let completedFinals=0,fullCompletionAttempts=0,earlyCompletionAttempts=0
+    const cognitiveProjections=new Map<ResearchFrozenUnit,ReturnType<typeof prepareCognitiveProjection>>()
+    const cognitiveProjectionFor=(unit:ResearchFrozenUnit)=>{
+      let projection=cognitiveProjections.get(unit)
+      if(!projection){projection=prepareCognitiveProjection(unit);cognitiveProjections.set(unit,projection)}
+      return projection
+    }
+    const scoreColumnsFor=(unit:ResearchFrozenUnit,waveId:string,ordinal:number)=>unit.kind==='COGNITIVE'
+      ?cognitiveProjectionFor(unit).columns.map(measurement=>({projectId:input.projectId,waveId,waveOrdinal:ordinal,measurement}))
+      :frozenScoreColumns(input.projectId,waveId,ordinal,unit)
     const rawSchemas=new Map<ResearchFrozenPublication,{
       ordinal:number;schema:ReturnType<typeof frozenRawSchema>
     }>()
@@ -605,6 +700,7 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
             publicationVersion:publication.version,instrumentRevision:frozen.draftRevision,
             ...(item.timeZone?{timeZone:item.timeZone}:{}),
             valueEncoding:answerValueEncoding(item.responseType),
+            ...(item.sjtMetadata??{}),
             ...(frozen.kind==='FORM'?{formSchemaVersion:(frozen.displayDefinition as FormDraft).schemaVersion}:{}),
             ...(frozen.kind==='SCALE'?{
               scalePresentationMode:(frozen.displayDefinition as ScaleDraft).presentationMode??'ALL_AT_ONCE',
@@ -614,7 +710,7 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
             ...(snapshot.flow?{flowDigest:snapshot.flow.flowDigest}:{}),
           })
         }
-        scoreColumns.push(...frozenScoreColumns(input.projectId,wave.id,wave.ordinal,frozen))
+        scoreColumns.push(...scoreColumnsFor(frozen,wave.id,wave.ordinal))
       }
     }
     let nextAttendanceCursor: string | null = null
@@ -626,7 +722,7 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
         status: row.sampleReview?.verdict === 'EXCLUDED' ? 'QUALITY_EXCLUDED' : row.status }))
       nextAttendanceCursor = attendanceSlice.length > pageSize ? selected.at(-1)!.id : null
     }
-    for(const final of finals){
+    const prepareFinal=async(final:(typeof finals)[number])=>{
       await new Promise<void>(resolve => setImmediate(resolve))
       const wave=final.wave,attempt=final.attempt
       const publication=publicationById.get(final.publicationId)
@@ -635,7 +731,7 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
         ||attempt.waveId!==wave.id||wave.publicationId!==publication.id
         ||publication.projectId!==input.projectId||final.definitionDigest!==publication.definitionDigest)
         invalid('研究 FINAL 的项目、波次或发布来源不一致')
-      if(attempt.participant?.status==='WITHDRAWN')continue
+      if(attempt.participant?.status==='WITHDRAWN')return null
       const snapshot=verifiedSnapshots.get(publication.id)
       if(!snapshot||snapshot.waveId!==wave.id)
         throw new SurveyAnalyticsError(409,'研究 FINAL 的冻结发布来源不一致')
@@ -670,64 +766,141 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
         attemptStartedAt:attempt.startedAt.toISOString(),
         completedAt:final.completedAt.toISOString(),sourceFinalHash:final.resultsHash,
       }
-      const flowTrace=result.executionTrace
-      const flowData=flowTrace?{
-        flowDigest:flowTrace.flowDigest,experimentGroup:flowTrace.groupKey,
-        shownBlocks:JSON.stringify(flowTrace.shownBlocks),
-        flowTermination:flowTrace.termination,
-      }:{}
-      for(let i=0;i<snapshot.units.length;i++){
-        const frozen=snapshot.units[i],unit=result.units[i]
-        if(!unit||unit.instrumentKey!==frozen.instrumentKey||unit.kind!==frozen.kind
-          ||unit.sourceDigest!==frozen.sourceDigest||unit.scoringDigest!==frozen.scoringDigest)
-          invalid('研究 FINAL 组件来源与冻结定义不一致')
-        if(input.selectScore!==false&&(!input.selectScore||
-          frozen.instrumentKey===input.selectScore.instrumentKey))
-          scores.push(...scoresFrom(frozen,unit,meta).filter(score=>!input.selectScore||
-            score.measurement.scoreKey===input.selectScore.scoreKey))
-        if(input.selectRaw!==false&&(!input.selectRaw||
-          frozen.instrumentKey===input.selectRaw.instrumentKey)){
-          const items=rawSchemaFor(snapshot,wave.ordinal).itemsByUnit.get(frozen)!
-          for(const {item:r,value,missingReason} of projectRawItems(items,unit,input.selectRaw?input.selectRaw.itemKey:undefined)){
-          const columnKey=columnKeyFor(snapshot,wave.ordinal,frozen,r.itemKey)
-          if(raw.length>=25000)
-            throw new SurveyAnalyticsError(413,'逐题投影超过 25000 行上限，请缩小波次范围')
-          const itemTiming=frozen.kind==='SCALE'
-            ?result.itemTimings?.[frozen.instrumentKey]?.[r.itemKey]:undefined
-          raw.push({...meta,...flowData,sourceVerified:true,kind:frozen.kind,
-            instrumentKey:frozen.instrumentKey,itemKey:r.itemKey,columnKey,responseType:r.responseType,
-            publicationVersion:publication.version,
-            value,missingReason,
-            ...(itemTiming?{itemTiming}:{})})
-          if(!codebook.has(columnKey))
-            codebook.set(columnKey,{columnKey,waveId:wave.id,waveOrdinal:wave.ordinal,
-              instrumentKey:frozen.instrumentKey,itemKey:r.itemKey,kind:frozen.kind,
-              responseType:r.responseType,
-              title:frozen.title,prompt:r.prompt,options:r.options.map(option=>({...option})),
-              definitionDigest:frozen.sourceDigest,scoringDigest:frozen.scoringDigest,
-              publicationVersion:publication.version,
-              instrumentRevision:frozen.draftRevision,
-              ...(r.timeZone?{timeZone:r.timeZone}:{}),
-              valueEncoding:answerValueEncoding(r.responseType),
-              ...(frozen.kind==='FORM'?{formSchemaVersion:(frozen.displayDefinition as FormDraft).schemaVersion}:{}),
-              ...(frozen.kind==='SCALE'?{
-                scalePresentationMode:(frozen.displayDefinition as ScaleDraft).presentationMode??'ALL_AT_ONCE',
-                timingContract:(frozen.displayDefinition as ScaleDraft).presentationMode==='ONE_BY_ONE'
-                  ?'SURVEY_SCALE_ITEM_TIMING_V1':'NOT_COLLECTED',
-              } as const:{}),
-              ...(snapshot.flow?{flowDigest:snapshot.flow.flowDigest}:{}),
-            })
+      const cognitiveUnits=result.units.filter(unit=>unit.kind==='COGNITIVE'&&!unit.notExecuted)
+      if(cognitiveUnits.some(unit=>!unit.childReference))invalid('研究 FINAL 缺少认知子结果引用')
+      return {final,wave,publication,snapshot,result,meta,cognitiveUnits}
+    }
+    // Keep only one chunk of decrypted parents/children alive. Eight complete
+    // parent groups preserve the existing 1 MiB per-parent metrics allowance,
+    // with at most 8 MiB active child ciphertext; this is not a new page cap.
+    // Ordinary-only publications retain the original one-parent live working set.
+    const parentBatchSize=[...verifiedSnapshots.values()].some(snapshot=>snapshot.units.some(unit=>unit.kind==='COGNITIVE'))?8:1
+    for(let offset=0;offset<finals.length;offset+=parentBatchSize){
+      const preparedFinals:Array<NonNullable<Awaited<ReturnType<typeof prepareFinal>>>>=[]
+      for(const final of finals.slice(offset,offset+parentBatchSize)){
+        const prepared=await prepareFinal(final)
+        if(prepared)preparedFinals.push(prepared)
+      }
+      let childGroups:Awaited<ReturnType<typeof loadSurveyCognitiveResultGroups>>=[]
+      if(preparedFinals.some(parent=>parent.cognitiveUnits.length)){
+        try{
+          const groups=preparedFinals.map(parent=>({projectId:input.projectId,waveId:parent.wave.id,
+            attemptId:parent.final.attempt.id,publicationId:parent.publication.id,
+            references:parent.cognitiveUnits.map(unit=>unit.childReference!)}))
+          childGroups=await prisma.$transaction(async tx=>input.cognitiveTrials
+            ?[await loadSurveyCognitiveResults(tx,{...groups[0],includeRaw:true})]
+            :loadSurveyCognitiveResultGroups(tx,groups),
+          {isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead})
+        }catch(e){if(e instanceof SurveyCognitiveError)throw new SurveyAnalyticsError(e.statusCode,e.message);throw e}
+      }
+      for(let parentIndex=0;parentIndex<preparedFinals.length;parentIndex++){
+        const {final,wave,publication,snapshot,result,meta}=preparedFinals[parentIndex]
+        const children=childGroups[parentIndex]??[]
+        const childrenBySlot=new Map(children.map(child=>[child.reference.slotKey,child]))
+        const cognitiveMeta={...meta,publicationId:publication.id,publicationVersion:publication.version,
+          completionStatus:result.executionTrace?.termination??'COMPLETE' as const}
+        const trialInputs:Array<Iterable<CognitiveTrialObservation>>=[]
+        const flowTrace=result.executionTrace
+        const completionStatus=flowTrace?.termination??'COMPLETE'
+        completedFinals++
+        if(completionStatus==='COMPLETE')fullCompletionAttempts++
+        else if(completionStatus==='COMPLETE_EARLY')earlyCompletionAttempts++
+        const flowData=flowTrace?{
+          flowDigest:flowTrace.flowDigest,experimentGroup:flowTrace.groupKey,
+          shownBlocks:JSON.stringify(flowTrace.shownBlocks),
+          flowTermination:flowTrace.termination,
+        }:{}
+        for(let i=0;i<snapshot.units.length;i++){
+          const frozen=snapshot.units[i],unit=result.units[i]
+          if(!unit||unit.instrumentKey!==frozen.instrumentKey||unit.kind!==frozen.kind
+            ||unit.sourceDigest!==frozen.sourceDigest||unit.scoringDigest!==frozen.scoringDigest)
+            invalid('研究 FINAL 组件来源与冻结定义不一致')
+          if(frozen.kind==='COGNITIVE'&&(Object.keys(unit.rawAnswers).length
+            ||(unit.notExecuted&&unit.childReference)))invalid('认知整轮 FINAL 不得复制原始试次或引用未呈现的子任务')
+          if(frozen.kind==='COGNITIVE'&&unit.notExecuted){
+            if(input.selectScore!==false&&(!input.selectScore||frozen.instrumentKey===input.selectScore.instrumentKey))
+              scores.push(...scoreColumnsFor(frozen,wave.id,wave.ordinal)
+                .filter(column=>!input.selectScore||column.measurement.scoreKey===input.selectScore.scoreKey)
+                .map(column=>({...meta,sourceVerified:true as const,measurement:column.measurement,
+                  value:null,missingReason:'NOT_SHOWN' as MissingReason,completionStatus})))
+            continue
           }
+          if(frozen.kind==='COGNITIVE'&&!unit.notExecuted){
+            const child=childrenBySlot.get(frozen.instrumentKey)
+            if(!child)invalid('研究 FINAL 的认知子结果来源缺失')
+            const projection=cognitiveProjectionFor(frozen)
+            const childScores=projection.scoresFromChild(unit,child,cognitiveMeta)
+            if(input.selectScore!==false&&(!input.selectScore||frozen.instrumentKey===input.selectScore.instrumentKey))
+              scores.push(...childScores.filter(score=>!input.selectScore||score.measurement.scoreKey===input.selectScore.scoreKey))
+            if(input.cognitiveTrials)trialInputs.push(projection.trialRows(child,cognitiveMeta))
+            continue
+          }
+          if(input.selectScore!==false&&(!input.selectScore||
+            frozen.instrumentKey===input.selectScore.instrumentKey))
+            scores.push(...scoresFrom(frozen,unit,meta).filter(score=>!input.selectScore||
+              score.measurement.scoreKey===input.selectScore.scoreKey).map(score=>
+                score.measurement.provenance?{...score,completionStatus}:score))
+          if(input.selectRaw!==false&&(!input.selectRaw||
+            frozen.instrumentKey===input.selectRaw.instrumentKey)){
+            const items=rawSchemaFor(snapshot,wave.ordinal).itemsByUnit.get(frozen)!
+            for(const {item:r,value,missingReason,scorerOptionKey} of projectRawItems(items,unit,input.selectRaw?input.selectRaw.itemKey:undefined)){
+            const columnKey=columnKeyFor(snapshot,wave.ordinal,frozen,r.itemKey)
+            if(raw.length>=25000)
+              throw new SurveyAnalyticsError(413,'逐题投影超过 25000 行上限，请缩小波次范围')
+            const itemTiming=frozen.kind==='SCALE'
+              ?result.itemTimings?.[frozen.instrumentKey]?.[r.itemKey]:undefined
+            raw.push({...meta,...flowData,sourceVerified:true,kind:frozen.kind,
+              instrumentKey:frozen.instrumentKey,itemKey:r.itemKey,columnKey,responseType:r.responseType,
+              publicationVersion:publication.version,
+              value,missingReason,
+              ...(r.sjtMetadata?{motherSceneKey:r.sjtMetadata.motherSceneKey,scorerOptionKey,completionStatus}:{}),
+              ...(itemTiming?{itemTiming}:{})})
+            if(!codebook.has(columnKey))
+              codebook.set(columnKey,{columnKey,waveId:wave.id,waveOrdinal:wave.ordinal,
+                instrumentKey:frozen.instrumentKey,itemKey:r.itemKey,kind:frozen.kind,
+                responseType:r.responseType,
+                title:frozen.title,prompt:r.prompt,options:r.options.map(option=>({...option})),
+                definitionDigest:frozen.sourceDigest,scoringDigest:frozen.scoringDigest,
+                publicationVersion:publication.version,
+                instrumentRevision:frozen.draftRevision,
+                ...(r.timeZone?{timeZone:r.timeZone}:{}),
+                valueEncoding:answerValueEncoding(r.responseType),
+                ...(r.sjtMetadata??{}),
+                ...(frozen.kind==='FORM'?{formSchemaVersion:(frozen.displayDefinition as FormDraft).schemaVersion}:{}),
+                ...(frozen.kind==='SCALE'?{
+                  scalePresentationMode:(frozen.displayDefinition as ScaleDraft).presentationMode??'ALL_AT_ONCE',
+                  timingContract:(frozen.displayDefinition as ScaleDraft).presentationMode==='ONE_BY_ONE'
+                    ?'SURVEY_SCALE_ITEM_TIMING_V1':'NOT_COLLECTED',
+                } as const:{}),
+                ...(snapshot.flow?{flowDigest:snapshot.flow.flowDigest}:{}),
+              })
+            }
+          }
+        }
+        if(input.cognitiveTrials){
+          const request=input.cognitiveTrials
+          if((request.expectedFinalId&&request.expectedFinalId!==final.id)
+            ||(request.expectedFinalHash&&request.expectedFinalHash!==final.resultsHash))
+            invalid('认知试次分页引用的整轮 FINAL 已变化')
+          function* allTrials(){for(const rows of trialInputs)yield* rows}
+          const page=pageCognitiveTrialRows(allTrials(),request.offset,
+            request.maxRows!==undefined&&request.maxBytes!==undefined?{maxRows:request.maxRows,maxBytes:request.maxBytes}:undefined)
+          cognitiveTrials=page.rows
+          cognitivePage={finalId:final.id,sourceFinalHash:final.resultsHash,offset:request.offset,
+            nextOffset:page.nextOffset,estimatedBytes:page.estimatedBytes}
         }
       }
     }
+    if(input.cognitiveTrials&&!finals.length&&input.cognitiveTrials.expectedFinalId)
+      invalid('认知试次分页引用的整轮 FINAL 不再可用')
     return {projectId:input.projectId,collectionMode:project.collectionMode,
       sourceRevision:project.sourceRevision,
-      completeAttempts:input.pageMode?finals.length:
-        new Set(scores.map(s=>s.attemptId).concat(raw.map(r=>r.attemptId))).size,
+      completeAttempts:completedFinals,
       cutOff:cutOff.toISOString(),nextFinalCursor,sourceFinalCount,
       sourceAttendanceCount,nextAttendanceCursor,
-      scores,scoreColumns,raw,codebook:[...codebook.values()],attendance}
+      fullCompletionAttempts,earlyCompletionAttempts,
+      scores,scoreColumns,raw,codebook:[...codebook.values()],attendance,
+      ...(input.cognitiveTrials?{cognitiveTrials:cognitiveTrials??[],cognitivePage}:{})}
       },
     }
   },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead})

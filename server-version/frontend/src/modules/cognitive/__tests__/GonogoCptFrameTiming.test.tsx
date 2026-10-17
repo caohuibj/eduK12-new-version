@@ -135,4 +135,34 @@ describe('FE-07B Go/No-Go and CPT frame timing routing', () => {
     act(() => vi.advanceTimersByTime(1))
     expect(screen.queryByText('X')).toBeNull()
   })
+  it('enforces Survey keyboard-only responses and persists formal focus loss as interrupted raw data',async()=>{
+    // jsdom checks event/state/payload wiring only; no hardware timing claim.
+    let now=100
+    vi.spyOn(performance,'now').mockImplementation(()=>now)
+    const Runner=requireRunner('gonogo'),onTrialComplete=vi.fn(async()=>{})
+    render(<Runner taskContext={{...baseContext,testType:'gonogo',configVersion:'1.1.0',requiredInput:'KEYBOARD',
+      config:{totalTrials:8,nogoRatio:0.25,stimulusMs:50,isiMs:20,validRtFloorMs:100}}}
+      trialIndex={0} onTrialComplete={onTrialComplete}/>)
+    fireEvent.click(screen.getByText('开始练习'))
+    for(let i=0;i<4;i++){
+      act(()=>vi.advanceTimersByTime(20));now=100+i*1000;flushFrame(now)
+      if(i%2===0){
+        const event=new KeyboardEvent('keydown',{key:' ',bubbles:true,cancelable:true})
+        Object.defineProperty(event,'timeStamp',{value:now+10});now+=10;fireEvent(window,event)
+      }
+      await act(async()=>{vi.advanceTimersByTime(650)})
+    }
+    fireEvent.click(screen.getByText('开始正式测验'))
+    act(()=>vi.advanceTimersByTime(20));now=5000;flushFrame(now)
+    // This seeded first formal trial is no-go; a pointer must not create a response.
+    const pointer=new Event('pointerdown',{bubbles:true,cancelable:true})
+    Object.defineProperties(pointer,{isPrimary:{value:true},pointerType:{value:'mouse'},button:{value:0},timeStamp:{value:now+10}})
+    fireEvent(screen.getByLabelText('respond'),pointer)
+    expect(onTrialComplete).not.toHaveBeenCalled()
+    fireEvent(window,new Event('blur'))
+    await act(async()=>{vi.advanceTimersByTime(50)})
+    expect(onTrialComplete).toHaveBeenCalledWith({trialType:'nogo',responded:false,rtMs:null,interrupted:true})
+    vi.restoreAllMocks()
+  })
+
 })

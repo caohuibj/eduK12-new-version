@@ -16,6 +16,9 @@ import { resolveSurveyPublicId } from './public-project'
 import * as admission from './admission.service'
 import { surveyImageRefs } from './media.references'
 import { serveAssessmentImageContent,AssessmentImageDeliveryError } from '../assessment-media/assessment-image-delivery'
+import { surveyCognitiveRouter } from './cognitive.public.routes'
+import { SurveyCognitiveError } from './cognitive.results'
+import { surveyCognitiveReferenceSchema } from './cognitive.definition'
 import type { AssessmentStaticImageAssetIdentityV1 } from '../assessment-media/assessment-image'
 
 export const publicSurveyRouter=Router()
@@ -41,6 +44,7 @@ const checkpointWrite=proof.extend({revision:z.number().int().min(0).max(100),
   answers:z.record(z.record(z.unknown())),
   itemTimings:z.record(z.record(z.unknown())).optional()}).strict()
 const submission=proof.extend({submissionId:z.string().min(16).max(200),
+  cognitiveReferences:z.array(surveyCognitiveReferenceSchema).max(4).optional(),
   answers:z.record(z.record(z.unknown())),
   itemTimings:z.record(z.record(z.unknown())).optional(),
   presentation:z.object({shownBlocks:z.array(z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/)).max(70)}).strict().optional()}).strict()
@@ -48,7 +52,7 @@ const handle=(action:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Res
   try{return success(res,await action(req))}
   catch(e){
     if(e instanceof z.ZodError)return error(res,'输入不合法',-1,400)
-    if(e instanceof SurveyWaveError||e instanceof SurveyFinalError||e instanceof ResearchIdentityError)
+    if(e instanceof SurveyWaveError||e instanceof SurveyFinalError||e instanceof ResearchIdentityError||e instanceof SurveyCognitiveError)
       return error(res,e.message,-1,e.statusCode)
     if(e instanceof SurveyFinalValidationError)return error(res,e.path+'：'+e.message,-1,400)
     if(e instanceof SurveyAssignmentError)return error(res,e.message,-1,409)
@@ -56,6 +60,7 @@ const handle=(action:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Res
     next(e)
   }
 }
+publicSurveyRouter.use('/r/:publicId/attempts/:attemptId/cognitive',surveyCognitiveRouter)
 publicSurveyRouter.get('/r/:publicId/info',handle(req=>
   admission.getPublicResearchInfo(id.parse(req.params.publicId))))
 publicSurveyRouter.post('/r/:publicId/waves/:waveId/join',handle(req=>

@@ -90,11 +90,13 @@ export function rawLongExport(projectId:string,source:SurveySourceProjection,wav
   const displayCode=displayCodes()
   const rows=ordered(source,waveId,displayCode)
   const hasFlow=source.codebook.some(c=>c.flowDigest&&(!waveId||c.waveId===waveId))
+  const hasSjtV2=source.codebook.some(c=>c.sjtSchemaVersion===2&&(!waveId||c.waveId===waveId))
   const timingByColumn=new Map(source.codebook.map(c=>[c.columnKey,c.timingContract]))
   const cols=['research_code_or_attempt','wave_id','wave_ordinal','publication_version',
     'instrument_key','item_key','variable_code','value','missing_reason','source_final_hash',
     'attempt_started_at_utc','final_completed_at_utc',
     'first_response_ms','active_time_ms','answer_change_count','item_revisit_count','timing_status',
+    ...(hasSjtV2?['mother_scene_key','question_key','scorer_option_key','completion_status']:[]),
     ...(hasFlow?['flow_digest','experiment_group','shown_blocks','flow_termination']:[])]
   const mapped=rows.map(r=>[
     displayCode(r),r.waveId,r.waveOrdinal,r.publicationVersion,r.instrumentKey,r.itemKey,r.columnKey,
@@ -106,6 +108,7 @@ export function rawLongExport(projectId:string,source:SurveySourceProjection,wav
       :r.missingReason==='NOT_SHOWN'?'NOT_SHOWN'
         :timingByColumn.get(r.columnKey)!=='SURVEY_SCALE_ITEM_TIMING_V1'?'NOT_COLLECTED'
           :timingStatus(r.itemTiming),
+    ...(hasSjtV2?[r.motherSceneKey??null,r.motherSceneKey?r.itemKey:null,r.scorerOptionKey??null,r.completionStatus??null]:[]),
     ...(hasFlow?[r.flowDigest??null,r.experimentGroup??null,
       r.shownBlocks??null,r.flowTermination??null]:[]),
   ])
@@ -128,6 +131,7 @@ export function rawLongExport(projectId:string,source:SurveySourceProjection,wav
         variable.instrumentKey,variable.itemKey,variable.columnKey,null,
         status==='QUALITY_EXCLUDED'?'QUALITY_EXCLUDED':status?'ABANDONED':'NO_WAVE',null,
         null,null,null,null,null,null,'NON_FINAL',
+        ...(hasSjtV2?[variable.motherSceneKey??null,variable.motherSceneKey?variable.itemKey:null,null,'NON_FINAL']:[]),
         ...(hasFlow?[variable.flowDigest??null,null,null,null]:[])])
     }
   }

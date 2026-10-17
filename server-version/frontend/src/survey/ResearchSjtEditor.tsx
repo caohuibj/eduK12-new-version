@@ -1,9 +1,14 @@
-import type { SjtDraft } from './builder.types'
+import type { SjtDraft, SjtDraftV1 } from './builder.types'
 import { researchKey } from './builder.types'
+import { ResearchSjtV2Editor } from './ResearchSjtV2Editor'
 import { SurveyImageField } from './SurveyImageField'
-export function ResearchSjtEditor({value,onChange,projectId}:{value:SjtDraft;
-  onChange:(next:SjtDraft)=>void;projectId:string}){
-  const changeQuestion=(i:number,fn:(q:SjtDraft['questions'][number])=>SjtDraft['questions'][number])=>
+export function ResearchSjtEditor(props:{value:SjtDraft;onChange:(next:SjtDraft)=>void;projectId:string}){
+  return props.value.schemaVersion===2?<ResearchSjtV2Editor {...props} value={props.value}/>:
+    <ResearchSjtV1Editor {...props} value={props.value}/>
+}
+function ResearchSjtV1Editor({value,onChange,projectId}:{value:SjtDraftV1;
+  onChange:(next:SjtDraftV1)=>void;projectId:string}){
+  const changeQuestion=(i:number,fn:(q:SjtDraftV1['questions'][number])=>SjtDraftV1['questions'][number])=>
     onChange({...value,questions:value.questions.map((q,index)=>i===index?fn(q):q)})
   const newContributions=()=>Object.fromEntries(value.metrics.map(m=>[m.metricKey,0]))
   return <div className="space-y-5">
@@ -18,7 +23,7 @@ export function ResearchSjtEditor({value,onChange,projectId}:{value:SjtDraft;
         onChange={image=>onChange({...value,image})}/>
       <label className="block text-sm">参与者类型
         <select className="input block" value={value.respondentType}
-          onChange={e=>onChange({...value,respondentType:e.target.value as SjtDraft['respondentType']})}>
+          onChange={e=>onChange({...value,respondentType:e.target.value as SjtDraftV1['respondentType']})}>
           <option value="student_self_report">学生</option><option value="teacher_self_report">教师</option>
         </select></label>
       <p className="text-xs text-slate-600">SJT 允许学生/教师研究场景下受控单选，或最多 24 个合法组合的受控多选（需设置聚合规则）；其他研究对象类型尚不支持正式发布。</p>
@@ -31,14 +36,14 @@ export function ResearchSjtEditor({value,onChange,projectId}:{value:SjtDraft;
           onChange={e=>onChange({...value,sourceNote:e.target.value})}/></label>
       <label className="block text-sm">权属声明
         <select className="input block w-full" value={value.licenseStatus??'unknown'}
-          onChange={e=>onChange({...value,licenseStatus:e.target.value as SjtDraft['licenseStatus']})}>
+          onChange={e=>onChange({...value,licenseStatus:e.target.value as SjtDraftV1['licenseStatus']})}>
           <option value="unknown">尚未确认，不允许冻结发布</option>
           <option value="self_authored">研究者原创</option>
           <option value="authorized">已取得明确授权</option>
         </select></label>
       <label className="block text-sm">研究链接中的展示与分发权
         <select className="input block w-full" value={value.redistribution}
-          onChange={e=>onChange({...value,redistribution:e.target.value as SjtDraft['redistribution']})}>
+          onChange={e=>onChange({...value,redistribution:e.target.value as SjtDraftV1['redistribution']})}>
           <option value="unknown">尚未核实</option>
           <option value="restricted">限制展示，不允许公开研究发布</option>
           <option value="allowed">已授权在本研究中展示</option>

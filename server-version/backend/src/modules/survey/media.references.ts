@@ -1,7 +1,8 @@
+import { surveySjtScenes } from './sjt-structure'
 import { Prisma } from '@prisma/client'
 import { retainAssessmentAssetReferences } from '../assessment-media/assessment-asset'
 import { ASSESSMENT_STATIC_IMAGE_MIME_TYPES } from '../assessment-media/assessment-image'
-import type { SurveyKind,FormDraft,SjtDraft } from './builder.definition'
+import type { SurveyKind,FormDraft,AnySjtDraft } from './builder.definition'
 
 type Tx=Prisma.TransactionClient
 export const surveyMaxImageBytes=2*1024*1024
@@ -19,8 +20,8 @@ export const surveyImageRefs=(units:readonly UnitDef[]):ImageIdentity[]=>units.f
     return (d.pages||[]).flatMap(p=>(p.questions||[]).map(q=>q.image).filter(Boolean)) as ImageIdentity[]
   }
   if(kind==='SJT'){
-    const d=definition as SjtDraft
-    return d.image?[d.image as ImageIdentity]:[]
+    const d=definition as AnySjtDraft
+    return surveySjtScenes(d).flatMap(scene=>scene.image?[scene.image as ImageIdentity]:[])
   }
   return []
 })

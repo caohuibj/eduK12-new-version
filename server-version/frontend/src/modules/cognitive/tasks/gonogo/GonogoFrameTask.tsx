@@ -46,10 +46,13 @@ export const GonogoFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
       interruptedRef.current = true
       if (phase === 'formal' && trialIndex < total) timingDiagnostics.visibilityLost(performance.now(), trialIndex)
     }
-    const onBlur = () => { if (phase === 'formal' && trialIndex < total) timingDiagnostics.focusLost(performance.now(), trialIndex) }
+    const onBlur = () => { if (phase === 'formal' && trialIndex < total) {
+      if (taskContext.requiredInput === 'KEYBOARD') interruptedRef.current = true
+      timingDiagnostics.focusLost(performance.now(), trialIndex)
+    } }
     document.addEventListener('visibilitychange', onHidden); window.addEventListener('blur', onBlur)
     return () => { document.removeEventListener('visibilitychange', onHidden); window.removeEventListener('blur', onBlur) }
-  }, [phase, trialIndex, total, timingDiagnostics])
+  }, [phase, trialIndex, total, timingDiagnostics, taskContext.requiredInput])
 
   useEffect(() => {
     if (phase !== 'practice' && phase !== 'formal') return
@@ -123,11 +126,11 @@ export const GonogoFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
   })
 
   const pointerDown = (event: React.PointerEvent<HTMLButtonElement>) => {
-    if (!event.isPrimary || (event.pointerType === 'mouse' && event.button !== 0)) return
+    if (taskContext.requiredInput === 'KEYBOARD' || !event.isPrimary || (event.pointerType === 'mouse' && event.button !== 0)) return
     void respond(event.timeStamp)
   }
   const cancelPointer = (event: React.PointerEvent<HTMLButtonElement>) => {
-    if (!event.isPrimary) return
+    if (taskContext.requiredInput === 'KEYBOARD' || !event.isPrimary) return
     interruptedRef.current = true
     if (phase === 'formal') timingDiagnostics.pointerCancelled(performance.now(), trialIndex)
   }
@@ -137,7 +140,7 @@ export const GonogoFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
       <CognitiveTaskIntro
         title="Go/No-Go"
         description="绿色出现时尽快按下；红色出现时不要按。"
-        hint="电脑可按空格或 Enter；触屏点击中央圆形。练习不计入正式成绩。"
+        hint={taskContext.requiredInput==='KEYBOARD'?'本研究仅接受实体键盘：按空格或 Enter。练习不计入正式成绩。':'电脑可按空格或 Enter；触屏点击中央圆形。练习不计入正式成绩。'}
         onAction={startPractice}
       />
     )
@@ -156,6 +159,6 @@ export const GonogoFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
   }
   if (phase === 'formal' && trialIndex >= total) return <CognitiveTaskCompletionNotice />
 
-  const taskBody = <div className="mx-auto max-w-2xl text-center p-8">{phase === 'practice' ? <p className="text-sm text-gray-500 mb-2">练习 {practiceIndex + 1} / {PRACTICE_TRIAL_COUNT}</p> : null}{feedback && <p className="text-sm mb-3">{feedback}</p>}<button type="button" aria-label="respond" className={`mx-auto h-32 w-32 rounded-full ${visible ? (trialType === 'go' ? 'bg-green-500' : 'bg-red-500') : 'bg-gray-200'}`} onPointerDown={pointerDown} onPointerCancel={cancelPointer}/>{phase === 'formal' ? <p className="mt-5 text-xs text-gray-400">绿色：按空格 / Enter 或点击圆形；红色：不要按</p> : null}</div>
+  const taskBody = <div className="mx-auto max-w-2xl text-center p-8">{phase === 'practice' ? <p className="text-sm text-gray-500 mb-2">练习 {practiceIndex + 1} / {PRACTICE_TRIAL_COUNT}</p> : null}{feedback && <p className="text-sm mb-3">{feedback}</p>}<button type="button" aria-label="respond" className={`mx-auto h-32 w-32 rounded-full ${visible ? (trialType === 'go' ? 'bg-green-500' : 'bg-red-500') : 'bg-gray-200'}`} onPointerDown={pointerDown} onPointerCancel={cancelPointer}/>{phase === 'formal' ? <p className="mt-5 text-xs text-gray-400">{taskContext.requiredInput==='KEYBOARD'?'绿色：按空格 / Enter；红色：不要按':'绿色：按空格 / Enter 或点击圆形；红色：不要按'}</p> : null}</div>
   return phase === 'formal' ? <CognitiveFocusStage ariaLabel="Go No-Go 正式测验">{taskBody}</CognitiveFocusStage> : taskBody
 }

@@ -52,7 +52,8 @@ surveyBuilderRouter.post('/:pid/instruments/:iid/validate',handle(req=>
 
 const simulation=z.object({
   answers:z.record(z.union([
-    z.string().max(2000),z.number().finite(),
+    z.string().max(2000),z.number().finite(),z.null(),
+    z.object({_surveyRefusal:z.literal(true)}).strict(),
     z.array(z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/)).max(6),
   ])),
 }).strict()
