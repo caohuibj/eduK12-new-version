@@ -17,7 +17,7 @@ AT = '2026-10-17T10:47:04Z'
 
 
 def source_fixture():
-    run = {'id': r.SOURCE_RUN, 'repository': {'full_name': r.REPOSITORY}, 'head_repository': {'full_name': r.REPOSITORY}, 'event': 'pull_request', 'path': '.github/workflows/ci.yml', 'head_sha': r.SOURCE_HEAD, 'status': 'completed', 'conclusion': 'failure', 'created_at': AT, 'pull_requests': [{'number': r.PR_NUMBER, 'head': {'sha': r.SOURCE_HEAD}}]}
+    run = {'id': r.SOURCE_RUN, 'repository': {'full_name': r.REPOSITORY}, 'head_repository': {'full_name': r.REPOSITORY}, 'event': 'pull_request', 'path': '.github/workflows/ci.yml', 'head_sha': r.SOURCE_HEAD, 'status': 'completed', 'conclusion': 'failure', 'created_at': AT, 'pull_requests': [{'number': r.PR_NUMBER, 'head': {'sha': r.SOURCE_HEAD, 'ref': 'fix/survey-storage-export-roundtrip-20261017', 'repo': {'id': 1338215995}}, 'base': {'ref': 'main', 'sha': '21c1778a545c1988bef65900789c701208b647e5', 'repo': {'id': 1338215995}}}]}
     job = {'id': r.SOURCE_JOB, 'run_id': r.SOURCE_RUN, 'name': 'survey-candidate / candidate', 'head_sha': r.SOURCE_HEAD, 'status': 'completed', 'conclusion': 'failure', 'completed_at': AT}
     artifact = {'id': 12098149475, 'name': 'survey-candidate-' + r.SOURCE_MERGE, 'workflow_run': {'id': r.SOURCE_RUN, 'head_sha': r.SOURCE_HEAD}, 'expired': False, 'created_at': AT, 'size_in_bytes': 1044554171, 'digest': 'sha256:a4fc034c58fb819d0caab0e49d733c02b6d0332119381902a23a706888a34226'}
     return run, job, artifact
@@ -36,6 +36,33 @@ class ReceiptTests(unittest.TestCase):
         for mutate in [lambda d: d.update(id=1), lambda d: d.update(head_sha=r.SOURCE_MERGE), lambda d: d.update(event='push'), lambda d: d.update(repository={'full_name': 'other/repo'}), lambda d: d.update(head_repository={'full_name': 'fork/repo'}), lambda d: d.update(pull_requests=[]), lambda d: d.update(created_at='2026-10-15T00:00:00Z')]:
             run, job, artifact = source_fixture(); mutate(run)
             with self.assertRaises(r.ReuseRejected): r.validate_official_source(run, job, artifact, NOW)
+
+    def test_live_linked_pr_head_is_not_historical_run_head(self):
+        run, job, artifact = source_fixture()
+        run['pull_requests'][0]['head']['sha'] = 'd' * 40
+        self.assertEqual(r.validate_official_source(run, job, artifact, NOW)['sourceHead'], r.SOURCE_HEAD)
+        for key, value in [('ref', 'other-branch'), ('repo', {'id': 1}), ('sha', 'invalid')]:
+            bad = copy.deepcopy(run); bad['pull_requests'][0]['head'][key] = value
+            with self.assertRaises(r.ReuseRejected): r.validate_official_source(bad, job, artifact, NOW)
+        bad = copy.deepcopy(run); bad['pull_requests'][0]['base']['sha'] = 'b' * 40
+        with self.assertRaises(r.ReuseRejected): r.validate_official_source(bad, job, artifact, NOW)
+
+    def test_scope_transition_retains_only_exact_unchanged_inputs(self):
+        before = {r.SELF_PATH: ('100644', 'blob', 'beec7418fe7d0d42a0c9bf07cd4cb3efcc601f2f'), '.github/scripts/survey-candidate-reuse.test.py': ('100644', 'blob', 'a1f0f1bd3e51ecfaf47d769d4e81c730f8699fe1'), '.github/workflows/ci.yml': ('100644', 'blob', 'fb85b9d59cac47cf9cfd886bc7e9c3f26c04916e'), 'unchanged': ('100644', 'blob', 'a' * 40)}
+        after = dict(before)
+        for path in ('.github/scripts/survey-candidate-reuse.test.py', '.github/workflows/ci.yml'): after[path] = ('100644', 'blob', r.REVIEWED_TRANSITIONS[path]['after'])
+        after[r.SELF_PATH] = ('100644', 'blob', 'b' * 40)
+        self.assertEqual(r.validate_scope_transition(before, after, 'b' * 40)['unchangedObjects'], 1)
+        for path, value in [('unchanged', ('100644', 'blob', 'c' * 40)), (r.SELF_PATH, ('120000', 'blob', 'b' * 40))]:
+            bad = dict(after); bad[path] = value
+            with self.assertRaises(r.ReuseRejected): r.validate_scope_transition(before, bad, 'b' * 40)
+
+    def test_scope_tap_requires_all_selected_names_and_zero_failures(self):
+        names = ['synthetic case ' + str(n) for n in range(17)]
+        output = '\n'.join('ok ' + str(n+1) + ' - ' + name for n, name in enumerate(names)) + '\n# pass 17\n# fail 0\n# cancelled 0\n# todo 0\n'
+        self.assertTrue(r.validate_scope_tap(output, names))
+        for bad in [output.replace('synthetic case 0', 'wrong case'), output.replace('# fail 0', '# fail 1'), output.replace(' - synthetic case 1\n', ' - synthetic case 1 # SKIP\n')]:
+            with self.assertRaises(r.ReuseRejected): r.validate_scope_tap(bad, names)
 
     def test_artifact_identity_digest_expiry_and_job_skip_rejected(self):
         for mutate in [lambda d: d.update(name='other'), lambda d: d.update(digest='missing'), lambda d: d.update(expired=True), lambda d: d.update(workflow_run={'id': 1, 'head_sha': r.SOURCE_HEAD}), lambda d: d.update(size_in_bytes=0)]:

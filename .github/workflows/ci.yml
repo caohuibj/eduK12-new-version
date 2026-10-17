@@ -324,8 +324,12 @@ jobs:
 
       - name: frozen Survey scope and fail-closed merge contracts
         if: steps.scope.outputs.application_route == 'survey-candidate' && github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          SURVEY_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
         run: |
-          node --test .github/scripts/survey-candidate-scope.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs
+          python3 -B .github/scripts/survey-candidate-reuse.py --scope-receipt
           python3 -B .github/scripts/survey-candidate-reuse.test.py
 
       - name: frozen shared asset scope and fail-closed merge contracts

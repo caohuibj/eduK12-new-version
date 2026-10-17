@@ -16,6 +16,7 @@ import re
 import shutil
 import stat
 import subprocess
+import sys
 import tarfile
 import tempfile
 import urllib.parse
@@ -55,7 +56,7 @@ SELF_PATH = '.github/scripts/survey-candidate-reuse.py'
 REVIEWED_TRANSITIONS = {
     '.github/workflows/ci.yml': {
         'before': '77b87d41e9ab422edfb8253bed8fbf26da5fd39c',
-        'after': 'fb85b9d59cac47cf9cfd886bc7e9c3f26c04916e',
+        'after': '3e26ce8e887b4fce7bbb53e8bc01d6b9df5d30ec',
     },
     '.github/workflows/ci-survey-candidate.yml': {
         'before': '540757c3a3f99659cc3d480fa62ab4a102ead9e8',
@@ -75,7 +76,7 @@ REVIEWED_TRANSITIONS = {
     },
     '.github/scripts/survey-candidate-reuse.test.py': {
         'before': None,
-        'after': 'a1f0f1bd3e51ecfaf47d769d4e81c730f8699fe1',
+        'after': 'aeffdaf4fd378ee87531341f000368edf87b939b',
     },
     'docs/release/README.md': {
         'before': 'b921dba1ba1ee10dbd01bbcfd22448ef8e07d63a',
@@ -150,7 +151,15 @@ def validate_official_source(run, job, artifact, now=None):
     require(run.get('head_sha') == SOURCE_HEAD, 'SOURCE_RUN_HEAD')
     require(run.get('status') == 'completed' and recent(run.get('created_at'), now), 'SOURCE_RUN_NOT_TERMINAL_OR_STALE')
     prs = [p for p in run.get('pull_requests', []) if p.get('number') == PR_NUMBER]
-    require(len(prs) == 1 and prs[0].get('head', {}).get('sha') == SOURCE_HEAD, 'SOURCE_PR_HEAD')
+    require(len(prs) == 1, 'SOURCE_PR_ASSOCIATION')
+    # GitHub updates the linked PR head when its branch moves. The immutable
+    # run/job/artifact head fields bind history; this object binds PR identity.
+    linked_head, linked_base = prs[0].get('head', {}), prs[0].get('base', {})
+    require(linked_head.get('ref') == 'fix/survey-storage-export-roundtrip-20261017'
+            and linked_head.get('repo', {}).get('id') == 1338215995
+            and bool(re.fullmatch('[0-9a-f]{40}', linked_head.get('sha', ''))), 'SOURCE_PR_HEAD_IDENTITY')
+    require(linked_base.get('ref') == 'main' and linked_base.get('repo', {}).get('id') == 1338215995
+            and linked_base.get('sha') == '21c1778a545c1988bef65900789c701208b647e5', 'SOURCE_PR_BASE_IDENTITY')
     require(job.get('id') == SOURCE_JOB and job.get('run_id') == SOURCE_RUN, 'SOURCE_JOB_ID')
     require(job.get('name') == 'survey-candidate / candidate', 'SOURCE_JOB_NAME')
     require(job.get('head_sha') == SOURCE_HEAD, 'SOURCE_JOB_HEAD')
@@ -167,7 +176,7 @@ def validate_official_source(run, job, artifact, now=None):
     return {'runId': SOURCE_RUN, 'jobId': SOURCE_JOB, 'jobConclusion': job['conclusion'],
             'artifactId': artifact['id'], 'artifactDigest': artifact['digest'],
             'sourceHead': SOURCE_HEAD, 'mergeHead': SOURCE_MERGE,
-            'wholeCandidateQualified': False}
+            'observedLinkedPrHead': linked_head['sha'], 'wholeCandidateQualified': False}
 
 
 def require_candidate_success(job):
@@ -630,5 +639,85 @@ def main():
                       'wholeCandidateQualified': False}))
 
 
+
+SCOPE_RUN = 39026966367
+SCOPE_JOB = 117379774345
+SCOPE_HEAD = 'dd4c97dac14dd66d2a940f10e9f04025c5f97e93'
+SCOPE_TREE = '89ee92a46e944bba1825f5dd700acdd621d09954'
+SCOPE_TEST_FILES = ('survey-candidate-scope.test.mjs', 'content-workflows.test.mjs', 'ci-topology.test.mjs')
+
+def validate_scope_transition(before, after, verifier_blob):
+    paths = {SELF_PATH, '.github/scripts/survey-candidate-reuse.test.py', '.github/workflows/ci.yml'}
+    changed = {path for path in set(before) | set(after) if before.get(path) != after.get(path)}
+    require(changed == paths, 'UNREVIEWED_SCOPE_TRANSITION')
+    require(before.get(SELF_PATH) == ('100644', 'blob', 'beec7418fe7d0d42a0c9bf07cd4cb3efcc601f2f')
+            and after.get(SELF_PATH) == ('100644', 'blob', verifier_blob), 'SCOPE_ADAPTER_TRANSITION')
+    for path, old in {'.github/scripts/survey-candidate-reuse.test.py': 'a1f0f1bd3e51ecfaf47d769d4e81c730f8699fe1',
+                      '.github/workflows/ci.yml': 'fb85b9d59cac47cf9cfd886bc7e9c3f26c04916e'}.items():
+        require(before.get(path) == ('100644', 'blob', old)
+                and after.get(path) == ('100644', 'blob', REVIEWED_TRANSITIONS[path]['after']), 'SCOPE_REVIEWED_INPUT_' + path)
+    return {'changedPaths': sorted(paths), 'unchangedObjects': len(before) - len(paths)}
+
+def validate_scope_tap(output, affected):
+    passed = re.findall(r'^ok \d+ - (.+)$', output, re.M)
+    passed = [name for name in passed if ' # SKIP' not in name]
+    require(sorted(passed) == sorted(affected), 'SCOPE_EXECUTED_NAMES')
+    for key, count in [('pass', 17), ('fail', 0), ('cancelled', 0), ('todo', 0)]:
+        require(re.search(r'^# ' + key + r' ' + str(count) + r'$', output, re.M), 'SCOPE_EXECUTED_' + key)
+    return True
+
+def scope_receipt():
+    # Only the CI-workflow readers have changed inputs. Retain the other 19
+    # already-successful contracts from their official job; no generic cache.
+    require_official_ci()
+    require(os.environ.get('RUNNER_OS') == 'Linux' and subprocess.check_output(['node', '--version'], text=True).strip() == 'v24.21.0', 'SCOPE_ENVIRONMENT')
+    current = git('rev-parse', 'HEAD').decode().strip()
+    require(current == os.environ.get('GITHUB_SHA'), 'SCOPE_CHECKOUT')
+    source = os.environ.get('SURVEY_SOURCE_HEAD', '')
+    require(bool(re.fullmatch('[0-9a-f]{40}', source)), 'SCOPE_SOURCE_SHA')
+    for ref in (SCOPE_HEAD, source):
+        if subprocess.run(['git', 'cat-file', '-e', ref + '^{commit}'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode:
+            subprocess.run(['git', 'fetch', '--no-tags', '--depth=1', 'origin', ref], check=True, timeout=120)
+    require(git('rev-parse', SCOPE_HEAD + '^{tree}').decode().strip() == SCOPE_TREE, 'SCOPE_ORIGINAL_TREE')
+    require(git('rev-parse', source + '^{tree}').decode().strip() == git('rev-parse', current + '^{tree}').decode().strip(), 'SCOPE_CURRENT_TREE')
+    binding = validate_scope_transition(git_objects(SCOPE_HEAD), git_objects(source), git('hash-object', str(Path(__file__).resolve())).decode().strip())
+    run = official_json(f'/actions/runs/{SCOPE_RUN}')
+    job = official_json(f'/actions/jobs/{SCOPE_JOB}')
+    require(run.get('id') == SCOPE_RUN and run.get('head_sha') == SCOPE_HEAD and run.get('event') == 'pull_request'
+            and run.get('repository', {}).get('full_name') == REPOSITORY and run.get('head_repository', {}).get('full_name') == REPOSITORY
+            and run.get('path') == '.github/workflows/ci.yml' and recent(run.get('created_at'))
+            and any(pr.get('number') == PR_NUMBER for pr in run.get('pull_requests', [])), 'SCOPE_RUN_ORIGIN')
+    require(job.get('id') == SCOPE_JOB and job.get('run_id') == SCOPE_RUN and job.get('head_sha') == SCOPE_HEAD
+            and job.get('name') == 'classify changed content' and job.get('status') == 'completed'
+            and job.get('conclusion') == 'success' and recent(job.get('completed_at')), 'SCOPE_JOB_ORIGIN')
+    steps = [step for step in job.get('steps', []) if step.get('name') == 'frozen Survey scope and fail-closed merge contracts']
+    require(len(steps) == 1 and steps[0].get('conclusion') == 'success', 'SCOPE_ORIGINAL_SELECTED_STEP')
+    with official_request(f'/actions/jobs/{SCOPE_JOB}/logs') as response:
+        raw = response.read(MAX_JSON_BYTES + 1)
+    require(len(raw) <= MAX_JSON_BYTES, 'SCOPE_LOG_SIZE')
+    log = raw.decode('utf8')
+    require('ℹ tests 36' in log and 'ℹ pass 36' in log and 'ℹ fail 0' in log and 'ℹ skipped 0' in log, 'SCOPE_ORIGINAL_NODE_COUNTS')
+    affected, retained = [], []
+    for file in SCOPE_TEST_FILES:
+        text = Path('.github/scripts', file).read_text()
+        matches = list(re.finditer(r"^test\('([^']+)'", text, re.M))
+        for index, match in enumerate(matches):
+            block = text[match.start():matches[index + 1].start() if index + 1 < len(matches) else len(text)]
+            (affected if 'ci.yml' in block or "source('ci')" in block or 'all versioned jobs' in match[1] else retained).append(match[1])
+    require(len(affected) == 17 and len(retained) == 19, 'SCOPE_CONSUMER_SELECTION_CHANGED')
+    for name in affected + retained:
+        require(re.search(r'✔ ' + re.escape(name) + r' \([^\n]+\)', log), 'SCOPE_ORIGINAL_NAMED_PASS')
+    receipt = {'schema': 1, 'currentHead': current, 'currentSourceHead': source, 'sourceRun': SCOPE_RUN, 'sourceJob': SCOPE_JOB,
+               'sourceHead': SCOPE_HEAD, 'sourceTree': SCOPE_TREE, 'sourceLogSha256': sha256(raw), 'inputBinding': binding,
+               'retainedNodeTests': retained, 'executedNodeTests': affected, 'wholeCandidateQualified': False}
+    print(json.dumps(receipt), flush=True)
+    pattern = '^(' + '|'.join(re.escape(name) for name in affected) + ')$'
+    result = subprocess.run(['node', '--test', '--test-reporter=tap', '--test-name-pattern', pattern, *['.github/scripts/' + name for name in SCOPE_TEST_FILES]], capture_output=True, text=True, timeout=120)
+    print(result.stdout, end='', flush=True)
+    print(result.stderr, end='', file=sys.stderr, flush=True)
+    require(result.returncode == 0, 'SCOPE_EXECUTED_FAILURE')
+    validate_scope_tap(result.stdout, affected)
+    print(json.dumps({'status': 'SCOPE_QUALIFIED', 'executedPassed': 17, 'retainedPassed': 19, 'sourceRun': SCOPE_RUN}), flush=True)
+
 if __name__ == '__main__':
-    main()
+    scope_receipt() if sys.argv[1:] == ['--scope-receipt'] else main()
