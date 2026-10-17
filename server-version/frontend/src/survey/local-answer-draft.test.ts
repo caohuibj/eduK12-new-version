@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import {describe,it,expect,beforeEach} from 'vitest'
+import {describe,it,expect,beforeEach,vi} from 'vitest'
 import {saveLocalSurveyDraft,restoreLocalSurveyDraftEnvelope,
   restoreLocalSurveyDraft,clearLocalSurveyDraft} from './local-answer-draft'
 const project='33333333-3333-4333-8333-333333333333'
@@ -56,6 +56,30 @@ describe('Survey short-lived local-only answer recovery',()=>{
     expect(saveLocalSurveyDraft(project,attempt,digest,answers)).toBe(true)
     expect(restoreLocalSurveyDraftEnvelope(project,attempt,digest))
       .toEqual({answers})
+  })
+
+  it('preserves only the bounded submission descriptor with the existing exact answer envelope',()=>{
+    const answers={scale:{qone:'o3'}}
+    const finalSubmission={submissionId:'f'.repeat(36),screenOut:false,presentation:{shownBlocks:['scale']}}
+    expect(saveLocalSurveyDraft(project,attempt,digest,answers,undefined,finalSubmission)).toBe(true)
+    expect(restoreLocalSurveyDraftEnvelope(project,attempt,digest)).toEqual({answers,finalSubmission})
+    const key=sessionStorage.key(0)!
+    const saved=JSON.parse(sessionStorage.getItem(key)!)
+    sessionStorage.setItem(key,JSON.stringify({...saved,finalSubmission:{...finalSubmission,accessCredential:'must-not-restore'}}))
+    expect(restoreLocalSurveyDraftEnvelope(project,attempt,digest)).toEqual({answers,finalSubmission})
+    sessionStorage.setItem(key,JSON.stringify({...saved,finalSubmission:{...finalSubmission,submissionId:42}}))
+    expect(restoreLocalSurveyDraftEnvelope(project,attempt,digest)).toBeNull()
+  })
+
+  it('does not extend a sealed request lifetime when saving its exact retry again',()=>{
+    const clock=vi.spyOn(Date,'now').mockReturnValue(10000000)
+    try{
+      const finalSubmission={submissionId:'f'.repeat(36),screenOut:false}
+      expect(saveLocalSurveyDraft(project,attempt,digest,{form:{q:'yes'}},undefined,finalSubmission)).toBe(true)
+      clock.mockReturnValue(10000000+7200001)
+      expect(saveLocalSurveyDraft(project,attempt,digest,{form:{q:'yes'}},undefined,finalSubmission)).toBe(true)
+      expect(restoreLocalSurveyDraftEnvelope(project,attempt,digest)).toBeNull()
+    }finally{clock.mockRestore()}
   })
 
 })

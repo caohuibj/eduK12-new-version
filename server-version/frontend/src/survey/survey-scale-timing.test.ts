@@ -83,4 +83,18 @@ describe('Survey frozen one-by-one response timing',()=>{
     expect(a.q.firstResponseMs).toBe(114)
     expect(a.q.activeTimeMs).toBe(114)
   })
+  it('pauses a sealed submission without adding interruption or a phantom revisit',()=>{
+    const tracker=new SurveyScaleTimingTracker()
+    tracker.enter('q',true,100)
+    tracker.answer('q',undefined,'yes',1100)
+    tracker.pause(1100)
+    expect(tracker.snapshot(9000).q.activeTimeMs).toBe(1000)
+    tracker.resume(10000)
+    tracker.answer('q','yes','no',11000)
+    expect(tracker.snapshot(11000).q).toMatchObject({
+      firstResponseMs:1000,activeTimeMs:2000,changeCount:1,
+      visits:1,revisitCount:0,interrupted:false,
+    })
+  })
+
 })

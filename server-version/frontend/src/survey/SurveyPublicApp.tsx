@@ -3,7 +3,7 @@ import type { SurveyPublicImage } from './builder.types'
 import { visibleFormKeys,sanitizeFormAnswers } from './form-visibility'
 import { ProfessionalFormAnswer,type ProfessionalAnswer } from './ProfessionalFormAnswer'
 import { FormChoiceExtras,hasSelectedOther,toggleFormMultiple } from './FormChoiceExtras'
-import {saveLocalSurveyDraft,restoreLocalSurveyDraftEnvelope,clearLocalSurveyDraft} from './local-answer-draft'
+import {saveLocalSurveyDraft,restoreLocalSurveyDraftEnvelope,clearLocalSurveyDraft,type SurveyFinalSubmission} from './local-answer-draft'
 import {SurveyTimedScale} from './SurveyTimedScale'
 import {SurveyScaleTimingTracker,sealSurveyScaleTimings,
   type SurveyWaveScaleTimings} from './survey-scale-timing'
@@ -61,12 +61,15 @@ const safePattern=/^[a-f0-9-]{36}$/i
 const own=<T,>(values:Record<string,T>,key:string):T|undefined=>
   Object.prototype.hasOwnProperty.call(values,key)?values[key]:undefined
 const parseError=(e:unknown)=>e instanceof Error?e.message:'研究访问失败，请重试'
+class SurveyPublicApiError extends Error {
+  constructor(message:string,readonly status:number){super(message)}
+}
 const publicApi=async <T,>(path:string,method='GET',body?:unknown):Promise<T>=>{
   const result=await fetch('/api/public/survey'+path,{method,credentials:'omit',
     cache:'no-store',headers:{'Content-Type':'application/json'},
     ...(body===undefined?{}:{body:JSON.stringify(body)})})
   const envelope=await result.json() as ApiResult<T>
-  if(!result.ok||envelope.code!==0||!envelope.data)throw new Error(envelope.message||'操作未完成')
+  if(!result.ok||envelope.code!==0||!envelope.data)throw new SurveyPublicApiError(envelope.message||'操作未完成',result.status)
   return envelope.data
 }
 export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purpose='SURVEY'}:{unit:Unit;answer:Record<string,Answer>;
@@ -226,6 +229,15 @@ export default function SurveyPublicApp(){
   const [checkpointOverwritePending,setCheckpointOverwritePending]=useState(false)
   const [attemptId,setAttemptId]=useState(''),[submissionId,setSubmissionId]=useState('')
   const [general,setGeneral]=useState<General|null>(null),[notice,setNotice]=useState('')
+  const [finalSealed,setFinalSealed]=useState(false)
+  const finalRequest=useRef<{attemptId:string;path:string;
+    body:{accessCredential:string;researchCode?:string;submissionId:string;answers:Record<string,Record<string,Answer>>;
+      itemTimings?:SurveyWaveScaleTimings;presentation?:{shownBlocks:string[]}}}|null>(null)
+  const finalInFlight=useRef(false)
+  const completedAttempts=useRef(new Set<string>())
+  const [completion,setCompletion]=useState<{attemptId:string;proof:{accessCredential:string;researchCode?:string}}|null>(null)
+  const draftState=useRef({answers,itemTimings})
+  draftState.current={answers,itemTimings}
   const [withdrawn,setWithdrawn]=useState(false),[revoked,setRevoked]=useState(false)
   // SHORT-LIVED same-tab recovery only. Never shared across waves or devices.
   const [singleResume,setSingleResume]=useState<SingleResume|null>(()=>readSingleResume(publicId))
@@ -246,17 +258,33 @@ export default function SurveyPublicApp(){
   // Only the already-authorized local browser tab may recover unfinished answers.
   useEffect(()=>{
     if(!task||task.status!=='STARTED'||!attemptId)return
-    const flush=()=>{
-      if(!saveLocalSurveyDraft(publicId,attemptId,task.definitionDigest,answers,itemTimings))
+    const flush=(leaving=false)=>{
+      if(completedAttempts.current.has(attemptId)||taskState.current?.attemptId!==attemptId)return
+      const sealed=finalRequest.current?.attemptId===attemptId?finalRequest.current:null
+      if(sealed){
+        saveLocalSurveyDraft(publicId,attemptId,task.definitionDigest,sealed.body.answers,
+          sealed.body.itemTimings,{submissionId:sealed.body.submissionId,screenOut:sealed.path.endsWith('/screen-out'),
+            ...(sealed.body.presentation?{presentation:sealed.body.presentation}:{})})
+        return
+      }
+      const liveTimings={...draftState.current.itemTimings}
+      for(const [key,tracker] of Object.entries(timingTrackers.current)){
+        if(leaving)tracker.suspend()
+        liveTimings[key]=tracker.snapshot()
+      }
+      if(!saveLocalSurveyDraft(publicId,attemptId,task.definitionDigest,draftState.current.answers,liveTimings))
         setNotice('本标签页临时保存失败（空间或权限不足）。刷新、关闭页面可能丢失未提交答案；如已开放服务器加密暂存，请主动保存，或完成本次 FINAL。')
     }
-    const timeout=window.setTimeout(flush,450)
-    window.addEventListener('pagehide',flush)
-    window.addEventListener('beforeunload',flush)
+    const timeout=window.setTimeout(()=>flush(),450)
+    const leaving=()=>flush(true)
+    // beforeunload can be cancelled; only pagehide establishes an actual pause.
+    const beforeUnload=()=>flush()
+    window.addEventListener('pagehide',leaving)
+    window.addEventListener('beforeunload',beforeUnload)
     return ()=>{
       window.clearTimeout(timeout)
-      window.removeEventListener('pagehide',flush)
-      window.removeEventListener('beforeunload',flush)
+      window.removeEventListener('pagehide',leaving)
+      window.removeEventListener('beforeunload',beforeUnload)
     }
   },[publicId,attemptId,task,answers,itemTimings])
   useEffect(()=>{
@@ -306,7 +334,17 @@ export default function SurveyPublicApp(){
     discardEntry()
     setProofReceived(true);setNotice('此研究编号与私密恢复凭证只显示在当前设备页面，请分别妥善保存。')
   })
-  const chooseWave=(wave:Wave)=>{setSelectedWave(wave);setAgreed(false);setTask(null);setGeneral(null);setWithdrawn(false);setRevoked(false)}
+  const chooseWave=(wave:Wave)=>{setSelectedWave(wave);setAgreed(false);setTask(null);setGeneral(null);setCompletion(null);setWithdrawn(false);setRevoked(false)}
+  const readCompletion=async(id:string,proof:{accessCredential:string;researchCode?:string})=>{
+    const result=await publicApi<General>(base+'/attempts/'+id+'/general','POST',proof)
+    setGeneral(result);setNotice('提交成功。系统不会提供未经验证的诊断或常模等级。')
+  }
+  const markCompleted=(id:string,proof:{accessCredential:string;researchCode?:string})=>{
+    completedAttempts.current.add(id)
+    clearLocalSurveyDraft(publicId,id)
+    setCheckpointRevision(0);setTask(null);setCompletion({attemptId:id,proof})
+    finalRequest.current=null;setFinalSealed(false)
+  }
   const loadTask=async(id:string,code:string,secret:string)=>{
     const data=await publicApi<Task>(base+'/attempts/'+id+'/task','POST',{
       ...(code?{researchCode:code}:{}),accessCredential:secret,
@@ -321,7 +359,7 @@ export default function SurveyPublicApp(){
     let restoredRevision=0,overwritePending=false
     if(data.status==='COMPLETED')clearLocalSurveyDraft(publicId,id)
     else if(saved)setNotice('已恢复本标签页暂存的未提交答案。请复核后再提交。')
-    if(data.status==='STARTED'&&data.checkpointPolicy?.enabled){
+    if(data.status==='STARTED'&&data.checkpointPolicy?.enabled&&!saved?.finalSubmission){
       try{
         const remote=await publicApi<{revision:number;checkpoint:{
           answers:Record<string,Record<string,Answer>>;
@@ -348,15 +386,22 @@ export default function SurveyPublicApp(){
       }catch(e){setNotice('无法恢复服务器临时存档：'+parseError(e))}
     }
     timingTrackers.current={}
-    setAttemptId(id);setSubmissionId(crypto.randomUUID())
+    const savedFinal=saved?.finalSubmission
+    finalRequest.current=savedFinal?{attemptId:id,
+      path:base+'/attempts/'+id+(savedFinal.screenOut?'/screen-out':'/final'),
+      body:{...(code?{researchCode:code}:{}),accessCredential:secret,
+        submissionId:savedFinal.submissionId,answers:restoredAnswers,
+        ...(saved.itemTimings?{itemTimings:restoredTimings}:{}),
+        ...(savedFinal.presentation?{presentation:savedFinal.presentation}:{})}}:null
+    setFinalSealed(!!savedFinal);setCompletion(null)
+    setAttemptId(id);setSubmissionId(savedFinal?.submissionId??crypto.randomUUID())
     setTask(data);setFormPages({});setScalePages({});setFlowStep(0);setToolStep(0);setScreenedOut(false)
     setCheckpointRevision(restoredRevision);setCheckpointOverwritePending(overwritePending)
     setAnswers(restoredAnswers);setItemTimings(restoredTimings)
     if(data.status==='COMPLETED'){
-      const result=await publicApi<General>(base+'/attempts/'+id+'/general','POST',{
-        ...(code?{researchCode:code}:{}),accessCredential:secret,
-      })
-      setGeneral(result)
+      const proof={...(code?{researchCode:code}:{}),accessCredential:secret}
+      markCompleted(id,proof)
+      await readCompletion(id,proof)
     }
   }
   const resumeSingle=()=>{if(!singleResume)return;void run(async()=>{
@@ -439,6 +484,7 @@ export default function SurveyPublicApp(){
     else if(timedSequence)setToolStep(i=>Math.min(i+1,task!.units.length-1))
   }
   const updateAnswer=(unit:Unit,key:string,value:Answer)=>setAnswers(previous=>{
+    if(finalRequest.current||completedAttempts.current.has(attemptId))return previous
     const next={...(own(previous,unit.instrumentKey)??{}),[key]:value}
     const question=unit.kind==='FORM'?unit.pages?.flatMap(page=>page.questions)
       .find(q=>q.itemKey===key&&q.otherOptionKey):undefined
@@ -462,7 +508,7 @@ export default function SurveyPublicApp(){
           items:(unit.items??[]).map(q=>({itemKey:q.itemKey,prompt:q.prompt,required:q.required})),
           responseOptions:unit.responseOptions??[]}}
         answer={own(answers,unit.instrumentKey)??{}}
-        tracker={timingFor(unit)}
+        tracker={timingFor(unit)} paused={finalSealed}
         index={own(scalePages,unit.instrumentKey)??0}
         onIndexChange={next=>setScalePages(prev=>({...prev,[unit.instrumentKey]:next}))}
         onAnswer={(key,value)=>updateAnswer(unit,key,value)}
@@ -476,13 +522,14 @@ export default function SurveyPublicApp(){
       answer={answers[unit.instrumentKey]||{}}
       onChange={(key,value)=>updateAnswer(unit,key,value)}/>
   }
-  const submit=(e:FormEvent)=>{e.preventDefault();if(!task||!attemptId)return;
-    if((currentFlow||timedSequence)&&!finalFlowStep){
+  const submit=(e:FormEvent)=>{e.preventDefault();if(!task||!attemptId||finalInFlight.current)return;
+    if(!finalRequest.current&&(currentFlow||timedSequence)&&!finalFlowStep){
       setError('请按顺序完成当前研究步骤');return
     }
-    if((currentFlow||timedSequence)&&!canAdvanceFlow()){
+    if(!finalRequest.current&&(currentFlow||timedSequence)&&!canAdvanceFlow()){
       setError('请完成当前工具后再提交');return
     }
+    finalInFlight.current=true
     void run(async()=>{
     // Match the frozen conditional form. An earlier selection change must
     // clear fields that are now hidden; the server repeats this validation.
@@ -494,6 +541,7 @@ export default function SurveyPublicApp(){
         ?sanitizeFormAnswers(unit.pages?.flatMap(p=>p.questions)||[],original)
         :original]
     }))
+    if(!finalRequest.current)for(const tracker of Object.values(timingTrackers.current))tracker.pause()
     const timedUnits=task.units.filter(unit=>
       unit.kind==='SCALE'&&unit.presentationMode==='ONE_BY_ONE'&&
       (eligible===null||eligible.has(unit.instrumentKey)))
@@ -504,16 +552,43 @@ export default function SurveyPublicApp(){
           own(itemTimings,unit.instrumentKey)??{},
       ),
     ]))
-    const screened=currentFlow?.termination==='SCREEN_OUT'
-    const final=await publicApi<{status:string}>(
-      base+'/attempts/'+attemptId+(screened?'/screen-out':'/final'),'POST',{
+    const screened=finalRequest.current?finalRequest.current.path.endsWith('/screen-out')
+      :currentFlow?.termination==='SCREEN_OUT'
+    const path=base+'/attempts/'+attemptId+(screened?'/screen-out':'/final')
+    if(!finalRequest.current){
+      finalRequest.current={attemptId,path,body:{
       ...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode:researchCode.trim().toUpperCase()}:{}),
       accessCredential:accessCredential.trim(),submissionId,answers:payload,
       ...(timedUnits.length?{itemTimings:sealedTimings}:{}),
       ...(currentFlow?{presentation:{shownBlocks:currentFlow.shownBlocks}}:{}),
-    })
+      }}
+      setFinalSealed(true)
+      const descriptor:SurveyFinalSubmission={submissionId,screenOut:!!screened,
+        ...(currentFlow?{presentation:{shownBlocks:currentFlow.shownBlocks}}:{})}
+      if(!saveLocalSurveyDraft(publicId,attemptId,task.definitionDigest,payload,
+        timedUnits.length?sealedTimings:undefined,descriptor))
+        setNotice('本标签页无法保存封存提交。重试仅在当前页面有效，请勿刷新或关闭页面，直至确认完成。')
+    }
+    const sealed=finalRequest.current
+    if(sealed.attemptId!==attemptId)throw new Error('提交所属作答已变化，请重新读取本轮')
+    let final:{status:string}
+    try{final=await publicApi<{status:string}>(sealed.path,'POST',sealed.body)}
+    catch(e){
+      // Only an explicit validation rejection proves this request did not commit.
+      // Ambiguous network/server failures must keep the exact request for retry.
+      if(e instanceof SurveyPublicApiError&&[400,413].includes(e.status)){
+        finalRequest.current=null;setFinalSealed(false)
+        if(document.visibilityState!=='hidden'&&document.hasFocus())
+          for(const tracker of Object.values(timingTrackers.current))tracker.resume()
+        saveLocalSurveyDraft(publicId,attemptId,task.definitionDigest,
+          draftState.current.answers,draftState.current.itemTimings)
+      }
+      throw e
+    }
     if(screened){
       if(final.status!=='SCREENED_OUT')throw new Error('资格筛除未确认')
+      completedAttempts.current.add(attemptId)
+      finalRequest.current=null;setFinalSealed(false)
       clearLocalSurveyDraft(publicId,attemptId);setCheckpointRevision(0)
       try{sessionStorage.removeItem(singleStorageKey(publicId))}catch{/* private session unavailable */}
       setSingleResume(null);setTask(null);setScreenedOut(true)
@@ -523,15 +598,13 @@ export default function SurveyPublicApp(){
     if(final.status!=='COMPLETED')throw new Error('作答尚未完成提交')
     // FINAL is authoritative even if the subsequent General request fails.
     // Never keep a local draft after the server accepted completion.
-    clearLocalSurveyDraft(publicId,attemptId);setCheckpointRevision(0)
-    const generalResult=await publicApi<General>(base+'/attempts/'+attemptId+'/general','POST',{
+    const proof={
       ...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode:researchCode.trim().toUpperCase()}:{}),
       accessCredential:accessCredential.trim(),
-    })
-    setGeneral(generalResult)
-    setTask(null)
-    setNotice('提交成功。系统不会提供未经验证的诊断或常模等级。')
-  })}
+    }
+    markCompleted(attemptId,proof)
+    await readCompletion(attemptId,proof)
+  }).finally(()=>{finalInFlight.current=false})}
   const saveCheckpoint=()=>{if(!task?.checkpointPolicy?.enabled||!attemptId)return
     if(checkpointOverwritePending&&!window.confirm(
       '确认用当前本地答案替换另一设备保存的服务器 Checkpoint？此操作不能恢复被覆盖的未提交草稿。',
@@ -574,7 +647,7 @@ export default function SurveyPublicApp(){
         researchCode:researchCode.trim().toUpperCase(),accessCredential:accessCredential.trim(),
       })
       if(attemptId)clearLocalSurveyDraft(publicId,attemptId)
-      setRevoked(true);setHome(null);setTask(null);setGeneral(null)
+      setRevoked(true);setHome(null);setTask(null);setGeneral(null);setCompletion(null)
       setSelectedWave(null);setAgreed(false);setProofReceived(false)
       discardEntry()
       setNotice('已终止未来访问，仍可凭原始研究身份申请撤回数据。')
@@ -597,7 +670,7 @@ export default function SurveyPublicApp(){
         })
       }
       if(attemptId)clearLocalSurveyDraft(publicId,attemptId)
-      setWithdrawn(true);setGeneral(null);setTask(null);setHome(null)
+      setWithdrawn(true);setGeneral(null);setCompletion(null);setTask(null);setHome(null)
       setSingleResume(null)
       try{sessionStorage.removeItem(singleStorageKey(publicId))}catch{/* storage unavailable */}
       setResearchCode('');setAccessCredential('')
@@ -610,7 +683,7 @@ export default function SurveyPublicApp(){
     const data=await publicApi<{waves:Wave[]}>(base+'/enter','POST',{
       researchCode:researchCode.trim().toUpperCase(),accessCredential:accessCredential.trim(),
     })
-    setHome(data.waves);setSelectedWave(null);setGeneral(null);setTask(null)
+    setHome(data.waves);setSelectedWave(null);setGeneral(null);setCompletion(null);setTask(null)
   })
   return <div className="min-h-screen bg-slate-50 text-slate-800">
     <header className="border-b bg-white"><div className="max-w-3xl mx-auto p-5">
@@ -634,7 +707,7 @@ export default function SurveyPublicApp(){
           ?'多波次研究：同一研究编号的回答将在本研究内关联。无需登录或提供真实姓名。'
           :'独立匿名研究：本次作答不与其他波次关联，无需登录或提供真实姓名。'}</p>
       </section>
-      {info.project.collectionMode==='LINKED_WAVES'&&!home&&!task&&!general&&!revoked&&<section className="bg-white rounded-xl border p-5">
+      {info.project.collectionMode==='LINKED_WAVES'&&!home&&!task&&!general&&!completion&&!revoked&&<section className="bg-white rounded-xl border p-5">
         <h3 className="font-semibold text-lg">已有研究编号 · 继续参加后续波次</h3>
         <p className="text-sm my-2">公开研究编号不是登录密码，必须同时提供本人私密恢复凭证。</p>
         <form onSubmit={recover} className="grid gap-3">
@@ -655,18 +728,18 @@ export default function SurveyPublicApp(){
         <button className="btn-secondary mt-3" type="button" onClick={()=>setProofReceived(false)}>
           我已分别保存这两个凭证</button>
       </section>}
-      {info.project.collectionMode==='SINGLE_UNLINKED'&&singleResume&&!task&&!general&&
+      {info.project.collectionMode==='SINGLE_UNLINKED'&&singleResume&&!task&&!general&&!completion&&
         <section className="bg-white border rounded-xl p-4">
           <h3 className="font-semibold">恢复本次单次匿名作答</h3>
           <p className="text-sm my-2">仅此浏览器标签可尝试恢复短期作答；不建立跨波次身份。公共设备请在完成后关闭标签。</p>
           <button className="btn-secondary" type="button" disabled={busy} onClick={resumeSingle}>
             恢复本次作答／查看已完成回执</button>
         </section>}
-      {home&&!task&&!general&&info.project.collectionMode==='LINKED_WAVES'&&
+      {home&&!task&&!general&&!completion&&info.project.collectionMode==='LINKED_WAVES'&&
         <button type="button" className="btn-secondary" disabled={busy} onClick={revokeAccess}>
           停止后续研究参与并撤销未来访问权限（已收集数据不自动删除）
         </button>}
-      {!task&&!general&&!revoked&&<section className="bg-white rounded-xl border p-5">
+      {!task&&!general&&!completion&&!revoked&&<section className="bg-white rounded-xl border p-5">
         <h3 className="font-semibold text-lg">研究波次</h3>
         {!validEntry&&<label className="block text-sm my-3">缺少有效邀请凭证？从原研究邀请中复制 43 位凭证到这里。
           <input className="input block w-full mt-2" autoComplete="off"
@@ -699,6 +772,7 @@ export default function SurveyPublicApp(){
         </div>}
       </section>}
       {task&&!general&&<form className="space-y-5" onSubmit={submit}>
+        <fieldset disabled={busy||finalSealed} className="space-y-5 min-w-0 border-0 p-0">
         <div className="bg-white border rounded-xl p-4"><h3 className="font-semibold">本轮研究作答</h3>
           <p className="text-sm text-slate-500">请按实际情况回答。研究内部计分不作为个人诊断反馈。</p>
           <p className="text-xs text-slate-500 mt-2">未提交答案仅在当前浏览器标签页暂存，至多两小时；
@@ -736,7 +810,9 @@ export default function SurveyPublicApp(){
               onClick={advanceFlow}>确认当前工具，继续</button>}
           </nav>
         </section>:task.units.map(renderSurveyTask)}
-        {finalFlowStep&&<button className="btn-primary" disabled={busy||(!task.flow&&!task.units.every(unit=>{
+        </fieldset>
+        {finalSealed&&<p role="status">本次答案已封存。结果未确认时请重试原提交，暂不能修改答案。</p>}
+        {(finalSealed||finalFlowStep)&&<button className="btn-primary" disabled={busy||(!finalSealed&&!task.flow&&!task.units.every(unit=>{
           if(unit.kind!=='FORM')return true
           const vis=visibleFormKeys(unit.pages?.flatMap(p=>p.questions)||[],
             own(answers,unit.instrumentKey)??{})
@@ -752,6 +828,12 @@ export default function SurveyPublicApp(){
               onClick={returnHome}>返回我的研究波次</button>
           :<button type="button" className="btn-secondary" disabled={busy}
               onClick={withdraw}>撤回本轮筛选记录</button>}
+      </section>}
+      {completion&&!general&&<section className="bg-white border rounded-xl p-5 space-y-3">
+        <h2 className="text-xl font-semibold">本轮回答已完成</h2>
+        <p>正式回答已保存，完成回执尚未读取。</p>
+        <button type="button" className="btn-secondary" disabled={busy}
+          onClick={()=>void run(()=>readCompletion(completion.attemptId,completion.proof))}>重试读取完成回执</button>
       </section>}
       {general&&<section className="bg-white border rounded-xl p-5 space-y-3">
         <h2 className="text-xl font-semibold">本轮回答已完成</h2>
