@@ -7,6 +7,7 @@
   "quarantineHours": 24,
   "maxDeleteObjects": 20,
   "maxDeleteBytes": 536870912,
+  "maxHostPointDeleteBytes": 0,
   "maxInventoryVersions": 10000,
   "maxScanBytes": 536870912,
   "retention": {"hourlyHours": 48, "dailyDays": 30, "weeklyWeeks": 12, "monthlyMonths": 12}

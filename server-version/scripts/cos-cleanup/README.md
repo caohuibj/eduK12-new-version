@@ -136,3 +136,18 @@ Reference scanning still visits every restored row. Its root-private JSONL expor
 Reference exports use psql FETCH_COUNT=16, with the statement timeout configured in a separate command so cursor fetching applies to the SELECT. All rows are still scanned; incomplete or failed exports never create a completed binding. Large compacted table exports have a 600-second wall-clock bound, the existing 120-second SQL bound, 4 MiB row/12 GiB raw input/512 MiB projected-output limits, and unchanged 384 MiB isolated PostgreSQL memory.
 
 After the unchanged attachment verifier succeeds, a root-private authenticated checkpoint preserves that exact per-point binding. Retrying still validates database, snapshot and blob versions/hashes, key identity, verifier source and genuine restore evidence, and rechecks remote HEAD. Checkpoints alone never authorize cleanup or update the global proof time. Only complete all-point verification publishes the global proof; stale checkpoints are removed only after success.
+
+### Exclusive large host-point rotation
+
+The ordinary maxDeleteBytes ceiling remains 512 MiB. Optional
+maxHostPointDeleteBytes defaults to zero (disabled), with a hard maximum of
+2 GiB + 64 MiB. Only one complete, exact three-object native host backup point
+(database, server configuration, receipt) may use it. The database is bounded to
+2 GiB, configuration to 64 MiB, receipt to 1 MiB, and the combined group must fit
+the configured total. No attachment, extra metadata, second point or partial group
+can join an oversized transaction. The executor independently validates the same
+shape and budget on every initial execution and resume; sealed configuration
+binding, retention, protected points, quarantine, recovery proof, two checkpoints
+and exact VersionId checks remain mandatory. Oversized groups that still cannot
+fit remain untouched. Change configuration only with reviewed authorization and
+no pending transaction; retain the original configuration for rollback.
