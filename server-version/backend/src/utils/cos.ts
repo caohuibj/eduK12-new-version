@@ -1,3 +1,5 @@
+import { Prisma } from '@prisma/client'
+import { prisma } from '../config/database'
 import COS from 'cos-nodejs-sdk-v5'
 import { config } from '../config'
 import fs from 'fs'
@@ -104,24 +106,20 @@ export const extractCOSKey = (url: string): string | null => {
   return null
 }
 
-// 删除 COS 文件
+// Hold the same object lock as controlled sharing while checking actual rows.
+// Even soft-deleted logical assets protect bytes until their own retirement.
 export const deleteFromCOS = async (key: string): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    cos.deleteObject(
-      {
-        Bucket: config.cosBucket!,
-        Region: config.cosRegion!,
-        Key: key,
-      },
-      (err) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve()
-        }
-      }
-    )
-  })
+  await prisma.$transaction(async tx => {
+    await tx.$queryRaw(Prisma.sql`SELECT pg_advisory_xact_lock(hashtextextended(${'eduk12:cos:' + key}, 0))::text`)
+    const references = await tx.storedAsset.count({ where: { provider: 'cos', OR: [
+      { storageObjectKey: key }, { storageObjectKey: null, objectKey: key },
+    ] } })
+    if (references) throw new Error('COS object is retained by a logical asset')
+    await new Promise<void>((resolve, reject) => {
+      cos.deleteObject({ Bucket: config.cosBucket!, Region: config.cosRegion!, Key: key },
+        err => err ? reject(err) : resolve())
+    })
+  }, { maxWait: 5000, timeout: 20000 })
 }
 
 // 删除 COS 文件（通过 URL）
