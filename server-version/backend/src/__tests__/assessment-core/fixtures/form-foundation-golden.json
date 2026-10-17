@@ -1,0 +1,2755 @@
+{
+  "baselineCommit": "aeb5ce0111d28f878d733aff73c6e60e85d4bdbf",
+  "cases": [
+    {
+      "name": "v2-normalized-draft",
+      "output": {
+        "definition": {
+          "schemaVersion": 2,
+          "pages": [
+            {
+              "pageKey": "page",
+              "title": "Fixture",
+              "questions": [
+                {
+                  "itemKey": "single",
+                  "type": "SINGLE",
+                  "prompt": "single",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [
+                    {
+                      "optionKey": "a",
+                      "label": "A"
+                    },
+                    {
+                      "optionKey": "b",
+                      "label": "B"
+                    },
+                    {
+                      "optionKey": "other",
+                      "label": "OTHER"
+                    },
+                    {
+                      "optionKey": "none",
+                      "label": "NONE"
+                    }
+                  ],
+                  "rows": [],
+                  "otherOptionKey": "other"
+                },
+                {
+                  "itemKey": "multiple",
+                  "type": "MULTIPLE",
+                  "prompt": "multiple",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [
+                    {
+                      "optionKey": "a",
+                      "label": "A"
+                    },
+                    {
+                      "optionKey": "b",
+                      "label": "B"
+                    },
+                    {
+                      "optionKey": "other",
+                      "label": "OTHER"
+                    },
+                    {
+                      "optionKey": "none",
+                      "label": "NONE"
+                    }
+                  ],
+                  "rows": [],
+                  "otherOptionKey": "other",
+                  "exclusiveOptionKeys": [
+                    "none"
+                  ]
+                },
+                {
+                  "itemKey": "short",
+                  "type": "SHORT_TEXT",
+                  "prompt": "short",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [],
+                  "rows": [],
+                  "maxLength": 20
+                },
+                {
+                  "itemKey": "long",
+                  "type": "LONG_TEXT",
+                  "prompt": "long",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [],
+                  "rows": [],
+                  "maxLength": 40
+                },
+                {
+                  "itemKey": "number",
+                  "type": "NUMBER",
+                  "prompt": "number",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [],
+                  "rows": [],
+                  "min": -2,
+                  "max": 10,
+                  "step": 0.5,
+                  "precision": 1
+                },
+                {
+                  "itemKey": "likert",
+                  "type": "LIKERT",
+                  "prompt": "likert",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [
+                    {
+                      "optionKey": "a",
+                      "label": "A"
+                    },
+                    {
+                      "optionKey": "b",
+                      "label": "B"
+                    }
+                  ],
+                  "rows": []
+                },
+                {
+                  "itemKey": "matrix",
+                  "type": "MATRIX",
+                  "prompt": "matrix",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [
+                    {
+                      "optionKey": "a",
+                      "label": "A"
+                    },
+                    {
+                      "optionKey": "b",
+                      "label": "B"
+                    }
+                  ],
+                  "rows": [
+                    {
+                      "rowKey": "first",
+                      "label": "First"
+                    },
+                    {
+                      "rowKey": "second",
+                      "label": "Second"
+                    }
+                  ]
+                },
+                {
+                  "itemKey": "date",
+                  "type": "DATE",
+                  "prompt": "date",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [],
+                  "rows": []
+                },
+                {
+                  "itemKey": "time",
+                  "type": "TIME",
+                  "prompt": "time",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [],
+                  "rows": [],
+                  "timeZone": "UTC"
+                },
+                {
+                  "itemKey": "rank",
+                  "type": "RANK_ORDER",
+                  "prompt": "rank",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [
+                    {
+                      "optionKey": "a",
+                      "label": "A"
+                    },
+                    {
+                      "optionKey": "b",
+                      "label": "B"
+                    }
+                  ],
+                  "rows": []
+                },
+                {
+                  "itemKey": "slider",
+                  "type": "SLIDER",
+                  "prompt": "slider",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [],
+                  "rows": [],
+                  "min": 0,
+                  "max": 10,
+                  "step": 0.5
+                },
+                {
+                  "itemKey": "sum",
+                  "type": "CONSTANT_SUM",
+                  "prompt": "sum",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [
+                    {
+                      "optionKey": "a",
+                      "label": "A"
+                    },
+                    {
+                      "optionKey": "b",
+                      "label": "B"
+                    }
+                  ],
+                  "rows": [],
+                  "integerOnly": true,
+                  "total": 10
+                },
+                {
+                  "itemKey": "matrix_multi",
+                  "type": "MATRIX_MULTIPLE",
+                  "prompt": "matrix_multi",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [
+                    {
+                      "optionKey": "a",
+                      "label": "A"
+                    },
+                    {
+                      "optionKey": "b",
+                      "label": "B"
+                    }
+                  ],
+                  "rows": [
+                    {
+                      "rowKey": "first",
+                      "label": "First"
+                    },
+                    {
+                      "rowKey": "second",
+                      "label": "Second"
+                    }
+                  ],
+                  "minSelections": 1,
+                  "maxSelections": 2
+                },
+                {
+                  "itemKey": "hidden",
+                  "type": "SHORT_TEXT",
+                  "prompt": "hidden",
+                  "required": false,
+                  "options": [],
+                  "rows": [],
+                  "displayIf": {
+                    "itemKey": "single",
+                    "operator": "EQUALS",
+                    "optionKey": "b"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "issues": [],
+        "digest": "74bb78fb5ec5f8474444c436cd61db579f780f79632ae86165191734b5ef3fc6"
+      }
+    },
+    {
+      "name": "v2-all-13-types",
+      "output": {
+        "rawAnswers": {
+          "single": "a",
+          "multiple": [
+            "a",
+            "b"
+          ],
+          "short": "REFUSED",
+          "long": "descriptive text",
+          "number": 0,
+          "likert": "b",
+          "matrix": {
+            "first": "a"
+          },
+          "date": "2024-02-29",
+          "time": "09:30",
+          "rank": [
+            "b",
+            "a"
+          ],
+          "slider": 0,
+          "sum": {
+            "a": 0,
+            "b": 10
+          },
+          "matrix_multi": {
+            "first": [
+              "b",
+              "a"
+            ],
+            "second": []
+          }
+        },
+        "missing": [
+          {
+            "itemKey": "single:other",
+            "reason": "NOT_SHOWN"
+          },
+          {
+            "itemKey": "multiple:other",
+            "reason": "NOT_SHOWN"
+          },
+          {
+            "itemKey": "matrix:second",
+            "reason": "REFUSED"
+          },
+          {
+            "itemKey": "hidden",
+            "reason": "NOT_SHOWN"
+          }
+        ]
+      }
+    },
+    {
+      "name": "v2-frozen-final",
+      "output": {
+        "unit": {
+          "draftId": "draft",
+          "instrumentKey": "form",
+          "kind": "FORM",
+          "title": "Fixture",
+          "draftRevision": 1,
+          "sourceDigest": "74bb78fb5ec5f8474444c436cd61db579f780f79632ae86165191734b5ef3fc6",
+          "scoringDigest": null,
+          "compiledDefinition": {
+            "schemaVersion": 2,
+            "pages": [
+              {
+                "pageKey": "page",
+                "title": "Fixture",
+                "questions": [
+                  {
+                    "itemKey": "single",
+                    "type": "SINGLE",
+                    "prompt": "single",
+                    "required": false,
+                    "allowRefusal": true,
+                    "options": [
+                      {
+                        "optionKey": "a",
+                        "label": "A"
+                      },
+                      {
+                        "optionKey": "b",
+                        "label": "B"
+                      },
+                      {
+                        "optionKey": "other",
+                        "label": "OTHER"
+                      },
+                      {
+                        "optionKey": "none",
+                        "label": "NONE"
+                      }
+                    ],
+                    "rows": [],
+                    "otherOptionKey": "other"
+                  },
+                  {
+                    "itemKey": "multiple",
+                    "type": "MULTIPLE",
+                    "prompt": "multiple",
+                    "required": false,
+                    "allowRefusal": true,
+                    "options": [
+                      {
+                        "optionKey": "a",
+                        "label": "A"
+                      },
+                      {
+                        "optionKey": "b",
+                        "label": "B"
+                      },
+                      {
+                        "optionKey": "other",
+                        "label": "OTHER"
+                      },
+                      {
+                        "optionKey": "none",
+                        "label": "NONE"
+                      }
+                    ],
+                    "rows": [],
+                    "otherOptionKey": "other",
+                    "exclusiveOptionKeys": [
+                      "none"
+                    ]
+                  },
+                  {
+                    "itemKey": "short",
+                    "type": "SHORT_TEXT",
+                    "prompt": "short",
+                    "required": false,
+                    "allowRefusal": true,
+                    "options": [],
+                    "rows": [],
+                    "maxLength": 20
+                  },
+                  {
+                    "itemKey": "long",
+                    "type": "LONG_TEXT",
+                    "prompt": "long",
+                    "required": false,
+                    "allowRefusal": true,
+                    "options": [],
+                    "rows": [],
+                    "maxLength": 40
+                  },
+                  {
+                    "itemKey": "number",
+                    "type": "NUMBER",
+                    "prompt": "number",
+                    "required": false,
+                    "allowRefusal": true,
+                    "options": [],
+                    "rows": [],
+                    "min": -2,
+                    "max": 10,
+                    "step": 0.5,
+                    "precision": 1
+                  },
+                  {
+                    "itemKey": "likert",
+                    "type": "LIKERT",
+                    "prompt": "likert",
+                    "required": false,
+                    "allowRefusal": true,
+                    "options": [
+                      {
+                        "optionKey": "a",
+                        "label": "A"
+                      },
+                      {
+                        "optionKey": "b",
+                        "label": "B"
+                      }
+                    ],
+                    "rows": []
+                  },
+                  {
+                    "itemKey": "matrix",
+                    "type": "MATRIX",
+                    "prompt": "matrix",
+                    "required": false,
+                    "allowRefusal": true,
+                    "options": [
+                      {
+                        "optionKey": "a",
+                        "label": "A"
+                      },
+                      {
+                        "optionKey": "b",
+                        "label": "B"
+                      }
+                    ],
+                    "rows": [
+                      {
+                        "rowKey": "first",
+                        "label": "First"
+                      },
+                      {
+                        "rowKey": "second",
+                        "label": "Second"
+                      }
+                    ]
+                  },
+                  {
+                    "itemKey": "date",
+                    "type": "DATE",
+                    "prompt": "date",
+                    "required": false,
+                    "allowRefusal": true,
+                    "options": [],
+                    "rows": []
+                  },
+                  {
+                    "itemKey": "time",
+                    "type": "TIME",
+                    "prompt": "time",
+                    "required": false,
+                    "allowRefusal": true,
+                    "options": [],
+                    "rows": [],
+                    "timeZone": "UTC"
+                  },
+                  {
+                    "itemKey": "rank",
+                    "type": "RANK_ORDER",
+                    "prompt": "rank",
+                    "required": false,
+                    "allowRefusal": true,
+                    "options": [
+                      {
+                        "optionKey": "a",
+                        "label": "A"
+                      },
+                      {
+                        "optionKey": "b",
+                        "label": "B"
+                      }
+                    ],
+                    "rows": []
+                  },
+                  {
+                    "itemKey": "slider",
+                    "type": "SLIDER",
+                    "prompt": "slider",
+                    "required": false,
+                    "allowRefusal": true,
+                    "options": [],
+                    "rows": [],
+                    "min": 0,
+                    "max": 10,
+                    "step": 0.5
+                  },
+                  {
+                    "itemKey": "sum",
+                    "type": "CONSTANT_SUM",
+                    "prompt": "sum",
+                    "required": false,
+                    "allowRefusal": true,
+                    "options": [
+                      {
+                        "optionKey": "a",
+                        "label": "A"
+                      },
+                      {
+                        "optionKey": "b",
+                        "label": "B"
+                      }
+                    ],
+                    "rows": [],
+                    "integerOnly": true,
+                    "total": 10
+                  },
+                  {
+                    "itemKey": "matrix_multi",
+                    "type": "MATRIX_MULTIPLE",
+                    "prompt": "matrix_multi",
+                    "required": false,
+                    "allowRefusal": true,
+                    "options": [
+                      {
+                        "optionKey": "a",
+                        "label": "A"
+                      },
+                      {
+                        "optionKey": "b",
+                        "label": "B"
+                      }
+                    ],
+                    "rows": [
+                      {
+                        "rowKey": "first",
+                        "label": "First"
+                      },
+                      {
+                        "rowKey": "second",
+                        "label": "Second"
+                      }
+                    ],
+                    "minSelections": 1,
+                    "maxSelections": 2
+                  },
+                  {
+                    "itemKey": "hidden",
+                    "type": "SHORT_TEXT",
+                    "prompt": "hidden",
+                    "required": false,
+                    "options": [],
+                    "rows": [],
+                    "displayIf": {
+                      "itemKey": "single",
+                      "operator": "EQUALS",
+                      "optionKey": "b"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "displayDefinition": {
+            "schemaVersion": 2,
+            "pages": [
+              {
+                "pageKey": "page",
+                "title": "Fixture",
+                "questions": [
+                  {
+                    "itemKey": "single",
+                    "type": "SINGLE",
+                    "prompt": "single",
+                    "required": false,
+                    "allowRefusal": true,
+                    "options": [
+                      {
+                        "optionKey": "a",
+                        "label": "A"
+                      },
+                      {
+                        "optionKey": "b",
+                        "label": "B"
+                      },
+                      {
+                        "optionKey": "other",
+                        "label": "OTHER"
+                      },
+                      {
+                        "optionKey": "none",
+                        "label": "NONE"
+                      }
+                    ],
+                    "rows": [],
+                    "otherOptionKey": "other"
+                  },
+                  {
+                    "itemKey": "multiple",
+                    "type": "MULTIPLE",
+                    "prompt": "multiple",
+                    "required": false,
+                    "allowRefusal": true,
+                    "options": [
+                      {
+                        "optionKey": "a",
+                        "label": "A"
+                      },
+                      {
+                        "optionKey": "b",
+                        "label": "B"
+                      },
+                      {
+                        "optionKey": "other",
+                        "label": "OTHER"
+                      },
+                      {
+                        "optionKey": "none",
+                        "label": "NONE"
+                      }
+                    ],
+                    "rows": [],
+                    "otherOptionKey": "other",
+                    "exclusiveOptionKeys": [
+                      "none"
+                    ]
+                  },
+                  {
+                    "itemKey": "short",
+                    "type": "SHORT_TEXT",
+                    "prompt": "short",
+                    "required": false,
+                    "allowRefusal": true,
+                    "options": [],
+                    "rows": [],
+                    "maxLength": 20
+                  },
+                  {
+                    "itemKey": "long",
+                    "type": "LONG_TEXT",
+                    "prompt": "long",
+                    "required": false,
+                    "allowRefusal": true,
+                    "options": [],
+                    "rows": [],
+                    "maxLength": 40
+                  },
+                  {
+                    "itemKey": "number",
+                    "type": "NUMBER",
+                    "prompt": "number",
+                    "required": false,
+                    "allowRefusal": true,
+                    "options": [],
+                    "rows": [],
+                    "min": -2,
+                    "max": 10,
+                    "step": 0.5,
+                    "precision": 1
+                  },
+                  {
+                    "itemKey": "likert",
+                    "type": "LIKERT",
+                    "prompt": "likert",
+                    "required": false,
+                    "allowRefusal": true,
+                    "options": [
+                      {
+                        "optionKey": "a",
+                        "label": "A"
+                      },
+                      {
+                        "optionKey": "b",
+                        "label": "B"
+                      }
+                    ],
+                    "rows": []
+                  },
+                  {
+                    "itemKey": "matrix",
+                    "type": "MATRIX",
+                    "prompt": "matrix",
+                    "required": false,
+                    "allowRefusal": true,
+                    "options": [
+                      {
+                        "optionKey": "a",
+                        "label": "A"
+                      },
+                      {
+                        "optionKey": "b",
+                        "label": "B"
+                      }
+                    ],
+                    "rows": [
+                      {
+                        "rowKey": "first",
+                        "label": "First"
+                      },
+                      {
+                        "rowKey": "second",
+                        "label": "Second"
+                      }
+                    ]
+                  },
+                  {
+                    "itemKey": "date",
+                    "type": "DATE",
+                    "prompt": "date",
+                    "required": false,
+                    "allowRefusal": true,
+                    "options": [],
+                    "rows": []
+                  },
+                  {
+                    "itemKey": "time",
+                    "type": "TIME",
+                    "prompt": "time",
+                    "required": false,
+                    "allowRefusal": true,
+                    "options": [],
+                    "rows": [],
+                    "timeZone": "UTC"
+                  },
+                  {
+                    "itemKey": "rank",
+                    "type": "RANK_ORDER",
+                    "prompt": "rank",
+                    "required": false,
+                    "allowRefusal": true,
+                    "options": [
+                      {
+                        "optionKey": "a",
+                        "label": "A"
+                      },
+                      {
+                        "optionKey": "b",
+                        "label": "B"
+                      }
+                    ],
+                    "rows": []
+                  },
+                  {
+                    "itemKey": "slider",
+                    "type": "SLIDER",
+                    "prompt": "slider",
+                    "required": false,
+                    "allowRefusal": true,
+                    "options": [],
+                    "rows": [],
+                    "min": 0,
+                    "max": 10,
+                    "step": 0.5
+                  },
+                  {
+                    "itemKey": "sum",
+                    "type": "CONSTANT_SUM",
+                    "prompt": "sum",
+                    "required": false,
+                    "allowRefusal": true,
+                    "options": [
+                      {
+                        "optionKey": "a",
+                        "label": "A"
+                      },
+                      {
+                        "optionKey": "b",
+                        "label": "B"
+                      }
+                    ],
+                    "rows": [],
+                    "integerOnly": true,
+                    "total": 10
+                  },
+                  {
+                    "itemKey": "matrix_multi",
+                    "type": "MATRIX_MULTIPLE",
+                    "prompt": "matrix_multi",
+                    "required": false,
+                    "allowRefusal": true,
+                    "options": [
+                      {
+                        "optionKey": "a",
+                        "label": "A"
+                      },
+                      {
+                        "optionKey": "b",
+                        "label": "B"
+                      }
+                    ],
+                    "rows": [
+                      {
+                        "rowKey": "first",
+                        "label": "First"
+                      },
+                      {
+                        "rowKey": "second",
+                        "label": "Second"
+                      }
+                    ],
+                    "minSelections": 1,
+                    "maxSelections": 2
+                  },
+                  {
+                    "itemKey": "hidden",
+                    "type": "SHORT_TEXT",
+                    "prompt": "hidden",
+                    "required": false,
+                    "options": [],
+                    "rows": [],
+                    "displayIf": {
+                      "itemKey": "single",
+                      "operator": "EQUALS",
+                      "optionKey": "b"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "result": {
+          "schemaVersion": 1,
+          "definitionDigest": "cacf2b33f10ae253620d121457f4329298a151070ea313b735e03b4816ff6870",
+          "units": [
+            {
+              "instrumentKey": "form",
+              "kind": "FORM",
+              "sourceDigest": "74bb78fb5ec5f8474444c436cd61db579f780f79632ae86165191734b5ef3fc6",
+              "scoringDigest": null,
+              "rawAnswers": {
+                "single": "a",
+                "multiple": [
+                  "a",
+                  "b"
+                ],
+                "short": "REFUSED",
+                "long": "descriptive text",
+                "number": 0,
+                "likert": "b",
+                "matrix": {
+                  "first": "a"
+                },
+                "date": "2024-02-29",
+                "time": "09:30",
+                "rank": [
+                  "b",
+                  "a"
+                ],
+                "slider": 0,
+                "sum": {
+                  "a": 0,
+                  "b": 10
+                },
+                "matrix_multi": {
+                  "first": [
+                    "b",
+                    "a"
+                  ],
+                  "second": []
+                }
+              },
+              "missing": [
+                {
+                  "itemKey": "single:other",
+                  "reason": "NOT_SHOWN"
+                },
+                {
+                  "itemKey": "multiple:other",
+                  "reason": "NOT_SHOWN"
+                },
+                {
+                  "itemKey": "matrix:second",
+                  "reason": "REFUSED"
+                },
+                {
+                  "itemKey": "hidden",
+                  "reason": "NOT_SHOWN"
+                }
+              ],
+              "privateScoring": null
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "optional-all-missing",
+      "output": {
+        "rawAnswers": {
+          "matrix": {},
+          "matrix_multi": {}
+        },
+        "missing": [
+          {
+            "itemKey": "single",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "single:other",
+            "reason": "NOT_SHOWN"
+          },
+          {
+            "itemKey": "multiple",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "multiple:other",
+            "reason": "NOT_SHOWN"
+          },
+          {
+            "itemKey": "short",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "long",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "number",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "likert",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "matrix:first",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "matrix:second",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "date",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "time",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "rank",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "slider",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "sum",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "matrix_multi:first",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "matrix_multi:second",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "hidden",
+            "reason": "NOT_SHOWN"
+          }
+        ]
+      }
+    },
+    {
+      "name": "optional-empty-multiselect",
+      "output": {
+        "rawAnswers": {
+          "multiple": [],
+          "matrix": {},
+          "matrix_multi": {}
+        },
+        "missing": [
+          {
+            "itemKey": "single",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "single:other",
+            "reason": "NOT_SHOWN"
+          },
+          {
+            "itemKey": "multiple:other",
+            "reason": "NOT_SHOWN"
+          },
+          {
+            "itemKey": "short",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "long",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "number",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "likert",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "matrix:first",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "matrix:second",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "date",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "time",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "rank",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "slider",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "sum",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "matrix_multi:first",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "matrix_multi:second",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "hidden",
+            "reason": "NOT_SHOWN"
+          }
+        ]
+      }
+    },
+    {
+      "name": "answer-number-None",
+      "output": {
+        "rawAnswers": {
+          "single": "a",
+          "multiple": [
+            "a",
+            "b"
+          ],
+          "short": "REFUSED",
+          "long": "descriptive text",
+          "likert": "b",
+          "matrix": {
+            "first": "a"
+          },
+          "date": "2024-02-29",
+          "time": "09:30",
+          "rank": [
+            "b",
+            "a"
+          ],
+          "slider": 0,
+          "sum": {
+            "a": 0,
+            "b": 10
+          },
+          "matrix_multi": {
+            "first": [
+              "b",
+              "a"
+            ],
+            "second": []
+          }
+        },
+        "missing": [
+          {
+            "itemKey": "single:other",
+            "reason": "NOT_SHOWN"
+          },
+          {
+            "itemKey": "multiple:other",
+            "reason": "NOT_SHOWN"
+          },
+          {
+            "itemKey": "number",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "matrix:second",
+            "reason": "REFUSED"
+          },
+          {
+            "itemKey": "hidden",
+            "reason": "NOT_SHOWN"
+          }
+        ]
+      }
+    },
+    {
+      "name": "answer-number-",
+      "output": {
+        "rawAnswers": {
+          "single": "a",
+          "multiple": [
+            "a",
+            "b"
+          ],
+          "short": "REFUSED",
+          "long": "descriptive text",
+          "likert": "b",
+          "matrix": {
+            "first": "a"
+          },
+          "date": "2024-02-29",
+          "time": "09:30",
+          "rank": [
+            "b",
+            "a"
+          ],
+          "slider": 0,
+          "sum": {
+            "a": 0,
+            "b": 10
+          },
+          "matrix_multi": {
+            "first": [
+              "b",
+              "a"
+            ],
+            "second": []
+          }
+        },
+        "missing": [
+          {
+            "itemKey": "single:other",
+            "reason": "NOT_SHOWN"
+          },
+          {
+            "itemKey": "multiple:other",
+            "reason": "NOT_SHOWN"
+          },
+          {
+            "itemKey": "number",
+            "reason": "SHOWN_MISSING"
+          },
+          {
+            "itemKey": "matrix:second",
+            "reason": "REFUSED"
+          },
+          {
+            "itemKey": "hidden",
+            "reason": "NOT_SHOWN"
+          }
+        ]
+      }
+    },
+    {
+      "name": "answer-single-{'_surveyRefusal': True}",
+      "output": {
+        "rawAnswers": {
+          "multiple": [
+            "a",
+            "b"
+          ],
+          "short": "REFUSED",
+          "long": "descriptive text",
+          "number": 0,
+          "likert": "b",
+          "matrix": {
+            "first": "a"
+          },
+          "date": "2024-02-29",
+          "time": "09:30",
+          "rank": [
+            "b",
+            "a"
+          ],
+          "slider": 0,
+          "sum": {
+            "a": 0,
+            "b": 10
+          },
+          "matrix_multi": {
+            "first": [
+              "b",
+              "a"
+            ],
+            "second": []
+          }
+        },
+        "missing": [
+          {
+            "itemKey": "single:other",
+            "reason": "NOT_SHOWN"
+          },
+          {
+            "itemKey": "single",
+            "reason": "REFUSED"
+          },
+          {
+            "itemKey": "multiple:other",
+            "reason": "NOT_SHOWN"
+          },
+          {
+            "itemKey": "matrix:second",
+            "reason": "REFUSED"
+          },
+          {
+            "itemKey": "hidden",
+            "reason": "NOT_SHOWN"
+          }
+        ]
+      }
+    },
+    {
+      "name": "answer-long-{'_surveyRefusal': True}",
+      "output": {
+        "rawAnswers": {
+          "single": "a",
+          "multiple": [
+            "a",
+            "b"
+          ],
+          "short": "REFUSED",
+          "number": 0,
+          "likert": "b",
+          "matrix": {
+            "first": "a"
+          },
+          "date": "2024-02-29",
+          "time": "09:30",
+          "rank": [
+            "b",
+            "a"
+          ],
+          "slider": 0,
+          "sum": {
+            "a": 0,
+            "b": 10
+          },
+          "matrix_multi": {
+            "first": [
+              "b",
+              "a"
+            ],
+            "second": []
+          }
+        },
+        "missing": [
+          {
+            "itemKey": "single:other",
+            "reason": "NOT_SHOWN"
+          },
+          {
+            "itemKey": "multiple:other",
+            "reason": "NOT_SHOWN"
+          },
+          {
+            "itemKey": "long",
+            "reason": "REFUSED"
+          },
+          {
+            "itemKey": "matrix:second",
+            "reason": "REFUSED"
+          },
+          {
+            "itemKey": "hidden",
+            "reason": "NOT_SHOWN"
+          }
+        ]
+      }
+    },
+    {
+      "name": "answer-single-other",
+      "output": {
+        "error": {
+          "name": "Error",
+          "message": "请选择其他选项后填写非空文本，并遵守字数限制",
+          "path": "answers.single:other"
+        }
+      }
+    },
+    {
+      "name": "answer-multiple-['none', 'a']",
+      "output": {
+        "error": {
+          "name": "Error",
+          "message": "互斥选项不能与其他选项同时选择",
+          "path": "answers.multiple"
+        }
+      }
+    },
+    {
+      "name": "answer-date-2023-02-29",
+      "output": {
+        "error": {
+          "name": "Error",
+          "message": "日期必须是有效的 YYYY-MM-DD",
+          "path": "answers.date"
+        }
+      }
+    },
+    {
+      "name": "answer-date-0000-01-01",
+      "output": {
+        "error": {
+          "name": "Error",
+          "message": "日期必须是有效的 YYYY-MM-DD",
+          "path": "answers.date"
+        }
+      }
+    },
+    {
+      "name": "answer-time-24:00",
+      "output": {
+        "error": {
+          "name": "Error",
+          "message": "时间必须是 24 小时 HH:mm 格式",
+          "path": "answers.time"
+        }
+      }
+    },
+    {
+      "name": "answer-rank-['a', 'a']",
+      "output": {
+        "error": {
+          "name": "Error",
+          "message": "排序必须包含每个选项且不可重复",
+          "path": "answers.rank"
+        }
+      }
+    },
+    {
+      "name": "answer-number-0.1",
+      "output": {
+        "error": {
+          "name": "Error",
+          "message": "数值必须以 0.5 为步长",
+          "path": "answers.number"
+        }
+      }
+    },
+    {
+      "name": "answer-slider-0.1",
+      "output": {
+        "error": {
+          "name": "Error",
+          "message": "数值必须以 0.5 为步长",
+          "path": "answers.slider"
+        }
+      }
+    },
+    {
+      "name": "answer-sum-{'a': 0, 'b': 9}",
+      "output": {
+        "error": {
+          "name": "Error",
+          "message": "各选项之和必须等于规定总值",
+          "path": "answers.sum"
+        }
+      }
+    },
+    {
+      "name": "answer-matrix-{}",
+      "output": {
+        "error": {
+          "name": "Error",
+          "message": "矩阵题请按独立行提交，不能提交未经验证的汇总字段",
+          "path": "answers.matrix"
+        }
+      }
+    },
+    {
+      "name": "answer-matrix_multi:first-['a', 'a']",
+      "output": {
+        "error": {
+          "name": "Error",
+          "message": "矩阵多选行包含无效或重复选项",
+          "path": "answers.matrix_multi.first"
+        }
+      }
+    },
+    {
+      "name": "answer-hidden-injected",
+      "output": {
+        "error": {
+          "name": "Error",
+          "message": "隐藏的题目不能提交回答",
+          "path": "answers.hidden"
+        }
+      }
+    },
+    {
+      "name": "answer-extra-injected",
+      "output": {
+        "error": {
+          "name": "Error",
+          "message": "提交包含不存在的或未授权题目",
+          "path": "answers.extra"
+        }
+      }
+    },
+    {
+      "name": "selected-other",
+      "output": {
+        "rawAnswers": {
+          "single": "other",
+          "single:other": "private",
+          "multiple": [
+            "other"
+          ],
+          "multiple:other": "text",
+          "short": "REFUSED",
+          "long": "descriptive text",
+          "number": 0,
+          "likert": "b",
+          "matrix": {
+            "first": "a"
+          },
+          "date": "2024-02-29",
+          "time": "09:30",
+          "rank": [
+            "b",
+            "a"
+          ],
+          "slider": 0,
+          "sum": {
+            "a": 0,
+            "b": 10
+          },
+          "matrix_multi": {
+            "first": [
+              "b",
+              "a"
+            ],
+            "second": []
+          }
+        },
+        "missing": [
+          {
+            "itemKey": "matrix:second",
+            "reason": "REFUSED"
+          },
+          {
+            "itemKey": "hidden",
+            "reason": "NOT_SHOWN"
+          }
+        ]
+      }
+    },
+    {
+      "name": "other-without-selection",
+      "output": {
+        "error": {
+          "name": "Error",
+          "message": "未选择其他选项时不能提交其他填写内容",
+          "path": "answers.single:other"
+        }
+      }
+    },
+    {
+      "name": "refusal-with-other",
+      "output": {
+        "error": {
+          "name": "Error",
+          "message": "明确拒答时不能同时提交其他填写内容",
+          "path": "answers.single.other"
+        }
+      }
+    },
+    {
+      "name": "invalid-schemaVersion-3",
+      "output": {
+        "issues": [
+          {
+            "path": "schemaVersion",
+            "message": "Invalid input",
+            "severity": "error"
+          }
+        ]
+      }
+    },
+    {
+      "name": "invalid-schemaVersion-1",
+      "output": {
+        "definition": {
+          "schemaVersion": 1,
+          "pages": [
+            {
+              "pageKey": "page",
+              "title": "Fixture",
+              "questions": [
+                {
+                  "itemKey": "single",
+                  "type": "SINGLE",
+                  "prompt": "single",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [
+                    {
+                      "optionKey": "a",
+                      "label": "A"
+                    },
+                    {
+                      "optionKey": "b",
+                      "label": "B"
+                    },
+                    {
+                      "optionKey": "other",
+                      "label": "OTHER"
+                    },
+                    {
+                      "optionKey": "none",
+                      "label": "NONE"
+                    }
+                  ],
+                  "rows": [],
+                  "otherOptionKey": "other"
+                },
+                {
+                  "itemKey": "multiple",
+                  "type": "MULTIPLE",
+                  "prompt": "multiple",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [
+                    {
+                      "optionKey": "a",
+                      "label": "A"
+                    },
+                    {
+                      "optionKey": "b",
+                      "label": "B"
+                    },
+                    {
+                      "optionKey": "other",
+                      "label": "OTHER"
+                    },
+                    {
+                      "optionKey": "none",
+                      "label": "NONE"
+                    }
+                  ],
+                  "rows": [],
+                  "otherOptionKey": "other",
+                  "exclusiveOptionKeys": [
+                    "none"
+                  ]
+                },
+                {
+                  "itemKey": "short",
+                  "type": "SHORT_TEXT",
+                  "prompt": "short",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [],
+                  "rows": [],
+                  "maxLength": 20
+                },
+                {
+                  "itemKey": "long",
+                  "type": "LONG_TEXT",
+                  "prompt": "long",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [],
+                  "rows": [],
+                  "maxLength": 40
+                },
+                {
+                  "itemKey": "number",
+                  "type": "NUMBER",
+                  "prompt": "number",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [],
+                  "rows": [],
+                  "min": -2,
+                  "max": 10,
+                  "step": 0.5,
+                  "precision": 1
+                },
+                {
+                  "itemKey": "likert",
+                  "type": "LIKERT",
+                  "prompt": "likert",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [
+                    {
+                      "optionKey": "a",
+                      "label": "A"
+                    },
+                    {
+                      "optionKey": "b",
+                      "label": "B"
+                    }
+                  ],
+                  "rows": []
+                },
+                {
+                  "itemKey": "matrix",
+                  "type": "MATRIX",
+                  "prompt": "matrix",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [
+                    {
+                      "optionKey": "a",
+                      "label": "A"
+                    },
+                    {
+                      "optionKey": "b",
+                      "label": "B"
+                    }
+                  ],
+                  "rows": [
+                    {
+                      "rowKey": "first",
+                      "label": "First"
+                    },
+                    {
+                      "rowKey": "second",
+                      "label": "Second"
+                    }
+                  ]
+                },
+                {
+                  "itemKey": "date",
+                  "type": "DATE",
+                  "prompt": "date",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [],
+                  "rows": []
+                },
+                {
+                  "itemKey": "time",
+                  "type": "TIME",
+                  "prompt": "time",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [],
+                  "rows": [],
+                  "timeZone": "UTC"
+                },
+                {
+                  "itemKey": "rank",
+                  "type": "RANK_ORDER",
+                  "prompt": "rank",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [
+                    {
+                      "optionKey": "a",
+                      "label": "A"
+                    },
+                    {
+                      "optionKey": "b",
+                      "label": "B"
+                    }
+                  ],
+                  "rows": []
+                },
+                {
+                  "itemKey": "slider",
+                  "type": "SLIDER",
+                  "prompt": "slider",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [],
+                  "rows": [],
+                  "min": 0,
+                  "max": 10,
+                  "step": 0.5
+                },
+                {
+                  "itemKey": "sum",
+                  "type": "CONSTANT_SUM",
+                  "prompt": "sum",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [
+                    {
+                      "optionKey": "a",
+                      "label": "A"
+                    },
+                    {
+                      "optionKey": "b",
+                      "label": "B"
+                    }
+                  ],
+                  "rows": [],
+                  "integerOnly": true,
+                  "total": 10
+                },
+                {
+                  "itemKey": "matrix_multi",
+                  "type": "MATRIX_MULTIPLE",
+                  "prompt": "matrix_multi",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [
+                    {
+                      "optionKey": "a",
+                      "label": "A"
+                    },
+                    {
+                      "optionKey": "b",
+                      "label": "B"
+                    }
+                  ],
+                  "rows": [
+                    {
+                      "rowKey": "first",
+                      "label": "First"
+                    },
+                    {
+                      "rowKey": "second",
+                      "label": "Second"
+                    }
+                  ],
+                  "minSelections": 1,
+                  "maxSelections": 2
+                },
+                {
+                  "itemKey": "hidden",
+                  "type": "SHORT_TEXT",
+                  "prompt": "hidden",
+                  "required": false,
+                  "options": [],
+                  "rows": [],
+                  "displayIf": {
+                    "itemKey": "single",
+                    "operator": "EQUALS",
+                    "optionKey": "b"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "issues": [
+          {
+            "path": "pages.0.questions.0.schemaVersion",
+            "message": "新的选项与文本校验规则只允许在 Form V2 中配置",
+            "severity": "error"
+          },
+          {
+            "path": "pages.0.questions.0.otherOptionKey",
+            "message": "其他文本只允许 Form V2 的单选或多选题",
+            "severity": "error"
+          },
+          {
+            "path": "pages.0.questions.1.schemaVersion",
+            "message": "新的选项与文本校验规则只允许在 Form V2 中配置",
+            "severity": "error"
+          },
+          {
+            "path": "pages.0.questions.1.otherOptionKey",
+            "message": "其他文本只允许 Form V2 的单选或多选题",
+            "severity": "error"
+          },
+          {
+            "path": "pages.0.questions.1.exclusiveOptionKeys",
+            "message": "互斥选项只允许 Form V2 多选题",
+            "severity": "error"
+          },
+          {
+            "path": "pages.0.questions.7.type",
+            "message": "专业题型必须先升级到 Form V2，旧版 V1 不得改变答案语义",
+            "severity": "error"
+          },
+          {
+            "path": "pages.0.questions.8.type",
+            "message": "专业题型必须先升级到 Form V2，旧版 V1 不得改变答案语义",
+            "severity": "error"
+          },
+          {
+            "path": "pages.0.questions.9.type",
+            "message": "专业题型必须先升级到 Form V2，旧版 V1 不得改变答案语义",
+            "severity": "error"
+          },
+          {
+            "path": "pages.0.questions.10.type",
+            "message": "专业题型必须先升级到 Form V2，旧版 V1 不得改变答案语义",
+            "severity": "error"
+          },
+          {
+            "path": "pages.0.questions.11.type",
+            "message": "专业题型必须先升级到 Form V2，旧版 V1 不得改变答案语义",
+            "severity": "error"
+          },
+          {
+            "path": "pages.0.questions.12.type",
+            "message": "专业题型必须先升级到 Form V2，旧版 V1 不得改变答案语义",
+            "severity": "error"
+          },
+          {
+            "path": "pages.0.questions.12.schemaVersion",
+            "message": "新的选项与文本校验规则只允许在 Form V2 中配置",
+            "severity": "error"
+          }
+        ],
+        "digest": "b7647a2bb2cc153b881b7e9f404f6a752efb6aa735e457e64aa01d9543345db0"
+      }
+    },
+    {
+      "name": "schema-type",
+      "output": {
+        "issues": [
+          {
+            "path": "pages.0.questions.0.type",
+            "message": "Invalid enum value. Expected 'SINGLE' | 'MULTIPLE' | 'SHORT_TEXT' | 'LONG_TEXT' | 'NUMBER' | 'LIKERT' | 'MATRIX' | 'DATE' | 'TIME' | 'RANK_ORDER' | 'SLIDER' | 'CONSTANT_SUM' | 'MATRIX_MULTIPLE', received 'BAD'",
+            "severity": "error"
+          }
+        ]
+      }
+    },
+    {
+      "name": "schema-itemKey",
+      "output": {
+        "issues": [
+          {
+            "path": "pages.0.questions.0.itemKey",
+            "message": "Invalid",
+            "severity": "error"
+          }
+        ]
+      }
+    },
+    {
+      "name": "schema-required",
+      "output": {
+        "issues": [
+          {
+            "path": "pages.0.questions.0.required",
+            "message": "Expected boolean, received null",
+            "severity": "error"
+          }
+        ]
+      }
+    },
+    {
+      "name": "schema-minSelections",
+      "output": {
+        "issues": [
+          {
+            "path": "pages.0.questions.0.minSelections",
+            "message": "Number must be greater than or equal to 1",
+            "severity": "error"
+          }
+        ]
+      }
+    },
+    {
+      "name": "schema-unknown",
+      "output": {
+        "issues": [
+          {
+            "path": "pages.0.questions.0",
+            "message": "Unrecognized key(s) in object: 'unknown'",
+            "severity": "error"
+          }
+        ]
+      }
+    },
+    {
+      "name": "issue-order",
+      "output": {
+        "definition": {
+          "schemaVersion": 2,
+          "pages": [
+            {
+              "pageKey": "page",
+              "title": "",
+              "questions": [
+                {
+                  "itemKey": "single",
+                  "type": "SINGLE",
+                  "prompt": "single",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [
+                    {
+                      "optionKey": "a",
+                      "label": "A"
+                    },
+                    {
+                      "optionKey": "b",
+                      "label": "B"
+                    },
+                    {
+                      "optionKey": "other",
+                      "label": "OTHER"
+                    },
+                    {
+                      "optionKey": "none",
+                      "label": "NONE"
+                    }
+                  ],
+                  "rows": [],
+                  "otherOptionKey": "other"
+                },
+                {
+                  "itemKey": "single",
+                  "type": "MULTIPLE",
+                  "prompt": "multiple",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [
+                    {
+                      "optionKey": "a",
+                      "label": "A"
+                    },
+                    {
+                      "optionKey": "b",
+                      "label": "B"
+                    },
+                    {
+                      "optionKey": "other",
+                      "label": "OTHER"
+                    },
+                    {
+                      "optionKey": "none",
+                      "label": "NONE"
+                    }
+                  ],
+                  "rows": [],
+                  "otherOptionKey": "other",
+                  "exclusiveOptionKeys": [
+                    "none"
+                  ]
+                },
+                {
+                  "itemKey": "short",
+                  "type": "SHORT_TEXT",
+                  "prompt": "",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [],
+                  "rows": [],
+                  "maxLength": 20
+                },
+                {
+                  "itemKey": "long",
+                  "type": "LONG_TEXT",
+                  "prompt": "long",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [],
+                  "rows": [],
+                  "maxLength": 40
+                },
+                {
+                  "itemKey": "number",
+                  "type": "NUMBER",
+                  "prompt": "number",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [],
+                  "rows": [],
+                  "min": -2,
+                  "max": 10,
+                  "step": 0.5,
+                  "precision": 1
+                },
+                {
+                  "itemKey": "likert",
+                  "type": "LIKERT",
+                  "prompt": "likert",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [
+                    {
+                      "optionKey": "a",
+                      "label": "A"
+                    },
+                    {
+                      "optionKey": "b",
+                      "label": "B"
+                    }
+                  ],
+                  "rows": []
+                },
+                {
+                  "itemKey": "matrix",
+                  "type": "MATRIX",
+                  "prompt": "matrix",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [
+                    {
+                      "optionKey": "a",
+                      "label": "A"
+                    },
+                    {
+                      "optionKey": "b",
+                      "label": "B"
+                    }
+                  ],
+                  "rows": [
+                    {
+                      "rowKey": "first",
+                      "label": "First"
+                    },
+                    {
+                      "rowKey": "second",
+                      "label": "Second"
+                    }
+                  ]
+                },
+                {
+                  "itemKey": "date",
+                  "type": "DATE",
+                  "prompt": "date",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [],
+                  "rows": []
+                },
+                {
+                  "itemKey": "time",
+                  "type": "TIME",
+                  "prompt": "time",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [],
+                  "rows": [],
+                  "timeZone": "UTC"
+                },
+                {
+                  "itemKey": "rank",
+                  "type": "RANK_ORDER",
+                  "prompt": "rank",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [
+                    {
+                      "optionKey": "a",
+                      "label": "A"
+                    },
+                    {
+                      "optionKey": "b",
+                      "label": "B"
+                    }
+                  ],
+                  "rows": []
+                },
+                {
+                  "itemKey": "slider",
+                  "type": "SLIDER",
+                  "prompt": "slider",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [],
+                  "rows": [],
+                  "min": 0,
+                  "max": 10,
+                  "step": 0.5
+                },
+                {
+                  "itemKey": "sum",
+                  "type": "CONSTANT_SUM",
+                  "prompt": "sum",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [
+                    {
+                      "optionKey": "a",
+                      "label": "A"
+                    },
+                    {
+                      "optionKey": "b",
+                      "label": "B"
+                    }
+                  ],
+                  "rows": [],
+                  "integerOnly": true,
+                  "total": 10
+                },
+                {
+                  "itemKey": "matrix_multi",
+                  "type": "MATRIX_MULTIPLE",
+                  "prompt": "matrix_multi",
+                  "required": false,
+                  "allowRefusal": true,
+                  "options": [
+                    {
+                      "optionKey": "a",
+                      "label": "A"
+                    },
+                    {
+                      "optionKey": "b",
+                      "label": "B"
+                    }
+                  ],
+                  "rows": [
+                    {
+                      "rowKey": "first",
+                      "label": "First"
+                    },
+                    {
+                      "rowKey": "second",
+                      "label": "Second"
+                    }
+                  ],
+                  "minSelections": 1,
+                  "maxSelections": 2
+                },
+                {
+                  "itemKey": "hidden",
+                  "type": "SHORT_TEXT",
+                  "prompt": "hidden",
+                  "required": false,
+                  "options": [],
+                  "rows": [],
+                  "displayIf": {
+                    "itemKey": "single",
+                    "operator": "EQUALS",
+                    "optionKey": "b"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "issues": [
+          {
+            "path": "items.1",
+            "message": "标识重复，请使用新的稳定编码",
+            "severity": "error"
+          },
+          {
+            "path": "pages.0.title",
+            "message": "请填写内容",
+            "severity": "error"
+          },
+          {
+            "path": "pages.0.questions.2.prompt",
+            "message": "请填写内容",
+            "severity": "error"
+          },
+          {
+            "path": "pages.0.questions.13.displayIf.operator",
+            "message": "多选条件必须使用 INCLUDES，单选/Likert 条件必须使用 EQUALS",
+            "severity": "error"
+          }
+        ],
+        "digest": "4296b37681e5dad768a8cd52bcf5b343c430fe00a691ddd6d3c93c07a6be3525"
+      }
+    },
+    {
+      "name": "required-empty",
+      "output": {
+        "error": {
+          "name": "Error",
+          "message": "必答题目未完成",
+          "path": "answers.single"
+        }
+      }
+    },
+    {
+      "name": "refusal-disallowed",
+      "output": {
+        "error": {
+          "name": "Error",
+          "message": "此题未声明允许明确拒答",
+          "path": "answers.single"
+        }
+      }
+    },
+    {
+      "name": "v1-operator-authoring",
+      "output": {
+        "definition": {
+          "schemaVersion": 1,
+          "pages": [
+            {
+              "pageKey": "legacy",
+              "title": "Legacy",
+              "questions": [
+                {
+                  "itemKey": "source",
+                  "type": "SINGLE",
+                  "prompt": "source",
+                  "required": false,
+                  "options": [
+                    {
+                      "optionKey": "a",
+                      "label": "A"
+                    },
+                    {
+                      "optionKey": "b",
+                      "label": "B"
+                    }
+                  ],
+                  "rows": []
+                },
+                {
+                  "itemKey": "follow",
+                  "type": "SHORT_TEXT",
+                  "prompt": "follow",
+                  "required": false,
+                  "options": [],
+                  "rows": [],
+                  "displayIf": {
+                    "itemKey": "source",
+                    "operator": "INCLUDES",
+                    "optionKey": "a"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "issues": [
+          {
+            "path": "pages.0.questions.1.displayIf.operator",
+            "message": "多选条件必须使用 INCLUDES，单选/Likert 条件必须使用 EQUALS",
+            "severity": "error"
+          }
+        ],
+        "digest": "89f50c1532c4c8522201d4c228edf966162eae9ed1ff2e54262697b0b35f248a"
+      }
+    },
+    {
+      "name": "v1-frozen-operator",
+      "output": {
+        "rawAnswers": {
+          "source": "a"
+        },
+        "missing": [
+          {
+            "itemKey": "follow",
+            "reason": "NOT_SHOWN"
+          }
+        ]
+      }
+    },
+    {
+      "name": "v1-valid-digest",
+      "output": {
+        "definition": {
+          "schemaVersion": 1,
+          "pages": [
+            {
+              "pageKey": "legacy",
+              "title": "Legacy",
+              "questions": [
+                {
+                  "itemKey": "source",
+                  "type": "SINGLE",
+                  "prompt": "source",
+                  "required": false,
+                  "options": [
+                    {
+                      "optionKey": "a",
+                      "label": "A"
+                    },
+                    {
+                      "optionKey": "b",
+                      "label": "B"
+                    }
+                  ],
+                  "rows": []
+                },
+                {
+                  "itemKey": "follow",
+                  "type": "SHORT_TEXT",
+                  "prompt": "follow",
+                  "required": false,
+                  "options": [],
+                  "rows": [],
+                  "displayIf": {
+                    "itemKey": "source",
+                    "operator": "EQUALS",
+                    "optionKey": "a"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "issues": [],
+        "digest": "ccc18462cd1d617b4016a4dee81999453c6e441c1ac938fe29f570b67f922967"
+      }
+    },
+    {
+      "name": "v1-final",
+      "output": {
+        "unit": {
+          "draftId": "draft",
+          "instrumentKey": "form",
+          "kind": "FORM",
+          "title": "Fixture",
+          "draftRevision": 1,
+          "sourceDigest": "ccc18462cd1d617b4016a4dee81999453c6e441c1ac938fe29f570b67f922967",
+          "scoringDigest": null,
+          "compiledDefinition": {
+            "schemaVersion": 1,
+            "pages": [
+              {
+                "pageKey": "legacy",
+                "title": "Legacy",
+                "questions": [
+                  {
+                    "itemKey": "source",
+                    "type": "SINGLE",
+                    "prompt": "source",
+                    "required": false,
+                    "options": [
+                      {
+                        "optionKey": "a",
+                        "label": "A"
+                      },
+                      {
+                        "optionKey": "b",
+                        "label": "B"
+                      }
+                    ],
+                    "rows": []
+                  },
+                  {
+                    "itemKey": "follow",
+                    "type": "SHORT_TEXT",
+                    "prompt": "follow",
+                    "required": false,
+                    "options": [],
+                    "rows": [],
+                    "displayIf": {
+                      "itemKey": "source",
+                      "operator": "EQUALS",
+                      "optionKey": "a"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "displayDefinition": {
+            "schemaVersion": 1,
+            "pages": [
+              {
+                "pageKey": "legacy",
+                "title": "Legacy",
+                "questions": [
+                  {
+                    "itemKey": "source",
+                    "type": "SINGLE",
+                    "prompt": "source",
+                    "required": false,
+                    "options": [
+                      {
+                        "optionKey": "a",
+                        "label": "A"
+                      },
+                      {
+                        "optionKey": "b",
+                        "label": "B"
+                      }
+                    ],
+                    "rows": []
+                  },
+                  {
+                    "itemKey": "follow",
+                    "type": "SHORT_TEXT",
+                    "prompt": "follow",
+                    "required": false,
+                    "options": [],
+                    "rows": [],
+                    "displayIf": {
+                      "itemKey": "source",
+                      "operator": "EQUALS",
+                      "optionKey": "a"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "result": {
+          "schemaVersion": 1,
+          "definitionDigest": "5228f3ee6c8ca54d889285842fa074fcbaa129d24c37b13cf12e9dc0eef0e67d",
+          "units": [
+            {
+              "instrumentKey": "form",
+              "kind": "FORM",
+              "sourceDigest": "ccc18462cd1d617b4016a4dee81999453c6e441c1ac938fe29f570b67f922967",
+              "scoringDigest": null,
+              "rawAnswers": {
+                "source": "a",
+                "follow": "old"
+              },
+              "missing": [],
+              "privateScoring": null
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "empty-v1",
+      "output": {
+        "definition": {
+          "schemaVersion": 1,
+          "pages": [
+            {
+              "pageKey": "page",
+              "title": "Fixture",
+              "questions": []
+            }
+          ]
+        },
+        "issues": [
+          {
+            "path": "pages",
+            "message": "至少添加一道题目",
+            "severity": "error"
+          }
+        ],
+        "digest": "751760a16ff908421f4d8f3051279fb257df33bd1f2e29df8905bda114a5e122"
+      }
+    },
+    {
+      "name": "empty-v2",
+      "output": {
+        "definition": {
+          "schemaVersion": 2,
+          "pages": [
+            {
+              "pageKey": "page",
+              "title": "Fixture",
+              "questions": []
+            }
+          ]
+        },
+        "issues": [
+          {
+            "path": "pages",
+            "message": "至少添加一道题目",
+            "severity": "error"
+          }
+        ],
+        "digest": "aada25eeb8c33f45caf76e30d56cc766d0b51a6fc2920ff48d0ec58a943ef494"
+      }
+    },
+    {
+      "name": "import-text",
+      "output": {
+        "preview": {
+          "ok": true,
+          "issues": [],
+          "digest": "40b34db6945b2998ddebc0ceca89e2786bf1d36fcd066c94a84819e1c7027ee1",
+          "items": [
+            {
+              "type": "SINGLE",
+              "prompt": "Question one",
+              "required": true,
+              "options": [
+                "Yes",
+                "No"
+              ],
+              "rows": [],
+              "reverse": false,
+              "sourceLine": 1
+            },
+            {
+              "type": "SHORT_TEXT",
+              "prompt": "Question two",
+              "required": true,
+              "options": [],
+              "rows": [],
+              "reverse": false,
+              "sourceLine": 5
+            }
+          ],
+          "count": 2
+        },
+        "applied": {
+          "schemaVersion": 2,
+          "pages": [
+            {
+              "pageKey": "rde2950546c0d6cf30c9a6b74",
+              "title": "问卷页面",
+              "questions": [
+                {
+                  "itemKey": "r68824bcd914188a091d40c65",
+                  "type": "SINGLE",
+                  "prompt": "Question one",
+                  "required": true,
+                  "options": [
+                    {
+                      "optionKey": "r711a4a27e51fb8ced9e1d76d",
+                      "label": "Yes"
+                    },
+                    {
+                      "optionKey": "ra241d0dab72f927d64e78d42",
+                      "label": "No"
+                    }
+                  ],
+                  "rows": []
+                },
+                {
+                  "itemKey": "r177f8e6af15769f93cc09299",
+                  "type": "SHORT_TEXT",
+                  "prompt": "Question two",
+                  "required": true,
+                  "options": [],
+                  "rows": []
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "import-csv",
+      "output": {
+        "preview": {
+          "ok": true,
+          "issues": [],
+          "digest": "426c298bf2c409d1c6f826a1cdbe5ec384e8d45fa17eadbf8c1bcdc984e06314",
+          "items": [
+            {
+              "type": "SINGLE",
+              "prompt": "Line one\nLine two",
+              "required": false,
+              "options": [
+                "A",
+                "B"
+              ],
+              "rows": [],
+              "reverse": false,
+              "sourceLine": 2
+            },
+            {
+              "type": "NUMBER",
+              "prompt": "Number",
+              "required": true,
+              "options": [],
+              "rows": [],
+              "reverse": false,
+              "sourceLine": 4
+            }
+          ],
+          "count": 2
+        },
+        "applied": {
+          "schemaVersion": 2,
+          "pages": [
+            {
+              "pageKey": "rde2950546c0d6cf30c9a6b74",
+              "title": "问卷页面",
+              "questions": [
+                {
+                  "itemKey": "r68824bcd914188a091d40c65",
+                  "type": "SINGLE",
+                  "prompt": "Line one\nLine two",
+                  "required": false,
+                  "options": [
+                    {
+                      "optionKey": "r711a4a27e51fb8ced9e1d76d",
+                      "label": "A"
+                    },
+                    {
+                      "optionKey": "ra241d0dab72f927d64e78d42",
+                      "label": "B"
+                    }
+                  ],
+                  "rows": []
+                },
+                {
+                  "itemKey": "r177f8e6af15769f93cc09299",
+                  "type": "NUMBER",
+                  "prompt": "Number",
+                  "required": true,
+                  "options": [],
+                  "rows": []
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "import-bad-csv",
+      "output": {
+        "preview": {
+          "ok": false,
+          "issues": [
+            {
+              "line": 1,
+              "message": "CSV 引号未闭合"
+            }
+          ],
+          "digest": "668c49932c856c102543dc16cbd44a6222aecc49d9fc07eeb66516b9b15b6985",
+          "items": [],
+          "count": 0
+        }
+      }
+    },
+    {
+      "name": "import-duplicate-headers",
+      "output": {
+        "preview": {
+          "ok": false,
+          "issues": [
+            {
+              "line": 1,
+              "message": "表头不能重复"
+            }
+          ],
+          "digest": "668c49932c856c102543dc16cbd44a6222aecc49d9fc07eeb66516b9b15b6985",
+          "items": [],
+          "count": 0
+        }
+      }
+    },
+    {
+      "name": "import-unknown-type",
+      "output": {
+        "preview": {
+          "ok": false,
+          "issues": [
+            {
+              "line": 2,
+              "message": "未知题型"
+            },
+            {
+              "line": 1,
+              "message": "未识别有效数据行"
+            }
+          ],
+          "digest": "668c49932c856c102543dc16cbd44a6222aecc49d9fc07eeb66516b9b15b6985",
+          "items": [],
+          "count": 0
+        }
+      }
+    },
+    {
+      "name": "import-v2-csv",
+      "output": {
+        "preview": {
+          "ok": true,
+          "issues": [],
+          "digest": "ef2663017754f9c3b4879dff83a4909d8fde8134b4923e213cc5558aa58f097a",
+          "items": [
+            {
+              "type": "CONSTANT_SUM",
+              "prompt": "Allocate",
+              "required": true,
+              "options": [
+                "A",
+                "B"
+              ],
+              "rows": [],
+              "reverse": false,
+              "sourceLine": 2,
+              "total": 10
+            },
+            {
+              "type": "TIME",
+              "prompt": "Time",
+              "required": true,
+              "options": [],
+              "rows": [],
+              "reverse": false,
+              "sourceLine": 3,
+              "timeZone": "UTC"
+            }
+          ],
+          "count": 2
+        },
+        "applied": {
+          "schemaVersion": 2,
+          "pages": [
+            {
+              "pageKey": "rde2950546c0d6cf30c9a6b74",
+              "title": "问卷页面",
+              "questions": [
+                {
+                  "itemKey": "r68824bcd914188a091d40c65",
+                  "type": "CONSTANT_SUM",
+                  "prompt": "Allocate",
+                  "required": true,
+                  "options": [
+                    {
+                      "optionKey": "r711a4a27e51fb8ced9e1d76d",
+                      "label": "A"
+                    },
+                    {
+                      "optionKey": "ra241d0dab72f927d64e78d42",
+                      "label": "B"
+                    }
+                  ],
+                  "rows": [],
+                  "total": 10
+                },
+                {
+                  "itemKey": "r177f8e6af15769f93cc09299",
+                  "type": "TIME",
+                  "prompt": "Time",
+                  "required": true,
+                  "options": [],
+                  "rows": [],
+                  "timeZone": "UTC"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

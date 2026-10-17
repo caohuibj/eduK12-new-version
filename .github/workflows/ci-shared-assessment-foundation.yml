@@ -1,0 +1,249 @@
+name: Shared assessment foundation targeted candidate
+
+on:
+  push:
+    branches: [fix/shared-assessment-foundation-20261017]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: foundation-targeted-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CI: 'true'
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+
+jobs:
+  scope:
+    name: frozen complete main-to-head scope
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: frozen product boundary and explicit local-review distinction
+        run: |
+          python3 -B .github/scripts/shared-assessment-foundation-ci.py scope
+      - uses: actions/upload-artifact@v4
+        with:
+          name: foundation-${{ github.run_id }}-${{ github.sha }}-scope
+          path: foundation-ci-evidence/scope.json
+          if-no-files-found: error
+          retention-days: 3
+
+  build:
+    name: build once / ${{ matrix.component }}
+    needs: scope
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [backend, frontend]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: compile this component once and preserve its immutable builder
+        run: python3 -B .github/scripts/shared-assessment-foundation-ci.py build ${{ matrix.component }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: foundation-${{ github.run_id }}-${{ github.sha }}-${{ matrix.component }}-builder
+          path: |
+            foundation-ci-evidence/${{ matrix.component }}-builder.json
+            foundation-ci-evidence/${{ matrix.component }}-builder.tar.zst
+          if-no-files-found: error
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: foundation-${{ github.run_id }}-${{ github.sha }}-${{ matrix.component }}-producer-report-attempt-${{ github.run_attempt }}
+          path: |
+            foundation-ci-evidence/*.json
+          if-no-files-found: error
+          retention-days: 3
+
+  runtime:
+    name: package exact candidate runtime / ${{ matrix.component }}
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [backend, frontend]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: foundation-${{ github.run_id }}-${{ github.sha }}-${{ matrix.component }}-builder
+          path: foundation-ci-evidence
+      - name: package from the exact successful builder without compiling
+        run: python3 -B .github/scripts/shared-assessment-foundation-ci.py runtime ${{ matrix.component }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: foundation-${{ github.run_id }}-${{ github.sha }}-${{ matrix.component }}-runtime
+          path: |
+            foundation-ci-evidence/${{ matrix.component }}-runtime.json
+            foundation-ci-evidence/${{ matrix.component }}-runtime.tar.zst
+          if-no-files-found: error
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: foundation-${{ github.run_id }}-${{ github.sha }}-${{ matrix.component }}-runtime-producer-attempt-${{ github.run_attempt }}
+          path: foundation-ci-evidence/*.json
+          if-no-files-found: error
+          retention-days: 3
+
+  audit:
+    name: candidate dependency audit / ${{ matrix.component }}
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [backend, frontend]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: foundation-${{ github.run_id }}-${{ github.sha }}-${{ matrix.component }}-builder
+          path: foundation-ci-evidence
+      - name: official high-threshold dependency audit
+        run: python3 -B .github/scripts/shared-assessment-foundation-ci.py audit ${{ matrix.component }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: foundation-${{ github.run_id }}-${{ github.sha }}-${{ matrix.component }}-audit-attempt-${{ github.run_attempt }}
+          path: foundation-ci-evidence/*.json
+          if-no-files-found: error
+          retention-days: 3
+
+  scan:
+    name: actual candidate image scan / ${{ matrix.component }}
+    needs: runtime
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [backend, frontend]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: foundation-${{ github.run_id }}-${{ github.sha }}-${{ matrix.component }}-runtime
+          path: foundation-ci-evidence
+      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        with:
+          version: v0.70.0
+          cache: false
+      - name: preserve existing HIGH CRITICAL runtime vulnerability threshold
+        run: python3 -B .github/scripts/shared-assessment-foundation-ci.py scan ${{ matrix.component }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: foundation-${{ github.run_id }}-${{ github.sha }}-${{ matrix.component }}-scan-attempt-${{ github.run_attempt }}
+          path: foundation-ci-evidence/*.json
+          if-no-files-found: error
+          retention-days: 3
+
+  probe:
+    name: bounded candidate runtime checks / ${{ matrix.component }}
+    needs: runtime
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [backend, frontend]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: foundation-${{ github.run_id }}-${{ github.sha }}-${{ matrix.component }}-runtime
+          path: foundation-ci-evidence
+      - uses: actions/download-artifact@v4
+        if: matrix.component == 'backend'
+        with:
+          name: foundation-${{ github.run_id }}-${{ github.sha }}-backend-builder
+          path: foundation-ci-evidence
+      - name: new compiled runtime and exact static packaging checks
+        run: python3 -B .github/scripts/shared-assessment-foundation-ci.py probe ${{ matrix.component }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: foundation-${{ github.run_id }}-${{ github.sha }}-${{ matrix.component }}-probe-attempt-${{ github.run_attempt }}
+          path: foundation-ci-evidence/*.json
+          if-no-files-found: error
+          retention-days: 3
+
+  codeql:
+    name: affected code static analysis
+    needs: scope
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript,python
+          config: |
+            paths:
+              - server-version/backend/src
+              - server-version/frontend/src/pages
+              - server-version/frontend/src/training
+              - server-version/frontend/src/survey
+              - server-version/frontend/src/modules/assessment-core
+              - server-version/frontend/src/modules/composite
+              - .github/scripts
+      - uses: github/codeql-action/analyze@v3
+        with:
+          category: /shared-assessment-foundation-targeted
+
+  result:
+    name: targeted candidate result (not merge readiness)
+    needs: [scope, build, runtime, audit, scan, probe, codeql]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: require exact success of every selected job
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          results = json.loads(os.environ['RESULTS'])
+          assert set(results) == {'scope', 'build', 'runtime', 'audit', 'scan', 'probe', 'codeql'}
+          assert all(item['result'] == 'success' for item in results.values()), results
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+              summary.write('Local input-bound functional review plus CI candidate assembly, security and bounded runtime verification completed.\n\n')
+              summary.write('The local 196 foundation tests and Training evidence were not replayed or labeled as Actions execution. No browser E2E, full-platform gate, merge readiness or production qualification is claimed.\n')
+          PY

@@ -39,6 +39,11 @@ const CourseList: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'my' | 'shared'>('my')
 
   const isAdmin = user?.role === 'ADMIN'
+  const currentUserRef = useRef(user)
+  currentUserRef.current = user
+  // CourseShare grants content reuse, not roster/report management. Removal
+  // follows the backend's sharedBy/ADMIN rule, not platformRole.
+  const canRemoveShare = (share: CourseShare) => Boolean(currentUserRef.current?.id && (share.sharedBy === currentUserRef.current.id || currentUserRef.current.role === 'ADMIN'))
 
   useEffect(() => {
     fetchCourses()
@@ -250,11 +255,12 @@ const CourseList: React.FC = () => {
   }
 
   // 取消分享
-  const handleRemoveShare = async (shareId: string) => {
-    if (!await ask('确定要取消分享吗？')) return
+  const handleRemoveShare = async (share: CourseShare) => {
+    if (!canRemoveShare(share) || !await ask('确定要取消分享吗？')) return
+    if (!canRemoveShare(share)) return
 
     try {
-      const response = await apiClient.delete(`/courses/share/${shareId}`)
+      const response = await apiClient.delete(`/courses/share/${share.id}`)
       if (response.code === 0) {
         fetchSharedToMe()
       }
@@ -509,14 +515,15 @@ const CourseList: React.FC = () => {
                       >
                         <Copy className="w-4 h-4" />
                       </button>
-                      {/* 取消分享 */}
-                      <button
-                        onClick={() => handleRemoveShare(share.id)}
+                      {/* 只有分享者和 ADMIN 可以取消分享 */}
+                      {canRemoveShare(share) && <button
+                        onClick={() => handleRemoveShare(share)}
                         className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded"
                         title="移除"
+                        aria-label={`取消分享 ${course.title}`}
                       >
                         <X className="w-4 h-4" />
-                      </button>
+                      </button>}
                     </div>
                   </div>
 

@@ -12,7 +12,7 @@ import { Messages } from '../constants'
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { z } from 'zod'
 import multer from 'multer'
-import { canAccessCourseContent, hasActiveCourseMembership } from '../utils/courseAccess'
+import { canAccessCourseContent, canAccessCourseRoster, hasActiveCourseMembership } from '../utils/courseAccess'
 import {
   AssetDatabase,
   AssetReferenceValidationError,
@@ -623,6 +623,7 @@ export const checkinController = {
       const checkin = await prisma.checkin.findUnique({
         where: { id },
         include: {
+          _count: { select: { submissions: true } },
           course: {
             select: {
               id: true,
@@ -642,7 +643,7 @@ export const checkinController = {
         }
       })
 
-      if (!checkin) {
+      if (!checkin || (req.query.courseId !== undefined && req.query.courseId !== checkin.courseId)) {
         return notFound(res, '打卡不存在')
       }
 
@@ -654,9 +655,11 @@ export const checkinController = {
         return forbidden(res, '您没有权限访问此打卡')
       }
 
-      const { course: courseWithAccess, ...checkinData } = checkin
+      const { course: courseWithAccess, _count, ...checkinData } = checkin
       const { shares: _shares, ...course } = courseWithAccess
-      const hydrated = await hydrateAssetReferences({ ...checkinData, course }, false, {
+      const hydrated = await hydrateAssetReferences({ ...checkinData, course,
+        ...(canAccessCourseRoster(course, req.user?.userId, req.user?.role) ? { _count } : {}),
+      }, false, {
         entityType: 'Checkin',
         entityId: checkin.id,
         courseId: checkin.course.id,

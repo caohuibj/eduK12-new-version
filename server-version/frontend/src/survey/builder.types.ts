@@ -1,22 +1,15 @@
+import type { FormDraft as SharedFormDraft, FormQuestion as SharedFormQuestion, Option } from '../modules/assessment-core/form/types'
+export type { Option, Condition } from '../modules/assessment-core/form/types'
+
 export type Kind='FORM'|'SCALE'|'SJT'|'COGNITIVE'
-export type Option={optionKey:string;label:string;score?:number}
-export type Condition={itemKey:string;operator:'EQUALS'|'INCLUDES';optionKey:string}
 export type SurveyImage={
   asset:{assetId:string;contentHash:string;mimeType:'image/png'|'image/jpeg'|'image/webp'};
   altText:string;caption?:string;rightsStatus:'self_authored'|'authorized'|'unknown';rightsNote:string
 }
 export type SurveyPublicImage=Pick<SurveyImage,'asset'|'altText'|'caption'>
-export type FormQuestion={
-  itemKey:string;type:'SINGLE'|'MULTIPLE'|'SHORT_TEXT'|'LONG_TEXT'|'NUMBER'|'LIKERT'|'MATRIX'|
-    'DATE'|'TIME'|'RANK_ORDER'|'SLIDER'|'CONSTANT_SUM'|'MATRIX_MULTIPLE';
-  prompt:string;image?:SurveyImage;required:boolean;allowRefusal?:boolean;options:Option[];rows:{rowKey:string;label:string}[];
-  min?:number;max?:number;integerOnly?:boolean;step?:number;precision?:number;
-  maxLength?:number;total?:number;minSelections?:number;maxSelections?:number;
-  timeZone?:'Asia/Shanghai'|'UTC';textValidation?:'EMAIL'|'DIGITS'|'ALPHANUMERIC';
-  otherOptionKey?:string;otherMaxLength?:number;exclusiveOptionKeys?:string[];
-  displayIf?:Condition
-}
-export type FormDraft={schemaVersion:1|2;pages:{pageKey:string;title:string;description?:string;questions:FormQuestion[]}[]}
+// Product-owned image metadata stays outside the shared Form contracts.
+export type FormQuestion=SharedFormQuestion<SurveyImage>
+export type FormDraft=SharedFormDraft<SurveyImage>
 export type ScaleDraft={
   schemaVersion:1;presentationMode?:'ONE_BY_ONE'|'ALL_AT_ONCE';respondentType:'participant_self_report'|'student_self_report'|'teacher_self_report';
   responseOptions:{optionKey:string;label:string;score:number}[];

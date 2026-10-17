@@ -2,6 +2,17 @@
 
 本文件是新发布路线的统一入口，实现位于 `server-version/scripts/release/`。生产启用须有当次用户授权；文档本身不自动赋予部署权限。本轮用户已追加快速合并及部署授权，实际结果另行记录。
 
+## 已审查候选的正式接纳（reviewed-candidate）
+
+本路线只接纳 `.github/scripts/reviewed-candidate-source.json` 明列的完整基线、原始源码文件及 blob、前后端完整 tree、官方工作流/run/attempt/jobs/artifacts 和镜像身份。当前来源为 `1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c` 的官方 push run `39051668787` attempt 1；原候选工作流的成功本身不代表可合并。新 manifest 须独立审查，不能自动发现一个成功 run 后扩大适用范围。
+
+- 修改组件 → 新增接纳、分类和汇总工具；产品源码与原 49 个源码/候选 CI 文件逐一保持原 blob，前后端整个 tree 不变。完整 diff 必须同时包含精确列出的 12 个接纳工具/说明路径。漏文件、额外路径、删除、重命名、执行位或链接均不进入此路线，继续旧分类。
+- 具体故障 → 错配来源/过期或失败回执、篡改产物、遗漏产品改动、PR head 与 merge tree 不符，以及尚未覆盖的 Training 实镜像交互和 Scale 真实 PostgreSQL 并发写入。正式接纳重新核验来源、输入和官方小回执，只按固定 artifact ID 下载所需镜像，原构建、测试、审计、扫描及产品 SAST 不重复。
+- 主要位置 → PR 的 scope 运行新增边界/拒绝/合并契约；两个独立 GitHub-hosted VM 分别运行缺失的 browser、race 探针；新工具的 JavaScript/TypeScript 与 Python CodeQL 仅分析有效目录 `.github/scripts`。不安装应用依赖、不重新构建应用、不连接生产，不使用私有 secrets 或 self-hosted runner，不改变信任及 ruleset。
+- 正式门禁 → 原稳定 `merge gate / ready PR` 必须同时看到 scope、reviewed-candidate（两个 matrix job）及 codeql 的真实 success，并对实际 checkout HEAD 重算完整计划。draft、缺失、跳过、取消或失败均不得授予合并资格；不新增同名假绿检查。
+- 时间预算 → 探针在约 5 分钟时报告当前安装/接纳/运行阶段，单 job 上限 15 分钟；故障定位仍限受影响项，不恢复无关全量验收。产物只保留当前 run/head/action/attempt 的小 JSON 与截图，不上传镜像 tar 或私有数据。
+- 合并后 → main push 只按原有规则分类，不重跑此 PR 的契约、接纳或探针。上线仍单独受当次发布授权及版本/就绪/一条受影响短流程/回退门禁约束；这次 CI 接入不等同于已上线。
+
 ## 规则位置与每次开工方式
 
 仓库本文件是完整规则的唯一维护来源，根 `AGENTS.md` 是开发/代理入口，`.github/PULL_REQUEST_TEMPLATE.md` 只记录本次适用项。本机 `~/.codex/AGENTS.md` 的 Huisurvey 专用段落和服务器 `/opt/eduk12-new/deploy/AGENTS.md` 仅作指引，指向同一仓库规则，不独立维护另一套发布标准。源码和文档均按实际 Git 版本读取；服务器安装版本不可静默改写为另一版本。
