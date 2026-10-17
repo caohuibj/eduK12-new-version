@@ -2,7 +2,7 @@ import { useCursorList } from '../hooks/useCursorList'
 import { isTrainingHost } from '../training/context'
 import { useEditorGuard } from '../components/shared-ui/useEditorGuard'
 import ModalSurface from '../components/shared-ui/ModalSurface'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Plus, Search, Camera, Trash2, Edit, Copy, Users, BookOpen, CheckCircle2, Video, Image as ImageIcon, Download, Eye, X, FileText, Share2 } from 'lucide-react'
 import apiClient from '../api/client'
@@ -70,15 +70,26 @@ interface CheckinSubmission {
   createdAt: string
 }
 
+// A changed deep-link/auth identity must never display the previous record or editor.
 const CheckinList: React.FC = () => {
   const { user } = useAuth()
+  const [params] = useSearchParams()
+  return <CheckinListContent key={JSON.stringify([user?.id, user?.role, params.get('courseId'), params.get('id')])} />
+}
+
+const CheckinListContent: React.FC = () => {
+  const { user } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
+  const requestedCourseId = searchParams.get('courseId')
   const focusId = searchParams.get('id')
   const { feedback, confirm, success, error: showError, info } = useStaffFeedback()
   const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const [checkins, setCheckins] = useState<Checkin[]>([])
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const mounted = useRef(true)
+  const loadSequence = useRef(0)
   const [keyword, setKeyword] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [editingCheckin, setEditingCheckin] = useState<Checkin | null>(null)
@@ -104,9 +115,11 @@ const CheckinList: React.FC = () => {
   const { list: submissions, loading: submissionsLoading, error: submissionsError, total: submissionsTotal, more: moreSubmissions, refresh: refreshSubmissions, hasMore: moreSubmissionsAvailable } = useCursorList<CheckinSubmission>(showSubmissionsModal && selectedCheckin ? `/checkins/${selectedCheckin.id}/submissions` : null)
 
   useEffect(() => {
-    fetchCheckins()
-    fetchCourses()
-    fetchTags()
+    mounted.current = true
+    void fetchCheckins()
+    void fetchCourses()
+    void fetchTags()
+    return () => { mounted.current = false; loadSequence.current++ }
   }, [])
 
   // Permit a course page to open the existing check-in editor with its
@@ -142,16 +155,39 @@ const CheckinList: React.FC = () => {
   }, [loading, focusId])
 
   const fetchCheckins = async () => {
+    if (!mounted.current) return
+    const request = ++loadSequence.current
+    setLoading(true)
+    setLoadError(null)
+    setCheckins([])
     try {
-      setLoading(true)
-      const response = await apiClient.get('/checkins')
-      if (response.code === 0) {
+      if (focusId) {
+        // Resolve the authorized record directly, including records beyond list page 1.
+        const detailPath = `/checkins/${encodeURIComponent(focusId)}` + (requestedCourseId ? `?courseId=${encodeURIComponent(requestedCourseId)}` : '')
+        const response = await apiClient.get<Checkin>(detailPath)
+        if (request !== loadSequence.current) return
+        if (response.code !== 0 || !response.data) throw new Error(response.message || '无法读取打卡')
+        const record = response.data
+        if (record.id !== focusId || !record.courseId
+          || (requestedCourseId && record.courseId !== requestedCourseId)
+          || record.course?.id !== record.courseId
+          || (user?.role === 'TEACHER' && record.course?.creatorId !== user.id)) {
+          throw new Error('无法管理此课程的打卡')
+        }
+        setCheckins([record])
+      } else {
+        const path = '/checkins' + (requestedCourseId ? `?courseId=${encodeURIComponent(requestedCourseId)}` : '')
+        const response = await apiClient.get<{ list: Checkin[] }>(path)
+        if (request !== loadSequence.current) return
+        if (response.code !== 0) throw new Error(response.message || '获取打卡列表失败')
         setCheckins(response.data.list)
       }
     } catch (error) {
-      console.error('获取打卡列表失败:', error)
+      if (request !== loadSequence.current) return
+      setCheckins([])
+      setLoadError(error instanceof Error ? error.message : '获取打卡列表失败')
     } finally {
-      setLoading(false)
+      if (request === loadSequence.current) setLoading(false)
     }
   }
 
@@ -166,7 +202,7 @@ const CheckinList: React.FC = () => {
             userId: user?.id,
             knownIds: list.map(course => course.id),
           }) : null
-        setCourses(appended ? [...list, appended] : list)
+        if (mounted.current) setCourses(appended ? [...list, appended] : list)
       }
     } catch (error) {
       console.error('获取课程列表失败:', error)
@@ -177,7 +213,7 @@ const CheckinList: React.FC = () => {
     try {
       const response = await apiClient.get('/checkins/tags')
       if (response.code === 0) {
-        setAvailableTags(response.data.tags)
+        if (mounted.current) setAvailableTags(response.data.tags)
       }
     } catch (error) {
       console.error('获取标签列表失败:', error)
@@ -426,9 +462,10 @@ const CheckinList: React.FC = () => {
     <ProductPage width="management" className="space-y-6">
       <PageHeader title="打卡管理" description="集中查看课程打卡、参与情况和截止时间。" actions={<ProductButton variant="primary" onClick={openCreateModal}><Plus className="w-4 h-4" aria-hidden="true" />创建打卡</ProductButton>} />
       {feedback}
-      <div className="staff-toolbar"><label className="staff-search-field"><Search className="w-4 h-4" aria-hidden="true" /><span className="sr-only">搜索打卡</span><input type="search" value={keyword} onChange={e=>setKeyword(e.target.value)} placeholder="搜索打卡或课程" /></label><span className="staff-help">共 {filteredCheckins.length} 个打卡</span></div>
+      <div className="staff-toolbar"><label className="staff-search-field"><Search className="w-4 h-4" aria-hidden="true" /><span className="sr-only">搜索打卡</span><input type="search" value={keyword} onChange={e=>setKeyword(e.target.value)} placeholder="搜索打卡或课程" /></label>{!loading && !loadError && <span className="staff-help">共 {filteredCheckins.length} 个打卡</span>}</div>
       {availableTags.length > 0 && <TagFilter availableTags={availableTags} selectedTags={selectedTags} onChange={setSelectedTags} title="标签筛选" />}
       {loading ? <ProductStatus kind="pending" title="正在加载打卡">正在读取打卡和参与概况。</ProductStatus>
+      : loadError ? <ProductStatus kind="error" title="打卡列表加载失败" actions={<ProductButton onClick={() => void fetchCheckins()}>重试</ProductButton>}>{loadError}</ProductStatus>
       : filteredCheckins.length === 0 ? <ProductStatus kind="info" title="暂无匹配打卡">可以调整筛选条件，或创建第一项打卡。</ProductStatus>
       : <div className={`staff-table-container ${isTrainingHost() ? "staff-record-table" : ""}`}><table className="staff-table"><thead><tr><th>打卡</th><th>课程</th><th>截止时间</th><th>参与</th><th>公开参与</th><th className="text-right">操作</th></tr></thead><tbody>
         {filteredCheckins.map(checkin=><tr id={`checkin-record-${checkin.id}`} tabIndex={-1} key={checkin.id} className={focusId===checkin.id?'staff-target-row':''}>
@@ -465,6 +502,7 @@ const CheckinList: React.FC = () => {
                   disabled={!!editingCheckin}
                 >
                   <option value="">请选择课程</option>
+                  {editingCheckin?.course && !courses.some(course => course.id === editingCheckin.courseId) && <option value={editingCheckin.courseId}>{editingCheckin.course.title}</option>}
                   {courses.map((course) => (
                     <option key={course.id} value={course.id}>
                       {course.title} (课程码: {course.courseCode})

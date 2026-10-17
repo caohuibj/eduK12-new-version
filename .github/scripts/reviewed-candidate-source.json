@@ -1,0 +1,840 @@
+{
+  "schema": 1,
+  "repository": "caohuibj/eduK12-new-version",
+  "base": "0c41f07cb8c6104ad7c88448d948682baf24cf37",
+  "source": {
+    "head": "1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c",
+    "tree": "8bebe1e6111eb08030af65df9f2bd25691b685e4",
+    "branch": "fix/shared-assessment-foundation-20261017",
+    "run": 39051668787,
+    "event": "push",
+    "workflow": ".github/workflows/ci-shared-assessment-foundation.yml",
+    "attempt": 1,
+    "jobs": [
+      {
+        "id": 117451353633,
+        "name": "frozen complete main-to-head scope"
+      },
+      {
+        "id": 117451384033,
+        "name": "affected code static analysis"
+      },
+      {
+        "id": 117451384163,
+        "name": "build once / backend"
+      },
+      {
+        "id": 117451384232,
+        "name": "build once / frontend"
+      },
+      {
+        "id": 117451729831,
+        "name": "candidate dependency audit / frontend"
+      },
+      {
+        "id": 117451729834,
+        "name": "candidate dependency audit / backend"
+      },
+      {
+        "id": 117451729851,
+        "name": "package exact candidate runtime / backend"
+      },
+      {
+        "id": 117451729871,
+        "name": "package exact candidate runtime / frontend"
+      },
+      {
+        "id": 117452104708,
+        "name": "actual candidate image scan / backend"
+      },
+      {
+        "id": 117452104750,
+        "name": "actual candidate image scan / frontend"
+      },
+      {
+        "id": 117452104754,
+        "name": "bounded candidate runtime checks / frontend"
+      },
+      {
+        "id": 117452104778,
+        "name": "bounded candidate runtime checks / backend"
+      },
+      {
+        "id": 117452360408,
+        "name": "targeted candidate result (not merge readiness)"
+      }
+    ],
+    "artifacts": [
+      {
+        "id": 12108270326,
+        "name": "foundation-39051668787-1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c-frontend-runtime-producer-attempt-1",
+        "size": 45533,
+        "digest": "sha256:e6accdb6e2091f161cff54a88e7bcb7883d739e105416a5ff22d27e6e7e36e9d",
+        "createdAt": "2026-10-17T17:00:19Z"
+      },
+      {
+        "id": 12108245349,
+        "name": "foundation-39051668787-1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c-frontend-builder",
+        "size": 318615832,
+        "digest": "sha256:05dcb525aa55c9e1ef31832e68d159d24f5bf7139e855adce24908259b93de73",
+        "createdAt": "2026-10-17T16:59:08Z"
+      },
+      {
+        "id": 12108225895,
+        "name": "foundation-39051668787-1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c-backend-probe-attempt-1",
+        "size": 10516,
+        "digest": "sha256:5d99d10021c01f4e35604d23a070dc1a9e51906872ff2f1c6950c3e036222673",
+        "createdAt": "2026-10-17T17:02:33Z"
+      },
+      {
+        "id": 12108161641,
+        "name": "foundation-39051668787-1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c-backend-runtime",
+        "size": 311865228,
+        "digest": "sha256:9f818320c1086ebdcfb4afa9cd6098b98da97977aeb6c322719266cd4e6c8214",
+        "createdAt": "2026-10-17T17:01:21Z"
+      },
+      {
+        "id": 12108107165,
+        "name": "foundation-39051668787-1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c-frontend-scan-attempt-1",
+        "size": 36025,
+        "digest": "sha256:548d3a9990ebe06651767bb9e4d3afffb4066ba0c4ed8ecdd5734e9196a99e0b",
+        "createdAt": "2026-10-17T17:01:57Z"
+      },
+      {
+        "id": 12108091968,
+        "name": "foundation-39051668787-1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c-frontend-audit-attempt-1",
+        "size": 24845,
+        "digest": "sha256:886cd6019d848d121c1822bcfb6363555ffb27e0264c111cf382a1162e765913",
+        "createdAt": "2026-10-17T17:00:24Z"
+      },
+      {
+        "id": 12108067227,
+        "name": "foundation-39051668787-1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c-backend-runtime-producer-attempt-1",
+        "size": 5803,
+        "digest": "sha256:67843f1c1173c6afeb203eb1a1f3ffbe8952b6be6e4a1e2325227bfb55488d5e",
+        "createdAt": "2026-10-17T17:01:22Z"
+      },
+      {
+        "id": 12107757271,
+        "name": "foundation-39051668787-1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c-backend-audit-attempt-1",
+        "size": 4987,
+        "digest": "sha256:b64c6eff2192c0b207b623508c6fb1e8aea2bb5911e2ea92ef9a29f816384aea",
+        "createdAt": "2026-10-17T17:00:29Z"
+      },
+      {
+        "id": 12107614128,
+        "name": "foundation-39051668787-1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c-frontend-producer-report-attempt-1",
+        "size": 24437,
+        "digest": "sha256:694ee577733140d69fcd7745cd6cd463b2d65de232bf1f381e15bbb0d751d6d0",
+        "createdAt": "2026-10-17T16:59:09Z"
+      },
+      {
+        "id": 12107494414,
+        "name": "foundation-39051668787-1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c-scope",
+        "size": 3496,
+        "digest": "sha256:a088ef1b1362489bd184438c87324f7b353acc5bcd3d18b8c3d558e7b6535f2b",
+        "createdAt": "2026-10-17T16:57:55Z"
+      },
+      {
+        "id": 12107474796,
+        "name": "foundation-39051668787-1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c-frontend-probe-attempt-1",
+        "size": 25136,
+        "digest": "sha256:3305dea2a4830fb23fca58a6da38d4acd2cd303a95bdc71eb7e454a996ed43c6",
+        "createdAt": "2026-10-17T17:01:42Z"
+      },
+      {
+        "id": 12107444739,
+        "name": "foundation-39051668787-1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c-frontend-runtime",
+        "size": 30043445,
+        "digest": "sha256:ed2e81671c7873559c78ec29e4826691b50401c5f25086af9630e4ea8e98b2df",
+        "createdAt": "2026-10-17T17:00:18Z"
+      },
+      {
+        "id": 12107183957,
+        "name": "foundation-39051668787-1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c-backend-producer-report-attempt-1",
+        "size": 4579,
+        "digest": "sha256:56a87271dcc19159172682de8e3f40a7bd1c1d55fbe4d27990c11ce7a42ed0f2",
+        "createdAt": "2026-10-17T16:59:39Z"
+      },
+      {
+        "id": 12107169340,
+        "name": "foundation-39051668787-1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c-backend-scan-attempt-1",
+        "size": 95123,
+        "digest": "sha256:1a219bf39762825ebaa12fa6f61dee31f6988f4b2ba66a5981132534b71a392c",
+        "createdAt": "2026-10-17T17:02:33Z"
+      },
+      {
+        "id": 12107144156,
+        "name": "foundation-39051668787-1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c-backend-builder",
+        "size": 414099473,
+        "digest": "sha256:49f72a2d9a60447d3dad24de17f7bc93769eac61c35c91e45c1b3ee53344a039",
+        "createdAt": "2026-10-17T16:59:38Z"
+      }
+    ]
+  },
+  "required": [
+    "official-input-bound-evidence",
+    "training-runtime-browser",
+    "scale-runtime-race",
+    "changed-tool-contracts",
+    "tool-sast"
+  ],
+  "components": {
+    "frontend": "485b4d1a5e15df2f72e277a25828cd4ae0738421",
+    "backend": "cc7dbffeae5f847aec3b853b6b8138b3b04ce390"
+  },
+  "files": {
+    ".github/scripts/shared-assessment-foundation-bindings.json": {
+      "before": null,
+      "after": "fade90fad1412a2da53656dbe0fe84ec39b7147e",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    ".github/scripts/shared-assessment-foundation-ci.py": {
+      "before": null,
+      "after": "aa1b69bf673501537fedbcf1a8f9e58c29cbe712",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    ".github/scripts/shared-assessment-foundation-ci.test.py": {
+      "before": null,
+      "after": "0b2e53573e2618f60a5b2463294c7562c3bd0b46",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    ".github/scripts/shared-assessment-foundation-runtime.cjs": {
+      "before": null,
+      "after": "fc731f8f86f5f81aeb7a0f41d63882329982fa6d",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    ".github/workflows/ci-shared-assessment-foundation.yml": {
+      "before": null,
+      "after": "f30319dc21eab64c7cab21016b6ffb6ab3909765",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "docs/shared-assessment-foundation-ci.md": {
+      "before": null,
+      "after": "6d1ab66c6cdc8fb8228373c728add383d5db068e",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "docs/shared-assessment-foundation-v1.md": {
+      "before": null,
+      "after": "90d78f6986977a94cc0a2f014f2811df8665ec8b",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/__tests__/assessment-core/fixtures/form-foundation-cases.json": {
+      "before": null,
+      "after": "babdc5c98c7cb15759f1d245e3fd57f4cc447686",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/__tests__/assessment-core/fixtures/form-foundation-golden.json": {
+      "before": null,
+      "after": "7c1da5a0fae250b4c2eea03cf934344f7d405d32",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/__tests__/assessment-core/form-foundation-corpus.ts": {
+      "before": null,
+      "after": "bf3753c9543b0194c7edce70ac4b25627ed47e56",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/__tests__/assessment-core/form-foundation.contract.test.ts": {
+      "before": null,
+      "after": "961733607ce71257ad47a4da72093944d96dc877",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/__tests__/controllers/training-task-detail.test.ts": {
+      "before": null,
+      "after": "d40b39b5681f12cd60ee98fd16698c5c2563145b",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/__tests__/scale/scale-draft-write-guard.test.ts": {
+      "before": null,
+      "after": "477b133813681993b0e76c494574d928ebadd0cd",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/controllers/assignmentController.ts": {
+      "before": "71a121e82be1dca2c6b6f3840799f3cc37cd8424",
+      "after": "34a41cfe93eae2d8f263a2780172cf945681de40",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/controllers/checkinController.ts": {
+      "before": "66016031262e13094c15ab6cdf33662da049537c",
+      "after": "9b207eca6d3ecf4354c7f03f2cd469ff6b124e6e",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/controllers/scaleController.ts": {
+      "before": "48ab157fcc962006f7586679007667ab8b788649",
+      "after": "3909418dbccfd06cf4e3a211d6fef74de794d111",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/controllers/scaleImageController.ts": {
+      "before": "5d19144ef842c56b12ac789bac74e76b231e634a",
+      "after": "4e72a4cb2b8a841b0552ecbe942bb01d27fc13da",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/assessment-core/definition-primitives.ts": {
+      "before": null,
+      "after": "831ec982b84246fabb514622697c95af34b379e9",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/assessment-core/form/answers.ts": {
+      "before": null,
+      "after": "b5a531121e43f055e98ad2b6c8c6d150a42b5c10",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/assessment-core/form/definition.ts": {
+      "before": null,
+      "after": "1c6786635d3bb53ccc0bf188f274f19b2c6964bc",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/assessment-core/form/import-parser.ts": {
+      "before": null,
+      "after": "dcd5f26132d7b57304b35f171d6af4118cba69b1",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/assessment-core/form/runtime.ts": {
+      "before": null,
+      "after": "6d6fdfaafc7d17beb1faf0c41d8c1b3736b07af0",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/builder.definition.ts": {
+      "before": "0512c1cc3fced4929ca9e7baf30d10e09fae6600",
+      "after": "5a566ea81be938ac7b644fc93e7a9530a2f76368",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/builder.import.ts": {
+      "before": "4c672d6b72843205d67afe9ace1f9ed257d9b846",
+      "after": "e8e57a952326074dbc815a6e705ea0638b68e9ab",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/backend/src/modules/survey/final.compute.ts": {
+      "before": "e98d130bc72cde1554d34003209cffa17012ebe8",
+      "after": "b5569e41fc53b561b37ca9e10680972178a2fb81",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/modules/assessment-core/form/FormChoiceExtras.tsx": {
+      "before": null,
+      "after": "e42704b0952d41a504c29f25415a6c7fdb034d6a",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/modules/assessment-core/form/ProfessionalFormAnswer.tsx": {
+      "before": null,
+      "after": "882d9f521894dc8a07a73c330f42b56222a92209",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/modules/assessment-core/form/form-visibility.ts": {
+      "before": null,
+      "after": "efda87730a6cdf436a30b0ab3df523998f2638f6",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/modules/assessment-core/form/index.ts": {
+      "before": null,
+      "after": "bf9efb1532615a753fb7281592eb1d38b86099aa",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/modules/assessment-core/form/types.ts": {
+      "before": null,
+      "after": "53f681ab3053a6e14f7e768390388d27a3d8c18c",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/modules/composite/types.ts": {
+      "before": "2a7216c8ac2f52a0c828aa5285e86797f1b25ce2",
+      "after": "e49d8463af6d9eb606e98c159d91d490dcefe7c0",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/AssignmentList.tsx": {
+      "before": "bfdcc74bcec8781ba98801c7a212be42c22ae0a9",
+      "after": "5b1ac959c219acebee038db301ac7933f9524cb3",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/CheckinList.tsx": {
+      "before": "59b076d1c6adb1732012fa7d2284bc7e8beafb91",
+      "after": "553315ba8020fb6cb01e7c0c92c5ca2cbd3a0c33",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/CourseList.tsx": {
+      "before": "3069c2cae414691125148b2a828ff34a7bac491d",
+      "after": "33c3274d39cbe90006b0b440a1e38f053a6efc67",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/ScaleEdit.tsx": {
+      "before": "058f47472e2038e9219f22509ff9cc788c5689d6",
+      "after": "583c857bebe681bca7ee54ba8cd6d83b9c7e5020",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/ScaleList.tsx": {
+      "before": "e1c992aa34829ca411170c79c5a22f90987fe55a",
+      "after": "5858c731720ef22be5cc100a0dee13a5d8a4abb7",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/__tests__/CourseList.share-authority.test.tsx": {
+      "before": null,
+      "after": "787515143308316c973a55cc438c7ee4877bbbf7",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/__tests__/ScaleEdit.readonly.test.tsx": {
+      "before": null,
+      "after": "f13805ec7a20b82b0916c2b1e5f2348a726e6795",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/__tests__/ScaleList.grants.test.tsx": {
+      "before": "5194a961e5c553481eb262813c80af45e83dcfeb",
+      "after": "cd6efbdff798fac619a1ca6a858cdf785789abde",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/__tests__/TrainingTaskDeepLinks.test.tsx": {
+      "before": null,
+      "after": "a587c2ff2f13871d193412d91b864eeb86ae60af",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/teacher/CompositeAssessmentResults.tsx": {
+      "before": "6c3d1935cc511c5b33af9d58c8553d8604dd0d70",
+      "after": "7e3d6fae1402b98d8072040ff4a31c417fc30005",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/teacher/__tests__/CompositeAssessmentResults.navigation.test.tsx": {
+      "before": null,
+      "after": "25c151e703cda5068d43e3091c2d04eabffe05f2",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/survey/FormChoiceExtras.tsx": {
+      "before": "1c686a6e7ad2208e168aab42be3c61245cf82b05",
+      "after": "de0ad58735705f3b1a7d09f1e24553b6a0883c7b",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/survey/ProfessionalFormAnswer.tsx": {
+      "before": "4337b1caa87468c86a5f1a5146ab5ab45e43221e",
+      "after": "fbba6bfd4fd0329b1be5e954cb9fd8543cdad6ad",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/survey/builder.types.ts": {
+      "before": "b88c2e73e420c5c97020d83c7f175b73ad3fc4cf",
+      "after": "d0495d42b80417898a7e58baf9be503a0e970690",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/survey/form-core-compatibility.test.ts": {
+      "before": null,
+      "after": "5761856f851ffb76e94e366d81313f6285afd782",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/survey/form-visibility.ts": {
+      "before": "4ca3602e1fe18dc1901a80a8cff19372b647400c",
+      "after": "0f49c5d19906f7018fd374584736b8e62c37b7f6",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/training/TrainingCoursePages.test.tsx": {
+      "before": "b7ee55d100752627f2e4761e184e6dbd5ece7c97",
+      "after": "3d571dc325289917fd80fb5f279ad199cce54b37",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/training/TrainingTrainerCourse.tsx": {
+      "before": "a225cf1b943136342072004022e7f86dcab137f2",
+      "after": "ecca0544237c8399b8852a7d0900cc6523bc2d03",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    }
+  },
+  "unchangedConsumers": {
+    ".github/scripts/access-efficiency-reuse.py": "70bd8410d7b2d13079e5858de0300b2de0e2117c",
+    ".github/scripts/survey-candidate-recovery.py": "e067dcafec9a375f39248d39925af23094c8bac3",
+    ".github/release-tools/package.json": "1913b93fbd582fbbd28398488e8e91d6bb9865d5",
+    ".github/release-tools/package-lock.json": "b7731f8e3b798e08d1693a9c7b108405d183f45e"
+  },
+  "images": {
+    "backend-builder": "sha256:5712dc25b5376079960db0fcfee59cf1275001e6a0be1c958dd932f214c117f1",
+    "backend-runtime": "sha256:844fa51e7d09e8155af9b43c61cd3e8f796e51ef9b5a2b0c16a0feff5a55598c",
+    "frontend-runtime": "sha256:29abe75a707f8c88a523fcbd762f0efb6e7568ec0e0c90100d501c2ae5e28312",
+    "frontend-builder": "sha256:545a36b6cc138e0a7ed31b3a007d5746cfebf2f5f757e8ad65c18bbe5aec0add"
+  },
+  "reportDigests": {
+    "12108270326": {
+      "frontend-builder.json": "ffbd5e28f2b9091b4ca05ef645d3468a6b7270752503ed5b0945bdb892a0aa8d",
+      "frontend-runtime.json": "6d4a27f33649dfc6d55942844ec6e469084350ae20241036feab136870c8cca7",
+      "scope.json": "82006787eb0a979b7131ab55d32f6d2eb955db25220685cb831e4288cb97f549"
+    },
+    "12108107165": {
+      "frontend-runtime.json": "6d4a27f33649dfc6d55942844ec6e469084350ae20241036feab136870c8cca7",
+      "frontend-scan-verification.json": "5b9acc70c0523315117ab04b6cf16d36526dfe2170db0522ab3c7b1d1b52cb9b",
+      "frontend-scan.json": "4dce8c61f3ea33e70bf2aa6f0cd6469cbd967cc2818d1fadc8c8c3b1e344e033",
+      "scope.json": "82006787eb0a979b7131ab55d32f6d2eb955db25220685cb831e4288cb97f549"
+    },
+    "12107614128": {
+      "frontend-builder.json": "ffbd5e28f2b9091b4ca05ef645d3468a6b7270752503ed5b0945bdb892a0aa8d",
+      "scope.json": "82006787eb0a979b7131ab55d32f6d2eb955db25220685cb831e4288cb97f549"
+    },
+    "12107757271": {
+      "backend-audit-verification.json": "485ee476e551925cb52c356f3108ccf0e4dd3570dbbdd79af256f1ac83df8482",
+      "backend-builder.json": "1eb34c856399d0ce1657f3eea0176658fc82d191d397bf42cf66b37c058f2338",
+      "scope.json": "82006787eb0a979b7131ab55d32f6d2eb955db25220685cb831e4288cb97f549"
+    },
+    "12107169340": {
+      "backend-runtime.json": "ca6beebfa3fc2cd3c6c347fb0d664db38db4fcf117693086aedb7e87875fa1b3",
+      "backend-scan-verification.json": "2cacdd7f9160b04bb6659dda0b946172fd9062aedb7c0e3c8e9fa4f782f95dad",
+      "backend-scan.json": "a43d085ad0a2a8f38a02ea6f6716273a65e4558107758eeb0d306bc464e91ead",
+      "scope.json": "82006787eb0a979b7131ab55d32f6d2eb955db25220685cb831e4288cb97f549"
+    },
+    "12108067227": {
+      "backend-builder.json": "1eb34c856399d0ce1657f3eea0176658fc82d191d397bf42cf66b37c058f2338",
+      "backend-runtime.json": "ca6beebfa3fc2cd3c6c347fb0d664db38db4fcf117693086aedb7e87875fa1b3",
+      "scope.json": "82006787eb0a979b7131ab55d32f6d2eb955db25220685cb831e4288cb97f549"
+    },
+    "12108225895": {
+      "backend-builder.json": "1eb34c856399d0ce1657f3eea0176658fc82d191d397bf42cf66b37c058f2338",
+      "backend-probe-verification.json": "bf8f300e8a453a1c128a9d27604794c4a1d3ea018fdd6034126201474e7b135e",
+      "backend-runtime.json": "ca6beebfa3fc2cd3c6c347fb0d664db38db4fcf117693086aedb7e87875fa1b3",
+      "recovery-bootstrap.json": "54e2fc9722dc2f221cef2ea7779df2e0dfc1c3c4830050d93e4b47322eedfa91",
+      "runtime-http.json": "ec68ebcddc2f64508311cb31412af6804f881d9564eb2e3b60d4d4d682e20331",
+      "scope.json": "82006787eb0a979b7131ab55d32f6d2eb955db25220685cb831e4288cb97f549"
+    },
+    "12107183957": {
+      "backend-builder.json": "1eb34c856399d0ce1657f3eea0176658fc82d191d397bf42cf66b37c058f2338",
+      "scope.json": "82006787eb0a979b7131ab55d32f6d2eb955db25220685cb831e4288cb97f549"
+    },
+    "12107474796": {
+      "frontend-probe-verification.json": "231cd7c516330d887ec59b1dbb79ddeab7e2d2bba1d996d436d0b40761ea70d9",
+      "frontend-runtime.json": "6d4a27f33649dfc6d55942844ec6e469084350ae20241036feab136870c8cca7",
+      "scope.json": "82006787eb0a979b7131ab55d32f6d2eb955db25220685cb831e4288cb97f549"
+    },
+    "12107494414": {
+      "scope.json": "82006787eb0a979b7131ab55d32f6d2eb955db25220685cb831e4288cb97f549"
+    },
+    "12108091968": {
+      "frontend-audit-verification.json": "174b964007c8bf9b637ec817354f134cf6c45b4225bbd696a7d70d72c742a191",
+      "frontend-builder.json": "ffbd5e28f2b9091b4ca05ef645d3468a6b7270752503ed5b0945bdb892a0aa8d",
+      "scope.json": "82006787eb0a979b7131ab55d32f6d2eb955db25220685cb831e4288cb97f549"
+    }
+  },
+  "raceReceipt": {
+    "run": 39054194991,
+    "head": "b54ee2745e2551e898aee9d8632682ae4c9a6d26",
+    "tree": "2610c7e1a779f927533b455f6d6d9411c93bd1ba",
+    "mergeHead": "49195bf6e49b000801386b842455a36a76d91393",
+    "workflow": ".github/workflows/ci.yml",
+    "event": "pull_request",
+    "branch": "fix/shared-assessment-foundation-merge-20261017",
+    "attempt": 1,
+    "pr": 310,
+    "base": "0c41f07cb8c6104ad7c88448d948682baf24cf37",
+    "job": {
+      "id": 117458745733,
+      "name": "reviewed-candidate / admitted runtime / race",
+      "completedAt": "2026-10-17T17:33:47Z"
+    },
+    "artifact": {
+      "id": 12109046588,
+      "name": "reviewed-candidate-39054194991-b54ee2745e2551e898aee9d8632682ae4c9a6d26-race-attempt-1",
+      "size": 6353,
+      "digest": "sha256:9fdeeee5c882c9ff76d0d3577c3bc0d1dbc959c7c61bef253c5802dd21349ec6",
+      "createdAt": "2026-10-17T17:33:45Z"
+    },
+    "reportDigests": {
+      "official-admission.json": "153a84dd9b16ce2df83be8ea50530c8a5eaa3c179420161871e42b0b1999f163",
+      "race-verification.json": "a63723e2c82ed3c18f0b14081e6151763287676142795cd52147bf26f4187afb",
+      "recovery-bootstrap.json": "e5218ca2b73a9072fd0f69da506ca42afba9541b959a5dbf2949689868a91936",
+      "scale-race.json": "40988ca4695560ba092798760bdf55712cd2336756a4ce60d9f7e06cb6e4d7d0"
+    },
+    "scriptBlob": "d5357d57198919273c6b78c47663cc17a49ecd55",
+    "originalAdapterBlob": "dcb4930e7149b834932025577b3b3215cbba6cb1",
+    "functionHashes": {
+      "container": "b6dffbc9fa1b3a3eedd1aa8e0450b8c7975e75fa2b60df67046449c3f2e94bbb",
+      "probe": "ffae8259d4af590901632ded3d0378086fe5a42b3e75afd8d82f0cf56d38a393",
+      "runtime_environment": "825f41d6b408ad7f354f1b578b93a985ac92aaa9e959956c874e21907d86edf6",
+      "wait_services": "7454b353de7708d4587e88337493ad1576a376e7d313729ea60b100bdc4dbbda",
+      "wait_api": "a3445be99a210aa21fd25152c0db6c8881cb677827dadf36ab5360fb2aedbe62"
+    },
+    "backendTree": "cc7dbffeae5f847aec3b853b6b8138b3b04ce390",
+    "backendImages": {
+      "backend-builder": "sha256:5712dc25b5376079960db0fcfee59cf1275001e6a0be1c958dd932f214c117f1",
+      "backend-runtime": "sha256:844fa51e7d09e8155af9b43c61cd3e8f796e51ef9b5a2b0c16a0feff5a55598c"
+    }
+  },
+  "frontendPatch": {
+    "beforeTree": "485b4d1a5e15df2f72e277a25828cd4ae0738421",
+    "afterTree": "a16e227fce4a9154ccad9a83700db1dba8df428c",
+    "files": {
+      "server-version/frontend/src/pages/ScaleEdit.tsx": {
+        "before": "583c857bebe681bca7ee54ba8cd6d83b9c7e5020",
+        "after": "eefb412bdbf4528ae71cf0e36ef4bd0d47d26a52",
+        "status": "M",
+        "oldMode": "100644",
+        "newMode": "100644"
+      },
+      "server-version/frontend/src/pages/ScaleEdit.css": {
+        "before": null,
+        "after": "ceae6baf3497c464f9e03ac9b0587bde6f9f84dc",
+        "status": "A",
+        "oldMode": "000000",
+        "newMode": "100644"
+      }
+    }
+  },
+  "testFix": {
+    "beforeTree": "a16e227fce4a9154ccad9a83700db1dba8df428c",
+    "afterTree": "94c93e4ae841c452a39f8f96ca12eb1222a67d80",
+    "files": {
+      "server-version/frontend/src/pages/__tests__/TrainingTaskDeepLinks.test.tsx": {
+        "before": "a587c2ff2f13871d193412d91b864eeb86ae60af",
+        "after": "dfb060a6de61ffc076814c5e096e91efff2a793d",
+        "status": "M",
+        "oldMode": "100644",
+        "newMode": "100644"
+      },
+      "server-version/e2e/visual-interaction-states-browser-e2e.cjs": {
+        "before": "ea557936d8785a4a18066ec1bf88206e98176932",
+        "after": "c927844d8641f02e80adfaf862dc6c0c908d1a53",
+        "status": "M",
+        "oldMode": "100644",
+        "newMode": "100644"
+      }
+    }
+  },
+  "frontendAssemblyReceipt": {
+    "run": 39076589264,
+    "head": "1ffb8eeb02fac5bf2969f8536cffe8837ceda18e",
+    "tree": "4402bab18001d7307399016d7cd81b072ffc65e7",
+    "mergeHead": "bccf8b1c32dd4c48f94812c78f277cb661a0877b",
+    "workflow": ".github/workflows/ci.yml",
+    "event": "pull_request",
+    "branch": "fix/shared-assessment-foundation-merge-20261017",
+    "attempt": 1,
+    "pr": 310,
+    "base": "0c41f07cb8c6104ad7c88448d948682baf24cf37",
+    "job": {
+      "id": 117525035914,
+      "name": "reviewed-candidate / changed frontend / build scan and package",
+      "completedAt": "2026-10-17T22:51:23Z"
+    },
+    "artifact": {
+      "id": 12117506265,
+      "name": "reviewed-current-frontend-39076589264-1ffb8eeb02fac5bf2969f8536cffe8837ceda18e-attempt-1",
+      "size": 30051558,
+      "digest": "sha256:f33ccd45e91626fc73b05d979add229e57a727b9d125f9169c2013048af98bbb",
+      "createdAt": "2026-10-17T22:51:20Z"
+    },
+    "reportsArtifact": {
+      "id": 12117600855,
+      "name": "reviewed-candidate-39076589264-1ffb8eeb02fac5bf2969f8536cffe8837ceda18e-frontend-attempt-1",
+      "size": 23022,
+      "digest": "sha256:41c4e1873b5dfe3773823398cb43641329656bae42b94210dffccc645071d58f",
+      "createdAt": "2026-10-17T22:51:21Z"
+    },
+    "reportDigests": {
+      "frontend-runtime.json": "1893742d6468c62a4d4094d474f5596786a1116c2ca05d791216a3d7a35c2dfa",
+      "frontend-verification.json": "329d210280a509cb8d68a6982b087da78ae30f450696fdd8ebba7e7aa59af049",
+      "official-admission.json": "8487a80f60be7004bea595cc3abfd54602d4564d325234962a9e771af87af018"
+    },
+    "imageId": "sha256:d17082be977d42c85ee21077f6fd2c6f3d8469c92b2ea7aee211f8433baba7f3",
+    "componentTree": "a16e227fce4a9154ccad9a83700db1dba8df428c",
+    "claim": "Only successful build, runtime assembly and scoped lint phases admitted from a failed job. Types, component tests and scan are not passed; run them against complete checkout and this exact runtime."
+  },
+  "qualificationReceipt": {
+    "run": 39077490826,
+    "head": "b5c63aa6e3ebef520212abc6c564baac4928a992",
+    "tree": "c09244b764a40e4142fc7f722df32c22579223ae",
+    "mergeHead": "b5e7e93adaab263a2dd73d1a5e02934f6d11bc92",
+    "workflow": ".github/workflows/ci.yml",
+    "event": "pull_request",
+    "branch": "fix/shared-assessment-foundation-merge-20261017",
+    "attempt": 1,
+    "pr": 310,
+    "base": "0c41f07cb8c6104ad7c88448d948682baf24cf37",
+    "frontendTree": "94c93e4ae841c452a39f8f96ca12eb1222a67d80",
+    "backendTree": "cc7dbffeae5f847aec3b853b6b8138b3b04ce390",
+    "jobs": {
+      "frontend": {
+        "id": 117527620237,
+        "name": "reviewed-candidate / admitted frontend / missing types contracts and scan",
+        "completedAt": "2026-10-17T23:04:43Z"
+      },
+      "browser": {
+        "id": 117527900476,
+        "name": "reviewed-candidate / admitted runtime / browser",
+        "completedAt": "2026-10-17T23:06:03Z"
+      },
+      "interaction-chromium": {
+        "id": 117527900470,
+        "name": "reviewed-candidate / admitted runtime / interaction-chromium",
+        "completedAt": "2026-10-17T23:05:52Z"
+      },
+      "interaction-firefox": {
+        "id": 117527900553,
+        "name": "reviewed-candidate / admitted runtime / interaction-firefox",
+        "completedAt": "2026-10-17T23:06:00Z"
+      },
+      "interaction-webkit": {
+        "id": 117527900478,
+        "name": "reviewed-candidate / admitted runtime / interaction-webkit",
+        "completedAt": "2026-10-17T23:06:16Z"
+      }
+    },
+    "artifacts": {
+      "frontend": {
+        "id": 12117124436,
+        "name": "reviewed-candidate-39077490826-b5c63aa6e3ebef520212abc6c564baac4928a992-frontend-attempt-1",
+        "size": 37902,
+        "digest": "sha256:04e6396d5600b1f1e831192efd511e1cbbeb2554c9b61b50f37511d2f5e53fae",
+        "createdAt": "2026-10-17T23:04:40Z"
+      },
+      "browser": {
+        "id": 12117537813,
+        "name": "reviewed-candidate-39077490826-b5c63aa6e3ebef520212abc6c564baac4928a992-browser-attempt-1",
+        "size": 558745,
+        "digest": "sha256:2b0a467b0fa522141690388cea05fcd7fe8979f5db997154b6d0bc1440642114",
+        "createdAt": "2026-10-17T23:06:01Z"
+      },
+      "interaction-chromium": {
+        "id": 12117667238,
+        "name": "reviewed-candidate-39077490826-b5c63aa6e3ebef520212abc6c564baac4928a992-interaction-chromium-attempt-1",
+        "size": 1656590,
+        "digest": "sha256:3458afa3bfa0e1dca7fd1ba94ba73541c21584c09fdb09c3ed159fccd50632f6",
+        "createdAt": "2026-10-17T23:05:49Z"
+      },
+      "interaction-firefox": {
+        "id": 12117766884,
+        "name": "reviewed-candidate-39077490826-b5c63aa6e3ebef520212abc6c564baac4928a992-interaction-firefox-attempt-1",
+        "size": 1484257,
+        "digest": "sha256:e42915902d0abd40d6c9175e62755254ac0685aaa2bd654721a20a2769957e8b",
+        "createdAt": "2026-10-17T23:05:58Z"
+      },
+      "interaction-webkit": {
+        "id": 12117129603,
+        "name": "reviewed-candidate-39077490826-b5c63aa6e3ebef520212abc6c564baac4928a992-interaction-webkit-attempt-1",
+        "size": 1458216,
+        "digest": "sha256:3999f472fa6e4692e1219b08da9e3f60062d6931e9d44a6c1d066f92141330ea",
+        "createdAt": "2026-10-17T23:06:14Z"
+      }
+    },
+    "reportDigests": {
+      "frontend": {
+        "frontend-verification.json": "6072d908358f260d04768912eb386cf3edd478a2a901c537a4b556fa729f433b",
+        "selected-component-tests.json": "4e224dee6a02682ea6d83fc6306fe2bea7da4dca79ea78aae084aaab9c012066",
+        "frontend-scan.json": "b2d5e220512b3d688c0dd7c64e4465047db01715cea4c981db6ed26a7852c552"
+      },
+      "browser": {
+        "browser.json": "546ee7b0f94580717cf2cb259e9e422249ffd4c40701b7ee3a7feca9fb211a5d",
+        "contrast-baseline.json": "0a57fc7fde933bc7e5552cea89fcfc9538b17516a2ef457fad1469ecf8d16a0d",
+        "browser-verification.json": "91341b357af7a20d5c5ba6749c69c77df7b5dba877afcc19b9ef89ced4999c70"
+      },
+      "interaction-chromium": {
+        "interaction-chromium-verification.json": "8de7ab4c576b4be633da219abe5561f9c36cefe6b7e8b4d6a504650b4dd124a7",
+        "interaction-chromium/interaction-states/qa.json": "9fff525fcd0b50bfb290d21837f3ab7c304a382814cf73f9bd5929ce1f1b53c4"
+      },
+      "interaction-firefox": {
+        "interaction-firefox-verification.json": "7c4843435036619cfd74a20144c67ecc6791fbee79b5c89841a2c1d4ba5a59c1",
+        "interaction-firefox/interaction-states/qa.json": "9fff525fcd0b50bfb290d21837f3ab7c304a382814cf73f9bd5929ce1f1b53c4"
+      },
+      "interaction-webkit": {
+        "interaction-webkit-verification.json": "cdab13a8006406a105559f3a7b08fcb15141012c0adeae0f0779a460d1b2e825",
+        "interaction-webkit/interaction-states/qa.json": "9fff525fcd0b50bfb290d21837f3ab7c304a382814cf73f9bd5929ce1f1b53c4"
+      }
+    },
+    "inputs": {
+      ".github/scripts/reviewed-candidate-browser.mjs": "43e6b343fe76b250b207038837c9dd9f1da4bc7f",
+      ".github/release-tools/package.json": "1913b93fbd582fbbd28398488e8e91d6bb9865d5",
+      ".github/release-tools/package-lock.json": "b7731f8e3b798e08d1693a9c7b108405d183f45e",
+      "server-version/e2e/visual-interaction-states-browser-e2e.cjs": "c927844d8641f02e80adfaf862dc6c0c908d1a53",
+      "server-version/e2e/visual-canonical-browser-e2e.cjs": "82b8b25778b6801a0fc3a5b4dcc3087f6682afbd",
+      "server-version/e2e/visual-failure-diagnostics.cjs": "af3b71f49c23c365756eee689cbc5b7d1487ac46",
+      "server-version/cognitive-randomization-golden-v1.json": "5b3cb7c11138044ad6a85626e74004bea2a3e62a",
+      "server-version/backend/src/modules/cognitive/generated/identities.json": "dc7aa603721cdea46de7e0ed93f04ba9679a02e4",
+      "server-version/frontend/src/pages/__tests__/TrainingTaskDeepLinks.test.tsx": "dfb060a6de61ffc076814c5e096e91efff2a793d",
+      "server-version/frontend/src/pages/__tests__/ScaleEdit.readonly.test.tsx": "f13805ec7a20b82b0916c2b1e5f2348a726e6795"
+    },
+    "browserScriptBlob": "43e6b343fe76b250b207038837c9dd9f1da4bc7f",
+    "browserScriptSha256": "38f3b7602caed03c214be813add31a802a6efd25f2abc60f1bd6472e3034797b"
+  }
+}

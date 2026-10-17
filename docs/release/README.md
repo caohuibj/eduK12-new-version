@@ -2,6 +2,18 @@
 
 本文件是新发布路线的统一入口，实现位于 `server-version/scripts/release/`。生产启用须有当次用户授权；文档本身不自动赋予部署权限。本轮用户已追加快速合并及部署授权，实际结果另行记录。
 
+## 已审查候选的正式接纳（reviewed-candidate）
+
+本路线保留 `.github/scripts/reviewed-candidate-source.json` 原始 49 文件、blob、前后端 tree、官方工作流/run/attempt/jobs/artifacts、镜像及报告摘要作为不可改写基线。原来源仍为 `1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c` 的官方 push run `39051668787` attempt 1；成功的原候选工作流本身不代表可合并。新 manifest 须独立审查，不能自动发现成功 run 后扩大范围。
+
+- 修改组件 → 原 49 文件及精确 12 个接纳工具/说明路径，加上 `frontendPatch` 明列的 ScaleEdit.tsx 和组件专用 ScaleEdit.css 产品覆盖层；另有 `testFix` 精确绑定 TrainingTaskDeepLinks.test.tsx 和 visual-interaction-states-browser-e2e.cjs 两个测试修复。完整 main→head 共 63 路径；后端、依赖、数据库和附件不变。每项 before/after blob、模式及前端树均绑定；未知路径、删除、重命名、执行位或链接拒绝本路线。
+- 具体故障 → 原浏览器发现 ScaleEdit 未选中标签对比度 4.46095，低于既有 4.5 门槛。局部颜色修正已完成一次官方构建与装配。其后类型检查在前端-only 容器缺仓库兄弟 JSON fixture 而失败；另有异步 focus 测试过早断言和旧列表 mock 不适配已授权详情 API。保留失败历史，不放宽焦点、权限、可访问性或扫描要求。
+- 复用证据 → 原 13 项官方来源及成功 PostgreSQL race job `117458745733` / artifact `12109046588` 保留原身份、24 小时有效期、113 断言、6 HTTP、5 竞争及清理证据。固定 run `39076589264` 的 frontend job `117525035914` 明确为失败；只接纳其实际成功的 build/package/lint 阶段，使用 artifact `12117506265` 的原镜像与原 source 标签，不能称类型、单测或扫描已通过。核验固定 SHA/tree、官方 run/job/attempt、ZIP 大小/摘要、3 份原始报告摘要及镜像 ID；不改变原证据时间，不自动发现或回退到其他 run。
+- 主要位置 → GitHub PR scope 执行变化后的边界/拒绝/合并契约。固定 run `39077490826` 的 app types、两文件 41 单测、同 runtime 扫描和三浏览器各五状态×四宽度已经成功；按原 job、ZIP、报告摘要、完整组件 tree 与工具 blob 接纳，不重复安装或执行。该 run 的 browser job 保留 failure：仅接纳已成功的五个 390px 场景与原对比度基线；核对固定旧脚本的 fixture、启动参数、helper、场景正文，唯一行为修复是 Survey 题干改用准确 textbox 可访问名称定位。当前 browser 只执行剩余九个上下文，报告分列新执行九个与旧接纳五个，完整十四项全部通过才成功。后端 race 继续原直接来源接纳。CodeQL 覆盖变化工具/测试，不扩大至未修改后端。本机只静态审查，不运行应用检查或连接生产，不新增 secrets/self-hosted runner，不改信任及 ruleset。
+- 正式门禁 → 稳定 `merge gate / ready PR` 要求 scope、reviewed-candidate（完整六作业）和 codeql 真实 success，并重算实际 checkout 的完整计划。当前 frontend 资格真实成功前不运行消费项。draft、缺失、跳过、取消或失败不得授予合并资格；仅明确绑定的旧成功阶段可接纳，旧失败作业不改写为成功。
+- 时间预算 → 约 5 分钟报告当前等待阶段；frontend 证据接纳上限 5 分钟，各消费项上限 15 分钟。缺失来源证据直接阻断已知候选，不恢复无关全量验收；其他未知差异仍按通用保守规则处理。新 artifacts 仅保留当前 run/head/action/attempt 的 JSON 和截图，不上传私有数据、数据库或重复镜像。
+- 合并后 → main push 对本次固定 before base 取三份固定源 SHA 并核 tree 后分类，不重跑此 PR 的契约、接纳或探针。上线仍单独受当次授权及版本/就绪/短流程/回退门禁约束；本轮 CI 不授予生产部署权限。
+
 ## 规则位置与每次开工方式
 
 仓库本文件是完整规则的唯一维护来源，根 `AGENTS.md` 是开发/代理入口，`.github/PULL_REQUEST_TEMPLATE.md` 只记录本次适用项。本机 `~/.codex/AGENTS.md` 的 Huisurvey 专用段落和服务器 `/opt/eduk12-new/deploy/AGENTS.md` 仅作指引，指向同一仓库规则，不独立维护另一套发布标准。源码和文档均按实际 Git 版本读取；服务器安装版本不可静默改写为另一版本。

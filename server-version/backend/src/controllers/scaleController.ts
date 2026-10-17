@@ -269,18 +269,21 @@ export const scaleController = {
       if (!scale) return notFound(res, '量表不存在')
       if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) return forbidden(res, '无权限修改此量表')
       if (scale.instrumentClass !== 'CUSTOM_DESCRIPTIVE') return error(res, 'STANDARD 量表 definition 由代码 package 管理，不能通过网页修改')
-      if (scale.status !== 'DRAFT') return error(res, '只有草稿状态的量表可以修改 definition')
+      if (scale.status !== 'DRAFT') return error(res, '只有草稿状态的量表可以修改 definition', -1, 409)
 
       const validation = validateScaleDefinition(parsedBody.data.definition, { instrumentClass: 'CUSTOM_DESCRIPTIVE' })
       if (!validation.definition || validation.issues.some((issue) => issue.severity === 'error')) {
         return error(res, definitionIssuesMessage(validation.issues))
       }
+      // The state predicate is part of the write: publishing between the read
+      // and this update must never mutate the newly frozen definition.
       const updated = await prisma.scale.update({
-        where: { id },
+        where: { id, status: 'DRAFT', instrumentClass: 'CUSTOM_DESCRIPTIVE' },
         data: { definition: validation.definition as any, definitionHash: hashScaleDefinition(validation.definition), ...definitionSummary(validation.definition) },
       })
       return success(res, { ...updated, definition: validation.definition }, 'definition 保存成功')
     } catch (err) {
+      if ((err as { code?: string })?.code === 'P2025') return error(res, '量表状态已变化，请刷新后重试', -1, 409)
       logger.error('保存量表 definition 错误', err)
       return error(res, '保存量表 definition 失败')
     }
@@ -464,15 +467,18 @@ export const scaleController = {
         return forbidden(res, '无权限修改此量表')
       }
 
+      if (scale.instrumentClass !== 'CUSTOM_DESCRIPTIVE') {
+        return error(res, 'STANDARD 量表由代码 package 管理，网页只读')
+      }
       // 已发布的量表不能修改核心配置
       if (scale.status !== 'DRAFT') {
-        return error(res, '只有草稿状态的量表可以修改')
+        return error(res, '只有草稿状态的量表可以修改', -1, 409)
       }
 
       const payload = result.data
 
       const updated = await prisma.scale.update({
-        where: { id },
+        where: { id, status: 'DRAFT', instrumentClass: 'CUSTOM_DESCRIPTIVE' },
         data: payload,
         include: {
           creator: {
@@ -497,6 +503,7 @@ export const scaleController = {
 
       return success(res, updated, '量表更新成功')
     } catch (err) {
+      if ((err as { code?: string })?.code === 'P2025') return error(res, '量表状态已变化，请刷新后重试', -1, 409)
       logger.error('更新量表错误', err)
       return error(res, '更新量表失败')
     }

@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { PageHeader, ProductPage, ProductStatus } from '../../components/product-ui'
 import { compositeApi } from '../../modules/composite/api'
+import { useAuth } from '../../contexts/AuthContext'
 import type {
   CompositeAttemptListStatus,
   CompositeTeacherAttemptRow,
@@ -23,6 +24,11 @@ const formatTime = (value: string | null) => {
 
 const CompositeAssessmentResults: React.FC = () => {
   const { id = '' } = useParams<{ id: string }>()
+  const { user } = useAuth()
+  return <CompositeAssessmentResultsContent key={JSON.stringify([user?.id, user?.role, id])} id={id} />
+}
+
+const CompositeAssessmentResultsContent: React.FC<{ id: string }> = ({ id }) => {
   const navigate = useNavigate()
   const [data, setData] = useState<CompositeTeacherAttemptsResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -32,31 +38,46 @@ const CompositeAssessmentResults: React.FC = () => {
   const [q, setQ] = useState('')
   const [page, setPage] = useState(1)
 
-  const load = async () => {
-    if (!id) return
-    setLoading(true)
-    try {
-      const response = await compositeApi.attempts(id, {
-        status: status || undefined,
-        q: q || undefined,
-        page,
-        pageSize: 20,
-      })
-      if (response.code !== 0 || !response.data) throw new Error(response.message || '无法加载作答名单')
-      setData(response.data)
-      setError(null)
-    } catch (err) {
-      setData(null)
-      setError((err as { message?: string }).message || '无法加载作答名单')
-    } finally {
-      setLoading(false)
-    }
-  }
+  const [revision, setRevision] = useState(0)
 
-  useEffect(() => { void load() }, [id, status, q, page])
+  useEffect(() => {
+    let active = true
+    setLoading(true)
+    setData(null)
+    setError(null)
+    void (async () => {
+      try {
+        if (!id) throw new Error('测评链接无效')
+        const response = await compositeApi.attempts(id, {
+          status: status || undefined,
+          q: q || undefined,
+          page,
+          pageSize: 20,
+        })
+        if (!active) return
+        if (response.code !== 0 || !response.data || response.data.assessment.id !== id) throw new Error(response.message || '无法加载作答名单')
+        setData(response.data)
+      } catch (err) {
+        if (active) {
+          setData(null)
+          setError((err as { message?: string }).message || '无法加载作答名单')
+        }
+      } finally {
+        if (active) setLoading(false)
+      }
+    })()
+    return () => { active = false }
+  }, [id, status, q, page, revision])
+
+  const productKind = data?.assessment.productKind
+  const isBundle = productKind === 'ASSESSMENT_BUNDLE'
+  const editorPath = productKind === 'QUESTIONNAIRE' ? '/questionnaire-products/' + encodeURIComponent(id)
+    : isBundle ? '/bundle-products/' + encodeURIComponent(id)
+      : productKind === 'LEGACY_COMPOSITE' ? '/composite-assessments/' + encodeURIComponent(id) : null
+  const reportAvailable = (row: CompositeTeacherAttemptRow) => row.status === 'COMPLETED' || (!isBundle && row.partialReportAvailable)
 
   const openReport = (row: CompositeTeacherAttemptRow) => {
-    if (row.status !== 'COMPLETED' && !row.partialReportAvailable) return
+    if (!reportAvailable(row)) return
     navigate(`/composite-assessments/${id}/attempts/${row.id}/report${row.status === 'COMPLETED' ? '' : '?partial=1'}`)
   }
 
@@ -64,8 +85,9 @@ const CompositeAssessmentResults: React.FC = () => {
 
   return (
     <ProductPage width="management" className="space-y-6">
-      <PageHeader title={data?.assessment.name || '作答与报告'} description={data?.assessment.code || '查看参与者进度与已完成报告'} actions={<button onClick={() => navigate((data?.assessment as any)?.productKind === 'QUESTIONNAIRE' ? '/questionnaire-products/' + id : '/composite-assessments/' + id)} className="staff-secondary-link"><ArrowLeft className="w-4 h-4" aria-hidden="true" />返回配置</button>} />
-      {error && <ProductStatus kind="error" title="作答名单加载失败">{error}</ProductStatus>}
+      <PageHeader title={data?.assessment.name || '作答与报告'} description={data?.assessment.code || '查看参与者进度与已完成报告'} actions={editorPath ? <button onClick={() => navigate(editorPath)} className="staff-secondary-link"><ArrowLeft className="w-4 h-4" aria-hidden="true" />返回配置</button> : undefined} />
+      {error && <ProductStatus kind="error" title="作答名单加载失败" actions={<button type="button" className="btn-secondary" onClick={() => setRevision(value => value + 1)}>重试</button>}>{error}</ProductStatus>}
+      {isBundle && <p className="text-sm text-gray-600">综合报告可用时，可在报告页导出 JSON。</p>}
       <div className="grid grid-cols-3 gap-3 mb-5">
         <div className="card p-4"><p className="text-sm text-gray-500">已开始</p><p className="text-2xl font-semibold">{counts?.started ?? 0}</p></div>
         <div className="card p-4"><p className="text-sm text-gray-500">进行中</p><p className="text-2xl font-semibold">{counts?.inProgress ?? 0}</p></div>
@@ -142,11 +164,11 @@ const CompositeAssessmentResults: React.FC = () => {
                     <button
                       type="button"
                       className="btn-secondary py-1 px-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                      disabled={row.status !== 'COMPLETED' && !row.partialReportAvailable}
-                      title={row.status === 'COMPLETED' ? '查看报告' : row.partialReportAvailable ? '只读查看已完成单项' : '完成后方可查看报告'}
+                      disabled={!reportAvailable(row)}
+                      title={row.status === 'COMPLETED' ? '查看报告' : reportAvailable(row) ? '只读查看已完成单项' : '完成后方可查看报告'}
                       onClick={() => openReport(row)}
                     >
-                      {row.status === 'COMPLETED' ? '查看' : row.partialReportAvailable ? '已完成单项' : '查看'}
+                      {isBundle && row.status === 'COMPLETED' ? '查看报告' : row.status !== 'COMPLETED' && reportAvailable(row) ? '已完成单项' : '查看'}
                     </button>
                   </td>
                 </tr>

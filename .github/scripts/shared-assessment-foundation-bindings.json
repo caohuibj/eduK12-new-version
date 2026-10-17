@@ -1,0 +1,295 @@
+{
+  "schema": 1,
+  "base": "0c41f07cb8c6104ad7c88448d948682baf24cf37",
+  "productSource": "33500d2c5fdc0262008ceb86c4530b31d57b8055",
+  "productTree": "fc437e2d782d16d1f4318e439f9f666bae077ba4",
+  "branch": "refs/heads/fix/shared-assessment-foundation-20261017",
+  "components": {
+    "backend": "cc7dbffeae5f847aec3b853b6b8138b3b04ce390",
+    "frontend": "485b4d1a5e15df2f72e277a25828cd4ae0738421"
+  },
+  "files": {
+    "docs/shared-assessment-foundation-v1.md": {
+      "before": null,
+      "after": "90d78f6986977a94cc0a2f014f2811df8665ec8b"
+    },
+    "server-version/backend/src/__tests__/assessment-core/fixtures/form-foundation-cases.json": {
+      "before": null,
+      "after": "babdc5c98c7cb15759f1d245e3fd57f4cc447686"
+    },
+    "server-version/backend/src/__tests__/assessment-core/fixtures/form-foundation-golden.json": {
+      "before": null,
+      "after": "7c1da5a0fae250b4c2eea03cf934344f7d405d32"
+    },
+    "server-version/backend/src/__tests__/assessment-core/form-foundation-corpus.ts": {
+      "before": null,
+      "after": "bf3753c9543b0194c7edce70ac4b25627ed47e56"
+    },
+    "server-version/backend/src/__tests__/assessment-core/form-foundation.contract.test.ts": {
+      "before": null,
+      "after": "961733607ce71257ad47a4da72093944d96dc877"
+    },
+    "server-version/backend/src/__tests__/controllers/training-task-detail.test.ts": {
+      "before": null,
+      "after": "d40b39b5681f12cd60ee98fd16698c5c2563145b"
+    },
+    "server-version/backend/src/__tests__/scale/scale-draft-write-guard.test.ts": {
+      "before": null,
+      "after": "477b133813681993b0e76c494574d928ebadd0cd"
+    },
+    "server-version/backend/src/controllers/assignmentController.ts": {
+      "before": "71a121e82be1dca2c6b6f3840799f3cc37cd8424",
+      "after": "34a41cfe93eae2d8f263a2780172cf945681de40"
+    },
+    "server-version/backend/src/controllers/checkinController.ts": {
+      "before": "66016031262e13094c15ab6cdf33662da049537c",
+      "after": "9b207eca6d3ecf4354c7f03f2cd469ff6b124e6e"
+    },
+    "server-version/backend/src/controllers/scaleController.ts": {
+      "before": "48ab157fcc962006f7586679007667ab8b788649",
+      "after": "3909418dbccfd06cf4e3a211d6fef74de794d111"
+    },
+    "server-version/backend/src/controllers/scaleImageController.ts": {
+      "before": "5d19144ef842c56b12ac789bac74e76b231e634a",
+      "after": "4e72a4cb2b8a841b0552ecbe942bb01d27fc13da"
+    },
+    "server-version/backend/src/modules/assessment-core/definition-primitives.ts": {
+      "before": null,
+      "after": "831ec982b84246fabb514622697c95af34b379e9"
+    },
+    "server-version/backend/src/modules/assessment-core/form/answers.ts": {
+      "before": null,
+      "after": "b5a531121e43f055e98ad2b6c8c6d150a42b5c10"
+    },
+    "server-version/backend/src/modules/assessment-core/form/definition.ts": {
+      "before": null,
+      "after": "1c6786635d3bb53ccc0bf188f274f19b2c6964bc"
+    },
+    "server-version/backend/src/modules/assessment-core/form/import-parser.ts": {
+      "before": null,
+      "after": "dcd5f26132d7b57304b35f171d6af4118cba69b1"
+    },
+    "server-version/backend/src/modules/assessment-core/form/runtime.ts": {
+      "before": null,
+      "after": "6d6fdfaafc7d17beb1faf0c41d8c1b3736b07af0"
+    },
+    "server-version/backend/src/modules/survey/builder.definition.ts": {
+      "before": "0512c1cc3fced4929ca9e7baf30d10e09fae6600",
+      "after": "5a566ea81be938ac7b644fc93e7a9530a2f76368"
+    },
+    "server-version/backend/src/modules/survey/builder.import.ts": {
+      "before": "4c672d6b72843205d67afe9ace1f9ed257d9b846",
+      "after": "e8e57a952326074dbc815a6e705ea0638b68e9ab"
+    },
+    "server-version/backend/src/modules/survey/final.compute.ts": {
+      "before": "e98d130bc72cde1554d34003209cffa17012ebe8",
+      "after": "b5569e41fc53b561b37ca9e10680972178a2fb81"
+    },
+    "server-version/frontend/src/modules/assessment-core/form/FormChoiceExtras.tsx": {
+      "before": null,
+      "after": "e42704b0952d41a504c29f25415a6c7fdb034d6a"
+    },
+    "server-version/frontend/src/modules/assessment-core/form/ProfessionalFormAnswer.tsx": {
+      "before": null,
+      "after": "882d9f521894dc8a07a73c330f42b56222a92209"
+    },
+    "server-version/frontend/src/modules/assessment-core/form/form-visibility.ts": {
+      "before": null,
+      "after": "efda87730a6cdf436a30b0ab3df523998f2638f6"
+    },
+    "server-version/frontend/src/modules/assessment-core/form/index.ts": {
+      "before": null,
+      "after": "bf9efb1532615a753fb7281592eb1d38b86099aa"
+    },
+    "server-version/frontend/src/modules/assessment-core/form/types.ts": {
+      "before": null,
+      "after": "53f681ab3053a6e14f7e768390388d27a3d8c18c"
+    },
+    "server-version/frontend/src/modules/composite/types.ts": {
+      "before": "2a7216c8ac2f52a0c828aa5285e86797f1b25ce2",
+      "after": "e49d8463af6d9eb606e98c159d91d490dcefe7c0"
+    },
+    "server-version/frontend/src/pages/AssignmentList.tsx": {
+      "before": "bfdcc74bcec8781ba98801c7a212be42c22ae0a9",
+      "after": "5b1ac959c219acebee038db301ac7933f9524cb3"
+    },
+    "server-version/frontend/src/pages/CheckinList.tsx": {
+      "before": "59b076d1c6adb1732012fa7d2284bc7e8beafb91",
+      "after": "553315ba8020fb6cb01e7c0c92c5ca2cbd3a0c33"
+    },
+    "server-version/frontend/src/pages/CourseList.tsx": {
+      "before": "3069c2cae414691125148b2a828ff34a7bac491d",
+      "after": "33c3274d39cbe90006b0b440a1e38f053a6efc67"
+    },
+    "server-version/frontend/src/pages/ScaleEdit.tsx": {
+      "before": "058f47472e2038e9219f22509ff9cc788c5689d6",
+      "after": "583c857bebe681bca7ee54ba8cd6d83b9c7e5020"
+    },
+    "server-version/frontend/src/pages/ScaleList.tsx": {
+      "before": "e1c992aa34829ca411170c79c5a22f90987fe55a",
+      "after": "5858c731720ef22be5cc100a0dee13a5d8a4abb7"
+    },
+    "server-version/frontend/src/pages/__tests__/CourseList.share-authority.test.tsx": {
+      "before": null,
+      "after": "787515143308316c973a55cc438c7ee4877bbbf7"
+    },
+    "server-version/frontend/src/pages/__tests__/ScaleEdit.readonly.test.tsx": {
+      "before": null,
+      "after": "f13805ec7a20b82b0916c2b1e5f2348a726e6795"
+    },
+    "server-version/frontend/src/pages/__tests__/ScaleList.grants.test.tsx": {
+      "before": "5194a961e5c553481eb262813c80af45e83dcfeb",
+      "after": "cd6efbdff798fac619a1ca6a858cdf785789abde"
+    },
+    "server-version/frontend/src/pages/__tests__/TrainingTaskDeepLinks.test.tsx": {
+      "before": null,
+      "after": "a587c2ff2f13871d193412d91b864eeb86ae60af"
+    },
+    "server-version/frontend/src/pages/teacher/CompositeAssessmentResults.tsx": {
+      "before": "6c3d1935cc511c5b33af9d58c8553d8604dd0d70",
+      "after": "7e3d6fae1402b98d8072040ff4a31c417fc30005"
+    },
+    "server-version/frontend/src/pages/teacher/__tests__/CompositeAssessmentResults.navigation.test.tsx": {
+      "before": null,
+      "after": "25c151e703cda5068d43e3091c2d04eabffe05f2"
+    },
+    "server-version/frontend/src/survey/FormChoiceExtras.tsx": {
+      "before": "1c686a6e7ad2208e168aab42be3c61245cf82b05",
+      "after": "de0ad58735705f3b1a7d09f1e24553b6a0883c7b"
+    },
+    "server-version/frontend/src/survey/ProfessionalFormAnswer.tsx": {
+      "before": "4337b1caa87468c86a5f1a5146ab5ab45e43221e",
+      "after": "fbba6bfd4fd0329b1be5e954cb9fd8543cdad6ad"
+    },
+    "server-version/frontend/src/survey/builder.types.ts": {
+      "before": "b88c2e73e420c5c97020d83c7f175b73ad3fc4cf",
+      "after": "d0495d42b80417898a7e58baf9be503a0e970690"
+    },
+    "server-version/frontend/src/survey/form-core-compatibility.test.ts": {
+      "before": null,
+      "after": "5761856f851ffb76e94e366d81313f6285afd782"
+    },
+    "server-version/frontend/src/survey/form-visibility.ts": {
+      "before": "4ca3602e1fe18dc1901a80a8cff19372b647400c",
+      "after": "0f49c5d19906f7018fd374584736b8e62c37b7f6"
+    },
+    "server-version/frontend/src/training/TrainingCoursePages.test.tsx": {
+      "before": "b7ee55d100752627f2e4761e184e6dbd5ece7c97",
+      "after": "3d571dc325289917fd80fb5f279ad199cce54b37"
+    },
+    "server-version/frontend/src/training/TrainingTrainerCourse.tsx": {
+      "before": "a225cf1b943136342072004022e7f86dcab137f2",
+      "after": "ecca0544237c8399b8852a7d0900cc6523bc2d03"
+    }
+  },
+  "localReview": {
+    "notice": "Local review evidence only. These checks are NOT Actions execution or signed application admission.",
+    "foundation": {
+      "commit": "33500d2c5fdc0262008ceb86c4530b31d57b8055",
+      "tree": "fc437e2d782d16d1f4318e439f9f666bae077ba4",
+      "tests": {
+        "backendFinal": 164,
+        "unaffectedScaleSjtReused": 5,
+        "frontend": 27
+      },
+      "finalBindingSha256": "d8c593ab18e7b037bbc1d1ce18f1087f8b9df7374e73d917ca0ae17540366872",
+      "checks": {
+        "backend-final-contracts": {
+          "bindingSha256": "5e634f7a6c366e223594e29f6e1a6262f4b5193439f188c4c4201efd632e2144",
+          "exitCode": 0,
+          "inputMismatches": [],
+          "seconds": 7.799
+        },
+        "frontend-targeted": {
+          "bindingSha256": "a97f29a537cd86aaa809615c48a96ceb42f8795a94983bc9ad577b5be83182fe",
+          "exitCode": 0,
+          "inputMismatches": [],
+          "seconds": 5.582
+        },
+        "frontend-app-types": {
+          "bindingSha256": "92ff03874677f180f2c2e02063b928e500a4496587511421fb225b4fea99d9af",
+          "exitCode": 0,
+          "inputMismatches": [],
+          "seconds": 19.827
+        },
+        "frontend-scoped-lint": {
+          "bindingSha256": "eee33beaeb15cc99317ae415f3b773eb2213595a6a0c3a2b10a13d7b33751c1e",
+          "exitCode": 0,
+          "inputMismatches": [],
+          "seconds": 0.766
+        },
+        "backend-scorer-compatibility": {
+          "bindingSha256": "df03f06f63b51834fdb95288e0339987b37609eb3ca1b9df88c9baa0b2f81e54",
+          "exitCode": 0,
+          "wholeComponentInputChangesSinceCheck": [
+            "server-version/backend/src/modules/assessment-core/form/runtime.ts"
+          ],
+          "reuseBasis": "Only pure FORM normalizer never-returning helper declaration changed afterward. Selected five Scale/SJT paths do not call this normalizer; their schema, answer-map budget, errors, compilers and scorer sources are unchanged. Not a claim of whole-component exact-source reuse."
+        }
+      },
+      "metrics": {
+        "baseline": {
+          "files": 393,
+          "totalArtifactBytes": 27919865,
+          "jsFiles": 168,
+          "jsBytes": 5434014,
+          "jsGzipBytes": 1733428,
+          "cssBytes": 398018
+        },
+        "candidate": {
+          "files": 393,
+          "totalArtifactBytes": 27919865,
+          "jsFiles": 168,
+          "jsBytes": 5434014,
+          "jsGzipBytes": 1733428,
+          "cssBytes": 398018
+        },
+        "exactArtifactManifestEqual": true,
+        "baselineManifestSha256": "494762578212a3052135495a74daac09812ed5d92b6867d9fe94d48bb37d6c1e",
+        "candidateManifestSha256": "494762578212a3052135495a74daac09812ed5d92b6867d9fe94d48bb37d6c1e",
+        "note": "All 393 output files are byte-identical; no browser bundle size/performance reduction is claimed. No extra renderer implementation is bundled."
+      },
+      "parseCalls": {
+        "before": 2,
+        "after": 1,
+        "frozenBefore": 1,
+        "frozenAfter": 1
+      },
+      "failedBuilds": [
+        {
+          "stage": "backend attempt 1",
+          "result": "Node compiler 1024 MiB heap limit exhausted; no successful artifact",
+          "evidence": "backend-build-attempt1-oom.log"
+        },
+        {
+          "stage": "backend attempt 2",
+          "result": "TypeScript never-helper arrow did not narrow; restored baseline function declaration",
+          "evidence": "backend-build-attempt2-types.log"
+        }
+      ]
+    },
+    "training": {
+      "commit": "7acd085b72d36402218e483e75b246671949b3d9",
+      "equivalentRemote": "aeb5ce0111d28f878d733aff73c6e60e85d4bdbf",
+      "tree": "0d0768d8406ef4d7b963cb365cc08e49a89dd09c",
+      "backendUnique": 87,
+      "frontendUnique": 86,
+      "httpAssertions": 50,
+      "httpRequests": 214,
+      "ledgerSha256": "0e873922b0c89ea5e6ea277f96c801fd35797d14eb3ba67d702f3697a3a6d84a"
+    },
+    "notClaimed": [
+      "Actions execution of local tests",
+      "merge readiness",
+      "browser E2E",
+      "production qualification",
+      "SQL or memory improvement"
+    ],
+    "officialFrontendInputsDiffer": {
+      "localCognitiveEnabled": false,
+      "officialCognitiveEnabled": true,
+      "localDotenvExcludedByDocker": true,
+      "policy": "Local-to-Docker byte equality is informational; same-run Docker builder-to-runtime bytes must match exactly."
+    }
+  }
+}

@@ -113,7 +113,7 @@ export default function TrainingTrainerCourse() {
                   : <div className="training-item-list">{assignments.rows.map(task =>
                     <article className="training-task-item" key={task.id}>
                       <div><h2>{task.title}</h2><p>{task.description || '课程作业'}</p><span>{task.status === 'PUBLISHED' ? '已发布' : '草稿'}</span></div>
-                      <Link to={'/assignments?id=' + encodeURIComponent(task.id)} className="training-row-action">查看管理<ArrowRight size={16} aria-hidden="true" /></Link>
+                      <Link to={'/assignments?id=' + encodeURIComponent(task.id) + '&courseId=' + encoded} className="training-row-action">查看管理<ArrowRight size={16} aria-hidden="true" /></Link>
                     </article>)}</div>}
             </section>}
 
@@ -124,7 +124,7 @@ export default function TrainingTrainerCourse() {
                   : <div className="training-item-list">{checkins.rows.map(task =>
                     <article className="training-task-item" key={task.id}>
                       <div><h2>{task.title}</h2><p>{task.description || '课程打卡'}</p><span>{task.status === 'DRAFT' ? '草稿' : '已发布'}</span></div>
-                      <Link to={'/checkins?id=' + encodeURIComponent(task.id)} className="training-row-action">查看管理<ArrowRight size={16} aria-hidden="true" /></Link>
+                      <Link to={'/checkins?id=' + encodeURIComponent(task.id) + '&courseId=' + encoded} className="training-row-action">查看管理<ArrowRight size={16} aria-hidden="true" /></Link>
                     </article>)}</div>}
             </section>}
 
