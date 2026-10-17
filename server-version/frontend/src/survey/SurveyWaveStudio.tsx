@@ -1,3 +1,4 @@
+import { productOrigins, surveyRecruitmentUrl } from '../products/origins'
 import { useCallback, useRef, useEffect,useState,type FormEvent } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { SurveyFlowStudio,type FormQuestionInfo } from './SurveyFlowStudio'
@@ -224,18 +225,24 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
   const lifecycle=(operation:'prepare'|'open'|'pause'|'resume'|'close'|'hard-stop')=>{
     if(!editing)return
     const wave=editing
+    if(operation==='open'&&!productOrigins()){setError('当前地址不支持生成招募链接');return}
     if(['close','hard-stop'].includes(operation)&&
       !window.confirm(operation==='hard-stop'
         ?'确认紧急停止此波次？已经开始但尚未提交的作答也将禁止 FINAL。'
         :'确认关闭本波次？新的被试将无法开始。'))return
     void act(async()=>{
       const epoch=projectEpoch.current,selection=selectionEpoch.current
+      if(operation==='open')setShareLink('')
       const result=await surveyApi<{researchUrl?:string}>(path+'/waves/'+wave.id+'/'+operation,'POST',{
         revision:wave.revision,
       })
       if(epoch!==projectEpoch.current)return
       if(selection!==selectionEpoch.current){await refresh();return}
-      if(result.researchUrl)setShareLink(result.researchUrl)
+      if(result.researchUrl){
+        const link=surveyRecruitmentUrl(result.researchUrl)
+        if(!link)throw new Error('招募链接地址不受支持，请联系管理员')
+        setShareLink(link)
+      }
       const fresh=await surveyApi<Wave>(path+'/waves/'+wave.id)
       if(epoch!==projectEpoch.current)return
       if(selection!==selectionEpoch.current){await refresh();return}
@@ -263,15 +270,19 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
     })
   }
   const entryToken=(action:'rotate'|'revoke')=>{
+    if(action==='rotate'&&!productOrigins()){setError('当前地址不支持生成招募链接');return}
     if(!editing||!['OPEN','PAUSED'].includes(editing.status))return
     if(action==='revoke'&&!window.confirm('撤销本波次全部已签发的招募链接？已有参与者的个人恢复凭证不会被撤销。'))return
     void act(async()=>{
       const epoch=projectEpoch.current,selection=selectionEpoch.current
+      setShareLink('')
       const result=await surveyApi<{researchUrl?:string;revoked?:boolean}>(
         path+'/waves/'+editing.id+'/entry-token/'+action,'POST',{revision:editing.revision})
       if(epoch!==projectEpoch.current)return
       if(selection!==selectionEpoch.current){await refresh();return}
-      setShareLink(result.researchUrl||'')
+      const link=result.researchUrl?surveyRecruitmentUrl(result.researchUrl):''
+      if(link===null)throw new Error('招募链接地址不受支持，请联系管理员')
+      setShareLink(link)
       const fresh=await surveyApi<Wave>(path+'/waves/'+editing.id)
       if(epoch!==projectEpoch.current)return
       if(selection!==selectionEpoch.current){await refresh();return}

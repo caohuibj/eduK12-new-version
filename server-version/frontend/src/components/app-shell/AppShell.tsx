@@ -1,3 +1,4 @@
+import { productOrigins } from '../../products/origins'
 import { RelationalAvailabilityProvider, useRelationalAvailability } from '../../contexts/RelationalAvailabilityContext'
 import AssessmentTaskShortcut from '../AssessmentTaskShortcut'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
@@ -45,7 +46,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const routeOrganizationId=matchPath('/organizations/:organizationId/*',location.pathname)?.params.organizationId
   const displayOrganization=!routeOrganizationId||routeOrganizationId==='new'||activeOrganization?.organization.id===routeOrganizationId?activeOrganization:null
   const items=training?trainingNavigation(user?.role):[...navigationFor(user?.role,cognitive,relational.status==='available'),...(user?organizationNavigation(displayOrganization?.organization.id,displayOrganization?.allowedActions,platformRole,directoryActions):[])]
-  items.push(...surveyGovernanceNavigation(training,user?.role,platformRole??user?.platformRole))
+  items.push(...surveyGovernanceNavigation(Boolean(productOrigins()),user?.role,platformRole??user?.platformRole))
   if(!training&&user?.role==='ADMIN'&&platformRole==='SYSTEM_ADMIN') items.push({path:'/admin/legacy-archive',label:'历史归档（只读）',section:'system'})
   if(!training&&user?.role==='ADMIN'&&platformRole==='SYSTEM_ADMIN')
     items.push({path:'/admin/education-products',label:'教育产品治理',section:'system'})

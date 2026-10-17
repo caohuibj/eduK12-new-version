@@ -1,3 +1,4 @@
+import { productOrigins, surveyInvitationUrl } from '../../products/origins'
 import { useEffect, useState } from 'react'
 import { SurveyCatalogGrants } from './SurveyCatalogGrants'
 import { ProductPage } from '../../components/product-ui'
@@ -41,13 +42,16 @@ export default function SurveyResearchersAdmin(){
   }
   useEffect(()=>{void refresh().catch(e=>setError(e instanceof Error?e.message:'研究者列表暂不可用'))},[])
   const act=async(path:string,actorName?:string)=>{
+    if(!productOrigins()){setError('当前地址不支持生成 Survey 链接');return}
     if(!password){setError('请输入当前系统管理员密码');return}
     setBusy(true);setError('');setNotice('');setLink('')
     try{
       const result=await platformApi<{id?:string;token?:string;kind?:string}>(path,'POST',{currentPassword:password})
       if(result.token){
         const endpoint=result.kind==='PASSWORD_RESET'?'reset-password':'claim'
-        setLink('https://survey.eduk12.top/'+endpoint+'#token='+result.token)
+        const url=surveyInvitationUrl(endpoint,result.token)
+        if(!url)throw new Error('当前地址不支持生成 Survey 链接')
+        setLink(url)
         setNotice('一次性邀请仅在本次操作显示，请通过受控渠道交付。')
       }else setNotice(actorName?actorName+' 的资格已更新':'操作成功')
       await refresh(1,1)

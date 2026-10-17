@@ -40,18 +40,19 @@ export function internalReturnTo(value: string | null | undefined): string | nul
 const staffRoots = ['dashboard', 'courses', 'students', 'assignments', 'checkins', 'scales', 'questionnaires', 'general-questionnaires', 'composite-assessments', 'bundle-products', 'cognitive-assignments', 'videos', 'images', 'documents', 'profile']
 const adminRoots = ['users', 'teacher-codes', 'admin/training', 'admin/material-grants', 'admin/instrument-authorizations', 'admin/survey-researchers']
 const inRoot = (pathname: string, root: string) => pathname === `/${root}` || pathname.startsWith(`/${root}/`)
-export function returnAfterLogin(value: string | null | undefined, role: Role): string {
+export function returnAfterLogin(value: string | null | undefined, role: Role, adminFallback?: string): string {
+  const fallback = role === 'ADMIN' && adminFallback === '/users' ? adminFallback : homeFor(role)
   const target = internalReturnTo(value)
-  if (!target) return homeFor(role)
+  if (!target) return fallback
   const pathname = new URL(target, 'https://huisurvey.invalid').pathname
-  if (isAuthPath(pathname)) return homeFor(role)
+  if (isAuthPath(pathname)) return fallback
   const organizationTarget = inRoot(pathname, 'organizations') || inRoot(pathname, 'organization-tasks') || inRoot(pathname, 'my-assessments')
   const participantScaleTarget = /^\/student\/scales\/(?:result\/)?[^/]+$/.test(pathname)
   const allowed = participantScaleTarget || inRoot(pathname, 'scale-library') || organizationTarget || (role === 'PARENT'
     ? inRoot(pathname, 'parent') || inRoot(pathname, 'relational')
     : inRoot(pathname, 'scale-library') || (role === 'STUDENT' ? inRoot(pathname, 'student') || inRoot(pathname, 'relational')
       : staffRoots.some((root) => inRoot(pathname, root)) || inRoot(pathname, 'teacher/classrooms') || (role === 'TEACHER' && inRoot(pathname, 'relational')) || (role === 'ADMIN' && adminRoots.some((root) => inRoot(pathname, root)))))
-  return allowed ? target : homeFor(role)
+  return allowed ? target : fallback
 }
 export function loginUrl(role: Role | undefined, destination: string) {
   const adminSurvey = internalReturnTo(destination)?.split(/[?#]/)[0] === '/admin/survey-researchers'

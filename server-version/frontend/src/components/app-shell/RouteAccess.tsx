@@ -1,3 +1,4 @@
+import { SURVEY_ADMIN_PATH } from '../../products/origins'
 import { useEffect, type ReactNode } from 'react'
 import { Link, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
@@ -28,6 +29,7 @@ export function RouteAccess({ children, roles }: { children: ReactNode; roles?: 
   }, [canConsumePending, clearReauthentication])
 
   if (isLoading) return <RouteLoading />
+  if (!user && location.pathname === SURVEY_ADMIN_PATH) return <Navigate to={loginUrl(undefined, target)} replace />
   if (!user && (!roles || roles.length === 3) && !matchingPending) return <Navigate to={`/?returnTo=${encodeURIComponent(target)}`} replace />
   if (!user) return <Navigate to={loginUrl(matchingPending ? matchingPending.role : roles?.length === 1 ? roles[0] : 'TEACHER', target)} replace />
   if (roles && !roles.includes(user.role)) return <ProductPage><ProductStatus kind="warning" title="当前账户无法访问此页面" actions={<Link to={homeFor(user.role)}>返回我的首页</Link>}>请使用获授权的账户打开原链接。</ProductStatus></ProductPage>

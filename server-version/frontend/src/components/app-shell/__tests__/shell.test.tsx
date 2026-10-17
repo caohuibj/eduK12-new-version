@@ -217,3 +217,25 @@ it('requires explicit directory creation permission even for SYSTEM_ADMIN', () =
   view.rerender(<MemoryRouter initialEntries={['/users']}><AppShell><p>用户管理内容</p></AppShell></MemoryRouter>)
   expect(screen.getByRole('link', { name: '创建组织' })).toHaveAttribute('href', '/organizations/new')
 })
+
+it.each([
+  ['ADMIN', 'SYSTEM_ADMIN', true], ['ADMIN', 'STANDARD', false],
+  ['TEACHER', 'SYSTEM_ADMIN', false], ['STUDENT', 'SYSTEM_ADMIN', false],
+] as const)('shows the local Survey menu only for both roles (%s/%s)', (role, platformRole, visible) => {
+  auth.user = { id: 'synthetic', username: 'synthetic', role, platformRole } as User
+  organization.platformRole = platformRole
+  render(<MemoryRouter initialEntries={['/users']}><AppShell><p>content</p></AppShell></MemoryRouter>)
+  const links = screen.queryAllByRole('link', { name: 'Survey 研究者与工具授权' })
+  expect(links.length > 0).toBe(visible)
+  for (const link of links) expect(link).toHaveAttribute('href', '/admin/survey-researchers')
+})
+
+it('routes anonymous direct Survey governance entry to administrator login without changing role authorization', () => {
+  auth.user = null
+  render(<MemoryRouter initialEntries={['/admin/survey-researchers']}><Routes>
+    <Route path="/admin/survey-researchers" element={<RouteAccess><p>governance</p></RouteAccess>} />
+    <Route path="/admin/login" element={<Location />} />
+  </Routes></MemoryRouter>)
+  expect(screen.getByRole('status')).toHaveTextContent('/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers')
+  expect(screen.queryByText('governance')).not.toBeInTheDocument()
+})

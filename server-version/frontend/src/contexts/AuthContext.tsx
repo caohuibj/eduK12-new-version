@@ -24,7 +24,7 @@ interface AuthContextType {
   clearReauthentication: () => void
   isAuthenticated: boolean
   isLoading: boolean
-  login: (username: string, password: string, expectedRole?: LoginRequest['expectedRole']) => Promise<void>
+  login: (username: string, password: string, expectedRole?: LoginRequest['expectedRole'], entrance?: 'admin') => Promise<void>
   setAuthenticatedUser: (userData: User) => void
   logout: () => Promise<void>
   setUser: (user: User | null) => void
@@ -228,13 +228,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   }, [replaceIdentity])
 
-  const login = async (username: string, password: string, expectedRole?: LoginRequest['expectedRole']) => {
+  const login = async (username: string, password: string, expectedRole?: LoginRequest['expectedRole'], entrance?: 'admin') => {
     const requestEpoch = ++authEpochRef.current
     localLoginPending.current = requestEpoch
     try {
       await authApi.csrf()
       if (requestEpoch !== authEpochRef.current) return
-      const response = await authApi.login({ username, password, ...(expectedRole ? { expectedRole } : {}) })
+      const data = { username, password, ...(expectedRole ? { expectedRole } : {}) }
+      const response = await (entrance ? authApi.login(data, entrance) : authApi.login(data))
       if (requestEpoch !== authEpochRef.current) return
       if (response.code === 0 && response.data) {
         lastAuthTransitionAtRef.current = Date.now()

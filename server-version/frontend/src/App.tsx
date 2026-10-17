@@ -9,6 +9,7 @@ import { isTrainingHost } from './training/context'
 
 // Portal & Auth Pages
 import Portal from './pages/Portal'
+import SurveyAdminOrigin from './components/app-shell/SurveyAdminOrigin'
 import AdminLogin from './pages/AdminLogin'
 import TeacherLogin from './pages/TeacherLogin'
 import TeacherRegister from './pages/TeacherRegister'
@@ -407,7 +408,7 @@ function AppRoutes() {
             }
           />
           <Route path="/bundle-products" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><BundleProducts /></ProtectedRoute>} />
-          <Route path="/admin/survey-researchers" element={<RelationalProtectedRoute><SurveyResearchersAdmin /></RelationalProtectedRoute>} />
+          <Route path="/admin/survey-researchers" element={<SurveyAdminOrigin><RelationalProtectedRoute><SurveyResearchersAdmin /></RelationalProtectedRoute></SurveyAdminOrigin>} />
           <Route path="/admin/bundle-authoring" element={<ProtectedRoute roles={['ADMIN']}><BundleAuthoring /></ProtectedRoute>} />
           <Route path="/bundle-products/:id" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><BundleProductDetail /></ProtectedRoute>} />
           <Route

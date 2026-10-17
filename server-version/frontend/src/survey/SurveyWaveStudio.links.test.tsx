@@ -1,0 +1,70 @@
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { SurveyWaveStudio } from './SurveyWaveStudio'
+vi.mock('./SurveyFlowStudio',()=>({SurveyFlowStudio:()=>null}))
+vi.mock('./SurveyStudyPreview',()=>({SurveyStudyPreview:()=>null}))
+vi.mock('qrcode.react',()=>({QRCodeSVG:({value,title}:{value:string;title:string})=><svg role="img" aria-label={title} data-value={value}/>}))
+const wave={id:'w1',projectId:'p1',title:'链接测试',ordinal:1,status:'DRAFT',revision:1,
+  instrumentIds:[],publicationId:'pub1',consentText:'本次研究的参与说明与知情同意材料，至少二十字。',generalText:'谢谢',consentVersion:1,
+  linkageNoticeConfirmed:false,opensAt:null,closesAt:'2027-01-01T00:00:00Z',finishUntil:null,quotaStarts:null,startsCount:0,
+  allowNewParticipants:false,hardStopAt:null,groupIpPolicy:null,groupIpActivatedAt:null}
+const response=(data:unknown)=>({ok:true,json:async()=>({code:0,data})})
+function fixture(origin:string,bad=false){
+  const original=window
+  vi.stubGlobal('window',new Proxy(original,{get(target,key){return key==='location'?{origin}:Reflect.get(target,key)}}))
+  const writeText=vi.fn().mockResolvedValue(undefined)
+  Object.defineProperty(navigator,'clipboard',{value:{writeText},configurable:true})
+  let current={...wave},issued=0
+  const fetcher=vi.fn(async(input:RequestInfo|URL,_init?:RequestInit)=>{
+    const url=String(input)
+    if(url.endsWith('/auth/csrf'))return response({csrfToken:'synthetic-csrf'})
+    if(url.includes('/waves?page='))return response({list:[current]})
+    if(url.includes('/instruments?page='))return response({list:[]})
+    if(url.endsWith('/waves/w1'))return response(current)
+    if(url.endsWith('/open')||url.endsWith('/entry-token/rotate')){
+      current={...current,status:'OPEN',revision:current.revision+1};issued++
+      return response({researchUrl:`https://${bad?'evil.test':'survey.eduk12.top'}/r/public-id#entry=synthetic-token-${issued}`})
+    }
+    if(url.endsWith('/projects/p1'))return response({id:'p1',collectionMode:'SINGLE_UNLINKED',status:'ACTIVE',revision:1})
+    throw new Error('Unexpected fixture route')
+  })
+  vi.stubGlobal('fetch',fetcher)
+  return {fetcher,writeText}
+}
+async function mount(){
+  render(<SurveyWaveStudio projectId="p1"/> )
+  fireEvent.click(await screen.findByRole('button',{name:/T1 · 链接测试/}))
+  await screen.findByRole('heading',{name:'T1 · 链接测试'})
+}
+afterEach(()=>vi.unstubAllGlobals())
+describe('recruitment capability display, clipboard and QR share one trusted URL',()=>{
+  it.each(['http://survey.localhost:5173','https://survey.eduk12.top'])(
+    'uses the environment at %s for both open and rotate',async origin=>{
+      const api=fixture(origin);await mount()
+      fireEvent.click(screen.getByRole('button',{name:'正式开放本轮'}))
+      for(const issued of [1,2]){
+        const expected=`${origin}/r/public-id#entry=synthetic-token-${issued}`
+        expect(await screen.findByText(expected)).toBeInTheDocument()
+        expect(screen.getByRole('img',{name:'研究参与招募二维码'})).toHaveAttribute('data-value',expected)
+        fireEvent.click(screen.getByRole('button',{name:'复制研究链接'}))
+        expect(api.writeText).toHaveBeenLastCalledWith(expected)
+        await waitFor(()=>expect(screen.getByRole('button',{name:'轮换招募链接'})).toBeEnabled())
+        if(issued===1)fireEvent.click(screen.getByRole('button',{name:'轮换招募链接'}))
+      }
+      expect(api.fetcher.mock.calls.filter(([,init])=>init?.method==='POST')).toHaveLength(2)
+      expect(api.fetcher.mock.calls.every(([url])=>String(url).startsWith('/api/'))).toBe(true)
+    })
+  it('rejects an untrusted response without display, clipboard or QR',async()=>{
+    fixture('http://survey.localhost:5173',true);await mount()
+    fireEvent.click(screen.getByRole('button',{name:'正式开放本轮'}))
+    expect(await screen.findByText('招募链接地址不受支持，请联系管理员')).toBeInTheDocument()
+    expect(screen.queryByRole('img',{name:'研究参与招募二维码'})).not.toBeInTheDocument()
+    expect(screen.queryByRole('button',{name:'复制研究链接'})).not.toBeInTheDocument()
+  })
+  it('fails before token issuance on an unknown origin',async()=>{
+    const api=fixture('http://unknown.localhost:5173');await mount()
+    fireEvent.click(screen.getByRole('button',{name:'正式开放本轮'}))
+    expect(await screen.findByText('当前地址不支持生成招募链接')).toBeInTheDocument()
+    expect(api.fetcher.mock.calls.filter(([,init])=>init?.method==='POST')).toHaveLength(0)
+  })
+})
