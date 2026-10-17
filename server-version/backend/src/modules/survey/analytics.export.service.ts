@@ -210,7 +210,11 @@ export async function createSurveyExport(req:Request,input:{
         if(/exceeds?|too many|too large|oversiz|bounded rows/i.test(detail))fail(413,detail)
         fail(409,'导出来源不完整或不一致，请先核验研究数据')
       }
-      const selectedVersions=[...new Map(sources.codebook.map(x=>[
+      const selectedVersions=[...new Map([
+        ...(sources.sourceVersions??[]).map(x=>[
+          x.waveId+':'+x.instrumentKey+':'+x.definitionDigest,{...x},
+        ] as const),
+        ...sources.codebook.map(x=>[
         x.waveId+':'+x.instrumentKey+':'+x.definitionDigest,
         {waveId:x.waveId,instrumentKey:x.instrumentKey,
           publicationVersion:x.publicationVersion,
@@ -218,8 +222,10 @@ export async function createSurveyExport(req:Request,input:{
           definitionDigest:x.definitionDigest,scoringDigest:x.scoringDigest,
           formSchemaVersion:x.formSchemaVersion??null,flowDigest:x.flowDigest??null,
           scalePresentationMode:x.scalePresentationMode??null,
-          scaleTimingContract:x.timingContract??null},
-      ] as const)).values()]
+          scaleTimingContract:x.timingContract??null,
+          ...(x.sourceProvenance?{sourceProvenance:x.sourceProvenance}:{}),
+          ...(x.sourceAnswerMapping?{sourceAnswerMapping:x.sourceAnswerMapping}:{})},
+      ] as const)]).values()]
       const measurementVersions=[...new Map(sources.scoreColumns.filter(column=>column.measurement.provenance)
         .map(column=>[canonicalHash({waveId:column.waveId,instrumentKey:column.measurement.instrumentKey,
           provenance:column.measurement.provenance}),{waveId:column.waveId,instrumentKey:column.measurement.instrumentKey,

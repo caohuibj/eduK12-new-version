@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { SurveyCatalogGrants } from './SurveyCatalogGrants'
 import { ProductPage } from '../../components/product-ui'
 type Envelope<T>={code:number|string;message:string;data:T}
 type Researcher={id:string;username:string;status:string;createdAt:string}
@@ -53,7 +54,7 @@ export default function SurveyResearchersAdmin(){
     }catch(e){setError(e instanceof Error?e.message:'操作失败')}finally{setBusy(false)}
   }
   return <ProductPage><div className="max-w-4xl mx-auto space-y-5">
-    <h1 className="text-2xl font-semibold">Survey｜研究者资格管理</h1>
+    <h1 className="text-2xl font-semibold">Survey｜研究者与工具授权</h1>
     <p className="text-sm text-gray-600">此页面仅用于系统管理员开通和管理 Researcher 资格，不自动授予科研原始答案权限。</p>
     {error&&<p role="alert" className="border-l-4 border-red-600 p-3">{error}</p>}
     {notice&&<p role="status" className="border-l-4 border-teal-600 p-3">{notice}</p>}
@@ -66,6 +67,7 @@ export default function SurveyResearchersAdmin(){
       <button className="btn-secondary" type="button" onClick={()=>void navigator.clipboard.writeText(link)}>复制链接</button>
       <p className="text-sm text-gray-500">邀请 7 天有效；不包含研究者密码。请勿存入公开日志或群聊。</p>
     </div>}
+    <SurveyCatalogGrants api={platformApi} password={password} researchers={list}/>
     <h2 className="text-xl font-semibold">未领取的研究者邀请</h2>
     <p className="text-sm text-gray-600">仅显示安全元数据。已签发令牌不会再次回显；过期邀请须重新签发。</p>
     <div className="space-y-2">{pending.map(inv=><article className="border rounded-lg p-3" key={inv.id}>

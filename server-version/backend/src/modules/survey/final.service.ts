@@ -10,7 +10,7 @@ import { encryptUnifiedRuntimePayload,decryptUnifiedRuntimePayload } from '../as
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { verifySurveyFinalPublication, SurveyFinalValidationError } from './final.compute'
 import { SurveyScaleTimingError } from './timing.definition'
-import { ensureSurveyFlowAssignment } from './flow.assignment'
+import { ensureSurveyFlowAssignment,assignedSurveySnapshot } from './flow.assignment'
 import { hashResearchCredential } from './identity.service'
 import { verifiedSurveyAttempt } from './admission.service'
 import { SurveyWaveError } from './waves.service'
@@ -146,7 +146,7 @@ export async function submitResearchFinal(input:FinalInput){
     if(snapshot.units.some(unit=>unit.kind==='COGNITIVE')||input.cognitiveReferences?.length){
       await assertSurveyCognitiveLockedAnswers(tx,attempt.id,input.answers)
       const references=await verifySurveyCognitiveReferences(tx,{projectId:known.projectId,waveId:wave.id,
-        attemptId:attempt.id,publicationId:publication.id,snapshot,references:input.cognitiveReferences??[]})
+        attemptId:attempt.id,publicationId:publication.id,snapshot:assignedSurveySnapshot(snapshot,assignment),references:input.cognitiveReferences??[]})
       const results=await loadSurveyCognitiveResults(tx,{projectId:known.projectId,waveId:wave.id,
         attemptId:attempt.id,publicationId:publication.id,references})
       for(const loaded of results){

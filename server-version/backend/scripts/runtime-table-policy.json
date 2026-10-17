@@ -202,6 +202,7 @@
     "survey_waves": "RUNTIME_RW",
     "teacher_codes": "RUNTIME_RW",
     "users": "RUNTIME_RW",
-    "videos": "RUNTIME_RW"
+    "videos": "RUNTIME_RW",
+    "survey_tool_grants": "RUNTIME_RW"
   }
 }

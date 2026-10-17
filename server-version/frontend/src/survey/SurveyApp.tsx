@@ -153,6 +153,7 @@ export default function SurveyApp(){
         <a className="text-sm underline underline-offset-4" href="/">返回首页</a>
         <h2 className="text-xl font-semibold">Researcher 登录</h2>
         <p>研究者仅由系统管理员邀请开通，账户与培训和校园系统相互独立。</p>
+        <a className="text-sm underline" href="https://training.eduk12.top/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers">系统管理员入口：研究者与工具授权</a>
         <form onSubmit={login}>{field('研究者登录名',username,setUsername)}
           {field('密码',password,setPassword,'password')}
           <button className="btn-primary" disabled={busy}>进入双因素验证</button></form>

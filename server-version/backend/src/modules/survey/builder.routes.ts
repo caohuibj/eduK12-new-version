@@ -1,3 +1,5 @@
+import {SurveyGovernanceError} from './governance.service'
+import {CatalogSourceError} from './catalog.sources'
 import { Router, type Request, type Response, type NextFunction } from 'express'
 import { z } from 'zod'
 import { authenticateSurvey } from '../../middleware/auth'
@@ -8,6 +10,7 @@ import { bulkInputSchema, BulkImportError } from './builder.import'
 
 export const surveyBuilderRouter=Router()
 surveyBuilderRouter.use('/:pid/instruments',authenticateSurvey)
+surveyBuilderRouter.use('/:pid/catalog',authenticateSurvey)
 const id=z.string().uuid()
 const create=z.object({
   requestId:id,kind:surveyKindSchema,instrumentKey:surveyKeySchema,
@@ -31,6 +34,7 @@ const handle=(action:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Res
       message:'研究工具包含待修正字段',data:{issues:e.issues}})
     if(e instanceof BulkImportError)return res.status(400).json({code:'SURVEY_IMPORT_INVALID',
       message:'批量导入包含错误',data:{issues:e.issues}})
+    if(e instanceof SurveyGovernanceError||e instanceof CatalogSourceError)return error(res,e.message,-1,e.statusCode)
     if(e instanceof service.SurveyBuilderError)return error(res,e.message,-1,e.statusCode)
     next(e)
   }
@@ -74,3 +78,8 @@ const applyInput=z.object({
 }).strict()
 surveyBuilderRouter.post('/:pid/instruments/:iid/bulk-import/apply',handle(req=>
   service.applySurveyImport(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.iid),applyInput.parse(req.body))))
+
+surveyBuilderRouter.get('/:pid/catalog',handle(req=>service.listResearcherCatalog(req.user!.userId,id.parse(req.params.pid),
+  z.coerce.number().int().min(1).max(1000).default(1).parse(req.query.page))))
+surveyBuilderRouter.post('/:pid/catalog/:gid/import',handle(req=>service.importCatalogDraft(req.user!.userId,
+  id.parse(req.params.pid),id.parse(req.params.gid),copy.parse(req.body))))

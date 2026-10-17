@@ -16,8 +16,9 @@ export type FlowBlock={
 export type FlowDraft={
   schemaVersion:1
   experiment?:{
+    mode?:'QUESTIONNAIRE_VARIANTS';
     experimentKey:string;linkedPolicy:'KEEP_LINKED'|'RERANDOMIZE';
-    groups:{groupKey:string;weight:number;materialTitle:string;materialBody:string}[]
+    groups:{groupKey:string;weight:number;materialTitle:string;materialBody:string;variantLabel?:string;instrumentKeys?:string[]}[]
   }
   embeddedData:{key:string;type:'STRING'|'NUMBER'|'BOOLEAN';source:'STATIC';value:string|number|boolean}[]
   blocks:FlowBlock[]
@@ -87,4 +88,15 @@ export function resolveClientSurveyFlow(flow:PublicFlow,
   }
   return {blocks:active,shownBlocks,termination,
     visibleUnitKeys:active.filter(b=>b.kind==='INSTRUMENT').map(b=>b.instrumentKey!)}
+}
+
+/** Researcher-only simulation. Public participants receive a server-projected flow. */
+export function previewSurveyFlow(flow:FlowDraft,groupKey:string):PublicFlow{
+  const group=flow.experiment?.groups.find(g=>g.groupKey===groupKey)
+  const variants=flow.experiment?.mode==='QUESTIONNAIRE_VARIANTS'
+  const keys=new Set(group?.instrumentKeys??[])
+  return {schemaVersion:1,flowDigest:'PREVIEW_ONLY',embeddedData:flow.embeddedData,
+    ...(group&&(!variants||group.materialTitle.trim()||group.materialBody.trim())
+      ?{selectedMaterial:{blockKey:'assigned_material' as const,title:group.materialTitle,body:group.materialBody}}:{}),
+    blocks:flow.blocks.filter(b=>!variants||b.kind!=='INSTRUMENT'||keys.has(b.instrumentKey??''))}
 }

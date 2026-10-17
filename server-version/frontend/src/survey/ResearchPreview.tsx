@@ -115,7 +115,7 @@ export function ResearchPreview({draft,onSimulate,onValidateForm,errorPath,initi
       <progress className="w-full" max={Math.max(1,formPages.length)}
         value={currentPage?currentIndex+1:0} aria-label="研究者表单预览进度"/>
       {currentPage&&<div key={currentPage.pageKey}>
-        <h4 className="font-semibold">{currentPage.title}</h4>{currentPage.questions.map(question)}
+        <h4 className="font-semibold">{currentPage.title}</h4>{currentPage.description&&<p className="whitespace-pre-wrap text-sm">{currentPage.description}</p>}{currentPage.questions.map(question)}
       </div>}
       <nav className="flex justify-between mt-3 gap-2" aria-label="试答分页">
         <button type="button" className="btn-secondary" disabled={currentIndex<=0}

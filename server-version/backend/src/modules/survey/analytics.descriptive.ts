@@ -1,3 +1,4 @@
+import {rejectPooledVariants} from './analytics.variant'
 import type { SurveySourceProjection, ResearchRawCodebook } from './analytics.source'
 import { pairedDescriptive } from './analytics.cohorts'
 import {canonicalHash} from '../assessment-runtime/canonical'
@@ -27,6 +28,7 @@ const numeric=(values:number[])=>{
  * Raw free-text values must never leak via descriptive frequency charts.
  */
 export function describeWave(source:SurveySourceProjection,waveId:string){
+  rejectPooledVariants(source)
   if(!source.projectId)throw new Error('Missing scoped research source')
   const dictionary=new Map<string,ResearchRawCodebook>(
     source.codebook.filter(c=>c.waveId===waveId).map(c=>[c.columnKey,c]))
@@ -122,6 +124,7 @@ export function describeWave(source:SurveySourceProjection,waveId:string){
 export function describePairedScores(source:SurveySourceProjection,input:{
   baselineWaveId:string;followupWaveId:string;instrumentKey:string;scoreKey:string
 }){
+  rejectPooledVariants(source)
   if(source.collectionMode!=='LINKED_WAVES')throw new Error('无法关联匿名研究，不可计算个体配对统计')
   return pairedDescriptive({
     projectId:source.projectId,observations:source.scores,
@@ -138,6 +141,7 @@ export function describeWaveGroups(source:SurveySourceProjection,input:{
   waveId:string;groupInstrumentKey:string;groupItemKey:string;
   scoreInstrumentKey:string;scoreKey:string
 }){
+  rejectPooledVariants(source)
   const {waveId,groupInstrumentKey,groupItemKey,scoreInstrumentKey,scoreKey}=input
   const candidates=source.codebook.filter(c=>c.waveId===waveId&&c.kind==='FORM'
     &&c.instrumentKey===groupInstrumentKey&&c.itemKey===groupItemKey

@@ -47,11 +47,26 @@ beforeEach(()=>{
 })
 afterEach(()=>{vi.restoreAllMocks();vi.unstubAllEnvs()})
 describe('Cognitive trial export uses existing MFA, ticket and revocation boundaries',()=>{
+  it.each(['RAW_WAVE','SCORE_LONG','COGNITIVE_TRIAL_LONG'] as const)('retains frozen sourced cognitive provenance in %s manifests without raw item columns',async format=>{
+    database()
+    const frozenSource={waveId,instrumentKey:'gonogo',publicationVersion:1,instrumentRevision:2,
+      definitionDigest:'frozen-native-definition',scoringDigest:'frozen-native-scoring',
+      sourceProvenance:{source:{kind:'COGNITIVE',sourceId:'native-task',sourceVersion:'1'},
+        definitionDigest:'frozen-native-definition',adapterVersion:'SURVEY_CATALOG_V1'},
+      sourceAnswerMapping:{type:'SCALE_TYPED_V1' as const,items:{i_0:'Native.Item'},options:{o_0:'001',o_1:1}}}
+    vi.mocked(loadSurveySource).mockResolvedValue({...source(0,null,firstFinal,false),sourceVersions:[frozenSource]})
+    const created=await createSurveyExport(req,{projectId,waveId,format})
+    expect(created.manifest.selectedVersions).toEqual([frozenSource])
+    const downloaded=await downloadSurveyExport(req,{projectId,exportId:created.id})
+    expect((downloaded.manifest as {selectedVersions:unknown[]}).selectedVersions).toEqual([frozenSource])
+  })
+
   it('advances within one FINAL before advancing the exact existing FINAL keyset',async()=>{
     const db=database()
     vi.mocked(loadSurveySource).mockResolvedValueOnce(source(0,40)).mockResolvedValueOnce(source(40,null))
       .mockResolvedValueOnce(source(0,null,secondFinal,false))
     const first=await createSurveyExport(req,input)
+    expect(first.manifest.selectedVersions).toEqual([])
     const firstCursor=decodeSurveyExportCursor(first.nextCursor!,projectId,input.format,waveId)
     expect(firstCursor).toMatchObject({v:5,pageLimit:1,trial:{finalId:firstFinal,finalHash:sourceHash,offset:40},
       after:{id:'00000000-0000-0000-0000-000000000000'}})

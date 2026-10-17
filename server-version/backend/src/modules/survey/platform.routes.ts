@@ -1,3 +1,5 @@
+import * as catalog from './catalog.service'
+import {CatalogSourceError} from './catalog.sources'
 import { Router, type Request, type Response, type NextFunction } from 'express'
 import { z } from 'zod'
 import { authenticate } from '../../middleware/auth'
@@ -12,6 +14,7 @@ const inviteId=z.string().uuid()
 const handler=(fn:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Response,next:NextFunction)=>{
   try{return success(res,await fn(req))}
   catch(e){if(e instanceof z.ZodError)return error(res,'输入格式不合法',-1,400)
+    if(e instanceof CatalogSourceError)return error(res,e.message,-1,e.statusCode)
     if(e instanceof governance.SurveyGovernanceError)return error(res,e.message,-1,e.statusCode)
     next(e)
   }
@@ -47,4 +50,20 @@ surveyPlatformRouter.post('/researchers/:id/mfa-reset',handler(async req=>{
 }))
 surveyPlatformRouter.post('/researchers/:id/password-reset-invitations',handler(async req=>{
   await administrator(req);return governance.invitePasswordReset(req.user!.userId,inviteId.parse(req.params.id))
+}))
+
+const sourceRef=z.object({kind:z.enum(['SCALE','SJT','COGNITIVE','FORM']),sourceId:z.string().min(1).max(200),
+  sourceVersion:z.string().min(1).max(100),organizationId:z.string().uuid().optional()}).strict()
+const page=(raw:unknown)=>z.coerce.number().int().min(1).max(1000).default(1).parse(raw)
+surveyPlatformRouter.get('/source-catalog',handler(req=>catalog.sourceCatalog(req.user!.userId,{
+  page:page(req.query.page),kind:sourceRef.shape.kind.optional().parse(req.query.kind),
+  organizationId:sourceRef.shape.organizationId.parse(req.query.organizationId)})))
+surveyPlatformRouter.get('/researchers/:id/tool-grants',handler(req=>catalog.listToolGrants(req.user!.userId,inviteId.parse(req.params.id),page(req.query.page))))
+surveyPlatformRouter.post('/researchers/:id/tool-grants',handler(async req=>{
+  const body=z.object({currentPassword:z.string().min(1).max(128),source:sourceRef}).strict().parse(req.body)
+  await governance.authorizeAdmin(req.user!.userId,body.currentPassword)
+  return catalog.grantCatalogSource(req.user!.userId,inviteId.parse(req.params.id),body.source)
+}))
+surveyPlatformRouter.post('/tool-grants/:id/revoke',handler(async req=>{
+  await administrator(req);return catalog.revokeToolGrant(req.user!.userId,inviteId.parse(req.params.id))
 }))

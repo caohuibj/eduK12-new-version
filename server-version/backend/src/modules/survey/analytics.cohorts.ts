@@ -1,3 +1,4 @@
+import {rejectPooledVariants,type SurveyVariantAudit,type SurveyVariantConfiguration} from './analytics.variant'
 import {canonicalHash} from '../assessment-runtime/canonical'
 /** Researcher-only deterministic longitudinal cohort algorithms. No normality,
  * causal, clinical or norm-based inference. Data must already be projected from
@@ -7,6 +8,9 @@ export type MissingReason =
   | 'NOT_SHOWN' | 'SHOWN_MISSING' | 'REFUSED' | 'UNABLE_TO_JUDGE' | 'NO_WAVE'
   | 'ABANDONED' | 'NOT_COMPARABLE' | 'WITHDRAWN' | 'QUALITY_EXCLUDED'
 export interface SurveyMeasurementIdentity {
+  variantConfiguration?:SurveyVariantConfiguration
+  sourceProvenance?:unknown
+  sourceAnswerMapping?:unknown
   instrumentKey:string
   scoreKey:string
   scoringDigest:string
@@ -20,7 +24,7 @@ export interface SurveyMeasurementIdentity {
     timingPolicy?:string;devicePolicy?:string;scoringMethod?:string
   }
 }
-export interface FrozenScoreObservation {
+export interface FrozenScoreObservation extends SurveyVariantAudit {
   projectId:string
   waveId:string
   waveOrdinal:number
@@ -66,6 +70,7 @@ export function pairedDescriptive(input:{
   instrumentKey:string;scoreKey:string;observations:readonly FrozenScoreObservation[]
   expectedColumns?:readonly Pick<FrozenScoreObservation,'projectId'|'waveId'|'measurement'>[]
 }):PairedDescriptive {
+  rejectPooledVariants({scores:[...input.observations],scoreColumns:input.expectedColumns?[...input.expectedColumns]:[]})
   const {projectId,baselineWaveId,followupWaveId,instrumentKey,scoreKey,observations}=input
   if(baselineWaveId===followupWaveId)throw new Error('Paired waves must be distinct')
   if(observations.some(o=>o.projectId!==projectId||o.sourceVerified!==true))
@@ -130,6 +135,7 @@ export interface WaveSummary {
   missingByReason:Partial<Record<MissingReason,number>>
 }
 export function summarizeWaveScores(projectId:string,waveId:string,rows:readonly FrozenScoreObservation[]):WaveSummary {
+  rejectPooledVariants({scores:[...rows]})
   if(rows.some(r=>r.projectId!==projectId||r.sourceVerified!==true))
     throw new Error('Unauthorized or unverified longitudinal source')
   const matches=rows.filter(r=>r.waveId===waveId)

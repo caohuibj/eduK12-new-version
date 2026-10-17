@@ -1,3 +1,5 @@
+import {SurveyGovernanceError} from './governance.service'
+import {CatalogSourceError} from './catalog.sources'
 import { Router, type Request, type Response, type NextFunction } from 'express'
 import { z } from 'zod'
 import { authenticateSurvey } from '../../middleware/auth'
@@ -31,6 +33,7 @@ const handle=(fn:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Respons
   try{return success(res,await fn(req))}
   catch(e){
     if(e instanceof z.ZodError)return error(res,'研究波次参数格式不合法',-1,400)
+    if(e instanceof SurveyGovernanceError||e instanceof CatalogSourceError)return error(res,e.message,-1,e.statusCode)
     if(e instanceof service.SurveyWaveError)return error(res,e.message,-1,e.statusCode)
     if(e instanceof SurveyFlowError)return error(res,e.issues.slice(0,5).map(i=>i.path+'：'+i.message).join('；'),-1,400)
     next(e)

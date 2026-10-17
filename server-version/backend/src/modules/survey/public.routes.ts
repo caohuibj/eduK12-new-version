@@ -7,7 +7,7 @@ import { success,error } from '../../utils/response'
 import { SurveyWaveError } from './waves.service'
 import { SurveyFinalError,submitResearchFinal,readGeneralForOwnAttempt } from './final.service'
 import { screenOutResearchAttempt } from './flow.screen-out.service'
-import { SurveyAssignmentError } from './flow.assignment'
+import { SurveyAssignmentError,ensureSurveyFlowAssignment,assignedSurveySnapshot } from './flow.assignment'
 import { readSurveyCheckpoint,saveSurveyCheckpoint,clearSurveyCheckpoint,SurveyCheckpointError } from './checkpoint.service'
 import { ResearchIdentityError,revokeLinkedResearchAccess,withdrawLinkedResearchData,withdrawSingleResearchAttempt } from './identity.service'
 import { SurveyFinalValidationError } from './final.compute'
@@ -132,7 +132,14 @@ publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/images/:assetId',
       })
       if(!['STARTED','COMPLETED'].includes(own.status))return res.status(404).end()
       const assetId=id.parse(req.params.assetId)
-      const refs=surveyImageRefs(own.compiledSnapshot.units.map(u=>({
+      const assignment=own.compiledSnapshot.flow?.experiment?.mode==='QUESTIONNAIRE_VARIANTS'
+        ?await prisma.$transaction(tx=>ensureSurveyFlowAssignment(tx,{
+          projectId:own.projectId,waveId:own.waveId,attemptId:own.attemptId,
+          participantId:own.participantId,researchCode:params.researchCode,
+          accessCredential:params.accessCredential,snapshot:own.compiledSnapshot,
+        })):null
+      const selected=assignment?assignedSurveySnapshot(own.compiledSnapshot,assignment):own.compiledSnapshot
+      const refs=surveyImageRefs(selected.units.map(u=>({
         kind:u.kind,definition:u.displayDefinition,
       })))
       const frozen=refs.find(x=>x.asset.assetId===assetId)
@@ -144,7 +151,7 @@ publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/images/:assetId',
       })
     }catch(e){
       if(e instanceof z.ZodError||e instanceof SurveyWaveError
-        ||e instanceof ResearchIdentityError||e instanceof AssessmentImageDeliveryError)
+        ||e instanceof ResearchIdentityError||e instanceof AssessmentImageDeliveryError||e instanceof SurveyAssignmentError)
         return res.status(404).end()
       next(e)
     }

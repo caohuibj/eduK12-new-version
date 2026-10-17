@@ -27,6 +27,11 @@ function Host({conditional=true}:{conditional?:boolean}){
     <output data-testid="page-answers">{JSON.stringify(answers)}</output></>
 }
 describe('Survey real participant Form paging',()=>{
+  it('preserves source section instructions as display text, not an answer field',()=>{
+    render(<TaskForm unit={{kind:'FORM',instrumentKey:'source',title:'Source',pages:[{pageKey:'p',title:'Section',description:'Answer for the last 7 days',questions:[{itemKey:'q',type:'SINGLE',prompt:'Choose',required:true,options:[{optionKey:'yes',label:'Yes'}]}]}]}} pageIndex={0} onPageChange={()=>{}} answer={{}} onChange={()=>{}}/>)
+    expect(screen.getByText('Answer for the last 7 days')).toBeInTheDocument()
+    expect(screen.getAllByRole('radio')).toHaveLength(1)
+  })
   it.each(['RANK_ORDER','CONSTANT_SUM'])('accepts explicit refusal before advancing a required %s page',type=>{
     function RefusalHost(){
       const [pageIndex,setPageIndex]=useState(0)

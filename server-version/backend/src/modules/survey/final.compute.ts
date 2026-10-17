@@ -293,7 +293,13 @@ const scaleResult=(unit:ResearchFrozenUnit,answers:AnswerMap,computeScore=true):
   }
   if(!computeScore)return {instrumentKey:unit.instrumentKey,kind:'SCALE',sourceDigest:unit.sourceDigest,
     scoringDigest:unit.scoringDigest,rawAnswers:raw,missing:[],privateScoring:null}
-  const result=scoreScale(unit.compiledDefinition as ScaleDefinitionV2,raw)
+  const mapping=unit.sourceAnswerMapping
+  const nativeAnswers:Record<string,string|number>=mapping?Object.fromEntries(Object.entries(raw).map(([key,value])=>{
+    const originalItem=mapping.items[key],originalValue=mapping.options[value]
+    if(!originalItem||originalValue===undefined)invalid('answers.'+key,'量表来源映射不完整')
+    return [originalItem,originalValue]
+  })):raw
+  const result=scoreScale(unit.compiledDefinition as ScaleDefinitionV2,nativeAnswers)
   if(result.quality.status==='invalid')invalid('scoring','量表数据不足以计算研究得分')
   return {instrumentKey:unit.instrumentKey,kind:'SCALE',sourceDigest:unit.sourceDigest,
     scoringDigest:unit.scoringDigest,rawAnswers:raw,missing:[],privateScoring:result}

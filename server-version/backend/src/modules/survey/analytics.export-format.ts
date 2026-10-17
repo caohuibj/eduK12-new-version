@@ -1,3 +1,4 @@
+import {variantAuditColumns,variantAuditValues,type SurveyVariantConfiguration,type SurveyVariantAudit} from './analytics.variant'
 import { canonicalHash, canonicalJsonString } from '../assessment-runtime/canonical'
 import type { FrozenScoreObservation, MissingReason } from './analytics.cohorts'
 
@@ -6,6 +7,9 @@ import type { FrozenScoreObservation, MissingReason } from './analytics.cohorts'
  * immutable FINAL source, withdrawal filtering, and a stable source watermark.
  */
 export interface ResearchExportCodebookRow {
+  variantConfiguration?:SurveyVariantConfiguration
+  sourceProvenance?:unknown
+  sourceAnswerMapping?:unknown
   column:string
   waveId:string
   ordinal:number
@@ -18,6 +22,7 @@ export interface ResearchExportCodebookRow {
   missingMeanings:Readonly<Partial<Record<MissingReason,string>>>
 }
 export interface ResearchExportManifest {
+  variantConfigurations?:SurveyVariantConfiguration[]
   schemaVersion:1
   format:'LONG'|'WIDE'
   projectId:string
@@ -107,6 +112,9 @@ const exportIdentifiers=()=>{
 const codebookFor=(o:Pick<FrozenScoreColumn,'waveId'|'waveOrdinal'|'measurement'>,
   column:string):ResearchExportCodebookRow=>({
   column,waveId:o.waveId,ordinal:o.waveOrdinal,
+  ...(o.measurement.variantConfiguration?{variantConfiguration:o.measurement.variantConfiguration}:{}),
+  ...(o.measurement.sourceProvenance?{sourceProvenance:o.measurement.sourceProvenance}:{}),
+  ...(o.measurement.sourceAnswerMapping?{sourceAnswerMapping:o.measurement.sourceAnswerMapping}:{}),
   instrumentKey:o.measurement.instrumentKey,scoreKey:o.measurement.scoreKey,
   scoringDigest:o.measurement.scoringDigest,responseSignature:o.measurement.responseSignature,
   unit:o.measurement.unit,missingMeanings:o.measurement.provenance
@@ -143,6 +151,7 @@ function finalArtifact(format:'LONG'|'WIDE',projectId:string,cols:string[],rows:
   const csv=tableToCsv(cols,rows)
   return {csv,codebook,manifest:{
     schemaVersion:1,format,projectId,
+    ...((codebook.some(c=>c.variantConfiguration))?{variantConfigurations:[...new Map(codebook.flatMap(c=>c.variantConfiguration?[[c.waveId,c.variantConfiguration] as const]:[])).values()]}:{}),
     projectSourceHash:canonicalHash(source.map(r=>({
       final:r.sourceFinalHash,wave:r.waveId,attempt:r.attemptId,
       instrument:r.measurement.instrumentKey,score:r.measurement.scoreKey,
@@ -161,12 +170,13 @@ export function exportLong(projectId:string,observations:readonly FrozenScoreObs
   const {columnId,attemptCode}=exportIdentifiers()
   const decorated=decorateColumns(source,expectedColumns,columnId)
   const versioned=decorated.codebook.some(row=>row.provenance)
+  const variants=decorated.codebook.some(row=>row.variantConfiguration)||source.some(row=>row.variant)
   const columns=['research_code_or_attempt','wave_id','wave_ordinal','attempt_code',
     'column','instrument_key','score_key','scoring_digest','response_signature',
     'value','missing_reason','source_final_hash',
     ...(versioned?['unit','computation_status','quality_status','quality_flags','quality_reasons',
       'source_result_hash','epoch','measurement_digest','scoring_version','config_hash',
-      'protocol_signature','engine_version','timing_policy','device_policy','scoring_method','completion_status','metric_details']:[])]
+      'protocol_signature','engine_version','timing_policy','device_policy','scoring_method','completion_status','metric_details']:[]),...(variants?variantAuditColumns:[])]
   const data=decorated.rows.map(({o,column})=>{
     return [o.researchCode||attemptCode(o.attemptId),o.waveId,o.waveOrdinal,attemptCode(o.attemptId),
       column,o.measurement.instrumentKey,o.measurement.scoreKey,
@@ -179,7 +189,7 @@ export function exportLong(projectId:string,observations:readonly FrozenScoreObs
         o.measurement.provenance?.protocolSignature??null,o.measurement.provenance?.engineVersion??null,
         o.measurement.provenance?.timingPolicy??null,o.measurement.provenance?.devicePolicy??null,
         o.measurement.provenance?.scoringMethod??null,o.completionStatus??null,
-        o.metricDetails?JSON.stringify(o.metricDetails):null]:[])]
+        o.metricDetails?JSON.stringify(o.metricDetails):null]:[]),...(variants?variantAuditValues(o):[])]
   })
   if(new Set(attendance.map(a=>a.researchCode)).size*expectedColumns.length
     +source.length>10000)
@@ -204,7 +214,7 @@ export function exportLong(projectId:string,observations:readonly FrozenScoreObs
           expected.measurement.provenance?.engineVersion??null,
           expected.measurement.provenance?.timingPolicy??null,
           expected.measurement.provenance?.devicePolicy??null,
-          expected.measurement.provenance?.scoringMethod??null,'NON_FINAL',null]:[])])
+          expected.measurement.provenance?.scoringMethod??null,'NON_FINAL',null]:[]),...(variants?variantAuditValues({}):[])])
     }
   }
   return finalArtifact('LONG',projectId,columns,data,source,decorated.codebook)
@@ -223,7 +233,16 @@ export function exportWide(projectId:string,observations:readonly FrozenScoreObs
   // Frozen scorer definitions yield columns even if this Wave has zero FINALs.
   const decorated=decorateColumns(source,expectedColumns,columnId)
   const codebook=decorated.codebook.sort((a,b)=>a.ordinal-b.ordinal||a.column.localeCompare(b.column))
-  const columns=['research_code',...codebook.flatMap(x=>[x.column,x.column+'__missing'])]
+  const variantWaves=[...new Map(codebook.flatMap(c=>c.variantConfiguration?[[c.waveId,{waveId:c.waveId,ordinal:c.ordinal}] as const]:[])).values()]
+  const byVariant=new Map<string,SurveyVariantAudit>()
+  for(const row of source)if(row.variant){
+    const key=row.researchCode+':'+row.waveId,old=byVariant.get(key)
+    if(old&&JSON.stringify(variantAuditValues(old))!==JSON.stringify(variantAuditValues(row)))
+      throw new Error('Conflicting variant assignment within one participant Wave')
+    byVariant.set(key,row)
+  }
+  const columns=['research_code',...codebook.flatMap(x=>[x.column,x.column+'__missing']),
+    ...variantWaves.flatMap(w=>variantAuditColumns.map(c=>'W'+String(w.ordinal).padStart(3,'0')+'__'+c))]
   if(columns.length>512)throw new Error('Wide format would produce too many columns; use LONG')
   const byCode=new Map<string,Map<string,{value:number|null;missingReason:MissingReason|null}>>()
   for(const entry of attendance)
@@ -244,6 +263,6 @@ export function exportWide(projectId:string,observations:readonly FrozenScoreObs
       const state=participation.get(code+':'+c.waveId)
       return [null,state==='QUALITY_EXCLUDED'?'QUALITY_EXCLUDED':
         state&&state!=='COMPLETED'?'ABANDONED':'NO_WAVE']
-    })])
+    }),...variantWaves.flatMap(w=>variantAuditValues(byVariant.get(code+':'+w.waveId)??{}))])
   return finalArtifact('WIDE',projectId,columns,rows,source,codebook)
 }

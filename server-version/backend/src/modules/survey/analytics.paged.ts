@@ -1,3 +1,4 @@
+import {rejectPooledVariants} from './analytics.variant'
 import {loadSurveySource} from './analytics.source'
 import {pairedDescriptive,type FrozenScoreObservation} from './analytics.cohorts'
 import {SurveyAnalyticsError} from './analytics.read'
@@ -36,6 +37,7 @@ export async function describeSurveyPairedScoresPaged(input:{
     })
     if(chunk.collectionMode!=='LINKED_WAVES')
       throw new SurveyAnalyticsError(409,'独立匿名研究不支持按研究编号计算纵向配对')
+    rejectPooledVariants(chunk)
     if(!snapshotCutOff){
       snapshotCutOff=new Date(chunk.cutOff)
       expectedSourceRevision=chunk.sourceRevision
@@ -90,6 +92,7 @@ export async function describeSurveyWaveItemPaged(input:{
       selectScore:false,
       afterFinal,snapshotCutOff,expectedSourceRevision,expectedFinalCount,
     })
+    rejectPooledVariants(chunk)
     if(!snapshotCutOff){
       snapshotCutOff=new Date(chunk.cutOff)
       expectedSourceRevision=chunk.sourceRevision
@@ -203,6 +206,7 @@ export async function describeSurveyWaveGroupsPaged(input:{
       selectScore:{instrumentKey:input.scoreInstrumentKey,scoreKey:input.scoreKey},
       afterFinal,snapshotCutOff,expectedSourceRevision,expectedFinalCount,
     })
+    rejectPooledVariants(chunk)
     if(!first){
       first=chunk
       snapshotCutOff=new Date(chunk.cutOff)

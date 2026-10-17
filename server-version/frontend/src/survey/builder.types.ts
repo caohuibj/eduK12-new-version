@@ -16,7 +16,7 @@ export type FormQuestion={
   otherOptionKey?:string;otherMaxLength?:number;exclusiveOptionKeys?:string[];
   displayIf?:Condition
 }
-export type FormDraft={schemaVersion:1|2;pages:{pageKey:string;title:string;questions:FormQuestion[]}[]}
+export type FormDraft={schemaVersion:1|2;pages:{pageKey:string;title:string;description?:string;questions:FormQuestion[]}[]}
 export type ScaleDraft={
   schemaVersion:1;presentationMode?:'ONE_BY_ONE'|'ALL_AT_ONCE';respondentType:'participant_self_report'|'student_self_report'|'teacher_self_report';
   responseOptions:{optionKey:string;label:string;score:number}[];
@@ -59,7 +59,8 @@ export type Definition=FormDraft|ScaleDraft|SjtDraft|CognitiveDraft
 export type ResearchDraft={
   id:string;projectId:string;instrumentKey:string;kind:Kind;title:string;
   definition:Definition;revision:number;status:'DRAFT'|'ARCHIVED';
-  updatedAt:string;createdAt:string
+  updatedAt:string;createdAt:string;catalogGrantId?:string|null;readOnly?:boolean;
+  sourceProvenance?:import('./ResearchCatalog').CatalogProvenance
 }
 export type Issue={path:string;message:string;severity:'error'|'warning'}
 export const researchKey=(prefix='k')=>prefix+crypto.randomUUID().replace(/-/g,'').slice(0,18)

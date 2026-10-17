@@ -4,7 +4,8 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { encryptUnifiedRuntimePayload,decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 const hashResearchCredential=(raw:string)=>createHash('sha256').update(raw).digest('hex')
 import type { ResearchFrozenPublication } from './publication.service'
-import type { FrozenSurveyFlow } from './flow.definition'
+import { surveyVariantProvenance,surveyVariantInstrumentKeys,surveyAssignedFlowBlocks,
+  type FrozenSurveyFlow,type SurveyVariantProvenance } from './flow.definition'
 
 export type SurveyFlowAssignment={
   schemaVersion:1
@@ -13,6 +14,7 @@ export type SurveyFlowAssignment={
   groupKey:string|null
   algorithm:'CRYPTO_RANDOM_INT_V1'|'CRYPTO_QUOTA_WEIGHTED_V1'|'LINKED_INHERIT_V1'|'NO_EXPERIMENT'
   assignedAt:string
+  variant?:SurveyVariantProvenance
   inheritedFromAttemptId?:string
 }
 export class SurveyAssignmentError extends Error{
@@ -34,6 +36,27 @@ export const chooseSurveyGroup=(flow:FrozenSurveyFlow,draw:(max:number)=>number=
   return fail('实验分配无法匹配冻结权重')
 }
 export const assignmentDigest=(value:SurveyFlowAssignment)=>canonicalHash(value)
+export function assertSurveyFlowAssignment(flow:FrozenSurveyFlow,value:SurveyFlowAssignment){
+  const experiment=flow.experiment
+  if(value.schemaVersion!==1||value.flowDigest!==flow.flowDigest
+    ||value.experimentKey!==(experiment?.experimentKey??null)
+    ||(experiment?(!value.groupKey||!experiment.groups.some(g=>g.groupKey===value.groupKey)):value.groupKey!==null))
+    fail('作答已有的冻结实验分配与当前发布不一致')
+  const expected=surveyVariantProvenance(flow,value.groupKey)
+  if(expected?(canonicalHash(value.variant??null)!==canonicalHash(expected)
+    ||value.algorithm!=='CRYPTO_RANDOM_INT_V1'):value.variant!==undefined)
+    fail('问卷子版本分配来源与冻结版本不一致')
+}
+/** Used only for authorization/projection. FINAL retains the immutable union snapshot. */
+export function assignedSurveySnapshot(snapshot:ResearchFrozenPublication,assignment:SurveyFlowAssignment|null){
+  const flow=snapshot.flow
+  if(!flow)return snapshot
+  if(!assignment)fail('冻结流程缺少持久化分配')
+  assertSurveyFlowAssignment(flow,assignment!)
+  const keys=surveyVariantInstrumentKeys(flow,assignment!.groupKey)
+  return keys?{...snapshot,units:snapshot.units.filter(u=>keys.has(u.instrumentKey)),
+    flow:{...flow,blocks:surveyAssignedFlowBlocks(flow,assignment!.groupKey)}}:snapshot
+}
 /** Assignment is a durable, encrypted property of one Attempt, not a browser
  * session, JWT claim, client random number or mutable Wave setting.
  * Caller proves credential again while holding the exact Attempt lock.
@@ -78,10 +101,7 @@ export async function ensureSurveyFlowAssignment(tx:Prisma.TransactionClient,inp
   }else if(current.sessionHash!==credentialHash)fail('单次匿名凭证已失效')
   if(current.flowAssignmentCipher){
     const prior=decryptUnifiedRuntimePayload<SurveyFlowAssignment>(current.flowAssignmentCipher)
-    if(prior.schemaVersion!==1||prior.flowDigest!==flow.flowDigest
-      ||prior.experimentKey!==(experiment?.experimentKey??null)
-      ||(experiment?(!prior.groupKey||!experiment.groups.some(g=>g.groupKey===prior.groupKey)):prior.groupKey!==null))
-      fail('作答已有的冻结实验分配与当前发布不一致')
+    assertSurveyFlowAssignment(flow,prior)
     return prior
   }
   let groupKey:string|null=null
@@ -107,6 +127,8 @@ export async function ensureSurveyFlowAssignment(tx:Prisma.TransactionClient,inp
   // Wave admission already holds a Wave UPDATE lock; an atomic counter CAS
   // also protects against legacy/parallel participant task reads.
   const policy=input.snapshot.quotaPolicy
+  if(experiment?.mode==='QUESTIONNAIRE_VARIANTS'&&(policy||experiment.linkedPolicy!=='RERANDOMIZE'))
+    fail('问卷子版本只支持每波次独立概率分配')
   let quotaBucket:{groupKey:string;maxAssigned:number;assignedCount:number}|undefined
   if(policy){
     if(!experiment)fail('研究条件配额要求冻结的实验定义')
@@ -153,6 +175,8 @@ export async function ensureSurveyFlowAssignment(tx:Prisma.TransactionClient,inp
     assignedAt:new Date().toISOString(),
     ...(inheritedFromAttemptId?{inheritedFromAttemptId}:{}),
   }
+  const variant=surveyVariantProvenance(flow,groupKey)
+  if(variant)value.variant=variant
   const changed=await tx.surveyWaveAttempt.updateMany({
     where:{id:current.id,projectId:input.projectId,flowAssignmentCipher:null},
     data:{flowAssignmentCipher:encryptUnifiedRuntimePayload(value)},

@@ -1,10 +1,11 @@
+import {frozenVariantConfiguration,type SurveyVariantAudit,type SurveyVariantConfiguration} from './analytics.variant'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import type { ResearchFrozenPublication, ResearchFrozenUnit } from './publication.service'
 import type { SurveyComputedFinal, FrozenUnitResult, AnswerPrimitive } from './final.compute'
-import type { SurveyFlowAssignment } from './flow.assignment'
+import {assertSurveyFlowAssignment,type SurveyFlowAssignment } from './flow.assignment'
 import type { FrozenScoreObservation, MissingReason } from './analytics.cohorts'
 import type { FormDraft, ScaleDraft, AnySjtDraft } from './builder.definition'
 import {surveySjtQuestionEntries} from './sjt-structure'
@@ -20,6 +21,9 @@ import {validateSurveyScaleTimings,SurveyScaleTimingError,
   type SurveyScaleItemTimingV1} from './timing.definition'
 
 export interface ResearchRawCodebook {
+  variantConfiguration?:SurveyVariantConfiguration
+  sourceProvenance?:ResearchFrozenUnit['sourceProvenance']
+  sourceAnswerMapping?:ResearchFrozenUnit['sourceAnswerMapping']
   columnKey:string;waveId:string;waveOrdinal:number;instrumentKey:string;
   itemKey:string;kind:'FORM'|'SCALE'|'SJT'|'COGNITIVE';responseType:string;title:string;prompt:string;
   options:{code:string;label:string;nonanswerReason?:string}[];
@@ -39,7 +43,8 @@ export interface ResearchRawCodebook {
     rawEncoding:'AUTHORED_ORDER_OPTION_SET'|'SINGLE_OPTION';
     explicitRefusalEncoding:'JSON_SURVEY_REFUSAL_OBJECT';scorerKeyEncoding:'SINGLE_OPTION_OR_DERIVED_COMBINATION'}
 }
-export interface ResearchRawObservation {
+export interface ResearchRawObservation extends SurveyVariantAudit {
+  sourceItemKey?:string;sourceOptionValue?:string|number|null
   projectId:string;waveId:string;waveOrdinal:number;attemptId:string;
   researchCode:string|null;sourceFinalHash:string;
   instrumentKey:string;kind:'FORM'|'SCALE'|'SJT'|'COGNITIVE';responseType:string;
@@ -52,7 +57,12 @@ export interface ResearchRawObservation {
   motherSceneKey?:string;scorerOptionKey?:string|null
   completionStatus?:'COMPLETE'|'COMPLETE_EARLY'|'SCREEN_OUT'
 }
+export type SurveySourceVersion=Pick<ResearchRawCodebook,'waveId'|'instrumentKey'|'publicationVersion'|
+  'instrumentRevision'|'definitionDigest'|'scoringDigest'|'sourceProvenance'|'sourceAnswerMapping'>
 export interface SurveySourceProjection {
+  /** Frozen sourced instruments, including cognitive units with no raw item codebook. */
+  sourceVersions?:SurveySourceVersion[]
+  variantConfigurations?:SurveyVariantConfiguration[]
   projectId:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES'
   completeAttempts:number
   fullCompletionAttempts?:number
@@ -272,6 +282,11 @@ function frozenScoreColumns(projectId:string,waveId:string,ordinal:number,frozen
     },
   }))
 }
+function frozenSourceMetadata(frozen:ResearchFrozenUnit){
+  const source=frozen
+  return {...(source.sourceProvenance?{sourceProvenance:source.sourceProvenance}:{}),
+    ...(source.sourceAnswerMapping?{sourceAnswerMapping:source.sourceAnswerMapping}:{})}
+}
 const codeKey=(waveOrdinal:number,instrumentKey:string,itemKey:string,hash:string)=>
   'W'+String(waveOrdinal).padStart(3,'0')+'__'
     +(instrumentKey.replace(/[^a-z0-9_]/gi,'_').slice(0,38))
@@ -432,6 +447,7 @@ type SurveySourceInput = {
 }
 
 export async function loadSurveySource(input: SurveySourceInput): Promise<SurveySourceProjection> {
+  if(input.waveIds&&input.waveIds.length>100)throw new SurveyAnalyticsError(413,'本次选择的波次数量超出安全上限')
   if(input.cognitiveTrials&&(!input.pageMode||!input.stableIdCursor||input.maxFinals!==1
     ||input.waveIds?.length!==1||input.includeAttendance!==false||input.attendanceOnly))
     throw new SurveyAnalyticsError(400,'认知试次仅允许单波次、单 FINAL 的有界分页')
@@ -469,8 +485,13 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
     if(input.expectedSourceRevision!==undefined
        &&project.sourceRevision!==input.expectedSourceRevision)
       throw new SurveyAnalyticsError(409,'研究样本或项目版本在分批分析期间变化，请重新开始')
+    // For an explicitly bounded wave selection, reuse the ownership read as
+    // the small frozen-schema header read. Keep both source-fence passes.
+    const ownedSchemaWaves=input.includeWideSchema&&input.waveIds?.length
+      ?await tx.surveyWave.findMany({where:{projectId:input.projectId,id:{in:input.waveIds}},
+        select:{id:true,ordinal:true,publicationId:true,status:true},orderBy:{ordinal:'asc'},take:101}):null
     if(input.waveIds?.length){
-      const ownerWaves=await tx.surveyWave.count({where:{projectId:input.projectId,id:{in:input.waveIds}}})
+      const ownerWaves=ownedSchemaWaves?.length??await tx.surveyWave.count({where:{projectId:input.projectId,id:{in:input.waveIds}}})
       if(ownerWaves!==new Set(input.waveIds).size)denied()
     }
     // Stage 1: select only small identifiers; never deserialize full encrypted
@@ -527,7 +548,8 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
     const ids=selectedHeaders.map(row=>row.id)
     // A Wave may have STARTED attempts but no FINAL. Only Wide exports need
     // its frozen schema to distinguish ABANDONED from NO_WAVE.
-    const frozenWaves=input.includeWideSchema?await tx.surveyWave.findMany({
+    const frozenWaves=ownedSchemaWaves?ownedSchemaWaves.filter(w=>w.publicationId!==null&&['OPEN','PAUSED','CLOSED'].includes(w.status))
+      :input.includeWideSchema?await tx.surveyWave.findMany({
       where:{projectId:input.projectId,
         ...(input.waveIds?.length?{id:{in:input.waveIds}}:{}),
         // A prepared DRAFT is not a collected Wave; do not label future
@@ -646,6 +668,18 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
       row.participant?.status!=='WITHDRAWN'&&row.excludedAt===null)
       .map(row=>({researchCode:row.participant!.researchCode,waveId:row.waveId,status:row.sampleReview?.verdict==='EXCLUDED'?'QUALITY_EXCLUDED':row.status}))
     // Row projection remains bounded independently from the ciphertext budget.
+    const variantConfigurations=[...verifiedSnapshots.values()].flatMap(snapshot=>{
+      const config=frozenVariantConfiguration(snapshot.flow,snapshot.waveId);return config?[config]:[]
+    })
+    const sourceVersions:SurveySourceVersion[]=publications.flatMap(publication=>{
+      const snapshot=verifiedSnapshots.get(publication.id)!
+      return snapshot.units.filter(unit=>unit.sourceProvenance||unit.sourceAnswerMapping).map(unit=>({
+        waveId:snapshot.waveId,instrumentKey:unit.instrumentKey,publicationVersion:publication.version,
+        instrumentRevision:unit.draftRevision,definitionDigest:unit.sourceDigest,scoringDigest:unit.scoringDigest,
+        ...frozenSourceMetadata(unit),
+      }))
+    })
+    const variantConfigByWave=new Map(variantConfigurations.map(c=>[c.waveId,c]))
     const codebook=new Map<string,ResearchRawCodebook>()
     const scoreColumns:SurveySourceProjection['scoreColumns']=[]
     const scores:FrozenScoreObservation[]=[],raw:ResearchRawObservation[]=[]
@@ -658,9 +692,10 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
       if(!projection){projection=prepareCognitiveProjection(unit);cognitiveProjections.set(unit,projection)}
       return projection
     }
-    const scoreColumnsFor=(unit:ResearchFrozenUnit,waveId:string,ordinal:number)=>unit.kind==='COGNITIVE'
+    const scoreColumnsFor=(unit:ResearchFrozenUnit,waveId:string,ordinal:number)=>(unit.kind==='COGNITIVE'
       ?cognitiveProjectionFor(unit).columns.map(measurement=>({projectId:input.projectId,waveId,waveOrdinal:ordinal,measurement}))
-      :frozenScoreColumns(input.projectId,waveId,ordinal,unit)
+      :frozenScoreColumns(input.projectId,waveId,ordinal,unit)).map(column=>({...column,measurement:{...column.measurement,
+        ...frozenSourceMetadata(unit),...(variantConfigByWave.get(waveId)?{variantConfiguration:variantConfigByWave.get(waveId)}:{})}}))
     const rawSchemas=new Map<ResearchFrozenPublication,{
       ordinal:number;schema:ReturnType<typeof frozenRawSchema>
     }>()
@@ -687,6 +722,7 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
       const snapshot=verifiedSnapshots.get(publication.id)
       if(!snapshot||snapshot.waveId!==wave.id)
         throw new SurveyAnalyticsError(409,'冻结波次定义摘要缺失')
+      const variantConfiguration=variantConfigByWave.get(wave.id)
       const rawSchema=rawSchemaFor(snapshot,wave.ordinal)
       for(const frozen of snapshot.units){
         for(const item of rawSchema.itemsByUnit.get(frozen)!){
@@ -694,6 +730,8 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
           if(codebook.has(columnKey))invalid('冻结研究变量编码重复')
           codebook.set(columnKey,{
             columnKey,waveId:wave.id,waveOrdinal:wave.ordinal,
+            ...(variantConfiguration?{variantConfiguration}:{}),
+            ...frozenSourceMetadata(frozen),
             instrumentKey:frozen.instrumentKey,itemKey:item.itemKey,kind:frozen.kind,
             responseType:item.responseType,title:frozen.title,prompt:item.prompt,options:item.options.map(option=>({...option})),
             definitionDigest:frozen.sourceDigest,scoringDigest:frozen.scoringDigest,
@@ -740,12 +778,22 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
         ||canonicalHash(JSON.parse(JSON.stringify(result)))!==final.resultsHash)
         invalid('研究 FINAL 加密内容或摘要无法验证')
       if(result.units.length!==snapshot.units.length)invalid('研究 FINAL 子任务数与冻结定义不一致')
+      let variantAudit:SurveyVariantAudit={}
       if(snapshot.flow){
         const trace=result.executionTrace
         if(!trace||trace.schemaVersion!==1||trace.flowDigest!==snapshot.flow.flowDigest
           ||trace.clientPresentation!=='VERIFIED_SUBMISSION'||!attempt.flowAssignmentCipher)
           invalid('研究 Flow 来源及展示审计不可核验')
         const assigned=decryptUnifiedRuntimePayload<SurveyFlowAssignment>(attempt.flowAssignmentCipher)
+        try{assertSurveyFlowAssignment(snapshot.flow,assigned)}catch{invalid('研究问卷子版本分配来源不可核验')}
+        if(assigned.variant){
+          if(canonicalHash(trace.variant??null)!==canonicalHash(assigned.variant)
+            ||trace.assignedAt!==assigned.assignedAt||trace.algorithm!==assigned.algorithm
+            ||!Number.isFinite(Date.parse(assigned.assignedAt)))
+            invalid('研究问卷子版本执行轨迹与分配来源不一致')
+          variantAudit={variant:assigned.variant,assignmentAlgorithm:assigned.algorithm,
+            assignmentDigest:canonicalHash(assigned),assignedAt:assigned.assignedAt}
+        }else if(trace.variant)invalid('普通流程不允许伪造问卷子版本来源')
         if(assigned.flowDigest!==snapshot.flow.flowDigest||
           trace.assignmentDigest!==canonicalHash(assigned)||
           trace.groupKey!==assigned.groupKey||trace.experimentKey!==assigned.experimentKey)
@@ -761,7 +809,7 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
         throw e
       }
       const meta={
-        projectId:input.projectId,waveId:wave.id,waveOrdinal:wave.ordinal,
+        ...variantAudit,projectId:input.projectId,waveId:wave.id,waveOrdinal:wave.ordinal,
         attemptId:attempt.id,researchCode:attempt.participant?.researchCode??null,
         attemptStartedAt:attempt.startedAt.toISOString(),
         completedAt:final.completedAt.toISOString(),sourceFinalHash:final.resultsHash,
@@ -829,7 +877,8 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
             const child=childrenBySlot.get(frozen.instrumentKey)
             if(!child)invalid('研究 FINAL 的认知子结果来源缺失')
             const projection=cognitiveProjectionFor(frozen)
-            const childScores=projection.scoresFromChild(unit,child,cognitiveMeta)
+            const childScores=projection.scoresFromChild(unit,child,cognitiveMeta).map(score=>({...score,measurement:{...score.measurement,
+              ...(variantConfigByWave.get(wave.id)?{variantConfiguration:variantConfigByWave.get(wave.id)}:{})}}))
             if(input.selectScore!==false&&(!input.selectScore||frozen.instrumentKey===input.selectScore.instrumentKey))
               scores.push(...childScores.filter(score=>!input.selectScore||score.measurement.scoreKey===input.selectScore.scoreKey))
             if(input.cognitiveTrials)trialInputs.push(projection.trialRows(child,cognitiveMeta))
@@ -839,7 +888,8 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
             frozen.instrumentKey===input.selectScore.instrumentKey))
             scores.push(...scoresFrom(frozen,unit,meta).filter(score=>!input.selectScore||
               score.measurement.scoreKey===input.selectScore.scoreKey).map(score=>
-                score.measurement.provenance?{...score,completionStatus}:score))
+                ({...score,...(score.measurement.provenance||meta.variant?{completionStatus}:{}),measurement:{...score.measurement,...frozenSourceMetadata(frozen),
+                  ...(variantConfigByWave.get(wave.id)?{variantConfiguration:variantConfigByWave.get(wave.id)}:{})}})))
           if(input.selectRaw!==false&&(!input.selectRaw||
             frozen.instrumentKey===input.selectRaw.instrumentKey)){
             const items=rawSchemaFor(snapshot,wave.ordinal).itemsByUnit.get(frozen)!
@@ -852,11 +902,15 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
             raw.push({...meta,...flowData,sourceVerified:true,kind:frozen.kind,
               instrumentKey:frozen.instrumentKey,itemKey:r.itemKey,columnKey,responseType:r.responseType,
               publicationVersion:publication.version,
+              ...(frozen.sourceAnswerMapping?{sourceItemKey:frozen.sourceAnswerMapping.items[r.itemKey],
+                sourceOptionValue:typeof value==='string'?(frozen.sourceAnswerMapping.options[value]??null):null}:{}),
               value,missingReason,
               ...(r.sjtMetadata?{motherSceneKey:r.sjtMetadata.motherSceneKey,scorerOptionKey,completionStatus}:{}),
               ...(itemTiming?{itemTiming}:{})})
             if(!codebook.has(columnKey))
               codebook.set(columnKey,{columnKey,waveId:wave.id,waveOrdinal:wave.ordinal,
+                ...(variantConfigByWave.get(wave.id)?{variantConfiguration:variantConfigByWave.get(wave.id)}:{}),
+                ...frozenSourceMetadata(frozen),
                 instrumentKey:frozen.instrumentKey,itemKey:r.itemKey,kind:frozen.kind,
                 responseType:r.responseType,
                 title:frozen.title,prompt:r.prompt,options:r.options.map(option=>({...option})),
@@ -893,7 +947,8 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
     }
     if(input.cognitiveTrials&&!finals.length&&input.cognitiveTrials.expectedFinalId)
       invalid('认知试次分页引用的整轮 FINAL 不再可用')
-    return {projectId:input.projectId,collectionMode:project.collectionMode,
+    return {projectId:input.projectId,collectionMode:project.collectionMode,variantConfigurations,
+      ...(sourceVersions.length?{sourceVersions}:{}),
       sourceRevision:project.sourceRevision,
       completeAttempts:completedFinals,
       cutOff:cutOff.toISOString(),nextFinalCursor,sourceFinalCount,

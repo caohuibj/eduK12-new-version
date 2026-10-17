@@ -23,6 +23,8 @@ export const compileGroupQuotaPolicy=(raw:unknown,
   const policy=parsed.data
   if(!flow?.experiment)
     throw new SurveyOperationsDefinitionError('条件配额要求同一冻结 Flow 定义实验分组')
+  if(flow.experiment.mode==='QUESTIONNAIRE_VARIANTS')
+    throw new SurveyOperationsDefinitionError('问卷子版本使用独立概率分配，不支持条件配额或保证人数')
   const codes=Object.keys(policy.groupLimits)
   const groups=flow.experiment.groups.map(g=>g.groupKey)
   if(codes.length!==groups.length||codes.some(code=>!groups.includes(code)))

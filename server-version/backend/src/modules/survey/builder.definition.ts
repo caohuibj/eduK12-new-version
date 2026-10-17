@@ -99,7 +99,7 @@ export type FormQuestion=z.infer<typeof formQuestionSchema>
 export const formDraftSchema=z.object({
   schemaVersion:z.union([z.literal(1),z.literal(2)]),
   pages:z.array(z.object({
-    pageKey:key,title:label,
+    pageKey:key,title:label,description:z.string().max(8000).optional(),
     questions:z.array(formQuestionSchema).max(80),
   }).strict()).max(40),
 }).strict()

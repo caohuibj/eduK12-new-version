@@ -14,7 +14,7 @@ import { isTrainingHost, trainingNavigation } from '../../training/context'
 import TrainingBrand from '../../training/TrainingBrand'
 import TrainingContextBack from '../../training/TrainingContextBack'
 import { homeFor, isAuthPath, isPublicAssessmentPath, shellModeFor } from './access'
-import { activeNavigation, breadcrumbsFor, isStaffWorkspacePath, navigationFor, organizationNavigation, routeTitle } from './navigation'
+import { activeNavigation, breadcrumbsFor, isStaffWorkspacePath, navigationFor, organizationNavigation, routeTitle, surveyGovernanceNavigation } from './navigation'
 import './app-shell.css'
 import '../staff-ui/staff-ui.css'
 import '../student-ui/student-ui.css'
@@ -45,6 +45,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const routeOrganizationId=matchPath('/organizations/:organizationId/*',location.pathname)?.params.organizationId
   const displayOrganization=!routeOrganizationId||routeOrganizationId==='new'||activeOrganization?.organization.id===routeOrganizationId?activeOrganization:null
   const items=training?trainingNavigation(user?.role):[...navigationFor(user?.role,cognitive,relational.status==='available'),...(user?organizationNavigation(displayOrganization?.organization.id,displayOrganization?.allowedActions,platformRole,directoryActions):[])]
+  items.push(...surveyGovernanceNavigation(training,user?.role,platformRole??user?.platformRole))
   if(!training&&user?.role==='ADMIN'&&platformRole==='SYSTEM_ADMIN') items.push({path:'/admin/legacy-archive',label:'历史归档（只读）',section:'system'})
   if(!training&&user?.role==='ADMIN'&&platformRole==='SYSTEM_ADMIN')
     items.push({path:'/admin/education-products',label:'教育产品治理',section:'system'})

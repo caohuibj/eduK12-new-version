@@ -1,3 +1,5 @@
+import {catalogSnapshotsForDrafts,compileCatalogUnit} from './catalog.service'
+import type {SourceAnswerMapping} from './catalog.sources'
 import { SURVEY_COGNITIVE_NOTICE } from './measurement.notice'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
@@ -19,6 +21,8 @@ import { compileGroupQuotaPolicy,compileCheckpointPolicy,
  * publication. The Survey FINAL admission adapter is separate from legacy catalog.
  */
 export interface ResearchFrozenUnit {
+  sourceProvenance?:Record<string,unknown>
+  sourceAnswerMapping?:SourceAnswerMapping
   draftId:string
   instrumentKey:string
   kind:'FORM'|'SCALE'|'SJT'|'COGNITIVE'
@@ -128,11 +132,12 @@ export async function freezeResearchWaveDraft(input:{
     const rows=await tx.surveyInstrumentDraft.findMany({
       where:{projectId:input.projectId,id:{in:orderedIds},status:'DRAFT'},
     })
+    const sources=await catalogSnapshotsForDrafts(tx,input.actorUserId,rows.flatMap(r=>r.catalogGrantId?[r.catalogGrantId]:[]))
     const byId=new Map(rows.map(row=>[row.id,row]))
     const units=orderedIds.map(id=>{
       const draft=byId.get(id)
       if(!draft)stop('研究工具来源已发生变化')
-      return compileFrozenResearchUnit(draft!)
+      return draft!.catalogGrantId?compileCatalogUnit(draft!,sources.get(draft!.catalogGrantId)!):compileFrozenResearchUnit(draft!)
     })
     // Initial bounded research safety limit, not a measured capacity claim.
     if(units.filter(unit=>unit.kind==='COGNITIVE').length>4)

@@ -24,7 +24,7 @@ export interface CognitiveExportChild {
   randomSeed?:string
 }
 export type CognitiveSourceMeta=Pick<FrozenScoreObservation,'projectId'|'waveId'|'waveOrdinal'|
-  'attemptId'|'researchCode'|'completedAt'|'sourceFinalHash'|'completionStatus'> & {publicationId:string;publicationVersion:number}
+  'attemptId'|'researchCode'|'completedAt'|'sourceFinalHash'|'completionStatus'|'variant'|'assignmentAlgorithm'|'assignmentDigest'|'assignedAt'> & {publicationId:string;publicationVersion:number}
 export interface CognitiveTrialObservation extends CognitiveSourceMeta {
   sourceVerified:true;instrumentKey:string;sourceResultHash:string;epoch:number;
   measurementDigest:string;configHash:string;protocolSignature:string;

@@ -90,7 +90,7 @@ surveyAnalyticsRouter.post('/:pid/analytics/waves/:wid/items/paged',wrap(req=>{
 surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/items',wrap(async req=>{
   const projectId=id.parse(req.params.pid),waveId=id.parse(req.params.wid)
   const source=await loadSurveySource({actorUserId:req.user!.userId,projectId,
-    waveIds:[waveId],maxFinals:250})
+    waveIds:[waveId],maxFinals:250,includeWideSchema:true})
   return describeWave(source,waveId)
 }))
 const groupRequest=z.object({

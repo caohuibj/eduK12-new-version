@@ -30,7 +30,7 @@ type SjtPublicQuestion={questionKey:string;prompt:string;responseType?:'SINGLE'|
 type Unit={kind:'FORM'|'SCALE'|'SJT'|'COGNITIVE';instrumentKey:string;title:string;image?:SurveyPublicImage;
   presentationMode?:'ONE_BY_ONE'|'ALL_AT_ONCE';
   stimulus?:string;scenarioTitle?:string;
-  pages?:{pageKey:string;title:string;questions:Question[]}[];
+  pages?:{pageKey:string;title:string;description?:string;questions:Question[]}[];
   responseOptions?:Choice[];
   items?:Question[];
   feedback?:{mode:'GENERAL'|'DESCRIPTIVE';release:'AFTER_FINAL'|'AFTER_COLLECTION'};
@@ -206,7 +206,7 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purp
         value={activePage?currentIndex+1:0} aria-label="本工具作答进度"/>
       {activePage&&<div key={activePage.pageKey}>
         <h4 className="mt-4 font-medium scroll-mt-5" id={'survey-page-'+unit.instrumentKey}
-          tabIndex={-1}>{activePage.title}</h4>
+          tabIndex={-1}>{activePage.title}</h4>{activePage.description&&<p className="whitespace-pre-wrap text-sm">{activePage.description}</p>}
         {activePage.questions.map(item)}
       </div>}
       {pageError&&<p role="alert" className="text-sm text-red-700 my-2">{pageError}</p>}

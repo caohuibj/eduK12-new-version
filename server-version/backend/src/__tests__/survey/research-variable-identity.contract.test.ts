@@ -31,7 +31,7 @@ function fixture(units:ResearchFrozenUnit[],answers:Record<string,unknown>,itemT
   const result=computeSurveyFinal(snapshot,answers,undefined,undefined,'FINAL',itemTimings)
   const publication={id:'synthetic-publication',projectId:owner.projectId,version:1,
     compiledSnapshot:snapshot,definitionDigest:canonicalHash(snapshot)}
-  const wave={id:owner.waveIds[0],projectId:owner.projectId,ordinal:1,publicationId:publication.id}
+  const wave={id:owner.waveIds[0],projectId:owner.projectId,ordinal:1,publicationId:publication.id,status:'OPEN'}
   const completedAt=new Date('2026-10-17T00:00:00Z')
   const final={id:'00000000-0000-0000-0000-000000000001',publicationId:publication.id,
     definitionDigest:publication.definitionDigest,completedAt,
@@ -60,6 +60,20 @@ beforeEach(()=>{
 afterEach(()=>vi.unstubAllEnvs())
 
 describe('Frozen Survey raw variable identity',()=>{
+  it('reuses bounded owned wave headers for empty-final schema and both release fences',async()=>{
+    const {tx}=fixture([formUnit('form',[question('ordinary')])],{form:{ordinary:1}})
+    await expect(loadSurveySource({...owner,waveIds:Array.from({length:101},(_,i)=>String(i)),includeWideSchema:true})).rejects.toMatchObject({statusCode:413})
+    expect(tx.surveyWave.findMany).not.toHaveBeenCalled()
+    tx.surveyWaveFinal.findMany.mockResolvedValue([])
+    const source=await loadSurveySource({...owner,includeWideSchema:true})
+    expect(source.codebook).toHaveLength(1)
+    expect(tx.surveyWave.count).not.toHaveBeenCalled()
+    expect(tx.surveyWave.findMany).toHaveBeenCalledTimes(2)
+    expect(tx.surveyWave.findMany).toHaveBeenCalledWith(expect.objectContaining({where:{projectId:owner.projectId,id:{in:owner.waveIds}}}))
+    tx.surveyWave.findMany.mockResolvedValue([])
+    await expect(loadSurveySource({...owner,includeWideSchema:true})).rejects.toMatchObject({statusCode:404})
+  })
+
   it('exports valid hyphen and underscore item keys without collision',async()=>{
     const unit=formUnit('form',[question('q-a'),question('q_a')])
     fixture([unit],{form:{'q-a':1,q_a:2}})

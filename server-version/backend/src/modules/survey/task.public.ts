@@ -4,7 +4,7 @@ import { parseFrozenSurveyCognitive } from './cognitive.definition'
 import { assertSurveyDraft, type FormDraft, type ScaleDraft, type AnySjtDraft } from './builder.definition'
 import { verifiedSurveyAttempt } from './admission.service'
 import { prisma } from '../../config/database'
-import { ensureSurveyFlowAssignment } from './flow.assignment'
+import { ensureSurveyFlowAssignment,assignedSurveySnapshot } from './flow.assignment'
 import { buildSurveyFlowPublicProjection } from './flow.runtime'
 import { SurveyWaveError } from './waves.service'
 type SurveyFrozenImage=NonNullable<FormDraft['pages'][number]['questions'][number]['image']>
@@ -38,13 +38,14 @@ export async function getOwnResearchTask(input:{
       participantId:own.participantId,researchCode:input.researchCode,
       accessCredential:input.accessCredential,snapshot:own.compiledSnapshot,
     })):null
-  const units=own.compiledSnapshot.units.map(unit=>{
+  const selected=assignedSurveySnapshot(own.compiledSnapshot,assignment)
+  const units=selected.units.map(unit=>{
     if(unit.kind==='FORM'){
       // Published definitions are immutable; do not retroactively invalidate an
       // older Wave solely for an operator combination newly restricted in Builder.
       const d=assertSurveyDraft('FORM',unit.displayDefinition,true,true) as FormDraft
       return {kind:'FORM',instrumentKey:unit.instrumentKey,title:unit.title,
-        pages:d.pages.map(page=>({pageKey:page.pageKey,title:page.title,
+        pages:d.pages.map(page=>({pageKey:page.pageKey,title:page.title,...(page.description?{description:page.description}:{}),
           questions:page.questions.map(q=>({
             itemKey:q.itemKey,type:q.type,prompt:q.prompt,image:projectPublicSurveyImage(q.image),required:q.required,allowRefusal:q.allowRefusal===true,
             options:q.options.map(o=>({optionKey:o.optionKey,label:o.label})),
@@ -91,7 +92,7 @@ export async function getOwnResearchTask(input:{
       orderPolicy:'FIXED',scenes}
 
   })
-  const cognitiveProgress=own.status==='STARTED'&&own.compiledSnapshot.units.some(unit=>unit.kind==='COGNITIVE')
+  const cognitiveProgress=own.status==='STARTED'&&selected.units.some(unit=>unit.kind==='COGNITIVE')
     ?await readSurveyCognitiveProgressFromVerifiedAttempt(input,own):null
   return {attemptId:own.attemptId,waveId:own.waveId,status:own.status,
     ...(cognitiveProgress??{}),

@@ -1,3 +1,4 @@
+import {variantAuditColumns,variantAuditValues} from './analytics.variant'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {surveyAttemptCode,tableToCsv} from './analytics.export-format'
 import {COGNITIVE_TRIAL_PAGE_ROWS,COGNITIVE_TRIAL_PAGE_BYTES} from './analytics.cognitive'
@@ -9,13 +10,14 @@ export function cognitiveTrialLongExport(projectId:string,source:SurveySourcePro
     ||row.sourceVerified!==true||!row.sourceFinalHash||!row.sourceResultHash))
     throw new Error('Cognitive trial export requires verified project-owned parent FINAL and child results')
   if(rows.length>COGNITIVE_TRIAL_PAGE_ROWS)throw new Error('Cognitive trial export exceeds row budget')
+  const variants=!!source.variantConfigurations?.length||rows.some(r=>r.variant)
   const columns=['research_code_or_attempt','wave_id','wave_ordinal','publication_id','publication_version',
     'instrument_key','epoch','completion_status','phase','trial_index','condition','stimulus_code',
     'responded','response','rt','rt_unit','rt_missing_reason','started_at_perf_ms','ended_at_perf_ms',
     'duration_ms','timeout','premature','interrupted','quality_events','quality_status','quality_flags',
     'quality_reasons','restart_count','measurement_digest','config_hash','protocol_signature',
     'engine_version','scoring_version','config_version','timing_policy','randomization_version','random_seed',
-    'administration_provenance','source_final_hash','source_result_hash','child_completed_at_utc','final_completed_at_utc']
+    'administration_provenance','source_final_hash','source_result_hash','child_completed_at_utc','final_completed_at_utc',...(variants?variantAuditColumns:[])]
   const attemptCodes=new Map<string,string>()
   const attemptCode=(id:string)=>{
     let code=attemptCodes.get(id)
@@ -29,7 +31,7 @@ export function cognitiveTrialLongExport(projectId:string,source:SurveySourcePro
     JSON.stringify(row.qualityEvents),row.qualityStatus,JSON.stringify(row.qualityFlags),JSON.stringify(row.qualityReasons),
     row.restartCount,row.measurementDigest,row.configHash,row.protocolSignature,row.engineVersion,row.scoringVersion,
     row.configVersion,row.timingPolicy,row.randomizationVersion,row.randomSeed,JSON.stringify(row.administrationProvenance),
-    row.sourceFinalHash,row.sourceResultHash,row.childCompletedAt,row.completedAt])
+    row.sourceFinalHash,row.sourceResultHash,row.childCompletedAt,row.completedAt,...(variants?variantAuditValues(row):[])])
   const csv=tableToCsv(columns,records,COGNITIVE_TRIAL_PAGE_ROWS)
   const codebook=columns.map(field=>({field,
     unit:field==='rt'||field.endsWith('_perf_ms')||field==='duration_ms'?'ms':null,
@@ -44,6 +46,7 @@ export function cognitiveTrialLongExport(projectId:string,source:SurveySourcePro
                   :field.endsWith('_at_utc')?'Server UTC receipt time, not a reaction-time clock':field,
   }))
   return {csv,codebook,manifest:{schemaVersion:2 as const,format:'COGNITIVE_TRIAL_LONG' as const,
+    ...(source.variantConfigurations?.length?{variantConfigurations:source.variantConfigurations}:{}),
     projectId,waveIds:[waveId],cutOff:source.cutOff,rowCount:rows.length,columnCount:columns.length,
     sourceDigest:canonicalHash(rows.map(row=>({parent:row.sourceFinalHash,child:row.sourceResultHash,
       slot:row.instrumentKey,epoch:row.epoch,phase:row.phase,index:row.trialIndex}))),

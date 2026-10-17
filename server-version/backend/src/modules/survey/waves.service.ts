@@ -1,3 +1,4 @@
+import {catalogSnapshotsForDrafts,compileCatalogUnit} from './catalog.service'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -184,7 +185,8 @@ export async function preflightWave(uid:string,pid:string,wid:string){
     if(ids.length!==(Array.isArray(wave.instrumentIds)?wave.instrumentIds.length:-1))fail(400,'工具引用格式错误')
     await validateDraftRefs(tx,pid,ids)
     const drafts=await tx.surveyInstrumentDraft.findMany({where:{projectId:pid,id:{in:ids}}})
-    return {project,wave,drafts:ids.map(id=>drafts.find(d=>d.id===id)!),selected:ids}
+    const catalogSources=await catalogSnapshotsForDrafts(tx,uid,drafts.flatMap(d=>d.catalogGrantId?[d.catalogGrantId]:[]))
+    return {project,wave,drafts:ids.map(id=>drafts.find(d=>d.id===id)!),selected:ids,catalogSources}
   })
   const checks:Array<{key:string;ok:boolean;issues:string[];digest?:string}>=[]
   let compiledFlow:import('./flow.definition').FrozenSurveyFlow|undefined
@@ -239,6 +241,11 @@ export async function preflightWave(uid:string,pid:string,wid:string){
       issues:linkedConfirmed?[]:['跨波次研究必须由研究者确认已明确告知：随机研究编号将关联不同时间点的答案']})
   }
   for(const draft of input.drafts){
+    if(draft.catalogGrantId){
+      const compiled=compileCatalogUnit(draft,input.catalogSources.get(draft.catalogGrantId)!)
+      checks.push({key:draft.id,ok:true,issues:[],digest:compiled.sourceDigest})
+      continue
+    }
     const compilation=previewResearchInstrument({
       kind:surveyKindSchema.parse(draft.kind),instrumentKey:draft.instrumentKey,
       title:draft.title,definition:draft.definition,

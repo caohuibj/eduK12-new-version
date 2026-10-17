@@ -14,7 +14,7 @@ import { verifiedSurveyAttempt } from './admission.service'
 import { hashResearchCredential } from './identity.service'
 import { validateSurveyUnitAnswers } from './final.compute'
 import { evaluateFlowCondition,staticFlowValues } from './flow.definition'
-import { ensureSurveyFlowAssignment } from './flow.assignment'
+import { ensureSurveyFlowAssignment,assignedSurveySnapshot } from './flow.assignment'
 import type { ResearchFrozenPublication } from './publication.service'
 import { parseFrozenSurveyCognitive,surveyCognitiveTaskDefinition,type FrozenSurveyCognitive } from './cognitive.definition'
 import { cognitiveFail,assertSurveyCognitiveLockedAnswers,surveyCognitiveResultReference,
@@ -68,7 +68,12 @@ async function lockAccess(tx:Tx,proof:SurveyCognitiveProof,known:Known,allowComp
     accepted:true,consentVersion:wave.consentVersion,
   },select:{id:true}})
   if(!consent)cognitiveFail(403,'当前研究缺少有效的知情同意记录')
-  return {attempt:attempt!,snapshot:publication!.compiledSnapshot as unknown as ResearchFrozenPublication}
+  const snapshot=publication!.compiledSnapshot as unknown as ResearchFrozenPublication
+  const assignment=snapshot.flow?.experiment?.mode==='QUESTIONNAIRE_VARIANTS'
+    ?await ensureSurveyFlowAssignment(tx,{projectId:known.projectId,waveId:known.waveId,
+      attemptId:known.attemptId,participantId:known.participantId,researchCode:proof.researchCode,
+      accessCredential:proof.accessCredential,snapshot}):null
+  return {attempt:attempt!,snapshot:assignment?assignedSurveySnapshot(snapshot,assignment):snapshot}
 }
 function frozenUnit(snapshot:ResearchFrozenPublication,slotKey:string):FrozenSurveyCognitive{
   const unit=snapshot.units.find(u=>u.instrumentKey===slotKey&&u.kind==='COGNITIVE')
@@ -138,6 +143,8 @@ async function prefixAnswers(tx:Tx,known:Known,snapshot:ResearchFrozenPublicatio
   const {answers}=prepareSurveyCognitivePriorAnswers(input)
   const verified:Record<string,Record<string,unknown>>={},locked:Record<string,unknown>={}
   const units=new Map(snapshot.units.map(u=>[u.instrumentKey,u]))
+  if(snapshot.flow?.experiment?.mode==='QUESTIONNAIRE_VARIANTS'&&Object.keys(answers).some(key=>!units.has(key)))
+    cognitiveFail(400,'认知前置答案不属于当前问卷子版本')
   const blocks=snapshot.flow?.blocks??snapshot.units.map(u=>({kind:'INSTRUMENT',instrumentKey:u.instrumentKey,when:undefined}))
   const vars=snapshot.flow?staticFlowValues(snapshot.flow):{}
   const priorCognitive:string[]=[]
@@ -318,10 +325,15 @@ export async function readSurveyCognitiveProgress(proof:SurveyCognitiveProof){
 export async function readSurveyCognitiveProgressFromVerifiedAttempt(proof:SurveyCognitiveProof,known:Known){
   if(known.attemptId!==proof.attemptId)cognitiveFail(403,'研究作答不属于当前入口')
   return prisma.$transaction(async tx=>{
-    await lockAccess(tx,proof,known,true)
+    const {snapshot}=await lockAccess(tx,proof,known,true)
     const cognitiveSessions=await listSurveyCognitiveSessions(tx,known.attemptId)
     const lockedPriorAnswers=await readSurveyCognitiveLockedAnswers(tx,{projectId:known.projectId,waveId:known.waveId,
       attemptId:known.attemptId,publicationId:known.publicationId})
+    if(snapshot.flow?.experiment?.mode==='QUESTIONNAIRE_VARIANTS'){
+      const keys=new Set(snapshot.units.map(u=>u.instrumentKey))
+      if(cognitiveSessions.some(s=>!keys.has(s.slotKey))||Object.keys(lockedPriorAnswers).some(key=>!keys.has(key)))
+        cognitiveFail(409,'认知进度不属于当前问卷子版本')
+    }
     return {cognitiveSessions,lockedPriorAnswers}
   })
 }

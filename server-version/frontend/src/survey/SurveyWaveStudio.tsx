@@ -1,4 +1,4 @@
-import { useEffect,useState,type FormEvent } from 'react'
+import { useRef, useEffect,useState,type FormEvent } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { SurveyFlowStudio,type FormQuestionInfo } from './SurveyFlowStudio'
 import type { FlowDraft } from './flow.client'
@@ -80,7 +80,8 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChang
   const [ready,setReady]=useState<Preflight|null>(null),[busy,setBusy]=useState(false)
   const [error,setError]=useState(''),[notice,setNotice]=useState('')
   const [shareLink,setShareLink]=useState('')
-  const [studyPreview,setStudyPreview]=useState<{drafts:ResearchDraft[];snapshots:Record<string,CognitivePreviewSnapshot>}|null>(null)
+  const previewEpoch=useRef(0)
+  const [studyPreview,setStudyPreview]=useState<{drafts:ResearchDraft[];snapshots:Record<string,CognitivePreviewSnapshot>;flow:FlowDraft|null;consentText:string;generalText:string}|null>(null)
   const [flowAnalytics,setFlowAnalytics]=useState<FlowAnalytics|null>(null)
   const [categoryKey,setCategoryKey]=useState('')
   const [scoreSelection,setScoreSelection]=useState('')
@@ -94,7 +95,7 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChang
     onProjectChanged?.(projectDetails)
     setWavePage(nextWavePage);setToolPage(nextToolPage)
   }
-  useEffect(()=>{setEditing(null);setReady(null);setShareLink('');setForm(initial());setDetails({})
+  useEffect(()=>{previewEpoch.current++;setStudyPreview(null);setEditing(null);setReady(null);setShareLink('');setForm(initial());setDetails({})
     void refresh().catch(e=>setError(message(e)))
   },[projectId])
   useEffect(()=>{
@@ -111,6 +112,7 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChang
     try{await action()}catch(e){setError(message(e))}finally{setBusy(false)}
   }
   const select=(wave:Wave)=>void act(async()=>{
+    previewEpoch.current++;setStudyPreview(null)
     const detail=await surveyApi<Wave>(path+'/waves/'+wave.id)
     // Resolve selected draft identities by ID; a research may select tools
     // from several pages of the paginated library.
@@ -131,6 +133,8 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChang
     })
   })
   const previewStudy=()=>void act(async()=>{
+    const epoch=++previewEpoch.current,saved=structuredClone(form)
+    setStudyPreview(null)
     const drafts=await Promise.all(form.instrumentIds.map(id=>surveyApi<ResearchDraft>(path+'/instruments/'+id)))
     const snapshots:Record<string,CognitivePreviewSnapshot>={}
     for(const draft of drafts.filter(d=>d.kind==='COGNITIVE')){
@@ -138,7 +142,7 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChang
       if(!result.ok||!result.cognitivePreview)throw new Error(draft.title+' 尚未通过编译，无法预览')
       snapshots[draft.instrumentKey]=result.cognitivePreview
     }
-    setStudyPreview({drafts,snapshots})
+    if(epoch===previewEpoch.current)setStudyPreview({drafts,snapshots,flow:saved.flowDefinition,consentText:saved.consentText,generalText:saved.generalText})
   })
   const payload=()=>{
     const start=form.opensAt?new Date(form.opensAt):null
@@ -288,7 +292,7 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChang
     <div className="grid md:grid-cols-[220px_minmax(0,1fr)] gap-5">
       <nav aria-label="研究波次列表" className="space-y-2">
         <button className="btn-secondary w-full" type="button" onClick={()=>{
-          setEditing(null);setForm(initial());setReady(null);setShareLink('')
+          previewEpoch.current++;setStudyPreview(null);setEditing(null);setForm(initial());setReady(null);setShareLink('')
         }}>新建波次</button>
         <div className="flex items-center justify-between text-xs gap-2">
           <button type="button" className="btn-secondary" disabled={busy||wavePage<=1}
@@ -338,18 +342,20 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChang
           </div>
           </fieldset>
           <SurveyFlowStudio value={form.flowDefinition}
-            onChange={flowDefinition=>setForm(old=>({...old,flowDefinition}))}
+            onChange={flowDefinition=>setForm(old=>({...old,flowDefinition,
+              quotaPolicy:flowDefinition?.experiment?.mode==='QUESTIONNAIRE_VARIANTS'?null:old.quotaPolicy}))}
             tools={flowTools} selectedIds={form.instrumentIds} questions={flowQuestions}
             collectionMode={project?.collectionMode??'SINGLE_UNLINKED'}/>
           <fieldset className="border rounded-xl p-4 space-y-2">
             <legend className="text-sm font-semibold">实验组条件配额（可选）</legend>
             <label className="text-sm flex gap-2">
-              <input type="checkbox" checked={!!form.quotaPolicy} disabled={!form.flowDefinition?.experiment}
+              <input type="checkbox" checked={!!form.quotaPolicy} disabled={!form.flowDefinition?.experiment||form.flowDefinition.experiment.mode==='QUESTIONNAIRE_VARIANTS'}
                 onChange={e=>setForm(prev=>({...prev,quotaPolicy:e.target.checked
                   ?{schemaVersion:1,groupLimits:Object.fromEntries(
                     (prev.flowDefinition?.experiment?.groups??[]).map(g=>[g.groupKey,100]))}:null}))}/>
               首次准入时按实验组原子占用名额</label>
-            {form.quotaPolicy&&form.flowDefinition?.experiment?.groups.map(g=>
+            {form.flowDefinition?.experiment?.mode==='QUESTIONNAIRE_VARIANTS'&&<p className="text-sm">A/B问卷子版本使用随机概率，不支持实验组配额。</p>}
+            {form.quotaPolicy&&form.flowDefinition?.experiment?.mode!=='QUESTIONNAIRE_VARIANTS'&&form.flowDefinition?.experiment?.groups.map(g=>
               <label key={g.groupKey} className="block text-xs">组别 {g.groupKey} 最大入场数（1–10000）
                 <input className="input block w-full" type="number" min={1} max={10000}
                   value={form.quotaPolicy?.groupLimits[g.groupKey]??''}
@@ -388,7 +394,7 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChang
           <button type="submit" className="btn-primary" disabled={busy||!form.title||form.consentText.length<20}>
             {editing?'保存波次草稿':'创建波次'}</button>
         </form>}
-        {studyPreview&&<SurveyStudyPreview drafts={studyPreview.drafts} cognitiveSnapshots={studyPreview.snapshots} flow={form.flowDefinition} consentText={form.consentText} generalText={form.generalText} onClose={()=>setStudyPreview(null)}/>}
+        {studyPreview&&<SurveyStudyPreview drafts={studyPreview.drafts} cognitiveSnapshots={studyPreview.snapshots} flow={studyPreview.flow} consentText={studyPreview.consentText} generalText={studyPreview.generalText} onClose={()=>{previewEpoch.current++;setStudyPreview(null)}}/>}
         {editing&&<div className="rounded-lg border p-4 space-y-4">
           <h3 className="font-semibold">T{editing.ordinal} · {editing.title}</h3>
           <p className="text-sm">状态：{editing.status} · revision {editing.revision} · 已启动 {editing.startsCount}

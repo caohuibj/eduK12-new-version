@@ -1,10 +1,10 @@
+import type {ResearchFrozenPublication} from './publication.service'
 import { prisma } from '../../config/database'
 import { Prisma } from '@prisma/client'
 
 type Tx=Prisma.TransactionClient
-export class SurveyAnalyticsError extends Error {
-  constructor(readonly statusCode:number,message:string){super(message)}
-}
+export {SurveyAnalyticsError} from './analytics.errors'
+import {SurveyAnalyticsError} from './analytics.errors'
 async function authorized(tx:Tx,uid:string,pid:string) {
   const rows=await tx.$queryRaw<Array<{collectionMode:string}>>`
     SELECT p.collection_mode AS "collectionMode"
@@ -82,8 +82,10 @@ export async function matchedWaveCounts(input:{
       throw new SurveyAnalyticsError(409,'单次独立匿名研究不能按个人匹配')
     const waveRows=await tx.surveyWave.findMany({
       where:{projectId:input.projectId,id:{in:[input.baselineWaveId,input.followupWaveId]}},
-      select:{id:true},
+      select:{id:true,publication:{select:{compiledSnapshot:true}}},
     })
+    if(waveRows.some(w=>(w.publication?.compiledSnapshot as unknown as ResearchFrozenPublication|undefined)?.flow?.experiment?.mode==='QUESTIONNAIRE_VARIANTS'))
+      throw new SurveyAnalyticsError(409,'A/B问卷子版本不可合并配对统计；请按冻结子版本分层分析')
     if(waveRows.length!==2)throw new SurveyAnalyticsError(404,'研究波次不属于当前项目')
     // Keep the participant set in PostgreSQL; the API needs one count row,
     // regardless of the number of completed answers in either Wave.
