@@ -61,6 +61,116 @@ afterEach(()=>{
   else delete (HTMLElement.prototype as Partial<HTMLElement>).scrollIntoView
 })
 
+const receiptText='本次提交时确认的一般说明'
+const firstSuccess=(overrides:Record<string,unknown>={})=>({
+  attemptId,receiptId:'33333333-3333-4333-8333-333333333333',status:'COMPLETED',idempotent:false,
+  completedAt:'2026-10-17T00:00:00Z',generalText:receiptText,
+  generalReceipt:{text:receiptText,disclaimer:'本次提交的一般免责声明',completedAt:'2026-10-17T00:00:00Z'},
+  ...overrides,
+})
+const generalCalls=()=>vi.mocked(fetch).mock.calls.filter(([url])=>String(url).endsWith('/general'))
+
+describe('Survey first-success GENERAL receipt consumption',()=>{
+  it('renders the controlled first-success receipt without another HTTP request or persisting it',async()=>{
+    finalReply=()=>response(firstSuccess())
+    generalReply=()=>Promise.reject(new Error('First success must not read GENERAL'))
+    await openTask()
+    now=1100;fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
+    await screen.findByText(receiptText)
+    expect(screen.getByText('本次提交的一般免责声明')).toBeInTheDocument()
+    expect(screen.getByText(/完成时间：/)).toBeInTheDocument()
+    expect(finalCalls).toHaveLength(1)
+    expect(generalCalls()).toHaveLength(0)
+    expect(screen.queryAllByRole('radio')).toHaveLength(0)
+    expect(sessionStorage.getItem(draftKey)).toBeNull()
+    expect(JSON.stringify(sessionStorage)).not.toContain(receiptText)
+  })
+  it.each([
+    ['legacy server',{generalReceipt:undefined,idempotent:undefined}],
+    ['idempotent response',{idempotent:true}],
+    ['missing first-commit marker',{idempotent:undefined}],
+    ['different attempt',{attemptId:'44444444-4444-4444-8444-444444444444'}],
+    ['different completion time',{generalReceipt:{text:receiptText,disclaimer:'说明',completedAt:'2026-10-16T00:00:00Z'}}],
+    ['missing disclaimer',{generalReceipt:{text:receiptText,completedAt:'2026-10-17T00:00:00Z'}}],
+    ['invalid completion time',{completedAt:'invalid',generalReceipt:{text:receiptText,disclaimer:'说明',completedAt:'invalid'}}],
+    ['uncontrolled result fields',{generalReceipt:{text:receiptText,disclaimer:'说明',completedAt:'2026-10-17T00:00:00Z',privateScoring:{score:99}}}],
+  ])('uses current-authorized GENERAL for %s',async(_label,overrides)=>{
+    finalReply=()=>response(firstSuccess(overrides as Record<string,unknown>))
+    await openTask()
+    fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
+    await screen.findByText('感谢参与')
+    expect(screen.queryByText(receiptText)).toBeNull()
+    expect(generalCalls()).toHaveLength(1)
+    expect(finalCalls).toHaveLength(1)
+  })
+  it('reauthorizes GENERAL after an ambiguous retry even if that retry creates the first FINAL',async()=>{
+    finalReply=()=>Promise.reject(new Error('结果未知'))
+    await openTask()
+    fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
+    await screen.findByRole('alert')
+    finalReply=()=>response(firstSuccess())
+    submit();await screen.findByText('感谢参与')
+    expect(finalCalls[1]).toEqual(finalCalls[0])
+    expect(generalCalls()).toHaveLength(1)
+    expect(screen.queryByText(receiptText)).toBeNull()
+  })
+  it.each([400,403,409,503])('does not display receipt data from a rejected FINAL (%s)',async(status)=>{
+    finalReply=()=>response(firstSuccess(),status,'本次提交被拒绝')
+    await openTask()
+    fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
+    await screen.findByText('本次提交被拒绝')
+    expect(screen.queryByText(receiptText)).toBeNull()
+    expect(screen.queryByRole('heading',{name:'本轮回答已完成'})).toBeNull()
+    expect(generalCalls()).toHaveLength(0)
+    expect(sessionStorage.getItem(draftKey)).not.toBeNull()
+    if(status===400)expect(screen.getByRole('radio',{name:'不同意'})).toBeEnabled()
+    else expect(screen.getByRole('radio',{name:'不同意'})).toBeDisabled()
+  })
+  it('clears the embedded receipt and recovery state on explicit withdrawal',async()=>{
+    vi.spyOn(window,'confirm').mockReturnValue(true)
+    const original=vi.mocked(fetch).getMockImplementation()!
+    vi.mocked(fetch).mockImplementation((input,init)=>String(input).endsWith('/withdraw-data')
+      ?response({status:'WITHDRAWN'}):original(input,init))
+    finalReply=()=>response(firstSuccess())
+    await openTask()
+    fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
+    await screen.findByText(receiptText)
+    fireEvent.click(screen.getByRole('button',{name:'申请撤回本研究数据（排除未来统计）'}))
+    await waitFor(()=>expect(screen.queryByText(receiptText)).toBeNull())
+    expect(screen.queryByRole('heading',{name:'本轮回答已完成'})).toBeNull()
+    expect(sessionStorage.getItem(`huisurvey:v1:single:${publicId}`)).toBeNull()
+    expect(generalCalls()).toHaveLength(0)
+    expect(finalCalls).toHaveLength(1)
+  })
+  it('reauthorizes GENERAL for a restored sealed retry instead of using its embedded receipt',async()=>{
+    finalReply=()=>Promise.reject(new Error('结果未知'))
+    const view=await openTask()
+    fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
+    await screen.findByRole('alert');view.unmount()
+    finalReply=()=>response(firstSuccess())
+    await openTask()
+    submit();await screen.findByText('感谢参与')
+    expect(finalCalls[1]).toEqual(finalCalls[0])
+    expect(generalCalls()).toHaveLength(1)
+    expect(screen.queryByText(receiptText)).toBeNull()
+  })
+  it('does not reuse a first-success receipt after refresh when current GENERAL authorization is denied',async()=>{
+    finalReply=()=>response(firstSuccess())
+    const view=await openTask()
+    fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
+    await screen.findByText(receiptText);view.unmount()
+    taskValue={...taskValue,status:'COMPLETED'}
+    generalReply=()=>response(null,403,'研究身份已失效')
+    render(<SurveyPublicApp/>)
+    fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}))
+    await screen.findByText('研究身份已失效')
+    expect(screen.queryByText(receiptText)).toBeNull()
+    expect(generalCalls()).toHaveLength(1)
+    expect(finalCalls).toHaveLength(1)
+    expect(screen.queryByRole('button',{name:'提交本轮正式回答'})).toBeNull()
+  })
+})
+
 describe('Survey authoritative FINAL and timing lifecycle',()=>{
   it('returns to the exact earlier Flow Form after a validation rejection and permits correction',async()=>{
     const form=(instrumentKey:string,prompt:string)=>({kind:'FORM',instrumentKey,title:prompt,
@@ -331,6 +441,7 @@ describe('Survey authoritative FINAL and timing lifecycle',()=>{
   })
 
   it('clears the completed receipt state when linked future access is revoked',async()=>{
+    finalReply=()=>response(firstSuccess({generalReceipt:{text:'感谢参与',disclaimer:'一般反馈',completedAt:'2026-10-17T00:00:00Z'}}))
     linked=true
     vi.spyOn(window,'confirm').mockReturnValue(true)
     render(<SurveyPublicApp/>)

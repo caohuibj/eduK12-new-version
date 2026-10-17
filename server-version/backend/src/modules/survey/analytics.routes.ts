@@ -6,7 +6,7 @@ import { success,error } from '../../utils/response'
 import * as service from './analytics.read'
 import {listSampleQuality,listSampleQualityHistory,setSampleQuality} from './sample-quality.service'
 import {describeSurveyPairedScoresPaged,describeSurveyWaveItemPaged,describeSurveyWaveGroupsPaged} from './analytics.paged'
-import { loadSurveySource } from './analytics.source'
+import { loadSurveyItemDictionary,loadSurveySource } from './analytics.source'
 import { describeWave } from './analytics.descriptive'
 import { describeSurveyFlowOperations } from './analytics.flow-operations'
 import { assertRecentSurveyMfa } from './analytics.export.service'
@@ -78,15 +78,7 @@ const measurement=z.object({
 surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/items/dictionary',wrap(async req=>{
   assertRecentSurveyMfa(req)
   const projectId=id.parse(req.params.pid),waveId=id.parse(req.params.wid)
-  const source=await loadSurveySource({actorUserId:req.user!.userId,projectId,
-    waveIds:[waveId],maxFinals:1,pageMode:true,includeWideSchema:true,
-    includeAttendance:false})
-  return {waveId,source:'FROZEN_CODEBOOK',variables:source.codebook
-    .filter(c=>c.waveId===waveId&&!['SHORT_TEXT','LONG_TEXT','OTHER_TEXT'].includes(c.responseType))
-    .map(c=>({instrumentKey:c.instrumentKey,itemKey:c.itemKey,
-      prompt:c.prompt,responseType:c.responseType,kind:c.kind,
-      columnKey:c.columnKey,definitionDigest:c.definitionDigest})),
-  }
+  return loadSurveyItemDictionary({actorUserId:req.user!.userId,projectId,waveId})
 }))
 surveyAnalyticsRouter.post('/:pid/analytics/waves/:wid/items/paged',wrap(req=>{
   assertRecentSurveyMfa(req)

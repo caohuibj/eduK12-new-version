@@ -18,6 +18,13 @@ export class SurveyFinalError extends Error {
 function blocked(message:string): never {throw new SurveyFinalError(403,message)}
 function invalid(message:string): never {throw new SurveyFinalError(409,message)}
 const proofShape=/^[A-Za-z0-9_-]{43}$/
+const defaultGeneralText='感谢参与研究。研究结果将按研究说明进行汇总分析，不构成个人心理诊断。'
+// Explicit participant allowlist shared by first-commit and independently
+// authorized GENERAL reads. Never pass FINAL results or authority through it.
+function generalReceipt(text:string|null|undefined,completedAt:Date){
+  return {text:text||defaultGeneralText,
+    disclaimer:'本研究反馈仅作一般说明，不提供未经验证的常模、诊断或个体能力等级。',completedAt}
+}
 export interface FinalInput {
   publicId:string
   attemptId:string
@@ -100,13 +107,14 @@ export async function submitResearchFinal(input:FinalInput){
     // must not recover a successful receipt after the Attempt is excluded.
     if(!['STARTED','COMPLETED'].includes(attempt.status)||attempt.excludedAt!==null)
       invalid('这份作答已经关闭或撤回')
-    const existing=await tx.surveyWaveFinal.findUnique({where:{attemptId:attempt.id}})
+    const existing=await tx.surveyWaveFinal.findUnique({where:{attemptId:attempt.id},
+      select:{id:true,completedAt:true,payloadHash:true,submissionId:true}})
     if(existing){
       if(existing.payloadHash!==canonical.hash||existing.submissionId!==input.submissionId)
         invalid('此波次已有不同的正式 FINAL，不能再次覆盖')
       return {attemptId:attempt.id,receiptId:existing.id,completedAt:existing.completedAt,
         status:'COMPLETED' as const,idempotent:true,
-        generalText:wave.generalText||'感谢参与研究，您的回答已完整提交。'}
+        generalText:wave.generalText||defaultGeneralText}
     }
     if(attempt.status!=='STARTED')invalid('这份作答已经关闭或终止')
     const now=new Date()
@@ -136,16 +144,20 @@ export async function submitResearchFinal(input:FinalInput){
       publicationId:publication.id,submissionId:input.submissionId,
       definitionDigest:publication.definitionDigest,payloadHash:canonical.hash,
       resultsCipher,resultsHash,
-    }})
+    },select:{id:true,completedAt:true}})
     const updated=await tx.surveyWaveAttempt.updateMany({
       where:{id:attempt.id,projectId:known.projectId,status:'STARTED'},
       data:{status:'COMPLETED',completedAt:receipt.completedAt},
     })
     if(updated.count!==1)invalid('作答状态变更发生冲突')
     await tx.surveyAttemptCheckpoint.deleteMany({where:{attemptId:attempt.id}})
+    // This is the validated submission-time receipt, returned only after the
+    // enclosing transaction commits. Replays and independent reads must still
+    // use current authorization; no receipt or participant authority is cached.
+    const general=generalReceipt(wave.generalText,receipt.completedAt)
     return {attemptId:attempt.id,receiptId:receipt.id,completedAt:receipt.completedAt,
       status:'COMPLETED' as const,idempotent:false,
-      generalText:wave.generalText||'感谢参与研究，您的回答已完整提交。'}
+      generalText:general.text,generalReceipt:general}
   })
 }
 export async function readGeneralForOwnAttempt(input:{
@@ -159,7 +171,5 @@ export async function readGeneralForOwnAttempt(input:{
   if(final.definitionDigest!==valid.definitionDigest)blocked('冻结研究报告来源校验失败')
   // ALLOWLIST: no scoring, raw answers, canonical SJT weights, or longitudinal
   // psychological interpretation may be exposed via participant General.
-  return {kind:'GENERAL_ONLY' as const,completedAt:final.completedAt,
-    text:valid.generalText||'感谢参与研究。研究结果将按研究说明进行汇总分析，不构成个人心理诊断。',
-    disclaimer:'本研究反馈仅作一般说明，不提供未经验证的常模、诊断或个体能力等级。'}
+  return {kind:'GENERAL_ONLY' as const,...generalReceipt(valid.generalText,final.completedAt)}
 }

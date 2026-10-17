@@ -3,7 +3,7 @@ import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import * as canonical from '../../modules/assessment-runtime/canonical'
 import {prepareCanonicalSubmission} from '../../services/instrumentFinalSubmit'
 import {computeSurveyFinal,verifySurveyFinalPublication} from '../../modules/survey/final.compute'
-import {submitResearchFinal} from '../../modules/survey/final.service'
+import {submitResearchFinal,readGeneralForOwnAttempt} from '../../modules/survey/final.service'
 import {getOwnResearchTask} from '../../modules/survey/task.public'
 import {screenOutResearchAttempt} from '../../modules/survey/flow.screen-out.service'
 import type {ResearchFrozenPublication} from '../../modules/survey/publication.service'
@@ -12,9 +12,10 @@ import {compileSurveyFlow} from '../../modules/survey/flow.definition'
 import type {SurveyFlowAssignment} from '../../modules/survey/flow.assignment'
 
 const mocks=vi.hoisted(()=>({verified:vi.fn(),transaction:vi.fn(),assignment:vi.fn(),
-  attempt:vi.fn(),person:vi.fn(),final:vi.fn(),lock:vi.fn(),encrypt:vi.fn(),
+  attempt:vi.fn(),person:vi.fn(),final:vi.fn(),readFinal:vi.fn(),lock:vi.fn(),encrypt:vi.fn(),
   consent:vi.fn(),createFinal:vi.fn(),updateAttempt:vi.fn(),deleteCheckpoint:vi.fn()}))
-vi.mock('../../config/database',()=>({prisma:{$transaction:mocks.transaction}}))
+vi.mock('../../config/database',()=>({prisma:{$transaction:mocks.transaction,
+  surveyWaveFinal:{findFirst:mocks.readFinal}}}))
 vi.mock('../../services/questionnaireProgressService',()=>({withFinalOnlyCompletionTransaction:mocks.transaction}))
 vi.mock('../../modules/survey/admission.service',()=>({verifiedSurveyAttempt:mocks.verified}))
 vi.mock('../../modules/survey/identity.service',()=>({hashResearchCredential:()=> 'credential-hash'}))
@@ -64,6 +65,8 @@ beforeEach(()=>{
   mocks.updateAttempt.mockResolvedValue({count:1})
   mocks.deleteCheckpoint.mockResolvedValue({count:1})
   mocks.encrypt.mockReturnValue('synthetic-cipher')
+  mocks.readFinal.mockResolvedValue({id:'receipt',completedAt:new Date('2026-10-17T00:00:00Z'),
+    definitionDigest})
   mocks.final.mockResolvedValue({id:'receipt',completedAt:new Date('2026-10-17T00:00:00Z'),
     submissionId:input().submissionId,payloadHash:prepareCanonicalSubmission({
       publicationId:known.publicationId,definitionDigest:known.definitionDigest,answers:answers(),
@@ -162,10 +165,17 @@ describe('Survey terminal receipt and withdrawal boundaries',()=>{
     expect(mocks.encrypt).toHaveBeenCalledWith(computeSurveyFinal(snapshot(),answers()))
     expect(mocks.createFinal).toHaveBeenCalledWith({data:expect.objectContaining({
       publicationId:'publication',definitionDigest:known.definitionDigest,resultsCipher:'synthetic-cipher',
-    })})
+    }),select:{id:true,completedAt:true}})
     expect(mocks.updateAttempt).toHaveBeenCalledWith({where:{id:'attempt',projectId:'project',status:'STARTED'},
       data:{status:'COMPLETED',completedAt:new Date('2026-10-17T00:00:00Z')}})
     expect(mocks.deleteCheckpoint).toHaveBeenCalledWith({where:{attemptId:'attempt'}})
+  })
+  it('loads only receipt and integrity fields for exact FINAL replay',async()=>{
+    await expect(submitResearchFinal(input())).resolves.toMatchObject({idempotent:true,receiptId:'receipt'})
+    expect(mocks.final).toHaveBeenCalledWith({where:{attemptId:'attempt'},
+      select:{id:true,completedAt:true,payloadHash:true,submissionId:true}})
+    expect(mocks.createFinal).not.toHaveBeenCalled()
+    expect(mocks.encrypt).not.toHaveBeenCalled()
   })
   it('rejects a withdrawn unlinked replay even when its immutable FINAL remains',async()=>{
     known.status=current.status='WITHDRAWN';current.excludedAt=new Date()
@@ -182,6 +192,11 @@ describe('Survey terminal receipt and withdrawal boundaries',()=>{
     await expect(submitResearchFinal(input())).resolves.toMatchObject({idempotent:true,status:'COMPLETED'})
     await expect(submitResearchFinal({...input(),answers:{form:{choice:'no'}}})).rejects.toMatchObject({statusCode:409})
   })
+  it('rejects a changed submission id despite identical replay answers',async()=>{
+    await expect(submitResearchFinal({...input(),submissionId:'00000000-0000-4000-8000-000000000002'}))
+      .rejects.toMatchObject({statusCode:409})
+    expect(mocks.createFinal).not.toHaveBeenCalled()
+  })
   it('still rejects a changed publication inside the completion transaction',async()=>{
     current.wave.publication={...current.wave.publication,definitionDigest:'0'.repeat(64)}
     await expect(submitResearchFinal(input())).rejects.toMatchObject({statusCode:409})
@@ -196,6 +211,89 @@ describe('Survey terminal receipt and withdrawal boundaries',()=>{
     known.participantId=current.participantId='participant';mocks.person.mockResolvedValue(null)
     await expect(submitResearchFinal({...input(),researchCode:'R-12345678'})).rejects.toMatchObject({statusCode:403})
     expect(mocks.final).not.toHaveBeenCalled()
+  })
+})
+
+describe('Survey first-success GENERAL receipt allowlist',()=>{
+  const disclaimer='本研究反馈仅作一般说明，不提供未经验证的常模、诊断或个体能力等级。'
+  const defaultText='感谢参与研究。研究结果将按研究说明进行汇总分析，不构成个人心理诊断。'
+  const start=()=>{known.status=current.status='STARTED';mocks.final.mockResolvedValue(null)}
+  it('returns only submission-time general text, disclaimer and persisted completion time on first success',async()=>{
+    start()
+    known.generalText='Stale pre-transaction text'
+    current.wave.generalText='Current transaction text'
+    const result=await submitResearchFinal(input())
+    expect(result).toMatchObject({attemptId:'attempt',receiptId:'receipt',status:'COMPLETED',idempotent:false,
+      generalText:'Current transaction text',generalReceipt:{text:'Current transaction text',disclaimer,
+        completedAt:new Date('2026-10-17T00:00:00Z')}})
+    expect(Object.keys((result as any).generalReceipt).sort()).toEqual(['completedAt','disclaimer','text'])
+    expect(mocks.verified).toHaveBeenCalledTimes(1)
+    expect(mocks.readFinal).not.toHaveBeenCalled()
+    expect(JSON.stringify(result)).not.toMatch(/answers|privateScoring|resultsCipher|payloadHash|credential/)
+  })
+  it.each(['',null])('uses identical default wording for the new receipt, legacy FINAL text and GENERAL route (%s)',async(text)=>{
+    start();known.generalText=current.wave.generalText=text
+    const result=await submitResearchFinal(input())
+    known.status='COMPLETED'
+    const general=await readGeneralForOwnAttempt(proof)
+    expect(result.generalText).toBe(defaultText)
+    expect((result as any).generalReceipt).toEqual({text:defaultText,disclaimer,completedAt:general.completedAt})
+    expect(general).toEqual({kind:'GENERAL_ONLY',text:defaultText,disclaimer,
+      completedAt:new Date('2026-10-17T00:00:00Z')})
+  })
+  it('keeps the custom GENERAL text and legacy route response exactly compatible',async()=>{
+    start();known.generalText=current.wave.generalText='研究者一般说明'
+    const result=await submitResearchFinal(input())
+    known.status='COMPLETED'
+    const general=await readGeneralForOwnAttempt(proof)
+    expect(general).toEqual({kind:'GENERAL_ONLY',text:result.generalText,disclaimer,
+      completedAt:result.completedAt})
+    expect((result as any).generalReceipt).toEqual({text:general.text,disclaimer:general.disclaimer,
+      completedAt:general.completedAt})
+  })
+  it('does not include a first-success receipt in an idempotent replay and preserves legacy text',async()=>{
+    current.wave.generalText=known.generalText=''
+    const result=await submitResearchFinal(input())
+    expect(result).toMatchObject({status:'COMPLETED',idempotent:true,generalText:defaultText})
+    expect(result).not.toHaveProperty('generalReceipt')
+    expect(mocks.verified).toHaveBeenCalledWith(proof)
+    expect(mocks.createFinal).not.toHaveBeenCalled()
+  })
+  it('reauthorizes every independent GENERAL read rather than caching the first-success receipt',async()=>{
+    start();await submitResearchFinal(input())
+    known.status='COMPLETED'
+    await readGeneralForOwnAttempt(proof)
+    const rejected=new Error('Current credential revoked')
+    mocks.verified.mockRejectedValueOnce(rejected)
+    await expect(readGeneralForOwnAttempt(proof)).rejects.toBe(rejected)
+    expect(mocks.verified).toHaveBeenCalledTimes(3)
+    expect(mocks.readFinal).toHaveBeenCalledTimes(1)
+  })
+  it.each(['hard stop','expired window','missing consent','withdrawn','revoked linked identity','changed unlinked credential'])(
+    'rejects first completion after %s without writing or returning a receipt',async(reason)=>{
+      start()
+      if(reason==='hard stop')current.wave.hardStopAt=new Date()
+      if(reason==='expired window')current.wave.finishUntil=new Date(0)
+      if(reason==='missing consent')mocks.consent.mockResolvedValue(null)
+      if(reason==='withdrawn'){current.status='WITHDRAWN';current.excludedAt=new Date()}
+      if(reason==='revoked linked identity'){
+        known.participantId=current.participantId='participant';mocks.person.mockResolvedValue(null)
+      }
+      if(reason==='changed unlinked credential')current.sessionHash='revoked'
+      await expect(submitResearchFinal({...input(),researchCode:'R-12345678'})).rejects.toMatchObject({
+        statusCode:reason==='withdrawn'?409:403,
+      })
+      expect(mocks.createFinal).not.toHaveBeenCalled()
+      expect(mocks.encrypt).not.toHaveBeenCalled()
+    })
+  it('does not report completion or a receipt before the transaction commits',async()=>{
+    start()
+    const execute=mocks.transaction.getMockImplementation()!
+    const rollback=new Error('Commit failed')
+    mocks.transaction.mockImplementationOnce(async(callback)=>{await execute(callback);throw rollback})
+    await expect(submitResearchFinal(input())).rejects.toBe(rollback)
+    expect(mocks.createFinal).toHaveBeenCalledTimes(1)
+    expect(mocks.readFinal).not.toHaveBeenCalled()
   })
 })
 

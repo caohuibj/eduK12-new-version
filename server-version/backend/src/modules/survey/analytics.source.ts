@@ -10,6 +10,7 @@ import type { FormDraft, ScaleDraft, SjtDraft } from './builder.definition'
 import type { ScaleDefinitionV2 } from '../scale/scale-definition'
 import type { SituationDefinitionV2 } from '../situational/situation-branching'
 import { SurveyAnalyticsError } from './analytics.read'
+import { isResearchFreeTextType } from './analytics.response-privacy'
 import {validateSurveyScaleTimings,SurveyScaleTimingError,
   type SurveyScaleItemTimingV1} from './timing.definition'
 
@@ -66,58 +67,78 @@ const cleanValue=(v:AnswerPrimitive):string|number|null=>{
   if(typeof v==='object')return JSON.stringify(v)
   return invalid('研究答案包含不受支持的数据类型')
 }
-const missingFrom=(unit:FrozenUnitResult,key:string):MissingReason|null=>{
-  const row=unit.missing.find(x=>x.itemKey===key)
-  return row?.reason??null
-}
 const answerValueEncoding=(type:string):NonNullable<ResearchRawCodebook['valueEncoding']>=>
   type==='RANK_ORDER'||type==='MULTIPLE'||type==='MATRIX_MULTIPLE'||type==='SJT_MULTIPLE'
     ?'JSON_STRING_ARRAY':type==='CONSTANT_SUM'?'JSON_NUMBER_OBJECT':
     type==='SLIDER'||type==='NUMBER'?'NUMBER':'TEXT'
-const rawItems=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult,onlyItemKey?:string):Array<{
-  itemKey:string;prompt:string;responseType:string;options:{code:string;label:string}[];value:string|number|null;missingReason:MissingReason|null;
-  timeZone?:'Asia/Shanghai'|'UTC'
-}>=>{
-  const values=unit.rawAnswers
-  const output:Array<{itemKey:string;prompt:string;responseType:string;options:{code:string;label:string}[];value:string|number|null;missingReason:MissingReason|null;timeZone?:'Asia/Shanghai'|'UTC'}>=[]
-  const add=(key:string,prompt:string,responseType:string,options:{code:string;label:string}[],timeZone?:'Asia/Shanghai'|'UTC')=>{
-    const value=cleanValue(values[key]??null)
-    output.push({itemKey:key,prompt,responseType,options,value,missingReason:missingFrom(unit,key),timeZone})
-  }
+type FrozenRawItem=Readonly<{
+  itemKey:string;prompt:string;responseType:string;
+  options:ReadonlyArray<Readonly<{code:string;label:string}>>;
+  answerKey:string;matrixRow?:string;timeZone?:'Asia/Shanghai'|'UTC'
+}>
+/** Static descriptors belong to one verified publication in one request. Copy
+ * and freeze their options so participant projection cannot mutate the schema.
+ * The dictionary needs no option tables or participant value/missing metadata.
+ */
+const frozenRawItems=(frozen:ResearchFrozenUnit,includeOptions:boolean):readonly FrozenRawItem[]=>{
+  const output:FrozenRawItem[]=[]
+  const emptyOptions:FrozenRawItem['options']=Object.freeze([])
+  const optionsFor=(options:readonly {optionKey:string;label:string}[])=>includeOptions
+    ?Object.freeze(options.map(o=>Object.freeze({code:o.optionKey,label:o.label})))
+    :emptyOptions
+  const add=(item:FrozenRawItem)=>output.push(Object.freeze(item))
   if(frozen.kind==='FORM'){
     const draft=frozen.displayDefinition as FormDraft
     for(const page of draft.pages)for(const q of page.questions){
-      if(onlyItemKey&&q.itemKey!==onlyItemKey
-        &&!(q.otherOptionKey&&q.itemKey+':other'===onlyItemKey)
-        &&!((q.type==='MATRIX'||q.type==='MATRIX_MULTIPLE')
-          &&q.rows.some(row=>q.itemKey+':'+row.rowKey===onlyItemKey)))continue
-      const options=q.options.map(o=>({code:o.optionKey,label:o.label}))
+      const options=optionsFor(q.options)
       if(q.type==='MATRIX'||q.type==='MATRIX_MULTIPLE'){
-        const value=values[q.itemKey]
-        const normalized=value&&typeof value==='object'&&!Array.isArray(value)
-          ?value as Record<string,string|string[]>:{}
-        for(const row of q.rows){
-          const key=q.itemKey+':'+row.rowKey
-          if(onlyItemKey&&key!==onlyItemKey)continue
-          output.push({itemKey:key,prompt:q.prompt+'／'+row.label,responseType:q.type,options,
-            value:cleanValue(normalized[row.rowKey]??null),
-            missingReason:missingFrom(unit,key)||missingFrom(unit,q.itemKey)})
-        }
+        for(const row of q.rows)add({itemKey:q.itemKey+':'+row.rowKey,
+          prompt:q.prompt+'／'+row.label,responseType:q.type,options,
+          answerKey:q.itemKey,matrixRow:row.rowKey})
       }else{
-        if(!onlyItemKey||onlyItemKey===q.itemKey)
-          add(q.itemKey,q.prompt,q.type,options,q.timeZone)
-        if(q.otherOptionKey&&(!onlyItemKey||onlyItemKey===q.itemKey+':other'))
-          add(q.itemKey+':other',q.prompt+'／其他填写','OTHER_TEXT',[])
+        add({itemKey:q.itemKey,prompt:q.prompt,responseType:q.type,options,
+          answerKey:q.itemKey,timeZone:q.timeZone})
+        if(q.otherOptionKey)add({itemKey:q.itemKey+':other',prompt:q.prompt+'／其他填写',
+          responseType:'OTHER_TEXT',options:emptyOptions,answerKey:q.itemKey+':other'})
       }
     }
   }else if(frozen.kind==='SCALE'){
     const draft=frozen.displayDefinition as ScaleDraft
-    for(const q of draft.items)if(!onlyItemKey||q.itemKey===onlyItemKey)
-      add(q.itemKey,q.prompt,'LIKERT',draft.responseOptions.map(o=>({code:o.optionKey,label:o.label})))
-  }else {
+    const options=optionsFor(draft.responseOptions)
+    for(const q of draft.items)add({itemKey:q.itemKey,prompt:q.prompt,responseType:'LIKERT',
+      options,answerKey:q.itemKey})
+  }else{
     const draft=frozen.displayDefinition as SjtDraft
-    for(const q of draft.questions)if(!onlyItemKey||q.questionKey===onlyItemKey)
-      add(q.questionKey,q.prompt,q.responseType==='MULTIPLE'?'SJT_MULTIPLE':'SJT_SINGLE',q.options.map(o=>({code:o.optionKey,label:o.label})))
+    for(const q of draft.questions)add({itemKey:q.questionKey,prompt:q.prompt,
+      responseType:q.responseType==='MULTIPLE'?'SJT_MULTIPLE':'SJT_SINGLE',
+      options:optionsFor(q.options),answerKey:q.questionKey})
+  }
+  return Object.freeze(output)
+}
+const projectRawItems=(items:readonly FrozenRawItem[],unit:FrozenUnitResult,onlyItemKey?:string)=>{
+  // Match Array.find's first occurrence, including duplicate missing entries.
+  // Matrix rows retain their explicit reason before the parent-question reason.
+  const missing=new Map<string,MissingReason|null>()
+  for(const row of unit.missing)if(!missing.has(row.itemKey))
+    missing.set(row.itemKey,row.reason??null)
+  const values=unit.rawAnswers
+  const output:Array<{item:FrozenRawItem;value:string|number|null;missingReason:MissingReason|null}>=[]
+  let matrixAnswerKey:string|undefined
+  let matrixAnswers:Record<string,string|string[]>={}
+  for(const item of items){
+    if(onlyItemKey&&item.itemKey!==onlyItemKey)continue
+    let value:AnswerPrimitive=values[item.answerKey]??null
+    let missingReason=missing.get(item.itemKey)??null
+    if(item.matrixRow!==undefined){
+      if(matrixAnswerKey!==item.answerKey){
+        matrixAnswerKey=item.answerKey
+        matrixAnswers=value&&typeof value==='object'&&!Array.isArray(value)
+          ?value as Record<string,string|string[]>:{}
+      }
+      value=matrixAnswers[item.matrixRow]??null
+      missingReason=missingReason||(missing.get(item.answerKey)??null)
+    }
+    output.push({item,value:cleanValue(value),missingReason})
   }
   return output
 }
@@ -183,16 +204,16 @@ const codeKey=(waveOrdinal:number,instrumentKey:string,itemKey:string,hash:strin
  * Identical definitions can also collide across differently named instruments.
  * Uppercase K separates generated suffixes from the lowercase legacy key space.
  */
-const frozenRawColumnKeys=(snapshot:ResearchFrozenPublication,waveOrdinal:number)=>{
+const frozenRawSchema=(snapshot:ResearchFrozenPublication,waveOrdinal:number,includeOptions=true)=>{
   const candidates:Array<{unit:ResearchFrozenUnit;itemKey:string;legacy:string}>=[]
   const counts=new Map<string,number>()
-  const result=new Map<ResearchFrozenUnit,Map<string,string>>()
+  const keys=new Map<ResearchFrozenUnit,Map<string,string>>()
+  const itemsByUnit=new Map<ResearchFrozenUnit,readonly FrozenRawItem[]>()
   for(const unit of snapshot.units){
-    const empty:FrozenUnitResult={instrumentKey:unit.instrumentKey,kind:unit.kind,
-      sourceDigest:unit.sourceDigest,scoringDigest:unit.scoringDigest,
-      rawAnswers:{},missing:[],privateScoring:null}
-    result.set(unit,new Map())
-    for(const item of rawItems(unit,empty)){
+    const items=frozenRawItems(unit,includeOptions)
+    itemsByUnit.set(unit,items)
+    keys.set(unit,new Map())
+    for(const item of items){
       const legacy=codeKey(waveOrdinal,unit.instrumentKey,item.itemKey,unit.sourceDigest)
       candidates.push({unit,itemKey:item.itemKey,legacy})
       counts.set(legacy,(counts.get(legacy)??0)+1)
@@ -202,11 +223,96 @@ const frozenRawColumnKeys=(snapshot:ResearchFrozenPublication,waveOrdinal:number
   for(const {unit,itemKey,legacy} of candidates){
     const column=counts.get(legacy)===1?legacy:
       legacy+'__K'+canonicalHash([unit.instrumentKey,itemKey]).slice(0,16)
-    const items=result.get(unit)!
+    const items=keys.get(unit)!
     if(used.has(column)||items.has(itemKey))invalid('冻结研究变量编码重复')
     used.add(column);items.set(itemKey,column)
   }
-  return result
+  return {itemsByUnit,keys}
+}
+
+type SurveyDictionaryInput={actorUserId:string;projectId:string;waveId:string}
+export interface SurveyItemDictionary {
+  waveId:string
+  source:'FROZEN_CODEBOOK'
+  variables:Pick<ResearchRawCodebook,'instrumentKey'|'itemKey'|'prompt'|'responseType'|
+    'kind'|'columnKey'|'definitionDigest'>[]
+}
+/** A dictionary describes the current frozen Publication, never participant
+ * data. Read and fence only that source, so neither cohort size nor unrelated
+ * FINAL corruption can affect the variable list. Projection stays outside
+ * business locks; current ownership/MFA and the exact source are read again.
+ */
+export async function loadSurveyItemDictionary(input:SurveyDictionaryInput):Promise<SurveyItemDictionary>{
+  const first=await readSurveyDictionaryMaterial(input)
+  const signature=(material:typeof first)=>canonicalHash(JSON.parse(JSON.stringify(material)))
+  const originalSignature=signature(first)
+  const variables:SurveyItemDictionary['variables']=[]
+  if(first.publication){
+    const publication=first.publication
+    const snapshot=publication.compiledSnapshot as unknown as ResearchFrozenPublication
+    if(publication.projectId!==input.projectId
+      ||!snapshot||snapshot.schemaVersion!==1||snapshot.purpose!=='RESEARCH_ONLY'
+      ||snapshot.projectId!==input.projectId||snapshot.runtimeStatus!=='SURVEY_FINAL_V1'
+      ||!Array.isArray(snapshot.units)||!snapshot.units.length
+      ||canonicalHash(JSON.parse(JSON.stringify(snapshot)))!==publication.definitionDigest)
+      invalid('冻结研究发布定义摘要不匹配')
+    if(snapshot.waveId!==first.wave.id)invalid('冻结波次定义摘要缺失')
+    // Resolve collisions against the complete schema, including text fields
+    // excluded from this endpoint. These IDs must match every export page.
+    const schema=frozenRawSchema(snapshot,first.wave.ordinal,false)
+    for(const unit of snapshot.units){
+      for(const item of schema.itemsByUnit.get(unit)!){
+        if(isResearchFreeTextType(item.responseType))continue
+        const columnKey=schema.keys.get(unit)?.get(item.itemKey)
+        if(!columnKey)invalid('冻结研究变量编码缺失')
+        variables.push({instrumentKey:unit.instrumentKey,itemKey:item.itemKey,
+          prompt:item.prompt,responseType:item.responseType,kind:unit.kind,
+          columnKey,definitionDigest:unit.sourceDigest})
+      }
+    }
+  }
+  const current=await readSurveyDictionaryMaterial(input)
+  if(originalSignature!==signature(current))
+    invalid('研究来源在计算期间变化，请重新开始')
+  return {waveId:input.waveId,source:'FROZEN_CODEBOOK',variables}
+}
+
+async function readSurveyDictionaryMaterial(input:SurveyDictionaryInput){
+  return prisma.$transaction(async tx=>{
+    const [project]=await tx.$queryRaw<Array<{
+      collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';sourceRevision:number
+    }>>`
+      SELECT p.collection_mode AS "collectionMode", p.revision AS "sourceRevision"
+      FROM "survey_projects" p
+      JOIN "users" u ON u.id=p.owner_user_id
+      JOIN "survey_researcher_grants" g ON g.user_id=u.id
+      JOIN "survey_mfa_credentials" m ON m.user_id=u.id
+      WHERE p.id=${input.projectId} AND p.owner_user_id=${input.actorUserId}
+        AND u.account_domain='SURVEY' AND u.is_active AND NOT u.is_frozen
+        AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp())
+        AND g.status='ACTIVE' AND m.enabled
+      FOR SHARE OF p,u,g,m
+    `
+    if(!project)denied()
+    const wave=await tx.surveyWave.findFirst({
+      where:{id:input.waveId,projectId:input.projectId},
+      select:{id:true,projectId:true,ordinal:true,status:true,revision:true,publicationId:true},
+    })
+    if(!wave)denied()
+    // Preserve the existing dictionary behavior for unreleased DRAFT waves.
+    // Their authored definitions are not a collected, frozen schema.
+    if(!['OPEN','PAUSED','CLOSED'].includes(wave.status)||!wave.publicationId)
+      return {project,wave,publication:null}
+    const frozenBytes=(await tx.$queryRaw<Array<{bytes:bigint}>>`
+      SELECT octet_length(compiled_snapshot::text)::bigint AS "bytes"
+      FROM survey_publications WHERE id=${wave.publicationId}
+    `)[0]?.bytes??0n
+    if(frozenBytes>BigInt(8*1024*1024))
+      throw new SurveyAnalyticsError(413,'冻结材料与加密答案超过单次内存预算，请缩小波次')
+    const publication=await tx.surveyPublication.findUnique({where:{id:wave.publicationId}})
+    if(!publication)invalid('冻结波次来源缺失')
+    return {project,wave,publication}
+  },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead})
 }
 /** Bounded transactions read authorized immutable material and recheck its
  * complete version after hash/decryption/projection outside business locks.
@@ -460,18 +566,21 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
     const codebook=new Map<string,ResearchRawCodebook>()
     const scoreColumns:SurveySourceProjection['scoreColumns']=[]
     const scores:FrozenScoreObservation[]=[],raw:ResearchRawObservation[]=[]
-    const rawColumnKeys=new Map<ResearchFrozenPublication,{
-      ordinal:number;keys:ReturnType<typeof frozenRawColumnKeys>
+    const rawSchemas=new Map<ResearchFrozenPublication,{
+      ordinal:number;schema:ReturnType<typeof frozenRawSchema>
     }>()
-    const columnKeyFor=(snapshot:ResearchFrozenPublication,ordinal:number,
-      unit:ResearchFrozenUnit,itemKey:string)=>{
-      let entry=rawColumnKeys.get(snapshot)
+    const rawSchemaFor=(snapshot:ResearchFrozenPublication,ordinal:number)=>{
+      let entry=rawSchemas.get(snapshot)
       if(!entry){
-        entry={ordinal,keys:frozenRawColumnKeys(snapshot,ordinal)}
-        rawColumnKeys.set(snapshot,entry)
+        entry={ordinal,schema:frozenRawSchema(snapshot,ordinal)}
+        rawSchemas.set(snapshot,entry)
       }
       if(entry.ordinal!==ordinal)invalid('冻结研究波次序号不一致')
-      const column=entry.keys.get(unit)?.get(itemKey)
+      return entry.schema
+    }
+    const columnKeyFor=(snapshot:ResearchFrozenPublication,ordinal:number,
+      unit:ResearchFrozenUnit,itemKey:string)=>{
+      const column=rawSchemaFor(snapshot,ordinal).keys.get(unit)?.get(itemKey)
       if(!column)invalid('冻结研究变量编码缺失')
       return column
     }
@@ -483,19 +592,15 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
       const snapshot=verifiedSnapshots.get(publication.id)
       if(!snapshot||snapshot.waveId!==wave.id)
         throw new SurveyAnalyticsError(409,'冻结波次定义摘要缺失')
+      const rawSchema=rawSchemaFor(snapshot,wave.ordinal)
       for(const frozen of snapshot.units){
-        const empty:FrozenUnitResult={
-          instrumentKey:frozen.instrumentKey,kind:frozen.kind,
-          sourceDigest:frozen.sourceDigest,scoringDigest:frozen.scoringDigest,
-          rawAnswers:{},missing:[],privateScoring:null,
-        }
-        for(const item of rawItems(frozen,empty)){
+        for(const item of rawSchema.itemsByUnit.get(frozen)!){
           const columnKey=columnKeyFor(snapshot,wave.ordinal,frozen,item.itemKey)
           if(codebook.has(columnKey))invalid('冻结研究变量编码重复')
           codebook.set(columnKey,{
             columnKey,waveId:wave.id,waveOrdinal:wave.ordinal,
             instrumentKey:frozen.instrumentKey,itemKey:item.itemKey,kind:frozen.kind,
-            responseType:item.responseType,title:frozen.title,prompt:item.prompt,options:item.options,
+            responseType:item.responseType,title:frozen.title,prompt:item.prompt,options:item.options.map(option=>({...option})),
             definitionDigest:frozen.sourceDigest,scoringDigest:frozen.scoringDigest,
             publicationVersion:publication.version,instrumentRevision:frozen.draftRevision,
             ...(item.timeZone?{timeZone:item.timeZone}:{}),
@@ -582,7 +687,8 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
             score.measurement.scoreKey===input.selectScore.scoreKey))
         if(input.selectRaw!==false&&(!input.selectRaw||
           frozen.instrumentKey===input.selectRaw.instrumentKey)){
-          for(const r of rawItems(frozen,unit,input.selectRaw?input.selectRaw.itemKey:undefined)){
+          const items=rawSchemaFor(snapshot,wave.ordinal).itemsByUnit.get(frozen)!
+          for(const {item:r,value,missingReason} of projectRawItems(items,unit,input.selectRaw?input.selectRaw.itemKey:undefined)){
           const columnKey=columnKeyFor(snapshot,wave.ordinal,frozen,r.itemKey)
           if(raw.length>=25000)
             throw new SurveyAnalyticsError(413,'逐题投影超过 25000 行上限，请缩小波次范围')
@@ -591,13 +697,13 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
           raw.push({...meta,...flowData,sourceVerified:true,kind:frozen.kind,
             instrumentKey:frozen.instrumentKey,itemKey:r.itemKey,columnKey,responseType:r.responseType,
             publicationVersion:publication.version,
-            value:r.value,missingReason:r.missingReason,
+            value,missingReason,
             ...(itemTiming?{itemTiming}:{})})
           if(!codebook.has(columnKey))
             codebook.set(columnKey,{columnKey,waveId:wave.id,waveOrdinal:wave.ordinal,
               instrumentKey:frozen.instrumentKey,itemKey:r.itemKey,kind:frozen.kind,
               responseType:r.responseType,
-              title:frozen.title,prompt:r.prompt,options:r.options,
+              title:frozen.title,prompt:r.prompt,options:r.options.map(option=>({...option})),
               definitionDigest:frozen.sourceDigest,scoringDigest:frozen.scoringDigest,
               publicationVersion:publication.version,
               instrumentRevision:frozen.draftRevision,

@@ -19,12 +19,23 @@ const check=(projectId:string,source:SurveySourceProjection)=>{
     source.raw.some(x=>x.projectId!==projectId||x.sourceVerified!==true))
     throw new Error('Raw export must use verified scoped Survey FINAL')
 }
-const displayCode=(row:ResearchRawObservation)=>row.researchCode||attemptCode(row.attemptId)
+const displayCodes=()=>{
+  // A single export owns this memo; its exact Attempt ID key is the complete
+  // pseudonym hash input. Never retain identities across requests.
+  const codes=new Map<string,string>()
+  return (row:ResearchRawObservation)=>{
+    if(row.researchCode)return row.researchCode
+    let code=codes.get(row.attemptId)
+    if(code===undefined){code=attemptCode(row.attemptId);codes.set(row.attemptId,code)}
+    return code
+  }
+}
 const timingStatus=(timing:ResearchRawObservation['itemTiming'])=>
   !timing?'NOT_RECORDED':
     timing.recoveredWithoutClock?'RECOVERED_NO_FIRST_RESPONSE':
       timing.interrupted?'INTERRUPTED':'RECORDED'
-const ordered=(source:SurveySourceProjection,waveId?:string):ResearchRawObservation[]=>
+const ordered=(source:SurveySourceProjection,waveId:string|undefined,
+  displayCode:ReturnType<typeof displayCodes>):ResearchRawObservation[]=>
   source.raw.filter(r=>waveId===undefined||r.waveId===waveId)
     .sort((a,b)=>a.waveOrdinal-b.waveOrdinal
       ||displayCode(a).localeCompare(displayCode(b))
@@ -76,7 +87,8 @@ export function compactSurveyAttendanceExport(
 }
 export function rawLongExport(projectId:string,source:SurveySourceProjection,waveId?:string):SurveyRawExport{
   check(projectId,source)
-  const rows=ordered(source,waveId)
+  const displayCode=displayCodes()
+  const rows=ordered(source,waveId,displayCode)
   const hasFlow=source.codebook.some(c=>c.flowDigest&&(!waveId||c.waveId===waveId))
   const timingByColumn=new Map(source.codebook.map(c=>[c.columnKey,c.timingContract]))
   const cols=['research_code_or_attempt','wave_id','wave_ordinal','publication_version',
@@ -125,7 +137,7 @@ export function rawWideExport(projectId:string,source:SurveySourceProjection):Su
   check(projectId,source)
   if(source.collectionMode!=='LINKED_WAVES'||source.raw.some(r=>!r.researchCode))
     throw new Error('RAW_WIDE requires project-local pseudonymous Linked Waves')
-  const rows=ordered(source)
+  const rows=ordered(source,undefined,displayCodes())
   const byColumn=new Map(source.codebook.map(x=>[x.columnKey,x]))
   // The frozen publication codebook includes variables from Waves with zero
   // completed FINAL; deriving columns only from observed answers drops those Waves.

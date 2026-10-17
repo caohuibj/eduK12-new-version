@@ -33,6 +33,22 @@ type Unit={kind:'FORM'|'SCALE'|'SJT';instrumentKey:string;title:string;image?:Su
     minSelections?:number;maxSelections?:number;options:Choice[]}[]}
 type Task={attemptId:string;waveId:string;status:string;definitionDigest:string;units:Unit[];reportMode:'GENERAL_ONLY';flow?:PublicFlow;checkpointPolicy?:{enabled:true;ttlHours:number}}
 type General={kind:'GENERAL_ONLY';text:string;disclaimer:string;completedAt:string}
+type FinalResponse={status:string;attemptId?:string;receiptId?:string;completedAt?:string;
+  idempotent?:boolean;generalReceipt?:unknown}
+// Only the first, unambiguous committed FINAL may supply this submission-time
+// receipt. Older servers or malformed payloads fall back to the GENERAL route.
+function firstFinalGeneral(result:FinalResponse,attemptId:string):General|null {
+  if(result.status!=='COMPLETED'||result.idempotent!==false||result.attemptId!==attemptId
+    ||typeof result.receiptId!=='string'||!result.receiptId)return null
+  const value=result.generalReceipt
+  if(!value||typeof value!=='object'||Array.isArray(value))return null
+  const receipt=value as Record<string,unknown>
+  if(Object.keys(receipt).sort().join(',')!=='completedAt,disclaimer,text'
+    ||typeof receipt.text!=='string'||typeof receipt.disclaimer!=='string'
+    ||typeof receipt.completedAt!=='string'||receipt.completedAt!==result.completedAt
+    ||!Number.isFinite(Date.parse(receipt.completedAt)))return null
+  return {kind:'GENERAL_ONLY',text:receipt.text,disclaimer:receipt.disclaimer,completedAt:receipt.completedAt}
+}
 type SingleResume={attemptId:string;accessCredential:string;createdAt:number}
 const singleStorageKey=(id:string)=>'huisurvey:v1:single:'+id
 const readSingleResume=(id:string):SingleResume|null=>{
@@ -580,6 +596,9 @@ export default function SurveyPublicApp(){
     const screened=finalRequest.current?finalRequest.current.path.endsWith('/screen-out')
       :currentFlow?.termination==='SCREEN_OUT'
     const path=base+'/attempts/'+attemptId+(screened?'/screen-out':'/final')
+    // A sealed request from a prior error/reload has an ambiguous outcome even
+    // if its retry creates the first FINAL. Keep the current GENERAL recheck.
+    const firstRequest=finalRequest.current===null
     if(!finalRequest.current){
       finalRequest.current={attemptId,path,body:{
       ...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode:researchCode.trim().toUpperCase()}:{}),
@@ -596,8 +615,8 @@ export default function SurveyPublicApp(){
     }
     const sealed=finalRequest.current
     if(sealed.attemptId!==attemptId)throw new Error('提交所属作答已变化，请重新读取本轮')
-    let final:{status:string}
-    try{final=await publicApi<{status:string}>(sealed.path,'POST',sealed.body)}
+    let final:FinalResponse
+    try{final=await publicApi<FinalResponse>(sealed.path,'POST',sealed.body)}
     catch(e){
       // Only an explicit validation rejection proves this request did not commit.
       // Ambiguous network/server failures must keep the exact request for retry.
@@ -623,7 +642,12 @@ export default function SurveyPublicApp(){
       accessCredential:accessCredential.trim(),
     }
     markCompleted(attemptId,proof)
-    await readCompletion(attemptId,proof)
+    const receipt=firstRequest?firstFinalGeneral(final,attemptId):null
+    if(receipt){
+      // In-memory display only. Refresh/reopen and explicit reads reauthorize.
+      setGeneral(receipt)
+      setNotice('提交成功。以下为本次提交时确认的完成回执。')
+    }else await readCompletion(attemptId,proof)
   }).finally(()=>{finalInFlight.current=false})}
   const saveCheckpoint=()=>{if(!task?.checkpointPolicy?.enabled||!attemptId)return
     if(checkpointOverwritePending&&!window.confirm(
