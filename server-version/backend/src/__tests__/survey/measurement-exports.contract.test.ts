@@ -1,4 +1,5 @@
 import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest'
+import {selectSurveyFixtureRecord,surveyFixtureSql} from './survey-source-select.fixture'
 import {prisma} from '../../config/database'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {encryptUnifiedRuntimePayload} from '../../modules/assessment-runtime/security'
@@ -78,17 +79,17 @@ function fixture(kind:'SJT'|'COGNITIVE'='COGNITIVE',answers:Record<string,unknow
   const state={hasFinal:true,sourceRevision:1,allow:true,sourceReads:0,changeOnSecond:false,rawTamper:false,malformedRaw:false}
   const tx={
     $queryRaw:vi.fn(async(parts:TemplateStringsArray|{strings:string[];values:unknown[]})=>{
-      const query=('strings' in parts?parts.strings:parts).join('')
+      const query=surveyFixtureSql(parts)
       if(query.includes('FROM "survey_projects"')){
         state.sourceReads++;if(state.changeOnSecond&&state.sourceReads===2)state.sourceRevision++
         return state.allow?[{collectionMode:'SINGLE_UNLINKED',sourceRevision:state.sourceRevision,sourceCutOff:new Date('2026-10-17T00:01:00Z')}]:[]
       }
       if(query.includes('FROM survey_cognitive_results'))return [{id:resultId,projectId,waveId,attemptId,publicationId,bytes:20000}]
-      return [{bytes:0n}]
+      return query.includes('finalCipherBytes')?[{finalCipherBytes:0n,frozenBytes:0n}]:[{bytes:0n}]
     }),
     surveyWave:{count:vi.fn(async()=>1),findMany:vi.fn(async()=>[wave])},
     surveyWaveFinal:{count:vi.fn(async()=>state.hasFinal?1:0),findMany:vi.fn(async(args:{select?:unknown})=>!state.hasFinal?[]:
-      args.select?[{id:finalId,publicationId,completedAt:final.completedAt}]:[final])},
+      [selectSurveyFixtureRecord(final,args.select)])},
     surveyPublication:{findMany:vi.fn(async()=>[publication])},
     surveyCognitiveResult:{findMany:vi.fn(async()=>child?[{id:resultId,sessionId:child.sessionId,projectId,waveId,attemptId,publicationId,
       slotKey:'tool',epoch:1,measurementDigest:child.reference.measurementDigest,resultHash:child.reference.resultHash,
@@ -117,7 +118,7 @@ function batchFixture(count:number){
   })
   const originalQuery=f.tx.$queryRaw.getMockImplementation()!
   f.tx.$queryRaw.mockImplementation(async parts=>{
-    const query=('strings' in parts?parts.strings:parts).join('')
+    const query=surveyFixtureSql(parts)
     if(!query.includes('FROM survey_cognitive_results'))return originalQuery(parts)
     const values='strings' in parts?parts.values:[]
     return records.filter(({child})=>values.includes(child.id)).map(({child})=>({
@@ -125,9 +126,8 @@ function batchFixture(count:number){
     }))
   })
   f.tx.surveyWaveFinal.count.mockResolvedValue(count)
-  f.tx.surveyWaveFinal.findMany.mockImplementation(async args=>args.select
-    ?records.map(({final})=>({id:final.id,publicationId,completedAt:final.completedAt}))
-    :records.map(({final})=>final))
+  f.tx.surveyWaveFinal.findMany.mockImplementation(async args=>
+    records.map(({final})=>selectSurveyFixtureRecord(final,args.select)))
   f.tx.surveyCognitiveResult.findMany.mockImplementation((async(args:{where:{OR:Array<{id:{in:string[]}}>}})=>{
     const ids=new Set(args.where.OR.flatMap(scope=>scope.id.in))
     return records.filter(({child})=>ids.has(child.id)).map(({child})=>child)

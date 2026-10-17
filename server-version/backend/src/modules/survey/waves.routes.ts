@@ -6,6 +6,7 @@ import { authenticateSurvey } from '../../middleware/auth'
 import { success, error } from '../../utils/response'
 import * as service from './waves.service'
 import * as publish from './waves.publish'
+import { SurveyDraftError } from './builder.definition'
 import { SurveyFlowError } from './flow.definition'
 import { groupQuotaPolicySchema,surveyCheckpointPolicySchema } from './operations.definition'
 
@@ -33,6 +34,9 @@ const handle=(fn:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Respons
   try{return success(res,await fn(req))}
   catch(e){
     if(e instanceof z.ZodError)return error(res,'研究波次参数格式不合法',-1,400)
+    if(e instanceof SurveyDraftError)return res.status(400).json({code:'SURVEY_DRAFT_INVALID',
+      message:e.issues.slice(0,5).map(i=>i.path+'：'+i.message).join('；')||'研究工具包含待修正字段',
+      data:{issues:e.issues}})
     if(e instanceof SurveyGovernanceError||e instanceof CatalogSourceError)return error(res,e.message,-1,e.statusCode)
     if(e instanceof service.SurveyWaveError)return error(res,e.message,-1,e.statusCode)
     if(e instanceof SurveyFlowError)return error(res,e.issues.slice(0,5).map(i=>i.path+'：'+i.message).join('；'),-1,400)

@@ -1,3 +1,4 @@
+import {selectSurveyFixtureRecord,surveyFixtureSql} from './survey-source-select.fixture'
 import {describe,it,expect,vi,beforeAll,afterAll} from 'vitest'
 beforeAll(()=>vi.stubEnv('DATA_ENCRYPTION_KEY','1'.repeat(64)))
 afterAll(()=>vi.unstubAllEnvs())
@@ -114,12 +115,12 @@ function persistedFixture(){
   const state={hasFinal:true}
   const tx={
     $queryRaw:vi.fn(async(parts:TemplateStringsArray|{strings:string[]})=>{
-      const query=('strings' in parts?parts.strings:parts).join('')
-      return query.includes('FROM "survey_projects"')?[{collectionMode:'SINGLE_UNLINKED',sourceRevision:1,sourceCutOff:new Date('2026-10-17T00:20:00.000Z')}]:[{bytes:0n}]
+      const query=surveyFixtureSql(parts)
+      return query.includes('FROM "survey_projects"')?[{collectionMode:'SINGLE_UNLINKED',sourceRevision:1,sourceCutOff:new Date('2026-10-17T00:20:00.000Z')}]:query.includes('finalCipherBytes')?[{finalCipherBytes:0n,frozenBytes:0n}]:[{bytes:0n}]
     }),
     surveyWave:{count:vi.fn(async()=>1),findMany:vi.fn(async()=>[wave])},
     surveyWaveFinal:{count:vi.fn(async()=>state.hasFinal?1:0),findMany:vi.fn(async(args:{select?:unknown})=>!state.hasFinal?[]:
-      args.select?[{id:final.id,publicationId:final.publicationId,completedAt:final.completedAt}]:[final])},
+      [selectSurveyFixtureRecord(final,args.select)])},
     surveyPublication:{findMany:vi.fn(async()=>[publication])},
   }
   vi.mocked(prisma.$transaction).mockImplementation((async(fn:(t:typeof tx)=>unknown)=>fn(tx)) as never)

@@ -93,10 +93,10 @@ const publicApi=async <T,>(path:string,method='GET',body?:unknown):Promise<T>=>{
   if(!result.ok||envelope.code!==0||!envelope.data)throw new SurveyPublicApiError(envelope.message||'操作未完成',result.status)
   return envelope.data
 }
-export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purpose='SURVEY'}:{unit:Unit;answer:Record<string,Answer>;
+export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purpose='SURVEY',readOnly=false}:{unit:Unit;answer:Record<string,Answer>;
   onChange:(name:string,value:Answer)=>void;proof?:SurveyImageProof;
   pageIndex:number;onPageChange:(next:number)=>void;
-  purpose?:'SURVEY'|'HUITEACHER'}){
+  purpose?:'SURVEY'|'HUITEACHER';readOnly?:boolean}){
   const [pageError,setPageError]=useState('')
 
   const shownFormKeys=unit.kind==='FORM'
@@ -157,7 +157,7 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purp
         onChange={()=>onChange(q.itemKey,o.optionKey)}/> {o.label}</label>)
   const item=(q:Question)=>{
     if(shownFormKeys&&!shownFormKeys.has(q.itemKey))return null
-    return <fieldset className="border rounded-lg p-4 my-4 bg-white scroll-mt-4"
+    return <fieldset disabled={readOnly} className="border rounded-lg p-4 my-4 bg-white scroll-mt-4"
       id={'survey-answer-'+unit.instrumentKey+'-'+q.itemKey} tabIndex={-1} key={q.itemKey}>
       <legend className="font-medium text-sm">{q.prompt}{q.required?' *':''}</legend>
       {q.image&&proof&&<SurveyParticipantImage image={q.image} proof={proof}/>}
@@ -539,11 +539,21 @@ export default function SurveyPublicApp(){
     if(flowUnit.kind==='SCALE')return (flowUnit.items??[]).every(q=>
       typeof existing[q.itemKey]==='string'&&(existing[q.itemKey] as string).length>0)
     return (flowUnit.scenes?.flatMap(scene=>scene.questions)??flowUnit.questions??[]).every(q=>{
-      if(q.required===false)return true
       const answer=existing[q.questionKey]
+      // Optional means it can be empty, not that a supplied partial selection
+      // can bypass the frozen bounds and strand a forward-only Flow at FINAL.
+      if(q.required===false&&(answer===undefined||answer===null||
+        q.responseType==='MULTIPLE'&&Array.isArray(answer)&&answer.length===0))return true
       if(q.allowRefusal&&isRefusal(answer))return true
-      if(q.responseType==='MULTIPLE'&&Array.isArray(answer))return answer.length===1&&q.options.some(o=>o.optionKey===answer[0]&&o.nonanswerReason)||answer.length>=(q.minSelections??1)&&answer.length<=(q.maxSelections??q.options.length)
-      return typeof answer==='string'&&answer.length>0
+      if(q.responseType==='MULTIPLE'){
+        if(!Array.isArray(answer)||new Set(answer).size!==answer.length)return false
+        const selected=q.options.filter(option=>answer.includes(option.optionKey))
+        if(selected.length!==answer.length)return false
+        if(selected.some(option=>option.nonanswerReason))return selected.length===1
+        if(selected.length>1&&selected.some(option=>q.exclusiveOptionKeys?.includes(option.optionKey)))return false
+        return selected.length>=(q.minSelections??1)&&selected.length<=(q.maxSelections??q.options.length)
+      }
+      return typeof answer==='string'&&q.options.some(option=>option.optionKey===answer)
     })
   }
   const advanceFlow=()=>{
@@ -592,17 +602,21 @@ export default function SurveyPublicApp(){
       onCommitted={reference=>{setCognitiveReferences(old=>[...old.filter(r=>r.slotKey!==reference.slotKey),reference]);setCognitiveRunning(false)}}
       onRunningChange={setCognitiveRunning}/>
     if(unit.kind==='SCALE'&&unit.presentationMode==='ONE_BY_ONE')
-      return <fieldset key={unit.instrumentKey} disabled={Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey)} className="border-0 p-0 min-w-0"><SurveyTimedScale
+      return <fieldset key={unit.instrumentKey} className="border-0 p-0 min-w-0"><SurveyTimedScale
         unit={{instrumentKey:unit.instrumentKey,title:unit.title,
           items:(unit.items??[]).map(q=>({itemKey:q.itemKey,prompt:q.prompt,required:q.required})),
           responseOptions:unit.responseOptions??[]}}
         answer={own(answers,unit.instrumentKey)??{}}
-        tracker={timingFor(unit)} paused={finalSealed||Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey)}
+        tracker={timingFor(unit)} paused={finalSealed}
+        readOnly={Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey)}
         index={own(scalePages,unit.instrumentKey)??0}
         onIndexChange={next=>setScalePages(prev=>({...prev,[unit.instrumentKey]:next}))}
         onAnswer={(key,value)=>updateAnswer(unit,key,value)}
         onTiming={next=>recordTiming(unit.instrumentKey,next)}/></fieldset>
-    return <fieldset key={unit.instrumentKey} disabled={Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey)} className="min-w-0 border-0 p-0"><TaskForm unit={unit}
+    // Lock answer controls, not pagination: recovery starts at page zero and
+    // must still let participants review a locked multi-page prerequisite.
+    return <fieldset key={unit.instrumentKey} className="min-w-0 border-0 p-0"><TaskForm unit={unit}
+      readOnly={Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey)}
       pageIndex={own(formPages,unit.instrumentKey)??0}
       onPageChange={next=>setFormPages(current=>({...current,[unit.instrumentKey]:next}))}
       proof={{publicId,attemptId,accessCredential,

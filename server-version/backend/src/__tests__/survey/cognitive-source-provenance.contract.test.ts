@@ -1,4 +1,5 @@
 import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest'
+import {selectSurveyFixtureRecord,surveyFixtureSql} from './survey-source-select.fixture'
 import type {Request} from 'express'
 import {prisma} from '../../config/database'
 import {verifyToken} from '../../utils/jwt'
@@ -94,17 +95,17 @@ function fixture(shown:boolean[]){
   const tickets:Record<string,unknown>[]=[]
   const tx={
     $queryRaw:vi.fn(async(parts:TemplateStringsArray|{strings:string[];values:unknown[]})=>{
-      const query=('strings' in parts?parts.strings:parts).join('')
+      const query=surveyFixtureSql(parts)
       if(query.includes('FROM "survey_projects"'))return [{id:projectId,revision:1,collectionMode:'LINKED_WAVES',
         sourceRevision:1,sourceCutOff:new Date('2026-10-17T00:01:00.000Z')}]
       if(query.includes('FROM survey_cognitive_results'))return records.filter(r=>r.isShown).map(({child})=>({
         id:child.id,projectId,waveId,attemptId:child.attemptId,publicationId,bytes:Buffer.byteLength(child.resultCipher)}))
-      return [{bytes:0n}]
+      return query.includes('finalCipherBytes')?[{finalCipherBytes:0n,frozenBytes:0n}]:[{bytes:0n}]
     }),
     surveyWave:{count:vi.fn(async()=>1),findMany:vi.fn(async()=>[wave])},
     surveyWaveFinal:{count:vi.fn(async()=>records.length),findMany:vi.fn(async(args:{select?:unknown})=>
-      args.select?records.map(({final})=>({id:final.id,publicationId,completedAt:final.completedAt})):
-        records.map(r=>r.final).reverse())},
+      (args.select&&!(args.select as Record<string,unknown>).resultsCipher?records:[...records].reverse())
+        .map(({final})=>selectSurveyFixtureRecord(final,args.select)))},
     surveyPublication:{findMany:vi.fn(async()=>[publication])},
     surveyWaveAttempt:{findMany:vi.fn(async()=>[]),count:vi.fn(async()=>0)},
     surveyCognitiveResult:{findMany:vi.fn(async()=>records.filter(r=>r.isShown).map(r=>r.child).reverse())},

@@ -1,4 +1,5 @@
 import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest'
+import {selectSurveyFixtureRecord,surveyFixtureSql} from './survey-source-select.fixture'
 import {prisma} from '../../config/database'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import * as security from '../../modules/assessment-runtime/security'
@@ -61,11 +62,11 @@ function fixture(participants=3){
       participant:{status:'ACTIVE',researchCode:'R-'+i}}}))
   const state={reads:0,beforeRead:(_read:number)=>{}}
   const tx={
-    $queryRaw:vi.fn(async(parts:TemplateStringsArray)=>parts.join('').includes('FROM "survey_projects"')
-      ?[{collectionMode:'LINKED_WAVES',sourceRevision:1,sourceCutOff:new Date('2026-10-17T00:01:00Z')}]:[{bytes:0n}]),
+    $queryRaw:vi.fn(async(parts:TemplateStringsArray|{strings:string[]})=>surveyFixtureSql(parts).includes('FROM "survey_projects"')
+      ?[{collectionMode:'LINKED_WAVES',sourceRevision:1,sourceCutOff:new Date('2026-10-17T00:01:00Z')}]:surveyFixtureSql(parts).includes('finalCipherBytes')?[{finalCipherBytes:0n,frozenBytes:0n}]:[{bytes:0n}]),
     surveyWave:{count:vi.fn(async()=>1),findFirst:vi.fn(async()=>wave),findMany:vi.fn(async()=>[wave])},
-    surveyWaveFinal:{count:vi.fn(async()=>finals.length),findMany:vi.fn(async(args:{select?:unknown})=>args.select
-      ?finals.map(({id,publicationId,completedAt})=>({id,publicationId,completedAt})):finals)},
+    surveyWaveFinal:{count:vi.fn(async()=>finals.length),findMany:vi.fn(async(args:{select?:unknown})=>
+      finals.map(final=>selectSurveyFixtureRecord(final,args.select)))},
     surveyPublication:{findUnique:vi.fn(async()=>publication),findMany:vi.fn(async()=>[publication])},
   }
   vi.mocked(prisma.$transaction).mockImplementation((async(fn:(value:typeof tx)=>Promise<unknown>)=>{

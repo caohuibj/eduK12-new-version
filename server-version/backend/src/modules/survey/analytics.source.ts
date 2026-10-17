@@ -485,9 +485,12 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
     if(input.expectedSourceRevision!==undefined
        &&project.sourceRevision!==input.expectedSourceRevision)
       throw new SurveyAnalyticsError(409,'研究样本或项目版本在分批分析期间变化，请重新开始')
-    // For an explicitly bounded wave selection, reuse the ownership read as
-    // the small frozen-schema header read. Keep both source-fence passes.
-    const ownedSchemaWaves=input.includeWideSchema&&input.waveIds?.length
+    const needsAttendance=project.collectionMode==='LINKED_WAVES'&&
+      (input.attendanceOnly||input.includeAttendance!==false)
+    // Bounded schema and compact attendance reads can share the ownership
+    // headers. Check ownership before filtering out uncollected DRAFT waves.
+    // Keep both independent authorization/source-fence passes.
+    const ownedSchemaWaves=(input.includeWideSchema||needsAttendance)&&input.waveIds?.length
       ?await tx.surveyWave.findMany({where:{projectId:input.projectId,id:{in:input.waveIds}},
         select:{id:true,ordinal:true,publicationId:true,status:true},orderBy:{ordinal:'asc'},take:101}):null
     if(input.waveIds?.length){
@@ -548,7 +551,7 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
     const ids=selectedHeaders.map(row=>row.id)
     // A Wave may have STARTED attempts but no FINAL. Only Wide exports need
     // its frozen schema to distinguish ABANDONED from NO_WAVE.
-    const frozenWaves=ownedSchemaWaves?ownedSchemaWaves.filter(w=>w.publicationId!==null&&['OPEN','PAUSED','CLOSED'].includes(w.status))
+    const frozenWaves=!input.includeWideSchema?[]:ownedSchemaWaves?ownedSchemaWaves.filter(w=>w.publicationId!==null&&['OPEN','PAUSED','CLOSED'].includes(w.status))
       :input.includeWideSchema?await tx.surveyWave.findMany({
       where:{projectId:input.projectId,
         ...(input.waveIds?.length?{id:{in:input.waveIds}}:{}),
@@ -563,9 +566,8 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
       throw new SurveyAnalyticsError(413,'本次宽表波次数量超出安全上限')
     // Compact attendance still needs the exact frozen allocation, but not the
     // item/score matrix. Reuse schema headers whenever they are already loaded.
-    const needsAttendance=project.collectionMode==='LINKED_WAVES'&&
-      (input.attendanceOnly||input.includeAttendance!==false)
     const attendanceWaves=!needsAttendance?[]:input.includeWideSchema?frozenWaves:
+      ownedSchemaWaves?ownedSchemaWaves.filter(w=>w.publicationId!==null&&['OPEN','PAUSED','CLOSED'].includes(w.status)):
       await tx.surveyWave.findMany({where:{projectId:input.projectId,
         ...(input.waveIds?.length?{id:{in:input.waveIds}}:{}),
         status:{in:['OPEN','PAUSED','CLOSED']},publicationId:{not:null}},
@@ -580,22 +582,27 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
     // Both byte budgets apply before loading any potentially large JSON or
     // encrypted FINAL. The Publication budget counts each frozen id once.
     if(ids.length||publicationIds.length){
-      const cipherBytes=ids.length?(await tx.$queryRaw<Array<{bytes:bigint}>>`
-        SELECT COALESCE(SUM(octet_length(results_cipher)),0)::bigint AS "bytes"
-        FROM survey_wave_finals WHERE id IN (${Prisma.join(ids)})
-      `)[0]?.bytes??0n:0n
-      const frozenBytes=publicationIds.length?(await tx.$queryRaw<Array<{bytes:bigint}>>`
-        SELECT COALESCE(SUM(octet_length(compiled_snapshot::text)),0)::bigint AS "bytes"
-        FROM survey_publications WHERE id IN (${Prisma.join(publicationIds)})
-      `)[0]?.bytes??0n:0n
-      if(cipherBytes>BigInt(8*1024*1024)||frozenBytes>BigInt(8*1024*1024))
+      // Independent scalar subqueries avoid a FINAL × Publication join and
+      // retain the original separate limits in one database round trip.
+      const [bytes]=await tx.$queryRaw<Array<{finalCipherBytes:bigint;frozenBytes:bigint}>>(Prisma.sql`
+        SELECT ${ids.length?Prisma.sql`(SELECT COALESCE(SUM(octet_length(results_cipher)),0)::bigint
+          FROM survey_wave_finals WHERE id IN (${Prisma.join(ids)}))`:Prisma.sql`0::bigint`} AS "finalCipherBytes",
+          ${publicationIds.length?Prisma.sql`(SELECT COALESCE(SUM(octet_length(compiled_snapshot::text)),0)::bigint
+          FROM survey_publications WHERE id IN (${Prisma.join(publicationIds)}))`:Prisma.sql`0::bigint`} AS "frozenBytes"
+      `)
+      if((bytes?.finalCipherBytes??0n)>BigInt(8*1024*1024)||(bytes?.frozenBytes??0n)>BigInt(8*1024*1024))
         throw new SurveyAnalyticsError(413,'冻结材料与加密答案超过单次内存预算，请缩小波次')
     }
     // Stage 2: fetch bounded bytes, and load each frozen Publication only
     // once regardless of how many participant FINALs reference it.
     const finals=ids.length?await tx.surveyWaveFinal.findMany({
       where:{id:{in:ids}},orderBy:[{completedAt:'asc'},{id:'asc'}],
-      include:{attempt:{include:{participant:true}},wave:true},
+      // Exactly the source signature and projection fields: do not transfer
+      // mutable Wave definitions or participant/session credentials per FINAL.
+      select:{id:true,completedAt:true,publicationId:true,definitionDigest:true,resultsHash:true,resultsCipher:true,
+        attempt:{select:{id:true,projectId:true,waveId:true,startedAt:true,flowAssignmentCipher:true,
+          participant:{select:{status:true,researchCode:true}}}},
+        wave:{select:{id:true,projectId:true,ordinal:true,publicationId:true}}},
     }):[]
     const publications=publicationIds.length?await tx.surveyPublication.findMany({
       where:{id:{in:publicationIds}}, orderBy: { id: 'asc' },

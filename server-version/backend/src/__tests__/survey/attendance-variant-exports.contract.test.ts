@@ -91,6 +91,7 @@ function persistedAttendanceFixture(options:{count?:number;legacy?:boolean}={}){
     $queryRaw:vi.fn(async(parts:TemplateStringsArray|{strings:string[]})=>{
       const query=('strings' in parts?parts.strings:parts).join('')
       if(query.includes('FROM "survey_projects"'))return [{collectionMode:'LINKED_WAVES',sourceRevision:1,sourceCutOff:new Date(cutOff)}]
+      if(query.includes('finalCipherBytes')){state.events.push('publication-budget');return [{finalCipherBytes:0n,frozenBytes:state.publicationBytes}]}
       if(query.includes('flow_assignment_cipher')){state.events.push('assignment-budget');return [{bytes:state.assignmentBytes}]}
       if(query.includes('compiled_snapshot')){state.events.push('publication-budget');return [{bytes:state.publicationBytes}]}
       return [{bytes:0n}]

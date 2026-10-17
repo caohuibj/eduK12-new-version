@@ -1,4 +1,5 @@
 import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest'
+import {selectSurveyFixtureRecord,surveyFixtureSql} from './survey-source-select.fixture'
 import type {NextFunction,Request,Response} from 'express'
 import {prisma} from '../../config/database'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
@@ -37,11 +38,13 @@ function fixture(){
   const state={authorized:true,sourceRevision:1,publication:publication as typeof publication|null,
     wave:wave as typeof wave|null,frozenBytes:0n,corruptFinal:false,beforeRead:(_read:number)=>{},reads:0}
   const tx={
-    $queryRaw:vi.fn(async(parts:TemplateStringsArray,...values:unknown[])=>{
-      if(parts.join('').includes('FROM "survey_projects"'))return state.authorized&&values.includes(owner)
+    $queryRaw:vi.fn(async(parts:TemplateStringsArray|{strings:string[];values:unknown[]},...values:unknown[])=>{
+      const query=surveyFixtureSql(parts)
+      if(query.includes('FROM "survey_projects"'))return state.authorized&&('strings' in parts?parts.values:values).includes(owner)
         ?[{collectionMode:'LINKED_WAVES',sourceRevision:state.sourceRevision,
           sourceCutOff:new Date('2026-10-17T00:01:00Z')}]:[]
-      return [{bytes:parts.join('').includes('compiled_snapshot')?state.frozenBytes:0n}]
+      return query.includes('finalCipherBytes')?[{finalCipherBytes:0n,frozenBytes:state.frozenBytes}]
+        :[{bytes:query.includes('compiled_snapshot')?state.frozenBytes:0n}]
     }),
     surveyWave:{
       count:vi.fn(async()=>state.wave?1:0),
@@ -55,12 +58,10 @@ function fixture(){
     },
     surveyWaveFinal:{
       count:vi.fn(async()=>state.corruptFinal?1:0),
-      findMany:vi.fn(async(args:{select?:unknown})=>!state.corruptFinal?[]:args.select
-        ?[{id:'unrelated-final',publicationId:publication.id,completedAt:new Date('2026-10-17T00:00:00Z')}]
-        :[{id:'unrelated-final',publicationId:publication.id,definitionDigest:publication.definitionDigest,
+      findMany:vi.fn(async(args:{select?:unknown})=>!state.corruptFinal?[]:[selectSurveyFixtureRecord({id:'unrelated-final',publicationId:publication.id,definitionDigest:publication.definitionDigest,
           resultsHash:'invalid',resultsCipher:'unrelated-corrupt-cipher',completedAt:new Date('2026-10-17T00:00:00Z'),
           wave,attempt:{id:'unrelated-attempt',projectId,waveId,startedAt:new Date('2026-10-17T00:00:00Z'),
-            flowAssignmentCipher:null,participant:null}}]),
+            flowAssignmentCipher:null,participant:null}},args.select)]),
     },
     surveyWaveAttempt:{count:vi.fn(),findMany:vi.fn()},
   }
@@ -90,7 +91,7 @@ const noParticipantWork=(tx:ReturnType<typeof fixture>['tx'])=>{
   expect(tx.surveyWaveFinal.findMany).not.toHaveBeenCalled()
   expect(tx.surveyWaveAttempt.count).not.toHaveBeenCalled()
   expect(tx.surveyWaveAttempt.findMany).not.toHaveBeenCalled()
-  expect(tx.$queryRaw.mock.calls.map(([parts])=>parts.join('')).join('\n')).not.toMatch(/survey_wave_finals|survey_wave_attempts/)
+  expect(tx.$queryRaw.mock.calls.map(([parts])=>surveyFixtureSql(parts)).join('\n')).not.toMatch(/survey_wave_finals|survey_wave_attempts/)
 }
 beforeEach(()=>{
   vi.clearAllMocks()
@@ -158,7 +159,7 @@ describe('Publication-only Survey item dictionary',()=>{
     const {state,tx}=fixture()
     state.beforeRead=read=>{if(read===2)state.authorized=false}
     expect((await dictionary()).status).toBe(404)
-    const queries=tx.$queryRaw.mock.calls.map(([parts])=>parts.join('')).filter(sql=>sql.includes('FROM "survey_projects"'))
+    const queries=tx.$queryRaw.mock.calls.map(([parts])=>surveyFixtureSql(parts)).filter(sql=>sql.includes('FROM "survey_projects"'))
     expect(queries).toHaveLength(2)
     for(const sql of queries){
       expect(sql).toContain('p.owner_user_id=')

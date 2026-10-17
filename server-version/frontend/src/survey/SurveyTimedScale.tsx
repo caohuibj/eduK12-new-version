@@ -8,13 +8,14 @@ export type SurveyTimedScaleUnit={
 }
 /** One active Scale item at a time; answers and telemetry stay in local memory
  * until the same authoritative Survey FINAL. No per-question HTTP traffic. */
-export function SurveyTimedScale({unit,answer,onAnswer,tracker,onTiming,index,onIndexChange,paused=false}:{
+export function SurveyTimedScale({unit,answer,onAnswer,tracker,onTiming,index,onIndexChange,paused=false,readOnly=false}:{
   unit:SurveyTimedScaleUnit;answer:Record<string,unknown>
   onAnswer:(itemKey:string,optionKey:string)=>void
   tracker:SurveyScaleTimingTracker
   onTiming:(next:SurveyScaleTimings)=>void
   index:number
   paused?:boolean
+  readOnly?:boolean
   onIndexChange:(index:number)=>void
 }){
   const current=unit.items[Math.min(index,unit.items.length-1)]
@@ -22,13 +23,14 @@ export function SurveyTimedScale({unit,answer,onAnswer,tracker,onTiming,index,on
   const timingCallback=useRef(onTiming)
   timingCallback.current=onTiming
   const pausedState=useRef(paused)
-  pausedState.current=paused
+  pausedState.current=paused||readOnly
   useEffect(()=>{
-    if(paused)tracker.pause()
+    if(paused||readOnly)tracker.pause()
     else if(document.visibilityState!=='hidden'&&document.hasFocus())tracker.resume()
-  },[paused,tracker])
+  },[paused,readOnly,tracker])
   useEffect(()=>{
-    if(!currentKey)return
+    // Reviewing locked prerequisites is navigation, not another administration.
+    if(!currentKey||readOnly)return
     tracker.enter(currentKey,!pausedState.current&&document.visibilityState!=='hidden'&&document.hasFocus())
     timingCallback.current(tracker.snapshot())
     const suspend=()=>{tracker.suspend();timingCallback.current(tracker.snapshot())}
@@ -49,7 +51,7 @@ export function SurveyTimedScale({unit,answer,onAnswer,tracker,onTiming,index,on
       tracker.leave()
       timingCallback.current(tracker.snapshot())
     }
-  },[currentKey,tracker])
+  },[currentKey,readOnly,tracker])
   if(!current)return <section className="rounded border p-4">
     <h3>{unit.title}</h3><p role="alert">此量表没有可作答的冻结题目。</p>
   </section>
@@ -68,7 +70,7 @@ export function SurveyTimedScale({unit,answer,onAnswer,tracker,onTiming,index,on
       {unit.responseOptions.map(option=><label key={option.optionKey}
         className="flex items-start gap-3 rounded border p-3 text-sm min-h-11">
         <input type="radio" name={unit.instrumentKey+'-'+current.itemKey}
-          checked={selected===option.optionKey} disabled={paused}
+          checked={selected===option.optionKey} disabled={paused||readOnly}
           onChange={()=>{
             tracker.answer(current.itemKey,selected,option.optionKey)
             onAnswer(current.itemKey,option.optionKey)

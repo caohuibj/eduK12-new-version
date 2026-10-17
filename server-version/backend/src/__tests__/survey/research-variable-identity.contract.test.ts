@@ -1,4 +1,5 @@
 import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest'
+import {selectSurveyFixtureRecord,surveyFixtureSql} from './survey-source-select.fixture'
 import {prisma} from '../../config/database'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {encryptUnifiedRuntimePayload} from '../../modules/assessment-runtime/security'
@@ -40,12 +41,12 @@ function fixture(units:ResearchFrozenUnit[],answers:Record<string,unknown>,itemT
       startedAt:new Date('2026-10-16T23:59:00Z'),flowAssignmentCipher:null,
       participant:{status:'ACTIVE',researchCode:'R-SYNTHETIC'}}}
   const tx={
-    $queryRaw:vi.fn(async (parts:TemplateStringsArray)=>parts.join('').includes('FROM "survey_projects"')
+    $queryRaw:vi.fn(async (parts:TemplateStringsArray|{strings:string[]})=>surveyFixtureSql(parts).includes('FROM "survey_projects"')
       ?[{collectionMode:'LINKED_WAVES',sourceRevision:1,sourceCutOff:new Date('2026-10-17T00:01:00Z')}]
-      :[{bytes:0n}]),
+      :surveyFixtureSql(parts).includes('finalCipherBytes')?[{finalCipherBytes:0n,frozenBytes:0n}]:[{bytes:0n}]),
     surveyWave:{count:vi.fn(async()=>1),findMany:vi.fn(async()=>[wave])},
-    surveyWaveFinal:{count:vi.fn(async()=>1),findMany:vi.fn(async(args:{select?:unknown})=>args.select
-      ?[{id:final.id,publicationId:publication.id,completedAt}]:[final])},
+    surveyWaveFinal:{count:vi.fn(async()=>1),findMany:vi.fn(async(args:{select?:unknown})=>
+      [selectSurveyFixtureRecord(final,args.select)])},
     surveyPublication:{findMany:vi.fn(async()=>[publication])},
   }
   vi.mocked(prisma.$transaction).mockImplementation((async(fn:(value:typeof tx)=>Promise<unknown>)=>fn(tx)) as never)
@@ -166,8 +167,9 @@ describe('Frozen Survey raw variable identity',()=>{
     const unit=formUnit('form',[question('q-a'),question('q_a')])
     const {tx}=fixture([unit],{form:{'q-a':1,q_a:2}})
     let ownerReads=0
-    tx.$queryRaw.mockImplementation(async(parts:TemplateStringsArray)=>{
-      if(!parts.join('').includes('FROM "survey_projects"'))return [{bytes:0n}] as never
+    tx.$queryRaw.mockImplementation(async(parts:TemplateStringsArray|{strings:string[]})=>{
+      if(!surveyFixtureSql(parts).includes('FROM "survey_projects"'))return (surveyFixtureSql(parts).includes('finalCipherBytes')
+        ?[{finalCipherBytes:0n,frozenBytes:0n}]:[{bytes:0n}]) as never
       return (++ownerReads===1?[{collectionMode:'LINKED_WAVES',sourceRevision:1,
         sourceCutOff:new Date('2026-10-17T00:01:00Z')}]:[]) as never
     })
