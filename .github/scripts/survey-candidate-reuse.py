@@ -1,5 +1,5 @@
 """Fixed PR309 evidence chain: original compile A, browser-failed candidate B,
-then the exact two-line accessibility repair C. This is not a general cache.
+with a flat E report for unchanged Wave tests after the accessibility repair. This is not a general cache.
 Original failed jobs and reports remain unchanged; only explicitly unaffected
 qualifications are retained. New frontend bytes and browser must qualify in C.
 Importing does no I/O. Official downloads and Docker loads are Actions-only.
@@ -97,20 +97,64 @@ ORIGIN_B = {
     'digest': 'sha256:99b78c424d1bd93d7bb648ad3dd9d6a27343d36b15373f3dee8351a6e61822d4',
     'size': 1077596361,
 }
+# E contributes only its two unchanged Wave suites and Wave-file lint. Its
+# images, receipt and inherited qualifications are never consumed.
+ORIGIN_E = {
+    'run': 39029204907, 'job': 117386179439,
+    'head': 'e5c6bf86065a77be6c3efeaad0e6b347d0ea5ee3',
+    'merge': '2a23501c00e70f4c589821b70f41cf1f643e3296',
+    'tree': 'd7319756b14f131269fa7756fbac6be381e0e39d',
+    'artifact': 12099682106,
+    'digest': 'sha256:0af5028c565b16c284d3c543d07ed90f422aa276d43a35bd64b2e5c364862575',
+    'size': 4591791,
+}
+E_VERIFIER_BLOB = 'e88c87d7eb28e96dce200cff2d252f9e3ac6676e'
+E_REVIEWED_BEFORE = {
+    '.github/scripts/survey-candidate-reuse.test.py': 'd59223661d0bad78651f632d8f5277c7c6cad1c6',
+    '.github/scripts/survey-candidate-bindings.json': '43c2fc04118aa6ed112be3bc119bfef6b33331a7',
+    '.github/scripts/survey-candidate.py': '56b60a851634d6abce0c9815202158c2ccfdf42d',
+    '.github/workflows/ci-survey-candidate.yml': '0aa206b2f9bb1c1f02180877deb1d326fcae7163',
+    'server-version/frontend/src/survey/ResearchCatalog.tsx': 'fdaf9fe1b56e1e5bcef27bd6ef04399857a3dc9f',
+    'server-version/frontend/src/survey/ResearchCatalog.test.tsx': 'ec44097575d671535fa0d05b686f0b2f6c45c058',
+    'server-version/e2e/survey-candidate-browser.cjs': '4fdb55c2d26c1e3967097041d55839dcfefdf82a',
+}
+E_REPORT_SHA256 = {
+    'survey-candidate-evidence/checks.json': 'd2e8881837c48a58e3dca6ac4a9c158c134c93959be314dd109a84d2117dc339',
+    'survey-candidate-evidence/frontend-qr-tests.json': '526b3c602fcdec9e48ab5c5d8f4d1b6c7c2c0605c014b975dad51a58fb7fa9a7',
+    'survey-candidate-evidence/browser/result.json': '2c125eb0666bc0891525039de1ebe0441002a0d087fc0f4bfba3bad390ad3960',
+}
+E_SUCCESS_PHASES = (
+    'frontend-compile', 'frontend-builder-archive', 'frontend-app-types', 'frontend-qr-lint',
+    'frontend-runtime', 'frontend-archive', 'browser-environment-migration',
+    'browser-environment-runtime-role', 'affected-frontend-qr-contracts',
+)
+E_SUCCESS_STEPS = (
+    'restore verified backend gates and unchanged frontend evidence',
+    'compile only the accessibility-repaired frontend from verified dependencies',
+    'scan repaired frontend runtime; backend scan is verified in its receipt',
+    'prepare disposable browser services with the unchanged restricted runtime',
+    'run only three directly affected WaveStudio frontend suites',
+    'install official pinned browser tools', CLEANUP_STEP,
+)
+E_IMAGES = {
+    'backend': 'sha256:97ebc868e52eee1d2ee984cbb45a54528b26afd1f0cdd67f7b4f374720471563',
+    'frontend': 'sha256:cf248e36e161bc8851e89ddb77d3471dee2eceec126b71a2b101a7444d2d1abc',
+}
+E_BUILDER = 'sha256:e6f1da3d9e8a1d6714a509e24ce052827e8b511686f2ba8f8448bfb99fa0ca24'
 B_VERIFIER_BLOB = 'fe285c1b768c9a4b4c8772b26e633e899090843b'
 REPAIR_TRANSITIONS_FINALIZED = True
 REPAIR_TRANSITIONS = {
     '.github/scripts/survey-candidate-bindings.json': {
         'before': '5dc809344db0bfa9be251dab06d574a554d81d89',
-        'after': '43c2fc04118aa6ed112be3bc119bfef6b33331a7',
+        'after': 'db6e2b7a186ed64adced48cf9b88a6856b8c0fd0',
     },
     '.github/scripts/survey-candidate.py': {
         'before': 'fcc8d9927ac6ddf43de7921c4375b7a3d263f7f6',
-        'after': '56b60a851634d6abce0c9815202158c2ccfdf42d',
+        'after': 'd38d92be5c27def9679b5ee6bb5e34f61cb20383',
     },
     '.github/workflows/ci-survey-candidate.yml': {
         'before': 'e4b773693870680bb582c068aabbb305713e5b79',
-        'after': '0aa206b2f9bb1c1f02180877deb1d326fcae7163',
+        'after': '319efaf1e02dca6371923f72d5eb6854d71f5799',
     },
     'server-version/frontend/src/survey/SurveyWaveStudio.tsx': {
         'before': '935e1787752d5729b44bd21898bb47ab210d15b9',
@@ -120,20 +164,38 @@ REPAIR_TRANSITIONS = {
         'before': 'e6d12858bbd357ad2bcf89431428698f85078cb0',
         'after': '75beb3b57f5759c1d7b8ddf1d5564096070b7be2',
     },
+    'server-version/frontend/src/survey/ResearchCatalog.tsx': {
+        'before': 'fdaf9fe1b56e1e5bcef27bd6ef04399857a3dc9f',
+        'after': '751ce32b5e9d7e40ed8de49301c9f8af4b3b0d40',
+    },
+    'server-version/frontend/src/survey/ResearchCatalog.test.tsx': {
+        'before': 'ec44097575d671535fa0d05b686f0b2f6c45c058',
+        'after': '3e9f3d737b49d6489f5a9466e3b62dfaa76cd1c6',
+    },
+    'server-version/e2e/survey-candidate-browser.cjs': {
+        'before': '4fdb55c2d26c1e3967097041d55839dcfefdf82a',
+        'after': '4e150826fed7859d63cefd1ac4198a69e6efd9e0',
+    },
     '.github/scripts/survey-candidate-reuse.test.py': {
         'before': 'aeffdaf4fd378ee87531341f000368edf87b939b',
-        'after': 'd59223661d0bad78651f632d8f5277c7c6cad1c6',
+        'after': '293e962f2bdaf2106809603edb6fac885ecb2b2e',
     },
 }
 REPAIR_PRODUCT_PATHS = (
     'server-version/frontend/src/survey/SurveyWaveStudio.tsx',
     'server-version/frontend/src/survey/SurveyWaveStudio.group-ip.test.tsx',
+    'server-version/frontend/src/survey/ResearchCatalog.tsx',
+    'server-version/frontend/src/survey/ResearchCatalog.test.tsx',
 )
+REPAIR_BROWSER_HARNESS_PATH = 'server-version/e2e/survey-candidate-browser.cjs'
 REPAIR_TESTS = (
     'src/survey/SurveyWaveStudio.group-ip.test.tsx',
     'src/survey/SurveyWaveStudio.preview.test.tsx',
     'src/survey/SurveyWorkspace.requests.test.tsx',
 )
+ADDITIONAL_REPAIR_TESTS = ('src/survey/ResearchCatalog.test.tsx',)
+FRONTEND_TESTS_TO_RUN = (REPAIR_TESTS[2], *ADDITIONAL_REPAIR_TESTS)
+E_RETAINED_TESTS = REPAIR_TESTS[:2]
 B_SUCCESS_PHASES = (
     'frontend-app-types', 'frontend-cognitive-types', 'frontend-changed-lint',
     'frontend-dependency-audit', 'frontend-runtime', 'frontend-archive',
@@ -226,7 +288,7 @@ def validate_current_event(event, plan, source_head):
 def validate_official_source(run, job, artifact, now=None, origin=None):
     """Validate either fixed origin; failed jobs never become whole successes."""
     origin = ORIGIN_A if origin is None else origin
-    require(origin in (ORIGIN_A, ORIGIN_B), 'UNKNOWN_EVIDENCE_ORIGIN')
+    require(origin in (ORIGIN_A, ORIGIN_B, ORIGIN_E), 'UNKNOWN_EVIDENCE_ORIGIN')
     require(run.get('id') == origin['run'], 'WRONG_SOURCE_RUN')
     require(run.get('repository', {}).get('full_name') == REPOSITORY, 'SOURCE_REPOSITORY')
     require(run.get('head_repository', {}).get('full_name') == REPOSITORY, 'SOURCE_FORK')
@@ -250,7 +312,7 @@ def validate_official_source(run, job, artifact, now=None, origin=None):
     require(recent(job.get('completed_at'), now), 'SOURCE_JOB_STALE')
     require(artifact.get('workflow_run', {}).get('id') == origin['run'], 'ARTIFACT_RUN')
     require(artifact.get('workflow_run', {}).get('head_sha') == origin['head'], 'ARTIFACT_SOURCE_HEAD')
-    require(artifact.get('name') == 'survey-candidate-' + origin['merge'], 'ARTIFACT_NAME')
+    require(artifact.get('name') == ('survey-candidate-reports-' if origin == ORIGIN_E else 'survey-candidate-') + origin['merge'], 'ARTIFACT_NAME')
     require(artifact.get('id') == origin['artifact'], 'ARTIFACT_ID')
     require(not artifact.get('expired') and recent(artifact.get('created_at'), now), 'ARTIFACT_EXPIRED_OR_STALE')
     require(type(artifact.get('size_in_bytes')) is int and 0 < artifact['size_in_bytes'] <= MAX_DOWNLOAD_BYTES, 'ARTIFACT_SIZE')
@@ -407,7 +469,7 @@ def official_json(path):
 
 def source_metadata(origin=None):
     origin = ORIGIN_A if origin is None else origin
-    require(origin in (ORIGIN_A, ORIGIN_B), 'UNKNOWN_EVIDENCE_ORIGIN')
+    require(origin in (ORIGIN_A, ORIGIN_B, ORIGIN_E), 'UNKNOWN_EVIDENCE_ORIGIN')
     run = official_json(f"/actions/runs/{origin['run']}")
     job = official_json(f"/actions/jobs/{origin['job']}")
     candidates = []
@@ -415,7 +477,7 @@ def source_metadata(origin=None):
         body = official_json(f"/actions/runs/{origin['run']}/artifacts?per_page=100&page={page}")
         rows = body.get('artifacts')
         require(isinstance(rows, list), 'ARTIFACT_API_RESPONSE')
-        candidates.extend(a for a in rows if a.get('name') == 'survey-candidate-' + origin['merge'])
+        candidates.extend(a for a in rows if a.get('name') == ('survey-candidate-reports-' if origin == ORIGIN_E else 'survey-candidate-') + origin['merge'])
         if len(rows) < 100:
             break
     else:
@@ -456,7 +518,10 @@ def safe_zip_entries(infos, origin=None):
     expected_chain = {'survey-candidate-evidence/resume-proof.json',
                       'survey-candidate-evidence/qualified-original-plan.json',
                       'survey-candidate-evidence/qualified-original-checks.json'}
-    if origin == ORIGIN_B:
+    if origin == ORIGIN_E:
+        require(total <= 64 * 1024**2 and all(path in seen for path in E_REPORT_SHA256), 'E_SMALL_REPORT_BUDGET_OR_CONTENT')
+        require(not any('.tar' in name for name in seen), 'E_IMAGE_ARCHIVES_FORBIDDEN')
+    elif origin == ORIGIN_B:
         require(chain_markers == expected_chain, 'ONLY_FIXED_A_TO_B_CHAIN_ALLOWED')
         require(all(path in seen for path in B_REPORT_SHA256), 'B_CHAIN_REPORTS_MISSING')
         allowed_nested = {'survey-candidate-evidence/original-evidence/survey-candidate-plan.json',
@@ -477,6 +542,8 @@ def safe_extract(archive, destination, origin=None):
     safe_zip_entries(infos, origin)
     destination.mkdir(parents=True, mode=0o700)
     for info in infos:
+        if origin == ORIGIN_E and info.filename not in E_REPORT_SHA256:
+            continue  # Preserve only three flat raw reports; never extract E's nested receipts.
         target = destination.joinpath(*PurePosixPath(info.filename).parts)
         if info.is_dir():
             target.mkdir(parents=True, exist_ok=True)
@@ -492,13 +559,13 @@ def download_verified_artifact(artifact, destination, origin=None):
     """Actions-only intake. Retains original bytes; grants no reuse eligibility."""
     require_official_ci()
     origin = ORIGIN_A if origin is None else origin
-    require(origin in (ORIGIN_A, ORIGIN_B), 'UNKNOWN_DOWNLOAD_ORIGIN')
+    require(origin in (ORIGIN_A, ORIGIN_B, ORIGIN_E), 'UNKNOWN_DOWNLOAD_ORIGIN')
     destination = Path(destination)
     require(not destination.exists(), 'ARTIFACT_DESTINATION_EXISTS')
     require(artifact.get('workflow_run', {}).get('id') == origin['run'], 'WRONG_DOWNLOAD_RUN')
     require(artifact.get('id') == origin['artifact'] and artifact.get('digest') == origin['digest'], 'WRONG_PINNED_DOWNLOAD')
     require(type(artifact.get('id')) is int and artifact['id'] > 0, 'INVALID_DOWNLOAD_ID')
-    require(artifact.get('name') == 'survey-candidate-' + origin['merge'], 'WRONG_DOWNLOAD_NAME')
+    require(artifact.get('name') == ('survey-candidate-reports-' if origin == ORIGIN_E else 'survey-candidate-') + origin['merge'], 'WRONG_DOWNLOAD_NAME')
     require(not artifact.get('expired') and recent(artifact.get('created_at')), 'STALE_DOWNLOAD')
     with tempfile.TemporaryDirectory(prefix='survey-official-intake-', dir=str(destination.parent)) as temporary:
         archive_path = Path(temporary) / 'official.zip'
@@ -506,8 +573,9 @@ def download_verified_artifact(artifact, destination, origin=None):
         with official_request(f"/actions/artifacts/{artifact['id']}/zip") as response, archive_path.open('xb') as output:
             while chunk := response.read(1024**2):
                 size += len(chunk)
-                require(size <= MAX_DOWNLOAD_BYTES, 'DOWNLOAD_SIZE_BUDGET')
+                require(size <= origin['size'], 'DOWNLOAD_SIZE_BUDGET')
                 output.write(chunk)
+        require(size == origin['size'], 'DOWNLOAD_BYTE_COUNT')
         verify_official_digest(archive_path, artifact.get('digest'))
         with zipfile.ZipFile(archive_path) as archive:
             unpacked = safe_extract(archive, Path(temporary) / 'original', origin)
@@ -672,19 +740,22 @@ def load_and_alias(path, image_id, alias):
 
 
 def validate_repair_transition(before, after, verifier_blob, transitions=None):
-    """Exactly B -> C, including the two reviewed accessible-name lines."""
+    """Exactly B -> current: reviewed accessibility/layout and browser diagnostics."""
     reviewed = REPAIR_TRANSITIONS if transitions is None else transitions
     require(bool(reviewed) and bool(re.fullmatch('[0-9a-f]{40}', verifier_blob)), 'REPAIR_REVIEW_REQUIRED')
     changed = {path for path in set(before) | set(after) if before.get(path) != after.get(path)}
     require(changed == set(reviewed) | {SELF_PATH}, 'UNREVIEWED_REPAIR_DIFF')
     require(before.get(SELF_PATH) == ('100644', 'blob', B_VERIFIER_BLOB)
             and after.get(SELF_PATH) == ('100644', 'blob', verifier_blob), 'REPAIR_VERIFIER_TRANSITION')
-    require(set(REPAIR_PRODUCT_PATHS) <= set(reviewed), 'BOTH_REPAIR_PRODUCT_BINDINGS_REQUIRED')
+    require(set(REPAIR_PRODUCT_PATHS) | {REPAIR_BROWSER_HARNESS_PATH} <= set(reviewed), 'ALL_REPAIR_SOURCE_BINDINGS_REQUIRED')
     for path, values in reviewed.items():
         require(before.get(path) == ('100644', 'blob', values['before']), 'REPAIR_BEFORE_' + path)
         require(after.get(path) == ('100644', 'blob', values['after']), 'REPAIR_AFTER_' + path)
-    product = {path for path in changed if path.startswith('server-version/')}
+    product = {path for path in changed if path.startswith('server-version/frontend/')}
     require(product == set(REPAIR_PRODUCT_PATHS), 'REPAIR_PRODUCT_SCOPE')
+    other_server = {path for path in changed if path.startswith('server-version/')
+                    and not path.startswith('server-version/frontend/')}
+    require(other_server == {REPAIR_BROWSER_HARNESS_PATH}, 'REPAIR_SERVER_TOOL_SCOPE')
     unaffected = [(path, list(before[path])) for path in sorted(before) if path not in changed]
     return {'changedPaths': sorted(changed), 'unchangedGitObjects': len(unaffected),
             'unchangedInputsSha256': sha256(json.dumps(unaffected, separators=(',', ':')).encode()),
@@ -768,7 +839,8 @@ def validate_repair_plan(original, proof, current):
     require(current.get('components', {}).get('backend') == original['components']['backend'], 'REPAIR_BACKEND_CHANGED')
     require(current.get('components', {}).get('frontend') != original['components']['frontend'], 'REPAIR_FRONTEND_NOT_CHANGED')
     selected = original['frontendTests']
-    require(len(selected) == 16 and all(name in selected for name in REPAIR_TESTS), 'REPAIR_FRONTEND_SELECTION')
+    require(len(selected) == 16 and all(name in selected for name in REPAIR_TESTS)
+            and not set(ADDITIONAL_REPAIR_TESTS) & set(selected), 'REPAIR_FRONTEND_SELECTION')
     return [name for name in selected if name not in REPAIR_TESTS]
 
 
@@ -856,6 +928,104 @@ def validate_repair_reports(reports, plan, checks, runtime_sha, recovery_sha, br
             'backendDistSha256': dist, 'browserQualified': False}
 
 
+def validate_e_transition(before, after, verifier_blob):
+    """Flat E report admission: all Wave/compiler/dependency inputs unchanged."""
+    require(bool(re.fullmatch('[0-9a-f]{40}', verifier_blob)), 'E_VERIFIER_BLOB')
+    expected = set(E_REVIEWED_BEFORE) | {SELF_PATH}
+    changed = {path for path in set(before) | set(after) if before.get(path) != after.get(path)}
+    require(changed == expected, 'E_UNREVIEWED_TRANSITION')
+    require(before.get(SELF_PATH) == ('100644', 'blob', E_VERIFIER_BLOB)
+            and after.get(SELF_PATH) == ('100644', 'blob', verifier_blob), 'E_VERIFIER_TRANSITION')
+    for path, old in E_REVIEWED_BEFORE.items():
+        require(before.get(path) == ('100644', 'blob', old)
+                and after.get(path) == ('100644', 'blob', REPAIR_TRANSITIONS[path]['after']), 'E_EXACT_INPUT_' + path)
+    unchanged = [(path, list(before[path])) for path in sorted(before) if path not in expected]
+    return {'changedPaths': sorted(expected), 'unchangedObjects': len(unchanged),
+            'unchangedInputsSha256': sha256(json.dumps(unchanged, separators=(',', ':')).encode())}
+
+
+def validate_e_wave_reports(job, checks, tests, browser):
+    """E remains failed; qualify only 7+3 Wave assertions and two-file lint."""
+    require(job.get('id') == ORIGIN_E['job'] and job.get('run_id') == ORIGIN_E['run']
+            and job.get('head_sha') == ORIGIN_E['head'] and job.get('status') == 'completed'
+            and job.get('conclusion') == 'failure', 'E_FAILED_JOB_REQUIRED')
+    steps = job.get('steps', [])
+    require(isinstance(steps, list), 'E_STEPS_REQUIRED')
+    for name in (*E_SUCCESS_STEPS, DOWNSTREAM_STEPS[-1]):
+        rows = [step for step in steps if step.get('name') == name]
+        expected = 'failure' if name == DOWNSTREAM_STEPS[-1] else 'success'
+        require(len(rows) == 1 and rows[0].get('status') == 'completed'
+                and rows[0].get('conclusion') == expected, 'E_SELECTED_STEP_' + name)
+    require([step.get('name') for step in steps if step.get('conclusion') == 'failure'] == [DOWNSTREAM_STEPS[-1]], 'E_ONLY_BROWSER_FAILURE')
+    require(checks.get('head') == ORIGIN_E['merge'] and checks.get('sourceHead') == ORIGIN_E['head']
+            and checks.get('tree') == ORIGIN_E['tree'], 'E_SOURCE_BINDING')
+    phases = checks.get('phases', [])
+    require([phase.get('name') for phase in phases] == [*E_SUCCESS_PHASES, B_FAILED_PHASE], 'E_EXACT_PHASE_LEDGER')
+    for name in E_SUCCESS_PHASES:
+        require_success_phase(checks, name)
+    require(phases[-1].get('status') == 'failure' and phases[-1].get('errorType') == 'CalledProcessError', 'E_BROWSER_PHASE_FAILED')
+    require(checks.get('privateBrowserMaterialRemoved') is True and checks.get('isolatedResourcesRemoved') is True
+            and checks.get('cleanupErrors') == [], 'E_CLEANUP_REQUIRED')
+    require(checks.get('executionInputs') == {
+        'node': 'v24.21.0', 'docker': '28.0.4', 'runnerOS': 'Linux',
+        'workflow': E_REVIEWED_BEFORE['.github/workflows/ci-survey-candidate.yml'],
+        'executor': E_REVIEWED_BEFORE['.github/scripts/survey-candidate.py'],
+        'environmentSha256': '18ca82be087ab5064162ed40039425db87ee860775f9aba0f20be18d3e770cff'}, 'E_EXECUTION_INPUTS')
+    require(checks.get('images') == E_IMAGES and checks.get('builders', {}).get('frontend') == E_BUILDER, 'E_IMAGE_BINDING')
+    recipe = checks.get('frontendBuildRecipe', {})
+    wave_blobs = {path.removeprefix('server-version/frontend/'): REPAIR_TRANSITIONS[path]['after']
+                  for path in REPAIR_PRODUCT_PATHS[:2]}
+    require(recipe.get('dependencyProducer') == 'sha256:2deb951d082a71060a9e91d367c7878654189d17503bf2ce27e3236ee7d7fb30'
+            and recipe.get('copiedSourceBlobs') == wave_blobs
+            and recipe.get('dependencyLockUnchanged') is True, 'E_WAVE_BUILD_INPUTS')
+    validate_test_report(tests, list(REPAIR_TESTS))
+    require(tests.get('numTotalTests') == 30 and len(tests['testResults']) == 3, 'E_EXACT_TEST_COUNTS')
+    for name, count in zip(REPAIR_TESTS, (7, 3, 20)):
+        rows = [row for row in tests['testResults'] if row['name'].replace('\\', '/').endswith('/' + name)]
+        require(len(rows) == 1 and len(rows[0]['assertionResults']) == count, 'E_SUITE_COUNT_' + name)
+    require(browser.get('status') == 'failed' and browser.get('sourceCommit') == ORIGIN_E['merge']
+            and browser.get('images') == E_IMAGES
+            and browser.get('harnessSha256') == '21b0156745886c779595efd4764e6c509290defa6b6f87124f6f21e598af570d', 'E_BROWSER_BINDING')
+    phase = 'researcher four-type composition and publication'
+    require(browser.get('browserErrors') == [] and browser.get('phase') == phase
+            and browser.get('failure') == {'phase': phase, 'name': 'AssertionError',
+                                           'message': 'researcher has no document horizontal overflow at 390'}, 'E_EXACT_OVERFLOW_FAILURE')
+    accessibility = browser.get('accessibility', [])
+    require(len(accessibility) == 2 and [row.get('state') for row in accessibility]
+            == ['admin-invitation-grants', 'researcher-published-wave']
+            and all(row.get('violations') == [] for row in accessibility), 'E_UNEXPECTED_ACCESSIBILITY_FAILURE')
+    return {'sourceRun': ORIGIN_E['run'], 'sourceJob': ORIGIN_E['job'], 'sourceHead': ORIGIN_E['head'],
+            'sourceMergeHead': ORIGIN_E['merge'], 'sourceTree': ORIGIN_E['tree'],
+            'sourceJobConclusion': 'failure', 'originalFailedPhase': B_FAILED_PHASE,
+            'retainedAssertions': 10, 'retainedSuites': list(E_RETAINED_TESTS),
+            'originalTestPhase': 'affected-frontend-qr-contracts',
+            'invalidatedSuites': [REPAIR_TESTS[2]],
+            'lint': {'originalPhase': 'frontend-qr-lint', 'status': 'success', 'files': wave_blobs},
+            'wholeCandidateQualified': False, 'browserQualified': False, 'imagesReused': False}
+
+
+def qualified_e_wave_reports(current_source, evidence):
+    require_official_ci()
+    for ref in (ORIGIN_E['head'], ORIGIN_E['merge']):
+        if subprocess.run(['git', 'cat-file', '-e', ref + '^{commit}'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode:
+            subprocess.run(['git', 'fetch', '--no-tags', 'origin', ref], check=True, timeout=120)
+        require(git('rev-parse', ref + '^{tree}').decode().strip() == ORIGIN_E['tree'], 'E_SOURCE_TREE')
+    binding = validate_e_transition(git_objects(ORIGIN_E['head']), git_objects(current_source),
+                                    git('hash-object', str(Path(__file__).resolve())).decode().strip())
+    run, job, artifact = source_metadata(ORIGIN_E)
+    root = download_verified_artifact(artifact, evidence / 'additional-wave-evidence', ORIGIN_E)
+    for name, digest in E_REPORT_SHA256.items():
+        require(file_sha256(root / name) == digest, 'E_RAW_REPORT_HASH_' + name)
+    names = ('checks.json', 'frontend-qr-tests.json', 'browser/result.json')
+    reports = {name: read_json(root / 'survey-candidate-evidence' / name) for name in names}
+    receipt = validate_e_wave_reports(job, reports['checks.json'], reports['frontend-qr-tests.json'], reports['browser/result.json'])
+    receipt.update({'artifact': {key: artifact[key] for key in ('id', 'digest', 'size_in_bytes')},
+                    'reportPaths': {name: str(root / 'survey-candidate-evidence' / name) for name in names},
+                    'rawReportSha256': E_REPORT_SHA256, 'inputBinding': binding,
+                    'provenance': validate_official_source(run, job, artifact, origin=ORIGIN_E)})
+    return receipt
+
+
 def browser_repair_main():
     require_official_ci()
     require(REPAIR_TRANSITIONS_FINALIZED, 'REPAIR_TRANSITIONS_NOT_FINALIZED')
@@ -892,6 +1062,7 @@ def browser_repair_main():
         sha256(git('show', ORIGIN_B['head'] + ':.github/scripts/survey-candidate-runtime.cjs')),
         sha256(git('show', ORIGIN_B['head'] + ':.github/scripts/survey-candidate-recovery.py')),
         sha256(git('show', ORIGIN_B['head'] + ':server-version/e2e/survey-candidate-browser.cjs')))
+    additional = qualified_e_wave_reports(current_source, evidence)
     specs = (
         ('backendBuilder', 'backend', True, b_checks['builders']['backend']),
         ('backendRuntime', 'backend', False, b_checks['images']['backend']),
@@ -937,10 +1108,13 @@ def browser_repair_main():
                           'originalPlan': a_plan, 'originalChecks': a_checks},
         'reusedPhases': retained_a + retained_b,
         'phaseOrigins': {**{name: SOURCE_RUN for name in retained_a}, **{name: ORIGIN_B['run'] for name in retained_b}},
-        'retainedBackendTests': 132, 'retainedFrontendTests': 136,
-        'frontendTestsToRun': list(REPAIR_TESTS), 'frontendTestsReused': retained_tests,
+        'retainedBackendTests': 132, 'retainedBFrontendTests': 136, 'retainedFrontendTests': 146,
+        'frontendTestsToRun': list(FRONTEND_TESTS_TO_RUN),
+        'frontendTestsReused': [*retained_tests, *E_RETAINED_TESTS],
+        'additionalFrontendQualification': additional,
+        'additionalFrontendTestsFirstExecution': list(ADDITIONAL_REPAIR_TESTS),
         'retainedBackendScan': True, 'retainedFrontendAudit': True,
-        'invalidatedFrontend': ['compile', 'app-types', 'changed-lint', 'runtime', 'scan', 'affected-30-contracts', 'browser'],
+        'invalidatedFrontend': ['compile', 'app-types', 'changed-lint', 'runtime', 'scan', 'workspace-20-contracts', 'new-catalog-6-contracts', 'browser'],
         'originalFailedPhase': B_FAILED_PHASE, 'originalJobConclusion': 'failure',
         'originalEvidencePath': str(original), 'reportPaths': {name: str(original / name) for name in report_names},
         'archives': archives, 'currentAliases': aliases, 'inputBinding': binding,
@@ -954,8 +1128,8 @@ def browser_repair_main():
     with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
         output.write('restored=true\n')
     print(json.dumps({'status': receipt['status'], 'sourceRun': ORIGIN_B['run'],
-                      'retainedBackendTests': 132, 'retainedFrontendTests': 136,
-                      'frontendTestsToRun': list(REPAIR_TESTS), 'wholeCandidateQualified': False}))
+                      'retainedBackendTests': 132, 'retainedBFrontendTests': 136, 'retainedFrontendTests': 146,
+                      'frontendTestsToRun': list(FRONTEND_TESTS_TO_RUN), 'wholeCandidateQualified': False}))
 
 
 SCOPE_RUN = 39026966367
@@ -992,25 +1166,18 @@ SCOPE_REPAIR_TESTS = (
 )
 
 
-SCOPE_D = {
-    'run': 39028725448, 'job': 117384749384,
-    'head': 'ddb69202d417386f1b17dbd4dcc2dcfe57f06870',
-    'merge': '0a01e062844693295b8e8d25ed7572f391b5d0b4',
-    'tree': '10c1eba41203d28667123bb1cc4d03278eaea7ee',
-    'verifier': '79536d70155b51e29a48f5275726dcbd63b091d9',
-    'tests': 'a0cd16fddc131b3fbf2aea3fe0ec93c810c0efd0',
-}
 EMPTY_SCOPE_FILE = '.github/scripts/ci-topology.test.mjs'
+CURRENT_SCOPE_TESTS = SCOPE_REPAIR_TESTS
 
 
 def parse_scope_repair_tap(output, affected):
-    """Strict Node24 TAP for the three fixed cases, not arbitrary TAP input.
+    """Strict Node24 TAP for the three fixed scope contracts.
 
     Node24 may report the unmatched ci-topology file itself as a passing test:
     its empty 1..0 plan is immediately followed by that exact file subtest.
     The file wrapper counts in TAP totals but never as a named contract.
     """
-    require(list(affected) == list(SCOPE_REPAIR_TESTS), 'SCOPE_REPAIR_EXACT_SELECTION')
+    require(tuple(affected) in (SCOPE_REPAIR_TESTS, CURRENT_SCOPE_TESTS), 'SCOPE_REPAIR_EXACT_SELECTION')
     lines = output.splitlines()
     require(lines and lines[0] == 'TAP version 13', 'SCOPE_TAP_VERSION')
     records, summaries, plans = [], {}, []
@@ -1033,7 +1200,8 @@ def parse_scope_repair_tap(output, affected):
                 raise ReuseRejected('SCOPE_TAP_UNEXPECTED_DIAGNOSTIC')
             continue
         if line == '1..0':
-            require(not empty and not records and pending is None and not plans
+            require(tuple(affected) == SCOPE_REPAIR_TESTS
+                    and not empty and not records and pending is None and not plans
                     and index + 1 < len(lines) and lines[index + 1] == '# Subtest: ' + EMPTY_SCOPE_FILE,
                     'SCOPE_TAP_EMPTY_FILE_PLAN')
             empty = True
@@ -1075,7 +1243,7 @@ def parse_scope_repair_tap(output, affected):
     require(not yaml and pending is None and len(plans) == 1, 'SCOPE_TAP_INCOMPLETE')
     wrappers = [name for name in records if name == EMPTY_SCOPE_FILE]
     named = [name for name in records if name != EMPTY_SCOPE_FILE]
-    require(sorted(named) == sorted(affected) and len(named) == 3
+    require(sorted(named) == sorted(affected) and len(named) == len(affected)
             and len(wrappers) == int(empty), 'SCOPE_TAP_NAMED_CONTRACT_SET')
     count = len(records)
     require(summaries == {'tests': count, 'suites': 0, 'pass': count, 'fail': 0,
@@ -1099,61 +1267,6 @@ def extract_scope_repair_tap(log):
             and re.fullmatch(r'# duration_ms (?:0|[1-9]\d*)(?:\.\d+)?', line)]
     require(len(ends) == 1, 'SCOPE_D_COMPLETE_TAP_REQUIRED')
     return '\n'.join(lines[start:ends[0] + 1]) + '\n'
-
-
-def validate_scope_parser_transition(before, after, verifier_blob):
-    """D -> current changes only this verifier and its rejection contracts."""
-    test = '.github/scripts/survey-candidate-reuse.test.py'
-    changed = {path for path in set(before) | set(after) if before.get(path) != after.get(path)}
-    require(changed == {SELF_PATH, test}, 'SCOPE_D_UNREVIEWED_INPUT_CHANGE')
-    require(before.get(SELF_PATH) == ('100644', 'blob', SCOPE_D['verifier'])
-            and after.get(SELF_PATH) == ('100644', 'blob', verifier_blob), 'SCOPE_D_VERIFIER_BINDING')
-    require(before.get(test) == ('100644', 'blob', SCOPE_D['tests'])
-            and after.get(test) == ('100644', 'blob', REPAIR_TRANSITIONS[test]['after']), 'SCOPE_D_TEST_BINDING')
-    return {'changedPaths': sorted(changed), 'unchangedObjects': len(before) - 2,
-            'originalVerifierBlob': SCOPE_D['verifier'], 'currentVerifierBlob': verifier_blob}
-
-
-def qualified_d_scope_cases(current_source):
-    require_official_ci()
-    for ref in (SCOPE_D['head'], SCOPE_D['merge']):
-        if subprocess.run(['git', 'cat-file', '-e', ref + '^{commit}'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode:
-            subprocess.run(['git', 'fetch', '--no-tags', 'origin', ref], check=True, timeout=120)
-        require(git('rev-parse', ref + '^{tree}').decode().strip() == SCOPE_D['tree'], 'SCOPE_D_SOURCE_TREE')
-    binding = validate_scope_parser_transition(git_objects(SCOPE_D['head']), git_objects(current_source),
-                                               git('hash-object', str(Path(__file__).resolve())).decode().strip())
-    run = official_json(f"/actions/runs/{SCOPE_D['run']}")
-    job = official_json(f"/actions/jobs/{SCOPE_D['job']}")
-    require(run.get('id') == SCOPE_D['run'] and run.get('head_sha') == SCOPE_D['head']
-            and run.get('event') == 'pull_request' and run.get('status') in ('in_progress', 'completed')
-            and run.get('repository', {}).get('full_name') == REPOSITORY
-            and run.get('head_repository', {}).get('full_name') == REPOSITORY
-            and run.get('path') == '.github/workflows/ci.yml' and recent(run.get('created_at'))
-            and any(pr.get('number') == PR_NUMBER for pr in run.get('pull_requests', [])), 'SCOPE_D_RUN_ORIGIN')
-    require(job.get('id') == SCOPE_D['job'] and job.get('run_id') == SCOPE_D['run']
-            and job.get('head_sha') == SCOPE_D['head'] and job.get('name') == 'classify changed content'
-            and job.get('status') == 'completed' and job.get('conclusion') == 'failure'
-            and recent(job.get('completed_at')), 'SCOPE_D_FAILED_JOB_REQUIRED')
-    step_name = 'frozen Survey scope and fail-closed merge contracts'
-    selected = [step for step in job.get('steps', []) if step.get('name') == step_name]
-    require(len(selected) == 1 and selected[0].get('status') == 'completed'
-            and selected[0].get('conclusion') == 'failure'
-            and [step.get('name') for step in job.get('steps', []) if step.get('conclusion') == 'failure'] == [step_name], 'SCOPE_D_ONLY_ADAPTER_STEP_FAILED')
-    with official_request(f"/actions/jobs/{SCOPE_D['job']}/logs") as response:
-        raw = response.read(MAX_JSON_BYTES + 1)
-    require(len(raw) <= MAX_JSON_BYTES, 'SCOPE_D_LOG_SIZE')
-    text = raw.decode('utf8')
-    require('ReuseRejected: SCOPE_REPAIR_EXECUTED_NAMES' in text
-            and 'ReuseRejected: SCOPE_REPAIR_EXECUTED_FAILURE' not in text
-            and 'node: v24.21.0' in text, 'SCOPE_D_KNOWN_POST_EXECUTION_ADAPTER_FAILURE')
-    tap = extract_scope_repair_tap(text)
-    parsed = parse_scope_repair_tap(tap, SCOPE_REPAIR_TESTS)
-    require(parsed['emptyFileWrappers'] == [EMPTY_SCOPE_FILE], 'SCOPE_D_EXACT_KNOWN_WRAPPER')
-    return {'sourceRun': SCOPE_D['run'], 'sourceJob': SCOPE_D['job'], 'sourceHead': SCOPE_D['head'],
-            'sourceMergeHead': SCOPE_D['merge'], 'sourceTree': SCOPE_D['tree'],
-            'sourceJobConclusion': 'failure', 'wholeJobQualified': False,
-            'qualifiedNamedTests': parsed['namedTests'], 'ignoredEmptyFileWrappers': parsed['emptyFileWrappers'],
-            'sourceLogSha256': sha256(raw), 'tapSha256': sha256(tap.encode()), 'inputBinding': binding}
 
 
 def scope_repair_receipt():
@@ -1231,23 +1344,30 @@ def scope_repair_receipt():
     validate_scope_tap(previous_text, old_executed)
     retained = [name for name in all_names if name not in SCOPE_REPAIR_TESTS]
     require(len(retained) == 33 and all(name in all_names for name in SCOPE_REPAIR_TESTS), 'SCOPE_REPAIR_SELECTION_CHANGED')
-    # The three named cases already executed successfully in D. Read that
-    # official TAP directly; do not inherit D's failed job or its 33-case receipt.
-    d = qualified_d_scope_cases(source)
     sources = {name: ORIGIN_B['run'] if name in old_executed else SCOPE_RUN for name in retained}
-    sources.update({name: SCOPE_D['run'] for name in SCOPE_REPAIR_TESTS})
-    require(set(sources) == set(all_names), 'SCOPE_ALL_CONTRACT_SOURCES_REQUIRED')
+    require(len(sources) == 33, 'SCOPE_RETAINED_CONTRACT_SOURCES_REQUIRED')
     receipt = {'schema': 1, 'currentHead': current, 'currentSourceHead': source,
                'sourceRun': ORIGIN_B['run'], 'sourceJob': SCOPE_B_JOB,
                'originalSourceRun': SCOPE_RUN, 'originalSourceJob': SCOPE_JOB,
                'sourceLogsSha256': {label: value['sha256'] for label, value in logs.items()},
-               'inputBinding': binding, 'retainedNodeTests': all_names,
-               'retainedNodeSources': sources, 'directNamedCaseSource': d,
-               'executedNodeTests': [], 'wholeCandidateQualified': False}
+               'inputBinding': binding, 'retainedNodeTests': [name for name in all_names if name in sources],
+               'retainedNodeSources': sources,
+               'executedNodeTests': list(CURRENT_SCOPE_TESTS), 'wholeCandidateQualified': False}
     print(json.dumps(receipt), flush=True)
-    print(json.dumps({'status': 'SCOPE_QUALIFIED', 'executedPassed': 0, 'retainedPassed': 36,
-                      'sourceRun': ORIGIN_B['run'], 'originalSourceRun': SCOPE_RUN,
-                      'directNamedCaseRun': SCOPE_D['run'], 'directNamedCaseSourceJobConclusion': 'failure'}), flush=True)
+    # Both files contain selected contracts; omit the unrelated ci-topology file.
+    pattern = '^(?:' + '|'.join(re.escape(name) for name in CURRENT_SCOPE_TESTS) + ')$'
+    result = subprocess.run(['node', '--test', '--test-reporter=tap', '--test-name-pattern', pattern,
+                             '.github/scripts/survey-candidate-scope.test.mjs',
+                             '.github/scripts/content-workflows.test.mjs'],
+                            capture_output=True, text=True, timeout=120)
+    print(result.stdout, end='', flush=True)
+    print(result.stderr, end='', file=sys.stderr, flush=True)
+    require(result.returncode == 0, 'SCOPE_CURRENT_CONTRACT_FAILURE')
+    parsed = parse_scope_repair_tap(result.stdout, CURRENT_SCOPE_TESTS)
+    require(not parsed['emptyFileWrappers'], 'SCOPE_CURRENT_UNEXPECTED_EMPTY_FILE')
+    print(json.dumps({'status': 'SCOPE_QUALIFIED', 'executedPassed': 3, 'retainedPassed': 33,
+                      'sourceRun': ORIGIN_B['run'], 'originalSourceRun': SCOPE_RUN}), flush=True)
+
 
 
 if __name__ == '__main__':

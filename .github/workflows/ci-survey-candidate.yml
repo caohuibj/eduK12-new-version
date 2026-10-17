@@ -52,7 +52,7 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: python3 -B .github/scripts/survey-candidate-reuse.py
       - uses: docker/setup-buildx-action@v3
-      - name: compile only the accessibility-repaired frontend from verified dependencies
+      - name: compile only the repaired frontend from verified dependencies
         run: python3 -B .github/scripts/survey-candidate.py resume-browser-repair
       - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
         with:
@@ -66,7 +66,7 @@ jobs:
           done
       - name: prepare disposable browser services with the unchanged restricted runtime
         run: python3 -B .github/scripts/survey-candidate.py services
-      - name: run only three directly affected WaveStudio frontend suites
+      - name: run only directly affected catalog and workspace frontend suites
         run: python3 -B .github/scripts/survey-candidate.py frontend-repair-tests
       - name: install official pinned browser tools
         run: |

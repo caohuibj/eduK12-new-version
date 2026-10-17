@@ -43,6 +43,7 @@
  */
 'use strict'
 const assert = require('node:assert/strict')
+const { isDeepStrictEqual } = require('node:util')
 const fs = require('node:fs')
 const path = require('node:path')
 const dns = require('node:dns').promises
@@ -55,13 +56,22 @@ const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 const SHA256 = value => createHash('sha256').update(value).digest('hex')
 let fixture, output, browser, activePage, phase = 'setup', timer
 const evidence = { schemaVersion: 1, status: 'running', startedAt: new Date().toISOString(),
-  environment: { node: process.version }, checks: [], requests: [], browserErrors: [], accessibility: [],
+  environment: { node: process.version }, checks: [], requests: [], browserErrors: [], accessibility: [], visualFailures: [],
   scope: 'Real Chromium UI + isolated candidate API/PostgreSQL. Synthetic actors and content only.',
   timingClaim: 'Unaccelerated software-observed browser timing; not physical device attestation.' }
 const save = () => { if (output) fs.writeFileSync(path.join(output, 'result.json'), JSON.stringify(evidence, null, 2)) }
 function check(name, actual, expected = true) {
   assert.deepEqual(actual, expected, name)
   evidence.checks.push({ name, pass: true }); save()
+}
+// Pure presentation failures are collected so independent safe participant
+// checks still run. Every security, API, state and timing prerequisite remains
+// fail-fast; the final visual assertion is mandatory before status can pass.
+function visualCheck(name, actual, expected) {
+  const pass = isDeepStrictEqual(actual, expected)
+  evidence.checks.push({ name, pass })
+  if (!pass) evidence.visualFailures.push({ phase, name })
+  save()
 }
 function milestone(name) { phase = name; evidence.phase = name; save(); console.log('Survey browser: ' + name) }
 async function loopback(url, hostname) {
@@ -123,7 +133,7 @@ async function widths(page, name) {
     // Two rendering frames after a real resize, never advance task clocks.
     await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))))
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)
-    check(name + ' has no document horizontal overflow at ' + width, overflow, false)
+    visualCheck(name + ' has no document horizontal overflow at ' + width, overflow, false)
     await screenshot(page, name + '-' + width)
   }
 }
@@ -148,7 +158,7 @@ async function accessibility(page, state) {
   evidence.accessibility.push({ state, scope: 'main', viewport: page.viewportSize(),
     sourceSha256: SHA256(axeSource), ...result }); save()
   check(state + ' uses the pinned axe-core runtime', result.version, axeVersion)
-  check(state + ' has no WCAG A/AA violations, including serious/critical', result.violations, [])
+  visualCheck(state + ' has no WCAG A/AA violations, including serious/critical', result.violations, [])
 }
 function parseCsv(input) {
   const result = []; let row = [], field = '', quoted = false
@@ -570,6 +580,7 @@ async function main() {
   await exportJourney(researcher.page, researcher.wave, participant)
   check('No browser runtime errors', evidence.browserErrors, [])
   check('All observed Survey API responses succeed', evidence.requests.filter(request => request.status >= 400), [])
+  check('No collected visual or accessibility failures', evidence.visualFailures, [])
   evidence.status = 'pass'; evidence.finishedAt = new Date().toISOString(); save()
   console.log(JSON.stringify({ status: 'pass', checks: evidence.checks.length, requests: evidence.requests.length }))
 }

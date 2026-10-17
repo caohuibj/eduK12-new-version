@@ -119,12 +119,12 @@ def resume_browser_repair():
  proof=json.loads((E/'resume-proof.json').read_text());old=proof['originalChecks']
  assert proof['schema']==1 and proof['status']=='QUALIFIED_BROWSER_REPAIR' and proof['currentHead']==P['head'] and proof['currentSourceHead']==os.environ['SURVEY_SOURCE_HEAD']
  assert old['components']['backend']==P['components']['backend'] and C['phases']==[]
- C['reusedQualification']={'sourceRun':proof['sourceRun'],'sourceHead':proof['sourceHead'],'sourceMergeHead':proof['sourceMergeHead'],'artifact':proof['artifact'],'phases':proof['reusedPhases'],'reportPaths':proof['reportPaths'],'compileOrigin':proof['compileOrigin'],'retainedBackendTests':proof['retainedBackendTests'],'retainedFrontendTests':proof['retainedFrontendTests'],'frontendTestsReused':proof['frontendTestsReused']}
+ C['reusedQualification']={'sourceRun':proof['sourceRun'],'sourceHead':proof['sourceHead'],'sourceMergeHead':proof['sourceMergeHead'],'artifact':proof['artifact'],'phases':proof['reusedPhases'],'reportPaths':proof['reportPaths'],'compileOrigin':proof['compileOrigin'],'retainedBackendTests':proof['retainedBackendTests'],'retainedFrontendTests':proof['retainedFrontendTests'],'frontendTestsReused':proof['frontendTestsReused'],'retainedBFrontendTests':proof['retainedBFrontendTests'],'additionalFrontendQualification':proof['additionalFrontendQualification']}
  C['bases']=old['bases'];C['builders']={'backend':old['builders']['backend']};C['images']={'backend':old['images']['backend']}
  C['executionInputs']={'node':out(['node','--version']),'docker':out(['docker','version','--format','{{.Client.Version}}']),'runnerOS':os.environ.get('RUNNER_OS'),'workflow':out(['git','hash-object','.github/workflows/ci-survey-candidate.yml']),'executor':out(['git','hash-object','.github/scripts/survey-candidate.py']),'environmentSha256':hashlib.sha256(json.dumps(ENV,sort_keys=True).encode()).hexdigest()};save()
  base=proof['currentAliases']['frontendBuilder']['alias']
  assert out(['docker','image','inspect','--format','{{.Id}}',base])==old['builders']['frontend']
- changed=['src/survey/SurveyWaveStudio.tsx','src/survey/SurveyWaveStudio.group-ip.test.tsx']
+ changed=['src/survey/SurveyWaveStudio.tsx','src/survey/SurveyWaveStudio.group-ip.test.tsx','src/survey/ResearchCatalog.tsx','src/survey/ResearchCatalog.test.tsx']
  df=TMP/'frontend-qr-build.Dockerfile'
  df.write_text('FROM '+base+' AS build\nWORKDIR /app\n'+''.join('COPY '+f+' /app/'+f+'\n' for f in changed)+'RUN npm run build\n')
  C['frontendBuildRecipe']={'sha256':hashlib.sha256(df.read_bytes()).hexdigest(),'dependencyProducer':old['builders']['frontend'],'copiedSourceBlobs':{f:out(['git','hash-object','server-version/frontend/'+f]) for f in changed},'dependencyLockUnchanged':True};save()
@@ -132,7 +132,7 @@ def resume_browser_repair():
  C['builders']['frontend']=out(['docker','image','inspect','--format','{{.Id}}',tag('frontend',True)]);save()
  archive_image('frontend',True)
  phase('frontend-app-types',lambda:run(frontend_env()+[tag('frontend',True),'npx','tsc','-p','tsconfig.app.json','--noEmit'],600))
- phase('frontend-qr-lint',lambda:run(frontend_env()+[tag('frontend',True),'npx','eslint',*changed],300))
+ phase('frontend-catalog-lint',lambda:run(frontend_env()+[tag('frontend',True),'npx','eslint','src/survey/ResearchCatalog.tsx','src/survey/ResearchCatalog.test.tsx'],300))
  original=(ROOT/'server-version/frontend/Dockerfile').read_text();marker='FROM nginx:1.31.6-alpine3.24-slim AS runtime';assert original.count(marker)==1
  tail=original[original.index(marker):].replace('nginx:1.31.6-alpine3.24-slim',C['bases']['nginx:1.31.6-alpine3.24-slim'],1)
  alias='eduk12-qualified-survey-frontend:'+C['builders']['frontend'].removeprefix('sha256:');run(['docker','tag',C['builders']['frontend'],alias],30)
@@ -143,10 +143,10 @@ def resume_browser_repair():
 
 def frontend_repair_tests():
  proof=json.loads((E/'resume-proof.json').read_text());selected=proof['frontendTestsToRun']
- assert selected==['src/survey/SurveyWaveStudio.group-ip.test.tsx','src/survey/SurveyWaveStudio.preview.test.tsx','src/survey/SurveyWorkspace.requests.test.tsx']
- cmd='npx vitest run '+shlex.join(selected)+' --maxWorkers=2 --reporter=json --outputFile=/evidence/frontend-qr-tests.json'
- def check():run(frontend_env()+[tag('frontend',True),'sh','-ec',cmd],600);report('frontend-qr-tests.json',selected)
- phase('affected-frontend-qr-contracts',check)
+ assert selected==['src/survey/SurveyWorkspace.requests.test.tsx','src/survey/ResearchCatalog.test.tsx']
+ cmd='npx vitest run '+shlex.join(selected)+' --maxWorkers=2 --reporter=json --outputFile=/evidence/frontend-catalog-tests.json'
+ def check():run(frontend_env()+[tag('frontend',True),'sh','-ec',cmd],600);report('frontend-catalog-tests.json',selected)
+ phase('affected-frontend-catalog-contracts',check)
 
 def services():
  run(['docker','run','-d','--name','survey-ci-postgres','-e','POSTGRES_USER=ptool','-e','POSTGRES_PASSWORD=ptool123','-e','POSTGRES_DB=survey_candidate_ci_test','-p','127.0.0.1:5432:5432','postgres:16.15-bookworm'],180)

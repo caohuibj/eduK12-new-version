@@ -48,6 +48,16 @@ def repair_reports_fixture():
     return reports, plan, checks
 
 
+def e_wave_fixture():
+    origin = r.ORIGIN_E
+    job = {'id': origin['job'], 'run_id': origin['run'], 'head_sha': origin['head'], 'status': 'completed', 'conclusion': 'failure', 'steps': [*[{'name': name, 'status': 'completed', 'conclusion': 'success'} for name in r.E_SUCCESS_STEPS], {'name': r.DOWNSTREAM_STEPS[-1], 'status': 'completed', 'conclusion': 'failure'}, *[{'name': 'Run actions/upload-artifact@v4', 'status': 'completed', 'conclusion': 'success'} for _ in range(2)]]}
+    checks = {'head': origin['merge'], 'sourceHead': origin['head'], 'tree': origin['tree'], 'phases': [*[{'name': name, 'status': 'success', 'seconds': 1} for name in r.E_SUCCESS_PHASES], {'name': r.B_FAILED_PHASE, 'status': 'failure', 'errorType': 'CalledProcessError', 'seconds': 1}], 'privateBrowserMaterialRemoved': True, 'isolatedResourcesRemoved': True, 'cleanupErrors': [], 'images': dict(r.E_IMAGES), 'builders': {'frontend': r.E_BUILDER}, 'executionInputs': {'node': 'v24.21.0', 'docker': '28.0.4', 'runnerOS': 'Linux', 'workflow': r.E_REVIEWED_BEFORE['.github/workflows/ci-survey-candidate.yml'], 'executor': r.E_REVIEWED_BEFORE['.github/scripts/survey-candidate.py'], 'environmentSha256': '18ca82be087ab5064162ed40039425db87ee860775f9aba0f20be18d3e770cff'}, 'frontendBuildRecipe': {'dependencyProducer': 'sha256:2deb951d082a71060a9e91d367c7878654189d17503bf2ce27e3236ee7d7fb30', 'copiedSourceBlobs': {path.removeprefix('server-version/frontend/'): r.REPAIR_TRANSITIONS[path]['after'] for path in r.REPAIR_PRODUCT_PATHS[:2]}, 'dependencyLockUnchanged': True}}
+    tests = {'success': True, 'numTotalTests': 30, 'numPassedTests': 30, 'testResults': [{'name': '/app/' + name, 'status': 'passed', 'assertionResults': [{'status': 'passed'} for _ in range(count)]} for name, count in zip(r.REPAIR_TESTS, (7, 3, 20))]}
+    phase = 'researcher four-type composition and publication'
+    browser = {'status': 'failed', 'sourceCommit': origin['merge'], 'images': dict(r.E_IMAGES), 'harnessSha256': '21b0156745886c779595efd4764e6c509290defa6b6f87124f6f21e598af570d', 'browserErrors': [], 'phase': phase, 'failure': {'phase': phase, 'name': 'AssertionError', 'message': 'researcher has no document horizontal overflow at 390'}, 'accessibility': [{'state': state, 'violations': []} for state in ('admin-invitation-grants', 'researcher-published-wave')]}
+    return job, checks, tests, browser
+
+
 class ReceiptTests(unittest.TestCase):
     def test_official_origin_does_not_qualify_failed_candidate(self):
         run, job, artifact = source_fixture()
@@ -120,7 +130,7 @@ class ReceiptTests(unittest.TestCase):
             with self.assertRaises(r.ReuseRejected): r.validate_repair_reports(bad, *args)
 
     def test_browser_repair_transition_rejects_backend_or_unreviewed_product_change(self):
-        reviewed = {path: {'before': str(index + 1) * 40, 'after': str(index + 3) * 40} for index, path in enumerate(r.REPAIR_PRODUCT_PATHS)}
+        reviewed = {path: {'before': str(index + 1) * 40, 'after': str(index + 3) * 40} for index, path in enumerate((*r.REPAIR_PRODUCT_PATHS, r.REPAIR_BROWSER_HARNESS_PATH))}
         before = {path: ('100644', 'blob', values['before']) for path, values in reviewed.items()}
         before[r.SELF_PATH] = ('100644', 'blob', r.B_VERIFIER_BLOB)
         before['server-version/backend/unchanged.ts'] = ('100644', 'blob', 'e' * 40)
@@ -130,6 +140,11 @@ class ReceiptTests(unittest.TestCase):
         self.assertEqual(r.validate_repair_transition(before, after, 'f' * 40, reviewed)['unchangedGitObjects'], 1)
         bad = dict(after); bad['server-version/backend/unchanged.ts'] = ('100644', 'blob', 'd' * 40)
         with self.assertRaises(r.ReuseRejected): r.validate_repair_transition(before, bad, 'f' * 40, reviewed)
+        missing = dict(reviewed); missing.pop(r.REPAIR_BROWSER_HARNESS_PATH)
+        with self.assertRaises(r.ReuseRejected): r.validate_repair_transition(before, after, 'f' * 40, missing)
+        self.assertEqual(r.ADDITIONAL_REPAIR_TESTS, ('src/survey/ResearchCatalog.test.tsx',))
+        self.assertFalse(set(r.REPAIR_TESTS) & set(r.ADDITIONAL_REPAIR_TESTS))
+        self.assertNotIn(r.REPAIR_BROWSER_HARNESS_PATH, r.REPAIR_PRODUCT_PATHS)
 
     def test_repair_scope_tap_requires_exact_named_contracts_and_complete_counts(self):
         names = list(r.SCOPE_REPAIR_TESTS)
@@ -154,16 +169,64 @@ class ReceiptTests(unittest.TestCase):
         for bad in [stamped + stamped, stamped.replace('# duration_ms 70.894038', '# incomplete')]:
             with self.assertRaises(r.ReuseRejected): r.extract_scope_repair_tap(bad)
 
-    def test_parser_repair_retains_only_exact_d_source_and_two_file_transition(self):
+    def test_flat_wave_report_requires_exact_reviewed_e_transition(self):
         test = '.github/scripts/survey-candidate-reuse.test.py'
-        before = {r.SELF_PATH: ('100644', 'blob', r.SCOPE_D['verifier']), test: ('100644', 'blob', r.SCOPE_D['tests']), '.github/workflows/ci.yml': ('100644', 'blob', 'c' * 40)}
-        after = {**before, r.SELF_PATH: ('100644', 'blob', 'f' * 40), test: ('100644', 'blob', r.REPAIR_TRANSITIONS[test]['after'])}
-        self.assertEqual(r.validate_scope_parser_transition(before, after, 'f' * 40)['unchangedObjects'], 1)
-        for path, entry in [('.github/workflows/ci.yml', ('100644', 'blob', 'd' * 40)), (r.SELF_PATH, ('120000', 'blob', 'f' * 40)), (test, ('100644', 'blob', 'e' * 40)), ('unreviewed.ts', ('100644', 'blob', 'a' * 40))]:
+        before = {path: ('100644', 'blob', digest) for path, digest in r.E_REVIEWED_BEFORE.items()}
+        before.update({r.SELF_PATH: ('100644', 'blob', r.E_VERIFIER_BLOB), 'server-version/frontend/src/survey/SurveyWaveStudio.tsx': ('100644', 'blob', 'c' * 40)})
+        after = {**before, r.SELF_PATH: ('100644', 'blob', 'f' * 40)}
+        for path in r.E_REVIEWED_BEFORE:
+            after[path] = ('100644', 'blob', r.REPAIR_TRANSITIONS[path]['after'])
+        self.assertEqual(r.validate_e_transition(before, after, 'f' * 40)['unchangedObjects'], 1)
+        for path, entry in [('server-version/frontend/src/survey/SurveyWaveStudio.tsx', ('100644', 'blob', 'd' * 40)), (r.SELF_PATH, ('120000', 'blob', 'f' * 40)), (test, ('100644', 'blob', 'e' * 40)), ('unreviewed.ts', ('100644', 'blob', 'a' * 40)), ('server-version/e2e/other-browser.cjs', ('100644', 'blob', 'b' * 40))]:
             bad = dict(after); bad[path] = entry
-            with self.assertRaises(r.ReuseRejected): r.validate_scope_parser_transition(before, bad, 'f' * 40)
-        bad = dict(before); bad[r.SELF_PATH] = ('100644', 'blob', '0' * 40)
-        with self.assertRaises(r.ReuseRejected): r.validate_scope_parser_transition(bad, after, 'f' * 40)
+            with self.assertRaises(r.ReuseRejected): r.validate_e_transition(before, bad, 'f' * 40)
+        for path in (*r.E_REVIEWED_BEFORE, r.SELF_PATH):
+            bad = dict(before); bad[path] = ('100644', 'blob', '0' * 40)
+            with self.assertRaises(r.ReuseRejected): r.validate_e_transition(bad, after, 'f' * 40)
+
+    def test_flat_wave_report_retains_only_ten_and_lint_with_original_failure(self):
+        job, checks, tests, browser = e_wave_fixture()
+        result = r.validate_e_wave_reports(job, checks, tests, browser)
+        self.assertEqual(result['retainedAssertions'], 10)
+        self.assertEqual(result['retainedSuites'], list(r.REPAIR_TESTS[:2]))
+        self.assertEqual(result['sourceRun'], r.ORIGIN_E['run'])
+        self.assertFalse(result['wholeCandidateQualified'])
+        self.assertFalse(result['imagesReused'])
+        self.assertEqual(r.FRONTEND_TESTS_TO_RUN, ('src/survey/SurveyWorkspace.requests.test.tsx', 'src/survey/ResearchCatalog.test.tsx'))
+        for change in ('head', 'phase', 'extra', 'cleanup', 'environment', 'image', 'recipe', 'skip', 'count', 'suite', 'failure', 'axe', 'browser_source', 'job', 'step', 'duplicate'):
+            j, c, t, b = copy.deepcopy((job, checks, tests, browser))
+            if change == 'head': c['sourceHead'] = '0' * 40
+            elif change == 'phase': c['phases'][3]['status'] = 'skipped'
+            elif change == 'extra': c['phases'].append({'name': 'other', 'status': 'success', 'seconds': 1})
+            elif change == 'cleanup': c['cleanupErrors'] = ['unremoved']
+            elif change == 'environment': c['executionInputs']['node'] = 'v24.19.0'
+            elif change == 'image': c['images']['frontend'] = 'sha256:' + '0' * 64
+            elif change == 'recipe': c['frontendBuildRecipe']['copiedSourceBlobs'] = {}
+            elif change == 'skip': t['testResults'][0]['assertionResults'][0]['status'] = 'skipped'
+            elif change == 'count': t['numTotalTests'] = 29
+            elif change == 'suite': t['testResults'][0]['name'] = '/app/src/other.test.tsx'
+            elif change == 'failure': b['failure']['message'] = 'different failure'
+            elif change == 'axe': b['accessibility'][0]['violations'] = [{'id': 'svg-img-alt'}]
+            elif change == 'browser_source': b['sourceCommit'] = r.ORIGIN_B['merge']
+            elif change == 'job': j['conclusion'] = 'success'
+            elif change == 'step': j['steps'][0]['conclusion'] = 'skipped'
+            else: j['steps'].append(dict(j['steps'][0]))
+            with self.subTest(change=change):
+                with self.assertRaises(r.ReuseRejected): r.validate_e_wave_reports(j, c, t, b)
+
+    def test_flat_e_official_artifact_and_small_zip_admission(self):
+        run, job, artifact = source_fixture(); origin = r.ORIGIN_E
+        run.update(id=origin['run'], head_sha=origin['head'])
+        job.update(id=origin['job'], run_id=origin['run'], head_sha=origin['head'])
+        artifact.update(id=origin['artifact'], digest=origin['digest'], size_in_bytes=origin['size'], name='survey-candidate-reports-' + origin['merge'], workflow_run={'id': origin['run'], 'head_sha': origin['head']})
+        self.assertFalse(r.validate_official_source(run, job, artifact, NOW, origin)['wholeCandidateQualified'])
+        for field, value in [('name', 'survey-candidate-' + origin['merge']), ('digest', r.ORIGIN_B['digest']), ('size_in_bytes', r.ORIGIN_B['size'])]:
+            bad = dict(artifact); bad[field] = value
+            with self.assertRaises(r.ReuseRejected): r.validate_official_source(run, job, bad, NOW, origin)
+        valid = [zipfile.ZipInfo('survey-candidate-plan.json'), *[zipfile.ZipInfo(name) for name in r.E_REPORT_SHA256]]
+        self.assertTrue(r.safe_zip_entries(valid, origin))
+        for entries in [valid[:-1], valid + [zipfile.ZipInfo('survey-candidate-evidence/frontend-image.tar.zst')], valid + [valid[1]], valid + [zipfile.ZipInfo('../outside')]]:
+            with self.assertRaises(r.ReuseRejected): r.safe_zip_entries(entries, origin)
 
     def test_artifact_identity_digest_expiry_and_job_skip_rejected(self):
         for mutate in [lambda d: d.update(name='other'), lambda d: d.update(digest='missing'), lambda d: d.update(expired=True), lambda d: d.update(workflow_run={'id': 1, 'head_sha': r.SOURCE_HEAD}), lambda d: d.update(size_in_bytes=0)]:

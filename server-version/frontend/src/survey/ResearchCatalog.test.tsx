@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { ResearchCatalog, type CatalogApi, type CatalogGrant } from './ResearchCatalog'
+import { ResearchCatalog, SourceProvenance, type CatalogApi, type CatalogGrant } from './ResearchCatalog'
 import { SurveyCatalogGrants } from '../pages/admin/SurveyCatalogGrants'
 import { SurveyBuilder } from './SurveyBuilder'
 const source={kind:'SCALE' as const,sourceId:'scale-key',sourceVersion:3}
@@ -8,6 +8,15 @@ const grant:CatalogGrant={id:'grant-1',title:'授权量表',kind:'SCALE',status:
   sourceProvenance:{source,definitionDigest:'sha256-original',adapterVersion:'survey-catalog-v1'}}
 afterEach(()=>vi.unstubAllGlobals())
 describe('original source catalog grants',()=>{
+  it.each(['catalog','imported'] as const)('wraps the complete long version in %s source metadata',view=>{
+    const longSource={kind:'FORM' as const,sourceId:'questionnaire:synthetic-source',sourceVersion:'a'.repeat(64),organizationId:'synthetic-organization'}
+    const provenance={source:longSource,definitionDigest:'b'.repeat(64),adapterVersion:'survey-catalog-v1'}
+    render(<SourceProvenance source={view==='catalog'?longSource:undefined} provenance={provenance}/>)
+    const metadata=screen.getByText(`FORM · ${longSource.sourceId} · 版本 ${longSource.sourceVersion} · 组织 ${longSource.organizationId}`)
+    expect(metadata.textContent).toBe(`FORM · ${longSource.sourceId} · 版本 ${longSource.sourceVersion} · 组织 ${longSource.organizationId}`)
+    expect(metadata).toHaveClass('break-all')
+    expect(screen.getByText(provenance.definitionDigest)).toHaveTextContent(provenance.definitionDigest)
+  })
   it('lists exact versions and imports the chosen grant only',async()=>{
     const api=vi.fn(async()=>({list:[grant]}))
     const onImport=vi.fn(async()=>{})

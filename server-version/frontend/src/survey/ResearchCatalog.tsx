@@ -9,7 +9,7 @@ export function SourceProvenance({source,provenance}:{source?:CatalogSourceRef;p
   const values=[['内容摘要',provenance?.definitionDigest],['适配版本',provenance?.adapterVersion]].filter(([,value])=>typeof value==='string')
   return <div className="rounded-lg border bg-slate-50 p-3 text-sm space-y-2" aria-label="原版工具来源">
     <p className="font-semibold">已授权原版工具 · 只读版本快照</p>
-    {source&&<p>{source.kind} · {source.sourceId} · 版本 {source.sourceVersion}{source.organizationId?' · 组织 '+source.organizationId:''}</p>}
+    {source&&<p className="break-all">{source.kind} · {source.sourceId} · 版本 {source.sourceVersion}{source.organizationId?' · 组织 '+source.organizationId:''}</p>}
     <dl className="break-all">{values.map(([key,value])=><div key={key}><dt className="inline">{key}：</dt><dd className="inline">{String(value)}</dd></div>)}</dl>
     <p>保留原版内容、计分与来源。不得在此改编题目或评分；复制后仍为只读授权工具。授权不代表诊断资质或额外版权许可。</p>
   </div>

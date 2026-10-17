@@ -536,11 +536,11 @@
     },
     "server-version/frontend/src/survey/ResearchCatalog.test.tsx": {
       "before": null,
-      "after": "ec44097575d671535fa0d05b686f0b2f6c45c058"
+      "after": "3e9f3d737b49d6489f5a9466e3b62dfaa76cd1c6"
     },
     "server-version/frontend/src/survey/ResearchCatalog.tsx": {
       "before": null,
-      "after": "fdaf9fe1b56e1e5bcef27bd6ef04399857a3dc9f"
+      "after": "751ce32b5e9d7e40ed8de49301c9f8af4b3b0d40"
     },
     "server-version/frontend/src/survey/ResearchCognitiveEditor.tsx": {
       "before": null,
