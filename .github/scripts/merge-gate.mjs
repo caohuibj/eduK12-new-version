@@ -1,3 +1,4 @@
+import {validReviewedCandidatePlan} from './reviewed-candidate-scope.mjs';
 import { pathToFileURL } from 'node:url';
 import { mediaPlan } from './ci-media-plan.mjs';
 
@@ -10,6 +11,7 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if (scope.application_route === 'reviewed-candidate') return ['scope','reviewed-candidate','codeql'];
   if (scope.application_route === 'survey-candidate') return ['scope','survey-candidate','codeql'];
   if (scope.application_route === 'assessment-capacity') return ['scope',...(!draft?['assessment-capacity','codeql']:[])];
   if (scope.application_route === 'teacher-survey') return ['scope',...(!draft?['teacher-survey','codeql']:[])];
@@ -59,6 +61,16 @@ export function requiredChecks(needs, draft) {
 export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if (scope.application_route === 'reviewed-candidate') {
+    let plan; try { plan = JSON.parse(scope.reviewed_candidate_plan); } catch {}
+    if (draft || !validReviewedCandidatePlan(plan) || scope.scenario !== 'reviewed-candidate'
+        || scope.codeql !== 'true' || scope.frontend_build !== 'false' || scope.ui_required !== 'false'
+        || scope.runner_profile !== 'hosted' || scope.visual_hosted !== 'false'
+        || scope.media_selection !== '[]' || scope.media_groups !== '[]'
+        || ['maintenance','content','presentation','frontend','frontend_test','documentation',...Object.keys(acceptanceJobs)]
+          .some(key => scope[key] !== 'false')) failed.push('scope');
+    return [...new Set(failed)];
+  }
   if(scope.application_route==='survey-candidate'){
     let p;try{p=JSON.parse(scope.survey_candidate_plan)}catch{}
     if(draft||!p||p.schema!==1||p.route!=='survey-candidate'||scope.scenario!=='survey-candidate'||scope.codeql!=='true'
@@ -204,6 +216,17 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     const actual=plan(p.base,p.head);
     if (JSON.stringify(actual) !== JSON.stringify(p)) failed.push('recomputed-plan');
     if (needs.scope.outputs.scenario==='release-tooling' && (actual.route!=='C' || actual.changed.length || !toolingOnly(actual.changes))) failed.push('mixed-or-unknown-tooling');
+  }
+  if (needs.scope?.outputs?.application_route === 'reviewed-candidate') {
+    const {reviewedCandidatePlan} = await import('./reviewed-candidate-scope.mjs');
+    const {changedEntries} = await import('./content-scope.mjs');
+    const {execFileSync} = await import('node:child_process');
+    try {
+      const plan = JSON.parse(needs.scope.outputs.reviewed_candidate_plan);
+      const head = execFileSync('git', ['rev-parse','HEAD'], {encoding:'utf8'}).trim();
+      if (plan.head !== head || JSON.stringify(reviewedCandidatePlan(changedEntries(plan.base, head), plan.base, head)) !== JSON.stringify(plan))
+        failed.push('recomputed-reviewed-candidate-plan');
+    } catch { failed.push('recomputed-reviewed-candidate-plan'); }
   }
   if(needs.scope?.outputs?.application_route==='survey-candidate'){
     const {surveyCandidatePlan}=await import('./survey-candidate-scope.mjs');

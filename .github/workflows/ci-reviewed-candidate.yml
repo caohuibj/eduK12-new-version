@@ -1,0 +1,77 @@
+name: Reviewed candidate admission
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+jobs:
+  verify:
+    name: admitted runtime / ${{ matrix.action }}
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        action: [browser, race]
+    env:
+      CANDIDATE_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      CI_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      GH_TOKEN: ${{ github.token }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      REVIEWED_CANDIDATE_PLAN: reviewed-candidate-plan.json
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: preserve the classified plan without shell interpolation
+        env:
+          PLAN_JSON: ${{ inputs.plan }}
+        run: |
+          python3 -B - <<'PY'
+          import json, os
+          with open(os.environ['REVIEWED_CANDIDATE_PLAN'], 'w') as output:
+              json.dump(json.loads(os.environ['PLAN_JSON']), output)
+          PY
+      - name: verify official receipts and run only the missing runtime probe
+        timeout-minutes: 14
+        env:
+          PROBE_ACTION: ${{ matrix.action }}
+        run: |
+          set -euo pipefail
+          phase="$RUNNER_TEMP/reviewed-candidate-phase"
+          printf '%s\n' 'initializing admission' > "$phase"
+          (sleep 300; printf '::warning::Reviewed candidate %s has exceeded the five-minute diagnosis budget; current step: %s. Do not add unrelated checks.\n' "$PROBE_ACTION" "$(cat "$phase")") &
+          watcher=$!
+          trap 'kill "$watcher" 2>/dev/null || true; wait "$watcher" 2>/dev/null || true' EXIT
+          if [ "$PROBE_ACTION" = browser ]; then
+            printf '%s\n' 'installing the locked official browser tooling' > "$phase"
+            npm ci --ignore-scripts --prefix .github/release-tools
+            printf '%s\n' 'installing official Chromium and its system dependencies' > "$phase"
+            node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
+          fi
+          printf '%s\n' 'authenticating exact source receipts, loading immutable images and running the selected isolated probe' > "$phase"
+          python3 -B .github/scripts/reviewed-candidate-admission.py "$PROBE_ACTION"
+      - name: retain small current-attempt probe evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: reviewed-candidate-${{ github.run_id }}-${{ github.event.pull_request.head.sha }}-${{ matrix.action }}-attempt-${{ github.run_attempt }}
+          path: |
+            reviewed-candidate-evidence/*.json
+            reviewed-candidate-evidence/screenshots/*.png
+          retention-days: 3
+          if-no-files-found: error
