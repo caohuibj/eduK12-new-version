@@ -178,11 +178,9 @@ const requireText=(value:string,path:string,issues:Issue[])=>{
   if(!value.trim())issues.push({path,message:'请填写内容',severity:'error'})
 }
 const err=(issues:Issue[],path:string,message:string)=>issues.push({path,message,severity:'error'})
-export const validateSurveyDraft=(
-  kind:SurveyKind,input:unknown,forPreview=false,
-  // Historical immutable Publications could contain operator pairs accepted
-  // before the v1.1 authoring check. Only their runtime projection opts in.
-  allowLegacyFrozenConditionOperators=false,
+const validateSurveyDraftCore=(
+  kind:SurveyKind,input:unknown,forPreview:boolean,
+  allowLegacyFrozenConditionOperators:boolean,includeDigest:boolean,
 ):{
   definition?:SurveyDraft;issues:Issue[];digest?:string
 }=>{
@@ -376,14 +374,24 @@ export const validateSurveyDraft=(
   const canonical=JSON.parse(JSON.stringify({kind,definition}))
   if(Buffer.byteLength(JSON.stringify(canonical),'utf8')>480000)
     err(issues,'definition','单份研究工具数据体积不能超过 480 KB')
-  return {definition,issues,digest:canonicalHash(canonical)}
+  return includeDigest?{definition,issues,digest:canonicalHash(canonical)}:{definition,issues}
 }
+export const validateSurveyDraft=(
+  kind:SurveyKind,input:unknown,forPreview=false,
+  // Historical immutable Publications could contain operator pairs accepted
+  // before the v1.1 authoring check. Only their runtime projection opts in.
+  allowLegacyFrozenConditionOperators=false,
+):{
+  definition?:SurveyDraft;issues:Issue[];digest?:string
+}=>validateSurveyDraftCore(kind,input,forPreview,allowLegacyFrozenConditionOperators,true)
 export const assertSurveyDraft=(
   kind:SurveyKind,input:unknown,forPreview=false,
   allowLegacyFrozenConditionOperators=false,
 ):SurveyDraft=>{
-  const result=validateSurveyDraft(
-    kind,input,forPreview,allowLegacyFrozenConditionOperators,
+  // Keep normalization and every validation, including the serialized size
+  // budget; assertions do not consume the authoring API's draft digest.
+  const result=validateSurveyDraftCore(
+    kind,input,forPreview,allowLegacyFrozenConditionOperators,false,
   )
   if(!result.definition||result.issues.some(i=>i.severity==='error'))
     throw new SurveyDraftError(result.issues)
