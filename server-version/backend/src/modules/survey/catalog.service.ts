@@ -17,7 +17,7 @@ const view=(r:Grant)=>({id:r.id,title:r.snapshot.title,kind:r.snapshot.ref.kind,
 export async function sourceCatalog(actorUserId:string,input:{kind?:CatalogSourceRef['kind'];organizationId?:string;page:number}){
   await assertCurrentSystemAdmin(prisma,actorUserId)
   const result=await listCatalogSources({actorUserId,...input},prisma)
-  return {page:input.page,pageSize:25,list:result.list}
+  return {...result,pageSize:25}
 }
 async function target(tx:Tx,id:string){
   const rows=await tx.$queryRaw<{id:string}[]>`SELECT u.id FROM users u

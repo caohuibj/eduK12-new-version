@@ -20,6 +20,8 @@ export type CatalogSourceSnapshot={ref:CatalogSourceRef;title:string;displayDefi
   definitionDigest:string;scoringDigest:string|null;answerMapping?:SourceAnswerMapping;
   adapterVersion:typeof CATALOG_ADAPTER_VERSION;provenance:Record<string,unknown>}
 export type CatalogSourceRow={ref:CatalogSourceRef;title:string;available:boolean;unsupportedReason:string|null;definitionDigest?:string}
+const CATALOG_MAX_PAGE=40
+export type CatalogSourcePage={list:CatalogSourceRow[];page:number;hasMore:boolean;terminalReason:'PAGE_LIMIT_REACHED'|'END_OF_CATALOG'|null}
 export class CatalogSourceError extends Error {
   constructor(public readonly code:string,public readonly statusCode=409){super(code);this.name='CatalogSourceError'}
 }
@@ -219,9 +221,10 @@ async function readCatalogSourceSnapshot(input:{actorUserId:string;ref:CatalogSo
   return snapshot(ref,row!.title,definition,definition,definition,null,{organizationId:ref.organizationId,revision:row!.revision,definitionDigest:row!.definitionDigest,createdByUserId:row!.createdByUserId})
 }
 /** Administrative caller owns authorization; omitted kind selects Scale, never a cross-product scan. */
-export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyKind;organizationId?:string;page?:number;limit?:number},db:Database=prisma):Promise<{list:CatalogSourceRow[];page:number;hasMore:boolean}>{
+export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyKind;organizationId?:string;page?:number;limit?:number},db:Database=prisma):Promise<CatalogSourcePage>{
   const kind=input.kind??'SCALE'
-  const limit=Math.min(25,Math.max(1,Math.floor(input.limit||25))),page=Math.min(40,Math.max(1,Math.floor(input.page||1)))
+  const limit=Math.min(25,Math.max(1,Math.floor(input.limit||25))),page=Math.max(1,Math.floor(input.page||1))
+  if(page>CATALOG_MAX_PAGE)throw new CatalogSourceError('SOURCE_CATALOG_PAGE_LIMIT_EXCEEDED',400)
   const offset=(page-1)*limit,take=limit+1,refs:Array<{ref:CatalogSourceRef;title:string}>=[]
   let cached:Database=db
   if(kind==='SCALE'){
@@ -256,7 +259,9 @@ export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyK
     if(!(e instanceof CatalogSourceError)&&!(e instanceof Error&&e.name==='SurveyDraftError'))throw e
     list.push({...item,available:false,unsupportedReason:e instanceof CatalogSourceError?e.code:'SOURCE_SURVEY_DISPLAY_SHAPE_UNSUPPORTED'})
   }}
-  return {list,page,hasMore:refs.length>limit}
+  const moreSources=refs.length>limit
+  return {list,page,hasMore:moreSources&&page<CATALOG_MAX_PAGE,
+    terminalReason:!moreSources?'END_OF_CATALOG':page===CATALOG_MAX_PAGE?'PAGE_LIMIT_REACHED':null}
 }
 
 /** One source-row lock and one bounded source read per family, plus one authority read per distinct Form grantor/organization.

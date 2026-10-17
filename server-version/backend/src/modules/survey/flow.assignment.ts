@@ -36,6 +36,25 @@ export const chooseSurveyGroup=(flow:FrozenSurveyFlow,draw:(max:number)=>number=
   return fail('实验分配无法匹配冻结权重')
 }
 export const assignmentDigest=(value:SurveyFlowAssignment)=>canonicalHash(value)
+/** Reuse frozen group provenance hashes across a bounded analytics request.
+ * Each stored assignment is still checked in full; no cross-request cache. */
+export function prepareSurveyFlowAssignmentValidator(flow:FrozenSurveyFlow){
+  const experiment=flow.experiment
+  const expectedByGroup=new Map((experiment?.groups??[]).map(group=>{
+    const expected=surveyVariantProvenance(flow,group.groupKey)
+    return [group.groupKey,expected?canonicalHash(expected):null] as const
+  }))
+  return (value:SurveyFlowAssignment)=>{
+    if(value.schemaVersion!==1||value.flowDigest!==flow.flowDigest
+      ||value.experimentKey!==(experiment?.experimentKey??null)
+      ||(experiment?(!value.groupKey||!expectedByGroup.has(value.groupKey)):value.groupKey!==null))
+      fail('作答已有的冻结实验分配与当前发布不一致')
+    const expected=value.groupKey?expectedByGroup.get(value.groupKey):null
+    if(expected?(canonicalHash(value.variant??null)!==expected
+      ||value.algorithm!=='CRYPTO_RANDOM_INT_V1'):value.variant!==undefined)
+      fail('问卷子版本分配来源与冻结版本不一致')
+  }
+}
 export function assertSurveyFlowAssignment(flow:FrozenSurveyFlow,value:SurveyFlowAssignment){
   const experiment=flow.experiment
   if(value.schemaVersion!==1||value.flowDigest!==flow.flowDigest

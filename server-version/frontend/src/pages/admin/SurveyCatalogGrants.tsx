@@ -2,15 +2,18 @@ import { useEffect, useState } from 'react'
 import { SourceProvenance, type CatalogApi, type CatalogGrant, type CatalogSourceRef } from '../../survey/ResearchCatalog'
 import type { Kind } from '../../survey/builder.types'
 type Source={ref:CatalogSourceRef;title:string;available:boolean;unsupportedReason?:string;definitionDigest?:string}
+type SourcePage={list:Source[];page:number;hasMore:boolean;terminalReason:'PAGE_LIMIT_REACHED'|'END_OF_CATALOG'|null}
+const emptySourcePage:SourcePage={list:[],page:1,hasMore:false,terminalReason:null}
 export function SurveyCatalogGrants({api,password,researchers}:{api:CatalogApi;password:string;researchers:{id:string;username:string;status:string}[]}){
   const [researcherId,setResearcherId]=useState(''),[kind,setKind]=useState<Kind>('SCALE')
-  const [sources,setSources]=useState<Source[]>([]),[grants,setGrants]=useState<CatalogGrant[]>([]),[page,setPage]=useState(1),[grantPage,setGrantPage]=useState(1)
+  const [sourcePage,setSourcePage]=useState<SourcePage>(emptySourcePage),[grants,setGrants]=useState<CatalogGrant[]>([]),[grantPage,setGrantPage]=useState(1)
+  const {list:sources,page,hasMore,terminalReason}=sourcePage
   const [busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('')
   useEffect(()=>{if(researcherId&&!researchers.some(r=>r.id===researcherId)){setResearcherId('');setGrants([])}},[researchers,researcherId])
   const run=async(task:()=>Promise<void>)=>{setBusy(true);setError('');setNotice('');try{await task()}catch(e){setError(e instanceof Error?e.message:'操作失败')}finally{setBusy(false)}}
   const loadSources=async(next=1)=>{
-    const data=await api<{list:Source[]}>('/source-catalog?kind='+kind+'&page='+next)
-    setSources(data.list);setPage(next)
+    const data=await api<SourcePage>('/source-catalog?kind='+kind+'&page='+next)
+    setSourcePage(data)
   }
   const loadGrants=async(id=researcherId,next=1)=>{const data=await api<{list:CatalogGrant[]}>('/researchers/'+encodeURIComponent(id)+'/tool-grants?page='+next);setGrants(data.list);setGrantPage(next)}
   const grant=async(source:Source)=>{
@@ -25,7 +28,7 @@ export function SurveyCatalogGrants({api,password,researchers}:{api:CatalogApi;p
       <label className="block">授权给研究者<select className="input block w-full" value={researcherId} onChange={e=>{const id=e.target.value;setResearcherId(id);setGrants([]);if(id)void run(()=>loadGrants(id))}}>
         <option value="">从当前研究者列表选择</option>{researchers.filter(r=>r.status!=='REVOKED').map(r=><option value={r.id} key={r.id}>{r.username} · {r.status}</option>)}</select></label>
       <p className="text-xs">下拉列表对应本页研究者；可用下方研究者分页切换。</p>
-      <label className="block">来源类型<select className="input block" value={kind} onChange={e=>{setKind(e.target.value as Kind);setSources([]);setPage(1)}}>
+      <label className="block">来源类型<select className="input block" value={kind} onChange={e=>{setKind(e.target.value as Kind);setSourcePage(emptySourcePage);setError('');setNotice('')}}>
         <option value="SCALE">Scale · 量表</option><option value="SJT">SJT · 情境判断</option><option value="COGNITIVE">Cognitive · 认知任务</option><option value="FORM">Form · 本管理员已发布的普通表单</option></select></label>
       {kind==='FORM'&&<p className="text-sm">仅显示本管理员创建并已发布问卷中的普通表单区段；不包含身份背景字段或其他机构内容。版本以内容摘要冻结。</p>}
       <button type="button" className="btn-secondary" disabled={busy} onClick={()=>void run(()=>loadSources())}>查询可授权版本</button>
@@ -35,7 +38,9 @@ export function SurveyCatalogGrants({api,password,researchers}:{api:CatalogApi;p
         {!source.available&&<p className="text-sm">不可授权：{source.unsupportedReason||'当前来源未提供可安全冻结的版本'}</p>}
         <button type="button" className="btn-primary" disabled={busy||!password||!researcherId||!source.available} onClick={()=>void run(()=>grant(source))}>授权此版本：{source.title}</button>
       </article>)}
-      <div className="flex gap-3 items-center text-sm"><button type="button" className="btn-secondary" disabled={busy||page<=1} onClick={()=>void run(()=>loadSources(page-1))}>来源上一页</button><span>来源第 {page} 页</span><button type="button" className="btn-secondary" disabled={busy||sources.length<25} onClick={()=>void run(()=>loadSources(page+1))}>来源下一页</button></div>
+      <div className="flex gap-3 items-center text-sm"><button type="button" className="btn-secondary" disabled={busy||page<=1} onClick={()=>void run(()=>loadSources(page-1))}>来源上一页</button><span>来源第 {page} 页</span><button type="button" className="btn-secondary" disabled={busy||!hasMore} onClick={()=>void run(()=>loadSources(page+1))}>来源下一页</button></div>
+      {terminalReason==='PAGE_LIMIT_REACHED'&&<p role="status" className="text-sm">已到达来源目录浏览上限：每类最多显示前 1000 个版本，仍有更多版本未显示。</p>}
+      {terminalReason==='END_OF_CATALOG'&&<p role="status" className="text-sm">{sources.length?'已到达来源目录末页。':'当前页没有可授权版本。'}</p>}
       {researcherId&&<div className="space-y-3"><h3 className="font-semibold">该研究者的工具授权</h3>{!grants.length&&<p>暂无版本授权。</p>}{grants.map(item=><article key={item.id} className="border rounded-lg p-3 space-y-2">
         <h4>{item.title} · {item.status}</h4><SourceProvenance source={item.sourceRef} provenance={item.sourceProvenance}/>
         {item.status==='ACTIVE'&&<button type="button" className="btn-secondary" disabled={busy||!password} onClick={()=>{

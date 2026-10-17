@@ -3,7 +3,7 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { protectCsvCell,tableToCsv,surveyAttemptCode } from './analytics.export-format'
 import type { SurveySourceProjection,ResearchRawObservation,ResearchRawCodebook } from './analytics.source'
 
-export type SurveyRawFormat='WAVE'|'RAW_LONG'|'RAW_WIDE'|'ATTENDANCE_COMPACT_V1'
+export type SurveyRawFormat='WAVE'|'RAW_LONG'|'RAW_WIDE'|'ATTENDANCE_COMPACT_V1'|'ATTENDANCE_COMPACT_V2'
 export interface SurveyRawExport {
   csv:string
   codebook:ResearchRawCodebook[]
@@ -74,17 +74,20 @@ export function compactSurveyAttendanceExport(
      source.raw.length||source.scores.length||
      source.attendance.some(row=>row.waveId!==waveId))
     throw new Error('Compact attendance requires scoped non-FINAL linked participation')
-  const columns=['research_code','wave_id','participation_status','missing_reason']
+  const hasVariants=!!source.variantConfigurations?.length||source.attendance.some(row=>row.variant)
+  const columns=['research_code','wave_id','participation_status','missing_reason',...(hasVariants?variantAuditColumns:[])]
   const records=source.attendance.map(row=>[
     row.researchCode,row.waveId,row.status,
     row.status==='QUALITY_EXCLUDED'?'QUALITY_EXCLUDED':'ABANDONED',
+    ...(hasVariants?variantAuditValues(row):[]),
   ])
   const csv=tableToCsv(columns,records,250)
   return {csv,codebook:[],manifest:{
-    schemaVersion:2,format:'ATTENDANCE_COMPACT_V1',projectId,waveIds:[waveId],
+    schemaVersion:2,format:hasVariants?'ATTENDANCE_COMPACT_V2':'ATTENDANCE_COMPACT_V1',projectId,waveIds:[waveId],
     sourceDigest:canonicalHash(records),codebookDigest:canonicalHash([]),
     rowCount:records.length,columnCount:columns.length,cutOff:source.cutOff,
     dataDigest:canonicalHash(csv),formulaGuard:'EXCEL_APOSTROPHE_PREFIX',
+    ...(source.variantConfigurations?.length?{variantConfigurations:source.variantConfigurations}:{}),
   }}
 }
 export function rawLongExport(projectId:string,source:SurveySourceProjection,waveId?:string):SurveyRawExport{
@@ -125,14 +128,15 @@ export function rawLongExport(projectId:string,source:SurveySourceProjection,wav
   if(source.collectionMode==='LINKED_WAVES'){
     const present=new Set(rows.filter(x=>x.researchCode)
       .map(x=>x.researchCode+':'+x.columnKey))
-    const attendance=new Map(source.attendance.map(a=>[a.researchCode+':'+a.waveId,a.status]))
+    const attendance=new Map(source.attendance.map(a=>[a.researchCode+':'+a.waveId,a]))
     const participants=[...new Set(source.attendance.map(a=>a.researchCode))].sort()
     // Reject before allocating millions of synthetic longitudinal cells.
     if(participants.length*dictionary.length+rows.length>25000)
       throw new Error('Long format exceeds 25000 bounded rows; narrow the Wave selection')
     for(const code of participants)for(const variable of dictionary){
       if(present.has(code+':'+variable.columnKey))continue
-      const status=attendance.get(code+':'+variable.waveId)
+      const participation=attendance.get(code+':'+variable.waveId)
+      const status=participation?.status
       if(status==='COMPLETED')continue
       mapped.push([code,variable.waveId,variable.waveOrdinal,variable.publicationVersion,
         variable.instrumentKey,variable.itemKey,variable.columnKey,null,
@@ -140,7 +144,7 @@ export function rawLongExport(projectId:string,source:SurveySourceProjection,wav
         null,null,null,null,null,null,'NON_FINAL',
         ...(hasSjtV2?[variable.motherSceneKey??null,variable.motherSceneKey?variable.itemKey:null,null,'NON_FINAL']:[]),
         ...(hasFlow?[variable.flowDigest??null,null,null,null]:[]),
-        ...(hasVariants?variantAuditValues({}):[]),...(hasSource?[variable.sourceAnswerMapping?.items[variable.itemKey]??null,null,null]:[])])
+        ...(hasVariants?variantAuditValues(participation??{}):[]),...(hasSource?[variable.sourceAnswerMapping?.items[variable.itemKey]??null,null,null]:[])])
     }
   }
   return prepare(projectId,source,waveId?'WAVE':'RAW_LONG',cols,mapped,dictionary)
@@ -159,7 +163,7 @@ export function rawWideExport(projectId:string,source:SurveySourceProjection):Su
     .sort((a,b)=>a.ordinal-b.ordinal||a.waveId.localeCompare(b.waveId))
   const variantWaves=[...new Map((source.variantConfigurations??source.codebook.flatMap(c=>c.variantConfiguration?[c.variantConfiguration]:[])).map(c=>[c.waveId,c])).values()]
   const variantByWave=new Map<string,SurveyVariantAudit>()
-  for(const row of rows)if(row.variant){
+  for(const row of [...source.attendance,...rows])if(row.variant){
     const key=row.researchCode+':'+row.waveId,old=variantByWave.get(key)
     if(old&&JSON.stringify(variantAuditValues(old))!==JSON.stringify(variantAuditValues(row)))
       throw new Error('Conflicting variant assignment within one participant Wave')

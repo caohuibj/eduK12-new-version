@@ -26,6 +26,7 @@ const ticket={id:ticketId,status:'READY',format:'RAW_WAVE',
 }
 type Request={url:string;method:string;body:Record<string,unknown>|undefined}
 type Download={filename:string;url:string;attached:boolean}
+let responseTicket:typeof ticket
 let requests:Request[]
 let blobs:Blob[]
 let downloads:Download[]
@@ -39,7 +40,7 @@ const readBytes=(blob:Blob)=>new Promise<Uint8Array>((resolve,reject)=>{
 })
 
 beforeEach(()=>{
-  requests=[];blobs=[];downloads=[]
+  requests=[];blobs=[];downloads=[];responseTicket=structuredClone(ticket)
   // Keep the real DOM Blob and FileReader; only the browser's URL/download
   // boundary is mocked so the test can inspect actual encoded file contents.
   vi.stubGlobal('URL',class extends URL {
@@ -65,7 +66,7 @@ beforeEach(()=>{
     })
     if(url===base+'/analytics/quality/attempts?page=1'&&method==='GET')return response({list:[]})
     if(url===base+'/analytics/waves/'+waveId+'/items')return response({waveId,items:[],note:'仅为描述',completedFinals:3,fullCompletionAttempts:2,earlyCompletionAttempts:1,descriptiveScores:[{instrumentKey:'cog',scoreKey:'goMedianRtMs',validN:2,mean:320,sampleSd:20,unit:'ms',qualityCounts:{interpretable:1,limited:1},completionCounts:{COMPLETE:2},provenance:{kind:'COGNITIVE',measurementDigest:'digest-frozen',scoringVersion:'1.0.0',engineVersion:'1.0.0',timingPolicy:'software-frame-v1'}}]})
-    if(url===base+'/exports'&&method==='POST')return response(ticket)
+    if(url===base+'/exports'&&method==='POST')return response(responseTicket)
     if(url===base+'/exports/'+ticketId+'/download'&&method==='GET')return response(artifact)
     throw new Error('Unexpected request '+method+' '+url)
   }))
@@ -78,6 +79,21 @@ afterEach(()=>{
 })
 
 describe('Survey analytics artifact downloads',()=>{
+  it.each(['ATTENDANCE_COMPACT_V1','ATTENDANCE_COMPACT_V2'])('labels and downloads %s as a separate attendance relation',async representation=>{
+    responseTicket={...ticket,manifest:{...ticket.manifest,batch:{phase:'NON_FINAL_PARTICIPATION',representation}}} as typeof ticket
+    artifact={id:ticketId,format:'RAW_WAVE',csv:'"research_code","wave_id","variant_key"\r\n"R-1","wave-01","a"\r\n',
+      codebook:[],manifest:responseTicket.manifest}
+    render(<SurveyAnalyticsWorkspace projectId={projectId}/>)
+    fireEvent.click(await screen.findByRole('button',{name:'创建受控导出'}))
+    expect(await screen.findByText(/已生成紧凑参与状态表/)).toBeInTheDocument()
+    expect(screen.getByText(/本批为独立参与状态表/)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button',{name:'下载当前批次 CSV、Codebook 与 Manifest'}))
+    await screen.findByText(/已下载参与状态 CSV 和 Manifest/)
+    expect(downloads[0].filename).toBe('survey_abcdef01_raw_wave_batch007_attendance_export01.csv')
+    const bytes=await readBytes(blobs[0])
+    expect([...bytes.slice(3)]).toEqual([...new TextEncoder().encode(artifact.csv)])
+  })
+
   it('renders server units, version identity, quality and full/early completion counts',async()=>{
     render(<SurveyAnalyticsWorkspace projectId={projectId}/>)
     fireEvent.click(await screen.findByRole('button',{name:'查看此波次题目频数与探索性得分'}))

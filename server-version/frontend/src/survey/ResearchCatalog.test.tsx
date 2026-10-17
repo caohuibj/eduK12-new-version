@@ -19,7 +19,7 @@ describe('original source catalog grants',()=>{
     expect(onImport).toHaveBeenCalledWith(grant)
   })
   it('looks up only administrator-owned published Form sections without requesting institution access',async()=>{
-    const api=vi.fn(async()=>({list:[]}))
+    const api=vi.fn(async()=>({list:[],page:1,hasMore:false,terminalReason:'END_OF_CATALOG'}))
     render(<SurveyCatalogGrants api={api as CatalogApi} password="test-password" researchers={[]}/>)
     fireEvent.change(screen.getByLabelText('来源类型'),{target:{value:'FORM'}})
     expect(screen.getByRole('button',{name:'查询可授权版本'})).toBeEnabled()
@@ -30,7 +30,7 @@ describe('original source catalog grants',()=>{
   })
   it('grants an exact source version and confirms revocation consequences',async()=>{
     const api=vi.fn(async(path:string)=>path.startsWith('/source-catalog')
-      ?{list:[{ref:source,title:'授权量表',available:true}]}:{list:[grant]})
+      ?{list:[{ref:source,title:'授权量表',available:true}],page:1,hasMore:false,terminalReason:'END_OF_CATALOG'}:{list:[grant]})
     vi.stubGlobal('confirm',vi.fn(()=>true))
     render(<SurveyCatalogGrants api={api as CatalogApi} password="test-password" researchers={[{id:'r1',username:'researcher',status:'ACTIVE'}]}/>)
     fireEvent.change(screen.getByLabelText('授权给研究者'),{target:{value:'r1'}})

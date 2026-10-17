@@ -38,6 +38,8 @@ type Ticket={id:string;status:'READY';format:ExportFormat;expiresAt:string;
   nextCursor:string|null;pageNumber:number|null;
   manifest:{rowCount:number;columnCount:number;
     batch?:{phase?:'VERIFIED_FINAL'|'NON_FINAL_PARTICIPATION';representation?:string}}}
+const isCompactAttendance=(ticket:Ticket)=>['ATTENDANCE_COMPACT_V1','ATTENDANCE_COMPACT_V2']
+  .includes(ticket.manifest.batch?.representation??'')
 type Artifact={id:string;format:ExportFormat;csv:string;codebook:unknown;manifest:unknown}
 const kindOptions:Record<ExportFormat,string>={
   RAW_WAVE:'单波次逐题原始数据',
@@ -209,7 +211,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
       ...(cursor?{cursor}:{}),
     })
     setTicket(result);setBatchDownloaded(false)
-    setMessage(result.manifest.batch?.representation==='ATTENDANCE_COMPACT_V1'
+    setMessage(isCompactAttendance(result)
       ?'已生成紧凑参与状态表；每人每波次一行。按研究编号及波次关联 FINAL CSV，切勿直接拼接两种 CSV。'
       :'第 '+(result.pageNumber||1)+' 批有效 FINAL 已生成；逐批下载并保留 Manifest。')
   })
@@ -217,13 +219,13 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
     const artifact=await api<Artifact>(base+'/exports/'+ticket.id+'/download')
     const batchLabel=String(ticket.pageNumber??1).padStart(3,'0')
     const baseName='survey_'+projectId.slice(0,8)+'_'+artifact.format.toLowerCase()
-      +'_batch'+batchLabel+(ticket.manifest.batch?.representation==='ATTENDANCE_COMPACT_V1'
+      +'_batch'+batchLabel+(isCompactAttendance(ticket)
         ?'_attendance':'')+'_'+ticket.id.slice(0,8)
     downloadBlob(baseName+'.csv','\uFEFF'+artifact.csv,'text/csv;charset=utf-8')
     downloadBlob(baseName+'_codebook.json',JSON.stringify(artifact.codebook,null,2),'application/json;charset=utf-8')
     downloadBlob(baseName+'_manifest.json',JSON.stringify(artifact.manifest,null,2),'application/json;charset=utf-8')
     setBatchDownloaded(true)
-    setMessage(ticket.manifest.batch?.representation==='ATTENDANCE_COMPACT_V1'
+    setMessage(isCompactAttendance(ticket)
       ?'已下载参与状态 CSV 和 Manifest；按状态表 research_code / wave_id 对应 FINAL 的 research_code_or_attempt / wave_id 关联，不能直接拼接行。'
       :'已下载当前批次 CSV、变量编码字典和 Manifest，请保管敏感数据。')
   })}
@@ -483,7 +485,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
           <p className="text-sm">导出 {ticket.format} · 第 {ticket.pageNumber||1} 批 · {ticket.manifest.rowCount} 行 ·
             {ticket.manifest.columnCount} 列</p>
           <p className="text-xs">到期：{new Date(ticket.expiresAt).toLocaleString('zh-CN')}</p>
-          {ticket.manifest.batch?.representation==='ATTENDANCE_COMPACT_V1'&&
+          {isCompactAttendance(ticket)&&
             <p className="text-xs text-amber-800">本批为独立参与状态表，不是逐题答案；请保留 Manifest 的关联说明。</p>}
           <button type="button" className="btn-secondary" disabled={busy} onClick={download}>
             下载当前批次 CSV、Codebook 与 Manifest</button>

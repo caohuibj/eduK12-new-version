@@ -162,7 +162,7 @@ function finalArtifact(format:'LONG'|'WIDE',projectId:string,cols:string[],rows:
   }}
 }
 export function exportLong(projectId:string,observations:readonly FrozenScoreObservation[],
-  attendance:readonly {researchCode:string;waveId:string;status:string}[]=[],
+  attendance:readonly ({researchCode:string;waveId:string;status:string}&SurveyVariantAudit)[]=[],
   expectedColumns:readonly FrozenScoreColumn[]=[]):BoundedResearchExport{
   const source=sourceRows(projectId,observations)
   if(expectedColumns.some(column=>column.projectId!==projectId))
@@ -196,11 +196,12 @@ export function exportLong(projectId:string,observations:readonly FrozenScoreObs
     throw new Error('Score Long exceeds 10000 bounded rows; narrow the Wave selection')
   const present=new Set(decorated.rows.filter(({o})=>o.researchCode)
     .map(({o,column})=>o.researchCode+':'+column))
-  const participation=new Map(attendance.map(a=>[a.researchCode+':'+a.waveId,a.status]))
+  const participation=new Map(attendance.map(a=>[a.researchCode+':'+a.waveId,a]))
   for(const code of new Set(attendance.map(a=>a.researchCode))){
     for(const {o:expected,column} of decorated.expected){
       if(present.has(code+':'+column))continue
-      const status=participation.get(code+':'+expected.waveId)
+      const attended=participation.get(code+':'+expected.waveId)
+      const status=attended?.status
       if(status==='COMPLETED')continue
       data.push([code,expected.waveId,expected.waveOrdinal,null,
         column,expected.measurement.instrumentKey,expected.measurement.scoreKey,
@@ -214,7 +215,7 @@ export function exportLong(projectId:string,observations:readonly FrozenScoreObs
           expected.measurement.provenance?.engineVersion??null,
           expected.measurement.provenance?.timingPolicy??null,
           expected.measurement.provenance?.devicePolicy??null,
-          expected.measurement.provenance?.scoringMethod??null,'NON_FINAL',null]:[]),...(variants?variantAuditValues({}):[])])
+          expected.measurement.provenance?.scoringMethod??null,'NON_FINAL',null]:[]),...(variants?variantAuditValues(attended??{}):[])])
     }
   }
   return finalArtifact('LONG',projectId,columns,data,source,decorated.codebook)
@@ -222,7 +223,7 @@ export function exportLong(projectId:string,observations:readonly FrozenScoreObs
 /** WIDE is legitimate ONLY in LINKED_WAVES. Rows with no stable researchCode
  * are rejected rather than synthesizing a false shared identity. */
 export function exportWide(projectId:string,observations:readonly FrozenScoreObservation[],
-  attendance:readonly {researchCode:string;waveId:string;status:string}[]=[],
+  attendance:readonly ({researchCode:string;waveId:string;status:string}&SurveyVariantAudit)[]=[],
   expectedColumns:readonly FrozenScoreColumn[]=[]):BoundedResearchExport{
   const source=sourceRows(projectId,observations)
   if(source.some(o=>!o.researchCode))
@@ -235,7 +236,7 @@ export function exportWide(projectId:string,observations:readonly FrozenScoreObs
   const codebook=decorated.codebook.sort((a,b)=>a.ordinal-b.ordinal||a.column.localeCompare(b.column))
   const variantWaves=[...new Map(codebook.flatMap(c=>c.variantConfiguration?[[c.waveId,{waveId:c.waveId,ordinal:c.ordinal}] as const]:[])).values()]
   const byVariant=new Map<string,SurveyVariantAudit>()
-  for(const row of source)if(row.variant){
+  for(const row of [...attendance,...source])if(row.variant){
     const key=row.researchCode+':'+row.waveId,old=byVariant.get(key)
     if(old&&JSON.stringify(variantAuditValues(old))!==JSON.stringify(variantAuditValues(row)))
       throw new Error('Conflicting variant assignment within one participant Wave')

@@ -241,7 +241,7 @@ export async function createSurveyExport(req:Request,input:{
           :'COMPLETED_FINAL_NOT_WITHDRAWN_AND_NOT_QUALITY_EXCLUDED',
         batch:{pageNumber,hasNext:!!nextCursor,
           phase:attendanceOnly?'NON_FINAL_PARTICIPATION':'VERIFIED_FINAL',
-          representation:attendanceOnly?(compact?'ATTENDANCE_COMPACT_V1':'LEGACY_EXPANDED_ATTENDANCE_V3')
+          representation:attendanceOnly?(compact?artifact.manifest.format:'LEGACY_EXPANDED_ATTENDANCE_V3')
             :cognitive?'FINAL_BOUND_CHILD_TRIAL_ROWS':'FINAL_ITEM_OR_SCORE_ROWS',
           ...(cognitive?{parentFinalContinued:!!prior?.trial,withinFinalHasNext:!!withinFinal,
             parentFinalHash:sources.cognitivePage?.sourceFinalHash??null}:{}),

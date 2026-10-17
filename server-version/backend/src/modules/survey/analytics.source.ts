@@ -5,7 +5,7 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import type { ResearchFrozenPublication, ResearchFrozenUnit } from './publication.service'
 import type { SurveyComputedFinal, FrozenUnitResult, AnswerPrimitive } from './final.compute'
-import {assertSurveyFlowAssignment,type SurveyFlowAssignment } from './flow.assignment'
+import {prepareSurveyFlowAssignmentValidator,type SurveyFlowAssignment } from './flow.assignment'
 import type { FrozenScoreObservation, MissingReason } from './analytics.cohorts'
 import type { FormDraft, ScaleDraft, AnySjtDraft } from './builder.definition'
 import {surveySjtQuestionEntries} from './sjt-structure'
@@ -81,7 +81,7 @@ export interface SurveySourceProjection {
   scoreColumns:Pick<FrozenScoreObservation,'projectId'|'waveId'|'waveOrdinal'|'measurement'>[]
   raw:ResearchRawObservation[]
   codebook:ResearchRawCodebook[]
-  attendance:{researchCode:string;waveId:string;status:string}[]
+  attendance:({researchCode:string;waveId:string;status:string}&SurveyVariantAudit)[]
   cognitiveTrials?:CognitiveTrialObservation[]
   cognitivePage?:{finalId:string;sourceFinalHash:string;offset:number;nextOffset:number|null;estimatedBytes:number}
 }
@@ -561,9 +561,21 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
     }):[]
     if(frozenWaves.length>100)
       throw new SurveyAnalyticsError(413,'本次宽表波次数量超出安全上限')
+    // Compact attendance still needs the exact frozen allocation, but not the
+    // item/score matrix. Reuse schema headers whenever they are already loaded.
+    const needsAttendance=project.collectionMode==='LINKED_WAVES'&&
+      (input.attendanceOnly||input.includeAttendance!==false)
+    const attendanceWaves=!needsAttendance?[]:input.includeWideSchema?frozenWaves:
+      await tx.surveyWave.findMany({where:{projectId:input.projectId,
+        ...(input.waveIds?.length?{id:{in:input.waveIds}}:{}),
+        status:{in:['OPEN','PAUSED','CLOSED']},publicationId:{not:null}},
+        select:{id:true,ordinal:true,publicationId:true},orderBy:{ordinal:'asc'},take:101})
+    if(attendanceWaves.length>100)
+      throw new SurveyAnalyticsError(413,'本次参与状态波次数量超出安全上限')
     const publicationIds=[...new Set([
       ...selectedHeaders.map(row=>row.publicationId),
       ...frozenWaves.flatMap(w=>w.publicationId?[w.publicationId]:[]),
+      ...attendanceWaves.flatMap(w=>w.publicationId?[w.publicationId]:[]),
     ])]
     // Both byte budgets apply before loading any potentially large JSON or
     // encrypted FINAL. The Publication budget counts each frozen id once.
@@ -591,13 +603,13 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
     const publicationById=new Map(publications.map(row=>[row.id,row]))
     // A linked participant may have STARTED but not FINAL at T2. Preserve
     // that distinction from NO_WAVE without decrypting incomplete answers.
-    const attendanceRows=input.includeAttendance===false||input.attendanceOnly?[]:await tx.surveyWaveAttempt.findMany({
+    const attendanceRows=!needsAttendance||input.attendanceOnly?[]:await tx.surveyWaveAttempt.findMany({
       where:{
         projectId:input.projectId,
         ...(input.waveIds?.length?{waveId:{in:input.waveIds}}:{}),
-        participantId:{not:null},
+        participantId:{not:null},startedAt:{lt:cutOff},
       },
-      select:{waveId:true,status:true,excludedAt:true,
+      select:{id:true,waveId:true,status:true,excludedAt:true,
         sampleReview:{select:{verdict:true}},
         participant:{select:{researchCode:true,status:true}}},
       orderBy: { id: 'asc' }, take:5001,
@@ -637,6 +649,30 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
         })
       }
     }
+    // Read no assignment TEXT on legacy publications. For variant attendance,
+    // budget ciphertext before one bulk fetch, never a per-attempt lookup.
+    const variantWaveIds=new Set(attendanceWaves.filter(w=>
+      (publicationById.get(w.publicationId!)?.compiledSnapshot as unknown as ResearchFrozenPublication)
+        ?.flow?.experiment?.mode==='QUESTIONNAIRE_VARIANTS').map(w=>w.id))
+    const assignmentIds=[...new Set([
+      ...attendanceRows.filter(row=>row.excludedAt===null&&row.participant?.status!=='WITHDRAWN'&&
+        (row.status!=='COMPLETED'||row.sampleReview?.verdict==='EXCLUDED')),
+      ...attendanceSlice,
+    ].filter(row=>variantWaveIds.has(row.waveId)).map(row=>row.id))]
+    if(attendanceRows.length>5000)
+      throw new SurveyAnalyticsError(413,'研究进度数据超出单次读取上限，请缩小波次范围')
+    if(assignmentIds.length){
+      const bytes=(await tx.$queryRaw<Array<{bytes:bigint}>>`
+        SELECT COALESCE(SUM(octet_length(flow_assignment_cipher)),0)::bigint AS "bytes"
+        FROM survey_wave_attempts WHERE id IN (${Prisma.join(assignmentIds)})
+      `)[0]?.bytes??0n
+      if(bytes>BigInt(8*1024*1024))
+        throw new SurveyAnalyticsError(413,'参与状态分配审计超过单次内存预算，请缩小波次')
+    }
+    const attendanceAssignments=assignmentIds.length?await tx.surveyWaveAttempt.findMany({
+      where:{projectId:input.projectId,id:{in:assignmentIds}},
+      select:{id:true,waveId:true,flowAssignmentCipher:true},orderBy:{id:'asc'},take:5001,
+    }):[]
     return {
       signature: () => canonicalHash(JSON.parse(JSON.stringify({ project: { collectionMode: project.collectionMode, sourceRevision: project.sourceRevision },
         cutOff: cutOff.toISOString(), headers: selectedHeaders, frozenWaves,
@@ -647,7 +683,7 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
             startedAt: final.attempt.startedAt, flowAssignmentCipher: final.attempt.flowAssignmentCipher,
             participant: final.attempt.participant ? { status: final.attempt.participant.status, researchCode: final.attempt.participant.researchCode } : null } })),
         publications,
-        attendanceRows, attendanceSlice, sourceFinalCount, sourceAttendanceCount }))),
+        attendanceRows, attendanceSlice, attendanceWaves, attendanceAssignments, sourceFinalCount, sourceAttendanceCount }))),
       compute: async (): Promise<SurveySourceProjection> => {
     // Validate each immutable Publication once per RepeatableRead snapshot.
     // Never reserialize its entire frozen JSON for every participant FINAL.
@@ -664,9 +700,36 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
     }
     if(attendanceRows.length>5000)
       throw new SurveyAnalyticsError(413,'研究进度数据超出单次读取上限，请缩小波次范围')
+    const assignmentValidators=new Map([...verifiedSnapshots].flatMap(([id,snapshot])=>snapshot.flow
+      ?[[id,prepareSurveyFlowAssignmentValidator(snapshot.flow)] as const]:[]))
+    for(const wave of attendanceWaves){
+      if(!wave.publicationId||verifiedSnapshots.get(wave.publicationId)?.waveId!==wave.id)
+        invalid('参与状态的冻结波次来源不可核验')
+    }
+    const attendanceWaveById=new Map(attendanceWaves.map(w=>[w.id,w]))
+    const attendanceAssignmentById=new Map(attendanceAssignments.map(row=>[row.id,row]))
+    const attendanceAudit=(row:{id:string;waveId:string}):SurveyVariantAudit=>{
+      if(!variantWaveIds.has(row.waveId))return {}
+      const wave=attendanceWaveById.get(row.waveId)
+      const snapshot=wave?.publicationId?verifiedSnapshots.get(wave.publicationId):undefined
+      const stored=attendanceAssignmentById.get(row.id)
+      if(!snapshot||snapshot.waveId!==row.waveId||!snapshot.flow||
+        !stored||stored.waveId!==row.waveId||!stored.flowAssignmentCipher)
+        invalid('参与状态的冻结问卷分配来源不可核验')
+      let assigned:SurveyFlowAssignment
+      try{
+        assigned=decryptUnifiedRuntimePayload<SurveyFlowAssignment>(stored.flowAssignmentCipher)
+        assignmentValidators.get(wave!.publicationId!)!(assigned)
+      }catch{invalid('参与状态的冻结问卷分配来源不可核验')}
+      if(!assigned.variant||!Number.isFinite(Date.parse(assigned.assignedAt)))
+        invalid('参与状态的冻结问卷分配时间不可核验')
+      return {variant:assigned.variant,assignmentAlgorithm:assigned.algorithm,
+        assignmentDigest:canonicalHash(assigned),assignedAt:assigned.assignedAt}
+    }
     let attendance:SurveySourceProjection['attendance']=attendanceRows.filter(row=>
       row.participant?.status!=='WITHDRAWN'&&row.excludedAt===null)
-      .map(row=>({researchCode:row.participant!.researchCode,waveId:row.waveId,status:row.sampleReview?.verdict==='EXCLUDED'?'QUALITY_EXCLUDED':row.status}))
+      .map(row=>({researchCode:row.participant!.researchCode,waveId:row.waveId,status:row.sampleReview?.verdict==='EXCLUDED'?'QUALITY_EXCLUDED':row.status,
+        ...(row.status!=='COMPLETED'||row.sampleReview?.verdict==='EXCLUDED'?attendanceAudit(row):{})}))
     // Row projection remains bounded independently from the ciphertext budget.
     const variantConfigurations=[...verifiedSnapshots.values()].flatMap(snapshot=>{
       const config=frozenVariantConfiguration(snapshot.flow,snapshot.waveId);return config?[config]:[]
@@ -757,7 +820,7 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
       const pageSize = input.includeWideSchema ? Math.max(1, Math.min(250, Math.floor(6000 / variableCount))) : 250
       const selected = attendanceSlice.slice(0, pageSize)
       attendance = selected.map(row => ({ researchCode: row.participant!.researchCode, waveId: row.waveId,
-        status: row.sampleReview?.verdict === 'EXCLUDED' ? 'QUALITY_EXCLUDED' : row.status }))
+        status: row.sampleReview?.verdict === 'EXCLUDED' ? 'QUALITY_EXCLUDED' : row.status,...attendanceAudit(row) }))
       nextAttendanceCursor = attendanceSlice.length > pageSize ? selected.at(-1)!.id : null
     }
     const prepareFinal=async(final:(typeof finals)[number])=>{
@@ -785,17 +848,18 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
           ||trace.clientPresentation!=='VERIFIED_SUBMISSION'||!attempt.flowAssignmentCipher)
           invalid('研究 Flow 来源及展示审计不可核验')
         const assigned=decryptUnifiedRuntimePayload<SurveyFlowAssignment>(attempt.flowAssignmentCipher)
-        try{assertSurveyFlowAssignment(snapshot.flow,assigned)}catch{invalid('研究问卷子版本分配来源不可核验')}
+        try{assignmentValidators.get(publication.id)!(assigned)}catch{invalid('研究问卷子版本分配来源不可核验')}
+        const assignedDigest=canonicalHash(assigned)
         if(assigned.variant){
           if(canonicalHash(trace.variant??null)!==canonicalHash(assigned.variant)
             ||trace.assignedAt!==assigned.assignedAt||trace.algorithm!==assigned.algorithm
             ||!Number.isFinite(Date.parse(assigned.assignedAt)))
             invalid('研究问卷子版本执行轨迹与分配来源不一致')
           variantAudit={variant:assigned.variant,assignmentAlgorithm:assigned.algorithm,
-            assignmentDigest:canonicalHash(assigned),assignedAt:assigned.assignedAt}
+            assignmentDigest:assignedDigest,assignedAt:assigned.assignedAt}
         }else if(trace.variant)invalid('普通流程不允许伪造问卷子版本来源')
         if(assigned.flowDigest!==snapshot.flow.flowDigest||
-          trace.assignmentDigest!==canonicalHash(assigned)||
+          trace.assignmentDigest!==assignedDigest||
           trace.groupKey!==assigned.groupKey||trace.experimentKey!==assigned.experimentKey)
           invalid('研究流程实际执行轨迹与 Attempt 分组不一致')
       }else if(result.executionTrace)invalid('旧版 FINAL 不允许伪造 Flow 审计数据')
@@ -877,7 +941,7 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
             const child=childrenBySlot.get(frozen.instrumentKey)
             if(!child)invalid('研究 FINAL 的认知子结果来源缺失')
             const projection=cognitiveProjectionFor(frozen)
-            const childScores=projection.scoresFromChild(unit,child,cognitiveMeta).map(score=>({...score,measurement:{...score.measurement,
+            const childScores=projection.scoresFromChild(unit,child,cognitiveMeta).map(score=>({...score,measurement:{...score.measurement,...frozenSourceMetadata(frozen),
               ...(variantConfigByWave.get(wave.id)?{variantConfiguration:variantConfigByWave.get(wave.id)}:{})}}))
             if(input.selectScore!==false&&(!input.selectScore||frozen.instrumentKey===input.selectScore.instrumentKey))
               scores.push(...childScores.filter(score=>!input.selectScore||score.measurement.scoreKey===input.selectScore.scoreKey))
