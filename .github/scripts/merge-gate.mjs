@@ -99,7 +99,7 @@ export function failedChecks(needs, draft) {
   }
   if (scope.application_route === 'shared-asset-storage') {
     let p;try{p=JSON.parse(scope.shared_asset_storage_plan);}catch{}
-    if(!p||p.schema!==1||p.route!=='shared-asset-storage'
+    if(draft||!p||p.schema!==1||p.route!=='shared-asset-storage'
       ||scope.scenario!=='shared-asset-storage'||scope.codeql!=='true'
       ||scope.frontend_build!=='false'||scope.ui_required!=='false'
       ||scope.media_selection!=='[]'||scope.media_groups!=='[]'
