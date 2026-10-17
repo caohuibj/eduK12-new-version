@@ -109,3 +109,30 @@ class ReferenceProjection(unittest.TestCase):
   script="import fs from 'node:fs';import assert from 'node:assert/strict';import {referenceIndex,addAsset,addReferenceRow} from "+json.dumps(module)+";const input=JSON.parse(fs.readFileSync(0,'utf8'));function check(rows){const e={source:{provider:'cos',key:'assets/a'},sha256:'a'.repeat(64),bytes:1,blob:'attachments/v1/blob',versionId:'v1'};const i=referenceIndex({scope:'attachment_inventory_only',complete:true,entries:[e]});addAsset(i,{id:'asset-1',provider:'cos',object_key:'assets/a',sha256:e.sha256,size_bytes:1});for(const row of rows)addReferenceRow(i,row.table,row.data,{cos:['fixture.cos.test'],site:[]});return {rows:i.rows,references:i.references,externalUrls:i.externalUrls,needed:[...i.needed.keys()]};}assert.deepEqual(check(input.before),check(input.after));"
   result=subprocess.run(['node','--input-type=module','-e',script],input=json.dumps({'before':records,'after':r.compact_reference_text(records)}),text=True,capture_output=True)
   self.assertEqual(result.returncode,0,result.stderr)
+
+class CompletedBindings(unittest.TestCase):
+ def test_authenticated_completed_work_reuses_same_verifier_and_key_only(self):
+  import hmac
+  class Backup:
+   def canonical(self,v):return json.dumps(v,sort_keys=True,separators=(',',':')).encode()
+   def sha(self,p):return 'verifier-1'
+   def private_read(self,p):return p.read_text()
+   def seal(self,v,s):return {'payload':v,'hmac':hmac.new(s.encode(),self.canonical(v),'sha256').hexdigest()}
+   def unseal(self,v,s):
+    if not hmac.compare_digest(v['hmac'],self.seal(v['payload'],s)['hmac']):raise RuntimeError('HMAC_INVALID')
+    return v['payload']
+   def atomic(self,p,v):p.write_text(json.dumps(v));p.chmod(0o600)
+  with tempfile.TemporaryDirectory() as d,patch.object(r,'ROOT',Path(d)),patch.object(r,'CODE',Path(d)):
+   b=Backup();point='a'*32;binding={'hostPointId':point,'databaseRestoredAt':'2026-01-01T00:00:00+00:00'};repo={'identity':{'keyId':'key-1'},'points':[{'id':point}],'previousProof':None}
+   r.save_completed(b,repo,binding,'synthetic-secret');file=Path(d)/'completed-bindings'/(point+'.json')
+   self.assertEqual(file.stat().st_mode&0o777,0o600);self.assertTrue(r.load_completed(b,repo,'synthetic-secret'))
+   self.assertEqual(repo['previousProof']['bindings'],[binding]);self.assertEqual(repo['previousProof']['bindings'][0]['databaseRestoredAt'],binding['databaseRestoredAt'])
+   changed={**repo,'identity':{'keyId':'other-key'},'previousProof':None};self.assertFalse(r.load_completed(b,changed,'synthetic-secret'))
+   with patch.object(b,'sha',return_value='changed-verifier'):self.assertFalse(r.load_completed(b,{**repo,'previousProof':None},'synthetic-secret'))
+   damaged=json.loads(file.read_text());damaged['payload']['binding']['hostPointId']='b'*32;file.write_text(json.dumps(damaged))
+   with self.assertRaisesRegex(RuntimeError,'HMAC_INVALID'):r.load_completed(b,{**repo,'previousProof':None},'synthetic-secret')
+ def test_unfinished_checkpoint_cannot_satisfy_unchanged_js_verifier(self):
+  import subprocess
+  module=Path(__file__).with_name('recovery.mjs').as_uri()
+  script="import assert from 'node:assert/strict';import {cachedBinding} from "+json.dumps(module)+";const identity={keyId:'key-1'},p={id:'a',objects:[{versionId:'db-v1',sha256:'db-hash'}]},s={id:'snapshot-1',remote:{versionId:'s-v1',encryptedSha256:'s-hash'}},b={hostPointId:'a',databaseVersionId:'db-v1',databaseSha256:'db-hash',attachmentSnapshotId:s.id,snapshotVersionId:'s-v1',snapshotSha256:'s-hash',databaseRestoredAt:'2026-01-01T00:00:00+00:00',verifiedBlobIds:[],verifiedBlobHashes:{}};const proof={schema:1,status:'VERIFIED',identity,referenceVerifierSha256:'verifier-1',checks:{databaseRestore:true,attachmentDecrypt:true,databaseReferences:true},bindings:[b]};assert.equal(cachedBinding(proof,p,[s],[],identity,'verifier-1'),null);b.databaseRestore={status:'PASS',network:'none',failedMigrations:0,appliedMigrations:1};assert.ok(cachedBinding(proof,p,[s],[],identity,'verifier-1'));assert.equal(cachedBinding(proof,{...p,objects:[{...p.objects[0],versionId:'changed'}]},[s],[],identity,'verifier-1'),null);"
+  result=subprocess.run(['node','--input-type=module','-e',script],capture_output=True,text=True);self.assertEqual(result.returncode,0,result.stderr)
