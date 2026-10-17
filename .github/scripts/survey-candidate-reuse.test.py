@@ -131,12 +131,39 @@ class ReceiptTests(unittest.TestCase):
         bad = dict(after); bad['server-version/backend/unchanged.ts'] = ('100644', 'blob', 'd' * 40)
         with self.assertRaises(r.ReuseRejected): r.validate_repair_transition(before, bad, 'f' * 40, reviewed)
 
-    def test_repair_scope_tap_requires_exact_three_current_consumers(self):
+    def test_repair_scope_tap_requires_exact_named_contracts_and_complete_counts(self):
         names = list(r.SCOPE_REPAIR_TESTS)
-        output = '\n'.join('ok ' + str(n + 1) + ' - ' + name for n, name in enumerate(names)) + '\n# pass 3\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n'
+        output = 'TAP version 13\n' + '\n'.join('ok ' + str(n + 1) + ' - ' + name for n, name in enumerate(names)) + '\n1..3\n# tests 3\n# suites 0\n# pass 3\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 70.894038\n'
         self.assertTrue(r.validate_scope_repair_tap(output, names))
-        for bad in [output.replace('# pass 3', '# pass 2'), output.replace('ok 1 - ' + names[0], 'ok 1 - ' + names[0] + ' # SKIP'), output.replace('# skipped 0', '# skipped 1')]:
-            with self.assertRaises(r.ReuseRejected): r.validate_scope_repair_tap(bad, names)
+        self.assertEqual(r.parse_scope_repair_tap(output, names), {'namedTests': names, 'emptyFileWrappers': [], 'tapTests': 3})
+        for bad in [output.replace('# pass 3', '# pass 2'), output.replace('# tests 3', '# tests 4'), output.replace('# suites 0', '# suites 1'), output.replace('1..3', '1..4'), output.replace('TAP version 13\n', ''), output.replace('ok 2 - ' + names[1], 'ok 2 - ' + names[0]), output.replace('ok 2 - ', 'ok 3 - '), output.replace('ok 1 - ', 'not ok 1 - '), output.replace('ok 1 - ' + names[0], 'ok 1 - ' + names[0] + ' # SKIP'), output.replace('ok 1 - ' + names[0], 'ok 1 - ' + names[0] + ' # TODO'), output.replace('# skipped 0', '# skipped 1'), output.replace('# cancelled 0', '# cancelled 1'), output.replace('# todo 0', '# todo 1'), output.replace('# fail 0', '# fail 1'), output.replace('# todo 0\n', ''), output.replace('# fail 0', '# fail 0\n# fail 0'), output.replace('1..3', 'ok 4 - unexpected case\n1..4'), output.replace('ok 1 - ', '    ok 1 - ')]:
+            with self.subTest(tap=bad):
+                with self.assertRaises(r.ReuseRejected): r.validate_scope_repair_tap(bad, names)
+
+    def test_node24_empty_file_wrapper_is_verified_but_never_counted_as_a_contract(self):
+        names = [r.SCOPE_REPAIR_TESTS[2], *r.SCOPE_REPAIR_TESTS[:2]]
+        records = [r.EMPTY_SCOPE_FILE, *names]
+        output = 'TAP version 13\n1..0\n' + ''.join('# Subtest: ' + name + '\nok ' + str(n + 1) + ' - ' + name + "\n  ---\n  duration_ms: 0.472917\n  type: 'test'\n  ...\n" for n, name in enumerate(records)) + '1..4\n# tests 4\n# suites 0\n# pass 4\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 70.894038\n'
+        parsed = r.parse_scope_repair_tap(output, r.SCOPE_REPAIR_TESTS)
+        self.assertEqual(parsed, {'namedTests': names, 'emptyFileWrappers': [r.EMPTY_SCOPE_FILE], 'tapTests': 4})
+        stamped = '\n'.join('2026-10-17T11:27:11.0960101Z ' + line for line in output.splitlines()) + '\n2026-10-17T11:27:11.1375787Z ReuseRejected: SCOPE_REPAIR_EXECUTED_NAMES\n'
+        self.assertEqual(r.extract_scope_repair_tap(stamped), output)
+        for bad in [output.replace('1..0\n', ''), output.replace('1..0\n', '1..0\n1..0\n'), output.replace(r.EMPTY_SCOPE_FILE, '.github/scripts/arbitrary.test.mjs'), output.replace('ok 1 - ' + r.EMPTY_SCOPE_FILE, 'ok 1 - ' + r.EMPTY_SCOPE_FILE + ' # SKIP'), output.replace('# tests 4', '# tests 3'), output.replace('# pass 4', '# pass 3'), output.replace("type: 'test'", "type: 'suite'"), output.replace('  ...\n', '', 1), output.replace('# Subtest: ' + names[0], '# Subtest: ' + names[1], 1), output.replace('1..4', 'ok 5 - ' + r.EMPTY_SCOPE_FILE + '\n1..5'), output.replace('# Subtest: ' + names[0], '# Subtest: ' + names[0] + '\n# Subtest: ' + names[1], 1)]:
+            with self.subTest(tap=bad):
+                with self.assertRaises(r.ReuseRejected): r.validate_scope_repair_tap(bad, r.SCOPE_REPAIR_TESTS)
+        for bad in [stamped + stamped, stamped.replace('# duration_ms 70.894038', '# incomplete')]:
+            with self.assertRaises(r.ReuseRejected): r.extract_scope_repair_tap(bad)
+
+    def test_parser_repair_retains_only_exact_d_source_and_two_file_transition(self):
+        test = '.github/scripts/survey-candidate-reuse.test.py'
+        before = {r.SELF_PATH: ('100644', 'blob', r.SCOPE_D['verifier']), test: ('100644', 'blob', r.SCOPE_D['tests']), '.github/workflows/ci.yml': ('100644', 'blob', 'c' * 40)}
+        after = {**before, r.SELF_PATH: ('100644', 'blob', 'f' * 40), test: ('100644', 'blob', r.REPAIR_TRANSITIONS[test]['after'])}
+        self.assertEqual(r.validate_scope_parser_transition(before, after, 'f' * 40)['unchangedObjects'], 1)
+        for path, entry in [('.github/workflows/ci.yml', ('100644', 'blob', 'd' * 40)), (r.SELF_PATH, ('120000', 'blob', 'f' * 40)), (test, ('100644', 'blob', 'e' * 40)), ('unreviewed.ts', ('100644', 'blob', 'a' * 40))]:
+            bad = dict(after); bad[path] = entry
+            with self.assertRaises(r.ReuseRejected): r.validate_scope_parser_transition(before, bad, 'f' * 40)
+        bad = dict(before); bad[r.SELF_PATH] = ('100644', 'blob', '0' * 40)
+        with self.assertRaises(r.ReuseRejected): r.validate_scope_parser_transition(bad, after, 'f' * 40)
 
     def test_artifact_identity_digest_expiry_and_job_skip_rejected(self):
         for mutate in [lambda d: d.update(name='other'), lambda d: d.update(digest='missing'), lambda d: d.update(expired=True), lambda d: d.update(workflow_run={'id': 1, 'head_sha': r.SOURCE_HEAD}), lambda d: d.update(size_in_bytes=0)]:

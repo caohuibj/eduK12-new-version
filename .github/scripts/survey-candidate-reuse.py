@@ -122,7 +122,7 @@ REPAIR_TRANSITIONS = {
     },
     '.github/scripts/survey-candidate-reuse.test.py': {
         'before': 'aeffdaf4fd378ee87531341f000368edf87b939b',
-        'after': 'a0cd16fddc131b3fbf2aea3fe0ec93c810c0efd0',
+        'after': 'd59223661d0bad78651f632d8f5277c7c6cad1c6',
     },
 }
 REPAIR_PRODUCT_PATHS = (
@@ -992,13 +992,168 @@ SCOPE_REPAIR_TESTS = (
 )
 
 
-def validate_scope_repair_tap(output, affected):
+SCOPE_D = {
+    'run': 39028725448, 'job': 117384749384,
+    'head': 'ddb69202d417386f1b17dbd4dcc2dcfe57f06870',
+    'merge': '0a01e062844693295b8e8d25ed7572f391b5d0b4',
+    'tree': '10c1eba41203d28667123bb1cc4d03278eaea7ee',
+    'verifier': '79536d70155b51e29a48f5275726dcbd63b091d9',
+    'tests': 'a0cd16fddc131b3fbf2aea3fe0ec93c810c0efd0',
+}
+EMPTY_SCOPE_FILE = '.github/scripts/ci-topology.test.mjs'
+
+
+def parse_scope_repair_tap(output, affected):
+    """Strict Node24 TAP for the three fixed cases, not arbitrary TAP input.
+
+    Node24 may report the unmatched ci-topology file itself as a passing test:
+    its empty 1..0 plan is immediately followed by that exact file subtest.
+    The file wrapper counts in TAP totals but never as a named contract.
+    """
     require(list(affected) == list(SCOPE_REPAIR_TESTS), 'SCOPE_REPAIR_EXACT_SELECTION')
-    passed = re.findall(r'^ok \d+ - (.+)$', output, re.M)
-    require(sorted(passed) == sorted(affected), 'SCOPE_REPAIR_EXECUTED_NAMES')
-    for key, count in [('pass', 3), ('fail', 0), ('cancelled', 0), ('skipped', 0), ('todo', 0)]:
-        require(re.search(r'^# ' + key + r' ' + str(count) + r'$', output, re.M), 'SCOPE_REPAIR_EXECUTED_' + key)
+    lines = output.splitlines()
+    require(lines and lines[0] == 'TAP version 13', 'SCOPE_TAP_VERSION')
+    records, summaries, plans = [], {}, []
+    pending, empty, yaml = None, False, False
+    for index, line in enumerate(lines[1:], 1):
+        if not line:
+            continue
+        if line == '  ---':
+            require(records and not yaml and pending is None and not plans, 'SCOPE_TAP_DIAGNOSTIC_START')
+            yaml = True
+            continue
+        if yaml:
+            if line == '  ...':
+                yaml = False
+            elif re.fullmatch(r'  duration_ms: (?:0|[1-9]\d*)(?:\.\d+)?', line):
+                pass
+            elif line == "  type: 'test'":
+                pass
+            else:
+                raise ReuseRejected('SCOPE_TAP_UNEXPECTED_DIAGNOSTIC')
+            continue
+        if line == '1..0':
+            require(not empty and not records and pending is None and not plans
+                    and index + 1 < len(lines) and lines[index + 1] == '# Subtest: ' + EMPTY_SCOPE_FILE,
+                    'SCOPE_TAP_EMPTY_FILE_PLAN')
+            empty = True
+            continue
+        if line.startswith('# Subtest: '):
+            require(pending is None and not plans, 'SCOPE_TAP_NESTED_OR_LATE_SUBTEST')
+            pending = line.removeprefix('# Subtest: ')
+            require(pending in (*affected, EMPTY_SCOPE_FILE), 'SCOPE_TAP_UNEXPECTED_SUBTEST')
+            continue
+        result = re.fullmatch(r'(ok|not ok) (\d+) - (.+)', line)
+        if result:
+            status, number, name = result.groups()
+            require(not plans and status == 'ok' and int(number) == len(records) + 1,
+                    'SCOPE_TAP_FAILED_OR_NONCONTIGUOUS_RESULT')
+            require(name in (*affected, EMPTY_SCOPE_FILE) and name not in records,
+                    'SCOPE_TAP_UNKNOWN_DUPLICATE_OR_DIRECTIVE')
+            require(pending in (None, name), 'SCOPE_TAP_SUBTEST_RESULT_MISMATCH')
+            if name == EMPTY_SCOPE_FILE:
+                require(empty and not records and pending == EMPTY_SCOPE_FILE, 'SCOPE_TAP_UNPROVEN_EMPTY_WRAPPER')
+            elif empty:
+                require(EMPTY_SCOPE_FILE in records, 'SCOPE_TAP_EMPTY_PLAN_WITHOUT_WRAPPER')
+            records.append(name)
+            pending = None
+            continue
+        plan = re.fullmatch(r'1\.\.(\d+)', line)
+        if plan:
+            require(not plans and pending is None and records and int(plan[1]) == len(records), 'SCOPE_TAP_FINAL_PLAN')
+            plans.append(int(plan[1]))
+            continue
+        summary = re.fullmatch(r'# (tests|suites|pass|fail|cancelled|skipped|todo) (\d+)', line)
+        if summary:
+            require(plans and summary[1] not in summaries, 'SCOPE_TAP_DUPLICATE_OR_EARLY_SUMMARY')
+            summaries[summary[1]] = int(summary[2])
+            continue
+        if re.fullmatch(r'# duration_ms (?:0|[1-9]\d*)(?:\.\d+)?', line):
+            require(index == len(lines) - 1 and plans, 'SCOPE_TAP_DURATION_POSITION')
+            continue
+        raise ReuseRejected('SCOPE_TAP_UNEXPECTED_LINE')
+    require(not yaml and pending is None and len(plans) == 1, 'SCOPE_TAP_INCOMPLETE')
+    wrappers = [name for name in records if name == EMPTY_SCOPE_FILE]
+    named = [name for name in records if name != EMPTY_SCOPE_FILE]
+    require(sorted(named) == sorted(affected) and len(named) == 3
+            and len(wrappers) == int(empty), 'SCOPE_TAP_NAMED_CONTRACT_SET')
+    count = len(records)
+    require(summaries == {'tests': count, 'suites': 0, 'pass': count, 'fail': 0,
+                          'cancelled': 0, 'skipped': 0, 'todo': 0}, 'SCOPE_TAP_RESULT_COUNTS')
+    return {'namedTests': named, 'emptyFileWrappers': wrappers, 'tapTests': count}
+
+
+def validate_scope_repair_tap(output, affected):
+    parse_scope_repair_tap(output, affected)
     return True
+
+
+def extract_scope_repair_tap(log):
+    """Extract the sole complete TAP block, never traceback/command text."""
+    text = re.sub(r'^\d{4}-\d{2}-\d{2}T[^ ]+ ', '', log, flags=re.M)
+    lines = text.splitlines()
+    starts = [index for index, line in enumerate(lines) if line == 'TAP version 13']
+    require(len(starts) == 1, 'SCOPE_D_UNIQUE_TAP_REQUIRED')
+    start = starts[0]
+    ends = [index for index, line in enumerate(lines) if index > start
+            and re.fullmatch(r'# duration_ms (?:0|[1-9]\d*)(?:\.\d+)?', line)]
+    require(len(ends) == 1, 'SCOPE_D_COMPLETE_TAP_REQUIRED')
+    return '\n'.join(lines[start:ends[0] + 1]) + '\n'
+
+
+def validate_scope_parser_transition(before, after, verifier_blob):
+    """D -> current changes only this verifier and its rejection contracts."""
+    test = '.github/scripts/survey-candidate-reuse.test.py'
+    changed = {path for path in set(before) | set(after) if before.get(path) != after.get(path)}
+    require(changed == {SELF_PATH, test}, 'SCOPE_D_UNREVIEWED_INPUT_CHANGE')
+    require(before.get(SELF_PATH) == ('100644', 'blob', SCOPE_D['verifier'])
+            and after.get(SELF_PATH) == ('100644', 'blob', verifier_blob), 'SCOPE_D_VERIFIER_BINDING')
+    require(before.get(test) == ('100644', 'blob', SCOPE_D['tests'])
+            and after.get(test) == ('100644', 'blob', REPAIR_TRANSITIONS[test]['after']), 'SCOPE_D_TEST_BINDING')
+    return {'changedPaths': sorted(changed), 'unchangedObjects': len(before) - 2,
+            'originalVerifierBlob': SCOPE_D['verifier'], 'currentVerifierBlob': verifier_blob}
+
+
+def qualified_d_scope_cases(current_source):
+    require_official_ci()
+    for ref in (SCOPE_D['head'], SCOPE_D['merge']):
+        if subprocess.run(['git', 'cat-file', '-e', ref + '^{commit}'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode:
+            subprocess.run(['git', 'fetch', '--no-tags', 'origin', ref], check=True, timeout=120)
+        require(git('rev-parse', ref + '^{tree}').decode().strip() == SCOPE_D['tree'], 'SCOPE_D_SOURCE_TREE')
+    binding = validate_scope_parser_transition(git_objects(SCOPE_D['head']), git_objects(current_source),
+                                               git('hash-object', str(Path(__file__).resolve())).decode().strip())
+    run = official_json(f"/actions/runs/{SCOPE_D['run']}")
+    job = official_json(f"/actions/jobs/{SCOPE_D['job']}")
+    require(run.get('id') == SCOPE_D['run'] and run.get('head_sha') == SCOPE_D['head']
+            and run.get('event') == 'pull_request' and run.get('status') in ('in_progress', 'completed')
+            and run.get('repository', {}).get('full_name') == REPOSITORY
+            and run.get('head_repository', {}).get('full_name') == REPOSITORY
+            and run.get('path') == '.github/workflows/ci.yml' and recent(run.get('created_at'))
+            and any(pr.get('number') == PR_NUMBER for pr in run.get('pull_requests', [])), 'SCOPE_D_RUN_ORIGIN')
+    require(job.get('id') == SCOPE_D['job'] and job.get('run_id') == SCOPE_D['run']
+            and job.get('head_sha') == SCOPE_D['head'] and job.get('name') == 'classify changed content'
+            and job.get('status') == 'completed' and job.get('conclusion') == 'failure'
+            and recent(job.get('completed_at')), 'SCOPE_D_FAILED_JOB_REQUIRED')
+    step_name = 'frozen Survey scope and fail-closed merge contracts'
+    selected = [step for step in job.get('steps', []) if step.get('name') == step_name]
+    require(len(selected) == 1 and selected[0].get('status') == 'completed'
+            and selected[0].get('conclusion') == 'failure'
+            and [step.get('name') for step in job.get('steps', []) if step.get('conclusion') == 'failure'] == [step_name], 'SCOPE_D_ONLY_ADAPTER_STEP_FAILED')
+    with official_request(f"/actions/jobs/{SCOPE_D['job']}/logs") as response:
+        raw = response.read(MAX_JSON_BYTES + 1)
+    require(len(raw) <= MAX_JSON_BYTES, 'SCOPE_D_LOG_SIZE')
+    text = raw.decode('utf8')
+    require('ReuseRejected: SCOPE_REPAIR_EXECUTED_NAMES' in text
+            and 'ReuseRejected: SCOPE_REPAIR_EXECUTED_FAILURE' not in text
+            and 'node: v24.21.0' in text, 'SCOPE_D_KNOWN_POST_EXECUTION_ADAPTER_FAILURE')
+    tap = extract_scope_repair_tap(text)
+    parsed = parse_scope_repair_tap(tap, SCOPE_REPAIR_TESTS)
+    require(parsed['emptyFileWrappers'] == [EMPTY_SCOPE_FILE], 'SCOPE_D_EXACT_KNOWN_WRAPPER')
+    return {'sourceRun': SCOPE_D['run'], 'sourceJob': SCOPE_D['job'], 'sourceHead': SCOPE_D['head'],
+            'sourceMergeHead': SCOPE_D['merge'], 'sourceTree': SCOPE_D['tree'],
+            'sourceJobConclusion': 'failure', 'wholeJobQualified': False,
+            'qualifiedNamedTests': parsed['namedTests'], 'ignoredEmptyFileWrappers': parsed['emptyFileWrappers'],
+            'sourceLogSha256': sha256(raw), 'tapSha256': sha256(tap.encode()), 'inputBinding': binding}
 
 
 def scope_repair_receipt():
@@ -1076,24 +1231,23 @@ def scope_repair_receipt():
     validate_scope_tap(previous_text, old_executed)
     retained = [name for name in all_names if name not in SCOPE_REPAIR_TESTS]
     require(len(retained) == 33 and all(name in all_names for name in SCOPE_REPAIR_TESTS), 'SCOPE_REPAIR_SELECTION_CHANGED')
+    # The three named cases already executed successfully in D. Read that
+    # official TAP directly; do not inherit D's failed job or its 33-case receipt.
+    d = qualified_d_scope_cases(source)
+    sources = {name: ORIGIN_B['run'] if name in old_executed else SCOPE_RUN for name in retained}
+    sources.update({name: SCOPE_D['run'] for name in SCOPE_REPAIR_TESTS})
+    require(set(sources) == set(all_names), 'SCOPE_ALL_CONTRACT_SOURCES_REQUIRED')
     receipt = {'schema': 1, 'currentHead': current, 'currentSourceHead': source,
                'sourceRun': ORIGIN_B['run'], 'sourceJob': SCOPE_B_JOB,
                'originalSourceRun': SCOPE_RUN, 'originalSourceJob': SCOPE_JOB,
                'sourceLogsSha256': {label: value['sha256'] for label, value in logs.items()},
-               'inputBinding': binding, 'retainedNodeTests': retained,
-               'retainedNodeSources': {name: ORIGIN_B['run'] if name in old_executed else SCOPE_RUN for name in retained},
-               'executedNodeTests': list(SCOPE_REPAIR_TESTS), 'wholeCandidateQualified': False}
+               'inputBinding': binding, 'retainedNodeTests': all_names,
+               'retainedNodeSources': sources, 'directNamedCaseSource': d,
+               'executedNodeTests': [], 'wholeCandidateQualified': False}
     print(json.dumps(receipt), flush=True)
-    pattern = '^(' + '|'.join(re.escape(name) for name in SCOPE_REPAIR_TESTS) + ')$'
-    result = subprocess.run(['node', '--test', '--test-reporter=tap', '--test-name-pattern', pattern,
-                             *['.github/scripts/' + name for name in SCOPE_TEST_FILES]],
-                            capture_output=True, text=True, timeout=120)
-    print(result.stdout, end='', flush=True)
-    print(result.stderr, end='', file=sys.stderr, flush=True)
-    require(result.returncode == 0, 'SCOPE_REPAIR_EXECUTED_FAILURE')
-    validate_scope_repair_tap(result.stdout, SCOPE_REPAIR_TESTS)
-    print(json.dumps({'status': 'SCOPE_QUALIFIED', 'executedPassed': 3, 'retainedPassed': 33,
-                      'sourceRun': ORIGIN_B['run'], 'originalSourceRun': SCOPE_RUN}), flush=True)
+    print(json.dumps({'status': 'SCOPE_QUALIFIED', 'executedPassed': 0, 'retainedPassed': 36,
+                      'sourceRun': ORIGIN_B['run'], 'originalSourceRun': SCOPE_RUN,
+                      'directNamedCaseRun': SCOPE_D['run'], 'directNamedCaseSourceJobConclusion': 'failure'}), flush=True)
 
 
 if __name__ == '__main__':
