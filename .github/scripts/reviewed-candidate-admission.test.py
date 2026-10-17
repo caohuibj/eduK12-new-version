@@ -160,6 +160,79 @@ class ChangedFrontendAndRaceRefusals(unittest.TestCase):
         self.assertEqual(a.bound_function_hashes(original), a.bound_function_hashes(original + dispatcher))
         self.assertNotEqual(a.bound_function_hashes(original), a.bound_function_hashes(original.replace('42','41')))
 
+class PartialFrontendAssemblyRefusals(unittest.TestCase):
+    def fixture(self):
+        receipt = M['frontendAssemblyReceipt']
+        actual = {'id': receipt['run'], 'head_sha': receipt['head'], 'head_branch': receipt['branch'],
+                  'event': receipt['event'], 'path': receipt['workflow'], 'run_attempt': receipt['attempt'],
+                  'status': 'completed', 'conclusion': 'failure', 'repository': {'full_name': M['repository']},
+                  'head_repository': {'full_name': M['repository']}}
+        job = {'id': receipt['job']['id'], 'name': receipt['job']['name'], 'run_id': receipt['run'],
+               'run_attempt': receipt['attempt'], 'head_sha': receipt['head'], 'status': 'completed',
+               'conclusion': 'failure', 'completed_at': receipt['job']['completedAt']}
+        runtime = {'schema': 1, 'status': 'success', 'stage': 'runtime-assembly', 'head': receipt['head'],
+                   'checkoutSha': receipt['mergeHead'], 'run': str(receipt['run']), 'attempt': str(receipt['attempt']),
+                   'componentTree': M['frontendPatch']['afterTree'], 'imageId': receipt['imageId'],
+                   'archive': {'sha256': 'b' * 64}, 'entryChanged': True}
+        statuses = [('admit-original-official-evidence', 'success'), ('changed-frontend-frontend', 'failure'),
+                    ('fetch-base-node', 'success'), ('fetch-base-nginx', 'success'), ('changed-frontend-build-once', 'success'),
+                    ('package-exact-new-builder', 'success'), ('changed-scale-scoped-lint', 'success'),
+                    ('changed-frontend-app-types', 'failure')]
+        verification = {'status': 'failure', 'currentHead': receipt['head'], 'sourceSha': M['source']['head'],
+                        'phases': [{'name': name, 'status': status} for name, status in statuses],
+                        'runtimeAssembly': {'imageId': runtime['imageId'], 'archiveSha256': runtime['archive']['sha256']}}
+        return actual, job, runtime, verification, receipt
+
+    def test_exact_failed_producer_can_supply_only_its_successful_assembly(self):
+        actual, job, runtime, verification, receipt = self.fixture()
+        with patch.object(a.transport, 'recent', return_value=True):
+            a.validate_assembly_origin(actual, job, receipt)
+        a.validate_assembly_reports(runtime, verification, receipt)
+        self.assertEqual(verification['status'], 'failure')
+        self.assertEqual(verification['phases'][-1]['status'], 'failure')
+
+    def test_other_run_job_attempt_head_or_conclusion_is_refused(self):
+        for target, fields in [('run', ['id', 'head_sha', 'head_branch', 'event', 'path', 'run_attempt', 'status', 'conclusion']),
+                               ('job', ['id', 'name', 'run_id', 'run_attempt', 'head_sha', 'status', 'conclusion', 'completed_at'])]:
+            for field in fields:
+                actual, job, _, _, receipt = self.fixture()
+                (actual if target == 'run' else job)[field] = 'wrong'
+                with self.subTest(target=target, field=field), patch.object(a.transport, 'recent', return_value=True), self.assertRaises(ValueError):
+                    a.validate_assembly_origin(actual, job, receipt)
+
+    def test_fork_or_expired_assembly_is_refused(self):
+        actual, job, _, _, receipt = self.fixture()
+        for key in ['repository', 'head_repository']:
+            changed = copy.deepcopy(actual); changed[key]['full_name'] = 'other/repository'
+            with patch.object(a.transport, 'recent', return_value=True), self.assertRaises(ValueError):
+                a.validate_assembly_origin(changed, job, receipt)
+        with patch.object(a.transport, 'recent', return_value=False), self.assertRaises(ValueError):
+            a.validate_assembly_origin(actual, job, receipt)
+
+    def test_failed_missing_duplicate_or_newly_claimed_phase_is_refused(self):
+        _, _, runtime, verification, receipt = self.fixture()
+        for index in range(len(verification['phases'])):
+            changed = copy.deepcopy(verification)
+            changed['phases'][index]['status'] = 'failure' if changed['phases'][index]['status'] == 'success' else 'success'
+            with self.subTest(index=index), self.assertRaises(ValueError):
+                a.validate_assembly_reports(runtime, changed, receipt)
+        for phases in [verification['phases'][:-1], verification['phases'] + [verification['phases'][0]],
+                       verification['phases'] + [{'name': 'new-runtime-high-critical-scan', 'status': 'success'}]]:
+            with self.assertRaises(ValueError):
+                a.validate_assembly_reports(runtime, {**verification, 'phases': phases}, receipt)
+
+    def test_changed_source_image_or_receipt_cannot_be_relabelled_current(self):
+        _, _, runtime, verification, receipt = self.fixture()
+        for field in ['schema', 'status', 'stage', 'head', 'checkoutSha', 'run', 'attempt', 'componentTree', 'imageId', 'entryChanged']:
+            changed = copy.deepcopy(runtime); changed[field] = 'wrong'
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                a.validate_assembly_reports(changed, verification, receipt)
+        for field in ['status', 'currentHead', 'sourceSha', 'runtimeAssembly']:
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                a.validate_assembly_reports(runtime, {**verification, field: 'wrong'}, receipt)
+        changed = copy.deepcopy(runtime); changed['archive']['sha256'] = 'c' * 64
+        with self.assertRaises(ValueError): a.validate_assembly_reports(changed, verification, receipt)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -6,13 +6,13 @@
 
 本路线保留 `.github/scripts/reviewed-candidate-source.json` 原始 49 文件、blob、前后端 tree、官方工作流/run/attempt/jobs/artifacts、镜像及报告摘要作为不可改写基线。原来源仍为 `1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c` 的官方 push run `39051668787` attempt 1；成功的原候选工作流本身不代表可合并。新 manifest 须独立审查，不能自动发现成功 run 后扩大范围。
 
-- 修改组件 → 原 49 文件及精确 12 个接纳工具/说明路径，加上 `frontendPatch` 明列的 ScaleEdit.tsx 和组件专用 ScaleEdit.css 两文件覆盖层。只改变未选中标签文字颜色；无全局主题、后端、依赖、数据库或附件变化。覆盖层逐一绑定原始/当前 blob 及完整前端 before/after tree；新 CSS 须在原基线和 main 均不存在。漏文件、额外路径、删除、重命名、执行位或链接均拒绝本路线。
-- 具体故障 → 原真实浏览器检查发现 ScaleEdit 未选中标签颜色对比度 4.46095，低于既有 4.5 门槛。原失败不改写为通过；只重建受影响前端、生产打包及原 HIGH/CRITICAL 扫描、静态包装检查，再运行既有真实交互、可访问性和溢出断言。原前端报告保留为基线，不能证明新前端通过。
-- 复用证据 → 原后端产物、测试、审计、扫描保持原身份；官方 PR #310 run `39054194991` attempt 1 的成功 race job `117458745733` 及 artifact `12109046588` 接纳为未变化 PostgreSQL 并发输入的证明。核验官方 job success、同 PR/base/head/tree、24 小时有效期、ZIP 元数据/摘要、每份报告摘要、113 断言、6 HTTP 竞争、5 数据库后置条件、清理成功及原脚本/runtime 环境函数绑定。整个旧 run 因 browser 失败，绝不将整轮称为成功，也不重跑已成功的 PostgreSQL 竞争。
-- 主要位置 → GitHub PR scope 运行变化后的边界/拒绝/合并契约；单个 frontend producer 使用原冻结官方基础镜像只构建一次新前端，保存一个当前 run/head 的生产镜像；browser 通过精确官方 artifact ID 消费它，race 仅核验回执。浏览器失败后重试失败 job 可继续使用同一次 producer，不再构建。JavaScript/TypeScript 与 Python CodeQL 使用 `.github/scripts` 和 `server-version/frontend/src/pages` 两个有效目录覆盖变化的工具与 ScaleEdit 页面，不扩大到未修改后端。本机不安装或运行应用检查，不连接生产，不使用私有 secrets/self-hosted runner，不改变信任及 ruleset。
-- 正式门禁 → 原稳定 `merge gate / ready PR` 仍要求 scope、reviewed-candidate（包含 frontend producer 与 browser/race）和 codeql 真实 success，并对实际 checkout HEAD 重算完整计划。draft、缺失、跳过、取消或失败均不得授予合并资格；不新增同名假绿检查。
-- 时间预算 → 约 5 分钟报告当前等待阶段；frontend producer 上限 20 分钟，browser/race 上限 15 分钟。故障定位只处理受影响项，不恢复无关全量验收。唯一前端运行镜像只保留在该 producer 的官方 artifact，其他产物只含当前 run/head/action/attempt 小 JSON 与截图，不上传私有数据、数据库或重复镜像。
-- 合并后 → main push 只按原有规则分类，不重跑此 PR 的契约、接纳或探针。上线仍单独受当次发布授权及版本/就绪/一条受影响短流程/回退门禁约束；这次 CI 接入不等同于已上线。
+- 修改组件 → 原 49 文件及精确 12 个接纳工具/说明路径，加上 `frontendPatch` 明列的 ScaleEdit.tsx 和组件专用 ScaleEdit.css 产品覆盖层；另有 `testFix` 精确绑定 TrainingTaskDeepLinks.test.tsx 和 visual-interaction-states-browser-e2e.cjs 两个测试修复。完整 main→head 共 63 路径；后端、依赖、数据库和附件不变。每项 before/after blob、模式及前端树均绑定；未知路径、删除、重命名、执行位或链接拒绝本路线。
+- 具体故障 → 原浏览器发现 ScaleEdit 未选中标签对比度 4.46095，低于既有 4.5 门槛。局部颜色修正已完成一次官方构建与装配。其后类型检查在前端-only 容器缺仓库兄弟 JSON fixture 而失败；另有异步 focus 测试过早断言和旧列表 mock 不适配已授权详情 API。保留失败历史，不放宽焦点、权限、可访问性或扫描要求。
+- 复用证据 → 原 13 项官方来源及成功 PostgreSQL race job `117458745733` / artifact `12109046588` 保留原身份、24 小时有效期、113 断言、6 HTTP、5 竞争及清理证据。固定 run `39076589264` 的 frontend job `117525035914` 明确为失败；只接纳其实际成功的 build/package/lint 阶段，使用 artifact `12117506265` 的原镜像与原 source 标签，不能称类型、单测或扫描已通过。核验固定 SHA/tree、官方 run/job/attempt、ZIP 大小/摘要、3 份原始报告摘要及镜像 ID；不改变原证据时间，不自动发现或回退到其他 run。
+- 主要位置 → GitHub PR scope 执行变化后的边界/拒绝/合并契约。一个 frontend 资格 job 在完整 checkout 中安装锁定工具，执行 app types、ScaleEdit 和 TrainingTaskDeepLinks 两个精确单测文件，再扫描已装配的同一 runtime（原 HIGH/CRITICAL 门槛）。不重建、不重跑成功 lint、不重传镜像。五个消费项分别为原 browser 补证、旧 race 接纳及 Chromium/Firefox/WebKit 作业五状态×四宽度专项；其他旧 visual 场景不重复。CodeQL 使用 `.github/scripts`、`server-version/frontend/src/pages`、`server-version/e2e` 三个有效目录覆盖变化工具/测试，不扩大至未修改后端。本机只静态审查，不运行应用检查或连接生产，不新增 secrets/self-hosted runner，不改信任及 ruleset。
+- 正式门禁 → 稳定 `merge gate / ready PR` 要求 scope、reviewed-candidate（完整六作业）和 codeql 真实 success，并重算实际 checkout 的完整计划。当前 frontend 资格真实成功前不运行消费项。draft、缺失、跳过、取消或失败不得授予合并资格；仅明确绑定的旧成功阶段可接纳，旧失败作业不改写为成功。
+- 时间预算 → 约 5 分钟报告当前等待阶段；frontend 资格上限 20 分钟，各消费项上限 15 分钟。缺失来源证据直接阻断已知候选，不恢复无关全量验收；其他未知差异仍按通用保守规则处理。新 artifacts 仅保留当前 run/head/action/attempt 的 JSON 和截图，不上传私有数据、数据库或重复镜像。
+- 合并后 → main push 对本次固定 before base 取两份固定源 SHA 并核 tree 后分类，不重跑此 PR 的契约、接纳或探针。上线仍单独受当次授权及版本/就绪/短流程/回退门禁约束；本轮 CI 不授予生产部署权限。
 
 ## 规则位置与每次开工方式
 

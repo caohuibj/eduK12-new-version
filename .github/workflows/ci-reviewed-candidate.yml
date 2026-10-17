@@ -15,13 +15,10 @@ env:
   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
 jobs:
   frontend:
-    name: changed frontend / build scan and package
+    name: admitted frontend / missing types contracts and scan
     if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-24.04
     timeout-minutes: 20
-    outputs:
-      artifact_id: ${{ steps.frontend-artifact.outputs.artifact-id }}
-      artifact_digest: ${{ steps.frontend-artifact.outputs.artifact-digest }}
     env:
       CANDIDATE_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
       CI_BASE_SHA: ${{ github.event.pull_request.base.sha }}
@@ -50,25 +47,14 @@ jobs:
           with open(os.environ['REVIEWED_CANDIDATE_PLAN'], 'w') as output:
               json.dump(json.loads(os.environ['PLAN_JSON']), output)
           PY
-      - name: build once and qualify only the exact patched frontend
+      - name: admit exact successful assembly and finish only missing frontend checks
         timeout-minutes: 18
         run: |
           set -euo pipefail
-          (sleep 300; printf '::warning::Exact ScaleEdit frontend preparation exceeded the five-minute diagnosis budget. Inspect the active admission, build, packaging or scan phase; do not add unrelated checks.\n') &
+          (sleep 300; printf '::warning::Exact frontend qualification exceeded the five-minute diagnosis budget. Inspect the active artifact admission, dependency install, types, selected contracts or scan phase; do not rebuild or add unrelated checks.\n') &
           watcher=$!
           trap 'kill "$watcher" 2>/dev/null || true; wait "$watcher" 2>/dev/null || true' EXIT
           python3 -B .github/scripts/reviewed-candidate-admission.py frontend
-      - name: retain the one current frontend runtime for browser consumption
-        id: frontend-artifact
-        if: ${{ always() && hashFiles('reviewed-candidate-evidence/frontend-runtime.json') != '' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: reviewed-current-frontend-${{ github.run_id }}-${{ github.event.pull_request.head.sha }}-attempt-${{ github.run_attempt }}
-          path: |
-            reviewed-candidate-evidence/frontend-runtime.json
-            reviewed-candidate-evidence/frontend-runtime.tar.zst
-          retention-days: 3
-          if-no-files-found: error
       - name: retain small current frontend qualification reports
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
@@ -86,7 +72,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        action: [browser, race]
+        action: [browser, race, interaction-chromium, interaction-firefox, interaction-webkit]
     env:
       CANDIDATE_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
       CI_BASE_SHA: ${{ github.event.pull_request.base.sha }}
@@ -94,8 +80,6 @@ jobs:
       PR_NUMBER: ${{ github.event.pull_request.number }}
       REVIEWED_CANDIDATE_PLAN: reviewed-candidate-plan.json
       PYTHONDONTWRITEBYTECODE: '1'
-      CURRENT_FRONTEND_ARTIFACT_ID: ${{ needs.frontend.outputs.artifact_id }}
-      CURRENT_FRONTEND_ARTIFACT_DIGEST: ${{ needs.frontend.outputs.artifact_digest }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -113,7 +97,7 @@ jobs:
           with open(os.environ['REVIEWED_CANDIDATE_PLAN'], 'w') as output:
               json.dump(json.loads(os.environ['PLAN_JSON']), output)
           PY
-      - name: verify successful race receipts and run only the missing browser probe
+      - name: accept unchanged race or execute one missing browser scope
         timeout-minutes: 14
         env:
           PROBE_ACTION: ${{ matrix.action }}
@@ -124,13 +108,19 @@ jobs:
           (sleep 300; printf '::warning::Reviewed candidate %s has exceeded the five-minute diagnosis budget; current step: %s. Do not add unrelated checks.\n' "$PROBE_ACTION" "$(cat "$phase")") &
           watcher=$!
           trap 'kill "$watcher" 2>/dev/null || true; wait "$watcher" 2>/dev/null || true' EXIT
-          if [ "$PROBE_ACTION" = browser ]; then
-            printf '%s\n' 'installing the locked official browser tooling' > "$phase"
+          case "$PROBE_ACTION" in
+            browser) engine=chromium ;;
+            interaction-chromium|interaction-firefox|interaction-webkit) engine="${PROBE_ACTION#interaction-}" ;;
+            race) engine= ;;
+            *) exit 1 ;;
+          esac
+          if [ -n "$engine" ]; then
+            printf '%s\n' 'installing locked official browser tooling' > "$phase"
             npm ci --ignore-scripts --prefix .github/release-tools
-            printf '%s\n' 'installing official Chromium and its system dependencies' > "$phase"
-            node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
+            printf '%s\n' "installing official $engine and its system dependencies" > "$phase"
+            node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps "$engine"
           fi
-          printf '%s\n' 'authenticating exact receipts; browser consumes the current frontend, race accepts unchanged PostgreSQL evidence' > "$phase"
+          printf '%s\n' 'authenticating immutable assembly; executing only the selected missing scope' > "$phase"
           python3 -B .github/scripts/reviewed-candidate-admission.py "$PROBE_ACTION"
       - name: retain small current-attempt probe evidence
         if: ${{ always() }}
@@ -140,5 +130,7 @@ jobs:
           path: |
             reviewed-candidate-evidence/*.json
             reviewed-candidate-evidence/screenshots/*.png
+            reviewed-candidate-evidence/interaction-*/interaction-states/qa.json
+            reviewed-candidate-evidence/interaction-*/interaction-states/*.png
           retention-days: 3
           if-no-files-found: error

@@ -58,7 +58,7 @@ describe.each([
     })
     mount(url)
     const title = await screen.findByRole('button', { name: '第 21 项任务' })
-    expect(title.closest('tr')).toHaveFocus()
+    await waitFor(() => expect(title.closest('tr')).toHaveFocus())
     expect(screen.getByRole('button', { name: count })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /返回当前课程/ })).toHaveAttribute('href', '/courses/course-old/detail')
     expect(get.mock.calls.filter(([request]) => request.startsWith('/' + path) && !request.endsWith('/tags'))).toEqual([[detail]])

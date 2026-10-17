@@ -661,5 +661,64 @@
         "newMode": "100644"
       }
     }
+  },
+  "testFix": {
+    "beforeTree": "a16e227fce4a9154ccad9a83700db1dba8df428c",
+    "afterTree": "94c93e4ae841c452a39f8f96ca12eb1222a67d80",
+    "files": {
+      "server-version/frontend/src/pages/__tests__/TrainingTaskDeepLinks.test.tsx": {
+        "before": "a587c2ff2f13871d193412d91b864eeb86ae60af",
+        "after": "dfb060a6de61ffc076814c5e096e91efff2a793d",
+        "status": "M",
+        "oldMode": "100644",
+        "newMode": "100644"
+      },
+      "server-version/e2e/visual-interaction-states-browser-e2e.cjs": {
+        "before": "ea557936d8785a4a18066ec1bf88206e98176932",
+        "after": "c927844d8641f02e80adfaf862dc6c0c908d1a53",
+        "status": "M",
+        "oldMode": "100644",
+        "newMode": "100644"
+      }
+    }
+  },
+  "frontendAssemblyReceipt": {
+    "run": 39076589264,
+    "head": "1ffb8eeb02fac5bf2969f8536cffe8837ceda18e",
+    "tree": "4402bab18001d7307399016d7cd81b072ffc65e7",
+    "mergeHead": "bccf8b1c32dd4c48f94812c78f277cb661a0877b",
+    "workflow": ".github/workflows/ci.yml",
+    "event": "pull_request",
+    "branch": "fix/shared-assessment-foundation-merge-20261017",
+    "attempt": 1,
+    "pr": 310,
+    "base": "0c41f07cb8c6104ad7c88448d948682baf24cf37",
+    "job": {
+      "id": 117525035914,
+      "name": "reviewed-candidate / changed frontend / build scan and package",
+      "completedAt": "2026-10-17T22:51:23Z"
+    },
+    "artifact": {
+      "id": 12117506265,
+      "name": "reviewed-current-frontend-39076589264-1ffb8eeb02fac5bf2969f8536cffe8837ceda18e-attempt-1",
+      "size": 30051558,
+      "digest": "sha256:f33ccd45e91626fc73b05d979add229e57a727b9d125f9169c2013048af98bbb",
+      "createdAt": "2026-10-17T22:51:20Z"
+    },
+    "reportsArtifact": {
+      "id": 12117600855,
+      "name": "reviewed-candidate-39076589264-1ffb8eeb02fac5bf2969f8536cffe8837ceda18e-frontend-attempt-1",
+      "size": 23022,
+      "digest": "sha256:41c4e1873b5dfe3773823398cb43641329656bae42b94210dffccc645071d58f",
+      "createdAt": "2026-10-17T22:51:21Z"
+    },
+    "reportDigests": {
+      "frontend-runtime.json": "1893742d6468c62a4d4094d474f5596786a1116c2ca05d791216a3d7a35c2dfa",
+      "frontend-verification.json": "329d210280a509cb8d68a6982b087da78ae30f450696fdd8ebba7e7aa59af049",
+      "official-admission.json": "8487a80f60be7004bea595cc3abfd54602d4564d325234962a9e771af87af018"
+    },
+    "imageId": "sha256:d17082be977d42c85ee21077f6fd2c6f3d8469c92b2ea7aee211f8433baba7f3",
+    "componentTree": "a16e227fce4a9154ccad9a83700db1dba8df428c",
+    "claim": "Only successful build, runtime assembly and scoped lint phases admitted from a failed job. Types, component tests and scan are not passed; run them against complete checkout and this exact runtime."
   }
 }

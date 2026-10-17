@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url'
 
 const SOURCE = '1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c'
 const IMAGE = 'sha256:29abe75a707f8c88a523fcbd762f0efb6e7568ec0e0c90100d501c2ae5e28312'
+const MANIFEST = JSON.parse(readFileSync(new URL('./reviewed-candidate-source.json', import.meta.url), 'utf8'))
 const BASELINE = process.argv.includes('--contrast-baseline')
 const OUTPUT = 'reviewed-candidate-evidence'
 const TIMEOUT = 10_000
@@ -360,9 +361,20 @@ async function run() {
         execution: report.entryChanged ? 'new-entry-assembly-smoke' : 'not-repeated',
         reason: report.entryChanged ? 'Adapter verified changed entry script path or bytes; approximately 10 seconds only for new runtime assembly.' : 'Adapter verified unchanged entry script path and bytes; retain the two prior successful functional contexts.',
       }
-      assert.equal(report.sourceSha, report.currentHead, 'current frontend must be built from the exact PR head')
+      const assembly = MANIFEST.frontendAssemblyReceipt
+      assert.equal(report.sourceSha, assembly.head, 'runtime retains the exact original assembly source head')
+      assert.equal(report.imageId, assembly.imageId, 'runtime retains the exact original assembled image identity')
+      assert.equal(gitTree(report.sourceSha), assembly.tree, 'original assembly source tree identity')
+      execFileSync('git', ['merge-base', '--is-ancestor', assembly.head, report.currentHead])
       const frontendTree = ref => execFileSync('git', ['rev-parse', `${ref}:server-version/frontend`], { encoding: 'utf8' }).trim()
-      assert.equal(frontendTree(checkoutSha), frontendTree(report.sourceSha), 'runtime source and checkout frontend tree identity')
+      assert.equal(assembly.componentTree, MANIFEST.frontendPatch.afterTree, 'assembly belongs to the exact ScaleEdit product patch')
+      assert.equal(MANIFEST.testFix.beforeTree, assembly.componentTree, 'test-only overlay starts from the original assembly')
+      assert.equal(frontendTree(report.sourceSha), assembly.componentTree, 'runtime source frontend tree identity')
+      assert.equal(frontendTree(checkoutSha), MANIFEST.testFix.afterTree, 'checkout frontend includes only the admitted test overlay')
+      report.runtimeFrontendTree = assembly.componentTree
+      report.currentFrontendTree = MANIFEST.testFix.afterTree
+      report.runtimeArtifactId = assembly.artifact.id
+      report.runtimeBuiltForCurrentHead = report.sourceSha === report.currentHead
     }
     report.checkoutSha = checkoutSha
     assert.equal(port, 3189, 'only the isolated candidate loopback port is allowed')

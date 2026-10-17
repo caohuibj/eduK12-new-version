@@ -8,6 +8,8 @@ const { reportVisualFailure } = require('./visual-failure-diagnostics.cjs')
 const base = process.env.VISUAL_QA_BASE_URL || 'http://127.0.0.1:5173'
 const output = path.join(process.env.VISUAL_QA_EVIDENCE_DIR || '/tmp/eduk12-visual-qa', 'interaction-states')
 const widths = [360, 390, 768, 1440]
+const scope = process.env.VISUAL_QA_SCOPE ?? 'full'
+const assignmentStates = ['loading', 'populated', 'empty', 'filtered-empty', 'error']
 const longTitle = '面向学生与教师的学习反思及成长观察量表 · Long English Instrument Title for Responsive Reading'
 const selectedFile = { name: '非常长的文件名-LongFilenameWithoutSpacesToStressWrapping'.repeat(3) + '.mp4', mimeType: 'video/mp4', buffer: Buffer.from('visual fixture') }
 const entry = {
@@ -48,10 +50,14 @@ async function assertModal(page, dialog, background) {
 }
 
 async function main() {
+  if (process.env.VISUAL_QA_SCOPE !== undefined && scope !== 'assignment-list-states') {
+    throw new Error(`Unknown VISUAL_QA_SCOPE: ${scope}`)
+  }
   fs.mkdirSync(output, { recursive: true })
   const browser = await browsers[process.env.VISUAL_QA_BROWSER_ENGINE || 'chromium'].launch({ headless: true, channel: process.env.VISUAL_QA_BROWSER_CHANNEL || undefined })
   const results = []
-  async function scenario(width, role, run) {
+  async function scenario(width, role, run, scenarioScope = 'full') {
+    if (scope !== 'full' && scenarioScope !== scope) return
     const context = await browser.newContext({ viewport: { width, height: width < 768 ? 844 : 1024 }, reducedMotion: 'reduce' })
     const page = await context.newPage()
     // Keep WebKit requestAnimationFrame actionability checks on an active page.
@@ -73,6 +79,7 @@ async function main() {
   }
   try {
     for (const width of widths) {
+      const assignmentResults = []
       await scenario(width, 'ADMIN', async page => {
         let failed = true
         const teacher = { id: 'grant-teacher', username: 'teacher', nickname: '示例教师', role: 'TEACHER', teacherApproved: true, isActive: true, isFrozen: false }
@@ -209,24 +216,43 @@ async function main() {
         await page.getByText('版本与证据', { exact: true }).press('Enter')
         await capture(page, 'scale-card-evidence', width)
       })
-      for (const state of ['loading', 'populated', 'empty', 'filtered-empty', 'error']) {
+      for (const state of assignmentStates) {
         await scenario(width, 'TEACHER', async page => {
           let release
           const wait = new Promise(resolve => { release = resolve })
           let failed = state === 'error'
+          const deepLink = ['populated', 'filtered-empty'].includes(state)
+          const assignmentRequests = new Set()
           await page.route('**/api/assignments/tags', route => fulfill(route, { tags: [] }))
           await page.route('**/api/assignments', async route => {
+            assignmentRequests.add('/assignments')
+            assert.equal(route.request().method(), 'GET')
             if (state === 'loading') await wait
-            return fulfill(route, { list: ['populated', 'filtered-empty'].includes(state) ? [{ id: 'visual-list', title: longTitle, course: { title: '跨学科学习与成长观察课程 · Long Course Name' }, deadline: '2099-10-01T10:00:00Z', tags: ['学习反思', '成长观察'], questions: [], _count: { submissions: 13 } }] : [] }, failed ? 503 : 200)
+            return fulfill(route, { list: [] }, failed ? 503 : 200)
           })
-          await page.goto(base + '/assignments?id=visual-list')
+          await page.route('**/api/assignments/visual-list', route => {
+            assignmentRequests.add('/assignments/visual-list')
+            assert.equal(route.request().method(), 'GET')
+            return fulfill(route, {
+              id: 'visual-list', title: longTitle, courseId: sampleCourse.id,
+              course: { id: sampleCourse.id, title: '跨学科学习与成长观察课程 · Long Course Name', courseCode: sampleCourse.courseCode, creatorId: sampleCourse.creatorId },
+              status: 'PUBLISHED', description: '', content: '', deadline: '2099-10-01T10:00:00Z',
+              tags: ['学习反思', '成长观察'], questions: [], videos: [], images: [], documents: [],
+              createdAt: '2026-09-01T00:00:00.000Z', updatedAt: '2026-09-01T00:00:00.000Z',
+              _count: { submissions: 13 }, mySubmission: null,
+            })
+          })
+          // Empty/loading/error are list states; an id resolves one authorized detail.
+          await page.goto(base + (deepLink ? '/assignments?id=visual-list' : '/assignments'))
           if (state === 'loading') await page.getByText('正在加载作业', { exact: true }).waitFor()
           else if (failed) await page.getByText('作业列表加载失败', { exact: true }).waitFor()
           else if (state === 'empty') await page.getByText('暂无匹配作业', { exact: true }).waitFor()
           else {
             await page.getByRole('button', { name: longTitle, exact: true }).waitFor()
             assert.equal(await page.locator('#assignment-record-visual-list').count(), 1, 'one record at all widths')
+            await page.locator('#assignment-record-visual-list:focus').waitFor()
             assert.equal(await page.locator('#assignment-record-visual-list').evaluate(el => el === document.activeElement), true, 'course handoff focuses the record')
+            assert.deepEqual([...assignmentRequests], ['/assignments/visual-list'], 'deep link reads only its exact detail API')
             if (width < 768) assert.equal(await page.locator('.staff-record-table').evaluate(el => el.scrollWidth <= el.clientWidth + 1), true, 'mobile records need no horizontal scrolling')
             if (state === 'filtered-empty') {
               await page.getByRole('searchbox', { name: '搜索作业' }).fill('unmatched')
@@ -250,7 +276,8 @@ async function main() {
             await page.getByRole('button', { name: '重试', exact: true }).click()
             await page.getByText('暂无匹配作业', { exact: true }).waitFor()
           }
-        })
+        }, 'assignment-list-states')
+        assignmentResults.push({ state, passed: true })
       }
       for (const state of ['loading', 'empty', 'error', 'populated']) {
         await scenario(width, 'STUDENT', async page => {
@@ -366,10 +393,10 @@ async function main() {
           assert.equal(await trigger.evaluate(el => el === document.activeElement), true)
         })
       }
-      results.push({ width, passed: true })
-      console.log(`Interaction and state QA passed at ${width}px`)
+      results.push({ width, passed: true, assignmentStates: assignmentResults })
+      console.log(`Interaction and state QA (${scope}) passed at ${width}px`)
     }
-    fs.writeFileSync(path.join(output, 'qa.json'), JSON.stringify({ results }, null, 2))
+    fs.writeFileSync(path.join(output, 'qa.json'), JSON.stringify({ scope, results }, null, 2))
   } finally { await browser.close() }
 }
 main().catch(error => {

@@ -1,11 +1,10 @@
-"""Single-origin official receipt admission and missing runtime checks only.
+"""Fixed official receipt admission and missing runtime checks only.
 
-No fallback build/test/scan, multi-run chain, local-test promotion or expiry renewal.
+No rebuild, fallback source, local-test promotion or expiry renewal.
 The exact source manifest is reviewable data; the transport helpers are existing CI code.
 """
 import argparse
 import ast
-import gzip
 import hashlib
 import importlib.util
 import json
@@ -140,8 +139,10 @@ def source_scope():
     for component, tree in plan['components'].items():
         require(git('rev-parse', head + ':server-version/' + component) == tree, 'Product input changed')
     for file, binding in M['files'].items():
-        expected = M.get('frontendPatch', {}).get('files', {}).get(file, binding)['after']
+        expected = M.get('testFix', {}).get('files', {}).get(file, M.get('frontendPatch', {}).get('files', {}).get(file, binding))['after']
         require(git('rev-parse', head + ':' + file) == expected, 'Reviewed candidate blob changed: ' + file)
+    for file, binding in M['testFix']['files'].items():
+        require(git('rev-parse', head + ':' + file) == binding['after'], 'Reviewed test fixture blob changed: ' + file)
     for file, blob in M['unchangedConsumers'].items():
         require(git('rev-parse', head + ':' + file) == blob, 'Supporting consumer changed: ' + file)
     # Independently recompute the actual full diff using the same fail-closed plan.
@@ -200,7 +201,7 @@ def admit():
                'artifactDigests': {str(a['id']): a['digest'] for a in expected.values()},
                'components': M['components'], 'images': M['images'],
                'originalFrontendProofIsBaselineOnly': bool(M.get('frontendPatch')),
-               'claim': 'Original backend and unchanged dependency evidence accepted; original frontend runtime is baseline only after the exact readability patch. New frontend assembly, scan and UI execute in this run. Local test counts remain local review evidence.'}
+               'claim': 'Original backend and unchanged dependency evidence accepted. The exact prior frontend assembly remains its original source; missing types, selected contracts, scan and UI require current-run success. Local test counts remain local review evidence.'}
     write('official-admission.json', receipt)
     return reports
 
@@ -450,141 +451,181 @@ def accept_race(record):
     record['execution'] = 'official-receipt-only; zero PostgreSQL services/checks rerun'
 
 
-def run_frontend_check(image, command, label, timeout, mounts=(), env=()):
-    name = 'reviewed-check-' + os.environ['GITHUB_RUN_ID'] + '-' + os.environ['GITHUB_RUN_ATTEMPT'] + '-' + label
-    owner = name
-    require(subprocess.run(['docker','inspect',name],capture_output=True).returncode != 0, 'Frontend check container already exists')
-    identity = None
-    try:
-        args = ['docker','create','--network','none','--name',name,'--label','reviewed-candidate-owner=' + owner]
-        for source, target in mounts: args += ['-v',str(source) + ':' + target]
-        for key, value in env: args += ['-e',key + '=' + value]
-        identity = output(args + [image, *command], 30)
-        require(re.fullmatch('[a-f0-9]{64}', identity), 'Invalid frontend check container ID')
-        run(['docker','start','-a',identity], timeout)
-        require(output(['docker','inspect','--format','{{.State.ExitCode}}',identity]) == '0', 'Frontend check exited nonzero')
-    finally:
-        if identity is None:
-            found = subprocess.run(['docker','inspect',name],capture_output=True,text=True)
-            if found.returncode == 0:
-                value = json.loads(found.stdout)[0]
-                if value.get('Config',{}).get('Labels',{}).get('reviewed-candidate-owner') == owner: identity = value['Id']
-        if identity:
-            require(subprocess.run(['docker','rm','-f','-v',identity],capture_output=True).returncode == 0, 'Frontend check container cleanup failed')
+def validate_assembly_origin(actual, job, receipt):
+    # This exact producer failed after assembly/lint. Admit those phases only;
+    # its failed types and unexecuted tests/scan remain missing current-run work.
+    for key, value in {'id': receipt['run'], 'head_sha': receipt['head'], 'head_branch': receipt['branch'],
+                       'event': receipt['event'], 'path': receipt['workflow'], 'run_attempt': receipt['attempt'],
+                       'status': 'completed', 'conclusion': 'failure'}.items():
+        require(actual.get(key) == value, 'Partial frontend run mismatch: ' + key)
+    require(actual.get('repository', {}).get('full_name') == M['repository']
+            and actual.get('head_repository', {}).get('full_name') == M['repository'], 'Partial frontend repository mismatch')
+    for key, value in {'id': receipt['job']['id'], 'name': receipt['job']['name'], 'run_id': receipt['run'],
+                       'run_attempt': receipt['attempt'], 'head_sha': receipt['head'], 'status': 'completed',
+                       'conclusion': 'failure', 'completed_at': receipt['job']['completedAt']}.items():
+        require(job.get(key) == value, 'Partial frontend job mismatch: ' + key)
+    require(transport.recent(job['completed_at']), 'Original partial frontend job expired')
 
 
-def build_frontend(reports, record):
-    helper = module('candidate_image_utilities', '.github/scripts/shared-assessment-foundation-ci.py')
-    head = os.environ['CANDIDATE_HEAD_SHA']
-    context = ROOT / 'server-version/frontend'
-    bases = reports['frontend-builder.json']['bases']
-    recipe = (context / 'Dockerfile').read_text()
-    for tag, digest in bases.items():
-        require('@sha256:' in digest, 'Unpinned original frontend base')
-        recipe = recipe.replace('FROM ' + tag + ' AS ', 'FROM ' + digest + ' AS ')
-        phase(record, 'fetch-base-' + tag.split(':')[0], lambda image=digest: run(['docker', 'pull', image], 300))
-    effective = PRIVATE / 'frontend.Dockerfile'; effective.write_text(recipe)
-    prefix = 'reviewed-current-frontend:' + head
-    common = ['docker', 'buildx', 'build', '--builder', 'default', '--load', '-f', str(effective),
-              '--label', 'org.opencontainers.image.revision=' + head,
-              '--build-arg', 'NPM_REGISTRY=https://registry.npmjs.org', '--build-arg', 'VITE_COGNITIVE_MODULE_ENABLED=true']
-    phase(record, 'changed-frontend-build-once', lambda: run(common + ['--target', 'build', '-t', prefix + '-builder', str(context)], 1200))
-    builder = output(['docker', 'image', 'inspect', '--format', '{{.Id}}', prefix + '-builder'])
-    static = PRIVATE / 'new-builder-static'; static.mkdir()
-    helper.copy_files(builder, '/app/dist', static)
-    files = helper.files_manifest(static)
-    marker = 'FROM ' + bases['nginx:1.31.6-alpine3.24-slim'] + ' AS runtime'
-    require(recipe.count(marker) == 1, 'Runtime stage ambiguous')
-    runtime_recipe = PRIVATE / 'frontend-runtime.Dockerfile'
-    runtime_recipe.write_text('FROM ' + prefix + '-builder AS build\n' + recipe[recipe.index(marker):])
-    phase(record, 'package-exact-new-builder', lambda: run(['docker', 'buildx', 'build', '--builder', 'default', '--load',
-        '-f', str(runtime_recipe), '--label', 'org.opencontainers.image.revision=' + head,
-        '--target', 'runtime', '-t', prefix, str(context)], 300))
-    image = output(['docker', 'image', 'inspect', '--format', '{{.Id}}', prefix])
-    actual_path = PRIVATE / 'new-runtime-static'; actual_path.mkdir()
-    helper.copy_files(image, '/usr/share/nginx/html', actual_path)
-    actual = helper.files_manifest(actual_path)
-    require(actual == {**reports['frontend-builder.json']['baseStaticFiles'], **files}, 'Current runtime differs from exact builder plus unchanged pinned nginx stock')
-    archive = E / 'frontend-runtime.tar.zst'
-    producer = subprocess.Popen(['docker', 'save', image], stdout=subprocess.PIPE)
-    try:
-        with archive.open('wb') as sink:
-            run(['zstd', '-T2', '-3', '-c'], 300, stdin=producer.stdout, stdout=sink)
-        require(producer.wait(timeout=30) == 0, 'Current runtime save failed')
-    finally:
-        producer.stdout.close()
-        if producer.poll() is None: producer.kill(); producer.wait()
-    js = list(static.rglob('*.js'))
-    receipt = {'schema': 1, 'status': 'success', 'stage': 'runtime-assembly', 'head': head,
-        'checkoutSha': git('rev-parse', 'HEAD'), 'run': os.environ['GITHUB_RUN_ID'], 'attempt': os.environ['GITHUB_RUN_ATTEMPT'],
-        'componentTree': M['frontendPatch']['afterTree'], 'builderImage': builder, 'imageId': image, 'bases': bases,
-        'effectiveDockerfileSha256': sha(effective.read_bytes()), 'runtimeDockerfileSha256': sha(runtime_recipe.read_bytes()),
-        'archive': {'sha256': file_sha(archive), 'bytes': archive.stat().st_size}, 'staticFiles': files,
-        'builderStaticFileCount': len(files), 'runtimeStaticFileCount': len(actual),
-        'staticBytes': sum(p.stat().st_size for p in static.rglob('*') if p.is_file()),
-        'jsBytes': sum(p.stat().st_size for p in js), 'jsGzipBytes': sum(len(gzip.compress(p.read_bytes(), mtime=0)) for p in js),
-        'buildFlags': reports['frontend-builder.json']['buildFlags'],
-        'claim': 'Only the exact component-scoped contrast patch changes product inputs. Assembly receipt is separate from scan result.'}
-    entry_scripts = re.findall(r'<script[^>]+src=[\"\']([^\"\']+)[\"\']', (static / 'index.html').read_text())
-    require(entry_scripts and all(name.startswith('/assets/') and '..' not in name for name in entry_scripts), 'Missing or unexpected built entry scripts')
-    before_files = reports['frontend-builder.json']['staticFiles']
-    receipt['entryComparison'] = {'indexHtmlBefore': before_files['index.html'], 'indexHtmlAfter': files['index.html'],
-        'entryScripts': [{'path': name, 'before': before_files.get(name.lstrip('/')), 'after': files[name.lstrip('/')]} for name in entry_scripts]}
-    receipt['entryChanged'] = receipt['entryComparison']['indexHtmlBefore'] != receipt['entryComparison']['indexHtmlAfter'] or any(item['before'] != item['after'] for item in receipt['entryComparison']['entryScripts'])
-    write('frontend-runtime.json', receipt)
-    record['runtimeAssembly'] = {'imageId': image, 'archiveSha256': receipt['archive']['sha256']}
-    phase(record, 'changed-scale-scoped-lint', lambda: run_frontend_check(builder, ['npx','eslint','src/pages/ScaleEdit.tsx'], 'lint', 180))
-    phase(record, 'changed-frontend-app-types', lambda: run_frontend_check(builder, ['npx','tsc','-p','tsconfig.app.json','--noEmit'], 'types', 300, env=[('NODE_OPTIONS','--max-old-space-size=4096')]))
-    phase(record, 'affected-scale-component-contracts', lambda: run_frontend_check(builder,
-        ['npx','vitest','run','--maxWorkers=2','src/pages/__tests__/ScaleEdit.readonly.test.tsx','--reporter=json','--outputFile=/evidence/scale-component-tests.json'], 'components', 180, mounts=[(E,'/evidence')]))
-    # Save the successful assembly before the scan, so a scan failure never
-    # destroys the immutable bytes or mislabels it as a failed build.
-    phase(record, 'new-runtime-high-critical-scan', lambda: run(['trivy', 'image', '--exit-code', '1', '--ignore-unfixed',
-        '--scanners', 'vuln', '--severity', 'HIGH,CRITICAL', '--format', 'json', '--output', str(E / 'frontend-scan.json'), image], 600))
-    write('frontend-byte-comparison.json', {'oldSource': M['source']['head'], 'newHead': head,
-        'before': {k: reports['frontend-builder.json'][k] for k in ['staticBytes','jsBytes','jsGzipBytes']},
-        'after': {k: receipt[k] for k in ['staticBytes','jsBytes','jsGzipBytes']},
-        'claim': 'Measured artifact size delta for readability correction, not runtime speed or memory improvement.'})
+def validate_assembly_reports(runtime, verification, receipt):
+    for key, value in {'schema': 1, 'status': 'success', 'stage': 'runtime-assembly', 'head': receipt['head'],
+                       'checkoutSha': receipt['mergeHead'], 'run': str(receipt['run']), 'attempt': str(receipt['attempt']),
+                       'componentTree': M['frontendPatch']['afterTree'], 'imageId': receipt['imageId']}.items():
+        require(runtime.get(key) == value, 'Partial frontend assembly mismatch: ' + key)
+    require(receipt['componentTree'] == M['frontendPatch']['afterTree'], 'Assembly manifest component tree mismatch')
+    require(verification.get('status') == 'failure' and verification.get('currentHead') == receipt['head']
+            and verification.get('sourceSha') == M['source']['head'], 'Partial producer failure/origin changed')
+    expected = {'admit-original-official-evidence': 'success', 'changed-frontend-frontend': 'failure',
+                'fetch-base-node': 'success', 'fetch-base-nginx': 'success',
+                'changed-frontend-build-once': 'success', 'package-exact-new-builder': 'success',
+                'changed-scale-scoped-lint': 'success', 'changed-frontend-app-types': 'failure'}
+    phases = verification.get('phases', [])
+    require(len(phases) == len(expected) and {p['name']: p['status'] for p in phases} == expected,
+            'Partial frontend phase set/status changed')
+    require(verification.get('runtimeAssembly') == {'imageId': runtime['imageId'], 'archiveSha256': runtime['archive']['sha256']},
+            'Partial frontend assembly identity mismatch')
+    require(re.fullmatch(r'sha256:[0-9a-f]{64}', runtime['imageId']) and runtime.get('entryChanged') is True,
+            'Missing exact runtime identity/entry comparison')
 
 
 def current_frontend_image():
-    artifact_id = os.environ['CURRENT_FRONTEND_ARTIFACT_ID']
-    require(artifact_id.isdigit() and int(artifact_id) > 0, 'Missing official current artifact ID')
-    artifact = transport.api('/actions/artifacts/' + artifact_id)
-    digest = os.environ['CURRENT_FRONTEND_ARTIFACT_DIGEST'].removeprefix('sha256:')
-    require(re.fullmatch('[0-9a-f]{64}', digest) and artifact['digest'] == 'sha256:' + digest, 'Current official artifact digest mismatch')
-    require(artifact['id'] == int(artifact_id) and not artifact['expired'] and transport.recent(artifact['created_at']), 'Current artifact missing/expired')
-    require(artifact['workflow_run']['id'] == int(os.environ['GITHUB_RUN_ID']) and artifact['workflow_run']['head_sha'] == os.environ['CANDIDATE_HEAD_SHA'], 'Current artifact source mismatch')
-    expected = {'id': artifact['id'], 'name': artifact['name'], 'size': artifact['size_in_bytes'], 'digest': artifact['digest'], 'createdAt': artifact['created_at']}
-    directory = download(expected, ['frontend-runtime.json', 'frontend-runtime.tar.zst'])
-    receipt = json.loads((directory / 'frontend-runtime.json').read_text())
-    write('frontend-runtime.json', receipt)
-    require(artifact['name'] == 'reviewed-current-frontend-' + receipt['run'] + '-' + receipt['head'] + '-attempt-' + receipt['attempt'], 'Current artifact name mismatch')
-    require(artifact['workflow_run']['id'] == int(os.environ['GITHUB_RUN_ID']) and artifact['workflow_run']['head_sha'] == receipt['head'], 'Current artifact source mismatch')
-    jobs = transport.api('/actions/runs/' + os.environ['GITHUB_RUN_ID'] + '/jobs?filter=all&per_page=100')
-    require(jobs['total_count'] == len(jobs['jobs']), 'Truncated current jobs')
-    producer = [j for j in jobs['jobs'] if j['name'] == 'reviewed-candidate / changed frontend / build scan and package' and j['run_attempt'] == int(receipt['attempt'])]
-    require(len(producer) == 1 and producer[0]['status'] == 'completed' and producer[0]['conclusion'] == 'success' and producer[0]['head_sha'] == receipt['head'], 'Current frontend producer not successful')
-    require(receipt['status'] == 'success' and receipt['stage'] == 'runtime-assembly', 'New frontend assembly failed')
-    require(receipt['head'] == os.environ['CANDIDATE_HEAD_SHA'] and receipt['run'] == os.environ['GITHUB_RUN_ID'], 'New frontend artifact not from same PR/run')
-    require(receipt['componentTree'] == M['frontendPatch']['afterTree'] == git('rev-parse', 'HEAD:server-version/frontend'), 'New frontend inputs changed')
+    receipt = M['frontendAssemblyReceipt']
+    actual = transport.api('/actions/runs/' + str(receipt['run']))
+    job = transport.api('/actions/jobs/' + str(receipt['job']['id']))
+    validate_assembly_origin(actual, job, receipt)
+    require(receipt['pr'] == int(os.environ['PR_NUMBER']) and receipt['base'] == M['base'], 'Partial frontend PR/base mismatch')
+    require(git('rev-parse', receipt['head'] + '^{tree}') == receipt['tree'], 'Partial frontend source tree changed')
+    require(transport.api('/git/commits/' + receipt['mergeHead'])['tree']['sha'] == receipt['tree'], 'Partial frontend merge tree changed')
+    run(['git', 'merge-base', '--is-ancestor', receipt['head'], os.environ['CANDIDATE_HEAD_SHA']], 30)
+    require(git('rev-parse', receipt['head'] + ':server-version/frontend') == M['frontendPatch']['afterTree'], 'Assembly frontend tree changed')
+    require(git('rev-parse', 'HEAD:server-version/frontend') == M['testFix']['afterTree'], 'Current test overlay tree changed')
+    # Docker COPY includes tests, but this one test is neither a Vite entry nor
+    # imported by production code. Keep the old image, source label and bytes.
+    test_file = 'server-version/frontend/src/pages/__tests__/TrainingTaskDeepLinks.test.tsx'
+    changed = git('diff', '--name-only', '--no-renames', receipt['head'], 'HEAD', '--', 'server-version/frontend').splitlines()
+    require(changed == [test_file], 'Unexpected frontend build input change')
+    binding = M['testFix']['files'][test_file]
+    require(git('rev-parse', receipt['head'] + ':' + test_file) == binding['before']
+            and git('rev-parse', 'HEAD:' + test_file) == binding['after'], 'Exact test-only overlay changed')
+    provenance = {**M, 'source': {'run': receipt['run'], 'head': receipt['head']}}
+    for item in [receipt['artifact'], receipt['reportsArtifact']]:
+        validate_artifact(transport.api('/actions/artifacts/' + str(item['id'])), item, provenance)
+    reports_dir = download(receipt['reportsArtifact'], receipt['reportDigests'])
+    reports = {}
+    for name, digest in receipt['reportDigests'].items():
+        raw = (reports_dir / name).read_bytes()
+        require(sha(raw) == digest, 'Partial frontend report bytes changed: ' + name)
+        reports[name] = json.loads(raw)
+    runtime, verification = reports['frontend-runtime.json'], reports['frontend-verification.json']
+    validate_assembly_reports(runtime, verification, receipt)
+    original_builder = M['source']['head']
+    require(reports['official-admission.json']['sourceSha'] == original_builder
+            and reports['official-admission.json']['prHead'] == receipt['head']
+            and reports['official-admission.json']['status'] == 'success', 'Partial frontend original admission changed')
+    directory = download(receipt['artifact'], ['frontend-runtime.json', 'frontend-runtime.tar.zst'])
+    require(file_sha(directory / 'frontend-runtime.json') == receipt['reportDigests']['frontend-runtime.json'], 'Runtime artifact receipt differs')
     archive = directory / 'frontend-runtime.tar.zst'
-    require(archive.stat().st_size == receipt['archive']['bytes'] and file_sha(archive) == receipt['archive']['sha256'], 'New frontend archive changed')
+    require(archive.stat().st_size == runtime['archive']['bytes'] and file_sha(archive) == runtime['archive']['sha256'], 'Partial frontend archive changed')
     producer = subprocess.Popen(['zstd', '-dc', str(archive)], stdout=subprocess.PIPE)
     try:
         run(['docker', 'load'], 300, stdin=producer.stdout)
-        require(producer.wait(timeout=30) == 0, 'New frontend decompression failed')
+        require(producer.wait(timeout=30) == 0, 'Partial frontend decompression failed')
     finally:
         producer.stdout.close()
         if producer.poll() is None: producer.kill(); producer.wait()
-    image = receipt['imageId']
+    image = runtime['imageId']
     detail = json.loads(output(['docker', 'image', 'inspect', image]))[0]
-    require(detail['Id'] == image and detail['Config']['Labels']['org.opencontainers.image.revision'] == receipt['head'], 'New frontend image ID/revision changed')
+    require(detail['Id'] == image and detail['Config']['Labels']['org.opencontainers.image.revision'] == receipt['head'],
+            'Original frontend image ID/revision changed')
     archive.unlink()
+    write('frontend-runtime.json', runtime)
+    write('source-frontend-verification.json', verification)
+    write('accepted-frontend-assembly.json', {'status': 'success', 'currentHead': os.environ['CANDIDATE_HEAD_SHA'],
+        'sourceHead': receipt['head'], 'sourceTree': receipt['tree'], 'sourceRun': receipt['run'], 'sourceJob': receipt['job']['id'],
+        'originalJobConclusion': 'failure', 'originalCompletedAt': receipt['job']['completedAt'],
+        'artifact': receipt['artifact'], 'reportsArtifact': receipt['reportsArtifact'], 'reportDigests': receipt['reportDigests'],
+        'imageId': image, 'acceptedPhases': ['changed-frontend-build-once', 'package-exact-new-builder', 'changed-scale-scoped-lint'],
+        'claim': 'Only successful assembly and unchanged Scale lint are accepted from this failed producer. The source image is unchanged; types, selected contracts and image scan require current-run success.'})
     return image
 
 
+def qualify_frontend(reports, record):
+    image = current_frontend_image()
+    frontend = ROOT / 'server-version/frontend'
+    phase(record, 'install-locked-host-frontend-tooling', lambda: run(['npm', 'ci', '--prefix', str(frontend)], 300))
+    # A full checkout supplies the tracked sibling JSON fixtures that are absent
+    # in the frontend-only Docker build context. No bundling or lint is repeated.
+    phase(record, 'missing-frontend-app-types', lambda: subprocess.run(
+        ['node', 'node_modules/typescript/bin/tsc', '-p', 'tsconfig.app.json', '--noEmit'], cwd=frontend,
+        check=True, timeout=300, env={**os.environ, 'NODE_OPTIONS': '--max-old-space-size=4096'}))
+    selected = ['src/pages/__tests__/ScaleEdit.readonly.test.tsx', 'src/pages/__tests__/TrainingTaskDeepLinks.test.tsx']
+    phase(record, 'missing-scale-and-changed-training-contracts', lambda: subprocess.run(
+        ['node', 'node_modules/vitest/vitest.mjs', 'run', '--maxWorkers=2', *selected,
+         '--reporter=json', '--outputFile=' + str(E / 'selected-component-tests.json')], cwd=frontend, check=True, timeout=180))
+    tests = json.loads((E / 'selected-component-tests.json').read_text())
+    require(tests.get('success') is True and len(tests.get('testResults', [])) == len(selected), 'Selected contract files incomplete')
+    require({str(Path(t['name']).relative_to(frontend)) for t in tests['testResults']} == set(selected), 'Unexpected selected contract file')
+    require(all(t.get('assertionResults') and all(a.get('status') == 'passed' for a in t['assertionResults'])
+                for t in tests['testResults']), 'Selected assertions failed/skipped')
+    phase(record, 'missing-runtime-high-critical-scan', lambda: run(['trivy', 'image', '--exit-code', '1', '--ignore-unfixed',
+        '--scanners', 'vuln', '--severity', 'HIGH,CRITICAL', '--format', 'json', '--output', str(E / 'frontend-scan.json'), image], 600))
+    record['imageId'] = image
+    record['execution'] = 'Reused exact successful assembly/lint only; current checkout app types, two selected test files and actual image scan executed. No build.'
+
+
+def require_current_frontend_qualification():
+    jobs = transport.api('/actions/runs/' + os.environ['GITHUB_RUN_ID'] + '/attempts/' + os.environ['GITHUB_RUN_ATTEMPT'] + '/jobs?per_page=100')
+    require(jobs['total_count'] == len(jobs['jobs']), 'Truncated current qualification jobs')
+    qualified = [job for job in jobs['jobs'] if job['name'] == 'reviewed-candidate / admitted frontend / missing types contracts and scan']
+    require(len(qualified) == 1 and qualified[0]['head_sha'] == os.environ['CANDIDATE_HEAD_SHA']
+            and qualified[0]['status'] == 'completed' and qualified[0]['conclusion'] == 'success', 'Current frontend qualification not successful')
+
+
+def interaction_frontend(engine, record):
+    require(engine in ['chromium', 'firefox', 'webkit'], 'Unknown interaction browser')
+    require_current_frontend_qualification()
+    image = current_frontend_image()
+    name = 'reviewed-interaction-' + os.environ['GITHUB_RUN_ID'] + '-' + engine
+    owner = name + '-' + os.environ['GITHUB_RUN_ATTEMPT']
+    require(subprocess.run(['docker', 'inspect', name], capture_output=True).returncode != 0, 'Interaction container already exists')
+    identity = None
+    try:
+        identity = output(['docker', 'run', '-d', '--name', name, '--label', 'reviewed-candidate-owner=' + owner,
+                           '-p', '127.0.0.1:3189:80', image], 120)
+        require(re.fullmatch('[a-f0-9]{64}', identity), 'Invalid interaction container ID')
+        for _ in range(30):
+            try:
+                with urllib.request.urlopen('http://127.0.0.1:3189/', timeout=2) as response:
+                    if response.status == 200: break
+            except Exception: pass
+            time.sleep(1)
+        else: raise RuntimeError('Interaction frontend readiness exceeded 30 seconds')
+        evidence = E / ('interaction-' + engine)
+        env = {**os.environ, 'PLAYWRIGHT_CORE_PATH': str(ROOT / '.github/release-tools/node_modules/playwright-core'),
+               'VISUAL_QA_BASE_URL': 'http://127.0.0.1:3189', 'VISUAL_QA_EVIDENCE_DIR': str(evidence),
+               'VISUAL_QA_BROWSER_ENGINE': engine, 'VISUAL_QA_SCOPE': 'assignment-list-states'}
+        phase(record, 'affected-assignment-states-' + engine, lambda: run(
+            ['node', 'server-version/e2e/visual-interaction-states-browser-e2e.cjs'], 240, env=env))
+        result = json.loads((evidence / 'interaction-states/qa.json').read_text())
+        require(result.get('scope') == 'assignment-list-states' and result.get('results') ==
+                [{'width': width, 'passed': True, 'assignmentStates': [{'state': state, 'passed': True} for state in
+                  ['loading', 'populated', 'empty', 'filtered-empty', 'error']]} for width in [360, 390, 768, 1440]],
+                'Interaction coverage incomplete')
+        record.update(imageId=image, artifactSourceHead=M['frontendAssemblyReceipt']['head'], browser=engine,
+                      scope='assignment-list-states', testScriptBlob=git('rev-parse', 'HEAD:server-version/e2e/visual-interaction-states-browser-e2e.cjs'))
+    finally:
+        if identity is None:
+            found = subprocess.run(['docker', 'inspect', name], capture_output=True, text=True)
+            if found.returncode == 0:
+                detail = json.loads(found.stdout)[0]
+                if detail.get('Config', {}).get('Labels', {}).get('reviewed-candidate-owner') == owner: identity = detail['Id']
+        record['isolatedResourcesRemoved'] = not identity or subprocess.run(['docker', 'rm', '-f', '-v', identity], capture_output=True).returncode == 0
+        write(record['report'], record)
+        require(record['isolatedResourcesRemoved'], 'Interaction resource cleanup failed')
+
+
 def browser_frontend(reports, record):
+    require_current_frontend_qualification()
     old = load_image('frontend-runtime', reports)
     current = current_frontend_image()
     # No unimplemented partial-job receipt may silently substitute for two UI contexts.
@@ -593,7 +634,7 @@ def browser_frontend(reports, record):
             'Entry bytes unchanged: prior two-context admission is not implemented; stop rather than repeat or silently skip')
     owned = []
     try:
-        for mode, image, source in [('baseline', old, M['source']['head']), ('current', current, os.environ['CANDIDATE_HEAD_SHA'])]:
+        for mode, image, source in [('baseline', old, M['source']['head']), ('current', current, M['frontendAssemblyReceipt']['head'])]:
             name = 'reviewed-candidate-frontend-' + mode
             require(subprocess.run(['docker', 'inspect', name], capture_output=True).returncode != 0, 'Frontend probe container already exists')
             label = os.environ['GITHUB_RUN_ID'] + '-' + os.environ['GITHUB_RUN_ATTEMPT'] + '-' + mode
@@ -621,7 +662,7 @@ def browser_frontend(reports, record):
             phase(record, mode + '-frontend-browser', lambda: run(command, 240, env=env))
             run(['docker', 'rm', '-f', '-v', identity], 30); owned.remove(identity)
         value = json.loads((E / 'browser.json').read_text())
-        require(value['status'] == 'success' and value['sourceSha'] == os.environ['CANDIDATE_HEAD_SHA']
+        require(value['status'] == 'success' and value['sourceSha'] == M['frontendAssemblyReceipt']['head']
                 and value['currentHead'] == os.environ['CANDIDATE_HEAD_SHA'] and value['imageId'] == current, 'Current browser source/status mismatch')
     finally:
         failures = [identity for identity in reversed(owned) if subprocess.run(['docker','rm','-f','-v',identity],capture_output=True).returncode != 0]
@@ -631,22 +672,24 @@ def browser_frontend(reports, record):
 
 def probe(action, reports, record):
     if action == 'race': return accept_race(record)
-    if action == 'frontend': return build_frontend(reports, record)
+    if action == 'frontend': return qualify_frontend(reports, record)
+    if action.startswith('interaction-'): return interaction_frontend(action.removeprefix('interaction-'), record)
     return browser_frontend(reports, record)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=['frontend', 'browser', 'race'])
+    parser.add_argument('action', choices=['frontend', 'browser', 'race', 'interaction-chromium', 'interaction-firefox', 'interaction-webkit'])
     action = parser.parse_args().action
     require(not PRIVATE.exists(), 'Refuse stale private state')
     PRIVATE.mkdir(mode=0o700); E.mkdir(exist_ok=True)
     record = {'schema': 1, 'report': action + '-verification.json', 'status': 'running',
-              'sourceSha': M['source']['head'], 'currentHead': os.environ.get('CANDIDATE_HEAD_SHA'), 'phases': []}
+              'sourceSha': M['source']['head'] if action == 'race' else M['frontendAssemblyReceipt']['head'],
+              'currentHead': os.environ.get('CANDIDATE_HEAD_SHA'), 'phases': []}
     try:
         reports = {}
         phase(record, 'admit-original-official-evidence', lambda: reports.update(admit()))
-        phase(record, 'accept-prior-successful-race' if action == 'race' else 'changed-frontend-' + action, lambda: probe(action, reports, record))
+        phase(record, 'accept-prior-successful-race' if action == 'race' else 'qualify-missing-' + action, lambda: probe(action, reports, record))
         record['status'] = 'success'
     except BaseException:
         record['status'] = 'failure'

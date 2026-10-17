@@ -27,7 +27,11 @@ const patchPaths = Object.freeze([
   'server-version/frontend/src/pages/ScaleEdit.tsx',
   'server-version/frontend/src/pages/ScaleEdit.css',
 ]);
-const currentComponents = () => ({...manifest.components, frontend:manifest.frontendPatch?.afterTree});
+const testFixPaths = Object.freeze([
+  'server-version/frontend/src/pages/__tests__/TrainingTaskDeepLinks.test.tsx',
+  'server-version/e2e/visual-interaction-states-browser-e2e.cjs',
+]);
+const currentComponents = () => ({...manifest.components, frontend:manifest.testFix?.afterTree});
 function validPatch() {
   const patch = manifest.frontendPatch;
   if (!patch || patch.beforeTree !== manifest.components.frontend || !sha(patch.afterTree)
@@ -42,14 +46,32 @@ function validPatch() {
   }
   return true;
 }
+function validTestFix() {
+  const fix = manifest.testFix, assembly = manifest.frontendAssemblyReceipt;
+  if (!fix || fix.beforeTree !== manifest.frontendPatch?.afterTree || !sha(fix.afterTree)
+      || fix.beforeTree === fix.afterTree
+      || !same(Object.keys(fix.files ?? {}).sort(), [...testFixPaths].sort())
+      || !assembly || !sha(assembly.head) || !sha(assembly.tree) || !sha(assembly.mergeHead)
+      || assembly.base !== manifest.base || assembly.componentTree !== fix.beforeTree
+      || !/^sha256:[a-f0-9]{64}$/.test(assembly.imageId ?? '')) return false;
+  for (const [file, binding] of Object.entries(fix.files)) {
+    const original = manifest.files[file];
+    if (!sha(binding.before) || !sha(binding.after) || binding.before === binding.after
+        || binding.status !== 'M' || !regular(binding)
+        || Object.hasOwn(manifest.frontendPatch.files, file)
+        || (original && binding.before !== original.after)) return false;
+  }
+  return true;
+}
 const sourceBindings = () => ({...manifest.files,
-  ...Object.fromEntries(Object.entries(manifest.frontendPatch?.files ?? {}).filter(([file]) => !Object.hasOwn(manifest.files, file)))});
+  ...Object.fromEntries(Object.entries(manifest.frontendPatch?.files ?? {}).filter(([file]) => !Object.hasOwn(manifest.files, file))),
+  ...Object.fromEntries(Object.entries(manifest.testFix?.files ?? {}).filter(([file]) => !Object.hasOwn(manifest.files, file)))});
 const regular = entry => entry?.newMode === '100644'
   && ((entry.status === 'A' && entry.oldMode === '000000')
     || (entry.status === 'M' && entry.oldMode === '100644'));
 function boundary(entries) {
   const bindings = sourceBindings(), files = Object.keys(bindings);
-  if (manifest.schema !== 1 || !files.length || !validPatch() || !sha(manifest.base)
+  if (manifest.schema !== 1 || !files.length || !validPatch() || !validTestFix() || !sha(manifest.base)
       || !sha(manifest.source?.head) || !sha(manifest.source?.tree)
       || !same(manifest.required, reviewedCandidateRequired)
       || !['frontend','backend'].every(component => sha(manifest.components?.[component]))
@@ -73,13 +95,16 @@ const git = (ref, file) => execFileSync('git', ['rev-parse', `${ref}:${file}`], 
 export function reviewedCandidatePlan(entries, base, head, read = git) {
   if (!sha(base) || !sha(head) || base !== manifest.base || !boundary(entries)) return null;
   try {
+    const assembly = manifest.frontendAssemblyReceipt;
     for (const [file, binding] of Object.entries(manifest.files)) {
-      const after = manifest.frontendPatch.files[file]?.after ?? binding.after;
+      const assembled = manifest.frontendPatch.files[file]?.after ?? binding.after;
+      const after = manifest.testFix.files[file]?.after ?? assembled;
       if (read(head, file) !== after || read(manifest.source.head, file) !== binding.after
+          || read(assembly.head, file) !== assembled
           || (binding.before !== null && read(base, file) !== binding.before)) return null;
     }
     for (const [file, binding] of Object.entries(manifest.frontendPatch.files)) {
-      if (read(head, file) !== binding.after) return null;
+      if (read(head, file) !== binding.after || read(assembly.head, file) !== binding.after) return null;
       if (binding.before === null) {
         // A patch-only path must be absent in both original source and main.
         for (const ref of [manifest.source.head, base]) {
@@ -89,8 +114,18 @@ export function reviewedCandidatePlan(entries, base, head, read = git) {
         }
       } else if (read(manifest.source.head, file) !== binding.before) return null;
     }
-    // Original receipts retain their original trees; only the exact two-file
-    // overlay gets a new frontend tree. No backend/dependency/config drift.
+    for (const [file, binding] of Object.entries(manifest.testFix.files)) {
+      if (read(head, file) !== binding.after || read(assembly.head, file) !== binding.before
+          || read(manifest.source.head, file) !== binding.before) return null;
+      // A test-only path not in the original 49-file diff must already have
+      // exactly these bytes in main; it is not an unreviewed new application path.
+      if (!Object.hasOwn(manifest.files, file) && read(base, file) !== binding.before) return null;
+    }
+    // Original receipts and the successful runtime assembly retain their exact
+    // original trees. Only these two test files may differ at the current head.
+    if (read(assembly.head, '') !== assembly.tree
+        || read(assembly.head, 'server-version/frontend') !== manifest.frontendPatch.afterTree
+        || read(assembly.head, 'server-version/backend') !== manifest.components.backend) return null;
     for (const component of ['frontend','backend']) {
       const file = `server-version/${component}`;
       if (read(manifest.source.head, file) !== manifest.components[component]
@@ -102,7 +137,8 @@ export function reviewedCandidatePlan(entries, base, head, read = git) {
     if (!sha(tree) || !sha(manifestBlob)) return null;
     return {schema:1, route:'reviewed-candidate', base, head, tree,
       source:manifest.source, manifestBlob, changes:entries, changed:['frontend','backend'],
-      components:currentComponents(), frontendPatch:manifest.frontendPatch, raceReceipt:manifest.raceReceipt, required:reviewedCandidateRequired};
+      components:currentComponents(), frontendPatch:manifest.frontendPatch, testFix:manifest.testFix,
+      frontendAssemblyReceipt:manifest.frontendAssemblyReceipt, raceReceipt:manifest.raceReceipt, required:reviewedCandidateRequired};
   } catch { return null; }
 }
 
@@ -114,6 +150,7 @@ export function validReviewedCandidatePlan(plan) {
     && plan.base === manifest.base && sha(plan.head) && sha(plan.tree) && sha(plan.manifestBlob)
     && same(plan.source, manifest.source) && same(plan.components, currentComponents())
     && same(plan.frontendPatch, manifest.frontendPatch) && same(plan.raceReceipt, manifest.raceReceipt)
+    && same(plan.testFix, manifest.testFix) && same(plan.frontendAssemblyReceipt, manifest.frontendAssemblyReceipt)
     && same(plan.changed, ['frontend','backend']) && same(plan.required, reviewedCandidateRequired)
     && boundary(plan.changes));
 }
