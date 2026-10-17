@@ -23,6 +23,31 @@ def source_fixture():
     return run, job, artifact
 
 
+def repair_job_fixture():
+    origin = r.ORIGIN_B
+    job = {'id': origin['job'], 'run_id': origin['run'], 'head_sha': origin['head'], 'status': 'completed', 'conclusion': 'failure', 'steps': [*[{'name': name, 'status': 'completed', 'conclusion': 'success'} for name in r.B_REQUIRED_SUCCESS_STEPS], {'name': r.DOWNSTREAM_STEPS[-1], 'status': 'completed', 'conclusion': 'failure'}, *[{'name': 'Run actions/upload-artifact@v4', 'status': 'completed', 'conclusion': 'success'} for _ in range(2)]]}
+    proof = {'head': origin['merge'], 'sourceHead': origin['head'], 'tree': origin['tree'], 'phases': [*[{'name': name, 'status': 'success', 'seconds': 1} for name in r.B_SUCCESS_PHASES], {'name': r.B_FAILED_PHASE, 'status': 'failure', 'errorType': 'CalledProcessError', 'seconds': 1}], 'privateBrowserMaterialRemoved': True, 'isolatedResourcesRemoved': True, 'cleanupErrors': [], 'builders': {'backend': 'sha256:' + 'a' * 64, 'frontend': 'sha256:' + 'b' * 64}, 'images': {'backend': 'sha256:' + 'c' * 64, 'frontend': 'sha256:' + 'd' * 64}, 'executionInputs': {'node': 'v24.21.0', 'docker': '28.0.4', 'runnerOS': 'Linux', 'workflow': r.REVIEWED_TRANSITIONS['.github/workflows/ci-survey-candidate.yml']['after'], 'executor': r.REVIEWED_TRANSITIONS['.github/scripts/survey-candidate.py']['after'], 'environmentSha256': 'bc50178d55dd2f5cdb9564a5ba742ab6cb786f5e4e42ccfbc10d5d95aaf4fa31'}}
+    return job, proof
+
+
+def repair_reports_fixture():
+    _, checks = repair_job_fixture()
+    plan = {'backendTests': ['src/backend-' + str(n) + '.test.ts' for n in range(16)], 'frontendTests': [*r.REPAIR_TESTS, *['src/stable-' + str(n) + '.test.ts' for n in range(13)]]}
+    def tests(names, counts):
+        return {'success': True, 'numTotalTests': sum(counts), 'numPassedTests': sum(counts), 'numFailedTests': 0, 'numPendingTests': 0, 'testResults': [{'name': '/app/' + name, 'status': 'passed', 'assertionResults': [{'status': 'passed'} for _ in range(count)]} for name, count in zip(names, counts)]}
+    def probe(count): return {'status': 'pass', 'checks': [{'name': 'synthetic check ' + str(n), 'pass': True} for n in range(count)]}
+    reports = {'backend-tests.json': tests(plan['backendTests'], [117, *([1] * 15)]), 'frontend-tests.json': tests(plan['frontendTests'], [7, 3, 20, 124, *([1] * 12)])}
+    for component in ('backend', 'frontend'):
+        reports[component + '-scan.json'] = {'ArtifactType': 'container_image', 'ArtifactName': 'eduk12-survey-candidate-' + component + ':' + r.ORIGIN_B['merge'], 'Metadata': {'ImageID': checks['images'][component]}, 'Results': []}
+    for name, count in [('runtime-result.json', 39), ('runtime-restore.json', 11)]:
+        reports[name] = {**probe(count), 'binding': {'sourceSha': r.ORIGIN_B['merge'], 'imageId': checks['builders']['backend'], 'probeSha256': 'runtime-hash', 'node': '24.21.0', 'postgres': '160015', 'redis': '7.4.11', 'distSha256': 'e' * 64}, 'serverStopped': True, 'runtimeRole': {'restrictedRuntimeRole': True}}
+    for name, count, phase in [('recovery-bootstrap.json', 4, 'bootstrap'), ('recovery-result.json', 31, 'verify')]:
+        reports[name] = {**probe(count), 'phase': phase, 'sourceSha': r.ORIGIN_B['merge'], 'buildImageId': checks['builders']['backend'], 'scriptSha256': 'recovery-hash', 'runtimeRoles': {'synthetic': {'ok': True, 'restrictedRuntimeRole': True, 'migrationCount': 165}}, 'distSha256': 'e' * 64, 'compiledRestoreChecks': reports['runtime-restore.json']['checks']}
+    phase = 'researcher four-type composition and publication'
+    reports['browser/result.json'] = {'status': 'failed', 'sourceCommit': r.ORIGIN_B['merge'], 'images': checks['images'], 'harnessSha256': 'browser-hash', 'browserErrors': [], 'phase': phase, 'failure': {'name': 'AssertionError', 'phase': phase, 'message': 'researcher-published-wave has no WCAG A/AA violations, including serious/critical'}, 'accessibility': [{'state': 'admin-invitation-grants', 'violations': []}, {'state': 'researcher-published-wave', 'violations': [{'id': 'svg-img-alt', 'impact': 'serious', 'nodeCount': 1}]}]}
+    return reports, plan, checks
+
+
 class ReceiptTests(unittest.TestCase):
     def test_official_origin_does_not_qualify_failed_candidate(self):
         run, job, artifact = source_fixture()
@@ -63,6 +88,55 @@ class ReceiptTests(unittest.TestCase):
         self.assertTrue(r.validate_scope_tap(output, names))
         for bad in [output.replace('synthetic case 0', 'wrong case'), output.replace('# fail 0', '# fail 1'), output.replace(' - synthetic case 1\n', ' - synthetic case 1 # SKIP\n')]:
             with self.assertRaises(r.ReuseRejected): r.validate_scope_tap(bad, names)
+
+    def test_browser_repair_requires_only_the_exact_browser_failure(self):
+        job, proof = repair_job_fixture()
+        self.assertEqual(r.validate_browser_failure_candidate(job, proof), list(r.B_SUCCESS_PHASES))
+        for change in ('source', 'phase', 'cleanup', 'environment'):
+            bad = copy.deepcopy(proof)
+            if change == 'source': bad['sourceHead'] = '0' * 40
+            elif change == 'phase': bad['phases'][0]['status'] = 'failure'
+            elif change == 'cleanup': bad['cleanupErrors'] = [{'resource': 'synthetic'}]
+            else: bad['executionInputs']['node'] = 'v24.19.0'
+            with self.assertRaises(r.ReuseRejected): r.validate_browser_failure_candidate(job, bad)
+        bad = copy.deepcopy(job); bad['steps'][0]['conclusion'] = 'skipped'
+        with self.assertRaises(r.ReuseRejected): r.validate_browser_failure_candidate(bad, proof)
+        bad = copy.deepcopy(job); bad['steps'].append(dict(bad['steps'][0]))
+        with self.assertRaises(r.ReuseRejected): r.validate_browser_failure_candidate(bad, proof)
+
+    def test_browser_repair_never_retains_wrong_scan_partial_tests_or_other_failure(self):
+        reports, plan, checks = repair_reports_fixture()
+        args = (plan, checks, 'runtime-hash', 'recovery-hash', 'browser-hash')
+        summary = r.validate_repair_reports(reports, *args)
+        self.assertEqual((summary['backendAssertions'], summary['frontendRetainedAssertions'], summary['frontendInvalidatedAssertions']), (132, 136, 30))
+        self.assertFalse(summary['browserQualified'])
+        for change in ('skip', 'scan', 'runtime', 'restore', 'browser'):
+            bad = copy.deepcopy(reports)
+            if change == 'skip': bad['frontend-tests.json']['testResults'][3]['assertionResults'][0]['status'] = 'skipped'
+            elif change == 'scan': bad['backend-scan.json']['Metadata']['ImageID'] = 'sha256:' + '0' * 64
+            elif change == 'runtime': bad['runtime-result.json']['serverStopped'] = False
+            elif change == 'restore': bad['recovery-result.json']['checks'][0]['pass'] = False
+            else: bad['browser/result.json']['accessibility'][1]['violations'][0]['id'] = 'different-rule'
+            with self.assertRaises(r.ReuseRejected): r.validate_repair_reports(bad, *args)
+
+    def test_browser_repair_transition_rejects_backend_or_unreviewed_product_change(self):
+        reviewed = {path: {'before': str(index + 1) * 40, 'after': str(index + 3) * 40} for index, path in enumerate(r.REPAIR_PRODUCT_PATHS)}
+        before = {path: ('100644', 'blob', values['before']) for path, values in reviewed.items()}
+        before[r.SELF_PATH] = ('100644', 'blob', r.B_VERIFIER_BLOB)
+        before['server-version/backend/unchanged.ts'] = ('100644', 'blob', 'e' * 40)
+        after = dict(before)
+        for path, values in reviewed.items(): after[path] = ('100644', 'blob', values['after'])
+        after[r.SELF_PATH] = ('100644', 'blob', 'f' * 40)
+        self.assertEqual(r.validate_repair_transition(before, after, 'f' * 40, reviewed)['unchangedGitObjects'], 1)
+        bad = dict(after); bad['server-version/backend/unchanged.ts'] = ('100644', 'blob', 'd' * 40)
+        with self.assertRaises(r.ReuseRejected): r.validate_repair_transition(before, bad, 'f' * 40, reviewed)
+
+    def test_repair_scope_tap_requires_exact_three_current_consumers(self):
+        names = list(r.SCOPE_REPAIR_TESTS)
+        output = '\n'.join('ok ' + str(n + 1) + ' - ' + name for n, name in enumerate(names)) + '\n# pass 3\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n'
+        self.assertTrue(r.validate_scope_repair_tap(output, names))
+        for bad in [output.replace('# pass 3', '# pass 2'), output.replace('ok 1 - ' + names[0], 'ok 1 - ' + names[0] + ' # SKIP'), output.replace('# skipped 0', '# skipped 1')]:
+            with self.assertRaises(r.ReuseRejected): r.validate_scope_repair_tap(bad, names)
 
     def test_artifact_identity_digest_expiry_and_job_skip_rejected(self):
         for mutate in [lambda d: d.update(name='other'), lambda d: d.update(digest='missing'), lambda d: d.update(expired=True), lambda d: d.update(workflow_run={'id': 1, 'head_sha': r.SOURCE_HEAD}), lambda d: d.update(size_in_bytes=0)]:

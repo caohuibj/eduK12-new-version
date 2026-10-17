@@ -91,6 +91,7 @@ describe('wave collective same-IP controls',()=>{
     fireEvent.click(screen.getByRole('button',{name:'正式开放本轮'}))
     await screen.findByText(/集体作答截止：2026\/10\/19 12:00:00（Asia\/Shanghai）/)
     expect(screen.getByText(/已于 2026\/10\/17 12:00:00（Asia\/Shanghai）开放/)).toBeInTheDocument()
+    expect(screen.getByRole('img',{name:'研究参与招募二维码'})).toBeInTheDocument()
     expect(api.bodies[0]).toEqual({revision:1})
   })
   it('keeps the same deadline visible while paused without editable policy controls',async()=>{

@@ -652,7 +652,7 @@
     },
     "server-version/frontend/src/survey/SurveyWaveStudio.group-ip.test.tsx": {
       "before": null,
-      "after": "e6d12858bbd357ad2bcf89431428698f85078cb0"
+      "after": "75beb3b57f5759c1d7b8ddf1d5564096070b7be2"
     },
     "server-version/frontend/src/survey/SurveyWaveStudio.preview.test.tsx": {
       "before": null,
@@ -660,7 +660,7 @@
     },
     "server-version/frontend/src/survey/SurveyWaveStudio.tsx": {
       "before": "7a44cc036fc4d419a109b78fef3f069aecb6ea00",
-      "after": "935e1787752d5729b44bd21898bb47ab210d15b9"
+      "after": "e6340fbfb5d2b4c3e25f7d12d782b4fbbc0e80ae"
     },
     "server-version/frontend/src/survey/SurveyWorkspace.lifecycle.test.tsx": {
       "before": null,

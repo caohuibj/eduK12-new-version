@@ -115,6 +115,39 @@ def resume_build():
  C['images']['frontend']=out(['docker','image','inspect','--format','{{.Id}}',tag('frontend')]);save()
  archive_image('frontend',False)
 
+def resume_browser_repair():
+ proof=json.loads((E/'resume-proof.json').read_text());old=proof['originalChecks']
+ assert proof['schema']==1 and proof['status']=='QUALIFIED_BROWSER_REPAIR' and proof['currentHead']==P['head'] and proof['currentSourceHead']==os.environ['SURVEY_SOURCE_HEAD']
+ assert old['components']['backend']==P['components']['backend'] and C['phases']==[]
+ C['reusedQualification']={'sourceRun':proof['sourceRun'],'sourceHead':proof['sourceHead'],'sourceMergeHead':proof['sourceMergeHead'],'artifact':proof['artifact'],'phases':proof['reusedPhases'],'reportPaths':proof['reportPaths'],'compileOrigin':proof['compileOrigin'],'retainedBackendTests':proof['retainedBackendTests'],'retainedFrontendTests':proof['retainedFrontendTests'],'frontendTestsReused':proof['frontendTestsReused']}
+ C['bases']=old['bases'];C['builders']={'backend':old['builders']['backend']};C['images']={'backend':old['images']['backend']}
+ C['executionInputs']={'node':out(['node','--version']),'docker':out(['docker','version','--format','{{.Client.Version}}']),'runnerOS':os.environ.get('RUNNER_OS'),'workflow':out(['git','hash-object','.github/workflows/ci-survey-candidate.yml']),'executor':out(['git','hash-object','.github/scripts/survey-candidate.py']),'environmentSha256':hashlib.sha256(json.dumps(ENV,sort_keys=True).encode()).hexdigest()};save()
+ base=proof['currentAliases']['frontendBuilder']['alias']
+ assert out(['docker','image','inspect','--format','{{.Id}}',base])==old['builders']['frontend']
+ changed=['src/survey/SurveyWaveStudio.tsx','src/survey/SurveyWaveStudio.group-ip.test.tsx']
+ df=TMP/'frontend-qr-build.Dockerfile'
+ df.write_text('FROM '+base+' AS build\nWORKDIR /app\n'+''.join('COPY '+f+' /app/'+f+'\n' for f in changed)+'RUN npm run build\n')
+ C['frontendBuildRecipe']={'sha256':hashlib.sha256(df.read_bytes()).hexdigest(),'dependencyProducer':old['builders']['frontend'],'copiedSourceBlobs':{f:out(['git','hash-object','server-version/frontend/'+f]) for f in changed},'dependencyLockUnchanged':True};save()
+ phase('frontend-compile',lambda:run(['docker','buildx','build','--builder','default','--load','-f',str(df),'--label','org.opencontainers.image.revision='+P['head'],'--target','build','-t',tag('frontend',True),str(ROOT/'server-version/frontend')],1200))
+ C['builders']['frontend']=out(['docker','image','inspect','--format','{{.Id}}',tag('frontend',True)]);save()
+ archive_image('frontend',True)
+ phase('frontend-app-types',lambda:run(frontend_env()+[tag('frontend',True),'npx','tsc','-p','tsconfig.app.json','--noEmit'],600))
+ phase('frontend-qr-lint',lambda:run(frontend_env()+[tag('frontend',True),'npx','eslint',*changed],300))
+ original=(ROOT/'server-version/frontend/Dockerfile').read_text();marker='FROM nginx:1.31.6-alpine3.24-slim AS runtime';assert original.count(marker)==1
+ tail=original[original.index(marker):].replace('nginx:1.31.6-alpine3.24-slim',C['bases']['nginx:1.31.6-alpine3.24-slim'],1)
+ alias='eduk12-qualified-survey-frontend:'+C['builders']['frontend'].removeprefix('sha256:');run(['docker','tag',C['builders']['frontend'],alias],30)
+ df=TMP/'frontend-qr-runtime.Dockerfile';df.write_text('FROM '+alias+' AS build\n'+tail)
+ C['frontendRuntimeRecipe']={'sha256':hashlib.sha256(df.read_bytes()).hexdigest(),'producer':C['builders']['frontend'],'compiledSourceHead':os.environ['SURVEY_SOURCE_HEAD'],'compiledMergeHead':P['head'],'runtimeBase':C['bases']['nginx:1.31.6-alpine3.24-slim']};save()
+ phase('frontend-runtime',lambda:run(['docker','buildx','build','--builder','default','--load','-f',str(df),'--label','org.opencontainers.image.revision='+P['head'],'--target','runtime','-t',tag('frontend'),str(ROOT/'server-version/frontend')],900))
+ C['images']['frontend']=out(['docker','image','inspect','--format','{{.Id}}',tag('frontend')]);save();archive_image('frontend',False)
+
+def frontend_repair_tests():
+ proof=json.loads((E/'resume-proof.json').read_text());selected=proof['frontendTestsToRun']
+ assert selected==['src/survey/SurveyWaveStudio.group-ip.test.tsx','src/survey/SurveyWaveStudio.preview.test.tsx','src/survey/SurveyWorkspace.requests.test.tsx']
+ cmd='npx vitest run '+shlex.join(selected)+' --maxWorkers=2 --reporter=json --outputFile=/evidence/frontend-qr-tests.json'
+ def check():run(frontend_env()+[tag('frontend',True),'sh','-ec',cmd],600);report('frontend-qr-tests.json',selected)
+ phase('affected-frontend-qr-contracts',check)
+
 def services():
  run(['docker','run','-d','--name','survey-ci-postgres','-e','POSTGRES_USER=ptool','-e','POSTGRES_PASSWORD=ptool123','-e','POSTGRES_DB=survey_candidate_ci_test','-p','127.0.0.1:5432:5432','postgres:16.15-bookworm'],180)
  run(['docker','run','-d','--name','survey-ci-redis','-p','127.0.0.1:6379:6379','redis:7.4.11-bookworm'],180)
@@ -123,9 +156,9 @@ def services():
   time.sleep(1)
  else:raise RuntimeError('Isolated service readiness timeout')
  C['services']={n:out(['docker','inspect','--format','{{.Image}}',n]) for n in ['survey-ci-postgres','survey-ci-redis']};save()
- phase('integrated-migration',lambda:run(docker_env()+[tag('backend',True),'npx','prisma','migrate','deploy'],300))
+ phase('browser-environment-migration',lambda:run(docker_env()+[tag('backend',True),'npx','prisma','migrate','deploy'],300))
  env={**os.environ,**ENV,'SURVEY_CI_IMAGE_ID':C['builders']['backend']}
- phase('restricted-runtime-bootstrap',lambda:run(['python3','-B','.github/scripts/survey-candidate-recovery.py','bootstrap',tag('backend',True),str(E)],300,env=env))
+ phase('browser-environment-runtime-role',lambda:run(['python3','-B','.github/scripts/survey-candidate-recovery.py','bootstrap',tag('backend',True),str(E)],300,env=env))
 def backend_tests():
  selected=P['backendTests'];cmd='npx vitest run '+shlex.join(selected)+' --no-file-parallelism --reporter=json --outputFile=/evidence/backend-tests.json'
  def check():run(docker_env()+[tag('backend',True),'sh','-ec',cmd],900);report('backend-tests.json',selected)
@@ -193,5 +226,5 @@ def cleanup():
   C['privateBrowserMaterialRemoved']=not TMP.exists();C['isolatedResourcesRemoved']=not errors;C['cleanupErrors']=errors;save()
  if errors:raise RuntimeError('Isolated container cleanup failed; private browser material removed')
 if __name__=='__main__':
- action=sys.argv[1];assert action in ['build','resume-build','services','backend-tests','frontend-tests','runtime','browser','cleanup']
- {'build':build,'resume-build':resume_build,'services':services,'backend-tests':backend_tests,'frontend-tests':frontend_tests,'runtime':runtime,'browser':browser,'cleanup':cleanup}[action]()
+ action=sys.argv[1];assert action in ['build','resume-build','resume-browser-repair','frontend-repair-tests','services','backend-tests','frontend-tests','runtime','browser','cleanup']
+ {'build':build,'resume-build':resume_build,'resume-browser-repair':resume_browser_repair,'frontend-repair-tests':frontend_repair_tests,'services':services,'backend-tests':backend_tests,'frontend-tests':frontend_tests,'runtime':runtime,'browser':browser,'cleanup':cleanup}[action]()

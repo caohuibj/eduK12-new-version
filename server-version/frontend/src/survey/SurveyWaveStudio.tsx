@@ -598,7 +598,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
             <p>本次开放的一次性招募链接（只显示本次）：</p>
             <code className="block break-all text-sm my-3">{shareLink}</code>
             <div className="w-fit border rounded-lg bg-white p-3">
-              <QRCodeSVG value={shareLink} size={168}/>
+              <QRCodeSVG value={shareLink} size={168} title="研究参与招募二维码"/>
             </div>
             <button type="button" className="btn-secondary" onClick={()=>void navigator.clipboard.writeText(shareLink)}>
               复制研究链接</button>

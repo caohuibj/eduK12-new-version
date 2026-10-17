@@ -45,33 +45,29 @@ jobs:
           execFileSync('git',['merge-base','--is-ancestor',p.base,process.env.SURVEY_SOURCE_HEAD]);
           writeFileSync('survey-candidate-plan.json',JSON.stringify(p,null,2));
           JS
-      - name: restore only verified original successful build phases
+      - name: restore verified backend gates and unchanged frontend evidence
         id: reuse
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: python3 -B .github/scripts/survey-candidate-reuse.py
       - uses: docker/setup-buildx-action@v3
-      - name: resume failed frontend checks and package its existing compiled bytes
-        run: python3 -B .github/scripts/survey-candidate.py resume-build
+      - name: compile only the accessibility-repaired frontend from verified dependencies
+        run: python3 -B .github/scripts/survey-candidate.py resume-browser-repair
       - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
         with:
           version: v0.70.0
           cache: false
-      - name: scan exact backend-worker and frontend runtime images
+      - name: scan repaired frontend runtime; backend scan is verified in its receipt
         run: |
           set -euo pipefail
-          for component in backend frontend; do
+          for component in frontend; do
             trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output "survey-candidate-evidence/${component}-scan.json" "eduk12-survey-candidate-${component}:${GITHUB_SHA}"
           done
-      - name: migrate disposable services and enforce restricted runtime
+      - name: prepare disposable browser services with the unchanged restricted runtime
         run: python3 -B .github/scripts/survey-candidate.py services
-      - name: run missing and integrated-schema backend contracts only
-        run: python3 -B .github/scripts/survey-candidate.py backend-tests
-      - name: run affected and missing frontend contracts only
-        run: python3 -B .github/scripts/survey-candidate.py frontend-tests
-      - name: production Redis behavior, legacy upgrade and new-format restore
-        run: python3 -B .github/scripts/survey-candidate.py runtime
+      - name: run only three directly affected WaveStudio frontend suites
+        run: python3 -B .github/scripts/survey-candidate.py frontend-repair-tests
       - name: install official pinned browser tools
         run: |
           npm ci --ignore-scripts --prefix .github/release-tools
