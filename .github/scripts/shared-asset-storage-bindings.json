@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "files": {
+    "server-version/backend/prisma/schema.prisma": {
+      "before": "ccc0f8b752f0cab6c381a4553369fc2c9aa7cb67",
+      "after": "a8edac8278c7514cff58c374a411e40e9bc51966"
+    },
+    "server-version/backend/prisma/migrations/20261017010000_shared_asset_storage/migration.sql": {
+      "before": null,
+      "after": "54eb4b62ffa1b8880191a5a5011a11ac9e7320df"
+    },
+    "server-version/backend/src/services/assetStorage.ts": {
+      "before": "27f906e21a0b85f992c4d433d1e75b1758fd4028",
+      "after": "454baa6483b6c8724511c4808eac40ad7bb9ae40"
+    },
+    "server-version/backend/src/services/assetStorageKey.ts": {
+      "before": null,
+      "after": "178229306395caebb60a7045b3ffb67343f114f1"
+    },
+    "server-version/backend/src/services/sharedAssetStorage.ts": {
+      "before": null,
+      "after": "78b1aac3b6ab958699a6baf47ae661d8a8b89528"
+    },
+    "server-version/backend/src/utils/cos.ts": {
+      "before": "afbfd155a0661f80a6878dfc365ac11942e0285f",
+      "after": "cfc4e78438f2e657bd46a3075301a8743623e516"
+    },
+    "server-version/backend/src/modules/assessment-media/assessment-asset.ts": {
+      "before": "eb45b5d8adbefcd853c97b952741108b81260c1f",
+      "after": "8ee166b98e43db142142eb242eb9da23b5ac7126"
+    },
+    "server-version/backend/src/modules/assessment-media/assessment-image-delivery.ts": {
+      "before": "c2abda9daa78ae27ff9e9c5208b784707a9b662f",
+      "after": "5f02932d8c1ea3c52b960d6d3d978d516421440c"
+    },
+    "server-version/backend/src/modules/assessment-media/assessment-video-delivery.ts": {
+      "before": "bbe5b74c182d8a6a154a631b7b2f8524ba1d2621",
+      "after": "00323295fccc27686094a692149a400c2c7d268e"
+    },
+    "server-version/scripts/cos-cleanup/recovery.mjs": {
+      "before": "fac1cfe6ced05cdf85d25bcd73868946f5c5d6c8",
+      "after": "e6af2871b25de1e3e525d8f8486ae9b3f9bacff8"
+    }
+  }
+}

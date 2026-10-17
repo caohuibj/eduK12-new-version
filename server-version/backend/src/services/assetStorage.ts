@@ -1,3 +1,4 @@
+import { assetStorageKey } from './assetStorageKey'
 import { streamResponse } from '../utils/streamResponse'
 import crypto from 'node:crypto'
 import fs from 'node:fs'
@@ -57,6 +58,7 @@ export interface StoreAssetInput {
 export interface StoredAssetContent {
   id: string
   objectKey: string
+  storageObjectKey?: string | null
   provider: string
   mimeType: string
   sizeBytes: number
@@ -691,7 +693,7 @@ export const serveStoredAssetContent = async (
   expiresAt = Math.floor(Date.now() / 1000) + ASSET_URL_TTL_SECONDS,
 ): Promise<Response | void> => {
   if (asset.provider === 'cos') {
-    const url = await getCOSSignedUrl(asset.objectKey, Math.max(1, expiresAt - Math.floor(Date.now() / 1000)))
+    const url = await getCOSSignedUrl(assetStorageKey(asset), Math.max(1, expiresAt - Math.floor(Date.now() / 1000)))
     return res.redirect(302, url)
   }
 

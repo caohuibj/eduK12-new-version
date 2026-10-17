@@ -1458,6 +1458,7 @@ model Document {
 model StoredAsset {
   id           String    @id @default(uuid())
   objectKey    String    @unique @map("object_key")
+  storageObjectKey String? @map("storage_object_key")
   provider     String    @default("local")
   mimeType     String    @map("mime_type")
   sizeBytes    Int       @map("size_bytes")
@@ -1480,6 +1481,7 @@ model StoredAsset {
 
   @@index([ownerId])
   @@index([accessScope, scopeId])
+  @@index([storageObjectKey])
   @@map("stored_assets")
 }
 

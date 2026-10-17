@@ -268,3 +268,10 @@ API 的单元提交/问卷完成槽位各 50、报告汇总 20、Prisma 池 20�
 功能开关经明确 overlay 启用；白名单为空覆盖上述整个合格问卷家族，不能声称只作用于一个测试课程。回退可暂停新整卷 ACK 和新异步登记，但保留兼容的 API/消费者排空已 ACK 的原始答案。未获 ACK 的本机封存草稿保留原身份，恢复入口后继续确认；不要改走不同的分量表协议。退回不兼容旧二进制前必须确认新格式任务已排空，并保留兼容客户端和草稿恢复路径。新增列和最小角色权限保留，不以恢复旧数据库覆盖已接收答案。
 
 正式恢复资格同时验证旧单元回执，以及尚无权威单元快照的整卷密文；真实隔离备份恢复后使用受限运行角色继续评分、核对原提交身份和哈希，并验证幂等确认。服务器源代码试验不冒充正式 CI 资格。只有相关输入变化的阶段重验，同一候选产物只构建一次；传输继续遵循 GitHub→服务器，必要时 GitHub→K2→服务器，产物字节不经本机。
+
+
+## Shared asset storage — exact C candidate (2026-10-17)
+
+`shared-asset-storage` binds the full approved source diff to exact before/after Git blobs. It changes only nullable COS physical references, media reads/deletion protection and recovery alias resolution. Logical IDs, ownership, product/course scopes, frozen identities and old application URLs remain unchanged. New writes stay unique; this route does not authorize arbitrary upload deduplication.
+
+GitHub is the sole formal validation location: one backend build, actual isolated PostgreSQL migration and shared media/authorization/concurrent deletion contracts, a new-format PostgreSQL dump/restore, recovery reference contracts, the same runtime HIGH/CRITICAL scan and affected SAST. Frontend/scoring and load tests are excluded. The scanned runtime is archived for three days; production installs that exact artifact. Missing/failed/skipped candidate or SAST results block merge. Old native signed URLs must expire before retiring duplicate bodies. Before an old binary rollback after retirement, restore original bodies, verify hashes and clear physical pointers; never restore an old database over newly accepted business data.

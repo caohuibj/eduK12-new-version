@@ -38,11 +38,12 @@ export class AssessmentAssetValidationError extends Error {
   }
 }
 
-type StoredAssetRecord = Pick<StoredAssetContent, 'id' | 'objectKey' | 'provider' | 'mimeType' | 'sizeBytes' | 'sha256' | 'deletedAt'>
+type StoredAssetRecord = Pick<StoredAssetContent, 'id' | 'objectKey' | 'storageObjectKey' | 'provider' | 'mimeType' | 'sizeBytes' | 'sha256' | 'deletedAt'>
 
 export const assessmentAssetSelect = {
   id: true,
   objectKey: true,
+  storageObjectKey: true,
   provider: true,
   mimeType: true,
   sizeBytes: true,

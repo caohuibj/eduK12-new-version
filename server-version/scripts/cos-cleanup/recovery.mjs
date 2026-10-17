@@ -19,7 +19,7 @@ export function referenceIndex(manifest) {
     need(e.source&&['cos','local'].includes(e.source.provider)&&typeof e.source.key==='string','RECOVERY_SOURCE_INVALID');
     const key=JSON.stringify([e.source.provider,e.source.key]);need(!sources.has(key),'RECOVERY_SOURCE_DUPLICATE');sources.set(key,e);
   }
-  return {sources,assets,needed:new Map(),rows:0,references:0,externalUrls:0};
+  return {sources,assets,aliases:new Map(),needed:new Map(),rows:0,references:0,externalUrls:0};
 }
 const keyFor=(provider,key)=>JSON.stringify([provider,key]);
 function safeKey(value) {
@@ -27,21 +27,31 @@ function safeKey(value) {
   const key=value.replace(/^\/+/, '');need(!key.split('/').some(p=>!p||p==='.'||p==='..'),'RECOVERY_REFERENCE_PATH_INVALID');return key;
 }
 function matchSource(index,provider,key,expected=null) {
-  const e=index.sources.get(keyFor(provider,safeKey(key)));need(e,'RECOVERY_REFERENCE_MISSING');
+  const logical=keyFor(provider,safeKey(key));
+  const e=index.sources.get(index.aliases.get(logical)||logical);need(e,'RECOVERY_REFERENCE_MISSING');
   if(expected)need(e.sha256===expected.sha256&&e.bytes===expected.size_bytes,'RECOVERY_REFERENCE_CONTENT_CHANGED');
   index.references++;index.needed.set(id({key:e.blob,versionId:e.versionId}),e);return e;
 }
 function matchAsset(index,assetId) {
   const a=index.assets.get(assetId);need(a,'RECOVERY_ASSET_REFERENCE_MISSING');
   // Soft-deleted assets are deliberately inaccessible in the restored application.
-  if(!a.deleted_at)matchSource(index,a.provider,a.object_key,a);
+  if(!a.deleted_at)matchSource(index,a.provider,a.storage_object_key||a.object_key,a);
 }
 export function addAsset(index,row) {
   need(typeof row.id==='string'&&!index.assets.has(row.id)&&['cos','local'].includes(row.provider),'RECOVERY_ASSET_METADATA_INVALID');
   index.assets.set(row.id,row);
   if(!row.deleted_at) {
     need(/^[a-f0-9]{64}$/.test(row.sha256||'')&&Number.isSafeInteger(row.size_bytes)&&row.size_bytes>0,'RECOVERY_ASSET_METADATA_INVALID');
-    matchSource(index,row.provider,row.object_key,row);
+    const physical=row.storage_object_key||row.object_key;
+    need(!row.storage_object_key||(row.provider==='cos'&&safeKey(physical).startsWith('assets/')),'RECOVERY_SHARED_STORAGE_INVALID');
+    matchSource(index,row.provider,physical,row);
+    // Old relational columns and archived URLs retain their logical alias.
+    // Resolve only aliases supplied by validated StoredAsset metadata.
+    if(row.storage_object_key) {
+      const alias=keyFor(row.provider,safeKey(row.object_key));
+      need(!index.aliases.has(alias),'RECOVERY_SHARED_ALIAS_DUPLICATE');
+      index.aliases.set(alias,keyFor(row.provider,safeKey(physical)));
+    }
   }
 }
 function managedString(index,value,hosts) {
