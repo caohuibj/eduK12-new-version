@@ -1,5 +1,6 @@
 import { Router,type Request,type Response,type NextFunction } from 'express'
 import { z } from 'zod'
+import { surveyAnalyticsItemRequestSchema } from './analytics.request'
 import { authenticateSurvey } from '../../middleware/auth'
 import { success,error } from '../../utils/response'
 import * as service from './analytics.read'
@@ -73,10 +74,7 @@ const measurement=z.object({
   instrumentKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),
   scoreKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),
 }).strict()
-const itemRequest=z.object({
-  instrumentKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),
-  itemKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),
-}).strict()
+
 surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/items/dictionary',wrap(async req=>{
   assertRecentSurveyMfa(req)
   const projectId=id.parse(req.params.pid),waveId=id.parse(req.params.wid)
@@ -94,7 +92,7 @@ surveyAnalyticsRouter.post('/:pid/analytics/waves/:wid/items/paged',wrap(req=>{
   assertRecentSurveyMfa(req)
   return describeSurveyWaveItemPaged({
     actorUserId:req.user!.userId,projectId:id.parse(req.params.pid),
-    waveId:id.parse(req.params.wid),...itemRequest.parse(req.body),
+    waveId:id.parse(req.params.wid),...surveyAnalyticsItemRequestSchema.parse(req.body),
   })
 }))
 surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/items',wrap(async req=>{

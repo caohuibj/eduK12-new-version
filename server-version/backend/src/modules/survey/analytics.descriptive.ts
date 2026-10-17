@@ -42,7 +42,7 @@ export function describeWave(source:SurveySourceProjection,waveId:string){
     const frequencies=new Map<string,number>()
     const combinations=new Map<string,number>()
     const possible=new Set(codebook.options.map(o=>o.code))
-    const multi=codebook.responseType==='MULTIPLE'||codebook.responseType==='SJT_MULTIPLE'
+    const multi=['MULTIPLE','MATRIX_MULTIPLE','SJT_MULTIPLE'].includes(codebook.responseType)
     const values:number[]=[]
     for(const row of rows){
       if(row.missingReason){
@@ -62,6 +62,17 @@ export function describeWave(source:SurveySourceProjection,waveId:string){
           for(const item of normalized)frequencies.set(item,(frequencies.get(item)||0)+1)
           const combination=JSON.stringify(normalized)
           combinations.set(combination,(combinations.get(combination)||0)+1)
+        }else if(codebook.responseType==='RANK_ORDER'){
+          let order:unknown
+          try{order=JSON.parse(row.value)}catch{throw new Error('Frozen ranking response is not valid JSON')}
+          if(!Array.isArray(order)||order.length!==possible.size
+            ||order.some(x=>typeof x!=='string'||!possible.has(x))
+            ||new Set(order).size!==order.length)
+            throw new Error('Frozen ranking source contains invalid or duplicate options')
+          order.forEach((value,rank)=>{
+            const key=String(value)+'@rank'+(rank+1)
+            frequencies.set(key,(frequencies.get(key)||0)+1)
+          })
         }else if(possible.has(row.value)){
           frequencies.set(row.value,(frequencies.get(row.value)||0)+1)
         }
