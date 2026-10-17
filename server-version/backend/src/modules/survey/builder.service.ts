@@ -1,3 +1,4 @@
+import {catalogSnapshotsForDrafts,compileCatalogUnit,researcherCatalog} from './catalog.service'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -19,6 +20,7 @@ const fail=(code:number,text:string):never=>{throw new SurveyBuilderError(code,t
 const publicRow=(row:any)=>({
   id:row.id,projectId:row.projectId,instrumentKey:row.instrumentKey,
   kind:row.kind,title:row.title,definition:row.definition,revision:row.revision,
+  catalogGrantId:row.catalogGrantId??null,readOnly:!!row.catalogGrantId,
   status:row.status,createdAt:row.createdAt,updatedAt:row.updatedAt,
 })
 
@@ -54,15 +56,17 @@ export async function listDrafts(userId:string,projectId:string,page:number) {
     const list=await tx.surveyInstrumentDraft.findMany({
       where:{projectId},orderBy:[{updatedAt:'desc'},{id:'desc'}],
       take:25,skip:(page-1)*25,
-      select:{id:true,projectId:true,instrumentKey:true,kind:true,title:true,status:true,revision:true,updatedAt:true,createdAt:true},
+      select:{id:true,projectId:true,instrumentKey:true,kind:true,title:true,status:true,revision:true,updatedAt:true,createdAt:true,catalogGrantId:true},
     })
-    return {page,pageSize:25,list}
+    return {page,pageSize:25,list:list.map(row=>({...row,readOnly:!!row.catalogGrantId}))}
   })
 }
 export async function getDraft(userId:string,projectId:string,id:string){
   return prisma.$transaction(async tx=>{
     await authorizedProject(tx,userId,projectId,false)
-    return publicRow(await findDraft(tx,projectId,id))
+    const row=await findDraft(tx,projectId,id)
+    const sources=await catalogSnapshotsForDrafts(tx,userId,row.catalogGrantId?[row.catalogGrantId]:[],false)
+    return {...publicRow(row),...(row.catalogGrantId?{sourceProvenance:compileCatalogUnit(row,sources.get(row.catalogGrantId)!).sourceProvenance}:{})}
   })
 }
 export async function createDraft(userId:string,projectId:string,raw:{
@@ -95,6 +99,7 @@ export async function updateDraft(userId:string,projectId:string,id:string,
   return prisma.$transaction(async tx=>{
     await authorizedProject(tx,userId,projectId,true)
     const row=await findDraft(tx,projectId,id)
+    if(row.catalogGrantId)fail(409,'来源授权工具为只读，不能编辑定义')
     if(row.status!=='DRAFT'||row.revision!==input.revision)fail(409,'草稿版本已变化，请获取最新内容后再保存')
     const definition=assertSurveyDraft(surveyKindSchema.parse(row.kind),input.definition)
     const changed=await tx.surveyInstrumentDraft.updateMany({
@@ -113,6 +118,7 @@ export async function copyDraft(userId:string,projectId:string,id:string,input:{
   return prisma.$transaction(async tx=>{
     await authorizedProject(tx,userId,projectId,true)
     const from=await findDraft(tx,projectId,id)
+    await catalogSnapshotsForDrafts(tx,userId,from.catalogGrantId?[from.catalogGrantId]:[])
     const prior=await tx.surveyInstrumentDraft.findUnique({where:{id:input.requestId}})
     if(prior){
       if(prior.projectId!==projectId||prior.instrumentKey!==input.instrumentKey||prior.title!==input.title)
@@ -126,7 +132,7 @@ export async function copyDraft(userId:string,projectId:string,id:string,input:{
     // new instrument, and PR3 never treats it as comparable merely by title.
     const created=await tx.surveyInstrumentDraft.create({data:{
       id:input.requestId,projectId,instrumentKey:input.instrumentKey,title:input.title,
-      kind:from.kind,definition:from.definition as Prisma.InputJsonValue,
+      kind:from.kind,definition:from.definition as Prisma.InputJsonValue,catalogGrantId:from.catalogGrantId,
     }})
     await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:userId,projectId,action:'INSTRUMENT_COPIED',
       metadata:{instrumentId:created.id,copiedFrom:id}}})
@@ -151,6 +157,14 @@ export async function validateDraftForPreview(userId:string,projectId:string,id:
   return prisma.$transaction(async tx=>{
     await authorizedProject(tx,userId,projectId,false)
     const row=await findDraft(tx,projectId,id)
+    if(row.catalogGrantId){
+      const sources=await catalogSnapshotsForDrafts(tx,userId,[row.catalogGrantId])
+      const unit=compileCatalogUnit(row,sources.get(row.catalogGrantId)!)
+      return {id,kind:unit.kind,revision:row.revision,ok:true,issues:[],score:null,
+        definitionDigest:unit.sourceDigest,scoringDigest:unit.scoringDigest,compiledDefinition:unit.compiledDefinition,
+        ...(unit.kind==='COGNITIVE'?{cognitivePreview:(unit.compiledDefinition as import('./cognitive.definition').FrozenSurveyCognitive).sessionSnapshot}:{}),
+        participantReport:'GENERAL_ONLY' as const}
+    }
     const kind=surveyKindSchema.parse(row.kind)
     const result=previewResearchInstrument({
       kind,instrumentKey:row.instrumentKey,title:row.title,definition:row.definition,
@@ -164,6 +178,7 @@ export async function simulateSurveyDraft(userId:string,projectId:string,id:stri
   return prisma.$transaction(async tx=>{
     await authorizedProject(tx,userId,projectId,false)
     const row=await findDraft(tx,projectId,id)
+    if(row.catalogGrantId)fail(409,'来源授权工具为只读；使用冻结研究版本进行预览')
     return {id,revision:row.revision,...previewResearchInstrument({
       kind:surveyKindSchema.parse(row.kind),instrumentKey:row.instrumentKey,
       title:row.title,definition:row.definition,answers,
@@ -175,6 +190,7 @@ export async function dryRunFormDraft(userId:string,projectId:string,id:string,a
   return prisma.$transaction(async tx=>{
     await authorizedProject(tx,userId,projectId,false)
     const row=await findDraft(tx,projectId,id)
+    if(row.catalogGrantId)fail(409,'来源授权工具为只读；使用冻结研究版本进行预览')
     if(row.kind!=='FORM')fail(400,'此入口只用于 Form 草稿')
     try{
       const result=dryRunSurveyForm(row.definition,answers)
@@ -190,7 +206,8 @@ export async function previewSurveyImport(userId:string,projectId:string,id:stri
   return prisma.$transaction(async tx=>{
     await authorizedProject(tx,userId,projectId,false)
     const row=await findDraft(tx,projectId,id)
-    if(row.status!=='DRAFT'||row.kind==='SJT')fail(409,'只有 Form/Scale 草稿支持此批量导入')
+    if(row.catalogGrantId)fail(409,'来源授权工具为只读；使用冻结研究版本进行预览')
+    if(row.status!=='DRAFT'||!['FORM','SCALE'].includes(row.kind))fail(409,'只有 Form/Scale 草稿支持此批量导入')
     const schemaVersion=row.kind==='FORM'?(row.definition as {schemaVersion:1|2}).schemaVersion:undefined
     const kind=row.kind as 'FORM'|'SCALE'
     const candidate=previewBulk(input,kind,schemaVersion)
@@ -212,7 +229,8 @@ export async function applySurveyImport(userId:string,projectId:string,id:string
   return prisma.$transaction(async tx=>{
     await authorizedProject(tx,userId,projectId,true)
     const row=await findDraft(tx,projectId,id)
-    if(row.kind==='SJT'||row.status!=='DRAFT'||row.revision!==input.revision)
+    if(row.catalogGrantId)fail(409,'来源授权工具为只读；使用冻结研究版本进行预览')
+    if(!['FORM','SCALE'].includes(row.kind)||row.status!=='DRAFT'||row.revision!==input.revision)
       fail(409,'导入前草稿已变化，请重新预览')
     const definition=applyBulk(row.kind as 'FORM'|'SCALE',row.definition,input.batch,input.digest)
     const changed=await tx.surveyInstrumentDraft.updateMany({
@@ -224,5 +242,29 @@ export async function applySurveyImport(userId:string,projectId:string,id:string
       action:'INSTRUMENT_BULK_IMPORTED',
       metadata:{instrumentId:id,revision:input.revision+1,batchDigest:input.digest}}})
     return publicRow(await findDraft(tx,projectId,id))
+  })
+}
+
+export async function listResearcherCatalog(userId:string,projectId:string,page:number){
+  return prisma.$transaction(async tx=>{await authorizedProject(tx,userId,projectId,false)
+    return researcherCatalog(tx,userId,page)})
+}
+export async function importCatalogDraft(userId:string,projectId:string,grantId:string,input:{requestId:string;instrumentKey:string;title:string}){
+  return prisma.$transaction(async tx=>{
+    await authorizedProject(tx,userId,projectId,true)
+    const sources=await catalogSnapshotsForDrafts(tx,userId,[grantId])
+    const source=sources.get(grantId)!
+    const prior=await tx.surveyInstrumentDraft.findUnique({where:{id:input.requestId}})
+    if(prior){
+      if(prior.projectId!==projectId||prior.catalogGrantId!==grantId||prior.instrumentKey!==input.instrumentKey||prior.title!==input.title)
+        fail(409,'导入请求标识已用于其他内容')
+      return {...publicRow(prior),sourceProvenance:compileCatalogUnit(prior,source).sourceProvenance}
+    }
+    const row=await tx.surveyInstrumentDraft.create({data:{id:input.requestId,projectId,
+      instrumentKey:surveyKeySchema.parse(input.instrumentKey),title:input.title,kind:source.ref.kind,
+      definition:source.displayDefinition as Prisma.InputJsonValue,catalogGrantId:grantId}})
+    await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:userId,projectId,
+      action:'CATALOG_TOOL_IMPORTED',metadata:{grantId,instrumentId:row.id,sourceDigest:source.definitionDigest}}})
+    return {...publicRow(row),sourceProvenance:compileCatalogUnit(row,source).sourceProvenance}
   })
 }

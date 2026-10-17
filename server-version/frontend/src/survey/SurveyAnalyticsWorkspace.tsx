@@ -6,12 +6,16 @@ type WaveSummary={id:string;ordinal:number;title:string;status:string;
   uniqueLinkedCodes:number|null;excluded:number}
 type Overview={projectId:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';source:string;note:string;waves:WaveSummary[]}
 type Matched={baselineN:number;followupN:number;matchedN:number;attritionN:number;lateJoinN:number;note:string}
-type ScoreStat={instrumentKey:string;scoreKey:string;validN:number;mean:number|null;sampleSd:number|null}
+type ScoreStat={instrumentKey:string;scoreKey:string;validN:number;mean:number|null;sampleSd:number|null;
+  scoringDigest?:string;responseSignature?:string;unit?:string|null;
+  provenance?:{kind:string;measurementDigest:string;scoringVersion:string;engineVersion?:string;timingPolicy?:string;devicePolicy?:string};
+  qualityCounts?:Record<string,number>;completionCounts?:Record<string,number>}
 type ItemStat={itemKey:string;instrumentKey:string;prompt:string;kind:string;respondentN:number;
   missingByReason:Record<string,number>;frequencies:{value:string;count:number}[];
   combinationFrequencies?:{value:string;count:number}[];responseType?:string;
   numericMean:number|null;numericSampleSd:number|null}
-type WaveItems={waveId:string;items:ItemStat[];descriptiveScores:ScoreStat[];note:string}
+type WaveItems={waveId:string;items:ItemStat[];descriptiveScores:ScoreStat[];note:string;
+  completedFinals?:number;fullCompletionAttempts?:number|null;earlyCompletionAttempts?:number|null}
 type BoundedVariable={instrumentKey:string;itemKey:string;prompt:string;
   responseType:string;columnKey:string;kind:string}
 type BoundedItem={analysisFinalCount:number;respondentN:number;prompt:string;
@@ -29,11 +33,13 @@ type QualityRow={attemptId:string;attemptCode:string;researchCode:string|null;wa
   completedAt:string;verdict:'INCLUDED'|'EXCLUDED';reason:string|null;revision:number}
 type QualityAudit={reviewedAt:string;reviewerId:string|null;previousVerdict:'INCLUDED'|'EXCLUDED';
   verdict:'INCLUDED'|'EXCLUDED';reason:string;revision:number}
-type ExportFormat='RAW_WAVE'|'RAW_LONG'|'RAW_WIDE'|'SCORE_LONG'|'SCORE_WIDE'
+type ExportFormat='RAW_WAVE'|'RAW_LONG'|'RAW_WIDE'|'SCORE_LONG'|'SCORE_WIDE'|'COGNITIVE_TRIAL_LONG'
 type Ticket={id:string;status:'READY';format:ExportFormat;expiresAt:string;
   nextCursor:string|null;pageNumber:number|null;
   manifest:{rowCount:number;columnCount:number;
     batch?:{phase?:'VERIFIED_FINAL'|'NON_FINAL_PARTICIPATION';representation?:string}}}
+const isCompactAttendance=(ticket:Ticket)=>['ATTENDANCE_COMPACT_V1','ATTENDANCE_COMPACT_V2']
+  .includes(ticket.manifest.batch?.representation??'')
 type Artifact={id:string;format:ExportFormat;csv:string;codebook:unknown;manifest:unknown}
 const kindOptions:Record<ExportFormat,string>={
   RAW_WAVE:'单波次逐题原始数据',
@@ -41,6 +47,7 @@ const kindOptions:Record<ExportFormat,string>={
   RAW_WIDE:'同编号逐题 Wide',
   SCORE_LONG:'全部波次探索性得分 Long',
   SCORE_WIDE:'同编号探索性得分 Wide',
+  COGNITIVE_TRIAL_LONG:'单波次认知原始试次 Long',
 }
 async function api<T>(endpoint:string,method='GET',body?:unknown):Promise<T>{
   const headers:Record<string,string>={'Content-Type':'application/json'}
@@ -97,14 +104,18 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
     attemptId:string;page:number;list:QualityAudit[]
   }|null>(null)
   const base='/projects/'+projectId
+  const changeWave=(id:string)=>{
+    setWaveId(id);setTicket(null);setBatchDownloaded(false)
+    setItemStats(null);setPairedScore(null);setGroupResult(null);setGroupItem('');setGroupScore('')
+    setBoundedVariables([]);setBoundedItemKey('');setBoundedItem(null)
+  }
   const reload=async()=>{
     const res=await api<Overview>(base+'/analytics/overview')
     setOverview(res)
     const ordered=res.waves
-    if(ordered[0]){setWaveId(ordered[0].id);setBaseline(ordered[0].id)}
+    changeWave(ordered[0]?.id??'')
+    if(ordered[0])setBaseline(ordered[0].id)
     if(ordered[1])setFollowup(ordered[1].id)
-    setItemStats(null);setPairedScore(null);setGroupResult(null);setGroupItem('');setGroupScore('')
-    setBoundedVariables([]);setBoundedItemKey('');setBoundedItem(null)
   }
   useEffect(()=>{
     setOverview(null);setError('');setTicket(null);setPaired(null)
@@ -190,17 +201,17 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
   })}
   const createExport=(cursor?:string)=>void execute(async()=>{
     const result=await api<Ticket>(base+'/exports','POST',{
-      format,...(format==='RAW_WAVE'?{waveId}:
+      format,...(['RAW_WAVE','COGNITIVE_TRIAL_LONG'].includes(format)?{waveId}:
         (['RAW_LONG','SCORE_LONG'].includes(format)&&exportWaveId?{waveId:exportWaveId}:{})),
       ...(format.startsWith('RAW')?{includeFreeText}:{}),
-      ...(format==='RAW_WAVE'?{
+      ...(['RAW_WAVE','COGNITIVE_TRIAL_LONG'].includes(format)?{
         ...(completedFrom?{completedFrom:new Date(completedFrom).toISOString()}:{}),
         ...(completedBefore?{completedBefore:new Date(completedBefore).toISOString()}:{}),
       }:{}),
       ...(cursor?{cursor}:{}),
     })
     setTicket(result);setBatchDownloaded(false)
-    setMessage(result.manifest.batch?.representation==='ATTENDANCE_COMPACT_V1'
+    setMessage(isCompactAttendance(result)
       ?'已生成紧凑参与状态表；每人每波次一行。按研究编号及波次关联 FINAL CSV，切勿直接拼接两种 CSV。'
       :'第 '+(result.pageNumber||1)+' 批有效 FINAL 已生成；逐批下载并保留 Manifest。')
   })
@@ -208,13 +219,13 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
     const artifact=await api<Artifact>(base+'/exports/'+ticket.id+'/download')
     const batchLabel=String(ticket.pageNumber??1).padStart(3,'0')
     const baseName='survey_'+projectId.slice(0,8)+'_'+artifact.format.toLowerCase()
-      +'_batch'+batchLabel+(ticket.manifest.batch?.representation==='ATTENDANCE_COMPACT_V1'
+      +'_batch'+batchLabel+(isCompactAttendance(ticket)
         ?'_attendance':'')+'_'+ticket.id.slice(0,8)
     downloadBlob(baseName+'.csv','\uFEFF'+artifact.csv,'text/csv;charset=utf-8')
     downloadBlob(baseName+'_codebook.json',JSON.stringify(artifact.codebook,null,2),'application/json;charset=utf-8')
     downloadBlob(baseName+'_manifest.json',JSON.stringify(artifact.manifest,null,2),'application/json;charset=utf-8')
     setBatchDownloaded(true)
-    setMessage(ticket.manifest.batch?.representation==='ATTENDANCE_COMPACT_V1'
+    setMessage(isCompactAttendance(ticket)
       ?'已下载参与状态 CSV 和 Manifest；按状态表 research_code / wave_id 对应 FINAL 的 research_code_or_attempt / wave_id 关联，不能直接拼接行。'
       :'已下载当前批次 CSV、变量编码字典和 Manifest，请保管敏感数据。')
   })}
@@ -223,6 +234,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
       <p className="text-sm text-slate-600">完成与配对统计只来源于可核对的加密 Survey FINAL；研究编号数不等于经过实名验证的自然人数。</p></header>
     {error&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{error}</p>}
     {message&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{message}</p>}
+    <fieldset disabled={busy} className="min-w-0 border-0 p-0 space-y-4" aria-label="研究数据操作">
     <button className="btn-secondary" disabled={busy} onClick={()=>void execute(reload)}>刷新完成进度</button>
     {overview&&<><div className="overflow-x-auto" tabIndex={0} role="region" aria-label="研究波次完成统计"><table className="w-full text-sm border-collapse">
       <thead><tr className="bg-slate-100"><th className="p-2 text-left">波次</th><th className="p-2">状态</th>
@@ -310,7 +322,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
         <h3 className="font-semibold">逐题与描述性统计</h3>
         <div className="flex flex-wrap gap-3 items-end">
           <label className="text-sm">波次
-            <select className="input block" value={waveId} onChange={e=>{setWaveId(e.target.value);setTicket(null);setItemStats(null);setGroupResult(null);setGroupItem('');setGroupScore('');setBoundedVariables([]);setBoundedItem(null)}}>
+            <select className="input block" value={waveId} onChange={e=>changeWave(e.target.value)}>
               {overview.waves.map(w=><option key={w.id} value={w.id}>T{w.ordinal} {w.title}</option>)}
             </select></label>
           <button type="button" className="btn-secondary" disabled={busy||!waveId} onClick={loadItems}>
@@ -363,11 +375,16 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
           </table></div>
           {itemStats.descriptiveScores.length>0&&<div>
             <h4 className="font-semibold text-sm">研究性维度得分（非诊断）</h4>
-            {itemStats.descriptiveScores.map(m=><p key={m.instrumentKey+':'+m.scoreKey} className="text-sm my-1">
+            {itemStats.completedFinals!==undefined&&<p className="text-xs">持久 FINAL：{itemStats.completedFinals}；完整完成：{itemStats.fullCompletionAttempts??'—'}；提前结束：{itemStats.earlyCompletionAttempts??'—'}。</p>}
+            {itemStats.descriptiveScores.map((m,index)=><div key={m.instrumentKey+':'+m.scoreKey+':'+index} className="text-sm my-2"><p>
               {m.instrumentKey} · {m.scoreKey}：N={m.validN}，
               M={m.mean?.toFixed(2)??'—'}，
-              SD={m.sampleSd?.toFixed(2)??'—'}
-            </p>)}
+              SD={m.sampleSd?.toFixed(2)??'—'}{m.unit?'（单位：'+m.unit+'）':''}
+              </p>
+              {m.qualityCounts&&<p className="text-xs">质量状态：{Object.entries(m.qualityCounts).map(([k,v])=>k+' '+v).join('；')}。均值仅作描述，不能据此认定全部样本可解释。</p>}
+              {m.completionCounts&&<p className="text-xs">完成类型：{Object.entries(m.completionCounts).map(([k,v])=>k+' '+v).join('；')}</p>}
+              {m.provenance&&<p className="text-xs break-all">冻结测量：{m.provenance.measurementDigest}；评分 {m.provenance.scoringVersion}{m.provenance.engineVersion?'；引擎 '+m.provenance.engineVersion:''}{m.provenance.timingPolicy?'；计时 '+m.provenance.timingPolicy:''}</p>}
+            </div>)}
           </div>}
         </div>}
         {itemStats&&itemStats.items.some(q=>q.kind==='FORM'&&['SINGLE','LIKERT'].includes(q.responseType||''))
@@ -444,20 +461,21 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
                  {overview.waves.map(w=><option key={w.id} value={w.id}>T{w.ordinal} {w.title}</option>)}
                </select>
              </label>}
-           {format==='RAW_WAVE'&&<label className="text-sm">波次
-            <select className="input block" value={waveId} onChange={e=>{setWaveId(e.target.value);setTicket(null)}}>
+           {['RAW_WAVE','COGNITIVE_TRIAL_LONG'].includes(format)&&<label className="text-sm">波次
+            <select className="input block" value={waveId} onChange={e=>changeWave(e.target.value)}>
               {overview.waves.map(w=><option key={w.id} value={w.id}>T{w.ordinal} {w.title}</option>)}
             </select></label>}
-          {format==='RAW_WAVE'&&<div className="grid gap-2 text-sm">
+          {['RAW_WAVE','COGNITIVE_TRIAL_LONG'].includes(format)&&<div className="grid gap-2 text-sm">
             <label>完成时间起点（含）<input type="datetime-local" className="input block w-full"
               value={completedFrom} onChange={e=>{setCompletedFrom(e.target.value);setTicket(null)}}/></label>
             <label>完成时间终点（不含）<input type="datetime-local" className="input block w-full"
               value={completedBefore} onChange={e=>{setCompletedBefore(e.target.value);setTicket(null)}}/></label>
             <p className="text-xs">留空表示不限制。按完成时间分段；未 FINAL 的记录可能重复出现，合并时请按研究编号和状态去重。</p>
           </div>}
-          <button type="button" className="btn-primary" disabled={busy||format==='RAW_WAVE'&&!waveId}
+          <button type="button" className="btn-primary" disabled={busy||['RAW_WAVE','COGNITIVE_TRIAL_LONG'].includes(format)&&!waveId}
             onClick={()=>createExport()}>创建受控导出</button>
         </div>
+        {format==='COGNITIVE_TRIAL_LONG'&&<p className="text-sm text-amber-800">认知试次按行与字节预算分批导出，只包含已被整轮 FINAL 引用的子结果；含协议、epoch、测量签名与研究授权范围内的复现信息。请保留每批 Codebook 与 Manifest，不将不同版本、输入设备的结果直接合并。</p>}
         {format.startsWith('RAW')&&<label className="flex gap-2 text-sm items-start rounded-lg border border-amber-200 bg-amber-50 p-3">
           <input type="checkbox" checked={includeFreeText}
             onChange={e=>{setIncludeFreeText(e.target.checked);setTicket(null)}}/>
@@ -467,7 +485,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
           <p className="text-sm">导出 {ticket.format} · 第 {ticket.pageNumber||1} 批 · {ticket.manifest.rowCount} 行 ·
             {ticket.manifest.columnCount} 列</p>
           <p className="text-xs">到期：{new Date(ticket.expiresAt).toLocaleString('zh-CN')}</p>
-          {ticket.manifest.batch?.representation==='ATTENDANCE_COMPACT_V1'&&
+          {isCompactAttendance(ticket)&&
             <p className="text-xs text-amber-800">本批为独立参与状态表，不是逐题答案；请保留 Manifest 的关联说明。</p>}
           <button type="button" className="btn-secondary" disabled={busy} onClick={download}>
             下载当前批次 CSV、Codebook 与 Manifest</button>
@@ -479,5 +497,6 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
         </div>}
       </div>
     </>}
+    </fieldset>
   </section>
 }

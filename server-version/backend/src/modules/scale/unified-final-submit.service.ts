@@ -1,3 +1,4 @@
+import { rethrowScaleSubmissionIdConflict, rethrowConfirmedScaleBatchSubmissionConflict } from './scale-final-submit-conflict'
 import { loadScaleAnswers } from './scale-workflow.service'
 import { compactAssessmentStorageEnabled } from '../assessment-runtime/compact-field-codec'
 import { prepareCompactScaleFacts } from '../assessment-runtime/compact-scale-facts'
@@ -368,7 +369,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
         submissionPayloadHash: payloadHash,
         submissionCompletedAt: completedAt,
       },
-    })
+    }).catch(rethrowScaleSubmissionIdConflict)
     if (updated.count !== 1) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评状态已变化，请重试', 409)
     const slotKey = admission.parent?.slotKey
     if (encrypted.canonicalResult && current.questionnaireAssessmentId) {
@@ -579,5 +580,6 @@ export const submitUnifiedScaleCollectionBatch = async (
       const fact = byFactId.get(child.id)
       return fact ? attachCommittedScaleFacts(record, { row: fact, result: write!.result, canonical: write!.canonical }) : record
     })
-  })
+  }).catch(error => rethrowConfirmedScaleBatchSubmissionConflict(error,
+    prepared.map(unit => unit.data.submissionId), prepared.map(unit => unit.child.id), prisma))
 }

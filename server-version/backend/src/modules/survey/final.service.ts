@@ -1,14 +1,18 @@
+import { verifySurveyCognitiveReferences,loadSurveyCognitiveResults,assertSurveyCognitiveLockedAnswers } from './cognitive.results'
+import type { SurveyCognitiveReference } from './cognitive.definition'
+import { cognitiveParentUnit,cognitiveParticipantFeedback } from './measurement.result'
+import type { FrozenUnitResult,SurveyComputedFinal } from './final.compute'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
 import { prepareCanonicalSubmission, assertCanonicalSubmissionPayloadSize, validateSubmissionId } from '../../services/instrumentFinalSubmit'
 import { withFinalOnlyCompletionTransaction } from '../../services/questionnaireProgressService'
-import { encryptUnifiedRuntimePayload } from '../assessment-runtime/security'
+import { encryptUnifiedRuntimePayload,decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { computeSurveyFinal, SurveyFinalValidationError } from './final.compute'
+import { verifySurveyFinalPublication, SurveyFinalValidationError } from './final.compute'
 import { SurveyScaleTimingError } from './timing.definition'
-import { ensureSurveyFlowAssignment } from './flow.assignment'
+import { ensureSurveyFlowAssignment,assignedSurveySnapshot } from './flow.assignment'
 import { hashResearchCredential } from './identity.service'
-import { verifiedSurveyAttempt } from './admission.service'
+import { verifiedSurveyAttempt,verifiedSurveyFinalLocator } from './admission.service'
 import { SurveyWaveError } from './waves.service'
 import type { ResearchFrozenPublication } from './publication.service'
 
@@ -18,6 +22,13 @@ export class SurveyFinalError extends Error {
 function blocked(message:string): never {throw new SurveyFinalError(403,message)}
 function invalid(message:string): never {throw new SurveyFinalError(409,message)}
 const proofShape=/^[A-Za-z0-9_-]{43}$/
+const defaultGeneralText='感谢参与研究。研究结果将按研究说明进行汇总分析，不构成个人心理诊断。'
+// Explicit participant allowlist shared by first-commit and independently
+// authorized GENERAL reads. Never pass FINAL results or authority through it.
+function generalReceipt(text:string|null|undefined,completedAt:Date){
+  return {text:text||defaultGeneralText,
+    disclaimer:'本研究反馈仅作一般说明，不提供未经验证的常模、诊断或个体能力等级。',completedAt}
+}
 export interface FinalInput {
   publicId:string
   attemptId:string
@@ -26,6 +37,7 @@ export interface FinalInput {
   submissionId:string
   answers:Record<string,unknown>
   itemTimings?:unknown
+  cognitiveReferences?:SurveyCognitiveReference[]
   presentation?:{shownBlocks:string[]}
 }
 /** No per-item network scoring or database writes; a complete attempt makes
@@ -38,13 +50,14 @@ export async function submitResearchFinal(input:FinalInput){
   if(!proofShape.test(input.accessCredential))blocked('作答凭证无效')
   validateSubmissionId(input.submissionId)
   // Zero business identity authority is inferred from a Study Code.
-  const known=await verifiedSurveyAttempt({
+  const known=await verifiedSurveyFinalLocator({
     publicId:input.publicId,attemptId:input.attemptId,
     researchCode:input.researchCode,accessCredential:input.accessCredential,
   })
   const canonical=prepareCanonicalSubmission({
     publicationId:known.publicationId,definitionDigest:known.definitionDigest,
     answers:input.answers,
+    ...(input.cognitiveReferences!==undefined?{cognitiveReferences:input.cognitiveReferences}:{}),
     ...(input.itemTimings!==undefined?{itemTimings:input.itemTimings}:{}),
   })
   assertCanonicalSubmissionPayloadSize(canonical,1024*1024,'研究 FINAL 作答')
@@ -70,9 +83,13 @@ export async function submitResearchFinal(input:FinalInput){
     if(publication.id!==known.publicationId||
       publication.definitionDigest!==known.definitionDigest)
       invalid('提交时研究冻结版本已经发生变化')
-    const snapshot=publication.compiledSnapshot as unknown as ResearchFrozenPublication
-    if(canonicalHash(JSON.parse(JSON.stringify(snapshot)))!==publication.definitionDigest)
+    if((publication.compiledSnapshot as unknown as ResearchFrozenPublication)?.runtimeStatus!=='SURVEY_FINAL_V1')
       blocked('冻结研究定义校验失败')
+    const verified=verifySurveyFinalPublication(
+      publication.compiledSnapshot as unknown as ResearchFrozenPublication,publication.definitionDigest)
+    if(!verified)
+      blocked('冻结研究定义校验失败')
+    const snapshot=verified.snapshot
     // Flow assignment is fixed to this Attempt while serialized with the
     // Wave/Attempt and participant's current credential and revocation locks.
     const assignment=snapshot.flow?await ensureSurveyFlowAssignment(tx,{
@@ -94,33 +111,64 @@ export async function submitResearchFinal(input:FinalInput){
       if(!person)blocked('研究身份已失效')
     }else if(!snapshot.flow&&attempt.sessionHash!==hashResearchCredential(input.accessCredential))
       blocked('单次研究作答凭证已失效')
-    const existing=await tx.surveyWaveFinal.findUnique({where:{attemptId:attempt.id}})
+    // Withdrawal retains immutable FINAL data for audit, but its old bearer
+    // must not recover a successful receipt after the Attempt is excluded.
+    if(!['STARTED','COMPLETED'].includes(attempt.status)||attempt.excludedAt!==null)
+      invalid('这份作答已经关闭或撤回')
+    const hasCognitive=snapshot.units.some(unit=>unit.kind==='COGNITIVE')
+    // New cognitive parents recheck current consent/window even for receipt
+    // replay. Historical noncognitive replay behavior remains unchanged.
+    if(hasCognitive){
+      const end=wave.finishUntil??wave.closesAt
+      if(wave.hardStopAt||!end||end<=new Date())blocked('研究作答提交窗口已结束')
+      const liveConsent=await tx.surveyConsent.findFirst({where:{projectId:known.projectId,waveId:wave.id,
+        attemptId:attempt.id,accepted:true,consentVersion:wave.consentVersion},select:{id:true}})
+      if(!liveConsent)blocked('当前研究缺少有效的知情同意记录')
+    }
+    const existing=await tx.surveyWaveFinal.findUnique({where:{attemptId:attempt.id},
+      select:{id:true,completedAt:true,payloadHash:true,submissionId:true}})
     if(existing){
       if(existing.payloadHash!==canonical.hash||existing.submissionId!==input.submissionId)
         invalid('此波次已有不同的正式 FINAL，不能再次覆盖')
       return {attemptId:attempt.id,receiptId:existing.id,completedAt:existing.completedAt,
         status:'COMPLETED' as const,idempotent:true,
-        generalText:wave.generalText||'感谢参与研究，您的回答已完整提交。'}
+        generalText:wave.generalText||defaultGeneralText}
     }
     if(attempt.status!=='STARTED')invalid('这份作答已经关闭或终止')
     const now=new Date()
     const finishUntil=wave.finishUntil||wave.closesAt
     if(wave.hardStopAt||!finishUntil||finishUntil<=now)
       blocked('研究作答提交窗口已结束')
-    const consent=await tx.surveyConsent.findFirst({where:{
+    const consent=hasCognitive||await tx.surveyConsent.findFirst({where:{
       projectId:known.projectId,waveId:wave.id,attemptId:attempt.id,
       accepted:true,consentVersion:wave.consentVersion,
     },select:{id:true}})
     if(!consent)blocked('当前研究缺少有效的知情同意记录')
+    const cognitiveResults=new Map<string,FrozenUnitResult>()
+    if(snapshot.units.some(unit=>unit.kind==='COGNITIVE')||input.cognitiveReferences?.length){
+      await assertSurveyCognitiveLockedAnswers(tx,attempt.id,input.answers)
+      const references=await verifySurveyCognitiveReferences(tx,{projectId:known.projectId,waveId:wave.id,
+        attemptId:attempt.id,publicationId:publication.id,snapshot:assignedSurveySnapshot(snapshot,assignment),references:input.cognitiveReferences??[]})
+      const results=await loadSurveyCognitiveResults(tx,{projectId:known.projectId,waveId:wave.id,
+        attemptId:attempt.id,publicationId:publication.id,references})
+      for(const loaded of results){
+        const unit=snapshot.units.find(unit=>unit.instrumentKey===loaded.reference.slotKey)!
+        cognitiveResults.set(unit.instrumentKey,cognitiveParentUnit(unit,loaded))
+      }
+    }
     let calculated
     try{
-      calculated=computeSurveyFinal(snapshot,input.answers,assignment,
-        input.presentation?.shownBlocks,'FINAL',input.itemTimings)
+      calculated=verified.compute(input.answers,assignment,
+        input.presentation?.shownBlocks,'FINAL',input.itemTimings,cognitiveResults)
     }catch(e){
       if(e instanceof SurveyFinalValidationError||e instanceof SurveyScaleTimingError)
         throw new SurveyFinalError(400,e.path+'：'+e.message)
       throw e
     }
+    const reachedCognitive=calculated.units.filter(unit=>unit.kind==='COGNITIVE'&&!unit.notExecuted)
+    if(reachedCognitive.length!==cognitiveResults.size||
+      reachedCognitive.some(unit=>!cognitiveResults.has(unit.instrumentKey)))
+      invalid('认知结果引用集合与最终可达路径不一致')
     if(calculated.definitionDigest!==publication.definitionDigest)
       blocked('所提交作答与冻结内容不一致')
     const resultsHash=canonicalHash(JSON.parse(JSON.stringify(calculated)))
@@ -130,22 +178,69 @@ export async function submitResearchFinal(input:FinalInput){
       publicationId:publication.id,submissionId:input.submissionId,
       definitionDigest:publication.definitionDigest,payloadHash:canonical.hash,
       resultsCipher,resultsHash,
-    }})
+    },select:{id:true,completedAt:true}})
     const updated=await tx.surveyWaveAttempt.updateMany({
       where:{id:attempt.id,projectId:known.projectId,status:'STARTED'},
       data:{status:'COMPLETED',completedAt:receipt.completedAt},
     })
     if(updated.count!==1)invalid('作答状态变更发生冲突')
     await tx.surveyAttemptCheckpoint.deleteMany({where:{attemptId:attempt.id}})
+    // This is the validated submission-time receipt, returned only after the
+    // enclosing transaction commits. Replays and independent reads must still
+    // use current authorization; no receipt or participant authority is cached.
+    const general=generalReceipt(wave.generalText,receipt.completedAt)
     return {attemptId:attempt.id,receiptId:receipt.id,completedAt:receipt.completedAt,
       status:'COMPLETED' as const,idempotent:false,
-      generalText:wave.generalText||'感谢参与研究，您的回答已完整提交。'}
+      generalText:general.text,generalReceipt:general}
   })
 }
 export async function readGeneralForOwnAttempt(input:{
   publicId:string;attemptId:string;researchCode?:string;accessCredential:string
 }){
   const valid=await verifiedSurveyAttempt(input)
+  const hasFeedback=valid.compiledSnapshot.units.some(unit=>unit.kind==='COGNITIVE')
+  if(hasFeedback)return prisma.$transaction(async tx=>{
+    // Serialize disclosure with current withdrawal/credential/window governance.
+    await tx.$queryRaw`SELECT id FROM survey_projects WHERE id=${valid.projectId} FOR SHARE`
+    await tx.$queryRaw`SELECT id FROM survey_waves WHERE id=${valid.waveId}
+      AND project_id=${valid.projectId} FOR SHARE`
+    await tx.$queryRaw`SELECT id FROM survey_wave_attempts WHERE id=${valid.attemptId}
+      AND project_id=${valid.projectId} FOR SHARE`
+    const attempt=await tx.surveyWaveAttempt.findFirst({where:{id:valid.attemptId,projectId:valid.projectId,
+      waveId:valid.waveId},include:{wave:true}})
+    if(!attempt||attempt.status!=='COMPLETED'||attempt.excludedAt!==null||
+      attempt.participantId!==valid.participantId)blocked('研究反馈不可访问')
+    if(attempt.participantId){
+      await tx.$queryRaw`SELECT id FROM survey_participants WHERE id=${attempt.participantId}
+        AND project_id=${valid.projectId} FOR SHARE`
+      const person=await tx.surveyParticipant.findFirst({where:{id:attempt.participantId,
+        projectId:valid.projectId,researchCode:input.researchCode,status:'ACTIVE',credentialRevokedAt:null,
+        credentialHash:hashResearchCredential(input.accessCredential)}})
+      if(!person)blocked('研究身份已失效')
+    }else if(attempt.sessionHash!==hashResearchCredential(input.accessCredential))blocked('研究凭证已失效')
+    const consent=await tx.surveyConsent.findFirst({where:{projectId:valid.projectId,waveId:valid.waveId,
+      attemptId:valid.attemptId,accepted:true,consentVersion:attempt.wave.consentVersion},select:{id:true}})
+    if(!consent)blocked('当前研究缺少有效的知情同意记录')
+    const final=await tx.surveyWaveFinal.findUnique({where:{attemptId:valid.attemptId}})
+    if(!final||final.definitionDigest!==valid.definitionDigest)blocked('研究反馈来源校验失败')
+    const result=decryptUnifiedRuntimePayload<SurveyComputedFinal>(final.resultsCipher)
+    if(canonicalHash(result)!==final.resultsHash||result.definitionDigest!==valid.definitionDigest)
+      blocked('研究反馈结果摘要校验失败')
+    const collectionEnd=attempt.wave.finishUntil??attempt.wave.closesAt
+    const collectionClosed=attempt.wave.hardStopAt!==null||
+      (collectionEnd!==null&&collectionEnd<=new Date())
+    const measurements=[];let pending=false
+    for(const unit of valid.compiledSnapshot.units.filter(unit=>unit.kind==='COGNITIVE')){
+      const stored=result.units.find(candidate=>candidate.instrumentKey===unit.instrumentKey)
+      if(!stored)blocked('研究反馈工具来源缺失')
+      const feedback=cognitiveParticipantFeedback(unit,stored,collectionClosed)
+      if(feedback?.pending)pending=true
+      else if(feedback)measurements.push(feedback)
+    }
+    const general=generalReceipt(attempt.wave.generalText,final.completedAt)
+    return measurements.length||pending?{kind:'DESCRIPTIVE' as const,...general,measurements,pending}:
+      {kind:'GENERAL_ONLY' as const,...general}
+  })
   const final=await prisma.surveyWaveFinal.findFirst({where:{
     attemptId:valid.attemptId,projectId:valid.projectId,waveId:valid.waveId,
   },select:{completedAt:true,id:true,definitionDigest:true}})
@@ -153,7 +248,5 @@ export async function readGeneralForOwnAttempt(input:{
   if(final.definitionDigest!==valid.definitionDigest)blocked('冻结研究报告来源校验失败')
   // ALLOWLIST: no scoring, raw answers, canonical SJT weights, or longitudinal
   // psychological interpretation may be exposed via participant General.
-  return {kind:'GENERAL_ONLY' as const,completedAt:final.completedAt,
-    text:valid.generalText||'感谢参与研究。研究结果将按研究说明进行汇总分析，不构成个人心理诊断。',
-    disclaimer:'本研究反馈仅作一般说明，不提供未经验证的常模、诊断或个体能力等级。'}
+  return {kind:'GENERAL_ONLY' as const,...generalReceipt(valid.generalText,final.completedAt)}
 }

@@ -238,13 +238,15 @@ const CompositeReportPage: React.FC = () => {
 
   if (!report && generation && generation.reportStatus.state !== 'READY') {
     const failed = generation.reportStatus.state === 'FAILED'
+    const submissionConflict = failed && generation.reportStatus.errorCode === 'REPORT_SUBMISSION_KEY_CONFLICT'
     const waiting = generation.reportStatus.state === 'WAITING'
     const cancelled = generation.reportStatus.state === 'CANCELLED'
     return <ReportShell
       title="综合测评报告"
       status={{ kind: failed || cancelled ? 'error' : 'info',
-        title: failed ? '报告生成暂时失败' : waiting ? '作答尚未全部完成' : cancelled ? '报告任务已停止' : '作答记录已保存，报告生成中',
-        description: failed ? '已保存的交卷不会丢失。可重新生成报告，无需再次提交答案。'
+        title: submissionConflict ? '作答已保存，报告需要处理' : failed ? '报告生成暂时失败' : waiting ? '作答尚未全部完成' : cancelled ? '报告任务已停止' : '作答记录已保存，报告生成中',
+        description: submissionConflict ? '答案已安全保存，请联系测评负责人处理报告。无需再次提交答案，也请勿反复重新生成。'
+          : failed ? '已保存的交卷不会丢失。可重新生成报告，无需再次提交答案。'
           : waiting ? '已提交单元保留在服务器，请先继续完成剩余作答。'
           : cancelled ? '请重新读取当前作答状态，核对测评版本。'
           : pollCount.current >= automaticPollLimit ? '报告仍在准备。已暂停自动查询，可稍后重新加载。'
@@ -252,7 +254,7 @@ const CompositeReportPage: React.FC = () => {
           : waitSeconds >= 30 ? `作答已安全保存。本页已等待 ${waitSeconds} 秒，报告仍在准备；你可以离开，稍后回来查看，无需重新交卷。`
           : `作答已安全保存，报告准备中（本页已等待 ${waitSeconds} 秒）。页面会自动更新，离开不会取消报告任务。` }}
       actions={<>
-        {failed && !teacherMode && <button type="button" className="hui-button hui-button--primary" onClick={() => {
+        {failed && !submissionConflict && !teacherMode && <button type="button" className="hui-button hui-button--primary" onClick={() => {
           setLoading(true)
           void (publicMode ? publicCompositeApi(recoveryToken).retryReport(attemptId!) : compositeApi.retryReport(attemptId!))
             .then(response => { if (response.code !== 0) throw new Error(response.message || '报告重试失败'); pollCount.current = 0; return load() })

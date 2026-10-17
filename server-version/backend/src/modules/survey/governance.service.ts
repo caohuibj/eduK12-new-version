@@ -4,22 +4,40 @@ import { prisma } from '../../config/database'
 import { assertCurrentSystemAdmin } from '../../services/accountAuthorityService'
 import { comparePassword, hashPassword } from '../../utils/password'
 import { withLoginPasswordVerification } from '../../middleware/loginRateLimit'
+import { cacheService } from '../../services/cacheService'
 import { beginSurveyMfaChallenge } from './mfa.service'
 import type { Request, Response } from 'express'
 
 export class SurveyGovernanceError extends Error {
-  constructor(public readonly statusCode:number, message:string){super(message)}
+  constructor(public readonly statusCode:number, message:string, public readonly retryAfterSeconds?:number){super(message)}
 }
 const digest=(value:string)=>createHash('sha256').update(value).digest('hex')
 const randomSecret=()=>randomBytes(32).toString('base64url')
 type Tx=Prisma.TransactionClient
 export async function authorizeAdmin(actorId:string,password:string) {
-  const passed=await withLoginPasswordVerification(async()=>{
+  await withLoginPasswordVerification(async()=>{
     const a=await prisma.user.findUnique({where:{id:actorId}})
-    return !!a && a.isActive && !a.isFrozen && a.platformRole==='SYSTEM_ADMIN'
-      && await comparePassword(password,a.passwordHash)
+    if(!a || !a.isActive || a.isFrozen || a.platformRole!=='SYSTEM_ADMIN')
+      throw new SurveyGovernanceError(403,'需要系统管理员当前密码重新验证')
+    const protectedMode=process.env.NODE_ENV!=='development' && process.env.NODE_ENV!=='test'
+    const failureKey='auth:survey:admin-password:'+digest(actorId)
+    // Check inside the existing bcrypt admission, not before its queue. Only
+    // already-admitted verifications may finish across the failure threshold.
+    if(protectedMode){
+      const state=await cacheService.getRateLimitState(failureKey)
+      if(!state)throw new SurveyGovernanceError(503,'密码验证暂不可用，请稍后重试')
+      if(state.count>=15)throw new SurveyGovernanceError(429,'当前密码错误次数过多，请稍后重试',Math.max(1,state.retryAfterSeconds))
+    }
+    if(await comparePassword(password,a.passwordHash))return
+    if(protectedMode){
+      const budget=await cacheService.consumeRateLimit(failureKey,15,900)
+      if(!budget)throw new SurveyGovernanceError(503,'密码验证暂不可用，请稍后重试')
+      if(!budget.allowed)throw new SurveyGovernanceError(429,'当前密码错误次数过多，请稍后重试',Math.max(1,budget.retryAfterSeconds))
+    }
+    // Correct passwords never consume or clear this fixed failure window.
+    // Keeping its TTL avoids a concurrent success erasing a newer failure.
+    throw new SurveyGovernanceError(403,'需要系统管理员当前密码重新验证')
   })
-  if(!passed)throw new SurveyGovernanceError(403,'需要系统管理员当前密码重新验证')
 }
 async function event(tx:Tx, actor:string|null, action:string, target:string|null, metadata:object={}) {
   await tx.surveyEvent.create({data:{

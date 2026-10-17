@@ -1,8 +1,10 @@
+import { surveySjtQuestions } from './sjt-structure'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { evaluateFlowCondition,staticFlowValues,safeFlowText,
+  surveyAssignedFlowBlocks,surveyGroupHasMaterial,type SurveyVariantProvenance,
   type FrozenSurveyFlow } from './flow.definition'
 import type { ResearchFrozenPublication,ResearchFrozenUnit } from './publication.service'
-import type { SurveyFlowAssignment } from './flow.assignment'
+import { assertSurveyFlowAssignment,type SurveyFlowAssignment } from './flow.assignment'
 import type { FrozenUnitResult,MissingItem } from './final.compute'
 export class SurveyFlowExecutionError extends Error{
   constructor(readonly path:string,message:string){super(message)}
@@ -16,6 +18,7 @@ export type FlowPresentationBlock={
 export type SurveyExecutionTrace={
   schemaVersion:1;flowDigest:string;assignmentDigest:string;
   algorithm:SurveyFlowAssignment['algorithm'];experimentKey:string|null;groupKey:string|null;
+  variant?:SurveyVariantProvenance;assignedAt?:string;
   shownBlocks:string[];skippedInstrumentKeys:string[];
   termination:'COMPLETE'|'COMPLETE_EARLY'|'SCREEN_OUT'
   endBlockKey:string|null
@@ -41,9 +44,9 @@ const missingUnit=(unit:ResearchFrozenUnit):FrozenUnitResult=>{
   }else if(unit.kind==='SCALE'){
     const d=unit.displayDefinition as import('./builder.definition').ScaleDraft
     for(const q of d.items)missing.push({itemKey:q.itemKey,reason:'NOT_SHOWN'})
-  }else{
-    const d=unit.displayDefinition as import('./builder.definition').SjtDraft
-    for(const q of d.questions)missing.push({itemKey:q.questionKey,reason:'NOT_SHOWN'})
+  }else if(unit.kind==='SJT'){
+    const d=unit.displayDefinition as import('./builder.definition').AnySjtDraft
+    for(const q of surveySjtQuestions(d))missing.push({itemKey:q.questionKey,reason:'NOT_SHOWN'})
   }
   return {instrumentKey:unit.instrumentKey,kind:unit.kind,sourceDigest:unit.sourceDigest,
     scoringDigest:unit.scoringDigest,rawAnswers:{},missing,
@@ -65,6 +68,7 @@ export function executeSurveyFlow(input:{
     ||(input.assignment.groupKey!==null&&!flow.experiment?.groups.some(g=>
       g.groupKey===input.assignment.groupKey)))
     fail('flow.assignment','Attempt 实验分配与冻结研究内容不匹配')
+  assertSurveyFlowAssignment(flow,input.assignment)
   const byKey=new Map(input.snapshot.units.map(unit=>[unit.instrumentKey,unit]))
   const seen=new Set<string>(),verified:Record<string,Record<string,unknown>>={}
   const shown:string[]=[],presentation:FlowPresentationBlock[]=[]
@@ -73,14 +77,14 @@ export function executeSurveyFlow(input:{
   let endBlockKey:string|null=null
   const group=flow.experiment?.groups.find(g=>g.groupKey===input.assignment.groupKey)
   if(flow.experiment&&!group)fail('flow.assignment','当前试验组不存在于冻结实验配置')
-  if(group){
+  if(group&&surveyGroupHasMaterial(group)){
     shown.push('assigned_material')
     presentation.push({blockKey:'assigned_material',kind:'MATERIAL',
       title:safeFlowText(group.materialTitle,flow),
       body:safeFlowText(group.materialBody,flow)})
   }
   const vars=staticFlowValues(flow)
-  for(const block of flow.blocks){
+  for(const block of surveyAssignedFlowBlocks(flow,input.assignment.groupKey)){
     if(block.when&&!evaluateFlowCondition(block.when,verified,vars))continue
     shown.push(block.blockKey)
     if(block.kind==='MATERIAL'){
@@ -120,20 +124,21 @@ export function executeSurveyFlow(input:{
     assignmentDigest:canonicalHash(input.assignment),algorithm:input.assignment.algorithm,
     experimentKey:input.assignment.experimentKey,groupKey:input.assignment.groupKey,
     shownBlocks:shown,skippedInstrumentKeys:ordered.filter(x=>x.notExecuted).map(x=>x.instrumentKey),
+    ...(input.assignment.variant?{variant:input.assignment.variant,assignedAt:input.assignment.assignedAt}:{}),
     termination,endBlockKey,clientPresentation:'VERIFIED_SUBMISSION',
   }
   return {trace,units:ordered,presentation}
 }
 export const buildSurveyFlowPublicProjection=(flow:FrozenSurveyFlow,assignment:SurveyFlowAssignment)=>{
-  if(assignment.flowDigest!==flow.flowDigest)fail('flow','实验分配与冻结版本不一致')
+  assertSurveyFlowAssignment(flow,assignment)
   const group=flow.experiment?.groups.find(g=>g.groupKey===assignment.groupKey)
   return {
     schemaVersion:1 as const,flowDigest:flow.flowDigest,
-    ...(group?{selectedMaterial:{blockKey:'assigned_material',
+    ...(group&&surveyGroupHasMaterial(group)?{selectedMaterial:{blockKey:'assigned_material',
       title:safeFlowText(group.materialTitle,flow),
       body:safeFlowText(group.materialBody,flow)}}:{}),
     embeddedData:flow.embeddedData.map(v=>({key:v.key,value:v.value,type:v.type})),
-    blocks:flow.blocks.map(b=>({
+    blocks:surveyAssignedFlowBlocks(flow,assignment.groupKey).map(b=>({
       blockKey:b.blockKey,kind:b.kind,instrumentKey:b.instrumentKey,
       title:b.kind==='MATERIAL'?safeFlowText(b.title??'',flow):b.title,
       body:b.kind==='MATERIAL'?safeFlowText(b.body??'',flow):undefined,

@@ -5,7 +5,7 @@ import { ResearchFormEditor } from './ResearchFormEditor'
 import { ResearchScaleEditor } from './ResearchScaleEditor'
 import { ResearchSjtEditor } from './ResearchSjtEditor'
 import { ResearchPreview } from './ResearchPreview'
-import type { FormDraft, ScaleDraft, SjtDraft, ResearchDraft } from './builder.types'
+import type { FormDraft, ScaleDraft, SjtDraft, SjtDraftV1, ResearchDraft } from './builder.types'
 
 const scale=():ScaleDraft=>({
   schemaVersion:1,respondentType:'participant_self_report',aggregation:'mean',
@@ -85,13 +85,13 @@ describe('Survey Research Builder editing widgets',()=>{
     fireEvent.click(screen.getByRole('button',{name:'增加构念'}))
     fireEvent.click(screen.getByRole('button',{name:'增加问题'}))
     fireEvent.change(screen.getByLabelText('作答方式'),{target:{value:'MULTIPLE'}})
-    const state=JSON.parse(screen.getByTestId('sjt-state').textContent||'{}') as SjtDraft
+    const state=JSON.parse(screen.getByTestId('sjt-state').textContent||'{}') as SjtDraftV1
     expect(state.questions[0].responseType).toBe('MULTIPLE')
     expect(state.questions[0].minSelections).toBe(1)
     expect(state.questions[0].maxSelections).toBe(2)
     expect(state.questions[0].aggregationPolicy).toBeUndefined()
     fireEvent.change(screen.getByLabelText('多选计分聚合规则'),{target:{value:'MEAN'}})
-    const configured=JSON.parse(screen.getByTestId('sjt-state').textContent||'{}') as SjtDraft
+    const configured=JSON.parse(screen.getByTestId('sjt-state').textContent||'{}') as SjtDraftV1
     expect(configured.questions[0].aggregationPolicy).toBe('MEAN')
   })
   it('records nonuniform contribution weights per SJT option and construct',()=>{
@@ -101,7 +101,7 @@ describe('Survey Research Builder editing widgets',()=>{
     const weights=screen.getAllByLabelText(/权重/)
     expect(weights.length).toBe(2)
     fireEvent.change(weights[0],{target:{value:'3'}})
-    const result=JSON.parse(screen.getByTestId('sjt-state').textContent||'{}') as SjtDraft
+    const result=JSON.parse(screen.getByTestId('sjt-state').textContent||'{}') as SjtDraftV1
     const dimension=result.metrics[0].metricKey
     expect(result.questions[0].options[0].contributions[dimension]).toBe(3)
     expect(result.questions[0].options[1].contributions[dimension]).toBe(0)

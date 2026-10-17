@@ -1,11 +1,12 @@
 import { Router,type Request,type Response,type NextFunction } from 'express'
 import { z } from 'zod'
+import { surveyAnalyticsItemRequestSchema } from './analytics.request'
 import { authenticateSurvey } from '../../middleware/auth'
 import { success,error } from '../../utils/response'
 import * as service from './analytics.read'
 import {listSampleQuality,listSampleQualityHistory,setSampleQuality} from './sample-quality.service'
 import {describeSurveyPairedScoresPaged,describeSurveyWaveItemPaged,describeSurveyWaveGroupsPaged} from './analytics.paged'
-import { loadSurveySource } from './analytics.source'
+import { loadSurveyItemDictionary,loadSurveySource } from './analytics.source'
 import { describeWave } from './analytics.descriptive'
 import { describeSurveyFlowOperations } from './analytics.flow-operations'
 import { assertRecentSurveyMfa } from './analytics.export.service'
@@ -73,34 +74,23 @@ const measurement=z.object({
   instrumentKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),
   scoreKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),
 }).strict()
-const itemRequest=z.object({
-  instrumentKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),
-  itemKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),
-}).strict()
+
 surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/items/dictionary',wrap(async req=>{
   assertRecentSurveyMfa(req)
   const projectId=id.parse(req.params.pid),waveId=id.parse(req.params.wid)
-  const source=await loadSurveySource({actorUserId:req.user!.userId,projectId,
-    waveIds:[waveId],maxFinals:1,pageMode:true,includeWideSchema:true,
-    includeAttendance:false})
-  return {waveId,source:'FROZEN_CODEBOOK',variables:source.codebook
-    .filter(c=>c.waveId===waveId&&!['SHORT_TEXT','LONG_TEXT','OTHER_TEXT'].includes(c.responseType))
-    .map(c=>({instrumentKey:c.instrumentKey,itemKey:c.itemKey,
-      prompt:c.prompt,responseType:c.responseType,kind:c.kind,
-      columnKey:c.columnKey,definitionDigest:c.definitionDigest})),
-  }
+  return loadSurveyItemDictionary({actorUserId:req.user!.userId,projectId,waveId})
 }))
 surveyAnalyticsRouter.post('/:pid/analytics/waves/:wid/items/paged',wrap(req=>{
   assertRecentSurveyMfa(req)
   return describeSurveyWaveItemPaged({
     actorUserId:req.user!.userId,projectId:id.parse(req.params.pid),
-    waveId:id.parse(req.params.wid),...itemRequest.parse(req.body),
+    waveId:id.parse(req.params.wid),...surveyAnalyticsItemRequestSchema.parse(req.body),
   })
 }))
 surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/items',wrap(async req=>{
   const projectId=id.parse(req.params.pid),waveId=id.parse(req.params.wid)
   const source=await loadSurveySource({actorUserId:req.user!.userId,projectId,
-    waveIds:[waveId],maxFinals:250})
+    waveIds:[waveId],maxFinals:250,includeWideSchema:true})
   return describeWave(source,waveId)
 }))
 const groupRequest=z.object({

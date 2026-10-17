@@ -180,6 +180,8 @@
     "submissions": "RUNTIME_RW",
     "survey_accounts": "RUNTIME_RW",
     "survey_attempt_checkpoints": "RUNTIME_RW",
+    "survey_cognitive_results": "RUNTIME_RW",
+    "survey_cognitive_sessions": "RUNTIME_RW",
     "survey_consents": "RUNTIME_RW",
     "survey_entry_tokens": "RUNTIME_RW",
     "survey_events": "RUNTIME_RW",
@@ -200,6 +202,7 @@
     "survey_waves": "RUNTIME_RW",
     "teacher_codes": "RUNTIME_RW",
     "users": "RUNTIME_RW",
-    "videos": "RUNTIME_RW"
+    "videos": "RUNTIME_RW",
+    "survey_tool_grants": "RUNTIME_RW"
   }
 }

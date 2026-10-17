@@ -1,4 +1,4 @@
-import { useEffect,useState } from 'react'
+import { useEffect,useId,useRef,useState } from 'react'
 import type { SurveyImage } from './builder.types'
 
 type Stored={assetId:string;contentHash:string;mimeType:SurveyImage['asset']['mimeType'];originalName:string|null;sizeBytes:number}
@@ -9,23 +9,47 @@ export function SurveyImageField({projectId,image,onChange}:{
   projectId:string;image?:SurveyImage;onChange:(value:SurveyImage|undefined)=>void
 }){
   const [library,setLibrary]=useState<Stored[]>([]),[busy,setBusy]=useState(false),[error,setError]=useState('')
+  const [libraryOpen,setLibraryOpen]=useState(false),[libraryLoading,setLibraryLoading]=useState(false)
+  const [libraryError,setLibraryError]=useState('')
+  const libraryId=useId(),libraryRequest=useRef<AbortController|null>(null)
   const base='/api/survey/projects/'+encodeURIComponent(projectId)+'/assets'
+  const currentBase=useRef(base),mounted=useRef(true)
+  currentBase.current=base
   useEffect(()=>{
-    let mounted=true
-    if(typeof globalThis.fetch!=='function')return()=>{mounted=false}
-    void fetch(base,{credentials:'same-origin'}).then(async r=>{
-      if(!r.ok)throw new Error('素材库无权访问')
-      return r.json() as Promise<Envelope<{assets:Stored[]}>>
-    }).then(x=>{if(mounted)setLibrary(x.data?.assets||[])}).catch(e=>{
-      if(mounted)setError(e instanceof Error?e.message:'素材库加载失败')
-    })
-    return()=>{mounted=false}
+    mounted.current=true
+    setLibrary([]);setLibraryOpen(false);setLibraryLoading(false);setLibraryError('')
+    setBusy(false);setError('')
+    return()=>{mounted.current=false;libraryRequest.current?.abort()}
   },[base])
+  const loadLibrary=async()=>{
+    libraryRequest.current?.abort()
+    const controller=new AbortController()
+    libraryRequest.current=controller
+    setLibrary([]);setLibraryError('');setLibraryLoading(true)
+    const current=()=>mounted.current&&currentBase.current===base&&!controller.signal.aborted
+    try{
+      const response=await fetch(base,{credentials:'same-origin',cache:'no-store',signal:controller.signal})
+      if(!response.ok)throw new Error('素材库无权访问或暂不可用')
+      const result=await response.json() as Envelope<{assets:Stored[]}>
+      if(result.code!==0||!result.data)throw new Error(result.message||'素材库加载失败')
+      if(current())setLibrary(result.data.assets)
+    }catch(e){if(current())setLibraryError(e instanceof Error?e.message:'素材库加载失败')}
+    finally{if(current())setLibraryLoading(false)}
+  }
+  const toggleLibrary=()=>{
+    if(libraryOpen){
+      libraryRequest.current?.abort()
+      setLibraryOpen(false);setLibrary([]);setLibraryError('');setLibraryLoading(false)
+    }else{
+      setLibraryOpen(true);void loadLibrary()
+    }
+  }
   const upload=async(file:File)=>{
     if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>2*1024*1024||!file.size){
       setError('只允许不超过 2MB 的 JPEG/PNG/WebP 静态图片');return
     }
     setBusy(true);setError('')
+    const current=()=>mounted.current&&currentBase.current===base
     try{
       let csrf=cookie()
       if(!csrf){
@@ -34,19 +58,21 @@ export function SurveyImageField({projectId,image,onChange}:{
         csrf=result.data?.csrfToken||''
       }
       if(!csrf)throw new Error('缺少合法安全会话')
+      if(!current())return
       const body=new FormData();body.append('image',file)
       const response=await fetch(base,{method:'POST',credentials:'same-origin',
         headers:{'X-CSRF-Token':csrf},body})
       const output=await response.json() as Envelope<Stored>
       if(!response.ok||!output.data)throw new Error(output.message||'图片上传失败')
+      if(!current())return
       const media=output.data
       setLibrary(xs=>[media,...xs.filter(x=>x.assetId!==media.assetId)])
       onChange({asset:{
         assetId:media.assetId,contentHash:media.contentHash,mimeType:media.mimeType,
       },altText:file.name.replace(/\.[^.]+$/,'').slice(0,300)||'研究图片',
         rightsStatus:'unknown',rightsNote:''})
-    }catch(e){setError(e instanceof Error?e.message:'图片上传失败')}
-    finally{setBusy(false)}
+    }catch(e){if(current())setError(e instanceof Error?e.message:'图片上传失败')}
+    finally{if(current())setBusy(false)}
   }
   return <fieldset className="border rounded-lg p-3 space-y-3">
     <legend className="text-sm font-semibold">授权静态研究图片（可选）</legend>
@@ -57,8 +83,17 @@ export function SurveyImageField({projectId,image,onChange}:{
         className="block mt-1 max-w-full"
         onChange={e=>{const f=e.target.files?.[0];if(f)void upload(f);e.target.value=''}}/>
     </label>
+    <button type="button" className="btn-secondary" disabled={busy}
+      aria-expanded={libraryOpen} aria-controls={libraryId} onClick={toggleLibrary}>
+      {libraryOpen?'收起本项目素材库':'打开本项目素材库'}</button>
+    <div id={libraryId} hidden={!libraryOpen} className="space-y-2">{libraryOpen&&<>
+    {libraryLoading&&<p role="status" className="text-sm">正在读取本项目素材库…</p>}
+    {libraryError&&<><p role="alert" className="text-red-700 text-sm">{libraryError}</p>
+      <button type="button" className="btn-secondary" disabled={busy||libraryLoading}
+        onClick={()=>void loadLibrary()}>重试读取素材库</button></>}
     <label className="text-sm block">从本项目素材库选择
-      <select className="input block w-full" value={image?.asset.assetId||''} disabled={busy}
+      <select className="input block w-full" value={image?.asset.assetId||''}
+        disabled={busy||libraryLoading||!!libraryError}
         onChange={e=>{
           const match=library.find(x=>x.assetId===e.target.value)
           onChange(match?{asset:{
@@ -71,6 +106,7 @@ export function SurveyImageField({projectId,image,onChange}:{
           {a.originalName||a.assetId} · {Math.round(a.sizeBytes/1024)} KB</option>)}
       </select>
     </label>
+    </>}</div>
     {image&&<div className="space-y-2">
       <img src={base+'/'+encodeURIComponent(image.asset.assetId)+'/preview'}
         alt={image.altText||'研究图片预览'} loading="lazy"

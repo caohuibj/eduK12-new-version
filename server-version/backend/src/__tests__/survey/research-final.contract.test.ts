@@ -1,6 +1,8 @@
-import { describe,expect,it } from 'vitest'
+import * as scaleKernel from '../../modules/scale/scale-scoring'
+import * as sjtKernel from '../../modules/situational/situation-model-resolver'
+import { describe,expect,it,vi } from 'vitest'
 import { compileFrozenResearchUnit,type ResearchFrozenPublication } from '../../modules/survey/publication.service'
-import { computeSurveyFinal,SurveyFinalValidationError } from '../../modules/survey/final.compute'
+import { computeSurveyFinal,validateSurveyUnitAnswers,SurveyFinalValidationError } from '../../modules/survey/final.compute'
 import type { FormDraft,ScaleDraft,SjtDraft } from '../../modules/survey/builder.definition'
 
 const frozen=(kind:'FORM'|'SCALE'|'SJT',definition:FormDraft|ScaleDraft|SjtDraft)=>
@@ -140,5 +142,32 @@ describe('Survey RESEARCH_ONLY authoritative FINAL',()=>{
     expect(Object.keys(unit).sort()).toEqual([
       'instrumentKey','kind','missing','privateScoring','rawAnswers','scoringDigest','sourceDigest',
     ].sort())
+  })
+})
+
+ describe('Survey cognitive prefix validation efficiency',()=>{
+  it('validates Scale choices without scoring and scores only authoritative FINAL',()=>{
+    const unit=frozen('SCALE',scale),answers={itemone:'five',itemtwo:'five'}
+    const spy=vi.spyOn(scaleKernel,'scoreScale')
+    try{
+      expect(validateSurveyUnitAnswers(unit,answers)).toEqual({rawAnswers:answers,missing:[]})
+      expect(()=>validateSurveyUnitAnswers(unit,{itemone:'five'})).toThrow()
+      expect(()=>validateSurveyUnitAnswers(unit,{...answers,itemtwo:'invalid'})).toThrow()
+      expect(spy).toHaveBeenCalledTimes(0)
+      computeSurveyFinal(snapshot(unit),{researchinstrument:answers})
+      expect(spy).toHaveBeenCalledTimes(1)
+    }finally{spy.mockRestore()}
+  })
+  it('validates legacy SJT choices and terminal trajectory without scoring',()=>{
+    const unit=frozen('SJT',sjt),answers={first:'aone',second:'bone'}
+    const spy=vi.spyOn(sjtKernel,'scoreSituationalModel')
+    try{
+      expect(validateSurveyUnitAnswers(unit,answers)).toEqual({rawAnswers:answers,missing:[]})
+      expect(()=>validateSurveyUnitAnswers(unit,{first:'aone'})).toThrow()
+      expect(()=>validateSurveyUnitAnswers(unit,{...answers,second:'invalid'})).toThrow()
+      expect(spy).toHaveBeenCalledTimes(0)
+      computeSurveyFinal(snapshot(unit),{researchinstrument:answers})
+      expect(spy).toHaveBeenCalledTimes(1)
+    }finally{spy.mockRestore()}
   })
 })

@@ -1,3 +1,4 @@
+import {catalogSnapshotsForDrafts,compileCatalogUnit} from './catalog.service'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -8,6 +9,8 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { compileSurveyFlow,parseSurveyFlowDraft,SurveyFlowError } from './flow.definition'
 import { compileGroupQuotaPolicy,compileCheckpointPolicy,
   groupQuotaPolicySchema,surveyCheckpointPolicySchema } from './operations.definition'
+
+import { groupIpDraftPolicySchema,freezeGroupIpPolicy,resolveGroupIpOpenWindow } from './group-ip-policy'
 
 type Tx=Prisma.TransactionClient
 export class SurveyWaveError extends Error {
@@ -66,7 +69,7 @@ export async function listWaves(uid:string,pid:string,page:number){
     const list=await tx.surveyWave.findMany({where:{projectId:pid},
       orderBy:[{ordinal:'asc'}],take:25,skip:(page-1)*25,
       select:{id:true,projectId:true,title:true,ordinal:true,status:true,revision:true,
-        opensAt:true,closesAt:true,quotaStarts:true,startsCount:true,allowNewParticipants:true,publicationId:true}})
+        opensAt:true,closesAt:true,finishUntil:true,groupIpPolicy:true,groupIpActivatedAt:true,quotaStarts:true,startsCount:true,allowNewParticipants:true,publicationId:true}})
     return {page,pageSize:25,list}
   })
 }
@@ -84,6 +87,7 @@ type WaveInput={
   flowDefinition?:unknown|null
   quotaPolicy?:unknown|null
   checkpointPolicy?:unknown|null
+  groupIpPolicy?:unknown|null
 }
 export async function createWave(uid:string,pid:string,input:WaveInput){
   ensureWindow(input)
@@ -93,6 +97,8 @@ export async function createWave(uid:string,pid:string,input:WaveInput){
     ?null:groupQuotaPolicySchema.parse(input.quotaPolicy)
   const checkpointPolicy=input.checkpointPolicy===undefined||input.checkpointPolicy===null
     ?null:surveyCheckpointPolicySchema.parse(input.checkpointPolicy)
+  const groupIpPolicy=input.groupIpPolicy===undefined||input.groupIpPolicy===null
+    ?null:groupIpDraftPolicySchema.parse(input.groupIpPolicy)
   return prisma.$transaction(async tx=>{
     // Acquire the strongest project lock first. SHARE -> UPDATE promotion
     // can deadlock when two creators concurrently allocate the next ordinal.
@@ -108,6 +114,7 @@ export async function createWave(uid:string,pid:string,input:WaveInput){
         ||canonicalHash(existing.flowDefinition)!==canonicalHash(flowDefinition)
         ||canonicalHash(existing.quotaPolicy)!==canonicalHash(quotaPolicy)
         ||canonicalHash(existing.checkpointPolicy)!==canonicalHash(checkpointPolicy)
+        ||canonicalHash(existing.groupIpPolicy)!==canonicalHash(groupIpPolicy)
         ||!exactDate(existing.opensAt,input.opensAt)
         ||!exactDate(existing.closesAt,input.closesAt)
         ||!exactDate(existing.finishUntil,input.finishUntil)
@@ -128,6 +135,7 @@ export async function createWave(uid:string,pid:string,input:WaveInput){
       flowDefinition:flowDefinition===null?Prisma.DbNull:flowDefinition as Prisma.InputJsonValue,
       quotaPolicy:quotaPolicy===null?Prisma.DbNull:quotaPolicy as Prisma.InputJsonValue,
       checkpointPolicy:checkpointPolicy===null?Prisma.DbNull:checkpointPolicy as Prisma.InputJsonValue,
+      groupIpPolicy:groupIpPolicy===null?Prisma.DbNull:groupIpPolicy as Prisma.InputJsonValue,
       status:'DRAFT',
       opensAt:input.opensAt?new Date(input.opensAt):null,
       closesAt:input.closesAt?new Date(input.closesAt):null,
@@ -149,6 +157,8 @@ export async function updateWave(uid:string,pid:string,wid:string,input:WaveUpda
     input.quotaPolicy===null?null:groupQuotaPolicySchema.parse(input.quotaPolicy)
   const requestedCheckpoint=input.checkpointPolicy===undefined?undefined:
     input.checkpointPolicy===null?null:surveyCheckpointPolicySchema.parse(input.checkpointPolicy)
+  const requestedGroupIp=input.groupIpPolicy===undefined?undefined:
+    input.groupIpPolicy===null?null:groupIpDraftPolicySchema.parse(input.groupIpPolicy)
   return prisma.$transaction(async tx=>{
     await ownProject(tx,uid,pid,true)
     const old=await ownWave(tx,pid,wid)
@@ -161,6 +171,7 @@ export async function updateWave(uid:string,pid:string,wid:string,input:WaveUpda
         ...(requestedFlow===undefined?{}:{flowDefinition:requestedFlow===null?Prisma.DbNull:requestedFlow as Prisma.InputJsonValue}),
         ...(requestedQuota===undefined?{}:{quotaPolicy:requestedQuota===null?Prisma.DbNull:requestedQuota as Prisma.InputJsonValue}),
         ...(requestedCheckpoint===undefined?{}:{checkpointPolicy:requestedCheckpoint===null?Prisma.DbNull:requestedCheckpoint as Prisma.InputJsonValue}),
+        ...(requestedGroupIp===undefined?{}:{groupIpPolicy:requestedGroupIp===null?Prisma.DbNull:requestedGroupIp as Prisma.InputJsonValue}),
         linkageNoticeConfirmed:input.linkageNoticeConfirmed===true,
         opensAt:input.opensAt?new Date(input.opensAt):null,
         closesAt:input.closesAt?new Date(input.closesAt):null,
@@ -184,7 +195,8 @@ export async function preflightWave(uid:string,pid:string,wid:string){
     if(ids.length!==(Array.isArray(wave.instrumentIds)?wave.instrumentIds.length:-1))fail(400,'工具引用格式错误')
     await validateDraftRefs(tx,pid,ids)
     const drafts=await tx.surveyInstrumentDraft.findMany({where:{projectId:pid,id:{in:ids}}})
-    return {project,wave,drafts:ids.map(id=>drafts.find(d=>d.id===id)!),selected:ids}
+    const catalogSources=await catalogSnapshotsForDrafts(tx,uid,drafts.flatMap(d=>d.catalogGrantId?[d.catalogGrantId]:[]))
+    return {project,wave,drafts:ids.map(id=>drafts.find(d=>d.id===id)!),selected:ids,catalogSources}
   })
   const checks:Array<{key:string;ok:boolean;issues:string[];digest?:string}>=[]
   let compiledFlow:import('./flow.definition').FrozenSurveyFlow|undefined
@@ -216,6 +228,14 @@ export async function preflightWave(uid:string,pid:string,wid:string){
     }catch(e){checks.push({key:'checkpoint',ok:false,
       issues:[e instanceof Error?e.message:'Checkpoint 定义不可用']})}
   }
+  if(input.wave.groupIpPolicy){
+    try{
+      const now=new Date()
+      resolveGroupIpOpenWindow(freezeGroupIpPolicy(input.wave.groupIpPolicy,now),input.wave,now)
+      checks.push({key:'group_ip',ok:true,issues:[]})
+    }catch(e){checks.push({key:'group_ip',ok:false,
+      issues:[e instanceof Error?e.message:'集中采集设置不可用']})}
+  }
   try{
     await prisma.$transaction(async tx=>{
       await ownProject(tx,uid,pid,false)
@@ -239,6 +259,11 @@ export async function preflightWave(uid:string,pid:string,wid:string){
       issues:linkedConfirmed?[]:['跨波次研究必须由研究者确认已明确告知：随机研究编号将关联不同时间点的答案']})
   }
   for(const draft of input.drafts){
+    if(draft.catalogGrantId){
+      const compiled=compileCatalogUnit(draft,input.catalogSources.get(draft.catalogGrantId)!)
+      checks.push({key:draft.id,ok:true,issues:[],digest:compiled.sourceDigest})
+      continue
+    }
     const compilation=previewResearchInstrument({
       kind:surveyKindSchema.parse(draft.kind),instrumentKey:draft.instrumentKey,
       title:draft.title,definition:draft.definition,
@@ -253,7 +278,7 @@ export async function preflightWave(uid:string,pid:string,wid:string){
     selectionDigest:canonicalHash(input.selected),checks,
     ok:checks.length===input.selected.length+(input.project.collectionMode==='LINKED_WAVES'?4:3)+
       (input.wave.flowDefinition?1:0)+(input.wave.quotaPolicy?1:0)+
-      (input.wave.checkpointPolicy?1:0)&&checks.every(c=>c.ok),
+      (input.wave.checkpointPolicy?1:0)+(input.wave.groupIpPolicy?1:0)&&checks.every(c=>c.ok),
     publicationReady:process.env.SURVEY_PUBLICATION_ENABLED==='true',
     reason:process.env.SURVEY_PUBLICATION_ENABLED==='true'
       ?'研究专用 FINAL 可用，仍需以当前发布版本完成预检'

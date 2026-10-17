@@ -1,3 +1,4 @@
+import { ScaleSubmissionKeyConflictError } from '../scale/scale-final-submit-conflict'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import type { ScaleResultV2 } from '../scale/scale-result'
@@ -40,7 +41,12 @@ export const persistScaleFactRecords=async(db:FactDb,rows:ScaleFactRecord[]):Pro
  const inserted=await db.$queryRaw<Array<{id:string}>>`INSERT INTO assessment_result_facts(assessment_id,attempt_epoch,submission_id,payload_hash,source_result_hash,canonical_result_hash,facts_encrypted,raw_answers_encrypted,raw_receipt_attempt_id,completed_at,total_time)
   SELECT source.id,source."attemptEpoch",source."submissionId",source."payloadHash",source."sourceResultHash",source."canonicalResultHash",source."factsEncrypted",source."rawAnswersEncrypted",source."rawReceiptAttemptId",source."completedAt",source."totalTime"
   FROM jsonb_to_recordset(${JSON.stringify(data)}::jsonb) AS source(id text,"attemptEpoch" integer,"submissionId" text,"payloadHash" text,"sourceResultHash" text,"canonicalResultHash" text,"factsEncrypted" text,"rawAnswersEncrypted" text,"rawReceiptAttemptId" text,"completedAt" timestamp,"totalTime" integer)
+  ON CONFLICT ON CONSTRAINT assessment_result_facts_submission_id_key DO NOTHING
   RETURNING assessment_id AS id`
+ // Only this named submission-key constraint may suppress an insertion. Both
+ // callers run in the enclosing FINAL transaction; throwing rolls back all
+ // other rows in a mixed batch. Other unique/database errors remain unchanged.
+ if(inserted.length<rows.length)throw new ScaleSubmissionKeyConflictError()
  if(inserted.length!==rows.length||new Set(inserted.map(r=>r.id)).size!==rows.length)throw new Error('Result fact insert count mismatch')
 }
 

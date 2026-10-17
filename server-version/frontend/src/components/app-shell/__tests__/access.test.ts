@@ -1,6 +1,6 @@
 import { describe, expect, it, afterEach } from 'vitest'
-import { internalReturnTo, parentReturnTo, returnAfterLogin, shellModeFor, rememberReauthReturn, readReauthReturn } from '../access'
-import { activeNavigation, navigationFor } from '../navigation'
+import { internalReturnTo, loginUrl, parentReturnTo, returnAfterLogin, shellModeFor, rememberReauthReturn, readReauthReturn } from '../access'
+import { activeNavigation, navigationFor, routeTitle, surveyGovernanceNavigation } from '../navigation'
 
 afterEach(() => sessionStorage.clear())
 describe('safe access and return context', () => {
@@ -8,6 +8,11 @@ describe('safe access and return context', () => {
   it('retains exact nested query values without double decoding', () => {
     const path = '/student/cognitive/sessions/s1?returnTo=%2Fstudent%2Fcomposite%2Fattempts%2Fa%3Fx%3D1#ready'
     expect(returnAfterLogin(path, 'STUDENT')).toBe(path)
+  })
+  it('returns Survey governance through administrator login only', () => {
+    expect(loginUrl('TEACHER', '/admin/survey-researchers')).toBe('/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers')
+    expect(returnAfterLogin('/admin/survey-researchers', 'ADMIN')).toBe('/admin/survey-researchers')
+    expect(returnAfterLogin('/admin/survey-researchers', 'TEACHER')).toBe('/dashboard')
   })
   it('rejects role escalation and authentication loops', () => {
     expect(returnAfterLogin('/users', 'TEACHER')).toBe('/dashboard')
@@ -69,4 +74,12 @@ describe('role navigation', () => {
     const admin = navigationFor('ADMIN', true)
     expect(admin.find(item => item.path === '/users')?.section).toBe('system')
   })
+})
+
+it('discovers Survey governance only in Training for existing system admins', () => {
+  expect(surveyGovernanceNavigation(true, 'ADMIN', 'SYSTEM_ADMIN')[0]?.path).toBe('/admin/survey-researchers')
+  expect(surveyGovernanceNavigation(false, 'ADMIN', 'SYSTEM_ADMIN')).toEqual([])
+  expect(surveyGovernanceNavigation(true, 'TEACHER', 'SYSTEM_ADMIN')).toEqual([])
+  expect(surveyGovernanceNavigation(true, 'ADMIN', null)).toEqual([])
+  expect(routeTitle('/admin/survey-researchers')).toBe('Survey 研究者与工具授权')
 })

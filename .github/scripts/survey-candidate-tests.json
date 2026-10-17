@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "backendTests": [
+    "src/__tests__/survey/group-ip-policy.contract.test.ts",
+    "src/__tests__/survey/group-ip-freeze.contract.test.ts",
+    "src/__tests__/survey/group-ip-wave-lifecycle.contract.test.ts",
+    "src/__tests__/survey/research-sjt-v2.contract.test.ts",
+    "src/__tests__/survey/research-sjt-multiselect.contract.test.ts",
+    "src/__tests__/survey/research-builder.postgres.integration.test.ts",
+    "src/__tests__/survey/research-catalog.postgres.integration.test.ts",
+    "src/__tests__/survey/research-cognitive.postgres.integration.test.ts",
+    "src/__tests__/survey/research-flow.postgres.integration.test.ts",
+    "src/__tests__/survey/research-media.postgres.integration.test.ts",
+    "src/__tests__/survey/research-operations.postgres.integration.test.ts",
+    "src/__tests__/survey/research-variants.postgres.integration.test.ts",
+    "src/__tests__/survey/research-wave-final.postgres.integration.test.ts",
+    "src/__tests__/survey/survey-realm.postgres.integration.test.ts",
+    "src/__tests__/integration/report-permanent-conflict.postgres.integration.test.ts",
+    "src/__tests__/scale/scale-submission-key.postgres.integration.test.ts"
+  ],
+  "frontendTests": [
+    "src/survey/SurveyWaveStudio.group-ip.test.tsx",
+    "src/survey/SurveyWaveStudio.preview.test.tsx",
+    "src/survey/SurveyWorkspace.requests.test.tsx",
+    "src/survey/SurveyFormPagination.test.tsx",
+    "src/survey/SurveyMeasurement.extension.test.tsx",
+    "src/survey/SurveyPublicApp.cognitive.test.tsx",
+    "src/survey/SurveyPublicApp.final.test.tsx",
+    "src/survey/SurveyPublicApp.group-ip.test.tsx",
+    "src/survey/SurveyCognitiveRunner.integration.test.tsx",
+    "src/survey/SurveyCognitiveUnit.test.tsx",
+    "src/survey/survey-cognitive-local.test.ts",
+    "src/survey/survey-cognitive-retention.test.ts",
+    "src/services/persistence/__tests__/finalDraftStore.test.ts",
+    "src/services/persistence/__tests__/finalDraftSurveyRetention.test.ts",
+    "src/modules/cognitive/core/__tests__/useCognitiveSession.test.tsx",
+    "src/services/persistence/__tests__/finalSubmissionFailure.test.ts"
+  ],
+  "reasons": {
+    "missingOriginalRunner": [
+      "group IP policy/freeze/lifecycle unit contracts",
+      "SJT V2 and legacy adapter contracts",
+      "researcher group-IP UI contract",
+      "Wave preview and workspace request final input results were retrospective summaries; persisted earlier logs used superseded source"
+    ],
+    "changedInputs": [
+      "Merged main adds PostgreSQL physical asset schema and media consumers; real Survey PG suites exercise the integrated schema with PG16.15/Redis7.4",
+      "The approved Survey local draft TTL change will invalidate frontend build/types and its direct consumer contracts",
+      "SurveyPublicApp startup now lazily sweeps Survey cognition drafts; its current consent, group, form, cognitive and FINAL consumer contracts need this precise candidate",
+      "Shared finalDraftStore writes and cognitive session initialization changed: targeted shared storage, sealed/reopen and default cognitive session consumers protect other products"
+    ],
+    "retainedReviewEvidence": "Prior verified input-matching local results remain review evidence, not fabricated Actions runs. Existing actual HTTP/PG evidence is not relabeled as this CI execution."
+  }
+}

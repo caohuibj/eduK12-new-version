@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { surveyKeySchema, type FormDraft } from './builder.definition'
 import type { ResearchFrozenUnit } from './publication.service'
+import { cognitiveDraftSchema } from './cognitive.definition'
 
 const key=surveyKeySchema
 const text=z.string().trim().max(8000)
@@ -30,9 +31,12 @@ const block=z.object({
 }).strict()
 const experiment=z.object({
   experimentKey:key,linkedPolicy:z.enum(['KEEP_LINKED','RERANDOMIZE']),
+  mode:z.literal('QUESTIONNAIRE_VARIANTS').optional(),
   groups:z.array(z.object({
     groupKey:key,weight:z.number().int().min(1).max(100),
     materialTitle:text,materialBody:text,
+    variantLabel:z.string().trim().min(1).max(200).optional(),
+    instrumentKeys:z.array(key).min(1).max(30).optional(),
   }).strict()).min(2).max(8),
 }).strict()
 export const surveyFlowDraftSchema=z.object({
@@ -45,7 +49,39 @@ export const surveyFlowDraftSchema=z.object({
   blocks:z.array(block).min(1).max(64),
 }).strict()
 export type SurveyFlowDraft=z.infer<typeof surveyFlowDraftSchema>
-export type FrozenSurveyFlow=SurveyFlowDraft&{flowDigest:string}
+export type FrozenSurveyFlow=Omit<SurveyFlowDraft,'experiment'>&{flowDigest:string;
+  experiment?: Omit<NonNullable<SurveyFlowDraft['experiment']>,'groups'>&{
+    groups:Array<NonNullable<SurveyFlowDraft['experiment']>['groups'][number]&{variantDigest?:string}>
+  }
+}
+export type SurveyVariantProvenance={
+  schemaVersion:1;variantKey:string;variantLabel:string;variantDigest:string;
+  allocationConfigId:string;weight:number;totalWeight:number;probability:number
+}
+/** Frozen group membership is authoritative. Never infer an arm from client answers. */
+export function surveyVariantInstrumentKeys(flow:FrozenSurveyFlow,groupKey:string|null):Set<string>|null{
+  if(flow.experiment?.mode!=='QUESTIONNAIRE_VARIANTS')return null
+  const group=flow.experiment.groups.find(g=>g.groupKey===groupKey)
+  if(!group?.instrumentKeys?.length||!group.variantDigest)
+    throw new SurveyFlowError([{path:'flow.assignment',message:'问卷子版本分配与冻结定义不匹配'}])
+  return new Set(group.instrumentKeys)
+}
+export function surveyAssignedFlowBlocks(flow:FrozenSurveyFlow,groupKey:string|null){
+  const keys=surveyVariantInstrumentKeys(flow,groupKey)
+  return keys?flow.blocks.filter(b=>b.kind!=='INSTRUMENT'||keys.has(b.instrumentKey!)):flow.blocks
+}
+export function surveyVariantProvenance(flow:FrozenSurveyFlow,groupKey:string|null):SurveyVariantProvenance|undefined{
+  if(flow.experiment?.mode!=='QUESTIONNAIRE_VARIANTS')return undefined
+  surveyVariantInstrumentKeys(flow,groupKey)
+  const group=flow.experiment.groups.find(g=>g.groupKey===groupKey)!
+  const totalWeight=flow.experiment.groups.reduce((n,g)=>n+g.weight,0)
+  return {schemaVersion:1,variantKey:group.groupKey,variantLabel:group.variantLabel!,
+    variantDigest:group.variantDigest!,allocationConfigId:flow.flowDigest,
+    weight:group.weight,totalWeight,probability:group.weight/totalWeight}
+}
+export const surveyGroupHasMaterial=(group:NonNullable<FrozenSurveyFlow['experiment']>['groups'][number])=>
+  !!(group.materialTitle.trim()||group.materialBody.trim())
+
 export class SurveyFlowError extends Error {
   constructor(readonly issues:Array<{path:string;message:string}>){
     super('研究流程定义未通过安全编译')
@@ -114,7 +150,7 @@ export function compileSurveyFlow(input:unknown,units:readonly ResearchFrozenUni
       error(issues,'flow.experiment.linkedPolicy','不关联匿名研究不能保持跨波次分组')
     const sum=flow.experiment.groups.reduce((n,g)=>n+g.weight,0)
     if(sum>800)error(issues,'flow.experiment.groups','实验随机权重总和超限')
-    if(!flow.experiment.groups.every(g=>g.materialTitle.trim()&&g.materialBody.trim()))
+    if(flow.experiment.mode!=='QUESTIONNAIRE_VARIANTS'&&!flow.experiment.groups.every(g=>g.materialTitle.trim()&&g.materialBody.trim()))
       error(issues,'flow.experiment.groups','各实验组必须提供完整展示材料')
   }
   const visited=new Set<string>()
@@ -221,6 +257,55 @@ export function compileSurveyFlow(input:unknown,units:readonly ResearchFrozenUni
   for(const unit of allUnitKeys)if(!visited.has(unit))
     error(issues,'flow.blocks','所有冻结研究工具必须在流程中准确出现一次：'+unit)
   if(issues.length)throw new SurveyFlowError(issues)
+  if(flow.experiment?.mode==='QUESTIONNAIRE_VARIANTS'){
+    const experiment=flow.experiment
+    if(experiment.linkedPolicy!=='RERANDOMIZE')
+      error(issues,'flow.experiment.linkedPolicy','问卷子版本只支持每波次独立概率分配')
+    const covered=new Set<string>()
+    for(const [i,group] of experiment.groups.entries()){
+      const path='flow.experiment.groups.'+i
+      if(!group.variantLabel||!group.instrumentKeys?.length){
+        error(issues,path,'每个问卷子版本必须有名称和完整工具列表');continue
+      }
+      strictKeys(group.instrumentKeys,path+'.instrumentKeys',issues)
+      for(const instrumentKey of group.instrumentKeys){
+        covered.add(instrumentKey)
+        if(!unitMap.has(instrumentKey))error(issues,path+'.instrumentKeys','子版本引用了未选择的研究工具')
+      }
+      const keys=new Set(group.instrumentKeys)
+      const selected=units.filter(u=>keys.has(u.instrumentKey))
+      const blocks=flow.blocks.filter(b=>b.kind!=='INSTRUMENT'||keys.has(b.instrumentKey!))
+      try{
+        compileSurveyFlow({schemaVersion:1,embeddedData:flow.embeddedData,blocks},selected,collectionMode)
+      }catch(e){
+        if(e instanceof SurveyFlowError)for(const issue of e.issues)
+          error(issues,path+'.'+issue.path,issue.message)
+        else throw e
+      }
+    }
+    if(allUnitKeys.some(k=>!covered.has(k)))
+      error(issues,'flow.experiment.groups','所有冻结工具必须明确归入至少一个问卷子版本')
+    // One participant-facing cognitive feedback policy across all variants avoids
+    // revealing a hidden arm through a different report release or metric contract.
+    const feedback=units.filter(u=>u.kind==='COGNITIVE').map(u=>
+      cognitiveDraftSchema.parse(u.displayDefinition).feedback)
+    if(new Set(feedback.map(value=>canonicalHash(value))).size>1)
+      error(issues,'flow.experiment.groups','各问卷子版本认知任务的反馈和发布策略必须一致')
+    if(issues.length)throw new SurveyFlowError(issues)
+    const frozenGroups=experiment.groups.map(group=>{
+      const keys=new Set(group.instrumentKeys!)
+      return {...group,variantDigest:canonicalHash(JSON.parse(JSON.stringify({schemaVersion:1,
+        groupKey:group.groupKey,variantLabel:group.variantLabel,
+        units:units.filter(u=>keys.has(u.instrumentKey)),
+        blocks:flow.blocks.filter(b=>b.kind!=='INSTRUMENT'||keys.has(b.instrumentKey!)),
+        embeddedData:flow.embeddedData,materialTitle:group.materialTitle,materialBody:group.materialBody,
+      })))}
+    })
+    const frozen={...flow,experiment:{...experiment,groups:frozenGroups}}
+    return {...frozen,flowDigest:canonicalHash(JSON.parse(JSON.stringify(frozen)))}
+  }
+  if(flow.experiment?.groups.some(g=>g.instrumentKeys!==undefined||g.variantLabel!==undefined))
+    throw new SurveyFlowError([{path:'flow.experiment',message:'问卷子版本字段要求明确的子版本模式'}])
   const flowDigest=canonicalHash(JSON.parse(JSON.stringify(flow)))
   return {...flow,flowDigest}
 }

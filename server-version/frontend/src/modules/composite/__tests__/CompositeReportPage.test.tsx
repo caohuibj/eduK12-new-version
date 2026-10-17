@@ -431,4 +431,19 @@ describe('asynchronous report feedback', () => {
     expect(mockCompositeApi.retryReport).toHaveBeenCalledWith('failed')
     expect(mockCompositeApi.report).toHaveBeenCalledWith('failed')
   })
+  it.each(['student', 'public'])('explains permanent conflict without inviting futile retries in %s mode', async mode => {
+    sessionStorage.setItem('composite:recovery:attempt:conflict', 'synthetic-recovery')
+    mockCompositeApi.reportStatus.mockResolvedValue({ code: 0, data: { attemptId: 'conflict', attemptEpoch: 1, status: 'IN_PROGRESS', hasAcceptedSubmission: true,
+      reportStatus: { state: 'FAILED', jobId: 'own-job', retryAfterSeconds: 2, errorCode: 'REPORT_SUBMISSION_KEY_CONFLICT', completedAt: null } } })
+    const page = render(<MemoryRouter initialEntries={[`/${mode}/composite/attempts/conflict/report`]}><Routes><Route path="/:mode/composite/attempts/:attemptId/report" element={<CompositeReportPage />} /></Routes></MemoryRouter>)
+    expect(await screen.findByText('作答已保存，报告需要处理')).toBeInTheDocument()
+    expect(screen.getByText('答案已安全保存，请联系测评负责人处理报告。无需再次提交答案，也请勿反复重新生成。')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '重新生成报告' })).toBeNull()
+    expect(screen.getByRole('button', { name: '返回' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '重新加载报告' }))
+    await waitFor(() => expect(mockCompositeApi.reportStatus).toHaveBeenCalledTimes(2))
+    expect(mockCompositeApi.retryReport).not.toHaveBeenCalled(); expect(mockCompositeApi.report).not.toHaveBeenCalled()
+    page.unmount(); sessionStorage.removeItem('composite:recovery:attempt:conflict')
+  })
+
 })

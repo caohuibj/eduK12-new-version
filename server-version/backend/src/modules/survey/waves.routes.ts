@@ -1,11 +1,15 @@
+import {SurveyGovernanceError} from './governance.service'
+import {CatalogSourceError} from './catalog.sources'
 import { Router, type Request, type Response, type NextFunction } from 'express'
 import { z } from 'zod'
 import { authenticateSurvey } from '../../middleware/auth'
 import { success, error } from '../../utils/response'
 import * as service from './waves.service'
 import * as publish from './waves.publish'
+import { SurveyDraftError } from './builder.definition'
 import { SurveyFlowError } from './flow.definition'
 import { groupQuotaPolicySchema,surveyCheckpointPolicySchema } from './operations.definition'
+import { groupIpDraftPolicySchema,GroupIpPolicyError } from './group-ip-policy'
 
 export const surveyWavesRouter=Router()
 surveyWavesRouter.use('/:pid/waves',authenticateSurvey)
@@ -24,6 +28,7 @@ const wave=z.object({
   flowDefinition:z.unknown().nullable().optional(),
   quotaPolicy:groupQuotaPolicySchema.nullable().optional(),
   checkpointPolicy:surveyCheckpointPolicySchema.nullable().optional(),
+  groupIpPolicy:groupIpDraftPolicySchema.nullable().optional(),
 }).strict()
 const create=wave.extend({requestId:id})
 const update=wave.extend({revision:z.number().int().nonnegative()})
@@ -31,6 +36,11 @@ const handle=(fn:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Respons
   try{return success(res,await fn(req))}
   catch(e){
     if(e instanceof z.ZodError)return error(res,'研究波次参数格式不合法',-1,400)
+    if(e instanceof SurveyDraftError)return res.status(400).json({code:'SURVEY_DRAFT_INVALID',
+      message:e.issues.slice(0,5).map(i=>i.path+'：'+i.message).join('；')||'研究工具包含待修正字段',
+      data:{issues:e.issues}})
+    if(e instanceof SurveyGovernanceError||e instanceof CatalogSourceError)return error(res,e.message,-1,e.statusCode)
+    if(e instanceof GroupIpPolicyError)return error(res,e.message,-1,e.statusCode)
     if(e instanceof service.SurveyWaveError)return error(res,e.message,-1,e.statusCode)
     if(e instanceof SurveyFlowError)return error(res,e.issues.slice(0,5).map(i=>i.path+'：'+i.message).join('；'),-1,400)
     next(e)

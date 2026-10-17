@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { ResearchDraft, FormDraft, ScaleDraft, SjtDraft, FormQuestion, SurveyImage } from './builder.types'
 import { visibleFormKeys,sanitizeFormAnswers } from './form-visibility'
 import { ProfessionalFormAnswer,type ProfessionalAnswer } from './ProfessionalFormAnswer'
@@ -10,14 +10,16 @@ const refusal=():Refusal=>({_surveyRefusal:true})
 const isRefusal=(value:Answer|undefined):value is Refusal=>
   !!value&&typeof value==='object'&&!Array.isArray(value)&&'_surveyRefusal' in value
     &&value._surveyRefusal===true
-export function ResearchPreview({draft,onSimulate,onValidateForm,errorPath}:{draft:ResearchDraft;
-  onSimulate:(answers:Record<string,string|number|string[]>)=>void;
+export function ResearchPreview({draft,onSimulate,onValidateForm,errorPath,initialAnswers,onAnswersChange,hideSimulation=false}:{draft:ResearchDraft;
+  onSimulate:(answers:Record<string,unknown>)=>void;
   onValidateForm?:(answers:Record<string,Answer>)=>void;
-  errorPath?:string}){
-  const [answers,setAnswers]=useState<Record<string,Answer>>({})
+  errorPath?:string;initialAnswers?:Record<string,Answer>;onAnswersChange?:(answers:Record<string,Answer>)=>void;hideSimulation?:boolean}){
+  const [answers,setAnswers]=useState<Record<string,Answer>>(initialAnswers??{})
   const [pageIndex,setPageIndex]=useState(0)
   const [scaleIndex,setScaleIndex]=useState(0)
-  useEffect(()=>{setAnswers({});setPageIndex(0);setScaleIndex(0)},[draft.id,draft.revision])
+  const answerListener=useRef(onAnswersChange);answerListener.current=onAnswersChange
+  useEffect(()=>{answerListener.current?.(answers)},[answers])
+  useEffect(()=>{setAnswers(initialAnswers??{});setPageIndex(0);setScaleIndex(0)},[draft.id,draft.revision])
   useEffect(()=>{
     if(draft.kind!=='FORM'||!errorPath)return
     const key=errorPath.match(/^answers\.([a-z][a-z0-9_-]*)/i)?.[1]
@@ -44,6 +46,7 @@ export function ResearchPreview({draft,onSimulate,onValidateForm,errorPath}:{dra
   const currentIndex=Math.min(pageIndex,Math.max(0,formPages.length-1))
   const currentPage=formPages[currentIndex]
   const simulate=()=>{
+    if(draft.kind==='SJT'){onSimulate(answers);return}
     // Score simulation is only offered for SCALE / SJT, not Form refusal answers.
     const scoreAnswers:Record<string,string|number|string[]>={}
     for(const [key,value] of Object.entries(answers))
@@ -112,7 +115,7 @@ export function ResearchPreview({draft,onSimulate,onValidateForm,errorPath}:{dra
       <progress className="w-full" max={Math.max(1,formPages.length)}
         value={currentPage?currentIndex+1:0} aria-label="研究者表单预览进度"/>
       {currentPage&&<div key={currentPage.pageKey}>
-        <h4 className="font-semibold">{currentPage.title}</h4>{currentPage.questions.map(question)}
+        <h4 className="font-semibold">{currentPage.title}</h4>{currentPage.description&&<p className="whitespace-pre-wrap text-sm">{currentPage.description}</p>}{currentPage.questions.map(question)}
       </div>}
       <nav className="flex justify-between mt-3 gap-2" aria-label="试答分页">
         <button type="button" className="btn-secondary" disabled={currentIndex<=0}
@@ -148,9 +151,12 @@ export function ResearchPreview({draft,onSimulate,onValidateForm,errorPath}:{dra
           预览用于核对题目呈现，不产生研究者或被试的正式反应时。</p>}
       </div>
     })()}
-    {draft.kind==='SJT'&&<><div className="font-semibold">{(draft.definition as SjtDraft).stimulus}</div>
-      {picture((draft.definition as SjtDraft).image)}
-      {(draft.definition as SjtDraft).questions.map(q=><fieldset key={q.questionKey} className="border bg-white rounded-lg p-3">
+    {draft.kind==='SJT'&&(()=>{
+      const definition=draft.definition as SjtDraft
+      const scenes=definition.schemaVersion===2?definition.scenes:[{sceneKey:definition.scenarioKey,title:definition.title,stimulus:definition.stimulus,image:definition.image,questions:definition.questions}]
+      return scenes.map(scene=><section key={scene.sceneKey} className="space-y-3"><h4 className="font-semibold">{scene.title}</h4><div className="whitespace-pre-wrap">{scene.stimulus}</div>
+      {picture(scene.image)}
+      {scene.questions.map(q=><fieldset key={q.questionKey} className="border bg-white rounded-lg p-3">
         <legend>{q.prompt||'未填写题干'} {q.responseType==='MULTIPLE'?'（可多选）':''}</legend>
         {q.responseType==='MULTIPLE'&&<p className="text-xs">
           至少选择 {q.minSelections??1} 项，最多选择 {q.maxSelections??q.options.length} 项。</p>}
@@ -160,11 +166,14 @@ export function ResearchPreview({draft,onSimulate,onValidateForm,errorPath}:{dra
           return <label key={o.optionKey} className="block my-2">
             <input type={multiple?'checkbox':'radio'} name={q.questionKey}
               checked={multiple?selected.includes(o.optionKey):answers[q.questionKey]===o.optionKey}
-              onChange={e=>choose(q.questionKey,multiple?
-                (e.target.checked?[...selected,o.optionKey]:selected.filter(x=>x!==o.optionKey)):
-                o.optionKey)}/> {o.label}</label>
-        })}</fieldset>)}</>}
-    {draft.kind!=='FORM'&&<button type="button" className="btn-secondary"
+              disabled={multiple&&!selected.includes(o.optionKey)&&selected.length>=(q.maxSelections??q.options.length)&&!('nonanswerReason' in o&&o.nonanswerReason)&&!('exclusiveOptionKeys' in q&&q.exclusiveOptionKeys?.includes(o.optionKey))}
+              onChange={e=>choose(q.questionKey,multiple?toggleFormMultiple(selected,o.optionKey,e.target.checked,
+                [...('exclusiveOptionKeys' in q?q.exclusiveOptionKeys??[]:[]),...q.options.filter(x=>'nonanswerReason' in x&&x.nonanswerReason).map(x=>x.optionKey)]):o.optionKey)}/> {o.label}</label>
+        })}
+        {'allowRefusal' in q&&q.allowRefusal&&<label className="block my-2"><input type="checkbox" checked={isRefusal(answers[q.questionKey])} onChange={e=>choose(q.questionKey,e.target.checked?refusal():null)}/>我选择不回答这一题</label>}
+        </fieldset>)}</section>)
+    })()}
+    {!hideSimulation&&(draft.kind==='SCALE'||draft.kind==='SJT')&&<button type="button" className="btn-secondary"
       onClick={simulate}>
       计算当前研究性模拟得分</button>}
     {draft.kind==='FORM'&&onValidateForm&&<><button type="button" className="btn-secondary"

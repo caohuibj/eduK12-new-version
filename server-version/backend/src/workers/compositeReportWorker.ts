@@ -1,3 +1,4 @@
+import { isScaleSubmissionKeyConflictError, REPORT_SUBMISSION_KEY_CONFLICT } from '../modules/scale/scale-final-submit-conflict'
 import { reportResourceClaimDecision } from '../services/assessmentResourceProtection'
 import { reportClaimDecision, reportPriorityClaimed, startReportClaimPriority, stopReportClaimPriority } from '../services/wholeSubmissionPriority'
 import { publishReportReady } from '../services/reportReadyNotifications'
@@ -63,7 +64,8 @@ export const processCompositeReportJob = async (job: CompositeReportJob): Promis
     // Technical failures have bounded automatic retries. A failed report keeps
     // its durable receipt and can be explicitly requeued after diagnosis; it
     // never asks the participant to resubmit answers.
-    outcome = stale ? { kind: 'cancelled' }
+    outcome = isScaleSubmissionKeyConflictError(error) ? { kind: 'failed', errorCode: REPORT_SUBMISSION_KEY_CONFLICT }
+      : stale ? { kind: 'cancelled' }
       : job.attemptCount < settings.maxAttempts
         ? { kind: 'retry', errorCode: capacity ? 'REPORT_BUSY' : 'REPORT_GENERATION_FAILED',
             delayMs: Math.min(30_000, 1_000 * 2 ** Math.min(job.attemptCount - 1, 5)) + Math.floor(Math.random() * 500) }

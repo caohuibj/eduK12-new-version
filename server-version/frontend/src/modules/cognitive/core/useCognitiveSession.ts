@@ -117,7 +117,7 @@ export interface CognitiveSessionController {
 export function useCognitiveSession(
   sessionId: string,
   api: CognitiveSessionApi = cognitiveApi,
-  options: { aggregateOnly?: boolean } = {},
+  options: { aggregateOnly?: boolean; failClosedOnTrialPersistence?: boolean } = {},
 ): CognitiveSessionController {
   const [state, dispatch] = useReducer(runnerReducer, initialRunnerState)
   const sessionIdRef = useRef(sessionId)
@@ -195,6 +195,8 @@ export function useCognitiveSession(
             contextSnapshotHash: session.contextSnapshotHash ?? null,
             deliveryMode: 'final_only',
             submissionId: checkpointId(),
+            ...(api.localDraftScope === 'survey-cognitive'
+              ? { surveyRetention: { schemaVersion: 1 as const, lastWriteAt: Date.now() } } : {}),
           }))
           if (meta.status === 'CONFLICT') {
             dispatch({ type: 'RECOVERY_REQUIRED' })
@@ -359,6 +361,11 @@ export function useCognitiveSession(
         dispatch({ type: 'TRIAL_SUBMIT_SUCCESS', trialIndex: nextIndex })
         return true
       } catch (err) {
+        if (options.failClosedOnTrialPersistence && stateRef.current.session?.deliveryMode === 'FINAL_ONLY') {
+          dispatch({ type: 'RECOVERY_REQUIRED', error: { code: 'LOCAL_TRIAL_PERSISTENCE_FAILED',
+            message: '本机试次暂存失败，任务已停止。不能重复当前试次或继续计时；请返回研究页面核对提交并处理整单元恢复。' } })
+          return false
+        }
         if (checkpointErrorStatus(err) === 409) {
           checkpointScheduler.block('cognitive', sessionId, err)
           dispatch({ type: 'TRIAL_CONFLICT' })
@@ -368,7 +375,7 @@ export function useCognitiveSession(
         return false
       }
     },
-    [cognitiveCheckpointTransport, handleCheckpointError, sessionId]
+    [cognitiveCheckpointTransport, handleCheckpointError, options.failClosedOnTrialPersistence, sessionId]
   )
 
   const complete = useCallback(async (administrationProvenance?: AdministrationProvenanceV1) => {

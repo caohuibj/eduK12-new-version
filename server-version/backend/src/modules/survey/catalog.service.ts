@@ -1,0 +1,95 @@
+import {randomUUID} from 'node:crypto'
+import {Prisma} from '@prisma/client'
+import {prisma} from '../../config/database'
+import {canonicalHash} from '../assessment-runtime/canonical'
+import {assertCurrentSystemAdmin} from '../../services/accountAuthorityService'
+import {SurveyGovernanceError} from './governance.service'
+import {getCatalogSourceSnapshot,listCatalogSources,assertCatalogSourcesCurrent,type CatalogSourceRef} from './catalog.sources'
+import type {ResearchFrozenUnit} from './publication.service'
+
+type Tx=Prisma.TransactionClient
+const fail=(status:number,message:string):never=>{throw new SurveyGovernanceError(status,message)}
+export type CatalogSnapshot=Awaited<ReturnType<typeof getCatalogSourceSnapshot>>
+type Grant={id:string;createdBy:string;userId:string;status:string;snapshot:CatalogSnapshot;snapshotDigest:string;createdAt:Date;revokedAt:Date|null}
+const view=(r:Grant)=>({id:r.id,title:r.snapshot.title,kind:r.snapshot.ref.kind,status:r.status,
+  sourceRef:r.snapshot.ref,sourceProvenance:{...r.snapshot.provenance,originalSource:r.snapshot.provenance.source??null,source:r.snapshot.ref,
+    definitionDigest:r.snapshot.definitionDigest,adapterVersion:r.snapshot.adapterVersion},createdAt:r.createdAt,revokedAt:r.revokedAt})
+export async function sourceCatalog(actorUserId:string,input:{kind?:CatalogSourceRef['kind'];organizationId?:string;page:number}){
+  await assertCurrentSystemAdmin(prisma,actorUserId)
+  const result=await listCatalogSources({actorUserId,...input},prisma)
+  return {...result,pageSize:25}
+}
+async function target(tx:Tx,id:string){
+  const rows=await tx.$queryRaw<{id:string}[]>`SELECT u.id FROM users u
+    JOIN survey_researcher_grants g ON g.user_id=u.id JOIN survey_accounts a ON a.user_id=u.id
+    WHERE u.id=${id} AND u.account_domain='SURVEY' AND u.is_active AND NOT u.is_frozen
+    AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp())
+    AND g.status IN ('ACTIVE','PENDING_MFA') FOR SHARE OF u,g`
+  if(!rows.length)fail(404,'研究者不存在或资格不可用')
+}
+export async function grantCatalogSource(actorUserId:string,userId:string,ref:CatalogSourceRef){
+  return prisma.$transaction(async tx=>{
+    await assertCurrentSystemAdmin(tx,actorUserId);await target(tx,userId)
+    const snapshot=await getCatalogSourceSnapshot({actorUserId,ref},tx)
+    const snapshotDigest=canonicalHash(snapshot)
+    const rows=await tx.$queryRaw<Grant[]>`INSERT INTO survey_tool_grants
+      (id,user_id,status,snapshot,snapshot_digest,created_by)
+      VALUES (${randomUUID()},${userId},'ACTIVE',${JSON.stringify(snapshot)}::jsonb,${snapshotDigest},${actorUserId})
+      ON CONFLICT (user_id,snapshot_digest) WHERE status='ACTIVE' DO UPDATE SET status='ACTIVE'
+      RETURNING id,user_id AS "userId",status,snapshot,snapshot_digest AS "snapshotDigest",created_at AS "createdAt",revoked_at AS "revokedAt"`
+    await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId,targetUserId:userId,
+      action:'CATALOG_TOOL_GRANTED',metadata:{grantId:rows[0].id,source:ref,snapshotDigest}}})
+    return view(rows[0])
+  })
+}
+export async function listToolGrants(actorUserId:string,userId:string,page=1){
+  await assertCurrentSystemAdmin(prisma,actorUserId)
+  const rows=await prisma.$queryRaw<Grant[]>`SELECT id,created_by AS "createdBy",user_id AS "userId",status,jsonb_build_object('title',snapshot->'title','ref',snapshot->'ref','provenance',jsonb_build_object('license',snapshot#>'{provenance,license}','reuseAuthority',snapshot#>'{provenance,reuseAuthority}'),
+      'definitionDigest',snapshot->'definitionDigest','adapterVersion',snapshot->'adapterVersion') AS snapshot,snapshot_digest AS "snapshotDigest",
+    created_at AS "createdAt",revoked_at AS "revokedAt" FROM survey_tool_grants WHERE user_id=${userId}
+    ORDER BY created_at DESC,id LIMIT 25 OFFSET ${(page-1)*25}`
+  return {page,pageSize:25,list:rows.map(view)}
+}
+export async function revokeToolGrant(actorUserId:string,id:string){
+  return prisma.$transaction(async tx=>{
+    await assertCurrentSystemAdmin(tx,actorUserId)
+    const rows=await tx.$queryRaw<{userId:string}[]>`UPDATE survey_tool_grants SET status='REVOKED',revoked_at=statement_timestamp()
+      WHERE id=${id} AND status='ACTIVE' RETURNING user_id AS "userId"`
+    if(!rows.length)fail(404,'授权不存在或已撤销')
+    await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId,targetUserId:rows[0].userId,
+      action:'CATALOG_TOOL_REVOKED',metadata:{grantId:id,policy:'FUTURE_IMPORT_AND_PUBLICATION_ONLY'}}})
+    return {revoked:true}
+  })
+}
+/** One bulk source/grant read, only for sourced drafts. Never on participant/scorer paths. */
+export async function catalogSnapshotsForDrafts(tx:Tx,userId:string,ids:readonly string[],active=true){
+  if(!ids.length)return new Map<string,CatalogSnapshot>()
+  const rows=await tx.$queryRaw<Grant[]>`SELECT id,created_by AS "createdBy",user_id AS "userId",status,snapshot,snapshot_digest AS "snapshotDigest",
+    created_at AS "createdAt",revoked_at AS "revokedAt" FROM survey_tool_grants
+    WHERE id IN (${Prisma.join([...new Set(ids)])}) AND user_id=${userId} ORDER BY id FOR SHARE`
+  const map=new Map<string,CatalogSnapshot>()
+  for(const row of rows){
+    if(active&&row.status!=='ACTIVE')fail(409,'工具复用授权已撤销，不能继续导入或冻结新的研究版本')
+    if(canonicalHash(row.snapshot)!==row.snapshotDigest)fail(409,'授权工具来源摘要不匹配')
+    map.set(row.id,row.snapshot)
+  }
+  if(map.size!==new Set(ids).size)fail(403,'工具来源不属于当前研究者授权')
+  if(active)await assertCatalogSourcesCurrent(rows.map(r=>({snapshot:r.snapshot,actorUserId:r.createdBy})),tx)
+  return map
+}
+export function compileCatalogUnit(draft:{id:string;instrumentKey:string;kind:string;title:string;revision:number;definition:unknown},snapshot:CatalogSnapshot):ResearchFrozenUnit{
+  if(draft.kind!==snapshot.ref.kind||canonicalHash(draft.definition)!==canonicalHash(snapshot.displayDefinition))
+    fail(409,'只读来源工具的定义已经变化')
+  return {draftId:draft.id,instrumentKey:draft.instrumentKey,kind:snapshot.ref.kind,title:draft.title,
+    draftRevision:draft.revision,sourceDigest:snapshot.definitionDigest,scoringDigest:snapshot.scoringDigest,
+    compiledDefinition:snapshot.compiledDefinition,displayDefinition:snapshot.displayDefinition,
+    sourceProvenance:{...snapshot.provenance,originalSource:snapshot.provenance.source??null,source:snapshot.ref,definitionDigest:snapshot.definitionDigest,
+      adapterVersion:snapshot.adapterVersion},...(snapshot.answerMapping?{sourceAnswerMapping:snapshot.answerMapping}:{})}
+}
+export async function researcherCatalog(tx:Tx,userId:string,page:number){
+  const rows=await tx.$queryRaw<Grant[]>`SELECT id,created_by AS "createdBy",user_id AS "userId",status,jsonb_build_object('title',snapshot->'title','ref',snapshot->'ref','provenance',jsonb_build_object('license',snapshot#>'{provenance,license}','reuseAuthority',snapshot#>'{provenance,reuseAuthority}'),
+      'definitionDigest',snapshot->'definitionDigest','adapterVersion',snapshot->'adapterVersion') AS snapshot,snapshot_digest AS "snapshotDigest",
+    created_at AS "createdAt",revoked_at AS "revokedAt" FROM survey_tool_grants
+    WHERE user_id=${userId} AND status='ACTIVE' ORDER BY created_at DESC,id LIMIT 25 OFFSET ${(page-1)*25}`
+  return {page,pageSize:25,list:rows.map(view)}
+}

@@ -1,19 +1,30 @@
+import {rejectPooledVariants,type SurveyVariantAudit,type SurveyVariantConfiguration} from './analytics.variant'
+import {canonicalHash} from '../assessment-runtime/canonical'
 /** Researcher-only deterministic longitudinal cohort algorithms. No normality,
  * causal, clinical or norm-based inference. Data must already be projected from
  * an authenticated project-scoped, frozen FINAL source (PR4 read adapter).
  */
 export type MissingReason =
-  | 'NOT_SHOWN' | 'SHOWN_MISSING' | 'REFUSED' | 'NO_WAVE'
+  | 'NOT_SHOWN' | 'SHOWN_MISSING' | 'REFUSED' | 'UNABLE_TO_JUDGE' | 'NO_WAVE'
   | 'ABANDONED' | 'NOT_COMPARABLE' | 'WITHDRAWN' | 'QUALITY_EXCLUDED'
 export interface SurveyMeasurementIdentity {
+  variantConfiguration?:SurveyVariantConfiguration
+  sourceProvenance?:unknown
+  sourceAnswerMapping?:unknown
   instrumentKey:string
   scoreKey:string
   scoringDigest:string
   responseSignature:string
   respondentType:string
   unit:string|null
+  /** Frozen versioned measurement identity. No subject-specific seed or data. */
+  provenance?:{
+    kind:'SJT'|'COGNITIVE';measurementDigest:string;scoringVersion:string;
+    configHash?:string;protocolSignature?:string;engineVersion?:string;
+    timingPolicy?:string;devicePolicy?:string;scoringMethod?:string
+  }
 }
-export interface FrozenScoreObservation {
+export interface FrozenScoreObservation extends SurveyVariantAudit {
   projectId:string
   waveId:string
   waveOrdinal:number
@@ -25,6 +36,13 @@ export interface FrozenScoreObservation {
   value:number|null
   missingReason:MissingReason|null
   completedAt:string
+  status?:string
+  quality?:{status:string;flags:Record<string,boolean>;reasons?:string[]}
+  sourceResultHash?:string
+  epoch?:number
+  completionStatus?:'COMPLETE'|'COMPLETE_EARLY'|'SCREEN_OUT'
+  metricDetails?:{range?:{min:number;max:number};coverage?:{
+    numberOfOpportunities:number;numberOfAnsweredOpportunities:number;numberOfIndependentScenes:number};maturity?:string}
 }
 export interface PairedDescriptive {
   baselineWaveId:string
@@ -43,6 +61,8 @@ const measurementMatches=(a:SurveyMeasurementIdentity,b:SurveyMeasurementIdentit
   a.instrumentKey===b.instrumentKey&&a.scoreKey===b.scoreKey
   &&a.scoringDigest===b.scoringDigest&&a.responseSignature===b.responseSignature
   &&a.respondentType===b.respondentType&&a.unit===b.unit
+  &&((a.provenance===undefined&&b.provenance===undefined)
+    ||canonicalHash(a.provenance??null)===canonicalHash(b.provenance??null))
 const distinct=(xs:string[])=>new Set(xs).size===xs.length
 
 export function pairedDescriptive(input:{
@@ -50,6 +70,7 @@ export function pairedDescriptive(input:{
   instrumentKey:string;scoreKey:string;observations:readonly FrozenScoreObservation[]
   expectedColumns?:readonly Pick<FrozenScoreObservation,'projectId'|'waveId'|'measurement'>[]
 }):PairedDescriptive {
+  rejectPooledVariants({scores:[...input.observations],scoreColumns:input.expectedColumns?[...input.expectedColumns]:[]})
   const {projectId,baselineWaveId,followupWaveId,instrumentKey,scoreKey,observations}=input
   if(baselineWaveId===followupWaveId)throw new Error('Paired waves must be distinct')
   if(observations.some(o=>o.projectId!==projectId||o.sourceVerified!==true))
@@ -114,6 +135,7 @@ export interface WaveSummary {
   missingByReason:Partial<Record<MissingReason,number>>
 }
 export function summarizeWaveScores(projectId:string,waveId:string,rows:readonly FrozenScoreObservation[]):WaveSummary {
+  rejectPooledVariants({scores:[...rows]})
   if(rows.some(r=>r.projectId!==projectId||r.sourceVerified!==true))
     throw new Error('Unauthorized or unverified longitudinal source')
   const matches=rows.filter(r=>r.waveId===waveId)

@@ -1,3 +1,4 @@
+import {surveyCandidatePlan} from './survey-candidate-scope.mjs';
 import {sharedAssetStoragePlan} from './shared-asset-storage-scope.mjs';
 import {assessmentCapacityPlan} from './assessment-capacity-scope.mjs';
 import {teacherSurveyPlan} from './teacher-survey-scope.mjs';
@@ -241,26 +242,27 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const teacher = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' ? teacherHomePlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
   const survey = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' ? surveyHomePlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
   const backendRepair = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' ? backendSecurityEfficiencyPlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
+  const surveyCandidate = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' ? surveyCandidatePlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
   const sharedStorage = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' ? sharedAssetStoragePlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
   const efficiency = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' ? accessEfficiencyPlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
   const assessment = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' ? assessmentCapacityPlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
   const review = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' ? teacherSurveyPlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
-  const scenario = sharedStorage ? 'shared-asset-storage' : assessment ? 'assessment-capacity' : review ? 'teacher-survey' : efficiency ? 'access-efficiency' : backendRepair ? 'backend-security-efficiency' : teacher ? 'teacher-home' : survey ? 'survey-home' : copy ? 'homepage-copy' : campus ? 'campus' : releaseTools ? 'release-tooling' : dependencies ? 'dependencies' : result.maintenance ? 'maintenance' : result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
+  const scenario = surveyCandidate ? 'survey-candidate' : sharedStorage ? 'shared-asset-storage' : assessment ? 'assessment-capacity' : review ? 'teacher-survey' : efficiency ? 'access-efficiency' : backendRepair ? 'backend-security-efficiency' : teacher ? 'teacher-home' : survey ? 'survey-home' : copy ? 'homepage-copy' : campus ? 'campus' : releaseTools ? 'release-tooling' : dependencies ? 'dependencies' : result.maintenance ? 'maintenance' : result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
     : result.presentation ? 'presentation' : frontendTest ? 'frontend-test' : frontend ? 'frontend' : 'platform';
   // No production artifact or acceptance scenario is changed by a narrowly
   // admitted test-only diff. Keep the full frontend test suite itself mandatory.
   const selectedAcceptance = acceptanceFor(files);
-  const acceptance = sharedStorage || assessment || review || efficiency || backendRepair || teacher || survey || copy || campus || frontendTest || releaseTools ? Object.fromEntries(Object.keys(selectedAcceptance).map(key => [key, false])) : selectedAcceptance;
+  const acceptance = surveyCandidate || sharedStorage || assessment || review || efficiency || backendRepair || teacher || survey || copy || campus || frontendTest || releaseTools ? Object.fromEntries(Object.keys(selectedAcceptance).map(key => [key, false])) : selectedAcceptance;
   if (scenario === 'platform' || (event === 'workflow_dispatch' && process.env.CI_FULL_ACCEPTANCE === 'true'))
     for (const key of Object.keys(acceptance)) acceptance[key] = true;
   const plan = runnerPlan({ profile:process.env.CI_RUNNER_PROFILE || 'hosted', scenario });
   const mediaSelection = ['media2','video_core','media7','situational_video','situational_branching'].filter(key => acceptance[key]);
   const uiRequired = acceptance.app_shell || acceptance.canonical_visual;
-  const frontendBuild = Boolean(assessment) || Boolean(efficiency) || dependencies || frontend || scenario === 'platform' || uiRequired || mediaSelection.length > 0;
-  const codeql = Boolean(sharedStorage) || Boolean(assessment) || Boolean(review) || Boolean(efficiency) || Boolean(backendRepair) || Boolean(teacher) || Boolean(survey) || Boolean(campus) || releaseTools || dependencies || scenario === 'platform' || frontend
+  const frontendBuild = Boolean(surveyCandidate) || Boolean(assessment) || Boolean(efficiency) || dependencies || frontend || scenario === 'platform' || uiRequired || mediaSelection.length > 0;
+  const codeql = Boolean(surveyCandidate) || Boolean(sharedStorage) || Boolean(assessment) || Boolean(review) || Boolean(efficiency) || Boolean(backendRepair) || Boolean(teacher) || Boolean(survey) || Boolean(campus) || releaseTools || dependencies || scenario === 'platform' || frontend
     || (result.content && files.some(file => /\.[cm]?[jt]sx?$/.test(file)));
   const release = event === 'workflow_dispatch' || process.env.CI_FORCE_FULL === 'true' ? null : applicationPlan(base, execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  const output = { shared_asset_storage_plan:JSON.stringify(sharedStorage), assessment_capacity_plan:JSON.stringify(assessment), teacher_survey_plan:JSON.stringify(review), access_efficiency_plan:JSON.stringify(efficiency), backend_security_efficiency_plan:JSON.stringify(backendRepair), teacher_home_plan:JSON.stringify(teacher), survey_home_plan:JSON.stringify(survey), homepage_copy_plan:JSON.stringify(copy), application_route:sharedStorage ? 'shared-asset-storage' : assessment ? 'assessment-capacity' : review ? 'teacher-survey' : efficiency ? 'access-efficiency' : backendRepair ? 'backend-security-efficiency' : teacher ? 'teacher-home' : survey ? 'survey-home' : copy ? 'homepage-copy' : campus ? 'campus' : release && release.route !== 'C' ? release.route : 'legacy', campus_plan:JSON.stringify(campus), release_plan:JSON.stringify(release), maintenance: result.maintenance, content: result.content, presentation: result.presentation, frontend, frontend_test:frontendTest,
+  const output = { survey_candidate_plan:JSON.stringify(surveyCandidate), shared_asset_storage_plan:JSON.stringify(sharedStorage), assessment_capacity_plan:JSON.stringify(assessment), teacher_survey_plan:JSON.stringify(review), access_efficiency_plan:JSON.stringify(efficiency), backend_security_efficiency_plan:JSON.stringify(backendRepair), teacher_home_plan:JSON.stringify(teacher), survey_home_plan:JSON.stringify(survey), homepage_copy_plan:JSON.stringify(copy), application_route:surveyCandidate ? 'survey-candidate' : sharedStorage ? 'shared-asset-storage' : assessment ? 'assessment-capacity' : review ? 'teacher-survey' : efficiency ? 'access-efficiency' : backendRepair ? 'backend-security-efficiency' : teacher ? 'teacher-home' : survey ? 'survey-home' : copy ? 'homepage-copy' : campus ? 'campus' : release && release.route !== 'C' ? release.route : 'legacy', campus_plan:JSON.stringify(campus), release_plan:JSON.stringify(release), maintenance: result.maintenance, content: result.content, presentation: result.presentation, frontend, frontend_test:frontendTest,
     documentation: result.documentation, codeql, scenario,
     frontend_build:frontendBuild, ui_required:uiRequired,
     media_selection:JSON.stringify(mediaSelection), media_groups:JSON.stringify(mediaSelection.length ? mediaPlan(mediaSelection) : []),
@@ -268,7 +270,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     situational: result.domains.includes('situational'), bundle: result.domains.includes('bundle'),
     ...acceptance, ...Object.fromEntries(Object.entries(plan).map(([key,value]) =>
       [key, Array.isArray(value) ? JSON.stringify(value) : value])) };
-  console.log(JSON.stringify({ ...output, base, validationClosure: 'all-bundles', platformReasons: sharedStorage || assessment || review || efficiency || backendRepair || dependencies ? [] : platformReasons(entries, process.env.CI_FORCE_FULL === 'true' || event === 'workflow_dispatch') }));
+  console.log(JSON.stringify({ ...output, base, validationClosure: 'all-bundles', platformReasons: surveyCandidate || sharedStorage || assessment || review || efficiency || backendRepair || dependencies ? [] : platformReasons(entries, process.env.CI_FORCE_FULL === 'true' || event === 'workflow_dispatch') }));
   if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT,
     Object.entries(output).map(([key, value]) => `${key}=${value}\n`).join(''));
 }

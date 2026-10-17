@@ -1,10 +1,12 @@
 import { z } from 'zod'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { expandedSurveySjtOptions } from './sjt-selection'
+import { validateSurveySjtV2 } from './sjt-v2.validation'
+import { cognitiveDraftSchema, initialCognitiveDefinition, validateCognitiveDraft, type CognitiveDraft } from './cognitive.definition'
 import { assessmentStaticImageAssetIdentitySchema } from '../assessment-media/assessment-image'
 
 /** Survey-only research drafts, never platform scientific publication definitions. */
-export const surveyKindSchema = z.enum(['FORM','SCALE','SJT'])
+export const surveyKindSchema = z.enum(['FORM','SCALE','SJT','COGNITIVE'])
 export type SurveyKind = z.infer<typeof surveyKindSchema>
 export const surveyKeySchema = z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/)
 const label = z.string().trim().max(2000)
@@ -97,7 +99,7 @@ export type FormQuestion=z.infer<typeof formQuestionSchema>
 export const formDraftSchema=z.object({
   schemaVersion:z.union([z.literal(1),z.literal(2)]),
   pages:z.array(z.object({
-    pageKey:key,title:label,
+    pageKey:key,title:label,description:z.string().max(8000).optional(),
     questions:z.array(formQuestionSchema).max(80),
   }).strict()).max(40),
 }).strict()
@@ -119,7 +121,7 @@ export const scaleDraftSchema=z.object({
   }).strict()).max(240),
 }).strict()
 export type ScaleDraft=z.infer<typeof scaleDraftSchema>
-export const sjtDraftSchema=z.object({
+export const sjtDraftV1Schema=z.object({
   schemaVersion:z.literal(1),
   respondentType:z.enum(['student_self_report','teacher_self_report']),
   scenarioKey:key, title:label,stimulus:note,
@@ -143,8 +145,42 @@ export const sjtDraftSchema=z.object({
     }).strict()).max(12),
   }).strict()).max(5),
 }).strict()
-export type SjtDraft=z.infer<typeof sjtDraftSchema>
-export type SurveyDraft=FormDraft|ScaleDraft|SjtDraft
+/** V1 remains a named historical contract; new work uses AnySjtDraft. */
+export type SjtDraft=z.infer<typeof sjtDraftV1Schema>
+export const SURVEY_SJT_V2_LIMITS={scenes:20,questionsPerScene:10,questions:100,metrics:20,
+  singleOptions:12,multipleOptions:6,derivedChoices:24,scoredCells:16000} as const
+export const sjtQuestionV2Schema=z.object({
+  questionKey:key,prompt:note,responseType:z.enum(['SINGLE','MULTIPLE']),
+  required:z.boolean(),allowRefusal:z.boolean(),
+  aggregationPolicy:z.enum(['SUM','MEAN']).optional(),
+  minSelections:z.number().int().min(1).max(6).optional(),
+  maxSelections:z.number().int().min(1).max(6).optional(),
+  exclusiveOptionKeys:z.array(key).max(12).optional(),
+  options:z.array(z.object({
+    optionKey:key,label,
+    contributions:z.record(key,z.number().finite().min(-100000).max(100000)),
+    nonanswerReason:z.enum(['DECLINED','UNABLE_TO_JUDGE']).optional(),
+  }).strict()).max(SURVEY_SJT_V2_LIMITS.singleOptions),
+}).strict()
+export const sjtDraftV2Schema=z.object({
+  schemaVersion:z.literal(2),
+  respondentType:z.enum(['participant_self_report','student_self_report','teacher_self_report']),
+  title:label,author:label,sourceNote:label,
+  licenseStatus:z.enum(['self_authored','authorized','unknown']),
+  redistribution:z.enum(['allowed','restricted','unknown']),orderPolicy:z.literal('FIXED'),
+  metrics:z.array(z.object({metricKey:key,label,direction:z.literal('descriptive')}).strict())
+    .max(SURVEY_SJT_V2_LIMITS.metrics),
+  scoring:z.object({modelKey:z.enum(['AUTHOR_KEY_SUM','EXPERT_KEY']),
+    modelVersion:z.literal('1'),sourceNote:note}).strict(),
+  scenes:z.array(z.object({sceneKey:key,title:label,stimulus:note,image:surveyImageSchema.optional(),
+    questions:z.array(sjtQuestionV2Schema).max(SURVEY_SJT_V2_LIMITS.questionsPerScene),
+  }).strict()).max(SURVEY_SJT_V2_LIMITS.scenes),
+}).strict()
+export type SjtDraftV2=z.infer<typeof sjtDraftV2Schema>
+export type SjtQuestionV2=z.infer<typeof sjtQuestionV2Schema>
+export const sjtDraftSchema=z.discriminatedUnion('schemaVersion',[sjtDraftV1Schema,sjtDraftV2Schema])
+export type AnySjtDraft=SjtDraft|SjtDraftV2
+export type SurveyDraft=FormDraft|ScaleDraft|AnySjtDraft|CognitiveDraft
 export type Issue={path:string;message:string;severity:'error'|'warning'}
 export const initialSurveyDefinition=(kind:SurveyKind):SurveyDraft=>{
   if(kind==='FORM')return {schemaVersion:1,pages:[]}
@@ -159,14 +195,15 @@ export const initialSurveyDefinition=(kind:SurveyKind):SurveyDraft=>{
     ],
     dimensions:[],aggregation:'mean',items:[],
   }
+  if(kind==='COGNITIVE')return initialCognitiveDefinition()
   return {
-    schemaVersion:1,respondentType:'student_self_report',scenarioKey:'scene1',title:'',stimulus:'',
-    author:'',sourceNote:'',licenseStatus:'unknown',redistribution:'unknown',
-    metrics:[],questions:[],
+    schemaVersion:2,respondentType:'participant_self_report',title:'',
+    author:'',sourceNote:'',licenseStatus:'unknown',redistribution:'unknown',orderPolicy:'FIXED',
+    metrics:[],scoring:{modelKey:'AUTHOR_KEY_SUM',modelVersion:'1',sourceNote:''},scenes:[],
   }
 }
 export const surveyDraftSchemaFor=(kind:SurveyKind)=>
-  kind==='FORM'?formDraftSchema:kind==='SCALE'?scaleDraftSchema:sjtDraftSchema
+  kind==='FORM'?formDraftSchema:kind==='SCALE'?scaleDraftSchema:kind==='COGNITIVE'?cognitiveDraftSchema:sjtDraftSchema
 const unique=(values:string[],path:string,issues:Issue[])=>{
   const seen=new Set<string>()
   values.forEach((value,index)=>{
@@ -178,11 +215,9 @@ const requireText=(value:string,path:string,issues:Issue[])=>{
   if(!value.trim())issues.push({path,message:'请填写内容',severity:'error'})
 }
 const err=(issues:Issue[],path:string,message:string)=>issues.push({path,message,severity:'error'})
-export const validateSurveyDraft=(
-  kind:SurveyKind,input:unknown,forPreview=false,
-  // Historical immutable Publications could contain operator pairs accepted
-  // before the v1.1 authoring check. Only their runtime projection opts in.
-  allowLegacyFrozenConditionOperators=false,
+const validateSurveyDraftCore=(
+  kind:SurveyKind,input:unknown,forPreview:boolean,
+  allowLegacyFrozenConditionOperators:boolean,includeDigest:boolean,
 ):{
   definition?:SurveyDraft;issues:Issue[];digest?:string
 }=>{
@@ -327,7 +362,9 @@ export const validateSurveyDraft=(
         err(issues,`dimensions.${i}`,'维度至少包含一道题目')
     })
   }
-  if(kind==='SJT'){
+  if(kind==='COGNITIVE')issues.push(...validateCognitiveDraft(definition as CognitiveDraft,forPreview))
+  if(kind==='SJT'&&definition.schemaVersion===2)issues.push(...validateSurveySjtV2(definition as SjtDraftV2,forPreview))
+  if(kind==='SJT'&&definition.schemaVersion===1){
     const d=definition as SjtDraft
     unique(d.metrics.map(m=>m.metricKey),'metrics',issues)
     unique(d.questions.map(q=>q.questionKey),'questions',issues)
@@ -376,14 +413,24 @@ export const validateSurveyDraft=(
   const canonical=JSON.parse(JSON.stringify({kind,definition}))
   if(Buffer.byteLength(JSON.stringify(canonical),'utf8')>480000)
     err(issues,'definition','单份研究工具数据体积不能超过 480 KB')
-  return {definition,issues,digest:canonicalHash(canonical)}
+  return includeDigest?{definition,issues,digest:canonicalHash(canonical)}:{definition,issues}
 }
+export const validateSurveyDraft=(
+  kind:SurveyKind,input:unknown,forPreview=false,
+  // Historical immutable Publications could contain operator pairs accepted
+  // before the v1.1 authoring check. Only their runtime projection opts in.
+  allowLegacyFrozenConditionOperators=false,
+):{
+  definition?:SurveyDraft;issues:Issue[];digest?:string
+}=>validateSurveyDraftCore(kind,input,forPreview,allowLegacyFrozenConditionOperators,true)
 export const assertSurveyDraft=(
   kind:SurveyKind,input:unknown,forPreview=false,
   allowLegacyFrozenConditionOperators=false,
 ):SurveyDraft=>{
-  const result=validateSurveyDraft(
-    kind,input,forPreview,allowLegacyFrozenConditionOperators,
+  // Keep normalization and every validation, including the serialized size
+  // budget; assertions do not consume the authoring API's draft digest.
+  const result=validateSurveyDraftCore(
+    kind,input,forPreview,allowLegacyFrozenConditionOperators,false,
   )
   if(!result.definition||result.issues.some(i=>i.severity==='error'))
     throw new SurveyDraftError(result.issues)

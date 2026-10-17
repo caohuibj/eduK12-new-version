@@ -38,7 +38,7 @@ export function internalReturnTo(value: string | null | undefined): string | nul
   } catch { return null }
 }
 const staffRoots = ['dashboard', 'courses', 'students', 'assignments', 'checkins', 'scales', 'questionnaires', 'general-questionnaires', 'composite-assessments', 'bundle-products', 'cognitive-assignments', 'videos', 'images', 'documents', 'profile']
-const adminRoots = ['users', 'teacher-codes', 'admin/training', 'admin/material-grants', 'admin/instrument-authorizations']
+const adminRoots = ['users', 'teacher-codes', 'admin/training', 'admin/material-grants', 'admin/instrument-authorizations', 'admin/survey-researchers']
 const inRoot = (pathname: string, root: string) => pathname === `/${root}` || pathname.startsWith(`/${root}/`)
 export function returnAfterLogin(value: string | null | undefined, role: Role): string {
   const target = internalReturnTo(value)
@@ -54,7 +54,8 @@ export function returnAfterLogin(value: string | null | undefined, role: Role): 
   return allowed ? target : homeFor(role)
 }
 export function loginUrl(role: Role | undefined, destination: string) {
-  return `${loginFor(role)}?returnTo=${encodeURIComponent(destination)}`
+  const adminSurvey = internalReturnTo(destination)?.split(/[?#]/)[0] === '/admin/survey-researchers'
+  return `${adminSurvey ? '/admin/login' : loginFor(role)}?returnTo=${encodeURIComponent(destination)}`
 }
 
 // Reauthentication hint only, never credentials or draft data.

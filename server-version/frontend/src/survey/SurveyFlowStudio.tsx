@@ -130,6 +130,10 @@ export function SurveyFlowStudio({value,onChange,tools,selectedIds,questions,col
       }))})}>启用 Flow V1</button>
     {!allAvailable&&<p role="alert" className="text-sm text-amber-700">已选择的工具不在当前列表页，需先切换列表页确认编码后再启用流程。</p>}
   </section>
+  const variants=value.experiment?.mode==='QUESTIONNAIRE_VARIANTS'
+  const totalWeight=value.experiment?.groups.reduce((sum,g)=>sum+g.weight,0)??0
+  const memberships=new Set(value.experiment?.groups.flatMap(g=>g.instrumentKeys??[])??[])
+  const uncovered=variants?selected.filter(t=>!memberships.has(t.instrumentKey)):[]
   const used=new Set(value.blocks.filter(x=>x.kind==='INSTRUMENT').map(x=>x.instrumentKey))
   const missing=selected.filter(t=>!used.has(t.instrumentKey))
   const unavailable=value.blocks.filter(b=>b.kind==='INSTRUMENT'&&
@@ -151,12 +155,33 @@ export function SurveyFlowStudio({value,onChange,tools,selectedIds,questions,col
           groups:[{groupKey:researchKey('g'),weight:1,materialTitle:'积极材料',materialBody:''},
             {groupKey:researchKey('g'),weight:1,materialTitle:'风险材料',materialBody:''}]}})}>
         添加研究实验分组</button>:<>
+        <label className="block text-sm">实验设计方式
+          <select className="input block w-full" value={variants?'QUESTIONNAIRE_VARIANTS':'MATERIALS'}
+            onChange={e=>{
+              const variant=e.target.value==='QUESTIONNAIRE_VARIANTS'
+              apply({...value,experiment:{...value.experiment!,mode:variant?'QUESTIONNAIRE_VARIANTS':undefined,
+                linkedPolicy:variant?'RERANDOMIZE':value.experiment!.linkedPolicy,
+                groups:value.experiment!.groups.map((g,i)=>variant?{...g,
+                  variantLabel:g.variantLabel||String.fromCharCode(65+i),
+                  instrumentKeys:g.instrumentKeys??selected.map(t=>t.instrumentKey)}:
+                  {groupKey:g.groupKey,weight:g.weight,materialTitle:g.materialTitle,materialBody:g.materialBody})}})
+            }}>
+            <option value="MATERIALS">实验材料分组（共享全部工具）</option>
+            <option value="QUESTIONNAIRE_VARIANTS">A/B问卷子版本</option>
+          </select>
+        </label>
+        {variants&&<div className="text-sm space-y-1">
+          <p>每个子版本是一份完整问卷。勾选其包含的工具，按下方共同块顺序呈现；同一工具可由多个子版本共享，题目内容不同时请先创建独立工具。</p>
+          <p>权重归一化后是随机分配概率，不保证精确人数或配额。仅支持每波次重新随机，不支持实验组配额。</p>
+          {uncovered.length>0&&<p role="alert" className="text-red-700">以下工具尚未分配给任何子版本：{uncovered.map(t=>t.title).join('、')}</p>}
+        </div>}
+
         <label className="block text-sm">跨波次分组政策
-          <select className="input block w-full" value={value.experiment.linkedPolicy}
+          <select className="input block w-full" value={value.experiment.linkedPolicy} disabled={variants}
             onChange={e=>apply({...value,experiment:{...value.experiment!,
               linkedPolicy:e.target.value as 'KEEP_LINKED'|'RERANDOMIZE'}})}>
             <option value="RERANDOMIZE">每一波次重新使用加密安全随机数分组</option>
-            {collectionMode==='LINKED_WAVES'&&<option value="KEEP_LINKED">关联 T1/T2/T3 保持同一研究实验组</option>}
+            {collectionMode==='LINKED_WAVES'&&!variants&&<option value="KEEP_LINKED">关联 T1/T2/T3 保持同一研究实验组</option>}
           </select>
         </label>
         {value.experiment.groups.map((group,i)=><div key={group.groupKey} className="rounded border p-3 grid sm:grid-cols-2 gap-2">
@@ -167,12 +192,28 @@ export function SurveyFlowStudio({value,onChange,tools,selectedIds,questions,col
               value={group.weight} onChange={e=>apply({...value,experiment:{...value.experiment!,
                 groups:value.experiment!.groups.map((g,j)=>j===i?{...g,weight:Number(e.target.value)}:g)}})}/>
           </label>
+          {variants&&<>
+            <label className="text-xs">子版本名称
+              <input className="input block w-full" value={group.variantLabel??''} maxLength={200}
+                onChange={e=>apply({...value,experiment:{...value.experiment!,groups:value.experiment!.groups.map((g,j)=>j===i?{...g,variantLabel:e.target.value}:g)}})}/>
+            </label>
+            <p className="text-sm">分配概率：{totalWeight>0?((group.weight/totalWeight)*100).toFixed(1):'0.0'}%</p>
+            <fieldset className="sm:col-span-2 space-y-1"><legend className="text-xs">此子版本包含的研究工具（1–30 项）</legend>
+              {selected.map(tool=><label key={tool.id} className="block text-sm">
+                <input type="checkbox" checked={(group.instrumentKeys??[]).includes(tool.instrumentKey)}
+                  disabled={!(group.instrumentKeys??[]).includes(tool.instrumentKey)&&(group.instrumentKeys??[]).length>=30}
+                  onChange={e=>apply({...value,experiment:{...value.experiment!,groups:value.experiment!.groups.map((g,j)=>j===i?{...g,
+                    instrumentKeys:e.target.checked?[...(g.instrumentKeys??[]),tool.instrumentKey]:(g.instrumentKeys??[]).filter(k=>k!==tool.instrumentKey)}:g)}})}/>
+                {tool.title}（{tool.instrumentKey}）</label>)}
+              {!group.instrumentKeys?.length&&<p role="alert" className="text-red-700">每个子版本至少需要一个研究工具。</p>}
+            </fieldset>
+          </>}
           <label className="text-xs">呈现材料标题
             <input className="input block w-full" value={group.materialTitle}
               onChange={e=>apply({...value,experiment:{...value.experiment!,
                 groups:value.experiment!.groups.map((g,j)=>j===i?{...g,materialTitle:e.target.value}:g)}})}/>
           </label>
-          <label className="text-xs sm:col-span-2">呈现材料（每组必须填写）
+          <label className="text-xs sm:col-span-2">{variants?'呈现材料（可选，留空时不增加材料步骤）':'呈现材料（每组必须填写）'}
             <textarea className="input block w-full" rows={3} value={group.materialBody}
               onChange={e=>apply({...value,experiment:{...value.experiment!,
                 groups:value.experiment!.groups.map((g,j)=>j===i?{...g,materialBody:e.target.value}:g)}})}/></label>
@@ -184,7 +225,8 @@ export function SurveyFlowStudio({value,onChange,tools,selectedIds,questions,col
           <button className="btn-secondary" type="button" disabled={value.experiment!.groups.length>=8}
             onClick={()=>apply({...value,experiment:{...value.experiment!,
               groups:[...value.experiment!.groups,{groupKey:researchKey('g'),weight:1,
-                materialTitle:'中性材料',materialBody:''}]}})}>增加实验组</button>
+                materialTitle:variants?'':'中性材料',materialBody:'',
+                ...(variants?{variantLabel:String.fromCharCode(65+value.experiment!.groups.length),instrumentKeys:selected.map(t=>t.instrumentKey)}:{})}]}})}>增加实验组</button>
           <button className="btn-secondary" type="button" onClick={()=>apply({...value,experiment:undefined})}>
             删除实验设计</button>
         </div>

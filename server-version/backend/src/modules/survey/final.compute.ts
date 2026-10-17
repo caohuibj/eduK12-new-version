@@ -1,3 +1,6 @@
+import { normalizeSurveySjtAnswers,scoreResearchSjtAnswers,SurveySjtAnswerError } from './sjt-runtime'
+import type { SurveyCognitiveReference } from './cognitive.definition'
+import { projectStoredMeasurement,type MeasurementResultV1 } from '../assessment-runtime/measurement-result'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { scoreScale } from '../scale/scale-scoring'
 import { scoreSituationalModel } from '../situational/situation-model-resolver'
@@ -7,7 +10,7 @@ import { resolveSurveySjtAnswer } from './sjt-selection'
 import {validateSurveyScaleTimings,type SurveyScaleTimings} from './timing.definition'
 import { executeSurveyFlow,SurveyFlowExecutionError,type SurveyExecutionTrace } from './flow.runtime'
 import type { SurveyFlowAssignment } from './flow.assignment'
-import { assertSurveyDraft, type FormDraft, type ScaleDraft, type SjtDraft } from './builder.definition'
+import { assertSurveyDraft, type FormDraft, type ScaleDraft, type SjtDraft, type SjtDraftV2 } from './builder.definition'
 import type { ResearchFrozenPublication, ResearchFrozenUnit } from './publication.service'
 import type { ScaleDefinitionV2 } from '../scale/scale-definition'
 import type { SituationDefinitionV2 } from '../situational/situation-branching'
@@ -24,15 +27,17 @@ const isRefusal=(value:unknown):value is ExplicitSurveyRefusal=>
   !!value&&typeof value==='object'&&!Array.isArray(value)
   &&Object.keys(value).length===1&&(value as ExplicitSurveyRefusal)._surveyRefusal===true
 export type AnswerMap=Record<string,AnswerPrimitive>
-export interface MissingItem {itemKey:string;reason:'NOT_SHOWN'|'SHOWN_MISSING'|'REFUSED'}
+export interface MissingItem {itemKey:string;reason:'NOT_SHOWN'|'SHOWN_MISSING'|'REFUSED'|'UNABLE_TO_JUDGE'}
 export interface FrozenUnitResult {
   instrumentKey:string
-  kind:'FORM'|'SCALE'|'SJT'
+  kind:'FORM'|'SCALE'|'SJT'|'COGNITIVE'
   sourceDigest:string
   scoringDigest:string|null
   rawAnswers:AnswerMap
   missing:MissingItem[]
   privateScoring:unknown|null
+  childReference?:SurveyCognitiveReference
+  measurement?:MeasurementResultV1
   /** PRESENT only when the entire frozen tool was not reached by Flow V1. */
   notExecuted?:true
 }
@@ -275,7 +280,7 @@ export function dryRunSurveyForm(definition:unknown,answers:unknown){
   const result=formResult(unit,safeObject(answers,'answers'))
   return {rawAnswers:result.rawAnswers,missing:result.missing}
 }
-const scaleResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
+const scaleResult=(unit:ResearchFrozenUnit,answers:AnswerMap,computeScore=true):FrozenUnitResult=>{
   const display=assertSurveyDraft('SCALE',unit.displayDefinition,true) as ScaleDraft
   const allowed=new Set(display.items.map(q=>q.itemKey))
   for(const k of Object.keys(answers))if(!allowed.has(k))invalid('answers.'+k,'无效量表题目')
@@ -286,12 +291,41 @@ const scaleResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>
       invalid('answers.'+item.itemKey,'研究量表必须完整选择有效的响应选项')
     raw[item.itemKey]=value as string
   }
-  const result=scoreScale(unit.compiledDefinition as ScaleDefinitionV2,raw)
+  if(!computeScore)return {instrumentKey:unit.instrumentKey,kind:'SCALE',sourceDigest:unit.sourceDigest,
+    scoringDigest:unit.scoringDigest,rawAnswers:raw,missing:[],privateScoring:null}
+  const mapping=unit.sourceAnswerMapping
+  const nativeAnswers:Record<string,string|number>=mapping?Object.fromEntries(Object.entries(raw).map(([key,value])=>{
+    const originalItem=mapping.items[key],originalValue=mapping.options[value]
+    if(!originalItem||originalValue===undefined)invalid('answers.'+key,'量表来源映射不完整')
+    return [originalItem,originalValue]
+  })):raw
+  const result=scoreScale(unit.compiledDefinition as ScaleDefinitionV2,nativeAnswers)
   if(result.quality.status==='invalid')invalid('scoring','量表数据不足以计算研究得分')
   return {instrumentKey:unit.instrumentKey,kind:'SCALE',sourceDigest:unit.sourceDigest,
     scoringDigest:unit.scoringDigest,rawAnswers:raw,missing:[],privateScoring:result}
 }
-const sjtResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
+const sjtResult=(unit:ResearchFrozenUnit,answers:AnswerMap,computeScore=true):FrozenUnitResult=>{
+  if((unit.displayDefinition as {schemaVersion:number}).schemaVersion===2){
+    const display=assertSurveyDraft('SJT',unit.displayDefinition,true) as SjtDraftV2
+    const definition=unit.compiledDefinition as SituationDefinitionV2
+    try{
+      const normalized=normalizeSurveySjtAnswers(display,definition,answers,{requireComplete:true})
+      if(!computeScore)return {instrumentKey:unit.instrumentKey,kind:'SJT',sourceDigest:unit.sourceDigest,
+        scoringDigest:unit.scoringDigest,rawAnswers:normalized.rawAnswers,missing:normalized.missing,privateScoring:null}
+      const scored=scoreResearchSjtAnswers(display,definition,normalized.responses)
+      const privateScoring={...scored,questionResults:normalized.questionResults}
+      return {instrumentKey:unit.instrumentKey,kind:'SJT',sourceDigest:unit.sourceDigest,
+        scoringDigest:unit.scoringDigest,rawAnswers:normalized.rawAnswers,
+        missing:normalized.missing,privateScoring,
+        measurement:projectStoredMeasurement({identity:{schemaVersion:1,kind:'SJT',
+          sourceDigest:unit.sourceDigest,scoringDigest:unit.scoringDigest,
+          engineVersion:'SURVEY_SJT_V2',scoringVersion:display.scoring.modelVersion,
+          protocolDigest:null},storedResult:privateScoring})}
+    }catch(error){
+      if(error instanceof SurveySjtAnswerError)invalid(error.path,error.message)
+      throw error
+    }
+  }
   const display=assertSurveyDraft('SJT',unit.displayDefinition,true) as SjtDraft
   const allowed=new Set(display.questions.map(q=>q.questionKey))
   for(const k of Object.keys(answers))if(!allowed.has(k))invalid('answers.'+k,'无效 SJT 题目')
@@ -312,14 +346,64 @@ const sjtResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
   }
   const journey=deriveAuthoritativeSituationalTrajectory(definition,responses)
   if(!journey.reachedTerminal)invalid('answers','未完成情境要求的所有合法步骤')
+  if(!computeScore)return {instrumentKey:unit.instrumentKey,kind:'SJT',sourceDigest:unit.sourceDigest,
+    scoringDigest:unit.scoringDigest,rawAnswers:raw,missing:[],privateScoring:null}
   const scores=scoreSituationalModel(asLinearSituationDefinition(definition),responses)
   if(scores.quality.status==='invalid')invalid('scoring','情境数据无法生成受控研究结果')
   return {instrumentKey:unit.instrumentKey,kind:'SJT',sourceDigest:unit.sourceDigest,
     scoringDigest:unit.scoringDigest,rawAnswers:raw,missing:[],privateScoring:scores}
 }
+/** Shared ordinary-unit validator for cognitive admission. It validates the
+ * reached prefix without trusting caller-provided scoring or requiring timing. */
+export function validateSurveyUnitAnswers(unit:ResearchFrozenUnit,answer:unknown):Pick<FrozenUnitResult,'rawAnswers'|'missing'> {
+  const raw=safeObject(answer,'answers.'+unit.instrumentKey)
+  const normalized=unit.kind==='FORM'?formResult(unit,raw)
+    :unit.kind==='SCALE'?scaleResult(unit,raw,false)
+      :unit.kind==='SJT'?sjtResult(unit,raw,false)
+        :invalid('answers.'+unit.instrumentKey,'认知工具必须通过专用会话完成')
+  // This result cannot be used as an authoritative scored FINAL. Scoring runs
+  // only when the reached ordinary units are committed in the parent FINAL.
+  return {rawAnswers:normalized.rawAnswers,missing:normalized.missing}
+}
+/** A request-local proof owns its frozen copy. Its compute closure is the only
+ * route that can reuse this digest; callers cannot supply a trusted hash to the
+ * ordinary scorer. No authorization, Attempt state or result is cached. */
+export function verifySurveyFinalPublication(snapshot:ResearchFrozenPublication,expectedDigest:string){
+  const frozen=JSON.parse(JSON.stringify(snapshot)) as ResearchFrozenPublication
+  const definitionDigest=canonicalHash(frozen)
+  if(definitionDigest!==expectedDigest)return null
+  const freeze=(value:unknown):void=>{
+    if(!value||typeof value!=='object'||Object.isFrozen(value))return
+    for(const child of Object.values(value))freeze(child)
+    Object.freeze(value)
+  }
+  freeze(frozen)
+  return Object.freeze({snapshot:frozen,
+    compute:(input:Record<string,unknown>,assignment?:SurveyFlowAssignment|null,
+      clientObservedBlocks?:readonly string[],mode:'FINAL'|'SCREEN_OUT'='FINAL',itemTimings?:unknown,
+      cognitiveResults?:ReadonlyMap<string,FrozenUnitResult>)=>
+      computeSurveyFinalFromSnapshot(frozen,input,assignment,clientObservedBlocks,mode,itemTimings,definitionDigest,cognitiveResults),
+  })
+}
+
 export function computeSurveyFinal(snapshot:ResearchFrozenPublication,input:Record<string,unknown>,
   assignment?:SurveyFlowAssignment|null,clientObservedBlocks?:readonly string[],
   mode:'FINAL'|'SCREEN_OUT'='FINAL',itemTimings?:unknown):SurveyComputedFinal{
+  return computeSurveyFinalFromSnapshot(snapshot,input,assignment,clientObservedBlocks,mode,itemTimings)
+}
+
+function computeSurveyFinalFromSnapshot(snapshot:ResearchFrozenPublication,input:Record<string,unknown>,
+  assignment?:SurveyFlowAssignment|null,clientObservedBlocks?:readonly string[],
+  mode:'FINAL'|'SCREEN_OUT'='FINAL',itemTimings?:unknown,verifiedDigest?:string,
+  cognitiveResults?:ReadonlyMap<string,FrozenUnitResult>):SurveyComputedFinal{
+  const cognitiveResult=(unit:ResearchFrozenUnit,raw:AnswerMap):FrozenUnitResult=>{
+    if(Object.keys(raw).length)invalid('answers.'+unit.instrumentKey,'认知原始试次只能由受控子会话提交')
+    const result=cognitiveResults?.get(unit.instrumentKey)
+    if(!result||result.kind!=='COGNITIVE'||!result.childReference||
+      result.sourceDigest!==unit.sourceDigest||result.scoringDigest!==unit.scoringDigest)
+      invalid('answers.'+unit.instrumentKey,'认知任务缺少已验证的正式子结果')
+    return result
+  }
   if(snapshot.schemaVersion!==1||snapshot.purpose!=='RESEARCH_ONLY'||
      snapshot.runtimeStatus!=='SURVEY_FINAL_V1'||!snapshot.units.length)
     invalid('publication','尚未提供可执行的 Survey 专用冻结定义')
@@ -334,6 +418,7 @@ export function computeSurveyFinal(snapshot:ResearchFrozenPublication,input:Reco
           try{
             if(unit.kind==='FORM')return formResult(unit,raw)
             if(unit.kind==='SCALE')return scaleResult(unit,raw)
+            if(unit.kind==='COGNITIVE')return cognitiveResult(unit,raw)
             return sjtResult(unit,raw)
           }catch(e){
             if(e instanceof SurveyFinalValidationError&&e.path.startsWith('answers.'))
@@ -352,7 +437,7 @@ export function computeSurveyFinal(snapshot:ResearchFrozenPublication,input:Reco
       invalid('flow','当前路径不能标记为资格筛除')
     const verifiedTimings=validateSurveyScaleTimings(snapshot,input,itemTimings,mode==='FINAL')
     return {schemaVersion:1,
-      definitionDigest:canonicalHash(JSON.parse(JSON.stringify(snapshot))),
+      definitionDigest:verifiedDigest??canonicalHash(JSON.parse(JSON.stringify(snapshot))),
       units:result.units,executionTrace:result.trace,
       ...(verifiedTimings?{itemTimings:verifiedTimings}:{})}
   }
@@ -373,9 +458,10 @@ export function computeSurveyFinal(snapshot:ResearchFrozenPublication,input:Reco
     }
     if(unit.kind==='SCALE')return scaleResult(unit,raw)
     if(unit.kind==='SJT')return sjtResult(unit,raw)
+    if(unit.kind==='COGNITIVE')return cognitiveResult(unit,raw)
     return invalid('publication','未知研究内容类型')
   })
-  const definitionDigest=canonicalHash(JSON.parse(JSON.stringify(snapshot)))
+  const definitionDigest=verifiedDigest??canonicalHash(JSON.parse(JSON.stringify(snapshot)))
   const verifiedTimings=validateSurveyScaleTimings(snapshot,input,itemTimings,true)
   return {schemaVersion:1,definitionDigest,units,
     ...(verifiedTimings?{itemTimings:verifiedTimings}:{})}

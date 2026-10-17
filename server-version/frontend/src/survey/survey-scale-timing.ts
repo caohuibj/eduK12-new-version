@@ -81,10 +81,14 @@ export class SurveyScaleTimingTracker {
     if(previous!==undefined&&previous!==next)
       row.changeCount=Math.min(MAX_COUNT,row.changeCount+1)
   }
-  suspend(now=readScaleTimingNow()){
+  /** Stop a sealed submission clock without inventing a tab interruption or revisit. */
+  pause(now=readScaleTimingNow()){
     this.flush(now)
-    if(this.current!==null)this.row(this.current).interrupted=true
     this.start=null
+  }
+  suspend(now=readScaleTimingNow()){
+    this.pause(now)
+    if(this.current!==null)this.row(this.current).interrupted=true
   }
   resume(now=readScaleTimingNow()){
     if(this.current!==null&&this.start===null)this.start=now

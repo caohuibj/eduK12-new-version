@@ -1,3 +1,5 @@
+import { surveySjtQuestions } from './sjt-structure'
+import { assertSurveyCognitiveLockedAnswers } from './cognitive.results'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -5,8 +7,9 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { encryptUnifiedRuntimePayload,decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { hashResearchCredential } from './identity.service'
 import { verifiedSurveyAttempt } from './admission.service'
+import {ensureSurveyFlowAssignment,assignedSurveySnapshot} from './flow.assignment'
 import type { ResearchFrozenPublication } from './publication.service'
-import type { FormDraft,ScaleDraft,SjtDraft } from './builder.definition'
+import type { FormDraft,ScaleDraft,AnySjtDraft } from './builder.definition'
 import { validateSurveyScaleTimings,SurveyScaleTimingError,
   type SurveyScaleTimings } from './timing.definition'
 
@@ -58,8 +61,8 @@ const validCheckpointAnswers=(snapshot:ResearchFrozenPublication,raw:unknown):Ch
       }
     }else if(unit.kind==='SCALE'){
       for(const q of (unit.displayDefinition as ScaleDraft).items)allowed.add(q.itemKey)
-    }else{
-      for(const q of (unit.displayDefinition as SjtDraft).questions)allowed.add(q.questionKey)
+    }else if(unit.kind==='SJT'){
+      for(const q of surveySjtQuestions(unit.displayDefinition as AnySjtDraft))allowed.add(q.questionKey)
     }
     const keys=Object.keys(value as Record<string,unknown>)
     if(keys.length>500||keys.some(k=>!allowed.has(k)))
@@ -99,7 +102,10 @@ const access=async(tx:Prisma.TransactionClient,proof:Proof,known:AuthContext)=>{
     fail(409,'临时作答与冻结发布内容不一致')
   const hash=hashResearchCredential(proof.accessCredential)
   if(attempt.participantId){
-    await tx.$queryRaw`SELECT id FROM survey_participants
+    if(known.compiledSnapshot.flow?.experiment?.mode==='QUESTIONNAIRE_VARIANTS')
+      await tx.$queryRaw`SELECT id FROM survey_participants
+        WHERE id=${attempt.participantId} AND project_id=${known.projectId} FOR UPDATE`
+    else await tx.$queryRaw`SELECT id FROM survey_participants
       WHERE id=${attempt.participantId} AND project_id=${known.projectId} FOR SHARE`
     const person=await tx.surveyParticipant.findFirst({where:{
       id:attempt.participantId,projectId:known.projectId,
@@ -110,13 +116,17 @@ const access=async(tx:Prisma.TransactionClient,proof:Proof,known:AuthContext)=>{
   }else if(attempt.sessionHash!==hash)fail(403,'匿名恢复凭证已失效')
   const policy=known.compiledSnapshot.checkpointPolicy
   if(!policy?.enabled)fail(404,'本研究未开启服务器临时存档')
-  return {policy,wave:attempt.wave}
+  const assignment=known.compiledSnapshot.flow?.experiment?.mode==='QUESTIONNAIRE_VARIANTS'
+    ?await ensureSurveyFlowAssignment(tx,{...known,researchCode:proof.researchCode,
+      accessCredential:proof.accessCredential,snapshot:known.compiledSnapshot}):null
+  const snapshot=assignment?assignedSurveySnapshot(known.compiledSnapshot,assignment):known.compiledSnapshot
+  return {policy,wave:attempt.wave,snapshot}
 }
 const context=async(proof:Proof):Promise<AuthContext>=>verifiedSurveyAttempt(proof)
 export async function readSurveyCheckpoint(proof:Proof){
   const known=await context(proof)
   return prisma.$transaction(async tx=>{
-    await access(tx,proof,known)
+    const {snapshot}=await access(tx,proof,known)
     const checkpoint=await tx.surveyAttemptCheckpoint.findUnique({where:{
       attemptId:known.attemptId,
     }})
@@ -134,13 +144,10 @@ export async function readSurveyCheckpoint(proof:Proof){
       ?stored as TimedCheckpointV2:null
     const answers=envelope?.answers??stored as CheckpointAnswers
     let itemTimings:SurveyScaleTimings|undefined
-    if(envelope){
-      try{
-        validCheckpointAnswers(known.compiledSnapshot,answers)
-        itemTimings=validateSurveyScaleTimings(known.compiledSnapshot,answers,
-          envelope.itemTimings,false)
-      }catch{fail(409,'服务器临时计时存档与冻结工具不匹配')}
-    }
+    try{
+      validCheckpointAnswers(snapshot,answers)
+      itemTimings=validateSurveyScaleTimings(snapshot,answers,envelope?.itemTimings,false)
+    }catch{fail(409,'服务器临时存档与当前问卷子版本不匹配')}
     return {enabled:true as const,revision:checkpoint.version,
       checkpoint:{answers,...(itemTimings?{itemTimings}:{}),
         expiresAt:checkpoint.expiresAt,updatedAt:checkpoint.updatedAt,
@@ -151,22 +158,24 @@ export async function saveSurveyCheckpoint(proof:Proof,input:{
   revision:number;answers:unknown;itemTimings?:unknown;
 }){
   const known=await context(proof)
-  const answers=validCheckpointAnswers(known.compiledSnapshot,input.answers)
-  let itemTimings:SurveyScaleTimings|undefined
-  try{
-    itemTimings=validateSurveyScaleTimings(known.compiledSnapshot,answers,
-      input.itemTimings,false)
-  }catch(e){
-    if(e instanceof SurveyScaleTimingError)fail(400,e.path+'：'+e.message)
-    throw e
-  }
-  const content= itemTimings?{
-    schemaVersion:2 as const,answers,itemTimings,
-  }:answers
-  if(Buffer.byteLength(JSON.stringify(content),'utf8')>MAX_CHECKPOINT_BYTES)
-    fail(413,'临时作答和计时记录合计超过 64KB，无法安全暂存')
   return prisma.$transaction(async tx=>{
-    const {policy,wave}=await access(tx,proof,known)
+    const {policy,wave,snapshot}=await access(tx,proof,known)
+    const answers=validCheckpointAnswers(snapshot,input.answers)
+    let itemTimings:SurveyScaleTimings|undefined
+    try{
+      itemTimings=validateSurveyScaleTimings(snapshot,answers,
+        input.itemTimings,false)
+    }catch(e){
+      if(e instanceof SurveyScaleTimingError)fail(400,e.path+'：'+e.message)
+      throw e
+    }
+    const content= itemTimings?{
+      schemaVersion:2 as const,answers,itemTimings,
+    }:answers
+    if(Buffer.byteLength(JSON.stringify(content),'utf8')>MAX_CHECKPOINT_BYTES)
+      fail(413,'临时作答和计时记录合计超过 64KB，无法安全暂存')
+    if(known.compiledSnapshot.units.some(unit=>unit.kind==='COGNITIVE'))
+      await assertSurveyCognitiveLockedAnswers(tx,known.attemptId,answers)
     const now=new Date()
     const end=wave.finishUntil??wave.closesAt
     const expiresAt=new Date(Math.min(now.getTime()+policy.ttlHours*3600000,

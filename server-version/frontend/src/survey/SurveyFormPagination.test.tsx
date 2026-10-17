@@ -27,6 +27,33 @@ function Host({conditional=true}:{conditional?:boolean}){
     <output data-testid="page-answers">{JSON.stringify(answers)}</output></>
 }
 describe('Survey real participant Form paging',()=>{
+  it('preserves source section instructions as display text, not an answer field',()=>{
+    render(<TaskForm unit={{kind:'FORM',instrumentKey:'source',title:'Source',pages:[{pageKey:'p',title:'Section',description:'Answer for the last 7 days',questions:[{itemKey:'q',type:'SINGLE',prompt:'Choose',required:true,options:[{optionKey:'yes',label:'Yes'}]}]}]}} pageIndex={0} onPageChange={()=>{}} answer={{}} onChange={()=>{}}/>)
+    expect(screen.getByText('Answer for the last 7 days')).toBeInTheDocument()
+    expect(screen.getAllByRole('radio')).toHaveLength(1)
+  })
+  it.each(['RANK_ORDER','CONSTANT_SUM'])('accepts explicit refusal before advancing a required %s page',type=>{
+    function RefusalHost(){
+      const [pageIndex,setPageIndex]=useState(0)
+      const [answers,setAnswers]=useState<Record<string,ProfessionalAnswer>>({})
+      return <TaskForm unit={{kind:'FORM',instrumentKey:'refusal',title:'允许拒答',pages:[
+        {pageKey:'first',title:'允许拒答的第一页',questions:[{itemKey:'question',type,
+          prompt:'可明确拒答',required:true,allowRefusal:true,total:100,
+          options:[{optionKey:'a',label:'选项 A'},{optionKey:'b',label:'选项 B'}]}]},
+        {pageKey:'second',title:'拒答后的下一页',questions:[{itemKey:'next',type:'SHORT_TEXT',
+          prompt:'后续选答题',required:false,options:[]}]},
+      ]}} pageIndex={pageIndex} onPageChange={setPageIndex} answer={answers}
+        onChange={(key,value)=>setAnswers(previous=>({...previous,[key]:value}))}/>
+    }
+    render(<RefusalHost/>)
+    fireEvent.click(screen.getByRole('checkbox',{name:/我选择不回答这一题/}))
+    fireEvent.click(screen.getByRole('button',{name:'下一页'}))
+    expect(screen.getByText('拒答后的下一页')).toBeInTheDocument()
+    expect(screen.queryByRole('alert')).toBeNull()
+    fireEvent.click(screen.getByRole('button',{name:'上一页'}))
+    expect(screen.getByRole('checkbox',{name:/我选择不回答这一题/})).toBeChecked()
+  })
+
   it('renders exactly one visible page and retains answers across navigation',()=>{
     render(<Host/>)
     expect(screen.getByText('第一页')).toBeInTheDocument()

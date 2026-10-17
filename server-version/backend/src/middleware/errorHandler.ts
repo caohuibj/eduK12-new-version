@@ -1,8 +1,11 @@
 import { Request, Response, NextFunction } from 'express'
-import { error, instrumentError } from '../utils/response'
+import { error, instrumentError, completionBusy } from '../utils/response'
 import { logger } from '../utils/logger'
 
 export const errorHandler = (err: any, req: Request & { requestId?: string }, res: Response, _next: NextFunction) => {
+  // Only the shared completion boundary classifies transient DB failures.
+  // Preserve its safe retry contract in routes without a local busy mapper.
+  if (err?.code === 'COMPLETION_BUSY') return completionBusy(res, err.retryAfterSeconds)
   if (err?.code === 'ASSESSMENT_RUNTIME_UNAVAILABLE' && err?.statusCode === 503) {
     res.setHeader('Retry-After', '5')
     return instrumentError(res, 'ASSESSMENT_RUNTIME_UNAVAILABLE', '测评内容暂时无法读取，作答会保留，请稍后重试。', 503)

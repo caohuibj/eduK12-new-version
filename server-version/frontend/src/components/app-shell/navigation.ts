@@ -73,6 +73,7 @@ export function activeNavigation(items: NavigationItem[], pathname: string): Nav
 }
 const staffTitles: Array<[string, string]> = [
   ['/admin/training', '培训版管理'],
+  ['/admin/survey-researchers', 'Survey 研究者与工具授权'],
   ['/assessment-workbench', '测评结果工作台'], ['/assessment-templates', '测评模板库'], ['/assessment-management', '对象与操作记录'],
   ['/admin/bundle-authoring', '固定测评包制作与审批'],
   ['/admin/legacy-archive/:kind/:id', '历史记录详情'], ['/admin/legacy-archive', '历史归档（只读）'],
@@ -132,4 +133,10 @@ export function isStaffWorkspacePath(pathname: string): boolean {
     '/general-questionnaires','/composite-assessments','/bundle-products','/cognitive-assignments','/teacher/classrooms','/videos','/images','/documents',
     '/users','/teacher-codes','/admin/training','/admin/legacy-archive','/admin/material-grants','/admin/reporting-content','/admin/instrument-authorizations','/admin/bundle-authoring','/profile','/organizations','/organization-tasks']
     .some(root => pathname === root || pathname.startsWith(`${root}/`))
+}
+
+/** Discovery only; platform governance API remains the authorization boundary. */
+export function surveyGovernanceNavigation(training: boolean, role?: Role, platformRole?: string | null): NavigationItem[] {
+  return training && role === 'ADMIN' && platformRole === 'SYSTEM_ADMIN'
+    ? [{ path: '/admin/survey-researchers', label: 'Survey 研究者与工具授权', section: 'system' }] : []
 }

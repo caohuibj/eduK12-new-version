@@ -1,5 +1,7 @@
+import {rejectPooledVariants} from './analytics.variant'
 import type { SurveySourceProjection, ResearchRawCodebook } from './analytics.source'
 import { pairedDescriptive } from './analytics.cohorts'
+import {canonicalHash} from '../assessment-runtime/canonical'
 export interface ItemSummary {
   columnKey:string
   itemKey:string
@@ -26,6 +28,7 @@ const numeric=(values:number[])=>{
  * Raw free-text values must never leak via descriptive frequency charts.
  */
 export function describeWave(source:SurveySourceProjection,waveId:string){
+  rejectPooledVariants(source)
   if(!source.projectId)throw new Error('Missing scoped research source')
   const dictionary=new Map<string,ResearchRawCodebook>(
     source.codebook.filter(c=>c.waveId===waveId).map(c=>[c.columnKey,c]))
@@ -42,7 +45,7 @@ export function describeWave(source:SurveySourceProjection,waveId:string){
     const frequencies=new Map<string,number>()
     const combinations=new Map<string,number>()
     const possible=new Set(codebook.options.map(o=>o.code))
-    const multi=codebook.responseType==='MULTIPLE'||codebook.responseType==='SJT_MULTIPLE'
+    const multi=['MULTIPLE','MATRIX_MULTIPLE','SJT_MULTIPLE'].includes(codebook.responseType)
     const values:number[]=[]
     for(const row of rows){
       if(row.missingReason){
@@ -62,6 +65,17 @@ export function describeWave(source:SurveySourceProjection,waveId:string){
           for(const item of normalized)frequencies.set(item,(frequencies.get(item)||0)+1)
           const combination=JSON.stringify(normalized)
           combinations.set(combination,(combinations.get(combination)||0)+1)
+        }else if(codebook.responseType==='RANK_ORDER'){
+          let order:unknown
+          try{order=JSON.parse(row.value)}catch{throw new Error('Frozen ranking response is not valid JSON')}
+          if(!Array.isArray(order)||order.length!==possible.size
+            ||order.some(x=>typeof x!=='string'||!possible.has(x))
+            ||new Set(order).size!==order.length)
+            throw new Error('Frozen ranking source contains invalid or duplicate options')
+          order.forEach((value,rank)=>{
+            const key=String(value)+'@rank'+(rank+1)
+            frequencies.set(key,(frequencies.get(key)||0)+1)
+          })
         }else if(possible.has(row.value)){
           frequencies.set(row.value,(frequencies.get(row.value)||0)+1)
         }
@@ -78,23 +92,39 @@ export function describeWave(source:SurveySourceProjection,waveId:string){
     })
   }
   const scoreGroups=new Map<string,number[]>()
+  const versionedGroups=new Map<string,{measurement:typeof source.scores[number]['measurement'];
+    qualityCounts:Record<string,number>;completionCounts:Record<string,number>}>()
   for(const score of source.scores.filter(s=>s.waveId===waveId&&s.missingReason===null&&s.value!==null)){
     const key=[score.measurement.instrumentKey,score.measurement.scoreKey,
-      score.measurement.scoringDigest,score.measurement.responseSignature].join('|')
+      score.measurement.scoringDigest,score.measurement.responseSignature,
+      ...(score.measurement.provenance?[canonicalHash(score.measurement)]:[])].join('|')
     const group=scoreGroups.get(key)||[];group.push(score.value!);scoreGroups.set(key,group)
+    if(score.measurement.provenance){
+      const metadata=versionedGroups.get(key)??{measurement:score.measurement,qualityCounts:{},completionCounts:{}}
+      const quality=score.quality?.status??'NOT_RECORDED',completion=score.completionStatus??'NOT_RECORDED'
+      metadata.qualityCounts[quality]=(metadata.qualityCounts[quality]??0)+1
+      metadata.completionCounts[completion]=(metadata.completionCounts[completion]??0)+1
+      versionedGroups.set(key,metadata)
+    }
   }
   const descriptiveScores=[...scoreGroups].map(([key,values])=>{
     const [instrumentKey,scoreKey,scoringDigest,responseSignature]=key.split('|')
+    const versioned=versionedGroups.get(key)
     return {instrumentKey,scoreKey,scoringDigest,responseSignature,
-      validN:values.length,mean:numeric(values).mean,sampleSd:numeric(values).sd}
+      validN:values.length,mean:numeric(values).mean,sampleSd:numeric(values).sd,
+      ...(versioned?{unit:versioned.measurement.unit,provenance:versioned.measurement.provenance,
+        qualityCounts:versioned.qualityCounts,completionCounts:versioned.completionCounts}:{}),}
   })
   return {projectId:source.projectId,waveId,source:'VERIFIED_ENCRYPTED_SURVEY_FINAL',
     items,descriptiveScores,
+    ...(versionedGroups.size?{completedFinals:source.completeAttempts,
+      fullCompletionAttempts:source.fullCompletionAttempts??null,earlyCompletionAttempts:source.earlyCompletionAttempts??null}:{}),
     note:'自由文本不进入自动频数公开输出；均值/SD 为描述性科研统计，不构成诊断或常模。'}
 }
 export function describePairedScores(source:SurveySourceProjection,input:{
   baselineWaveId:string;followupWaveId:string;instrumentKey:string;scoreKey:string
 }){
+  rejectPooledVariants(source)
   if(source.collectionMode!=='LINKED_WAVES')throw new Error('无法关联匿名研究，不可计算个体配对统计')
   return pairedDescriptive({
     projectId:source.projectId,observations:source.scores,
@@ -111,6 +141,7 @@ export function describeWaveGroups(source:SurveySourceProjection,input:{
   waveId:string;groupInstrumentKey:string;groupItemKey:string;
   scoreInstrumentKey:string;scoreKey:string
 }){
+  rejectPooledVariants(source)
   const {waveId,groupInstrumentKey,groupItemKey,scoreInstrumentKey,scoreKey}=input
   const candidates=source.codebook.filter(c=>c.waveId===waveId&&c.kind==='FORM'
     &&c.instrumentKey===groupInstrumentKey&&c.itemKey===groupItemKey

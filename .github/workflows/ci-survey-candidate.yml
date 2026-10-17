@@ -1,0 +1,90 @@
+name: Survey exact candidate
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+  actions: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+jobs:
+  candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      CI: 'true'
+      PLAN: ${{ inputs.plan }}
+      SURVEY_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+      # Explicit one-run user authorization for synthetic isolated browser trust.
+      # Set only after permission is received; no system or production CA change.
+      SURVEY_CI_EPHEMERAL_CA_APPROVED: 'true'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: recheck frozen full diff and exact PR head tree
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {writeFileSync} from 'node:fs';
+          import {execFileSync} from 'node:child_process';
+          import {surveyCandidatePlan} from './.github/scripts/survey-candidate-scope.mjs';
+          import {changedEntries} from './.github/scripts/content-scope.mjs';
+          const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
+          const p=JSON.parse(process.env.PLAN),head=git('rev-parse','HEAD');
+          assert.equal(p.head,head);
+          assert.deepEqual(p,surveyCandidatePlan(changedEntries(p.base,head),p.base,head));
+          assert.equal(git('rev-parse',process.env.SURVEY_SOURCE_HEAD+'^{tree}'),p.tree,'PR merge tree must equal the reviewed up-to-date head');
+          execFileSync('git',['merge-base','--is-ancestor',p.base,process.env.SURVEY_SOURCE_HEAD]);
+          writeFileSync('survey-candidate-plan.json',JSON.stringify(p,null,2));
+          JS
+      - name: restore fixed candidate images and verified HIGH,CRITICAL scan receipts
+        id: reuse
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: python3 -B .github/scripts/survey-candidate-reuse.py
+      - name: bind unchanged qualified product images for browser-only repair
+        run: python3 -B .github/scripts/survey-candidate.py resume-browser-only
+      - name: prepare disposable browser services with the unchanged restricted runtime
+        run: python3 -B .github/scripts/survey-candidate.py services
+      - name: install official pinned browser tools
+        run: |
+          npm ci --ignore-scripts --prefix .github/release-tools
+          node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
+          sudo apt-get -o APT::Update::Error-Mode=any update
+          sudo apt-get install -y --no-install-recommends libnss3-tools
+      - name: real three-role Chromium and Survey retention smoke
+        run: python3 -B .github/scripts/survey-candidate.py browser
+      - name: remove only this run's isolated resources and private browser material
+        if: always()
+        run: python3 -B .github/scripts/survey-candidate.py cleanup
+      - uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: survey-candidate-${{ github.sha }}
+          path: |
+            survey-candidate-plan.json
+            survey-candidate-evidence/
+          if-no-files-found: error
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: survey-candidate-reports-${{ github.sha }}
+          path: |
+            survey-candidate-plan.json
+            survey-candidate-evidence/
+            !survey-candidate-evidence/*.tar.zst
+            !survey-candidate-evidence/*.tar.zst.sha256
+            !survey-candidate-evidence/**/*.tar.zst
+            !survey-candidate-evidence/**/*.tar.zst.sha256
+          if-no-files-found: error
+          retention-days: 3
