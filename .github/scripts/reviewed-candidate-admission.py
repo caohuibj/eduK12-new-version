@@ -4,6 +4,8 @@ No fallback build/test/scan, multi-run chain, local-test promotion or expiry ren
 The exact source manifest is reviewable data; the transport helpers are existing CI code.
 """
 import argparse
+import ast
+import gzip
 import hashlib
 import importlib.util
 import json
@@ -135,10 +137,11 @@ def source_scope():
     run(['git', 'merge-base', '--is-ancestor', M['base'], pr['head']['sha']], 30)
     plan = json.loads((ROOT / 'reviewed-candidate-plan.json').read_text())
     require(plan['base'] == M['base'] and plan['head'] == head and plan['route'] == 'reviewed-candidate', 'Plan checkout mismatch')
-    for component, tree in M['components'].items():
+    for component, tree in plan['components'].items():
         require(git('rev-parse', head + ':server-version/' + component) == tree, 'Product input changed')
     for file, binding in M['files'].items():
-        require(git('rev-parse', head + ':' + file) == binding['after'], 'Original candidate blob changed: ' + file)
+        expected = M.get('frontendPatch', {}).get('files', {}).get(file, binding)['after']
+        require(git('rev-parse', head + ':' + file) == expected, 'Reviewed candidate blob changed: ' + file)
     for file, blob in M['unchangedConsumers'].items():
         require(git('rev-parse', head + ':' + file) == blob, 'Supporting consumer changed: ' + file)
     # Independently recompute the actual full diff using the same fail-closed plan.
@@ -196,7 +199,8 @@ def admit():
                'originalArtifactCreatedAt': {str(a['id']): a['createdAt'] for a in expected.values()},
                'artifactDigests': {str(a['id']): a['digest'] for a in expected.values()},
                'components': M['components'], 'images': M['images'],
-               'claim': 'Original official checks accepted for identical inputs; local test counts remain review evidence; missing UI and race checks execute separately.'}
+               'originalFrontendProofIsBaselineOnly': bool(M.get('frontendPatch')),
+               'claim': 'Original backend and unchanged dependency evidence accepted; original frontend runtime is baseline only after the exact readability patch. New frontend assembly, scan and UI execute in this run. Local test counts remain local review evidence.'}
     write('official-admission.json', receipt)
     return reports
 
@@ -269,7 +273,7 @@ def container(env, image, command=(), mounts=(), user=False):
     return args + [image, *command]
 
 
-def probe(action, reports, record):
+def original_probe(action, reports, record):
     owned = []
     names = ['reviewed-candidate-frontend'] if action == 'browser' else ['survey-ci-postgres', 'reviewed-candidate-redis', 'reviewed-candidate-api']
     for name in names:
@@ -381,9 +385,259 @@ def wait_api():
     raise RuntimeError('Candidate API readiness exceeded 60 seconds')
 
 
+def bound_function_hashes(source):
+    result = {}
+    nodes = ast.parse(source).body
+    has_original = any(isinstance(n, ast.FunctionDef) and n.name == 'original_probe' for n in nodes)
+    for node in nodes:
+        if isinstance(node, ast.FunctionDef):
+            if has_original and node.name == 'probe':
+                continue
+            name = 'probe' if node.name == 'original_probe' else node.name
+            if name in ['probe', 'runtime_environment', 'wait_services', 'wait_api', 'container']:
+                node.name = 'bound_function'
+                result[name] = sha(ast.dump(node, include_attributes=False).encode())
+    return result
+
+
+def validate_race_job(job, receipt):
+    for key, value in {'id': receipt['job']['id'], 'name': receipt['job']['name'], 'run_id': receipt['run'],
+                       'head_sha': receipt['head'], 'status': 'completed', 'conclusion': 'success',
+                       'completed_at': receipt['job']['completedAt']}.items():
+        require(job.get(key) == value, 'Prior race job mismatch: ' + key)
+    require(transport.recent(job['completed_at']), 'Prior race expired')
+
+
+def accept_race(record):
+    receipt = M['raceReceipt']
+    actual = transport.api('/actions/runs/' + str(receipt['run']))
+    for key, value in {'id': receipt['run'], 'head_sha': receipt['head'], 'head_branch': receipt['branch'],
+                       'event': receipt['event'], 'path': receipt['workflow'], 'run_attempt': receipt['attempt'],
+                       'status': 'completed', 'conclusion': 'failure'}.items():
+        require(actual.get(key) == value, 'Prior race run mismatch: ' + key)
+    require(actual['repository']['full_name'] == M['repository'] and actual['head_repository']['full_name'] == M['repository'], 'Prior race fork/repository mismatch')
+    job = transport.api('/actions/jobs/' + str(receipt['job']['id']))
+    validate_race_job(job, receipt)
+    require(git('rev-parse', receipt['head'] + '^{tree}') == receipt['tree'], 'Prior PR tree changed')
+    run(['git', 'merge-base', '--is-ancestor', receipt['head'], os.environ['CANDIDATE_HEAD_SHA']], 30)
+    require(git('rev-parse', 'HEAD:server-version/backend') == receipt['backendTree'] == M['components']['backend'], 'Race backend inputs changed')
+    script = '.github/scripts/reviewed-candidate-scale-race.cjs'
+    require(git('rev-parse', 'HEAD:' + script) == git('rev-parse', receipt['head'] + ':' + script) == receipt['scriptBlob'], 'Race script changed')
+    adapter = '.github/scripts/reviewed-candidate-admission.py'
+    require(git('rev-parse', receipt['head'] + ':' + adapter) == receipt['originalAdapterBlob'], 'Original race adapter changed')
+    old = git('show', receipt['head'] + ':' + adapter)
+    require(bound_function_hashes(old) == bound_function_hashes((ROOT / adapter).read_text()) == receipt['functionHashes'], 'Race runtime setup/cleanup changed')
+    expected = receipt['artifact']
+    artifact = transport.api('/actions/artifacts/' + str(expected['id']))
+    validate_artifact(artifact, expected, {**M, 'source': {'run': receipt['run'], 'head': receipt['head']}})
+    directory = download(expected, receipt['reportDigests'])
+    values = {}
+    for name, digest in receipt['reportDigests'].items():
+        raw = (directory / name).read_bytes(); require(sha(raw) == digest, 'Prior race report bytes changed')
+        values[name] = json.loads(raw)
+    value, verification = values['scale-race.json'], values['race-verification.json']
+    require(value['status'] == verification['status'] == 'success' and verification['isolatedResourcesRemoved'] is True, 'Prior race failed/unclean')
+    require(value['currentHead'] == verification['currentHead'] == receipt['head'], 'Race PR origin mismatch')
+    require(value['sourceSha'] == verification['sourceSha'] == M['source']['head'] and value['imageId'] == M['images']['backend-runtime'], 'Race image/source changed')
+    require(len(value['checks']) == 113 and all(c['pass'] is True for c in value['checks']), 'Race assertions incomplete')
+    require(len(value['requests']) == 6 and len(value['postconditions']) == 5, 'Race coverage incomplete')
+    require(all(p['status'] == 'success' for p in verification['phases']), 'Race phase failed')
+    write('accepted-race.json', {'status': 'success', 'currentHead': os.environ['CANDIDATE_HEAD_SHA'],
+        'sourceRun': receipt['run'], 'sourceHead': receipt['head'], 'sourceJob': job['id'],
+        'originalCompletedAt': job['completed_at'], 'artifact': expected, 'reportDigests': receipt['reportDigests'],
+        'assertions': 113, 'httpRequests': 6, 'postconditions': 5,
+        'claim': 'Prior independently successful official race job accepted unchanged. No PostgreSQL service or race check executed in this job.'})
+    record['execution'] = 'official-receipt-only; zero PostgreSQL services/checks rerun'
+
+
+def run_frontend_check(image, command, label, timeout, mounts=(), env=()):
+    name = 'reviewed-check-' + os.environ['GITHUB_RUN_ID'] + '-' + os.environ['GITHUB_RUN_ATTEMPT'] + '-' + label
+    owner = name
+    require(subprocess.run(['docker','inspect',name],capture_output=True).returncode != 0, 'Frontend check container already exists')
+    identity = None
+    try:
+        args = ['docker','create','--network','none','--name',name,'--label','reviewed-candidate-owner=' + owner]
+        for source, target in mounts: args += ['-v',str(source) + ':' + target]
+        for key, value in env: args += ['-e',key + '=' + value]
+        identity = output(args + [image, *command], 30)
+        require(re.fullmatch('[a-f0-9]{64}', identity), 'Invalid frontend check container ID')
+        run(['docker','start','-a',identity], timeout)
+        require(output(['docker','inspect','--format','{{.State.ExitCode}}',identity]) == '0', 'Frontend check exited nonzero')
+    finally:
+        if identity is None:
+            found = subprocess.run(['docker','inspect',name],capture_output=True,text=True)
+            if found.returncode == 0:
+                value = json.loads(found.stdout)[0]
+                if value.get('Config',{}).get('Labels',{}).get('reviewed-candidate-owner') == owner: identity = value['Id']
+        if identity:
+            require(subprocess.run(['docker','rm','-f','-v',identity],capture_output=True).returncode == 0, 'Frontend check container cleanup failed')
+
+
+def build_frontend(reports, record):
+    helper = module('candidate_image_utilities', '.github/scripts/shared-assessment-foundation-ci.py')
+    head = os.environ['CANDIDATE_HEAD_SHA']
+    context = ROOT / 'server-version/frontend'
+    bases = reports['frontend-builder.json']['bases']
+    recipe = (context / 'Dockerfile').read_text()
+    for tag, digest in bases.items():
+        require('@sha256:' in digest, 'Unpinned original frontend base')
+        recipe = recipe.replace('FROM ' + tag + ' AS ', 'FROM ' + digest + ' AS ')
+        phase(record, 'fetch-base-' + tag.split(':')[0], lambda image=digest: run(['docker', 'pull', image], 300))
+    effective = PRIVATE / 'frontend.Dockerfile'; effective.write_text(recipe)
+    prefix = 'reviewed-current-frontend:' + head
+    common = ['docker', 'buildx', 'build', '--builder', 'default', '--load', '-f', str(effective),
+              '--label', 'org.opencontainers.image.revision=' + head,
+              '--build-arg', 'NPM_REGISTRY=https://registry.npmjs.org', '--build-arg', 'VITE_COGNITIVE_MODULE_ENABLED=true']
+    phase(record, 'changed-frontend-build-once', lambda: run(common + ['--target', 'build', '-t', prefix + '-builder', str(context)], 1200))
+    builder = output(['docker', 'image', 'inspect', '--format', '{{.Id}}', prefix + '-builder'])
+    static = PRIVATE / 'new-builder-static'; static.mkdir()
+    helper.copy_files(builder, '/app/dist', static)
+    files = helper.files_manifest(static)
+    marker = 'FROM ' + bases['nginx:1.31.6-alpine3.24-slim'] + ' AS runtime'
+    require(recipe.count(marker) == 1, 'Runtime stage ambiguous')
+    runtime_recipe = PRIVATE / 'frontend-runtime.Dockerfile'
+    runtime_recipe.write_text('FROM ' + prefix + '-builder AS build\n' + recipe[recipe.index(marker):])
+    phase(record, 'package-exact-new-builder', lambda: run(['docker', 'buildx', 'build', '--builder', 'default', '--load',
+        '-f', str(runtime_recipe), '--label', 'org.opencontainers.image.revision=' + head,
+        '--target', 'runtime', '-t', prefix, str(context)], 300))
+    image = output(['docker', 'image', 'inspect', '--format', '{{.Id}}', prefix])
+    actual_path = PRIVATE / 'new-runtime-static'; actual_path.mkdir()
+    helper.copy_files(image, '/usr/share/nginx/html', actual_path)
+    actual = helper.files_manifest(actual_path)
+    require(actual == {**reports['frontend-builder.json']['baseStaticFiles'], **files}, 'Current runtime differs from exact builder plus unchanged pinned nginx stock')
+    archive = E / 'frontend-runtime.tar.zst'
+    producer = subprocess.Popen(['docker', 'save', image], stdout=subprocess.PIPE)
+    try:
+        with archive.open('wb') as sink:
+            run(['zstd', '-T2', '-3', '-c'], 300, stdin=producer.stdout, stdout=sink)
+        require(producer.wait(timeout=30) == 0, 'Current runtime save failed')
+    finally:
+        producer.stdout.close()
+        if producer.poll() is None: producer.kill(); producer.wait()
+    js = list(static.rglob('*.js'))
+    receipt = {'schema': 1, 'status': 'success', 'stage': 'runtime-assembly', 'head': head,
+        'checkoutSha': git('rev-parse', 'HEAD'), 'run': os.environ['GITHUB_RUN_ID'], 'attempt': os.environ['GITHUB_RUN_ATTEMPT'],
+        'componentTree': M['frontendPatch']['afterTree'], 'builderImage': builder, 'imageId': image, 'bases': bases,
+        'effectiveDockerfileSha256': sha(effective.read_bytes()), 'runtimeDockerfileSha256': sha(runtime_recipe.read_bytes()),
+        'archive': {'sha256': file_sha(archive), 'bytes': archive.stat().st_size}, 'staticFiles': files,
+        'builderStaticFileCount': len(files), 'runtimeStaticFileCount': len(actual),
+        'staticBytes': sum(p.stat().st_size for p in static.rglob('*') if p.is_file()),
+        'jsBytes': sum(p.stat().st_size for p in js), 'jsGzipBytes': sum(len(gzip.compress(p.read_bytes(), mtime=0)) for p in js),
+        'buildFlags': reports['frontend-builder.json']['buildFlags'],
+        'claim': 'Only the exact component-scoped contrast patch changes product inputs. Assembly receipt is separate from scan result.'}
+    entry_scripts = re.findall(r'<script[^>]+src=[\"\']([^\"\']+)[\"\']', (static / 'index.html').read_text())
+    require(entry_scripts and all(name.startswith('/assets/') and '..' not in name for name in entry_scripts), 'Missing or unexpected built entry scripts')
+    before_files = reports['frontend-builder.json']['staticFiles']
+    receipt['entryComparison'] = {'indexHtmlBefore': before_files['index.html'], 'indexHtmlAfter': files['index.html'],
+        'entryScripts': [{'path': name, 'before': before_files.get(name.lstrip('/')), 'after': files[name.lstrip('/')]} for name in entry_scripts]}
+    receipt['entryChanged'] = receipt['entryComparison']['indexHtmlBefore'] != receipt['entryComparison']['indexHtmlAfter'] or any(item['before'] != item['after'] for item in receipt['entryComparison']['entryScripts'])
+    write('frontend-runtime.json', receipt)
+    record['runtimeAssembly'] = {'imageId': image, 'archiveSha256': receipt['archive']['sha256']}
+    phase(record, 'changed-scale-scoped-lint', lambda: run_frontend_check(builder, ['npx','eslint','src/pages/ScaleEdit.tsx'], 'lint', 180))
+    phase(record, 'changed-frontend-app-types', lambda: run_frontend_check(builder, ['npx','tsc','-p','tsconfig.app.json','--noEmit'], 'types', 300, env=[('NODE_OPTIONS','--max-old-space-size=4096')]))
+    phase(record, 'affected-scale-component-contracts', lambda: run_frontend_check(builder,
+        ['npx','vitest','run','--maxWorkers=2','src/pages/__tests__/ScaleEdit.readonly.test.tsx','--reporter=json','--outputFile=/evidence/scale-component-tests.json'], 'components', 180, mounts=[(E,'/evidence')]))
+    # Save the successful assembly before the scan, so a scan failure never
+    # destroys the immutable bytes or mislabels it as a failed build.
+    phase(record, 'new-runtime-high-critical-scan', lambda: run(['trivy', 'image', '--exit-code', '1', '--ignore-unfixed',
+        '--scanners', 'vuln', '--severity', 'HIGH,CRITICAL', '--format', 'json', '--output', str(E / 'frontend-scan.json'), image], 600))
+    write('frontend-byte-comparison.json', {'oldSource': M['source']['head'], 'newHead': head,
+        'before': {k: reports['frontend-builder.json'][k] for k in ['staticBytes','jsBytes','jsGzipBytes']},
+        'after': {k: receipt[k] for k in ['staticBytes','jsBytes','jsGzipBytes']},
+        'claim': 'Measured artifact size delta for readability correction, not runtime speed or memory improvement.'})
+
+
+def current_frontend_image():
+    artifact_id = os.environ['CURRENT_FRONTEND_ARTIFACT_ID']
+    require(artifact_id.isdigit() and int(artifact_id) > 0, 'Missing official current artifact ID')
+    artifact = transport.api('/actions/artifacts/' + artifact_id)
+    digest = os.environ['CURRENT_FRONTEND_ARTIFACT_DIGEST'].removeprefix('sha256:')
+    require(re.fullmatch('[0-9a-f]{64}', digest) and artifact['digest'] == 'sha256:' + digest, 'Current official artifact digest mismatch')
+    require(artifact['id'] == int(artifact_id) and not artifact['expired'] and transport.recent(artifact['created_at']), 'Current artifact missing/expired')
+    require(artifact['workflow_run']['id'] == int(os.environ['GITHUB_RUN_ID']) and artifact['workflow_run']['head_sha'] == os.environ['CANDIDATE_HEAD_SHA'], 'Current artifact source mismatch')
+    expected = {'id': artifact['id'], 'name': artifact['name'], 'size': artifact['size_in_bytes'], 'digest': artifact['digest'], 'createdAt': artifact['created_at']}
+    directory = download(expected, ['frontend-runtime.json', 'frontend-runtime.tar.zst'])
+    receipt = json.loads((directory / 'frontend-runtime.json').read_text())
+    write('frontend-runtime.json', receipt)
+    require(artifact['name'] == 'reviewed-current-frontend-' + receipt['run'] + '-' + receipt['head'] + '-attempt-' + receipt['attempt'], 'Current artifact name mismatch')
+    require(artifact['workflow_run']['id'] == int(os.environ['GITHUB_RUN_ID']) and artifact['workflow_run']['head_sha'] == receipt['head'], 'Current artifact source mismatch')
+    jobs = transport.api('/actions/runs/' + os.environ['GITHUB_RUN_ID'] + '/jobs?filter=all&per_page=100')
+    require(jobs['total_count'] == len(jobs['jobs']), 'Truncated current jobs')
+    producer = [j for j in jobs['jobs'] if j['name'] == 'reviewed-candidate / changed frontend / build scan and package' and j['run_attempt'] == int(receipt['attempt'])]
+    require(len(producer) == 1 and producer[0]['status'] == 'completed' and producer[0]['conclusion'] == 'success' and producer[0]['head_sha'] == receipt['head'], 'Current frontend producer not successful')
+    require(receipt['status'] == 'success' and receipt['stage'] == 'runtime-assembly', 'New frontend assembly failed')
+    require(receipt['head'] == os.environ['CANDIDATE_HEAD_SHA'] and receipt['run'] == os.environ['GITHUB_RUN_ID'], 'New frontend artifact not from same PR/run')
+    require(receipt['componentTree'] == M['frontendPatch']['afterTree'] == git('rev-parse', 'HEAD:server-version/frontend'), 'New frontend inputs changed')
+    archive = directory / 'frontend-runtime.tar.zst'
+    require(archive.stat().st_size == receipt['archive']['bytes'] and file_sha(archive) == receipt['archive']['sha256'], 'New frontend archive changed')
+    producer = subprocess.Popen(['zstd', '-dc', str(archive)], stdout=subprocess.PIPE)
+    try:
+        run(['docker', 'load'], 300, stdin=producer.stdout)
+        require(producer.wait(timeout=30) == 0, 'New frontend decompression failed')
+    finally:
+        producer.stdout.close()
+        if producer.poll() is None: producer.kill(); producer.wait()
+    image = receipt['imageId']
+    detail = json.loads(output(['docker', 'image', 'inspect', image]))[0]
+    require(detail['Id'] == image and detail['Config']['Labels']['org.opencontainers.image.revision'] == receipt['head'], 'New frontend image ID/revision changed')
+    archive.unlink()
+    return image
+
+
+def browser_frontend(reports, record):
+    old = load_image('frontend-runtime', reports)
+    current = current_frontend_image()
+    # No unimplemented partial-job receipt may silently substitute for two UI contexts.
+    # If the actual entry is unchanged, stop for explicit prior-context admission instead.
+    require(json.loads((E / 'frontend-runtime.json').read_text())['entryChanged'] is True,
+            'Entry bytes unchanged: prior two-context admission is not implemented; stop rather than repeat or silently skip')
+    owned = []
+    try:
+        for mode, image, source in [('baseline', old, M['source']['head']), ('current', current, os.environ['CANDIDATE_HEAD_SHA'])]:
+            name = 'reviewed-candidate-frontend-' + mode
+            require(subprocess.run(['docker', 'inspect', name], capture_output=True).returncode != 0, 'Frontend probe container already exists')
+            label = os.environ['GITHUB_RUN_ID'] + '-' + os.environ['GITHUB_RUN_ATTEMPT'] + '-' + mode
+            try:
+                identity = output(['docker', 'run', '-d', '--label', 'reviewed-candidate-owner=' + label, '--name', name, '-p', '127.0.0.1:3189:80', image], 120)
+                require(re.fullmatch('[a-f0-9]{64}', identity), 'Invalid frontend container ID')
+                owned.append(identity)
+            except BaseException:
+                found = subprocess.run(['docker','inspect',name],capture_output=True,text=True)
+                if found.returncode == 0:
+                    value = json.loads(found.stdout)[0]
+                    if value.get('Config',{}).get('Labels',{}).get('reviewed-candidate-owner') == label: owned.append(value['Id'])
+                raise
+            for _ in range(30):
+                try:
+                    with urllib.request.urlopen('http://127.0.0.1:3189/', timeout=2) as response:
+                        if response.status == 200: break
+                except Exception: pass
+                time.sleep(1)
+            else: raise RuntimeError('Frontend readiness exceeded 30 seconds')
+            entry_changed = json.loads((E / 'frontend-runtime.json').read_text())['entryChanged']
+            require(isinstance(entry_changed, bool), 'Missing measured entry comparison')
+            env = {**os.environ, 'CANDIDATE_SOURCE_SHA': source, 'CANDIDATE_IMAGE_ID': image, 'CANDIDATE_ORIGIN_PORT': '3189', 'CANDIDATE_ENTRY_CHANGED': str(entry_changed).lower()}
+            command = ['node', '.github/scripts/reviewed-candidate-browser.mjs'] + (['--contrast-baseline'] if mode == 'baseline' else [])
+            phase(record, mode + '-frontend-browser', lambda: run(command, 240, env=env))
+            run(['docker', 'rm', '-f', '-v', identity], 30); owned.remove(identity)
+        value = json.loads((E / 'browser.json').read_text())
+        require(value['status'] == 'success' and value['sourceSha'] == os.environ['CANDIDATE_HEAD_SHA']
+                and value['currentHead'] == os.environ['CANDIDATE_HEAD_SHA'] and value['imageId'] == current, 'Current browser source/status mismatch')
+    finally:
+        failures = [identity for identity in reversed(owned) if subprocess.run(['docker','rm','-f','-v',identity],capture_output=True).returncode != 0]
+        record['isolatedResourcesRemoved'] = not failures; write(record['report'], record)
+        require(not failures, 'Current frontend cleanup failed')
+
+
+def probe(action, reports, record):
+    if action == 'race': return accept_race(record)
+    if action == 'frontend': return build_frontend(reports, record)
+    return browser_frontend(reports, record)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=['browser', 'race'])
+    parser.add_argument('action', choices=['frontend', 'browser', 'race'])
     action = parser.parse_args().action
     require(not PRIVATE.exists(), 'Refuse stale private state')
     PRIVATE.mkdir(mode=0o700); E.mkdir(exist_ok=True)
@@ -392,7 +646,7 @@ if __name__ == '__main__':
     try:
         reports = {}
         phase(record, 'admit-original-official-evidence', lambda: reports.update(admit()))
-        phase(record, 'missing-runtime-check', lambda: probe(action, reports, record))
+        phase(record, 'accept-prior-successful-race' if action == 'race' else 'changed-frontend-' + action, lambda: probe(action, reports, record))
         record['status'] = 'success'
     except BaseException:
         record['status'] = 'failure'

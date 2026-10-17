@@ -597,5 +597,69 @@
       "frontend-builder.json": "ffbd5e28f2b9091b4ca05ef645d3468a6b7270752503ed5b0945bdb892a0aa8d",
       "scope.json": "82006787eb0a979b7131ab55d32f6d2eb955db25220685cb831e4288cb97f549"
     }
+  },
+  "raceReceipt": {
+    "run": 39054194991,
+    "head": "b54ee2745e2551e898aee9d8632682ae4c9a6d26",
+    "tree": "2610c7e1a779f927533b455f6d6d9411c93bd1ba",
+    "mergeHead": "49195bf6e49b000801386b842455a36a76d91393",
+    "workflow": ".github/workflows/ci.yml",
+    "event": "pull_request",
+    "branch": "fix/shared-assessment-foundation-merge-20261017",
+    "attempt": 1,
+    "pr": 310,
+    "base": "0c41f07cb8c6104ad7c88448d948682baf24cf37",
+    "job": {
+      "id": 117458745733,
+      "name": "reviewed-candidate / admitted runtime / race",
+      "completedAt": "2026-10-17T17:33:47Z"
+    },
+    "artifact": {
+      "id": 12109046588,
+      "name": "reviewed-candidate-39054194991-b54ee2745e2551e898aee9d8632682ae4c9a6d26-race-attempt-1",
+      "size": 6353,
+      "digest": "sha256:9fdeeee5c882c9ff76d0d3577c3bc0d1dbc959c7c61bef253c5802dd21349ec6",
+      "createdAt": "2026-10-17T17:33:45Z"
+    },
+    "reportDigests": {
+      "official-admission.json": "153a84dd9b16ce2df83be8ea50530c8a5eaa3c179420161871e42b0b1999f163",
+      "race-verification.json": "a63723e2c82ed3c18f0b14081e6151763287676142795cd52147bf26f4187afb",
+      "recovery-bootstrap.json": "e5218ca2b73a9072fd0f69da506ca42afba9541b959a5dbf2949689868a91936",
+      "scale-race.json": "40988ca4695560ba092798760bdf55712cd2336756a4ce60d9f7e06cb6e4d7d0"
+    },
+    "scriptBlob": "d5357d57198919273c6b78c47663cc17a49ecd55",
+    "originalAdapterBlob": "dcb4930e7149b834932025577b3b3215cbba6cb1",
+    "functionHashes": {
+      "container": "b6dffbc9fa1b3a3eedd1aa8e0450b8c7975e75fa2b60df67046449c3f2e94bbb",
+      "probe": "ffae8259d4af590901632ded3d0378086fe5a42b3e75afd8d82f0cf56d38a393",
+      "runtime_environment": "825f41d6b408ad7f354f1b578b93a985ac92aaa9e959956c874e21907d86edf6",
+      "wait_services": "7454b353de7708d4587e88337493ad1576a376e7d313729ea60b100bdc4dbbda",
+      "wait_api": "a3445be99a210aa21fd25152c0db6c8881cb677827dadf36ab5360fb2aedbe62"
+    },
+    "backendTree": "cc7dbffeae5f847aec3b853b6b8138b3b04ce390",
+    "backendImages": {
+      "backend-builder": "sha256:5712dc25b5376079960db0fcfee59cf1275001e6a0be1c958dd932f214c117f1",
+      "backend-runtime": "sha256:844fa51e7d09e8155af9b43c61cd3e8f796e51ef9b5a2b0c16a0feff5a55598c"
+    }
+  },
+  "frontendPatch": {
+    "beforeTree": "485b4d1a5e15df2f72e277a25828cd4ae0738421",
+    "afterTree": "a16e227fce4a9154ccad9a83700db1dba8df428c",
+    "files": {
+      "server-version/frontend/src/pages/ScaleEdit.tsx": {
+        "before": "583c857bebe681bca7ee54ba8cd6d83b9c7e5020",
+        "after": "eefb412bdbf4528ae71cf0e36ef4bd0d47d26a52",
+        "status": "M",
+        "oldMode": "100644",
+        "newMode": "100644"
+      },
+      "server-version/frontend/src/pages/ScaleEdit.css": {
+        "before": null,
+        "after": "ceae6baf3497c464f9e03ac9b0587bde6f9f84dc",
+        "status": "A",
+        "oldMode": "000000",
+        "newMode": "100644"
+      }
+    }
   }
 }

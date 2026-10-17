@@ -1,0 +1,4 @@
+/* Keep the shared selected, focus and disabled styles; only inactive Scale tabs differ. */
+.hui-training.hui-app--standard.training-workspace-shell .scale-edit-tabs button[aria-pressed="false"] {
+  color: #53675d;
+}

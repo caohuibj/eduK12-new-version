@@ -1,8 +1,9 @@
 /**
- * Missing UI evidence only, against the already-built immutable frontend.
+ * Missing UI evidence only, against the caller-verified immutable frontend.
  * The caller verifies/loads the image and runs its unchanged nginx on loopback.
  * Explicit synthetic DTOs establish UI behavior, never real API authorization.
- * Run only in GitHub Actions. --check-fixtures is a browser-free fixture check.
+ * Run only in GitHub Actions. --contrast-baseline observes only the original
+ * Scale draft defect; --check-fixtures is a browser-free fixture check.
  */
 import assert from 'node:assert/strict'
 import { execFileSync } from 'node:child_process'
@@ -12,11 +13,13 @@ import { fileURLToPath } from 'node:url'
 
 const SOURCE = '1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c'
 const IMAGE = 'sha256:29abe75a707f8c88a523fcbd762f0efb6e7568ec0e0c90100d501c2ae5e28312'
+const BASELINE = process.argv.includes('--contrast-baseline')
 const OUTPUT = 'reviewed-candidate-evidence'
 const TIMEOUT = 10_000
 const BUDGET = 120_000
 const HOSTS = ['training.eduk12.top', 'survey.eduk12.top', 'teacher.eduk12.top']
 const WIDTHS = [390, 1440]
+const SCALE_TABS = '[role="group"][aria-label="量表编辑分区"]'
 const DATE = '2026-10-17T00:00:00Z'
 const COURSE_ID = 'review-course'
 const PROJECT_ID = '11111111-1111-4111-8111-111111111111'
@@ -73,19 +76,24 @@ async function run() {
   const report = {
     status: 'running', sourceSha: process.env.CANDIDATE_SOURCE_SHA || null,
     currentHead: process.env.CANDIDATE_HEAD_SHA || null, imageId: process.env.CANDIDATE_IMAGE_ID || null,
+    mode: BASELINE ? 'original-contrast-baseline' : 'current-frontend-browser',
     scriptSha256: createHash('sha256').update(readFileSync(fileURLToPath(import.meta.url))).digest('hex'),
     authority: 'UI-only explicit synthetic DTOs. Real authentication/authorization and runtime evidence remain the prior official backend checks.',
     transport: 'Canonical production hosts mapped to isolated HTTP loopback; unchanged runtime nginx; no TLS/certificate/security-context overrides.',
     exclusions: ['Survey participant recovery and FINAL require HTTPS crypto.randomUUID and are not exercised here.', 'No product lifecycle, real authentication, backend permission, browser matrix, application rebuild, or deployment check is repeated.'],
-    checks: [], records: [], unexpected: [], screenshots: [],
+    checks: [], records: [], unexpected: [], screenshots: [], visualFailures: [], scaleColors: [],
   }
   let browser, active, axe, timer
-  const write = () => writeFileSync(`${OUTPUT}/browser.json`, JSON.stringify(report, null, 2) + '\n')
+  const reportFile = BASELINE ? 'contrast-baseline.json' : 'browser.json'
+  const write = () => writeFileSync(`${OUTPUT}/${reportFile}`, JSON.stringify(report, null, 2) + '\n')
   const clean = value => String(value).replace(/https?:\/\/[^\s"')]+/g, raw => {
     try { const u = new URL(raw); return `${u.origin}${u.pathname}` } catch { return '[URL]' }
   }).replace(/(?:token|credential|authorization)[=:]\s*[^\s,;]+/gi, '[redacted]').slice(0, 1200)
   const check = (name, detail = {}) => report.checks.push({ scenario: active?.record.scenario, width: active?.record.width, name, status: 'passed', ...detail })
-  const unexpected = (kind, detail) => report.unexpected.push({ scenario: active?.record.scenario, width: active?.record.width, kind, ...detail })
+  const unexpected = (kind, detail) => {
+    report.unexpected.push({ scenario: active?.record.scenario, width: active?.record.width, kind, ...detail })
+    active?.rejectFatal(new Error(`Unexpected ${kind}; stop before further scenarios`))
+  }
   const port = Number(process.env.CANDIDATE_ORIGIN_PORT)
   const origin = product => `http://${product}.eduk12.top:${port}`
   const envelope = (data, status = 200) => ({ status, contentType: 'application/json', body: JSON.stringify({ code: status === 200 ? 0 : status, message: status === 200 ? 'ok' : 'Synthetic denied detail', data }) })
@@ -121,9 +129,13 @@ async function run() {
     page.setDefaultNavigationTimeout(TIMEOUT)
     const record = { scenario: name, width, status: 'running', calls: [], screenshots: [], pageErrors: [] }
     report.records.push(record)
-    active = { ctx, page, record }
+    let rejectFatal
+    const fatal = new Promise((_, reject) => { rejectFatal = reject })
+    // Attach immediately: a route failure during setup must not become an unhandled rejection.
+    void fatal.catch(() => {})
+    active = { ctx, page, record, rejectFatal }
     const base = origin(product)
-    page.on('pageerror', error => record.pageErrors.push(clean(error.message)))
+    page.on('pageerror', error => { record.pageErrors.push(clean(error.message)); rejectFatal(new Error(`${name}: browser runtime error`)) })
     page.on('dialog', dialog => { unexpected('unexpected-dialog', { type: dialog.type() }); void dialog.dismiss() })
     page.on('response', response => {
       const u = new URL(response.url())
@@ -156,10 +168,12 @@ async function run() {
     })
     await ctx.routeWebSocket('**/*', socket => { unexpected('websocket-blocked', { origin: new URL(socket.url()).origin }); socket.close() })
     try {
-      await work({ page, ctx, record, base })
+      await Promise.race([work({ page, ctx, record, base }), fatal])
       assert.deepEqual(record.pageErrors, [], `${name}: browser runtime errors`)
       assert.equal(report.unexpected.length, 0, `${name}: unexpected network/resource/fixture error`)
-      record.status = 'passed'
+      record.functionalStatus = 'passed'
+      record.visualStatus = report.visualFailures.some(failure => failure.scenario === name && failure.width === width) ? (BASELINE ? 'baseline-observation' : 'failed') : 'passed'
+      record.status = record.visualStatus === 'failed' ? 'failed' : 'passed'
       write()
       await ctx.close()
       active = null
@@ -167,18 +181,156 @@ async function run() {
   }
   async function visual(page, name, scope) {
     await page.evaluate(() => document.fonts.ready)
-    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false, 'document horizontal overflow')
+    const overflow = await page.evaluate(() => ({ scrollWidth: document.documentElement.scrollWidth, viewportWidth: innerWidth }))
     if (scope) await page.locator(scope).scrollIntoViewIfNeeded()
     if (!await page.evaluate(() => typeof window.axe !== 'undefined')) await page.addScriptTag({ url: new URL('/reviewed-candidate-axe.js', page.url()).href })
-    const violations = await page.evaluate(async selector => {
-      const results = await window.axe.run(selector ? document.querySelector(selector) : document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } })
-      return results.violations.map(v => ({ id: v.id, impact: v.impact, targets: v.nodes.map(n => n.target) }))
+    const audit = await page.evaluate(async selector => {
+      const root = selector ? document.querySelector(selector) : document
+      if (!root) throw new Error('Audit scope is missing')
+      const results = await window.axe.run(root, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } })
+      const computed = target => {
+        if (target.length !== 1 || typeof target[0] !== 'string') return null
+        const element = document.querySelector(target[0])
+        if (!element) return null
+        const style = getComputedStyle(element)
+        const backgrounds = []
+        for (let node = element; node; node = node.parentElement) {
+          const current = getComputedStyle(node)
+          backgrounds.push({ tag: node.tagName, className: node.className, backgroundColor: current.backgroundColor, opacity: current.opacity })
+        }
+        return { color: style.color, backgroundColor: style.backgroundColor, fontSize: style.fontSize, fontWeight: style.fontWeight, opacity: style.opacity, backgrounds }
+      }
+      // Preserve raw axe check data (including fg/bg colors, contrastRatio and
+      // expectedContrastRatio), rather than losing diagnosis in target-only output.
+      return {
+        engine: results.testEngine,
+        violations: results.violations,
+        colorContrast: {
+          passes: results.passes.filter(result => result.id === 'color-contrast'),
+          incomplete: results.incomplete.filter(result => result.id === 'color-contrast'),
+        },
+        computedViolations: results.violations.flatMap(result => result.nodes.map(node => ({ rule: result.id, target: node.target, computed: computed(node.target) }))),
+      }
     }, scope)
-    report.checks.push({ scenario: active.record.scenario, width: active.record.width, name: 'responsive and targeted WCAG audit', view: name, status: violations.length ? 'failed' : 'passed', violations })
-    assert.deepEqual(violations, [], `${name}: WCAG violations`)
+    const violations = audit.violations.map(v => ({ id: v.id, impact: v.impact, targets: v.nodes.map(n => n.target) }))
+    const failed = violations.length > 0 || overflow.scrollWidth > overflow.viewportWidth + 1
+    const result = { scenario: active.record.scenario, width: active.record.width, name: 'responsive and targeted WCAG audit', view: name, status: failed ? 'failed' : 'passed', overflow, violations, axe: audit }
+    report.checks.push(result)
+    if (failed) report.visualFailures.push({ scenario: active.record.scenario, width: active.record.width, view: name, violations, overflow })
     const file = `screenshots/${name}-${active.record.width}.png`
     await page.screenshot({ path: `${OUTPUT}/${file}`, fullPage: false, timeout: TIMEOUT })
     report.screenshots.push(file); active.record.screenshots.push(file)
+    write()
+    return result
+  }
+  function styleCheck(name, passed, detail = {}) {
+    const result = { scenario: active.record.scenario, width: active.record.width, name, status: passed ? 'passed' : 'failed', ...detail }
+    report.checks.push(result)
+    if (!passed) report.visualFailures.push(result)
+  }
+  async function scaleColors(page, view, { readOnly = false, focused = false } = {}) {
+    await page.evaluate(() => document.fonts.ready)
+    const colors = await page.evaluate(selector => {
+      const rgba = value => {
+        const numbers = value.match(/[\d.]+/g)?.map(Number)
+        if (!numbers || numbers.length < 3) throw new Error(`Unsupported computed color: ${value}`)
+        return [...numbers.slice(0, 3), numbers[3] ?? 1]
+      }
+      const composite = (foreground, background) => foreground.slice(0, 3).map((channel, i) => channel * foreground[3] + background[i] * (1 - foreground[3]))
+      const luminance = color => color.map(channel => channel / 255).map(channel => channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4).reduce((sum, channel, i) => sum + channel * [0.2126, 0.7152, 0.0722][i], 0)
+      const ratio = (foreground, background) => {
+        const light = [luminance(foreground), luminance(background)].sort((a, b) => b - a)
+        return (light[0] + 0.05) / (light[1] + 0.05)
+      }
+      const describe = element => {
+        const style = getComputedStyle(element), layers = []
+        for (let node = element; node; node = node.parentElement) {
+          const current = getComputedStyle(node)
+          layers.push({ backgroundColor: current.backgroundColor, opacity: current.opacity })
+        }
+        const background = [...layers].reverse().reduce((color, layer) => composite(rgba(layer.backgroundColor), color), [255, 255, 255])
+        const foreground = composite(rgba(style.color), background)
+        return {
+          text: element.textContent.trim(), tag: element.tagName, label: element.labels?.[0]?.textContent.trim() || element.getAttribute('placeholder'),
+          pressed: element.getAttribute('aria-pressed'), disabled: Boolean(element.disabled), focused: document.activeElement === element, focusVisible: element.matches(':focus-visible'),
+          color: style.color, backgroundColor: style.backgroundColor, effectiveBackgroundRgb: background,
+          fontSize: style.fontSize, fontWeight: style.fontWeight, opacity: style.opacity, textFillColor: style.webkitTextFillColor,
+          outlineColor: style.outlineColor, outlineStyle: style.outlineStyle, outlineWidth: style.outlineWidth, outlineOffset: style.outlineOffset,
+          backgrounds: layers, computedContrastRatio: ratio(foreground, background),
+          outlineContrastRatio: ratio(composite(rgba(style.outlineColor), background), background),
+        }
+      }
+      return {
+        tabs: [...document.querySelectorAll(`${selector} > button`)].map(describe),
+        disabledControls: [...document.querySelectorAll('#hui-main :is(button,input,textarea,select):disabled')].map(describe),
+      }
+    }, SCALE_TABS)
+    const result = { scenario: active.record.scenario, width: active.record.width, view, ...colors }
+    report.scaleColors.push(result)
+    assert.equal(colors.tabs.length, 5, 'exact Scale tab controls must exist')
+    assert.equal(colors.tabs.filter(tab => tab.pressed === 'true').length, 1, 'exactly one Scale section is selected')
+    assert.equal(colors.tabs.filter(tab => tab.pressed === 'false').length, 4, 'four Scale sections are inactive')
+    assert(colors.tabs.every(tab => !tab.disabled), 'Scale read-only mode must still permit section navigation')
+    if (!BASELINE) {
+      styleCheck('Scale tab color measurements have no translucent ancestors', colors.tabs.every(tab => tab.backgrounds.every(layer => layer.opacity === '1')), { view })
+      styleCheck('Scale inactive tabs retain exact scoped color and AA text contrast', colors.tabs.filter(tab => tab.pressed === 'false').every(tab => tab.color === 'rgb(83, 103, 93)' && tab.effectiveBackgroundRgb.join(',') === '239,242,233' && tab.computedContrastRatio >= 4.5), { view })
+      styleCheck('Scale selected tab retains its existing foreground and background', colors.tabs.filter(tab => tab.pressed === 'true').every(tab => tab.color === 'rgb(255, 253, 249)' && tab.effectiveBackgroundRgb.join(',') === '31,77,59' && tab.computedContrastRatio >= 4.5), { view })
+      if (focused) styleCheck('Scale inactive tab keyboard focus remains visible and readable', colors.tabs.some(tab => tab.pressed === 'false' && tab.focused && tab.focusVisible && tab.outlineStyle !== 'none' && parseFloat(tab.outlineWidth) > 0 && tab.outlineContrastRatio >= 3 && tab.computedContrastRatio >= 4.5), { view })
+      if (readOnly) {
+        const save = colors.disabledControls.find(control => control.tag === 'BUTTON' && control.text === '保存基本信息')
+        assert(save, 'read-only basic save control is present and disabled')
+        // Disabled controls are exempt from WCAG text-contrast requirements.
+        // Preserve and record their existing colors; do not silently relabel them AA.
+        styleCheck('Scale read-only disabled save keeps its existing legible styling', save.color === 'rgb(96, 115, 106)' && save.backgroundColor === 'rgb(238, 235, 227)' && save.opacity === '1', { view, disabledContrastExemption: true })
+      }
+    }
+    write()
+    return result
+  }
+  async function scaleFocus(page, view) {
+    const buttons = page.locator(`${SCALE_TABS} > button`)
+    await buttons.first().focus()
+    await page.keyboard.press('Tab')
+    await scaleColors(page, view, { focused: true })
+    await visual(page, view, SCALE_TABS)
+  }
+  async function contrastBaseline() {
+    const { r } = trainingRoutes()
+    r.add('GET', '/api/scales/review-draft', structuredClone(scales[0]))
+    await scenario('training', 390, 'original-scale-draft-contrast-baseline', r, async ({ page, record, base }) => {
+      await page.goto(base + '/scales/review-draft')
+      await page.getByRole('heading', { name: scales[0].name, exact: true }).waitFor()
+      assert.equal(await page.getByLabel('量表名称', { exact: true }).isEnabled(), true)
+      const colors = await scaleColors(page, 'original-scale-draft')
+      const audit = await visual(page, 'original-scale-draft', '#hui-main')
+      assert.deepEqual(audit.violations, [{ id: 'color-contrast', impact: 'serious', targets: [
+        ['.staff-segmented > button[type="button"]:nth-child(2)'],
+        ['button[type="button"]:nth-child(3)'],
+        ['button[type="button"]:nth-child(4)'],
+        ['button[type="button"]:nth-child(5)'],
+      ] }], 'baseline must reproduce only the four exact known inactive-tab findings')
+      assert(audit.overflow.scrollWidth <= audit.overflow.viewportWidth + 1, 'baseline must not introduce another visual defect')
+      for (const tab of colors.tabs.filter(tab => tab.pressed === 'false')) {
+        assert.equal(tab.color, 'rgb(96, 115, 106)')
+        assert.deepEqual(tab.effectiveBackgroundRgb, [239, 242, 233])
+        assert(tab.backgrounds.every(layer => layer.opacity === '1'), 'baseline contrast must not omit opacity')
+        assert(tab.computedContrastRatio > 4.46 && tab.computedContrastRatio < 4.47, 'known baseline computed contrast')
+      }
+      for (const node of audit.axe.violations[0].nodes) {
+        const contrast = [...node.any, ...node.all, ...node.none].find(item => item.id === 'color-contrast')?.data
+        assert(contrast, 'raw axe contrast data must be retained')
+        assert.equal(contrast.fgColor, '#60736a')
+        assert.equal(contrast.bgColor, '#eff2e9')
+        assert(contrast.contrastRatio >= 4.46 && contrast.contrastRatio < 4.47, 'known baseline axe contrast')
+        assert.equal(contrast.expectedContrastRatio, '4.5:1')
+      }
+      assert(record.calls.every(call => call.method === 'GET'), 'baseline is read-only and must not repeat business mutations')
+      audit.status = 'expected-baseline-failure'
+      report.knownBaselineFinding = { observed: true, rule: 'color-contrast', inactiveTabs: 4, foreground: '#60736a', background: '#eff2e9' }
+      check('original immutable frontend reproduces the exact known contrast defect; this is not current-frontend acceptance')
+    })
+    assert.equal(report.records.length, 1, 'baseline must execute only one Scale context')
+    assert.deepEqual(report.unexpected, [])
   }
   const hasCall = (record, method, path) => record.calls.some(c => c.method === method && c.path === path)
   async function noOldEditor(page, title, dialogName) {
@@ -189,20 +341,38 @@ async function run() {
 
   async function allChecks() {
     assert.equal(process.env.GITHUB_ACTIONS, 'true', 'Browser execution is restricted to the sole official GitHub check')
-    assert.equal(report.sourceSha, SOURCE)
-    assert.equal(report.imageId, IMAGE)
+    assert.match(report.sourceSha || '', /^[a-f0-9]{40}$/)
+    assert.match(report.imageId || '', /^sha256:[a-f0-9]{64}$/)
     assert.match(report.currentHead || '', /^[a-f0-9]{40}$/)
     const checkoutSha = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim()
     const gitTree = ref => execFileSync('git', ['rev-parse', `${ref}^{tree}`], { encoding: 'utf8' }).trim()
     assert.equal(gitTree(checkoutSha), gitTree(report.currentHead), 'PR merge/head tree identity')
     execFileSync('git', ['merge-base', '--is-ancestor', SOURCE, report.currentHead])
+    if (BASELINE) {
+      assert.equal(report.sourceSha, SOURCE, 'baseline must retain the original reviewed source')
+      assert.equal(report.imageId, IMAGE, 'baseline must retain the original immutable runtime')
+    } else {
+      assert(['true', 'false'].includes(process.env.CANDIDATE_ENTRY_CHANGED), 'adapter must report exact entry script path/hash comparison as true or false')
+      report.entryChanged = process.env.CANDIDATE_ENTRY_CHANGED === 'true'
+      report.prior390AssignmentCheckin = {
+        functionalInputsUnchanged: true,
+        priorFunctionalEvidenceRetained: true,
+        execution: report.entryChanged ? 'new-entry-assembly-smoke' : 'not-repeated',
+        reason: report.entryChanged ? 'Adapter verified changed entry script path or bytes; approximately 10 seconds only for new runtime assembly.' : 'Adapter verified unchanged entry script path and bytes; retain the two prior successful functional contexts.',
+      }
+      assert.equal(report.sourceSha, report.currentHead, 'current frontend must be built from the exact PR head')
+      const frontendTree = ref => execFileSync('git', ['rev-parse', `${ref}:server-version/frontend`], { encoding: 'utf8' }).trim()
+      assert.equal(frontendTree(checkoutSha), frontendTree(report.sourceSha), 'runtime source and checkout frontend tree identity')
+    }
     report.checkoutSha = checkoutSha
     assert.equal(port, 3189, 'only the isolated candidate loopback port is allowed')
     axe = readFileSync(new URL('../release-tools/node_modules/axe-core/axe.min.js', import.meta.url), 'utf8')
     const { chromium } = await import('../release-tools/node_modules/playwright-core/index.mjs')
     browser = await chromium.launch({ headless: true, timeout: TIMEOUT, args: ['--no-proxy-server', `--host-resolver-rules=${HOSTS.map(host => `MAP ${host} 127.0.0.1`).join(', ')}`] })
+    if (BASELINE) return contrastBaseline()
     for (const width of WIDTHS) {
       for (const [collection, item, noun] of [['assignments', assignment, '作业'], ['checkins', checkin, '打卡']]) {
+        if (width === 390 && !report.entryChanged) continue
         const { r, state } = trainingRoutes()
         // Course list intentionally omits this course: only direct detail may supply it.
         r.add('GET', '/api/courses', { list: [] })
@@ -267,6 +437,12 @@ async function run() {
             assert.equal(await page.getByLabel('量表名称', { exact: true }).isDisabled(), true)
             assert.equal(await page.getByRole('button', { name: '保存草稿', exact: true }).count(), 0)
             assert.equal(await page.getByRole('button', { name: '保存基本信息', exact: true }).isDisabled(), true)
+            const view = name === 'Synthetic published scale' ? 'scale-published-readonly' : 'scale-standard-readonly'
+            await scaleColors(page, view, { readOnly: true })
+            await visual(page, view, SCALE_TABS)
+            const disabledFile = `screenshots/${view}-disabled-save-${width}.png`
+            await page.getByRole('button', { name: '保存基本信息', exact: true }).screenshot({ path: `${OUTPUT}/${disabledFile}`, timeout: TIMEOUT })
+            report.screenshots.push(disabledFile); record.screenshots.push(disabledFile)
             await page.getByRole('button', { name: '题目', exact: true }).click()
             assert.equal(await page.getByRole('button', { name: '增加题目', exact: true }).isDisabled(), true)
             assert.equal(await page.getByRole('button', { name: '保存题目', exact: true }).isDisabled(), true)
@@ -285,7 +461,9 @@ async function run() {
           assert.equal(await page.getByRole('button', { name: '保存基本信息', exact: true }).isEnabled(), true)
           assert.deepEqual(record.calls.filter(c => c.method !== 'GET').map(c => `${c.method} ${c.path}`), ['PUT /api/scales/review-draft'])
           check('draft accepts one exact synthetic metadata save; frozen scales send no mutation')
+          await scaleColors(page, 'scale-draft')
           await visual(page, 'scale-draft', '#hui-main')
+          await scaleFocus(page, 'scale-draft-focused')
         })
       }
 
@@ -400,9 +578,12 @@ async function run() {
         })
       }
     }
-    assert.equal(report.records.length, WIDTHS.length * 7)
-    assert(report.records.every(record => record.status === 'passed'))
+    assert.equal(report.records.length, WIDTHS.length * 7 - (report.entryChanged ? 0 : 2))
+    assert(report.records.every(record => record.functionalStatus === 'passed'))
     assert.deepEqual(report.unexpected, [])
+    report.completedBusinessScenarios = report.records.length
+    write()
+    assert.equal(report.visualFailures.length, 0, `Visual failures collected after all ${report.completedBusinessScenarios} safe business scenarios completed`)
   }
 
   try {
@@ -410,7 +591,7 @@ async function run() {
     report.status = 'success'
   } catch (error) {
     report.status = 'failed'
-    report.failure = { scenario: active?.record.scenario || 'initialization', width: active?.record.width || null, error: clean(error.message || error) }
+    report.failure = { scenario: active?.record.scenario || (report.completedBusinessScenarios ? 'visual-summary' : 'initialization'), width: active?.record.width || null, error: clean(error.message || error) }
     if (active) {
       active.record.status = 'failed'
       if (!active.page.isClosed()) {
@@ -424,5 +605,5 @@ async function run() {
     write()
     if (browser) await browser.close()
   }
-  console.log(JSON.stringify({ status: report.status, report: `${OUTPUT}/browser.json`, scenarios: report.records.length, unexpected: report.unexpected.length }))
+  console.log(JSON.stringify({ status: report.status, report: `${OUTPUT}/${reportFile}`, scenarios: report.records.length, unexpected: report.unexpected.length, visualFailures: report.visualFailures.length }))
 }

@@ -131,5 +131,35 @@ class AdmissionRefusals(unittest.TestCase):
         with self.assertRaises(ValueError): a.validate_reports(r)
 
 
+class ChangedFrontendAndRaceRefusals(unittest.TestCase):
+    def fixture_job(self):
+        r = M['raceReceipt']
+        return {'id': r['job']['id'], 'name': r['job']['name'], 'run_id': r['run'],
+                'head_sha': r['head'], 'status': 'completed', 'conclusion': 'success',
+                'completed_at': r['job']['completedAt']}
+
+    def test_exact_independent_race_job_is_accepted(self):
+        with patch.object(a.transport, 'recent', return_value=True): a.validate_race_job(self.fixture_job(), M['raceReceipt'])
+
+    def test_race_job_wrong_origin_or_failed_status_is_refused(self):
+        for field in ['id','name','run_id','head_sha','status','conclusion','completed_at']:
+            value = self.fixture_job(); value[field] = 'wrong'
+            with self.subTest(field=field), patch.object(a.transport, 'recent', return_value=True), self.assertRaises(ValueError):
+                a.validate_race_job(value, M['raceReceipt'])
+
+    def test_race_completion_time_is_not_renewed(self):
+        with patch.object(a.transport, 'recent', return_value=False), self.assertRaises(ValueError):
+            a.validate_race_job(self.fixture_job(), M['raceReceipt'])
+
+    def test_retained_runtime_setup_matches_the_original_official_job(self):
+        self.assertEqual(a.bound_function_hashes(Path(a.__file__).read_text()), M['raceReceipt']['functionHashes'])
+
+    def test_new_dispatcher_cannot_replace_the_original_bound_probe(self):
+        original = 'def original_probe(action, reports, record):\n    return 42\n'
+        dispatcher = 'def probe(action, reports, record):\n    return 0\n'
+        self.assertEqual(a.bound_function_hashes(original), a.bound_function_hashes(original + dispatcher))
+        self.assertNotEqual(a.bound_function_hashes(original), a.bound_function_hashes(original.replace('42','41')))
+
+
 if __name__ == '__main__':
     unittest.main()

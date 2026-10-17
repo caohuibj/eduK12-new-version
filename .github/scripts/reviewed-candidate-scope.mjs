@@ -23,12 +23,33 @@ export const reviewedCandidateTools = Object.freeze([
   'docs/release/README.md',
 ]);
 const tools = new Set(reviewedCandidateTools);
+const patchPaths = Object.freeze([
+  'server-version/frontend/src/pages/ScaleEdit.tsx',
+  'server-version/frontend/src/pages/ScaleEdit.css',
+]);
+const currentComponents = () => ({...manifest.components, frontend:manifest.frontendPatch?.afterTree});
+function validPatch() {
+  const patch = manifest.frontendPatch;
+  if (!patch || patch.beforeTree !== manifest.components.frontend || !sha(patch.afterTree)
+      || patch.beforeTree === patch.afterTree
+      || !same(Object.keys(patch.files ?? {}).sort(), [...patchPaths].sort())) return false;
+  for (const [file, binding] of Object.entries(patch.files)) {
+    const original = manifest.files[file];
+    if (!sha(binding.after) || binding.after === binding.before
+        || binding.before !== (original?.after ?? null)
+        || !regular(binding)
+        || (original ? binding.status !== 'M' : binding.status !== 'A')) return false;
+  }
+  return true;
+}
+const sourceBindings = () => ({...manifest.files,
+  ...Object.fromEntries(Object.entries(manifest.frontendPatch?.files ?? {}).filter(([file]) => !Object.hasOwn(manifest.files, file)))});
 const regular = entry => entry?.newMode === '100644'
   && ((entry.status === 'A' && entry.oldMode === '000000')
     || (entry.status === 'M' && entry.oldMode === '100644'));
 function boundary(entries) {
-  const files = Object.keys(manifest.files ?? {});
-  if (manifest.schema !== 1 || !files.length || !sha(manifest.base)
+  const bindings = sourceBindings(), files = Object.keys(bindings);
+  if (manifest.schema !== 1 || !files.length || !validPatch() || !sha(manifest.base)
       || !sha(manifest.source?.head) || !sha(manifest.source?.tree)
       || !same(manifest.required, reviewedCandidateRequired)
       || !['frontend','backend'].every(component => sha(manifest.components?.[component]))
@@ -38,8 +59,8 @@ function boundary(entries) {
   for (const entry of entries) {
     if (!regular(entry) || seen.has(entry.file)) return false;
     seen.add(entry.file);
-    if (Object.hasOwn(manifest.files, entry.file)) {
-      const binding = manifest.files[entry.file];
+    if (Object.hasOwn(bindings, entry.file)) {
+      const binding = bindings[entry.file];
       if (!sha(binding.after) || !(binding.before === null || sha(binding.before))
           || !['status','oldMode','newMode'].every(key => entry[key] === binding[key])
           || (binding.before === null) !== (entry.status === 'A')) return false;
@@ -53,20 +74,35 @@ export function reviewedCandidatePlan(entries, base, head, read = git) {
   if (!sha(base) || !sha(head) || base !== manifest.base || !boundary(entries)) return null;
   try {
     for (const [file, binding] of Object.entries(manifest.files)) {
-      if (read(head, file) !== binding.after
+      const after = manifest.frontendPatch.files[file]?.after ?? binding.after;
+      if (read(head, file) !== after || read(manifest.source.head, file) !== binding.after
           || (binding.before !== null && read(base, file) !== binding.before)) return null;
     }
-    // Whole component trees bind dependencies, config, Dockerfiles and unchanged
-    // application files as well as the explicit source patch.
-    for (const component of ['frontend','backend'])
-      if (read(head, `server-version/${component}`) !== manifest.components[component]) return null;
+    for (const [file, binding] of Object.entries(manifest.frontendPatch.files)) {
+      if (read(head, file) !== binding.after) return null;
+      if (binding.before === null) {
+        // A patch-only path must be absent in both original source and main.
+        for (const ref of [manifest.source.head, base]) {
+          let present = false;
+          try { present = Boolean(read(ref, file)); } catch { /* absent Git path */ }
+          if (present) return null;
+        }
+      } else if (read(manifest.source.head, file) !== binding.before) return null;
+    }
+    // Original receipts retain their original trees; only the exact two-file
+    // overlay gets a new frontend tree. No backend/dependency/config drift.
+    for (const component of ['frontend','backend']) {
+      const file = `server-version/${component}`;
+      if (read(manifest.source.head, file) !== manifest.components[component]
+          || read(head, file) !== currentComponents()[component]) return null;
+    }
     for (const [file, blob] of Object.entries(manifest.unchangedConsumers ?? {}))
       if (!sha(blob) || read(base, file) !== blob || read(head, file) !== blob) return null;
     const tree = read(head, ''), manifestBlob = read(head, manifestPath);
     if (!sha(tree) || !sha(manifestBlob)) return null;
     return {schema:1, route:'reviewed-candidate', base, head, tree,
       source:manifest.source, manifestBlob, changes:entries, changed:['frontend','backend'],
-      components:manifest.components, required:reviewedCandidateRequired};
+      components:currentComponents(), frontendPatch:manifest.frontendPatch, raceReceipt:manifest.raceReceipt, required:reviewedCandidateRequired};
   } catch { return null; }
 }
 
@@ -76,7 +112,8 @@ export function reviewedCandidatePlan(entries, base, head, read = git) {
 export function validReviewedCandidatePlan(plan) {
   return Boolean(plan && plan.schema === 1 && plan.route === 'reviewed-candidate'
     && plan.base === manifest.base && sha(plan.head) && sha(plan.tree) && sha(plan.manifestBlob)
-    && same(plan.source, manifest.source) && same(plan.components, manifest.components)
+    && same(plan.source, manifest.source) && same(plan.components, currentComponents())
+    && same(plan.frontendPatch, manifest.frontendPatch) && same(plan.raceReceipt, manifest.raceReceipt)
     && same(plan.changed, ['frontend','backend']) && same(plan.required, reviewedCandidateRequired)
     && boundary(plan.changes));
 }

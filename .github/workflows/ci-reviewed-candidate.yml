@@ -10,11 +10,76 @@ permissions:
   actions: read
   pull-requests: read
 env:
+  CI: 'true'
   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
 jobs:
+  frontend:
+    name: changed frontend / build scan and package
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    outputs:
+      artifact_id: ${{ steps.frontend-artifact.outputs.artifact-id }}
+      artifact_digest: ${{ steps.frontend-artifact.outputs.artifact-digest }}
+    env:
+      CANDIDATE_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      CI_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+      GH_TOKEN: ${{ github.token }}
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      REVIEWED_CANDIDATE_PLAN: reviewed-candidate-plan.json
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        with:
+          version: v0.70.0
+          cache: false
+      - name: preserve the classified plan without shell interpolation
+        env:
+          PLAN_JSON: ${{ inputs.plan }}
+        run: |
+          python3 -B - <<'PY'
+          import json, os
+          with open(os.environ['REVIEWED_CANDIDATE_PLAN'], 'w') as output:
+              json.dump(json.loads(os.environ['PLAN_JSON']), output)
+          PY
+      - name: build once and qualify only the exact patched frontend
+        timeout-minutes: 18
+        run: |
+          set -euo pipefail
+          (sleep 300; printf '::warning::Exact ScaleEdit frontend preparation exceeded the five-minute diagnosis budget. Inspect the active admission, build, packaging or scan phase; do not add unrelated checks.\n') &
+          watcher=$!
+          trap 'kill "$watcher" 2>/dev/null || true; wait "$watcher" 2>/dev/null || true' EXIT
+          python3 -B .github/scripts/reviewed-candidate-admission.py frontend
+      - name: retain the one current frontend runtime for browser consumption
+        id: frontend-artifact
+        if: ${{ always() && hashFiles('reviewed-candidate-evidence/frontend-runtime.json') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: reviewed-current-frontend-${{ github.run_id }}-${{ github.event.pull_request.head.sha }}-attempt-${{ github.run_attempt }}
+          path: |
+            reviewed-candidate-evidence/frontend-runtime.json
+            reviewed-candidate-evidence/frontend-runtime.tar.zst
+          retention-days: 3
+          if-no-files-found: error
+      - name: retain small current frontend qualification reports
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: reviewed-candidate-${{ github.run_id }}-${{ github.event.pull_request.head.sha }}-frontend-attempt-${{ github.run_attempt }}
+          path: reviewed-candidate-evidence/*.json
+          retention-days: 3
+          if-no-files-found: error
   verify:
     name: admitted runtime / ${{ matrix.action }}
+    needs: [frontend]
     if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-24.04
     timeout-minutes: 15
@@ -29,6 +94,8 @@ jobs:
       PR_NUMBER: ${{ github.event.pull_request.number }}
       REVIEWED_CANDIDATE_PLAN: reviewed-candidate-plan.json
       PYTHONDONTWRITEBYTECODE: '1'
+      CURRENT_FRONTEND_ARTIFACT_ID: ${{ needs.frontend.outputs.artifact_id }}
+      CURRENT_FRONTEND_ARTIFACT_DIGEST: ${{ needs.frontend.outputs.artifact_digest }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -46,7 +113,7 @@ jobs:
           with open(os.environ['REVIEWED_CANDIDATE_PLAN'], 'w') as output:
               json.dump(json.loads(os.environ['PLAN_JSON']), output)
           PY
-      - name: verify official receipts and run only the missing runtime probe
+      - name: verify successful race receipts and run only the missing browser probe
         timeout-minutes: 14
         env:
           PROBE_ACTION: ${{ matrix.action }}
@@ -63,7 +130,7 @@ jobs:
             printf '%s\n' 'installing official Chromium and its system dependencies' > "$phase"
             node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
           fi
-          printf '%s\n' 'authenticating exact source receipts, loading immutable images and running the selected isolated probe' > "$phase"
+          printf '%s\n' 'authenticating exact receipts; browser consumes the current frontend, race accepts unchanged PostgreSQL evidence' > "$phase"
           python3 -B .github/scripts/reviewed-candidate-admission.py "$PROBE_ACTION"
       - name: retain small current-attempt probe evidence
         if: ${{ always() }}

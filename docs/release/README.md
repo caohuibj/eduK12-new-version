@@ -4,13 +4,14 @@
 
 ## 已审查候选的正式接纳（reviewed-candidate）
 
-本路线只接纳 `.github/scripts/reviewed-candidate-source.json` 明列的完整基线、原始源码文件及 blob、前后端完整 tree、官方工作流/run/attempt/jobs/artifacts 和镜像身份。当前来源为 `1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c` 的官方 push run `39051668787` attempt 1；原候选工作流的成功本身不代表可合并。新 manifest 须独立审查，不能自动发现一个成功 run 后扩大适用范围。
+本路线保留 `.github/scripts/reviewed-candidate-source.json` 原始 49 文件、blob、前后端 tree、官方工作流/run/attempt/jobs/artifacts、镜像及报告摘要作为不可改写基线。原来源仍为 `1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c` 的官方 push run `39051668787` attempt 1；成功的原候选工作流本身不代表可合并。新 manifest 须独立审查，不能自动发现成功 run 后扩大范围。
 
-- 修改组件 → 新增接纳、分类和汇总工具；产品源码与原 49 个源码/候选 CI 文件逐一保持原 blob，前后端整个 tree 不变。完整 diff 必须同时包含精确列出的 12 个接纳工具/说明路径。漏文件、额外路径、删除、重命名、执行位或链接均不进入此路线，继续旧分类。
-- 具体故障 → 错配来源/过期或失败回执、篡改产物、遗漏产品改动、PR head 与 merge tree 不符，以及尚未覆盖的 Training 实镜像交互和 Scale 真实 PostgreSQL 并发写入。正式接纳重新核验来源、输入和官方小回执，只按固定 artifact ID 下载所需镜像，原构建、测试、审计、扫描及产品 SAST 不重复。
-- 主要位置 → PR 的 scope 运行新增边界/拒绝/合并契约；两个独立 GitHub-hosted VM 分别运行缺失的 browser、race 探针；新工具的 JavaScript/TypeScript 与 Python CodeQL 仅分析有效目录 `.github/scripts`。不安装应用依赖、不重新构建应用、不连接生产，不使用私有 secrets 或 self-hosted runner，不改变信任及 ruleset。
-- 正式门禁 → 原稳定 `merge gate / ready PR` 必须同时看到 scope、reviewed-candidate（两个 matrix job）及 codeql 的真实 success，并对实际 checkout HEAD 重算完整计划。draft、缺失、跳过、取消或失败均不得授予合并资格；不新增同名假绿检查。
-- 时间预算 → 探针在约 5 分钟时报告当前安装/接纳/运行阶段，单 job 上限 15 分钟；故障定位仍限受影响项，不恢复无关全量验收。产物只保留当前 run/head/action/attempt 的小 JSON 与截图，不上传镜像 tar 或私有数据。
+- 修改组件 → 原 49 文件及精确 12 个接纳工具/说明路径，加上 `frontendPatch` 明列的 ScaleEdit.tsx 和组件专用 ScaleEdit.css 两文件覆盖层。只改变未选中标签文字颜色；无全局主题、后端、依赖、数据库或附件变化。覆盖层逐一绑定原始/当前 blob 及完整前端 before/after tree；新 CSS 须在原基线和 main 均不存在。漏文件、额外路径、删除、重命名、执行位或链接均拒绝本路线。
+- 具体故障 → 原真实浏览器检查发现 ScaleEdit 未选中标签颜色对比度 4.46095，低于既有 4.5 门槛。原失败不改写为通过；只重建受影响前端、生产打包及原 HIGH/CRITICAL 扫描、静态包装检查，再运行既有真实交互、可访问性和溢出断言。原前端报告保留为基线，不能证明新前端通过。
+- 复用证据 → 原后端产物、测试、审计、扫描保持原身份；官方 PR #310 run `39054194991` attempt 1 的成功 race job `117458745733` 及 artifact `12109046588` 接纳为未变化 PostgreSQL 并发输入的证明。核验官方 job success、同 PR/base/head/tree、24 小时有效期、ZIP 元数据/摘要、每份报告摘要、113 断言、6 HTTP 竞争、5 数据库后置条件、清理成功及原脚本/runtime 环境函数绑定。整个旧 run 因 browser 失败，绝不将整轮称为成功，也不重跑已成功的 PostgreSQL 竞争。
+- 主要位置 → GitHub PR scope 运行变化后的边界/拒绝/合并契约；单个 frontend producer 使用原冻结官方基础镜像只构建一次新前端，保存一个当前 run/head 的生产镜像；browser 通过精确官方 artifact ID 消费它，race 仅核验回执。浏览器失败后重试失败 job 可继续使用同一次 producer，不再构建。JavaScript/TypeScript 与 Python CodeQL 使用 `.github/scripts` 和 `server-version/frontend/src/pages` 两个有效目录覆盖变化的工具与 ScaleEdit 页面，不扩大到未修改后端。本机不安装或运行应用检查，不连接生产，不使用私有 secrets/self-hosted runner，不改变信任及 ruleset。
+- 正式门禁 → 原稳定 `merge gate / ready PR` 仍要求 scope、reviewed-candidate（包含 frontend producer 与 browser/race）和 codeql 真实 success，并对实际 checkout HEAD 重算完整计划。draft、缺失、跳过、取消或失败均不得授予合并资格；不新增同名假绿检查。
+- 时间预算 → 约 5 分钟报告当前等待阶段；frontend producer 上限 20 分钟，browser/race 上限 15 分钟。故障定位只处理受影响项，不恢复无关全量验收。唯一前端运行镜像只保留在该 producer 的官方 artifact，其他产物只含当前 run/head/action/attempt 小 JSON 与截图，不上传私有数据、数据库或重复镜像。
 - 合并后 → main push 只按原有规则分类，不重跑此 PR 的契约、接纳或探针。上线仍单独受当次发布授权及版本/就绪/一条受影响短流程/回退门禁约束；这次 CI 接入不等同于已上线。
 
 ## 规则位置与每次开工方式
