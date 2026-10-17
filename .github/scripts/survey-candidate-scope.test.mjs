@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {readFileSync,statSync} from 'node:fs';
 import {admitsSurveyCandidate,surveyCandidateRequired} from './survey-candidate-scope.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const bindings=JSON.parse(readFileSync(new URL('./survey-candidate-bindings.json',import.meta.url)));
@@ -31,4 +31,11 @@ test('Survey workflow keeps explicit isolation, source binding, scans and artifa
  assert.ok(!workflow.includes('secrets: inherit'));assert.ok(!/continue-on-error:\s*true/.test(workflow));
  const main=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
  assert.ok(main.includes("if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'survey-candidate'"));
+});
+
+test('Survey mixed-language SAST only uses existing directories',()=>{
+ const workflow=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+ const config=workflow.split("application_route == 'survey-candidate' && 'paths: [")[1]?.split(']')[0];
+ assert.ok(config,'Survey CodeQL config must exist');
+ for(const path of config.split(',').map(s=>s.trim()))assert.ok(statSync(new URL('../../'+path,import.meta.url)).isDirectory(),path);
 });

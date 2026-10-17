@@ -31,6 +31,15 @@ def docker_env(overrides=None):
  env={**ENV,**(overrides or {})};cmd=['docker','run','--rm','--network','host','-v',str(E)+':/evidence']
  for k,v in env.items():cmd+=['-e',k+'='+str(v)]
  return cmd
+def frontend_env():
+ # These unchanged monorepo JSON inputs sit outside the frontend Docker context.
+ inputs={'server-version/cognitive-randomization-golden-v1.json':('/cognitive-randomization-golden-v1.json','5b3cb7c11138044ad6a85626e74004bea2a3e62a'),'server-version/backend/src/modules/cognitive/generated/identities.json':('/backend/src/modules/cognitive/generated/identities.json','dc7aa603721cdea46de7e0ed93f04ba9679a02e4')}
+ cmd=docker_env()
+ for file,(target,expected) in inputs.items():
+  assert out(['git','hash-object',file])==expected,'Changed external frontend test fixture'
+  cmd+=['-v',str(ROOT/file)+':'+target+':ro']
+ C['frontendExternalFixtureBlobs']={k:v[1] for k,v in inputs.items()};save()
+ return cmd
 def report(file,selected):
  d=json.loads((E/file).read_text());assert d.get('success') and d.get('numTotalTests',0)>0 and d.get('numFailedTests',0)==0 and d.get('numPendingTests',0)==0
  for f in selected:
@@ -78,6 +87,34 @@ def build():
   C['images'][component]=out(['docker','image','inspect','--format','{{.Id}}',tag(component)]);save()
   archive_image(component,False)
 
+def resume_build():
+ proof=json.loads((E/'resume-proof.json').read_text());old=proof['originalChecks']
+ assert proof['schema']==1 and proof['status']=='QUALIFIED_PARTIAL_RESUME' and proof['currentHead']==P['head'] and proof['currentSourceHead']==os.environ['SURVEY_SOURCE_HEAD']
+ expected=['backend-compile','backend-builder-archive','backend-dependency-audit','backend-runtime','backend-archive','frontend-compile','frontend-builder-archive']
+ assert proof['reusedPhases']==expected and old['components']==P['components'] and C['phases']==[]
+ C['reusedQualification']={'sourceRun':proof['sourceRun'],'sourceHead':proof['sourceHead'],'sourceMergeHead':proof['sourceMergeHead'],'artifact':proof['artifact'],'phases':expected,'rawChecks':'qualified-original-checks.json','rawPlan':'qualified-original-plan.json'}
+ C['bases']=old['bases'];C['builders']=old['builders'];C['images']={'backend':old['images']['backend']}
+ C['executionInputs']={'node':out(['node','--version']),'docker':out(['docker','version','--format','{{.Client.Version}}']),'runnerOS':os.environ.get('RUNNER_OS'),'workflow':out(['git','hash-object','.github/workflows/ci-survey-candidate.yml']),'executor':out(['git','hash-object','.github/scripts/survey-candidate.py']),'environmentSha256':hashlib.sha256(json.dumps(ENV,sort_keys=True).encode()).hexdigest()};save()
+ for component,builder in [('backend',True),('backend',False),('frontend',True)]:
+  expected_id=C['builders'][component] if builder else C['images'][component]
+  actual=json.loads(out(['docker','image','inspect',tag(component,builder)]))[0]
+  assert actual['Id']==expected_id and actual['Config']['Labels']['org.opencontainers.image.revision']==proof['sourceMergeHead']
+ changed=[e['file'].removeprefix('server-version/frontend/') for e in P['changes'] if e['file'].startswith('server-version/frontend/src/') and e['file'].endswith(('.ts','.tsx'))]
+ for name,cmd in [('frontend-app-types','npx tsc -p tsconfig.app.json --noEmit'),('frontend-cognitive-types','npx tsc -p tsconfig.cognitive.json --noEmit'),('frontend-changed-lint','npx eslint '+shlex.join(changed))]:
+  phase(name,lambda command=cmd:run(frontend_env()+[tag('frontend',True),'sh','-ec',command],600))
+ phase('frontend-dependency-audit',lambda:run(docker_env()+[tag('frontend',True),'npm','audit','--audit-level=high'],300))
+ # Only package the already compiled /app/dist. No source/dependency compile stage runs.
+ original=(ROOT/'server-version/frontend/Dockerfile').read_text();marker='FROM nginx:1.31.6-alpine3.24-slim AS runtime'
+ assert original.count(marker)==1
+ tail=original[original.index(marker):].replace('nginx:1.31.6-alpine3.24-slim',C['bases']['nginx:1.31.6-alpine3.24-slim'],1)
+ alias='eduk12-qualified-survey-frontend:'+C['builders']['frontend'].removeprefix('sha256:')
+ run(['docker','tag',C['builders']['frontend'],alias],30)
+ df=TMP/'frontend-runtime-only.Dockerfile';df.write_text('FROM '+alias+' AS build\n'+tail)
+ C['frontendRuntimeRecipe']={'sha256':hashlib.sha256(df.read_bytes()).hexdigest(),'producer':C['builders']['frontend'],'compiledSourceHead':proof['sourceHead'],'compiledMergeHead':proof['sourceMergeHead'],'runtimeBase':C['bases']['nginx:1.31.6-alpine3.24-slim']};save()
+ phase('frontend-runtime',lambda:run(['docker','buildx','build','--builder','default','--load','-f',str(df),'--label','org.opencontainers.image.revision='+P['head'],'--target','runtime','-t',tag('frontend'),str(ROOT/'server-version/frontend')],900))
+ C['images']['frontend']=out(['docker','image','inspect','--format','{{.Id}}',tag('frontend')]);save()
+ archive_image('frontend',False)
+
 def services():
  run(['docker','run','-d','--name','survey-ci-postgres','-e','POSTGRES_USER=ptool','-e','POSTGRES_PASSWORD=ptool123','-e','POSTGRES_DB=survey_candidate_ci_test','-p','127.0.0.1:5432:5432','postgres:16.15-bookworm'],180)
  run(['docker','run','-d','--name','survey-ci-redis','-p','127.0.0.1:6379:6379','redis:7.4.11-bookworm'],180)
@@ -95,7 +132,7 @@ def backend_tests():
  phase('selected-backend-contracts',check)
 def frontend_tests():
  selected=P['frontendTests'];cmd='npx vitest run '+shlex.join(selected)+' --maxWorkers=2 --reporter=json --outputFile=/evidence/frontend-tests.json'
- def check():run(docker_env()+[tag('frontend',True),'sh','-ec',cmd],900);report('frontend-tests.json',selected)
+ def check():run(frontend_env()+[tag('frontend',True),'sh','-ec',cmd],900);report('frontend-tests.json',selected)
  phase('selected-frontend-contracts',check)
 def runtime():
  env={**ENV,'SURVEY_CI_IMAGE_ID':C['builders']['backend']}
@@ -156,5 +193,5 @@ def cleanup():
   C['privateBrowserMaterialRemoved']=not TMP.exists();C['isolatedResourcesRemoved']=not errors;C['cleanupErrors']=errors;save()
  if errors:raise RuntimeError('Isolated container cleanup failed; private browser material removed')
 if __name__=='__main__':
- action=sys.argv[1];assert action in ['build','services','backend-tests','frontend-tests','runtime','browser','cleanup']
- {'build':build,'services':services,'backend-tests':backend_tests,'frontend-tests':frontend_tests,'runtime':runtime,'browser':browser,'cleanup':cleanup}[action]()
+ action=sys.argv[1];assert action in ['build','resume-build','services','backend-tests','frontend-tests','runtime','browser','cleanup']
+ {'build':build,'resume-build':resume_build,'services':services,'backend-tests':backend_tests,'frontend-tests':frontend_tests,'runtime':runtime,'browser':browser,'cleanup':cleanup}[action]()
