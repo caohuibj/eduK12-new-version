@@ -166,3 +166,17 @@ test('reviewed merge evidence is limited to the maintenance route and exact admi
  }
  assert.match(job(ci,'merge-gate'),/run: node .github\/scripts\/merge-gate.mjs/);
 });
+
+ test('CDN viewer-only operations use exact host maintenance files',()=>{
+  const host='server-version/scripts/host-ops/';
+  for(const file of ['cdn.py','test_cdn.py','cdn-origin.cjs','cdn-origin.test.cjs','CDN.md'])assert.equal(classifyChanges([entry(host+file)]).maintenance,true,file);
+  for(const file of ['cdn-delete-media.py','cdn-publish-app.py'])assert.equal(classifyChanges([entry(host+'cdn.py'),entry(host+file)]).maintenance,false,file);
+  assert.equal(classifyChanges([entry(host+'cdn.py'),entry('server-version/backend/src/utils/cos.ts')]).maintenance,false);
+ });
+
+test('viewer and origin follow-ups retain both affected CDN test suites',()=>{
+ const lane=source('ci-maintenance');
+ assert.match(lane,/selected=any\(p[.]startswith\('server-version\/scripts\/host-ops\/cdn'\)/);
+ assert.match(lane,/node --test server-version\/scripts\/host-ops\/cdn-origin[.]test[.]cjs/);
+ assert.match(lane,/-p test_cdn[.]py -v/);
+});

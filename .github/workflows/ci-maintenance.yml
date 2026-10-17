@@ -47,6 +47,36 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+      - name: Select exact CDN viewer-only operations
+        id: cdnscope
+        env:
+          DIFF_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          python3 - <<'PY_CDN'
+          import os,subprocess
+          base=os.environ.get('DIFF_BASE','')
+          allowed={'server-version/scripts/host-ops/'+p for p in ['cdn.py','test_cdn.py','cdn-origin.cjs','cdn-origin.test.cjs','CDN.md']}
+          allowed|={'.github/scripts/content-scope.mjs','.github/scripts/maintenance-routing.test.mjs','.github/workflows/ci-maintenance.yml'}
+          selected=False
+          if len(base)==40 and base!='0'*40:
+              rows=subprocess.check_output(['git','diff','--raw','-z','--no-renames',base,'HEAD']).split(b'\0')
+              paths=[]
+              for index in range(0,len(rows)-1,2):
+                  meta=rows[index].decode().split();path=rows[index+1].decode()
+                  if meta[1]!='100644' or meta[-1] not in ['A','M'] or path not in allowed:break
+                  paths.append(path)
+              else:
+                  selected=any(p.startswith('server-version/scripts/host-ops/cdn') or p=='server-version/scripts/host-ops/test_cdn.py' or p=='server-version/scripts/host-ops/CDN.md' for p in paths) and all(subprocess.check_output(['git','rev-parse',base+':'+p])==subprocess.check_output(['git','rev-parse','HEAD:'+p]) for p in ['server-version/backend','server-version/frontend','server-version/scripts/backup','server-version/scripts/attachment-backup','server-version/scripts/cos-cleanup'])
+          with open(os.environ['GITHUB_OUTPUT'],'a') as out:out.write('cdn_only='+str(selected).lower()+'\n')
+          print('Exact CDN viewer-only scope: '+str(selected))
+          PY_CDN
+      - name: Verify CDN authentication and exact maintenance routing
+        if: steps.cdnscope.outputs.cdn_only == 'true'
+        run: |
+          git diff --check
+          python3 -B -m unittest discover -s server-version/scripts/host-ops -p test_cdn.py -v
+          node --test server-version/scripts/host-ops/cdn-origin.test.cjs
+          node --test .github/scripts/content-scope.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs
       - name: Select frozen standalone database memory repair
         id: backupscope
         env:
@@ -70,7 +100,7 @@ jobs:
           print('Frozen database backup scope: '+str(selected))
           PY_SCOPE
       - name: Verify only affected encrypted backup contracts
-        if: steps.backupscope.outputs.backup_only == 'true'
+        if: steps.backupscope.outputs.backup_only == 'true' && steps.cdnscope.outputs.cdn_only != 'true'
         run: |
           git diff --check
           python3 -B -m unittest discover -s server-version/scripts/host-ops -p test_backup.py -v
@@ -78,12 +108,12 @@ jobs:
           node --test server-version/scripts/host-ops/backup-cos.test.mjs
           node --check server-version/scripts/host-ops/backup-crypto.mjs
       - name: Verify streamed database restore and failure-volume cleanup
-        if: steps.backupscope.outputs.backup_only == 'true'
+        if: steps.backupscope.outputs.backup_only == 'true' && steps.cdnscope.outputs.cdn_only != 'true'
         run: |
           docker pull postgres:16.15-bookworm
           sudo env PATH="$PATH" CI=true GITHUB_ACTIONS=true NODE_ENV=test python3 -B server-version/scripts/host-ops/ci-backup-smoke.py
       - name: Save exact backup source and input receipt
-        if: steps.backupscope.outputs.backup_only == 'true'
+        if: steps.backupscope.outputs.backup_only == 'true' && steps.cdnscope.outputs.cdn_only != 'true'
         run: |
           git archive --format=tar HEAD server-version/scripts/host-ops server-version/scripts/backup server-version/scripts/attachment-backup/core.mjs > backup-memory-source.tar
           python3 - <<'PY_RECEIPT'
@@ -94,7 +124,7 @@ jobs:
           Path('backup-memory-receipt.json').write_text(json.dumps(receipt,indent=2))
           PY_RECEIPT
       - uses: actions/upload-artifact@v4
-        if: steps.backupscope.outputs.backup_only == 'true'
+        if: steps.backupscope.outputs.backup_only == 'true' && steps.cdnscope.outputs.cdn_only != 'true'
         with:
           name: backup-memory-${{ github.sha }}
           path: |
@@ -103,14 +133,14 @@ jobs:
           retention-days: 3
       - name: Qualify reviewed operations merge evidence
         id: mergequalified
-        if: inputs.merge_proof
+        if: inputs.merge_proof && steps.cdnscope.outputs.cdn_only != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           python3 -B -m unittest discover -s .github/scripts -p test_maintenance_merge.py -v
           python3 -B .github/scripts/maintenance-merge.py
       - name: Publish official current-head maintenance admission receipt
-        if: steps.mergequalified.outputs.reused == 'true'
+        if: steps.mergequalified.outputs.reused == 'true' && steps.cdnscope.outputs.cdn_only != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: qualified-maintenance-merge-${{ github.sha }}
@@ -119,7 +149,7 @@ jobs:
           if-no-files-found: error
       - name: Qualify unchanged maintenance evidence for exact cache follow-up
         id: qualified
-        if: inputs.cache_policy_followup != ''
+        if: inputs.cache_policy_followup != '' && steps.cdnscope.outputs.cdn_only != 'true'
         env:
           PRIOR_RUN: ${{ inputs.cache_policy_followup }}
           GH_TOKEN: ${{ github.token }}
@@ -152,13 +182,13 @@ jobs:
           print('Qualified original successful maintenance run '+run+'; only the exact cache whitelist input changed.')
           PY
       - name: Verify affected cache policy only
-        if: steps.qualified.outputs.reused == 'true'
+        if: steps.qualified.outputs.reused == 'true' && steps.cdnscope.outputs.cdn_only != 'true'
         run: |
           python3 -B -m unittest discover -s server-version/scripts/host-ops -p 'test_storage.py' -v
           node --test .github/scripts/maintenance-routing.test.mjs
       - name: Qualify unchanged foundations for operations follow-up
         id: opsqualified
-        if: inputs.ops_followup != ''
+        if: inputs.ops_followup != '' && steps.cdnscope.outputs.cdn_only != 'true'
         env:
           PRIOR_RUN: ${{ inputs.ops_followup }}
           GH_TOKEN: ${{ github.token }}
@@ -219,7 +249,7 @@ jobs:
           print('Qualified successful foundation run 38347265525 and exact cache follow-up '+run+'; unchanged DB/crypto/launcher/attachment verifier inputs retained.')
           PY
       - name: Verify affected backup cycle, capacity, image protection and quarantine
-        if: steps.opsqualified.outputs.reused == 'true' && steps.opsqualified.outputs.cycle_only != 'true' && steps.opsqualified.outputs.tail_only != 'true' && steps.opsqualified.outputs.runtime_only != 'true'
+        if: steps.opsqualified.outputs.reused == 'true' && steps.opsqualified.outputs.cycle_only != 'true' && steps.opsqualified.outputs.tail_only != 'true' && steps.opsqualified.outputs.runtime_only != 'true' && steps.cdnscope.outputs.cdn_only != 'true'
         run: |
           for name in test_cycle.py test_capacity.py test_storage.py test_monitor.py; do
             python3 -B -m unittest discover -s server-version/scripts/host-ops -p "$name" -v
@@ -231,33 +261,33 @@ jobs:
           sudo install -D -m 644 server-version/scripts/host-ops/storage.py /opt/eduk12-ops/current/storage.py
           sudo systemd-analyze verify server-version/scripts/host-ops/systemd/eduk12-backup-cycle.* server-version/scripts/host-ops/systemd/eduk12-storage-maintenance.*
       - name: Verify daily verification safety margin only
-        if: steps.opsqualified.outputs.cycle_only == 'true'
+        if: steps.opsqualified.outputs.cycle_only == 'true' && steps.cdnscope.outputs.cdn_only != 'true'
         run: |
           python3 -B -m unittest discover -s server-version/scripts/host-ops -p 'test_cycle.py' -v
           node --test .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs
       - name: Verify large snapshot batching and skipped space maintenance only
-        if: steps.opsqualified.outputs.tail_only == 'true'
+        if: steps.opsqualified.outputs.tail_only == 'true' && steps.cdnscope.outputs.cdn_only != 'true'
         run: |
           python3 -B -m unittest discover -s server-version/scripts/host-ops -p 'test_cycle.py' -v
           python3 -B -m unittest discover -s server-version/scripts/host-ops -p 'test_monitor.py' -v
           node --test .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs
       - name: Match production Python major and minor for the timestamp fix
-        if: steps.opsqualified.outputs.runtime_only == 'true'
+        if: steps.opsqualified.outputs.runtime_only == 'true' && steps.cdnscope.outputs.cdn_only != 'true'
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
       - name: Verify production timestamp and operator identity separation only
-        if: steps.opsqualified.outputs.runtime_only == 'true'
+        if: steps.opsqualified.outputs.runtime_only == 'true' && steps.cdnscope.outputs.cdn_only != 'true'
         run: |
           python3 -B -m unittest discover -s server-version/scripts/host-ops -p 'test_storage.py' -v
           node --test --test-name-pattern='different read and delete clients' server-version/scripts/cos-cleanup/cleanup.test.mjs
           node --check server-version/scripts/cos-cleanup/sdk-smoke.mjs
           node --test .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs
       - name: CI routing and attachment invariants
-        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true' && steps.backupscope.outputs.backup_only != 'true'
+        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true' && steps.backupscope.outputs.backup_only != 'true' && steps.cdnscope.outputs.cdn_only != 'true'
         run: node --test .github/scripts/runner-preflight.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/api-response.test.mjs .github/scripts/mac-ci-cleanup.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-image-plan.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs .github/scripts/dependency-routing.test.mjs server-version/scripts/attachment-backup/core.test.mjs server-version/scripts/backup/cleanup-restore-container.test.mjs
       - name: Host launcher and existing monitoring guards
-        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true' && steps.backupscope.outputs.backup_only != 'true'
+        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true' && steps.backupscope.outputs.backup_only != 'true' && steps.cdnscope.outputs.cdn_only != 'true'
         run: |
           python3 -B -m unittest discover -s server-version/scripts/attachment-backup -p 'test_*.py' -v
           python3 -B -m unittest discover -s server-version/scripts/host-ops -p 'test_*.py' -v
@@ -270,7 +300,7 @@ jobs:
           node --check server-version/scripts/cos-cleanup/recovery.mjs
           node --check server-version/scripts/cos-cleanup/recovery-smoke.mjs
       - name: Check shell and systemd units without starting production services
-        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true' && steps.backupscope.outputs.backup_only != 'true'
+        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true' && steps.backupscope.outputs.backup_only != 'true' && steps.cdnscope.outputs.cdn_only != 'true'
         run: |
           bash -n server-version/scripts/attachment-backup/install.sh
           bash -n server-version/scripts/host-ops/install.sh
@@ -287,13 +317,13 @@ jobs:
           sudo install -D -m 644 server-version/scripts/cos-cleanup/recovery.py /opt/eduk12-cos-cleanup/current/recovery.py
           sudo systemd-analyze verify server-version/scripts/cos-cleanup/systemd/*
       - name: Real isolated Docker launcher and failed-task cleanup
-        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true' && steps.backupscope.outputs.backup_only != 'true'
+        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true' && steps.backupscope.outputs.backup_only != 'true' && steps.cdnscope.outputs.cdn_only != 'true'
         run: |
           docker pull node:24.21.0-bookworm-slim
           sudo env CI=true GITHUB_ACTIONS=true NODE_ENV=test python3 -B server-version/scripts/attachment-backup/ci-container-smoke.py
           sudo env CI=true GITHUB_ACTIONS=true NODE_ENV=test python3 -B server-version/scripts/cos-cleanup/ci-container-smoke.py
       - name: Actual encrypted database restore and failure-volume cleanup
-        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true' && steps.backupscope.outputs.backup_only != 'true'
+        if: steps.qualified.outputs.reused != 'true' && steps.opsqualified.outputs.reused != 'true' && steps.mergequalified.outputs.reused != 'true' && steps.backupscope.outputs.backup_only != 'true' && steps.cdnscope.outputs.cdn_only != 'true'
         run: |
           docker pull postgres:16.15-bookworm
           sudo env PATH="$PATH" CI=true GITHUB_ACTIONS=true NODE_ENV=test python3 -B server-version/scripts/host-ops/ci-backup-smoke.py
