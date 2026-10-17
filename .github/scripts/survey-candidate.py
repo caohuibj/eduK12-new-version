@@ -141,6 +141,17 @@ def resume_browser_repair():
  phase('frontend-runtime',lambda:run(['docker','buildx','build','--builder','default','--load','-f',str(df),'--label','org.opencontainers.image.revision='+P['head'],'--target','runtime','-t',tag('frontend'),str(ROOT/'server-version/frontend')],900))
  C['images']['frontend']=out(['docker','image','inspect','--format','{{.Id}}',tag('frontend')]);save();archive_image('frontend',False)
 
+def resume_browser_only():
+ proof=json.loads((E/'resume-proof.json').read_text());old=proof['originalChecks']
+ assert proof['schema']==1 and proof['status']=='QUALIFIED_BROWSER_ONLY' and proof['currentHead']==P['head'] and proof['currentSourceHead']==os.environ['SURVEY_SOURCE_HEAD']
+ assert old['components']==P['components'] and C['phases']==[]
+ C['reusedQualification']={key:proof[key] for key in ['sourceRun','sourceHead','sourceMergeHead','artifact','compileOrigin','reportPaths','frontendReportPaths','retainedBackendTests','retainedFrontendTests','retainedBFrontendTests','additionalFrontendQualification','currentFrontendQualification']}
+ C['bases']=old['bases'];C['builders']={'backend':old['builders']['backend']};C['images']=old['images']
+ for key,image in [('backendBuilder',C['builders']['backend']),('backendRuntime',C['images']['backend']),('frontendRuntime',C['images']['frontend'])]:
+  assert out(['docker','image','inspect','--format','{{.Id}}',proof['currentAliases'][key]['alias']])==image
+ C['executionInputs']={'node':out(['node','--version']),'docker':out(['docker','version','--format','{{.Client.Version}}']),'runnerOS':os.environ.get('RUNNER_OS'),'workflow':out(['git','hash-object','.github/workflows/ci-survey-candidate.yml']),'executor':out(['git','hash-object','.github/scripts/survey-candidate.py']),'environmentSha256':hashlib.sha256(json.dumps(ENV,sort_keys=True).encode()).hexdigest()}
+ C['productSource']={'sourceHead':proof['sourceHead'],'mergeHead':proof['sourceMergeHead'],'components':old['components'],'frontendImageRevision':proof['sourceMergeHead']};save()
+
 def frontend_repair_tests():
  proof=json.loads((E/'resume-proof.json').read_text());selected=proof['frontendTestsToRun']
  assert selected==['src/survey/SurveyWorkspace.requests.test.tsx','src/survey/ResearchCatalog.test.tsx']
@@ -226,5 +237,5 @@ def cleanup():
   C['privateBrowserMaterialRemoved']=not TMP.exists();C['isolatedResourcesRemoved']=not errors;C['cleanupErrors']=errors;save()
  if errors:raise RuntimeError('Isolated container cleanup failed; private browser material removed')
 if __name__=='__main__':
- action=sys.argv[1];assert action in ['build','resume-build','resume-browser-repair','frontend-repair-tests','services','backend-tests','frontend-tests','runtime','browser','cleanup']
- {'build':build,'resume-build':resume_build,'resume-browser-repair':resume_browser_repair,'frontend-repair-tests':frontend_repair_tests,'services':services,'backend-tests':backend_tests,'frontend-tests':frontend_tests,'runtime':runtime,'browser':browser,'cleanup':cleanup}[action]()
+ action=sys.argv[1];assert action in ['build','resume-build','resume-browser-repair','resume-browser-only','frontend-repair-tests','services','backend-tests','frontend-tests','runtime','browser','cleanup']
+ {'build':build,'resume-build':resume_build,'resume-browser-repair':resume_browser_repair,'resume-browser-only':resume_browser_only,'frontend-repair-tests':frontend_repair_tests,'services':services,'backend-tests':backend_tests,'frontend-tests':frontend_tests,'runtime':runtime,'browser':browser,'cleanup':cleanup}[action]()

@@ -1,7 +1,7 @@
 """Fixed PR309 evidence chain: original compile A, browser-failed candidate B,
-with a flat E report for unchanged Wave tests after the accessibility repair. This is not a general cache.
+flat E Wave reports, and the fixed F product candidate for a browser-only repair. This is not a general cache.
 Original failed jobs and reports remain unchanged; only explicitly unaffected
-qualifications are retained. New frontend bytes and browser must qualify in C.
+qualifications are retained. F product bytes are frozen; the browser reruns fully.
 Importing does no I/O. Official downloads and Docker loads are Actions-only.
 """
 import datetime
@@ -141,6 +141,50 @@ E_IMAGES = {
     'frontend': 'sha256:cf248e36e161bc8851e89ddb77d3471dee2eceec126b71a2b101a7444d2d1abc',
 }
 E_BUILDER = 'sha256:e6f1da3d9e8a1d6714a509e24ce052827e8b511686f2ba8f8448bfb99fa0ca24'
+# F is the fixed final-product candidate. Only its browser locator is repaired.
+ORIGIN_F = {
+    'run': 39030390531, 'job': 117389591858,
+    'head': '02a933c47e9d244082a59e9bc356b66da7047ddf',
+    'merge': 'b8be568565e559bbd0ae16a95299384fe4955e5f',
+    'tree': '66d81cfd891e453c0e5daa8beb9832f97812f165',
+    'artifact': 12099963847,
+    'digest': 'sha256:50ad877d673d33d38e6f7a65cc3a537dc5f5d86808f24eee246b3714b2a00f2c',
+    'size': 1451835882,
+}
+F_VERIFIER_BLOB = '094425bfed3965e9fb35228a117949b4056427db'
+F_REVIEWED_BEFORE = {
+    '.github/scripts/survey-candidate-reuse.test.py': '293e962f2bdaf2106809603edb6fac885ecb2b2e',
+    '.github/scripts/survey-candidate.py': 'd38d92be5c27def9679b5ee6bb5e34f61cb20383',
+    '.github/workflows/ci-survey-candidate.yml': '319efaf1e02dca6371923f72d5eb6854d71f5799',
+    'server-version/e2e/survey-candidate-browser.cjs': '4e150826fed7859d63cefd1ac4198a69e6efd9e0',
+}
+F_SUCCESS_PHASES = (
+    'frontend-compile', 'frontend-builder-archive', 'frontend-app-types', 'frontend-catalog-lint',
+    'frontend-runtime', 'frontend-archive', 'browser-environment-migration',
+    'browser-environment-runtime-role', 'affected-frontend-catalog-contracts',
+)
+F_SUCCESS_STEPS = (
+    'restore verified backend gates and unchanged frontend evidence',
+    'compile only the repaired frontend from verified dependencies',
+    'scan repaired frontend runtime; backend scan is verified in its receipt',
+    'prepare disposable browser services with the unchanged restricted runtime',
+    'run only directly affected catalog and workspace frontend suites',
+    'install official pinned browser tools', CLEANUP_STEP,
+)
+F_IMAGES = {**E_IMAGES, 'frontend': 'sha256:4b26a2747dd1af536dd7614b3bbe9701d4d46f9bbc1cabc3aecd1097dded300a'}
+F_BUILDERS = {
+    'backend': 'sha256:5d489d9b1cad1133268aa0cf9ce6d75c555717c5deda6d3dd9fd4052c5ee0022',
+    'frontend': 'sha256:48ca482646a29cbf91971bba9a87b4b17c90f8162c96d54cc489f76fd8b1944a',
+}
+F_CURRENT_REPORT_SHA256 = {
+    'survey-candidate-plan.json': 'd123dee18a36f79976dfb15f77e7f1706bad4ad827480ad0c1c0ae6f7a079a8e',
+    'survey-candidate-evidence/checks.json': '47fc0d135230ed07f8d6208d148c0d377248842a1dcd0e1442d13bd35cbf312d',
+    'survey-candidate-evidence/frontend-catalog-tests.json': 'eae93dda405cc09548222c48330d6bd97ef4c7ff467377b5894fdaad5207e6b1',
+    'survey-candidate-evidence/frontend-scan.json': '368762d6a15e6d1f11a667b747a64a3806de0e0cca85661909462225cecdf33d',
+    'survey-candidate-evidence/browser/result.json': 'c614062315cb62338f7a6cabcc6eb98f6862e5c883622de9a46ce6ac7400d644',
+}
+F_ARCHIVE_PATHS = tuple('survey-candidate-evidence/' + stem + '-image.tar.zst' + suffix
+                        for stem in ('backend-builder', 'backend', 'frontend') for suffix in ('', '.sha256'))
 B_VERIFIER_BLOB = 'fe285c1b768c9a4b4c8772b26e633e899090843b'
 REPAIR_TRANSITIONS_FINALIZED = True
 REPAIR_TRANSITIONS = {
@@ -150,11 +194,11 @@ REPAIR_TRANSITIONS = {
     },
     '.github/scripts/survey-candidate.py': {
         'before': 'fcc8d9927ac6ddf43de7921c4375b7a3d263f7f6',
-        'after': 'd38d92be5c27def9679b5ee6bb5e34f61cb20383',
+        'after': '706ab3e23d62dc8dbf7a63a868527e4b9146cdcf',
     },
     '.github/workflows/ci-survey-candidate.yml': {
         'before': 'e4b773693870680bb582c068aabbb305713e5b79',
-        'after': '319efaf1e02dca6371923f72d5eb6854d71f5799',
+        'after': '59e1c877a8d9f6e96c089ec30692ce83f2a15bc3',
     },
     'server-version/frontend/src/survey/SurveyWaveStudio.tsx': {
         'before': '935e1787752d5729b44bd21898bb47ab210d15b9',
@@ -174,11 +218,11 @@ REPAIR_TRANSITIONS = {
     },
     'server-version/e2e/survey-candidate-browser.cjs': {
         'before': '4fdb55c2d26c1e3967097041d55839dcfefdf82a',
-        'after': '4e150826fed7859d63cefd1ac4198a69e6efd9e0',
+        'after': 'b150f891d0d668b6bd0bf58617cec66a2308384f',
     },
     '.github/scripts/survey-candidate-reuse.test.py': {
         'before': 'aeffdaf4fd378ee87531341f000368edf87b939b',
-        'after': '293e962f2bdaf2106809603edb6fac885ecb2b2e',
+        'after': '9318dec7546409073165a5cc3541eef12dcf7791',
     },
 }
 REPAIR_PRODUCT_PATHS = (
@@ -226,6 +270,12 @@ B_REPORT_SHA256 = {'survey-candidate-evidence/backend-scan.json': '3fb994e7af0cc
     'survey-candidate-evidence/runtime-restore.json': '8cac2f0ff51b96d62ec915ada9839785c6e042c10374ddf6c70c9470226ea9e4',
     'survey-candidate-evidence/runtime-result.json': 'c3a02921bc84d38f49e86f57a6b53c8a221314cb97f655178f5767c38700576e',
     'survey-candidate-plan.json': '588bbac5e0740e1fd0b3c8cf54c33571923c78bc807440020063540839af820e'}
+
+F_REPORT_SHA256 = {
+    **F_CURRENT_REPORT_SHA256,
+    **{'survey-candidate-evidence/original-evidence/' + name: digest for name, digest in B_REPORT_SHA256.items()},
+    **{'survey-candidate-evidence/additional-wave-evidence/' + name: digest for name, digest in E_REPORT_SHA256.items()},
+}
 
 MAX_DOWNLOAD_BYTES = 12 * 1024**3
 MAX_ZIP_EXPANDED_BYTES = 16 * 1024**3
@@ -288,7 +338,7 @@ def validate_current_event(event, plan, source_head):
 def validate_official_source(run, job, artifact, now=None, origin=None):
     """Validate either fixed origin; failed jobs never become whole successes."""
     origin = ORIGIN_A if origin is None else origin
-    require(origin in (ORIGIN_A, ORIGIN_B, ORIGIN_E), 'UNKNOWN_EVIDENCE_ORIGIN')
+    require(origin in (ORIGIN_A, ORIGIN_B, ORIGIN_E, ORIGIN_F), 'UNKNOWN_EVIDENCE_ORIGIN')
     require(run.get('id') == origin['run'], 'WRONG_SOURCE_RUN')
     require(run.get('repository', {}).get('full_name') == REPOSITORY, 'SOURCE_REPOSITORY')
     require(run.get('head_repository', {}).get('full_name') == REPOSITORY, 'SOURCE_FORK')
@@ -469,7 +519,7 @@ def official_json(path):
 
 def source_metadata(origin=None):
     origin = ORIGIN_A if origin is None else origin
-    require(origin in (ORIGIN_A, ORIGIN_B, ORIGIN_E), 'UNKNOWN_EVIDENCE_ORIGIN')
+    require(origin in (ORIGIN_A, ORIGIN_B, ORIGIN_E, ORIGIN_F), 'UNKNOWN_EVIDENCE_ORIGIN')
     run = official_json(f"/actions/runs/{origin['run']}")
     job = official_json(f"/actions/jobs/{origin['job']}")
     candidates = []
@@ -518,7 +568,9 @@ def safe_zip_entries(infos, origin=None):
     expected_chain = {'survey-candidate-evidence/resume-proof.json',
                       'survey-candidate-evidence/qualified-original-plan.json',
                       'survey-candidate-evidence/qualified-original-checks.json'}
-    if origin == ORIGIN_E:
+    if origin == ORIGIN_F:
+        require(set(F_REPORT_SHA256) | set(F_ARCHIVE_PATHS) <= seen, 'F_FIXED_RAW_REPORTS_AND_ARCHIVES_REQUIRED')
+    elif origin == ORIGIN_E:
         require(total <= 64 * 1024**2 and all(path in seen for path in E_REPORT_SHA256), 'E_SMALL_REPORT_BUDGET_OR_CONTENT')
         require(not any('.tar' in name for name in seen), 'E_IMAGE_ARCHIVES_FORBIDDEN')
     elif origin == ORIGIN_B:
@@ -542,6 +594,8 @@ def safe_extract(archive, destination, origin=None):
     safe_zip_entries(infos, origin)
     destination.mkdir(parents=True, mode=0o700)
     for info in infos:
+        if origin == ORIGIN_F and info.filename not in F_REPORT_SHA256 and info.filename not in F_ARCHIVE_PATHS:
+            continue  # F admission consumes only fixed raw reports and three exact archives.
         if origin == ORIGIN_E and info.filename not in E_REPORT_SHA256:
             continue  # Preserve only three flat raw reports; never extract E's nested receipts.
         target = destination.joinpath(*PurePosixPath(info.filename).parts)
@@ -559,7 +613,7 @@ def download_verified_artifact(artifact, destination, origin=None):
     """Actions-only intake. Retains original bytes; grants no reuse eligibility."""
     require_official_ci()
     origin = ORIGIN_A if origin is None else origin
-    require(origin in (ORIGIN_A, ORIGIN_B, ORIGIN_E), 'UNKNOWN_DOWNLOAD_ORIGIN')
+    require(origin in (ORIGIN_A, ORIGIN_B, ORIGIN_E, ORIGIN_F), 'UNKNOWN_DOWNLOAD_ORIGIN')
     destination = Path(destination)
     require(not destination.exists(), 'ARTIFACT_DESTINATION_EXISTS')
     require(artifact.get('workflow_run', {}).get('id') == origin['run'], 'WRONG_DOWNLOAD_RUN')
@@ -713,8 +767,9 @@ def validate_execution_inputs(proof):
             'rootGoldenFixtureBlob': before['server-version/cognitive-randomization-golden-v1.json'][2]}
 
 
-def load_and_alias(path, image_id, alias):
+def load_and_alias(path, image_id, alias, revision=SOURCE_MERGE):
     require_official_ci()
+    require(revision in (SOURCE_MERGE, ORIGIN_F['merge']), 'LOAD_REVISION_NOT_REVIEWED')
     decoder = subprocess.Popen(['zstd', '-dc', '--', str(path)], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
     try:
         subprocess.run(['docker', 'load'], stdin=decoder.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -730,12 +785,12 @@ def load_and_alias(path, image_id, alias):
     raw = subprocess.check_output(['docker', 'image', 'inspect', image_id], timeout=60)
     rows = json.loads(raw)
     require(len(rows) == 1 and rows[0].get('Id') == image_id, 'LOADED_IMAGE_ID_MISMATCH')
-    require(rows[0].get('Config', {}).get('Labels', {}).get('org.opencontainers.image.revision') == SOURCE_MERGE,
+    require(rows[0].get('Config', {}).get('Labels', {}).get('org.opencontainers.image.revision') == revision,
             'LOADED_IMAGE_ORIGINAL_REVISION_MISMATCH')
     subprocess.run(['docker', 'image', 'tag', image_id, alias], check=True, timeout=60)
     actual = subprocess.check_output(['docker', 'image', 'inspect', '--format', '{{.Id}}', alias], timeout=60).decode().strip()
     require(actual == image_id, 'CURRENT_ALIAS_CHANGED_IMAGE_ID')
-    return {'alias': alias, 'imageId': image_id, 'originalRevision': SOURCE_MERGE}
+    return {'alias': alias, 'imageId': image_id, 'originalRevision': revision}
 
 
 
@@ -1026,6 +1081,220 @@ def qualified_e_wave_reports(current_source, evidence):
     return receipt
 
 
+def validate_f_transition(before, after, verifier_blob):
+    """The F product, dependencies and configuration are byte-for-byte frozen."""
+    require(bool(re.fullmatch('[0-9a-f]{40}', verifier_blob)), 'F_VERIFIER_BLOB')
+    expected = set(F_REVIEWED_BEFORE) | {SELF_PATH}
+    changed = {path for path in set(before) | set(after) if before.get(path) != after.get(path)}
+    require(changed == expected, 'F_PRODUCT_OR_UNREVIEWED_CHANGE')
+    require(before.get(SELF_PATH) == ('100644', 'blob', F_VERIFIER_BLOB)
+            and after.get(SELF_PATH) == ('100644', 'blob', verifier_blob), 'F_VERIFIER_TRANSITION')
+    for path, old in F_REVIEWED_BEFORE.items():
+        require(before.get(path) == ('100644', 'blob', old)
+                and after.get(path) == ('100644', 'blob', REPAIR_TRANSITIONS[path]['after']), 'F_EXACT_INPUT_' + path)
+    unchanged = [(path, list(before[path])) for path in sorted(before) if path not in expected]
+    return {'changedPaths': sorted(expected), 'unchangedObjects': len(unchanged),
+            'unchangedInputsSha256': sha256(json.dumps(unchanged, separators=(',', ':')).encode())}
+
+
+def validate_f_plan(original, checks, current):
+    require(original.get('head') == ORIGIN_F['merge'] and original.get('tree') == ORIGIN_F['tree'], 'F_PLAN_ORIGIN')
+    for key in ('schema', 'route', 'base', 'changed', 'components', 'backendTests', 'frontendTests', 'selectionBlob', 'required'):
+        require(key in original and original[key] == current.get(key), 'F_PLAN_INPUT_CHANGED_' + key)
+    require(checks.get('components') == original.get('components'), 'F_COMPONENT_BINDING')
+    require(original.get('components') == {'frontend': 'edc094d12071138ead7fbd193f397e1f1ce1e33a',
+                                         'backend': 'dca5ca3924b293275c70bf2f58b8649c40a466a1'}, 'F_FIXED_COMPONENTS')
+    return True
+
+
+def validate_f_browser_only(job, checks, tests, scan, browser):
+    require(job.get('id') == ORIGIN_F['job'] and job.get('run_id') == ORIGIN_F['run']
+            and job.get('head_sha') == ORIGIN_F['head'] and job.get('status') == 'completed'
+            and job.get('conclusion') == 'failure', 'F_FAILED_JOB_REQUIRED')
+    steps = job.get('steps', [])
+    require(isinstance(steps, list), 'F_STEPS_REQUIRED')
+    for name in (*F_SUCCESS_STEPS, DOWNSTREAM_STEPS[-1]):
+        rows = [step for step in steps if step.get('name') == name]
+        expected = 'failure' if name == DOWNSTREAM_STEPS[-1] else 'success'
+        require(len(rows) == 1 and rows[0].get('status') == 'completed'
+                and rows[0].get('conclusion') == expected, 'F_SELECTED_STEP_' + name)
+    require([step.get('name') for step in steps if step.get('conclusion') == 'failure'] == [DOWNSTREAM_STEPS[-1]], 'F_ONLY_BROWSER_FAILURE')
+    require(checks.get('head') == ORIGIN_F['merge'] and checks.get('sourceHead') == ORIGIN_F['head']
+            and checks.get('tree') == ORIGIN_F['tree'], 'F_SOURCE_BINDING')
+    phases = checks.get('phases', [])
+    require([phase.get('name') for phase in phases] == [*F_SUCCESS_PHASES, B_FAILED_PHASE], 'F_EXACT_PHASE_LEDGER')
+    for name in F_SUCCESS_PHASES:
+        require_success_phase(checks, name)
+    require(phases[-1].get('status') == 'failure' and phases[-1].get('errorType') == 'CalledProcessError', 'F_BROWSER_PHASE_FAILED')
+    require(checks.get('privateBrowserMaterialRemoved') is True and checks.get('isolatedResourcesRemoved') is True
+            and checks.get('cleanupErrors') == [], 'F_CLEANUP_REQUIRED')
+    require(checks.get('executionInputs') == {
+        'node': 'v24.21.0', 'docker': '28.0.4', 'runnerOS': 'Linux',
+        'workflow': F_REVIEWED_BEFORE['.github/workflows/ci-survey-candidate.yml'],
+        'executor': F_REVIEWED_BEFORE['.github/scripts/survey-candidate.py'],
+        'environmentSha256': '5d01b4f55dcfa41489e3f5bc7910a28ae982542f7dc1df739d20ca53f2a62c32'}, 'F_EXECUTION_INPUTS')
+    require(checks.get('images') == F_IMAGES and checks.get('builders') == F_BUILDERS, 'F_FIXED_IMAGES')
+    recipe = checks.get('frontendBuildRecipe', {})
+    require(recipe.get('dependencyProducer') == 'sha256:2deb951d082a71060a9e91d367c7878654189d17503bf2ce27e3236ee7d7fb30'
+            and recipe.get('copiedSourceBlobs') == {path.removeprefix('server-version/frontend/'): REPAIR_TRANSITIONS[path]['after'] for path in REPAIR_PRODUCT_PATHS}
+            and recipe.get('dependencyLockUnchanged') is True, 'F_COMPILED_PRODUCT_BINDING')
+    runtime = checks.get('frontendRuntimeRecipe', {})
+    require(runtime.get('producer') == F_BUILDERS['frontend'] and runtime.get('compiledSourceHead') == ORIGIN_F['head']
+            and runtime.get('compiledMergeHead') == ORIGIN_F['merge']
+            and runtime.get('runtimeBase') == 'nginx@sha256:f761b94f2cb9e8e05e2943d5f773609596113ef69b54e2433a996d109a8f78b7', 'F_RUNTIME_RECIPE')
+    validate_test_report(tests, list(FRONTEND_TESTS_TO_RUN))
+    require(tests.get('numTotalTests') == 26 and len(tests['testResults']) == 2, 'F_EXACT_CONTRACT_COUNTS')
+    for name, count in zip(FRONTEND_TESTS_TO_RUN, (20, 6)):
+        rows = [row for row in tests['testResults'] if row['name'].replace('\\', '/').endswith('/' + name)]
+        require(len(rows) == 1 and len(rows[0]['assertionResults']) == count, 'F_SUITE_COUNT_' + name)
+    validate_runtime_scan(scan, F_IMAGES['frontend'], 'eduk12-survey-candidate-frontend:' + ORIGIN_F['merge'])
+    phase = 'researcher timing and cognitive provenance exports'
+    require(browser.get('status') == 'failed' and browser.get('sourceCommit') == ORIGIN_F['merge']
+            and browser.get('images') == F_IMAGES
+            and browser.get('harnessSha256') == 'c681e2771377bd7eedf2b7a6988b54f0cf06a481032adcad9cb17acc40807a28', 'F_BROWSER_BINDING')
+    require(browser.get('browserErrors') == [] and browser.get('visualFailures') == []
+            and browser.get('phase') == phase and browser.get('failure') == {
+                'phase': phase, 'name': 'TimeoutError', 'message': 'locator.selectOption: Timeout 20000ms exceeded.'}, 'F_ONLY_EXPORT_LOCATOR_FAILURE')
+    progress = browser.get('checks', [])
+    require(len(progress) == 60 and len({row.get('name') for row in progress}) == 60
+            and all(row.get('pass') is True for row in progress), 'F_BROWSER_PROGRESS_NOT_ALL_PASS')
+    axe = browser.get('accessibility', [])
+    require([row.get('state') for row in axe] == ['admin-invitation-grants', 'researcher-published-wave',
+                                               'participant-consent', 'participant-completed-feedback']
+            and all(row.get('violations') == [] for row in axe), 'F_BROWSER_ACCESSIBILITY_FAILURE')
+    return {'sourceRun': ORIGIN_F['run'], 'sourceJob': ORIGIN_F['job'], 'sourceHead': ORIGIN_F['head'],
+            'sourceMergeHead': ORIGIN_F['merge'], 'sourceTree': ORIGIN_F['tree'],
+            'sourceJobConclusion': 'failure', 'originalFailedPhase': B_FAILED_PHASE,
+            'retainedAssertions': 26, 'retainedSuites': list(FRONTEND_TESTS_TO_RUN),
+            'retainedPhases': list(F_SUCCESS_PHASES[:6]) + ['affected-frontend-catalog-contracts'],
+            'retainedFrontendScan': True, 'browserObservedPasses': 60,
+            'wholeCandidateQualified': False, 'browserQualified': False}
+
+
+def fetch_f_inputs(current_source):
+    require_official_ci()
+    for ref in (ORIGIN_F['head'], ORIGIN_F['merge']):
+        if subprocess.run(['git', 'cat-file', '-e', ref + '^{commit}'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode:
+            subprocess.run(['git', 'fetch', '--no-tags', 'origin', ref], check=True, timeout=120)
+        require(git('rev-parse', ref + '^{tree}').decode().strip() == ORIGIN_F['tree'], 'F_SOURCE_TREE')
+    return validate_f_transition(git_objects(ORIGIN_F['head']), git_objects(current_source),
+                                 git('hash-object', str(Path(__file__).resolve())).decode().strip())
+
+
+def browser_only_main():
+    require_official_ci()
+    require(REPAIR_TRANSITIONS_FINALIZED, 'REPAIR_TRANSITIONS_NOT_FINALIZED')
+    current, current_source = read_json('survey-candidate-plan.json'), os.environ.get('SURVEY_SOURCE_HEAD', '')
+    validate_current_event(read_json(os.environ['GITHUB_EVENT_PATH']), current, current_source)
+    binding = validate_repair_inputs(current, current_source)
+    f_binding = fetch_f_inputs(current_source)
+    metadata = {label: source_metadata(origin) for label, origin in (
+        ('compile', ORIGIN_A), ('contracts', ORIGIN_B), ('wave', ORIGIN_E), ('product', ORIGIN_F))}
+    evidence = Path('survey-candidate-evidence')
+    require(not evidence.exists(), 'CURRENT_EVIDENCE_ALREADY_EXISTS')
+    evidence.mkdir(mode=0o700)
+    f_artifact = metadata['product'][2]
+    root = download_verified_artifact(f_artifact, evidence / 'original-f-evidence', ORIGIN_F)
+    for path, digest in F_REPORT_SHA256.items():
+        require(file_sha256(root / path) == digest, 'F_FIXED_RAW_REPORT_HASH_' + path)
+    original = root / 'survey-candidate-evidence'
+    b_root = original / 'original-evidence'
+    b_evidence = b_root / 'survey-candidate-evidence'
+    e_evidence = original / 'additional-wave-evidence' / 'survey-candidate-evidence'
+    f_plan, f_checks = read_json(root / 'survey-candidate-plan.json'), read_json(original / 'checks.json')
+    b_plan, b_checks = read_json(b_root / 'survey-candidate-plan.json'), read_json(b_evidence / 'checks.json')
+    a_plan, a_checks = read_json(b_evidence / 'qualified-original-plan.json'), read_json(b_evidence / 'qualified-original-checks.json')
+    b_receipt = read_json(b_evidence / 'resume-proof.json')
+    validate_partial_candidate(metadata['compile'][1], a_checks)
+    validate_browser_failure_candidate(metadata['contracts'][1], b_checks)
+    validate_fixed_chain_receipt(b_receipt, a_plan, a_checks, b_plan, b_checks)
+    require(b_receipt.get('inputBinding') == binding['compileToContractTransition'], 'F_B_ORIGINAL_TRANSITION')
+    require(b_receipt.get('originalExecutionInputs') == validate_execution_inputs(a_checks), 'F_A_EXECUTION_INPUTS')
+    retained_b = validate_repair_plan(b_plan, b_checks, f_plan)
+    report_names = ('backend-tests.json', 'frontend-tests.json', 'backend-scan.json', 'frontend-scan.json',
+                    'runtime-result.json', 'runtime-restore.json', 'recovery-bootstrap.json', 'recovery-result.json', 'browser/result.json')
+    b_reports = {name: read_json(b_evidence / name) for name in report_names}
+    qualification_b = validate_repair_reports(b_reports, b_plan, b_checks,
+        sha256(git('show', ORIGIN_B['head'] + ':.github/scripts/survey-candidate-runtime.cjs')),
+        sha256(git('show', ORIGIN_B['head'] + ':.github/scripts/survey-candidate-recovery.py')),
+        sha256(git('show', ORIGIN_B['head'] + ':' + REPAIR_BROWSER_HARNESS_PATH)))
+    # E is a flat independent source: three pinned reports, no E receipt/images.
+    for ref in (ORIGIN_E['head'], ORIGIN_E['merge']):
+        if subprocess.run(['git', 'cat-file', '-e', ref + '^{commit}'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode:
+            subprocess.run(['git', 'fetch', '--no-tags', 'origin', ref], check=True, timeout=120)
+        require(git('rev-parse', ref + '^{tree}').decode().strip() == ORIGIN_E['tree'], 'F_E_FIXED_TREE')
+    additional = validate_e_wave_reports(metadata['wave'][1], read_json(e_evidence / 'checks.json'),
+                                         read_json(e_evidence / 'frontend-qr-tests.json'), read_json(e_evidence / 'browser/result.json'))
+    additional.update({'artifact': {key: metadata['wave'][2][key] for key in ('id', 'digest', 'size_in_bytes')},
+                       'inputBinding': validate_e_transition(git_objects(ORIGIN_E['head']), git_objects(current_source),
+                           git('hash-object', str(Path(__file__).resolve())).decode().strip()),
+                       'reportPaths': {name: str(e_evidence / name) for name in ('checks.json', 'frontend-qr-tests.json', 'browser/result.json')},
+                       'rawReportSha256': E_REPORT_SHA256})
+    validate_f_plan(f_plan, f_checks, current)
+    f_names = ('checks.json', 'frontend-catalog-tests.json', 'frontend-scan.json', 'browser/result.json')
+    f_reports = {name: read_json(original / name) for name in f_names}
+    qualification_f = validate_f_browser_only(metadata['product'][1], f_checks,
+        f_reports['frontend-catalog-tests.json'], f_reports['frontend-scan.json'], f_reports['browser/result.json'])
+    qualification_f.update({'inputBinding': f_binding, 'reportPaths': {name: str(original / name) for name in f_names},
+                            'rawReportSha256': F_CURRENT_REPORT_SHA256})
+    specs = (
+        ('backendBuilder', 'backend-builder-image.tar.zst', F_BUILDERS['backend'], SOURCE_MERGE,
+         'eduk12-survey-candidate-backend:' + SOURCE_MERGE + '-build', 'backend', '-build'),
+        ('backendRuntime', 'backend-image.tar.zst', F_IMAGES['backend'], SOURCE_MERGE,
+         'eduk12-survey-candidate-backend:' + SOURCE_MERGE, 'backend', ''),
+        ('frontendRuntime', 'frontend-image.tar.zst', F_IMAGES['frontend'], ORIGIN_F['merge'],
+         'eduk12-survey-candidate-frontend:' + ORIGIN_F['merge'], 'frontend', ''),
+    )
+    archives, aliases = {}, {}
+    for key, name, image_id, revision, old_tag, component, suffix in specs:
+        archive = verify_image_archive(original / name, image_id, old_tag, revision)
+        if component == 'backend':
+            require(archive == b_receipt.get('archives', {}).get(key), 'F_ORIGINAL_BACKEND_ARCHIVE_CHANGED')
+        archives[key] = archive
+    # No frontend builder is extracted or loaded. The F runtime is already final.
+    for key, name, image_id, revision, old_tag, component, suffix in specs:
+        for extra in ('', '.sha256'):
+            os.replace(original / (name + extra), evidence / (name + extra))
+        aliases[key] = load_and_alias(evidence / name, image_id,
+            'eduk12-survey-candidate-' + component + ':' + current['head'] + suffix, revision)
+        archives[key]['retainedPath'] = str(evidence / name)
+    retained_a_phases = [name for name in REUSED_PHASES if name.startswith('backend-')]
+    retained_b_phases = ['frontend-cognitive-types', 'frontend-dependency-audit', 'integrated-migration',
+        'restricted-runtime-bootstrap', 'selected-backend-contracts', 'production-redis-runtime', 'legacy-upgrade-new-schema-restore']
+    receipt = {
+        'schema': 1, 'status': 'QUALIFIED_BROWSER_ONLY', 'currentHead': current['head'], 'currentSourceHead': current_source,
+        'sourceHead': ORIGIN_F['head'], 'sourceMergeHead': ORIGIN_F['merge'], 'sourceRun': ORIGIN_F['run'], 'sourceJob': ORIGIN_F['job'],
+        'artifact': {key: f_artifact[key] for key in ('id', 'digest', 'size_in_bytes')},
+        'originalPlan': f_plan, 'originalChecks': f_checks, 'inputBinding': f_binding,
+        'compileOrigin': {'sourceRun': SOURCE_RUN, 'sourceJob': SOURCE_JOB, 'sourceHead': SOURCE_HEAD,
+                         'sourceMergeHead': SOURCE_MERGE, 'artifact': b_receipt['artifact'],
+                         'originalPlan': a_plan, 'originalChecks': a_checks},
+        'backendQualification': {'sourceRun': ORIGIN_B['run'], 'sourceJob': ORIGIN_B['job'],
+                                'sourceHead': ORIGIN_B['head'], 'sourceMergeHead': ORIGIN_B['merge'],
+                                'qualifications': qualification_b},
+        'additionalFrontendQualification': additional, 'currentFrontendQualification': qualification_f,
+        'reusedPhases': retained_a_phases + retained_b_phases + qualification_f['retainedPhases'],
+        'phaseOrigins': {**{name: SOURCE_RUN for name in retained_a_phases}, **{name: ORIGIN_B['run'] for name in retained_b_phases},
+                        **{name: ORIGIN_F['run'] for name in qualification_f['retainedPhases']}},
+        'retainedBackendTests': 132, 'retainedBFrontendTests': 136, 'retainedFrontendTests': 172,
+        'frontendTestsReused': [*retained_b, *E_RETAINED_TESTS, *FRONTEND_TESTS_TO_RUN], 'frontendTestsToRun': [],
+        'retainedBackendScan': True, 'retainedFrontendScan': True, 'retainedFrontendAudit': True,
+        'reportPaths': {name: str(b_evidence / name) for name in report_names},
+        'frontendReportPaths': {name: str(original / name) for name in f_names},
+        'archives': archives, 'currentAliases': aliases, 'originalFailedPhase': B_FAILED_PHASE,
+        'originalJobConclusion': 'failure', 'originalEvidencePath': str(original),
+        'provenance': {label: validate_official_source(*metadata[label], origin=origin) for label, origin in (
+            ('compile', ORIGIN_A), ('contracts', ORIGIN_B), ('wave', ORIGIN_E), ('product', ORIGIN_F))},
+        'qualifiedAt': datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        'wholeCandidateQualified': False, 'browserQualified': False, 'rebuilt': False, 'retested': False, 'rescanned': False,
+    }
+    (evidence / 'resume-proof.json').write_text(json.dumps(receipt, indent=2) + '\n')
+    with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+        output.write('restored=true\n')
+    print(json.dumps({'status': receipt['status'], 'sourceRun': ORIGIN_F['run'],
+                      'retainedBackendTests': 132, 'retainedFrontendTests': 172, 'wholeCandidateQualified': False}))
+
+
 def browser_repair_main():
     require_official_ci()
     require(REPAIR_TRANSITIONS_FINALIZED, 'REPAIR_TRANSITIONS_NOT_FINALIZED')
@@ -1167,7 +1436,8 @@ SCOPE_REPAIR_TESTS = (
 
 
 EMPTY_SCOPE_FILE = '.github/scripts/ci-topology.test.mjs'
-CURRENT_SCOPE_TESTS = SCOPE_REPAIR_TESTS
+CURRENT_SCOPE_TESTS = SCOPE_REPAIR_TESTS[1:]
+SCOPE_F_JOB = 117389494061
 
 
 def parse_scope_repair_tap(output, affected):
@@ -1269,6 +1539,38 @@ def extract_scope_repair_tap(log):
     return '\n'.join(lines[start:ends[0] + 1]) + '\n'
 
 
+def qualified_f_boundary_case():
+    """Read only F's actual boundary test, never its inherited scope receipt."""
+    run = official_json(f"/actions/runs/{ORIGIN_F['run']}")
+    job = official_json(f'/actions/jobs/{SCOPE_F_JOB}')
+    require(run.get('id') == ORIGIN_F['run'] and run.get('head_sha') == ORIGIN_F['head']
+            and run.get('event') == 'pull_request' and run.get('status') == 'completed'
+            and run.get('repository', {}).get('full_name') == REPOSITORY
+            and run.get('head_repository', {}).get('full_name') == REPOSITORY
+            and run.get('path') == '.github/workflows/ci.yml' and recent(run.get('created_at'))
+            and any(pr.get('number') == PR_NUMBER for pr in run.get('pull_requests', [])), 'SCOPE_F_RUN_ORIGIN')
+    require(job.get('id') == SCOPE_F_JOB and job.get('run_id') == ORIGIN_F['run']
+            and job.get('head_sha') == ORIGIN_F['head'] and job.get('name') == 'classify changed content'
+            and job.get('status') == 'completed' and job.get('conclusion') == 'success'
+            and recent(job.get('completed_at')), 'SCOPE_F_SUCCESSFUL_JOB_REQUIRED')
+    selected = [step for step in job.get('steps', [])
+                if step.get('name') == 'frozen Survey scope and fail-closed merge contracts']
+    require(len(selected) == 1 and selected[0].get('status') == 'completed'
+            and selected[0].get('conclusion') == 'success', 'SCOPE_F_SELECTED_STEP')
+    with official_request(f'/actions/jobs/{SCOPE_F_JOB}/logs') as response:
+        raw = response.read(MAX_JSON_BYTES + 1)
+    require(len(raw) <= MAX_JSON_BYTES, 'SCOPE_F_LOG_SIZE')
+    text = raw.decode('utf8')
+    require('node: v24.21.0' in text, 'SCOPE_F_NODE_VERSION')
+    tap = extract_scope_repair_tap(text)
+    parsed = parse_scope_repair_tap(tap, SCOPE_REPAIR_TESTS)
+    require(not parsed['emptyFileWrappers'], 'SCOPE_F_EMPTY_WRAPPER_FORBIDDEN')
+    return {'sourceRun': ORIGIN_F['run'], 'sourceJob': SCOPE_F_JOB,
+            'sourceHead': ORIGIN_F['head'], 'sourceMergeHead': ORIGIN_F['merge'], 'sourceTree': ORIGIN_F['tree'],
+            'sourceJobConclusion': 'success', 'qualifiedNamedTests': [SCOPE_REPAIR_TESTS[0]],
+            'sourceLogSha256': sha256(raw), 'tapSha256': sha256(tap.encode())}
+
+
 def scope_repair_receipt():
     require_official_ci()
     require(REPAIR_TRANSITIONS_FINALIZED, 'REPAIR_TRANSITIONS_NOT_FINALIZED')
@@ -1283,6 +1585,7 @@ def scope_repair_receipt():
             'base': '21c1778a545c1988bef65900789c701208b647e5'}
     validate_current_event(event, plan, source)
     binding = validate_repair_inputs(plan, source)
+    binding['browserOnlyTransition'] = fetch_f_inputs(source)
     if subprocess.run(['git', 'cat-file', '-e', SCOPE_HEAD + '^{commit}'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode:
         subprocess.run(['git', 'fetch', '--no-tags', '--depth=1', 'origin', SCOPE_HEAD], check=True, timeout=120)
     require(git('rev-parse', SCOPE_HEAD + '^{tree}').decode().strip() == SCOPE_TREE, 'SCOPE_ORIGINAL_TREE')
@@ -1345,13 +1648,16 @@ def scope_repair_receipt():
     retained = [name for name in all_names if name not in SCOPE_REPAIR_TESTS]
     require(len(retained) == 33 and all(name in all_names for name in SCOPE_REPAIR_TESTS), 'SCOPE_REPAIR_SELECTION_CHANGED')
     sources = {name: ORIGIN_B['run'] if name in old_executed else SCOPE_RUN for name in retained}
-    require(len(sources) == 33, 'SCOPE_RETAINED_CONTRACT_SOURCES_REQUIRED')
+    boundary = qualified_f_boundary_case()
+    sources[SCOPE_REPAIR_TESTS[0]] = ORIGIN_F['run']
+    require(len(sources) == 34 and set(sources) == set(all_names) - set(CURRENT_SCOPE_TESTS),
+            'SCOPE_RETAINED_CONTRACT_SOURCES_REQUIRED')
     receipt = {'schema': 1, 'currentHead': current, 'currentSourceHead': source,
                'sourceRun': ORIGIN_B['run'], 'sourceJob': SCOPE_B_JOB,
                'originalSourceRun': SCOPE_RUN, 'originalSourceJob': SCOPE_JOB,
                'sourceLogsSha256': {label: value['sha256'] for label, value in logs.items()},
                'inputBinding': binding, 'retainedNodeTests': [name for name in all_names if name in sources],
-               'retainedNodeSources': sources,
+               'retainedNodeSources': sources, 'directBoundarySource': boundary,
                'executedNodeTests': list(CURRENT_SCOPE_TESTS), 'wholeCandidateQualified': False}
     print(json.dumps(receipt), flush=True)
     # Both files contain selected contracts; omit the unrelated ci-topology file.
@@ -1365,10 +1671,10 @@ def scope_repair_receipt():
     require(result.returncode == 0, 'SCOPE_CURRENT_CONTRACT_FAILURE')
     parsed = parse_scope_repair_tap(result.stdout, CURRENT_SCOPE_TESTS)
     require(not parsed['emptyFileWrappers'], 'SCOPE_CURRENT_UNEXPECTED_EMPTY_FILE')
-    print(json.dumps({'status': 'SCOPE_QUALIFIED', 'executedPassed': 3, 'retainedPassed': 33,
+    print(json.dumps({'status': 'SCOPE_QUALIFIED', 'executedPassed': 2, 'retainedPassed': 34,
                       'sourceRun': ORIGIN_B['run'], 'originalSourceRun': SCOPE_RUN}), flush=True)
 
 
 
 if __name__ == '__main__':
-    scope_repair_receipt() if sys.argv[1:] == ['--scope-receipt'] else browser_repair_main()
+    scope_repair_receipt() if sys.argv[1:] == ['--scope-receipt'] else browser_only_main()

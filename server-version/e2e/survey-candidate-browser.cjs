@@ -478,13 +478,28 @@ async function exportJourney(page, wave, participant) {
   await action(page, '/api/survey/auth/mfa/step-up',
     () => analytics.getByRole('button', { name: '完成五分钟内二次认证', exact: true }).click())
   const artifacts = {}
+  const exportSection = analytics.locator('div.border.rounded-xl').filter({ has: page.getByRole('heading', { name: '匿名科研数据导出', exact: true }) })
+  check('Exactly one researcher export section exists', await exportSection.count(), 1)
   for (const format of ['RAW_WAVE', 'COGNITIVE_TRIAL_LONG']) {
-    await analytics.getByLabel('数据格式', { exact: true }).selectOption(format)
-    // The wave selector has this exact accessible name in the export section.
-    const exportSection = analytics.locator('div.border.rounded-xl').filter({ has: page.getByRole('heading', { name: '匿名科研数据导出', exact: true }) })
-    await exportSection.getByLabel('波次', { exact: true }).selectOption(wave.id)
+    milestone('researcher export format selection: ' + format)
+    // Role names exclude nested option text; exact label text includes it.
+    const formatSelect = exportSection.getByRole('combobox', { name: '数据格式', exact: true })
+    check(format + ' format control is unique', await formatSelect.count(), 1)
+    check(format + ' is a real UI option', await formatSelect.locator('option').evaluateAll((options, value) => options.some(option => option.value === value), format))
+    check(format + ' UI selects the requested format', await formatSelect.selectOption(format), [format])
+    check(format + ' selected format is retained', await formatSelect.inputValue(), format)
+    milestone('researcher export wave selection: ' + format)
+    const waveSelect = exportSection.getByRole('combobox', { name: '波次', exact: true })
+    check(format + ' wave control is unique', await waveSelect.count(), 1)
+    check(format + ' contains the completed wave option', await waveSelect.locator('option').evaluateAll((options, value) => options.some(option => option.value === value), wave.id))
+    check(format + ' UI selects the completed wave', await waveSelect.selectOption(wave.id), [wave.id])
+    check(format + ' selected wave is retained', await waveSelect.inputValue(), wave.id)
+    milestone('researcher export ticket and download: ' + format)
     const ticket = await action(page, '/api/survey/projects/' + fixture.project.id + '/exports',
-      () => analytics.getByRole('button', { name: '创建受控导出', exact: true }).click())
+      () => exportSection.getByRole('button', { name: '创建受控导出', exact: true }).click())
+    const selection = ticket.request.postDataJSON()
+    check(format + ' request binds selected format and completed wave', { format: selection.format, waveId: selection.waveId }, { format, waveId: wave.id })
+    check(format + ' ticket is ready for the selected format', { status: ticket.data.status, format: ticket.data.format }, { status: 'READY', format })
     check(format + ' fits the declared single bounded page', ticket.data.nextCursor == null)
     const downloads = []
     const listener = download => downloads.push(download)
@@ -495,12 +510,19 @@ async function exportJourney(page, wave, participant) {
     while (downloads.length < 3 && Date.now() < until) await delay(25)
     page.off('download', listener)
     check(format + ' UI downloads CSV, codebook and manifest', downloads.length, 3)
+    const filenames = downloads.map(download => download.suggestedFilename())
+    check(format + ' download filenames are unique', new Set(filenames).size, 3)
+    for (const suffix of ['.csv', '_codebook.json', '_manifest.json']) {
+      check(format + ' has exactly one ' + suffix + ' artifact', filenames.filter(name => name.endsWith(suffix)).length, 1)
+    }
     for (const download of downloads) {
       assert(/^[a-zA-Z0-9_.-]+$/.test(download.suggestedFilename()), 'Safe download filename')
       await download.saveAs(path.join(output, download.suggestedFilename()))
       assert.equal(await download.failure(), null)
     }
     const artifact = downloaded.data, rows = parseCsv(artifact.csv)
+    check(format + ' download is the requested ticket and format', { id: artifact.id, format: artifact.format }, { id: ticket.data.id, format })
+    check(format + ' manifest records the requested selection', artifact.manifest.selection.format, format)
     check(format + ' manifest row count matches actual CSV', rows.length, artifact.manifest.rowCount)
     check(format + ' manifest project identity', artifact.manifest.projectId, fixture.project.id)
     check(format + ' manifest binds actual CSV bytes', artifact.manifest.dataDigest, SHA256(JSON.stringify(artifact.csv)))
@@ -528,7 +550,9 @@ async function exportJourney(page, wave, participant) {
   check('Cognitive indexes are complete', trials.map(row => Number(row.trial_index)).sort((a, b) => a - b), Array.from({ length: 120 }, (_, i) => i))
   check('Cognitive export binds exact child hash and measurement', trials.every(row => row.source_result_hash === participant.child.resultHash &&
     row.measurement_digest === participant.child.measurementDigest && row.epoch === String(participant.child.epoch)))
+  check('Every exported row has a complete parent FINAL hash', [...raw, ...trials].every(row => /^[a-f0-9]{64}$/.test(row.source_final_hash)))
   check('All exports share one verified parent FINAL hash', new Set([...raw, ...trials].map(row => row.source_final_hash)).size, 1)
+  check('Cognitive manifest binds the exported parent FINAL hash', artifacts.COGNITIVE_TRIAL_LONG.manifest.batch.parentFinalHash, trials[0].source_final_hash)
   check('Cognitive export retains software-frame protocol', trials.every(row => row.timing_policy === 'software-frame-v1' && row.config_version === '1.1.0'))
   check('Cognitive export has keyboard provenance', trials.every(row => {
     const provenance = JSON.parse(row.administration_provenance)
