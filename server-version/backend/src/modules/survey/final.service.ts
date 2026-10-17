@@ -4,7 +4,7 @@ import { prepareCanonicalSubmission, assertCanonicalSubmissionPayloadSize, valid
 import { withFinalOnlyCompletionTransaction } from '../../services/questionnaireProgressService'
 import { encryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { computeSurveyFinal, SurveyFinalValidationError } from './final.compute'
+import { verifySurveyFinalPublication, SurveyFinalValidationError } from './final.compute'
 import { SurveyScaleTimingError } from './timing.definition'
 import { ensureSurveyFlowAssignment } from './flow.assignment'
 import { hashResearchCredential } from './identity.service'
@@ -70,9 +70,11 @@ export async function submitResearchFinal(input:FinalInput){
     if(publication.id!==known.publicationId||
       publication.definitionDigest!==known.definitionDigest)
       invalid('提交时研究冻结版本已经发生变化')
-    const snapshot=publication.compiledSnapshot as unknown as ResearchFrozenPublication
-    if(canonicalHash(JSON.parse(JSON.stringify(snapshot)))!==publication.definitionDigest)
+    const verified=verifySurveyFinalPublication(
+      publication.compiledSnapshot as unknown as ResearchFrozenPublication,publication.definitionDigest)
+    if(!verified)
       blocked('冻结研究定义校验失败')
+    const snapshot=verified.snapshot
     // Flow assignment is fixed to this Attempt while serialized with the
     // Wave/Attempt and participant's current credential and revocation locks.
     const assignment=snapshot.flow?await ensureSurveyFlowAssignment(tx,{
@@ -94,6 +96,10 @@ export async function submitResearchFinal(input:FinalInput){
       if(!person)blocked('研究身份已失效')
     }else if(!snapshot.flow&&attempt.sessionHash!==hashResearchCredential(input.accessCredential))
       blocked('单次研究作答凭证已失效')
+    // Withdrawal retains immutable FINAL data for audit, but its old bearer
+    // must not recover a successful receipt after the Attempt is excluded.
+    if(!['STARTED','COMPLETED'].includes(attempt.status)||attempt.excludedAt!==null)
+      invalid('这份作答已经关闭或撤回')
     const existing=await tx.surveyWaveFinal.findUnique({where:{attemptId:attempt.id}})
     if(existing){
       if(existing.payloadHash!==canonical.hash||existing.submissionId!==input.submissionId)
@@ -114,7 +120,7 @@ export async function submitResearchFinal(input:FinalInput){
     if(!consent)blocked('当前研究缺少有效的知情同意记录')
     let calculated
     try{
-      calculated=computeSurveyFinal(snapshot,input.answers,assignment,
+      calculated=verified.compute(input.answers,assignment,
         input.presentation?.shownBlocks,'FINAL',input.itemTimings)
     }catch(e){
       if(e instanceof SurveyFinalValidationError||e instanceof SurveyScaleTimingError)

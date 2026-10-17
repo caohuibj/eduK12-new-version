@@ -97,14 +97,18 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
     attemptId:string;page:number;list:QualityAudit[]
   }|null>(null)
   const base='/projects/'+projectId
+  const changeWave=(id:string)=>{
+    setWaveId(id);setTicket(null);setBatchDownloaded(false)
+    setItemStats(null);setPairedScore(null);setGroupResult(null);setGroupItem('');setGroupScore('')
+    setBoundedVariables([]);setBoundedItemKey('');setBoundedItem(null)
+  }
   const reload=async()=>{
     const res=await api<Overview>(base+'/analytics/overview')
     setOverview(res)
     const ordered=res.waves
-    if(ordered[0]){setWaveId(ordered[0].id);setBaseline(ordered[0].id)}
+    changeWave(ordered[0]?.id??'')
+    if(ordered[0])setBaseline(ordered[0].id)
     if(ordered[1])setFollowup(ordered[1].id)
-    setItemStats(null);setPairedScore(null);setGroupResult(null);setGroupItem('');setGroupScore('')
-    setBoundedVariables([]);setBoundedItemKey('');setBoundedItem(null)
   }
   useEffect(()=>{
     setOverview(null);setError('');setTicket(null);setPaired(null)
@@ -223,6 +227,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
       <p className="text-sm text-slate-600">完成与配对统计只来源于可核对的加密 Survey FINAL；研究编号数不等于经过实名验证的自然人数。</p></header>
     {error&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{error}</p>}
     {message&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{message}</p>}
+    <fieldset disabled={busy} className="min-w-0 border-0 p-0 space-y-4" aria-label="研究数据操作">
     <button className="btn-secondary" disabled={busy} onClick={()=>void execute(reload)}>刷新完成进度</button>
     {overview&&<><div className="overflow-x-auto" tabIndex={0} role="region" aria-label="研究波次完成统计"><table className="w-full text-sm border-collapse">
       <thead><tr className="bg-slate-100"><th className="p-2 text-left">波次</th><th className="p-2">状态</th>
@@ -310,7 +315,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
         <h3 className="font-semibold">逐题与描述性统计</h3>
         <div className="flex flex-wrap gap-3 items-end">
           <label className="text-sm">波次
-            <select className="input block" value={waveId} onChange={e=>{setWaveId(e.target.value);setTicket(null);setItemStats(null);setGroupResult(null);setGroupItem('');setGroupScore('');setBoundedVariables([]);setBoundedItem(null)}}>
+            <select className="input block" value={waveId} onChange={e=>changeWave(e.target.value)}>
               {overview.waves.map(w=><option key={w.id} value={w.id}>T{w.ordinal} {w.title}</option>)}
             </select></label>
           <button type="button" className="btn-secondary" disabled={busy||!waveId} onClick={loadItems}>
@@ -445,7 +450,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
                </select>
              </label>}
            {format==='RAW_WAVE'&&<label className="text-sm">波次
-            <select className="input block" value={waveId} onChange={e=>{setWaveId(e.target.value);setTicket(null)}}>
+            <select className="input block" value={waveId} onChange={e=>changeWave(e.target.value)}>
               {overview.waves.map(w=><option key={w.id} value={w.id}>T{w.ordinal} {w.title}</option>)}
             </select></label>}
           {format==='RAW_WAVE'&&<div className="grid gap-2 text-sm">
@@ -479,5 +484,6 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
         </div>}
       </div>
     </>}
+    </fieldset>
   </section>
 }

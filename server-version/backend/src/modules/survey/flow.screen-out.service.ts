@@ -4,6 +4,7 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { prepareCanonicalSubmission,assertCanonicalSubmissionPayloadSize,validateSubmissionId } from '../../services/instrumentFinalSubmit'
 import { withFinalOnlyCompletionTransaction } from '../../services/questionnaireProgressService'
 import { verifiedSurveyAttempt } from './admission.service'
+import { hashResearchCredential } from './identity.service'
 import { ensureSurveyFlowAssignment } from './flow.assignment'
 import { computeSurveyFinal,SurveyFinalValidationError } from './final.compute'
 import { SurveyFinalError,type FinalInput } from './final.service'
@@ -35,8 +36,28 @@ export async function screenOutResearchAttempt(input:FinalInput){
     },include:{wave:{include:{publication:true}}}})
     if(!attempt||attempt.participantId!==own.participantId)
       throw new SurveyFinalError(403,'研究身份已失效')
-    if(attempt.status==='SCREENED_OUT')return {
-      status:'SCREENED_OUT' as const,idempotent:true,
+    if(attempt.status==='SCREENED_OUT'){
+      if(attempt.excludedAt!==null)
+        throw new SurveyFinalError(409,'研究作答已经撤回')
+      // The initial proof may predate a revocation committed while waiting
+      // for these locks. Terminal recovery still requires current authority.
+      if(attempt.participantId){
+        if(!input.researchCode)throw new SurveyFinalError(403,'研究身份已失效')
+        await tx.$queryRaw`SELECT id FROM survey_participants
+          WHERE id=${attempt.participantId} AND project_id=${own.projectId} FOR SHARE`
+        const person=await tx.surveyParticipant.findFirst({where:{
+          id:attempt.participantId,projectId:own.projectId,researchCode:input.researchCode,
+          status:'ACTIVE',credentialRevokedAt:null,
+          credentialHash:hashResearchCredential(input.accessCredential),
+        },select:{id:true}})
+        if(!person)throw new SurveyFinalError(403,'研究身份已失效')
+      }else if(attempt.sessionHash!==hashResearchCredential(input.accessCredential))
+        throw new SurveyFinalError(403,'单次研究作答凭证已失效')
+      const publication=attempt.wave.publication
+      if(!publication||publication.id!==own.publicationId||publication.definitionDigest!==own.definitionDigest||
+        canonicalHash(JSON.parse(JSON.stringify(publication.compiledSnapshot)))!==publication.definitionDigest)
+        throw new SurveyFinalError(409,'冻结版本已经变化')
+      return {status:'SCREENED_OUT' as const,idempotent:true}
     }
     if(attempt.status!=='STARTED')
       throw new SurveyFinalError(409,'研究作答已经完成或停止')

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { ResearchFormEditor } from './ResearchFormEditor'
 import { ResearchScaleEditor } from './ResearchScaleEditor'
 import { ResearchSjtEditor } from './ResearchSjtEditor'
@@ -43,6 +43,7 @@ export function SurveyBuilder({projectId,onInstrumentsChanged}:{projectId:string
   const [instruments,setInstruments]=useState<Summary[]>([])
   const [instrumentPage,setInstrumentPage]=useState(1)
   const [active,setActive]=useState<ResearchDraft|null>(null),[dirty,setDirty]=useState(false)
+  const editGeneration=useRef(0)
   const [newKind,setNewKind]=useState<Kind>('FORM'),[newTitle,setNewTitle]=useState('')
   const [busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('')
   const [preview,setPreview]=useState<Preview|null>(null),[showPreview,setShowPreview]=useState(false)
@@ -84,15 +85,23 @@ export function SurveyBuilder({projectId,onInstrumentsChanged}:{projectId:string
     setNotice('已创建研究专用草稿，尚未进入正式测评目录')
   })}
   const change=(definition:Definition)=>{
+    editGeneration.current++
     setActive(old=>old?{...old,definition}:old)
     setDirty(true);setPreview(null);setBulk(null);setUndo(null);setAnswerReview(null)
   }
-  const save=()=>{if(!active||!dirty)return;const snapshot=active;void run(async()=>{
+  const save=()=>{if(!active||!dirty)return;const snapshot=active,generation=editGeneration.current;void run(async()=>{
     const updated=await api<ResearchDraft>(prefix+'/'+snapshot.id,'PATCH',{
       revision:snapshot.revision,title:snapshot.title,definition:snapshot.definition,
     })
-    setActive(updated);setDirty(false);setPreview(null);setBulk(null);setUndo(null)
-    await refreshList(instrumentPage,true);setNotice('草稿已保存；发布冻结将在研究波次阶段执行')
+    // Native disabled controls stop new typing; an upload already in flight
+    // can still finish. Keep that new draft content against the ACK revision.
+    const changedWhileSaving=editGeneration.current!==generation
+    setActive(current=>changedWhileSaving&&current?.id===snapshot.id
+      ?{...updated,title:current.title,definition:current.definition}:updated)
+    setDirty(changedWhileSaving);setPreview(null);setBulk(null);setUndo(null)
+    await refreshList(instrumentPage,true)
+    setNotice(changedWhileSaving?'本次草稿已保存；保存期间产生的新修改仍待保存。'
+      :'草稿已保存；发布冻结将在研究波次阶段执行')
   })}
   const validate=()=>{if(!active||dirty)return;void run(async()=>{
     const result=await api<Preview>(prefix+'/'+active.id+'/validate','POST',{})
@@ -154,6 +163,7 @@ export function SurveyBuilder({projectId,onInstrumentsChanged}:{projectId:string
     </header>
     {error&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{error}</p>}
     {notice&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{notice}</p>}
+    <fieldset disabled={busy} className="min-w-0 border-0 p-0 space-y-5" aria-label="研究工具操作">
     <form className="flex flex-wrap gap-3 items-end border-b pb-4" onSubmit={create}>
       <label className="text-sm">工具类型
         <select className="input block" value={newKind} onChange={e=>setNewKind(e.target.value as Kind)}>
@@ -188,6 +198,7 @@ export function SurveyBuilder({projectId,onInstrumentsChanged}:{projectId:string
         <p className="text-xs">{displayKind[active.kind]} · 工具标识 <code>{active.instrumentKey}</code> · 修订 {active.revision} {dirty?'· 未保存':''}</p>
         <label className="text-sm block">研究工具名称
           <input className="input block w-full" value={active.title} maxLength={200} onChange={e=>{
+            editGeneration.current++
             setActive(d=>d?{...d,title:e.target.value}:d);setDirty(true);setPreview(null)
           }}/></label>
         <div className="flex flex-wrap gap-2">
@@ -200,9 +211,9 @@ export function SurveyBuilder({projectId,onInstrumentsChanged}:{projectId:string
         {dirty&&<p className="text-xs text-amber-700">请先保存。若另一个标签已经更新，服务器将拒绝旧 revision 的覆盖，本地内容不会被自动清除。</p>}
       </div>
       {active.status==='DRAFT'&&<>
-        {active.kind==='FORM'&&<ResearchFormEditor value={active.definition as FormDraft} onChange={change} projectId={projectId}/>}
-        {active.kind==='SCALE'&&<ResearchScaleEditor value={active.definition as ScaleDraft} onChange={change}/>}
-        {active.kind==='SJT'&&<ResearchSjtEditor value={active.definition as SjtDraft} onChange={change} projectId={projectId}/>}
+        {active.kind==='FORM'&&<ResearchFormEditor key={active.id} value={active.definition as FormDraft} onChange={change} projectId={projectId}/>}
+        {active.kind==='SCALE'&&<ResearchScaleEditor key={active.id} value={active.definition as ScaleDraft} onChange={change}/>}
+        {active.kind==='SJT'&&<ResearchSjtEditor key={active.id} value={active.definition as SjtDraft} onChange={change} projectId={projectId}/>}
       </>}
       {active.kind!=='SJT'&&active.status==='DRAFT'&&<div className="border rounded-xl p-4 space-y-3">
         <h3 className="font-semibold">批量录入</h3>
@@ -303,5 +314,6 @@ export function SurveyBuilder({projectId,onInstrumentsChanged}:{projectId:string
         </>}
       </aside>
     </div>
+    </fieldset>
   </section>
 }

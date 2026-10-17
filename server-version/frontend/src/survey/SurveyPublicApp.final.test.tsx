@@ -12,11 +12,13 @@ const task={attemptId,waveId:'wave',status:'STARTED',definitionDigest:'a'.repeat
   reportMode:'GENERAL_ONLY',units:[{kind:'SCALE',instrumentKey:'scale',title:'计时量表',
     presentationMode:'ONE_BY_ONE',items:[{itemKey:'q1',prompt:'第一题',required:true}],
     responseOptions:[{optionKey:'yes',label:'同意'},{optionKey:'no',label:'不同意'}]}]}
+const originalScrollIntoView=HTMLElement.prototype.scrollIntoView
 let now=100
 let finalCalls:Record<string,unknown>[]
 let finalReply:(body:Record<string,unknown>)=>Promise<Response>
 let generalReply:()=>Promise<Response>
 let taskValue:typeof task
+let taskOverrides:Record<string,unknown>
 let linked:boolean
 let linkedWaves:{id:string;title:string;ordinal:number;status:string;consentText:string;consentVersion:number;attempt:{id:string;status:string}}[]
 async function openTask(){
@@ -28,12 +30,13 @@ async function openTask(){
 }
 const submit=()=>fireEvent.click(screen.getByRole('button',{name:'提交本轮正式回答'}))
 beforeEach(()=>{
+  HTMLElement.prototype.scrollIntoView=vi.fn()
   sessionStorage.clear()
   window.history.replaceState(null,'',`/r/${publicId}`)
   sessionStorage.setItem(`huisurvey:v1:single:${publicId}`,JSON.stringify({
     attemptId,accessCredential:'a'.repeat(43),createdAt:Date.now(),
   }))
-  now=100;finalCalls=[];taskValue=structuredClone(task);linked=false
+  now=100;finalCalls=[];taskValue=structuredClone(task);taskOverrides={};linked=false
   linkedWaves=[{id:'wave',title:'本轮',ordinal:1,status:'OPEN',consentText:'研究说明',consentVersion:1,attempt:{id:attemptId,status:'STARTED'}}]
   vi.spyOn(performance,'now').mockImplementation(()=>now)
   vi.spyOn(document,'hasFocus').mockReturnValue(true)
@@ -43,7 +46,7 @@ beforeEach(()=>{
     if(url.endsWith('/info'))return response({project:{name:'研究',description:'说明',collectionMode:linked?'LINKED_WAVES':'SINGLE_UNLINKED',status:'OPEN'},waves:[]})
     if(url.endsWith('/enter'))return response({waves:linkedWaves})
     if(url.endsWith('/revoke-access'))return response({status:'REVOKED'})
-    if(url.endsWith('/task'))return response(taskValue)
+    if(url.endsWith('/task'))return response({...taskValue,...taskOverrides})
     if(url.endsWith('/final')){
       const body=JSON.parse(String(init?.body)) as Record<string,unknown>
       finalCalls.push(body);return finalReply(body)
@@ -52,9 +55,97 @@ beforeEach(()=>{
     throw new Error('Unexpected route '+url)
   }))
 })
-afterEach(()=>{vi.restoreAllMocks();vi.unstubAllGlobals()})
+afterEach(()=>{
+  vi.restoreAllMocks();vi.unstubAllGlobals()
+  if(originalScrollIntoView)HTMLElement.prototype.scrollIntoView=originalScrollIntoView
+  else delete (HTMLElement.prototype as Partial<HTMLElement>).scrollIntoView
+})
 
 describe('Survey authoritative FINAL and timing lifecycle',()=>{
+  it('returns to the exact earlier Flow Form after a validation rejection and permits correction',async()=>{
+    const form=(instrumentKey:string,prompt:string)=>({kind:'FORM',instrumentKey,title:prompt,
+      pages:[{pageKey:'page',title:prompt,questions:[{itemKey:'shared',type:'SHORT_TEXT',
+        prompt,required:true,options:[],textValidation:'EMAIL'}]}]})
+    taskOverrides={units:[form('first','第一份联系信息'),form('second','第二份联系信息')],
+      flow:{schemaVersion:1,flowDigest:'b'.repeat(64),embeddedData:[],blocks:[
+        {blockKey:'first_block',kind:'INSTRUMENT',instrumentKey:'first'},
+        {blockKey:'second_block',kind:'INSTRUMENT',instrumentKey:'second'},
+      ]}}
+    render(<SurveyPublicApp/>)
+    fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}))
+    fireEvent.change(await screen.findByLabelText('第一份联系信息'),{target:{value:'invalid'}})
+    fireEvent.click(screen.getByRole('button',{name:'确认当前步骤，继续研究'}))
+    fireEvent.change(screen.getByLabelText('第二份联系信息'),{target:{value:'second@example.test'}})
+    finalReply=()=>response(null,400,'answers.first.shared：请填写有效电子邮件')
+    submit();await screen.findByRole('alert')
+    const first=await screen.findByLabelText('第一份联系信息')
+    expect(first).toHaveValue('invalid')
+    expect(first).toBeEnabled()
+    expect(screen.queryByLabelText('第二份联系信息')).toBeNull()
+    fireEvent.change(first,{target:{value:'first@example.test'}})
+    fireEvent.click(screen.getByRole('button',{name:'确认当前步骤，继续研究'}))
+    expect(screen.getByLabelText('第二份联系信息')).toHaveValue('second@example.test')
+    finalReply=()=>response({status:'COMPLETED'})
+    submit();await screen.findByText('感谢参与')
+    expect(finalCalls).toHaveLength(2)
+    expect(finalCalls[1].answers).toEqual({first:{shared:'first@example.test'},second:{shared:'second@example.test'}})
+  })
+
+  it('reveals the earlier Form when a sequential timed Wave rejects one of its answers',async()=>{
+    taskOverrides={units:[{kind:'FORM',instrumentKey:'first',title:'先前问卷',
+      pages:[{pageKey:'page',title:'信息页',questions:[{itemKey:'email',type:'SHORT_TEXT',
+        prompt:'联系信息',required:true,options:[],textValidation:'EMAIL'}]}]},...task.units]}
+    render(<SurveyPublicApp/>)
+    fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}))
+    fireEvent.change(await screen.findByLabelText('联系信息'),{target:{value:'invalid'}})
+    now=500;fireEvent.click(screen.getByRole('button',{name:'确认当前工具，继续'}))
+    now=1500;fireEvent.click(screen.getByRole('radio',{name:'同意'}))
+    finalReply=()=>response(null,400,'answers.first.email：请填写有效电子邮件')
+    now=2500;submit();await screen.findByRole('alert')
+    expect(await screen.findByLabelText('联系信息')).toHaveValue('invalid')
+    expect(screen.queryByRole('radio',{name:'同意'})).toBeNull()
+    fireEvent.change(screen.getByLabelText('联系信息'),{target:{value:'correct@example.test'}})
+    now=6500;fireEvent.click(screen.getByRole('button',{name:'确认当前工具，继续'}))
+    expect(screen.getByRole('radio',{name:'同意'})).toBeChecked()
+    finalReply=()=>response({status:'COMPLETED'})
+    now=7500;submit();await screen.findByText('感谢参与')
+    expect(finalCalls[1].answers).toEqual({first:{email:'correct@example.test'},scale:{q1:'yes'}})
+    expect(finalCalls[1].itemTimings).toMatchObject({scale:{q1:{
+      firstResponseMs:1000,activeTimeMs:3000,changeCount:0,revisitCount:1,visits:2,
+    }}})
+  })
+
+  it('reconciles a committed screen-out after a lost response and reload without replaying answers',async()=>{
+    let screenOutCalls=0
+    const original=vi.mocked(fetch).getMockImplementation()!
+    vi.mocked(fetch).mockImplementation((input,init)=>{
+      if(String(input).endsWith('/screen-out')){
+        screenOutCalls++
+        return Promise.reject(new Error('筛除结果未知'))
+      }
+      return original(input,init)
+    })
+    taskOverrides={units:[],flow:{schemaVersion:1,flowDigest:'b'.repeat(64),embeddedData:[],
+      blocks:[{blockKey:'end',kind:'END',termination:'SCREEN_OUT'}]}}
+    const view=render(<SurveyPublicApp/>)
+    fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}))
+    fireEvent.click(await screen.findByRole('button',{name:'完成资格筛选'}))
+    await screen.findByRole('alert')
+    expect(JSON.parse(sessionStorage.getItem(draftKey)!).finalSubmission.screenOut).toBe(true)
+    view.unmount()
+    taskOverrides={status:'SCREENED_OUT',units:[]}
+    render(<SurveyPublicApp/>)
+    fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}))
+    await screen.findByRole('heading',{name:'本轮资格筛选已结束'})
+    expect(sessionStorage.getItem(draftKey)).toBeNull()
+    expect(sessionStorage.getItem(`huisurvey:v1:single:${publicId}`)).toBeNull()
+    expect(screen.queryByRole('button',{name:'提交本轮正式回答'})).toBeNull()
+    expect(screen.queryByRole('button',{name:'完成资格筛选'})).toBeNull()
+    expect(screenOutCalls).toBe(1)
+    expect(finalCalls).toHaveLength(0)
+    expect(vi.mocked(fetch).mock.calls.filter(([url])=>String(url).endsWith('/general'))).toHaveLength(0)
+  })
+
   it('retries exact sealed answers and timing after an uncertain response',async()=>{
     finalReply=()=>Promise.reject(new Error('网络中断'))
     await openTask()

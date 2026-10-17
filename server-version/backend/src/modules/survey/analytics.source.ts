@@ -178,6 +178,36 @@ const codeKey=(waveOrdinal:number,instrumentKey:string,itemKey:string,hash:strin
     +(instrumentKey.replace(/[^a-z0-9_]/gi,'_').slice(0,38))
     +'__'+(itemKey.replace(/[^a-z0-9_]/gi,'_').slice(0,38))
     +'__'+hash.slice(0,16)
+/** Preserve existing noncolliding IDs, but resolve lossy normalization/truncation
+ * against the entire frozen publication, never the selected item or FINAL page.
+ * Identical definitions can also collide across differently named instruments.
+ * Uppercase K separates generated suffixes from the lowercase legacy key space.
+ */
+const frozenRawColumnKeys=(snapshot:ResearchFrozenPublication,waveOrdinal:number)=>{
+  const candidates:Array<{unit:ResearchFrozenUnit;itemKey:string;legacy:string}>=[]
+  const counts=new Map<string,number>()
+  const result=new Map<ResearchFrozenUnit,Map<string,string>>()
+  for(const unit of snapshot.units){
+    const empty:FrozenUnitResult={instrumentKey:unit.instrumentKey,kind:unit.kind,
+      sourceDigest:unit.sourceDigest,scoringDigest:unit.scoringDigest,
+      rawAnswers:{},missing:[],privateScoring:null}
+    result.set(unit,new Map())
+    for(const item of rawItems(unit,empty)){
+      const legacy=codeKey(waveOrdinal,unit.instrumentKey,item.itemKey,unit.sourceDigest)
+      candidates.push({unit,itemKey:item.itemKey,legacy})
+      counts.set(legacy,(counts.get(legacy)??0)+1)
+    }
+  }
+  const used=new Set<string>()
+  for(const {unit,itemKey,legacy} of candidates){
+    const column=counts.get(legacy)===1?legacy:
+      legacy+'__K'+canonicalHash([unit.instrumentKey,itemKey]).slice(0,16)
+    const items=result.get(unit)!
+    if(used.has(column)||items.has(itemKey))invalid('冻结研究变量编码重复')
+    used.add(column);items.set(itemKey,column)
+  }
+  return result
+}
 /** Bounded transactions read authorized immutable material and recheck its
  * complete version after hash/decryption/projection outside business locks.
  * No arbitrary project administrator inherits the raw-data grant.
@@ -430,6 +460,21 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
     const codebook=new Map<string,ResearchRawCodebook>()
     const scoreColumns:SurveySourceProjection['scoreColumns']=[]
     const scores:FrozenScoreObservation[]=[],raw:ResearchRawObservation[]=[]
+    const rawColumnKeys=new Map<ResearchFrozenPublication,{
+      ordinal:number;keys:ReturnType<typeof frozenRawColumnKeys>
+    }>()
+    const columnKeyFor=(snapshot:ResearchFrozenPublication,ordinal:number,
+      unit:ResearchFrozenUnit,itemKey:string)=>{
+      let entry=rawColumnKeys.get(snapshot)
+      if(!entry){
+        entry={ordinal,keys:frozenRawColumnKeys(snapshot,ordinal)}
+        rawColumnKeys.set(snapshot,entry)
+      }
+      if(entry.ordinal!==ordinal)invalid('冻结研究波次序号不一致')
+      const column=entry.keys.get(unit)?.get(itemKey)
+      if(!column)invalid('冻结研究变量编码缺失')
+      return column
+    }
     // Build expected variables from every selected frozen Wave, not only
     // the sample that completed FINAL. This also covers entire empty Waves.
     for(const wave of frozenWaves){
@@ -445,7 +490,7 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
           rawAnswers:{},missing:[],privateScoring:null,
         }
         for(const item of rawItems(frozen,empty)){
-          const columnKey=codeKey(wave.ordinal,frozen.instrumentKey,item.itemKey,frozen.sourceDigest)
+          const columnKey=columnKeyFor(snapshot,wave.ordinal,frozen,item.itemKey)
           if(codebook.has(columnKey))invalid('冻结研究变量编码重复')
           codebook.set(columnKey,{
             columnKey,waveId:wave.id,waveOrdinal:wave.ordinal,
@@ -538,7 +583,7 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
         if(input.selectRaw!==false&&(!input.selectRaw||
           frozen.instrumentKey===input.selectRaw.instrumentKey)){
           for(const r of rawItems(frozen,unit,input.selectRaw?input.selectRaw.itemKey:undefined)){
-          const columnKey=codeKey(wave.ordinal,frozen.instrumentKey,r.itemKey,frozen.sourceDigest)
+          const columnKey=columnKeyFor(snapshot,wave.ordinal,frozen,r.itemKey)
           if(raw.length>=25000)
             throw new SurveyAnalyticsError(413,'逐题投影超过 25000 行上限，请缩小波次范围')
           const itemTiming=frozen.kind==='SCALE'

@@ -317,9 +317,35 @@ const sjtResult=(unit:ResearchFrozenUnit,answers:AnswerMap):FrozenUnitResult=>{
   return {instrumentKey:unit.instrumentKey,kind:'SJT',sourceDigest:unit.sourceDigest,
     scoringDigest:unit.scoringDigest,rawAnswers:raw,missing:[],privateScoring:scores}
 }
+/** A request-local proof owns its frozen copy. Its compute closure is the only
+ * route that can reuse this digest; callers cannot supply a trusted hash to the
+ * ordinary scorer. No authorization, Attempt state or result is cached. */
+export function verifySurveyFinalPublication(snapshot:ResearchFrozenPublication,expectedDigest:string){
+  const frozen=JSON.parse(JSON.stringify(snapshot)) as ResearchFrozenPublication
+  const definitionDigest=canonicalHash(frozen)
+  if(definitionDigest!==expectedDigest)return null
+  const freeze=(value:unknown):void=>{
+    if(!value||typeof value!=='object'||Object.isFrozen(value))return
+    for(const child of Object.values(value))freeze(child)
+    Object.freeze(value)
+  }
+  freeze(frozen)
+  return Object.freeze({snapshot:frozen,
+    compute:(input:Record<string,unknown>,assignment?:SurveyFlowAssignment|null,
+      clientObservedBlocks?:readonly string[],mode:'FINAL'|'SCREEN_OUT'='FINAL',itemTimings?:unknown)=>
+      computeSurveyFinalFromSnapshot(frozen,input,assignment,clientObservedBlocks,mode,itemTimings,definitionDigest),
+  })
+}
+
 export function computeSurveyFinal(snapshot:ResearchFrozenPublication,input:Record<string,unknown>,
   assignment?:SurveyFlowAssignment|null,clientObservedBlocks?:readonly string[],
   mode:'FINAL'|'SCREEN_OUT'='FINAL',itemTimings?:unknown):SurveyComputedFinal{
+  return computeSurveyFinalFromSnapshot(snapshot,input,assignment,clientObservedBlocks,mode,itemTimings)
+}
+
+function computeSurveyFinalFromSnapshot(snapshot:ResearchFrozenPublication,input:Record<string,unknown>,
+  assignment?:SurveyFlowAssignment|null,clientObservedBlocks?:readonly string[],
+  mode:'FINAL'|'SCREEN_OUT'='FINAL',itemTimings?:unknown,verifiedDigest?:string):SurveyComputedFinal{
   if(snapshot.schemaVersion!==1||snapshot.purpose!=='RESEARCH_ONLY'||
      snapshot.runtimeStatus!=='SURVEY_FINAL_V1'||!snapshot.units.length)
     invalid('publication','尚未提供可执行的 Survey 专用冻结定义')
@@ -352,7 +378,7 @@ export function computeSurveyFinal(snapshot:ResearchFrozenPublication,input:Reco
       invalid('flow','当前路径不能标记为资格筛除')
     const verifiedTimings=validateSurveyScaleTimings(snapshot,input,itemTimings,mode==='FINAL')
     return {schemaVersion:1,
-      definitionDigest:canonicalHash(JSON.parse(JSON.stringify(snapshot))),
+      definitionDigest:verifiedDigest??canonicalHash(JSON.parse(JSON.stringify(snapshot))),
       units:result.units,executionTrace:result.trace,
       ...(verifiedTimings?{itemTimings:verifiedTimings}:{})}
   }
@@ -375,7 +401,7 @@ export function computeSurveyFinal(snapshot:ResearchFrozenPublication,input:Reco
     if(unit.kind==='SJT')return sjtResult(unit,raw)
     return invalid('publication','未知研究内容类型')
   })
-  const definitionDigest=canonicalHash(JSON.parse(JSON.stringify(snapshot)))
+  const definitionDigest=verifiedDigest??canonicalHash(JSON.parse(JSON.stringify(snapshot)))
   const verifiedTimings=validateSurveyScaleTimings(snapshot,input,itemTimings,true)
   return {schemaVersion:1,definitionDigest,units,
     ...(verifiedTimings?{itemTimings:verifiedTimings}:{})}

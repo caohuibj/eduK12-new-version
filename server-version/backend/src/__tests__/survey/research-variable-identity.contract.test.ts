@@ -1,0 +1,195 @@
+import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest'
+import {prisma} from '../../config/database'
+import {canonicalHash} from '../../modules/assessment-runtime/canonical'
+import {encryptUnifiedRuntimePayload} from '../../modules/assessment-runtime/security'
+import {encryptCompactField} from '../../modules/assessment-runtime/compact-field-codec'
+import {compileFrozenResearchUnit,type ResearchFrozenPublication,type ResearchFrozenUnit} from '../../modules/survey/publication.service'
+import {computeSurveyFinal} from '../../modules/survey/final.compute'
+import {loadSurveySource} from '../../modules/survey/analytics.source'
+import {rawLongExport,rawWideExport} from '../../modules/survey/analytics.raw-export'
+import {exportLong} from '../../modules/survey/analytics.export-format'
+import type {FormDraft,FormQuestion,ScaleDraft} from '../../modules/survey/builder.definition'
+
+vi.mock('../../config/database',()=>({prisma:{$transaction:vi.fn()}}))
+const question=(itemKey:string,extra:Partial<FormQuestion>={}):FormQuestion=>({
+  itemKey,type:'NUMBER',prompt:itemKey,required:true,options:[],rows:[],...extra,
+})
+const formUnit=(instrumentKey:string,questions:FormQuestion[]):ResearchFrozenUnit=>{
+  const definition:FormDraft={schemaVersion:2,pages:[{pageKey:'page',title:'Synthetic',questions}]}
+  return compileFrozenResearchUnit({id:instrumentKey,instrumentKey,kind:'FORM',title:'Synthetic',revision:1,definition})
+}
+const legacyId=(unit:ResearchFrozenUnit,itemKey:string)=>'W001__'+
+  unit.instrumentKey.replace(/[^a-z0-9_]/gi,'_').slice(0,38)+'__'+
+  itemKey.replace(/[^a-z0-9_]/gi,'_').slice(0,38)+'__'+unit.sourceDigest.slice(0,16)
+const owner={actorUserId:'synthetic-owner',projectId:'synthetic-project',waveIds:['synthetic-wave'],includeAttendance:false}
+
+function fixture(units:ResearchFrozenUnit[],answers:Record<string,unknown>,itemTimings?:unknown){
+  const snapshot:ResearchFrozenPublication={schemaVersion:1,purpose:'RESEARCH_ONLY',
+    projectId:owner.projectId,waveId:owner.waveIds[0],collectionMode:'LINKED_WAVES',
+    consentVersion:1,linkageNoticeConfirmed:true,consentDigest:'synthetic-consent',
+    runtimeStatus:'SURVEY_FINAL_V1',units}
+  const result=computeSurveyFinal(snapshot,answers,undefined,undefined,'FINAL',itemTimings)
+  const publication={id:'synthetic-publication',projectId:owner.projectId,version:1,
+    compiledSnapshot:snapshot,definitionDigest:canonicalHash(snapshot)}
+  const wave={id:owner.waveIds[0],projectId:owner.projectId,ordinal:1,publicationId:publication.id}
+  const completedAt=new Date('2026-10-17T00:00:00Z')
+  const final={id:'00000000-0000-0000-0000-000000000001',publicationId:publication.id,
+    definitionDigest:publication.definitionDigest,completedAt,
+    resultsHash:canonicalHash(result),resultsCipher:encryptUnifiedRuntimePayload(result),wave,
+    attempt:{id:'synthetic-attempt',projectId:owner.projectId,waveId:wave.id,
+      startedAt:new Date('2026-10-16T23:59:00Z'),flowAssignmentCipher:null,
+      participant:{status:'ACTIVE',researchCode:'R-SYNTHETIC'}}}
+  const tx={
+    $queryRaw:vi.fn(async (parts:TemplateStringsArray)=>parts.join('').includes('FROM "survey_projects"')
+      ?[{collectionMode:'LINKED_WAVES',sourceRevision:1,sourceCutOff:new Date('2026-10-17T00:01:00Z')}]
+      :[{bytes:0n}]),
+    surveyWave:{count:vi.fn(async()=>1),findMany:vi.fn(async()=>[wave])},
+    surveyWaveFinal:{count:vi.fn(async()=>1),findMany:vi.fn(async(args:{select?:unknown})=>args.select
+      ?[{id:final.id,publicationId:publication.id,completedAt}]:[final])},
+    surveyPublication:{findMany:vi.fn(async()=>[publication])},
+  }
+  vi.mocked(prisma.$transaction).mockImplementation((async(fn:(value:typeof tx)=>Promise<unknown>)=>fn(tx)) as never)
+  return {snapshot,result,final,tx}
+}
+
+beforeEach(()=>{
+  vi.clearAllMocks()
+  vi.stubEnv('DATA_ENCRYPTION_KEY','ab'.repeat(32))
+  vi.stubEnv('ASSESSMENT_COMPACT_FACTS_ENABLED','false')
+})
+afterEach(()=>vi.unstubAllEnvs())
+
+describe('Frozen Survey raw variable identity',()=>{
+  it('exports valid hyphen and underscore item keys without collision',async()=>{
+    const unit=formUnit('form',[question('q-a'),question('q_a')])
+    fixture([unit],{form:{'q-a':1,q_a:2}})
+    const source=await loadSurveySource({...owner,includeWideSchema:true})
+    expect(source.codebook).toHaveLength(2)
+    expect(new Set(source.codebook.map(c=>c.columnKey)).size).toBe(2)
+    expect(rawLongExport(owner.projectId,source).manifest.rowCount).toBe(2)
+    expect(rawWideExport(owner.projectId,source).manifest.columnCount).toBe(5)
+  })
+  it('disambiguates truncation and stays bounded without changing unrelated legacy IDs',async()=>{
+    const prefix='q'+'a'.repeat(37),keys=[prefix+'x',prefix+'y','q__k0123456789abcdef','ordinary']
+    const unit=formUnit('form',keys.map(key=>question(key)))
+    fixture([unit],{form:Object.fromEntries(keys.map((key,i)=>[key,i]))})
+    const source=await loadSurveySource({...owner,includeWideSchema:true})
+    expect(new Set(source.codebook.map(c=>c.columnKey)).size).toBe(keys.length)
+    for(const row of source.codebook){
+      expect(row.columnKey.length).toBeLessThanOrEqual(121)
+      expect(row.columnKey).toMatch(/^[A-Za-z0-9_]+$/)
+      if(row.itemKey.startsWith(prefix))expect(row.columnKey).toContain('__K')
+      else expect(row.columnKey).toBe(legacyId(unit,row.itemKey))
+    }
+  })
+  it('keeps cross-instrument IDs consistent between full and selected-item pages',async()=>{
+    const units=['form-a','form_a'].map(key=>formUnit(key,[question('same')]))
+    expect(units[0].sourceDigest).toBe(units[1].sourceDigest)
+    fixture(units,{'form-a':{same:10},form_a:{same:20}})
+    const source=await loadSurveySource({...owner,includeWideSchema:true})
+    expect(new Set(source.codebook.map(c=>c.columnKey)).size).toBe(2)
+    for(const unit of units){
+      const selected=await loadSurveySource({...owner,pageMode:true,stableIdCursor:true,
+        includeWideSchema:false,selectRaw:{instrumentKey:unit.instrumentKey,itemKey:'same'},selectScore:false})
+      expect(selected.raw).toEqual(source.raw.filter(r=>r.instrumentKey===unit.instrumentKey))
+      expect(selected.codebook).toEqual(source.codebook.filter(c=>c.instrumentKey===unit.instrumentKey))
+    }
+    expect(rawWideExport(owner.projectId,source).manifest.columnCount).toBe(5)
+  })
+  it('keeps matrix and other-text generated keys distinct from authored keys on every page',async()=>{
+    const options=[{optionKey:'a',label:'A'},{optionKey:'b',label:'B'}]
+    const unit=formUnit('form',[
+      question('grid',{type:'MATRIX',options,rows:[{rowKey:'row',label:'Row'}]}),question('grid_row'),
+      question('choose',{type:'SINGLE',options,otherOptionKey:'b'}),question('choose_other'),
+    ])
+    fixture([unit],{form:{'grid:row':'a',grid_row:7,choose:'b','choose:other':'synthetic text',choose_other:8}})
+    const source=await loadSurveySource({...owner,includeWideSchema:true})
+    expect(source.codebook).toHaveLength(5)
+    expect(new Set(source.codebook.map(c=>c.columnKey)).size).toBe(5)
+    for(const itemKey of ['grid:row','grid_row','choose:other','choose_other']){
+      const selected=await loadSurveySource({...owner,pageMode:true,stableIdCursor:true,
+        includeWideSchema:false,selectRaw:{instrumentKey:'form',itemKey},selectScore:false})
+      expect(selected.raw).toEqual(source.raw.filter(r=>r.itemKey===itemKey))
+      expect(selected.codebook).toEqual(source.codebook.filter(c=>c.itemKey===itemKey))
+    }
+    expect(source.codebook.find(c=>c.itemKey==='choose')!.columnKey).toBe(legacyId(unit,'choose'))
+    const projected={...source,raw:source.raw.filter(r=>r.responseType!=='OTHER_TEXT'),
+      codebook:source.codebook.filter(r=>r.responseType!=='OTHER_TEXT')}
+    expect(rawLongExport(owner.projectId,projected).csv).not.toContain('synthetic text')
+    expect(rawWideExport(owner.projectId,projected).manifest.columnCount).toBe(9)
+  })
+  it('preserves noncolliding legacy matrix and hyphen IDs byte-for-byte',async()=>{
+    const unit=formUnit('form-a',[question('ordinary-key'),question('grid',{type:'MATRIX',
+      options:[{optionKey:'a',label:'A'},{optionKey:'b',label:'B'}],rows:[{rowKey:'row-a',label:'Row'}]})])
+    fixture([unit],{'form-a':{'ordinary-key':0,'grid:row-a':'b'}})
+    const source=await loadSurveySource({...owner,includeWideSchema:true})
+    expect(source.codebook.map(c=>c.columnKey)).toEqual(['ordinary-key','grid:row-a'].map(key=>legacyId(unit,key)))
+  })
+  it('binds timed Scale suffixes to disambiguated RAW IDs while retaining SCORE identities',async()=>{
+    const definition:ScaleDraft={schemaVersion:1,presentationMode:'ONE_BY_ONE',
+      respondentType:'participant_self_report',aggregation:'sum',
+      responseOptions:[{optionKey:'a',label:'A',score:1},{optionKey:'b',label:'B',score:3}],
+      dimensions:[{dimensionKey:'total',label:'Total',direction:'descriptive'}],
+      items:['q-a','q_a'].map(itemKey=>({itemKey,prompt:itemKey,required:true,reverse:false,dimensionKeys:['total']}))}
+    const unit=compileFrozenResearchUnit({id:'scale',instrumentKey:'scale',kind:'SCALE',title:'Scale',revision:1,definition})
+    const timing={schemaVersion:1,firstResponseMs:100,activeTimeMs:250,changeCount:0,revisitCount:0,
+      visits:1,interrupted:false,recoveredWithoutClock:false}
+    fixture([unit],{scale:{'q-a':'a',q_a:'b'}},{scale:{'q-a':timing,q_a:{...timing,firstResponseMs:150}}})
+    const source=await loadSurveySource({...owner,includeWideSchema:true})
+    const wide=rawWideExport(owner.projectId,source)
+    expect(wide.manifest.columnCount).toBe(15)
+    for(const row of source.raw){
+      expect(wide.csv).toContain('"'+row.columnKey+'__first_response_ms"')
+      expect(wide.csv).toContain('"'+row.columnKey+'__timing_status"')
+      expect(row.itemTiming?.activeTimeMs).toBe(250)
+    }
+    expect(source.scores[0].value).toBe(4)
+    const measurement=source.scores[0].measurement
+    expect(exportLong(owner.projectId,source.scores).codebook[0].column)
+      .toBe('W001__scale__total__'+canonicalHash(measurement).slice(0,12))
+  })
+  it('still denies ownership revoked after colliding-source projection',async()=>{
+    const unit=formUnit('form',[question('q-a'),question('q_a')])
+    const {tx}=fixture([unit],{form:{'q-a':1,q_a:2}})
+    let ownerReads=0
+    tx.$queryRaw.mockImplementation(async(parts:TemplateStringsArray)=>{
+      if(!parts.join('').includes('FROM "survey_projects"'))return [{bytes:0n}] as never
+      return (++ownerReads===1?[{collectionMode:'LINKED_WAVES',sourceRevision:1,
+        sourceCutOff:new Date('2026-10-17T00:01:00Z')}]:[]) as never
+    })
+    await expect(loadSurveySource({...owner,includeWideSchema:true})).rejects.toMatchObject({statusCode:404})
+    expect(ownerReads).toBe(2)
+  })
+  it('fails closed if a frozen publication repeats the exact original item identity',async()=>{
+    const unit=formUnit('form',[question('ordinary')])
+    const {snapshot,tx}=fixture([unit],{form:{ordinary:1}})
+    const malformed=structuredClone(snapshot)
+    const questions=(malformed.units[0].displayDefinition as FormDraft).pages[0].questions
+    questions.push(structuredClone(questions[0]))
+    tx.surveyPublication.findMany.mockResolvedValue([{id:'synthetic-publication',projectId:owner.projectId,version:1,
+      compiledSnapshot:malformed,definitionDigest:canonicalHash(malformed)}])
+    await expect(loadSurveySource({...owner,includeWideSchema:true})).rejects.toThrow('冻结研究变量编码重复')
+  })
+  it('derives collision-safe dictionaries before any FINAL exists',async()=>{
+    const unit=formUnit('form',[question('q-a'),question('q_a')])
+    const {tx}=fixture([unit],{form:{'q-a':1,q_a:2}})
+    tx.surveyWaveFinal.findMany.mockResolvedValue([])
+    tx.surveyWaveFinal.count.mockResolvedValue(0)
+    const source=await loadSurveySource({...owner,includeWideSchema:true,pageMode:true})
+    expect(source.raw).toEqual([])
+    expect(source.completeAttempts).toBe(0)
+    expect(new Set(source.codebook.map(c=>c.columnKey)).size).toBe(2)
+    expect(rawWideExport(owner.projectId,source).manifest).toMatchObject({rowCount:0,columnCount:5})
+  })
+  it('reads existing compact FINALs with the compact write flag still false',async()=>{
+    const unit=formUnit('form',[question('q-a'),question('q_a')])
+    const {result,final}=fixture([unit],{form:{'q-a':1,q_a:2}})
+    expect(final.resultsCipher).not.toMatch(/^ekc1:/)
+    final.resultsCipher=encryptCompactField({schemaVersion:1,value:result})
+    const source=await loadSurveySource({...owner,includeWideSchema:true})
+    expect(source.raw.map(r=>r.value)).toEqual([1,2])
+    expect(new Set(source.codebook.map(c=>c.columnKey)).size).toBe(2)
+    expect(process.env.ASSESSMENT_COMPACT_FACTS_ENABLED).toBe('false')
+    expect(encryptUnifiedRuntimePayload(result)).not.toMatch(/^ekc1:/)
+  })
+})

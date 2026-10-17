@@ -89,6 +89,8 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purp
     if(!activePage||currentIndex>=visiblePages.length-1)return
     for(const q of activePage.questions){
       if(!shownFormKeys?.has(q.itemKey)||!q.required)continue
+      if(q.allowRefusal&&!['MATRIX','MATRIX_MULTIPLE'].includes(q.type)&&
+        isRefusal(answer[q.itemKey]))continue
       const keys=['MATRIX','MATRIX_MULTIPLE'].includes(q.type)
         ?(q.rows||[]).map(row=>q.itemKey+':'+row.rowKey):[q.itemKey]
       const empty=keys.some(key=>{
@@ -313,6 +315,17 @@ export default function SurveyPublicApp(){
         const pages=targetUnit.pages?.filter(p=>p.questions.some(q=>visible.has(q.itemKey)))||[]
         const index=pages.findIndex(p=>p.questions.some(q=>q.itemKey===itemKey))
         if(index>=0)setFormPages(prev=>({...prev,[targetUnit.instrumentKey]:index}))
+        // A rejected answer may belong to a tool that is no longer mounted.
+        // Reveal its exact frozen Flow block/tool before focusing its page.
+        const activeTask=taskState.current
+        if(activeTask?.flow){
+          const route=resolveClientSurveyFlow(activeTask.flow,activeTask.units,answers)
+          const step=route.blocks.findIndex(block=>block.kind==='INSTRUMENT'&&
+            block.instrumentKey===targetUnit.instrumentKey)
+          if(step>=0)setFlowStep(step)
+        }else if(activeTask){
+          setToolStep(activeTask.units.findIndex(unit=>unit.instrumentKey===targetUnit.instrumentKey))
+        }
         window.setTimeout(()=>{
           const target=document.getElementById('survey-answer-'+targetUnit.instrumentKey+'-'+itemKey)
           target?.focus();target?.scrollIntoView({block:'center'})
@@ -345,10 +358,22 @@ export default function SurveyPublicApp(){
     setCheckpointRevision(0);setTask(null);setCompletion({attemptId:id,proof})
     finalRequest.current=null;setFinalSealed(false)
   }
+  const markScreenedOut=(id:string)=>{
+    completedAttempts.current.add(id)
+    finalRequest.current=null;setFinalSealed(false)
+    clearLocalSurveyDraft(publicId,id);setCheckpointRevision(0)
+    try{sessionStorage.removeItem(singleStorageKey(publicId))}catch{/* private session unavailable */}
+    setAttemptId(id);setSingleResume(null);setTask(null);setCompletion(null);setGeneral(null)
+    setScreenedOut(true)
+    setNotice('本轮研究筛选已结束。未生成正式 FINAL，未将筛选答案保存为正式测量记录。')
+  }
   const loadTask=async(id:string,code:string,secret:string)=>{
     const data=await publicApi<Task>(base+'/attempts/'+id+'/task','POST',{
       ...(code?{researchCode:code}:{}),accessCredential:secret,
     })
+    // The authenticated terminal projection contains no answers or task units.
+    // A lost screen-out response must not reopen its sealed qualifying draft.
+    if(data.status==='SCREENED_OUT'){markScreenedOut(id);return}
     // Reconcile complete local+remote envelopes before mounting any timed
     // Scale runner. An older local revision can never silently replace remote.
     const saved=data.status==='COMPLETED'?null:
@@ -406,8 +431,8 @@ export default function SurveyPublicApp(){
   }
   const resumeSingle=()=>{if(!singleResume)return;void run(async()=>{
     setAccessCredential(singleResume.accessCredential)
-    await loadTask(singleResume.attemptId,'',singleResume.accessCredential)
     setNotice('正在恢复本设备尚在有效期内的单次匿名研究作答。')
+    await loadTask(singleResume.attemptId,'',singleResume.accessCredential)
   })}
   const start=()=>{if(!selectedWave||!agreed)return;void run(async()=>{
     const wave=selectedWave
@@ -587,12 +612,7 @@ export default function SurveyPublicApp(){
     }
     if(screened){
       if(final.status!=='SCREENED_OUT')throw new Error('资格筛除未确认')
-      completedAttempts.current.add(attemptId)
-      finalRequest.current=null;setFinalSealed(false)
-      clearLocalSurveyDraft(publicId,attemptId);setCheckpointRevision(0)
-      try{sessionStorage.removeItem(singleStorageKey(publicId))}catch{/* private session unavailable */}
-      setSingleResume(null);setTask(null);setScreenedOut(true)
-      setNotice('本轮研究筛选已结束。未生成正式 FINAL，未将筛选答案保存为正式测量记录。')
+      markScreenedOut(attemptId)
       return
     }
     if(final.status!=='COMPLETED')throw new Error('作答尚未完成提交')

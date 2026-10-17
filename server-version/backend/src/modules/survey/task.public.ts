@@ -19,6 +19,12 @@ export async function getOwnResearchTask(input:{
   publicId:string;attemptId:string;researchCode?:string;accessCredential:string
 }){
   const own=await verifiedSurveyAttempt(input)
+  // A lost screen-out response must be recoverable without revealing the
+  // qualifying answers or allocating/reopening an already terminal Flow.
+  if(own.status==='SCREENED_OUT')return {
+    attemptId:own.attemptId,waveId:own.waveId,status:'SCREENED_OUT' as const,
+    definitionDigest:own.definitionDigest,reportMode:'GENERAL_ONLY' as const,units:[],
+  }
   if(!['STARTED','COMPLETED'].includes(own.status))
     throw new SurveyWaveError(403,'研究作答已经关闭')
   // Recheck current identity under Attempt/participant locks; this persists
