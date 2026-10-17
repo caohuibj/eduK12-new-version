@@ -9,7 +9,7 @@ import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { z } from 'zod'
 import { workbookBuffer } from '../utils/excelWorkbook'
 import { hashIdempotencyKey, hashIdempotencyPayload } from '../utils/idempotency'
-import { canAccessCourseContent, hasActiveCourseMembership } from '../utils/courseAccess'
+import { canAccessCourseContent, canAccessCourseRoster, hasActiveCourseMembership } from '../utils/courseAccess'
 import { config } from '../config'
 import { createAttachmentSchema } from '../utils/attachmentSchema'
 import {
@@ -391,6 +391,9 @@ export const assignmentController = {
         where: { id },
         select: {
           id: true,
+          courseId: true,
+          tags: true,
+          _count: { select: { submissions: true } },
           title: true,
           description: true,
           content: true,
@@ -416,7 +419,7 @@ export const assignmentController = {
         }
       })
 
-      if (!assignment) {
+      if (!assignment || (req.query.courseId !== undefined && req.query.courseId !== assignment.courseId)) {
         return notFound(res, '作业不存在')
       }
 
@@ -444,10 +447,12 @@ export const assignmentController = {
       }
 
       const { shares: _shares, ...course } = assignment.course
+      const { _count, ...assignmentData } = assignment
 
       return success(res, await hydrateAssetReferences({
-        ...assignment,
+        ...assignmentData,
         course,
+        ...(canAccessCourseRoster(course, userId, userRole) ? { _count } : {}),
         mySubmission,
       }, false, {
         entityType: 'Assignment',

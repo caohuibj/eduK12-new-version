@@ -57,7 +57,20 @@ describe('ScaleList grant badges', () => {
     expect(screen.queryByTitle('授权给教师')).not.toBeInTheDocument()
   })
 
-  it('lets ADMIN grant a published other scale while keeping edit', async () => {
+  it.each([
+    ['DRAFT', 'CUSTOM_DESCRIPTIVE', '编辑'],
+    ['PUBLISHED', 'CUSTOM_DESCRIPTIVE', '查看'],
+    ['DEPRECATED', 'CUSTOM_DESCRIPTIVE', '查看'],
+    ['ARCHIVED', 'CUSTOM_DESCRIPTIVE', '查看'],
+    ['DRAFT', 'STANDARD', '查看'],
+  ])('offers %s %s only its allowed definition entry', async (status, instrumentClass, action) => {
+    mockGet.mockImplementation((url: string) => Promise.resolve({ code: 0, data: url.includes('/tags') ? { tags: [] } : { list: [scale({ status, instrumentClass })], total: 1 } }))
+    render(<MemoryRouter><ScaleList /></MemoryRouter>)
+    expect(await screen.findByRole('link', { name: `${action} 焦虑量表` })).toHaveAttribute('href', '/scales/scale-1')
+    expect(screen.queryByRole('link', { name: `${action === '编辑' ? '查看' : '编辑'} 焦虑量表` })).not.toBeInTheDocument()
+  })
+
+  it('lets ADMIN grant and view a published other scale without editing its frozen definition', async () => {
     authState.user = { id: 'admin-1', role: 'ADMIN' }
     mockGet.mockImplementation((url: string) => {
       if (String(url).includes('/tags')) return Promise.resolve({ code: 0, data: { tags: [] } })
@@ -78,7 +91,8 @@ describe('ScaleList grant badges', () => {
         <ScaleList />
       </MemoryRouter>
     )
-    expect(await screen.findByTitle('编辑')).toBeInTheDocument()
+    expect(await screen.findByTitle('查看')).toBeInTheDocument()
+    expect(screen.queryByTitle('编辑')).not.toBeInTheDocument()
     expect(screen.getByTitle('授权给教师')).toBeInTheDocument()
     expect(screen.queryByText('管理员授权 · 只读')).not.toBeInTheDocument()
   })

@@ -381,7 +381,7 @@ export interface CompositeTeacherAttemptRow {
 }
 
 export interface CompositeTeacherAttemptsResponse {
-  assessment: { id: string; name: string; code: string; status: string; courseId: string | null }
+  assessment: { id: string; name: string; productKind: string; code: string; status: string; courseId: string | null }
   attemptCounts: CompositeAttemptCounts
   list: CompositeTeacherAttemptRow[]
   page: number

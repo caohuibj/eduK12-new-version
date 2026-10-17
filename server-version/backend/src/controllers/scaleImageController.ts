@@ -30,7 +30,7 @@ export const scaleImageController = {
       if (!scale) return notFound(res, '量表不存在')
       if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) return forbidden(res, '无权限发布此量表')
       if (scale.instrumentClass !== 'CUSTOM_DESCRIPTIVE') return error(res, 'STANDARD 量表必须由代码 package 发布，网页只读')
-      if (scale.status !== 'DRAFT') return error(res, '只有草稿状态的量表可以发布')
+      if (scale.status !== 'DRAFT') return error(res, '只有草稿状态的量表可以发布', -1, 409)
 
       const validation = validateScaleProductDefinition(scale.definition, 'CUSTOM_DESCRIPTIVE')
       const definition = validation.definition
@@ -44,8 +44,11 @@ export const scaleImageController = {
           definition,
           db: tx as never,
         })
+        // Publish exactly the draft that passed validation. A concurrent save
+        // or publication invalidates this predicate and rolls back media pins.
         return tx.scale.update({
-          where: { id },
+          where: { id, status: 'DRAFT', instrumentClass: 'CUSTOM_DESCRIPTIVE',
+            updatedAt: scale.updatedAt, definitionHash: scale.definitionHash },
           data: {
             status: 'PUBLISHED',
             definition: definition as any,
@@ -56,6 +59,7 @@ export const scaleImageController = {
       })
       return success(res, updated, '量表发布成功')
     } catch (cause) {
+      if ((cause as { code?: string })?.code === 'P2025') return error(res, '量表草稿已变化，请刷新后重新发布', -1, 409)
       return error(res, cause instanceof Error ? cause.message : '发布量表失败')
     }
   },

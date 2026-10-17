@@ -1,6 +1,6 @@
 import { useEditorGuard } from '../components/shared-ui/useEditorGuard'
 import ModalSurface from '../components/shared-ui/ModalSurface'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Plus, Search, Edit, Trash2, ClipboardList, FileText, Copy, CheckCircle2, Clock, BookOpen, Video, Image as ImageIcon, Download, Eye, CheckSquare, Square, MessageSquare, Users, X } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 import apiClient from '../api/client'
@@ -74,7 +74,14 @@ interface Submission {
   reviewedAt?: string
 }
 
+// A changed deep-link/auth identity must never display the previous record or editor.
 const AssignmentList: React.FC = () => {
+  const { user } = useAuth()
+  const [params] = useSearchParams()
+  return <AssignmentListContent key={JSON.stringify([user?.id, user?.role, params.get('courseId'), params.get('id')])} />
+}
+
+const AssignmentListContent: React.FC = () => {
   const { user } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
   const requestedCourseId = searchParams.get('courseId')
@@ -85,6 +92,8 @@ const AssignmentList: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
+  const mounted = useRef(true)
+  const loadSequence = useRef(0)
   const [keyword, setKeyword] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [editingAssignment, setEditingAssignment] = useState<Assignment | null>(null)
@@ -116,9 +125,11 @@ const AssignmentList: React.FC = () => {
   const [showBatchGradeModal, setShowBatchGradeModal] = useState(false)
 
   useEffect(() => {
-    fetchAssignments()
-    fetchCourses()
-    fetchTags()
+    mounted.current = true
+    void fetchAssignments()
+    void fetchCourses()
+    void fetchTags()
+    return () => { mounted.current = false; loadSequence.current++ }
   }, [])
 
   useEffect(() => {
@@ -139,17 +150,39 @@ const AssignmentList: React.FC = () => {
   }, [courses, requestedCourseId, searchParams, setSearchParams])
 
   const fetchAssignments = async () => {
+    if (!mounted.current) return
+    const request = ++loadSequence.current
+    setLoading(true)
+    setLoadError(null)
+    setAssignments([])
     try {
-      setLoading(true)
-      setLoadError(null)
-      const response = await apiClient.get('/assignments')
-      if (response.code !== 0) throw new Error(response.message || '获取作业列表失败')
-      setAssignments(response.data.list)
+      if (focusId) {
+        // Resolve the authorized record directly, including records beyond list page 1.
+        const detailPath = `/assignments/${encodeURIComponent(focusId)}` + (requestedCourseId ? `?courseId=${encodeURIComponent(requestedCourseId)}` : '')
+        const response = await apiClient.get<Assignment>(detailPath)
+        if (request !== loadSequence.current) return
+        if (response.code !== 0 || !response.data) throw new Error(response.message || '无法读取作业')
+        const record = response.data
+        if (record.id !== focusId || !record.courseId
+          || (requestedCourseId && record.courseId !== requestedCourseId)
+          || record.course?.id !== record.courseId
+          || (user?.role === 'TEACHER' && record.course?.creatorId !== user.id)) {
+          throw new Error('无法管理此课程的作业')
+        }
+        setAssignments([record])
+      } else {
+        const path = '/assignments' + (requestedCourseId ? `?courseId=${encodeURIComponent(requestedCourseId)}` : '')
+        const response = await apiClient.get<{ list: Assignment[] }>(path)
+        if (request !== loadSequence.current) return
+        if (response.code !== 0) throw new Error(response.message || '获取作业列表失败')
+        setAssignments(response.data.list)
+      }
     } catch (error) {
-      console.error('获取作业列表失败:', error)
+      if (request !== loadSequence.current) return
+      setAssignments([])
       setLoadError(error instanceof Error ? error.message : '获取作业列表失败')
     } finally {
-      setLoading(false)
+      if (request === loadSequence.current) setLoading(false)
     }
   }
 
@@ -164,7 +197,7 @@ const AssignmentList: React.FC = () => {
             userId: user?.id,
             knownIds: list.map(course => course.id),
           }) : null
-        setCourses(appended ? [...list, appended] : list)
+        if (mounted.current) setCourses(appended ? [...list, appended] : list)
       }
     } catch (error) {
       console.error('获取课程列表失败:', error)
@@ -175,7 +208,7 @@ const AssignmentList: React.FC = () => {
     try {
       const response = await apiClient.get('/assignments/tags')
       if (response.code === 0) {
-        setAvailableTags(response.data.tags)
+        if (mounted.current) setAvailableTags(response.data.tags)
       }
     } catch (error) {
       console.error('获取标签列表失败:', error)
@@ -557,6 +590,7 @@ const AssignmentList: React.FC = () => {
                   disabled={!!editingAssignment}
                 >
                   <option value="">请选择课程</option>
+                  {editingAssignment?.course && !courses.some(course => course.id === editingAssignment.courseId) && <option value={editingAssignment.courseId}>{editingAssignment.course.title}</option>}
                   {courses.map((course) => (
                     <option key={course.id} value={course.id}>
                       {course.title} (课程码: {course.courseCode})

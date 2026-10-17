@@ -358,10 +358,10 @@ const ScaleList: React.FC = () => {
                             <Link
                               to={`/scales/${scale.id}`}
                               className="text-action hover:text-action/80"
-                              title="编辑"
-                              aria-label={`编辑 ${scale.name}`}
+                              title={scale.status === 'DRAFT' && scale.instrumentClass !== 'STANDARD' ? '编辑' : '查看'}
+                              aria-label={`${scale.status === 'DRAFT' && scale.instrumentClass !== 'STANDARD' ? '编辑' : '查看'} ${scale.name}`}
                             >
-                              <Edit className="h-4 w-4" aria-hidden="true" />
+                              {scale.status === 'DRAFT' && scale.instrumentClass !== 'STANDARD' ? <Edit className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
                             </Link>
                             {scale.status === 'DRAFT' && scale.instrumentClass !== 'STANDARD' && (
                               <button type="button" onClick={() => handlePublish(scale.id)} className="text-green-600 hover:text-green-800" title="发布" aria-label={`发布 ${scale.name}`}>
