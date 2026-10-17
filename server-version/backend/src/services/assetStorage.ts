@@ -1,3 +1,4 @@
+import { registerCOSAssetUpload, cleanupAssetUploadDuplicate } from './assetUploadDeduplication'
 import { assetStorageKey } from './assetStorageKey'
 import { streamResponse } from '../utils/streamResponse'
 import crypto from 'node:crypto'
@@ -10,7 +11,7 @@ import { prisma } from '../config/database'
 import { config } from '../config'
 import { CourseStudentStatus, UserRole } from '../types'
 import { forbidden, notFound, unauthorized } from '../utils/response'
-import { getCOSSignedUrl, isCOSEnabled, uploadBufferToCOS, uploadToCOS, deleteFromCOS } from '../utils/cos'
+import { getCOSSignedUrl, isCOSEnabled, uploadBufferToCOS, uploadAssetFileToCOS, deleteFromCOS } from '../utils/cos'
 
 export const ASSET_URL_TTL_SECONDS = 10 * 60
 // objectKey is always relative to the upload root (for example
@@ -109,36 +110,30 @@ export const storeAsset = async (input: StoreAssetInput) => {
   const objectKey = `assets/${id}${extensionFor(input.originalName, input.mimeType)}`
   const provider = input.provider || providerFromEnvironment()
   const localPath = localPathFor(objectKey)
-
+  const digest = sha256Buffer(input.buffer)
+  const data = {
+    id, objectKey, provider, mimeType: input.mimeType, sizeBytes: input.buffer.length, sha256: digest,
+    originalName: input.originalName, ownerId: input.ownerId, accessScope: input.accessScope || 'PRIVATE', scopeId: input.scopeId,
+    ...(input.initialReference ? { references: { create: input.initialReference } } : {}),
+  }
+  let writeAttempted = false
   try {
     if (provider === 'cos') {
-      await uploadBufferToCOS(input.buffer, objectKey)
+      const reused = await registerCOSAssetUpload(data, 'reuse-only')
+      if (reused) return reused
+      writeAttempted = true
+      await uploadBufferToCOS(input.buffer, objectKey, 'STANDARD', { mimeType: input.mimeType, sha256: digest })
     } else {
       await fsPromises.mkdir(path.dirname(localPath), { recursive: true, mode: 0o700 })
       await fsPromises.writeFile(localPath, input.buffer, { mode: 0o600, flag: 'wx' })
     }
-
-    return await prisma.storedAsset.create({
-      data: {
-        id,
-        objectKey,
-        provider,
-        mimeType: input.mimeType,
-        sizeBytes: input.buffer.length,
-        sha256: sha256Buffer(input.buffer),
-        originalName: input.originalName,
-        ownerId: input.ownerId,
-        accessScope: input.accessScope || 'PRIVATE',
-        scopeId: input.scopeId,
-        ...(input.initialReference ? { references: { create: input.initialReference } } : {}),
-      },
-    })
+    const asset = provider === 'cos' ? await registerCOSAssetUpload(data) : await prisma.storedAsset.create({ data })
+    if (!asset) throw new Error('Uploaded asset registration missing')
+    if (asset.duplicateCleanupPending && await cleanupAssetUploadDuplicate(asset.id)) asset.duplicateCleanupPending = false
+    return asset
   } catch (error) {
-    if (provider === 'local') {
-      await fsPromises.rm(localPath, { force: true }).catch(() => undefined)
-    } else {
-      await deleteFromCOS(objectKey).catch(() => undefined)
-    }
+    if (provider === 'local') await fsPromises.rm(localPath, { force: true }).catch(() => undefined)
+    else if (writeAttempted) await deleteFromCOS(objectKey).catch(() => undefined)
     throw error
   }
 }
@@ -164,42 +159,34 @@ export interface StoreAssetFileInput {
 export const storeAssetFromFile = async (input: StoreAssetFileInput) => {
   const stat = await fsPromises.stat(input.filePath)
   if (!stat.isFile() || stat.size <= 0) throw new Error('asset file cannot be empty')
-
   const id = crypto.randomUUID()
   const objectKey = `assets/${id}${extensionFor(input.originalName, input.mimeType)}`
   const provider = input.provider || providerFromEnvironment()
   const localPath = localPathFor(objectKey)
   const digest = await sha256File(input.filePath)
-
+  const data = {
+    id, objectKey, provider, mimeType: input.mimeType, sizeBytes: stat.size, sha256: digest,
+    originalName: input.originalName, ownerId: input.ownerId, accessScope: input.accessScope || 'PRIVATE', scopeId: input.scopeId,
+  }
+  let writeAttempted = false
   try {
     if (provider === 'cos') {
-      await uploadToCOS(input.filePath, objectKey)
+      const reused = await registerCOSAssetUpload(data, 'reuse-only')
+      if (reused) return reused
+      writeAttempted = true
+      await uploadAssetFileToCOS(input.filePath, objectKey, input.mimeType, stat.size, digest)
     } else {
       await fsPromises.mkdir(path.dirname(localPath), { recursive: true, mode: 0o700 })
       await fsPromises.copyFile(input.filePath, localPath)
       await fsPromises.chmod(localPath, 0o600)
     }
-
-    return await prisma.storedAsset.create({
-      data: {
-        id,
-        objectKey,
-        provider,
-        mimeType: input.mimeType,
-        sizeBytes: stat.size,
-        sha256: digest,
-        originalName: input.originalName,
-        ownerId: input.ownerId,
-        accessScope: input.accessScope || 'PRIVATE',
-        scopeId: input.scopeId,
-      },
-    })
+    const asset = provider === 'cos' ? await registerCOSAssetUpload(data) : await prisma.storedAsset.create({ data })
+    if (!asset) throw new Error('Uploaded asset registration missing')
+    if (asset.duplicateCleanupPending && await cleanupAssetUploadDuplicate(asset.id)) asset.duplicateCleanupPending = false
+    return asset
   } catch (error) {
-    if (provider === 'local') {
-      await fsPromises.rm(localPath, { force: true }).catch(() => undefined)
-    } else {
-      await deleteFromCOS(objectKey).catch(() => undefined)
-    }
+    if (provider === 'local') await fsPromises.rm(localPath, { force: true }).catch(() => undefined)
+    else if (writeAttempted) await deleteFromCOS(objectKey).catch(() => undefined)
     throw error
   }
 }
@@ -232,11 +219,14 @@ export const discardUnreferencedAsset = async (asset: {
   objectKey: string
   provider: string
 }): Promise<boolean> => {
+  const stored = await prisma.storedAsset.findUnique({ where: { id: asset.id } }).catch(() => null)
+  if (!stored) return false
+  if (stored.duplicateCleanupPending && !await cleanupAssetUploadDuplicate(stored.id)) return false
   let deleted = false
   try {
     const result = await prisma.storedAsset.deleteMany({
       where: {
-        id: asset.id,
+        id: stored.id, objectKey: stored.objectKey, storageObjectKey: stored.storageObjectKey,
         references: { none: {} },
       },
     })
@@ -246,10 +236,10 @@ export const discardUnreferencedAsset = async (asset: {
   }
   if (!deleted) return false
 
-  if (asset.provider === 'local') {
-    await fsPromises.rm(localPathFor(asset.objectKey), { force: true }).catch(() => undefined)
+  if (stored.provider === 'local') {
+    await fsPromises.rm(localPathFor(stored.objectKey), { force: true }).catch(() => undefined)
   } else {
-    await deleteFromCOS(asset.objectKey).catch(() => undefined)
+    await deleteFromCOS(assetStorageKey(stored)).catch(() => undefined)
   }
   return true
 }

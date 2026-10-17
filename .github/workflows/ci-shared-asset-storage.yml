@@ -40,6 +40,7 @@ jobs:
           writeFileSync('shared-asset-storage-plan.json',JSON.stringify(p,null,2));
           JS
       - name: shared reference restore contracts
+        if: contains(join(fromJSON(inputs.plan).changes.*.file, ','), 'server-version/scripts/cos-cleanup/recovery.')
         run: node --test server-version/scripts/cos-cleanup/recovery.test.mjs
       - uses: docker/setup-buildx-action@v3
       - name: compile backend once and run affected contracts on isolated PostgreSQL
