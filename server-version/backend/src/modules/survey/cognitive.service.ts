@@ -306,7 +306,7 @@ export async function submitSurveyCognitiveFinal(proof:SurveyCognitiveProof,slot
       epoch:current.epoch,measurementDigest:frozen.measurementDigest,submissionId,payloadHash:canonical.hash,
       rawHash,rawCipher:encryptUnifiedRuntimePayload(raw),resultHash:canonicalHash(result),
       resultCipher:encryptUnifiedRuntimePayload(result),trialCount:trials.length,completedAt,
-    }})
+    },select:surveyCognitiveReceiptSelect})
     const updated=await tx.surveyCognitiveSession.updateMany({where:{id:current.id,epoch:current.epoch,
       status:{in:['IN_PROGRESS','INTERRUPTED']}},data:{status:'COMPLETED',finishedAt:completedAt}})
     if(updated.count!==1)cognitiveFail(409,'认知会话状态发生并发变化')

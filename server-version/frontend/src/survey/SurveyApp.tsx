@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { ProductPasswordChange } from '../components/account/ProductPasswordChange'
 import { SurveyBuilder } from './SurveyBuilder'
+import { createInstrumentLibrary } from './instrument-library'
 import { SurveyWaveStudio } from './SurveyWaveStudio'
 import { SurveyAnalyticsWorkspace } from './SurveyAnalyticsWorkspace'
 import { SurveyBrand } from './SurveyBrand'
@@ -48,8 +49,8 @@ export default function SurveyApp(){
   const [projects,setProjects]=useState<Project[]>([]),[selected,setSelected]=useState<Project|null>(null)
   const [projectPage,setProjectPage]=useState(1)
   const [available,setAvailable]=useState<{analytics:boolean;publication:boolean}|null>(null)
-  const [instrumentsRevision,setInstrumentsRevision]=useState(0)
-  const instrumentsChanged=useCallback(()=>setInstrumentsRevision(value=>value+1),[])
+  const selectedProjectId=selected?.id
+  const instrumentLibrary=useMemo(()=>selectedProjectId?createInstrumentLibrary(selectedProjectId):undefined,[selectedProjectId])
   const projectChanged=useCallback((project:Pick<Project,'id'|'status'|'revision'|'collectionMode'>)=>{
     setSelected(current=>current?.id===project.id?{...current,...project}:current)
     setProjects(current=>current.map(row=>row.id===project.id?{...row,...project}:row))
@@ -117,7 +118,7 @@ export default function SurveyApp(){
     const p=await api<Project>('/projects','POST',{requestId:crypto.randomUUID(),title,description,collectionMode:mode})
     await loadProjects(1);choose(p);setNotice('研究草稿已创建')
   })}
-  const choose=(p:Project)=>{setSelected(p);setTitle(p.title);setDescription(p.description);setMode(p.collectionMode);setInstrumentsRevision(0)}
+  const choose=(p:Project)=>{setSelected(p);setTitle(p.title);setDescription(p.description);setMode(p.collectionMode)}
   const save=(e:FormEvent)=>{e.preventDefault();if(!selected)return;void work(async()=>{
     const p=await api<Project>('/projects/'+selected.id,'PATCH',
       {revision:selected.revision,title,description,collectionMode:mode})
@@ -211,7 +212,7 @@ export default function SurveyApp(){
           <div className="flex flex-wrap gap-3 mt-4"><button className="btn-primary" disabled={busy||(selected!==null&&selected.status!=='DRAFT')}>{selected?'保存修改':'创建研究'}</button>
             {selected&&<button type="button" className="btn-secondary" onClick={()=>{setSelected(null);setTitle('');setDescription('')}}>新建其他项目</button>}</div>
         </form><p className="text-sm text-slate-500 mt-4">研究工具编辑、研究专用发布、匿名参与与科研分析可按功能开关使用；正式生产开通须完成独立部署验收。</p>
-      </section>{selected&&<><SurveyBuilder key={'builder-'+selected.id} projectId={selected.id} onInstrumentsChanged={instrumentsChanged}/><SurveyWaveStudio key={'waves-'+selected.id} projectId={selected.id} instrumentsRevision={instrumentsRevision} onProjectChanged={projectChanged}/>
+      </section>{selected&&<><SurveyBuilder key={'builder-'+selected.id} projectId={selected.id} instrumentLibrary={instrumentLibrary}/><SurveyWaveStudio key={'waves-'+selected.id} projectId={selected.id} instrumentLibrary={instrumentLibrary} onProjectChanged={projectChanged}/>
           {available?.analytics
             ?<SurveyAnalyticsWorkspace key={'analysis-'+selected.id} projectId={selected.id}/>
             :<section className="rounded-xl border bg-white p-4" aria-label="研究数据状态">

@@ -2829,6 +2829,8 @@ model SurveyWave {
   flowDefinition  Json?         @map("flow_definition")
   quotaPolicy     Json?         @map("quota_policy")
   checkpointPolicy Json?        @map("checkpoint_policy")
+  groupIpPolicy   Json?         @map("group_ip_policy")
+  groupIpActivatedAt DateTime?  @map("group_ip_activated_at") @db.Timestamptz(6)
   opensAt         DateTime?     @map("opens_at") @db.Timestamptz(6)
   closesAt        DateTime?     @map("closes_at") @db.Timestamptz(6)
   finishUntil     DateTime?     @map("finish_until") @db.Timestamptz(6)

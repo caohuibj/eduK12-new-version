@@ -17,9 +17,11 @@ const mocks=vi.hoisted(()=>({verified:vi.fn(),transaction:vi.fn(),assignment:vi.
 vi.mock('../../config/database',()=>({prisma:{$transaction:mocks.transaction,
   surveyWaveFinal:{findFirst:mocks.readFinal}}}))
 vi.mock('../../services/questionnaireProgressService',()=>({withFinalOnlyCompletionTransaction:mocks.transaction}))
-vi.mock('../../modules/survey/admission.service',()=>({verifiedSurveyAttempt:mocks.verified}))
+vi.mock('../../modules/survey/admission.service',()=>({verifiedSurveyAttempt:mocks.verified,verifiedSurveyFinalLocator:mocks.verified}))
 vi.mock('../../modules/survey/identity.service',()=>({hashResearchCredential:()=> 'credential-hash'}))
-vi.mock('../../modules/survey/flow.assignment',()=>({ensureSurveyFlowAssignment:mocks.assignment}))
+vi.mock('../../modules/survey/flow.assignment',async importOriginal=>({
+  ...await importOriginal<typeof import('../../modules/survey/flow.assignment')>(),ensureSurveyFlowAssignment:mocks.assignment,
+}))
 vi.mock('../../modules/assessment-runtime/security',()=>({encryptUnifiedRuntimePayload:mocks.encrypt}))
 
 function snapshot():ResearchFrozenPublication {
@@ -333,5 +335,33 @@ describe('Survey screened-out recovery without answer or assignment exposure',()
     expect(mocks.assignment).not.toHaveBeenCalled()
     expect(mocks.encrypt).not.toHaveBeenCalled()
     expect(mocks.createFinal).not.toHaveBeenCalled()
+  })
+})
+
+// The locator carries no definition authority. All checks below happen after
+// the current publication is reloaded under the original transaction locks.
+describe('parent FINAL narrow preflight source fence',()=>{
+  it('does not require a preflight snapshot and verifies the locked full definition once',async()=>{
+    delete known.compiledSnapshot
+    const hash=vi.spyOn(canonical,'canonicalHash')
+    await expect(submitResearchFinal(input())).resolves.toMatchObject({idempotent:true})
+    expect(hash.mock.calls.filter(([value])=>(value as any)?.runtimeStatus==='SURVEY_FINAL_V1')).toHaveLength(1)
+    expect(mocks.lock).toHaveBeenCalledTimes(3)
+  })
+  it.each(['id','definitionDigest'])('rejects a publication %s changed after preflight before receipt replay',async field=>{
+    current.wave.publication[field]='changed-after-preflight'
+    await expect(submitResearchFinal(input())).rejects.toMatchObject({statusCode:409})
+    expect(mocks.final).not.toHaveBeenCalled();expect(mocks.createFinal).not.toHaveBeenCalled()
+  })
+  it('rejects a corrupted current snapshot even when its stored digest is unchanged',async()=>{
+    current.wave.publication.compiledSnapshot.units[0].title='corrupted-after-preflight'
+    await expect(submitResearchFinal(input())).rejects.toMatchObject({statusCode:403})
+    expect(mocks.final).not.toHaveBeenCalled();expect(mocks.createFinal).not.toHaveBeenCalled()
+  })
+  it('rejects a matching digest for an unsupported runtime before receipt replay',async()=>{
+    current.wave.publication.compiledSnapshot.runtimeStatus='OTHER_RUNTIME'
+    known.definitionDigest=current.wave.publication.definitionDigest=canonicalHash(current.wave.publication.compiledSnapshot)
+    await expect(submitResearchFinal(input())).rejects.toMatchObject({statusCode:403})
+    expect(mocks.final).not.toHaveBeenCalled();expect(mocks.createFinal).not.toHaveBeenCalled()
   })
 })

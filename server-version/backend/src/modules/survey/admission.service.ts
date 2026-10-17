@@ -75,7 +75,8 @@ const claimQuota=async(tx:Tx,waveId:string,startsCount:number)=>{
 }
 type ConsentWaveProjection={
   id:string;title:string;ordinal:number;status:string;consentText:string;consentVersion:number;
-  opensAt:Date|null;closesAt:Date|null;allowNewParticipants:boolean;measurementNotice:unknown
+  opensAt:Date|null;closesAt:Date|null;allowNewParticipants:boolean;measurementNotice:unknown;
+  groupIpPolicy:unknown;groupIpActivatedAt:Date|null
 }
 // Read only the frozen public disclosure, never the full private compiled
 // snapshot. The joined projection keeps the prior single wave-list query.
@@ -83,20 +84,31 @@ const consentWaveColumns=Prisma.sql`w.id,w.title,w.ordinal,w.status,
   w.consent_text AS "consentText",w.consent_version AS "consentVersion",
   w.opens_at AS "opensAt",w.closes_at AS "closesAt",
   w.allow_new_participants AS "allowNewParticipants",
+  w.group_ip_policy AS "groupIpPolicy",w.group_ip_activated_at AS "groupIpActivatedAt",
   p.compiled_snapshot->'measurementNotice' AS "measurementNotice"`
-export async function getPublicResearchInfo(publicId:string){
+export async function getPublicResearchInfo(publicId:string,entryToken?:string){
   enabled()
   return prisma.$transaction(async tx=>{
     const project=await projectPublic(tx,publicId)
     const now=new Date()
+    let scopeWaveId:string|undefined
+    if(entryToken!==undefined){
+      if(!secretPattern.test(entryToken))blocked('研究招募链接无效')
+      const entry=await tx.surveyEntryToken.findFirst({where:{projectId:project.id,
+        tokenHash:hashResearchCredential(entryToken),revokedAt:null,expiresAt:{gt:now}},
+        select:{waveId:true,wave:{select:{groupIpPolicy:true}}}})
+      if(!entry)blocked('研究招募链接已经失效')
+      if(entry.wave.groupIpPolicy!==null)scopeWaveId=entry.waveId
+    }
     const waves=project.status==='ACTIVE'?await tx.$queryRaw<ConsentWaveProjection[]>`
       SELECT ${consentWaveColumns} FROM survey_waves w
       LEFT JOIN survey_publications p ON p.id=w.publication_id AND p.project_id=w.project_id
       WHERE w.project_id=${project.id} AND w.status='OPEN' AND w.publication_id IS NOT NULL
         AND w.hard_stop_at IS NULL AND (w.opens_at IS NULL OR w.opens_at<=${now})
         AND (w.closes_at IS NULL OR w.closes_at>${now})
+        ${scopeWaveId?Prisma.sql`AND w.id=${scopeWaveId}`:Prisma.empty}
       ORDER BY w.ordinal ASC LIMIT 100`:[]
-    return {project:{name:project.title,description:project.description,
+    return {scopeWaveId:scopeWaveId??null,project:{name:project.title,description:project.description,
       collectionMode:project.collectionMode,status:project.status},
       waves:waves.map(({measurementNotice,...wave})=>({...wave,
         consentText:disclosedSurveyConsent(wave.consentText,{measurementNotice})}))}
@@ -120,7 +132,7 @@ export async function joinLinkedStudy(input:{
   })
 }
 export async function listOwnLinkedWaves(input:{
-  publicId:string;researchCode:string;accessCredential:string
+  publicId:string;researchCode:string;accessCredential:string;waveId?:string
 }){
   enabled()
   const project=await prisma.$transaction(tx=>projectPublic(tx,input.publicId))
@@ -134,9 +146,11 @@ export async function listOwnLinkedWaves(input:{
     LEFT JOIN survey_publications p ON p.id=w.publication_id AND p.project_id=w.project_id
     WHERE w.project_id=${project.id} AND w.publication_id IS NOT NULL
       AND w.status IN ('OPEN','PAUSED','CLOSED')
+      ${input.waveId?Prisma.sql`AND w.id=${input.waveId}`:Prisma.empty}
     ORDER BY w.ordinal ASC LIMIT 100`
   const attempts=await prisma.surveyWaveAttempt.findMany({where:{
     projectId:project.id,participantId:identity.participantId,
+    ...(input.waveId?{waveId:input.waveId}:{}),
   },select:{id:true,waveId:true,status:true,completedAt:true}})
   const state=new Map(attempts.map(a=>[a.waveId,a]))
   const now=new Date()
@@ -230,22 +244,23 @@ export async function startSingleUnlinkedWave(input:{
       accessCredential:proof.accessCredential}
   })
 }
-/** Called by private FINAL and public task read; every request proves current
- * Survey participant authority independently of Researcher/Training cookies.
- */
-export async function verifiedSurveyAttempt(input:{
-  publicId:string;attemptId:string;researchCode?:string;accessCredential:string
-}):Promise<{attemptId:string;projectId:string;waveId:string;participantId:string|null;
+type SurveyAttemptProof={publicId:string;attemptId:string;researchCode?:string;accessCredential:string}
+type VerifiedSurveyAttempt={attemptId:string;projectId:string;waveId:string;participantId:string|null;
   status:string;publicationId:string;definitionDigest:string;
   compiledSnapshot:ResearchFrozenPublication;generalText:string;finishUntil:Date|null;
-  hardStopAt:Date|null}> {
+  hardStopAt:Date|null}
+/** Read the current bearer and frozen-version locator. Only readers that need
+ * the definition outside a later authoritative transaction select its payload. */
+async function readVerifiedSurveyAttempt(input:SurveyAttemptProof,includeSnapshot:boolean){
   enabled()
   if(!secretPattern.test(input.accessCredential))blocked()
   const project=await prisma.$transaction(tx=>projectPublic(tx,input.publicId))
-  const result=await prisma.$transaction(async tx=>{
+  return prisma.$transaction(async tx=>{
     const attempt=await tx.surveyWaveAttempt.findFirst({where:{
       id:input.attemptId,projectId:project.id,
-    },include:{wave:{include:{publication:true}}}})
+    },select:{id:true,waveId:true,participantId:true,status:true,sessionHash:true,
+      wave:{select:{generalText:true,finishUntil:true,hardStopAt:true,
+        publication:{select:{id:true,definitionDigest:true,compiledSnapshot:includeSnapshot}}}}}})
     if(!attempt||!attempt.wave.publication)blocked()
     if(attempt.participantId){
       if(!input.researchCode)blocked()
@@ -255,8 +270,9 @@ export async function verifiedSurveyAttempt(input:{
       if(linked.participantId!==attempt.participantId)blocked()
     }else if(attempt.sessionHash!==hashResearchCredential(input.accessCredential))blocked()
     const pub=attempt.wave.publication
-    const snapshot=pub!.compiledSnapshot as unknown as ResearchFrozenPublication
-    if(snapshot.runtimeStatus!=='SURVEY_FINAL_V1'||canonicalHash(JSON.parse(JSON.stringify(snapshot)))!==pub!.definitionDigest)
+    const snapshot=includeSnapshot?pub!.compiledSnapshot as unknown as ResearchFrozenPublication:undefined
+    if(includeSnapshot&&(snapshot?.runtimeStatus!=='SURVEY_FINAL_V1'
+      ||canonicalHash(JSON.parse(JSON.stringify(snapshot)))!==pub!.definitionDigest))
       blocked('研究冻结定义不可用')
     return {attemptId:attempt.id,projectId:project.id,waveId:attempt.waveId,
       participantId:attempt.participantId,status:attempt.status,
@@ -264,5 +280,16 @@ export async function verifiedSurveyAttempt(input:{
       generalText:attempt.wave.generalText,finishUntil:attempt.wave.finishUntil,
       hardStopAt:attempt.wave.hardStopAt}
   })
-  return result
+}
+/** Public task/read paths independently verify their full frozen definition. */
+export async function verifiedSurveyAttempt(input:SurveyAttemptProof):Promise<VerifiedSurveyAttempt>{
+  const result=await readVerifiedSurveyAttempt(input,true)
+  return {...result,compiledSnapshot:result.compiledSnapshot!}
+}
+/** Internal parent-FINAL locator, not a verified definition or cached authority.
+ * The caller MUST reload and hash the full current publication under the
+ * Project -> Wave -> Attempt locks, before replay or mutation. */
+export async function verifiedSurveyFinalLocator(input:SurveyAttemptProof):Promise<Omit<VerifiedSurveyAttempt,'compiledSnapshot'>>{
+  const {compiledSnapshot,...locator}=await readVerifiedSurveyAttempt(input,false)
+  return locator
 }

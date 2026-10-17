@@ -8,8 +8,11 @@ import { encryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/s
 import { compileFrozenResearchUnit } from '../../modules/survey/publication.service'
 import { initialCognitiveDefinition } from '../../modules/survey/cognitive.definition'
 import { hashResearchCredential } from '../../modules/survey/identity.service'
-import { readSurveyCognitive,restartSurveyCognitive,startSurveyCognitive,
+import { readSurveyCognitive,restartSurveyCognitive,startSurveyCognitive,submitSurveyCognitiveFinal,
   readSurveyCognitiveProgressFromVerifiedAttempt } from '../../modules/survey/cognitive.service'
+import { gonogoSequence } from '../../modules/cognitive/randomization'
+import { createTrialEnvelope } from '../../modules/cognitive/v2/trial-envelope'
+import { surveyCognitiveReceiptSelect } from '../../modules/survey/cognitive.results'
 import { getOwnResearchTask } from '../../modules/survey/task.public'
 
 const provenance={schemaVersion:1,deviceClass:'DESKTOP_LAPTOP',administrationMode:'KEYBOARD_MOUSE'}
@@ -31,10 +34,10 @@ function fixture(){
     retentionReviewAt:new Date(),startedAt:new Date(),interruptedAt:null,finishedAt:null,result:null}
   const tx={$queryRaw:vi.fn().mockResolvedValue([{id:'locked'}]),surveyWaveAttempt:{findFirst:vi.fn().mockResolvedValue(attempt)},
     surveyConsent:{findFirst:vi.fn().mockResolvedValue({id:'consent'})},
-    surveyCognitiveResult:{findUnique:vi.fn()},
+    surveyCognitiveResult:{findUnique:vi.fn(),create:vi.fn(async({data,select}:any)=>Object.fromEntries(Object.keys(select).map(key=>[key,data[key]])))},
     surveyCognitiveSession:{findFirst:vi.fn(async(_args:any)=>current),findMany:vi.fn(async(args:any)=>
       args.select?.lockedAnswersCipher?(current?[current]:[]):(current?[current]:[])),
-      update:vi.fn(async({data}:any)=>Object.assign(current,data)),
+      update:vi.fn(async({data}:any)=>Object.assign(current,data)),updateMany:vi.fn().mockResolvedValue({count:1}),
       create:vi.fn(async({data}:any)=>current={...data,startedAt:new Date(),interruptedAt:null,finishedAt:null})}}
   mocks.verified.mockResolvedValue(known);mocks.db.$transaction.mockImplementation(async(callback:any)=>callback(tx))
   return {proof,known,attempt,tx,get current(){return current},set current(value:any){current=value}}
@@ -97,4 +100,23 @@ describe('Survey participant lifecycle query reuse',()=>{
     await expect(readSurveyCognitiveProgressFromVerifiedAttempt(f.proof,{...f.known,attemptId:randomUUID()} as any)).rejects.toThrow('入口')
     expect(mocks.db.$transaction).not.toHaveBeenCalled()
   })
+})
+
+describe('Survey cognitive FINAL receipt-only INSERT projection',()=>{
+ it('persists both encrypted payloads while returning only receipt metadata',async()=>{
+  const f=fixture(),frozen=f.attempt.wave.publication.compiledSnapshot.units[0].compiledDefinition as any
+  const trials=gonogoSequence('seed',120,.25).map((trialType,trialIndex)=>createTrialEnvelope({trialIndex,phase:'test',
+   startedAtPerfMs:trialIndex*1300,endedAtPerfMs:trialIndex*1300+800,
+   payload:{trialType,responded:trialType==='go',rtMs:trialType==='go'?320:null,interrupted:false}}))
+  const result=await submitSurveyCognitiveFinal(f.proof,'go',f.current.id,{
+   submissionId:randomUUID(),attemptEpoch:1,definitionHash:frozen.sessionSnapshot.configHash,trials,
+   administrationProvenance:provenance as any,
+  })
+  const query=f.tx.surveyCognitiveResult.create.mock.calls[0][0]
+  expect(query.select).toEqual(surveyCognitiveReceiptSelect)
+  expect(query.data.rawCipher).toEqual(expect.any(String));expect(query.data.resultCipher).toEqual(expect.any(String))
+  expect(query.data.trialCount).toBe(120);expect(result.resultReference.resultId).toBe(query.data.id)
+  expect(result.payloadHash).toBe(query.data.payloadHash);expect(result.completed).toBe(true)
+  expect(JSON.stringify(result)).not.toMatch(/rawCipher|resultCipher|trialIndex|randomSeed/)
+ })
 })

@@ -12,7 +12,7 @@ import { verifySurveyFinalPublication, SurveyFinalValidationError } from './fina
 import { SurveyScaleTimingError } from './timing.definition'
 import { ensureSurveyFlowAssignment,assignedSurveySnapshot } from './flow.assignment'
 import { hashResearchCredential } from './identity.service'
-import { verifiedSurveyAttempt } from './admission.service'
+import { verifiedSurveyAttempt,verifiedSurveyFinalLocator } from './admission.service'
 import { SurveyWaveError } from './waves.service'
 import type { ResearchFrozenPublication } from './publication.service'
 
@@ -50,7 +50,7 @@ export async function submitResearchFinal(input:FinalInput){
   if(!proofShape.test(input.accessCredential))blocked('作答凭证无效')
   validateSubmissionId(input.submissionId)
   // Zero business identity authority is inferred from a Study Code.
-  const known=await verifiedSurveyAttempt({
+  const known=await verifiedSurveyFinalLocator({
     publicId:input.publicId,attemptId:input.attemptId,
     researchCode:input.researchCode,accessCredential:input.accessCredential,
   })
@@ -83,6 +83,8 @@ export async function submitResearchFinal(input:FinalInput){
     if(publication.id!==known.publicationId||
       publication.definitionDigest!==known.definitionDigest)
       invalid('提交时研究冻结版本已经发生变化')
+    if((publication.compiledSnapshot as unknown as ResearchFrozenPublication)?.runtimeStatus!=='SURVEY_FINAL_V1')
+      blocked('冻结研究定义校验失败')
     const verified=verifySurveyFinalPublication(
       publication.compiledSnapshot as unknown as ResearchFrozenPublication,publication.definitionDigest)
     if(!verified)

@@ -1,3 +1,4 @@
+import { REPORT_SUBMISSION_KEY_CONFLICT, REPORT_SUBMISSION_KEY_CONFLICT_MESSAGE } from '../scale/scale-final-submit-conflict'
 import { detachedWholeReceiptsEnabled } from './whole-receipt-storage'
 import { registerWholeReceiptAtomic } from './whole-receipt-atomic'
 import { markAssessmentTimeline, traceAssessmentPhase, recordAssessmentReportClaim } from '../../services/runtimeObservability'
@@ -178,14 +179,17 @@ const enqueueBoundReport = async (tx: Prisma.TransactionClient, parent: BoundRep
 /** Owner authorization belongs to the caller; retry uses the current frozen binding. */
 export const retryCompositeReport = async (parent: BoundReportParent): Promise<void> => {
   await prisma.$transaction(async tx => {
-    const rows = await tx.$queryRaw<Array<{ status: string; wholeSubmissionId: string | null }>>`
-      SELECT "status", "whole_submission_id" AS "wholeSubmissionId" FROM "composite_report_jobs"
+    const rows = await tx.$queryRaw<Array<{ status: string; wholeSubmissionId: string | null; errorCode: string | null }>>`
+      SELECT "status", "whole_submission_id" AS "wholeSubmissionId", "error_code" AS "errorCode" FROM "composite_report_jobs"
       WHERE "attempt_id" = ${parent.id} AND "attempt_epoch" = ${parent.attemptEpoch}
         AND "slot_set_hash" = ${parent.frozenActiveSlotSetHash}
         AND "context_hash" IS NOT DISTINCT FROM ${parent.contextSnapshotHash} FOR UPDATE
     `
     if (!rows.length) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '没有可恢复的报告任务', 404)
     if (rows[0].status !== 'FAILED') return
+    if (rows[0].errorCode === REPORT_SUBMISSION_KEY_CONFLICT) {
+      throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', REPORT_SUBMISSION_KEY_CONFLICT_MESSAGE, 409)
+    }
     if (rows[0].wholeSubmissionId) {
       await tx.compositeReportJob.updateMany({
         where: { attemptId: parent.id, attemptEpoch: parent.attemptEpoch, status: 'FAILED',
@@ -343,7 +347,9 @@ export const compositeReportJobState = (job: Pick<CompositeReportJob, 'id' | 'st
   state: job?.status ?? 'PENDING',
   jobId: job?.id ?? null,
   retryAfterSeconds: job?.status === 'PROCESSING' ? 5 : 2,
-  errorCode: job?.status === 'FAILED' ? 'REPORT_GENERATION_FAILED' : null,
+  errorCode: job?.status === 'FAILED'
+    ? job.errorCode === REPORT_SUBMISSION_KEY_CONFLICT ? REPORT_SUBMISSION_KEY_CONFLICT : 'REPORT_GENERATION_FAILED'
+    : null,
   completedAt: job?.completedAt ?? null,
 })
 

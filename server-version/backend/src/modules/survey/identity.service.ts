@@ -29,13 +29,14 @@ async function activePublicWave(tx:Tx,projectId:string,waveId:string,rawEntry:st
     return fail('研究项目当前不接受新的多波次参与者')
   const rows=await tx.$queryRaw<Array<{
     waveId:string;ordinal:number;allowNewParticipants:boolean;
-    consentVersion:number;startsCount:number;quotaStarts:number|null;publicationId:string|null
+    consentVersion:number;startsCount:number;quotaStarts:number|null;publicationId:string|null;
+    groupIpPolicy:unknown;closesAt:Date|null
   }>>`
     SELECT w.id AS "waveId",w.ordinal,
       w.allow_new_participants AS "allowNewParticipants",
       w.consent_version AS "consentVersion",
       w.publication_id AS "publicationId",
-      w.starts_count AS "startsCount",w.quota_starts AS "quotaStarts"
+      w.starts_count AS "startsCount",w.quota_starts AS "quotaStarts",w.group_ip_policy AS "groupIpPolicy",w.closes_at AS "closesAt"
     FROM "survey_waves" w
     JOIN "survey_entry_tokens" t ON t.wave_id=w.id AND t.project_id=w.project_id
     JOIN "survey_projects" p ON p.id=w.project_id
@@ -56,6 +57,10 @@ async function activePublicWave(tx:Tx,projectId:string,waveId:string,rawEntry:st
   `
   const wave=rows[0]
   if(!wave)return fail('研究目前未开放参加')
+  // statement_timestamp is fixed before a lock wait. Group recruitment must
+  // recheck the real clock AFTER the Wave lock has actually been acquired.
+  if(wave.groupIpPolicy!==null&&(!wave.closesAt||wave.closesAt<=new Date()))
+    return fail('集体作答的采集时间已经结束')
   if(wave.ordinal>1&&!wave.allowNewParticipants)
     return fail('此波次暂不接受新的研究编号')
   if(wave.quotaStarts!==null&&wave.startsCount>=wave.quotaStarts)

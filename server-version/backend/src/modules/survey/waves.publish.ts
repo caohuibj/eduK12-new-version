@@ -4,6 +4,7 @@ import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { freezeResearchWaveDraft, type ResearchFrozenPublication } from './publication.service'
 import { SurveyWaveError,MAX_WAVE_FINISH_GRACE_MS } from './waves.service'
+import { resolveGroupIpOpenWindow,assertGroupIpWindowActive } from './group-ip-policy'
 
 type Tx=Prisma.TransactionClient
 const token=()=>randomBytes(32).toString('base64url')
@@ -59,12 +60,18 @@ export async function openWave(userId:string,projectId:string,waveId:string,revi
       where:{id:wave.publicationId,projectId},
     })
     if(!publication)fail('冻结发布定义缺失')
-    assertRuntime(publication)
+    const snapshot=assertRuntime(publication)
+    if(canonicalHash(snapshot.groupIpPolicy??null)!==canonicalHash(wave.groupIpPolicy??null))
+      fail('集中采集设置与冻结发布定义不一致')
+    if(wave.groupIpPolicy&&(snapshot.projectId!==projectId||snapshot.waveId!==waveId||wave.groupIpActivatedAt))
+      fail('集中采集冻结来源或启用状态无效')
     const now=new Date()
-    const open=wave.opensAt||now,close=wave.closesAt||new Date(now.getTime()+30*86400000)
+    const groupWindow=resolveGroupIpOpenWindow(wave.groupIpPolicy,wave,now)
+    const open=groupWindow?.opensAt??wave.opensAt??now
+    const close=groupWindow?.closesAt??wave.closesAt??new Date(now.getTime()+30*86400000)
     if(close<=now||close<=open)fail('波次采集时间窗无效')
     if(close.getTime()-now.getTime()>365*86400000)fail('单次公开链接不允许超过一年')
-    const finishUntil=wave.finishUntil||new Date(close.getTime()+MAX_WAVE_FINISH_GRACE_MS)
+    const finishUntil=groupWindow?.finishUntil??wave.finishUntil??new Date(close.getTime()+MAX_WAVE_FINISH_GRACE_MS)
     if(finishUntil<close||finishUntil.getTime()-close.getTime()>MAX_WAVE_FINISH_GRACE_MS)
       fail('在途作答最迟不得超过本轮招募结束后两小时')
     const publicId=project.publicId||randomUUID()
@@ -75,6 +82,7 @@ export async function openWave(userId:string,projectId:string,waveId:string,revi
     const updated=await tx.surveyWave.updateMany({
       where:{id:waveId,projectId,status:'DRAFT',revision},
       data:{status:'OPEN',opensAt:open,closesAt:close,finishUntil,
+        ...(groupWindow?{groupIpActivatedAt:groupWindow.groupIpActivatedAt}:{}),
         revision:{increment:1},updatedAt:now},
     })
     if(updated.count!==1)fail('波次开放发生并发冲突')
@@ -112,6 +120,7 @@ export async function updateWaveEntryToken(input:{
       ||wave.hardStopAt||wave.revision!==input.revision)
       fail('只有当前活动研究的开放或暂停波次可以管理招募凭证')
     const now=new Date()
+    if(input.action==='ROTATE')assertGroupIpWindowActive(wave,now)
     if(input.action==='ROTATE'&&(!wave.closesAt||wave.closesAt<=now))
       fail('采集时间已经结束，不能签发新的招募链接')
     await tx.surveyEntryToken.updateMany({
@@ -157,17 +166,18 @@ export async function transitionWave(userId:string,projectId:string,waveId:strin
           &&!!wave.finishUntil&&wave.finishUntil>now)
     if(!allowed)fail('当前波次状态不允许此操作')
     if(action==='RESUME'&&project.status!=='ACTIVE')fail('项目尚未恢复采集资格')
+    if(action==='RESUME')assertGroupIpWindowActive(wave,now)
     const nextStatus=action==='PAUSE'?'PAUSED':action==='RESUME'?'OPEN':'CLOSED'
     const changes:Prisma.SurveyWaveUpdateManyMutationInput={
       status:nextStatus,revision:{increment:1},updatedAt:now,
     }
     if(action==='CLOSE'){
-      const latest=new Date(now.getTime()+2*3600000)
+      const latest=wave.groupIpPolicy?now:new Date(now.getTime()+2*3600000)
       changes.finishUntil=wave.finishUntil&&wave.finishUntil<latest?wave.finishUntil:latest
     }
     if(action==='HARD_STOP'){
       changes.hardStopAt=now
-      changes.finishUntil=now
+      changes.finishUntil=wave.groupIpPolicy&&wave.finishUntil&&wave.finishUntil<now?wave.finishUntil:now
     }
     const row=await tx.surveyWave.updateMany({
       where:{id:waveId,projectId,status:wave.status,revision},data:changes,

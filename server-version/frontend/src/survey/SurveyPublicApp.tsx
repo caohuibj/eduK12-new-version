@@ -17,8 +17,9 @@ import { readRecruitmentEntry, rememberRecruitmentEntry, clearRecruitmentEntry, 
 
 type ApiResult<T>={code:number|string;message:string;data:T|null}
 type Wave={id:string;title:string;ordinal:number;status:string;consentText:string;consentVersion:number;
-  opensAt:string|null;closesAt:string|null;allowNewParticipants:boolean;attempt?:{id:string;status:string}|null}
-type StudyInfo={project:{name:string;description:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';status:string};waves:Wave[]}
+  opensAt:string|null;closesAt:string|null;allowNewParticipants:boolean;attempt?:{id:string;status:string}|null;
+  groupIpPolicy?:{schemaVersion:1;timeZone:string;activationDate?:string}|null;groupIpActivatedAt?:string|null}
+type StudyInfo={project:{name:string;description:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';status:string};waves:Wave[];scopeWaveId?:string|null}
 type Choice={optionKey:string;label:string;nonanswerReason?:'DECLINED'|'UNABLE_TO_JUDGE'}
 type Question={itemKey:string;questionKey?:string;type:string;prompt:string;image?:SurveyPublicImage;required:boolean;
   options:Choice[];rows?:{rowKey:string;label:string}[];allowRefusal?:boolean;displayIf?:{itemKey:string;operator:'EQUALS'|'INCLUDES';optionKey:string};
@@ -279,6 +280,9 @@ export default function SurveyPublicApp(){
   taskState.current=task
   const base='/r/'+publicId
   const validEntry=isRecruitmentEntryToken(entryToken)
+  const infoEntryToken=validEntry?entryToken:''
+  const hasScopedInfoRequest=useRef(false),infoRequest=useRef(0)
+  const groupWave=info?.waves.length===1&&info.waves[0].groupIpPolicy?info.waves[0]:null
   const discardEntry=()=>{
     try{clearRecruitmentEntry(publicId,sessionStorage)}catch{/* private storage unavailable */}
     setEntryToken('')
@@ -327,9 +331,21 @@ export default function SurveyPublicApp(){
     // Recruitment capability stays in memory, not browser history/Referrer.
     window.history.replaceState(null,'',window.location.pathname)
     if(!safePattern.test(publicId)){setError('研究链接格式不正确');setLoading(false);return}
-    void publicApi<StudyInfo>(base+'/info').then(setInfo)
-      .catch(e=>setError(parseError(e))).finally(()=>setLoading(false))
-  },[base,publicId])
+    // Token-scoped discovery avoids a shared-network request revealing or
+    // borrowing admission from another wave. Discarding a consumed token must
+    // preserve this scope rather than trigger the unscoped GET fallback.
+    if(hasScopedInfoRequest.current&&!infoEntryToken)return
+    if(infoEntryToken)hasScopedInfoRequest.current=true
+    let current=true
+    const requests=infoRequest,request=++requests.current
+    setLoading(true);setError('');setInfo(null);setHome(null);setSelectedWave(null);setAgreed(false)
+    void publicApi<StudyInfo>(base+'/info',infoEntryToken?'POST':'GET',
+      infoEntryToken?{entryToken:infoEntryToken}:undefined)
+      .then(data=>{if(current&&request===requests.current)setInfo(data)})
+      .catch(e=>{if(current&&request===requests.current)setError(parseError(e))})
+      .finally(()=>{if(current&&request===requests.current)setLoading(false)})
+    return()=>{current=false;requests.current++}
+  },[base,publicId,infoEntryToken])
   const run=async(task:()=>Promise<void>)=>{
     setError('');setNotice('');setBusy(true)
     try{await task()}catch(e){
@@ -366,9 +382,21 @@ export default function SurveyPublicApp(){
       }
     }finally{setBusy(false)}
   }
+  const recoverWithoutInvitation=()=>void run(async()=>{
+    // Existing participant rights do not depend on an unexpired invitation.
+    // This explicit fallback retains the ordinary, unscoped rate limit.
+    const request=++infoRequest.current
+    try{
+      const data=await publicApi<StudyInfo>(base+'/info')
+      if(request!==infoRequest.current)return
+      setInfo(data);setHome(null);setSelectedWave(null);setAgreed(false)
+      discardEntry()
+    }catch(e){if(request===infoRequest.current)throw e}
+  })
   const recover=(e:FormEvent)=>{e.preventDefault();void run(async()=>{
     const data=await publicApi<{waves:Wave[]}>(base+'/enter','POST',{
       researchCode:researchCode.trim().toUpperCase(),accessCredential:accessCredential.trim(),
+      ...(info?.scopeWaveId?{waveId:info.scopeWaveId}:{}),
     })
     setResearchCode(x=>x.trim().toUpperCase());setAccessCredential(x=>x.trim())
     setHome(data.waves);setProofReceived(false)
@@ -794,6 +822,7 @@ export default function SurveyPublicApp(){
   const returnHome=()=>void run(async()=>{
     const data=await publicApi<{waves:Wave[]}>(base+'/enter','POST',{
       researchCode:researchCode.trim().toUpperCase(),accessCredential:accessCredential.trim(),
+      ...(info?.scopeWaveId?{waveId:info.scopeWaveId}:{}),
     })
     setHome(data.waves);setSelectedWave(null);setGeneral(null);setCompletion(null);setTask(null)
   })
@@ -812,12 +841,24 @@ export default function SurveyPublicApp(){
       {withdrawn&&<p role="status" className="border-l-4 border-teal-600 p-4">
         您的研究数据撤回请求已被记录。后续统计和新导出将排除可定位回答。
       </p>}
+      {!info&&!loading&&<section className="space-y-3"><label className="block text-sm">请从原研究邀请中复制 43 位凭证重试。
+        <input className="input block w-full mt-2" autoComplete="off"
+          aria-label="重新输入研究邀请凭证" value={entryToken}
+          onChange={event=>setEntryToken(event.target.value.trim())}/>
+      </label><button type="button" className="btn-secondary" disabled={busy||!safePattern.test(publicId)}
+        onClick={recoverWithoutInvitation}>已有私密凭据 · 恢复作答或撤回数据</button></section>}
       {info&&<><section className="bg-white rounded-xl border p-5">
         <h2 className="text-xl font-semibold">{info.project.name}</h2>
         <p className="my-3 whitespace-pre-wrap">{info.project.description}</p>
         <p className="text-sm">{info.project.collectionMode==='LINKED_WAVES'
           ?'多波次研究：同一研究编号的回答将在本研究内关联。无需登录或提供真实姓名。'
           :'独立匿名研究：本次作答不与其他波次关联，无需登录或提供真实姓名。'}</p>
+        {groupWave?.groupIpPolicy&&groupWave.closesAt&&<p className="mt-3 text-sm text-amber-800">
+          同 IP 集体作答截止：{new Date(groupWave.closesAt).toLocaleString('zh-CN',{
+            timeZone:groupWave.groupIpPolicy.timeZone,year:'numeric',month:'2-digit',day:'2-digit',
+            hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,
+          })}（{groupWave.groupIpPolicy.timeZone}）。请在截止前完成提交；到期无宽限，暂停不延长窗口。
+        </p>}
       </section>
       {info.project.collectionMode==='LINKED_WAVES'&&!home&&!task&&!general&&!completion&&!revoked&&<section className="bg-white rounded-xl border p-5">
         <h3 className="font-semibold text-lg">已有研究编号 · 继续参加后续波次</h3>

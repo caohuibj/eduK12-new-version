@@ -9,6 +9,7 @@ import * as publish from './waves.publish'
 import { SurveyDraftError } from './builder.definition'
 import { SurveyFlowError } from './flow.definition'
 import { groupQuotaPolicySchema,surveyCheckpointPolicySchema } from './operations.definition'
+import { groupIpDraftPolicySchema,GroupIpPolicyError } from './group-ip-policy'
 
 export const surveyWavesRouter=Router()
 surveyWavesRouter.use('/:pid/waves',authenticateSurvey)
@@ -27,6 +28,7 @@ const wave=z.object({
   flowDefinition:z.unknown().nullable().optional(),
   quotaPolicy:groupQuotaPolicySchema.nullable().optional(),
   checkpointPolicy:surveyCheckpointPolicySchema.nullable().optional(),
+  groupIpPolicy:groupIpDraftPolicySchema.nullable().optional(),
 }).strict()
 const create=wave.extend({requestId:id})
 const update=wave.extend({revision:z.number().int().nonnegative()})
@@ -38,6 +40,7 @@ const handle=(fn:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Respons
       message:e.issues.slice(0,5).map(i=>i.path+'：'+i.message).join('；')||'研究工具包含待修正字段',
       data:{issues:e.issues}})
     if(e instanceof SurveyGovernanceError||e instanceof CatalogSourceError)return error(res,e.message,-1,e.statusCode)
+    if(e instanceof GroupIpPolicyError)return error(res,e.message,-1,e.statusCode)
     if(e instanceof service.SurveyWaveError)return error(res,e.message,-1,e.statusCode)
     if(e instanceof SurveyFlowError)return error(res,e.issues.slice(0,5).map(i=>i.path+'：'+i.message).join('；'),-1,400)
     next(e)

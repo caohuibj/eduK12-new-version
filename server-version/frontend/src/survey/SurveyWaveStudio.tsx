@@ -1,15 +1,17 @@
-import { useRef, useEffect,useState,type FormEvent } from 'react'
+import { useCallback, useRef, useEffect,useState,type FormEvent } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { SurveyFlowStudio,type FormQuestionInfo } from './SurveyFlowStudio'
 import type { FlowDraft } from './flow.client'
 import { SurveyStudyPreview } from './SurveyStudyPreview'
 import type { CognitivePreviewSnapshot } from './ResearchCognitivePreview'
 import type { FormDraft, ResearchDraft } from './builder.types'
+import { useInstrumentLibrary, type InstrumentLibrary } from './instrument-library'
 
 type ApiResult<T>={code:number|string;message:string;data:T|null}
 type Instrument={id:string;title:string;kind:string;status:string;instrumentKey:string}
 type InstrumentDetails=Instrument&{definition:FormDraft|Record<string,unknown>}
 type Project={id:string;collectionMode:'LINKED_WAVES'|'SINGLE_UNLINKED';status:'DRAFT'|'ACTIVE'|'PAUSED'|'CLOSED'|'ARCHIVED';revision:number}
+type GroupIpPolicy={schemaVersion:1;timeZone:string;activationDate?:string}
 type Wave={
   id:string;projectId:string;title:string;ordinal:number;status:'DRAFT'|'OPEN'|'PAUSED'|'CLOSED';
   revision:number;instrumentIds:string[];publicationId:string|null;
@@ -20,6 +22,8 @@ type Wave={
   flowDefinition?:FlowDraft|null
   quotaPolicy?:{schemaVersion:1;groupLimits:Record<string,number>}|null
   checkpointPolicy?:{schemaVersion:1;enabled:true;ttlHours:number}|null
+  groupIpPolicy?:GroupIpPolicy|null
+  groupIpActivatedAt?:string|null
 }
 type FlowCounts={starts:number;assigned:number;completedFinal:number;analysisIncluded:number;
   qualityExcluded:number;withdrawn:number;screenedOut:number;inProgress:number}
@@ -61,6 +65,7 @@ const initial=()=>({
   flowDefinition:null as FlowDraft|null,
   quotaPolicy:null as {schemaVersion:1;groupLimits:Record<string,number>}|null,
   checkpointPolicy:null as {schemaVersion:1;enabled:true;ttlHours:number}|null,
+  groupIpPolicy:null as GroupIpPolicy|null,
 })
 type FormState=ReturnType<typeof initial>
 const localTime=(raw:string|null)=>{
@@ -68,57 +73,91 @@ const localTime=(raw:string|null)=>{
   const date=new Date(raw)
   return new Date(date.getTime()-date.getTimezoneOffset()*60000).toISOString().slice(0,16)
 }
-export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChanged}:{
-  projectId:string;instrumentsRevision?:number;onProjectChanged?:(project:Project)=>void
+const groupTime=(raw:string,timeZone:string)=>new Date(raw).toLocaleString('zh-CN',{
+  timeZone,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,
+})
+export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:{
+  projectId:string;instrumentLibrary?:InstrumentLibrary;onProjectChanged?:(project:Project)=>void
 }){
-  const path='/projects/'+projectId
-  const [waves,setWaves]=useState<Wave[]>([]),[tools,setTools]=useState<Instrument[]>([])
+  const path='/projects/'+encodeURIComponent(projectId)
+  const [waves,setWaves]=useState<Wave[]>([])
+  const {list:tools,page:toolPage,refresh:refreshTools,error:toolsError,loading:toolsLoading,revision:instrumentsRevision}=useInstrumentLibrary(projectId,instrumentLibrary)
   const [details,setDetails]=useState<Record<string,InstrumentDetails>>({})
-  const [wavePage,setWavePage]=useState(1),[toolPage,setToolPage]=useState(1)
+  const [detailsError,setDetailsError]=useState(''),[detailsRetry,setDetailsRetry]=useState(0)
+  const [wavePage,setWavePage]=useState(1),[waveError,setWaveError]=useState('')
   const [project,setProject]=useState<Project|null>(null)
   const [editing,setEditing]=useState<Wave|null>(null),[form,setForm]=useState<FormState>(initial)
   const [ready,setReady]=useState<Preflight|null>(null),[busy,setBusy]=useState(false)
   const [error,setError]=useState(''),[notice,setNotice]=useState('')
   const [shareLink,setShareLink]=useState('')
-  const previewEpoch=useRef(0)
+  const previewEpoch=useRef(0),projectEpoch=useRef(0),selectionEpoch=useRef(0)
+  const waveRequest=useRef(0),projectRequest=useRef(0),actionRequest=useRef(0)
+  const detailReads=useRef({path,revision:instrumentsRevision,selection:0,requests:new Map<string,Promise<InstrumentDetails>>()})
   const [studyPreview,setStudyPreview]=useState<{drafts:ResearchDraft[];snapshots:Record<string,CognitivePreviewSnapshot>;flow:FlowDraft|null;consentText:string;generalText:string}|null>(null)
   const [flowAnalytics,setFlowAnalytics]=useState<FlowAnalytics|null>(null)
   const [categoryKey,setCategoryKey]=useState('')
   const [scoreSelection,setScoreSelection]=useState('')
-  const refresh=async(nextWavePage=wavePage,nextToolPage=toolPage)=>{
-    const [waveList,instrumentList,projectDetails]=await Promise.all([
-      surveyApi<{list:Wave[]}>(path+'/waves?page='+nextWavePage),
-      surveyApi<{list:Instrument[]}>(path+'/instruments?page='+nextToolPage),
-      surveyApi<Project>(path),
-    ])
-    setWaves(waveList.list);setTools(instrumentList.list);setProject(projectDetails)
-    onProjectChanged?.(projectDetails)
-    setWavePage(nextWavePage);setToolPage(nextToolPage)
-  }
-  useEffect(()=>{previewEpoch.current++;setStudyPreview(null);setEditing(null);setReady(null);setShareLink('');setForm(initial());setDetails({})
-    void refresh().catch(e=>setError(message(e)))
-  },[projectId])
+  const refreshWaves=useCallback(async(page:number)=>{
+    const epoch=projectEpoch.current,request=++waveRequest.current
+    setWaveError('')
+    try{
+      const result=await surveyApi<{list:Wave[]}>(path+'/waves?page='+page)
+      if(epoch!==projectEpoch.current||request!==waveRequest.current)return
+      setWaves(result.list);setWavePage(page)
+    }catch(e){if(epoch===projectEpoch.current&&request===waveRequest.current)setWaveError(message(e))}
+  },[path])
+  const refreshProject=useCallback(async()=>{
+    const epoch=projectEpoch.current,request=++projectRequest.current
+    const result=await surveyApi<Project>(path)
+    if(epoch!==projectEpoch.current||request!==projectRequest.current)return
+    setProject(result);onProjectChanged?.(result)
+  },[path,onProjectChanged])
+  const refresh=async()=>{await Promise.all([refreshWaves(wavePage),refreshProject()])}
   useEffect(()=>{
-    if(instrumentsRevision===0)return
+    const projects=projectEpoch,selections=selectionEpoch,previews=previewEpoch
+    const epoch=++projects.current
+    previewEpoch.current++;selectionEpoch.current++;setStudyPreview(null);setEditing(null);setReady(null);setShareLink('');setForm(initial());setDetails({})
+    setWaves([]);setWavePage(1);setProject(null);setError('');setNotice('');setBusy(false)
+    void Promise.all([refreshWaves(1),refreshProject()]).catch(e=>{if(epoch===projectEpoch.current)setError(message(e))})
+    return()=>{projects.current++;selections.current++;previews.current++}
+  },[refreshWaves,refreshProject])
+  useEffect(()=>{
     let current=true
-    // Update the library without discarding the user's unsaved wave settings.
-    void surveyApi<{list:Instrument[]}>(path+'/instruments?page='+toolPage)
-      .then(result=>{if(current)setTools(result.list)})
-      .catch(e=>{if(current)setError(message(e))})
+    const previous=detailReads.current
+    const reset=previous.path!==path||previous.revision!==instrumentsRevision||previous.selection!==selectionEpoch.current
+    if(reset)detailReads.current={path,revision:instrumentsRevision,selection:selectionEpoch.current,requests:new Map()}
+    const requests=detailReads.current.requests
+    const ids=form.instrumentIds
+    for(const id of requests.keys())if(!ids.includes(id))requests.delete(id)
+    setDetails(items=>reset?{}:Object.fromEntries(Object.entries(items).filter(([id])=>ids.includes(id))))
+    setDetailsError('')
+    // One owner follows the current selection and mutation version. Changing
+    // the selection joins existing reads instead of replacing newer details
+    // with an older selection's response. Only selected identities are kept.
+    void Promise.all(ids.map(id=>{
+      let request=requests.get(id)
+      if(!request){
+        const pending=surveyApi<InstrumentDetails>(path+'/instruments/'+id)
+        request=pending.catch(error=>{if(requests.get(id)===request)requests.delete(id);throw error})
+        requests.set(id,request)
+      }
+      return request
+    })).then(items=>{if(current)setDetails(Object.fromEntries(items.map(item=>[item.id,item])))})
+      .catch(e=>{if(current)setDetailsError(message(e))})
     return()=>{current=false}
-  },[path,instrumentsRevision,toolPage])
+  },[path,instrumentsRevision,form.instrumentIds,detailsRetry])
   const act=async(action:()=>Promise<void>)=>{
+    const epoch=projectEpoch.current,request=++actionRequest.current
     setError('');setNotice('');setBusy(true)
-    try{await action()}catch(e){setError(message(e))}finally{setBusy(false)}
+    const pending=action(),selection=selectionEpoch.current
+    try{await pending}catch(e){if(epoch===projectEpoch.current&&selection===selectionEpoch.current)setError(message(e))}
+    finally{if(epoch===projectEpoch.current&&request===actionRequest.current)setBusy(false)}
   }
   const select=(wave:Wave)=>void act(async()=>{
+    const selection=++selectionEpoch.current,epoch=projectEpoch.current
     previewEpoch.current++;setStudyPreview(null)
     const detail=await surveyApi<Wave>(path+'/waves/'+wave.id)
-    // Resolve selected draft identities by ID; a research may select tools
-    // from several pages of the paginated library.
-    const selected=await Promise.all(detail.instrumentIds.map(id=>
-      surveyApi<InstrumentDetails>(path+'/instruments/'+id)))
-    setDetails(previous=>({...previous,...Object.fromEntries(selected.map(item=>[item.id,item]))}))
+    if(selection!==selectionEpoch.current||epoch!==projectEpoch.current)return
     setEditing(detail);setReady(null);setShareLink('');setFlowAnalytics(null);setCategoryKey('');setScoreSelection('')
     setForm({
       title:detail.title,consentText:detail.consentText,generalText:detail.generalText,
@@ -130,6 +169,7 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChang
       flowDefinition:detail.flowDefinition??null,
       quotaPolicy:detail.quotaPolicy??null,
       checkpointPolicy:detail.checkpointPolicy??null,
+      groupIpPolicy:detail.groupIpPolicy??null,
     })
   })
   const previewStudy=()=>void act(async()=>{
@@ -145,7 +185,7 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChang
     if(epoch===previewEpoch.current)setStudyPreview({drafts,snapshots,flow:saved.flowDefinition,consentText:saved.consentText,generalText:saved.generalText})
   })
   const payload=()=>{
-    const start=form.opensAt?new Date(form.opensAt):null
+    const start=!form.groupIpPolicy&&form.opensAt?new Date(form.opensAt):null
     const stop=form.closesAt?new Date(form.closesAt):null
     return {
       title:form.title,consentText:form.consentText,generalText:form.generalText,
@@ -158,18 +198,26 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChang
       flowDefinition:form.flowDefinition,
       quotaPolicy:form.quotaPolicy,
       checkpointPolicy:form.checkpointPolicy,
+      groupIpPolicy:form.groupIpPolicy?{schemaVersion:1,timeZone:form.groupIpPolicy.timeZone}:null,
     }
   }
   const save=(e:FormEvent)=>{e.preventDefault();void act(async()=>{
+    const epoch=projectEpoch.current,selection=selectionEpoch.current
     const body=payload()
     const wave=editing
       ?await surveyApi<Wave>(path+'/waves/'+editing.id,'PATCH',{...body,revision:editing.revision})
       :await surveyApi<Wave>(path+'/waves','POST',{...body,requestId:crypto.randomUUID()})
-    await refresh();setEditing(wave);setReady(null);setFlowAnalytics(null)
-    setNotice('波次草稿已保存；冻结定义和正式开放需要分别确认')
+    if(epoch!==projectEpoch.current)return
+    if(selection===selectionEpoch.current){
+      setEditing(wave);setReady(null);setFlowAnalytics(null)
+      setNotice('波次草稿已保存；冻结定义和正式开放需要分别确认')
+    }
+    await refreshWaves(wavePage)
   })}
   const preflight=()=>{if(!editing)return;void act(async()=>{
+    const epoch=projectEpoch.current,selection=selectionEpoch.current
     const result=await surveyApi<Preflight>(path+'/waves/'+editing.id+'/preflight','POST',{})
+    if(epoch!==projectEpoch.current||selection!==selectionEpoch.current)return
     setReady(result)
     setNotice(result.ok?'研究内容预检通过；发布阶段仍须通过运行时和权限门禁':'当前波次尚不满足发布条件')
   })}
@@ -181,12 +229,19 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChang
         ?'确认紧急停止此波次？已经开始但尚未提交的作答也将禁止 FINAL。'
         :'确认关闭本波次？新的被试将无法开始。'))return
     void act(async()=>{
+      const epoch=projectEpoch.current,selection=selectionEpoch.current
       const result=await surveyApi<{researchUrl?:string}>(path+'/waves/'+wave.id+'/'+operation,'POST',{
         revision:wave.revision,
       })
+      if(epoch!==projectEpoch.current)return
+      if(selection!==selectionEpoch.current){await refresh();return}
       if(result.researchUrl)setShareLink(result.researchUrl)
       const fresh=await surveyApi<Wave>(path+'/waves/'+wave.id)
-      setEditing(fresh);await refresh();setReady(null);setFlowAnalytics(null)
+      if(epoch!==projectEpoch.current)return
+      if(selection!==selectionEpoch.current){await refresh();return}
+      setEditing(fresh);await refresh()
+      if(epoch!==projectEpoch.current||selection!==selectionEpoch.current)return
+      setReady(null);setFlowAnalytics(null)
       setNotice(operation==='prepare'?'已冻结此波次的研究定义，下一步可正式开放':
         operation==='open'?'已创建一次性招募链接，请通过受控渠道交付':
           '波次状态已更新')
@@ -198,8 +253,11 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChang
       '确认永久结束本研究项目？将停止全部波次的新准入，已完成的 FINAL 仍按研究说明保留。'
     ))return
     void act(async()=>{
+      const epoch=projectEpoch.current
       await surveyApi(path+'/'+action,'POST',{revision:project.revision})
+      if(epoch!==projectEpoch.current)return
       await refresh()
+      if(epoch!==projectEpoch.current)return
       setNotice(action==='pause'?'整个研究项目已暂停新准入':
         action==='resume'?'研究项目已恢复':'研究项目已结束，历史已完成研究数据仍保留。')
     })
@@ -208,11 +266,17 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChang
     if(!editing||!['OPEN','PAUSED'].includes(editing.status))return
     if(action==='revoke'&&!window.confirm('撤销本波次全部已签发的招募链接？已有参与者的个人恢复凭证不会被撤销。'))return
     void act(async()=>{
+      const epoch=projectEpoch.current,selection=selectionEpoch.current
       const result=await surveyApi<{researchUrl?:string;revoked?:boolean}>(
         path+'/waves/'+editing.id+'/entry-token/'+action,'POST',{revision:editing.revision})
+      if(epoch!==projectEpoch.current)return
+      if(selection!==selectionEpoch.current){await refresh();return}
       setShareLink(result.researchUrl||'')
       const fresh=await surveyApi<Wave>(path+'/waves/'+editing.id)
+      if(epoch!==projectEpoch.current)return
+      if(selection!==selectionEpoch.current){await refresh();return}
       setEditing(fresh);await refresh()
+      if(epoch!==projectEpoch.current||selection!==selectionEpoch.current)return
       setNotice(action==='rotate'?'已轮换招募链接：旧链接立即失效，请保存下方新链接。'
         :'招募链接已撤销，现有研究参与者仍可凭私人凭证恢复合法作答。')
     })
@@ -220,6 +284,7 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChang
   const loadFlowAnalytics=()=>{
     if(!editing)return
     void act(async()=>{
+      const epoch=projectEpoch.current,selection=selectionEpoch.current
       const category=categoryKey?(()=>{
         const [instrumentKey,itemKey]=categoryKey.split(':')
         return {instrumentKey,itemKey}
@@ -231,6 +296,7 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChang
       const data=await surveyApi<FlowAnalytics>(
         path+'/analytics/waves/'+editing.id+'/flow-cohort','POST',
         {...(category?{category}:{}),...(score?{score}:{})})
+      if(epoch!==projectEpoch.current||selection!==selectionEpoch.current)return
       setFlowAnalytics(data)
       setNotice('已读取受控 Flow 样本统计。若包含实验分组，小样本详情仍不可公开转发。')
     })
@@ -239,11 +305,6 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChang
     setForm(old=>({...old,
       instrumentIds:checked?[...old.instrumentIds,id]:old.instrumentIds.filter(k=>k!==id),
     }))
-    if(checked&&!details[id]){
-      void surveyApi<InstrumentDetails>(path+'/instruments/'+id)
-        .then(item=>setDetails(previous=>({...previous,[id]:item})))
-        .catch(e=>setError(message(e)))
-    }
   }
   const flowTools=[...new Map([...tools,...Object.values(details)].map(t=>[t.id,t])).values()]
   const flowQuestions:FormQuestionInfo[]=Object.values(details)
@@ -274,6 +335,12 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChang
           :'本项目每轮均为独立匿名作答，不生成跨波次关联研究编号，也不允许个人纵向匹配。'}
         波次正式发布后，题目、评分和知情同意即被冻结；改变测量内容应建立新波次。</p></header>
     {error&&<p role="alert" className="bg-red-50 border-l-4 border-red-600 p-3">{error}</p>}
+    {waveError&&<div role="alert" className="bg-red-50 border-l-4 border-red-600 p-3">{waveError}
+      <button type="button" className="btn-secondary" disabled={busy} onClick={()=>void act(()=>refreshWaves(wavePage))}>重试波次列表</button></div>}
+    {detailsError&&<div role="alert" className="bg-red-50 border-l-4 border-red-600 p-3">{detailsError}
+      <button type="button" className="btn-secondary" onClick={()=>setDetailsRetry(value=>value+1)}>重试已选工具详情</button></div>}
+    {toolsError&&<div role="alert" className="bg-red-50 border-l-4 border-red-600 p-3">{toolsError}
+      <button type="button" className="btn-secondary" disabled={toolsLoading} onClick={()=>void act(()=>refreshTools(toolPage))}>重试波次工具列表</button></div>}
     {notice&&<p role="status" className="bg-teal-50 border-l-4 border-teal-600 p-3">{notice}</p>}
     {project&&<div className="border rounded-lg bg-slate-50 p-3 space-y-3">
       <div className="flex justify-between gap-3 flex-wrap items-center">
@@ -292,14 +359,14 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChang
     <div className="grid md:grid-cols-[220px_minmax(0,1fr)] gap-5">
       <nav aria-label="研究波次列表" className="space-y-2">
         <button className="btn-secondary w-full" type="button" onClick={()=>{
-          previewEpoch.current++;setStudyPreview(null);setEditing(null);setForm(initial());setReady(null);setShareLink('')
+          previewEpoch.current++;selectionEpoch.current++;setDetails({});setStudyPreview(null);setEditing(null);setForm(initial());setReady(null);setShareLink('')
         }}>新建波次</button>
         <div className="flex items-center justify-between text-xs gap-2">
           <button type="button" className="btn-secondary" disabled={busy||wavePage<=1}
-            onClick={()=>void act(()=>refresh(wavePage-1,toolPage))}>上一页</button>
+            onClick={()=>void act(()=>refreshWaves(wavePage-1))}>上一页</button>
           <span>波次第 {wavePage} 页</span>
           <button type="button" className="btn-secondary" disabled={busy||waves.length<25}
-            onClick={()=>void act(()=>refresh(wavePage+1,toolPage))}>下一页</button>
+            onClick={()=>void act(()=>refreshWaves(wavePage+1))}>下一页</button>
         </div>
         {waves.map(w=><button type="button" key={w.id} disabled={busy}
           className={'block w-full rounded-lg border text-left p-3 '+(w.id===editing?.id?'bg-sky-50 border-sky-700':'bg-white')}
@@ -335,10 +402,10 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChang
             {!tools.filter(t=>t.status==='DRAFT').length&&<p className="text-xs">请先通过 Builder 创建研究工具。</p>}
           <div className="flex items-center justify-between text-xs gap-2">
             <button type="button" className="btn-secondary" disabled={busy||toolPage<=1}
-              onClick={()=>void act(()=>refresh(wavePage,toolPage-1))}>工具上一页</button>
+              onClick={()=>void act(()=>refreshTools(toolPage-1))}>工具上一页</button>
             <span>研究工具第 {toolPage} 页，已选择 {form.instrumentIds.length} 项</span>
             <button type="button" className="btn-secondary" disabled={busy||tools.length<25}
-              onClick={()=>void act(()=>refresh(wavePage,toolPage+1))}>工具下一页</button>
+              onClick={()=>void act(()=>refreshTools(toolPage+1))}>工具下一页</button>
           </div>
           </fieldset>
           <SurveyFlowStudio value={form.flowDefinition}
@@ -379,9 +446,27 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChang
             </label>}
             <p className="text-xs text-slate-500">暂存不是 FINAL；完成、筛除及撤回时销毁，凭研究专用私密凭证跨设备恢复。</p>
           </fieldset>
+          <fieldset className="border rounded-xl p-4 space-y-2">
+            <legend className="text-sm font-semibold">同 IP 集体作答（默认关闭）</legend>
+            <label className="flex gap-2 text-sm">
+              <input type="checkbox" checked={!!form.groupIpPolicy}
+                onChange={e=>setForm(prev=>({...prev,groupIpPolicy:e.target.checked
+                  ?{schemaVersion:1,timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone}:null}))}/>
+              允许本轮同一 IP 集体作答，不设 IP 人数上限</label>
+            {form.groupIpPolicy&&<label className="block text-sm">集体作答时区（IANA，冻结后不可修改）
+              <input className="input block w-full" required value={form.groupIpPolicy.timeZone}
+                placeholder="Asia/Shanghai"
+                onChange={e=>setForm(prev=>({...prev,groupIpPolicy:prev.groupIpPolicy
+                  ?{...prev.groupIpPolicy,timeZone:e.target.value}:null}))}/>
+            </label>}
+            {form.groupIpPolicy&&<p className="text-xs text-slate-600">下方结束时间按当前设备时区（{Intl.DateTimeFormat().resolvedOptions().timeZone}）输入；冻结后的截止时间按上述时区显示。</p>}
+            <p className="text-xs text-slate-600">启用后须在冻结当天（按所选时区）点击“正式开放本轮”，立即生效。
+              结束时间留空时，开放后 48 小时自动结束；填写时须在 48 小时内，可提前截止。到期无宽限，暂停或恢复不延长窗口。</p>
+            <p className="text-xs text-slate-600">仅在本轮时间窗内取消同 IP 请求限额；邀请凭证、知情同意、身份验证、总名额和实验组配额仍有效。</p>
+          </fieldset>
           <div className="grid sm:grid-cols-2 gap-3">
             <label className="block text-sm">计划开放时间<input type="datetime-local" className="input block w-full"
-              value={form.opensAt} onChange={e=>setForm({...form,opensAt:e.target.value})}/></label>
+              disabled={!!form.groupIpPolicy} value={form.groupIpPolicy?'':form.opensAt} onChange={e=>setForm({...form,opensAt:e.target.value})}/></label>
             <label className="block text-sm">结束新参与时间<input type="datetime-local" className="input block w-full"
               value={form.closesAt} onChange={e=>setForm({...form,closesAt:e.target.value})}/></label>
           </div>
@@ -400,6 +485,18 @@ export function SurveyWaveStudio({projectId,instrumentsRevision=0,onProjectChang
           <p className="text-sm">状态：{editing.status} · revision {editing.revision} · 已启动 {editing.startsCount}
             {editing.quotaStarts!==null?'/'+editing.quotaStarts:''}</p>
           <p className="text-sm">公开发布使用独立研究权限和冻结定义；是否可发布由当前环境的权限与配置决定。</p>
+          {editing.publicationId&&<section className="border rounded-lg p-3 space-y-2" aria-label="已冻结的集体作答设置">
+            <label className="flex gap-2 text-sm"><input type="checkbox" disabled checked={!!editing.groupIpPolicy}/>
+              允许本轮同一 IP 集体作答，不设 IP 人数上限</label>
+            {editing.groupIpPolicy&&<>
+              <label className="block text-sm">集体作答时区（IANA，冻结后不可修改）
+                <input className="input block w-full" disabled value={editing.groupIpPolicy.timeZone}/></label>
+              {!editing.groupIpActivatedAt&&<p className="text-sm">须在 {editing.groupIpPolicy.activationDate??'冻结当天'}（{editing.groupIpPolicy.timeZone}）正式开放，点击后立即生效。</p>}
+              {editing.groupIpActivatedAt&&<p className="text-sm">已于 {groupTime(editing.groupIpActivatedAt,editing.groupIpPolicy.timeZone)}（{editing.groupIpPolicy.timeZone}）开放。</p>}
+              {editing.closesAt&&<p className="text-sm">集体作答截止：{groupTime(editing.closesAt,editing.groupIpPolicy.timeZone)}（{editing.groupIpPolicy.timeZone}）。</p>}
+              <p className="text-xs text-slate-600">开放后最长 48 小时，到期自动结束且无宽限；暂停或恢复不会续期。邀请、同意、身份与名额限制仍有效。</p>
+            </>}
+          </section>}
           <div className="flex flex-wrap gap-2">
             {editing.status==='DRAFT'&&!editing.publicationId&&<>
               <button type="button" className="btn-secondary" disabled={busy} onClick={preflight}>检查知情同意与所有工具</button>

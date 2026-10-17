@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { ResearchCatalog, SourceProvenance, type CatalogGrant } from './ResearchCatalog'
 import { ResearchFormEditor } from './ResearchFormEditor'
 import { ResearchScaleEditor } from './ResearchScaleEditor'
@@ -8,9 +8,9 @@ import { ResearchSjtEditor } from './ResearchSjtEditor'
 import { ResearchPreview } from './ResearchPreview'
 import type { ResearchDraft, Kind, Definition, FormDraft, ScaleDraft, SjtDraft, CognitiveDraft, Issue } from './builder.types'
 import { researchKey } from './builder.types'
+import { useInstrumentLibrary, type InstrumentLibrary } from './instrument-library'
 
 type Envelope<T>={code:number|string;message:string;data:T|null}
-type Summary=Pick<ResearchDraft,'id'|'kind'|'title'|'instrumentKey'|'revision'|'status'|'updatedAt'>
 type Preview={revision:number;ok:boolean;issues:Issue[];definitionDigest?:string;scoringDigest?:string;
   kind:Kind;cognitivePreview?:CognitivePreviewSnapshot;score?:{scores?:{key:string;value:number|null;status:string}[];metrics?:{key:string;value:number|null}[]}|null}
 type BulkBatch={batchId:string;format:'TEXT'|'CSV';content:string;pageKey?:string;dimensionKey?:string}
@@ -41,10 +41,9 @@ async function api<T>(path:string,method='GET',payload?:unknown):Promise<T>{
   return data.data as T
 }
 const displayKind:Record<Kind,string>={FORM:'Form · 表单',SCALE:'Scale · 量表',SJT:'SJT · 情境判断',COGNITIVE:'Cognitive · 认知任务'}
-export function SurveyBuilder({projectId,onInstrumentsChanged}:{projectId:string;onInstrumentsChanged?:()=>void}){
+export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;instrumentLibrary?:InstrumentLibrary}){
   const prefix='/projects/'+encodeURIComponent(projectId)+'/instruments'
-  const [instruments,setInstruments]=useState<Summary[]>([])
-  const [instrumentPage,setInstrumentPage]=useState(1)
+  const {list:instruments,page:instrumentPage,refresh:refreshList,error:listError,loading:listLoading}=useInstrumentLibrary(projectId,instrumentLibrary)
   const [active,setActive]=useState<ResearchDraft|null>(null),[dirty,setDirty]=useState(false)
   const readOnly=Boolean(active?.readOnly||active?.catalogGrantId)
   const editGeneration=useRef(0)
@@ -57,18 +56,15 @@ export function SurveyBuilder({projectId,onInstrumentsChanged}:{projectId:string
   const [bulkTargetPageKey,setBulkTargetPageKey]=useState('')
   const [bulk,setBulk]=useState<{batch:BulkBatch;result:BulkResult}|null>(null)
   const [undo,setUndo]=useState<{definition:Definition;title:string}|null>(null)
-  const refreshList=useCallback(async(page=1,notify=false)=>{
-    const r=await api<{list:Summary[]}>(prefix+'?page='+page)
-    setInstruments(r.list);setInstrumentPage(page)
-    if(notify)onInstrumentsChanged?.()
-  },[prefix,onInstrumentsChanged])
-  useEffect(()=>{setActive(null);setPreview(null);setError('');setBulk(null);void refreshList().catch(e=>{
-    setError(e instanceof Error?e.message:'研究工具列表无法加载')})},[refreshList])
+  useEffect(()=>{setActive(null);setPreview(null);setError('');setBulk(null)},[projectId])
   const run=async(task:()=>Promise<void>)=>{
     setBusy(true);setError('');setNotice('')
     try{await task()}catch(e){setError(e instanceof Error?e.message:'操作失败')}
     finally{setBusy(false)}
   }
+  // The write is already acknowledged. List failures have their own retry UI
+  // and must never invite another create/import with a fresh request ID.
+  const refreshAfterWrite=(page:number)=>refreshList(page,true).catch(()=>{})
   const clearReview=()=>{
     setPreview(null);setShowPreview(false);setAnswerReview(null)
     setBulk(null);setUndo(null);setBulkTargetPageKey('')
@@ -85,16 +81,18 @@ export function SurveyBuilder({projectId,onInstrumentsChanged}:{projectId:string
     const item=await api<ResearchDraft>(prefix,'POST',{
       requestId:crypto.randomUUID(),instrumentKey:researchKey('i'),kind:newKind,title:newTitle.trim(),
     })
-    await refreshList(1,true);setActive(item);setDirty(false);clearReview();setNewTitle('')
+    setActive(item);setDirty(false);clearReview();setNewTitle('')
     setNotice('已创建研究专用草稿，尚未进入正式测评目录')
+    await refreshAfterWrite(1)
   })}
   const importCatalog=(grant:CatalogGrant)=>run(async()=>{
     if(dirty&&!window.confirm('当前草稿存在未保存内容。确定放弃并导入原版工具？'))return
     const item=await api<ResearchDraft>('/projects/'+encodeURIComponent(projectId)+'/catalog/'+encodeURIComponent(grant.id)+'/import','POST',{
       requestId:crypto.randomUUID(),instrumentKey:researchKey('i'),title:grant.title,
     })
-    await refreshList(1,true);setActive(item);setDirty(false);clearReview()
+    setActive(item);setDirty(false);clearReview()
     setNotice('已导入明确版本的原版工具，内容与计分只读。')
+    await refreshAfterWrite(1)
   })
   const change=(definition:Definition)=>{
     if(readOnly)return
@@ -112,7 +110,7 @@ export function SurveyBuilder({projectId,onInstrumentsChanged}:{projectId:string
     setActive(current=>changedWhileSaving&&current?.id===snapshot.id
       ?{...updated,title:current.title,definition:current.definition}:updated)
     setDirty(changedWhileSaving);setPreview(null);setBulk(null);setUndo(null)
-    await refreshList(instrumentPage,true)
+    await refreshAfterWrite(instrumentPage)
     setNotice(changedWhileSaving?'本次草稿已保存；保存期间产生的新修改仍待保存。'
       :'草稿已保存；发布冻结将在研究波次阶段执行')
   })}
@@ -140,13 +138,14 @@ export function SurveyBuilder({projectId,onInstrumentsChanged}:{projectId:string
     const r=await api<ResearchDraft>(prefix+'/'+active.id+'/copy','POST',{
       requestId:crypto.randomUUID(),instrumentKey:researchKey('i'),title:active.title+'（副本）',
     })
-    await refreshList(1,true);setActive(r);setDirty(false);clearReview()
+    setActive(r);setDirty(false);clearReview()
     setNotice(r.readOnly||r.catalogGrantId?'已复制授权原版工具，副本仍保持原版来源与只读限制。':'已复制为新的独立研究工具，不能仅凭同名假定纵向可比')
+    await refreshAfterWrite(1)
   })}
   const archive=()=>{if(!active)return;void run(async()=>{
     await api(prefix+'/'+active.id+'/archive','POST',{revision:active.revision})
     setActive(null);setDirty(false);clearReview()
-    await refreshList(instrumentPage,true);setNotice('草稿已归档')
+    await refreshAfterWrite(instrumentPage);setNotice('草稿已归档')
   })}
   const bulkPreview=()=>{if(!active||readOnly||dirty)return;void run(async()=>{
     const batch:BulkBatch={batchId:crypto.randomUUID(),format:bulkFormat,content:bulkText,
@@ -161,20 +160,22 @@ export function SurveyBuilder({projectId,onInstrumentsChanged}:{projectId:string
       revision:active.revision,digest:bulk.result.digest,batch:bulk.batch,
     })
     setUndo(before);setActive(updated);setDirty(false);setBulk(null);setPreview(null)
-    await refreshList(instrumentPage,true);setNotice('整批题目已导入。若需撤销，可使用撤销本次导入。')
+    await refreshAfterWrite(instrumentPage);setNotice('整批题目已导入。若需撤销，可使用撤销本次导入。')
   })}
   const undoImport=()=>{if(!active||readOnly||!undo)return;void run(async()=>{
     const updated=await api<ResearchDraft>(prefix+'/'+active.id,'PATCH',{
       revision:active.revision,title:undo.title,definition:undo.definition,
     })
     setUndo(null);setActive(updated);setPreview(null);setDirty(false)
-    await refreshList(instrumentPage,true);setNotice('已撤销上一批导入')
+    await refreshAfterWrite(instrumentPage);setNotice('已撤销上一批导入')
   })}
   return <section className="bg-white border rounded-xl p-4 sm:p-6 my-5 space-y-5" aria-label="Survey Research Builder">
     <header><h2 className="text-xl font-semibold">研究工具 · Builder</h2>
       <p className="text-sm text-slate-600">创建表单、心理量表、情境测验和受控认知任务。研究工具仅限本人项目；不进入正式科学量表目录。</p>
     </header>
     {error&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{error}</p>}
+    {listError&&<div role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{listError}
+      <button type="button" className="btn-secondary" disabled={listLoading} onClick={()=>void run(()=>refreshList(instrumentPage))}>重试研究工具列表</button></div>}
     {notice&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{notice}</p>}
     <fieldset disabled={busy} className="min-w-0 border-0 p-0 space-y-5" aria-label="研究工具操作">
     <ResearchCatalog projectId={projectId} api={api} busy={busy} onImport={importCatalog}/>

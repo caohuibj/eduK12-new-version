@@ -1,8 +1,7 @@
 import { Router,type Request,type Response,type NextFunction } from 'express'
 import { z } from 'zod'
 import { prisma } from '../../config/database'
-import { createRedisRateLimiter } from '../../middleware/redisRateLimit'
-import { surveyPublicRateLimits } from './public-rate.config'
+import { createSurveyPublicRateLimiter } from './public-rate.middleware'
 import { success,error } from '../../utils/response'
 import { SurveyWaveError } from './waves.service'
 import { SurveyFinalError,submitResearchFinal,readGeneralForOwnAttempt } from './final.service'
@@ -27,12 +26,9 @@ publicSurveyRouter.use((_req,res,next)=>{
   res.setHeader('Referrer-Policy','no-referrer')
   next()
 })
-// A deliberately simple NAT-friendly ceiling, rather than separate quotas for
-// every public action. Redis fail-closed and per-attempt FINAL authority remain.
-publicSurveyRouter.use(createRedisRateLimiter({
-  name:'survey-public-entry',
-  ...surveyPublicRateLimits(),
-}))
+// Only a current server-authorized group wave may bypass this shared IP bucket.
+// The exemption is not participant authorization; all handlers retain their fences.
+publicSurveyRouter.use(createSurveyPublicRateLimiter())
 const id=z.string().uuid(), secret=z.string().regex(/^[A-Za-z0-9_-]{43}$/)
 const code=z.string().regex(/^R-[A-Z0-9]{8,32}$/)
 const consent=z.object({consent:z.literal(true),consentVersion:z.number().int().positive()})
@@ -63,11 +59,14 @@ const handle=(action:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Res
 publicSurveyRouter.use('/r/:publicId/attempts/:attemptId/cognitive',surveyCognitiveRouter)
 publicSurveyRouter.get('/r/:publicId/info',handle(req=>
   admission.getPublicResearchInfo(id.parse(req.params.publicId))))
+publicSurveyRouter.post('/r/:publicId/info',handle(req=>
+  admission.getPublicResearchInfo(id.parse(req.params.publicId),
+    z.object({entryToken:secret}).strict().parse(req.body).entryToken)))
 publicSurveyRouter.post('/r/:publicId/waves/:waveId/join',handle(req=>
   admission.joinLinkedStudy({publicId:id.parse(req.params.publicId),
     waveId:id.parse(req.params.waveId),...entry.parse(req.body)})))
 publicSurveyRouter.post('/r/:publicId/enter',handle(req=>
-  admission.listOwnLinkedWaves({publicId:id.parse(req.params.publicId),...identity.parse(req.body)})))
+  admission.listOwnLinkedWaves({publicId:id.parse(req.params.publicId),...identity.extend({waveId:id.optional()}).parse(req.body)})))
 publicSurveyRouter.post('/r/:publicId/waves/:waveId/start',handle(req=>
   admission.startLinkedWave({publicId:id.parse(req.params.publicId),
     waveId:id.parse(req.params.waveId),...linked.parse(req.body)})))

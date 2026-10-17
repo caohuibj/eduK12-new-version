@@ -16,6 +16,8 @@ import { compileSurveyFlow,SurveyFlowError,type FrozenSurveyFlow } from './flow.
 import { compileGroupQuotaPolicy,compileCheckpointPolicy,
   type SurveyGroupQuotaPolicy,type SurveyCheckpointPolicy } from './operations.definition'
 
+import { freezeGroupIpPolicy,resolveGroupIpOpenWindow,type FrozenGroupIpPolicy } from './group-ip-policy'
+
 /** Stored data contract for PR3 anonymous Wave runtime adapter.
  * This is a frozen research-only definition, NOT a formal scale/SJT
  * publication. The Survey FINAL admission adapter is separate from legacy catalog.
@@ -47,6 +49,7 @@ export interface ResearchFrozenPublication {
   flow?:FrozenSurveyFlow
   quotaPolicy?:SurveyGroupQuotaPolicy
   checkpointPolicy?:SurveyCheckpointPolicy
+  groupIpPolicy?:FrozenGroupIpPolicy
   runtimeStatus:'SURVEY_FINAL_V1'
 }
 const stop=(message:string):never=>{throw new SurveyWaveError(409,message)}
@@ -218,6 +221,11 @@ export async function freezeResearchWaveDraft(input:{
     }catch(e){
       stop(e instanceof Error?e.message:'研究运营设置未通过冻结校验')
     }
+    // Freeze the server-local publication day while the project and wave locks are held.
+    const frozenAt=new Date()
+    const groupIpPolicy=freezeGroupIpPolicy(wave.groupIpPolicy,frozenAt)
+    // Reject an unusable schedule before the immutable publication is persisted.
+    resolveGroupIpOpenWindow(groupIpPolicy,wave,frozenAt)
     const measurementNotice=units.some(unit=>unit.kind==='COGNITIVE')?SURVEY_COGNITIVE_NOTICE:undefined
     const snapshot:ResearchFrozenPublication={
       schemaVersion:1,purpose:'RESEARCH_ONLY',projectId:input.projectId,
@@ -230,6 +238,7 @@ export async function freezeResearchWaveDraft(input:{
       units,...(frozenFlow?{flow:frozenFlow}:{}),
       ...(quotaPolicy?{quotaPolicy}:{}),
       ...(checkpointPolicy?{checkpointPolicy}:{}),
+      ...(groupIpPolicy?{groupIpPolicy}:{}),
       runtimeStatus:'SURVEY_FINAL_V1',
     }
     const serial=JSON.stringify(snapshot)
@@ -243,7 +252,7 @@ export async function freezeResearchWaveDraft(input:{
       id:publicationId,projectId:input.projectId,
       version:version+1,definitionDigest:digest,
       compiledSnapshot:JSON.parse(serial) as Prisma.InputJsonValue,
-      consentVersion:wave.consentVersion,purpose:'RESEARCH_ONLY',
+      consentVersion:wave.consentVersion,purpose:'RESEARCH_ONLY',createdAt:frozenAt,
     }})
     if(quotaPolicy){
       await tx.surveyExperimentQuotaBucket.createMany({data:
@@ -256,7 +265,8 @@ export async function freezeResearchWaveDraft(input:{
     const changed=await tx.surveyWave.updateMany({
       where:{id:input.waveId,projectId:input.projectId,status:'DRAFT',
         publicationId:null,revision:input.revision},
-      data:{publicationId,revision:{increment:1},updatedAt:new Date()},
+      data:{publicationId,groupIpPolicy:groupIpPolicy===null?Prisma.DbNull:groupIpPolicy as Prisma.InputJsonValue,
+        revision:{increment:1},updatedAt:frozenAt},
     })
     if(changed.count!==1)stop('波次已由其他会话冻结')
     const first=await tx.surveyProject.findUniqueOrThrow({where:{id:input.projectId}})
