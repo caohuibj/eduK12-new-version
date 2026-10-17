@@ -249,6 +249,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const assessment = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' ? assessmentCapacityPlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
   const review = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' ? teacherSurveyPlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
   const reviewedCandidate = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' ? reviewedCandidatePlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
+  if (process.env.CI_REVIEWED_CANDIDATE_REQUIRED === 'true' && !reviewedCandidate)
+    throw new Error('Known reviewed candidate is missing fixed source evidence or has an unreviewed diff; stop instead of starting unrelated legacy checks');
   const scenario = reviewedCandidate ? 'reviewed-candidate' : surveyCandidate ? 'survey-candidate' : sharedStorage ? 'shared-asset-storage' : assessment ? 'assessment-capacity' : review ? 'teacher-survey' : efficiency ? 'access-efficiency' : backendRepair ? 'backend-security-efficiency' : teacher ? 'teacher-home' : survey ? 'survey-home' : copy ? 'homepage-copy' : campus ? 'campus' : releaseTools ? 'release-tooling' : dependencies ? 'dependencies' : result.maintenance ? 'maintenance' : result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
     : result.presentation ? 'presentation' : frontendTest ? 'frontend-test' : frontend ? 'frontend' : 'platform';
   // No production artifact or acceptance scenario is changed by a narrowly

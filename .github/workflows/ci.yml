@@ -267,6 +267,11 @@ jobs:
         run: |
           node .github/scripts/runner-preflight.mjs --control
           node .github/scripts/fetch-ci-base.mjs
+      - name: fetch the fixed reviewed candidate source for shallow classification
+        if: (github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'fix/shared-assessment-foundation-merge-20261017' && github.event.pull_request.head.repo.full_name == github.repository) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.before == '0c41f07cb8c6104ad7c88448d948682baf24cf37')
+        run: |
+          git fetch --no-tags --depth=1 origin 1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c
+          test "$(git rev-parse '1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c^{tree}')" = 8bebe1e6111eb08030af65df9f2bd25691b685e4
       - id: documentation-scope
         name: select dependency-free documentation or tooling classification
         env:
@@ -288,6 +293,7 @@ jobs:
         run: npm ci --ignore-scripts --prefix .github/release-tools
       - id: scope
         env:
+          CI_REVIEWED_CANDIDATE_REQUIRED: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'fix/shared-assessment-foundation-merge-20261017' && github.event.pull_request.head.repo.full_name == github.repository }}
           CI_RUNNER_PROFILE: hosted
           CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
           CI_EVENT: ${{ github.event_name }}

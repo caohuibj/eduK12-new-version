@@ -189,6 +189,14 @@ test('main wiring preserves legacy routes and limits new PR work to contracts, p
   assert.match(job(main, 'merge-gate'), /name: merge gate \/ ready PR/);
   assert.match(job(main, 'merge-gate'), /needs: \[.*reviewed-candidate/);
   assert.match(job(main, 'scope'), /application_route == 'reviewed-candidate' && github.event_name == 'pull_request'/);
+  const classification = job(main, 'scope');
+  assert.match(classification, /git fetch --no-tags --depth=1 origin 1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c/);
+  assert.match(classification, /1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c\^\{tree\}/);
+  assert.match(classification, /8bebe1e6111eb08030af65df9f2bd25691b685e4/);
+  assert.match(classification, /CI_REVIEWED_CANDIDATE_REQUIRED: .*head.ref == 'fix\/shared-assessment-foundation-merge-20261017'/);
+  const scopeScript = readFileSync(new URL('./content-scope.mjs', import.meta.url), 'utf8');
+  assert.match(scopeScript, /process.env.CI_REVIEWED_CANDIDATE_REQUIRED === 'true' && !reviewedCandidate/);
+  assert.match(scopeScript, /throw new Error\('Known reviewed candidate/);
   assert.match(job(main, 'scope'), /node --test \.github\/scripts\/reviewed-candidate-scope.test.mjs/);
   assert.match(job(main, 'scope'), /python3 -B \.github\/scripts\/reviewed-candidate-admission.test.py/);
   for (const name of ['backend','backend-regression','frontend','frontend-build','browser','docker','accept-ui','accept-media','accept-ops','accept-perf'])
