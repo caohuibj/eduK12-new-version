@@ -11,6 +11,8 @@ export function config(c) {
   need(['plan_only', 'execute'].includes(c.mode), 'CLEANUP_MODE_REFUSED');
   for (const [k, min, max] of [['quarantineHours',24,168],['maxDeleteObjects',1,100],['maxDeleteBytes',1,536870912],['maxInventoryVersions',1,10000],['maxScanBytes',1,536870912]])
     need(Number.isSafeInteger(c[k]) && c[k] >= min && c[k] <= max, 'CLEANUP_LIMIT_REFUSED');
+  need(Number.isSafeInteger(c.maxHostPointDeleteBytes ?? 0) && (c.maxHostPointDeleteBytes ?? 0) >= 0
+    && (c.maxHostPointDeleteBytes ?? 0) <= 2214592512, 'HOST_POINT_LIMIT_REFUSED');
   need(c.retention?.hourlyHours >= 48 && c.retention.dailyDays >= 30 && c.retention.weeklyWeeks >= 12 && c.retention.monthlyMonths >= 12, 'RETENTION_TOO_SHORT');
   return c;
 }
@@ -19,6 +21,25 @@ export function validRecord(r) {
   need(/^host-backups\/v1\/[a-f0-9]{32}\/(database\.edubackup\.enc|server-config\.gcm|receipt\.json)$/.test(r.key)
     || /^attachments\/v1\/(catalog-latest\.json|(?:snapshots|catalogs)\/[a-f0-9-]{36}\.gcm|objects\/[a-z0-9-]+\/[a-f0-9]{64}\.gcm(?:\.receipt\.json)?)$/.test(r.key), 'DELETE_NAMESPACE_REFUSED');
   return r;
+}
+// A larger budget is opt-in and exclusive to one exact complete host point.
+// It never raises the ordinary attachment/index budget or splits a host point.
+export function withinDeletionBudget(c, rows) {
+  if (rows.length > c.maxDeleteObjects) return false;
+  const bytes = rows.reduce((n,r) => n+r.bytes,0);
+  if (!Number.isSafeInteger(bytes) || bytes < 0) return false;
+  if (bytes <= c.maxDeleteBytes) return true;
+  if (!c.maxHostPointDeleteBytes || bytes > c.maxHostPointDeleteBytes || rows.length !== 3) return false;
+  const point = rows[0]?.pointId;
+  if (!/^[a-f0-9]{32}$/.test(point || '') || rows.some(r=>r.kind !== 'host' || r.pointId !== point)) return false;
+  const limits = new Map([['database.edubackup.enc',2147483648],['server-config.gcm',67108864],['receipt.json',1048576]]);
+  for (const r of rows) {
+    const file = r.key.slice(('host-backups/v1/'+point+'/').length);
+    if (r.key !== 'host-backups/v1/'+point+'/'+file || !limits.has(file)
+      || !Number.isSafeInteger(r.bytes) || r.bytes < 0 || r.bytes > limits.get(file)) return false;
+    limits.delete(file);
+  }
+  return limits.size === 0;
 }
 function keepHosts(points, now, r) {
   const active = points.filter(p => p.status !== 'RETIRED');
@@ -102,7 +123,7 @@ export function plan(c, input, previous, now) {
   const actions = new Map(); let bytes = 0;
   const addGroup = rows => {
     const newRows = [...new Map(rows.map(r=>[id(r),r])).values()].filter(x => !actions.has(id(x)));
-    if (actions.size + newRows.length > c.maxDeleteObjects || bytes + newRows.reduce((n,r) => n+r.bytes,0) > c.maxDeleteBytes) return false;
+    if (!withinDeletionBudget(c, [...actions.values(), ...newRows])) return false;
     for (const r of newRows) { actions.set(id(r),r); bytes += r.bytes; } return true;
   };
   // Whole host points; never retire one because only its small receipt fits a budget.

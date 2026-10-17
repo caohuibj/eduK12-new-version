@@ -3,7 +3,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { Readable } from 'node:stream';
 import { atomicJson as baseAtomicJson, seal, unseal, encryptStream, verifyEncrypted } from '../attachment-backup/core.mjs';
-import { config, need, hash, id, age, plan, detach, validRecord } from './model.mjs';
+import { config, need, hash, id, age, plan, detach, validRecord, withinDeletionBudget } from './model.mjs';
 import { scan, fingerprint, METADATA_CIPHER_LIMIT } from './store.mjs';
 
 async function atomicJson(file,value) {
@@ -135,7 +135,7 @@ export class Cleanup {
   async executionGuards(j,completion=false) {
     need(!completion||this.completedActions(j),'COMPLETION_NOT_READY');
     need(j.schema===1&&j.configHash===hash(this.c)&&j.plan.actions.length<=this.c.maxDeleteObjects
-      &&j.plan.actions.reduce((n,r)=>n+r.bytes,0)<=this.c.maxDeleteBytes,'JOURNAL_CONFIGURATION_CHANGED');
+      &&withinDeletionBudget(this.c,j.plan.actions),'JOURNAL_CONFIGURATION_CHANGED');
     for(const r of j.plan.actions)validRecord(r);
     const local=await this.local();need(local.sourceHashes[this.paths.proof]===j.proofHash,'RECOVERY_PROOF_CHANGED');
     const proof=local.proof;

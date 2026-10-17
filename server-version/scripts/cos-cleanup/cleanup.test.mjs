@@ -5,7 +5,7 @@ import path from 'node:path';
 import os from 'node:os';
 import crypto from 'node:crypto';
 import { Readable } from 'node:stream';
-import { config, plan, detach, protectedGraph, validRecord, hash, id } from './model.mjs';
+import { config, plan, detach, protectedGraph, validRecord, hash, id, withinDeletionBudget } from './model.mjs';
 import { Cleanup } from './engine.mjs';
 import { CosApi, scan, fingerprint } from './store.mjs';
 import { seal, unseal, keyFingerprint, encryptStream } from '../attachment-backup/core.mjs';
@@ -217,4 +217,54 @@ test('different read and delete clients route only exact version deletes to the 
  assert.equal(calls.filter(x=>x==='deleter:delete').length,1);assert.ok(calls.filter(x=>x==='reader:head').length>=3);
  const probe=await fs.readFile(new URL('./sdk-smoke.mjs',import.meta.url),'utf8');
  assert.match(probe,/new CosApi\(c,client,deleter\)/);assert.match(probe,/input[.]deleteCredentials/);
+});
+
+const largeConfig = {...c,maxHostPointDeleteBytes:2214592512};
+function enlargeHost(f,bytes=800*1024**2) {
+  const p=f.host.points[1],r=p.objects[0];r.bytes=bytes;f.records.get(id(r)).bytes=bytes;
+  const inventory=f.inventory.find(x=>id(x)===id(r));inventory.bytes=bytes;
+  f.inventoryHash=fingerprint(f.inventory);return p;
+}
+function matureWith(cfg,f) {
+  const first=plan(cfg,f,null,now);
+  for(const o of Object.values(first.observations)){o.firstSeen=at(25*hour);o.lastSeen=at(hour);}
+  return plan(cfg,f,first,now);
+}
+test('large host point uses an exclusive opt-in budget without raising ordinary limits',()=>{
+  const f=fixture();enlargeHost(f);assert.ok(!matureWith(c,f).actions.some(r=>r.kind==='host'));
+  const p=matureWith(largeConfig,f);assert.equal(p.actions.length,3);assert.ok(p.actions.every(r=>r.kind==='host'));
+  assert.ok(p.bytes>c.maxDeleteBytes);assert.ok(withinDeletionBudget(largeConfig,p.actions));
+  assert.equal(detach(f,p).host.points[1].status,'RETIRED');
+  const boundary=fixture();enlargeHost(boundary,2147483648);
+  assert.equal(matureWith(largeConfig,boundary).actions.length,3);
+});
+test('large budget rejects mixed groups, duplicate files, excess bytes and excessive configuration',()=>{
+  const f=fixture();enlargeHost(f);const rows=matureWith(largeConfig,f).actions;
+  for(const bad of [rows.slice(0,2),[...rows,f.baseline],[rows[0],rows[1],rows[1]],
+    rows.map((r,i)=>i===0?{...r,pointId:'f'.repeat(32)}:r),
+    rows.map(r=>r.key.endsWith('database.edubackup.enc')?{...r,bytes:2147483649}:r),
+    rows.map(r=>r.key.endsWith('server-config.gcm')?{...r,bytes:67108865}:r)])
+    assert.equal(withinDeletionBudget(largeConfig,bad),false);
+  assert.equal(withinDeletionBudget(largeConfig,[{...f.baseline,bytes:600*1024**2}]),false);
+  for(const n of [-1,1.5,2214592513])assert.throws(()=>config({...c,maxHostPointDeleteBytes:n}));
+  assert.throws(()=>config({...largeConfig,maxDeleteBytes:536870913}));
+});
+test('large point still obeys quarantine, protected retention and whole-point object count',()=>{
+  const f=fixture();enlargeHost(f);assert.equal(plan(largeConfig,f,null,now).actions.length,0);
+  f.host.points[1].protected=true;assert.ok(!matureWith(largeConfig,f).actions.some(r=>r.kind==='host'));
+  f.host.points[1].protected=false;assert.ok(!matureWith({...largeConfig,maxDeleteObjects:2},f).actions.some(r=>r.kind==='host'));
+});
+test('large host transaction resumes a lost exact DELETE and rejects changed budget',async t=>{
+  const {task,api,f,paths}=await diskFixture(t);const p=enlargeHost(f);
+  api.rows.get(id(p.objects[0])).bytes=p.objects[0].bytes;
+  await fs.writeFile(paths.host,JSON.stringify(seal(f.host,secret))+'\n');
+  task.c=largeConfig;const first=await task.makePlan();
+  for(const o of Object.values(first.p.observations)){o.firstSeen=at(25*hour);o.lastSeen=at(hour);}
+  await fs.writeFile(task.planFile,JSON.stringify(seal(first.p,secret)));
+  api.failAfterDelete=true;await assert.rejects(task.run(),/SYNTHETIC_NETWORK_LOST_AFTER_DELETE/);
+  const before=api.deleted.length;task.c={...largeConfig,maxHostPointDeleteBytes:0};
+  await assert.rejects(task.run(),/JOURNAL_CONFIGURATION_CHANGED/);assert.equal(api.deleted.length,before);
+  task.c=largeConfig;await task.run();const j=await task.read(task.journalFile);
+  assert.equal(j.status,'COMPLETE');assert.equal(j.plan.actions.length,3);
+  assert.equal(new Set(api.deleted).size,3);assert.ok(api.rows.has(id(f.baseline)));
 });
