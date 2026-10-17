@@ -50,3 +50,6 @@ Both accepted before and final probes pass19 assertions and100 labeled HTTP requ
 Two efficiency candidate compiles:30.366s first candidate, then28.884s final candidate after narrowing ordinary working set. Earlier candidate is retained as superseded. No frontend changes/build or full-product suites were needed. All owned service harnesses report stopped.
 
 Remaining limitations from the extension are unchanged: real browser rendering/input/timing deferred; no automatic abandoned local draft TTL purge; server retention review does not silently hard-delete data; lost final restart admission without sealed FINAL fails closed. No further optimization is inferred from the bounded samples.
+
+
+2026-10-17 qualification follow-up: the historical limitations above describe that efficiency experiment. The subsequently user-approved seven-day Survey-only cognitive draft retention and exact-candidate Chromium smoke are described in `survey-measurement-extension-20261017.md`; they do not retroactively change this experiment or constitute an Actions pass. Server review-only retention and the lost-restart fail-closed boundary remain unchanged.

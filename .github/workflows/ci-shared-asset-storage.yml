@@ -1,0 +1,79 @@
+name: Shared asset storage candidate
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+  actions: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+
+jobs:
+  candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      CI: 'true'
+      PLAN: ${{ inputs.plan }}
+      SHARED_ASSET_STORAGE_CANDIDATE: 'true'
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: recheck frozen full diff and backend-only plan
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {writeFileSync} from 'node:fs';
+          import {execFileSync} from 'node:child_process';
+          import {sharedAssetStoragePlan} from './.github/scripts/shared-asset-storage-scope.mjs';
+          import {changedEntries} from './.github/scripts/content-scope.mjs';
+          const p=JSON.parse(process.env.PLAN),head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+          assert.equal(p.head,head);
+          assert.deepEqual(p,sharedAssetStoragePlan(changedEntries(p.base,head),p.base,head));
+          writeFileSync('shared-asset-storage-plan.json',JSON.stringify(p,null,2));
+          JS
+      - name: shared reference restore contracts
+        if: contains(join(fromJSON(inputs.plan).changes.*.file, ','), 'server-version/scripts/cos-cleanup/recovery.')
+        run: node --test server-version/scripts/cos-cleanup/recovery.test.mjs
+      - name: official candidate reuse refusal contracts
+        run: python3 -B .github/scripts/test_shared_asset_storage_reuse.py
+      - id: reuse
+        name: retain the qualified candidate for the reviewed SAST-only follow-up
+        run: python3 -B .github/scripts/shared-asset-storage-reuse.py
+      - uses: docker/setup-buildx-action@v3
+        if: steps.reuse.outputs.reused != 'true'
+      - name: compile backend once and run affected contracts on isolated PostgreSQL
+        if: steps.reuse.outputs.reused != 'true'
+        run: python3 -B .github/scripts/shared-asset-storage-candidate.py
+      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        if: steps.reuse.outputs.reused != 'true'
+        with:
+          version: v0.70.0
+          cache: false
+      - name: scan the actual backend and worker runtime image at existing thresholds
+        if: steps.reuse.outputs.reused != 'true'
+        run: trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output shared-asset-storage-evidence/scan.json eduk12-shared-asset-storage-backend:${{ github.sha }}
+      - name: archive the exact scanned runtime
+        if: steps.reuse.outputs.reused != 'true'
+        run: |
+          docker save eduk12-shared-asset-storage-backend:${{ github.sha }} | zstd -T2 -3 -o shared-asset-storage-evidence/backend-image.tar.zst
+          sha256sum shared-asset-storage-evidence/backend-image.tar.zst > shared-asset-storage-evidence/backend-image.tar.zst.sha256
+      - uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: shared-asset-storage-${{ github.sha }}
+          path: |
+            shared-asset-storage-plan.json
+            shared-asset-storage-evidence/
+          if-no-files-found: error
+          retention-days: 3

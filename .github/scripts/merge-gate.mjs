@@ -10,10 +10,12 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if (scope.application_route === 'survey-candidate') return ['scope','survey-candidate','codeql'];
   if (scope.application_route === 'assessment-capacity') return ['scope',...(!draft?['assessment-capacity','codeql']:[])];
   if (scope.application_route === 'teacher-survey') return ['scope',...(!draft?['teacher-survey','codeql']:[])];
   if (scope.application_route === 'access-efficiency') return ['scope',...(!draft?['access-efficiency','codeql']:[])];
   if (scope.application_route === 'backend-security-efficiency') return ['scope',...(!draft?['backend-security-efficiency','codeql']:[])];
+  if (scope.application_route === 'shared-asset-storage') return ['scope',...(!draft?['shared-asset-storage','codeql']:[])];
   if (scope.application_route === 'teacher-home') return ['scope','teacher-home','codeql'];
   if (scope.application_route === 'survey-home') return ['scope','survey-home','codeql'];
   if (scope.application_route === 'homepage-copy') {
@@ -57,6 +59,17 @@ export function requiredChecks(needs, draft) {
 export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if(scope.application_route==='survey-candidate'){
+    let p;try{p=JSON.parse(scope.survey_candidate_plan)}catch{}
+    if(draft||!p||p.schema!==1||p.route!=='survey-candidate'||scope.scenario!=='survey-candidate'||scope.codeql!=='true'
+      ||scope.frontend_build!=='true'||scope.ui_required!=='false'||scope.media_selection!=='[]'||scope.media_groups!=='[]'
+      ||JSON.stringify(p.changed)!==JSON.stringify(['frontend','backend'])||!p.backendTests?.length||!p.frontendTests?.length
+      ||!/^[a-f0-9]{40}$/.test(p.base||'')||!/^[a-f0-9]{40}$/.test(p.head||'')||!/^[a-f0-9]{40}$/.test(p.tree||'')
+      ||!['frontend','backend'].every(c=>/^[a-f0-9]{40}$/.test(p.components?.[c]||''))
+      ||JSON.stringify(p.required)!==JSON.stringify(['frozen-boundary','changed-builds-types','missing-survey-contracts','integrated-postgres-contracts','production-redis-limits','new-schema-restore','restricted-runtime','runtime-scans','three-role-browser','sast'])
+      ||Object.keys(acceptanceJobs).some(k=>scope[k]!=='false'))failed.push('scope');
+    return [...new Set(failed)];
+  }
   if(scope.application_route==='assessment-capacity'){
     let p;try{p=JSON.parse(scope.assessment_capacity_plan)}catch{}
     if(!p||p.schema!==1||p.route!=='assessment-capacity'||scope.scenario!=='assessment-capacity'||scope.codeql!=='true'
@@ -93,6 +106,19 @@ export function failedChecks(needs, draft) {
       ||!Array.isArray(p.tests)||!p.tests.length
       ||!/^[a-f0-9]{40}$/.test(p.base||'')||!/^[a-f0-9]{40}$/.test(p.head||'')
       ||JSON.stringify(p.required)!==JSON.stringify(['frozen-boundary','backend-compile','focused-security-efficiency-contracts','runtime-scan','sast'])
+      ||Object.keys(acceptanceJobs).some(k=>scope[k]!=='false'))failed.push('scope');
+    return [...new Set(failed)];
+  }
+  if (scope.application_route === 'shared-asset-storage') {
+    let p;try{p=JSON.parse(scope.shared_asset_storage_plan);}catch{}
+    if(draft||!p||p.schema!==1||p.route!=='shared-asset-storage'
+      ||scope.scenario!=='shared-asset-storage'||scope.codeql!=='true'
+      ||scope.frontend_build!=='false'||scope.ui_required!=='false'
+      ||scope.media_selection!=='[]'||scope.media_groups!=='[]'
+      ||JSON.stringify(p.changed)!==JSON.stringify(['backend'])
+      ||!Array.isArray(p.tests)||!p.tests.length
+      ||!/^[a-f0-9]{40}$/.test(p.base||'')||!/^[a-f0-9]{40}$/.test(p.head||'')
+      ||JSON.stringify(p.required)!==JSON.stringify(["frozen-boundary", "backend-compile", "shared-media-permissions", "new-schema-restore", "runtime-scan", "sast"])
       ||Object.keys(acceptanceJobs).some(k=>scope[k]!=='false'))failed.push('scope');
     return [...new Set(failed)];
   }
@@ -179,6 +205,13 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     if (JSON.stringify(actual) !== JSON.stringify(p)) failed.push('recomputed-plan');
     if (needs.scope.outputs.scenario==='release-tooling' && (actual.route!=='C' || actual.changed.length || !toolingOnly(actual.changes))) failed.push('mixed-or-unknown-tooling');
   }
+  if(needs.scope?.outputs?.application_route==='survey-candidate'){
+    const {surveyCandidatePlan}=await import('./survey-candidate-scope.mjs');
+    const {changedEntries}=await import('./content-scope.mjs');
+    const {execFileSync}=await import('node:child_process');
+    const p=JSON.parse(needs.scope.outputs.survey_candidate_plan),head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+    if(p.head!==head||JSON.stringify(surveyCandidatePlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-survey-candidate-plan');
+  }
   if(needs.scope?.outputs?.application_route==='assessment-capacity'){
     const {assessmentCapacityPlan}=await import('./assessment-capacity-scope.mjs');
     const {changedEntries}=await import('./content-scope.mjs');
@@ -208,6 +241,14 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     const p=JSON.parse(needs.scope.outputs.backend_security_efficiency_plan);
     const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
     if(p.head!==head||JSON.stringify(backendSecurityEfficiencyPlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-backend-security-efficiency-plan');
+  }
+  if(needs.scope?.outputs?.application_route==='shared-asset-storage'){
+    const {sharedAssetStoragePlan}=await import('./shared-asset-storage-scope.mjs');
+    const {changedEntries}=await import('./content-scope.mjs');
+    const {execFileSync}=await import('node:child_process');
+    const p=JSON.parse(needs.scope.outputs.shared_asset_storage_plan);
+    const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+    if(p.head!==head||JSON.stringify(sharedAssetStoragePlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-shared-asset-storage-plan');
   }
   if(needs.scope?.outputs?.application_route==='teacher-home'){
     const {teacherHomePlan}=await import('./teacher-home-scope.mjs');

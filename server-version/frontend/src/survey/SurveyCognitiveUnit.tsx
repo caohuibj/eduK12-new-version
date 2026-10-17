@@ -1,3 +1,4 @@
+import { holdSurveyCognitiveDraft } from './survey-cognitive-retention'
 import { useCallback,useEffect,useMemo,useRef,useState } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { CognitiveRunner } from '../modules/cognitive/pages/CognitiveRunner'
@@ -26,16 +27,27 @@ export function SurveyCognitiveUnit({publicId,attemptId,instrumentKey,title,proo
   const enteredHere=useRef(false),restartPending=useRef(false),inFlight=useRef(false)
   const startPending=useRef<Record<string,unknown>|null>(null),activeSessionId=useRef(existing?.sessionId??'')
   const mounted=useRef(true),generation=useRef(0)
+  const draftLease=useRef<{id:string;controller:AbortController;ready:Promise<void>}|null>(null)
+  const releaseDraft=()=>{draftLease.current?.controller.abort();draftLease.current=null}
+  const holdDraft=async(id:string)=>{
+    if(draftLease.current?.id===id){await draftLease.current.ready;return}
+    releaseDraft()
+    const controller=new AbortController()
+    const ready=holdSurveyCognitiveDraft(id,controller.signal).then(release=>{if(controller.signal.aborted)release()})
+    draftLease.current={id,controller,ready}
+    try{await ready}catch(error){if(draftLease.current?.controller===controller)releaseDraft();throw error}
+  }
   const isCurrent=(token:number)=>mounted.current&&generation.current===token
   const path=surveyCognitivePath(publicId,attemptId,instrumentKey)
   const callbacks=useRef({onStarted,onCommitted,onRunningChange});callbacks.current={onStarted,onCommitted,onRunningChange}
-  useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;generation.current++;callbacks.current.onRunningChange(false)}},[])
+  useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;generation.current++;releaseDraft();callbacks.current.onRunningChange(false)}},[])
   const cleanup=useCallback(async(id:string)=>{
     const token=generation.current
     if(id&&!await clearSurveyCognitiveSession(publicId,id)&&isCurrent(token))setError('服务器状态已确认，但本机试次清理失败。请关闭本研究页面并清理本网站存储。')
   },[publicId])
   const accept=useCallback((reference:SurveyCognitiveReference)=>{
     if(!mounted.current)return
+    releaseDraft()
     void cleanup(activeSessionId.current)
     setCommitted(reference);callbacks.current.onCommitted(reference);callbacks.current.onRunningChange(false)
   },[cleanup])
@@ -49,6 +61,8 @@ export function SurveyCognitiveUnit({publicId,attemptId,instrumentKey,title,proo
   }
   const admit=async(session:SurveyCognitiveSession,allowFresh:boolean,token=generation.current)=>{
     if(!isCurrent(token))return false
+    await holdDraft(session.sessionId)
+    if(!isCurrent(token))return false
     setRecovery(true);recordSession(session)
     if(session.status==='COMPLETED'&&session.resultReference){accept(session.resultReference);return false}
     // Server allocation is the one-use fresh admission. Replayed starts and
@@ -58,6 +72,7 @@ export function SurveyCognitiveUnit({publicId,attemptId,instrumentKey,title,proo
     if(runnable){
       setRecovery(false);callbacks.current.onRunningChange(true);return true
     }else{
+      releaseDraft()
       setRecovery(true);callbacks.current.onRunningChange(false)
       if((session.attemptEpoch??session.attemptNo)>=2)setError('整单元重做机会已使用，无法安全恢复计时任务。仅能核对已封存提交；若没有，请联系研究者。')
       return false
@@ -70,10 +85,12 @@ export function SurveyCognitiveUnit({publicId,attemptId,instrumentKey,title,proo
     const token=generation.current
     void (async()=>{
       try{
+        await holdDraft(existing.sessionId)
+        if(!alive||!isCurrent(token))return
         const current=await request<SurveyCognitiveSession>(path+'/'+encodeURIComponent(existing.sessionId)+'/read','POST',proof)
         if(!alive||!isCurrent(token))return
         await admit(current,false,token)
-      }catch(e){if(alive&&isCurrent(token))setError(e instanceof Error?e.message:'任务状态无法确认，请重试读取')}
+      }catch(e){if(alive&&isCurrent(token)){releaseDraft();setError(e instanceof Error?e.message:'任务状态无法确认，请重试读取')}}
       finally{if(alive&&isCurrent(token))setChecking(false)}
     })()
     return()=>{alive=false}
@@ -96,7 +113,7 @@ export function SurveyCognitiveUnit({publicId,attemptId,instrumentKey,title,proo
       if(!isCurrent(token))return
       const status=(e as {status?:number})?.status
       if(status===400||status===413){startPending.current=null;resolved=true}
-      if(resolved)callbacks.current.onRunningChange(false)
+      if(resolved){releaseDraft();callbacks.current.onRunningChange(false)}
       setError(e instanceof Error?e.message:'任务无法开始')
     }
     finally{if(isCurrent(token)){inFlight.current=false;setBusy(false)}}
@@ -107,6 +124,8 @@ export function SurveyCognitiveUnit({publicId,attemptId,instrumentKey,title,proo
     inFlight.current=true;setBusy(true);setError('');callbacks.current.onRunningChange(true)
     let runnerMounted=false
     try{
+      await holdDraft(sessionId)
+      if(!isCurrent(token))return
       if(!restartPending.current){
         const current=await request<SurveyCognitiveSession>(path+'/'+encodeURIComponent(sessionId)+'/read','POST',proof)
         if(!isCurrent(token))return
@@ -129,7 +148,7 @@ export function SurveyCognitiveUnit({publicId,attemptId,instrumentKey,title,proo
       await cleanup(previous)
       runnerMounted=await admit(next,true,token)
     }catch(e){if(isCurrent(token))setError(e instanceof Error?e.message:'无法重做任务')}
-    finally{if(isCurrent(token)){if(!runnerMounted)callbacks.current.onRunningChange(false);inFlight.current=false;setBusy(false)}}
+    finally{if(isCurrent(token)){if(!runnerMounted){releaseDraft();callbacks.current.onRunningChange(false)};inFlight.current=false;setBusy(false)}}
   }
   return <section className="border rounded-xl p-4 bg-white space-y-3" aria-label={'认知任务 '+title}>
     <h3 className="font-semibold text-lg">{title}</h3>
@@ -145,7 +164,7 @@ export function SurveyCognitiveUnit({publicId,attemptId,instrumentKey,title,proo
         requiredInput:'KEYBOARD',failClosedOnTrialPersistence:true,completionTitle:'此认知任务已提交',completionAction:'确认任务回执，继续研究',
         completionNotice:'单个任务已持久化；整轮研究尚需最终提交。',
         onCompleted:()=>{const token=generation.current;void api.getSession(sessionId).catch(e=>{if(isCurrent(token))setError(e instanceof Error?e.message:'回执读取失败')})},
-        onExit:()=>{setRecovery(true);callbacks.current.onRunningChange(false)},
+        onExit:()=>{releaseDraft();setRecovery(true);callbacks.current.onRunningChange(false)},
       }}/></MemoryRouter>:
       !busy&&!error&&!startPending.current&&<SurveyCognitiveDeviceGate onReady={()=>void enter()}/>}
     {busy&&<p role="status">正在核对认知任务…</p>}

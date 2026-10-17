@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "files": {
+    "server-version/backend/prisma/schema.prisma": {
+      "before": "a8edac8278c7514cff58c374a411e40e9bc51966",
+      "after": "e444345877955e0172b68d77d6149bb0cc208907"
+    },
+    "server-version/backend/prisma/migrations/20261017020000_asset_upload_deduplication/migration.sql": {
+      "before": null,
+      "after": "2a748c7774b13aeb576b51e354fe393f544c816b"
+    },
+    "server-version/backend/src/services/assetStorage.ts": {
+      "before": "454baa6483b6c8724511c4808eac40ad7bb9ae40",
+      "after": "d7269eee9ecbe2b33643ca915d0c27a6058b21e0"
+    },
+    "server-version/backend/src/services/assetUploadDeduplication.ts": {
+      "before": null,
+      "after": "4a7eaee68bd379b870d4f1f71e16451cac200948"
+    },
+    "server-version/backend/src/utils/cos.ts": {
+      "before": "cfc4e78438f2e657bd46a3075301a8743623e516",
+      "after": "3841db454803d13772afc3275a1fe6fa3eb70c65"
+    },
+    "server-version/backend/src/scripts/asset-upload-cleanup.ts": {
+      "before": null,
+      "after": "d643dded73efe43ad046016b7a7e487dde72cf78"
+    },
+    "server-version/scripts/asset-upload-cleanup/run.py": {
+      "before": null,
+      "after": "ef720d72bf62838bb550e25351db03caece36268"
+    },
+    "server-version/scripts/asset-upload-cleanup/eduk12-asset-upload-cleanup.service": {
+      "before": null,
+      "after": "c53b546f250bc2ba7024fa23c4acc914975db3c6"
+    },
+    "server-version/scripts/asset-upload-cleanup/eduk12-asset-upload-cleanup.timer": {
+      "before": null,
+      "after": "2fee6be45ff004e236f2e074b0416b84fced5b3f"
+    }
+  }
+}

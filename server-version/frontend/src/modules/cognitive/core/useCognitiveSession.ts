@@ -195,6 +195,8 @@ export function useCognitiveSession(
             contextSnapshotHash: session.contextSnapshotHash ?? null,
             deliveryMode: 'final_only',
             submissionId: checkpointId(),
+            ...(api.localDraftScope === 'survey-cognitive'
+              ? { surveyRetention: { schemaVersion: 1 as const, lastWriteAt: Date.now() } } : {}),
           }))
           if (meta.status === 'CONFLICT') {
             dispatch({ type: 'RECOVERY_REQUIRED' })

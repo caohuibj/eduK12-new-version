@@ -29,3 +29,16 @@ export async function clearSurveyCognitiveSession(publicId:string,sessionId:stri
     write(publicId,read(publicId).filter(r=>r.sessionId!==sessionId));return true
   }catch{return false}
 }
+
+/** Only the existing Survey namespace can identify unmarked legacy drafts. */
+export function readSurveyCognitiveSessionIds():string[]{
+  try{
+    const prefix='huisurvey:v1:cognitive-sessions:'
+    const ids=new Set<string>()
+    for(let i=0;i<localStorage.length;i++){
+      const storedKey=localStorage.key(i)
+      if(storedKey?.startsWith(prefix))for(const row of read(storedKey.slice(prefix.length)))ids.add(row.sessionId)
+    }
+    return [...ids]
+  }catch{return []}
+}

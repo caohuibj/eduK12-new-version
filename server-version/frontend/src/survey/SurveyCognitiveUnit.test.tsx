@@ -164,4 +164,22 @@ describe('Survey embedded cognitive lifecycle (component contract only)',()=>{
     expect(callbacks.onRunningChange).toHaveBeenLastCalledWith(false)
   })
 
+  it('keeps fresh admission runnable when the optional cleanup lock is denied',async()=>{
+    const descriptor=Object.getOwnPropertyDescriptor(navigator,'locks')
+    Object.defineProperty(navigator,'locks',{configurable:true,value:{
+      request:vi.fn().mockRejectedValue(new DOMException('locks denied','SecurityError')),
+    }})
+    try{
+      const request=vi.fn(async()=>current),{unmount}=setup(request)
+      fireEvent.click(screen.getByRole('button',{name:'通过设备检查'}))
+      await screen.findByTestId('shared-runner')
+      expect(request).toHaveBeenCalledTimes(1)
+      expect(localStorage.getItem('huisurvey:v1:cognitive-retention-paused')).toBe('1')
+      unmount()
+    }finally{
+      if(descriptor)Object.defineProperty(navigator,'locks',descriptor)
+      else Reflect.deleteProperty(navigator,'locks')
+    }
+  })
+
 })

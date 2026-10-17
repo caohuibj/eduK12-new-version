@@ -1,3 +1,4 @@
+import { assetStorageKey } from '../../services/assetStorageKey'
 import { streamResponse } from '../../utils/streamResponse'
 import fs from 'node:fs'
 import { promises as fsPromises } from 'node:fs'
@@ -13,7 +14,7 @@ import {
   type AssessmentMediaCapabilityPayloadV1,
 } from './assessment-media-capability'
 
-type StoredAssetRecord = Pick<StoredAssetContent, 'id' | 'objectKey' | 'provider' | 'mimeType' | 'sizeBytes' | 'sha256' | 'deletedAt'>
+type StoredAssetRecord = Pick<StoredAssetContent, 'id' | 'objectKey' | 'storageObjectKey' | 'provider' | 'mimeType' | 'sizeBytes' | 'sha256' | 'deletedAt'>
 
 export class AssessmentMediaDeliveryError extends Error {
   readonly reason: 'UNAVAILABLE' | 'IDENTITY_MISMATCH'
@@ -139,7 +140,7 @@ const proxyCosContent = async (params: {
 
   let upstream: globalThis.Response
   try {
-    const signedUrl = await getCOSSignedUrl(asset.objectKey)
+    const signedUrl = await getCOSSignedUrl(assetStorageKey(asset))
     upstream = await fetch(signedUrl, {
       headers: range ? { Range: `bytes=${range.start}-${range.end}` } : undefined,
     })

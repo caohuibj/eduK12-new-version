@@ -1,3 +1,4 @@
+import { cleanupExpiredSurveyCognitiveDrafts } from './survey-cognitive-retention'
 import { clearSurveyCognitiveSessions,rememberSurveyCognitiveSession } from './survey-cognitive-local'
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { SurveyCognitiveUnit } from './SurveyCognitiveUnit'
@@ -233,6 +234,7 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purp
  * This UI contains no researcher or management cookie-based fallbacks.
  */
 export default function SurveyPublicApp(){
+  useEffect(()=>{void cleanupExpiredSurveyCognitiveDrafts()},[])
   const publicId=useMemo(()=>window.location.pathname.match(/^\/r\/([a-f0-9-]{36})$/i)?.[1]||'',[])
   const [entryToken,setEntryToken]=useState(()=>{
     try{return readRecruitmentEntry(publicId,window.location.hash,sessionStorage)}

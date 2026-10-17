@@ -1,3 +1,4 @@
+import { assetStorageKey } from '../../services/assetStorageKey'
 import { streamResponse } from '../../utils/streamResponse'
 import { Readable } from 'node:stream'
 import type { Response } from 'express'
@@ -14,7 +15,7 @@ import {
 } from '../../services/assetStorage'
 import { getCOSSignedUrl } from '../../utils/cos'
 
-type StoredAssetRecord = Pick<StoredAssetContent, 'id' | 'objectKey' | 'provider' | 'mimeType' | 'sizeBytes' | 'sha256' | 'deletedAt'>
+type StoredAssetRecord = Pick<StoredAssetContent, 'id' | 'objectKey' | 'storageObjectKey' | 'provider' | 'mimeType' | 'sizeBytes' | 'sha256' | 'deletedAt'>
 
 export class AssessmentImageDeliveryError extends Error {
   readonly reason: 'UNAVAILABLE' | 'IDENTITY_MISMATCH'
@@ -29,7 +30,7 @@ export class AssessmentImageDeliveryError extends Error {
 const proxyCosImage = async (asset: StoredAssetRecord, res: Response): Promise<Response | void> => {
   let upstream: globalThis.Response
   try {
-    const signedUrl = await getCOSSignedUrl(asset.objectKey)
+    const signedUrl = await getCOSSignedUrl(assetStorageKey(asset))
     upstream = await fetch(signedUrl)
   } catch {
     throw new AssessmentImageDeliveryError('UNAVAILABLE', 'Assessment image is temporarily unavailable')

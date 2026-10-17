@@ -41,6 +41,7 @@ export function SurveyCognitiveDeviceGate({onReady,preview=false}:{onReady:()=>v
       <input className="input block w-full" aria-label="键盘检查" readOnly value={keyboard?'已检测到 Enter 按键':''}
         onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();setKeyboard(true)}}}/></label>
     {!preview&&<p className="text-xs">开始后，前置工具答案将锁定。未封存的中断不逐试次续测，最多允许整个单元重做一次。任务试次只暂存本机，结束后一次提交。</p>}
+    {!preview&&<p className="text-xs">未封存的认知暂存自最后一次实际写入起超过 7 天，会在下次打开 Survey 时分批清理；已封存的待重试提交、已提交结果和服务器数据不受影响。正在打开的任务会受保护，页面关闭时不会后台清理；浏览器不支持安全跨标签页清理时会暂缓；若安全锁被浏览器拒绝，自动清理会停止，任务仍可继续。</p>}
     {error&&<p role="alert">{error}</p>}
     <button type="button" className="btn-primary" disabled={busy||!desktop||!keyboard||!confirmed} onClick={()=>void ready()}>{preview?'开始真实任务预览':'检查暂存并进入认知任务'}</button>
   </section>

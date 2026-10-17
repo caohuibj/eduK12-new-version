@@ -14,6 +14,7 @@ export function createSurveyCognitiveApi(request:SurveyCognitiveRequest,path:str
   onReference:(reference:SurveyCognitiveReference)=>void):CognitiveSessionApi{
   const wrap=<T,>(data:T):ApiResponse<T>=>({code:0,message:'成功',data})
   return {
+    localDraftScope:'survey-cognitive',
     getSession:async id=>{
       const data=await request<SurveyCognitiveSession>(path+'/'+encodeURIComponent(id)+'/read','POST',proof)
       if(data.status==='COMPLETED'&&data.resultReference)onReference(data.resultReference)

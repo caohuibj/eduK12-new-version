@@ -62,3 +62,15 @@ test('bounded version download verifies ciphertext hash and removes failed priva
 test('private JSON row stream refuses oversized exports and symlinks',async()=>{
  const dir=await fs.mkdtemp(path.join(os.tmpdir(),'recovery-rows-'));try{const f=path.join(dir,'rows');await fs.writeFile(f,'{"data":{"asset_id":"x"}}\n');let rows=0;await readRows(f,()=>rows++);assert.equal(rows,1);await assert.rejects(readRows(f,()=>{},1),/ROWS_LIMIT/);await fs.symlink(f,path.join(dir,'link'));await assert.rejects(readRows(path.join(dir,'link'),()=>{}),/ROWS_LIMIT/);}finally{await fs.rm(dir,{recursive:true,force:true});}
 });
+
+test('shared physical storage restores distinct assets and old aliases from one verified body',()=>{
+ const ix=index();addAsset(ix,asset);
+ const shared={...asset,id:'asset-2',object_key:'assets/old-alias.pdf',storage_object_key:asset.object_key};
+ addAsset(ix,shared);
+ addReferenceRow(ix,'documents',{asset_id:shared.id,cos_key:shared.object_key},hosts);
+ addReferenceRow(ix,'frozen',{assetId:shared.id,url:'https://media.test/'+shared.object_key},hosts);
+ assert.equal(ix.assets.size,2);assert.equal(ix.needed.size,1);
+ assert.throws(()=>addAsset(index(),{...shared,provider:'local'}),/SHARED_STORAGE_INVALID/);
+ assert.throws(()=>addAsset(index(),{...shared,sha256:'b'.repeat(64)}),/CONTENT_CHANGED/);
+ assert.throws(()=>addAsset(index(),{...shared,storage_object_key:'assets/missing.pdf'}),/REFERENCE_MISSING/);
+});

@@ -4,6 +4,8 @@ import type { CognitiveAssignmentSummary, CognitiveHistoryPage, CognitiveSession
 import type { AdministrationProvenanceV1 } from './core/administration-provenance'
 
 export interface CognitiveSessionApi {
+  /** Explicit local-only retention ownership; absent for every other product. */
+  localDraftScope?: 'survey-cognitive'
   getSession: (sessionId: string) => ReturnType<typeof apiClient.get<CognitiveSession>>
   loadAsset?: (sessionId: string, assetId: string) => Promise<Blob>
   issueVideoCapabilities?: (sessionId: string, videoKey: string) => ReturnType<typeof apiClient.post<AssessmentVideoCapabilitySources>>
