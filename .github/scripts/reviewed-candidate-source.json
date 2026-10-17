@@ -720,5 +720,121 @@
     "imageId": "sha256:d17082be977d42c85ee21077f6fd2c6f3d8469c92b2ea7aee211f8433baba7f3",
     "componentTree": "a16e227fce4a9154ccad9a83700db1dba8df428c",
     "claim": "Only successful build, runtime assembly and scoped lint phases admitted from a failed job. Types, component tests and scan are not passed; run them against complete checkout and this exact runtime."
+  },
+  "qualificationReceipt": {
+    "run": 39077490826,
+    "head": "b5c63aa6e3ebef520212abc6c564baac4928a992",
+    "tree": "c09244b764a40e4142fc7f722df32c22579223ae",
+    "mergeHead": "b5e7e93adaab263a2dd73d1a5e02934f6d11bc92",
+    "workflow": ".github/workflows/ci.yml",
+    "event": "pull_request",
+    "branch": "fix/shared-assessment-foundation-merge-20261017",
+    "attempt": 1,
+    "pr": 310,
+    "base": "0c41f07cb8c6104ad7c88448d948682baf24cf37",
+    "frontendTree": "94c93e4ae841c452a39f8f96ca12eb1222a67d80",
+    "backendTree": "cc7dbffeae5f847aec3b853b6b8138b3b04ce390",
+    "jobs": {
+      "frontend": {
+        "id": 117527620237,
+        "name": "reviewed-candidate / admitted frontend / missing types contracts and scan",
+        "completedAt": "2026-10-17T23:04:43Z"
+      },
+      "browser": {
+        "id": 117527900476,
+        "name": "reviewed-candidate / admitted runtime / browser",
+        "completedAt": "2026-10-17T23:06:03Z"
+      },
+      "interaction-chromium": {
+        "id": 117527900470,
+        "name": "reviewed-candidate / admitted runtime / interaction-chromium",
+        "completedAt": "2026-10-17T23:05:52Z"
+      },
+      "interaction-firefox": {
+        "id": 117527900553,
+        "name": "reviewed-candidate / admitted runtime / interaction-firefox",
+        "completedAt": "2026-10-17T23:06:00Z"
+      },
+      "interaction-webkit": {
+        "id": 117527900478,
+        "name": "reviewed-candidate / admitted runtime / interaction-webkit",
+        "completedAt": "2026-10-17T23:06:16Z"
+      }
+    },
+    "artifacts": {
+      "frontend": {
+        "id": 12117124436,
+        "name": "reviewed-candidate-39077490826-b5c63aa6e3ebef520212abc6c564baac4928a992-frontend-attempt-1",
+        "size": 37902,
+        "digest": "sha256:04e6396d5600b1f1e831192efd511e1cbbeb2554c9b61b50f37511d2f5e53fae",
+        "createdAt": "2026-10-17T23:04:40Z"
+      },
+      "browser": {
+        "id": 12117537813,
+        "name": "reviewed-candidate-39077490826-b5c63aa6e3ebef520212abc6c564baac4928a992-browser-attempt-1",
+        "size": 558745,
+        "digest": "sha256:2b0a467b0fa522141690388cea05fcd7fe8979f5db997154b6d0bc1440642114",
+        "createdAt": "2026-10-17T23:06:01Z"
+      },
+      "interaction-chromium": {
+        "id": 12117667238,
+        "name": "reviewed-candidate-39077490826-b5c63aa6e3ebef520212abc6c564baac4928a992-interaction-chromium-attempt-1",
+        "size": 1656590,
+        "digest": "sha256:3458afa3bfa0e1dca7fd1ba94ba73541c21584c09fdb09c3ed159fccd50632f6",
+        "createdAt": "2026-10-17T23:05:49Z"
+      },
+      "interaction-firefox": {
+        "id": 12117766884,
+        "name": "reviewed-candidate-39077490826-b5c63aa6e3ebef520212abc6c564baac4928a992-interaction-firefox-attempt-1",
+        "size": 1484257,
+        "digest": "sha256:e42915902d0abd40d6c9175e62755254ac0685aaa2bd654721a20a2769957e8b",
+        "createdAt": "2026-10-17T23:05:58Z"
+      },
+      "interaction-webkit": {
+        "id": 12117129603,
+        "name": "reviewed-candidate-39077490826-b5c63aa6e3ebef520212abc6c564baac4928a992-interaction-webkit-attempt-1",
+        "size": 1458216,
+        "digest": "sha256:3999f472fa6e4692e1219b08da9e3f60062d6931e9d44a6c1d066f92141330ea",
+        "createdAt": "2026-10-17T23:06:14Z"
+      }
+    },
+    "reportDigests": {
+      "frontend": {
+        "frontend-verification.json": "6072d908358f260d04768912eb386cf3edd478a2a901c537a4b556fa729f433b",
+        "selected-component-tests.json": "4e224dee6a02682ea6d83fc6306fe2bea7da4dca79ea78aae084aaab9c012066",
+        "frontend-scan.json": "b2d5e220512b3d688c0dd7c64e4465047db01715cea4c981db6ed26a7852c552"
+      },
+      "browser": {
+        "browser.json": "546ee7b0f94580717cf2cb259e9e422249ffd4c40701b7ee3a7feca9fb211a5d",
+        "contrast-baseline.json": "0a57fc7fde933bc7e5552cea89fcfc9538b17516a2ef457fad1469ecf8d16a0d",
+        "browser-verification.json": "91341b357af7a20d5c5ba6749c69c77df7b5dba877afcc19b9ef89ced4999c70"
+      },
+      "interaction-chromium": {
+        "interaction-chromium-verification.json": "8de7ab4c576b4be633da219abe5561f9c36cefe6b7e8b4d6a504650b4dd124a7",
+        "interaction-chromium/interaction-states/qa.json": "9fff525fcd0b50bfb290d21837f3ab7c304a382814cf73f9bd5929ce1f1b53c4"
+      },
+      "interaction-firefox": {
+        "interaction-firefox-verification.json": "7c4843435036619cfd74a20144c67ecc6791fbee79b5c89841a2c1d4ba5a59c1",
+        "interaction-firefox/interaction-states/qa.json": "9fff525fcd0b50bfb290d21837f3ab7c304a382814cf73f9bd5929ce1f1b53c4"
+      },
+      "interaction-webkit": {
+        "interaction-webkit-verification.json": "cdab13a8006406a105559f3a7b08fcb15141012c0adeae0f0779a460d1b2e825",
+        "interaction-webkit/interaction-states/qa.json": "9fff525fcd0b50bfb290d21837f3ab7c304a382814cf73f9bd5929ce1f1b53c4"
+      }
+    },
+    "inputs": {
+      ".github/scripts/reviewed-candidate-browser.mjs": "43e6b343fe76b250b207038837c9dd9f1da4bc7f",
+      ".github/release-tools/package.json": "1913b93fbd582fbbd28398488e8e91d6bb9865d5",
+      ".github/release-tools/package-lock.json": "b7731f8e3b798e08d1693a9c7b108405d183f45e",
+      "server-version/e2e/visual-interaction-states-browser-e2e.cjs": "c927844d8641f02e80adfaf862dc6c0c908d1a53",
+      "server-version/e2e/visual-canonical-browser-e2e.cjs": "82b8b25778b6801a0fc3a5b4dcc3087f6682afbd",
+      "server-version/e2e/visual-failure-diagnostics.cjs": "af3b71f49c23c365756eee689cbc5b7d1487ac46",
+      "server-version/cognitive-randomization-golden-v1.json": "5b3cb7c11138044ad6a85626e74004bea2a3e62a",
+      "server-version/backend/src/modules/cognitive/generated/identities.json": "dc7aa603721cdea46de7e0ed93f04ba9679a02e4",
+      "server-version/frontend/src/pages/__tests__/TrainingTaskDeepLinks.test.tsx": "dfb060a6de61ffc076814c5e096e91efff2a793d",
+      "server-version/frontend/src/pages/__tests__/ScaleEdit.readonly.test.tsx": "f13805ec7a20b82b0916c2b1e5f2348a726e6795"
+    },
+    "browserScriptBlob": "43e6b343fe76b250b207038837c9dd9f1da4bc7f",
+    "browserScriptSha256": "38f3b7602caed03c214be813add31a802a6efd25f2abc60f1bd6472e3034797b"
   }
 }

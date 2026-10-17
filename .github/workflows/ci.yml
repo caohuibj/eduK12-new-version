@@ -274,6 +274,8 @@ jobs:
           test "$(git rev-parse '1b388507c5eaaada29bbb3d6a0eb7bb7589ad46c^{tree}')" = 8bebe1e6111eb08030af65df9f2bd25691b685e4
           git fetch --no-tags --depth=1 origin 1ffb8eeb02fac5bf2969f8536cffe8837ceda18e
           test "$(git rev-parse '1ffb8eeb02fac5bf2969f8536cffe8837ceda18e^{tree}')" = 4402bab18001d7307399016d7cd81b072ffc65e7
+          git fetch --no-tags --depth=1 origin b5c63aa6e3ebef520212abc6c564baac4928a992
+          test "$(git rev-parse 'b5c63aa6e3ebef520212abc6c564baac4928a992^{tree}')" = c09244b764a40e4142fc7f722df32c22579223ae
       - id: documentation-scope
         name: select dependency-free documentation or tooling classification
         env:

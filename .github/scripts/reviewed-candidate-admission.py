@@ -152,7 +152,7 @@ def source_scope():
     return head
 
 
-def download(expected, members):
+def download(expected, members, selected_reports=False):
     path = PRIVATE / (str(expected['id']) + '.zip')
     request = urllib.request.Request('https://api.github.com/repos/' + M['repository'] + '/actions/artifacts/' + str(expected['id']) + '/zip',
                                      headers={'Authorization': 'Bearer ' + os.environ['GH_TOKEN']})
@@ -162,8 +162,20 @@ def download(expected, members):
     require(path.stat().st_size == expected['size'] and 'sha256:' + file_sha(path) == expected['digest'], 'Official ZIP digest/size mismatch')
     target = PRIVATE / str(expected['id']); target.mkdir()
     with zipfile.ZipFile(path) as archive:
-        validate_members(archive.infolist(), members)
+        if selected_reports:
+            # The fixed whole-ZIP digest is already verified. Read only declared
+            # JSON reports; screenshots and other members are never extracted.
+            infos = archive.infolist()
+            require(len({i.filename for i in infos}) == len(infos), 'Duplicate qualification ZIP member')
+            for name in members:
+                require(name.endswith('.json') and '\\' not in name and all(part not in ['', '.', '..'] for part in name.split('/')), 'Unsafe qualification report path')
+                info = archive.getinfo(name)
+                require(not info.is_dir() and ((info.external_attr >> 16) & 0o170000) != 0o120000
+                        and info.file_size <= 20_000_000, 'Unsafe qualification report member')
+        else:
+            validate_members(archive.infolist(), members)
         for name in members:
+            (target / name).parent.mkdir(parents=True, exist_ok=True)
             with archive.open(name) as source, (target / name).open('wb') as sink:
                 shutil.copyfileobj(source, sink)
     path.unlink()
@@ -545,96 +557,136 @@ def current_frontend_image():
         'originalJobConclusion': 'failure', 'originalCompletedAt': receipt['job']['completedAt'],
         'artifact': receipt['artifact'], 'reportsArtifact': receipt['reportsArtifact'], 'reportDigests': receipt['reportDigests'],
         'imageId': image, 'acceptedPhases': ['changed-frontend-build-once', 'package-exact-new-builder', 'changed-scale-scoped-lint'],
-        'claim': 'Only successful assembly and unchanged Scale lint are accepted from this failed producer. The source image is unchanged; types, selected contracts and image scan require current-run success.'})
+        'claim': 'Only successful assembly and unchanged Scale lint are accepted from this failed producer. The source image is unchanged; types, selected contracts and image scan are admitted from the independently successful job fixed by qualificationReceipt.'})
     return image
 
 
+def validate_qualification_origin(actual, job, action, receipt):
+    require(action in ['frontend', 'browser', 'interaction-chromium', 'interaction-firefox', 'interaction-webkit'], 'Unknown qualification action')
+    for key, value in {'id': receipt['run'], 'head_sha': receipt['head'], 'head_branch': receipt['branch'],
+                       'event': receipt['event'], 'path': receipt['workflow'], 'run_attempt': receipt['attempt'],
+                       'status': 'completed', 'conclusion': 'failure'}.items():
+        require(actual.get(key) == value, 'Qualification run mismatch: ' + key)
+    require(actual.get('repository', {}).get('full_name') == M['repository']
+            and actual.get('head_repository', {}).get('full_name') == M['repository'], 'Qualification repository mismatch')
+    expected = receipt['jobs'][action]
+    for key, value in {'id': expected['id'], 'name': expected['name'], 'run_id': receipt['run'],
+                       'run_attempt': receipt['attempt'], 'head_sha': receipt['head'], 'status': 'completed',
+                       'conclusion': 'failure' if action == 'browser' else 'success', 'completed_at': expected['completedAt']}.items():
+        require(job.get(key) == value, 'Qualification job mismatch: ' + key)
+    require(transport.recent(job['completed_at']), 'Original qualification expired')
+
+
+def load_qualification_reports(action):
+    receipt = M['qualificationReceipt']
+    validate_qualification_origin(transport.api('/actions/runs/' + str(receipt['run'])),
+        transport.api('/actions/jobs/' + str(receipt['jobs'][action]['id'])), action, receipt)
+    require(receipt['pr'] == int(os.environ['PR_NUMBER']) and receipt['base'] == M['base'], 'Qualification PR/base mismatch')
+    require(git('rev-parse', receipt['head'] + '^{tree}') == receipt['tree'], 'Qualification source tree changed')
+    require(transport.api('/git/commits/' + receipt['mergeHead'])['tree']['sha'] == receipt['tree'], 'Qualification merge tree changed')
+    run(['git', 'merge-base', '--is-ancestor', receipt['head'], os.environ['CANDIDATE_HEAD_SHA']], 30)
+    for component in ['frontend', 'backend']:
+        for ref in [receipt['head'], 'HEAD']:
+            require(git('rev-parse', ref + ':server-version/' + component) == receipt[component + 'Tree'], 'Qualified component inputs changed')
+    for file, blob in receipt['inputs'].items():
+        require(git('rev-parse', receipt['head'] + ':' + file) == blob, 'Original qualification tool changed: ' + file)
+        # The browser runner independently proves its narrowly repaired selector
+        # and admission-only additions preserve the five accepted context bodies.
+        if file != '.github/scripts/reviewed-candidate-browser.mjs':
+            require(git('rev-parse', 'HEAD:' + file) == blob, 'Qualified consumer input changed: ' + file)
+    expected = receipt['artifacts'][action]
+    validate_artifact(transport.api('/actions/artifacts/' + str(expected['id'])), expected,
+                      {**M, 'source': {'run': receipt['run'], 'head': receipt['head']}})
+    digests = receipt['reportDigests'][action]
+    directory = download(expected, digests, selected_reports=True)
+    reports = {}
+    for name, digest in digests.items():
+        raw = (directory / name).read_bytes()
+        require(sha(raw) == digest, 'Qualification report bytes changed: ' + name)
+        reports[name] = json.loads(raw)
+    return reports, directory
+
+
+def validate_qualification_reports(action, reports, receipt):
+    require(action in ['frontend', 'interaction-chromium', 'interaction-firefox', 'interaction-webkit'], 'Only independently successful jobs qualify here')
+    value = reports[action + '-verification.json']
+    image = M['frontendAssemblyReceipt']['imageId']
+    require(value.get('status') == 'success' and value.get('currentHead') == receipt['head']
+            and value.get('sourceSha') == M['frontendAssemblyReceipt']['head'] and value.get('imageId') == image,
+            'Qualification report source/status/image changed')
+    expected = ['admit-original-official-evidence', 'qualify-missing-' + action]
+    if action == 'frontend':
+        expected += ['install-locked-host-frontend-tooling', 'missing-frontend-app-types',
+                     'missing-scale-and-changed-training-contracts', 'missing-runtime-high-critical-scan']
+        tests, scan = reports['selected-component-tests.json'], reports['frontend-scan.json']
+        require(tests.get('success') is True and tests.get('numTotalTests') == tests.get('numPassedTests') == 41
+                and all(tests.get(key) == 0 for key in ['numFailedTests', 'numPendingTests', 'numTodoTests']), 'Qualified tests incomplete')
+        selected = {'ScaleEdit.readonly.test.tsx': 21, 'TrainingTaskDeepLinks.test.tsx': 20}
+        require(len(tests.get('testResults', [])) == 2 and {Path(t['name']).name: len(t['assertionResults']) for t in tests['testResults']} == selected,
+                'Qualified test files changed')
+        require(all(t['status'] == 'passed' and all(a['status'] == 'passed' for a in t['assertionResults']) for t in tests['testResults']), 'Qualified assertion failed/skipped')
+        require(scan.get('ArtifactID') == scan.get('ArtifactName') == scan.get('Metadata', {}).get('ImageID') == image
+                and scan.get('ArtifactType') == 'container_image' and scan.get('Trivy', {}).get('Version') == '0.70.0', 'Qualified scan image/tool mismatch')
+        require(scan.get('Results') and not [v for r in scan['Results'] for v in r.get('Vulnerabilities', [])], 'Qualified HIGH/CRITICAL scan not clean')
+    else:
+        engine = action.removeprefix('interaction-')
+        expected += ['affected-assignment-states-' + engine]
+        require(value.get('browser') == engine and value.get('scope') == 'assignment-list-states'
+                and value.get('artifactSourceHead') == M['frontendAssemblyReceipt']['head'] and value.get('isolatedResourcesRemoved') is True
+                and value.get('testScriptBlob') == receipt['inputs']['server-version/e2e/visual-interaction-states-browser-e2e.cjs'],
+                'Qualified interaction scope/cleanup/script changed')
+        qa = reports[action + '/interaction-states/qa.json']
+        require(qa.get('scope') == 'assignment-list-states' and qa.get('results') ==
+                [{'width': width, 'passed': True, 'assignmentStates': [{'state': state, 'passed': True} for state in
+                  ['loading', 'populated', 'empty', 'filtered-empty', 'error']]} for width in [360, 390, 768, 1440]], 'Qualified interaction coverage incomplete')
+    phases = value.get('phases', [])
+    require(len(phases) == len(expected) and [p['name'] for p in phases] == expected
+            and all(p['status'] == 'success' for p in phases), 'Qualification phases missing/failed')
+
+
+def accept_qualification(action, record):
+    reports, directory = load_qualification_reports(action)
+    receipt = M['qualificationReceipt']
+    validate_qualification_reports(action, reports, receipt)
+    shutil.copyfile(directory / (action + '-verification.json'), E / ('source-' + action + '-verification.json'))
+    write('accepted-' + action + '.json', {'status': 'success', 'currentHead': os.environ['CANDIDATE_HEAD_SHA'],
+        'sourceHead': receipt['head'], 'sourceRun': receipt['run'], 'sourceJob': receipt['jobs'][action]['id'],
+        'originalCompletedAt': receipt['jobs'][action]['completedAt'], 'artifact': receipt['artifacts'][action],
+        'reportDigests': receipt['reportDigests'][action], 'imageId': M['frontendAssemblyReceipt']['imageId'],
+        'claim': 'This independently successful original job is accepted unchanged. No build, install, typecheck, test, scan or browser execution occurred here.'})
+    record['execution'] = 'Official receipt only; original completion time and source retained'
+
+
 def qualify_frontend(reports, record):
-    image = current_frontend_image()
-    frontend = ROOT / 'server-version/frontend'
-    phase(record, 'install-locked-host-frontend-tooling', lambda: run(['npm', 'ci', '--prefix', str(frontend)], 300))
-    # A full checkout supplies the tracked sibling JSON fixtures that are absent
-    # in the frontend-only Docker build context. No bundling or lint is repeated.
-    phase(record, 'missing-frontend-app-types', lambda: subprocess.run(
-        ['node', 'node_modules/typescript/bin/tsc', '-p', 'tsconfig.app.json', '--noEmit'], cwd=frontend,
-        check=True, timeout=300, env={**os.environ, 'NODE_OPTIONS': '--max-old-space-size=4096'}))
-    selected = ['src/pages/__tests__/ScaleEdit.readonly.test.tsx', 'src/pages/__tests__/TrainingTaskDeepLinks.test.tsx']
-    phase(record, 'missing-scale-and-changed-training-contracts', lambda: subprocess.run(
-        ['node', 'node_modules/vitest/vitest.mjs', 'run', '--maxWorkers=2', *selected,
-         '--reporter=json', '--outputFile=' + str(E / 'selected-component-tests.json')], cwd=frontend, check=True, timeout=180))
-    tests = json.loads((E / 'selected-component-tests.json').read_text())
-    require(tests.get('success') is True and len(tests.get('testResults', [])) == len(selected), 'Selected contract files incomplete')
-    require({str(Path(t['name']).relative_to(frontend)) for t in tests['testResults']} == set(selected), 'Unexpected selected contract file')
-    require(all(t.get('assertionResults') and all(a.get('status') == 'passed' for a in t['assertionResults'])
-                for t in tests['testResults']), 'Selected assertions failed/skipped')
-    phase(record, 'missing-runtime-high-critical-scan', lambda: run(['trivy', 'image', '--exit-code', '1', '--ignore-unfixed',
-        '--scanners', 'vuln', '--severity', 'HIGH,CRITICAL', '--format', 'json', '--output', str(E / 'frontend-scan.json'), image], 600))
-    record['imageId'] = image
-    record['execution'] = 'Reused exact successful assembly/lint only; current checkout app types, two selected test files and actual image scan executed. No build.'
+    return accept_qualification('frontend', record)
 
 
 def require_current_frontend_qualification():
     jobs = transport.api('/actions/runs/' + os.environ['GITHUB_RUN_ID'] + '/attempts/' + os.environ['GITHUB_RUN_ATTEMPT'] + '/jobs?per_page=100')
     require(jobs['total_count'] == len(jobs['jobs']), 'Truncated current qualification jobs')
-    qualified = [job for job in jobs['jobs'] if job['name'] == 'reviewed-candidate / admitted frontend / missing types contracts and scan']
+    qualified = [job for job in jobs['jobs'] if job['name'] == 'reviewed-candidate / admitted frontend / unchanged qualification receipts']
     require(len(qualified) == 1 and qualified[0]['head_sha'] == os.environ['CANDIDATE_HEAD_SHA']
             and qualified[0]['status'] == 'completed' and qualified[0]['conclusion'] == 'success', 'Current frontend qualification not successful')
 
 
 def interaction_frontend(engine, record):
     require(engine in ['chromium', 'firefox', 'webkit'], 'Unknown interaction browser')
-    require_current_frontend_qualification()
-    image = current_frontend_image()
-    name = 'reviewed-interaction-' + os.environ['GITHUB_RUN_ID'] + '-' + engine
-    owner = name + '-' + os.environ['GITHUB_RUN_ATTEMPT']
-    require(subprocess.run(['docker', 'inspect', name], capture_output=True).returncode != 0, 'Interaction container already exists')
-    identity = None
-    try:
-        identity = output(['docker', 'run', '-d', '--name', name, '--label', 'reviewed-candidate-owner=' + owner,
-                           '-p', '127.0.0.1:3189:80', image], 120)
-        require(re.fullmatch('[a-f0-9]{64}', identity), 'Invalid interaction container ID')
-        for _ in range(30):
-            try:
-                with urllib.request.urlopen('http://127.0.0.1:3189/', timeout=2) as response:
-                    if response.status == 200: break
-            except Exception: pass
-            time.sleep(1)
-        else: raise RuntimeError('Interaction frontend readiness exceeded 30 seconds')
-        evidence = E / ('interaction-' + engine)
-        env = {**os.environ, 'PLAYWRIGHT_CORE_PATH': str(ROOT / '.github/release-tools/node_modules/playwright-core'),
-               'VISUAL_QA_BASE_URL': 'http://127.0.0.1:3189', 'VISUAL_QA_EVIDENCE_DIR': str(evidence),
-               'VISUAL_QA_BROWSER_ENGINE': engine, 'VISUAL_QA_SCOPE': 'assignment-list-states'}
-        phase(record, 'affected-assignment-states-' + engine, lambda: run(
-            ['node', 'server-version/e2e/visual-interaction-states-browser-e2e.cjs'], 240, env=env))
-        result = json.loads((evidence / 'interaction-states/qa.json').read_text())
-        require(result.get('scope') == 'assignment-list-states' and result.get('results') ==
-                [{'width': width, 'passed': True, 'assignmentStates': [{'state': state, 'passed': True} for state in
-                  ['loading', 'populated', 'empty', 'filtered-empty', 'error']]} for width in [360, 390, 768, 1440]],
-                'Interaction coverage incomplete')
-        record.update(imageId=image, artifactSourceHead=M['frontendAssemblyReceipt']['head'], browser=engine,
-                      scope='assignment-list-states', testScriptBlob=git('rev-parse', 'HEAD:server-version/e2e/visual-interaction-states-browser-e2e.cjs'))
-    finally:
-        if identity is None:
-            found = subprocess.run(['docker', 'inspect', name], capture_output=True, text=True)
-            if found.returncode == 0:
-                detail = json.loads(found.stdout)[0]
-                if detail.get('Config', {}).get('Labels', {}).get('reviewed-candidate-owner') == owner: identity = detail['Id']
-        record['isolatedResourcesRemoved'] = not identity or subprocess.run(['docker', 'rm', '-f', '-v', identity], capture_output=True).returncode == 0
-        write(record['report'], record)
-        require(record['isolatedResourcesRemoved'], 'Interaction resource cleanup failed')
+    return accept_qualification('interaction-' + engine, record)
 
 
 def browser_frontend(reports, record):
     require_current_frontend_qualification()
-    old = load_image('frontend-runtime', reports)
+    prior, prior_directory = load_qualification_reports('browser')
+    for name in ['browser.json', 'contrast-baseline.json', 'browser-verification.json']:
+        shutil.copyfile(prior_directory / name, E / ('prior-' + name))
     current = current_frontend_image()
-    # No unimplemented partial-job receipt may silently substitute for two UI contexts.
-    # If the actual entry is unchanged, stop for explicit prior-context admission instead.
+    # The prior run bound five passed contexts and the separate contrast baseline
+    # to these immutable bytes. The browser runner verifies and retains those originals.
     require(json.loads((E / 'frontend-runtime.json').read_text())['entryChanged'] is True,
-            'Entry bytes unchanged: prior two-context admission is not implemented; stop rather than repeat or silently skip')
+            'Original qualified assembly entry comparison changed')
     owned = []
     try:
-        for mode, image, source in [('baseline', old, M['source']['head']), ('current', current, M['frontendAssemblyReceipt']['head'])]:
+        for mode, image, source in [('current', current, M['frontendAssemblyReceipt']['head'])]:
             name = 'reviewed-candidate-frontend-' + mode
             require(subprocess.run(['docker', 'inspect', name], capture_output=True).returncode != 0, 'Frontend probe container already exists')
             label = os.environ['GITHUB_RUN_ID'] + '-' + os.environ['GITHUB_RUN_ATTEMPT'] + '-' + mode
@@ -657,13 +709,28 @@ def browser_frontend(reports, record):
             else: raise RuntimeError('Frontend readiness exceeded 30 seconds')
             entry_changed = json.loads((E / 'frontend-runtime.json').read_text())['entryChanged']
             require(isinstance(entry_changed, bool), 'Missing measured entry comparison')
-            env = {**os.environ, 'CANDIDATE_SOURCE_SHA': source, 'CANDIDATE_IMAGE_ID': image, 'CANDIDATE_ORIGIN_PORT': '3189', 'CANDIDATE_ENTRY_CHANGED': str(entry_changed).lower()}
-            command = ['node', '.github/scripts/reviewed-candidate-browser.mjs'] + (['--contrast-baseline'] if mode == 'baseline' else [])
+            env = {**os.environ, 'CANDIDATE_SOURCE_SHA': source, 'CANDIDATE_IMAGE_ID': image, 'CANDIDATE_ORIGIN_PORT': '3189', 'CANDIDATE_ENTRY_CHANGED': str(entry_changed).lower(),
+                   'REVIEWED_PRIOR_BROWSER_REPORT': str(E / 'prior-browser.json'),
+                   'REVIEWED_PRIOR_CONTRAST_REPORT': str(E / 'prior-contrast-baseline.json'),
+                   'REVIEWED_PRIOR_BROWSER_VERIFICATION': str(E / 'prior-browser-verification.json')}
+            command = ['node', '.github/scripts/reviewed-candidate-browser.mjs']
             phase(record, mode + '-frontend-browser', lambda: run(command, 240, env=env))
             run(['docker', 'rm', '-f', '-v', identity], 30); owned.remove(identity)
         value = json.loads((E / 'browser.json').read_text())
         require(value['status'] == 'success' and value['sourceSha'] == M['frontendAssemblyReceipt']['head']
                 and value['currentHead'] == os.environ['CANDIDATE_HEAD_SHA'] and value['imageId'] == current, 'Current browser source/status mismatch')
+        scenarios = ['assignments-target-and-identity', 'checkins-target-and-identity', 'scale-draft-published-standard',
+                     'course-share-sender-and-admin', 'composite-results-course-return',
+                     'survey-existing-form-shared-preview', 'teacher-existing-form-shared-runner']
+        accepted, executed = value.get('acceptedRecords', []), value.get('records', [])
+        require(len(accepted) == 5 and len(executed) == 9 and value.get('completedBusinessScenarios') == 14,
+                'Prior/new browser context counts changed')
+        require({(r['scenario'], r['width']) for r in accepted} == {(name, 390) for name in scenarios[:5]}, 'Accepted browser context set changed')
+        require({(r['scenario'], r['width']) for r in accepted + executed} == {(name, width) for name in scenarios for width in [390, 1440]},
+                'Complete browser context set changed')
+        require(all(r.get('status') == r.get('functionalStatus') == r.get('visualStatus') == 'passed' for r in accepted + executed),
+                'Prior/new browser context failed')
+
     finally:
         failures = [identity for identity in reversed(owned) if subprocess.run(['docker','rm','-f','-v',identity],capture_output=True).returncode != 0]
         record['isolatedResourcesRemoved'] = not failures; write(record['report'], record)
@@ -688,7 +755,10 @@ if __name__ == '__main__':
               'currentHead': os.environ.get('CANDIDATE_HEAD_SHA'), 'phases': []}
     try:
         reports = {}
-        phase(record, 'admit-original-official-evidence', lambda: reports.update(admit()))
+        if action == 'race':
+            phase(record, 'admit-original-official-evidence', lambda: reports.update(admit()))
+        else:
+            phase(record, 'validate-current-reviewed-scope', source_scope)
         phase(record, 'accept-prior-successful-race' if action == 'race' else 'qualify-missing-' + action, lambda: probe(action, reports, record))
         record['status'] = 'success'
     except BaseException:

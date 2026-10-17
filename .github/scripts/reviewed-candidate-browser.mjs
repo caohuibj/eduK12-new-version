@@ -16,6 +16,7 @@ const IMAGE = 'sha256:29abe75a707f8c88a523fcbd762f0efb6e7568ec0e0c90100d501c2ae5
 const MANIFEST = JSON.parse(readFileSync(new URL('./reviewed-candidate-source.json', import.meta.url), 'utf8'))
 const BASELINE = process.argv.includes('--contrast-baseline')
 const OUTPUT = 'reviewed-candidate-evidence'
+const PRIOR_SCENARIOS = ['assignments-target-and-identity', 'checkins-target-and-identity', 'scale-draft-published-standard', 'course-share-sender-and-admin', 'composite-results-course-return']
 const TIMEOUT = 10_000
 const BUDGET = 120_000
 const HOSTS = ['training.eduk12.top', 'survey.eduk12.top', 'teacher.eduk12.top']
@@ -82,7 +83,118 @@ async function run() {
     authority: 'UI-only explicit synthetic DTOs. Real authentication/authorization and runtime evidence remain the prior official backend checks.',
     transport: 'Canonical production hosts mapped to isolated HTTP loopback; unchanged runtime nginx; no TLS/certificate/security-context overrides.',
     exclusions: ['Survey participant recovery and FINAL require HTTPS crypto.randomUUID and are not exercised here.', 'No product lifecycle, real authentication, backend permission, browser matrix, application rebuild, or deployment check is repeated.'],
-    checks: [], records: [], unexpected: [], screenshots: [], visualFailures: [], scaleColors: [],
+    checks: [], records: [], acceptedRecords: [], unexpected: [], screenshots: [], visualFailures: [], scaleColors: [],
+  }
+  let priorEvidence
+  function acceptPriorEvidence() {
+    const receipt = MANIFEST.qualificationReceipt
+    const reports = {}
+    for (const [name, variable] of [['browser.json', 'REVIEWED_PRIOR_BROWSER_REPORT'], ['contrast-baseline.json', 'REVIEWED_PRIOR_CONTRAST_REPORT'], ['browser-verification.json', 'REVIEWED_PRIOR_BROWSER_VERIFICATION']]) {
+      assert(process.env[variable], `verified prior report path is required: ${name}`)
+      const bytes = readFileSync(process.env[variable])
+      assert.equal(createHash('sha256').update(bytes).digest('hex'), receipt.reportDigests.browser[name], `fixed prior report bytes: ${name}`)
+      reports[name] = JSON.parse(bytes)
+    }
+    const prior = reports['browser.json'], baseline = reports['contrast-baseline.json'], verification = reports['browser-verification.json']
+    const script = '.github/scripts/reviewed-candidate-browser.mjs'
+    assert.equal(receipt.inputs[script], receipt.browserScriptBlob)
+    assert.equal(execFileSync('git', ['rev-parse', `${receipt.head}:${script}`], { encoding: 'utf8' }).trim(), receipt.inputs[script], 'fixed original browser script blob')
+    const originalSource = execFileSync('git', ['show', `${receipt.head}:${script}`], { encoding: 'utf8' })
+    assert.equal(createHash('sha256').update(originalSource).digest('hex'), prior.scriptSha256, 'original script matches the original browser report')
+    assert.equal(prior.scriptSha256, receipt.browserScriptSha256)
+    assert.equal(baseline.scriptSha256, prior.scriptSha256)
+    const currentSource = readFileSync(fileURLToPath(import.meta.url), 'utf8')
+    const section = (source, start, end) => {
+      const from = source.indexOf(start), to = source.indexOf(end, from + start.length)
+      assert(from >= 0 && to > from && source.indexOf(start, from + start.length) === -1, 'unique protected browser source boundaries')
+      return source.slice(from, to)
+    }
+    const skip = '    if (acceptPriorScenario(product, width, name)) return\n'
+    const oldSelector = "page.getByLabel('题干', { exact: true })"
+    const fixedSelector = "page.getByRole('textbox', { name: '题干', exact: true })"
+    const segments = [
+      ['fixtures', '\nconst TIMEOUT =', '\nfixtureReview()\n'],
+      ['sharedHelpers', '\n  const clean =', '\n  async function allChecks() {'],
+      ['runtimeSetup', '\n  async function allChecks() {', '\n    for (const width of WIDTHS) {'],
+      ['scenarioBodies', '\n    for (const width of WIDTHS) {', '\n    assert.equal(report.records.length,'],
+    ]
+    const inputHashes = {}
+    for (const [name, start, end] of segments) {
+      const original = section(originalSource, start, end)
+      let current = section(currentSource, start, end)
+      if (name === 'sharedHelpers') {
+        assert.equal(current.split(skip).length, 2, 'only one explicit prior-scenario admission hook')
+        current = current.replace(skip, '')
+      }
+      if (name === 'runtimeSetup') {
+        const admission = '      acceptPriorEvidence()\n'
+        assert.equal(current.split(admission).length, 2, 'only one explicit prior-evidence admission hook')
+        current = current.replace(admission, '')
+      }
+      if (name === 'scenarioBodies') {
+        assert.equal(current.split(fixedSelector).length, 2, 'only one repaired Survey selector')
+        assert.equal(original.split(oldSelector).length, 2, 'only one original failing Survey selector')
+        current = current.replace(fixedSelector, oldSelector)
+      }
+      assert.equal(current, original, `unchanged prior-browser inputs: ${name}`)
+      inputHashes[name] = createHash('sha256').update(original).digest('hex')
+    }
+    assert.equal(prior.status, 'failed', 'the partial original browser run remains failed')
+    assert.equal(prior.currentHead, receipt.head)
+    assert.equal(prior.checkoutSha, receipt.mergeHead)
+    assert.equal(prior.sourceSha, report.sourceSha)
+    assert.equal(prior.imageId, report.imageId)
+    assert.equal(prior.currentFrontendTree, MANIFEST.testFix.afterTree)
+    assert.equal(prior.entryChanged, true)
+    assert.equal(report.entryChanged, true)
+    assert.deepEqual(prior.unexpected, [])
+    assert.deepEqual(prior.visualFailures, [])
+    assert.equal(prior.records.length, 6)
+    assert.equal(prior.failure.scenario, 'survey-existing-form-shared-preview')
+    assert.equal(prior.failure.width, 390)
+    assert.deepEqual(prior.records.slice(0, 5).map(record => record.scenario), PRIOR_SCENARIOS)
+    for (const record of prior.records.slice(0, 5)) {
+      assert.equal(record.width, 390)
+      for (const key of ['status', 'functionalStatus', 'visualStatus']) assert.equal(record[key], 'passed')
+      assert.deepEqual(record.pageErrors, [])
+      const checks = prior.checks.filter(check => check.scenario === record.scenario && check.width === 390)
+      assert(checks.length && checks.every(check => check.status === 'passed'))
+      assert(checks.some(check => check.name === 'responsive and targeted WCAG audit'))
+    }
+    assert.equal(verification.status, 'failure')
+    assert.equal(verification.currentHead, receipt.head)
+    assert.equal(verification.sourceSha, prior.sourceSha)
+    assert.equal(verification.isolatedResourcesRemoved, true)
+    assert(verification.phases.some(phase => phase.name === 'baseline-frontend-browser' && phase.status === 'success'))
+    assert.equal(baseline.status, 'success')
+    assert.equal(baseline.currentHead, receipt.head)
+    assert.equal(baseline.checkoutSha, receipt.mergeHead)
+    assert.equal(baseline.sourceSha, SOURCE)
+    assert.equal(baseline.imageId, IMAGE)
+    assert.equal(baseline.records.length, 1)
+    assert.equal(baseline.records[0].scenario, 'original-scale-draft-contrast-baseline')
+    assert.equal(baseline.records[0].width, 390)
+    assert.equal(baseline.records[0].status, 'passed')
+    assert.equal(baseline.records[0].functionalStatus, 'passed')
+    assert.equal(baseline.records[0].visualStatus, 'baseline-observation')
+    assert.deepEqual(baseline.unexpected, [])
+    assert.equal(baseline.knownBaselineFinding.observed, true)
+    const provenance = { run: receipt.run, head: receipt.head, job: receipt.jobs.browser.id, artifact: receipt.artifacts.browser.id, scriptSha256: prior.scriptSha256 }
+    priorEvidence = { prior, provenance }
+    report.acceptedInputHashes = inputHashes
+    report.acceptedBaseline = { provenance, report: baseline }
+    report.prior390AssignmentCheckin.execution = 'prior-official-scenarios-accepted'
+    report.prior390AssignmentCheckin.reason = 'The same immutable runtime already passed these exact 390px scenarios in the authenticated prior report.'
+  }
+  function acceptPriorScenario(product, width, name) {
+    if (BASELINE || width !== 390 || !PRIOR_SCENARIOS.includes(name)) return false
+    assert(priorEvidence, 'prior evidence must be authenticated before skipping a scenario')
+    assert.equal(product, 'training')
+    assert(!report.acceptedRecords.some(record => record.scenario === name), 'prior scenario accepted only once')
+    const { prior, provenance } = priorEvidence
+    const record = prior.records.find(record => record.scenario === name && record.width === width)
+    report.acceptedRecords.push({ ...record, provenance, checks: prior.checks.filter(check => check.scenario === name && check.width === width) })
+    return true
   }
   let browser, active, axe, timer
   const reportFile = BASELINE ? 'contrast-baseline.json' : 'browser.json'
@@ -124,6 +236,7 @@ async function run() {
     r.add('GET', `/api/courses/${COURSE_ID}/training-assessments`, { list: [] })
   }
   async function scenario(product, width, name, r, work) {
+    if (acceptPriorScenario(product, width, name)) return
     const ctx = await browser.newContext({ viewport: { width, height: 900 }, serviceWorkers: 'block', reducedMotion: 'reduce', locale: 'zh-CN', timezoneId: 'UTC' })
     const page = await ctx.newPage()
     page.setDefaultTimeout(TIMEOUT)
@@ -375,6 +488,7 @@ async function run() {
       report.currentFrontendTree = MANIFEST.testFix.afterTree
       report.runtimeArtifactId = assembly.artifact.id
       report.runtimeBuiltForCurrentHead = report.sourceSha === report.currentHead
+      acceptPriorEvidence()
     }
     report.checkoutSha = checkoutSha
     assert.equal(port, 3189, 'only the isolated candidate loopback port is allowed')
@@ -557,7 +671,7 @@ async function run() {
           await page.goto(base + '/workspace')
           await page.getByRole('button', { name: '查看/编辑', exact: true }).click()
           await page.getByRole('button', { name: /^Synthetic existing Form FORM/ }).click()
-          assert.equal(await page.getByLabel('题干', { exact: true }).inputValue(), QUESTION)
+          assert.equal(await page.getByRole('textbox', { name: '题干', exact: true }).inputValue(), QUESTION)
           await page.getByRole('button', { name: '结构检查与编译预览', exact: true }).click()
           const preview = page.getByRole('region', { name: '研究工具试答预览', exact: true })
           const input = preview.getByLabel(QUESTION, { exact: true })
@@ -590,10 +704,16 @@ async function run() {
         })
       }
     }
-    assert.equal(report.records.length, WIDTHS.length * 7 - (report.entryChanged ? 0 : 2))
+    assert.equal(report.records.length, 9, 'only the nine previously incomplete browser scenarios execute')
+    assert.equal(report.acceptedRecords.length, 5, 'the five passed 390px scenarios retain their original evidence')
     assert(report.records.every(record => record.functionalStatus === 'passed'))
+    const completed = [...report.acceptedRecords, ...report.records]
+    const expected = WIDTHS.flatMap(width => [...PRIOR_SCENARIOS, 'survey-existing-form-shared-preview', 'teacher-existing-form-shared-runner'].map(name => `${name}:${width}`)).sort()
+    assert.deepEqual(completed.map(record => `${record.scenario}:${record.width}`).sort(), expected, 'exact complete fourteen-scenario coverage')
     assert.deepEqual(report.unexpected, [])
-    report.completedBusinessScenarios = report.records.length
+    report.executedBusinessScenarios = report.records.length
+    report.acceptedBusinessScenarios = report.acceptedRecords.length
+    report.completedBusinessScenarios = completed.length
     write()
     assert.equal(report.visualFailures.length, 0, `Visual failures collected after all ${report.completedBusinessScenarios} safe business scenarios completed`)
   }
@@ -617,5 +737,5 @@ async function run() {
     write()
     if (browser) await browser.close()
   }
-  console.log(JSON.stringify({ status: report.status, report: `${OUTPUT}/${reportFile}`, scenarios: report.records.length, unexpected: report.unexpected.length, visualFailures: report.visualFailures.length }))
+  console.log(JSON.stringify({ status: report.status, report: `${OUTPUT}/${reportFile}`, executedScenarios: report.records.length, acceptedScenarios: report.acceptedRecords.length, unexpected: report.unexpected.length, visualFailures: report.visualFailures.length }))
 }

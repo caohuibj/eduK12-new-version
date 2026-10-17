@@ -14,21 +14,23 @@ const entries = () => [
   ...reviewedCandidateTools.map(file => ({file, status:existingTools.has(file) ? 'M' : 'A', oldMode:existingTools.has(file) ? '100644' : '000000', newMode:'100644'})),
 ].sort((a, b) => a.file.localeCompare(b.file));
 const read = (ref, file) => {
-  if (![head, manifest.base, manifest.source.head, manifest.frontendAssemblyReceipt.head].includes(ref)) throw Error('Unexpected ref');
+  if (![head, manifest.base, manifest.source.head, manifest.frontendAssemblyReceipt.head, manifest.qualificationReceipt.head].includes(ref)) throw Error('Unexpected ref');
   const assembled = ref === manifest.frontendAssemblyReceipt.head;
+  const qualified = ref === manifest.qualificationReceipt.head;
   const fix = manifest.testFix.files[file];
-  if (fix && ref === head) return fix.after;
+  if (fix && (ref === head || qualified)) return fix.after;
   if (fix && (assembled || !Object.hasOwn(manifest.files, file))) return fix.before;
   const patch = manifest.frontendPatch.files[file];
-  if (patch && (ref === head || assembled)) return patch.after;
+  if (patch && (ref === head || assembled || qualified)) return patch.after;
   if (Object.hasOwn(manifest.files, file)) return manifest.files[file][ref === manifest.base ? 'before' : 'after'];
   if (patch) throw Error('New patch path absent in original source/main');
   if (Object.hasOwn(manifest.unchangedConsumers, file)) return manifest.unchangedConsumers[file];
   for (const component of ['frontend','backend'])
-    if (file === `server-version/${component}`) return ref === head && component === 'frontend'
+    if (file === `server-version/${component}`) return (ref === head || qualified) && component === 'frontend'
       ? manifest.testFix.afterTree : assembled && component === 'frontend'
         ? manifest.frontendPatch.afterTree : manifest.components[component];
   if (file === '' && assembled) return manifest.frontendAssemblyReceipt.tree;
+  if (file === '' && qualified) return manifest.qualificationReceipt.tree;
   if (file === '' || file === '.github/scripts/reviewed-candidate-source.json') return digest(file);
   throw Error(`Unexpected object: ${file}`);
 };
@@ -44,6 +46,7 @@ test('only the complete reviewed source patch plus every exact tool is admitted'
   assert.deepEqual(admitted.frontendPatch, manifest.frontendPatch);
   assert.deepEqual(admitted.testFix, manifest.testFix);
   assert.deepEqual(admitted.frontendAssemblyReceipt, manifest.frontendAssemblyReceipt);
+  assert.deepEqual(admitted.qualificationReceipt, manifest.qualificationReceipt);
   assert.deepEqual(admitted.raceReceipt, manifest.raceReceipt);
   for (const entry of entries())
     assert.equal(reviewedCandidatePlan(entries().filter(item => item.file !== entry.file), manifest.base, head, read), null, `missing ${entry.file}`);
@@ -96,7 +99,7 @@ test('the exact frontend overlay rejects stale blobs, old frontend trees and une
   assert.equal(reviewedCandidatePlan(entries(), manifest.base, head, oldTree), null);
   const css = entries().find(x => x.file.endsWith('/ScaleEdit.css'));
   assert.equal(reviewedCandidatePlan(entries().map(x => x.file === css.file ? {...x, file:'server-version/frontend/src/pages/Global.css'} : x), manifest.base, head, read), null);
-  for (const key of ['frontendPatch','testFix','frontendAssemblyReceipt','raceReceipt']) {
+  for (const key of ['frontendPatch','testFix','frontendAssemblyReceipt','qualificationReceipt','raceReceipt']) {
     const changed = structuredClone(plan()); changed[key] = {};
     assert.equal(validReviewedCandidatePlan(changed), false);
   }
@@ -129,6 +132,8 @@ test('the two exact test fixes preserve the assembled product and bind every sou
   for (const file of ['', 'server-version/frontend', 'server-version/backend']) {
     const altered = (r, f) => r === manifest.frontendAssemblyReceipt.head && f === file ? 'f'.repeat(40) : read(r, f);
     assert.equal(reviewedCandidatePlan(entries(), manifest.base, head, altered), null, `assembled ${file}`);
+    const changedQualification = (r, f) => r === manifest.qualificationReceipt.head && f === file ? 'f'.repeat(40) : read(r, f);
+    assert.equal(reviewedCandidatePlan(entries(), manifest.base, head, changedQualification), null, `qualified ${file}`);
   }
   const staleTree = (r, f) => r === head && f === 'server-version/frontend' ? manifest.frontendPatch.afterTree : read(r, f);
   assert.equal(reviewedCandidatePlan(entries(), manifest.base, head, staleTree), null);
@@ -148,6 +153,12 @@ test('original 49-file receipts, images and reports remain an unchanged baseline
   assert.equal(manifest.frontendAssemblyReceipt.run, 39076589264);
   assert.equal(manifest.frontendAssemblyReceipt.head, '1ffb8eeb02fac5bf2969f8536cffe8837ceda18e');
   assert.equal(manifest.frontendAssemblyReceipt.artifact.id, 12117506265);
+  assert.equal(manifest.qualificationReceipt.run, 39077490826);
+  assert.equal(manifest.qualificationReceipt.head, 'b5c63aa6e3ebef520212abc6c564baac4928a992');
+  assert.equal(manifest.qualificationReceipt.jobs.browser.id, 117527900476);
+  assert.equal(manifest.qualificationReceipt.artifacts.browser.id, 12117537813);
+  assert.equal(manifest.qualificationReceipt.browserScriptBlob, manifest.qualificationReceipt.inputs['.github/scripts/reviewed-candidate-browser.mjs']);
+  assert.equal(manifest.qualificationReceipt.browserScriptSha256, '38f3b7602caed03c214be813add31a802a6efd25f2abc60f1bd6472e3034797b');
 });
 
 const falseFlags = ['maintenance','content','presentation','frontend','frontend_test','documentation','frontend_build','ui_required','visual_hosted',
@@ -182,7 +193,7 @@ test('flags, receipt bindings and incomplete plans cannot turn missing evidence 
     const needs = fixture(); needs.scope.outputs.reviewed_candidate_plan = value;
     assert.ok(failedChecks(needs, false).includes('scope'));
   }
-  for (const key of ['schema','route','base','head','tree','manifestBlob','source','components','frontendPatch','testFix','frontendAssemblyReceipt','raceReceipt','changed','required','changes']) {
+  for (const key of ['schema','route','base','head','tree','manifestBlob','source','components','frontendPatch','testFix','frontendAssemblyReceipt','qualificationReceipt','raceReceipt','changed','required','changes']) {
     const needs = fixture(), changed = plan(); delete changed[key];
     needs.scope.outputs.reviewed_candidate_plan = JSON.stringify(changed);
     assert.ok(failedChecks(needs, false).includes('scope'), key);
@@ -194,9 +205,9 @@ test('flags, receipt bindings and incomplete plans cannot turn missing evidence 
 
 const workflow = name => readFileSync(new URL(`../workflows/${name}.yml`, import.meta.url), 'utf8');
 const job = (text, name) => text.split(`  ${name}:\n`)[1]?.split(/\n  [a-z][a-z0-9-]*:\n/)[0] ?? '';
-test('workflow admits the exact assembly, runs missing checks and requires every selected browser scope', () => {
+test('workflow admits exact successful qualifications and executes only missing browser scenarios', () => {
   const text = workflow('ci-reviewed-candidate');
-  for (const required of ['action: [browser, race, interaction-chromium, interaction-firefox, interaction-webkit]','fail-fast: false','ubuntu-24.04','timeout-minutes: 15','timeout-minutes: 20',"CI: 'true'",'sleep 300',
+  for (const required of ['action: [browser, race, interaction-chromium, interaction-firefox, interaction-webkit]','fail-fast: false','ubuntu-24.04','timeout-minutes: 15','timeout-minutes: 5',"CI: 'true'",'sleep 300',
     'fetch-depth: 0','persist-credentials: false',"node-version: '24.21.0'",'github.event.pull_request.head.sha',
     'github.event.pull_request.base.sha','github.event.pull_request.number','https://registry.npmjs.org','NPM_CONFIG_REPLACE_REGISTRY_HOST: always',
     'npm ci --ignore-scripts --prefix .github/release-tools','playwright-core/cli.js install --with-deps "$engine"',
@@ -204,32 +215,32 @@ test('workflow admits the exact assembly, runs missing checks and requires every
     'reviewed-candidate-evidence/screenshots/*.png','reviewed-candidate-evidence/interaction-*/interaction-states/qa.json',
     'reviewed-candidate-evidence/interaction-*/interaction-states/*.png','github.run_id','github.run_attempt','if-no-files-found: error']) assert.ok(text.includes(required), required);
   assert.doesNotMatch(text, /secrets: inherit|self-hosted|continue-on-error|npm (?:run build|test)|working-directory: server-version/);
-  assert.doesNotMatch(text, /CURRENT_FRONTEND_ARTIFACT|reviewed-current-frontend|frontend-runtime\.tar|outputs:/);
+  assert.doesNotMatch(text, /CURRENT_FRONTEND_ARTIFACT|reviewed-current-frontend|frontend-runtime\.tar|outputs:|setup-trivy/);
   const producer = job(text, 'frontend'), consumers = job(text, 'verify');
-  assert.match(producer, /name: admitted frontend \/ missing types contracts and scan/);
+  assert.match(producer, /name: admitted frontend \/ unchanged qualification receipts/);
   assert.match(producer, /reviewed-candidate-admission\.py frontend/);
   assert.match(producer, /path: reviewed-candidate-evidence\/\*\.json/);
   assert.match(consumers, /needs: \[frontend\]/);
   assert.doesNotMatch(consumers, /uses: actions\/download-artifact/);
   assert.match(consumers, /browser\) engine=chromium/);
-  assert.match(consumers, /interaction-chromium\|interaction-firefox\|interaction-webkit\) engine="\$\{PROBE_ACTION#interaction-\}"/);
-  assert.match(consumers, /race\) engine= ;;/);
+  assert.match(consumers, /race\|interaction-chromium\|interaction-firefox\|interaction-webkit\) engine= ;;/);
   const admission = readFileSync(new URL('./reviewed-candidate-admission.py', import.meta.url), 'utf8');
   assert.match(admission, /receipt = M\['frontendAssemblyReceipt'\]/);
   assert.match(admission, /directory = download\(receipt\['artifact'\], \['frontend-runtime.json', 'frontend-runtime.tar.zst'\]\)/);
   assert.match(admission, /require_current_frontend_qualification\(\)/);
-  assert.doesNotMatch(admission, /\['docker', 'build'|\['npm', 'run', '(?:build|lint)'/);
+  assert.doesNotMatch(admission, /\['docker', 'build'|\['npm', '(?:run|ci)'|node_modules\/typescript\/bin\/tsc|node_modules\/vitest\/vitest.mjs|\['trivy', 'image'/);
   const qualification = admission.split('def qualify_frontend(')[1]?.split('\ndef require_current_frontend_qualification(')[0] ?? '';
-  assert.match(qualification, /\['npm', 'ci', '--prefix', str\(frontend\)\]/);
-  assert.match(qualification, /node_modules\/typescript\/bin\/tsc', '-p', 'tsconfig.app.json', '--noEmit'/);
-  assert.match(qualification, /selected = \['src\/pages\/__tests__\/ScaleEdit.readonly.test.tsx', 'src\/pages\/__tests__\/TrainingTaskDeepLinks.test.tsx'\]/);
-  assert.match(qualification, /node_modules\/vitest\/vitest.mjs', 'run', '--maxWorkers=2', \*selected/);
-  assert.match(qualification, /'trivy', 'image', '--exit-code', '1'/);
-  assert.match(qualification, /'--severity', 'HIGH,CRITICAL'/);
+  assert.match(qualification, /return accept_qualification\('frontend', record\)/);
+  const interaction = admission.split('def interaction_frontend(')[1]?.split('\ndef browser_frontend(')[0] ?? '';
+  assert.match(interaction, /return accept_qualification\('interaction-' \+ engine, record\)/);
+  const browser = admission.split('def browser_frontend(')[1]?.split('\ndef probe(')[0] ?? '';
+  assert.match(browser, /load_qualification_reports\('browser'\)/);
+  assert.match(browser, /\[\('current', current, M\['frontendAssemblyReceipt'\]\['head'\]\)\]/);
+  assert.doesNotMatch(browser, /--contrast-baseline|\('baseline'|load_image\(/);
+  for (const name of ['REVIEWED_PRIOR_BROWSER_REPORT', 'REVIEWED_PRIOR_CONTRAST_REPORT', 'REVIEWED_PRIOR_BROWSER_VERIFICATION']) assert.ok(browser.includes(name), name);
+  assert.match(browser, /len\(accepted\) == 5 and len\(executed\) == 9/);
+  assert.match(browser, /value.get\('completedBusinessScenarios'\) == 14/);
   assert.doesNotMatch(consumers, /frontend-runtime\.tar|setup-trivy|reviewed-candidate-admission\.py frontend/);
-  const original = workflow('ci-shared-assessment-foundation');
-  const trivy = /uses: aquasecurity\/setup-trivy@[a-f0-9]+\n        with:\n          version: v[0-9.]+\n          cache: false/;
-  assert.equal(producer.match(trivy)?.[0], original.match(trivy)?.[0]);
   const lock = JSON.parse(readFileSync(new URL('../release-tools/package-lock.json', import.meta.url)));
   assert.equal(lock.packages['node_modules/playwright-core'].version, '1.62.1');
 });
@@ -244,6 +255,15 @@ test('browser reports original assembly identity separately from the current tes
   assert.match(browser, /assert.equal\(frontendTree\(checkoutSha\), MANIFEST.testFix.afterTree/);
   assert.match(browser, /report.runtimeBuiltForCurrentHead = report.sourceSha === report.currentHead/);
   assert.doesNotMatch(browser, /assert.equal\(report.sourceSha, report.currentHead/);
+  assert.match(browser, /getByRole\('textbox', \{ name: '题干', exact: true \}\).inputValue\(\), QUESTION/);
+  assert.match(browser, /receipt.reportDigests.browser\[name\]/);
+  assert.match(browser, /assert.equal\(current, original, `unchanged prior-browser inputs:/);
+  for (const section of ['fixtures', 'sharedHelpers', 'runtimeSetup', 'scenarioBodies']) assert.ok(browser.includes(`['${section}',`), section);
+  assert.match(browser, /if \(acceptPriorScenario\(product, width, name\)\) return/);
+  assert.match(browser, /assert.equal\(report.records.length, 9,/);
+  assert.match(browser, /assert.equal\(report.acceptedRecords.length, 5,/);
+  assert.match(browser, /report.acceptedBaseline = \{ provenance, report: baseline \}/);
+  assert.match(browser, /report.acceptedRecords.push\(\{ \.\.\.record, provenance, checks:/);
 });
 
 test('main wiring preserves legacy routes and limits new PR work to contracts, probes and tool SAST', () => {
@@ -262,6 +282,9 @@ test('main wiring preserves legacy routes and limits new PR work to contracts, p
   assert.match(classification, /git fetch --no-tags --depth=1 origin 1ffb8eeb02fac5bf2969f8536cffe8837ceda18e/);
   assert.match(classification, /1ffb8eeb02fac5bf2969f8536cffe8837ceda18e\^\{tree\}/);
   assert.match(classification, /4402bab18001d7307399016d7cd81b072ffc65e7/);
+  assert.match(classification, /git fetch --no-tags --depth=1 origin b5c63aa6e3ebef520212abc6c564baac4928a992/);
+  assert.match(classification, /b5c63aa6e3ebef520212abc6c564baac4928a992\^\{tree\}/);
+  assert.match(classification, /c09244b764a40e4142fc7f722df32c22579223ae/);
   assert.match(classification, /CI_REVIEWED_CANDIDATE_REQUIRED: .*head.ref == 'fix\/shared-assessment-foundation-merge-20261017'/);
   const scopeScript = readFileSync(new URL('./content-scope.mjs', import.meta.url), 'utf8');
   assert.match(scopeScript, /process.env.CI_REVIEWED_CANDIDATE_REQUIRED === 'true' && !reviewedCandidate/);

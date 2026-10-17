@@ -233,6 +233,71 @@ class PartialFrontendAssemblyRefusals(unittest.TestCase):
         changed = copy.deepcopy(runtime); changed['archive']['sha256'] = 'c' * 64
         with self.assertRaises(ValueError): a.validate_assembly_reports(changed, verification, receipt)
 
+class QualificationReceiptRefusals(unittest.TestCase):
+    def origin(self, action):
+        receipt = M['qualificationReceipt']
+        actual = {'id': receipt['run'], 'head_sha': receipt['head'], 'head_branch': receipt['branch'],
+                  'event': receipt['event'], 'path': receipt['workflow'], 'run_attempt': receipt['attempt'],
+                  'status': 'completed', 'conclusion': 'failure', 'repository': {'full_name': M['repository']},
+                  'head_repository': {'full_name': M['repository']}}
+        expected = receipt['jobs'][action]
+        job = {'id': expected['id'], 'name': expected['name'], 'run_id': receipt['run'], 'run_attempt': receipt['attempt'],
+               'head_sha': receipt['head'], 'status': 'completed', 'conclusion': 'failure' if action == 'browser' else 'success',
+               'completed_at': expected['completedAt']}
+        return actual, job, receipt
+
+    def reports(self, action):
+        receipt = M['qualificationReceipt']; image = M['frontendAssemblyReceipt']['imageId']
+        phases = ['admit-original-official-evidence', 'qualify-missing-' + action]
+        value = {'status': 'success', 'currentHead': receipt['head'], 'sourceSha': M['frontendAssemblyReceipt']['head'], 'imageId': image}
+        result = {action + '-verification.json': value}
+        if action == 'frontend':
+            phases += ['install-locked-host-frontend-tooling', 'missing-frontend-app-types', 'missing-scale-and-changed-training-contracts', 'missing-runtime-high-critical-scan']
+            result['selected-component-tests.json'] = {'success': True, 'numTotalTests': 41, 'numPassedTests': 41, 'numFailedTests': 0,
+                'numPendingTests': 0, 'numTodoTests': 0, 'testResults': [{'name': name, 'status': 'passed',
+                    'assertionResults': [{'status': 'passed'} for _ in range(count)]} for name, count in [('ScaleEdit.readonly.test.tsx', 21), ('TrainingTaskDeepLinks.test.tsx', 20)]]}
+            result['frontend-scan.json'] = {'ArtifactID': image, 'ArtifactName': image, 'Metadata': {'ImageID': image},
+                'ArtifactType': 'container_image', 'Trivy': {'Version': '0.70.0'}, 'Results': [{'Vulnerabilities': []}]}
+        else:
+            engine = action.removeprefix('interaction-'); phases += ['affected-assignment-states-' + engine]
+            value.update(browser=engine, scope='assignment-list-states', artifactSourceHead=M['frontendAssemblyReceipt']['head'],
+                isolatedResourcesRemoved=True, testScriptBlob=receipt['inputs']['server-version/e2e/visual-interaction-states-browser-e2e.cjs'])
+            result[action + '/interaction-states/qa.json'] = {'scope': 'assignment-list-states', 'results': [{'width': width, 'passed': True,
+                'assignmentStates': [{'state': state, 'passed': True} for state in ['loading', 'populated', 'empty', 'filtered-empty', 'error']]}
+                for width in [360, 390, 768, 1440]]}
+        value['phases'] = [{'name': name, 'status': 'success'} for name in phases]
+        return result
+
+    def test_exact_job_statuses_preserve_partial_browser_failure(self):
+        for action in ['frontend', 'browser', 'interaction-chromium', 'interaction-firefox', 'interaction-webkit']:
+            actual, job, receipt = self.origin(action)
+            with patch.object(a.transport, 'recent', return_value=True): a.validate_qualification_origin(actual, job, action, receipt)
+            for key in ['id', 'name', 'run_id', 'run_attempt', 'head_sha', 'status', 'conclusion', 'completed_at']:
+                with self.subTest(action=action, key=key), patch.object(a.transport, 'recent', return_value=True), self.assertRaises(ValueError):
+                    a.validate_qualification_origin(actual, {**job, key: 'wrong'}, action, receipt)
+            with patch.object(a.transport, 'recent', return_value=False), self.assertRaises(ValueError):
+                a.validate_qualification_origin(actual, job, action, receipt)
+        with self.assertRaises(ValueError): a.validate_qualification_reports('browser', {}, M['qualificationReceipt'])
+
+    def test_only_exact_successful_phase_sets_and_complete_assertions_qualify(self):
+        for action in ['frontend', 'interaction-chromium', 'interaction-firefox', 'interaction-webkit']:
+            reports = self.reports(action)
+            a.validate_qualification_reports(action, reports, M['qualificationReceipt'])
+            for key in ['status', 'currentHead', 'sourceSha', 'imageId']:
+                changed = copy.deepcopy(reports); changed[action + '-verification.json'][key] = 'wrong'
+                with self.subTest(action=action, key=key), self.assertRaises(ValueError):
+                    a.validate_qualification_reports(action, changed, M['qualificationReceipt'])
+            changed = copy.deepcopy(reports); changed[action + '-verification.json']['phases'][0]['status'] = 'skipped'
+            with self.assertRaises(ValueError): a.validate_qualification_reports(action, changed, M['qualificationReceipt'])
+        changed = self.reports('frontend'); changed['selected-component-tests.json']['numPassedTests'] = 40
+        with self.assertRaises(ValueError): a.validate_qualification_reports('frontend', changed, M['qualificationReceipt'])
+        changed = self.reports('frontend'); changed['frontend-scan.json']['Results'][0]['Vulnerabilities'] = [{'Severity': 'HIGH'}]
+        with self.assertRaises(ValueError): a.validate_qualification_reports('frontend', changed, M['qualificationReceipt'])
+        changed = self.reports('interaction-chromium'); changed['interaction-chromium/interaction-states/qa.json']['results'][0]['assignmentStates'].pop()
+        with self.assertRaises(ValueError): a.validate_qualification_reports('interaction-chromium', changed, M['qualificationReceipt'])
+        changed = self.reports('interaction-chromium'); changed['interaction-chromium-verification.json']['isolatedResourcesRemoved'] = False
+        with self.assertRaises(ValueError): a.validate_qualification_reports('interaction-chromium', changed, M['qualificationReceipt'])
+
 
 if __name__ == '__main__':
     unittest.main()
