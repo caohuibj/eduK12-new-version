@@ -233,6 +233,8 @@ export interface ScaleUnitReport {
 }
 
 export interface FormBackgroundReport {
+  typedValue?: string | number | string[] | Record<string,string|number|string[]> | null
+  presentation?: {type:string;options:Array<{key:string;label:string}>;rows:Array<{key:string;label:string}>}
   state?: string
   rowStates?: Record<string, string>
   otherText?: string | null

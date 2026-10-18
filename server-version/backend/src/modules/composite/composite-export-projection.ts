@@ -34,6 +34,8 @@ export interface CompositeExportProjectionBindingV1 {
 type CompositeScaleItem = {
   id: string
   type: string
+  formDefinition?: unknown
+  formPolicy?: unknown
   scale?: {
     id?: string | null
     code?: string | null
@@ -89,6 +91,7 @@ export const buildCompositeExportProjectionBinding = (input: {
     resourceId: input.resourceId,
     audience,
     scales,
+    ...(input.items.some(item=>item.formDefinition!=null)?{typedFormExport:{version:'training-form-export-v1',definitions:input.items.filter(item=>item.formDefinition!=null).map(item=>({id:item.id,definition:item.formDefinition,policy:item.formPolicy??null}))}}:{}),
   }
   return { ...identity, fingerprint: canonicalHash(identity) }
 }
@@ -106,6 +109,7 @@ export const resolveCompositeExportProjectionBinding = async (
         select: {
           id: true,
           type: true,
+          formDefinition: true, formPolicy: true,
           scale: { select: { id: true, code: true, instrumentVersion: true, instrumentClass: true } },
         },
       },

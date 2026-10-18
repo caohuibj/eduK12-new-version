@@ -24,3 +24,11 @@ describe.each([['COGNITIVE', cognitiveController.exportData], ['COMPOSITE', comp
     expect(mocks.enqueue).not.toHaveBeenCalled()
   })
 })
+
+it('rejects typed SAV before durable enqueue and does not decrypt answers',async()=>{
+ vi.clearAllMocks();mocks.auth.mockResolvedValue({_count:{items:1}})
+ const res=response()
+ await compositeExportController.export({user:{userId:'owner',role:'TEACHER'},params:{id:'resource'},body:{detail:'full',format:'sav'},get:()=> 'typed-sav-request-key'} as any,res)
+ expect(res.status).toHaveBeenCalledWith(400);expect(res.json).toHaveBeenCalledWith(expect.objectContaining({message:expect.stringContaining('TYPED_FORM_SAV_NOT_SUPPORTED')}))
+ expect(mocks.enqueue).not.toHaveBeenCalled();expect(mocks.read).not.toHaveBeenCalled()
+})

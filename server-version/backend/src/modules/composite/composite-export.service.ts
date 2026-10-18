@@ -1,3 +1,9 @@
+import { legacyFormValueProjection } from '../assessment-runtime/typed-form'
+import { canonicalHash } from '../assessment-runtime/canonical'
+import { typedFormExportColumns, type TypedFormColumnSource } from './typed-form-export'
+import { readLoadedCompositeTypedFormValues } from '../assessment-runtime/typed-form-facts'
+import { mapCompositeSection } from '../assessment-runtime/form-section-definition'
+import { protectCsvCell } from '../../utils/exportCsvCell'
 import { loadScaleResult } from '../scale/scale-workflow.service'
 import { loadScaleAnswers } from '../scale/scale-workflow.service'
 import { compositeForbidden, compositeBadRequest } from './composite.errors'
@@ -32,6 +38,7 @@ export type CompositeExportDetail = 'summary' | 'full'
 export type CompositeExportFormat = 'csv' | 'sav' | 'zip'
 
 export interface CompositeExportField {
+  formSource?: TypedFormColumnSource
   name: string
   label: string
   type: 'numeric' | 'string' | 'date'
@@ -43,6 +50,7 @@ export interface CompositeExportField {
 }
 
 export interface CompositeExportData {
+  typedFormExportVersion?: string
   totalCount?: number
   assessmentId: string
   assessmentName: string
@@ -253,8 +261,10 @@ export const getExportData = async (
     },
   })
   if (!template) throw new Error('综合测评不存在')
-  // C07 supplies a typed, lossless CSV/ZIP/SAV contract. Never export String shadows.
-  if (template.items.some(item => item.formDefinition != null)) throw compositeBadRequest('TYPED_FORM_EXPORT_NOT_AVAILABLE: typed Form 无损导出尚未开放')
+  const hasTypedForms = template.items.some(item => item.formDefinition != null)
+  const sections = hasTypedForms ? await prisma.compositeFormSection.findMany({where:{compositeAssessmentId:assessmentId},include:{items:true}}) : []
+  const typedSections = sections.map(mapCompositeSection).filter(section=>section.items.some(item=>item.formDefinition!=null))
+  if(hasTypedForms && typedSections.reduce((n,section)=>n+section.items.filter(item=>item.formDefinition!=null).length,0)!==template.items.filter(item=>item.formDefinition!=null).length) throw compositeBadRequest('typed Form 缺少冻结区段')
   assertExportLimits({ records: template.attempts.length })
   const packageSlotLabels = getFrozenPackageSlotLabels(template)
 
@@ -268,7 +278,14 @@ export const getExportData = async (
   builder.add('A_context_snapshot_hash', '测评上下文快照哈希', 'string', 64)
 
   const formItems = template.items.filter((item: any) => item.type === 'FORM')
-  formItems.forEach((item: any, index: number) => builder.add(`F${String(index + 1).padStart(3, '0')}_value`, `[表单] ${packageSlotLabels.get(item.position) ?? item.formLabel}`, 'string', 80))
+  const sectionSources = new Map(typedSections.flatMap(section=>section.items.map(item=>[item.id,{sectionKey:section.id,sectionDefinitionHash:canonicalHash(section),factsSchemaVersion:(section.items.some(item=>item.formPolicy!=null)?3:2) as 2|3}] as const)))
+  const typedColumns = new Map<string,ReturnType<typeof typedFormExportColumns>>()
+  formItems.forEach((item: any, index: number) => {
+    if(item.formDefinition!=null) {
+      const columns=typedFormExportColumns(item,index,detail,sectionSources.get(item.id)); typedColumns.set(item.id,columns)
+      for(const {field} of columns) { builder.add(field.name,field.label,field.type,field.width,field.decimals,field); Object.assign(builder.fields.find(f=>f.name===field.name)!,field) }
+    } else builder.add(`F${String(index + 1).padStart(3, '0')}_value`, `[表单] ${packageSlotLabels.get(item.position) ?? item.formLabel}`, 'string', 80)
+  })
 
   template.items.forEach((item: any, index: number) => {
     const prefix = slotPrefix('S', index)
@@ -350,10 +367,17 @@ export const getExportData = async (
     }
   })
 
+  // One bounded query for all selected current epochs; never one query per attempt.
+  const snapshots = hasTypedForms && template.attempts.length ? await prisma.assessmentUnitSnapshot.findMany({where:{OR:template.attempts.map(attempt=>({compositeAttemptId:attempt.id,attemptEpoch:attempt.attemptEpoch})),unitType:'FORM_SECTION'}}) : []
+  const snapshotsByAttempt = new Map<string,typeof snapshots>()
+  for(const snapshot of snapshots) { const rows=snapshotsByAttempt.get(snapshot.compositeAttemptId!)??[]; rows.push(snapshot); snapshotsByAttempt.set(snapshot.compositeAttemptId!,rows) }
   const rows: Record<string, unknown>[] = []
   let trialCount = 0
   for (const attempt of template.attempts as any[]) {
     const readableFormAnswers = readContextFormAnswers(formItems, attempt.formAnswers)
+    const formStates = new Map<string,import('../assessment-runtime/typed-form-facts').TypedFormMetadata>()
+    const canonicalValues = hasTypedForms ? readLoadedCompositeTypedFormValues(attempt,typedSections,snapshotsByAttempt.get(attempt.id)??[],formStates) : new Map()
+    const legacyValues = new Map(readableFormAnswers.map((answer:any)=>[answer.itemId,answer.value]))
     const row: Record<string, unknown> = {
       U_id: attempt.anonymousCode || (attempt.userId ? `U${attempt.userId.substring(0, 8)}` : 'ANONYMOUS'),
       A_attempt_id: attempt.id,
@@ -366,7 +390,8 @@ export const getExportData = async (
 
     for (let index = 0; index < formItems.length; index += 1) {
       const item = formItems[index]
-      row[`F${String(index + 1).padStart(3, '0')}_value`] = readableFormAnswers.find((answer: any) => answer.itemId === item.id)?.value ?? null
+      if(item.formDefinition!=null) for(const column of typedColumns.get(item.id)??[]) row[column.field.name]=column.read(canonicalValues.get(item.id)??null,formStates.get(item.id))
+      else row[`F${String(index + 1).padStart(3, '0')}_value`] = canonicalValues.has(item.id)?legacyFormValueProjection(canonicalValues.get(item.id)??null):legacyValues.get(item.id)??null
     }
 
     for (let index = 0; index < template.items.length; index += 1) {
@@ -504,11 +529,17 @@ export const getExportData = async (
   // 动态字段在遍历数据时才会出现，确保每一行具有稳定列集合。
   for (const row of rows) for (const field of builder.fields) if (!(field.name in row)) row[field.name] = null
   assertExportLimits({ records: rows.length, fields: builder.fields.length, trials: trialCount })
-  return { assessmentId: template.id, assessmentName: template.name, detail, fields: builder.fields, rows, trialCount }
+  return { ...(hasTypedForms?{typedFormExportVersion:"training-form-export-v1"}:{}), assessmentId: template.id, assessmentName: template.name, detail, fields: builder.fields, rows, trialCount }
 }
 
 export const exportToCSV = (data: CompositeExportData) => {
-  return exportCognitiveToCSV(data)
+  if(!data.fields.some(field=>field.formSource)) return exportCognitiveToCSV(data)
+  // Only new typed text cells use the shared strengthened guard. Legacy bytes stay unchanged.
+  const typedTextFields=new Set(data.fields.filter(field=>field.formSource && field.type==='string').map(field=>field.name))
+  const rows=data.rows.map(row=>Object.fromEntries(Object.entries(row).map(([name,value])=>{
+    return [name,typedTextFields.has(name)?protectCsvCell(value):value]
+  })))
+  return exportCognitiveToCSV({...data,rows})
 }
 
 export const makeFileName = (assessmentId: string, detail: CompositeExportDetail, format: CompositeExportFormat) => {
@@ -523,6 +554,7 @@ export const saveExportFiles = async (
   data?: CompositeExportData
 ) => {
   const exportData = data ?? await getExportData(assessmentId, options)
+  if(format==='sav' && (exportData.typedFormExportVersion || exportData.fields.some(field=>field.formSource))) throw compositeBadRequest('TYPED_FORM_SAV_NOT_SUPPORTED: typed Form 仅支持 CSV/ZIP 无损导出')
   assertExportLimits({
     records: exportData.rows.length,
     fields: exportData.fields.length,

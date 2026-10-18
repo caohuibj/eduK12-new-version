@@ -24,6 +24,7 @@ def main():
     parser.add_argument('--state', type=Path, required=True)
     parser.add_argument('--hold-seconds', type=int, default=3600)
     parser.add_argument('--whole-submit', action='store_true', help='Enable whole-submit only in this isolated synthetic stack')
+    parser.add_argument('--export-processing', action='store_true', help='Enable original export consumer only in this disposable synthetic stack')
     args = parser.parse_args()
     if not 1 <= args.hold_seconds <= 28800:
         parser.error('hold-seconds must be 1..28800')
@@ -136,6 +137,10 @@ def main():
             'HEAVY_PROCESSING_ENABLED': 'false', 'VIDEO_PROCESSING_ENABLED': 'false',
             'ASSESSMENT_REPORT_ASYNC_ENABLED': 'true', 'UPLOAD_DIR': str(state / 'uploads'),
         }
+        if args.export_processing:
+            runtime['EXPORT_DIR'] = str(state / 'exports')
+            runtime['HEAVY_PROCESSING_ENABLED'] = 'true'
+            runtime['HEAVY_MAINTENANCE_IDLE_CONFIRMED'] = 'true'
         if args.whole_submit:
             runtime['ASSESSMENT_WHOLE_SUBMIT_ENABLED'] = 'true'
         # This file is private runtime configuration, never a repository artifact.

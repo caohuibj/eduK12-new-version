@@ -3,6 +3,7 @@ import { buildZipStore } from '../modules/cognitive/export-zip'
 import { assertExportLimits } from './exportStorage'
 
 export type DictionaryField = {
+  formSource?: unknown
   name: string; label: string; type: string; unit?: string | null
   allowedValues?: unknown[]; missingMeaning?: string
 }
@@ -11,6 +12,7 @@ export type DictionaryField = {
  * rebuilds fields from live definitions after disclosure projection. */
 export function wideExportPackage(csv: string, fields: DictionaryField[], source: { resourceType: 'COGNITIVE' | 'COMPOSITE'; resourceId: string; detail: string }) {
   const columns = fields.map(field => ({
+    ...(field.formSource ? { formSource: field.formSource } : {}),
     name: field.name, label: field.label, type: field.type, unit: field.unit ?? null,
     allowedValues: field.allowedValues ?? null,
     missingMeaning: field.missingMeaning ?? '未作答、来源不可用、无法计算或按披露规则隐藏；请结合质量及版本列判断',

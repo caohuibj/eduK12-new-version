@@ -1,3 +1,4 @@
+import { ReadonlyFormAnswer } from '../assessment-core/form/ReadonlyFormAnswer'
 import { isTrainingHost } from '../../training/context'
 import '../../training/training-form-surface.css'
 import { withReportReadRecovery } from './receipt-recovery'
@@ -28,6 +29,8 @@ const formatDuration = (ms: number) => {
 }
 
 type LegacyCompositeModule = Record<string, unknown> & {
+  typedValue?: string | number | string[] | Record<string,string|number|string[]> | null
+  presentation?: {type:string;options:Array<{key:string;label:string}>;rows:Array<{key:string;label:string}>}
   state?: string
   rowStates?: Record<string, string>
   otherText?: string | null
@@ -319,9 +322,9 @@ const CompositeReportPage: React.FC = () => {
           <div key={background.itemId} className="report-metric">
             <div className="report-metric__label">{background.label || '表单回答'}</div>
             {background.state && <p className="mt-1 text-sm text-gray-600">{formStateLabels[background.state] ?? '作答状态待核对'}</p>}
-            <div className="mt-1 whitespace-pre-wrap text-sm text-gray-800">{background.displayValue ?? background.value ?? (background.state ? '—' : isTrainingHost() && !publicMode ? '未作答' : '—')}</div>
+            {background.presentation ? <ReadonlyFormAnswer value={background.typedValue??null} presentation={background.presentation} state={background.state} rowStates={background.rowStates} /> : <div className="mt-1 whitespace-pre-wrap text-sm text-gray-800">{background.displayValue ?? background.value ?? (background.state ? '—' : isTrainingHost() && !publicMode ? '未作答' : '—')}</div>}
             {background.otherText && <p className="mt-1 whitespace-pre-wrap text-sm">其他说明：{background.otherText}</p>}
-            {background.rowStates && <ul className="mt-1 text-sm">{Object.entries(background.rowStates).map(([key, state]) => <li key={key}>{key}：{formStateLabels[state] ?? '作答状态待核对'}</li>)}</ul>}
+            {!background.presentation && background.rowStates && <ul className="mt-1 text-sm">{Object.entries(background.rowStates).map(([key, state]) => <li key={key}>{key}：{formStateLabels[state] ?? '作答状态待核对'}</li>)}</ul>}
           </div>
         ))}</div>
       </ReportSection>}

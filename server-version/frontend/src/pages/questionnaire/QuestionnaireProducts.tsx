@@ -1,3 +1,4 @@
+import { TypedFormExportActions } from '../../modules/composite/TypedFormExportActions'
 import { StructuredFormConstraints } from '../../modules/assessment-core/form/StructuredFormConstraints'
 import { BasicFormConstraints } from '../../modules/assessment-core/form/BasicFormConstraints'
 import type { FormQuestion } from '../../modules/assessment-core/form/types'
@@ -906,6 +907,7 @@ export function QuestionnaireProductEdit() {
                 <ProductButton disabled={busy} onClick={() => void exportAll()}>
                   导出独立报告（JSON）
                 </ProductButton>
+                {detail.items?.some((item:{formDefinition?:unknown})=>item.formDefinition!=null) && <TypedFormExportActions key={id} assessmentId={id} />}
                 {detail.status === 'PUBLISHED' && (
                   <ProductButton variant="danger"
                     disabled={busy || dirty}

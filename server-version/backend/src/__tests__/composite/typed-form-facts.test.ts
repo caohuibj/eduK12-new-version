@@ -81,7 +81,7 @@ describe('Training typed Form facts foundation', () => {
     const facts = canonicalFacts(s, 12.3456)
     const parent = { id: 'attempt', attemptEpoch: 1, runtimeGeneration: 'UNIFIED_V1', compositeAssessment: { id: 'parent', items: [{ type: 'FORM', formDefinition: question('NUMBER') }], formSections: [{ ...s, items: s.items.map(item => ({ ...item, formPlaceholder: item.placeholder })) }] } }
     const { formSectionSlotKey } = await import('../../modules/assessment-runtime/slot-set')
-    mocks.findMany.mockResolvedValue([{ slotKey: formSectionSlotKey(s.id), terminalState: 'COMPLETED', payloadKind: 'COLLECTION_FACTS', unitType: 'FORM_SECTION', sourceType: 'COMPOSITE_FORM_SECTION', sourceDefinitionHash: canonicalHash(s), collectionFactsEncrypted: encryptUnifiedRuntimePayload(facts) }])
+    mocks.findMany.mockResolvedValue([{ compositeAttemptId:'attempt', attemptEpoch:1, slotKey: formSectionSlotKey(s.id), terminalState: 'COMPLETED', payloadKind: 'COLLECTION_FACTS', unitType: 'FORM_SECTION', sourceType: 'COMPOSITE_FORM_SECTION', sourceDefinitionHash: canonicalHash(s), collectionFactsEncrypted: encryptUnifiedRuntimePayload(facts) }])
     const values = await loadCompositeTypedFormValues(parent)
     expect(values.get('db-id')).toBe(12.3456)
     expect(values.has('legacy')).toBe(true)
@@ -89,11 +89,11 @@ describe('Training typed Form facts foundation', () => {
     mocks.findMany.mockResolvedValue([])
     await expect(loadCompositeTypedFormValues(parent)).rejects.toThrow()
   })
-  it('rejects typed export before enqueue and preserves lightweight legacy context', async () => {
+  it('authorizes typed CSV/ZIP and preserves lightweight legacy context', async () => {
     mocks.findComposite.mockResolvedValue({ id: 'parent', createdBy: 'teacher', productKind: 'QUESTIONNAIRE', _count: { items: 0 } })
     await expect(getExportContext('teacher', 'TEACHER', 'parent')).resolves.toMatchObject({ id: 'parent' })
     mocks.findComposite.mockResolvedValue({ id: 'parent', createdBy: 'teacher', productKind: 'QUESTIONNAIRE', _count: { items: 1 } })
-    await expect(getExportContext('teacher', 'TEACHER', 'parent')).rejects.toMatchObject({ statusCode: 400, message: expect.stringContaining('TYPED_FORM_EXPORT_NOT_AVAILABLE') })
+    await expect(getExportContext('teacher', 'TEACHER', 'parent')).resolves.toMatchObject({ id: 'parent', _count: {items:1} })
   })
   it('expands only the composite wire contract', () => {
     const payload = { submissionId: 'typed-submission-id', attemptEpoch: 1, definitionHash: 'hash', answers: [{ formItemId: 'db-id', value: { a: 20, b: 80 } }] }

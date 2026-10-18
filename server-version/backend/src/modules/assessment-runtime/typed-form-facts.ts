@@ -52,8 +52,17 @@ export const loadCompositeTypedFormValues = async (attempt: {
     compositeAttemptId: attempt.id, attemptEpoch: attempt.attemptEpoch,
     slotKey: { in: sections.map(section => formSectionSlotKey(section.id)) },
   } })
+  return readLoadedCompositeTypedFormValues(attempt, sections, snapshots, metadata)
+}
+
+export type TypedFormMetadata = {state:string;rowStates?:Record<string,string>;otherText?:string}
+/** Pure reader for an authorized, batched current-epoch source. Shares the exact
+ * canonical validation with report reads, without one database query per row. */
+export const readLoadedCompositeTypedFormValues = (attempt: {id:string;attemptEpoch:number;runtimeGeneration?:string|null}, sections:CompositeSection[], snapshots:ReadonlyArray<any>, metadata?:Map<string,TypedFormMetadata>):Map<string,TypedFormValue> => {
+  const result = new Map<string,TypedFormValue>()
+  if (attempt.runtimeGeneration !== 'UNIFIED_V1') invalid('typed Form 缺少统一运行时事实')
   for (const section of sections) {
-    const found = snapshots.filter(snapshot => snapshot.slotKey === formSectionSlotKey(section.id))
+    const found = snapshots.filter(snapshot => snapshot.slotKey === formSectionSlotKey(section.id) && snapshot.compositeAttemptId === attempt.id && snapshot.attemptEpoch === attempt.attemptEpoch)
     const row = found[0]
     if (found.length !== 1 || row.terminalState !== 'COMPLETED' || row.payloadKind !== 'COLLECTION_FACTS' || row.unitType !== 'FORM_SECTION' || row.sourceType !== 'COMPOSITE_FORM_SECTION' || row.sourceDefinitionHash !== canonicalHash(section) || !row.collectionFactsEncrypted) invalid('typed Form 权威快照缺失或冻结绑定不匹配')
     const facts = readFormSectionCollectionFacts(decryptUnifiedRuntimePayload<unknown>(row.collectionFactsEncrypted!))
