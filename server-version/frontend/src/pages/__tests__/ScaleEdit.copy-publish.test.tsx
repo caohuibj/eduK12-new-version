@@ -128,6 +128,27 @@ describe('ScaleEdit safe copy, draft editing and publication', () => {
     expect(api.put.mock.calls.every(([url]) => url.startsWith('/scales/copy'))).toBe(true)
   })
 
+  it('exposes an exact visibility combobox name and persists COURSE when saving the draft', async () => {
+    let stored: any = draft()
+    api.get.mockImplementation(async () => ok(structuredClone(stored)))
+    api.put.mockImplementation(async (url: string, body: any) => {
+      if (url.endsWith('/definition')) stored.definition = structuredClone(body.definition)
+      else { const { expectedUpdatedAt: _, ...metadata } = body; stored = { ...stored, ...metadata } }
+      return ok(structuredClone(stored))
+    })
+    const user = userEvent.setup()
+    render(editor('/scales/copy'))
+    const visibility = await screen.findByRole('combobox', { name: '可见性', exact: true })
+    expect(screen.getByLabelText('可见性', { exact: true })).toBe(visibility)
+    expect(visibility).toHaveAccessibleName('可见性')
+    await user.selectOptions(visibility, 'COURSE')
+    await user.click(screen.getByRole('button', { name: '保存草稿', exact: true }))
+    await screen.findByText('草稿内容已保存', { exact: true })
+    expect(api.put.mock.calls[0]).toEqual(['/scales/copy', expect.objectContaining({ visibility: 'COURSE' })])
+    expect(stored.visibility).toBe('COURSE')
+    expect(screen.getByRole('combobox', { name: '可见性', exact: true })).toHaveValue('COURSE')
+  })
+
   it.each([
     ['shared', { copyEligibility: { allowed: false, reason: '仅创建者可复制此量表' } }],
     ['standard', { instrumentClass: 'STANDARD', copyEligibility: { allowed: true } }],

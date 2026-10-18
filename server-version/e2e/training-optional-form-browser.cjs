@@ -251,7 +251,11 @@ async function main() {
     const scaleStarted = student.waitForResponse(r => new URL(r.url()).pathname === '/api/scales/' + scaleCopyId + '/assessments' && r.request().method() === 'POST')
     await student.goto(base + '/student/scales/' + scaleCopyId)
     assert.equal((await scaleStarted).status(), 200)
-    await student.getByRole('radio', { name: '是', exact: true }).check()
+    // FINAL_ONLY updates controlled radio state after durable IndexedDB persistence.
+    const selectedAnswer = student.getByRole('radio', { name: '是', exact: true })
+    await selectedAnswer.click()
+    await student.waitForFunction(() => Array.from(document.querySelectorAll('input[type=radio]')).some(input => input.checked && input.closest('label')?.textContent?.trim() === '是'))
+    assert.equal(await selectedAnswer.isChecked(), true)
     const scaleFinal = student.waitForResponse(r => /\/api\/scales\/assessments\/[^/]+\/submit$/.test(new URL(r.url()).pathname) && r.request().method() === 'POST')
     await student.getByRole('button', { name: '完成测评', exact: true }).click()
     assert.equal((await scaleFinal).status(), 200)
