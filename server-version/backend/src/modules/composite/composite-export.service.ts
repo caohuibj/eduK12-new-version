@@ -390,13 +390,21 @@ export const getExportData = async (
     }
   })
 
-  // One bounded query for all selected current epochs; never one query per attempt.
-  const snapshots = (hasTypedForms || hasSituational) && template.attempts.length ? await prisma.assessmentUnitSnapshot.findMany({where:{OR:template.attempts.map(attempt=>({compositeAttemptId:attempt.id,attemptEpoch:attempt.attemptEpoch})),unitType:{in:[...(hasTypedForms ? ['FORM_SECTION' as const] : []), ...(hasSituational ? ['SITUATIONAL' as const] : [])]}}}) : []
+  // Flow scopes already authenticated one batch of all current-epoch facts.
+  // Consume those exact rows, rather than rereading a potentially changed set.
+  // Other exports retain their original single bounded snapshot query.
+  const flowSnapshots = (template as any).trainingFlowFrozen != null ? template.attempts.flatMap(attempt => {
+    const flow = variantGraph?.scopes.get(attempt.id)?.flow
+    if (!flow) throw new Error('Training flow export verified scope missing')
+    return flow.snapshots
+  }) : null
+  const snapshots = flowSnapshots ?? ((hasTypedForms || hasSituational) && template.attempts.length ? await prisma.assessmentUnitSnapshot.findMany({where:{OR:template.attempts.map(attempt=>({compositeAttemptId:attempt.id,attemptEpoch:attempt.attemptEpoch})),unitType:{in:[...(hasTypedForms ? ['FORM_SECTION' as const] : []), ...(hasSituational ? ['SITUATIONAL' as const] : [])]}}}) : [])
   const snapshotsByAttempt = new Map<string,typeof snapshots>()
   for(const snapshot of snapshots) { const rows=snapshotsByAttempt.get(snapshot.compositeAttemptId!)??[]; rows.push(snapshot); snapshotsByAttempt.set(snapshot.compositeAttemptId!,rows) }
   const situationalSlots = hasSituational ? (variantGraph?.frozenSlotSets ?? await loadSituationalExportSlotSets(template.attempts)) : new Map()
   const situationalByAttempt = new Map(template.attempts.map(attempt => [attempt.id,
-    hasSituational ? readSituationalExportResults(attempt, snapshotsByAttempt.get(attempt.id) ?? [], situationalSlots.get(attempt.id)!) : new Map()]))
+    hasSituational ? readSituationalExportResults({ ...attempt, compositeAssessment: template }, snapshotsByAttempt.get(attempt.id) ?? [],
+      situationalSlots.get(attempt.id)!, variantGraph?.scopes.get(attempt.id)) : new Map()]))
   const visibleSjtSlots = new Set(template.items.filter(item => item.type === 'SITUATIONAL').map(item => `situational:${item.id}`))
   for (const plan of situationalSlots.values()) for (const slot of plan.slots) if (slot.unitType === 'SITUATIONAL' && !visibleSjtSlots.has(slot.slotKey)) throw new Error('SJT export frozen slot has no export column')
   const situationalColumns = new Map<string, ReturnType<typeof situationalExportColumns>>()
@@ -451,7 +459,7 @@ export const getExportData = async (
       const item: any = template.items[index]
       const prefix = slotPrefix('S', index)
       if (scope && !scope.itemIds.has(item.id)) {
-        if (item.type === 'SITUATIONAL') Object.assign(row, situationalColumns.get(item.id)!.read(null, 'NOT_APPLICABLE'))
+        if (item.type === 'SITUATIONAL') Object.assign(row, situationalColumns.get(item.id)!.read(null, scope.flow ? 'NOT_SHOWN' : 'NOT_APPLICABLE'))
         continue
       }
       if (item.type === 'SITUATIONAL') {

@@ -15,9 +15,14 @@ def main():
     parser.add_argument('--tools', type=Path, required=True); parser.add_argument('--state', type=Path, required=True)
     args = parser.parse_args(); db = m.Database(args.tools, args.state)
     assert db.status['state'] == 'restoring'
-    assert json.loads((args.state / 'c19-main-result.json').read_text())['passed'] is True
+    main_evidence=args.state/'c19-main-result.json'
+    if not main_evidence.exists():
+        history=json.loads((args.state/'c19-accepted-history.json').read_text())
+        main_evidence=args.state/'c19-main-remaining-result.json'
+        assert m.sha_file(main_evidence)==history['main-remaining']['resultSha256']
+    assert json.loads(main_evidence.read_text())['passed'] is True
     target = args.state / 'c19-restore-result.json'; assert not target.exists()
-    result = {'passed': False, 'checks': []}
+    result = {'passed': False, 'checks': [], 'acceptedMainProducer':{'file':main_evidence.name,'sha256':m.sha_file(main_evidence)}}
     try:
         result['retainedFacts'] = db.original_rows_unchanged(json.loads((args.state / 'c19-original-rows-private.json').read_text()))
         snapshot = db.snapshot(); assert len(snapshot['columns']) == 211

@@ -8,7 +8,10 @@ import { loadSituationalExportSlotSets, readSituationalExportResults as readBoun
 vi.mock('../../modules/assessment-runtime/security', () => ({ decryptUnifiedRuntimePayload: (value: string) => JSON.parse(value) }))
 import { createFrozenActiveSlotSet, type FrozenActiveSlotSetV1 } from '../../modules/assessment-runtime/slot-set'
 import { publicTemplates } from '../../modules/assessment-runtime/public-templates'
-vi.mock('../../modules/assessment-runtime/public-templates', () => ({ publicTemplates: { loadMany: vi.fn() } }))
+vi.mock('../../modules/assessment-runtime/public-templates', () => {
+  const publicTemplates = { loadMany: vi.fn() }
+  return { publicTemplates, publicTemplatesForDatabase: () => publicTemplates }
+})
 const parent = { id: 'parent', attemptEpoch: 2, contextSnapshotHash: 'context' }
 const core: CanonicalUnitResultCoreV1 = {
   schemaVersion: 1, unitType: 'SITUATIONAL', instrumentKey: 'accepted', instrumentVersion: '1',

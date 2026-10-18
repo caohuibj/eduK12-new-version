@@ -6,6 +6,7 @@ import type { AssessmentUnitSnapshot, Prisma } from '@prisma/client'
 import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { parseCanonicalUnitResultEnvelope, type CanonicalUnitResultEnvelopeV1 } from '../assessment-runtime/unit-result'
 import type { CompositeExportField } from './composite-export.service'
+import { assertVerifiedTrainingAttemptScope, type TrainingAttemptScope } from './training-variant-scope'
 
 export const SITUATIONAL_CANONICAL_EXPORT_VERSION = 'composite-sjt-canonical-summary-v2'
 
@@ -39,17 +40,33 @@ export async function loadSituationalExportSlotSets(attempts: ReadonlyArray<Expo
 /** Only accepted, current-epoch unit facts are inputs. No child/raw/template read
  * or rescoring is permitted, even when the enclosing export requests full detail. */
 export function readSituationalExportResults(
-  attempt: { id: string; attemptEpoch: number; contextSnapshotHash?: string | null },
+  attempt: ExportParent & { compositeAssessment?: unknown },
   snapshots: ReadonlyArray<AssessmentUnitSnapshot>,
   frozen: FrozenActiveSlotSetV1,
+  verifiedScope?: TrainingAttemptScope,
 ): Map<string, CanonicalUnitResultEnvelopeV1 | null> {
   if (frozen.attemptEpoch !== attempt.attemptEpoch) throw new Error('SJT export frozen epoch mismatch')
+  const flow = verifiedScope?.flow
+  if (flow) {
+    assertVerifiedTrainingAttemptScope(attempt, attempt.compositeAssessment, verifiedScope!)
+    if (frozen.snapshotHash !== attempt.frozenActiveSlotSetHash || frozen.snapshotHash !== flow.frozenSlots.snapshotHash) {
+      throw new Error('SJT export flow slot binding mismatch')
+    }
+  }
   const slots = new Map(frozen.slots.filter(slot => slot.unitType === 'SITUATIONAL').map(slot => [slot.slotKey, slot]))
   const result = new Map<string, CanonicalUnitResultEnvelopeV1 | null>()
   for (const row of snapshots) {
-    if (row.unitType !== 'SITUATIONAL') continue
     const slot = slots.get(row.slotKey)
+    if (row.unitType !== 'SITUATIONAL') {
+      if (slot) throw new Error('SJT export snapshot unit type mismatch')
+      continue
+    }
     if (!slot || !slot.runtimeIdentity) throw new Error('SJT export snapshot not in frozen slots')
+    // An END/conditional skip has no FINAL. Never filter an injected row into
+    // a seemingly legitimate missing value, even if its canonical body is valid.
+    if (flow && (!flow.executedSlotKeys.has(row.slotKey) || !flow.reachedSlotKeys.has(row.slotKey))) {
+      throw new Error('SJT export snapshot outside executed flow')
+    }
     if (row.compositeAttemptId !== attempt.id || row.attemptEpoch !== attempt.attemptEpoch
       || !row.slotKey.startsWith('situational:') || result.has(row.slotKey)) throw new Error('SJT export snapshot identity mismatch')
     if (row.terminalState === 'SKIPPED' || row.terminalState === 'NOT_APPLICABLE') {
@@ -79,7 +96,13 @@ export function readSituationalExportResults(
     }
     result.set(row.slotKey, envelope)
   }
-  for (const slot of slots.values()) if (slot.required && !result.has(slot.slotKey)) throw new Error('SJT export required snapshot missing')
+  for (const slot of slots.values()) if (slot.required && !result.has(slot.slotKey)) {
+    // Only an explicit skip in the authenticated accepted path can relax the
+    // required fact check. A current/reached unit with no snapshot still fails.
+    if (flow?.skippedSlotKeys.has(slot.slotKey) && !flow.reachedSlotKeys.has(slot.slotKey) && !flow.executedSlotKeys.has(slot.slotKey)) {
+      result.set(slot.slotKey, null)
+    } else throw new Error('SJT export required snapshot missing')
+  }
   return result
 }
 
