@@ -35,6 +35,10 @@ try:
     result['checks'].append('Every original FULL02 business row including users remains exact across C16 analysis, quality and export; no re-FINAL/rescore/task rewrite')
     schema = db.columns()
     before = db.projection(schema)
+    guard_sql = "SELECT jsonb_agg(jsonb_build_object('table',t.tgrelid::regclass::text,'name',t.tgname,'enabled',t.tgenabled,'trigger',pg_get_triggerdef(t.oid),'function',pg_get_functiondef(t.tgfoid)) ORDER BY t.tgname) FROM pg_trigger t WHERE NOT t.tgisinternal AND t.tgrelid IN ('training_analysis_quality'::regclass,'training_analysis_quality_audit'::regclass)"
+    guard_definitions = json.loads(db.sql(guard_sql))
+    assert len(guard_definitions) == 4 and all(row['enabled'] == 'O' for row in guard_definitions)
+    assert db.sql("SELECT count(*) FROM pg_proc WHERE proname LIKE 'c16_test_%'") == '0'
     for table in ['training_analysis_quality', 'training_analysis_quality_audit', 'export_batches', 'export_artifacts']:
         assert before[table]['rows'] > 0, f'{table}: nonempty C16 state required'
     out = a.state / 'c16-new-format-restore'
@@ -46,6 +50,11 @@ try:
     db.restore(restored, dump, 'restore-c16')
     assert db.columns(restored) == schema
     assert db.projection(schema, restored) == before
+    assert json.loads(db.sql(guard_sql, restored)) == guard_definitions
+    assert db.sql("SELECT count(*) FROM pg_proc WHERE proname LIKE 'c16_test_%'", restored) == '0'
+    result['qualityGuardDefinitionsSha256'] = module.digest(guard_definitions)
+    result['qualityGuardCount'] = len(guard_definitions)
+    result['checks'].append('All four original quality/audit trigger and function definitions, enabled states and deferred constraint properties survive nonempty dump/restore byte-equivalently; temporary fault injection is absent')
     db.apply_role(restored)
     result.update(tableCount=len(schema), projectionSha256=module.digest(before), qualityRows=before['training_analysis_quality']['rows'], auditRows=before['training_analysis_quality_audit']['rows'])
     result['checks'].append('Nonempty C16 quality/audit, original facts, synthetic two-wave sources and original-queue export records survive pg_dump/restore exactly; restricted role verified')

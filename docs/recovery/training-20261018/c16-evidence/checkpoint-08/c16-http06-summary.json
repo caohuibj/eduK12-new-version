@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "run": "HTTP06",
+  "passed": false,
+  "phase": "ORIGINAL_C14_DISCOVERY_WITH_WRONG_ACTOR",
+  "httpStatus": 404,
+  "expectedStatusInFailedHarness": 200,
+  "publicErrorCode": "TRAINING_ANALYSIS_NOT_FOUND",
+  "qualifiedChecks": [
+    "Real restricted-role PG rejects unaudited review revision at commit and audit rewrite/review deletion; exact review/audit unchanged; outsider and mismatched source review denied",
+    "Real HTTP quality with one precisely scoped synthetic AFTER-audit revision fault fails before COMMIT; independent restricted connection sees zero review/audit, temporary injection removed and original DB guards byte-identical",
+    "Affected quality write path with named immediate audit fence still has two real PG waiters, exactly one200/one409, one new revision2/audit and unchanged EXCLUDE population",
+    "Concurrent quality CAS permits one revision/audit and rejects stale writer409; changed quality invalidates stale registration, pending generation and READY download/status",
+    "Independent quality exclusions are missing reasons, never zero scores or task failures; five excluded FINAL facts remain COMPLETED/SATISFIED and paired valid N=45",
+    "Current course authority revocation blocks pending generation and READY status/download; no stale ownership reuse",
+    "Actual dist generation pauses only after its real temporary file write; quality revision and owner revocation each invalidate pre-READY revalidation, fail the generation, remove all batch files and deny status/download",
+    "New synthetic governed execution changes resultDisclosure; current analysis, pending generation and previously READY status/download all deny raw access"
+  ],
+  "requestCount": 43,
+  "sourceHead": "3f0444a593c21d11a18eacc41f3ab260790b98f4",
+  "sourceInputsSha256": "61f5efc795d005c57836d3dbde986b795aaf11782532fd59d7f0a8d9e393a7b4",
+  "runtimeFingerprint": {
+    "schemaVersion": 1,
+    "nodeVersion": "v24.21.0",
+    "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+    "dist": {
+      "files": 5105,
+      "sha256": "eb29f842dc0291b56a6b1f8da33576a5f8daffbb25a78cc33f46eaa139fbdaca"
+    },
+    "files": {
+      "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+      "prisma/schema.prisma": "55271313c6a9bc1ac763111c3c6c25ab2417c0cce95d5a50e500e71e6d4a28ba",
+      "node_modules/.prisma/client/schema.prisma": "7ebcda72219cb93bb112ecffddc8655f72007fc490bc4c06b256d999b687bf77",
+      "node_modules/.prisma/client/index.js": "47ed6e52ffedd95a414bf7d762bb48857f08cfb4feb3f84bc875cf5e1caa96b7"
+    },
+    "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+  },
+  "processExits": {
+    "postgres": 0,
+    "redis": 0,
+    "api": 0,
+    "c16-http": 1
+  },
+  "invariants": {
+    "cleanupVerified": true,
+    "sourceUnchanged": true,
+    "resumeSourceUnchanged": true,
+    "inputsUnchanged": true
+  },
+  "privateEvidenceSha256": {
+    "c16-runtime-result.json": "4e202fca39a6c58c6eb747f8053d3d60f72c2d1ef6362ca4faa60bc3f2095d5f",
+    "c16-http-result.json": "b54c166fe9d682d7b7cdb2ff3388c7ade918d22cabb512890fec9467b3786cba",
+    "c16-http.log": "a6f8423b1f58800592c3801894f1d675fa688e6d07d92bc97bc1f0eb7417ddf3",
+    "c16-fixture-private.json": "71f379c8ae156390a288d9239347f1df474bf21d76188741b53e8b2627ed1029",
+    "current-source-inputs.json": "4b55273fb4c0571b961b86e81516998b4dce4ae58cc3ad8a1f451b4b046962c2",
+    "c16-unaudited-review-denial.log": "d12caa14e154459645a432c5c0bc5a6ece96c20b89450487f16738d8e7294972",
+    "c16-audit-fault-guards-before.log": "3220bad97e99de7fdea47e9f48ac6a0b6f0e08f5b3cdb0418513f019f71e371d",
+    "c16-audit-fault-guards-after.log": "3220bad97e99de7fdea47e9f48ac6a0b6f0e08f5b3cdb0418513f019f71e371d",
+    "c16-audit-fault-independent-counts.log": "c3ced52be95ff128cd22f36cb4216f540c7c7ecadc597af5e212ac13b370c35b",
+    "c16-audit-fault-cleanup.log": "2345067a62a8e8d8200856ed0abe0c3ce9138a52e60ce4f316c06a1f13fd141a"
+  },
+  "diagnosis": {
+    "originalCourseType": "TRAINING_COURSE",
+    "actualOwnerEqualsTaskCreator": true,
+    "actualOwnerEqualsBaselineFixtureTeacher": false,
+    "ownerRole": "TEACHER",
+    "ownerAccountDomain": "TRAINING",
+    "meaning": "Correct ownership denial; harness used wrong existing actor. Continue with actual original C14 synthetic teacher, using original fixture password already bound by C14 seed, no account/password/source changes"
+  },
+  "exports": [
+    {
+      "layout": "long",
+      "format": "csv",
+      "bytes": 568118,
+      "sha256": "521487817b61d37996e256c5324d75d7db83eee5653cb2110d25e5a86e76dfe8"
+    },
+    {
+      "layout": "long",
+      "format": "csv",
+      "bytes": 568118,
+      "sha256": "521487817b61d37996e256c5324d75d7db83eee5653cb2110d25e5a86e76dfe8"
+    }
+  ],
+  "continuation": "Reuse all eight new qualified boundary checks; continue only original-owner fact reading, missing/incomparable exports, isolated selected-group poison/duplicate and final nonempty restore",
+  "priorDeferredCommit": {
+    "prismaPromiseResolved": true,
+    "databaseMutationRolledBack": true,
+    "storedRevision": 1,
+    "auditRows": 1
+  },
+  "unauditedPgDenial": {
+    "executable": "psql16.15",
+    "processExit": 1,
+    "sqlState": "P0001",
+    "failureAt": "COMMIT",
+    "storedRevision": 1,
+    "rowUnchanged": true,
+    "independentConnectionRole": "eduk12_runtime",
+    "beforeReviewAuditSha256": "c48bc07f835d4ad10afda5e5d404886665bc0b3a244225aae486aad1f582d2ec",
+    "afterReviewAuditSha256": "c48bc07f835d4ad10afda5e5d404886665bc0b3a244225aae486aad1f582d2ec"
+  },
+  "auditHttpFault": {
+    "httpStatus": 500,
+    "originalAuditInsertSucceededBeforeSyntheticRevision2": true,
+    "failureAt": "SET CONSTRAINTS training_analysis_quality_requires_audit IMMEDIATE",
+    "independentConnectionRole": "eduk12_runtime",
+    "storedReviews": 0,
+    "storedAudits": 0,
+    "existingGuardsSha256": "3220bad97e99de7fdea47e9f48ac6a0b6f0e08f5b3cdb0418513f019f71e371d"
+  },
+  "qualityFenceRace": {
+    "actualPgWaiters": 2,
+    "lock": "courses row FOR UPDATE",
+    "concurrentRequests": 2,
+    "responses": [
+      200,
+      409
+    ],
+    "storedRevision": 2,
+    "auditRevisions": [
+      1,
+      2
+    ]
+  },
+  "duringGeneration": [
+    {
+      "mutation": "QUALITY_REVISION",
+      "actualFileWritten": true,
+      "observedBatchStatus": "PROCESSING",
+      "generation": 1,
+      "finalStatus": "FAILED",
+      "generationAndTemporaryFilesRemoved": true,
+      "statusAndDownloadDenied": true
+    },
+    {
+      "mutation": "OWNER_REVOKED",
+      "actualFileWritten": true,
+      "observedBatchStatus": "PROCESSING",
+      "generation": 1,
+      "finalStatus": "FAILED",
+      "generationAndTemporaryFilesRemoved": true,
+      "statusAndDownloadDenied": true
+    }
+  ]
+}

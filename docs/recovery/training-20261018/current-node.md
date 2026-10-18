@@ -46,3 +46,9 @@ API/报告 worker 的 1GiB RSS、低可用内存停止线已配置；尚未制�
 原 pool=6 冷 shared-slot 事务遗漏经真实 PG 等待诊断和同条件6并发修复验证闭合，未加超时或池容量。中央 outbox 的独立冷-cache、旧 null Form 六首 FINAL 并发回归已在12:51 UTC通过；既有variant full preview也已实际通过。当前是本批最小范围的限定功能资格，仍不等同全平台验收。正式浏览器 C25、完整性能 C26、跨人/配对指标 C16 留待后续。
 
 恢复入口与限制见 `c14-weighted-variants.md`、`c14-evidence/full02-qualified/summary.md`、`server-version/scripts/recovery/c14-slot-transaction-audit.md`。大型 JSON 使用 gzip mtime=0，manifest 同时列解压原 bytes/SHA；不得以压缩文件 hash 代替原证据身份。私有 PG/上传/运行密钥不在 Git 中，需按恢复规程使用合格私有 dump 或重新生成明确标注的新合成输入。
+
+## C16/C17 当前接续点（2026-10-18 14:16 UTC）
+
+独立工作树 `eduk12_c16_20261018` 的生产源码固定3f0444a5，HTTP07脚本固定a2dd31ca；此前源码修复均已由主线程逐次远端保护。HTTP01升级及HTTP03–07各自有效阶段形成限定功能动态证据，最终证据review进行中。HTTP07全部进程exit0且已停止，旧205表所有原业务行保持，新非空207表恢复一致（quality5/audit7），原4组guard/function/deferred定义及受限角色通过。
+
+原文件与私有运行状态均保留，最终dump SHA256 `8918ed028d494ff2a90f6199b363c636efd643b18036a96f19a43863025db6f9`；该私有dump及密钥不入Git。最后可用磁盘约8.36GiB，低于8GiB须停止新增大状态并报告，不能自行删除DB/证据。完整事实/权限/竞态范围与原失败见 `c16-analysis.md`。下一功能阶段为C18；C25浏览器/native/media和C26完整性能仍待实施。

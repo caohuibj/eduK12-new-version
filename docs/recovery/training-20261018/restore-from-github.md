@@ -90,3 +90,10 @@ C02 已执行当前节点重建与最小运行链，C03 开发中已执行合成
 - 脚本 `c14-variants-upgrade.py` / `c14-variants-restore.py` 使用新独立 state、PG TCP/UTC与受限运行角色；`c14-variants-resume.py` 只接受受支持的停机合格来源，不用于盲目重跑所有已通过请求。服务与客户端同一 exec，measurement lock串行，finally仅清理本轮服务。
 - 恢复后明确采用对应源码/dist/flags：新的 shared-slot 读写必须传事务 client，不得用全局连接池在持事务时再借连接。FULL02 的六优化开关开启；原 whole atomic/durable backlog 关闭，本阶段不授后者资格。旧 anonymousStudy、普通 null模式与既有 hash 保持原契约。
 - 当原目录全部丢失且私有 dump/密钥不可得，只能在官方工具和独立依赖上重新构造合成 fixture并验证，标注为新输入，不能称原私有数据已恢复。
+
+## C16/C17 分析与质量恢复补充
+
+- 第172迁移仅新增独立质量review/audit及原子审计guards；171→172在旧205表全部列/行不变下验证。受限角色不能删除review或改写audit；服务同事务显式await命名审计约束，不能移除而依赖Prisma deferred COMMIT返回值。
+- HTTP07验证非空207表、5条review/7条audit和4组原guard/function/deferred属性精确恢复，最终私有dump SHA256 `8918ed028d494ff2a90f6199b363c636efd643b18036a96f19a43863025db6f9`。运行密钥和dump不入Git；缺原件只能重造明确标注的新合成输入。
+- `c16-analysis-http.py`、`c16-analysis-smoke.mjs`、`c16-analysis-restore.py`绑定实际源码/dist/Node24.21和独立Prisma；continue-state只复用已记录有效阶段，不将原失败标绿。所有服务同exec、measurement lock串行，磁盘低于8GiB停止；无生产操作授权。
+- 原队列保存完整服务端manifest，下载必须重新验证每源权限/事实/质量。恢复不得重评分或扩大冻结集合，不得把客户端hash当权威，也不得重写原owner/课程类型来适配fixture。

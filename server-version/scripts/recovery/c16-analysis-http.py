@@ -74,7 +74,7 @@ def main():
         assert resumed_result['passed'] is False and all(resumed_result[key] is True for key in ['cleanupVerified', 'sourceUnchanged', 'inputsUnchanged'])
         assert resumed_result['phases']['upgrade']['passed'] is True and resumed_http['passed'] is False
         if continuation:
-            assert len(resumed_http['checks']) in [1, 3]
+            assert len(resumed_http['checks']) in [1, 3, 8]
             if resumed_http['checks'][0].startswith('Real HTTP two-wave 10/20/50 synthetic four-tool numeric facts'):
                 assert resumed_http['exports'] == []
                 assert resumed_http['checks'][1].startswith('Actual PostgreSQL SQL-event counts remain batch-bounded')
@@ -89,6 +89,14 @@ def main():
                 assert resumed_http['requests'][-1]['status'] == 400
                 assert resumed_http['reusedEvidence']['stage'] == 'AFTER_NUMERICAL_SQL_AUTHORITY'
                 continuation_stage = 'AFTER_QUALITY_LIST'
+            elif resumed_http['checks'][0].startswith('Real restricted-role PG rejects unaudited review'):
+                assert len(resumed_http['checks']) == 8 and len(resumed_http['exports']) == 2
+                assert len(resumed_http['duringGeneration']) == 2
+                assert resumed_http['auditHttpFault']['httpStatus'] == 500 and resumed_http['auditHttpFault']['storedReviews'] == 0
+                assert resumed_http['qualityFenceRace']['responses'] == [200, 409]
+                assert resumed_http['requests'][-1]['status'] == 404
+                assert resumed_http['reusedEvidence']['stage'] == 'AFTER_EXPORT_CAS'
+                continuation_stage = 'AFTER_DISCLOSURE'
             else:
                 assert len(resumed_http['checks']) == 1 and len(resumed_http['exports']) == 4
                 assert resumed_http['checks'][0].startswith('Original Redis queue + dist export consumer')
@@ -229,7 +237,7 @@ def main():
             if continuation:
                 for name in ['c16-fixture-private.json', 'c16-http-result.json']:
                     shutil.copyfile(resume / name, state / ('prior-' + name))
-                evidence = {'stage': continuation_stage, 'priorHead': resumed_result['head'], 'priorRuntimeResultSha256': sha_file(resume / 'c16-runtime-result.json'), 'priorHttpResultSha256': sha_file(resume / 'c16-http-result.json'), 'priorSourceInputsSha256': resumed_result['sourceInputsSha256'], 'reusedChecks': resumed_http['checks'], 'reusedMeasurements': resumed_http['measurements'], 'priorReusedEvidence': resumed_http.get('reusedEvidence'), 'reusedSqlQueryFamilies': resumed_http.get('sqlQueryFamilies'), 'reusedExports': resumed_http['exports'], 'reusedQualityRace': resumed_http.get('qualityRace')}
+                evidence = {'stage': continuation_stage, 'priorHead': resumed_result['head'], 'priorRuntimeResultSha256': sha_file(resume / 'c16-runtime-result.json'), 'priorHttpResultSha256': sha_file(resume / 'c16-http-result.json'), 'priorSourceInputsSha256': resumed_result['sourceInputsSha256'], 'reusedChecks': resumed_http['checks'], 'reusedMeasurements': resumed_http['measurements'], 'priorReusedEvidence': resumed_http.get('reusedEvidence'), 'reusedSqlQueryFamilies': resumed_http.get('sqlQueryFamilies'), 'reusedExports': resumed_http['exports'], 'reusedQualityRace': resumed_http.get('qualityRace'), 'reusedBoundaryEvidence': {key: resumed_http[key] for key in ['priorDeferredCommit', 'unauditedPgDenial', 'auditHttpFault', 'qualityFenceRace', 'duringGeneration'] if key in resumed_http}}
                 (state / 'c16-continuation.json').write_text(json.dumps(evidence, indent=2))
                 result['reusedHttp'] = evidence
         copy_source = resume or source
@@ -284,6 +292,7 @@ def main():
             result['phases']['http'] = json.loads((state / 'c16-http-result.json').read_text())
             assert result['phases']['http']['passed'] is True
             verify()
+            guard()
             run(['python3', BASE / 'c16-analysis-restore.py', '--tools', tools, '--state', state], 'c16-restore', timeout=300)
             result['phases']['restore'] = json.loads((state / 'c16-restore-result.json').read_text())
             assert result['phases']['restore']['passed'] is True

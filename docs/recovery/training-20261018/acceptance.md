@@ -55,3 +55,7 @@
 - 直接子API的selected guard有定向单元/source检查；FULL02的隐藏单元HTTP覆盖父路由与跨slot探针，未另造不可达隐藏child来声称全部native child入口独立动态覆盖。fullpreview在后续独立cold-final阶段补充真实HTTP200与异teacher拒，未计入FULL02的361请求；清null后旧artifact指纹拒绝仍只有定向/source资格。
 - 真浏览器仍C25；本节点既有EPERM结论不重复绕过。C26完整CPU/RSS/DB/吞吐与长时负载尚未执行，pool饥饿诊断及219ms单窗口不是性能收益。全部候选抽前prepare的CPU/解密/编译/媒体查询绝对成本需在C26单列。
 - gzip只是证据容器，解压bytes/SHA必须吻合manifest；原失败与旧runtime通过范围保持，不把重用数据当作当前runtime重测。
+
+## C16/C17 增量限定结果（2026-10-18 14:16 UTC）
+
+上表仍保留初始状态。课程跨人描述/配对、独立质量审核与原队列长宽表/字典已完成限定功能动态检查；最终固定证据 review 进行中。证据按 HTTP01–07 的冻结来源逐项保留，见 `c16-analysis.md` 和 `c16-evidence/`，不把失败 aggregate 改写为通过。手算四工具、真实 PG 25-query 固定来源扩展、权限与质量竞态、旧事实不变及非空恢复已覆盖；正式浏览器/全平台整合和容量仍属 C25/C26。

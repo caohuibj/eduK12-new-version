@@ -64,19 +64,23 @@ async function exportReady(f,a,layout='long',format='csv'){
  const entry=await queue(f,a,layout,format);await processExport(entry);assert.equal((await teacher.request(entry.route+'/status')).status,'READY');const bytes=await teacher.request(entry.route,'GET',undefined,200,true)
  result.exports.push({batchId:entry.queued.batchId,layout,format,bytes:bytes.length,sha256:sha(bytes)});return {...entry,bytes}
 }
-async function originalC14(teacherId){
+async function originalC14(){
  const old=JSON.parse(fs.readFileSync(path.join(state,'source-c14-http-result.json'))),first=old.completed[0],task=await prisma.compositeAssessment.findUniqueOrThrow({where:{id:first.productId},include:{items:true}}),parent=await prisma.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:first.attemptId}})
- const variants=[...new Set(old.completed.filter(row=>row.productId===task.id).map(row=>row.variantKey))];assert.equal(variants.length,2)
- const available=await teacher.request(`/courses/${parent.deliveryCourseId}/training-analysis/sources`)
+ const variants=[...new Set(old.completed.filter(row=>row.productId===task.id).map(row=>row.variantKey))],representations={};assert.equal(variants.length,2)
+ const owner=await prisma.user.findUniqueOrThrow({where:{id:task.createdBy}}),course=await prisma.course.findUniqueOrThrow({where:{id:parent.deliveryCourseId}}),seed=await prisma.user.findUniqueOrThrow({where:{username:credentials.student.username}})
+ assert.equal(course.courseType,'TRAINING_COURSE');assert.equal(course.creatorId,owner.id);assert.equal(owner.role,'TEACHER');assert.equal(owner.accountDomain,'TRAINING');assert.ok(owner.username.startsWith('c14-'));assert.equal(owner.passwordHash,seed.passwordHash)
+ const originalOwner=client();await originalOwner.login({username:owner.username,password:credentials.student.password})
+ const available=await originalOwner.request(`/courses/${parent.deliveryCourseId}/training-analysis/sources`)
  const selector={schemaVersion:1,courseId:parent.deliveryCourseId,mode:'PAIRWISE',waves:[]}
  for(const variantKey of variants){const example=old.completed.find(row=>row.productId===task.id&&row.variantKey===variantKey),snapshots=await prisma.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:example.attemptId}}),metrics=[]
-  for(const type of ['SCALE','COGNITIVE','SITUATIONAL']){const snapshot=snapshots.find(row=>row.unitType===type),envelope=await loadStoredCanonicalUnitResult(snapshot.canonicalResultEncrypted,prisma),item=task.items.find(row=>row.type===type&&example.selectedItemIds.includes(row.id));const allowed=available.list.find(row=>row.taskId===task.id&&row.variantKey===variantKey)?.metrics??[];const metric=envelope.core.metrics.find(row=>typeof row.value==='number'&&(type!=='SITUATIONAL'||row.key==='cooperation')&&(type!=='COGNITIVE'||allowed.some(value=>value.itemId===item.id&&value.metricKey===row.key)));assert.ok(metric);metrics.push({itemId:item.id,metricKey:metric.key})}
+  for(const type of ['SCALE','COGNITIVE','SITUATIONAL']){const snapshot=snapshots.find(row=>row.unitType===type),representation=decryptUnifiedRuntimePayload(snapshot.canonicalResultEncrypted);representations[type+':'+(representation?.k??'INLINE_V1')]=(representations[type+':'+(representation?.k??'INLINE_V1')]??0)+1;const envelope=await loadStoredCanonicalUnitResult(snapshot.canonicalResultEncrypted,prisma),item=task.items.find(row=>row.type===type&&example.selectedItemIds.includes(row.id));const allowed=available.list.find(row=>row.taskId===task.id&&row.variantKey===variantKey)?.metrics??[];const metric=envelope.core.metrics.find(row=>typeof row.value==='number'&&(type!=='SITUATIONAL'||row.key==='cooperation')&&(type!=='COGNITIVE'||allowed.some(value=>value.itemId===item.id&&value.metricKey===row.key)));assert.ok(metric);metrics.push({itemId:item.id,metricKey:metric.key})}
   selector.waves.push({waveKey:'original_'+variantKey,taskId:task.id,publication:task.publishedAt.toISOString(),configDigest:task.trainingVariantDigest,variantKey,metrics})
  }
- const loaded=await prisma.$transaction(tx=>loadTrainingAnalysisSources(tx,{userId:teacherId,role:'TEACHER'},selector))
+ const loaded=await prisma.$transaction(tx=>loadTrainingAnalysisSources(tx,{userId:owner.id,role:'TEACHER'},selector))
  assert.ok(loaded.source.observations.some(row=>row.metricKey==='cooperation'&&row.value===9));assert.ok(loaded.source.observations.some(row=>row.metricKey==='total'&&row.value===1));assert.ok(loaded.source.observations.some(row=>row.itemId===selector.waves[0].metrics[1].itemId&&typeof row.value==='number'))
- result.originalC14={taskId:task.id,sourceCount:loaded.manifest.attempts.length,observationCount:loaded.source.observations.length,completedFourToolFacts:old.completed.length,originalTrialCount:120,readOnly:true};check('Actual C14 four-tool accepted facts reused read-only; Scale=1/SJT cooperation=9/cognitive frozen numeric facts validated, no resubmission or rescoring')
- const bad=structuredClone(selector);bad.waves[0].metrics[1].metricKey='productIndex';await teacher.request(`/courses/${parent.deliveryCourseId}/training-analysis`,'POST',{selector:bad},deny);check('Unauthorized cognitive product index cannot be unlocked through analysis')
+ for(const wave of selector.waves)assert.ok(loaded.source.observations.some(row=>row.waveKey===wave.waveKey))
+ result.originalC14={actualCourseOwnerAuthenticated:true,variantCount:variants.length,canonicalStorageRepresentations:representations,taskId:task.id,sourceCount:loaded.manifest.attempts.length,observationCount:loaded.source.observations.length,completedFourToolFacts:old.completed.length,originalTrialCount:120,readOnly:true};check('Actual C14 four-tool accepted facts reused read-only; Scale=1/SJT cooperation=9/cognitive frozen numeric facts validated, no resubmission or rescoring')
+ const bad=structuredClone(selector);bad.waves[0].metrics[1].metricKey='productIndex';await originalOwner.request(`/courses/${parent.deliveryCourseId}/training-analysis`,'POST',{selector:bad},deny);check('Unauthorized cognitive product index cannot be unlocked through analysis');return {ownerId:owner.id,client:originalOwner,selector,sourceFingerprint:loaded.sourceFingerprint}
 }
 
 async function auditHttpFault(teacherId,passwordHash){
@@ -122,12 +126,12 @@ try{
  const continuationPath=path.join(state,'c16-continuation.json'),continuation=fs.existsSync(continuationPath)?JSON.parse(fs.readFileSync(continuationPath)):null
  let current,allQuality
  if(continuation){
-  assert.ok(['AFTER_NUMERICAL_SQL_AUTHORITY','AFTER_QUALITY_LIST','AFTER_EXPORT_CAS'].includes(continuation.stage));assert.ok([1,3].includes(continuation.reusedChecks.length))
+  assert.ok(['AFTER_NUMERICAL_SQL_AUTHORITY','AFTER_QUALITY_LIST','AFTER_EXPORT_CAS','AFTER_DISCLOSURE'].includes(continuation.stage));assert.ok([1,3,8].includes(continuation.reusedChecks.length))
   fixture=JSON.parse(fs.readFileSync(path.join(state,'prior-c16-fixture-private.json')));assert.equal(fixture.participants.length,50)
   const share=await prisma.courseShare.findFirstOrThrow({where:{courseId:fixture.courseId,sharedBy:owner.id}}),otherAccount=await prisma.user.findUniqueOrThrow({where:{id:share.sharedTo}});otherId=otherAccount.id
   await other.login({username:otherAccount.username,password:credentials.student.password});await student.login(credentials.student,'STUDENT')
   result.reusedEvidence=continuation
-  if(continuation.stage==='AFTER_EXPORT_CAS'){
+  if(['AFTER_EXPORT_CAS','AFTER_DISCLOSURE'].includes(continuation.stage)){
    // Existing export intents retain the exact pre-quality manifest below.
   }else if(continuation.stage==='AFTER_QUALITY_LIST'){
    // Refresh the frozen intent and review-row context once; do not replay the
@@ -163,13 +167,14 @@ try{
  await prisma.courseShare.create({data:{courseId:fixture.courseId,sharedBy:owner.id,sharedTo:otherId}});await other.request(root(fixture),'POST',{selector:fixture.selector},deny)
  check('Owner discovers/analyzes current Training course; nonowner, student and CourseShare-only teacher denied')
  }
- if(!['AFTER_QUALITY_LIST','AFTER_EXPORT_CAS'].includes(continuation?.stage)){
+ if(!['AFTER_QUALITY_LIST','AFTER_EXPORT_CAS','AFTER_DISCLOSURE'].includes(continuation?.stage)){
  const alias=structuredClone(fixture.selector);alias.waves[1]={...alias.waves[0],waveKey:'alias'};await teacher.request(root(fixture),'POST',{selector:alias},409)
  const full=await teacher.request(root(fixture),'POST',{selector:{...fixture.selector,mode:'FULL_CASE'}});golden(full.analysis,50,fixture);assert.equal(full.analysis.metrics[0].countKind,'COMPLETE_CASE')
  check('Same publication alias rejected 409; full-case mode retains the same explicitly matched 50 participants')
  const departed=fixture.participants[0];assert.equal((await prisma.courseStudent.deleteMany({where:{courseId:fixture.courseId,studentId:departed.id}})).count,1);const afterDeparture=await analyze(fixture);golden(afterDeparture.analysis,50,fixture);assert.equal(afterDeparture.manifest.sourceHash,current.manifest.sourceHash);assert.equal(afterDeparture.manifest.qualityHash,current.manifest.qualityHash);assert.equal(afterDeparture.manifest.sourceCount,100);check('Removing one synthetic current enrollment retains all50 historical participants and100 frozen sources; SQL diagnostics show zero CourseStudent reads')
  allQuality=await qualityRows(fixture,current);assert.equal(allQuality.length,100);check('Bounded quality list paginates 25 rows with exact 100-source manifest binding')
  }
+ if(continuation?.stage!=='AFTER_DISCLOSURE'){
  let pending,target,body,audits,review,zip
  if(continuation?.stage!=='AFTER_EXPORT_CAS'){
  const long=await exportReady(fixture,current),wide=await exportReady(fixture,current,'wide'),dict=await exportReady(fixture,current,'dictionary');zip=await exportReady(fixture,current,'long','zip')
@@ -231,7 +236,8 @@ try{
  const disclosure=await createSyntheticDisclosureBinding(prisma,fixture);const beforeDisclosure=await analyze(fixture);assert.equal(beforeDisclosure.manifest.sourceHash,current.manifest.sourceHash);const disclosureReady=await exportReady(fixture,beforeDisclosure),disclosurePending=await queue(fixture,beforeDisclosure);await disclosure.restrict()
  await teacher.request(root(fixture),'POST',{selector:fixture.selector},deny);await processExport(disclosurePending,false);await teacher.request(disclosureReady.route,'GET',undefined,deny);await teacher.request(disclosureReady.route+'/status','GET',undefined,deny)
  check('New synthetic governed execution changes resultDisclosure; current analysis, pending generation and previously READY status/download all deny raw access')
- await originalC14(owner.id)
+ }
+ const c14=await originalC14()
  const missing=await createAnalysisFixture({prisma,teacherId:owner.id,passwordHash:password.passwordHash});await addParticipants(prisma,missing,10);await addParticipants(prisma,missing,15,{missingFirst:true,nonFinalSecond:true});await addParticipants(prisma,missing,20,{omitSecond:true});const missingResult=await analyze(missing)
  assert.equal(missingResult.analysis.descriptives.find(row=>row.waveKey==='wave_1').missingByReason.UNANSWERED,5);assert.equal(missingResult.analysis.descriptives.find(row=>row.waveKey==='wave_2').missingByReason.NON_FINAL,5);assert.equal(missingResult.analysis.metrics[0].validCaseN,10)
  const incomparable=await createAnalysisFixture({prisma,teacherId:owner.id,passwordHash:password.passwordHash,incomparable:true});await addParticipants(prisma,incomparable,10);const incomparableResult=await analyze(incomparable);assert.equal(incomparableResult.analysis.metrics[0].state,'not_comparable');assert.equal(incomparableResult.analysis.metrics[0].reason,'NOT_COMPARABLE');assert.ok(incomparableResult.analysis.descriptives.every(row=>row.validN===10))
@@ -241,10 +247,12 @@ try{
  const incompatibleLong=parseCsv((await exportReady(incomparable,incomparableResult)).bytes),incompatibleWide=parseCsv((await exportReady(incomparable,incomparableResult,'wide')).bytes)
  assert.equal(incompatibleLong.rows.length,20);assert.equal(incompatibleWide.rows.length,10);assertWideMatchesLong(incompatibleLong,incompatibleWide);assert.ok(incompatibleLong.rows.every(row=>row.value===''&&row.reason==='NOT_COMPARABLE'&&row.originalFinalStatus==='COMPLETED'&&row.taskSatisfied==='true'))
  check('Unanswered, non-FINAL, absent observation, independent quality exclusion and not-comparable measurement stay distinct in HTTP analysis and actual long/wide exports; invalid comparison cells are blank, and original FINAL/task states are preserved')
- const poison=await createVariantPoisonFixture(prisma,owner.id,password.passwordHash,JSON.parse(fs.readFileSync(path.join(state,'source-c14-http-result.json'))).completed)
- const poisonedHttp=await analyze(poison);assert.equal(poisonedHttp.manifest.sourceCount,5);assert.equal(poisonedHttp.manifest.observationCount,5);assert.equal(poisonedHttp.analysis.descriptives.find(row=>row.waveKey==='selected_group').validN,5)
+ const oldScopeBefore=await prisma.$transaction(tx=>loadTrainingAnalysisSources(tx,{userId:c14.ownerId,role:'TEACHER'},c14.selector));assert.equal(oldScopeBefore.sourceFingerprint,c14.sourceFingerprint)
+ const poison=await createVariantPoisonFixture(prisma,c14.ownerId,password.passwordHash,JSON.parse(fs.readFileSync(path.join(state,'source-c14-http-result.json'))).completed)
+ const oldScopeAfter=await prisma.$transaction(tx=>loadTrainingAnalysisSources(tx,{userId:c14.ownerId,role:'TEACHER'},c14.selector));assert.equal(oldScopeAfter.sourceFingerprint,oldScopeBefore.sourceFingerprint);result.originalScopeIsolation={beforeSourceFingerprint:oldScopeBefore.sourceFingerprint,afterSourceFingerprint:oldScopeAfter.sourceFingerprint,sourceCount:oldScopeAfter.manifest.attempts.length,syntheticAddedForeignKeysOnly:true,scope:'NEGATIVE_SELECTED_READ_FIXTURE_NOT_NORMAL_CROSS_COURSE_PUBLICATION'}
+ const poisonedHttp=await analyze(poison,c14.client);assert.equal(poisonedHttp.manifest.sourceCount,5);assert.equal(poisonedHttp.manifest.observationCount,5);assert.equal(poisonedHttp.analysis.descriptives.find(row=>row.waveKey==='selected_group').validN,5)
  poisonTrace={poisonParent:poison.poisonParent,poisonChild:poison.poisonChild,sqlEvents:0,factReads:0,forbiddenFactReads:0}
- const direct=await analyzeTrainingCourse({actor:{id:owner.id,role:'TEACHER'},courseId:poison.courseId,selector:poison.selector});assert.equal(direct.manifest.sources.length,5);assert.ok(direct.manifest.sources.every(row=>poison.selectedIds.includes(row.attemptId)))
+ const direct=await analyzeTrainingCourse({actor:{id:c14.ownerId,role:'TEACHER'},courseId:poison.courseId,selector:poison.selector});assert.equal(direct.manifest.sources.length,5);assert.ok(direct.manifest.sources.every(row=>poison.selectedIds.includes(row.attemptId)))
  const trace=poisonTrace;poisonTrace=null;assert.ok(trace.sqlEvents>0&&trace.factReads>0);assert.equal(trace.forbiddenFactReads,0);result.unselectedPoisonSql={sqlEvents:trace.sqlEvents,factReads:trace.factReads,forbiddenFactReads:trace.forbiddenFactReads,selectedSources:5,otherGroupPoisonSources:1};check('Actual HTTP and PG SQL select only five frozen chosen-group sources; another group has a deliberately invalid synthetic canonical ciphertext and no child/fact query includes its parent or child identity; separate real follow-up task has zero observations, this is selected-read evidence only')
  await addDuplicate(prisma,missing);const duplicate=await teacher.request(root(missing),'POST',{selector:missing.selector},409);assert.equal(duplicate.code,'AMBIGUOUS_OBSERVATION');check('Duplicate participant×wave×metric rejected409; no implicit latest-attempt pick')
  result.passed=true
