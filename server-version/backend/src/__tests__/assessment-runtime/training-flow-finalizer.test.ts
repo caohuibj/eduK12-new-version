@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 const mocks = vi.hoisted(() => ({
   global: { $transaction: vi.fn(), compositeAssessmentAttempt: { findUnique: vi.fn() }, assessmentUnitSnapshot: { findMany: vi.fn() } },
-  tx: { $queryRaw: vi.fn(), compositeAssessmentAttempt: { findUnique: vi.fn(), updateMany: vi.fn() },
+  tx: { $queryRaw: vi.fn(), compositeAssessmentAttempt: { findUnique: vi.fn(), update:vi.fn(), updateMany: vi.fn() },
     assessmentUnitSnapshot: { findMany: vi.fn(), create: vi.fn() }, compositeReportJob: { update: vi.fn() } },
 }))
 vi.mock('../../config/database', () => ({ prisma: mocks.global }))
@@ -23,7 +23,7 @@ beforeEach(() => {
   mocks.tx.$queryRaw.mockResolvedValue([{ id: 'parent' }])
   mocks.tx.compositeAssessmentAttempt.updateMany.mockResolvedValue({ count: 1 })
 })
-function fixture(options: { termination?: 'SCREEN_OUT' | 'COMPLETE_EARLY'; refused?: boolean; sjt?: 'valid' | 'invalid' | 'empty' | 'refused' } = {}) {
+async function fixture(options: { termination?: 'SCREEN_OUT' | 'COMPLETE_EARLY'; refused?: boolean; sjt?: 'valid' | 'invalid' | 'empty' | 'refused' } = {}) {
   const items: any[] = [0, 1].map(index => ({ id: `item-${index}`, type: 'FORM', position: index * 2,
     formSectionId: `section-${index}`, formSectionPosition: 0, formType: 'single_choice', formLabel: `Question ${index}`,
     required: true, formOptions: [{ value: 'yes', label: 'Yes' }, { value: 'no', label: 'No' }],
@@ -83,12 +83,15 @@ function fixture(options: { termination?: 'SCREEN_OUT' | 'COMPLETE_EARLY'; refus
   }
   mocks.tx.compositeAssessmentAttempt.findUnique.mockResolvedValue(parent)
   mocks.tx.assessmentUnitSnapshot.findMany.mockResolvedValue(rows)
+  const proof=await resolveTrainingFlowScope(parent,composite,{db:mocks.tx,snapshotRows:rows,frozenSlots:slots,allowAdvance:true})
+  parent.trainingFlowPathEncrypted=encryptUnifiedRuntimePayload(proof!.evidence);parent.trainingFlowPathHash=proof!.pathHash
+  mocks.tx.compositeAssessmentAttempt.update.mockImplementation(async({data})=>{Object.assign(parent,data);return parent})
   return { parent, rows, slots, config }
 }
 
 describe('transaction-bound training flow finalization', () => {
   it('atomically freezes actual path and completes once without rewriting candidate slots or inventing snapshots', async () => {
-    const f = fixture(), before = JSON.stringify({ slots: f.slots, rows: f.rows })
+    const f = await fixture(), before = JSON.stringify({ slots: f.slots, rows: f.rows })
     mocks.tx.compositeAssessmentAttempt.updateMany.mockImplementation(async ({ data }) => { Object.assign(f.parent, data); return { count: 1 } })
     const result = await finalizeCompositeAttemptUnifiedIfReady(f.parent.id, f.parent)
     expect(result).toMatchObject({ status: 'COMPLETED', taskSatisfaction: 'SATISFIED', progress: 100 })
@@ -109,29 +112,29 @@ describe('transaction-bound training flow finalization', () => {
     expect(mocks.tx.compositeAssessmentAttempt.updateMany).toHaveBeenCalledTimes(1)
   })
   it('screens out with NOT_SATISFIED even with valid measurement', async () => {
-    const f = fixture({ termination: 'SCREEN_OUT' })
+    const f = await fixture({ termination: 'SCREEN_OUT' })
     expect(await finalizeCompositeAttemptUnifiedIfReady(f.parent.id, f.parent)).toMatchObject({ status: 'COMPLETED', taskSatisfaction: 'NOT_SATISFIED' })
   })
   it('keeps required Form refusal unsatisfied after an early end', async () => {
-    const f = fixture({ refused: true })
+    const f = await fixture({ refused: true })
     expect(await finalizeCompositeAttemptUnifiedIfReady(f.parent.id, f.parent)).toMatchObject({ status: 'COMPLETED', taskSatisfaction: 'NOT_SATISFIED' })
   })
   it.each(['invalid', 'empty', 'refused'] as const)('does not upgrade %s required SJT because a prior Form is valid', async sjt => {
-    const f = fixture({ sjt })
+    const f = await fixture({ sjt })
     expect(await finalizeCompositeAttemptUnifiedIfReady(f.parent.id, f.parent)).toMatchObject({ status: 'COMPLETED', taskSatisfaction: 'NOT_SATISFIED' })
   })
   it('allows valid required SJT and Form evidence to qualify', async () => {
-    const f = fixture({ sjt: 'valid' })
+    const f = await fixture({ sjt: 'valid' })
     expect(await finalizeCompositeAttemptUnifiedIfReady(f.parent.id, f.parent)).toMatchObject({ status: 'COMPLETED', taskSatisfaction: 'SATISFIED' })
   })
   it('leaves a current pending unit open, with no terminal path write', async () => {
-    const f = fixture({ sjt: 'valid' }); f.rows.pop()
+    const f = await fixture({ sjt: 'valid' }); f.rows.pop();f.parent.trainingFlowPathEncrypted=null;f.parent.trainingFlowPathHash=null;const proof=await resolveTrainingFlowScope(f.parent,f.parent.compositeAssessment,{db:mocks.tx,allowAdvance:true});f.parent.trainingFlowPathEncrypted=encryptUnifiedRuntimePayload(proof!.evidence);f.parent.trainingFlowPathHash=proof!.pathHash
     expect(await finalizeCompositeAttemptUnifiedIfReady(f.parent.id, f.parent)).toMatchObject({ status: 'IN_PROGRESS', progress: 50 })
     const data = mocks.tx.compositeAssessmentAttempt.updateMany.mock.calls[0][0].data
     expect(data).not.toHaveProperty('trainingFlowPathHash'); expect(data).not.toHaveProperty('aggregateInputHash')
   })
   it('rejects injected future facts before any completion update', async () => {
-    const f = fixture()
+    const f = await fixture()
     f.rows.push({ ...f.rows[0], id: 'future-snapshot', slotKey: 'form-section:section-1', sourceAttemptId: 'future-section-attempt',
       sourceDefinitionHash: f.slots.slots[1].sourceDefinitionIdentity.hash,
       collectionFactsEncrypted: encryptUnifiedRuntimePayload({ schemaVersion: 3, sectionKey: 'section-1',
@@ -140,7 +143,7 @@ describe('transaction-bound training flow finalization', () => {
     expect(mocks.tx.compositeAssessmentAttempt.updateMany).not.toHaveBeenCalled()
   })
   it('coalesces early-path outbox notifications in the existing job and reserves one budget permit', async () => {
-    const f = fixture(); let budgetHeld = false; let budgetReservations = 0
+    const f = await fixture(); let budgetHeld = false; let budgetReservations = 0
     mocks.tx.$queryRaw.mockImplementation(async (strings: TemplateStringsArray) => {
       const sql = strings.join('')
       if (sql.includes('INSERT INTO "composite_report_jobs"')) return [{ id: 'job', status: 'WAITING', budgetHeld }]
@@ -156,7 +159,7 @@ describe('transaction-bound training flow finalization', () => {
     expect(scope?.executedSlotKeys.size).toBe(1); expect(f.slots.slots).toHaveLength(2)
   })
   it('keeps a pending-path job waiting until the actual last executed unit is accepted', async () => {
-    const f = fixture({ sjt: 'valid' }), last = f.rows.pop()
+    const f = await fixture({ sjt: 'valid' }), last = f.rows.pop();f.parent.trainingFlowPathEncrypted=null;f.parent.trainingFlowPathHash=null
     let budgetReservations = 0
     mocks.tx.$queryRaw.mockImplementation(async (strings: TemplateStringsArray) => {
       const sql = strings.join('')
@@ -169,5 +172,28 @@ describe('transaction-bound training flow finalization', () => {
     f.rows.push(last)
     await enqueueCompositeReportForUnit(mocks.tx as any, { compositeAttemptId: f.parent.id, attemptEpoch: 1 })
     expect(budgetReservations).toBe(1); expect(mocks.tx.compositeReportJob.update).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('persisted path proof integrity',()=>{
+  it.each(['cipherOnly','hashOnly','acceptedMissing','completedMissing','changedCipher','changedHeader','changedContext'])('rejects %s on normal reads',async mode=>{
+    const f=await fixture()
+    if(mode==='cipherOnly')f.parent.trainingFlowPathHash=null
+    if(mode==='hashOnly')f.parent.trainingFlowPathEncrypted=null
+    if(mode==='acceptedMissing'||mode==='completedMissing'){f.parent.trainingFlowPathEncrypted=null;f.parent.trainingFlowPathHash=null}
+    if(mode==='completedMissing')f.parent.status='COMPLETED'
+    if(mode==='changedCipher')f.rows[0].collectionFactsEncrypted=encryptUnifiedRuntimePayload({schemaVersion:3,sectionKey:'section-0',items:[]})
+    if(mode==='changedHeader')f.rows[0].sourceAttemptId='foreign-attempt'
+    if(mode==='changedContext')f.parent.contextSnapshotHash='foreign-context'
+    await expect(resolveTrainingFlowScope(f.parent,f.parent.compositeAssessment,{db:mocks.tx,snapshotRows:f.rows,frozenSlots:f.slots})).rejects.toThrow()
+  })
+  it('persists a nonterminal proof in the same supplied transaction before waiting',async()=>{
+    const f=await fixture({sjt:'valid'});f.rows.pop();f.parent.trainingFlowPathEncrypted=null;f.parent.trainingFlowPathHash=null
+    mocks.tx.$queryRaw.mockImplementation(async(strings:TemplateStringsArray)=>strings.join('').includes('INSERT INTO "composite_report_jobs"')?[{id:'job',status:'WAITING',budgetHeld:false}]:[{id:'parent'}])
+    await enqueueCompositeReportForUnit(mocks.tx as any,{compositeAttemptId:f.parent.id,attemptEpoch:1})
+    expect(mocks.tx.compositeAssessmentAttempt.update).toHaveBeenCalledTimes(1)
+    const proof=await resolveTrainingFlowScope(f.parent,f.parent.compositeAssessment,{db:mocks.tx,snapshotRows:f.rows,frozenSlots:f.slots})
+    expect(proof?.terminal).toBe(false);expect(proof?.path.currentInstrumentKey).toBe(trainingFlowItemKey('sjt'))
+    expect(f.parent.trainingFlowPathHash).toBe(proof?.pathHash)
   })
 })

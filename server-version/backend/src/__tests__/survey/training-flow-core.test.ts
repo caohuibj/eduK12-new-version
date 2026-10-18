@@ -227,3 +227,14 @@ describe('Training accepted/pending/skipped facts and path scan',()=>{
     expect(scanTrainingFlow(flow,units,{first:accepted('no',{hasValidMeasurement:false}),scale:accepted(null,{hasValidMeasurement:false})}).taskSatisfaction).toBe('NOT_SATISFIED')
   })
 })
+
+describe('hidden accepted Form dependencies',()=>{
+  it.each([missing(),{op:'NOT',term:equals()} as FlowCondition,{op:'OR',terms:[equals(),missing()]} as FlowCondition])('suppresses the whole condition for NOT_SHOWN: %j',condition=>{
+    expect(evaluateTrainingFlowCondition(condition,{first:accepted(null,{unavailableItemKeys:['answer']})})).toBe('SKIPPED')
+  })
+  it('keeps explicitly missing or refused accepted answers distinct from hidden and pending',()=>{
+    expect(evaluateTrainingFlowCondition(missing(),{first:accepted(null)})).toBe('TRUE')
+    expect(evaluateTrainingFlowCondition(missing(),{first:{status:'PENDING'}})).toBe('PENDING')
+    expect(evaluateTrainingFlowCondition(equals(),{first:accepted('yes',{unavailableItemKeys:['another']})})).toBe('TRUE')
+  })
+})

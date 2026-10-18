@@ -42,7 +42,7 @@ describe('Training server flow presentation', () => {
     expect(screen.queryByText('不可执行的下一工具')).not.toBeInTheDocument()
   })
   it('does not infer satisfaction when terminal state has no server result', () => {
-    render(<TrainingFlowBoundary state={{ ...state, trainingFlow: { ...state.trainingFlow!, materials: [], termination: 'COMPLETE_EARLY', currentInstrumentKey: null } }} onExit={vi.fn()} onCompleted={vi.fn()}><p>工具</p></TrainingFlowBoundary>)
+    render(<TrainingFlowBoundary state={{ ...state, taskSatisfaction: 'PENDING', taskSatisfied: false, trainingFlow: { ...state.trainingFlow!, materials: [], termination: 'COMPLETE_EARLY', currentInstrumentKey: null } }} onExit={vi.fn()} onCompleted={vi.fn()}><p>工具</p></TrainingFlowBoundary>)
     expect(screen.getByRole('status')).toHaveTextContent('任务达成状态待确认')
   })
   it('never initializes, restores, or submits whole FINAL for a flow attempt', () => {

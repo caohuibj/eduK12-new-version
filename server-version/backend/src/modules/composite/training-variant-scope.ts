@@ -35,17 +35,20 @@ export type TrainingAttemptScope = {
   items:any[];formSections:any[];itemIds:Set<string>;sectionIds:Set<string>;variant:any|null;flow?:Awaited<ReturnType<typeof resolveTrainingFlowScope>>
 }
 const scopes=new WeakMap<object,TrainingAttemptScope>()
+const flowScopeBindings=new WeakMap<object,string>()
+const flowBinding=(attempt:any,composite:any)=>canonicalHash({compositeId:composite?.id??null,publishedAt:composite?.publishedAt==null?null:new Date(composite.publishedAt).toISOString(),id:attempt.id,epoch:attempt.attemptEpoch,slots:attempt.frozenActiveSlotSetHash??null,context:attempt.contextSnapshotHash??null,snapshot:attempt.trainingFlowSnapshotHash??null,path:attempt.trainingFlowPathHash??null,config:composite?.trainingFlowDigest??null})
 const verifiedDefinitions=new WeakMap<object,ReturnType<typeof parseCompiledWeightedVariants>>()
-export type TrainingAttemptScopeOptions = { db?: SharedControlDb; frozenSlotSets?: Map<string, Awaited<ReturnType<typeof loadFrozenActiveSlotSet>>> }
+export type TrainingAttemptScopeOptions = { db?: SharedControlDb; flowSnapshots?:Map<string,any[]>; verifiedScope?:TrainingAttemptScope; frozenSlotSets?: Map<string, Awaited<ReturnType<typeof loadFrozenActiveSlotSet>>> }
 export async function resolveTrainingAttemptScope(attempt:any,composite:any=attempt.compositeAssessment,options?:TrainingAttemptScopeOptions):Promise<TrainingAttemptScope>{
-  const known=scopes.get(attempt)
-  if(known)return known
+  const known=options?.verifiedScope??scopes.get(attempt)
+  if(known){if(known.flow&&flowScopeBindings.get(known)!==flowBinding(attempt,composite))throw compositeForbidden('流程scope绑定已变化');return known}
   if(!composite)throw compositeForbidden('作答缺少冻结问卷来源')
   if(trainingVariantMarkerState(attempt,composite)==='UNKNOWN')throw compositeForbidden('概率分卷来源标志未加载，不能推断旧模式')
   if(trainingFlowMarkerState(attempt,composite)==='FLOW'){
-    const flow=await resolveTrainingFlowScope(attempt,composite,{db:options?.db,frozenSlots:options?.frozenSlotSets?.get(attempt.id)})
+    const flow=await resolveTrainingFlowScope(attempt,composite,{db:options?.db,frozenSlots:options?.frozenSlotSets?.get(attempt.id),snapshotRows:options?.flowSnapshots?.get(attempt.id)})
     if(!flow)throw compositeForbidden('流程模式无法解析')
-    return {items:(composite.items??[]).filter((i:any)=>flow.itemIds.has(i.id)),formSections:(composite.formSections??[]).filter((s:any)=>flow.sectionIds.has(s.id)),itemIds:flow.itemIds,sectionIds:flow.sectionIds,variant:null,flow}
+    const resolved={items:(composite.items??[]).filter((i:any)=>flow.itemIds.has(i.id)),formSections:(composite.formSections??[]).filter((s:any)=>flow.sectionIds.has(s.id)),itemIds:flow.itemIds,sectionIds:flow.sectionIds,variant:null,flow}
+    scopes.set(attempt,resolved);flowScopeBindings.set(resolved,flowBinding(attempt,composite));return resolved
   }
   const configured=composite.trainingVariantFrozen!=null||composite.trainingVariantDigest!=null
   if(!configured){

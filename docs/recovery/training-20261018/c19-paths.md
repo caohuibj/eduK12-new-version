@@ -30,3 +30,21 @@
 ## 后续主要检查与预算
 
 每checkpoint最长30分钟备份。下一段固定build与scope/FINAL测试，随后真实PG生产dist四工具链和明确权限反例；最后新格式非空恢复与独立review。单次重型检查持工具目录measurement lock。旧null新增flow查询目标0；flow批量读取接受事实，不逐block查询；候选snapshot字节/查询/解密/实际child-session-quota计数单列，性能收益不预先声称。磁盘低于8GiB停报，不删除失败DB/历史证据。
+
+## Checkpoint 02 增量（开发中）
+
+修正每次接受 FINAL 后的非终态路径证据：在原 snapshot 后 outbox 入口，同一父锁事务写入 path cipher/hash；同步模式也写。读取须验证 cipher/hash 成对、parent/epoch/publication/config/slot 及快照头与实际密文 SHA；已有 accepted facts 或已 COMPLETED 却缺 proof 时 failclosed。只有同事务接受边界可显式推进，普通读不得自行修复。父锁内本次已验证 scope 可供同次 outbox completeness 复用。
+
+批量导出预载全部所选 attempt snapshots，按实际 item/section 集合与 epoch 分组；分析复用已验证且身份/hash绑定的 request-local scope。每人的 proof 仍独立验证，不能当授权 cache。报告集合投影明确安全 flow provenance，compact SQL加载七列，量表授权 helper 使用本事务。初始候选与后续可达准入均检查 status/grant。
+
+题级 NOT_SHOWN 显式抑制整个依赖条件，包括 NOT/OR；REFUSED/SHOWN_MISSING 为已决缺失，其 canonical 状态与资格仍保留。修正 runtime union hash 与 compiler 的 JSON normalization 一致性，避免合法 typed Form 的可选 undefined 字段触发 canonical error。
+
+有限检查：pure+finalizer 首轮 11 失败（上述规范化缺口）/26通过，修复后37通过；追加隐藏题与proof完整性后48通过。消费者首轮18旧fixture缺nullable markers失败，补齐真实旧行的显式null后46通过；同批report projector/finalizer已通过，不重复跑未变输入。四FINAL guard相关72例中4项仅源码接线断言；前端6文件62例、app/cognitive tsc与定向lint通过，仍非浏览器资格。归档 checkpoint02-development 包含失败与分项续验；不能把重复用例相加。后端 tsc04 exit0，后续少量runtime改动须由新冻结build检查。
+
+仍未完成：真实PG/HTTP四工具、并发双tab、媒体/恢复/撤销对照、非空nullable升级和dump/restore/正式角色、全部消费者动态反例、候选字节与成本实测，以及固定新版独立review。当前脚本仍由另一worker编写，未纳入此业务checkpoint。C19未验收，C25/C26未赋资格。
+
+### Checkpoint 03：消费者绑定与独立 upgrade 生产者
+
+新增19个消费者用例首轮发现2个 request-local scope 复用绑定缺口（缺 compositeId/publishedAt），已补齐；14个受影响scope/batch用例定向通过，5个未变报告投影用例复用首轮，不累计重复。尚未证明外部HTTP可利用此内部缺口。路径proof另显式绑定 contextSnapshotHash，防旧proof在背景上下文漂移时复用，其新反例待定向运行。
+
+业务checkpoint02 的同输入构建已通过全部原构建前置与 tsc，1617个输入前后SHA一致、5133个dist文件留manifest；之后上述scope改动仅需受影响tsc重emit，未变前置不重跑。新增恢复launcher/db/upgrade已静态检查并独立冻结：upgrade仅消费DB迁移/schema/role/helper/工具，不绑定尚未消费HTTP脚本或dist；真实执行仍待。未宣称升级通过。

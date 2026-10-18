@@ -24,6 +24,7 @@ export type TrainingFlowDraft=z.infer<typeof trainingFlowDraftSchema>
 export const TRAINING_FLOW_POLICY={
   schemaVersion:1,dependency:'ACCEPTED_ONLY',skippedDependency:'SKIP_WHOLE_CONDITION',
   completion:'VALID_MEASUREMENT_AND_ACCEPTED_REQUIRED_V1',material:'DISPLAY_ONLY',
+  hiddenAnswer:'SKIP_WHOLE_CONDITION',refusedAnswer:'MISSING',
 } as const
 export type FrozenTrainingFlow=TrainingFlowDraft&{
   policy:typeof TRAINING_FLOW_POLICY;unionDigest:string;flowDigest:string
@@ -78,7 +79,7 @@ export function compileTrainingFlow(input:unknown,units:readonly TrainingFlowUni
   return {...frozen,flowDigest:canonicalHash(jsonValue(frozen))}
 }
 export type TrainingFlowAcceptedFact={
-  status:'ACCEPTED';answers?:Record<string,unknown>;acceptedHash:string;
+  status:'ACCEPTED';answers?:Record<string,unknown>;unavailableItemKeys?:string[];acceptedHash:string;
   requirementSatisfied:boolean;hasValidMeasurement:boolean
 }
 export type TrainingFlowFact=TrainingFlowAcceptedFact|{status:'PENDING'}|{status:'SKIPPED'}
@@ -91,11 +92,13 @@ const getFact=(facts:TrainingFlowFacts,key:string):TrainingFlowFact|undefined=>
  * suppresses the whole condition (including NOT/OR), as declared in policy. */
 export function evaluateTrainingFlowCondition(condition:FlowCondition,facts:TrainingFlowFacts):TrainingConditionResult{
   const dependencies=new Set<string>()
+  const hiddenDependencies:Array<{instrumentKey:string;itemKey:string}>=[]
   const visit=(node:FlowCondition):void=>{
     if('terms' in node){node.terms.forEach(visit);return}
     if('term' in node){visit(node.term);return}
     if(node.field.source!=='ANSWER')fail('flow.when','课程流程不支持嵌入变量')
     dependencies.add(node.field.instrumentKey)
+    hiddenDependencies.push(node.field)
   }
   visit(condition)
   let pending=false
@@ -106,6 +109,7 @@ export function evaluateTrainingFlowCondition(condition:FlowCondition,facts:Trai
     if(!fact||fact.status==='PENDING'){pending=true;continue}
     answers[key]=Object.assign(Object.create(null),fact.answers??{})
   }
+  for(const field of hiddenDependencies){const fact=getFact(facts,field.instrumentKey);if(fact?.status==='ACCEPTED'&&fact.unavailableItemKeys?.includes(field.itemKey))return 'SKIPPED'}
   if(pending)return 'PENDING'
   return evaluateFlowCondition(condition,answers,{})?'TRUE':'FALSE'
 }
@@ -120,7 +124,7 @@ export type TrainingFlowPath={
   acceptedFacts:Array<{instrumentKey:string;acceptedHash:string;requirementSatisfied:boolean;hasValidMeasurement:boolean}>
 }
 const acceptedFactSchema=z.object({status:z.literal('ACCEPTED'),
-  acceptedHash:z.string().min(1).max(256),answers:z.record(z.unknown()).optional(),
+  acceptedHash:z.string().min(1).max(256),answers:z.record(z.unknown()).optional(),unavailableItemKeys:z.array(assessmentKeySchema).max(500).optional(),
   requirementSatisfied:z.boolean(),hasValidMeasurement:z.boolean(),
 }).strict()
 /** Pure path reconstruction from server-accepted facts. Never mutate the frozen

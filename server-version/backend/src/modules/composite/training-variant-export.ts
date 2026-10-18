@@ -57,7 +57,7 @@ export async function loadTrainingVariantExportGraph(assessmentId: string, where
   const marker = await db.$queryRaw<Array<{id: string}>>`SELECT c.id FROM composite_assessments c
     WHERE c.id=${assessmentId} AND (c.training_variant_frozen IS NOT NULL OR c.training_variant_digest IS NOT NULL
       OR c.training_variant_draft IS NOT NULL OR c.training_flow_draft IS NOT NULL OR c.training_flow_frozen IS NOT NULL OR c.training_flow_digest IS NOT NULL OR EXISTS (SELECT 1 FROM composite_assessment_attempts a
-        WHERE a.composite_assessment_id=c.id AND (a.training_variant_allocation_encrypted IS NOT NULL OR a.training_variant_allocation_hash IS NOT NULL OR a.training_flow_snapshot_hash IS NOT NULL OR a.training_flow_path_hash IS NOT NULL)))`
+        WHERE a.composite_assessment_id=c.id AND (a.training_variant_allocation_encrypted IS NOT NULL OR a.training_variant_allocation_hash IS NOT NULL OR a.training_flow_snapshot_encrypted IS NOT NULL OR a.training_flow_snapshot_hash IS NOT NULL OR a.training_flow_path_encrypted IS NOT NULL OR a.training_flow_path_hash IS NOT NULL)))`
   if (!marker.length) return null
   const template: any = await db.compositeAssessment.findUnique({ where: { id: assessmentId }, include: {
     items: { orderBy: { position: 'asc' }, include: {
@@ -76,14 +76,20 @@ export async function loadTrainingVariantExportGraph(assessmentId: string, where
   }
   assertExportLimits({records: template.attempts.length})
   const frozenSlotSets = await loadSituationalExportSlotSets(template.attempts, db)
+  const flowSnapshots=new Map<string,any[]>()
+  if(template.trainingFlowFrozen!=null&&template.attempts.length){
+    const rows=await db.assessmentUnitSnapshot.findMany({where:{OR:template.attempts.map((a:any)=>({compositeAttemptId:a.id,attemptEpoch:a.attemptEpoch}))}})
+    for(const attempt of template.attempts)flowSnapshots.set(attempt.id,[])
+    for(const row of rows)flowSnapshots.get(row.compositeAttemptId!)!.push(row)
+  }
   const scopes = new Map<string, TrainingAttemptScope>()
-  for (const attempt of template.attempts) scopes.set(attempt.id, await resolveTrainingAttemptScope(attempt, template, {frozenSlotSets, db}))
+  for (const attempt of template.attempts) scopes.set(attempt.id, await resolveTrainingAttemptScope(attempt, template, {frozenSlotSets, flowSnapshots, db}))
   if (headersOnly) return {template, scopes, frozenSlotSets}
   // Group by the immutable selection and current epoch, avoiding one OR
   // predicate per participant and quadratic child-to-parent attachment.
   const groups = new Map<string, {attemptIds: string[]; attemptEpoch: number; scope: TrainingAttemptScope}>()
   for (const attempt of template.attempts) {
-    const scope = scopes.get(attempt.id)!, key = `${scope.flow?.pathHash??trainingVariantStratumKey(scope)}:${attempt.attemptEpoch}`
+    const scope = scopes.get(attempt.id)!, key = `${scope.flow?canonicalHash({items:[...scope.itemIds].sort(),sections:[...scope.sectionIds].sort()}):trainingVariantStratumKey(scope)}:${attempt.attemptEpoch}`
     const group = groups.get(key) ?? {attemptIds: [] as string[], attemptEpoch: attempt.attemptEpoch, scope}
     group.attemptIds.push(attempt.id); groups.set(key, group)
   }

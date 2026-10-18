@@ -2570,7 +2570,7 @@ const ensureTrainingFlowCurrentChild = async (attemptId:string, context:{userId?
   const prepared:PreparedVariantRuntimes={scales:new Map(),cognitive:new Map(),assignments:new Map(),references:new Map()}
   const releases=new Map<string,ResolvedSituationalRelease>()
   if(item.type==='SCALE'){
-    if(item.scale.status!=='PUBLISHED'||!await canUseScale(composite.createdBy,composite.creator?.role??UserRole.TEACHER,item.scale))throw compositeForbidden('当前量表已不可准入')
+    if(item.scale.status!=='PUBLISHED'||!await canUseScale(composite.createdBy,composite.creator?.role??UserRole.TEACHER,item.scale,tx))throw compositeForbidden('当前量表已不可准入')
     const snapshot=await loadFrozenScaleRuntimeSnapshot(candidate.references[item.id],tx)
     prepared.scales.set(item.id,snapshot);prepared.references!.set(item.id,candidate.references[item.id])
   }else if(item.type==='COGNITIVE'){
@@ -2664,15 +2664,15 @@ const createAttempt = async (
   const variantEnabled = composite.trainingVariantFrozen != null || composite.trainingVariantDraft != null || composite.trainingVariantDigest != null
   const prepared: PreparedVariantRuntimes | undefined = (variantEnabled||flowEnabled) ? { scales:new Map(), cognitive:new Map(), assignments:new Map() } : undefined
   if (variantEnabled && relationalIdentity) throw compositeBadRequest('概率分卷不支持关系测评投放')
-  if (variantEnabled) {
-    await assertTrainingVariantAuthoringScope(db as any, composite)
+  if (variantEnabled || flowEnabled) {
+    if(variantEnabled)await assertTrainingVariantAuthoringScope(db as any, composite)
     if(!userId)composite={...composite,deliveryCourseId:composite.questionnaireCourses[0].courseId}
     // Validate every candidate before drawing. A revoked/broken candidate fails admission;
     // never redraw or silently renormalize the remaining probabilities.
     const scaleIds=composite.items.filter((i:any)=>i.type==='SCALE').map((i:any)=>i.scaleId)
     const scales=await db.scale.findMany({where:{id:{in:scaleIds}}})
     const scaleMap=new Map(scales.map((x:any)=>[x.id,x]))
-    for(const id of scaleIds){const scale:any=scaleMap.get(id);if(!scale||scale.status!=='PUBLISHED'||!scale.definition||!await canUseScale(composite.createdBy,composite.creator?.role??UserRole.TEACHER,scale))throw compositeForbidden('候选分卷的量表已不可用')}
+    for(const id of scaleIds){const scale:any=scaleMap.get(id);if(!scale||scale.status!=='PUBLISHED'||!scale.definition||!await canUseScale(composite.createdBy,composite.creator?.role??UserRole.TEACHER,scale,db))throw compositeForbidden('候选分卷的量表已不可用')}
     const cognitiveIds=composite.items.filter((i:any)=>i.type==='COGNITIVE').map((i:any)=>i.cognitiveAssignmentId)
     const cognitive=await db.cognitiveAssignment.findMany({where:{id:{in:cognitiveIds}},include:{config:true}})
     if(cognitive.length!==new Set(cognitiveIds).size)throw compositeForbidden('候选分卷的认知配置不存在')
@@ -4361,7 +4361,7 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
       const { reconcileRelationalCompositeCompletion } = await import('../assessment-relational/runtime-completion')
       await reconcileRelationalCompositeCompletion(attemptId)
     }
-    if (state.status === 'IN_PROGRESS' && state.totalItems > 0 && state.completedItems >= state.totalItems) {
+    if (state.status === 'IN_PROGRESS' && ((state as any).trainingFlow?.termination && (state as any).trainingFlow.termination!=='PENDING' || state.totalItems > 0 && state.completedItems >= state.totalItems)) {
       // Reconcile-once: patch parent completion fields onto the first projection.
       if (runtime.asyncReportEpoch === runtime.attemptEpoch) {
         const job = await readCompositeReportJobHeader(attemptId, runtime.attemptEpoch)

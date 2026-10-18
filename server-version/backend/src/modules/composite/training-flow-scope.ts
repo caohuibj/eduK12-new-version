@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
@@ -8,7 +9,7 @@ import { mapCompositeSection } from '../assessment-runtime/form-section-definiti
 import { loadStoredCanonicalUnitResults } from '../assessment-runtime/compact-assessment-storage'
 import { onlineSituationalCanonicalTaskSatisfaction } from '../situational/situational-task-satisfaction'
 import { buildTrainingFlowUnits } from './training-flow-definition'
-import { scanTrainingFlow, trainingFlowUnitKey, trainingFlowItemKey } from '../assessment-core/flow/training'
+import { scanTrainingFlow, trainingFlowUnitKey, trainingFlowItemKey, TRAINING_FLOW_POLICY } from '../assessment-core/flow/training'
 import { compositeForbidden } from './composite.errors'
 
 export const TRAINING_FLOW_DEFINITION_SELECT = { trainingFlowDraft:true, trainingFlowFrozen:true, trainingFlowDigest:true } as const
@@ -17,7 +18,7 @@ export function trainingFlowMarkerState(parent:any, definition:any=parent?.compo
   const values=[...Object.keys(TRAINING_FLOW_PARENT_SELECT).map(k=>parent?.[k]),...Object.keys(TRAINING_FLOW_DEFINITION_SELECT).map(k=>definition?.[k])]
   return values.some(v=>v===undefined)?'UNKNOWN':values.every(v=>v===null)?'LEGACY':'FLOW'
 }
-export type TrainingFlowScopeOptions={db?:any;snapshotRows?:any[];frozenSlots?:Awaited<ReturnType<typeof loadFrozenActiveSlotSet>>}
+export type TrainingFlowScopeOptions={db?:any;snapshotRows?:any[];frozenSlots?:Awaited<ReturnType<typeof loadFrozenActiveSlotSet>>;allowAdvance?:boolean}
 /** Only after parent ownership authorization. No global authorization cache. All
  * accepted facts are fetched in one batch and exact immutable source bindings
  * are checked before any compact canonical body is expanded. */
@@ -32,6 +33,8 @@ export async function resolveTrainingFlowScope(attempt:any, composite:any=attemp
   const config=composite.trainingFlowFrozen
   if(config.flowDigest!==composite.trainingFlowDigest)fail()
   const units=buildTrainingFlowUnits(composite)
+  const {flowDigest,...frozenDefinition}=config
+  if(canonicalHash(frozenDefinition)!==flowDigest||canonicalHash(JSON.parse(JSON.stringify(units)))!==config.unionDigest||canonicalHash(config.policy)!==canonicalHash(TRAINING_FLOW_POLICY))fail()
   const frozenSlots=options.frozenSlots??await loadFrozenActiveSlotSet(attempt.frozenActiveSlotSetEncrypted,db)
   if(frozenSlots.snapshotHash!==attempt.frozenActiveSlotSetHash||frozenSlots.attemptEpoch!==attempt.attemptEpoch)fail()
   const snapshot=decryptUnifiedRuntimePayload<any>(attempt.trainingFlowSnapshotEncrypted)
@@ -51,6 +54,13 @@ export async function resolveTrainingFlowScope(attempt:any, composite:any=attemp
     if(slot.unitType==='FORM_SECTION'?(row.payloadKind!=='COLLECTION_FACTS'||!row.collectionFactsEncrypted):(row.payloadKind!=='UNIT_RESULT'||!row.canonicalResultEncrypted||row.compiledRuntimeHash!==slot.sourceBinding.compiledRuntimeHash))fail()
     bySlot.set(row.slotKey,row)
   }
+  const cipherHash=(value:unknown)=>typeof value==='string'?createHash('sha256').update(value).digest('hex'):null
+  const snapshotHeadersDigest=canonicalHash(snapshots.map(row=>({id:row.id,slotKey:row.slotKey,attemptEpoch:row.attemptEpoch,sourceType:row.sourceType,sourceAttemptId:row.sourceAttemptId,sourceSubmissionId:row.sourceSubmissionId??null,sourceDefinitionHash:row.sourceDefinitionHash,compiledRuntimeHash:row.compiledRuntimeHash??null,terminalState:row.terminalState,payloadKind:row.payloadKind,canonicalCipherHash:cipherHash(row.canonicalResultEncrypted),collectionCipherHash:cipherHash(row.collectionFactsEncrypted)})).sort((a,b)=>a.slotKey.localeCompare(b.slotKey)))
+  const stored=attempt.trainingFlowPathEncrypted?decryptUnifiedRuntimePayload<any>(attempt.trainingFlowPathEncrypted):null
+  if((stored===null)!==(attempt.trainingFlowPathHash==null))fail()
+  if(!stored&&(attempt.status==='COMPLETED'||snapshots.length>0)&&!options.allowAdvance)fail()
+  if(stored&&(canonicalHash(stored)!==attempt.trainingFlowPathHash||stored.attemptId!==attempt.id||stored.attemptEpoch!==attempt.attemptEpoch||stored.compositeId!==composite.id||stored.configDigest!==config.flowDigest||stored.slotSetHash!==frozenSlots.snapshotHash||stored.contextSnapshotHash!==(attempt.contextSnapshotHash??null)||stored.publishedAt!==new Date(composite.publishedAt).toISOString()))fail()
+  const compute=async()=>{
   const native=snapshots.filter(r=>r.payloadKind==='UNIT_RESULT')
   // The parent-owned, current-epoch snapshot source ID is checked again against
   // each decoded canonical envelope; SCF2 is resolved through this same db.
@@ -66,10 +76,10 @@ export async function resolveTrainingFlowScope(attempt:any, composite:any=attemp
       if(row.sourceType!=='COMPOSITE_FORM_SECTION')fail()
       const body=readFormSectionCollectionFacts(decryptUnifiedRuntimePayload(row.collectionFactsEncrypted))
       const qualification=assertTypedCompositeFormFacts(section,body)
-      const answers:Record<string,unknown>={}
-      for(const fact of body.items){const item=section.items.find(i=>i.id===fact.key);const stable=(item as any)?.formDefinition?.itemKey;if(stable)answers[stable]=('state'in fact&&fact.state!=='ANSWERED')?null:fact.value}
+      const answers:Record<string,unknown>={},unavailableItemKeys:string[]=[]
+      for(const fact of body.items){const item=section.items.find(i=>i.id===fact.key);const stable=(item as any)?.formDefinition?.itemKey;if(stable){answers[stable]=('state'in fact&&fact.state!=='ANSWERED')?null:fact.value;if('state'in fact&&fact.state==='NOT_SHOWN')unavailableItemKeys.push(stable)}}
       const substantive=body.items.some(f=>('state'in f?f.state==='ANSWERED':true)&&f.value!==null&&f.value!==''&&(!Array.isArray(f.value)||f.value.length>0))
-      facts[key]={status:'ACCEPTED',answers,acceptedHash:canonicalHash(body),requirementSatisfied:qualification!=='NOT_SATISFIED',hasValidMeasurement:substantive}
+      facts[key]={status:'ACCEPTED',answers,unavailableItemKeys,acceptedHash:canonicalHash(body),requirementSatisfied:qualification!=='NOT_SATISFIED',hasValidMeasurement:substantive}
     }else{
       const entry=nativeFacts.get(slotKey)!,core=entry.envelope.core, provenance=entry.envelope.persistenceProvenance
       if(core.unitType!==row.unitType||core.sourceDefinitionHash!==row.sourceDefinitionHash||core.compiledRuntimeHash!==row.compiledRuntimeHash||provenance.sourceAttemptId!==row.sourceAttemptId||provenance.sourceType!==row.sourceType||(provenance.sourceSubmissionId??null)!==(row.sourceSubmissionId??null)||core.instrumentKey!==slotsByKey.get(slotKey)!.sourceDefinitionIdentity.key||core.instrumentVersion!==slotsByKey.get(slotKey)!.sourceDefinitionIdentity.version||core.contextHash!==(attempt.contextSnapshotHash??null))fail()
@@ -78,21 +88,31 @@ export async function resolveTrainingFlowScope(attempt:any, composite:any=attemp
       facts[key]={status:'ACCEPTED',acceptedHash:entry.envelope.resultHash,requirementSatisfied:valid,hasValidMeasurement:valid}
     }
   }
-  const path=scanTrainingFlow(config,units,facts)
+  return scanTrainingFlow(config,units,facts)
+  }
+  let path:Awaited<ReturnType<typeof compute>>
+  if(stored&&stored.snapshotHeadersDigest===snapshotHeadersDigest){
+    path=stored.path
+    const {pathDigest,...body}=path
+    if(canonicalHash(body)!==pathDigest||!Array.isArray(path.reachedInstrumentKeys)||!Array.isArray(path.acceptedInstrumentKeys)||!Array.isArray(path.skipped))fail()
+  }else{
+    if(stored&&!options.allowAdvance)fail()
+    path=await compute()
+  }
   const reached=new Set(path.reachedInstrumentKeys)
   // Reject injected accepted facts in a skipped/future branch, even if they are
   // valid native facts in isolation. No path can grant its own predecessor.
-  for(const[key,fact]of Object.entries(facts))if((fact as any).status==='ACCEPTED'&&!reached.has(key))fail()
+  for(const [key,slot]of unitSlots)if(bySlot.has(slot)&&!reached.has(key))fail()
   const sectionIds=new Set<string>([...sectionKeys].filter(([key])=>reached.has(key)).map(([,id])=>id))
   const itemIds=new Set<string>([...itemKeys].filter(([key])=>reached.has(key)).map(([,id])=>id))
   for(const section of composite.formSections??[])if(sectionIds.has(section.id))for(const item of section.items??[])itemIds.add(item.id)
   const reachedSlotKeys=new Set([...reached].map(k=>unitSlots.get(k)!))
-  const executedSlotKeys=new Set([...unitSlots].filter(([key])=>facts[key]?.status==='ACCEPTED').map(([,slot])=>slot))
+  const executedSlotKeys=new Set([...unitSlots].filter(([,slot])=>bySlot.has(slot)).map(([,slot])=>slot))
   const skippedSlotKeys=new Set(path.skipped.map((entry:any)=>unitSlots.get(entry.instrumentKey)!).filter(Boolean))
   const terminal=path.currentInstrumentKey==null&&path.taskSatisfaction!=='PENDING'
-  const evidence={schemaVersion:1,compositeId:composite.id,publishedAt:new Date(composite.publishedAt).toISOString(),attemptId:attempt.id,attemptEpoch:attempt.attemptEpoch,configDigest:config.flowDigest,slotSetHash:frozenSlots.snapshotHash,path}
+  const evidence={schemaVersion:1,compositeId:composite.id,publishedAt:new Date(composite.publishedAt).toISOString(),attemptId:attempt.id,attemptEpoch:attempt.attemptEpoch,configDigest:config.flowDigest,slotSetHash:frozenSlots.snapshotHash,contextSnapshotHash:attempt.contextSnapshotHash??null,snapshotHeadersDigest,path}
   const pathHash=canonicalHash(evidence)
-  if(attempt.trainingFlowPathHash!=null&&(attempt.trainingFlowPathHash!==pathHash||!attempt.trainingFlowPathEncrypted||canonicalHash(decryptUnifiedRuntimePayload(attempt.trainingFlowPathEncrypted))!==pathHash))fail()
+  if(!options.allowAdvance&&attempt.trainingFlowPathHash!=null&&attempt.trainingFlowPathHash!==pathHash)fail()
   return {config,path,pathHash,evidence,itemIds,sectionIds,reachedSlotKeys,executedSlotKeys,skippedSlotKeys,terminal,snapshots,frozenSlots,
     aggregatePathPolicy:{kind:'TRAINING_FLOW_V1' as const,terminal,reachedSlotKeys:[...reachedSlotKeys],executedSlotKeys:[...executedSlotKeys]}}
 }

@@ -30,7 +30,7 @@ const question = (id: string, position: number) => ({id, type: 'FORM', formType:
 function fixture() {
   const items = [question('item-a', 0), question('item-b', 1)]
   const formSections = items.map((item, i) => ({id: `section-${i}`, title: `Form ${i}`, position: i, contextSection: false, items: [item]}))
-  const template: any = {id: 'parent', name: '分卷', productKind: 'QUESTIONNAIRE', publishedAt: new Date('2026-10-18T00:00:00Z'), items, formSections}
+  const template: any = {trainingFlowDraft:null,trainingFlowFrozen:null,trainingFlowDigest:null,id: 'parent', name: '分卷', productKind: 'QUESTIONNAIRE', publishedAt: new Date('2026-10-18T00:00:00Z'), items, formSections}
   const config = compileWeightedVariants({schemaVersion: 1, groups: formSections.map((section, i) => ({variantKey: `group_${i}`, label: `组${i}`, weight: i ? 3 : 1, units: [{type: 'FORM_SECTION', id: section.id}]}))}, buildTrainingVariantUnion(template))
   template.trainingVariantDraft = null; template.trainingVariantFrozen = config; template.trainingVariantDigest = config.configDigest
   template.attempts = items.map((item, i) => {
@@ -38,7 +38,7 @@ function fixture() {
     const allocation = createWeightedVariantAllocation(config, {compositeId: template.id, attemptId: id, participantKey, attemptEpoch: 1, publishedAt: template.publishedAt.toISOString()}, {randomInt: () => i, assignedAt: '2026-10-18T00:00:01Z'})
     const frozen = createFrozenActiveSlotSet({schemaVersion: 1, runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1, slots: [{slotKey: `form-section:section-${i}`, unitType: 'FORM_SECTION', required: true,
       sourceDefinitionIdentity: {key: `section-${i}`, version: '2', hash: canonicalHash(mapCompositeSection(formSections[i]))}, sourceBinding: {sectionId: `section-${i}`}}]})
-    return {id, participantKey, attemptEpoch: 1, runtimeGeneration: 'UNIFIED_V1', deliveryMode: 'FINAL_ONLY', status: 'COMPLETED', taskSatisfaction: i ? 'NOT_SATISFIED' : 'SATISFIED',
+    return {trainingFlowSnapshotEncrypted:null,trainingFlowSnapshotHash:null,trainingFlowPathEncrypted:null,trainingFlowPathHash:null,id, participantKey, attemptEpoch: 1, runtimeGeneration: 'UNIFIED_V1', deliveryMode: 'FINAL_ONLY', status: 'COMPLETED', taskSatisfaction: i ? 'NOT_SATISFIED' : 'SATISFIED',
       trainingVariantAllocationEncrypted: encryptUnifiedRuntimePayload(allocation), trainingVariantAllocationHash: allocation.allocationHash,
       frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(frozen), frozenActiveSlotSetHash: frozen.snapshotHash, completedAt: new Date('2026-10-18T00:01:00Z')}
   })
@@ -107,7 +107,7 @@ describe('weighted variant export scope', () => {
 })
 
 function cognitiveFixture() {
-  const template: any = {id: 'parent', name: '认知分卷', productKind: 'QUESTIONNAIRE', publishedAt: new Date('2026-10-18T00:00:00Z'), formSections: [],
+  const template: any = {trainingFlowDraft:null,trainingFlowFrozen:null,trainingFlowDigest:null,id: 'parent', name: '认知分卷', productKind: 'QUESTIONNAIRE', publishedAt: new Date('2026-10-18T00:00:00Z'), formSections: [],
     items: ['a', 'b'].map((key, index) => ({id: `cog-${key}`, type: 'COGNITIVE', position: index, required: true, cognitiveAssignmentId: `assignment-${key}`, cognitiveAssignment: {title: `任务${key}`}}))}
   const config = compileWeightedVariants({schemaVersion: 1, groups: template.items.map((item: any, index: number) => ({variantKey: `group_${index}`, label: `组${index}`, weight: 1, units: [{type: 'ITEM', id: item.id}]}))}, buildTrainingVariantUnion(template))
   template.trainingVariantDraft = null; template.trainingVariantFrozen = config; template.trainingVariantDigest = config.configDigest
@@ -116,7 +116,7 @@ function cognitiveFixture() {
     const allocation = createWeightedVariantAllocation(config, {compositeId: template.id, attemptId: id, participantKey, attemptEpoch: 1, publishedAt: template.publishedAt.toISOString()}, {randomInt: () => index, assignedAt: '2026-10-18T00:00:01Z'})
     const frozen = createFrozenActiveSlotSet({schemaVersion: 1, runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1, slots: [{slotKey: `cognitive:${item.id}`, unitType: 'COGNITIVE', required: true,
       sourceDefinitionIdentity: {key: item.cognitiveAssignmentId, version: '1', hash: 'd'.repeat(64)}, sourceBinding: {compositeItemId: item.id, sessionId: `session-${index}`}}]})
-    return {id, participantKey, attemptEpoch: 1, runtimeGeneration: 'UNIFIED_V1', deliveryMode: 'FINAL_ONLY', status: 'COMPLETED',
+    return {trainingFlowSnapshotEncrypted:null,trainingFlowSnapshotHash:null,trainingFlowPathEncrypted:null,trainingFlowPathHash:null,id, participantKey, attemptEpoch: 1, runtimeGeneration: 'UNIFIED_V1', deliveryMode: 'FINAL_ONLY', status: 'COMPLETED',
       trainingVariantAllocationEncrypted: encryptUnifiedRuntimePayload(allocation), trainingVariantAllocationHash: allocation.allocationHash,
       frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(frozen), frozenActiveSlotSetHash: frozen.snapshotHash, completedAt: new Date('2026-10-18T00:01:00Z')}
   })

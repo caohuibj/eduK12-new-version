@@ -666,7 +666,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
 }
 
 export default function FinalCompositeShell(props: FinalCompositeAssessmentProps) {
-  return <TrainingFlowBoundary state={props.state} onExit={props.onExit} onCompleted={props.onCompleted}>
+  return <TrainingFlowBoundary state={props.state} onExit={props.onExit} onCompleted={props.onCompleted} onReload={props.onReload}>
     <FinalCompositeAssessment {...props} />
   </TrainingFlowBoundary>
 }

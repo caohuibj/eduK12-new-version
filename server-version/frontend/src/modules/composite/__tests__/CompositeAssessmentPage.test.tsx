@@ -238,3 +238,29 @@ it('routes a completed unsatisfied attempt to its report without restarting or r
   expect(mockCompositeApi.start).toHaveBeenCalledTimes(1)
   expect(mockPublicApi.start).not.toHaveBeenCalled()
 })
+
+describe('C19 server-computed terminal paths', () => {
+  it('keeps terminal materials and NOT_SATISFIED visible before explicit report navigation', async () => {
+    mockPublicApi.start.mockResolvedValue({ code: 0, data: { recoveryToken: 'recovery-flow', attempt: {
+      id: 'flow-attempt', assessmentId: 'composite-1', name: '条件课程', instruction: null,
+      status: 'COMPLETED', deliveryMode: 'FINAL_ONLY', productKind: 'QUESTIONNAIRE',
+      taskSatisfaction: 'NOT_SATISFIED', taskSatisfied: false, allUnitsSubmitted: true,
+      progress: 100, completedItems: 1, totalItems: 1, currentIndex: 1,
+      startedAt: '2026-10-18T00:00:00Z', lastSavedAt: '2026-10-18T00:00:00Z', completedAt: '2026-10-18T00:01:00Z', anonymousCode: 'ANON', items: [], currentItem: null,
+      trainingFlow: { termination: 'SCREEN_OUT', currentInstrumentKey: null, pathHash: 'server-path', materials: [{ blockKey: 'conclusion', kind: 'MATERIAL', title: '结束材料', body: '本次流程说明' }] },
+    } } })
+    render(<MemoryRouter initialEntries={['/public/composite/token-1']}><Routes>
+      <Route path="/public/composite/:token" element={<CompositeAssessmentPage />} />
+      <Route path="/public/composite/attempts/:id/report" element={<p>个人报告页面</p>} />
+    </Routes></MemoryRouter>)
+    const user = userEvent.setup()
+    await user.click(await screen.findByRole('button', { name: '开始匿名测评' }))
+    expect(await screen.findByRole('heading', { name: '结束材料' })).toBeInTheDocument()
+    expect(screen.queryByText('个人报告页面')).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: '继续' }))
+    expect(screen.getByRole('heading', { name: '交卷已结束' })).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent('任务未达成')
+    await user.click(screen.getByRole('button', { name: '查看本次结果' }))
+    expect(await screen.findByText('个人报告页面')).toBeInTheDocument()
+  })
+})

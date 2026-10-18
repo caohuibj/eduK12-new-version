@@ -216,7 +216,7 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
       const scope = graph?.scopes.get(row.id) ?? await resolveTrainingAttemptScope(attempt, task, {db: tx, frozenSlotSets: slotSets})
       if (!stratumMatches(wave, scope)) continue
       if (row.status === 'COMPLETED' && row.deliveryMode === 'FINAL_ONLY' && row.runtimeGeneration === 'UNIFIED_V1' && !slotSets.has(row.id)) invalid('已完成 FINAL 测量缺少冻结单元计划')
-      entries.push({wave, attempt: await applyTrainingAttemptScope(attempt, {db: tx, frozenSlotSets: slotSets}), scope, slots: slotSets.get(row.id) ?? null})
+      entries.push({wave, attempt: await applyTrainingAttemptScope(attempt, {db: tx, frozenSlotSets: slotSets,verifiedScope:scope}), scope, slots: slotSets.get(row.id) ?? null})
     }
   }
   if (entries.length > TRAINING_ANALYSIS_SOURCE_LIMIT) throw compositeBadRequest('分析来源超过 6000 条，请缩小选择范围')

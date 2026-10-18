@@ -1,3 +1,4 @@
+import { encryptUnifiedRuntimePayload } from './security'
 import { REPORT_SUBMISSION_KEY_CONFLICT, REPORT_SUBMISSION_KEY_CONFLICT_MESSAGE } from '../scale/scale-final-submit-conflict'
 import { detachedWholeReceiptsEnabled } from './whole-receipt-storage'
 import { registerWholeReceiptAtomic } from './whole-receipt-atomic'
@@ -111,10 +112,13 @@ export const enqueueCompositeReportForUnit = async (
   let parent: any = await tx.compositeAssessmentAttempt.findUnique({
     where: { id: input.compositeAttemptId }, select: { ...REPORT_PARENT_SELECT, frozenActiveSlotSetEncrypted: true },
   })
-  if (!parent || (parent.asyncReportEpoch !== parent.attemptEpoch && !acceptsAsyncCompositeReport(parent))) return null
+  if (!parent) return null
+  const asyncEligible=parent.asyncReportEpoch===parent.attemptEpoch||acceptsAsyncCompositeReport(parent)
+  if(!hasTrainingFlow(parent)&&!asyncEligible)return null
   if (parent.status !== 'IN_PROGRESS' || parent.attemptEpoch !== input.attemptEpoch || !parent.frozenActiveSlotSetHash) {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '报告任务与交卷版本不匹配', 409)
   }
+  let acceptedFlow:Awaited<ReturnType<typeof resolveTrainingFlowScope>>=null
   if (hasTrainingFlow(parent)) {
     // Flow FINAL callers hold this lock before inserting their snapshot. Keep
     // the parent -> job -> budget ordering explicit at this boundary too.
@@ -126,8 +130,15 @@ export const enqueueCompositeReportForUnit = async (
     if (!parent || parent.status !== 'IN_PROGRESS' || parent.attemptEpoch !== input.attemptEpoch) {
       throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '流程报告任务与交卷状态不匹配', 409)
     }
+    const flow=await resolveTrainingFlowScope(parent,parent.compositeAssessment,{db:tx,allowAdvance:true})
+    if(!flow)throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH','流程证据无法推进',409)
+    acceptedFlow=flow
+    const encrypted=encryptUnifiedRuntimePayload(flow.evidence)
+    await tx.compositeAssessmentAttempt.update({where:{id:parent.id},data:{trainingFlowPathEncrypted:encrypted,trainingFlowPathHash:flow.pathHash}})
+    parent={...parent,trainingFlowPathEncrypted:encrypted,trainingFlowPathHash:flow.pathHash}
+    if(!asyncEligible)return null
   }
-  const id = await enqueueBoundReport(tx, parent, true)
+  const id = await enqueueBoundReport(tx, parent, true, acceptedFlow)
   if (parent.asyncReportEpoch !== parent.attemptEpoch) {
     const updated = await tx.compositeAssessmentAttempt.updateMany({
       where: { id: parent.id, attemptEpoch: parent.attemptEpoch, status: 'IN_PROGRESS',
@@ -146,7 +157,7 @@ type BoundReportParent = { id: string; attemptEpoch: number; frozenActiveSlotSet
 const hasTrainingFlow = (parent: BoundReportParent): boolean => [parent.trainingFlowSnapshotEncrypted,
   parent.trainingFlowSnapshotHash, parent.trainingFlowPathEncrypted, parent.trainingFlowPathHash].some(value => value != null)
 
-const enqueueBoundReport = async (tx: Prisma.TransactionClient, parent: BoundReportParent, waitForCompletedUnits = false): Promise<string> => {
+const enqueueBoundReport = async (tx: Prisma.TransactionClient, parent: BoundReportParent, waitForCompletedUnits = false, acceptedFlow:Awaited<ReturnType<typeof resolveTrainingFlowScope>>=null): Promise<string> => {
   if (!parent.frozenActiveSlotSetHash) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '报告任务冻结单元缺失', 409)
   // Native upsert locks this ONE parent's job before the shared budget row.
   // Coalesce notifications without resetting a running lease. A changed
@@ -176,17 +187,17 @@ const enqueueBoundReport = async (tx: Prisma.TransactionClient, parent: BoundRep
     // no incomplete scan consumes a global permit or wakes a report worker.
     if (waitForCompletedUnits) {
       if (!parent.frozenActiveSlotSetEncrypted) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '报告冻结单元缺失', 409)
-      const slots = await loadFrozenActiveSlotSet(parent.frozenActiveSlotSetEncrypted, tx)
+      const slots = acceptedFlow?.frozenSlots??await loadFrozenActiveSlotSet(parent.frozenActiveSlotSetEncrypted, tx)
       if (slots.snapshotHash !== parent.frozenActiveSlotSetHash || slots.attemptEpoch !== parent.attemptEpoch) {
         throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '报告冻结单元绑定不匹配', 409)
       }
       const flowEnabled = hasTrainingFlow(parent)
-      const headers = await tx.assessmentUnitSnapshot.findMany({
+      const headers = acceptedFlow?.snapshots??await tx.assessmentUnitSnapshot.findMany({
         where: { compositeAttemptId: parent.id, attemptEpoch: parent.attemptEpoch },
         ...(flowEnabled ? {} : { select: { slotKey: true, attemptEpoch: true, unitType: true, terminalState: true,
           payloadKind: true, sourceType: true, sourceAttemptId: true } }),
       })
-      const scope = flowEnabled ? await resolveTrainingFlowScope(parent, parent.compositeAssessment,
+      const scope = flowEnabled ? acceptedFlow??await resolveTrainingFlowScope(parent, parent.compositeAssessment,
         { db: tx, snapshotRows: headers, frozenSlots: slots }) : null
       if (flowEnabled && !scope) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '流程报告冻结路径缺失', 409)
       const completeness = evaluateCompleteness({ slots: slots.slots, snapshots: headers,

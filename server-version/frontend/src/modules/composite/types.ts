@@ -322,7 +322,18 @@ export interface CompositePackageReport {
   provenance?: Record<string, string>
 }
 
+export interface TrainingFlowReportSummary {
+  schemaVersion: 1
+  configDigest: string
+  pathHash: string
+  termination: TrainingFlowState['termination']
+  taskSatisfaction: 'PENDING' | 'SATISFIED' | 'NOT_SATISFIED'
+  executedUnitCount: number
+  skippedUnitCount: number
+}
+
 export interface CompositeReport {
+  trainingFlow?: TrainingFlowReportSummary
   taskSatisfaction?: string | null
   taskSatisfied?: boolean
   reportState?: 'PARTIAL'
