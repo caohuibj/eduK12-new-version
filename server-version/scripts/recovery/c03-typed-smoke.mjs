@@ -36,6 +36,7 @@ const typedDefinitions=[
   {type:'NUMBER',formType:'number',prompt:'数值事实',required:true,min:0,max:100,precision:4,value:12.3456},
   {type:'MATRIX_MULTIPLE',formType:'matrix_multiple',prompt:'矩阵事实',required:true,options:[{optionKey:'a',label:'甲'},{optionKey:'b',label:'乙'}],rows:[{rowKey:'r1',label:'第一行'},{rowKey:'r2',label:'第二行'}],value:{r1:['b','a'],r2:['a']}},
   {type:'NUMBER',formType:'number',prompt:'选填空值',required:false,value:null},
+  {formType:'text_input',prompt:'同段旧题',required:true,value:'旧题原文'},
 ]
 async function createTyped(withScale=false){
   let draft=await teacher.request('/questionnaire-products','POST',{requestId:randomUUID(),name:'C03 synthetic typed '+(withScale?'whole':'form'),questionnaireType:'COURSE',courseIds:[fixture.courses[0].id],publicEnabled:false})
@@ -48,7 +49,7 @@ async function createTyped(withScale=false){
   assert.ok(sectionId)
   for(const [i,item] of items.entries()){
     const {formType,value,...q}=typedDefinitions[i]
-    await prisma.compositeAssessmentItem.update({where:{id:item.id},data:{formType,required:q.required,formSectionId:sectionId,formSectionPosition:i,formDefinition:{itemKey:'q_'+item.id.replaceAll('-','_'),options:[],rows:[],...q}}})
+    await prisma.compositeAssessmentItem.update({where:{id:item.id},data:{formType,required:q.required,formSectionId:sectionId,formSectionPosition:i,...(q.type?{formDefinition:{itemKey:'q_'+item.id.replaceAll('-','_'),options:[],rows:[],...q}}:{})}})
   }
   await prisma.compositeFormSection.deleteMany({where:{compositeAssessmentId:draft.id,id:{not:sectionId},items:{none:{}}}})
   const preflight=await teacher.request(`/questionnaire-products/${draft.id}/preflight`,'POST',{revision:draft.revision});assert.equal(preflight.ok,true)
@@ -61,6 +62,12 @@ async function createTyped(withScale=false){
 }
 try{
   await login(teacher,fixture.teacher,'TEACHER');await login(student,fixture.student,'STUDENT')
+  let f
+  if(process.env.C03_PHASE==='export-whole'){
+    const existing=await prisma.compositeAssessmentAttempt.findFirst({where:{status:'COMPLETED',compositeAssessment:{name:'C03 synthetic typed form'}},orderBy:{startedAt:'desc'}})
+    assert.ok(existing,'prior accepted typed fixture required')
+    f={draft:{id:existing.compositeAssessmentId},attempt:existing}
+  }else{
   // Existing accepted snapshots and encrypted reports remain readable after upgrade.
   const old=await prisma.compositeAssessmentAttempt.findFirst({where:{status:'COMPLETED',compositeAssessment:{name:'C02 synthetic Form baseline'}}})
   assert.ok(old)
@@ -71,7 +78,7 @@ try{
   const oldSection=await prisma.compositeFormSection.findFirst({where:{compositeAssessmentId:old.compositeAssessmentId},include:{items:true}})
   assert.equal(canonicalHash(mapCompositeSection(oldSection)),oldSnapshot.sourceDefinitionHash)
   check('historical frozen hash, V1 snapshot and teacher report readable after 167')
-  const f=await createTyped()
+  f=await createTyped()
   const copy=await teacher.request(`/questionnaire-products/${f.draft.id}/copy`,'POST',{requestId:randomUUID()})
   const copied=await prisma.compositeAssessmentItem.findMany({where:{compositeAssessmentId:copy.id,type:'FORM'},orderBy:{position:'asc'}})
   const original=await prisma.compositeAssessmentItem.findMany({where:{compositeAssessmentId:f.draft.id,type:'FORM'},orderBy:{position:'asc'}})
@@ -103,9 +110,13 @@ try{
   const rebuilt=await buildCompositeReport(parent)
   assert.ok(JSON.stringify(rebuilt).includes('12.3456'));assert.ok(!JSON.stringify(rebuilt).includes('CORRUPTED_LEGACY_SHADOW'))
   check('teacher report and explicit rebuild read canonical typed facts, never String shadows')
+  }
   const denied=await teacher.request(`/composite-assessments/${f.draft.id}/export/preview?detail=full`,'GET',undefined,400)
   assert.ok(denied.includes('TYPED_FORM_EXPORT_NOT_AVAILABLE'))
   await teacher.request(`/composite-assessments/${f.draft.id}/export`,'POST',{detail:'full',format:'sav',anonymize:true},400)
+  const oldExport=await prisma.compositeAssessment.findFirst({where:{name:'C02 synthetic Form baseline'}})
+  assert.ok(oldExport)
+  await teacher.request(`/composite-assessments/${oldExport.id}/export/preview?detail=full`)
   await student.request(`/questionnaire-products/${f.draft.id}/reports`,'GET',undefined,403)
   check('typed export preview/SAV registration explicitly rejected; student teacher-report route denied')
   const whole=await createTyped(true)
@@ -117,8 +128,13 @@ try{
   const wholeReport=await teacher.request(`/composite-assessments/${whole.draft.id}/attempts/${whole.attempt.id}/report`)
   assert.ok(JSON.stringify(wholeReport).includes('12.3456'))
   const final=await prisma.compositeAssessmentAttempt.findUnique({where:{id:whole.attempt.id}});assert.equal(final.status,'COMPLETED');assert.ok(final.aggregateInputHash)
-  check('real whole Scale receipt/worker FINAL preserves prerequisite typed Form facts and report')
-  fs.writeFileSync(path.join(state,'typed-http-result.json'),JSON.stringify({passed:true,requests,checks},null,2))
+  await prisma.compositeFormAnswer.updateMany({where:{attemptId:whole.attempt.id},data:{value:'CORRUPTED_WHOLE_SHADOW'}})
+  const wholeParent=await prisma.compositeAssessmentAttempt.findUnique({where:{id:whole.attempt.id},include:{compositeAssessment:{include:{items:true,formSections:{include:{items:true}}}}}})
+  const wholeValues=await loadCompositeTypedFormValues(wholeParent)
+  assert.equal(wholeValues.get(whole.items[3].id),'旧题原文')
+  assert.deepEqual([...wholeValues.values()],typedDefinitions.map(x=>x.value))
+  check('real whole Scale receipt/worker FINAL preserves typed and legacy fields in one V2 section and report')
+  fs.writeFileSync(path.join(state,'typed-http-result.json'),JSON.stringify({passed:true,phase:process.env.C03_PHASE??'full',requests,checks},null,2))
 }catch(e){fs.writeFileSync(path.join(state,'typed-http-result.json'),JSON.stringify({passed:false,requests,checks,error:String(e)},null,2));throw e}
 finally{await prisma.$disconnect()}
 // Imported production queues have lifecycle handles; all test work is finished.

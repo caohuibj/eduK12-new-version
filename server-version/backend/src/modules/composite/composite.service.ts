@@ -4474,7 +4474,7 @@ export const buildCompositeReport = async (attempt: any, verifiedContext?: Whole
   const packageBased = Boolean(attempt.compositeAssessment.reportPackageKey)
   for (const item of attempt.compositeAssessment.items) {
     if (item.type === 'FORM') {
-      backgroundValues.push(buildFormBackgroundReport({ itemId: item.id, label: packageSlotLabels.get(item.position) ?? item.formLabel, value: item.formDefinition != null ? legacyFormValueProjection(typedFormValues.get(item.id) ?? null) : formMap.get(item.id)?.value ?? null, formType: item.formType, options: item.formOptions }))
+      backgroundValues.push(buildFormBackgroundReport({ itemId: item.id, label: packageSlotLabels.get(item.position) ?? item.formLabel, value: typedFormValues.has(item.id) ? legacyFormValueProjection(typedFormValues.get(item.id) ?? null) : formMap.get(item.id)?.value ?? null, formType: item.formType, options: item.formOptions }))
       continue
     }
     if (item.type === 'SCALE') {
@@ -5301,10 +5301,16 @@ export const getAnalysisExportForTeacher = async (
 
 export const getExportContext = async (userId: string, role: UserRole, id: string) => {
   assertTeacher(role)
-  const composite = await loadComposite(id)
+  // Export-only authorization projection: the filtered relation count is part
+  // of this query, without loading definitions or adding per-export lookups.
+  const composite = await prisma.compositeAssessment.findUnique({ where: { id }, select: {
+    id: true, createdBy: true, productKind: true,
+    _count: { select: { items: { where: { formDefinition: { not: Prisma.AnyNull } } } } },
+  } })
+  if (!composite) throw compositeNotFound()
   assertOwner(composite, userId, role)
   if (composite.productKind === 'ASSESSMENT_BUNDLE') throw compositeConflict('请使用 Bundle 报告导出，通用明细导出不适用于测评包')
-  if (composite.items.some((item: any) => item.formDefinition != null)) throw compositeBadRequest('TYPED_FORM_EXPORT_NOT_AVAILABLE: typed Form 无损导出尚未开放')
+  if (composite._count.items > 0) throw compositeBadRequest('TYPED_FORM_EXPORT_NOT_AVAILABLE: typed Form 无损导出尚未开放')
   return composite
 }
 

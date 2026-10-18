@@ -1,7 +1,8 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { randomBytes } from 'node:crypto'
-const mocks = vi.hoisted(() => ({ findMany: vi.fn() }))
-vi.mock('../../config/database', () => ({ prisma: { assessmentUnitSnapshot: { findMany: mocks.findMany } } }))
+const mocks = vi.hoisted(() => ({ findMany: vi.fn(), findComposite: vi.fn() }))
+vi.mock('../../config/database', () => ({ prisma: { assessmentUnitSnapshot: { findMany: mocks.findMany }, compositeAssessment: { findUnique: mocks.findComposite } } }))
+import { getExportContext } from '../../modules/composite/composite.service'
 import { normalizeCompositeSectionAnswers } from '../../modules/composite/final-submit.service'
 import { mapCompositeSection, compositeFormSectionDefinitionHash } from '../../modules/assessment-runtime/form-section-definition'
 import { formFactsFor } from '../../modules/assessment-runtime/unified-form-section-final-submit.service'
@@ -74,13 +75,25 @@ describe('Training typed Form facts foundation', () => {
     expect(() => createTypedFormSectionCollectionFacts({ sectionKey: 's', items: [{ key: 'a', label: 'A', value: NaN }] })).toThrow()
   })
   it('reads typed values from snapshots, with no String fallback', async () => {
-    const s = section('NUMBER'), facts = canonicalFacts(s, 12.3456)
+    const s = section('NUMBER')
+    const { formDefinition: _definition, ...legacy } = s.items[0]
+    s.items.push({ ...legacy, id: 'legacy', formType: 'text_input', formLabel: 'Legacy', required: false, position: 1, formSectionPosition: 1 })
+    const facts = canonicalFacts(s, 12.3456)
     const parent = { id: 'attempt', attemptEpoch: 1, runtimeGeneration: 'UNIFIED_V1', compositeAssessment: { id: 'parent', items: [{ type: 'FORM', formDefinition: question('NUMBER') }], formSections: [{ ...s, items: s.items.map(item => ({ ...item, formPlaceholder: item.placeholder })) }] } }
     const { formSectionSlotKey } = await import('../../modules/assessment-runtime/slot-set')
     mocks.findMany.mockResolvedValue([{ slotKey: formSectionSlotKey(s.id), terminalState: 'COMPLETED', payloadKind: 'COLLECTION_FACTS', unitType: 'FORM_SECTION', sourceType: 'COMPOSITE_FORM_SECTION', sourceDefinitionHash: canonicalHash(s), collectionFactsEncrypted: encryptUnifiedRuntimePayload(facts) }])
-    expect((await loadCompositeTypedFormValues(parent)).get('db-id')).toBe(12.3456)
+    const values = await loadCompositeTypedFormValues(parent)
+    expect(values.get('db-id')).toBe(12.3456)
+    expect(values.has('legacy')).toBe(true)
+    expect(values.get('legacy')).toBeNull()
     mocks.findMany.mockResolvedValue([])
     await expect(loadCompositeTypedFormValues(parent)).rejects.toThrow()
+  })
+  it('rejects typed export before enqueue and preserves lightweight legacy context', async () => {
+    mocks.findComposite.mockResolvedValue({ id: 'parent', createdBy: 'teacher', productKind: 'QUESTIONNAIRE', _count: { items: 0 } })
+    await expect(getExportContext('teacher', 'TEACHER', 'parent')).resolves.toMatchObject({ id: 'parent' })
+    mocks.findComposite.mockResolvedValue({ id: 'parent', createdBy: 'teacher', productKind: 'QUESTIONNAIRE', _count: { items: 1 } })
+    await expect(getExportContext('teacher', 'TEACHER', 'parent')).rejects.toMatchObject({ statusCode: 400, message: expect.stringContaining('TYPED_FORM_EXPORT_NOT_AVAILABLE') })
   })
   it('expands only the composite wire contract', () => {
     const payload = { submissionId: 'typed-submission-id', attemptEpoch: 1, definitionHash: 'hash', answers: [{ formItemId: 'db-id', value: { a: 20, b: 80 } }] }

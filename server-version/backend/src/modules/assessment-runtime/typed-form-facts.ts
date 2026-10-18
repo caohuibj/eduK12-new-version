@@ -52,7 +52,9 @@ export const loadCompositeTypedFormValues = async (attempt: {
     if (found.length !== 1 || row.terminalState !== 'COMPLETED' || row.payloadKind !== 'COLLECTION_FACTS' || row.unitType !== 'FORM_SECTION' || row.sourceType !== 'COMPOSITE_FORM_SECTION' || row.sourceDefinitionHash !== canonicalHash(section) || !row.collectionFactsEncrypted) invalid('typed Form 权威快照缺失或冻结绑定不匹配')
     const facts = readFormSectionCollectionFacts(decryptUnifiedRuntimePayload<unknown>(row.collectionFactsEncrypted!))
     assertTypedCompositeFormFacts(section, facts)
-    for (const fact of facts.items) if (section.items.find(item => item.id === fact.key)?.formDefinition != null) result.set(fact.key, fact.value)
+    // Every value in a V2 section, including legacy-compatible text fields,
+    // comes from the same accepted snapshot.
+    for (const fact of facts.items) result.set(fact.key, fact.value)
   }
   return result
 }

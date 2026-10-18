@@ -341,7 +341,7 @@ describe('getReportForTeacher', () => {
 
 describe('getExportContext ownership', () => {
   it('denies another teacher while allowing the owner and admin', async () => {
-    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(compositeRow())
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue({ ...compositeRow(), _count: { items: 0 } })
     await expect(getExportContext('teacher-b', TEACHER, 'composite-1')).rejects.toMatchObject({ statusCode: 403 })
     await expect(getExportContext('teacher-a', TEACHER, 'composite-1')).resolves.toMatchObject({ id: 'composite-1' })
     await expect(getExportContext('admin-1', ADMIN, 'composite-1')).resolves.toMatchObject({ id: 'composite-1' })
