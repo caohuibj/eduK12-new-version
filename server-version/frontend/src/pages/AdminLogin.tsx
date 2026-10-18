@@ -1,3 +1,5 @@
+import SurveyAdminOrigin from '../components/app-shell/SurveyAdminOrigin'
+import { productOrigins } from '../products/origins'
 import LoginRecoveryNotice from '../components/app-shell/LoginRecoveryNotice'
 import AuthShell from '../components/auth/AuthShell'
 import React, { useState } from 'react'
@@ -6,7 +8,7 @@ import { useLoginReturn } from '../components/app-shell/useLoginReturn'
 import { useAuth } from '../contexts/AuthContext'
 
 const AdminLogin: React.FC = () => {
-  const completeLogin = useLoginReturn()
+  const completeLogin = useLoginReturn('/users')
   const { login } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -21,7 +23,7 @@ const AdminLogin: React.FC = () => {
     setError('')
 
     try {
-      await login(formData.username, formData.password)
+      await login(formData.username, formData.password, undefined, 'admin')
       completeLogin()
     } catch (err: any) {
       setError(err.message || '登录失败')
@@ -96,4 +98,10 @@ const AdminLogin: React.FC = () => {
   )
 }
 
-export default AdminLogin
+export default function AdminLoginEntry() {
+  // Only known product aliases require canonicalization; other legacy admin entries retain their routes.
+  const origins = productOrigins()
+  return origins && origins.admin !== window.location.origin
+    ? <SurveyAdminOrigin login><AdminLogin /></SurveyAdminOrigin>
+    : <AdminLogin />
+}

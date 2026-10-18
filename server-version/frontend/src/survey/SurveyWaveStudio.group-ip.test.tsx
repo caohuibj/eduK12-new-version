@@ -29,7 +29,7 @@ function fixture(overrides:Record<string,unknown>={}){
     if(url.endsWith('/waves/w1/open')){
       bodies.push(JSON.parse(String(init?.body)) as Record<string,unknown>)
       current={...current,status:'OPEN',groupIpActivatedAt:'2026-10-17T04:00:00Z',closesAt:'2026-10-19T04:00:00Z'}
-      return response({researchUrl:'https://survey.example/r/research#entry=token'})
+      return response({researchUrl:'https://survey.eduk12.top/r/research#entry=token'})
     }
     if(url.endsWith('/projects/p1'))return response({id:'p1',collectionMode:'SINGLE_UNLINKED',status:'ACTIVE',revision:1})
     throw new Error('Unexpected test request '+url)

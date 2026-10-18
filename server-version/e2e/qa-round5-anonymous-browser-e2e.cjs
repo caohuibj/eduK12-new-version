@@ -71,6 +71,17 @@ async function scenario(browser, engine, width) {
           assert.ok(payload.answers[0].value)
           attempt.answers.push(payload.answers[0].value)
           data = { receiptId: 'synthetic-receipt-' + index }
+        } else if (rest === '/report-status') {
+          assert.equal(request.method(), 'GET')
+          const completed = attempt.answers.length === 2
+          // Match reportStatusForHeader's synchronous (no outbox job) contract.
+          data = {
+            attemptId: id, attemptEpoch: 1, status: completed ? 'COMPLETED' : 'IN_PROGRESS',
+            feedbackWaitMs: 0, hasAcceptedSubmission: false,
+            wholeSubmissionReceived: false, wholeSubmissionId: null,
+            reportStatus: { state: completed ? 'READY' : 'WAITING', jobId: null,
+              retryAfterSeconds: 2, errorCode: null, completedAt: completed ? '2026-10-07T00:01:00Z' : null },
+          }
         } else if (rest === '/report') {
           assert.equal(attempt.answers.length, 2)
           data = { id, assessmentId: 'synthetic-composite', name: '匿名两区段验收', productKind: 'QUESTIONNAIRE', reportMode: 'COLLECTION_ONLY', anonymousCode: attempt.code, completedAt: '2026-10-07T00:01:00Z', totalTime: 24, unitReports: [], backgroundValues: attempt.answers.map((value, n) => ({ itemId: 'field-' + n, label: '合成回答 ' + (n + 1), value, displayValue: value })) }

@@ -8,12 +8,14 @@ export interface LoginRequest {
   expectedRole?: 'STUDENT' | 'TEACHER'
 }
 
+export type LoginEntrance = 'admin'
+
 export interface LoginData {
   user: User
 }
 
 export const authApi = {
-  login: (data: LoginRequest) => apiClient.post<LoginData>(isTrainingHost() ? '/auth/training-login' : '/auth/login', data),
+  login: (data: LoginRequest, entrance?: LoginEntrance) => apiClient.post<LoginData>(entrance !== 'admin' && isTrainingHost() ? '/auth/training-login' : '/auth/login', data),
   me: () => apiClient.get<User>('/auth/me'),
   csrf: () => apiClient.get<{ csrfToken: string }>('/auth/csrf'),
   logout: () => apiClient.post<void>('/auth/logout'),
