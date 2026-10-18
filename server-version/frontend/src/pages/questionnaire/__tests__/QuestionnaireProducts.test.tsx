@@ -233,3 +233,25 @@ describe('C05 structured authoring', () => {
     if (type === 'constant_sum') expect(definition.total).toBe(0)
   })
 })
+
+describe('C05 incomplete single question stays editable', () => {
+  it('retains title, options and matrix rows when the server rejects adding an incomplete question', async () => {
+    vi.resetAllMocks()
+    const row = { name: '结构化草稿', status: 'DRAFT', revision: 4, questionnaireType: 'COURSE', questionnaireCourses: [], items: [], formSections: [], publicEnabled: false }
+    api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? { scales: [], cognitive: [], situational: [], courses: [] } : row }))
+    api.post.mockResolvedValue({ code: 400, message: '矩阵题至少需要一行' })
+    mount('typed')
+    await screen.findByDisplayValue('结构化草稿')
+    const user = userEvent.setup()
+    await user.selectOptions(screen.getByLabelText('测评类型'), 'FORM')
+    await user.type(screen.getByLabelText('题目文字'), '未完成矩阵')
+    await user.selectOptions(screen.getByLabelText('题型'), 'matrix')
+    await user.type(screen.getByLabelText('选项（值=标签，以逗号分隔）'), 'a=甲,b=乙')
+    await user.click(screen.getByRole('button', { name: '添加到测评' }))
+    expect(await screen.findByText('矩阵题至少需要一行')).toBeInTheDocument()
+    expect(screen.getByLabelText('题目文字')).toHaveValue('未完成矩阵')
+    expect(screen.getByLabelText('选项（值=标签，以逗号分隔）')).toHaveValue('a=甲,b=乙')
+    expect(screen.getByLabelText('矩阵行（编码=标签，以逗号分隔）')).toHaveValue('')
+    expect(api.post).toHaveBeenCalledTimes(1)
+  })
+})

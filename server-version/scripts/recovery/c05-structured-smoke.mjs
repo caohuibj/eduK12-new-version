@@ -115,6 +115,19 @@ async function submitSections(f,{validate=false}={}){
  }
  return payloads
 }
+function assertReportValues(report,f){
+ const reports=[]
+ const visit=node=>{if(!node||typeof node!=='object')return;if(node.type==='FORM'&&typeof node.itemId==='string')reports.push(node);for(const child of Object.values(node))visit(child)}
+ visit(report)
+ for(const [index,item] of f.items.entries()){
+  const value=specs[index].value,expected=value===null?null:typeof value==='string'?value:JSON.stringify(value)
+  const found=reports.find(row=>row.itemId===item.id)
+  assert.ok(found,'report contains item '+index)
+  // Canonical object keys are sorted, so compare parsed structure rather than display order.
+  if(value!==null&&typeof value==='object')assert.deepEqual(JSON.parse(found.value),value)
+  else assert.equal(found.value,expected)
+ }
+}
 async function ready(f){
  const deadline=Date.now()+60000
  while(Date.now()<deadline){const s=await f.c.request(`${f.prefix}/attempts/${f.attempt.id}/report-status`);if(s.reportStatus?.state==='READY')return;await new Promise(r=>setTimeout(r,500))}
@@ -135,6 +148,7 @@ try {
   const changed=structuredClone(submitted[0]);changed.answers[0].value='a';await f.c.request(f.route,'POST',changed,409)
   await ready(f)
   const report=publicMode?await f.c.request(`${f.prefix}/attempts/${f.attempt.id}/report`):await teacher.request(`/composite-assessments/${f.draft.id}/attempts/${f.attempt.id}/report`)
+  assertReportValues(report,f)
   const reportText=JSON.stringify(report)
   for(const marker of ['结构化矩阵单选','结构化矩阵多选','结构化排序','结构化恒定总和'])assert.ok(reportText.includes(marker),marker)
   check(`${publicMode?'anonymous recovery':'logged-in'} author/publish/section FINAL preserves six structured values, optional null, zero-sum and legacy facts; exact replay immutable and changed replay rejected`)
@@ -148,6 +162,7 @@ try {
   await whole.c.request(`${whole.prefix}/attempts/${whole.attempt.id}/whole/submit`,'POST',payload)
   await ready(whole);const snapshots=await facts(whole,specs.map(x=>x.value))
   const wholeReport=publicMode?await whole.c.request(`${whole.prefix}/attempts/${whole.attempt.id}/report`):await teacher.request(`/composite-assessments/${whole.draft.id}/attempts/${whole.attempt.id}/report`)
+  assertReportValues(wholeReport,whole)
   assert.ok(JSON.stringify(wholeReport).includes('结构化矩阵多选'))
   observations.push({kind:'storage',publicMode,snapshots:snapshots.length,encryptedFactBytes:snapshots.reduce((n,s)=>n+Buffer.byteLength(s.collectionFactsEncrypted),0)})
   check(`${publicMode?'anonymous':'logged-in'} section + whole Scale receipt/replay and real worker report consume identical structured V2 facts`)
