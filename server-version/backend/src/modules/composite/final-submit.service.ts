@@ -1,3 +1,4 @@
+import { assertTrainingSectionSelected } from './training-variant-child-scope'
 import { Prisma } from '@prisma/client'
 import { normalizeTypedCompositeFormAnswer, normalizeTypedCompositeSection, validateTypedCompositeSectionDefinition, legacyFormValueProjection, type TypedFormValue } from '../assessment-runtime/typed-form'
 import { v4 as uuidv4 } from 'uuid'
@@ -471,41 +472,17 @@ const submitCompositeFormSectionFinalImpl = async (input: SectionSubmitInput) =>
   const submissionId = validateSubmissionId(input.submissionId)
   const route = await measureRequestPhase('final_submit_admission', () => prisma.compositeAssessmentAttempt.findUnique({
     where: { id: input.attemptId },
-    select: { id: true, runtimeGeneration: true, compositeAssessment: { select: { bundleInstance: true } } },
-  }))
-  if (!route) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评记录不存在', 404)
-  if (route.runtimeGeneration === 'UNIFIED_V1') {
-    const { submitUnifiedCompositeFormSectionFinal } = await import('../assessment-runtime/unified-form-section-final-submit.service')
-    return submitUnifiedCompositeFormSectionFinal(input, route.compositeAssessment?.bundleInstance)
-  }
-  const attempt = await measureRequestPhase('final_submit_admission', () => prisma.compositeAssessmentAttempt.findUnique({
-    where: { id: input.attemptId },
-    select: {
-      id: true,
-      userId: true,
-      recoveryTokenHash: true,
-      status: true,
-      deliveryMode: true,
-      runtimeGeneration: true,
-      attemptEpoch: true,
-      completedItems: true,
-      contextSnapshotEncrypted: true,
-      contextSnapshotHash: true,
-      frozenActiveSlotSetEncrypted: true,
-      frozenActiveSlotSetHash: true,
-      formSectionAttempts: {
-        where: { sectionId: input.sectionId },
-        select: { sectionId: true, status: true, attemptEpoch: true },
-      },
-      compositeAssessment: {
-        select: {
-          items: { select: { id: true, type: true, position: true, formSectionId: true, formSectionPosition: true } },
-          formSections: { orderBy: { position: 'asc' }, include: { items: true } },
-        },
-      },
+    include: {
+      compositeAssessment: { include: { bundleInstance: true, items: true, formSections: { orderBy: { position: 'asc' }, include: { items: true } } } },
+      formSectionAttempts: { where: { sectionId: input.sectionId }, select: { sectionId: true, status: true, attemptEpoch: true } },
     },
   }))
-  if (!attempt) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评记录不存在', 404)
+  if (!route) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评记录不存在', 404)
+  const attempt = await assertTrainingSectionSelected(input.attemptId, input.sectionId, { parent: route }) as typeof route
+  if (route.runtimeGeneration === 'UNIFIED_V1') {
+    const { submitUnifiedCompositeFormSectionFinal } = await import('../assessment-runtime/unified-form-section-final-submit.service')
+    return submitUnifiedCompositeFormSectionFinal(input, route.compositeAssessment?.bundleInstance, attempt)
+  }
   if (input.userId !== null && input.userId !== undefined) {
     if (attempt.userId !== input.userId) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权限操作此综合测评', 403)
   } else if (attempt.userId !== null || !input.recoveryTokenHash || attempt.recoveryTokenHash !== input.recoveryTokenHash) {

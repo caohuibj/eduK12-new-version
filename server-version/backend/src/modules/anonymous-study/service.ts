@@ -64,6 +64,9 @@ export async function addWave(userId:string,role:UserRole,studyId:string, input:
   return prisma.$transaction(tx=>insertWave(tx,userId,studyId,input,randomUUID(),token.token))
 }
 async function insertWave(tx:Db,userId:string,studyId:string,input:{compositeId:string;tokenId:string;title:string},id:string,token:string) {
+    await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${input.compositeId} FOR UPDATE`
+    const variant=await tx.compositeAssessment.findUnique({where:{id:input.compositeId},select:{trainingVariantDraft:true,trainingVariantFrozen:true}})
+    if(variant?.trainingVariantDraft!=null||variant?.trainingVariantFrozen!=null)throw compositeBadRequest('概率分卷暂不能与匿名研究波次组合')
     await tx.$queryRaw`SELECT id FROM anonymous_studies WHERE id=${studyId} FOR UPDATE`
     const study=await currentOwner(tx,userId,studyId)
     if(study.status!=='ACTIVE') throw compositeForbidden('研究已结束')

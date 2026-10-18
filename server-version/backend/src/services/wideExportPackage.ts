@@ -10,7 +10,7 @@ export type DictionaryField = {
 
 /** Receives the already-authorized, materialized export. Never queries or
  * rebuilds fields from live definitions after disclosure projection. */
-export function wideExportPackage(csv: string, fields: DictionaryField[], source: { resourceType: 'COGNITIVE' | 'COMPOSITE'; resourceId: string; detail: string }) {
+export function wideExportPackage(csv: string, fields: DictionaryField[], source: { resourceType: 'COGNITIVE' | 'COMPOSITE'; resourceId: string; detail: string; trainingVariantExport?: unknown }) {
   const columns = fields.map(field => ({
     ...(field.formSource ? { formSource: field.formSource } : {}),
     name: field.name, label: field.label, type: field.type, unit: field.unit ?? null,

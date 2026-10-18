@@ -31,6 +31,7 @@ export interface CompositeExportProjectionBindingV1 {
   scales: CompositeExportScaleBindingV1[]
   fingerprint: string
   timingExportEnabled?: boolean
+  trainingVariantExport?: {version: string; configDigest: string; publishedAt: string; frozenHash: string}
   situationalExport?: { version: string; slots: Array<{ itemId: string; prefix: string }> }
 }
 
@@ -84,6 +85,9 @@ export const buildCompositeExportProjectionBinding = (input: {
   timingExportEnabled?: boolean
   trainingTimingPolicy?: unknown
   timingExportRevision?:number
+  trainingVariantDigest?: string | null
+  trainingVariantFrozen?: unknown
+  publishedAt?: Date | string | null
 }): CompositeExportProjectionBindingV1 => {
   // Composite wide-export routes are teacher/admin product surfaces. ADMIN is
   // authorization, not a researcher/raw-data disclosure audience.
@@ -97,6 +101,7 @@ export const buildCompositeExportProjectionBinding = (input: {
     resourceId: input.resourceId,
     audience,
     scales,
+    ...(input.trainingVariantDigest != null || input.trainingVariantFrozen != null ? {trainingVariantExport: {version: 'training-weighted-variant-export-v1', configDigest: input.trainingVariantDigest ?? '', publishedAt: input.publishedAt ? new Date(input.publishedAt).toISOString() : '', frozenHash: canonicalHash(input.trainingVariantFrozen ?? null)}} : {}),
     ...(input.items.some(item => item.type === 'SITUATIONAL') ? { situationalExport: { version: SITUATIONAL_CANONICAL_EXPORT_VERSION, slots: input.items.flatMap((item, index) => item.type === 'SITUATIONAL' ? [{ itemId: item.id, prefix: `J${String(index + 1).padStart(3, '0')}_` }] : []) } } : {}),
     ...(input.timingExportEnabled ? {timingExportEnabled:true,trainingTimingPolicy:input.trainingTimingPolicy??null,timingExportRevision:input.timingExportRevision??0} : {}),
     ...(input.items.some(item=>item.formDefinition!=null)?{typedFormExport:{version:'training-form-export-v1',definitions:input.items.filter(item=>item.formDefinition!=null).map(item=>({id:item.id,definition:item.formDefinition,policy:item.formPolicy??null}))}}:{}),
@@ -113,6 +118,7 @@ export const resolveCompositeExportProjectionBinding = async (
     select: {
       id: true,
       timingExportEnabled:true,trainingTimingPolicy:true,productKind:true,revision:true,
+      trainingVariantDigest:true,trainingVariantFrozen:true,publishedAt:true,
       items: {
         orderBy: { position: 'asc' },
         select: {
@@ -125,7 +131,7 @@ export const resolveCompositeExportProjectionBinding = async (
     },
   })
   if (!composite) throw new Error('综合测评不存在')
-  return buildCompositeExportProjectionBinding({ resourceId: composite.id, audience, items: composite.items,timingExportEnabled:composite.productKind==='QUESTIONNAIRE'&&composite.timingExportEnabled,trainingTimingPolicy:composite.trainingTimingPolicy,timingExportRevision:composite.revision })
+  return buildCompositeExportProjectionBinding({ resourceId: composite.id, audience, items: composite.items,timingExportEnabled:composite.productKind==='QUESTIONNAIRE'&&composite.timingExportEnabled,trainingTimingPolicy:composite.trainingTimingPolicy,timingExportRevision:composite.revision, trainingVariantDigest:composite.trainingVariantDigest, trainingVariantFrozen:composite.trainingVariantFrozen, publishedAt:composite.publishedAt })
 }
 
 const scaleFieldAllowed = (suffix: string, caps: DisclosureCapabilitiesV1): boolean => {

@@ -1,3 +1,6 @@
+import { resolveTrainingAttemptScope, type TrainingAttemptScope } from '../composite/training-variant-scope'
+import { trainingVariantProvenance } from '../composite/training-variant-export'
+import { loadSituationalExportSlotSets } from '../composite/situational-canonical-export'
 import { isTaskSatisfied } from '../assessment-runtime/form-policy'
 import { UserRole } from '@prisma/client'
 import { z } from 'zod'
@@ -26,7 +29,7 @@ export async function saveTemplate(actor: Actor, raw: unknown) {
   const requestKey = actor.userId + ':' + input.requestId, requestHash = canonicalHash(input)
   const previous = await prisma.assessmentCompositionTemplate.findUnique({ where: { requestKey } })
   if (previous) { if (previous.requestHash !== requestHash) throw compositeConflict('同一模板请求不能更换内容'); return previous }
-  const copy = await questionnaire.copy(actor, input.sourceId, { requestId: input.requestId })
+  const copy = await questionnaire.copy(actor, input.sourceId, { requestId: input.requestId }, { allowTrainingVariants: false })
   return prisma.$transaction(async tx => {
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${requestKey},0))`
     const existing = await tx.assessmentCompositionTemplate.findUnique({ where: { requestKey } })
@@ -91,12 +94,42 @@ export async function courseOverview(actor: Actor, courseId: string, raw: unknow
     { compositeAttemptId: null, assignment: { ...creatorScope, courseId, listedStandalone: true } },
     { compositeAttempt: { assignmentRef: null, deliveryCourseId: courseId, compositeAssessment: { ...creatorScope, productKind: 'QUESTIONNAIRE', reportPackageKey: null, analysisProtocolKey: null } } },
     { compositeAttempt: { assignmentRef: null, compositeAssessment: { ...creatorScope, courseId, productKind: 'LEGACY_COMPOSITE', reportPackageKey: null, analysisProtocolKey: null } } },
-  ] }, select: { id: true, status: true, finishedAt: true, resultSnapshotEncrypted: true, assignment: { select: { id: true, title: true } }, user: { select: { nickname: true, username: true } }, compositeAttemptId: true, compositeAttempt: { select: { compositeAssessmentId: true, status: true } } }, orderBy: [{ createdAt: 'desc' }, { id: 'asc' }], skip: (page - 1) * pageSize, take: pageSize + 1 })
-  const quality = sessions.slice(0, pageSize).map(({ resultSnapshotEncrypted, user, assignment, compositeAttempt, ...row }) => {
+  ] }, select: { id: true, status: true, finishedAt: true, resultSnapshotEncrypted: true, assignment: { select: { id: true, title: true } }, user: { select: { nickname: true, username: true } }, compositeAttemptId: true, compositeItemId: true, attemptNo: true,
+    compositeAttempt: { select: { id: true, compositeAssessmentId: true, status: true, attemptEpoch: true, participantKey: true, runtimeGeneration: true, deliveryMode: true,
+      trainingVariantAllocationEncrypted: true, trainingVariantAllocationHash: true, frozenActiveSlotSetEncrypted: true, frozenActiveSlotSetHash: true,
+      compositeAssessment: { select: { id: true, trainingVariantDraft: true, trainingVariantFrozen: true, trainingVariantDigest: true } },
+    } } }, orderBy: [{ createdAt: 'desc' }, { id: 'asc' }], skip: (page - 1) * pageSize, take: pageSize + 1 })
+  const variantParents = new Map<string, any>()
+  for (const session of sessions) {
+    const parent = session.compositeAttempt
+    if (parent && (parent.trainingVariantAllocationEncrypted != null || parent.trainingVariantAllocationHash != null
+      || parent.compositeAssessment?.trainingVariantDraft != null || parent.compositeAssessment?.trainingVariantFrozen != null
+      || parent.compositeAssessment?.trainingVariantDigest != null)) variantParents.set(parent.id, parent)
+  }
+  const scopes = new Map<string, TrainingAttemptScope>()
+  if (variantParents.size) {
+    const definitions = await prisma.compositeAssessment.findMany({ where: { id: { in: [...new Set([...variantParents.values()].map(parent => parent.compositeAssessmentId))] } },
+      include: { items: true, formSections: { include: { items: true } } } })
+    const byId = new Map(definitions.map(definition => [definition.id, definition]))
+    for (const parent of variantParents.values()) {
+      const definition = byId.get(parent.compositeAssessmentId)
+      if (!definition) throw compositeConflict('分组问卷定义缺失，请联系管理员')
+      parent.compositeAssessment = definition
+    }
+    const frozenSlotSets = await loadSituationalExportSlotSets([...variantParents.values()])
+    for (const [attemptId, parent] of variantParents) scopes.set(attemptId, await resolveTrainingAttemptScope(parent, parent.compositeAssessment, { frozenSlotSets }))
+  }
+  const selectedSessions = sessions.filter(session => {
+    const scope = session.compositeAttemptId ? scopes.get(session.compositeAttemptId) : undefined
+    return !scope || Boolean(session.compositeItemId && scope.itemIds.has(session.compositeItemId)
+      && scope.items.some(item => item.id === session.compositeItemId && item.type === 'COGNITIVE')
+      && session.attemptNo === session.compositeAttempt!.attemptEpoch)
+  })
+  const quality = selectedSessions.slice(0, pageSize).map(({ resultSnapshotEncrypted, user, assignment, compositeAttempt, compositeItemId: _itemId, attemptNo: _epoch, ...row }) => {
     let qualityState = row.status === 'COMPLETED' ? 'unavailable' : 'pending'
     if (resultSnapshotEncrypted) { try { qualityState = parseCognitiveResultSnapshot(decryptCognitivePayload(resultSnapshotEncrypted)).quality.state } catch { /* Preserve unavailable; never guess. */ } }
     const reportHref = compositeAttempt ? `/composite-assessments/${compositeAttempt.compositeAssessmentId}/attempts/${row.compositeAttemptId}/report${compositeAttempt.status === 'COMPLETED' ? '' : '?partial=1'}` : assignment ? `/cognitive-assignments/${assignment.id}` : null
-    return { ...row, participant: user?.nickname || user?.username || '已停用账号', title: assignment?.title || '认知任务', qualityState, reportHref }
+    return { ...row, ...(row.compositeAttemptId && scopes.has(row.compositeAttemptId) ? { trainingVariant: trainingVariantProvenance(scopes.get(row.compositeAttemptId)!) } : {}), participant: user?.nickname || user?.username || '已停用账号', title: assignment?.title || '认知任务', qualityState, reportHref }
   })
   return { course, list, total, page, pageSize, quality, qualityHasMore: sessions.length > pageSize, countMeaning: '次数为本课程已登录作答次数；已交卷包含任务达成与未达成，两者以已交卷次数为分母。不去重为人数，不提供群体心理指标。' }
 }

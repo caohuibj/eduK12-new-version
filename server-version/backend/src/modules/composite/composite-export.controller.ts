@@ -35,6 +35,13 @@ const handleError = (res: Response, err: unknown): Response => {
  * until Scale fields have passed the disclosure projector.
  */
 export const compositeExportController = {
+  async variantAnalysis(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      await service.getExportContext(req.user.userId, req.user.role, req.params.id)
+      return success(res, await compositeExportService.getTrainingVariantTaskAnalysis(req.params.id, {userId: req.user.userId, role: req.user.role}))
+    } catch (err) { return handleError(res, err) }
+  },
   async preview(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
@@ -58,6 +65,7 @@ export const compositeExportController = {
         fieldsAreSampled: true,
         fieldCount: data.fields.length,
         fields: data.fields,
+        ...(data.trainingVariantExport ? {trainingVariantExport: data.trainingVariantExport} : {}),
       })
     } catch (err) { return handleError(res, err) }
   },

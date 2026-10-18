@@ -1,3 +1,4 @@
+import { assertTrainingChildSelected } from '../composite/training-variant-child-scope'
 import { onlineSituationalCanonicalTaskSatisfaction } from './situational-task-satisfaction'
 import { publicSjtOnlineMetadata } from './authoring/online'
 import { resolveSituationalRelease, type ResolvedSituationalRelease } from './situational-release.service'
@@ -188,6 +189,7 @@ export const assertSituationalAttemptOwner = (row: Pick<SituationalAttemptRow, '
 }
 
 export type SituationalEmbeddedAccess = {
+  parent?: any
   compositeAttemptId: string
   compositeItemId: string
   compositeSlotKey: string
@@ -232,6 +234,7 @@ export const loadSituationalAttemptRuntime = async (
   })
   if (!row) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评记录不存在', 404)
   assertSituationalAttemptOwner(row, userId)
+  await assertTrainingChildSelected(row)
   let snapshot: FrozenSituationalRuntimeSnapshotV1
   try {
     snapshot = decryptFrozenSituationalRuntimeSnapshot(row.runtimeSnapshotEncrypted)
@@ -252,6 +255,7 @@ export const loadEmbeddedSituationalAttemptRuntime = async (
   })
   if (!row) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评记录不存在', 404)
   assertEmbeddedSituationalAttemptBinding(row, input)
+  await assertTrainingChildSelected(row, { parent: input.parent })
   let snapshot: FrozenSituationalRuntimeSnapshotV1
   try {
     snapshot = decryptFrozenSituationalRuntimeSnapshot(row.runtimeSnapshotEncrypted)
@@ -460,6 +464,7 @@ export const startSituationalAttempt = async (userId: string, input: {
       select: SITUATIONAL_ATTEMPT_SELECT,
     })
     if (active) {
+      await assertTrainingChildSelected(active)
       const activeSnapshot = decryptFrozenSituationalRuntimeSnapshot(active.runtimeSnapshotEncrypted)
       assertRowMatchesSnapshot(active, activeSnapshot)
       return situationalAttemptForResponse(active, activeSnapshot)

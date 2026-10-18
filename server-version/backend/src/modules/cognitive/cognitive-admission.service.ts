@@ -1,3 +1,4 @@
+import { assertTrainingChildSelected } from '../composite/training-variant-child-scope'
 import { isCognitiveNewAdmissionEnabled } from './product-eligibility'
 import { loadStoredUnitAdmission } from '../assessment-runtime/unit-admission'
 import { prisma } from '../../config/database'
@@ -169,6 +170,7 @@ export const activateCognitiveAdmission = async (
   row: CognitiveAdmissionChildRow,
   parent?: CompositeCognitiveAdmissionParent,
 ): Promise<FrozenUnitAdmissionV1> => {
+  parent = await assertTrainingChildSelected(row, { parent }) ?? parent
   const stored = await loadStoredCognitiveAdmission(row)
   if (stored) return stored
   // A session shell is not admission. Never activate one while new admission is disabled.
@@ -183,24 +185,7 @@ export const activateCognitiveAdmission = async (
   }
 
   if (row.compositeAttemptId) {
-    const loaded = parent ?? await prisma.compositeAssessmentAttempt.findUnique({
-      where: { id: row.compositeAttemptId },
-      select: {
-        id: true,
-        userId: true,
-        recoveryTokenHash: true,
-        deliveryMode: true,
-        attemptEpoch: true,
-        contextSnapshotEncrypted: true,
-        contextSnapshotHash: true,
-        frozenActiveSlotSetEncrypted: true,
-        frozenActiveSlotSetHash: true,
-        compositeAssessment: {
-          select: { formSections: { select: { contextSection: true, items: { select: { contextKey: true } } } } },
-        },
-      },
-    })
-    if (!loaded) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '上级测评记录不存在', 404)
+    const loaded = parent!
     assertFinalOnly(loaded.deliveryMode)
     assertAttemptEpoch(loaded.attemptEpoch, row.attemptNo)
     if (!row.compositeItemId) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '认知任务未绑定到当前测评单元', 409)

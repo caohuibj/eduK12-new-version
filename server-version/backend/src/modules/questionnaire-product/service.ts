@@ -1,3 +1,6 @@
+import { compileWeightedVariants, weightedVariantConfigSchema } from '../assessment-core/weighted-variants'
+import { buildTrainingVariantUnion } from '../composite/training-variant-scope'
+import { assertTrainingVariantAuthoringScope } from './training-variant-authoring'
 import {freezeTrainingTimingPolicy,readTrainingTimingPolicy} from '../assessment-runtime/training-scale-timing'
 import { remapTrainingFormDefinition } from '../assessment-runtime/form-policy'
 import { typedCompositeFormQuestion } from '../assessment-runtime/typed-form'
@@ -35,6 +38,10 @@ const metadata = {
 }
 export const createSchema = z.object({ ...metadata, requestId: z.string().uuid(), questionnaireType: z.enum(['COURSE', 'GENERAL']) }).strict()
 export const editSchema = z.object({ ...metadata, revision: z.number().int().nonnegative() }).strict()
+export const trainingVariantsSchema = z.object({
+  revision: z.number().int().nonnegative(), config: weightedVariantConfigSchema.nullable(),
+  maxAttempts: z.number().int().min(1).max(100).optional(),
+}).strict()
 export const revisionSchema = z.object({ revision: z.number().int().nonnegative() }).strict()
 export const itemSchema = z.object({ revision: z.number().int().nonnegative(), item: addCompositeItemSchema, formSectionId: z.string().min(1).optional() }).strict()
 export const orderSchema = z.object({ revision: z.number().int().nonnegative(),
@@ -65,6 +72,31 @@ export async function updateTimingExport(actor:Actor,id:string,raw:unknown){
   await tx.compositeAssessment.update({where:{id},data:{timingExportEnabled:input.enabled}})
   await tx.assessmentManagementEvent.create({data:{actorId:actor.userId,resourceId:id,action:'TRAINING_TIMING_EXPORT_POLICY',metadata:{previous:row.timingExportEnabled,enabled:input.enabled,revision:row.revision+1}}})
  },false)
+}
+/** Explicit opt-in; the ordinary null configuration is never inferred or backfilled. */
+export async function updateTrainingVariants(actor: Actor, id: string, raw: unknown) {
+  const input = trainingVariantsSchema.parse(raw)
+  return mutate(actor, id, input.revision, async (tx, row) => {
+    if (input.config === null) {
+      if (input.maxAttempts !== undefined) throw compositeBadRequest('关闭分组时不能同时改变作答次数')
+      await tx.compositeAssessment.update({ where: { id }, data: {
+        trainingVariantDraft: Prisma.DbNull, trainingVariantFrozen: Prisma.DbNull, trainingVariantDigest: null,
+      } })
+      return
+    }
+    const candidate = { ...row, maxAttempts: input.maxAttempts ?? row.maxAttempts }
+    await assertTrainingVariantAuthoringScope(tx, candidate)
+    compileWeightedVariants(input.config, buildTrainingVariantUnion(candidate))
+    await tx.compositeAssessment.update({ where: { id }, data: {
+      trainingVariantDraft: input.config as Prisma.InputJsonValue,
+      trainingVariantFrozen: Prisma.DbNull, trainingVariantDigest: null, maxAttempts: candidate.maxAttempts,
+    } })
+  })
+}
+async function validateTrainingVariants(tx: Tx, row: any) {
+  if (row.trainingVariantDraft == null) return
+  await assertTrainingVariantAuthoringScope(tx, row)
+  return compileWeightedVariants(row.trainingVariantDraft, buildTrainingVariantUnion(row))
 }
 export async function detail(actor: Actor, id: string) {
   const row = await prisma.compositeAssessment.findUnique({ where: { id } })
@@ -113,6 +145,14 @@ async function mutate(actor: Actor, id: string, revision: number, fn: (tx: Tx, r
     if (row.revision !== revision) throw compositeConflict('问卷已被其他操作修改，请刷新后重试')
     if (draft && row.status !== 'DRAFT') throw compositeConflict('已发布问卷不能修改，请复制为新草稿')
     await fn(tx, row)
+    // Keep every edit atomic with the saved group references. Authors can
+    // explicitly disable grouping before changing the global unit layout.
+    if (draft && row.status === 'DRAFT' && row.trainingVariantDraft != null) {
+      const current = await tx.compositeAssessment.findUnique({ where: { id }, include: {
+        questionnaireCourses: true, items: true, formSections: { include: { items: true } },
+      } })
+      if (current?.trainingVariantDraft != null) await validateTrainingVariants(tx, current)
+    }
     await tx.compositeAssessment.update({ where: { id }, data: { revision: { increment: 1 } } })
   }, { timeout: 30000 })
   return detail(actor, id)
@@ -240,6 +280,7 @@ export async function preflight(actor: Actor, id: string, raw: unknown) {
     const checks: Array<{ key: string; label: string; status: 'passed' | 'failed'; message: string; targetId?: string }> = []
     for (const [key, label, validate] of [
       ['delivery', '课程、公开投放与时间', () => validateDelivery(tx, actor, row)],
+      ['training-variants', 'Training 加权分组、完整覆盖与次数限制', () => validateTrainingVariants(tx, row)],
       ['resources', '内容依赖与当前权限', () => validateResources(tx, actor, row, inspectedSituational)],
       ['content', '区段、背景顺序、字段与冻结定义', () => {
         if (inspectedSituational.errors.size) throw inspectedSituational.errors.values().next().value
@@ -272,6 +313,7 @@ export async function preflight(actor: Actor, id: string, raw: unknown) {
 export async function publish(actor: Actor, id: string, raw: unknown) {
   return mutate(actor, id, revisionSchema.parse(raw).revision, async (tx, row) => {
     if (await tx.assessmentCompositionTemplate.findUnique({ where: { definitionId: id } })) throw compositeConflict('组合模板需要先复制为新草稿，再绑定课程或公开投放')
+    if(row.trainingVariantDraft!=null)await validateTrainingVariants(tx,row)
     await validateDelivery(tx, actor, row)
     const situational = await validateResources(tx, actor, row)
     await lockCompositeAssetReferences(tx, row.items, row.formSections, situational)
@@ -350,7 +392,7 @@ export async function resources(actor: Actor) {
   const [scales, cognitive, courseRows, situational] = await Promise.all([
     prisma.scale.findMany({ where: { status: 'PUBLISHED' }, orderBy: { name: 'asc' } }),
     isCognitiveNewAdmissionEnabled() ? prisma.cognitiveAssignment.findMany({ where: { status: 'PUBLISHED', listedStandalone: true, config: { status: 'PUBLISHED' }, ...(actor.role === 'ADMIN' ? {} : { createdBy: actor.userId }) }, include: { config: true }, orderBy: { title: 'asc' } }) : Promise.resolve([]),
-    prisma.course.findMany({ where: { isLibrary: false, ...(actor.role === 'ADMIN' ? {} : { creatorId: actor.userId }) }, select: { id: true, title: true } }),
+    prisma.course.findMany({ where: { isLibrary: false, ...(actor.role === 'ADMIN' ? {} : { creatorId: actor.userId }) }, select: { id: true, title: true, courseType: true } }),
     listSituationalResourceSummaries(actor.userId),
   ])
   const usable = []
@@ -364,7 +406,7 @@ export async function resources(actor: Actor) {
 }
 
 /** Copy definitions only; no attempts, responses, tokens or report ciphertext. */
-export async function copy(actor: Actor, id: string, raw: unknown) {
+export async function copy(actor: Actor, id: string, raw: unknown, options: { allowTrainingVariants?: boolean } = {}) {
   author(actor)
   if (process.env.QUESTIONNAIRE_PRODUCTS_ENABLED === 'false') throw compositeConflict('暂未开放新版问卷创建')
   const { requestId } = z.object({ requestId: z.string().uuid() }).strict().parse(raw)
@@ -374,16 +416,28 @@ export async function copy(actor: Actor, id: string, raw: unknown) {
     const existing = await tx.compositeAssessment.findUnique({ where: { creationKey } })
     if (existing) {
       if (existing.creationHash !== creationHash) throw compositeConflict('创建请求已用于其他内容')
+      if (options.allowTrainingVariants === false && (existing.trainingVariantDraft != null || existing.trainingVariantFrozen != null)) {
+        throw compositeBadRequest('加权随机分组暂不支持无课程投放的私有模板，请复制为课程草稿')
+      }
       return existing.id
     }
     // Resolve storage server-side. A collision is rejected rather than guessed.
     const legacy = await tx.questionnaire.findUnique({ where: { id }, include: {
       questionnaireScales: true, formItems: true, formSections: true, courseQuestionnaires: true,
     } })
-    const composite = await tx.compositeAssessment.findUnique({ where: { id }, include: { items: { include: { cognitiveAssignment: true } }, formSections: true, questionnaireCourses: true } })
+    let composite = await tx.compositeAssessment.findUnique({ where: { id }, include: { items: { include: { cognitiveAssignment: true } }, formSections: true, questionnaireCourses: true } })
     if ((!legacy && !composite) || (legacy && composite)) throw compositeNotFound('无法唯一识别来源问卷')
-    const source = legacy ?? composite!
     owner(actor, { createdBy: legacy ? legacy.creatorId : composite!.createdBy })
+    if (composite?.trainingVariantDraft != null || composite?.trainingVariantFrozen != null) {
+      await tx.$queryRawUnsafe('SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR SHARE', id)
+      composite = await tx.compositeAssessment.findUnique({ where: { id }, include: { items: { include: { cognitiveAssignment: true } }, formSections: true, questionnaireCourses: true } })
+      if (!composite) throw compositeNotFound('来源问卷不存在')
+      owner(actor, composite)
+      if (options.allowTrainingVariants === false) throw compositeBadRequest('加权随机分组暂不支持无课程投放的私有模板，请复制为课程草稿')
+      if (composite.trainingVariantDraft == null) throw compositeBadRequest('来源问卷缺少加权分组定义')
+      await assertTrainingVariantAuthoringScope(tx, composite)
+    }
+    const source = legacy ?? composite!
     if (composite && (composite.productKind === 'ASSESSMENT_BUNDLE' || composite.reportPackageKey || composite.analysisProtocolKey)) throw compositeBadRequest('固定报告包不能复制为问卷')
     const questionnaireType = legacy?.type ?? composite!.questionnaireType ?? 'COURSE'
     const sourceCourses = legacy ? legacy.courseQuestionnaires.map(v => v.courseId) : composite!.productKind === 'LEGACY_COMPOSITE' ? (composite!.courseId ? [composite!.courseId] : []) : composite!.questionnaireCourses.map(v => v.courseId)
@@ -401,9 +455,11 @@ export async function copy(actor: Actor, id: string, raw: unknown) {
     const target = await tx.compositeAssessment.create({ data: {
       code: 'Q-' + randomUUID(), name: source.name + '（副本）', description: source.description, instruction: source.instruction,
       productKind: 'QUESTIONNAIRE', questionnaireType, createdBy: actor.userId, creationKey, creationHash,
+      ...(composite?.trainingVariantDraft != null ? { maxAttempts: composite.maxAttempts } : {}),
       trainingTimingPolicy:await timingPolicy(tx,{productKind:'QUESTIONNAIRE',questionnaireType,questionnaireCourses:sourceCourses.map(courseId=>({courseId})),publicEnabled:false},Boolean(composite?.trainingTimingPolicy)),
       questionnaireCourses: { create: sourceCourses.map(courseId => ({ courseId })) },
     } })
+    const copiedIds = new Map<string, string>((composite?.items ?? []).map(item => [item.id, randomUUID()]))
     const sectionIds = new Map<string, string>()
     for (const section of source.formSections) {
       const created = await tx.compositeFormSection.create({ data: {
@@ -423,7 +479,6 @@ export async function copy(actor: Actor, id: string, raw: unknown) {
         formSectionId: form.sectionId ? sectionIds.get(form.sectionId) : null, formSectionPosition: form.sectionPosition,
       } })
     } else {
-      const copiedIds = new Map(composite!.items.map(item=>[item.id,randomUUID()]))
       const copiedKeys = new Map<string,string>(composite!.items.filter(item=>item.formDefinition!=null).map(item=>[(item.formDefinition as any).itemKey,'q_'+copiedIds.get(item.id)]))
       for (const item of composite!.items) {
         if (item.formDefinition != null) typedCompositeFormQuestion({ ...item, placeholder: item.formPlaceholder ?? null } as any)
@@ -451,6 +506,27 @@ export async function copy(actor: Actor, id: string, raw: unknown) {
       }
     }
     await ensureCompositeFormSections(target.id, tx)
+    if (composite?.trainingVariantDraft != null) {
+      const original = weightedVariantConfigSchema.parse(composite.trainingVariantDraft)
+      const remapped = { ...original, groups: original.groups.map(group => ({ ...group,
+        units: group.units.map(unit => {
+          const mapped = (unit.type === 'FORM_SECTION' ? sectionIds : copiedIds).get(unit.id)
+          if (!mapped) throw compositeBadRequest('来源分组引用了不存在的内容单元，请先修复原草稿')
+          return { ...unit, id: mapped }
+        }),
+      })) }
+      const copied = await tx.compositeAssessment.findUniqueOrThrow({ where: { id: target.id }, include: {
+        questionnaireCourses: true, items: true, formSections: { include: { items: true } },
+      } })
+      await assertTrainingVariantAuthoringScope(tx, copied)
+      // Recompile all remapped definition references; the new draft does not
+      // inherit the source's immutable publication digest or allocation data.
+      compileWeightedVariants(remapped, buildTrainingVariantUnion(copied))
+      await tx.compositeAssessment.update({ where: { id: target.id }, data: {
+        trainingVariantDraft: remapped as Prisma.InputJsonValue,
+        trainingVariantFrozen: Prisma.DbNull, trainingVariantDigest: null,
+      } })
+    }
     return target.id
   }, { timeout: 30000 })
   let target: string
@@ -460,8 +536,13 @@ export async function copy(actor: Actor, id: string, raw: unknown) {
 
 /** Paged audience-projected reports, never raw response tables. */
 export async function exportReports(actor: Actor, id: string, raw: unknown) {
-  await detail(actor, id)
+  const definition = await detail(actor, id)
   const { after } = z.object({ after: z.string().uuid().optional() }).strict().parse(raw)
+  if (definition.trainingVariantDraft != null || definition.trainingVariantFrozen != null || definition.trainingVariantDigest != null) {
+    const { getTrainingVariantReportsForTeacher } = await import('../composite/composite.service')
+    const page = await getTrainingVariantReportsForTeacher(actor.userId, actor.role, id, after)
+    return { schemaVersion: 'questionnaire-independent-reports-v1', reportMode: 'COLLECTION_ONLY', questionnaireId: id, ...page }
+  }
   const rows = await prisma.compositeAssessmentAttempt.findMany({
     where: { compositeAssessmentId: id, status: 'COMPLETED', ...(after ? { id: { gt: after } } : {}) },
     orderBy: { id: 'asc' }, take: 101, select: { id: true },

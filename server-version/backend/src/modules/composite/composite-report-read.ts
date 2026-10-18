@@ -14,8 +14,8 @@ export const readCompositeReportStatusContext = async (attemptId: string, includ
       'contextSnapshotHash', p."context_snapshot_hash", 'aggregateInputHash', p."aggregate_input_hash",
       'assignmentRef', p."assignment_ref", 'deliveryCourseId', p."delivery_course_id",
       'compositeAssessmentId', p."composite_assessment_id", 'userId', p."user_id",
-      'recoveryTokenHash', p."recovery_token_hash",'trainingTimingSnapshot',p."training_timing_snapshot",
-      'compositeAssessment', jsonb_build_object('id', c."id", 'productKind', c."product_kind",'timingExportEnabled',c."timing_export_enabled",'revision',c."revision",
+      'trainingVariantAllocationEncrypted',p."training_variant_allocation_encrypted",'recoveryTokenHash', p."recovery_token_hash",'trainingTimingSnapshot',p."training_timing_snapshot",
+      'compositeAssessment', jsonb_build_object('trainingVariantFrozen',c."training_variant_frozen",'id', c."id", 'productKind', c."product_kind",'timingExportEnabled',c."timing_export_enabled",'revision',c."revision",
         'items', COALESCE((SELECT jsonb_agg(jsonb_build_object('type', i."type"))
           FROM "composite_assessment_items" i WHERE i."composite_assessment_id" = c."id"), '[]'::jsonb))
     ) AS parent,

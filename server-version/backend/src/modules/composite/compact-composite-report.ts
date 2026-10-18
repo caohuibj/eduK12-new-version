@@ -1,3 +1,5 @@
+import type { TrainingAttemptScope } from './training-variant-scope'
+import { trainingVariantProvenance } from './training-variant-export'
 import { createHash } from 'node:crypto'
 import { decryptCognitivePayload } from '../cognitive/cognitive.security'
 import { parseCognitiveResultSnapshot, referencesForCognitiveResult } from '../cognitive/v2/result-snapshot'
@@ -23,8 +25,21 @@ export const canStoreCompactCompositeReport=(report:any,children:any[],cognitive
     ||sharedControlWritesEnabled()&&u.type==='COGNITIVE'&&cognitive.some(c=>c.compositeItemId===u.itemId&&typeof c.resultSnapshotEncrypted==='string'&&c.resultSnapshotEncrypted&&c.finishedAt)))
 
 
+/** A cached report is authorized against the current verified allocation,
+ * before loading any source facts. Its original field order remains untouched. */
+export function assertTrainingVariantReportScope(report:any, scope?:TrainingAttemptScope):void {
+  if (!scope?.variant) {
+    if (report.trainingVariant != null) throw new Error('Variant report allocation was not verified')
+    return
+  }
+  if (canonicalHash(report.trainingVariant ?? null) !== canonicalHash(trainingVariantProvenance(scope))) throw new Error('Variant report provenance mismatch')
+  const ids = [...(report.unitReports ?? []).map((row:any) => row.itemId), ...(report.backgroundValues ?? []).map((row:any) => row.itemId)]
+  if (new Set(ids).size !== ids.length || ids.length !== scope.itemIds.size || ids.some(id => !scope.itemIds.has(id))) throw new Error('Variant report contains a missing or unselected item')
+}
+
 /** A manifest retains source/version binding; it never stores a second score set. */
-export const encryptCompactCompositeReport=async(report:any,binding:Binding,children:any[],templates:PublicTemplateStore=publicTemplates,cognitive:any[]=[]):Promise<string>=>{
+export const encryptCompactCompositeReport=async(report:any,binding:Binding,children:any[],templates:PublicTemplateStore=publicTemplates,cognitive:any[]=[],scope?:TrainingAttemptScope):Promise<string>=>{
+  assertTrainingVariantReportScope(report,scope)
   if(!canStoreCompactCompositeReport(report,children,cognitive))throw new Error('Compact report requires committed scale facts')
   const units:Manifest['units']=[],layoutUnits=[]
   for(const unit of report.unitReports){
@@ -51,7 +66,7 @@ export const encryptCompactCompositeReport=async(report:any,binding:Binding,chil
   const personal=Object.fromEntries(Object.entries(report).filter(([key])=>!rootStatic.includes(key)&&key!=='unitReports'))
   return encryptCompactField({kind:'COMPOSITE_REPORT_FACTS',version:units.some(u=>u.type==='COGNITIVE')?2:1,binding,layout,personal,units} satisfies Manifest)
 }
-export const decryptCompactCompositeReport=async(encrypted:string,binding:Binding,dependencies:{templates?:PublicTemplateStore;readRows?:(binding:Binding,ids:string[])=>Promise<any[]>;readCognitiveRows?:(binding:Binding,ids:string[])=>Promise<any[]>}={}):Promise<any|null>=>{
+export const decryptCompactCompositeReport=async(encrypted:string,binding:Binding,dependencies:{trainingVariantScope?:TrainingAttemptScope;templates?:PublicTemplateStore;readRows?:(binding:Binding,ids:string[])=>Promise<any[]>;readCognitiveRows?:(binding:Binding,ids:string[])=>Promise<any[]>}={}):Promise<any|null>=>{
   if(!isCompactEncryptedField(encrypted))return null
   const templates=dependencies.templates??publicTemplates
   const manifest=decryptCompactField<Manifest>(encrypted)
@@ -60,6 +75,7 @@ export const decryptCompactCompositeReport=async(encrypted:string,binding:Bindin
     ||!Array.isArray(manifest.units)||manifest.units.length<1||manifest.units.length>1000||new Set(manifest.units.map(u=>u.type==='COGNITIVE'?'c:'+u.sessionId:'s:'+u.assessmentId)).size!==manifest.units.length)throw new Error('Compact report binding invalid')
   const [layout]=await templates.loadMany([{hash:manifest.layout,kind:'COMPOSITE_REPORT_LAYOUT'}])
   if(layout?.version!==1||!Array.isArray(layout.units)||layout.units.length!==manifest.units.length)throw new Error('Compact report layout invalid')
+  assertTrainingVariantReportScope({...layout.root,...manifest.personal,unitReports:layout.units},dependencies.trainingVariantScope)
   const scaleUnits=manifest.units.filter(u=>!u.type||u.type==='SCALE'),cognitiveUnits=manifest.units.filter(u=>u.type==='COGNITIVE')
   if(scaleUnits.length+cognitiveUnits.length!==manifest.units.length||manifest.units.some(u=>u.type==='COGNITIVE'?!u.sessionId:!u.assessmentId))throw new Error('Report source type invalid')
   const ids=scaleUnits.map(u=>u.assessmentId!)

@@ -1,3 +1,4 @@
+import { applyTrainingAttemptScope } from './training-variant-scope'
 import {readTrainingTimingSnapshot,normalizeTrainingScaleTiming,type TrainingTimingSnapshot} from '../assessment-runtime/training-scale-timing'
 import { withSharedControlContext, storeSharedWholeValidation, loadSharedWholeValidation } from '../assessment-runtime/shared-control-records'
 import { compactAssessmentStorageEnabled } from '../assessment-runtime/compact-field-codec'
@@ -45,16 +46,16 @@ export type WholeQuestionnaireReportContext = {
 
 const wholeParentSelect = {
   ...REPORT_PARENT_SELECT, userId: true, recoveryTokenHash: true,
-  trainingTimingSnapshot: true,
+  trainingTimingSnapshot: true, participantKey: true, trainingVariantAllocationEncrypted: true, trainingVariantAllocationHash: true,
   contextSnapshotEncrypted: true, frozenActiveSlotSetEncrypted: true,
-  compositeAssessment: { select: { productKind: true, reportPackageKey: true, analysisProtocolKey: true,
-    items: { select: { id: true, position: true } },
-    formSections: { select: { contextSection: true, items: { select: { contextKey: true } } } } } },
+  compositeAssessment: { select: { id: true, productKind: true, reportPackageKey: true, analysisProtocolKey: true,
+    publishedAt: true, trainingVariantDraft: true, trainingVariantFrozen: true, trainingVariantDigest: true,
+    items: true, formSections: { include: {items: true} } } },
   scaleAssessments: { select: { ...UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
     scale: { select: { ...UNIFIED_SCALE_CHILD_ADMISSION_SELECT.scale.select, instruction: true } } } },
 } as const
 // Worker-only superset: a single read supplies frozen admission, aggregate
-// metadata and collection rendering. Participant delivery keeps its old select.
+// metadata and collection rendering. Both paths include frozen variant binding.
 const wholeReportParentSelect = {
   ...wholeParentSelect, anonymousCode: true, totalTime: true, startedAt: true,
   formSectionAttempts: {select:{sectionId:true,attemptEpoch:true,status:true,taskSatisfaction:true}},
@@ -62,6 +63,7 @@ const wholeReportParentSelect = {
   formAnswers: { select: { itemId: true, value: true } },
   compositeAssessment: { select: {
     id: true, name: true, productKind: true, reportPackageKey: true, analysisProtocolKey: true,
+    publishedAt: true, trainingVariantDraft: true, trainingVariantFrozen: true, trainingVariantDigest: true,
     reportPackageVersion: true, reportPackageProfile: true, reportPackageSnapshotEncrypted: true,
     items: { orderBy: { position: 'asc' }, include: {
       scale: { select: { id: true, code: true, name: true, instrumentVersion: true, instrumentClass: true } },
@@ -79,11 +81,13 @@ type WholeReportParent = Prisma.CompositeAssessmentAttemptGetPayload<{ select: t
 
 const failure = (message: string, status = 409) => new InstrumentFinalSubmitError('STALE_ATTEMPT', message, status)
 const loadParent = async (attemptId: string, principal: Principal, preloaded?: WholeReportParent) => {
-  const parent = preloaded ?? await prisma.compositeAssessmentAttempt.findUnique({ where: { id: attemptId }, select: wholeParentSelect })
-  if (!parent) throw failure('问卷作答不存在', 404)
+  const loaded = preloaded ?? await prisma.compositeAssessmentAttempt.findUnique({ where: { id: attemptId }, select: wholeParentSelect })
+  if (!loaded) throw failure('问卷作答不存在', 404)
+  let parent = loaded
   const owned = principal.userId ? parent.userId === principal.userId
     : parent.userId === null && Boolean(principal.recoveryTokenHash && parent.recoveryTokenHash === principal.recoveryTokenHash)
   if (!owned) throw failure('无权限操作此问卷', 403)
+  parent = await applyTrainingAttemptScope(parent) as typeof loaded
   if (parent.asyncReportEpoch !== parent.attemptEpoch && !acceptsAsyncCompositeReport(parent)) throw failure('此问卷尚未启用整份交卷')
   if (!parent.frozenActiveSlotSetEncrypted || !parent.frozenActiveSlotSetHash) throw failure('问卷冻结内容缺失')
   const frozen = await loadFrozenActiveSlotSet(parent.frozenActiveSlotSetEncrypted)
@@ -332,7 +336,8 @@ export const processWholeQuestionnaireAnswers = async (job: CompositeReportJob,
     const reportParent = reuseCommitted ? await prisma.compositeAssessmentAttempt.findUnique({
       where: { id: job.attemptId }, select: wholeReportParentSelect,
     }) : undefined
-    return { ...await loadParent(job.attemptId, principal, reportParent ?? undefined), reportParent }
+    const loaded = await loadParent(job.attemptId, principal, reportParent ?? undefined)
+    return { ...loaded, reportParent: reportParent ? loaded.parent as WholeReportParent : undefined }
   })
   assertReportJobIdentity(parent, { attemptEpoch: job.attemptEpoch, slotSetHash: job.slotSetHash, contextHash: job.contextHash })
   if (children.length !== envelope.units.length) throw failure('整份交卷单元数量不匹配')

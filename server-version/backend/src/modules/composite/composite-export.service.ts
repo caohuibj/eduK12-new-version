@@ -1,3 +1,4 @@
+import { loadTrainingVariantExportGraph, trainingVariantProvenance, trainingVariantStratumKey, trainingVariantExportStrata, readTrainingVariantCognitiveTrials, TRAINING_VARIANT_EXPORT_VERSION } from './training-variant-export'
 import { loadSituationalExportSlotSets, readSituationalExportResults, situationalExportColumns } from './situational-canonical-export'
 import {projectTrainingTimingFact} from '../assessment-runtime/training-scale-timing'
 import {decryptUnifiedRuntimePayload} from '../assessment-runtime/security'
@@ -53,6 +54,7 @@ export interface CompositeExportField {
 }
 
 export interface CompositeExportData {
+  trainingVariantExport?: { version: typeof TRAINING_VARIANT_EXPORT_VERSION; strata: ReturnType<typeof trainingVariantExportStrata>; pooling: 'STRATIFIED_ONLY' }
   typedFormExportVersion?: string
   totalCount?: number
   assessmentId: string
@@ -194,7 +196,8 @@ export const getExportData = async (
   // growth.
   const recordCount = await prisma.compositeAssessmentAttempt.count({ where: completedAttemptWhere })
   if (!options.previewLimit) assertExportLimits({ records: recordCount })
-  if (!options.previewLimit && detail === 'full') {
+  const variantGraph = await loadTrainingVariantExportGraph(assessmentId, completedAttemptWhere, {...options, detail})
+  if (!variantGraph && !options.previewLimit && detail === 'full') {
     const trialCount = await prisma.cognitiveTrial.count({
       where: {
         session: {
@@ -207,7 +210,7 @@ export const getExportData = async (
     assertExportLimits({ trials: trialCount })
   }
 
-  const template = await prisma.compositeAssessment.findUnique({
+  const legacyTemplate = variantGraph ? null : await prisma.compositeAssessment.findUnique({
     where: { id: assessmentId },
     include: {
       items: {
@@ -264,10 +267,11 @@ export const getExportData = async (
       },
     },
   })
+  const template = (variantGraph?.template as NonNullable<typeof legacyTemplate> | undefined) ?? legacyTemplate
   if (!template) throw new Error('综合测评不存在')
-  const hasSituational = template.items.some(item => item.type === 'SITUATIONAL')
+  const hasSituational = template.items.some((item: any) => item.type === 'SITUATIONAL')
   const hasTypedForms = template.items.some(item => item.formDefinition != null)
-  const sections = hasTypedForms ? await prisma.compositeFormSection.findMany({where:{compositeAssessmentId:assessmentId},include:{items:true}}) : []
+  const sections: any[] = variantGraph ? variantGraph.template.formSections : hasTypedForms ? await prisma.compositeFormSection.findMany({where:{compositeAssessmentId:assessmentId},include:{items:true}}) : []
   const typedSections = sections.map(mapCompositeSection).filter(section=>section.items.some(item=>item.formDefinition!=null))
   if(hasTypedForms && typedSections.reduce((n,section)=>n+section.items.filter(item=>item.formDefinition!=null).length,0)!==template.items.filter(item=>item.formDefinition!=null).length) throw compositeBadRequest('typed Form 缺少冻结区段')
   assertExportLimits({ records: template.attempts.length })
@@ -281,6 +285,8 @@ export const getExportData = async (
   builder.add('A_date', '完成日期', 'date', 80)
   builder.add('A_duration_s', '完成用时(秒)', 'numeric', 12)
   builder.add('A_context_snapshot_hash', '测评上下文快照哈希', 'string', 64)
+  if (variantGraph) for (const [key, label] of [['stratum_key', '独立分析分层'], ['config_digest', '分卷配置摘要'], ['union_digest', '发布全集摘要'], ['published_at', '发布时刻'], ['variant_key', '分组'], ['algorithm', '分配算法'], ['assigned_at', '分配时刻'], ['allocation_hash', '分配记录摘要']]) builder.add(`V_${key}`, label, 'string', 80)
+  if (variantGraph) for (const [index, item] of (template.items as any[]).entries()) builder.add(`V${String(index + 1).padStart(3, '0')}_selection_state`, `[${item.id}] 分卷呈现状态`, 'string', 24, 0, {allowedValues: ['SELECTED', 'NOT_SHOWN'], missingMeaning: 'NOT_SHOWN 为未选中，不是零分、未完成或拒答；不同分层不得静默合并分析。'})
 
   const formItems = template.items.filter((item: any) => item.type === 'FORM')
   const sectionSources = new Map(typedSections.flatMap(section=>{
@@ -384,7 +390,7 @@ export const getExportData = async (
   const snapshots = (hasTypedForms || hasSituational) && template.attempts.length ? await prisma.assessmentUnitSnapshot.findMany({where:{OR:template.attempts.map(attempt=>({compositeAttemptId:attempt.id,attemptEpoch:attempt.attemptEpoch})),unitType:{in:[...(hasTypedForms ? ['FORM_SECTION' as const] : []), ...(hasSituational ? ['SITUATIONAL' as const] : [])]}}}) : []
   const snapshotsByAttempt = new Map<string,typeof snapshots>()
   for(const snapshot of snapshots) { const rows=snapshotsByAttempt.get(snapshot.compositeAttemptId!)??[]; rows.push(snapshot); snapshotsByAttempt.set(snapshot.compositeAttemptId!,rows) }
-  const situationalSlots = hasSituational ? await loadSituationalExportSlotSets(template.attempts) : new Map()
+  const situationalSlots = hasSituational ? (variantGraph?.frozenSlotSets ?? await loadSituationalExportSlotSets(template.attempts)) : new Map()
   const situationalByAttempt = new Map(template.attempts.map(attempt => [attempt.id,
     hasSituational ? readSituationalExportResults(attempt, snapshotsByAttempt.get(attempt.id) ?? [], situationalSlots.get(attempt.id)!) : new Map()]))
   const visibleSjtSlots = new Set(template.items.filter(item => item.type === 'SITUATIONAL').map(item => `situational:${item.id}`))
@@ -400,9 +406,12 @@ export const getExportData = async (
   const rows: Record<string, unknown>[] = []
   let trialCount = 0
   for (const attempt of template.attempts as any[]) {
-    const readableFormAnswers = readContextFormAnswers(formItems, attempt.formAnswers)
+    const scope = variantGraph?.scopes.get(attempt.id)
+    const selectedFormItems = scope ? formItems.filter((item: any) => scope.itemIds.has(item.id)) : formItems
+    const selectedTypedSections = scope ? typedSections.filter(section => scope.sectionIds.has(section.id)) : typedSections
+    const readableFormAnswers = readContextFormAnswers(selectedFormItems, attempt.formAnswers)
     const formStates = new Map<string,import('../assessment-runtime/typed-form-facts').TypedFormMetadata>()
-    const canonicalValues = hasTypedForms ? readLoadedCompositeTypedFormValues(attempt,typedSections,snapshotsByAttempt.get(attempt.id)??[],formStates) : new Map()
+    const canonicalValues = hasTypedForms ? readLoadedCompositeTypedFormValues(attempt,selectedTypedSections,snapshotsByAttempt.get(attempt.id)??[],formStates) : new Map()
     const legacyValues = new Map(readableFormAnswers.map((answer:any)=>[answer.itemId,answer.value]))
     const row: Record<string, unknown> = {
       U_id: attempt.anonymousCode || (attempt.userId ? `U${attempt.userId.substring(0, 8)}` : 'ANONYMOUS'),
@@ -412,10 +421,20 @@ export const getExportData = async (
       A_duration_s: attempt.totalTime == null ? null : Math.round(attempt.totalTime / 1000),
       A_context_snapshot_hash: attempt.contextSnapshotHash ?? null,
     }
+    if (scope) {
+      const provenance = trainingVariantProvenance(scope)!
+      Object.assign(row, {V_stratum_key: trainingVariantStratumKey(scope), V_config_digest: provenance.configDigest, V_union_digest: provenance.unionDigest, V_published_at: provenance.publishedAt, V_variant_key: provenance.variantKey, V_algorithm: provenance.algorithm, V_assigned_at: provenance.assignedAt, V_allocation_hash: provenance.allocationHash})
+      template.items.forEach((item: any, index: number) => {row[`V${String(index + 1).padStart(3, '0')}_selection_state`] = scope.itemIds.has(item.id) ? 'SELECTED' : 'NOT_SHOWN'})
+    }
     if (!anonymize) row.U_name = attempt.user?.nickname || attempt.user?.username || null
 
     for (let index = 0; index < formItems.length; index += 1) {
       const item = formItems[index]
+      if (scope && !scope.itemIds.has(item.id)) {
+        for (const column of typedColumns.get(item.id) ?? []) row[column.field.name] = column.field.formSource?.encoding === 'STATE' ? 'NOT_SHOWN' : null
+        if (item.formDefinition == null) row[`F${String(index + 1).padStart(3, '0')}_value`] = null
+        continue
+      }
       if(item.formDefinition!=null) for(const column of typedColumns.get(item.id)??[]) row[column.field.name]=column.read(canonicalValues.get(item.id)??null,formStates.get(item.id))
       else row[`F${String(index + 1).padStart(3, '0')}_value`] = canonicalValues.has(item.id)?legacyFormValueProjection(canonicalValues.get(item.id)??null):legacyValues.get(item.id)??null
     }
@@ -423,6 +442,10 @@ export const getExportData = async (
     for (let index = 0; index < template.items.length; index += 1) {
       const item: any = template.items[index]
       const prefix = slotPrefix('S', index)
+      if (scope && !scope.itemIds.has(item.id)) {
+        if (item.type === 'SITUATIONAL') Object.assign(row, situationalColumns.get(item.id)!.read(null, 'NOT_APPLICABLE'))
+        continue
+      }
       if (item.type === 'SITUATIONAL') {
         const slotKey = `situational:${item.id}`
         const terminal = snapshotsByAttempt.get(attempt.id)?.find(snapshot => snapshot.slotKey === slotKey)?.terminalState
@@ -547,8 +570,9 @@ export const getExportData = async (
             }
           }
           if (detail === 'full') {
-            for (const trial of session.trials || []) {
-              const payload = decryptCognitivePayload<unknown>(trial.payloadEncrypted)
+            const decodedTrials = scope ? readTrainingVariantCognitiveTrials(session) : null
+            for (const trial of decodedTrials ?? session.trials ?? []) {
+              const payload = decodedTrials ? trial.payload : decryptCognitivePayload<unknown>(trial.payloadEncrypted)
               trialCount += 1
               for (const [key, value] of flatten(payload)) {
                 const trialLabel = `[${packageSlotLabels.get(item.position) ?? (item.cognitiveAssignment?.title || '认知任务')}] 第${trial.trialIndex + 1}次 ${key}`
@@ -573,7 +597,23 @@ export const getExportData = async (
   // 动态字段在遍历数据时才会出现，确保每一行具有稳定列集合。
   for (const row of rows) for (const field of builder.fields) if (!(field.name in row)) row[field.name] = null
   assertExportLimits({ records: rows.length, fields: builder.fields.length, trials: trialCount })
-  return { ...(hasTypedForms?{typedFormExportVersion:"training-form-export-v1"}:{}), assessmentId: template.id, assessmentName: template.name, detail, fields: builder.fields, rows, trialCount }
+  return { ...(options.previewLimit ? {totalCount: recordCount} : {}), ...(variantGraph ? {trainingVariantExport: {version: TRAINING_VARIANT_EXPORT_VERSION, pooling: 'STRATIFIED_ONLY' as const, strata: trainingVariantExportStrata(template.attempts, variantGraph.scopes)}} : {}), ...(hasTypedForms?{typedFormExportVersion:"training-form-export-v1"}:{}), assessmentId: template.id, assessmentName: template.name, detail, fields: builder.fields, rows, trialCount }
+}
+
+/** Basic task administration only. Every denominator is a single immutable
+ * publication/configuration/group; no psychological metrics are pooled. */
+export const getTrainingVariantTaskAnalysis = async (assessmentId: string, actor: NonNullable<CompositeExportOptions['actor']>) => {
+  const visibility = await teacherRelationalExportVisibility(actor)
+  const where: Prisma.CompositeAssessmentAttemptWhereInput = {AND: [{compositeAssessmentId: assessmentId}, ...(visibility ? [visibility] : [])]}
+  const recordCount = await prisma.compositeAssessmentAttempt.count({where})
+  assertExportLimits({records: recordCount})
+  const graph = await loadTrainingVariantExportGraph(assessmentId, where, {}, true)
+  if (!graph) throw compositeBadRequest('此问卷未启用概率分卷')
+  // A concurrent append cannot be silently omitted from a bounded result.
+  assertExportLimits({records: graph.template.attempts.length})
+  return {schemaVersion: TRAINING_VARIANT_EXPORT_VERSION, assessmentId, pooling: 'STRATIFIED_ONLY' as const,
+    recordCount: graph.template.attempts.length, strata: trainingVariantExportStrata(graph.template.attempts, graph.scopes),
+    countMeaning: '每个发布、配置、分组独立计数；次数不是人数。任务达成以该组已交卷为分母。未选中单元不适用，不计作零分或缺失。未提供跨组心理指标统计。'}
 }
 
 export const exportToCSV = (data: CompositeExportData) => {
@@ -613,7 +653,7 @@ export const saveExportFiles = async (
     assertExportLimits({ bytes: Buffer.byteLength(content, 'utf8') })
     fs.writeFileSync(filePath, content, 'utf8')
   } else if (format === 'zip') {
-    fs.writeFileSync(filePath, wideExportPackage(exportToCSV(exportData), exportData.fields, { resourceType: 'COMPOSITE', resourceId: assessmentId, detail: exportData.detail }))
+    fs.writeFileSync(filePath, wideExportPackage(exportToCSV(exportData), exportData.fields, { resourceType: 'COMPOSITE', resourceId: assessmentId, detail: exportData.detail, ...(exportData.trainingVariantExport ? {trainingVariantExport: exportData.trainingVariantExport} : {}) }))
   } else {
     const variables = toSavVariables(exportData.fields)
     saveToFile(filePath, exportData.rows, variables)
@@ -633,7 +673,7 @@ export const toSavVariables = (fields: CompositeExportField[]): SavVariable[] =>
   measure: field.type === 'string' || field.type === 'date' ? VariableMeasure.Nominal : VariableMeasure.Continuous,
 }))
 
-export const compositeExportService = { getExportData, exportToCSV, makeFileName, saveExportFiles, toSavVariables }
+export const compositeExportService = { getTrainingVariantTaskAnalysis, getExportData, exportToCSV, makeFileName, saveExportFiles, toSavVariables }
 
 // PR11 analysis exports are implemented as a separate frozen-Snapshot path;
 // re-export the builder here so existing composite export imports remain the

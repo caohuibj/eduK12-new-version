@@ -1,3 +1,4 @@
+import { assertTrainingSectionSelected } from '../composite/training-variant-child-scope'
 import { createHash } from 'node:crypto'
 import type { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -293,11 +294,14 @@ export const submitUnifiedQuestionnaireFormSectionFinal = async (
 export const submitUnifiedCompositeFormSectionFinal = async (
   input: CompositeSectionSubmitInput,
   _parent?: unknown,
+  selectedParent?: unknown,
 ) => {
   const submissionId = validateSubmissionId(input.submissionId)
-  const child = await ensureCompositeSectionAttempt(input.attemptId, input.sectionId, input.attemptEpoch)
+  const parent = await assertTrainingSectionSelected(input.attemptId, input.sectionId, { parent: selectedParent })
+  const child = await ensureCompositeSectionAttempt(input.attemptId, input.sectionId, input.attemptEpoch, parent)
   const admission = await measureRequestPhase('final_submit_admission', () => activateStoredOrCatalogCompositeFormAdmission({
     parentId: input.attemptId,
+    parent,
     sectionId: input.sectionId,
     child,
   }))

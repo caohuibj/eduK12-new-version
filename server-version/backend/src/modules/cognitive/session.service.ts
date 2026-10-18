@@ -1,3 +1,4 @@
+import { assertTrainingChildSelected } from '../composite/training-variant-child-scope'
 import { storeSharedCognitiveRuntime, loadSharedCognitiveRuntime } from '../assessment-runtime/shared-cognitive-runtime'
 import { assertCognitiveProductEligible, assertCognitiveNewAdmissionEnabled, isCognitiveNewAdmissionEnabled } from './product-eligibility'
 import { randomBytes } from 'crypto'
@@ -287,11 +288,12 @@ const toRunnerPayload = async (session: {
   assignment?: { resolvedReportSnapshotEncrypted?: string | null } | null
   compositeAttempt?: { contextSnapshotHash?: string | null } | null
 }, nextTrialIndex?: number, exposeAnonymousCode = false, frozenReport?: FrozenReportSnapshot | null) => {
+  const selectedParent = await assertTrainingChildSelected(session as any)
   // Authorized delivery establishes admission once. Completed history remains a pure frozen read.
   if (session.status === 'IN_PROGRESS' && !isCognitiveNewAdmissionEnabled() && !(session as any).frozenAdmissionSnapshotHash) assertCognitiveNewAdmissionEnabled()
   if (session.status === 'IN_PROGRESS' && (session as any).runtimeGeneration === 'UNIFIED_V1') {
     const { ensureCognitiveAdmissionAtDelivery } = await import('./cognitive-admission.service')
-    await ensureCognitiveAdmissionAtDelivery(session.id, undefined, session as import('./cognitive-admission.service').CognitiveAdmissionChildRow)
+    await ensureCognitiveAdmissionAtDelivery(session.id, selectedParent, session as import('./cognitive-admission.service').CognitiveAdmissionChildRow)
   }
   const storedConfig = await loadCognitiveSessionConfig(session.configSnapshotEncrypted)
   const validatedConfig = storedConfig.config

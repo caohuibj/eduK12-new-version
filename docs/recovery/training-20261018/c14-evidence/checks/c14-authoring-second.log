@@ -1,0 +1,60 @@
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/backend
+
+ ❯ src/__tests__/questionnaire/training-variant-authoring-scope.test.ts (28 tests | 3 failed) 19ms
+     × rejects missing/duplicate/malformed provenance {"courseId":"training"} 6ms
+     × rejects missing/duplicate/malformed provenance {"courseId":""} 1ms
+     × rejects missing or nonTraining actual rows undefined 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/questionnaire/training-variant-authoring-scope.test.ts > Training weighted variant authoring source boundary > rejects missing/duplicate/malformed provenance {"courseId":"training"}
+ FAIL  src/__tests__/questionnaire/training-variant-authoring-scope.test.ts > Training weighted variant authoring source boundary > rejects missing/duplicate/malformed provenance {"courseId":""}
+AssertionError: expected TypeError: (row.questionnaireCourses ?? [… to match object { statusCode: 400 }
+
+- Expected
++ Received
+
+- {
+-   "statusCode": 400,
++ TypeError {
++   "message": "(row.questionnaireCourses ?? []).map is not a function",
+  }
+
+ ❯ src/__tests__/questionnaire/training-variant-authoring-scope.test.ts:22:92
+     20|   })
+     21|   it.each([[],[{courseId:'training'},{courseId:'training'}],[{courseId…
+     22|     await expect(assertTrainingVariantAuthoringScope(tx as any,row({qu…
+       |                                                                                            ^
+     23|   })
+     24|   it.each([[],[{id:'training',courseType:'LEGACY',isLibrary:false}],[{…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/__tests__/questionnaire/training-variant-authoring-scope.test.ts > Training weighted variant authoring source boundary > rejects missing or nonTraining actual rows undefined
+AssertionError: promise resolved "undefined" instead of rejecting
+
+- Expected:
+Error {
+  "message": "rejected promise",
+}
+
++ Received:
+undefined
+
+ ❯ src/__tests__/questionnaire/training-variant-authoring-scope.test.ts:25:83
+     23|   })
+     24|   it.each([[],[{id:'training',courseType:'LEGACY',isLibrary:false}],[{…
+     25|     setup(facts);await expect(assertTrainingVariantAuthoringScope(tx a…
+       |                                                                                   ^
+     26|   })
+     27|   it('permits a unique Training public source but rejects multi-course…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  3 failed | 41 passed (44)
+   Start at  20:39:04
+   Duration  2.65s (transform 1.68s, setup 0ms, import 2.29s, tests 39ms, environment 0ms)
+

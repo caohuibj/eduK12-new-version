@@ -15,6 +15,8 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useStaffFeedback } from '../../components/staff-ui/useStaffFeedback'
 import LocalDateTimeInput, { localDateTimeValue, parseLocalDateTime } from '../../components/LocalDateTimeInput'
 import './questionnaire-products.css'
+import { TrainingVariantEditor } from './TrainingVariantEditor'
+import { validateTrainingVariants, type TrainingVariantConfig } from './trainingVariants'
 import {
   ProductPage,
   PageHeader,
@@ -185,6 +187,8 @@ export function QuestionnaireProductEdit() {
   const [courseIds, setCourseIds] = useState<string[]>([])
   const [publicEnabled, setPublic] = useState(false)
   const [timingEnabled,setTimingEnabled]=useState(false)
+  const [trainingVariantDraft, setTrainingVariantDraft] = useState<TrainingVariantConfig | null>(null)
+  const [maxAttempts, setMaxAttempts] = useState(1)
   const [expiresAt, setExpiry] = useState('')
   const [opensAt, setOpens] = useState('')
   const [type, setType] = useState('SCALE')
@@ -220,6 +224,7 @@ export function QuestionnaireProductEdit() {
   const [required, setRequired] = useState(true)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const actionInFlight = useRef(false)
   const [preflight, setPreflight] = useState<{ revision: number; ok: boolean; checks: Array<{ key: string; label: string; status: string; message: string; targetId?: string }> } | null>(null)
   const [nameError, setNameError] = useState('')
   const [expiryError, setExpiryError] = useState('')
@@ -233,6 +238,8 @@ export function QuestionnaireProductEdit() {
     setCourseIds((row.questionnaireCourses || []).map((v: any) => v.courseId))
     setPublic(row.publicEnabled)
     setTimingEnabled(Boolean(row.trainingTimingPolicy))
+    setTrainingVariantDraft(row.trainingVariantDraft ?? null)
+    setMaxAttempts(row.maxAttempts ?? 1)
     setExpiry(row.expiresAt || '')
     setOpens(row.opensAt || '')
   }
@@ -272,6 +279,8 @@ export function QuestionnaireProductEdit() {
     return () => { active = false }
   }, [id, preselectedScaleId, preselectedCourseId, user?.id])
   const action = async (fn: () => Promise<void>) => {
+    if (actionInFlight.current) return
+    actionInFlight.current = true
     setBusy(true)
     setError('')
     try {
@@ -279,6 +288,7 @@ export function QuestionnaireProductEdit() {
     } catch (e) {
       setError(message(e))
     } finally {
+      actionInFlight.current = false
       setBusy(false)
     }
   }
@@ -313,6 +323,12 @@ export function QuestionnaireProductEdit() {
         ?.focus()
       return
     }
+    if (variantsDirty && trainingVariantDraft) {
+      const variantError = !variantsEligible
+        ? '随机分组仅支持真实 Training 课程投放；公开链接须唯一绑定一个课程。'
+        : validateTrainingVariants(trainingVariantDraft, maxAttempts, units)
+      if (variantError) { setError(variantError); return }
+    }
     return action(async () => {
       if (id === 'new') {
         const row = await request('', {
@@ -321,14 +337,23 @@ export function QuestionnaireProductEdit() {
           requestId,
         })
         navigate(base + '/' + row.id + (preselectedScaleId ? '?scaleId=' + encodeURIComponent(preselectedScaleId) : ''), { replace: true })
-      } else
-        hydrate(
-          await request(
-            '/' + id,
-            { ...metadata(), revision: detail.revision },
-            'put',
-          ),
-        )
+      } else {
+        let row = detail
+        // Disable first so delivery can leave Training without an active config.
+        // Keep each successful revision if a later save fails; local edits remain.
+        if (variantsDirty && !trainingVariantDraft) {
+          row = await request('/' + id + '/training-variants', { revision: row.revision, config: null })
+          setDetail(row)
+        }
+        if (metadataDirty) {
+          row = await request('/' + id, { ...metadata(), revision: row.revision }, 'put')
+          setDetail(row)
+        }
+        if (variantsDirty && trainingVariantDraft) {
+          row = await request('/' + id + '/training-variants', { revision: row.revision, config: trainingVariantDraft, maxAttempts })
+        }
+        hydrate(row)
+      }
     })
   }
   const add = () =>
@@ -428,7 +453,7 @@ export function QuestionnaireProductEdit() {
         after = payload.next
       } while (after)
     })
-  const dirty = Boolean(
+  const metadataDirty = Boolean(
     detail &&
       (name !== detail.name ||
         instruction !== (detail.instruction || '') ||
@@ -446,6 +471,15 @@ export function QuestionnaireProductEdit() {
               .sort(),
           )),
   )
+  const variantsDirty = Boolean(detail && (
+    JSON.stringify(trainingVariantDraft) !== JSON.stringify(detail.trainingVariantDraft ?? null) ||
+    (trainingVariantDraft && maxAttempts !== (detail.maxAttempts ?? 1))
+  ))
+  const dirty = metadataDirty || variantsDirty
+  const variantsEligible = kind === 'COURSE' && !detail?.reportPackage && !detail?.analysisProtocol &&
+    (!detail?.productKind || detail.productKind === 'QUESTIONNAIRE') && courseIds.length > 0 && courseIds.length <= 100 &&
+    courseIds.every(courseId => catalog.courses.some((course: { id: string; courseType?: string; isLibrary?: boolean }) => course.id === courseId && course.courseType === 'TRAINING_COURSE' && !course.isLibrary)) &&
+    (!publicEnabled || courseIds.length === 1)
   const draft = id === 'new' || detail?.status === 'DRAFT'
   const choices =
     type === 'SCALE'
@@ -900,6 +934,19 @@ export function QuestionnaireProductEdit() {
               )}
               </div></div>
               {deliverySettings}
+              {(draft ? variantsEligible || trainingVariantDraft || detail.trainingVariantDraft : detail.trainingVariantFrozen) && <TrainingVariantEditor
+                config={trainingVariantDraft}
+                frozen={detail.trainingVariantFrozen ?? null}
+                maxAttempts={maxAttempts}
+                units={units}
+                draft={draft}
+                eligible={variantsEligible}
+                busy={busy}
+                dirty={variantsDirty}
+                onChange={setTrainingVariantDraft}
+                onMaxAttemptsChange={setMaxAttempts}
+                onSave={() => void save()}
+              />}
               <div className="flex flex-wrap gap-4 my-5">
                 <ProductButton
                   disabled={busy}

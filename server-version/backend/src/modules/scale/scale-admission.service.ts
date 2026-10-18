@@ -1,3 +1,4 @@
+import { assertTrainingChildSelected } from '../composite/training-variant-child-scope'
 import {readTrainingTimingSnapshot,type TrainingTimingSnapshot} from '../assessment-runtime/training-scale-timing'
 import { loadStoredVersionedUnitAdmission } from '../assessment-runtime/unit-admission'
 import { withSerializableScaleTransaction } from './deployment/transactions'
@@ -641,25 +642,7 @@ const activateUnstoredScaleAdmission = async (
   }
 
   if (row.compositeAttemptId) {
-    const loaded = parent ?? await db.compositeAssessmentAttempt.findUnique({
-      where: { id: row.compositeAttemptId },
-      select: {
-        id: true,
-        userId: true,
-        recoveryTokenHash: true,
-        trainingTimingSnapshot: true,
-        deliveryMode: true,
-        attemptEpoch: true,
-        contextSnapshotEncrypted: true,
-        contextSnapshotHash: true,
-        frozenActiveSlotSetEncrypted: true,
-        frozenActiveSlotSetHash: true,
-        compositeAssessment: {
-          select: { formSections: { select: { contextSection: true, items: { select: { contextKey: true } } } } },
-        },
-      },
-    })
-    if (!loaded) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '上级测评记录不存在', 404)
+    const loaded = await assertTrainingChildSelected(row, { parent, db })
     assertFinalOnly(loaded.deliveryMode)
     assertAttemptEpoch(loaded.attemptEpoch, row.attemptEpoch)
     if (!row.compositeItemId) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表未绑定到当前测评单元', 409)
@@ -733,6 +716,7 @@ export const activateScaleAdmission = async (
   parent?: CompositeScaleAdmissionParent,
   referenceTimeMs = Date.now(),
 ): Promise<VersionedFrozenUnitAdmission> => {
+  parent = await assertTrainingChildSelected(row, { parent }) ?? parent
   const stored = await loadStoredScaleAdmission(row)
   if (stored) return (await validateStoredAgainstRuntime(row, stored, referenceTimeMs))
   assertFinalOnly(row.deliveryMode)
