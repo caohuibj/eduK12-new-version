@@ -138,15 +138,15 @@ describe('ScaleEdit safe copy, draft editing and publication', () => {
     })
     const user = userEvent.setup()
     render(editor('/scales/copy'))
-    const visibility = await screen.findByRole('combobox', { name: '可见性', exact: true })
+    const visibility = await screen.findByRole('combobox', { name: '可见性' })
     expect(screen.getByLabelText('可见性', { exact: true })).toBe(visibility)
     expect(visibility).toHaveAccessibleName('可见性')
     await user.selectOptions(visibility, 'COURSE')
-    await user.click(screen.getByRole('button', { name: '保存草稿', exact: true }))
+    await user.click(screen.getByRole('button', { name: '保存草稿' }))
     await screen.findByText('草稿内容已保存', { exact: true })
     expect(api.put.mock.calls[0]).toEqual(['/scales/copy', expect.objectContaining({ visibility: 'COURSE' })])
     expect(stored.visibility).toBe('COURSE')
-    expect(screen.getByRole('combobox', { name: '可见性', exact: true })).toHaveValue('COURSE')
+    expect(screen.getByRole('combobox', { name: '可见性' })).toHaveValue('COURSE')
   })
 
   it.each([
