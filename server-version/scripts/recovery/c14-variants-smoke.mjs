@@ -10,7 +10,9 @@ import {createRequire} from 'node:module'
 import {randomUUID, createHash} from 'node:crypto'
 import {fileURLToPath} from 'node:url'
 import {deflateSync} from 'node:zlib'
+import {observeConcurrentAdmission} from './c14-admission-observer.mjs'
 import {createTrainingCourseFixture} from './c14-training-fixture.mjs'
+import {verifyWholeSharedBeforeAck,verifyWholeSharedAfterReport} from './c14-whole-shared-controls.mjs'
 const backend=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../../backend')
 const require=createRequire(path.join(backend,'package.json'))
 const {prisma}=require(path.join(backend,'dist/config/database.js'))
@@ -24,8 +26,8 @@ const {loadFrozenActiveSlotSet}=require(path.join(backend,'dist/modules/assessme
 const state=process.argv[2],status=JSON.parse(fs.readFileSync(path.join(state,'status.json'))),fixture=JSON.parse(fs.readFileSync(path.join(state,'fixture-private.json')))
 assert.equal(new URL(status.apiUrl).hostname,'127.0.0.1');assert.equal(process.env.NODE_ENV,'test')
 assert.match(process.env.DATABASE_URL,/eduk12_runtime:.*@127\.0\.0\.1:\d+\/eduk12_recovery/)
-const reportOnly=process.env.C14_REPORT_ONLY==='1'
-const checks=[],requests=[],counts=[],races=[],allocations=[],completed=[],gateClients=[]
+const reportOnly=process.env.C14_REPORT_ONLY==='1',admissionOnly=process.env.C14_ADMISSION_ONLY==='1'
+const checks=[],requests=[],counts=[],races=[],allocations=[],completed=[],gateClients=[],optimizedWholeEvidence=[]
 let passed=false,teacherId,studentId,syntheticPasswordHash,reusedEvidence=null
 const prefix='/composite-assessments',pub='/public/composite-assessments',products='/questionnaire-products',auth='/situational/authoring'
 const denied=[400,403,404,409,422],pause=ms=>new Promise(r=>setTimeout(r,ms)),sha=value=>createHash('sha256').update(value).digest('hex')
@@ -163,12 +165,15 @@ async function asyncWholeRestartCheck(){
  const config={schemaVersion:1,groups:d.items.map((item,index)=>({variantKey:index?'b':'a',label:index?'B':'A',weight:1,units:[{type:'ITEM',id:item.id}]}))}
  d=await configureAndPublish({draft:d,config,maxAttempts:2});const c=await actor(),{attempt:a}=await c.request(`${prefix}/${d.id}/attempts`,'POST',{}),fact=await allocation(a,d),definition=await c.request(`${prefix}/attempts/${a.id}/whole/definition`)
  const body=wholeBody(definition)
+ let optimized
  await withPausedReportWorker(async()=>{
+  if(process.env.ASSESSMENT_SHARED_CONTROL_ENABLED==='true')optimized=await verifyWholeSharedBeforeAck({prisma,client:c,attempt:a,product:d,fact,definition,body,noWrites,check})
   await c.request(`${prefix}/attempts/${a.id}/whole/submit`,'POST',body)
   const job=await prisma.compositeReportJob.findUniqueOrThrow({where:{attemptId_attemptEpoch:{attemptId:a.id,attemptEpoch:a.attemptEpoch}}});assert.equal(job.wholeSubmissionId,body.submissionId);assert.ok(job.wholeAcceptedAt);assert.equal(await prisma.assessmentUnitSnapshot.count({where:{compositeAttemptId:a.id}}),0);assert.equal((await prisma.assessment.findUniqueOrThrow({where:{id:fact.scales[0].id}})).status,'IN_PROGRESS')
   await noWrites('Durable async whole FINAL ACK with zero unit snapshots still forbids weighted restart',()=>c.request(`${prefix}/attempts/${a.id}/restart`,'POST',{},409));await allocation(a,d)
  })
  await report(c,a,d,prefix);assert.equal(await prisma.assessmentUnitSnapshot.count({where:{compositeAttemptId:a.id}}),1);check('Original worker resumed and materialized the previously ACKed selected Scale; frozen allocation unchanged')
+ if(optimized)optimizedWholeEvidence.push({...optimized,completed:await verifyWholeSharedAfterReport({prisma,attempt:a,product:d,fact,body,check,state,status})})
  await wholeRestartRaces(d)
 }
 async function wholeRestartRaces(product){
@@ -271,10 +276,34 @@ async function resumeHttp03(){
  return main
 }
 
+
+async function sixStarts(c,productId){
+ const outcomes=await observeConcurrentAdmission({prisma,status,state,requests:Array.from({length:6},()=>()=>c.request(`${prefix}/${productId}/attempts`,'POST',{}))})
+ const failure=outcomes.find(result=>result.status==='rejected');if(failure)throw failure.reason
+ return outcomes.map(result=>result.value)
+}
+async function admissionOnlyCheck(){
+ const source=JSON.parse(fs.readFileSync(path.join(state,'c14-resume-source-result.json')));assert.equal(source.sourceMetadata.sourceMode,'REPORT_ONLY')
+ const old=await prisma.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:source.http.allocations[0].attemptId}})
+ const product=await prisma.compositeAssessment.findUniqueOrThrow({where:{id:old.compositeAssessmentId},include:{items:{orderBy:{position:'asc'}},formSections:{include:{items:true}}}})
+ assert.equal(await prisma.compositeAssessmentAttempt.count({where:{compositeAssessmentId:product.id,userId:studentId}}),0)
+ const before=await census(),quotaBefore=await prisma.cognitiveSession.count({where:{userId:studentId}})
+ let results
+ try{results=await sixStarts(student,product.id)}finally{
+  const after=await census(),quotaAfter=await prisma.cognitiveSession.count({where:{userId:studentId}});counts.push({name:'Targeted six-start census and Cognitive quota consumption',before,after,quotaBefore,quotaAfter})
+  fs.writeFileSync(path.join(state,'c14-admission-census.json'),JSON.stringify({before,after,quotaBefore,quotaAfter},null,2),{mode:0o600})
+ }
+ const first=results[0].attempt;assert.ok(results.every(result=>result.attempt.id===first.id))
+ const fact=await allocation(first,product);assert.equal(fact.forms.length,1);assert.equal(fact.scales.length,1);assert.equal(fact.cognitive.length,1);assert.equal(fact.sjt.length,1)
+ const after=await census();assert.deepEqual(after,{...before,parents:before.parents+1,forms:before.forms+1,scales:before.scales+1,cognitive:before.cognitive+1,sjt:before.sjt+1});assert.equal(await prisma.cognitiveSession.count({where:{userId:studentId}}),quotaBefore+1)
+ check('ADMISSION_ONLY: six concurrent starts succeed with one private allocation, exactly four selected children, one Cognitive quota use, and real PG/pool/CPU diagnostic evidence; no answers or reports executed')
+}
 try {
  const [role]=await prisma.$queryRawUnsafe('SELECT current_user AS name, rolsuper, rolcreatedb, rolcreaterole, rolbypassrls FROM pg_roles WHERE rolname=current_user');assert.equal(role.name,'eduk12_runtime');for(const key of ['rolsuper','rolcreatedb','rolcreaterole','rolbypassrls'])assert.equal(role[key],false)
- await admin.login(fixture.admin,'ADMIN');await student.login(fixture.student,'STUDENT')
+ if(!admissionOnly)await admin.login(fixture.admin,'ADMIN');await student.login(fixture.student,'STUDENT')
  const fixtureStudent=await prisma.user.findUniqueOrThrow({where:{username:fixture.student.username}});studentId=fixtureStudent.id;syntheticPasswordHash=fixtureStudent.passwordHash;assert.equal(fixtureStudent.role,'STUDENT');assert.ok(['TRAINING','LEGACY'].includes(fixtureStudent.accountDomain))
+ if(admissionOnly)await admissionOnlyCheck()
+ else {
  let main
  if(fs.existsSync(path.join(state,'c14-resume-source-result.json')))main=await resumeHttp03()
  else {
@@ -297,7 +326,7 @@ try {
  const infoClient=client();await infoClient.request('/auth/csrf');const publicToken=await token(main,1),publicInfo=await infoClient.request(`${pub}/${publicToken.token}`);assert.equal(publicInfo.weightedVariants,true);assert.deepEqual(publicInfo.units,[]);assert.deepEqual(publicInfo.items,[]);assert.deepEqual(publicInfo.formSections,[])
  await noWrites('Nonmember cannot allocate any group',()=>outsider.request(`${prefix}/${main.id}/attempts`,'POST',{},[403,404]))
  // Genuine same-identity contention: no preselected group, no random stub.
- const definitionsBeforeAdmission=await prisma.compositeAssessment.count();const concurrent=await Promise.all(Array.from({length:6},()=>student.request(`${prefix}/${main.id}/attempts`,'POST',{}))),first=concurrent[0].attempt;assert.ok(concurrent.every(x=>x.attempt.id===first.id));assert.equal(await prisma.compositeAssessmentAttempt.count({where:{compositeAssessmentId:main.id,userId:studentId}}),1);const firstFact=await allocation(first,main);await denyExternal(student,first,main);await noWrites('Same identity resume is read-only and does not redraw allocation',async()=>{for(let i=0;i<3;i++){const resumed=await student.request(`${prefix}/${main.id}/attempts`,'POST',{});assert.equal(resumed.attempt.id,first.id);await allocation(resumed.attempt,main)}});assert.equal(await prisma.compositeAssessment.count(),definitionsBeforeAdmission);check('Six concurrent starts persist exactly one parent allocation and only selected children')
+ const definitionsBeforeAdmission=await prisma.compositeAssessment.count();const concurrent=await sixStarts(student,main.id),first=concurrent[0].attempt;assert.ok(concurrent.every(x=>x.attempt.id===first.id));assert.equal(await prisma.compositeAssessmentAttempt.count({where:{compositeAssessmentId:main.id,userId:studentId}}),1);const firstFact=await allocation(first,main);await denyExternal(student,first,main);await noWrites('Same identity resume is read-only and does not redraw allocation',async()=>{for(let i=0;i<3;i++){const resumed=await student.request(`${prefix}/${main.id}/attempts`,'POST',{});assert.equal(resumed.attempt.id,first.id);await allocation(resumed.attempt,main)}});assert.equal(await prisma.compositeAssessment.count(),definitionsBeforeAdmission);check('Six concurrent starts persist exactly one parent allocation and only selected children')
  await finish(student,first,main);const sampledKeys=new Set([firstFact.value.variantKey]);let sampleCount=1
  while(sampledKeys.size<2&&sampleCount<16){const c=await actor(),{attempt:a}=await c.request(`${prefix}/${main.id}/attempts`,'POST',{}),fact=await allocation(a,main);if(!sampledKeys.has(fact.value.variantKey))await denyExternal(c,a,main);await finish(c,a,main);sampledKeys.add(fact.value.variantKey);sampleCount++}
  assert.equal(sampledKeys.size,2,'Bounded actual draws did not reach both groups; cannot claim both-group HTTP coverage');check(`Both weighted groups actually drawn and all four tools answered in ${sampleCount} bounded natural samples; no distribution/load qualification`)
@@ -323,6 +352,7 @@ try {
  sources[1].grant=await grant(sources[1].d.release);let granted
  await withGate('stored_assets',sources[0].d.asset.assetId,async(pid,unlock)=>{const start=tracked(grantClient.request(`${prefix}/${grantProduct.id}/attempts`,'POST',{})),startPid=await observedLock('stored_assets',pid,start),rev=tracked(revoke(sources[1].grant));await observedLock('sjt_release_grants',startPid,rev);unlock();granted=(await start.result()).attempt;await rev.result()});await allocation(granted,grantProduct);await allocation(await grantClient.request(`${prefix}/attempts/${granted.id}`),grantProduct);await noWrites('A revoked unselected candidate is not silently dropped on fresh union admission',async()=>{const c=await actor();await c.request(`${prefix}/${grantProduct.id}/attempts`,'POST',{},denied)});check('Candidate authorization uses actual grant→asset lock order before draw; accepted frozen allocation survives later revoke')
  }
+ }
  passed=true
 } catch(error) { console.error(error);throw error }
-finally {for(const db of gateClients)await db.$disconnect();await prisma.$disconnect();fs.writeFileSync(path.join(state,'c14-http-result.json'),JSON.stringify({passed,qualificationScope:reportOnly?'REPORT_ONLY':'FULL_CONTINUATION',checks,requests,counts,races,allocations,completed,reusedEvidence,qualification:{browser:false,load:false,cpuOrLatency:false,sampling:'Natural production crypto draws; bounded at 16; both groups must be observed and every sampled attempt fully answered',mediaLimit:'Hidden SJT probes exercise cross-slot denial; no successful selected-video capability fixture or independent hidden-child HTTP selection-guard claim'}},null,2))}
+finally {for(const db of gateClients)await db.$disconnect();await prisma.$disconnect();fs.writeFileSync(path.join(state,'c14-http-result.json'),JSON.stringify({passed,qualificationScope:admissionOnly?'ADMISSION_ONLY':reportOnly?'REPORT_ONLY':'FULL_CONTINUATION',checks,requests,counts,races,allocations,completed,reusedEvidence,optimizedWholeEvidence,qualification:{browser:false,load:false,cpuOrLatency:false,sampling:'Natural production crypto draws; bounded at 16; both groups must be observed and every sampled attempt fully answered',mediaLimit:'Hidden SJT probes exercise cross-slot denial; no successful selected-video capability fixture or independent hidden-child HTTP selection-guard claim'}},null,2))}

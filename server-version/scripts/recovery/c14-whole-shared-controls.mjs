@@ -4,6 +4,7 @@
  */
 import assert from 'node:assert/strict'
 import path from 'node:path'
+import fs from 'node:fs'
 import {createRequire} from 'node:module'
 import {fileURLToPath} from 'node:url'
 import {randomUUID,createHash} from 'node:crypto'
@@ -11,9 +12,9 @@ const backend=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../../b
 const require=createRequire(path.join(backend,'package.json'))
 const {Prisma}=require('@prisma/client')
 const {decryptUnifiedRuntimePayload}=require(path.join(backend,'dist/modules/assessment-runtime/security.js'))
-const {isCompactEncryptedField}=require(path.join(backend,'dist/modules/assessment-runtime/compact-field-codec.js'))
+const {isCompactEncryptedField,decryptCompactField}=require(path.join(backend,'dist/modules/assessment-runtime/compact-field-codec.js'))
 const {publicTemplates}=require(path.join(backend,'dist/modules/assessment-runtime/public-templates.js'))
-const {loadStoredCanonicalUnitResult}=require(path.join(backend,'dist/modules/assessment-runtime/compact-assessment-storage.js'))
+const {loadStoredCanonicalUnitResult,resolveStoredScaleAnswers}=require(path.join(backend,'dist/modules/assessment-runtime/compact-assessment-storage.js'))
 const hash=value=>createHash('sha256').update(JSON.stringify(value,(_k,v)=>typeof v==='bigint'?String(v):v)).digest('hex')
 const requiredFlags=['ASSESSMENT_COMPACT_FACTS_ENABLED','ASSESSMENT_SHARED_CONTROL_ENABLED','ASSESSMENT_REPORT_COMPACT_READ_ENABLED','ASSESSMENT_REPORT_COMMITTED_CONTEXT_ENABLED','ASSESSMENT_SCALE_COLLECTION_BATCH_ENABLED','ASSESSMENT_REPORT_CONTEXT_REUSE_ENABLED']
 
@@ -74,8 +75,8 @@ export async function verifyWholeSharedBeforeAck({prisma,client,attempt,product,
  const hidden=product.items.find(item=>!fact.value.selectedItemIds.includes(item.id))
  await deny('Cached whole rejects client-forged allocation/group fields before ACK',{...body,submissionId:randomUUID(),trainingVariantAllocation:{variantKey:hidden.id,allocationHash:'0'.repeat(64)}},400)
  await deny('Cached whole rejects missing selected units before ACK',{...body,submissionId:randomUUID(),units:[]},400)
- await deny('Cached whole rejects replacing the selected unit with a real outside-group item before ACK',{...body,submissionId:randomUUID(),units:[{...body.units[0],itemId:hidden.id}]},[400,403,409])
- await deny('Cached whole rejects adding a real outside-group unit before ACK',{...body,submissionId:randomUUID(),units:[...body.units,{...body.units[0],itemId:hidden.id}]},[400,403,409])
+ await deny('Cached whole rejects replacing the selected unit with a real outside-group item before ACK',{...body,submissionId:randomUUID(),units:[{...body.units[0],itemId:hidden.id}]},409)
+ await deny('Cached whole rejects adding a real outside-group unit before ACK',{...body,submissionId:randomUUID(),units:[...body.units,{...body.units[0],itemId:hidden.id}]},400)
  const original=await prisma.compositeAssessment.findUniqueOrThrow({where:{id:product.id}})
  assert.equal(await prisma.compositeAssessmentAttempt.count({where:{compositeAssessmentId:product.id}}),1,'Marker corruption is restricted to the independent new whole product')
  const restore={trainingVariantDraft:original.trainingVariantDraft??Prisma.DbNull,trainingVariantFrozen:original.trainingVariantFrozen??Prisma.DbNull,trainingVariantDigest:original.trainingVariantDigest,updatedAt:original.updatedAt}
@@ -94,20 +95,44 @@ export async function verifyWholeSharedBeforeAck({prisma,client,attempt,product,
  return {attemptId:attempt.id,selectedItemIds:fact.value.selectedItemIds,publicPlanHashes:[slotRef.p,validationRef.p,admissionRef.p],unacceptedFactsSha256:before,receiptMode:'TRANSACTIONAL',flags:Object.fromEntries(requiredFlags.map(key=>[key,process.env[key]]))}
 }
 
-export async function verifyWholeSharedAfterReport({prisma,attempt,fact,body,check}){
+export async function verifyWholeSharedAfterReport({prisma,attempt,product,fact,body,check,state,status}){
  assertFlags()
  const parent=await prisma.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:attempt.id}})
  const job=await prisma.compositeReportJob.findUniqueOrThrow({where:{attemptId_attemptEpoch:{attemptId:attempt.id,attemptEpoch:attempt.attemptEpoch}}})
- assert.equal(parent.status,'COMPLETED');assert.equal(job.status,'READY');assert.equal(job.wholeSubmissionId,body.submissionId)
+ assert.equal(parent.status,'COMPLETED');assert.equal(job.status,'READY');assert.equal(job.wholeSubmissionId,body.submissionId);assert.equal(job.attemptCount,1,'Fresh optimized whole must complete in its first worker execution')
  assert.ok(job.wholeAcceptedAt);assert.ok(isCompactEncryptedField(job.wholeAnswersEncrypted));assert.equal(parent.trainingVariantAllocationEncrypted,fact.row.trainingVariantAllocationEncrypted)
  const stored=await prisma.assessmentResultFact.findMany({where:{assessmentId:{in:fact.scales.map(child=>child.id)}}})
  assert.equal(stored.length,1)
  for(const row of stored){assert.equal(row.rawReceiptAttemptId,attempt.id);assert.equal(row.rawAnswersEncrypted,null);assert.equal(row.attemptEpoch,attempt.attemptEpoch);assert.ok(isCompactEncryptedField(row.factsEncrypted))}
  const snapshots=await prisma.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:attempt.id,attemptEpoch:attempt.attemptEpoch}})
  assert.equal(snapshots.length,1);assert.equal(snapshots[0].unitType,'SCALE');assert.equal(snapshots[0].terminalState,'COMPLETED')
- const ref=decryptUnifiedRuntimePayload(snapshots[0].canonicalResultEncrypted);assert.equal(ref.k,'SCF2');assert.equal(ref.a,stored[0].assessmentId)
+ const ref=decryptUnifiedRuntimePayload(snapshots[0].canonicalResultEncrypted);assert.equal(ref.k,'SCF2');assert.equal(ref.a,stored[0].assessmentId);assert.equal(ref.e,attempt.attemptEpoch)
  const canonical=await loadStoredCanonicalUnitResult(snapshots[0].canonicalResultEncrypted,prisma)
  assert.equal(canonical.resultHash,stored[0].canonicalResultHash)
- check('Legal selected-only whole ACK completed through original worker with compact receipt-backed Scale fact and canonical SCF2; all six optimized-path flags enabled, transactional receipt retained')
- return {attemptId:attempt.id,wholeSubmissionId:body.submissionId,canonicalResultHash:canonical.resultHash,compactScaleFacts:stored.length,privateAllocationUnchanged:true}
+ const child=await prisma.assessment.findUniqueOrThrow({where:{id:stored[0].assessmentId}})
+ assert.deepEqual(child.answers,{k:'SFR1',e:attempt.attemptEpoch});assert.deepEqual(child.result,{k:'SFF1',e:attempt.attemptEpoch})
+ const raw=await resolveStoredScaleAnswers(child.answers,child,prisma)
+ assert.deepEqual(raw.answers.map(({itemCode,responseValue})=>({itemCode,responseValue})),body.units[0].answers)
+ const compactReport=decryptCompactField(job.reportEncrypted);assert.equal(compactReport.kind,'COMPOSITE_REPORT_FACTS');assert.equal(compactReport.binding.attemptId,attempt.id);assert.equal(compactReport.binding.attemptEpoch,attempt.attemptEpoch);assert.deepEqual(compactReport.units.map(unit=>unit.assessmentId),[child.id])
+ const [layout]=await publicTemplates.loadMany([{hash:compactReport.layout,kind:'COMPOSITE_REPORT_LAYOUT'}]);assert.equal(layout.root.assessmentId,product.id);const {assessmentId:publicProductId,...publicRoot}=layout.root;noPrivateOrHidden({...layout,root:publicRoot},product,fact)
+ const timeline=await verifiedWorkerTimeline(state,status,attempt.id)
+ check('Legal selected-only whole ACK completed through original worker with compact receipt-backed Scale fact and canonical SCF2; direct worker batch and committed-graph timeline verified; transactional receipt retained')
+ return {attemptId:attempt.id,wholeSubmissionId:body.submissionId,canonicalResultHash:canonical.resultHash,compactScaleFacts:stored.length,privateAllocationUnchanged:true,jobAttemptCount:job.attemptCount,requestedRevision:job.requestedRevision,claimedRevision:job.claimedRevision,timeline}
+}
+
+async function verifiedWorkerTimeline(state,status,attemptId){
+ assert.equal(process.env.PERF_ISOLATED_TEST_MODE,'1');assert.equal(process.env.ASSESSMENT_TIMELINE_ENABLED,'true')
+ const attemptHash=createHash('sha256').update(attemptId).digest('hex').slice(0,24),file=path.join(state,'report-worker.log'),deadline=Date.now()+5000
+ while(Date.now()<deadline){
+  const records=fs.readFileSync(file,'utf8').split('\n').flatMap(line=>{const at=line.indexOf('ASSESSMENT_TIMELINE ');if(at<0)return [];try{return [JSON.parse(line.slice(at+'ASSESSMENT_TIMELINE '.length))]}catch{return []}})
+  const matches=records.filter(record=>record.kind==='report'&&record.attemptHash===attemptHash&&record.processId===status.pids['report-worker'])
+  const ready=matches.filter(record=>record.events.some(event=>event.name==='report.ready_commit_confirmed'))
+  if(ready.length){
+   assert.equal(ready.length,1);const record=ready[0],names=record.events.map(event=>event.name)
+   assert.equal(record.dropped,0);assert.equal(record.terminal,'returned');assert.ok(names.includes('report.units_batch'));assert.ok(names.includes('report.aggregate_finalize'));assert.ok(names.includes('report.aggregate_materialize'));assert.ok(names.includes('aggregate.validate'));assert.ok(!names.includes('aggregate.definition_db'),'Fresh whole report must reuse its committed parent graph rather than reload the graph')
+   return {attemptHash,processId:record.processId,events:names,dropped:record.dropped,terminal:record.terminal,evidence:'Existing worker timeline proves batch execution and committed-parent graph reuse; no CPU, latency, or throughput conclusion'}
+  }
+  await new Promise(resolve=>setTimeout(resolve,25))
+ }
+ throw new Error('Original worker did not emit the complete optimized whole timeline')
 }

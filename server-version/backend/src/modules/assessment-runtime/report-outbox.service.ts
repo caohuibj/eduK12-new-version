@@ -155,7 +155,7 @@ const enqueueBoundReport = async (tx: Prisma.TransactionClient, parent: BoundRep
     // no incomplete scan consumes a global permit or wakes a report worker.
     if (waitForCompletedUnits) {
       if (!parent.frozenActiveSlotSetEncrypted) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '报告冻结单元缺失', 409)
-      const slots = await loadFrozenActiveSlotSet(parent.frozenActiveSlotSetEncrypted)
+      const slots = await loadFrozenActiveSlotSet(parent.frozenActiveSlotSetEncrypted, tx)
       if (slots.snapshotHash !== parent.frozenActiveSlotSetHash || slots.attemptEpoch !== parent.attemptEpoch) {
         throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '报告冻结单元绑定不匹配', 409)
       }

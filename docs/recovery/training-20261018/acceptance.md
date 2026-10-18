@@ -40,3 +40,18 @@
 新复杂流程策略初期不与概率分卷、anonymousStudy 混用；未实现的组合在编制/发布明确拒绝，不能暗中接纳。跨版本研究需要任务级适配；最终 Training 与 Survey 差距清单保留所有限制。
 
 性能先功能后测量，重型检查与压测串行。导出累计 N 行成本与每次提交成本分列；旧基线仅比其支持的同语义路径，新功能绝对成本或同候选on/off。监控API/worker CPU、RSS、heap/external、PG连接/锁/IO、cgroup节流与发压端；队列排空后观察，不凭RSS未回落断言泄漏。API RSS≥1GiB、可用内存低于2GiB或阶段超过10分钟自动停止该次发压并保留记录。热点检查：重复模板/hash、native media重放前置Form、逐报告授权/策略查询、缓存冷轮转、草稿清理锁。不得用两份SJT代替真实四工具，不并行跑互相污染的压测。
+
+## C14/C15 增量限定结果（2026-10-18）
+
+上表“初始状态”保留计划原文；当前 C14/C15 的详细源码/迁移/动态证据见 `c14-weighted-variants.md` 与 `c14-evidence/`。FULL02 业务源码固定15024877，真实主链、分层报告导出及非空新格式恢复通过；中央 outbox 冷-cache旧null Form六首FINAL并发及既有variant full preview已补充通过；本批最小范围限定功能闭合，正式整合/浏览器/性能仍后续阶段。
+
+本批最小产品边界：2–8组、整数weight1–100、union顺序子序列、完整Form section、相同first context；有限attempt预算且取消耗次；已接收任一FINAL不能restart原attempt。一个parent任务、selected children/active slots，不造私卷parent或未选空事实；owner union编制，个人selected报告，任务按publication/config/group分层，未分配为NOT_SHOWN/不适用。
+
+保留差距：
+- C15当前任务分析是完成/状态/任务满意度分层摘要与可用CSV/ZIP；跨人指标、配对完整统计在C16。
+- 新variants不与复杂delivery policies、anonymousStudy、关系测评、报告包或无课程私模板混用；明确拒绝，普通null与旧anonymousStudy保持原语义。
+- 未移植Survey完整assignment service；共享纯weighted core仅配置/权重/抽样/分配校验。quota/KEEP_LINKED不是本批功能，留C20。
+- 主链真实使用Form、Scale、120-trial Cognitive和SJT；隐藏SJT资产探针证明跨slot拒绝，但没有新选中video能力fixture，不能称独立视频能力验收。
+- 直接子API的selected guard有定向单元/source检查；FULL02的隐藏单元HTTP覆盖父路由与跨slot探针，未另造不可达隐藏child来声称全部native child入口独立动态覆盖。fullpreview在后续独立cold-final阶段补充真实HTTP200与异teacher拒，未计入FULL02的361请求；清null后旧artifact指纹拒绝仍只有定向/source资格。
+- 真浏览器仍C25；本节点既有EPERM结论不重复绕过。C26完整CPU/RSS/DB/吞吐与长时负载尚未执行，pool饥饿诊断及219ms单窗口不是性能收益。全部候选抽前prepare的CPU/解密/编译/媒体查询绝对成本需在C26单列。
+- gzip只是证据容器，解压bytes/SHA必须吻合manifest；原失败与旧runtime通过范围保持，不把重用数据当作当前runtime重测。

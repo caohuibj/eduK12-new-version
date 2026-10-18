@@ -1,0 +1,9 @@
+{
+  "file": "c14-admission-observation.json.gz",
+  "rawBytes": 547837,
+  "rawSha256": "161feef0fe93397cb4239a53aa80efda818a06903833b0e1a4e22914d2e8e2ed",
+  "gzipBytes": 13462,
+  "gzipSha256": "334cf156938a11a900fcc014d6368135b5aea398a401998792f0a2d6918ed845",
+  "gzipMtime": 0,
+  "preservesEverySample": true
+}

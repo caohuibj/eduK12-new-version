@@ -1,0 +1,3 @@
+PASS /composite-assessments b: HTTP03 accepted facts retained; report-only continuation, four canonical facts and original reports
+PASS HTTP03 checkpoint resumed read-only accepted facts plus original report queue; fixture, bad candidates and existing FINAL/replay inputs were not rerun
+PASS REPORT_ONLY: original accepted four-tool facts unchanged and original report worker completed; remaining HTTP/optimized/restore scenarios not claimed

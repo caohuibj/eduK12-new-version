@@ -47,8 +47,8 @@ export const loadTrainingChildParent = async (attemptId: string, parent?: any, d
 const scopedParent = async (parent: any, db: any): Promise<{ parent: any; scope: Awaited<ReturnType<typeof resolveTrainingAttemptScope>> | null }> => {
   requireKnownMarkers(parent)
   if (trainingVariantMarkerState(parent) === 'LEGACY') return { parent, scope: null }
-  const scope = await resolveTrainingAttemptScope(parent, parent.compositeAssessment, db)
-  return { parent: await applyTrainingAttemptScope(parent, db), scope }
+  const scope = await resolveTrainingAttemptScope(parent, parent.compositeAssessment, { db })
+  return { parent: await applyTrainingAttemptScope(parent, { db }), scope }
 }
 
 export const assertTrainingChildSelected = async (

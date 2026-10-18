@@ -36,3 +36,13 @@ API/报告 worker 的 1GiB RSS、低可用内存停止线已配置；尚未制�
 4. 重复使用同一认知 fixture 触发合法最大次数 409；后续使用新合成参与者和任务，不放宽产品次数限制。
 5. 前端健康探针误用不存在的 /api/health，修正为实际代理接口；API 自身 /health、/ready 单独验证。
 6. review 后重新绑定最终启动指纹与受限消费者环境；逐次结果与失败日志保留，未覆盖失败为成功。
+
+## C14/C15 当前接续点（2026-10-18 12:43 UTC）
+
+以上 C02 内容为历史节点记录，不是当前业务 HEAD。C14/C15 在独立分支 `recovery/c14-weighted-variants-20261018` 实施，固定起点 75fb1ef1898d34e0991752515067c0483ab675d4。业务源码资格为 150248772c5592035e1da484a671548e7aa2c8a0；证据紧凑归档 checkpoint 为 8f1d9cafc6f96240f3af014f6a2fb51336814847。
+
+主链 FULL02 已通过：361 HTTP/70检查，真实 Form/Scale/Cognitive/SJT 两组作答、selected-only report、原队列 CSV/ZIP 分层、compact/shared whole 与实际 worker batch/committed timeline、合法次数/恢复与锁顺序竞争。新格式 205 表全列恢复、17 allocations、2私有图片与受限 role 验证通过。旧 HTTP03 accepted facts 保持原 hash，仅续跑原 worker完成；所有原失败记录保留。源码审查与动态报告分别限定，旧99请求不冒充当前 runtime 通过。
+
+原 pool=6 冷 shared-slot 事务遗漏经真实 PG 等待诊断和同条件6并发修复验证闭合，未加超时或池容量。中央 outbox 的独立冷-cache、旧 null Form 六首 FINAL 并发回归已在12:51 UTC通过；既有variant full preview也已实际通过。当前是本批最小范围的限定功能资格，仍不等同全平台验收。正式浏览器 C25、完整性能 C26、跨人/配对指标 C16 留待后续。
+
+恢复入口与限制见 `c14-weighted-variants.md`、`c14-evidence/full02-qualified/summary.md`、`server-version/scripts/recovery/c14-slot-transaction-audit.md`。大型 JSON 使用 gzip mtime=0，manifest 同时列解压原 bytes/SHA；不得以压缩文件 hash 代替原证据身份。私有 PG/上传/运行密钥不在 Git 中，需按恢复规程使用合格私有 dump 或重新生成明确标注的新合成输入。

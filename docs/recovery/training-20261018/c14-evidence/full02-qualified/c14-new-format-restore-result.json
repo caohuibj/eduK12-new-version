@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "checks": [
+    "Real HTTP-written C14 config/frozen/digest, encrypted allocations, all four-tool answers/raw/canonical records and every old table column survive pg_dump\u2192new DB restore exactly",
+    "Every recorded actual HTTP allocation retains byte-identical ciphertext and allocation hash after restore",
+    "New private image bytes copied separately and matched against restored asset identity/hash/size; retained references exact",
+    "Restored C14 new-format DB passes unchanged restricted runtime role contract; no API/old HTTP replay"
+  ],
+  "dumpSha256": "a40b5f82ea2058a507140a9735bab4666c9babb96900e0622f279a3a58b0cde6",
+  "verifiedFrozenAllocations": 17,
+  "verifiedPrivateImageCopies": 2,
+  "tableCount": 205,
+  "projectionSha256": "326e054514d96403a7eb5c4389aef4854a9d7c652d926e86aa451147adeffd5a"
+}

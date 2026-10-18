@@ -1,0 +1,70 @@
+PASS /composite-assessments b: HTTP03 accepted facts retained; report-only continuation, four canonical facts and original reports
+PASS HTTP03 checkpoint resumed read-only accepted facts plus original report queue; fixture, bad candidates and existing FINAL/replay inputs were not rerun
+PASS Nonmember cannot allocate any group
+PASS /composite-assessments: outside-group start/state/FINAL/image/video denied without children, allocations, raw, snapshots, jobs or token use
+PASS Same identity resume is read-only and does not redraw allocation
+PASS Six concurrent starts persist exactly one parent allocation and only selected children
+PASS /composite-assessments FORM_SECTION: first durable FINAL ACK prevents restart before replay/state/report
+PASS /composite-assessments SCALE: first durable FINAL ACK prevents restart before replay/state/report
+PASS /composite-assessments COGNITIVE: first durable FINAL ACK prevents restart before replay/state/report
+PASS /composite-assessments SITUATIONAL: first durable FINAL ACK prevents restart before replay/state/report
+PASS /composite-assessments b: actual Form→Scale→120 Go/No-Go trials→SJT FINAL/replay, four canonical facts and original reports
+PASS /composite-assessments FORM_SECTION: first durable FINAL ACK prevents restart before replay/state/report
+PASS /composite-assessments SCALE: first durable FINAL ACK prevents restart before replay/state/report
+PASS /composite-assessments COGNITIVE: first durable FINAL ACK prevents restart before replay/state/report
+PASS /composite-assessments SITUATIONAL: first durable FINAL ACK prevents restart before replay/state/report
+PASS /composite-assessments b: actual Form→Scale→120 Go/No-Go trials→SJT FINAL/replay, four canonical facts and original reports
+PASS /composite-assessments FORM_SECTION: first durable FINAL ACK prevents restart before replay/state/report
+PASS /composite-assessments SCALE: first durable FINAL ACK prevents restart before replay/state/report
+PASS /composite-assessments COGNITIVE: first durable FINAL ACK prevents restart before replay/state/report
+PASS /composite-assessments SITUATIONAL: first durable FINAL ACK prevents restart before replay/state/report
+PASS /composite-assessments b: actual Form→Scale→120 Go/No-Go trials→SJT FINAL/replay, four canonical facts and original reports
+PASS /composite-assessments: outside-group start/state/FINAL/image/video denied without children, allocations, raw, snapshots, jobs or token use
+PASS /composite-assessments FORM_SECTION: first durable FINAL ACK prevents restart before replay/state/report
+PASS /composite-assessments SCALE: first durable FINAL ACK prevents restart before replay/state/report
+PASS /composite-assessments COGNITIVE: first durable FINAL ACK prevents restart before replay/state/report
+PASS /composite-assessments SITUATIONAL: first durable FINAL ACK prevents restart before replay/state/report
+PASS /composite-assessments a: actual Form→Scale→120 Go/No-Go trials→SJT FINAL/replay, four canonical facts and original reports
+PASS Both weighted groups actually drawn and all four tools answered in 4 bounded natural samples; no distribution/load qualification
+PASS FINAL cannot restart or change its frozen allocation
+PASS Restart-abandoned attempt consumes budget; no fourth allocation or child/job
+PASS /composite-assessments FORM_SECTION: first durable FINAL ACK prevents restart before replay/state/report
+PASS /composite-assessments SCALE: first durable FINAL ACK prevents restart before replay/state/report
+PASS /composite-assessments COGNITIVE: first durable FINAL ACK prevents restart before replay/state/report
+PASS /composite-assessments SITUATIONAL: first durable FINAL ACK prevents restart before replay/state/report
+PASS /composite-assessments a: actual Form→Scale→120 Go/No-Go trials→SJT FINAL/replay, four canonical facts and original reports
+PASS Completed and abandoned attempts exhaust the same user budget
+PASS Legal next attempt independently allocates, may retain same group; restart retires old facts and counts all statuses
+PASS /public/composite-assessments: outside-group start/state/FINAL/image/video denied without children, allocations, raw, snapshots, jobs or token use
+PASS Public same participantKey restart budget exhausted without token reconsumption
+PASS /public/composite-assessments FORM_SECTION: first durable FINAL ACK prevents restart before replay/state/report
+PASS /public/composite-assessments SCALE: first durable FINAL ACK prevents restart before replay/state/report
+PASS /public/composite-assessments COGNITIVE: first durable FINAL ACK prevents restart before replay/state/report
+PASS /public/composite-assessments SITUATIONAL: first durable FINAL ACK prevents restart before replay/state/report
+PASS /public/composite-assessments b: actual Form→Scale→120 Go/No-Go trials→SJT FINAL/replay, four canonical facts and original reports
+PASS Public FINAL cannot restart; exhausted public token cannot allocate another identity
+PASS Public resume keeps allocation; restart rotates recovery while keeping participantKey, budget and token usedCount=1
+PASS Original CSV queue: exact allocations, stable union columns, explicit NOT_SHOWN, blank hidden values, actual cognitive trials and canonical SJT hash
+PASS Original ZIP queue: exact allocations, stable union columns, explicit NOT_SHOWN, blank hidden values, actual cognitive trials and canonical SJT hash
+PASS Owner-only basic task counts are stratified by immutable publication/config/group, including abandoned attempts
+PASS Real compact/shared storage: private encrypted allocation, selected-only FSP2/UAR2/WVP2 plans, no public allocation or participant identity
+PASS Cached whole rejects client-forged allocation/group fields before ACK
+PASS Cached whole rejects missing selected units before ACK
+PASS Cached whole rejects replacing the selected unit with a real outside-group item before ACK
+PASS Cached whole rejects adding a real outside-group unit before ACK
+PASS Cached whole rejects missing publication markers despite retained valid private allocation, before ACK
+PASS Cached whole rejects mismatched publication/allocation digest before ACK
+PASS Durable async whole FINAL ACK with zero unit snapshots still forbids weighted restart
+PASS Original worker resumed and materialized the previously ACKed selected Scale; frozen allocation unchanged
+PASS Legal selected-only whole ACK completed through original worker with compact receipt-backed Scale fact and canonical SCF2; direct worker batch and committed-graph timeline verified; transactional receipt retained
+PASS Real FINAL_FIRST parent-attempt lock race: winner retained, loser denied, no extra receipt/children/allocation; worker resumed
+PASS Restart-first losing old FINAL stays stale with no receipt or allocation residue
+PASS Real RESTART_FIRST parent-attempt lock race: winner retained, loser denied, no extra receipt/children/allocation; worker resumed
+PASS Historical null-policy public partial-unit restart still creates a new credential/participant identity and preserves old accepted facts
+PASS Real close-first parent lock rejects new allocation with no children/jobs
+PASS Real admission-first locks freeze one selected allocation before close; accepted attempt resumes unchanged
+PASS Real public revoke-first token lock rejects admission without token use/allocation/children/jobs
+PASS Real public admission-first freezes selected allocation before token revoke; token count once and accepted recovery unchanged
+PASS Real candidate-B revoke-first rejects whole union admission; no filtered redraw or partial children
+PASS A revoked unselected candidate is not silently dropped on fresh union admission
+PASS Candidate authorization uses actual grant→asset lock order before draw; accepted frozen allocation survives later revoke

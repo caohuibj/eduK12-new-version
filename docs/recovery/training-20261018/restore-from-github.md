@@ -82,3 +82,11 @@ node server-version/scripts/recovery/baseline-smoke.mjs "$NEW_PRIVATE_STATE"
 ## 演练边界
 
 C02 已执行当前节点重建与最小运行链，C03 开发中已执行合成旧库升级检查。本文件是恢复操作规程，尚未在“所有节点目录同时丢失”的新节点上完整演练；不能声称零损失或一键恢复已验证。
+
+## C14/C15 分卷数据协议的恢复补充
+
+- 原 170 迁移 C13 合成库经独立副本升级到 171 迁移；五个 nullable 新列不回填。新 allocation 密文/hash 成对、不可变 UPDATE trigger，不得借恢复改写 accepted facts。
+- 新格式合格输入为 FULL02 受限角色真实 HTTP 数据，dump SHA256 `a40b5f82ea2058a507140a9735bab4666c9babb96900e0622f279a3a58b0cde6`。全205表/列、17冻结分配和2私有图片已在新库验证。私有 dump、上传副本及其加密密钥不入 Git；仅有公开证据不能解密重建被试事实。
+- 脚本 `c14-variants-upgrade.py` / `c14-variants-restore.py` 使用新独立 state、PG TCP/UTC与受限运行角色；`c14-variants-resume.py` 只接受受支持的停机合格来源，不用于盲目重跑所有已通过请求。服务与客户端同一 exec，measurement lock串行，finally仅清理本轮服务。
+- 恢复后明确采用对应源码/dist/flags：新的 shared-slot 读写必须传事务 client，不得用全局连接池在持事务时再借连接。FULL02 的六优化开关开启；原 whole atomic/durable backlog 关闭，本阶段不授后者资格。旧 anonymousStudy、普通 null模式与既有 hash 保持原契约。
+- 当原目录全部丢失且私有 dump/密钥不可得，只能在官方工具和独立依赖上重新构造合成 fixture并验证，标注为新输入，不能称原私有数据已恢复。

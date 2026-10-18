@@ -27,7 +27,10 @@ def main():
     parser.add_argument('--tools', type=Path, required=True)
     parser.add_argument('--source-state', type=Path, required=True)
     parser.add_argument('--state', type=Path, required=True)
-    parser.add_argument('--report-only', action='store_true', help='Resume only the already accepted original attempt report; skip all later scenarios and restore')
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument('--report-only', action='store_true', help='Resume only the already accepted original attempt report; skip all later scenarios and restore')
+    mode.add_argument('--admission-only', action='store_true', help='Run only six real HTTP admissions and isolated diagnostics from a passed report-only clone; skip old reports and restore')
+    mode.add_argument('--cold-final-only', action='store_true', help='Prepare fresh Form-only attempts, restart only the owned API, and observe their first FINALs; no old inputs or restore')
     args = parser.parse_args()
     source, state, tools = (p.resolve() for p in (args.source_state, args.state, args.tools))
     base = Path(__file__).resolve().parent
@@ -50,20 +53,33 @@ def main():
     assert source_status.get('state') == 'stopped' and source_status.get('cleanupVerified') is True
     assert source_status.get('cleanupErrors') == [] and original.get('cleanupVerified') is True
     report_checkpoint = original.get('passed') is True and original.get('qualificationScope') == 'REPORT_ONLY'
-    if report_checkpoint:
-        assert direct_http.get('passed') is True and direct_http.get('qualificationScope') == 'REPORT_ONLY'
+    full_checkpoint = original.get('passed') is True and original.get('qualificationScope') == 'FULL_CONTINUATION'
+    assert not args.admission_only or report_checkpoint, 'admission-only requires a clean passed REPORT_ONLY source checkpoint'
+    assert not args.cold_final_only or full_checkpoint, 'cold-final-only requires a clean passed FULL_CONTINUATION source checkpoint'
+    assert not full_checkpoint or args.cold_final_only, 'a full checkpoint is accepted only for cold-final-only'
+    if report_checkpoint or full_checkpoint:
+        assert direct_http.get('passed') is True and direct_http.get('qualificationScope') == ('FULL_CONTINUATION' if full_checkpoint else 'REPORT_ONLY')
         assert original.get('sourceUnchanged') is True and original.get('inputsUnchanged') is True
-        assert original['phases']['variants'] == direct_http and 'newFormatRestore' not in original['phases']
+        assert original['phases']['variants'] == direct_http
+        if full_checkpoint:
+            originals['c14-new-format-restore-result.json'] = (source / 'c14-new-format-restore-result.json').read_bytes()
+            assert json.loads(originals['c14-new-format-restore-result.json']) == original['phases']['newFormatRestore']
+            assert original['phases']['newFormatRestore']['passed'] is True
+            assert len(direct_http['allocations']) >= 2 and len({item['variantKey'] for item in direct_http['completed']}) == 2
+        else:
+            assert 'newFormatRestore' not in original['phases']
         originals['c14-resume-source-result.json'] = (source / 'c14-resume-source-result.json').read_bytes()
         previous_resume = json.loads(originals['c14-resume-source-result.json'])
         http = previous_resume['http']
         historical = previous_resume['originalAggregate']
         historical_status = previous_resume['originalStatus']
         assert previous_resume['originalFailureMarker'] == 'active unit required'
-        assert len(direct_http['allocations']) == len(direct_http['completed']) == 1
-        assert direct_http['allocations'][0] == http['allocations'][0]
-        assert direct_http['completed'][0]['attemptId'] == http['allocations'][0]['attemptId']
-        assert direct_http['completed'][0]['allocationHash'] == http['allocations'][0]['allocationHash']
+        if report_checkpoint:
+            assert len(direct_http['allocations']) == len(direct_http['completed']) == 1
+        original_allocation = [item for item in direct_http['allocations'] if item['attemptId'] == http['allocations'][0]['attemptId']]
+        original_completion = [item for item in direct_http['completed'] if item['attemptId'] == http['allocations'][0]['attemptId']]
+        assert original_allocation == [http['allocations'][0]] and len(original_completion) == 1
+        assert original_completion[0]['allocationHash'] == http['allocations'][0]['allocationHash']
         accepted_facts = direct_http['reusedEvidence']['acceptedFacts']
         assert re.fullmatch(r'[0-9a-f]{64}', accepted_facts['sha256']) and isinstance(accepted_facts['counts'], dict)
         historical_bytes = {}
@@ -122,6 +138,8 @@ def main():
         'ASSESSMENT_SCALE_COLLECTION_BATCH_ENABLED': 'true',
         'ASSESSMENT_WHOLE_ATOMIC_RECEIPT_ENABLED': 'false',
         'ASSESSMENT_WHOLE_DURABLE_BACKLOG_ENABLED': 'false',
+        'PERF_ISOLATED_TEST_MODE': '1',
+        'ASSESSMENT_TIMELINE_ENABLED': 'true',
     }
     for key, value in runtime_flag_overrides.items():
         if value == 'false':
@@ -129,18 +147,18 @@ def main():
     runtime_flag_changes = {key: {
         'sourcePresent': key in source_runtime,
         'sourceValue': source_runtime.get(key),
-        'sourceEffectiveEnabled': source_runtime.get(key) == 'true',
+        'sourceEffectiveEnabled': source_runtime.get(key) == ('1' if key == 'PERF_ISOLATED_TEST_MODE' else 'true'),
         'currentPresent': True,
         'currentValue': value,
-        'currentEffectiveEnabled': value == 'true',
+        'currentEffectiveEnabled': value == ('1' if key == 'PERF_ISOLATED_TEST_MODE' else 'true'),
     } for key, value in runtime_flag_overrides.items()}
 
     os.umask(0o077)
     state.mkdir(mode=0o700)
     result = {'passed': False, 'originalAggregatePassed': False, 'checks': [], 'phases': {},
               'sourceHead': source_status['head'], 'sourceRuntimeFingerprint': original['runtimeFingerprint'],
-              'qualificationScope': 'REPORT_ONLY' if args.report_only else 'FULL_CONTINUATION',
-              'sourceQualificationScope': 'REPORT_ONLY' if report_checkpoint else 'ORIGINAL_FAILED_HTTP',
+              'qualificationScope': 'COLD_FINAL_ONLY' if args.cold_final_only else 'ADMISSION_ONLY' if args.admission_only else 'REPORT_ONLY' if args.report_only else 'FULL_CONTINUATION',
+              'sourceQualificationScope': 'FULL_CONTINUATION' if full_checkpoint else 'REPORT_ONLY' if report_checkpoint else 'ORIGINAL_FAILED_HTTP',
               'originalSourceHead': historical['sourceHead'], 'originalRuntimeFingerprint': historical['runtimeFingerprint'],
               'sourceHarnessInputs': original['harnessInputs'], 'sourceState': str(source),
               'evidenceScope': 'Historical passed observations remain bound to the original runtime and feature flags and do not qualify the current runtime; existing accepted facts stay unchanged while only missing and affected continuation work is executed.',
@@ -152,6 +170,9 @@ def main():
     summary = {'state': 'preparing', 'startedAt': time.time(), 'checks': {}, 'pids': {}, 'ports': {},
                'runtimeFlagChanges': runtime_flag_changes, 'historicalObservationsQualifyCurrentRuntime': False}
     env = {'PATH': f'{node.parent}:{pg}:/usr/bin:/bin', 'HOME': str(state), 'TMPDIR': str(state), 'LANG': 'C.UTF-8', 'TZ': 'UTC', 'NODE_ENV': 'test'}
+    if full_checkpoint:
+        result['sourceNewFormatRestore'] = original['phases']['newFormatRestore']
+    cold_deadline = time.monotonic() + 600 if args.cold_final_only else None
     children, logs = [], []
     source_manifest = None
     pinned = None
@@ -209,7 +230,7 @@ def main():
                 'sourceDiffSha256': sha(patch + b'\0UNTRACKED\0' + json.dumps(additions, sort_keys=True).encode()),
                 'harnessInputs': {str(path.relative_to(backend.parent)): file_sha(path) for path in
                     [Path(__file__).resolve(), base / 'c14-variants-smoke.mjs', base / 'c14-training-fixture.mjs',
-                     base / 'c14-variants-restore.py', base / 'local-stack.py', base / 'runtime-fingerprint.cjs',
+                     base / 'c14-variants-restore.py', base / 'c14-whole-shared-controls.mjs', base / 'c14-admission-observer.mjs', base / 'c14-cold-final.mjs', base / 'local-stack.py', base / 'runtime-fingerprint.cjs',
                      base / 'loopback-only.cjs', backend.parent / 'e2e/questionnaire-products-fixture.ts',
                      backend / 'src/modules/situational/authoring/examples/online-hand-calculated.json']}}
 
@@ -222,6 +243,8 @@ def main():
         temporary.replace(state / 'status.json')
 
     def guard():
+        if cold_deadline is not None and time.monotonic() >= cold_deadline:
+            raise TimeoutError('cold-final-only exceeded the 10 minute work budget')
         available = next(int(line.split()[1]) * 1024 for line in Path('/proc/meminfo').read_text().splitlines() if line.startswith('MemAvailable:'))
         assert available >= 2 * 1024 ** 3, 'host available memory below 2GiB stop line'
         for name, process, service in children:
@@ -236,8 +259,8 @@ def main():
         if (state / 'stop').exists():
             raise KeyboardInterrupt
 
-    def start(command, name, extra=None, service=True):
-        log = (state / (name + '.log')).open('w')
+    def start(command, name, extra=None, service=True, log_name=None):
+        log = (state / ((log_name or name) + '.log')).open('w')
         logs.append(log)
         process = subprocess.Popen(list(map(str, command)), cwd=backend, env={**env, **(extra or {})},
                                    stdout=log, stderr=log, start_new_session=True)
@@ -338,7 +361,7 @@ def main():
         assert all(runtime[key] == source_runtime[key] for key in ['JWT_SECRET', 'ASSET_SIGNING_SECRET', 'DATA_ENCRYPTION_KEY', 'DATA_PSEUDONYM_KEY'])
         assert all(str(source) not in value for value in runtime.values() if isinstance(value, str)), 'runtime must not retain source paths'
         (state / 'runtime-private.json').write_text(json.dumps(runtime))
-        source_metadata = {'sourceMode': 'REPORT_ONLY' if report_checkpoint else 'HTTP03', 'sourceState': str(source), 'sourceHead': historical['sourceHead'], 'sourceRuntimeFingerprint': historical['runtimeFingerprint'],
+        source_metadata = {'sourceMode': 'FULL_CONTINUATION' if full_checkpoint else 'REPORT_ONLY' if report_checkpoint else 'HTTP03', 'sourceState': str(source), 'sourceHead': historical['sourceHead'], 'sourceRuntimeFingerprint': historical['runtimeFingerprint'],
                            'directSource': {'state': str(source), 'head': source_status['head'],
                                             'runtimeFingerprint': original['runtimeFingerprint'],
                                             'aggregatePassed': original['passed'],
@@ -354,6 +377,11 @@ def main():
                          'originalFailureMarker': 'active unit required', 'sourceMetadata': source_metadata, 'originalAggregatePassed': False}
         if report_checkpoint:
             resume_source['reportOnlyCheckpoint'] = {'acceptedFacts': accepted_facts, 'completed': direct_http['completed'][0]}
+        if full_checkpoint:
+            resume_source['fullContinuationCheckpoint'] = {'acceptedFacts': accepted_facts,
+                'allocations': len(direct_http['allocations']), 'completed': len(direct_http['completed']),
+                'newFormatRestore': original['phases']['newFormatRestore']}
+            (state / 'source-c14-new-format-restore-result.json').write_bytes(originals['c14-new-format-restore-result.json'])
         (state / 'c14-resume-source-result.json').write_text(json.dumps(resume_source, indent=2))
         owner = urlparse(runtime['DATABASE_URL_OWNER'])
         auth = {'PGPASSWORD': unquote(owner.password)}
@@ -386,35 +414,96 @@ def main():
         record()
         result['checks'].append('Existing restricted runtime role/schema verified; fresh Redis, original API/report/export consumers, no seed or migration')
         verify_inputs()
-        try:
-            run([node, base / 'c14-variants-smoke.mjs', state], 'c14-http',
-                {**public_runtime, 'PERF_ISOLATED_TEST_MODE': '1', 'PERF_SQL_EVENT_COUNT': '1',
-                 **({'C14_REPORT_ONLY': '1'} if args.report_only else {})}, timeout=1000)
-        finally:
-            if (state / 'c14-http-result.json').is_file():
-                result['phases']['variants'] = json.loads((state / 'c14-http-result.json').read_text())
-        assert result['phases']['variants']['passed'] is True
-        verify_inputs()
-        assert schema_snapshot('schema-after-http') == schema_before, 'HTTP continuation changed database schema'
-        if args.report_only:
-            report = result['phases']['variants']
-            assert report.get('qualificationScope') == 'REPORT_ONLY'
-            assert len(report['allocations']) == len(report['completed']) == 1
-            assert report['allocations'][0] == http['allocations'][0]
-            assert report['completed'][0]['attemptId'] == http['allocations'][0]['attemptId']
-            assert report['completed'][0]['allocationHash'] == http['allocations'][0]['allocationHash']
-            result['checks'].append('REPORT_ONLY: existing accepted original attempt reached report completion; current inputs/schema unchanged; later scenarios and restore were not executed')
-        else:
-            assert result['phases']['variants'].get('qualificationScope') == 'FULL_CONTINUATION', 'report-only evidence cannot qualify full continuation'
+        if args.cold_final_only:
+            cold_script = base / 'c14-cold-final.mjs'
+            cold_env = {**public_runtime, 'PERF_ISOLATED_TEST_MODE': '1', 'PERF_SQL_EVENT_COUNT': '1'}
             try:
-                run(['python3', base / 'c14-variants-restore.py', '--tools', tools, '--state', state], 'c14-new-format-restore', timeout=240)
+                run([node, cold_script, state, 'prepare'], 'c14-cold-final-prepare', cold_env, timeout=180)
             finally:
-                if (state / 'c14-new-format-restore-result.json').is_file():
-                    result['phases']['newFormatRestore'] = json.loads((state / 'c14-new-format-restore-result.json').read_text())
-            assert result['phases']['newFormatRestore']['passed'] is True
+                if (state / 'c14-cold-final-prepare-result.json').is_file():
+                    result['phases']['coldFinalPrepare'] = json.loads((state / 'c14-cold-final-prepare-result.json').read_text())
+            prepared = result['phases']['coldFinalPrepare']
+            assert prepared.get('prepared') is True and prepared['apiPid'] == api.pid
+            assert len(prepared['attemptIds']) == len(set(prepared['attemptIds'])) == 6
+            assert prepared['productId'] and not set(prepared['attemptIds']) & {item['attemptId'] for item in direct_http['allocations']}
             verify_inputs()
-            assert schema_snapshot('schema-after-restore') == schema_before, 'source clone schema changed during restore'
-            result['checks'].append('Current runtime/source/harness bindings pinned throughout continuation and restore; original clone schema unchanged')
+            assert schema_snapshot('schema-after-cold-prepare') == schema_before
+            old_api_pid = api.pid
+            # Keep the retired owned PID in cleanup bookkeeping, but intentional
+            # exit must no longer trigger the live-service guard.
+            index = next(i for i, (_, process, _) in enumerate(children) if process is api)
+            children[index] = ('api-before-cold-final', api, False)
+            api.send_signal(signal.SIGTERM)
+            api.wait(timeout=20)
+            assert api.returncode in (0, -signal.SIGTERM), 'old API did not exit gracefully'
+            try:
+                with socket.create_connection(('127.0.0.1', apiport), timeout=.2):
+                    raise RuntimeError('old API port remains open after graceful stop')
+            except OSError:
+                pass
+            guard()
+            api = start([node, '--require', base / 'loopback-only.cjs', 'dist/index.js'], 'api', public_runtime, log_name='api-cold-final')
+            wait_port(apiport, api)
+            assert api.pid != old_api_pid
+            restart = {'oldPid': old_api_pid, 'newPid': api.pid, 'oldPort': apiport, 'port': apiport,
+                       'source': 'owned-wrapper-cold-final'}
+            summary['apiRestart'] = restart
+            result['apiRestart'] = restart
+            for endpoint in ['health', 'ready']:
+                with urllib.request.urlopen(summary['apiUrl'] + '/' + endpoint, timeout=8) as response:
+                    assert response.status == 200
+                    summary['checks']['coldApi' + endpoint.title()] = response.status
+            record()
+            verify_inputs()
+            try:
+                run([node, cold_script, state, 'submit'], 'c14-cold-final-submit', cold_env, timeout=360)
+            finally:
+                if (state / 'c14-cold-final-result.json').is_file():
+                    result['phases']['coldFinal'] = json.loads((state / 'c14-cold-final-result.json').read_text())
+            cold = result['phases']['coldFinal']
+            assert cold.get('passed') is True and cold.get('qualificationScope') == 'COLD_FINAL_ONLY'
+            assert cold['attemptIds'] == prepared['attemptIds'] and len(cold['completed']) == 6
+            assert len(set(cold['attemptIds'])) == 6
+            verify_inputs()
+            assert schema_snapshot('schema-after-cold-final') == schema_before
+            result['checks'].append('COLD_FINAL_ONLY: six fresh Form-only attempts prepared, owned API gracefully restarted on identical port/runtime, first FINALs and original worker completion observed; old accepted inputs and restore not replayed')
+        else:
+            try:
+                run([node, base / 'c14-variants-smoke.mjs', state], 'c14-http',
+                    {**public_runtime, 'PERF_ISOLATED_TEST_MODE': '1', 'PERF_SQL_EVENT_COUNT': '1',
+                     **({'C14_REPORT_ONLY': '1'} if args.report_only else {}),
+                     **({'C14_ADMISSION_ONLY': '1'} if args.admission_only else {})}, timeout=1000)
+            finally:
+                if (state / 'c14-http-result.json').is_file():
+                    result['phases']['variants'] = json.loads((state / 'c14-http-result.json').read_text())
+            assert result['phases']['variants']['passed'] is True
+            verify_inputs()
+            assert schema_snapshot('schema-after-http') == schema_before, 'HTTP continuation changed database schema'
+            if args.admission_only:
+                admission = result['phases']['variants']
+                assert admission.get('qualificationScope') == 'ADMISSION_ONLY'
+                assert len(admission['allocations']) == 1 and len(admission['completed']) == 0
+                assert admission['allocations'][0]['attemptId'] != http['allocations'][0]['attemptId']
+                result['checks'].append('ADMISSION_ONLY: six HTTP starts admitted one new allocation with selected children; old report/FINAL inputs, later scenarios and restore were not executed')
+            elif args.report_only:
+                report = result['phases']['variants']
+                assert report.get('qualificationScope') == 'REPORT_ONLY'
+                assert len(report['allocations']) == len(report['completed']) == 1
+                assert report['allocations'][0] == http['allocations'][0]
+                assert report['completed'][0]['attemptId'] == http['allocations'][0]['attemptId']
+                assert report['completed'][0]['allocationHash'] == http['allocations'][0]['allocationHash']
+                result['checks'].append('REPORT_ONLY: existing accepted original attempt reached report completion; current inputs/schema unchanged; later scenarios and restore were not executed')
+            else:
+                assert result['phases']['variants'].get('qualificationScope') == 'FULL_CONTINUATION', 'report-only evidence cannot qualify full continuation'
+                try:
+                    run(['python3', base / 'c14-variants-restore.py', '--tools', tools, '--state', state], 'c14-new-format-restore', timeout=240)
+                finally:
+                    if (state / 'c14-new-format-restore-result.json').is_file():
+                        result['phases']['newFormatRestore'] = json.loads((state / 'c14-new-format-restore-result.json').read_text())
+                assert result['phases']['newFormatRestore']['passed'] is True
+                verify_inputs()
+                assert schema_snapshot('schema-after-restore') == schema_before, 'source clone schema changed during restore'
+                result['checks'].append('Current runtime/source/harness bindings pinned throughout continuation and restore; original clone schema unchanged')
         result['passed'] = True
     except BaseException as error:
         result['errorType'] = type(error).__name__

@@ -1,0 +1,47 @@
+{
+  "kind": "C14_REPORT_OUTBOX_SLOT_TRANSACTION_LOCAL_EVIDENCE",
+  "createdAt": "2026-10-18T12:39:20.008524+00:00",
+  "gitHeadAtRecord": "f0d7c426bf9bf4e6414b95a210078fa813c92046",
+  "nodeExecutable": "/workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/node_modules/node/bin/node",
+  "nodeVersion": "v24.21.0",
+  "nodeExecutableSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+  "measurementLock": "/workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/.measurement.lock",
+  "sourceAndInputs": [
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/report-outbox.service.ts",
+      "sha256": "9221cdc8ddad2b482ab320bc14d842201bd487c2a559bb8b76233eaf3fee8f4d"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-runtime/report-outbox-slot-transaction.test.ts",
+      "sha256": "62baa14174ef04eed44eb013131cb03c63e244e9e3c534ea26ef7be85636889a"
+    },
+    {
+      "path": "server-version/backend/package-lock.json",
+      "sha256": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6"
+    },
+    {
+      "path": "server-version/backend/vitest.config.ts",
+      "sha256": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b"
+    }
+  ],
+  "checks": [
+    {
+      "log": "c14-report-outbox-slot-tx-test-01.log",
+      "command": "flock /workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/.measurement.lock /workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/__tests__/assessment-runtime/report-outbox-slot-transaction.test.ts",
+      "startedAt": "2026-10-18T12:39:01Z",
+      "finishedAt": "2026-10-18T12:39:02Z",
+      "result": "passed",
+      "tests": 1,
+      "exitCode": 0,
+      "coverage": [
+        "enqueueCompositeReportForUnit passes identical active transaction and encrypted slot reference to loadFrozenActiveSlotSet",
+        "Slot reader sentinel propagates; no later snapshot read, budget or parent update",
+        "No global database query, write or transaction call"
+      ]
+    }
+  ],
+  "limitations": [
+    "Only new direct callsite contract tested; unchanged helper tests not repeated.",
+    "Mocked unit evidence does not establish real PostgreSQL concurrent throughput; parent owns that validation."
+  ]
+}

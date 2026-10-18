@@ -147,7 +147,7 @@ const readRequiredScaleSlot = async (input: {
   attemptEpoch: number
   slotKey: string
   scale: ScaleAdmissionChildRow['scale']
-}): Promise<FrozenActiveSlotV1> => {
+}, db?: Db): Promise<FrozenActiveSlotV1> => {
   let slot: FrozenActiveSlotV1
   try {
     slot = await loadFrozenActiveSlot({
@@ -155,7 +155,7 @@ const readRequiredScaleSlot = async (input: {
       storedHash: input.storedHash,
       attemptEpoch: input.attemptEpoch,
       slotKey: input.slotKey,
-    })
+    }, db)
   } catch (error) {
     throw new InstrumentFinalSubmitError(
       'DEFINITION_MISMATCH',
@@ -602,7 +602,7 @@ const activateUnstoredScaleAdmission = async (
       attemptEpoch: row.attemptEpoch,
       slotKey,
       scale: row.scale,
-    })
+    }, db)
     const compiledRuntimeHash = compiledRuntimeHashFrom(slot, row.compiledRuntimeHash)
     if (compiledRuntimeHash !== runtime.compiledRuntime.compiledRuntimeHash) {
       throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结单元运行时哈希不匹配', 409)
@@ -656,7 +656,7 @@ const activateUnstoredScaleAdmission = async (
       attemptEpoch: row.attemptEpoch,
       slotKey,
       scale: row.scale,
-    })
+    }, db)
     const compiledRuntimeHash = compiledRuntimeHashFrom(slot, row.compiledRuntimeHash)
     if (compiledRuntimeHash !== runtime.compiledRuntime.compiledRuntimeHash) {
       throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结单元运行时哈希不匹配', 409)

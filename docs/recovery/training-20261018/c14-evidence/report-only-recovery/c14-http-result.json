@@ -1,0 +1,697 @@
+{
+  "passed": true,
+  "qualificationScope": "REPORT_ONLY",
+  "checks": [
+    "/composite-assessments b: HTTP03 accepted facts retained; report-only continuation, four canonical facts and original reports",
+    "HTTP03 checkpoint resumed read-only accepted facts plus original report queue; fixture, bad candidates and existing FINAL/replay inputs were not rerun",
+    "REPORT_ONLY: original accepted four-tool facts unchanged and original report worker completed; remaining HTTP/optimized/restore scenarios not claimed"
+  ],
+  "requests": [
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 312
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 318
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 290
+    },
+    {
+      "route": "/questionnaire-products/a33ef06a-ab12-4331-a484-e222e48a2ca9",
+      "method": "GET",
+      "status": 200,
+      "bytes": 9210
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 284
+    },
+    {
+      "route": "/composite-assessments/attempts/81c52ecf-dc02-4d1c-97ce-de614c58c8cc",
+      "method": "GET",
+      "status": 200,
+      "bytes": 2863
+    },
+    {
+      "route": "/composite-assessments/attempts/81c52ecf-dc02-4d1c-97ce-de614c58c8cc/report-status",
+      "method": "GET",
+      "status": 200,
+      "bytes": 398
+    },
+    {
+      "route": "/composite-assessments/attempts/81c52ecf-dc02-4d1c-97ce-de614c58c8cc/report",
+      "method": "GET",
+      "status": 200,
+      "bytes": 6547
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts/81c52ecf-dc02-4d1c-97ce-de614c58c8cc/report",
+      "method": "GET",
+      "status": 200,
+      "bytes": 6554
+    },
+    {
+      "route": "/composite-assessments/attempts/81c52ecf-dc02-4d1c-97ce-de614c58c8cc/report",
+      "method": "GET",
+      "status": 200,
+      "bytes": 6547
+    },
+    {
+      "route": "/composite-assessments/attempts/81c52ecf-dc02-4d1c-97ce-de614c58c8cc",
+      "method": "GET",
+      "status": 200,
+      "bytes": 2863
+    }
+  ],
+  "counts": [],
+  "races": [],
+  "allocations": [
+    {
+      "attemptId": "81c52ecf-dc02-4d1c-97ce-de614c58c8cc",
+      "allocationHash": "12fbd5e5be5adefd483888c9b83f2e5bfb143190897a9ed756a5bcf62c2fe384",
+      "ciphertextSha256": "c3ff8f3194727d4e4e8d55c3ea7d65f59a21fecb884c242e9f6eebcd13edde96",
+      "configDigest": "328bd26dcd54afa969907794e7fb05a6344ac26f3ca406fe1d634cd305ffc75d",
+      "variantKey": "b",
+      "selectedItemIds": [
+        "49dbc2ba-c128-4843-9b93-fab61fd44bf2",
+        "94ba59bb-2b0b-4b26-8dcb-6289c6e475c2",
+        "ea600253-8311-4b67-b8d2-7d34bc0775d3",
+        "959d871d-5824-47bf-8b80-bbc4d5fa5ae2"
+      ],
+      "selectedSectionIds": [
+        "f696d3c4-9d4d-44dc-8d8b-ef25f97bae7c"
+      ]
+    }
+  ],
+  "completed": [
+    {
+      "attemptId": "81c52ecf-dc02-4d1c-97ce-de614c58c8cc",
+      "allocationHash": "12fbd5e5be5adefd483888c9b83f2e5bfb143190897a9ed756a5bcf62c2fe384",
+      "ciphertextSha256": "c3ff8f3194727d4e4e8d55c3ea7d65f59a21fecb884c242e9f6eebcd13edde96",
+      "configDigest": "328bd26dcd54afa969907794e7fb05a6344ac26f3ca406fe1d634cd305ffc75d",
+      "variantKey": "b",
+      "selectedItemIds": [
+        "49dbc2ba-c128-4843-9b93-fab61fd44bf2",
+        "94ba59bb-2b0b-4b26-8dcb-6289c6e475c2",
+        "ea600253-8311-4b67-b8d2-7d34bc0775d3",
+        "959d871d-5824-47bf-8b80-bbc4d5fa5ae2"
+      ],
+      "selectedSectionIds": [
+        "f696d3c4-9d4d-44dc-8d8b-ef25f97bae7c"
+      ],
+      "productId": "a33ef06a-ab12-4331-a484-e222e48a2ca9",
+      "sjtResultHash": "2e4dd0f40fda47e13cb1ad350dc19b0d597aedf78f1f513272914408075e2a26",
+      "cognitiveTrialCount": 120
+    }
+  ],
+  "reusedEvidence": {
+    "sourceMode": "HTTP03",
+    "sourceState": "/workspace/scratch/5a77e8bdc1ae/eduk12_c14_http_03",
+    "sourceHead": "9aa8b7690c3970e60de6f5d5d3bf3f8403a8e689",
+    "sourceRuntimeFingerprint": {
+      "schemaVersion": 1,
+      "nodeVersion": "v24.21.0",
+      "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+      "dist": {
+        "files": 5073,
+        "sha256": "d21bf9405cdfba0688bbeac91c8d1765f6cb36f325de48c1c6f251421ddc1b69"
+      },
+      "files": {
+        "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+        "prisma/schema.prisma": "57e56f348583acd947c031cfcd3ff65ad091f5482bb65b767fa26fc4127a7318",
+        "node_modules/.prisma/client/schema.prisma": "dae38fb7ab4b5ca2ce9785f1b3ab89a282e6c2cac92bcf32c5f4fd65d86f1b14",
+        "node_modules/.prisma/client/index.js": "0704ca08d1a8c3a0df1bae43180e15a73844f701a729c6a684a747400f44277b"
+      },
+      "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+    },
+    "directSource": {
+      "state": "/workspace/scratch/5a77e8bdc1ae/eduk12_c14_http_03",
+      "head": "9aa8b7690c3970e60de6f5d5d3bf3f8403a8e689",
+      "runtimeFingerprint": {
+        "schemaVersion": 1,
+        "nodeVersion": "v24.21.0",
+        "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+        "dist": {
+          "files": 5073,
+          "sha256": "d21bf9405cdfba0688bbeac91c8d1765f6cb36f325de48c1c6f251421ddc1b69"
+        },
+        "files": {
+          "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+          "prisma/schema.prisma": "57e56f348583acd947c031cfcd3ff65ad091f5482bb65b767fa26fc4127a7318",
+          "node_modules/.prisma/client/schema.prisma": "dae38fb7ab4b5ca2ce9785f1b3ab89a282e6c2cac92bcf32c5f4fd65d86f1b14",
+          "node_modules/.prisma/client/index.js": "0704ca08d1a8c3a0df1bae43180e15a73844f701a729c6a684a747400f44277b"
+        },
+        "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+      },
+      "aggregatePassed": false,
+      "qualificationScope": "ORIGINAL_FAILED_HTTP"
+    },
+    "currentHead": "e90550c534cca1024011a55f8ea1ee82abed99b1",
+    "currentRuntimeFingerprint": {
+      "schemaVersion": 1,
+      "nodeVersion": "v24.21.0",
+      "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+      "dist": {
+        "files": 5077,
+        "sha256": "bdb62c4e56cd7c9805223ad84d1acd1eb90cb081d145559ebe21be0ba0f7802e"
+      },
+      "files": {
+        "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+        "prisma/schema.prisma": "57e56f348583acd947c031cfcd3ff65ad091f5482bb65b767fa26fc4127a7318",
+        "node_modules/.prisma/client/schema.prisma": "dae38fb7ab4b5ca2ce9785f1b3ab89a282e6c2cac92bcf32c5f4fd65d86f1b14",
+        "node_modules/.prisma/client/index.js": "0704ca08d1a8c3a0df1bae43180e15a73844f701a729c6a684a747400f44277b"
+      },
+      "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+    },
+    "sourceManifestSha256": "08d129f011807ca2a42c44ab7b1f73a442ea1783735187f82a9261690d244069",
+    "sourceSummarySha256": {
+      "status.json": "a166bd27662190eb78e7d04fe7e0160469ea1f90b18e3e0313f9338fc595e317",
+      "c14-runtime-result.json": "acdfb7bac0a067dabe12e11558d0d0ee6bf8c9bf788925ff39bd562d616e3d00",
+      "c14-http-result.json": "49fa134a404b1232426b520d87fe84851b7b5036727b371cc5a0ac6395ef469b",
+      "c14-http.log": "10e02acff69b71e5107738862d729b3a1e0acad80d38c644f2c48f052d7fd0ff"
+    },
+    "changedSourceFiles": [
+      "server-version/backend/src/__tests__/assessment-context/freeze.service.test.ts",
+      "server-version/backend/src/__tests__/assessment-runtime/training-variant-aggregate-finalizer.test.ts",
+      "server-version/backend/src/__tests__/composite/training-variant-child-scope.test.ts",
+      "server-version/backend/src/__tests__/composite/training-variant-export.test.ts",
+      "server-version/backend/src/__tests__/composite/training-variant-markers.test.ts",
+      "server-version/backend/src/__tests__/composite/training-variant-scope.test.ts",
+      "server-version/backend/src/__tests__/composite/training-variant-whole-submit.test.ts",
+      "server-version/backend/src/__tests__/scale/composite-export-projection.test.ts",
+      "server-version/backend/src/modules/assessment-runtime/unified-aggregate-finalizer.service.ts",
+      "server-version/backend/src/modules/cognitive/history.service.ts",
+      "server-version/backend/src/modules/composite/composite-export-projection.ts",
+      "server-version/backend/src/modules/composite/composite-report-read.ts",
+      "server-version/backend/src/modules/composite/composite.service.ts",
+      "server-version/backend/src/modules/composite/training-variant-child-scope.ts",
+      "server-version/backend/src/modules/composite/training-variant-markers.ts",
+      "server-version/backend/src/modules/composite/training-variant-scope.ts",
+      "server-version/backend/src/modules/composite/whole-questionnaire.service.ts",
+      "server-version/scripts/recovery/c14-http-contract-audit.md",
+      "server-version/scripts/recovery/c14-variants-resume.py",
+      "server-version/scripts/recovery/c14-variants-smoke.mjs",
+      "server-version/scripts/recovery/c14-whole-shared-controls.mjs"
+    ],
+    "sourceDiffSha256": "dff544df669b9d6a84b845c5e0caba60cd255e12afe2eb31586c9c4b0a07ad97",
+    "runtimeFlagChanges": {
+      "ASSESSMENT_COMPACT_FACTS_ENABLED": {
+        "sourcePresent": false,
+        "sourceValue": null,
+        "sourceEffectiveEnabled": false,
+        "currentPresent": true,
+        "currentValue": "true",
+        "currentEffectiveEnabled": true
+      },
+      "ASSESSMENT_SHARED_CONTROL_ENABLED": {
+        "sourcePresent": false,
+        "sourceValue": null,
+        "sourceEffectiveEnabled": false,
+        "currentPresent": true,
+        "currentValue": "true",
+        "currentEffectiveEnabled": true
+      },
+      "ASSESSMENT_REPORT_COMPACT_READ_ENABLED": {
+        "sourcePresent": false,
+        "sourceValue": null,
+        "sourceEffectiveEnabled": false,
+        "currentPresent": true,
+        "currentValue": "true",
+        "currentEffectiveEnabled": true
+      },
+      "ASSESSMENT_REPORT_COMMITTED_CONTEXT_ENABLED": {
+        "sourcePresent": false,
+        "sourceValue": null,
+        "sourceEffectiveEnabled": false,
+        "currentPresent": true,
+        "currentValue": "true",
+        "currentEffectiveEnabled": true
+      },
+      "ASSESSMENT_REPORT_CONTEXT_REUSE_ENABLED": {
+        "sourcePresent": false,
+        "sourceValue": null,
+        "sourceEffectiveEnabled": false,
+        "currentPresent": true,
+        "currentValue": "true",
+        "currentEffectiveEnabled": true
+      },
+      "ASSESSMENT_SCALE_COLLECTION_BATCH_ENABLED": {
+        "sourcePresent": false,
+        "sourceValue": null,
+        "sourceEffectiveEnabled": false,
+        "currentPresent": true,
+        "currentValue": "true",
+        "currentEffectiveEnabled": true
+      },
+      "ASSESSMENT_WHOLE_ATOMIC_RECEIPT_ENABLED": {
+        "sourcePresent": false,
+        "sourceValue": null,
+        "sourceEffectiveEnabled": false,
+        "currentPresent": true,
+        "currentValue": "false",
+        "currentEffectiveEnabled": false
+      },
+      "ASSESSMENT_WHOLE_DURABLE_BACKLOG_ENABLED": {
+        "sourcePresent": false,
+        "sourceValue": null,
+        "sourceEffectiveEnabled": false,
+        "currentPresent": true,
+        "currentValue": "false",
+        "currentEffectiveEnabled": false
+      }
+    },
+    "runtimeArtifactChanged": true,
+    "runtimeConfigurationChanged": true,
+    "originalAggregatePassed": false,
+    "historicalObservationsQualifyCurrentRuntime": false,
+    "checks": [
+      "Real restricted runtime; independent owner-authored SJT releases/images and exact grants; group-exclusive four-tool synthetic resources",
+      "Owner revisioned config validation and immutable publication; one parent union, no per-group composite products",
+      "Candidate a Scale deployment DENY prevents every group draw for member/public",
+      "Candidate a decryptable invalid resolved Cognitive config prevents every group draw for member/public",
+      "Candidate b Scale deployment DENY prevents every group draw for member/public",
+      "Candidate b decryptable invalid resolved Cognitive config prevents every group draw for member/public",
+      "/composite-assessments FORM_SECTION: first durable FINAL ACK prevents restart before replay/state/report",
+      "/composite-assessments SCALE: first durable FINAL ACK prevents restart before replay/state/report",
+      "/composite-assessments COGNITIVE: first durable FINAL ACK prevents restart before replay/state/report",
+      "/composite-assessments SITUATIONAL: first durable FINAL ACK prevents restart before replay/state/report"
+    ],
+    "requestCount": 99,
+    "counts": [
+      {
+        "name": "Candidate a Scale deployment DENY prevents every group draw for member/public",
+        "before": {
+          "definitions": 1,
+          "parents": 0,
+          "forms": 0,
+          "formAnswers": 0,
+          "scales": 0,
+          "cognitive": 0,
+          "sjt": 0,
+          "rawScale": 0,
+          "rawCognitive": 0,
+          "rawSjt": 0,
+          "snapshots": 0,
+          "jobs": 0,
+          "tokens": [
+            {
+              "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+              "usedCount": 0
+            }
+          ]
+        },
+        "after": {
+          "definitions": 1,
+          "parents": 0,
+          "forms": 0,
+          "formAnswers": 0,
+          "scales": 0,
+          "cognitive": 0,
+          "sjt": 0,
+          "rawScale": 0,
+          "rawCognitive": 0,
+          "rawSjt": 0,
+          "snapshots": 0,
+          "jobs": 0,
+          "tokens": [
+            {
+              "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+              "usedCount": 0
+            }
+          ]
+        }
+      },
+      {
+        "name": "Candidate a decryptable invalid resolved Cognitive config prevents every group draw for member/public",
+        "before": {
+          "definitions": 1,
+          "parents": 0,
+          "forms": 0,
+          "formAnswers": 0,
+          "scales": 0,
+          "cognitive": 0,
+          "sjt": 0,
+          "rawScale": 0,
+          "rawCognitive": 0,
+          "rawSjt": 0,
+          "snapshots": 0,
+          "jobs": 0,
+          "tokens": [
+            {
+              "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+              "usedCount": 0
+            }
+          ]
+        },
+        "after": {
+          "definitions": 1,
+          "parents": 0,
+          "forms": 0,
+          "formAnswers": 0,
+          "scales": 0,
+          "cognitive": 0,
+          "sjt": 0,
+          "rawScale": 0,
+          "rawCognitive": 0,
+          "rawSjt": 0,
+          "snapshots": 0,
+          "jobs": 0,
+          "tokens": [
+            {
+              "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+              "usedCount": 0
+            }
+          ]
+        }
+      },
+      {
+        "name": "Candidate b Scale deployment DENY prevents every group draw for member/public",
+        "before": {
+          "definitions": 1,
+          "parents": 0,
+          "forms": 0,
+          "formAnswers": 0,
+          "scales": 0,
+          "cognitive": 0,
+          "sjt": 0,
+          "rawScale": 0,
+          "rawCognitive": 0,
+          "rawSjt": 0,
+          "snapshots": 0,
+          "jobs": 0,
+          "tokens": [
+            {
+              "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+              "usedCount": 0
+            }
+          ]
+        },
+        "after": {
+          "definitions": 1,
+          "parents": 0,
+          "forms": 0,
+          "formAnswers": 0,
+          "scales": 0,
+          "cognitive": 0,
+          "sjt": 0,
+          "rawScale": 0,
+          "rawCognitive": 0,
+          "rawSjt": 0,
+          "snapshots": 0,
+          "jobs": 0,
+          "tokens": [
+            {
+              "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+              "usedCount": 0
+            }
+          ]
+        }
+      },
+      {
+        "name": "Candidate b decryptable invalid resolved Cognitive config prevents every group draw for member/public",
+        "before": {
+          "definitions": 1,
+          "parents": 0,
+          "forms": 0,
+          "formAnswers": 0,
+          "scales": 0,
+          "cognitive": 0,
+          "sjt": 0,
+          "rawScale": 0,
+          "rawCognitive": 0,
+          "rawSjt": 0,
+          "snapshots": 0,
+          "jobs": 0,
+          "tokens": [
+            {
+              "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+              "usedCount": 0
+            }
+          ]
+        },
+        "after": {
+          "definitions": 1,
+          "parents": 0,
+          "forms": 0,
+          "formAnswers": 0,
+          "scales": 0,
+          "cognitive": 0,
+          "sjt": 0,
+          "rawScale": 0,
+          "rawCognitive": 0,
+          "rawSjt": 0,
+          "snapshots": 0,
+          "jobs": 0,
+          "tokens": [
+            {
+              "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+              "usedCount": 0
+            }
+          ]
+        }
+      },
+      {
+        "name": "/composite-assessments FORM_SECTION: first durable FINAL ACK prevents restart before replay/state/report",
+        "before": {
+          "definitions": 1,
+          "parents": 1,
+          "forms": 1,
+          "formAnswers": 1,
+          "scales": 1,
+          "cognitive": 1,
+          "sjt": 1,
+          "rawScale": 0,
+          "rawCognitive": 0,
+          "rawSjt": 0,
+          "snapshots": 1,
+          "jobs": 1,
+          "tokens": [
+            {
+              "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+              "usedCount": 0
+            }
+          ]
+        },
+        "after": {
+          "definitions": 1,
+          "parents": 1,
+          "forms": 1,
+          "formAnswers": 1,
+          "scales": 1,
+          "cognitive": 1,
+          "sjt": 1,
+          "rawScale": 0,
+          "rawCognitive": 0,
+          "rawSjt": 0,
+          "snapshots": 1,
+          "jobs": 1,
+          "tokens": [
+            {
+              "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+              "usedCount": 0
+            }
+          ]
+        }
+      },
+      {
+        "name": "/composite-assessments SCALE: first durable FINAL ACK prevents restart before replay/state/report",
+        "before": {
+          "definitions": 1,
+          "parents": 1,
+          "forms": 1,
+          "formAnswers": 1,
+          "scales": 1,
+          "cognitive": 1,
+          "sjt": 1,
+          "rawScale": 0,
+          "rawCognitive": 0,
+          "rawSjt": 0,
+          "snapshots": 2,
+          "jobs": 1,
+          "tokens": [
+            {
+              "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+              "usedCount": 0
+            }
+          ]
+        },
+        "after": {
+          "definitions": 1,
+          "parents": 1,
+          "forms": 1,
+          "formAnswers": 1,
+          "scales": 1,
+          "cognitive": 1,
+          "sjt": 1,
+          "rawScale": 0,
+          "rawCognitive": 0,
+          "rawSjt": 0,
+          "snapshots": 2,
+          "jobs": 1,
+          "tokens": [
+            {
+              "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+              "usedCount": 0
+            }
+          ]
+        }
+      },
+      {
+        "name": "/composite-assessments COGNITIVE: first durable FINAL ACK prevents restart before replay/state/report",
+        "before": {
+          "definitions": 1,
+          "parents": 1,
+          "forms": 1,
+          "formAnswers": 1,
+          "scales": 1,
+          "cognitive": 1,
+          "sjt": 1,
+          "rawScale": 0,
+          "rawCognitive": 1,
+          "rawSjt": 0,
+          "snapshots": 3,
+          "jobs": 1,
+          "tokens": [
+            {
+              "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+              "usedCount": 0
+            }
+          ]
+        },
+        "after": {
+          "definitions": 1,
+          "parents": 1,
+          "forms": 1,
+          "formAnswers": 1,
+          "scales": 1,
+          "cognitive": 1,
+          "sjt": 1,
+          "rawScale": 0,
+          "rawCognitive": 1,
+          "rawSjt": 0,
+          "snapshots": 3,
+          "jobs": 1,
+          "tokens": [
+            {
+              "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+              "usedCount": 0
+            }
+          ]
+        }
+      },
+      {
+        "name": "/composite-assessments SITUATIONAL: first durable FINAL ACK prevents restart before replay/state/report",
+        "before": {
+          "definitions": 1,
+          "parents": 1,
+          "forms": 1,
+          "formAnswers": 1,
+          "scales": 1,
+          "cognitive": 1,
+          "sjt": 1,
+          "rawScale": 0,
+          "rawCognitive": 1,
+          "rawSjt": 1,
+          "snapshots": 4,
+          "jobs": 1,
+          "tokens": [
+            {
+              "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+              "usedCount": 0
+            }
+          ]
+        },
+        "after": {
+          "definitions": 1,
+          "parents": 1,
+          "forms": 1,
+          "formAnswers": 1,
+          "scales": 1,
+          "cognitive": 1,
+          "sjt": 1,
+          "rawScale": 0,
+          "rawCognitive": 1,
+          "rawSjt": 1,
+          "snapshots": 4,
+          "jobs": 1,
+          "tokens": [
+            {
+              "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+              "usedCount": 0
+            }
+          ]
+        }
+      }
+    ],
+    "allocation": {
+      "attemptId": "81c52ecf-dc02-4d1c-97ce-de614c58c8cc",
+      "allocationHash": "12fbd5e5be5adefd483888c9b83f2e5bfb143190897a9ed756a5bcf62c2fe384",
+      "ciphertextSha256": "c3ff8f3194727d4e4e8d55c3ea7d65f59a21fecb884c242e9f6eebcd13edde96",
+      "configDigest": "328bd26dcd54afa969907794e7fb05a6344ac26f3ca406fe1d634cd305ffc75d",
+      "variantKey": "b",
+      "selectedItemIds": [
+        "49dbc2ba-c128-4843-9b93-fab61fd44bf2",
+        "94ba59bb-2b0b-4b26-8dcb-6289c6e475c2",
+        "ea600253-8311-4b67-b8d2-7d34bc0775d3",
+        "959d871d-5824-47bf-8b80-bbc4d5fa5ae2"
+      ],
+      "selectedSectionIds": [
+        "f696d3c4-9d4d-44dc-8d8b-ef25f97bae7c"
+      ]
+    },
+    "acceptedFacts": {
+      "sha256": "c9489f8c4d4835d9ed144501db830e9e94087cf0818f0d70a0971234a8812705",
+      "counts": {
+        "forms": 1,
+        "scale": 1,
+        "scaleResultFacts": 0,
+        "cognitive": 1,
+        "sjt": 1,
+        "snapshots": 4
+      }
+    },
+    "scope": "Historical HTTP03 checks retain their original source/fingerprint; only uncompleted report/state and later scenarios execute on this runtime"
+  },
+  "qualification": {
+    "browser": false,
+    "load": false,
+    "cpuOrLatency": false,
+    "sampling": "Natural production crypto draws; bounded at 16; both groups must be observed and every sampled attempt fully answered",
+    "mediaLimit": "Hidden SJT probes exercise cross-slot denial; no successful selected-video capability fixture or independent hidden-child HTTP selection-guard claim"
+  }
+}

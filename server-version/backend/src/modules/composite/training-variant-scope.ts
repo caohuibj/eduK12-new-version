@@ -1,3 +1,4 @@
+import type { SharedControlDb } from '../assessment-runtime/shared-control-records'
 import { trainingVariantMarkerState } from './training-variant-markers'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
@@ -34,7 +35,8 @@ export type TrainingAttemptScope = {
 }
 const scopes=new WeakMap<object,TrainingAttemptScope>()
 const verifiedDefinitions=new WeakMap<object,ReturnType<typeof parseCompiledWeightedVariants>>()
-export async function resolveTrainingAttemptScope(attempt:any,composite:any=attempt.compositeAssessment,options?:any):Promise<TrainingAttemptScope>{
+export type TrainingAttemptScopeOptions = { db?: SharedControlDb; frozenSlotSets?: Map<string, Awaited<ReturnType<typeof loadFrozenActiveSlotSet>>> }
+export async function resolveTrainingAttemptScope(attempt:any,composite:any=attempt.compositeAssessment,options?:TrainingAttemptScopeOptions):Promise<TrainingAttemptScope>{
   const known=scopes.get(attempt)
   if(known)return known
   if(!composite)throw compositeForbidden('作答缺少冻结问卷来源')
@@ -63,7 +65,7 @@ export async function resolveTrainingAttemptScope(attempt:any,composite:any=atte
     })
     if(allocation.allocationHash!==attempt.trainingVariantAllocationHash)throw new Error('allocation hash mismatch')
     if(!attempt.frozenActiveSlotSetEncrypted||!attempt.frozenActiveSlotSetHash)throw new Error('missing selected slots')
-    const slots=options?.frozenSlotSets?.get(attempt.id) ?? await loadFrozenActiveSlotSet(attempt.frozenActiveSlotSetEncrypted)
+    const slots=options?.frozenSlotSets?.get(attempt.id) ?? await loadFrozenActiveSlotSet(attempt.frozenActiveSlotSetEncrypted, options?.db)
     if(slots.snapshotHash!==attempt.frozenActiveSlotSetHash||slots.attemptEpoch!==attempt.attemptEpoch)throw new Error('selected slot identity mismatch')
     const itemIds=new Set<string>(allocation.selectedItemIds),sectionIds=new Set<string>(allocation.selectedSectionIds)
     const items=(composite.items??[]).filter((i:any)=>itemIds.has(i.id)),formSections=(composite.formSections??[]).filter((s:any)=>sectionIds.has(s.id))
@@ -81,8 +83,8 @@ export async function resolveTrainingAttemptScope(attempt:any,composite:any=atte
   }catch(error){throw compositeForbidden('概率分卷作答的冻结配置、分配或单元不一致')}
 }
 /** Returns a shallow projection; never mutates the loaded union graph. */
-export async function applyTrainingAttemptScope(attempt:any,db?:unknown):Promise<any>{
-  const scope=await resolveTrainingAttemptScope(attempt,attempt.compositeAssessment,db)
+export async function applyTrainingAttemptScope(attempt:any,options?:TrainingAttemptScopeOptions):Promise<any>{
+  const scope=await resolveTrainingAttemptScope(attempt,attempt.compositeAssessment,options)
   if(!scope.variant)return attempt
   const projected={...attempt,compositeAssessment:{...attempt.compositeAssessment,items:scope.items,formSections:scope.formSections},trainingVariantScope:scope}
   scopes.set(projected,scope)

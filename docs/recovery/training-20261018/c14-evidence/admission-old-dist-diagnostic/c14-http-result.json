@@ -1,0 +1,114 @@
+{
+  "passed": false,
+  "qualificationScope": "ADMISSION_ONLY",
+  "checks": [],
+  "requests": [
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 318
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+      "method": "POST",
+      "status": 500,
+      "bytes": 57
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+      "method": "POST",
+      "status": 500,
+      "bytes": 57
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+      "method": "POST",
+      "status": 500,
+      "bytes": 57
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+      "method": "POST",
+      "status": 500,
+      "bytes": 57
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+      "method": "POST",
+      "status": 500,
+      "bytes": 57
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+      "method": "POST",
+      "status": 500,
+      "bytes": 57
+    }
+  ],
+  "counts": [
+    {
+      "name": "Targeted six-start census and Cognitive quota consumption",
+      "before": {
+        "definitions": 1,
+        "parents": 1,
+        "forms": 1,
+        "formAnswers": 1,
+        "scales": 1,
+        "cognitive": 1,
+        "sjt": 1,
+        "rawScale": 0,
+        "rawCognitive": 1,
+        "rawSjt": 1,
+        "snapshots": 4,
+        "jobs": 1,
+        "tokens": [
+          {
+            "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+            "usedCount": 0
+          }
+        ]
+      },
+      "after": {
+        "definitions": 1,
+        "parents": 1,
+        "forms": 1,
+        "formAnswers": 1,
+        "scales": 1,
+        "cognitive": 1,
+        "sjt": 1,
+        "rawScale": 0,
+        "rawCognitive": 1,
+        "rawSjt": 1,
+        "snapshots": 4,
+        "jobs": 1,
+        "tokens": [
+          {
+            "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+            "usedCount": 0
+          }
+        ]
+      },
+      "quotaBefore": 0,
+      "quotaAfter": 0
+    }
+  ],
+  "races": [],
+  "allocations": [],
+  "completed": [],
+  "reusedEvidence": null,
+  "optimizedWholeEvidence": [],
+  "qualification": {
+    "browser": false,
+    "load": false,
+    "cpuOrLatency": false,
+    "sampling": "Natural production crypto draws; bounded at 16; both groups must be observed and every sampled attempt fully answered",
+    "mediaLimit": "Hidden SJT probes exercise cross-slot denial; no successful selected-video capability fixture or independent hidden-child HTTP selection-guard claim"
+  }
+}

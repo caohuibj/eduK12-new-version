@@ -1,5 +1,5 @@
 import { isControlReferenceField } from './control-reference-codec'
-import { storeSharedSlotPlan, loadSharedSlotPlan, sharedControlWritesEnabled } from './shared-control-records'
+import { storeSharedSlotPlan, loadSharedSlotPlan, sharedControlWritesEnabled, type SharedControlDb } from './shared-control-records'
 import { createHash } from 'node:crypto'
 import { BoundedArtifactCache, artifactContentKey } from './bounded-artifact-cache'
 import { compactAssessmentStorageEnabled } from './compact-field-codec'
@@ -179,13 +179,16 @@ export const questionnaireScaleSlotKey = (questionnaireScaleId: string): string 
 export const compositeItemSlotKey = (compositeItemId: string, unitType: 'SCALE' | 'COGNITIVE' | 'SITUATIONAL'): string => `${unitType.toLowerCase()}:${compositeItemId}`
 export const formSectionSlotKey = (sectionId: string): string => `form-section:${sectionId}`
 
-export const storeFrozenActiveSlotSet = (snapshot: FrozenActiveSlotSetV1): Promise<string> => storeSharedSlotPlan(snapshot)
+export const storeFrozenActiveSlotSet = (snapshot: FrozenActiveSlotSetV1, db?:SharedControlDb): Promise<string> => storeSharedSlotPlan(snapshot,db)
 const sharedSlotContentIndex=new BoundedArtifactCache<string>(128,64*1024)
-export const loadFrozenActiveSlotSet = async (value: string): Promise<FrozenActiveSlotSetV1> => {
+export const loadFrozenActiveSlotSet = async (value: string, db?:SharedControlDb): Promise<FrozenActiveSlotSetV1> => {
   // Legacy ciphertext keeps the existing verified-cipher fast path.
   if(!isControlReferenceField(value))return decryptFrozenActiveSlotSet(value)
   const ref=decryptUnifiedRuntimePayload<any>(value)
   if(ref?.k!=='FSP2'||typeof ref.p!=='string'||!/^[a-f0-9]{64}$/.test(ref.p)||!Number.isSafeInteger(ref.e)||ref.e<1||Object.keys(ref).some(k=>!['k','p','e'].includes(k)))throw new Error('Frozen slot reference invalid')
+  // An operation-local store can see uncommitted rows. Do not publish those
+  // values into the process-wide existence cache if the transaction rolls back.
+  if(db)return retainImmutableCanonicalValue(parseFrozenActiveSlotSet(await loadSharedSlotPlan(value,ref,db)))
   const key=ref.p+':'+ref.e,knownHash=sharedSlotContentIndex.get(key),known=knownHash?verifiedSlotPlans.get(knownHash):undefined
   if(known)return known
   const decoded=await loadSharedSlotPlan(value,ref),parsed=parseFrozenActiveSlotSet(decoded)
@@ -195,9 +198,9 @@ export const loadFrozenActiveSlotSet = async (value: string): Promise<FrozenActi
   return parsed
 }
 
-export const loadFrozenActiveSlot = async (input: Parameters<typeof getFrozenActiveSlot>[0]): Promise<FrozenActiveSlotV1> => {
+export const loadFrozenActiveSlot = async (input: Parameters<typeof getFrozenActiveSlot>[0], db?:SharedControlDb): Promise<FrozenActiveSlotV1> => {
   if (!input.encrypted || !input.storedHash) throw new Error('Frozen active slot set is missing')
-  const snapshot = await loadFrozenActiveSlotSet(input.encrypted)
+  const snapshot = await loadFrozenActiveSlotSet(input.encrypted,db)
   if (snapshot.snapshotHash !== input.storedHash || snapshot.attemptEpoch !== input.attemptEpoch) throw new Error('Frozen active slot set binding mismatch')
   const slot = snapshot.slots.find(candidate => candidate.slotKey === input.slotKey)
   if (!slot) throw new Error('Frozen active slot is missing')

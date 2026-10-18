@@ -1,0 +1,189 @@
+{
+  "prepared": true,
+  "productId": "0e8fa2c4-3b90-4991-bae0-494c51656bef",
+  "attemptIds": [
+    "084e3ab9-fca0-466b-a6f2-eacf4822c60d",
+    "80f13f59-ab3b-46c6-89b2-a8890f2b1d12",
+    "34dab3b2-7443-4639-b35d-222b01160602",
+    "7cb4171c-1360-4d7c-8e90-a6e6eb6323ee",
+    "415941a1-4d91-4978-ae66-d2208849855b",
+    "3d929f3d-c903-4f04-9b1e-2a227098bdac"
+  ],
+  "apiPid": 136,
+  "checks": [
+    "FULL02 read-only consistency: three budgeted attempts, exact selected children and source-bound Cognitive quota; no extra standalone session",
+    "Existing completed weighted-variant full preview returns sampleSize=1 and stratified field metadata; other teacher denied, no re-answer or export job",
+    "Fresh owner-published null-policy Form product and six distinct normal HTTP starts; persisted UAR2/FSP2, zero FINALs/facts/outbox jobs"
+  ],
+  "requests": [
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 290
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/export/preview?detail=full",
+      "method": "GET",
+      "status": 200,
+      "bytes": 75954
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 284
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/export/preview?detail=full",
+      "method": "GET",
+      "status": 403,
+      "bytes": 66
+    },
+    {
+      "route": "/questionnaire-products",
+      "method": "POST",
+      "status": 200,
+      "bytes": 1256
+    },
+    {
+      "route": "/questionnaire-products/0e8fa2c4-3b90-4991-bae0-494c51656bef/items",
+      "method": "POST",
+      "status": 200,
+      "bytes": 2092
+    },
+    {
+      "route": "/questionnaire-products/0e8fa2c4-3b90-4991-bae0-494c51656bef/preflight",
+      "method": "POST",
+      "status": 200,
+      "bytes": 539
+    },
+    {
+      "route": "/questionnaire-products/0e8fa2c4-3b90-4991-bae0-494c51656bef/publish",
+      "method": "POST",
+      "status": 200,
+      "bytes": 2118
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 289
+    },
+    {
+      "route": "/composite-assessments/0e8fa2c4-3b90-4991-bae0-494c51656bef/attempts",
+      "method": "POST",
+      "status": 200,
+      "bytes": 2487
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 289
+    },
+    {
+      "route": "/composite-assessments/0e8fa2c4-3b90-4991-bae0-494c51656bef/attempts",
+      "method": "POST",
+      "status": 200,
+      "bytes": 2487
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 289
+    },
+    {
+      "route": "/composite-assessments/0e8fa2c4-3b90-4991-bae0-494c51656bef/attempts",
+      "method": "POST",
+      "status": 200,
+      "bytes": 2487
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 289
+    },
+    {
+      "route": "/composite-assessments/0e8fa2c4-3b90-4991-bae0-494c51656bef/attempts",
+      "method": "POST",
+      "status": 200,
+      "bytes": 2487
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 289
+    },
+    {
+      "route": "/composite-assessments/0e8fa2c4-3b90-4991-bae0-494c51656bef/attempts",
+      "method": "POST",
+      "status": 200,
+      "bytes": 2487
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 289
+    },
+    {
+      "route": "/composite-assessments/0e8fa2c4-3b90-4991-bae0-494c51656bef/attempts",
+      "method": "POST",
+      "status": 200,
+      "bytes": 2487
+    }
+  ],
+  "finalsSubmitted": 0
+}

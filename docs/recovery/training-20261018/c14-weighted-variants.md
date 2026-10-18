@@ -50,3 +50,19 @@
 HTTP03已接收同一选中组 Form、Scale、120-trial Go/No-Go、SJT 的真实 FINAL 与重放，坏候选与每次 ACK 后重启拒绝均有原始证据。原 worker 却遍历 union Form sections，错误要求未分配 section 的 collection facts；原 aggregate 明确 failed。独立停机 PG 字节副本用原 dist 重现确切 DEFINITION_MISMATCH，源未变/副本已停机，未重交或重算 accepted facts。
 
 修复让 finalizer 原 union 身份验证后使用同一 selected scope；whole committed carrier 保留 union，避免浅拷贝丢失 WeakMap 后对 selected 图错误重算 union。集中 Prisma marker select 与强类型三态：五字段显式 null 才旧模式，任何 undefined/漏字段是 UNKNOWN，必须窄读或拒绝。whole cached header 在 ACK/replay 前验证完整分配，报告 header/history 补全检测。ordinary 保留既有窄查询，不为了 DB-only 孤立分配损坏给普通 artifact 下载加 EXISTS；已发布配置合法 API 不可清空、allocation UPDATE trigger 不可重写，原 variant artifact 在 config→null 时 fingerprint 自然失配。后续须实际开启 compact/shared/whole committed 相关开关验证最小链，单元用例不替代 HTTP 资格。
+
+## 原四工具 accepted facts 的定向恢复（12:28 UTC）
+
+固定 e90550c5 源码与 Node 24.21.0 新 dist，在 HTTP03 停机状态的独立字节核验副本完成 REPORT_ONLY 续跑。原 Form、Scale、120-trial Cognitive、SJT 的 accepted facts 与 allocation 密文/hash 保持不变，没有重交 FINAL；原 report worker 正常完成，participant/teacher report 返回 200，最终 parent COMPLETED。15 个 HTTP 请求的范围和六个运行开关变更均记录在 `c14-evidence/report-only-recovery/`。原失败 aggregate 仍为 false，不改写历史资格；源字节不变，服务已停机且 cleanupVerified=true。剩余优化 whole 实际 ACK、队列 CSV/ZIP、分层与非空新格式恢复仍待验证。
+
+## 六并发冷 shared slot 路径的事务缺口（12:35 UTC）
+
+Full01 延续原 facts 恢复成功后，六个同身份 start 在 pool=6、原 5 秒期限下全事务过期。源码与日志定位：首事务持 parent 锁，另外五个事务等该锁；首事务的 shared slot template 使用 global Prisma 另借连接，产生池自等待。原日志保留。修复四个真实事务调用点传同 db/tx，经已有事务局部 public-template store 读写；事务外默认 client 保留，默认关闭序列化与科学 hash 不变。scope 的事务读取参数也显式传递，避免有 tx 却另借全局连接；未提交读不进入全局缓存。5 个 helper 定向测试、1 个 scope forwarding 与完整 noEmit 通过。真实 PG 等待观测和相同六并发复验尚待进行；不调整 pool、超时或必要授权/锁/原子性，不称吞吐收益。
+
+## 本批最小范围收口（12:52 UTC）
+
+- 业务源码15024877：FULL02的361HTTP/70检查通过（不是361个唯一测试）；7条四工具完成记录中1条原事实只读复用、6条新完成。两组均实际使用120-trial认知任务；分层报告与原queueCSV/ZIP、六开关whole缓存负例及batch/committed实际timeline、16个锁见证和次数/恢复规则通过。205表全列新格式恢复、17allocation、2私有图片和受限role通过。
+- pool=6原5s的6start冷模板问题经原dist一次PG诊断定位、同条件修复验证：214个原stall采样保留在确定性gzip，旧dist身份明确；修复后6请求同一attempt。仅为并发正确性诊断，不宣称吞吐收益。
+- harness8a2fcd16：新null Form六首FINAL经API冷重启和6真实PG事务阻塞见证后全部ACK、原worker各完成1次；没有重交旧facts。FSP首次读取位置明确为固定source路径推断，不把SQL类当bound hash证据。
+- 既有variant full preview owner200/full/sample1/分层字段及异teacher拒真实通过；HTTP契约没有rows。原FULL student三attempt的selected children/sourcequota做事后一致性核对，无额外standalone session；不冒称即时before/after。
+- 两次通过均sourceUnchanged/inputsUnchanged/cleanupVerified=true，服务已停机。原失败保留，已过输入不重复。证据见full02-qualified与cold-final-qualified。正式浏览器C25、完整性能C26、C16统计及本文列明组合/视频/native子API动态边界保留。

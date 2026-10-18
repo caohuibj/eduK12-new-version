@@ -1,0 +1,44 @@
+{
+  "before": {
+    "definitions": 1,
+    "parents": 1,
+    "forms": 1,
+    "formAnswers": 1,
+    "scales": 1,
+    "cognitive": 1,
+    "sjt": 1,
+    "rawScale": 0,
+    "rawCognitive": 1,
+    "rawSjt": 1,
+    "snapshots": 4,
+    "jobs": 1,
+    "tokens": [
+      {
+        "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+        "usedCount": 0
+      }
+    ]
+  },
+  "after": {
+    "definitions": 1,
+    "parents": 1,
+    "forms": 1,
+    "formAnswers": 1,
+    "scales": 1,
+    "cognitive": 1,
+    "sjt": 1,
+    "rawScale": 0,
+    "rawCognitive": 1,
+    "rawSjt": 1,
+    "snapshots": 4,
+    "jobs": 1,
+    "tokens": [
+      {
+        "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+        "usedCount": 0
+      }
+    ]
+  },
+  "quotaBefore": 0,
+  "quotaAfter": 0
+}

@@ -2721,7 +2721,7 @@ const createAttempt = async (
     await db.compositeAssessmentAttempt.update({
       where: { id: attempt.id },
       data: {
-        frozenActiveSlotSetEncrypted: await storeFrozenActiveSlotSet(frozenActiveSlotSet),
+        frozenActiveSlotSetEncrypted: await storeFrozenActiveSlotSet(frozenActiveSlotSet, db),
         frozenActiveSlotSetHash: frozenActiveSlotSet.snapshotHash,
       },
     })

@@ -165,7 +165,7 @@ export const freezeCompositeAttemptContext = async (
   })
   if (!attempt) throw new AssessmentContextServiceError('综合测评记录不存在', 404)
   const parent = await loadTrainingChildParent(attemptId, attempt, db)
-  const scope = await resolveTrainingAttemptScope(parent, parent.compositeAssessment, db)
+  const scope = await resolveTrainingAttemptScope(parent, parent.compositeAssessment, { db })
   if (attempt.contextSnapshotEncrypted && attempt.contextSnapshotHash) {
     try {
       const context = decryptAssessmentContext(attempt.contextSnapshotEncrypted)

@@ -92,17 +92,17 @@ export const loadSharedUnitAdmission = async (encrypted: string,db?:SharedContro
   return { ...unsigned, snapshotHash: canonicalHash(unsigned) }
 }
 
-export const storeSharedSlotPlan = async (snapshot: any): Promise<string> => {
+export const storeSharedSlotPlan = async (snapshot: any, db?:SharedControlDb): Promise<string> => {
   if (!sharedControlWritesEnabled()) return encryptUnifiedRuntimePayload(snapshot)
   const { attemptEpoch, snapshotHash: _hash, ...plan } = snapshot
-  const [p] = await publicTemplates.saveMany([{ kind: 'FROZEN_SLOT_PLAN', value: plan }])
+  const [p] = await publicTemplatesForDatabase(db).saveMany([{ kind: 'FROZEN_SLOT_PLAN', value: plan }])
   return encryptControlReference({ k: 'FSP2', p, e: attemptEpoch })
 }
-export const loadSharedSlotPlan = async (encrypted: string, decoded?:unknown): Promise<unknown> => {
+export const loadSharedSlotPlan = async (encrypted: string, decoded?:unknown, db?:SharedControlDb): Promise<unknown> => {
   const ref = decoded===undefined?decryptUnifiedRuntimePayload<any>(encrypted):decoded as any
   if (ref?.k !== 'FSP2') return ref
   if (!Number.isSafeInteger(ref.e) || ref.e < 1 || Object.keys(ref).some(k => !['k','p','e'].includes(k))) throw new Error('Frozen slot reference invalid')
-  const [plan] = await publicTemplates.loadMany([{ hash: ref.p, kind: 'FROZEN_SLOT_PLAN' }])
+  const [plan] = await publicTemplatesForDatabase(db).loadMany([{ hash: ref.p, kind: 'FROZEN_SLOT_PLAN' }])
   const unsigned = { ...plan, attemptEpoch: ref.e }
   return { ...unsigned, snapshotHash: canonicalHash(unsigned) }
 }
