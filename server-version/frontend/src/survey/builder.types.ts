@@ -30,20 +30,9 @@ export type SjtDraftV1={
     optionKey:string;label:string;contributions:Record<string,number>
   }[]}[]
 }
-export type SjtQuestion={
-  questionKey:string;prompt:string;responseType:'SINGLE'|'MULTIPLE';required:boolean;allowRefusal:boolean;
-  minSelections?:number;maxSelections?:number;aggregationPolicy?:'SUM'|'MEAN';exclusiveOptionKeys?:string[];
-  options:{optionKey:string;label:string;contributions:Record<string,number>;
-    nonanswerReason?:'DECLINED'|'UNABLE_TO_JUDGE'}[]
-}
-export type SjtScene={sceneKey:string;title:string;stimulus:string;image?:SurveyImage;questions:SjtQuestion[]}
-export type SjtDraftV2={
-  schemaVersion:2;respondentType:'participant_self_report'|'student_self_report'|'teacher_self_report';
-  title:string;author:string;sourceNote:string;licenseStatus:'self_authored'|'authorized'|'unknown';
-  redistribution:'allowed'|'restricted'|'unknown';orderPolicy:'FIXED';
-  metrics:{metricKey:string;label:string;direction:'descriptive'}[];
-  scoring:{modelKey:'AUTHOR_KEY_SUM'|'EXPERT_KEY';modelVersion:'1';sourceNote:string};scenes:SjtScene[]
-}
+export type { SjtQuestion } from '../modules/assessment-core/sjt/types'
+export type SjtScene = import('../modules/assessment-core/sjt/types').SjtScene<SurveyImage>
+export type SjtDraftV2 = import('../modules/assessment-core/sjt/types').SjtDraftV2<SurveyImage>
 export type SjtDraft=SjtDraftV1|SjtDraftV2
 export type CognitiveDraft={schemaVersion:1;templateKey:'gonogo-software-frame-v1';
   feedback:{mode:'GENERAL'|'DESCRIPTIVE';metricKeys:('hitRate'|'goMedianRtMs')[];

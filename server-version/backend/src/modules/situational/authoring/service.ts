@@ -6,7 +6,7 @@ import {
   validateSituationPackage,
   type SituationPackage,
 } from '../situation-package.registry'
-import { compileSjtTemplate, assertSjtReleaseReady } from './template'
+import { compileSjtAuthorDocument, assertSjtAuthorReleaseReady } from './dispatcher'
 
 export interface SjtAuthorActor {
   userId: string
@@ -24,7 +24,7 @@ const assertAccess = (ownerId: string, actor: SjtAuthorActor) => {
 }
 
 export async function createSjtDraft(actor: SjtAuthorActor, input: unknown) {
-  const c = compileSjtTemplate(input)
+  const c = compileSjtAuthorDocument(input)
   assertUnreserved(c.template.instrumentKey)
   return prisma.$transaction(async (tx) => {
     const draft = await tx.sjtAuthorDraft.create({
@@ -54,6 +54,7 @@ export async function listSjtDrafts(actor: SjtAuthorActor) {
     return {
       ...d,
       template: {
+        templateVersion: t.templateVersion,
         title: t.title,
         instrumentKey: t.instrumentKey,
         instrumentVersion: t.instrumentVersion,
@@ -80,7 +81,7 @@ export async function reviseSjtDraft(
   input: unknown,
   audit: { action: 'REVISE' | 'RESTORE'; note?: string } = { action: 'REVISE' },
 ) {
-  const c = compileSjtTemplate(input)
+  const c = compileSjtAuthorDocument(input)
   assertUnreserved(c.template.instrumentKey)
   return prisma.$transaction(async (tx) => {
     const old = await tx.sjtAuthorDraft.findUnique({ where: { id } })
@@ -120,8 +121,8 @@ export async function requestSjtReview(
 ) {
   const draft = await getSjtDraft(actor, id)
   if (draft.ownerId !== actor.userId) throw problem('仅作者可提交审核', 403)
-  const c = compileSjtTemplate(draft.template)
-  assertSjtReleaseReady(c)
+  const c = compileSjtAuthorDocument(draft.template)
+  assertSjtAuthorReleaseReady(c)
   if (c.contentDigest !== digest || draft.contentDigest !== digest) throw problem('内容摘要已变化')
   return prisma.$transaction(async (tx) => {
     const changed = await tx.sjtAuthorDraft.updateMany({
@@ -162,11 +163,11 @@ export async function reviewSjtDraft(
         draft.contentDigest !== digest
       )
         throw problem('待审核内容已变化')
-      const c = compileSjtTemplate(draft.template)
+      const c = compileSjtAuthorDocument(draft.template)
       assertUnreserved(c.template.instrumentKey)
       if (c.contentDigest !== digest) throw problem('存储内容摘要不一致')
       if (approve) {
-        assertSjtReleaseReady(c)
+        assertSjtAuthorReleaseReady(c)
         const pkg = { ...c.package, releaseStatus: 'PUBLISHED' as const }
         const existing = await tx.sjtAuthorRelease.findUnique({
           where: {
@@ -236,10 +237,10 @@ export async function availableSjtPackages(): Promise<SituationPackage[]> {
   return [...builtins, ...uploaded]
 }
 export function diffSjtTemplates(before: unknown, after: unknown) {
-  const a = compileSjtTemplate(before).template,
-    b = compileSjtTemplate(after).template
-  return Object.keys(b).filter(
-    (key) => canonicalHash(a[key as keyof typeof a]) !== canonicalHash(b[key as keyof typeof b]),
+  const a = compileSjtAuthorDocument(before).template as unknown as Record<string, unknown>,
+    b = compileSjtAuthorDocument(after).template as unknown as Record<string, unknown>
+  return [...new Set([...Object.keys(a), ...Object.keys(b)])].filter(
+    (key) => canonicalHash(a[key] ?? null) !== canonicalHash(b[key] ?? null),
   )
 }
 
@@ -288,7 +289,7 @@ export async function projectSjtReleaseStatus<
     instrument: { key: string; version: string; scoringVersion: string; releaseStatus: string }
   },
 >(data: T): Promise<T> {
-  if (data.instrument.scoringVersion !== 'author-key-sum-v1') return data
+  if (data.instrument.scoringVersion !== 'author-key-sum-v1' && !data.instrument.scoringVersion.startsWith('sjt-online-')) return data
   const release = await prisma.sjtAuthorRelease.findUnique({
     where: {
       instrumentKey_instrumentVersion: {

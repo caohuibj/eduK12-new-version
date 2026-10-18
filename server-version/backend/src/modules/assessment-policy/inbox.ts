@@ -1,3 +1,6 @@
+import { onlineSituationalCanonicalTaskSatisfaction } from '../situational/situational-task-satisfaction'
+import { parseCanonicalUnitResultEnvelope } from '../assessment-runtime/unit-result'
+import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { respondentCompletionFeedback } from './feedback'
 import { prisma } from '../../config/database'
 import { listStudentAssignments } from '../cognitive/assignment.service'
@@ -86,8 +89,8 @@ export async function listRespondentAssessments(userId: string, accountRole: Use
     resultAvailability: row.status === 'COMPLETED' ? 'REPORT' : 'PENDING', organization: null, course: [] })
   if (accountRole === 'STUDENT') {
     const situational = await prisma.situationalAttempt.findMany({ where: { userId, compositeAttemptId: null }, orderBy: { startedAt: 'desc' }, take: 100,
-      select: { id: true, instrumentKey: true, instrumentVersion: true, status: true } })
-    for (const row of situational) list.push({ taskId: 'situational:' + row.id, sourceType: 'SELF_SERVICE', sourceId: row.id, title: '情境测评', state: row.status,
+      select: { id: true, instrumentKey: true, instrumentVersion: true, status: true, canonicalResultEncrypted: true } })
+    for (const row of situational) list.push({ taskId: 'situational:' + row.id, sourceType: 'SELF_SERVICE', sourceId: row.id, title: '情境测评', state: row.status === 'COMPLETED' && row.canonicalResultEncrypted && onlineSituationalCanonicalTaskSatisfaction(parseCanonicalUnitResultEnvelope(decryptUnifiedRuntimePayload(row.canonicalResultEncrypted)).core) === 'NOT_SATISFIED' ? 'SUBMITTED_NOT_SATISFIED' : row.status,
       deadline: null, resourceFamily: 'SITUATIONAL', resourceKey: row.instrumentKey, resourceVersion: row.instrumentVersion,
       subject: { userId, role: accountRole }, respondent: { userId, role: accountRole }, relationship: 'SELF', perspective: 'SELF_REPORT', consentState: 'NOT_REQUIRED',
       launchTarget: row.status === 'IN_PROGRESS' ? '/student/situational/' + encodeURIComponent(row.instrumentKey) : null,

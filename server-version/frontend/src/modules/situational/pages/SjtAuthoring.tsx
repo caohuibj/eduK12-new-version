@@ -1,9 +1,12 @@
+import { OnlineAnswerField } from '../OnlineAnswerField'
+import { onlineRunnerDefinition, onlineResponses, onlineAnswerComplete } from '../online'
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../../contexts/AuthContext'
 import { sessionFetch } from '../../../api/client'
 import { ProductPage, PageHeader, ProductStatus } from '../../../components/product-ui'
 import type { SituationalRunnerDefinition, SituationalDraftAnswer } from '../types'
 import { deriveReachableTrajectory } from '../traversal'
+import { OnlineAuthorEditor, newOnlineDocument, type OnlineDocument } from '../OnlineAuthorEditor'
 
 type Draft = {
   id: string
@@ -11,7 +14,7 @@ type Draft = {
   revision: number
   status: string
   contentDigest: string
-  template: { title: string; instrumentKey: string; instrumentVersion: string }
+  template: { title: string; instrumentKey: string; instrumentVersion: string; templateVersion?:string } & Partial<OnlineDocument>
   release?: { status: string } | null
   runner?: SituationalRunnerDefinition
   audits?: Array<{ action: string; revision: number; note?: string; template?: unknown }>
@@ -73,6 +76,8 @@ const download = (name: string, text: string) => {
 
 export default function SjtAuthoring() {
   const { user } = useAuth()
+  const [online, setOnline] = useState<OnlineDocument>(newOnlineDocument)
+  const [showOnline, setShowOnline] = useState(false)
   const [drafts, setDrafts] = useState<Draft[]>([]),
     [selected, setSelected] = useState<Draft | null>(null)
   const [file, setFile] = useState<File | null>(null),
@@ -110,7 +115,10 @@ export default function SjtAuthoring() {
     }
   }
   async function open(id: string) {
-    setSelected(await call<Draft>(`/drafts/${id}`))
+    const draft = await call<Draft>(`/drafts/${id}`)
+    if (draft.template.templateVersion === 'sjt-online-v1' && draft.template.display) draft.runner = onlineRunnerDefinition({responseProtocol:'sjt-online-response-v1',compilerVersion:'',definitionHash:'',displayHash:'',display:draft.template.display})
+    setSelected(draft)
+    if (draft.template.templateVersion === 'sjt-online-v1') { setOnline(draft.template as OnlineDocument); setShowOnline(true) } else setShowOnline(false)
     setPreview(false)
     setParagraphs([])
   }
@@ -167,6 +175,17 @@ export default function SjtAuthoring() {
         description="填写模板，检查内容并预览作答；审核通过后发布试点版本。"
       />
       <section className="card my-5 space-y-4 p-6">
+        <button className="btn-primary" disabled={busy} onClick={()=>{setSelected(null);setOnline(newOnlineDocument());setShowOnline(true);setPreview(false)}}>在线创建文字题包</button>
+        <p className="text-sm">在线编辑情境、单选／多选、拒答与评分矩阵，并独立录入人工验收样例。图片支持不在本版范围。</p>
+        {showOnline && <>
+          <OnlineAuthorEditor value={online} onChange={setOnline} disabled={busy || Boolean(selected && (!owned || selected.status==='PUBLISHED'))}/>
+          {(!selected || (owned && selected.status!=='PUBLISHED')) && <button className="btn-primary" disabled={busy} onClick={()=>void run(async()=>{
+            const saved = selected ? await call<Draft>(`/drafts/${selected.id}`,'PUT',{revision:selected.revision,template:online}) : await call<Draft>('/online/drafts','POST',{template:online})
+            await refresh(); await open(selected?.id??saved.id);setNotice('在线题包已保存。人工验收通过后可提交独立审核。')
+          })}>{selected?'保存在线修订':'保存在线新草稿'}</button>}
+        </>}
+      </section>
+      <section className="card my-5 space-y-4 p-6">
         <div className="flex flex-wrap gap-3">
         <a href={`${base}/template`} className="btn-secondary inline-flex">
           下载空白 Excel 模板
@@ -204,7 +223,7 @@ export default function SjtAuthoring() {
           >
             保存新草稿
           </button>
-          {owned && selected?.status !== 'PUBLISHED' ? (
+          {owned && selected?.template.templateVersion !== 'sjt-online-v1' && selected?.status !== 'PUBLISHED' ? (
             <button
               disabled={busy}
               className="btn-secondary"
@@ -417,7 +436,7 @@ export default function SjtAuthoring() {
           {channels.map((c) => (
             <fieldset key={c.channelKey}>
               <legend>{c.prompt}</legend>
-              {c.responseType === 'SINGLE_CHOICE' ? (
+              {c.online ? <OnlineAnswerField channel={c} answer={answers[`${scene.sceneKey}:${c.channelKey}`]} name={`${scene.sceneKey}:${c.channelKey}`} onChange={(responseValue,status)=>setAnswers(a=>({...a,[`${scene.sceneKey}:${c.channelKey}`]:{responseValue,status}}))}/> : c.responseType === 'SINGLE_CHOICE' ? (
                 c.options?.map((o) => (
                   <label key={o.optionKey} className="my-2 block rounded-lg border p-3">
                     <input
@@ -455,7 +474,7 @@ export default function SjtAuthoring() {
             disabled={
               busy ||
               channels.some(
-                (c) => c.required !== false && !answers[`${scene.sceneKey}:${c.channelKey}`],
+                (c) => c.online ? !onlineAnswerComplete(c,answers[`${scene.sceneKey}:${c.channelKey}`]) : c.required !== false && !answers[`${scene.sceneKey}:${c.channelKey}`],
               )
             }
             className="btn-primary"
@@ -478,7 +497,8 @@ export default function SjtAuthoring() {
                   `/drafts/${selected.id}/preview`,
                   'POST',
                   {
-                    responses: Object.entries(answers)
+                    ...(selected.template.templateVersion==='sjt-online-v1'?{responseProtocol:'sjt-online-response-v1'}:{}),
+                    responses: selected.template.templateVersion==='sjt-online-v1'&&selected.runner ? onlineResponses(selected.runner,answers) : Object.entries(answers)
                       .filter(([, a]) => String(a.responseValue).trim())
                       .map(([pair, a]) => ({
                         sceneKey: pair.split(':')[0],

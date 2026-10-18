@@ -42,7 +42,7 @@ export async function inspectSituationalReleases(identities: SituationalReleaseI
       if (!pkg) throw unavailable()
       const validation = validateSituationPackage(pkg)
       if (!validation.valid || pkg.key !== identity.instrumentKey || pkg.instrumentVersion !== identity.instrumentVersion || (row && validation.definitionHash !== row.definitionHash)) throw corrupt()
-      const snapshot = freezeSituationalRuntimeAtAttemptStart({ instrumentKey: pkg.key, instrumentVersion: pkg.instrumentVersion, definition: pkg.definition, scientificContext: resolveSituationalScientificContext(pkg) })
+      const snapshot = freezeSituationalRuntimeAtAttemptStart({ instrumentKey: pkg.key, instrumentVersion: pkg.instrumentVersion, definition: pkg.definition, scientificContext: resolveSituationalScientificContext(pkg), ...(pkg.online ? { online: pkg.online } : {}) })
       resolved.set(key, { situationPackage: pkg, definitionHash: validation.definitionHash, runtime: snapshot.compiledRuntime, snapshot })
     } catch (error) { errors.set(key, error) }
   }
@@ -97,10 +97,11 @@ export async function loadSituationalReleaseMetadata(identities: SituationalRele
   const unique = [...new Map(identities.map(identity => [situationalReleaseKey(identity), identity])).values()]
   const builtins = listSituationPackages()
   const uploaded = unique.filter(identity => !builtins.some(pkg => pkg.key === identity.instrumentKey))
-  const rows = uploaded.length ? await db.$queryRaw<Array<SituationalReleaseIdentity & { status: string; definitionHash: string; packageKey: string | null; packageVersion: string | null; packageStatus: string | null; modelKey: string | null; scoringVersion: string | null }>>(Prisma.sql`
+  const rows = uploaded.length ? await db.$queryRaw<Array<SituationalReleaseIdentity & { status: string; definitionHash: string; packageKey: string | null; packageVersion: string | null; packageStatus: string | null; modelKey: string | null; scoringVersion: string | null; responseProtocol: string | null; compilerVersion: string | null }>>(Prisma.sql`
     SELECT "instrument_key" AS "instrumentKey", "instrument_version" AS "instrumentVersion", "status", "definition_hash" AS "definitionHash",
       "package" ->> 'key' AS "packageKey", "package" ->> 'instrumentVersion' AS "packageVersion", "package" ->> 'releaseStatus' AS "packageStatus",
-      "package" #>> '{definition,scoring,model,modelKey}' AS "modelKey", "package" #>> '{definition,scoring,scoringVersion}' AS "scoringVersion"
+      "package" #>> '{definition,scoring,model,modelKey}' AS "modelKey", "package" #>> '{definition,scoring,scoringVersion}' AS "scoringVersion",
+      "package" #>> '{online,responseProtocol}' AS "responseProtocol", "package" #>> '{online,compilerVersion}' AS "compilerVersion"
     FROM "sjt_author_releases" WHERE ${Prisma.join(uploaded.map(identity => Prisma.sql`("instrument_key" = ${identity.instrumentKey} AND "instrument_version" = ${identity.instrumentVersion})`), ' OR ')}
   `) : []
   const byKey = new Map(rows.map(row => [situationalReleaseKey(row), row]))
@@ -112,7 +113,9 @@ export async function loadSituationalReleaseMetadata(identities: SituationalRele
     else {
       const row = byKey.get(key)
       if (!row) throw unavailable()
-      if (!['PUBLISHED', 'RETIRED'].includes(row.status) || row.packageKey !== identity.instrumentKey || row.packageVersion !== identity.instrumentVersion || row.packageStatus !== 'PUBLISHED' || row.modelKey !== 'AUTHOR_KEY_SUM' || row.scoringVersion !== 'author-key-sum-v1' || !/^[a-f0-9]{64}$/.test(row.definitionHash)) throw corrupt()
+      if (!['PUBLISHED', 'RETIRED'].includes(row.status) || row.packageKey !== identity.instrumentKey || row.packageVersion !== identity.instrumentVersion || row.packageStatus !== 'PUBLISHED' || !(row.responseProtocol === 'sjt-online-response-v1' && row.compilerVersion === 'sjt-online-fixed-v1'
+        ? (row.modelKey === 'AUTHOR_KEY_SUM' && row.scoringVersion === 'sjt-online-v1-author-sum-1') || (row.modelKey === 'EXPERT_KEY' && row.scoringVersion === 'sjt-online-v1-expert-mean-1')
+        : !row.responseProtocol && !row.compilerVersion && row.modelKey === 'AUTHOR_KEY_SUM' && row.scoringVersion === 'author-key-sum-v1') || !/^[a-f0-9]{64}$/.test(row.definitionHash)) throw corrupt()
       metadata.set(key, { status: row.status, scienceMaturity: 'PILOT' })
     }
   }

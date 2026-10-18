@@ -1,3 +1,5 @@
+import { onlineSituationalCanonicalTaskSatisfaction } from './situational-task-satisfaction'
+import { publicSjtOnlineMetadata } from './authoring/online'
 import { resolveSituationalRelease, type ResolvedSituationalRelease } from './situational-release.service'
 import { deriveSituationalAssignment, assignedSituationalRunnerDefinition } from './situation-assignment'
 import { frozenSituationalScientificProjection } from './onboarding/scientific-schema'
@@ -148,6 +150,7 @@ const instrumentResponse = (snapshot: FrozenSituationalRuntimeSnapshotV1) => {
     scorerKey: snapshot.scorerKey,
     scoringVersion: snapshot.scoringVersion,
     frozenAt: snapshot.frozenAt,
+    ...(snapshot.online ? { online: publicSjtOnlineMetadata(snapshot.online) } : {}),
     releaseStatus: governance?.releaseStatus ?? 'RETIRED' as const,
     sampling: snapshot.runnerDefinition.sampling,
     definition: snapshot.runnerDefinition,
@@ -305,6 +308,7 @@ export const situationalAttemptForResponse = (
       instrumentVersion: row.instrumentVersion,
       attemptNo: row.attemptNo,
       status: row.status,
+      ...(snapshot.online && stored ? { taskSatisfaction: onlineSituationalCanonicalTaskSatisfaction(stored.canonicalResult.core), taskSatisfied: onlineSituationalCanonicalTaskSatisfaction(stored.canonicalResult.core) === 'SATISFIED' } : {}),
       deliveryMode: row.deliveryMode,
       runtimeGeneration: row.runtimeGeneration,
       attemptEpoch: row.attemptEpoch,
@@ -391,6 +395,7 @@ export const getSituationalInstrument = (instrumentKey: string, instrumentVersio
     instrumentKey: situationPackage.key,
     instrumentVersion: situationPackage.instrumentVersion,
     definition: situationPackage.definition,
+    ...(situationPackage.online ? { online: situationPackage.online } : {}),
     scientificContext: resolveSituationalScientificContext(situationPackage),
     frozenAt: new Date(0),
   })

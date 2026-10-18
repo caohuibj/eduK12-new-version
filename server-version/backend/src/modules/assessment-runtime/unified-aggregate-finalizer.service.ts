@@ -1,3 +1,4 @@
+import { mergeSituationalTaskSatisfaction } from '../situational/situational-task-satisfaction'
 import { assertTypedCompositeFormFacts } from './typed-form-facts'
 import { mapCompositeSection } from './form-section-definition'
 import { compactAssessmentStorageEnabled } from './compact-field-codec'
@@ -1090,13 +1091,13 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?:
     aggregateInputHash,
     packageAnalysis,
     payloadEncrypted,
-    taskSatisfaction: assessment.formSections.some((section:any)=>section.items.some((item:any)=>item.formPolicy!=null))
+    taskSatisfaction: mergeSituationalTaskSatisfaction(assessment.formSections.some((section:any)=>section.items.some((item:any)=>item.formPolicy!=null))
       ? (()=> {
         const required = assessment.formSections.filter((section:any)=>section.items.some((item:any)=>item.formPolicy!=null))
         const states = required.map((section:any)=>(parent.formSectionAttempts??[]).find((row:any)=>row.sectionId===section.id && row.attemptEpoch===parent.attemptEpoch && row.status==='COMPLETED')?.taskSatisfaction)
         if(states.some((state:any)=>state!=='SATISFIED'&&state!=='NOT_SATISFIED'))throw aggregateInputError('Form V3 已接受区段缺少任务资格')
         return states.includes('NOT_SATISFIED')?'NOT_SATISFIED':'SATISFIED'
-      })() : null,
+      })() : null, completed.payloads.flatMap(payload => payload.envelope ? [payload.envelope.core] : [])),
   })
 }
 

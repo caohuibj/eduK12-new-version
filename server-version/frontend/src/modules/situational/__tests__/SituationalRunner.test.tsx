@@ -450,4 +450,23 @@ describe('Situational journal failure recovery', () => {
     const saved = trials.flatMap(t => (t.payload as { events?: SituationalResearchEvent[] }).events ?? [t.payload])
     expect(saved).toHaveLength(outcome === 'saved' ? 2 : 0)
   })
+  it('online frozen display renders real multiple choices and seals raw arrays', async () => {
+    const source=startData()
+    source.instrument.online={responseProtocol:'sjt-online-response-v1',compilerVersion:'test',definitionHash:source.attempt.definitionHash,displayHash:'display',display:{title:'Online',respondentType:'teacher_self_report',scenes:[{sceneKey:'mother',title:'在线情境',stimulus:'冻结的文字材料',questions:[{questionKey:'q',prompt:'原始多选题',responseType:'MULTIPLE',required:true,allowRefusal:true,minSelections:2,maxSelections:2,options:[{optionKey:'a',label:'原始选项甲'},{optionKey:'b',label:'原始选项乙'}]}]}]}}
+    vi.mocked(situationalApi.start).mockResolvedValue({code:0,message:'ok',data:source})
+    renderRunner()
+    expect(await screen.findByText('冻结的文字材料')).toBeInTheDocument()
+    expect(screen.getAllByRole('checkbox')).toHaveLength(2)
+    fireEvent.click(screen.getByLabelText('原始选项甲'))
+    await waitFor(()=>expect(screen.getByLabelText('原始选项甲')).toBeChecked())
+    fireEvent.click(screen.getByRole('button',{name:/提交测评/}))
+    expect(situationalApi.submit).not.toHaveBeenCalled()
+    expect(await screen.findByText('还有必答通道未完成，请补充后再提交。')).toBeInTheDocument()
+    fireEvent.click(screen.getByLabelText('原始选项乙'))
+    await waitFor(()=>expect(screen.getByRole('button',{name:/提交测评/})).not.toBeDisabled())
+    fireEvent.click(screen.getByRole('button',{name:/提交测评/}))
+    await waitFor(()=>expect(situationalApi.submit).toHaveBeenCalledTimes(1))
+    expect(vi.mocked(situationalApi.submit).mock.calls[0]![1]).toMatchObject({responseProtocol:'sjt-online-response-v1',responses:[{sceneKey:'sjt_q_q',channelKey:'q',status:'ANSWERED',responseValue:['a','b']}]})
+  })
+
 })

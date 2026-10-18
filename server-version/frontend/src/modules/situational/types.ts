@@ -3,9 +3,9 @@ import type {
   AssessmentVideoPresentationV1,
 } from '../assessment-media/types'
 
-export type SituationalResponseValue = string | number
+export type SituationalResponseValue = string | number | string[]
 
-export type SituationalResponseType = 'SINGLE_CHOICE' | 'CONTINUOUS' | 'FREE_TEXT'
+export type SituationalResponseType = 'SINGLE_CHOICE' | 'MULTIPLE_CHOICE' | 'CONTINUOUS' | 'FREE_TEXT'
 
 export interface SituationalOption {
   optionKey: string
@@ -19,6 +19,11 @@ export interface SituationalRunnerChannel {
   /** Omitted means required; only explicit false is projected by V2. */
   required?: false
   options?: SituationalOption[]
+  allowRefusal?: boolean
+  minSelections?: number
+  maxSelections?: number
+  exclusiveOptionKeys?: string[]
+  online?: boolean
   maxLength?: number
   range?: { min: number; max: number }
 }
@@ -131,6 +136,7 @@ export interface SituationalScientificContext {
 }
 
 export interface SituationalInstrument {
+  online?: import('./online').OnlineFrozenDisplay
   title?: string
   assignment?: { assignmentVersion: string; assignmentIdentity: string; seedIdentity: string; selections: Array<{ groupKey: string; nodeKey: string; eligibleSet: string[]; assignedVariant: string; probability: number; omittedChannelKeys: string[]; probeTiming: 'DEFINED' | 'PRE_CHOICE' | 'POST_CHOICE'; stimulusVariantKey?: string }> }
   scientificContext?: SituationalScientificContext
@@ -254,6 +260,7 @@ export interface SituationalAttemptResponse {
 }
 
 export type SituationalDraftAnswer = {
+  status?: 'ANSWERED' | 'REFUSED' | 'BLANK'
   responseValue: SituationalResponseValue
   responseTimeMs?: number
   answeredAt?: string

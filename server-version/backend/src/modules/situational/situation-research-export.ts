@@ -48,7 +48,7 @@ export function buildSituationalResearchArtifact(input: {
   if (!/^[a-f0-9]{64}$/i.test(input.pseudonymKey)) throw new Error('Research pseudonym key unavailable')
   const { snapshot, raw } = input
   if (raw.attemptEpoch !== input.attemptEpoch) throw new Error('Research raw epoch mismatch')
-  const hash = prepareCanonicalSubmission({ responses: raw.responses, ...(raw.researchCapture ? { researchCapture: raw.researchCapture } : {}) }).hash
+  const hash = prepareCanonicalSubmission({ responses: raw.responses, ...(raw.schemaVersion === 2 ? { responseProtocol: raw.responseProtocol, rawResponses: raw.rawResponses } : {}), ...(raw.researchCapture ? { researchCapture: raw.researchCapture } : {}) }).hash
   if (hash !== input.submissionPayloadHash) throw new Error('Research raw submission digest mismatch')
   const assignment = deriveSituationalAssignment(snapshot.definition, input.attemptId, snapshot.definitionHash)
   const definition = assignedSituationalDefinition(snapshot.definition, assignment)
@@ -82,7 +82,7 @@ export function buildSituationalResearchArtifact(input: {
     attemptIdentity: createHmac('sha256', Buffer.from(input.pseudonymKey, 'hex')).update(`situational-research:${input.attemptId}`).digest('hex'),
     instrument: { key: snapshot.instrumentKey, version: snapshot.instrumentVersion, definitionHash: snapshot.definitionHash, compiledRuntimeHash: snapshot.compiledRuntimeHash, snapshotHash: snapshot.snapshotHash, scoringVersion: snapshot.scoringVersion, scorerKey: snapshot.scorerKey, model: snapshot.definition.scoring.model ?? { modelKey: 'PROVISIONAL_SCALAR', modelVersion: '1' }, modelHash: canonicalHash(snapshot.definition.scoring.model ?? { modelKey: 'PROVISIONAL_SCALAR', modelVersion: '1', scoringVersion: snapshot.scoringVersion, choiceScores: snapshot.definition.scoring.choiceScores }) },
     scientificContext: snapshot.scientificContext ?? null,
-    assignment, trajectory, rawResponses, opportunities, events: (raw.researchCapture?.events ?? []).filter(e => !freeNodePairs.has(`${e.nodeKey}:${e.channelKey}`)),
+    assignment, trajectory, rawResponses, ...(raw.schemaVersion === 2 ? { responseProtocol: raw.responseProtocol, participantSelections: raw.rawResponses } : {}), opportunities, events: (raw.researchCapture?.events ?? []).filter(e => !freeNodePairs.has(`${e.nodeKey}:${e.channelKey}`)),
     ...(freePairs.size ? { freeTextProjection: 'EXCLUDED' } : {}),
     ...(snapshot.definition.scoring.model?.modelKey === 'AUTHOR_KEY_SUM' ? { derivedScores: scoreSituationalModel(projectReachableSituationDefinitionForScoring(definition, trajectory), raw.responses, { responsesValidated: true, independentSceneKeyBySceneKey: definition.schemaVersion === 2 ? Object.fromEntries(definition.flow.nodes.flatMap(n => n.nodeType === 'SCENE' ? [[n.sceneKey,n.motherSceneKey]] : [])) : {} }) } : {}),
     optionSemantics: snapshot.definition.scenes.flatMap(s => s.channels.flatMap(c => c.responseType === 'SINGLE_CHOICE' ? c.options.filter(o => o.evidence).map(o => ({ sceneKey: s.sceneKey, channelKey: c.channelKey, optionKey: o.optionKey, evidence: o.evidence })) : [])),

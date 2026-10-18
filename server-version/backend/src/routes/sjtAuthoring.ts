@@ -8,6 +8,8 @@ import { UserRole } from '../types'
 import { uploadPrincipalRateLimit, withUploadAdmission } from '../middleware/uploadAdmission'
 import { createTemporaryUploadStorage } from '../utils/uploadTemp'
 import { SjtTemplateError, compileSjtTemplate } from '../modules/situational/authoring/template'
+import { compileSjtAuthorDocument } from '../modules/situational/authoring/dispatcher'
+import { compileSjtOnlineDocument, publicSjtOnlineMetadata, normalizeSjtOnlineResponses } from '../modules/situational/authoring/online'
 import { readSjtWorkbook, locateSjtWorkbookIssues } from '../modules/situational/authoring/workbook'
 import {
   createSjtDraft,
@@ -152,6 +154,12 @@ router.get(
 )
 router.post('/validate', uploadPrincipalRateLimit, uploadHandler(false))
 router.post('/drafts', uploadPrincipalRateLimit, uploadHandler(true))
+router.post('/online/drafts', uploadPrincipalRateLimit, handle(async (req, res) => {
+  const body = z.object({ template: z.unknown() }).strict().parse(req.body)
+  // This endpoint deliberately cannot reinterpret the legacy upload protocol.
+  const compiled = compileSjtOnlineDocument(body.template)
+  send(res, await createSjtDraft(actor(req), compiled.template))
+}))
 router.get(
   '/drafts',
   handle(async (req, res) => send(res, await listSjtDrafts(actor(req)))),
@@ -160,9 +168,10 @@ router.get(
   '/drafts/:id',
   handle(async (req, res) => {
     const d = await getSjtDraft(actor(req), req.params.id),
-      c = compileSjtTemplate(d.template)
+      c = compileSjtAuthorDocument(d.template)
     send(res, {
       ...d,
+      ...(c.package.online ? { online: publicSjtOnlineMetadata(c.package.online) } : {}),
       runner: runnerSituationRuntimeDefinition(c.package.definition),
       changes: d.audits.find((a) => a.template && a.revision < d.revision)?.template
         ? diffSjtTemplates(
@@ -213,7 +222,18 @@ router.post(
   '/drafts/:id/preview',
   handle(async (req, res) => {
     const d = await getSjtDraft(actor(req), req.params.id),
-      c = compileSjtTemplate(d.template)
+      c = compileSjtAuthorDocument(d.template)
+    if (c.package.online) {
+      const body = z.object({ responseProtocol: z.literal('sjt-online-response-v1'), responses: z.array(z.unknown()).max(100) }).strict().parse(req.body)
+      const normalized = normalizeSjtOnlineResponses(c.package.online.display, c.package.definition as import('../modules/situational/situation-branching').SituationDefinitionV2, body.responses)
+      const definition = c.package.definition
+      const result = scoreSituationalModel(asLinearSituationDefinition(definition), normalized.responses, {
+        responsesValidated: true,
+        independentSceneKeyBySceneKey: definition.schemaVersion === 2 ? Object.fromEntries(definition.flow.nodes.flatMap(n => n.nodeType === 'SCENE' ? [[n.sceneKey, n.motherSceneKey]] : [])) : {},
+      })
+      send(res, { ...result, previewOnly: true })
+      return
+    }
     const body = z
       .object({
         responses: z
