@@ -68,7 +68,7 @@ export const copyScaleToDraft = async (sourceId: string, userId: string) => pris
   const definition = validation.definition
   if (source.definitionHash !== hashScaleDefinition(definition)) throw new ScaleCopyError('来源定义摘要不一致，不能复制。')
   const copied = await tx.scale.create({ data: {
-    code: `${source.code}_copy_${randomUUID()}`, name: `${source.name}（新草稿）`, description: source.description,
+    code: `COPY_${randomUUID()}`, name: `${source.name}（新草稿）`, description: source.description,
     status: 'DRAFT', visibility: 'HIDDEN', instrumentClass: 'CUSTOM_DESCRIPTIVE', instrumentVersion: source.instrumentVersion,
     definition: source.definition as Prisma.InputJsonValue, definitionHash: source.definitionHash,
     copySource: sourceSnapshot(source, definition), itemCount: source.itemCount, dimensionCount: source.dimensionCount,
