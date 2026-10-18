@@ -1,3 +1,4 @@
+import { sjtCourseGrantReceiptSchema, type SjtCourseGrantReceipt } from '../situational/authoring/grant-contract'
 import { sjtOnlineMetadataSchema, validateSjtOnlineMetadata, type SjtOnlineMetadata } from '../situational/authoring/online'
 import { assertSituationalScorerAvailable } from '../situational/situation-model-resolver'
 import { situationalScientificContextSchema, type SituationalScientificContextV1 } from '../situational/onboarding/scientific-schema'
@@ -38,6 +39,7 @@ export interface FrozenSituationalRuntimeSnapshotV1 {
   definition: SituationRuntimeDefinition
   runnerDefinition: ReturnType<typeof runnerSituationRuntimeDefinition>
   compiledRuntime: CompiledInstrumentRuntimeV1
+  authorizationReceipt?: SjtCourseGrantReceipt
   online?: SjtOnlineMetadata
   scientificContext?: SituationalScientificContextV1
   snapshotHash: string
@@ -100,6 +102,7 @@ const frozenSituationalRuntimeSnapshotSchema = z.object({
   definition: z.union([situationDefinitionSchema, situationDefinitionV2Schema]),
   runnerDefinition: z.union([runnerDefinitionV1Schema, runnerDefinitionV2Schema]),
   compiledRuntime: z.record(z.unknown()),
+  authorizationReceipt: sjtCourseGrantReceiptSchema.optional(),
   online: sjtOnlineMetadataSchema.optional(),
   scientificContext: situationalScientificContextSchema.optional(),
   snapshotHash: z.string().regex(/^[0-9a-f]{64}$/),
@@ -118,6 +121,7 @@ const unsignedSnapshot = (input: Omit<FrozenSituationalRuntimeSnapshotV1, 'snaps
   definition: input.definition,
   runnerDefinition: input.runnerDefinition,
   compiledRuntime: input.compiledRuntime,
+  ...(input.authorizationReceipt ? { authorizationReceipt: input.authorizationReceipt } : {}),
   ...(input.online ? { online: input.online } : {}),
   ...(input.scientificContext ? { scientificContext: input.scientificContext } : {}),
 })
@@ -143,6 +147,7 @@ const buildFrozenSnapshot = (input: {
   instrumentKey: string
   instrumentVersion: string
   definition: SituationRuntimeDefinition
+  authorizationReceipt?: SjtCourseGrantReceipt
   online?: SjtOnlineMetadata
   scientificContext?: SituationalScientificContextV1
   frozenAt?: Date
@@ -156,6 +161,8 @@ const buildFrozenSnapshot = (input: {
   assertSituationalScorerAvailable(definition)
   const definitionHash = hashSituationRuntimeDefinition(definition)
   const online = input.online ? validateSjtOnlineMetadata(input.online, definition) : undefined
+  const authorizationReceipt = input.authorizationReceipt ? sjtCourseGrantReceiptSchema.parse(input.authorizationReceipt) : undefined
+  if (authorizationReceipt && (authorizationReceipt.permission !== 'DISTRIBUTE' || authorizationReceipt.instrumentKey !== input.instrumentKey || authorizationReceipt.instrumentVersion !== input.instrumentVersion || authorizationReceipt.definitionHash !== definitionHash)) throw new Error('Frozen SJT grant receipt identity mismatch')
   const compiledRuntime = compileSituationRuntime({
     instrumentKey: input.instrumentKey,
     instrumentVersion: input.instrumentVersion,
@@ -182,6 +189,7 @@ const buildFrozenSnapshot = (input: {
     runnerDefinition,
     compiledRuntime,
     online,
+    authorizationReceipt,
     scientificContext,
   })
   return { ...unsigned, snapshotHash: canonicalHash(unsigned) }
@@ -192,6 +200,7 @@ export const freezeSituationalRuntimeAtAttemptStart = (input: {
   instrumentKey: string
   instrumentVersion: string
   definition: SituationRuntimeDefinition
+  authorizationReceipt?: SjtCourseGrantReceipt
   online?: SjtOnlineMetadata
   scientificContext?: SituationalScientificContextV1
   frozenAt?: Date
@@ -209,6 +218,7 @@ export const parseFrozenSituationalRuntimeSnapshot = (value: unknown): FrozenSit
   const definition = validation.definition
   const definitionHash = hashSituationRuntimeDefinition(definition)
   const online = parsed.online ? validateSjtOnlineMetadata(parsed.online, definition) : undefined
+  if (parsed.authorizationReceipt && (parsed.authorizationReceipt.permission !== 'DISTRIBUTE' || parsed.authorizationReceipt.instrumentKey !== parsed.instrumentKey || parsed.authorizationReceipt.instrumentVersion !== parsed.instrumentVersion || parsed.authorizationReceipt.definitionHash !== definitionHash)) throw new Error('Frozen SJT grant receipt identity mismatch')
   if (parsed.definitionHash !== definitionHash) throw new Error('Frozen Situational definition hash mismatch')
   if (canonicalHash(parsed.runnerDefinition) !== canonicalHash(runnerSituationRuntimeDefinition(definition))) {
     throw new Error('Frozen Situational runner definition mismatch')
@@ -241,6 +251,7 @@ export const parseFrozenSituationalRuntimeSnapshot = (value: unknown): FrozenSit
     runnerDefinition: parsed.runnerDefinition,
     compiledRuntime,
     online,
+    authorizationReceipt: parsed.authorizationReceipt,
     scientificContext: parsed.scientificContext,
   })
   if (canonicalHash(unsigned) !== parsed.snapshotHash) throw new Error('Frozen Situational runtime snapshot hash mismatch')

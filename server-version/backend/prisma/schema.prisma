@@ -2452,6 +2452,8 @@ model SjtAuthorDraft {
   status        String   @default("DRAFT")
   contentDigest String   @map("content_digest")
   template      Json
+  authorizationPolicy String? @map("authorization_policy")
+  adaptationSource Json? @map("adaptation_source")
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
   audits        SjtAuthorAudit[]
@@ -2469,6 +2471,7 @@ model SjtAuthorAudit {
   action        String
   contentDigest String   @map("content_digest")
   template      Json?
+  authorizationPolicy String? @map("authorization_policy")
   note          String?
   createdAt     DateTime @default(now()) @map("created_at")
   @@index([draftId, createdAt])
@@ -2484,12 +2487,57 @@ model SjtAuthorRelease {
   contentDigest     String   @map("content_digest")
   definitionHash    String   @map("definition_hash")
   package           Json
+  authorizationPolicy String? @map("authorization_policy")
+  grants            SjtReleaseGrant[]
   authorId          String   @map("author_id")
   reviewerId        String   @map("reviewer_id")
   status            String   @default("PUBLISHED")
   createdAt         DateTime @default(now()) @map("created_at")
   @@unique([instrumentKey, instrumentVersion])
   @@map("sjt_author_releases")
+}
+
+// Exact, expiring permissions; DISTRIBUTE never implies access to authoring content.
+model SjtReleaseGrant {
+  id                String @id @default(uuid())
+  releaseId         String @map("release_id")
+  release           SjtAuthorRelease @relation(fields: [releaseId], references: [id], onDelete: Restrict)
+  instrumentKey     String @map("instrument_key")
+  instrumentVersion String @map("instrument_version")
+  definitionHash    String @map("definition_hash")
+  contentDigest     String @map("content_digest")
+  granteeTeacherId   String @map("grantee_teacher_id")
+  courseId          String @map("course_id")
+  purpose           String
+  permission        String
+  validFrom         DateTime @map("valid_from") @db.Timestamptz(6)
+  expiresAt         DateTime @map("expires_at") @db.Timestamptz(6)
+  status            String @default("ACTIVE")
+  version           Int @default(1)
+  grantorId         String @map("grantor_id")
+  note              String
+  revokedAt         DateTime? @map("revoked_at") @db.Timestamptz(6)
+  revokedBy         String? @map("revoked_by")
+  revokeNote        String? @map("revoke_note")
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  audits            SjtReleaseGrantAudit[]
+  @@index([granteeTeacherId, courseId, purpose, permission, status])
+  @@index([releaseId, status])
+  @@map("sjt_release_grants")
+}
+
+model SjtReleaseGrantAudit {
+  id        String @id @default(uuid())
+  grantId   String @map("grant_id")
+  grant     SjtReleaseGrant @relation(fields: [grantId], references: [id], onDelete: Restrict)
+  actorId   String @map("actor_id")
+  action    String
+  version   Int
+  snapshot  Json
+  note      String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@unique([grantId, version])
+  @@map("sjt_release_grant_audits")
 }
 
 /// 旧系统（ptool）导入簿记：仅迁移工具读写，运行时代码不使用。

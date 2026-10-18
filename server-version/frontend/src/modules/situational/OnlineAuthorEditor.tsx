@@ -1,15 +1,18 @@
+import type { AssessmentImage } from '../assessment-media/types'
+import { OnlineImageField } from './OnlineImageField'
 import { SjtTextEditor } from '../assessment-core/sjt/SjtTextEditor'
 import type { SjtDraftV2 } from '../assessment-core/sjt/types'
 export type OnlineCase = { name: string; responses: Array<{sceneKey:string;channelKey:string;status:'ANSWERED'|'REFUSED'|'BLANK';responseValue?:string|string[]}>; expected: Record<string,number|null> }
-export type OnlineDocument = {templateVersion:'sjt-online-v1';instrumentKey:string;instrumentVersion:string;title:string;display:SjtDraftV2;goldenCases:OnlineCase[]}
+export type OnlineDocument = {templateVersion:'sjt-online-v1';instrumentKey:string;instrumentVersion:string;title:string;display:SjtDraftV2<AssessmentImage>;goldenCases:OnlineCase[]}
 export const newOnlineDocument = (): OnlineDocument => ({templateVersion:'sjt-online-v1',instrumentKey:'',instrumentVersion:'1.0.0',title:'新情境测验',display:{schemaVersion:2,respondentType:'teacher_self_report',title:'新情境测验',author:'',sourceNote:'',licenseStatus:'unknown',redistribution:'unknown',orderPolicy:'FIXED',metrics:[],scoring:{modelKey:'AUTHOR_KEY_SUM',modelVersion:'1',sourceNote:''},scenes:[]},goldenCases:[]})
-export function OnlineAuthorEditor({value,onChange,disabled=false}:{value:OnlineDocument;onChange:(value:OnlineDocument)=>void;disabled?:boolean}) {
+export function OnlineAuthorEditor({value,onChange,disabled=false,draftId,onMediaBusyChange}:{value:OnlineDocument;onChange:(value:OnlineDocument)=>void;disabled?:boolean;draftId?:string;onMediaBusyChange?:(busy:boolean)=>void}) {
  const changeCase=(index:number,fn:(c:OnlineCase)=>OnlineCase)=>onChange({...value,goldenCases:value.goldenCases.map((c,i)=>i===index?fn(c):c)})
- return <fieldset disabled={disabled} className="space-y-4 min-w-0">
-  <legend className="text-lg font-semibold">在线编制 · 文字情境</legend>
-  <div className="grid gap-3 sm:grid-cols-2"><label>题包标识<input className="input block w-full" value={value.instrumentKey} onChange={e=>onChange({...value,instrumentKey:e.target.value})}/></label><label>内容版本<input className="input block w-full" value={value.instrumentVersion} onChange={e=>onChange({...value,instrumentVersion:e.target.value})}/></label></div>
-  <SjtTextEditor allowGeneralRespondent={false} value={value.display} onChange={display=>onChange({...value,title:display.title,display})}/>
-  <section className="space-y-4 border rounded-xl p-4"><h3 className="font-semibold">人工验收样例（独立评分依据）</h3>
+ return <fieldset className="space-y-4 min-w-0">
+  <legend className="text-lg font-semibold">在线编制 · 图文情境</legend>
+  <fieldset disabled={disabled} className="grid gap-3 sm:grid-cols-2"><label>题包标识<input className="input block w-full" value={value.instrumentKey} onChange={e=>onChange({...value,instrumentKey:e.target.value})}/></label><label>内容版本<input className="input block w-full" value={value.instrumentVersion} onChange={e=>onChange({...value,instrumentVersion:e.target.value})}/></label></fieldset>
+  <SjtTextEditor readOnly={disabled} allowGeneralRespondent={false} value={value.display} onChange={display=>onChange({...value,title:display.title,display})}
+    renderSceneMedia={(scene,changeImage)=><OnlineImageField key={scene.sceneKey} image={scene.image} onChange={changeImage} draftId={draftId} readOnly={disabled} onBusyChange={onMediaBusyChange}/>}/>
+  <fieldset disabled={disabled} className="space-y-4 border rounded-xl p-4"><h3 className="font-semibold">人工验收样例（独立评分依据）</h3>
   <p className="text-sm">由作者或审核者独立计算并填写每个构念的期望分数。预览不会自动填入期望值。应覆盖每道题的全部合法选择组合、允许的拒答和选填留空；修改题目后需重新核对样例。</p>
   {value.goldenCases.map((c,i)=><article className="border rounded p-3 space-y-3" key={i}>
    <label>样例名称<input className="input block w-full" value={c.name} onChange={e=>changeCase(i,x=>({...x,name:e.target.value}))}/></label>
@@ -20,6 +23,6 @@ export function OnlineAuthorEditor({value,onChange,disabled=false}:{value:Online
    <button type="button" className="btn-secondary" onClick={()=>onChange({...value,goldenCases:value.goldenCases.filter((_,n)=>n!==i)})}>删除样例</button>
   </article>)}
   <button type="button" className="btn-secondary" onClick={()=>onChange({...value,goldenCases:[...value.goldenCases,{name:'样例 '+(value.goldenCases.length+1),responses:[],expected:{}}]})}>添加人工样例</button>
-  </section>
+  </fieldset>
  </fieldset>
 }

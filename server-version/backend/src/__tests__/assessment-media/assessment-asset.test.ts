@@ -11,6 +11,8 @@ const { mockDb, mockAttachAssetReference } = vi.hoisted(() => ({
 vi.mock('../../config/database', () => ({ prisma: mockDb }))
 vi.mock('../../services/assetStorage', () => ({
   attachAssetReference: mockAttachAssetReference,
+  lockStoredAssetRows: vi.fn(),
+  inAssetTransaction: async (db: unknown, run: (tx: unknown) => Promise<unknown>) => run(db),
 }))
 
 import {

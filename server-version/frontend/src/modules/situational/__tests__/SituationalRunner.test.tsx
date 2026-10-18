@@ -450,6 +450,21 @@ describe('Situational journal failure recovery', () => {
     const saved = trials.flatMap(t => (t.payload as { events?: SituationalResearchEvent[] }).events ?? [t.payload])
     expect(saved).toHaveLength(outcome === 'saved' ? 2 : 0)
   })
+  it('online frozen image uses the attempt proxy and blocks answers until the image is ready', async () => {
+    const source=startData()
+    source.instrument.online={responseProtocol:'sjt-online-response-v1',compilerVersion:'sjt-online-static-image-v1',definitionHash:source.attempt.definitionHash,displayHash:'display',display:{title:'Online',respondentType:'teacher_self_report',scenes:[{sceneKey:'mother',title:'图片情境',stimulus:'冻结的图文材料',image:{asset:{assetId:'online-image',contentHash:'a'.repeat(64),mimeType:'image/png'},altText:'冻结图片替代文字',caption:'冻结说明'},questions:[{questionKey:'q',prompt:'图片选择',responseType:'SINGLE',required:true,allowRefusal:false,options:[{optionKey:'a',label:'图文选项甲'},{optionKey:'b',label:'图文选项乙'}]}]}]}}
+    let resolveImage!: (blob: Blob) => void
+    vi.mocked(situationalApi.loadAsset).mockImplementation(() => new Promise(resolve => { resolveImage = resolve }))
+    vi.mocked(situationalApi.start).mockResolvedValue({code:0,message:'ok',data:source})
+    renderRunner()
+    expect(await screen.findByText('冻结的图文材料')).toBeInTheDocument()
+    expect(screen.getByLabelText('图文选项甲')).toBeDisabled()
+    expect(situationalApi.loadAsset).toHaveBeenCalledWith('ui-attempt','online-image')
+    resolveImage(new Blob(['image'],{type:'image/png'}))
+    expect(await screen.findByRole('img',{name:'冻结图片替代文字'})).toBeInTheDocument()
+    await waitFor(()=>expect(screen.getByLabelText('图文选项甲')).toBeEnabled())
+    expect(screen.getByText('冻结说明')).toBeInTheDocument()
+  })
   it('online frozen display renders real multiple choices and seals raw arrays', async () => {
     const source=startData()
     source.instrument.online={responseProtocol:'sjt-online-response-v1',compilerVersion:'test',definitionHash:source.attempt.definitionHash,displayHash:'display',display:{title:'Online',respondentType:'teacher_self_report',scenes:[{sceneKey:'mother',title:'在线情境',stimulus:'冻结的文字材料',questions:[{questionKey:'q',prompt:'原始多选题',responseType:'MULTIPLE',required:true,allowRefusal:true,minSelections:2,maxSelections:2,options:[{optionKey:'a',label:'原始选项甲'},{optionKey:'b',label:'原始选项乙'}]}]}]}}

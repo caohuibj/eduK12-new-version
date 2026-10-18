@@ -5,8 +5,8 @@ const researchKey=(prefix='k')=>prefix+crypto.randomUUID().replace(/-/g,'').slic
 const reorder=<T,>(xs:T[],index:number,delta:number)=>{
   const next=[...xs];[next[index],next[index+delta]]=[next[index+delta],next[index]];return next
 }
-export function SjtTextEditor<Image = never>({value,onChange,renderSceneMedia,allowGeneralRespondent=true}:{value:SjtDraftV2<Image>;
-  onChange:(next:SjtDraftV2<Image>)=>void;allowGeneralRespondent?:boolean;renderSceneMedia?:(scene:SjtScene<Image>, onChange:(image:Image|undefined)=>void)=>ReactNode}){
+export function SjtTextEditor<Image = never>({value,onChange,renderSceneMedia,allowGeneralRespondent=true,readOnly=false}:{value:SjtDraftV2<Image>;
+  onChange:(next:SjtDraftV2<Image>)=>void;allowGeneralRespondent?:boolean;readOnly?:boolean;renderSceneMedia?:(scene:SjtScene<Image>, onChange:(image:Image|undefined)=>void)=>ReactNode}){
   const [selected,setSelected]=useState(value.scenes[0]?.sceneKey??'')
   const scene=value.scenes.find(s=>s.sceneKey===selected)??value.scenes[0]
   const contributions=():Record<string,number>=>({})
@@ -22,7 +22,7 @@ export function SjtTextEditor<Image = never>({value,onChange,renderSceneMedia,al
   }
   const total=value.scenes.reduce((n,s)=>n+s.questions.length,0)
   return <div className="space-y-4">
-    <section className="border rounded-xl p-4 space-y-3">
+    <fieldset disabled={readOnly} className="border rounded-xl p-4 space-y-3">
       <h3 className="font-semibold">情境测验 · 多情境固定顺序</h3>
       <p className="text-sm text-slate-600">每个情境独立编号；同一情境下的多道题只计为一个独立情境。最多 20 个情境、每个 10 题、合计 100 题。</p>
       <label className="block text-sm">适用人群／作答视角<select className="input block w-full" value={value.respondentType}
@@ -38,8 +38,8 @@ export function SjtTextEditor<Image = never>({value,onChange,renderSceneMedia,al
       <label className="block text-sm">研究展示许可<select className="input block w-full" value={value.redistribution}
         onChange={e=>onChange({...value,redistribution:e.target.value as SjtDraftV2['redistribution']})}>
         <option value="unknown">待核实</option><option value="restricted">限制展示，不能发布</option><option value="allowed">允许本研究展示</option></select></label>
-    </section>
-    <section className="border rounded-xl p-4 space-y-3" aria-label="维度与计分矩阵">
+    </fieldset>
+    <fieldset disabled={readOnly} className="border rounded-xl p-4 space-y-3" aria-label="维度与计分矩阵">
       <h3 className="font-semibold">维度与计分</h3>
       <label className="block text-sm">受控计分规则<select className="input block w-full" value={value.scoring.modelKey}
         onChange={e=>onChange({...value,scoring:{...value.scoring,modelKey:e.target.value as 'AUTHOR_KEY_SUM'|'EXPERT_KEY'}})}>
@@ -56,28 +56,31 @@ export function SjtTextEditor<Image = never>({value,onChange,renderSceneMedia,al
         const metricKey=researchKey('m');onChange({...value,metrics:[...value.metrics,{metricKey,label:'新构念',direction:'descriptive'}],
           scenes:value.scenes})
       }}>增加构念</button>
-    </section>
+    </fieldset>
     <div className="grid lg:grid-cols-[190px_minmax(0,1fr)] gap-4">
       <nav aria-label="情境列表" className="border rounded-xl p-3 space-y-2">
         {value.scenes.map((s,i)=><div key={s.sceneKey} className="border rounded p-2 space-y-2">
           <button type="button" aria-current={scene?.sceneKey===s.sceneKey?'step':undefined} className="text-left w-full font-medium" onClick={()=>setSelected(s.sceneKey)}>{i+1}. {s.title||'未命名情境'}</button>
           <div className="flex flex-wrap gap-2 text-xs">
-            <button type="button" disabled={!i} onClick={()=>onChange({...value,scenes:reorder(value.scenes,i,-1)})}>上移</button>
-            <button type="button" disabled={i===value.scenes.length-1} onClick={()=>onChange({...value,scenes:reorder(value.scenes,i,1)})}>下移</button>
-            <button type="button" disabled={value.scenes.length>=20||total+s.questions.length>100} onClick={()=>{
+            <button type="button" disabled={readOnly||!i} onClick={()=>onChange({...value,scenes:reorder(value.scenes,i,-1)})}>上移</button>
+            <button type="button" disabled={readOnly||i===value.scenes.length-1} onClick={()=>onChange({...value,scenes:reorder(value.scenes,i,1)})}>下移</button>
+            <button type="button" disabled={readOnly||value.scenes.length>=20||total+s.questions.length>100} onClick={()=>{
               const copy={...structuredClone(s),sceneKey:researchKey('scene'),title:s.title+'（副本）',questions:s.questions.map(cloneQuestion)}
               onChange({...value,scenes:[...value.scenes,copy]});setSelected(copy.sceneKey)
             }}>复制情境</button>
-            <button type="button" onClick={()=>onChange({...value,scenes:value.scenes.filter(x=>x.sceneKey!==s.sceneKey)})}>删除情境</button>
+            <button type="button" disabled={readOnly} onClick={()=>onChange({...value,scenes:value.scenes.filter(x=>x.sceneKey!==s.sceneKey)})}>删除情境</button>
           </div></div>)}
-        <button type="button" className="btn-secondary" disabled={value.scenes.length>=20||total>=100} onClick={()=>{
+        <button type="button" className="btn-secondary" disabled={readOnly||value.scenes.length>=20||total>=100} onClick={()=>{
           const next={sceneKey:researchKey('scene'),title:'新情境',stimulus:'',questions:[newQuestion()]};onChange({...value,scenes:[...value.scenes,next]});setSelected(next.sceneKey)
         }}>增加情境</button>
       </nav>
       {scene&&<section className="border rounded-xl p-4 space-y-4" aria-label="当前情境编辑">
+        <fieldset disabled={readOnly} className="space-y-4 min-w-0">
         <label className="block text-sm">情境标题<input className="input block w-full" value={scene.title} onChange={e=>changeScene(s=>({...s,title:e.target.value}))}/></label>
         <label className="block text-sm">情境材料<textarea className="input block w-full" rows={5} value={scene.stimulus} onChange={e=>changeScene(s=>({...s,stimulus:e.target.value}))}/></label>
+        </fieldset>
         {renderSceneMedia?.(scene,image=>changeScene(s=>({...s,image})))}
+        <fieldset disabled={readOnly} className="space-y-4 min-w-0">
         {scene.questions.map((q,i)=><article key={q.questionKey} id={'survey-sjt-'+q.questionKey} tabIndex={-1} className="border rounded-lg bg-slate-50 p-3 space-y-3">
           <div className="flex flex-wrap gap-3 items-center"><strong>问题 {i+1}</strong>
             <button type="button" disabled={!i} onClick={()=>changeScene(s=>({...s,questions:reorder(s.questions,i,-1)}))}>上移</button>
@@ -113,6 +116,7 @@ export function SjtTextEditor<Image = never>({value,onChange,renderSceneMedia,al
           <button type="button" className="btn-secondary" disabled={q.options.length>=(q.responseType==='MULTIPLE'?6:12)} onClick={()=>changeQuestion(q.questionKey,x=>({...x,options:[...x.options,{optionKey:researchKey('o'),label:'新选项',contributions:contributions()}]}))}>增加选项</button>
         </article>)}
         <button type="button" className="btn-secondary" disabled={scene.questions.length>=10||total>=100} onClick={()=>changeScene(s=>({...s,questions:[...s.questions,newQuestion()]}))}>增加问题</button>
+        </fieldset>
       </section>}
     </div>
   </div>

@@ -21,6 +21,8 @@ import {
   diffSjtTemplates,
   restoreSjtRevision,
   retireSjtRelease,
+  setSjtDraftPolicy,
+  adaptSjtRelease,
 } from '../modules/situational/authoring/service'
 import {
   runnerSituationRuntimeDefinition,
@@ -37,9 +39,13 @@ import {
 } from '../modules/situational/situation-trajectory'
 import { scoreSituationalModel } from '../modules/situational/situation-model-resolver'
 import { buildSjtNarrative } from '../modules/situational/authoring/narrative'
+import { createSjtReleaseGrant, revokeSjtReleaseGrant, listSjtReleaseGrants,
+  listSjtControlledReleases } from '../modules/situational/authoring/grants'
+import sjtAuthoringMediaRouter from './sjtAuthoringMedia'
 
 const router = Router()
 router.use(authenticate, requireTeacher)
+router.use(sjtAuthoringMediaRouter)
 const actor = (req: Request) => ({
   userId: req.user!.userId,
   admin: req.user!.role === UserRole.ADMIN,
@@ -156,8 +162,9 @@ router.post('/validate', uploadPrincipalRateLimit, uploadHandler(false))
 router.post('/drafts', uploadPrincipalRateLimit, uploadHandler(true))
 router.post('/online/drafts', uploadPrincipalRateLimit, handle(async (req, res) => {
   // The service compiles exactly once. The route only selects the explicit protocol.
-  const body = z.object({ template: z.object({ templateVersion: z.literal('sjt-online-v1') }).passthrough() }).strict().parse(req.body)
-  send(res, await createSjtDraft(actor(req), body.template))
+  const body = z.object({ template: z.object({ templateVersion: z.literal('sjt-online-v1') }).passthrough(),
+    authorizationPolicy: z.literal('COURSE_GRANT_V1').nullable().optional() }).strict().parse(req.body)
+  send(res, await createSjtDraft(actor(req), body.template, { authorizationPolicy: body.authorizationPolicy }))
 }))
 router.get(
   '/drafts',
@@ -312,4 +319,36 @@ router.post(
     send(res, { retired: true })
   }),
 )
+const exactRelease = z.object({
+  instrumentKey: z.string().min(1).max(80), instrumentVersion: z.string().min(1).max(40),
+  definitionHash: z.string().regex(/^[a-f0-9]{64}$/), contentDigest: z.string().regex(/^[a-f0-9]{64}$/),
+}).strict()
+router.put('/drafts/:id/policy', handle(async (req, res) => {
+  const body = z.object({ revision: z.number().int().positive(),
+    authorizationPolicy: z.literal('COURSE_GRANT_V1').nullable() }).strict().parse(req.body)
+  send(res, await setSjtDraftPolicy(actor(req), req.params.id, body.revision, body.authorizationPolicy))
+}))
+router.get('/releases', handle(async (req, res) => send(res, await listSjtControlledReleases(actor(req)))))
+router.get('/releases/:id/grants', handle(async (req, res) => send(res, await listSjtReleaseGrants(actor(req), req.params.id))))
+router.post('/releases/:id/grants', handle(async (req, res) => {
+  const body = exactRelease.extend({
+    granteeTeacherId: z.string().uuid(), courseId: z.string().uuid(), purpose: z.literal('TRAINING_COURSE'),
+    permission: z.enum(['DISTRIBUTE', 'ADAPT']), validFrom: z.string().datetime({ offset: true }),
+    expiresAt: z.string().datetime({ offset: true }), note: z.string().trim().min(1).max(2000),
+  }).strict().parse(req.body)
+  send(res, await createSjtReleaseGrant(actor(req), req.params.id, { ...body,
+    validFrom: new Date(body.validFrom), expiresAt: new Date(body.expiresAt) }))
+}))
+router.post('/grants/:id/revoke', handle(async (req, res) => {
+  const body = z.object({ version: z.number().int().positive(), note: z.string().trim().min(1).max(2000) }).strict().parse(req.body)
+  send(res, await revokeSjtReleaseGrant(actor(req), req.params.id, body.version, body.note))
+}))
+router.post('/releases/:id/adapt', handle(async (req, res) => {
+  const body = exactRelease.extend({
+    courseId: z.string().uuid(), grantId: z.string().uuid(), grantVersion: z.number().int().positive(),
+    newInstrumentKey: z.string().max(80).regex(/^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/),
+    newInstrumentVersion: z.string().max(40).regex(/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/),
+  }).strict().parse(req.body)
+  send(res, await adaptSjtRelease(actor(req), req.params.id, body))
+}))
 export default router

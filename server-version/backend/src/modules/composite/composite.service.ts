@@ -1,3 +1,9 @@
+import { mapCompositeSection } from '../assessment-runtime/form-section-definition'
+import { lockStoredAssetRows } from '../../services/assetStorage'
+import { situationalAssetReferences } from '../situational/situation-definition'
+import { scaleAssessmentMediaReferences } from '../scale/scale-image-retention'
+import { compositeFormSectionMediaReferences } from '../assessment-runtime/form-image.adapter'
+import type { SjtCourseGrantScope } from '../situational/authoring/grants'
 import {withTrainingTimingReport} from './training-timing-report'
 import {freezeTrainingTimingSnapshot,readTrainingTimingPolicy} from '../assessment-runtime/training-scale-timing'
 import { typedFormPresentation } from '../reporting/typed-form-presentation'
@@ -316,19 +322,44 @@ const situationalItemIdentity = (item: SituationalCompositeItem) => {
   if (!item.situationalInstrumentKey || !item.situationalInstrumentVersion) throw compositeBadRequest('情境化模块必须绑定精确 instrumentKey 和 instrumentVersion')
   return { instrumentKey: item.situationalInstrumentKey, instrumentVersion: item.situationalInstrumentVersion }
 }
-export const resolveCompositeSituationalItems = async (items: SituationalCompositeItem[], db: Db = defaultPrisma, lock = false) => {
-  const resolved = await resolveSituationalReleases(items.filter(item => item.type === 'SITUATIONAL').map(situationalItemIdentity), db, lock)
+/** New controlled releases deliberately support one unambiguous server-side
+ * Training delivery. Legacy releases ignore this optional scope. Never select
+ * the first course from a multi-course questionnaire or trust request host/id. */
+export const compositeSjtGrantScope = (composite: {
+  createdBy?: string | null; courseId?: string | null; productKind?: string;
+  questionnaireType?: string | null; questionnaireCourses?: Array<{ courseId: string }>;
+  deliveryCourseId?: string | null;
+}, teacherId = composite.createdBy): SjtCourseGrantScope | undefined => {
+  if (!teacherId) return undefined
+  const courses = composite.productKind === 'QUESTIONNAIRE'
+    ? composite.questionnaireType === 'COURSE' ? composite.questionnaireCourses?.map(row => row.courseId) ?? [] : []
+    : composite.courseId ? [composite.courseId] : []
+  if (courses.length !== 1 || (composite.deliveryCourseId && composite.deliveryCourseId !== courses[0])) return undefined
+  return { teacherId, courseId: courses[0], purpose: 'TRAINING_COURSE' }
+}
+export const resolveCompositeSituationalItems = async (items: SituationalCompositeItem[], db: Db = defaultPrisma, lock = false, scope?: SjtCourseGrantScope) => {
+  const resolved = await resolveSituationalReleases(items.filter(item => item.type === 'SITUATIONAL').map(situationalItemIdentity), db, lock, scope)
   for (const situation of resolved.values()) assertSituationalCompositeItem(situation)
   return resolved
 }
 /** Preflight retains both successful and failed exact identities for all of its
  * checks and per-item diagnostics; no repeated upload fetch/compile on errors. */
-export const inspectCompositeSituationalItems = async (items: SituationalCompositeItem[], db: Db = defaultPrisma) => {
-  const outcome = await inspectSituationalReleases(items.filter(item => item.type === 'SITUATIONAL').map(situationalItemIdentity), db)
+export const inspectCompositeSituationalItems = async (items: SituationalCompositeItem[], db: Db = defaultPrisma, scope?: SjtCourseGrantScope) => {
+  const outcome = await inspectSituationalReleases(items.filter(item => item.type === 'SITUATIONAL').map(situationalItemIdentity), db, false, scope)
   for (const [key, situation] of outcome.releases) {
     try { assertSituationalCompositeItem(situation) } catch (error) { outcome.errors.set(key, error); outcome.releases.delete(key) }
   }
   return outcome
+}
+/** Prelock every image/media identity used by this parent, across tool types,
+ * before per-child retention. Reentrant retain locks cannot invert item order. */
+export const lockCompositeAssetReferences = async (db: Db, items: any[], formSections: any[], releases: Map<string, ResolvedSituationalRelease>) => {
+  const references = [
+    ...[...releases.values()].flatMap(release => release.snapshot.definition.scenes.flatMap(scene => situationalAssetReferences(scene.stimulus))),
+    ...items.filter(item => item.type === 'SCALE' && item.scale?.definition).flatMap(item => scaleAssessmentMediaReferences(frozenDatabaseScaleDefinition(item.scale))),
+    ...formSections.flatMap(section => compositeFormSectionMediaReferences(mapCompositeSection(section))),
+  ]
+  if (references.length) await lockStoredAssetRows(db, references.map(reference => reference.assetId))
 }
 const assertSituationalCompositeItem = (situation: ResolvedSituationalRelease) => {
   const { runtime, situationPackage } = situation
@@ -508,7 +539,7 @@ export const assertValidItem = async (
   input: AddCompositeItemInput,
   userId: string,
   role: UserRole,
-  composite: { courseId: string | null; productKind?: string },
+  composite: { courseId: string | null; productKind?: string; createdBy?: string | null; questionnaireType?: string | null; questionnaireCourses?: Array<{courseId:string}> },
   prisma: Db = defaultPrisma,
   situationalReleases?: Map<string, ResolvedSituationalRelease>,
 ) => {
@@ -559,7 +590,7 @@ export const assertValidItem = async (
     if (!input.situationalInstrumentKey || !input.situationalInstrumentVersion || supplied !== 1) {
       throw compositeBadRequest('情境化模块必须提供精确 instrumentKey 和 instrumentVersion')
     }
-    const releases = situationalReleases ?? await resolveCompositeSituationalItems([input], prisma)
+    const releases = situationalReleases ?? await resolveCompositeSituationalItems([input], prisma, prisma !== defaultPrisma, compositeSjtGrantScope(composite, composite.createdBy ?? userId))
     assertSituationalCompositeItem(releases.get(situationalReleaseKey(situationalItemIdentity(input)))!)
     return
   }
@@ -1149,7 +1180,7 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
       code = `${source.code}_copy_${nanoid(8)}`
     }
 
-    const situationalReleases = await resolveCompositeSituationalItems(source.items, tx)
+    const situationalReleases = await resolveCompositeSituationalItems(source.items, tx, true, compositeSjtGrantScope({ ...source, courseId: targetCourseId }, userId))
     const itemData: Array<Record<string, unknown>> = []
     for (const item of source.items) {
       if (item.type === 'SCALE') {
@@ -1870,7 +1901,8 @@ export const prepareCompositePublication = async (userId: string, role: UserRole
   const sectionByItem = new Map<string, any>(
     (composite.formSections ?? []).flatMap((section: any) => section.items.map((item: any) => [item.id, section] as const)),
   )
-  const situationalReleases = resolvedSituational ?? await resolveCompositeSituationalItems(composite.items, prisma)
+  const situationalReleases = resolvedSituational ?? await resolveCompositeSituationalItems(composite.items, prisma, prisma !== defaultPrisma, compositeSjtGrantScope(composite))
+  if (prisma !== defaultPrisma) await lockCompositeAssetReferences(prisma, composite.items, composite.formSections ?? [], situationalReleases)
   const contextIssues = validateContextFormItems(
     composite.items.filter((item: any) => item.type === 'FORM').map((item: any) => ({
       id: item.id,
@@ -1904,7 +1936,7 @@ export const prepareCompositePublication = async (userId: string, role: UserRole
     }
     if (item.type === 'SITUATIONAL') {
       const situation = assertSituationalCompositeItem(situationalReleases.get(situationalReleaseKey(situationalItemIdentity(item)))!)
-      await assertSituationalAssetReferencesReady(situation.situationPackage.definition)
+      await assertSituationalAssetReferencesReady(situation.situationPackage.definition, prisma)
     }
     if (item.type === 'FORM') {
       if (item.formPolicy != null && (composite.productKind !== 'QUESTIONNAIRE' || composite.deliveryMode==='LEGACY' || composite.reportPackageKey || composite.analysisProtocolKey)) throw compositeBadRequest('Form V3 只支持新版普通问卷')
@@ -2524,7 +2556,12 @@ const createAttempt = async (
   if(composite.trainingTimingPolicy && (composite.productKind!=='QUESTIONNAIRE'||composite.questionnaireType!=='COURSE'||!finalOnly||relationalIdentity||composite.reportPackageKey||composite.analysisProtocolKey)) throw compositeBadRequest('此投放不支持可选计时')
   const trainingTimingSnapshot=freezeTrainingTimingSnapshot(composite.trainingTimingPolicy,composite.deliveryCourseId??null,attemptEpoch,!userId)
   if(trainingTimingSnapshot&&!userId){const course=await db.course.findUnique({where:{id:trainingTimingSnapshot.course.courseId},select:{courseType:true,isLibrary:true}});if(!course||course.courseType!=='TRAINING_COURSE'||course.isLibrary)throw compositeBadRequest('新匿名计时准入的 Training 课程来源已不可用')}
-  const situationalReleases = await resolveCompositeSituationalItems(composite.items, db, true)
+  const situationalReleases = await resolveCompositeSituationalItems(composite.items, db, true, compositeSjtGrantScope(composite))
+  await lockCompositeAssetReferences(db, composite.items, formSections, situationalReleases)
+  if ([...situationalReleases.values()].some(release => release.snapshot.authorizationReceipt)) {
+    // Anonymous entry obtains the same unique persisted delivery, never a client hint.
+    composite.deliveryCourseId = compositeSjtGrantScope(composite)!.courseId
+  }
   const attempt = await db.compositeAssessmentAttempt.create({
     data: {
       compositeAssessmentId: composite.id,

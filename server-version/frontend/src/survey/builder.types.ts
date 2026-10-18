@@ -2,10 +2,7 @@ import type { FormDraft as SharedFormDraft, FormQuestion as SharedFormQuestion, 
 export type { Option, Condition } from '../modules/assessment-core/form/types'
 
 export type Kind='FORM'|'SCALE'|'SJT'|'COGNITIVE'
-export type SurveyImage={
-  asset:{assetId:string;contentHash:string;mimeType:'image/png'|'image/jpeg'|'image/webp'};
-  altText:string;caption?:string;rightsStatus:'self_authored'|'authorized'|'unknown';rightsNote:string
-}
+export type SurveyImage = import('../modules/assessment-media/types').AssessmentImage
 export type SurveyPublicImage=Pick<SurveyImage,'asset'|'altText'|'caption'>
 // Product-owned image metadata stays outside the shared Form contracts.
 export type FormQuestion=SharedFormQuestion<SurveyImage>

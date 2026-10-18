@@ -12,11 +12,12 @@ import type { SituationalResponse } from '../situation-scoring'
 import { SjtTemplateError, type SjtAuthorIssue } from './template'
 
 export const SJT_ONLINE_COMPILER_VERSION = 'sjt-online-fixed-v1' as const
+export const SJT_ONLINE_IMAGE_COMPILER_VERSION = 'sjt-online-static-image-v1' as const
 export const SJT_ONLINE_RESPONSE_PROTOCOL = 'sjt-online-response-v1' as const
 const hash = z.string().regex(/^[a-f0-9]{64}$/)
 export const sjtOnlineMetadataSchema = z.object({
   responseProtocol: z.literal(SJT_ONLINE_RESPONSE_PROTOCOL),
-  compilerVersion: z.literal(SJT_ONLINE_COMPILER_VERSION),
+  compilerVersion: z.enum([SJT_ONLINE_COMPILER_VERSION, SJT_ONLINE_IMAGE_COMPILER_VERSION]),
   definitionHash: hash, displayHash: hash, display: sjtDraftV2Schema,
 }).strict()
 export type SjtOnlineMetadata = z.infer<typeof sjtOnlineMetadataSchema>
@@ -62,15 +63,18 @@ function validateDisplay(display:SjtDraftV2) {
   const issues:SjtAuthorIssue[]=validateSjtV2(display,true).filter(i=>i.severity==='error'&&!['licenseStatus','redistribution'].includes(i.path))
     .map(i=>({path:'display.'+i.path,message:i.message,code:'FIELD'}))
   if(display.respondentType==='participant_self_report')issues.push({path:'display.respondentType',message:'正式情境工具只支持教师或学生自评',code:'FIELD'})
-  display.scenes.forEach((scene,i)=>{
-    if(scene.image)issues.push({path:`display.scenes.${i}.image`,message:'在线编制当前仅支持文字情境，请移除图片',code:'MEDIA'})
-  })
   if(issues.length)throw new SjtTemplateError(issues)
+}
+// Text-only documents keep their exact C12 identity and response protocol.
+// Images explicitly opt into a new compiler identity without touching scoring.
+function onlineCompilerVersion(display:SjtDraftV2) {
+  return display.scenes.some(scene=>scene.image)
+    ? SJT_ONLINE_IMAGE_COMPILER_VERSION : SJT_ONLINE_COMPILER_VERSION
 }
 function compileDisplay(display:SjtDraftV2,instrumentKey='online-validation',instrumentVersion='0.1.0') {
   validateDisplay(display)
   try { return compileSjtV2(instrumentKey,display,{
-    compilerVersion:SJT_ONLINE_COMPILER_VERSION,physicalPrefix:'sjt_q_',
+    compilerVersion:onlineCompilerVersion(display),physicalPrefix:'sjt_q_',
     scoringPrefix:'sjt-online-v1-',reportVersion:'sjt-online-descriptive-v1',
     metricChannelKey:'sjt_response',packageKey:instrumentKey,instrumentVersion,
   }) } catch(error) {
@@ -84,6 +88,8 @@ export function validateSjtOnlineMetadata(input:unknown,definition:SituationRunt
   const metadata=parse(sjtOnlineMetadataSchema,input)
   if(canonicalHash(metadata.display)!==metadata.displayHash)fail('online.displayHash','在线题面摘要不匹配','INTEGRITY')
   const compiled=compileDisplay(metadata.display)
+  if(metadata.compilerVersion!==onlineCompilerVersion(metadata.display))
+    fail('online.compilerVersion','图片题面编译身份不匹配','INTEGRITY')
   if(metadata.definitionHash!==canonicalHash(definition)||compiled.definitionHash!==metadata.definitionHash)
     fail('online.definitionHash','在线题面与冻结计分定义不一致','INTEGRITY')
   return metadata
@@ -95,6 +101,8 @@ export function publicSjtOnlineMetadata(metadata:SjtOnlineMetadata) {
     definitionHash:metadata.definitionHash,displayHash:metadata.displayHash,
     display:{schemaVersion:d.schemaVersion,title:d.title,respondentType:d.respondentType,orderPolicy:d.orderPolicy,
       scenes:d.scenes.map(s=>({sceneKey:s.sceneKey,title:s.title,stimulus:s.stimulus,
+        ...(s.image?{image:{asset:{assetId:s.image.asset.assetId,contentHash:s.image.asset.contentHash,mimeType:s.image.asset.mimeType},
+          altText:s.image.altText,...(s.image.caption!==undefined?{caption:s.image.caption}:{})}}:{}),
         questions:s.questions.map(q=>({questionKey:q.questionKey,prompt:q.prompt,responseType:q.responseType,
           required:q.required,allowRefusal:q.allowRefusal,
           ...(q.minSelections!==undefined?{minSelections:q.minSelections}:{}),
@@ -171,11 +179,11 @@ export function compileSjtOnlineDocument(input:unknown) {
     }}
   })
   const online:SjtOnlineMetadata={responseProtocol:SJT_ONLINE_RESPONSE_PROTOCOL,
-    compilerVersion:SJT_ONLINE_COMPILER_VERSION,definitionHash:compiled.definitionHash,
+    compilerVersion:onlineCompilerVersion(template.display),definitionHash:compiled.definitionHash,
     displayHash:canonicalHash(template.display),display:template.display}
   const pkg={...compiled.package,goldenCases,online}
   return {template,package:pkg,definitionHash:compiled.definitionHash,
-    contentDigest:canonicalHash({compilerVersion:SJT_ONLINE_COMPILER_VERSION,template,package:pkg})}
+    contentDigest:canonicalHash({compilerVersion:onlineCompilerVersion(template.display),template,package:pkg})}
 }
 /** Authors must supply every expected value themselves; this function never manufactures fixtures. */
 export function assertSjtOnlineReleaseReady(compiled:ReturnType<typeof compileSjtOnlineDocument>):void {

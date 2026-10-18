@@ -10,6 +10,12 @@ export interface AssessmentStaticImageAssetIdentityV1 extends AssessmentAssetIde
   mimeType: AssessmentStaticImageMimeType
 }
 
+/** Portable authoring metadata. Rights remain private; public renderers use presentation only. */
+export interface AssessmentImage extends AssessmentImagePresentationItem {
+  rightsStatus: 'self_authored' | 'authorized' | 'unknown'
+  rightsNote: string
+}
+
 export interface AssessmentImagePresentationItem {
   asset: AssessmentStaticImageAssetIdentityV1
   altText: string

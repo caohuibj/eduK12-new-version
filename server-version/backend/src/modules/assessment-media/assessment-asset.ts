@@ -1,6 +1,8 @@
 import { prisma } from '../../config/database'
 import {
   attachAssetReference,
+  lockStoredAssetRows,
+  inAssetTransaction,
   type AssetDatabase,
   type StoredAssetContent,
 } from '../../services/assetStorage'
@@ -123,19 +125,22 @@ export const retainAssessmentAssetReferences = async (params: {
   references: readonly AssessmentAssetIdentityV1[]
   db?: AssetDatabase
 }): Promise<void> => {
-  const db = params.db || prisma
-  await assertAssessmentAssetReferencesReady(params.references, db)
-
-  const uniqueReferences = params.references.filter((reference, index, all) => (
-    all.findIndex((candidate) => candidate.assetId === reference.assetId) === index
-  ))
-
-  for (const reference of uniqueReferences) {
-    await attachAssetReference({
-      assetId: reference.assetId,
-      entityType: params.owner.entityType,
-      entityId: params.owner.entityId,
-      field: params.owner.field,
-    }, db)
-  }
+  if (!params.references.length) return
+  await inAssetTransaction(params.db || prisma, async db => {
+    // Serialize with soft deletion on stable logical identities, not mutable
+    // content hashes. Validation must happen AFTER the potentially waiting lock.
+    await lockStoredAssetRows(db, params.references.map(reference => reference.assetId))
+    await assertAssessmentAssetReferencesReady(params.references, db)
+    const uniqueReferences = params.references.filter((reference, index, all) => (
+      all.findIndex((candidate) => candidate.assetId === reference.assetId) === index
+    ))
+    for (const reference of uniqueReferences) {
+      await attachAssetReference({
+        assetId: reference.assetId,
+        entityType: params.owner.entityType,
+        entityId: params.owner.entityId,
+        field: params.owner.field,
+      }, db)
+    }
+  })
 }

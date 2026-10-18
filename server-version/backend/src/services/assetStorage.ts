@@ -191,22 +191,54 @@ export const storeAssetFromFile = async (input: StoreAssetFileInput) => {
   }
 }
 
+/** Shared logical-asset lock, always the last lock tier.
+ * Existing COS writers acquire content -> physical-object -> ordered logical rows.
+ * Retention and soft deletion acquire ONLY these rows; never take a content or
+ * physical lock while holding them. Re-read authorization/identity after locking.
+ */
+export const lockStoredAssetRows = async (db: AssetDatabase, assetIds: readonly string[]): Promise<void> => {
+  const ids = [...new Set(assetIds)].sort()
+  if (!ids.length) return
+  await db.$queryRaw(Prisma.sql`SELECT id FROM stored_assets WHERE id IN (${Prisma.join(ids)}) ORDER BY id FOR UPDATE`)
+}
+
+/** Reuse the caller's transaction so parent facts and retention commit together. */
+export const inAssetTransaction = async <T>(db: AssetDatabase, run: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> => {
+  if ('$transaction' in db) return db.$transaction(run)
+  return run(db)
+}
+
+export type SoftDeleteAssetResult = 'deleted' | 'missing' | 'forbidden' | 'referenced'
+export const softDeleteStoredAsset = async (params: {
+  assetId: string
+  authorize: (asset: Prisma.StoredAssetGetPayload<{}>, tx: Prisma.TransactionClient) => Promise<boolean>
+  db?: AssetDatabase
+}): Promise<SoftDeleteAssetResult> => inAssetTransaction(params.db || prisma, async tx => {
+  await lockStoredAssetRows(tx, [params.assetId])
+  const asset = await tx.storedAsset.findUnique({ where: { id: params.assetId } })
+  if (!asset) return 'missing'
+  if (!await params.authorize(asset, tx)) return 'forbidden'
+  if (await tx.assetReference.count({ where: { assetId: asset.id } })) return 'referenced'
+  await tx.storedAsset.update({ where: { id: asset.id }, data: { deletedAt: asset.deletedAt || new Date() } })
+  // Soft deletion intentionally retains the physical body. This keeps rollback
+  // safe and preserves shared COS bytes; controlled GC owns physical cleanup.
+  return 'deleted'
+})
+
 export const attachAssetReference = async (params: {
   assetId: string
   entityType: string
   entityId: string
   field: string
-}, db: AssetDatabase = prisma) => db.assetReference.upsert({
-  where: {
-    assetId_entityType_entityId_field: {
-      assetId: params.assetId,
-      entityType: params.entityType,
-      entityId: params.entityId,
-      field: params.field,
-    },
-  },
-  create: params,
-  update: {},
+}, db: AssetDatabase = prisma) => inAssetTransaction(db, async tx => {
+  await lockStoredAssetRows(tx, [params.assetId])
+  const asset = await tx.storedAsset.findUnique({ where: { id: params.assetId }, select: { id: true, deletedAt: true } })
+  if (!asset || asset.deletedAt) throw new AssetReferenceValidationError('附件不存在或已删除')
+  return tx.assetReference.upsert({
+    where: { assetId_entityType_entityId_field: params },
+    create: params,
+    update: {},
+  })
 })
 
 /**
@@ -219,22 +251,23 @@ export const discardUnreferencedAsset = async (asset: {
   objectKey: string
   provider: string
 }): Promise<boolean> => {
-  const stored = await prisma.storedAsset.findUnique({ where: { id: asset.id } }).catch(() => null)
-  if (!stored) return false
-  if (stored.duplicateCleanupPending && !await cleanupAssetUploadDuplicate(stored.id)) return false
-  let deleted = false
+  const initial = await prisma.storedAsset.findUnique({ where: { id: asset.id } }).catch(() => null)
+  if (!initial || initial.objectKey !== asset.objectKey || initial.provider !== asset.provider) return false
+  if (initial.duplicateCleanupPending && !await cleanupAssetUploadDuplicate(initial.id)) return false
+  let stored: Prisma.StoredAssetGetPayload<{}> | null
   try {
-    const result = await prisma.storedAsset.deleteMany({
-      where: {
-        id: stored.id, objectKey: stored.objectKey, storageObjectKey: stored.storageObjectKey,
-        references: { none: {} },
-      },
+    stored = await prisma.$transaction(async tx => {
+      await lockStoredAssetRows(tx, [asset.id])
+      const current = await tx.storedAsset.findUnique({ where: { id: asset.id } })
+      if (!current || current.objectKey !== asset.objectKey || current.provider !== asset.provider
+        || current.duplicateCleanupPending || await tx.assetReference.count({ where: { assetId: asset.id } })) return null
+      const result = await tx.storedAsset.deleteMany({ where: { id: current.id, references: { none: {} } } })
+      return result.count === 1 ? current : null
     })
-    deleted = result.count === 1
-  } catch {
-    return false
-  }
-  if (!deleted) return false
+  } catch { return false }
+  if (!stored) return false
+  // Physical deletion starts only after the logical transaction has committed.
+  // deleteFromCOS takes its object lock and rechecks ALL remaining logical rows.
 
   if (stored.provider === 'local') {
     await fsPromises.rm(localPathFor(stored.objectKey), { force: true }).catch(() => undefined)
@@ -278,25 +311,29 @@ export const syncAssetReferences = async (params: {
   values: Record<string, unknown>
   db?: AssetDatabase
 }): Promise<void> => {
-  const db = params.db || prisma
   const references = Object.entries(params.values)
     .flatMap(([field, value]) => collectAssetReferences(value, field))
     .filter((reference, index, all) => all.findIndex((candidate) => (
       candidate.assetId === reference.assetId && candidate.field === reference.field
     )) === index)
 
-  await db.assetReference.deleteMany({
-    where: { entityType: params.entityType, entityId: params.entityId },
-  })
+  await inAssetTransaction(params.db || prisma, async db => {
+    // Lock the entire incoming set once; per-reference locking alone can reverse
+    // order when two content updates contain the same assets in different orders.
+    await lockStoredAssetRows(db, references.map(reference => reference.assetId))
+    await db.assetReference.deleteMany({
+      where: { entityType: params.entityType, entityId: params.entityId },
+    })
 
-  for (const reference of references) {
-    await attachAssetReference({
-      assetId: reference.assetId,
-      entityType: params.entityType,
-      entityId: params.entityId,
-      field: reference.field,
-    }, db)
-  }
+    for (const reference of references) {
+      await attachAssetReference({
+        assetId: reference.assetId,
+        entityType: params.entityType,
+        entityId: params.entityId,
+        field: reference.field,
+      }, db)
+    }
+  })
 }
 
 /** Generic legacy asset endpoints must authorize the target product, even for ADMIN.
