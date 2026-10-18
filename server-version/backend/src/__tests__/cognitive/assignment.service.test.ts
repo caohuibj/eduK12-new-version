@@ -33,6 +33,8 @@ import {
   publishAssignment,
   archiveAssignment,
   ensureTeacherPublishedAssignment,
+  prepareTeacherPublishedAssignment,
+  persistPreparedTeacherPublishedAssignment,
 } from '../../modules/cognitive/assignment.service'
 
 beforeAll(() => {
@@ -586,5 +588,30 @@ describe('composite wrapper assignment class', () => {
     mockPrisma.compositeAssessmentItem.findFirst.mockResolvedValue({ id: 'package-item-1' })
     await expect(archiveAssignment('teacher-1', TEACHER, 'asg-1')).rejects.toMatchObject({ statusCode: 409 })
     expect(mockPrisma.cognitiveAssignment.updateMany).not.toHaveBeenCalled()
+  })
+})
+
+
+describe('variant candidate wrapper preparation', () => {
+  const input = {userId:'teacher-1',courseId:'course-1',configId:'config-1',title:'candidate',instruction:null}
+  beforeEach(() => {
+    mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue(publishedV2Config)
+    mockPrisma.cognitiveAssignment.findMany.mockResolvedValue([])
+    mockPrisma.course.findUnique.mockResolvedValue(course)
+  })
+  it('prepares a valid wrapper without creating it until selected', async () => {
+    const prepared=await prepareTeacherPublishedAssignment(mockPrisma as any,input)
+    expect(prepared.data).toMatchObject({courseId:'course-1',status:'PUBLISHED'})
+    expect(mockPrisma.cognitiveAssignment.create).not.toHaveBeenCalled()
+    await persistPreparedTeacherPublishedAssignment(mockPrisma as any,prepared)
+    expect(mockPrisma.cognitiveAssignment.create).toHaveBeenCalledTimes(1)
+  })
+  it('rejects partial source profile freezes before candidate selection', async () => {
+    await expect(prepareTeacherPublishedAssignment(mockPrisma as any,{...input,sourceFreeze:{profile:'standard'} as any})).rejects.toThrow(/冻结信息不完整/)
+    expect(mockPrisma.cognitiveAssignment.create).not.toHaveBeenCalled()
+  })
+  it('rejects corrupt source report ciphertext before candidate selection', async () => {
+    await expect(prepareTeacherPublishedAssignment(mockPrisma as any,{...input,sourceFreeze:{profile:'standard',profileDefinitionVersion:'1',resolvedConfigSnapshotEncrypted:'cipher',resolvedConfigHash:'a'.repeat(64),resolvedReportSnapshotEncrypted:'corrupt'}})).rejects.toThrow()
+    expect(mockPrisma.cognitiveAssignment.create).not.toHaveBeenCalled()
   })
 })

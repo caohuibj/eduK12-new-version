@@ -1,4 +1,4 @@
-import { assertTrainingSectionSelected } from '../composite/training-variant-child-scope'
+import { assertTrainingSectionSelected, loadTrainingChildAdmissionParent } from '../composite/training-variant-child-scope'
 import { loadStoredUnitAdmission } from './unit-admission'
 import { prisma } from '../../config/database'
 import { assertAttemptEpoch, assertFinalOnly, InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
@@ -305,9 +305,10 @@ export const activateCompositeFormAdmission = async (input: {
     frozenAdmissionSnapshotHash: string | null
   }
 }): Promise<FrozenUnitAdmissionV1> => {
-  const parent = await assertTrainingSectionSelected(input.parent.id, input.sectionId, { parent: input.parent })
+  const selectedParent = await assertTrainingSectionSelected(input.parent.id, input.sectionId, { parent: input.parent })
   const stored = await loadStoredFormAdmission(input.child)
   if (stored) return stored
+  const parent = await loadTrainingChildAdmissionParent(input.parent.id, selectedParent)
   if(input.definition.items.some(item=>item.formPolicy!=null) && (parent.compositeAssessment.productKind!=="QUESTIONNAIRE" || parent.assignmentRef || parent.compositeAssessment.reportPackageKey || parent.compositeAssessment.analysisProtocolKey)) throw new InstrumentFinalSubmitError("INSTRUMENT_NOT_AVAILABLE","Form V3 不支持此任务组合",422)
   if (parent.runtimeGeneration !== 'UNIFIED_V1') {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评运行时版本不匹配，请重启测评', 409)
@@ -399,7 +400,8 @@ export const ensureCompositeFormAdmissionAtDelivery = async (
   section: CompositeSection,
   parent?: CompositeFormAdmissionParent,
 ): Promise<FrozenUnitAdmissionV1> => {
-  const loaded = await assertTrainingSectionSelected(attemptId, section.id, { parent })
+  const selectedParent = await assertTrainingSectionSelected(attemptId, section.id, { parent })
+  const loaded = await loadTrainingChildAdmissionParent(attemptId, selectedParent)
   if (loaded.runtimeGeneration !== 'UNIFIED_V1') {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评运行时版本不匹配，请重启测评', 409)
   }
@@ -462,9 +464,10 @@ export const activateStoredOrCatalogCompositeFormAdmission = async (input: {
     frozenAdmissionSnapshotHash: string | null
   }
 }): Promise<FrozenUnitAdmissionV1> => {
-  const parent = await assertTrainingSectionSelected(input.parentId, input.sectionId, { parent: input.parent })
+  const selectedParent = await assertTrainingSectionSelected(input.parentId, input.sectionId, { parent: input.parent })
   const stored = await loadStoredFormAdmission(input.child)
   if (stored) return stored
+  const parent = await loadTrainingChildAdmissionParent(input.parentId, selectedParent)
   const section = await prisma.compositeFormSection.findUnique({
     where: { id: input.sectionId },
     include: { items: { orderBy: [{ formSectionPosition: 'asc' }, { position: 'asc' }] } },

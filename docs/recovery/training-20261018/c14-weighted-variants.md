@@ -32,3 +32,13 @@
 ## 首源码恢复点（11:48 UTC）
 
 最终后端 TypeScript 编译与更新后的 19 scope / 75 core 用例通过；原完整 build 前置已通过且输入未变。迁移升级真实通过：204 张旧业务表（加 ledger 共 205）所有原列不变，170→171 迁移，5 个新增 nullable 列全部 null，受限角色合格，升级库 dump/restore 全列与 ledger 精确相等，原 C13 停机源字节不变，cleanupVerified=true。新模式实际非空数据恢复仍待 HTTP。证据位于 `c14-evidence/`；旧 Node 或失败日志不是合格通过，摘要不能覆盖原失败。
+
+## 首轮审查修正（11:59 UTC，动态验收仍待执行）
+
+- 抽前准备使用与真实选中准入相同的 Scale runtime/deployment/context 与 Cognitive config/registry/profile/report/reference 编译逻辑；复制 assignment 和 snapshot 的准备阶段只读，selected 才持久化。全部候选跨工具媒体合并稳定锁后检查 catalog；原 release/grant/asset 后才锁现有认知次数来源，避免新旧路径倒序。任何坏候选均拒绝整个新准入。
+- variants restart 在原 parent 串行锁下检查当前 epoch 的权威 FINAL 接收字段与 snapshot，包含已 ACK、异步尚未物化的 whole receipt；已接收任一单元须继续原 attempt。合法完成后经正常 start 消耗剩余次数。旧 null 公开 restart 仍生成原新的匿名身份，只有 variants 重用身份计算预算。
+- 默认 OFF 的旧 session 9 个失败已查明为测试 fixture 开关输入：显式 `COGNITIVE_MODULE_ENABLED=true` / `COGNITIVE_TEST_FIXTURES_ENABLED=true` 后，原 9 个失败目标全部通过，未改权限断言。此前 OFF/base 原日志保留。准备阶段变更后 assignment/session 共 67 个原回归通过；新增 Cognitive prepare 4 项、assignment prepare 3 项通过。
+- HTTP01 仅在 fixture 错误更新不可变 course_type 处失败，未获得任何四工具动态合格。已改用可复用 helper 新建 Training 课程并复制成员，保留原失败与 cleanup 证据；未修改不可变 trigger。后续验证须绑定新源码与脚本。
+- 本次未搬迁 Survey assignment service，Survey 原输出/hash保持原实现。新共享 weighted core 仅负责纯配置/权重/抽样/分配验证。C15 基础分层摘要不替代 C16 跨人指标或配对分析；浏览器 C25、完整性能 C26 仍未验收。
+
+报告增量审查修复 compact 与 fallback 页级事实/模板/layout/runtime/typed snapshots 批量预取，逐 attempt 保留 identity/digest/selected 校验；full preview 有界加载对应 raw，保留原 full 权限。旧 null child guard 沿既有 owner/attempt 投影携带 nullable marker，guard 本身不加载 union；父 state 已有完整 scope 时不再重复取 marker 关系。合成读形状诊断仅表示额外 Prisma parent 调用 1→0、其返回 JSON 5287→0 字节，既有结果增加 204-byte marker；不是物理 SQL/网络字节或性能收益。正式 C26 仍待真实对照。

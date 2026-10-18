@@ -5,12 +5,12 @@ from pathlib import Path
 p=argparse.ArgumentParser();p.add_argument('--tools',type=Path,required=True);p.add_argument('--state',type=Path,required=True);a=p.parse_args()
 base=Path(__file__).resolve().parent;backend=base.parents[1]/'backend';node=a.tools.resolve()/'node_modules/node/bin/node';state=a.state.resolve()
 assert not state.exists(), 'new private state required'
-launcher=subprocess.Popen(['python3',str(base/'local-stack.py'),'--tools',str(a.tools.resolve()),'--state',str(state),'--hold-seconds','1800','--export-processing'],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True)
+launcher=subprocess.Popen(['python3',str(base/'local-stack.py'),'--tools',str(a.tools.resolve()),'--state',str(state),'--hold-seconds','1800','--export-processing','--whole-submit'],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True)
 result={'passed':False};env={'PATH':f'{node.parent}:/usr/bin:/bin','HOME':str(state),'TMPDIR':str(state),'LANG':'C.UTF-8','NODE_ENV':'test'}
 def stop_signal(signum,frame):raise KeyboardInterrupt
 for sig in [signal.SIGINT,signal.SIGTERM,signal.SIGHUP]:signal.signal(sig,stop_signal)
 def harness_inputs():
- paths=[Path(__file__).resolve(),base/'c14-variants-smoke.mjs',base/'c14-variants-restore.py',backend.parent/'e2e/questionnaire-products-fixture.ts',backend/'src/modules/situational/authoring/examples/online-hand-calculated.json',base/'local-stack.py',base/'runtime-fingerprint.cjs']
+ paths=[Path(__file__).resolve(),base/'c14-variants-smoke.mjs',base/'c14-training-fixture.mjs',base/'c14-variants-restore.py',backend.parent/'e2e/questionnaire-products-fixture.ts',backend/'src/modules/situational/authoring/examples/online-hand-calculated.json',base/'local-stack.py',base/'runtime-fingerprint.cjs']
  return {str(p.relative_to(backend.parent)):hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
 def fingerprint():return json.loads(subprocess.check_output([str(node),str(base/'runtime-fingerprint.cjs'),str(backend)],text=True))
 try:

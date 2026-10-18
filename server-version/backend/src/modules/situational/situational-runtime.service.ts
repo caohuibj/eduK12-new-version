@@ -1,4 +1,4 @@
-import { assertTrainingChildSelected } from '../composite/training-variant-child-scope'
+import { assertTrainingChildSelected, TRAINING_VARIANT_PARENT_MARKER_SELECT } from '../composite/training-variant-child-scope'
 import { onlineSituationalCanonicalTaskSatisfaction } from './situational-task-satisfaction'
 import { publicSjtOnlineMetadata } from './authoring/online'
 import { resolveSituationalRelease, type ResolvedSituationalRelease } from './situational-release.service'
@@ -81,6 +81,7 @@ export const SITUATIONAL_ATTEMPT_SELECT = {
   updatedAt: true,
   compositeAttempt: {
     select: {
+      ...TRAINING_VARIANT_PARENT_MARKER_SELECT,
       id: true,
       userId: true,
       recoveryTokenHash: true,

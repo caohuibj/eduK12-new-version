@@ -93,7 +93,9 @@ export async function loadTrainingVariantExportGraph(assessmentId: string, where
     const ids = group.scope.items.filter(item => item.type === 'FORM').map(item => item.id)
     return ids.length ? [{attemptId: {in: group.attemptIds}, itemId: {in: ids}}] : []
   })}
-  const full = !options.previewLimit && options.detail === 'full'
+  // A full preview samples parents, not raw fields. Preflight and load only
+  // that bounded selected parent/epoch set, using the same full permission path.
+  const full = options.detail === 'full'
   if (full && cognitiveWhere.OR.length) {
     const [legacy, unified] = await Promise.all([
       prisma.cognitiveTrial.count({where: {session: {is: {...cognitiveWhere, AND: [{OR: [{runtimeGeneration: null}, {runtimeGeneration: {not: 'UNIFIED_V1'}}]}]}}}}),

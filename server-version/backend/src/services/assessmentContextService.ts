@@ -1,3 +1,4 @@
+import { loadTrainingChildParent } from '../modules/composite/training-variant-child-scope'
 import { resolveTrainingAttemptScope } from '../modules/composite/training-variant-scope'
 import { Prisma } from '@prisma/client'
 import {
@@ -160,10 +161,11 @@ export const freezeCompositeAttemptContext = async (
   await lockCompositeAssessmentAttempt(db, attemptId)
   const attempt = await db.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId },
-    include: { compositeAssessment: { include: { items: { orderBy: { position: 'asc' } }, formSections: { include: { items: true } } } }, formAnswers: true },
+    include: { compositeAssessment: { include: { items: { orderBy: { position: 'asc' } } } }, formAnswers: true },
   })
   if (!attempt) throw new AssessmentContextServiceError('综合测评记录不存在', 404)
-  const scope = await resolveTrainingAttemptScope(attempt, attempt.compositeAssessment, db)
+  const parent = await loadTrainingChildParent(attemptId, attempt, db)
+  const scope = await resolveTrainingAttemptScope(parent, parent.compositeAssessment, db)
   if (attempt.contextSnapshotEncrypted && attempt.contextSnapshotHash) {
     try {
       const context = decryptAssessmentContext(attempt.contextSnapshotEncrypted)

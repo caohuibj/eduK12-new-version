@@ -1,4 +1,4 @@
-import { assertTrainingChildSelected } from '../composite/training-variant-child-scope'
+import { assertTrainingChildSelected, loadTrainingChildAdmissionParent, TRAINING_VARIANT_PARENT_MARKER_SELECT } from '../composite/training-variant-child-scope'
 import { isCognitiveNewAdmissionEnabled } from './product-eligibility'
 import { loadStoredUnitAdmission } from '../assessment-runtime/unit-admission'
 import { prisma } from '../../config/database'
@@ -23,6 +23,7 @@ export const UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT = {
   userId: true,
   compositeAttemptId: true,
   compositeItemId: true,
+  compositeAttempt: { select: TRAINING_VARIANT_PARENT_MARKER_SELECT },
   recoveryTokenHash: true,
   testType: true,
   attemptNo: true,
@@ -48,6 +49,7 @@ export type CognitiveAdmissionChildRow = {
   userId: string | null
   compositeAttemptId: string | null
   compositeItemId: string | null
+  compositeAttempt?: any
   recoveryTokenHash: string | null
   testType: string
   attemptNo: number
@@ -185,7 +187,7 @@ export const activateCognitiveAdmission = async (
   }
 
   if (row.compositeAttemptId) {
-    const loaded = parent!
+    const loaded = await loadTrainingChildAdmissionParent(row.compositeAttemptId, parent)
     assertFinalOnly(loaded.deliveryMode)
     assertAttemptEpoch(loaded.attemptEpoch, row.attemptNo)
     if (!row.compositeItemId) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '认知任务未绑定到当前测评单元', 409)

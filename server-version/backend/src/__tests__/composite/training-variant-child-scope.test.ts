@@ -1,3 +1,4 @@
+import { writeFileSync } from 'node:fs'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 const mocks = vi.hoisted(() => ({ parent: vi.fn(), sectionFind: vi.fn(), sectionCreate: vi.fn(), cognitive: vi.fn(), situational: vi.fn() }))
 vi.mock('../../config/database', () => ({ prisma: {
@@ -23,6 +24,7 @@ import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { mapCompositeSection } from '../../modules/assessment-runtime/form-section-definition'
 import { getParticipantKey } from '../../modules/assessment-runtime/participant-key'
 import { hashRecoveryToken } from '../../services/anonymousAccess'
+import { lockSession } from '../../modules/cognitive/session-lock'
 import { freezeCompositeAttemptContext } from '../../services/assessmentContextService'
 
 const fixture = () => {
@@ -83,8 +85,86 @@ describe('C14 selected child scope enforcement', () => {
   it('preserves legacy null parent identity and standalone zero-read behavior', async () => {
     expect(await assertTrainingChildSelected({ compositeAttemptId: null })).toBeUndefined()
     const parent: any = { id: 'legacy', trainingVariantAllocationEncrypted: null, trainingVariantAllocationHash: null,
-      compositeAssessment: { trainingVariantFrozen: null, trainingVariantDigest: null, items: [{ id: 'legacy-item' }], formSections: [] } }
+      compositeAssessment: { trainingVariantDraft: null, trainingVariantFrozen: null, trainingVariantDigest: null, items: [{ id: 'legacy-item' }], formSections: [] } }
     expect(await assertTrainingChildSelected({ compositeAttemptId: 'legacy', compositeItemId: 'legacy-item' }, { parent })).toBe(parent)
+    expect(mocks.parent).not.toHaveBeenCalled()
+  })
+  it('keeps explicit-null child and section guards at zero additional queries or union bytes', async () => {
+    const marker: any = { id: 'legacy', trainingVariantAllocationEncrypted: null, trainingVariantAllocationHash: null,
+      compositeAssessment: { trainingVariantDraft: null, trainingVariantFrozen: null, trainingVariantDigest: null } }
+    const legacyUnion = { ...fixture(), ...marker, compositeAssessment: { ...fixture().compositeAssessment, ...marker.compositeAssessment } }
+    for (const type of ['scale', 'cognitive', 'sjt']) {
+      expect(await assertTrainingChildSelected({ compositeAttemptId: 'legacy', compositeItemId: `${type}-a`, compositeAttempt: marker })).toBe(marker)
+    }
+    expect(await assertTrainingSectionSelected('legacy', 'section-a', { parent: marker })).toBe(marker)
+    expect(mocks.parent).not.toHaveBeenCalled()
+    expect(marker.compositeAssessment).not.toHaveProperty('items')
+    const diagnostic = {
+      sample: 'two groups, four tools, null variant metadata', node: process.version,
+      previousAdditionalPrismaParentCallsPerGuard: 1, currentAdditionalPrismaParentCallsPerGuard: mocks.parent.mock.calls.length,
+      previousFullParentResultJsonBytes: Buffer.byteLength(JSON.stringify(legacyUnion)),
+      currentAdditionalParentResultJsonBytes: 0,
+      markerJsonBytesAddedToExistingOwnerRead: Buffer.byteLength(JSON.stringify(marker)),
+      scope: 'Synthetic service-call/read-shape diagnostic only; not SQL wire bytes, physical SQL counts, or C26 capacity evidence',
+    }
+    if (process.env.C14_CHILD_READ_DIAGNOSTIC) writeFileSync(process.env.C14_CHILD_READ_DIAGNOSTIC, JSON.stringify(diagnostic, null, 2))
+  })
+  it('expands a configured marker once and reuses verified scope across child and section checks', async () => {
+    const parent = fixture()
+    const marker = { id: parent.id, trainingVariantAllocationEncrypted: parent.trainingVariantAllocationEncrypted,
+      trainingVariantAllocationHash: parent.trainingVariantAllocationHash, compositeAssessment: {
+        trainingVariantDraft: null, trainingVariantFrozen: parent.compositeAssessment.trainingVariantFrozen,
+        trainingVariantDigest: parent.compositeAssessment.trainingVariantDigest,
+      } }
+    mocks.parent.mockResolvedValue(parent)
+    const selected = await assertTrainingChildSelected({ compositeAttemptId: 'attempt', compositeItemId: 'scale-a', compositeAttempt: marker })
+    await assertTrainingSectionSelected('attempt', 'section-a', { parent: marker })
+    await assertTrainingChildSelected({ compositeAttemptId: 'attempt', compositeItemId: 'cognitive-a' }, { parent: selected })
+    expect(mocks.parent).toHaveBeenCalledTimes(1)
+    expect(mocks.parent.mock.calls[0][0].include.compositeAssessment.include.items).toBe(true)
+    expect(await resolveTrainingAttemptScope(selected)).toBe(await resolveTrainingAttemptScope(parent))
+  })
+  it('does not treat null allocation markers as legacy when the definition remains configured', async () => {
+    const parent = fixture()
+    parent.trainingVariantAllocationEncrypted = null as any
+    parent.trainingVariantAllocationHash = null as any
+    const marker = { id: parent.id, trainingVariantAllocationEncrypted: null, trainingVariantAllocationHash: null,
+      compositeAssessment: { trainingVariantDraft: null, trainingVariantFrozen: parent.compositeAssessment.trainingVariantFrozen,
+        trainingVariantDigest: parent.compositeAssessment.trainingVariantDigest } }
+    mocks.parent.mockResolvedValue(parent)
+    await expect(assertTrainingChildSelected({ compositeAttemptId: 'attempt', compositeItemId: 'scale-a', compositeAttempt: marker })).rejects.toThrow(/冻结/)
+    expect(mocks.parent).toHaveBeenCalledTimes(1)
+  })
+  it('checks only narrow metadata when a legacy caller has not selected any variant fields', async () => {
+    const marker = { id: 'legacy', trainingVariantAllocationEncrypted: null, trainingVariantAllocationHash: null,
+      compositeAssessment: { trainingVariantDraft: null, trainingVariantFrozen: null, trainingVariantDigest: null } }
+    mocks.parent.mockResolvedValue(marker)
+    await assertTrainingChildSelected({ compositeAttemptId: 'legacy', compositeItemId: 'old-item' })
+    expect(mocks.parent).toHaveBeenCalledTimes(1)
+    expect(mocks.parent.mock.calls[0][0]).not.toHaveProperty('include')
+    expect(mocks.parent.mock.calls[0][0].select.compositeAssessment.select).not.toHaveProperty('items')
+  })
+  it.each(['FORM', 'SCALE', 'COGNITIVE'])('keeps legacy %s stored-admission decoding free of added parent queries', async type => {
+    const parent = { id: 'legacy', trainingVariantAllocationEncrypted: null, trainingVariantAllocationHash: null,
+      compositeAssessment: { trainingVariantDraft: null, trainingVariantFrozen: null, trainingVariantDigest: null } }
+    const child: any = { id: 'legacy-child', compositeAttemptId: 'legacy', compositeItemId: 'old-item', compositeAttempt: parent,
+      attemptEpoch: 1, frozenAdmissionSnapshotEncrypted: 'corrupt-snapshot', frozenAdmissionSnapshotHash: 'x' }
+    const result = type === 'FORM'
+      ? activateCompositeFormAdmission({ parent, sectionId: 'old-section', definition: {} as any, child } as any)
+      : type === 'SCALE' ? activateScaleAdmission(child) : activateCognitiveAdmission(child)
+    await expect(result).rejects.toMatchObject({ statusCode: 409 })
+    expect(mocks.parent).not.toHaveBeenCalled()
+  })
+  it('carries null markers through the existing Cognitive row lock without an additional parent read', async () => {
+    const marker = { id: 'legacy', trainingVariantAllocationEncrypted: null, trainingVariantAllocationHash: null,
+      compositeAssessment: { trainingVariantDraft: null, trainingVariantFrozen: null, trainingVariantDigest: null } }
+    const tx: any = { $queryRaw: vi.fn().mockResolvedValue([{ id: 'child', composite_attempt_id: 'legacy', composite_item_id: 'cognitive-a', training_variant_parent: marker }]) }
+    const child = await lockSession(tx, 'child')
+    expect(await assertTrainingChildSelected(child!, { db: tx })).toBe(marker)
+    expect(tx.$queryRaw).toHaveBeenCalledTimes(1)
+    const query = tx.$queryRaw.mock.calls[0][0].sql
+    expect(query).toContain('training_variant_parent')
+    expect(query).toContain('FOR UPDATE')
     expect(mocks.parent).not.toHaveBeenCalled()
   })
   it('rejects an unselected Form before creating or loading any section child', async () => {

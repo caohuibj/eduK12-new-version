@@ -1,4 +1,4 @@
-import { assertTrainingChildSelected } from '../modules/composite/training-variant-child-scope'
+import { assertTrainingChildSelected, TRAINING_VARIANT_PARENT_MARKER_SELECT } from '../modules/composite/training-variant-child-scope'
 import { loadScaleAnswers } from '../modules/scale/scale-workflow.service'
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
@@ -938,6 +938,7 @@ export const scaleController = {
         const assessment = await tx.assessment.findUnique({
           where: { id: assessmentId },
           include: {
+            compositeAttempt: { select: TRAINING_VARIANT_PARENT_MARKER_SELECT },
             scale: { select: { id: true, code: true, name: true, instrumentVersion: true, instrumentClass: true, definition: true } },
             questionnaireAssessment: { select: { contextSnapshotEncrypted: true, contextSnapshotHash: true } },
           },
@@ -1013,6 +1014,7 @@ export const scaleController = {
         const assessment = await tx.assessment.findUnique({
           where: { id: assessmentId },
           include: {
+            compositeAttempt: { select: TRAINING_VARIANT_PARENT_MARKER_SELECT },
             scale: { select: { id: true, code: true, name: true, instrumentVersion: true, instrumentClass: true, definition: true } },
             questionnaireAssessment: { select: { contextSnapshotEncrypted: true, contextSnapshotHash: true } },
           },
@@ -1175,7 +1177,7 @@ export const scaleController = {
       const { assessmentId } = req.params
       const assessment = await prisma.assessment.findUnique({
         where: { id: assessmentId },
-        include: { scale: { select: { id: true, code: true, name: true, description: true, instrumentVersion: true, instrumentClass: true, definition: true } } },
+        include: { compositeAttempt: { select: TRAINING_VARIANT_PARENT_MARKER_SELECT }, scale: { select: { id: true, code: true, name: true, description: true, instrumentVersion: true, instrumentClass: true, definition: true } } },
       })
       if (!assessment) return notFound(res, '测评记录不存在')
       if (assessment.userId !== userId) return forbidden(res, '无权限查看此测评')

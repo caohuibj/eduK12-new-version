@@ -1,4 +1,4 @@
-import { assertTrainingChildSelected } from '../composite/training-variant-child-scope'
+import { assertTrainingChildSelected, loadTrainingChildAdmissionParent, TRAINING_VARIANT_PARENT_MARKER_SELECT } from '../composite/training-variant-child-scope'
 import {readTrainingTimingSnapshot,type TrainingTimingSnapshot} from '../assessment-runtime/training-scale-timing'
 import { loadStoredVersionedUnitAdmission } from '../assessment-runtime/unit-admission'
 import { withSerializableScaleTransaction } from './deployment/transactions'
@@ -57,6 +57,7 @@ export const UNIFIED_SCALE_CHILD_ADMISSION_SELECT = {
   questionnaireAssessmentId: true,
   compositeAttemptId: true,
   compositeItemId: true,
+  compositeAttempt: { select: TRAINING_VARIANT_PARENT_MARKER_SELECT },
   scaleId: true,
   subjectUserId: true,
   respondentUserId: true,
@@ -91,6 +92,7 @@ export type ScaleAdmissionChildRow = {
   questionnaireAssessmentId: string | null
   compositeAttemptId: string | null
   compositeItemId: string | null
+  compositeAttempt?: any
   scaleId: string
   subjectUserId: string | null
   respondentUserId: string | null
@@ -642,7 +644,8 @@ const activateUnstoredScaleAdmission = async (
   }
 
   if (row.compositeAttemptId) {
-    const loaded = await assertTrainingChildSelected(row, { parent, db })
+    const scoped = await assertTrainingChildSelected(row, { parent, db })
+    const loaded = await loadTrainingChildAdmissionParent(row.compositeAttemptId, scoped, db)
     assertFinalOnly(loaded.deliveryMode)
     assertAttemptEpoch(loaded.attemptEpoch, row.attemptEpoch)
     if (!row.compositeItemId) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表未绑定到当前测评单元', 409)

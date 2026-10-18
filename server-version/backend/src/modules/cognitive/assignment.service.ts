@@ -537,7 +537,8 @@ export type FrozenAssignmentCopy = {
   resolvedReportSnapshotEncrypted: string | null
 }
 
-export const ensureTeacherPublishedAssignment = async (
+/** Read-only wrapper resolution. No candidate assignment is created until selected. */
+export const prepareTeacherPublishedAssignment = async (
   tx: Prisma.TransactionClient,
   input: {
     userId: string
@@ -612,9 +613,9 @@ export const ensureTeacherPublishedAssignment = async (
       candidate.profileDefinitionVersion === expectedDefinitionVersion
       && hashResolvedConfig(readFrozenReport(candidate.resolvedReportSnapshotEncrypted)) === sourceReportHash
     )
-    if (existing) return existing
+    if (existing) return { existing }
   } else if (candidates[0]) {
-    return candidates[0]
+    return { existing: candidates[0] }
   }
 
   const course = await tx.course.findUnique({ where: { id: input.courseId } })
@@ -638,8 +639,7 @@ export const ensureTeacherPublishedAssignment = async (
           resolvedReportSnapshotEncrypted: null,
         }
 
-  return tx.cognitiveAssignment.create({
-    data: {
+  const data: Prisma.CognitiveAssignmentUncheckedCreateInput = {
       courseId: input.courseId,
       configId: input.configId,
       createdBy: input.userId,
@@ -653,6 +653,16 @@ export const ensureTeacherPublishedAssignment = async (
       quotaSourceAssignmentId: input.quotaSourceAssignmentId ?? null,
       courseSnapshot: { id: course.id, title: course.title, courseCode: course.courseCode },
       ...freezeData,
-    },
-  })
+  }
+  return { data }
 }
+
+export const persistPreparedTeacherPublishedAssignment = async (
+  tx: Prisma.TransactionClient,
+  prepared: Awaited<ReturnType<typeof prepareTeacherPublishedAssignment>>,
+) => prepared.existing ?? tx.cognitiveAssignment.create({ data: prepared.data! })
+
+export const ensureTeacherPublishedAssignment = async (
+  tx: Prisma.TransactionClient,
+  input: Parameters<typeof prepareTeacherPublishedAssignment>[1],
+) => persistPreparedTeacherPublishedAssignment(tx, await prepareTeacherPublishedAssignment(tx, input))

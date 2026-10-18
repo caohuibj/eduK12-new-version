@@ -26,6 +26,7 @@ export interface LockedSessionRow {
   assignmentId: string | null
   compositeAttemptId: string | null
   compositeItemId: string | null
+  compositeAttempt?: any
   recoveryTokenHash: string | null
   anonymousCode: string | null
   configId: string
@@ -62,6 +63,7 @@ interface RawSessionRow {
   assignment_id: string | null
   composite_attempt_id: string | null
   composite_item_id: string | null
+  training_variant_parent?: unknown
   recovery_token_hash: string | null
   anonymous_code: string | null
   config_id: string
@@ -107,7 +109,18 @@ export const lockSession = async (
       submission_payload_hash, submitted_at, started_at, finished_at,
       score_encrypted, metrics_encrypted, quality_flags_encrypted, result_snapshot_encrypted, config_version,
       config_snapshot_encrypted, engine_version, scoring_version, random_seed,
-      completion_key, created_at, updated_at
+      completion_key, created_at, updated_at,
+      (SELECT jsonb_build_object(
+        'id', parent.id,
+        'trainingVariantAllocationEncrypted', parent.training_variant_allocation_encrypted,
+        'trainingVariantAllocationHash', parent.training_variant_allocation_hash,
+        'compositeAssessment', jsonb_build_object(
+          'trainingVariantDraft', definition.training_variant_draft,
+          'trainingVariantFrozen', definition.training_variant_frozen,
+          'trainingVariantDigest', definition.training_variant_digest))
+       FROM composite_assessment_attempts parent
+       JOIN composite_assessments definition ON definition.id = parent.composite_assessment_id
+       WHERE parent.id = cognitive_sessions.composite_attempt_id) AS training_variant_parent
     FROM cognitive_sessions
     WHERE id = ${sessionId}
     FOR UPDATE
@@ -122,6 +135,7 @@ export const lockSession = async (
     assignmentId: r.assignment_id,
     compositeAttemptId: r.composite_attempt_id,
     compositeItemId: r.composite_item_id,
+    compositeAttempt: r.training_variant_parent,
     recoveryTokenHash: r.recovery_token_hash,
     anonymousCode: r.anonymous_code,
     configId: r.config_id,

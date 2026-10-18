@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-const db = vi.hoisted(() => ({$queryRaw: vi.fn(), compositeAssessment: {findUnique: vi.fn()}, compositeAssessmentAttempt: {count: vi.fn()},
+const db = vi.hoisted(() => ({$queryRaw: vi.fn(), compositeAssessment: {findUnique: vi.fn()}, compositeAssessmentAttempt: {count: vi.fn(), findMany: vi.fn()}, compositeReportJob: {findMany: vi.fn()},
   assessment: {findMany: vi.fn()}, cognitiveSession: {findMany: vi.fn()}, compositeFormAnswer: {findMany: vi.fn()},
   cognitiveTrial: {count: vi.fn()}, cognitiveRawSubmission: {aggregate: vi.fn()}, assessmentUnitSnapshot: {findMany: vi.fn()},
   relationalAssessmentAssignment: {findMany: vi.fn()}}))
@@ -141,6 +141,16 @@ describe('weighted variant raw, batch and history consumers', () => {
     expect(db.cognitiveSession.findMany.mock.calls[0][0].where.OR).toHaveLength(2)
     expect(db.cognitiveSession.findMany.mock.calls[0][0].where.OR[0]).toMatchObject({compositeAttemptId: {in: ['attempt-0']}, attemptNo: 1, compositeItemId: {in: ['cog-a']}})
   })
+  it('full preview loads bounded selected raw and preserves fractional values without a missing-raw fallback', async () => {
+    const {template,sessions}=cognitiveFixture(); template.attempts=template.attempts.slice(1); db.cognitiveSession.findMany.mockResolvedValue(sessions.slice(1))
+    const data=await getExportData('parent',{detail:'full',previewLimit:1})
+    expect(data.totalCount).toBe(2); expect(data.rows).toHaveLength(1); expect(data.trialCount).toBe(1)
+    expect(data.rows[0].C002_T001_rtms).toBe(1.125); expect(data.rows[0].V001_selection_state).toBe('NOT_SHOWN')
+    expect(db.cognitiveSession.findMany.mock.calls[0][0].include.rawSubmissions).toBeTruthy()
+    expect(db.cognitiveRawSubmission.aggregate.mock.calls[0][0].where.OR).toHaveLength(1)
+    sessions[1].rawSubmissions=[]
+    await expect(getExportData('parent',{detail:'full',previewLimit:1})).rejects.toThrow('原始提交缺失')
+  })
   it('preflights combined scoped legacy and unified trial bounds before raw source reads', async () => {
     cognitiveFixture(); db.cognitiveRawSubmission.aggregate.mockResolvedValue({_sum: {trialCount: 100001}})
     await expect(getExportData('parent', {detail: 'full'})).rejects.toThrow()
@@ -178,5 +188,31 @@ describe('weighted variant raw, batch and history consumers', () => {
     db.cognitiveSession.findMany.mockResolvedValue([selected, {...selected, id: 'wrong-slot', compositeItemId: 'cog-b', scoreEncrypted: 'POISON'}, {...selected, id: 'old-epoch', attemptNo: 2, scoreEncrypted: 'POISON'}])
     const data = await listMyHistory('user-0', {skip: 0, take: 20, page: 1, pageSize: 20})
     expect(data.total).toBe(1); expect(data.list[0]).toMatchObject({sessionId: 'session-0', score: 0, trainingVariant: {variantKey: 'group_0'}})
+  })
+})
+
+
+describe('variant report page canonical batches',()=>{
+  it('loads selected typed snapshots once for a multi-person teacher report page',async()=>{
+    const {template}=fixture()
+    const attempts=template.attempts.map((attempt:any)=>({...attempt,compositeAssessmentId:template.id,scaleAssessments:[],cognitiveSessions:[],situationalAttempts:[],formAnswers:[],formSectionAttempts:[]}))
+    db.compositeAssessmentAttempt.findMany.mockResolvedValue(attempts);db.compositeReportJob.findMany.mockResolvedValue([])
+    const {getTrainingVariantReportsForTeacher}=await import('../../modules/composite/composite.service')
+    const page=await getTrainingVariantReportsForTeacher('admin',UserRole.ADMIN,'parent')
+    expect(page.reports.map((report:any)=>report.backgroundValues.map((value:any)=>value.itemId))).toEqual([['item-a'],['item-b']])
+    expect(page.reports.map((report:any)=>report.backgroundValues[0].value)).toEqual(['0','7'])
+    expect(db.assessmentUnitSnapshot.findMany).toHaveBeenCalledTimes(1)
+    expect(db.compositeReportJob.findMany).toHaveBeenCalledTimes(1)
+  })
+  it.each(['parent','epoch','section'])('rejects %s drift in a batched typed source',async mode=>{
+    const {template,snapshots}=fixture()
+    const {applyTrainingAttemptScope}=await import('../../modules/composite/training-variant-scope')
+    const {preloadCompositeReportFacts}=await import('../../modules/composite/composite-report-read-batch')
+    const attempts=await Promise.all(template.attempts.map((attempt:any)=>applyTrainingAttemptScope({...attempt,compositeAssessment:template,scaleAssessments:[]})))
+    if(mode==='parent')snapshots[0].compositeAttemptId='other'
+    if(mode==='epoch')snapshots[0].attemptEpoch=2
+    if(mode==='section')snapshots[0].slotKey='form-section:section-1'
+    await expect(preloadCompositeReportFacts(attempts)).rejects.toThrow()
+    expect(db.assessmentUnitSnapshot.findMany).toHaveBeenCalledTimes(1)
   })
 })

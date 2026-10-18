@@ -1,0 +1,10 @@
+{
+  "sample": "two groups, four tools, null variant metadata",
+  "node": "v24.21.0",
+  "previousAdditionalPrismaParentCallsPerGuard": 1,
+  "currentAdditionalPrismaParentCallsPerGuard": 0,
+  "previousFullParentResultJsonBytes": 5287,
+  "currentAdditionalParentResultJsonBytes": 0,
+  "markerJsonBytesAddedToExistingOwnerRead": 204,
+  "scope": "Synthetic service-call/read-shape diagnostic only; not SQL wire bytes, physical SQL counts, or C26 capacity evidence"
+}

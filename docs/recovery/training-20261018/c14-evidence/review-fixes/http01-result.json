@@ -1,0 +1,32 @@
+{
+  "passed": false,
+  "harnessInputs": {
+    "scripts/recovery/c14-variants-http.py": "6bd893514143b4cccbb8687a8917971389b5ee9ccb25a510261b3875213ce2b4",
+    "scripts/recovery/c14-variants-smoke.mjs": "ecebf81d3148ea2e4fc95eec9cbf3d71734b494de566b09c8d4da653099567e7",
+    "scripts/recovery/c14-variants-restore.py": "6f8396ed29a70f34ac6ae516de9fb3dea3fb0c8eb37ad90c65a5ef1564786144",
+    "e2e/questionnaire-products-fixture.ts": "f5a1f97986a60c937f6bc299d73f83cb10a448701f5dcc751c70077a11c7e1ac",
+    "backend/src/modules/situational/authoring/examples/online-hand-calculated.json": "a8e9eb897bd7705c785a86bc0de16d0bce7c7e28e90611542ac2e0c79ccf7e5a",
+    "scripts/recovery/local-stack.py": "6e2be9037719977a502dbd5eb9a7aeac04e06b2d22f5cf41eb7e767f6b3eb79b",
+    "scripts/recovery/runtime-fingerprint.cjs": "d03a5fdafa8718657ae974e11b52f71f5a77623aac32e243eb729cc338791ce2"
+  },
+  "sourceHead": "b53284b525080386cc38a0067c1ba152e51cdf7c",
+  "runtimeFingerprint": {
+    "schemaVersion": 1,
+    "nodeVersion": "v24.21.0",
+    "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+    "dist": {
+      "files": 5069,
+      "sha256": "99db0e389bee81a9a23fc71d10464165e2b66372cc702ec7436f791c71c11751"
+    },
+    "files": {
+      "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+      "prisma/schema.prisma": "57e56f348583acd947c031cfcd3ff65ad091f5482bb65b767fa26fc4127a7318",
+      "node_modules/.prisma/client/schema.prisma": "dae38fb7ab4b5ca2ce9785f1b3ab89a282e6c2cac92bcf32c5f4fd65d86f1b14",
+      "node_modules/.prisma/client/index.js": "0704ca08d1a8c3a0df1bae43180e15a73844f701a729c6a684a747400f44277b"
+    },
+    "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+  },
+  "phases": {},
+  "errorType": "CalledProcessError",
+  "cleanupVerified": true
+}
