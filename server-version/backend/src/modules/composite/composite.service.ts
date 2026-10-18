@@ -5413,7 +5413,12 @@ async function projectPartialReport(attempt: any, audience: CompositeReportAudie
   const completed = (children: any[]) => completedMeasurementChildren(children, attempt.attemptEpoch, finalized)
   const scaleAssessments = completed(attempt.scaleAssessments), cognitiveSessions = completed(attempt.cognitiveSessions), situationalAttempts = completed(attempt.situationalAttempts ?? [])
   const itemIds = new Set([...scaleAssessments, ...cognitiveSessions, ...situationalAttempts].map(child => child.compositeItemId))
-  const report = (attempt.trainingVariantScope?.variant||attempt.trainingFlowScope) ? await buildCompositeReport(attempt) : await buildCompositeReport({ ...attempt, scaleAssessments, cognitiveSessions, situationalAttempts, formAnswers: [], compositeAssessment: { ...definition, items: definition.items.filter((item: any) => itemIds.has(item.id) && item.type !== 'FORM') } })
+  // Teacher partial reports contain completed measurements only. A reached but
+  // pending Form has no accepted facts yet; do not require or synthesize them
+  // merely to discard all background fields immediately below.
+  const flowPartial = attempt.trainingFlowScope ? await applyTrainingAttemptScope({ ...attempt, scaleAssessments, cognitiveSessions, situationalAttempts }, { verifiedScope: attempt.trainingVariantScope }) : null
+  const partialFacts = flowPartial ? await preloadCompositeReportFacts([flowPartial], prisma, { selectedItemIds: new Map([[attempt.id, itemIds]]) }) : undefined
+  const report = (attempt.trainingVariantScope?.variant||attempt.trainingFlowScope) ? await buildCompositeReport(flowPartial ?? attempt, undefined, partialFacts) : await buildCompositeReport({ ...attempt, scaleAssessments, cognitiveSessions, situationalAttempts, formAnswers: [], compositeAssessment: { ...definition, items: definition.items.filter((item: any) => itemIds.has(item.id) && item.type !== 'FORM') } })
   const projected = projectCompositeCollectionReport((attempt.trainingVariantScope?.variant||attempt.trainingFlowScope) ? {...report,backgroundValues:[],unitReports:report.unitReports.filter((unit:any)=>itemIds.has(unit.itemId))} : report, audience)
   return { ...projected, reportState: 'PARTIAL' as const, completedAt: null, totalTime: null }
 }

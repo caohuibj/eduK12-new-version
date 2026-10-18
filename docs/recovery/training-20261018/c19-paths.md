@@ -48,3 +48,11 @@
 新增19个消费者用例首轮发现2个 request-local scope 复用绑定缺口（缺 compositeId/publishedAt），已补齐；14个受影响scope/batch用例定向通过，5个未变报告投影用例复用首轮，不累计重复。尚未证明外部HTTP可利用此内部缺口。路径proof另显式绑定 contextSnapshotHash，防旧proof在背景上下文漂移时复用，其新反例待定向运行。
 
 业务checkpoint02 的同输入构建已通过全部原构建前置与 tsc，1617个输入前后SHA一致、5133个dist文件留manifest；之后上述scope改动仅需受影响tsc重emit，未变前置不重跑。新增恢复launcher/db/upgrade已静态检查并独立冻结：upgrade仅消费DB迁移/schema/role/helper/工具，不绑定尚未消费HTTP脚本或dist；真实执行仍待。未宣称升级通过。
+
+### Checkpoint 04：已验非空升级，HTTP仍待
+
+私有state `/workspace/scratch/5a77e8bdc1ae/eduk12_c19_http_01` 已停机，upgrade passed/cleanupVerified/sourceUnchanged/inputsUnchanged全true。173→174迁移、211表、精确7nullable新列、4054旧行全保留、guards/constraints不变，固定C18非空dump对照和正式runtime-role apply/verify通过。upgrade phaseInputHash `42cf03574b3d6deab491fcd431f78907713f9136388c787744957fa26c766d38`，runtime-result SHA `c89eca5df666e80889301e7409c425c0279fa4bf69fdc7e6856c6163fcf3e6c3`，upgrade-result SHA `e7f00e75e9401dcf08afa940bfb80a86799b11b4bc3f8b9d1a7198ec2c419cae`。对应generated client manifest SHA `4f488f4c50f2f26273bc9d9ab8efffbb13f1131b1c3bb495e816235f1652535d`。此生产者明确 DATABASE_ONLY，不把并行HTTP脚本、dist、业务source或测试当成其输入/资格。
+
+contextHash proof受影响finalizer19例通过，另追加pending current Form无快照正常与COMPLETED丢失accepted snapshot拒绝2例定向通过（原19 skipped复用）。教师partial source仅加载已完成测量facts，保留完整scope验证；未接受当前Form不要求不存在的facts，终态/已接受损坏仍严拒，真实教师HTTP场景待执行。消费者19个不同测试的2失败→14定向复验与旧5复用来源完整归档。
+
+受影响tsc重emit成功，1397 runtime输入前后SHA一致，5133 dist文件摘要已存。checkpoint04 archive包含升级公共结果/输入manifest、两次build记录和上述分项原始测试证据，不含private配置、dump、原答案或凭据。HTTP、并发、revocation、media、CSV/分析和C19新格式恢复尚未取得资格。

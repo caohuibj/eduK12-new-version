@@ -23,7 +23,7 @@ beforeEach(() => {
   mocks.tx.$queryRaw.mockResolvedValue([{ id: 'parent' }])
   mocks.tx.compositeAssessmentAttempt.updateMany.mockResolvedValue({ count: 1 })
 })
-async function fixture(options: { termination?: 'SCREEN_OUT' | 'COMPLETE_EARLY'; refused?: boolean; sjt?: 'valid' | 'invalid' | 'empty' | 'refused' } = {}) {
+async function fixture(options: { termination?: 'SCREEN_OUT' | 'COMPLETE_EARLY'; refused?: boolean; answer?:'yes'|'no'; sjt?: 'valid' | 'invalid' | 'empty' | 'refused' } = {}) {
   const items: any[] = [0, 1].map(index => ({ id: `item-${index}`, type: 'FORM', position: index * 2,
     formSectionId: `section-${index}`, formSectionPosition: 0, formType: 'single_choice', formLabel: `Question ${index}`,
     required: true, formOptions: [{ value: 'yes', label: 'Yes' }, { value: 'no', label: 'No' }],
@@ -64,7 +64,7 @@ async function fixture(options: { termination?: 'SCREEN_OUT' | 'COMPLETE_EARLY';
     frozenActiveSlotSetHash: slots.snapshotHash, compositeAssessment: composite,
     formSectionAttempts: [{ sectionId: 'section-0', attemptEpoch: 1, status: 'COMPLETED', taskSatisfaction: options.refused ? 'NOT_SATISFIED' : 'SATISFIED' }] }
   const facts = { schemaVersion: 3, sectionKey: 'section-0', items: [{ key: 'item-0', label: 'Question 0',
-    value: options.refused ? null : 'yes', state: options.refused ? 'REFUSED' : 'ANSWERED' }] }
+    value: options.refused ? null : (options.answer??'yes'), state: options.refused ? 'REFUSED' : 'ANSWERED' }] }
   const rows: any[] = [{ id: 'snapshot', compositeAttemptId: parent.id, attemptEpoch: 1, slotKey: 'form-section:section-0', unitType: 'FORM_SECTION',
     terminalState: 'COMPLETED', payloadKind: 'COLLECTION_FACTS', sourceType: 'COMPOSITE_FORM_SECTION', sourceAttemptId: 'section-attempt', sourceSubmissionId: 'submission',
     sourceDefinitionHash: candidateSlots[0].sourceDefinitionIdentity.hash, compiledRuntimeHash: null, completedAt: new Date('2026-10-18T00:01:00Z'),
@@ -176,7 +176,14 @@ describe('transaction-bound training flow finalization', () => {
 })
 
 describe('persisted path proof integrity',()=>{
-  it.each(['cipherOnly','hashOnly','acceptedMissing','completedMissing','changedCipher','changedHeader','changedContext'])('rejects %s on normal reads',async mode=>{
+  it('allows a pending current Form without inventing an accepted snapshot',async()=>{
+    const f=await fixture({answer:'no'})
+    const scope=await resolveTrainingFlowScope(f.parent,f.parent.compositeAssessment,{db:mocks.tx,snapshotRows:f.rows,frozenSlots:f.slots})
+    expect(scope?.path.currentInstrumentKey).toBe(trainingFlowUnitKey('section-1'))
+    expect(scope?.terminal).toBe(false);expect(scope?.executedSlotKeys.size).toBe(1);expect(f.rows).toHaveLength(1)
+  })
+
+  it.each(['cipherOnly','hashOnly','acceptedMissing','completedMissing','changedCipher','changedHeader','changedContext','missingAcceptedSnapshot'])('rejects %s on normal reads',async mode=>{
     const f=await fixture()
     if(mode==='cipherOnly')f.parent.trainingFlowPathHash=null
     if(mode==='hashOnly')f.parent.trainingFlowPathEncrypted=null
@@ -185,6 +192,7 @@ describe('persisted path proof integrity',()=>{
     if(mode==='changedCipher')f.rows[0].collectionFactsEncrypted=encryptUnifiedRuntimePayload({schemaVersion:3,sectionKey:'section-0',items:[]})
     if(mode==='changedHeader')f.rows[0].sourceAttemptId='foreign-attempt'
     if(mode==='changedContext')f.parent.contextSnapshotHash='foreign-context'
+    if(mode==='missingAcceptedSnapshot'){f.parent.status='COMPLETED';f.rows.length=0}
     await expect(resolveTrainingFlowScope(f.parent,f.parent.compositeAssessment,{db:mocks.tx,snapshotRows:f.rows,frozenSlots:f.slots})).rejects.toThrow()
   })
   it('persists a nonterminal proof in the same supplied transaction before waiting',async()=>{
