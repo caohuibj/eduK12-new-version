@@ -50,13 +50,14 @@ function fixture(n = 2) {
   }
   return {db, task, parents, snapshots, section, field}
 }
-function scaleFixture(numericScores = true) {
+function scaleFixture(numericScores = true, legacyClass?: 'CUSTOM_DESCRIPTIVE' | 'STANDARD') {
   const f = fixture(1), source = getScaleInstrumentSource('adexi_v1', '2.0.0')!, executable = source.executable!, golden = executable.goldenCases[0]
-  const result = buildScaleResult({scaleId: 'scale', instrumentKey: source.identity.instrumentKey, name: 'Scale', instrumentVersion: source.identity.instrumentVersion,
+  const instrumentKey = legacyClass ? 'training_custom_fixture' : source.identity.instrumentKey
+  const result = buildScaleResult({scaleId: 'scale', instrumentKey, name: 'Scale', instrumentVersion: source.identity.instrumentVersion,
     definition: executable.definition, answers: golden.answers, referenceSets: []})
-  const runtime = createFrozenScaleRuntimeSnapshotV2FromV1(createFrozenScaleRuntimeSnapshot({instrumentKey: source.identity.instrumentKey, instrumentVersion: source.identity.instrumentVersion,
-    definition: executable.definition, frozenAt: new Date(publication)}), compileScalePolicy({...source, disclosure: {...source.disclosure!, audiences: {teacher: numericScores ? DISCLOSURE_PRESETS.SCORES() : DISCLOSURE_PRESETS.EDUCATIONAL_ONLY(), researcher: DISCLOSURE_PRESETS.FULL_REPORT()}}}))
-  const scale: any = {id: 'scale-item', type: 'SCALE', position: 1, required: true, scaleId: 'scale', scale: {id: 'scale', code: runtime.instrumentKey, instrumentVersion: runtime.instrumentVersion, instrumentClass: 'STANDARD'}}
+  const v1 = createFrozenScaleRuntimeSnapshot({instrumentKey, instrumentVersion: source.identity.instrumentVersion, definition: executable.definition, frozenAt: new Date(publication)})
+  const runtime = legacyClass ? v1 : createFrozenScaleRuntimeSnapshotV2FromV1(v1, compileScalePolicy({...source, disclosure: {...source.disclosure!, audiences: {teacher: numericScores ? DISCLOSURE_PRESETS.SCORES() : DISCLOSURE_PRESETS.EDUCATIONAL_ONLY(), researcher: DISCLOSURE_PRESETS.FULL_REPORT()}}}))
+  const scale: any = {id: 'scale-item', type: 'SCALE', position: 1, required: true, scaleId: 'scale', scale: {id: 'scale', code: runtime.instrumentKey, instrumentVersion: runtime.instrumentVersion, instrumentClass: legacyClass ?? 'STANDARD'}}
   f.task.items.push(scale)
   const slots = createFrozenActiveSlotSet({schemaVersion: 1, runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1, slots: [
     {slotKey: 'scale:scale-item', unitType: 'SCALE', required: true, sourceDefinitionIdentity: {key: runtime.instrumentKey, version: runtime.instrumentVersion, hash: runtime.sourceDefinitionHash}, sourceBinding: {compiledRuntimeHash: runtime.compiledRuntime.compiledRuntimeHash}},
@@ -176,6 +177,21 @@ describe('authorized Training numeric source adapter', () => {
     expect(f.db.assessmentUnitSnapshot.findMany).toHaveBeenCalledTimes(1)
     expect(f.db.assessmentUnitSnapshot.findMany.mock.calls[0][0].where.OR[0].slotKey.in).toEqual(['scale:scale-item'])
     expect(f.db.assessment.findMany.mock.calls[0][0].select).not.toHaveProperty('answers')
+  })
+  it('uses the authoritative custom class for V1 numeric policy without additional reads', async () => {
+    const f = scaleFixture(true, 'CUSTOM_DESCRIPTIVE')
+    expect(f.runtime.schemaVersion).toBe(1); expect(f.child).not.toHaveProperty('scale')
+    const result = await loadTrainingAnalysisSources(f.db, actor, f.selector)
+    expect(result.source.observations[0]).toMatchObject({value: f.result.scores[0].value, reason: null, measurement: {instrumentKey: f.runtime.instrumentKey}})
+    expect(f.db.assessment.findMany).toHaveBeenCalledTimes(1); expect(globalRead).not.toHaveBeenCalled()
+  })
+  it.each(['STANDARD', null])('keeps an unknown V1 identity with class %s denied', async instrumentClass => {
+    const f = scaleFixture(true, 'STANDARD'); f.task.items[1].scale.instrumentClass = instrumentClass
+    await expect(loadTrainingAnalysisSources(f.db, actor, f.selector)).rejects.toMatchObject({statusCode: 404})
+  })
+  it('rejects a mismatched authoritative Scale relation before policy resolution', async () => {
+    const f = scaleFixture(true, 'CUSTOM_DESCRIPTIVE'); f.task.items[1].scale.id = 'another-scale'
+    await expect(loadTrainingAnalysisSources(f.db, actor, f.selector)).rejects.toMatchObject({statusCode: 409})
   })
   it('educational-only Scale policies cannot become numeric analysis through course ownership', async () => {
     const f = scaleFixture(false)

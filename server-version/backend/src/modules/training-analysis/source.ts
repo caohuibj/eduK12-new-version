@@ -297,8 +297,13 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
               || runtime.compiledRuntime.compiledRuntimeHash !== core.compiledRuntimeHash || runtime.instrumentKey !== core.instrumentKey
               || runtime.instrumentVersion !== core.instrumentVersion || runtime.sourceDefinitionHash !== core.sourceDefinitionHash || result.instrument.code !== runtime.instrumentKey
               || result.instrument.instrumentVersion !== runtime.instrumentVersion || result.method.definitionHash !== runtime.legacyDefinitionHash
-              || result.method.scoringVersion !== core.scorerVersion || result.instrument.scaleId !== child.scaleId || child.scaleId !== item.scaleId) invalid('量表冻结运行时或评分版本不一致')
-            const policy = resolveProjectionPolicyForAssessment(child, result, runtime)
+              || result.method.scoringVersion !== core.scorerVersion || result.instrument.scaleId !== child.scaleId || child.scaleId !== item.scaleId || item.scale?.id !== child.scaleId) invalid('量表冻结运行时或评分版本不一致')
+            // V1 compatibility needs the explicitly authoritative Scale class.
+            // Preserve frozen scientific identity; do not infer a custom class
+            // from an unregistered instrument or replace a V2 frozen policy.
+            const policy = resolveProjectionPolicyForAssessment({...child, scale: {
+              code: runtime.instrumentKey, instrumentVersion: runtime.instrumentVersion, instrumentClass: item.scale.instrumentClass,
+            }}, result, runtime)
             const capability = resolveEffectiveScaleDisclosure(createScaleProjectionContext({instrumentKey: runtime.instrumentKey, instrumentVersion: runtime.instrumentVersion,
               audience: 'teacher', purpose: 'export', principalId: actor.userId, frozenPolicy: policy.policy}))
             if (policy.snapshotError || !capability.numericScores) unavailable()
