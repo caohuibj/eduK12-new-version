@@ -36,7 +36,7 @@ const responseError = (response: ApiResponse<unknown>) => Object.assign(new Erro
 const readAnswer = (value: unknown): Answer => typeof value === 'object' && value !== null && 'responseValue' in value
   ? value as Answer : { responseValue: value as string | number }
 
-export default function WholeCompositeQuestionnaire({ state, api, publicMode = false, recoveryToken, fallback, onExit, onCompleted }: Props) {
+function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, recoveryToken, fallback, onExit, onCompleted }: Props) {
   const draftKey = wholeDraftKey(state.id, state.attemptEpoch ?? 1)
   const [definition, setDefinition] = useState<WholeQuestionnaireDefinition | null>(null)
   const [meta, setMeta] = useState<FinalDraftMeta | null>(null)
@@ -260,4 +260,11 @@ export default function WholeCompositeQuestionnaire({ state, api, publicMode = f
           </AssessmentImageGate>
         </div> : <button type="button" className="btn-secondary min-h-11" onClick={() => setLoadRound(prior => prior + 1)}>重新加载整卷草稿</button>}
   </AssessmentShell>
+}
+
+/** Conditional paths must submit only the current accepted unit, even if a
+ * stale whole-questionnaire draft happens to exist in this browser. */
+export default function WholeCompositeQuestionnaire(props: Props) {
+  if (props.state.trainingFlow) return <>{props.fallback}</>
+  return <WholeCompositeQuestionnaireRunner {...props} />
 }

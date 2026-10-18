@@ -1,3 +1,4 @@
+import { lockTrainingFlowFinalAdmission, requiresTrainingFlowFinalLock } from '../composite/training-variant-child-scope'
 import { encryptCompactCognitivePayload } from './cognitive.security'
 import { sharedControlWritesEnabled } from '../assessment-runtime/shared-control-records'
 import { createHash } from 'node:crypto'
@@ -307,6 +308,12 @@ export const submitUnifiedCognitiveSessionFinal = async (
   if (child.status === 'COMPLETED') {
     const replay = assertSubmissionReplay(child, submissionId, prepared.payloadHash)
     if (replay === 'replay') {
+      if (requiresTrainingFlowFinalLock(child.compositeAttemptId, child.compositeAttempt)) {
+        await withFinalOnlyCompletionTransaction(async tx => {
+          const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, { attemptId: child.compositeAttemptId, parent: child.compositeAttempt, attemptEpoch: input.attemptEpoch, itemId: child.compositeItemId, sourceAttemptId: child.id, submissionId })
+          assertFlowFinal(true)
+        })
+      }
       if (!child.resultSnapshotEncrypted) throw new Error('Completed Cognitive session result snapshot is missing')
       const snapshot = parseCognitiveResultSnapshot(
         decryptCognitivePayload<unknown>(child.resultSnapshotEncrypted),
@@ -437,6 +444,7 @@ export const submitUnifiedCognitiveSessionFinal = async (
   }))
 
   const committed = await withFinalOnlyCompletionTransaction(async (tx) => {
+    const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, { attemptId: child.compositeAttemptId, parent: child.compositeAttempt, attemptEpoch: input.attemptEpoch, itemId: child.compositeItemId, sourceAttemptId: child.id, submissionId })
     const current = await tx.cognitiveSession.findUnique({
       where: { id: input.sessionId },
       select: {
@@ -465,6 +473,7 @@ export const submitUnifiedCognitiveSessionFinal = async (
     }
     const replay = assertSubmissionReplay(current, submissionId, prepared.payloadHash)
     if (replay === 'replay' && current.status === 'COMPLETED') {
+      assertFlowFinal(true)
       if (!current.resultSnapshotEncrypted) throw new Error('Completed Cognitive session result snapshot is missing')
       const stored = parseCognitiveResultSnapshot(decryptCognitivePayload<unknown>(current.resultSnapshotEncrypted))
       return { replayed: true, response: responseFromSnapshot(current.id, stored) }
@@ -473,6 +482,7 @@ export const submitUnifiedCognitiveSessionFinal = async (
       throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '认知测评已结束，请重试', 409)
     }
 
+    assertFlowFinal(false)
     try {
       await tx.cognitiveRawSubmission.create({
         data: {

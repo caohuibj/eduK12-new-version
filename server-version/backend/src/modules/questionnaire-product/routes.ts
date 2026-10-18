@@ -33,6 +33,7 @@ router.post('/:id/items/:itemId/remove', handle(req => service.removeItem(req.us
 router.post('/:id/form-sections/:sectionId/remove', handle(req => service.removeEmptySection(req.user!, req.params.id, req.params.sectionId, req.body)))
 router.post('/:id/reorder', handle(req => service.reorder(req.user!, req.params.id, req.body)))
 router.post('/:id/training-variants', handle(req => service.updateTrainingVariants(req.user!, req.params.id, req.body)))
+router.post('/:id/training-flow', handle(req => service.updateTrainingFlow(req.user!, req.params.id, req.body)))
 router.post('/:id/timing-export-policy', handle(req => service.updateTimingExport(req.user!, req.params.id, req.body)))
 router.post('/:id/publish', handle(req => service.publish(req.user!, req.params.id, req.body)))
 router.post('/:id/preflight', handle(req => service.preflight(req.user!, req.params.id, req.body)))

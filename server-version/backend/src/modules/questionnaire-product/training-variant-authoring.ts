@@ -9,8 +9,9 @@ export async function assertTrainingVariantAuthoringScope(tx: Prisma.Transaction
     || row.reportPackageKey || row.analysisProtocolKey || row.bundleInstance
     || row.deliveryPolicy || row.selectionPolicy || row.routingPolicy || row.randomizationPolicy
     || row.assignmentRef || row.anonymousStudy || row.anonymousStudyId
+    || row.trainingFlowDraft != null || row.trainingFlowFrozen != null || row.trainingFlowDigest != null
     || typeof row.createdBy !== 'string' || !row.createdBy) {
-    throw compositeBadRequest('加权随机分组仅支持 Training 课程普通问卷，不能组合报告包、研究波次或其他投放策略')
+    throw compositeBadRequest('加权随机分组仅支持 Training 课程普通问卷，不能组合跨工具流程、报告包、研究波次或其他投放策略')
   }
   if (!Number.isInteger(row.maxAttempts) || row.maxAttempts < 1 || row.maxAttempts > 100) {
     throw compositeBadRequest('加权随机分组的每人作答次数必须为 1–100 次；取消作答也消耗一次')

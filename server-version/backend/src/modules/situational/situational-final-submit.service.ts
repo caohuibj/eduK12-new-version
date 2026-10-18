@@ -1,3 +1,4 @@
+import { lockTrainingFlowFinalAdmission, requiresTrainingFlowFinalLock } from '../composite/training-variant-child-scope'
 import { onlineSituationalTaskSatisfied, SJT_ONLINE_PROTOCOL_FLAG, SJT_ONLINE_UNSATISFIED_FLAG } from './situational-task-satisfaction'
 import { normalizeSjtOnlineResponses } from './authoring/online'
 import { situationalLegacyFinalSubmitSchema, situationalOnlineFinalSubmitSchema } from './situational-final-submit.schema'
@@ -272,6 +273,12 @@ const persistSituationalAttemptFinal = async (
 
   if (row.status === 'COMPLETED') {
     if (assertSubmissionReplay(row, submissionId, payloadHash) === 'replay') {
+      if (requiresTrainingFlowFinalLock(row.compositeAttemptId, row.compositeAttempt)) {
+        await withFinalOnlyCompletionTransaction(async tx => {
+          const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, { attemptId: row.compositeAttemptId, parent: row.compositeAttempt, attemptEpoch: input.attemptEpoch, itemId: row.compositeItemId, sourceAttemptId: row.id, submissionId })
+          assertFlowFinal(true)
+        })
+      }
       return {
         data: situationalAttemptForResponse(row, snapshot, { replayed: true }),
         parentAttemptId: embedded?.compositeAttemptId ?? null,
@@ -326,6 +333,7 @@ const persistSituationalAttemptFinal = async (
 
   const committed = await withFinalOnlyCompletionTransaction(async (tx) => {
     if (embedded) await lockEmbeddedCompositeAttempt(tx, embedded.compositeAttemptId)
+    const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, { attemptId: row.compositeAttemptId, parent: row.compositeAttempt, attemptEpoch: input.attemptEpoch, itemId: row.compositeItemId, sourceAttemptId: row.id, submissionId, parentLocked: Boolean(embedded) })
     await lockSituationalAttempt(tx, input.attemptId)
     const current = await transactionRow(tx, input.attemptId)
     if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评记录不存在', 404)
@@ -342,11 +350,13 @@ const persistSituationalAttemptFinal = async (
 
     if (current.status === 'COMPLETED') {
       if (assertSubmissionReplay(current, submissionId, payloadHash) === 'replay') {
+        assertFlowFinal(true)
         return { kind: 'replay' as const, row: current }
       }
       throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', 'submissionId 已用于其他提交内容', 409)
     }
 
+    assertFlowFinal(false)
     const update = await tx.situationalAttempt.updateMany({
       where: {
         id: input.attemptId,

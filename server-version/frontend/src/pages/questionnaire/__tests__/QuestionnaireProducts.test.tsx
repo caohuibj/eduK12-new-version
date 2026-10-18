@@ -291,3 +291,44 @@ it('shows typed export actions from the actual nested teacher form DTO',async()=
   api.get.mockImplementation(async path=>({code:0,data:path.endsWith('/resources')?{scales:[],cognitive:[],situational:[],courses:[]}:row}))
   mount('typed-export');expect(await screen.findByRole('button',{name:'完整表单与字段字典（ZIP）'})).toBeTruthy();expect(screen.getByText(/暂不支持 SAV/)).toBeTruthy()
 })
+
+describe('C19 Training conditional flow authoring', () => {
+  const section = { id: 'section-1', title: '筛选', position: 0, contextSection: false, items: [{ id: 'form-1', type: 'FORM', formLabel: '资格', formDefinition: { itemKey: 'eligible', type: 'SINGLE', prompt: '资格', options: [{ optionKey: 'yes', label: '是' }, { optionKey: 'no', label: '否' }], rows: [], required: true } }] }
+  const row = { name: '课程条件流程', status: 'DRAFT', productKind: 'QUESTIONNAIRE', revision: 7, questionnaireType: 'COURSE', questionnaireCourses: [{ courseId: 'training-course' }], items: [{ id: 'scale-1', type: 'SCALE', position: 1, required: true, scale: { name: '量表' } }], formSections: [section], publicEnabled: false, trainingFlowDraft: null }
+  beforeEach(() => {
+    vi.resetAllMocks()
+    api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? { scales: [], cognitive: [], situational: [], courses: [{ id: 'training-course', title: 'Training 课程', courseType: 'TRAINING_COURSE', isLibrary: false }] } : row }))
+  })
+  it('saves with the latest revision after metadata and blocks publication until successful', async () => {
+    api.put.mockImplementation(async (_path, body) => ({ code: 0, data: { ...row, name: body.name, revision: 8 } }))
+    api.post.mockImplementation(async (_path, body) => ({ code: 0, data: { ...row, name: '已改名', revision: 9, trainingFlowDraft: body.config } }))
+    mount('flow')
+    const user = userEvent.setup()
+    await user.click(await screen.findByRole('checkbox', { name: '启用跨工具条件流程' }))
+    fireEvent.change(screen.getByLabelText('测评名称'), { target: { value: '已改名' } })
+    expect(screen.getByRole('button', { name: '发布组合测评' })).toBeDisabled()
+    await user.click(screen.getByRole('button', { name: '添加条件结束模板' }))
+    await user.click(screen.getByRole('button', { name: '添加材料模板' }))
+    await user.click(screen.getByRole('button', { name: '保存流程设置' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith('/questionnaire-products/flow/training-flow', { revision: 8, config: expect.objectContaining({ schemaVersion: 1, blocks: expect.arrayContaining([expect.objectContaining({ kind: 'END', termination: 'SCREEN_OUT' }), expect.objectContaining({ kind: 'MATERIAL' })]) }) }))
+    await waitFor(() => expect(screen.getByRole('button', { name: '发布组合测评' })).toBeEnabled())
+  })
+  it('focuses invalid flow JSON and keeps unsaved edits after server conflict', async () => {
+    mount('flow')
+    const user = userEvent.setup()
+    await user.click(await screen.findByRole('checkbox', { name: '启用跨工具条件流程' }))
+    const input = screen.getByLabelText('流程 JSON（高级编辑）')
+    const valid = (input as HTMLTextAreaElement).value
+    fireEvent.change(input, { target: { value: '{broken' } })
+    await user.click(screen.getByRole('button', { name: '保存流程设置' }))
+    expect(input).toHaveFocus()
+    expect(input).toHaveAttribute('aria-invalid', 'true')
+    expect(api.post).not.toHaveBeenCalled()
+    fireEvent.change(input, { target: { value: valid } })
+    api.post.mockRejectedValue(new Error('草稿修订号已变化，请重新读取'))
+    await user.click(screen.getByRole('button', { name: '保存流程设置' }))
+    await waitFor(() => expect(screen.getAllByText('草稿修订号已变化，请重新读取').length).toBeGreaterThan(0))
+    expect(input).toHaveValue(valid)
+    expect(screen.getByRole('button', { name: '发布组合测评' })).toBeDisabled()
+  })
+})

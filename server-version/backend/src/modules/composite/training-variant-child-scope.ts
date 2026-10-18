@@ -1,6 +1,9 @@
 import { prisma } from '../../config/database'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import { applyTrainingAttemptScope, resolveTrainingAttemptScope } from './training-variant-scope'
+import { resolveTrainingFlowScope, trainingFlowMarkerState } from './training-flow-scope'
+import { trainingFlowItemKey, trainingFlowUnitKey } from '../assessment-core/flow/training'
+import { compositeItemSlotKey, formSectionSlotKey } from '../assessment-runtime/slot-set'
 
 import {
   TRAINING_VARIANT_DEFINITION_MARKER_SELECT,
@@ -28,7 +31,7 @@ export const loadTrainingChildParent = async (attemptId: string, parent?: any, d
   const cached = parent && loadedParents.get(parent)
   if (cached) return cached
   let loaded = trainingVariantMarkerState(parent) !== 'UNKNOWN' ? parent : await db.compositeAssessmentAttempt.findUnique({
-    where: { id: attemptId }, select: TRAINING_VARIANT_PARENT_MARKER_SELECT,
+    where: { id: attemptId }, select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, userId: true, recoveryTokenHash: true },
   })
   if (!loaded) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '上级测评记录不存在', 404)
   requireKnownMarkers(loaded)
@@ -44,11 +47,83 @@ export const loadTrainingChildParent = async (attemptId: string, parent?: any, d
   return loaded
 }
 
+/** Authorize before resolving a flow, which can expand accepted answer facts. */
+export const assertTrainingFormFinalPrincipal = (
+  parent: any,
+  input: { userId?: string | null; recoveryTokenHash?: string },
+): void => {
+  if (input.userId != null && parent?.userId === input.userId) return
+  if (input.userId == null && parent?.userId === null && input.recoveryTokenHash
+    && parent.recoveryTokenHash === input.recoveryTokenHash) return
+  throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权限操作此综合测评', 403)
+}
+
+/** Only explicit, complete null markers permit the unchanged legacy fast path. */
+export const requiresTrainingFlowFinalLock = (attemptId: string | null | undefined, parent: any): boolean => {
+  if (!attemptId) return false
+  const known = parent && (loadedParents.get(parent) ?? parent)
+  if (known?.id !== attemptId) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '子单元与上级测评身份不匹配', 409)
+  requireKnownMarkers(known)
+  return trainingFlowMarkerState(known) === 'FLOW'
+}
+
+type TrainingFlowFinalTarget = {
+  attemptId?: string | null
+  parent?: any
+  attemptEpoch: number
+  itemId?: string | null
+  sectionId?: string
+  sourceAttemptId: string
+  submissionId: string
+  /** The SJT path already holds this parent lock, including for legacy rows. */
+  parentLocked?: boolean
+}
+
+/** Parent -> child -> outbox. Never reuse a pre-lock graph or fact projection.
+ * Call the returned assertion after the child's existing replay validation and
+ * before its first mutation. Historical accepted units are replay-only.
+ */
+export const lockTrainingFlowFinalAdmission = async (
+  tx: any,
+  input: TrainingFlowFinalTarget,
+): Promise<(replayed: boolean) => void> => {
+  if (!requiresTrainingFlowFinalLock(input.attemptId, input.parent)) return () => undefined
+  if (!input.parentLocked) {
+    const rows = await tx.$queryRaw`SELECT "id" FROM "composite_assessment_attempts" WHERE "id" = ${input.attemptId} FOR UPDATE`
+    if (!rows[0]) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '上级测评记录不存在', 404)
+  }
+  const parent = await tx.compositeAssessmentAttempt.findUnique({
+    where: { id: input.attemptId },
+    include: { compositeAssessment: { include: { items: true, formSections: { include: { items: true } } } } },
+  })
+  if (!parent) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '上级测评记录不存在', 404)
+  requireKnownMarkers(parent)
+  if (parent.id !== input.attemptId || parent.attemptEpoch !== input.attemptEpoch || trainingFlowMarkerState(parent) !== 'FLOW') {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '流程测评来源或轮次已变化', 409)
+  }
+  const scope = await resolveTrainingFlowScope(parent, parent.compositeAssessment, { db: tx })
+  if (!scope) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '流程来源缺失', 409)
+  const item = !input.sectionId && parent.compositeAssessment.items.find((candidate: any) => candidate.id === input.itemId && candidate.type !== 'FORM')
+  const section = input.sectionId && parent.compositeAssessment.formSections.find((candidate: any) => candidate.id === input.sectionId)
+  if (!item && !section) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '流程单元不存在', 404)
+  const key = section ? trainingFlowUnitKey(section.id) : trainingFlowItemKey(item.id)
+  const slotKey = section ? formSectionSlotKey(section.id) : compositeItemSlotKey(item.id, item.type)
+  return (replayed: boolean): void => {
+    if (replayed) {
+      const accepted = scope.snapshots.find((row: any) => row.slotKey === slotKey)
+      if (scope.executedSlotKeys.has(slotKey) && accepted?.sourceAttemptId === input.sourceAttemptId
+        && accepted.sourceSubmissionId === input.submissionId) return
+    } else if (parent.status === 'IN_PROGRESS' && !scope.terminal && scope.path.currentInstrumentKey === key
+      && scope.reachedSlotKeys.has(slotKey) && !scope.executedSlotKeys.has(slotKey)) return
+    throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '当前流程不允许提交此测评单元', 409)
+  }
+}
+
 const scopedParent = async (parent: any, db: any): Promise<{ parent: any; scope: Awaited<ReturnType<typeof resolveTrainingAttemptScope>> | null }> => {
   requireKnownMarkers(parent)
   if (trainingVariantMarkerState(parent) === 'LEGACY') return { parent, scope: null }
-  const scope = await resolveTrainingAttemptScope(parent, parent.compositeAssessment, { db })
-  return { parent: await applyTrainingAttemptScope(parent, { db }), scope }
+  const projected = await applyTrainingAttemptScope(parent, { db })
+  return { parent: projected, scope: projected.trainingVariantScope }
 }
 
 export const assertTrainingChildSelected = async (

@@ -1,4 +1,4 @@
-import { assertTrainingSectionSelected, TRAINING_VARIANT_DEFINITION_MARKER_SELECT, TRAINING_VARIANT_PARENT_MARKER_SELECT } from './training-variant-child-scope'
+import { assertTrainingFormFinalPrincipal, assertTrainingSectionSelected, TRAINING_VARIANT_DEFINITION_MARKER_SELECT, TRAINING_VARIANT_PARENT_MARKER_SELECT } from './training-variant-child-scope'
 import { Prisma } from '@prisma/client'
 import { normalizeTypedCompositeFormAnswer, normalizeTypedCompositeSection, validateTypedCompositeSectionDefinition, legacyFormValueProjection, type TypedFormValue } from '../assessment-runtime/typed-form'
 import { v4 as uuidv4 } from 'uuid'
@@ -472,10 +472,11 @@ const submitCompositeFormSectionFinalImpl = async (input: SectionSubmitInput) =>
   const submissionId = validateSubmissionId(input.submissionId)
   const route = await measureRequestPhase('final_submit_admission', () => prisma.compositeAssessmentAttempt.findUnique({
     where: { id: input.attemptId },
-    select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, runtimeGeneration: true,
+    select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, userId: true, recoveryTokenHash: true, runtimeGeneration: true,
       compositeAssessment: { select: { ...TRAINING_VARIANT_DEFINITION_MARKER_SELECT, bundleInstance: true } } },
   }))
   if (!route) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评记录不存在', 404)
+  assertTrainingFormFinalPrincipal(route, input)
   const selectedParent = await assertTrainingSectionSelected(input.attemptId, input.sectionId, { parent: route })
   if (route.runtimeGeneration === 'UNIFIED_V1') {
     const { submitUnifiedCompositeFormSectionFinal } = await import('../assessment-runtime/unified-form-section-final-submit.service')

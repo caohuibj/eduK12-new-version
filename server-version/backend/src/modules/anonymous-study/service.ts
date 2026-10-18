@@ -65,8 +65,7 @@ export async function addWave(userId:string,role:UserRole,studyId:string, input:
 }
 async function insertWave(tx:Db,userId:string,studyId:string,input:{compositeId:string;tokenId:string;title:string},id:string,token:string) {
     await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${input.compositeId} FOR UPDATE`
-    const variant=await tx.compositeAssessment.findUnique({where:{id:input.compositeId},select:{trainingVariantDraft:true,trainingVariantFrozen:true}})
-    if(variant?.trainingVariantDraft!=null||variant?.trainingVariantFrozen!=null)throw compositeBadRequest('概率分卷暂不能与匿名研究波次组合')
+    await assertWaveCompatibleDefinition(tx,input.compositeId)
     await tx.$queryRaw`SELECT id FROM anonymous_studies WHERE id=${studyId} FOR UPDATE`
     const study=await currentOwner(tx,userId,studyId)
     if(study.status!=='ACTIVE') throw compositeForbidden('研究已结束')
@@ -84,6 +83,15 @@ async function insertWave(tx:Db,userId:string,studyId:string,input:{compositeId:
     await tx.$executeRaw`INSERT INTO anonymous_study_waves(id,study_id,access_token_id,title,ordinal) VALUES(${id},${studyId},${input.tokenId},${input.title},${ordinal})`
     return {id,studyId,title:input.title,ordinal,tokenId:input.tokenId,entryPath:`/public/studies/waves/${id}/${encodeURIComponent(token)}`}
 }
+async function assertWaveCompatibleDefinition(tx:Db,id:string) {
+  const definition=await tx.compositeAssessment.findUnique({where:{id},select:{
+    trainingVariantDraft:true,trainingVariantFrozen:true,trainingVariantDigest:true,
+    trainingFlowDraft:true,trainingFlowFrozen:true,trainingFlowDigest:true,
+  }})
+  if(!definition) return hidden()
+  if(definition.trainingVariantDraft!=null||definition.trainingVariantFrozen!=null||definition.trainingVariantDigest!=null)throw compositeBadRequest('概率分卷暂不能与匿名研究波次组合')
+  if(definition.trainingFlowDraft!=null||definition.trainingFlowFrozen!=null||definition.trainingFlowDigest!=null)throw compositeBadRequest('跨工具流程暂不能与匿名研究波次组合')
+}
 /** One durable request creates both objects or neither. A lost response can
  * replay the same UUID without consuming another link or wave ordinal. */
 export async function createWaveWithLink(userId:string,role:UserRole,studyId:string,input:{requestId:string;compositeId:string;title:string;expiresAt:string;maxUses:number}) {
@@ -91,9 +99,12 @@ export async function createWaveWithLink(userId:string,role:UserRole,studyId:str
   if(!Number.isFinite(parsedExpiry.getTime())) throw compositeBadRequest('请选择有效的波次有效期')
   const expiresAt=parsedExpiry.toISOString()
   return prisma.$transaction(async tx=>{
+    // Match addWave and authoring: parent definition precedes study/token locks.
+    await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${input.compositeId} FOR UPDATE`
     await tx.$queryRaw`SELECT id FROM anonymous_studies WHERE id=${studyId} FOR UPDATE`
     const study=await currentOwner(tx,userId,studyId)
     if(study.status!=='ACTIVE') throw compositeForbidden('研究已结束')
+    await assertWaveCompatibleDefinition(tx,input.compositeId)
     const previous=await tx.$queryRaw<Array<{studyId:string;compositeId:string;title:string;ordinal:number;tokenId:string;token:string|null;tokenEncrypted:string|null;expiresAt:Date;maxUses:number}>>`
       SELECT w.study_id AS "studyId",t.composite_assessment_id AS "compositeId",w.title,w.ordinal,t.id AS "tokenId",t.token,t.token_encrypted AS "tokenEncrypted",t.expires_at AS "expiresAt",t.max_uses AS "maxUses"
       FROM anonymous_study_waves w JOIN composite_assessment_access_tokens t ON t.id=w.access_token_id WHERE w.id=${input.requestId}
@@ -105,7 +116,6 @@ export async function createWaveWithLink(userId:string,role:UserRole,studyId:str
       if(!token) return hidden()
       return {id:input.requestId,studyId,title:row.title,ordinal:row.ordinal,tokenId:row.tokenId,entryPath:`/public/studies/waves/${input.requestId}/${encodeURIComponent(token)}`}
     }
-    await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${input.compositeId} FOR UPDATE`
     const token=await composite.createAccessTokenForComposite(userId,role,input.compositeId,expiresAt,input.maxUses,tx)
     await composite.getPublicCompositeInfo(token.token,tx)
     return insertWave(tx,userId,studyId,{compositeId:input.compositeId,tokenId:token.id,title:input.title},input.requestId,token.token)

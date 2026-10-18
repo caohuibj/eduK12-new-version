@@ -96,8 +96,8 @@ export async function courseOverview(actor: Actor, courseId: string, raw: unknow
     { compositeAttempt: { assignmentRef: null, compositeAssessment: { ...creatorScope, courseId, productKind: 'LEGACY_COMPOSITE', reportPackageKey: null, analysisProtocolKey: null } } },
   ] }, select: { id: true, status: true, finishedAt: true, resultSnapshotEncrypted: true, assignment: { select: { id: true, title: true } }, user: { select: { nickname: true, username: true } }, compositeAttemptId: true, compositeItemId: true, attemptNo: true,
     compositeAttempt: { select: { id: true, compositeAssessmentId: true, status: true, attemptEpoch: true, participantKey: true, runtimeGeneration: true, deliveryMode: true,
-      trainingVariantAllocationEncrypted: true, trainingVariantAllocationHash: true, frozenActiveSlotSetEncrypted: true, frozenActiveSlotSetHash: true,
-      compositeAssessment: { select: { id: true, trainingVariantDraft: true, trainingVariantFrozen: true, trainingVariantDigest: true } },
+      trainingVariantAllocationEncrypted: true, trainingFlowSnapshotEncrypted:true,trainingFlowSnapshotHash:true,trainingFlowPathEncrypted:true,trainingFlowPathHash:true,trainingVariantAllocationHash:true, frozenActiveSlotSetEncrypted: true, frozenActiveSlotSetHash: true,
+      compositeAssessment: { select: { id: true, trainingVariantDraft: true, trainingVariantFrozen: true, trainingFlowDraft:true,trainingFlowFrozen:true,trainingFlowDigest:true,trainingVariantDigest:true } },
     } } }, orderBy: [{ createdAt: 'desc' }, { id: 'asc' }], skip: (page - 1) * pageSize, take: pageSize + 1 })
   const variantParents = new Map<string, any>()
   for (const session of sessions) {

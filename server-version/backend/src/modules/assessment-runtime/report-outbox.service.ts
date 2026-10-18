@@ -6,6 +6,7 @@ import type { WholeReceiptExecution } from '../composite/whole-questionnaire.ser
 import { randomUUID } from 'node:crypto'
 import { loadFrozenActiveSlotSet } from './slot-set'
 import { evaluateCompleteness } from './unified-aggregate'
+import { resolveTrainingFlowScope } from '../composite/training-flow-scope'
 import type { CompositeReportJob, Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { acceptsAsyncCompositeReport, assessmentReportConfig } from '../../config/assessmentReports'
@@ -13,11 +14,14 @@ import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit
 import { QuestionnaireCompletionAdmissionBusyError } from '../../services/questionnaireCompletionAdmission'
 
 export const REPORT_PARENT_SELECT = {
+  trainingFlowSnapshotEncrypted: true, trainingFlowSnapshotHash: true,
+  trainingFlowPathEncrypted: true, trainingFlowPathHash: true,
   id: true, status: true, progress: true, completedAt: true, attemptEpoch: true, taskSatisfaction: true,
   asyncReportEpoch: true, deliveryMode: true, runtimeGeneration: true,
   frozenActiveSlotSetHash: true, contextSnapshotHash: true, aggregateInputHash: true,
   assignmentRef: true, deliveryCourseId: true,
-  compositeAssessment: { select: { productKind: true, reportPackageKey: true, analysisProtocolKey: true } },
+  compositeAssessment: { select: { productKind: true, reportPackageKey: true, analysisProtocolKey: true,
+    trainingFlowDraft: true, trainingFlowFrozen: true, trainingFlowDigest: true } },
 } as const
 
 /** A lost processing lease never cancels an already accepted answer receipt. */
@@ -104,12 +108,24 @@ export const enqueueCompositeReportForUnit = async (
     if (!rows.length) throw new ReportProcessingLeaseLostError()
     return rows[0].id
   }
-  const parent = await tx.compositeAssessmentAttempt.findUnique({
+  let parent: any = await tx.compositeAssessmentAttempt.findUnique({
     where: { id: input.compositeAttemptId }, select: { ...REPORT_PARENT_SELECT, frozenActiveSlotSetEncrypted: true },
   })
   if (!parent || (parent.asyncReportEpoch !== parent.attemptEpoch && !acceptsAsyncCompositeReport(parent))) return null
   if (parent.status !== 'IN_PROGRESS' || parent.attemptEpoch !== input.attemptEpoch || !parent.frozenActiveSlotSetHash) {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '报告任务与交卷版本不匹配', 409)
+  }
+  if (hasTrainingFlow(parent)) {
+    // Flow FINAL callers hold this lock before inserting their snapshot. Keep
+    // the parent -> job -> budget ordering explicit at this boundary too.
+    await tx.$queryRaw`SELECT "id" FROM "composite_assessment_attempts" WHERE "id" = ${parent.id} FOR UPDATE`
+    parent = await tx.compositeAssessmentAttempt.findUnique({ where: { id: parent.id }, include: {
+      compositeAssessment: { include: { items: true, formSections: { include: { items: true } } } },
+      formSectionAttempts: true,
+    } })
+    if (!parent || parent.status !== 'IN_PROGRESS' || parent.attemptEpoch !== input.attemptEpoch) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '流程报告任务与交卷状态不匹配', 409)
+    }
   }
   const id = await enqueueBoundReport(tx, parent, true)
   if (parent.asyncReportEpoch !== parent.attemptEpoch) {
@@ -123,7 +139,12 @@ export const enqueueCompositeReportForUnit = async (
   return id
 }
 
-type BoundReportParent = { id: string; attemptEpoch: number; frozenActiveSlotSetHash: string | null; contextSnapshotHash: string | null; frozenActiveSlotSetEncrypted?: string | null }
+type BoundReportParent = { id: string; attemptEpoch: number; frozenActiveSlotSetHash: string | null; contextSnapshotHash: string | null; frozenActiveSlotSetEncrypted?: string | null;
+  trainingFlowSnapshotEncrypted?: string | null; trainingFlowSnapshotHash?: string | null;
+  trainingFlowPathEncrypted?: string | null; trainingFlowPathHash?: string | null; compositeAssessment?: any }
+
+const hasTrainingFlow = (parent: BoundReportParent): boolean => [parent.trainingFlowSnapshotEncrypted,
+  parent.trainingFlowSnapshotHash, parent.trainingFlowPathEncrypted, parent.trainingFlowPathHash].some(value => value != null)
 
 const enqueueBoundReport = async (tx: Prisma.TransactionClient, parent: BoundReportParent, waitForCompletedUnits = false): Promise<string> => {
   if (!parent.frozenActiveSlotSetHash) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '报告任务冻结单元缺失', 409)
@@ -159,12 +180,17 @@ const enqueueBoundReport = async (tx: Prisma.TransactionClient, parent: BoundRep
       if (slots.snapshotHash !== parent.frozenActiveSlotSetHash || slots.attemptEpoch !== parent.attemptEpoch) {
         throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '报告冻结单元绑定不匹配', 409)
       }
+      const flowEnabled = hasTrainingFlow(parent)
       const headers = await tx.assessmentUnitSnapshot.findMany({
         where: { compositeAttemptId: parent.id, attemptEpoch: parent.attemptEpoch },
-        select: { slotKey: true, attemptEpoch: true, unitType: true, terminalState: true,
-          payloadKind: true, sourceType: true, sourceAttemptId: true },
+        ...(flowEnabled ? {} : { select: { slotKey: true, attemptEpoch: true, unitType: true, terminalState: true,
+          payloadKind: true, sourceType: true, sourceAttemptId: true } }),
       })
-      const completeness = evaluateCompleteness({ slots: slots.slots, snapshots: headers, attemptEpoch: parent.attemptEpoch })
+      const scope = flowEnabled ? await resolveTrainingFlowScope(parent, parent.compositeAssessment,
+        { db: tx, snapshotRows: headers, frozenSlots: slots }) : null
+      if (flowEnabled && !scope) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '流程报告冻结路径缺失', 409)
+      const completeness = evaluateCompleteness({ slots: slots.slots, snapshots: headers,
+        attemptEpoch: parent.attemptEpoch, pathPolicy: scope?.aggregatePathPolicy })
       if (completeness.invalidSlotKeys.length) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '报告单元快照不匹配', 409)
       if (!completeness.ready) return job.id
     }

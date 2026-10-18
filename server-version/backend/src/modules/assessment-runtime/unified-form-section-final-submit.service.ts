@@ -1,4 +1,4 @@
-import { assertTrainingSectionSelected } from '../composite/training-variant-child-scope'
+import { assertTrainingSectionSelected, loadTrainingChildParent, assertTrainingFormFinalPrincipal, lockTrainingFlowFinalAdmission } from '../composite/training-variant-child-scope'
 import { createHash } from 'node:crypto'
 import type { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -297,7 +297,9 @@ export const submitUnifiedCompositeFormSectionFinal = async (
   selectedParent?: unknown,
 ) => {
   const submissionId = validateSubmissionId(input.submissionId)
-  const parent = await assertTrainingSectionSelected(input.attemptId, input.sectionId, { parent: selectedParent })
+  const principalParent = await loadTrainingChildParent(input.attemptId, selectedParent)
+  assertTrainingFormFinalPrincipal(principalParent, input)
+  const parent = await assertTrainingSectionSelected(input.attemptId, input.sectionId, { parent: principalParent })
   const child = await ensureCompositeSectionAttempt(input.attemptId, input.sectionId, input.attemptEpoch, parent)
   const admission = await measureRequestPhase('final_submit_admission', () => activateStoredOrCatalogCompositeFormAdmission({
     parentId: input.attemptId,
@@ -330,6 +332,9 @@ export const submitUnifiedCompositeFormSectionFinal = async (
   void _parent
 
   const committed = await measureRequestPhase('final_submit_db_query', () => withCompositeFormUnitTransaction(async (tx) => {
+    const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, {
+      attemptId: input.attemptId, parent, attemptEpoch: input.attemptEpoch, sectionId: input.sectionId, sourceAttemptId: child.id, submissionId,
+    })
     const currentSection = await tx.compositeFormSectionAttempt.findUnique({
       where: { id: child.id },
       select: {
@@ -348,9 +353,11 @@ export const submitUnifiedCompositeFormSectionFinal = async (
     }
     const replay = assertSubmissionReplay(currentSection, submissionId, payloadHash)
     if (replay === 'replay' && currentSection.status === 'COMPLETED') {
+      assertFlowFinal(true)
       return { replayed: true, sectionAttemptId: currentSection.id, contextSnapshotHash: admission.contextSnapshotHash }
     }
     if (currentSection.status !== 'IN_PROGRESS') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段已结束，请重试', 409)
+    assertFlowFinal(false)
     await persistCompositeFormSection(tx, input.attemptId, currentSection.id, normalized.normalized.map((entry: any) => ({ itemId: entry.item.id, value: entry.storedValue })))
     let contextSnapshotHash = admission.contextSnapshotHash
     if (context) {

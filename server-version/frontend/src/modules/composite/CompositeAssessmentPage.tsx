@@ -121,7 +121,7 @@ const CompositeAssessmentContent: React.FC = () => {
   const applyState = (next: CompositeAttemptState) => {
     if (pageSignal().aborted) return
     setState(next)
-    if (next.status === 'COMPLETED' || next.allUnitsSubmitted) {
+    if (!next.trainingFlow && (next.status === 'COMPLETED' || next.allUnitsSubmitted)) {
       goReport(next.id)
       return
     }
@@ -188,7 +188,7 @@ const CompositeAssessmentContent: React.FC = () => {
           store(tokenKey(token), returnedCredential)
           store(attemptKey(response.data.attempt.id), returnedCredential)
         }
-        if (response.data.attempt.status === 'COMPLETED')
+        if (response.data.attempt.status === 'COMPLETED' && !response.data.attempt.trainingFlow)
           goReport(response.data.attempt.id)
         else
           applyState(
@@ -204,7 +204,7 @@ const CompositeAssessmentContent: React.FC = () => {
         if (signal.aborted) return
         if (response.code !== 0 || !response.data)
           throw new Error(response.message || '无法开始综合测评')
-        if (response.data.attempt.status === 'COMPLETED')
+        if (response.data.attempt.status === 'COMPLETED' && !response.data.attempt.trainingFlow)
           goReport(response.data.attempt.id)
         else applyState(await freezeBeforeMeasurement(response.data.attempt))
       }
@@ -484,7 +484,7 @@ const CompositeAssessmentContent: React.FC = () => {
     </>}
   >{error || '综合测评不存在或不可访问'}{error?.includes('最大次数') && !existingReportId && <p>已有结果可从课程详情中查看。</p>}</ProductStatus></ProductPage>
 
-  if (state.status === 'COMPLETED') {
+  if (state.status === 'COMPLETED' && !state.trainingFlow) {
     return <div className="card p-8 max-w-xl mx-auto text-center"><CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" /><h1 className="text-2xl font-bold mb-3">{state.taskSatisfied === false ? '已交卷，任务未达成' : state.productKind === 'QUESTIONNAIRE' ? '问卷已完成' : '综合测评已完成'}</h1>{state.taskSatisfied === false && <p className="mb-3 text-sm text-gray-600">作答已保存并计入次数，可查看本次个人报告。</p>}<button onClick={() => goReport(state.id)} className="btn-primary">{relationalMode ? '返回关系测评' : '查看个人报告'}</button></div>
   }
 
@@ -499,7 +499,7 @@ const CompositeAssessmentContent: React.FC = () => {
     )
   }
 
-  if (state.deliveryMode === 'FINAL_ONLY') {
+  if (state.deliveryMode === 'FINAL_ONLY' || state.trainingFlow) {
     const unitAssessment = (
       <FinalCompositeAssessment
         state={state}
@@ -515,7 +515,7 @@ const CompositeAssessmentContent: React.FC = () => {
         onRestart={restartLegacyAttempt}
       />
     )
-    if (state.productKind === 'QUESTIONNAIRE' && !relationalMode && state.currentItem?.type === 'SCALE') {
+    if (!state.trainingFlow && state.productKind === 'QUESTIONNAIRE' && !relationalMode && state.currentItem?.type === 'SCALE') {
       return <WholeCompositeQuestionnaire state={state} api={api} publicMode={publicMode} recoveryToken={recoveryToken}
         fallback={unitAssessment} onExit={() => void saveAndExit()} onCompleted={() => goReport(state.id)} />
     }

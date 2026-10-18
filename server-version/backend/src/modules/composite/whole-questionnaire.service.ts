@@ -46,10 +46,10 @@ export type WholeQuestionnaireReportContext = {
 
 const wholeParentSelect = {
   ...REPORT_PARENT_SELECT, userId: true, recoveryTokenHash: true,
-  trainingTimingSnapshot: true, participantKey: true, trainingVariantAllocationEncrypted: true, trainingVariantAllocationHash: true,
+  trainingTimingSnapshot: true, participantKey: true, trainingVariantAllocationEncrypted: true, trainingFlowSnapshotEncrypted:true,trainingFlowSnapshotHash:true,trainingFlowPathEncrypted:true,trainingFlowPathHash:true,trainingVariantAllocationHash:true,
   contextSnapshotEncrypted: true, frozenActiveSlotSetEncrypted: true,
   compositeAssessment: { select: { id: true, productKind: true, reportPackageKey: true, analysisProtocolKey: true,
-    publishedAt: true, trainingVariantDraft: true, trainingVariantFrozen: true, trainingVariantDigest: true,
+    publishedAt: true, trainingVariantDraft: true, trainingVariantFrozen: true, trainingFlowDraft:true,trainingFlowFrozen:true,trainingFlowDigest:true,trainingVariantDigest:true,
     items: true, formSections: { include: {items: true} } } },
   scaleAssessments: { select: { ...UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
     scale: { select: { ...UNIFIED_SCALE_CHILD_ADMISSION_SELECT.scale.select, instruction: true } } } },
@@ -63,7 +63,7 @@ const wholeReportParentSelect = {
   formAnswers: { select: { itemId: true, value: true } },
   compositeAssessment: { select: {
     id: true, name: true, productKind: true, reportPackageKey: true, analysisProtocolKey: true,
-    publishedAt: true, trainingVariantDraft: true, trainingVariantFrozen: true, trainingVariantDigest: true,
+    publishedAt: true, trainingVariantDraft: true, trainingVariantFrozen: true, trainingFlowDraft:true,trainingFlowFrozen:true,trainingFlowDigest:true,trainingVariantDigest:true,
     reportPackageVersion: true, reportPackageProfile: true, reportPackageSnapshotEncrypted: true,
     items: { orderBy: { position: 'asc' }, include: {
       scale: { select: { id: true, code: true, name: true, instrumentVersion: true, instrumentClass: true } },
@@ -96,6 +96,7 @@ const loadParent = async (attemptId: string, principal: Principal, preloaded?: W
   const owned = principal.userId ? parent.userId === principal.userId
     : parent.userId === null && Boolean(principal.recoveryTokenHash && parent.recoveryTokenHash === principal.recoveryTokenHash)
   if (!owned) throw failure('无权限操作此问卷', 403)
+  if(parent.trainingFlowSnapshotHash!=null||parent.compositeAssessment.trainingFlowFrozen!=null)throw failure('条件流程必须按当前工具逐项提交')
   parent = await applyTrainingAttemptScope(parent) as typeof loaded
   if (parent.asyncReportEpoch !== parent.attemptEpoch && !acceptsAsyncCompositeReport(parent)) throw failure('此问卷尚未启用整份交卷')
   if (!parent.frozenActiveSlotSetEncrypted || !parent.frozenActiveSlotSetHash) throw failure('问卷冻结内容缺失')
@@ -224,6 +225,7 @@ const loadWholeSubmissionContext = async (attemptId: string) => {
   const rows = await prisma.$queryRaw<Array<Omit<WholeSubmissionHeader, 'compositeAssessment'> & {
     productKind: WholeSubmissionHeader['compositeAssessment']['productKind'];
     reportPackageKey: string | null; analysisProtocolKey: string | null;
+    trainingFlowDraft: Prisma.JsonValue;trainingFlowFrozen:Prisma.JsonValue;trainingFlowDigest:string|null;
     trainingVariantDraft: unknown; trainingVariantFrozen: unknown; trainingVariantDigest: string | null;
     jobId: string | null; jobStatus: string | null; leaseToken: string | null;
     wholeSubmissionId: string | null; wholePayloadHash: string | null; wholeAcceptedAt: Date | null;
@@ -243,6 +245,8 @@ const loadWholeSubmissionContext = async (attemptId: string) => {
       parent."assignment_ref" AS "assignmentRef", parent."consent_id" AS "consentId",
       parent."delivery_course_id" AS "deliveryCourseId",
       parent."training_timing_snapshot" AS "trainingTimingSnapshot",
+      parent."training_flow_snapshot_encrypted" AS "trainingFlowSnapshotEncrypted", parent."training_flow_snapshot_hash" AS "trainingFlowSnapshotHash",
+      parent."training_flow_path_encrypted" AS "trainingFlowPathEncrypted", parent."training_flow_path_hash" AS "trainingFlowPathHash",
       parent."training_variant_allocation_encrypted" AS "trainingVariantAllocationEncrypted",
       parent."training_variant_allocation_hash" AS "trainingVariantAllocationHash",
       parent."user_id" AS "userId",
@@ -252,6 +256,7 @@ const loadWholeSubmissionContext = async (attemptId: string) => {
       product."training_variant_draft" AS "trainingVariantDraft",
       product."training_variant_frozen" AS "trainingVariantFrozen",
       product."training_variant_digest" AS "trainingVariantDigest",
+      product."training_flow_draft" AS "trainingFlowDraft", product."training_flow_frozen" AS "trainingFlowFrozen", product."training_flow_digest" AS "trainingFlowDigest",
       job."id" AS "jobId", job."status" AS "jobStatus", job."lease_token" AS "leaseToken",
       job."whole_submission_id" AS "wholeSubmissionId", job."whole_payload_hash" AS "wholePayloadHash",
       job."whole_accepted_at" AS "wholeAcceptedAt",
@@ -265,6 +270,7 @@ const loadWholeSubmissionContext = async (attemptId: string) => {
   if (!row) return null
   const parent: WholeSubmissionHeader = { ...row, compositeAssessment: {
     productKind: row.productKind, reportPackageKey: row.reportPackageKey, analysisProtocolKey: row.analysisProtocolKey,
+    trainingFlowDraft:row.trainingFlowDraft,trainingFlowFrozen:row.trainingFlowFrozen,trainingFlowDigest:row.trainingFlowDigest,
     trainingVariantDraft: row.trainingVariantDraft, trainingVariantFrozen: row.trainingVariantFrozen, trainingVariantDigest: row.trainingVariantDigest,
   } }
   const prior: WholeQuestionnaireReceipt | null = row.jobId ? {

@@ -285,8 +285,12 @@ export const getExportData = async (
   builder.add('A_date', '完成日期', 'date', 80)
   builder.add('A_duration_s', '完成用时(秒)', 'numeric', 12)
   builder.add('A_context_snapshot_hash', '测评上下文快照哈希', 'string', 64)
-  if (variantGraph) for (const [key, label] of [['stratum_key', '独立分析分层'], ['config_digest', '分卷配置摘要'], ['union_digest', '发布全集摘要'], ['published_at', '发布时刻'], ['variant_key', '分组'], ['algorithm', '分配算法'], ['assigned_at', '分配时刻'], ['allocation_hash', '分配记录摘要']]) builder.add(`V_${key}`, label, 'string', 80)
-  if (variantGraph) for (const [index, item] of (template.items as any[]).entries()) builder.add(`V${String(index + 1).padStart(3, '0')}_selection_state`, `[${item.id}] 分卷呈现状态`, 'string', 24, 0, {allowedValues: ['SELECTED', 'NOT_SHOWN'], missingMeaning: 'NOT_SHOWN 为未选中，不是零分、未完成或拒答；不同分层不得静默合并分析。'})
+  if((template as any).trainingFlowFrozen!=null){
+    for(const [key,label]of [['config_digest','流程配置摘要'],['path_hash','接受事实路径摘要'],['termination','结束原因'],['task_satisfaction','课程任务满足状态']])builder.add(`P_${key}`,label,'string',80)
+    for(const [index,item]of(template.items as any[]).entries())builder.add(`P${String(index+1).padStart(3,'0')}_path_state`,`[${item.id}] 流程呈现状态`,'string',32,0,{allowedValues:['EXECUTED','CURRENT','NOT_SHOWN'],missingMeaning:'NOT_SHOWN未执行，测量/计时为空而非0。'})
+  }
+  if (template.trainingVariantFrozen!=null) for (const [key, label] of [['stratum_key', '独立分析分层'], ['config_digest', '分卷配置摘要'], ['union_digest', '发布全集摘要'], ['published_at', '发布时刻'], ['variant_key', '分组'], ['algorithm', '分配算法'], ['assigned_at', '分配时刻'], ['allocation_hash', '分配记录摘要']]) builder.add(`V_${key}`, label, 'string', 80)
+  if (template.trainingVariantFrozen!=null) for (const [index, item] of (template.items as any[]).entries()) builder.add(`V${String(index + 1).padStart(3, '0')}_selection_state`, `[${item.id}] 分卷呈现状态`, 'string', 24, 0, {allowedValues: ['SELECTED', 'NOT_SHOWN'], missingMeaning: 'NOT_SHOWN 为未选中，不是零分、未完成或拒答；不同分层不得静默合并分析。'})
 
   const formItems = template.items.filter((item: any) => item.type === 'FORM')
   const sectionSources = new Map(typedSections.flatMap(section=>{
@@ -421,10 +425,14 @@ export const getExportData = async (
       A_duration_s: attempt.totalTime == null ? null : Math.round(attempt.totalTime / 1000),
       A_context_snapshot_hash: attempt.contextSnapshotHash ?? null,
     }
-    if (scope) {
+    if (scope?.variant) {
       const provenance = trainingVariantProvenance(scope)!
       Object.assign(row, {V_stratum_key: trainingVariantStratumKey(scope), V_config_digest: provenance.configDigest, V_union_digest: provenance.unionDigest, V_published_at: provenance.publishedAt, V_variant_key: provenance.variantKey, V_algorithm: provenance.algorithm, V_assigned_at: provenance.assignedAt, V_allocation_hash: provenance.allocationHash})
       template.items.forEach((item: any, index: number) => {row[`V${String(index + 1).padStart(3, '0')}_selection_state`] = scope.itemIds.has(item.id) ? 'SELECTED' : 'NOT_SHOWN'})
+    }
+    if(scope?.flow){
+      Object.assign(row,{P_config_digest:scope.flow.config.flowDigest,P_path_hash:scope.flow.pathHash,P_termination:scope.flow.path.termination,P_task_satisfaction:scope.flow.path.taskSatisfaction})
+      template.items.forEach((item:any,index:number)=>{const slot=item.type==='FORM'?`form-section:${item.formSectionId}`:`${item.type.toLowerCase()}:${item.id}`;row[`P${String(index+1).padStart(3,'0')}_path_state`]=scope.flow!.executedSlotKeys.has(slot)?'EXECUTED':scope.itemIds.has(item.id)?'CURRENT':'NOT_SHOWN'})
     }
     if (!anonymize) row.U_name = attempt.user?.nickname || attempt.user?.username || null
 
@@ -597,7 +605,7 @@ export const getExportData = async (
   // 动态字段在遍历数据时才会出现，确保每一行具有稳定列集合。
   for (const row of rows) for (const field of builder.fields) if (!(field.name in row)) row[field.name] = null
   assertExportLimits({ records: rows.length, fields: builder.fields.length, trials: trialCount })
-  return { ...(options.previewLimit ? {totalCount: recordCount} : {}), ...(variantGraph ? {trainingVariantExport: {version: TRAINING_VARIANT_EXPORT_VERSION, pooling: 'STRATIFIED_ONLY' as const, strata: trainingVariantExportStrata(template.attempts, variantGraph.scopes)}} : {}), ...(hasTypedForms?{typedFormExportVersion:"training-form-export-v1"}:{}), assessmentId: template.id, assessmentName: template.name, detail, fields: builder.fields, rows, trialCount }
+  return { ...(options.previewLimit ? {totalCount: recordCount} : {}), ...(variantGraph && template.trainingVariantFrozen!=null ? {trainingVariantExport: {version: TRAINING_VARIANT_EXPORT_VERSION, pooling: 'STRATIFIED_ONLY' as const, strata: trainingVariantExportStrata(template.attempts, variantGraph.scopes)}} : {}), ...(hasTypedForms?{typedFormExportVersion:"training-form-export-v1"}:{}), assessmentId: template.id, assessmentName: template.name, detail, fields: builder.fields, rows, trialCount }
 }
 
 /** Basic task administration only. Every denominator is a single immutable

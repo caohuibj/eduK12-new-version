@@ -14,6 +14,7 @@ import { assessmentImageItems, assessmentOptionImageItems } from '../modules/ass
 import { formOptionVideoPresentations, scaleItemVideoPresentation } from '../modules/assessment-media/video-adapter'
 import { requestAssessmentVideoCapabilities } from '../modules/assessment-media/video-capability-client'
 import CompositeUnitRequirements from '../modules/composite/CompositeUnitRequirements'
+import { TrainingFlowBoundary } from '../modules/composite/TrainingFlowBoundary'
 import { AssessmentShell } from './assessment-shell'
 import { trainingVisibleFields, sanitizeTrainingFormValues } from '../modules/assessment-core/form/training-policy'
 import FormPlayer, { type FormPlayerValue } from './questionnaire/FormPlayer'
@@ -664,4 +665,8 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
   )
 }
 
-export default FinalCompositeAssessment
+export default function FinalCompositeShell(props: FinalCompositeAssessmentProps) {
+  return <TrainingFlowBoundary state={props.state} onExit={props.onExit} onCompleted={props.onCompleted}>
+    <FinalCompositeAssessment {...props} />
+  </TrainingFlowBoundary>
+}

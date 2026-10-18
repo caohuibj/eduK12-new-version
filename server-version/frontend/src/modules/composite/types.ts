@@ -171,7 +171,15 @@ export interface CompositeReportStatus {
   reportStatus: CompositeReportJobState
 }
 
+export type TrainingFlowState = {
+  materials: Array<{ blockKey: string; kind: 'MATERIAL'; title?: string; body: string }>
+  termination: 'PENDING' | 'COMPLETE' | 'SCREEN_OUT' | 'COMPLETE_EARLY'
+  currentInstrumentKey: string | null
+  pathHash: string
+}
+
 export interface CompositeAttemptState {
+  trainingFlow?: TrainingFlowState
   taskSatisfaction?: string | null
   taskSatisfied?: boolean
   allUnitsSubmitted?: boolean

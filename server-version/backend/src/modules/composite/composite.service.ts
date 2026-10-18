@@ -1,3 +1,8 @@
+import { canonicalHash } from '../assessment-runtime/canonical'
+import { resolveTrainingFlowScope, trainingFlowMarkerState, trainingFlowProvenance } from './training-flow-scope'
+import { buildTrainingFlowUnits } from './training-flow-definition'
+import { compileTrainingFlow, trainingFlowUnitKey, trainingFlowItemKey } from '../assessment-core/flow/training'
+import { assertTrainingFlowAuthoringScope } from '../questionnaire-product/training-flow-authoring'
 import { preloadCompositeReportFacts, type CompositeReportFactsReader } from './composite-report-read-batch'
 import { cognitivePresentationAssetReferences } from '../cognitive/v2/presentation'
 import { assertAssessmentAssetReferencesReady, type AssessmentAssetIdentityV1 } from '../assessment-media/assessment-asset'
@@ -996,6 +1001,7 @@ export const getCompositeForTeacher = async (userId: string, role: UserRole, id:
     id: composite.id,
     productKind: composite.productKind,
     questionnaireType: composite.questionnaireType,
+    trainingFlowDraft:composite.trainingFlowDraft??null,trainingFlowFrozen:composite.trainingFlowFrozen??null,trainingFlowDigest:composite.trainingFlowDigest??null,
     trainingVariantDraft:composite.trainingVariantDraft??null,trainingVariantFrozen:composite.trainingVariantFrozen??null,trainingVariantDigest:composite.trainingVariantDigest??null,
     trainingTimingPolicy:composite.trainingTimingPolicy??null,timingExportEnabled:composite.timingExportEnabled===true,
     revision: composite.revision,
@@ -1101,6 +1107,7 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
     },
   })
   if (!source) throw compositeNotFound()
+  if(source.trainingFlowDraft!=null||source.trainingFlowFrozen!=null)throw compositeBadRequest('条件流程请使用问卷专用复制入口')
   if(source.trainingVariantDraft!=null||source.trainingVariantFrozen!=null)throw compositeBadRequest('概率分卷请使用问卷专用复制入口')
   const selfCopy = source.createdBy === userId
   const libraryCopy = isAdminLibraryTemplate(source)
@@ -1336,7 +1343,7 @@ export const listAttemptsForTeacher = async (
         id: true,
         status: true,
         taskSatisfaction: true,
-        participantKey:true,trainingVariantAllocationEncrypted:true,trainingVariantAllocationHash:true,
+        participantKey:true,trainingVariantAllocationEncrypted:true,trainingFlowSnapshotEncrypted:true,trainingFlowSnapshotHash:true,trainingFlowPathEncrypted:true,trainingFlowPathHash:true,trainingVariantAllocationHash:true,
         progress: true,
         assignmentRef: true,
         completedItems: true,
@@ -2066,12 +2073,18 @@ export const prepareCompositePublication = async (userId: string, role: UserRole
     }
   }
 
+  let flowFields = {}
+  if(composite.trainingFlowDraft!=null){
+    await assertTrainingFlowAuthoringScope(prisma as any,composite)
+    const flow=compileTrainingFlow(composite.trainingFlowDraft,buildTrainingFlowUnits(composite))
+    flowFields={trainingFlowFrozen:flow as any,trainingFlowDigest:flow.flowDigest}
+  }else if(composite.trainingFlowFrozen!=null||composite.trainingFlowDigest!=null)throw compositeBadRequest('流程草稿与冻结配置不一致')
   let variantFields = {}
   if (composite.trainingVariantDraft != null) {
     const frozen = compileWeightedVariants(composite.trainingVariantDraft, buildTrainingVariantUnion(composite))
     variantFields = { trainingVariantFrozen: frozen as any, trainingVariantDigest: frozen.configDigest }
   } else if (composite.trainingVariantFrozen != null || composite.trainingVariantDigest != null) throw compositeBadRequest('概率分卷草稿与冻结配置不一致')
-  return { analysisProtocolSnapshotEncrypted, reportPackageSnapshotEncrypted, ...variantFields }
+  return { analysisProtocolSnapshotEncrypted, reportPackageSnapshotEncrypted, ...variantFields, ...flowFields }
 }
 
 const publishCompositeInTransaction = async (userId: string, role: UserRole, id: string, db: Db, resolvedSituational?: Map<string, ResolvedSituationalRelease>) => {
@@ -2278,9 +2291,9 @@ export const listAvailableForStudent = async (userId: string, now = Date.now()) 
       canContinue,
       admissionPaused: Boolean(admissionPaused),
       weightedVariants: item.trainingVariantFrozen != null,
-      items: item.trainingVariantFrozen != null ? [] : item.items.map((child: any) => ({ type: child.type, position: child.position, label: resolveCompositeItemLabel(child, getFrozenPackageSlotLabels(item)) })),
-      units: item.trainingVariantFrozen != null ? [] : units,
-      formSections: item.trainingVariantFrozen != null ? [] : sections,
+      items: (item.trainingVariantFrozen != null || item.trainingFlowFrozen != null) ? [] : item.items.map((child: any) => ({ type: child.type, position: child.position, label: resolveCompositeItemLabel(child, getFrozenPackageSlotLabels(item)) })),
+      units: (item.trainingVariantFrozen != null || item.trainingFlowFrozen != null) ? [] : units,
+      formSections: (item.trainingVariantFrozen != null || item.trainingFlowFrozen != null) ? [] : sections,
       attempt: latestAttempt,
       latestCompletedAttempt: latestCompletedAttempt ? { ...latestCompletedAttempt, taskSatisfied: isTaskSatisfied(latestCompletedAttempt) } : null,
       latestSatisfiedAttempt,
@@ -2313,7 +2326,7 @@ const assertStudentEligibility = async (composite: any, userId: string) => {
 }
 
 type PreparedCognitiveVariantRuntime = Awaited<ReturnType<typeof cognitiveSessionService.prepareUnifiedCognitiveSessionConfigSnapshot>>
-type PreparedVariantRuntimes = { scales: Map<string, Awaited<ReturnType<typeof freezeScaleRuntimeAtAttemptStart>>>; cognitive: Map<string, PreparedCognitiveVariantRuntime>; assignments: Map<string, Awaited<ReturnType<typeof prepareTeacherPublishedAssignment>>> }
+type PreparedVariantRuntimes = { references?:Map<string,string>; scales: Map<string, Awaited<ReturnType<typeof freezeScaleRuntimeAtAttemptStart>>>; cognitive: Map<string, PreparedCognitiveVariantRuntime>; assignments: Map<string, Awaited<ReturnType<typeof prepareTeacherPublishedAssignment>>> }
 
 const resolvedCompositeCognitiveConfig = (assignment: any) => {
   const config = assignment?.config
@@ -2326,7 +2339,7 @@ const resolvedCompositeCognitiveConfig = (assignment: any) => {
   } catch { throw compositeBadRequest('认知任务冻结的 Profile 配置不可用') }
 }
 
-const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: string | null, prepared?: PreparedCognitiveVariantRuntime, preparedAssignment?: Awaited<ReturnType<typeof prepareTeacherPublishedAssignment>>) => {
+const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: string | null, prepared?: PreparedCognitiveVariantRuntime, preparedAssignment?: Awaited<ReturnType<typeof prepareTeacherPublishedAssignment>>, runtimeReference?:string) => {
   assertCognitiveModuleEnabled()
   let assignment = item.cognitiveAssignment
   if (attempt.deliveryCourseId && assignment) {
@@ -2352,7 +2365,7 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
   if (!assignment || !config) throw compositeBadRequest('认知任务配置不存在')
   const anonymous = !userId
   const sessionConfig = prepared ? prepared.snapshot.config : resolvedCompositeCognitiveConfig(assignment)
-  const unifiedSnapshot = prepared
+  const unifiedSnapshot = runtimeReference && prepared ? {encrypted:runtimeReference,compiledRuntime:prepared.compiledRuntime} : prepared
     ? await cognitiveSessionService.persistPreparedUnifiedCognitiveSessionConfigSnapshot(prepared, db)
     : attempt.runtimeGeneration === 'UNIFIED_V1'
       ? await cognitiveSessionService.createUnifiedCognitiveSessionConfigSnapshot({db, testType:config.testType,
@@ -2444,7 +2457,7 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
           respondentType: attempt.respondentType ?? 'SELF',
           ...(frozenScale ? {
             runtimeGeneration: 'UNIFIED_V1' as const,
-            runtimeSnapshotEncrypted: (await persistFrozenScaleRuntimeSnapshot(frozenScale, db)),
+            runtimeSnapshotEncrypted: prepared?.references?.get(item.id) ?? (await persistFrozenScaleRuntimeSnapshot(frozenScale, db)),
             compiledRuntimeHash: frozenScale.compiledRuntime.compiledRuntimeHash,
           } : {}),
         },
@@ -2460,7 +2473,7 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
         })
       }
     } else if (item.type === 'COGNITIVE') {
-      const session = await createCognitiveChild(db, attempt, item, userId, prepared?.cognitive.get(item.id), prepared?.assignments.get(item.id))
+      const session = await createCognitiveChild(db, attempt, item, userId, prepared?.cognitive.get(item.id), prepared?.assignments.get(item.id), prepared?.references?.get(item.id))
       if (attempt.runtimeGeneration === 'UNIFIED_V1') {
         const snapshot = prepared?.cognitive.get(item.id)?.snapshot ?? (await cognitiveSessionService.loadCognitiveSessionConfig(session.configSnapshotEncrypted,db as any)).snapshot
         if (!snapshot?.compiledRuntime) throw new Error('Unified Cognitive session runtime snapshot is missing')
@@ -2504,6 +2517,83 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
   }
   return runtime
 }
+
+/** Freeze candidates without creating children, sessions, jobs or quota claims.
+ * Existing shared-runtime stores remain the only full Scale/Cognitive bodies. */
+const freezeTrainingFlowCandidates = async (db:Db, attempt:any, composite:any, prepared:PreparedVariantRuntimes, releases:Map<string,ResolvedSituationalRelease>) => {
+  const references:Record<string,string>={}, assignments:Record<string,unknown>={}, situational:Record<string,unknown>={}
+  const runtime={scales:[] as any[],cognitive:[] as any[],situational:[] as any[]}
+  for(const item of composite.items){
+    if(item.type==='SCALE'){
+      const snapshot=prepared.scales.get(item.id)!
+      references[item.id]=await persistFrozenScaleRuntimeSnapshot(snapshot,db)
+      await retainFrozenScaleAssessmentImages({assessmentId:`flow:${attempt.id}:${item.id}`,snapshot,db})
+      runtime.scales.push({compositeItemId:item.id,code:snapshot.instrumentKey,instrumentVersion:snapshot.instrumentVersion,sourceDefinitionHash:snapshot.sourceDefinitionHash,compiledRuntimeHash:snapshot.compiledRuntime.compiledRuntimeHash})
+    }else if(item.type==='COGNITIVE'){
+      const frozen=prepared.cognitive.get(item.id)!
+      references[item.id]=(await cognitiveSessionService.persistPreparedUnifiedCognitiveSessionConfigSnapshot(frozen,db)).encrypted
+      if(prepared.assignments.has(item.id))assignments[item.id]=prepared.assignments.get(item.id)
+      runtime.cognitive.push({compositeItemId:item.id,testType:item.cognitiveAssignment.config.testType,instrumentVersion:frozen.compiledRuntime.instrumentVersion,sourceDefinitionHash:frozen.compiledRuntime.sourceDefinitionHash,compiledRuntimeHash:frozen.compiledRuntime.compiledRuntimeHash})
+    }else if(item.type==='SITUATIONAL'){
+      const snapshot=releases.get(situationalReleaseKey(situationalItemIdentity(item)))!.snapshot
+      situational[item.id]=snapshot
+      runtime.situational.push({compositeItemId:item.id,instrumentKey:snapshot.instrumentKey,instrumentVersion:snapshot.instrumentVersion,definitionHash:snapshot.definitionHash,compiledRuntimeHash:snapshot.compiledRuntimeHash,scorerKey:snapshot.scorerKey,scoringVersion:snapshot.scoringVersion,runtimeGeneration:snapshot.runtimeGeneration,deliveryMode:'FINAL_ONLY',frozenAt:snapshot.frozenAt})
+    }
+  }
+  const snapshot={schemaVersion:1,compositeId:composite.id,publishedAt:new Date(composite.publishedAt).toISOString(),attemptId:attempt.id,attemptEpoch:attempt.attemptEpoch,flowDigest:composite.trainingFlowDigest,references,assignments,situational}
+  return {runtime,snapshot}
+}
+
+/** Called only after ownership is checked. Parent lock serializes FINAL, END,
+ * two tabs and child creation. No current-template recompilation supplies a
+ * candidate body, and a denied admission never reroutes to another branch. */
+const ensureTrainingFlowCurrentChild = async (attemptId:string, context:{userId?:string;recoveryTokenHash?:string}) => prisma.$transaction(async tx=>{
+  await tx.$queryRaw`SELECT id FROM composite_assessment_attempts WHERE id=${attemptId} FOR UPDATE`
+  const parent=await tx.compositeAssessmentAttempt.findUnique({where:{id:attemptId}})
+  if(!parent)throw compositeNotFound('作答不存在')
+  if(context.userId?parent.userId!==context.userId:!(context.recoveryTokenHash&&parent.userId===null&&parent.recoveryTokenHash===context.recoveryTokenHash))throw compositeForbidden('无权限查看此作答')
+  const composite=await loadComposite(parent.compositeAssessmentId,true,tx)
+  const flow=await resolveTrainingFlowScope({...parent,compositeAssessment:composite},composite,{db:tx})
+  if(!flow||parent.status!=='IN_PROGRESS'||!flow.path.currentInstrumentKey)return
+  const key=flow.path.currentInstrumentKey
+  const section=composite.formSections.find((s:any)=>trainingFlowUnitKey(s.id)===key)
+  if(section){
+    await tx.compositeFormSectionAttempt.upsert({where:{attemptId_sectionId:{attemptId,sectionId:section.id}},create:{attemptId,sectionId:section.id,attemptEpoch:parent.attemptEpoch},update:{}})
+    return
+  }
+  const item=composite.items.find((i:any)=>i.type!=='FORM'&&trainingFlowItemKey(i.id)===key)
+  if(!item)throw compositeForbidden('当前流程工具不存在')
+  const existing=item.type==='SCALE'?await tx.assessment.findFirst({where:{compositeAttemptId:attemptId,compositeItemId:item.id}}):item.type==='COGNITIVE'?await tx.cognitiveSession.findFirst({where:{compositeAttemptId:attemptId,compositeItemId:item.id}}):await tx.situationalAttempt.findFirst({where:{compositeAttemptId:attemptId,compositeItemId:item.id}})
+  if(existing)return
+  const candidate=decryptUnifiedRuntimePayload<any>(parent.trainingFlowSnapshotEncrypted!)
+  if(canonicalHash(candidate)!==parent.trainingFlowSnapshotHash)throw compositeForbidden('候选运行时摘要不匹配')
+  const prepared:PreparedVariantRuntimes={scales:new Map(),cognitive:new Map(),assignments:new Map(),references:new Map()}
+  const releases=new Map<string,ResolvedSituationalRelease>()
+  if(item.type==='SCALE'){
+    if(item.scale.status!=='PUBLISHED'||!await canUseScale(composite.createdBy,composite.creator?.role??UserRole.TEACHER,item.scale))throw compositeForbidden('当前量表已不可准入')
+    const snapshot=await loadFrozenScaleRuntimeSnapshot(candidate.references[item.id],tx)
+    prepared.scales.set(item.id,snapshot);prepared.references!.set(item.id,candidate.references[item.id])
+  }else if(item.type==='COGNITIVE'){
+    assertCognitiveModuleEnabled()
+    if(item.cognitiveAssignment.status!=='PUBLISHED'||item.cognitiveAssignment.config.status!=='PUBLISHED')throw compositeForbidden('当前认知配置已不可准入')
+    const loaded=await cognitiveSessionService.loadCognitiveSessionConfig(candidate.references[item.id],tx as any)
+    if(!loaded.snapshot?.compiledRuntime)throw compositeForbidden('冻结认知运行时缺失')
+    prepared.cognitive.set(item.id,{snapshot:loaded.snapshot,compiledRuntime:loaded.snapshot.compiledRuntime})
+    prepared.references!.set(item.id,candidate.references[item.id])
+    if(candidate.assignments[item.id])prepared.assignments.set(item.id,candidate.assignments[item.id])
+    if(parent.userId){const source=await cognitiveQuotaSource(tx,item.cognitiveAssignmentId);await lockCognitiveQuota(tx,parent.userId,source.id)}
+  }else{
+    const current=await resolveCompositeSituationalItems([item],tx,true,compositeSjtGrantScope({...composite,deliveryCourseId:parent.deliveryCourseId}))
+    const release=current.get(situationalReleaseKey(situationalItemIdentity(item)))!
+    const snapshot=candidate.situational[item.id]
+    if(!snapshot||snapshot.definitionHash!==release.snapshot.definitionHash||snapshot.compiledRuntimeHash!==release.snapshot.compiledRuntimeHash)throw compositeForbidden('情境工具冻结身份不匹配')
+    releases.set(situationalReleaseKey(situationalItemIdentity(item)),{...release,snapshot})
+  }
+  const runtime=await createChildRecords(tx,parent,[item],parent.userId,composite.formSections,releases,prepared)
+  const created=freezeCompositeActiveSlotSet({...runtime,attemptEpoch:parent.attemptEpoch,formSections:[]})
+  const expected=flow.frozenSlots.slots.find(s=>s.sourceBinding.compositeItemId===item.id)
+  if(created.slots.length!==1||canonicalHash(created.slots[0])!==canonicalHash(expected))throw compositeForbidden('实际准入与冻结候选不一致')
+})
 
 export interface RelationalCompositeAttemptIdentityV1 {
   subjectUserId: string
@@ -2563,8 +2653,16 @@ const createAttempt = async (
   const bundleRuntimeHash = composite.productKind === 'ASSESSMENT_BUNDLE'
     ? await (await import('../bundle-product/runtime')).compiledHashForInstance(db, composite.id)
     : null
+  const flowEnabled = composite.trainingFlowFrozen!=null||composite.trainingFlowDraft!=null||composite.trainingFlowDigest!=null
+  if(flowEnabled){
+    if(relationalIdentity||!finalOnly)throw compositeBadRequest('条件流程不支持关系或旧投放')
+    await assertTrainingFlowAuthoringScope(db as any,composite)
+    const compiled=compileTrainingFlow(composite.trainingFlowDraft,buildTrainingFlowUnits(composite))
+    if(compiled.flowDigest!==composite.trainingFlowDigest||canonicalHash(compiled)!==canonicalHash(composite.trainingFlowFrozen))throw compositeBadRequest('流程冻结配置不一致')
+    if(!userId)composite={...composite,deliveryCourseId:composite.questionnaireCourses[0].courseId}
+  }
   const variantEnabled = composite.trainingVariantFrozen != null || composite.trainingVariantDraft != null || composite.trainingVariantDigest != null
-  const prepared: PreparedVariantRuntimes | undefined = variantEnabled ? { scales:new Map(), cognitive:new Map(), assignments:new Map() } : undefined
+  const prepared: PreparedVariantRuntimes | undefined = (variantEnabled||flowEnabled) ? { scales:new Map(), cognitive:new Map(), assignments:new Map() } : undefined
   if (variantEnabled && relationalIdentity) throw compositeBadRequest('概率分卷不支持关系测评投放')
   if (variantEnabled) {
     await assertTrainingVariantAuthoringScope(db as any, composite)
@@ -2611,7 +2709,7 @@ const createAttempt = async (
         }))
       }
     }
-    for (const group of parseCompiledWeightedVariants(composite.trainingVariantFrozen).groups) {
+    for (const group of (variantEnabled?parseCompiledWeightedVariants(composite.trainingVariantFrozen).groups:[{selectedSectionIds:formSections.map((s:any)=>s.id),selectedItemIds:composite.items.map((i:any)=>i.id)}])) {
       const selectedSections=formSections.filter((section:any)=>group.selectedSectionIds.includes(section.id))
       for(const item of composite.items) {
         const scale=prepared.scales.get(item.id)
@@ -2628,7 +2726,7 @@ const createAttempt = async (
   if (prepared) {
     try { await assertAssessmentAssetReferencesReady(candidateMedia, db) }
     catch { throw compositeBadRequest('候选分卷包含不可用或不匹配的冻结媒体') }
-    if (userId) {
+    if (userId && variantEnabled) {
       const cognitiveItems=composite.items.filter((i:any)=>i.type==='COGNITIVE')
       const sources = await Promise.all(cognitiveItems.map((i:any)=>cognitiveQuotaSource(db as any,i.cognitiveAssignmentId)))
       const byItem=new Map<string,string>(cognitiveItems.map((item:any,index:number)=>[item.id,sources[index].id]))
@@ -2697,7 +2795,7 @@ const createAttempt = async (
       progress,
     },
   })
-  if (finalOnly && formSections.length > 0) {
+  if (finalOnly && formSections.length > 0 && !flowEnabled) {
     await db.compositeFormSectionAttempt.createMany({
       data: formSections.map((section: any) => ({
         attemptId: attempt.id,
@@ -2706,7 +2804,8 @@ const createAttempt = async (
       })),
     })
   }
-  const runtime = await createChildRecords(db, attempt, composite.items, userId, formSections, situationalReleases, prepared)
+  const flowCandidate = flowEnabled ? await freezeTrainingFlowCandidates(db,attempt,composite,prepared!,situationalReleases) : null
+  const runtime = flowCandidate?.runtime ?? await createChildRecords(db, attempt, composite.items, userId, formSections, situationalReleases, prepared)
   if (finalOnly) {
     const frozenActiveSlotSet = freezeCompositeActiveSlotSet({
       attemptEpoch,
@@ -2721,6 +2820,7 @@ const createAttempt = async (
     await db.compositeAssessmentAttempt.update({
       where: { id: attempt.id },
       data: {
+        ...(flowCandidate ? (()=>{const snapshot={...flowCandidate.snapshot,slotSetHash:frozenActiveSlotSet.snapshotHash};return {trainingFlowSnapshotEncrypted:encryptUnifiedRuntimePayload(snapshot),trainingFlowSnapshotHash:canonicalHash(snapshot)}})():{}),
         frozenActiveSlotSetEncrypted: await storeFrozenActiveSlotSet(frozenActiveSlotSet, db),
         frozenActiveSlotSetHash: frozenActiveSlotSet.snapshotHash,
       },
@@ -2989,9 +3089,9 @@ export const getPublicCompositeInfo = async (tokenValue: string, db: Db = prisma
     attemptEpoch: 1,
     weightedVariants:current.trainingVariantFrozen!=null,
     maxAttempts:current.maxAttempts,
-    items: current.trainingVariantFrozen!=null?[]:current.items.map((item: any) => ({ type: item.type, position: item.position, label: resolveCompositeItemLabel(item, packageSlotLabels) })),
-    units:current.trainingVariantFrozen!=null?[]:units,
-    formSections: current.trainingVariantFrozen!=null?[]:(current.formSections ?? []).map((section: any) => ({
+    items: (current.trainingVariantFrozen!=null||current.trainingFlowFrozen!=null)?[]:current.items.map((item: any) => ({ type: item.type, position: item.position, label: resolveCompositeItemLabel(item, packageSlotLabels) })),
+    units:(current.trainingVariantFrozen!=null||current.trainingFlowFrozen!=null)?[]:units,
+    formSections: (current.trainingVariantFrozen!=null||current.trainingFlowFrozen!=null)?[]:(current.formSections ?? []).map((section: any) => ({
       id: section.id,
       title: section.title,
       description: section.description ?? null,
@@ -3015,7 +3115,7 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
   // repairs sections on a published composite. loadComposite already includes
   // formSections + items, so no separate section read is needed.
   const composite = await loadComposite(token.compositeAssessment.id, true)
-  if (study && composite.trainingVariantFrozen != null) throw compositeBadRequest('概率分卷暂不支持匿名研究组合')
+  if (study && (composite.trainingVariantFrozen != null || composite.trainingFlowFrozen != null)) throw compositeBadRequest('概率分卷暂不支持匿名研究组合')
   if (recoveryToken) {
     const recoveryTokenHash = hashRecoveryToken(recoveryToken)
     const existing = await prisma.compositeAssessmentAttempt.findFirst({ where: { accessTokenId: token.id, recoveryTokenHash } })
@@ -3358,7 +3458,7 @@ const unifiedCompositeProgressSnapshot = (
 // re-reads the same composite attempt row for routing, projection, or
 // admission.
 const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
-  participantKey:true, trainingVariantAllocationEncrypted:true, trainingVariantAllocationHash:true,
+  participantKey:true, trainingVariantAllocationEncrypted:true, trainingFlowSnapshotEncrypted:true,trainingFlowSnapshotHash:true,trainingFlowPathEncrypted:true,trainingFlowPathHash:true,trainingVariantAllocationHash:true,
   taskSatisfaction: true,
   id: true,
   asyncReportEpoch: true,
@@ -3382,7 +3482,7 @@ const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
   compositeAssessment: {
     select: {
       id: true,
-      publishedAt:true,trainingVariantDraft:true,trainingVariantFrozen:true,trainingVariantDigest:true,
+      publishedAt:true,trainingVariantDraft:true,trainingVariantFrozen:true,trainingFlowDraft:true,trainingFlowFrozen:true,trainingFlowDigest:true,trainingVariantDigest:true,
       name: true,
       productKind: true,
       instruction: true,
@@ -3548,7 +3648,7 @@ const getUnifiedCompositeAttemptState = async (
   })
   const slotsByKey = new Map(frozenSlotSet.slots.map((slot: FrozenActiveSlotV1) => [slot.slotKey, slot]))
   const headers = snapshotRows.map((row) => unifiedCompositeProgressSnapshot(row, slotsByKey, attempt.attemptEpoch))
-  const completeness = evaluateCompleteness({ slots: frozenSlotSet.slots, snapshots: headers, attemptEpoch: attempt.attemptEpoch })
+  const completeness = evaluateCompleteness({ slots: frozenSlotSet.slots, snapshots: headers, attemptEpoch: attempt.attemptEpoch, pathPolicy:attempt.trainingFlowScope?.aggregatePathPolicy })
   if (completeness.invalidSlotKeys.length > 0) throw compositeBadRequest('综合测评进度快照不可用，请重启测评')
   const headerByKey = new Map(headers.map((header) => [header.slotKey, header]))
   const slotKeyForItem = (item: any): string | null => item.type === 'SCALE' || item.type === 'COGNITIVE' || item.type === 'SITUATIONAL'
@@ -3757,6 +3857,7 @@ const getUnifiedCompositeAttemptState = async (
     ...(attempt.compositeAssessment.productKind === 'QUESTIONNAIRE' ? { productKind: 'QUESTIONNAIRE' as const, reportMode: 'COLLECTION_ONLY' as const } : {}),
     instruction: attempt.compositeAssessment.instruction,
     status: attempt.status,
+    ...(attempt.trainingFlowScope?{trainingFlow:{materials:attempt.trainingFlowScope.path.materials,termination:attempt.trainingFlowScope.path.termination,currentInstrumentKey:attempt.trainingFlowScope.path.currentInstrumentKey,pathHash:attempt.trainingFlowScope.pathHash}}:{}),
     taskSatisfaction: attempt.taskSatisfaction ?? null,
     taskSatisfied: isTaskSatisfied(attempt),
     deliveryMode: attempt.deliveryMode,
@@ -3845,6 +3946,7 @@ const finalizeCompositeAttemptLegacyIfReady = async (attemptId: string) => withQ
   if (attempt.status === 'COMPLETED') {
     return {
       status: attempt.status,
+    ...(attempt.trainingFlowScope?{trainingFlow:{materials:attempt.trainingFlowScope.path.materials,termination:attempt.trainingFlowScope.path.termination,currentInstrumentKey:attempt.trainingFlowScope.path.currentInstrumentKey,pathHash:attempt.trainingFlowScope.pathHash}}:{}),
     taskSatisfaction: attempt.taskSatisfaction ?? null,
     taskSatisfied: isTaskSatisfied(attempt),
       progress: attempt.progress,
@@ -4236,12 +4338,16 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
   // select and shared by the unified state projection and the
   // ensure*AtDelivery steps. The legacy path (rare, pre-UNIFIED_V1 attempts)
   // re-reads through findAttempt below.
-  const runtime = await prisma.compositeAssessmentAttempt.findUnique({
+  let runtime = await prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId },
     select: UNIFIED_ATTEMPT_STATE_PARENT_SELECT,
   }) as any
   if (!runtime) throw compositeNotFound('综合测评记录不存在')
   if (runtime.runtimeGeneration === 'UNIFIED_V1') {
+    if(trainingFlowMarkerState(runtime)==='FLOW'){
+      await ensureTrainingFlowCurrentChild(attemptId,context)
+      runtime=await prisma.compositeAssessmentAttempt.findUnique({where:{id:attemptId},select:UNIFIED_ATTEMPT_STATE_PARENT_SELECT})
+    }
     if(requestedUnit){
       const authorized=context.userId?runtime.userId===context.userId:Boolean(context.recoveryTokenHash&&runtime.userId===null&&runtime.recoveryTokenHash===context.recoveryTokenHash)
       if(!authorized)throw compositeForbidden('无权限查看此综合测评记录')
@@ -4390,6 +4496,7 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
     ...(attempt.compositeAssessment.productKind === 'QUESTIONNAIRE' ? { productKind: 'QUESTIONNAIRE' as const, reportMode: 'COLLECTION_ONLY' as const } : {}),
     instruction: attempt.compositeAssessment.instruction,
     status: attempt.status,
+    ...(attempt.trainingFlowScope?{trainingFlow:{materials:attempt.trainingFlowScope.path.materials,termination:attempt.trainingFlowScope.path.termination,currentInstrumentKey:attempt.trainingFlowScope.path.currentInstrumentKey,pathHash:attempt.trainingFlowScope.pathHash}}:{}),
     taskSatisfaction: attempt.taskSatisfaction ?? null,
     taskSatisfied: isTaskSatisfied(attempt),
     deliveryMode: attempt.deliveryMode,
@@ -4929,7 +5036,7 @@ export const buildCompositeReport = async (attempt: any, verifiedContext?: Whole
     }
   }
   const report = {
-    ...(attempt.trainingVariantScope?.variant?{trainingVariant:trainingVariantProvenance(attempt.trainingVariantScope)}:{}),
+    ...(attempt.trainingFlowScope?{trainingFlow:trainingFlowProvenance(attempt.trainingFlowScope)}:{}),...(attempt.trainingVariantScope?.variant?{trainingVariant:trainingVariantProvenance(attempt.trainingVariantScope)}:{}),
     taskSatisfaction: attempt.taskSatisfaction ?? null, taskSatisfied:isTaskSatisfied(attempt),
     id: attempt.id,
     assessmentId: attempt.compositeAssessment.id,
@@ -5060,8 +5167,8 @@ const packageAnalysisExportContextFor = async (
 }
 
 const reportReadHeaderSelect = {
-  ...REPORT_PARENT_SELECT, compositeAssessmentId: true, userId: true, recoveryTokenHash: true,trainingTimingSnapshot:true,trainingVariantAllocationEncrypted:true,trainingVariantAllocationHash:true,
-  compositeAssessment: { select: { id: true, productKind: true,timingExportEnabled:true,revision:true,trainingVariantFrozen:true,trainingVariantDraft:true,trainingVariantDigest:true, items: { select: { type: true } } } },
+  ...REPORT_PARENT_SELECT, compositeAssessmentId: true, userId: true, recoveryTokenHash: true,trainingTimingSnapshot:true,trainingVariantAllocationEncrypted:true,trainingFlowSnapshotEncrypted:true,trainingFlowSnapshotHash:true,trainingFlowPathEncrypted:true,trainingFlowPathHash:true,trainingVariantAllocationHash:true,
+  compositeAssessment: { select: { id: true, productKind: true,timingExportEnabled:true,revision:true,trainingVariantFrozen:true,trainingVariantDraft:true,trainingFlowDraft:true,trainingFlowFrozen:true,trainingFlowDigest:true,trainingVariantDigest:true, items: { select: { type: true } } } },
 } as const
 
 const loadReportReadHeader = async (attemptId: string) => {
@@ -5172,10 +5279,10 @@ const loadCollectionReportAttempt = async (attemptId: string) => {
   const attempt = await prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId },
     select: {
-      ...REPORT_PARENT_SELECT, frozenActiveSlotSetEncrypted:true, anonymousCode: true, totalTime: true, participantKey:true, trainingVariantAllocationEncrypted:true, trainingVariantAllocationHash:true,
+      ...REPORT_PARENT_SELECT, frozenActiveSlotSetEncrypted:true, anonymousCode: true, totalTime: true, participantKey:true, trainingVariantAllocationEncrypted:true, trainingFlowSnapshotEncrypted:true,trainingFlowSnapshotHash:true,trainingFlowPathEncrypted:true,trainingFlowPathHash:true,trainingVariantAllocationHash:true,
       compositeAssessment: { select: {
         id: true, name: true, productKind: true, reportPackageKey: true, analysisProtocolKey: true,
-        publishedAt:true,trainingVariantDraft:true,trainingVariantFrozen:true,trainingVariantDigest:true,formSections:{include:{items:true}},
+        publishedAt:true,trainingVariantDraft:true,trainingVariantFrozen:true,trainingFlowDraft:true,trainingFlowFrozen:true,trainingFlowDigest:true,trainingVariantDigest:true,formSections:{include:{items:true}},
         reportPackageSnapshotEncrypted: true,
         items: { orderBy: { position: 'asc' }, include: {
           scale: { select: { id: true, code: true, name: true, instrumentVersion: true, instrumentClass: true } },
@@ -5238,7 +5345,7 @@ const materializeCompactReportFromFacts = async (attempt: any, binding: ReportJo
     const unit={itemId:item.id,type:'SCALE',kind:'scale',scaleId:item.scaleId,scaleCode:item.scale?.code,scaleName:item.scale?.name||'未知量表',result}
     Object.defineProperty(unit,'__scaleProjectionPolicy',{value:policy.policy,enumerable:false});unitReports.push(unit)
   }
-  const report={...(attempt.trainingVariantScope?.variant?{trainingVariant:trainingVariantProvenance(attempt.trainingVariantScope)}:{}),id:attempt.id,assessmentId:attempt.compositeAssessment.id,name:attempt.compositeAssessment.name,productKind:'QUESTIONNAIRE',reportMode:'COLLECTION_ONLY',
+  const report={...(attempt.trainingFlowScope?{trainingFlow:trainingFlowProvenance(attempt.trainingFlowScope)}:{}),...(attempt.trainingVariantScope?.variant?{trainingVariant:trainingVariantProvenance(attempt.trainingVariantScope)}:{}),id:attempt.id,assessmentId:attempt.compositeAssessment.id,name:attempt.compositeAssessment.name,productKind:'QUESTIONNAIRE',reportMode:'COLLECTION_ONLY',
     anonymousCode:attempt.anonymousCode,completedAt:attempt.completedAt,totalTime:attempt.totalTime,backgroundValues,unitReports}
   return canStoreCompactCompositeReport(report,attempt.scaleAssessments,attempt.cognitiveSessions)
     ?encryptCompactCompositeReport(report,binding,attempt.scaleAssessments,undefined,attempt.cognitiveSessions,await resolveTrainingAttemptScope(attempt)):null
@@ -5306,8 +5413,8 @@ async function projectPartialReport(attempt: any, audience: CompositeReportAudie
   const completed = (children: any[]) => completedMeasurementChildren(children, attempt.attemptEpoch, finalized)
   const scaleAssessments = completed(attempt.scaleAssessments), cognitiveSessions = completed(attempt.cognitiveSessions), situationalAttempts = completed(attempt.situationalAttempts ?? [])
   const itemIds = new Set([...scaleAssessments, ...cognitiveSessions, ...situationalAttempts].map(child => child.compositeItemId))
-  const report = attempt.trainingVariantScope?.variant ? await buildCompositeReport(attempt) : await buildCompositeReport({ ...attempt, scaleAssessments, cognitiveSessions, situationalAttempts, formAnswers: [], compositeAssessment: { ...definition, items: definition.items.filter((item: any) => itemIds.has(item.id) && item.type !== 'FORM') } })
-  const projected = projectCompositeCollectionReport(attempt.trainingVariantScope?.variant ? {...report,backgroundValues:[],unitReports:report.unitReports.filter((unit:any)=>itemIds.has(unit.itemId))} : report, audience)
+  const report = (attempt.trainingVariantScope?.variant||attempt.trainingFlowScope) ? await buildCompositeReport(attempt) : await buildCompositeReport({ ...attempt, scaleAssessments, cognitiveSessions, situationalAttempts, formAnswers: [], compositeAssessment: { ...definition, items: definition.items.filter((item: any) => itemIds.has(item.id) && item.type !== 'FORM') } })
+  const projected = projectCompositeCollectionReport((attempt.trainingVariantScope?.variant||attempt.trainingFlowScope) ? {...report,backgroundValues:[],unitReports:report.unitReports.filter((unit:any)=>itemIds.has(unit.itemId))} : report, audience)
   return { ...projected, reportState: 'PARTIAL' as const, completedAt: null, totalTime: null }
 }
 

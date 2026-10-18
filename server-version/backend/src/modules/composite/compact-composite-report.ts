@@ -1,3 +1,4 @@
+import { trainingFlowProvenance } from './training-flow-scope'
 import { createReportReadTemplateStore } from './composite-report-read-batch'
 import type { TrainingAttemptScope } from './training-variant-scope'
 import { trainingVariantProvenance } from './training-variant-export'
@@ -29,6 +30,13 @@ export const canStoreCompactCompositeReport=(report:any,children:any[],cognitive
 /** A cached report is authorized against the current verified allocation,
  * before loading any source facts. Its original field order remains untouched. */
 export function assertTrainingVariantReportScope(report:any, scope?:TrainingAttemptScope):void {
+  if(scope?.flow){
+    if(canonicalHash(report.trainingFlow??null)!==canonicalHash(trainingFlowProvenance(scope.flow)))throw new Error('Flow report provenance mismatch')
+    const ids=[...(report.unitReports??[]),...(report.backgroundValues??[])].map((r:any)=>r.itemId)
+    if(new Set(ids).size!==ids.length||ids.some((id:string)=>!scope.itemIds.has(id)))throw new Error('Flow report includes unreachable item')
+    return
+  }
+  if(report.trainingFlow!=null)throw new Error('Flow report path was not verified')
   if (!scope?.variant) {
     if (report.trainingVariant != null) throw new Error('Variant report allocation was not verified')
     return

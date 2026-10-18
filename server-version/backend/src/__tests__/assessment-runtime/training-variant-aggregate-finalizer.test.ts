@@ -18,13 +18,14 @@ function fixture(){
  const items=[0,1].map(index=>({id:`item-${index}`,type:'FORM',position:index,formSectionPosition:0,formType:'number',formLabel:`Question ${index}`,required:true,formOptions:null,
    formDefinition:{itemKey:`item_${index}`,type:'NUMBER',prompt:`Question ${index}`,required:true,options:[],rows:[]},formPolicy:{version:3,requiredRefusal:'ALLOW_SUBMIT',hiddenRequired:'EXEMPT'}}))
  const sections=items.map((item,index)=>({id:`section-${index}`,title:`Section ${index}`,description:null,position:index,contextSection:false,items:[item]}))
- const composite:any={id:'composite',productKind:'QUESTIONNAIRE',trainingVariantDraft:null,publishedAt:new Date('2026-10-18T00:00:00Z'),items,formSections:sections}
+ const composite:any={id:'composite',productKind:'QUESTIONNAIRE',trainingVariantDraft:null,trainingFlowDraft:null,trainingFlowFrozen:null,trainingFlowDigest:null,publishedAt:new Date('2026-10-18T00:00:00Z'),items,formSections:sections}
  const compiled=compileWeightedVariants({schemaVersion:1,groups:sections.map((section,index)=>({variantKey:`group_${index}`,label:`Group ${index}`,weight:1,units:[{type:'FORM_SECTION',id:section.id}]}))},buildTrainingVariantUnion(composite))
  composite.trainingVariantFrozen=compiled;composite.trainingVariantDigest=compiled.configDigest
  const allocation=createWeightedVariantAllocation(compiled,{compositeId:composite.id,attemptId:'parent',participantKey:'user',attemptEpoch:1,publishedAt:composite.publishedAt.toISOString()},{randomInt:()=>0,assignedAt:'2026-10-18T00:00:01Z'})
  const slots=createFrozenActiveSlotSet({schemaVersion:1,runtimeGeneration:'UNIFIED_V1',attemptEpoch:1,slots:[{slotKey:'form-section:section-0',unitType:'FORM_SECTION',required:true,sourceDefinitionIdentity:{key:'section-0',version:'FORM_SECTION_V3',hash:canonicalHash(mapCompositeSection(sections[0]))},sourceBinding:{sectionId:'section-0'}}]})
  const parent:any={id:'parent',status:'IN_PROGRESS',runtimeGeneration:'UNIFIED_V1',deliveryMode:'FINAL_ONLY',attemptEpoch:1,participantKey:'user',startedAt:new Date('2026-10-18T00:00:00Z'),completedAt:null,progress:0,completedItems:0,
    contextSnapshotEncrypted:null,contextSnapshotHash:null,compiledBundleRuntimeHash:null,aggregateInputHash:null,trainingVariantAllocationEncrypted:encryptUnifiedRuntimePayload(allocation),trainingVariantAllocationHash:allocation.allocationHash,
+   trainingFlowSnapshotEncrypted:null,trainingFlowSnapshotHash:null,trainingFlowPathEncrypted:null,trainingFlowPathHash:null,
    frozenActiveSlotSetEncrypted:encryptFrozenActiveSlotSet(slots),frozenActiveSlotSetHash:slots.snapshotHash,compositeAssessment:composite,
    formSectionAttempts:[{sectionId:'section-0',attemptEpoch:1,status:'COMPLETED',taskSatisfaction:'SATISFIED'}]}
  const facts={schemaVersion:3,sectionKey:'section-0',items:[{key:'item-0',label:'Question 0',value:0,state:'ANSWERED'}]}

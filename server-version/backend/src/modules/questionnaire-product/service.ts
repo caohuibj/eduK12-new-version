@@ -1,6 +1,7 @@
 import { compileWeightedVariants, weightedVariantConfigSchema } from '../assessment-core/weighted-variants'
 import { buildTrainingVariantUnion } from '../composite/training-variant-scope'
 import { assertTrainingVariantAuthoringScope } from './training-variant-authoring'
+import { assertTrainingFlowAuthoringScope, compileTrainingFlowDefinition, hasTrainingFlowDefinition, remapTrainingFlowDraft, trainingFlowSchema, validateTrainingFlow } from './training-flow-authoring'
 import {freezeTrainingTimingPolicy,readTrainingTimingPolicy} from '../assessment-runtime/training-scale-timing'
 import { remapTrainingFormDefinition } from '../assessment-runtime/form-policy'
 import { typedCompositeFormQuestion } from '../assessment-runtime/typed-form'
@@ -93,6 +94,20 @@ export async function updateTrainingVariants(actor: Actor, id: string, raw: unkn
     } })
   })
 }
+/** Explicit opt-in. No flow is inferred from a legacy questionnaire layout. */
+export async function updateTrainingFlow(actor: Actor, id: string, raw: unknown) {
+  const input = trainingFlowSchema.parse(raw)
+  return mutate(actor, id, input.revision, async (tx, row) => {
+    if (input.config !== null) {
+      await assertTrainingFlowAuthoringScope(tx, row)
+      compileTrainingFlowDefinition(input.config, row)
+    }
+    await tx.compositeAssessment.update({ where: { id }, data: {
+      trainingFlowDraft: input.config === null ? Prisma.DbNull : input.config as Prisma.InputJsonValue,
+      trainingFlowFrozen: Prisma.DbNull, trainingFlowDigest: null,
+    } })
+  })
+}
 async function validateTrainingVariants(tx: Tx, row: any) {
   if (row.trainingVariantDraft == null) return
   await assertTrainingVariantAuthoringScope(tx, row)
@@ -147,11 +162,12 @@ async function mutate(actor: Actor, id: string, revision: number, fn: (tx: Tx, r
     await fn(tx, row)
     // Keep every edit atomic with the saved group references. Authors can
     // explicitly disable grouping before changing the global unit layout.
-    if (draft && row.status === 'DRAFT' && row.trainingVariantDraft != null) {
+    if (draft && row.status === 'DRAFT' && (row.trainingVariantDraft != null || hasTrainingFlowDefinition(row))) {
       const current = await tx.compositeAssessment.findUnique({ where: { id }, include: {
         questionnaireCourses: true, items: true, formSections: { include: { items: true } },
       } })
       if (current?.trainingVariantDraft != null) await validateTrainingVariants(tx, current)
+      if (current) await validateTrainingFlow(tx, current)
     }
     await tx.compositeAssessment.update({ where: { id }, data: { revision: { increment: 1 } } })
   }, { timeout: 30000 })
@@ -281,6 +297,7 @@ export async function preflight(actor: Actor, id: string, raw: unknown) {
     for (const [key, label, validate] of [
       ['delivery', '课程、公开投放与时间', () => validateDelivery(tx, actor, row)],
       ['training-variants', 'Training 加权分组、完整覆盖与次数限制', () => validateTrainingVariants(tx, row)],
+      ['training-flow', 'Training 条件路径、材料与结束规则', () => validateTrainingFlow(tx, row)],
       ['resources', '内容依赖与当前权限', () => validateResources(tx, actor, row, inspectedSituational)],
       ['content', '区段、背景顺序、字段与冻结定义', () => {
         if (inspectedSituational.errors.size) throw inspectedSituational.errors.values().next().value
@@ -406,7 +423,7 @@ export async function resources(actor: Actor) {
 }
 
 /** Copy definitions only; no attempts, responses, tokens or report ciphertext. */
-export async function copy(actor: Actor, id: string, raw: unknown, options: { allowTrainingVariants?: boolean } = {}) {
+export async function copy(actor: Actor, id: string, raw: unknown, options: { allowTrainingVariants?: boolean; allowTrainingFlow?: boolean } = {}) {
   author(actor)
   if (process.env.QUESTIONNAIRE_PRODUCTS_ENABLED === 'false') throw compositeConflict('暂未开放新版问卷创建')
   const { requestId } = z.object({ requestId: z.string().uuid() }).strict().parse(raw)
@@ -419,6 +436,9 @@ export async function copy(actor: Actor, id: string, raw: unknown, options: { al
       if (options.allowTrainingVariants === false && (existing.trainingVariantDraft != null || existing.trainingVariantFrozen != null)) {
         throw compositeBadRequest('加权随机分组暂不支持无课程投放的私有模板，请复制为课程草稿')
       }
+      if ((options.allowTrainingFlow ?? options.allowTrainingVariants) === false && hasTrainingFlowDefinition(existing)) {
+        throw compositeBadRequest('跨工具流程暂不支持无课程投放的私有模板，请复制为课程草稿')
+      }
       return existing.id
     }
     // Resolve storage server-side. A collision is rejected rather than guessed.
@@ -428,14 +448,20 @@ export async function copy(actor: Actor, id: string, raw: unknown, options: { al
     let composite = await tx.compositeAssessment.findUnique({ where: { id }, include: { items: { include: { cognitiveAssignment: true } }, formSections: true, questionnaireCourses: true } })
     if ((!legacy && !composite) || (legacy && composite)) throw compositeNotFound('无法唯一识别来源问卷')
     owner(actor, { createdBy: legacy ? legacy.creatorId : composite!.createdBy })
-    if (composite?.trainingVariantDraft != null || composite?.trainingVariantFrozen != null) {
+    if (composite && (composite.trainingVariantDraft != null || composite.trainingVariantFrozen != null || hasTrainingFlowDefinition(composite))) {
       await tx.$queryRawUnsafe('SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR SHARE', id)
       composite = await tx.compositeAssessment.findUnique({ where: { id }, include: { items: { include: { cognitiveAssignment: true } }, formSections: true, questionnaireCourses: true } })
       if (!composite) throw compositeNotFound('来源问卷不存在')
       owner(actor, composite)
-      if (options.allowTrainingVariants === false) throw compositeBadRequest('加权随机分组暂不支持无课程投放的私有模板，请复制为课程草稿')
-      if (composite.trainingVariantDraft == null) throw compositeBadRequest('来源问卷缺少加权分组定义')
-      await assertTrainingVariantAuthoringScope(tx, composite)
+      if (composite.trainingVariantDraft != null || composite.trainingVariantFrozen != null) {
+        if (options.allowTrainingVariants === false) throw compositeBadRequest('加权随机分组暂不支持无课程投放的私有模板，请复制为课程草稿')
+        if (composite.trainingVariantDraft == null) throw compositeBadRequest('来源问卷缺少加权分组定义')
+        await assertTrainingVariantAuthoringScope(tx, composite)
+      }
+      if (hasTrainingFlowDefinition(composite)) {
+        if ((options.allowTrainingFlow ?? options.allowTrainingVariants) === false) throw compositeBadRequest('跨工具流程暂不支持无课程投放的私有模板，请复制为课程草稿')
+        await validateTrainingFlow(tx, composite)
+      }
     }
     const source = legacy ?? composite!
     if (composite && (composite.productKind === 'ASSESSMENT_BUNDLE' || composite.reportPackageKey || composite.analysisProtocolKey)) throw compositeBadRequest('固定报告包不能复制为问卷')
@@ -460,6 +486,7 @@ export async function copy(actor: Actor, id: string, raw: unknown, options: { al
       questionnaireCourses: { create: sourceCourses.map(courseId => ({ courseId })) },
     } })
     const copiedIds = new Map<string, string>((composite?.items ?? []).map(item => [item.id, randomUUID()]))
+    const copiedKeys = new Map<string, string>((composite?.items ?? []).filter(item => item.formDefinition != null).map(item => [(item.formDefinition as any).itemKey, 'q_' + copiedIds.get(item.id)]))
     const sectionIds = new Map<string, string>()
     for (const section of source.formSections) {
       const created = await tx.compositeFormSection.create({ data: {
@@ -479,7 +506,6 @@ export async function copy(actor: Actor, id: string, raw: unknown, options: { al
         formSectionId: form.sectionId ? sectionIds.get(form.sectionId) : null, formSectionPosition: form.sectionPosition,
       } })
     } else {
-      const copiedKeys = new Map<string,string>(composite!.items.filter(item=>item.formDefinition!=null).map(item=>[(item.formDefinition as any).itemKey,'q_'+copiedIds.get(item.id)]))
       for (const item of composite!.items) {
         if (item.formDefinition != null) typedCompositeFormQuestion({ ...item, placeholder: item.formPlaceholder ?? null } as any)
         const { id: _id, compositeAssessmentId: _parent, cognitiveAssignment, ...data } = item
@@ -525,6 +551,17 @@ export async function copy(actor: Actor, id: string, raw: unknown, options: { al
       await tx.compositeAssessment.update({ where: { id: target.id }, data: {
         trainingVariantDraft: remapped as Prisma.InputJsonValue,
         trainingVariantFrozen: Prisma.DbNull, trainingVariantDigest: null,
+      } })
+    }
+    if (composite?.trainingFlowDraft != null) {
+      const remapped = remapTrainingFlowDraft(composite.trainingFlowDraft, sectionIds, copiedIds, copiedKeys)
+      const copied = await tx.compositeAssessment.findUniqueOrThrow({ where: { id: target.id }, include: {
+        questionnaireCourses: true, items: true, formSections: { include: { items: true } },
+      } })
+      await assertTrainingFlowAuthoringScope(tx, copied)
+      compileTrainingFlowDefinition(remapped, copied)
+      await tx.compositeAssessment.update({ where: { id: target.id }, data: {
+        trainingFlowDraft: remapped as Prisma.InputJsonValue, trainingFlowFrozen: Prisma.DbNull, trainingFlowDigest: null,
       } })
     }
     return target.id

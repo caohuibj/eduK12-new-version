@@ -56,8 +56,8 @@ export function trainingVariantExportStrata(attempts: any[], scopes: Map<string,
 export async function loadTrainingVariantExportGraph(assessmentId: string, where: any, options: CompositeExportOptions, headersOnly = false, db: Prisma.TransactionClient = prisma) {
   const marker = await db.$queryRaw<Array<{id: string}>>`SELECT c.id FROM composite_assessments c
     WHERE c.id=${assessmentId} AND (c.training_variant_frozen IS NOT NULL OR c.training_variant_digest IS NOT NULL
-      OR c.training_variant_draft IS NOT NULL OR EXISTS (SELECT 1 FROM composite_assessment_attempts a
-        WHERE a.composite_assessment_id=c.id AND (a.training_variant_allocation_encrypted IS NOT NULL OR a.training_variant_allocation_hash IS NOT NULL)))`
+      OR c.training_variant_draft IS NOT NULL OR c.training_flow_draft IS NOT NULL OR c.training_flow_frozen IS NOT NULL OR c.training_flow_digest IS NOT NULL OR EXISTS (SELECT 1 FROM composite_assessment_attempts a
+        WHERE a.composite_assessment_id=c.id AND (a.training_variant_allocation_encrypted IS NOT NULL OR a.training_variant_allocation_hash IS NOT NULL OR a.training_flow_snapshot_hash IS NOT NULL OR a.training_flow_path_hash IS NOT NULL)))`
   if (!marker.length) return null
   const template: any = await db.compositeAssessment.findUnique({ where: { id: assessmentId }, include: {
     items: { orderBy: { position: 'asc' }, include: {
@@ -70,8 +70,10 @@ export async function loadTrainingVariantExportGraph(assessmentId: string, where
       include: {user: {select: {id: true, nickname: true, username: true}}} },
   } })
   if (!template) throw new Error('综合测评不存在')
+  if(template.trainingVariantFrozen!=null){
   const config = parseCompiledWeightedVariants(template.trainingVariantFrozen)
   if (config.configDigest !== template.trainingVariantDigest || config.unionDigest !== canonicalHash({kind: 'WEIGHTED_VARIANT_UNION', schemaVersion: 1, units: buildTrainingVariantUnion(template).units})) throw compositeBadRequest('分卷发布配置不一致')
+  }
   assertExportLimits({records: template.attempts.length})
   const frozenSlotSets = await loadSituationalExportSlotSets(template.attempts, db)
   const scopes = new Map<string, TrainingAttemptScope>()
@@ -81,7 +83,7 @@ export async function loadTrainingVariantExportGraph(assessmentId: string, where
   // predicate per participant and quadratic child-to-parent attachment.
   const groups = new Map<string, {attemptIds: string[]; attemptEpoch: number; scope: TrainingAttemptScope}>()
   for (const attempt of template.attempts) {
-    const scope = scopes.get(attempt.id)!, key = `${trainingVariantStratumKey(scope)}:${attempt.attemptEpoch}`
+    const scope = scopes.get(attempt.id)!, key = `${scope.flow?.pathHash??trainingVariantStratumKey(scope)}:${attempt.attemptEpoch}`
     const group = groups.get(key) ?? {attemptIds: [] as string[], attemptEpoch: attempt.attemptEpoch, scope}
     group.attemptIds.push(attempt.id); groups.set(key, group)
   }

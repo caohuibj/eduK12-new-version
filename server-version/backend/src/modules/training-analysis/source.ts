@@ -84,7 +84,7 @@ const parentIdentity = (attempt: any) => ({id: attempt.id, taskId: attempt.compo
   runtimeGeneration: attempt.runtimeGeneration ?? null, taskSatisfaction: attempt.taskSatisfaction ?? null,
   completedAt: iso(attempt.completedAt), aggregateInputHash: attempt.aggregateInputHash ?? null,
   contextHash: attempt.contextSnapshotHash ?? null, slotsHash: attempt.frozenActiveSlotSetHash ?? null,
-  allocationHash: attempt.trainingVariantAllocationHash ?? null})
+  allocationHash: attempt.trainingVariantAllocationHash ?? null,...(attempt.trainingFlowSnapshotHash!=null?{flowSnapshotHash:attempt.trainingFlowSnapshotHash,flowPathHash:attempt.trainingFlowPathHash??null}: {})})
 const stratumMatches = (wave: TrainingAnalysisWaveV1, scope: TrainingAttemptScope) => scope.variant
   ? wave.configDigest === scope.variant.configDigest && wave.variantKey === scope.variant.variantKey && wave.publication === scope.variant.publishedAt
   : wave.configDigest === null && wave.variantKey === null

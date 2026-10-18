@@ -88,6 +88,8 @@ export const buildCompositeExportProjectionBinding = (input: {
   trainingTimingPolicy?: unknown
   timingExportRevision?:number
   trainingVariantDigest?: string | null
+  trainingFlowFrozen?:unknown
+  trainingFlowDigest?:string|null
   trainingVariantFrozen?: unknown
   publishedAt?: Date | string | null
 }): CompositeExportProjectionBindingV1 => {
@@ -103,6 +105,7 @@ export const buildCompositeExportProjectionBinding = (input: {
     resourceId: input.resourceId,
     audience,
     scales,
+    ...(input.trainingFlowDigest!=null||input.trainingFlowFrozen!=null?{trainingFlowExport:{version:'training-flow-export-v1',configDigest:input.trainingFlowDigest??'',frozenHash:canonicalHash(input.trainingFlowFrozen??null)}}:{}),
     ...(input.trainingVariantDigest != null || input.trainingVariantFrozen != null ? {trainingVariantExport: {version: 'training-weighted-variant-export-v1', configDigest: input.trainingVariantDigest ?? '', publishedAt: input.publishedAt ? new Date(input.publishedAt).toISOString() : '', frozenHash: canonicalHash(input.trainingVariantFrozen ?? null)}} : {}),
     ...(input.items.some(item => item.type === 'SITUATIONAL') ? { situationalExport: { version: SITUATIONAL_CANONICAL_EXPORT_VERSION, slots: input.items.flatMap((item, index) => item.type === 'SITUATIONAL' ? [{ itemId: item.id, prefix: `J${String(index + 1).padStart(3, '0')}_` }] : []) } } : {}),
     ...(input.timingExportEnabled ? {timingExportEnabled:true,trainingTimingPolicy:input.trainingTimingPolicy??null,timingExportRevision:input.timingExportRevision??0} : {}),
@@ -120,7 +123,7 @@ export const resolveCompositeExportProjectionBinding = async (
     select: {
       id: true,
       timingExportEnabled:true,trainingTimingPolicy:true,productKind:true,revision:true,
-      trainingVariantDraft:true,trainingVariantDigest:true,trainingVariantFrozen:true,publishedAt:true,
+      trainingVariantDraft:true,trainingFlowDraft:true,trainingFlowFrozen:true,trainingFlowDigest:true,trainingVariantDigest:true,trainingVariantFrozen:true,publishedAt:true,
       items: {
         orderBy: { position: 'asc' },
         select: {
@@ -141,7 +144,14 @@ export const resolveCompositeExportProjectionBinding = async (
         ||parseCompiledWeightedVariants(composite.trainingVariantFrozen).configDigest!==composite.trainingVariantDigest) throw new Error('incomplete publication')
     } catch { throw compositeForbidden('导出来源的分卷冻结配置不完整') }
   }
-  return buildCompositeExportProjectionBinding({ resourceId: composite.id, audience, items: composite.items,timingExportEnabled:composite.productKind==='QUESTIONNAIRE'&&composite.timingExportEnabled,trainingTimingPolicy:composite.trainingTimingPolicy,timingExportRevision:composite.revision, trainingVariantDigest:composite.trainingVariantDigest, trainingVariantFrozen:composite.trainingVariantFrozen, publishedAt:composite.publishedAt })
+  if([composite.trainingFlowDraft,composite.trainingFlowFrozen,composite.trainingFlowDigest].some(v=>v===undefined))throw compositeForbidden('流程导出来源未加载')
+  if([composite.trainingFlowDraft,composite.trainingFlowFrozen,composite.trainingFlowDigest].some(v=>v!=null)){
+    const frozen:any=composite.trainingFlowFrozen
+    if(!frozen||!composite.trainingFlowDigest||frozen.flowDigest!==composite.trainingFlowDigest)throw compositeForbidden('流程导出来源不完整')
+    const {flowDigest,...definition}=frozen
+    if(canonicalHash(definition)!==flowDigest)throw compositeForbidden('流程导出摘要不匹配')
+  }
+  return buildCompositeExportProjectionBinding({ resourceId: composite.id, audience, items: composite.items,timingExportEnabled:composite.productKind==='QUESTIONNAIRE'&&composite.timingExportEnabled,trainingTimingPolicy:composite.trainingTimingPolicy,timingExportRevision:composite.revision, trainingFlowDigest:composite.trainingFlowDigest,trainingFlowFrozen:composite.trainingFlowFrozen,trainingVariantDigest:composite.trainingVariantDigest, trainingVariantFrozen:composite.trainingVariantFrozen, publishedAt:composite.publishedAt })
 }
 
 const scaleFieldAllowed = (suffix: string, caps: DisclosureCapabilitiesV1): boolean => {

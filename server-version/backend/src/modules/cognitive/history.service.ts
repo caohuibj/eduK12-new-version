@@ -52,7 +52,7 @@ export const listMyHistory = async (userId: string, pagination: PaginationParams
       qualityFlagsEncrypted: true,
       resultSnapshotEncrypted: true,
       assignment: { select: { title: true } },
-      compositeAttempt: { select: { id: true, status: true, attemptEpoch: true, participantKey: true, runtimeGeneration: true, deliveryMode: true, trainingVariantAllocationEncrypted: true, trainingVariantAllocationHash: true, frozenActiveSlotSetEncrypted: true, frozenActiveSlotSetHash: true, compositeAssessment: { select: { id: true, name: true, publishedAt: true, trainingVariantDraft: true, trainingVariantFrozen: true, trainingVariantDigest: true, items: true, formSections: {include: {items: true}} } } } },
+      compositeAttempt: { select: { id: true, status: true, attemptEpoch: true, participantKey: true, runtimeGeneration: true, deliveryMode: true, trainingVariantAllocationEncrypted: true, trainingFlowSnapshotEncrypted:true,trainingFlowSnapshotHash:true,trainingFlowPathEncrypted:true,trainingFlowPathHash:true,trainingVariantAllocationHash:true, frozenActiveSlotSetEncrypted: true, frozenActiveSlotSetHash: true, compositeAssessment: { select: { id: true, name: true, publishedAt: true, trainingVariantDraft: true, trainingVariantFrozen: true, trainingFlowDraft:true,trainingFlowFrozen:true,trainingFlowDigest:true,trainingVariantDigest:true, items: true, formSections: {include: {items: true}} } } } },
     },
   })
 

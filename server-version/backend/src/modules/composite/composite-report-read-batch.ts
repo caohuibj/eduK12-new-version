@@ -43,6 +43,7 @@ export type CompositeReportFacts = {
 export type CompositeReportFactsReader = (attempt: any) => CompositeReportFacts
 const identity = (attempt: any) => canonicalHash({
   id: attempt.id, epoch: attempt.attemptEpoch, slotSetHash: attempt.frozenActiveSlotSetHash ?? null,
+  ...(attempt.trainingFlowPathHash!=null?{trainingFlowPathHash:attempt.trainingFlowPathHash}:{}),
   contextHash: attempt.contextSnapshotHash ?? null, allocationHash: attempt.trainingVariantAllocationHash ?? null,
   items: attempt.compositeAssessment.items.map((item: any) => item.id),
   sections: (attempt.compositeAssessment.formSections ?? []).map(mapCompositeSection),

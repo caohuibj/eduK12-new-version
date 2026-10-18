@@ -2,6 +2,7 @@ import type { Prisma } from '@prisma/client'
 
 /** Select every marker together. Omission is not evidence of a legacy row. */
 export const TRAINING_VARIANT_DEFINITION_MARKER_SELECT = {
+  trainingFlowDraft: true, trainingFlowFrozen: true, trainingFlowDigest: true,
   trainingVariantDraft: true,
   trainingVariantFrozen: true,
   trainingVariantDigest: true,
@@ -9,6 +10,8 @@ export const TRAINING_VARIANT_DEFINITION_MARKER_SELECT = {
 
 export const TRAINING_VARIANT_PARENT_MARKER_SELECT = {
   id: true,
+  trainingFlowSnapshotEncrypted: true, trainingFlowSnapshotHash: true,
+  trainingFlowPathEncrypted: true, trainingFlowPathHash: true,
   trainingVariantAllocationEncrypted: true,
   trainingVariantAllocationHash: true,
   compositeAssessment: { select: TRAINING_VARIANT_DEFINITION_MARKER_SELECT },
@@ -32,6 +35,9 @@ export function trainingVariantMarkerState(attempt: unknown, composite?: unknown
   const parent = record(attempt)
   const definition = record(composite === undefined ? parent?.compositeAssessment : composite)
   const values = [
+    markerValue(parent, 'trainingFlowSnapshotEncrypted'), markerValue(parent, 'trainingFlowSnapshotHash'),
+    markerValue(parent, 'trainingFlowPathEncrypted'), markerValue(parent, 'trainingFlowPathHash'),
+    markerValue(definition, 'trainingFlowDraft'), markerValue(definition, 'trainingFlowFrozen'), markerValue(definition, 'trainingFlowDigest'),
     markerValue(parent, 'trainingVariantAllocationEncrypted'),
     markerValue(parent, 'trainingVariantAllocationHash'),
     markerValue(definition, 'trainingVariantDraft'),

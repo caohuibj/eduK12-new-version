@@ -1,3 +1,4 @@
+import { lockTrainingFlowFinalAdmission, requiresTrainingFlowFinalLock } from '../composite/training-variant-child-scope'
 import {normalizeTrainingScaleTiming} from '../assessment-runtime/training-scale-timing'
 import { rethrowScaleSubmissionIdConflict, rethrowConfirmedScaleBatchSubmissionConflict } from './scale-final-submit-conflict'
 import { loadScaleAnswers } from './scale-workflow.service'
@@ -312,6 +313,12 @@ export const submitUnifiedScaleAssessmentFinal = async (
   if (child.status === 'COMPLETED') {
     const replay = assertSubmissionReplay(child, submissionId, payloadHash)
     if (replay === 'replay') {
+      if (requiresTrainingFlowFinalLock(child.compositeAttemptId, child.compositeAttempt)) {
+        await withFinalOnlyCompletionTransaction(async tx => {
+          const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, { attemptId: child.compositeAttemptId, parent: child.compositeAttempt, attemptEpoch: input.attemptEpoch, itemId: child.compositeItemId, sourceAttemptId: child.id, submissionId })
+          assertFlowFinal(true)
+        })
+      }
       return {
         submissionId,
         payloadHash,
@@ -326,6 +333,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
     input, child, { submissionId, admission, snapshot, answers, payloadHash, timing }, wholeReceipt, referenceDb)
 
   const committed = await withFinalOnlyCompletionTransaction(async (tx) => {
+    const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, { attemptId: child.compositeAttemptId, parent: child.compositeAttempt, attemptEpoch: input.attemptEpoch, itemId: child.compositeItemId, sourceAttemptId: child.id, submissionId })
     const current = await tx.assessment.findUnique({
       where: { id: input.assessmentId },
       select: { ...txAdmissionSelect, runtimeSnapshotEncrypted: !wholeReceipt },
@@ -342,9 +350,11 @@ export const submitUnifiedScaleAssessmentFinal = async (
     }
     const replay = assertSubmissionReplay(current, submissionId, payloadHash)
     if (replay === 'replay' && current.status === 'COMPLETED') {
+      assertFlowFinal(true)
       return { replayed: true, current }
     }
     if (current.status !== 'IN_PROGRESS') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评已结束', 409)
+    assertFlowFinal(false)
     const totalTime = Math.max(0, completedAt.getTime() - current.startedAt.getTime())
     const where: Record<string, unknown> = {
       id: input.assessmentId,

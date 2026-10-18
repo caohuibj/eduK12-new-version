@@ -32,6 +32,15 @@ export type AggregateCompleteness = {
   progress: number
 }
 
+/** An explicitly verified flow path narrows readiness, never the immutable
+ * candidate slot set. Only accepted, actually executed units carry snapshots. */
+export type AggregatePathCompletenessPolicy = {
+  kind: 'TRAINING_FLOW_V1'
+  terminal: boolean
+  reachedSlotKeys: readonly string[]
+  executedSlotKeys: readonly string[]
+}
+
 const expectedPayloadKind = (slot: FrozenActiveSlotV1): AggregateSnapshotHeader['payloadKind'] => (
   slot.unitType === 'FORM_SECTION' ? 'COLLECTION_FACTS' : 'UNIT_RESULT'
 )
@@ -45,7 +54,9 @@ export const evaluateCompleteness = (input: {
   slots: FrozenActiveSlotV1[]
   snapshots: AggregateSnapshotHeader[]
   attemptEpoch: number
+  pathPolicy?: AggregatePathCompletenessPolicy | null
 }): AggregateCompleteness => {
+  if (input.pathPolicy != null) return evaluatePathCompleteness({ ...input, pathPolicy: input.pathPolicy })
   const required = input.slots.filter((slot) => slot.required)
   const requiredByKey = new Map(required.map((slot) => [slot.slotKey, slot]))
   const snapshotsByKey = new Map<string, AggregateSnapshotHeader>()
@@ -90,6 +101,54 @@ export const evaluateCompleteness = (input: {
   }
 }
 
+const evaluatePathCompleteness = (input: {
+  slots: FrozenActiveSlotV1[]
+  snapshots: AggregateSnapshotHeader[]
+  attemptEpoch: number
+  pathPolicy: AggregatePathCompletenessPolicy
+}): AggregateCompleteness => {
+  const policy = input.pathPolicy
+  const candidates = new Map(input.slots.map(slot => [slot.slotKey, slot]))
+  const reached = new Set(policy.reachedSlotKeys)
+  const executed = new Set(policy.executedSlotKeys)
+  const invalid = new Set<string>()
+  const snapshots = new Map<string, AggregateSnapshotHeader>()
+  if (policy.kind !== 'TRAINING_FLOW_V1') invalid.add('training-flow:policy')
+  for (const keys of [policy.reachedSlotKeys, policy.executedSlotKeys]) {
+    const seen = new Set<string>()
+    for (const key of keys) {
+      if (!candidates.has(key) || seen.has(key)) invalid.add(key)
+      seen.add(key)
+    }
+  }
+  for (const key of executed) if (!reached.has(key)) invalid.add(key)
+  for (const snapshot of input.snapshots) {
+    const slot = candidates.get(snapshot.slotKey)
+    if (!slot || !executed.has(snapshot.slotKey) || snapshots.has(snapshot.slotKey)) {
+      invalid.add(snapshot.slotKey)
+      continue
+    }
+    snapshots.set(snapshot.slotKey, snapshot)
+    if (snapshot.attemptEpoch !== input.attemptEpoch
+      || snapshot.unitType !== slot.unitType
+      || snapshot.terminalState !== 'COMPLETED'
+      || snapshot.payloadKind !== expectedPayloadKind(slot)) invalid.add(snapshot.slotKey)
+  }
+  // Reached includes the current pending unit. Even an optional instrument
+  // cannot be silently treated as accepted by the aggregate layer.
+  const missingSlotKeys = [...reached].filter(key => !snapshots.has(key))
+  const completedSlotCount = [...executed].filter(key => snapshots.has(key) && !invalid.has(key)).length
+  const ready = policy.terminal && missingSlotKeys.length === 0 && invalid.size === 0
+  return {
+    ready,
+    requiredSlotCount: reached.size,
+    completedSlotCount,
+    missingSlotKeys,
+    invalidSlotKeys: [...invalid].sort(),
+    progress: ready ? 100 : reached.size === 0 ? 0 : Math.min(99, Math.round(completedSlotCount / reached.size * 100)),
+  }
+}
+
 export type AggregateInputHashEntry = {
   slotKey: string
   terminalState: AggregateSnapshotHeader['terminalState']
@@ -108,11 +167,14 @@ export const buildAggregateInputHash = (input: {
   contextHash?: string | null
   compiledBundleRuntimeHash?: string | null
   entries: AggregateInputHashEntry[]
+  trainingFlowPath?: { pathHash: string; evidence: unknown } | null
 }): string => canonicalHash({
   hashScheme: UNIFIED_AGGREGATE_HASH_SCHEME,
   attemptEpoch: input.attemptEpoch,
   contextHash: input.contextHash ?? null,
   compiledBundleRuntimeHash: input.compiledBundleRuntimeHash ?? null,
+  // Do not add even a null member to historical hashes.
+  ...(input.trainingFlowPath == null ? {} : { trainingFlowPath: input.trainingFlowPath }),
   slots: [...input.entries]
     .sort((left, right) => left.slotKey < right.slotKey ? -1 : left.slotKey > right.slotKey ? 1 : 0)
     .map((entry) => ({

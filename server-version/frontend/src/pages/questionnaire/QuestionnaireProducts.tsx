@@ -16,6 +16,8 @@ import { useStaffFeedback } from '../../components/staff-ui/useStaffFeedback'
 import LocalDateTimeInput, { localDateTimeValue, parseLocalDateTime } from '../../components/LocalDateTimeInput'
 import './questionnaire-products.css'
 import { TrainingVariantEditor } from './TrainingVariantEditor'
+import { TrainingFlowEditor, trainingFlowEditorId } from './TrainingFlowEditor'
+import { formatTrainingFlow, parseTrainingFlow, type TrainingFlowConfig } from './trainingFlow'
 import { validateTrainingVariants, type TrainingVariantConfig } from './trainingVariants'
 import {
   ProductPage,
@@ -188,6 +190,8 @@ export function QuestionnaireProductEdit() {
   const [publicEnabled, setPublic] = useState(false)
   const [timingEnabled,setTimingEnabled]=useState(false)
   const [trainingVariantDraft, setTrainingVariantDraft] = useState<TrainingVariantConfig | null>(null)
+  const [trainingFlowText, setTrainingFlowText] = useState('')
+  const [trainingFlowError, setTrainingFlowError] = useState('')
   const [maxAttempts, setMaxAttempts] = useState(1)
   const [expiresAt, setExpiry] = useState('')
   const [opensAt, setOpens] = useState('')
@@ -239,6 +243,8 @@ export function QuestionnaireProductEdit() {
     setPublic(row.publicEnabled)
     setTimingEnabled(Boolean(row.trainingTimingPolicy))
     setTrainingVariantDraft(row.trainingVariantDraft ?? null)
+    setTrainingFlowText(formatTrainingFlow(row.trainingFlowDraft ?? null))
+    setTrainingFlowError('')
     setMaxAttempts(row.maxAttempts ?? 1)
     setExpiry(row.expiresAt || '')
     setOpens(row.opensAt || '')
@@ -329,6 +335,18 @@ export function QuestionnaireProductEdit() {
         : validateTrainingVariants(trainingVariantDraft, maxAttempts, units)
       if (variantError) { setError(variantError); return }
     }
+    let flowConfig: TrainingFlowConfig | null = null
+    if (flowDirty) {
+      try {
+        flowConfig = parseTrainingFlow(trainingFlowText, units)
+        if (flowConfig && !flowEligible) throw new Error('条件流程仅支持真实 Training 课程投放，且不能与随机分组或其他投放策略组合。')
+        setTrainingFlowError('')
+      } catch (cause) {
+        setTrainingFlowError(message(cause))
+        document.getElementById(trainingFlowEditorId)?.focus()
+        return
+      }
+    }
     return action(async () => {
       if (id === 'new') {
         const row = await request('', {
@@ -345,12 +363,25 @@ export function QuestionnaireProductEdit() {
           row = await request('/' + id + '/training-variants', { revision: row.revision, config: null })
           setDetail(row)
         }
+        if (flowDirty && !flowConfig) {
+          row = await request('/' + id + '/training-flow', { revision: row.revision, config: null })
+          setDetail(row)
+        }
         if (metadataDirty) {
           row = await request('/' + id, { ...metadata(), revision: row.revision }, 'put')
           setDetail(row)
         }
         if (variantsDirty && trainingVariantDraft) {
           row = await request('/' + id + '/training-variants', { revision: row.revision, config: trainingVariantDraft, maxAttempts })
+        }
+        if (flowDirty && flowConfig) {
+          try {
+            row = await request('/' + id + '/training-flow', { revision: row.revision, config: flowConfig })
+          } catch (cause) {
+            setTrainingFlowError(message(cause))
+            requestAnimationFrame(() => document.getElementById(trainingFlowEditorId)?.focus())
+            throw cause
+          }
         }
         hydrate(row)
       }
@@ -475,11 +506,16 @@ export function QuestionnaireProductEdit() {
     JSON.stringify(trainingVariantDraft) !== JSON.stringify(detail.trainingVariantDraft ?? null) ||
     (trainingVariantDraft && maxAttempts !== (detail.maxAttempts ?? 1))
   ))
-  const dirty = metadataDirty || variantsDirty
-  const variantsEligible = kind === 'COURSE' && !detail?.reportPackage && !detail?.analysisProtocol &&
+  const flowDirty = Boolean(detail && trainingFlowText !== formatTrainingFlow(detail.trainingFlowDraft ?? null))
+  const dirty = metadataDirty || variantsDirty || flowDirty
+  const trainingEligible = kind === 'COURSE' && !detail?.reportPackage && !detail?.analysisProtocol &&
     (!detail?.productKind || detail.productKind === 'QUESTIONNAIRE') && courseIds.length > 0 && courseIds.length <= 100 &&
     courseIds.every(courseId => catalog.courses.some((course: { id: string; courseType?: string; isLibrary?: boolean }) => course.id === courseId && course.courseType === 'TRAINING_COURSE' && !course.isLibrary)) &&
     (!publicEnabled || courseIds.length === 1)
+  const variantsEligible = trainingEligible && !trainingFlowText.trim() && !detail?.trainingFlowFrozen
+  const flowEligible = trainingEligible && !trainingVariantDraft && !detail?.trainingVariantFrozen &&
+    !detail?.anonymousStudy && !detail?.anonymousStudyId && !detail?.assignmentRef &&
+    !detail?.deliveryPolicy && !detail?.selectionPolicy && !detail?.routingPolicy && !detail?.randomizationPolicy
   const draft = id === 'new' || detail?.status === 'DRAFT'
   const choices =
     type === 'SCALE'
@@ -946,6 +982,12 @@ export function QuestionnaireProductEdit() {
                 onChange={setTrainingVariantDraft}
                 onMaxAttemptsChange={setMaxAttempts}
                 onSave={() => void save()}
+              />}
+              {(draft ? trainingEligible || trainingFlowText || detail.trainingFlowDraft : detail.trainingFlowFrozen) && <TrainingFlowEditor
+                text={trainingFlowText} frozen={detail.trainingFlowFrozen ?? null} units={units}
+                draft={draft} eligible={flowEligible} busy={busy} dirty={flowDirty} error={trainingFlowError}
+                onChange={text => { setTrainingFlowText(text); setTrainingFlowError('') }}
+                onError={setTrainingFlowError} onSave={() => void save()}
               />}
               <div className="flex flex-wrap gap-4 my-5">
                 <ProductButton

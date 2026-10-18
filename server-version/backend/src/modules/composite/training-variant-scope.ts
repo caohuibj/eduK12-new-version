@@ -1,3 +1,4 @@
+import { resolveTrainingFlowScope, trainingFlowMarkerState } from './training-flow-scope'
 import type { SharedControlDb } from '../assessment-runtime/shared-control-records'
 import { trainingVariantMarkerState } from './training-variant-markers'
 import { canonicalHash } from '../assessment-runtime/canonical'
@@ -31,7 +32,7 @@ export const hasTrainingVariantMetadata = (attempt:any, composite:any=attempt.co
   trainingVariantMarkerState(attempt,composite) !== 'LEGACY'
 
 export type TrainingAttemptScope = {
-  items:any[];formSections:any[];itemIds:Set<string>;sectionIds:Set<string>;variant:any|null
+  items:any[];formSections:any[];itemIds:Set<string>;sectionIds:Set<string>;variant:any|null;flow?:Awaited<ReturnType<typeof resolveTrainingFlowScope>>
 }
 const scopes=new WeakMap<object,TrainingAttemptScope>()
 const verifiedDefinitions=new WeakMap<object,ReturnType<typeof parseCompiledWeightedVariants>>()
@@ -41,6 +42,11 @@ export async function resolveTrainingAttemptScope(attempt:any,composite:any=atte
   if(known)return known
   if(!composite)throw compositeForbidden('作答缺少冻结问卷来源')
   if(trainingVariantMarkerState(attempt,composite)==='UNKNOWN')throw compositeForbidden('概率分卷来源标志未加载，不能推断旧模式')
+  if(trainingFlowMarkerState(attempt,composite)==='FLOW'){
+    const flow=await resolveTrainingFlowScope(attempt,composite,{db:options?.db,frozenSlots:options?.frozenSlotSets?.get(attempt.id)})
+    if(!flow)throw compositeForbidden('流程模式无法解析')
+    return {items:(composite.items??[]).filter((i:any)=>flow.itemIds.has(i.id)),formSections:(composite.formSections??[]).filter((s:any)=>flow.sectionIds.has(s.id)),itemIds:flow.itemIds,sectionIds:flow.sectionIds,variant:null,flow}
+  }
   const configured=composite.trainingVariantFrozen!=null||composite.trainingVariantDigest!=null
   if(!configured){
     if(attempt.trainingVariantAllocationEncrypted!=null||attempt.trainingVariantAllocationHash!=null||composite.trainingVariantDraft!=null)
@@ -85,8 +91,10 @@ export async function resolveTrainingAttemptScope(attempt:any,composite:any=atte
 /** Returns a shallow projection; never mutates the loaded union graph. */
 export async function applyTrainingAttemptScope(attempt:any,options?:TrainingAttemptScopeOptions):Promise<any>{
   const scope=await resolveTrainingAttemptScope(attempt,attempt.compositeAssessment,options)
-  if(!scope.variant)return attempt
-  const projected={...attempt,compositeAssessment:{...attempt.compositeAssessment,items:scope.items,formSections:scope.formSections},trainingVariantScope:scope}
+  if(!scope.variant&&!scope.flow)return attempt
+  const projected={...attempt,compositeAssessment:{...attempt.compositeAssessment,items:scope.items,formSections:scope.formSections},trainingVariantScope:scope,...(scope.flow?{trainingFlowScope:scope.flow}:{}),
+    ...Object.fromEntries(['scaleAssessments','cognitiveSessions','situationalAttempts'].filter(k=>Array.isArray(attempt[k])).map(k=>[k,attempt[k].filter((child:any)=>scope.itemIds.has(child.compositeItemId))])),
+    ...(Array.isArray(attempt.formSectionAttempts)?{formSectionAttempts:attempt.formSectionAttempts.filter((child:any)=>scope.sectionIds.has(child.sectionId))}:{})}
   scopes.set(projected,scope)
   return projected
 }
