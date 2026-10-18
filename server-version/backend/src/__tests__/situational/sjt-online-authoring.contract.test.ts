@@ -79,6 +79,34 @@ describe('online SJT authoring shared-core contract',()=>{
     expect(()=>compileSjtOnlineDocument(missing)).toThrow(SjtTemplateError)
     expect(document).toEqual(fixture())
   })
+  it('never accepts partial/null fixtures as numerical coverage of any substantive combination',()=>{
+    for(const modelKey of ['AUTHOR_KEY_SUM','EXPERT_KEY'] as const){
+      const d=fixture(),original=fixture().goldenCases
+      d.display.scoring={modelKey,modelVersion:'1',sourceNote:'独立人工评分键'}
+      const first=d.display.scenes[0].questions[0]
+      d.display.scenes[0].questions.push({...first,questionKey:'second'})
+      // Every legal combination, each optional blank and each refusal is present,
+      // but no case has observed all scoring opportunities: all expected are null.
+      d.goldenCases=original.flatMap(c=>[
+        {...c,name:'first-'+c.name,expected:{coordination:null}},
+        {...c,name:'second-'+c.name,responses:c.responses.map(r=>({...r,sceneKey:'sjt_q_second',channelKey:'second'})),expected:{coordination:null}},
+      ])
+      const partial=compileSjtOnlineDocument(d)
+      expect(()=>assertSjtOnlineReleaseReady(partial)).toThrow(SjtTemplateError)
+      const complete=original.filter(c=>c.expected.coordination!==null).flatMap(c=>{
+        const expected={coordination:(c.expected.coordination!+2)/(modelKey==='EXPERT_KEY'?2:1)}
+        return [
+          {...c,name:'numeric-first-'+c.name,responses:[...c.responses,{sceneKey:'sjt_q_second',channelKey:'second',status:'ANSWERED' as const,responseValue:['discuss']}],expected},
+          {...c,name:'numeric-second-'+c.name,responses:[{sceneKey:'sjt_q_action',channelKey:'action',status:'ANSWERED' as const,responseValue:['discuss']},...c.responses.map(r=>({...r,sceneKey:'sjt_q_second',channelKey:'second'}))],expected},
+        ]
+      })
+      d.goldenCases.push(complete[0])
+      // One complete numerical case cannot launder the remaining null-only combinations.
+      expect(()=>assertSjtOnlineReleaseReady(compileSjtOnlineDocument(d))).toThrow(SjtTemplateError)
+      d.goldenCases.push(...complete.slice(1))
+      expect(()=>assertSjtOnlineReleaseReady(compileSjtOnlineDocument(d))).not.toThrow()
+    }
+  })
   it('allows empty-golden and unknown-license drafts but never releases them',()=>{
     const d=fixture();d.goldenCases=[]
     expect(()=>assertSjtOnlineReleaseReady(compileSjtOnlineDocument(d))).toThrow(SjtTemplateError)

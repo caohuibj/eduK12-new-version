@@ -1,0 +1,33 @@
+{
+  "startedAt": 1792320408.2203588,
+  "stoppedAt": 1792320418.8738687,
+  "state": "stopped",
+  "checks": {
+    "runtimeRole": "passed",
+    "health": 200,
+    "ready": 200
+  },
+  "head": "618d374504b671533386813d6c85e946394e3f0f",
+  "schemaSha256": "33e2a793329c331f3ee5813bc21811688f9aae1e70aaffc44d9341ad4a9fc6fb",
+  "launcherSha256": "6e2be9037719977a502dbd5eb9a7aeac04e06b2d22f5cf41eb7e767f6b3eb79b",
+  "backendTree": "24797c51d97790fb7f20f5186cdb2a72bbcb2da4",
+  "node": "v24.21.0",
+  "runtimeFingerprint": {
+    "schemaVersion": 1,
+    "nodeVersion": "v24.21.0",
+    "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+    "dist": {
+      "files": 5033,
+      "sha256": "a9161cecd67bec3b3e23dae7908e14d1827716826561ef804f9d577b9f5b6295"
+    },
+    "files": {
+      "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+      "prisma/schema.prisma": "33e2a793329c331f3ee5813bc21811688f9aae1e70aaffc44d9341ad4a9fc6fb",
+      "node_modules/.prisma/client/schema.prisma": "3786095e6b9a5477273b36a1842ca7b144daa23aa33fccb0fb3da2c95a16d822",
+      "node_modules/.prisma/client/index.js": "7fcb0b1b1bd5a7941668e2749df16880622b0b67c5838d4f44f10ab793fa5bbb"
+    },
+    "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+  },
+  "cleanupVerified": true,
+  "cleanupErrors": []
+}

@@ -34,3 +34,14 @@ export function mergeSituationalTaskSatisfaction(form: string | null, cores: Arr
   if (form === 'NOT_SATISFIED' || states.includes('NOT_SATISFIED')) return 'NOT_SATISFIED'
   return form === 'SATISFIED' || states.length ? 'SATISFIED' : null
 }
+
+/** Optional units may finish without qualifying; they cannot block a parent task. */
+export function mergeRequiredSituationalTaskSatisfaction(
+  form: string | null,
+  slots: Array<{ slotKey: string; required: boolean }>,
+  payloads: Array<{ header: { slotKey: string }; envelope?: { core: Pick<CanonicalUnitResultCoreV1, 'unitType' | 'quality'> } }>,
+): 'SATISFIED' | 'NOT_SATISFIED' | null {
+  const required = new Set(slots.filter(slot => slot.required).map(slot => slot.slotKey))
+  return mergeSituationalTaskSatisfaction(form, payloads.flatMap(payload =>
+    required.has(payload.header.slotKey) && payload.envelope ? [payload.envelope.core] : []))
+}

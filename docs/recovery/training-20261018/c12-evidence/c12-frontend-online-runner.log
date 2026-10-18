@@ -1,0 +1,32 @@
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/eduk12_c12_20261018/server-version/frontend
+
+ ❯ src/modules/situational/__tests__/SituationalRunner.test.tsx (18 tests | 1 failed | 17 skipped) 120ms
+     × online frozen display renders real multiple choices and seals raw arrays 118ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/modules/situational/__tests__/SituationalRunner.test.tsx > Situational journal failure recovery > online frozen display renders real multiple choices and seals raw arrays
+Error: expect(element).toBeDisabled()
+
+Received element is not disabled:
+  <button
+  class="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+  type="button"
+/>
+ ❯ src/modules/situational/__tests__/SituationalRunner.test.tsx:462:54
+    460|     fireEvent.click(screen.getByLabelText('原始选项甲'))
+    461|     await waitFor(()=>expect(screen.getByLabelText('原始选项甲')).toBeCheck…
+    462|     expect(screen.getByRole('button',{name:/提交测评/})).toBeDisabled()
+       |                                                      ^
+    463|     fireEvent.click(screen.getByLabelText('原始选项乙'))
+    464|     await waitFor(()=>expect(screen.getByRole('button',{name:/提交测评/}))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 17 skipped (18)
+   Start at  19:43:20
+   Duration  1.02s (transform 276ms, setup 112ms, import 383ms, tests 120ms, environment 276ms)
+

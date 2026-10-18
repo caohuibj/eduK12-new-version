@@ -188,8 +188,14 @@ export function assertSjtOnlineReleaseReady(compiled:ReturnType<typeof compileSj
   const covered=new Set<string>()
   for(const c of checked.template.goldenCases){
     const n=normalizeSjtOnlineResponses(checked.template.display,checked.package.definition,c.responses)
+    // Every question has an explicit contribution for every metric. Only a
+    // fully answered case with independently supplied numeric expectations can
+    // prove a substantive choice: partial/null cases cannot validate SUM/MEAN.
+    const completeNumeric=n.questionResults.every(r=>r.status==='ANSWERED'&&r.scorerOptionKey!==null)
+      &&checked.template.display.metrics.every(m=>typeof c.expected[m.metricKey]==='number'&&Number.isFinite(c.expected[m.metricKey]))
     for(const r of n.questionResults){
-      covered.add(`${r.questionKey}:${r.scorerOptionKey??r.status}`)
+      if(r.scorerOptionKey===null)covered.add(`${r.questionKey}:${r.status}`)
+      else if(completeNumeric)covered.add(`${r.questionKey}:${r.scorerOptionKey}`)
       if(r.response&&typeof r.response==='object'&&!Array.isArray(r.response))
         covered.add(`${r.questionKey}:EXPLICIT_REFUSED`)
       if(r.scorerOptionKey===null&&(typeof r.response==='string'||Array.isArray(r.response)))

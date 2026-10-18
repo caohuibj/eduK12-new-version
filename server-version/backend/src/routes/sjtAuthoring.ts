@@ -9,7 +9,7 @@ import { uploadPrincipalRateLimit, withUploadAdmission } from '../middleware/upl
 import { createTemporaryUploadStorage } from '../utils/uploadTemp'
 import { SjtTemplateError, compileSjtTemplate } from '../modules/situational/authoring/template'
 import { compileSjtAuthorDocument } from '../modules/situational/authoring/dispatcher'
-import { compileSjtOnlineDocument, publicSjtOnlineMetadata, normalizeSjtOnlineResponses } from '../modules/situational/authoring/online'
+import { publicSjtOnlineMetadata, normalizeSjtOnlineResponses } from '../modules/situational/authoring/online'
 import { readSjtWorkbook, locateSjtWorkbookIssues } from '../modules/situational/authoring/workbook'
 import {
   createSjtDraft,
@@ -155,10 +155,9 @@ router.get(
 router.post('/validate', uploadPrincipalRateLimit, uploadHandler(false))
 router.post('/drafts', uploadPrincipalRateLimit, uploadHandler(true))
 router.post('/online/drafts', uploadPrincipalRateLimit, handle(async (req, res) => {
-  const body = z.object({ template: z.unknown() }).strict().parse(req.body)
-  // This endpoint deliberately cannot reinterpret the legacy upload protocol.
-  const compiled = compileSjtOnlineDocument(body.template)
-  send(res, await createSjtDraft(actor(req), compiled.template))
+  // The service compiles exactly once. The route only selects the explicit protocol.
+  const body = z.object({ template: z.object({ templateVersion: z.literal('sjt-online-v1') }).passthrough() }).strict().parse(req.body)
+  send(res, await createSjtDraft(actor(req), body.template))
 }))
 router.get(
   '/drafts',

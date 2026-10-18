@@ -40,7 +40,10 @@ export async function inspectSituationalReleases(identities: SituationalReleaseI
         ? selectPublishedSituationPackage(builtins, identity.instrumentKey, identity.instrumentVersion)
         : row?.status === 'PUBLISHED' ? selectPublishedSituationPackage([row.package as unknown as SituationPackage], identity.instrumentKey, identity.instrumentVersion) : undefined
       if (!pkg) throw unavailable()
-      const validation = validateSituationPackage(pkg)
+      // Freeze below performs online source/display integrity exactly once in this
+      // operation. Definition/golden checks remain here; stored snapshot parsing
+      // always performs its own complete verification on future requests.
+      const validation = validateSituationPackage(pkg.online ? { ...pkg, online: undefined } : pkg)
       if (!validation.valid || pkg.key !== identity.instrumentKey || pkg.instrumentVersion !== identity.instrumentVersion || (row && validation.definitionHash !== row.definitionHash)) throw corrupt()
       const snapshot = freezeSituationalRuntimeAtAttemptStart({ instrumentKey: pkg.key, instrumentVersion: pkg.instrumentVersion, definition: pkg.definition, scientificContext: resolveSituationalScientificContext(pkg), ...(pkg.online ? { online: pkg.online } : {}) })
       resolved.set(key, { situationPackage: pkg, definitionHash: validation.definitionHash, runtime: snapshot.compiledRuntime, snapshot })

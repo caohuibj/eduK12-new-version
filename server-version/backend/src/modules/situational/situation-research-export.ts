@@ -1,3 +1,4 @@
+import { normalizeSjtOnlineResponses } from './authoring/online'
 import { scoreSituationalModel } from './situation-model-resolver'
 import { projectReachableSituationDefinitionForScoring } from './situation-trajectory'
 import { createHmac } from 'node:crypto'
@@ -47,11 +48,19 @@ export function buildSituationalResearchArtifact(input: {
 }) {
   if (!/^[a-f0-9]{64}$/i.test(input.pseudonymKey)) throw new Error('Research pseudonym key unavailable')
   const { snapshot, raw } = input
+  if ((raw.schemaVersion === 2) !== Boolean(snapshot.online)) throw new Error('Research raw protocol does not match frozen runtime')
+  if (raw.schemaVersion === 2 && raw.responseProtocol !== snapshot.online?.responseProtocol) throw new Error('Research raw protocol does not match frozen runtime')
   if (raw.attemptEpoch !== input.attemptEpoch) throw new Error('Research raw epoch mismatch')
   const hash = prepareCanonicalSubmission({ responses: raw.responses, ...(raw.schemaVersion === 2 ? { responseProtocol: raw.responseProtocol, rawResponses: raw.rawResponses } : {}), ...(raw.researchCapture ? { researchCapture: raw.researchCapture } : {}) }).hash
   if (hash !== input.submissionPayloadHash) throw new Error('Research raw submission digest mismatch')
   const assignment = deriveSituationalAssignment(snapshot.definition, input.attemptId, snapshot.definitionHash)
   const definition = assignedSituationalDefinition(snapshot.definition, assignment)
+  const online = raw.schemaVersion === 2 && snapshot.online
+    ? normalizeSjtOnlineResponses(snapshot.online.display, definition, raw.rawResponses) : undefined
+  // The fixed online display and flow share frozen question order. Hash every
+  // derived field, including timing, to reject mismatched raw/scorer evidence.
+  if (online && canonicalHash(online.responses) !== canonicalHash(raw.responses)) throw new Error('Research raw derived response mismatch')
+  const onlineMissing = new Map(online?.missing.map(missing => [missing.itemKey, missing.reason]) ?? [])
   const trajectory = deriveAuthoritativeSituationalTrajectory(definition, raw.responses)
   const reached = new Set(trajectory.sceneKeys), answered = new Map(raw.responses.map(r => [`${r.sceneKey}:${r.channelKey}`, r]))
   const freePairs = new Set(snapshot.definition.scenes.flatMap(s => s.channels.filter(c => c.responseType === 'FREE_TEXT').map(c => `${s.sceneKey}:${c.channelKey}`)))
@@ -72,7 +81,7 @@ export function buildSituationalResearchArtifact(input: {
       finalResponse: freeTextExcluded ? null : value?.responseValue ?? null, firstEverResponse: freeTextExcluded ? null : events[0]?.responseValue ?? null, firstResponse: freeTextExcluded ? null : firstCurrent?.responseValue ?? null,
       ...(freeTextExcluded ? { freeTextExcluded: true } : {}),
       firstResponseStatus: raw.researchCapture ? firstCurrent ? 'RECORDED' : 'NOT_ANSWERED' : 'LEGACY_NOT_CAPTURED',
-      missingness: nonanswer ?? (value ? null : !reached.has(scene.sceneKey) ? 'STRUCTURAL_NOT_REACHED' : planned ? 'PLANNED_NOT_ADMINISTERED' : raw.researchCapture?.unansweredReasons?.find(r => r.nodeKey === node?.nodeKey && r.channelKey === channel.channelKey)?.reason ?? (historicalOnly || invalidated.length ? 'INVALIDATED_BY_HISTORY_CHANGE' : 'PARTICIPANT_SKIPPED')),
+      missingness: onlineMissing.get(channel.channelKey) === 'REFUSED' ? 'DECLINED' : onlineMissing.get(channel.channelKey) === 'UNABLE_TO_JUDGE' ? 'UNABLE_TO_JUDGE' : nonanswer ?? (value ? null : !reached.has(scene.sceneKey) ? 'STRUCTURAL_NOT_REACHED' : planned ? 'PLANNED_NOT_ADMINISTERED' : raw.researchCapture?.unansweredReasons?.find(r => r.nodeKey === node?.nodeKey && r.channelKey === channel.channelKey)?.reason ?? (historicalOnly || invalidated.length ? 'INVALIDATED_BY_HISTORY_CHANGE' : 'PARTICIPANT_SKIPPED')),
       invalidatedHistoricalResponses: invalidated.length,
       eligibility: reached.has(scene.sceneKey) && !planned,
     }

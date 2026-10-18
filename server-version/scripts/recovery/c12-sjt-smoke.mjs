@@ -55,7 +55,7 @@ const state=process.argv[2],status=JSON.parse(fs.readFileSync(path.join(state,'s
 assert.equal(new URL(status.apiUrl).hostname,'127.0.0.1')
 assert.equal(process.env.NODE_ENV,'test')
 assert.match(process.env.DATABASE_URL,/eduk12_runtime:.*@127\.0\.0\.1:\d+\/eduk12_recovery/)
-const checks=[],requests=[],counts=[];let passed=false
+const checks=[],requests=[],counts=[],diagnostics=[];let passed=false
 const check=name=>{checks.push(name);console.log('PASS',name)}
 const pause=ms=>new Promise(r=>setTimeout(r,ms))
 function client(){const cookies=new Map();return {recovery:null,async request(route,method='GET',body,expected=200,raw=false){
@@ -110,7 +110,7 @@ try{
  assert.equal(await prisma.assessmentUnitSnapshot.count({where:{compositeAttemptId:a.id,unitType:'SITUATIONAL'}}),1)
  await report(student,a);await teacher.request(`${prefix}/${product.id}/attempts/${a.id}/report`);await outsider.request(`${prefix}/attempts/${a.id}/report`,'GET',undefined,[403,404])
  const accepted=await prisma.assessmentUnitSnapshot.findFirstOrThrow({where:{compositeAttemptId:a.id,unitType:'SITUATIONAL'}}),canonical=parseCanonicalUnitResultEnvelope(decryptUnifiedRuntimePayload(accepted.canonicalResultEncrypted))
- assert.equal(canonical.core.metrics.find(m=>m.key==='cooperation')?.value,9);assert.equal(canonical.core.metrics.find(m=>m.key==='cooperation')?.coverage?.numberOfIndependentScenes,2)
+ assert.equal(canonical.core.metrics.find(m=>m.key==='cooperation')?.value,9);const storedAttempt=await prisma.situationalAttempt.findUniqueOrThrow({where:{id:a.currentItem.situationalAttemptId}});assert.equal(decryptUnifiedRuntimePayload(storedAttempt.resultEncrypted).metrics.find(m=>m.key==='cooperation')?.coverage?.numberOfIndependentScenes,2)
  check('Two scenes/three questions real multiselect SUM+MEAN, raw FINAL/replay, common scorer yields manual 9 and two independent scenes')
  await exportCheck(product,a,'csv');await exportCheck(product,a,'zip')
  // Each new case has its own authorized product/attempt, no direct raw writes.
@@ -124,6 +124,11 @@ try{
  const rp=await composition(required.template.instrumentKey),{attempt:ra}=await student.request(`${prefix}/${rp.id}/attempts`,'POST',{});await student.request(embeddedRoute(ra)+'/submit','POST',await payload(ra,required,student,prefix,[]),[400,409,422]);check('Required blank rejected on explicit new protocol')
  const builtin=JSON.parse(fs.readFileSync(path.join(backend,'src/modules/situational/instruments/sjt-assertiveness-golden/1.0.0/instrument.json'))),lp=await composition(builtin.identity.instrumentKey,builtin.identity.instrumentVersion),{attempt:la}=await student.request(`${prefix}/${lp.id}/attempts`,'POST',{}),lr=await student.request(embeddedRoute(la)),lb={submissionId:randomUUID(),attemptEpoch:lr.attempt.attemptEpoch,definitionHash:lr.attempt.definitionHash,compiledRuntimeHash:lr.attempt.compiledRuntimeHash,scoringVersion:lr.attempt.scoringVersion,responses:[]}
  await student.request(embeddedRoute(la)+'/submit','POST',lb,[400,409,422]);await student.request(embeddedRoute(la)+'/submit','POST',{...lb,responseProtocol:'sjt-online-response-v1'},[400,409,422]);assert.equal(await prisma.situationalRawSubmission.count({where:{attemptId:la.currentItem.situationalAttemptId}}),0);check('Old empty FINAL and client-driven protocol upgrade rejected without raw writes')
+ const standalone=await student.request('/situational/attempts','POST',{instrumentKey:d.template.instrumentKey,instrumentVersion:'1.0.0'}),sb={submissionId:randomUUID(),attemptEpoch:standalone.attempt.attemptEpoch,definitionHash:standalone.attempt.definitionHash,compiledRuntimeHash:standalone.attempt.compiledRuntimeHash,scoringVersion:standalone.attempt.scoringVersion,responseProtocol:'sjt-online-response-v1',responses:[]}
+ await student.request(`/situational/attempts/${standalone.attemptId}/submit`,'POST',sb)
+ const inbox=await student.request('/my-assessments');assert.equal(inbox.list.find(x=>x.sourceId===standalone.attemptId)?.state,'SUBMITTED_NOT_SATISFIED')
+ const blob=await prisma.situationalAttempt.findUniqueOrThrow({where:{id:standalone.attemptId},select:{canonicalResultEncrypted:true}});diagnostics.push({name:'single online standalone inbox qualification',onlineResultRows:1,encryptedCanonicalBytes:Buffer.byteLength(blob.canonicalResultEncrypted),plaintextCanonicalBytes:Buffer.byteLength(JSON.stringify(decryptUnifiedRuntimePayload(blob.canonicalResultEncrypted))),httpResponseBytes:requests.at(-1).bytes,note:'diagnostic only; not throughput or memory qualification'})
+ check('Standalone new empty FINAL projects unsatisfied inbox; record actual canonical and response bytes')
  passed=true
-}catch(error){console.error(error);throw error}finally{await prisma.$disconnect();fs.writeFileSync(path.join(state,'c12-http-result.json'),JSON.stringify({passed,checks,requests,counts},null,2))}
+}catch(error){console.error(error);throw error}finally{await prisma.$disconnect();fs.writeFileSync(path.join(state,'c12-http-result.json'),JSON.stringify({passed,checks,requests,counts,diagnostics},null,2))}
 process.exit(0)

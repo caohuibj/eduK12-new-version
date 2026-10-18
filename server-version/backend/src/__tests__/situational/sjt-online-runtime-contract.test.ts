@@ -5,7 +5,7 @@ import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { describe, expect, it } from 'vitest'
 import { situationalFinalSubmitSchema, situationalLegacyFinalSubmitSchema, situationalOnlineFinalSubmitSchema } from '../../modules/situational/situational-final-submit.schema'
 import { createSituationalRawSubmissionPayload, createSituationalOnlineRawSubmissionPayload, parseSituationalRawSubmissionPayload } from '../../modules/situational/situational-raw-submission'
-import { onlineSituationalTaskSatisfied, mergeSituationalTaskSatisfaction, SJT_ONLINE_PROTOCOL_FLAG, SJT_ONLINE_UNSATISFIED_FLAG } from '../../modules/situational/situational-task-satisfaction'
+import { onlineSituationalTaskSatisfied, mergeSituationalTaskSatisfaction, mergeRequiredSituationalTaskSatisfaction, SJT_ONLINE_PROTOCOL_FLAG, SJT_ONLINE_UNSATISFIED_FLAG } from '../../modules/situational/situational-task-satisfaction'
 import { SJT_ASSERTIVENESS_GOLDEN_ZH_CN_V1_PACKAGE } from '../../modules/situational/packages/sjt-assertiveness-golden-zh-cn-v1'
 
 const identity = { submissionId: 'online-submission-0001', attemptEpoch: 1, definitionHash: 'a'.repeat(64) }
@@ -89,4 +89,13 @@ describe('online frozen identity', () => {
     expect(canonicalHash(oldUnsigned)).toBe(snapshotHash)
     expect(parseFrozenSituationalRuntimeSnapshot(snapshot)).toEqual(snapshot)
   })
+})
+
+
+it('only required frozen online slots influence parent task qualification', () => {
+  const payload = { header: { slotKey: 'online' }, envelope: { core: { unitType: 'SITUATIONAL' as const, quality: { status: 'invalid' as const, flags: [SJT_ONLINE_PROTOCOL_FLAG, SJT_ONLINE_UNSATISFIED_FLAG] } } } }
+  expect(mergeRequiredSituationalTaskSatisfaction(null, [{ slotKey: 'online', required: false }], [payload])).toBe(null)
+  expect(mergeRequiredSituationalTaskSatisfaction('SATISFIED', [{ slotKey: 'online', required: false }], [payload])).toBe('SATISFIED')
+  expect(mergeRequiredSituationalTaskSatisfaction(null, [{ slotKey: 'online', required: true }], [payload])).toBe('NOT_SATISFIED')
+  expect(mergeRequiredSituationalTaskSatisfaction('NOT_SATISFIED', [{ slotKey: 'online', required: false }], [payload])).toBe('NOT_SATISFIED')
 })
