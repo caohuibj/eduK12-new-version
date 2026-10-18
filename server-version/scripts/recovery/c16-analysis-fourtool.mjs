@@ -14,6 +14,7 @@ const {decryptUnifiedRuntimePayload,encryptUnifiedRuntimePayload}=require(path.j
 const {loadFrozenActiveSlotSet,createFrozenActiveSlotSet}=require(path.join(backend,'dist/modules/assessment-runtime/slot-set.js'))
 const {parseCanonicalUnitResultEnvelope}=require(path.join(backend,'dist/modules/assessment-runtime/unit-result.js'))
 const {loadScaleResult,loadScaleAnswers,encryptScaleAnswers}=require(path.join(backend,'dist/modules/scale/scale-workflow.service.js'))
+const {loadStoredCanonicalUnitResult}=require(path.join(backend,'dist/modules/assessment-runtime/compact-assessment-storage.js'))
 const {prepareCompactScaleFacts,decodeScaleFacts}=require(path.join(backend,'dist/modules/assessment-runtime/compact-scale-facts.js'))
 const {readFrozenReport}=require(path.join(backend,'dist/modules/cognitive/profile-freeze.js'))
 
@@ -26,7 +27,7 @@ export async function attachFourToolSources(prisma,fixture,original){
  const slots=await loadFrozenActiveSlotSet(parent.frozenActiveSlotSetEncrypted,prisma),units=[]
  for(const type of ['SCALE','COGNITIVE','SITUATIONAL']){
   const item=task.items.find(row=>row.type===type&&original.selectedItemIds.includes(row.id)),snapshot=snapshots.find(row=>row.unitType===type)
-  assert.ok(item&&snapshot);assert.equal(snapshot.attemptEpoch,1);const envelope=parseCanonicalUnitResultEnvelope(decryptUnifiedRuntimePayload(snapshot.canonicalResultEncrypted)),slot=slots.slots.find(row=>row.slotKey===snapshot.slotKey)
+  assert.ok(item&&snapshot);assert.equal(snapshot.attemptEpoch,1);const envelope=await loadStoredCanonicalUnitResult(snapshot.canonicalResultEncrypted,prisma),slot=slots.slots.find(row=>row.slotKey===snapshot.slotKey)
   assert.ok(slot);let child,raw,result,answers,metric
   if(type==='SCALE'){
    child=await prisma.assessment.findUniqueOrThrow({where:{id:snapshot.sourceAttemptId}})
@@ -81,7 +82,7 @@ export async function addCopiedFourToolFacts(prisma,fixture,users){
     await prisma.situationalAttempt.create({data:{...unit.child,id,userId:user.id,participantKey:'c16-synthetic:'+user.id,compositeAttemptId:parent.id,compositeItemId:item.id,compositeSlotKey:slotKey,submissionId,canonicalResultEncrypted}})
     await prisma.situationalRawSubmission.create({data:{...unit.raw,id:randomUUID(),attemptId:id}})
    }
-   await prisma.assessmentUnitSnapshot.create({data:{...unit.snapshot,id:randomUUID(),compositeAttemptId:parent.id,slotKey,sourceAttemptId:id,sourceSubmissionId:submissionId,canonicalResultEncrypted}})
+   await prisma.assessmentUnitSnapshot.create({data:{...unit.snapshot,id:randomUUID(),compositeAttemptId:parent.id,slotKey,sourceAttemptId:id,sourceSubmissionId:submissionId,canonicalResultEncrypted:fixture.poisonUnitType===unit.type?'C16_SYNTHETIC_UNSELECTED_POISON':canonicalResultEncrypted}})
    parent.metrics??={c16_numeric_value:parent.value};parent.metrics[unit.metricKey]=unit.value
   }
  }

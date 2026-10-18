@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "phase": "COMPACT_SOURCE_COMPATIBILITY_DYNAMIC_RETEST_PENDING",
+  "node": "v24.21.0",
+  "backendTscExit": 0,
+  "incrementalTests": {
+    "canonicalStorageAndAffectedSharedPreloader": 20,
+    "nullableSelectedChildGuard": 1,
+    "earlierDigestSubset": 7,
+    "note": "Overlapping incremental checks; do not sum as unique coverage."
+  },
+  "limitations": [
+    "HTTP01/02 completed no acceptance checks. Upgrade phase remains independently qualified.",
+    "Reference validation adds one bounded fact batch and internal scored-item expansion; real SQL and memory costs pending.",
+    "Form duplicate snapshot read/decrypt remains P3."
+  ],
+  "files": [
+    {
+      "file": "c16-backend-tsc-compact-source-final.log",
+      "bytes": 155,
+      "sha256": "3e56956365896ed0a97895bef0bb643a3c1f409dbf29e96b6e8d582674c4493e"
+    },
+    {
+      "file": "c16-backend-tsc-compact-source.log",
+      "bytes": 350,
+      "sha256": "b88e725bbc4d7c3a9d97366fdbdeb9a1a57b4ffbbb19d9683857456dd1f074f9"
+    },
+    {
+      "file": "c16-http01-http02-probe-summary.json",
+      "bytes": 10117,
+      "sha256": "8a9a01cd94dd091d5c9903d63cf6c8fed4a987b55cf6e3cc1f297d5ad45d15b5"
+    },
+    {
+      "file": "c16-source-canonical-storage.log",
+      "bytes": 274,
+      "sha256": "aee23dabd73422346c52369e22e7db2ac177bb5d438a251d40decea30196a09e"
+    },
+    {
+      "file": "c16-source-compact-digest.log",
+      "bytes": 273,
+      "sha256": "92c22400e0c749b68a6f4a7f1a95f6e990bbb77c649ee64bf6af5a14b9093682"
+    },
+    {
+      "file": "c16-source-null-child-item.log",
+      "bytes": 272,
+      "sha256": "e0b5dad8604982da7bdb64d73d546225423ef1d248bb28195d11e1f9230d0b74"
+    }
+  ]
+}

@@ -11,14 +11,16 @@ import {randomUUID,createHash} from 'node:crypto'
 import {spawnSync} from 'node:child_process'
 import {createAnalysisFixture,addParticipants,addDuplicate} from './c16-analysis-fixture.mjs'
 import {attachFourToolSources} from './c16-analysis-fourtool.mjs'
+import {createSyntheticDisclosureBinding,createVariantPoisonFixture} from './c16-analysis-boundaries.mjs'
 const base=path.dirname(fileURLToPath(import.meta.url)),backend=path.resolve(base,'../../backend'),require=createRequire(path.join(backend,'package.json'))
 const {prisma}=require(path.join(backend,'dist/config/database.js'))
 const {PrismaClient}=require('@prisma/client')
 const {closeQueues,exportQueue}=require(path.join(backend,'dist/config/queue.js'))
 const {runExportBatch}=require(path.join(backend,'dist/workers/exportBatchTask.js'))
 const {loadTrainingAnalysisSources}=require(path.join(backend,'dist/modules/training-analysis/source.js'))
+const {analyzeTrainingCourse}=require(path.join(backend,'dist/modules/training-analysis/service.js'))
 const {decryptUnifiedRuntimePayload}=require(path.join(backend,'dist/modules/assessment-runtime/security.js'))
-const {parseCanonicalUnitResultEnvelope}=require(path.join(backend,'dist/modules/assessment-runtime/unit-result.js'))
+const {loadStoredCanonicalUnitResult}=require(path.join(backend,'dist/modules/assessment-runtime/compact-assessment-storage.js'))
 const state=process.argv[2],status=JSON.parse(fs.readFileSync(path.join(state,'status.json'))),credentials=JSON.parse(fs.readFileSync(path.join(state,'fixture-private.json')))
 assert.equal(new URL(status.apiUrl).hostname,'127.0.0.1');assert.equal(new URL(process.env.DATABASE_URL).username,'eduk12_runtime');assert.equal(process.env.NODE_ENV,'test')
 const result={passed:false,qualificationScope:'C16_ANALYSIS_ONLY',checks:[],requests:[],measurements:[],exports:[],fixtureScope:'10/20/50 two-wave synthetic four-tool PG facts: new numeric Form and explicitly copied C14 Scale/Cognitive/SJT canonical cores, not browser or re-FINAL; original C14 text Form remains nonnumeric and source rows read only'}
@@ -32,6 +34,8 @@ function client(){const cookies=new Map();return {async request(route,method='GE
  if(raw)return bytes;const envelope=JSON.parse(bytes.toString());if(response.status!==200)return {httpStatus:response.status,...envelope};assert.equal(envelope.code,0);return envelope.data
  },async login(who,role='TEACHER'){await this.request('/auth/csrf');await this.request('/auth/training-login','POST',{...who,expectedRole:role})}}}
 const teacher=client(),other=client(),student=client()
+let poisonTrace=null
+prisma.$on('query',event=>{if(!poisonTrace||!/^SELECT/i.test(event.query.trim()))return;poisonTrace.sqlEvents++;if(/FROM\s+"?(?:public"?\.)?"?(assessment_unit_snapshots|assessments|assessment_result_facts|cognitive_sessions|cognitive_raw_submissions|situational_attempts|situational_raw_submissions)"?/i.test(event.query)){poisonTrace.factReads++;if(event.params.includes(poisonTrace.poisonParent)||event.params.includes(poisonTrace.poisonChild))poisonTrace.forbiddenFactReads++}})
 const root=f=>`/courses/${f.courseId}/training-analysis`,analyze=(f,c=teacher)=>c.request(root(f),'POST',{selector:f.selector})
 function parseCsv(bytes){const text=bytes.toString('utf8').replace(/^\uFEFF/,''),rows=[];let row=[],cell='',quoted=false;for(let i=0;i<text.length;i++){const c=text[i];if(quoted){if(c==='"'&&text[i+1]==='"'){cell+='"';i++}else if(c==='"')quoted=false;else cell+=c}else if(c==='"')quoted=true;else if(c===','){row.push(cell);cell=''}else if(c==='\r'&&text[i+1]==='\n'){row.push(cell);rows.push(row);row=[];cell='';i++}else cell+=c}assert.equal(quoted,false);assert.deepEqual(row,[]);const [columns,...values]=rows;return {columns,rows:values.map(value=>Object.fromEntries(columns.map((key,index)=>[key,value[index]])))}}
 function assertWideMatchesLong(long,wide){for(const row of wide.rows){const matching=long.rows.filter(item=>item.participantKind===row.participantKind&&item.participantKey===row.participantKey);assert.ok(matching.length);for(const source of matching)for(const suffix of ['value','reason','attemptId','attemptEpoch','originalFinalStatus','taskSatisfied','sourceHashes'])assert.equal(row[source.columnKey+'__'+suffix],source[suffix])}}
@@ -63,7 +67,7 @@ async function originalC14(teacherId){
  const available=await teacher.request(`/courses/${parent.deliveryCourseId}/training-analysis/sources`)
  const selector={schemaVersion:1,courseId:parent.deliveryCourseId,mode:'PAIRWISE',waves:[]}
  for(const variantKey of variants){const example=old.completed.find(row=>row.productId===task.id&&row.variantKey===variantKey),snapshots=await prisma.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:example.attemptId}}),metrics=[]
-  for(const type of ['SCALE','COGNITIVE','SITUATIONAL']){const snapshot=snapshots.find(row=>row.unitType===type),envelope=parseCanonicalUnitResultEnvelope(decryptUnifiedRuntimePayload(snapshot.canonicalResultEncrypted)),item=task.items.find(row=>row.type===type&&example.selectedItemIds.includes(row.id));const allowed=available.list.find(row=>row.taskId===task.id&&row.variantKey===variantKey)?.metrics??[];const metric=envelope.core.metrics.find(row=>typeof row.value==='number'&&(type!=='SITUATIONAL'||row.key==='cooperation')&&(type!=='COGNITIVE'||allowed.some(value=>value.itemId===item.id&&value.metricKey===row.key)));assert.ok(metric);metrics.push({itemId:item.id,metricKey:metric.key})}
+  for(const type of ['SCALE','COGNITIVE','SITUATIONAL']){const snapshot=snapshots.find(row=>row.unitType===type),envelope=await loadStoredCanonicalUnitResult(snapshot.canonicalResultEncrypted,prisma),item=task.items.find(row=>row.type===type&&example.selectedItemIds.includes(row.id));const allowed=available.list.find(row=>row.taskId===task.id&&row.variantKey===variantKey)?.metrics??[];const metric=envelope.core.metrics.find(row=>typeof row.value==='number'&&(type!=='SITUATIONAL'||row.key==='cooperation')&&(type!=='COGNITIVE'||allowed.some(value=>value.itemId===item.id&&value.metricKey===row.key)));assert.ok(metric);metrics.push({itemId:item.id,metricKey:metric.key})}
   selector.waves.push({waveKey:'original_'+variantKey,taskId:task.id,publication:task.publishedAt.toISOString(),configDigest:task.trainingVariantDigest,variantKey,metrics})
  }
  const loaded=await prisma.$transaction(tx=>loadTrainingAnalysisSources(tx,{userId:teacherId,role:'TEACHER'},selector))
@@ -106,6 +110,7 @@ try{
  const alias=structuredClone(fixture.selector);alias.waves[1]={...alias.waves[0],waveKey:'alias'};await teacher.request(root(fixture),'POST',{selector:alias},409)
  const full=await teacher.request(root(fixture),'POST',{selector:{...fixture.selector,mode:'FULL_CASE'}});golden(full.analysis,50,fixture);assert.equal(full.analysis.metrics[0].countKind,'COMPLETE_CASE')
  check('Same publication alias rejected 409; full-case mode retains the same explicitly matched 50 participants')
+ const departed=fixture.participants[0];assert.equal((await prisma.courseStudent.deleteMany({where:{courseId:fixture.courseId,studentId:departed.id}})).count,1);const afterDeparture=await analyze(fixture);golden(afterDeparture.analysis,50,fixture);assert.equal(afterDeparture.manifest.sourceHash,current.manifest.sourceHash);assert.equal(afterDeparture.manifest.qualityHash,current.manifest.qualityHash);assert.equal(afterDeparture.manifest.sourceCount,100);check('Removing one synthetic current enrollment retains all50 historical participants and100 frozen sources; SQL diagnostics show zero CourseStudent reads')
  const allQuality=await qualityRows(fixture,current);assert.equal(allQuality.length,100);check('Bounded quality list paginates 25 rows with exact 100-source manifest binding')
  const long=await exportReady(fixture,current),wide=await exportReady(fixture,current,'wide'),dict=await exportReady(fixture,current,'dictionary'),zip=await exportReady(fixture,current,'long','zip')
  const L=parseCsv(long.bytes),W=parseCsv(wide.bytes),D=parseCsv(dict.bytes),Z=unzip(zip.bytes);assert.equal(L.rows.length,400);assert.equal(W.rows.length,50);assert.equal(D.rows.length,8)
@@ -133,6 +138,9 @@ try{
  const permissionPending=await queue(fixture,current);await prisma.course.update({where:{id:fixture.courseId},data:{creatorId:otherId}})
  try{await processExport(permissionPending,false);await teacher.request(excluded.route,'GET',undefined,deny);await teacher.request(excluded.route+'/status','GET',undefined,deny)}finally{await prisma.course.update({where:{id:fixture.courseId},data:{creatorId:owner.id}})}
  check('Current course authority revocation blocks pending generation and READY status/download; no stale ownership reuse')
+ const disclosure=await createSyntheticDisclosureBinding(prisma,fixture);const beforeDisclosure=await analyze(fixture);assert.equal(beforeDisclosure.manifest.sourceHash,current.manifest.sourceHash);const disclosureReady=await exportReady(fixture,beforeDisclosure),disclosurePending=await queue(fixture,beforeDisclosure);await disclosure.restrict()
+ await teacher.request(root(fixture),'POST',{selector:fixture.selector},deny);await processExport(disclosurePending,false);await teacher.request(disclosureReady.route,'GET',undefined,deny);await teacher.request(disclosureReady.route+'/status','GET',undefined,deny)
+ check('New synthetic governed execution changes resultDisclosure; current analysis, pending generation and previously READY status/download all deny raw access')
  await originalC14(owner.id)
  const missing=await createAnalysisFixture({prisma,teacherId:owner.id,passwordHash:password.passwordHash});await addParticipants(prisma,missing,10);await addParticipants(prisma,missing,15,{missingFirst:true,nonFinalSecond:true});await addParticipants(prisma,missing,20,{omitSecond:true});const missingResult=await analyze(missing)
  assert.equal(missingResult.analysis.descriptives.find(row=>row.waveKey==='wave_1').missingByReason.UNANSWERED,5);assert.equal(missingResult.analysis.descriptives.find(row=>row.waveKey==='wave_2').missingByReason.NON_FINAL,5);assert.equal(missingResult.analysis.metrics[0].validCaseN,10)
@@ -143,6 +151,11 @@ try{
  const incompatibleLong=parseCsv((await exportReady(incomparable,incomparableResult)).bytes),incompatibleWide=parseCsv((await exportReady(incomparable,incomparableResult,'wide')).bytes)
  assert.equal(incompatibleLong.rows.length,20);assert.equal(incompatibleWide.rows.length,10);assertWideMatchesLong(incompatibleLong,incompatibleWide);assert.ok(incompatibleLong.rows.every(row=>row.value===''&&row.reason==='NOT_COMPARABLE'&&row.originalFinalStatus==='COMPLETED'&&row.taskSatisfied==='true'))
  check('Unanswered, non-FINAL, absent observation, independent quality exclusion and not-comparable measurement stay distinct in HTTP analysis and actual long/wide exports; invalid comparison cells are blank, and original FINAL/task states are preserved')
+ const poison=await createVariantPoisonFixture(prisma,owner.id,password.passwordHash,JSON.parse(fs.readFileSync(path.join(state,'source-c14-http-result.json'))).completed)
+ const poisonedHttp=await analyze(poison);assert.equal(poisonedHttp.manifest.sourceCount,5);assert.equal(poisonedHttp.manifest.observationCount,5);assert.equal(poisonedHttp.analysis.descriptives.find(row=>row.waveKey==='selected_group').validN,5)
+ poisonTrace={poisonParent:poison.poisonParent,poisonChild:poison.poisonChild,sqlEvents:0,factReads:0,forbiddenFactReads:0}
+ const direct=await analyzeTrainingCourse({actor:{id:owner.id,role:'TEACHER'},courseId:poison.courseId,selector:poison.selector});assert.equal(direct.manifest.sources.length,5);assert.ok(direct.manifest.sources.every(row=>poison.selectedIds.includes(row.attemptId)))
+ const trace=poisonTrace;poisonTrace=null;assert.ok(trace.sqlEvents>0&&trace.factReads>0);assert.equal(trace.forbiddenFactReads,0);result.unselectedPoisonSql={sqlEvents:trace.sqlEvents,factReads:trace.factReads,forbiddenFactReads:trace.forbiddenFactReads,selectedSources:5,otherGroupPoisonSources:1};check('Actual HTTP and PG SQL select only five frozen chosen-group sources; another group has a deliberately invalid synthetic canonical ciphertext and no child/fact query includes its parent or child identity; separate real follow-up task has zero observations, this is selected-read evidence only')
  await addDuplicate(prisma,missing);const duplicate=await teacher.request(root(missing),'POST',{selector:missing.selector},409);assert.equal(duplicate.code,'AMBIGUOUS_OBSERVATION');check('Duplicate participant×wave×metric rejected409; no implicit latest-attempt pick')
  result.passed=true
 }catch(error){result.errorType=error?.name;throw error}

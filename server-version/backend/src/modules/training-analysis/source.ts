@@ -1,6 +1,8 @@
 import { Prisma, UserRole } from '@prisma/client'
 import { parseCompiledWeightedVariants } from '../assessment-core/weighted-variants'
 import { canonicalHash } from '../assessment-runtime/canonical'
+import { isScaleReportFactsView } from '../assessment-runtime/compact-scale-facts'
+import { loadStoredCanonicalUnitResults } from '../assessment-runtime/compact-assessment-storage'
 import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { compositeItemSlotKey, formSectionSlotKey, type FrozenActiveSlotSetV1 } from '../assessment-runtime/slot-set'
 import { mapCompositeSection } from '../assessment-runtime/form-section-definition'
@@ -116,7 +118,7 @@ async function participantIdentities(tx: Prisma.TransactionClient, actor: Traini
   return ids
 }
 
-function acceptedEnvelope(attempt: any, item: any, snapshots: any[], slots: FrozenActiveSlotSetV1): CanonicalUnitResultEnvelopeV1 | null {
+function acceptedEnvelope(attempt: any, item: any, snapshots: any[], slots: FrozenActiveSlotSetV1, canonicalByCipher?: ReadonlyMap<string, CanonicalUnitResultEnvelopeV1>): CanonicalUnitResultEnvelopeV1 | null {
   const key = compositeItemSlotKey(item.id, item.type), slot = slots.slots.find(row => row.slotKey === key)
   const matches = snapshots.filter(row => row.slotKey === key)
   if (!slot) {if (item.required !== false || matches.length) invalid('必需测量缺少冻结单元或事实未被分配'); return null}
@@ -130,7 +132,9 @@ function acceptedEnvelope(attempt: any, item: any, snapshots: any[], slots: Froz
     return null
   }
   if (row.terminalState !== 'COMPLETED' || row.payloadKind !== 'UNIT_RESULT' || !row.sourceSubmissionId || !row.canonicalResultEncrypted || row.collectionFactsEncrypted) invalid('已接受测量事实不完整')
-  const result = parseCanonicalUnitResultEnvelope(decryptUnifiedRuntimePayload(row.canonicalResultEncrypted)), core = result.core
+  const result = canonicalByCipher ? canonicalByCipher.get(row.canonicalResultEncrypted) : parseCanonicalUnitResultEnvelope(decryptUnifiedRuntimePayload(row.canonicalResultEncrypted))
+  if (!result) invalid('已接受测量事实缺少规范结果')
+  const core = result.core
   const expectedSourceType = item.type === 'SCALE' ? 'ASSESSMENT' : item.type === 'COGNITIVE' ? 'COGNITIVE_SESSION' : 'SITUATIONAL_ATTEMPT'
   if (new Set(core.metrics.map(metric => metric.key)).size !== core.metrics.length || row.sourceType !== expectedSourceType
     || core.scientificProvenance.instrumentKey !== core.instrumentKey || core.scientificProvenance.instrumentVersion !== core.instrumentVersion) invalid('测量事实指标或科学来源身份不一致')
@@ -239,6 +243,31 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
   // Each immutable Scale fact binds two SQL parameters (id, epoch). Keep
   // the batch below PostgreSQL's parameter ceiling, before any fact read.
   if (children.length > 15000) throw new CompositeServiceError('选中的量表来源超过 15000 条，请减少指标或波次', 413)
+  // Validate reference boundaries before the canonical loader can read any
+  // referenced fact. Inline envelopes keep the shared runtime parser; this is
+  // only authorization of the two existing reference storage representations.
+  const allowedSnapshotSlots = new Map<string, Set<string>>()
+  for (const condition of snapshotConditions) {
+    const key = `${condition.compositeAttemptId}:${condition.attemptEpoch}`, keys = allowedSnapshotSlots.get(key) ?? new Set<string>()
+    condition.slotKey.in.forEach(slotKey => keys.add(slotKey)); allowedSnapshotSlots.set(key, keys)
+  }
+  const selectedChildren = new Map(children.map(child => [`${child.compositeAttemptId}:${child.attemptEpoch}:${child.id}`, child]))
+  const canonicalCiphers: string[] = []
+  for (const row of snapshots) {
+    if (!allowedSnapshotSlots.get(`${row.compositeAttemptId}:${row.attemptEpoch}`)?.has(row.slotKey)) invalid('测量快照不在选中来源范围')
+    if (row.terminalState !== 'COMPLETED' || row.payloadKind !== 'UNIT_RESULT' || !row.canonicalResultEncrypted) continue
+    const stored = decryptUnifiedRuntimePayload<any>(row.canonicalResultEncrypted)
+    if (stored?.k === 'SCF2' || stored?.kind === 'SCALE_FACTS_CANONICAL_REF') {
+      const referenceId = stored.k === 'SCF2' ? stored.a : stored.binding?.assessmentId
+      const referenceEpoch = stored.k === 'SCF2' ? stored.e : stored.binding?.attemptEpoch
+      const child = selectedChildren.get(`${row.compositeAttemptId}:${row.attemptEpoch}:${row.sourceAttemptId}`)
+      if (row.unitType !== 'SCALE' || row.sourceType !== 'ASSESSMENT' || !child || referenceId !== child.id || referenceEpoch !== child.attemptEpoch
+        || referenceEpoch !== row.attemptEpoch || !child.compositeItemId || row.slotKey !== compositeItemSlotKey(child.compositeItemId, 'SCALE')
+        || row.sourceSubmissionId !== child.submissionId
+        || (stored.kind === 'SCALE_FACTS_CANONICAL_REF' && (stored.version !== 1 || stored.binding?.submissionId !== child.submissionId || stored.binding?.payloadHash !== child.submissionPayloadHash))) invalid('规范结果引用不属于选中测量来源')
+    }
+    canonicalCiphers.push(row.canonicalResultEncrypted)
+  }
   const childrenByParent = groupRows(children, row => row.compositeAttemptId), snapshotsByParent = groupRows(snapshots, row => row.compositeAttemptId)
   for (const entry of final) entry.attempt.scaleAssessments = childrenByParent.get(entry.attempt.id) ?? []
   // Existing batch parser performs immutable source-result hash, epoch and
@@ -246,6 +275,12 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
   const selectedItemIds = new Map<string, Set<string>>()
   for (const {wave, attempt} of final) {const ids = selectedItemIds.get(attempt.id) ?? new Set<string>(); wave.metrics.forEach(metric => ids.add(metric.itemId)); selectedItemIds.set(attempt.id, ids)}
   const factsFor = await preloadCompositeReportFacts(final.map(entry => entry.attempt), tx, {selectedItemIds, numericOnly: true})
+  // Existing canonical validation may internally expand scored item facts, but
+  // never reads raw answers. Reference storage adds one bounded fact batch;
+  // neither scored items nor raw fields enter analysis/export output.
+  const uniqueCiphers = [...new Set(canonicalCiphers)]
+  const canonicalViews = await loadStoredCanonicalUnitResults(uniqueCiphers, tx)
+  const canonicalByCipher = new Map(uniqueCiphers.map((cipher, index) => [cipher, canonicalViews[index]]))
   const observations: TrainingNumericObservationV1[] = [], manifests: TrainingAnalysisManifestAttemptV1[] = [], formSourceHashes = new WeakMap<object, string>()
   for (const {wave, attempt, scope, slots} of selected) {
     const participant = identities.get(attempt.id)!, attemptObservations: TrainingNumericObservationV1[] = []
@@ -274,7 +309,7 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
         sourceHashes[item.id] = formHash
         policies.push({taskId: taskIdOf(attempt), itemId: item.id, formReadable: true})
       } else {
-        const envelope = acceptedEnvelope(attempt, item, snapshotsByParent.get(attempt.id) ?? [], slots!)
+        const envelope = acceptedEnvelope(attempt, item, snapshotsByParent.get(attempt.id) ?? [], slots!, canonicalByCipher)
         if (!envelope) {
           const terminal = (snapshotsByParent.get(attempt.id) ?? []).find(row => row.slotKey === compositeItemSlotKey(item.id, item.type))
           reason = terminal ? 'NOT_ASSIGNED' : 'MISSING_SOURCE'
@@ -314,7 +349,14 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
             if (!score || score.value !== storedMetric.value || (runtime.compiledRuntime.metricDefinitions[metric.metricKey]?.unit ?? null) !== (storedMetric.unit ?? null)
               || hash({status: result.quality.status, flags: [...result.quality.flags].sort()}) !== hash(core.quality)) invalid('量表分数与已接受事实不一致')
             responseSignature = hash({items: runtime.definition.items.map(row => ({itemCode: row.itemCode, responseSetKey: row.responseSetKey})), responseSets: runtime.definition.responseSets})
-            sourceHashes[`scale:${item.id}`] = hash({id: child.id, epoch: child.attemptEpoch, submissionId: child.submissionId, payloadHash: child.submissionPayloadHash, runtime: runtime.snapshotHash, result: hash(result)})
+            // A numeric compact view intentionally omits original item/raw data
+            // and carries a non-JSON marker. Its digest must come from the bound
+            // immutable fact, never from hashing or stripping the report view.
+            const immutableResultHash = facts!.scaleSourceResultHashes.get(child)
+            if (isScaleReportFactsView(result) && !immutableResultHash) invalid('量表原始结果摘要缺失')
+            const sourceResultHash = immutableResultHash ?? hash(result) // Validated, original noncompact result only.
+            if (envelope.bundleBridge && envelope.bundleBridge.sourceResultHash !== sourceResultHash) invalid('量表原始结果摘要与已接受事实不一致')
+            sourceHashes[`scale:${item.id}`] = hash({id: child.id, epoch: child.attemptEpoch, submissionId: child.submissionId, payloadHash: child.submissionPayloadHash, runtime: runtime.snapshotHash, result: sourceResultHash})
           } else if (item.type === 'COGNITIVE') {
             const {report, metric: definition} = cognitivePermission(item, metric.metricKey, actor)
             if ((definition.unit ?? null) !== (storedMetric.unit ?? null)) invalid('认知指标单位不一致')

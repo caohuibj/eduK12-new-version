@@ -34,6 +34,8 @@ export function createReportReadTemplateStore(source: PublicTemplateStore = publ
 
 export type CompositeReportFacts = {
   scaleResults: Map<any, any>
+  /** Original immutable-result digests for verified compact facts, keyed by the exact bound child. */
+  scaleSourceResultHashes: Map<any, string>
   scaleRuntimes: Map<any, VersionedFrozenScaleRuntimeSnapshot | undefined>
   typedFormValues: Map<string, TypedFormValue>
   typedFormStates: Map<string, TypedFormMetadata>
@@ -63,7 +65,7 @@ export async function preloadCompositeReportFacts(attempts: any[], db: Prisma.Tr
     if (typedCount && (!sections.length || sections.reduce((n: number, section: ReturnType<typeof mapCompositeSection>) => n + section.items.filter(item => item.formDefinition != null).length, 0) !== typedCount)) throw new Error('Report batch typed sections missing')
     sectionsByAttempt.set(attempt, sections)
     for (const row of attempt.scaleAssessments) if (row.compositeAttemptId !== attempt.id || row.attemptEpoch !== attempt.attemptEpoch || !scope.itemIds.has(row.compositeItemId)) throw new Error('Report batch scale ownership/version mismatch')
-    contexts.set(attempt, {identity: identity(attempt), facts: {scaleResults: new Map(), scaleRuntimes: new Map(), typedFormValues: new Map(), typedFormStates: new Map()}})
+    contexts.set(attempt, {identity: identity(attempt), facts: {scaleResults: new Map(), scaleSourceResultHashes: new Map(), scaleRuntimes: new Map(), typedFormValues: new Map(), typedFormStates: new Map()}})
   }
   const records = attempts.flatMap(attempt => attempt.scaleAssessments), references = records.filter(row => isScaleFactsReference(row.result))
   const snapshotWhere = attempts.flatMap(attempt => {
@@ -112,6 +114,7 @@ export async function preloadCompositeReportFacts(attempts: any[], db: Prisma.Tr
       }
       const facts = decoded.get(record)
       context.scaleResults.set(record, facts ? (await restoreCompactScaleFacts(facts, {canonical: false, ...(options?.numericOnly ? {reportOnly: true} : {})}, templates)).result : record.result)
+      if (facts) context.scaleSourceResultHashes.set(record, facts.sourceResultHash)
     }
     const sections = sectionsByAttempt.get(attempt)!
     if (sections.length) context.typedFormValues = readLoadedCompositeTypedFormValues(attempt, sections, snapshotsByAttempt.get(attempt.id) ?? [], context.typedFormStates)

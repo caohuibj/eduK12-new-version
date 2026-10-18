@@ -2,7 +2,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest'
 const db=vi.hoisted(()=>({$queryRaw:vi.fn(),assessmentUnitSnapshot:{findMany:vi.fn()},assessment:{findMany:vi.fn()}}))
 vi.mock('../../config/database',()=>({prisma:db}))
 import {createPublicTemplateStore,publicTemplates,type PublicTemplateRow} from '../../modules/assessment-runtime/public-templates'
-import {prepareCompactScaleFacts,decodeScaleFacts} from '../../modules/assessment-runtime/compact-scale-facts'
+import {prepareCompactScaleFacts,decodeScaleFacts,isScaleReportFactsView} from '../../modules/assessment-runtime/compact-scale-facts'
 import {encryptCompactField,decryptCompactField} from '../../modules/assessment-runtime/compact-field-codec'
 import {buildScaleResult} from '../../modules/scale/scale-result'
 import {listScalePackages} from '../../modules/scale/scale-package.registry'
@@ -60,6 +60,9 @@ describe('bounded report source batches',()=>{
   try{
    const read=await preloadCompositeReportFacts(f.attempts)
    expect(f.attempts.map(attempt=>read(attempt).scaleResults.get(attempt.scaleAssessments[0]).scores)).toEqual([f.result.scores,f.result.scores,f.result.scores])
+   expect(f.attempts.map(attempt=>read(attempt).scaleSourceResultHashes.get(attempt.scaleAssessments[0]))).toEqual(f.sources.map(row=>row.sourceResultHash))
+   expect(isScaleReportFactsView(read(f.attempts[0]).scaleResults.get(f.attempts[0].scaleAssessments[0]))).toBe(true)
+   expect(read(f.attempts[0]).scaleSourceResultHashes.get({...f.attempts[0].scaleAssessments[0]})).toBeUndefined()
    expect(db.$queryRaw).toHaveBeenCalledTimes(1);expect(f.repo.read).toHaveBeenCalledTimes(1)
    expect(()=>read({...f.attempts[0]})).toThrow('identity')
    f.attempts[0].scaleAssessments[0].submissionPayloadHash='changed';expect(()=>read(f.attempts[0])).toThrow('identity')

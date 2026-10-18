@@ -3,6 +3,10 @@ const globalRead = vi.hoisted(() => vi.fn(() => {throw new Error('Global databas
 vi.mock('../../config/database', () => ({prisma: new Proxy({}, {get: () => globalRead})}))
 import {loadTrainingAnalysisSources, listTrainingAnalysisSources} from '../../modules/training-analysis/source'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
+import {createPublicTemplateStore, type PublicTemplateRow} from '../../modules/assessment-runtime/public-templates'
+import {prepareCompactScaleFacts, decodeScaleFacts, isScaleReportFactsView} from '../../modules/assessment-runtime/compact-scale-facts'
+import {preloadCompositeReportFacts} from '../../modules/composite/composite-report-read-batch'
+import {makeCanonicalFactsReference} from '../../modules/assessment-runtime/compact-assessment-storage'
 import {createFrozenActiveSlotSet, encryptFrozenActiveSlotSet} from '../../modules/assessment-runtime/slot-set'
 import {mapCompositeSection} from '../../modules/assessment-runtime/form-section-definition'
 import {encryptUnifiedRuntimePayload} from '../../modules/assessment-runtime/security'
@@ -75,6 +79,22 @@ function scaleFixture(numericScores = true, legacyClass?: 'CUSTOM_DESCRIPTIVE' |
   f.db.assessment.findMany.mockResolvedValue([child])
   const selector = request(); selector.waves[0].metrics = [{itemId: 'scale-item', metricKey: result.scores[0].key}]
   return {...f, child, result, runtime, envelope, selector}
+}
+async function compactScaleFixture() {
+  const f = scaleFixture(), storage = new Map<string, PublicTemplateRow>()
+  const templates = createPublicTemplateStore({read: async hashes => hashes.flatMap(hash => storage.has(hash) ? [storage.get(hash)!] : []), append: async rows => {for (const row of rows) storage.set(row.templateHash, row)}})
+  const envelope = createCanonicalUnitResultEnvelope({...f.envelope, bundleBridge: {sourceResultHash: canonicalHash(f.result)}})
+  const factsEncrypted = await prepareCompactScaleFacts({result: f.result, itemOrder: f.result.itemScores.map(row => row.itemCode),
+    binding: {assessmentId: f.child.id, attemptEpoch: f.child.attemptEpoch, submissionId: f.child.submissionId, payloadHash: f.child.submissionPayloadHash}, canonical: envelope}, templates)
+  const decoded = decodeScaleFacts(factsEncrypted)!
+  const fact = {id: f.child.id, attemptEpoch: f.child.attemptEpoch, submissionId: f.child.submissionId, submissionPayloadHash: f.child.submissionPayloadHash,
+    sourceResultHash: decoded.sourceResultHash, canonicalResultHash: envelope.resultHash, factsEncrypted}
+  Object.defineProperty(fact, 'rawAnswersEncrypted', {get: () => {throw new Error('Numeric analysis must not read raw answers')}})
+  ;(f.child as any).result = {k: 'SFF1', e: 1}
+  f.snapshots[1].canonicalResultEncrypted = encryptUnifiedRuntimePayload(envelope)
+  f.db.$queryRaw.mockImplementation(async (parts: TemplateStringsArray) => parts.join('').includes('assessment_result_facts') ? [fact]
+    : parts.join('').includes('assessment_public_templates') ? [...storage.values()] : [])
+  return {...f, fact, envelope}
 }
 describe('authorized Training numeric source adapter', () => {
   it('retains historical course participants without current membership and uses the passed transaction for frozen facts', async () => {
@@ -177,6 +197,66 @@ describe('authorized Training numeric source adapter', () => {
     expect(f.db.assessmentUnitSnapshot.findMany).toHaveBeenCalledTimes(1)
     expect(f.db.assessmentUnitSnapshot.findMany.mock.calls[0][0].where.OR[0].slotKey.in).toEqual(['scale:scale-item'])
     expect(f.db.assessment.findMany.mock.calls[0][0].select).not.toHaveProperty('answers')
+  })
+  it.each(['SCF2', 'legacy'])('keeps the complete source fingerprint equal for inline and %s canonical storage', async representation => {
+    const f = await compactScaleFixture(), before = await loadTrainingAnalysisSources(f.db, actor, f.selector)
+    const binding = {assessmentId: f.child.id, attemptEpoch: f.child.attemptEpoch, submissionId: f.child.submissionId, payloadHash: f.child.submissionPayloadHash}
+    f.snapshots[1].canonicalResultEncrypted = representation === 'SCF2' ? makeCanonicalFactsReference(binding, f.envelope.resultHash)
+      : encryptUnifiedRuntimePayload({kind: 'SCALE_FACTS_CANONICAL_REF', version: 1, binding, resultHash: f.envelope.resultHash})
+    f.db.$queryRaw.mockClear()
+    const after = await loadTrainingAnalysisSources(f.db, actor, f.selector)
+    expect(after.sourceFingerprint).toBe(before.sourceFingerprint)
+    expect(after.manifest.attempts[0].sourceHash).toBe(before.manifest.attempts[0].sourceHash)
+    expect(f.db.$queryRaw.mock.calls.filter(([parts]: any) => parts.join('').includes('assessment_result_facts'))).toHaveLength(2)
+    expect(globalRead).not.toHaveBeenCalled()
+  })
+  it.each(['child', 'epoch', 'slot', 'unit', 'missing-item', 'legacy-submission'])('rejects a canonical reference with the wrong %s before referenced facts are read', async mode => {
+    const f = await compactScaleFixture(), binding = {assessmentId: f.child.id, attemptEpoch: f.child.attemptEpoch, submissionId: f.child.submissionId, payloadHash: f.child.submissionPayloadHash}
+    if (mode === 'child') binding.assessmentId = 'OUTSIDE-GROUP-POISON'
+    if (mode === 'epoch') binding.attemptEpoch++
+    if (mode === 'slot') f.snapshots[1].slotKey = 'scale:other-slot'
+    if (mode === 'unit') f.snapshots[1].unitType = 'COGNITIVE'
+    if (mode === 'missing-item') f.child.compositeItemId = null
+    if (mode === 'legacy-submission') binding.submissionId = 'wrong-submission'
+    f.snapshots[1].canonicalResultEncrypted = mode === 'legacy-submission' ? encryptUnifiedRuntimePayload({kind: 'SCALE_FACTS_CANONICAL_REF', version: 1, binding, resultHash: f.envelope.resultHash})
+      : makeCanonicalFactsReference(binding, f.envelope.resultHash)
+    if (mode === 'slot') f.db.assessmentUnitSnapshot.findMany.mockResolvedValue([f.snapshots[1]])
+    await expect(loadTrainingAnalysisSources(f.db, actor, f.selector)).rejects.toMatchObject({statusCode: 409})
+    expect(f.db.$queryRaw.mock.calls.some(([parts]: any) => parts.join('').includes('assessment_result_facts'))).toBe(false)
+  })
+  it('fails closed when an authorized canonical reference has no immutable fact', async () => {
+    const f = scaleFixture(), binding = {assessmentId: f.child.id, attemptEpoch: f.child.attemptEpoch, submissionId: f.child.submissionId, payloadHash: f.child.submissionPayloadHash}
+    f.snapshots[1].canonicalResultEncrypted = makeCanonicalFactsReference(binding, f.envelope.resultHash)
+    await expect(loadTrainingAnalysisSources(f.db, actor, f.selector)).rejects.toThrow('Canonical fact version missing')
+  })
+  it('rejects a referenced immutable canonical hash mismatch through the existing runtime validator', async () => {
+    const f = await compactScaleFixture(), binding = {assessmentId: f.child.id, attemptEpoch: f.child.attemptEpoch, submissionId: f.child.submissionId, payloadHash: f.child.submissionPayloadHash}
+    f.snapshots[1].canonicalResultEncrypted = makeCanonicalFactsReference(binding, f.envelope.resultHash); f.fact.canonicalResultHash = '0'.repeat(64)
+    await expect(loadTrainingAnalysisSources(f.db, actor, f.selector)).rejects.toThrow('Canonical result hash mismatch')
+  })
+  it('uses the original immutable digest for a real marked compact numeric view without raw or item reconstruction', async () => {
+    const f = await compactScaleFixture()
+    const attempt = {...f.parents[0], compositeAssessment: f.task, scaleAssessments: [f.child]}
+    const reader = await preloadCompositeReportFacts([attempt], f.db, {selectedItemIds: new Map([[attempt.id, new Set(['scale-item'])]]), numericOnly: true})
+    const facts = reader(attempt), view = facts.scaleResults.get(f.child)
+    expect(isScaleReportFactsView(view)).toBe(true); expect(view.itemScores).toEqual([])
+    expect(() => canonicalHash(view)).toThrow('symbol')
+    expect(facts.scaleSourceResultHashes.get(f.child)).toBe(canonicalHash(f.result))
+    expect(facts.scaleSourceResultHashes.get({...f.child})).toBeUndefined()
+    const result = await loadTrainingAnalysisSources(f.db, actor, f.selector)
+    expect(result.source.observations[0]).toMatchObject({value: f.result.scores[0].value, reason: null})
+    expect(result.manifest.attempts[0].sourceHashes['scale:scale-item']).toBe(canonicalHash({id: f.child.id, epoch: 1, submissionId: f.child.submissionId,
+      payloadHash: f.child.submissionPayloadHash, runtime: f.runtime.snapshotHash, result: f.fact.sourceResultHash}))
+    expect(globalRead).not.toHaveBeenCalled()
+  })
+  it('rejects compact immutable row digest drift before exporting numeric values', async () => {
+    const f = await compactScaleFixture(); f.fact.sourceResultHash = '0'.repeat(64)
+    await expect(loadTrainingAnalysisSources(f.db, actor, f.selector)).rejects.toThrow('source digest')
+  })
+  it.each(['compact', 'noncompact'])('rejects an accepted bridge digest that mismatches the %s original source', async kind => {
+    const f = kind === 'compact' ? await compactScaleFixture() : scaleFixture()
+    f.snapshots[1].canonicalResultEncrypted = encryptUnifiedRuntimePayload(createCanonicalUnitResultEnvelope({...f.envelope, bundleBridge: {sourceResultHash: '0'.repeat(64)}}))
+    await expect(loadTrainingAnalysisSources(f.db, actor, f.selector)).rejects.toMatchObject({statusCode: 409})
   })
   it('uses the authoritative custom class for V1 numeric policy without additional reads', async () => {
     const f = scaleFixture(true, 'CUSTOM_DESCRIPTIVE')

@@ -54,10 +54,26 @@ def main():
     parser.add_argument('--source-state', type=Path, required=True)
     parser.add_argument('--state', type=Path, required=True)
     parser.add_argument('--upgrade-only', action='store_true')
+    parser.add_argument('--resume-state', type=Path, help='Stopped failed C16 clone whose upgrade passed and whose HTTP checks did not yet pass')
     args = parser.parse_args()
     tools, source, state = (value.resolve() for value in (args.tools, args.source_state, args.state))
     assert source != state and source not in state.parents and state not in source.parents
     assert REPO not in state.parents and state != REPO and not state.exists()
+    resume = args.resume_state.resolve() if args.resume_state else None
+    if resume:
+        assert resume != state and resume not in state.parents and state not in resume.parents and resume != source
+        assert not args.upgrade_only
+        resumed_status = json.loads((resume / 'status.json').read_text())
+        resumed_result = json.loads((resume / 'c16-runtime-result.json').read_text())
+        resumed_http = json.loads((resume / 'c16-http-result.json').read_text())
+        assert resumed_status['state'] == 'stopped' and resumed_status['cleanupVerified'] and not resumed_status['cleanupErrors']
+        assert resumed_result['passed'] is False and all(resumed_result[key] is True for key in ['cleanupVerified', 'sourceUnchanged', 'inputsUnchanged'])
+        assert resumed_result['phases']['upgrade']['passed'] is True and resumed_http['passed'] is False and resumed_http['checks'] == []
+        assert not (resume / 'pgdata/postmaster.pid').exists()
+        assert resumed_result['pinnedC14DumpSha256'] == PINNED_DUMP_SHA256
+        for entry in json.loads((resume / 'current-source-inputs.json').read_text()):
+            if '/prisma/' in entry['path'] or '/backend/scripts/' in entry['path'] or entry['path'].endswith(('backend/package.json', 'backend/package-lock.json')):
+                assert sha_file(REPO / entry['path']) == entry['sha256'], 'upgrade inputs changed; passed migration evidence cannot be reused'
     node, pg, redis = tools / 'node_modules/node/bin/node', tools / 'postgresql/bin', tools / 'redis/bin/redis-server'
     assert subprocess.check_output([str(node), '--version'], text=True).strip() == 'v24.21.0'
     assert '16.15' in subprocess.check_output([str(pg / 'postgres'), '--version'], text=True)
@@ -92,7 +108,7 @@ def main():
     env = {'PATH': f'{node.parent}:{pg}:/usr/bin:/bin', 'HOME': str(state), 'TMPDIR': str(state), 'TZ': 'UTC', 'LANG': 'C.UTF-8', 'NODE_ENV': 'test'}
     result = {'passed': False, 'qualificationScope': 'C16_UPGRADE_ONLY' if args.upgrade_only else 'C16_ANALYSIS_ONLY', 'phases': {}, 'checks': [], 'pinnedC14DumpSha256': PINNED_DUMP_SHA256, 'sourceHead': source_status['head']}
     status = {'state': 'preparing', 'ports': {}, 'pids': {}, 'startedAt': time.time()}
-    children, logs, source_manifest = [], [], None
+    children, logs, source_manifest, resume_manifest = [], [], None, None
     pinned = None
 
     def record():
@@ -173,9 +189,17 @@ def main():
         source_manifest = manifest(source)
         result['sourceManifestSha256'] = hashlib.sha256(json.dumps(source_manifest, sort_keys=True).encode()).hexdigest()
         (state / 'source-byte-manifest.json').write_text(json.dumps(source_manifest, indent=2))
+        if resume:
+            resume_manifest = manifest(resume)
+            result['reusedUpgrade'] = {'sourceState': str(resume), 'resultSha256': sha_file(resume / 'c16-upgrade-result.json'), 'runtimeResultSha256': sha_file(resume / 'c16-runtime-result.json'), 'sourceManifestSha256': hashlib.sha256(json.dumps(resume_manifest, sort_keys=True).encode()).hexdigest(), 'scope': 'EXACT_STOPPED_UPGRADED_CLONE_NO_PASSED_HTTP_CHECKS_REPLAYED'}
+            (state / 'resume-byte-manifest.json').write_text(json.dumps(resume_manifest, indent=2))
+            assert resumed_result['sourceManifestSha256'] == result['sourceManifestSha256']
+            for name in ['c16-original-rows-private.json', 'c16-old-projections.json', 'c16-upgrade-result.json']:
+                shutil.copyfile(resume / name, state / name)
+        copy_source = resume or source
         for directory in ['pgdata', 'uploads', 'exports']:
-            before = manifest(source / directory)
-            shutil.copytree(source / directory, state / directory, copy_function=shutil.copy2)
+            before = manifest(copy_source / directory)
+            shutil.copytree(copy_source / directory, state / directory, copy_function=shutil.copy2)
             assert manifest(state / directory) == before
         assert manifest(source) == source_manifest
         for name in ['fixture-private.json', 'c14-http-result.json', 'c14-runtime-result.json']:
@@ -204,7 +228,8 @@ def main():
         wait_port(dbport, postgres)
         status.update(state='upgrading', head=pinned['head'], node='v24.21.0', runtimeFingerprint=pinned['runtimeFingerprint'])
         record()
-        run(['python3', BASE / 'c16-analysis-upgrade.py', '--tools', tools, '--state', state], 'c16-upgrade', timeout=300)
+        if not resume:
+            run(['python3', BASE / 'c16-analysis-upgrade.py', '--tools', tools, '--state', state], 'c16-upgrade', timeout=300)
         result['phases']['upgrade'] = json.loads((state / 'c16-upgrade-result.json').read_text())
         assert result['phases']['upgrade']['passed'] is True
         verify()
@@ -266,13 +291,18 @@ def main():
             result['inputsUnchanged'] = pinned is not None and binding() == pinned
         except Exception:
             result['inputsUnchanged'] = False
-        result['passed'] = result['passed'] and result['cleanupVerified'] and result['sourceUnchanged'] and result['inputsUnchanged']
+        if resume:
+            try:
+                result['resumeSourceUnchanged'] = resume_manifest is not None and manifest(resume) == resume_manifest and not (resume / 'pgdata/postmaster.pid').exists()
+            except Exception:
+                result['resumeSourceUnchanged'] = False
+        result['passed'] = result['passed'] and result['cleanupVerified'] and result['sourceUnchanged'] and result['inputsUnchanged'] and result.get('resumeSourceUnchanged', True)
         status.update(state='stopped', cleanupVerified=result['cleanupVerified'], cleanupErrors=cleanup, endedAt=time.time())
         record()
         (state / 'c16-runtime-result.json').write_text(json.dumps(result, indent=2))
         print(json.dumps({key: result[key] for key in ['passed', 'cleanupVerified', 'sourceUnchanged', 'inputsUnchanged']}), flush=True)
         lock.close()
-        if not all(result.get(key) for key in ['cleanupVerified', 'sourceUnchanged', 'inputsUnchanged']):
+        if not all(result.get(key) for key in ['cleanupVerified', 'sourceUnchanged', 'inputsUnchanged']) or not result.get('resumeSourceUnchanged', True):
             raise RuntimeError('C16 isolation/cleanup/input validation failed')
 
 
