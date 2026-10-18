@@ -230,6 +230,7 @@ async function main() {
     await teacher.getByRole('complementary', { name: '量表副本来源', exact: true }).waitFor()
     const copyName = 'Training复制量表浏览器验收'
     await teacher.getByLabel('量表名称', { exact: true }).fill(copyName)
+    await teacher.getByLabel('可见性', { exact: true }).selectOption('COURSE')
     await teacher.getByRole('button', { name: '保存草稿', exact: true }).click()
     await teacher.getByText('草稿内容已保存', { exact: true }).waitFor()
     await shots(teacher, 'scale-copy-draft')
@@ -247,7 +248,9 @@ async function main() {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ courseIds: [fixture.courses[0].id] }),
     }))
     await shots(teacher, 'scale-copy-published')
+    const scaleStarted = student.waitForResponse(r => new URL(r.url()).pathname === '/api/scales/' + scaleCopyId + '/assessments' && r.request().method() === 'POST')
     await student.goto(base + '/student/scales/' + scaleCopyId)
+    assert.equal((await scaleStarted).status(), 200)
     await student.getByRole('radio', { name: '是', exact: true }).check()
     const scaleFinal = student.waitForResponse(r => /\/api\/scales\/assessments\/[^/]+\/submit$/.test(new URL(r.url()).pathname) && r.request().method() === 'POST')
     await student.getByRole('button', { name: '完成测评', exact: true }).click()
