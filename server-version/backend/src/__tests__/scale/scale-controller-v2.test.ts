@@ -5,9 +5,9 @@ const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
     $transaction: vi.fn(),
     $queryRaw: vi.fn().mockResolvedValue([]),
-    scale: { findUnique: vi.fn() },
+    scale: { findUnique: vi.fn(), findMany: vi.fn(), count: vi.fn() },
     courseStudent: { findFirst: vi.fn() },
-    materialGrant: { findUnique: vi.fn() },
+    materialGrant: { findUnique: vi.fn(), findMany: vi.fn() },
     assessment: {
       findFirst: vi.fn(),
       findUnique: vi.fn(),
@@ -78,6 +78,39 @@ describe('Scale v2 controller boundaries', () => {
 
     expect(res.statusCode).toBe(404)
     expect(mockPrisma.courseStudent.findFirst).not.toHaveBeenCalled()
+  })
+
+  it('does not disclose copied source identifiers to a student viewing the child', async () => {
+    mockPrisma.scale.findUnique.mockResolvedValue({ ...publicScale, copySource: { parentId: 'hidden-parent', parentCode: 'private-title' } })
+    const res = makeRes()
+    await scaleController.detail(makeReq({ params: { id: 'scale-1' } }) as any, res)
+    expect(res.statusCode).toBe(200)
+    expect(res.body.data.copySource).toBeUndefined()
+    expect(res.body.data.definition).toBeUndefined()
+    expect(res.body.data.runner).toBeTruthy()
+  })
+
+  it('does not grant provenance access with a use-only grant', async () => {
+    mockPrisma.scale.findUnique.mockResolvedValue({ ...publicScale, copySource: { parentId: 'hidden-parent' } })
+    mockPrisma.materialGrant.findUnique.mockResolvedValue({ id: 'grant' })
+    const res = makeRes()
+    await scaleController.detail(makeReq({ user: { userId: 'teacher-viewer', role: UserRole.TEACHER }, params: { id: 'scale-1' } }) as any, res)
+    expect(res.statusCode).toBe(200)
+    expect(res.body.data.copySource).toBeUndefined()
+    expect(res.body.data.copyEligibility.allowed).toBe(false)
+  })
+
+  it.each([
+    ['teacher-viewer', UserRole.TEACHER, false], ['admin-1', UserRole.TEACHER, true], ['support', UserRole.ADMIN, true],
+  ])('projects manager-list provenance only for child owner/admin: %s', async (userId, role, allowed) => {
+    const copySource = { parentId: 'hidden-parent' }
+    mockPrisma.scale.findMany.mockResolvedValue([{ ...publicScale, copySource }])
+    mockPrisma.scale.count.mockResolvedValue(1)
+    mockPrisma.materialGrant.findMany.mockResolvedValue([{ resourceId: 'scale-1' }])
+    const res = makeRes()
+    await scaleController.list(makeReq({ user: { userId, role } }) as any, res)
+    expect(res.statusCode).toBe(200)
+    expect(res.body.data.list[0].copySource).toEqual(allowed ? copySource : undefined)
   })
 
   it('blocks a student from starting a non-published scale by id', async () => {

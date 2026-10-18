@@ -677,6 +677,8 @@ model Scale {
   instrumentVersion String               @default("2.0.0") @map("instrument_version")
   definition        Json? // ScaleDefinitionV2；运行时唯一计分来源
   definitionHash    String?              @map("definition_hash")
+  // Immutable, server-authored provenance for a copied draft; never part of scoring/hash.
+  copySource        Json?                @map("copy_source")
   itemCount         Int                  @default(0) @map("item_count")
   dimensionCount    Int                  @default(0) @map("dimension_count")
   estimatedTime     Int?                 @map("estimated_time") // 预计用时（分钟）

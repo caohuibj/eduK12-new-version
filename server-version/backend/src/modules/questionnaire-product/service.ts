@@ -175,6 +175,11 @@ async function validateDelivery(tx: Tx, actor: Actor, row: any) {
 
 async function validateResources(tx: Tx, actor: Actor, row: any) {
   for (const item of row.items) {
+    // Legacy storage accepts arbitrary strings. Do not publish an unknown
+    // field type as a text input through the player's compatibility fallback.
+    if (item.type === 'FORM' && !['fill_blank', 'single_choice', 'multiple_choice', 'text_input', 'year_month'].includes(item.formType)) {
+      throw compositeBadRequest(`表单字段“${item.formLabel || item.id}”的题型不受支持，请在副本中重新配置后发布`)
+    }
     if (copiedCognitiveBinding(item, row)) continue
     await assertValidItem({ ...item, required: item.required } as any, actor.userId, actor.role, row, tx)
   }
@@ -334,9 +339,8 @@ export async function copy(actor: Actor, id: string, raw: unknown) {
     const questionnaireType = legacy?.type ?? composite!.questionnaireType ?? 'COURSE'
     const sourceCourses = legacy ? legacy.courseQuestionnaires.map(v => v.courseId) : composite!.productKind === 'LEGACY_COMPOSITE' ? (composite!.courseId ? [composite!.courseId] : []) : composite!.questionnaireCourses.map(v => v.courseId)
     await courses(tx, actor, sourceCourses, questionnaireType)
-    if (legacy?.formItems.some(form => !form.required && !form.contextKey)) {
-      throw compositeConflict('新版问卷暂不支持普通非必填字段；请继续维护历史问卷，不会自动改为必填')
-    }
+    // Optional Form fields share the existing FINAL skip contract. Preserve
+    // their required flag, options and section mapping without rewriting them.
     for (const item of composite?.items ?? []) {
       if (item.cognitiveAssignment) {
         const config = await tx.cognitiveTestConfig.findUnique({ where: { id: item.cognitiveAssignment.configId } })

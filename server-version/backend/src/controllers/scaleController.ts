@@ -52,6 +52,7 @@ import { isUnitSubmitAdmissionBusyError } from '../services/unitSubmitAdmission'
 import { deviceInputProvenanceV1Schema } from '../modules/scale/device-input-provenance'
 import { isRelationalCohortOnlyCompositeAttempt, projectRelationalUnitFinalResponse } from '../modules/assessment-relational/result-authority'
 import { isCompositeParticipantFeedbackDeferred } from '../modules/assessment-policy/participant-feedback'
+import { copyScaleToDraft, scaleCopyEligibility, ScaleCopyError, syncCopiedScaleDraftMedia } from '../modules/scale/scale-copy.service'
 
 // ==================== Validation Schemas ====================
 
@@ -66,6 +67,7 @@ const createScaleSchema = z.object({
 })
 
 const updateScaleSchema = z.object({
+  expectedUpdatedAt: z.string().datetime({ offset: true }).optional(),
   name: z.string().min(1, '量表名称不能为空').optional(),
   description: z.string().optional(),
   visibility: z.enum(['HIDDEN', 'COURSE', 'PUBLIC']).optional(),
@@ -75,6 +77,7 @@ const updateScaleSchema = z.object({
 })
 
 const definitionRequestSchema = z.object({
+  expectedUpdatedAt: z.string().datetime({ offset: true }).optional(),
   definition: z.unknown(),
 })
 
@@ -174,10 +177,14 @@ export const scaleController = {
         prisma.scale.count({ where }),
       ])
 
-      const withSource = scales.map((scale) => ({
-        ...scale,
-        source: scaleSource(userId as string, userRole as UserRole, scale),
-      }))
+      const withSource = scales.map((scale) => {
+        const { copySource, ...metadata } = scale
+        return {
+          ...metadata,
+          ...(scale.creatorId === userId || userRole === UserRole.ADMIN ? { copySource } : {}),
+          source: scaleSource(userId as string, userRole as UserRole, scale),
+        }
+      })
       const result = buildPaginatedResult(withSource, total, pagination)
       return success(res, result)
     } catch (err) {
@@ -256,6 +263,19 @@ export const scaleController = {
     }
   },
 
+  async copy(req: Request, res: Response) {
+    try {
+      if (!req.user?.userId) return forbidden(res, '未登录')
+      if (!z.object({}).strict().safeParse(req.body || {}).success) return error(res, '复制请求不能覆盖来源或定义')
+      const copied = await copyScaleToDraft(req.params.id, req.user.userId)
+      return success(res, copied, '已复制为新的草稿，原已发布版本保持不变')
+    } catch (cause) {
+      if (cause instanceof ScaleCopyError) return error(res, cause.message, -1, cause.status)
+      logger.error('复制量表错误', cause)
+      return error(res, '复制量表失败')
+    }
+  },
+
   // 原子保存完整的 ScaleDefinitionV2。新建的教师量表只能是描述性自定义量表。
   async updateDefinition(req: Request, res: Response) {
     try {
@@ -277,9 +297,15 @@ export const scaleController = {
       }
       // The state predicate is part of the write: publishing between the read
       // and this update must never mutate the newly frozen definition.
-      const updated = await prisma.scale.update({
-        where: { id, status: 'DRAFT', instrumentClass: 'CUSTOM_DESCRIPTIVE' },
-        data: { definition: validation.definition as any, definitionHash: hashScaleDefinition(validation.definition), ...definitionSummary(validation.definition) },
+      const write = (db: typeof prisma) => db.scale.update({
+        where: { id, status: 'DRAFT', instrumentClass: 'CUSTOM_DESCRIPTIVE',
+          ...(parsedBody.data.expectedUpdatedAt ? { updatedAt: new Date(parsedBody.data.expectedUpdatedAt) } : {}) },
+        data: { definition: validation.definition as any, definitionHash: hashScaleDefinition(validation.definition!), ...definitionSummary(validation.definition) },
+      })
+      const updated = scale.copySource == null ? await write(prisma) : await prisma.$transaction(async tx => {
+        const saved = await write(tx as typeof prisma)
+        await syncCopiedScaleDraftMedia(tx, id, validation.definition!)
+        return saved
       })
       return success(res, { ...updated, definition: validation.definition }, 'definition 保存成功')
     } catch (err) {
@@ -432,10 +458,13 @@ export const scaleController = {
         }
       }
       if (req.user?.role === UserRole.STUDENT) {
-        const { definition: _definition, ...metadata } = scale
+        const { definition: _definition, copySource: _copySource, ...metadata } = scale
         return success(res, { ...metadata, runner })
       }
-      return success(res, { ...scale, runner })
+      const { copySource, ...metadata } = scale
+      return success(res, { ...metadata, runner,
+        ...(scale.creatorId === req.user!.userId || req.user!.role === UserRole.ADMIN ? { copySource } : {}),
+        copyEligibility: scaleCopyEligibility(scale, req.user!.userId) })
     } catch (err) {
       logger.error('获取量表详情错误', err)
       return error(res, '获取量表详情失败')
@@ -475,10 +504,10 @@ export const scaleController = {
         return error(res, '只有草稿状态的量表可以修改', -1, 409)
       }
 
-      const payload = result.data
+      const { expectedUpdatedAt, ...payload } = result.data
 
       const updated = await prisma.scale.update({
-        where: { id, status: 'DRAFT', instrumentClass: 'CUSTOM_DESCRIPTIVE' },
+        where: { id, ...(expectedUpdatedAt ? { updatedAt: new Date(expectedUpdatedAt) } : {}), status: 'DRAFT', instrumentClass: 'CUSTOM_DESCRIPTIVE' },
         data: payload,
         include: {
           creator: {
@@ -541,9 +570,15 @@ export const scaleController = {
         return error(res, '该量表已有测评记录，无法删除')
       }
 
-      await prisma.scale.delete({
-        where: { id }
-      })
+      if (scale.copySource == null) {
+        await prisma.scale.delete({ where: { id } })
+      } else {
+        await prisma.$transaction(async tx => {
+          await tx.scale.delete({ where: { id } })
+          // Only this draft's references. Published and attempt owners stay pinned.
+          await tx.assetReference.deleteMany({ where: { entityType: 'ScaleCopyDraft', entityId: id } })
+        })
+      }
 
       return success(res, null, '量表已删除')
     } catch (err) {

@@ -71,10 +71,10 @@ import { deviceInputProvenanceV1Schema } from '../modules/scale/device-input-pro
 
 const publicScaleRunner = (scale: any) => {
   try {
-    const { definition: _definition, ...metadata } = scale
+    const { definition: _definition, copySource: _copySource, ...metadata } = scale
     return { ...metadata, definition: scaleRunnerFromRecord(scale) }
   } catch {
-    const { definition: _definition, ...metadata } = scale
+    const { definition: _definition, copySource: _copySource, ...metadata } = scale
     return { ...metadata, definition: null, definitionError: true }
   }
 }

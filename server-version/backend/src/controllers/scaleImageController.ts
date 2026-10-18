@@ -1,3 +1,5 @@
+import { z } from 'zod'
+import { assertScaleCopyPublishSource, ScaleCopyError } from '../modules/scale/scale-copy.service'
 import type { Request, Response } from 'express'
 import { prisma } from '../config/database'
 import { UserRole } from '../types'
@@ -26,11 +28,14 @@ export const scaleImageController = {
       const userId = req.user?.userId
       const userRole = req.user?.role
       const { id } = req.params
+      const request = z.object({ expectedUpdatedAt: z.string().datetime({ offset: true }).optional() }).safeParse(req.body || {})
+      if (!request.success) return error(res, '发布版本参数无效')
       const scale = await prisma.scale.findUnique({ where: { id } })
       if (!scale) return notFound(res, '量表不存在')
       if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) return forbidden(res, '无权限发布此量表')
       if (scale.instrumentClass !== 'CUSTOM_DESCRIPTIVE') return error(res, 'STANDARD 量表必须由代码 package 发布，网页只读')
       if (scale.status !== 'DRAFT') return error(res, '只有草稿状态的量表可以发布', -1, 409)
+      if (request.data.expectedUpdatedAt && new Date(request.data.expectedUpdatedAt).getTime() !== scale.updatedAt.getTime()) return error(res, '量表草稿已变化，请刷新后重新发布', -1, 409)
 
       const validation = validateScaleProductDefinition(scale.definition, 'CUSTOM_DESCRIPTIVE')
       const definition = validation.definition
@@ -39,6 +44,7 @@ export const scaleImageController = {
       }
       const definitionHash = hashScaleDefinition(definition)
       const updated = await prisma.$transaction(async (tx) => {
+        await assertScaleCopyPublishSource(tx, scale)
         await retainScaleAssessmentImages({
           owner: publishedScaleMediaOwner(scale.id, definitionHash),
           definition,
@@ -46,7 +52,7 @@ export const scaleImageController = {
         })
         // Publish exactly the draft that passed validation. A concurrent save
         // or publication invalidates this predicate and rolls back media pins.
-        return tx.scale.update({
+        const published = await tx.scale.update({
           where: { id, status: 'DRAFT', instrumentClass: 'CUSTOM_DESCRIPTIVE',
             updatedAt: scale.updatedAt, definitionHash: scale.definitionHash },
           data: {
@@ -56,9 +62,12 @@ export const scaleImageController = {
             ...definitionSummary(definition),
           },
         })
+        if (scale.copySource != null) await tx.assetReference.deleteMany({ where: { entityType: 'ScaleCopyDraft', entityId: id } })
+        return published
       })
       return success(res, updated, '量表发布成功')
     } catch (cause) {
+      if (cause instanceof ScaleCopyError) return error(res, cause.message, -1, cause.status)
       if ((cause as { code?: string })?.code === 'P2025') return error(res, '量表草稿已变化，请刷新后重新发布', -1, 409)
       return error(res, cause instanceof Error ? cause.message : '发布量表失败')
     }

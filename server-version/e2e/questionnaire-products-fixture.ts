@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { writeFile } from 'node:fs/promises'
+import { readFile, writeFile } from 'node:fs/promises'
 import bcrypt from '../backend/node_modules/bcryptjs'
 import { PrismaClient, UserRole } from '../backend/node_modules/@prisma/client'
 import { MIXED_SCALE_DEFINITION } from '../backend/src/__tests__/questionnaire/product-fixtures'
@@ -11,6 +11,28 @@ async function main() {
   if (process.env.NODE_ENV !== 'test' || !process.env.QUESTIONNAIRE_PRODUCT_TEST_DATABASE_URL ||
       process.env.QUESTIONNAIRE_PRODUCT_TEST_DATABASE_URL !== process.env.DATABASE_URL) {
     throw new Error('Use an explicitly isolated QUESTIONNAIRE_PRODUCT_TEST_DATABASE_URL with NODE_ENV=test')
+  }
+  if (process.env.TRAINING_OPTIONAL_WORK === 'copy-source') {
+    const file = process.env.QUESTIONNAIRE_PRODUCT_FIXTURE_FILE || '/tmp/huisurvey-q1-browser-fixture.json'
+    const fixture = JSON.parse(await readFile(file, 'utf8'))
+    const db = new PrismaClient()
+    try {
+      const source = await db.questionnaire.create({ data: {
+        code: 'legacy-copy-' + randomUUID(), name: 'Training历史选填复制验收', type: 'COURSE', status: 'PUBLISHED',
+        creatorId: fixture.teacher.username, courseQuestionnaires: { create: { courseId: fixture.courses[0].id } },
+      } })
+      const types = ['text_input', 'fill_blank', 'single_choice', 'multiple_choice', 'year_month']
+      const labels = ['必填反思', '选填填空', '选填单选', '选填多选', '选填年月']
+      for (let i = 0; i < types.length; i++) {
+        const section = await db.questionnaireFormSection.create({ data: { questionnaireId: source.id, title: '历史区段' + (i + 1), position: i, contextSection: false } })
+        await db.questionnaireFormItem.create({ data: { questionnaireId: source.id, sectionId: section.id, sectionPosition: 0,
+          type: types[i], label: labels[i], required: i === 0, position: i,
+          ...(i === 2 || i === 3 ? { options: [{ value: 'a', label: '选项甲' }, { value: 'b', label: '选项乙' }] } : {}),
+        } })
+      }
+      await writeFile(file, JSON.stringify({ ...fixture, legacyCopySource: { id: source.id, name: source.name } }), { mode: 0o600 })
+    } finally { await db.$disconnect() }
+    return
   }
   // Bounded real production workers for the Training browser scenario only.
   // They materialize HTTP-accepted work; they never write answers or bypass auth.
