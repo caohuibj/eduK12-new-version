@@ -1,3 +1,5 @@
+import { isTrainingHost } from '../../training/context'
+import '../../training/training-form-surface.css'
 import { withReportReadRecovery } from './receipt-recovery'
 import { runWithCompletionRetry } from '../../services/completionRetry'
 import { REPORT_AUTO_POLL_LIMIT, reportPollingDelayMs } from './report-polling'
@@ -307,10 +309,10 @@ const CompositeReportPage: React.FC = () => {
       {report.reportState === 'PARTIAL' && !unitReports.length && <ReportSection title="暂无已完成单项">完成单项并正式提交后，可在此查看其冻结结果。</ReportSection>}
       <ReportSection title="适用范围与解释边界" description="参考来源、适用人群与版本以各单项报告的已审批方案为准。">质量受限或没有可用参考依据时，保留相应说明；重复测验的差异不自动代表成长或能力改变。</ReportSection>
       {backgroundValues.length > 0 && <ReportSection title="表单回答" eyebrow="作答信息" testId="composite-background-values">
-        <div className="grid gap-3 sm:grid-cols-2">{backgroundValues.map((background) => (
+        <div className={`grid gap-3 sm:grid-cols-2${isTrainingHost() && !publicMode ? ' training-form-report' : ''}`}>{backgroundValues.map((background) => (
           <div key={background.itemId} className="report-metric">
             <div className="report-metric__label">{background.label || '表单回答'}</div>
-            <div className="mt-1 whitespace-pre-wrap text-sm text-gray-800">{background.displayValue ?? background.value ?? '—'}</div>
+            <div className="mt-1 whitespace-pre-wrap text-sm text-gray-800">{background.displayValue ?? background.value ?? (isTrainingHost() && !publicMode ? '未作答' : '—')}</div>
           </div>
         ))}</div>
       </ReportSection>}

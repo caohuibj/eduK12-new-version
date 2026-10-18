@@ -416,7 +416,27 @@ export const persistCompositeFormSection = async (
   mutations: Array<{ itemId: string; value: string | null }>,
 ) => {
   if (mutations.length === 0) return
-  const values = mutations.map((mutation) => Prisma.sql`(
+  // V1 facts carry explicit nulls; the legacy String projection contains only
+  // actual answers. Missing projection rows are read as null by old consumers.
+  // Never write an empty-string sentinel or delete an already accepted answer.
+  const missingIds = mutations.filter((mutation) => mutation.value === null).map((mutation) => mutation.itemId)
+  if (missingIds.length > 0) {
+    const accepted = await tx.compositeFormAnswer.findFirst({
+      where: { attemptId, itemId: { in: missingIds }, OR: [
+        { completed: true },
+        { formSectionAttemptId: { not: null }, NOT: { formSectionAttemptId: sectionAttemptId } },
+      ] },
+      select: { id: true },
+    })
+    if (accepted) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '已接受的表单答案不能被未答覆盖', 409)
+    await tx.compositeFormAnswer.deleteMany({
+      where: { attemptId, itemId: { in: missingIds }, completed: false,
+        OR: [{ formSectionAttemptId: null }, { formSectionAttemptId: sectionAttemptId }] },
+    })
+  }
+  const answered = mutations.filter((mutation): mutation is { itemId: string; value: string } => mutation.value !== null)
+  if (answered.length === 0) return
+  const values = answered.map((mutation) => Prisma.sql`(
     ${uuidv4()}, ${attemptId}, ${mutation.itemId}, ${sectionAttemptId}, ${mutation.value}, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
   )`)
   await tx.$executeRaw(Prisma.sql`

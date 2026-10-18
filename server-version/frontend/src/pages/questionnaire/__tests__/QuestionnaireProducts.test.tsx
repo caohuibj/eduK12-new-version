@@ -156,4 +156,17 @@ describe('questionnaire draft feedback', () => {
     expect(screen.getByLabelText('截止时间')).toHaveFocus()
     expect(api.post).not.toHaveBeenCalled()
   })
+  it('authors an ordinary optional Form with the original revision and no context binding', async () => {
+    const row = { name: '普通表单', status: 'DRAFT', revision: 7, questionnaireType: 'COURSE', questionnaireCourses: [], items: [], formSections: [], publicEnabled: false }
+    api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? { scales: [], cognitive: [], situational: [], courses: [] } : row }))
+    api.post.mockResolvedValue({ code: 0, data: { ...row, revision: 8 } })
+    mount('saved')
+    const user = userEvent.setup()
+    await user.selectOptions(await screen.findByLabelText('测评类型'), 'FORM')
+    await user.type(screen.getByLabelText('题目文字'), '选填意见')
+    await user.click(screen.getByRole('checkbox', { name: '必填' }))
+    await user.click(screen.getByRole('button', { name: '添加到测评' }))
+    expect(api.post).toHaveBeenCalledWith('/questionnaire-products/saved/items', { revision: 7, item: expect.objectContaining({ type: 'FORM', required: false, contextKey: null, formLabel: '选填意见' }) })
+  })
+
 })

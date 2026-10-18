@@ -32,6 +32,10 @@ describe('composite assessment schemas', () => {
     expect(() => addCompositeItemSchema.parse({ type: 'SCALE', scaleId: 'scale-1', required: false })).toThrow()
   })
 
+  it('accepts ordinary optional Form without a context binding', () => {
+    expect(addCompositeItemSchema.parse({ type: 'FORM', formType: 'text_input', formLabel: 'Reflection', required: false }).required).toBe(false)
+  })
+
   it('requires a valid time window for public templates and tokens', () => {
     expect(() => createCompositeSchema.parse({
       code: 'COMPOSITE-1',

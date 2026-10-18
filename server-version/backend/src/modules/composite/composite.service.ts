@@ -513,8 +513,8 @@ export const assertValidItem = async (
   composite: { courseId: string | null; productKind?: string },
   prisma: Db = defaultPrisma,
 ) => {
-  if (input.required === false && (input.type !== 'FORM' || !input.contextKey)) {
-    throw compositeBadRequest('只有 context 表单可以设置为非必填')
+  if (input.required === false && input.type !== 'FORM') {
+    throw compositeBadRequest('只有表单字段可以设置为选填')
   }
   const supplied = [
     input.scaleId,

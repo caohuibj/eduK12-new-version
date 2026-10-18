@@ -91,8 +91,8 @@ export const addCompositeItemSchema = z.object({
   if (input.type === 'SITUATIONAL' && (!input.situationalInstrumentKey || !input.situationalInstrumentVersion)) {
     ctx.addIssue({ code: 'custom', path: ['situationalInstrumentKey'], message: '情境化模块必须提供精确 instrumentKey 和 instrumentVersion' })
   }
-  if (input.required === false && (input.type !== 'FORM' || !input.contextKey)) {
-    ctx.addIssue({ code: 'custom', path: ['required'], message: '只有 context 表单可以设置为非必填' })
+  if (input.required === false && input.type !== 'FORM') {
+    ctx.addIssue({ code: 'custom', path: ['required'], message: '只有表单字段可以设置为选填' })
   }
 })
 

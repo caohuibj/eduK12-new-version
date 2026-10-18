@@ -340,6 +340,39 @@ jobs:
         run: |
           backend/node_modules/.bin/tsx e2e/questionnaire-products-fixture.ts
           node e2e/questionnaire-products-browser-e2e.cjs
+      - name: Training optional Form authenticated browser and CSV acceptance
+        if: matrix.group == 'products'
+        timeout-minutes: 6
+        env:
+          QUESTIONNAIRE_PRODUCT_ISOLATED_DB: '1'
+          QUESTIONNAIRE_PRODUCT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+          TRAINING_OPTIONAL_EVIDENCE: /tmp/eduk12-training-optional-e2e
+          CORS_ORIGIN: https://training.eduk12.top:5443
+          COOKIE_SECURE: 'true'
+          TRAINING_OPTIONAL_EPHEMERAL_CA_APPROVED: 'true'
+        run: |
+          # Last products consumer: earlier cases have exited before changing the
+          # exact isolated origin. No system hosts, trust store or production change.
+          kill -- -$(cat /tmp/eduk12-situational-bundle-backend.pid)
+          for attempt in $(seq 1 30); do
+            if ! curl --fail --silent http://127.0.0.1:3000/ready > /dev/null; then break; fi
+            sleep 1
+          done
+          if curl --fail --silent http://127.0.0.1:3000/ready > /dev/null; then exit 1; fi
+          nohup setsid node backend/dist/index.js > /tmp/eduk12-training-optional-backend.log 2>&1 &
+          echo $! > /tmp/eduk12-situational-bundle-backend.pid
+          ready=false
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/ready > /dev/null; then ready=true; break; fi
+            sleep 1
+          done
+          if [ "$ready" != true ]; then cat /tmp/eduk12-training-optional-backend.log; exit 1; fi
+          backend/node_modules/.bin/tsx e2e/questionnaire-products-fixture.ts
+          if ! command -v certutil >/dev/null; then
+            timeout -k 10s 120s sudo -n apt-get update -o Acquire::Retries=1
+            timeout -k 10s 120s sudo -n apt-get install -y --no-install-recommends libnss3-tools
+          fi
+          python3 e2e/training-optional-https.py
       - name: enforced production CSP browser acceptance
         if: matrix.group == 'security'
         run: |
@@ -364,6 +397,8 @@ jobs:
             /tmp/eduk12-pr5-scenario-backend.log
             /tmp/eduk12-bundle-products-e2e
             /tmp/eduk12-questionnaire-public-e2e
+            /tmp/eduk12-training-optional-e2e
+            /tmp/eduk12-training-optional-backend.log
             /tmp/reporting-v22-evidence
             /tmp/eduk12-bundle-products-backend.log
           if-no-files-found: ignore

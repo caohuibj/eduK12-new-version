@@ -5,7 +5,8 @@ import type { CompositeAttemptState, CompositeCurrentItem } from '../../modules/
 import { finalDraftStore } from '../../services/persistence/finalDraftStore'
 import FinalCompositeAssessment from '../FinalCompositeAssessment'
 
-const { mockRetry } = vi.hoisted(() => ({ mockRetry: vi.fn() }))
+const { mockRetry, trainingHost } = vi.hoisted(() => ({ mockRetry: vi.fn(), trainingHost: vi.fn(() => false) }))
+vi.mock('../../training/context', () => ({ isTrainingHost: trainingHost }))
 
 vi.mock('../../services/persistence/finalDraftCapacityRetry', () => ({
   runFinalDraftCapacityRetry: mockRetry,
@@ -58,6 +59,7 @@ const state: CompositeAttemptState = {
 describe('FinalCompositeAssessment presentation reuse', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    trainingHost.mockReturnValue(false)
     mockRetry.mockImplementation(async ({ operation }: { operation: () => Promise<unknown> }) => operation())
   })
 
@@ -98,4 +100,47 @@ describe('FinalCompositeAssessment presentation reuse', () => {
       answers: [{ formItemId: 'grade', value: 'g1' }],
     })
   })
+  it('seals ordinary optional fallback fields as null, including cleared text', async () => {
+    const user = userEvent.setup()
+    const submitFormSection = vi.fn().mockResolvedValue({ code: 0, data: null })
+    const optional = { ...formItem, formAnswers: undefined, answers: [{ ...formItem.formAnswers![0], type: 'text_input', label: '选填意见', required: false }] }
+    render(<FinalCompositeAssessment state={{ ...state, currentItem: optional }} submitFormSection={submitFormSection} submitScale={vi.fn()} onReload={vi.fn().mockResolvedValue(undefined)} onExit={vi.fn()} onCompleted={vi.fn()} onEnterCognitive={vi.fn()} onEnterSituational={vi.fn()} />)
+    const input = await screen.findByRole('textbox')
+    await user.type(input, '   ')
+    await user.click(screen.getByRole('button', { name: '提交整个区段' }))
+    await waitFor(() => expect(submitFormSection).toHaveBeenCalledTimes(1))
+    expect(submitFormSection.mock.calls[0][2].answers).toEqual([{ formItemId: 'grade', value: null }])
+  })
+
+  it('clears an optional single choice without choosing a refusal value', async () => {
+    const user = userEvent.setup()
+    const submitFormSection = vi.fn().mockResolvedValue({ code: 0, data: null })
+    const optional = { ...formItem, formAnswers: [{ ...formItem.formAnswers![0], required: false }] }
+    render(<FinalCompositeAssessment state={{ ...state, currentItem: optional }} submitFormSection={submitFormSection} submitScale={vi.fn()} onReload={vi.fn().mockResolvedValue(undefined)} onExit={vi.fn()} onCompleted={vi.fn()} onEnterCognitive={vi.fn()} onEnterSituational={vi.fn()} />)
+    await user.click(await screen.findByRole('radio', { name: '一年级' }))
+    await user.click(screen.getByRole('button', { name: '清空本题（不作答）' }))
+    expect(screen.getByRole('radio', { name: '一年级' })).not.toBeChecked()
+    await user.click(screen.getByRole('button', { name: '提交整个区段' }))
+    await waitFor(() => expect(submitFormSection).toHaveBeenCalledTimes(1))
+    expect(submitFormSection.mock.calls[0][2].answers).toEqual([{ formItemId: 'grade', value: null }])
+  })
+
+  it('limits the Training skin to ordinary Form and leaves other entry/mode surfaces unchanged', async () => {
+    trainingHost.mockReturnValue(true)
+    const props = { state, submitFormSection: vi.fn(), submitScale: vi.fn(), onReload: vi.fn().mockResolvedValue(undefined), onExit: vi.fn(), onCompleted: vi.fn(), onEnterCognitive: vi.fn(), onEnterSituational: vi.fn() }
+    const { container, rerender } = render(<FinalCompositeAssessment {...props} />)
+    await screen.findByRole('radio', { name: '一年级' })
+    expect(container.querySelector('.training-form-surface')).not.toBeNull()
+    rerender(<FinalCompositeAssessment {...props} campusMode />)
+    expect(container.querySelector('.training-form-surface')).toBeNull()
+    rerender(<FinalCompositeAssessment {...props} publicMode />)
+    expect(container.querySelector('.training-form-surface')).toBeNull()
+    trainingHost.mockReturnValue(false)
+    rerender(<FinalCompositeAssessment {...props} />)
+    expect(container.querySelector('.training-form-surface')).toBeNull()
+    trainingHost.mockReturnValue(true)
+    rerender(<FinalCompositeAssessment {...props} state={{ ...state, currentItem: { ...formItem, type: 'COGNITIVE' } }} />)
+    expect(container.querySelector('.training-form-surface')).toBeNull()
+  })
+
 })
