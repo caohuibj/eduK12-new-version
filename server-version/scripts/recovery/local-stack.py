@@ -46,8 +46,17 @@ def main():
            'LANG': 'C.UTF-8', 'TMPDIR': str(state), 'NODE_ENV': 'test'}
     summary = {'startedAt': time.time(), 'state': 'preparing', 'checks': {}}
 
+    def interrupt(signum, _frame):
+        summary['stopReason'] = f'signal_{signum}'
+        raise KeyboardInterrupt
+
+    for signum in [signal.SIGINT, signal.SIGTERM, signal.SIGHUP]:
+        signal.signal(signum, interrupt)
+
     def record():
-        (state / 'status.json').write_text(json.dumps(summary, indent=2))
+        temporary = state / 'status.tmp'
+        temporary.write_text(json.dumps(summary, indent=2))
+        temporary.replace(state / 'status.json')
 
     def run(command, label, extra=None, data=None, cwd=backend, timeout=240):
         with (state / f'{label}.log').open('w') as log:
@@ -83,7 +92,11 @@ def main():
     try:
         summary['head'] = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=repo, text=True).strip()
         summary['schemaSha256'] = hashlib.sha256((backend / 'prisma/schema.prisma').read_bytes()).hexdigest()
+        summary['launcherSha256'] = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+        summary['backendTree'] = subprocess.check_output(['git', 'rev-parse', 'HEAD:server-version/backend'], cwd=repo, text=True).strip()
         summary['node'] = subprocess.check_output([str(node), '--version'], text=True).strip()
+        summary['runtimeFingerprint'] = json.loads(subprocess.check_output(
+            [str(node), str(Path(__file__).with_name('runtime-fingerprint.cjs')), str(backend)], text=True))
         dbport, redisport, apiport = port(), port(), port()
         summary['ports'] = {'postgres': dbport, 'redis': redisport, 'api': apiport}
         owner_password, runtime_password = secrets.token_hex(24), secrets.token_hex(24)
@@ -93,7 +106,7 @@ def main():
              '--auth-local=trust', '--auth-host=scram-sha-256', f'--pwfile={password_file}',
              '--encoding=UTF8', '--locale=C.UTF-8'], 'initdb')
         process = start([pg / 'postgres', '-D', state / 'pgdata', '-h', '127.0.0.1',
-                         '-p', dbport, '-k', state, '-c', 'shared_buffers=128MB',
+                         '-p', dbport, '-k', '', '-c', 'shared_buffers=128MB',
                          '-c', 'max_connections=40'], 'postgres')
         wait_port(dbport, process)
         psql = [pg / 'psql', '-X', '-v', 'ON_ERROR_STOP=1', '-h', '127.0.0.1',
@@ -143,6 +156,10 @@ def main():
         print(json.dumps(summary), flush=True)
         deadline = time.monotonic() + args.hold_seconds
         while time.monotonic() < deadline and not (state / 'stop').exists():
+            memory = Path('/proc/meminfo').read_text()
+            available = next(int(line.split()[1]) * 1024 for line in memory.splitlines() if line.startswith('MemAvailable:'))
+            if available < 2 * 1024 ** 3:
+                raise RuntimeError('host available memory below 2GiB stop line')
             for name, child in children:
                 if child.poll() is not None:
                     raise RuntimeError(f'{name} exited unexpectedly')
@@ -155,24 +172,36 @@ def main():
             record()
             time.sleep(1)
     except KeyboardInterrupt:
-        summary['stopReason'] = 'operator_interrupt'
+        summary.setdefault('stopReason', 'operator_interrupt')
     except Exception as error:
         summary['stopReason'] = str(error)
         raise
     finally:
+        for signum in [signal.SIGINT, signal.SIGTERM, signal.SIGHUP]:
+            signal.signal(signum, signal.SIG_IGN)
+        cleanup_errors = []
         for name, child in reversed(children):
-            if child.poll() is None:
-                child.send_signal(signal.SIGINT if name == 'postgres' else signal.SIGTERM)
-                try:
-                    child.wait(timeout=20)
-                except subprocess.TimeoutExpired:
-                    child.kill()
-                    child.wait(timeout=5)
+            try:
+                if child.poll() is None:
+                    child.send_signal(signal.SIGINT if name == 'postgres' else signal.SIGTERM)
+                    try:
+                        child.wait(timeout=20)
+                    except subprocess.TimeoutExpired:
+                        child.kill()
+                        child.wait(timeout=5)
+            except ProcessLookupError:
+                child.poll()
+            except Exception as error:
+                cleanup_errors.append({'service': name, 'errorType': type(error).__name__})
         for log in logs:
             log.close()
-        summary['state'] = 'stopped'
+        summary['cleanupVerified'] = not cleanup_errors and all(child.poll() is not None for _, child in children)
+        summary['state'] = 'stopped' if summary['cleanupVerified'] else 'cleanup_failed'
+        summary['cleanupErrors'] = cleanup_errors
         summary['stoppedAt'] = time.time()
         record()
+        if not summary['cleanupVerified']:
+            raise RuntimeError('LOCAL_STACK_CLEANUP_INCOMPLETE')
 
 
 if __name__ == '__main__':

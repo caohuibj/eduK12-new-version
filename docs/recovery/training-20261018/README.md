@@ -14,7 +14,7 @@
 
 ## 当前接续点
 
-C01 合同与恢复盘点完成；C02 隔离运行环境准备中；C03–C26 尚未实现或验收。源码已有能力见 [source-gaps.md](source-gaps.md)，逐项合同见 [acceptance.md](acceptance.md)，运行约束见 [environment.md](environment.md)。状态随实际结果更新，备份 commit 不能被表述为功能验收成功。
+C01 合同与恢复盘点完成；C02 已在当前助手节点完成基础运行、Form 最小闭环及四工具编制/准入基线，见 [current-node.md](current-node.md)；C03–C26 尚未实现或验收。源码已有能力见 [source-gaps.md](source-gaps.md)，逐项合同见 [acceptance.md](acceptance.md)，运行约束见 [environment.md](environment.md)。状态随实际结果更新，备份 commit 不能被表述为功能验收成功。
 
 ## 变更与验证范围
 

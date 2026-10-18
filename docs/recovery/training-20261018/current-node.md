@@ -1,26 +1,38 @@
-# C02：当前助手云节点（2026-10-18）
+# C02：当前助手云节点（2026-10-18 07:34 UTC）
 
-用户要求直接在当前助手云节点工作，不再委托独立 Codex、Work 或 Chat 任务。
-先前 `environment.md` 描述的是已停止的独立环境，不能用其容器、编译或健康状态作为本节点证据。
+**基础运行与最小链路已完成；C03 尚未开始。** 本节点直接执行，不委托独立 Codex、Work 或 Chat 任务。先前 `environment.md` 是已停止的独立环境记录，不能作为此节点证据。
 
-本节点独立 clone 已接续远端 `recovery/training-rebuild-20261018` 的 `a9d6131`。
-业务源码仍为 main `f6df9c5`，C03 尚未开始。本提交仅是 **C02 未完成 checkpoint**。
+业务源码仍为 main `f6df9c5`。本阶段只增加开发工具与证据，不改变生产监听、评分、数据库模型、认证或 CI 规则。
 
-## 已执行
+## 本节点实际结果
 
-- 官方 npm 安装 Node 24.21.0；前后端按原锁文件使用官方 registry 安装独立依赖。
-- fresh Prisma Client 5.22.0 生成；sharp、jieba 加载通过，canvas 官方安装生命周期成功。
-- PostgreSQL 16.15 官方源码 SHA-256 校验通过；首次无 SSL 构建不能满足 pgcrypto，追加 OpenSSL 后增量链接失败，保留失败记录，正在 clean rebuild。
-- Redis 7.4.11 官方源码与 redis-hashes 仓库公布的 SHA-256 一致，编译成功；使用 libc allocator，性能比较时必须记录这一配置。
-- 开发专用 loopback preload 的 4 项真实 TCP/拒绝测试通过；不修改生产监听默认值和系统网络设置。
-- `local-stack.py` 仅通过 Python 语法检查，尚未实际启动验证。
+- 官方来源：Node 24.21.0；原锁文件安装独立前后端依赖；fresh Prisma Client 5.22.0。
+- PostgreSQL 16.15 官方源码摘要校验通过，OpenSSL clean build 与 pgcrypto 可用；Redis 7.4.11 官方源码摘要核对通过，使用 libc allocator。
+- 后端全部既有 build 前置及 TypeScript 编译通过。tsx CLI 的 Unix IPC 在本环境不可用，因此通过 `node --import tsx` 执行同样脚本，没有删减检查。前端 Vite build 通过；并不声称另跑了未修改前端的所有类型/组件测试。
+- API、独立报告 worker、PG、Redis 与前端预览在同一持续执行会话内运行，均限 loopback。不同工具调用不共享网络命名空间，真实 HTTP 检查在服务所在会话执行，不开放公网。
+- 166 迁移完成；现有运行角色合同通过：203 表、1 sequence，API 与消费者使用受限角色。
+- `/health`、`/ready` 均 200；前端首页及实际 `/api/auth/csrf` 代理均 200。
+- 26 次真实 HTTP：教师/学员 cookie 与 CSRF 登录，Form 编制、自检、发布、FINAL、相同提交重放，教师报告原文，CSV 引号/换行/中文核对，学员越权拒绝，以及四工具组合编制、发布、准入。
+- 4 项真实 loopback/拒绝测试通过。最终 launcher 的真实 SIGTERM 测试确认四个自建服务 PID 消失、状态为 stopped、cleanupVerified=true。
+- C02 脚本独立只读审查的问题已修：信号退出清理、清理失败非零退出、export 消费者环境白名单排除 owner 密钥、唯一排他日志、启动时与测试前后实际 dist/工具输入指纹一致。
 
-## 尚未执行或完成
+脱敏输入与结果见 `c02-baseline.json`；脚本在 `server-version/scripts/recovery/`。输出绑定实际 Node、4941 个 dist 文件的组合摘要、锁文件、schema、生成客户端、preload 和 harness 摘要。旧 source HEAD 的业务组件与本提交保持不变，不能把旧运行说成未来业务修改已通过。
 
-当前节点的 API/worker 编译、隔离数据库迁移、运行角色验证、健康检查、发布—作答—报告—导出基线，以及功能与性能验收均未完成。
+## 明确范围
 
-## 运行边界
+四工具组合只验证编制/发布/准入，未验证四工具作答完成；完整组合、浏览器与性能另按后续计划完成。Scale/Cognitive 使用仓库原合成 fixture，SJT 使用原公开 golden 定义。Form 不伪造评分。
 
-`server-version/scripts/recovery/local-stack.py` 仅创建新的私有合成数据目录；不复用旧数据库，不删除状态目录。数据库和 Redis 绑定 127.0.0.1；未修改的编译 API 通过开发专用 preload 约束到 loopback。使用独立低权限运行角色和仓库现有 ACL 分类，默认关闭重型媒体处理。API/报告 worker 达到 1GiB RSS 停止；所有子进程有受控退出路径。
+导出走原 HTTP 队列登记、原 dist 消费函数、原产物下载鉴权。受控调用消费者是功能验证，不代表实际队列调度吞吐。API/worker 空闲 RSS 不作为负载能力或优化收益。
 
-密钥、账号 fixture、数据库、原始运行日志和私有配置不提交 Git。需要持久保存的验收仅提交脱敏摘要、版本/源码/输入哈希和复现脚本。后续必须按实际运行结果更新本状态，不能把本 checkpoint 表述为 C02 完成。
+所有密钥、账号 fixture、数据库与原始私有日志保留在仓库外私有目录；不提交凭据、cookie 或真实被试数据。新 state 目录拒绝覆盖；退出仅处理本轮子进程，不删除数据目录。停止标记、SIGINT/SIGTERM/SIGHUP 有受控清理；SIGKILL 等不可捕获终止不能保证同样清理。
+
+API/报告 worker 的 1GiB RSS、低可用内存停止线已配置；尚未制造 OOM/低内存故障，不声称这些故障分支经过动态注入验证。
+
+## 保留的失败与修正
+
+1. PostgreSQL 追加 SSL 后增量链接失败，clean rebuild 解决；没有把失败构建当成功。
+2. 原 npm build 的 tsx IPC 权限失败，以支持的 Node import 方式执行同样检查。
+3. 第一版 HTTP harness 误取 start 响应顶层，实际是 data.attempt；已按接口修正。
+4. 重复使用同一认知 fixture 触发合法最大次数 409；后续使用新合成参与者和任务，不放宽产品次数限制。
+5. 前端健康探针误用不存在的 /api/health，修正为实际代理接口；API 自身 /health、/ready 单独验证。
+6. review 后重新绑定最终启动指纹与受限消费者环境；逐次结果与失败日志保留，未覆盖失败为成功。

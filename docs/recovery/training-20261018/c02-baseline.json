@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "kind": "development-baseline-not-ci-qualification",
+  "businessSourceHead": "f6df9c5b21c5a0d50853d5e6e2d1bfd79389dcd0",
+  "backendTree": "bf17129326c7acefeaef24533881e1d19d00e662",
+  "frontendTree": "910eef4d5879d72b7230501e2bf5cf0d70b87437",
+  "versions": {
+    "node": "24.21.0",
+    "prisma": "5.22.0",
+    "postgresql": "16.15",
+    "redis": "7.4.11",
+    "redisAllocator": "libc"
+  },
+  "roleVerification": {
+    "ok": true,
+    "runtimeTables": 203,
+    "runtimeSequences": 1,
+    "restrictedRuntimeRole": true,
+    "migrationCount": 166,
+    "migrationFingerprint": "517bfffb16e24332ce90a6da574178df44567bd79c04879d4d1a011f45c0e3e0"
+  },
+  "httpBaseline": {
+    "passed": true,
+    "checks": [
+      "real Training teacher and student cookie/CSRF login",
+      "authorized draft, Form item, preflight and publication",
+      "real Form FINAL and identical submission replay",
+      "teacher report retains answers; student teacher-report route denied",
+      "HTTP queued compiled export, exact synthetic CSV text, student download denied",
+      "four-tool synthetic fixture preflight, publish and authorized admission (not completion)"
+    ],
+    "requests": 26,
+    "head": "0ee5e18c094111332eb85c2ed2f1cf389a04becd",
+    "node": "v24.21.0",
+    "sourceScriptSha256": "e300b820beb811e82941cb11d2aaeffb35c1c8589c17cbd3c0bf33a37ef0df57",
+    "runtimeFingerprint": {
+      "schemaVersion": 1,
+      "nodeVersion": "v24.21.0",
+      "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+      "dist": {
+        "files": 4941,
+        "sha256": "e5349575a02a3491e6f85bfc5a4bd48abe596a22d56ddb8e055b8377ea42f542"
+      },
+      "files": {
+        "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+        "prisma/schema.prisma": "a36ffd77d90c9e26259b739f33f80f0910399a60569c8501332251e558f7d2b8",
+        "node_modules/.prisma/client/schema.prisma": "72e8fe6193b8334ea495fe0c78ff4996cd8317466e87f244c824c28685c6eb21",
+        "node_modules/.prisma/client/index.js": "2fa5623b5935e960f08a9b651312629b8baddefb874237c0e4f24ee28d6d2756"
+      },
+      "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+    },
+    "scope": "Form full baseline; four-tool authoring/admission only, no mixed completion/browser/performance claim"
+  },
+  "frontendReadiness": {
+    "/": 200,
+    "/api/auth/csrf": 200
+  },
+  "notClaimed": [
+    "four-tool completion",
+    "browser UI",
+    "load testing",
+    "production deployment",
+    "CI success"
+  ],
+  "inputSha256": {
+    "server-version/backend/package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+    "server-version/frontend/package-lock.json": "5288a377ebdd829533561cf2383cd2bcd20e15bd12e6d15762b36a05f7bec1ca",
+    "server-version/backend/prisma/schema.prisma": "a36ffd77d90c9e26259b739f33f80f0910399a60569c8501332251e558f7d2b8",
+    "server-version/scripts/recovery/local-stack.py": "01b84b2fc2d2a0d4196179b7cf6387304f2a1371a54126c9eab5dc07dc0f6520",
+    "server-version/scripts/recovery/baseline-smoke.mjs": "e300b820beb811e82941cb11d2aaeffb35c1c8589c17cbd3c0bf33a37ef0df57",
+    "server-version/scripts/recovery/loopback-only.cjs": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d",
+    "server-version/scripts/recovery/runtime-fingerprint.cjs": "d03a5fdafa8718657ae974e11b52f71f5a77623aac32e243eb729cc338791ce2"
+  },
+  "signalCleanup": {
+    "launcherSha256": "01b84b2fc2d2a0d4196179b7cf6387304f2a1371a54126c9eab5dc07dc0f6520",
+    "stopReason": "signal_15",
+    "cleanupVerified": true,
+    "cleanupErrors": [],
+    "state": "stopped"
+  },
+  "signalTestSha256": "10bb8aab3817083b49a3cf17c15c11c453e23f6250c89d5df3c294fe48f9ddf9"
+}
