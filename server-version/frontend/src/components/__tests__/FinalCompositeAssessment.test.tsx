@@ -21,6 +21,14 @@ vi.mock('../../services/persistence/finalDraftCapacityRetry', () => ({
   runFinalDraftCapacityRetry: mockRetry,
 }))
 
+const { frameHandlers } = vi.hoisted(()=>({frameHandlers:new Map<string,any>()}))
+
+// The test-only button emits two callbacks in one React event, before render.
+vi.mock('../questionnaire/FormPlayer', async () => {
+ const actual=await vi.importActual<typeof import('../questionnaire/FormPlayer')>('../questionnaire/FormPlayer')
+ return {...actual,default:(props:any)=>{frameHandlers.set(props.item.id,props);return <><actual.default {...props}/>{props.item.label==='同帧其他'&&<button onClick={()=>{props.onChange(['other']);props.onOtherTextChange('同帧文本')}}>同帧选择与文本</button>}</>}}
+})
+
 const provenance: DeviceInputProvenanceV1 = {
   schemaVersion: 1,
   deviceClass: 'DESKTOP',
@@ -380,4 +388,38 @@ describe('C06 visibility and durable answer cleanup',()=>{
   await user.click(screen.getByRole('button',{name:'提交整个区段'}));await waitFor(()=>expect(submit).toHaveBeenCalledTimes(1))
   expect(submit.mock.calls[0][2].answers).toEqual([{formItemId:'source',value:'no'}])
  })
+})
+
+
+describe('C06 versioned sealed recovery',()=>{
+ it.each([false,true])('preserves refusal through offline sealed replay (public=%s)',async publicMode=>{
+  const policy={version:3 as const,requiredRefusal:'ALLOW_SUBMIT' as const,hiddenRequired:'EXEMPT' as const}
+  const q={itemKey:'q_refusal',type:'SHORT_TEXT' as const,prompt:'拒答恢复',required:true,options:[],rows:[],allowRefusal:true}
+  const current:CompositeCurrentItem={...formItem,formAnswers:[{...formItem.formAnswers![0],label:q.prompt,required:true,formDefinition:q,formPolicy:policy,value:{_surveyRefusal:true}}]}
+  const submit=vi.fn().mockRejectedValueOnce(new Error('离线')).mockResolvedValue({code:0})
+  const props={...sharedProps,state:makeState(current),publicMode,recoveryToken:publicMode?'synthetic-recovery':undefined,submitFormSection:submit,submitScale:vi.fn()}
+  const first=render(<FinalCompositeAssessment {...props}/>);await waitFor(()=>expect(screen.getByRole('button',{name:'提交整个区段'})).toBeEnabled());await userEvent.click(screen.getByRole('button',{name:'提交整个区段'}));await waitFor(()=>expect(submit).toHaveBeenCalledTimes(1))
+  const payload=submit.mock.calls[0][2];expect(payload.answers).toEqual([{formItemId:'form-item-1',value:{_surveyRefusal:true}}]);first.unmount()
+  render(<FinalCompositeAssessment {...props}/>);await waitFor(()=>expect(screen.getByRole('button',{name:'提交整个区段'})).toBeEnabled());await userEvent.click(screen.getByRole('button',{name:'提交整个区段'}));await waitFor(()=>expect(submit).toHaveBeenCalledTimes(2));expect(submit.mock.calls[1][2]).toEqual(payload)
+ })
+ it('keeps same-frame selection and Other text through offline sealed replay',async()=>{
+  const policy={version:3 as const,requiredRefusal:'BLOCK_SUBMIT' as const,hiddenRequired:'EXEMPT' as const}
+  const q={itemKey:'q_other',type:'MULTIPLE' as const,prompt:'同帧其他',required:true,options:[{optionKey:'yes',label:'普通'},{optionKey:'other',label:'其他'}],rows:[],otherOptionKey:'other'}
+  const current:CompositeCurrentItem={...formItem,formAnswers:[{...formItem.formAnswers![0],type:'multiple_choice',label:q.prompt,required:true,formDefinition:q,formPolicy:policy,options:[{value:'yes',label:'普通'},{value:'other',label:'其他'}]}]}
+  const submit=vi.fn().mockRejectedValueOnce(new Error('离线')).mockResolvedValue({code:0});const props={...sharedProps,state:makeState(current),submitFormSection:submit,submitScale:vi.fn()}
+  const first=render(<FinalCompositeAssessment {...props}/>);await waitFor(()=>expect(screen.getByRole('button',{name:'提交整个区段'})).toBeEnabled());await userEvent.click(screen.getByRole('button',{name:'同帧选择与文本'}))
+  await waitFor(async()=>{const answers=await finalDraftStore.listAnswers('composite-form-section:composite-attempt-1:composite-form-section-1');expect(answers.find(a=>a.itemKey==='form-item-1')?.value).toEqual(['other']);expect(answers.find(a=>a.itemKey==='form-item-1:other')?.value).toBe('同帧文本')})
+  await userEvent.click(screen.getByRole('button',{name:'提交整个区段'}));await waitFor(()=>expect(submit).toHaveBeenCalledTimes(1));const payload=submit.mock.calls[0][2];expect(payload.answers).toEqual([{formItemId:'form-item-1',value:['other'],otherText:'同帧文本'}]);first.unmount();render(<FinalCompositeAssessment {...props}/>);await waitFor(()=>expect(screen.getByRole('button',{name:'提交整个区段'})).toBeEnabled());await userEvent.click(screen.getByRole('button',{name:'提交整个区段'}));await waitFor(()=>expect(submit).toHaveBeenCalledTimes(2));expect(submit.mock.calls[1][2]).toEqual(payload)
+ })
+})
+
+
+it('clears hidden selected Other and late same-frame text when a source changes',async()=>{
+ const policy={version:3 as const,requiredRefusal:'BLOCK_SUBMIT' as const,hiddenRequired:'EXEMPT' as const}
+ const source={...formItem.formAnswers![0],formItemId:'source-frame',type:'single_choice',label:'同帧来源',required:true,value:'yes',options:[{value:'yes',label:'显示'},{value:'no',label:'隐藏'}],formPolicy:policy,formDefinition:{itemKey:'q_source_frame',type:'SINGLE' as const,prompt:'同帧来源',required:true,options:[{optionKey:'yes',label:'显示'},{optionKey:'no',label:'隐藏'}],rows:[]}}
+ const other={...formItem.formAnswers![0],formItemId:'other-frame',type:'multiple_choice',label:'同帧其他',required:true,options:[{value:'other',label:'其他'}],formPolicy:policy,formDefinition:{itemKey:'q_other_frame',type:'MULTIPLE' as const,prompt:'同帧其他',required:true,options:[{optionKey:'other',label:'其他'}],rows:[],otherOptionKey:'other',displayIf:{itemKey:'q_source_frame',operator:'EQUALS' as const,optionKey:'yes'}}}
+ const submit=vi.fn().mockResolvedValue({code:0});render(<FinalCompositeAssessment {...sharedProps} state={makeState({...formItem,formAnswers:[source,other]})} submitFormSection={submit} submitScale={vi.fn()}/>);await waitFor(()=>expect(screen.getByRole('button',{name:'下一字段'})).toBeEnabled());await userEvent.click(screen.getByRole('button',{name:'下一字段'}));await userEvent.click(screen.getByRole('button',{name:'同帧选择与文本'}))
+ await act(async()=>{void frameHandlers.get('source-frame').onChange('no');void frameHandlers.get('other-frame').onOtherTextChange('晚到文本')})
+ await waitFor(async()=>{const rows=await finalDraftStore.listAnswers('composite-form-section:composite-attempt-1:composite-form-section-1');expect(rows.some(r=>r.itemKey==='other-frame'||r.itemKey==='other-frame:other')).toBe(false);expect(rows.find(r=>r.itemKey==='source-frame')?.value).toBe('no')})
+ await userEvent.click(screen.getByRole('button',{name:'提交整个区段'}));await waitFor(()=>expect(submit).toHaveBeenCalledTimes(1));expect(submit.mock.calls[0][2].answers).toEqual([{formItemId:'source-frame',value:'no'}])
 })
