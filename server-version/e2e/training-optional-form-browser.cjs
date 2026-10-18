@@ -261,6 +261,12 @@ async function main() {
     assert.equal((await scaleFinal).status(), 200)
     await student.waitForURL(url => url.pathname.startsWith('/student/scales/result/'))
     await student.getByRole('heading', { name: copyName, exact: true }).waitFor()
+    const scaleAssessmentId = new URL(student.url()).pathname.split('/').pop()
+    const scaleReport = ok(await sessionJsonFetch(student, '/scales/assessments/' + scaleAssessmentId))
+    assert.equal(scaleReport.status, 'COMPLETED')
+    assert.equal(scaleReport.report.kind, 'full')
+    assert.equal(scaleReport.report.scores.find(score => score.key === 'total')?.value, 1)
+    assert.equal(Object.hasOwn(scaleReport.scale, 'copySource'), false)
     await shots(student, 'scale-copy-report')
     check('Scale UI copy/edit/publish preserves source; authorized course student completes actual FINAL and report')
 
