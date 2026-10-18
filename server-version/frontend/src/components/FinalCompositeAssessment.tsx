@@ -1,3 +1,5 @@
+import { isTrainingHost } from '../training/context'
+import '../training/training-form-surface.css'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { FileText, Layers, Save } from 'lucide-react'
 import { sessionFetch } from '../api/client'
@@ -286,7 +288,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
       label: answer.label || '',
       placeholder: answer.placeholder || null,
       options: answer.options || null,
-      required: true,
+      required: answer.required !== false,
       contextKey: answer.contextKey || null,
       value: answer.value ?? null,
     }))
@@ -310,7 +312,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
           attemptEpoch: snapshot.meta.attemptEpoch,
           definitionHash: snapshot.meta.definitionHash,
           contextSnapshotHash: snapshot.meta.contextSnapshotHash,
-          answers: formAnswers.map((answer) => ({ formItemId: answer.formItemId, value: answerMap.get(answer.formItemId) ?? null })),
+          answers: formAnswers.map((answer) => ({ formItemId: answer.formItemId, value: !answer.required && emptyValue(answerMap.get(answer.formItemId)) ? null : answerMap.get(answer.formItemId) ?? null })),
         }
       })
       if (!sealed) throw new Error('本地综合表单草稿不存在，请重新加载')
@@ -457,6 +459,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
 
   return (
     <AssessmentShell
+      className={isTrainingHost() && !campusMode && !publicMode && isSection ? 'training-form-surface' : undefined}
       title={state.name}
       eyebrow={state.productKind === 'QUESTIONNAIRE' ? '问卷' : '综合测评'}
       instructions={(
@@ -559,6 +562,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
                       placeholder: field.placeholder,
                       required: Boolean(field.required),
                     }}
+                    allowSkip
                     options={options}
                     value={value}
                     navigationDisabled={exiting}

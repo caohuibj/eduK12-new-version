@@ -1,0 +1,60 @@
+/* Opt-in ordinary Form surfaces only. Never applied to a timed runner ancestor. */
+.training-form-surface,
+.hui-training.hui-app--standard.training-workspace-shell .training-form-management {
+  --training-paper: #f8f5ee;
+  --training-surface: #fffdf9;
+  --training-ink: #1f403b;
+  --training-bamboo: #1f4d3b;
+  --training-border: #dce3d8;
+  color: var(--training-ink);
+  background: var(--training-paper);
+}
+.training-form-surface .form-player,
+.training-form-surface .bg-white,
+.hui-training.hui-app--standard.training-workspace-shell .training-form-management fieldset {
+  background: var(--training-surface);
+  border-color: var(--training-border);
+  border-radius: 10px;
+}
+.training-form-surface .form-player label,
+.training-form-surface .form-player legend {
+  overflow-wrap: anywhere;
+  color: var(--training-ink);
+}
+.training-form-surface .form-player input,
+.training-form-surface .form-player textarea {
+  accent-color: var(--training-bamboo);
+}
+.training-form-surface .form-player label:has(input:checked) {
+  border-color: var(--training-bamboo);
+  background: #edf3ec;
+}
+.training-form-surface .bg-blue-700,
+.training-form-surface .btn-primary {
+  background: var(--training-bamboo);
+  color: #fffdf9;
+}
+.training-form-surface .form-player-skip {
+  border-color: #60736a;
+  color: var(--training-ink);
+  margin-left: auto;
+  order: 1;
+}
+.training-form-surface :is(button, input, textarea):focus-visible {
+  outline: 2px solid var(--training-bamboo);
+  outline-offset: 3px;
+}
+.hui-training.hui-app--standard.training-workspace-shell .training-form-management :is(button, input:not([type=checkbox]), select) {
+  min-height: 44px;
+}
+@media (max-width: 700px) {
+  .training-form-surface { padding-inline: 12px; }
+  .hui-training.hui-app--standard.training-workspace-shell .training-form-management :is(input, select) { max-width: 100%; min-width: 0; }
+}
+
+.training-form-report .report-metric {
+  background: #fffdf9;
+  border-color: #dce3d8;
+  color: #1f403b;
+  overflow-wrap: anywhere;
+}

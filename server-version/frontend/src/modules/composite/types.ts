@@ -96,6 +96,7 @@ export interface CompositeCurrentItem {
     responseTimeMs?: number
     changeCount?: number
     formItemId?: string
+    required?: boolean
     type?: string
     label?: string
     placeholder?: string | null

@@ -12,6 +12,25 @@ async function main() {
       process.env.QUESTIONNAIRE_PRODUCT_TEST_DATABASE_URL !== process.env.DATABASE_URL) {
     throw new Error('Use an explicitly isolated QUESTIONNAIRE_PRODUCT_TEST_DATABASE_URL with NODE_ENV=test')
   }
+  // Bounded real production workers for the Training browser scenario only.
+  // They materialize HTTP-accepted work; they never write answers or bypass auth.
+  if (process.env.TRAINING_OPTIONAL_WORK === 'reports') {
+    const { claimCompositeReportJob } = await import('../backend/src/modules/assessment-runtime/report-outbox.service')
+    const { processCompositeReportJob } = await import('../backend/src/workers/compositeReportWorker')
+    for (let count = 0; count < 30; count++) {
+      const job = await claimCompositeReportJob()
+      if (!job) process.exit(0)
+      await processCompositeReportJob(job)
+    }
+    throw new Error('Bounded report drain exceeded 30 jobs')
+  }
+  if (process.env.TRAINING_OPTIONAL_WORK === 'export') {
+    const batchId = process.env.TRAINING_OPTIONAL_BATCH_ID
+    if (!batchId || !/^[a-zA-Z0-9-]{1,100}$/.test(batchId)) throw new Error('Exact synthetic export batch required')
+    const { runExportBatch } = await import('../backend/src/workers/exportBatchTask')
+    await runExportBatch({ data: { batchId }, id: 'training-browser-' + batchId, opts: { attempts: 2 }, attemptsMade: 0 } as any)
+    process.exit(0)
+  }
   const db = new PrismaClient()
   const suffix = randomUUID()
   const actor = { userId: 'q1-browser-teacher-' + suffix, role: UserRole.TEACHER }

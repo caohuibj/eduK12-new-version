@@ -3,7 +3,8 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import CompositeReportPage from '../CompositeReportPage'
 
-const { mockCompositeApi, authState } = vi.hoisted(() => ({
+const { mockCompositeApi, authState, trainingHost } = vi.hoisted(() => ({
+  trainingHost: vi.fn(() => false),
   mockCompositeApi: {
     report: vi.fn(),
     reportStatus: vi.fn(),
@@ -17,6 +18,7 @@ const { mockCompositeApi, authState } = vi.hoisted(() => ({
   },
   authState: { user: null as null | { role: 'STUDENT' | 'TEACHER' | 'ADMIN' } },
 }))
+vi.mock('../../../training/context', () => ({ isTrainingHost: trainingHost }))
 vi.mock('../api', () => ({
   compositeApi: mockCompositeApi,
   publicCompositeApi: () => mockCompositeApi,
@@ -27,6 +29,7 @@ vi.mock('../../../contexts/AuthContext', () => ({
 
 beforeEach(() => {
   vi.clearAllMocks()
+  trainingHost.mockReturnValue(false)
   authState.user = null
   const ready = { code: 0, data: { attemptId: 'attempt-1', attemptEpoch: 1, status: 'COMPLETED', hasAcceptedSubmission: true,
     reportStatus: { state: 'READY', jobId: 'job-1', retryAfterSeconds: 2, errorCode: null, completedAt: '2026-10-15T00:00:00Z' } } }
@@ -39,6 +42,15 @@ beforeEach(() => {
 })
 
 describe('CompositeReportPage cognitive module', () => {
+  it('labels stored missing Form facts as unanswered on the Training report without scoring', async () => {
+    trainingHost.mockReturnValue(true)
+    mockCompositeApi.report.mockResolvedValue({ code: 0, data: { id: 'attempt-1', assessmentId: 'q', name: '选填反馈', productKind: 'QUESTIONNAIRE', reportMode: 'COLLECTION_ONLY', completedAt: '2026-10-18T00:00:00Z', totalTime: 1000, anonymousCode: null, backgroundValues: [{ itemId: 'f1', type: 'FORM', label: '选填意见', value: null }], unitReports: [] } })
+    const { container } = render(<MemoryRouter initialEntries={['/student/composite/attempts/attempt-1/report']}><Routes><Route path="/student/composite/attempts/:attemptId/report" element={<CompositeReportPage />} /></Routes></MemoryRouter>)
+    expect(await screen.findByText('未作答')).toBeInTheDocument()
+    expect(container.querySelector('.training-form-report')).not.toBeNull()
+    expect(mockCompositeApi.report).toHaveBeenCalledTimes(1)
+    expect(mockCompositeApi.reanalyze).not.toHaveBeenCalled()
+  })
   it('marks an unfinished collection as read-only partial and never asks for package analysis', async () => {
     authState.user = { role: 'TEACHER' }
     mockCompositeApi.teacherReport.mockResolvedValue({ code: 0, data: { id: 'partial-attempt', assessmentId: 'q', name: '部分结果', productKind: 'QUESTIONNAIRE', reportMode: 'COLLECTION_ONLY', reportState: 'PARTIAL', completedAt: null, totalTime: null, anonymousCode: null, backgroundValues: [], unitReports: [] } })
@@ -282,6 +294,7 @@ describe('CompositeReportPage cognitive module', () => {
     selectedView.unmount()
 
     vi.clearAllMocks()
+  trainingHost.mockReturnValue(false)
     mockCompositeApi.teacherReport.mockRejectedValue(Object.assign(new Error('Snapshot 不存在'), { status: 404 }))
     mockCompositeApi.snapshots.mockResolvedValue({
       code: 0,

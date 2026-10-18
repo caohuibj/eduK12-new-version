@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FormPlayer } from '../FormPlayer'
 
@@ -94,4 +94,17 @@ describe('FormPlayer', () => {
     await user.click(screen.getByRole('button', { name: '提交整个区段' }))
     expect(onSubmit).toHaveBeenCalledTimes(1)
   })
+  it('preserves Chinese composition events without submitting or navigating', () => {
+    const onChange = vi.fn(), onSubmit = vi.fn(), onNext = vi.fn()
+    render(<FormPlayer item={{ id: 'ime', type: 'text_input', label: '意见', required: false }} options={[]} value="" position={1} total={1} onPrevious={vi.fn()} onChange={onChange} onNext={onNext} onSubmit={onSubmit} allowSkip />)
+    const input = screen.getByRole('textbox')
+    fireEvent.compositionStart(input)
+    fireEvent.change(input, { target: { value: '中文🙂\n第二行' } })
+    fireEvent.keyDown(input, { key: 'Enter', isComposing: true })
+    fireEvent.compositionEnd(input, { data: '中文🙂\n第二行' })
+    expect(onChange).toHaveBeenLastCalledWith('中文🙂\n第二行')
+    expect(onSubmit).not.toHaveBeenCalled()
+    expect(onNext).not.toHaveBeenCalled()
+  })
+
 })

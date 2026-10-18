@@ -31,6 +31,7 @@ export interface FormPlayerProps {
   onNext?: () => void
   onSubmit?: () => void | Promise<void>
   submitting?: boolean
+  allowSkip?: boolean
 }
 
 const inputId = (itemId: string) => `form-player-${itemId}`
@@ -84,6 +85,7 @@ export function FormPlayer({
   onNext,
   onSubmit,
   submitting = false,
+  allowSkip = false,
 }: FormPlayerProps) {
   const describedBy = errorMessage ? errorId(item.id) : undefined
   const choiceName = `form-player-choice-${item.id}`
@@ -100,13 +102,14 @@ export function FormPlayer({
   const prompt = (
     <>
       {item.label}
-      {item.required ? <span className="ml-2 text-sm font-normal text-red-600">必填</span> : null}
+      {item.required ? <span className="ml-2 text-sm font-normal text-red-600">必填</span> : allowSkip ? <span className="ml-2 text-sm font-normal text-slate-600">选填</span> : null}
     </>
   )
 
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6" aria-label={`表单字段 ${position} / ${total}`}>
+    <section className="form-player rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6" aria-label={`表单字段 ${position} / ${total}`}>
       <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
+        {allowSkip && !item.required ? <button type="button" disabled={answerControlsDisabled} onClick={() => void onChange(null)} className="form-player-skip min-h-11 rounded border px-3 py-2 text-sm">清空本题（不作答）</button> : null}
         <p className="text-sm font-medium text-slate-500">字段 {position} / {total}</p>
       </div>
 

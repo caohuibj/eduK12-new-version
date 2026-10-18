@@ -1,3 +1,5 @@
+import { isTrainingHost } from '../../training/context'
+import '../../training/training-form-surface.css'
 import { apiErrorMessage } from '../../utils/apiErrorMessage'
 import { PublicDeliveryManager } from '../../components/PublicDeliveryManager'
 import React, { useEffect, useRef, useState } from 'react'
@@ -75,7 +77,7 @@ export function QuestionnaireProductList() {
     }
   }
   return (
-    <ProductPage width="management" className="hui-questionnaire-products">
+    <ProductPage width="management" className={`hui-questionnaire-products${isTrainingHost() ? ' training-form-management' : ''}`}>
       <PageHeader
         title="组合测评"
         description="自由编排量表、认知任务、情境判断和表单，提供单项报告合集。历史问卷与综合测评在此统一管理。"
@@ -508,7 +510,7 @@ export function QuestionnaireProductEdit() {
     {detail && draft && <div className="questionnaire-delivery-footer"><p role="status">{dirty ? '设置有未保存的修改' : '设置已保存'}</p><ProductButton variant={dirty ? 'primary' : 'secondary'} disabled={busy || !dirty} onClick={() => void save()}>保存投放设置</ProductButton><a href="#questionnaire-publish">前往正式发布 ↑</a></div>}
   </fieldset>
   return (
-    <ProductPage width="management" className="hui-questionnaire-products">
+    <ProductPage width="management" className={`hui-questionnaire-products${isTrainingHost() ? ' training-form-management' : ''}`}>
       <PageHeader
         title={id === 'new' ? '创建组合测评' : detail && !draft ? '查看组合测评' : '编制组合测评'}
         description="各项测评独立反馈，报告为单项结果合集。当前支持网页作答。"
@@ -658,7 +660,7 @@ export function QuestionnaireProductEdit() {
               {units.filter(v=>v.id===(units.some(unit=>unit.id===editingUnit)?editingUnit:units[0]?.id)).map(v=><section key={v.id} className="rounded border p-4"><h3 className="font-semibold">{v.label} · 配置</h3>                    {v.type === 'FORM_SECTION' &&
                       v.items.map((item: any) => (
                         <div key={item.id}>
-                          <span>{item.formLabel || item.label}</span>
+                          <span>{item.formLabel || item.label} · {item.required === false ? '选填' : '必填'}</span>
                           {draft && (
                             <ProductButton
                               disabled={busy || dirty}
@@ -827,7 +829,7 @@ export function QuestionnaireProductEdit() {
                           ))}
                         </select>
                       </label>
-                      {contextKey && (
+                      {type === 'FORM' && (
                         <label className="block">
                           <input
                             type="checkbox"

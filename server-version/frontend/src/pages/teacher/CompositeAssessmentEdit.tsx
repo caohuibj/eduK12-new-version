@@ -1,3 +1,5 @@
+import { isTrainingHost } from '../../training/context'
+import '../../training/training-form-surface.css'
 import { waitForExportArtifacts, requestExportIntent, assertExportDownload, triggerExportDownload, clearExportIntentKey, ExportJobFailedError } from '../../utils/exportJobs'
 import { PublicDeliveryManager } from '../../components/PublicDeliveryManager'
 import React, { useEffect, useState } from 'react'
@@ -261,7 +263,7 @@ const CompositeAssessmentEdit: React.FC = () => {
     item.type === 'SCALE' ? item.scale?.name : item.type === 'COGNITIVE' ? item.cognitiveAssignment?.title : item.type === 'SITUATIONAL' ? item.situational?.key : item.form?.label
 
   return (
-    <ProductPage width="management" className="staff-editor-page">
+    <ProductPage width="management" className={`staff-editor-page${isTrainingHost() ? ' training-form-management' : ''}`}>
       <PageHeader
         title={detail.name}
         description={(
