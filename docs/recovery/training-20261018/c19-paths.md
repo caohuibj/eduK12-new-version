@@ -102,3 +102,13 @@ state05在9ee45f69固定输入运行，正式runtime角色且原Form仅复用，
 定向84例首次81通过/3失败：两新fixture时间未规范为Date ISO、旧shared-plan mock遗漏现有factory。只修fixture不放宽生产绑定；新共享fixture影响24例及旧shared单例复验25通过/15skip，其他原通过文件字节不变复用，不重复累计。build08受影响tsc emit成功，input前后不变；input SHA `74ef4f3d4b55e3df3b1824d625d670afbdbf4d069e91f1fc8fd2f537b2f854cb`、dist manifest SHA `43a4f171f4f9b278cd5ea0d809922d2d658f2dbe50c938dcc98250c9bf8eb607`。原失败与分项续验全部归档。
 
 新export-continue仅固定state05失败和历史主链/branches/race producer，升级同hash复用；旧成功阶段明确HISTORICAL_PRODUCER_ONLY，不改称当前新dist结果。exports-continuation不重播seed/发布/FINAL/评分，从新正式export请求继续，核全部accepted parents/children/facts/job前后hash不变及原FAILED batch/artifacts原样保留。随后新格式restore绑定原main-remaining生产者，不伪造main成功文件。目前该续验/restore未运行；shared-storage完整ON/OFF、revocation与四native完整矩阵仍待补充。主链实际为mixed storage（control=true、Scale共享未开启），不冒充全ON。
+
+### Checkpoint 10：state06 三CSV成功，分析指标发现失败保留
+
+7227dd6e 固定输入的 state06 复用原升级、原8个终态attempt与既有事实，仅新建三个真实Redis队列CSV导出。三者READY且下载校验通过，6/1/1行、548/63/26列；路径config/hash/termination/task satisfaction正确，未达native原始值/分数/时间为空且NOT_SHOWN。原FAILED batch不重置。随后Training source-list缺少预期Scale total，harness `assert.ok(metric)`失败，尚未POST analysis，未执行restore，也未到末尾accepted-fingerprint对照，不能把该末尾保护声称已通过。
+
+原失败生产者保留：runtime SHA `c43577bb9acad245204ffae51c5af6e22560fc44492b9b242cd25f442ba51811`，分项result SHA `7befacb3128c86e7a48b7bedeccd601d0412974e628ef4fa8d9b00ccccb32669`，frozen-inputs SHA `aa6f11af170e2612bddb259fa63d5e13efda4708c0d461d96c83d2ceb31ccb9a`，exports producer `3e61b58c1eea47db5b200506ac1f6c5e03a1190ea7ce4e7799af722d43c25b59`。cleanup/source/priorSource/inputs四项全true，服务停止。checkpoint10归档仅公共结果、输入及前后字节manifest和安全失败log，不含私有配置、数据库、凭据或答案。
+
+源码核实 source-list 当前读取definition.scores，而官方V2字典为definition.scoring.scores；产品修复另行冻结，须从精确冻结runtime的统一V1/V2 parser发现指标，保持teacher numeric disclosure，不能简单回退当前可编辑模板。新analysis-only continuation锁定state06，原三READY CSV只读下载比对旧SHA/bytes，原FAILED与READY行、8事实前后固定，仅补缺失analysis及其CSV。当前只是静态脚本，不授动态资格。
+
+补充ON/OFF脚本已静态冻结：独立新14个FINAL（两模式各四工具，另两类撤权各A两次/B一次），每个attempt科学身份与封装hash分别绑定；四native真child非owner拒绝、未达无child/配额、Scale/SJT已达恢复与未达撤权拒绝。launcher尚未完成，未运行。独立progress窄审确认state/list和中间finalizer基于reached集合，无候选union分母泄漏，无需额外UI修改。
