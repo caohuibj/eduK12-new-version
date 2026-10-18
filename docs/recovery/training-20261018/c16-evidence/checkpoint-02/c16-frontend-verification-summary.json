@@ -1,0 +1,99 @@
+{
+  "kind": "C16 frontend verification summary; test outcomes transcribed from captured tool results, not raw runner logs",
+  "node": "24.21.0",
+  "scope": [
+    "server-version/frontend/src/api/trainingAnalysis.ts",
+    "server-version/frontend/src/api/__tests__/trainingAnalysis.test.ts",
+    "server-version/frontend/src/training/TrainingCourseAnalysis.tsx",
+    "server-version/frontend/src/training/TrainingCourseAnalysis.test.tsx",
+    "server-version/frontend/src/training/training-course-analysis.css",
+    "server-version/frontend/src/training/TrainingTrainerCourse.tsx",
+    "server-version/frontend/src/training/TrainingCoursePages.test.tsx"
+  ],
+  "sourceSha256": {
+    "server-version/frontend/src/api/trainingAnalysis.ts": "38d8f080b8d5a3e83bfd5179fa2e0934843ae7b6ddcf385f443145109a6f8841",
+    "server-version/frontend/src/api/__tests__/trainingAnalysis.test.ts": "c23231aebacce9e355fb49ba86bcd2a893a0525f733f942ca275e091c7fedddc",
+    "server-version/frontend/src/training/TrainingCourseAnalysis.tsx": "c70267823bdf5e297585da4b2c8168ce1dda0802271d1f26738c79e09b4c3688",
+    "server-version/frontend/src/training/TrainingCourseAnalysis.test.tsx": "213b37c61ad8099c45788f94187439ad2577dd0ee7467b5a0dba84794cd57b5b",
+    "server-version/frontend/src/training/training-course-analysis.css": "241e97e9b167965095dac5dba87fb50748d47eaf471eaa969e310529e0cf1729",
+    "server-version/frontend/src/training/TrainingTrainerCourse.tsx": "3cc4d645381130d0f70fd005ff50ca72bb4a9dff54624ea9de33c2c5300d7001",
+    "server-version/frontend/src/training/TrainingCoursePages.test.tsx": "21ef7b14597504eb3ed30caa39bc7159e0197a2949b0bd64ce66613222303945"
+  },
+  "runs": [
+    {
+      "toolOutputChunk": "c41a18",
+      "command": "vitest run src/training/TrainingCourseAnalysis.test.tsx src/api/__tests__/trainingAnalysis.test.ts src/training/TrainingCoursePages.test.tsx --maxWorkers=1",
+      "result": "PASS",
+      "files": 3,
+      "tests": 36,
+      "durationSeconds": 4.66
+    },
+    {
+      "toolOutputChunk": "67b8ff",
+      "command": "vitest run src/training/TrainingCourseAnalysis.test.tsx --maxWorkers=1",
+      "result": "PASS",
+      "files": 1,
+      "tests": 20,
+      "durationSeconds": 2.64,
+      "change": "Added stale discovery and final artifact-download permission checks; cleanup warning correction"
+    },
+    {
+      "toolOutputChunk": "f1ca65",
+      "command": "vitest run src/training/TrainingCourseAnalysis.test.tsx --testNamePattern \"requires explicit frozen|does not reconstruct\" --maxWorkers=1",
+      "result": "PASS",
+      "tests": 2,
+      "skipped": 18,
+      "durationSeconds": 1.04,
+      "change": "Aligned sample-flow labels and type with OBSERVED_SAMPLE/fromObservedN/toObservedN"
+    },
+    {
+      "toolOutputChunk": "7b16b0",
+      "command": "vitest run src/training/TrainingCourseAnalysis.test.tsx --testNamePattern \"labels unobserved\" --maxWorkers=1",
+      "result": "PASS",
+      "tests": 1,
+      "skipped": 20,
+      "durationSeconds": 0.932,
+      "change": "Added NO_OBSERVATION label and no-assignment/no-response-inference test"
+    },
+    {
+      "toolOutputChunk": "821243",
+      "command": "vitest run src/training/TrainingCourseAnalysis.test.tsx --testNamePattern \"answered-but-not-calculable\" --maxWorkers=1",
+      "result": "PASS",
+      "tests": 1,
+      "skipped": 21,
+      "durationSeconds": 0.887,
+      "rawLog": "c16-frontend-not-calculable-test.log",
+      "change": "Distinguish accepted but noncomputable scores from unanswered/missing observations"
+    }
+  ],
+  "distinctCoveredCases": 40,
+  "lint": "PASS, zero errors or warnings after targeted cleanup; changed production/test files checked with ESLint",
+  "limits": [
+    "Browser not run per parent C25/known EPERM instruction",
+    "No CI, server, production, commit or push",
+    "Pre-label build is superseded by final build, whose raw log is separate"
+  ],
+  "finalLogs": [
+    "c16-frontend-final-types.log",
+    "c16-frontend-final-build.log"
+  ],
+  "finalTypecheck": {
+    "result": "PASS",
+    "exitCode": 0,
+    "log": "c16-frontend-final-types.log"
+  },
+  "finalBuild": {
+    "result": "PASS",
+    "exitCode": 0,
+    "durationSeconds": 15.12,
+    "log": "c16-frontend-final-build.log",
+    "warnings": [
+      "Vite existing >500 kB chunk-size advisory; no build errors"
+    ]
+  },
+  "logSha256": {
+    "c16-frontend-final-types.log": "e15827127fe19552557abe9eb289552c619a20afde634220253491faa8a8c20f",
+    "c16-frontend-final-build.log": "5e765405969c4d6f695415592dcd2a2fa628752f910b2b64a57ed02727e53727"
+  },
+  "supersededEvidencePrefix": "c16-frontend-pre-not-calculable-"
+}

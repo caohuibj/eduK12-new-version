@@ -7,6 +7,7 @@ import { randomUUID } from 'node:crypto'
 import { createRequire } from 'node:module'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import {addCopiedFourToolFacts} from './c16-analysis-fourtool.mjs'
 const backend=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../../backend')
 const require=createRequire(path.join(backend,'package.json'))
 const {canonicalHash}=require(path.join(backend,'dist/modules/assessment-runtime/canonical.js'))
@@ -45,11 +46,12 @@ export async function addParticipants(prisma,fixture,count,options={}){
   const id=randomUUID(),sourceAttemptId=randomUUID(),submissionId=randomUUID(),completedAt=new Date(),value=options.missingFirst&&wave.index===0?null:user.index+10*wave.index,status=options.nonFinalSecond&&wave.index===1?'IN_PROGRESS':'COMPLETED'
   const facts=createTypedFormSectionCollectionFacts({sectionKey:wave.section.id,items:[{key:wave.item.id,label:wave.item.formLabel,value}]})
   assertTypedCompositeFormFacts(wave.mapped,facts)
-  parents.push({id,compositeAssessmentId:wave.task.id,userId:user.id,participantKey:'c16-synthetic:'+user.id,deliveryCourseId:fixture.courseId,status,runtimeGeneration:'UNIFIED_V1',deliveryMode:'FINAL_ONLY',attemptEpoch:1,attemptNo:1,progress:100,completedItems:1,completedAt,taskSatisfaction:'SATISFIED',frozenActiveSlotSetEncrypted:encryptFrozenActiveSlotSet(wave.slots),frozenActiveSlotSetHash:wave.slots.snapshotHash,aggregateInputHash:canonicalHash({synthetic:true,user:user.id,wave:wave.index,value})})
+  parents.push({id,compositeAssessmentId:wave.task.id,userId:user.id,participantKey:'c16-synthetic:'+user.id,deliveryCourseId:fixture.courseId,status,runtimeGeneration:'UNIFIED_V1',deliveryMode:'FINAL_ONLY',attemptEpoch:1,attemptNo:1,progress:status==='COMPLETED'?100:0,completedItems:status==='COMPLETED'?(fixture.fourTool?4:1):0,completedAt:status==='COMPLETED'?completedAt:null,...(fixture.fourTool?{contextSnapshotHash:fixture.fourTool.contextHash,contextSnapshotEncrypted:fixture.fourTool.contextEncrypted,respondentType:fixture.fourTool.respondentType}:{}),taskSatisfaction:status==='COMPLETED'?'SATISFIED':null,frozenActiveSlotSetEncrypted:encryptFrozenActiveSlotSet(wave.slots),frozenActiveSlotSetHash:wave.slots.snapshotHash,aggregateInputHash:canonicalHash({synthetic:true,user:user.id,wave:wave.index,value})})
   if(status==='COMPLETED')snapshots.push({id:randomUUID(),compositeAttemptId:id,attemptEpoch:1,slotKey:formSectionSlotKey(wave.section.id),unitType:'FORM_SECTION',terminalState:'COMPLETED',payloadKind:'COLLECTION_FACTS',sourceType:'COMPOSITE_FORM_SECTION',sourceAttemptId,sourceSubmissionId:submissionId,sourceDefinitionHash:canonicalHash(wave.mapped),collectionFactsEncrypted:encryptUnifiedRuntimePayload(facts),completedAt})
   fixture.attempts.push({id,userId:user.id,index:user.index,waveIndex:wave.index,value})
  }
  await prisma.compositeAssessmentAttempt.createMany({data:parents});await prisma.assessmentUnitSnapshot.createMany({data:snapshots})
+ if(fixture.fourTool)await addCopiedFourToolFacts(prisma,fixture,users)
  fixture.participants.push(...users.map(({passwordHash,...user})=>user))
 }
 

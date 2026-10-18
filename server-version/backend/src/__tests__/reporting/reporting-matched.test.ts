@@ -180,3 +180,19 @@ it('preserves the old organizational metric-resolution scope outside the matched
   const w2 = wave({ id: 'w2', ordinal: 2, resolved: Array.from({ length: 5 }, (_, i) => result(`b${i}`, `u${i}`, `n${i}`, i + 2)) })
   expect(buildMatchedLongitudinalProjection({ waves: [w1, w2], spec: spec(5), mode: 'PAIRWISE' }).metrics?.score.validCaseN).toBe(5)
 })
+
+it('preserves organizational short-circuiting before malformed metrics in a later Wave', () => {
+  const earlyMissing = result('a-missing', 'u5', 'm5', null)
+  const laterDuplicate = result('b-duplicate', 'u5', 'n5', 7)
+  laterDuplicate.metrics.push({ ...laterDuplicate.metrics[0] })
+  const w1 = wave({ id: 'w1', ordinal: 1, resolved: [...Array.from({ length: 5 }, (_, i) => result(`a${i}`, `u${i}`, `m${i}`, i)), earlyMissing] })
+  const w2 = wave({ id: 'w2', ordinal: 2, resolved: [...Array.from({ length: 5 }, (_, i) => result(`b${i}`, `u${i}`, `n${i}`, i + 2)), laterDuplicate] })
+  expect(selectMatchedMetricCases({ waves: [w2, w1], rule: metricRule })).toMatchObject({ matchedEligibleN: 6, cases: expect.any(Array) })
+  expect(selectMatchedMetricCases({ waves: [w2, w1], rule: metricRule }).cases).toHaveLength(5)
+  expect(buildMatchedLongitudinalProjection({ waves: [w2, w1], spec: spec(5), mode: 'PAIRWISE' }).metrics?.score).toMatchObject({
+    state: 'present', validCaseN: 5, waveMeans: [{ mean: 2 }, { mean: 4 }], comparisons: [{ delta: 2 }],
+  })
+  // Once the first Wave is eligible, the duplicate later metric still rejects.
+  earlyMissing.metrics.push({ key: 'score', value: 5, resultQuality: 'interpretable', metricQuality: null })
+  expect(() => selectMatchedMetricCases({ waves: [w1, w2], rule: metricRule })).toThrow('ambiguous')
+})

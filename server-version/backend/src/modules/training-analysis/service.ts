@@ -111,6 +111,11 @@ export async function setTrainingAnalysisQuality(input:{actor:TrainingAnalysisAc
     }else await tx.trainingAnalysisQuality.create({data:{id,...where,...data}})
     await tx.trainingAnalysisQualityAudit.create({data:{id:randomUUID(),reviewId:id,...where,...data,previousVerdict:old?.verdict??'INCLUDE'}})
     return {...where,...data}
+  },{isolationLevel:Prisma.TransactionIsolationLevel.Serializable}).catch((error:unknown)=>{
+    // PostgreSQL may detect the losing CAS at the serialization/unique fence.
+    if(['P2034','P2002'].includes((error as {code?:string})?.code??''))
+      fail(409,'TRAINING_ANALYSIS_QUALITY_CONFLICT','复核发生并发变化，请刷新后重试')
+    throw error
   })
 }
 

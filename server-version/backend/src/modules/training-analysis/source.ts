@@ -10,7 +10,7 @@ import { preloadCompositeReportFacts } from '../composite/composite-report-read-
 import { loadTrainingVariantExportGraph } from '../composite/training-variant-export'
 import { applyTrainingAttemptScope, resolveTrainingAttemptScope, buildTrainingVariantUnion, type TrainingAttemptScope } from '../composite/training-variant-scope'
 import { loadSituationalExportSlotSets } from '../composite/situational-canonical-export'
-import { compositeBadRequest, compositeConflict, compositeNotFound } from '../composite/composite.errors'
+import { CompositeServiceError, compositeBadRequest, compositeConflict, compositeNotFound } from '../composite/composite.errors'
 import { readScaleResult, resolveProjectionPolicyForAssessment } from '../scale/scale-workflow.service'
 import { createScaleProjectionContext } from '../scale/projection/context-factory'
 import { resolveEffectiveScaleDisclosure } from '../scale/projection/context'
@@ -118,15 +118,22 @@ async function participantIdentities(tx: Prisma.TransactionClient, actor: Traini
 
 function acceptedEnvelope(attempt: any, item: any, snapshots: any[], slots: FrozenActiveSlotSetV1): CanonicalUnitResultEnvelopeV1 | null {
   const key = compositeItemSlotKey(item.id, item.type), slot = slots.slots.find(row => row.slotKey === key)
-  if (!slot) return null
   const matches = snapshots.filter(row => row.slotKey === key)
-  if (!matches.length) return null
+  if (!slot) {if (item.required !== false || matches.length) invalid('必需测量缺少冻结单元或事实未被分配'); return null}
+  if (item.required !== false && !slot.required) invalid('必需测量冻结策略不一致')
+  if (!matches.length) {if (slot.required) invalid('必需测量缺少已接受事实'); return null}
   if (matches.length !== 1) invalid('重复的已接受测量事实')
   const row = matches[0]
   if (row.compositeAttemptId !== attempt.id || row.attemptEpoch !== attempt.attemptEpoch || row.unitType !== item.type) invalid('测量事实父记录或版本不一致')
-  if (['SKIPPED', 'NOT_APPLICABLE'].includes(row.terminalState) && row.payloadKind === 'NONE') return null
+  if (['SKIPPED', 'NOT_APPLICABLE'].includes(row.terminalState)) {
+    if (slot.required || row.payloadKind !== 'NONE' || row.canonicalResultEncrypted || row.collectionFactsEncrypted) invalid('必需测量或跳过状态事实不一致')
+    return null
+  }
   if (row.terminalState !== 'COMPLETED' || row.payloadKind !== 'UNIT_RESULT' || !row.sourceSubmissionId || !row.canonicalResultEncrypted || row.collectionFactsEncrypted) invalid('已接受测量事实不完整')
   const result = parseCanonicalUnitResultEnvelope(decryptUnifiedRuntimePayload(row.canonicalResultEncrypted)), core = result.core
+  const expectedSourceType = item.type === 'SCALE' ? 'ASSESSMENT' : item.type === 'COGNITIVE' ? 'COGNITIVE_SESSION' : 'SITUATIONAL_ATTEMPT'
+  if (new Set(core.metrics.map(metric => metric.key)).size !== core.metrics.length || row.sourceType !== expectedSourceType
+    || core.scientificProvenance.instrumentKey !== core.instrumentKey || core.scientificProvenance.instrumentVersion !== core.instrumentVersion) invalid('测量事实指标或科学来源身份不一致')
   if (core.unitType !== item.type || core.instrumentKey !== slot.sourceDefinitionIdentity.key || core.instrumentVersion !== slot.sourceDefinitionIdentity.version
     || core.sourceDefinitionHash !== slot.sourceDefinitionIdentity.hash || core.sourceDefinitionHash !== row.sourceDefinitionHash
     || core.compiledRuntimeHash !== row.compiledRuntimeHash || core.contextHash !== (attempt.contextSnapshotHash ?? null)
@@ -147,10 +154,10 @@ function cognitivePermission(item: any, key: string, actor: TrainingAnalysisActo
   const report = readFrozenReport(item.cognitiveAssignment?.resolvedReportSnapshotEncrypted)
   const metric: any = report?.metricDefinitions?.[key]
   if (!report || !metric || !['number', 'integer'].includes(metric.valueType)) unavailable()
-  if (actor.role !== UserRole.ADMIN && (metric.role === 'research_only'
+  if (metric.role === 'research_only'
     || (report.profile === 'research' && !metric.availableProfiles?.includes('standard'))
     || (metric.availableProfiles && !metric.availableProfiles.includes('standard'))
-    || key === 'productIndex' || key === 'product_index')) unavailable()
+    || key === 'productIndex' || key === 'product_index') unavailable()
   return {report, metric}
 }
 
@@ -193,6 +200,7 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
       const attempt = {...row, compositeAssessment: task, scaleAssessments: [], cognitiveSessions: [], formAnswers: []}
       const scope = graph?.scopes.get(row.id) ?? await resolveTrainingAttemptScope(attempt, task, {db: tx, frozenSlotSets: slotSets})
       if (!stratumMatches(wave, scope)) continue
+      if (row.status === 'COMPLETED' && row.deliveryMode === 'FINAL_ONLY' && row.runtimeGeneration === 'UNIFIED_V1' && !slotSets.has(row.id)) invalid('已完成 FINAL 测量缺少冻结单元计划')
       entries.push({wave, attempt: await applyTrainingAttemptScope(attempt, {db: tx, frozenSlotSets: slotSets}), scope, slots: slotSets.get(row.id) ?? null})
     }
   }
@@ -217,12 +225,20 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
     const item = scope.items.find(candidate => candidate.id === metric.itemId)
     return !item ? [] : [item.type === 'FORM' ? formSectionSlotKey(item.formSectionId) : compositeItemSlotKey(item.id, item.type)]
   }))]}})).filter(row => row.slotKey.in.length)
+  // Prisma's PostgreSQL connector has a lower safe bind budget than the
+  // wire-protocol maximum. Reject before either child query, never partially
+  // fetch a selected sample. Each OR branch binds parent, epoch and selected IDs.
+  if (childConditions.reduce((sum, row) => sum + 2 + row.compositeItemId.in.length, 0) > 30000
+    || snapshotConditions.reduce((sum, row) => sum + 2 + row.slotKey.in.length, 0) > 30000) throw new CompositeServiceError('选中的来源查询超过参数上限，请减少指标或波次', 413)
   const [children, snapshots] = await Promise.all([
     childConditions.length ? tx.assessment.findMany({where: {OR: childConditions}, select: {id: true, compositeAttemptId: true, compositeItemId: true,
       scaleId: true, status: true, deliveryMode: true, runtimeGeneration: true, attemptEpoch: true, submissionId: true, submissionPayloadHash: true,
       result: true, runtimeSnapshotEncrypted: true, compiledRuntimeHash: true, respondentType: true}}) : [],
     snapshotConditions.length ? tx.assessmentUnitSnapshot.findMany({where: {OR: snapshotConditions}}) : [],
   ])
+  // Each immutable Scale fact binds two SQL parameters (id, epoch). Keep
+  // the batch below PostgreSQL's parameter ceiling, before any fact read.
+  if (children.length > 15000) throw new CompositeServiceError('选中的量表来源超过 15000 条，请减少指标或波次', 413)
   const childrenByParent = groupRows(children, row => row.compositeAttemptId), snapshotsByParent = groupRows(snapshots, row => row.compositeAttemptId)
   for (const entry of final) entry.attempt.scaleAssessments = childrenByParent.get(entry.attempt.id) ?? []
   // Existing batch parser performs immutable source-result hash, epoch and
@@ -259,8 +275,15 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
         policies.push({taskId: taskIdOf(attempt), itemId: item.id, formReadable: true})
       } else {
         const envelope = acceptedEnvelope(attempt, item, snapshotsByParent.get(attempt.id) ?? [], slots!)
-        if (!envelope) reason = 'MISSING_SOURCE'
-        else {
+        if (!envelope) {
+          const terminal = (snapshotsByParent.get(attempt.id) ?? []).find(row => row.slotKey === compositeItemSlotKey(item.id, item.type))
+          reason = terminal ? 'NOT_ASSIGNED' : 'MISSING_SOURCE'
+          // An accepted optional skip is still frozen evidence, not an absent
+          // source. Bind its terminal state so replay cannot silently change it.
+          if (terminal) sourceHashes[item.id] = hash({slotKey: terminal.slotKey, terminalState: terminal.terminalState, payloadKind: terminal.payloadKind,
+            sourceType: terminal.sourceType ?? null, sourceAttemptId: terminal.sourceAttemptId ?? null, sourceSubmissionId: terminal.sourceSubmissionId ?? null,
+            definitionHash: terminal.sourceDefinitionHash ?? null, completedAt: iso(terminal.completedAt)})
+        } else {
           const core = envelope.core, storedMetric = core.metrics.find(candidate => candidate.key === metric.metricKey)
           if (!storedMetric) unavailable()
           let responseSignature = core.scientificProvenance.protocolSignature ?? core.compiledRuntimeHash
@@ -272,18 +295,19 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
             const runtime = facts!.scaleRuntimes.get(child), result = readScaleResult(facts!.scaleResults.get(child)).result
             if (!runtime || !result || runtime.compiledRuntime.compiledRuntimeHash !== child.compiledRuntimeHash
               || runtime.compiledRuntime.compiledRuntimeHash !== core.compiledRuntimeHash || runtime.instrumentKey !== core.instrumentKey
-              || runtime.instrumentVersion !== core.instrumentVersion || result.instrument.code !== runtime.instrumentKey
+              || runtime.instrumentVersion !== core.instrumentVersion || runtime.sourceDefinitionHash !== core.sourceDefinitionHash || result.instrument.code !== runtime.instrumentKey
               || result.instrument.instrumentVersion !== runtime.instrumentVersion || result.method.definitionHash !== runtime.legacyDefinitionHash
               || result.method.scoringVersion !== core.scorerVersion || result.instrument.scaleId !== child.scaleId || child.scaleId !== item.scaleId) invalid('量表冻结运行时或评分版本不一致')
             const policy = resolveProjectionPolicyForAssessment(child, result, runtime)
             const capability = resolveEffectiveScaleDisclosure(createScaleProjectionContext({instrumentKey: runtime.instrumentKey, instrumentVersion: runtime.instrumentVersion,
-              audience: actor.role === UserRole.ADMIN ? 'researcher' : 'teacher', purpose: 'export', principalId: actor.userId, frozenPolicy: policy.policy}))
+              audience: 'teacher', purpose: 'export', principalId: actor.userId, frozenPolicy: policy.policy}))
             if (policy.snapshotError || !capability.numericScores) unavailable()
             // RawAnswers and itemScores remain independent; neither is needed or
             // inferred from numericScores, and neither is returned by this API.
             policies.push({taskId: wave.taskId, itemId: item.id, policy: policy.policy, capability})
             const score = result.scores.find(candidate => candidate.key === metric.metricKey)
-            if (!score || score.value !== storedMetric.value) invalid('量表分数与已接受事实不一致')
+            if (!score || score.value !== storedMetric.value || (runtime.compiledRuntime.metricDefinitions[metric.metricKey]?.unit ?? null) !== (storedMetric.unit ?? null)
+              || hash({status: result.quality.status, flags: [...result.quality.flags].sort()}) !== hash(core.quality)) invalid('量表分数与已接受事实不一致')
             responseSignature = hash({items: runtime.definition.items.map(row => ({itemCode: row.itemCode, responseSetKey: row.responseSetKey})), responseSets: runtime.definition.responseSets})
             sourceHashes[`scale:${item.id}`] = hash({id: child.id, epoch: child.attemptEpoch, submissionId: child.submissionId, payloadHash: child.submissionPayloadHash, runtime: runtime.snapshotHash, result: hash(result)})
           } else if (item.type === 'COGNITIVE') {
@@ -297,7 +321,7 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
             scoringDigest: hash({scorer: core.scorerKey, version: core.scorerVersion, definition: core.sourceDefinitionHash, runtime: core.compiledRuntimeHash}),
             responseSignature, respondentType: attempt.respondentType ?? 'SELF', unit: storedMetric.unit ?? null, version: core.instrumentVersion}
           value = numeric(storedMetric.value) ? storedMetric.value : null
-          reason = core.quality.status === 'invalid' ? 'INVALID_VALUE' : storedMetric.value === null ? 'UNANSWERED' : !numeric(storedMetric.value) ? 'INVALID_VALUE' : null
+          reason = storedMetric.quality === 'not_calculable' ? 'NOT_CALCULABLE' : core.quality.status === 'invalid' ? 'INVALID_VALUE' : storedMetric.value === null ? 'UNANSWERED' : !numeric(storedMetric.value) ? 'INVALID_VALUE' : null
           sourceHashes[item.id] = envelope.resultHash
         }
       }
@@ -368,7 +392,7 @@ export async function listTrainingAnalysisSources(tx: Prisma.TransactionClient, 
     for (const item of task.items) {
       if (item.type === 'SCALE') {
         const disclosure = resolveEffectiveScaleDisclosure(createScaleProjectionContext({instrumentKey: item.scale?.code, instrumentVersion: item.scale?.instrumentVersion,
-          instrumentClass: item.scale?.instrumentClass, audience: actor.role === UserRole.ADMIN ? 'researcher' : 'teacher', purpose: 'export'}))
+          instrumentClass: item.scale?.instrumentClass, audience: 'teacher', purpose: 'export'}))
         if (disclosure.numericScores) for (const score of item.scale?.definition?.scores ?? []) metrics.push({itemId: item.id, metricKey: score.key, label: score.label ?? score.key})
       } else if (item.type === 'FORM' && item.formDefinition && ['NUMBER', 'SLIDER'].includes(item.formDefinition.type)) {
         const question = formMetric(item, item.formDefinition.itemKey); metrics.push({itemId: item.id, metricKey: question.itemKey, label: question.prompt})

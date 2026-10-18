@@ -171,6 +171,16 @@ describe('authorized course analysis workspace', () => {
     expect(screen.getByRole('button', { name: '生成课程分析' })).toBeDisabled()
   })
 
+  it('keeps answered-but-not-calculable values distinct from unanswered cells', async () => {
+    const notCalculable = structuredClone(result)
+    notCalculable.analysis.descriptives[0].missingByReason = { NOT_CALCULABLE: 5 }
+    mocks.analyze.mockResolvedValue(notCalculable)
+    render(<TrainingCourseAnalysis courseId="course-1" />)
+    await analyze()
+    expect(screen.getByText(/无法计算数值 5/)).toBeVisible()
+    expect(screen.queryByText(/未回答 5|本波次未观察到记录 5/)).toBeNull()
+  })
+
   it('labels unobserved cells without inferring assignment or refusal', async () => {
     const unobserved = structuredClone(result)
     unobserved.analysis.descriptives[0].missingByReason = { NO_OBSERVATION: 5 }

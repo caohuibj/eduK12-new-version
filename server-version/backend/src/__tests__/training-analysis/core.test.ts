@@ -78,6 +78,23 @@ describe('Training numeric and matched kernel', () => {
     expect(actual.metrics[0]).toMatchObject({ validCaseN: 5, flow: [{ attritionN: 0, lateJoiningN: 0, retainedN: 10, basis: 'OBSERVED_SAMPLE' }] })
   })
 
+  it('preserves a completed but not-calculable metric as distinct from an unanswered item', () => {
+    const input = source(7)
+    const unavailable = input.observations.find((row) => row.waveKey === 'w2' && row.participantKey === 'u6')!
+    unavailable.reason = 'NOT_CALCULABLE'; unavailable.value = null
+    const unanswered = input.observations.find((row) => row.waveKey === 'w2' && row.participantKey === 'u7')!
+    unanswered.reason = 'UNANSWERED'; unanswered.value = null
+    const tables = buildTrainingAnalysisTables(request(), input), dictionary = buildTrainingDictionary(request(), input)
+    expect(tables.long.rows.find((row) => row.attemptId === unavailable.attemptId)).toMatchObject({
+      value: null, reason: 'NOT_CALCULABLE', originalFinalStatus: 'COMPLETED', taskSatisfied: true,
+    })
+    expect(tables.long.rows.find((row) => row.attemptId === unanswered.attemptId)?.reason).toBe('UNANSWERED')
+    const code = tables.long.rows.find((row) => row.attemptId === unavailable.attemptId)!.participantKey
+    expect(tables.wide.rows.find((row) => row.participantKey === code)?.[`${dictionary[1].columnKey}__reason`]).toBe('NOT_CALCULABLE')
+    expect(dictionary[1].missingReasons).toContain('NOT_CALCULABLE')
+    expect(buildTrainingAnalysis(request(), input).metrics[0].validCaseN).toBe(5)
+  })
+
   it('keeps full-case selection separate from pairwise and computes adjacent comparisons from the full intersection', () => {
     const input = source(6, 3)
     input.observations.find((row) => row.waveKey === 'w3' && row.participantKey === 'u6')!.reason = 'NON_FINAL'

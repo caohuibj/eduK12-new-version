@@ -19,8 +19,8 @@ try{
  for(const temperature of ['PROCESS_COLD_TEMPLATE_FIRST_READ','SAME_PROCESS_TEMPLATE_HOT']){
   const before=count,sqlBefore=duration,start=performance.now()
   const result=await analyzeTrainingCourse({actor:{id:fixture.teacherId,role:'TEACHER'},courseId:fixture.courseId,selector:fixture.selector})
-  rows.push({participants:n,waves:2,temperature,sqlEvents:count-before,sqlDurationMs:duration-sqlBefore,elapsedMs:performance.now()-start,sourceCount:result.manifest.sources.length,observationCount:result.manifest.observationCount,analysisState:result.analysis.state})
-  assert.equal(result.manifest.sources.length,2*n);assert.equal(result.manifest.observationCount,2*n)
+  rows.push({participants:n,waves:2,tools:4,temperature,sqlEvents:count-before,sqlDurationMs:duration-sqlBefore,elapsedMs:performance.now()-start,sourceCount:result.manifest.sources.length,observationCount:result.manifest.observationCount,analysisState:result.analysis.state})
+  assert.equal(result.manifest.sources.length,2*n);assert.equal(result.manifest.observationCount,8*n)
  }
  fs.writeFileSync(path.join(state,`c16-measure-${n}.json`),JSON.stringify({passed:true,scope:'REAL_PG_SQL_EVENT_DIAGNOSTIC_NOT_CAPACITY',rows},null,2));console.log(JSON.stringify(rows))
 }finally{await closeQueues(true);await prisma.$disconnect()}

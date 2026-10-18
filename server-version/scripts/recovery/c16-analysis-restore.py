@@ -23,7 +23,7 @@ try:
     original = json.loads((a.state / 'c16-original-rows-private.json').read_text())
     current = db.rows(original['columns'])
     for table, rows in original['rows'].items():
-        if table in ['_prisma_migrations', 'users']:
+        if table == '_prisma_migrations':
             continue
         # Compare full-row canonical multisets, so a changed original row cannot
         # be hidden by additive fixtures or by a missing/nonstandard primary key.
@@ -32,7 +32,7 @@ try:
         after = Counter(json.dumps(row, sort_keys=True, separators=(',', ':')) for row in current[table])
         assert not before - after, f'{table}: original accepted row changed or disappeared'
     result['originalRowsUnchanged'] = True
-    result['checks'].append('Every original FULL02 business row except login activity in users remains exact across C16 analysis, quality and export; no re-FINAL/rescore/task rewrite')
+    result['checks'].append('Every original FULL02 business row including users remains exact across C16 analysis, quality and export; no re-FINAL/rescore/task rewrite')
     schema = db.columns()
     before = db.projection(schema)
     for table in ['training_analysis_quality', 'training_analysis_quality_audit', 'export_batches', 'export_artifacts']:

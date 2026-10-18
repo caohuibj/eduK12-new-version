@@ -13,6 +13,7 @@ import {getScaleInstrumentSource} from '../../modules/scale/onboarding/instrumen
 import {createFrozenScaleRuntimeSnapshot} from '../../modules/assessment-runtime/runtime-snapshot'
 import {createFrozenScaleRuntimeSnapshotV2FromV1} from '../../modules/assessment-runtime/runtime-snapshot-v2'
 import {compileScalePolicy} from '../../modules/scale/policy/compile'
+import {encryptCognitivePayload} from '../../modules/cognitive/cognitive.security'
 import {DISCLOSURE_PRESETS} from '../../modules/scale/policy/disclosure'
 import {createCanonicalUnitResultEnvelope, projectScaleCanonicalUnitResult} from '../../modules/assessment-runtime/unit-result'
 import type {TrainingAnalysisRequestV1} from '../../modules/training-analysis/types'
@@ -54,7 +55,7 @@ function scaleFixture(numericScores = true) {
   const result = buildScaleResult({scaleId: 'scale', instrumentKey: source.identity.instrumentKey, name: 'Scale', instrumentVersion: source.identity.instrumentVersion,
     definition: executable.definition, answers: golden.answers, referenceSets: []})
   const runtime = createFrozenScaleRuntimeSnapshotV2FromV1(createFrozenScaleRuntimeSnapshot({instrumentKey: source.identity.instrumentKey, instrumentVersion: source.identity.instrumentVersion,
-    definition: executable.definition, frozenAt: new Date(publication)}), compileScalePolicy({...source, disclosure: {...source.disclosure!, audiences: {teacher: numericScores ? DISCLOSURE_PRESETS.SCORES() : DISCLOSURE_PRESETS.EDUCATIONAL_ONLY()}}}))
+    definition: executable.definition, frozenAt: new Date(publication)}), compileScalePolicy({...source, disclosure: {...source.disclosure!, audiences: {teacher: numericScores ? DISCLOSURE_PRESETS.SCORES() : DISCLOSURE_PRESETS.EDUCATIONAL_ONLY(), researcher: DISCLOSURE_PRESETS.FULL_REPORT()}}}))
   const scale: any = {id: 'scale-item', type: 'SCALE', position: 1, required: true, scaleId: 'scale', scale: {id: 'scale', code: runtime.instrumentKey, instrumentVersion: runtime.instrumentVersion, instrumentClass: 'STANDARD'}}
   f.task.items.push(scale)
   const slots = createFrozenActiveSlotSet({schemaVersion: 1, runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1, slots: [
@@ -72,7 +73,7 @@ function scaleFixture(numericScores = true) {
     attemptEpoch: 1, submissionId: 'scale-submit', submissionPayloadHash: 'a'.repeat(64), result, runtimeSnapshotEncrypted: encryptUnifiedRuntimePayload(runtime), compiledRuntimeHash: runtime.compiledRuntime.compiledRuntimeHash}
   f.db.assessment.findMany.mockResolvedValue([child])
   const selector = request(); selector.waves[0].metrics = [{itemId: 'scale-item', metricKey: result.scores[0].key}]
-  return {...f, child, result, runtime, selector}
+  return {...f, child, result, runtime, envelope, selector}
 }
 describe('authorized Training numeric source adapter', () => {
   it('retains historical course participants without current membership and uses the passed transaction for frozen facts', async () => {
@@ -188,7 +189,16 @@ describe('authorized Training numeric source adapter', () => {
     if (mode === 'result') f.result.scores[0].value = (f.result.scores[0].value ?? 0) + 1
     await expect(loadTrainingAnalysisSources(f.db, actor, f.selector)).rejects.toThrow()
   })
-  it('discovers SJT numeric metric keys from the exact accepted frozen source', async () => {
+  it.each(['duplicate-metric', 'provenance', 'source-type', 'unit'])('rejects canonical %s identity corruption before numeric output', async mode => {
+    const f = scaleFixture(), snapshot = f.snapshots[1], envelope = structuredClone(f.envelope)
+    if (mode === 'duplicate-metric') envelope.core.metrics.push({...envelope.core.metrics[0]})
+    if (mode === 'provenance') envelope.core.scientificProvenance.instrumentKey = 'different-instrument'
+    if (mode === 'source-type') {envelope.persistenceProvenance.sourceType = 'SITUATIONAL_ATTEMPT'; snapshot.sourceType = 'SITUATIONAL_ATTEMPT'}
+    if (mode === 'unit') envelope.core.metrics.find(metric => metric.key === f.selector.waves[0].metrics[0].metricKey)!.unit = 'milliseconds'
+    snapshot.canonicalResultEncrypted = encryptUnifiedRuntimePayload(createCanonicalUnitResultEnvelope(envelope))
+    await expect(loadTrainingAnalysisSources(f.db, actor, f.selector)).rejects.toThrow()
+  })
+  it.each(['calculated', 'not_calculable'])('discovers SJT frozen metrics while preserving %s status', async status => {
     const f = fixture(1), runtime = {instrumentKey: 'sjt_fixture', instrumentVersion: '1.0.0', definitionHash: 'a'.repeat(64), compiledRuntimeHash: 'b'.repeat(64), scorerKey: 'sjt.scorer', scoringVersion: '1.0.0', runtimeGeneration: 'UNIFIED_V1' as const, deliveryMode: 'FINAL_ONLY' as const, frozenAt: publication}
     f.task.items = [{id: 'sjt-item', type: 'SITUATIONAL', position: 0, required: true, situationalInstrumentKey: runtime.instrumentKey, situationalInstrumentVersion: runtime.instrumentVersion}]; f.task.formSections = []
     const slots = createFrozenActiveSlotSet({schemaVersion: 1, runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1, slots: [{slotKey: 'situational:sjt-item', unitType: 'SITUATIONAL', required: true,
@@ -196,7 +206,7 @@ describe('authorized Training numeric source adapter', () => {
     f.parents[0].frozenActiveSlotSetEncrypted = encryptFrozenActiveSlotSet(slots); f.parents[0].frozenActiveSlotSetHash = slots.snapshotHash
     const envelope = createCanonicalUnitResultEnvelope({core: {schemaVersion: 1, unitType: 'SITUATIONAL', instrumentKey: runtime.instrumentKey, instrumentVersion: runtime.instrumentVersion,
       sourceDefinitionHash: runtime.definitionHash, compilerVersion: '1', compiledRuntimeHash: runtime.compiledRuntimeHash, scorerKey: runtime.scorerKey, scorerVersion: runtime.scoringVersion,
-      quality: {status: 'interpretable', flags: []}, metrics: [{key: 'cooperation', value: 3, unit: 'score'}], facts: [], references: [], contextHash: null,
+      quality: {status: status === 'not_calculable' ? 'invalid' : 'interpretable', flags: []}, metrics: [{key: 'cooperation', value: status === 'not_calculable' ? null : 3, unit: 'score', quality: status}], facts: [], references: [], contextHash: null,
       scientificProvenance: {instrumentKey: runtime.instrumentKey, instrumentVersion: runtime.instrumentVersion}}, completedAt: publication,
       persistenceProvenance: {sourceType: 'SITUATIONAL_ATTEMPT', sourceAttemptId: 'sjt-attempt', sourceSubmissionId: 'sjt-submit'}})
     const snapshot = {compositeAttemptId: f.parents[0].id, compositeAttempt: f.parents[0], attemptEpoch: 1, slotKey: 'situational:sjt-item', unitType: 'SITUATIONAL', terminalState: 'COMPLETED', payloadKind: 'UNIT_RESULT',
@@ -207,13 +217,73 @@ describe('authorized Training numeric source adapter', () => {
     expect(discovery.list[0].metrics).toEqual([{itemId: 'sjt-item', metricKey: 'cooperation', label: 'cooperation'}])
     const selector = request(); selector.waves[0].metrics = [{itemId: 'sjt-item', metricKey: 'cooperation'}]
     const result = await loadTrainingAnalysisSources(f.db, actor, selector)
-    expect(result.source.observations[0]).toMatchObject({value: 3, measurement: {instrumentKey: runtime.instrumentKey, unit: 'score'}})
+    expect(result.source.observations[0]).toMatchObject({value: status === 'not_calculable' ? null : 3, reason: status === 'not_calculable' ? 'NOT_CALCULABLE' : null, originalFinalStatus: 'COMPLETED', measurement: {instrumentKey: runtime.instrumentKey, unit: 'score'}})
   })
   it('includes accepted Form submission identity in its source hash', async () => {
     const f = fixture(1), before = await loadTrainingAnalysisSources(f.db, actor, request())
     f.snapshots[0].sourceSubmissionId = 'changed-final-submission'
     const after = await loadTrainingAnalysisSources(f.db, actor, request(), {fixedManifest: before.manifest})
     expect(after.sourceFingerprint).not.toBe(before.sourceFingerprint)
+  })
+  it.each(['slot', 'snapshot', 'SKIPPED', 'NOT_APPLICABLE'])('fails closed when required FINAL evidence is %s', async mode => {
+    const f = scaleFixture()
+    if (mode === 'slot') {
+      const slots = createFrozenActiveSlotSet({schemaVersion: 1, runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1, slots: []})
+      f.parents[0].frozenActiveSlotSetEncrypted = encryptFrozenActiveSlotSet(slots); f.parents[0].frozenActiveSlotSetHash = slots.snapshotHash
+    } else if (mode === 'snapshot') f.snapshots.splice(1)
+    else {f.snapshots[1].terminalState = mode; f.snapshots[1].payloadKind = 'NONE'; f.snapshots[1].canonicalResultEncrypted = null}
+    await expect(loadTrainingAnalysisSources(f.db, actor, f.selector)).rejects.toMatchObject({statusCode: 409})
+  })
+  it.each(['frozenActiveSlotSetEncrypted', 'frozenActiveSlotSetHash'])('fails closed for a completed FINAL parent missing %s', async field => {
+    const f = fixture(1); f.parents[0][field] = null
+    await expect(loadTrainingAnalysisSources(f.db, actor, request())).rejects.toMatchObject({statusCode: 409})
+    expect(f.db.assessmentUnitSnapshot.findMany).not.toHaveBeenCalled()
+  })
+  it.each(['SKIPPED', 'NOT_APPLICABLE'])('preserves optional %s as NOT_ASSIGNED and freezes its terminal evidence', async state => {
+    const f = scaleFixture(); f.task.items[1].required = false
+    const slots = createFrozenActiveSlotSet({schemaVersion: 1, runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1, slots: [
+      {slotKey: 'scale:scale-item', unitType: 'SCALE', required: false, sourceDefinitionIdentity: {key: f.runtime.instrumentKey, version: f.runtime.instrumentVersion, hash: f.runtime.sourceDefinitionHash}, sourceBinding: {compiledRuntimeHash: f.runtime.compiledRuntime.compiledRuntimeHash}},
+    ]})
+    f.parents[0].frozenActiveSlotSetEncrypted = encryptFrozenActiveSlotSet(slots); f.parents[0].frozenActiveSlotSetHash = slots.snapshotHash
+    f.snapshots[1].terminalState = state; f.snapshots[1].payloadKind = 'NONE'; f.snapshots[1].canonicalResultEncrypted = null
+    const before = await loadTrainingAnalysisSources(f.db, actor, f.selector)
+    expect(before.source.observations[0]).toMatchObject({value: null, reason: 'NOT_ASSIGNED', originalFinalStatus: 'COMPLETED'})
+    f.snapshots.splice(1)
+    const after = await loadTrainingAnalysisSources(f.db, actor, f.selector, {fixedManifest: before.manifest})
+    expect(after.source.observations[0].reason).toBe('MISSING_SOURCE')
+    expect(after.sourceFingerprint).not.toBe(before.sourceFingerprint)
+  })
+  it('preserves explicit optional missingness instead of fabricating a required result', async () => {
+    const f = scaleFixture(); f.task.items[1].required = false; f.snapshots.splice(1)
+    const slots = createFrozenActiveSlotSet({schemaVersion: 1, runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1, slots: []})
+    f.parents[0].frozenActiveSlotSetEncrypted = encryptFrozenActiveSlotSet(slots); f.parents[0].frozenActiveSlotSetHash = slots.snapshotHash
+    const result = await loadTrainingAnalysisSources(f.db, actor, f.selector)
+    expect(result.source.observations[0]).toMatchObject({value: null, reason: 'MISSING_SOURCE'})
+  })
+  it('ADMIN cannot promote teacher numeric disclosure to a researcher audience', async () => {
+    const f = scaleFixture(false), admin = {...actor, role: 'ADMIN' as const}
+    await expect(loadTrainingAnalysisSources(f.db, admin, f.selector)).rejects.toMatchObject({statusCode: 404})
+  })
+  it('ADMIN discovery cannot bypass frozen Cognitive research-only profile restrictions', async () => {
+    const f = fixture(), report = {profile: 'research', metricDefinitions: {secret: {key: 'secret', label: 'Research only', role: 'research_only', availableProfiles: ['research'], unit: 'score', valueType: 'number'}}}
+    f.task.items = [{id: 'cognitive', type: 'COGNITIVE', cognitiveAssignment: {resolvedReportSnapshotEncrypted: encryptCognitivePayload(report)}}]; f.task.formSections = []
+    const discovery = await listTrainingAnalysisSources(f.db, {...actor, role: 'ADMIN'}, 'course')
+    expect(discovery.list).toEqual([])
+  })
+  it('rejects a selected snapshot query bind budget before any child or fact reads', async () => {
+    const f = fixture(900), selector = request()
+    for (let i = 1; i < 32; i++) {
+      const extra = item(`number-${i}`); f.task.items.push(extra)
+      f.task.formSections.push({id: extra.formSectionId, title: 'Number', position: i, contextSection: false, items: [extra]})
+      selector.waves[0].metrics.push({itemId: extra.id, metricKey: extra.formDefinition.itemKey})
+    }
+    await expect(loadTrainingAnalysisSources(f.db, actor, selector)).rejects.toMatchObject({statusCode: 413})
+    expect(f.db.assessment.findMany).not.toHaveBeenCalled(); expect(f.db.assessmentUnitSnapshot.findMany).not.toHaveBeenCalled()
+  })
+  it('rejects an over-budget Scale fact batch before the immutable fact query', async () => {
+    const f = scaleFixture(); f.db.assessment.findMany.mockResolvedValue(Array.from({length: 15001}, (_, index) => ({...f.child, id: `child-${index}`, result: {k: 'SFF1', e: 1}})))
+    await expect(loadTrainingAnalysisSources(f.db, actor, f.selector)).rejects.toMatchObject({statusCode: 413})
+    expect(f.db.$queryRaw.mock.calls.some(([parts]: any) => parts.join('').includes('assessment_result_facts'))).toBe(false)
   })
   it('bounds parent loading before any facts at 6000 records', async () => {
     const f = fixture(6001)

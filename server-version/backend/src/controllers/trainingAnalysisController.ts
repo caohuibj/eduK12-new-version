@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { analyzeTrainingCourse, discoverTrainingCourseSources, setTrainingAnalysisQuality, trainingQualityPage } from '../modules/training-analysis/service'
 import { trainingManifestSummary, type TrainingAnalysisActor } from '../modules/training-analysis/manifest'
 import { enqueueExportJob } from '../services/exportJobService'
+import { assertExportLimits } from '../services/exportStorage'
 import { success } from '../utils/response'
 
 const actor = (req:Request):TrainingAnalysisActor => ({id:req.user!.userId,role:req.user!.role as 'ADMIN'|'TEACHER'})
@@ -42,8 +43,10 @@ export const trainingAnalysisController={
   exports:async(req:Request,res:Response)=>{try{
     const {layout,format,requestKey}=z.object({layout:z.enum(['long','wide','dictionary']),format:z.enum(['csv','zip']),requestKey:z.string().min(16).max(160)}).parse(req.body)
     const result=await reproduce(req)
+    const tables=result.tables
+    for(const table of format==='zip'?Object.values(tables):[tables[layout]]) assertExportLimits({records:table.rows.length,fields:table.columns.length})
     return success(res,await enqueueExportJob({resourceType:'TRAINING_ANALYSIS',resourceId:req.params.id,createdBy:req.user!.userId,
-      anonymized:true,format,recordCount:result.manifest.sources.length,requestKey,
+      anonymized:true,format,recordCount:tables[layout].rows.length,requestKey,
       options:{anonymize:true,creatorRole:actor(req).role,detail:'research',trainingAnalysis:{version:1,selector:result.manifest.selector,manifest:result.manifest,table:layout}}}))
   }catch(err){return respondError(res,err)}},
 }

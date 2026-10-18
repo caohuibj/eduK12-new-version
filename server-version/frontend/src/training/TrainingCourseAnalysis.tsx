@@ -35,7 +35,7 @@ const explainError = (error: unknown) => {
 const missingReasonLabels: Record<string, string> = {
   QUALITY_EXCLUDED: '质量判断排除', NOT_COMPARABLE: '不可比较', NOT_ASSIGNED: '未分配', UNANSWERED: '未回答',
   NON_FINAL: '未最终提交', NOT_ATTEMPTED: '未开始', INVALID_VALUE: '无效数值', MISSING_SOURCE: '来源缺失',
-  NO_OBSERVATION: '本波次未观察到记录', LEGACY_UNSCOPED: '历史记录无法确定范围', IDENTITY_UNAVAILABLE: '身份无法可靠匹配',
+  NOT_CALCULABLE: '无法计算数值', NO_OBSERVATION: '本波次未观察到记录', LEGACY_UNSCOPED: '历史记录无法确定范围', IDENTITY_UNAVAILABLE: '身份无法可靠匹配',
 }
 
 function QualityEditor({ row, disabled, onSave }: { row: TrainingAnalysisQualityRow; disabled: boolean; onSave: (row: TrainingAnalysisQualityRow, verdict: 'INCLUDE' | 'EXCLUDE', reason: string) => void }) {

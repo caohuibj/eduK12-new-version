@@ -171,19 +171,28 @@ export const selectMatchedNumericCases = (waves: MatchedNumericWaveV1[]): Matche
 
 const numericWavesFor = (waves: ReportingSeriesWaveRecordV1[], rule?: ReportingMetricRuleV1): MatchedNumericWaveV1[] => {
   // Preserve the organizational wrapper's historical eligibility semantics:
-  // quality/metric resolution is applied only to the stable-user intersection.
-  const common = new Set(intersectStableUsers(waves))
-  return waves.map((wave) => {
-    const resolved = resolvedByUser(wave)
-    return {
-      waveId: wave.id,
-      waveKey: wave.waveKey,
-      observations: [...populationByUser(wave).keys()].map((participantKey) => ({
-        participantKey,
-        value: rule && common.has(participantKey) ? eligibleMetricValue(resolved.get(participantKey), rule) : null,
-      })),
+  // resolve each matched user in Wave order and stop at the first absent value.
+  // A later Wave's metrics were never inspected for an already incomplete case.
+  // This compatibility adapter does not change the strict generic kernel.
+  const common = intersectStableUsers(waves)
+  const populations = waves.map(populationByUser)
+  const resolved = waves.map(resolvedByUser)
+  const values = waves.map(() => new Map<string, number | null>())
+  if (rule) for (const participantKey of common) {
+    for (let index = 0; index < waves.length; index += 1) {
+      const value = eligibleMetricValue(resolved[index].get(participantKey), rule)
+      values[index].set(participantKey, value)
+      if (value === null) break
     }
-  })
+  }
+  return waves.map((wave, index) => ({
+    waveId: wave.id,
+    waveKey: wave.waveKey,
+    observations: [...populations[index].keys()].map((participantKey) => ({
+      participantKey,
+      value: values[index].get(participantKey) ?? null,
+    })),
+  }))
 }
 
 const intersectStableUsers = (waves: ReportingSeriesWaveRecordV1[]): string[] => {

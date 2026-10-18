@@ -28,7 +28,7 @@ export interface TrainingMetricIdentityV1 {
 export type TrainingObservationReason =
   | 'QUALITY_EXCLUDED' | 'NOT_COMPARABLE' | 'NOT_ASSIGNED' | 'UNANSWERED'
   | 'NON_FINAL' | 'NOT_ATTEMPTED' | 'INVALID_VALUE' | 'MISSING_SOURCE'
-  | 'LEGACY_UNSCOPED' | 'IDENTITY_UNAVAILABLE' | 'NO_OBSERVATION'
+  | 'LEGACY_UNSCOPED' | 'IDENTITY_UNAVAILABLE' | 'NO_OBSERVATION' | 'NOT_CALCULABLE'
 /** Only an authorized adapter may create this source. Never use an anonymous
  * response token or demographic attribute as a stable participant identity. */
 export interface TrainingNumericObservationV1 {
