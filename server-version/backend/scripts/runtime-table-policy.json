@@ -211,6 +211,10 @@
     "anonymous_study_consent_versions": "RUNTIME_RW",
     "anonymous_study_consent_acceptances": "RUNTIME_RW",
     "anonymous_study_research_states": "RUNTIME_RW",
-    "anonymous_study_research_audit": "RUNTIME_RW"
+    "anonymous_study_research_audit": "RUNTIME_RW",
+    "training_material_experiments": "RUNTIME_RW",
+    "training_material_subject_bindings": "RUNTIME_RW",
+    "training_material_quota_buckets": "RUNTIME_RW",
+    "training_material_allocation_claims": "RUNTIME_RW"
   }
 }

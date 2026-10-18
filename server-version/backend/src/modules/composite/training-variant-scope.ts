@@ -36,7 +36,7 @@ export type TrainingAttemptScope = {
 }
 const scopes=new WeakMap<object,TrainingAttemptScope>()
 const flowScopeBindings=new WeakMap<object,string>()
-const flowBinding=(attempt:any,composite:any)=>canonicalHash({compositeId:composite?.id??null,publishedAt:composite?.publishedAt==null?null:new Date(composite.publishedAt).toISOString(),id:attempt.id,epoch:attempt.attemptEpoch,slots:attempt.frozenActiveSlotSetHash??null,context:attempt.contextSnapshotHash??null,snapshot:attempt.trainingFlowSnapshotHash??null,path:attempt.trainingFlowPathHash??null,config:composite?.trainingFlowDigest??null})
+const flowBinding=(attempt:any,composite:any)=>canonicalHash({...((composite?.trainingFlowFrozen?.schemaVersion===2)?{participantKey:attempt.participantKey??null}:{}),compositeId:composite?.id??null,publishedAt:composite?.publishedAt==null?null:new Date(composite.publishedAt).toISOString(),id:attempt.id,epoch:attempt.attemptEpoch,slots:attempt.frozenActiveSlotSetHash??null,context:attempt.contextSnapshotHash??null,snapshot:attempt.trainingFlowSnapshotHash??null,path:attempt.trainingFlowPathHash??null,config:composite?.trainingFlowDigest??null})
 /** Consumers may reuse only the original request-local verified flow scope.
  * This authenticates its existing binding without another query or decrypt. */
 export function assertVerifiedTrainingAttemptScope(attempt:any,composite:any,scope:TrainingAttemptScope):void {

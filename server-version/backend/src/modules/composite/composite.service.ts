@@ -1,3 +1,4 @@
+import { allocateTrainingMaterial, materialRestartClaim } from './training-material-allocation'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { resolveTrainingFlowScope, trainingFlowMarkerState, trainingFlowProvenance, hasTrainingFlowDefinitionMarkers } from './training-flow-scope'
 import { buildTrainingFlowUnits } from './training-flow-definition'
@@ -2547,7 +2548,7 @@ const freezeTrainingFlowCandidates = async (db:Db, attempt:any, composite:any, p
 /** Called only after ownership is checked. Parent lock serializes FINAL, END,
  * two tabs and child creation. No current-template recompilation supplies a
  * candidate body, and a denied admission never reroutes to another branch. */
-const ensureTrainingFlowCurrentChild = async (attemptId:string, context:{userId?:string;recoveryTokenHash?:string}) => prisma.$transaction(async tx=>{
+const ensureTrainingFlowCurrentChildInTransaction = async (tx:Prisma.TransactionClient,attemptId:string, context:{userId?:string;recoveryTokenHash?:string}) => {
   await tx.$queryRaw`SELECT id FROM composite_assessment_attempts WHERE id=${attemptId} FOR UPDATE`
   const parent=await tx.compositeAssessmentAttempt.findUnique({where:{id:attemptId}})
   if(!parent)throw compositeNotFound('作答不存在')
@@ -2593,7 +2594,8 @@ const ensureTrainingFlowCurrentChild = async (attemptId:string, context:{userId?
   const created=freezeCompositeActiveSlotSet({...runtime,attemptEpoch:parent.attemptEpoch,formSections:[]})
   const expected=flow.frozenSlots.slots.find(s=>s.sourceBinding.compositeItemId===item.id)
   if(created.slots.length!==1||canonicalHash(created.slots[0])!==canonicalHash(expected))throw compositeForbidden('实际准入与冻结候选不一致')
-})
+}
+const ensureTrainingFlowCurrentChild = async (attemptId:string, context:{userId?:string;recoveryTokenHash?:string}) => prisma.$transaction(tx=>ensureTrainingFlowCurrentChildInTransaction(tx,attemptId,context))
 
 export interface RelationalCompositeAttemptIdentityV1 {
   subjectUserId: string
@@ -2613,6 +2615,7 @@ const createAttempt = async (
   attemptNo = 1,
   attemptEpoch = 1,
   relationalIdentity?: RelationalCompositeAttemptIdentityV1,
+  restartMaterialClaimId?: string,
 ) => {
   assertSupportedComposite(composite)
   if(composite.items.some((item:any)=>item.formPolicy!=null) && (composite.productKind!=='QUESTIONNAIRE' || composite.deliveryMode==='LEGACY' || relationalIdentity || composite.reportPackageKey || composite.analysisProtocolKey)) throw compositeBadRequest('Form V3 只支持普通问卷的统一 FINAL 运行时')
@@ -2804,6 +2807,7 @@ const createAttempt = async (
       })),
     })
   }
+  const materialAssignment = await allocateTrainingMaterial(db,attempt,composite,restartMaterialClaimId)
   const flowCandidate = flowEnabled ? await freezeTrainingFlowCandidates(db,attempt,composite,prepared!,situationalReleases) : null
   const runtime = flowCandidate?.runtime ?? await createChildRecords(db, attempt, composite.items, userId, formSections, situationalReleases, prepared)
   if (finalOnly) {
@@ -2820,11 +2824,15 @@ const createAttempt = async (
     await db.compositeAssessmentAttempt.update({
       where: { id: attempt.id },
       data: {
-        ...(flowCandidate ? (()=>{const snapshot={...flowCandidate.snapshot,slotSetHash:frozenActiveSlotSet.snapshotHash};return {trainingFlowSnapshotEncrypted:encryptUnifiedRuntimePayload(snapshot),trainingFlowSnapshotHash:canonicalHash(snapshot)}})():{}),
+        ...(flowCandidate ? (()=>{const snapshot={...flowCandidate.snapshot,...(materialAssignment?{schemaVersion:2,materialAssignment}:{}),slotSetHash:frozenActiveSlotSet.snapshotHash};return {trainingFlowSnapshotEncrypted:encryptUnifiedRuntimePayload(snapshot),trainingFlowSnapshotHash:canonicalHash(snapshot)}})():{}),
         frozenActiveSlotSetEncrypted: await storeFrozenActiveSlotSet(frozenActiveSlotSet, db),
         frozenActiveSlotSetHash: frozenActiveSlotSet.snapshotHash,
       },
     })
+  }
+  if(materialAssignment){
+    await ensureTrainingFlowCurrentChildInTransaction(db as Prisma.TransactionClient,attempt.id,userId?{userId}:{recoveryTokenHash:credential!.hash})
+    await db.$executeRawUnsafe('SET CONSTRAINTS training_material_claim_scope, training_material_binding_scope, training_material_claim_attempt_fk, training_material_binding_initial_claim_fk IMMEDIATE')
   }
   return attempt
 }
@@ -2954,9 +2962,9 @@ export const restartUserAttempt = async (userId: string, attemptId: string) => {
   await assertStudentEligibility(composite, userId)
 
   const next = await prisma.$transaction(async (tx: Db) => {
-    if(composite.trainingVariantFrozen != null) await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${composite.id} FOR UPDATE`
+    await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${composite.id} FOR UPDATE`
     await lockCompositeAttempt(tx, attemptId)
-    if(composite.trainingVariantFrozen != null){
+    if(composite.trainingVariantFrozen != null || composite.trainingFlowFrozen?.schemaVersion===2){
       const used=await tx.compositeAssessmentAttempt.count({where:{compositeAssessmentId:composite.id,...(existing.userId?{userId:existing.userId}:{participantKey:(existing as any).participantKey})}})
       if(!Number.isInteger(composite.maxAttempts)||composite.maxAttempts<1||composite.maxAttempts>100||used>=composite.maxAttempts)throw compositeConflict('概率分卷次数已用完；取消和重启也计入次数')
     }
@@ -2969,16 +2977,16 @@ export const restartUserAttempt = async (userId: string, attemptId: string) => {
         compositeAssessmentId: true,
         status: true,
         attemptNo: true,
-        attemptEpoch: true,
+        attemptEpoch: true, participantKey:true, trainingFlowSnapshotEncrypted:true, trainingFlowSnapshotHash:true,
       },
     })
     if (!current) throw compositeNotFound('综合测评记录不存在')
     if (current.userId !== userId) throw compositeForbidden('无权限重启此综合测评')
     if (current.status !== 'IN_PROGRESS') throw compositeConflict('只有进行中的综合测评可以重启')
-    if (composite.trainingVariantFrozen != null) await assertNoAcceptedTrainingVariantUnit(tx, current.id, current.attemptEpoch)
+    if (composite.trainingVariantFrozen != null || composite.trainingFlowFrozen?.schemaVersion===2) await assertNoAcceptedTrainingVariantUnit(tx, current.id, current.attemptEpoch)
     await tx.compositeAssessmentAttempt.update({
       where: { id: current.id },
-      data: { status: 'ABANDONED', completedAt: new Date() },
+      data: { status: 'ABANDONED', completedAt: new Date(), recoveryTokenHash: null },
     })
     return createAttempt(
       tx,
@@ -2988,6 +2996,8 @@ export const restartUserAttempt = async (userId: string, attemptId: string) => {
       undefined,
       current.attemptNo + 1,
       current.attemptEpoch + 1,
+      undefined,
+      materialRestartClaim(current,composite),
     )
   })
   return { attempt: await getAttemptState(next.id, { userId }), recoveryToken: null }
@@ -3126,7 +3136,7 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
   assertCompositeWindow(token.compositeAssessment)
   const credential = study?.credential ?? createRecoveryCredential()
   const attempt = await prisma.$transaction(async (tx) => {
-    if(composite.trainingVariantFrozen != null) await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${composite.id} FOR UPDATE`
+    if(composite.trainingVariantFrozen != null || composite.trainingFlowFrozen != null) await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${composite.id} FOR UPDATE`
     const existingId = study ? await study.beforeAdmission(tx) : null
     if (existingId) {
       const existing = await tx.compositeAssessmentAttempt.findUnique({where:{id:existingId}})
@@ -3184,12 +3194,14 @@ export const restartPublicAttempt = async (attemptId: string, recoveryTokenHash:
   const composite = await loadComposite(existing.compositeAssessmentId, true)
   assertSupportedComposite(composite)
   if (!composite.publicEnabled || composite.status !== 'PUBLISHED') throw compositeForbidden('综合测评未开放公开参与')
-  const credential = { ...createRecoveryCredential(), ...(composite.trainingVariantFrozen != null ? { participantKey:existing.participantKey, anonymousCode:existing.anonymousCode! } : {}) }
+  const credential = { ...createRecoveryCredential(), participantKey:existing.participantKey, anonymousCode:existing.anonymousCode! }
 
   const next = await prisma.$transaction(async (tx: Db) => {
-    if(composite.trainingVariantFrozen != null) await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${composite.id} FOR UPDATE`
+    await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${composite.id} FOR UPDATE`
+    const tokens=await tx.$queryRaw<Array<{isActive:boolean;expiresAt:Date}>>`SELECT is_active AS "isActive",expires_at AS "expiresAt" FROM composite_assessment_access_tokens WHERE id=${existing.accessTokenId} AND composite_assessment_id=${composite.id} FOR UPDATE`
+    if(tokens.length!==1||!tokens[0].isActive||new Date(tokens[0].expiresAt).getTime()<=Date.now())throw compositeForbidden('公开链接已失效')
     await lockCompositeAttempt(tx, attemptId)
-    if(composite.trainingVariantFrozen != null){
+    if(composite.trainingVariantFrozen != null || composite.trainingFlowFrozen?.schemaVersion===2){
       const used=await tx.compositeAssessmentAttempt.count({where:{compositeAssessmentId:composite.id,...(existing.userId?{userId:existing.userId}:{participantKey:(existing as any).participantKey})}})
       if(!Number.isInteger(composite.maxAttempts)||composite.maxAttempts<1||composite.maxAttempts>100||used>=composite.maxAttempts)throw compositeConflict('概率分卷次数已用完；取消和重启也计入次数')
     }
@@ -3204,18 +3216,18 @@ export const restartPublicAttempt = async (attemptId: string, recoveryTokenHash:
         status: true,
         attemptNo: true,
         attemptEpoch: true,
-        compositeAssessmentId: true,
+        compositeAssessmentId: true, participantKey:true, trainingFlowSnapshotEncrypted:true, trainingFlowSnapshotHash:true,
       },
     })
     if (!current) throw compositeNotFound('综合测评记录不存在')
-    if (current.userId !== null || current.recoveryTokenHash !== recoveryTokenHash) {
+    if (current.userId !== null || current.recoveryTokenHash !== recoveryTokenHash || current.participantKey !== existing.participantKey) {
       throw compositeForbidden('恢复凭证无权重启此综合测评')
     }
     if (current.status !== 'IN_PROGRESS') throw compositeConflict('只有进行中的综合测评可以重启')
-    if (composite.trainingVariantFrozen != null) await assertNoAcceptedTrainingVariantUnit(tx, current.id, current.attemptEpoch)
+    if (composite.trainingVariantFrozen != null || composite.trainingFlowFrozen?.schemaVersion===2) await assertNoAcceptedTrainingVariantUnit(tx, current.id, current.attemptEpoch)
     await tx.compositeAssessmentAttempt.update({
       where: { id: current.id },
-      data: { status: 'ABANDONED', completedAt: new Date() },
+      data: { status: 'ABANDONED', completedAt: new Date(), recoveryTokenHash: null },
     })
     return createAttempt(
       tx,
@@ -3225,6 +3237,8 @@ export const restartPublicAttempt = async (attemptId: string, recoveryTokenHash:
       credential,
       current.attemptNo + 1,
       current.attemptEpoch + 1,
+      undefined,
+      materialRestartClaim(current,composite),
     )
   })
   return { attempt: await getAttemptState(next.id, { recoveryTokenHash: credential.hash }), recoveryToken: credential.token }

@@ -1,0 +1,1558 @@
+{
+  "source": {
+    "commit": "c0cd98296915b7006d0f98495b75e18198647bd8",
+    "flowDefinitionBlob": "4de705de37917521c49dba9bf056e78d089a9839",
+    "operationsDefinitionBlob": "7484878850718365507f32adaff3c1af88436c7f",
+    "method": "Executed unchanged pre-C20 modules from git show; captured parsed values, complete error issues, compiler outputs and digests."
+  },
+  "flows": [
+    {
+      "name": "trim-and-default",
+      "input": {
+        "schemaVersion": 1,
+        "experiment": {
+          "experimentKey": "materials",
+          "linkedPolicy": "KEEP_LINKED",
+          "groups": [
+            {
+              "groupKey": "a",
+              "weight": 1,
+              "materialTitle": " Title A ",
+              "materialBody": " Body A "
+            },
+            {
+              "groupKey": "b",
+              "weight": 100,
+              "materialTitle": "Title B",
+              "materialBody": "Body B"
+            }
+          ]
+        },
+        "blocks": [
+          {
+            "blockKey": "closing",
+            "kind": "MATERIAL",
+            "body": "Thank you"
+          }
+        ]
+      },
+      "mode": "LINKED_WAVES",
+      "parse": {
+        "ok": true,
+        "value": {
+          "schemaVersion": 1,
+          "experiment": {
+            "experimentKey": "materials",
+            "linkedPolicy": "KEEP_LINKED",
+            "groups": [
+              {
+                "groupKey": "a",
+                "weight": 1,
+                "materialTitle": "Title A",
+                "materialBody": "Body A"
+              },
+              {
+                "groupKey": "b",
+                "weight": 100,
+                "materialTitle": "Title B",
+                "materialBody": "Body B"
+              }
+            ]
+          },
+          "embeddedData": [],
+          "blocks": [
+            {
+              "blockKey": "closing",
+              "kind": "MATERIAL",
+              "body": "Thank you"
+            }
+          ]
+        }
+      },
+      "compile": {
+        "ok": true,
+        "value": {
+          "schemaVersion": 1,
+          "experiment": {
+            "experimentKey": "materials",
+            "linkedPolicy": "KEEP_LINKED",
+            "groups": [
+              {
+                "groupKey": "a",
+                "weight": 1,
+                "materialTitle": "Title A",
+                "materialBody": "Body A"
+              },
+              {
+                "groupKey": "b",
+                "weight": 100,
+                "materialTitle": "Title B",
+                "materialBody": "Body B"
+              }
+            ]
+          },
+          "embeddedData": [],
+          "blocks": [
+            {
+              "blockKey": "closing",
+              "kind": "MATERIAL",
+              "body": "Thank you"
+            }
+          ],
+          "flowDigest": "79f19d87fddeb9235a7dd7954fd7b47ff63f44af24445a6dca5484d8e9f8569c"
+        }
+      }
+    },
+    {
+      "name": "single-unlinked",
+      "input": {
+        "schemaVersion": 1,
+        "experiment": {
+          "experimentKey": "materials",
+          "linkedPolicy": "KEEP_LINKED",
+          "groups": [
+            {
+              "groupKey": "a",
+              "weight": 1,
+              "materialTitle": " Title A ",
+              "materialBody": " Body A "
+            },
+            {
+              "groupKey": "b",
+              "weight": 100,
+              "materialTitle": "Title B",
+              "materialBody": "Body B"
+            }
+          ]
+        },
+        "blocks": [
+          {
+            "blockKey": "closing",
+            "kind": "MATERIAL",
+            "body": "Thank you"
+          }
+        ]
+      },
+      "mode": "SINGLE_UNLINKED",
+      "parse": {
+        "ok": true,
+        "value": {
+          "schemaVersion": 1,
+          "experiment": {
+            "experimentKey": "materials",
+            "linkedPolicy": "KEEP_LINKED",
+            "groups": [
+              {
+                "groupKey": "a",
+                "weight": 1,
+                "materialTitle": "Title A",
+                "materialBody": "Body A"
+              },
+              {
+                "groupKey": "b",
+                "weight": 100,
+                "materialTitle": "Title B",
+                "materialBody": "Body B"
+              }
+            ]
+          },
+          "embeddedData": [],
+          "blocks": [
+            {
+              "blockKey": "closing",
+              "kind": "MATERIAL",
+              "body": "Thank you"
+            }
+          ]
+        }
+      },
+      "compile": {
+        "ok": false,
+        "name": "SurveyFlowError",
+        "message": "研究流程定义未通过安全编译",
+        "issues": [
+          {
+            "path": "flow.experiment.linkedPolicy",
+            "message": "不关联匿名研究不能保持跨波次分组"
+          }
+        ]
+      }
+    },
+    {
+      "name": "no-experiment",
+      "input": {
+        "schemaVersion": 1,
+        "blocks": [
+          {
+            "blockKey": "closing",
+            "kind": "MATERIAL",
+            "body": "Thank you"
+          }
+        ]
+      },
+      "mode": "LINKED_WAVES",
+      "parse": {
+        "ok": true,
+        "value": {
+          "schemaVersion": 1,
+          "embeddedData": [],
+          "blocks": [
+            {
+              "blockKey": "closing",
+              "kind": "MATERIAL",
+              "body": "Thank you"
+            }
+          ]
+        }
+      },
+      "compile": {
+        "ok": true,
+        "value": {
+          "schemaVersion": 1,
+          "embeddedData": [],
+          "blocks": [
+            {
+              "blockKey": "closing",
+              "kind": "MATERIAL",
+              "body": "Thank you"
+            }
+          ],
+          "flowDigest": "6b606148ebc053489383fa9e87d7197be4d385d2402f9c4eb1ee7692ea93d8e9"
+        }
+      }
+    },
+    {
+      "name": "duplicate-group",
+      "input": {
+        "schemaVersion": 1,
+        "experiment": {
+          "experimentKey": "materials",
+          "linkedPolicy": "KEEP_LINKED",
+          "groups": [
+            {
+              "groupKey": "a",
+              "weight": 1,
+              "materialTitle": " Title A ",
+              "materialBody": " Body A "
+            },
+            {
+              "groupKey": "a",
+              "weight": 100,
+              "materialTitle": "Title B",
+              "materialBody": "Body B"
+            }
+          ]
+        },
+        "blocks": [
+          {
+            "blockKey": "closing",
+            "kind": "MATERIAL",
+            "body": "Thank you"
+          }
+        ]
+      },
+      "mode": "LINKED_WAVES",
+      "parse": {
+        "ok": true,
+        "value": {
+          "schemaVersion": 1,
+          "experiment": {
+            "experimentKey": "materials",
+            "linkedPolicy": "KEEP_LINKED",
+            "groups": [
+              {
+                "groupKey": "a",
+                "weight": 1,
+                "materialTitle": "Title A",
+                "materialBody": "Body A"
+              },
+              {
+                "groupKey": "a",
+                "weight": 100,
+                "materialTitle": "Title B",
+                "materialBody": "Body B"
+              }
+            ]
+          },
+          "embeddedData": [],
+          "blocks": [
+            {
+              "blockKey": "closing",
+              "kind": "MATERIAL",
+              "body": "Thank you"
+            }
+          ]
+        }
+      },
+      "compile": {
+        "ok": false,
+        "name": "SurveyFlowError",
+        "message": "研究流程定义未通过安全编译",
+        "issues": [
+          {
+            "path": "flow.experiment.groups.1",
+            "message": "流程标识必须唯一"
+          }
+        ]
+      }
+    },
+    {
+      "name": "blank-material",
+      "input": {
+        "schemaVersion": 1,
+        "experiment": {
+          "experimentKey": "materials",
+          "linkedPolicy": "KEEP_LINKED",
+          "groups": [
+            {
+              "groupKey": "a",
+              "weight": 1,
+              "materialTitle": " Title A ",
+              "materialBody": "  "
+            },
+            {
+              "groupKey": "b",
+              "weight": 100,
+              "materialTitle": "Title B",
+              "materialBody": "Body B"
+            }
+          ]
+        },
+        "blocks": [
+          {
+            "blockKey": "closing",
+            "kind": "MATERIAL",
+            "body": "Thank you"
+          }
+        ]
+      },
+      "mode": "LINKED_WAVES",
+      "parse": {
+        "ok": true,
+        "value": {
+          "schemaVersion": 1,
+          "experiment": {
+            "experimentKey": "materials",
+            "linkedPolicy": "KEEP_LINKED",
+            "groups": [
+              {
+                "groupKey": "a",
+                "weight": 1,
+                "materialTitle": "Title A",
+                "materialBody": ""
+              },
+              {
+                "groupKey": "b",
+                "weight": 100,
+                "materialTitle": "Title B",
+                "materialBody": "Body B"
+              }
+            ]
+          },
+          "embeddedData": [],
+          "blocks": [
+            {
+              "blockKey": "closing",
+              "kind": "MATERIAL",
+              "body": "Thank you"
+            }
+          ]
+        }
+      },
+      "compile": {
+        "ok": false,
+        "name": "SurveyFlowError",
+        "message": "研究流程定义未通过安全编译",
+        "issues": [
+          {
+            "path": "flow.experiment.groups",
+            "message": "各实验组必须提供完整展示材料"
+          }
+        ]
+      }
+    },
+    {
+      "name": "unknown-template",
+      "input": {
+        "schemaVersion": 1,
+        "experiment": {
+          "experimentKey": "materials",
+          "linkedPolicy": "KEEP_LINKED",
+          "groups": [
+            {
+              "groupKey": "a",
+              "weight": 1,
+              "materialTitle": " Title A ",
+              "materialBody": "{{secret}}"
+            },
+            {
+              "groupKey": "b",
+              "weight": 100,
+              "materialTitle": "Title B",
+              "materialBody": "Body B"
+            }
+          ]
+        },
+        "blocks": [
+          {
+            "blockKey": "closing",
+            "kind": "MATERIAL",
+            "body": "Thank you"
+          }
+        ]
+      },
+      "mode": "LINKED_WAVES",
+      "parse": {
+        "ok": true,
+        "value": {
+          "schemaVersion": 1,
+          "experiment": {
+            "experimentKey": "materials",
+            "linkedPolicy": "KEEP_LINKED",
+            "groups": [
+              {
+                "groupKey": "a",
+                "weight": 1,
+                "materialTitle": "Title A",
+                "materialBody": "{{secret}}"
+              },
+              {
+                "groupKey": "b",
+                "weight": 100,
+                "materialTitle": "Title B",
+                "materialBody": "Body B"
+              }
+            ]
+          },
+          "embeddedData": [],
+          "blocks": [
+            {
+              "blockKey": "closing",
+              "kind": "MATERIAL",
+              "body": "Thank you"
+            }
+          ]
+        }
+      },
+      "compile": {
+        "ok": false,
+        "name": "SurveyFlowError",
+        "message": "研究流程定义未通过安全编译",
+        "issues": [
+          {
+            "path": "flow.experiment.groups.0.materialBody",
+            "message": "受控文案引用了未声明的静态变量 secret"
+          }
+        ]
+      }
+    },
+    {
+      "name": "expression-template",
+      "input": {
+        "schemaVersion": 1,
+        "experiment": {
+          "experimentKey": "materials",
+          "linkedPolicy": "KEEP_LINKED",
+          "groups": [
+            {
+              "groupKey": "a",
+              "weight": 1,
+              "materialTitle": "{{a + b}}",
+              "materialBody": " Body A "
+            },
+            {
+              "groupKey": "b",
+              "weight": 100,
+              "materialTitle": "Title B",
+              "materialBody": "Body B"
+            }
+          ]
+        },
+        "blocks": [
+          {
+            "blockKey": "closing",
+            "kind": "MATERIAL",
+            "body": "Thank you"
+          }
+        ]
+      },
+      "mode": "LINKED_WAVES",
+      "parse": {
+        "ok": true,
+        "value": {
+          "schemaVersion": 1,
+          "experiment": {
+            "experimentKey": "materials",
+            "linkedPolicy": "KEEP_LINKED",
+            "groups": [
+              {
+                "groupKey": "a",
+                "weight": 1,
+                "materialTitle": "{{a + b}}",
+                "materialBody": "Body A"
+              },
+              {
+                "groupKey": "b",
+                "weight": 100,
+                "materialTitle": "Title B",
+                "materialBody": "Body B"
+              }
+            ]
+          },
+          "embeddedData": [],
+          "blocks": [
+            {
+              "blockKey": "closing",
+              "kind": "MATERIAL",
+              "body": "Thank you"
+            }
+          ]
+        }
+      },
+      "compile": {
+        "ok": false,
+        "name": "SurveyFlowError",
+        "message": "研究流程定义未通过安全编译",
+        "issues": [
+          {
+            "path": "flow.experiment.groups.0.materialTitle",
+            "message": "文案变量必须使用 {{变量编码}}，不允许执行表达式"
+          }
+        ]
+      }
+    },
+    {
+      "name": "valid-template",
+      "input": {
+        "schemaVersion": 1,
+        "experiment": {
+          "experimentKey": "materials",
+          "linkedPolicy": "KEEP_LINKED",
+          "groups": [
+            {
+              "groupKey": "a",
+              "weight": 1,
+              "materialTitle": " Title A ",
+              "materialBody": "{{year}}"
+            },
+            {
+              "groupKey": "b",
+              "weight": 100,
+              "materialTitle": "Title B",
+              "materialBody": "Body B"
+            }
+          ]
+        },
+        "blocks": [
+          {
+            "blockKey": "closing",
+            "kind": "MATERIAL",
+            "body": "Thank you"
+          }
+        ],
+        "embeddedData": [
+          {
+            "key": "year",
+            "type": "NUMBER",
+            "source": "STATIC",
+            "value": 2026
+          }
+        ]
+      },
+      "mode": "LINKED_WAVES",
+      "parse": {
+        "ok": true,
+        "value": {
+          "schemaVersion": 1,
+          "experiment": {
+            "experimentKey": "materials",
+            "linkedPolicy": "KEEP_LINKED",
+            "groups": [
+              {
+                "groupKey": "a",
+                "weight": 1,
+                "materialTitle": "Title A",
+                "materialBody": "{{year}}"
+              },
+              {
+                "groupKey": "b",
+                "weight": 100,
+                "materialTitle": "Title B",
+                "materialBody": "Body B"
+              }
+            ]
+          },
+          "embeddedData": [
+            {
+              "key": "year",
+              "type": "NUMBER",
+              "source": "STATIC",
+              "value": 2026
+            }
+          ],
+          "blocks": [
+            {
+              "blockKey": "closing",
+              "kind": "MATERIAL",
+              "body": "Thank you"
+            }
+          ]
+        }
+      },
+      "compile": {
+        "ok": true,
+        "value": {
+          "schemaVersion": 1,
+          "experiment": {
+            "experimentKey": "materials",
+            "linkedPolicy": "KEEP_LINKED",
+            "groups": [
+              {
+                "groupKey": "a",
+                "weight": 1,
+                "materialTitle": "Title A",
+                "materialBody": "{{year}}"
+              },
+              {
+                "groupKey": "b",
+                "weight": 100,
+                "materialTitle": "Title B",
+                "materialBody": "Body B"
+              }
+            ]
+          },
+          "embeddedData": [
+            {
+              "key": "year",
+              "type": "NUMBER",
+              "source": "STATIC",
+              "value": 2026
+            }
+          ],
+          "blocks": [
+            {
+              "blockKey": "closing",
+              "kind": "MATERIAL",
+              "body": "Thank you"
+            }
+          ],
+          "flowDigest": "0f7b04c6c98dfc4ca4c5b6c699a1e2a8ecc667f6a93855083917412eaf2d1d20"
+        }
+      }
+    },
+    {
+      "name": "reserved-block",
+      "input": {
+        "schemaVersion": 1,
+        "experiment": {
+          "experimentKey": "materials",
+          "linkedPolicy": "KEEP_LINKED",
+          "groups": [
+            {
+              "groupKey": "a",
+              "weight": 1,
+              "materialTitle": " Title A ",
+              "materialBody": " Body A "
+            },
+            {
+              "groupKey": "b",
+              "weight": 100,
+              "materialTitle": "Title B",
+              "materialBody": "Body B"
+            }
+          ]
+        },
+        "blocks": [
+          {
+            "blockKey": "assigned_material",
+            "kind": "MATERIAL",
+            "body": "Thank you"
+          }
+        ]
+      },
+      "mode": "LINKED_WAVES",
+      "parse": {
+        "ok": true,
+        "value": {
+          "schemaVersion": 1,
+          "experiment": {
+            "experimentKey": "materials",
+            "linkedPolicy": "KEEP_LINKED",
+            "groups": [
+              {
+                "groupKey": "a",
+                "weight": 1,
+                "materialTitle": "Title A",
+                "materialBody": "Body A"
+              },
+              {
+                "groupKey": "b",
+                "weight": 100,
+                "materialTitle": "Title B",
+                "materialBody": "Body B"
+              }
+            ]
+          },
+          "embeddedData": [],
+          "blocks": [
+            {
+              "blockKey": "assigned_material",
+              "kind": "MATERIAL",
+              "body": "Thank you"
+            }
+          ]
+        }
+      },
+      "compile": {
+        "ok": false,
+        "name": "SurveyFlowError",
+        "message": "研究流程定义未通过安全编译",
+        "issues": [
+          {
+            "path": "flow.blocks",
+            "message": "assigned_material 是研究实验材料保留标识，不能由编制者重用"
+          }
+        ]
+      }
+    },
+    {
+      "name": "extra-field",
+      "input": {
+        "schemaVersion": 1,
+        "experiment": {
+          "experimentKey": "materials",
+          "linkedPolicy": "KEEP_LINKED",
+          "groups": [
+            {
+              "groupKey": "a",
+              "weight": 1,
+              "materialTitle": " Title A ",
+              "materialBody": " Body A ",
+              "extra": true
+            },
+            {
+              "groupKey": "b",
+              "weight": 100,
+              "materialTitle": "Title B",
+              "materialBody": "Body B"
+            }
+          ]
+        },
+        "blocks": [
+          {
+            "blockKey": "closing",
+            "kind": "MATERIAL",
+            "body": "Thank you"
+          }
+        ]
+      },
+      "mode": "LINKED_WAVES",
+      "parse": {
+        "ok": false,
+        "name": "ZodError",
+        "message": "[\n  {\n    \"code\": \"unrecognized_keys\",\n    \"keys\": [\n      \"extra\"\n    ],\n    \"path\": [\n      \"experiment\",\n      \"groups\",\n      0\n    ],\n    \"message\": \"Unrecognized key(s) in object: 'extra'\"\n  }\n]",
+        "issues": [
+          {
+            "code": "unrecognized_keys",
+            "keys": [
+              "extra"
+            ],
+            "path": [
+              "experiment",
+              "groups",
+              0
+            ],
+            "message": "Unrecognized key(s) in object: 'extra'"
+          }
+        ]
+      },
+      "compile": {
+        "ok": false,
+        "name": "SurveyFlowError",
+        "message": "研究流程定义未通过安全编译",
+        "issues": [
+          {
+            "path": "experiment.groups.0",
+            "message": "Unrecognized key(s) in object: 'extra'"
+          }
+        ]
+      }
+    },
+    {
+      "name": "invalid-mode-and-groups",
+      "input": {
+        "schemaVersion": 1,
+        "experiment": {
+          "experimentKey": "materials",
+          "linkedPolicy": "KEEP_LINKED",
+          "groups": [
+            {
+              "groupKey": "a",
+              "weight": 0,
+              "materialTitle": " Title A ",
+              "materialBody": " Body A "
+            },
+            {
+              "groupKey": "b",
+              "weight": 100,
+              "materialTitle": 3,
+              "materialBody": "Body B"
+            }
+          ],
+          "mode": "MATERIALS"
+        },
+        "blocks": [
+          {
+            "blockKey": "closing",
+            "kind": "MATERIAL",
+            "body": "Thank you"
+          }
+        ]
+      },
+      "mode": "LINKED_WAVES",
+      "parse": {
+        "ok": false,
+        "name": "ZodError",
+        "message": "[\n  {\n    \"received\": \"MATERIALS\",\n    \"code\": \"invalid_literal\",\n    \"expected\": \"QUESTIONNAIRE_VARIANTS\",\n    \"path\": [\n      \"experiment\",\n      \"mode\"\n    ],\n    \"message\": \"Invalid literal value, expected \\\"QUESTIONNAIRE_VARIANTS\\\"\"\n  },\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"number\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"Number must be greater than or equal to 1\",\n    \"path\": [\n      \"experiment\",\n      \"groups\",\n      0,\n      \"weight\"\n    ]\n  },\n  {\n    \"code\": \"invalid_type\",\n    \"expected\": \"string\",\n    \"received\": \"number\",\n    \"path\": [\n      \"experiment\",\n      \"groups\",\n      1,\n      \"materialTitle\"\n    ],\n    \"message\": \"Expected string, received number\"\n  }\n]",
+        "issues": [
+          {
+            "received": "MATERIALS",
+            "code": "invalid_literal",
+            "expected": "QUESTIONNAIRE_VARIANTS",
+            "path": [
+              "experiment",
+              "mode"
+            ],
+            "message": "Invalid literal value, expected \"QUESTIONNAIRE_VARIANTS\""
+          },
+          {
+            "code": "too_small",
+            "minimum": 1,
+            "type": "number",
+            "inclusive": true,
+            "exact": false,
+            "message": "Number must be greater than or equal to 1",
+            "path": [
+              "experiment",
+              "groups",
+              0,
+              "weight"
+            ]
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "number",
+            "path": [
+              "experiment",
+              "groups",
+              1,
+              "materialTitle"
+            ],
+            "message": "Expected string, received number"
+          }
+        ]
+      },
+      "compile": {
+        "ok": false,
+        "name": "SurveyFlowError",
+        "message": "研究流程定义未通过安全编译",
+        "issues": [
+          {
+            "path": "experiment.mode",
+            "message": "Invalid literal value, expected \"QUESTIONNAIRE_VARIANTS\""
+          },
+          {
+            "path": "experiment.groups.0.weight",
+            "message": "Number must be greater than or equal to 1"
+          },
+          {
+            "path": "experiment.groups.1.materialTitle",
+            "message": "Expected string, received number"
+          }
+        ]
+      }
+    },
+    {
+      "name": "wrong-key",
+      "input": {
+        "schemaVersion": 1,
+        "experiment": {
+          "experimentKey": "UPPER",
+          "linkedPolicy": "KEEP_LINKED",
+          "groups": [
+            {
+              "groupKey": "a",
+              "weight": 1,
+              "materialTitle": " Title A ",
+              "materialBody": " Body A "
+            },
+            {
+              "groupKey": "b",
+              "weight": 100,
+              "materialTitle": "Title B",
+              "materialBody": "Body B"
+            }
+          ]
+        },
+        "blocks": [
+          {
+            "blockKey": "closing",
+            "kind": "MATERIAL",
+            "body": "Thank you"
+          }
+        ]
+      },
+      "mode": "LINKED_WAVES",
+      "parse": {
+        "ok": false,
+        "name": "ZodError",
+        "message": "[\n  {\n    \"validation\": \"regex\",\n    \"code\": \"invalid_string\",\n    \"message\": \"Invalid\",\n    \"path\": [\n      \"experiment\",\n      \"experimentKey\"\n    ]\n  }\n]",
+        "issues": [
+          {
+            "validation": "regex",
+            "code": "invalid_string",
+            "message": "Invalid",
+            "path": [
+              "experiment",
+              "experimentKey"
+            ]
+          }
+        ]
+      },
+      "compile": {
+        "ok": false,
+        "name": "SurveyFlowError",
+        "message": "研究流程定义未通过安全编译",
+        "issues": [
+          {
+            "path": "experiment.experimentKey",
+            "message": "Invalid"
+          }
+        ]
+      }
+    },
+    {
+      "name": "fractional-weight",
+      "input": {
+        "schemaVersion": 1,
+        "experiment": {
+          "experimentKey": "materials",
+          "linkedPolicy": "KEEP_LINKED",
+          "groups": [
+            {
+              "groupKey": "a",
+              "weight": 1.5,
+              "materialTitle": " Title A ",
+              "materialBody": " Body A "
+            },
+            {
+              "groupKey": "b",
+              "weight": 100,
+              "materialTitle": "Title B",
+              "materialBody": "Body B"
+            }
+          ]
+        },
+        "blocks": [
+          {
+            "blockKey": "closing",
+            "kind": "MATERIAL",
+            "body": "Thank you"
+          }
+        ]
+      },
+      "mode": "LINKED_WAVES",
+      "parse": {
+        "ok": false,
+        "name": "ZodError",
+        "message": "[\n  {\n    \"code\": \"invalid_type\",\n    \"expected\": \"integer\",\n    \"received\": \"float\",\n    \"message\": \"Expected integer, received float\",\n    \"path\": [\n      \"experiment\",\n      \"groups\",\n      0,\n      \"weight\"\n    ]\n  }\n]",
+        "issues": [
+          {
+            "code": "invalid_type",
+            "expected": "integer",
+            "received": "float",
+            "message": "Expected integer, received float",
+            "path": [
+              "experiment",
+              "groups",
+              0,
+              "weight"
+            ]
+          }
+        ]
+      },
+      "compile": {
+        "ok": false,
+        "name": "SurveyFlowError",
+        "message": "研究流程定义未通过安全编译",
+        "issues": [
+          {
+            "path": "experiment.groups.0.weight",
+            "message": "Expected integer, received float"
+          }
+        ]
+      }
+    },
+    {
+      "name": "too-large-weight",
+      "input": {
+        "schemaVersion": 1,
+        "experiment": {
+          "experimentKey": "materials",
+          "linkedPolicy": "KEEP_LINKED",
+          "groups": [
+            {
+              "groupKey": "a",
+              "weight": 101,
+              "materialTitle": " Title A ",
+              "materialBody": " Body A "
+            },
+            {
+              "groupKey": "b",
+              "weight": 100,
+              "materialTitle": "Title B",
+              "materialBody": "Body B"
+            }
+          ]
+        },
+        "blocks": [
+          {
+            "blockKey": "closing",
+            "kind": "MATERIAL",
+            "body": "Thank you"
+          }
+        ]
+      },
+      "mode": "LINKED_WAVES",
+      "parse": {
+        "ok": false,
+        "name": "ZodError",
+        "message": "[\n  {\n    \"code\": \"too_big\",\n    \"maximum\": 100,\n    \"type\": \"number\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"Number must be less than or equal to 100\",\n    \"path\": [\n      \"experiment\",\n      \"groups\",\n      0,\n      \"weight\"\n    ]\n  }\n]",
+        "issues": [
+          {
+            "code": "too_big",
+            "maximum": 100,
+            "type": "number",
+            "inclusive": true,
+            "exact": false,
+            "message": "Number must be less than or equal to 100",
+            "path": [
+              "experiment",
+              "groups",
+              0,
+              "weight"
+            ]
+          }
+        ]
+      },
+      "compile": {
+        "ok": false,
+        "name": "SurveyFlowError",
+        "message": "研究流程定义未通过安全编译",
+        "issues": [
+          {
+            "path": "experiment.groups.0.weight",
+            "message": "Number must be less than or equal to 100"
+          }
+        ]
+      }
+    },
+    {
+      "name": "one-group",
+      "input": {
+        "schemaVersion": 1,
+        "experiment": {
+          "experimentKey": "materials",
+          "linkedPolicy": "KEEP_LINKED",
+          "groups": [
+            {
+              "groupKey": "a",
+              "weight": 1,
+              "materialTitle": " Title A ",
+              "materialBody": " Body A "
+            }
+          ]
+        },
+        "blocks": [
+          {
+            "blockKey": "closing",
+            "kind": "MATERIAL",
+            "body": "Thank you"
+          }
+        ]
+      },
+      "mode": "LINKED_WAVES",
+      "parse": {
+        "ok": false,
+        "name": "ZodError",
+        "message": "[\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 2,\n    \"type\": \"array\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"Array must contain at least 2 element(s)\",\n    \"path\": [\n      \"experiment\",\n      \"groups\"\n    ]\n  }\n]",
+        "issues": [
+          {
+            "code": "too_small",
+            "minimum": 2,
+            "type": "array",
+            "inclusive": true,
+            "exact": false,
+            "message": "Array must contain at least 2 element(s)",
+            "path": [
+              "experiment",
+              "groups"
+            ]
+          }
+        ]
+      },
+      "compile": {
+        "ok": false,
+        "name": "SurveyFlowError",
+        "message": "研究流程定义未通过安全编译",
+        "issues": [
+          {
+            "path": "experiment.groups",
+            "message": "Array must contain at least 2 element(s)"
+          }
+        ]
+      }
+    },
+    {
+      "name": "nine-groups",
+      "input": {
+        "schemaVersion": 1,
+        "experiment": {
+          "experimentKey": "materials",
+          "linkedPolicy": "KEEP_LINKED",
+          "groups": [
+            {
+              "groupKey": "g0",
+              "weight": 1,
+              "materialTitle": " Title A ",
+              "materialBody": " Body A "
+            },
+            {
+              "groupKey": "g1",
+              "weight": 1,
+              "materialTitle": " Title A ",
+              "materialBody": " Body A "
+            },
+            {
+              "groupKey": "g2",
+              "weight": 1,
+              "materialTitle": " Title A ",
+              "materialBody": " Body A "
+            },
+            {
+              "groupKey": "g3",
+              "weight": 1,
+              "materialTitle": " Title A ",
+              "materialBody": " Body A "
+            },
+            {
+              "groupKey": "g4",
+              "weight": 1,
+              "materialTitle": " Title A ",
+              "materialBody": " Body A "
+            },
+            {
+              "groupKey": "g5",
+              "weight": 1,
+              "materialTitle": " Title A ",
+              "materialBody": " Body A "
+            },
+            {
+              "groupKey": "g6",
+              "weight": 1,
+              "materialTitle": " Title A ",
+              "materialBody": " Body A "
+            },
+            {
+              "groupKey": "g7",
+              "weight": 1,
+              "materialTitle": " Title A ",
+              "materialBody": " Body A "
+            },
+            {
+              "groupKey": "g8",
+              "weight": 1,
+              "materialTitle": " Title A ",
+              "materialBody": " Body A "
+            }
+          ]
+        },
+        "blocks": [
+          {
+            "blockKey": "closing",
+            "kind": "MATERIAL",
+            "body": "Thank you"
+          }
+        ]
+      },
+      "mode": "LINKED_WAVES",
+      "parse": {
+        "ok": false,
+        "name": "ZodError",
+        "message": "[\n  {\n    \"code\": \"too_big\",\n    \"maximum\": 8,\n    \"type\": \"array\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"Array must contain at most 8 element(s)\",\n    \"path\": [\n      \"experiment\",\n      \"groups\"\n    ]\n  }\n]",
+        "issues": [
+          {
+            "code": "too_big",
+            "maximum": 8,
+            "type": "array",
+            "inclusive": true,
+            "exact": false,
+            "message": "Array must contain at most 8 element(s)",
+            "path": [
+              "experiment",
+              "groups"
+            ]
+          }
+        ]
+      },
+      "compile": {
+        "ok": false,
+        "name": "SurveyFlowError",
+        "message": "研究流程定义未通过安全编译",
+        "issues": [
+          {
+            "path": "experiment.groups",
+            "message": "Array must contain at most 8 element(s)"
+          }
+        ]
+      }
+    },
+    {
+      "name": "variant-fields-without-mode",
+      "input": {
+        "schemaVersion": 1,
+        "experiment": {
+          "experimentKey": "materials",
+          "linkedPolicy": "KEEP_LINKED",
+          "groups": [
+            {
+              "groupKey": "a",
+              "weight": 1,
+              "materialTitle": " Title A ",
+              "materialBody": " Body A ",
+              "variantLabel": "Variant"
+            },
+            {
+              "groupKey": "b",
+              "weight": 100,
+              "materialTitle": "Title B",
+              "materialBody": "Body B"
+            }
+          ]
+        },
+        "blocks": [
+          {
+            "blockKey": "closing",
+            "kind": "MATERIAL",
+            "body": "Thank you"
+          }
+        ]
+      },
+      "mode": "LINKED_WAVES",
+      "parse": {
+        "ok": true,
+        "value": {
+          "schemaVersion": 1,
+          "experiment": {
+            "experimentKey": "materials",
+            "linkedPolicy": "KEEP_LINKED",
+            "groups": [
+              {
+                "groupKey": "a",
+                "weight": 1,
+                "materialTitle": "Title A",
+                "materialBody": "Body A",
+                "variantLabel": "Variant"
+              },
+              {
+                "groupKey": "b",
+                "weight": 100,
+                "materialTitle": "Title B",
+                "materialBody": "Body B"
+              }
+            ]
+          },
+          "embeddedData": [],
+          "blocks": [
+            {
+              "blockKey": "closing",
+              "kind": "MATERIAL",
+              "body": "Thank you"
+            }
+          ]
+        }
+      },
+      "compile": {
+        "ok": false,
+        "name": "SurveyFlowError",
+        "message": "研究流程定义未通过安全编译",
+        "issues": [
+          {
+            "path": "flow.experiment",
+            "message": "问卷子版本字段要求明确的子版本模式"
+          }
+        ]
+      }
+    },
+    {
+      "name": "variant-missing-labels",
+      "input": {
+        "schemaVersion": 1,
+        "experiment": {
+          "experimentKey": "materials",
+          "linkedPolicy": "RERANDOMIZE",
+          "groups": [
+            {
+              "groupKey": "a",
+              "weight": 1,
+              "materialTitle": " Title A ",
+              "materialBody": " Body A "
+            },
+            {
+              "groupKey": "b",
+              "weight": 100,
+              "materialTitle": "Title B",
+              "materialBody": "Body B"
+            }
+          ],
+          "mode": "QUESTIONNAIRE_VARIANTS"
+        },
+        "blocks": [
+          {
+            "blockKey": "closing",
+            "kind": "MATERIAL",
+            "body": "Thank you"
+          }
+        ]
+      },
+      "mode": "LINKED_WAVES",
+      "parse": {
+        "ok": true,
+        "value": {
+          "schemaVersion": 1,
+          "experiment": {
+            "experimentKey": "materials",
+            "linkedPolicy": "RERANDOMIZE",
+            "mode": "QUESTIONNAIRE_VARIANTS",
+            "groups": [
+              {
+                "groupKey": "a",
+                "weight": 1,
+                "materialTitle": "Title A",
+                "materialBody": "Body A"
+              },
+              {
+                "groupKey": "b",
+                "weight": 100,
+                "materialTitle": "Title B",
+                "materialBody": "Body B"
+              }
+            ]
+          },
+          "embeddedData": [],
+          "blocks": [
+            {
+              "blockKey": "closing",
+              "kind": "MATERIAL",
+              "body": "Thank you"
+            }
+          ]
+        }
+      },
+      "compile": {
+        "ok": false,
+        "name": "SurveyFlowError",
+        "message": "研究流程定义未通过安全编译",
+        "issues": [
+          {
+            "path": "flow.experiment.groups.0",
+            "message": "每个问卷子版本必须有名称和完整工具列表"
+          },
+          {
+            "path": "flow.experiment.groups.1",
+            "message": "每个问卷子版本必须有名称和完整工具列表"
+          }
+        ]
+      }
+    },
+    {
+      "name": "multiple-semantic-errors",
+      "input": {
+        "schemaVersion": 1,
+        "experiment": {
+          "experimentKey": "materials",
+          "linkedPolicy": "KEEP_LINKED",
+          "groups": [
+            {
+              "groupKey": "a",
+              "weight": 1,
+              "materialTitle": " Title A ",
+              "materialBody": ""
+            },
+            {
+              "groupKey": "a",
+              "weight": 100,
+              "materialTitle": "{{missing}}",
+              "materialBody": "Body B"
+            }
+          ]
+        },
+        "blocks": [
+          {
+            "blockKey": "assigned_material",
+            "kind": "MATERIAL",
+            "body": "Thank you"
+          }
+        ]
+      },
+      "mode": "LINKED_WAVES",
+      "parse": {
+        "ok": true,
+        "value": {
+          "schemaVersion": 1,
+          "experiment": {
+            "experimentKey": "materials",
+            "linkedPolicy": "KEEP_LINKED",
+            "groups": [
+              {
+                "groupKey": "a",
+                "weight": 1,
+                "materialTitle": "Title A",
+                "materialBody": ""
+              },
+              {
+                "groupKey": "a",
+                "weight": 100,
+                "materialTitle": "{{missing}}",
+                "materialBody": "Body B"
+              }
+            ]
+          },
+          "embeddedData": [],
+          "blocks": [
+            {
+              "blockKey": "assigned_material",
+              "kind": "MATERIAL",
+              "body": "Thank you"
+            }
+          ]
+        }
+      },
+      "compile": {
+        "ok": false,
+        "name": "SurveyFlowError",
+        "message": "研究流程定义未通过安全编译",
+        "issues": [
+          {
+            "path": "flow.blocks",
+            "message": "assigned_material 是研究实验材料保留标识，不能由编制者重用"
+          },
+          {
+            "path": "flow.experiment.groups.1",
+            "message": "流程标识必须唯一"
+          },
+          {
+            "path": "flow.experiment.groups",
+            "message": "各实验组必须提供完整展示材料"
+          },
+          {
+            "path": "flow.experiment.groups.1.materialTitle",
+            "message": "受控文案引用了未声明的静态变量 missing"
+          }
+        ]
+      }
+    }
+  ],
+  "quotas": [
+    {
+      "input": null,
+      "result": {
+        "ok": true
+      }
+    },
+    {
+      "input": {},
+      "result": {
+        "ok": false,
+        "name": "SurveyOperationsDefinitionError",
+        "message": "条件配额配置结构不合法"
+      }
+    },
+    {
+      "input": {
+        "schemaVersion": 1,
+        "groupLimits": {
+          "a": 1,
+          "b": 10000
+        }
+      },
+      "result": {
+        "ok": true,
+        "value": {
+          "schemaVersion": 1,
+          "groupLimits": {
+            "a": 1,
+            "b": 10000
+          }
+        }
+      }
+    },
+    {
+      "input": {
+        "schemaVersion": 1,
+        "groupLimits": {
+          "a": 0,
+          "b": 10001
+        }
+      },
+      "result": {
+        "ok": false,
+        "name": "SurveyOperationsDefinitionError",
+        "message": "条件配额配置结构不合法"
+      }
+    },
+    {
+      "input": {
+        "schemaVersion": 1,
+        "groupLimits": {
+          "a": 1
+        }
+      },
+      "result": {
+        "ok": false,
+        "name": "SurveyOperationsDefinitionError",
+        "message": "每个实验组必须且只能设置一个明确的配额上限"
+      }
+    },
+    {
+      "input": {
+        "schemaVersion": 1,
+        "groupLimits": {
+          "a": 1,
+          "c": 1
+        }
+      },
+      "result": {
+        "ok": false,
+        "name": "SurveyOperationsDefinitionError",
+        "message": "每个实验组必须且只能设置一个明确的配额上限"
+      }
+    },
+    {
+      "input": {
+        "schemaVersion": 1,
+        "groupLimits": {
+          "a": 1,
+          "b": 2
+        },
+        "extra": true
+      },
+      "result": {
+        "ok": false,
+        "name": "SurveyOperationsDefinitionError",
+        "message": "条件配额配置结构不合法"
+      }
+    }
+  ]
+}

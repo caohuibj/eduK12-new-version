@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { materialOnlyExperimentSchema, groupQuotaPolicySchema, compileMaterialQuotaPolicy, validateMaterialExperiment, assignedMaterial } from '../materials/definition'
 import { assessmentKeySchema } from '../definition-primitives'
 import { canonicalHash } from '../../assessment-runtime/canonical'
 import { flowBlockSchema,guardFlowShape,FlowDefinitionError,evaluateFlowCondition,
@@ -15,9 +16,14 @@ export const trainingFlowUnitKey=(sectionId:string):string=>
   assessmentKeySchema.parse('section_'+sectionId.replace(/-/g,'_'))
 export const trainingFlowItemKey=(itemId:string):string=>
   assessmentKeySchema.parse('item_'+itemId.replace(/-/g,'_'))
-export const trainingFlowDraftSchema=z.object({
+const trainingFlowV1Schema=z.object({
   schemaVersion:z.literal(1),blocks:z.array(flowBlockSchema).min(1).max(64),
 }).strict()
+const trainingFlowV2Schema=z.object({
+  schemaVersion:z.literal(2),blocks:z.array(flowBlockSchema).min(1).max(64),
+  experiment:materialOnlyExperimentSchema,quotaPolicy:groupQuotaPolicySchema.optional(),
+}).strict()
+export const trainingFlowDraftSchema=z.discriminatedUnion('schemaVersion',[trainingFlowV1Schema,trainingFlowV2Schema])
 export type TrainingFlowDraft=z.infer<typeof trainingFlowDraftSchema>
 /** Part of the frozen protocol. In particular, NOT cannot turn a skipped source
  * into an executing block, and a pending FINAL is never an absent answer. */
@@ -74,6 +80,13 @@ export function compileTrainingFlow(input:unknown,units:readonly TrainingFlowUni
   const issues:FlowCompileIssue[]=[]
   strictFlowKeys(flow.blocks.map(block=>block.blockKey),'flow.blocks',issues)
   validateFlowBlocks({blocks:flow.blocks,units,choiceAnswersOnly:true},issues)
+  if(flow.schemaVersion===2){
+    if(flow.blocks.some(block=>block.blockKey==='assigned_material'))issues.push({path:'flow.blocks',message:'assigned_material 是实验材料保留标识'})
+    validateMaterialExperiment(flow.experiment,{linked:true,staticVars:new Map()},issues)
+    compileMaterialQuotaPolicy(flow.quotaPolicy,flow.experiment,message=>fail('flow.quotaPolicy',message))
+    if(flow.experiment.groups.some(group=>[group.materialTitle,group.materialBody].some(text=>/\{\{|\}\}/.test(text))))
+      issues.push({path:'flow.experiment.groups',message:'Training 实验材料不支持变量或表达式插值'})
+  }
   if(issues.length)failIssues(issues)
   const frozen={...flow,policy:{...TRAINING_FLOW_POLICY},unionDigest:canonicalHash(jsonValue(units))}
   return {...frozen,flowDigest:canonicalHash(jsonValue(frozen))}
@@ -115,7 +128,7 @@ export function evaluateTrainingFlowCondition(condition:FlowCondition,facts:Trai
 }
 export type TrainingFlowSkipReason='CONDITION_FALSE'|'DEPENDENCY_SKIPPED'|'END_SCREEN_OUT'|'END_COMPLETE_EARLY'
 export type TrainingFlowPath={
-  schemaVersion:1;flowDigest:string;unionDigest:string;pathDigest:string;
+  schemaVersion:1|2;flowDigest:string;unionDigest:string;pathDigest:string;assignmentHash?:string;
   reachedInstrumentKeys:string[];acceptedInstrumentKeys:string[];currentInstrumentKey:string|null;
   materials:Array<{blockKey:string;kind:'MATERIAL';title?:string;body:string}>;
   shownBlocks:string[];skipped:Array<{instrumentKey:string;reason:TrainingFlowSkipReason}>;
@@ -131,7 +144,7 @@ const acceptedFactSchema=z.object({status:z.literal('ACCEPTED'),
  * candidate union, accept client branch decisions, or look beyond current tool.
  * The result is internal evidence: adapters expose only reached tools/materials,
  * never the skipped candidate identities or the frozen branch language. */
-export function scanTrainingFlow(flow:FrozenTrainingFlow,units:readonly TrainingFlowUnit[],facts:TrainingFlowFacts):TrainingFlowPath{
+export function scanTrainingFlow(flow:FrozenTrainingFlow,units:readonly TrainingFlowUnit[],facts:TrainingFlowFacts,assignment?:{groupKey:string;assignmentHash:string}):TrainingFlowPath{
   // Bind both all candidates and the exact frozen language/policy, without
   // compiling questions repeatedly on every server projection.
   if(canonicalHash(jsonValue(flow.policy))!==canonicalHash(TRAINING_FLOW_POLICY))
@@ -149,6 +162,13 @@ export function scanTrainingFlow(flow:FrozenTrainingFlow,units:readonly Training
   }
   const reachedInstrumentKeys:string[]=[],acceptedInstrumentKeys:string[]=[],shownBlocks:string[]=[]
   const materials:TrainingFlowPath['materials']=[],skipped:TrainingFlowPath['skipped']=[]
+  if(flow.schemaVersion===2){
+    if(!assignment||!/^[a-f0-9]{64}$/.test(assignment.assignmentHash))fail('flow.assignment','实验流程缺少合法冻结分配')
+    const material=assignedMaterial(flow.experiment,assignment!.groupKey)
+    if(!material)fail('flow.assignment','实验流程缺少已分配材料')
+    materials.push({...material!,kind:'MATERIAL'})
+    shownBlocks.push('assigned_material')
+  }else if(assignment)fail('flow.assignment','旧流程不能附加实验分配')
   const acceptedFacts:TrainingFlowPath['acceptedFacts']=[]
   const resolved:Record<string,TrainingFlowFact>=Object.create(null)
   let currentInstrumentKey:string|null=null,endBlockKey:string|null=null
@@ -198,7 +218,7 @@ export function scanTrainingFlow(flow:FrozenTrainingFlow,units:readonly Training
     fail('facts.'+key,'未来或未执行的流程工具不能包含已接受事实')
   const taskSatisfaction:TrainingFlowPath['taskSatisfaction']=termination==='PENDING'?'PENDING':
     termination==='SCREEN_OUT'||!anyValidMeasurement||!acceptedRequiredSatisfied?'NOT_SATISFIED':'SATISFIED'
-  const path={schemaVersion:1 as const,flowDigest,unionDigest:flow.unionDigest,reachedInstrumentKeys,
+  const path={schemaVersion:flow.schemaVersion,...(flow.schemaVersion===2?{assignmentHash:assignment!.assignmentHash}:{}),flowDigest,unionDigest:flow.unionDigest,reachedInstrumentKeys,
     acceptedInstrumentKeys,currentInstrumentKey,materials,shownBlocks,skipped,termination,endBlockKey,
     taskSatisfaction,acceptedFacts}
   return {...path,pathDigest:canonicalHash(path)}

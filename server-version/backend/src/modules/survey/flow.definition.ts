@@ -1,8 +1,9 @@
+import { materialExperimentSchema as experiment,validateMaterialExperiment,groupHasMaterial } from '../assessment-core/materials/definition'
 import { z } from 'zod'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { surveyKeySchema } from './builder.definition'
 import { flowBlockSchema as block,flowScalarSchema as scalar,guardFlowShape as guardSharedFlowShape } from '../assessment-core/flow/definition'
-import { strictFlowKeys as strictKeys,flowError as error,checkFlowText,validateFlowBlocks } from '../assessment-core/flow/compiler'
+import { strictFlowKeys as strictKeys,flowError as error,validateFlowBlocks } from '../assessment-core/flow/compiler'
 export { flowConditionSchema,evaluateFlowCondition } from '../assessment-core/flow/definition'
 export type { FlowField,FlowCondition,FlowScalar } from '../assessment-core/flow/definition'
 import type { FlowScalar } from '../assessment-core/flow/definition'
@@ -10,17 +11,6 @@ import type { ResearchFrozenUnit } from './publication.service'
 import { cognitiveDraftSchema } from './cognitive.definition'
 
 const key=surveyKeySchema
-const text=z.string().trim().max(8000)
-const experiment=z.object({
-  experimentKey:key,linkedPolicy:z.enum(['KEEP_LINKED','RERANDOMIZE']),
-  mode:z.literal('QUESTIONNAIRE_VARIANTS').optional(),
-  groups:z.array(z.object({
-    groupKey:key,weight:z.number().int().min(1).max(100),
-    materialTitle:text,materialBody:text,
-    variantLabel:z.string().trim().min(1).max(200).optional(),
-    instrumentKeys:z.array(key).min(1).max(30).optional(),
-  }).strict()).min(2).max(8),
-}).strict()
 export const surveyFlowDraftSchema=z.object({
   schemaVersion:z.literal(1),
   experiment:experiment.optional(),
@@ -61,8 +51,7 @@ export function surveyVariantProvenance(flow:FrozenSurveyFlow,groupKey:string|nu
     variantDigest:group.variantDigest!,allocationConfigId:flow.flowDigest,
     weight:group.weight,totalWeight,probability:group.weight/totalWeight}
 }
-export const surveyGroupHasMaterial=(group:NonNullable<FrozenSurveyFlow['experiment']>['groups'][number])=>
-  !!(group.materialTitle.trim()||group.materialBody.trim())
+export const surveyGroupHasMaterial=groupHasMaterial
 
 export class SurveyFlowError extends Error {
   constructor(readonly issues:Array<{path:string;message:string}>){
@@ -96,19 +85,7 @@ export function compileSurveyFlow(input:unknown,units:readonly ResearchFrozenUni
       v.type==='NUMBER'?typeof v.value!=='number':typeof v.value!=='boolean')
       error(issues,'flow.embeddedData.'+i+'.value','嵌入变量的类型和值不匹配')
   })
-  if(flow.experiment){
-    strictKeys(flow.experiment.groups.map(g=>g.groupKey),'flow.experiment.groups',issues)
-    if(flow.experiment.linkedPolicy==='KEEP_LINKED'&&collectionMode!=='LINKED_WAVES')
-      error(issues,'flow.experiment.linkedPolicy','不关联匿名研究不能保持跨波次分组')
-    const sum=flow.experiment.groups.reduce((n,g)=>n+g.weight,0)
-    if(sum>800)error(issues,'flow.experiment.groups','实验随机权重总和超限')
-    if(flow.experiment.mode!=='QUESTIONNAIRE_VARIANTS'&&!flow.experiment.groups.every(g=>g.materialTitle.trim()&&g.materialBody.trim()))
-      error(issues,'flow.experiment.groups','各实验组必须提供完整展示材料')
-  }
-  flow.experiment?.groups.forEach((g,i)=>{
-    checkFlowText(g.materialTitle,staticVars,'flow.experiment.groups.'+i+'.materialTitle',issues)
-    checkFlowText(g.materialBody,staticVars,'flow.experiment.groups.'+i+'.materialBody',issues)
-  })
+  validateMaterialExperiment(flow.experiment,{linked:collectionMode==='LINKED_WAVES',staticVars},issues)
   validateFlowBlocks({blocks:flow.blocks,units,staticVars},issues)
   if(issues.length)throw new SurveyFlowError(issues)
   if(flow.experiment?.mode==='QUESTIONNAIRE_VARIANTS'){

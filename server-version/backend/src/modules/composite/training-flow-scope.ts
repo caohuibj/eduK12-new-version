@@ -1,3 +1,4 @@
+import { assertTrainingMaterialAssignment } from './training-material-allocation'
 import { createHash } from 'node:crypto'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
@@ -41,6 +42,8 @@ export async function resolveTrainingFlowScope(attempt:any, composite:any=attemp
   if(frozenSlots.snapshotHash!==attempt.frozenActiveSlotSetHash||frozenSlots.attemptEpoch!==attempt.attemptEpoch)fail()
   const snapshot=decryptUnifiedRuntimePayload<any>(attempt.trainingFlowSnapshotEncrypted)
   if(canonicalHash(snapshot)!==attempt.trainingFlowSnapshotHash||snapshot.compositeId!==composite.id||snapshot.publishedAt!==new Date(composite.publishedAt).toISOString()||snapshot.attemptId!==attempt.id||snapshot.attemptEpoch!==attempt.attemptEpoch||snapshot.flowDigest!==config.flowDigest||snapshot.slotSetHash!==frozenSlots.snapshotHash)fail()
+  const materialAssignment=config.schemaVersion===2?assertTrainingMaterialAssignment(snapshot.materialAssignment,config,attempt,composite):null
+  if(config.schemaVersion===2?snapshot.schemaVersion!==2:(config.schemaVersion!==1||snapshot.schemaVersion!==1||snapshot.materialAssignment!==undefined))fail()
   const unitSlots=new Map<string,string>()
   const itemKeys=new Map<string,string>(),sectionKeys=new Map<string,string>()
   for(const section of composite.formSections??[]){const key=trainingFlowUnitKey(section.id);unitSlots.set(key,formSectionSlotKey(section.id));sectionKeys.set(key,section.id)}
@@ -62,6 +65,7 @@ export async function resolveTrainingFlowScope(attempt:any, composite:any=attemp
   if((stored===null)!==(attempt.trainingFlowPathHash==null))fail()
   if(!stored&&(attempt.status==='COMPLETED'||snapshots.length>0)&&!options.allowAdvance)fail()
   if(stored&&(canonicalHash(stored)!==attempt.trainingFlowPathHash||stored.attemptId!==attempt.id||stored.attemptEpoch!==attempt.attemptEpoch||stored.compositeId!==composite.id||stored.configDigest!==config.flowDigest||stored.slotSetHash!==frozenSlots.snapshotHash||stored.contextSnapshotHash!==(attempt.contextSnapshotHash??null)||stored.publishedAt!==new Date(composite.publishedAt).toISOString()))fail()
+  if(stored&&(materialAssignment?stored.schemaVersion!==2||stored.assignmentHash!==materialAssignment.assignmentHash:stored.schemaVersion!==1||stored.assignmentHash!==undefined))fail()
   const compute=async()=>{
   const native=snapshots.filter(r=>r.payloadKind==='UNIT_RESULT')
   // The parent-owned, current-epoch snapshot source ID is checked again against
@@ -90,12 +94,13 @@ export async function resolveTrainingFlowScope(attempt:any, composite:any=attemp
       facts[key]={status:'ACCEPTED',acceptedHash:entry.envelope.resultHash,requirementSatisfied:valid,hasValidMeasurement:valid}
     }
   }
-  return scanTrainingFlow(config,units,facts)
+  return scanTrainingFlow(config,units,facts,materialAssignment??undefined)
   }
   let path:Awaited<ReturnType<typeof compute>>
   if(stored&&stored.snapshotHeadersDigest===snapshotHeadersDigest){
     path=stored.path
     const {pathDigest,...body}=path
+    if(materialAssignment&&(path.schemaVersion!==2||path.assignmentHash!==materialAssignment.assignmentHash||path.flowDigest!==config.flowDigest||path.unionDigest!==config.unionDigest))fail()
     if(canonicalHash(body)!==pathDigest||!Array.isArray(path.reachedInstrumentKeys)||!Array.isArray(path.acceptedInstrumentKeys)||!Array.isArray(path.skipped))fail()
   }else{
     if(stored&&!options.allowAdvance)fail()
@@ -112,12 +117,12 @@ export async function resolveTrainingFlowScope(attempt:any, composite:any=attemp
   const executedSlotKeys=new Set([...unitSlots].filter(([,slot])=>bySlot.has(slot)).map(([,slot])=>slot))
   const skippedSlotKeys=new Set(path.skipped.map((entry:any)=>unitSlots.get(entry.instrumentKey)!).filter(Boolean))
   const terminal=path.currentInstrumentKey==null&&path.taskSatisfaction!=='PENDING'
-  const evidence={schemaVersion:1,compositeId:composite.id,publishedAt:new Date(composite.publishedAt).toISOString(),attemptId:attempt.id,attemptEpoch:attempt.attemptEpoch,configDigest:config.flowDigest,slotSetHash:frozenSlots.snapshotHash,contextSnapshotHash:attempt.contextSnapshotHash??null,snapshotHeadersDigest,path}
+  const evidence={schemaVersion:config.schemaVersion,...(materialAssignment?{assignmentHash:materialAssignment.assignmentHash}:{}),compositeId:composite.id,publishedAt:new Date(composite.publishedAt).toISOString(),attemptId:attempt.id,attemptEpoch:attempt.attemptEpoch,configDigest:config.flowDigest,slotSetHash:frozenSlots.snapshotHash,contextSnapshotHash:attempt.contextSnapshotHash??null,snapshotHeadersDigest,path}
   const pathHash=canonicalHash(evidence)
   if(!options.allowAdvance&&attempt.trainingFlowPathHash!=null&&attempt.trainingFlowPathHash!==pathHash)fail()
-  return {config,path,pathHash,evidence,itemIds,sectionIds,reachedSlotKeys,executedSlotKeys,skippedSlotKeys,terminal,snapshots,frozenSlots,
+  return {config,materialAssignment,path,pathHash,evidence,itemIds,sectionIds,reachedSlotKeys,executedSlotKeys,skippedSlotKeys,terminal,snapshots,frozenSlots,
     aggregatePathPolicy:{kind:'TRAINING_FLOW_V1' as const,terminal,reachedSlotKeys:[...reachedSlotKeys],executedSlotKeys:[...executedSlotKeys]}}
 }
 
 /** Safe report provenance; never exposes future candidate identities or conditions. */
-export const trainingFlowProvenance=(flow:NonNullable<Awaited<ReturnType<typeof resolveTrainingFlowScope>>>)=>({schemaVersion:1,configDigest:flow.config.flowDigest,pathHash:flow.pathHash,termination:flow.path.termination,taskSatisfaction:flow.path.taskSatisfaction,executedUnitCount:flow.executedSlotKeys.size,skippedUnitCount:flow.skippedSlotKeys.size})
+export const trainingFlowProvenance=(flow:NonNullable<Awaited<ReturnType<typeof resolveTrainingFlowScope>>>)=>({schemaVersion:1,...(flow.materialAssignment?{materialAssignment:{assignmentHash:flow.materialAssignment.assignmentHash,configDigest:flow.materialAssignment.configDigest,groupKey:flow.materialAssignment.groupKey,materialDigest:flow.materialAssignment.materialDigest}}:{}),configDigest:flow.config.flowDigest,pathHash:flow.pathHash,termination:flow.path.termination,taskSatisfaction:flow.path.taskSatisfaction,executedUnitCount:flow.executedSlotKeys.size,skippedUnitCount:flow.skippedSlotKeys.size})

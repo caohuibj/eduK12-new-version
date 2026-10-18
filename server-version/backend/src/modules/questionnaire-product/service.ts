@@ -98,13 +98,15 @@ export async function updateTrainingVariants(actor: Actor, id: string, raw: unkn
 export async function updateTrainingFlow(actor: Actor, id: string, raw: unknown) {
   const input = trainingFlowSchema.parse(raw)
   return mutate(actor, id, input.revision, async (tx, row) => {
+    if(input.maxAttempts!==undefined&&input.config?.schemaVersion!==2)throw compositeBadRequest('作答预算仅随明确材料实验设置')
+    const candidate={...row,trainingFlowDraft:input.config,maxAttempts:input.maxAttempts??row.maxAttempts}
     if (input.config !== null) {
-      await assertTrainingFlowAuthoringScope(tx, row)
-      compileTrainingFlowDefinition(input.config, row)
+      await assertTrainingFlowAuthoringScope(tx, candidate)
+      compileTrainingFlowDefinition(input.config, candidate)
     }
     await tx.compositeAssessment.update({ where: { id }, data: {
       trainingFlowDraft: input.config === null ? Prisma.DbNull : input.config as Prisma.InputJsonValue,
-      trainingFlowFrozen: Prisma.DbNull, trainingFlowDigest: null,
+      trainingFlowFrozen: Prisma.DbNull, trainingFlowDigest: null, ...(input.maxAttempts!==undefined?{maxAttempts:input.maxAttempts}:{}),
     } })
   })
 }
@@ -481,7 +483,7 @@ export async function copy(actor: Actor, id: string, raw: unknown, options: { al
     const target = await tx.compositeAssessment.create({ data: {
       code: 'Q-' + randomUUID(), name: source.name + '（副本）', description: source.description, instruction: source.instruction,
       productKind: 'QUESTIONNAIRE', questionnaireType, createdBy: actor.userId, creationKey, creationHash,
-      ...(composite?.trainingVariantDraft != null ? { maxAttempts: composite.maxAttempts } : {}),
+      ...((composite?.trainingVariantDraft != null||(composite?.trainingFlowDraft as any)?.schemaVersion===2) ? { maxAttempts: composite.maxAttempts } : {}),
       trainingTimingPolicy:await timingPolicy(tx,{productKind:'QUESTIONNAIRE',questionnaireType,questionnaireCourses:sourceCourses.map(courseId=>({courseId})),publicEnabled:false},Boolean(composite?.trainingTimingPolicy)),
       questionnaireCourses: { create: sourceCourses.map(courseId => ({ courseId })) },
     } })

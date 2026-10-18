@@ -1,7 +1,8 @@
+import { assignedMaterial } from '../assessment-core/materials/definition'
 import { surveySjtQuestions } from './sjt-structure'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { evaluateFlowCondition,staticFlowValues,safeFlowText,
-  surveyAssignedFlowBlocks,surveyGroupHasMaterial,type SurveyVariantProvenance,
+  surveyAssignedFlowBlocks,type SurveyVariantProvenance,
   type FrozenSurveyFlow } from './flow.definition'
 import type { ResearchFrozenPublication,ResearchFrozenUnit } from './publication.service'
 import { assertSurveyFlowAssignment,type SurveyFlowAssignment } from './flow.assignment'
@@ -77,11 +78,10 @@ export function executeSurveyFlow(input:{
   let endBlockKey:string|null=null
   const group=flow.experiment?.groups.find(g=>g.groupKey===input.assignment.groupKey)
   if(flow.experiment&&!group)fail('flow.assignment','当前试验组不存在于冻结实验配置')
-  if(group&&surveyGroupHasMaterial(group)){
-    shown.push('assigned_material')
-    presentation.push({blockKey:'assigned_material',kind:'MATERIAL',
-      title:safeFlowText(group.materialTitle,flow),
-      body:safeFlowText(group.materialBody,flow)})
+  const material=assignedMaterial(flow.experiment,input.assignment.groupKey,source=>safeFlowText(source,flow))
+  if(material){
+    shown.push(material.blockKey)
+    presentation.push({...material,kind:'MATERIAL'})
   }
   const vars=staticFlowValues(flow)
   for(const block of surveyAssignedFlowBlocks(flow,input.assignment.groupKey)){
@@ -131,12 +131,10 @@ export function executeSurveyFlow(input:{
 }
 export const buildSurveyFlowPublicProjection=(flow:FrozenSurveyFlow,assignment:SurveyFlowAssignment)=>{
   assertSurveyFlowAssignment(flow,assignment)
-  const group=flow.experiment?.groups.find(g=>g.groupKey===assignment.groupKey)
+  const material=assignedMaterial(flow.experiment,assignment.groupKey,source=>safeFlowText(source,flow))
   return {
     schemaVersion:1 as const,flowDigest:flow.flowDigest,
-    ...(group&&surveyGroupHasMaterial(group)?{selectedMaterial:{blockKey:'assigned_material',
-      title:safeFlowText(group.materialTitle,flow),
-      body:safeFlowText(group.materialBody,flow)}}:{}),
+    ...(material?{selectedMaterial:material}:{}),
     embeddedData:flow.embeddedData.map(v=>({key:v.key,value:v.value,type:v.type})),
     blocks:surveyAssignedFlowBlocks(flow,assignment.groupKey).map(b=>({
       blockKey:b.blockKey,kind:b.kind,instrumentKey:b.instrumentKey,

@@ -14,7 +14,7 @@ function flowInput<T>(read: () => T): T {
   }
 }
 // Run the shared bounded shape parser before any recursive Zod traversal.
-export const trainingFlowSchema = z.object({ revision: z.number().int().nonnegative(),
+export const trainingFlowSchema = z.object({ revision: z.number().int().nonnegative(), maxAttempts:z.number().int().min(1).max(100).optional(),
   config: z.unknown().transform(value => value === null ? null : flowInput(() => parseTrainingFlowDraft(value))),
 }).strict()
 
@@ -29,6 +29,7 @@ export async function assertTrainingFlowAuthoringScope(tx: Prisma.TransactionCli
     || typeof row.createdBy !== 'string' || !row.createdBy) {
     throw compositeBadRequest('跨工具流程仅支持 Training 课程普通问卷，暂不能组合概率分卷、报告包、关系测评、匿名研究或其他投放策略')
   }
+  if((row.trainingFlowDraft?.schemaVersion===2||row.trainingFlowFrozen?.schemaVersion===2)&&(!Number.isInteger(row.maxAttempts)||row.maxAttempts<1||row.maxAttempts>100))throw compositeBadRequest('材料实验必须明确设置1–100次作答预算')
   const ids = (row.questionnaireCourses ?? []).map((entry: any) => entry.courseId)
   if (!ids.length || ids.length > 100 || ids.some((id: unknown) => typeof id !== 'string' || !id) || new Set(ids).size !== ids.length) {
     throw compositeBadRequest('跨工具流程必须明确绑定真实 Training 投放课程')

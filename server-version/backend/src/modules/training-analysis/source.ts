@@ -299,6 +299,7 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
   for (const {wave, attempt, scope, slots} of selected) {
     const participant = identities.get(attempt.id)!, attemptObservations: TrainingNumericObservationV1[] = []
     const sourceHashes: Record<string, string> = {participant: hash(participant), parent: hash(parentIdentity(attempt)), publication: hash({taskId: wave.taskId, publication: wave.publication, configDigest: wave.configDigest, variantKey: wave.variantKey})}
+    if(scope.flow?.materialAssignment){sourceHashes.materialAssignment=scope.flow.materialAssignment.assignmentHash;sourceHashes.materialConfig=scope.flow.config.flowDigest;sourceHashes.materialPath=scope.flow.pathHash}
     const isFinal = finalSet.has(attempt), facts = isFinal ? factsFor(attempt) : null
     for (const metric of wave.metrics) {
       const item = scope.items.find(candidate => candidate.id === metric.itemId)

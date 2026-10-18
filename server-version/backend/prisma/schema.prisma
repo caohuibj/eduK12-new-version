@@ -3785,3 +3785,59 @@ model TrainingAnalysisQualityAudit {
   @@index([courseId, attemptId])
   @@map("training_analysis_quality_audit")
 }
+
+// C20 durable material-only assignment receipts. Existing attempt ciphertext is
+// the envelope carrier; historical attempts and flow hashes are not rewritten.
+model TrainingMaterialExperiment {
+  id            String @id @default(uuid())
+  ownerId       String @map("owner_id")
+  courseId      String @map("course_id")
+  experimentKey String @map("experiment_key")
+  groupKeysHash String @map("group_keys_hash")
+
+  @@unique([ownerId, courseId, experimentKey], map: "training_material_experiment_scope_key")
+  @@map("training_material_experiments")
+}
+
+model TrainingMaterialSubjectBinding {
+  id             String @id @default(uuid())
+  experimentId   String @map("experiment_id")
+  participantKey String @map("participant_key")
+  groupKey       String @map("group_key")
+  initialClaimId String @map("initial_claim_id")
+
+  @@unique([experimentId, participantKey], map: "training_material_binding_subject_key")
+  @@map("training_material_subject_bindings")
+}
+
+model TrainingMaterialQuotaBucket {
+  id             String @id @default(uuid())
+  compositeId    String @map("composite_id")
+  publicationKey String @map("publication_key")
+  configDigest   String @map("config_digest")
+  groupKey       String @map("group_key")
+  maxAssigned    Int @map("max_assigned")
+  assignedCount  Int @default(0) @map("assigned_count")
+
+  @@unique([compositeId, publicationKey, configDigest, groupKey], map: "training_material_quota_scope_key")
+  @@map("training_material_quota_buckets")
+}
+
+model TrainingMaterialAllocationClaim {
+  id                   String @id @default(uuid())
+  experimentId         String @map("experiment_id")
+  compositeId          String @map("composite_id")
+  publicationKey       String @map("publication_key")
+  configDigest         String @map("config_digest")
+  participantKey       String @map("participant_key")
+  groupKey             String @map("group_key")
+  algorithm            String
+  inheritedFromClaimId String? @map("inherited_from_claim_id")
+  initialAttemptId     String @unique(map: "training_material_claim_attempt_key") @map("initial_attempt_id")
+  materialDigest       String @map("material_digest")
+  createdAt            DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([experimentId, participantKey], map: "training_material_claim_subject_idx")
+  @@index([compositeId, publicationKey, configDigest, groupKey], map: "training_material_claim_quota_idx")
+  @@map("training_material_allocation_claims")
+}
