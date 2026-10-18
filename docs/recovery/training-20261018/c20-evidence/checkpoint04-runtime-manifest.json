@@ -1,0 +1,40 @@
+{
+  "qualification": "state03 anonymous/linked accepted; race partial last-quota and double-restart accepted; later null token expiry fixture failed; other phases not run",
+  "members": {
+    "eduk12_c20_http_03/c20-anonymous-result.json": {
+      "sha256": "a84589ac10868bbc959034afdb5e8f4da93b29747791d040d283ef4d2b889257",
+      "size": 39884,
+      "gzipSha256": "a8fdd06897be047c01f8f13cb80310f0e9b7094a453187423f4d760cbb31d375",
+      "gzipSize": 3935
+    },
+    "eduk12_c20_http_03/c20-linked-result.json": {
+      "sha256": "e22b260206ab0216f7eb88181531ae537cab1bd4ed2b521c8f32f9db658dd4a7",
+      "size": 21942,
+      "gzipSha256": "43f6f29d4e5042583a29efe01ffad8e44fe3ca8134cd3fcd87b104b56f7ffdf2",
+      "gzipSize": 2569
+    },
+    "eduk12_c20_http_03/c20-race-result.json": {
+      "sha256": "f77ff1916c4ed6e039a3699efc002bee71ca3e842c62e33e3f9ce1e68d546678",
+      "size": 11801,
+      "gzipSha256": "4134743821e90867f64956726391ff6233d50b646b818fff6a680c3da590323e",
+      "gzipSize": 1526
+    },
+    "eduk12_c20_http_03/c20-runtime-result.json": {
+      "sha256": "30c286a84a9e40e9aa29a3707c29b77729f058a2286ef71b2725b8e048cc994f",
+      "size": 126623,
+      "gzipSha256": "0aca3d4770c1cd5d46db989ab2f7165b0d686ed4a1ab223208c19e89805ab5c9",
+      "gzipSize": 15109
+    },
+    "eduk12_c20_http_03/frozen-inputs.json": {
+      "sha256": "08affb29c0c94c6e3176e7a5a26b4e487b3e6e5fed8c68cf7c67f98304487153",
+      "size": 358836,
+      "gzipSha256": "0652a4681dbb4ff12841d91cf299be1de5928f504476b49dcae1ca5c393d2cec",
+      "gzipSize": 86742
+    }
+  },
+  "archive": {
+    "name": "checkpoint04-runtime-partial.tar.gz",
+    "sha256": "5a9d1c6bd2350e030a0e4d29730b329a679b6656ba591ddd0065437d6e187698",
+    "size": 108777
+  }
+}

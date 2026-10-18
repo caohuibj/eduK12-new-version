@@ -52,3 +52,7 @@ state02为准确续验，绑定state01 receipt、失败result、私有fixture和
 后续launcher增加phaseProducers保留实际argv/脚本SHA/冻结输入/父receipt。state02历史main只能按明确continuation+唯一新phase导入，历史argv=null；upgrade明确为已验证receipt引用。旧结果及旧phasehash原样不回写。独立两review均对业务源码限定GO；动态匿名/KEEP/竞态/故障/消费者/恢复仍待。
 
 成本脚本冻结为固定51主体、a50/b1、两publication102parents/204FINAL，按a层10/20/50与真实导出总n+b分别测。另以固定anchor比较同task1/2目标组，API最少2waves；FULL_CASE互斥组空匹配不能解释为优化收益。同task不同group每wave仍重复graph是有界P3，记录SQL/返回行/解密量，不宣称跨组一次load或C26容量资格。
+
+state03（失败aggregate保留）：匿名V2四first-native恢复/restart/旧能力撤销、KEEP跨发布/满组拒绝/跨scope/maxAttempts通过。race首两项最后1配额与同attempt双restart各观察两个真实PGwaiter，均无部分残留；随后null fixture token的Date.now+1h晚于product的先前+1h而被400正确拒，非业务放宽。续验仅修稳定有界expiry，补未完null锁序及此前缺失的null/V1完整凭证轮换、跨两publication KEEP首binding advisory竞争。
+
+新增显式continuation-phase可与all共用，严格绑定失败phase/旧receipt/已过子项，逐phase记录实际producer；旧state02无phase仍唯一new-main规则。显式续验自身若失败，保留failed结果SHA且仅验证导入，绝不列accepted。静态receipt校验目前15项通过仅有工具transcript，未冒原生保存日志；新V1官方schema/有界token准备检查同样不计动态功能。下一state04尚待运行。

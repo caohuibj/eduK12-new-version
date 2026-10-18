@@ -42,13 +42,17 @@ def main():
     parser.add_argument('--from-state', type=Path, help='Read-only stopped C20 state with complete matching earlier phases')
     parser.add_argument('--continuation-script', help='Reviewed c20-*.mjs phase continuation, never automatic replay')
     parser.add_argument('--continuation-sha256')
+    parser.add_argument('--continuation-phase', choices=[p for p in PHASES if p not in ['upgrade','restore']], help='Explicit failed phase filled before proceeding with remaining requested phases')
     parser.add_argument('--expected-prior-runtime-sha256')
     args = parser.parse_args()
     if args.from_state:
         assert args.expected_prior_runtime_sha256, 'all from-state imports require exact prior receipt SHA'
         assert sha_file(args.from_state/'c20-runtime-result.json') == args.expected_prior_runtime_sha256
+    continuation_phase=args.continuation_phase or args.phase
+    if args.continuation_phase: assert args.continuation_script
     if args.continuation_script:
-        assert args.from_state and args.phase not in ['all','upgrade','restore']
+        assert args.from_state and continuation_phase not in ['all','upgrade','restore']
+        assert args.phase=='all' or PHASES.index(continuation_phase)<=PHASES.index(args.phase)
         assert re.fullmatch(r'c20-[a-z0-9-]+[.]mjs',args.continuation_script)
         assert sha_file(BASE/args.continuation_script)==args.continuation_sha256
         assert sha_file(args.from_state/'c20-runtime-result.json')==args.expected_prior_runtime_sha256
@@ -88,6 +92,12 @@ def main():
         assert all(prior_result.get(k) is True for k in ['cleanupVerified','sourceUnchanged','inputsUnchanged'])
         assert prior_result.get('priorSourceUnchanged',True)
         assert prior_result['pinnedC19DumpSha256'] == m.PINNED_DUMP_SHA256
+        if args.continuation_script:
+            failed_path=prior/f'c20-{continuation_phase}-result.json'
+            assert failed_path.is_file(), 'explicit continuation phase has no failed result'
+            failed_receipt=json.loads(failed_path.read_text())
+            assert failed_receipt.get('phase')==continuation_phase and failed_receipt.get('passed') is False
+            assert not prior_result['phases'].get(continuation_phase,{}).get('passed'), 'cannot relabel an accepted phase as failed'
     copy_source = prior or source
     source_runtime = json.loads((copy_source/'runtime-private.json').read_text())
     copy_status = json.loads((copy_source/'status.json').read_text())
@@ -191,14 +201,14 @@ def main():
                     result['phaseProducers'][phase]=prior_producers[phase]
                 elif (prior/f'c20-{phase}-result.json').exists():
                     failed=json.loads((prior/f'c20-{phase}-result.json').read_text())
-                    assert not failed.get('checks') or (args.continuation_script and phase==args.phase), 'partial successful phase needs exact reviewed continuation, never rerun'
+                    assert not failed.get('checks') or (args.continuation_script and phase==continuation_phase), 'partial successful phase needs exact reviewed continuation, never rerun'
             assert any(p not in result['reusedPhases'] for p in requested)
             for file in prior.glob('c20-*.json'):
                 if file.name not in ['c20-runtime-result.json'] and ('private' in file.name or any(file.name.startswith(f'c20-{phase}-') for phase in result['reusedPhases'])): shutil.copy2(file,state/file.name)
             for journal in prior.glob('c20-*-private.jsonl'): shutil.copy2(journal,state/journal.name)
             if args.continuation_script:
-                failed=prior/f'c20-{args.phase}-result.json'
-                assert failed.is_file();shutil.copy2(failed,state/f'c20-prior-{args.phase}-failed-result.json')
+                failed=prior/f'c20-{continuation_phase}-result.json'
+                assert failed.is_file();shutil.copy2(failed,state/f'c20-prior-{continuation_phase}-failed-result.json')
         for directory in ['pgdata','uploads','exports']:
             before=manifest(copy_source/directory); shutil.copytree(copy_source/directory,state/directory,copy_function=shutil.copy2)
             assert manifest(state/directory)==before; guard()
@@ -226,13 +236,14 @@ def main():
             checkpoint=prior/'c20-final-db-snapshot.json' if args.continuation_script else prior/f'c20-{latest}-post-state.json'
             assert db.snapshot()==json.loads(checkpoint.read_text()), 'prior clone differs from frozen stopped checkpoint'
             if args.continuation_script:
-                assert all(p in result['reusedPhases'] for p in requested if p!=args.phase), 'continuation only fills one missing phase'
-                result['continuation']={'file':args.continuation_script,'sha256':args.continuation_sha256,'priorRuntimeSha256':args.expected_prior_runtime_sha256}
+                assert continuation_phase not in result['reusedPhases'], 'cannot continue an already accepted phase'
+                assert all(p in result['reusedPhases'] for p in requested if PHASES.index(p)<PHASES.index(continuation_phase)), 'continuation requires accepted predecessor phases'
+                result['continuation']={'phase':continuation_phase,'file':args.continuation_script,'sha256':args.continuation_sha256,'priorRuntimeSha256':args.expected_prior_runtime_sha256,'priorFailedResultSha256':sha_file(prior/f'c20-{continuation_phase}-result.json')}
         http_started=False
         for phase in requested:
             if phase in result['reusedPhases']: continue
             verify()
-            producer_file = args.continuation_script if args.continuation_script and phase==args.phase else f'c20-materials-{phase}.' + ('py' if phase in ['upgrade','restore'] else 'mjs')
+            producer_file = args.continuation_script if args.continuation_script and phase==continuation_phase else f'c20-materials-{phase}.' + ('py' if phase in ['upgrade','restore'] else 'mjs')
             producer_argv = ['python3',BASE/producer_file,'--tools',tools,'--state',state] if phase in ['upgrade','restore'] else [node,'--require',BASE/'loopback-only.cjs',BASE/producer_file,state]
             if phase in ['upgrade','restore']:
                 status['state']='upgrading' if phase=='upgrade' else 'restoring'; record()
@@ -289,6 +300,11 @@ def main():
         isolation=all(result.get(k) is True for k in ['cleanupVerified','sourceUnchanged','inputsUnchanged']) and result.get('priorSourceUnchanged',True)
         result['passed']=result['passed'] and isolation
         status.update(state='stopped',cleanupVerified=result['cleanupVerified'],cleanupErrors=cleanup,endedAt=time.time()); record()
+        result['failedPhaseResultsSha256']={}
+        for phase in requested:
+            failed_file=state/f'c20-{phase}-result.json'
+            if failed_file.is_file() and json.loads(failed_file.read_text()).get('passed') is False:
+                result['failedPhaseResultsSha256'][phase]=sha_file(failed_file)
         (state/'c20-runtime-result.json').write_text(json.dumps(result,indent=2))
         print(json.dumps({k:result[k] for k in ['passed','cleanupVerified','sourceUnchanged','inputsUnchanged']}),flush=True); lock.close()
         if not isolation: raise RuntimeError('C20 isolation/cleanup/input validation failed')

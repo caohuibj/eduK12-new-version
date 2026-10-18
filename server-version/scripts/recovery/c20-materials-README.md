@@ -161,9 +161,43 @@ phase hashes remain unchanged. This permits continuation provenance to survive
 subsequent `all` reuse without claiming that the nominal main script ran.
 
 `python3 server-version/scripts/recovery/c20-materials-receipts-check.py` performs
-seven pure temporary-file checks, including absent continuation markers, wrong
+fifteen pure temporary-file checks, including absent continuation markers, wrong
 producer hashes, multiple newly executed phases, exact-receipt mismatch, and
 second-generation preservation. These checks are preparation evidence only.
 The receipt helper is included in launcher frozen inputs, not the per-phase
 business input set, so this provenance-only patch does not invalidate prior
 upgrade/main execution hashes.
+
+## State03 exact race continuation and remaining phases
+
+Use `--phase all --continuation-phase race` with the reviewed
+`c20-materials-race-continuation.mjs`, its exact SHA, and state03 exact receipt
+`30c286a84a9e40e9aa29a3707c29b77729f058a2286ef71b2725b8e048cc994f`.
+The earlier accepted phases are reused. The failed race result is retained, and
+its successful last-quota/double-restart checks are referenced without replay.
+Only the explicit race phase runs the continuation; later phases run their own
+recorded producers in the same clone. New receipts identify continuation.phase;
+legacy state02 without that field still requires exactly one newly run phase.
+
+The continuation reuses state03's exact null-flow publication, validates zero
+parents/tokens before proceeding, and bounds token expiry below its stored
+expiry. It adds null/V1 stable-participant and rotated-credential checks, real
+old Form submission rejection and replacement submission success (two new
+FINALs with original outboxes processed). No nonexistent Form GET is used as
+a revocation probe: the parent-state endpoint is its definition-read boundary.
+It also creates two no-quota KEEP_LINKED publications, seeds the experiment with
+a distinct real participant, then observes two PostgreSQL waiters on the exact
+new target subject advisory lock. Expected results are one random assignment,
+one inherited assignment, one binding and two claims for that target.
+
+`c20-materials-race-precheck.mjs` checks the actual new V1 configuration through
+the official pure schemas, the actual token helper at three valid time bounds,
+and two invalid time inputs. This is preparation evidence, not runtime proof.
+The existing branches producer now bounds its token below the reused main
+publication's stored expiry as well. Previously accepted anonymous inputs stay
+frozen; their token cases already passed.
+
+A failed explicit continuation remains recoverable: its retained failed result
+file is SHA-bound in the runtime receipt and must identify the same target and
+prior producer. Import validates that evidence while importing only previously
+accepted phases; it never marks the failed continuation as accepted or reused.

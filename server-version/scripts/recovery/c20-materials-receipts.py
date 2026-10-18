@@ -40,11 +40,30 @@ def import_receipt(state, expected_sha):
     if markers:
         assert continuation, 'continuation result is missing producer marker'
     if continuation:
-        assert len(new) == 1, 'legacy continuation must identify exactly one newly executed phase'
-        phase = next(iter(new))
-        assert markers == {phase}, 'continuation phase result marker missing'
+        if continuation.get('phase'):
+            phase = continuation['phase']
+            assert phase not in reused, 'explicit continuation target is falsely reused'
+            if phase not in new:
+                failed_path = state / f'c20-{phase}-result.json'
+                assert failed_path.is_file(), 'explicit failed continuation result missing'
+                failed = json.loads(failed_path.read_text())
+                assert failed.get('phase') == phase and failed.get('passed') is False
+                assert receipt.get('failedPhaseResultsSha256', {}).get(phase) == sha_file(failed_path), 'failed continuation result hash mismatch'
+                assert failed.get('priorProducer', {}).get('continuation'), 'failed continuation producer marker missing'
+                assert not markers, 'unexpected second continuation marker'
+                target_result = failed
+            else:
+                target_result = phases[phase]
+        else:
+            assert len(new) == 1, 'legacy continuation must identify exactly one newly executed phase'
+            phase = next(iter(new))
+            target_result = phases[phase]
+        assert markers == ({phase} if phase in new else set()), 'continuation phase result marker missing'
         assert source_sha(frozen, continuation['file']) == continuation['sha256'], 'continuation SHA differs from frozen inputs'
-        assert phases[phase]['priorProducer']['runtimeSha256'] == continuation['priorRuntimeSha256']
+        assert target_result['priorProducer']['runtimeSha256'] == continuation['priorRuntimeSha256']
+        if continuation.get('phase'):
+            assert target_result['priorProducer']['resultSha256'] == continuation['priorFailedResultSha256']
+            assert receipt.get('acceptedPriorRuntimeSha256') == continuation['priorRuntimeSha256']
     records = {}
     for phase, value in phases.items():
         if value.get('passed') is not True:
@@ -63,7 +82,7 @@ def import_receipt(state, expected_sha):
             record = {'schemaVersion': 1, 'nominalPhaseInputHash': receipt['phaseInputHashes'][phase],
                       'phaseResultSha256': digest(value), 'sourceInputsSha256': frozen['sourceInputsSha256'],
                       'evidenceReceiptSha256': receipt_sha, 'evidenceFrozenInputsSha256': sha_file(state / 'frozen-inputs.json')}
-            if continuation and phase in new:
+            if continuation and phase in markers:
                 record.update(qualification='LEGACY_EXPLICIT_CONTINUATION', file=continuation['file'], sha256=continuation['sha256'],
                               continuation=copy.deepcopy(continuation), argv=None,
                               evidence='Unique newly executed phase plus explicit top-level continuation and frozen source entry; historical argv was not recorded.')

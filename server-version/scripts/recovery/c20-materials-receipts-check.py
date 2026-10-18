@@ -54,6 +54,30 @@ def main():
         checks.append('second import preserves actual legacy producer and receipt chain')
         bad = copy.deepcopy(second); bad['phaseProducers']['main']['phaseResultSha256'] = '7' * 64
         rejects('mapped phase result mismatch rejected', bad)
+        explicit = copy.deepcopy(receipt)
+        explicit['continuation'].update(phase='main', priorFailedResultSha256='8' * 64)
+        explicit['acceptedPriorRuntimeSha256'] = old
+        explicit['phases']['main']['priorProducer']['resultSha256'] = '8' * 64
+        explicit['phases']['later'] = {'passed': True}
+        frozen['phaseInputHashes']['later'] = '9' * 64
+        explicit['phaseInputHashes'] = copy.deepcopy(frozen['phaseInputHashes'])
+        m.import_receipt(root, write(explicit))
+        checks.append('explicit target permits later newly executed phases')
+        bad = copy.deepcopy(explicit); bad['continuation']['phase'] = 'later'; rejects('wrong explicit continuation phase rejected', bad)
+        bad = copy.deepcopy(explicit); bad['reusedPhases'].append('main'); rejects('falsely reused continuation target rejected', bad)
+        bad = copy.deepcopy(explicit); del bad['acceptedPriorRuntimeSha256']; rejects('missing predecessor receipt rejected', bad)
+        bad = copy.deepcopy(explicit); bad['acceptedPriorRuntimeSha256'] = '0' * 64; rejects('mismatched predecessor receipt rejected', bad)
+        bad = copy.deepcopy(explicit); bad['continuation']['priorFailedResultSha256'] = '0' * 64; rejects('mismatched failed phase receipt rejected', bad)
+        partial = copy.deepcopy(explicit)
+        failed = partial['phases'].pop('main'); failed.update(phase='main', passed=False)
+        del partial['phases']['later']
+        (root / 'c20-main-result.json').write_text(json.dumps(failed))
+        partial['failedPhaseResultsSha256'] = {'main': m.sha_file(root / 'c20-main-result.json')}
+        _, accepted = m.import_receipt(root, write(partial))
+        assert set(accepted) == {'upgrade'}
+        checks.append('failed explicit continuation imports only previously accepted phases')
+        bad = copy.deepcopy(partial); bad['failedPhaseResultsSha256']['main'] = '0' * 64
+        rejects('failed continuation file hash mismatch rejected', bad)
     print(json.dumps({'passed': True, 'scope': 'STATIC_RECEIPT_VALIDATION_ONLY', 'checks': checks}, indent=2))
 
 if __name__ == '__main__': main()

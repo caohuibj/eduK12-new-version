@@ -35,7 +35,7 @@ try{
  legacy=await teacher.request(`${products}/${legacy.id}/items`,'POST',{revision:legacy.revision,item:form('route')})
  const flight=await teacher.request(`${products}/${legacy.id}/preflight`,'POST',{revision:legacy.revision});assert.equal(flight.ok,true)
  legacy=await teacher.request(`${products}/${legacy.id}/publish`,'POST',{revision:legacy.revision});assert.equal(legacy.trainingFlowFrozen,null)
- const lt=await teacher.request(`${prefix}/${legacy.id}/public-tokens`,'POST',{expiresAt:expiry(),maxUses:2}),lc=h.client(),newcomer=h.client();await lc.request('/auth/csrf');await newcomer.request('/auth/csrf')
+ const lt=await teacher.request(`${prefix}/${legacy.id}/public-tokens`,'POST',{expiresAt:new Date(Math.min(Date.now()+1800000,new Date(legacy.expiresAt).getTime()-1000)).toISOString(),maxUses:2}),lc=h.client(),newcomer=h.client();await lc.request('/auth/csrf');await newcomer.request('/auth/csrf')
  const original=await lc.request(`${pub}/${lt.token}/start`,'POST',{});lc.recovery=original.recoveryToken
  const joint=await collide(legacy.id,[()=>lc.request(`${pub}/attempts/${original.attempt.id}/restart`,'POST',{}),()=>newcomer.request(`${pub}/${lt.token}/start`,'POST',{})],'legacy_start_restart')
  assert.ok(joint.every(r=>r.attempt));assert.equal(await prisma.compositeAssessmentAttempt.count({where:{compositeAssessmentId:legacy.id}}),3)

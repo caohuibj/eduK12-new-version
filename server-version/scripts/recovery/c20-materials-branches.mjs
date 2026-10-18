@@ -39,7 +39,8 @@ try{
   h.check(`${mode}: accepted typed FINAL drives ${termination}/${satisfaction}; real student list consumes satisfaction, skipped native facts/scores/quota stay absent`)
  }
  // Real anonymous admission/recovery, separate from unsupported anonymousStudy.
- const token=await teacher.request(`${prefix}/${product.id}/public-tokens`,'POST',{expiresAt:new Date(Date.now()+1800000).toISOString(),maxUses:1})
+ const tokenExpiresAt=new Date(Math.min(Date.now()+1800000,new Date(product.expiresAt).getTime()-1000)).toISOString();assert.ok(Date.parse(tokenExpiresAt)>Date.now()&&Date.parse(tokenExpiresAt)<Date.parse(product.expiresAt))
+ const token=await teacher.request(`${prefix}/${product.id}/public-tokens`,'POST',{expiresAt:tokenExpiresAt,maxUses:1})
  const anonymous=h.client();await anonymous.request('/auth/csrf')
  const info=await anonymous.request(`${pub}/${token.token}`);assert.deepEqual(info.items,[]);assert.deepEqual(info.units,[]);assert.deepEqual(info.formSections,[])
  let started=await anonymous.request(`${pub}/${token.token}/start`,'POST',{});anonymous.recovery=started.recoveryToken
