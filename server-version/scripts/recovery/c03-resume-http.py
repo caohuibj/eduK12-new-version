@@ -4,7 +4,7 @@ Retains failed evidence and does not repeat a qualified migration/restore check.
 """
 import argparse, hashlib, json, os, signal, socket, subprocess, time, urllib.parse
 from pathlib import Path
-p=argparse.ArgumentParser();p.add_argument('--tools',type=Path,required=True);p.add_argument('--state',type=Path,required=True);p.add_argument('--phase',choices=['full','export-whole'],default='full');a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--tools',type=Path,required=True);p.add_argument('--state',type=Path,required=True);p.add_argument('--phase',choices=['full','export-whole','diagnose'],default='full');a=p.parse_args()
 state=a.state.resolve();backend=Path(__file__).resolve().parents[2]/'backend';node=a.tools.resolve()/'node_modules/node/bin/node'
 prior=json.loads((state/'c03-upgrade-result.json').read_text())
 assert prior.get('historicalProjectionSha256') and all(x['stopped'] for x in prior['cleanup']), 'require completed isolated upgrade and shutdown'
@@ -38,10 +38,10 @@ try:
  result['runtimeFingerprint']=fingerprint()
  result['head']=subprocess.check_output(['git','rev-parse','HEAD'],cwd=backend,text=True).strip()
  script=Path(__file__).with_name('c03-typed-smoke.mjs');result['harnessSha256']=hashlib.sha256(script.read_bytes()).hexdigest()
- pg=start([a.tools/'postgresql/bin/postgres','-D',state/'pgdata','-h','127.0.0.1','-p',dbport,'-k','','-c','shared_buffers=128MB','-c','max_connections=40'],'postgres');waitport(dbport,pg)
+ pg=start([a.tools/'postgresql/bin/postgres','-D',state/'pgdata','-h','127.0.0.1','-p',dbport,'-k','','-c','timezone=UTC','-c','shared_buffers=128MB','-c','max_connections=40'],'postgres');waitport(dbport,pg)
  redis=start([a.tools/'redis/bin/redis-server','--bind','127.0.0.1','--port',redisport,'--dir',runstate,'--save','','--appendonly','no','--maxmemory','128mb','--maxmemory-policy','noeviction'],'redis');waitport(redisport,redis)
  api=start([node,'--require',Path(__file__).with_name('loopback-only.cjs'),'dist/index.js'],'api',runtime);waitport(apiport,api)
- worker=start([node,'dist/workers/main.js'],'report-worker',runtime)
+ if a.phase != 'diagnose': worker=start([node,'dist/workers/main.js'],'report-worker',runtime)
  with (runstate/'typed-http.log').open('w') as f:subprocess.run([str(node),str(script),str(runstate)],cwd=backend,env={**env,**runtime,'C03_PHASE':a.phase},stdout=f,stderr=f,check=True,timeout=240)
  assert fingerprint()==result['runtimeFingerprint'] and hashlib.sha256(script.read_bytes()).hexdigest()==result['harnessSha256'],'inputs changed during check'
  result['http']=json.loads((runstate/'typed-http-result.json').read_text());result['passed']=result['http']['passed']

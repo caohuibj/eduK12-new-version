@@ -14,7 +14,7 @@
 
 ## 当前接续点
 
-C01 合同与恢复盘点完成；C02 已在当前助手节点完成基础运行、Form 最小闭环及四工具编制/准入基线，见 [current-node.md](current-node.md)；C03 typed Form 内核已备份，真实链路验证继续中，见 [c03-form-facts.md](c03-form-facts.md)，C04–C26 尚未验收。源码已有能力见 [source-gaps.md](source-gaps.md)，逐项合同见 [acceptance.md](acceptance.md)。`environment.md` 仅为先前已停止环境的历史记录，当前运行以 current-node 为准。状态随实际结果更新，备份 commit 不能被表述为功能验收成功。
+C01 合同与恢复盘点完成；C02 已在当前助手节点完成基础运行、Form 最小闭环及四工具编制/准入基线，见 [current-node.md](current-node.md)；C03 typed Form 内核及隔离 UTC 真实链路基础验证完成（不含编制/UI/导出/性能验收），见 [c03-form-facts.md](c03-form-facts.md)，C04–C26 尚未验收。源码已有能力见 [source-gaps.md](source-gaps.md)，逐项合同见 [acceptance.md](acceptance.md)。`environment.md` 仅为先前已停止环境的历史记录，当前运行以 current-node 为准。状态随实际结果更新，备份 commit 不能被表述为功能验收成功。
 
 目录再次丢失时，按 [从 GitHub 最新 commit 恢复](restore-from-github.md) 接续；必须读取恢复分支实时 head，而非仅恢复 main。源码备份不包含私有运行密钥、数据库或未推送改动。
 

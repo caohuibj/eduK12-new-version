@@ -1,0 +1,83 @@
+{
+  "scope": "C03 foundation; isolated synthetic PG16/Redis7; UTC HTTP runtime",
+  "sourceCommit": "50c0bc2a3103ddbf432cea3e9cad17a880097a0e",
+  "migration": {
+    "passed": true,
+    "from": 166,
+    "to": 167,
+    "oldTables": 203,
+    "sourceDumpSha256": "54fb653f5e9471cf49a612c5094b395a57a3af294223006b1b4a6a25d4a09c96",
+    "historicalProjectionSha256": "195c4f36e569fd7691286718109641b0b311c90b34ae1da9eb0c64a1b7dedb05",
+    "checks": [
+      "166→167: all 203 pre-existing table projections unchanged; new column all NULL"
+    ],
+    "initialCombinedRunPassed": false,
+    "initialHttpFailure": "fixture grouped into separate sections; migration comparison completed before failure"
+  },
+  "http": {
+    "passed": true,
+    "reusedUpgradeEvidence": "19746fa67d71ced645132b7fbfc69fcb0f0e9f7fd0a9002f5792a55618c04f91",
+    "phase": "full",
+    "runtimeFingerprint": {
+      "schemaVersion": 1,
+      "nodeVersion": "v24.21.0",
+      "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+      "dist": {
+        "files": 4949,
+        "sha256": "ea24700ab6b5d57046ec5e999c1fff4229594938b2b6102cd7edb257c104ef46"
+      },
+      "files": {
+        "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+        "prisma/schema.prisma": "f4024a069e078f2d03ce09a30a89c2311d454e1de6be32282d4cd2e29aec6f6f",
+        "node_modules/.prisma/client/schema.prisma": "881fa942b6757ebf3cf0f4b1c01274b240994e46b8c242b0320e813aeb46f10b",
+        "node_modules/.prisma/client/index.js": "303fdb6261f36808ab45038e8b962376db7d85259d46d803ca1b142daa94563e"
+      },
+      "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+    },
+    "head": "50c0bc2a3103ddbf432cea3e9cad17a880097a0e",
+    "harnessSha256": "d7fd9c8d22c54dc6de9d27ae098cb095fd8c76c0d620708961bc683f0d4ae69c",
+    "http": {
+      "passed": true,
+      "phase": "full",
+      "requests": 42,
+      "checks": [
+        "historical frozen hash, V1 snapshot and teacher report readable after 167",
+        "typed DRAFT publication, frozen admission and copy preserves definition with new DB IDs",
+        "duplicate IDs, string-coerced number, hidden matrix row and injected field rejected before snapshot",
+        "real PG typed V2 number/object/null snapshot and idempotent HTTP FINAL replay",
+        "teacher report and explicit rebuild read canonical typed facts, never String shadows",
+        "typed export preview/SAV registration explicitly rejected; student teacher-report route denied",
+        "real whole Scale receipt/worker FINAL preserves typed and legacy fields in one V2 section and report"
+      ]
+    },
+    "cleanup": [
+      {
+        "service": "report-worker",
+        "stopped": true
+      },
+      {
+        "service": "api",
+        "stopped": true
+      },
+      {
+        "service": "redis",
+        "stopped": true
+      },
+      {
+        "service": "postgres",
+        "stopped": true
+      }
+    ]
+  },
+  "limits": [
+    "Public authoring/new UI not opened; no browser qualification",
+    "Typed exports intentionally return 400 until C07",
+    "Whole raw Date/TIMESTAMP requires UTC session; Asia/Tokyo reproduction failed acceptedAt identity; pre-existing robustness issue retained"
+  ],
+  "sourceBinding": {
+    "localSourceCommit": "50c0bc2a3103ddbf432cea3e9cad17a880097a0e",
+    "remoteEquivalentBusinessCommit": "04e23a85c3cff45bf3f16fabdc8c613fea39cdf5",
+    "backendTree": "9c0611ce87706cfe958adc77db941f26130776ca",
+    "note": "Connector commit metadata and root recovery documents differ; backend source tree is identical to tested 50c0bc2a."
+  }
+}

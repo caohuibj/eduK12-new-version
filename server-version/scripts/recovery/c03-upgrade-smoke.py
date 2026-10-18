@@ -51,7 +51,7 @@ try:
     owner, runtimepass = secrets.token_hex(24), secrets.token_hex(24)
     (state/'pg-password').write_text(owner)
     run([pg/'initdb','-D',state/'pgdata','-U','eduk12_owner','--auth-local=trust','--auth-host=scram-sha-256',f'--pwfile={state / "pg-password"}','--encoding=UTF8','--locale=C.UTF-8'],'initdb')
-    db=start([pg/'postgres','-D',state/'pgdata','-h','127.0.0.1','-p',dbport,'-k','', '-c','shared_buffers=128MB','-c','max_connections=40'],'postgres'); waitport(dbport,db)
+    db=start([pg/'postgres','-D',state/'pgdata','-h','127.0.0.1','-p',dbport,'-k','', '-c','timezone=UTC','-c','shared_buffers=128MB','-c','max_connections=40'],'postgres'); waitport(dbport,db)
     psql=[pg/'psql','-X','-q','-v','ON_ERROR_STOP=1','-h','127.0.0.1','-p',dbport,'-U','eduk12_owner']
     auth={'PGPASSWORD':owner}
     run([*psql,'-d','postgres'],'create',auth,"CREATE DATABASE eduk12_c03;\nCREATE ROLE eduk12_runtime LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS PASSWORD '"+runtimepass+"';")

@@ -1,4 +1,4 @@
-# C03 typed Form 基础：实现 checkpoint（未完成真实 PG/HTTP 验证）
+# C03 typed Form 基础：限定范围完成
 
 范围：`CompositeAssessmentItem.formDefinition` 可空 JSON 单题公共 `FormQuestion` → 统一 Form 定义/答案校验 → canonical FINAL payload → V2 encrypted collection facts → definition-bound aggregate/report reader。旧定义不新增 null 键进入 hash；旧 V1 facts 不改写。新增迁移只追加 nullable JSONB，无 UPDATE/backfill。
 
@@ -10,12 +10,28 @@
 
 报告从权威 typed 快照读取，仅兼容显示为无损 JSON 文本，未完成 C07 结构化报告布局。typed 导出在 C07 无损 CSV/ZIP/SAV 合同接入前明确报 TYPED_FORM_EXPORT_NOT_AVAILABLE，避免旧80字符列截断。旧报告和导出保持原路径。整卷提交仍先完成 Form section，再交 Scale units；whole report graph 已带 formDefinition，最终聚合消费 V2 reader，不新增第二套提交协议。
 
-## 验证状态
+## 验证状态（2026-10-18）
 
-- 独立 worktree，独立离线 npm ci 419 包，Node 24.21.0，fresh Prisma Client 5.22.0。
-- 新 typed 24 测试 + 既有 optional Form/V32-1 15 测试：39/39 通过。
-- 首轮两条 fixture 失败：TIME 未声明公共规则要求的时区；模拟 DB formOptions 用 undefined 而非 null。只修 fixture，没有放宽产品规则。
-- 首轮 tsc 发现新增 JSON 可空字段的复制路径需要 Prisma.DbNull，已修。下一次 tsc --noEmit 通过；最终编译另记录。
-- 尚未声称真实数据库迁移、HTTP、whole worker、报告或浏览器通过。下一步使用 C02 合成166迁移快照独立恢复，核对旧行/冻结hash不变、新列全null，再运行167上的 typed FINAL/重放/报告/拒绝导出与 whole 路径。使用当前节点独立 state/端口/受限角色，不触碰 C02 栈或生产。
+- 独立 worktree、独立离线 npm ci 419 包、Node 24.21.0、fresh Prisma Client 5.22.0。最终 tsc 编译通过。
+- 基础 checkpoint：typed 24 + optional Form/V32-1 15 = 39/39。最终增量：typed 25 + results 20 + legacy answer validation 5 = 50/50；results 测试需要 COGNITIVE_MODULE_ENABLED=true。
+- 真实 PG16.15 从 C02 合成166迁移 dump恢复至167：203张旧表的旧列投影逐表一致；新增 form_definition 全 NULL。旧冻结定义hash/V1 FINAL/教师报告仍可读取。
+- 最终业务源码 `50c0bc2a3103ddbf432cea3e9cad17a880097a0e`：真实 HTTP 42请求、7组检查全部通过。number/matrix/null/旧题混合V2、非法输入、复制、FINAL幂等、canonical报告和String投影毒化后重建、typed导出400/旧导出200、whole Scale receipt→worker→COMPLETED/aggregateInputHash/报告均有实证。
+- 精确来源、运行dist/schema/client/hash、HTTP检查、清理结果见 `c03-evidence.json`。证据摘要无账号密钥；私有合成dump/运行凭据不入Git。四个隔离服务全停止，未触碰C02服务。
+- 失败记录保留：TIME缺时区和DB options undefined的单测fixture已修；JSON复制DbNull编译问题已修；HTTP分组fixture已修；导出前置loader缺items导致500已以导出专用授权轻量查询修复；未隐藏或把早期整轮失败改为通过。导出count集成在原授权查询中，无每次旧导出额外防御查询。
 
-检查主要位置为本节点；不启动 CI，不改 workflow/生产/Mac。已完成且输入一致的旧前置manifest检查沿用 C02 输入，不重复无关平台门禁。预计真实 PG/HTTP 检查 10–15 分钟，失败保留并定点修复。
+## 已知风险：whole timestamp / session timezone 契约
+
+真实隔离PG默认继承Asia/Tokyo时，whole租约所有身份谓词通过，唯 whole_accepted_at exact equality失败。TIMESTAMP(3)原文16:56，Prisma读取16:56Z，绑定timestamptz显示次日01:56+09；raw Date写入及比较依赖会话UTC。此问题非本次typed引入，但属于原有健壮性风险，不能声称非UTC兼容已修。
+
+本次C03和既有C02 local-stack harness显式启动 timezone=UTC；重新创建typed/whole合成测评后全链路通过。未修改原有receipt、租约守卫或生产代码。后续Training批次应优先核对真实部署连接会话的UTC契约，统一审查 whole-receipt-atomic、report-outbox、scale batch raw时间参数策略，并增加UTC/Asia-Tokyo双时区回归；不能只对单处比较cast或降低exact acceptedAt保护。
+
+## C04/C05 接口交接
+
+- `formDefinition` 是单个公共 `FormQuestion`，不是完整 `FormDefinition`。formType小写snake映射公共大写type；NUMBER/LONG_TEXT/DATE/TIME可先开放，prompt必须等于formLabel、required必须等于formRequired。TIME必须提供公共规则要求的timeZone。
+- 编制保存应生成稳定唯一 `q_<item UUID>` itemKey；复制保留定义稳定键、数据库ID重新生成，整段不得key碰撞。提交使用DB formItemId，服务端显式映射公共键，不能字符串替换引用图。
+- 目前public add/update schema仍旧五题型且无formDefinition；新增编制必须覆盖schema→存储→copy→preflight/publish。公共core不改旧五题型及可选null语义。
+- FinalCompositeAssessment和FinalQuestionnaireAssessment前端作答适配均需支持typed值，禁止Number/Object先String化；本次仅composite FINAL wire扩展，旧独立 Questionnaire FINAL协议未扩展，不能直接把公共前端类型放宽当服务端支持。
+- 拒绝image/displayIf/refusal/other/exclusive/contextKey保持到对应授权/策略实现；复用公共Form控件时不得导入Survey产品权限/API。
+- 旧题继续V1；区段包含typed才V2，V2整段包括旧字段均以权威快照读取，缺失或不匹配fail-closed。报告目前为无损JSON文本兼容显示；结构化布局和无损导出属C07，不列本次全功能验收。
+
+检查在当前节点完成；未启动CI、未改workflow/生产/Mac。未做浏览器交互验收。

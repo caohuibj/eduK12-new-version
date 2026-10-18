@@ -106,7 +106,7 @@ def main():
              '--auth-local=trust', '--auth-host=scram-sha-256', f'--pwfile={password_file}',
              '--encoding=UTF8', '--locale=C.UTF-8'], 'initdb')
         process = start([pg / 'postgres', '-D', state / 'pgdata', '-h', '127.0.0.1',
-                         '-p', dbport, '-k', '', '-c', 'shared_buffers=128MB',
+                         '-p', dbport, '-k', '', '-c', 'timezone=UTC', '-c', 'shared_buffers=128MB',
                          '-c', 'max_connections=40'], 'postgres')
         wait_port(dbport, process)
         psql = [pg / 'psql', '-X', '-v', 'ON_ERROR_STOP=1', '-h', '127.0.0.1',

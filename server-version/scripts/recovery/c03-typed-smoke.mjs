@@ -62,6 +62,29 @@ async function createTyped(withScale=false){
 }
 try{
   await login(teacher,fixture.teacher,'TEACHER');await login(student,fixture.student,'STUDENT')
+  if(process.env.C03_PHASE==='diagnose'){
+    const target=await prisma.compositeAssessmentAttempt.findFirst({where:{compositeAssessment:{name:'C03 synthetic typed whole'}},orderBy:{startedAt:'desc'},include:{scaleAssessments:{select:{status:true,submissionId:true}},unitSnapshots:{select:{unitType:true,terminalState:true}}}})
+    console.log('DIAG_PARENT',JSON.stringify(target && {id:target.id,status:target.status,scales:target.scaleAssessments,snapshots:target.unitSnapshots}))
+    const outbox=require(path.join(backend,'dist/modules/assessment-runtime/report-outbox.service.js'))
+    let job=null
+    for(let i=0;i<80&&!job;i++){job=await outbox.claimCompositeReportJob();if(!job)await new Promise(r=>setTimeout(r,500))}
+    assert.ok(job,'claim existing receipt');assert.equal(job.attemptId,target.id)
+    const predicates=await prisma.$queryRaw`SELECT parent.status, parent.attempt_epoch=job.attempt_epoch AS epoch, parent.async_report_epoch=parent.attempt_epoch AS async, job.slot_set_hash=parent.frozen_active_slot_set_hash AS slots, job.context_hash IS NOT DISTINCT FROM parent.context_snapshot_hash AS context, job.whole_submission_id=${job.wholeSubmissionId} AS submission, job.whole_accepted_at=${job.wholeAcceptedAt} AS accepted, job.status='PROCESSING' AS processing, job.lease_token=${job.leaseToken} AS token, job.lease_expires_at>(CURRENT_TIMESTAMP AT TIME ZONE 'UTC') AS lease FROM composite_report_jobs job JOIN composite_assessment_attempts parent ON parent.id=job.attempt_id WHERE job.id=${job.id}`
+    console.log('DIAG_PREDICATES',JSON.stringify(predicates))
+    console.log('DIAG_TIME',JSON.stringify(await prisma.$queryRaw`SELECT current_setting('TimeZone') AS timezone, whole_accepted_at::text AS stored, ${job.wholeAcceptedAt}::timestamptz::text AS bound, whole_accepted_at=${job.wholeAcceptedAt}::timestamp AS cast_equal FROM composite_report_jobs WHERE id=${job.id}`),job.wholeAcceptedAt.toISOString())
+    const service=require(path.join(backend,'dist/modules/composite/composite.service.js'))
+    try{
+      await require(path.join(backend,'dist/modules/composite/whole-questionnaire.service.js')).processWholeQuestionnaireAnswers(job)
+      console.log('DIAG_WHOLE_UNITS_OK')
+      const finalized=await service.finalizeCompositeAttemptIfReady(target.id)
+      console.log('DIAG_FINALIZED',JSON.stringify(finalized))
+      const report=await service.materializeCompositeQuestionnaireReport(target.id,{attemptEpoch:job.attemptEpoch,slotSetHash:job.slotSetHash,contextHash:job.contextHash})
+      console.log('DIAG_MATERIALIZED_OK')
+      await outbox.finishCompositeReportJob(job,{kind:'ready',...report})
+    }catch(error){console.error('DIAG_STAGE_ERROR',error.stack);throw error}
+    fs.writeFileSync(path.join(state,'typed-http-result.json'),JSON.stringify({passed:true,phase:'diagnose',requests,checks:['existing receipt diagnosis completed']}))
+    await prisma.$disconnect();process.exit(0)
+  }
   let f
   if(process.env.C03_PHASE==='export-whole'){
     const existing=await prisma.compositeAssessmentAttempt.findFirst({where:{status:'COMPLETED',compositeAssessment:{name:'C03 synthetic typed form'}},orderBy:{startedAt:'desc'}})
