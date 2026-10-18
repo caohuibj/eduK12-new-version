@@ -52,6 +52,7 @@ suite('legacy definition writes use one atomic parent lock', () => {
   })
   afterAll(async () => {
     if (!db) return
+    await db.compositeAssessment.deleteMany({ where: { createdBy: { in: users } } })
     await db.questionnaire.deleteMany({ where: { id: { in: questionnaires } } })
     await db.scale.deleteMany({ where: { id: { in: scales } } })
     await db.user.deleteMany({ where: { id: { in: users } } })
@@ -111,14 +112,15 @@ suite('legacy definition writes use one atomic parent lock', () => {
     await Promise.all([call(guard('GENERAL', general.update), first.req), call(guard('GENERAL', general.update), second.req)])
     expect((await db.questionnaire.findMany({ where: { id: { in: [first.q.id, second.q.id] } } })).every(q => q.name === 'Changed')).toBe(true)
   })
-  it('rejects an optional-field legacy copy before creating a target and keeps the original definition', async () => {
+  it('copies an optional legacy field without making it required or changing the original definition', async () => {
     const { q, user } = await fixture()
-    await db.questionnaireFormItem.create({ data: { questionnaireId: q.id, type: 'text_input', label: 'Optional', required: false } })
+    const original = await db.questionnaireFormItem.create({ data: { questionnaireId: q.id, type: 'text_input', label: 'Optional', required: false, position: 1 } })
     const copy = (await import('../../modules/questionnaire-product/service')).copy
     const key = randomUUID()
-    await expect(copy({ userId: user.id, role: 'TEACHER' }, q.id, { requestId: key })).rejects.toThrow(/普通非必填字段/)
-    expect(await db.compositeAssessment.findUnique({ where: { creationKey: user.id + ':' + key } })).toBeNull()
-    expect((await db.questionnaireFormItem.findFirstOrThrow({ where: { questionnaireId: q.id } })).required).toBe(false)
+    const copied = await copy({ userId: user.id, role: 'TEACHER' }, q.id, { requestId: key })
+    expect(copied).toMatchObject({ status: 'DRAFT', productKind: 'QUESTIONNAIRE' })
+    expect(await db.compositeAssessmentItem.findFirstOrThrow({ where: { compositeAssessmentId: copied.id, type: 'FORM' } })).toMatchObject({ required: false, formType: 'text_input', formLabel: 'Optional', position: 1 })
+    expect(await db.questionnaireFormItem.findUniqueOrThrow({ where: { id: original.id } })).toEqual(original)
   })
 
 })
