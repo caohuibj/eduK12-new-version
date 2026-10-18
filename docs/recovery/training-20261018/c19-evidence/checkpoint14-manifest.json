@@ -1,0 +1,129 @@
+{
+  "scope": "C19 state08 successful ON/OFF real four-tool/new revocation and native authorization boundaries plus nonempty 211-table dump/restore and official runtime role. Historical accepted FINALs not replayed. All cleanup/source/prior/input/runtime checks true; browser, selected-video and capacity remain unqualified.",
+  "members": [
+    {
+      "name": "c19-runtime-result.json.gz",
+      "rawSha256": "f248800fe0b654d9b3ca8654ee76a71117627e41ee892b2ab5eac6d19cf7ad58",
+      "rawBytes": 126452,
+      "gzipSha256": "9d9a319a47cd84f343783ac9a9831c7dfa78060ad59e4495de3b4e7e7bed8755",
+      "gzipBytes": 19247
+    },
+    {
+      "name": "c19-boundaries-on-result.json.gz",
+      "rawSha256": "324fd57117917a8fa9201d87c146b2282c1a3ecf57ea10bfc6136ec609a1eaf0",
+      "rawBytes": 14111,
+      "gzipSha256": "88fbe130cc3f80b3689e23fcd028ed0906cf6d6479f8aa30180b024e84e65e92",
+      "gzipBytes": 3298
+    },
+    {
+      "name": "c19-boundaries-off-result.json.gz",
+      "rawSha256": "cc24371548713cfdf43846ae16fd9486b47ac2cbeeb83590298829e0e205dcea",
+      "rawBytes": 53808,
+      "gzipSha256": "4d1f6925d8a4d83cd32245a857fc07cff952c12ce84917640b7b1be84f675553",
+      "gzipBytes": 8259
+    },
+    {
+      "name": "c19-restore-result.json.gz",
+      "rawSha256": "6c9f5eea74770387928b673f8fca9f62528716a6b4f7704836c102148bb2aed4",
+      "rawBytes": 15569,
+      "gzipSha256": "18be2c60f411ebe69f094d10d33ec824e07a87dd98f3ae67149e5f67e6de1dcb",
+      "gzipBytes": 2194
+    },
+    {
+      "name": "frozen-inputs.json.gz",
+      "rawSha256": "d9c9a4b029e419285338a6d47f344c7ea98d02dd4b6ee6df63b714a4df179efb",
+      "rawBytes": 351063,
+      "gzipSha256": "242411011c1d622a14cacdbf69a5148b7a886feada86030a0e5fa67ce2444640",
+      "gzipBytes": 84639
+    },
+    {
+      "name": "c19-accepted-history.json.gz",
+      "rawSha256": "e014527ec1511c0fa373adee82dd5d6538d4be38a76514fb2663487a8cbca203",
+      "rawBytes": 1522,
+      "gzipSha256": "c6e2c0523eb44f8943d7fcf11315328906c1940f04555f6b64a3087a1d61a628",
+      "gzipBytes": 629
+    },
+    {
+      "name": "c19-boundaries-on.log.gz",
+      "rawSha256": "2a27bd1f062315a7fe8a9eb12d2170254f9145a4e76df4bab23d30676bb08244",
+      "rawBytes": 3766,
+      "gzipSha256": "738a518fe9565041dca6dab8a0049c6db3617ece56dc137c107802c2e2bdb053",
+      "gzipBytes": 1316
+    },
+    {
+      "name": "c19-boundaries-off.log.gz",
+      "rawSha256": "dae2fecd6352690b14f9c929fb8fb705b02dd5c4042a8324b0ca767bc1ca85b1",
+      "rawBytes": 11146,
+      "gzipSha256": "5dcbef5da65be752ee48003c28f3652f703d4caf8bc1e0790e4ad017d407693a",
+      "gzipBytes": 2757
+    },
+    {
+      "name": "c19-restore.log.gz",
+      "rawSha256": "61deff397a2f626415fb9a040fdedd1491501293dc2e6dc17a3199f76060802b",
+      "rawBytes": 30,
+      "gzipSha256": "7679307572fe92e8c662f19550f12033032baa6aa37cfd078ddd0864a1df1fe9",
+      "gzipBytes": 48
+    },
+    {
+      "name": "eduk12_c19_http_restore-runtime-role.log.gz",
+      "rawSha256": "c09766de0c5f1b3fb16a36166a096b19aff49778bb5aaa0401af3d9c71bb9ca8",
+      "rawBytes": 193,
+      "gzipSha256": "dac736992f835caf1cf1415950ed6afd8e12cbdbaa13211ad9d63f42279b7e1e",
+      "gzipBytes": 163
+    },
+    {
+      "name": "eduk12_c19_http_restore-acl.log.gz",
+      "rawSha256": "ac21f556fbfd2804ec793bd4ddce3134aa36fa472501881033f9a863289d062f",
+      "rawBytes": 14815,
+      "gzipSha256": "e6cbf4ca26c77de2274a130dd2564d866054a6d6f5c5bb6272124f4894f5994c",
+      "gzipBytes": 2038
+    },
+    {
+      "name": "source-byte-manifest-before.json.gz",
+      "rawSha256": "05c5dbc8ca6f9a34bf2a391132fcca3f0888214f44927ac905daace839f2ed0c",
+      "rawBytes": 2042502,
+      "gzipSha256": "267cc5579947643779b298515729b2fc50840b7104b9bdfdad6ae0c693b3901f",
+      "gzipBytes": 389918
+    },
+    {
+      "name": "source-byte-manifest-after.json.gz",
+      "rawSha256": "05c5dbc8ca6f9a34bf2a391132fcca3f0888214f44927ac905daace839f2ed0c",
+      "rawBytes": 2042502,
+      "gzipSha256": "267cc5579947643779b298515729b2fc50840b7104b9bdfdad6ae0c693b3901f",
+      "gzipBytes": 389918
+    },
+    {
+      "name": "prior-byte-manifest-before.json.gz",
+      "rawSha256": "c876815f57305249509dee339acbeffd374a7df840878012f8dcc3032547ed7b",
+      "rawBytes": 2352442,
+      "gzipSha256": "e58499ac59dfb2f5a9b3a921ab60205d0f81084c05a91201019248dd46643952",
+      "gzipBytes": 448625
+    },
+    {
+      "name": "prior-byte-manifest-after.json.gz",
+      "rawSha256": "c876815f57305249509dee339acbeffd374a7df840878012f8dcc3032547ed7b",
+      "rawBytes": 2352442,
+      "gzipSha256": "e58499ac59dfb2f5a9b3a921ab60205d0f81084c05a91201019248dd46643952",
+      "gzipBytes": 448625
+    },
+    {
+      "name": "c19-new-format-restore-source-schema-evidence.json.gz",
+      "rawSha256": "38025b80ef1dfd1e0c8b6dd0e1b88db167cbc0c2d6f24390a9e8eadc2f3efb34",
+      "rawBytes": 1915145,
+      "gzipSha256": "7e00a07d62a115d4753026ad4c72d12dd4e1fc765c6771bfe6d70810ea784684",
+      "gzipBytes": 86315
+    },
+    {
+      "name": "c19-new-format-restore-restored-schema-evidence.json.gz",
+      "rawSha256": "b88cb3027835a1b9bd340df3b097d20357f172464856bacb6d83c792e60569b3",
+      "rawBytes": 1915135,
+      "gzipSha256": "7c49b6c77d299d0935e32dd575a82a48beb8c6449989b867f673f9fa7e2e5cc5",
+      "gzipBytes": 86327
+    }
+  ],
+  "archive": {
+    "file": "checkpoint14-state08-boundaries-restore.tar.gz",
+    "sha256": "815ed50b8b0c605ff454220a4e4db8930afd0a710c297c30f7ed742ec3c14e21",
+    "bytes": 1974465
+  }
+}

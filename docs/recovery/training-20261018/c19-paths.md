@@ -128,3 +128,37 @@ Scale source discovery不再读取可编辑definition.scores。按已授权课�
 新15例首轮在共同fixture构建时缺mandatory SJT runtimeIdentity而全部失败，原记录保留；只补真实冻结identity，不放宽生产断言。随后新15及直接受影响旧SJT2例通过，tsc通过。build12输入前后完全一致，input SHA `5eb76251114149fc00dc7c5973d95d66a8fcd1e4e01b0d331dbd801a83fd0360`，dist manifest SHA `a5539b931ebe00c0a56f9ccdab340ef95fb682cfe62dac2846e8b0e98caadcd8`。Scale字典函数和37例文件未改，其此前成功仅按原生产者和直接影响闭包复用，不标为新source整套重跑。checkpoint12归档包含失败、受影响续验及固定输入/产物摘要。
 
 analysis-only续验已独立静态核无阻断，尚待本新增源码独立审查及state07实际执行；ON/OFF/native/revocation和最终新格式restore仍未运行。
+
+### Checkpoint 13：state07 分析与long CSV真实通过
+
+固定d5e5d5cf的state07执行analysis-only成功，passed/cleanup/source/priorSource/inputs全true且服务已停。原三READY CSV只GET校验原bytes/SHA，没有重入export worker；随后两publication真实Training analysis及新队列long CSV通过，10 observations中4个未执行为null/NOT_ASSIGNED，direct分析表中已接受Scale值1（与HTTP manifestHash绑定），另一教师请求404。long CSV本次断言仅覆盖行数与screened空值/NOT_ASSIGNED，未逐列核验其Scale=1单元格。原8个accepted parent/children/snapshot/job前后fingerprint均 `3158d28b5eb5bf410fda4e0d0271c7c687c4943a2899d40c09e664ebe3c8cb00`，原FAILED及三READY batch/artifact行不变。
+
+runtime-result SHA `cbdb6e1e6ca35d430afd03763838564e74f5e7c090124f015e871c76522e2df8`，analysis-result SHA `3de5dcf69437cbfbbe5679fbff09e9529fd1e16cf5d374f9bc4181d946ab32f7`，frozen-inputs SHA `5cc66f3e401f5a3f4f5091e9806acedb2f99b7afd780f76cfa709b8e8630cf6e`。实际单次source-list GET 2753B、65.56ms、进程窗口SQL26；analysis POST 3744B、79.56ms、SQL48；long CSV 7168B。均仅此合成小样本功能观测，窗口SQL包含实际鉴权/关系读取，非独立场景数或容量收益，不外推并发/吞吐。
+
+state07未执行restore，精确停机state可作为下一独立state08来源。ON/OFF/native/revocation脚本和launcher已独立静态审无已知阻断，但14新FINAL、两共享模式科学绑定、撤权边界及非空新格式dump/restore仍须实际运行。checkpoint13仅保护本阶段公共证据，私有runtime/fixture/DB原件留云端不入Git。
+
+### Checkpoint 14：state08 两模式、权限撤权与非空恢复通过
+
+固定4f9ed2d1执行新state08，两个API顺序运行相同生产dist/PG/Redis，完整私有env逐字段/SHA绑定，仅PORT与两个shared开关不同；COMPACT=true。ON真实四工具4新FINAL，OFF四工具4新FINAL及新课程Scale/SJT撤权各A两次、B一次，共14新FINAL，旧FINAL重交0。每个新attempt完整candidate hash独立绑定，canonical科学投影hash均 `855878a6e45889b830044ee20739e1c27de44b9132ff45b0770ca906aed4b495`，slot科学hash均 `d29ed038166b84bcea1009f4ac8653be946787aec3e34ed76a575ae99f155cdb`。ON candidate6048B/slot101B，OFF15092B/1531B；Scale与Cognitive引用各105B，OFF各2151/8298B。此为同候选科学身份与实际child绑定、字节记录，不是容量收益估计。
+
+两模式首Form仅创建Form child，未来Scale/Cognitive/SJT及Cog quota均未占用；后续每段按原FINAL和stateGET准入，最终各四snapshot/一个原outbox、Cog quota0→1。OFF新四工具未新增shared artifact/binding行，能恢复/读取既有ON引用且ON全部parent/children/answers/raw/facts/jobs摘要前后不变。四native使用真实child、合法形状payload的非owner GET/FINAL拒绝，父包装、未达候选路径、Cognitive独立启动绕过、SJT跨父真实child/media与真实skipped Form均拒绝且无写入。由于未来child本来不存在，不将虚构ID 404冒称其准入矩阵。
+
+撤权仅新课程/新Scale/新精确course SJT grant，通过正式教师编制和ADMIN grant/revoke API：A已达到并冻结native，撤权后新登录恢复原runtime并完成；B保持首Form，撤权后只提交该Form，其后native准入403，未创建native、不重选分支、原WAITING job attemptCount0/budgetHeld=false。原queue预算行前后SHA相同，已达A正常由原worker完成；不把合法等待强行READY。
+
+整个state08 passed/cleanupVerified/sourceUnchanged/priorSourceUnchanged/inputsUnchanged/privateRuntimeFilesUnchanged全true，PG/Redis/两API已停。runtime-result SHA `f248800fe0b654d9b3ca8654ee76a71117627e41ee892b2ab5eac6d19cf7ad58`；ON result `324fd57117917a8fa9201d87c146b2282c1a3ecf57ea10bfc6136ec609a1eaf0`；OFF result `cc24371548713cfdf43846ae16fd9486b47ac2cbeeb83590298829e0e205dcea`；restore result `6c9f5eea74770387928b673f8fca9f62528716a6b4f7704836c102148bb2aed4`。新非空dump SHA `c93890e3958e905304254225c9c94879690a0c37da13755a462fc77103c6dd15`，路径 `/workspace/scratch/5a77e8bdc1ae/eduk12_c19_http_08/c19-new-format-restore/c19-http-new-format.dump`，私有不入Git。恢复211表/174迁移、全部guard/列/facts精确等价、正式runtime-role apply/verify成功；原4054行、约束及guards保留。C18历史physical ordinal/CHECK精确白名单不变，没有弱化恢复比较。
+
+#### C19 限定交接
+
+主链/END/三态与真实PG父锁双tab由state05原producer接受，三CSV由state06分项接受，分析及long CSV由state07接受，共享ON/OFF/完整native负例与撤权/新恢复由state08接受。每次失败producer与分项续验均保留，不将旧事实重新计分、不合并重复断言为独立场景数；对应checkpoint09–14记录实际范围。新增runtime源码最终dist由build12绑定，后续checkpoint13/14仅证据文档，未再构建。
+
+功能与恢复证据现已齐备，待最终独立review给限定结论。C25真实浏览器/selected-video/fresh当前版本端到端整合、C26容量/跨请求成本与P3 Form重复snapshot/decrypt仍未验；C20随机材料、C21短IP、C22延迟反馈、C23TTL、C24视觉未顺手实现，不授整批CI/merge资格。state08是当前合格停机恢复候选，后续只读克隆，保留其私有runtime/fixture和所有历史失败state。最后空间约9.1GiB，新增worktree/clone须重新预留到8GiB停线以上，不删除数据库证据。
+
+### 最终独立review的证据口径校正
+
+固定87dcb389的功能/恢复证据独立核验中，科学review确认state07 `analysis.statisticsSuppressionRetained=true` 是harness声明而非对HTTP/direct统计suppressed输出的独立断言；原check字符串也不构成该断言证据。因此本次不得宣称动态实测最小cohort抑制，仅保持此前未修改核心的既有合同/证据资格。原result与脚本精确保留，不回写为“已测”。
+
+Scale=1实际来自direct analysis tables，并通过相同manifestHash与HTTP分析结果绑定；long CSV本次仅实测行数与筛出记录空值/NOT_ASSIGNED，没有逐列断言measured Scale=1，不能扩大为该CSV数值校验已覆盖。章节13已按此校正。此为证据说明修正，不改变业务/运行产物，也不重跑原成功analysis或CSV任务。
+
+### 限定结论与后续必补验收
+
+两域独立 review 已在最终固定证据及 fb3917d2 口径修正范围内给出限定 GO。C25 当前版本的新库 happy-path 入口须直接断言小样本 suppressed 输出，并把实际下载的 flow long CSV 已测数值逐列与独立预期对照，不能只依赖 direct tables/manifestHash 或硬编码成功标记。此记录不扩充本轮资格，不重写原 producer。C20 可从已停机 state08 的精确副本接续。
