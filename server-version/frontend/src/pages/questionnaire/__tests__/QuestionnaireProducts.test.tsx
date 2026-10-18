@@ -2,6 +2,8 @@ import { render, screen, fireEvent, act, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route, Link } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+const capabilities = vi.hoisted(() => ({ enabled: true }))
+vi.mock('../../../contexts/CapabilitiesContext', () => ({ useCognitiveEnabled: () => capabilities.enabled }))
 const api = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), put: vi.fn() }))
 vi.mock('../../../api/client', () => ({ default: api }))
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'teacher-1', role: 'TEACHER' } }) }))
@@ -23,6 +25,7 @@ function mount(id = 'new', search = '') {
 }
 describe('questionnaire draft feedback', () => {
   beforeEach(() => {
+    capabilities.enabled = true
     vi.resetAllMocks()
     api.get.mockResolvedValue({
       code: 0,
@@ -34,6 +37,16 @@ describe('questionnaire draft feedback', () => {
       },
     })
   })
+  it('hides the cognitive authoring type while disabled and preserves stored cognitive content', async () => {
+    capabilities.enabled = false
+    const row = { name: '历史认知问卷', status: 'DRAFT', revision: 1, questionnaireType: 'COURSE', questionnaireCourses: [], items: [{ id:'cog', type:'COGNITIVE', position:0, cognitiveAssignment:{ title:'历史认知任务' } }], formSections: [], publicEnabled:false }
+    api.get.mockImplementation(async path => ({ code:0, data:path.endsWith('/resources') ? { scales:[], cognitive:[], situational:[], courses:[] } : row }))
+    mount('saved')
+    await screen.findByDisplayValue('历史认知问卷')
+    expect(screen.queryByRole('option', { name:'认知测验' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '配置第 1 项：1. 历史认知任务' })).toBeInTheDocument()
+  })
+
   it('exposes the active composition section to keyboard and screen-reader users', async () => {
     mount()
     const steps = screen.getByRole('navigation', { name: '编制步骤' })
@@ -173,6 +186,7 @@ describe('questionnaire draft feedback', () => {
 
 describe('C04 typed authoring', () => {
   it.each(['number', 'long_text', 'date', 'time'])('creates %s using the public Form definition without a client itemKey', async type => {
+    capabilities.enabled = true
     vi.resetAllMocks()
     const row = { name: '基础题型', status: 'DRAFT', revision: 4, questionnaireType: 'COURSE', questionnaireCourses: [], items: [], formSections: [], publicEnabled: false }
     api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? { scales: [], cognitive: [], situational: [], courses: [] } : row }))
@@ -207,6 +221,7 @@ describe('C04 typed authoring', () => {
 
 describe('C05 structured authoring', () => {
   it.each(['likert', 'matrix', 'matrix_multiple', 'rank_order', 'slider', 'constant_sum'])('creates %s as one public FormQuestion', async type => {
+    capabilities.enabled = true
     vi.resetAllMocks()
     const row = { name: '结构化题型', status: 'DRAFT', revision: 4, questionnaireType: 'COURSE', questionnaireCourses: [], items: [], formSections: [], publicEnabled: false }
     api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? { scales: [], cognitive: [], situational: [], courses: [] } : row }))
@@ -236,6 +251,7 @@ describe('C05 structured authoring', () => {
 
 describe('C05 incomplete single question stays editable', () => {
   it('retains title, options and matrix rows when the server rejects adding an incomplete question', async () => {
+    capabilities.enabled = true
     vi.resetAllMocks()
     const row = { name: '结构化草稿', status: 'DRAFT', revision: 4, questionnaireType: 'COURSE', questionnaireCourses: [], items: [], formSections: [], publicEnabled: false }
     api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? { scales: [], cognitive: [], situational: [], courses: [] } : row }))

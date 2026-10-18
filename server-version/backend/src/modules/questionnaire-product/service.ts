@@ -1,7 +1,8 @@
 import {freezeTrainingTimingPolicy,readTrainingTimingPolicy} from '../assessment-runtime/training-scale-timing'
 import { remapTrainingFormDefinition } from '../assessment-runtime/form-policy'
 import { typedCompositeFormQuestion } from '../assessment-runtime/typed-form'
-import { assertCognitiveProductEligible, isCognitiveProductEligible } from '../cognitive/product-eligibility'
+import { assertCognitiveProductEligible, isCognitiveProductEligible, isCognitiveNewAdmissionEnabled } from '../cognitive/product-eligibility'
+import { assertCognitiveCatalogConfiguration } from '../cognitive/assignment.service'
 import { Prisma, UserRole } from '@prisma/client'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
@@ -337,11 +338,12 @@ export async function resources(actor: Actor) {
   author(actor)
   const [scales, cognitive, courseRows] = await Promise.all([
     prisma.scale.findMany({ where: { status: 'PUBLISHED' }, orderBy: { name: 'asc' } }),
-    prisma.cognitiveAssignment.findMany({ where: { status: 'PUBLISHED', listedStandalone: true, config: { status: 'PUBLISHED' }, ...(actor.role === 'ADMIN' ? {} : { createdBy: actor.userId }) }, include: { config: true }, orderBy: { title: 'asc' } }),
+    isCognitiveNewAdmissionEnabled() ? prisma.cognitiveAssignment.findMany({ where: { status: 'PUBLISHED', listedStandalone: true, config: { status: 'PUBLISHED' }, ...(actor.role === 'ADMIN' ? {} : { createdBy: actor.userId }) }, include: { config: true }, orderBy: { title: 'asc' } }) : Promise.resolve([]),
     prisma.course.findMany({ where: { isLibrary: false, ...(actor.role === 'ADMIN' ? {} : { creatorId: actor.userId }) }, select: { id: true, title: true } }),
   ])
   const usable = []
   for (const row of scales) if (await canUseScale(actor.userId, actor.role, row)) usable.push({ id: row.id, name: row.name, code: row.code, version: row.instrumentVersion })
+  for (const row of cognitive.filter(v => isCognitiveProductEligible(v.config.testType))) assertCognitiveCatalogConfiguration(row.config)
   return {
     scales: usable, cognitive: cognitive.filter(v => isCognitiveProductEligible(v.config.testType)).map(v => ({ id: v.id, name: v.title, profile: v.profile, testType: v.config.testType, configVersion: v.config.configVersion, engineVersion: v.config.engineVersion, scoringVersion: v.config.scoringVersion })),
     situational: listSituationPackages().filter(v => v.releaseStatus === 'PUBLISHED').map(v => ({ id: v.key + '/' + v.instrumentVersion, name: v.definition.source.title || v.key, instrumentKey: v.key, instrumentVersion: v.instrumentVersion })),

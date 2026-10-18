@@ -69,11 +69,31 @@ describe('course-scope measurement projection', () => {
     expect(result[0].href).toBe('/student/cognitive/assignments/cog-quota')
   })
 
-  it('does not fetch a disabled cognitive capability', async () => {
+  it('fetches historical records but hides unstarted cognitive tasks when disabled', async () => {
     const result = await loadCourseAssessments(course, false)
     expect(result.errors).toEqual([])
     expect(result.items.some(item => item.kind === 'cognitive')).toBe(false)
-    expect(myCognitive).not.toHaveBeenCalled()
+    expect(myCognitive).toHaveBeenCalledTimes(1)
+  })
+
+  it('OFF links stored current/history sessions directly without offering new starts', async () => {
+    myCognitive.mockResolvedValue({ code:0, data:[
+      { id:'active', courseId:course, title:'已准入', status:'PUBLISHED', continueHref:'/student/cognitive/sessions/accepted' },
+      { id:'done', courseId:course, title:'历史', status:'PUBLISHED', latestCompletedSessionId:'completed' },
+      { id:'new', courseId:course, title:'未开始', status:'PUBLISHED' },
+    ] })
+    const rows=(await loadCourseAssessments(course,false)).items.filter(item=>item.kind==='cognitive')
+    expect(rows.map(row=>row.href)).toEqual(['/student/cognitive/sessions/accepted','/student/cognitive/sessions/completed/result'])
+    expect(rows.map(row=>row.action)).toEqual(['继续测评','查看反馈'])
+  })
+
+  it('retains an unadmitted shell as paused without a runner or start link', () => {
+    const rows=projectCourseAssessments(course,[],[],[{ id:'shell',courseId:course,title:'等待恢复',status:'PUBLISHED',admissionPaused:true } as any],[{
+      ...composite('shell-composite',course),canContinue:false,canStartNewAttempt:false,admissionPaused:true,
+      attempt:{id:'shell-parent',status:'IN_PROGRESS',progress:0.5},
+    }],false)
+    expect(rows).toHaveLength(2)
+    expect(rows.every(row=>row.href===null && row.status==='暂不可用，重新开放后继续')).toBe(true)
   })
 
   it('does not turn a blocked assessment into an enabled start link', () => {

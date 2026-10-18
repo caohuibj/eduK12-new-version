@@ -17,7 +17,7 @@ import { assertNoAcceptedWholeQuestionnaire } from '../assessment-runtime/report
 import { assessmentReportConfig } from '../../config/assessmentReports'
 import { assertReportJobIdentity, compositeReportJobState, readCompositeReportMaterialization, readCompositeReportJobHeader, retryCompositeReport, REPORT_PARENT_SELECT, type ReportJobIdentity } from '../assessment-runtime/report-outbox.service'
 import { encryptCompositeCollectionReport, decryptCompositeCollectionReport } from './composite-report-cache'
-import { assertCognitiveProductEligible } from '../cognitive/product-eligibility'
+import { assertCognitiveProductEligible, assertCognitiveNewAdmissionEnabled } from '../cognitive/product-eligibility'
 import { loadFrozenCompositeProgress, loadFrozenMeasurementFinalHeaders } from './frozen-progress'
 import { resolveSituationalScientificMaturity } from '../situational/scientific-maturity'
 import { frozenSituationalScientificProjection } from '../situational/onboarding/scientific-schema'
@@ -314,7 +314,7 @@ const assertCollectionOnlyEditing = (composite: {
 }
 
 const assertCognitiveModuleEnabled = () => {
-  if (!config.cognitiveModuleEnabled) throw compositeBadRequest('认知模块未启用')
+  assertCognitiveNewAdmissionEnabled()
 }
 
 const assertSituationalCompositeItem = (item: {
@@ -347,8 +347,8 @@ const assertSituationalCompositeItem = (item: {
   return { situationPackage, runtime, definitionHash: validation.definitionHash }
 }
 
-const assertSupportedComposite = (composite: { items?: Array<{ type: string; situationalInstrumentKey?: string | null; situationalInstrumentVersion?: string | null }> }, frozenAttempt = false) => {
-  if (!config.cognitiveModuleEnabled && composite.items?.some((item) => item.type === 'COGNITIVE')) {
+const assertSupportedComposite = (composite: { items?: Array<{ type: string; situationalInstrumentKey?: string | null; situationalInstrumentVersion?: string | null }> }, frozenAttempt = false, newAdmission = !frozenAttempt) => {
+  if (newAdmission && !config.cognitiveModuleEnabled && composite.items?.some((item) => item.type === 'COGNITIVE')) {
     throw compositeBadRequest('认知模块未启用')
   }
   for (const item of composite.items ?? []) {
@@ -908,9 +908,8 @@ export const listComposites = async (userId: string, role: UserRole) => {
       },
     },
   })
-  const supportedList = config.cognitiveModuleEnabled
-    ? list
-    : list.filter((item: any) => !item.items.some((child: any) => child.type === 'COGNITIVE'))
+  // Historical management rows remain visible; the flag controls new authoring/admission.
+  const supportedList = list
   const counts = await loadAttemptCountsByCompositeIds(supportedList.map((item: any) => item.id), userId, role)
   return supportedList.map((item: any) => {
     const {
@@ -2056,9 +2055,10 @@ const assertCompositeWindow = (composite: { opensAt: Date | null; expiresAt: Dat
 export const createAccessTokenForComposite = async (userId: string, role: UserRole, compositeId: string, expiresAt: string, maxUses: number, db: Db = prisma) => {
   assertTeacher(role)
   if (!Number.isSafeInteger(maxUses) || maxUses < 0 || maxUses > MAX_TOKEN_USES) throw compositeBadRequest('最大参与次数无效')
-  const composite = await loadComposite(compositeId, false, db)
+  const composite = await loadComposite(compositeId, true, db)
   assertOwner(composite, userId, role)
   if (composite.status !== 'PUBLISHED') throw compositeBadRequest('只有已发布综合测评可以生成公开链接')
+  assertSupportedComposite(composite)
   assertNotLibraryComposite(composite, '库课程上的综合测评不能公开作答')
   const expiry = new Date(expiresAt)
   if (!publicAccessExpiryWithinPolicy(expiry, { upperBound: composite.expiresAt })) {
@@ -2152,10 +2152,13 @@ export const listAvailableForStudent = async (userId: string, now = Date.now()) 
       },
     },
   })
-  const supportedList = config.cognitiveModuleEnabled
-    ? list
-    : list.filter((item: any) => !item.items.some((child: any) => child.type === 'COGNITIVE'))
-  const attempts = await prisma.compositeAssessmentAttempt.findMany({ where: { userId, compositeAssessmentId: { in: supportedList.map((item) => item.id) } }, orderBy: { startedAt: 'desc' }, select: { id: true, compositeAssessmentId: true, status: true, taskSatisfaction: true, progress: true, completedAt: true } })
+  const attemptRows = await prisma.compositeAssessmentAttempt.findMany({ where: { userId, compositeAssessmentId: { in: list.map((item) => item.id) } }, orderBy: { startedAt: 'desc' }, select: { id: true, compositeAssessmentId: true, status: true, taskSatisfaction: true, progress: true, completedAt: true, cognitiveSessions: { select: { status: true, frozenAdmissionSnapshotHash: true } } } })
+  const attempts = attemptRows.map(({ cognitiveSessions, ...attempt }) => ({ ...attempt,
+    admissionPaused: !config.cognitiveModuleEnabled && cognitiveSessions?.some(session => session.status === 'IN_PROGRESS' && !session.frozenAdmissionSnapshotHash),
+  }))
+  const historicalIds = new Set(attempts.map(attempt => attempt.compositeAssessmentId))
+  const supportedList = config.cognitiveModuleEnabled ? list : list.filter(item =>
+    !item.items.some(child => child.type === 'COGNITIVE') || historicalIds.has(item.id))
   const latest = new Map<string, any>()
   for (const attempt of attempts) {
     // 查询已按 startedAt 倒序，最新的进行中记录必须优先于更早的已完成记录，保证可继续作答。
@@ -2177,7 +2180,8 @@ export const listAvailableForStudent = async (userId: string, now = Date.now()) 
     const attemptsUsed = compositeAttempts.length
     const availability = availabilityFor(item)
     const latestAttempt = latest.get(item.id) ?? null
-    const canContinue = latestAttempt?.status === 'IN_PROGRESS'
+    const admissionPaused = latestAttempt?.status === 'IN_PROGRESS' && latestAttempt.admissionPaused
+    const canContinue = latestAttempt?.status === 'IN_PROGRESS' && !admissionPaused
     // `attempts` is ordered newest-first, so this is the most recent completed
     // attempt even when a newer attempt is currently in progress.
     const latestCompletedAttempt = compositeAttempts.find((attempt) => attempt.status === 'COMPLETED') ?? null
@@ -2219,8 +2223,9 @@ export const listAvailableForStudent = async (userId: string, now = Date.now()) 
       maxAttempts: item.maxAttempts,
       attemptsUsed,
       availability,
-      canStartNewAttempt: availability === 'OPEN' && !canContinue && attemptsUsed < item.maxAttempts,
+      canStartNewAttempt: (config.cognitiveModuleEnabled || !item.items.some((child: any) => child.type === 'COGNITIVE')) && availability === 'OPEN' && !canContinue && attemptsUsed < item.maxAttempts,
       canContinue,
+      admissionPaused: Boolean(admissionPaused),
       items: item.items.map((child: any) => ({ type: child.type, position: child.position, label: resolveCompositeItemLabel(child, getFrozenPackageSlotLabels(item)) })),
       units,
       formSections: sections,
@@ -2471,6 +2476,7 @@ const createAttempt = async (
   attemptEpoch = 1,
   relationalIdentity?: RelationalCompositeAttemptIdentityV1,
 ) => {
+  assertSupportedComposite(composite)
   if(composite.items.some((item:any)=>item.formPolicy!=null) && (composite.productKind!=='QUESTIONNAIRE' || composite.deliveryMode==='LEGACY' || relationalIdentity || composite.reportPackageKey || composite.analysisProtocolKey)) throw compositeBadRequest('Form V3 只支持普通问卷的统一 FINAL 运行时')
   if (['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(composite.productKind)) {
     // Serialize new admission against archive; never trust the pre-lock read.
@@ -2593,7 +2599,7 @@ export const startRelationalCompositeAttemptInTransaction = async (
   }
   await db.$queryRaw`SELECT "id" FROM "composite_assessments" WHERE "id" = ${input.compositeAssessmentId} FOR UPDATE`
   const composite = await loadComposite(input.compositeAssessmentId, true, db)
-  assertSupportedComposite(composite)
+  assertSupportedComposite(composite, false, false)
   if (composite.status !== 'PUBLISHED') throw compositeBadRequest('关系测评运行目标尚未发布')
   if (composite.deliveryMode === 'LEGACY') throw compositeBadRequest('关系测评必须使用 Unified FINAL_ONLY 运行时')
   if (composite.course?.isLibrary) throw compositeBadRequest('库课程综合测评不能作为关系测评运行目标')
@@ -2632,7 +2638,7 @@ export const startUserAttempt = async (userId: string, compositeId: string) => {
   // repairs sections on a published composite. loadComposite already includes
   // formSections + items, so no separate section read is needed.
   const composite = await loadComposite(compositeId, true)
-  assertSupportedComposite(composite)
+  assertSupportedComposite(composite, false, false)
   await assertStudentEligibility(composite, userId)
 
   const isUniqueConstraintError = (err: unknown) =>
@@ -2772,12 +2778,13 @@ const findPublicToken = async (tokenValue: string, db: Db = prisma) => {
   if (!token) throw compositeNotFound('公开链接不存在')
   if (!token.compositeAssessment.publicEnabled || token.compositeAssessment.status !== 'PUBLISHED') throw compositeForbidden('综合测评未开放公开参与')
   assertNotLibraryComposite(token.compositeAssessment, '库课程上的综合测评不能公开作答')
-  assertSupportedComposite(token.compositeAssessment)
+  assertSupportedComposite(token.compositeAssessment, false, false)
   return token as any
 }
 
 export const getPublicCompositeInfo = async (tokenValue: string, db: Db = prisma) => {
   const token = await findPublicToken(tokenValue, db)
+  assertSupportedComposite(token.compositeAssessment)
   assertTokenWindow(token)
   const composite = token.compositeAssessment
   assertCompositeWindow(composite)
@@ -3048,7 +3055,7 @@ const findAttempt = async (attemptId: string, context: { userId?: string; recove
     ? attempt.userId === context.userId
     : Boolean(context.recoveryTokenHash && attempt.recoveryTokenHash === context.recoveryTokenHash && !attempt.userId)
   if (!authorized) throw compositeForbidden('无权限查看此综合测评记录')
-  assertSupportedComposite(attempt.compositeAssessment, frozenRead && ['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(attempt.compositeAssessment.productKind))
+  assertSupportedComposite(attempt.compositeAssessment, frozenRead && ['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(attempt.compositeAssessment.productKind), false)
   return attempt
 }
 
@@ -5247,7 +5254,7 @@ export const listPackageAnalysisSnapshotsForTeacher = async (
   const composite = await loadComposite(attempt.compositeAssessmentId)
   assertOwner(composite, userId, role)
   await assertRelationalTeacherAttemptReadAllowed(attempt, userId, role)
-  assertSupportedComposite(attempt.compositeAssessment)
+  assertSupportedComposite(attempt.compositeAssessment, false, false)
   if (!attempt.compositeAssessment.reportPackageKey) return { list: [], total: 0 }
   if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
   if (
@@ -5321,7 +5328,7 @@ export const getReportForTeacher = async (
     await assertRelationalTeacherAttemptReadAllowed(attempt, userId, role)
     if (partial) return projectPartialReport(attempt, role === UserRole.ADMIN ? 'researcher' : 'teacher')
     if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
-    assertSupportedComposite(attempt.compositeAssessment, ['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(attempt.compositeAssessment.productKind))
+    assertSupportedComposite(attempt.compositeAssessment, ['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(attempt.compositeAssessment.productKind), false)
     return projectHttpReport(attempt, role === UserRole.ADMIN ? 'researcher' : 'teacher', snapshotId)
   }
   const header = await loadReportReadHeader(attemptId)
@@ -5336,7 +5343,7 @@ export const getReportForTeacher = async (
   await assertRelationalTeacherAttemptReadAllowed(attempt, userId, role)
   if (partial) return projectPartialReport(attempt, role === UserRole.ADMIN ? 'researcher' : 'teacher')
   if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
-  assertSupportedComposite(attempt.compositeAssessment, ['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(attempt.compositeAssessment.productKind))
+  assertSupportedComposite(attempt.compositeAssessment, ['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(attempt.compositeAssessment.productKind), false)
   return projectHttpReport(attempt, role === UserRole.ADMIN ? 'researcher' : 'teacher', snapshotId)
 }
 
@@ -5354,7 +5361,7 @@ export const getAnalysisExportForTeacher = async (
   if (attempt.compositeAssessmentId !== compositeId) throw compositeNotFound('综合测评记录不存在')
   await assertRelationalTeacherAttemptReadAllowed(attempt, userId, role)
   if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
-  assertSupportedComposite(attempt.compositeAssessment)
+  assertSupportedComposite(attempt.compositeAssessment, false, false)
   return packageAnalysisExportContextFor(attempt, role === UserRole.ADMIN ? 'researcher' : 'teacher', snapshotId)
 }
 

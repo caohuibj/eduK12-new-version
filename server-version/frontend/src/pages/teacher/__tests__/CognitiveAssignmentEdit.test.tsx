@@ -1,3 +1,5 @@
+const capability = vi.hoisted(() => ({ enabled: true }))
+vi.mock('../../../contexts/CapabilitiesContext', () => ({ useCognitiveEnabled: () => capability.enabled }))
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -29,7 +31,18 @@ import CognitiveAssignmentEdit from '../CognitiveAssignmentEdit'
 describe('CognitiveAssignmentEdit wrapper', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    capability.enabled = true
     mockCognitiveApi.updateAssignment.mockResolvedValue({ code: 0, data: {} })
+  })
+
+  it('OFF keeps a historical wrapper readable and archivable but hides editing', async () => {
+    capability.enabled=false
+    mockCognitiveApi.getAssignment.mockResolvedValue({code:0,data:{id:'wrap-1',title:'历史任务',instruction:'已冻结说明',status:'PUBLISHED',listedStandalone:false,config:{}}})
+    render(<CognitiveAssignmentEdit />)
+    expect(await screen.findByText('认知测评新编制暂不可用，历史记录保留。')).toBeInTheDocument()
+    expect(screen.getByRole('button',{name:'归档'})).toBeInTheDocument()
+    expect(screen.queryByRole('button',{name:'保存'})).toBeNull()
+    expect(screen.queryByRole('button',{name:'发布'})).toBeNull()
   })
 
   it('shows the composite-only badge and keeps title/instruction editing while hiding public links and export', async () => {

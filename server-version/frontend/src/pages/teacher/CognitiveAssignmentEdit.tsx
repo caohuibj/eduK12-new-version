@@ -1,3 +1,4 @@
+import { useCognitiveEnabled } from '../../contexts/CapabilitiesContext'
 import { waitForExportArtifacts, requestExportIntent, assertExportDownload, triggerExportDownload, clearExportIntentKey, ExportJobFailedError } from '../../utils/exportJobs'
 import { PublicDeliveryManager } from '../../components/PublicDeliveryManager'
 import React, { useEffect, useState } from 'react'
@@ -22,6 +23,7 @@ type CognitiveExportKind = 'summary-csv' | 'full-csv' | 'summary-zip' | 'researc
 const CognitiveAssignmentEdit: React.FC = () => {
   const { id = '' } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const cognitiveEnabled = useCognitiveEnabled()
   const { feedback, confirm: confirmAction, success } = useStaffFeedback()
   const [archiving, setArchiving] = useState(false)
   const [detail, setDetail] = useState<any>(null)
@@ -156,7 +158,7 @@ const CognitiveAssignmentEdit: React.FC = () => {
             <button type="button" onClick={() => navigate('/cognitive-assignments')} className="hui-button hui-button--secondary">
               <ArrowLeft className="w-4 h-4" aria-hidden="true" />返回认知任务
             </button>
-            {isDraft && !isWrapper && <button onClick={() => void publish()} className="hui-button hui-button--primary"><Send className="w-4 h-4" aria-hidden="true" />发布</button>}
+            {cognitiveEnabled && isDraft && !isWrapper && <button onClick={() => void publish()} className="hui-button hui-button--primary"><Send className="w-4 h-4" aria-hidden="true" />发布</button>}
             {canArchive && !isPackageLocked && <button disabled={archiving} onClick={() => void archive()} className="hui-button hui-button--secondary"><Archive className="w-4 h-4" aria-hidden="true" />{archiving ? '正在归档…' : '归档'}</button>}
             {!isWrapper && <button disabled={exporting !== null} onClick={() => void exportData('summary-csv', 'summary')} className="hui-button hui-button--secondary disabled:cursor-not-allowed disabled:opacity-50"><Download className="w-4 h-4" aria-hidden="true" />{exporting === 'summary-csv' ? '导出摘要中...' : '导出摘要'}</button>}
             {!isWrapper && <button type="button" onClick={() => setReadingReports(value => !value)} aria-expanded={readingReports} className="hui-button hui-button--secondary">{readingReports ? '收起专业报告' : '阅读专业报告'}</button>}
@@ -184,10 +186,10 @@ const CognitiveAssignmentEdit: React.FC = () => {
           <p className="text-sm text-gray-500 mb-4">
             此任务仅用于综合测评，不能单独发给学生或生成公开链接。群体数据请从综合测评导出。
           </p>
-          {isPackageLocked ? (
+          {isPackageLocked || !cognitiveEnabled ? (
             <>
               <p className="rounded bg-amber-50 border border-amber-200 px-3 py-2 text-sm text-amber-800 mb-4">
-                此任务已被报告包引用并冻结，标题、指导语和生命周期不能修改；综合测评中的固定槽位名称以报告包快照为准。
+                {!cognitiveEnabled ? '认知测评新编制暂不可用，历史记录保留。' : '此任务已被报告包引用并冻结，标题、指导语和生命周期不能修改；综合测评中的固定槽位名称以报告包快照为准。'}
               </p>
               <div className="space-y-3 text-sm text-gray-700">
                 <div><span className="text-gray-500">标题：</span>{detail.title}</div>
@@ -226,7 +228,7 @@ const CognitiveAssignmentEdit: React.FC = () => {
           </div>
         )
       )}
-      {detail.status === 'PUBLISHED' && !isWrapper && <PublicDeliveryManager key={id} family="COGNITIVE" resourceId={id} />}
+      {detail.status === 'PUBLISHED' && !isWrapper && <PublicDeliveryManager key={id} family="COGNITIVE" resourceId={id} canCreate={cognitiveEnabled} />}
 
     </ProductPage>
   )

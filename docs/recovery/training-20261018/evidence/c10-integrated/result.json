@@ -1,0 +1,35 @@
+{
+  "sourceCommit": "5ee474e9a05bdde2700d4a3d2a6fc3f0d51e0c1b",
+  "sourceTree": "4e0a059f2a47a6e59c5b103b79a6d1224b3e1ea5",
+  "composition": "b0436772 (C09 + C10) plus 157662eb detail/quota followup, cherry-picked as 5ee474e9",
+  "nodeVersion": "v24.21.0",
+  "timezone": "UTC",
+  "measurementLock": "TOOLS/.measurement.lock",
+  "prisma": "independent client regenerated from integrated schema",
+  "checks": {
+    "backendTypes": "passed",
+    "frontendAppTypes": "passed",
+    "backendContractFiles": 6,
+    "backendContractTests": 26,
+    "frontendContractFiles": 3,
+    "frontendContractTests": 29
+  },
+  "sourceSha256": {
+    "server-version/backend/src/modules/composite/composite.service.ts": "b7bf80642650514a3266b8e79f49e68581b16be4d3ae0f85ec4e02fb431eccf1",
+    "server-version/backend/src/modules/questionnaire-product/service.ts": "9da7d89f6260ce533a06b50de5941fb9d126cc5ebe018821584a5f3f353198a2",
+    "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx": "2426a66a0511cf4b310b9a14d9c97609c766a570981da7674faa96b5a3971651",
+    "server-version/backend/src/modules/cognitive/attempt-quota.ts": "edb1a1da3d54210b49ca9588a6a2b4d6aac05c8d2599f7e104a6ad2798f760fc",
+    "server-version/frontend/src/modules/cognitive/pages/CognitiveAssignmentEntry.tsx": "5453de4db50e116583b3f5c19d4e340435133ff5a7d4e6d9bcf6e35d8fcad154"
+  },
+  "logSha256": {
+    "frontend-contracts.log": "3a4b6ea7c68357f01e202538c6d26fa7fb33874c086766031ab806c050b21848",
+    "frontend-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "backend-contracts.log": "7ae8e0c4da3eccb0949433e88e642ed4e147ffb140bc5b28e9ca27157fa0ba5a",
+    "backend-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prisma.log": "f57080cd8b0f617e6394fb57500ce894eb9ca662b40c21d532b78063478b9a34"
+  },
+  "limits": [
+    "No repeated core HTTP suite or migrations.",
+    "No browser, production, full C25 regression, C26 performance, or OFF-worker new FINAL experiment."
+  ]
+}

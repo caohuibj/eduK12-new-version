@@ -1,3 +1,4 @@
+import { isCognitiveNewAdmissionEnabled } from './product-eligibility'
 import type { Prisma } from '@prisma/client'
 import { CONFLICT, NOT_FOUND } from './cognitive.errors'
 
@@ -28,9 +29,10 @@ export async function readCognitiveQuota(db: Tx, userId: string, assignmentId: s
   const session = await db.cognitiveSession.findFirst({ where: { ...where, status: 'IN_PROGRESS', OR: [
     { AND: [{ OR: where.OR }, { compositeAttemptId: null }] },
     { AND: [{ OR: where.OR }, { compositeAttempt: { userId, assignmentRef: null, compositeAssessment: { reportPackageKey: null, analysisProtocolKey: null } } }] },
-  ] }, orderBy: { createdAt: 'desc' }, select: { id: true, compositeAttemptId: true } })
-  return { maxAttempts: source.maxAttempts, usedAttempts: used, remainingAttempts: Math.max(0, source.maxAttempts - used),
-    continueHref: session ? session.compositeAttemptId ? `/student/composite/attempts/${session.compositeAttemptId}` : `/student/cognitive/sessions/${session.id}` : null }
+  ] }, orderBy: { createdAt: 'desc' }, select: { id: true, compositeAttemptId: true, frozenAdmissionSnapshotHash: true } })
+  const admissionPaused = Boolean(session && !isCognitiveNewAdmissionEnabled() && !session.frozenAdmissionSnapshotHash)
+  return { admissionPaused, maxAttempts: source.maxAttempts, usedAttempts: used, remainingAttempts: Math.max(0, source.maxAttempts - used),
+    continueHref: session && !admissionPaused ? session.compositeAttemptId ? `/student/composite/attempts/${session.compositeAttemptId}` : `/student/cognitive/sessions/${session.id}` : null }
 }
 
 /** Caller holds this lock until the new session has been inserted. Counts all

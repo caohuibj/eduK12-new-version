@@ -40,6 +40,8 @@ beforeAll(() => {
   process.env.DATA_PSEUDONYM_KEY = 'b'.repeat(64)
 })
 
+import { config as appConfig } from '../../config'
+
 const TEACHER = UserRole.TEACHER
 const ADMIN = UserRole.ADMIN
 const STUDENT = UserRole.STUDENT
@@ -105,6 +107,7 @@ const baseInput = {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  appConfig.cognitiveModuleEnabled = true
   mockPrisma.$transaction.mockImplementation((run: any) => run(mockPrisma))
   mockPrisma.cognitiveSession.count.mockResolvedValue(0)
   mockPrisma.cognitiveSession.findFirst.mockResolvedValue(null)
@@ -116,7 +119,7 @@ beforeEach(() => {
 describe('listPublishedConfigs', () => {
   it('hides GRANT configs the teacher cannot instantiate', async () => {
     mockPrisma.cognitiveTestConfig.findMany.mockResolvedValue([
-      { id: 'open-1', accessPolicy: 'OPEN' },
+      { ...publishedV2Config, id: 'open-1', accessPolicy: 'OPEN' },
     ])
     await listPublishedConfigs('teacher-1', TEACHER)
     expect(mockPrisma.cognitiveTestConfig.findMany).toHaveBeenCalledWith(expect.objectContaining({
@@ -140,6 +143,7 @@ describe('listPublishedConfigs', () => {
 
   it('keeps a database-published config even when legacy v2 compatibility metadata is Draft', async () => {
     mockPrisma.cognitiveTestConfig.findMany.mockResolvedValue([{
+      ...config,
       id: 'fake-config',
       testType: 'fake',
       engineVersion: '1.0.0',
@@ -152,6 +156,7 @@ describe('listPublishedConfigs', () => {
 
   it('keeps a database-published config whose exact v2 definition is Published', async () => {
     mockPrisma.cognitiveTestConfig.findMany.mockResolvedValue([{
+      ...publishedV2Config,
       id: 'reaction-config',
       testType: 'reaction',
       engineVersion: '1.0.0',

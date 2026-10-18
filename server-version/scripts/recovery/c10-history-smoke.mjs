@@ -1,0 +1,55 @@
+/** C10: real ON/OFF/reenabled API processes share only this disposable UTC database. */
+import assert from 'node:assert/strict'
+import fs from 'node:fs'
+import path from 'node:path'
+import net from 'node:net'
+import { spawn } from 'node:child_process'
+import { createRequire } from 'node:module'
+import { randomUUID, randomBytes } from 'node:crypto'
+import { fileURLToPath } from 'node:url'
+const base=path.dirname(fileURLToPath(import.meta.url)),backend=path.resolve(base,'../../backend'),require=createRequire(path.join(backend,'package.json'))
+const {prisma}=require(path.join(backend,'dist/config/database.js'))
+
+
+const state=process.argv[2],status=JSON.parse(fs.readFileSync(path.join(state,'status.json'))),fixture=JSON.parse(fs.readFileSync(path.join(state,'fixture-private.json')))
+assert.equal(new URL(status.apiUrl).hostname,'127.0.0.1')
+const checks=[],counts=[],requests=[];const children=[],logs=[]
+const check=name=>{checks.push(name);console.log('PASS',name)}
+const pause=ms=>new Promise(r=>setTimeout(r,ms))
+async function port(){const s=net.createServer();await new Promise(r=>s.listen(0,'127.0.0.1',r));const p=s.address().port;await new Promise(r=>s.close(r));return p}
+async function api(enabled,label){const p=await port(),log=fs.openSync(path.join(state,label+'.log'),'wx',0o600);logs.push(log)
+ const child=spawn(process.execPath,['--require',path.join(base,'loopback-only.cjs'),'dist/index.js'],{cwd:backend,env:{...process.env,COGNITIVE_MODULE_ENABLED:String(enabled),PORT:String(p)},stdio:['ignore',log,log]});children.push(child)
+ for(let i=0;i<150;i++){if(child.exitCode!==null)throw Error(label+' exited');try{const r=await fetch(`http://127.0.0.1:${p}/ready`);if(r.ok)return `http://127.0.0.1:${p}`}catch{}await pause(200)}throw Error(label+' startup timeout')}
+function client(url){const cookies=new Map();return {url,async request(route,method='GET',body,expected=200){const response=await fetch(this.url+'/api'+route,{method,signal:AbortSignal.timeout(20000),headers:{'content-type':'application/json',...(cookies.size?{cookie:[...cookies].map(([k,v])=>`${k}=${v}`).join('; ')}:{}),...(cookies.has('ptool_csrf')?{'x-csrf-token':cookies.get('ptool_csrf')}:{})},...(body===undefined?{}:{body:JSON.stringify(body)})});for(const c of response.headers.getSetCookie()){const pair=c.split(';',1)[0],i=pair.indexOf('=');cookies.set(pair.slice(0,i),pair.slice(i+1))}const text=await response.text();requests.push({route,method,status:response.status});assert.equal(response.status,expected,`${method} ${route}: ${text.slice(0,600)}`);const data=JSON.parse(text);if(expected!==200)return data;assert.equal(data.code,0,`${route}: ${data.message}`);return data.data},async login(who,role){await this.request('/auth/csrf');await this.request('/auth/training-login','POST',{...who,expectedRole:role})}}}
+async function census(){return {parents:await prisma.compositeAssessmentAttempt.count(),sessions:await prisma.cognitiveSession.count(),jobs:await prisma.compositeReportJob.count(),cognitiveTokens:await prisma.cognitiveAccessToken.findMany({orderBy:{id:'asc'},select:{id:true,usedCount:true}}),compositeTokens:await prisma.compositeAssessmentAccessToken.findMany({orderBy:{id:'asc'},select:{id:true,usedCount:true}}),courseQuotaUsed:await prisma.cognitiveSession.count({where:{userId:fixture.student.username}})}}
+async function noWrites(name,fn){const before=await census();await fn();const after=await census();assert.deepEqual(after,before,name);counts.push({name,before,after});check(name)}
+const teacher=client(status.apiUrl),student=client(status.apiUrl),anon=client(status.apiUrl)
+let passed=false
+try {
+ await teacher.login(fixture.teacher,'TEACHER');await student.login(fixture.student,'STUDENT')
+ assert.equal((await student.request('/capabilities')).cognitive,false)
+ await noWrites('OFF history feeds preserve existing owner records without admission, quota, job or token writes',async()=>{
+  const assignments=await student.request('/cognitive/assignments/my')
+  const rows=assignments.list ?? assignments
+  assert.ok(rows.some(row=>row.id===fixture.assignmentId && row.continueHref))
+  const available=await student.request('/composite-assessments/available');const list=available.list ?? available
+  assert.ok(list.some(row=>row.name==='C10 course'))
+  assert.ok(list.some(row=>row.name==='C10 shell'))
+  assert.ok(!list.some(row=>row.name==='C10 unused course'))
+  assert.ok(list.filter(row=>row.name.startsWith('C10 ')).every(row=>!row.canStartNewAttempt))
+  const active=await prisma.cognitiveSession.findFirstOrThrow({where:{userId:fixture.student.username,compositeAttemptId:null,status:'IN_PROGRESS'},orderBy:{createdAt:'desc'}})
+  const session=await student.request(`/cognitive/sessions/${active.id}`);assert.equal(session.sessionId,active.id)
+  await student.request('/cognitive/history')
+  const teacherRows=await teacher.request('/cognitive/assignments');assert.ok((teacherRows.list??teacherRows).some(row=>row.id===fixture.assignmentId))
+ })
+ // Synthetic old ACTIVE shell has no genuine admission: projection is paused, never a start link.
+ const active=await prisma.cognitiveSession.findFirstOrThrow({where:{userId:fixture.student.username,compositeAttemptId:null,status:'IN_PROGRESS'},orderBy:{createdAt:'desc'}})
+ await prisma.cognitiveSession.update({where:{id:active.id},data:{frozenAdmissionSnapshotHash:null,frozenAdmissionSnapshotEncrypted:null}})
+ try { await noWrites('OFF old ACTIVE shell is retained as paused and cannot activate from direct URL',async()=>{
+   const result=await student.request('/cognitive/assignments/my');const row=(result.list??result).find(row=>row.id===fixture.assignmentId)
+   assert.equal(row.admissionPaused,true);assert.equal(row.continueHref,null)
+   const detail=await student.request(`/cognitive/assignments/${fixture.assignmentId}`);assert.equal(detail.admissionPaused,true);assert.equal(detail.continueHref,null)
+   await student.request(`/cognitive/sessions/${active.id}`,'GET',undefined,400)
+ }) } finally {await prisma.cognitiveSession.update({where:{id:active.id},data:{frozenAdmissionSnapshotHash:active.frozenAdmissionSnapshotHash,frozenAdmissionSnapshotEncrypted:active.frozenAdmissionSnapshotEncrypted}})}
+ passed=true
+} finally { await prisma.$disconnect();fs.writeFileSync(path.join(state,'c10-history-result.json'),JSON.stringify({passed,checks,counts,requests},null,2)) }

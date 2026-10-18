@@ -1,4 +1,4 @@
-import { assertCognitiveProductEligible } from './product-eligibility'
+import { assertCognitiveProductEligible, isCognitiveProductEligible, isCognitiveNewAdmissionEnabled } from './product-eligibility'
 import { Prisma, UserRole, CourseStudentStatus, CognitiveAssignmentStatus, MaterialResourceType } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { readCognitiveQuota } from './attempt-quota'
@@ -56,6 +56,17 @@ const validateConfigForAssignment = async (courseId: string, configId: string, r
   }
 
   return { course, config, entry, validatedConfig: parsed.data }
+}
+
+/** Fail visibly for a permitted published resource; never disclose config contents. */
+export const assertCognitiveCatalogConfiguration = (row: CognitiveConfigIdentity & { config: unknown }): void => {
+  try {
+    requireReadyCognitiveV2Definition(row)
+    const entry = getCognitiveRegistryEntry(row.testType, row.engineVersion, row.scoringVersion)
+    if (!entry || !entry.configSchema.safeParse(row.config).success) throw new Error('Invalid config')
+  } catch {
+    throw BAD_REQUEST('认知资源目录配置不可用，请联系管理员检查已发布配置')
+  }
 }
 
 const isTeacherOrAdmin = (role: UserRole) => role === UserRole.TEACHER || role === UserRole.ADMIN
@@ -137,6 +148,7 @@ export const createAssignment = async (
 export const listPublishedConfigs = async (userId: string, role: UserRole) => {
   if (!isTeacherOrAdmin(role)) throw FORBIDDEN('Teacher role required')
 
+  if (!isCognitiveNewAdmissionEnabled()) return []
   const where: Record<string, unknown> = { status: 'PUBLISHED' }
   if (role !== UserRole.ADMIN && appConfig.materialGrantsEnabled) {
     const grantedIds = await grantedResourceIds(userId, MaterialResourceType.COGNITIVE_CONFIG)
@@ -159,16 +171,14 @@ export const listPublishedConfigs = async (userId: string, role: UserRole) => {
       scoringVersion: true,
       status: true,
       accessPolicy: true,
+      config: true,
     },
   })
 
-  return configs.filter((config) => {
-    try {
-      requireReadyCognitiveV2Definition(config)
-      return true
-    } catch {
-      return false
-    }
+  return configs.filter(row => isCognitiveProductEligible(row.testType)).map(row => {
+    assertCognitiveCatalogConfiguration(row)
+    const { config: _privateConfig, ...catalog } = row
+    return catalog
   })
 }
 
@@ -259,11 +269,17 @@ export const listStudentAssignments = async (userId: string) => {
   const assignments = await prisma.cognitiveAssignment.findMany({
     where: { courseId: { in: courseIds }, status: 'PUBLISHED', listedStandalone: true, course: { isLibrary: false } },
     orderBy: { publishedAt: 'desc' },
-    include: { config: true, course: true },
+    include: { config: true, course: true, sessions: {
+      where: { userId, compositeAttemptId: null, status: { in: ['IN_PROGRESS', 'COMPLETED'] } },
+      orderBy: { createdAt: 'desc' }, take: 1, select: { id: true, status: true, frozenAdmissionSnapshotHash: true },
+    } },
   })
 
-  return assignments.map((a) => ({
+  return assignments.filter(a => isCognitiveNewAdmissionEnabled() || (a.sessions?.length ?? 0) > 0).map((a) => ({
     id: a.id,
+    admissionPaused: !isCognitiveNewAdmissionEnabled() && a.sessions?.[0]?.status === 'IN_PROGRESS' && !a.sessions[0].frozenAdmissionSnapshotHash,
+    continueHref: a.sessions?.[0]?.status === 'IN_PROGRESS' && (isCognitiveNewAdmissionEnabled() || a.sessions[0].frozenAdmissionSnapshotHash) ? `/student/cognitive/sessions/${a.sessions[0].id}` : null,
+    latestCompletedSessionId: a.sessions?.[0]?.status === 'COMPLETED' ? a.sessions[0].id : null,
     courseId: a.courseId,
     title: a.title,
     instruction: a.instruction,

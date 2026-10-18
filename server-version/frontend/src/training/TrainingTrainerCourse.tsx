@@ -79,7 +79,7 @@ export default function TrainingTrainerCourse() {
     try { await navigator.clipboard.writeText(code); setCodeNotice('课程码已复制。') }
     catch { setCodeNotice('复制失败，请手动选中课程码。') }
   }
-  const displayedAssessments = assessments.rows.filter(item => cognitiveEnabled || item.kind !== 'COGNITIVE')
+  const displayedAssessments = assessments.rows
 
   return <div className="training-detail training-trainer-course">
     <Link to="/dashboard" className="training-back"><ArrowLeft size={16} aria-hidden="true" />我的课程</Link>

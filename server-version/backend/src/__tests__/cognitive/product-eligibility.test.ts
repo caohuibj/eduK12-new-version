@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { config as appConfig } from '../../config'
 import { UserRole } from '@prisma/client'
 const mock = vi.hoisted(() => ({ config: vi.fn(), course: vi.fn(), list: vi.fn(), write: vi.fn() }))
 vi.mock('../../config/database', () => ({ prisma: {
@@ -13,7 +14,7 @@ import { createCognitiveSessionConfigSnapshot, createUnifiedCognitiveSessionConf
 import { getCognitiveRegistryEntry } from '../../modules/cognitive/cognitive.registry'
 import { COGNITIVE_SEEDS } from '../../../prisma/seeds/cognitive'
 const fake = { id: 'fake-published', testType: 'fake', status: 'PUBLISHED', engineVersion: '1.0.0', scoringVersion: '1.0.0', configVersion: '1.0.0', config: {} }
-beforeEach(() => { vi.clearAllMocks(); vi.stubEnv('NODE_ENV', 'production'); mock.config.mockResolvedValue(fake); mock.course.mockResolvedValue({ id: 'course', creatorId: 'teacher' }) })
+beforeEach(() => { appConfig.cognitiveModuleEnabled = true; vi.clearAllMocks(); vi.stubEnv('NODE_ENV', 'production'); mock.config.mockResolvedValue(fake); mock.course.mockResolvedValue({ id: 'course', creatorId: 'teacher' }) })
 afterEach(() => vi.unstubAllEnvs())
 describe('framework fixture production exclusion', () => {
   it('cannot be opened by the fixture flag outside NODE_ENV=test', () => {
@@ -52,5 +53,25 @@ describe('framework fixture production exclusion', () => {
   })
   it('defaults the fixture seed to DRAFT without deleting or rewriting existing rows', () => {
     expect(COGNITIVE_SEEDS.find(seed => seed.testType === 'fake')?.status).toBe('DRAFT')
+  })
+})
+
+describe('server cognitive capability gates only new products', () => {
+  it('hides catalogs and rejects new snapshot writes while disabled; reenables without changing registry', async () => {
+    appConfig.cognitiveModuleEnabled = false
+    expect(isCognitiveProductEligible('reaction')).toBe(false)
+    expect(listCognitiveTestsCatalog().list).toEqual([])
+    expect(await listPublishedConfigs('admin', UserRole.ADMIN)).toEqual([])
+    expect(mock.list).not.toHaveBeenCalled()
+    await expect(createUnifiedCognitiveSessionConfigSnapshot({ ...fake, testType: 'reaction' })).rejects.toThrow(/暂不可用/)
+    expect(mock.write).not.toHaveBeenCalled()
+    expect(getCognitiveRegistryEntry('fake', '1.0.0', '1.0.0')).toBeDefined()
+    appConfig.cognitiveModuleEnabled = true
+    expect(isCognitiveProductEligible('reaction')).toBe(true)
+  })
+  it('does not turn a permitted broken configuration into a successful empty catalog', async () => {
+    mock.list.mockResolvedValue([{ ...fake, testType: 'reaction', engineVersion: 'missing-version', config: { private: 'do-not-leak' } }])
+    await expect(listPublishedConfigs('admin', UserRole.ADMIN)).rejects.toThrow('认知资源目录配置不可用')
+    try { await listPublishedConfigs('admin', UserRole.ADMIN) } catch (error) { expect(String(error)).not.toContain('do-not-leak') }
   })
 })

@@ -68,7 +68,7 @@ const StudentHome: React.FC = () => {
               <Link to="/student/cognitive" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 no-underline hover:border-slate-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">
                 <Brain className="h-5 w-5" aria-hidden="true" />认知测评
               </Link>
-            ) : null}
+            ) : <Link to="/student/cognitive/history" className="hui-button hui-button--secondary">认知测评历史</Link>}
             <Link to="/student/classroom/enter" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 no-underline hover:border-slate-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">
               <Keyboard className="h-5 w-5" aria-hidden="true" />加入课堂
             </Link>

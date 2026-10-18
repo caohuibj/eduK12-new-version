@@ -1,3 +1,4 @@
+import { isCognitiveNewAdmissionEnabled } from './product-eligibility'
 import { loadStoredUnitAdmission } from '../assessment-runtime/unit-admission'
 import { prisma } from '../../config/database'
 import { assertAttemptEpoch, assertFinalOnly, InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
@@ -170,6 +171,8 @@ export const activateCognitiveAdmission = async (
 ): Promise<FrozenUnitAdmissionV1> => {
   const stored = await loadStoredCognitiveAdmission(row)
   if (stored) return stored
+  // A session shell is not admission. Never activate one while new admission is disabled.
+  if (!isCognitiveNewAdmissionEnabled()) throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '认知模块暂不可用，尚未准入的任务请在重新开启后继续', 409)
   assertFinalOnly(row.deliveryMode)
   const configHash = await configHashFrom(row.configSnapshotEncrypted)
   const cognitive = {

@@ -449,7 +449,7 @@ function AppRoutes() {
                 path="/cognitive-assignments"
                 element={
                   <ProtectedRoute roles={['TEACHER', 'ADMIN']}>
-                    <CognitiveCapabilityRoute><CognitiveAssignmentList /></CognitiveCapabilityRoute>
+                    <CognitiveAssignmentList />
                   </ProtectedRoute>
                 }
               />
@@ -457,7 +457,7 @@ function AppRoutes() {
                 path="/cognitive-assignments/:id"
                 element={
                   <ProtectedRoute roles={['TEACHER', 'ADMIN']}>
-                    <CognitiveCapabilityRoute><CognitiveAssignmentEdit /></CognitiveCapabilityRoute>
+                    <CognitiveAssignmentEdit />
                   </ProtectedRoute>
                 }
               />
@@ -801,7 +801,7 @@ function AppRoutes() {
                 path="/student/cognitive/assignments/:assignmentId"
                 element={
                   <StudentProtectedRoute>
-                    <CognitiveCapabilityRoute><CognitiveAssignmentEntry /></CognitiveCapabilityRoute>
+                    <CognitiveAssignmentEntry />
                   </StudentProtectedRoute>
                 }
               />
@@ -809,7 +809,7 @@ function AppRoutes() {
                 path="/student/cognitive/history"
                 element={
                   <StudentProtectedRoute>
-                    <CognitiveCapabilityRoute><CognitiveHistory /></CognitiveCapabilityRoute>
+                    <CognitiveHistory />
                   </StudentProtectedRoute>
                 }
               />
@@ -817,7 +817,7 @@ function AppRoutes() {
                 path="/student/cognitive/sessions/:sessionId"
                 element={
                   <StudentProtectedRoute>
-                    <CognitiveCapabilityRoute><CognitiveRunner /></CognitiveCapabilityRoute>
+                    <CognitiveRunner />
                   </StudentProtectedRoute>
                 }
               />
@@ -825,17 +825,17 @@ function AppRoutes() {
                 path="/student/cognitive/sessions/:sessionId/result"
                 element={
                   <StudentProtectedRoute>
-                    <CognitiveCapabilityRoute><CognitiveResult /></CognitiveCapabilityRoute>
+                    <CognitiveResult />
                   </StudentProtectedRoute>
                 }
               />
               <Route
                 path="/relational/cognitive/sessions/:sessionId"
-                element={<RelationalProtectedRoute><CognitiveCapabilityRoute><CognitiveRunner /></CognitiveCapabilityRoute></RelationalProtectedRoute>}
+                element={<RelationalProtectedRoute><CognitiveRunner /></RelationalProtectedRoute>}
               />
-              <Route path="/public/cognitive/assignments/:token" element={<CognitiveCapabilityRoute><PublicCognitiveAssignment /></CognitiveCapabilityRoute>} />
-              <Route path="/public/cognitive/sessions/:sessionId" element={<CognitiveCapabilityRoute><CognitiveRunner /></CognitiveCapabilityRoute>} />
-              <Route path="/public/cognitive/sessions/:sessionId/result" element={<CognitiveCapabilityRoute><CognitiveResult /></CognitiveCapabilityRoute>} />
+              <Route path="/public/cognitive/assignments/:token" element={<PublicCognitiveAssignment />} />
+              <Route path="/public/cognitive/sessions/:sessionId" element={<CognitiveRunner />} />
+              <Route path="/public/cognitive/sessions/:sessionId/result" element={<CognitiveResult />} />
             </>
           )}
 

@@ -1,5 +1,5 @@
 import { storeSharedCognitiveRuntime, loadSharedCognitiveRuntime } from '../assessment-runtime/shared-cognitive-runtime'
-import { assertCognitiveProductEligible } from './product-eligibility'
+import { assertCognitiveProductEligible, assertCognitiveNewAdmissionEnabled, isCognitiveNewAdmissionEnabled } from './product-eligibility'
 import { randomBytes } from 'crypto'
 import { CourseStudentStatus, CognitiveSessionStatus } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -217,6 +217,7 @@ export const loadStartableAssignment = async (
 
   const config = await prisma.cognitiveTestConfig.findUnique({ where: { id: assignment.configId } })
   if (!config) throw NOT_FOUND('CognitiveTestConfig not found')
+  assertCognitiveProductEligible(config.testType)
 
   const entry = requireCognitiveRegistryEntry(config.testType, config.engineVersion, config.scoringVersion)
   let validatedConfig: unknown
@@ -286,6 +287,12 @@ const toRunnerPayload = async (session: {
   assignment?: { resolvedReportSnapshotEncrypted?: string | null } | null
   compositeAttempt?: { contextSnapshotHash?: string | null } | null
 }, nextTrialIndex?: number, exposeAnonymousCode = false, frozenReport?: FrozenReportSnapshot | null) => {
+  // Authorized delivery establishes admission once. Completed history remains a pure frozen read.
+  if (session.status === 'IN_PROGRESS' && !isCognitiveNewAdmissionEnabled() && !(session as any).frozenAdmissionSnapshotHash) assertCognitiveNewAdmissionEnabled()
+  if (session.status === 'IN_PROGRESS' && (session as any).runtimeGeneration === 'UNIFIED_V1') {
+    const { ensureCognitiveAdmissionAtDelivery } = await import('./cognitive-admission.service')
+    await ensureCognitiveAdmissionAtDelivery(session.id, undefined, session as import('./cognitive-admission.service').CognitiveAdmissionChildRow)
+  }
   const storedConfig = await loadCognitiveSessionConfig(session.configSnapshotEncrypted)
   const validatedConfig = storedConfig.config
   const snapshot = storedConfig.snapshot

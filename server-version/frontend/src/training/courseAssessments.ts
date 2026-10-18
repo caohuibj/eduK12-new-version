@@ -30,6 +30,7 @@ type Scale = {
 type Composite = {
   id: string; name: string; description: string | null; productKind?: string
   course: CourseRef
+  admissionPaused?: boolean
   canContinue: boolean; canStartNewAttempt: boolean
   attempt: { id: string; status: string; progress: number } | null
   hasSatisfiedAttempt?: boolean
@@ -83,6 +84,7 @@ export function projectCourseAssessments(
   scales: readonly Scale[],
   cognitives: readonly CognitiveAssignmentSummary[],
   composites: readonly Composite[],
+  cognitiveEnabled = true,
 ): CourseAssessmentView[] {
   const items: CourseAssessmentView[] = []
   const enc = encodeURIComponent
@@ -125,6 +127,7 @@ export function projectCourseAssessments(
 
   for (const item of cognitives) {
     if (item.courseId !== courseId || item.listedStandalone === false || item.status !== 'PUBLISHED') continue
+    if (!cognitiveEnabled && !item.continueHref && !item.latestCompletedSessionId && !item.admissionPaused) continue
     const canContinue = Boolean(item.continueHref)
     const now = Date.now()
     const upcoming = Boolean(item.opensAt && new Date(item.opensAt).getTime() > now)
@@ -132,14 +135,14 @@ export function projectCourseAssessments(
     const exhausted = item.remainingAttempts === 0
     // These labels are hints from existing metadata, not a second admission
     // system: the original CognitiveAssignmentEntry checks server authority.
-    const status = canContinue ? '进行中' : exhausted ? '尝试次数已用尽'
+    const status = item.admissionPaused ? '暂不可用，重新开放后继续' : canContinue ? '进行中' : exhausted ? '尝试次数已用尽'
       : upcoming ? '尚未开始' : expired ? '已截止' : '待完成'
     items.push({
       key: 'cognitive:' + item.id, kind: 'cognitive', name: item.title,
       typeLabel: '认知测评', description: item.instruction,
       status,
-      href: '/student/cognitive/assignments/' + enc(item.id),
-      action: canContinue ? '继续测评' : status === '待完成' ? '进入测评' : '查看任务',
+      href: item.admissionPaused ? null : !cognitiveEnabled ? item.continueHref || '/student/cognitive/sessions/' + enc(item.latestCompletedSessionId!) + '/result' : '/student/cognitive/assignments/' + enc(item.id),
+      action: item.admissionPaused ? '暂不可用' : canContinue ? '继续测评' : !cognitiveEnabled ? '查看反馈' : status === '待完成' ? '进入测评' : '查看任务',
     })
   }
 
@@ -156,7 +159,7 @@ export function projectCourseAssessments(
       : item.canStartNewAttempt
         ? '/student/composite/' + enc(item.id)
         : reportHref
-    const status = inProgress ? '进行中'
+    const status = item.admissionPaused ? '暂不可用，重新开放后继续' : inProgress ? '进行中'
       : item.availability === 'UPCOMING' ? '未开放'
         : item.availability === 'EXPIRED' ? '已截止'
           : finished ? item.hasSatisfiedAttempt === false ? '已交卷，任务未达成' : '任务已达成'
@@ -185,16 +188,16 @@ export async function loadCourseAssessments(courseId: string, cognitiveEnabled: 
     if (response.code !== 0) throw new Error(response.message || '请重试')
     return response.data?.list ?? []
   }, [] as Scale[])
-  const cognitiveTask = cognitiveEnabled ? attempt('认知测评', async () => {
+  const cognitiveTask = attempt('认知测评', async () => {
     const response = await cognitiveApi.getMyAssignments()
     if (response.code !== 0) throw new Error(response.message || '请重试')
     return response.data ?? []
-  }, [] as CognitiveAssignmentSummary[]) : Promise.resolve({ value: [] as CognitiveAssignmentSummary[], error: null as string | null })
+  }, [] as CognitiveAssignmentSummary[])
   const compositeTask = attempt('组合测评', () => availableComposites(courseId), [] as Composite[])
 
   const [questions, scales, cognitives, composites] = await Promise.all([questionTask, scaleTask, cognitiveTask, compositeTask])
   return {
-    items: projectCourseAssessments(courseId, questions.value, scales.value, cognitives.value, composites.value),
+    items: projectCourseAssessments(courseId, questions.value, scales.value, cognitives.value, composites.value, cognitiveEnabled),
     errors: [questions.error, scales.error, cognitives.error, composites.error].filter((error): error is string => Boolean(error)),
   }
 }

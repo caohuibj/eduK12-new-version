@@ -10,6 +10,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams, useLocation } from 'react-router-dom'
 import apiClient from '../../api/client'
 import { resolveTrainingCoursePrefill } from '../../training/resolveCoursePrefill'
+import { useCognitiveEnabled } from '../../contexts/CapabilitiesContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { useStaffFeedback } from '../../components/staff-ui/useStaffFeedback'
 import LocalDateTimeInput, { localDateTimeValue, parseLocalDateTime } from '../../components/LocalDateTimeInput'
@@ -162,6 +163,7 @@ export function QuestionnaireProductList() {
 }
 
 export function QuestionnaireProductEdit() {
+  const cognitiveEnabled = useCognitiveEnabled()
   const { user } = useAuth()
   const { feedback, confirm: confirmManagement } = useStaffFeedback()
   const { id = 'new' } = useParams()
@@ -187,6 +189,10 @@ export function QuestionnaireProductEdit() {
   const [opensAt, setOpens] = useState('')
   const [type, setType] = useState('SCALE')
   const [selected, setSelected] = useState('')
+  useEffect(() => {
+    if (!cognitiveEnabled && type === 'COGNITIVE') { setType('SCALE'); setSelected('') }
+  }, [cognitiveEnabled, type])
+
   const [formLabel, setFormLabel] = useState('')
   const [editingUnit, setEditingUnit] = useState('')
   const location = useLocation()
@@ -730,7 +736,7 @@ export function QuestionnaireProductEdit() {
                         setSelected('')
                       }}
                     >
-                      {['SCALE', 'COGNITIVE', 'SITUATIONAL', 'FORM'].map(
+                      {['SCALE', ...(cognitiveEnabled ? ['COGNITIVE'] : []), 'SITUATIONAL', 'FORM'].map(
                         (t) => (
                           <option key={t} value={t}>
                             {labels[t]}

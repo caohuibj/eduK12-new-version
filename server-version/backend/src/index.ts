@@ -382,11 +382,10 @@ app.use('/api/public/composite-assessments', ...publicAssessmentRateLimiters, co
 // 课堂互动路由（新增）
 app.use('/api/classrooms', classroomRoutes)
 
-// 认知测评路由（D3+）：feature flag 默认 false —— 关闭时 /api/cognitive/* 走 404，旧路由零改动
-if (config.cognitiveModuleEnabled) {
-  app.use('/api/cognitive', cognitiveRoutes)
-  app.use('/api/public/cognitive', ...publicAssessmentRateLimiters, cognitivePublicRoutes)
-}
+// Keep authorized historical reads and accepted submissions reachable.
+// New authoring/session admission is guarded in the shared services.
+app.use('/api/cognitive', cognitiveRoutes)
+app.use('/api/public/cognitive', ...publicAssessmentRateLimiters, cognitivePublicRoutes)
 
 app.use('/api/public', ...publicAssessmentRateLimiters, publicRoutes)
 
