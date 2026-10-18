@@ -13,7 +13,7 @@ import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit
 import { QuestionnaireCompletionAdmissionBusyError } from '../../services/questionnaireCompletionAdmission'
 
 export const REPORT_PARENT_SELECT = {
-  id: true, status: true, progress: true, completedAt: true, attemptEpoch: true,
+  id: true, status: true, progress: true, completedAt: true, attemptEpoch: true, taskSatisfaction: true,
   asyncReportEpoch: true, deliveryMode: true, runtimeGeneration: true,
   frozenActiveSlotSetHash: true, contextSnapshotHash: true, aggregateInputHash: true,
   assignmentRef: true, deliveryCourseId: true,

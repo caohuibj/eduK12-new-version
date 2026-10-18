@@ -1,3 +1,4 @@
+import { remapTrainingFormDefinition } from '../assessment-runtime/form-policy'
 import { typedCompositeFormQuestion } from '../assessment-runtime/typed-form'
 import { assertCognitiveProductEligible, isCognitiveProductEligible } from '../cognitive/product-eligibility'
 import { Prisma, UserRole } from '@prisma/client'
@@ -32,7 +33,7 @@ const metadata = {
 export const createSchema = z.object({ ...metadata, requestId: z.string().uuid(), questionnaireType: z.enum(['COURSE', 'GENERAL']) }).strict()
 export const editSchema = z.object({ ...metadata, revision: z.number().int().nonnegative() }).strict()
 export const revisionSchema = z.object({ revision: z.number().int().nonnegative() }).strict()
-export const itemSchema = z.object({ revision: z.number().int().nonnegative(), item: addCompositeItemSchema }).strict()
+export const itemSchema = z.object({ revision: z.number().int().nonnegative(), item: addCompositeItemSchema, formSectionId: z.string().min(1).optional() }).strict()
 export const orderSchema = z.object({ revision: z.number().int().nonnegative(),
   units: z.array(z.object({ id: z.string().min(1), type: z.enum(['FORM_SECTION', 'SCALE', 'COGNITIVE', 'SITUATIONAL']) }).strict()).min(1).max(500),
 }).strict()
@@ -110,14 +111,18 @@ export async function update(actor: Actor, id: string, raw: unknown) {
   })
 }
 export async function addItem(actor: Actor, id: string, raw: unknown) {
-  const { revision, item } = itemSchema.parse(raw)
+  const { revision, item, formSectionId } = itemSchema.parse(raw)
   return mutate(actor, id, revision, async (tx, row) => {
     await assertValidItem(item, actor.userId, actor.role, row, tx)
     if (row.items.length >= 500) throw compositeBadRequest('问卷最多包含 500 个内容项')
     const position = Math.max(-1, ...row.items.map((v: any) => v.position), ...row.formSections.map((v: any) => v.position)) + 1
     const itemId = randomUUID()
+    const targetSection = formSectionId ? row.formSections.find((section:any)=>section.id===formSectionId) : null
+    if (formSectionId && (item.type!=='FORM' || !targetSection || targetSection.contextSection || item.contextKey)) throw compositeBadRequest('只能加入当前草稿已有的普通表单区段')
     await tx.compositeAssessmentItem.create({ data: {
       id: itemId,
+      ...(targetSection ? {formSectionId:targetSection.id, formSectionPosition:Math.max(-1,...targetSection.items.map((child:any)=>child.formSectionPosition??child.position))+1}: {}),
+      ...(item.type==='FORM' && item.formPolicy ? {formPolicy:item.formPolicy}: {}),
       ...(item.type === 'FORM' && item.formDefinition ? { formDefinition: { ...item.formDefinition, itemKey: 'q_' + itemId } as Prisma.InputJsonValue } : {}),
       compositeAssessmentId: id, type: item.type, position, required: item.required,
       scaleId: item.type === 'SCALE' ? item.scaleId : null, cognitiveAssignmentId: item.type === 'COGNITIVE' ? item.cognitiveAssignmentId : null,
@@ -376,6 +381,8 @@ export async function copy(actor: Actor, id: string, raw: unknown) {
         formSectionId: form.sectionId ? sectionIds.get(form.sectionId) : null, formSectionPosition: form.sectionPosition,
       } })
     } else {
+      const copiedIds = new Map(composite!.items.map(item=>[item.id,randomUUID()]))
+      const copiedKeys = new Map<string,string>(composite!.items.filter(item=>item.formDefinition!=null).map(item=>[(item.formDefinition as any).itemKey,'q_'+copiedIds.get(item.id)]))
       for (const item of composite!.items) {
         if (item.formDefinition != null) typedCompositeFormQuestion({ ...item, placeholder: item.formPlaceholder ?? null } as any)
         const { id: _id, compositeAssessmentId: _parent, cognitiveAssignment, ...data } = item
@@ -393,9 +400,10 @@ export async function copy(actor: Actor, id: string, raw: unknown) {
           } })
           data.cognitiveAssignmentId = binding.id
         }
-        await tx.compositeAssessmentItem.create({ data: { ...data, compositeAssessmentId: target.id,
+        await tx.compositeAssessmentItem.create({ data: { ...data, id:copiedIds.get(item.id), compositeAssessmentId: target.id,
           formOptions: item.formOptions ?? Prisma.JsonNull,
-          formDefinition: item.formDefinition ?? Prisma.DbNull,
+          formDefinition: item.formDefinition != null ? remapTrainingFormDefinition(item.formDefinition,copiedKeys) : Prisma.DbNull,
+          formPolicy: item.formPolicy ?? Prisma.DbNull,
           formSectionId: item.formSectionId ? sectionIds.get(item.formSectionId) : null,
         } })
       }

@@ -55,6 +55,7 @@ const wholeParentSelect = {
 // metadata and collection rendering. Participant delivery keeps its old select.
 const wholeReportParentSelect = {
   ...wholeParentSelect, anonymousCode: true, totalTime: true, startedAt: true,
+  formSectionAttempts: {select:{sectionId:true,attemptEpoch:true,status:true,taskSatisfaction:true}},
   completedItems: true, compiledBundleRuntimeHash: true,
   formAnswers: { select: { itemId: true, value: true } },
   compositeAssessment: { select: {
@@ -66,7 +67,7 @@ const wholeReportParentSelect = {
     formSections: { orderBy: { position: 'asc' }, select: {
       id: true, title: true, description: true, position: true, contextSection: true,
       items: { orderBy: [{ formSectionPosition: 'asc' }, { position: 'asc' }], select: {
-        id: true, formType: true, formLabel: true, formPlaceholder: true, formOptions: true, formDefinition: true,
+        id: true, formType: true, formLabel: true, formPlaceholder: true, formOptions: true, formDefinition: true, formPolicy: true,
         contextKey: true, required: true, position: true, formSectionPosition: true,
       } },
     } },

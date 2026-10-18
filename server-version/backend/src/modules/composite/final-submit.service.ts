@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client'
-import { normalizeTypedCompositeFormAnswer, validateTypedCompositeSectionDefinition, legacyFormValueProjection, type TypedFormValue } from '../assessment-runtime/typed-form'
+import { normalizeTypedCompositeFormAnswer, normalizeTypedCompositeSection, validateTypedCompositeSectionDefinition, legacyFormValueProjection, type TypedFormValue } from '../assessment-runtime/typed-form'
 import { v4 as uuidv4 } from 'uuid'
 import { prisma } from '../../config/database'
 import {
@@ -49,7 +49,7 @@ export type SectionSubmitInput = {
   attemptEpoch: number
   definitionHash: string
   contextSnapshotHash?: string | null
-  answers: Array<{ formItemId: string; value: TypedFormValue }>
+  answers: Array<{ formItemId: string; value: TypedFormValue; otherText?: string }>
   userId?: string | null
   recoveryTokenHash?: string
 }
@@ -225,7 +225,7 @@ export const listCompositeFormItems = async (compositeId: string) => prisma.comp
     formLabel: true,
     formPlaceholder: true,
     formOptions: true,
-    formDefinition: true,
+    formDefinition: true, formPolicy: true,
     required: true,
     contextKey: true,
   },
@@ -394,16 +394,19 @@ export const normalizeCompositeSectionAnswers = (section: CompositeSection, valu
   }
   const itemMap = new Map(section.items.map((item) => [item.id, item]))
   if (itemMap.size !== section.items.length) throw new InstrumentFinalSubmitError('FORM_ANSWER_INVALID', '表单定义包含重复字段', 400)
-  const provided = new Map<string, TypedFormValue>()
+  const provided = new Map<string, {value: TypedFormValue; otherText?: string}>()
   for (const answer of values) {
     const item = itemMap.get(answer.formItemId)
     if (!item) throw new InstrumentFinalSubmitError('FORM_ANSWER_INVALID', '提交中包含不属于该区段的字段', 400)
     if (provided.has(answer.formItemId)) throw new InstrumentFinalSubmitError('FORM_ANSWER_INVALID', '同一字段不能重复提交', 400)
-    provided.set(answer.formItemId, answer.value)
+    provided.set(answer.formItemId, answer)
   }
+  const policyEnabled = section.items.some(item => item.formPolicy != null)
+  const typedResults = policyEnabled ? normalizeTypedCompositeSection(section.items, provided) : null
   const normalized = orderedItems(section.items).map((item) => {
-    const value = provided.has(item.id) ? provided.get(item.id)! : null
+    const value = provided.has(item.id) ? provided.get(item.id)!.value : null
     if (item.formDefinition != null) {
+      if (typedResults) return { item, ...typedResults.get(item.id)! }
       const normalizedValue = normalizeTypedCompositeFormAnswer(item, value)
       return { item, normalizedValue, storedValue: legacyFormValueProjection(normalizedValue), completed: normalizedValue !== null }
     }
@@ -419,7 +422,7 @@ export const normalizeCompositeSectionAnswers = (section: CompositeSection, valu
     const serialized = Array.isArray(valueAfterNormalization) ? JSON.stringify(valueAfterNormalization) : valueAfterNormalization
     return { item, normalizedValue: valueAfterNormalization, storedValue: writeContextFormAnswer(item.contextKey, serialized), completed: true }
   })
-  return { normalized, payloadAnswers: normalized.map((entry) => ({ formItemId: entry.item.id, value: entry.normalizedValue })) }
+  return { normalized, taskSatisfaction: policyEnabled ? (normalized.some(entry => 'qualifies' in entry && !entry.qualifies) ? 'NOT_SATISFIED' : 'SATISFIED') : null, payloadAnswers: normalized.filter(entry => !('state' in entry) || entry.state !== 'NOT_SHOWN').map((entry) => ({ formItemId: entry.item.id, value: 'payloadValue' in entry ? entry.payloadValue : entry.normalizedValue, ...('otherText' in entry && entry.otherText !== undefined ? {otherText:entry.otherText}: {}) })) }
 }
 
 export const persistCompositeFormSection = async (

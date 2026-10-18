@@ -130,6 +130,8 @@ const compositeParentHeaderSelect = {
 } as const
 
 const compositeParentGraphSelect = {
+  taskSatisfaction: true,
+  formSectionAttempts: {select:{sectionId:true,attemptEpoch:true,status:true,taskSatisfaction:true}},
   id: true,
   status: true,
   deliveryMode: true,
@@ -182,7 +184,7 @@ const compositeParentGraphSelect = {
           contextSection: true,
           items: {
             orderBy: [{ formSectionPosition: 'asc' }, { position: 'asc' }],
-            select: { id: true, formType: true, formLabel: true, formPlaceholder: true, formOptions: true, formDefinition: true, contextKey: true, required: true, position: true, formSectionPosition: true },
+            select: { id: true, formType: true, formLabel: true, formPlaceholder: true, formOptions: true, formDefinition: true, formPolicy: true, contextKey: true, required: true, position: true, formSectionPosition: true },
           },
         },
       },
@@ -1080,10 +1082,18 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?:
     aggregateInputHash,
     packageAnalysis,
     payloadEncrypted,
+    taskSatisfaction: assessment.formSections.some((section:any)=>section.items.some((item:any)=>item.formPolicy!=null))
+      ? (()=> {
+        const required = assessment.formSections.filter((section:any)=>section.items.some((item:any)=>item.formPolicy!=null))
+        const states = required.map((section:any)=>(parent.formSectionAttempts??[]).find((row:any)=>row.sectionId===section.id && row.attemptEpoch===parent.attemptEpoch && row.status==='COMPLETED')?.taskSatisfaction)
+        if(states.some((state:any)=>state!=='SATISFIED'&&state!=='NOT_SATISFIED'))throw aggregateInputError('Form V3 已接受区段缺少任务资格')
+        return states.includes('NOT_SATISFIED')?'NOT_SATISFIED':'SATISFIED'
+      })() : null,
   })
 }
 
 const persistCompositeCompletion = async (input: {
+  taskSatisfaction: string | null
   parent: any
   frozenSlots: FrozenActiveSlotSetV1
   headers: AggregateSnapshotHeader[]
@@ -1108,6 +1118,7 @@ const persistCompositeCompletion = async (input: {
           totalTime: Math.max(0, completedAt.getTime() - new Date(input.parent.startedAt).getTime()),
           lastSavedAt: completedAt,
           aggregateInputHash: input.aggregateInputHash,
+          ...(input.taskSatisfaction ? {taskSatisfaction:input.taskSatisfaction}: {}),
         },
       })
       if (updated.count !== 1) throw new AggregateCasLost()
@@ -1158,6 +1169,7 @@ const persistCompositeCompletion = async (input: {
             generatedBy: null,
             payloadEncrypted: input.payloadEncrypted,
             aggregateInputHash: input.aggregateInputHash,
+          ...(input.taskSatisfaction ? {taskSatisfaction:input.taskSatisfaction}: {}),
             hashScheme: UNIFIED_AGGREGATE_HASH_SCHEME,
             compiledBundleRuntimeHash: input.compiledBundleRuntimeHash,
             attemptEpoch: input.parent.attemptEpoch,
@@ -1222,6 +1234,7 @@ const compositeSectionDefinition = (section: any) => ({
       required: item.required !== false,
       formOptions: item.formOptions,
       ...(item.formDefinition != null ? { formDefinition: item.formDefinition } : {}),
+      ...(item.formPolicy != null ? { formPolicy: item.formPolicy } : {}),
       contextKey: item.contextKey ?? null,
       position: item.position,
       formSectionPosition: item.formSectionPosition ?? null,

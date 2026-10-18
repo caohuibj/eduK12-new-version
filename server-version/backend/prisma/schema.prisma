@@ -1217,6 +1217,7 @@ model CompositeAssessmentItem {
   formLabel             String?                     @map("form_label")
   formPlaceholder       String?                     @map("form_placeholder")
   formOptions           Json?                       @map("form_options")
+  formPolicy Json? @map("form_policy")
   formDefinition        Json?                       @map("form_definition")
   contextKey            String?                     @map("context_key")
   formSectionId         String?                     @map("form_section_id")
@@ -1262,6 +1263,7 @@ model CompositeFormSection {
 
 // 一次学生/匿名参与记录。recoveryTokenHash 只存哈希，原始恢复凭证只在创建时返回一次。
 model CompositeAssessmentAttempt {
+  taskSatisfaction String? @map("task_satisfaction")
   frozenControlBindings AssessmentFrozenBinding[]
   // Set atomically with the first durable report outbox event; survives disabling new admission.
   asyncReportEpoch Int? @map("async_report_epoch")
@@ -1377,6 +1379,7 @@ model CompositeFormAnswer {
 }
 
 model CompositeFormSectionAttempt {
+  taskSatisfaction String? @map("task_satisfaction")
   id                    String                           @id @default(uuid())
   attemptId             String                           @map("attempt_id")
   sectionId             String                           @map("section_id")

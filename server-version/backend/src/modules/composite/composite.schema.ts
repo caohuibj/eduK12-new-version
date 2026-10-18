@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { trainingFormPolicySchema } from '../assessment-runtime/form-policy'
 import { formQuestionSchema } from '../assessment-core/form/definition'
 import { typedCompositeFormQuestion } from '../assessment-runtime/typed-form'
 import { MAX_TOKEN_USES } from '../../constants'
@@ -74,13 +75,17 @@ export const addCompositeItemSchema = z.object({
   formLabel: z.string().min(1).max(500).optional(),
   // Stable itemKey is assigned by the server from the new database UUID.
   formDefinition: formQuestionSchema.omit({ itemKey: true }).optional(),
+  formPolicy: trainingFormPolicySchema.optional(),
   formPlaceholder: z.string().nullable().optional(),
   formOptions: z.array(formOption).nullable().optional(),
   contextKey: z.enum(['birthYearMonth', 'sexAtBirth', 'gradeLevel', 'primaryLanguage', 'countryOrRegion']).nullable().optional(),
 }).strict().superRefine((input, ctx) => {
   const advanced = ['number', 'long_text', 'date', 'time', 'likert', 'matrix', 'matrix_multiple', 'rank_order', 'slider', 'constant_sum'].includes(input.formType ?? '')
+  // C06 checkpoint: acceptance without task qualification stays closed until all consumers are connected.
+  if (input.formPolicy?.requiredRefusal === 'ALLOW_SUBMIT' || input.formPolicy?.hiddenRequired === 'NOT_SATISFIED') ctx.addIssue({code:'custom',path:['formPolicy'],message:'任务资格显示尚未接通，此策略暂不开放'})
+  if (input.formPolicy && !input.formDefinition) ctx.addIssue({code:'custom',path:['formPolicy'],message:'V3 策略必须绑定 typed 定义'})
   if (input.formDefinition || advanced) {
-    if (input.type !== 'FORM' || !advanced || !input.formDefinition) {
+    if (input.type !== 'FORM' || (!advanced && !input.formPolicy) || !input.formDefinition) {
       ctx.addIssue({ code: 'custom', path: ['formDefinition'], message: '新增题型必须提供公共表单定义，请使用已开放的基础或结构化题型' })
     } else {
       try {

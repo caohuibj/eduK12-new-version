@@ -15,14 +15,19 @@ const invalid = (message: string): never => { throw new InstrumentFinalSubmitErr
 export const assertTypedCompositeFormFacts = (section: CompositeSection, facts: FormSectionCollectionFacts): void => {
   const typed = section.items.some(item => item.formDefinition != null)
   if (!typed && facts.schemaVersion === 1) return
-  if (!typed || facts.schemaVersion !== 2 || facts.sectionKey !== section.id) invalid('typed Form facts 版本或区段绑定不匹配')
+  if (!typed || facts.schemaVersion !== (section.items.some(item=>item.formPolicy!=null)?3:2) || facts.sectionKey !== section.id) invalid('typed Form facts 版本或区段绑定不匹配')
   if (facts.items.length !== section.items.length) invalid('typed Form facts 数量不匹配')
   const byId = new Map(section.items.map(item => [item.id, item]))
   for (const fact of facts.items) if (byId.get(fact.key)?.formLabel !== fact.label) invalid('typed Form facts 题目绑定不匹配')
   let normalized: ReturnType<typeof normalizeCompositeSectionAnswers>
-  try { normalized = normalizeCompositeSectionAnswers(section, facts.items.map(fact => ({ formItemId: fact.key, value: fact.value }))) }
+  try { normalized = normalizeCompositeSectionAnswers(section, facts.items.filter(fact => !('state' in fact) || fact.state !== 'NOT_SHOWN').map(fact => {
+    let value: TypedFormValue = fact.value
+    if ('rowStates' in fact && fact.rowStates) value = { ...(value && typeof value === 'object' ? value : {}), ...Object.fromEntries(Object.entries(fact.rowStates).filter(([,state])=>state==='REFUSED').map(([key])=>[key,{_surveyRefusal:true}])) } as TypedFormValue
+    else if ('state' in fact && fact.state === 'REFUSED') value = {_surveyRefusal:true}
+    return {formItemId:fact.key,value,...('otherText' in fact && typeof fact.otherText==='string'?{otherText:fact.otherText}: {})}
+  })) }
   catch { invalid('typed Form facts 不符合冻结定义') }
-  const expected = normalized!.normalized.map(entry => ({ key: entry.item.id, label: entry.item.formLabel, value: entry.normalizedValue }))
+  const expected = facts.schemaVersion===3 ? normalized!.normalized.map(entry=>({key:entry.item.id,label:entry.item.formLabel,value:entry.normalizedValue,state:'state' in entry?entry.state:entry.normalizedValue===null?'SHOWN_MISSING':'ANSWERED',...('rowStates' in entry && entry.rowStates?{rowStates:entry.rowStates}:{}),...('otherText' in entry && entry.otherText!==undefined?{otherText:entry.otherText}:{})})) : normalized!.normalized.map(entry => ({ key: entry.item.id, label: entry.item.formLabel, value: entry.normalizedValue }))
   if (!canonicalJsonBytes(expected).equals(canonicalJsonBytes(facts.items))) invalid('typed Form facts 非规范化顺序或数值')
 }
 

@@ -69,7 +69,7 @@ export interface FormSectionCollectionFactsV2 {
   sectionKey: string
   items: Array<{ key: string; label: string; value: TypedFormValue }>
 }
-export type FormSectionCollectionFacts = FormSectionCollectionFactsV1 | FormSectionCollectionFactsV2
+export type FormSectionCollectionFacts = FormSectionCollectionFactsV1 | FormSectionCollectionFactsV2 | FormSectionCollectionFactsV3
 export const typedFormValueSchema = z.union([
   z.string(), z.number().finite(), z.array(z.string()),
   z.record(z.union([z.string(), z.number().finite(), z.array(z.string())])), z.null(),
@@ -87,9 +87,25 @@ export const createTypedFormSectionCollectionFacts = (input: Omit<FormSectionCol
 
 /** Shared reader for encrypted canonical snapshots; never consult String projections. */
 export const readFormSectionCollectionFacts = (value: unknown): FormSectionCollectionFacts => {
+  if(value && typeof value === "object" && (value as {schemaVersion?:unknown}).schemaVersion===3) return createPolicyFormSectionCollectionFacts(v3FactsSchema.parse(value))
   if (value && typeof value === 'object' && (value as {schemaVersion?: unknown}).schemaVersion === 2) {
     const parsed = typedFactsSchema.parse(value)
     return createTypedFormSectionCollectionFacts(parsed)
   }
   return parseFormSectionCollectionFacts(value)
+}
+
+const factState = z.enum(['ANSWERED','REFUSED','SHOWN_MISSING','NOT_SHOWN'])
+const refusalSchema = z.object({_surveyRefusal:z.literal(true)}).strict()
+export const trainingFormWireValueSchema = z.union([typedFormValueSchema, refusalSchema, z.record(z.union([z.string(),z.number().finite(),z.array(z.string()),refusalSchema]))])
+const v3FactsSchema = z.object({schemaVersion:z.literal(3),sectionKey:z.string().min(1),items:z.array(z.object({
+  key:z.string().min(1),label:z.string().min(1),value:typedFormValueSchema,state:factState,
+  rowStates:z.record(factState).optional(),otherText:z.string().optional(),
+}).strict()).max(500)}).strict()
+export type FormSectionCollectionFactsV3 = z.infer<typeof v3FactsSchema>
+export const createPolicyFormSectionCollectionFacts = (input: Omit<FormSectionCollectionFactsV3,'schemaVersion'>): FormSectionCollectionFactsV3 => {
+  const facts = v3FactsSchema.parse({...input,schemaVersion:3})
+  if(new Set(facts.items.map(item=>item.key)).size!==facts.items.length)throw new Error('Form section fact keys must be unique')
+  if(canonicalJsonBytes(facts).byteLength>512000)throw new Error('Form section facts exceed 500 KB')
+  return facts
 }

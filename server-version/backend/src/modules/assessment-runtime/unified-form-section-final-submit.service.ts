@@ -26,7 +26,7 @@ import {
   type CompositeSection,
 } from '../composite/final-submit.service'
 import { encryptUnifiedRuntimePayload } from './security'
-import { createFormSectionCollectionFacts, createTypedFormSectionCollectionFacts } from './form-facts'
+import { createFormSectionCollectionFacts, createTypedFormSectionCollectionFacts, createPolicyFormSectionCollectionFacts, typedFormValueSchema } from './form-facts'
 import type { TypedFormValue } from './typed-form'
 import { insertCompletedUnitSnapshot } from './persistence'
 import { formSectionSlotKey } from './slot-set'
@@ -54,7 +54,11 @@ type NormalizedSectionEntry = {
     options?: unknown
     formOptions?: unknown
     formDefinition?: unknown
+    formPolicy?: unknown
   }
+  state?: import("./form-policy").FormFactState
+  rowStates?: Record<string,import("./form-policy").FormFactState>
+  otherText?: string
   normalizedValue: TypedFormValue
   storedValue: string | null
   status?: string
@@ -90,6 +94,7 @@ const contextForEntries = (entries: NormalizedSectionEntry[], input: {
 
 export const formFactsFor = (sectionKey: string, entries: NormalizedSectionEntry[]) => {
   const input = { sectionKey, items: entries.map(entry => ({ key: entry.item.id, label: entry.item.label ?? entry.item.formLabel ?? entry.item.id, value: entry.normalizedValue })) }
+  if (entries.some(entry => entry.item.formPolicy != null)) return createPolicyFormSectionCollectionFacts({sectionKey,items:input.items.map((item,i)=>({...item,value:typedFormValueSchema.parse(item.value),state:entries[i].state ?? (item.value===null?"SHOWN_MISSING":"ANSWERED"), ...(entries[i].rowStates?{rowStates:entries[i].rowStates}:{}), ...(entries[i].otherText!==undefined?{otherText:entries[i].otherText}:{})}))})
   if (entries.some(entry => entry.item.formDefinition != null)) return createTypedFormSectionCollectionFacts(input)
   // Legacy normalization admits only this unchanged V1 value domain.
   return createFormSectionCollectionFacts(input as Parameters<typeof createFormSectionCollectionFacts>[0])
@@ -375,7 +380,7 @@ export const submitUnifiedCompositeFormSectionFinal = async (
           },
         },
       },
-      data: { status: 'COMPLETED', submissionId, submissionPayloadHash: payloadHash, submittedAt: completedAt },
+      data: { status: 'COMPLETED', submissionId, submissionPayloadHash: payloadHash, submittedAt: completedAt, ...(normalized.taskSatisfaction ? {taskSatisfaction:normalized.taskSatisfaction}: {}) },
     } as any)
     if (updated.count !== 1) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评状态已变化，请重试', 409)
     await insertCompletedUnitSnapshot(tx, {
