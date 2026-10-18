@@ -111,6 +111,7 @@ export const unifiedCompletionDispatchSelect = {
 } as const
 
 const compositeParentHeaderSelect = {
+  taskSatisfaction: true,
   id: true,
   status: true,
   deliveryMode: true,
@@ -233,6 +234,7 @@ const questionnaireParentGraphSelect = {
 }
 
 export type UnifiedParentHeader = {
+  taskSatisfaction?: string | null
   id: string
   status: string
   deliveryMode: string
@@ -259,8 +261,9 @@ type TerminalProbe =
   | { kind: 'incomplete'; parent: UnifiedParentHeader; frozenSlots: FrozenActiveSlotSetV1; headers: AggregateSnapshotHeader[]; snapshotRows?: AggregateSnapshotRow[]; completeness: ReturnType<typeof evaluateCompleteness> }
   | { kind: 'ready'; parent: UnifiedParentHeader; frozenSlots: FrozenActiveSlotSetV1; headers: AggregateSnapshotHeader[]; snapshotRows?: AggregateSnapshotRow[]; completeness: ReturnType<typeof evaluateCompleteness> }
 
-const terminalFromParent = (parent: Pick<UnifiedParentHeader, 'status' | 'progress' | 'completedAt'>): CompletionResult => ({
+const terminalFromParent = (parent: Pick<UnifiedParentHeader, 'status' | 'progress' | 'completedAt' | 'taskSatisfaction'>): CompletionResult => ({
   status: parent.status,
+  ...(parent.taskSatisfaction!=null?{taskSatisfaction:parent.taskSatisfaction}:{}),
   progress: parent.status === 'COMPLETED' ? 100 : parent.progress,
   completedAt: parent.completedAt,
 })
@@ -325,6 +328,7 @@ type CanonicalPayload = {
 }
 
 type CompletionResult = {
+  taskSatisfaction?: string | null
   status: string
   progress: number
   completedAt: Date | null
@@ -801,7 +805,7 @@ const readCasLoser = async (input: {
   const row: any = input.composite
     ? await prisma.compositeAssessmentAttempt.findUnique({
         where: { id: input.parentId },
-        select: { status: true, progress: true, completedAt: true, runtimeGeneration: true, attemptEpoch: true, aggregateInputHash: true, compiledBundleRuntimeHash: true },
+        select: { status: true, progress: true, completedAt: true, runtimeGeneration: true, attemptEpoch: true, aggregateInputHash: true, compiledBundleRuntimeHash: true, taskSatisfaction:true },
       })
     : await prisma.questionnaireAssessment.findUnique({
         where: { id: input.parentId },
@@ -1026,7 +1030,11 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?:
       const slot = frozenSlots.slots.find((candidate) => candidate.slotKey === formSectionSlotKey(section.id))
       const payload = slot ? payloadBySlot.get(slot.slotKey) : undefined
       if (!slot || !payload?.facts) throw aggregateInputError(`综合测评表单区段 ${section.id} 的 collection facts 缺失`)
-      validateCompositeFactsAgainstSection(section, payload.facts)
+      const expectedQualification = validateCompositeFactsAgainstSection(section, payload.facts)
+      if (expectedQualification != null) {
+        const accepted = (parent.formSectionAttempts??[]).find((row:any)=>row.sectionId===section.id && row.attemptEpoch===parent.attemptEpoch && row.status==='COMPLETED')
+        if (accepted?.taskSatisfaction!==expectedQualification) throw aggregateInputError('Form V3 任务资格与权威事实不匹配')
+      }
       const expectedDefinitionHash = canonicalHash(compositeSectionDefinition(section))
       if (slot.sourceDefinitionIdentity.hash !== expectedDefinitionHash) {
         throw aggregateInputError(`综合测评表单区段 ${section.id} 定义 hash 不匹配`)
@@ -1169,7 +1177,6 @@ const persistCompositeCompletion = async (input: {
             generatedBy: null,
             payloadEncrypted: input.payloadEncrypted,
             aggregateInputHash: input.aggregateInputHash,
-          ...(input.taskSatisfaction ? {taskSatisfaction:input.taskSatisfaction}: {}),
             hashScheme: UNIFIED_AGGREGATE_HASH_SCHEME,
             compiledBundleRuntimeHash: input.compiledBundleRuntimeHash,
             attemptEpoch: input.parent.attemptEpoch,
@@ -1179,7 +1186,7 @@ const persistCompositeCompletion = async (input: {
           update: {},
         })
       }
-      return { status: 'COMPLETED', progress: 100, completedAt, aggregateInputHash: input.aggregateInputHash,
+      return { status: 'COMPLETED', progress: 100, completedAt, aggregateInputHash: input.aggregateInputHash, taskSatisfaction:input.taskSatisfaction,
         totalTime: Math.max(0, completedAt.getTime() - new Date(input.parent.startedAt).getTime()) }
     }, { isolationLevel: 'ReadCommitted' }))
   } catch (error) {
@@ -1253,7 +1260,7 @@ const validateQuestionnaireFactsAgainstSection = (section: any, facts: FormSecti
 }
 
 const validateCompositeFactsAgainstSection = (section: any, facts: FormSectionCollectionFacts) => {
-  assertTypedCompositeFormFacts(mapCompositeSection(section), facts)
+  const qualification = assertTypedCompositeFormFacts(mapCompositeSection(section), facts)
   const expected = new Map(section.items.map((item: any) => [item.id, item.formLabel]))
   if (facts.items.length !== expected.size) throw aggregateInputError(`综合测评表单区段 ${section.id} facts 数量不匹配`)
   for (const fact of facts.items) {
@@ -1261,6 +1268,7 @@ const validateCompositeFactsAgainstSection = (section: any, facts: FormSectionCo
       throw aggregateInputError(`综合测评表单区段 ${section.id} facts identity 不匹配`)
     }
   }
+  return qualification
 }
 
 const finalizeQuestionnaireUnifiedImpl = async (assessmentId: string, preloadedParent?: UnifiedParentHeader): Promise<CompletionResult | null> => {

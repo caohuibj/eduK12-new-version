@@ -233,6 +233,9 @@ export interface ScaleUnitReport {
 }
 
 export interface FormBackgroundReport {
+  state?: string
+  rowStates?: Record<string, string>
+  otherText?: string | null
   itemId: string
   type: 'FORM'
   kind: 'background'

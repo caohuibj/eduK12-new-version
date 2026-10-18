@@ -268,7 +268,7 @@ const CompositeAssessmentEdit: React.FC = () => {
         title={detail.name}
         description={(
           <span className="flex flex-wrap items-center gap-2">
-            <span>{detail.code} · {detail.status} · 已开始 {detail.attemptCounts?.started ?? 0} · 已完成 {detail.attemptCounts?.completed ?? 0}</span>
+            <span>{detail.code} · {detail.status} · 已开始 {detail.attemptCounts?.started ?? 0} · 已交卷 {detail.attemptCounts?.completed ?? 0} · 任务达成 {detail.attemptCounts?.satisfied ?? detail.attemptCounts?.completed ?? 0}</span>
             {isLibraryCourse && <span className="staff-badge">库课程</span>}
             {detail.copyable && <span className="staff-badge staff-badge--success">可复制</span>}
           </span>

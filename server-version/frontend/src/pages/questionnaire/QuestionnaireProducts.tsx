@@ -200,7 +200,12 @@ export function QuestionnaireProductEdit() {
   }, [location.hash, hasDetail, id])
   const [formType, setFormType] = useState('text_input')
   const [formConstraints, setFormConstraints] = useState<Partial<FormQuestion<never>>>({})
-  const typedFormType = typedFormTypes[formType]
+  const [policyEnabled,setPolicyEnabled] = useState(false)
+  const [targetFormSection,setTargetFormSection] = useState('')
+  const [requiredRefusal,setRequiredRefusal] = useState<'BLOCK_SUBMIT'|'ALLOW_SUBMIT'>('BLOCK_SUBMIT')
+  const [hiddenRequired,setHiddenRequired] = useState<'EXEMPT'|'NOT_SATISFIED'>('EXEMPT')
+  const typedFormType = typedFormTypes[formType] ?? (policyEnabled ? ({single_choice:'SINGLE',multiple_choice:'MULTIPLE',text_input:'SHORT_TEXT',fill_blank:'SHORT_TEXT'} as const)[formType as 'single_choice'] : undefined)
+  const conditionSources = (detail?.formSections?.find((s:any)=>s.id===targetFormSection)?.items ?? []).filter((item:any)=>['SINGLE','MULTIPLE'].includes(item.formDefinition?.type))
   const [matrixRows, setMatrixRows] = useState('')
   const [options, setOptions] = useState('')
   const [contextKey, setContext] = useState('')
@@ -331,14 +336,15 @@ export function QuestionnaireProductEdit() {
         Object.assign(item, {
           formLabel,
           formType,
-          ...(typedFormType ? { formDefinition: { ...formConstraints, type: typedFormType, prompt: formLabel, required, options: structuredOptionTypes.includes(typedFormType) ? parseDelimitedOptions(options).map(option => ({ optionKey: option.value, label: option.label })) : [], rows: ['MATRIX', 'MATRIX_MULTIPLE'].includes(typedFormType) ? parseDelimitedOptions(matrixRows).map(row => ({ rowKey: row.value, label: row.label })) : [], ...(typedFormType === 'CONSTANT_SUM' ? { total: formConstraints.total ?? 100 } : {}), ...(typedFormType === 'TIME' ? { timeZone: formConstraints.timeZone ?? 'Asia/Shanghai' } : {}) } } : {}),
+          ...(typedFormType ? { formDefinition: { ...formConstraints, type: typedFormType, prompt: formLabel, required, options: [...structuredOptionTypes,'SINGLE','MULTIPLE'].includes(typedFormType) ? parseDelimitedOptions(options).map(option => ({ optionKey: option.value, label: option.label })) : [], rows: ['MATRIX', 'MATRIX_MULTIPLE'].includes(typedFormType) ? parseDelimitedOptions(matrixRows).map(row => ({ rowKey: row.value, label: row.label })) : [], ...(typedFormType === 'CONSTANT_SUM' ? { total: formConstraints.total ?? 100 } : {}), ...(typedFormType === 'TIME' ? { timeZone: formConstraints.timeZone ?? 'Asia/Shanghai' } : {}) } } : {}),
+          ...(policyEnabled ? {formPolicy:{version:3,requiredRefusal,hiddenRequired}}:{}),
           contextKey: contextKey || null,
           formOptions: ['single_choice', 'multiple_choice'].includes(formType)
             ? parseDelimitedOptions(options)
             : null,
         })
       hydrate(
-        await request('/' + id + '/items', { revision: detail.revision, item }),
+        await request('/' + id + '/items', { revision: detail.revision, item, ...(type==='FORM'&&targetFormSection?{formSectionId:targetFormSection}:{}) }),
       )
       setSelected('')
       setFormLabel('')
@@ -758,7 +764,7 @@ export function QuestionnaireProductEdit() {
                           aria-label="题型"
                           className="input ml-2 max-w-full"
                           value={formType}
-                          onChange={(e) => { setFormType(e.target.value); setFormConstraints(e.target.value === 'slider' ? { min: 0, max: 100 } : {}); setOptions(''); setMatrixRows(''); if (typedFormTypes[e.target.value]) setContext('') }}
+                          onChange={(e) => { setFormType(e.target.value); if(e.target.value==='year_month')setPolicyEnabled(false); setFormConstraints(e.target.value === 'slider' ? { min: 0, max: 100 } : {}); setOptions(''); setMatrixRows(''); if (typedFormTypes[e.target.value]) setContext('') }}
                         >
                           {[
                             'text_input',
@@ -785,6 +791,19 @@ export function QuestionnaireProductEdit() {
                           ))}
                         </select>
                       </label>
+                      <label className="block">加入表单区段<select aria-label="加入表单区段" value={targetFormSection} onChange={e=>{setTargetFormSection(e.target.value);setFormConstraints(previous=>({...previous,displayIf:undefined}))}}><option value="">创建新区段</option>{(detail?.formSections??[]).filter((s:any)=>!s.contextSection).map((s:any)=><option key={s.id} value={s.id}>{s.title}（{s.items?.length??0}题）</option>)}</select></label>
+                      {formType!=='year_month'&&!contextKey ? <label className="block"><input type="checkbox" checked={policyEnabled} onChange={e=>{setPolicyEnabled(e.target.checked);if(!e.target.checked)setFormConstraints(previous=>({...previous,allowRefusal:undefined,displayIf:undefined,otherOptionKey:undefined,otherMaxLength:undefined,exclusiveOptionKeys:undefined}))}}/>启用新表单策略（V3）</label>:null}
+                      {policyEnabled && <fieldset className="space-y-3 rounded border p-3"><legend>本次新发布的表单策略</legend>
+                        <label className="block"><input type="checkbox" checked={formConstraints.allowRefusal===true} onChange={e=>setFormConstraints(previous=>({...previous,allowRefusal:e.target.checked}))}/>允许明确拒答</label>
+                        <label className="block">必答拒答<select aria-label="必答拒答" value={requiredRefusal} onChange={e=>setRequiredRefusal(e.target.value as typeof requiredRefusal)}><option value="BLOCK_SUBMIT">拒答后不能交卷</option><option value="ALLOW_SUBMIT" disabled>允许交卷但不达成任务（尚待接通）</option></select></label>
+                        <label className="block">隐藏必答题<select aria-label="隐藏必答题" value={hiddenRequired} onChange={e=>setHiddenRequired(e.target.value as typeof hiddenRequired)}><option value="EXEMPT">本次不适用，不要求作答</option><option value="NOT_SATISFIED" disabled>本次任务未达成（尚待接通）</option></select></label>
+                        <label className="block">显示条件<select aria-label="显示条件" value={formConstraints.displayIf?.itemKey??''} onChange={e=>{const source=conditionSources.find((s:any)=>s.formDefinition.itemKey===e.target.value)?.formDefinition;setFormConstraints(previous=>({...previous,displayIf:source?{itemKey:source.itemKey,operator:source.type==='MULTIPLE'?'INCLUDES':'EQUALS',optionKey:source.options[0]?.optionKey??''}:undefined}))}}><option value="">始终显示</option>{conditionSources.map((source:any)=><option key={source.id} value={source.formDefinition.itemKey}>{source.formLabel}</option>)}</select></label>
+                        {formConstraints.displayIf ? <label className="block">前题选项<select aria-label="前题选项" value={formConstraints.displayIf.optionKey} onChange={e=>setFormConstraints(previous=>({...previous,displayIf:{...previous.displayIf!,optionKey:e.target.value}}))}>{(conditionSources.find((source:any)=>source.formDefinition.itemKey===formConstraints.displayIf?.itemKey)?.formDefinition.options??[]).map((option:any)=><option key={option.optionKey} value={option.optionKey}>{option.label}</option>)}</select></label>:null}
+                        {['single_choice','multiple_choice'].includes(formType)?<><label className="block">其他填写选项<select aria-label="其他填写选项" value={formConstraints.otherOptionKey??''} onChange={e=>setFormConstraints(previous=>({...previous,otherOptionKey:e.target.value||undefined,...(!e.target.value?{otherMaxLength:undefined}:{})}))}><option value="">不启用</option>{parseDelimitedOptions(options).map(option=><option key={option.value} value={option.value}>{option.label}</option>)}</select></label>{formConstraints.otherOptionKey?<label className="block">其他文本上限<input type="number" min="1" max="2000" value={formConstraints.otherMaxLength??300} onChange={e=>setFormConstraints(previous=>({...previous,otherMaxLength:Number(e.target.value)}))}/></label>:null}</>:null}
+                        {formType==='multiple_choice'?<fieldset><legend>互斥选项</legend>{parseDelimitedOptions(options).map(option=><label key={option.value} className="block"><input type="checkbox" checked={formConstraints.exclusiveOptionKeys?.includes(option.value)??false} onChange={e=>setFormConstraints(previous=>({...previous,exclusiveOptionKeys:e.target.checked?[...(previous.exclusiveOptionKeys??[]),option.value]:(previous.exclusiveOptionKeys??[]).filter(key=>key!==option.value)}))}/>{option.label}</label>)}</fieldset>:null}
+                        {['text_input','fill_blank','long_text'].includes(formType)?<label className="block">文本格式<select aria-label="文本格式" value={formConstraints.textValidation??''} onChange={e=>setFormConstraints(previous=>({...previous,textValidation:(e.target.value||undefined) as FormQuestion<never>['textValidation']}))}><option value="">不限</option><option value="EMAIL">电子邮箱</option><option value="DIGITS">仅数字</option><option value="ALPHANUMERIC">英文字母及数字</option></select></label>:null}
+                        <p className="text-sm">条件只引用同区段的前置单选、多选题。隐藏答案会清除；拒答独立记录，不计有效回答。已发布版本不可修改。</p>
+                      </fieldset>}
                       {typedFormType && <BasicFormConstraints question={{ ...formConstraints, type: typedFormType }} onChange={patch => setFormConstraints(previous => ({ ...previous, ...patch }))} />}
                       {typedFormType && <StructuredFormConstraints question={{ ...formConstraints, type: typedFormType }} onChange={patch => setFormConstraints(previous => ({ ...previous, ...patch }))} />}
                       {['matrix', 'matrix_multiple'].includes(formType) && <label className="block">矩阵行（编码=标签，以逗号分隔）
@@ -809,6 +828,8 @@ export function QuestionnaireProductEdit() {
                             setContext(e.target.value)
                             setRequired(true)
                             if (e.target.value) {
+                              setPolicyEnabled(false)
+                              setTargetFormSection('')
                               setFormType(
                                 e.target.value === 'birthYearMonth'
                                   ? 'year_month'

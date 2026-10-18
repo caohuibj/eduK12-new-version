@@ -15,7 +15,7 @@ export const readTrainingFormPolicy = (value: unknown): TrainingFormPolicy | nul
   return result.data
 }
 export const isTaskSatisfied = (attempt: {status: string; taskSatisfaction?: string | null}) =>
-  attempt.status === 'COMPLETED' && attempt.taskSatisfaction !== 'NOT_SATISFIED'
+  attempt.status === 'COMPLETED' && (attempt.taskSatisfaction == null || attempt.taskSatisfaction === 'SATISFIED')
 /** Exact identity graph remap. Never replace substrings of prompts or option keys. */
 export const remapTrainingFormDefinition = (definition: any, keys: ReadonlyMap<string, string>) => {
   if (definition == null) return definition

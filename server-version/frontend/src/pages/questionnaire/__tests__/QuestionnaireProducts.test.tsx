@@ -255,3 +255,17 @@ describe('C05 incomplete single question stays editable', () => {
     expect(api.post).toHaveBeenCalledTimes(1)
   })
 })
+
+describe('C06 stable policy authoring',()=>{
+ it('adds a conditional question to the chosen existing section using its stable source key',async()=>{
+  vi.resetAllMocks()
+  const source={id:'db-source',formType:'single_choice',formLabel:'先前选择',formDefinition:{itemKey:'q_stable_source',type:'SINGLE',options:[{optionKey:'yes',label:'是'},{optionKey:'no',label:'否'}]}}
+  const row={name:'策略问卷',status:'DRAFT',revision:9,questionnaireType:'COURSE',questionnaireCourses:[],items:[source],formSections:[{id:'section',title:'连续表单',items:[source],contextSection:false}],publicEnabled:false}
+  api.get.mockImplementation(async path=>({code:0,data:path.endsWith('/resources')?{scales:[],cognitive:[],situational:[],courses:[]}:row}));api.post.mockResolvedValue({code:0,data:{...row,revision:10}})
+  mount('policy');await screen.findByDisplayValue('策略问卷');const user=userEvent.setup()
+  await user.selectOptions(screen.getByLabelText('测评类型'),'FORM');await user.type(screen.getByLabelText('题目文字'),'后续文本')
+  await user.click(screen.getByLabelText('启用新表单策略（V3）'));await user.selectOptions(screen.getByLabelText('加入表单区段'),'section');await user.selectOptions(screen.getByLabelText('显示条件'),'q_stable_source');await user.selectOptions(screen.getByLabelText('文本格式'),'EMAIL')
+  await user.click(screen.getByRole('button',{name:'添加到测评'}));await waitFor(()=>expect(api.post).toHaveBeenCalled())
+  expect(api.post.mock.calls[0][1]).toMatchObject({revision:9,formSectionId:'section',item:{formPolicy:{version:3,requiredRefusal:'BLOCK_SUBMIT',hiddenRequired:'EXEMPT'},formDefinition:{type:'SHORT_TEXT',textValidation:'EMAIL',displayIf:{itemKey:'q_stable_source',operator:'EQUALS',optionKey:'yes'}}}})
+ })
+})

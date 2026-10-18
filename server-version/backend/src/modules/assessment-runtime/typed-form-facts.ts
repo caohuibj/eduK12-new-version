@@ -12,9 +12,9 @@ const invalid = (message: string): never => { throw new InstrumentFinalSubmitErr
 
 /** Definition-bound V2 validation, used by finalization and all new fact readers.
  * Identity-only V1 checks remain with the historical aggregate path. */
-export const assertTypedCompositeFormFacts = (section: CompositeSection, facts: FormSectionCollectionFacts): void => {
+export const assertTypedCompositeFormFacts = (section: CompositeSection, facts: FormSectionCollectionFacts): string | null => {
   const typed = section.items.some(item => item.formDefinition != null)
-  if (!typed && facts.schemaVersion === 1) return
+  if (!typed && facts.schemaVersion === 1) return null
   if (!typed || facts.schemaVersion !== (section.items.some(item=>item.formPolicy!=null)?3:2) || facts.sectionKey !== section.id) invalid('typed Form facts 版本或区段绑定不匹配')
   if (facts.items.length !== section.items.length) invalid('typed Form facts 数量不匹配')
   const byId = new Map(section.items.map(item => [item.id, item]))
@@ -29,6 +29,7 @@ export const assertTypedCompositeFormFacts = (section: CompositeSection, facts: 
   catch { invalid('typed Form facts 不符合冻结定义') }
   const expected = facts.schemaVersion===3 ? normalized!.normalized.map(entry=>({key:entry.item.id,label:entry.item.formLabel,value:entry.normalizedValue,state:'state' in entry?entry.state:entry.normalizedValue===null?'SHOWN_MISSING':'ANSWERED',...('rowStates' in entry && entry.rowStates?{rowStates:entry.rowStates}:{}),...('otherText' in entry && entry.otherText!==undefined?{otherText:entry.otherText}:{})})) : normalized!.normalized.map(entry => ({ key: entry.item.id, label: entry.item.formLabel, value: entry.normalizedValue }))
   if (!canonicalJsonBytes(expected).equals(canonicalJsonBytes(facts.items))) invalid('typed Form facts 非规范化顺序或数值')
+  return normalized!.taskSatisfaction
 }
 
 /** Caller must already authorize this parent. Returns authoritative typed facts,
@@ -36,7 +37,7 @@ export const assertTypedCompositeFormFacts = (section: CompositeSection, facts: 
 export const loadCompositeTypedFormValues = async (attempt: {
   id: string; attemptEpoch: number; runtimeGeneration?: string | null;
   compositeAssessment: { id?: string; items: Array<{ formDefinition?: unknown; type: string }>; formSections?: any[] };
-}): Promise<Map<string, TypedFormValue>> => {
+}, metadata?: Map<string, {state:string;rowStates?:Record<string,string>;otherText?:string}>): Promise<Map<string, TypedFormValue>> => {
   const result = new Map<string, TypedFormValue>()
   if (!attempt.compositeAssessment.items.some(item => item.type === 'FORM' && item.formDefinition != null)) return result
   if (attempt.runtimeGeneration !== 'UNIFIED_V1') invalid('typed Form 缺少统一运行时事实')
@@ -59,7 +60,10 @@ export const loadCompositeTypedFormValues = async (attempt: {
     assertTypedCompositeFormFacts(section, facts)
     // Every value in a V2 section, including legacy-compatible text fields,
     // comes from the same accepted snapshot.
-    for (const fact of facts.items) result.set(fact.key, fact.value)
+    for (const fact of facts.items) {
+      result.set(fact.key, fact.value)
+      if(facts.schemaVersion===3 && "state" in fact) metadata?.set(fact.key,{state:fact.state as string,...("rowStates" in fact && fact.rowStates?{rowStates:fact.rowStates as Record<string,string>}:{}),...("otherText" in fact && typeof fact.otherText==="string"?{otherText:fact.otherText}:{})})
+    }
   }
   return result
 }

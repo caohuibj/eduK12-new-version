@@ -226,3 +226,15 @@ it('does not redirect to a completed attempt after the participant leaves the pa
   )
   expect(screen.getByText('其他页面')).toBeInTheDocument()
 })
+
+it('routes a completed unsatisfied attempt to its report without restarting or reopening it', async () => {
+  window.history.pushState({}, '', '/student/composite/q')
+  mockCompositeApi.start.mockResolvedValue({ code: 0, data: { attempt: { id: 'submitted', productKind: 'QUESTIONNAIRE', status: 'COMPLETED', taskSatisfied: false, deliveryMode: 'FINAL_ONLY' } } })
+  render(<MemoryRouter initialEntries={['/student/composite/q']}><Routes>
+    <Route path="/student/composite/:assessmentId" element={<CompositeAssessmentPage />} />
+    <Route path="/student/composite/attempts/:attemptId/report" element={<p>已交卷报告入口</p>} />
+  </Routes></MemoryRouter>)
+  expect(await screen.findByText('已交卷报告入口')).toBeInTheDocument()
+  expect(mockCompositeApi.start).toHaveBeenCalledTimes(1)
+  expect(mockPublicApi.start).not.toHaveBeenCalled()
+})

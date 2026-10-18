@@ -14,6 +14,7 @@ export interface CourseAssessmentView {
   href: string | null
   action: string
   reportHref?: string | null
+  taskSatisfactionLabel?: string
 }
 type CourseRef = { id: string; title: string } | null
 type Question = {
@@ -31,7 +32,8 @@ type Composite = {
   course: CourseRef
   canContinue: boolean; canStartNewAttempt: boolean
   attempt: { id: string; status: string; progress: number } | null
-  latestCompletedAttempt: { id: string; status: string; progress: number } | null
+  hasSatisfiedAttempt?: boolean
+  latestCompletedAttempt: { id: string; status: string; progress: number; taskSatisfied?: boolean } | null
   availability: 'OPEN' | 'UPCOMING' | 'EXPIRED'
 }
 export type CourseAssessmentResult = { items: CourseAssessmentView[]; errors: string[] }
@@ -157,13 +159,15 @@ export function projectCourseAssessments(
     const status = inProgress ? '进行中'
       : item.availability === 'UPCOMING' ? '未开放'
         : item.availability === 'EXPIRED' ? '已截止'
-          : finished ? '已完成'
+          : finished ? item.hasSatisfiedAttempt === false ? '已交卷，任务未达成' : '任务已达成'
             : item.canStartNewAttempt ? '待完成' : '当前不可开始'
     items.push({
       key: 'composite:' + item.id, kind: 'composite', name: item.name,
       typeLabel: '组合测评', description: item.description,
+      taskSatisfactionLabel: !finished ? undefined : item.hasSatisfiedAttempt === false ? '本次作答已保存并计入次数，可查看报告。'
+        : item.latestCompletedAttempt?.taskSatisfied === false ? '本次未达成，历史达成仍保留' : '任务已达成',
       status, href, reportHref: reportHref && reportHref !== href ? reportHref : null,
-      action: inProgress ? '继续测评' : item.canStartNewAttempt ? '开始测评' : reportHref ? '查看反馈' : status,
+      action: inProgress ? '继续测评' : item.canStartNewAttempt ? finished ? '再次测评' : '开始测评' : reportHref ? '查看反馈' : status,
     })
   }
   return items

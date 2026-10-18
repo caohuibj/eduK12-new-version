@@ -18,6 +18,8 @@ import ScaleUnitReportCard, { type SafeScaleUnitReport } from '../reporting/Scal
 import SituationalReportCard, { type SituationalReportView } from '../reporting/SituationalReportCard'
 import { ReportSection } from '../reporting/ReportPrimitives'
 
+const formStateLabels: Record<string, string> = { ANSWERED: '已回答', REFUSED: '明确拒答', SHOWN_MISSING: '已显示未填写', NOT_SHOWN: '未显示' }
+
 const readRecovery = (attemptId: string) => typeof window === 'undefined' ? '' : window.sessionStorage.getItem(`composite:recovery:attempt:${attemptId}`) || ''
 const formatDuration = (ms: number) => {
   const minutes = Math.floor(ms / 60000)
@@ -26,6 +28,9 @@ const formatDuration = (ms: number) => {
 }
 
 type LegacyCompositeModule = Record<string, unknown> & {
+  state?: string
+  rowStates?: Record<string, string>
+  otherText?: string | null
   itemId: string
   type?: string
   label?: string | null
@@ -289,6 +294,7 @@ const CompositeReportPage: React.FC = () => {
     )
   }
 
+  const submittedNotSatisfied = report.reportState !== 'PARTIAL' && report.taskSatisfied === false
   const facts = [
     ...(report.completedAt ? [{ label: '完成时间', value: new Date(report.completedAt).toLocaleString('zh-CN') }] : []),
     ...(report.totalTime != null ? [{ label: '用时', value: formatDuration(report.totalTime) }] : []),
@@ -300,7 +306,7 @@ const CompositeReportPage: React.FC = () => {
       title={report.name}
       description={report.reportState === 'PARTIAL' ? '作答尚未全部完成。这里只读展示已完成单项的冻结结果，不生成整体报告。' : report.productKind === 'ASSESSMENT_BUNDLE' ? '综合报告结合各项冻结结果，以下同时保留单项反馈。' : '以下按内容顺序展示各项测评的独立结果。'}
       facts={facts}
-      status={{ kind: 'success', title: '已提交', description: '本次作答已提交，测评结果如下。' }}
+      status={{ kind: submittedNotSatisfied ? 'info' : 'success', title: submittedNotSatisfied ? '已交卷，任务未达成' : '已提交', description: submittedNotSatisfied ? '本次作答已保存并计入作答次数；任务条件未达成，仍可查看本次报告。' : '本次作答已提交，测评结果如下。' }}
       backAction={<button type="button" onClick={() => navigate(backTo)} className="hui-button hui-button--secondary">返回</button>}
     >
       {snapshotControls}
@@ -312,7 +318,10 @@ const CompositeReportPage: React.FC = () => {
         <div className={`grid gap-3 sm:grid-cols-2${isTrainingHost() && !publicMode ? ' training-form-report' : ''}`}>{backgroundValues.map((background) => (
           <div key={background.itemId} className="report-metric">
             <div className="report-metric__label">{background.label || '表单回答'}</div>
-            <div className="mt-1 whitespace-pre-wrap text-sm text-gray-800">{background.displayValue ?? background.value ?? (isTrainingHost() && !publicMode ? '未作答' : '—')}</div>
+            {background.state && <p className="mt-1 text-sm text-gray-600">{formStateLabels[background.state] ?? '作答状态待核对'}</p>}
+            <div className="mt-1 whitespace-pre-wrap text-sm text-gray-800">{background.displayValue ?? background.value ?? (background.state ? '—' : isTrainingHost() && !publicMode ? '未作答' : '—')}</div>
+            {background.otherText && <p className="mt-1 whitespace-pre-wrap text-sm">其他说明：{background.otherText}</p>}
+            {background.rowStates && <ul className="mt-1 text-sm">{Object.entries(background.rowStates).map(([key, state]) => <li key={key}>{key}：{formStateLabels[state] ?? '作答状态待核对'}</li>)}</ul>}
           </div>
         ))}</div>
       </ReportSection>}

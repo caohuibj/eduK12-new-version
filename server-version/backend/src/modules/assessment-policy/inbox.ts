@@ -64,14 +64,15 @@ export async function listRespondentAssessments(userId: string, accountRole: Use
   })
   for (const task of course?.list ?? []) {
     if (task.kind !== 'QUESTIONNAIRE' && task.kind !== 'COMPOSITE') continue
+    const submitted = task.state === 'COMPLETED' || task.state === 'SUBMITTED_NOT_SATISFIED'
     list.push({
       taskId: `course:${task.kind}:${task.id}`, sourceType: 'COURSE', sourceId: task.id,
       title: task.title, state: task.state, deadline: task.deadline, resourceFamily: task.kind,
       resourceKey: task.id, resourceVersion: null, subject: { userId, role: 'STUDENT' },
       respondent: { userId, role: 'STUDENT' }, relationship: 'SELF', perspective: 'SELF_REPORT',
-      consentState: 'NOT_REQUIRED', launchTarget: task.state !== 'COMPLETED' ? task.href : null,
-      reportTarget: task.state === 'COMPLETED' ? task.href : null,
-      resultAvailability: task.state === 'COMPLETED' && task.href ? 'REPORT' : 'PENDING',
+      consentState: 'NOT_REQUIRED', launchTarget: !submitted ? task.href : null,
+      reportTarget: submitted ? task.href : null,
+      resultAvailability: submitted && task.href ? 'REPORT' : 'PENDING',
       organization: null, course: task.courses,
     })
   }

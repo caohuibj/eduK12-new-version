@@ -197,3 +197,18 @@ describe('C05 structured typed adapters', () => {
     for (const control of document.querySelectorAll('.form-player input, .form-player button')) expect(control).toBeDisabled()
   })
 })
+
+describe('C06 policy controls',()=>{
+ const q={itemKey:'q_v3',type:'MULTIPLE' as const,prompt:'选择',required:true,allowRefusal:true,options:[{optionKey:'yes',label:'是'},{optionKey:'no',label:'无'},{optionKey:'other',label:'其他'}],rows:[],otherOptionKey:'other',exclusiveOptionKeys:['no']}
+ const item={id:'db',type:'multiple_choice',label:'选择',required:true,formDefinition:q,formPolicy:{version:3 as const,requiredRefusal:'ALLOW_SUBMIT' as const,hiddenRequired:'EXEMPT' as const}}
+ it('uses the shared exclusive toggle and records explicit refusal',()=>{
+  const change=vi.fn();render(<FormPlayer item={item} options={q.options.map(o=>({value:o.optionKey,label:o.label}))} value={['yes']} onChange={change} {...navigationProps}/>)
+  fireEvent.click(screen.getByRole('checkbox',{name:'无'}));expect(change).toHaveBeenLastCalledWith(['no'])
+  fireEvent.click(screen.getByRole('checkbox',{name:'我选择不回答这一题'}));expect(change).toHaveBeenLastCalledWith({_surveyRefusal:true})
+  expect(screen.getByText(/本次任务不会标记为达成/)).toBeInTheDocument()
+ })
+ it('edits selected other text through a separate typed side field',()=>{
+  const other=vi.fn();render(<FormPlayer item={item} options={q.options.map(o=>({value:o.optionKey,label:o.label}))} value={['other']} onChange={vi.fn()} otherText="先前文本" onOtherTextChange={other} {...navigationProps}/>)
+  fireEvent.change(screen.getByLabelText('其他填写：q_v3'),{target:{value:'补充'}});expect(other).toHaveBeenCalledWith('补充')
+ })
+})

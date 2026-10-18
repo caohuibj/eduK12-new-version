@@ -13,6 +13,7 @@ import { formOptionVideoPresentations, scaleItemVideoPresentation } from '../mod
 import { requestAssessmentVideoCapabilities } from '../modules/assessment-media/video-capability-client'
 import CompositeUnitRequirements from '../modules/composite/CompositeUnitRequirements'
 import { AssessmentShell } from './assessment-shell'
+import { trainingVisibleFields, sanitizeTrainingFormValues } from '../modules/assessment-core/form/training-policy'
 import FormPlayer, { type FormPlayerValue } from './questionnaire/FormPlayer'
 import ScalePlayer from './questionnaire/ScalePlayer'
 import { useLocalDraftSaveQueue } from './questionnaire/useLocalDraftSaveQueue'
@@ -36,7 +37,7 @@ export interface FinalCompositeAssessmentProps {
   state: CompositeAttemptState
   publicMode?: boolean
   recoveryToken?: string
-  submitFormSection: (attemptId: string, sectionId: string, input: { submissionId: string; attemptEpoch: number; definitionHash: string; contextSnapshotHash?: string | null; answers: Array<{ formItemId: string; value: FormValue }> }) => Promise<ApiResponse<unknown>>
+  submitFormSection: (attemptId: string, sectionId: string, input: { submissionId: string; attemptEpoch: number; definitionHash: string; contextSnapshotHash?: string | null; answers: Array<{ formItemId: string; value: FormValue; otherText?: string }> }) => Promise<ApiResponse<unknown>>
   submitScale: (attemptId: string, itemId: string, input: { submissionId: string; attemptEpoch: number; definitionHash: string; contextSnapshotHash?: string | null; answers: Array<{ itemCode: string; responseValue: ResponseValue; responseTimeMs?: number }>; deviceInputProvenance?: DeviceInputProvenanceV1 }) => Promise<ApiResponse<unknown>>
   onReload: () => Promise<void>
   onExit: () => void
@@ -78,6 +79,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
   const [sectionIndex, setSectionIndex] = useState(0)
   const [scaleIndex, setScaleIndex] = useState(0)
   const [formValues, setFormValues] = useState<Record<string, FormValue>>({})
+  const formValuesRef = useRef<Record<string, FormValue>>({})
   const [scaleValues, setScaleValues] = useState<Record<string, ResponseValue>>({})
   const [meta, setMeta] = useState<FinalDraftMeta | null>(null)
   const [loadingDraft, setLoadingDraft] = useState(true)
@@ -224,7 +226,11 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
           }
         })
         setMeta(nextMeta)
-        setFormValues(nextForm)
+        const fields = item?.type==='FORM_SECTION' ? (item.formAnswers || (item.answers || []).filter(a=>a.formItemId)) as any[] : []
+        const cleaned = sanitizeTrainingFormValues(fields,nextForm)
+        if (nextMeta.status==='DRAFT') await finalDraftStore.deleteAnswers(draftKey,Object.keys(nextForm).filter(key=>!(key in cleaned)))
+        formValuesRef.current = cleaned
+        setFormValues(cleaned)
         setScaleValues(nextScale)
         setRequiresRestart(nextMeta.status === 'CONFLICT')
         if (nextMeta.status === 'CONFLICT') {
@@ -255,9 +261,15 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
 
   const saveForm = async (itemId: string, value: FormValue) => {
     if (!draftKey || submitting || exiting || draftLocked) return
-    setFormValues((previous) => ({ ...previous, [itemId]: value }))
+    const fields = item?.type==='FORM_SECTION' ? (item.formAnswers || (item.answers || []).filter(a=>a.formItemId)) as any[] : []
+    const pendingValues = {...formValuesRef.current,[itemId]:value}
+    const nextValues = sanitizeTrainingFormValues(fields,pendingValues)
+    formValuesRef.current = nextValues
+    setFormValues(nextValues)
+    setSectionIndex(index=>Math.min(index,Math.max(0,trainingVisibleFields(fields,nextValues).length-1)))
     await scheduleLocalSave(`form:${itemId}`, async () => {
       await finalDraftStore.putAnswer({ draftKey, itemKey: itemId, value, updatedAt: Date.now() })
+      await finalDraftStore.deleteAnswers(draftKey,Object.keys(pendingValues).filter(key=>!(key in nextValues)))
     })
   }
 
@@ -293,9 +305,10 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
       formDefinition: answer.formDefinition,
       value: answer.value ?? null,
     }))
-    const missing = formAnswers.filter((answer) => answer.required && emptyValue(formValues[answer.formItemId]))
+    const visibleAnswers = trainingVisibleFields(formAnswers,formValues)
+    const missing = visibleAnswers.filter((answer) => answer.required && emptyValue(formValues[answer.formItemId]))
     if (missing.length > 0) {
-      setSectionIndex(Math.max(0, formAnswers.findIndex((answer) => answer.required && emptyValue(formValues[answer.formItemId]))))
+      setSectionIndex(Math.max(0, visibleAnswers.findIndex((answer) => answer.required && emptyValue(formValues[answer.formItemId]))))
       setError(`还有 ${missing.length} 个必填字段未完成`)
       return
     }
@@ -306,14 +319,16 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
       await flushLocalSaves()
       const sealed = await finalDraftStore.sealForSubmission(draftKey, (snapshot) => {
         const answerMap = new Map(snapshot.answers.map((answer) => [answer.itemKey, answer.value as FormValue] as const))
-        const missingStored = formAnswers.filter((answer) => answer.required && emptyValue(answerMap.get(answer.formItemId)))
+        const cleanMap = sanitizeTrainingFormValues(formAnswers,Object.fromEntries(answerMap))
+        const visibleStored = trainingVisibleFields(formAnswers,cleanMap)
+        const missingStored = visibleStored.filter((answer) => answer.required && emptyValue(answerMap.get(answer.formItemId)))
         if (missingStored.length > 0) throw new Error(`还有 ${missingStored.length} 个必填字段尚未保存，请确认后再提交`)
         return {
           submissionId: snapshot.meta.submissionId,
           attemptEpoch: snapshot.meta.attemptEpoch,
           definitionHash: snapshot.meta.definitionHash,
           contextSnapshotHash: snapshot.meta.contextSnapshotHash,
-          answers: formAnswers.map((answer) => ({ formItemId: answer.formItemId, value: !answer.required && emptyValue(answerMap.get(answer.formItemId)) ? null : answerMap.get(answer.formItemId) ?? null })),
+          answers: visibleStored.map((answer) => ({ formItemId: answer.formItemId, value: !answer.required && emptyValue(cleanMap[answer.formItemId]) ? null : cleanMap[answer.formItemId] ?? null, ...(typeof cleanMap[answer.formItemId+':other']==='string'?{otherText:cleanMap[answer.formItemId+':other'] as string}:{}) })),
         }
       })
       if (!sealed) throw new Error('本地综合表单草稿不存在，请重新加载')
@@ -452,7 +467,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     ? { state: 'blocked' as const, message: '本地草稿已保留。当前测评版本已变化，需要重启后继续。' }
     : { state: 'none' as const }
   const formFields = item?.type === 'FORM_SECTION'
-    ? (item.formAnswers || (item.answers || []).filter((answer) => Boolean(answer.formItemId))) as any[]
+    ? trainingVisibleFields((item.formAnswers || (item.answers || []).filter((answer) => Boolean(answer.formItemId))) as any[], formValues)
     : []
   const scaleItems = item?.type === 'SCALE'
     ? (item.scale?.definition?.items || []) as Array<(NonNullable<NonNullable<CompositeCurrentItem['scale']>['definition']>['items'][number]) & { images?: unknown; video?: unknown }>
@@ -563,10 +578,13 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
                       placeholder: field.placeholder,
                       required: Boolean(field.required),
                       formDefinition: field.formDefinition,
+                      formPolicy: field.formPolicy,
                     }}
                     allowSkip
                     options={options}
                     value={value}
+                    otherText={typeof formValues[field.formItemId+':other']==='string'?formValues[field.formItemId+':other'] as string:undefined}
+                    onOtherTextChange={text=>void saveForm(field.formItemId+':other',text)}
                     navigationDisabled={exiting}
                     answerDisabled={draftLocked || exiting}
                     submitDisabled={requiresRestart || exiting}

@@ -460,3 +460,24 @@ describe('asynchronous report feedback', () => {
   })
 
 })
+
+it.each(['student', 'public'])('shows submitted unsatisfied %s reports and all canonical V3 states without score inference', async (surface) => {
+  if (surface === 'public') window.sessionStorage.setItem('composite:recovery:attempt:attempt-1', 'c06-test-recovery')
+  mockCompositeApi.report.mockResolvedValue({ code: 0, data: {
+    id: 'attempt-1', assessmentId: 'q', name: 'V3报告', taskSatisfaction: 'NOT_SATISFIED', taskSatisfied: false,
+    productKind: 'QUESTIONNAIRE', reportMode: 'COLLECTION_ONLY', completedAt: '2026-10-18T00:00:00Z', totalTime: 1000,
+    anonymousCode: surface === 'public' ? 'ANON-1' : null, unitReports: [],
+    backgroundValues: [
+      { itemId: 'a', type: 'FORM', label: '回答', value: '其他', state: 'ANSWERED', otherText: '自定义说明' },
+      { itemId: 'r', type: 'FORM', label: '拒答', value: null, state: 'REFUSED' },
+      { itemId: 'm', type: 'FORM', label: '缺失', value: null, state: 'SHOWN_MISSING' },
+      { itemId: 'h', type: 'FORM', label: '隐藏', value: null, state: 'NOT_SHOWN', rowStates: { row1: 'NOT_SHOWN' } },
+    ],
+  } })
+  render(<MemoryRouter initialEntries={[`/${surface}/composite/attempts/attempt-1/report`]}><Routes><Route path={`/${surface}/composite/attempts/:attemptId/report`} element={<CompositeReportPage />} /></Routes></MemoryRouter>)
+  expect(await screen.findByText('已交卷，任务未达成')).toBeInTheDocument()
+  for (const label of ['已回答', '明确拒答', '已显示未填写', '未显示', '其他说明：自定义说明', 'row1：未显示']) expect(screen.getByText(label)).toBeInTheDocument()
+  expect(screen.queryByText('未作答')).not.toBeInTheDocument()
+  expect(mockCompositeApi.report).toHaveBeenCalledTimes(1)
+  expect(mockCompositeApi.reanalyze).not.toHaveBeenCalled()
+})

@@ -149,7 +149,7 @@ export default function TrainingLearnerCourse() {
                   {assessments.items.length === 0 && assessments.errors.length === 0 && <p className="training-empty-small">培训师还没有向这门课程发布测评。</p>}
                   {assessments.items.length > 0 && <div className="training-item-list">{assessments.items.map(task =>
                     <article className="training-task-item" key={task.key}>
-                      <div><span className="training-task-type">{task.typeLabel}</span><h2>{task.name}</h2><p>{task.description || '进入后可查看作答要求。'}</p><span>{task.status}</span></div>
+                      <div><span className="training-task-type">{task.typeLabel}</span><h2>{task.name}</h2><p>{task.description || '进入后可查看作答要求。'}</p><span>{task.status}</span>{task.taskSatisfactionLabel && <p>{task.taskSatisfactionLabel}</p>}</div>
                       <div className="training-task-actions">
                         {task.href ? <Link className="training-row-action" to={task.href}>{task.action}<ArrowRight size={16} aria-hidden="true" /></Link>
                           : <span className="training-task-disabled">{task.action}</span>}

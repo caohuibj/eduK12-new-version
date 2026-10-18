@@ -1,3 +1,4 @@
+import { isTaskSatisfied } from '../assessment-runtime/form-policy'
 import { UserRole } from '@prisma/client'
 import { z } from 'zod'
 import { prisma } from '../../config/database'
@@ -75,9 +76,16 @@ export async function courseOverview(actor: Actor, courseId: string, raw: unknow
     prisma.compositeAssessment.findMany({ where, select: { id: true, name: true, status: true, productKind: true }, orderBy: [{ createdAt: 'desc' }, { id: 'asc' }], skip: (page - 1) * pageSize, take: pageSize }),
     prisma.compositeAssessment.count({ where }),
   ])
-  const attempts = await prisma.compositeAssessmentAttempt.groupBy({ by: ['compositeAssessmentId', 'status'], where: { compositeAssessmentId: { in: assessments.map(a => a.id) }, userId: { not: null }, assignmentRef: null, OR: [{ deliveryCourseId: courseId }, { deliveryCourseId: null, compositeAssessment: { courseId, productKind: { not: 'QUESTIONNAIRE' } } }] }, _count: { _all: true } })
+  const attempts = await prisma.compositeAssessmentAttempt.groupBy({ by: ['compositeAssessmentId', 'status', 'taskSatisfaction'], where: { compositeAssessmentId: { in: assessments.map(a => a.id) }, userId: { not: null }, assignmentRef: null, OR: [{ deliveryCourseId: courseId }, { deliveryCourseId: null, compositeAssessment: { courseId, productKind: { not: 'QUESTIONNAIRE' } } }] }, _count: { _all: true } })
   // Administrative completion counts, never psychological group statistics.
-  const list = assessments.map(row => ({ ...row, attempts: Object.fromEntries(attempts.filter(a => a.compositeAssessmentId === row.id).map(a => [a.status, a._count._all])) }))
+  const countsById = new Map<string, Record<string, number>>()
+  for (const row of attempts) {
+    const counts = countsById.get(row.compositeAssessmentId) ?? { SATISFIED: 0, NOT_SATISFIED: 0 }
+    counts[row.status] = (counts[row.status] ?? 0) + row._count._all
+    if (row.status === 'COMPLETED') counts[isTaskSatisfied(row) ? 'SATISFIED' : 'NOT_SATISFIED'] += row._count._all
+    countsById.set(row.compositeAssessmentId, counts)
+  }
+  const list = assessments.map(row => ({ ...row, attempts: countsById.get(row.id) ?? { SATISFIED: 0, NOT_SATISFIED: 0 } }))
   const creatorScope = actor.role === 'ADMIN' ? {} : { createdBy: actor.userId }
   const sessions = await prisma.cognitiveSession.findMany({ where: { userId: { not: null }, assignment: creatorScope, OR: [
     { compositeAttemptId: null, assignment: { ...creatorScope, courseId, listedStandalone: true } },
@@ -90,5 +98,5 @@ export async function courseOverview(actor: Actor, courseId: string, raw: unknow
     const reportHref = compositeAttempt ? `/composite-assessments/${compositeAttempt.compositeAssessmentId}/attempts/${row.compositeAttemptId}/report${compositeAttempt.status === 'COMPLETED' ? '' : '?partial=1'}` : assignment ? `/cognitive-assignments/${assignment.id}` : null
     return { ...row, participant: user?.nickname || user?.username || '已停用账号', title: assignment?.title || '认知任务', qualityState, reportHref }
   })
-  return { course, list, total, page, pageSize, quality, qualityHasMore: sessions.length > pageSize, countMeaning: '次数为本课程已登录作答次数；不去重为人数，不提供群体心理指标。' }
+  return { course, list, total, page, pageSize, quality, qualityHasMore: sessions.length > pageSize, countMeaning: '次数为本课程已登录作答次数；已交卷包含任务达成与未达成，两者以已交卷次数为分母。不去重为人数，不提供群体心理指标。' }
 }

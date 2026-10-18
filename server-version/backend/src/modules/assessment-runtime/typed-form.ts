@@ -27,6 +27,7 @@ export const typedCompositeFormQuestion = (item: CompositeSectionItem): FormQues
   if (question.type !== (legacyTypes[item.formType] ?? item.formType) || question.required !== item.required || question.prompt !== item.formLabel) invalid('表单定义与字段类型、标题或必答策略不匹配')
   // C06 owns these policies; do not silently inherit Survey V2 semantics.
   if (!policy && (question.displayIf || question.allowRefusal || question.otherOptionKey || question.exclusiveOptionKeys?.length)) invalid('此 Training 版本尚未开放显隐、拒答或其他/互斥策略')
+  if ([question.itemKey,...question.rows.map(row=>row.rowKey),...question.options.map(option=>option.optionKey)].some(key=>['__proto__','constructor','prototype'].includes(key))) invalid('表单包含不允许的保留键')
   if (question.image) invalid('此 Training 版本尚未开放 typed Form 图片')
   if (item.formType === 'single_choice' || item.formType === 'multiple_choice') {
     const options = Array.isArray(item.formOptions) ? item.formOptions : []
@@ -115,6 +116,6 @@ export const normalizeTypedCompositeSection = (items: CompositeSectionItem[], pr
     const otherText = result.rawAnswers[q.itemKey+':other'] as string | undefined
     const qualifies = !item.required || (!refused && (state !== 'NOT_SHOWN' || policy?.hiddenRequired !== 'NOT_SATISFIED'))
     const payloadValue = rowStates ? Object.fromEntries(q.rows.flatMap(row => rowStates[row.rowKey] === 'REFUSED' ? [[row.rowKey, {_surveyRefusal:true}]] : value && typeof value === 'object' && Object.prototype.hasOwnProperty.call(value,row.rowKey) ? [[row.rowKey,(value as Record<string,unknown>)[row.rowKey]]] : [])) as TypedFormValue : state === 'REFUSED' ? {_surveyRefusal:true} as const : value
-    return [item.id, { normalizedValue:value, storedValue:legacyFormValueProjection(value), completed:state==='ANSWERED', state, ...(rowStates ? {rowStates}:{}), ...(otherText!==undefined?{otherText}:{}), qualifies, payloadValue }]
+    return [item.id, { normalizedValue:value, storedValue:state==='ANSWERED'?legacyFormValueProjection(value):null, completed:state==='ANSWERED', state, ...(rowStates ? {rowStates}:{}), ...(otherText!==undefined?{otherText}:{}), qualifies, payloadValue }]
   }))
 }

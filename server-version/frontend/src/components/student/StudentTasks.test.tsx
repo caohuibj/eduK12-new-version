@@ -6,7 +6,7 @@ const { get } = vi.hoisted(() => ({ get: vi.fn() }))
 vi.mock('../../api/client', () => ({ default: { get } }))
 import StudentTasks, { TaskPage } from './StudentTasks'
 const data: TaskPage = { list: [{ id: 'a', kind: 'ASSIGNMENT', title: '实验报告', courses: [{ id: 'c', title: '化学' }], state: 'IN_PROGRESS', deadline: null, opensAt: null, canContinue: true, canStart: false, href: '/student/assignments/a' }],
-  total: 21, page: 1, pageSize: 20, generatedAt: '2026-09-30T00:00:00Z', counts: { PENDING: 20, IN_PROGRESS: 1, UPCOMING: 0, EXPIRED: 0, COMPLETED: 0, UNAVAILABLE: 0 } }
+  total: 21, page: 1, pageSize: 20, generatedAt: '2026-09-30T00:00:00Z', counts: { PENDING: 20, IN_PROGRESS: 1, UPCOMING: 0, EXPIRED: 0, COMPLETED: 0, SUBMITTED_NOT_SATISFIED: 0, UNAVAILABLE: 0 } }
 beforeEach(() => { get.mockReset() })
 describe('student task aggregation UI', () => {
   it('uses one aggregate request, paginates and resets the page when filtering', async () => {
@@ -42,4 +42,13 @@ describe('student task aggregation UI', () => {
     resolve({ code: 0, data })
     await waitFor(() => expect(screen.queryByText('实验报告')).toBeNull())
   })
+})
+
+
+it('shows a submitted unsatisfied task with report access rather than starting it again', async () => {
+  get.mockResolvedValue({ code: 0, data: { ...data, total: 1, list: [{ ...data.list[0], id: 'q', title: '课程问卷', kind: 'COMPOSITE', state: 'SUBMITTED_NOT_SATISFIED', canContinue: false, canStart: false, hasSatisfiedAttempt: false, href: '/student/composite/attempts/submitted/report' }] } })
+  render(<MemoryRouter><StudentTasks /></MemoryRouter>)
+  expect(await screen.findByRole('link', { name: '查看课程问卷' })).toHaveAttribute('href', '/student/composite/attempts/submitted/report')
+  expect(screen.getByText('作答已保存，可查看报告。本次已计入作答次数。')).toBeInTheDocument()
+  expect(screen.queryByRole('link', { name: '开始课程问卷' })).not.toBeInTheDocument()
 })

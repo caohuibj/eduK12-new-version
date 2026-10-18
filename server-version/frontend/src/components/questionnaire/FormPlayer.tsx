@@ -1,10 +1,12 @@
+import { FormChoiceExtras, toggleFormMultiple } from '../../modules/assessment-core/form/FormChoiceExtras'
+import type { TrainingFormPolicy } from '../../modules/assessment-core/form/training-policy'
 import { ProfessionalFormAnswer } from '../../modules/assessment-core/form/ProfessionalFormAnswer'
 import type { ProfessionalAnswer } from '../../modules/assessment-core/form/types'
 import { BasicFormAnswer } from '../../modules/assessment-core/form/BasicFormAnswer'
 import type { FormQuestion } from '../../modules/assessment-core/form/types'
 import type { ChangeEvent } from 'react'
 
-export type FormPlayerValue = string | number | string[] | Record<string, string | number | string[]> | null
+export type FormPlayerValue = string | number | string[] | Record<string, string | number | string[] | {_surveyRefusal:true}> | {_surveyRefusal:true} | null
 
 export interface FormPlayerOption {
   value: string
@@ -18,12 +20,15 @@ export interface FormPlayerItem {
   placeholder?: string | null
   required: boolean
   formDefinition?: FormQuestion<never> | null
+  formPolicy?: TrainingFormPolicy | null
 }
 
 export interface FormPlayerProps {
   item: FormPlayerItem
   options: FormPlayerOption[]
   value: FormPlayerValue | undefined
+  otherText?: string
+  onOtherTextChange?: (text:string)=>void
   disabled?: boolean
   answerDisabled?: boolean
   navigationDisabled?: boolean
@@ -78,6 +83,7 @@ export function FormPlayer({
   item,
   options,
   value,
+  otherText, onOtherTextChange,
   disabled = false,
   answerDisabled = false,
   navigationDisabled = false,
@@ -104,19 +110,19 @@ export function FormPlayer({
   const matrix = q?.type === 'MATRIX' || q?.type === 'MATRIX_MULTIPLE'
   // The shared renderer uses independent row keys; Training wire/storage uses one
   // typed object per DB item. Preserve row keys rather than serializing the object.
-  const rowValues = value && typeof value === 'object' && !Array.isArray(value) ? value : {}
+  const rowValues: Record<string,string|number|string[]|{_surveyRefusal:true}> = value && typeof value === 'object' && !Array.isArray(value) && !('_surveyRefusal' in value) ? value : {}
   const professionalAnswers: Record<string, ProfessionalAnswer> = q
     ? matrix ? Object.fromEntries(Object.entries(rowValues).map(([key, answer]) => [q.itemKey + ':' + key, answer]))
       : { [q.itemKey]: value as ProfessionalAnswer ?? null }
     : {}
   const professionalChange = (key: string, next: ProfessionalAnswer) => {
-    if (!q || (next && typeof next === 'object' && !Array.isArray(next) && '_surveyRefusal' in next)) return
+    if (!q) return
     if (matrix) {
       const row = q.rows.find(row => key === q.itemKey + ':' + row.rowKey)
-      if (!row || (next !== null && typeof next !== 'string' && !Array.isArray(next))) return
+      if (!row || (next !== null && typeof next !== 'string' && !Array.isArray(next) && !(typeof next==='object' && '_surveyRefusal' in next))) return
       const updated = { ...rowValues }
       if (next === null) delete updated[row.rowKey]
-      else updated[row.rowKey] = next
+      else updated[row.rowKey] = next as string|string[]|{_surveyRefusal:true}
       void onChange(Object.keys(updated).length ? updated : null)
     } else void onChange(next as FormPlayerValue)
   }
@@ -174,9 +180,7 @@ export function FormPlayer({
                   checked={checked}
                   disabled={answerControlsDisabled}
                   describedBy={describedBy}
-                  onChange={() => void onChange(checked
-                    ? multipleValues.filter((entry) => entry !== option.value)
-                    : [...multipleValues, option.value])}
+                  onChange={() => void onChange(toggleFormMultiple(multipleValues,option.value,!checked,q?.exclusiveOptionKeys))}
                 />
               )
             })}
@@ -200,7 +204,7 @@ export function FormPlayer({
         </div>
       ) : null}
 
-      {item.formDefinition && ['NUMBER', 'LONG_TEXT', 'DATE', 'TIME'].includes(item.formDefinition.type) ? (
+      {item.formDefinition && ['NUMBER', 'SHORT_TEXT', 'LONG_TEXT', 'DATE', 'TIME'].includes(item.formDefinition.type) ? (
         <div>
           <label htmlFor={inputId(item.id)} className="mb-3 block text-lg font-semibold text-slate-900">{prompt}</label>
           <BasicFormAnswer question={item.formDefinition} id={inputId(item.id)}
@@ -235,6 +239,9 @@ export function FormPlayer({
         </div>
       ) : null}
 
+      {q?.otherOptionKey && onOtherTextChange ? <fieldset disabled={answerControlsDisabled}><FormChoiceExtras question={q} answers={{[q.itemKey]:value as ProfessionalAnswer,[q.itemKey+':other']:otherText??''}} onChange={(_,next)=>onOtherTextChange(typeof next==='string'?next:'')} /></fieldset> : null}
+      {q?.allowRefusal && !matrix ? <label className="mt-4 flex gap-2"><input type="checkbox" disabled={answerControlsDisabled} checked={Boolean(value && typeof value==='object' && '_surveyRefusal' in value)} onChange={e=>void onChange(e.target.checked?{_surveyRefusal:true}:null)}/>我选择不回答这一题</label> : null}
+      {q?.allowRefusal ? <p className="mt-2 text-sm text-slate-600">明确拒答会单独记录，不计有效回答。{item.required ? item.formPolicy?.requiredRefusal==='ALLOW_SUBMIT'?'此必答题可拒答交卷，但本次任务不会标记为达成。':'此必答题拒答后不能交卷。':''}</p> : null}
       {errorMessage ? <p id={errorId(item.id)} role="alert" className="mt-3 text-sm text-red-700">{errorMessage}</p> : null}
 
       <div className="mt-6 flex flex-wrap justify-between gap-3">

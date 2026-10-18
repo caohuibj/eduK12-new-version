@@ -734,3 +734,29 @@ describe('library composites are not takeable', () => {
     await expect(getPublicCompositeInfo('token')).rejects.toMatchObject({ statusCode: 400 })
   })
 })
+
+describe('C06 student satisfaction projection', () => {
+  it.each([null, 'SATISFIED'])('preserves historical satisfaction %s independently of the latest report with one light batch', async (historical) => {
+    mockPrisma.courseStudent.findMany.mockResolvedValue([{ courseId: 'course-t' }])
+    mockPrisma.compositeAssessment.findMany.mockResolvedValue(Array.from({ length: 30 }, (_, i) => ({
+      id: `q${i}`, code: `Q${i}`, name: '问卷', opensAt: null, expiresAt: null, maxAttempts: 2,
+      course: teacherCourse, items: [], formSections: [],
+    })))
+    mockPrisma.compositeAssessmentAttempt.findMany.mockResolvedValue(Array.from({ length: 30 }, (_, i) => [
+      { id: `new${i}`, compositeAssessmentId: `q${i}`, status: 'COMPLETED', taskSatisfaction: 'NOT_SATISFIED', progress: 100 },
+      { id: `old${i}`, compositeAssessmentId: `q${i}`, status: 'COMPLETED', taskSatisfaction: historical, progress: 100 },
+    ]).flat())
+    const result = await listAvailableForStudent('student-1')
+    expect(result).toHaveLength(30)
+    expect(result[0]).toMatchObject({ latestCompletedAttempt: { id: 'new0', taskSatisfied: false }, latestSatisfiedAttempt: { id: 'old0' }, hasSatisfiedAttempt: true, attemptsUsed: 2, canContinue: false, canStartNewAttempt: false })
+    expect(mockPrisma.compositeAssessmentAttempt.findMany).toHaveBeenCalledTimes(1)
+    expect(mockPrisma.compositeAssessmentAttempt.findMany.mock.calls[0][0].select).toEqual({ id: true, compositeAssessmentId: true, status: true, taskSatisfaction: true, progress: true, completedAt: true })
+  })
+  it.each(['NOT_SATISFIED', 'CORRUPT'])('never reopens a submitted %s attempt or grants additional attempts', async (taskSatisfaction) => {
+    mockPrisma.courseStudent.findMany.mockResolvedValue([{ courseId: 'course-t' }])
+    mockPrisma.compositeAssessment.findMany.mockResolvedValue([{ id: 'q', name: '问卷', opensAt: null, expiresAt: null, maxAttempts: 1, course: teacherCourse, items: [] }])
+    mockPrisma.compositeAssessmentAttempt.findMany.mockResolvedValue([{ id: 'submitted', compositeAssessmentId: 'q', status: 'COMPLETED', taskSatisfaction, progress: 100 }])
+    const [row] = await listAvailableForStudent('student-1')
+    expect(row).toMatchObject({ hasSatisfiedAttempt: false, latestSatisfiedAttempt: null, latestCompletedAttempt: { id: 'submitted' }, attemptsUsed: 1, canContinue: false, canStartNewAttempt: false })
+  })
+})

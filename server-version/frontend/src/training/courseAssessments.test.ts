@@ -115,3 +115,21 @@ describe('course-scope measurement projection', () => {
     expect(result.items.some(item => item.name === '仍可填写')).toBe(true)
   })
 })
+
+it.each([false, true])('preserves report and historical qualification in Training course cards: satisfied=%s', (hasSatisfiedAttempt) => {
+  const [row] = projectCourseAssessments(course, [], [], [], [{ ...composite('q', course),
+    canStartNewAttempt: false, hasSatisfiedAttempt,
+    attempt: { id: 'new', status: 'COMPLETED', progress: 100 },
+    latestCompletedAttempt: { id: 'new', status: 'COMPLETED', progress: 100, taskSatisfied: false },
+  }])
+  expect(row).toMatchObject({ status: hasSatisfiedAttempt ? '任务已达成' : '已交卷，任务未达成', href: '/student/composite/attempts/new/report', action: '查看反馈' })
+  expect(row.taskSatisfactionLabel).toBe(hasSatisfiedAttempt ? '本次未达成，历史达成仍保留' : '本次作答已保存并计入次数，可查看报告。')
+})
+
+it('uses the authorized retry allowance and never presents a submitted attempt as resumable', () => {
+  const [row] = projectCourseAssessments(course, [], [], [], [{ ...composite('q', course),
+    hasSatisfiedAttempt: false, canStartNewAttempt: true,
+    latestCompletedAttempt: { id: 'submitted', status: 'COMPLETED', progress: 100, taskSatisfied: false },
+  }])
+  expect(row).toMatchObject({ status: '已交卷，任务未达成', href: '/student/composite/q', action: '再次测评', reportHref: '/student/composite/attempts/submitted/report' })
+})

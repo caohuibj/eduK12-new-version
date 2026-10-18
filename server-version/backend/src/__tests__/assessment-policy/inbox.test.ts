@@ -28,3 +28,12 @@ describe('respondent inbox', () => {
     expect(JSON.stringify(result)).not.toContain('Homework')
   })
 })
+
+
+it.each(['COMPLETED', 'SUBMITTED_NOT_SATISFIED'])('routes submitted course state %s to reports and never a new launch', async (state) => {
+  mocks.course.mockResolvedValue({ list: [{ id: 'q', kind: 'COMPOSITE', title: 'Course', state, deadline: null, courses: [{ id: 'c', title: '课程' }], href: '/student/composite/attempts/a/report', canStart: false, canContinue: false }], total: 1 })
+  const result = await listRespondentAssessments('student-a', 'STUDENT')
+  expect(result.list[0]).toMatchObject({ state, launchTarget: null, reportTarget: '/student/composite/attempts/a/report', resultAvailability: 'REPORT', respondent: { userId: 'student-a', role: 'STUDENT' } })
+  expect(result.pendingCount).toBe(0)
+  expect(mocks.course).toHaveBeenCalledWith('student-a', { page: 1, pageSize: 200 })
+})

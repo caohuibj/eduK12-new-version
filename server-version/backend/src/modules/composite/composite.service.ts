@@ -41,6 +41,7 @@ import { parseCognitiveResultSnapshot, referencesForCognitiveResult } from '../c
 import { resolveCognitiveReferenceForResult } from '../cognitive/reference'
 import { readFrozenReport } from '../cognitive/profile-freeze'
 import { buildCognitiveSingleTaskReport } from '../cognitive/single-task-report'
+import { isTaskSatisfied } from '../assessment-runtime/form-policy'
 import { loadCompositeTypedFormValues } from '../assessment-runtime/typed-form-facts'
 import { typedCompositeFormQuestion, validateTypedCompositeSectionDefinition, legacyFormValueProjection } from '../assessment-runtime/typed-form'
 import { buildFormBackgroundReport, buildScaleUnitReport, SCALE_REPORT_DEFINITION_VERSION, SCALE_REPORT_DISCLAIMER } from '../reporting/scale-unit-report'
@@ -515,6 +516,7 @@ export const assertValidItem = async (
   composite: { courseId: string | null; productKind?: string },
   prisma: Db = defaultPrisma,
 ) => {
+  if ((input as any).formPolicy != null && composite.productKind !== 'QUESTIONNAIRE') throw compositeBadRequest('Form V3 只支持新版普通问卷')
   if (input.required === false && input.type !== 'FORM') {
     throw compositeBadRequest('只有表单字段可以设置为选填')
   }
@@ -639,6 +641,8 @@ type AttemptCounts = {
   started: number
   inProgress: number
   completed: number
+  satisfied: number
+  notSatisfied: number
   abandoned: number
 }
 
@@ -646,6 +650,8 @@ const emptyAttemptCounts = (): AttemptCounts => ({
   started: 0,
   inProgress: 0,
   completed: 0,
+  satisfied: 0,
+  notSatisfied: 0,
   abandoned: 0,
 })
 
@@ -714,7 +720,7 @@ const loadAttemptCountsByCompositeIds = async (
     ? { AND: [{ compositeAssessmentId: { in: ids } }, visibility] }
     : { compositeAssessmentId: { in: ids } }
   const grouped = await prisma.compositeAssessmentAttempt.groupBy({
-    by: ['compositeAssessmentId', 'status'],
+    by: ['compositeAssessmentId', 'status', 'taskSatisfaction'],
     where,
     _count: { _all: true },
   })
@@ -722,7 +728,11 @@ const loadAttemptCountsByCompositeIds = async (
     const current = byId.get(row.compositeAssessmentId) ?? emptyAttemptCounts()
     const n = row._count._all
     if (row.status === 'IN_PROGRESS') current.inProgress += n
-    else if (row.status === 'COMPLETED') current.completed += n
+    else if (row.status === 'COMPLETED') {
+      current.completed += n
+      if (isTaskSatisfied(row)) current.satisfied += n
+      else current.notSatisfied += n
+    }
     else if (row.status === 'ABANDONED') current.abandoned += n
     current.started = current.inProgress + current.completed + current.abandoned
     byId.set(row.compositeAssessmentId, current)
@@ -733,6 +743,7 @@ const loadAttemptCountsByCompositeIds = async (
 const mapAttemptRowForTeacher = (attempt: {
   id: string
   status: string
+  taskSatisfaction?: string | null
   progress: number
   progressUnavailableReason?: string | null
   completedItems: number
@@ -747,6 +758,8 @@ const mapAttemptRowForTeacher = (attempt: {
   const base = {
     id: attempt.id,
     status: attempt.status,
+    taskSatisfaction: attempt.taskSatisfaction ?? null,
+    taskSatisfied: isTaskSatisfied(attempt),
     progress: attempt.progress,
     progressUnavailableReason: attempt.progressUnavailableReason ?? null,
     completedItems: attempt.completedItems,
@@ -1144,6 +1157,7 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
         if (!item.scaleId || item.scale?.status !== 'PUBLISHED') throw compositeBadRequest('综合测评包含未发布量表')
         itemData.push({ type: 'SCALE', position: item.position, required: item.required, scaleId: item.scaleId })
       } else if (item.type === 'FORM') {
+        if (item.formPolicy != null) throw compositeBadRequest('Form V3 请使用新版问卷复制入口，保持区段和策略')
         if (item.formDefinition != null) typedCompositeFormQuestion({ ...item, formType: item.formType ?? '', formLabel: item.formLabel ?? '', placeholder: item.formPlaceholder ?? null })
         itemData.push({
           type: 'FORM',
@@ -1277,6 +1291,7 @@ export const listAttemptsForTeacher = async (
       select: {
         id: true,
         status: true,
+        taskSatisfaction: true,
         progress: true,
         assignmentRef: true,
         completedItems: true,
@@ -1891,6 +1906,7 @@ export const prepareCompositePublication = async (userId: string, role: UserRole
       await assertSituationalAssetReferencesReady(situation.situationPackage.definition)
     }
     if (item.type === 'FORM') {
+      if (item.formPolicy != null && (composite.productKind !== 'QUESTIONNAIRE' || composite.deliveryMode==='LEGACY' || composite.reportPackageKey || composite.analysisProtocolKey)) throw compositeBadRequest('Form V3 只支持新版普通问卷')
       if (item.formDefinition != null) typedCompositeFormQuestion({ ...item, formType: item.formType ?? '', formLabel: item.formLabel ?? '', placeholder: item.formPlaceholder ?? null })
       if (!item.formType || !item.formLabel) {
         throw compositeBadRequest('综合测评包含未配置完成的表单')
@@ -2127,7 +2143,7 @@ export const listAvailableForStudent = async (userId: string, now = Date.now()) 
   const supportedList = config.cognitiveModuleEnabled
     ? list
     : list.filter((item: any) => !item.items.some((child: any) => child.type === 'COGNITIVE'))
-  const attempts = await prisma.compositeAssessmentAttempt.findMany({ where: { userId, compositeAssessmentId: { in: supportedList.map((item) => item.id) } }, orderBy: { startedAt: 'desc' }, select: { id: true, compositeAssessmentId: true, status: true, progress: true, completedAt: true } })
+  const attempts = await prisma.compositeAssessmentAttempt.findMany({ where: { userId, compositeAssessmentId: { in: supportedList.map((item) => item.id) } }, orderBy: { startedAt: 'desc' }, select: { id: true, compositeAssessmentId: true, status: true, taskSatisfaction: true, progress: true, completedAt: true } })
   const latest = new Map<string, any>()
   for (const attempt of attempts) {
     // 查询已按 startedAt 倒序，最新的进行中记录必须优先于更早的已完成记录，保证可继续作答。
@@ -2153,6 +2169,8 @@ export const listAvailableForStudent = async (userId: string, now = Date.now()) 
     // `attempts` is ordered newest-first, so this is the most recent completed
     // attempt even when a newer attempt is currently in progress.
     const latestCompletedAttempt = compositeAttempts.find((attempt) => attempt.status === 'COMPLETED') ?? null
+    // Historical satisfaction is independent of the newest submitted report.
+    const latestSatisfiedAttempt = compositeAttempts.find(isTaskSatisfied) ?? null
     const sections = item.formSections ?? []
     const units = [
       ...item.items
@@ -2195,7 +2213,9 @@ export const listAvailableForStudent = async (userId: string, now = Date.now()) 
       units,
       formSections: sections,
       attempt: latestAttempt,
-      latestCompletedAttempt,
+      latestCompletedAttempt: latestCompletedAttempt ? { ...latestCompletedAttempt, taskSatisfied: isTaskSatisfied(latestCompletedAttempt) } : null,
+      latestSatisfiedAttempt,
+      hasSatisfiedAttempt: Boolean(latestSatisfiedAttempt),
     }
   })
 }
@@ -2439,6 +2459,7 @@ const createAttempt = async (
   attemptEpoch = 1,
   relationalIdentity?: RelationalCompositeAttemptIdentityV1,
 ) => {
+  if(composite.items.some((item:any)=>item.formPolicy!=null) && (composite.productKind!=='QUESTIONNAIRE' || composite.deliveryMode==='LEGACY' || relationalIdentity || composite.reportPackageKey || composite.analysisProtocolKey)) throw compositeBadRequest('Form V3 只支持普通问卷的统一 FINAL 运行时')
   if (['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(composite.productKind)) {
     // Serialize new admission against archive; never trust the pre-lock read.
     await db.$queryRawUnsafe('SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR UPDATE', composite.id)
@@ -3141,6 +3162,7 @@ const unifiedCompositeProgressSnapshot = (
 // re-reads the same composite attempt row for routing, projection, or
 // admission.
 const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
+  taskSatisfaction: true,
   id: true,
   asyncReportEpoch: true,
   assignmentRef: true,
@@ -3533,6 +3555,8 @@ const getUnifiedCompositeAttemptState = async (
     ...(attempt.compositeAssessment.productKind === 'QUESTIONNAIRE' ? { productKind: 'QUESTIONNAIRE' as const, reportMode: 'COLLECTION_ONLY' as const } : {}),
     instruction: attempt.compositeAssessment.instruction,
     status: attempt.status,
+    taskSatisfaction: attempt.taskSatisfaction ?? null,
+    taskSatisfied: isTaskSatisfied(attempt),
     deliveryMode: attempt.deliveryMode,
     attemptEpoch: attempt.attemptEpoch,
     definitionHash,
@@ -3619,6 +3643,8 @@ const finalizeCompositeAttemptLegacyIfReady = async (attemptId: string) => withQ
   if (attempt.status === 'COMPLETED') {
     return {
       status: attempt.status,
+    taskSatisfaction: attempt.taskSatisfaction ?? null,
+    taskSatisfied: isTaskSatisfied(attempt),
       progress: attempt.progress,
       completedAt: attempt.completedAt,
     }
@@ -4155,6 +4181,8 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
     ...(attempt.compositeAssessment.productKind === 'QUESTIONNAIRE' ? { productKind: 'QUESTIONNAIRE' as const, reportMode: 'COLLECTION_ONLY' as const } : {}),
     instruction: attempt.compositeAssessment.instruction,
     status: attempt.status,
+    taskSatisfaction: attempt.taskSatisfaction ?? null,
+    taskSatisfied: isTaskSatisfied(attempt),
     deliveryMode: attempt.deliveryMode,
     attemptEpoch: attempt.attemptEpoch,
     definitionHash: computeSubmissionPayloadHash({
@@ -4477,14 +4505,15 @@ export const buildCompositeReport = async (attempt: any, verifiedContext?: Whole
     attempt.formAnswers,
   )
   const formMap = new Map<string, any>(readableFormAnswers.map((item: any) => [item.itemId, item]))
-  const typedFormValues = await loadCompositeTypedFormValues(attempt)
+  const typedFormStates = new Map<string,{state:string;rowStates?:Record<string,string>;otherText?:string}>()
+  const typedFormValues = await loadCompositeTypedFormValues(attempt,typedFormStates)
   const unitReports: any[] = []
   const backgroundValues: any[] = []
   const packageSlotLabels = getFrozenPackageSlotLabels(attempt.compositeAssessment)
   const packageBased = Boolean(attempt.compositeAssessment.reportPackageKey)
   for (const item of attempt.compositeAssessment.items) {
     if (item.type === 'FORM') {
-      backgroundValues.push(buildFormBackgroundReport({ itemId: item.id, label: packageSlotLabels.get(item.position) ?? item.formLabel, value: typedFormValues.has(item.id) ? legacyFormValueProjection(typedFormValues.get(item.id) ?? null) : formMap.get(item.id)?.value ?? null, formType: item.formType, options: item.formOptions }))
+      backgroundValues.push({...buildFormBackgroundReport({ itemId: item.id, label: packageSlotLabels.get(item.position) ?? item.formLabel, value: typedFormValues.has(item.id) ? legacyFormValueProjection(typedFormValues.get(item.id) ?? null) : formMap.get(item.id)?.value ?? null, formType: item.formType, options: item.formOptions }), ...(typedFormStates.has(item.id)?typedFormStates.get(item.id):{})})
       continue
     }
     if (item.type === 'SCALE') {
@@ -4686,6 +4715,7 @@ export const buildCompositeReport = async (attempt: any, verifiedContext?: Whole
     }
   }
   const report = {
+    taskSatisfaction: attempt.taskSatisfaction ?? null, taskSatisfied:isTaskSatisfied(attempt),
     id: attempt.id,
     assessmentId: attempt.compositeAssessment.id,
     name: attempt.compositeAssessment.name,
@@ -4909,7 +4939,7 @@ const materializedReportForHeader = async (parent: any, audience: CompositeRepor
   const report = await decryptCompactCompositeReport(job.reportEncrypted, reportBinding) ?? decryptCompositeCollectionReport(job.reportEncrypted, reportBinding)
   // HTTP projection is applied to the CURRENT audience on every read. No
   // participant/teacher projection or authorization decision is globally cached.
-  return projectCompositeCollectionReport(report, audience)
+  return projectCompositeCollectionReport({...report,taskSatisfaction:parent.taskSatisfaction??null,taskSatisfied:isTaskSatisfied(parent)}, audience)
 }
 
 

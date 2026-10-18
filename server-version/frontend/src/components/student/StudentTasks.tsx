@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom'
 import apiClient from '../../api/client'
 import { ProductButton, ProductStatus } from '../product-ui'
 
-const labels = { PENDING: '待完成', IN_PROGRESS: '进行中', UPCOMING: '未开始', EXPIRED: '已截止', COMPLETED: '已完成', UNAVAILABLE: '次数已用尽' }
+const labels = { PENDING: '待完成', IN_PROGRESS: '进行中', UPCOMING: '未开始', EXPIRED: '已截止', COMPLETED: '已完成', SUBMITTED_NOT_SATISFIED: '已交卷，任务未达成', UNAVAILABLE: '次数已用尽' }
 type State = keyof typeof labels
 export interface TaskPage {
   list: { id: string; kind: 'ASSIGNMENT' | 'CHECKIN' | 'QUESTIONNAIRE' | 'COMPOSITE'; title: string;
     courses: { id: string; title: string }[]; state: State; deadline: string | null; opensAt: string | null;
-    canContinue: boolean; canStart: boolean; href: string | null }[]
+    canContinue: boolean; canStart: boolean; href: string | null; hasSatisfiedAttempt?: boolean; latestSubmissionSatisfied?: boolean }[]
   counts: Record<State, number> & { ACTIONABLE?: number }
   page: number
   pageSize: number
@@ -66,6 +66,9 @@ export default function StudentTasks({ refreshKey = 0 }: { refreshKey?: number }
               {result.list.map(task => <li key={`${task.kind}:${task.id}`} className="flex flex-wrap items-center justify-between gap-3 py-4">
                 <div className="min-w-0 flex-1"><h3 className="break-words font-medium text-slate-900">{task.title}</h3>
                   <p className="mt-1 text-sm text-slate-600">{kindLabels[task.kind]} · {task.courses.map(course => course.title).join('、') || '公共问卷'} · {labels[task.state]}</p>
+                  {task.state === 'SUBMITTED_NOT_SATISFIED' && <p className="mt-1 text-sm text-amber-700">作答已保存，可查看报告。本次已计入作答次数。</p>}
+                  {task.hasSatisfiedAttempt && task.latestSubmissionSatisfied === false && <p className="mt-1 text-sm text-amber-700">最近一次交卷未达成；历史作答已达成任务。</p>}
+                  {task.hasSatisfiedAttempt && task.state !== 'COMPLETED' && <p className="mt-1 text-sm text-green-700">历史作答已达成任务</p>}
                   {task.opensAt && task.state === 'UPCOMING' ? <p className="mt-1 text-sm text-slate-600">开始时间：{new Date(task.opensAt).toLocaleString('zh-CN')}</p> : null}
                   {task.deadline ? <p className="mt-1 text-sm text-slate-600">截止时间：{new Date(task.deadline).toLocaleString('zh-CN')}</p> : null}
                 </div>

@@ -85,7 +85,7 @@ export interface CompositeCurrentItem {
       options: Array<{ value: string; label: string }> | string | null
       required: boolean
       contextKey: string | null
-      value: string | number | string[] | Record<string, string | number | string[]> | null
+      value: import("../../components/questionnaire/FormPlayer").FormPlayerValue
     }>
   }
   form?: { type: string; label: string; placeholder: string | null; options: Array<{ value: string; label: string }> | null; value: string | null; contextKey?: string | null }
@@ -96,17 +96,17 @@ export interface CompositeCurrentItem {
     responseValue?: CompositeScaleResponseValue
     responseTimeMs?: number
     changeCount?: number
-    formDefinition?: FormQuestion<never> | null
+    formDefinition?: FormQuestion<never> | null; formPolicy?: import("../assessment-core/form/training-policy").TrainingFormPolicy | null
     formItemId?: string
     required?: boolean
     type?: string
     label?: string
     placeholder?: string | null
     options?: Array<{ value: string; label: string }> | string | null
-    value?: string | number | string[] | Record<string, string | number | string[]> | null
+    value?: import("../../components/questionnaire/FormPlayer").FormPlayerValue
     contextKey?: string | null
   }>
-  formAnswers?: Array<{ formDefinition?: FormQuestion<never> | null; formItemId: string; type: string; label: string; placeholder: string | null; options: Array<{ value: string; label: string }> | string | null; required: boolean; contextKey: string | null; value: string | number | string[] | Record<string, string | number | string[]> | null }>
+  formAnswers?: Array<{ formDefinition?: FormQuestion<never> | null; formPolicy?: import("../assessment-core/form/training-policy").TrainingFormPolicy | null; formItemId: string; type: string; label: string; placeholder: string | null; options: Array<{ value: string; label: string }> | string | null; required: boolean; contextKey: string | null; value: import("../../components/questionnaire/FormPlayer").FormPlayerValue }>
   cognitiveSession?: CognitiveSession
   situationalAttemptId?: string
   situationalInstrumentKey?: string
@@ -170,6 +170,8 @@ export interface CompositeReportStatus {
 }
 
 export interface CompositeAttemptState {
+  taskSatisfaction?: string | null
+  taskSatisfied?: boolean
   allUnitsSubmitted?: boolean
   reportStatus?: CompositeReportJobState
   productKind?: string
@@ -311,6 +313,8 @@ export interface CompositePackageReport {
 }
 
 export interface CompositeReport {
+  taskSatisfaction?: string | null
+  taskSatisfied?: boolean
   reportState?: 'PARTIAL'
   productKind?: 'QUESTIONNAIRE' | 'ASSESSMENT_BUNDLE'
   bundleReport?: import('../../pages/bundle/BundleReport').BundleReportData
@@ -355,6 +359,8 @@ export interface CompositeReport {
 }
 
 export interface CompositeAttemptCounts {
+  satisfied?: number
+  notSatisfied?: number
   started: number
   inProgress: number
   completed: number
@@ -364,6 +370,8 @@ export interface CompositeAttemptCounts {
 export type CompositeAttemptListStatus = 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED'
 
 export interface CompositeTeacherAttemptRow {
+  taskSatisfaction?: string | null
+  taskSatisfied?: boolean
   partialReportAvailable?: boolean
   partialReportUnitCount?: number
   id: string

@@ -45,6 +45,7 @@ export type QuestionnaireFormAdmissionParent = {
 }
 
 export type CompositeFormAdmissionParent = {
+  assignmentRef?: string | null
   id: string
   userId: string | null
   recoveryTokenHash: string | null
@@ -56,6 +57,9 @@ export type CompositeFormAdmissionParent = {
   frozenActiveSlotSetEncrypted: string | null
   frozenActiveSlotSetHash: string | null
   compositeAssessment: {
+    productKind?: string
+    reportPackageKey?: string | null
+    analysisProtocolKey?: string | null
     formSections: Array<{ contextSection: boolean; items: Array<{ contextKey: string | null }> }>
   }
 }
@@ -78,7 +82,7 @@ const QUESTIONNAIRE_FORM_ADMISSION_PARENT_SELECT = {
 } as const
 
 const COMPOSITE_FORM_ADMISSION_PARENT_SELECT = {
-  id: true,
+  id: true, assignmentRef: true,
   userId: true,
   recoveryTokenHash: true,
   deliveryMode: true,
@@ -89,7 +93,7 @@ const COMPOSITE_FORM_ADMISSION_PARENT_SELECT = {
   frozenActiveSlotSetEncrypted: true,
   frozenActiveSlotSetHash: true,
   compositeAssessment: {
-    select: { formSections: { select: { contextSection: true, items: { select: { contextKey: true } } } } },
+    select: { productKind:true, reportPackageKey:true, analysisProtocolKey:true, formSections: { select: { contextSection: true, items: { select: { contextKey: true } } } } },
   },
 } as const
 
@@ -316,6 +320,7 @@ export const activateCompositeFormAdmission = async (input: {
   const stored = await loadStoredFormAdmission(input.child)
   if (stored) return stored
   const parent = input.parent
+  if(input.definition.items.some(item=>item.formPolicy!=null) && (parent.compositeAssessment.productKind!=="QUESTIONNAIRE" || parent.assignmentRef || parent.compositeAssessment.reportPackageKey || parent.compositeAssessment.analysisProtocolKey)) throw new InstrumentFinalSubmitError("INSTRUMENT_NOT_AVAILABLE","Form V3 不支持此任务组合",422)
   if (parent.runtimeGeneration !== 'UNIFIED_V1') {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评运行时版本不匹配，请重启测评', 409)
   }

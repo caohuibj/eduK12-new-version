@@ -1,7 +1,7 @@
 import { prisma } from '../config/database'
 import { listAvailableForStudent } from '../modules/composite/composite.service'
 
-export const taskStates = ['PENDING', 'IN_PROGRESS', 'UPCOMING', 'EXPIRED', 'COMPLETED', 'UNAVAILABLE'] as const
+export const taskStates = ['PENDING', 'IN_PROGRESS', 'UPCOMING', 'EXPIRED', 'COMPLETED', 'SUBMITTED_NOT_SATISFIED', 'UNAVAILABLE'] as const
 export type TaskState = typeof taskStates[number]
 export const taskFilters = ['ACTIONABLE', ...taskStates] as const
 export interface StudentTask {
@@ -15,6 +15,8 @@ export interface StudentTask {
   canContinue: boolean
   canStart: boolean
   href: string | null
+  hasSatisfiedAttempt?: boolean
+  latestSubmissionSatisfied?: boolean
 }
 
 /** Batched reads, independent of course count. No answers, scores or peer data. */
@@ -96,13 +98,15 @@ export async function listStudentTasks(userId: string, options: { page: number; 
     const canContinue = available && item.canContinue
     const state: TaskState = item.canContinue
       ? item.availability === 'EXPIRED' ? 'EXPIRED' : item.availability === 'UPCOMING' ? 'UPCOMING' : 'IN_PROGRESS'
-      : item.latestCompletedAttempt ? 'COMPLETED' : item.availability === 'EXPIRED' ? 'EXPIRED'
+      : item.hasSatisfiedAttempt ? 'COMPLETED' : item.latestCompletedAttempt ? 'SUBMITTED_NOT_SATISFIED' : item.availability === 'EXPIRED' ? 'EXPIRED'
         : item.availability === 'UPCOMING' ? 'UPCOMING' : item.canStartNewAttempt ? 'PENDING' : 'UNAVAILABLE'
     tasks.push({ id: item.id, kind: 'COMPOSITE', title: item.name, courses: linkedCourses, state,
+      hasSatisfiedAttempt: item.hasSatisfiedAttempt,
+      latestSubmissionSatisfied: item.latestCompletedAttempt?.taskSatisfied,
       deadline: item.expiresAt?.toISOString() ?? null, opensAt: item.opensAt?.toISOString() ?? null,
       canContinue, canStart: state === 'PENDING' && item.canStartNewAttempt,
       href: canContinue ? `/student/composite/attempts/${item.attempt.id}`
-        : state === 'COMPLETED' ? `/student/composite/attempts/${item.latestCompletedAttempt.id}/report`
+        : (state === 'COMPLETED' || state === 'SUBMITTED_NOT_SATISFIED') && item.latestCompletedAttempt ? `/student/composite/attempts/${item.latestCompletedAttempt.id}/report`
           : state === 'PENDING' ? `/student/composite/${item.id}` : null })
   }
   // Optional course filter is applied to the already-authorized membership
@@ -111,7 +115,7 @@ export async function listStudentTasks(userId: string, options: { page: number; 
     ? tasks.filter(item => item.courses.some(course => course.id === options.courseId))
     : tasks
   const counts = Object.fromEntries(taskStates.map(state => [state, scoped.filter(item => item.state === state).length])) as Record<TaskState, number>
-  const order: TaskState[] = ['IN_PROGRESS', 'PENDING', 'UPCOMING', 'EXPIRED', 'UNAVAILABLE', 'COMPLETED']
+  const order: TaskState[] = ['IN_PROGRESS', 'PENDING', 'UPCOMING', 'EXPIRED', 'UNAVAILABLE', 'SUBMITTED_NOT_SATISFIED', 'COMPLETED']
   const actionable = (item: StudentTask) => Boolean(item.href && (item.canContinue || item.canStart))
   const filtered = scoped.filter(item => options.state === 'ACTIONABLE' ? actionable(item) : !options.state || item.state === options.state).sort((left, right) =>
     order.indexOf(left.state) - order.indexOf(right.state)

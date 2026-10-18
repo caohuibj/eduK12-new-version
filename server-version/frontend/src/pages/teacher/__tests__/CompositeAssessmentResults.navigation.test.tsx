@@ -118,3 +118,16 @@ describe('composite results product navigation and safe request state', () => {
     expect(attempts).toHaveBeenCalledTimes(2)
   })
 })
+
+
+it('keeps the anonymous unsatisfied submission report available and labels qualification separately', async () => {
+  const payload = response('QUESTIONNAIRE')
+  Object.assign(payload.data.list[0], { taskSatisfied: false, taskSatisfaction: 'NOT_SATISFIED', isAnonymous: true, displayName: 'ANON-1' })
+  Object.assign(payload.data.attemptCounts, { satisfied: 0, notSatisfied: 1 })
+  attempts.mockResolvedValue(payload)
+  mount()
+  expect(await screen.findByText('任务未达成')).toBeInTheDocument()
+  expect(screen.getByText(/已交卷中任务达成 0 次，未达成 1 次/)).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: '查看' }))
+  expect(screen.getByTestId('location').textContent).toBe('/composite-assessments/one/attempts/complete/report')
+})

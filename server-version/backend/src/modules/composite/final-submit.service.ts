@@ -399,6 +399,7 @@ export const normalizeCompositeSectionAnswers = (section: CompositeSection, valu
     const item = itemMap.get(answer.formItemId)
     if (!item) throw new InstrumentFinalSubmitError('FORM_ANSWER_INVALID', '提交中包含不属于该区段的字段', 400)
     if (provided.has(answer.formItemId)) throw new InstrumentFinalSubmitError('FORM_ANSWER_INVALID', '同一字段不能重复提交', 400)
+    if (Object.prototype.hasOwnProperty.call(answer,"otherText") && item.formPolicy == null) throw new InstrumentFinalSubmitError("FORM_ANSWER_INVALID","此题不允许其他填写内容",400)
     provided.set(answer.formItemId, answer)
   }
   const policyEnabled = section.items.some(item => item.formPolicy != null)

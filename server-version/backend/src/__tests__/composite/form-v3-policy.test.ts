@@ -4,6 +4,7 @@ import {normalizeCompositeSectionAnswers} from '../../modules/composite/final-su
 import {mapCompositeSection,compositeFormSectionDefinitionHash} from '../../modules/assessment-runtime/form-section-definition'
 import {formFactsFor} from '../../modules/assessment-runtime/unified-form-section-final-submit.service'
 import {assertTypedCompositeFormFacts} from '../../modules/assessment-runtime/typed-form-facts'
+import {validateTypedCompositeSectionDefinition} from '../../modules/assessment-runtime/typed-form'
 import {remapTrainingFormDefinition} from '../../modules/assessment-runtime/form-policy'
 const policy={version:3,requiredRefusal:'ALLOW_SUBMIT',hiddenRequired:'EXEMPT'}
 const opts=[{optionKey:'yes',label:'是'},{optionKey:'no',label:'否'},{optionKey:'other',label:'其他'}]
@@ -46,11 +47,39 @@ describe('Training V3 section policy',()=>{
   expect(()=>submit(s,[answer('a',{r1:'yes',r2:'no',unknown:'yes'})])).toThrow()
  })
  it('rejects forward, dangling, cross-section and Likert condition sources',()=>{
-  for(const source of ['q_missing','q_b']){const s=section([q('a','SHORT_TEXT',{displayIf:{itemKey:source,operator:'EQUALS',optionKey:'yes'}}),q('b','SINGLE')]);expect(()=>submit(s,[])).toThrow()}
+  const target=q('b','SHORT_TEXT',{displayIf:{itemKey:'q_a',operator:'EQUALS',optionKey:'yes'}})
+  const valid=section([q('a','SINGLE'),target])
+  expect(()=>validateTypedCompositeSectionDefinition(valid.items)).not.toThrow()
+  // Missing after deletion or selecting only the destination section has the
+  // same closed section namespace; neither may borrow a question elsewhere.
+  for(const items of [[target],[target,q('a','SINGLE')],[q('a','LIKERT',{options:opts}),target]]) {
+   expect(()=>validateTypedCompositeSectionDefinition(section(items).items)).toThrow('前置单选或多选题')
+  }
+  const dangling=section([q('a','SINGLE'),q('b','SHORT_TEXT',{displayIf:{itemKey:'q_missing',operator:'EQUALS',optionKey:'yes'}})])
+  expect(()=>validateTypedCompositeSectionDefinition(dangling.items)).toThrow('前置单选或多选题')
  })
  it('remaps references by exact keys without touching labels/options',()=>{
   const d=q('b','SHORT_TEXT',{prompt:'q_a is text',displayIf:{itemKey:'q_a',operator:'EQUALS',optionKey:'q_a'}}).formDefinition
   expect(remapTrainingFormDefinition(d,new Map([['q_a','q_new_a'],['q_b','q_new_b']]))).toMatchObject({itemKey:'q_new_b',prompt:'q_a is text',displayIf:{itemKey:'q_new_a',optionKey:'q_a'}})
   expect(()=>remapTrainingFormDefinition(d,new Map([['q_b','q_new_b']]))).toThrow()
  })
+})
+
+it('does not treat unknown qualifications as task satisfaction',async()=>{
+ const {isTaskSatisfied}=await import('../../modules/assessment-runtime/form-policy')
+ for(const taskSatisfaction of [undefined,null,'SATISFIED'])expect(isTaskSatisfied({status:'COMPLETED',taskSatisfaction})).toBe(true)
+ for(const taskSatisfaction of ['NOT_SATISFIED','corrupt',''])expect(isTaskSatisfied({status:'COMPLETED',taskSatisfaction})).toBe(false)
+ expect(isTaskSatisfied({status:'IN_PROGRESS',taskSatisfaction:'SATISFIED'})).toBe(false)
+})
+it('rejects prototype keys and side-channel text on legacy questions',()=>{
+ const s=section([q('a','MATRIX',{rows:[{rowKey:'constructor',label:'bad'}]})]);expect(()=>submit(s,[])).toThrow()
+ const legacy=section([{id:'old',formType:'text_input',formLabel:'old',required:false,position:0}]);expect(()=>submit(legacy,[answer('old','hi',{otherText:'extra'})])).toThrow()
+})
+
+it('rejects prototype wire keys before record parsing can drop them',async()=>{
+ const {finalCompositeFormSectionSubmitSchema}=await import('../../services/questionnaire-final-submit.schema')
+ const base={submissionId:'submission-123456789',attemptEpoch:1,definitionHash:'hash',answers:[{formItemId:'a',value:JSON.parse('{"__proto__":"yes","r1":"yes"}')}]}
+ expect(finalCompositeFormSectionSubmitSchema.safeParse({...base,answers:[{formItemId:'a',value:{r1:'yes'}}]}).success).toBe(true)
+ const parsed=finalCompositeFormSectionSubmitSchema.safeParse(base);expect(parsed.success).toBe(false)
+ if(!parsed.success)expect(parsed.error.issues.some(issue=>issue.path.includes('__proto__'))).toBe(true)
 })

@@ -365,3 +365,19 @@ describe('C05 structured FINAL persistence', () => {
     expect(submit.mock.calls[1][2]).toEqual(payload)
   })
 })
+
+describe('C06 visibility and durable answer cleanup',()=>{
+ it('clears a previously saved hidden answer and seals only visible fields',async()=>{
+  const policy={version:3 as const,requiredRefusal:'BLOCK_SUBMIT' as const,hiddenRequired:'EXEMPT' as const}
+  const first={...formItem.formAnswers![0],formItemId:'source',type:'single_choice',label:'是否显示',required:true,options:[{value:'yes',label:'显示'},{value:'no',label:'隐藏'}],formPolicy:policy,formDefinition:{itemKey:'q_source',type:'SINGLE' as const,prompt:'是否显示',required:true,options:[{optionKey:'yes',label:'显示'},{optionKey:'no',label:'隐藏'}],rows:[]}}
+  const second={...formItem.formAnswers![0],formItemId:'conditional',type:'long_text',label:'条件内容',required:true,formPolicy:policy,formDefinition:{itemKey:'q_conditional',type:'LONG_TEXT' as const,prompt:'条件内容',required:true,options:[],rows:[],displayIf:{itemKey:'q_source',operator:'EQUALS' as const,optionKey:'yes'}}}
+  const submit=vi.fn().mockResolvedValue({code:0,data:{}})
+  render(<FinalCompositeAssessment {...sharedProps} state={makeState({...formItem,formAnswers:[first,second]})} submitFormSection={submit} submitScale={vi.fn()}/>)
+  const user=userEvent.setup();await waitFor(()=>expect(screen.getByRole('radio',{name:'显示'})).toBeEnabled())
+  await user.click(screen.getByRole('radio',{name:'显示'}));await user.click(screen.getByRole('button',{name:'下一字段'}));await user.type(screen.getByLabelText('条件内容'),'应被清除')
+  await user.click(screen.getByRole('button',{name:'上一字段'}));await user.click(screen.getByRole('radio',{name:'隐藏'}))
+  await waitFor(async()=>expect((await finalDraftStore.listAnswers('composite-form-section:composite-attempt-1:composite-form-section-1')).some(a=>a.itemKey==='conditional')).toBe(false))
+  await user.click(screen.getByRole('button',{name:'提交整个区段'}));await waitFor(()=>expect(submit).toHaveBeenCalledTimes(1))
+  expect(submit.mock.calls[0][2].answers).toEqual([{formItemId:'source',value:'no'}])
+ })
+})
