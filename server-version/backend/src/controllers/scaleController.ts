@@ -563,11 +563,15 @@ export const scaleController = {
         return error(res, '该量表已有测评记录，无法删除')
       }
 
-      await prisma.$transaction(async tx => {
-        await tx.scale.delete({ where: { id } })
-        // Only this draft's references. Published and attempt owners stay pinned.
-        await tx.assetReference.deleteMany({ where: { entityType: 'ScaleCopyDraft', entityId: id } })
-      })
+      if (scale.copySource == null) {
+        await prisma.scale.delete({ where: { id } })
+      } else {
+        await prisma.$transaction(async tx => {
+          await tx.scale.delete({ where: { id } })
+          // Only this draft's references. Published and attempt owners stay pinned.
+          await tx.assetReference.deleteMany({ where: { entityType: 'ScaleCopyDraft', entityId: id } })
+        })
+      }
 
       return success(res, null, '量表已删除')
     } catch (err) {
