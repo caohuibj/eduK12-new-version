@@ -21,7 +21,7 @@ describe('C04 public basic typed authoring and shared answers', () => {
       { ...input('NUMBER'), contextKey: 'gradeLevel' }, { ...input('NUMBER'), type: 'SCALE', scaleId: 'scale' },
     ]) expect(addCompositeItemSchema.safeParse(raw).success).toBe(false)
   })
-  it('rejects unopened authoring and future policy capabilities', () => {
+  it('rejects incomplete structured definitions and future policy capabilities', () => {
     for (const type of ['MATRIX', 'LIKERT', 'SLIDER', 'RANK_ORDER', 'CONSTANT_SUM']) expect(addCompositeItemSchema.safeParse(input(type)).success).toBe(false)
     for (const patch of [{ allowRefusal: true }, { displayIf: { itemKey: 'prior', operator: 'EQUALS', optionKey: 'a' } }, { otherOptionKey: 'a' }, { exclusiveOptionKeys: ['a'] }, { image: {} }]) {
       expect(addCompositeItemSchema.safeParse(input('NUMBER', patch)).success).toBe(false)

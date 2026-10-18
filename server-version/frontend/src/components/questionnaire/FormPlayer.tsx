@@ -1,8 +1,10 @@
+import { ProfessionalFormAnswer } from '../../modules/assessment-core/form/ProfessionalFormAnswer'
+import type { ProfessionalAnswer } from '../../modules/assessment-core/form/types'
 import { BasicFormAnswer } from '../../modules/assessment-core/form/BasicFormAnswer'
 import type { FormQuestion } from '../../modules/assessment-core/form/types'
 import type { ChangeEvent } from 'react'
 
-export type FormPlayerValue = string | number | string[] | null
+export type FormPlayerValue = string | number | string[] | Record<string, string | number | string[]> | null
 
 export interface FormPlayerOption {
   value: string
@@ -98,6 +100,27 @@ export function FormPlayer({
   const navigationControlsDisabled = disabled || navigationDisabled || submitting
   const submitControlsDisabled = disabled || submitDisabled || submitting
 
+  const q = item.formDefinition
+  const matrix = q?.type === 'MATRIX' || q?.type === 'MATRIX_MULTIPLE'
+  // The shared renderer uses independent row keys; Training wire/storage uses one
+  // typed object per DB item. Preserve row keys rather than serializing the object.
+  const rowValues = value && typeof value === 'object' && !Array.isArray(value) ? value : {}
+  const professionalAnswers: Record<string, ProfessionalAnswer> = q
+    ? matrix ? Object.fromEntries(Object.entries(rowValues).map(([key, answer]) => [q.itemKey + ':' + key, answer]))
+      : { [q.itemKey]: value as ProfessionalAnswer ?? null }
+    : {}
+  const professionalChange = (key: string, next: ProfessionalAnswer) => {
+    if (!q || (next && typeof next === 'object' && !Array.isArray(next) && '_surveyRefusal' in next)) return
+    if (matrix) {
+      const row = q.rows.find(row => key === q.itemKey + ':' + row.rowKey)
+      if (!row || (next !== null && typeof next !== 'string' && !Array.isArray(next))) return
+      const updated = { ...rowValues }
+      if (next === null) delete updated[row.rowKey]
+      else updated[row.rowKey] = next
+      void onChange(Object.keys(updated).length ? updated : null)
+    } else void onChange(next as FormPlayerValue)
+  }
+
   const handleTextChange = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     void onChange(event.target.value)
   }
@@ -186,6 +209,14 @@ export function FormPlayer({
             placeholder={item.placeholder || '请输入'} onChange={next => void onChange(next)}
             className="min-h-11 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-200 disabled:bg-slate-100" />
         </div>
+      ) : null}
+
+      {q && ['LIKERT', 'MATRIX', 'MATRIX_MULTIPLE', 'RANK_ORDER', 'SLIDER', 'CONSTANT_SUM'].includes(q.type) ? (
+        <fieldset disabled={answerControlsDisabled} aria-describedby={describedBy}>
+          <legend className="mb-3 text-lg font-semibold text-slate-900">{prompt}</legend>
+          <ProfessionalFormAnswer question={q} answers={professionalAnswers}
+            prefix={inputId(item.id)} onAnswer={professionalChange} />
+        </fieldset>
       ) : null}
 
       {(!item.formDefinition && (item.type === 'fill_blank' || item.type === 'text_input' || !['single_choice', 'multiple_choice', 'year_month'].includes(item.type))) ? (

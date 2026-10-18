@@ -70,7 +70,7 @@ export const addCompositeItemSchema = z.object({
   cognitiveAssignmentId: z.string().min(1).optional(),
   situationalInstrumentKey: z.string().min(1).max(120).optional(),
   situationalInstrumentVersion: z.string().regex(/^\d+\.\d+\.\d+$/, '必须指定精确情境化题包版本').optional(),
-  formType: z.enum(['fill_blank', 'single_choice', 'multiple_choice', 'text_input', 'year_month', 'number', 'long_text', 'date', 'time']).optional(),
+  formType: z.enum(['fill_blank', 'single_choice', 'multiple_choice', 'text_input', 'year_month', 'number', 'long_text', 'date', 'time', 'likert', 'matrix', 'matrix_multiple', 'rank_order', 'slider', 'constant_sum']).optional(),
   formLabel: z.string().min(1).max(500).optional(),
   // Stable itemKey is assigned by the server from the new database UUID.
   formDefinition: formQuestionSchema.omit({ itemKey: true }).optional(),
@@ -78,10 +78,10 @@ export const addCompositeItemSchema = z.object({
   formOptions: z.array(formOption).nullable().optional(),
   contextKey: z.enum(['birthYearMonth', 'sexAtBirth', 'gradeLevel', 'primaryLanguage', 'countryOrRegion']).nullable().optional(),
 }).strict().superRefine((input, ctx) => {
-  const advanced = ['number', 'long_text', 'date', 'time'].includes(input.formType ?? '')
+  const advanced = ['number', 'long_text', 'date', 'time', 'likert', 'matrix', 'matrix_multiple', 'rank_order', 'slider', 'constant_sum'].includes(input.formType ?? '')
   if (input.formDefinition || advanced) {
     if (input.type !== 'FORM' || !advanced || !input.formDefinition) {
-      ctx.addIssue({ code: 'custom', path: ['formDefinition'], message: '新增题型必须提供公共表单定义，当前仅开放数值、长文本、日期、时间' })
+      ctx.addIssue({ code: 'custom', path: ['formDefinition'], message: '新增题型必须提供公共表单定义，请使用已开放的基础或结构化题型' })
     } else {
       try {
         typedCompositeFormQuestion({ ...input, id: 'new', formDefinition: { ...input.formDefinition, itemKey: 'q_new' }, placeholder: input.formPlaceholder ?? null, contextKey: input.contextKey ?? null, position: input.position ?? 0, formSectionPosition: null } as any)

@@ -1,3 +1,4 @@
+import { StructuredFormConstraints } from '../../modules/assessment-core/form/StructuredFormConstraints'
 import { BasicFormConstraints } from '../../modules/assessment-core/form/BasicFormConstraints'
 import type { FormQuestion } from '../../modules/assessment-core/form/types'
 import { isTrainingHost } from '../../training/context'
@@ -23,6 +24,11 @@ import {
   serializeDelimitedOptions,
 } from '../../modules/assessment-context/options'
 
+const typedFormTypes: Record<string, FormQuestion<never>['type']> = {
+  number: 'NUMBER', long_text: 'LONG_TEXT', date: 'DATE', time: 'TIME', likert: 'LIKERT',
+  matrix: 'MATRIX', matrix_multiple: 'MATRIX_MULTIPLE', rank_order: 'RANK_ORDER', slider: 'SLIDER', constant_sum: 'CONSTANT_SUM',
+}
+const structuredOptionTypes = ['LIKERT', 'MATRIX', 'MATRIX_MULTIPLE', 'RANK_ORDER', 'CONSTANT_SUM']
 const base = '/questionnaire-products'
 async function request(
   path: string,
@@ -194,7 +200,8 @@ export function QuestionnaireProductEdit() {
   }, [location.hash, hasDetail, id])
   const [formType, setFormType] = useState('text_input')
   const [formConstraints, setFormConstraints] = useState<Partial<FormQuestion<never>>>({})
-  const typedFormType = ({ number: 'NUMBER', long_text: 'LONG_TEXT', date: 'DATE', time: 'TIME' } as const)[formType as 'number' | 'long_text' | 'date' | 'time']
+  const typedFormType = typedFormTypes[formType]
+  const [matrixRows, setMatrixRows] = useState('')
   const [options, setOptions] = useState('')
   const [contextKey, setContext] = useState('')
   const [required, setRequired] = useState(true)
@@ -324,7 +331,7 @@ export function QuestionnaireProductEdit() {
         Object.assign(item, {
           formLabel,
           formType,
-          ...(typedFormType ? { formDefinition: { ...formConstraints, type: typedFormType, prompt: formLabel, required, options: [], rows: [], ...(typedFormType === 'TIME' ? { timeZone: formConstraints.timeZone ?? 'Asia/Shanghai' } : {}) } } : {}),
+          ...(typedFormType ? { formDefinition: { ...formConstraints, type: typedFormType, prompt: formLabel, required, options: structuredOptionTypes.includes(typedFormType) ? parseDelimitedOptions(options).map(option => ({ optionKey: option.value, label: option.label })) : [], rows: ['MATRIX', 'MATRIX_MULTIPLE'].includes(typedFormType) ? parseDelimitedOptions(matrixRows).map(row => ({ rowKey: row.value, label: row.label })) : [], ...(typedFormType === 'CONSTANT_SUM' ? { total: formConstraints.total ?? 100 } : {}), ...(typedFormType === 'TIME' ? { timeZone: formConstraints.timeZone ?? 'Asia/Shanghai' } : {}) } } : {}),
           contextKey: contextKey || null,
           formOptions: ['single_choice', 'multiple_choice'].includes(formType)
             ? parseDelimitedOptions(options)
@@ -751,7 +758,7 @@ export function QuestionnaireProductEdit() {
                           aria-label="题型"
                           className="input ml-2 max-w-full"
                           value={formType}
-                          onChange={(e) => { setFormType(e.target.value); setFormConstraints({}); if (['number', 'long_text', 'date', 'time'].includes(e.target.value)) setContext('') }}
+                          onChange={(e) => { setFormType(e.target.value); setFormConstraints(e.target.value === 'slider' ? { min: 0, max: 100 } : {}); setOptions(''); setMatrixRows(''); if (typedFormTypes[e.target.value]) setContext('') }}
                         >
                           {[
                             'text_input',
@@ -759,7 +766,7 @@ export function QuestionnaireProductEdit() {
                             'single_choice',
                             'multiple_choice',
                             'year_month',
-                            'number', 'long_text', 'date', 'time',
+                            'number', 'long_text', 'date', 'time', 'likert', 'matrix', 'matrix_multiple', 'rank_order', 'slider', 'constant_sum',
                           ].map((t) => (
                             <option key={t} value={t}>
                               {
@@ -770,7 +777,7 @@ export function QuestionnaireProductEdit() {
                                     single_choice: '单选',
                                     multiple_choice: '多选',
                                     year_month: '年月',
-                                    number: '数值', long_text: '长文本', date: '日期', time: '时间',
+                                    number: '数值', long_text: '长文本', date: '日期', time: '时间', likert: 'Likert', matrix: '矩阵单选', matrix_multiple: '矩阵多选', rank_order: '排序', slider: '滑块', constant_sum: '恒定总和',
                                   } as any
                                 )[t]
                               }
@@ -779,9 +786,11 @@ export function QuestionnaireProductEdit() {
                         </select>
                       </label>
                       {typedFormType && <BasicFormConstraints question={{ ...formConstraints, type: typedFormType }} onChange={patch => setFormConstraints(previous => ({ ...previous, ...patch }))} />}
-                      {['single_choice', 'multiple_choice'].includes(
-                        formType,
-                      ) && (
+                      {typedFormType && <StructuredFormConstraints question={{ ...formConstraints, type: typedFormType }} onChange={patch => setFormConstraints(previous => ({ ...previous, ...patch }))} />}
+                      {['matrix', 'matrix_multiple'].includes(formType) && <label className="block">矩阵行（编码=标签，以逗号分隔）
+                        <input value={matrixRows} onChange={e => setMatrixRows(e.target.value)} />
+                      </label>}
+                      {(['single_choice', 'multiple_choice'].includes(formType) || structuredOptionTypes.includes(typedFormType)) && (
                         <label className="block">
                           选项（值=标签，以逗号分隔）
                           <input

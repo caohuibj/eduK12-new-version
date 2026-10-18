@@ -15,6 +15,20 @@ export function ProfessionalFormAnswer({question:q,answers,onAnswer,prefix}:{
 }){
   const current=answers[q.itemKey]
   if(q.type==='DATE'||q.type==='TIME')return <BasicFormAnswer question={{...q,type:q.type}} value={typeof current==='string'?current:null} disabled={refused(current)} onChange={value=>onAnswer(q.itemKey,value)}/>
+  if(q.type==='LIKERT'||q.type==='MATRIX'){
+    const rows=q.type==='MATRIX'?(q.rows??[]):[{rowKey:'',label:q.prompt}]
+    return <div className="space-y-3">{rows.map(row=>{
+      const key=q.type==='MATRIX'?q.itemKey+':'+row.rowKey:q.itemKey
+      return <fieldset key={key} className="rounded border p-3 space-y-2">
+        <legend className="font-medium text-sm">{row.label}</legend>
+        {q.options.map(o=><label key={o.optionKey} className="flex items-center gap-2 text-sm">
+          <input type="radio" name={prefix+'-'+key} value={o.optionKey}
+            checked={answers[key]===o.optionKey} disabled={refused(answers[key])}
+            onChange={()=>onAnswer(key,o.optionKey)}/>{o.label}
+        </label>)}
+      </fieldset>
+    })}</div>
+  }
   if(q.type==='RANK_ORDER'){
     const all=q.options.map(o=>o.optionKey)
     const order=Array.isArray(current)&&current.length===all.length&&

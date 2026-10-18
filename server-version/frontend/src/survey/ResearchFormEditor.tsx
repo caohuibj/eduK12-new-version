@@ -1,3 +1,4 @@
+import { StructuredFormConstraints } from '../modules/assessment-core/form/StructuredFormConstraints'
 import { BasicFormConstraints } from '../modules/assessment-core/form/BasicFormConstraints'
 import type { FormDraft, FormQuestion } from './builder.types'
 import { choiceTypes, professionalTypes, newOption, newQuestion, researchKey } from './builder.types'
@@ -144,22 +145,7 @@ export function ResearchFormEditor({value,onChange,projectId}:{value:FormDraft;
             <button type="button" className="btn-secondary" onClick={()=>setQuestion(pi,qi,x=>({...x,rows:[...x.rows,{rowKey:researchKey('r'),label:'新行'}]}))}>增加矩阵行</button>
           </div>}
           <BasicFormConstraints question={q} onChange={patch=>setQuestion(pi,qi,x=>({...x,...patch}))}/>
-          {q.type==='CONSTANT_SUM'&&<div className="grid sm:grid-cols-2 gap-3">
-            <label className="block text-sm">指定总和
-              <input className="input block w-full" type="number" min="0" step="any"
-                value={q.total??100} onChange={e=>setQuestion(pi,qi,x=>({...x,total:Number(e.target.value)}))}/></label>
-            <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox"
-              checked={q.integerOnly===true} onChange={e=>setQuestion(pi,qi,x=>({...x,integerOnly:e.target.checked}))}/>
-              每项必须为整数</label>
-          </div>}
-          {value.schemaVersion===2&&['MULTIPLE','MATRIX_MULTIPLE'].includes(q.type)&&
-            <div className="grid sm:grid-cols-2 gap-3">
-            {(['minSelections','maxSelections'] as const).map(k=><label className="block text-sm" key={k}>
-              {k==='minSelections'?'最少选择':'最多选择'}（留空不限）
-              <input className="input block w-full" type="number" min="1" max="30" step="1"
-                value={q[k]??''} onChange={e=>setQuestion(pi,qi,x=>({...x,
-                  [k]:e.target.value===''?undefined:Number(e.target.value)}))}/></label>)}
-          </div>}
+          {value.schemaVersion===2&&<StructuredFormConstraints question={q} onChange={patch=>setQuestion(pi,qi,x=>({...x,...patch}))}/>}
           {value.schemaVersion===2&&['SHORT_TEXT','LONG_TEXT'].includes(q.type)&&
             <label className="block text-sm">输入格式
             <select className="input block" value={q.textValidation??''}

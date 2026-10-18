@@ -204,3 +204,32 @@ describe('C04 typed authoring', () => {
     if (type === 'long_text') expect(body.item.formDefinition.maxLength).toBe(500)
   })
 })
+
+describe('C05 structured authoring', () => {
+  it.each(['likert', 'matrix', 'matrix_multiple', 'rank_order', 'slider', 'constant_sum'])('creates %s as one public FormQuestion', async type => {
+    vi.resetAllMocks()
+    const row = { name: '结构化题型', status: 'DRAFT', revision: 4, questionnaireType: 'COURSE', questionnaireCourses: [], items: [], formSections: [], publicEnabled: false }
+    api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? { scales: [], cognitive: [], situational: [], courses: [] } : row }))
+    api.post.mockResolvedValue({ code: 0, data: { ...row, revision: 5 } })
+    mount('typed')
+    await screen.findByDisplayValue('结构化题型')
+    const user = userEvent.setup()
+    await user.selectOptions(screen.getByLabelText('测评类型'), 'FORM')
+    await user.type(screen.getByLabelText('题目文字'), '结构化题')
+    await user.selectOptions(screen.getByLabelText('题型'), type)
+    if (type !== 'slider') await user.type(screen.getByLabelText('选项（值=标签，以逗号分隔）'), 'a=甲,b=乙')
+    if (type.startsWith('matrix')) await user.type(screen.getByLabelText('矩阵行（编码=标签，以逗号分隔）'), 'r1=第一行,r2=第二行')
+    if (type === 'matrix_multiple') await user.type(screen.getByLabelText('最多选择（留空不限）'), '2')
+    if (type === 'constant_sum') { await user.clear(screen.getByLabelText('指定总和')); await user.type(screen.getByLabelText('指定总和'), '0') }
+    await user.click(screen.getByRole('button', { name: '添加到测评' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalled())
+    const definition = api.post.mock.calls[0][1].item.formDefinition
+    expect(definition).toMatchObject({ type: type.toUpperCase(), prompt: '结构化题', required: true })
+    expect(definition).not.toHaveProperty('itemKey')
+    if (type === 'slider') expect(definition).toMatchObject({ min: 0, max: 100, options: [], rows: [] })
+    else expect(definition.options).toEqual([{ optionKey: 'a', label: '甲' }, { optionKey: 'b', label: '乙' }])
+    if (type.startsWith('matrix')) expect(definition.rows).toEqual([{ rowKey: 'r1', label: '第一行' }, { rowKey: 'r2', label: '第二行' }])
+    if (type === 'matrix_multiple') expect(definition.maxSelections).toBe(2)
+    if (type === 'constant_sum') expect(definition.total).toBe(0)
+  })
+})

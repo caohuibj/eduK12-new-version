@@ -14,7 +14,7 @@ const legacyTypes: Record<string, string> = { single_choice: 'SINGLE', multiple_
 const invalid = (message: string): never => { throw new InstrumentFinalSubmitError('FORM_ANSWER_INVALID', message, 400) }
 
 export const typedCompositeFormQuestion = (item: CompositeSectionItem): FormQuestion => {
-  const checked = validateFormDefinition({ schemaVersion: 2, pages: [{ pageKey: 'training', title: 'Training', questions: [item.formDefinition] }] })
+  const checked = validateFormDefinition({ schemaVersion: 2, pages: [{ pageKey: 'training', title: 'Training', questions: [item.formDefinition] }] }, { forPreview: true })
   if (!checked.definition || checked.issues.some(issue => issue.severity === 'error')) invalid('表单定义无效：' + checked.issues.map(issue => issue.message).join('; '))
   const question = checked.definition!.pages[0].questions[0]
   if (question.type !== (legacyTypes[item.formType] ?? item.formType) || question.required !== item.required || question.prompt !== item.formLabel) invalid('表单定义与字段类型、标题或必答策略不匹配')
@@ -57,6 +57,6 @@ export const validateTypedCompositeSectionDefinition = (items: CompositeSectionI
   const pages = Array.from({ length: Math.ceil(questions.length / 80) }, (_, index) => ({
     pageKey: 'page_' + index, title: 'Training', questions: questions.slice(index * 80, (index + 1) * 80),
   }))
-  const checked = validateFormDefinition({ schemaVersion: 2, pages })
+  const checked = validateFormDefinition({ schemaVersion: 2, pages }, { forPreview: true })
   if (!checked.definition || checked.issues.some(issue => issue.severity === 'error')) invalid('表单区段定义无效：' + checked.issues.map(issue => issue.message).join('; '))
 }

@@ -137,3 +137,63 @@ describe('typed basic FormPlayer', () => {
     if (type === 'LONG_TEXT') expect(input).toHaveAttribute('maxlength', '123')
   })
 })
+
+describe('C05 structured typed adapters', () => {
+  const options = [{ optionKey: 'a', label: '甲' }, { optionKey: 'b', label: '乙' }, { optionKey: 'c', label: '丙' }]
+  const rows = [{ rowKey: 'r1', label: '第一行' }, { rowKey: 'r2', label: '第二行' }]
+  const mount = (type: import('../../../modules/assessment-core/form/types').FormQuestion<never>['type'], value: import('../FormPlayer').FormPlayerValue, patch = {}, disabled = false) => {
+    const onChange = vi.fn()
+    render(<FormPlayer item={{ id: 'db-id', type: type.toLowerCase(), label: '结构化题', required: false,
+      formDefinition: { itemKey: 'q-stable', type, prompt: '结构化题', required: false, options, rows: [], ...patch } }} options={[]}
+      value={value} onChange={onChange} allowSkip disabled={disabled} {...navigationProps} />)
+    return onChange
+  }
+  it('renders Likert through shared choices and clears optional answers to null', async () => {
+    const change = mount('LIKERT', 'a')
+    expect(screen.getByRole('radio', { name: '甲' })).toBeChecked()
+    await userEvent.click(screen.getByRole('radio', { name: '乙' }))
+    expect(change).toHaveBeenLastCalledWith('b')
+    await userEvent.click(screen.getByRole('button', { name: '清空本题（不作答）' }))
+    expect(change).toHaveBeenLastCalledWith(null)
+  })
+  it('adapts matrix row keys without dropping another row', async () => {
+    const change = mount('MATRIX', { r1: 'a', r2: 'b' }, { rows })
+    expect(screen.getAllByRole('radio', { name: '甲' })[0]).toBeChecked()
+    await userEvent.click(screen.getAllByRole('radio', { name: '丙' })[0])
+    expect(change).toHaveBeenCalledWith({ r1: 'c', r2: 'b' })
+  })
+  it('adapts multiple matrix row arrays and enforces max selections in controls', async () => {
+    const change = mount('MATRIX_MULTIPLE', { r1: ['a', 'b'], r2: ['c'] }, { rows, maxSelections: 2 })
+    expect(screen.getAllByRole('checkbox', { name: '丙' })[0]).toBeDisabled()
+    await userEvent.click(screen.getAllByRole('checkbox', { name: '甲' })[0])
+    expect(change).toHaveBeenCalledWith({ r1: ['b'], r2: ['c'] })
+  })
+  it('requires explicit ranking confirmation and returns a complete order', async () => {
+    const change = mount('RANK_ORDER', null)
+    expect(change).not.toHaveBeenCalled()
+    await userEvent.click(screen.getByRole('button', { name: '确认当前排序' }))
+    expect(change).toHaveBeenCalledWith(['a', 'b', 'c'])
+    await userEvent.click(screen.getByRole('button', { name: '下移第 1 项' }))
+    expect(change).toHaveBeenLastCalledWith(['b', 'a', 'c'])
+  })
+  it('keeps unconfirmed slider distinct from numeric zero', async () => {
+    const change = mount('SLIDER', null, { min: 0, max: 10, step: 0.5, options: [] })
+    expect(screen.getByText('尚未确认')).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: '确认当前值' }))
+    expect(change).toHaveBeenCalledWith(0)
+    fireEvent.change(screen.getByRole('slider'), { target: { value: '2.5' } })
+    expect(change).toHaveBeenLastCalledWith(2.5)
+  })
+  it('retains numeric zero and an incomplete constant sum without filling blanks', () => {
+    const change = mount('CONSTANT_SUM', { a: 0, b: 100 }, { total: 100 })
+    expect(screen.getByLabelText('分值：甲')).toHaveValue(0)
+    expect(screen.getByLabelText('分值：丙')).toHaveValue(null)
+    expect(screen.getByRole('status')).toHaveTextContent('留空不等于 0')
+    fireEvent.change(screen.getByLabelText('分值：丙'), { target: { value: '0' } })
+    expect(change).toHaveBeenLastCalledWith({ a: 0, b: 100, c: 0 })
+  })
+  it.each(['LIKERT', 'MATRIX', 'MATRIX_MULTIPLE', 'RANK_ORDER', 'SLIDER', 'CONSTANT_SUM'] as const)('locks every %s answer control inside the parent disabled fieldset', type => {
+    mount(type, null, { rows: type.startsWith('MATRIX') ? rows : [] }, true)
+    for (const control of document.querySelectorAll('.form-player input, .form-player button')) expect(control).toBeDisabled()
+  })
+})

@@ -85,7 +85,7 @@ export interface CompositeCurrentItem {
       options: Array<{ value: string; label: string }> | string | null
       required: boolean
       contextKey: string | null
-      value: string | number | string[] | null
+      value: string | number | string[] | Record<string, string | number | string[]> | null
     }>
   }
   form?: { type: string; label: string; placeholder: string | null; options: Array<{ value: string; label: string }> | null; value: string | null; contextKey?: string | null }
@@ -103,10 +103,10 @@ export interface CompositeCurrentItem {
     label?: string
     placeholder?: string | null
     options?: Array<{ value: string; label: string }> | string | null
-    value?: string | number | string[] | null
+    value?: string | number | string[] | Record<string, string | number | string[]> | null
     contextKey?: string | null
   }>
-  formAnswers?: Array<{ formDefinition?: FormQuestion<never> | null; formItemId: string; type: string; label: string; placeholder: string | null; options: Array<{ value: string; label: string }> | string | null; required: boolean; contextKey: string | null; value: string | number | string[] | null }>
+  formAnswers?: Array<{ formDefinition?: FormQuestion<never> | null; formItemId: string; type: string; label: string; placeholder: string | null; options: Array<{ value: string; label: string }> | string | null; required: boolean; contextKey: string | null; value: string | number | string[] | Record<string, string | number | string[]> | null }>
   cognitiveSession?: CognitiveSession
   situationalAttemptId?: string
   situationalInstrumentKey?: string

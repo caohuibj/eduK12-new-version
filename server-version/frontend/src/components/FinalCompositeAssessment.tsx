@@ -13,7 +13,7 @@ import { formOptionVideoPresentations, scaleItemVideoPresentation } from '../mod
 import { requestAssessmentVideoCapabilities } from '../modules/assessment-media/video-capability-client'
 import CompositeUnitRequirements from '../modules/composite/CompositeUnitRequirements'
 import { AssessmentShell } from './assessment-shell'
-import FormPlayer from './questionnaire/FormPlayer'
+import FormPlayer, { type FormPlayerValue } from './questionnaire/FormPlayer'
 import ScalePlayer from './questionnaire/ScalePlayer'
 import { useLocalDraftSaveQueue } from './questionnaire/useLocalDraftSaveQueue'
 import { checkpointId } from '../services/persistence/checkpointTypes'
@@ -29,7 +29,7 @@ import {
 } from '../modules/scale/device-input-provenance'
 
 type ResponseValue = string | number
-type FormValue = string | number | string[] | null
+type FormValue = FormPlayerValue
 type FormOption = { value: string; label: string; images?: unknown; video?: unknown }
 
 export interface FinalCompositeAssessmentProps {

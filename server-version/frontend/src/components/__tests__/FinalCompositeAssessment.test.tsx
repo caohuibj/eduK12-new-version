@@ -337,3 +337,31 @@ describe('C04 negative and large text draft restoration', () => {
     expect(submit.mock.calls[0][2].answers).toEqual([{ formItemId: 'form-item-1', value }])
   })
 })
+
+describe('C05 structured FINAL persistence', () => {
+  it.each([
+    { type: 'LIKERT' as const, value: 'a', patch: {} },
+    { type: 'MATRIX' as const, value: { r1: 'b', r2: 'a' }, patch: { rows: [{ rowKey: 'r1', label: '第一行' }, { rowKey: 'r2', label: '第二行' }] } },
+    { type: 'MATRIX_MULTIPLE' as const, value: { r1: ['b', 'a'], r2: ['a'] }, patch: { rows: [{ rowKey: 'r1', label: '第一行' }, { rowKey: 'r2', label: '第二行' }] } },
+    { type: 'RANK_ORDER' as const, value: ['b', 'a'], patch: {} },
+    { type: 'SLIDER' as const, value: 0, patch: { min: -1, max: 1, options: [] } },
+    { type: 'CONSTANT_SUM' as const, value: { a: 0, b: 100 }, patch: { total: 100 } },
+  ])('restores $type and replays identical sealed typed payload across reload', async ({ type, value, patch }) => {
+    const q = { itemKey: 'q_typed', type, prompt: '结构化恢复题', required: true, options: [{ optionKey: 'a', label: '甲' }, { optionKey: 'b', label: '乙' }], rows: [], ...patch }
+    const current: CompositeCurrentItem = { ...formItem, formAnswers: [{ ...formItem.formAnswers![0], required: true, type: type.toLowerCase(), label: q.prompt, formDefinition: q, value: value as import('../questionnaire/FormPlayer').FormPlayerValue }] }
+    const submit = vi.fn().mockRejectedValueOnce(new Error('暂时断线')).mockResolvedValue({ code: 0 })
+    const props = { ...sharedProps, state: makeState(current), publicMode: true, recoveryToken: 'synthetic-recovery-token', submitFormSection: submit, submitScale: vi.fn() }
+    const first = render(<FinalCompositeAssessment {...props} />)
+    await waitFor(() => expect(screen.getByRole('button', { name: '提交整个区段' })).toBeEnabled())
+    await userEvent.click(screen.getByRole('button', { name: '提交整个区段' }))
+    await waitFor(() => expect(submit).toHaveBeenCalledTimes(1))
+    const payload = submit.mock.calls[0][2]
+    expect(payload.answers).toEqual([{ formItemId: 'form-item-1', value }])
+    first.unmount()
+    render(<FinalCompositeAssessment {...props} />)
+    await waitFor(() => expect(screen.getByRole('button', { name: '提交整个区段' })).toBeEnabled())
+    await userEvent.click(screen.getByRole('button', { name: '提交整个区段' }))
+    await waitFor(() => expect(submit).toHaveBeenCalledTimes(2))
+    expect(submit.mock.calls[1][2]).toEqual(payload)
+  })
+})
