@@ -1,3 +1,4 @@
+import { readSituationalExportResults, situationalExportColumns } from './situational-canonical-export'
 import {projectTrainingTimingFact} from '../assessment-runtime/training-scale-timing'
 import {decryptUnifiedRuntimePayload} from '../assessment-runtime/security'
 import { legacyFormValueProjection } from '../assessment-runtime/typed-form'
@@ -264,6 +265,7 @@ export const getExportData = async (
     },
   })
   if (!template) throw new Error('综合测评不存在')
+  const hasSituational = template.items.some(item => item.type === 'SITUATIONAL')
   const hasTypedForms = template.items.some(item => item.formDefinition != null)
   const sections = hasTypedForms ? await prisma.compositeFormSection.findMany({where:{compositeAssessmentId:assessmentId},include:{items:true}}) : []
   const typedSections = sections.map(mapCompositeSection).filter(section=>section.items.some(item=>item.formDefinition!=null))
@@ -379,9 +381,19 @@ export const getExportData = async (
   })
 
   // One bounded query for all selected current epochs; never one query per attempt.
-  const snapshots = hasTypedForms && template.attempts.length ? await prisma.assessmentUnitSnapshot.findMany({where:{OR:template.attempts.map(attempt=>({compositeAttemptId:attempt.id,attemptEpoch:attempt.attemptEpoch})),unitType:'FORM_SECTION'}}) : []
+  const snapshots = (hasTypedForms || hasSituational) && template.attempts.length ? await prisma.assessmentUnitSnapshot.findMany({where:{OR:template.attempts.map(attempt=>({compositeAttemptId:attempt.id,attemptEpoch:attempt.attemptEpoch})),unitType:{in:[...(hasTypedForms ? ['FORM_SECTION' as const] : []), ...(hasSituational ? ['SITUATIONAL' as const] : [])]}}}) : []
   const snapshotsByAttempt = new Map<string,typeof snapshots>()
   for(const snapshot of snapshots) { const rows=snapshotsByAttempt.get(snapshot.compositeAttemptId!)??[]; rows.push(snapshot); snapshotsByAttempt.set(snapshot.compositeAttemptId!,rows) }
+  const situationalByAttempt = new Map(template.attempts.map(attempt => [attempt.id,
+    readSituationalExportResults(attempt, snapshotsByAttempt.get(attempt.id) ?? [])]))
+  const situationalColumns = new Map<string, ReturnType<typeof situationalExportColumns>>()
+  template.items.forEach((item, index) => {
+    if (item.type !== 'SITUATIONAL') return
+    const columns = situationalExportColumns(`J${String(index + 1).padStart(3, '0')}_`, packageSlotLabels.get(item.position) ?? 'SJT',
+      template.attempts.map(attempt => situationalByAttempt.get(attempt.id)?.get(`situational:${item.id}`) ?? null))
+    situationalColumns.set(item.id, columns)
+    for (const field of columns.fields) builder.add(field.name, field.label, field.type, field.width, field.decimals, field)
+  })
   const rows: Record<string, unknown>[] = []
   let trialCount = 0
   for (const attempt of template.attempts as any[]) {
@@ -408,6 +420,9 @@ export const getExportData = async (
     for (let index = 0; index < template.items.length; index += 1) {
       const item: any = template.items[index]
       const prefix = slotPrefix('S', index)
+      if (item.type === 'SITUATIONAL') {
+        Object.assign(row, situationalColumns.get(item.id)!.read(situationalByAttempt.get(attempt.id)?.get(`situational:${item.id}`) ?? null))
+      }
       if (item.type === 'SCALE') {
         const result = attempt.scaleAssessments.find((assessment: any) => assessment.compositeItemId === item.id)
         row[`${prefix}scale_id`] = item.scale?.id ?? item.scaleId ?? null

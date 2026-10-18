@@ -1,3 +1,4 @@
+import { SITUATIONAL_CANONICAL_EXPORT_VERSION, situationalSummaryFieldAllowed } from './situational-canonical-export'
 import { randomBytes } from 'crypto'
 import * as fs from 'fs'
 import * as path from 'path'
@@ -30,6 +31,7 @@ export interface CompositeExportProjectionBindingV1 {
   scales: CompositeExportScaleBindingV1[]
   fingerprint: string
   timingExportEnabled?: boolean
+  situationalExport?: { version: string; slots: Array<{ itemId: string; prefix: string }> }
 }
 
 type CompositeScaleItem = {
@@ -95,6 +97,7 @@ export const buildCompositeExportProjectionBinding = (input: {
     resourceId: input.resourceId,
     audience,
     scales,
+    ...(input.items.some(item => item.type === 'SITUATIONAL') ? { situationalExport: { version: SITUATIONAL_CANONICAL_EXPORT_VERSION, slots: input.items.flatMap((item, index) => item.type === 'SITUATIONAL' ? [{ itemId: item.id, prefix: `J${String(index + 1).padStart(3, '0')}_` }] : []) } } : {}),
     ...(input.timingExportEnabled ? {timingExportEnabled:true,trainingTimingPolicy:input.trainingTimingPolicy??null,timingExportRevision:input.timingExportRevision??0} : {}),
     ...(input.items.some(item=>item.formDefinition!=null)?{typedFormExport:{version:'training-form-export-v1',definitions:input.items.filter(item=>item.formDefinition!=null).map(item=>({id:item.id,definition:item.formDefinition,policy:item.formPolicy??null}))}}:{}),
   }
@@ -144,6 +147,10 @@ const scaleFieldAllowed = (suffix: string, caps: DisclosureCapabilitiesV1): bool
 }
 
 const fieldAllowed = (field: CompositeExportField, binding: CompositeExportProjectionBindingV1): boolean => {
+  const sjtPrefix = /^(J\d{3}_)/.exec(field.name)?.[1]
+  if (sjtPrefix) return binding.situationalExport?.version === SITUATIONAL_CANONICAL_EXPORT_VERSION
+    && binding.situationalExport.slots.some(slot => slot.prefix === sjtPrefix)
+    && situationalSummaryFieldAllowed(field.name.slice(sjtPrefix.length))
   const scalePrefixMatch = /^(S\d{3}_)/.exec(field.name)
   if (!scalePrefixMatch) return true
   const scale = binding.scales.find((candidate) => candidate.prefix === scalePrefixMatch[1])

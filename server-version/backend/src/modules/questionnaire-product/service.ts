@@ -7,7 +7,7 @@ import { Prisma, UserRole } from '@prisma/client'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { assertValidItem, getCompositeForTeacher, publishComposite, prepareCompositePublication, listAvailableForStudent } from '../composite/composite.service'
+import { resolveCompositeSituationalItems, assertValidItem, getCompositeForTeacher, publishComposite, prepareCompositePublication, listAvailableForStudent } from '../composite/composite.service'
 import { compositeBadRequest, compositeConflict, compositeForbidden, compositeNotFound } from '../composite/composite.errors'
 import { mapCompositeSection, compositeFormSectionDefinitionHash } from '../assessment-runtime/form-section-definition'
 import { compositeFormSectionImageReferences, publishedFormMediaOwner, retainFormSectionImages } from '../assessment-runtime/form-image.adapter'
@@ -15,7 +15,7 @@ import { compositeFormSectionVideoPresentations, retainFormSectionVideos } from 
 import { ensureCompositeFormSections } from '../composite/final-submit.service'
 import { addCompositeItemSchema } from '../composite/composite.schema'
 import { canUseScale } from '../../services/materialGrant'
-import { listSituationPackages } from '../situational/situation-package.registry'
+import { listSituationalResourceSummaries } from '../situational/situational-release.service'
 import { freezeAssignmentProfile, freezeDataForWrite } from '../cognitive/profile-freeze'
 import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
 import { z } from 'zod'
@@ -208,6 +208,7 @@ async function validateDelivery(tx: Tx, actor: Actor, row: any) {
 }
 
 async function validateResources(tx: Tx, actor: Actor, row: any) {
+  const situational = await resolveCompositeSituationalItems(row.items, tx)
   for (const item of row.items) {
     // Legacy storage accepts arbitrary strings. Do not publish an unknown
     // field type as a text input through the player's compatibility fallback.
@@ -215,8 +216,9 @@ async function validateResources(tx: Tx, actor: Actor, row: any) {
       throw compositeBadRequest(`表单字段“${item.formLabel || item.id}”的题型不受支持，请在副本中重新配置后发布`)
     }
     if (copiedCognitiveBinding(item, row)) continue
-    await assertValidItem({ ...item, required: item.required } as any, actor.userId, actor.role, row, tx)
+    await assertValidItem({ ...item, required: item.required } as any, actor.userId, actor.role, row, tx, situational)
   }
+  return situational
 }
 
 export async function preflight(actor: Actor, id: string, raw: unknown) {
@@ -263,7 +265,7 @@ export async function publish(actor: Actor, id: string, raw: unknown) {
   return mutate(actor, id, revisionSchema.parse(raw).revision, async (tx, row) => {
     if (await tx.assessmentCompositionTemplate.findUnique({ where: { definitionId: id } })) throw compositeConflict('组合模板需要先复制为新草稿，再绑定课程或公开投放')
     await validateDelivery(tx, actor, row)
-    await validateResources(tx, actor, row)
+    const situational = await validateResources(tx, actor, row)
     for (const item of row.items) {
       const copiedBinding = copiedCognitiveBinding(item, row)
       if (item.type === 'COGNITIVE' && !copiedBinding) {
@@ -289,7 +291,7 @@ export async function publish(actor: Actor, id: string, raw: unknown) {
       await retainFormSectionVideos({ owner: mediaOwner, presentations: compositeFormSectionVideoPresentations(definition), db: tx })
     }
     if(row.trainingTimingPolicy){readTrainingTimingPolicy(row.trainingTimingPolicy);await tx.compositeAssessment.update({where:{id},data:{trainingTimingPolicy:await timingPolicy(tx,row,true)}})}
-    await publishComposite(actor.userId, actor.role, id, tx)
+    await publishComposite(actor.userId, actor.role, id, tx, situational)
   })
 }
 export async function archive(actor: Actor, id: string, raw: unknown) {
@@ -336,17 +338,18 @@ export async function available(userId: string) {
 }
 export async function resources(actor: Actor) {
   author(actor)
-  const [scales, cognitive, courseRows] = await Promise.all([
+  const [scales, cognitive, courseRows, situational] = await Promise.all([
     prisma.scale.findMany({ where: { status: 'PUBLISHED' }, orderBy: { name: 'asc' } }),
     isCognitiveNewAdmissionEnabled() ? prisma.cognitiveAssignment.findMany({ where: { status: 'PUBLISHED', listedStandalone: true, config: { status: 'PUBLISHED' }, ...(actor.role === 'ADMIN' ? {} : { createdBy: actor.userId }) }, include: { config: true }, orderBy: { title: 'asc' } }) : Promise.resolve([]),
     prisma.course.findMany({ where: { isLibrary: false, ...(actor.role === 'ADMIN' ? {} : { creatorId: actor.userId }) }, select: { id: true, title: true } }),
+    listSituationalResourceSummaries(),
   ])
   const usable = []
   for (const row of scales) if (await canUseScale(actor.userId, actor.role, row)) usable.push({ id: row.id, name: row.name, code: row.code, version: row.instrumentVersion })
   for (const row of cognitive.filter(v => isCognitiveProductEligible(v.config.testType))) assertCognitiveCatalogConfiguration(row.config)
   return {
     scales: usable, cognitive: cognitive.filter(v => isCognitiveProductEligible(v.config.testType)).map(v => ({ id: v.id, name: v.title, profile: v.profile, testType: v.config.testType, configVersion: v.config.configVersion, engineVersion: v.config.engineVersion, scoringVersion: v.config.scoringVersion })),
-    situational: listSituationPackages().filter(v => v.releaseStatus === 'PUBLISHED').map(v => ({ id: v.key + '/' + v.instrumentVersion, name: v.definition.source.title || v.key, instrumentKey: v.key, instrumentVersion: v.instrumentVersion })),
+    situational,
     courses: courseRows,
   }
 }
@@ -385,6 +388,7 @@ export async function copy(actor: Actor, id: string, raw: unknown) {
         assertCognitiveProductEligible(config.testType)
       }
     }
+    if (composite) await resolveCompositeSituationalItems(composite.items, tx)
     const target = await tx.compositeAssessment.create({ data: {
       code: 'Q-' + randomUUID(), name: source.name + '（副本）', description: source.description, instruction: source.instruction,
       productKind: 'QUESTIONNAIRE', questionnaireType, createdBy: actor.userId, creationKey, creationHash,

@@ -1,4 +1,4 @@
-import { availableSjtPackages } from './authoring/service'
+import { resolveSituationalRelease, type ResolvedSituationalRelease } from './situational-release.service'
 import { deriveSituationalAssignment, assignedSituationalRunnerDefinition } from './situation-assignment'
 import { frozenSituationalScientificProjection } from './onboarding/scientific-schema'
 import { Prisma } from '@prisma/client'
@@ -428,22 +428,16 @@ export const startSituationalAttempt = async (userId: string, input: {
   instrumentKey: string
   instrumentVersion?: string
 }) => {
+  const resolved = await resolveSituationalRelease(input)
+  const situationPackage = resolved.situationPackage
   const uploaded = !listSituationPackages().some(p => p.key === input.instrumentKey)
-  const situationPackage = publishedPackage(input.instrumentKey, input.instrumentVersion, uploaded ? await availableSjtPackages() : listSituationPackages())
   if (situationPackage.definition.respondentType === 'teacher_self_report') {
     const participant = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } })
     if (participant?.role !== 'TEACHER') throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '该题包仅面向教师参与者', 403)
   }
   await assertSituationalAssetReferencesReady(situationPackage.definition)
   const participantKey = getParticipantKey(userId)
-  const frozenAt = new Date()
-  const snapshot = freezeSituationalRuntimeAtAttemptStart({
-    instrumentKey: situationPackage.key,
-    instrumentVersion: situationPackage.instrumentVersion,
-    definition: situationPackage.definition,
-    scientificContext: resolveSituationalScientificContext(situationPackage),
-    frozenAt,
-  })
+  const snapshot = resolved.snapshot
   const encryptedSnapshot = encryptFrozenSituationalRuntimeSnapshot(snapshot)
 
   // The partial unique index is the authoritative active-attempt boundary. A
@@ -479,13 +473,13 @@ export const startSituationalAttempt = async (userId: string, input: {
       const created = await prisma.$transaction(async (db) => {
         if (uploaded) {
           // Serialize new admission with retirement; a prior catalog read is not authority.
-          const releases = await db.$queryRaw<Array<{ status: string }>>`
-            SELECT "status" FROM "sjt_author_releases"
+          const releases = await db.$queryRaw<Array<{ status: string; definitionHash: string }>>`
+            SELECT "status", "definition_hash" AS "definitionHash" FROM "sjt_author_releases"
             WHERE "instrument_key" = ${situationPackage.key}
               AND "instrument_version" = ${situationPackage.instrumentVersion}
             FOR SHARE
           `
-          if (releases[0]?.status !== 'PUBLISHED') {
+          if (releases[0]?.status !== 'PUBLISHED' || releases[0].definitionHash !== resolved.definitionHash) {
             throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '情境化测评题包不存在或已停用', 404)
           }
         }
@@ -533,18 +527,8 @@ export const createEmbeddedSituationalAttempt = async (
     instrumentVersion: string
     attemptEpoch: number
   },
+  resolved?: ResolvedSituationalRelease,
 ) => {
-  const situationPackage = publishedPackage(input.instrumentKey, input.instrumentVersion)
-  await assertSituationalAssetReferencesReady(situationPackage.definition, db)
-  const frozenAt = new Date()
-  const snapshot = freezeSituationalRuntimeAtAttemptStart({
-    instrumentKey: situationPackage.key,
-    instrumentVersion: situationPackage.instrumentVersion,
-    definition: situationPackage.definition,
-    scientificContext: resolveSituationalScientificContext(situationPackage),
-    frozenAt,
-  })
-  const encryptedSnapshot = encryptFrozenSituationalRuntimeSnapshot(snapshot)
   const existing = await db.situationalAttempt.findFirst({
     where: {
       compositeAttemptId: input.compositeAttemptId,
@@ -560,6 +544,12 @@ export const createEmbeddedSituationalAttempt = async (
     }
     return { row: existing, snapshot: existingSnapshot }
   }
+  const release = resolved ?? await resolveSituationalRelease(input, db, true)
+  const { situationPackage, snapshot } = release
+  if (situationPackage.key !== input.instrumentKey || situationPackage.instrumentVersion !== input.instrumentVersion) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评版本绑定不一致', 409)
+  if (situationPackage.definition.respondentType === 'teacher_self_report') throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '教师自评题包不能用于学员综合测评', 403)
+  await assertSituationalAssetReferencesReady(situationPackage.definition, db)
+  const encryptedSnapshot = encryptFrozenSituationalRuntimeSnapshot(snapshot)
   try {
     const row = await db.situationalAttempt.create({
       data: {

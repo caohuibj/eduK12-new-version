@@ -89,13 +89,8 @@ import {
   situationalAttemptForResponse,
 } from '../situational/situational-runtime.service'
 import { assertSituationalAssetReferencesReady } from '../situational/situational-asset.service'
-import {
-  compileSituationRuntime,
-} from '../assessment-runtime/compiler'
-import {
-  getSituationPackage,
-  validateSituationPackage,
-} from '../situational/situation-package.registry'
+import { resolveSituationalReleases, situationalReleaseKey, type ResolvedSituationalRelease } from '../situational/situational-release.service'
+import { projectSjtReleaseStatus } from '../situational/authoring/service'
 import type {
   AddCompositeItemInput,
   CopyCompositeInput,
@@ -317,34 +312,23 @@ const assertCognitiveModuleEnabled = () => {
   assertCognitiveNewAdmissionEnabled()
 }
 
-const assertSituationalCompositeItem = (item: {
-  situationalInstrumentKey?: string | null
-  situationalInstrumentVersion?: string | null
-}) => {
-  if (!item.situationalInstrumentKey || !item.situationalInstrumentVersion) {
-    throw compositeBadRequest('情境化模块必须绑定精确 instrumentKey 和 instrumentVersion')
-  }
-  const situationPackage = getSituationPackage(item.situationalInstrumentKey, item.situationalInstrumentVersion)
-  if (!situationPackage || situationPackage.releaseStatus !== 'PUBLISHED') {
-    throw compositeBadRequest('情境化题包不存在或未发布')
-  }
-  const validation = validateSituationPackage(situationPackage)
-  if (!validation.valid) throw compositeBadRequest('情境化题包未通过运行时校验')
-  const runtime = compileSituationRuntime({
-    instrumentKey: situationPackage.key,
-    instrumentVersion: situationPackage.instrumentVersion,
-    definition: situationPackage.definition,
-    sourceDefinitionHash: validation.definitionHash,
-  })
-  if (
-    !runtime.runtimeCapabilities.supported
-    || !runtime.runtimeCapabilities.embedded
-    || !runtime.runtimeCapabilities.aggregateEligible
-    || runtime.runtimeCapabilities.collectionFacts
-  ) {
-    throw compositeBadRequest('情境化题包不支持 Unified Bundle 运行时')
-  }
-  return { situationPackage, runtime, definitionHash: validation.definitionHash }
+type SituationalCompositeItem = { type?: string; situationalInstrumentKey?: string | null; situationalInstrumentVersion?: string | null }
+const situationalItemIdentity = (item: SituationalCompositeItem) => {
+  if (!item.situationalInstrumentKey || !item.situationalInstrumentVersion) throw compositeBadRequest('情境化模块必须绑定精确 instrumentKey 和 instrumentVersion')
+  return { instrumentKey: item.situationalInstrumentKey, instrumentVersion: item.situationalInstrumentVersion }
+}
+export const resolveCompositeSituationalItems = async (items: SituationalCompositeItem[], db: Db = defaultPrisma, lock = false) => {
+  const resolved = await resolveSituationalReleases(items.filter(item => item.type === 'SITUATIONAL').map(situationalItemIdentity), db, lock)
+  for (const situation of resolved.values()) assertSituationalCompositeItem(situation)
+  return resolved
+}
+const assertSituationalCompositeItem = (situation: ResolvedSituationalRelease) => {
+  const { runtime, situationPackage } = situation
+  if (!runtime.runtimeCapabilities.supported || !runtime.runtimeCapabilities.embedded || !runtime.runtimeCapabilities.aggregateEligible || runtime.runtimeCapabilities.collectionFacts) throw compositeBadRequest('情境化题包不支持 Unified Bundle 运行时')
+  // Composite course delivery and anonymous student entry must not silently
+  // administer teacher self-report instruments to students.
+  if (situationPackage.definition.respondentType === 'teacher_self_report') throw compositeBadRequest('教师自评题包不能用于学员综合测评')
+  return situation
 }
 
 const assertSupportedComposite = (composite: { items?: Array<{ type: string; situationalInstrumentKey?: string | null; situationalInstrumentVersion?: string | null }> }, frozenAttempt = false, newAdmission = !frozenAttempt) => {
@@ -352,7 +336,7 @@ const assertSupportedComposite = (composite: { items?: Array<{ type: string; sit
     throw compositeBadRequest('认知模块未启用')
   }
   for (const item of composite.items ?? []) {
-    if (item.type === 'SITUATIONAL' && !frozenAttempt) assertSituationalCompositeItem(item)
+    if (item.type === 'SITUATIONAL' && !frozenAttempt) situationalItemIdentity(item)
   }
 }
 
@@ -518,6 +502,7 @@ export const assertValidItem = async (
   role: UserRole,
   composite: { courseId: string | null; productKind?: string },
   prisma: Db = defaultPrisma,
+  situationalReleases?: Map<string, ResolvedSituationalRelease>,
 ) => {
   if ((input as any).formPolicy != null && composite.productKind !== 'QUESTIONNAIRE') throw compositeBadRequest('Form V3 只支持新版普通问卷')
   if (input.required === false && input.type !== 'FORM') {
@@ -566,7 +551,8 @@ export const assertValidItem = async (
     if (!input.situationalInstrumentKey || !input.situationalInstrumentVersion || supplied !== 1) {
       throw compositeBadRequest('情境化模块必须提供精确 instrumentKey 和 instrumentVersion')
     }
-    assertSituationalCompositeItem(input)
+    const releases = situationalReleases ?? await resolveCompositeSituationalItems([input], prisma)
+    assertSituationalCompositeItem(releases.get(situationalReleaseKey(situationalItemIdentity(input)))!)
     return
   }
 
@@ -1154,6 +1140,7 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
       code = `${source.code}_copy_${nanoid(8)}`
     }
 
+    const situationalReleases = await resolveCompositeSituationalItems(source.items, tx)
     const itemData: Array<Record<string, unknown>> = []
     for (const item of source.items) {
       if (item.type === 'SCALE') {
@@ -1197,7 +1184,7 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
           cognitiveAssignmentId: ensured.id,
         })
       } else if (item.type === 'SITUATIONAL') {
-        assertSituationalCompositeItem(item)
+        assertSituationalCompositeItem(situationalReleases.get(situationalReleaseKey(situationalItemIdentity(item)))!)
         itemData.push({
           type: 'SITUATIONAL',
           position: item.position,
@@ -1835,7 +1822,7 @@ export const reorderItems = async (userId: string, role: UserRole, compositeId: 
   return reorderCompositeContentUnits(userId, role, compositeId, unitInputs)
 }
 
-export const prepareCompositePublication = async (userId: string, role: UserRole, id: string, prisma: Db = defaultPrisma) => {
+export const prepareCompositePublication = async (userId: string, role: UserRole, id: string, prisma: Db = defaultPrisma, resolvedSituational?: Map<string, ResolvedSituationalRelease>) => {
   assertTeacher(role)
   // Publish validates, it never repairs. The write-time invariant guarantees
   // every FORM module is sectioned on create/copy/import, so a published
@@ -1874,6 +1861,7 @@ export const prepareCompositePublication = async (userId: string, role: UserRole
   const sectionByItem = new Map<string, any>(
     (composite.formSections ?? []).flatMap((section: any) => section.items.map((item: any) => [item.id, section] as const)),
   )
+  const situationalReleases = resolvedSituational ?? await resolveCompositeSituationalItems(composite.items, prisma)
   const contextIssues = validateContextFormItems(
     composite.items.filter((item: any) => item.type === 'FORM').map((item: any) => ({
       id: item.id,
@@ -1906,7 +1894,7 @@ export const prepareCompositePublication = async (userId: string, role: UserRole
       validateCognitiveConfig(item.cognitiveAssignment.config, true)
     }
     if (item.type === 'SITUATIONAL') {
-      const situation = assertSituationalCompositeItem(item)
+      const situation = assertSituationalCompositeItem(situationalReleases.get(situationalReleaseKey(situationalItemIdentity(item)))!)
       await assertSituationalAssetReferencesReady(situation.situationPackage.definition)
     }
     if (item.type === 'FORM') {
@@ -2023,9 +2011,9 @@ export const prepareCompositePublication = async (userId: string, role: UserRole
   return { analysisProtocolSnapshotEncrypted, reportPackageSnapshotEncrypted }
 }
 
-const publishCompositeInTransaction = async (userId: string, role: UserRole, id: string, db: Db) => {
+const publishCompositeInTransaction = async (userId: string, role: UserRole, id: string, db: Db, resolvedSituational?: Map<string, ResolvedSituationalRelease>) => {
   await db.$queryRaw`SELECT "id" FROM "composite_assessments" WHERE "id" = ${id} FOR UPDATE`
-  const prepared = await prepareCompositePublication(userId, role, id, db)
+  const prepared = await prepareCompositePublication(userId, role, id, db, resolvedSituational)
   const published = await db.compositeAssessment.update({
     where: { id },
     data: {
@@ -2037,9 +2025,9 @@ const publishCompositeInTransaction = async (userId: string, role: UserRole, id:
   return withoutAnalysisProtocolCipher(published)
 }
 
-export const publishComposite = async (userId: string, role: UserRole, id: string, db: Db = defaultPrisma): Promise<any> =>
-  db === defaultPrisma ? defaultPrisma.$transaction(tx => publishCompositeInTransaction(userId, role, id, tx))
-    : publishCompositeInTransaction(userId, role, id, db)
+export const publishComposite = async (userId: string, role: UserRole, id: string, db: Db = defaultPrisma, resolvedSituational?: Map<string, ResolvedSituationalRelease>): Promise<any> =>
+  db === defaultPrisma ? defaultPrisma.$transaction(tx => publishCompositeInTransaction(userId, role, id, tx, resolvedSituational))
+    : publishCompositeInTransaction(userId, role, id, db, resolvedSituational)
 
 const assertTokenWindow = (token: { isActive: boolean; expiresAt: Date; maxUses: number; usedCount: number }) => {
   if (!token.isActive) throw compositeForbidden('公开链接已停用')
@@ -2345,7 +2333,7 @@ const createCognitiveChild = async (db: Db, attempt: any, item: any, userId: str
   })
 }
 
-const createChildRecords = async (db: Db, attempt: any, items: any[], userId: string | null, formSections: any[]) => {
+const createChildRecords = async (db: Db, attempt: any, items: any[], userId: string | null, formSections: any[], situationalReleases: Map<string, ResolvedSituationalRelease>) => {
   // A composition may reference several sources in different orders. Always
   // acquire their locks in the same order to avoid cross-composition deadlocks.
   if (userId) {
@@ -2426,7 +2414,7 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
       }
     } else if (item.type === 'SITUATIONAL') {
       if (attempt.runtimeGeneration !== 'UNIFIED_V1') throw compositeBadRequest('情境化模块必须使用 Unified FINAL_ONLY 运行时')
-      const situation = assertSituationalCompositeItem(item)
+      const situation = assertSituationalCompositeItem(situationalReleases.get(situationalReleaseKey(situationalItemIdentity(item)))!)
       const embedded = await createEmbeddedSituationalAttempt(db, {
         userId,
         // Composite parent rows retain their historical participant key
@@ -2439,7 +2427,7 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
         instrumentKey: situation.situationPackage.key,
         instrumentVersion: situation.situationPackage.instrumentVersion,
         attemptEpoch: attempt.attemptEpoch ?? 1,
-      })
+      }, situation)
       runtime.situational.push({
         compositeItemId: item.id,
         instrumentKey: embedded.snapshot.instrumentKey,
@@ -2527,6 +2515,7 @@ const createAttempt = async (
   if(composite.trainingTimingPolicy && (composite.productKind!=='QUESTIONNAIRE'||composite.questionnaireType!=='COURSE'||!finalOnly||relationalIdentity||composite.reportPackageKey||composite.analysisProtocolKey)) throw compositeBadRequest('此投放不支持可选计时')
   const trainingTimingSnapshot=freezeTrainingTimingSnapshot(composite.trainingTimingPolicy,composite.deliveryCourseId??null,attemptEpoch,!userId)
   if(trainingTimingSnapshot&&!userId){const course=await db.course.findUnique({where:{id:trainingTimingSnapshot.course.courseId},select:{courseType:true,isLibrary:true}});if(!course||course.courseType!=='TRAINING_COURSE'||course.isLibrary)throw compositeBadRequest('新匿名计时准入的 Training 课程来源已不可用')}
+  const situationalReleases = await resolveCompositeSituationalItems(composite.items, db, true)
   const attempt = await db.compositeAssessmentAttempt.create({
     data: {
       compositeAssessmentId: composite.id,
@@ -2563,7 +2552,7 @@ const createAttempt = async (
       })),
     })
   }
-  const runtime = await createChildRecords(db, attempt, composite.items, userId, formSections)
+  const runtime = await createChildRecords(db, attempt, composite.items, userId, formSections, situationalReleases)
   if (finalOnly) {
     const frozenActiveSlotSet = freezeCompositeActiveSlotSet({
       attemptEpoch,
@@ -3548,7 +3537,7 @@ const getUnifiedCompositeAttemptState = async (
         || runtime.snapshot.scoringVersion !== slot.runtimeIdentity.scoringVersion
         || runtime.snapshot.frozenAt !== slot.runtimeIdentity.frozenAt
       ) throw new Error('Situational runtime identity mismatch')
-      const child = situationalAttemptForResponse(runtime.row, runtime.snapshot)
+      const child = await projectSjtReleaseStatus(situationalAttemptForResponse(runtime.row, runtime.snapshot))
       currentItem = {
         id: currentUnit.item.id,
         type: 'SITUATIONAL',
