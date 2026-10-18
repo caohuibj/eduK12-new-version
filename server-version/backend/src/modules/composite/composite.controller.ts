@@ -33,7 +33,7 @@ import * as fs from 'fs'
 import { listReportPackageCatalog } from '../cognitive-analysis'
 import { buildCompositeAnalysisExport } from './composite-export.service'
 import { finalScaleSubmitSchema } from '../../services/scale-final-submit.schema'
-import { finalQuestionnaireFormSectionSubmitSchema } from '../../services/questionnaire-final-submit.schema'
+import { finalCompositeFormSectionSubmitSchema } from '../../services/questionnaire-final-submit.schema'
 import { isInstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import {
   isQuestionnaireCompletionAdmissionBusyError,
@@ -528,7 +528,7 @@ export const compositeController = {
   async submitFinalFormSection(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
-      const input = finalQuestionnaireFormSectionSubmitSchema.parse(req.body)
+      const input = finalCompositeFormSectionSubmitSchema.parse(req.body)
       const data = await submitCompositeFormSectionFinal({
         attemptId: req.params.attemptId,
         sectionId: req.params.sectionId,
@@ -812,7 +812,7 @@ export const compositeController = {
 
   async publicSubmitFinalFormSection(req: Request, res: Response) {
     try {
-      const input = finalQuestionnaireFormSectionSubmitSchema.parse(req.body)
+      const input = finalCompositeFormSectionSubmitSchema.parse(req.body)
       const data = await submitCompositeFormSectionFinal({
         attemptId: req.params.attemptId,
         sectionId: req.params.sectionId,

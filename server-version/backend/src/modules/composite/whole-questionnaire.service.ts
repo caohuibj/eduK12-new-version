@@ -66,7 +66,7 @@ const wholeReportParentSelect = {
     formSections: { orderBy: { position: 'asc' }, select: {
       id: true, title: true, description: true, position: true, contextSection: true,
       items: { orderBy: [{ formSectionPosition: 'asc' }, { position: 'asc' }], select: {
-        id: true, formType: true, formLabel: true, formPlaceholder: true, formOptions: true,
+        id: true, formType: true, formLabel: true, formPlaceholder: true, formOptions: true, formDefinition: true,
         contextKey: true, required: true, position: true, formSectionPosition: true,
       } },
     } },

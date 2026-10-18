@@ -1,4 +1,5 @@
 import { Prisma } from '@prisma/client'
+import { normalizeTypedCompositeFormAnswer, validateTypedCompositeSectionDefinition, legacyFormValueProjection, type TypedFormValue } from '../assessment-runtime/typed-form'
 import { v4 as uuidv4 } from 'uuid'
 import { prisma } from '../../config/database'
 import {
@@ -48,7 +49,7 @@ export type SectionSubmitInput = {
   attemptEpoch: number
   definitionHash: string
   contextSnapshotHash?: string | null
-  answers: Array<{ formItemId: string; value: string | string[] | null }>
+  answers: Array<{ formItemId: string; value: TypedFormValue }>
   userId?: string | null
   recoveryTokenHash?: string
 }
@@ -224,6 +225,7 @@ export const listCompositeFormItems = async (compositeId: string) => prisma.comp
     formLabel: true,
     formPlaceholder: true,
     formOptions: true,
+    formDefinition: true,
     required: true,
     contextKey: true,
   },
@@ -385,8 +387,14 @@ const lockCompositeFormSectionAttempt = async (tx: Prisma.TransactionClient, sec
 
 export const normalizeCompositeSectionAnswers = (section: CompositeSection, values: SectionSubmitInput['answers']) => {
   if (section.contextSection && !section.items.length) throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '历史背景信息区段缺少字段，请联系教师发布修复版本后重新开始；已提交记录会保留', 422)
+  const typed = section.items.filter(item => item.formDefinition != null)
+  if (typed.length) {
+    validateTypedCompositeSectionDefinition(section.items)
+    if (values.length > 500 || Buffer.byteLength(JSON.stringify(values), 'utf8') > 512000) throw new InstrumentFinalSubmitError('FORM_ANSWER_INVALID', '单份表单提交不能超过 500 个字段或 500 KB', 400)
+  }
   const itemMap = new Map(section.items.map((item) => [item.id, item]))
-  const provided = new Map<string, string | string[] | null>()
+  if (itemMap.size !== section.items.length) throw new InstrumentFinalSubmitError('FORM_ANSWER_INVALID', '表单定义包含重复字段', 400)
+  const provided = new Map<string, TypedFormValue>()
   for (const answer of values) {
     const item = itemMap.get(answer.formItemId)
     if (!item) throw new InstrumentFinalSubmitError('FORM_ANSWER_INVALID', '提交中包含不属于该区段的字段', 400)
@@ -395,10 +403,15 @@ export const normalizeCompositeSectionAnswers = (section: CompositeSection, valu
   }
   const normalized = orderedItems(section.items).map((item) => {
     const value = provided.has(item.id) ? provided.get(item.id)! : null
+    if (item.formDefinition != null) {
+      const normalizedValue = normalizeTypedCompositeFormAnswer(item, value)
+      return { item, normalizedValue, storedValue: legacyFormValueProjection(normalizedValue), completed: normalizedValue !== null }
+    }
     if (value === null) {
       if (item.required) throw new InstrumentFinalSubmitError('FORM_ANSWER_INVALID', `${item.formLabel} 为必填项`, 400)
       return { item, normalizedValue: null, storedValue: null, completed: false }
     }
+    if (!['fill_blank', 'text_input', 'single_choice', 'multiple_choice', 'year_month'].includes(item.formType)) throw new InstrumentFinalSubmitError('FORM_ANSWER_INVALID', '高级表单题目缺少公共定义', 400)
     const form = { id: item.id, type: item.formType, label: item.formLabel, required: item.required, options: item.formOptions, contextKey: item.contextKey }
     const validation = validateQuestionnaireFormAnswer(form, value)
     if (validation) throw new InstrumentFinalSubmitError('FORM_ANSWER_INVALID', validation, 400)
@@ -508,6 +521,7 @@ const submitCompositeFormSectionFinalImpl = async (input: SectionSubmitInput) =>
   const section = attempt.compositeAssessment.formSections.find((candidate) => candidate.id === input.sectionId)
   if (!section) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段不存在', 404)
   const mappedSection = mapCompositeSection(section)
+  if (mappedSection.items.some(item => item.formDefinition != null)) throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', 'typed Form 仅支持统一 FINAL 运行时', 422)
   const actualDefinitionHash = measureRequestPhaseSync(
     'final_submit_definition_prepare',
     () => compositeFormSectionDefinitionHash(mappedSection),

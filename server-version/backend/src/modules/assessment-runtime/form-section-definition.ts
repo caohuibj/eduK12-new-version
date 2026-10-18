@@ -28,6 +28,7 @@ export type CompositeFormSectionItem = {
   placeholder: string | null
   required: boolean
   formOptions: unknown
+  formDefinition?: unknown
   contextKey: string | null
   position: number
   formSectionPosition: number | null
@@ -89,6 +90,7 @@ export const mapCompositeSection = (section: any): CompositeFormSectionDefinitio
     placeholder: item.formPlaceholder ?? null,
     required: item.required !== false,
     formOptions: item.formOptions,
+    ...(item.formDefinition != null ? { formDefinition: item.formDefinition } : {}),
     contextKey: item.contextKey ?? null,
     position: item.position,
     formSectionPosition: item.formSectionPosition ?? null,
@@ -138,6 +140,7 @@ export const compositeFormSectionDefinitionHash = (section: CompositeFormSection
       placeholder: item.placeholder,
       required: item.required,
       formOptions: item.formOptions,
+      ...(item.formDefinition != null ? { formDefinition: item.formDefinition } : {}),
       contextKey: item.contextKey,
       position: item.position,
       formSectionPosition: item.formSectionPosition,

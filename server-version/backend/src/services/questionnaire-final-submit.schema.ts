@@ -10,3 +10,9 @@ export const finalQuestionnaireFormSectionSubmitSchema = z.object({
     value: z.union([z.string(), z.array(z.string()), z.null()]),
   }).strict()).max(1000),
 }).strict()
+
+// Training accepts the shared typed wire domain; legacy Questionnaire is unchanged.
+import { typedFormValueSchema } from '../modules/assessment-runtime/form-facts'
+export const finalCompositeFormSectionSubmitSchema = finalQuestionnaireFormSectionSubmitSchema.extend({
+  answers: z.array(z.object({ formItemId: z.string().min(1), value: typedFormValueSchema }).strict()).max(1000),
+})

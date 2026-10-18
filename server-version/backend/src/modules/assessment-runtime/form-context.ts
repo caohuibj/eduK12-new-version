@@ -1,10 +1,11 @@
+import type { TypedFormValue } from './typed-form'
 import { buildAssessmentContext, hashAssessmentContext, type ContextFormItem } from '../assessment-context'
 import { encryptAssessmentContext } from '../assessment-context/security'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 
 /** Validation uses normalized answers; storedValue may already be encrypted. */
 export const contextForNormalizedFormEntries = (
-  entries: Array<{ item: { id: string; contextKey: string | null }; normalizedValue: string | string[] | null; storedValue?: string | null }>,
+  entries: Array<{ item: { id: string; contextKey: string | null }; normalizedValue: TypedFormValue; storedValue?: string | null }>,
   items: ContextFormItem[],
 ): { encrypted: string; hash: string } => {
   const answers = entries.filter(entry => entry.item.contextKey && entry.normalizedValue !== null).map(entry => {

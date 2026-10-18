@@ -1217,6 +1217,7 @@ model CompositeAssessmentItem {
   formLabel             String?                     @map("form_label")
   formPlaceholder       String?                     @map("form_placeholder")
   formOptions           Json?                       @map("form_options")
+  formDefinition        Json?                       @map("form_definition")
   contextKey            String?                     @map("context_key")
   formSectionId         String?                     @map("form_section_id")
   formSectionPosition   Int?                        @map("form_section_position")

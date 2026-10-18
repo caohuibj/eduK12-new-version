@@ -253,6 +253,8 @@ export const getExportData = async (
     },
   })
   if (!template) throw new Error('综合测评不存在')
+  // C07 supplies a typed, lossless CSV/ZIP/SAV contract. Never export String shadows.
+  if (template.items.some(item => item.formDefinition != null)) throw new Error('TYPED_FORM_EXPORT_NOT_AVAILABLE: typed Form 无损导出尚未开放')
   assertExportLimits({ records: template.attempts.length })
   const packageSlotLabels = getFrozenPackageSlotLabels(template)
 

@@ -41,6 +41,8 @@ import { parseCognitiveResultSnapshot, referencesForCognitiveResult } from '../c
 import { resolveCognitiveReferenceForResult } from '../cognitive/reference'
 import { readFrozenReport } from '../cognitive/profile-freeze'
 import { buildCognitiveSingleTaskReport } from '../cognitive/single-task-report'
+import { loadCompositeTypedFormValues } from '../assessment-runtime/typed-form-facts'
+import { typedCompositeFormQuestion, validateTypedCompositeSectionDefinition, legacyFormValueProjection } from '../assessment-runtime/typed-form'
 import { buildFormBackgroundReport, buildScaleUnitReport, SCALE_REPORT_DEFINITION_VERSION, SCALE_REPORT_DISCLAIMER } from '../reporting/scale-unit-report'
 import {
   buildScaleResultForRecord,
@@ -567,6 +569,7 @@ export const assertValidItem = async (
     if (!input.formType || !input.formLabel || supplied !== 1) {
       throw compositeBadRequest('表单模块必须提供 formType 和 formLabel')
     }
+    if ((input as any).formDefinition != null) typedCompositeFormQuestion({ ...input, id: 'new', formDefinition: (input as any).formDefinition, placeholder: input.formPlaceholder ?? null, contextKey: input.contextKey ?? null, position: input.position ?? 0, formSectionPosition: null } as any)
     if (input.formType === 'single_choice' || input.formType === 'multiple_choice') {
       const options = input.formOptions ?? []
       const values = options.map((option) => option.value)
@@ -625,6 +628,7 @@ const mapItemForTeacher = (item: any, packageSlotLabels = new Map<number, string
         label: packageSlotLabels.get(item.position) ?? item.formLabel,
         placeholder: item.formPlaceholder,
         options: item.formOptions,
+        ...(item.formDefinition != null ? { formDefinition: item.formDefinition } : {}),
         contextKey: item.contextKey ?? null,
       }
     : null,
@@ -1139,6 +1143,7 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
         if (!item.scaleId || item.scale?.status !== 'PUBLISHED') throw compositeBadRequest('综合测评包含未发布量表')
         itemData.push({ type: 'SCALE', position: item.position, required: item.required, scaleId: item.scaleId })
       } else if (item.type === 'FORM') {
+        if (item.formDefinition != null) typedCompositeFormQuestion({ ...item, formType: item.formType ?? '', formLabel: item.formLabel ?? '', placeholder: item.formPlaceholder ?? null })
         itemData.push({
           type: 'FORM',
           position: item.position,
@@ -1147,6 +1152,7 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
           formLabel: item.formLabel,
           formPlaceholder: item.formPlaceholder,
           formOptions: item.formOptions ?? undefined,
+          formDefinition: item.formDefinition ?? undefined,
           contextKey: item.contextKey ?? undefined,
         })
       } else if (item.type === 'COGNITIVE') {
@@ -1631,6 +1637,7 @@ const compositeFormSectionRuntimeDefinition = (section: any) => {
       placeholder: item.formPlaceholder ?? null,
       required: item.required !== false,
       formOptions: item.formOptions,
+      ...(item.formDefinition != null ? { formDefinition: item.formDefinition } : {}),
       contextKey: item.contextKey ?? null,
       position: item.position,
       formSectionPosition: item.formSectionPosition ?? null,
@@ -1878,6 +1885,7 @@ export const prepareCompositePublication = async (userId: string, role: UserRole
       await assertSituationalAssetReferencesReady(situation.situationPackage.definition)
     }
     if (item.type === 'FORM') {
+      if (item.formDefinition != null) typedCompositeFormQuestion({ ...item, formType: item.formType ?? '', formLabel: item.formLabel ?? '', placeholder: item.formPlaceholder ?? null })
       if (!item.formType || !item.formLabel) {
         throw compositeBadRequest('综合测评包含未配置完成的表单')
       }
@@ -1890,6 +1898,8 @@ export const prepareCompositePublication = async (userId: string, role: UserRole
       }
     }
   }
+
+  for (const section of composite.formSections ?? []) validateTypedCompositeSectionDefinition(compositeFormSectionRuntimeDefinition(section).items)
 
   const hasPackageKey = Boolean(composite.reportPackageKey)
   const hasPackageVersion = Boolean(composite.reportPackageVersion)
@@ -3167,7 +3177,7 @@ const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
           formType: true,
           formLabel: true,
           formPlaceholder: true,
-          formOptions: true,
+          formOptions: true, formDefinition: true,
           contextKey: true,
           scale: {
             select: {
@@ -3198,7 +3208,7 @@ const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
               formType: true,
               formLabel: true,
               formPlaceholder: true,
-              formOptions: true,
+              formOptions: true, formDefinition: true,
               contextKey: true,
               required: true,
               position: true,
@@ -3353,6 +3363,7 @@ const getUnifiedCompositeAttemptState = async (
       label: packageSlotLabels.get(item.position) ?? item.formLabel,
       placeholder: item.formPlaceholder,
       options: item.formOptions,
+      ...(item.formDefinition != null ? { formDefinition: item.formDefinition } : {}),
       required: item.required !== false,
       contextKey: item.contextKey ?? null,
       value: null,
@@ -4054,6 +4065,7 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
       label: packageSlotLabels.get(item.position) ?? item.formLabel,
       placeholder: item.formPlaceholder,
       options: item.formOptions,
+      ...(item.formDefinition != null ? { formDefinition: item.formDefinition } : {}),
       required: item.required,
       contextKey: item.contextKey ?? null,
       value: formMap.get(item.id)?.value ?? null,
@@ -4082,6 +4094,7 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
               placeholder: item.formPlaceholder ?? null,
               required: item.required !== false,
               formOptions: item.formOptions,
+              ...(item.formDefinition != null ? { formDefinition: item.formDefinition } : {}),
               contextKey: item.contextKey ?? null,
               position: item.position,
               formSectionPosition: item.formSectionPosition ?? null,
@@ -4189,6 +4202,7 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
         label: packageSlotLabels.get(item.position) ?? item.formLabel,
         placeholder: item.formPlaceholder,
         options: item.formOptions,
+        ...(item.formDefinition != null ? { formDefinition: item.formDefinition } : {}),
         required: item.required !== false,
         contextKey: item.contextKey ?? null,
         value: formMap.get(item.id)?.value ?? null,
@@ -4453,13 +4467,14 @@ export const buildCompositeReport = async (attempt: any, verifiedContext?: Whole
     attempt.formAnswers,
   )
   const formMap = new Map<string, any>(readableFormAnswers.map((item: any) => [item.itemId, item]))
+  const typedFormValues = await loadCompositeTypedFormValues(attempt)
   const unitReports: any[] = []
   const backgroundValues: any[] = []
   const packageSlotLabels = getFrozenPackageSlotLabels(attempt.compositeAssessment)
   const packageBased = Boolean(attempt.compositeAssessment.reportPackageKey)
   for (const item of attempt.compositeAssessment.items) {
     if (item.type === 'FORM') {
-      backgroundValues.push(buildFormBackgroundReport({ itemId: item.id, label: packageSlotLabels.get(item.position) ?? item.formLabel, value: formMap.get(item.id)?.value ?? null, formType: item.formType, options: item.formOptions }))
+      backgroundValues.push(buildFormBackgroundReport({ itemId: item.id, label: packageSlotLabels.get(item.position) ?? item.formLabel, value: item.formDefinition != null ? legacyFormValueProjection(typedFormValues.get(item.id) ?? null) : formMap.get(item.id)?.value ?? null, formType: item.formType, options: item.formOptions }))
       continue
     }
     if (item.type === 'SCALE') {
@@ -4931,6 +4946,8 @@ const loadCollectionReportAttempt = async (attemptId: string) => {
 
 /** A completed ordinary questionnaire needs source references and layout, not an expanded report tree. */
 const materializeCompactReportFromFacts = async (attempt: any, binding: ReportJobIdentity & {attemptId:string;aggregateInputHash:string}, verified?: WholeQuestionnaireReportContext): Promise<string | null> => {
+  // C07 will add typed report layout to the compact format; use canonical reader meanwhile.
+  if (attempt.compositeAssessment.items.some((item:any) => item.formDefinition != null)) return null
   if (!sharedControlWritesEnabled() || !attempt.compositeAssessment.items.every((item:any)=>['FORM','SCALE','COGNITIVE'].includes(item.type))) return null
   const scaleByItem = new Map<string,any>(attempt.scaleAssessments.map((row:any)=>[row.compositeItemId,row])), cogByItem = new Map<string,any>(attempt.cognitiveSessions.map((row:any)=>[row.compositeItemId,row]))
   const rows = attempt.compositeAssessment.items.filter((item:any)=>item.type==='SCALE').map((item:any)=>scaleByItem.get(item.id))

@@ -26,7 +26,8 @@ import {
   type CompositeSection,
 } from '../composite/final-submit.service'
 import { encryptUnifiedRuntimePayload } from './security'
-import { createFormSectionCollectionFacts } from './form-facts'
+import { createFormSectionCollectionFacts, createTypedFormSectionCollectionFacts } from './form-facts'
+import type { TypedFormValue } from './typed-form'
 import { insertCompletedUnitSnapshot } from './persistence'
 import { formSectionSlotKey } from './slot-set'
 import { canonicalJsonBytes } from './canonical'
@@ -52,8 +53,9 @@ type NormalizedSectionEntry = {
     required: boolean
     options?: unknown
     formOptions?: unknown
+    formDefinition?: unknown
   }
-  normalizedValue: string | string[] | null
+  normalizedValue: TypedFormValue
   storedValue: string | null
   status?: string
   completed?: boolean
@@ -86,14 +88,12 @@ const contextForEntries = (entries: NormalizedSectionEntry[], input: {
   return contextForNormalizedFormEntries(entries, items)
 }
 
-const formFactsFor = (sectionKey: string, entries: NormalizedSectionEntry[]) => createFormSectionCollectionFacts({
-  sectionKey,
-  items: entries.map((entry) => ({
-    key: entry.item.id,
-    label: entry.item.label ?? entry.item.formLabel ?? entry.item.id,
-    value: entry.normalizedValue,
-  })),
-})
+export const formFactsFor = (sectionKey: string, entries: NormalizedSectionEntry[]) => {
+  const input = { sectionKey, items: entries.map(entry => ({ key: entry.item.id, label: entry.item.label ?? entry.item.formLabel ?? entry.item.id, value: entry.normalizedValue })) }
+  if (entries.some(entry => entry.item.formDefinition != null)) return createTypedFormSectionCollectionFacts(input)
+  // Legacy normalization admits only this unchanged V1 value domain.
+  return createFormSectionCollectionFacts(input as Parameters<typeof createFormSectionCollectionFacts>[0])
+}
 
 const questionnaireContextItems = (section: SectionRow) => section.items.map((item) => ({
   id: item.id,

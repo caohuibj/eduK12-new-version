@@ -1,3 +1,5 @@
+import { assertTypedCompositeFormFacts } from './typed-form-facts'
+import { mapCompositeSection } from './form-section-definition'
 import { compactAssessmentStorageEnabled } from './compact-field-codec'
 import { encryptCompactQuestionnaireReport } from '../reporting/compact-questionnaire-report'
 import { loadStoredCanonicalUnitResults } from './compact-assessment-storage'
@@ -37,8 +39,8 @@ import {
   decryptUnifiedRuntimePayload,
 } from './security'
 import {
-  parseFormSectionCollectionFacts,
-  type FormSectionCollectionFactsV1,
+  readFormSectionCollectionFacts,
+  type FormSectionCollectionFacts,
 } from './form-facts'
 import {
   parseStoredCanonicalUnitResult,
@@ -180,7 +182,7 @@ const compositeParentGraphSelect = {
           contextSection: true,
           items: {
             orderBy: [{ formSectionPosition: 'asc' }, { position: 'asc' }],
-            select: { id: true, formType: true, formLabel: true, formPlaceholder: true, formOptions: true, contextKey: true, required: true, position: true, formSectionPosition: true },
+            select: { id: true, formType: true, formLabel: true, formPlaceholder: true, formOptions: true, formDefinition: true, contextKey: true, required: true, position: true, formSectionPosition: true },
           },
         },
       },
@@ -317,7 +319,7 @@ type AggregateSnapshotRow = AggregateSnapshotHeader & {
 type CanonicalPayload = {
   header: AggregateSnapshotRow
   envelope?: CanonicalUnitResultEnvelopeV1
-  facts?: FormSectionCollectionFactsV1
+  facts?: FormSectionCollectionFacts
 }
 
 type CompletionResult = {
@@ -482,7 +484,7 @@ const validateCanonicalPayload = (input: {
 const validateCollectionFacts = (input: {
   row: AggregateSnapshotRow
   slot: FrozenActiveSlotV1
-  facts: FormSectionCollectionFactsV1
+  facts: FormSectionCollectionFacts
 }) => {
   const sectionId = (input.slot.sourceBinding as Record<string, unknown>).sectionId
   if (typeof sectionId !== 'string' || input.facts.sectionKey !== sectionId) {
@@ -543,7 +545,7 @@ const decryptCompletedPayloads = async (input: {
   type ParsedSlot = {
     slot: FrozenActiveSlotV1
     row: AggregateSnapshotRow
-    facts?: FormSectionCollectionFactsV1
+    facts?: FormSectionCollectionFacts
     envelope?: CanonicalUnitResultEnvelopeV1
   }
 
@@ -566,7 +568,7 @@ const decryptCompletedPayloads = async (input: {
       if (slot.unitType === 'FORM_SECTION') {
         const facts = withAggregateDefinitionBoundary(() => {
           if (!row.collectionFactsEncrypted) throw new Error('collection facts 加密载荷缺失')
-          return parseFormSectionCollectionFacts(decryptUnifiedRuntimePayload<unknown>(row.collectionFactsEncrypted))
+          return readFormSectionCollectionFacts(decryptUnifiedRuntimePayload<unknown>(row.collectionFactsEncrypted))
         })
         out.push({ slot, row, facts })
         continue
@@ -1219,13 +1221,15 @@ const compositeSectionDefinition = (section: any) => ({
       placeholder: item.formPlaceholder ?? null,
       required: item.required !== false,
       formOptions: item.formOptions,
+      ...(item.formDefinition != null ? { formDefinition: item.formDefinition } : {}),
       contextKey: item.contextKey ?? null,
       position: item.position,
       formSectionPosition: item.formSectionPosition ?? null,
     })),
 })
 
-const validateQuestionnaireFactsAgainstSection = (section: any, facts: FormSectionCollectionFactsV1) => {
+const validateQuestionnaireFactsAgainstSection = (section: any, facts: FormSectionCollectionFacts) => {
+  if (facts.schemaVersion !== 1) throw aggregateInputError('旧 Questionnaire 不支持 typed Form facts')
   const expected = new Map(section.items.map((item: any) => [item.id, item.label]))
   if (facts.items.length !== expected.size) throw aggregateInputError(`表单区段 ${section.id} facts 数量不匹配`)
   for (const fact of facts.items) {
@@ -1235,7 +1239,8 @@ const validateQuestionnaireFactsAgainstSection = (section: any, facts: FormSecti
   }
 }
 
-const validateCompositeFactsAgainstSection = (section: any, facts: FormSectionCollectionFactsV1) => {
+const validateCompositeFactsAgainstSection = (section: any, facts: FormSectionCollectionFacts) => {
+  assertTypedCompositeFormFacts(mapCompositeSection(section), facts)
   const expected = new Map(section.items.map((item: any) => [item.id, item.formLabel]))
   if (facts.items.length !== expected.size) throw aggregateInputError(`综合测评表单区段 ${section.id} facts 数量不匹配`)
   for (const fact of facts.items) {

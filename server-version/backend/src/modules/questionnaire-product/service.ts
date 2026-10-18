@@ -1,3 +1,4 @@
+import { typedCompositeFormQuestion } from '../assessment-runtime/typed-form'
 import { assertCognitiveProductEligible, isCognitiveProductEligible } from '../cognitive/product-eligibility'
 import { Prisma, UserRole } from '@prisma/client'
 import { randomUUID } from 'node:crypto'
@@ -177,7 +178,7 @@ async function validateResources(tx: Tx, actor: Actor, row: any) {
   for (const item of row.items) {
     // Legacy storage accepts arbitrary strings. Do not publish an unknown
     // field type as a text input through the player's compatibility fallback.
-    if (item.type === 'FORM' && !['fill_blank', 'single_choice', 'multiple_choice', 'text_input', 'year_month'].includes(item.formType)) {
+    if (item.type === 'FORM' && item.formDefinition == null && !['fill_blank', 'single_choice', 'multiple_choice', 'text_input', 'year_month'].includes(item.formType)) {
       throw compositeBadRequest(`表单字段“${item.formLabel || item.id}”的题型不受支持，请在副本中重新配置后发布`)
     }
     if (copiedCognitiveBinding(item, row)) continue
@@ -373,6 +374,7 @@ export async function copy(actor: Actor, id: string, raw: unknown) {
       } })
     } else {
       for (const item of composite!.items) {
+        if (item.formDefinition != null) typedCompositeFormQuestion({ ...item, placeholder: item.formPlaceholder ?? null } as any)
         const { id: _id, compositeAssessmentId: _parent, cognitiveAssignment, ...data } = item
         if (cognitiveAssignment?.listedStandalone === false) {
           const binding = await tx.cognitiveAssignment.create({ data: {
@@ -390,6 +392,7 @@ export async function copy(actor: Actor, id: string, raw: unknown) {
         }
         await tx.compositeAssessmentItem.create({ data: { ...data, compositeAssessmentId: target.id,
           formOptions: item.formOptions ?? Prisma.JsonNull,
+          formDefinition: item.formDefinition ?? Prisma.DbNull,
           formSectionId: item.formSectionId ? sectionIds.get(item.formSectionId) : null,
         } })
       }
