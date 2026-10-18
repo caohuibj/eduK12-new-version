@@ -1,0 +1,7 @@
+{"resultPath": "/workspace/scratch/5a77e8bdc1ae/eduk12_c07_http_01/c07-runtime-result.json", "passed": false, "cleanupVerified": true}
+Traceback (most recent call last):
+  File "/workspace/scratch/5a77e8bdc1ae/eduk12_c07_export_worktree/server-version/scripts/recovery/c07-export-http.py", line 28, in <module>
+    subprocess.run([str(node),'--import','tsx',str(seed)],cwd=backend,env={**env,**runtime,'QUESTIONNAIRE_PRODUCT_TEST_DATABASE_URL':runtime['DATABASE_URL'],'QUESTIONNAIRE_PRODUCT_FIXTURE_FILE':str(state/'fixture-private.json')},stdout=log,stderr=log,check=True,timeout=180)
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/node_modules/node/bin/node', '--import', 'tsx', '/workspace/scratch/5a77e8bdc1ae/eduk12_c07_export_worktree/server-version/e2e/questionnaire-products-fixture.ts']' returned non-zero exit status 1.

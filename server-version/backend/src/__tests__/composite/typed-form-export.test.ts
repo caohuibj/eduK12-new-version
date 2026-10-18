@@ -4,9 +4,10 @@ vi.mock('../../config/database',()=>({prisma:db}))
 import {typedFormExportColumns} from '../../modules/composite/typed-form-export'
 import {getExportData,exportToCSV,saveExportFiles} from '../../modules/composite/composite-export.service'
 import {mapCompositeSection} from '../../modules/assessment-runtime/form-section-definition'
-import {canonicalHash} from '../../modules/assessment-runtime/canonical'
+import {canonicalHash,canonicalJsonString} from '../../modules/assessment-runtime/canonical'
 import {encryptUnifiedRuntimePayload,decryptUnifiedRuntimePayload} from '../../modules/assessment-runtime/security'
 import {formSectionSlotKey} from '../../modules/assessment-runtime/slot-set'
+import {readFormSectionCollectionFacts} from '../../modules/assessment-runtime/form-facts'
 import {wideExportPackage} from '../../services/wideExportPackage'
 const options=[{optionKey:'b',label:'乙'},{optionKey:'a',label:'甲'}]
 const item=(type:string,extra:Record<string,unknown>={})=>({id:'item',type:'FORM',formType:({SINGLE:'single_choice',MULTIPLE:'multiple_choice',SHORT_TEXT:'text_input'} as Record<string,string>)[type]??type.toLowerCase(),formLabel:'题目',required:false,formOptions:['SINGLE','MULTIPLE'].includes(type)?((extra.options??[]) as typeof options).map(o=>({value:o.optionKey,label:o.label})):null,position:0,contextKey:null,placeholder:null,formSectionPosition:0,formDefinition:{itemKey:'stable',type,prompt:'题目',required:false,options:[],rows:[],...extra}})
@@ -18,6 +19,10 @@ beforeEach(()=>{vi.clearAllMocks();process.env.DATA_ENCRYPTION_KEY='a'.repeat(64
 describe('C07 typed CSV and dictionary independent values',()=>{
  it.each([0,-2.5,-12.34567891,1e308,null])('preserves number %s without string conversion',value=>{
   const {fields,row}=project('NUMBER',value);expect(row).toEqual({F001_value:value,F001_state:null});expect(fields[0].type).toBe('numeric')
+ })
+ it('preserves canonical zero semantics and rejects nonfinite numeric facts',()=>{
+  expect(canonicalJsonString(-0)).toBe('0')
+  for(const value of [NaN,Infinity,-Infinity]) expect(()=>readFormSectionCollectionFacts({schemaVersion:2,sectionKey:'s',items:[{key:'i',label:'数值',value}]})).toThrow()
  })
  it('preserves array order and explicitly labels JSON encoding',()=>{
   for(const type of ['MULTIPLE','RANK_ORDER']) {

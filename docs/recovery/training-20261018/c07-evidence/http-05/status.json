@@ -1,0 +1,49 @@
+{
+  "startedAt": 1792315911.7365813,
+  "state": "stopped",
+  "checks": {
+    "runtimeRole": "passed",
+    "health": 200,
+    "ready": 200
+  },
+  "head": "1aca95c2a467fa8ccc57bef56cdffa8129ee9720",
+  "schemaSha256": "bd464898ee84cf4b6c79d70096a104ba5fad0d5d2d5440de1f96d6959ef9f1a3",
+  "launcherSha256": "564565e72d85ced0f65ecd294b06d319945b547eb34b98caba3c7aa720f93ad2",
+  "backendTree": "430687677eff898affd45ad2e4aa975f4d200382",
+  "node": "v24.21.0",
+  "runtimeFingerprint": {
+    "schemaVersion": 1,
+    "nodeVersion": "v24.21.0",
+    "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+    "dist": {
+      "files": 4965,
+      "sha256": "da5870b79f3d0b826be9aa83561f3a502370f02cc9ae8b74df4f7734f636c231"
+    },
+    "files": {
+      "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+      "prisma/schema.prisma": "bd464898ee84cf4b6c79d70096a104ba5fad0d5d2d5440de1f96d6959ef9f1a3",
+      "node_modules/.prisma/client/schema.prisma": "f5b7d8a6385bfb86a1e09f2c4959bb7cc97ad998d9de9580d4634b6d635262bd",
+      "node_modules/.prisma/client/index.js": "00311681c4ac641dfa82ed9ec11ee09399cde66243f5032a8c14b0a94f8900b6"
+    },
+    "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+  },
+  "ports": {
+    "postgres": 55261,
+    "redis": 60957,
+    "api": 35683
+  },
+  "pids": {
+    "postgres": 72,
+    "redis": 178,
+    "api": 182,
+    "report-worker": 208
+  },
+  "apiUrl": "http://127.0.0.1:35683",
+  "peakRssBytes": {
+    "api": 353394688,
+    "report-worker": 241569792
+  },
+  "cleanupVerified": true,
+  "cleanupErrors": [],
+  "stoppedAt": 1792315926.6137967
+}

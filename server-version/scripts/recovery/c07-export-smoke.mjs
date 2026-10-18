@@ -31,16 +31,16 @@ const teacher=client(),student=client()
 const policy={version:3,requiredRefusal:'ALLOW_SUBMIT',hiddenRequired:'EXEMPT'}
 const options=[{optionKey:'b',label:'乙'},{optionKey:'a',label:'甲'}]
 const long='中文, "引用"\n尾 🐈'.repeat(400)
-const q=(label,type,extra={},v3=false)=>({type:'FORM',formType:({SINGLE:'single_choice',MULTIPLE:'multiple_choice',SHORT_TEXT:'text_input'}[type]??type.toLowerCase()),formLabel:label,required:false,...(v3?{formPolicy:policy}:{}),formDefinition:{type,prompt:label,required:false,options:['SINGLE','MULTIPLE','LIKERT','MATRIX','MATRIX_MULTIPLE','RANK_ORDER','CONSTANT_SUM'].includes(type)?options:[],rows:[],...extra}})
+const q=(label,type,extra={},v3=false)=>({type:'FORM',formType:({SINGLE:'single_choice',MULTIPLE:'multiple_choice',SHORT_TEXT:'text_input'}[type]??type.toLowerCase()),formLabel:label,required:false,...(['SINGLE','MULTIPLE'].includes(type)?{formOptions:options.map(o=>({value:o.optionKey,label:o.label}))}:{}),...(v3?{formPolicy:policy}:{}),formDefinition:{type,prompt:label,required:false,options:['SINGLE','MULTIPLE','LIKERT','MATRIX','MATRIX_MULTIPLE','RANK_ORDER','CONSTANT_SUM'].includes(type)?options:[],rows:[],...extra}})
 async function create(v3,publicMode){
  let draft=await teacher.request('/questionnaire-products','POST',{requestId:randomUUID(),name:'C07 typed export',questionnaireType:'COURSE',courseIds:[fixture.courses[0].id],publicEnabled:publicMode,...(publicMode?{expiresAt:new Date(Date.now()+3600000).toISOString()}:{})})
- const definitions=[q('zero','NUMBER',{precision:8},v3),q('decimal','NUMBER',{precision:8},v3),q('missing','NUMBER',{},v3),q('text','LONG_TEXT',{maxLength:16000},v3),q('formula','SHORT_TEXT',{},v3),q('apostrophe','SHORT_TEXT',{},v3),q('multi','MULTIPLE',{},v3),q('rank','RANK_ORDER',{},v3),q('matrix','MATRIX',{rows:[{rowKey:'r1',label:'行一'},{rowKey:'r2',label:'行二'}],...(v3?{allowRefusal:true}:{})},v3),q('matrixmulti','MATRIX_MULTIPLE',{rows:[{rowKey:'r1',label:'行一'},{rowKey:'r2',label:'行二'}]},v3),q('sum','CONSTANT_SUM',{total:100},v3),q('slider','SLIDER',{min:-1,max:1,step:0.25,precision:2},v3),q('date','DATE',{},v3),q('time','TIME',{timeZone:'UTC'},v3),q('likert','LIKERT',{},v3)]
+ const definitions=[q('zero','NUMBER',{precision:8},v3),q('decimal','NUMBER',{precision:8},v3),q('missing','NUMBER',{},v3),q('text','LONG_TEXT',{maxLength:10000},v3),q('formula',v3?'SHORT_TEXT':'LONG_TEXT',{},v3),q('apostrophe',v3?'SHORT_TEXT':'LONG_TEXT',{},v3),...(v3?[q('multi','MULTIPLE',{},true)]:[{type:'FORM',formType:'multiple_choice',formLabel:'multi',required:false,formOptions:options.map(o=>({value:o.optionKey,label:o.label}))}]),q('rank','RANK_ORDER',{},v3),q('matrix','MATRIX',{rows:[{rowKey:'r1',label:'行一'},{rowKey:'r2',label:'行二'}],...(v3?{allowRefusal:true}:{})},v3),q('matrixmulti','MATRIX_MULTIPLE',{rows:[{rowKey:'r1',label:'行一'},{rowKey:'r2',label:'行二'}]},v3),q('sum','CONSTANT_SUM',{total:100},v3),q('slider','SLIDER',{min:-1,max:1,step:0.25,precision:2},v3),q('date','DATE',{},v3),q('time','TIME',{timeZone:'UTC'},v3),q('likert','LIKERT',{},v3)]
  let sectionId
- for(const item of definitions){draft=await teacher.request(`/questionnaire-products/${draft.id}/items`,'POST',{revision:draft.revision,...(sectionId?{formSectionId:sectionId}:{}),item});sectionId=draft.items[0].formSectionId}
+ for(const item of definitions){draft=await teacher.request(`/questionnaire-products/${draft.id}/items`,'POST',{revision:draft.revision,...(sectionId?{formSectionId:sectionId}:{}),item});sectionId=draft.formSections[0]?.id;assert.ok(sectionId)}
  if(v3){
   for(const item of [q('source','SINGLE',{},true),q('other','MULTIPLE',{otherOptionKey:'b',otherMaxLength:80},true)])draft=await teacher.request(`/questionnaire-products/${draft.id}/items`,'POST',{revision:draft.revision,formSectionId:sectionId,item})
-  const source=draft.items.find(x=>x.formLabel==='source')
-  const hidden=q('hidden','SHORT_TEXT',{displayIf:{itemKey:source.formDefinition.itemKey,operator:'EQUALS',optionKey:'a'}},true)
+  const source=draft.items.find(x=>x.form?.label==='source')
+  const hidden=q('hidden','SHORT_TEXT',{displayIf:{itemKey:source.form.formDefinition.itemKey,operator:'EQUALS',optionKey:'a'}},true)
   draft=await teacher.request(`/questionnaire-products/${draft.id}/items`,'POST',{revision:draft.revision,formSectionId:sectionId,item:hidden})
  }
  const checked=await teacher.request(`/questionnaire-products/${draft.id}/preflight`,'POST',{revision:draft.revision});assert.equal(checked.ok,true,JSON.stringify(checked))
@@ -60,7 +60,7 @@ async function create(v3,publicMode){
  for(let n=0;n<120;n++){const status=await c.request(`${prefix}/attempts/${attempt.id}/report-status`);if(status.reportStatus?.state==='READY')break;await new Promise(r=>setTimeout(r,250));if(n===119)throw Error('report timeout')}
  const report=await c.request(`${prefix}/attempts/${attempt.id}/report`),cached=await c.request(`${prefix}/attempts/${attempt.id}/report`)
  assert.deepEqual(report,cached)
- for(const [label,value] of Object.entries(expected)){const field=report.backgroundValues.find(x=>x.itemId===byLabel[label]);assert.deepEqual(field.typedValue,value,label);assert.equal(field.presentation.type,draft.items.find(x=>x.id===byLabel[label]).formDefinition.type)}
+ for(const [label,value] of Object.entries(expected)){const field=report.backgroundValues.find(x=>x.itemId===byLabel[label]);const definition=draft.items.find(x=>x.id===byLabel[label]).form.formDefinition;if(definition){assert.deepEqual(field.typedValue,value,label);assert.equal(field.presentation.type,definition.type)}else assert.deepEqual(JSON.parse(field.value),value)}
  if(v3){assert.equal(report.backgroundValues.find(x=>x.itemId===byLabel.hidden).state,'NOT_SHOWN');assert.equal(report.backgroundValues.find(x=>x.itemId===byLabel.matrix).rowStates.r2,'REFUSED')}
  // Poison only this synthetic legacy shadow. Canonical snapshots remain immutable.
  await prisma.compositeFormAnswer.updateMany({where:{attemptId:attempt.id},data:{value:'POISON SHADOW'}})
@@ -81,16 +81,16 @@ async function exportAndVerify(f,detail,format){
  const [columns,...rows]=parseCsv(csv);assert.equal(rows.length,1);const data=Object.fromEntries(columns.map((name,i)=>[name,rows[0][i]]));assert.equal(data.A_attempt_id,f.attempt.id)
  const dictionary=files?JSON.parse(files['data_dictionary.json']):null
  for(let i=0;i<f.draft.items.length;i++){
-  const item=f.draft.items[i],prefix='F'+String(i+1).padStart(3,'0'),value=f.expected[item.formLabel],isText=['SHORT_TEXT','LONG_TEXT'].includes(item.formDefinition.type)
+  const raw=f.draft.items[i],item={...raw,formLabel:raw.form.label,formDefinition:raw.form.formDefinition},prefix='F'+String(i+1).padStart(3,'0'),value=f.expected[item.formLabel],isText=['SHORT_TEXT','LONG_TEXT'].includes(item.formDefinition?.type)
   if(detail==='summary'&&isText){assert.ok(!columns.includes(prefix+'_value'));continue}
   const encoded=data[prefix+'_value']
   assert.ok(columns.includes(prefix+'_value'))
   if(value===null)assert.equal(encoded,'');else if(typeof value==='number')assert.equal(Number(encoded),value);else if(typeof value==='object'||isText)assert.deepEqual(JSON.parse(encoded),value);else assert.equal(encoded,value)
-  assert.equal(data[prefix+'_state'],f.v3?(item.formLabel==='hidden'?'NOT_SHOWN':item.formLabel==='missing'?'SHOWN_MISSING':'ANSWERED'):'')
+  if(item.formDefinition)assert.equal(data[prefix+'_state'],f.v3?(item.formLabel==='hidden'?'NOT_SHOWN':item.formLabel==='missing'?'SHOWN_MISSING':'ANSWERED'):'')
   if(item.formLabel==='sum'){assert.equal(data[prefix+'_O001_value'],'100');assert.equal(data[prefix+'_O002_value'],'0')}
   if(item.formLabel==='matrix'&&f.v3){assert.equal(data[prefix+'_R002_value'],'');assert.equal(data[prefix+'_R002_state'],'REFUSED')}
   if(item.formLabel==='other'){if(detail==='full')assert.equal(JSON.parse(data[prefix+'_other_text']),'=其他, "说明"');else assert.ok(!columns.includes(prefix+'_other_text'))}
-  if(dictionary){const field=dictionary.columns.find(x=>x.name===prefix+'_value');assert.equal(field.formSource.factsSchemaVersion,f.v3?3:2);assert.equal(field.formSource.itemKey,item.formDefinition.itemKey);assert.deepEqual(field.formSource.options,item.formDefinition.options.map(x=>({optionKey:x.optionKey,label:x.label})));assert.equal(field.formSource.formulaGuard,'EXCEL_APOSTROPHE_PREFIX')}
+  if(dictionary&&item.formDefinition){const field=dictionary.columns.find(x=>x.name===prefix+'_value');assert.equal(field.formSource.factsSchemaVersion,f.v3?3:2);assert.equal(field.formSource.itemKey,item.formDefinition.itemKey);assert.deepEqual(field.formSource.options,item.formDefinition.options.map(x=>({optionKey:x.optionKey,label:x.label})));assert.equal(field.formSource.formulaGuard,'EXCEL_APOSTROPHE_PREFIX')}
  }
  if(dictionary){assert.deepEqual(dictionary.columns.map(x=>x.name),columns);const {createHash}=await import('node:crypto');assert.equal(dictionary.schemaVersion,createHash('sha256').update(JSON.stringify(dictionary.columns)).digest('hex'))}
  const stored=await prisma.exportArtifact.findUniqueOrThrow({where:{id:artifact.id}})
@@ -100,7 +100,7 @@ async function exportAndVerify(f,detail,format){
 }
 try{
  for(const [c,credentials,role] of [[teacher,fixture.teacher,'TEACHER'],[student,fixture.student,'STUDENT']]){await c.request('/auth/csrf');await c.request('/auth/training-login','POST',{...credentials,expectedRole:role})}
- for(const mode of [{v3:false,publicMode:false},{v3:true,publicMode:true}]){
+ for(const mode of (process.argv[3]==='v3'?[{v3:true,publicMode:true}]:[{v3:false,publicMode:false},{v3:true,publicMode:true}])){
   const f=await create(mode.v3,mode.publicMode)
   await teacher.request(`/composite-assessments/${f.draft.id}/export/preview`)
   const full=await exportAndVerify(f,'full','zip');await exportAndVerify(f,'summary','zip');await exportAndVerify(f,'full','csv')

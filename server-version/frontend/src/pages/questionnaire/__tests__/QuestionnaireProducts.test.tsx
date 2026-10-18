@@ -269,3 +269,9 @@ describe('C06 stable policy authoring',()=>{
   expect(api.post.mock.calls[0][1]).toMatchObject({revision:9,formSectionId:'section',item:{formPolicy:{version:3,requiredRefusal:'BLOCK_SUBMIT',hiddenRequired:'EXEMPT'},formDefinition:{type:'SHORT_TEXT',textValidation:'EMAIL',displayIf:{itemKey:'q_stable_source',operator:'EQUALS',optionKey:'yes'}}}})
  })
 })
+
+it('shows typed export actions from the actual nested teacher form DTO',async()=>{
+  const row={id:'typed-export',name:'导出问卷',status:'PUBLISHED',revision:1,questionnaireType:'COURSE',questionnaireCourses:[],publicEnabled:false,formSections:[],items:[{id:'number',type:'FORM',position:0,required:false,form:{type:'number',label:'数值',formDefinition:{itemKey:'q_number',type:'NUMBER',prompt:'数值',required:false,options:[],rows:[]}}}]}
+  api.get.mockImplementation(async path=>({code:0,data:path.endsWith('/resources')?{scales:[],cognitive:[],situational:[],courses:[]}:row}))
+  mount('typed-export');expect(await screen.findByRole('button',{name:'完整表单与字段字典（ZIP）'})).toBeTruthy();expect(screen.getByText(/暂不支持 SAV/)).toBeTruthy()
+})

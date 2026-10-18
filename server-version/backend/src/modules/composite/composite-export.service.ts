@@ -278,7 +278,10 @@ export const getExportData = async (
   builder.add('A_context_snapshot_hash', '测评上下文快照哈希', 'string', 64)
 
   const formItems = template.items.filter((item: any) => item.type === 'FORM')
-  const sectionSources = new Map(typedSections.flatMap(section=>section.items.map(item=>[item.id,{sectionKey:section.id,sectionDefinitionHash:canonicalHash(section),factsSchemaVersion:(section.items.some(item=>item.formPolicy!=null)?3:2) as 2|3}] as const)))
+  const sectionSources = new Map(typedSections.flatMap(section=>{
+    const source={sectionKey:section.id,sectionDefinitionHash:canonicalHash(section),factsSchemaVersion:(section.items.some(item=>item.formPolicy!=null)?3:2) as 2|3}
+    return section.items.map(item=>[item.id,source] as const)
+  }))
   const typedColumns = new Map<string,ReturnType<typeof typedFormExportColumns>>()
   formItems.forEach((item: any, index: number) => {
     if(item.formDefinition!=null) {

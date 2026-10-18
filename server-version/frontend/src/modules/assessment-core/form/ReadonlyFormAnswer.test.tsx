@@ -16,6 +16,10 @@ describe('typed frozen read-only Form presentation',()=>{
   expect(screen.getByText('第二行（未显示）')).toBeTruthy();expect(screen.queryByText('secret')).toBeNull()
   expect([...container.querySelectorAll('dd')].map(node=>node.textContent)).toEqual(['甲选项、乙选项','—'])
  })
+ it('keeps row labels and states when every matrix row is refused',()=>{
+  render(<ReadonlyFormAnswer value={null} state="REFUSED" presentation={{type:'MATRIX',options,rows:[{key:'r1',label:'第一行'}]}} rowStates={{r1:'REFUSED'}} />)
+  expect(screen.getByText('第一行（明确拒答）')).toBeTruthy()
+ })
  it.each(['REFUSED','SHOWN_MISSING','NOT_SHOWN'])('does not show a value for %s',state=>{
   const {container}=render(<ReadonlyFormAnswer value="secret" state={state} presentation={{type:'LONG_TEXT',options:[],rows:[]}} />)
   expect(container.textContent).toBe('—')

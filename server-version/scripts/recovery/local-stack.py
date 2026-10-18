@@ -139,8 +139,6 @@ def main():
         }
         if args.export_processing:
             runtime['EXPORT_DIR'] = str(state / 'exports')
-            runtime['HEAVY_PROCESSING_ENABLED'] = 'true'
-            runtime['HEAVY_MAINTENANCE_IDLE_CONFIRMED'] = 'true'
         if args.whole_submit:
             runtime['ASSESSMENT_WHOLE_SUBMIT_ENABLED'] = 'true'
         # This file is private runtime configuration, never a repository artifact.
@@ -153,7 +151,9 @@ def main():
         wait_port(redisport, rp)
         api = start([node, '--require', Path(__file__).with_name('loopback-only.cjs'), 'dist/index.js'], 'api', runtime)
         wait_port(apiport, api)
-        worker = start([node, 'dist/workers/main.js'], 'report-worker', runtime)
+        # Preload the original queue consumer for this isolated export test only;
+        # keep unrelated native image/video consumers disabled. No alternate worker algorithm.
+        worker = start([node, *(['--require', './dist/workers/exportProcessor.js'] if args.export_processing else []), 'dist/workers/main.js'], 'report-worker', runtime)
         for endpoint in ['health', 'ready']:
             with urllib.request.urlopen(f'http://127.0.0.1:{apiport}/{endpoint}', timeout=8) as response:
                 summary['checks'][endpoint] = response.status

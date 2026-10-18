@@ -1,0 +1,468 @@
+{
+  "passed": true,
+  "requests": 61,
+  "checks": [
+    "{\"v3\":true,\"publicMode\":true} canonical report/cache and original queue CSV/ZIP exact values/dictionary/summary/SAV rejection/revoked download"
+  ],
+  "observations": [
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 102,
+      "durationMs": 30
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 131,
+      "responseBytes": 318,
+      "durationMs": 135
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 102,
+      "durationMs": 2
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 131,
+      "responseBytes": 318,
+      "durationMs": 82
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 220,
+      "responseBytes": 1114,
+      "durationMs": 38
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 284,
+      "responseBytes": 2378,
+      "durationMs": 40
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 345,
+      "responseBytes": 3310,
+      "durationMs": 40
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 331,
+      "responseBytes": 4214,
+      "durationMs": 28
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 349,
+      "responseBytes": 5154,
+      "durationMs": 32
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 339,
+      "responseBytes": 6074,
+      "durationMs": 32
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 345,
+      "responseBytes": 7006,
+      "durationMs": 26
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 473,
+      "responseBytes": 8156,
+      "durationMs": 29
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 396,
+      "responseBytes": 9190,
+      "durationMs": 27
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 477,
+      "responseBytes": 10386,
+      "durationMs": 29
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 485,
+      "responseBytes": 11600,
+      "durationMs": 29
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 411,
+      "responseBytes": 12665,
+      "durationMs": 27
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 373,
+      "responseBytes": 13654,
+      "durationMs": 34
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 322,
+      "responseBytes": 14541,
+      "durationMs": 45
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 339,
+      "responseBytes": 15462,
+      "durationMs": 42
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 393,
+      "responseBytes": 16491,
+      "durationMs": 33
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 472,
+      "responseBytes": 17640,
+      "durationMs": 31
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 515,
+      "responseBytes": 18875,
+      "durationMs": 32
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 439,
+      "responseBytes": 19996,
+      "durationMs": 32
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 15,
+      "responseBytes": 413,
+      "durationMs": 26
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 15,
+      "responseBytes": 20022,
+      "durationMs": 75
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 52,
+      "responseBytes": 208,
+      "durationMs": 11
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 2,
+      "responseBytes": 31193,
+      "durationMs": 44
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 52,
+      "responseBytes": 31133,
+      "durationMs": 24
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 12666,
+      "responseBytes": 364,
+      "durationMs": 44
+    },
+    {
+      "kind": "accepted-storage",
+      "v3": true,
+      "bytes": 26534
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 12666,
+      "responseBytes": 285,
+      "durationMs": 15
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 380,
+      "durationMs": 6
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 398,
+      "durationMs": 7
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 27474,
+      "durationMs": 7
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 27474,
+      "durationMs": 5
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 37905,
+      "durationMs": 30
+    },
+    {
+      "method": "POST",
+      "status": 400,
+      "requestBytes": 32,
+      "responseBytes": 107,
+      "durationMs": 5
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 32,
+      "responseBytes": 490,
+      "durationMs": 18
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 437,
+      "durationMs": 9
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 437,
+      "durationMs": 9
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 437,
+      "durationMs": 13
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 437,
+      "durationMs": 10
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 437,
+      "durationMs": 10
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 446,
+      "durationMs": 12
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 77177,
+      "durationMs": 15
+    },
+    {
+      "kind": "artifact",
+      "format": "zip",
+      "detail": "full",
+      "downloadBytes": 77121,
+      "csvBytes": 13206,
+      "storageBytes": 77121,
+      "fields": 53
+    },
+    {
+      "method": "POST",
+      "status": 400,
+      "requestBytes": 35,
+      "responseBytes": 107,
+      "durationMs": 4
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 35,
+      "responseBytes": 490,
+      "durationMs": 14
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 437,
+      "durationMs": 8
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 437,
+      "durationMs": 10
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 437,
+      "durationMs": 11
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 437,
+      "durationMs": 9
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 446,
+      "durationMs": 11
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 54506,
+      "durationMs": 12
+    },
+    {
+      "kind": "artifact",
+      "format": "zip",
+      "detail": "summary",
+      "downloadBytes": 54440,
+      "csvBytes": 1006,
+      "storageBytes": 54440,
+      "fields": 44
+    },
+    {
+      "method": "POST",
+      "status": 400,
+      "requestBytes": 32,
+      "responseBytes": 107,
+      "durationMs": 10
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 32,
+      "responseBytes": 490,
+      "durationMs": 15
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 437,
+      "durationMs": 7
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 437,
+      "durationMs": 10
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 437,
+      "durationMs": 9
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 437,
+      "durationMs": 9
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 446,
+      "durationMs": 11
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 13206,
+      "durationMs": 9
+    },
+    {
+      "kind": "artifact",
+      "format": "csv",
+      "detail": "full",
+      "downloadBytes": 13206,
+      "csvBytes": 13206,
+      "storageBytes": 13206,
+      "fields": 53
+    },
+    {
+      "method": "GET",
+      "status": 404,
+      "requestBytes": 0,
+      "responseBytes": 51,
+      "durationMs": 5
+    }
+  ]
+}

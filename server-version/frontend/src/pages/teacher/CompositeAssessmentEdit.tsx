@@ -279,12 +279,12 @@ const CompositeAssessmentEdit: React.FC = () => {
             {isDraft && <button onClick={() => void publish()} className="hui-button hui-button--primary"><Send className="w-4 h-4" aria-hidden="true" />发布</button>}
             <button onClick={() => navigate(`/composite-assessments/${id}/results`)} className="hui-button hui-button--secondary">查看结果</button>
             <button disabled={exporting} onClick={() => void exportData('summary')} className="hui-button hui-button--secondary"><Download className="w-4 h-4" aria-hidden="true" />{exporting ? '正在导出…' : '导出摘要'}</button>
-            {detail.items?.some((item:{formDefinition?:unknown})=>item.formDefinition!=null) && <button disabled={exporting} onClick={() => void exportData('full', 'zip')} className="hui-button hui-button--secondary">完整表单与字段字典（ZIP）</button>}
+            {detail.items?.some((item:{form?:{formDefinition?:unknown}})=>item.form?.formDefinition!=null) && <button disabled={exporting} onClick={() => void exportData('full', 'zip')} className="hui-button hui-button--secondary">完整表单与字段字典（ZIP）</button>}
             <button disabled={exporting} onClick={() => void exportData('summary', 'zip')} className="hui-button hui-button--secondary">摘要与字段字典（ZIP）</button>
           </div>
         )}
       />
-      {detail.items?.some((item:{formDefinition?:unknown})=>item.formDefinition!=null) && <p className="mb-4 text-sm text-gray-600">高级表单支持 CSV/ZIP，暂不支持 SAV。摘要不包含自由文本及其他说明；完整导出包含这些回答。ZIP 字典说明冻结题目、选项、四态和文本公式防护。</p>}
+      {detail.items?.some((item:{form?:{formDefinition?:unknown}})=>item.form?.formDefinition!=null) && <p className="mb-4 text-sm text-gray-600">高级表单支持 CSV/ZIP，暂不支持 SAV。摘要不包含自由文本及其他说明；完整导出包含这些回答。ZIP 字典说明冻结题目、选项、四态和文本公式防护。</p>}
       {error && <p className="text-red-500 mb-4">{error}</p>}
       {exportNotice && <p role="status" className="mb-4">{exportNotice}</p>}
       {detail.canSetCopyable && (

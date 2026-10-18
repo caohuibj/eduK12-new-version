@@ -1,0 +1,176 @@
+{
+  "passed": false,
+  "requests": 24,
+  "checks": [],
+  "observations": [
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 102,
+      "durationMs": 35
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 131,
+      "responseBytes": 318,
+      "durationMs": 128
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 102,
+      "durationMs": 2
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 131,
+      "responseBytes": 318,
+      "durationMs": 82
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 182,
+      "responseBytes": 1093,
+      "durationMs": 38
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 198,
+      "responseBytes": 2185,
+      "durationMs": 40
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 204,
+      "responseBytes": 3292,
+      "durationMs": 32
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 190,
+      "responseBytes": 4371,
+      "durationMs": 30
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 208,
+      "responseBytes": 5486,
+      "durationMs": 32
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 196,
+      "responseBytes": 6577,
+      "durationMs": 30
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 202,
+      "responseBytes": 7680,
+      "durationMs": 32
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 175,
+      "responseBytes": 8589,
+      "durationMs": 29
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 255,
+      "responseBytes": 9798,
+      "durationMs": 62
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 316,
+      "responseBytes": 11129,
+      "durationMs": 31
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 344,
+      "responseBytes": 12517,
+      "durationMs": 34
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 270,
+      "responseBytes": 13758,
+      "durationMs": 32
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 232,
+      "responseBytes": 14923,
+      "durationMs": 35
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 181,
+      "responseBytes": 15986,
+      "durationMs": 31
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 198,
+      "responseBytes": 17083,
+      "durationMs": 31
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 252,
+      "responseBytes": 18288,
+      "durationMs": 32
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 15,
+      "responseBytes": 413,
+      "durationMs": 19
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 15,
+      "responseBytes": 18314,
+      "durationMs": 38
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 2,
+      "responseBytes": 22003,
+      "durationMs": 41
+    },
+    {
+      "method": "POST",
+      "status": 400,
+      "requestBytes": 11750,
+      "responseBytes": 174,
+      "durationMs": 5
+    }
+  ],
+  "error": "AssertionError [ERR_ASSERTION]: POST /composite-assessments/attempts/8f7802b7-9dea-403a-9f59-7cd3ef51cad5/form-sections/34f2e25b-0f0f-47f1-8a99-197aa40402f5/submit: {\"code\":-1,\"message\":\"Required; Required; Required; Required; Required; Required; Required; Required; Required; Required; Required; Required; Required; Required\",\"data\":null}\n\n400 !== 200\n"
+}
