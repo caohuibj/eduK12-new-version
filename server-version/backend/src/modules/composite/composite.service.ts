@@ -1921,6 +1921,13 @@ export const prepareCompositePublication = async (userId: string, role: UserRole
     }
   }
 
+  // New policy sections must remain contiguous after authoring/reorder/import.
+  const orderedPolicyItems = [...composite.items].sort((a,b)=>a.position-b.position)
+  for (const section of composite.formSections ?? []) {
+    if (!section.items.some((item:any)=>item.formPolicy != null)) continue
+    const indices = orderedPolicyItems.flatMap((item,index)=>item.formSectionId===section.id?[index]:[])
+    if (indices.length && indices[indices.length-1]-indices[0]+1!==indices.length) throw compositeBadRequest('同一 V3 表单区段的字段必须连续，不能跨越其他内容')
+  }
   for (const section of composite.formSections ?? []) validateTypedCompositeSectionDefinition(compositeFormSectionRuntimeDefinition(section).items)
 
   const hasPackageKey = Boolean(composite.reportPackageKey)

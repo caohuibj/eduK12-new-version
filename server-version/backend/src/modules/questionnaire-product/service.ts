@@ -119,6 +119,11 @@ export async function addItem(actor: Actor, id: string, raw: unknown) {
     const itemId = randomUUID()
     const targetSection = formSectionId ? row.formSections.find((section:any)=>section.id===formSectionId) : null
     if (formSectionId && (item.type!=='FORM' || !targetSection || targetSection.contextSection || item.contextKey)) throw compositeBadRequest('只能加入当前草稿已有的普通表单区段')
+    if (targetSection) {
+      const ordered = [...row.items].sort((a:any,b:any)=>a.position-b.position)
+      const start = ordered.findIndex((value:any)=>value.formSectionId===targetSection.id)
+      if (start < 0 || ordered.slice(start).some((value:any)=>value.formSectionId!==targetSection.id)) throw compositeBadRequest('只能追加到末尾连续表单区段；请创建新区段，不能跨越后续内容')
+    }
     await tx.compositeAssessmentItem.create({ data: {
       id: itemId,
       ...(targetSection ? {formSectionId:targetSection.id, formSectionPosition:Math.max(-1,...targetSection.items.map((child:any)=>child.formSectionPosition??child.position))+1}: {}),

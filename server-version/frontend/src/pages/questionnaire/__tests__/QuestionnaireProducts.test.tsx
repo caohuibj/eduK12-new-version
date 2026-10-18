@@ -259,7 +259,7 @@ describe('C05 incomplete single question stays editable', () => {
 describe('C06 stable policy authoring',()=>{
  it('adds a conditional question to the chosen existing section using its stable source key',async()=>{
   vi.resetAllMocks()
-  const source={id:'db-source',formType:'single_choice',formLabel:'先前选择',formDefinition:{itemKey:'q_stable_source',type:'SINGLE',options:[{optionKey:'yes',label:'是'},{optionKey:'no',label:'否'}]}}
+  const source={id:'db-source',position:0,formSectionId:'section',formType:'single_choice',formLabel:'先前选择',formDefinition:{itemKey:'q_stable_source',type:'SINGLE',options:[{optionKey:'yes',label:'是'},{optionKey:'no',label:'否'}]}}
   const row={name:'策略问卷',status:'DRAFT',revision:9,questionnaireType:'COURSE',questionnaireCourses:[],items:[source],formSections:[{id:'section',title:'连续表单',items:[source],contextSection:false}],publicEnabled:false}
   api.get.mockImplementation(async path=>({code:0,data:path.endsWith('/resources')?{scales:[],cognitive:[],situational:[],courses:[]}:row}));api.post.mockResolvedValue({code:0,data:{...row,revision:10}})
   mount('policy');await screen.findByDisplayValue('策略问卷');const user=userEvent.setup()
