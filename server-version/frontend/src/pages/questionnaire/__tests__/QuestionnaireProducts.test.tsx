@@ -170,3 +170,37 @@ describe('questionnaire draft feedback', () => {
   })
 
 })
+
+describe('C04 typed authoring', () => {
+  it.each(['number', 'long_text', 'date', 'time'])('creates %s using the public Form definition without a client itemKey', async type => {
+    vi.resetAllMocks()
+    const row = { name: '基础题型', status: 'DRAFT', revision: 4, questionnaireType: 'COURSE', questionnaireCourses: [], items: [], formSections: [], publicEnabled: false }
+    api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? { scales: [], cognitive: [], situational: [], courses: [] } : row }))
+    api.post.mockResolvedValue({ code: 0, data: { ...row, revision: 5 } })
+    mount('typed')
+    await screen.findByDisplayValue('基础题型')
+    const user = userEvent.setup()
+    await user.selectOptions(screen.getByLabelText('测评类型'), 'FORM')
+    await user.type(screen.getByLabelText('题目文字'), '合成题')
+    await user.selectOptions(screen.getByLabelText('题型'), type)
+    await user.click(screen.getByLabelText('必填'))
+    if (type === 'number') {
+      await user.type(screen.getByLabelText('最小值'), '0')
+      await user.type(screen.getByLabelText('最大值'), '100')
+      await user.type(screen.getByLabelText('最大小数位（留空表示不限制）'), '2')
+    }
+    if (type === 'time') await user.selectOptions(screen.getByLabelText('时间时区'), 'UTC')
+    if (type === 'long_text') await user.type(screen.getByLabelText('字数上限'), '500')
+    await user.click(screen.getByRole('button', { name: '添加到测评' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalled())
+    const [url, body] = api.post.mock.calls[0]
+    expect(url).toBe('/questionnaire-products/typed/items')
+    expect(body.revision).toBe(4)
+    expect(body.item).toMatchObject({ type: 'FORM', formType: type, formLabel: '合成题', required: false, contextKey: null,
+      formDefinition: { type: type.toUpperCase(), prompt: '合成题', required: false, options: [], rows: [] } })
+    expect(body.item.formDefinition).not.toHaveProperty('itemKey')
+    if (type === 'number') expect(body.item.formDefinition).toMatchObject({ min: 0, max: 100, precision: 2 })
+    if (type === 'time') expect(body.item.formDefinition.timeZone).toBe('UTC')
+    if (type === 'long_text') expect(body.item.formDefinition.maxLength).toBe(500)
+  })
+})

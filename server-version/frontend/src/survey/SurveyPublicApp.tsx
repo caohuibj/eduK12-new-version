@@ -1,3 +1,4 @@
+import { BasicFormAnswer } from '../modules/assessment-core/form/BasicFormAnswer'
 import { cleanupExpiredSurveyCognitiveDrafts } from './survey-cognitive-retention'
 import { clearSurveyCognitiveSessions,rememberSurveyCognitiveSession } from './survey-cognitive-local'
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
@@ -183,20 +184,13 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purp
           onChange={()=>onChange(q.itemKey+':'+row.rowKey,refusal())}/></td>}</tr>)}</tbody></table></div>}
       {['DATE','TIME','RANK_ORDER','SLIDER','CONSTANT_SUM','MATRIX_MULTIPLE'].includes(q.type)&&
         <ProfessionalFormAnswer question={q} answers={answer} prefix={unit.instrumentKey} onAnswer={onChange}/>}
-      {q.type==='NUMBER'&&<input className="input block w-full" type="number" min={q.min} max={q.max} step={q.step??(q.integerOnly?1:'any')}
-        aria-label={q.prompt} value={isRefusal(answer[q.itemKey])?'':String(answer[q.itemKey]??'')}
-        disabled={isRefusal(answer[q.itemKey])}
-        onChange={e=>onChange(q.itemKey,e.target.value===''?null:Number(e.target.value))}/>}
+      {q.type==='NUMBER'&&<BasicFormAnswer question={{...q,prompt:q.prompt||'数值回答'}} className="input block w-full" value={typeof answer[q.itemKey]==='number'?answer[q.itemKey] as number:null} disabled={isRefusal(answer[q.itemKey])} onChange={value=>onChange(q.itemKey,value)}/>}
       {q.allowRefusal&&!['MATRIX','MATRIX_MULTIPLE'].includes(q.type)&&<label className="block my-3 text-sm">
         <input type="checkbox" checked={isRefusal(answer[q.itemKey])}
           onChange={e=>onChange(q.itemKey,e.target.checked?refusal():null)}/>
         我选择不回答这一题（REFUSED）
       </label>}
-      {['SHORT_TEXT','LONG_TEXT'].includes(q.type)&&<textarea className="input block w-full" aria-label={q.prompt}
-        rows={q.type==='SHORT_TEXT'?2:5} maxLength={q.maxLength??(q.type==='SHORT_TEXT'?300:10000)}
-        value={isRefusal(answer[q.itemKey])?'':String(answer[q.itemKey]??'')}
-        disabled={isRefusal(answer[q.itemKey])}
-        onChange={e=>onChange(q.itemKey,e.target.value)}/>}
+      {['SHORT_TEXT','LONG_TEXT'].includes(q.type)&&<BasicFormAnswer question={{...q,prompt:q.prompt||'文本回答'}} value={typeof answer[q.itemKey]==='string'?answer[q.itemKey] as string:null} disabled={isRefusal(answer[q.itemKey])} onChange={value=>onChange(q.itemKey,value)}/>}
     </fieldset>
   }
   return <section className="border rounded-xl bg-slate-50 p-4 my-5">

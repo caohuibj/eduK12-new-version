@@ -289,3 +289,26 @@ describe('durable submission confirmation', () => {
     expect(await finalDraftStore.get('composite-scale:composite-scale-assessment-1')).toBeNull()
   })
 })
+
+describe('C04 typed FINAL persistence', () => {
+  it.each([false, true])('restores numeric zero and retries the identical sealed typed payload (public=%s)', async publicMode => {
+    const q = { itemKey: 'q_typed', type: 'NUMBER' as const, prompt: '数值事实', required: true, options: [], rows: [], min: 0, max: 10 }
+    const current: CompositeCurrentItem = { ...formItem, formAnswers: [{ ...formItem.formAnswers![0], required: true, type: 'number', label: q.prompt, formDefinition: q, value: 0 }] }
+    const submit = vi.fn().mockRejectedValueOnce(new Error('暂时断线')).mockResolvedValue({ code: 0 })
+    const props = { ...sharedProps, state: makeState(current), publicMode, recoveryToken: publicMode ? 'synthetic-recovery-token' : undefined, submitFormSection: submit, submitScale: vi.fn() }
+    const first = render(<FinalCompositeAssessment {...props} />)
+    expect(await screen.findByRole('spinbutton', { name: q.prompt })).toHaveValue(0)
+    await waitFor(() => expect(screen.getByRole('button', { name: '提交整个区段' })).toBeEnabled())
+    await userEvent.click(screen.getByRole('button', { name: '提交整个区段' }))
+    await waitFor(() => expect(submit).toHaveBeenCalledTimes(1))
+    const payload = submit.mock.calls[0][2]
+    expect(payload.answers).toEqual([{ formItemId: 'form-item-1', value: 0 }])
+    first.unmount()
+    render(<FinalCompositeAssessment {...props} />)
+    await waitFor(() => expect(screen.getByRole('button', { name: '提交整个区段' })).toBeEnabled())
+    expect(screen.getByRole('spinbutton', { name: q.prompt })).toHaveValue(0)
+    await userEvent.click(screen.getByRole('button', { name: '提交整个区段' }))
+    await waitFor(() => expect(submit).toHaveBeenCalledTimes(2))
+    expect(submit.mock.calls[1][2]).toEqual(payload)
+  })
+})

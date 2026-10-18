@@ -29,7 +29,7 @@ import {
 } from '../modules/scale/device-input-provenance'
 
 type ResponseValue = string | number
-type FormValue = string | string[] | null
+type FormValue = string | number | string[] | null
 type FormOption = { value: string; label: string; images?: unknown; video?: unknown }
 
 export interface FinalCompositeAssessmentProps {
@@ -290,6 +290,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
       options: answer.options || null,
       required: answer.required !== false,
       contextKey: answer.contextKey || null,
+      formDefinition: answer.formDefinition,
       value: answer.value ?? null,
     }))
     const missing = formAnswers.filter((answer) => answer.required && emptyValue(formValues[answer.formItemId]))
@@ -561,6 +562,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
                       label: field.label,
                       placeholder: field.placeholder,
                       required: Boolean(field.required),
+                      formDefinition: field.formDefinition,
                     }}
                     allowSkip
                     options={options}

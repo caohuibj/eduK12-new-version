@@ -1,6 +1,8 @@
+import { BasicFormAnswer } from '../../modules/assessment-core/form/BasicFormAnswer'
+import type { FormQuestion } from '../../modules/assessment-core/form/types'
 import type { ChangeEvent } from 'react'
 
-export type FormPlayerValue = string | string[] | null
+export type FormPlayerValue = string | number | string[] | null
 
 export interface FormPlayerOption {
   value: string
@@ -13,6 +15,7 @@ export interface FormPlayerItem {
   label: string
   placeholder?: string | null
   required: boolean
+  formDefinition?: FormQuestion<never> | null
 }
 
 export interface FormPlayerProps {
@@ -174,7 +177,18 @@ export function FormPlayer({
         </div>
       ) : null}
 
-      {(item.type === 'fill_blank' || item.type === 'text_input' || !['single_choice', 'multiple_choice', 'year_month'].includes(item.type)) ? (
+      {item.formDefinition && ['NUMBER', 'LONG_TEXT', 'DATE', 'TIME'].includes(item.formDefinition.type) ? (
+        <div>
+          <label htmlFor={inputId(item.id)} className="mb-3 block text-lg font-semibold text-slate-900">{prompt}</label>
+          <BasicFormAnswer question={item.formDefinition} id={inputId(item.id)}
+            value={typeof value === 'string' || typeof value === 'number' ? value : null}
+            disabled={answerControlsDisabled} describedBy={describedBy} invalid={Boolean(errorMessage)}
+            placeholder={item.placeholder || '请输入'} onChange={next => void onChange(next)}
+            className="min-h-11 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-200 disabled:bg-slate-100" />
+        </div>
+      ) : null}
+
+      {(!item.formDefinition && (item.type === 'fill_blank' || item.type === 'text_input' || !['single_choice', 'multiple_choice', 'year_month'].includes(item.type))) ? (
         <div>
           <label htmlFor={inputId(item.id)} className="mb-3 block text-lg font-semibold text-slate-900">{prompt}</label>
           <textarea

@@ -1,3 +1,4 @@
+import { BasicFormAnswer } from '../modules/assessment-core/form/BasicFormAnswer'
 import { useEffect, useRef, useState } from 'react'
 import type { ResearchDraft, FormDraft, ScaleDraft, SjtDraft, FormQuestion, SurveyImage } from './builder.types'
 import { visibleFormKeys,sanitizeFormAnswers } from './form-visibility'
@@ -89,22 +90,14 @@ export function ResearchPreview({draft,onSimulate,onValidateForm,errorPath,initi
             aria-label={'不愿回答：'+row.label} name={q.itemKey+':'+row.rowKey}
             checked={isRefusal(answers[q.itemKey+':'+row.rowKey])}
             onChange={()=>choose(q.itemKey+':'+row.rowKey,refusal())}/></td>}</tr>)}</tbody></table></div>}
-      {['SHORT_TEXT','LONG_TEXT'].includes(q.type)&&<textarea className="input block w-full"
-        aria-label={q.prompt||'文本回答'} rows={q.type==='SHORT_TEXT'?1:4}
-        value={isRefusal(answers[q.itemKey])?'':String(answers[q.itemKey]??'')}
-        disabled={isRefusal(answers[q.itemKey])}
-        onChange={e=>choose(q.itemKey,e.target.value)}/>}
+      {['SHORT_TEXT','LONG_TEXT'].includes(q.type)&&<BasicFormAnswer question={{...q,prompt:q.prompt||'文本回答'}} rows={q.type==='SHORT_TEXT'?1:4} value={typeof answers[q.itemKey]==='string'?answers[q.itemKey] as string:null} disabled={isRefusal(answers[q.itemKey])} onChange={value=>choose(q.itemKey,value)}/>}
       {q.allowRefusal&&!['MATRIX','MATRIX_MULTIPLE'].includes(q.type)&&<label className="flex gap-2 items-center text-sm">
         <input type="checkbox" checked={isRefusal(answers[q.itemKey])}
           onChange={e=>choose(q.itemKey,e.target.checked?refusal():null)}/>不愿回答（独立于未作答）
       </label>}
       {['DATE','TIME','RANK_ORDER','SLIDER','CONSTANT_SUM','MATRIX_MULTIPLE'].includes(q.type)&&
         <ProfessionalFormAnswer question={q} answers={answers} prefix="preview" onAnswer={choose}/>}
-      {q.type==='NUMBER'&&<input className="input block" aria-label={q.prompt||'数值回答'}
-        type="number" min={q.min} max={q.max} step={q.step??(q.integerOnly?1:'any')}
-        value={isRefusal(answers[q.itemKey])?'':String(answers[q.itemKey]??'')}
-        disabled={isRefusal(answers[q.itemKey])}
-        onChange={e=>choose(q.itemKey,e.target.value===''?null:Number(e.target.value))}/>}
+      {q.type==='NUMBER'&&<BasicFormAnswer question={{...q,prompt:q.prompt||'数值回答'}} className="input block" value={typeof answers[q.itemKey]==='number'?answers[q.itemKey] as number:null} disabled={isRefusal(answers[q.itemKey])} onChange={value=>choose(q.itemKey,value)}/>}
     </fieldset>
   }
   return <section className="border rounded-xl p-4 bg-slate-50 space-y-3" aria-label="研究工具试答预览">

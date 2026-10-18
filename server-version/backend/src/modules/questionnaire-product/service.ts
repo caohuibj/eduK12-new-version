@@ -115,7 +115,10 @@ export async function addItem(actor: Actor, id: string, raw: unknown) {
     await assertValidItem(item, actor.userId, actor.role, row, tx)
     if (row.items.length >= 500) throw compositeBadRequest('问卷最多包含 500 个内容项')
     const position = Math.max(-1, ...row.items.map((v: any) => v.position), ...row.formSections.map((v: any) => v.position)) + 1
+    const itemId = randomUUID()
     await tx.compositeAssessmentItem.create({ data: {
+      id: itemId,
+      ...(item.type === 'FORM' && item.formDefinition ? { formDefinition: { ...item.formDefinition, itemKey: 'q_' + itemId } as Prisma.InputJsonValue } : {}),
       compositeAssessmentId: id, type: item.type, position, required: item.required,
       scaleId: item.type === 'SCALE' ? item.scaleId : null, cognitiveAssignmentId: item.type === 'COGNITIVE' ? item.cognitiveAssignmentId : null,
       situationalInstrumentKey: item.type === 'SITUATIONAL' ? item.situationalInstrumentKey : null,

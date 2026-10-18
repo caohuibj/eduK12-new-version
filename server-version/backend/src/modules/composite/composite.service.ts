@@ -19,7 +19,7 @@ import { loadFrozenCompositeProgress, loadFrozenMeasurementFinalHeaders } from '
 import { resolveSituationalScientificMaturity } from '../situational/scientific-maturity'
 import { frozenSituationalScientificProjection } from '../situational/onboarding/scientific-schema'
 import { decryptFrozenSituationalRuntimeSnapshot } from '../assessment-runtime/situational-runtime-snapshot'
-import { randomBytes } from 'crypto'
+import { randomBytes, randomUUID } from 'crypto'
 import { nanoid } from 'nanoid'
 import { Prisma, UserRole } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -569,7 +569,7 @@ export const assertValidItem = async (
     if (!input.formType || !input.formLabel || supplied !== 1) {
       throw compositeBadRequest('表单模块必须提供 formType 和 formLabel')
     }
-    if ((input as any).formDefinition != null) typedCompositeFormQuestion({ ...input, id: 'new', formDefinition: (input as any).formDefinition, placeholder: input.formPlaceholder ?? null, contextKey: input.contextKey ?? null, position: input.position ?? 0, formSectionPosition: null } as any)
+    if ((input as any).formDefinition != null) typedCompositeFormQuestion({ ...input, id: 'new', formDefinition: { itemKey: 'q_new', ...(input as any).formDefinition }, placeholder: input.formPlaceholder ?? null, contextKey: input.contextKey ?? null, position: input.position ?? 0, formSectionPosition: null } as any)
     if (input.formType === 'single_choice' || input.formType === 'multiple_choice') {
       const options = input.formOptions ?? []
       const values = options.map((option) => option.value)
@@ -1536,7 +1536,7 @@ export const setCompositeReportPackage = async (
 
 export const addItem = async (userId: string, role: UserRole, compositeId: string, input: AddCompositeItemInput) => {
   assertTeacher(role)
-  if (input.required !== true) throw compositeBadRequest('新增加的综合测评模块必须为必答模块')
+  if (input.required !== true && !(input.type === 'FORM' && input.formDefinition)) throw compositeBadRequest('新增加的综合测评模块必须为必答模块')
   // Atomic materialize-on-write: the item create and its section assignment
   // share one transaction so a crash can never leave an orphan FORM module
   // that GET/start/publish would otherwise have to lazily repair.
@@ -1549,8 +1549,10 @@ export const addItem = async (userId: string, role: UserRole, compositeId: strin
     await assertValidItem(input, userId, role, composite, tx)
     const position = input.position ?? Math.max(-1, ...composite.items.map((item: any) => item.position), ...(composite.formSections ?? []).map((section: any) => section.position)) + 1
     if (composite.items.some((item: any) => item.position === position)) throw compositeConflict('模块排序位置已存在')
+    const itemId = randomUUID()
     const created = await tx.compositeAssessmentItem.create({
       data: {
+        id: itemId,
         compositeAssessmentId: compositeId,
         type: input.type,
         position,
@@ -1560,6 +1562,7 @@ export const addItem = async (userId: string, role: UserRole, compositeId: strin
         situationalInstrumentKey: input.type === 'SITUATIONAL' ? input.situationalInstrumentKey : null,
         situationalInstrumentVersion: input.type === 'SITUATIONAL' ? input.situationalInstrumentVersion : null,
         formType: input.type === 'FORM' ? input.formType : null,
+        ...(input.type === 'FORM' && input.formDefinition ? { formDefinition: { ...input.formDefinition, itemKey: 'q_' + itemId } as Prisma.InputJsonValue } : {}),
         formLabel: input.type === 'FORM' ? input.formLabel : null,
         formPlaceholder: input.type === 'FORM' ? input.formPlaceholder ?? null : null,
         formOptions: input.type === 'FORM' ? (input.formOptions as any) ?? null : null,

@@ -1,3 +1,5 @@
+import { BasicFormConstraints } from '../../modules/assessment-core/form/BasicFormConstraints'
+import type { FormQuestion } from '../../modules/assessment-core/form/types'
 import { isTrainingHost } from '../../training/context'
 import '../../training/training-form-surface.css'
 import { apiErrorMessage } from '../../utils/apiErrorMessage'
@@ -191,6 +193,8 @@ export function QuestionnaireProductEdit() {
     }
   }, [location.hash, hasDetail, id])
   const [formType, setFormType] = useState('text_input')
+  const [formConstraints, setFormConstraints] = useState<Partial<FormQuestion<never>>>({})
+  const typedFormType = ({ number: 'NUMBER', long_text: 'LONG_TEXT', date: 'DATE', time: 'TIME' } as const)[formType as 'number' | 'long_text' | 'date' | 'time']
   const [options, setOptions] = useState('')
   const [contextKey, setContext] = useState('')
   const [required, setRequired] = useState(true)
@@ -320,6 +324,7 @@ export function QuestionnaireProductEdit() {
         Object.assign(item, {
           formLabel,
           formType,
+          ...(typedFormType ? { formDefinition: { ...formConstraints, type: typedFormType, prompt: formLabel, required, options: [], rows: [], ...(typedFormType === 'TIME' ? { timeZone: formConstraints.timeZone ?? 'Asia/Shanghai' } : {}) } } : {}),
           contextKey: contextKey || null,
           formOptions: ['single_choice', 'multiple_choice'].includes(formType)
             ? parseDelimitedOptions(options)
@@ -746,7 +751,7 @@ export function QuestionnaireProductEdit() {
                           aria-label="题型"
                           className="input ml-2 max-w-full"
                           value={formType}
-                          onChange={(e) => setFormType(e.target.value)}
+                          onChange={(e) => { setFormType(e.target.value); setFormConstraints({}); if (['number', 'long_text', 'date', 'time'].includes(e.target.value)) setContext('') }}
                         >
                           {[
                             'text_input',
@@ -754,6 +759,7 @@ export function QuestionnaireProductEdit() {
                             'single_choice',
                             'multiple_choice',
                             'year_month',
+                            'number', 'long_text', 'date', 'time',
                           ].map((t) => (
                             <option key={t} value={t}>
                               {
@@ -764,6 +770,7 @@ export function QuestionnaireProductEdit() {
                                     single_choice: '单选',
                                     multiple_choice: '多选',
                                     year_month: '年月',
+                                    number: '数值', long_text: '长文本', date: '日期', time: '时间',
                                   } as any
                                 )[t]
                               }
@@ -771,6 +778,7 @@ export function QuestionnaireProductEdit() {
                           ))}
                         </select>
                       </label>
+                      {typedFormType && <BasicFormConstraints question={{ ...formConstraints, type: typedFormType }} onChange={patch => setFormConstraints(previous => ({ ...previous, ...patch }))} />}
                       {['single_choice', 'multiple_choice'].includes(
                         formType,
                       ) && (
