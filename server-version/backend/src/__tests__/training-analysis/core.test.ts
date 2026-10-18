@@ -283,3 +283,45 @@ describe('Training longitudinal research tables', () => {
     failure(() => buildTrainingAnalysisTables(selected, { ...source(), observations: [] }), 'TRAINING_ANALYSIS_LIMIT_EXCEEDED', 413)
   })
 })
+
+
+describe('material arm identity in the numeric kernel', () => {
+  const materialSource = (groups: string[]) => {
+    const req = request(), data = source()
+    req.waves.forEach((wave, index) => {wave.materialGroupKey = groups[index]})
+    data.observations.forEach(row => {row.materialGroupKey = groups[Number(row.waveKey.slice(1)) - 1]})
+    return {req, data}
+  }
+  it.each([['a', 'a'], ['a', 'b']])('compares explicitly selected conditions %s / %s with unchanged statistics', (left, right) => {
+    const {req, data} = materialSource([left, right])
+    const actual = buildTrainingAnalysis(req, data)
+    expect(actual.metrics[0].comparisons?.[0].delta).toBe(2)
+    expect(actual.descriptives.map(row => row.materialGroupKey)).toEqual([left, right])
+    const tables = buildTrainingAnalysisTables(req, data)
+    expect(tables.long.columns).toContain('materialGroupKey')
+    expect(tables.dictionary.columns).toContain('materialGroupKey')
+    expect(tables.long.rows.map(row => row.materialGroupKey)).toContain(right)
+    expect(buildTrainingDictionary(req, data).map(row => row.materialGroupKey)).toEqual([left, right])
+  })
+  it('rejects missing or mixed observation arm bindings', () => {
+    const {req, data} = materialSource(['a', 'a'])
+    delete data.observations[0].materialGroupKey
+    expect(() => buildTrainingAnalysis(req, data)).toThrow(/outside/)
+    data.observations[0].materialGroupKey = 'b'
+    expect(() => buildTrainingAnalysis(req, data)).toThrow(/outside/)
+  })
+  it('rejects pooled material observations under an ungrouped selector and mixed C14 identities', () => {
+    const {req, data} = materialSource(['a', 'a'])
+    delete req.waves[0].materialGroupKey
+    expect(() => buildTrainingAnalysis(req, data)).toThrow(/outside/)
+    req.waves[0].materialGroupKey = 'a'; req.waves[0].configDigest = 'digest'; req.waves[0].variantKey = 'variant'
+    expect(() => buildTrainingAnalysis(req, data)).toThrow(/identity/)
+  })
+  it('keeps legacy dictionary hashes, DTO keys and CSV headers unchanged', () => {
+    const req = request(), data = source(), dictionary = buildTrainingDictionary(req, data)
+    expect(dictionary.every(row => !Object.hasOwn(row, 'materialGroupKey'))).toBe(true)
+    const tables = buildTrainingAnalysisTables(req, data)
+    expect(tables.long.columns).not.toContain('materialGroupKey')
+    expect(tables.dictionary.columns).not.toContain('materialGroupKey')
+  })
+})

@@ -287,7 +287,7 @@ export const getExportData = async (
   builder.add('A_context_snapshot_hash', '测评上下文快照哈希', 'string', 64)
   if((template as any).trainingFlowFrozen!=null){
     for(const [key,label]of [['config_digest','流程配置摘要'],['path_hash','接受事实路径摘要'],['termination','结束原因'],['task_satisfaction','课程任务满足状态']])builder.add(`P_${key}`,label,'string',80)
-    if(template.trainingFlowFrozen?.schemaVersion===2)for(const [key,label]of [['assignment_hash','材料分配摘要'],['group_key','材料实验组'],['material_digest','已分配材料摘要']])builder.add(`M_${key}`,label,'string',80)
+    if((template.trainingFlowFrozen as any)?.schemaVersion===2)for(const [key,label]of [['assignment_hash','材料分配摘要'],['group_key','材料实验组'],['material_digest','已分配材料摘要']])builder.add(`M_${key}`,label,'string',80)
     for(const [index,item]of(template.items as any[]).entries())builder.add(`P${String(index+1).padStart(3,'0')}_path_state`,`[${item.id}] 流程呈现状态`,'string',32,0,{allowedValues:['EXECUTED','CURRENT','NOT_SHOWN'],missingMeaning:'NOT_SHOWN未执行，测量/计时为空而非0。'})
   }
   if (template.trainingVariantFrozen!=null) for (const [key, label] of [['stratum_key', '独立分析分层'], ['config_digest', '分卷配置摘要'], ['union_digest', '发布全集摘要'], ['published_at', '发布时刻'], ['variant_key', '分组'], ['algorithm', '分配算法'], ['assigned_at', '分配时刻'], ['allocation_hash', '分配记录摘要']]) builder.add(`V_${key}`, label, 'string', 80)

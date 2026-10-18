@@ -10,7 +10,7 @@ export const trainingAnalysisSelectorSchema = z.object({
   mode: z.enum(['PAIRWISE', 'FULL_CASE']),
   waves: z.array(z.object({
     waveKey: key, taskId: z.string().uuid(), publication: z.string().datetime(),
-    configDigest: hash.nullable(), variantKey: key.nullable(),
+    configDigest: hash.nullable(), variantKey: key.nullable(), materialGroupKey: key.optional(),
     metrics: z.array(z.object({metricKey: key, itemId: z.string().uuid()}).strict()).min(1).max(32),
   }).strict()).min(2).max(8),
 }).strict()
@@ -30,7 +30,7 @@ export function parseTrainingAnalysisSelector(value: unknown, courseId?: string)
   const sources = new Map<string, number>()
   request.waves.forEach((wave, index) => {
     for (const metric of wave.metrics) {
-      const identity = JSON.stringify([wave.taskId, wave.publication, wave.configDigest, wave.variantKey, metric.itemId, metric.metricKey])
+      const identity = JSON.stringify([wave.taskId, wave.publication, wave.configDigest, wave.variantKey, ...(wave.materialGroupKey === undefined ? [] : [wave.materialGroupKey]), metric.itemId, metric.metricKey])
       const prior = sources.get(identity)
       if (prior !== undefined && prior !== index) {
         throw Object.assign(new Error('同一测量来源不能映射为两个时间点'), {statusCode: 409, code: 'TRAINING_ANALYSIS_OBSERVATION_ALIAS'})
@@ -43,14 +43,14 @@ export function parseTrainingAnalysisSelector(value: unknown, courseId?: string)
 }
 
 export const trainingAnalysisFrozenSourceSchema = z.object({
-  waveKey: key, taskId: z.string().uuid(), attemptId: z.string().uuid(),
+  waveKey: key, taskId: z.string().uuid(), materialGroupKey: key.optional(), attemptId: z.string().uuid(),
   attemptEpoch: z.number().int().positive(), sourceHash: hash,
   sourceHashes: z.record(z.string()),
   status: z.string(), taskSatisfaction: z.string().nullable(),
 }).strict()
 const dictionaryColumn = z.object({
   columnKey: key, waveKey: key, taskId: z.string().uuid(), publication: z.string().datetime(),
-  configDigest: hash.nullable(), variantKey: key.nullable(), metricKey: key, itemId: z.string().uuid(),
+  configDigest: hash.nullable(), variantKey: key.nullable(), materialGroupKey: key.optional(), metricKey: key, itemId: z.string().uuid(),
   measurement: z.object({instrumentKey:key,scoreKey:key,scoringDigest:key,responseSignature:key,respondentType:key,unit:z.string().nullable(),version:key}).strict().nullable(),
   valueType: z.literal('NUMBER'), missingReasons: z.array(z.string()).max(32),
 }).strict()

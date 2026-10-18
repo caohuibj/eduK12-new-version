@@ -14,7 +14,16 @@ export type TrainingFlowBlock = {
   when?: TrainingFlowCondition
   termination?: 'COMPLETE_EARLY' | 'SCREEN_OUT'
 }
-export type TrainingFlowConfig = { schemaVersion: 1; blocks: TrainingFlowBlock[] }
+export type TrainingFlowV1 = { schemaVersion: 1; blocks: TrainingFlowBlock[] }
+export type TrainingFlowV2 = {
+  schemaVersion: 2
+  experiment: { experimentKey: string; linkedPolicy: 'KEEP_LINKED' | 'RERANDOMIZE'; groups: Array<{
+    groupKey: string; weight: number; materialTitle: string; materialBody: string
+  }> }
+  quotaPolicy?: { schemaVersion: 1; groupLimits: Record<string, number> }
+  blocks: TrainingFlowBlock[]
+}
+export type TrainingFlowConfig = TrainingFlowV1 | TrainingFlowV2
 export type TrainingFlowAuthoringUnit = {
   id: string; type: string; label: string
   items?: Array<{ formDefinition?: FormQuestion<never> | null }>
@@ -32,6 +41,24 @@ export const createTrainingFlow = (units: TrainingFlowAuthoringUnit[]): Training
   schemaVersion: 1,
   blocks: units.map((unit, index) => ({ blockKey: `tool_${index + 1}`, kind: 'INSTRUMENT', instrumentKey: trainingFlowUnitKey(unit) })),
 })
+export const enableTrainingMaterials = (config: TrainingFlowConfig): TrainingFlowV2 => config.schemaVersion === 2 ? config : ({
+  schemaVersion: 2,
+  experiment: { experimentKey: 'material_experiment', linkedPolicy: 'RERANDOMIZE', groups: [
+    { groupKey: 'group_a', weight: 1, materialTitle: '材料 A', materialBody: '请填写 A 组材料正文。' },
+    { groupKey: 'group_b', weight: 1, materialTitle: '材料 B', materialBody: '请填写 B 组材料正文。' },
+  ] },
+  blocks: config.blocks,
+})
+export function trainingFlowRequest(revision: number, config: TrainingFlowConfig | null, maxAttempts: number) {
+  if (config?.schemaVersion === 2) {
+    if (!Number.isInteger(maxAttempts) || maxAttempts < 1 || maxAttempts > 100) throw new Error('最多作答次数须为 1–100 的整数。')
+    return { revision, config, maxAttempts }
+  }
+  return { revision, config }
+}
+export const isMaterialFlowText = (text: string): boolean => {
+  try { return JSON.parse(text).schemaVersion === 2 } catch { return false }
+}
 export const formatTrainingFlow = (config: TrainingFlowConfig | null) => config ? JSON.stringify(config, null, 2) : ''
 const record = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null && !Array.isArray(value)
 const key = (value: unknown): value is string => typeof value === 'string' && /^[a-z][a-z0-9_-]{0,79}$/.test(value)
@@ -44,7 +71,22 @@ export function parseTrainingFlow(text: string, units: TrainingFlowAuthoringUnit
   if (text.length > 262144) throw new Error('流程 JSON 过大，请缩减至 256 KB 以内。')
   let input: unknown
   try { input = JSON.parse(text) } catch { throw new Error('流程 JSON 格式无效，请检查引号、逗号和括号。') }
-  if (!record(input) || !exact(input, ['schemaVersion', 'blocks']) || input.schemaVersion !== 1 || !Array.isArray(input.blocks) || !input.blocks.length || input.blocks.length > 64) throw new Error('流程须为 schemaVersion: 1，包含 1–64 个 blocks。')
+  if (!record(input) || (input.schemaVersion !== 1 && input.schemaVersion !== 2) || !exact(input, input.schemaVersion === 2 ? ['schemaVersion', 'experiment', 'quotaPolicy', 'blocks'] : ['schemaVersion', 'blocks']) || !Array.isArray(input.blocks) || !input.blocks.length || input.blocks.length > 64) throw new Error('流程须为 schemaVersion: 1 或 2，包含 1–64 个 blocks。')
+  if (input.schemaVersion === 2) {
+    const experiment = input.experiment
+    if (!record(experiment) || !exact(experiment, ['experimentKey', 'linkedPolicy', 'groups']) || !key(experiment.experimentKey) || !['KEEP_LINKED', 'RERANDOMIZE'].includes(String(experiment.linkedPolicy)) || !Array.isArray(experiment.groups) || experiment.groups.length < 2 || experiment.groups.length > 8) throw new Error('experiment 须有合法 experimentKey、linkedPolicy 和 2–8 个材料组。')
+    const groupKeys = new Set<string>()
+    for (const group of experiment.groups) {
+      if (!record(group) || !exact(group, ['groupKey', 'weight', 'materialTitle', 'materialBody']) || !key(group.groupKey) || groupKeys.has(group.groupKey) || !Number.isInteger(group.weight) || Number(group.weight) < 1 || Number(group.weight) > 100) throw new Error('材料组须有唯一 groupKey 和 1–100 的整数 weight。')
+      if ([group.materialTitle, group.materialBody].some(value => typeof value !== 'string' || !value.trim() || value.length > 8000)) throw new Error('材料标题和正文须为 1–8000 字的非空文本。')
+      if ([group.materialTitle, group.materialBody].some(value => /\{\{|\}\}/.test(String(value)))) throw new Error('当前材料仅支持纯文本，不支持变量或表达式插值。')
+      groupKeys.add(group.groupKey)
+    }
+    if (input.quotaPolicy !== undefined) {
+      const quota = input.quotaPolicy
+      if (!record(quota) || !exact(quota, ['schemaVersion', 'groupLimits']) || quota.schemaVersion !== 1 || !record(quota.groupLimits) || Object.keys(quota.groupLimits).length !== groupKeys.size || Object.entries(quota.groupLimits).some(([name, limit]) => !groupKeys.has(name) || !Number.isInteger(limit) || Number(limit) < 1 || Number(limit) > 10000)) throw new Error('quotaPolicy 须为 schemaVersion: 1，groupLimits 须精确包含全部组，每组为 1–10000 的整数。')
+    }
+  }
   const unitKeys = new Set(units.map(trainingFlowUnitKey)), visited = new Set<string>(), blockKeys = new Set<string>()
   const sources = trainingFlowSources(units)
   let predicates = 0, started = false
@@ -74,6 +116,7 @@ export function parseTrainingFlow(text: string, units: TrainingFlowAuthoringUnit
   for (const [index, raw] of input.blocks.entries()) {
     try {
       if (!record(raw) || !exact(raw, ['blockKey', 'kind', 'instrumentKey', 'title', 'body', 'when', 'termination']) || !key(raw.blockKey) || blockKeys.has(raw.blockKey)) throw new Error('blockKey 须唯一，以小写字母开头，只含小写字母、数字、下划线或连字符。')
+      if (input.schemaVersion === 2 && raw.blockKey === 'assigned_material') throw new Error('assigned_material 为服务端分配材料保留，不能用于自定义块。')
       blockKeys.add(raw.blockKey)
       if (raw.when !== undefined) condition(raw.when, 0)
       if (raw.kind === 'INSTRUMENT') {

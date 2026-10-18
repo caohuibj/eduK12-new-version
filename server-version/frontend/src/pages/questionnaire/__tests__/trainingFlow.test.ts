@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createTrainingFlow, parseTrainingFlow, trainingFlowUnitKey, type TrainingFlowAuthoringUnit, type TrainingFlowCondition } from '../trainingFlow'
+import { enableTrainingMaterials, trainingFlowRequest, createTrainingFlow, parseTrainingFlow, trainingFlowUnitKey, type TrainingFlowAuthoringUnit, type TrainingFlowCondition } from '../trainingFlow'
 const units: TrainingFlowAuthoringUnit[] = [
   { id: 'form-1', type: 'FORM_SECTION', label: '前置表单', items: [
     { formDefinition: { itemKey: 'q_single', type: 'SINGLE', prompt: '单选', required: true, options: [{ optionKey: 'yes', label: '是' }, { optionKey: 'no', label: '否' }], rows: [] } },
@@ -58,5 +58,66 @@ describe('Training flow authoring validation', () => {
     let nested: TrainingFlowCondition = condition
     for (let i = 0; i < 8; i++) nested = { op: 'NOT', term: nested }
     expect(() => parseTrainingFlow(withCondition(nested), units)).toThrow('深度')
+  })
+})
+
+describe('C20 explicit material experiments', () => {
+  const make = () => enableTrainingMaterials(createTrainingFlow(units))
+  it('keeps V1 unchanged and preserves the existing blocks on explicit V2 upgrade', () => {
+    const v1 = createTrainingFlow(units)
+    expect(v1).toEqual({ schemaVersion: 1, blocks: [
+      { blockKey: 'tool_1', kind: 'INSTRUMENT', instrumentKey: 'section_form_1' },
+      { blockKey: 'tool_2', kind: 'INSTRUMENT', instrumentKey: 'item_scale_2' },
+    ] })
+    v1.blocks[1].when = condition
+    const v2 = enableTrainingMaterials(v1)
+    expect(v2.blocks).toEqual(v1.blocks)
+    expect(parseTrainingFlow(JSON.stringify(v2), units)).toEqual(v2)
+    expect(enableTrainingMaterials(v2)).toBe(v2)
+    expect(trainingFlowRequest(2, v1, NaN)).toEqual({ revision: 2, config: v1 })
+    expect(trainingFlowRequest(2, null, 9)).toEqual({ revision: 2, config: null })
+    expect(trainingFlowRequest(2, v2, 7)).toEqual({ revision: 2, config: v2, maxAttempts: 7 })
+  })
+  it.each([0, 101, 1.5, NaN])('rejects invalid V2 attempt budget %s', budget => {
+    expect(() => trainingFlowRequest(2, make(), budget)).toThrow('1–100')
+  })
+  it('accepts both link policies and exact optional quota keys', () => {
+    for (const linkedPolicy of ['KEEP_LINKED', 'RERANDOMIZE'] as const) {
+      const flow = make()
+      flow.experiment.linkedPolicy = linkedPolicy
+      flow.quotaPolicy = { schemaVersion: 1, groupLimits: { group_a: 1, group_b: 10000 } }
+      expect(parseTrainingFlow(JSON.stringify(flow), units)).toEqual(flow)
+    }
+  })
+  it.each([
+    (flow: any) => { flow.experiment.groups.pop() },
+    (flow: any) => { flow.experiment.groups = Array.from({ length: 9 }, (_, i) => ({ ...flow.experiment.groups[0], groupKey: 'g_' + i })) },
+    (flow: any) => { flow.experiment.groups[1].groupKey = 'group_a' },
+    (flow: any) => { flow.experiment.groups[0].weight = 0 },
+    (flow: any) => { flow.experiment.groups[0].weight = 101 },
+    (flow: any) => { flow.experiment.groups[0].weight = 1.5 },
+    (flow: any) => { flow.experiment.groups[0].materialBody = ' ' },
+    (flow: any) => { flow.experiment.groups[0].materialTitle = '' },
+    (flow: any) => { flow.experiment.groups[0].materialBody = 'x'.repeat(8001) },
+    (flow: any) => { flow.experiment.groups[0].materialTitle = '{{groupKey}}' },
+    (flow: any) => { flow.experiment.groups[0].when = condition },
+    (flow: any) => { flow.experiment.linkedPolicy = 'UNKNOWN' },
+    (flow: any) => { flow.experiment.experimentKey = 'Bad key' },
+    (flow: any) => { flow.quotaPolicy = { schemaVersion: 1, groupLimits: { group_a: 10 } } },
+    (flow: any) => { flow.quotaPolicy = { schemaVersion: 1, groupLimits: { group_a: 10, extra: 10 } } },
+    (flow: any) => { flow.quotaPolicy = { schemaVersion: 1, groupLimits: { group_a: 10, group_b: 10001 } } },
+    (flow: any) => { flow.quotaPolicy = { schemaVersion: 2, groupLimits: { group_a: 10, group_b: 10 } } },
+    (flow: any) => { flow.blocks[0].blockKey = 'assigned_material' },
+    (flow: any) => { flow.blocks[1].when = { op: 'EQUALS', field: { source: 'GROUP', groupKey: 'group_a' }, value: 'group_a' } },
+    (flow: any) => { flow.schemaVersion = 1 },
+  ])('rejects unsupported material config %#', mutate => {
+    const flow = make()
+    mutate(flow)
+    expect(() => parseTrainingFlow(JSON.stringify(flow), units)).toThrow()
+  })
+  it('does not reserve a previously valid V1 block key retroactively', () => {
+    const flow = createTrainingFlow(units)
+    flow.blocks[0].blockKey = 'assigned_material'
+    expect(parseTrainingFlow(JSON.stringify(flow), units)).toEqual(flow)
   })
 })

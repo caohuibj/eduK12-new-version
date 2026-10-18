@@ -483,7 +483,7 @@ export async function copy(actor: Actor, id: string, raw: unknown, options: { al
     const target = await tx.compositeAssessment.create({ data: {
       code: 'Q-' + randomUUID(), name: source.name + '（副本）', description: source.description, instruction: source.instruction,
       productKind: 'QUESTIONNAIRE', questionnaireType, createdBy: actor.userId, creationKey, creationHash,
-      ...((composite?.trainingVariantDraft != null||(composite?.trainingFlowDraft as any)?.schemaVersion===2) ? { maxAttempts: composite.maxAttempts } : {}),
+      ...((composite?.trainingVariantDraft != null||(composite?.trainingFlowDraft as any)?.schemaVersion===2) ? { maxAttempts: composite!.maxAttempts } : {}),
       trainingTimingPolicy:await timingPolicy(tx,{productKind:'QUESTIONNAIRE',questionnaireType,questionnaireCourses:sourceCourses.map(courseId=>({courseId})),publicEnabled:false},Boolean(composite?.trainingTimingPolicy)),
       questionnaireCourses: { create: sourceCourses.map(courseId => ({ courseId })) },
     } })

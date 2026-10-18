@@ -29,11 +29,13 @@ CREATE TABLE training_material_allocation_claims (
  inherited_from_claim_id TEXT REFERENCES training_material_allocation_claims(id) ON DELETE RESTRICT,
  initial_attempt_id TEXT NOT NULL,
  material_digest TEXT NOT NULL CHECK(material_digest ~ '^[0-9a-f]{64}$'),
+ reservation_ordinal INTEGER CHECK(reservation_ordinal BETWEEN 1 AND 10000),
  created_at TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
  CONSTRAINT training_material_claim_attempt_fk FOREIGN KEY(initial_attempt_id) REFERENCES composite_assessment_attempts(id) ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED,
  CONSTRAINT training_material_claim_inheritance CHECK((algorithm='LINKED_INHERIT_V1')=(inherited_from_claim_id IS NOT NULL) AND inherited_from_claim_id IS DISTINCT FROM id)
 );
 CREATE UNIQUE INDEX training_material_claim_attempt_key ON training_material_allocation_claims(initial_attempt_id);
+CREATE UNIQUE INDEX training_material_claim_reservation_key ON training_material_allocation_claims(composite_id,publication_key,config_digest,group_key,reservation_ordinal);
 CREATE INDEX training_material_claim_subject_idx ON training_material_allocation_claims(experiment_id,participant_key);
 CREATE INDEX training_material_claim_quota_idx ON training_material_allocation_claims(composite_id,publication_key,config_digest,group_key);
 CREATE TABLE training_material_subject_bindings (
@@ -70,7 +72,7 @@ BEGIN
  IF TG_OP='DELETE' THEN RAISE EXCEPTION 'Training material quota is retained'; END IF;
  IF TG_OP='UPDATE' THEN
    IF (to_jsonb(NEW)-'assigned_count') IS DISTINCT FROM (to_jsonb(OLD)-'assigned_count')
-     OR NEW.assigned_count < OLD.assigned_count THEN
+     OR NEW.assigned_count <> OLD.assigned_count + 1 THEN
      RAISE EXCEPTION 'Training material quota identity and consumed capacity are immutable';
    END IF;
    RETURN NEW;
@@ -119,13 +121,26 @@ BEGIN
  IF config->'quotaPolicy' IS NOT NULL AND config->'quotaPolicy'<>'null'::jsonb THEN
    IF NOT EXISTS(SELECT 1 FROM training_material_quota_buckets b WHERE b.composite_id=NEW.composite_id
      AND b.publication_key=NEW.publication_key AND b.config_digest=NEW.config_digest AND b.group_key=NEW.group_key
-     AND b.max_assigned::text=config->'quotaPolicy'->'groupLimits'->>NEW.group_key AND b.assigned_count>0)
+     AND b.max_assigned::text=config->'quotaPolicy'->'groupLimits'->>NEW.group_key
+     AND NEW.reservation_ordinal BETWEEN 1 AND b.assigned_count AND NEW.reservation_ordinal<=b.max_assigned)
    OR NEW.algorithm='CRYPTO_RANDOM_INT_V1' THEN RAISE EXCEPTION 'Training material claim requires its frozen quota reservation'; END IF;
- ELSIF NEW.algorithm='CRYPTO_QUOTA_WEIGHTED_V1' THEN RAISE EXCEPTION 'Training material quota algorithm requires a quota policy'; END IF;
+ ELSIF NEW.algorithm='CRYPTO_QUOTA_WEIGHTED_V1' OR NEW.reservation_ordinal IS NOT NULL THEN RAISE EXCEPTION 'Training material quota algorithm requires a quota policy'; END IF;
  RETURN NULL;
 END $$;
 CREATE CONSTRAINT TRIGGER training_material_claim_scope AFTER INSERT ON training_material_allocation_claims
  DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION training_material_claim_scope();
+CREATE FUNCTION training_material_quota_claim_scope() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+ IF NOT EXISTS(SELECT 1 FROM training_material_allocation_claims claim
+   WHERE claim.composite_id=NEW.composite_id AND claim.publication_key=NEW.publication_key
+     AND claim.config_digest=NEW.config_digest AND claim.group_key=NEW.group_key
+     AND claim.reservation_ordinal=NEW.assigned_count) THEN
+   RAISE EXCEPTION 'Training material quota increment requires its unique immutable claim';
+ END IF;
+ RETURN NULL;
+END $$;
+CREATE CONSTRAINT TRIGGER training_material_quota_claim_scope AFTER UPDATE ON training_material_quota_buckets
+ DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION training_material_quota_claim_scope();
 CREATE FUNCTION training_material_binding_scope() RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
  IF NOT EXISTS(SELECT 1 FROM training_material_allocation_claims a

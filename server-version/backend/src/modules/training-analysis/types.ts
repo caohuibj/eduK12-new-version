@@ -8,6 +8,8 @@ export interface TrainingAnalysisWaveV1 {
   publication: string
   configDigest: string | null
   variantKey: string | null
+  /** Frozen material-only experimental arm; omitted for legacy and V1 flows. */
+  materialGroupKey?: string
   metrics: Array<{ metricKey: string; itemId: string }>
 }
 export interface TrainingAnalysisRequestV1 {
@@ -41,6 +43,8 @@ export interface TrainingNumericObservationV1 {
   publication: string
   configDigest: string | null
   variantKey: string | null
+  /** Frozen material-only experimental arm; omitted for legacy and V1 flows. */
+  materialGroupKey?: string
   attemptId: string | null
   attemptEpoch: number | null
   sourceHashes: Record<string, string>
@@ -73,6 +77,8 @@ export interface TrainingDescriptiveMetricV1 {
   publication: string
   configDigest: string | null
   variantKey: string | null
+  /** Frozen material-only experimental arm; omitted for legacy and V1 flows. */
+  materialGroupKey?: string
   metricKey: string
   itemId: string
   measurement: TrainingMetricIdentityV1 | null
@@ -126,6 +132,8 @@ export interface TrainingAnalysisDictionaryColumnV1 {
   publication: string
   configDigest: string | null
   variantKey: string | null
+  /** Frozen material-only experimental arm; omitted for legacy and V1 flows. */
+  materialGroupKey?: string
   metricKey: string
   itemId: string
   measurement: TrainingMetricIdentityV1 | null

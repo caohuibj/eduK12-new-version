@@ -28,3 +28,17 @@ Training开发定向：6文件137 tests通过，覆盖新V2纯流/包身份和�
 ## 尚未完成
 
 固定business输入build及受影响回归、完整真实HTTP/PG四工具、普通匿名/null与材料restart及四native能力撤销、KEEP跨发布/跨scope/满额、最后一个配额和双restart真实等待、故障回滚、报告CSV分析严格消费及10/20/50真实completed成本、旧事实和四新表非空恢复、独立review。新c20分项harness正在编写，未运行。原C19 state08只读；所有失败producer保留。
+
+## Checkpoint 02：review修正与分组分析（仍为WIP）
+
+- 全部公开start/restart统一definition→token→oldattempt顺序，锁内再验证身份/凭证；experiment仅SHARE，登录KEEP_LINKED首绑定以域分离的scope+subject advisory锁线性化。真实双waiter证据仍待运行。
+- 配额claim新增可空reservationOrdinal，仅新quota claim使用；唯一发布/config/group/ordinal索引、counter只能逐次+1、双向命名deferred约束以索引exists保证每次增加恰有claim，不扫描历史COUNT。旧表/旧attempt无回填。初始bucket仍必须0且cap/config/group完全匹配冻结发布。
+- Survey材料presentation恢复旧JSON键顺序；新增固定旧base的Survey输出字节及V1 pending/completed path golden，不用当前代码自算预期。
+- V2分析每wave必须显式materialGroupKey，发现列表按组提供选择，按已验证材料scope过滤后才读计分facts；alias、字典、manifest、long CSV、来源指纹均绑定组。旧null/V1不添null默认字段。不同组不会无提示合并，现有描述/配对规则可比较显式选中的条件；未新增因果估计器或scoring身份。没有新增逐人claim表查询。
+- 前端材料编辑、配额机会语义、maxAttempts和成功restart后恢复凭证缓存轮换已接入；79项既有定向测试、类型/scoped lint有独立证据。新增分析组件23项通过；正式browser仍未运行。
+
+有限构建证据（各目录均在worktree同级，运行前后source manifest保留）：c20-build-01七个原构建前置成功后tsc两处类型错误，均已修；c20-build-02为58通过/44失败，失败是旧analysis mock缺C19持久null markers，已仅修fixture。c20-build-03四个analysis文件129 tests通过、完整backend tsc通过、sourceUnchanged=true及dist-manifest；先前成功前置输入未改不重跑。c20-ordinal-01新独立PG16最小父表的ordinal目标用例通过，非完整runtime角色资格。c20-frontend-02新增分析23 tests通过后route inventory陈旧失败，失败保留；派生文档同步仅匹配现有未改路由，后续类型/build另记。
+
+全部真实PG生产dist HTTP分项脚本已编写，不能以语法通过代替运行。当前未获得C20功能GO、正式role/非空恢复/竞态/成本资格。C19动态suppressed独立断言、已测longCSV逐列assert和新fresh/browser/selected-video仍留C25，C26容量另验。
+
+c20-frontend-03：原inventory与session-auth门、app/cognitive两套tsc、Vite production build均通过，sourceUnchanged=true；只有既有chunk>500kB提示。路由派生修正的三个输入相对remote58完全未变，App最后变更为085fddd9（C10），保留历史深链接的局部授权和服务端新准入限制，未改运行路由。App/OrganizationRoutes/generator SHA分别af47d7ac8670aa45cdcc5dea2f34d00e0fe44af550d0eba5a7ffa7c5130d8114、7ff4d523067cd480a58a4c83a681628b61271eed29af392569e2f6e0fdd76f19、20c3239789f1f5fcb5fdf67cf506642ee779bee2f5e6f373d0de82cd0327d222。

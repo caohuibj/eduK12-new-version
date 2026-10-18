@@ -8,6 +8,7 @@ const { mockPublicApi, mockCompositeApi } = vi.hoisted(() => ({
     info: vi.fn(),
     start: vi.fn(),
     getAttempt: vi.fn(),
+    restart: vi.fn(),
   },
   mockCompositeApi: { start: vi.fn(), listAvailable: vi.fn() },
 }))
@@ -262,5 +263,40 @@ describe('C19 server-computed terminal paths', () => {
     expect(screen.getByRole('status')).toHaveTextContent('任务未达成')
     await user.click(screen.getByRole('button', { name: '查看本次结果' }))
     expect(await screen.findByText('个人报告页面')).toBeInTheDocument()
+  })
+})
+
+describe('C20 anonymous restart credential rotation', () => {
+  const oldAttempt = { id: 'old-attempt', status: 'IN_PROGRESS', deliveryMode: 'LEGACY', items: [], currentItem: null }
+  beforeEach(() => {
+    window.history.pushState({}, '', '/public/composite/attempts/old-attempt')
+    sessionStorage.setItem('composite:recovery:attempt:old-attempt', 'old-secret')
+    sessionStorage.setItem('composite:recovery:token:entry', 'old-secret')
+    sessionStorage.setItem('composite:recovery:token:unrelated', 'other-secret')
+    mockPublicApi.getAttempt.mockImplementation(async (id: string) => ({ code: 0, data: { ...oldAttempt, id } }))
+  })
+  it('stores the rotated credential and replaces only its associated cached keys after success', async () => {
+    mockPublicApi.restart.mockResolvedValue({ code: 0, data: { attempt: { id: 'new-attempt' }, recoveryToken: 'new-secret' } })
+    // A named attempt param is required by the existing recovery route.
+    render(<MemoryRouter initialEntries={['/public/composite/attempts/old-attempt']}><Routes>
+      <Route path="/public/composite/attempts/:attemptId" element={<CompositeAssessmentPage />} />
+    </Routes></MemoryRouter>)
+    fireEvent.click(await screen.findByRole('button', { name: '重启并继续作答' }))
+    await waitFor(() => expect(sessionStorage.getItem('composite:recovery:attempt:new-attempt')).toBe('new-secret'))
+    expect(mockPublicApi.restart).toHaveBeenCalledWith('old-attempt')
+    expect(sessionStorage.getItem('composite:recovery:attempt:old-attempt')).toBeNull()
+    expect(sessionStorage.getItem('composite:recovery:token:entry')).toBe('new-secret')
+    expect(sessionStorage.getItem('composite:recovery:token:unrelated')).toBe('other-secret')
+    expect(sessionStorage.getItem('composite:recovery:token:')).toBeNull()
+  })
+  it('keeps old cached credentials intact if restart fails', async () => {
+    mockPublicApi.restart.mockRejectedValue(new Error('重启失败'))
+    render(<MemoryRouter initialEntries={['/public/composite/attempts/old-attempt']}><Routes>
+      <Route path="/public/composite/attempts/:attemptId" element={<CompositeAssessmentPage />} />
+    </Routes></MemoryRouter>)
+    fireEvent.click(await screen.findByRole('button', { name: '重启并继续作答' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('重启失败')
+    expect(sessionStorage.getItem('composite:recovery:attempt:old-attempt')).toBe('old-secret')
+    expect(sessionStorage.getItem('composite:recovery:token:entry')).toBe('old-secret')
   })
 })

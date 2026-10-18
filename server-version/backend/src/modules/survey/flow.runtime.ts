@@ -81,7 +81,7 @@ export function executeSurveyFlow(input:{
   const material=assignedMaterial(flow.experiment,input.assignment.groupKey,source=>safeFlowText(source,flow))
   if(material){
     shown.push(material.blockKey)
-    presentation.push({...material,kind:'MATERIAL'})
+    presentation.push({blockKey:material.blockKey,kind:'MATERIAL',title:material.title,body:material.body})
   }
   const vars=staticFlowValues(flow)
   for(const block of surveyAssignedFlowBlocks(flow,input.assignment.groupKey)){

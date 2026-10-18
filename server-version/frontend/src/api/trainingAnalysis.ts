@@ -9,6 +9,8 @@ export interface TrainingAnalysisWave {
   publication: string
   configDigest: string | null
   variantKey: string | null
+  /** Frozen material-only experimental arm; omitted for legacy and V1 flows. */
+  materialGroupKey?: string
   metrics: TrainingAnalysisMetric[]
 }
 export interface TrainingAnalysisSelector {
@@ -23,6 +25,8 @@ export interface TrainingAnalysisSource {
   publication: string
   configDigest: string | null
   variantKey: string | null
+  /** Frozen material-only experimental arm; omitted for legacy and V1 flows. */
+  materialGroupKey?: string
   metrics: TrainingAnalysisMetric[]
 }
 export interface TrainingAnalysisSources { list: TrainingAnalysisSource[]; total: number; canQuality: boolean; canExport: boolean }
@@ -60,6 +64,8 @@ export interface TrainingAnalysisDescriptive {
   publication: string
   configDigest: string | null
   variantKey: string | null
+  /** Frozen material-only experimental arm; omitted for legacy and V1 flows. */
+  materialGroupKey?: string
   metricKey: string
   itemId: string
   measurement: TrainingAnalysisMeasurement | null

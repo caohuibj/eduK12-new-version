@@ -1,3 +1,5 @@
+import { compileTrainingFlow, type FrozenTrainingFlow } from '../assessment-core/flow/training'
+import { buildTrainingFlowUnits } from '../composite/training-flow-definition'
 import { Prisma, UserRole } from '@prisma/client'
 import { parseCompiledWeightedVariants } from '../assessment-core/weighted-variants'
 import { canonicalHash } from '../assessment-runtime/canonical'
@@ -25,13 +27,13 @@ import type { TrainingAnalysisRequestV1, TrainingAnalysisSourceV1, TrainingAnaly
 export const TRAINING_ANALYSIS_SOURCE_LIMIT = 6000
 export type TrainingAnalysisActor = {userId: string; role: UserRole}
 export interface TrainingAnalysisManifestAttemptV1 {
-  waveKey: string; taskId: string; attemptId: string; attemptEpoch: number
+  waveKey: string; taskId: string; materialGroupKey?: string; attemptId: string; attemptEpoch: number
   sourceHash: string; sourceHashes: Record<string, string>; status: string; taskSatisfaction: string | null
 }
 export interface TrainingAnalysisSourceManifestV1 {
   schemaVersion: 1; courseId: string; selectorHash: string
   attempts: TrainingAnalysisManifestAttemptV1[]
-  dictionary: Array<{waveKey: string; taskId: string; itemId: string; metricKey: string; measurement: TrainingMetricIdentityV1 | null}>
+  dictionary: Array<{waveKey: string; taskId: string; materialGroupKey?: string; itemId: string; metricKey: string; measurement: TrainingMetricIdentityV1 | null}>
   authoritySnapshot: unknown
   exclusions: {IDENTITY_UNAVAILABLE: number}
 }
@@ -88,9 +90,24 @@ const parentIdentity = (attempt: any) => ({id: attempt.id, taskId: attempt.compo
   completedAt: iso(attempt.completedAt), aggregateInputHash: attempt.aggregateInputHash ?? null,
   contextHash: attempt.contextSnapshotHash ?? null, slotsHash: attempt.frozenActiveSlotSetHash ?? null,
   allocationHash: attempt.trainingVariantAllocationHash ?? null,...(attempt.trainingFlowSnapshotHash!=null?{flowSnapshotHash:attempt.trainingFlowSnapshotHash,flowPathHash:attempt.trainingFlowPathHash??null}: {})})
-const stratumMatches = (wave: TrainingAnalysisWaveV1, scope: TrainingAttemptScope) => scope.variant
-  ? wave.configDigest === scope.variant.configDigest && wave.variantKey === scope.variant.variantKey && wave.publication === scope.variant.publishedAt
-  : wave.configDigest === null && wave.variantKey === null
+const materialFields = (value: {materialGroupKey?: string}) => value.materialGroupKey === undefined ? {} : {materialGroupKey: value.materialGroupKey}
+/** Validate the complete frozen definition even when a group has no attempts. */
+function materialConfig(task: any): FrozenTrainingFlow | null {
+  if (task.trainingFlowFrozen?.schemaVersion !== 2) return null
+  const {policy, unionDigest, flowDigest, ...draft} = task.trainingFlowFrozen
+  const compiled = compileTrainingFlow(draft, buildTrainingFlowUnits(task))
+  if (task.trainingVariantFrozen != null || task.trainingVariantDigest != null || task.trainingVariantDraft != null
+    || compiled.flowDigest !== task.trainingFlowDigest || hash(compiled) !== hash(task.trainingFlowFrozen)) invalid('实验材料冻结定义不一致')
+  return compiled
+}
+const stratumMatches = (wave: TrainingAnalysisWaveV1, scope: TrainingAttemptScope) => {
+  if (scope.flow?.materialAssignment) return wave.configDigest === null && wave.variantKey === null
+    && wave.materialGroupKey === scope.flow.materialAssignment.groupKey
+  if (wave.materialGroupKey !== undefined) invalid('实验材料分组缺少已验证分配')
+  return scope.variant
+    ? wave.configDigest === scope.variant.configDigest && wave.variantKey === scope.variant.variantKey && wave.publication === scope.variant.publishedAt
+    : wave.configDigest === null && wave.variantKey === null
+}
 const groupRows = (rows: any[], key: (row: any) => string) => {
   const result = new Map<string, any[]>()
   for (const row of rows) {const id = key(row), list = result.get(id) ?? []; list.push(row); result.set(id, list)}
@@ -192,12 +209,14 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
   if (tasks.length !== new Set(selector.waves.map(wave => wave.taskId)).size) unavailable()
   const byTask = new Map(tasks.map(task => [task.id, task])), entries: Array<{wave: TrainingAnalysisWaveV1; attempt: any; scope: TrainingAttemptScope; slots: FrozenActiveSlotSetV1 | null}> = []
   const fixed = options.fixedManifest?.attempts
-  if (fixed && (fixed.length > TRAINING_ANALYSIS_SOURCE_LIMIT || fixed.some(row => !selector.waves.some(wave => wave.waveKey === row.waveKey && wave.taskId === row.taskId)))) invalid('分析清单与选择范围不一致')
+  if (fixed && (fixed.length > TRAINING_ANALYSIS_SOURCE_LIMIT || fixed.some(row => !selector.waves.some(wave => wave.waveKey === row.waveKey && wave.taskId === row.taskId && wave.materialGroupKey === row.materialGroupKey)))) invalid('分析清单与选择范围不一致')
   const taskAuthority: unknown[] = [], policies: unknown[] = []
   for (const wave of selector.waves) {
     const task: any = byTask.get(wave.taskId)
     if (iso(task.publishedAt) !== wave.publication || !wave.metrics.length || wave.metrics.length > 32) unavailable()
     if ((task.trainingVariantDigest ?? null) !== wave.configDigest || Boolean(wave.configDigest) !== Boolean(wave.variantKey)) unavailable()
+    const material = materialConfig(task)
+    if (material?.schemaVersion === 2 ? !material.experiment.groups.some(group => group.groupKey === wave.materialGroupKey) : wave.materialGroupKey !== undefined) unavailable()
     if (wave.metrics.some(metric => !task.items.some((item: any) => item.id === metric.itemId))) unavailable()
     taskAuthority.push({id: task.id, createdBy: task.createdBy, productKind: task.productKind})
     const filters: Prisma.CompositeAssessmentAttemptWhereInput[] = [
@@ -298,7 +317,7 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
   const observations: TrainingNumericObservationV1[] = [], manifests: TrainingAnalysisManifestAttemptV1[] = [], formSourceHashes = new WeakMap<object, string>()
   for (const {wave, attempt, scope, slots} of selected) {
     const participant = identities.get(attempt.id)!, attemptObservations: TrainingNumericObservationV1[] = []
-    const sourceHashes: Record<string, string> = {participant: hash(participant), parent: hash(parentIdentity(attempt)), publication: hash({taskId: wave.taskId, publication: wave.publication, configDigest: wave.configDigest, variantKey: wave.variantKey})}
+    const sourceHashes: Record<string, string> = {participant: hash(participant), parent: hash(parentIdentity(attempt)), publication: hash({taskId: wave.taskId, publication: wave.publication, configDigest: wave.configDigest, variantKey: wave.variantKey, ...materialFields(wave)})}
     if(scope.flow?.materialAssignment){sourceHashes.materialAssignment=scope.flow.materialAssignment.assignmentHash;sourceHashes.materialConfig=scope.flow.config.flowDigest;sourceHashes.materialPath=scope.flow.pathHash}
     const isFinal = finalSet.has(attempt), facts = isFinal ? factsFor(attempt) : null
     for (const metric of wave.metrics) {
@@ -387,19 +406,19 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
           sourceHashes[item.id] = envelope.resultHash
         }
       }
-      attemptObservations.push({...participant,...(participant.participantKind==='STUDY_LOCAL'?{researchCategory:item?.type==='SITUATIONAL'?'SJT':item?.type}:{}), waveKey: wave.waveKey, taskId: wave.taskId, publication: wave.publication, configDigest: wave.configDigest, variantKey: wave.variantKey,
+      attemptObservations.push({...participant,...(participant.participantKind==='STUDY_LOCAL'?{researchCategory:item?.type==='SITUATIONAL'?'SJT':item?.type}:{}), waveKey: wave.waveKey, taskId: wave.taskId, publication: wave.publication, configDigest: wave.configDigest, variantKey: wave.variantKey, ...materialFields(wave),
         attemptId: attempt.id, attemptEpoch: attempt.attemptEpoch, sourceHashes, metricKey: metric.metricKey, itemId: metric.itemId, measurement, value, reason,
         originalFinalStatus: attempt.status, taskSatisfied: attempt.taskSatisfaction === 'SATISFIED' ? true : attempt.taskSatisfaction === 'NOT_SATISFIED' ? false : null})
     }
     const sourceHash = hash({sourceHashes, observations: attemptObservations.map(({metricKey, itemId, measurement, value, reason}) => ({metricKey, itemId, measurement, value, reason}))})
     sourceHashes.sourceHash = sourceHash
-    manifests.push({waveKey: wave.waveKey, taskId: wave.taskId, attemptId: attempt.id, attemptEpoch: attempt.attemptEpoch, sourceHash, sourceHashes,
+    manifests.push({waveKey: wave.waveKey, taskId: wave.taskId, ...materialFields(wave), attemptId: attempt.id, attemptEpoch: attempt.attemptEpoch, sourceHash, sourceHashes,
       status: attempt.status, taskSatisfaction: attempt.taskSatisfaction ?? null})
     observations.push(...attemptObservations)
   }
   manifests.sort((a, b) => a.waveKey.localeCompare(b.waveKey) || a.attemptId.localeCompare(b.attemptId))
   const dictionary = [...new Map(observations.map(row => {
-    const value = {waveKey: row.waveKey, taskId: row.taskId, itemId: row.itemId, metricKey: row.metricKey, measurement: row.measurement}
+    const value = {waveKey: row.waveKey, taskId: row.taskId, ...materialFields(row), itemId: row.itemId, metricKey: row.metricKey, measurement: row.measurement}
     return [hash(value), value] as const
   })).values()].sort((a, b) => hash(a).localeCompare(hash(b)))
   const authoritySnapshot = {principal: auth.principal, course: auth.course,
@@ -555,7 +574,7 @@ export async function listTrainingAnalysisSources(tx: Prisma.TransactionClient, 
   const auth = await authority(tx, actor, courseId)
   const tasks: any[] = await tx.compositeAssessment.findMany({where: {...authorizedTaskWhere(actor, courseId), publishedAt: {not: null}}, include: templateInclude,
     orderBy: [{publishedAt: 'desc'}, {id: 'asc'}], take: 101})
-  const list: Array<{taskId: string; taskName: string; publication: string; configDigest: string | null; variantKey: string | null; metrics: Array<{itemId: string; metricKey: string; label: string}>}> = []
+  const list: Array<{taskId: string; taskName: string; publication: string; configDigest: string | null; variantKey: string | null; materialGroupKey?: string; metrics: Array<{itemId: string; metricKey: string; label: string}>}> = []
   // Discover SJT metric keys from accepted frozen facts, never from a mutable
   // authoring registry or a grant that only permits derived C13 reporting.
   const governed = tasks.length ? await tx.$queryRaw<Array<{id: string}>>`SELECT DISTINCT a.composite_assessment_id AS id FROM composite_assessment_attempts a
@@ -627,7 +646,11 @@ export async function listTrainingAnalysisSources(tx: Prisma.TransactionClient, 
       }
     }
     if (!metrics.length) continue
-    if (task.trainingVariantFrozen || task.trainingVariantDigest) {
+    const material = materialConfig(task)
+    if (material?.schemaVersion === 2) {
+      for (const group of material.experiment.groups) list.push({taskId: task.id, taskName: task.name, publication: iso(task.publishedAt)!,
+        configDigest: null, variantKey: null, materialGroupKey: group.groupKey, metrics})
+    } else if (task.trainingVariantFrozen || task.trainingVariantDigest) {
       const config = parseCompiledWeightedVariants(task.trainingVariantFrozen)
       if (config.configDigest !== task.trainingVariantDigest || config.unionDigest !== hash({kind: 'WEIGHTED_VARIANT_UNION', schemaVersion: 1, units: buildTrainingVariantUnion(task).units})) invalid('分卷冻结定义不一致')
       for (const group of config.groups) list.push({taskId: task.id, taskName: task.name, publication: iso(task.publishedAt)!, configDigest: config.configDigest,

@@ -1,4 +1,5 @@
 import { describe,it,expect } from 'vitest'
+import { projectCompositeCollectionReport } from '../../modules/composite/composite-report.projector'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { compileTrainingFlow,scanTrainingFlow,type TrainingFlowUnit } from '../../modules/assessment-core/flow/training'
 import { assertTrainingMaterialAssignment,allocateTrainingMaterial } from '../../modules/composite/training-material-allocation'
@@ -16,4 +17,12 @@ describe('explicit Training material protocol',()=>{
  it('rejects missing, unknown and downgraded assignment envelopes',()=>{const flow=compileTrainingFlow(draft(),units);expect(()=>scanTrainingFlow(flow,units,{})).toThrow();expect(()=>assertTrainingMaterialAssignment({...envelope(flow),unexpected:true},flow,attempt,composite)).toThrow();expect(()=>assertTrainingMaterialAssignment({...envelope(flow),schemaVersion:99},flow,attempt,composite)).toThrow()})
  it.each([()=>({...draft(),schemaVersion:1}),()=>({...draft(),blocks:[{blockKey:'assigned_material',kind:'MATERIAL',body:'conflict'},...blocks]}),()=>({...draft(),experiment:{...draft().experiment,mode:'QUESTIONNAIRE_VARIANTS'}}),()=>({...draft(),quotaPolicy:{schemaVersion:1,groupLimits:{a:1}}}),()=>({...draft(),experiment:{...draft().experiment,groups:draft().experiment.groups.map(g=>({...g,materialBody:'{{groupKey}}'}))}})])('rejects unsupported or partial authoring configuration',change=>expect(()=>compileTrainingFlow(change(),units)).toThrow())
  it('performs no allocation SQL for old null or V1',async()=>{const db=new Proxy({}, {get(){throw new Error('unexpected SQL')}});expect(await allocateTrainingMaterial(db,attempt,{})).toBeNull();expect(await allocateTrainingMaterial(db,attempt,{trainingFlowFrozen:{schemaVersion:1}})).toBeNull()})
+})
+
+it('keeps material provenance teacher-only and rejects extra envelope fields at public projection',()=>{
+ const assignment={assignmentHash:'a'.repeat(64),configDigest:'b'.repeat(64),groupKey:'a',materialDigest:'c'.repeat(64),claimId:'private',algorithm:'private',weight:99}
+ const report={id:'attempt',assessmentId:'assessment',name:'test',unitReports:[],backgroundValues:[],trainingFlow:{schemaVersion:1,configDigest:'d'.repeat(64),pathHash:'e'.repeat(64),termination:'COMPLETE',taskSatisfaction:'SATISFIED',executedUnitCount:1,skippedUnitCount:0,materialAssignment:assignment}}
+ expect(projectCompositeCollectionReport(report,'participant').trainingFlow).not.toHaveProperty('materialAssignment')
+ expect(projectCompositeCollectionReport(report,'teacher').trainingFlow.materialAssignment).toEqual({assignmentHash:assignment.assignmentHash,configDigest:assignment.configDigest,groupKey:'a',materialDigest:assignment.materialDigest})
+ expect(JSON.stringify(projectCompositeCollectionReport(report,'participant'))).not.toContain('private')
 })

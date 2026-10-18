@@ -26,9 +26,10 @@ const stableParticipant = (row: TrainingNumericObservationV1) => tuple(row.parti
 const groupKey = (waveKey: string, metricKey: string) => tuple(waveKey, metricKey)
 const nonempty = (value: unknown): value is string => typeof value === 'string' && value.trim().length > 0 && value.length <= 500
 const fail = (message: string, code = 'TRAINING_ANALYSIS_SOURCE_INVALID', status = 409): never => reportingFail(code, message, status)
-const waveScope = (wave: Pick<TrainingAnalysisWaveV1, 'taskId' | 'publication' | 'configDigest' | 'variantKey'>) => (
-  tuple(wave.taskId, wave.publication, wave.configDigest, wave.variantKey)
+const waveScope = (wave: Pick<TrainingAnalysisWaveV1, 'taskId' | 'publication' | 'configDigest' | 'variantKey' | 'materialGroupKey'>) => (
+  tuple(wave.taskId, wave.publication, wave.configDigest, wave.variantKey, ...(wave.materialGroupKey === undefined ? [] : [wave.materialGroupKey]))
 )
+const materialFields = (value: {materialGroupKey?: string}) => value.materialGroupKey === undefined ? {} : {materialGroupKey: value.materialGroupKey}
 const validValue = (row: TrainingNumericObservationV1) => row.reason === null ? finiteReportingNumber(row.value) : null
 const identityKey = (identity: TrainingMetricIdentityV1) => canonicalHash(identity)
 const safeCount = (count: number, floor: number) => count === 0 || count >= floor
@@ -59,6 +60,7 @@ const prepare = (request: TrainingAnalysisRequestV1, source: TrainingAnalysisSou
     if (![wave.waveKey, wave.taskId, wave.publication].every(nonempty)
       || !(wave.configDigest === null || nonempty(wave.configDigest))
       || !(wave.variantKey === null || nonempty(wave.variantKey))
+      || (wave.materialGroupKey !== undefined && (!nonempty(wave.materialGroupKey) || wave.configDigest !== null || wave.variantKey !== null))
       || ((wave.configDigest === null) !== (wave.variantKey === null))) fail('Invalid frozen Wave identity', 'TRAINING_ANALYSIS_REQUEST_INVALID', 400)
     if (waves.has(wave.waveKey) || scopes.has(waveScope(wave))) fail('One source cannot be aliased into multiple timepoints', 'TRAINING_ANALYSIS_WAVE_ALIAS', 409)
     waves.set(wave.waveKey, wave); scopes.add(waveScope(wave))
@@ -127,7 +129,7 @@ const prepare = (request: TrainingAnalysisRequestV1, source: TrainingAnalysisSou
     [...wave.metrics].sort((a, b) => compare(a.metricKey, b.metricKey)).map((metric) => ({
       columnKey: `m_${canonicalHash({ waveKey: wave.waveKey, scope: waveScope(wave), ...metric })}`,
       waveKey: wave.waveKey, taskId: wave.taskId, publication: wave.publication,
-      configDigest: wave.configDigest, variantKey: wave.variantKey, ...metric,
+      configDigest: wave.configDigest, variantKey: wave.variantKey, ...materialFields(wave), ...metric,
       measurement: identities.get(groupKey(wave.waveKey, metric.metricKey))!, valueType: 'NUMBER' as const,
       missingReasons: [...TRAINING_ANALYSIS_REASONS,...(source.observations.some(row=>row.participantKind==='STUDY_LOCAL')?['RESEARCH_CONSENT_UNKNOWN','RESEARCH_WITHDRAWAL_PENDING','RESEARCH_EXCLUDED','RESEARCH_SCOPE_NOT_COVERED'] as TrainingObservationReason[]:[])],
     }))
@@ -271,6 +273,7 @@ const exportParticipantKey = (courseId: string, participantKind: string, partici
  * this is pseudonymization, not an assertion of absolute de-identification. */
 export const buildTrainingAnalysisTables = (request: TrainingAnalysisRequestV1, source: TrainingAnalysisSourceV1): TrainingAnalysisTablesV1 => {
   const prepared = prepare(request, source)
+  const materialColumns = request.waves.some(wave => wave.materialGroupKey !== undefined) ? ['materialGroupKey'] : []
   const columns = new Map(prepared.dictionary.map((column) => [groupKey(column.waveKey, column.metricKey), column]))
   const metricIdentities = new Map<string, Set<string>>()
   for (const column of prepared.dictionary) if (column.measurement !== null) {
@@ -297,16 +300,16 @@ export const buildTrainingAnalysisTables = (request: TrainingAnalysisRequestV1, 
       if (observed) return observed
       return {
         participantKind, participantKey, waveKey: column.waveKey, taskId: column.taskId,
-        publication: column.publication, configDigest: column.configDigest, variantKey: column.variantKey,
+        publication: column.publication, configDigest: column.configDigest, variantKey: column.variantKey, ...materialFields(column),
         metricKey: column.metricKey, itemId: column.itemId, measurement: column.measurement,
         attemptId: null, attemptEpoch: null, sourceHashes: {}, originalFinalStatus: null,
         taskSatisfied: null, value: null, reason: 'NO_OBSERVATION',
       }
     })
   })
-  const long: TrainingAnalysisTableV1 = { columns: [...LONG_COLUMNS], rows: exportRows.map((row) => ({
+  const long: TrainingAnalysisTableV1 = { columns: [...LONG_COLUMNS, ...materialColumns], rows: exportRows.map((row) => ({
     participantKind: row.participantKind, participantKey: exportParticipantKey(request.courseId, row.participantKind, row.participantKey), waveKey: row.waveKey, taskId: row.taskId,
-    publication: row.publication, configDigest: row.configDigest, variantKey: row.variantKey,
+    publication: row.publication, configDigest: row.configDigest, variantKey: row.variantKey, ...materialFields(row),
     itemId: row.itemId, metricKey: row.metricKey, columnKey: columns.get(groupKey(row.waveKey, row.metricKey))!.columnKey,
     attemptId: row.attemptId, attemptEpoch: row.attemptEpoch,
     originalFinalStatus: row.originalFinalStatus ?? null, taskSatisfied: row.taskSatisfied ?? null,
@@ -328,9 +331,9 @@ export const buildTrainingAnalysisTables = (request: TrainingAnalysisRequestV1, 
       return row
     }),
   }
-  const dictionary: TrainingAnalysisTableV1 = { columns: [...DICTIONARY_COLUMNS], rows: prepared.dictionary.map((column) => ({
+  const dictionary: TrainingAnalysisTableV1 = { columns: [...DICTIONARY_COLUMNS, ...materialColumns], rows: prepared.dictionary.map((column) => ({
     columnKey: column.columnKey, waveKey: column.waveKey, taskId: column.taskId, publication: column.publication,
-    configDigest: column.configDigest, variantKey: column.variantKey, itemId: column.itemId, metricKey: column.metricKey,
+    configDigest: column.configDigest, variantKey: column.variantKey, ...materialFields(column), itemId: column.itemId, metricKey: column.metricKey,
     valueType: column.valueType, ...identityFields(column.measurement), missingReasons: canonicalJsonString(column.missingReasons),
   })) }
   return { long, wide, dictionary }

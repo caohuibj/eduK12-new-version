@@ -332,3 +332,58 @@ describe('C19 Training conditional flow authoring', () => {
     expect(screen.getByRole('button', { name: '发布组合测评' })).toBeDisabled()
   })
 })
+
+describe('C20 material flow editor and attempt budget', () => {
+  const config = { schemaVersion: 2, experiment: { experimentKey: 'lesson', linkedPolicy: 'KEEP_LINKED', groups: [
+    { groupKey: 'a', weight: 1, materialTitle: 'A', materialBody: '正文 A' },
+    { groupKey: 'b', weight: 2, materialTitle: 'B', materialBody: '正文 B' },
+  ] }, blocks: [{ blockKey: 'tool_1', kind: 'INSTRUMENT', instrumentKey: 'item_scale_1' }] }
+  const row = { id: 'materials', name: '材料实验', status: 'DRAFT', productKind: 'QUESTIONNAIRE', revision: 3, maxAttempts: 4, questionnaireType: 'COURSE', questionnaireCourses: [{ courseId: 'training-course' }], items: [{ id: 'scale-1', type: 'SCALE', position: 0, required: true, scale: { name: '量表' } }], formSections: [], publicEnabled: false, trainingFlowDraft: config }
+  const resources = { scales: [], cognitive: [], situational: [], courses: [{ id: 'training-course', title: 'Training 课程', courseType: 'TRAINING_COURSE', isLibrary: false }] }
+  beforeEach(() => {
+    vi.resetAllMocks()
+    api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? resources : row }))
+    api.post.mockImplementation(async (_path, body) => ({ code: 0, data: { ...row, revision: 4, trainingFlowDraft: body.config, maxAttempts: body.maxAttempts } }))
+  })
+  it('loads the saved budget and sends budget-only changes with V2 config', async () => {
+    mount('materials')
+    const input = await screen.findByLabelText('最多作答次数（材料实验）')
+    expect(input).toHaveValue(4)
+    expect(screen.getByRole('button', { name: '保存流程设置' })).toBeDisabled()
+    fireEvent.change(input, { target: { value: '8' } })
+    fireEvent.click(screen.getByRole('button', { name: '保存流程设置' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith('/questionnaire-products/materials/training-flow', { revision: 3, config, maxAttempts: 8 }))
+    await waitFor(() => expect(screen.getByRole('button', { name: '保存流程设置' })).toBeDisabled())
+    expect(screen.getByText(/SCREEN_OUT 不退还配额/)).toBeInTheDocument()
+    expect(screen.getByText(/新链接不代表同一关联身份/)).toBeInTheDocument()
+  })
+  it('upgrades the existing V1 blocks only explicitly and adds an editable quota sample', async () => {
+    const v1 = { schemaVersion: 1, blocks: config.blocks }
+    api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? resources : { ...row, trainingFlowDraft: v1 } }))
+    mount('materials')
+    const input = await screen.findByLabelText('流程 JSON（高级编辑）')
+    expect(screen.queryByLabelText('最多作答次数（材料实验）')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '启用两组材料实验' }))
+    const upgraded = JSON.parse((input as HTMLTextAreaElement).value)
+    expect(upgraded.schemaVersion).toBe(2)
+    expect(upgraded.blocks).toEqual(config.blocks)
+    expect(upgraded.quotaPolicy).toBeUndefined()
+    fireEvent.click(screen.getByRole('button', { name: '添加配额示例' }))
+    expect(JSON.parse((input as HTMLTextAreaElement).value).quotaPolicy).toEqual({ schemaVersion: 1, groupLimits: { group_a: 100, group_b: 100 } })
+    fireEvent.change(screen.getByLabelText('最多作答次数（材料实验）'), { target: { value: '0' } })
+    fireEvent.click(screen.getByRole('button', { name: '保存流程设置' }))
+    expect(api.post).not.toHaveBeenCalled()
+    expect(input).toHaveFocus()
+    expect(screen.getByText('最多作答次数须为 1–100 的整数。')).toBeInTheDocument()
+  })
+  it('hydrates copied V2 config and budget from the returned draft detail', async () => {
+    const published = { ...row, status: 'PUBLISHED', trainingFlowDraft: null, trainingFlowFrozen: config }
+    api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? resources : path.endsWith('/copied') ? { ...row, id: 'copied' } : published }))
+    api.post.mockResolvedValue({ code: 0, data: { id: 'copied' } })
+    mount('materials')
+    await screen.findByText('每位作答者最多作答 4 次。')
+    fireEvent.click(screen.getByRole('button', { name: '复制为新草稿' }))
+    expect(await screen.findByLabelText('最多作答次数（材料实验）')).toHaveValue(4)
+    expect(JSON.parse((screen.getByLabelText('流程 JSON（高级编辑）') as HTMLTextAreaElement).value)).toEqual(config)
+  })
+})

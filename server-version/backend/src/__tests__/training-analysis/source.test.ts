@@ -2,6 +2,9 @@ import {beforeEach, describe, expect, it, vi} from 'vitest'
 const globalRead = vi.hoisted(() => vi.fn(() => {throw new Error('Global database used inside source transaction')}))
 vi.mock('../../config/database', () => ({prisma: new Proxy({}, {get: () => globalRead})}))
 import {loadTrainingAnalysisSources, listTrainingAnalysisSources} from '../../modules/training-analysis/source'
+import {compileTrainingFlow, trainingFlowUnitKey} from '../../modules/assessment-core/flow/training'
+import {buildTrainingFlowUnits} from '../../modules/composite/training-flow-definition'
+import {resolveTrainingFlowScope} from '../../modules/composite/training-flow-scope'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {createPublicTemplateStore, type PublicTemplateRow} from '../../modules/assessment-runtime/public-templates'
 import {prepareCompactScaleFacts, decodeScaleFacts, isScaleReportFactsView} from '../../modules/assessment-runtime/compact-scale-facts'
@@ -32,11 +35,13 @@ const request = (): TrainingAnalysisRequestV1 => ({schemaVersion: 1, courseId: '
 function fixture(n = 2) {
   const field = item(), section = {id: field.formSectionId, title: 'Form', position: 0, contextSection: false, items: [field]}
   const task: any = {id: 'task', name: 'Task', createdBy: 'teacher', productKind: 'QUESTIONNAIRE', publishedAt: new Date(publication),
+    trainingFlowDraft: null, trainingFlowFrozen: null, trainingFlowDigest: null,
     trainingVariantDraft: null, trainingVariantFrozen: null, trainingVariantDigest: null, items: [field], formSections: [section]}
   const slots = createFrozenActiveSlotSet({schemaVersion: 1, runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1, slots: [{slotKey: `form-section:${section.id}`, unitType: 'FORM_SECTION', required: true,
     sourceDefinitionIdentity: {key: section.id, version: '2', hash: canonicalHash(mapCompositeSection(section))}, sourceBinding: {sectionId: section.id}}]})
   const parents: any[] = Array.from({length: n}, (_, i) => ({id: `attempt-${i}`, compositeAssessmentId: 'task', userId: `user-${i}`, participantKey: `user-${i}`, deliveryCourseId: 'course', assignmentRef: null,
     status: 'COMPLETED', startedAt: new Date(publication), deliveryMode: 'FINAL_ONLY', runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1, trainingVariantAllocationEncrypted: null, trainingVariantAllocationHash: null,
+    trainingFlowSnapshotEncrypted: null, trainingFlowSnapshotHash: null, trainingFlowPathEncrypted: null, trainingFlowPathHash: null,
     respondentType: 'SELF', taskSatisfaction: i ? 'NOT_SATISFIED' : 'SATISFIED', completedAt: new Date(publication),
     frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(slots), frozenActiveSlotSetHash: slots.snapshotHash}))
   const snapshots: any[] = parents.map((parent, i) => ({compositeAttemptId: parent.id, attemptEpoch: 1, slotKey: `form-section:${section.id}`, unitType: 'FORM_SECTION', terminalState: 'COMPLETED', payloadKind: 'COLLECTION_FACTS', sourceType: 'COMPOSITE_FORM_SECTION', sourceAttemptId: `section-attempt-${i}`, sourceSubmissionId: `section-submit-${i}`,
@@ -49,7 +54,7 @@ function fixture(n = 2) {
     compositeAssessment: {findMany: vi.fn(async () => [task]), findUnique: vi.fn(async () => ({...task, attempts: parents}))},
     compositeAssessmentAttempt: {findMany: vi.fn(async ({where}: any) => parents.filter(row => matches(row, where)))},
     assessment: {findMany: vi.fn(async () => [])},
-    assessmentUnitSnapshot: {findMany: vi.fn(async ({where}: any) => snapshots.filter(row => where.OR.some((condition: any) => condition.compositeAttemptId === row.compositeAttemptId && condition.attemptEpoch === row.attemptEpoch && condition.slotKey.in.includes(row.slotKey))))},
+    assessmentUnitSnapshot: {findMany: vi.fn(async ({where}: any) => snapshots.filter(row => (where.OR ?? [where]).some((condition: any) => condition.compositeAttemptId === row.compositeAttemptId && condition.attemptEpoch === row.attemptEpoch && (!condition.slotKey || condition.slotKey.in.includes(row.slotKey)))))},
     $queryRaw: vi.fn(async () => []),
   }
   return {db, task, parents, snapshots, section, field}
@@ -394,4 +399,89 @@ describe('authorized Training numeric source adapter', () => {
     expect(result.list[0]).toMatchObject({taskId: 'task', publication, configDigest: null, variantKey: null, metrics: [{itemId: 'number', metricKey: 'stable_number'}]})
     expect(f.db.assessmentUnitSnapshot.findMany).not.toHaveBeenCalled()
   })
+})
+
+
+async function materialFixture(n = 2) {
+  const f = fixture(n)
+  const config = compileTrainingFlow({schemaVersion: 2,
+    experiment: {experimentKey: 'material_trial', linkedPolicy: 'KEEP_LINKED', groups: [
+      {groupKey: 'a', weight: 1, materialTitle: 'A title', materialBody: 'A body'},
+      {groupKey: 'b', weight: 1, materialTitle: 'B title', materialBody: 'B body'},
+    ]}, blocks: [{blockKey: 'measure', kind: 'INSTRUMENT', instrumentKey: trainingFlowUnitKey(f.section.id)}],
+  }, buildTrainingFlowUnits(f.task))
+  f.task.trainingFlowFrozen = config; f.task.trainingFlowDigest = config.flowDigest
+  if (config.schemaVersion !== 2) throw new Error('Expected V2 fixture')
+  for (const [index, parent] of f.parents.entries()) {
+    const group = config.experiment.groups[index % 2]
+    const assignmentBody = {schemaVersion: 1, claimId: `claim-${index}`, experimentId: 'experiment', compositeId: f.task.id,
+      publicationKey: publication, configDigest: config.flowDigest, participantKey: parent.participantKey,
+      attemptId: parent.id, attemptEpoch: parent.attemptEpoch, groupKey: group.groupKey,
+      materialDigest: canonicalHash({materialTitle: group.materialTitle, materialBody: group.materialBody}), algorithm: 'CRYPTO_RANDOM_INT_V1'}
+    const materialAssignment = {...assignmentBody, assignmentHash: canonicalHash(assignmentBody)}
+    const snapshot = {schemaVersion: 2, compositeId: f.task.id, publishedAt: publication, attemptId: parent.id, attemptEpoch: 1,
+      flowDigest: config.flowDigest, unionDigest: config.unionDigest, slotSetHash: parent.frozenActiveSlotSetHash, materialAssignment}
+    parent.trainingFlowSnapshotEncrypted = encryptUnifiedRuntimePayload(snapshot); parent.trainingFlowSnapshotHash = canonicalHash(snapshot)
+    f.snapshots[index].id = `snapshot-${index}`
+    const scope = await resolveTrainingFlowScope(parent, f.task, {db: f.db, snapshotRows: [f.snapshots[index]], allowAdvance: true})
+    parent.trainingFlowPathEncrypted = encryptUnifiedRuntimePayload(scope!.evidence); parent.trainingFlowPathHash = scope!.pathHash
+  }
+  const selector = request(); selector.waves[0].materialGroupKey = 'a'
+  return {...f, selector}
+}
+
+describe('material-only analysis strata', () => {
+  it('discovers explicit material arms with the same metrics and no C14 variant identity', async () => {
+    const f = await materialFixture(), result = await listTrainingAnalysisSources(f.db, actor, 'course')
+    expect(result.list.map(row => ({materialGroupKey: row.materialGroupKey, configDigest: row.configDigest, variantKey: row.variantKey})))
+      .toEqual([{materialGroupKey: 'a', configDigest: null, variantKey: null}, {materialGroupKey: 'b', configDigest: null, variantKey: null}])
+    expect(result.list[0].metrics).toEqual(result.list[1].metrics)
+  })
+  it('selects one verified material arm and binds observations, manifest, dictionary and source hashes', async () => {
+    const f = await materialFixture(), loaded = await loadTrainingAnalysisSources(f.db, actor, f.selector)
+    expect(loaded.source.observations).toHaveLength(1)
+    expect(loaded.source.observations[0]).toMatchObject({materialGroupKey: 'a', attemptId: 'attempt-0', value: 0, configDigest: null, variantKey: null})
+    expect(loaded.source.observations[0].sourceHashes).toMatchObject({materialConfig: f.task.trainingFlowDigest, materialAssignment: expect.any(String), materialPath: f.parents[0].trainingFlowPathHash})
+    expect(loaded.manifest.attempts[0]).toMatchObject({materialGroupKey: 'a'})
+    expect(loaded.dictionary[0]).toMatchObject({materialGroupKey: 'a'})
+    const selectedQuery = f.db.assessmentUnitSnapshot.findMany.mock.calls.at(-1)![0]
+    expect(selectedQuery.where.OR.map((row: any) => row.compositeAttemptId)).toEqual(['attempt-0'])
+  })
+  it.each([undefined, 'unknown'])('rejects an unselected or unknown arm (%s) before source reads', async group => {
+    const f = await materialFixture(); f.selector.waves[0].materialGroupKey = group
+    await expect(loadTrainingAnalysisSources(f.db, actor, f.selector)).rejects.toThrow()
+    expect(f.db.compositeAssessmentAttempt.findMany).not.toHaveBeenCalled()
+    expect(f.db.assessment.findMany).not.toHaveBeenCalled()
+  })
+  it('rejects material selection on legacy sources rather than silently accepting it', async () => {
+    const f = fixture(), selector = request(); selector.waves[0].materialGroupKey = 'a'
+    await expect(loadTrainingAnalysisSources(f.db, actor, selector)).rejects.toThrow()
+    expect(f.db.compositeAssessmentAttempt.findMany).not.toHaveBeenCalled()
+  })
+  it('rejects a tampered persisted group assignment and frozen config', async () => {
+    const f = await materialFixture()
+    f.parents[0].trainingFlowSnapshotHash = 'a'.repeat(64)
+    await expect(loadTrainingAnalysisSources(f.db, actor, f.selector)).rejects.toThrow()
+    const g = await materialFixture(); g.task.trainingFlowFrozen.experiment.groups[0].groupKey = 'changed'
+    await expect(listTrainingAnalysisSources(g.db, actor, 'course')).rejects.toThrow()
+  })
+  it('rejects a fixed manifest changed to a different group', async () => {
+    const f = await materialFixture(), loaded = await loadTrainingAnalysisSources(f.db, actor, f.selector)
+    const attempts = loaded.manifest.attempts.map(row => ({...row, materialGroupKey: 'b'}))
+    await expect(loadTrainingAnalysisSources(f.db, actor, f.selector, {fixedManifest: {attempts}})).rejects.toThrow()
+  })
+})
+
+
+it('material arms retain hand-calculated means 4 versus 5 instead of a pooled 4.5', async () => {
+  const f = await materialFixture(10)
+  const a = await loadTrainingAnalysisSources(f.db, actor, f.selector)
+  f.selector.waves[0].materialGroupKey = 'b'
+  const b = await loadTrainingAnalysisSources(f.db, actor, f.selector)
+  const valuesA = a.source.observations.map(row => row.value!), valuesB = b.source.observations.map(row => row.value!)
+  expect(valuesA).toEqual([0, 2, 4, 6, 8]); expect(valuesB).toEqual([1, 3, 5, 7, 9])
+  expect(valuesA.reduce((sum, value) => sum + value, 0) / valuesA.length).toBe(4)
+  expect(valuesB.reduce((sum, value) => sum + value, 0) / valuesB.length).toBe(5)
+  expect(a.sourceFingerprint).not.toBe(b.sourceFingerprint)
+  expect(f.db).not.toHaveProperty('trainingMaterialAllocationClaim')
 })

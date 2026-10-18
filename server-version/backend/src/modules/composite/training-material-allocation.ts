@@ -44,7 +44,7 @@ export async function allocateTrainingMaterial(tx:any,attempt:any,composite:any,
   const groupKeysHash=canonicalHash(flow.experiment.groups.map(group=>group.groupKey).sort())
   const id=randomUUID()
   await tx.$executeRaw`INSERT INTO training_material_experiments (id,owner_id,course_id,experiment_key,group_keys_hash) VALUES (${id},${composite.createdBy},${courseId},${flow.experiment.experimentKey},${groupKeysHash}) ON CONFLICT (owner_id,course_id,experiment_key) DO NOTHING`
-  const scopes=await tx.$queryRaw`SELECT id,group_keys_hash AS "groupKeysHash" FROM training_material_experiments WHERE owner_id=${composite.createdBy} AND course_id=${courseId} AND experiment_key=${flow.experiment.experimentKey} FOR UPDATE`
+  const scopes=await tx.$queryRaw`SELECT id,group_keys_hash AS "groupKeysHash" FROM training_material_experiments WHERE owner_id=${composite.createdBy} AND course_id=${courseId} AND experiment_key=${flow.experiment.experimentKey} FOR SHARE`
   const scope=scopes[0]
   if(scopes.length!==1||scope.groupKeysHash!==groupKeysHash)throw compositeConflict('同一课程实验的组键合同不一致，请使用新的明确实验标识')
   let claim:any
@@ -52,6 +52,12 @@ export async function allocateTrainingMaterial(tx:any,attempt:any,composite:any,
     claim=await tx.trainingMaterialAllocationClaim.findUnique({where:{id:restartClaimId}})
     if(!claim||claim.experimentId!==scope.id||claim.compositeId!==composite.id||claim.publicationKey!==publicationKey||claim.configDigest!==flow.flowDigest||claim.participantKey!==participantKey)fail()
   }else{
+    // The immutable experiment is shared across publications. Only an exact
+    // authenticated KEEP_LINKED subject must serialize its first binding.
+    // Hash collisions only serialize unrelated subjects; equality remains the
+    // complete indexed experimentId/participantKey pair below.
+    if(flow.experiment.linkedPolicy==='KEEP_LINKED'&&attempt.userId)
+      await tx.$queryRaw`SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtextextended(${'TRAINING_MATERIAL_KEEP_LINKED_V1:'+canonicalHash({experimentId:scope.id,participantKey})},0))`
     let buckets:any[]|undefined
     if(flow.quotaPolicy){
       await tx.trainingMaterialQuotaBucket.createMany({data:flow.experiment.groups.map(group=>({id:randomUUID(),compositeId:composite.id,publicationKey,configDigest:flow.flowDigest,groupKey:group.groupKey,maxAssigned:flow.quotaPolicy!.groupLimits[group.groupKey],assignedCount:0})),skipDuplicates:true})
@@ -68,7 +74,7 @@ export async function allocateTrainingMaterial(tx:any,attempt:any,composite:any,
       const updated=await tx.trainingMaterialQuotaBucket.updateMany({where:{compositeId:composite.id,publicationKey,configDigest:flow.flowDigest,groupKey:bucket.groupKey,maxAssigned:bucket.maxAssigned,assignedCount:bucket.assignedCount},data:{assignedCount:{increment:1}}})
       if(updated.count!==1)throw compositeConflict('材料组名额正在被领取，请重新进入')
     }
-    claim=await tx.trainingMaterialAllocationClaim.create({data:{id:randomUUID(),experimentId:scope.id,compositeId:composite.id,publicationKey,configDigest:flow.flowDigest,participantKey,groupKey:plan.groupKey,algorithm:plan.algorithm,materialDigest:materialDigest(group!),initialAttemptId:attempt.id,inheritedFromClaimId:linked?.initialClaimId??null}})
+    claim=await tx.trainingMaterialAllocationClaim.create({data:{id:randomUUID(),experimentId:scope.id,compositeId:composite.id,publicationKey,configDigest:flow.flowDigest,participantKey,groupKey:plan.groupKey,algorithm:plan.algorithm,materialDigest:materialDigest(group!),reservationOrdinal:plan.quotaBucket?plan.quotaBucket.assignedCount+1:null,initialAttemptId:attempt.id,inheritedFromClaimId:linked?.initialClaimId??null}})
     if(flow.experiment.linkedPolicy==='KEEP_LINKED'&&attempt.userId&&!linked)await tx.trainingMaterialSubjectBinding.create({data:{id:randomUUID(),experimentId:scope.id,participantKey,groupKey:claim.groupKey,initialClaimId:claim.id}})
   }
   const body={schemaVersion:1 as const,claimId:claim.id,experimentId:scope.id,compositeId:composite.id,publicationKey,configDigest:flow.flowDigest,participantKey,attemptId:attempt.id,attemptEpoch:attempt.attemptEpoch,groupKey:claim.groupKey,materialDigest:claim.materialDigest,algorithm:claim.algorithm}

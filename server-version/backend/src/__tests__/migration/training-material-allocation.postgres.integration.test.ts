@@ -57,10 +57,10 @@ describe.skipIf(!enabled)('C20 migration on isolated PostgreSQL', () => {
   async function rejected(sql: string, values: unknown[] = []) {
     await db.query('BEGIN')
     try {
-      await expect((async () => { await db.query(sql, values); await db.query('SET CONSTRAINTS ALL IMMEDIATE') })()).rejects.toThrow()
+      await expect((async () => { await db.query(sql, values); await db.query('SET CONSTRAINTS training_material_claim_scope, training_material_quota_claim_scope, training_material_binding_scope, training_material_claim_attempt_fk, training_material_binding_initial_claim_fk IMMEDIATE') })()).rejects.toThrow()
     } finally { await db.query('ROLLBACK') }
   }
-  const claim = (id: string, task = 'task', group = 'A', algorithm = 'CRYPTO_QUOTA_WEIGHTED_V1', inherited: string | null = null, participant = 'user:subject') => db.query(`INSERT INTO training_material_allocation_claims VALUES ($1,'experiment',$2,'2026-10-18T12:00:00.000Z',$3,$4,$5,$6,$7,$8,$3,DEFAULT)`, [id, task, digest, participant, group, algorithm, inherited, `attempt-${id}`])
+  const claim = (id: string, task = 'task', group = 'A', algorithm = 'CRYPTO_QUOTA_WEIGHTED_V1', inherited: string | null = null, participant = 'user:subject', ordinal: number|null = task==='task'?1:null) => db.query(`INSERT INTO training_material_allocation_claims VALUES ($1,'experiment',$2,'2026-10-18T12:00:00.000Z',$3,$4,$5,$6,$7,$8,$3,$9,DEFAULT)`, [id, task, digest, participant, group, algorithm, inherited, `attempt-${id}`,ordinal])
   const attempt = (id: string, task = 'task', participant = 'user:subject') => db.query(`INSERT INTO composite_assessment_attempts VALUES ($1,$2,$3,'subject','course')`, [`attempt-${id}`,task,participant])
   it('admits the authorized admin without allowing other teachers, libraries or legacy courses', async () => {
     await db.query(`INSERT INTO training_material_experiments VALUES ('admin-exp','admin','course','exp',$1)`, [digest])
@@ -81,9 +81,25 @@ describe.skipIf(!enabled)('C20 migration on isolated PostgreSQL', () => {
       await db.query(`INSERT INTO training_material_subject_bindings VALUES ('binding','experiment','user:subject','A','first')`)
       await claim('first')
       await attempt('first')
-      await db.query('SET CONSTRAINTS training_material_claim_scope, training_material_binding_scope, training_material_claim_attempt_fk, training_material_binding_initial_claim_fk IMMEDIATE')
+      await db.query('SET CONSTRAINTS training_material_claim_scope, training_material_quota_claim_scope, training_material_binding_scope, training_material_claim_attempt_fk, training_material_binding_initial_claim_fk IMMEDIATE')
       await db.query('COMMIT')
     } catch (error) { await db.query('ROLLBACK'); throw error }
+  })
+  it('cannot issue duplicate, uncharged or missing quota reservations', async () => {
+    // Self-contained scope: this test can run alone without replaying prior cases.
+    // Use an ordinary task group B so its cap is independently one and no prior claim is required.
+    await db.query(`INSERT INTO training_material_quota_buckets VALUES ('ordinal-bucket','task','2026-10-18T12:00:00.000Z',$1,'B',1,0)`,[digest])
+    await rejected(`UPDATE training_material_quota_buckets SET assigned_count=1 WHERE id='ordinal-bucket'`)
+    await rejected(`UPDATE training_material_quota_buckets SET assigned_count=2 WHERE id='ordinal-bucket'`)
+    for(const ordinal of [null,1,2]){
+      await db.query('BEGIN')
+      try{await attempt('ordinal-invalid');await expect((async()=>{await claim('ordinal-invalid','task','B','CRYPTO_QUOTA_WEIGHTED_V1',null,'user:subject',ordinal);await db.query('SET CONSTRAINTS training_material_claim_scope IMMEDIATE')})()).rejects.toThrow()}
+      finally{await db.query('ROLLBACK')}
+    }
+    await db.query('BEGIN');await db.query(`UPDATE training_material_quota_buckets SET assigned_count=1 WHERE id='ordinal-bucket'`);await attempt('ordinal-first');await claim('ordinal-first','task','B','CRYPTO_QUOTA_WEIGHTED_V1',null,'user:subject',1);await db.query('SET CONSTRAINTS training_material_claim_scope,training_material_claim_attempt_fk IMMEDIATE');await db.query('COMMIT')
+    await db.query('BEGIN')
+    try{await attempt('ordinal-duplicate');await expect(claim('ordinal-duplicate','task','B','CRYPTO_QUOTA_WEIGHTED_V1',null,'user:subject',1)).rejects.toThrow()}
+    finally{await db.query('ROLLBACK')}
   })
   it('allows material assignment without quotas and exact inherited linkage', async () => {
     await db.query('BEGIN')
@@ -105,7 +121,7 @@ describe.skipIf(!enabled)('C20 migration on isolated PostgreSQL', () => {
       async () => { await attempt('algorithm'); await claim('algorithm','task','A','CRYPTO_RANDOM_INT_V1') },
     ]) {
       await db.query('BEGIN')
-      try { await expect((async () => { await mutate(); await db.query('SET CONSTRAINTS ALL IMMEDIATE') })()).rejects.toThrow() }
+      try { await expect((async () => { await mutate(); await db.query('SET CONSTRAINTS training_material_claim_scope, training_material_quota_claim_scope, training_material_binding_scope, training_material_claim_attempt_fk, training_material_binding_initial_claim_fk IMMEDIATE') })()).rejects.toThrow() }
       finally { await db.query('ROLLBACK') }
     }
   })

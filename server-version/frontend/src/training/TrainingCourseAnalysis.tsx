@@ -18,7 +18,7 @@ import './training-course-analysis.css'
 type WaveDraft = { id: number; waveKey: string; taskId: string; version: string; sourceKey: string; metricKeys: string[] }
 type ResultSnapshot = { selector: TrainingAnalysisSelector; result: TrainingAnalysisResult }
 const newWave = (id: number): WaveDraft => ({ id, waveKey: id === 1 ? 'baseline' : id === 2 ? 'followup' : `followup_${id - 1}`, taskId: '', version: '', sourceKey: '', metricKeys: [] })
-const sourceKey = (source: TrainingAnalysisSource) => JSON.stringify([source.taskId, source.publication, source.configDigest, source.variantKey])
+const sourceKey = (source: TrainingAnalysisSource) => JSON.stringify([source.taskId, source.publication, source.configDigest, source.variantKey, ...(source.materialGroupKey === undefined ? [] : [source.materialGroupKey])])
 const versionKey = (source: TrainingAnalysisSource) => JSON.stringify([source.publication, source.configDigest])
 const metricKey = (metric: { itemId: string; metricKey: string }) => JSON.stringify([metric.itemId, metric.metricKey])
 const displayNumber = (value: number | null | undefined) => typeof value === 'number' && Number.isFinite(value) ? value.toLocaleString('zh-CN', { maximumFractionDigits: 4 }) : '—'
@@ -111,7 +111,7 @@ export default function TrainingCourseAnalysis({ courseId }: { courseId: string 
     const selector: TrainingAnalysisSelector = { schemaVersion: 1, courseId, mode, waves: waves.map(wave => {
       const source = sources.find(candidate => sourceKey(candidate) === wave.sourceKey)!
       return { waveKey: wave.waveKey.trim(), taskId: source.taskId, publication: source.publication, configDigest: source.configDigest,
-        variantKey: source.variantKey, metrics: source.metrics.filter(metric => wave.metricKeys.includes(metricKey(metric))).map(({ itemId, metricKey: key }) => ({ itemId, metricKey: key })) }
+        variantKey: source.variantKey, ...(source.materialGroupKey === undefined ? {} : { materialGroupKey: source.materialGroupKey }), metrics: source.metrics.filter(metric => wave.metricKeys.includes(metricKey(metric))).map(({ itemId, metricKey: key }) => ({ itemId, metricKey: key })) }
     }) }
     operation.current = true; setBusy(true); invalidate()
     const requestEpoch = epoch.current
@@ -210,7 +210,7 @@ export default function TrainingCourseAnalysis({ courseId }: { courseId: string 
                   <option value="">选择冻结版本</option>{versions.map(([key, item]) => <option key={key} value={key}>{item.publication} · {item.configDigest || '无分组配置'}</option>)}
                 </select></label>
                 <label>分组<select aria-label={`波次 ${index + 1} 分组`} value={wave.sourceKey} disabled={busy || !wave.version} onChange={event => updateWave(wave.id, { sourceKey: event.target.value, metricKeys: [] })} required>
-                  <option value="">选择分组</option>{variants.map(item => <option key={sourceKey(item)} value={sourceKey(item)}>{item.variantKey || '未分组'}</option>)}
+                  <option value="">选择分组</option>{variants.map(item => <option key={sourceKey(item)} value={sourceKey(item)}>{item.materialGroupKey ? `实验材料组 · ${item.materialGroupKey}` : item.variantKey || '未分组'}</option>)}
                 </select></label>
                 {source && <fieldset className="training-analysis-metrics"><legend>数值指标</legend>{source.metrics.length === 0 ? <p>这个来源没有可分析的数值指标。</p> : source.metrics.map(metric => <label key={metricKey(metric)}>
                   <input type="checkbox" checked={wave.metricKeys.includes(metricKey(metric))} disabled={busy || (!wave.metricKeys.includes(metricKey(metric)) && wave.metricKeys.length >= 64)} onChange={event => updateWave(wave.id, { metricKeys: event.target.checked ? [...wave.metricKeys, metricKey(metric)] : wave.metricKeys.filter(key => key !== metricKey(metric)) })} />

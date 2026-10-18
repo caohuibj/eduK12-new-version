@@ -3835,8 +3835,10 @@ model TrainingMaterialAllocationClaim {
   inheritedFromClaimId String? @map("inherited_from_claim_id")
   initialAttemptId     String @unique(map: "training_material_claim_attempt_key") @map("initial_attempt_id")
   materialDigest       String @map("material_digest")
+  reservationOrdinal   Int? @map("reservation_ordinal")
   createdAt            DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
+  @@unique([compositeId, publicationKey, configDigest, groupKey, reservationOrdinal], map: "training_material_claim_reservation_key")
   @@index([experimentId, participantKey], map: "training_material_claim_subject_idx")
   @@index([compositeId, publicationKey, configDigest, groupKey], map: "training_material_claim_quota_idx")
   @@map("training_material_allocation_claims")

@@ -17,7 +17,7 @@ import LocalDateTimeInput, { localDateTimeValue, parseLocalDateTime } from '../.
 import './questionnaire-products.css'
 import { TrainingVariantEditor } from './TrainingVariantEditor'
 import { TrainingFlowEditor, trainingFlowEditorId } from './TrainingFlowEditor'
-import { formatTrainingFlow, parseTrainingFlow, type TrainingFlowConfig } from './trainingFlow'
+import { formatTrainingFlow, isMaterialFlowText, trainingFlowRequest, parseTrainingFlow, type TrainingFlowConfig } from './trainingFlow'
 import { validateTrainingVariants, type TrainingVariantConfig } from './trainingVariants'
 import {
   ProductPage,
@@ -339,6 +339,7 @@ export function QuestionnaireProductEdit() {
     if (flowDirty) {
       try {
         flowConfig = parseTrainingFlow(trainingFlowText, units)
+        trainingFlowRequest(detail?.revision ?? 0, flowConfig, maxAttempts)
         if (flowConfig && !flowEligible) throw new Error('条件流程仅支持真实 Training 课程投放，且不能与随机分组或其他投放策略组合。')
         setTrainingFlowError('')
       } catch (cause) {
@@ -376,7 +377,7 @@ export function QuestionnaireProductEdit() {
         }
         if (flowDirty && flowConfig) {
           try {
-            row = await request('/' + id + '/training-flow', { revision: row.revision, config: flowConfig })
+            row = await request('/' + id + '/training-flow', trainingFlowRequest(row.revision, flowConfig, maxAttempts))
           } catch (cause) {
             setTrainingFlowError(message(cause))
             requestAnimationFrame(() => document.getElementById(trainingFlowEditorId)?.focus())
@@ -506,7 +507,7 @@ export function QuestionnaireProductEdit() {
     JSON.stringify(trainingVariantDraft) !== JSON.stringify(detail.trainingVariantDraft ?? null) ||
     (trainingVariantDraft && maxAttempts !== (detail.maxAttempts ?? 1))
   ))
-  const flowDirty = Boolean(detail && trainingFlowText !== formatTrainingFlow(detail.trainingFlowDraft ?? null))
+  const flowDirty = Boolean(detail && (trainingFlowText !== formatTrainingFlow(detail.trainingFlowDraft ?? null) || (isMaterialFlowText(trainingFlowText) && maxAttempts !== (detail.maxAttempts ?? 1))))
   const dirty = metadataDirty || variantsDirty || flowDirty
   const trainingEligible = kind === 'COURSE' && !detail?.reportPackage && !detail?.analysisProtocol &&
     (!detail?.productKind || detail.productKind === 'QUESTIONNAIRE') && courseIds.length > 0 && courseIds.length <= 100 &&
@@ -985,6 +986,7 @@ export function QuestionnaireProductEdit() {
               />}
               {(draft ? trainingEligible || trainingFlowText || detail.trainingFlowDraft : detail.trainingFlowFrozen) && <TrainingFlowEditor
                 text={trainingFlowText} frozen={detail.trainingFlowFrozen ?? null} units={units}
+                maxAttempts={maxAttempts} onMaxAttemptsChange={setMaxAttempts}
                 draft={draft} eligible={flowEligible} busy={busy} dirty={flowDirty} error={trainingFlowError}
                 onChange={text => { setTrainingFlowText(text); setTrainingFlowError('') }}
                 onError={setTrainingFlowError} onSave={() => void save()}

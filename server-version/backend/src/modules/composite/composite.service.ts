@@ -2832,7 +2832,7 @@ const createAttempt = async (
   }
   if(materialAssignment){
     await ensureTrainingFlowCurrentChildInTransaction(db as Prisma.TransactionClient,attempt.id,userId?{userId}:{recoveryTokenHash:credential!.hash})
-    await db.$executeRawUnsafe('SET CONSTRAINTS training_material_claim_scope, training_material_binding_scope, training_material_claim_attempt_fk, training_material_binding_initial_claim_fk IMMEDIATE')
+    await db.$executeRawUnsafe('SET CONSTRAINTS training_material_claim_scope, training_material_quota_claim_scope, training_material_binding_scope, training_material_claim_attempt_fk, training_material_binding_initial_claim_fk IMMEDIATE')
   }
   return attempt
 }
@@ -3136,7 +3136,7 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
   assertCompositeWindow(token.compositeAssessment)
   const credential = study?.credential ?? createRecoveryCredential()
   const attempt = await prisma.$transaction(async (tx) => {
-    if(composite.trainingVariantFrozen != null || composite.trainingFlowFrozen != null) await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${composite.id} FOR UPDATE`
+    await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${composite.id} FOR UPDATE`
     const existingId = study ? await study.beforeAdmission(tx) : null
     if (existingId) {
       const existing = await tx.compositeAssessmentAttempt.findUnique({where:{id:existingId}})

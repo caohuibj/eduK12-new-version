@@ -260,8 +260,13 @@ const CompositeAssessmentContent: React.FC = () => {
         const nextCredential = response.data.recoveryToken || recoveryToken
         if (nextCredential) {
           setRecoveryToken(nextCredential)
-          store(tokenKey(token), nextCredential)
+          if (token) store(tokenKey(token), nextCredential)
+          // Only rotate link caches that hold this exact authenticated old credential.
+          for (const key of Object.keys(window.sessionStorage)) {
+            if (key.startsWith('composite:recovery:token:') && readStored(key) === recoveryToken) store(key, nextCredential)
+          }
           store(attemptKey(nextId), nextCredential)
+          if (nextId !== state.id) window.sessionStorage.removeItem(attemptKey(state.id))
         }
         navigate(`/public/composite/attempts/${nextId}`)
       } else {

@@ -41,7 +41,7 @@ const selector = { schemaVersion: 1, courseId: 'course-1', mode: 'PAIRWISE', wav
 function chooseWave(index: number, source: TrainingAnalysisSource) {
   fireEvent.change(screen.getByRole('combobox', { name: `波次 ${index} 任务` }), { target: { value: source.taskId } })
   fireEvent.change(screen.getByRole('combobox', { name: `波次 ${index} 发布版本` }), { target: { value: JSON.stringify([source.publication, source.configDigest]) } })
-  fireEvent.change(screen.getByRole('combobox', { name: `波次 ${index} 分组` }), { target: { value: JSON.stringify([source.taskId, source.publication, source.configDigest, source.variantKey]) } })
+  fireEvent.change(screen.getByRole('combobox', { name: `波次 ${index} 分组` }), { target: { value: JSON.stringify([source.taskId, source.publication, source.configDigest, source.variantKey, ...(source.materialGroupKey === undefined ? [] : [source.materialGroupKey])]) } })
   const group = screen.getByRole('group', { name: index === 1 ? '基线来源' : `随访 ${index - 1}来源` })
   fireEvent.click(within(group).getByRole('checkbox', { name: /总分/ }))
 }
@@ -316,4 +316,21 @@ describe('authorized course analysis workspace', () => {
     expect(screen.queryByRole('region', { name: '课程分析结果' })).toBeNull()
     expect(mocks.fetch).not.toHaveBeenCalled()
   })
+})
+
+
+it('requires and submits each explicit material arm without pretending it is a tool-subset variant', async () => {
+  const a = {...baseline, configDigest: null, variantKey: null, materialGroupKey: 'a'}
+  const b = {...followup, configDigest: null, variantKey: null, materialGroupKey: 'b'}
+  mocks.sources.mockResolvedValue({list: [a, {...a, materialGroupKey: 'b'}, b], total: 3, canQuality: true, canExport: true})
+  render(<TrainingCourseAnalysis courseId="course-1" />)
+  await screen.findByRole('combobox', {name: '波次 1 任务'})
+  chooseWave(1, a); chooseWave(2, b)
+  expect(screen.getAllByRole('option', {name: '实验材料组 · b'})).toHaveLength(2)
+  fireEvent.click(screen.getByRole('button', {name: '生成课程分析'}))
+  await screen.findByRole('region', {name: '课程分析结果'})
+  expect(mocks.analyze.mock.calls[0][1].waves).toEqual([
+    expect.objectContaining({materialGroupKey: 'a', configDigest: null, variantKey: null}),
+    expect.objectContaining({materialGroupKey: 'b', configDigest: null, variantKey: null}),
+  ])
 })
