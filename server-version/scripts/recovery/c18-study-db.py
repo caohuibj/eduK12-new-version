@@ -206,13 +206,31 @@ class Database(_old.Database):
             before = Counter(json.dumps(row, sort_keys=True, separators=(',', ':')) for row in rows)
             after = Counter(json.dumps(row, sort_keys=True, separators=(',', ':')) for row in current[table])
             assert not before - after, f'{table}: an original full logical row changed or disappeared'
+        fixture_path = self.state / 'c18-fixture-private.json'
+        fixture = json.loads(fixture_path.read_text())['fixture'] if fixture_path.exists() else None
+        extras = {}
         for table, count in [('training_analysis_quality', 5), ('training_analysis_quality_audit', 7)]:
-            assert len(original['rows'][table]) == count
-            assert current[table] == original['rows'][table], f'{table}: C18 must not change the accepted C16 quality facts'
+            original_by_id = {row['id']: row for row in original['rows'][table]}
+            assert len(original_by_id) == len(original['rows'][table]) == count
+            retained_by_id = {row['id']: row for row in current[table] if row['id'] in original_by_id}
+            assert retained_by_id == original_by_id, f'{table}: an accepted C16 quality fact changed'
+            extras[table] = [row for row in current[table] if row['id'] not in original_by_id]
+            if extras[table]:
+                assert fixture, 'added quality facts require the exact private C18 fixture scope'
+                attempt_ids = {row['id'] for row in fixture['attempts']}
+                assert all(row['course_id'] == fixture['courseId'] and row['attempt_id'] in attempt_ids
+                           and row['reviewer_id'] == fixture['teacherId'] for row in extras[table]), 'added quality facts escaped C18 fixture course/attempt/reviewer scope'
+        extra_review_ids = {row['id'] for row in extras['training_analysis_quality']}
+        assert all(row['review_id'] in extra_review_ids for row in extras['training_analysis_quality_audit']), 'added audit does not belong to an added C18 fixture review'
+        if fixture and extra_review_ids:
+            study_attempts = {row['attempt_id'] for row in current['anonymous_study_attempts'] if row['study_id'] == fixture['studyId']}
+            assert all(row['attempt_id'] in study_attempts for row in extras['training_analysis_quality']), 'added quality review is not a persisted C18 study attempt'
         for table in ['export_batches', 'export_artifacts']:
             assert len(original['rows'][table]) == 17
         return {'oldTables': len(original['columns']), 'oldRows': sum(map(len, original['rows'].values())),
-                'qualityRows': 5, 'qualityAuditRows': 7, 'retainedExportBatches': 17, 'retainedExportArtifacts': 17}
+                'qualityRows': 5, 'qualityAuditRows': 7, 'retainedExportBatches': 17, 'retainedExportArtifacts': 17,
+                'newC18QualityRows': len(extras['training_analysis_quality']),
+                'newC18QualityAuditRows': len(extras['training_analysis_quality_audit']), 'addedQualityScopeVerified': True}
 
     def governance_guard_probe(self, database='eduk12_recovery'):
         """Real restricted-principal, rollback-only probes; no fixture survives."""

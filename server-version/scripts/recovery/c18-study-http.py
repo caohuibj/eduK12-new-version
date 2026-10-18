@@ -7,6 +7,9 @@ inside Git. --from-state clones only accepted stopped C18 phase evidence;
 completed phases are verified and reused, never silently replayed.
 """
 import argparse
+import ast
+import difflib
+import hashlib
 import fcntl
 import importlib.util
 import json
@@ -32,6 +35,178 @@ spec.loader.exec_module(db_module)
 sha_file, digest = db_module.sha_file, db_module.digest
 FLOOR = 8 * 1024 ** 3
 PHASES = ['upgrade', 'http', 'restore']
+
+HTTP03_FILES = {
+    'c18-http-result.json': '951d5ad8cdb91dba631fe04c7ca8c8719c79e2400bd7c99e79b883806d1b25f1',
+    'c18-runtime-result.json': '8abfaa300b42c63c16ba410cf77cc38b9701358a7e6aa2120c47ba3098ac9605',
+    'frozen-inputs.json': 'ce15e7e134b821fc651d7a3bd6ba6e30acf0c403028f0f5d723e672026d6d578',
+    'c18-upgrade-result.json': '47a61714c6957893860da1f98fec4cd916b532d7268f7347c0dbf0d520ef0212',
+}
+HTTP03_CHECKS = ['Real PG 10/20/50 study-local two-wave four-tool numerical analysis: fixed SQL count, one merged identity/governance batch, no audit scan or unselected study parameter; synthetic sources explicitly identified', 'Server body/scope hashes, immutable original acceptance, exact request replay/conflict, current-version and cross-study rejection; newer explanation preserves old eligibility and manifest', 'Unknown consent, pending withdrawal, confirmed exclusion and independent quality mix match hand calculation N=40/mean=30.5; INCLUDE cannot override withdrawal; full educational rows and completion counts unchanged', 'Original Redis queue/worker produces research V2 long/wide/dictionary/ZIP; pending withdrawal during PROCESSING fails generation and removes temp files; prior READY artifacts refuse download', 'Education-only analysis retains V1 and zero governance SQL; unrelated study withdrawal leaves its original export usable; old V1 study intent requires regeneration', 'Single visitor with no study participant never receives a cross-wave key; missing consent/identity is fingerprinted and stable during research export revalidation', 'Actual PG waiting publication/acceptance race linearizes at study row lock; old-version acceptance is either committed first or rejected 409', 'Restricted PG immutable version/acceptance/audit writes and unaudited governance fail; real AFTER-audit fault returns HTTP500, independent connection confirms rollback and exact original guards restored']
+COMPLETION_PATH = 'server-version/scripts/recovery/c18-study-completion.mjs'
+HTTP03_CHECKPOINT = 'd5eed774d3480c64c62da4f6dface385ecdade37'
+DB_HELPER_PATH = 'server-version/scripts/recovery/c18-study-db.py'
+FINALIZE_PATH = 'server-version/scripts/recovery/c18-study-finalize.mjs'
+HTTP04_FILES = {
+    'c18-completion-result.json': '25261da8dd5f2d6fa73da6bffd7072b88b8d85082cc93a4af689c2c8f15421a8',
+    'c18-runtime-result.json': '221df413ab89accc7d8c2f6ef56188da91ce233cbfd7aa346e40419eeb190596',
+    'frozen-inputs.json': '45fe9402883dc848801d52a19489169cefac61c07b79ecc55f108d90a4cdf92f',
+    'c18-upgrade-result.json': HTTP03_FILES['c18-upgrade-result.json'],
+    'source-c18-http-result.json': HTTP03_FILES['c18-http-result.json'],
+}
+
+
+
+def http_source_inputs(entries):
+    return [e for e in entries if '/backend/' in e['path'] or e['path'].endswith(('.mjs', 'loopback-only.cjs', 'runtime-fingerprint.cjs'))]
+
+
+def exact_http03(root):
+    """Only the captured eight-check expiry-fixture failure is admissible."""
+    for name, expected in HTTP03_FILES.items():
+        assert sha_file(root / name) == expected, f'HTTP03 exact evidence changed: {name}'
+    runtime = json.loads((root / 'c18-runtime-result.json').read_text())
+    http = json.loads((root / 'c18-http-result.json').read_text())
+    assert runtime['passed'] is False and runtime['phases']['upgrade']['passed'] is True
+    assert set(runtime['phases']) == {'upgrade'}
+    assert all(runtime[k] is True for k in ['cleanupVerified', 'sourceUnchanged', 'inputsUnchanged'])
+    assert http['passed'] is False and http['checks'] == HTTP03_CHECKS
+    assert len(http['requests']) == 198 and len(http['measurements']) == 4 and len(http['exports']) == 6
+    assert http['requests'][-1]['method'] == 'POST' and http['requests'][-1]['status'] == 400
+    assert re.fullmatch(r'/anonymous-studies/[0-9a-f-]{36}/waves/create-with-link', http['requests'][-1]['route'])
+    assert http['error']['name'] == 'AssertionError'
+    assert '公开链接有效期必须在未来一年内，且不能晚于综合测评有效期' in http['error']['message']
+    assert http['versionRace']['actualPgWaiters'] == 2 and http['auditHttpFault']['httpStatus'] == 500
+    assert len(http['duringGeneration']) == 1
+    return http
+
+
+def exact_http04(root):
+    """Only HTTP04's captured unfinalized Form parent and two passed races."""
+    for name, expected in HTTP04_FILES.items():
+        assert sha_file(root / name) == expected, f'HTTP04 exact evidence changed: {name}'
+    runtime = json.loads((root / 'c18-runtime-result.json').read_text())
+    completion = json.loads((root / 'c18-completion-result.json').read_text())
+    original = json.loads((root / 'source-c18-http-result.json').read_text())
+    assert runtime['passed'] is False and set(runtime['phases']) == {'upgrade'}
+    assert runtime['phases']['upgrade']['passed'] is True
+    assert all(runtime[k] is True for k in ['cleanupVerified', 'sourceUnchanged', 'priorSourceUnchanged', 'inputsUnchanged'])
+    assert runtime['acceptedPartialSnapshot']['clonedDatabaseVerifiedBeforeCompletion'] is True
+    assert original['passed'] is False and original['checks'] == HTTP03_CHECKS
+    assert completion['passed'] is False and completion['checks'] == []
+    assert len(completion['requests']) == 20 and completion['measurements'] == completion['exports'] == []
+    assert completion['priorHttpEvidenceSha256'] == HTTP03_FILES['c18-http-result.json']
+    assert completion['reverseVersionRace'] == {'queuedPublicationBeforeAcceptance': True, 'firstObservedWaiters': 1, 'totalObservedWaiters': 2, 'publishStatus': 200, 'acceptStatus': 409, 'acceptanceUnchanged': True}
+    assert completion['startWithdrawalRace'] == {'actualPgWaiters': 2, 'withdrawalState': 'WITHDRAWAL_PENDING', 'educationStartState': 'IN_PROGRESS'}
+    last = completion['requests'][-1]
+    assert last['method'] == 'POST' and last['status'] == 200
+    assert last['route'] == '/public/anonymous-studies/4f4593e0-0dc5-454c-bc12-0d81844feb45/waves/b22c9c5c-5b6e-468c-83c0-9193011e12a5/recover'
+    assert completion['error']['name'] == 'AssertionError'
+    assert completion['error']['message'] == "Expected values to be strictly equal:\n+ actual - expected\n\n+ 'IN_PROGRESS'\n- 'COMPLETED'\n"
+    return original, completion
+
+
+def http04_input_equivalence(previous, current, runtime):
+    launcher_path = 'server-version/scripts/recovery/c18-study-http.py'
+    old = {e['path']: e for e in previous['sourceInputs']}
+    new = {e['path']: e for e in current['sourceInputs']}
+    assert set(new) - set(old) == {FINALIZE_PATH}, 'only the missing HTTP04 finalize script may be added'
+    assert all(new.get(path) == entry for path, entry in old.items() if path != launcher_path), 'HTTP04 source changed beyond exact continuation launcher/new finalize script'
+    assert new[launcher_path]['mode'] == old[launcher_path]['mode']
+    assert old[COMPLETION_PATH]['sha256'] == 'a478c29ff7658f755c60d0171b34d8173a8d768d09e9b772063ad421c0fdd7df'
+    assert old[DB_HELPER_PATH]['sha256'] == 'beb042ffe77eef53f516ec5af1238d57b2b197746522c182f162a1cb11329f22'
+    for key in ['runtimeFingerprint', 'toolExecutables', 'generatedClientManifestSha256', 'runtimeConfigurationSha256']:
+        assert previous[key] == current[key], f'HTTP04 producer {key} changed'
+    old_http = http_source_inputs(previous['sourceInputs'])
+    assert [e for e in http_source_inputs(current['sourceInputs']) if e['path'] != FINALIZE_PATH] == old_http
+    reproduced = digest({'source': old_http, 'runtime': current['runtimeFingerprint'], 'tools': current['toolExecutables'], 'config': current['runtimeConfigurationSha256']})
+    assert reproduced == previous['phaseInputHashes']['http']
+    for phase in ['upgrade', 'restore']:
+        assert previous['phaseInputHashes'][phase] == current['phaseInputHashes'][phase]
+    original = runtime['acceptedPartialSnapshot']['producerInputs']
+    assert original['unchangedOriginalProducerInputs'] is True and original['reuseScope'] == 'EXACT_HTTP03_EIGHT_CHECKS_NOT_REPLAYED'
+    return {'originalHttpPhaseInputSha256': original['originalHttpPhaseInputSha256'],
+            'http04PhaseInputSha256': reproduced, 'finalizeSource': new[FINALIZE_PATH],
+            'unchangedOriginalProducerInputs': True, 'unchangedHttp04ProducerInputs': True,
+            'reuseScope': 'EXACT_HTTP03_EIGHT_CHECKS_AND_HTTP04_TWO_RACES_NOT_REPLAYED',
+            'backendProductionInputsSha256': original['backendProductionInputsSha256'],
+            'sameRuntimeDist': current['runtimeFingerprint']['dist'],
+            'sameGeneratedClientManifestSha256': current['generatedClientManifestSha256'],
+            'priorLauncherSha256': old[launcher_path]['sha256'], 'newLauncherSha256': new[launcher_path]['sha256'],
+            'originalFullInputSha256': previous['sourceInputsSha256'], 'newFullInputSha256': current['sourceInputsSha256'],
+            'fullHarnessInputsIdentical': False, 'originalUpgradePhaseInputSha256': previous['phaseInputHashes']['upgrade'],
+            'originalRestorePhaseInputSha256': previous['phaseInputHashes']['restore'],
+            'originalHttp03Provenance': original}
+
+
+def partial_database_snapshot(db):
+    value = db.snapshot()
+    value['allPublicUserGuards'] = db.guards(sorted(value['columns']))
+    return value
+
+
+def partial_input_equivalence(previous, current):
+    launcher_path = 'server-version/scripts/recovery/c18-study-http.py'
+    old_all = {e['path']: e for e in previous['sourceInputs']}
+    current_all = {e['path']: e for e in current['sourceInputs']}
+    assert set(current_all) - set(old_all) == {COMPLETION_PATH}, 'new source inputs exceed the authorized completion script'
+    assert all(current_all.get(path) == entry for path, entry in old_all.items() if path not in [launcher_path, DB_HELPER_PATH]), 'existing source changed beyond the authorized continuation launcher/retained-quality assertion'
+    assert old_all[launcher_path]['mode'] == current_all[launcher_path]['mode']
+    old_inputs = http_source_inputs(previous['sourceInputs'])
+    current_inputs = http_source_inputs(current['sourceInputs'])
+    added = [e for e in current_inputs if e['path'] == COMPLETION_PATH]
+    assert len(added) == 1 and added[0]['sha256'], 'exact completion script is required'
+    assert [e for e in current_inputs if e['path'] != COMPLETION_PATH] == old_inputs, 'HTTP03 producer inputs changed beyond the new completion script'
+    for key in ['runtimeFingerprint', 'toolExecutables', 'generatedClientManifestSha256', 'runtimeConfigurationSha256']:
+        assert previous[key] == current[key], f'HTTP03 producer {key} changed'
+    original_helper = subprocess.check_output(['git', 'show', HTTP03_CHECKPOINT + ':' + DB_HELPER_PATH], cwd=REPO).decode()
+    current_helper = (REPO / DB_HELPER_PATH).read_text()
+    assert hashlib.sha256(original_helper.encode()).hexdigest() == old_all[DB_HELPER_PATH]['sha256']
+    def without_retained_quality_assertion(source):
+        tree = ast.parse(source)
+        cls = next(node for node in tree.body if isinstance(node, ast.ClassDef) and node.name == 'Database')
+        method = next(node for node in cls.body if isinstance(node, ast.FunctionDef) and node.name == 'original_rows_unchanged')
+        lines = source.splitlines(keepends=True)
+        return ''.join(lines[:method.lineno - 1] + ['    # AUTHORIZED_EXACT_RETAINED_QUALITY_ASSERTION\n'] + lines[method.end_lineno:])
+    assert without_retained_quality_assertion(original_helper) == without_retained_quality_assertion(current_helper), 'DB helper changed outside the authorized old-row/new-fixture assertion'
+    helper_diff = ''.join(difflib.unified_diff(original_helper.splitlines(keepends=True), current_helper.splitlines(keepends=True), fromfile='http03/c18-study-db.py', tofile='http04/c18-study-db.py'))
+    shared = [e for e in previous['sourceInputs'] if '/backend/prisma/' in e['path'] or '/backend/scripts/' in e['path'] or e['path'].endswith(('backend/package.json', 'backend/package-lock.json', 'c18-study-db.py', 'c16-analysis-db.py'))]
+    db_inputs = {'source': shared, 'client': manifest(BACKEND / 'node_modules/.prisma/client'), 'tools': {k: v for k, v in current['toolExecutables'].items() if 'redis' not in k}}
+    original_upgrade_hash = digest({**db_inputs, 'script': sha_file(BASE / 'c18-study-upgrade.py')})
+    original_restore_hash = digest({**db_inputs, 'script': sha_file(BASE / 'c18-study-restore.py')})
+    assert original_upgrade_hash == previous['phaseInputHashes']['upgrade']
+    assert original_restore_hash == previous['phaseInputHashes']['restore']
+    reproduced = digest({'source': old_inputs, 'runtime': current['runtimeFingerprint'], 'tools': current['toolExecutables'], 'config': current['runtimeConfigurationSha256']})
+    assert reproduced == previous['phaseInputHashes']['http'], 'original HTTP03 phase input hash cannot be reproduced'
+    return {'originalHttpPhaseInputSha256': reproduced, 'completionSource': added[0],
+            'unchangedOriginalProducerInputs': True, 'reuseScope': 'EXACT_HTTP03_EIGHT_CHECKS_NOT_REPLAYED',
+            'backendProductionInputsSha256': digest([e for e in old_inputs if '/backend/' in e['path']]),
+            'sameRuntimeDist': current['runtimeFingerprint']['dist'],
+            'sameGeneratedClientManifestSha256': current['generatedClientManifestSha256'],
+            'priorLauncherSha256': old_all[launcher_path]['sha256'], 'newLauncherSha256': current_all[launcher_path]['sha256'],
+            'originalFullInputSha256': previous['sourceInputsSha256'], 'newFullInputSha256': current['sourceInputsSha256'],
+            'fullHarnessInputsIdentical': False, 'originalUpgradePhaseInputSha256': original_upgrade_hash,
+            'originalRestorePhaseInputSha256': original_restore_hash,
+            'priorDatabaseHelperSha256': old_all[DB_HELPER_PATH]['sha256'], 'newDatabaseHelperSha256': current_all[DB_HELPER_PATH]['sha256'],
+            'databaseHelperChangeScope': 'ONLY_original_rows_unchanged_METHOD; ORIGINAL_PK_VALUES_EXACT_PLUS_C18_FIXTURE_ADDITIONS',
+            'databaseHelperDiff': helper_diff, 'databaseHelperDiffSha256': hashlib.sha256(helper_diff.encode()).hexdigest()}
+
+
+def merge_http03_completion(original, completion, provenance):
+    assert original['checks'] == HTTP03_CHECKS and original['passed'] is False
+    assert completion['passed'] is True and len(completion['checks']) == 2
+    assert len(set(completion['checks'])) == 2 and not set(completion['checks']) & set(original['checks'])
+    assert isinstance(completion.get('requests'), list) and completion['requests']
+    merged = {**original, 'passed': True, 'qualificationScope': 'C18_HTTP03_REUSED_EIGHT_PLUS_TWO_NEW_CHECKS',
+              'checks': original['checks'] + completion['checks'], 'newChecks': completion['checks'],
+              'reusedChecks': original['checks'], 'reusedEvidence': provenance,
+              'priorFailure': original['error'], 'completionResult': completion}
+    merged.pop('error', None)
+    for key in ['requests', 'measurements', 'exports']:
+        merged[key] = original.get(key, []) + completion.get(key, [])
+    merged['executionCounts'] = {'reusedChecks': 8, 'newChecks': 2, 'reusedRequests': len(original['requests']), 'newRequests': len(completion['requests'])}
+    return merged
+
 
 
 def manifest(root):
@@ -72,10 +247,33 @@ def main():
     parser.add_argument('--source-state', type=Path, required=True, help='Read-only stopped C16 HTTP07 baseline')
     parser.add_argument('--state', type=Path, required=True, help='New, nonexistent private destination outside Git')
     parser.add_argument('--phase', choices=['upgrade', 'http', 'restore', 'all'], default='all')
-    parser.add_argument('--from-state', type=Path, help='Read-only stopped C18 clone with accepted earlier phases; never a C16 continue-state')
+    resume = parser.add_mutually_exclusive_group()
+    resume.add_argument('--from-state', type=Path, help='Read-only stopped C18 clone with accepted complete earlier phases')
+    resume.add_argument('--finalize-http-from-state', type=Path, help='Only exact HTTP04: preserve accepted Form FINAL and two races, execute missing finalization/assertions')
+    resume.add_argument('--continue-http-from-state', type=Path, help='Only the exact HTTP03 eight-check expiry failure, with a separately pinned complete partial snapshot')
+    parser.add_argument('--accepted-partial-snapshot', type=Path)
+    parser.add_argument('--partial-snapshot-sha256')
     args = parser.parse_args()
     tools, source, state = [p.resolve() for p in [args.tools, args.source_state, args.state]]
-    prior = args.from_state.resolve() if args.from_state else None
+    finalization = bool(args.finalize_http_from_state)
+    continuation = bool(args.continue_http_from_state or finalization)
+    prior_arg = args.finalize_http_from_state or args.continue_http_from_state or args.from_state
+    prior = prior_arg.resolve() if prior_arg else None
+    assert continuation == bool(args.accepted_partial_snapshot) == bool(args.partial_snapshot_sha256), 'partial snapshot parameters require an exact captured C18 continuation mode'
+    partial_evidence = partial_http = partial_completion = None
+    partial_files = HTTP04_FILES if finalization else HTTP03_FILES
+    partial_kind = 'C18_HTTP04_EXACT_UNFINALIZED_FORM_PARTIAL_SNAPSHOT' if finalization else 'C18_HTTP03_EXACT_EIGHT_CHECK_PARTIAL_SNAPSHOT'
+    if continuation:
+        assert args.phase in ['http', 'all'], 'exact captured continuation runs missing HTTP assertions, optionally followed by restore'
+        assert re.fullmatch(r'[0-9a-f]{64}', args.partial_snapshot_sha256)
+        assert sha_file(args.accepted_partial_snapshot) == args.partial_snapshot_sha256
+        partial_evidence = json.loads(args.accepted_partial_snapshot.read_text())
+        assert partial_evidence['schemaVersion'] == 1 and partial_evidence['kind'] == partial_kind
+        assert Path(partial_evidence['sourceState']).resolve() == prior
+        assert partial_evidence['sourceEvidenceSha256'] == partial_files
+        assert all(partial_evidence[k] is True for k in ['cleanupVerified', 'sourceUnchanged', 'diagnosticPgdataRemoved', 'originalRowsUnchanged'])
+        assert partial_evidence['snapshotSha256'] == digest(partial_evidence['snapshot'])
+        assert partial_evidence['captureDatabaseHelperSha256'] == sha_file(BASE / 'c18-study-db.py')
     for root in [source] + ([prior] if prior else []):
         assert root != state and root not in state.parents and state not in root.parents
     assert REPO not in state.parents and state != REPO and not state.exists()
@@ -100,9 +298,14 @@ def main():
         assert prior_result.get('priorSourceUnchanged', True) is True
         assert prior_result['pinnedC16DumpSha256'] == db_module.PINNED_DUMP_SHA256
         assert prior_result['phases'].get('upgrade', {}).get('passed') is True
-        if (prior / 'c18-http-result.json').exists():
+        if finalization:
+            partial_http, partial_completion = exact_http04(prior)
+        elif (prior / 'c18-http-result.json').exists():
             partial = json.loads((prior / 'c18-http-result.json').read_text())
-            assert partial['passed'] or not partial.get('checks'), 'partial HTTP success requires a targeted continuation, never automatic replay'
+            if continuation:
+                partial_http = exact_http03(prior)
+            else:
+                assert partial['passed'] or not partial.get('checks'), 'partial HTTP success requires a targeted continuation, never automatic replay'
     copy_source = prior or source
     source_runtime = json.loads((copy_source / 'runtime-private.json').read_text())
     effective = {**source_runtime, 'BACKGROUND_WORKERS_ENABLED': 'false', 'HEAVY_PROCESSING_ENABLED': 'false', 'VIDEO_PROCESSING_ENABLED': 'false', 'PERF_ISOLATED_TEST_MODE': '1', 'PERF_SQL_EVENT_COUNT': '1'}
@@ -153,7 +356,7 @@ def main():
         client = manifest(BACKEND / 'node_modules/.prisma/client')
         db_inputs = {'source': shared, 'client': client, 'tools': {k: v for k, v in binaries.items() if 'redis' not in k}}
         phase_hashes = {'upgrade': digest({**db_inputs, 'script': sha_file(BASE / 'c18-study-upgrade.py')}),
-                        'http': digest({'source': [e for e in entries if '/backend/' in e['path'] or e['path'].endswith(('.mjs', 'loopback-only.cjs', 'runtime-fingerprint.cjs'))], 'runtime': runtime, 'tools': binaries, 'config': runtime_config_hash}),
+                        'http': digest({'source': http_source_inputs(entries), 'runtime': runtime, 'tools': binaries, 'config': runtime_config_hash}),
                         'restore': digest({**db_inputs, 'script': sha_file(BASE / 'c18-study-restore.py')})}
         return {'head': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=REPO, text=True).strip(), 'runtimeFingerprint': runtime,
                 'sourceInputs': entries, 'sourceInputsSha256': digest(entries), 'toolExecutables': binaries,
@@ -228,10 +431,31 @@ def main():
         if prior:
             prior_manifest = manifest(prior)
             result['priorManifestSha256'] = digest(prior_manifest)
+            if continuation:
+                assert result['priorManifestSha256'] == partial_evidence['sourceManifestSha256'], 'captured partial source differs from the independently pinned snapshot'
+                prior_binding = json.loads((prior / 'frozen-inputs.json').read_text())
+                producer = http04_input_equivalence(prior_binding, pinned, prior_result) if finalization else partial_input_equivalence(prior_binding, pinned)
+                original_launcher = partial_evidence['priorLauncherSource'].encode() if finalization else subprocess.check_output(['git', 'show', prior_result['head'] + ':server-version/scripts/recovery/c18-study-http.py'], cwd=REPO)
+                assert hashlib.sha256(original_launcher).hexdigest() == producer['priorLauncherSha256'], 'original launcher bytes do not match original frozen input'
+                launcher_diff = ''.join(difflib.unified_diff(original_launcher.decode().splitlines(keepends=True), Path(__file__).read_text().splitlines(keepends=True), fromfile=('http04' if finalization else 'http03') + '/c18-study-http.py', tofile=('http05' if finalization else 'http04') + '/c18-study-http.py'))
+                (state / 'c18-continuation-launcher.diff').write_text(launcher_diff)
+                if not finalization:
+                    (state / 'c18-continuation-db-helper.diff').write_text(producer.pop('databaseHelperDiff'))
+                producer['launcherDiffSha256'] = hashlib.sha256(launcher_diff.encode()).hexdigest()
+                result['acceptedPartialSnapshot'] = {'evidenceSha256': args.partial_snapshot_sha256, 'snapshotSha256': partial_evidence['snapshotSha256'], 'sourceManifestSha256': partial_evidence['sourceManifestSha256'], 'sourceEvidenceSha256': partial_files, 'producerInputs': producer, 'reusedChecks': HTTP03_CHECKS, 'reuseIsNotRerun': True}
+                shutil.copy2(args.accepted_partial_snapshot, state / 'c18-accepted-partial-snapshot.json')
+                shutil.copy2(prior / ('source-c18-http-result.json' if finalization else 'c18-http-result.json'), state / 'source-c18-http-result.json')
+                if finalization:
+                    shutil.copy2(prior / 'c18-completion-result.json', state / 'source-c18-completion-result.json')
+                    result['acceptedPartialSnapshot']['reusedSubchecks'] = {key: partial_completion[key] for key in ['reverseVersionRace', 'startWithdrawalRace']}
+                    result['acceptedPartialSnapshot']['originalHttp03Snapshot'] = prior_result['acceptedPartialSnapshot']
             assert prior_result['sourceManifestSha256'] == result['sourceManifestSha256']
             for phase in PHASES:
                 if prior_result['phases'].get(phase, {}).get('passed'):
-                    assert prior_result['phaseInputHashes'][phase] == pinned['phaseInputHashes'][phase], f'passed {phase} inputs changed; cannot reuse or silently replay'
+                    if continuation and phase == 'upgrade':
+                        assert producer['originalUpgradePhaseInputSha256'] == prior_result['phaseInputHashes']['upgrade']
+                    else:
+                        assert prior_result['phaseInputHashes'][phase] == pinned['phaseInputHashes'][phase], f'passed {phase} inputs changed; cannot reuse or silently replay'
                     result['phases'][phase] = prior_result['phases'][phase]
                     result['reusedPhases'].append(phase)
             assert any(phase not in result['reusedPhases'] for phase in requested), 'all requested phases already passed; no services need starting'
@@ -275,9 +499,14 @@ def main():
         record()
         if prior:
             db = db_module.Database(tools, state)
-            latest = result['reusedPhases'][-1]
-            accepted = json.loads((state / f'c18-{latest}-post-state.json').read_text())
-            assert db.snapshot() == accepted, 'stopped clone differs from latest accepted phase; targeted continuation required'
+            if continuation:
+                assert partial_database_snapshot(db) == partial_evidence['snapshot'], 'cloned partial database differs from the independently pinned complete snapshot'
+                db.original_rows_unchanged(json.loads((state / 'c18-original-rows-private.json').read_text()))
+                result['acceptedPartialSnapshot']['clonedDatabaseVerifiedBeforeCompletion'] = True
+            else:
+                latest = result['reusedPhases'][-1]
+                accepted = json.loads((state / f'c18-{latest}-post-state.json').read_text())
+                assert db.snapshot() == accepted, 'stopped clone differs from latest accepted phase; targeted continuation required'
         for phase in requested:
             if phase in result['reusedPhases']:
                 continue
@@ -297,8 +526,22 @@ def main():
                         assert response.status == 200
                 status['state'] = 'running'
                 record()
-                run([node, '--require', BASE / 'loopback-only.cjs', BASE / 'c18-study-smoke.mjs', state], 'c18-http', public_runtime, timeout=600)
-                http = json.loads((state / 'c18-http-result.json').read_text())
+                if continuation:
+                    label = 'c18-finalize' if finalization else 'c18-completion'
+                    script = 'c18-study-finalize.mjs' if finalization else 'c18-study-completion.mjs'
+                    run([node, '--require', BASE / 'loopback-only.cjs', BASE / script, state], label, public_runtime, timeout=300)
+                    completion = json.loads((state / (label + '-result.json')).read_text())
+                    http = merge_http03_completion(partial_http, completion, result['acceptedPartialSnapshot'])
+                    if finalization:
+                        http['qualificationScope'] = 'C18_HTTP03_EIGHT_PLUS_HTTP04_RACES_REUSED_AND_TWO_FINALIZED_GROUPS'
+                        http['priorCompletionFailure'] = partial_completion['error']
+                        http['reusedPartialCompletionEvidence'] = partial_completion
+                        http['requests'] = partial_http['requests'] + partial_completion['requests'] + completion['requests']
+                        http['executionCounts'].update(reusedRequests=218, reusedHttp04Requests=20, reusedHttp04RaceSubchecks=2)
+                    (state / 'c18-http-result.json').write_text(json.dumps(http, indent=2))
+                else:
+                    run([node, '--require', BASE / 'loopback-only.cjs', BASE / 'c18-study-smoke.mjs', state], 'c18-http', public_runtime, timeout=600)
+                    http = json.loads((state / 'c18-http-result.json').read_text())
                 assert http['passed'] is True
                 db = db_module.Database(tools, state)
                 db.original_rows_unchanged(json.loads((state / 'c18-original-rows-private.json').read_text()))
