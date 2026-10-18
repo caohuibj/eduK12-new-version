@@ -7,10 +7,10 @@ const { readSessionUser, sessionJsonFetch } = require('./helpers/session-auth.cj
 assert.equal(process.env.QUESTIONNAIRE_PRODUCT_ISOLATED_DB, '1')
 assert.equal(process.env.NODE_ENV, 'test')
 const fixture = JSON.parse(fs.readFileSync(process.env.QUESTIONNAIRE_PRODUCT_FIXTURE_FILE || '/tmp/huisurvey-q1-browser-fixture.json', 'utf8'))
-const base = 'http://training.eduk12.top:5173'
+const base = 'https://training.eduk12.top:5443'
 const output = process.env.TRAINING_OPTIONAL_EVIDENCE || '/tmp/eduk12-training-optional-e2e'
 fs.mkdirSync(output, { recursive: true })
-const checks = [], screenshots = [], writes = [], errors = []
+const checks = [], screenshots = [], writes = [], errors = [], diagnostics = []
 const text = '中文反思，含"引号"\n第二行🙂'
 const labels = ['必填反思', '选填填空', '选填单选', '选填多选', '选填年月']
 const types = ['text_input', 'fill_blank', 'single_choice', 'multiple_choice', 'year_month']
@@ -33,6 +33,7 @@ async function loginTraining(page, route, user, role) {
   const session = ok(await readSessionUser(page))
   assert.ok(session.id)
   assert.equal(session.role, role)
+  await page.waitForURL(url => url.pathname !== route)
 }
 async function shots(page, name) {
   for (const width of [390, 768, 1440]) {
@@ -72,7 +73,12 @@ async function main() {
       page.on('pageerror', error => errors.push(error.message))
     }
     await loginTraining(teacher, '/teacher/account-login', fixture.teacher, 'TEACHER')
+    check('Teacher real Training login and session role verified')
     await teacher.goto(base + '/questionnaire-products/new')
+    const secure = await teacher.evaluate(() => ({ pathname: location.pathname, secureContext: isSecureContext, randomUUID: typeof crypto.randomUUID }))
+    diagnostics.push(secure)
+    assert.equal(secure.secureContext, true, 'Training production-origin scenario requires a genuine secure context')
+    assert.equal(secure.randomUUID, 'function')
     await teacher.getByLabel('测评名称', { exact: true }).fill('Training选填浏览器验收 ' + Date.now())
     await teacher.getByLabel(fixture.courses[0].title, { exact: true }).check()
     await teacher.getByRole('button', { name: '创建草稿', exact: true }).click()
@@ -198,6 +204,6 @@ async function main() {
   } finally { await browser.close() }
 }
 main().catch(error => {
-  fs.writeFileSync(path.join(output, 'result.json'), JSON.stringify({ status: 'FAIL', head: process.env.GITHUB_SHA, checks, screenshots, error: error.message }, null, 2))
+  fs.writeFileSync(path.join(output, 'result.json'), JSON.stringify({ status: 'FAIL', head: process.env.GITHUB_SHA, checks, screenshots, errors, diagnostics, error: error.message }, null, 2))
   console.error(error.message); process.exitCode = 1
 })
