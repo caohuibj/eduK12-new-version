@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "run": "HTTP03",
+  "passed": false,
+  "phase": "DUPLICATE_PUBLICATION_ALIAS",
+  "httpStatus": 500,
+  "expectedStatus": 409,
+  "publicErrorCode": "TRAINING_ANALYSIS_FAILED",
+  "errorType": "AssertionError",
+  "qualifiedChecks": [
+    "Real HTTP two-wave 10/20/50 synthetic four-tool numeric facts match independent mean/median/sample-SD/type7-quartile/min-max and Form paired-delta=10 and unchanged Scale/Cognitive/SJT delta=0 hand formulas",
+    "Actual PostgreSQL SQL-event counts remain batch-bounded at 10/20/50 fixed two-wave four-tool sources; cold and hot process timings separately recorded, no capacity claim",
+    "Owner discovers/analyzes current Training course; nonowner, student and CourseShare-only teacher denied"
+  ],
+  "measurements": [
+    {
+      "participants": 10,
+      "waves": 2,
+      "tools": 4,
+      "temperature": "PROCESS_COLD_TEMPLATE_FIRST_READ",
+      "sqlEvents": 25,
+      "courseStudentReads": 0,
+      "sqlDurationMs": 7,
+      "elapsedMs": 130.45250700000003,
+      "sourceCount": 20,
+      "observationCount": 80,
+      "analysisState": "present"
+    },
+    {
+      "participants": 10,
+      "waves": 2,
+      "tools": 4,
+      "temperature": "SAME_PROCESS_TEMPLATE_HOT",
+      "sqlEvents": 25,
+      "courseStudentReads": 0,
+      "sqlDurationMs": 2,
+      "elapsedMs": 107.92424200000005,
+      "sourceCount": 20,
+      "observationCount": 80,
+      "analysisState": "present"
+    },
+    {
+      "participants": 20,
+      "waves": 2,
+      "tools": 4,
+      "temperature": "PROCESS_COLD_TEMPLATE_FIRST_READ",
+      "sqlEvents": 25,
+      "courseStudentReads": 0,
+      "sqlDurationMs": 11,
+      "elapsedMs": 200.92679100000004,
+      "sourceCount": 40,
+      "observationCount": 160,
+      "analysisState": "present"
+    },
+    {
+      "participants": 20,
+      "waves": 2,
+      "tools": 4,
+      "temperature": "SAME_PROCESS_TEMPLATE_HOT",
+      "sqlEvents": 25,
+      "courseStudentReads": 0,
+      "sqlDurationMs": 5,
+      "elapsedMs": 140.99633599999993,
+      "sourceCount": 40,
+      "observationCount": 160,
+      "analysisState": "present"
+    },
+    {
+      "participants": 50,
+      "waves": 2,
+      "tools": 4,
+      "temperature": "PROCESS_COLD_TEMPLATE_FIRST_READ",
+      "sqlEvents": 25,
+      "courseStudentReads": 0,
+      "sqlDurationMs": 17,
+      "elapsedMs": 357.80194099999994,
+      "sourceCount": 100,
+      "observationCount": 400,
+      "analysisState": "present"
+    },
+    {
+      "participants": 50,
+      "waves": 2,
+      "tools": 4,
+      "temperature": "SAME_PROCESS_TEMPLATE_HOT",
+      "sqlEvents": 25,
+      "courseStudentReads": 0,
+      "sqlDurationMs": 9,
+      "elapsedMs": 282.6038080000001,
+      "sourceCount": 100,
+      "observationCount": 400,
+      "analysisState": "present"
+    }
+  ],
+  "requestCount": 15,
+  "exportsQualified": false,
+  "sourceHead": "94d2a1fb87399cbee9aa8d240efb711fbdf1da17",
+  "sourceInputsSha256": "ae5c2e7bd1ea183ae2d860759a31ff86daa57f3909aa74be51c6942b2779d1f8",
+  "runtimeFingerprint": {
+    "schemaVersion": 1,
+    "nodeVersion": "v24.21.0",
+    "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+    "dist": {
+      "files": 5105,
+      "sha256": "de1b30d333fc2ca2647277b674c9d83f4bbe29a84ec842f7ff1f0f0ca14fda37"
+    },
+    "files": {
+      "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+      "prisma/schema.prisma": "55271313c6a9bc1ac763111c3c6c25ab2417c0cce95d5a50e500e71e6d4a28ba",
+      "node_modules/.prisma/client/schema.prisma": "7ebcda72219cb93bb112ecffddc8655f72007fc490bc4c06b256d999b687bf77",
+      "node_modules/.prisma/client/index.js": "47ed6e52ffedd95a414bf7d762bb48857f08cfb4feb3f84bc875cf5e1caa96b7"
+    },
+    "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+  },
+  "processExits": {
+    "postgres": 0,
+    "redis": 0,
+    "api": 0,
+    "c16-http": 1
+  },
+  "invariants": {
+    "cleanupVerified": true,
+    "sourceUnchanged": true,
+    "resumeSourceUnchanged": true,
+    "inputsUnchanged": true
+  },
+  "privateEvidenceSha256": {
+    "c16-runtime-result.json": "617803dad4fd0c02d1392f3545caf1fa9920aed078af4f460e4b629944479b62",
+    "c16-http-result.json": "ae3de9fd39a866cc873b0e66a06d84673025a8f95e64ae1749b3a3fe6f547e7f",
+    "c16-http.log": "e6dab9b9279f2e8ac956adcb45bc266951c59210cdc5f292a706fae9961cb7e1",
+    "c16-fixture-private.json": "71f379c8ae156390a288d9239347f1df474bf21d76188741b53e8b2627ed1029",
+    "current-source-inputs.json": "98eb3bfdaedf3b6b8a41c2e7966c02bc0333588b711a11abf2d405618527bd8b"
+  },
+  "continuation": "Resume exact stopped HTTP03 clone after the three qualified checks; no repeated numerical/SQL/authority suite; HTTP01 upgrade remains reused"
+}

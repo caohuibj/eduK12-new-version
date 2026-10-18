@@ -34,7 +34,8 @@ function client(){const cookies=new Map();return {async request(route,method='GE
  if(raw)return bytes;const envelope=JSON.parse(bytes.toString());if(response.status!==200)return {httpStatus:response.status,...envelope};assert.equal(envelope.code,0);return envelope.data
  },async login(who,role='TEACHER'){await this.request('/auth/csrf');await this.request('/auth/training-login','POST',{...who,expectedRole:role})}}}
 const teacher=client(),other=client(),student=client()
-let poisonTrace=null
+let poisonTrace=null,sqlFamilyTrace=null
+prisma.$on('query',event=>{if(!sqlFamilyTrace)return;const operation=event.query.trim().split(/\s+/)[0].toUpperCase(),tables=[...new Set([...event.query.matchAll(/\b(?:FROM|JOIN|UPDATE|INTO)\s+(?:(?:"?[A-Za-z_][A-Za-z_0-9]*"?)\.)?"?([A-Za-z_][A-Za-z_0-9]*)"?/gi)].map(match=>match[1].toLowerCase()))].sort(),family=operation+':'+(tables.join('+')||'TRANSACTION_OR_CONTROL');sqlFamilyTrace.sqlEvents++;sqlFamilyTrace.sqlDurationMs+=event.duration;sqlFamilyTrace.families[family]=(sqlFamilyTrace.families[family]??0)+1;for(const table of tables)sqlFamilyTrace.tableMentions[table]=(sqlFamilyTrace.tableMentions[table]??0)+1})
 prisma.$on('query',event=>{if(!poisonTrace||!/^SELECT/i.test(event.query.trim()))return;poisonTrace.sqlEvents++;if(/FROM\s+"?(?:public"?\.)?"?(assessment_unit_snapshots|assessments|assessment_result_facts|cognitive_sessions|cognitive_raw_submissions|situational_attempts|situational_raw_submissions)"?/i.test(event.query)){poisonTrace.factReads++;if(event.params.includes(poisonTrace.poisonParent)||event.params.includes(poisonTrace.poisonChild))poisonTrace.forbiddenFactReads++}})
 const root=f=>`/courses/${f.courseId}/training-analysis`,analyze=(f,c=teacher)=>c.request(root(f),'POST',{selector:f.selector})
 function parseCsv(bytes){const text=bytes.toString('utf8').replace(/^\uFEFF/,''),rows=[];let row=[],cell='',quoted=false;for(let i=0;i<text.length;i++){const c=text[i];if(quoted){if(c==='"'&&text[i+1]==='"'){cell+='"';i++}else if(c==='"')quoted=false;else cell+=c}else if(c==='"')quoted=true;else if(c===','){row.push(cell);cell=''}else if(c==='\r'&&text[i+1]==='\n'){row.push(cell);rows.push(row);row=[];cell='';i++}else cell+=c}assert.equal(quoted,false);assert.deepEqual(row,[]);const [columns,...values]=rows;return {columns,rows:values.map(value=>Object.fromEntries(columns.map((key,index)=>[key,value[index]])))}}
@@ -89,11 +90,25 @@ async function witnessedQualityRace(f,body){
 let fixture,otherId
 try{
  await teacher.login(credentials.teacher);const owner=await prisma.user.findUniqueOrThrow({where:{username:credentials.teacher.username}}),password=await prisma.user.findUniqueOrThrow({where:{username:credentials.student.username}})
+ const continuationPath=path.join(state,'c16-continuation.json'),continuation=fs.existsSync(continuationPath)?JSON.parse(fs.readFileSync(continuationPath)):null
+ let current
+ if(continuation){
+  assert.equal(continuation.stage,'AFTER_NUMERICAL_SQL_AUTHORITY');assert.equal(continuation.reusedChecks.length,3)
+  fixture=JSON.parse(fs.readFileSync(path.join(state,'prior-c16-fixture-private.json')));assert.equal(fixture.participants.length,50)
+  const share=await prisma.courseShare.findFirstOrThrow({where:{courseId:fixture.courseId,sharedBy:owner.id}}),otherAccount=await prisma.user.findUniqueOrThrow({where:{id:share.sharedTo}});otherId=otherAccount.id
+  await other.login({username:otherAccount.username,password:credentials.student.password});await student.login(credentials.student,'STUDENT')
+  result.reusedEvidence=continuation;current=await analyze(fixture)
+  sqlFamilyTrace={scope:'SUPPLEMENTAL_SAME_50_SOURCE_QUERY_FAMILIES_NOT_COLD_HOT_OR_NUMERIC_REQUALIFICATION',sqlEvents:0,sqlDurationMs:0,families:{},tableMentions:{}}
+  const groupStart=performance.now(),grouped=await analyzeTrainingCourse({actor:{id:owner.id,role:'TEACHER'},courseId:fixture.courseId,selector:fixture.selector}),groupTrace=sqlFamilyTrace;sqlFamilyTrace=null
+  assert.equal(grouped.manifest.sourceHash,current.manifest.sourceHash);assert.equal(grouped.manifest.sources.length,100);assert.equal(grouped.manifest.observationCount,400);assert.equal(groupTrace.tableMentions.course_students??0,0)
+  result.sqlQueryFamilies={...groupTrace,elapsedMs:performance.now()-groupStart,sourceHash:grouped.manifest.sourceHash,sourceCount:100,observationCount:400,parametersRecorded:false,rawSqlRecorded:false}
+  console.log('PASS supplemental same50 source-bound SQL family observer',JSON.stringify(result.sqlQueryFamilies))
+  fs.writeFileSync(path.join(state,'c16-fixture-private.json'),JSON.stringify(fixture),{mode:0o600})
+ }else{
  const otherAccount=await prisma.user.create({data:{username:'c16-other-'+randomUUID(),passwordHash:password.passwordHash,role:'TEACHER',accountDomain:'TRAINING',teacherApproved:true,mustChangePassword:false}});otherId=otherAccount.id
  await other.login({username:otherAccount.username,password:credentials.student.password});await student.login(credentials.student,'STUDENT')
  fixture=await createAnalysisFixture({prisma,teacherId:owner.id,passwordHash:password.passwordHash})
  const original=JSON.parse(fs.readFileSync(path.join(state,'source-c14-http-result.json'))).completed[0];await attachFourToolSources(prisma,fixture,original)
- let current
  for(const n of [10,20,50]){
   await addParticipants(prisma,fixture,n);fs.writeFileSync(path.join(state,'c16-fixture-private.json'),JSON.stringify(fixture),{mode:0o600})
   current=await analyze(fixture);golden(current.analysis,n,fixture)
@@ -107,6 +122,7 @@ try{
  await other.request(root(fixture)+'/sources','GET',undefined,deny);await other.request(root(fixture),'POST',{selector:fixture.selector},deny);await student.request(root(fixture),'POST',{selector:fixture.selector},deny)
  await prisma.courseShare.create({data:{courseId:fixture.courseId,sharedBy:owner.id,sharedTo:otherId}});await other.request(root(fixture),'POST',{selector:fixture.selector},deny)
  check('Owner discovers/analyzes current Training course; nonowner, student and CourseShare-only teacher denied')
+ }
  const alias=structuredClone(fixture.selector);alias.waves[1]={...alias.waves[0],waveKey:'alias'};await teacher.request(root(fixture),'POST',{selector:alias},409)
  const full=await teacher.request(root(fixture),'POST',{selector:{...fixture.selector,mode:'FULL_CASE'}});golden(full.analysis,50,fixture);assert.equal(full.analysis.metrics[0].countKind,'COMPLETE_CASE')
  check('Same publication alias rejected 409; full-case mode retains the same explicitly matched 50 participants')

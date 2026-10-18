@@ -24,6 +24,20 @@ export function parseTrainingAnalysisSelector(value: unknown, courseId?: string)
   if (request.mode === 'PAIRWISE' && request.waves.length !== 2) {
     throw Object.assign(new Error('配对分析需要恰好两个波次'), {statusCode: 400, code: 'TRAINING_ANALYSIS_PAIR_REQUIRED'})
   }
+  // Logical labels cannot turn the same exact selected source/metric into two
+  // timepoints. Reject before shared batch readers see duplicate source rows.
+  // Different tasks or frozen variants remain distinct even when published together.
+  const sources = new Map<string, number>()
+  request.waves.forEach((wave, index) => {
+    for (const metric of wave.metrics) {
+      const identity = JSON.stringify([wave.taskId, wave.publication, wave.configDigest, wave.variantKey, metric.itemId, metric.metricKey])
+      const prior = sources.get(identity)
+      if (prior !== undefined && prior !== index) {
+        throw Object.assign(new Error('同一测量来源不能映射为两个时间点'), {statusCode: 409, code: 'TRAINING_ANALYSIS_OBSERVATION_ALIAS'})
+      }
+      sources.set(identity, index)
+    }
+  })
   // Normalize ordering without changing temporal Wave order or logical keys.
   return {...request, waves: request.waves.map(wave => ({...wave, metrics: [...wave.metrics].sort((a,b) => `${a.itemId}:${a.metricKey}`.localeCompare(`${b.itemId}:${b.metricKey}`))}))}
 }

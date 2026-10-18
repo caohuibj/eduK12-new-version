@@ -54,12 +54,16 @@ def main():
     parser.add_argument('--source-state', type=Path, required=True)
     parser.add_argument('--state', type=Path, required=True)
     parser.add_argument('--upgrade-only', action='store_true')
-    parser.add_argument('--resume-state', type=Path, help='Stopped failed C16 clone whose upgrade passed and whose HTTP checks did not yet pass')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--resume-state', type=Path, help='Stopped failed C16 clone whose upgrade passed and whose HTTP checks did not yet pass')
+    group.add_argument('--continue-state', type=Path, help='Stopped C16 clone after qualified numerical/SQL/authority checks; continue at duplicate-wave boundary')
     args = parser.parse_args()
     tools, source, state = (value.resolve() for value in (args.tools, args.source_state, args.state))
     assert source != state and source not in state.parents and state not in source.parents
     assert REPO not in state.parents and state != REPO and not state.exists()
-    resume = args.resume_state.resolve() if args.resume_state else None
+    resume_arg = args.resume_state or args.continue_state
+    resume = resume_arg.resolve() if resume_arg else None
+    continuation = bool(args.continue_state)
     if resume:
         assert resume != state and resume not in state.parents and state not in resume.parents and resume != source
         assert not args.upgrade_only
@@ -68,7 +72,16 @@ def main():
         resumed_http = json.loads((resume / 'c16-http-result.json').read_text())
         assert resumed_status['state'] == 'stopped' and resumed_status['cleanupVerified'] and not resumed_status['cleanupErrors']
         assert resumed_result['passed'] is False and all(resumed_result[key] is True for key in ['cleanupVerified', 'sourceUnchanged', 'inputsUnchanged'])
-        assert resumed_result['phases']['upgrade']['passed'] is True and resumed_http['passed'] is False and resumed_http['checks'] == []
+        assert resumed_result['phases']['upgrade']['passed'] is True and resumed_http['passed'] is False
+        if continuation:
+            assert len(resumed_http['checks']) == 3 and resumed_http['exports'] == []
+            assert resumed_http['checks'][0].startswith('Real HTTP two-wave 10/20/50 synthetic four-tool numeric facts')
+            assert resumed_http['checks'][1].startswith('Actual PostgreSQL SQL-event counts remain batch-bounded')
+            assert resumed_http['checks'][2].startswith('Owner discovers/analyzes current Training course')
+            assert resumed_http['requests'][-1]['status'] == 500
+            assert resumed_result.get('resumeSourceUnchanged', True) is True
+        else:
+            assert resumed_http['checks'] == []
         assert not (resume / 'pgdata/postmaster.pid').exists()
         assert resumed_result['pinnedC14DumpSha256'] == PINNED_DUMP_SHA256
         for entry in json.loads((resume / 'current-source-inputs.json').read_text()):
@@ -196,6 +209,12 @@ def main():
             assert resumed_result['sourceManifestSha256'] == result['sourceManifestSha256']
             for name in ['c16-original-rows-private.json', 'c16-old-projections.json', 'c16-upgrade-result.json']:
                 shutil.copyfile(resume / name, state / name)
+            if continuation:
+                for name in ['c16-fixture-private.json', 'c16-http-result.json']:
+                    shutil.copyfile(resume / name, state / ('prior-' + name))
+                evidence = {'stage': 'AFTER_NUMERICAL_SQL_AUTHORITY', 'priorHead': resumed_result['head'], 'priorRuntimeResultSha256': sha_file(resume / 'c16-runtime-result.json'), 'priorHttpResultSha256': sha_file(resume / 'c16-http-result.json'), 'priorSourceInputsSha256': resumed_result['sourceInputsSha256'], 'reusedChecks': resumed_http['checks'], 'reusedMeasurements': resumed_http['measurements']}
+                (state / 'c16-continuation.json').write_text(json.dumps(evidence, indent=2))
+                result['reusedHttp'] = evidence
         copy_source = resume or source
         for directory in ['pgdata', 'uploads', 'exports']:
             before = manifest(copy_source / directory)
