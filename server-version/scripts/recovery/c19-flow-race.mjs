@@ -25,17 +25,20 @@ try{
   assert.equal(blockers.length,2,'two real PostgreSQL waiters required');release();await held
   await Promise.all(requests.map(r=>r.promise));for(const request of requests)if(request.error)throw request.error;const outcomes=requests.map(r=>r.value);assert.equal(outcomes.filter(value=>value.replayed===true).length,1)
  }finally{release();await held;await Promise.allSettled(requests.map(r=>r.promise));await gate.$disconnect();gate=null}
- const completed=await actor.client.request(`${prefix}/attempts/${attempt.id}`),proof=await candidateProof(attempt.id),child=await children(attempt.id)
- assert.equal(completed.status,'COMPLETED');assert.equal(proof.row.taskSatisfaction,'NOT_SATISFIED');assert.equal(proof.proof.path.termination,'SCREEN_OUT');assert.equal(proof.proof.path.acceptedFacts.length,1)
+ const terminal=await actor.client.request(`${prefix}/attempts/${attempt.id}`),proof=await candidateProof(attempt.id),child=await children(attempt.id)
+ assert.equal(terminal.status,'IN_PROGRESS');assert.equal(terminal.allUnitsSubmitted,true);assert.equal(proof.proof.path.taskSatisfaction,'NOT_SATISFIED');assert.equal(proof.proof.path.termination,'SCREEN_OUT');assert.equal(proof.proof.path.acceptedFacts.length,1)
  assert.deepEqual(proof.stable,initial.stable);assert.deepEqual([child.forms.length,child.scales.length,child.cognitive.length,child.sjt.length,child.snapshots.length,child.jobs.length],[1,0,0,0,1,1])
  assert.equal(child.forms[0].submissionId,body.submissionId);assert.equal(child.snapshots[0].sourceSubmissionId,body.submissionId)
- assert.equal(child.jobs[0].requestedRevision,1);assert.equal(child.jobs[0].attemptCount,0);assert.equal((await readCognitiveQuota(prisma,actor.user.id,fixture.assignmentId)).usedAttempts,0)
+ assert.equal(child.jobs[0].requestedRevision,1);assert.equal(child.jobs[0].status,'PENDING');assert.equal(child.jobs[0].attemptCount,0);assert.equal((await readCognitiveQuota(prisma,actor.user.id,fixture.assignmentId)).usedAttempts,0)
  const stable={pathHash:proof.row.trainingFlowPathHash,pathEncrypted:proof.row.trainingFlowPathEncrypted,form:child.forms[0],snapshots:child.snapshots,jobs:child.jobs}
  await noWrites(h,'Post-race exact replay does not create another outbox/path/fact',()=>actor.client.request(route,'POST',body))
  const after=await children(attempt.id),parent=await candidateProof(attempt.id);assert.deepEqual({pathHash:parent.row.trainingFlowPathHash,pathEncrypted:parent.row.trainingFlowPathEncrypted,form:after.forms[0],snapshots:after.snapshots,jobs:after.jobs},stable)
+ await drainReports(h,[attempt.id])
+ const completed=await actor.client.request(`${prefix}/attempts/${attempt.id}`),final=await candidateProof(attempt.id)
+ assert.equal(completed.status,'COMPLETED');assert.equal(final.row.taskSatisfaction,'NOT_SATISFIED');assert.equal(final.row.trainingFlowPathHash,proof.row.trainingFlowPathHash);assert.deepEqual(final.stable,initial.stable)
+ assert.deepEqual((await children(attempt.id)).snapshots,child.snapshots)
  fixture.cases.push({name:'race_screen',attemptId:attempt.id,user:actor.user,productId:product.id,termination:'SCREEN_OUT',satisfaction:'NOT_SATISFIED',candidate:proof.stable});h.write('c19-fixture-private.json',fixture)
  h.result.race={actualPgWaiters:blockers,acceptedSubmissionId:body.submissionId,replayedRequests:1,snapshots:1,outboxJobs:1,requestedRevision:1,pathHash:proof.row.trainingFlowPathHash,candidateBytes:proof.stable.candidateBytes,quotaUsed:0}
  h.check('Two observed PostgreSQL parent-row FINAL waiters linearize to one accepted Form, one exact replay, one path proof and one outbox revision; SCREEN_OUT does not admit native children or charge quota')
- await drainReports(h,[attempt.id])
  h.result.passed=true
 }catch(e){error=e;throw e}finally{if(gate)await gate.$disconnect();await h.finish(error)}

@@ -28,8 +28,11 @@ try{
  h.result.partialReport={attemptId:attempt.id,currentType:'FORM_SECTION',acceptedSnapshotCount:1,reportUnitTypes:report.unitReports.map(unit=>unit.type),pathHash:beforePartial.row.trainingFlowPathHash}
  h.check('Teacher partial=true reads an accepted Scale while the next typed Form is pending; no missing Form fact is manufactured and nonowner is denied')
  await student.request(`${prefix}/attempts/${attempt.id}/form-sections/${attempt.currentItem.id}/submit`,'POST',formBody(attempt))
- attempt=await student.request(`${prefix}/attempts/${attempt.id}`);assert.equal(attempt.status,'COMPLETED')
- await drainReports(h,[attempt.id]);const proof=await candidateProof(attempt.id)
+ attempt=await student.request(`${prefix}/attempts/${attempt.id}`);assert.equal(attempt.status,'IN_PROGRESS');assert.equal(attempt.allUnitsSubmitted,true)
+ const terminalProof=await candidateProof(attempt.id),terminalChildren=await children(attempt.id)
+ assert.equal(terminalProof.proof.path.termination,'COMPLETE');assert.equal(terminalChildren.snapshots.length,2);assert.equal(terminalChildren.jobs.length,1);assert.equal(terminalChildren.jobs[0].status,'PENDING');assert.equal(terminalChildren.jobs[0].attemptCount,0)
+ await drainReports(h,[attempt.id]);attempt=await student.request(`${prefix}/attempts/${attempt.id}`);assert.equal(attempt.status,'COMPLETED')
+ const proof=await candidateProof(attempt.id);assert.equal(proof.row.trainingFlowPathHash,terminalProof.row.trainingFlowPathHash);assert.deepEqual(proof.stable,first.stable);assert.deepEqual((await children(attempt.id)).snapshots,terminalChildren.snapshots)
  fixture.partialProduct=partial;fixture.cases.push({name:'partial_final',attemptId:attempt.id,user:fixture.users.student,productId:partial.id,termination:'COMPLETE',satisfaction:'SATISFIED',candidate:proof.stable});h.write('c19-fixture-private.json',fixture)
  for(const item of fixture.cases){
   const respondent=h.client();let respondentPrefix=prefix

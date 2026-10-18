@@ -96,7 +96,7 @@ import {
   assertContextMutable,
 } from '../../services/assessmentContextService'
 import { logger } from '../../utils/logger'
-import { canUseReportPackage, canUseScale } from '../../services/materialGrant'
+import { canUseReportPackage, canUseScale, SCALE_USE_AUTHORIZATION_SELECT } from '../../services/materialGrant'
 import {
   CompositeServiceError,
   compositeBadRequest,
@@ -248,11 +248,10 @@ const loadComposite = async (id: string, includeItems = false, db: Db = prisma) 
               include: {
                 scale: {
                   select: {
-                    id: true,
+                    ...SCALE_USE_AUTHORIZATION_SELECT,
                     code: true,
                     name: true,
                     description: true,
-                    status: true,
                     instrumentClass: true,
                     instrumentVersion: true,
                     definition: true,

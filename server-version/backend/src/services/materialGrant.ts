@@ -74,6 +74,9 @@ export const scaleWhereForViewer = async (
 
 // 撤销 grant 只拦新的 addItem / addScale / 空白 createAssignment。
 // 已挂在 DRAFT 综合测评或问卷里的 scaleId 仍可发布；不扫描草稿、不拆已发布容器。
+/** Every projected scale passed to canUseScale must retain these fields. */
+export const SCALE_USE_AUTHORIZATION_SELECT = { id: true, creatorId: true, status: true } as const
+
 export const canUseScale = async (
   userId: string,
   role: UserRole | string,

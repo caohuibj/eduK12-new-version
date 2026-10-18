@@ -5,6 +5,16 @@ import {randomUUID} from 'node:crypto'
 import {harness,drainReports,prisma,children,candidateProof,noWrites,assertHidden,readCognitiveQuota,decryptUnifiedRuntimePayload,denied,prefix,pub,products} from './c19-flow-client.mjs'
 import {logins,participant,formBody,formRows,form,unitKey,condition,publish,expiry} from './c19-flow-fixture.mjs'
 const h=harness('branches');let error
+const processedOutboxes=[]
+async function materializeTerminal(attemptId){
+ const before=await candidateProof(attemptId),child=await children(attemptId)
+ assert.equal(before.row.status,'IN_PROGRESS');assert.equal(before.proof.path.currentInstrumentKey,null);assert.notEqual(before.proof.path.termination,'PENDING')
+ assert.equal(child.jobs.length,1);assert.equal(child.jobs[0].status,'PENDING');assert.equal(child.jobs[0].attemptCount,0)
+ h.result.measurements.push({stage:'TERMINAL_BEFORE_ORIGINAL_WORKER',attemptId,parentStatus:before.row.status,pathHash:before.row.trainingFlowPathHash,jobStatus:child.jobs[0].status,requestedRevision:child.jobs[0].requestedRevision})
+ processedOutboxes.push(...await drainReports(h,[attemptId]));h.result.originalOutboxProcessed=processedOutboxes
+ const after=await candidateProof(attemptId);assert.deepEqual(after.stable,before.stable);assert.equal(after.row.trainingFlowPathHash,before.row.trainingFlowPathHash)
+ assert.deepEqual((await children(attemptId)).snapshots,child.snapshots)
+}
 try{
  const fixture=h.read('c19-fixture-private.json'),product=fixture.product,{teacher,otherTeacher}=await logins(h,fixture)
  for(const [mode,termination,satisfaction]of [['screen','SCREEN_OUT','NOT_SATISFIED'],['early','COMPLETE_EARLY','SATISFIED'],['refused','COMPLETE_EARLY','NOT_SATISFIED']]){
@@ -13,6 +23,7 @@ try{
   const initial=await candidateProof(attempt.id);assert.equal(attempt.trainingFlow.termination,'PENDING');assert.deepEqual(attempt.trainingFlow.materials.map(v=>v.blockKey),['intro'])
   const body=formBody(attempt,mode),route=`${prefix}/attempts/${attempt.id}/form-sections/${attempt.currentItem.id}/submit`
   await client.request(route,'POST',body);assert.equal((await client.request(route,'POST',body)).replayed,true)
+  await materializeTerminal(attempt.id)
   attempt=await client.request(`${prefix}/attempts/${attempt.id}`)
   const proof=await candidateProof(attempt.id),child=await children(attempt.id)
   assert.equal(attempt.status,'COMPLETED');assert.equal(attempt.currentItem,null);assert.equal(attempt.trainingFlow.termination,termination);assert.equal(proof.row.taskSatisfaction,satisfaction);assert.equal(proof.proof.path.taskSatisfaction,satisfaction)
@@ -34,6 +45,7 @@ try{
  let started=await anonymous.request(`${pub}/${token.token}/start`,'POST',{});anonymous.recovery=started.recoveryToken
  const initial=await candidateProof(started.attempt.id),resumed=await anonymous.request(`${pub}/${token.token}/start`,'POST',{recoveryToken:anonymous.recovery});assert.equal(resumed.attempt.id,started.attempt.id)
  const body=formBody(started.attempt,'screen');await anonymous.request(`${pub}/attempts/${started.attempt.id}/form-sections/${started.attempt.currentItem.id}/submit`,'POST',body)
+ await materializeTerminal(started.attempt.id)
  const final=await anonymous.request(`${pub}/attempts/${started.attempt.id}`);assert.equal(final.status,'COMPLETED');assert.equal(final.trainingFlow.termination,'SCREEN_OUT')
  const recovered=await anonymous.request(`${pub}/${token.token}/start`,'POST',{recoveryToken:anonymous.recovery});assert.equal(recovered.attempt.id,final.id);assert.equal(recovered.attempt.status,'COMPLETED');assert.deepEqual((await candidateProof(final.id)).stable,initial.stable)
  assert.equal((await prisma.compositeAssessmentAccessToken.findUniqueOrThrow({where:{id:token.id}})).usedCount,1)
@@ -63,6 +75,7 @@ try{
  dependency=await publish(teacher,dependency,config);const actor=await participant(h,fixture,'dependency'),begin=(await actor.client.request(`${prefix}/${dependency.id}/attempts`,'POST',{})).attempt
  assert.deepEqual(begin.trainingFlow.materials,[]);assert.equal(begin.trainingFlow.termination,'PENDING')
  const first=await candidateProof(begin.id);await actor.client.request(`${prefix}/attempts/${begin.id}/form-sections/${begin.currentItem.id}/submit`,'POST',formBody(begin))
+ await materializeTerminal(begin.id)
  const ended=await actor.client.request(`${prefix}/attempts/${begin.id}`),proof=await candidateProof(begin.id),child=await children(begin.id)
  assert.equal(ended.status,'COMPLETED');assert.equal(proof.row.taskSatisfaction,'SATISFIED');assert.deepEqual(ended.trainingFlow.materials.map(row=>row.blockKey),['pending_not'])
  assert.deepEqual(proof.proof.path.skipped.map(row=>row.reason),['CONDITION_FALSE','CONDITION_FALSE','DEPENDENCY_SKIPPED','DEPENDENCY_SKIPPED'])
@@ -70,6 +83,5 @@ try{
  assert.equal((await readCognitiveQuota(prisma,actor.user.id,fixture.assignmentId)).usedAttempts,0)
  fixture.dependencyProduct=dependency;fixture.cases.push({name:'dependency_suppressed',attemptId:begin.id,user:actor.user,productId:dependency.id,termination:'COMPLETE',satisfaction:'SATISFIED',candidate:proof.stable});h.write('c19-fixture-private.json',fixture)
  h.check('Pending accepted-source NOT does not run early; skipped Form source suppresses entire NOT/IS_MISSING material and native conditions, without hidden child or quota admission')
- await drainReports(h,fixture.cases.filter(c=>c.name!=='fourtool').map(c=>c.attemptId))
  h.result.completed=fixture.cases.filter(c=>c.name!=='fourtool').map(({user,recovery,token,...safe})=>safe);h.result.passed=true
 }catch(e){error=e;throw e}finally{await h.finish(error)}
