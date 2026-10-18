@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, CheckCircle, Eye, Plus, Save, Trash2 } from 'lucide-react'
+import { ArrowLeft, CheckCircle, Copy, Eye, Plus, Save, Trash2 } from 'lucide-react'
 import apiClient from '../api/client'
 import { PageHeader, ProductPage, ProductStatus } from '../components/product-ui'
 import './ScaleEdit.css'
@@ -61,7 +61,24 @@ interface ScaleMeta {
   estimatedTime: number | null
   instruction: string | null
   tags?: string[]
+  copyEligibility?: { allowed: boolean; reason?: string }
+  copySource?: {
+    schemaVersion: 1
+    parentId: string
+    parentCode: string
+    parentVersion: string
+    parentDefinitionHash: string
+    parentScoringHash: string
+    parentCreatorId: string
+    parentSourceHash: string
+    parentLicenseHash: string
+  } | null
 }
+
+const basicValues = (scale: ScaleMeta) => ({
+  name: scale.name, description: scale.description || '', visibility: scale.visibility,
+  estimatedTime: scale.estimatedTime ?? null, instruction: scale.instruction || '', tags: scale.tags || [],
+})
 
 const emptyDefinition = (): ScaleDefinition => ({
   schemaVersion: 2,
@@ -143,32 +160,44 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
   const isNew = id === 'new'
   const [loading, setLoading] = useState(!isNew)
   const [saving, setSaving] = useState(false)
+  const [copying, setCopying] = useState(false)
   const [scale, setScale] = useState<ScaleMeta>(emptyScale)
   const [definition, setDefinition] = useState<ScaleDefinition>(emptyDefinition)
+  const [savedBasic, setSavedBasic] = useState(() => JSON.stringify(basicValues(emptyScale())))
+  const [savedDefinition, setSavedDefinition] = useState(() => JSON.stringify(emptyDefinition()))
   const [activeTab, setActiveTab] = useState<'basic' | 'responses' | 'items' | 'scores' | 'report'>('basic')
   const [issues, setIssues] = useState<Array<{ path: string; message: string; severity?: string }>>([])
   const [preview, setPreview] = useState<any>(null)
 
   const [accessBlocked, setAccessBlocked] = useState(false)
+  const [hasConflict, setHasConflict] = useState(false)
   const mountedRef = useRef(true)
   const readSequenceRef = useRef(0)
   const operationRef = useRef(0)
   const savingRef = useRef(false)
+  const updatedAtRef = useRef<string | undefined>(undefined)
   const standard = scale.instrumentClass === 'STANDARD'
   const readOnly = accessBlocked || standard || (!isNew && (scale.id !== id || scale.status !== 'DRAFT'))
   const readOnlyRef = useRef(readOnly)
   readOnlyRef.current = readOnly
-  const controlsDisabled = readOnly || saving
+  const controlsDisabled = readOnly || saving || copying
+  const basicDirty = JSON.stringify(basicValues(scale)) !== savedBasic
+  const definitionDirty = JSON.stringify(definition) !== savedDefinition
+  const canCopy = !loading && !accessBlocked && scale.id === id && scale.status === 'PUBLISHED' && !standard && scale.copyEligibility?.allowed === true
   const responseSet = definition.responseSets[0]
   const sortedItems = useMemo(() => [...definition.items].sort((a, b) => a.sortOrder - b.sortOrder), [definition.items])
 
-  const applyMetadata = useCallback((value: any) => {
+  const applyMetadata = useCallback((value: any, preserveDraftEdits = false) => {
     const frozen = (value.instrumentClass || 'CUSTOM_DESCRIPTIVE') !== 'CUSTOM_DESCRIPTIVE' || value.status !== 'DRAFT'
     readOnlyRef.current = frozen
-    setScale({
+    updatedAtRef.current = value.updatedAt
+    const next: ScaleMeta = {
       id: value.id, code: value.code, name: value.name, description: value.description, status: value.status, visibility: value.visibility,
       instrumentClass: value.instrumentClass || 'CUSTOM_DESCRIPTIVE', instrumentVersion: value.instrumentVersion || '2.0.0', estimatedTime: value.estimatedTime, instruction: value.instruction, tags: value.tags || [],
-    })
+      copyEligibility: value.copyEligibility, copySource: value.copySource || null,
+    }
+    setSavedBasic(JSON.stringify(basicValues(next)))
+    setScale(current => preserveDraftEdits ? { ...next, ...basicValues(current) } : next)
     return frozen
   }, [])
 
@@ -183,7 +212,9 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
           if (!active || sequence !== readSequenceRef.current) return
           if (response.code !== 0 || response.data?.id !== id) throw new Error(response.message || '量表加载失败')
           applyMetadata(response.data)
-          setDefinition(normalizeDefinition(response.data.definition))
+          const stored = normalizeDefinition(response.data.definition)
+          setDefinition(stored)
+          setSavedDefinition(JSON.stringify(stored))
         } catch (error) {
           if (active && sequence === readSequenceRef.current) setIssues([{ path: 'load', message: (error as { message?: string }).message || '量表加载失败', severity: 'error' }])
         } finally {
@@ -232,11 +263,11 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
       // refresh stays blocked; a readable DRAFT does not undo an explicit 403.
       readOnlyRef.current = true
       setAccessBlocked(true)
+      setHasConflict(true)
       try {
         const current = await readCurrentScale(operation)
         if (!current) return
-        const frozen = applyMetadata(current)
-        if (frozen) setDefinition(normalizeDefinition(current.definition))
+        const frozen = applyMetadata(current, true)
         readOnlyRef.current = status === 403 || frozen
         setAccessBlocked(status === 403)
       } catch {
@@ -244,7 +275,20 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
         message += '；未能刷新状态，已暂停编辑，请重新打开量表。'
       }
     }
+    if (status === 409) message += '；未自动重试。请核对当前状态与保留的编辑后再保存。'
     if (isCurrentOperation(operation)) setIssues([{ path, message, severity: 'error' }])
+  }
+
+  const writeVersion = () => updatedAtRef.current ? { expectedUpdatedAt: updatedAtRef.current } : {}
+  const persistBasic = async (operation: number) => {
+    if (!scale.name) throw new Error('量表名称不能为空')
+    const response = await apiClient.put<any>(`/scales/${id}`, { ...basicValues(scale), estimatedTime: scale.estimatedTime ?? undefined, ...writeVersion() })
+    if (!isCurrentOperation(operation)) return false
+    assertResponse(response, '基本信息保存失败')
+    if (response.data?.id !== id) throw new Error('未能确认基本信息保存结果，请重新打开量表核对')
+    applyMetadata(response.data)
+    setHasConflict(false)
+    return !readOnlyRef.current
   }
 
   const saveBasic = async () => {
@@ -261,11 +305,7 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
         navigate(`/scales/${response.data.id}`)
         return
       }
-      const response = await apiClient.put<any>(`/scales/${id}`, payload)
-      if (!isCurrentOperation(operation)) return
-      assertResponse(response, '保存失败')
-      if (response.data?.id === id) applyMetadata(response.data)
-      setIssues([])
+      if (await persistBasic(operation)) setIssues([{ path: '基本信息', message: '基本信息已保存。', severity: 'success' }])
     } catch (error) {
       await reportWriteError(error, 'basic', operation)
     } finally { finishWrite(operation) }
@@ -273,17 +313,22 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
 
   const persistDefinition = async (operation: number): Promise<boolean> => {
     const next = updateReportContract(definition)
-    const response = await apiClient.put<any>(`/scales/${id}/definition`, { definition: next })
+    const response = await apiClient.put<any>(`/scales/${id}/definition`, { definition: next, ...writeVersion() })
     if (!isCurrentOperation(operation)) return false
     assertResponse(response, 'definition 保存失败')
+    const writtenVersion = response.data?.updatedAt
+    if (writtenVersion) updatedAtRef.current = writtenVersion
     const confirmed = await readCurrentScale(operation)
     if (!confirmed) return false
     if (!confirmed.definition) throw new Error('未能确认保存结果，请重试；当前编辑内容已保留')
-    const frozen = applyMetadata(confirmed)
+    if (writtenVersion && confirmed.updatedAt !== writtenVersion) {
+      throw Object.assign(new Error('保存后量表又发生了修改，发布已暂停'), { status: 409 })
+    }
+    const frozen = applyMetadata(confirmed, true)
     const stored = normalizeDefinition(confirmed.definition)
     if (frozen) {
-      setDefinition(stored)
-      setIssues([{ path: 'definition', message: '量表状态已变更，当前定义只读。', severity: 'error' }])
+      setHasConflict(true)
+      setIssues([{ path: 'definition', message: '量表状态已变更，当前定义只读。本页编辑已保留，请重新打开量表核对已发布内容。', severity: 'error' }])
       return false
     }
     const selectedItems = (value: ScaleDefinition) => value.scoring.scores.map(score => ({
@@ -292,8 +337,47 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
     }))
     if (JSON.stringify(selectedItems(stored)) !== JSON.stringify(selectedItems(next))) throw new Error('保存后的计分题目与当前选择不一致，请重试；当前编辑内容已保留')
     setDefinition(stored)
+    setSavedDefinition(JSON.stringify(stored))
+    setHasConflict(false)
     setIssues([{ path: '计分与题目', message: '已保存，并重新读取确认计分题目。', severity: 'success' }])
     return true
+  }
+
+  const saveDraft = async () => {
+    const operation = beginWrite()
+    if (operation === null) return
+    try {
+      if (basicDirty && !await persistBasic(operation)) return
+      if (!isCurrentOperation(operation) || readOnlyRef.current) return
+      if (await persistDefinition(operation)) setIssues([{ path: '草稿', message: '基本信息、题目与定义已保存。', severity: 'success' }])
+    } catch (error) { await reportWriteError(error, '草稿', operation) }
+    finally { finishWrite(operation) }
+  }
+
+  const copyAsDraft = async () => {
+    if (!mountedRef.current || !canCopy || savingRef.current) return
+    savingRef.current = true
+    setCopying(true)
+    setIssues([])
+    const operation = ++operationRef.current
+    let opened = false
+    try {
+      const response = await apiClient.post<any>(`/scales/${id}/copy`, {})
+      if (!isCurrentOperation(operation)) return
+      assertResponse(response, '复制失败，请重试')
+      const draft = response.data
+      if (!draft?.id || draft.id === id || draft.status !== 'DRAFT' || draft.visibility !== 'HIDDEN' || draft.instrumentClass !== 'CUSTOM_DESCRIPTIVE') {
+        throw new Error('未能确认新草稿，请返回量表列表核对复制结果')
+      }
+      opened = true
+      navigate(`/scales/${draft.id}`)
+    } catch (error) { await reportWriteError(error, '复制', operation) }
+    finally {
+      if (isCurrentOperation(operation) && !opened) {
+        savingRef.current = false
+        setCopying(false)
+      }
+    }
   }
   const saveDefinition = async () => {
     const operation = beginWrite()
@@ -322,7 +406,7 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
     if (!scale.id || savingRef.current || sortedItems.length === 0) return
     const operation = operationRef.current
     try {
-      const response = await apiClient.post<any>(`/scales/${id}/preview`, { answers: sortedItems.map((item) => ({ itemCode: item.itemCode, responseValue: responseSet.options[0]?.value })) })
+      const response = await apiClient.post<any>(`/scales/${id}/preview`, { answers: sortedItems.map((item) => ({ itemCode: item.itemCode, responseValue: definition.responseSets.find(set => set.key === item.responseSetKey)?.options[0]?.value })) })
       if (!isCurrentOperation(operation)) return
       assertResponse(response, '预览失败')
       setPreview(response.data)
@@ -333,20 +417,22 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
     const operation = beginWrite()
     if (operation === null) return
     try {
+      if (basicDirty && !await persistBasic(operation)) return
       if (!await persistDefinition(operation) || !isCurrentOperation(operation) || readOnlyRef.current) return
-      const response = await apiClient.post<any>(`/scales/${id}/publish`, {})
+      const response = await apiClient.post<any>(`/scales/${id}/publish`, writeVersion())
       if (!isCurrentOperation(operation)) return
       assertResponse(response, '发布失败')
       readOnlyRef.current = true
-      setScale((current) => ({ ...current, status: 'PUBLISHED' }))
+      if (response.data?.id === id && response.data.status === 'PUBLISHED') applyMetadata(response.data)
+      else setScale((current) => ({ ...current, status: 'PUBLISHED', copyEligibility: undefined }))
       setIssues([{ path: 'publish', message: '量表已发布。', severity: 'success' }])
     } catch (error) { await reportWriteError(error, 'publish', operation) }
     finally { finishWrite(operation) }
   }
 
-  const updateOption = (index: number, patch: Partial<ResponseOption>) => setDefinition((current) => ({ ...current, responseSets: [{ ...current.responseSets[0], options: current.responseSets[0].options.map((option, optionIndex) => optionIndex === index ? { ...option, ...patch } : option) }] }))
-  const addOption = () => setDefinition((current) => ({ ...current, responseSets: [{ ...current.responseSets[0], options: [...current.responseSets[0].options, { value: `option_${current.responseSets[0].options.length + 1}`, label: `选项 ${current.responseSets[0].options.length + 1}`, score: current.responseSets[0].options.length + 1 }] }] }))
-  const removeOption = (index: number) => setDefinition((current) => current.responseSets[0].options.length <= 2 ? current : ({ ...current, responseSets: [{ ...current.responseSets[0], options: current.responseSets[0].options.filter((_, optionIndex) => optionIndex !== index) }] }))
+  const updateOption = (index: number, patch: Partial<ResponseOption>) => setDefinition((current) => ({ ...current, responseSets: [{ ...current.responseSets[0], options: current.responseSets[0].options.map((option, optionIndex) => optionIndex === index ? { ...option, ...patch } : option) }, ...current.responseSets.slice(1)] }))
+  const addOption = () => setDefinition((current) => ({ ...current, responseSets: [{ ...current.responseSets[0], options: [...current.responseSets[0].options, { value: `option_${current.responseSets[0].options.length + 1}`, label: `选项 ${current.responseSets[0].options.length + 1}`, score: current.responseSets[0].options.length + 1 }] }, ...current.responseSets.slice(1)] }))
+  const removeOption = (index: number) => setDefinition((current) => current.responseSets[0].options.length <= 2 ? current : ({ ...current, responseSets: [{ ...current.responseSets[0], options: current.responseSets[0].options.filter((_, optionIndex) => optionIndex !== index) }, ...current.responseSets.slice(1)] }))
 
   const addItem = () => setDefinition((current) => {
     const itemCodes = new Set(current.items.map((item) => item.itemCode))
@@ -355,7 +441,7 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
     const itemCode = `Q${number}`
     return {
       ...current,
-      items: [...current.items, { itemCode, content: '', type: 'single', required: true, sortOrder: current.items.length + 1, responseSetKey: 'default', randomizeOptions: false }],
+      items: [...current.items, { itemCode, content: '', type: 'single', required: true, sortOrder: current.items.length + 1, responseSetKey: current.responseSets[0].key, randomizeOptions: false }],
       scoring: { ...current.scoring, itemRules: [...current.scoring.itemRules, { itemCode, transform: { type: 'identity' } }] },
     }
   })
@@ -397,24 +483,40 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
 
   const tabs: Array<[typeof activeTab, string]> = [['basic', '基本信息'], ['responses', '响应选项'], ['items', '题目'], ['scores', '计分'], ['report', '报告文案']]
   return (
-    <ProductPage width="management" className="staff-editor-page">
+    <ProductPage width="management" className="staff-editor-page scale-edit-page">
       <PageHeader
         title={isNew ? '创建描述性量表' : scale.name || '量表编辑'}
         description={standard ? 'STANDARD package · 只读' : readOnly ? '自定义量表 · 只读 · 仅草稿可编辑' : '自定义量表 · 描述性结果 · 不提供群体参考'}
         actions={(
           <div className="staff-inline-actions">
             <Link to="/scales" className="staff-secondary-link"><ArrowLeft className="w-4 h-4" aria-hidden="true" />返回量表列表</Link>
-            {!isNew && <button onClick={() => void previewDefinition()} disabled={saving || standard || accessBlocked} className="hui-button hui-button--secondary"><Eye className="w-4 h-4" aria-hidden="true" />计分预览</button>}
-            {!readOnly && <button onClick={() => void (isNew ? saveBasic() : saveDefinition())} disabled={saving} className="hui-button hui-button--secondary"><Save className="w-4 h-4" aria-hidden="true" />保存草稿</button>}
+            {!isNew && <button onClick={() => void previewDefinition()} disabled={saving || copying || standard || accessBlocked} className="hui-button hui-button--secondary"><Eye className="w-4 h-4" aria-hidden="true" />计分预览</button>}
+            {canCopy && <button type="button" onClick={() => void copyAsDraft()} disabled={copying} aria-busy={copying} className="hui-button hui-button--primary scale-edit-copy"><Copy className="w-4 h-4" aria-hidden="true" />{copying ? '正在创建新草稿…' : '复制为新草稿'}</button>}
+            {!readOnly && <button onClick={() => void (isNew ? saveBasic() : saveDraft())} disabled={saving} className="hui-button hui-button--secondary"><Save className="w-4 h-4" aria-hidden="true" />保存草稿</button>}
           </div>
         )}
       />
-      {issues.length > 0 && <div className="mb-5 rounded-lg border p-4 bg-gray-50"><ul className="space-y-1 text-sm">{issues.map((issue, index) => <li key={`${issue.path}-${index}`} className={issue.severity === 'success' ? 'text-green-700' : 'text-red-700'}>{issue.severity === 'success' && <CheckCircle className="w-4 h-4 inline mr-1" />}{issue.path}：{issue.message}</li>)}</ul></div>}
+      <div className="scale-edit-state" aria-label="量表状态">
+        <div className="scale-edit-state__labels">
+          <span className={`scale-edit-badge ${scale.status === 'PUBLISHED' ? 'scale-edit-badge--published' : ''}`}>{standard ? '标准量表 · 只读' : scale.status === 'PUBLISHED' ? '已发布 · 只读' : readOnly ? '只读' : '草稿'}</span>
+          <span>{scale.visibility === 'PUBLIC' ? '公开可用' : scale.visibility === 'COURSE' ? '课程可用' : '隐藏'}</span>
+          {!isNew && scale.id && <span>版本 {scale.instrumentVersion}</span>}
+        </div>
+        <p className="scale-edit-save-state" role="status" aria-live="polite">{copying ? '正在复制为独立的隐藏草稿…' : saving ? '正在保存，请稍候…' : hasConflict ? '状态已变更，本页编辑已保留，请核对后继续' : readOnly ? '当前版本不可编辑' : isNew ? '尚未创建，先保存基本信息' : basicDirty || definitionDirty ? [basicDirty && '基本信息待保存', definitionDirty && '题目与定义待保存'].filter(Boolean).join(' · ') : '草稿内容已保存'}</p>
+      </div>
+      {scale.copySource && <aside className="scale-edit-source" aria-label="量表副本来源">
+        <div className="scale-edit-source__heading"><Copy className="w-4 h-4" aria-hidden="true" /><strong>复制来源</strong></div>
+        <p><Link to={`/scales/${scale.copySource.parentId}`}>{scale.copySource.parentCode}</Link><span> · 版本 {scale.copySource.parentVersion}</span></p>
+        <p>这是独立副本，修改和发布仅作用于当前量表。</p>
+        <details><summary>查看来源版本标识</summary><dl><dt>定义标识</dt><dd>{scale.copySource.parentDefinitionHash}</dd><dt>计分标识</dt><dd>{scale.copySource.parentScoringHash}</dd></dl></details>
+      </aside>}
+      {scale.status === 'PUBLISHED' && <div className="scale-edit-readonly-note">{canCopy ? '此版本已发布并冻结。复制为新草稿后，可以修改内容并重新检查、发布。' : scale.copyEligibility?.reason || '此版本已发布并冻结，当前不可复制。'}</div>}
+      {issues.length > 0 && <div className="scale-edit-feedback mb-5 rounded-lg border p-4 bg-gray-50" role={issues.some(issue => issue.severity !== 'success') ? 'alert' : 'status'}><ul className="space-y-1 text-sm">{issues.map((issue, index) => <li key={`${issue.path}-${index}`} className={issue.severity === 'success' ? 'text-green-700' : 'text-red-700'}>{issue.severity === 'success' && <CheckCircle className="w-4 h-4 inline mr-1" />}{issue.path}：{issue.message}</li>)}</ul></div>}
       <div className="staff-toolbar"><div className="staff-segmented scale-edit-tabs" role="group" aria-label="量表编辑分区">{tabs.map(([key, label]) => <button key={key} type="button" aria-pressed={activeTab === key} onClick={() => setActiveTab(key)}>{label}</button>)}</div></div>
 
       {activeTab === 'basic' && <section className="staff-panel staff-panel--padded p-6 space-y-4"><div className="grid md:grid-cols-2 gap-4"><label className="text-sm text-gray-700">量表编码<input disabled={!isNew || controlsDisabled} value={scale.code} onChange={(event) => setScale({ ...scale, code: event.target.value })} className="input mt-1 w-full" /></label><label className="text-sm text-gray-700">量表名称<input disabled={controlsDisabled} value={scale.name} onChange={(event) => setScale({ ...scale, name: event.target.value })} className="input mt-1 w-full" /></label><label className="text-sm text-gray-700">预计用时（分钟）<input type="number" disabled={controlsDisabled} value={scale.estimatedTime ?? ''} onChange={(event) => setScale({ ...scale, estimatedTime: event.target.value ? Number(event.target.value) : null })} className="input mt-1 w-full" /></label><label className="text-sm text-gray-700">可见性<select disabled={controlsDisabled} value={scale.visibility} onChange={(event) => setScale({ ...scale, visibility: event.target.value as ScaleMeta['visibility'] })} className="input mt-1 w-full"><option value="HIDDEN">隐藏</option><option value="COURSE">课程可用</option><option value="PUBLIC">公开可用</option></select></label></div><label className="block text-sm text-gray-700">说明<textarea disabled={controlsDisabled} value={scale.description || ''} onChange={(event) => setScale({ ...scale, description: event.target.value })} className="input mt-1 w-full min-h-24" /></label><label className="block text-sm text-gray-700">作答指导<textarea disabled={controlsDisabled} value={scale.instruction || ''} onChange={(event) => setScale({ ...scale, instruction: event.target.value })} className="input mt-1 w-full min-h-24" /></label><label className="block text-sm text-gray-700">自有内容 / 授权声明<textarea disabled={controlsDisabled} value={definition.license.note || ''} onChange={(event) => setDefinition((current) => ({ ...current, license: { ...current.license, note: event.target.value } }))} className="input mt-1 w-full min-h-20" placeholder="说明题目内容由谁提供，以及允许在本系统中使用的范围" /></label><div className="flex justify-end"><button onClick={() => void saveBasic()} disabled={controlsDisabled} className="hui-button hui-button--primary"><Save className="w-4 h-4 inline mr-1" />保存基本信息</button></div></section>}
 
-      {activeTab === 'responses' && <section className="staff-panel staff-panel--padded p-6"><div className="flex justify-between mb-4"><div><h2 className="font-semibold">共享响应选项</h2><p className="text-sm text-gray-500">学生只看到标签；分值仅由服务端用于权威计分。</p></div><button onClick={addOption} disabled={controlsDisabled} className="hui-button hui-button--secondary"><Plus className="w-4 h-4 inline mr-1" />增加选项</button></div><div className="space-y-3">{responseSet.options.map((option, index) => <div key={index} className="grid grid-cols-[1fr_1fr_100px_40px] gap-2 items-center"><input disabled={controlsDisabled} value={String(option.value)} onChange={(event) => updateOption(index, { value: event.target.value })} className="input" placeholder="稳定 value" /><input disabled={controlsDisabled} value={option.label} onChange={(event) => updateOption(index, { label: event.target.value })} className="input" placeholder="显示标签" /><input disabled={controlsDisabled} type="number" value={option.score} onChange={(event) => updateOption(index, { score: Number(event.target.value) })} className="input" placeholder="基础分" /><button onClick={() => removeOption(index)} disabled={controlsDisabled || responseSet.options.length <= 2} className="text-red-500 disabled:text-gray-300"><Trash2 className="w-4 h-4" /></button></div>)}</div><div className="flex justify-end mt-5"><button onClick={() => void saveDefinition()} disabled={controlsDisabled} className="hui-button hui-button--primary">保存响应集</button></div></section>}
+      {activeTab === 'responses' && <section className="staff-panel staff-panel--padded p-6"><div className="flex justify-between mb-4"><div><h2 className="font-semibold">共享响应选项</h2><p className="text-sm text-gray-500">学生只看到标签；分值仅由服务端用于权威计分。</p>{definition.responseSets.length > 1 && <p className="scale-edit-multiset-note">此量表含 {definition.responseSets.length} 组响应选项；这里编辑第一组（{responseSet.key}），其余响应集将完整保留。</p>}</div><button onClick={addOption} disabled={controlsDisabled} className="hui-button hui-button--secondary"><Plus className="w-4 h-4 inline mr-1" />增加选项</button></div><div className="space-y-3">{responseSet.options.map((option, index) => <div key={index} className="grid grid-cols-[1fr_1fr_100px_40px] gap-2 items-center"><input disabled={controlsDisabled} value={String(option.value)} onChange={(event) => updateOption(index, { value: event.target.value })} className="input" placeholder="稳定 value" /><input disabled={controlsDisabled} value={option.label} onChange={(event) => updateOption(index, { label: event.target.value })} className="input" placeholder="显示标签" /><input disabled={controlsDisabled} type="number" value={option.score} onChange={(event) => updateOption(index, { score: Number(event.target.value) })} className="input" placeholder="基础分" /><button onClick={() => removeOption(index)} disabled={controlsDisabled || responseSet.options.length <= 2} className="text-red-500 disabled:text-gray-300"><Trash2 className="w-4 h-4" /></button></div>)}</div><div className="flex justify-end mt-5"><button onClick={() => void saveDefinition()} disabled={controlsDisabled} className="hui-button hui-button--primary">保存响应集</button></div></section>}
 
       {activeTab === 'items' && <section className="staff-panel staff-panel--padded p-6"><div className="flex justify-between mb-4"><div><h2 className="font-semibold">题目</h2><p className="text-sm text-gray-500">每题使用稳定 itemCode；本编辑器强制完整作答。</p></div><button onClick={addItem} disabled={controlsDisabled} className="hui-button hui-button--secondary"><Plus className="w-4 h-4 inline mr-1" />增加题目</button></div><div className="space-y-3">{sortedItems.map((item) => { const rule = definition.scoring.itemRules.find((candidate) => candidate.itemCode === item.itemCode); return <div key={item.itemCode} className="border rounded-lg p-3 grid md:grid-cols-[100px_1fr_auto] gap-3 items-start"><input disabled value={item.itemCode} className="input bg-gray-50" title="itemCode 是稳定标识，不能在编辑器中修改" /><textarea disabled={controlsDisabled} value={item.content} onChange={(event) => updateItem(item.itemCode, { content: event.target.value })} className="input min-h-20" placeholder="题目内容" /><div className="flex md:flex-col gap-2 text-sm"><label><input type="checkbox" checked={rule?.transform.type === 'reverse'} disabled={controlsDisabled} onChange={() => toggleReverse(item.itemCode)} /> 反向计分</label><label><input type="checkbox" checked={item.required} disabled /> 必答</label><button onClick={() => removeItem(item.itemCode)} disabled={controlsDisabled} className="text-red-500 text-left"><Trash2 className="w-4 h-4 inline mr-1" />删除</button></div></div> })}</div><div className="flex justify-end mt-5"><button onClick={() => void saveDefinition()} disabled={controlsDisabled} className="hui-button hui-button--primary">保存题目</button></div></section>}
 
