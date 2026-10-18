@@ -4,6 +4,8 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { isScaleReportFactsView } from '../assessment-runtime/compact-scale-facts'
 import { loadStoredCanonicalUnitResults } from '../assessment-runtime/compact-assessment-storage'
 import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
+import { parseVersionedFrozenScaleRuntimeSnapshot, type VersionedFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
+import { createSharedScaleRuntimeStore, isSharedScaleRuntimeReference, type SharedScaleArtifactRecord } from '../assessment-runtime/shared-scale-runtime'
 import { compositeItemSlotKey, formSectionSlotKey, type FrozenActiveSlotSetV1 } from '../assessment-runtime/slot-set'
 import { mapCompositeSection } from '../assessment-runtime/form-section-definition'
 import { typedCompositeFormQuestion } from '../assessment-runtime/typed-form'
@@ -17,6 +19,7 @@ import { readScaleResult, resolveProjectionPolicyForAssessment } from '../scale/
 import { createScaleProjectionContext } from '../scale/projection/context-factory'
 import { resolveEffectiveScaleDisclosure } from '../scale/projection/context'
 import { readFrozenReport } from '../cognitive/profile-freeze'
+import { resolveTrainingComparability } from './core'
 import type { TrainingAnalysisRequestV1, TrainingAnalysisSourceV1, TrainingAnalysisWaveV1, TrainingMetricIdentityV1, TrainingNumericObservationV1, TrainingObservationReason } from './types'
 
 export const TRAINING_ANALYSIS_SOURCE_LIMIT = 6000
@@ -411,8 +414,142 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
 }
 const taskIdOf = (attempt: any) => attempt.compositeAssessmentId
 
+/** Runtime-only reader: no result facts, answers, reports or rescoring. Exact
+ * ciphertext/reference identities are request-local; artifacts are read in one
+ * batch and grouped so the bounded shared parser cannot churn between artifacts. */
+async function discoveryScaleRuntimes(rows: any[], tx: Prisma.TransactionClient) {
+  const decoded = new Map<string, any>(), groups = new Map<string, string[]>(), artifactHashes = new Set<string>()
+  try {
+    for (const row of rows) {
+      const cipher = row.runtimeSnapshotEncrypted
+      if (typeof cipher !== 'string' || !cipher) invalid('量表指标冻结运行时缺失')
+      if (decoded.has(cipher)) continue
+      const value = decryptUnifiedRuntimePayload<any>(cipher)
+      decoded.set(cipher, value)
+      const shared = isSharedScaleRuntimeReference(value)
+      if (shared && (typeof value.artifactHash !== 'string' || !/^[a-f0-9]{64}$/.test(value.artifactHash))) invalid('量表指标共享运行时无效')
+      if (shared) artifactHashes.add(value.artifactHash)
+      const key = shared ? value.artifactHash : cipher
+      const group = groups.get(key) ?? []; group.push(cipher); groups.set(key, group)
+    }
+    const artifacts = artifactHashes.size ? await tx.$queryRaw<SharedScaleArtifactRecord[]>`SELECT artifact_hash AS "artifactHash",format_version AS "formatVersion",plaintext_bytes AS "plaintextBytes",payload_encrypted AS "payloadEncrypted"
+      FROM assessment_runtime_artifacts WHERE artifact_hash IN (${Prisma.join([...artifactHashes])})` : []
+    const byHash = new Map(artifacts.map(row => [row.artifactHash, row]))
+    if (byHash.size !== artifacts.length || artifacts.length !== artifactHashes.size || artifacts.some(row => !artifactHashes.has(row.artifactHash))) invalid('量表指标共享运行时批次不一致')
+    const store = createSharedScaleRuntimeStore({find: async key => byHash.get(key) ?? null, insert: async () => {throw new Error('Discovery runtime reader is read only')}})
+    const runtimes = new Map<string, VersionedFrozenScaleRuntimeSnapshot>(), references = new Map<string, VersionedFrozenScaleRuntimeSnapshot>()
+    for (const group of groups.values()) for (const cipher of group) {
+      const value = decoded.get(cipher)
+      if (isSharedScaleRuntimeReference(value)) {
+        const identity = hash(value)
+        const runtime = references.get(identity) ?? await store.load(value)
+        references.set(identity, runtime); runtimes.set(cipher, runtime)
+      } else runtimes.set(cipher, parseVersionedFrozenScaleRuntimeSnapshot(value))
+    }
+    return runtimes
+  } catch {invalid('量表指标冻结运行时不可用')}
+}
+
+/** Discovery reads every authorized frozen dictionary, never editable templates.
+ * The public selector cannot distinguish conflicting meanings for one item/key. */
+async function discoverFrozenScaleMetrics(tx: Prisma.TransactionClient, actor: TrainingAnalysisActor, courseId: string,
+  tasks: any[], visibility: Prisma.CompositeAssessmentAttemptWhereInput | null) {
+  const scaleTasks = tasks.filter(task => task.items.some((item: any) => item.type === 'SCALE'))
+  const metrics = new Map<string, Array<{itemId: string; metricKey: string; label: string}>>()
+  if (!scaleTasks.length) return metrics
+  const rows: any[] = await tx.assessment.findMany({where: {
+    status: 'COMPLETED', deliveryMode: 'FINAL_ONLY', runtimeGeneration: 'UNIFIED_V1',
+    compositeAttempt: {is: {compositeAssessmentId: {in: scaleTasks.map(task => task.id)}, deliveryCourseId: courseId,
+      status: 'COMPLETED', deliveryMode: 'FINAL_ONLY', runtimeGeneration: 'UNIFIED_V1', ...(visibility ? {AND: [visibility]} : {})}},
+  }, select: {id: true, compositeAttemptId: true, compositeItemId: true, scaleId: true, attemptEpoch: true,
+    status: true, deliveryMode: true, runtimeGeneration: true, submissionId: true, submissionPayloadHash: true,
+    runtimeSnapshotEncrypted: true, compiledRuntimeHash: true, compositeAttempt: {select: {
+      id: true, compositeAssessmentId: true, participantKey: true, deliveryCourseId: true, assignmentRef: true, respondentType: true,
+      attemptEpoch: true, status: true, deliveryMode: true, runtimeGeneration: true, contextSnapshotHash: true,
+      frozenActiveSlotSetEncrypted: true, frozenActiveSlotSetHash: true,
+      trainingVariantAllocationEncrypted: true, trainingVariantAllocationHash: true,
+      trainingFlowSnapshotEncrypted: true, trainingFlowSnapshotHash: true, trainingFlowPathEncrypted: true, trainingFlowPathHash: true,
+    }}}, orderBy: {id: 'asc'}, take: TRAINING_ANALYSIS_SOURCE_LIMIT + 1})
+  if (rows.length > TRAINING_ANALYSIS_SOURCE_LIMIT) throw compositeBadRequest('量表指标来源超过 6000 条，请缩小课程范围')
+  const current = rows.filter(row => {
+    if (!row.compositeAttempt || row.compositeAttempt.id !== row.compositeAttemptId) invalid('量表指标父记录绑定不一致')
+    return row.attemptEpoch === row.compositeAttempt.attemptEpoch
+  })
+  const parents = [...new Map(current.map(row => [row.compositeAttempt.id, row.compositeAttempt])).values()]
+  const tasksById = new Map(scaleTasks.map(task => [task.id, task]))
+  const slots = await loadSituationalExportSlotSets(parents, tx), children = groupRows(current, row => row.compositeAttemptId)
+  const flowParents = parents.filter(parent => tasksById.get(parent.compositeAssessmentId)?.trainingFlowFrozen != null)
+  const flowSnapshots = new Map<string, any[]>(flowParents.map(parent => [parent.id, []]))
+  if (flowParents.length) {
+    const accepted = await tx.assessmentUnitSnapshot.findMany({where: {OR: flowParents.map(parent => ({compositeAttemptId: parent.id, attemptEpoch: parent.attemptEpoch}))}, orderBy: {id: 'asc'}, take: TRAINING_ANALYSIS_SOURCE_LIMIT + 1})
+    if (accepted.length > TRAINING_ANALYSIS_SOURCE_LIMIT) throw compositeBadRequest('量表流程来源超过 6000 条，请缩小课程范围')
+    const epochs = new Map(flowParents.map(parent => [parent.id, parent.attemptEpoch]))
+    for (const row of accepted) {
+      if (!row.compositeAttemptId || epochs.get(row.compositeAttemptId) !== row.attemptEpoch) invalid('量表流程快照不在发现范围')
+      flowSnapshots.get(row.compositeAttemptId)!.push(row)
+    }
+  }
+  const projected: any[] = []
+  for (const parent of parents) {
+    const task = tasksById.get(parent.compositeAssessmentId)
+    if (!task || parent.deliveryCourseId !== courseId || parent.status !== 'COMPLETED'
+      || parent.deliveryMode !== 'FINAL_ONLY' || parent.runtimeGeneration !== 'UNIFIED_V1') invalid('量表指标课程来源不一致')
+    const attempt = {...parent, compositeAssessment: task, scaleAssessments: children.get(parent.id) ?? []}
+    const scope = await resolveTrainingAttemptScope(attempt, task, {db: tx, frozenSlotSets: slots, flowSnapshots})
+    for (const child of attempt.scaleAssessments) {
+      if (child.compositeAttemptId !== parent.id || child.attemptEpoch !== parent.attemptEpoch
+        || !scope.items.some(item => item.id === child.compositeItemId && item.type === 'SCALE')) invalid('量表指标不在已分配范围')
+      if (scope.flow) {
+        const accepted = scope.flow.snapshots.filter(row => row.slotKey === compositeItemSlotKey(child.compositeItemId, 'SCALE'))
+        if (accepted.length !== 1 || accepted[0].sourceType !== 'ASSESSMENT' || accepted[0].sourceAttemptId !== child.id
+          || accepted[0].sourceSubmissionId !== child.submissionId || accepted[0].compiledRuntimeHash !== child.compiledRuntimeHash) invalid('量表指标流程已接受来源不一致')
+      }
+    }
+    projected.push(await applyTrainingAttemptScope(attempt, {db: tx, frozenSlotSets: slots, verifiedScope: scope}))
+  }
+  const runtimes = await discoveryScaleRuntimes(current, tx), meanings = new Map<string, {label: string; measurement: TrainingMetricIdentityV1}>()
+  const dictionaryIdentities = new Map<VersionedFrozenScaleRuntimeSnapshot, {scoringDigest: string; responseSignature: string}>()
+  for (const parent of projected) for (const child of parent.scaleAssessments) {
+    const item = parent.compositeAssessment.items.find((candidate: any) => candidate.id === child.compositeItemId)
+    const slot = slots.get(parent.id)!.slots.find(candidate => candidate.slotKey === compositeItemSlotKey(item.id, 'SCALE'))
+    const runtime = runtimes.get(child.runtimeSnapshotEncrypted)
+    if (!runtime || !slot || slot.unitType !== 'SCALE' || !child.submissionId || child.status !== 'COMPLETED'
+      || child.deliveryMode !== 'FINAL_ONLY' || child.runtimeGeneration !== 'UNIFIED_V1'
+      || child.scaleId !== item.scaleId || item.scale?.id !== child.scaleId
+      || runtime.instrumentKey !== slot.sourceDefinitionIdentity.key || runtime.instrumentVersion !== slot.sourceDefinitionIdentity.version
+      || runtime.sourceDefinitionHash !== slot.sourceDefinitionIdentity.hash || runtime.compiledRuntime.compiledRuntimeHash !== child.compiledRuntimeHash
+      || (slot.sourceBinding.compiledRuntimeHash && slot.sourceBinding.compiledRuntimeHash !== child.compiledRuntimeHash)) invalid('量表指标冻结运行时或来源不一致')
+    const policy = resolveProjectionPolicyForAssessment({...child, scale: {code: runtime.instrumentKey,
+      instrumentVersion: runtime.instrumentVersion, instrumentClass: item.scale.instrumentClass}}, null, runtime)
+    const disclosure = resolveEffectiveScaleDisclosure(createScaleProjectionContext({instrumentKey: runtime.instrumentKey,
+      instrumentVersion: runtime.instrumentVersion, audience: 'teacher', purpose: 'export', principalId: actor.userId, frozenPolicy: policy.policy}))
+    if (policy.snapshotError) invalid('量表指标冻结权限不可用')
+    if (!disclosure.numericScores) continue
+    const existing = metrics.get(parent.compositeAssessmentId) ?? [], compiled = runtime.compiledRuntime
+    let identity = dictionaryIdentities.get(runtime)
+    if (!identity) {
+      identity = {scoringDigest: hash({scorer: compiled.scorerKey, version: compiled.scorerVersion, definition: runtime.sourceDefinitionHash, runtime: compiled.compiledRuntimeHash}),
+        responseSignature: hash({items: runtime.definition.items.map(row => ({itemCode: row.itemCode, responseSetKey: row.responseSetKey})), responseSets: runtime.definition.responseSets})}
+      dictionaryIdentities.set(runtime, identity)
+    }
+    for (const score of runtime.definition.scoring.scores) {
+      const key = hash({taskId: parent.compositeAssessmentId, itemId: item.id, metricKey: score.key})
+      // Use the existing exact-measurement comparability contract. A policy or
+      // timestamp change alone is not a new scientific measurement identity.
+      const measurement: TrainingMetricIdentityV1 = {instrumentKey: runtime.instrumentKey, scoreKey: score.key, ...identity,
+        respondentType: parent.respondentType ?? 'SELF', unit: compiled.metricDefinitions[score.key]?.unit ?? null, version: runtime.instrumentVersion}
+      const previous = meanings.get(key)
+      if (previous && (previous.label !== score.label || resolveTrainingComparability(score.key, previous.measurement, measurement).level !== 'EXACT')) invalid('量表指标冻结版本冲突，当前选择协议无法区分')
+      meanings.set(key, {label: score.label, measurement})
+      if (!existing.some(value => value.itemId === item.id && value.metricKey === score.key)) existing.push({itemId: item.id, metricKey: score.key, label: score.label})
+    }
+    metrics.set(parent.compositeAssessmentId, existing)
+  }
+  return metrics
+}
+
 /** Bounded, owner-authorized discovery. Actual runs revalidate every frozen
- * source and disclosure; current definitions here are selector labels only. */
+ * source and disclosure; Scale selectors come only from frozen runtimes. */
 export async function listTrainingAnalysisSources(tx: Prisma.TransactionClient, actor: TrainingAnalysisActor, courseId: string) {
   const auth = await authority(tx, actor, courseId)
   const tasks: any[] = await tx.compositeAssessment.findMany({where: {...authorizedTaskWhere(actor, courseId), publishedAt: {not: null}}, include: templateInclude,
@@ -445,14 +582,11 @@ export async function listTrainingAnalysisSources(tx: Prisma.TransactionClient, 
     for (const metric of envelope?.core.metrics ?? []) if ((metric.value === null || numeric(metric.value)) && !existing.some(value => value.itemId === item.id && value.metricKey === metric.key)) existing.push({itemId: item.id, metricKey: metric.key, label: metric.key})
     sjtMetrics.set(task.id, existing)
   }
+  const scaleMetrics = await discoverFrozenScaleMetrics(tx, actor, courseId, available, auth.visibility)
   for (const task of available) {
-    const metrics: Array<{itemId: string; metricKey: string; label: string}> = [...(sjtMetrics.get(task.id) ?? [])]
+    const metrics: Array<{itemId: string; metricKey: string; label: string}> = [...(sjtMetrics.get(task.id) ?? []), ...(scaleMetrics.get(task.id) ?? [])]
     for (const item of task.items) {
-      if (item.type === 'SCALE') {
-        const disclosure = resolveEffectiveScaleDisclosure(createScaleProjectionContext({instrumentKey: item.scale?.code, instrumentVersion: item.scale?.instrumentVersion,
-          instrumentClass: item.scale?.instrumentClass, audience: 'teacher', purpose: 'export'}))
-        if (disclosure.numericScores) for (const score of item.scale?.definition?.scores ?? []) metrics.push({itemId: item.id, metricKey: score.key, label: score.label ?? score.key})
-      } else if (item.type === 'FORM' && item.formDefinition && ['NUMBER', 'SLIDER'].includes(item.formDefinition.type)) {
+      if (item.type === 'FORM' && item.formDefinition && ['NUMBER', 'SLIDER'].includes(item.formDefinition.type)) {
         const question = formMetric(item, item.formDefinition.itemKey); metrics.push({itemId: item.id, metricKey: question.itemKey, label: question.prompt})
       } else if (item.type === 'COGNITIVE') {
         const frozen = readFrozenReport(item.cognitiveAssignment?.resolvedReportSnapshotEncrypted)

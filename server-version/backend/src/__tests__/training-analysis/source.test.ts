@@ -296,6 +296,9 @@ describe('authorized Training numeric source adapter', () => {
   })
   it.each(['calculated', 'not_calculable'])('discovers SJT frozen metrics while preserving %s status', async status => {
     const f = fixture(1), runtime = {instrumentKey: 'sjt_fixture', instrumentVersion: '1.0.0', definitionHash: 'a'.repeat(64), compiledRuntimeHash: 'b'.repeat(64), scorerKey: 'sjt.scorer', scoringVersion: '1.0.0', runtimeGeneration: 'UNIFIED_V1' as const, deliveryMode: 'FINAL_ONLY' as const, frozenAt: publication}
+    // A real legacy row loads every nullable flow marker; omitted is UNKNOWN.
+    Object.assign(f.task, {trainingFlowDraft: null, trainingFlowFrozen: null, trainingFlowDigest: null})
+    Object.assign(f.parents[0], {trainingFlowSnapshotEncrypted: null, trainingFlowSnapshotHash: null, trainingFlowPathEncrypted: null, trainingFlowPathHash: null})
     f.task.items = [{id: 'sjt-item', type: 'SITUATIONAL', position: 0, required: true, situationalInstrumentKey: runtime.instrumentKey, situationalInstrumentVersion: runtime.instrumentVersion}]; f.task.formSections = []
     const slots = createFrozenActiveSlotSet({schemaVersion: 1, runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1, slots: [{slotKey: 'situational:sjt-item', unitType: 'SITUATIONAL', required: true,
       sourceDefinitionIdentity: {key: runtime.instrumentKey, version: runtime.instrumentVersion, hash: runtime.definitionHash}, sourceBinding: {}, runtimeIdentity: runtime}]})

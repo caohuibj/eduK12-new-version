@@ -112,3 +112,11 @@ state05在9ee45f69固定输入运行，正式runtime角色且原Form仅复用，
 源码核实 source-list 当前读取definition.scores，而官方V2字典为definition.scoring.scores；产品修复另行冻结，须从精确冻结runtime的统一V1/V2 parser发现指标，保持teacher numeric disclosure，不能简单回退当前可编辑模板。新analysis-only continuation锁定state06，原三READY CSV只读下载比对旧SHA/bytes，原FAILED与READY行、8事实前后固定，仅补缺失analysis及其CSV。当前只是静态脚本，不授动态资格。
 
 补充ON/OFF脚本已静态冻结：独立新14个FINAL（两模式各四工具，另两类撤权各A两次/B一次），每个attempt科学身份与封装hash分别绑定；四native真child非owner拒绝、未达无child/配额、Scale/SJT已达恢复与未达撤权拒绝。launcher尚未完成，未运行。独立progress窄审确认state/list和中间finalizer基于reached集合，无候选union分母泄漏，无需额外UI修改。
+
+### Checkpoint 11：冻结runtime字典修复及定向检查
+
+Scale source discovery不再读取可编辑definition.scores。按已授权课程/任务、有界已完成FINAL/UNIFIED child及最小parent headers，使用官方V1/V2/shared runtime parser；精确密文/引用按request去重，shared artifact一次IN批读，不读取result/answers/个人计分facts。每child仍核parent/epoch/slot/source/compiled hash和teacher numeric disclosure（ADMIN不升级audience），有效flow proof只核其快照密文摘要而不展开答案。相同item/key的所有冻结字典均校验，按既有comparability EXACT及label拒绝不可表达冲突，其他key并集；不新增selector/公共字段，当前无法细分选择冲突版本，既有NOT_COMPARABLE分析合同保持。
+
+新37例通过，原相关discovery4例首轮2通过、2因旧SJT fixture遗漏flow markers而UNKNOWN失败；只局部补参数化两个fixture的真实null，受影响2例续验通过，未改生产failclosed。build10 tsc通过且输入前后一致，input SHA `e4f48388658551a0e937c93df61ce263a9fe2f1f21994a918449c219a5057da0`，dist manifest SHA `eb62e59d6e5b673f0c68d994feadd3000187aa19aac5c2710ecbc28a696c94d7`。原失败与全部producer保留在checkpoint11归档，不将重叠例相加。
+
+新增Scale分支上限100任务、6000child/flow snapshot；一次child findMany（nested parent select的实际SQL可能多于1条）、shared slot及runtime artifact各至多一批、flow snapshots至多一批。mock调用数不冒充真实SQL/吞吐。另确认既有SJT discovery在新flow下每row未批传snapshot导致实际N+1，须在C19收口前局部合并本请求批量scope读取，不能仅推给C26。该后续修复尚未纳入当前构建/资格；state07也未运行。ON/OFF launcher现已静态WIP，五个prior SHA必填，未创建clone或服务。
