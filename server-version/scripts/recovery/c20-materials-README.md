@@ -201,3 +201,24 @@ A failed explicit continuation remains recoverable: its retained failed result
 file is SHA-bound in the runtime receipt and must identify the same target and
 prior producer. Import validates that evidence while importing only previously
 accepted phases; it never marks the failed continuation as accepted or reused.
+
+## State04 epoch-specific missing assertion
+
+The null replacement's genuine epoch2 outbox was processed once to READY, but
+an inherited helper's final lookup incorrectly assumed epoch1. State04 retains
+that failed result and journal. `c20-materials-race-epoch-continuation.mjs`
+SHA-binds both and only reads/asserts the existing null parent, FINAL snapshot,
+and epoch2 READY outbox. It does not resubmit that FINAL or process its job again.
+Its local worker helper reads the actual target epoch for the previously unrun
+V1 replacement; the shared client and previously accepted phase inputs stay
+unchanged. It then runs the previously unissued KEEP_LINKED subject race.
+
+The same continuation reads the four already accepted V2 anonymous cases'
+private journals without exposing credentials and fills just the missing old
+credential-to-new-replacement-ID rejection probes, with successful current
+credential reads and unchanged census. Null and new V1 receive that explicit
+cross-ID check too. Use state04 exact receipt
+`c1615d3e8304547d4f21d4ecd376b43a76670076e547eac20396c901a36686ee`
+and `--continuation-phase race --phase all` with the epoch continuation's exact
+SHA. The new script's official pure config/token checks can be run by passing
+its filename to `c20-materials-race-precheck.mjs`.

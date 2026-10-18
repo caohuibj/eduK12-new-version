@@ -1,0 +1,28 @@
+{
+  "qualification": "state04 race continuation failed on harness epoch1 outbox lookup after null epoch2 FINAL and original report processing; no producer replay",
+  "members": {
+    "eduk12_c20_http_04/c20-race-result.json": {
+      "sha256": "2f1061ecc1333dd5c01e28b624f2ade6614ee1ed3e1aa1319b43f32aa661a11f",
+      "size": 9236,
+      "gzipSha256": "22cbd741017a6472ae872fe6c2c4a530c9fd28f32ef1ea7a148b5171d6ff3acd",
+      "gzipSize": 1644
+    },
+    "eduk12_c20_http_04/c20-runtime-result.json": {
+      "sha256": "c1615d3e8304547d4f21d4ecd376b43a76670076e547eac20396c901a36686ee",
+      "size": 127412,
+      "gzipSha256": "54c88b413d9f0e244665c73d51e7d937a0bba5a636783e18a937a4d3ffe299a4",
+      "gzipSize": 15380
+    },
+    "eduk12_c20_http_04/frozen-inputs.json": {
+      "sha256": "137bc320be9b96f4bcb95253175f77f41fc80158ac0e2f827d6b99f2b0834846",
+      "size": 359036,
+      "gzipSha256": "2af2d70d64a02e756563b1c1456caf92b35d0978eea162481592b7baed74ee5a",
+      "gzipSize": 86786
+    }
+  },
+  "archive": {
+    "name": "checkpoint05-runtime-partial.tar.gz",
+    "sha256": "2299b5ad57bc3577f4d3cb68f58d53052fb64fe3193902e790fb94377d7d9177",
+    "size": 103572
+  }
+}

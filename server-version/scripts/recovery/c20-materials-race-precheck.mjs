@@ -8,7 +8,7 @@ import {createHash} from 'node:crypto'
 const base=path.dirname(new URL(import.meta.url).pathname),backend=path.resolve(base,'../../backend'),require=createRequire(path.join(backend,'package.json'))
 const {trainingFlowSchema}=require(path.join(backend,'dist/modules/questionnaire-product/training-flow-authoring.js'))
 const {parseTrainingFlowDraft,trainingFlowUnitKey}=require(path.join(backend,'dist/modules/assessment-core/flow/training.js'))
-const file=path.join(base,'c20-materials-race-continuation.mjs'),source=fs.readFileSync(file,'utf8')
+const file=path.join(base,process.argv[2]??'c20-materials-race-continuation.mjs'),source=fs.readFileSync(file,'utf8')
 const expression=source.split('\n').find(line=>line.startsWith(' const config=')).split(' const config=')[1]
 const config=vm.runInNewContext('('+expression+')',{unitKey:()=>trainingFlowUnitKey('11111111-1111-4111-8111-111111111111'),formRows:()=>[{}],v1:{}})
 trainingFlowSchema.parse({revision:1,config});parseTrainingFlowDraft(config)
