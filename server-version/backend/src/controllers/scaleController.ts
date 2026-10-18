@@ -177,10 +177,14 @@ export const scaleController = {
         prisma.scale.count({ where }),
       ])
 
-      const withSource = scales.map((scale) => ({
-        ...scale,
-        source: scaleSource(userId as string, userRole as UserRole, scale),
-      }))
+      const withSource = scales.map((scale) => {
+        const { copySource, ...metadata } = scale
+        return {
+          ...metadata,
+          ...(scale.creatorId === userId || userRole === UserRole.ADMIN ? { copySource } : {}),
+          source: scaleSource(userId as string, userRole as UserRole, scale),
+        }
+      })
       const result = buildPaginatedResult(withSource, total, pagination)
       return success(res, result)
     } catch (err) {
@@ -454,10 +458,13 @@ export const scaleController = {
         }
       }
       if (req.user?.role === UserRole.STUDENT) {
-        const { definition: _definition, ...metadata } = scale
+        const { definition: _definition, copySource: _copySource, ...metadata } = scale
         return success(res, { ...metadata, runner })
       }
-      return success(res, { ...scale, runner, copyEligibility: scaleCopyEligibility(scale, req.user!.userId) })
+      const { copySource, ...metadata } = scale
+      return success(res, { ...metadata, runner,
+        ...(scale.creatorId === req.user!.userId || req.user!.role === UserRole.ADMIN ? { copySource } : {}),
+        copyEligibility: scaleCopyEligibility(scale, req.user!.userId) })
     } catch (err) {
       logger.error('获取量表详情错误', err)
       return error(res, '获取量表详情失败')
