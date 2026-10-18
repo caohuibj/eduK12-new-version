@@ -63,6 +63,9 @@ router.get('/', authenticate, requireTeacher, scaleController.list)
 // 创建量表
 router.post('/', authenticate, requireTeacher, scaleController.create)
 
+// Only explicitly eligible authored published sources can create a new identity.
+router.post('/:id/copy', authenticate, requireTeacher, scaleController.copy)
+
 // 更新量表
 router.put('/:id', authenticate, requireTeacher, scaleController.update)
 
