@@ -32,7 +32,7 @@ function fixture() {
   const formSections = items.map((item, i) => ({id: `section-${i}`, title: `Form ${i}`, position: i, contextSection: false, items: [item]}))
   const template: any = {id: 'parent', name: '分卷', productKind: 'QUESTIONNAIRE', publishedAt: new Date('2026-10-18T00:00:00Z'), items, formSections}
   const config = compileWeightedVariants({schemaVersion: 1, groups: formSections.map((section, i) => ({variantKey: `group_${i}`, label: `组${i}`, weight: i ? 3 : 1, units: [{type: 'FORM_SECTION', id: section.id}]}))}, buildTrainingVariantUnion(template))
-  template.trainingVariantFrozen = config; template.trainingVariantDigest = config.configDigest
+  template.trainingVariantDraft = null; template.trainingVariantFrozen = config; template.trainingVariantDigest = config.configDigest
   template.attempts = items.map((item, i) => {
     const id = `attempt-${i}`, participantKey = `user-${i}`
     const allocation = createWeightedVariantAllocation(config, {compositeId: template.id, attemptId: id, participantKey, attemptEpoch: 1, publishedAt: template.publishedAt.toISOString()}, {randomInt: () => i, assignedAt: '2026-10-18T00:00:01Z'})
@@ -110,7 +110,7 @@ function cognitiveFixture() {
   const template: any = {id: 'parent', name: '认知分卷', productKind: 'QUESTIONNAIRE', publishedAt: new Date('2026-10-18T00:00:00Z'), formSections: [],
     items: ['a', 'b'].map((key, index) => ({id: `cog-${key}`, type: 'COGNITIVE', position: index, required: true, cognitiveAssignmentId: `assignment-${key}`, cognitiveAssignment: {title: `任务${key}`}}))}
   const config = compileWeightedVariants({schemaVersion: 1, groups: template.items.map((item: any, index: number) => ({variantKey: `group_${index}`, label: `组${index}`, weight: 1, units: [{type: 'ITEM', id: item.id}]}))}, buildTrainingVariantUnion(template))
-  template.trainingVariantFrozen = config; template.trainingVariantDigest = config.configDigest
+  template.trainingVariantDraft = null; template.trainingVariantFrozen = config; template.trainingVariantDigest = config.configDigest
   template.attempts = template.items.map((item: any, index: number) => {
     const id = `attempt-${index}`, participantKey = `user-${index}`
     const allocation = createWeightedVariantAllocation(config, {compositeId: template.id, attemptId: id, participantKey, attemptEpoch: 1, publishedAt: template.publishedAt.toISOString()}, {randomInt: () => index, assignedAt: '2026-10-18T00:00:01Z'})
@@ -215,4 +215,13 @@ describe('variant report page canonical batches',()=>{
     await expect(preloadCompositeReportFacts(attempts)).rejects.toThrow()
     expect(db.assessmentUnitSnapshot.findMany).toHaveBeenCalledTimes(1)
   })
+})
+
+it('history rejects draft-only variant metadata instead of treating it as ordinary history',async()=>{
+  const {template,sessions}=cognitiveFixture()
+  template.trainingVariantFrozen=null;template.trainingVariantDigest=null;template.trainingVariantDraft={schemaVersion:1,groups:[]}
+  const parent={...template.attempts[0],trainingVariantAllocationEncrypted:null,trainingVariantAllocationHash:null,compositeAssessment:template}
+  db.cognitiveSession.findMany.mockResolvedValue([{...sessions[0],compositeAttempt:parent,assignment:{title:'Incomplete'}}])
+  const {listMyHistory}=await import('../../modules/cognitive/history.service')
+  await expect(listMyHistory('user-0',{skip:0,take:20,page:1,pageSize:20})).rejects.toThrow(/冻结来源不完整/)
 })

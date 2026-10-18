@@ -167,6 +167,32 @@ describe('C14 selected child scope enforcement', () => {
     expect(query).toContain('FOR UPDATE')
     expect(mocks.parent).not.toHaveBeenCalled()
   })
+  it('rejects a narrow marker read that still omits any required metadata', async () => {
+    mocks.parent.mockResolvedValue({ id: 'attempt', trainingVariantAllocationEncrypted: null, trainingVariantAllocationHash: null,
+      compositeAssessment: { trainingVariantFrozen: null, trainingVariantDigest: null } })
+    await expect(ensureCompositeSectionAttempt('attempt', 'section-a', 1)).rejects.toMatchObject({ code: 'DEFINITION_MISMATCH', statusCode: 409 })
+    expect(mocks.parent).toHaveBeenCalledTimes(1)
+    expect(mocks.parent.mock.calls[0][0]).not.toHaveProperty('include')
+    expect(mocks.sectionFind).not.toHaveBeenCalled()
+    expect(mocks.sectionCreate).not.toHaveBeenCalled()
+  })
+  it('reloads explicit undefined markers instead of bypassing as legacy', async () => {
+    const supplied = { id: 'attempt', trainingVariantAllocationEncrypted: undefined, trainingVariantAllocationHash: null,
+      compositeAssessment: { trainingVariantDraft: null, trainingVariantFrozen: null, trainingVariantDigest: null } }
+    mocks.parent.mockResolvedValue(fixture())
+    await expect(assertTrainingChildSelected({ compositeAttemptId: 'attempt', compositeItemId: 'scale-b', compositeAttempt: supplied })).rejects.toMatchObject({ statusCode: 404 })
+    expect(mocks.parent).toHaveBeenCalledTimes(1)
+  })
+  it('rejects incomplete metadata returned by the full graph fetch too', async () => {
+    const parent = fixture(), marker = { id: parent.id, trainingVariantAllocationEncrypted: parent.trainingVariantAllocationEncrypted,
+      trainingVariantAllocationHash: parent.trainingVariantAllocationHash, compositeAssessment: {
+        trainingVariantDraft: null, trainingVariantFrozen: parent.compositeAssessment.trainingVariantFrozen,
+        trainingVariantDigest: parent.compositeAssessment.trainingVariantDigest } }
+    delete parent.compositeAssessment.trainingVariantDraft
+    mocks.parent.mockResolvedValue(parent)
+    await expect(assertTrainingChildSelected({ compositeAttemptId: 'attempt', compositeItemId: 'scale-a', compositeAttempt: marker })).rejects.toMatchObject({ code: 'DEFINITION_MISMATCH', statusCode: 409 })
+    expect(mocks.parent).toHaveBeenCalledTimes(1)
+  })
   it('rejects an unselected Form before creating or loading any section child', async () => {
     const parent = fixture(); mocks.parent.mockResolvedValue(parent)
     await expect(ensureCompositeSectionAttempt('attempt', 'section-b', 1)).rejects.toMatchObject({ statusCode: 404 })

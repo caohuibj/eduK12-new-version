@@ -1,3 +1,4 @@
+import { applyTrainingAttemptScope } from '../composite/training-variant-scope'
 import { mergeRequiredSituationalTaskSatisfaction } from '../situational/situational-task-satisfaction'
 import { assertTypedCompositeFormFacts } from './typed-form-facts'
 import { mapCompositeSection } from './form-section-definition'
@@ -132,6 +133,7 @@ const compositeParentHeaderSelect = {
 } as const
 
 const compositeParentGraphSelect = {
+  participantKey: true, trainingVariantAllocationEncrypted: true, trainingVariantAllocationHash: true,
   taskSatisfaction: true,
   formSectionAttempts: {select:{sectionId:true,attemptEpoch:true,status:true,taskSatisfaction:true}},
   id: true,
@@ -153,6 +155,7 @@ const compositeParentGraphSelect = {
       id: true,
       productKind: true,
       bundleInstance: true,
+      publishedAt: true, trainingVariantDraft: true, trainingVariantFrozen: true, trainingVariantDigest: true,
       reportPackageKey: true,
       reportPackageVersion: true,
       reportPackageProfile: true,
@@ -164,6 +167,7 @@ const compositeParentGraphSelect = {
           type: true,
           position: true,
           required: true,
+          scaleId: true, cognitiveAssignmentId: true, situationalInstrumentKey: true, situationalInstrumentVersion: true, formDefinition: true,
           scale: { select: { id: true, code: true, name: true, instrumentVersion: true } },
           cognitiveAssignment: {
             select: {
@@ -1003,7 +1007,7 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?:
     && preloadedGraph.frozenActiveSlotSetHash === reportJob.slotSetHash
     && preloadedGraph.contextSnapshotHash === reportJob.contextHash
     && preloadedGraph.status === 'IN_PROGRESS'
-  const parent = reusable ? preloadedGraph : await measureRequestPhase('aggregate.definition_db', () => prisma.compositeAssessmentAttempt.findUnique({
+  let parent = reusable ? preloadedGraph : await measureRequestPhase('aggregate.definition_db', () => prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId }, select: compositeParentGraphSelect as any,
   })) as any
   if (!parent) return null
@@ -1012,6 +1016,10 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?:
   assertReportJobIdentity(parent, reportJob ?? { attemptEpoch: probe.parent.attemptEpoch,
     slotSetHash: probe.parent.frozenActiveSlotSetHash as string, contextHash: probe.parent.contextSnapshotHash })
   const { frozenSlots, headers } = probe
+  // Readiness already used the selected frozen slots. Validate the allocation
+  // against the full publication, then apply that same selection before Form
+  // facts/qualification checks. Accepted snapshots and their hashes stay intact.
+  parent = await applyTrainingAttemptScope(parent, {frozenSlotSets: new Map([[parent.id, frozenSlots]])})
   const context = readAggregateContext(parent, true)
   const completed = await decryptCompletedPayloads({
     parentId: attemptId,

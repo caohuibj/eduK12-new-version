@@ -42,3 +42,11 @@
 - 本次未搬迁 Survey assignment service，Survey 原输出/hash保持原实现。新共享 weighted core 仅负责纯配置/权重/抽样/分配验证。C15 基础分层摘要不替代 C16 跨人指标或配对分析；浏览器 C25、完整性能 C26 仍未验收。
 
 报告增量审查修复 compact 与 fallback 页级事实/模板/layout/runtime/typed snapshots 批量预取，逐 attempt 保留 identity/digest/selected 校验；full preview 有界加载对应 raw，保留原 full 权限。旧 null child guard 沿既有 owner/attempt 投影携带 nullable marker，guard 本身不加载 union；父 state 已有完整 scope 时不再重复取 marker 关系。合成读形状诊断仅表示额外 Prisma parent 调用 1→0、其返回 JSON 5287→0 字节，既有结果增加 204-byte marker；不是物理 SQL/网络字节或性能收益。正式 C26 仍待真实对照。
+
+性能边界补充：新模式在抽签前执行全部候选准备是保持原权重语义所必需。其 CPU、解密、编译和媒体查询绝对成本应单列；不能与旧 ordinary 仅选中单元的路径当成同语义收益比较。本轮仅 operation-local 复用，不新增跨请求缓存。C26 可评估按不可变 publication/definition 缓存纯计算，但权限、时间、配额须实时重新检查。
+
+## 真实四工具后聚合缺口与修复（12:24 UTC，续跑未完成）
+
+HTTP03已接收同一选中组 Form、Scale、120-trial Go/No-Go、SJT 的真实 FINAL 与重放，坏候选与每次 ACK 后重启拒绝均有原始证据。原 worker 却遍历 union Form sections，错误要求未分配 section 的 collection facts；原 aggregate 明确 failed。独立停机 PG 字节副本用原 dist 重现确切 DEFINITION_MISMATCH，源未变/副本已停机，未重交或重算 accepted facts。
+
+修复让 finalizer 原 union 身份验证后使用同一 selected scope；whole committed carrier 保留 union，避免浅拷贝丢失 WeakMap 后对 selected 图错误重算 union。集中 Prisma marker select 与强类型三态：五字段显式 null 才旧模式，任何 undefined/漏字段是 UNKNOWN，必须窄读或拒绝。whole cached header 在 ACK/replay 前验证完整分配，报告 header/history 补全检测。ordinary 保留既有窄查询，不为了 DB-only 孤立分配损坏给普通 artifact 下载加 EXISTS；已发布配置合法 API 不可清空、allocation UPDATE trigger 不可重写，原 variant artifact 在 config→null 时 fingerprint 自然失配。后续须实际开启 compact/shared/whole committed 相关开关验证最小链，单元用例不替代 HTTP 资格。

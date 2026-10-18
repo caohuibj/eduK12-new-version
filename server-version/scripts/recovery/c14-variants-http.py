@@ -5,6 +5,7 @@ from pathlib import Path
 p=argparse.ArgumentParser();p.add_argument('--tools',type=Path,required=True);p.add_argument('--state',type=Path,required=True);a=p.parse_args()
 base=Path(__file__).resolve().parent;backend=base.parents[1]/'backend';node=a.tools.resolve()/'node_modules/node/bin/node';state=a.state.resolve()
 assert not state.exists(), 'new private state required'
+assert subprocess.check_output([str(node),'--version'],text=True).strip()=='v24.21.0', 'qualification requires pinned Node v24.21.0'
 launcher=subprocess.Popen(['python3',str(base/'local-stack.py'),'--tools',str(a.tools.resolve()),'--state',str(state),'--hold-seconds','1800','--export-processing','--whole-submit'],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True)
 result={'passed':False};env={'PATH':f'{node.parent}:/usr/bin:/bin','HOME':str(state),'TMPDIR':str(state),'LANG':'C.UTF-8','NODE_ENV':'test'}
 def stop_signal(signum,frame):raise KeyboardInterrupt

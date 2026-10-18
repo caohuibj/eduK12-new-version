@@ -40,14 +40,18 @@
       "log": "c14-report-review-types.log",
       "command": "npx tsc --noEmit --pretty false",
       "result": "failed",
-      "reason": "Two concurrent cognitive/session.service.ts projection type errors; no report errors. Kept as failed evidence."
+      "reason": "Two concurrent cognitive/session.service.ts projection type errors; no report errors. Kept as failed evidence.",
+      "qualification": "DIAGNOSTIC_ONLY_WRONG_RUNTIME",
+      "acceptedAsValidationEvidence": false
     },
     {
       "log": "c14-report-review-tests.log",
       "command": "npx vitest run src/__tests__/composite/training-variant-report-batch.test.ts src/__tests__/composite/training-variant-export.test.ts -t 'bounded report source batches|variant report page canonical batches|full preview'",
       "result": "passed",
       "tests": 12,
-      "skipped": 19
+      "skipped": 19,
+      "qualification": "DIAGNOSTIC_ONLY_WRONG_RUNTIME",
+      "acceptedAsValidationEvidence": false
     },
     {
       "log": "c14-report-review-runtime-tests.log",
@@ -55,27 +59,35 @@
       "result": "passed",
       "tests": 6,
       "skipped": 26,
-      "reason": "Only new runtime artifact coverage and readers impacted by stronger identity binding were rerun."
+      "reason": "Only new runtime artifact coverage and readers impacted by stronger identity binding were rerun.",
+      "qualification": "DIAGNOSTIC_ONLY_WRONG_RUNTIME",
+      "acceptedAsValidationEvidence": false
     },
     {
       "log": "c14-report-review-legacy-tests.log",
       "command": "npx vitest run src/__tests__/composite/training-variant-report-batch.test.ts -t 'legacy compact materialization'",
       "result": "passed",
       "tests": 1,
-      "skipped": 8
+      "skipped": 8,
+      "qualification": "DIAGNOSTIC_ONLY_WRONG_RUNTIME",
+      "acceptedAsValidationEvidence": false
     },
     {
       "log": "c14-report-review-final-types.log",
       "command": "npx tsc --noEmit --pretty false",
       "result": "passed",
-      "exitCode": 0
+      "exitCode": 0,
+      "qualification": "DIAGNOSTIC_ONLY_WRONG_RUNTIME",
+      "acceptedAsValidationEvidence": false
     },
     {
       "log": "c14-report-review-compact-compat.log",
       "command": "npx vitest run src/__tests__/assessment-runtime/compact-assessment-storage.test.ts -t 'report manifests'",
       "result": "passed",
       "tests": 1,
-      "skipped": 33
+      "skipped": 33,
+      "qualification": "DIAGNOSTIC_ONLY_WRONG_RUNTIME",
+      "acceptedAsValidationEvidence": false
     }
   ],
   "limits": [
@@ -83,5 +95,8 @@
     "Only removal of per-report database source reads is established; no CPU/RSS/load benefit claimed.",
     "Previously passing unaffected tests were not repeated.",
     "TypeScript excludes src/__tests__; test files are executed by Vitest."
-  ]
+  ],
+  "qualification": "DIAGNOSTIC_ONLY_WRONG_RUNTIME",
+  "acceptedAsValidationEvidence": false,
+  "disqualificationReason": "These original commands used ambient Node v24.19.0 and npx, not the required pinned Node v24.21.0. Execution results are retained as diagnosis only, including failures; none establishes candidate qualification."
 }

@@ -4,7 +4,7 @@ import { assertAssessmentAssetReferencesReady, type AssessmentAssetIdentityV1 } 
 import { loadSituationalExportSlotSets } from './situational-canonical-export'
 import { trainingVariantProvenance } from './training-variant-export'
 import { encryptUnifiedRuntimePayload } from '../assessment-runtime/security'
-import { buildTrainingVariantUnion, resolveTrainingAttemptScope, applyTrainingAttemptScope } from './training-variant-scope'
+import { hasTrainingVariantMetadata, buildTrainingVariantUnion, resolveTrainingAttemptScope, applyTrainingAttemptScope } from './training-variant-scope'
 import { compileWeightedVariants, parseCompiledWeightedVariants, createWeightedVariantAllocation } from '../assessment-core/weighted-variants'
 import { assertTrainingVariantAuthoringScope } from '../questionnaire-product/training-variant-authoring'
 import { mapCompositeSection } from '../assessment-runtime/form-section-definition'
@@ -5060,8 +5060,8 @@ const packageAnalysisExportContextFor = async (
 }
 
 const reportReadHeaderSelect = {
-  ...REPORT_PARENT_SELECT, compositeAssessmentId: true, userId: true, recoveryTokenHash: true,trainingTimingSnapshot:true,trainingVariantAllocationEncrypted:true,
-  compositeAssessment: { select: { id: true, productKind: true,timingExportEnabled:true,revision:true,trainingVariantFrozen:true, items: { select: { type: true } } } },
+  ...REPORT_PARENT_SELECT, compositeAssessmentId: true, userId: true, recoveryTokenHash: true,trainingTimingSnapshot:true,trainingVariantAllocationEncrypted:true,trainingVariantAllocationHash:true,
+  compositeAssessment: { select: { id: true, productKind: true,timingExportEnabled:true,revision:true,trainingVariantFrozen:true,trainingVariantDraft:true,trainingVariantDigest:true, items: { select: { type: true } } } },
 } as const
 
 const loadReportReadHeader = async (attemptId: string) => {
@@ -5154,7 +5154,7 @@ const materializedReportForHeader = async (parent: any, audience: CompositeRepor
   if (parent.asyncReportEpoch !== parent.attemptEpoch) return null
   const job = joinedJob !== undefined ? joinedJob : await readCompositeReportMaterialization(parent.id, parent.attemptEpoch)
   const reportBinding = await reportMaterializationBinding(parent,job)
-  const scope = verifiedScope ?? (parent.compositeAssessment.trainingVariantFrozen != null || parent.trainingVariantAllocationEncrypted != null
+  const scope = verifiedScope ?? (hasTrainingVariantMetadata(parent)
     ? await resolveTrainingAttemptScope(await loadAttemptWithChildren(parent.id)) : undefined)
   const report = await decryptCompactCompositeReport(job.reportEncrypted, reportBinding,{...batchReads,...(scope?{trainingVariantScope:scope}:{})}) ?? decryptCompositeCollectionReport(job.reportEncrypted, reportBinding)
   if(scope)assertTrainingVariantReportScope(report,scope)

@@ -1,0 +1,31 @@
+{
+  "node": "24.21.0",
+  "measurementLock": true,
+  "status": "passed",
+  "files": 7,
+  "testsPassed": 103,
+  "testsFailed": 0,
+  "sourceHead": "9aa8b7690c3970e60de6f5d5d3bf3f8403a8e689",
+  "scope": [
+    "Five marker Prisma selectors and generated payload types centralized",
+    "Missing or undefined own fields => UNKNOWN; all five null => LEGACY; complete nonnull => VARIANT",
+    "Unknown supplied parent triggers narrow metadata read; unknown narrow or full query result rejects before child lookup/write",
+    "Existing guard and context/row-lock/final-submit admission regressions preserved"
+  ],
+  "log": {
+    "path": "c14-child-marker-contract-01.log",
+    "sha256": "310dbb2a214cdb3b7fcab056ac7d1e06524506cf52110ebb75b2006adcbca7dd"
+  },
+  "sources": {
+    "server-version/backend/src/modules/composite/training-variant-markers.ts": "5355e19c6ad0f6b14564aeefb18e98cbf29dfe317550db32304a9b7b2fa6f4f7",
+    "server-version/backend/src/modules/composite/training-variant-child-scope.ts": "8174923de55af92fa0b8189a380e5e03ef580da161056e0d830908c0185fbc22",
+    "server-version/backend/src/modules/composite/training-variant-scope.ts": "17869565d909579fe24b72a076fec9de2544bbd6b87cd588bf26bfa7e89c09b9",
+    "server-version/backend/src/__tests__/composite/training-variant-markers.test.ts": "6b69f6d1f20b694e60470e90900bb11a5dd1dbbf788d38ceaed0cf84b4dca6b5",
+    "server-version/backend/src/__tests__/composite/training-variant-child-scope.test.ts": "9cd1bc974bd197846823a40977c695dc20d9062f18da1ff50259fc9cbabff80f",
+    "server-version/backend/src/__tests__/assessment-context/freeze.service.test.ts": "e3b889e2461894bd514a38670fa8e0952e7178f5581efc520354a4e8caaf2275"
+  },
+  "limits": [
+    "Targeted unit tests; integrated TypeScript emit and HTTP remain parent-owned.",
+    "No services started for this marker-contract check."
+  ]
+}

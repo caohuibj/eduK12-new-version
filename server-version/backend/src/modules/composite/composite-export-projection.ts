@@ -1,3 +1,5 @@
+import { parseCompiledWeightedVariants } from '../assessment-core/weighted-variants'
+import { compositeForbidden } from './composite.errors'
 import { SITUATIONAL_CANONICAL_EXPORT_VERSION, situationalSummaryFieldAllowed } from './situational-canonical-export'
 import { randomBytes } from 'crypto'
 import * as fs from 'fs'
@@ -118,7 +120,7 @@ export const resolveCompositeExportProjectionBinding = async (
     select: {
       id: true,
       timingExportEnabled:true,trainingTimingPolicy:true,productKind:true,revision:true,
-      trainingVariantDigest:true,trainingVariantFrozen:true,publishedAt:true,
+      trainingVariantDraft:true,trainingVariantDigest:true,trainingVariantFrozen:true,publishedAt:true,
       items: {
         orderBy: { position: 'asc' },
         select: {
@@ -131,6 +133,14 @@ export const resolveCompositeExportProjectionBinding = async (
     },
   })
   if (!composite) throw new Error('综合测评不存在')
+  if ([composite.trainingVariantDraft,composite.trainingVariantFrozen,composite.trainingVariantDigest].some(value=>value===undefined))
+    throw compositeForbidden('导出来源的分卷标志未加载')
+  if ([composite.trainingVariantDraft,composite.trainingVariantFrozen,composite.trainingVariantDigest].some(value=>value!=null)) {
+    try {
+      if(!composite.trainingVariantFrozen||!composite.trainingVariantDigest||!composite.publishedAt
+        ||parseCompiledWeightedVariants(composite.trainingVariantFrozen).configDigest!==composite.trainingVariantDigest) throw new Error('incomplete publication')
+    } catch { throw compositeForbidden('导出来源的分卷冻结配置不完整') }
+  }
   return buildCompositeExportProjectionBinding({ resourceId: composite.id, audience, items: composite.items,timingExportEnabled:composite.productKind==='QUESTIONNAIRE'&&composite.timingExportEnabled,trainingTimingPolicy:composite.trainingTimingPolicy,timingExportRevision:composite.revision, trainingVariantDigest:composite.trainingVariantDigest, trainingVariantFrozen:composite.trainingVariantFrozen, publishedAt:composite.publishedAt })
 }
 

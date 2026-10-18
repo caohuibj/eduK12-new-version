@@ -4,7 +4,7 @@ vi.mock('../../modules/assessment-runtime/slot-set',()=>({loadFrozenActiveSlotSe
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { mapCompositeSection } from '../../modules/assessment-runtime/form-section-definition'
 import { compileWeightedVariants, createWeightedVariantAllocation } from '../../modules/assessment-core/weighted-variants'
-import { buildTrainingVariantUnion, resolveTrainingAttemptScope, applyTrainingAttemptScope } from '../../modules/composite/training-variant-scope'
+import { hasTrainingVariantMetadata, buildTrainingVariantUnion, resolveTrainingAttemptScope, applyTrainingAttemptScope } from '../../modules/composite/training-variant-scope'
 import { loadFrozenActiveSlotSet } from '../../modules/assessment-runtime/slot-set'
 function fixture(){
  const sections=['a','b'].map((id,position)=>({id:`section_${id}`,title:id,description:null,position,contextSection:false,items:[{id:`form_${id}`,type:'FORM',formType:'text_input',formLabel:id,formOptions:[],required:true,position,formSectionPosition:0,contextKey:null,formSectionId:`section_${id}`}]}))
@@ -24,7 +24,7 @@ describe('Training variant attempt scope',()=>{
   expect(composite.items).toHaveLength(2);expect(attempt.compositeAssessment).toBe(composite)
   expect(await resolveTrainingAttemptScope(projected)).toBe(projected.trainingVariantScope)
  })
- it('leaves historical null attempts untouched',async()=>{const attempt={compositeAssessment:{items:[{id:'old'}],formSections:[]}};expect(await applyTrainingAttemptScope(attempt)).toBe(attempt)})
+ it('leaves historical null attempts untouched',async()=>{const attempt={trainingVariantAllocationEncrypted:null,trainingVariantAllocationHash:null,compositeAssessment:{trainingVariantDraft:null,trainingVariantFrozen:null,trainingVariantDigest:null,items:[{id:'old'}],formSections:[]}};expect(await applyTrainingAttemptScope(attempt)).toBe(attempt)})
  it('accepts batch preloaded slots without another read',async()=>{vi.mocked(loadFrozenActiveSlotSet).mockClear();const {attempt,slotset}=fixture();await resolveTrainingAttemptScope(attempt,attempt.compositeAssessment,{frozenSlotSets:new Map([[attempt.id,slotset]])});expect(loadFrozenActiveSlotSet).not.toHaveBeenCalled()})
  it.each(['trainingVariantAllocationEncrypted','trainingVariantAllocationHash','frozenActiveSlotSetEncrypted','frozenActiveSlotSetHash'])('fails closed on missing %s',async key=>{const {attempt}=fixture();attempt[key]=null;await expect(resolveTrainingAttemptScope(attempt)).rejects.toThrow()})
  it.each(['trainingVariantFrozen','trainingVariantDigest'])('fails closed on missing publication %s',async key=>{const {attempt,composite}=fixture();composite[key]=null;await expect(resolveTrainingAttemptScope(attempt)).rejects.toThrow()})
@@ -36,4 +36,19 @@ describe('Training variant attempt scope',()=>{
  it('rejects wrong scientific section identity',async()=>{const {attempt,slotset}=fixture();slotset.slots[0].sourceDefinitionIdentity.hash='wrong';attempt.frozenActiveSlotSetEncrypted=JSON.stringify(slotset);await expect(resolveTrainingAttemptScope(attempt)).rejects.toThrow()})
  it('rejects outside-group children',async()=>{const {attempt}=fixture();attempt.scaleAssessments=[{compositeItemId:'outside'}];await expect(resolveTrainingAttemptScope(attempt)).rejects.toThrow()})
  it('does not accept orphan allocation on legacy publication',async()=>{const {attempt}=fixture();attempt.compositeAssessment={items:[],formSections:[]};await expect(resolveTrainingAttemptScope(attempt)).rejects.toThrow()})
+})
+
+it('detects each incomplete marker before a legacy report fast path', async()=>{
+  expect(hasTrainingVariantMetadata({compositeAssessment:{}})).toBe(true)
+  await expect(resolveTrainingAttemptScope({compositeAssessment:{}})).rejects.toThrow(/标志未加载/)
+  for(const field of ['trainingVariantAllocationEncrypted','trainingVariantAllocationHash']){
+    const attempt={ [field]:'present',compositeAssessment:{} }
+    expect(hasTrainingVariantMetadata(attempt)).toBe(true)
+    await expect(resolveTrainingAttemptScope(attempt)).rejects.toThrow()
+  }
+  for(const field of ['trainingVariantDraft','trainingVariantFrozen','trainingVariantDigest']){
+    const attempt={compositeAssessment:{[field]:'present'}}
+    expect(hasTrainingVariantMetadata(attempt)).toBe(true)
+    await expect(resolveTrainingAttemptScope(attempt)).rejects.toThrow()
+  }
 })

@@ -1,3 +1,4 @@
+import { trainingVariantMarkerState } from './training-variant-markers'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { loadFrozenActiveSlotSet, compositeItemSlotKey, formSectionSlotKey } from '../assessment-runtime/slot-set'
@@ -24,6 +25,10 @@ export function buildTrainingVariantUnion(composite: any): WeightedVariantUnion 
   ].sort((a,b)=>a.position-b.position||a.id.localeCompare(b.id)).map(({position,...unit})=>unit)
   return {units}
 }
+/** Detect every marker, including incomplete metadata, before any legacy fast path. */
+export const hasTrainingVariantMetadata = (attempt:any, composite:any=attempt.compositeAssessment):boolean =>
+  trainingVariantMarkerState(attempt,composite) !== 'LEGACY'
+
 export type TrainingAttemptScope = {
   items:any[];formSections:any[];itemIds:Set<string>;sectionIds:Set<string>;variant:any|null
 }
@@ -33,6 +38,7 @@ export async function resolveTrainingAttemptScope(attempt:any,composite:any=atte
   const known=scopes.get(attempt)
   if(known)return known
   if(!composite)throw compositeForbidden('作答缺少冻结问卷来源')
+  if(trainingVariantMarkerState(attempt,composite)==='UNKNOWN')throw compositeForbidden('概率分卷来源标志未加载，不能推断旧模式')
   const configured=composite.trainingVariantFrozen!=null||composite.trainingVariantDigest!=null
   if(!configured){
     if(attempt.trainingVariantAllocationEncrypted!=null||attempt.trainingVariantAllocationHash!=null||composite.trainingVariantDraft!=null)

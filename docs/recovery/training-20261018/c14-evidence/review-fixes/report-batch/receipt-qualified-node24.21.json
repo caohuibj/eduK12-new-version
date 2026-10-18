@@ -1,0 +1,73 @@
+{
+  "kind": "C14_REPORT_BATCH_PINNED_RUNTIME_LOCAL_EVIDENCE",
+  "createdAt": "2026-10-18T12:05:03.173810+00:00",
+  "gitHead": "bbabf040eeb59a6fc3d018418c3eecf8897995e3",
+  "nodeExecutable": "/workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/node_modules/node/bin/node",
+  "nodeVersion": "v24.21.0",
+  "nodeExecutableSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+  "measurementLock": "/workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/.measurement.lock",
+  "executionIsolation": "Exclusive flock held for the entire measurement; parent confirmed HTTP02 stopped and cleanup true before execution.",
+  "sourceAndTests": [
+    {
+      "path": "server-version/backend/src/modules/composite/composite-report-read-batch.ts",
+      "sha256": "b5ace74abe0462c5cfb2ec026e01da7d5931172b660abb1f97665898f19ce06c"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/compact-composite-report.ts",
+      "sha256": "4b72fbbd9a16990ef68a568868e8dcf3d3a9e9ce66a9c5718564214e915623d3"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/composite.service.ts",
+      "sha256": "e74853021e38e7e95ab2f6eed53204de39d1789249f9e09b3fe6912a6102cd74"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-variant-export.ts",
+      "sha256": "4fc98b8fc6cfa75587eafbcd274ce7607c038ad4cbcc1d4ad652f63f77e10052"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-timing-report.ts",
+      "sha256": "3eff4a5d459905fcd4bc6fa7acc7acf146d17efa41573c69834f0f851037086c"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/composite/training-variant-report-batch.test.ts",
+      "sha256": "22cfa4350c6d8f2734de22e84bb20c67094118827c589335aa6f34de32850b60"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/composite/training-variant-export.test.ts",
+      "sha256": "5cfa583d7f5421f568c0e80e80fc1a930f80e8f9c9cf7c7ea0be264e8db3de20"
+    }
+  ],
+  "toolInputs": [
+    {
+      "path": "server-version/backend/package-lock.json",
+      "sha256": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6"
+    },
+    {
+      "path": "server-version/backend/vitest.config.ts",
+      "sha256": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b"
+    },
+    {
+      "path": "server-version/backend/node_modules/vitest/vitest.mjs",
+      "sha256": "39db22f579acf5639bbb17a261408debbde03f4692c0c439e77e7f13aeba74d6"
+    }
+  ],
+  "checks": [
+    {
+      "log": "c14-report-qualified-node24.21.log",
+      "command": "/workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/__tests__/composite/training-variant-report-batch.test.ts src/__tests__/composite/training-variant-export.test.ts src/__tests__/assessment-runtime/compact-assessment-storage.test.ts -t \"bounded report source batches|variant report page canonical batches|full preview|report manifests\"",
+      "startedAt": "2026-10-18T12:04:26Z",
+      "finishedAt": "2026-10-18T12:04:29Z",
+      "exitCode": 0,
+      "result": "passed",
+      "tests": 15,
+      "skipped": 52,
+      "selection": "Deduplicated final-input union of the original 12/6/1/1 affected targets: 9 batch/legacy/runtime, 4 typed page, 1 full preview, 1 compact manifest compatibility."
+    }
+  ],
+  "limitations": [
+    "Original ambient-node results are diagnostic-only and are not accepted or relabeled.",
+    "No unrelated previously qualified tests rerun; skipped cases are not claimed as passing.",
+    "This receipt qualifies only the selected local tests; no CI, deployment, CPU/RSS benefit, or full-platform qualification is asserted.",
+    "Original local typechecks are diagnostic only; no typecheck rerun in this correction. Parent owns pinned-runtime compilation evidence."
+  ]
+}

@@ -56,7 +56,7 @@ export const listMyHistory = async (userId: string, pagination: PaginationParams
     },
   })
 
-  const variantParents = new Map(sessions.flatMap(session => {const parent = session.compositeAttempt; return parent && (parent.trainingVariantAllocationEncrypted != null || parent.trainingVariantAllocationHash != null || parent.compositeAssessment.trainingVariantFrozen != null || parent.compositeAssessment.trainingVariantDigest != null) ? [[parent.id, parent] as const] : []}))
+  const variantParents = new Map(sessions.flatMap(session => {const parent = session.compositeAttempt; return parent && (parent.trainingVariantAllocationEncrypted != null || parent.trainingVariantAllocationHash != null || parent.compositeAssessment.trainingVariantDraft != null || parent.compositeAssessment.trainingVariantFrozen != null || parent.compositeAssessment.trainingVariantDigest != null) ? [[parent.id, parent] as const] : []}))
   const frozenSlotSets = await loadSituationalExportSlotSets([...variantParents.values()])
   const variantScopes = new Map(await Promise.all([...variantParents.values()].map(async parent => [parent.id, await resolveTrainingAttemptScope(parent, parent.compositeAssessment, {frozenSlotSets})] as const)))
   const displayable: HistoryRow[] = []

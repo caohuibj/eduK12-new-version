@@ -113,3 +113,11 @@ describe('Composite SJT summary projection fingerprint', () => {
     expect(projectCompositeExportData(sjtData, legacy).fields).toEqual([])
   })
 })
+
+it('invalidates a variant artifact if every publication variant marker is cleared',()=>{
+  const variant=buildCompositeExportProjectionBinding({resourceId:'composite-12345678',items:[],trainingVariantFrozen:{schemaVersion:1,configDigest:'a'.repeat(64)},trainingVariantDigest:'a'.repeat(64),publishedAt:new Date('2026-10-18T00:00:00Z')})
+  const cleared=buildCompositeExportProjectionBinding({resourceId:'composite-12345678',items:[],trainingVariantFrozen:null,trainingVariantDigest:null,publishedAt:new Date('2026-10-18T00:00:00Z')})
+  const artifact=bindCompositeExportFileName('composite_12345678_full_2026-10-18T00-00-00_00000000-0000-0000-0000-000000000000.csv',variant,'abcdef0')
+  expect(cleared.fingerprint).not.toBe(variant.fingerprint)
+  expect(compositeExportFileNameMatchesProjection(artifact,cleared)).toBe(false)
+})
