@@ -67,7 +67,9 @@ def main():
     assert os.environ.get('COOKIE_SECURE') == 'true'
     assert shutil.which('certutil'), 'Install official libnss3-tools before running'
     browser = None
-    with tempfile.TemporaryDirectory(prefix='training-browser-private-') as directory:
+    temporary = tempfile.TemporaryDirectory(prefix='training-browser-private-')
+    directory = temporary.name
+    try:
         root = Path(directory)
         home = root / 'home'
         nss = home / '.pki' / 'nssdb'
@@ -102,7 +104,10 @@ def main():
                     browser.wait(timeout=10)
             server.shutdown()
             server.server_close()
-    print('Disposable Training HTTPS ingress and browser trust cleaned up')
+    finally:
+        temporary.cleanup()
+        assert not Path(directory).exists(), 'Disposable browser trust cleanup failed'
+        print('Disposable Training HTTPS ingress and browser trust cleaned up', flush=True)
 
 
 def terminate(*_args):

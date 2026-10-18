@@ -145,7 +145,7 @@ async function main() {
     for (let i = 0; i < types.length; i++) {
       await student.locator('.form-player').getByText(labels[i], { exact: false }).first().waitFor()
       if (i) {
-        if (i === 1) await student.locator('.form-player input[type="text"]').fill('将清空的草稿')
+        if (i === 1) await student.locator('.form-player textarea').fill('将清空的草稿')
         if (i === 2) await student.locator('.form-player input[type="radio"]').first().check()
         if (i === 3) await student.locator('.form-player input[type="checkbox"]').first().check()
         if (i === 4) await student.locator('.form-player input[type="month"]').fill('2026-10')
