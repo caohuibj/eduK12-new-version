@@ -1,0 +1,7 @@
+{"resultPath": "[cloud-workspace]/eduk12_c11_state_01_20261018/c11-runtime-result.json", "passed": false, "cleanupVerified": true}
+Traceback (most recent call last):
+  File "[cloud-workspace]/eduk12_c11_20261018/server-version/scripts/recovery/c11-sjt-http.py", line 33, in <module>
+    subprocess.run([str(node),str(script),str(state)],cwd=backend,env={**env,**runtime,'PERF_ISOLATED_TEST_MODE':'1','PERF_SQL_EVENT_COUNT':'1'},stdout=log,stderr=log,check=True,timeout=360)
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['[cloud-workspace]/eduk12_tools_20261018/node_modules/node/bin/node', '[cloud-workspace]/eduk12_c11_20261018/server-version/scripts/recovery/c11-sjt-smoke.mjs', '[cloud-workspace]/eduk12_c11_state_01_20261018']' returned non-zero exit status 1.

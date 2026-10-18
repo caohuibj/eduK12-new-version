@@ -1,0 +1,30 @@
+AssertionError [ERR_ASSERTION]: POST /auth/training-login: 401 {"code":-1,"message":"用户名或密码错误","data":null}
+    at Object.request (file://[cloud-workspace]/eduk12_c11_20261018/server-version/scripts/recovery/c11-sjt-smoke.mjs:65:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async Object.login (file://[cloud-workspace]/eduk12_c11_20261018/server-version/scripts/recovery/c11-sjt-smoke.mjs:69:59)
+    at async file://[cloud-workspace]/eduk12_c11_20261018/server-version/scripts/recovery/c11-sjt-smoke.mjs:86:49 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: POST /auth/training-login: 401 {"code":-1,"message":"用户名或密码错误","data":null}
+    at Object.request (file://[cloud-workspace]/eduk12_c11_20261018/server-version/scripts/recovery/c11-sjt-smoke.mjs:65:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async Object.login (file://[cloud-workspace]/eduk12_c11_20261018/server-version/scripts/recovery/c11-sjt-smoke.mjs:69:59)
+    at async file://[cloud-workspace]/eduk12_c11_20261018/server-version/scripts/recovery/c11-sjt-smoke.mjs:86:49 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+
+Node.js v24.21.0

@@ -1,0 +1,550 @@
+
+ RUN  v4.1.11 [cloud-workspace]/eduk12_c11_20261018/server-version/backend
+
+ ❯ src/__tests__/composite/copy.service.test.ts (41 tests | 21 failed) 44ms
+     × only returns admin library templates and omits courseId 6ms
+     × copies a frozen cognitive snapshot into composite child sessions 8ms
+     × rejects a library course as the copy target 3ms
+     × copies a library template into a teacher DRAFT with a new cognitive wrapper 1ms
+     × reuses an existing wrapper on a second copy of the same config and course 0ms
+     × does not persist an assignment when the composite code collides 1ms
+     × copies a GRANT config from a library template without requiring a material grant 0ms
+     × lets ADMIN publish a draft bound to a library course 1ms
+     × rejects ADMIN publishing a draft with an orphan FORM module 1ms
+     × forbids ADMIN from copying onto another teacher’s course 1ms
+     × copies experience freeze identity instead of remelting standard 0ms
+     × does not reuse a standard wrapper when copying a research template 0ms
+     × does not reuse a wrapper when the report snapshot differs 0ms
+     × rejects a partially frozen source instead of writing a null legacy wrapper 1ms
+     × keeps the source freeze ciphertext when live registry metadata would differ 0ms
+     × copies a legacy unfrozen source without inventing standard 0ms
+     × rejects public tokens on a library composite 1ms
+     × preserves historical satisfaction null independently of the latest report with one light batch 1ms
+     × preserves historical satisfaction SATISFIED independently of the latest report with one light batch 1ms
+     × keeps original membership/library checks but does not re-gate existing timing by current type 0ms
+     × does not bypass original membership authorization for an existing attempt 1ms
+ ❯ src/__tests__/composite/addItem.service.test.ts (16 tests | 6 failed) 31ms
+     × allows a published assignment on the same course 9ms
+     × rejects a report-package wrapper in collection-only mode 5ms
+     × rejects an assignment from another course 1ms
+     × rejects a cognitive item when the composite has no course 1ms
+     × refuses to publish when an existing cognitive item is on another course 1ms
+     × uses database publication as release authority when v2 compatibility metadata is Draft 0ms
+ ❯ src/__tests__/scale/composite-export-projection.test.ts (4 tests | 1 failed) 9ms
+     × invalidates legacy artifacts and binds slot position without expanding raw access 4ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 28 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/composite/addItem.service.test.ts > addItem cognitive course match > allows a published assignment on the same course
+CognitiveServiceError: 认知模块暂不可用，尚未准入的任务请在重新开启后继续
+ ❯ BAD_REQUEST src/modules/cognitive/cognitive.errors.ts:17:45
+     15| export const NOT_FOUND = (msg: string) => new CognitiveServiceError(ms…
+     16| export const FORBIDDEN = (msg: string) => new CognitiveServiceError(ms…
+     17| export const BAD_REQUEST = (msg: string) => new CognitiveServiceError(…
+       |                                             ^
+     18| export const CONFLICT = (msg: string) => new CognitiveServiceError(msg…
+     19| export const SERVER_ERROR = (msg: string) => new CognitiveServiceError…
+ ❯ assertCognitiveNewAdmissionEnabled src/modules/cognitive/product-eligibility.ts:7:48
+ ❯ assertCognitiveModuleEnabled src/modules/composite/composite.service.ts:312:3
+ ❯ assertValidItem src/modules/composite/composite.service.ts:532:5
+ ❯ src/modules/composite/composite.service.ts:1556:11
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/28]⎯
+
+ FAIL  src/__tests__/composite/addItem.service.test.ts > addItem cognitive course match > rejects a report-package wrapper in collection-only mode
+AssertionError: expected CognitiveServiceError: 认知模块暂不可用，尚未准入的任务请在… { statusCode: … } to match object { statusCode: 403 }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "statusCode": 403,
++ CognitiveServiceError {
++   "statusCode": 400,
+  }
+
+ ❯ src/__tests__/composite/addItem.service.test.ts:105:7
+    103|       cognitiveAssignmentId: 'asg-1',
+    104|       required: true,
+    105|     })).rejects.toMatchObject({ statusCode: 403 })
+       |       ^
+    106|     expect(mockPrisma.compositeAssessmentItem.create).not.toHaveBeenCa…
+    107|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/28]⎯
+
+ FAIL  src/__tests__/composite/addItem.service.test.ts > addItem cognitive course match > rejects an assignment from another course
+AssertionError: expected CognitiveServiceError: 认知模块暂不可用，尚未准入的任务请在… { statusCode: … } to match object { statusCode: 400, …(1) }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "message": "认知任务必须与综合测评属于同一课程",
++ CognitiveServiceError {
+    "statusCode": 400,
+  }
+
+ ❯ src/__tests__/composite/addItem.service.test.ts:117:7
+    115|       cognitiveAssignmentId: 'asg-1',
+    116|       required: true,
+    117|     })).rejects.toMatchObject({ statusCode: 400, message: '认知任务必须与综合测评…
+       |       ^
+    118|     expect(mockPrisma.compositeAssessmentItem.create).not.toHaveBeenCa…
+    119|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/28]⎯
+
+ FAIL  src/__tests__/composite/addItem.service.test.ts > addItem cognitive course match > rejects a cognitive item when the composite has no course
+AssertionError: expected CognitiveServiceError: 认知模块暂不可用，尚未准入的任务请在… { statusCode: … } to match object { statusCode: 400, …(1) }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "message": "含认知模块的综合测评必须绑定课程",
++ CognitiveServiceError {
+    "statusCode": 400,
+  }
+
+ ❯ src/__tests__/composite/addItem.service.test.ts:129:7
+    127|       cognitiveAssignmentId: 'asg-1',
+    128|       required: true,
+    129|     })).rejects.toMatchObject({ statusCode: 400, message: '含认知模块的综合测评必…
+       |       ^
+    130|   })
+    131| })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/28]⎯
+
+ FAIL  src/__tests__/composite/addItem.service.test.ts > publishComposite cognitive course match > refuses to publish when an existing cognitive item is on another course
+AssertionError: expected CognitiveServiceError: 认知模块暂不可用，尚未准入的任务请在… { statusCode: … } to match object { statusCode: 400, …(1) }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "message": "认知任务必须与综合测评属于同一课程",
++ CognitiveServiceError {
+    "statusCode": 400,
+  }
+
+ ❯ src/__tests__/composite/addItem.service.test.ts:193:71
+    191|     }))
+    192|
+    193|     await expect(publishComposite('teacher-a', TEACHER, 'composite-1'))
+       |                                                                       ^
+    194|       .rejects.toMatchObject({ statusCode: 400, message: '认知任务必须与综合测评属…
+    195|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/28]⎯
+
+ FAIL  src/__tests__/composite/addItem.service.test.ts > publishComposite cognitive course match > uses database publication as release authority when v2 compatibility metadata is Draft
+CognitiveServiceError: 认知模块暂不可用，尚未准入的任务请在重新开启后继续
+ ❯ BAD_REQUEST src/modules/cognitive/cognitive.errors.ts:17:45
+     15| export const NOT_FOUND = (msg: string) => new CognitiveServiceError(ms…
+     16| export const FORBIDDEN = (msg: string) => new CognitiveServiceError(ms…
+     17| export const BAD_REQUEST = (msg: string) => new CognitiveServiceError(…
+       |                                             ^
+     18| export const CONFLICT = (msg: string) => new CognitiveServiceError(msg…
+     19| export const SERVER_ERROR = (msg: string) => new CognitiveServiceError…
+ ❯ assertCognitiveNewAdmissionEnabled src/modules/cognitive/product-eligibility.ts:7:48
+ ❯ assertCognitiveModuleEnabled src/modules/composite/composite.service.ts:312:3
+ ❯ prepareCompositePublication src/modules/composite/composite.service.ts:1882:36
+ ❯ publishCompositeInTransaction src/modules/composite/composite.service.ts:2016:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/28]⎯
+
+ FAIL  src/__tests__/composite/copy.service.test.ts > listLibraryTemplates > only returns admin library templates and omits courseId
+AssertionError: expected [] to have a length of 1 but got +0
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ src/__tests__/composite/copy.service.test.ts:213:18
+    211|     ])
+    212|     const list = await listLibraryTemplates('teacher-1', TEACHER)
+    213|     expect(list).toHaveLength(1)
+       |                  ^
+    214|     expect(list[0]).not.toHaveProperty('courseId')
+    215|     expect(list[0].id).toBe('source-1')
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/28]⎯
+
+ FAIL  src/__tests__/composite/copy.service.test.ts > copyComposite > copies a frozen cognitive snapshot into composite child sessions
+CompositeServiceError: 认知模块未启用
+ ❯ compositeBadRequest src/modules/composite/composite.errors.ts:13:57
+     11| export const compositeNotFound = (message = '综合测评不存在') => new Composit…
+     12| export const compositeForbidden = (message = '无权限操作此综合测评') => new Comp…
+     13| export const compositeBadRequest = (message: string) => new CompositeS…
+       |                                                         ^
+     14| export const compositeConflict = (message: string) => new CompositeSer…
+     15|
+ ❯ assertSupportedComposite src/modules/composite/composite.service.ts:336:11
+ ❯ createAttempt src/modules/composite/composite.service.ts:2467:3
+ ❯ src/modules/composite/composite.service.ts:2655:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/28]⎯
+
+ FAIL  src/__tests__/composite/copy.service.test.ts > copyComposite > rejects a library course as the copy target
+AssertionError: expected CognitiveServiceError: 认知模块暂不可用，尚未准入的任务请在… { statusCode: … } to match object { statusCode: 400, message: '不能绑定库课程' }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "message": "不能绑定库课程",
++ CognitiveServiceError {
+    "statusCode": 400,
+  }
+
+ ❯ src/__tests__/composite/copy.service.test.ts:299:88
+    297|     mockPrisma.compositeAssessment.findUnique.mockResolvedValue(librar…
+    298|     mockPrisma.course.findUnique.mockResolvedValue({ ...libraryCourse,…
+    299|     await expect(copyComposite('admin-1', ADMIN, 'source-1', { courseI…
+       |                                                                                        ^
+    300|       statusCode: 400,
+    301|       message: '不能绑定库课程',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/28]⎯
+
+ FAIL  src/__tests__/composite/copy.service.test.ts > copyComposite > copies a library template into a teacher DRAFT with a new cognitive wrapper
+CognitiveServiceError: 认知模块暂不可用，尚未准入的任务请在重新开启后继续
+ ❯ BAD_REQUEST src/modules/cognitive/cognitive.errors.ts:17:45
+     15| export const NOT_FOUND = (msg: string) => new CognitiveServiceError(ms…
+     16| export const FORBIDDEN = (msg: string) => new CognitiveServiceError(ms…
+     17| export const BAD_REQUEST = (msg: string) => new CognitiveServiceError(…
+       |                                             ^
+     18| export const CONFLICT = (msg: string) => new CognitiveServiceError(msg…
+     19| export const SERVER_ERROR = (msg: string) => new CognitiveServiceError…
+ ❯ assertCognitiveNewAdmissionEnabled src/modules/cognitive/product-eligibility.ts:7:48
+ ❯ assertCognitiveModuleEnabled src/modules/composite/composite.service.ts:312:3
+ ❯ Module.copyComposite src/modules/composite/composite.service.ts:1125:21
+ ❯ src/__tests__/composite/copy.service.test.ts:320:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/28]⎯
+
+ FAIL  src/__tests__/composite/copy.service.test.ts > copyComposite > reuses an existing wrapper on a second copy of the same config and course
+CompositeServiceError: 综合测评不存在
+ ❯ compositeNotFound src/modules/composite/composite.errors.ts:11:59
+      9| }
+     10|
+     11| export const compositeNotFound = (message = '综合测评不存在') => new Composit…
+       |                                                           ^
+     12| export const compositeForbidden = (message = '无权限操作此综合测评') => new Comp…
+     13| export const compositeBadRequest = (message: string) => new CompositeS…
+ ❯ Module.copyComposite src/modules/composite/composite.service.ts:1050:22
+ ❯ src/__tests__/composite/copy.service.test.ts:356:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/28]⎯
+
+ FAIL  src/__tests__/composite/copy.service.test.ts > copyComposite > does not persist an assignment when the composite code collides
+AssertionError: expected CognitiveServiceError: 认知模块暂不可用，尚未准入的任务请在… { statusCode: … } to match object { statusCode: 409 }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "statusCode": 409,
++ CognitiveServiceError {
++   "statusCode": 400,
+  }
+
+ ❯ src/__tests__/composite/copy.service.test.ts:366:106
+    364|       .mockResolvedValue({ id: 'taken' })
+    365|
+    366|     await expect(copyComposite('teacher-1', TEACHER, 'source-1', { cou…
+       |                                                                                                          ^
+    367|     expect(mockPrisma.cognitiveAssignment.create).not.toHaveBeenCalled…
+    368|     expect(mockPrisma.compositeAssessment.create).not.toHaveBeenCalled…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/28]⎯
+
+ FAIL  src/__tests__/composite/copy.service.test.ts > copyComposite > copies a GRANT config from a library template without requiring a material grant
+CompositeServiceError: 综合测评不存在
+ ❯ compositeNotFound src/modules/composite/composite.errors.ts:11:59
+      9| }
+     10|
+     11| export const compositeNotFound = (message = '综合测评不存在') => new Composit…
+       |                                                           ^
+     12| export const compositeForbidden = (message = '无权限操作此综合测评') => new Comp…
+     13| export const compositeBadRequest = (message: string) => new CompositeS…
+ ❯ Module.copyComposite src/modules/composite/composite.service.ts:1050:22
+ ❯ src/__tests__/composite/copy.service.test.ts:393:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/28]⎯
+
+ FAIL  src/__tests__/composite/copy.service.test.ts > copyComposite > lets ADMIN publish a draft bound to a library course
+CompositeServiceError: 只有草稿状态的综合测评可以修改
+ ❯ compositeConflict src/modules/composite/composite.errors.ts:14:55
+     12| export const compositeForbidden = (message = '无权限操作此综合测评') => new Comp…
+     13| export const compositeBadRequest = (message: string) => new CompositeS…
+     14| export const compositeConflict = (message: string) => new CompositeSer…
+       |                                                       ^
+     15|
+ ❯ assertDraft src/modules/composite/composite.service.ts:299:43
+ ❯ prepareCompositePublication src/modules/composite/composite.service.ts:1834:3
+ ❯ publishCompositeInTransaction src/modules/composite/composite.service.ts:2016:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/28]⎯
+
+ FAIL  src/__tests__/composite/copy.service.test.ts > copyComposite > rejects ADMIN publishing a draft with an orphan FORM module
+AssertionError: expected CompositeServiceError: 只有草稿状态的综合测评可以修改 { statusCode: … } to match object { statusCode: 400, …(1) }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "message": "综合测评包含未归属区段的表单模块，发布失败",
+-   "statusCode": 400,
++ CompositeServiceError {
++   "statusCode": 409,
+  }
+
+ ❯ src/__tests__/composite/copy.service.test.ts:436:64
+    434|     }))
+    435|     mockPrisma.course.findUnique.mockResolvedValue(libraryCourse)
+    436|     await expect(publishComposite('admin-1', ADMIN, 'source-1')).rejec…
+       |                                                                ^
+    437|       statusCode: 400,
+    438|       message: '综合测评包含未归属区段的表单模块，发布失败',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/28]⎯
+
+ FAIL  src/__tests__/composite/copy.service.test.ts > copyComposite > forbids ADMIN from copying onto another teacher’s course
+AssertionError: expected CompositeServiceError: 综合测评不存在 { …(1) } to match object { statusCode: 403 }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "statusCode": 403,
++ CompositeServiceError {
++   "statusCode": 404,
+  }
+
+ ❯ src/__tests__/composite/copy.service.test.ts:446:87
+    444|     mockPrisma.compositeAssessment.findUnique.mockResolvedValue(librar…
+    445|     mockPrisma.course.findUnique.mockResolvedValue(teacherCourse)
+    446|     await expect(copyComposite('admin-1', ADMIN, 'source-1', { courseI…
+       |                                                                                       ^
+    447|       statusCode: 403,
+    448|     })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/28]⎯
+
+ FAIL  src/__tests__/composite/copy.service.test.ts > copyComposite > copies experience freeze identity instead of remelting standard
+CognitiveServiceError: 认知模块暂不可用，尚未准入的任务请在重新开启后继续
+ ❯ BAD_REQUEST src/modules/cognitive/cognitive.errors.ts:17:45
+     15| export const NOT_FOUND = (msg: string) => new CognitiveServiceError(ms…
+     16| export const FORBIDDEN = (msg: string) => new CognitiveServiceError(ms…
+     17| export const BAD_REQUEST = (msg: string) => new CognitiveServiceError(…
+       |                                             ^
+     18| export const CONFLICT = (msg: string) => new CognitiveServiceError(msg…
+     19| export const SERVER_ERROR = (msg: string) => new CognitiveServiceError…
+ ❯ assertCognitiveNewAdmissionEnabled src/modules/cognitive/product-eligibility.ts:7:48
+ ❯ assertCognitiveModuleEnabled src/modules/composite/composite.service.ts:312:3
+ ❯ Module.copyComposite src/modules/composite/composite.service.ts:1125:21
+ ❯ src/__tests__/composite/copy.service.test.ts:510:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/28]⎯
+
+ FAIL  src/__tests__/composite/copy.service.test.ts > copyComposite > does not reuse a standard wrapper when copying a research template
+CompositeServiceError: 综合测评不存在
+ ❯ compositeNotFound src/modules/composite/composite.errors.ts:11:59
+      9| }
+     10|
+     11| export const compositeNotFound = (message = '综合测评不存在') => new Composit…
+       |                                                           ^
+     12| export const compositeForbidden = (message = '无权限操作此综合测评') => new Comp…
+     13| export const compositeBadRequest = (message: string) => new CompositeS…
+ ❯ Module.copyComposite src/modules/composite/composite.service.ts:1050:22
+ ❯ src/__tests__/composite/copy.service.test.ts:536:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/28]⎯
+
+ FAIL  src/__tests__/composite/copy.service.test.ts > copyComposite > does not reuse a wrapper when the report snapshot differs
+CognitiveServiceError: 认知模块暂不可用，尚未准入的任务请在重新开启后继续
+ ❯ BAD_REQUEST src/modules/cognitive/cognitive.errors.ts:17:45
+     15| export const NOT_FOUND = (msg: string) => new CognitiveServiceError(ms…
+     16| export const FORBIDDEN = (msg: string) => new CognitiveServiceError(ms…
+     17| export const BAD_REQUEST = (msg: string) => new CognitiveServiceError(…
+       |                                             ^
+     18| export const CONFLICT = (msg: string) => new CognitiveServiceError(msg…
+     19| export const SERVER_ERROR = (msg: string) => new CognitiveServiceError…
+ ❯ assertCognitiveNewAdmissionEnabled src/modules/cognitive/product-eligibility.ts:7:48
+ ❯ assertCognitiveModuleEnabled src/modules/composite/composite.service.ts:312:3
+ ❯ Module.copyComposite src/modules/composite/composite.service.ts:1125:21
+ ❯ src/__tests__/composite/copy.service.test.ts:566:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/28]⎯
+
+ FAIL  src/__tests__/composite/copy.service.test.ts > copyComposite > rejects a partially frozen source instead of writing a null legacy wrapper
+AssertionError: expected CompositeServiceError: 综合测评不存在 { …(1) } to match object { statusCode: 400 }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "statusCode": 400,
++ CompositeServiceError {
++   "statusCode": 404,
+  }
+
+ ❯ src/__tests__/composite/copy.service.test.ts:581:91
+    579|     }
+    580|     mockPrisma.compositeAssessment.findUnique.mockResolvedValueOnce(so…
+    581|     await expect(copyComposite('teacher-1', TEACHER, 'source-1', { cou…
+       |                                                                                           ^
+    582|       statusCode: 400,
+    583|     })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[20/28]⎯
+
+ FAIL  src/__tests__/composite/copy.service.test.ts > copyComposite > keeps the source freeze ciphertext when live registry metadata would differ
+CognitiveServiceError: 认知模块暂不可用，尚未准入的任务请在重新开启后继续
+ ❯ BAD_REQUEST src/modules/cognitive/cognitive.errors.ts:17:45
+     15| export const NOT_FOUND = (msg: string) => new CognitiveServiceError(ms…
+     16| export const FORBIDDEN = (msg: string) => new CognitiveServiceError(ms…
+     17| export const BAD_REQUEST = (msg: string) => new CognitiveServiceError(…
+       |                                             ^
+     18| export const CONFLICT = (msg: string) => new CognitiveServiceError(msg…
+     19| export const SERVER_ERROR = (msg: string) => new CognitiveServiceError…
+ ❯ assertCognitiveNewAdmissionEnabled src/modules/cognitive/product-eligibility.ts:7:48
+ ❯ assertCognitiveModuleEnabled src/modules/composite/composite.service.ts:312:3
+ ❯ Module.copyComposite src/modules/composite/composite.service.ts:1125:21
+ ❯ src/__tests__/composite/copy.service.test.ts:601:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[21/28]⎯
+
+ FAIL  src/__tests__/composite/copy.service.test.ts > copyComposite > copies a legacy unfrozen source without inventing standard
+CompositeServiceError: 综合测评不存在
+ ❯ compositeNotFound src/modules/composite/composite.errors.ts:11:59
+      9| }
+     10|
+     11| export const compositeNotFound = (message = '综合测评不存在') => new Composit…
+       |                                                           ^
+     12| export const compositeForbidden = (message = '无权限操作此综合测评') => new Comp…
+     13| export const compositeBadRequest = (message: string) => new CompositeS…
+ ❯ Module.copyComposite src/modules/composite/composite.service.ts:1050:22
+ ❯ src/__tests__/composite/copy.service.test.ts:627:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22/28]⎯
+
+ FAIL  src/__tests__/composite/copy.service.test.ts > library composites are not takeable > rejects public tokens on a library composite
+AssertionError: expected CompositeServiceError: 综合测评不存在 { …(1) } to match object { statusCode: 400 }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "statusCode": 400,
++ CompositeServiceError {
++   "statusCode": 404,
+  }
+
+ ❯ src/__tests__/composite/copy.service.test.ts:721:125
+    719|   it('rejects public tokens on a library composite', async () => {
+    720|     mockPrisma.compositeAssessment.findUnique.mockResolvedValue(librar…
+    721|     await expect(createAccessTokenForComposite('admin-1', ADMIN, 'sour…
+       |                                                                                                                             ^
+    722|       .rejects.toMatchObject({ statusCode: 400 })
+    723|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[23/28]⎯
+
+ FAIL  src/__tests__/composite/copy.service.test.ts > C06 student satisfaction projection > preserves historical satisfaction null independently of the latest report with one light batch
+ FAIL  src/__tests__/composite/copy.service.test.ts > C06 student satisfaction projection > preserves historical satisfaction SATISFIED independently of the latest report with one light batch
+AssertionError: expected { id: true, …(6) } to deeply equal { id: true, …(5) }
+
+- Expected
++ Received
+
+@@ -1,6 +1,12 @@
+  {
++   "cognitiveSessions": {
++     "select": {
++       "frozenAdmissionSnapshotHash": true,
++       "status": true,
++     },
++   },
+    "completedAt": true,
+    "compositeAssessmentId": true,
+    "id": true,
+    "progress": true,
+    "status": true,
+
+ ❯ src/__tests__/composite/copy.service.test.ts:753:84
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[24/28]⎯
+
+ FAIL  src/__tests__/composite/copy.service.test.ts > Training timed start recovery boundary > keeps original membership/library checks but does not re-gate existing timing by current type
+CompositeServiceError: 库课程上的综合测评不能作答
+ ❯ compositeBadRequest src/modules/composite/composite.errors.ts:13:57
+     11| export const compositeNotFound = (message = '综合测评不存在') => new Composit…
+     12| export const compositeForbidden = (message = '无权限操作此综合测评') => new Comp…
+     13| export const compositeBadRequest = (message: string) => new CompositeS…
+       |                                                         ^
+     14| export const compositeConflict = (message: string) => new CompositeSer…
+     15|
+ ❯ assertStudentEligibility src/modules/composite/composite.service.ts:2244:42
+ ❯ Module.startUserAttempt src/modules/composite/composite.service.ts:2631:9
+ ❯ src/__tests__/composite/copy.service.test.ts:773:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[25/28]⎯
+
+ FAIL  src/__tests__/composite/copy.service.test.ts > Training timed start recovery boundary > does not bypass original membership authorization for an existing attempt
+AssertionError: expected CompositeServiceError: 综合测评不存在 { …(1) } to match object { statusCode: 403 }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "statusCode": 403,
++ CompositeServiceError {
++   "statusCode": 404,
+  }
+
+ ❯ src/__tests__/composite/copy.service.test.ts:782:58
+    780|     mockPrisma.courseStudent.findFirst.mockResolvedValue(null)
+    781|     mockPrisma.compositeAssessmentAttempt.findFirst.mockResolvedValue(…
+    782|     await expect(startUserAttempt('student-1','source-1')).rejects.toM…
+       |                                                          ^
+    783|     expect(mockPrisma.compositeAssessmentAttempt.findFirst).not.toHave…
+    784|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[26/28]⎯
+
+ FAIL  src/__tests__/scale/composite-export-projection.test.ts > Composite SJT summary projection fingerprint > invalidates legacy artifacts and binds slot position without expanding raw access
+Error: 导出文件名缺少可绑定的 artifact identity
+ ❯ bindCompositeExportFileName src/modules/composite/composite-export-projection.ts:200:21
+    198| ): string => {
+    199|   const match = fileName.match(/_([0-9a-f-]{36})\.(csv|sav|zip)$/i)
+    200|   if (!match) throw new Error('导出文件名缺少可绑定的 artifact identity')
+       |                     ^
+    201|   const compact = `${expectedArtifactPrefix(binding)}${entropy.toLower…
+    202|   if (!/^[0-9a-f]{32}$/.test(compact)) throw new Error('导出 artifact id…
+ ❯ src/__tests__/scale/composite-export-projection.test.ts:109:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[27/28]⎯
+
+
+ Test Files  3 failed | 7 passed (10)
+      Tests  28 failed | 130 passed (158)
+   Start at  19:23:27
+   Duration  11.58s (transform 2.83s, setup 0ms, import 8.26s, tests 1.94s, environment 1ms)

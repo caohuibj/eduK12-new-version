@@ -19,7 +19,6 @@ import { assertReportJobIdentity, compositeReportJobState, readCompositeReportMa
 import { encryptCompositeCollectionReport, decryptCompositeCollectionReport } from './composite-report-cache'
 import { assertCognitiveProductEligible, assertCognitiveNewAdmissionEnabled } from '../cognitive/product-eligibility'
 import { loadFrozenCompositeProgress, loadFrozenMeasurementFinalHeaders } from './frozen-progress'
-import { resolveSituationalScientificMaturity } from '../situational/scientific-maturity'
 import { frozenSituationalScientificProjection } from '../situational/onboarding/scientific-schema'
 import { decryptFrozenSituationalRuntimeSnapshot } from '../assessment-runtime/situational-runtime-snapshot'
 import { randomBytes, randomUUID } from 'crypto'
@@ -89,7 +88,7 @@ import {
   situationalAttemptForResponse,
 } from '../situational/situational-runtime.service'
 import { assertSituationalAssetReferencesReady } from '../situational/situational-asset.service'
-import { resolveSituationalReleases, situationalReleaseKey, type ResolvedSituationalRelease } from '../situational/situational-release.service'
+import { loadSituationalReleaseMetadata, type SituationalReleaseMetadata, inspectSituationalReleases, resolveSituationalReleases, situationalReleaseKey, type ResolvedSituationalRelease } from '../situational/situational-release.service'
 import { projectSjtReleaseStatus } from '../situational/authoring/service'
 import type {
   AddCompositeItemInput,
@@ -321,6 +320,15 @@ export const resolveCompositeSituationalItems = async (items: SituationalComposi
   const resolved = await resolveSituationalReleases(items.filter(item => item.type === 'SITUATIONAL').map(situationalItemIdentity), db, lock)
   for (const situation of resolved.values()) assertSituationalCompositeItem(situation)
   return resolved
+}
+/** Preflight retains both successful and failed exact identities for all of its
+ * checks and per-item diagnostics; no repeated upload fetch/compile on errors. */
+export const inspectCompositeSituationalItems = async (items: SituationalCompositeItem[], db: Db = defaultPrisma) => {
+  const outcome = await inspectSituationalReleases(items.filter(item => item.type === 'SITUATIONAL').map(situationalItemIdentity), db)
+  for (const [key, situation] of outcome.releases) {
+    try { assertSituationalCompositeItem(situation) } catch (error) { outcome.errors.set(key, error); outcome.releases.delete(key) }
+  }
+  return outcome
 }
 const assertSituationalCompositeItem = (situation: ResolvedSituationalRelease) => {
   const { runtime, situationPackage } = situation
@@ -583,7 +591,7 @@ export const assertValidItem = async (
   throw compositeBadRequest('不支持的综合测评模块类型')
 }
 
-const mapItemForTeacher = (item: any, packageSlotLabels = new Map<number, string>()) => ({
+const mapItemForTeacher = (item: any, packageSlotLabels = new Map<number, string>(), situationalMetadata = new Map<string, SituationalReleaseMetadata>()) => ({
   id: item.id,
   type: item.type,
   position: item.position,
@@ -609,8 +617,7 @@ const mapItemForTeacher = (item: any, packageSlotLabels = new Map<number, string
     ? {
         key: item.situationalInstrumentKey,
         version: item.situationalInstrumentVersion,
-        status: 'PUBLISHED',
-        scienceMaturity: resolveSituationalScientificMaturity(item.situationalInstrumentKey, item.situationalInstrumentVersion),
+        ...situationalMetadata.get(situationalReleaseKey(situationalItemIdentity(item))),
       }
     : null,
   form: item.type === 'FORM'
@@ -897,6 +904,7 @@ export const listComposites = async (userId: string, role: UserRole) => {
   // Historical management rows remain visible; the flag controls new authoring/admission.
   const supportedList = list
   const counts = await loadAttemptCountsByCompositeIds(supportedList.map((item: any) => item.id), userId, role)
+  const situationalMetadata = await loadSituationalReleaseMetadata(supportedList.flatMap((item: any) => item.items.filter((child: any) => child.type === 'SITUATIONAL').map(situationalItemIdentity)))
   return supportedList.map((item: any) => {
     const {
       _count: _ignoredCount,
@@ -923,7 +931,7 @@ export const listComposites = async (userId: string, role: UserRole) => {
         : null,
       canSetCopyable: canSetCopyableFor(item, role),
       itemCount: item.items.length,
-      items: item.items.map((child: any) => mapItemForTeacher(child, packageSlotLabels)),
+      items: item.items.map((child: any) => mapItemForTeacher(child, packageSlotLabels, situationalMetadata)),
       attemptCounts: counts.get(item.id) ?? emptyAttemptCounts(),
     }
   })
@@ -935,6 +943,7 @@ export const getCompositeForTeacher = async (userId: string, role: UserRole, id:
   await ensureCompositeFormSections(id)
   const composite = await loadComposite(id, true)
   assertOwner(composite, userId, role)
+  const situationalMetadata = await loadSituationalReleaseMetadata(composite.items.filter((item: any) => item.type === 'SITUATIONAL').map(situationalItemIdentity))
   const counts = await loadAttemptCountsByCompositeIds([composite.id], userId, role)
   const [contentUnits, formSections] = await Promise.all([
     listCompositeContentUnits(composite.id),
@@ -978,7 +987,7 @@ export const getCompositeForTeacher = async (userId: string, role: UserRole, id:
           frozen: Boolean(composite.analysisProtocolSnapshotEncrypted),
         }
       : null,
-    items: composite.items.map((item: any) => mapItemForTeacher(item, getFrozenPackageSlotLabels(composite))),
+    items: composite.items.map((item: any) => mapItemForTeacher(item, getFrozenPackageSlotLabels(composite), situationalMetadata)),
     deliveryMode: 'FINAL_ONLY' as const,
     formSections,
     units: contentUnits,

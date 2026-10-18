@@ -3,7 +3,7 @@ import example from '../../modules/situational/authoring/examples/teacher-demons
 import { compileSjtTemplate } from '../../modules/situational/authoring/template'
 const mocks = vi.hoisted(() => ({ findMany: vi.fn(), query: vi.fn() }))
 vi.mock('../../config/database', () => ({ prisma: { sjtAuthorRelease: { findMany: mocks.findMany }, $queryRaw: mocks.query } }))
-import { listSituationalResourceSummaries, resolveSituationalRelease, resolveSituationalReleases, situationalReleaseKey } from '../../modules/situational/situational-release.service'
+import { loadSituationalReleaseMetadata, inspectSituationalReleases, listSituationalResourceSummaries, resolveSituationalRelease, resolveSituationalReleases, situationalReleaseKey } from '../../modules/situational/situational-release.service'
 import { resolveCompositeSituationalItems } from '../../modules/composite/composite.service'
 
 const compiled = compileSjtTemplate({ ...example, instrumentKey: 'c11-student-release', respondentType: 'student_self_report' })
@@ -35,6 +35,15 @@ describe('exact SJT release resolution', () => {
     mocks.findMany.mockResolvedValue(defect === 'missing' ? [] : [bad])
     await expect(resolveSituationalReleases([identity])).rejects.toMatchObject({ statusCode: expect.any(Number) })
   })
+  it('retains exact success and failure outcomes for one preflight operation without reloading', async () => {
+    const missing = { ...identity, instrumentVersion: '9.0.0' }
+    const outcome = await inspectSituationalReleases([identity, missing, identity, missing])
+    expect(outcome.releases.size).toBe(1)
+    expect(outcome.errors.size).toBe(1)
+    expect(outcome.errors.get(situationalReleaseKey(missing))).toMatchObject({ statusCode: 404 })
+    expect(outcome.releases.get(situationalReleaseKey(identity))?.snapshot.definitionHash).toBe(compiled.definitionHash)
+    expect(mocks.findMany).toHaveBeenCalledTimes(1)
+  })
   it('does not query uploads for builtin-only or empty operations', async () => {
     expect((await resolveSituationalReleases([])).size).toBe(0)
     expect((await resolveSituationalReleases([{ instrumentKey: 'sjt-assertiveness-golden', instrumentVersion: '1.0.0' }])).size).toBe(1)
@@ -50,6 +59,16 @@ describe('exact SJT release resolution', () => {
     const teacher = compileSjtTemplate({ ...example, instrumentKey: 'c11-teacher-release' })
     mocks.findMany.mockResolvedValue([{ instrumentKey: teacher.package.key, instrumentVersion: teacher.package.instrumentVersion, status: 'PUBLISHED', definitionHash: teacher.definitionHash, package: { ...teacher.package, releaseStatus: 'PUBLISHED' } }])
     await expect(resolveCompositeSituationalItems([{ type: 'SITUATIONAL', situationalInstrumentKey: teacher.package.key, situationalInstrumentVersion: teacher.package.instrumentVersion }])).rejects.toThrow('教师自评')
+  })
+  it('projects uploaded management metadata in one header-only batch, including retired releases', async () => {
+    const metadata = { ...identity, status: 'RETIRED', definitionHash: compiled.definitionHash, packageKey: identity.instrumentKey, packageVersion: identity.instrumentVersion, packageStatus: 'PUBLISHED', modelKey: 'AUTHOR_KEY_SUM', scoringVersion: 'author-key-sum-v1' }
+    mocks.query.mockResolvedValue([metadata])
+    const result = await loadSituationalReleaseMetadata([identity, identity])
+    expect(result.get(situationalReleaseKey(identity))).toEqual({ status: 'RETIRED', scienceMaturity: 'PILOT' })
+    expect(mocks.query).toHaveBeenCalledTimes(1)
+    expect(mocks.findMany).not.toHaveBeenCalled()
+    mocks.query.mockResolvedValue([{ ...metadata, modelKey: 'UNKNOWN' }])
+    await expect(loadSituationalReleaseMetadata([identity])).rejects.toThrow('校验失败')
   })
   it('projects resource headers without answer keys or templates and rejects corrupt metadata', async () => {
     const summary = { ...identity, definitionHash: compiled.definitionHash, name: '学生情境试点', respondentType: 'student_self_report', packageKey: identity.instrumentKey, packageVersion: identity.instrumentVersion, packageStatus: 'PUBLISHED' }

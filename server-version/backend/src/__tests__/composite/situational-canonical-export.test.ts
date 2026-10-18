@@ -3,9 +3,12 @@ import { resolve } from 'node:path'
 import { describe, expect, it, vi } from 'vitest'
 import type { AssessmentUnitSnapshot } from '@prisma/client'
 import { createCanonicalUnitResultEnvelope, type CanonicalUnitResultCoreV1 } from '../../modules/assessment-runtime/unit-result'
-import { readSituationalExportResults, situationalExportColumns, situationalSummaryFieldAllowed } from '../../modules/composite/situational-canonical-export'
+import { loadSituationalExportSlotSets, readSituationalExportResults as readBoundResults, situationalExportColumns, situationalSummaryFieldAllowed } from '../../modules/composite/situational-canonical-export'
 
 vi.mock('../../modules/assessment-runtime/security', () => ({ decryptUnifiedRuntimePayload: (value: string) => JSON.parse(value) }))
+import { createFrozenActiveSlotSet, type FrozenActiveSlotSetV1 } from '../../modules/assessment-runtime/slot-set'
+import { publicTemplates } from '../../modules/assessment-runtime/public-templates'
+vi.mock('../../modules/assessment-runtime/public-templates', () => ({ publicTemplates: { loadMany: vi.fn() } }))
 const parent = { id: 'parent', attemptEpoch: 2, contextSnapshotHash: 'context' }
 const core: CanonicalUnitResultCoreV1 = {
   schemaVersion: 1, unitType: 'SITUATIONAL', instrumentKey: 'accepted', instrumentVersion: '1',
@@ -15,6 +18,14 @@ const core: CanonicalUnitResultCoreV1 = {
   facts: [{ key: 'never_export', value: 'SECRET' }], references: [], contextHash: 'context',
   scientificProvenance: { instrumentKey: 'accepted', instrumentVersion: '1' },
 }
+const frozen = createFrozenActiveSlotSet({ schemaVersion: 1, runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 2, slots: [{
+  slotKey: 'situational:item', unitType: 'SITUATIONAL', required: true,
+  sourceDefinitionIdentity: { key: core.instrumentKey, version: core.instrumentVersion, hash: core.sourceDefinitionHash }, sourceBinding: {},
+  runtimeIdentity: { instrumentKey: core.instrumentKey, instrumentVersion: core.instrumentVersion, definitionHash: core.sourceDefinitionHash,
+    compiledRuntimeHash: core.compiledRuntimeHash, scorerKey: core.scorerKey, scoringVersion: core.scorerVersion,
+    runtimeGeneration: 'UNIFIED_V1', deliveryMode: 'FINAL_ONLY', frozenAt: '2026-10-18T00:00:00.000Z' },
+}] })
+const readSituationalExportResults = (attempt: typeof parent, rows: AssessmentUnitSnapshot[], slots: FrozenActiveSlotSetV1 = frozen) => readBoundResults(attempt, rows, slots)
 const envelope = (value = core) => createCanonicalUnitResultEnvelope({ core: value, completedAt: '2026-10-18T00:00:00.000Z', persistenceProvenance: { sourceType: 'SITUATIONAL_ATTEMPT', sourceAttemptId: 'child', sourceSubmissionId: 'submit' } })
 const snapshot = (value = envelope()): AssessmentUnitSnapshot => ({
   id: 'snapshot', questionnaireAssessmentId: null, compositeAttemptId: parent.id, attemptEpoch: 2,
@@ -43,7 +54,8 @@ describe('Composite SJT accepted canonical summary', () => {
   })
   it('has identity fields without records and fills absent metrics with null', () => {
     const columns = situationalExportColumns('J001_', 'SJT', [envelope()])
-    expect(Object.values(columns.read(null)).every(value => value === null)).toBe(true)
+    expect(columns.read(null).J001_terminal_state).toBe('NOT_ACTIVE')
+    expect(Object.entries(columns.read(null)).filter(([key]) => key !== 'J001_terminal_state').every(([, value]) => value === null)).toBe(true)
     expect(situationalExportColumns('J001_', 'SJT', []).fields.some(field => field.name === 'J001_result_hash')).toBe(true)
   })
   it.each([
@@ -63,7 +75,11 @@ describe('Composite SJT accepted canonical summary', () => {
   })
   it('preserves explicit terminal missingness without synthesizing results', () => {
     const skipped = { ...snapshot(), terminalState: 'SKIPPED' as const, payloadKind: 'NONE' as const, canonicalResultEncrypted: null }
-    expect(readSituationalExportResults(parent, [skipped]).get('situational:item')).toBeNull()
+    expect(() => readSituationalExportResults(parent, [skipped])).toThrow()
+    const { snapshotHash: _hash, ...unsigned } = frozen
+    const optional = createFrozenActiveSlotSet({ ...unsigned, slots: frozen.slots.map(slot => ({ ...slot, required: false })) })
+    expect(readSituationalExportResults(parent, [skipped], optional).get('situational:item')).toBeNull()
+    expect(situationalExportColumns('J001_', 'SJT', []).read(null, 'SKIPPED').J001_terminal_state).toBe('SKIPPED')
     expect(() => readSituationalExportResults(parent, [{ ...skipped, canonicalResultEncrypted: snapshot().canonicalResultEncrypted }])).toThrow()
   })
 })
@@ -77,4 +93,30 @@ it('uses the bounded snapshot path and retains standalone embedded/raw rejection
   const research = readFileSync(resolve(process.cwd(), 'src/modules/situational/situation-research-export.ts'), 'utf8')
   expect(research).toContain('if (input.embedded) throw denied()')
   expect(research).toContain('authorizeSituationalResearchExport(authority)')
+})
+
+
+it('requires every frozen required SJT and rejects a self-consistent different instrument/runtime', () => {
+  expect(() => readSituationalExportResults(parent, [])).toThrow('required snapshot missing')
+  expect(() => readSituationalExportResults(parent, [{ ...snapshot(), slotKey: 'situational:foreign' }])).toThrow()
+  for (const patch of [{ instrumentKey: 'other' }, { instrumentVersion: '2' }, { scorerVersion: '2' }, { scorerKey: 'other' }, { compiledRuntimeHash: 'c'.repeat(64) }, { sourceDefinitionHash: 'c'.repeat(64) }]) {
+    const altered = envelope({ ...core, ...patch })
+    expect(() => readSituationalExportResults(parent, [{ ...snapshot(altered), sourceDefinitionHash: altered.core.sourceDefinitionHash, compiledRuntimeHash: altered.core.compiledRuntimeHash }])).toThrow('canonical binding mismatch')
+  }
+})
+
+it('batch-resolves shared slot plans once and binds each parent epoch/hash', async () => {
+  const { attemptEpoch: _epoch, snapshotHash: _hash, ...plan } = frozen
+  vi.mocked(publicTemplates.loadMany).mockResolvedValue([plan])
+  const hash = 'd'.repeat(64)
+  const a = { ...parent, runtimeGeneration: 'UNIFIED_V1', frozenActiveSlotSetHash: frozen.snapshotHash, frozenActiveSlotSetEncrypted: JSON.stringify({ k: 'FSP2', p: hash, e: 2 }) }
+  const loaded = await loadSituationalExportSlotSets([a, { ...a, id: 'second' }])
+  expect(loaded.size).toBe(2)
+  expect(publicTemplates.loadMany).toHaveBeenCalledTimes(1)
+  expect(publicTemplates.loadMany).toHaveBeenCalledWith([{ hash, kind: 'FROZEN_SLOT_PLAN' }])
+  await expect(loadSituationalExportSlotSets([{ ...a, frozenActiveSlotSetHash: 'wrong' }])).rejects.toThrow('parent binding mismatch')
+  await expect(loadSituationalExportSlotSets([{ ...a, attemptEpoch: 3 }])).rejects.toThrow('parent binding mismatch')
+  await expect(loadSituationalExportSlotSets([{ ...a, frozenActiveSlotSetEncrypted: null }])).rejects.toThrow('slots missing')
+  const inline = await loadSituationalExportSlotSets([{ ...a, frozenActiveSlotSetEncrypted: JSON.stringify(frozen) }])
+  expect(inline.get(a.id)).toEqual(frozen)
 })

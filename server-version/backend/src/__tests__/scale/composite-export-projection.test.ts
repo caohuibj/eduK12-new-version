@@ -106,7 +106,7 @@ describe('Composite SJT summary projection fingerprint', () => {
     const moved = buildCompositeExportProjectionBinding({ resourceId: data.assessmentId, items: [{ id: 'form', type: 'FORM' }, { id: 'sjt', type: 'SITUATIONAL' }] })
     expect(current.fingerprint).not.toBe(legacy.fingerprint)
     expect(current.fingerprint).not.toBe(moved.fingerprint)
-    const file = bindCompositeExportFileName('composite_test.csv', legacy, 'abcdef0')
+    const file = bindCompositeExportFileName('composite_12345678_full_2026-09-21T03-00-00_00000000-0000-0000-0000-000000000000.csv', legacy, 'abcdef0')
     expect(compositeExportFileNameMatchesProjection(file, current)).toBe(false)
     const sjtData = { ...data, fields: ['J001_result_hash', 'J001_quality_status', 'J001_raw_responses', 'J002_result_hash'].map(name => ({ name, label: name, type: 'string' as const })), rows: [{ J001_result_hash: 'accepted', J001_quality_status: 'limited', J001_raw_responses: 'SECRET', J002_result_hash: 'other' }] }
     expect(projectCompositeExportData(sjtData, current).rows).toEqual([{ J001_result_hash: 'accepted', J001_quality_status: 'limited' }])

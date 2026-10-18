@@ -1,0 +1,58 @@
+{
+  "passed": false,
+  "sourceHead": "79fdb7fc12e21d25f5581e4099d12352eaae2067",
+  "runtimeFingerprint": {
+    "schemaVersion": 1,
+    "nodeVersion": "v24.21.0",
+    "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+    "dist": {
+      "files": 4997,
+      "sha256": "4bb321a265a34b2930e51aed34494ffe6d301c02810376bdf9228fd978f3086d"
+    },
+    "files": {
+      "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+      "prisma/schema.prisma": "33e2a793329c331f3ee5813bc21811688f9aae1e70aaffc44d9341ad4a9fc6fb",
+      "node_modules/.prisma/client/schema.prisma": "3786095e6b9a5477273b36a1842ca7b144daa23aa33fccb0fb3da2c95a16d822",
+      "node_modules/.prisma/client/index.js": "f304e125737075c874e338f0706a4dabf6800b57e2933027496c84474242c78e"
+    },
+    "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+  },
+  "harnessInputs": {
+    "scripts/recovery/c11-sjt-http.py": "58447fd076a5fe38f46a7e53ae4cdb750d26715c8172ac77158e0f0469c3180c",
+    "scripts/recovery/c11-sjt-smoke.mjs": "04cc7fa9b6f30af6df213230e8542395adc7a9096be47cef9b050af6e1b95f1a",
+    "e2e/questionnaire-products-fixture.ts": "f5a1f97986a60c937f6bc299d73f83cb10a448701f5dcc751c70077a11c7e1ac",
+    "backend/src/modules/situational/authoring/examples/teacher-demonstration.json": "785f883bca02e6abcdbdc3958f86fb15fa2e03e3d7267fde93bbaaed624cec11",
+    "backend/src/modules/situational/instruments/sjt-assertiveness-golden/1.0.0/instrument.json": "e0ef7c315cf42db521ba9d9fc19b4a11408473f487c2bd0f2e9ad1811214f1fb"
+  },
+  "cleanupVerified": true,
+  "attempt": 1,
+  "runtimeRole": "non-owner eduk12_runtime",
+  "services": {
+    "runtimeRole": "passed",
+    "health": 200,
+    "ready": 200
+  },
+  "startedAt": "2026-10-18T10:27:46.514320+00:00",
+  "stoppedAt": "2026-10-18T10:27:55.912162+00:00",
+  "peakRssBytesDiagnosticOnly": {
+    "api": 299094016,
+    "report-worker": 220696576
+  },
+  "cleanupErrors": [],
+  "rawRuntimeResultSha256": "60dcf3bc5f2b1b085a820bedcfc079fd5718204664b0c275c75d501aa4bb0dbc",
+  "rawStatusSha256": "0cae8aa56a58f274a636da493fc96207ef8476fbc1785c29bb173b919bc8b98a",
+  "phases": {
+    "sjt": {
+      "passed": false,
+      "requestCount": 4,
+      "checks": [],
+      "counts": [],
+      "httpStatuses": {
+        "200": 3,
+        "401": 1
+      },
+      "rawResultSha256": "9c35a685ecf732f407855b763e7ab2dd0621a6b6404e2b60457ae110f74694aa"
+    }
+  },
+  "failure": "Harness routed ADMIN to training-login; expected authentication denial. Corrected harness to official auth/login."
+}

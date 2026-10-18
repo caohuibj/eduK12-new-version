@@ -750,7 +750,7 @@ describe('C06 student satisfaction projection', () => {
     expect(result).toHaveLength(30)
     expect(result[0]).toMatchObject({ latestCompletedAttempt: { id: 'new0', taskSatisfied: false }, latestSatisfiedAttempt: { id: 'old0' }, hasSatisfiedAttempt: true, attemptsUsed: 2, canContinue: false, canStartNewAttempt: false })
     expect(mockPrisma.compositeAssessmentAttempt.findMany).toHaveBeenCalledTimes(1)
-    expect(mockPrisma.compositeAssessmentAttempt.findMany.mock.calls[0][0].select).toEqual({ id: true, compositeAssessmentId: true, status: true, taskSatisfaction: true, progress: true, completedAt: true })
+    expect(mockPrisma.compositeAssessmentAttempt.findMany.mock.calls[0][0].select).toEqual({ id: true, compositeAssessmentId: true, status: true, taskSatisfaction: true, progress: true, completedAt: true, cognitiveSessions: { select: { status: true, frozenAdmissionSnapshotHash: true } } })
   })
   it.each(['NOT_SATISFIED', 'CORRUPT'])('never reopens a submitted %s attempt or grants additional attempts', async (taskSatisfaction) => {
     mockPrisma.courseStudent.findMany.mockResolvedValue([{ courseId: 'course-t' }])

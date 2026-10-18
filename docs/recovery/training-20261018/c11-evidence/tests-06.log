@@ -1,0 +1,24 @@
+
+ RUN  v4.1.11 [cloud-workspace]/eduk12_c11_20261018/server-version/backend
+
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > keeps numeric zero distinct from null, quality, versions and hash, excluding facts/bridge/raw 5ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > has identity fields without records and fills absent metrics with null 0ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > fails closed for mismatched accepted identity {"attemptEpoch":1} 1ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > fails closed for mismatched accepted identity {"compositeAttemptId":"other"} 0ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > fails closed for mismatched accepted identity {"sourceAttemptId":"other"} 1ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > fails closed for mismatched accepted identity {"sourceSubmissionId":"other"} 1ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > fails closed for mismatched accepted identity {"sourceDefinitionHash":"other"} 0ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > fails closed for mismatched accepted identity {"compiledRuntimeHash":"other"} 0ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > fails closed for mismatched accepted identity {"canonicalResultEncrypted":null} 0ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > fails closed for mismatched accepted identity {"payloadKind":"NONE"} 0ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > fails closed for mismatched accepted identity {"sourceType":"ASSESSMENT"} 0ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > rejects altered content, context, duplicate slots/metrics and nonnumeric metrics 2ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > preserves explicit terminal missingness without synthesizing results 1ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > uses the bounded snapshot path and retains standalone embedded/raw rejection 1ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > requires every frozen required SJT and rejects a self-consistent different instrument/runtime 3ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > batch-resolves shared slot plans once and binds each parent epoch/hash 3ms
+
+ Test Files  1 passed (1)
+      Tests  16 passed (16)
+   Start at  19:27:27
+   Duration  492ms (transform 233ms, setup 0ms, import 340ms, tests 20ms, environment 0ms)

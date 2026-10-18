@@ -1,0 +1,139 @@
+{
+  "passed": true,
+  "sourceHead": "bcd11eab619d2047d5055197b7393ccf75296c72",
+  "runtimeFingerprint": {
+    "schemaVersion": 1,
+    "nodeVersion": "v24.21.0",
+    "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+    "dist": {
+      "files": 4997,
+      "sha256": "b14abad692be664b89367edb0ca700074560aa853c269d406391aedaef3b6375"
+    },
+    "files": {
+      "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+      "prisma/schema.prisma": "33e2a793329c331f3ee5813bc21811688f9aae1e70aaffc44d9341ad4a9fc6fb",
+      "node_modules/.prisma/client/schema.prisma": "3786095e6b9a5477273b36a1842ca7b144daa23aa33fccb0fb3da2c95a16d822",
+      "node_modules/.prisma/client/index.js": "f304e125737075c874e338f0706a4dabf6800b57e2933027496c84474242c78e"
+    },
+    "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+  },
+  "harnessInputs": {
+    "scripts/recovery/c11-sjt-http.py": "53739ad0677b8b97a0e417404b8ae709428b4bee118e00cacb78870c4dcac083",
+    "scripts/recovery/c11-sjt-smoke.mjs": "fe9f91b4e116b8ab3466a85bb43fe8ce399d4f637e0e71f6aa5d8272567ed1c9",
+    "scripts/recovery/c11-mixed-smoke.mjs": "12a19ac743a318c492b5078e36061513da485ef8ff82fda660fbfe2ff9e5db0b",
+    "e2e/questionnaire-products-fixture.ts": "f5a1f97986a60c937f6bc299d73f83cb10a448701f5dcc751c70077a11c7e1ac",
+    "backend/src/modules/situational/authoring/examples/teacher-demonstration.json": "785f883bca02e6abcdbdc3958f86fb15fa2e03e3d7267fde93bbaaed624cec11",
+    "backend/src/modules/situational/instruments/sjt-assertiveness-golden/1.0.0/instrument.json": "e0ef7c315cf42db521ba9d9fc19b4a11408473f487c2bd0f2e9ad1811214f1fb"
+  },
+  "cleanupVerified": true,
+  "attempt": 3,
+  "runtimeRole": "non-owner eduk12_runtime",
+  "services": {
+    "runtimeRole": "passed",
+    "health": 200,
+    "ready": 200
+  },
+  "startedAt": "2026-10-18T10:31:50.074862+00:00",
+  "stoppedAt": "2026-10-18T10:32:17.853821+00:00",
+  "peakRssBytesDiagnosticOnly": {
+    "api": 789561344,
+    "report-worker": 348303360
+  },
+  "cleanupErrors": [],
+  "rawRuntimeResultSha256": "d8dc366d9d492cab13cc8290477977b22c23dd391a61603ee358d60e30aab7e0",
+  "rawStatusSha256": "bab71052621f144a106fd294b842d33114256ce01a3de1ba0dcd7e545d96cf85",
+  "phases": {
+    "sjt": {
+      "passed": true,
+      "requestCount": 119,
+      "checks": [
+        "Formal upload and separate-admin publication; admin self-review and nonowner access rejected",
+        "teacher_self_report rejected by course authoring without attempt writes",
+        "Nonmember and cross-course student admission rejected without parent/child/job writes",
+        "Nonowner embedded read/FINAL denied without writes",
+        "Member start/resume, frozen FINAL/replay, one raw and canonical fact, parent and teacher report",
+        "Original export queue csv: exact canonical identities/metrics, no raw responses, owner-only download",
+        "Original export queue zip: exact canonical identities/metrics, no raw responses, owner-only download",
+        "Uploaded student SJT anonymous FINAL/replay/public report and unchanged E=3 oracle",
+        "Real retirement lock blocks first embedded admission; rollback leaves no parent/child/job; admitted frozen attempt and completed report survive retirement",
+        "Builtin anonymous start/recovery/FINAL/replay/public report and missing-recovery denial remain valid"
+      ],
+      "counts": [
+        {
+          "name": "teacher_self_report rejected by course authoring without attempt writes",
+          "before": {
+            "parents": 0,
+            "children": 0,
+            "jobs": 0
+          },
+          "after": {
+            "parents": 0,
+            "children": 0,
+            "jobs": 0
+          }
+        },
+        {
+          "name": "Nonmember and cross-course student admission rejected without parent/child/job writes",
+          "before": {
+            "parents": 0,
+            "children": 0,
+            "jobs": 0
+          },
+          "after": {
+            "parents": 0,
+            "children": 0,
+            "jobs": 0
+          }
+        },
+        {
+          "name": "Nonowner embedded read/FINAL denied without writes",
+          "before": {
+            "parents": 1,
+            "children": 1,
+            "jobs": 0
+          },
+          "after": {
+            "parents": 1,
+            "children": 1,
+            "jobs": 0
+          }
+        },
+        {
+          "name": "retire versus first embedded admission",
+          "before": {
+            "parents": 3,
+            "children": 3,
+            "jobs": 2
+          },
+          "after": {
+            "parents": 3,
+            "children": 3,
+            "jobs": 2
+          },
+          "blocked": true
+        }
+      ],
+      "httpStatuses": {
+        "200": 106,
+        "400": 2,
+        "403": 7,
+        "404": 4
+      },
+      "rawResultSha256": "b14b8a34a4469aa83c0214754e1aaafbaf0600314a16cb39283cc653c3a409f7"
+    },
+    "mixed": {
+      "passed": true,
+      "requestCount": 56,
+      "checks": [
+        "Course member mixed Form→Scale timing→uploaded SJT: FINAL/replay, frozen Training course, exact 200ms, three snapshots, original reports",
+        "Anonymous public mixed Form→Scale timing→uploaded SJT: FINAL/replay, frozen Training course, exact 200ms, three snapshots, original reports",
+        "Original mixed export queue retains Scale/SJT results while withholding unapproved timing columns"
+      ],
+      "counts": [],
+      "httpStatuses": {
+        "200": 56
+      },
+      "rawResultSha256": "5f8d47cd1b46597cf6b328f6de43dadd508bec8467d6ab277c67bfc330ac2b2b"
+    }
+  }
+}

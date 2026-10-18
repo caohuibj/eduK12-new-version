@@ -1,4 +1,4 @@
-import { readSituationalExportResults, situationalExportColumns } from './situational-canonical-export'
+import { loadSituationalExportSlotSets, readSituationalExportResults, situationalExportColumns } from './situational-canonical-export'
 import {projectTrainingTimingFact} from '../assessment-runtime/training-scale-timing'
 import {decryptUnifiedRuntimePayload} from '../assessment-runtime/security'
 import { legacyFormValueProjection } from '../assessment-runtime/typed-form'
@@ -384,8 +384,11 @@ export const getExportData = async (
   const snapshots = (hasTypedForms || hasSituational) && template.attempts.length ? await prisma.assessmentUnitSnapshot.findMany({where:{OR:template.attempts.map(attempt=>({compositeAttemptId:attempt.id,attemptEpoch:attempt.attemptEpoch})),unitType:{in:[...(hasTypedForms ? ['FORM_SECTION' as const] : []), ...(hasSituational ? ['SITUATIONAL' as const] : [])]}}}) : []
   const snapshotsByAttempt = new Map<string,typeof snapshots>()
   for(const snapshot of snapshots) { const rows=snapshotsByAttempt.get(snapshot.compositeAttemptId!)??[]; rows.push(snapshot); snapshotsByAttempt.set(snapshot.compositeAttemptId!,rows) }
+  const situationalSlots = hasSituational ? await loadSituationalExportSlotSets(template.attempts) : new Map()
   const situationalByAttempt = new Map(template.attempts.map(attempt => [attempt.id,
-    readSituationalExportResults(attempt, snapshotsByAttempt.get(attempt.id) ?? [])]))
+    hasSituational ? readSituationalExportResults(attempt, snapshotsByAttempt.get(attempt.id) ?? [], situationalSlots.get(attempt.id)!) : new Map()]))
+  const visibleSjtSlots = new Set(template.items.filter(item => item.type === 'SITUATIONAL').map(item => `situational:${item.id}`))
+  for (const plan of situationalSlots.values()) for (const slot of plan.slots) if (slot.unitType === 'SITUATIONAL' && !visibleSjtSlots.has(slot.slotKey)) throw new Error('SJT export frozen slot has no export column')
   const situationalColumns = new Map<string, ReturnType<typeof situationalExportColumns>>()
   template.items.forEach((item, index) => {
     if (item.type !== 'SITUATIONAL') return
@@ -421,7 +424,10 @@ export const getExportData = async (
       const item: any = template.items[index]
       const prefix = slotPrefix('S', index)
       if (item.type === 'SITUATIONAL') {
-        Object.assign(row, situationalColumns.get(item.id)!.read(situationalByAttempt.get(attempt.id)?.get(`situational:${item.id}`) ?? null))
+        const slotKey = `situational:${item.id}`
+        const terminal = snapshotsByAttempt.get(attempt.id)?.find(snapshot => snapshot.slotKey === slotKey)?.terminalState
+          ?? (situationalSlots.get(attempt.id)?.slots.some((slot: { slotKey: string }) => slot.slotKey === slotKey) ? 'MISSING_OPTIONAL' : 'NOT_ACTIVE')
+        Object.assign(row, situationalColumns.get(item.id)!.read(situationalByAttempt.get(attempt.id)?.get(slotKey) ?? null, terminal))
       }
       if (item.type === 'SCALE') {
         const result = attempt.scaleAssessments.find((assessment: any) => assessment.compositeItemId === item.id)

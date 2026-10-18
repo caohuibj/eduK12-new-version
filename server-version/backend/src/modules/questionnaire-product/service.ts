@@ -7,7 +7,7 @@ import { Prisma, UserRole } from '@prisma/client'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { resolveCompositeSituationalItems, assertValidItem, getCompositeForTeacher, publishComposite, prepareCompositePublication, listAvailableForStudent } from '../composite/composite.service'
+import { inspectCompositeSituationalItems, resolveCompositeSituationalItems, assertValidItem, getCompositeForTeacher, publishComposite, prepareCompositePublication, listAvailableForStudent } from '../composite/composite.service'
 import { compositeBadRequest, compositeConflict, compositeForbidden, compositeNotFound } from '../composite/composite.errors'
 import { mapCompositeSection, compositeFormSectionDefinitionHash } from '../assessment-runtime/form-section-definition'
 import { compositeFormSectionImageReferences, publishedFormMediaOwner, retainFormSectionImages } from '../assessment-runtime/form-image.adapter'
@@ -15,7 +15,7 @@ import { compositeFormSectionVideoPresentations, retainFormSectionVideos } from 
 import { ensureCompositeFormSections } from '../composite/final-submit.service'
 import { addCompositeItemSchema } from '../composite/composite.schema'
 import { canUseScale } from '../../services/materialGrant'
-import { listSituationalResourceSummaries } from '../situational/situational-release.service'
+import { situationalReleaseKey, listSituationalResourceSummaries } from '../situational/situational-release.service'
 import { freezeAssignmentProfile, freezeDataForWrite } from '../cognitive/profile-freeze'
 import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
 import { z } from 'zod'
@@ -207,8 +207,8 @@ async function validateDelivery(tx: Tx, actor: Actor, row: any) {
     await courses(tx, actor, row.questionnaireCourses.map((v: any) => v.courseId), row.questionnaireType)
 }
 
-async function validateResources(tx: Tx, actor: Actor, row: any) {
-  const situational = await resolveCompositeSituationalItems(row.items, tx)
+async function validateResources(tx: Tx, actor: Actor, row: any, inspected?: Awaited<ReturnType<typeof inspectCompositeSituationalItems>>) {
+  const situational = inspected?.releases ?? await resolveCompositeSituationalItems(row.items, tx)
   for (const item of row.items) {
     // Legacy storage accepts arbitrary strings. Do not publish an unknown
     // field type as a text input through the player's compatibility fallback.
@@ -216,6 +216,10 @@ async function validateResources(tx: Tx, actor: Actor, row: any) {
       throw compositeBadRequest(`表单字段“${item.formLabel || item.id}”的题型不受支持，请在副本中重新配置后发布`)
     }
     if (copiedCognitiveBinding(item, row)) continue
+    if (item.type === 'SITUATIONAL' && inspected) {
+      const key = situationalReleaseKey({ instrumentKey: item.situationalInstrumentKey, instrumentVersion: item.situationalInstrumentVersion })
+      if (inspected.errors.has(key)) throw inspected.errors.get(key)
+    }
     await assertValidItem({ ...item, required: item.required } as any, actor.userId, actor.role, row, tx, situational)
   }
   return situational
@@ -232,11 +236,15 @@ export async function preflight(actor: Actor, id: string, raw: unknown) {
     if (!row || row.productKind !== 'QUESTIONNAIRE') throw compositeNotFound()
     owner(actor, row)
     if (row.revision !== revision) throw compositeConflict('草稿已变化，请刷新后重新自检')
+    const inspectedSituational = await inspectCompositeSituationalItems(row.items, tx)
     const checks: Array<{ key: string; label: string; status: 'passed' | 'failed'; message: string; targetId?: string }> = []
     for (const [key, label, validate] of [
       ['delivery', '课程、公开投放与时间', () => validateDelivery(tx, actor, row)],
-      ['resources', '内容依赖与当前权限', () => validateResources(tx, actor, row)],
-      ['content', '区段、背景顺序、字段与冻结定义', () => prepareCompositePublication(actor.userId, actor.role, id, tx)],
+      ['resources', '内容依赖与当前权限', () => validateResources(tx, actor, row, inspectedSituational)],
+      ['content', '区段、背景顺序、字段与冻结定义', () => {
+        if (inspectedSituational.errors.size) throw inspectedSituational.errors.values().next().value
+        return prepareCompositePublication(actor.userId, actor.role, id, tx, inspectedSituational.releases)
+      }],
     ] as const) {
       try { await validate(); checks.push({ key, label, status: 'passed', message: '通过' }) }
       catch (cause: any) {
@@ -246,7 +254,7 @@ export async function preflight(actor: Actor, id: string, raw: unknown) {
     }
     if (checks.some(check => check.key === 'resources' && check.status === 'failed')) {
       for (const item of row.items) {
-        try { await validateResources(tx, actor, { ...row, items: [item] }) }
+        try { await validateResources(tx, actor, { ...row, items: [item] }, inspectedSituational) }
         catch (cause: any) {
           if (!(cause.statusCode >= 400 && cause.statusCode < 500)) throw cause
           checks.push({ key: 'resource:' + item.id, label: item.scale?.name || item.cognitiveAssignment?.title || item.formLabel || '内容依赖', status: 'failed', message: cause.message, targetId: item.formSectionId || item.id })

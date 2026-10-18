@@ -3,7 +3,7 @@ import { prisma } from '../../config/database'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import { freezeSituationalRuntimeAtAttemptStart } from '../assessment-runtime/situational-runtime-snapshot'
 import { listSituationPackages, selectPublishedSituationPackage, validateSituationPackage, type SituationPackage } from './situation-package.registry'
-import { resolveSituationalScientificContext } from './scientific-maturity'
+import { resolveSituationalScientificMaturity, resolveSituationalScientificContext } from './scientific-maturity'
 
 type Db = Pick<Prisma.TransactionClient, 'sjtAuthorRelease' | '$queryRaw'>
 export type SituationalReleaseIdentity = { instrumentKey: string; instrumentVersion: string }
@@ -20,7 +20,7 @@ export type ResolvedSituationalRelease = {
 /** Operation-local, exact-version resolution. Admission callers pass their parent
  * transaction and lock=true: retirement and the complete parent/child write then
  * serialize on the same release rows. Never used for an existing frozen attempt. */
-export async function resolveSituationalReleases(identities: SituationalReleaseIdentity[], db: Db = prisma, lock = false) {
+export async function inspectSituationalReleases(identities: SituationalReleaseIdentity[], db: Db = prisma, lock = false) {
   const unique = [...new Map(identities.map(identity => [situationalReleaseKey(identity), identity])).values()]
   const builtins = listSituationPackages()
   const uploaded = unique.filter(identity => !builtins.some(pkg => pkg.key === identity.instrumentKey))
@@ -30,19 +30,29 @@ export async function resolveSituationalReleases(identities: SituationalReleaseI
   const releases = uploaded.length ? await db.sjtAuthorRelease.findMany({ where: { OR: uploaded }, select: { instrumentKey: true, instrumentVersion: true, status: true, definitionHash: true, package: true } }) : []
   const rows = new Map(releases.map(row => [situationalReleaseKey(row), row]))
   const resolved = new Map<string, ResolvedSituationalRelease>()
+  const errors = new Map<string, unknown>()
   for (const identity of unique) {
     const key = situationalReleaseKey(identity)
-    const row = rows.get(key)
-    const pkg = builtins.some(candidate => candidate.key === identity.instrumentKey)
-      ? selectPublishedSituationPackage(builtins, identity.instrumentKey, identity.instrumentVersion)
-      : row?.status === 'PUBLISHED' ? selectPublishedSituationPackage([row.package as unknown as SituationPackage], identity.instrumentKey, identity.instrumentVersion) : undefined
-    if (!pkg) throw unavailable()
-    const validation = validateSituationPackage(pkg)
-    if (!validation.valid || pkg.key !== identity.instrumentKey || pkg.instrumentVersion !== identity.instrumentVersion || (row && validation.definitionHash !== row.definitionHash)) throw corrupt()
-    const snapshot = freezeSituationalRuntimeAtAttemptStart({ instrumentKey: pkg.key, instrumentVersion: pkg.instrumentVersion, definition: pkg.definition, scientificContext: resolveSituationalScientificContext(pkg) })
-    resolved.set(key, { situationPackage: pkg, definitionHash: validation.definitionHash, runtime: snapshot.compiledRuntime, snapshot })
+    try {
+      const row = rows.get(key)
+      if (row && (!row.package || typeof row.package !== 'object' || Array.isArray(row.package))) throw corrupt()
+      const pkg = builtins.some(candidate => candidate.key === identity.instrumentKey)
+        ? selectPublishedSituationPackage(builtins, identity.instrumentKey, identity.instrumentVersion)
+        : row?.status === 'PUBLISHED' ? selectPublishedSituationPackage([row.package as unknown as SituationPackage], identity.instrumentKey, identity.instrumentVersion) : undefined
+      if (!pkg) throw unavailable()
+      const validation = validateSituationPackage(pkg)
+      if (!validation.valid || pkg.key !== identity.instrumentKey || pkg.instrumentVersion !== identity.instrumentVersion || (row && validation.definitionHash !== row.definitionHash)) throw corrupt()
+      const snapshot = freezeSituationalRuntimeAtAttemptStart({ instrumentKey: pkg.key, instrumentVersion: pkg.instrumentVersion, definition: pkg.definition, scientificContext: resolveSituationalScientificContext(pkg) })
+      resolved.set(key, { situationPackage: pkg, definitionHash: validation.definitionHash, runtime: snapshot.compiledRuntime, snapshot })
+    } catch (error) { errors.set(key, error) }
   }
-  return resolved
+  return { releases: resolved, errors }
+}
+
+export async function resolveSituationalReleases(identities: SituationalReleaseIdentity[], db: Db = prisma, lock = false) {
+  const outcome = await inspectSituationalReleases(identities, db, lock)
+  if (outcome.errors.size) throw outcome.errors.values().next().value
+  return outcome.releases
 }
 
 /** Only version headers are loaded when the standalone API omits a version. */
@@ -78,4 +88,33 @@ export async function listSituationalResourceSummaries() {
   return [...builtins.filter(pkg => pkg.releaseStatus === 'PUBLISHED').map(pkg => ({ instrumentKey: pkg.key, instrumentVersion: pkg.instrumentVersion, name: pkg.definition.source.title || pkg.key, respondentType: pkg.definition.respondentType })), ...rows]
     .filter(row => row.respondentType !== 'teacher_self_report')
     .map(row => ({ id: row.instrumentKey + '/' + row.instrumentVersion, name: row.name, instrumentKey: row.instrumentKey, instrumentVersion: row.instrumentVersion }))
+}
+
+export type SituationalReleaseMetadata = { status: string; scienceMaturity: ReturnType<typeof resolveSituationalScientificMaturity> }
+/** Management metadata is not admission: a retired exact release remains
+ * inspectable, while no template or scoring key is loaded for a detail/list. */
+export async function loadSituationalReleaseMetadata(identities: SituationalReleaseIdentity[], db: Db = prisma) {
+  const unique = [...new Map(identities.map(identity => [situationalReleaseKey(identity), identity])).values()]
+  const builtins = listSituationPackages()
+  const uploaded = unique.filter(identity => !builtins.some(pkg => pkg.key === identity.instrumentKey))
+  const rows = uploaded.length ? await db.$queryRaw<Array<SituationalReleaseIdentity & { status: string; definitionHash: string; packageKey: string | null; packageVersion: string | null; packageStatus: string | null; modelKey: string | null; scoringVersion: string | null }>>(Prisma.sql`
+    SELECT "instrument_key" AS "instrumentKey", "instrument_version" AS "instrumentVersion", "status", "definition_hash" AS "definitionHash",
+      "package" ->> 'key' AS "packageKey", "package" ->> 'instrumentVersion' AS "packageVersion", "package" ->> 'releaseStatus' AS "packageStatus",
+      "package" #>> '{definition,scoring,model,modelKey}' AS "modelKey", "package" #>> '{definition,scoring,scoringVersion}' AS "scoringVersion"
+    FROM "sjt_author_releases" WHERE ${Prisma.join(uploaded.map(identity => Prisma.sql`("instrument_key" = ${identity.instrumentKey} AND "instrument_version" = ${identity.instrumentVersion})`), ' OR ')}
+  `) : []
+  const byKey = new Map(rows.map(row => [situationalReleaseKey(row), row]))
+  const metadata = new Map<string, SituationalReleaseMetadata>()
+  for (const identity of unique) {
+    const key = situationalReleaseKey(identity)
+    const builtin = builtins.find(pkg => pkg.key === identity.instrumentKey && pkg.instrumentVersion === identity.instrumentVersion)
+    if (builtin) metadata.set(key, { status: builtin.releaseStatus, scienceMaturity: resolveSituationalScientificMaturity(identity.instrumentKey, identity.instrumentVersion) })
+    else {
+      const row = byKey.get(key)
+      if (!row) throw unavailable()
+      if (!['PUBLISHED', 'RETIRED'].includes(row.status) || row.packageKey !== identity.instrumentKey || row.packageVersion !== identity.instrumentVersion || row.packageStatus !== 'PUBLISHED' || row.modelKey !== 'AUTHOR_KEY_SUM' || row.scoringVersion !== 'author-key-sum-v1' || !/^[a-f0-9]{64}$/.test(row.definitionHash)) throw corrupt()
+      metadata.set(key, { status: row.status, scienceMaturity: 'PILOT' })
+    }
+  }
+  return metadata
 }
