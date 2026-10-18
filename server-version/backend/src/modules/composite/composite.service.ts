@@ -5304,6 +5304,7 @@ export const getExportContext = async (userId: string, role: UserRole, id: strin
   const composite = await loadComposite(id)
   assertOwner(composite, userId, role)
   if (composite.productKind === 'ASSESSMENT_BUNDLE') throw compositeConflict('请使用 Bundle 报告导出，通用明细导出不适用于测评包')
+  if (composite.items.some((item: any) => item.formDefinition != null)) throw compositeBadRequest('TYPED_FORM_EXPORT_NOT_AVAILABLE: typed Form 无损导出尚未开放')
   return composite
 }
 
