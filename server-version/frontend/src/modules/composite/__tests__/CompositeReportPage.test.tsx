@@ -153,6 +153,7 @@ describe('CompositeReportPage cognitive module', () => {
             scaleId: 'scale-a',
             scaleCode: 'S-A',
             scaleName: '量表 A',
+            trainingTiming: {scope:'TRAINING_COURSE',status:'MISSING',unit:'ms',items:{}},
             dimensionScores: [{ dimensionId: 'd-a', dimensionCode: 'A', dimensionName: '维度 A', rawScore: 0, normalizedScore: 0, level: 'low', itemCount: 1, minScore: 0, maxScore: 10 }],
             feedback: { overall: '', dimensions: [{ dimensionId: 'd-a', dimensionCode: 'A', dimensionName: '维度 A', score: 0, minScore: 0, maxScore: 10, level: 'low', interpretation: '', suggestions: [] }] },
             caveats: ['量表测试注意事项'],
@@ -202,7 +203,9 @@ describe('CompositeReportPage cognitive module', () => {
     expect(screen.getByText('量表测试注意事项')).toBeTruthy()
     expect(screen.queryByText(/averageScore|overallScore|整体评估|聚合测评报告/)).toBeNull()
 
+    expect(screen.queryByText('浏览器有效作答计时')).toBeNull()
     participantView.unmount()
+    authState.user = { role: 'TEACHER' }
     const teacherView = render(
       <MemoryRouter initialEntries={['/composite-assessments/c1/attempts/attempt-mixed/report']}>
         <Routes>
@@ -216,6 +219,7 @@ describe('CompositeReportPage cognitive module', () => {
     expect(screen.getByText('认知 B')).toBeTruthy()
     expect(screen.getAllByTestId(/composite-unit-report-/)).toHaveLength(4)
     expect(screen.getByText('表单回答')).toBeTruthy()
+    expect(screen.getByText('浏览器有效作答计时')).toBeTruthy()
     teacherView.unmount()
 
     window.sessionStorage.setItem('composite:recovery:attempt:attempt-mixed', 'recovery-token-for-test')

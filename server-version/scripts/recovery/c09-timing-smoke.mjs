@@ -9,6 +9,8 @@ const backend=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../../b
 const require=createRequire(path.join(backend,'package.json'))
 const {prisma}=require(path.join(backend,'dist/config/database.js'))
 const {createCustomScaleDefinition}=require(path.join(backend,'dist/modules/scale/scale-definition.js'))
+const {publicTemplates}=require(path.join(backend,'dist/modules/assessment-runtime/public-templates.js'))
+const {loadSharedWholeValidation}=require(path.join(backend,'dist/modules/assessment-runtime/shared-control-records.js'))
 const {decryptUnifiedRuntimePayload}=require(path.join(backend,'dist/modules/assessment-runtime/security.js'))
 const bcrypt=require('bcryptjs')
 const state=process.argv[2],status=JSON.parse(fs.readFileSync(path.join(state,'status.json')))
@@ -60,6 +62,10 @@ try{
   await other.request(`/questionnaire-products/${draft.id}/timing-export-policy`,'POST',{revision:draft.revision,enabled:true},403)
   let c=student,prefix='/composite-assessments',attempt
   if(mode.anonymous){c=client();const token=await teacher.request(`/composite-assessments/${draft.id}/public-tokens`,'POST',{expiresAt:new Date(Date.now()+1800000).toISOString(),maxUses:4});const started=await c.request(`/public/composite-assessments/${token.token}/start`,'POST',{});c.recovery=started.recoveryToken;attempt=started.attempt;prefix='/public/composite-assessments'}else({attempt}=await c.request(`/composite-assessments/${draft.id}/attempts`,'POST',{}))
+  if(mode.enabled&&!mode.anonymous){
+   await assert.rejects(prisma.course.update({where:{id:courses[0].id},data:{courseType:'GENERAL'}}),/course product domain is immutable/)
+   const restored=await c.request(`/composite-assessments/${draft.id}/attempts`,'POST',{});assert.equal(restored.attempt.id,attempt.id)
+  }
   const child=attempt.currentItem;assert.equal(child.type,'SCALE');assert.equal(Boolean(child.trainingTiming),mode.enabled)
   const frozen=await prisma.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:attempt.id}})
   if(mode.enabled){assert.equal(frozen.trainingTimingSnapshot.course.courseId,courses[0].id);assert.equal(frozen.trainingTimingSnapshot.course.courseType,'TRAINING_COURSE')}
@@ -79,6 +85,13 @@ try{
   for(let i=0;i<120;i++){const current=await c.request(`${prefix}/attempts/${attempt.id}/report-status`);if(current.reportStatus?.state==='READY'){report=await c.request(`${prefix}/attempts/${attempt.id}/report`);break}await new Promise(r=>setTimeout(r,250));if(i===119)throw Error('report timeout '+JSON.stringify(current))}
   assert.ok(!JSON.stringify(report).includes('trainingTiming'))
   const record=await prisma.assessment.findUniqueOrThrow({where:{id:child.scaleAssessmentId}})
+  if(process.env.ASSESSMENT_SHARED_CONTROL_ENABLED==='true'){
+   assert.match(record.frozenAdmissionSnapshotEncrypted,/^ekr1:/)
+   const ref=decryptUnifiedRuntimePayload(record.frozenAdmissionSnapshotEncrypted);assert.equal(ref.k,'UAR2')
+   assert.deepEqual(ref.x.trainingTiming,mode.enabled?frozen.trainingTimingSnapshot:undefined)
+   const [plan]=await publicTemplates.loadMany([{hash:ref.p,kind:'UNIT_ADMISSION_PLAN'}]);assert.ok(!JSON.stringify(plan).includes('trainingTiming'));assert.ok(!JSON.stringify(plan).includes(users[2].id));assert.ok(!JSON.stringify(plan).includes(courses[0].id))
+   if(mode.whole){const job=await prisma.compositeReportJob.findUniqueOrThrow({where:{attemptId_attemptEpoch:{attemptId:attempt.id,attemptEpoch:attempt.attemptEpoch}}});assert.match(job.wholeValidationEncrypted,/^ekr1:/);const wholeRef=decryptUnifiedRuntimePayload(job.wholeValidationEncrypted);assert.equal(wholeRef.k,'WVP2');const [wholePlan]=await publicTemplates.loadMany([{hash:wholeRef.p,kind:'WHOLE_VALIDATION_PLAN'}]);assert.ok(!JSON.stringify(wholePlan).includes('trainingTiming'));assert.ok(!JSON.stringify(wholePlan).includes(users[2].id));assert.ok(!JSON.stringify(wholePlan).includes(courses[0].id));const manifest=await loadSharedWholeValidation(job.wholeValidationEncrypted);assert.deepEqual(manifest.units[0].trainingTiming,mode.enabled?frozen.trainingTimingSnapshot:undefined)}
+  }
   if(mode.enabled){const fact=decryptUnifiedRuntimePayload(record.timingEncrypted);assert.equal(fact.status,mode.missing?'MISSING':'RECORDED');if(!mode.missing)assert.deepEqual(fact.items.Q1,row);else assert.deepEqual(fact.items,{})}else assert.equal(record.timingEncrypted,null)
   storage.push({mode,policyBytes:Buffer.byteLength(JSON.stringify(draft.trainingTimingPolicy)),snapshotBytes:Buffer.byteLength(JSON.stringify(frozen.trainingTimingSnapshot)),timingCipherBytes:record.timingEncrypted?Buffer.byteLength(record.timingEncrypted):0})
   let teacherReport=await teacher.request(`/composite-assessments/${draft.id}/attempts/${attempt.id}/report`);assert.ok(!JSON.stringify(teacherReport).includes('trainingTiming'))

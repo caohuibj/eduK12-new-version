@@ -23,6 +23,7 @@ def main():
     parser.add_argument('--tools', type=Path, required=True)
     parser.add_argument('--state', type=Path, required=True)
     parser.add_argument('--hold-seconds', type=int, default=3600)
+    parser.add_argument('--compact-assessment', action='store_true', help='Enable compact/shared assessment paths only in this isolated synthetic stack')
     parser.add_argument('--whole-submit', action='store_true', help='Enable whole-submit only in this isolated synthetic stack')
     parser.add_argument('--export-processing', action='store_true', help='Enable original export consumer only in this disposable synthetic stack')
     args = parser.parse_args()
@@ -139,6 +140,8 @@ def main():
         }
         if args.export_processing:
             runtime['EXPORT_DIR'] = str(state / 'exports')
+        if args.compact_assessment:
+            runtime.update({key: 'true' for key in ['ASSESSMENT_COMPACT_FACTS_ENABLED','ASSESSMENT_SHARED_CONTROL_ENABLED','ASSESSMENT_REPORT_COMPACT_READ_ENABLED']})
         if args.whole_submit:
             runtime['ASSESSMENT_WHOLE_SUBMIT_ENABLED'] = 'true'
         # This file is private runtime configuration, never a repository artifact.

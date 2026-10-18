@@ -1,3 +1,4 @@
+import { readTrainingTimingSnapshot } from './training-scale-timing'
 import { encryptControlReference } from './control-reference-codec'
 import { AsyncLocalStorage } from 'node:async_hooks'
 import { prisma } from '../../config/database'
@@ -85,7 +86,7 @@ export const loadSharedUnitAdmission = async (encrypted: string,db?:SharedContro
   if (ref?.k !== 'UAR2') return ref
   if (typeof ref.p !== 'string' || typeof ref.b !== 'string' || !ref.x || typeof ref.x !== 'object' || Array.isArray(ref.x)) throw new Error('Frozen admission reference invalid')
   const [[plan], binding] = await Promise.all([publicTemplatesForDatabase(db).loadMany([{ hash: ref.p, kind: 'UNIT_ADMISSION_PLAN' }]), readBinding(ref.b,db)])
-  if (plan.parent?.kind !== binding.parent.kind || Object.keys(ref.x).some(key => !['frozenAt','governance','scalePolicy'].includes(key))) throw new Error('Frozen admission reference binding invalid')
+  if (plan.parent?.kind !== binding.parent.kind || Object.keys(ref.x).some(key => !['frozenAt','governance','scalePolicy','trainingTiming'].includes(key))) throw new Error('Frozen admission reference binding invalid')
   const unsigned = { ...plan, ...ref.x, attemptEpoch: binding.attemptEpoch, principal: binding.principal,
     parent: { ...plan.parent, parentId: binding.parent.id }, contextSnapshotHash: binding.contextSnapshotHash, contextValues: binding.contextValues }
   return { ...unsigned, snapshotHash: canonicalHash(unsigned) }
@@ -109,9 +110,9 @@ export const loadSharedSlotPlan = async (encrypted: string, decoded?:unknown): P
 export const storeSharedWholeValidation = async (manifest: any): Promise<string> => {
   if (!sharedControlWritesEnabled()) return encryptUnifiedRuntimePayload(manifest)
   const plan = { schemaVersion: manifest.schemaVersion, requiredFormSlots: manifest.requiredFormSlots,
-    units: manifest.units.map((u: any) => Object.fromEntries(Object.entries(u).filter(([k]) => !['assessmentId','admissionHash'].includes(k)))) }
+    units: manifest.units.map((u: any) => Object.fromEntries(Object.entries(u).filter(([k]) => !['assessmentId','admissionHash','trainingTiming'].includes(k)))) }
   const [p] = await publicTemplates.saveMany([{ kind: 'WHOLE_VALIDATION_PLAN', value: plan }])
-  return encryptControlReference({ k: 'WVP2', p, b: manifest.binding, u: manifest.units.map((u: any) => [u.assessmentId, u.admissionHash]) })
+  return encryptControlReference({ k: 'WVP2', p, b: manifest.binding, u: manifest.units.map((u: any) => [u.assessmentId, u.admissionHash, ...(u.trainingTiming ? [u.trainingTiming] : [])]) })
 }
 export const loadSharedWholeValidation = async <T>(encrypted: string): Promise<T> => {
   const ref = decryptUnifiedRuntimePayload<any>(encrypted)
@@ -119,8 +120,8 @@ export const loadSharedWholeValidation = async <T>(encrypted: string): Promise<T
   const [plan] = await publicTemplates.loadMany([{ hash: ref.p, kind: 'WHOLE_VALIDATION_PLAN' }])
   if (!Array.isArray(ref.u) || !Array.isArray(plan.units) || ref.u.length !== plan.units.length || ref.u.length > 32) throw new Error('Frozen whole validation reference invalid')
   return { ...plan, binding: ref.b, units: plan.units.map((unit: any, i: number) => {
-    const x = ref.u[i]; if (!Array.isArray(x) || x.length !== 2 || typeof x[0] !== 'string' || !/^[a-f0-9]{64}$/.test(x[1])) throw new Error('Frozen whole unit binding invalid')
-    return { ...unit, assessmentId: x[0], admissionHash: x[1] }
+    const x = ref.u[i]; if (!Array.isArray(x) || (x.length !== 2 && x.length !== 3) || typeof x[0] !== 'string' || !/^[a-f0-9]{64}$/.test(x[1])) throw new Error('Frozen whole unit binding invalid')
+    return { ...unit, assessmentId: x[0], admissionHash: x[1], ...(x.length === 3 ? {trainingTiming: readTrainingTimingSnapshot(x[2])} : {}) }
   }) } as T
 }
 

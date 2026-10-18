@@ -1,0 +1,87 @@
+{
+  "kind": "local-targeted-evidence-not-ci-attestation",
+  "dateUtc": "2026-10-18",
+  "sourceHeadBeforeEvidence": "badaeeabf53cfb550d6e2fa88844b9f97541faaa",
+  "logs": [
+    {
+      "path": "c09-ui-tests.log",
+      "sha256": "284b3410dd240b65557032b1e911b9bf3d8ddd6593a9117e918eb291abccdb0b"
+    },
+    {
+      "path": "c09-checkpoint-tests.log",
+      "sha256": "0038029100235cf57c50239dce06b793847fd71910b178fb58215db03e1bab74"
+    },
+    {
+      "path": "c09-http-run04.log",
+      "sha256": "c40beb992badc900529400a6e07e64285a5d67be5a3b9462acd23b967b1ed896"
+    },
+    {
+      "path": "c09-http-run04b.log",
+      "sha256": "9783d03ac62b5a527f3e569b7e039ccac5c60c2538df37e278a97566a5e17d8c"
+    },
+    {
+      "path": "c09-report-ui.log",
+      "sha256": "6d60fb51de616edaf7b4f591966163c6ab48a830bc4c77cf4e336a33b4e157ff"
+    },
+    {
+      "path": "c09-frontend-build.log",
+      "sha256": "8227d849b0e66a84baf0e9d62ce2d550b45a4adc298920f4b3742f8c79909fe2"
+    },
+    {
+      "path": "c09-report-query-test.log",
+      "sha256": "632f698201286bedb2bd32f1c8a1c0197e249f31f9a0519b9f774c8bfaf4fbf9"
+    },
+    {
+      "path": "c09-survey-contract-tests.log",
+      "sha256": "dc46cafae988ae8e77a6c6d3fb2df309b8e271e925ac8dced7d50364583c1321"
+    },
+    {
+      "path": "c09-recovery-boundary.log",
+      "sha256": "2e7556f81bfee57aefd0cc2b2b41c887caed695c73273dc33e927f51a1f5d7d5"
+    }
+  ],
+  "limitations": [
+    "No Chromium run; C25 separate.",
+    "No C26 concurrency/CPU/RSS conclusion.",
+    "Recovery type mutation is blocked by real PostgreSQL 23514; no trigger bypass.",
+    "Targeted recovery suite deliberately filters 39 unrelated cases.",
+    "Early frontend tsc without explicit project only checked the solution file; final explicit tsconfig.app.json check passed."
+  ],
+  "results": {
+    "ordinaryHttp": {
+      "requests": 217,
+      "passed": true,
+      "artifact": "http-02.json"
+    },
+    "compactSharedHttp": {
+      "requests": 221,
+      "passed": true,
+      "artifact": "http-04.json"
+    },
+    "surveyFinal": {
+      "success": true,
+      "numTotalTests": 27,
+      "numPassedTests": 27,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "reportQuery": {
+      "files": 1,
+      "passed": 2
+    },
+    "surveyContracts": {
+      "files": 3,
+      "passed": 69
+    },
+    "reportUi": {
+      "files": 2,
+      "passed": 19
+    },
+    "recoveryBoundary": {
+      "passed": 2,
+      "filtered": 39
+    },
+    "frontendExplicitAppTypes": "passed",
+    "frontendViteBuild": "passed with existing chunk warning"
+  }
+}

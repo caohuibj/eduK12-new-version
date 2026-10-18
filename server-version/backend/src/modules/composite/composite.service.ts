@@ -2237,7 +2237,7 @@ const assertStudentEligibility = async (composite: any, userId: string) => {
   if (composite.productKind === 'QUESTIONNAIRE') {
     if (composite.questionnaireType !== 'COURSE') throw compositeForbidden('此问卷请通过公开链接访问')
     const eligible = await prisma.courseStudent.findFirst({
-      where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false,...(composite.trainingTimingPolicy?{courseType:'TRAINING_COURSE'}:{}) },
+      where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false },
         courseId: { in: (composite.questionnaireCourses ?? []).map((row: any) => row.courseId) } },
       orderBy: { courseId: 'asc' },
     })

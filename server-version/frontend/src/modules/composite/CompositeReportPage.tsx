@@ -1,3 +1,4 @@
+import { TrainingTimingReport } from './TrainingTimingReport'
 import { ReadonlyFormAnswer } from '../assessment-core/form/ReadonlyFormAnswer'
 import { isTrainingHost } from '../../training/context'
 import '../../training/training-form-surface.css'
@@ -351,7 +352,7 @@ const CompositeReportPage: React.FC = () => {
             <p className="text-amber-700">该模块结果无法解密，分数未展示。</p>
           ) : (
             <>
-              {module.type === 'SCALE' && <ScaleUnitReportCard report={module as SafeScaleUnitReport} />}
+              {module.type === 'SCALE' && <><ScaleUnitReportCard report={module as SafeScaleUnitReport} />{staffMode && module.trainingTiming && <TrainingTimingReport value={module.trainingTiming} />}</>}
               {module.type === 'COGNITIVE' && (
                 module.singleTaskReport
                   ? <CognitiveSingleTaskReportCard report={module.singleTaskReport as unknown as CognitiveSingleTaskReport} headingLevel={3} />

@@ -58,7 +58,7 @@ export function normalizeTrainingScaleTiming(snapshotRaw:unknown,knownKeys:reado
    Object.defineProperty(items,key,{value:row,enumerable:true,writable:true,configurable:true})
   }
  }
- return {schemaVersion:1,contract:snapshot.contract,snapshotHash:snapshot.snapshotHash,status:answeredKeys.every(key=>Object.prototype.hasOwnProperty.call(items,key))?'RECORDED':'MISSING',items}
+ return {schemaVersion:1,contract:snapshot.contract,snapshotHash:snapshot.snapshotHash,status:raw!==undefined&&answeredKeys.every(key=>Object.prototype.hasOwnProperty.call(items,key))?'RECORDED':'MISSING',items}
 }
 
 export const trainingTimingFactSchema=z.object({schemaVersion:z.literal(1),contract:z.literal('BROWSER_ACTIVE_SCALE_V1'),snapshotHash:hash,status:z.enum(['RECORDED','MISSING']),items:z.record(scaleTimingItemSchema)}).strict()

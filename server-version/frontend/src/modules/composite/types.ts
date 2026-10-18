@@ -330,7 +330,7 @@ export interface CompositeReport {
   backgroundValues: FormBackgroundReport[]
   packageReport?: CompositePackageReport
   unitReports: Array<
-    | SafeScaleUnitReport
+    | (SafeScaleUnitReport & { trainingTiming?: import('./TrainingTimingReport').TrainingTimingReportValue })
     | (Record<string, unknown> & {
         itemId: string
         type: 'COGNITIVE'

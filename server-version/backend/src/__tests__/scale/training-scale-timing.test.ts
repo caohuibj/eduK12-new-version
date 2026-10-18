@@ -24,6 +24,7 @@ describe('Training optional Scale browser observations',()=>{
   expect(()=>normalizeTrainingScaleTiming(null,['q'],['q'],{})).toThrow()
  })
  it('allows missing optional timing without inventing zero',()=>{
+  expect(normalizeTrainingScaleTiming(snapshot,[],[],undefined)).toMatchObject({status:'MISSING',items:{}})
   expect(normalizeTrainingScaleTiming(snapshot,['q'],['q'],undefined)).toMatchObject({status:'MISSING',items:{}})
   const result=normalizeTrainingScaleTiming(snapshot,['q'],['q'],{q:row})!
   expect(result).toMatchObject({status:'RECORDED',items:{q:row}})
