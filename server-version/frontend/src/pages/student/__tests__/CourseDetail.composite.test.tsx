@@ -188,3 +188,18 @@ it('labels an exhausted unsatisfied submission without allowing restart and reta
   await user.click(screen.getByRole('button', { name: '查看报告' }))
   expect(mockNavigate).toHaveBeenCalledWith('/student/composite/attempts/attempt-exhausted/report')
 })
+
+it('shows a conditional path label instead of exposing a future candidate count', async () => {
+  const baseGet = mockGet.getMockImplementation()!
+  mockGet.mockImplementation(async (path: string) => {
+    const response = await baseGet(path)
+    if (path === '/composite-assessments/available') response.data.list = response.data.list.slice(0, 1).map((row: object) => ({ ...row, estimatedModules: null }))
+    return response
+  })
+  const user = userEvent.setup()
+  render(<MemoryRouter initialEntries={['/student/courses/course-1']}><Routes><Route path="/student/courses/:courseId" element={<CourseDetail />} /></Routes></MemoryRouter>)
+  await screen.findByText('语文课程')
+  await user.click(screen.getByRole('button', { name: /综合测评/ }))
+  expect(await screen.findByText('按作答路径逐步呈现')).toBeInTheDocument()
+  expect(screen.queryByText(/\d+ 个模块/)).not.toBeInTheDocument()
+})

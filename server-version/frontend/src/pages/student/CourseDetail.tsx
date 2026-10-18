@@ -49,7 +49,7 @@ interface CompositeAssessment {
   name: string
   description: string | null
   instruction: string | null
-  estimatedModules: number
+  estimatedModules: number | null
   items: Array<{ type: string; label: string | null }>
   course: { id: string; title: string; courseCode: string } | null
   attempt: { id: string; status: 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED'; progress: number } | null
@@ -566,7 +566,7 @@ const CourseDetail: React.FC = () => {
                       <h3 className="text-lg font-semibold text-gray-800 mb-2">{composite.name}</h3>
                       {composite.description && <p className="text-gray-600 text-sm mb-3">{composite.description}</p>}
                       <div className="flex items-center space-x-4 text-sm text-gray-500">
-                        <span>{composite.estimatedModules} 个模块</span>
+                        <span>{composite.estimatedModules == null ? '按作答路径逐步呈现' : `${composite.estimatedModules} 个模块`}</span>
                         {attempt && <span>{attempt.status === 'COMPLETED' ? '已交卷' : `已完成 ${attempt.progress}%`}</span>}
                         {canViewReport && <span>{composite.hasSatisfiedAttempt === false ? '任务未达成（已计入次数）' : '任务已达成'}</span>}
                         {composite.hasSatisfiedAttempt && composite.latestCompletedAttempt?.taskSatisfied === false && <span>本次未达成，历史达成仍保留</span>}

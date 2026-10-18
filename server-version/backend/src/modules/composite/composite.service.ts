@@ -1,5 +1,5 @@
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { resolveTrainingFlowScope, trainingFlowMarkerState, trainingFlowProvenance } from './training-flow-scope'
+import { resolveTrainingFlowScope, trainingFlowMarkerState, trainingFlowProvenance, hasTrainingFlowDefinitionMarkers } from './training-flow-scope'
 import { buildTrainingFlowUnits } from './training-flow-definition'
 import { compileTrainingFlow, trainingFlowUnitKey, trainingFlowItemKey } from '../assessment-core/flow/training'
 import { assertTrainingFlowAuthoringScope } from '../questionnaire-product/training-flow-authoring'
@@ -2280,7 +2280,7 @@ export const listAvailableForStudent = async (userId: string, now = Date.now()) 
       description: item.description,
       instruction: item.instruction,
       deliveryMode: 'FINAL_ONLY' as const,
-      estimatedModules: units.length,
+      estimatedModules: hasTrainingFlowDefinitionMarkers(item) ? null : units.length,
       course: item.course,
       opensAt: item.opensAt,
       expiresAt: item.expiresAt,
@@ -2291,9 +2291,9 @@ export const listAvailableForStudent = async (userId: string, now = Date.now()) 
       canContinue,
       admissionPaused: Boolean(admissionPaused),
       weightedVariants: item.trainingVariantFrozen != null,
-      items: (item.trainingVariantFrozen != null || item.trainingFlowFrozen != null) ? [] : item.items.map((child: any) => ({ type: child.type, position: child.position, label: resolveCompositeItemLabel(child, getFrozenPackageSlotLabels(item)) })),
-      units: (item.trainingVariantFrozen != null || item.trainingFlowFrozen != null) ? [] : units,
-      formSections: (item.trainingVariantFrozen != null || item.trainingFlowFrozen != null) ? [] : sections,
+      items: (item.trainingVariantFrozen != null || hasTrainingFlowDefinitionMarkers(item)) ? [] : item.items.map((child: any) => ({ type: child.type, position: child.position, label: resolveCompositeItemLabel(child, getFrozenPackageSlotLabels(item)) })),
+      units: (item.trainingVariantFrozen != null || hasTrainingFlowDefinitionMarkers(item)) ? [] : units,
+      formSections: (item.trainingVariantFrozen != null || hasTrainingFlowDefinitionMarkers(item)) ? [] : sections,
       attempt: latestAttempt,
       latestCompletedAttempt: latestCompletedAttempt ? { ...latestCompletedAttempt, taskSatisfied: isTaskSatisfied(latestCompletedAttempt) } : null,
       latestSatisfiedAttempt,
@@ -3089,9 +3089,9 @@ export const getPublicCompositeInfo = async (tokenValue: string, db: Db = prisma
     attemptEpoch: 1,
     weightedVariants:current.trainingVariantFrozen!=null,
     maxAttempts:current.maxAttempts,
-    items: (current.trainingVariantFrozen!=null||current.trainingFlowFrozen!=null)?[]:current.items.map((item: any) => ({ type: item.type, position: item.position, label: resolveCompositeItemLabel(item, packageSlotLabels) })),
-    units:(current.trainingVariantFrozen!=null||current.trainingFlowFrozen!=null)?[]:units,
-    formSections: (current.trainingVariantFrozen!=null||current.trainingFlowFrozen!=null)?[]:(current.formSections ?? []).map((section: any) => ({
+    items: (current.trainingVariantFrozen!=null||hasTrainingFlowDefinitionMarkers(current))?[]:current.items.map((item: any) => ({ type: item.type, position: item.position, label: resolveCompositeItemLabel(item, packageSlotLabels) })),
+    units:(current.trainingVariantFrozen!=null||hasTrainingFlowDefinitionMarkers(current))?[]:units,
+    formSections: (current.trainingVariantFrozen!=null||hasTrainingFlowDefinitionMarkers(current))?[]:(current.formSections ?? []).map((section: any) => ({
       id: section.id,
       title: section.title,
       description: section.description ?? null,

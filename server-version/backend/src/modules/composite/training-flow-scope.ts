@@ -13,6 +13,8 @@ import { scanTrainingFlow, trainingFlowUnitKey, trainingFlowItemKey, TRAINING_FL
 import { compositeForbidden } from './composite.errors'
 
 export const TRAINING_FLOW_DEFINITION_SELECT = { trainingFlowDraft:true, trainingFlowFrozen:true, trainingFlowDigest:true } as const
+/** Public discovery never falls back to the candidate union on a partial projection. */
+export const hasTrainingFlowDefinitionMarkers=(definition:any):boolean=>Object.keys(TRAINING_FLOW_DEFINITION_SELECT).some(key=>definition?.[key]!==null)
 export const TRAINING_FLOW_PARENT_SELECT = { trainingFlowSnapshotEncrypted:true, trainingFlowSnapshotHash:true, trainingFlowPathEncrypted:true, trainingFlowPathHash:true } as const
 export function trainingFlowMarkerState(parent:any, definition:any=parent?.compositeAssessment):'LEGACY'|'FLOW'|'UNKNOWN' {
   const values=[...Object.keys(TRAINING_FLOW_PARENT_SELECT).map(k=>parent?.[k]),...Object.keys(TRAINING_FLOW_DEFINITION_SELECT).map(k=>definition?.[k])]

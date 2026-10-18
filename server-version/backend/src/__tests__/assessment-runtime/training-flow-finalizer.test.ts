@@ -7,7 +7,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock('../../config/database', () => ({ prisma: mocks.global }))
 import { compileTrainingFlow, trainingFlowUnitKey, trainingFlowItemKey } from '../../modules/assessment-core/flow/training'
 import { buildTrainingFlowUnits } from '../../modules/composite/training-flow-definition'
-import { resolveTrainingFlowScope } from '../../modules/composite/training-flow-scope'
+import { resolveTrainingFlowScope, hasTrainingFlowDefinitionMarkers } from '../../modules/composite/training-flow-scope'
 import { mapCompositeSection } from '../../modules/assessment-runtime/form-section-definition'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { createFrozenActiveSlotSet, encryptFrozenActiveSlotSet, type FrozenActiveSlotV1 } from '../../modules/assessment-runtime/slot-set'
@@ -204,4 +204,11 @@ describe('persisted path proof integrity',()=>{
     expect(proof?.terminal).toBe(false);expect(proof?.path.currentInstrumentKey).toBe(trainingFlowItemKey('sjt'))
     expect(f.parent.trainingFlowPathHash).toBe(proof?.pathHash)
   })
+})
+
+
+describe('public flow discovery markers',()=>{
+  const legacy={trainingFlowDraft:null,trainingFlowFrozen:null,trainingFlowDigest:null}
+  it('retains only the explicit all-null legacy candidate projection',()=>expect(hasTrainingFlowDefinitionMarkers(legacy)).toBe(false))
+  it.each(['trainingFlowDraft','trainingFlowFrozen','trainingFlowDigest'])('hides candidates for partial %s',key=>{expect(hasTrainingFlowDefinitionMarkers({...legacy,[key]:{}})).toBe(true);expect(hasTrainingFlowDefinitionMarkers({...legacy,[key]:undefined})).toBe(true)})
 })

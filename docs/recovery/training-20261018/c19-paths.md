@@ -56,3 +56,11 @@
 contextHash proof受影响finalizer19例通过，另追加pending current Form无快照正常与COMPLETED丢失accepted snapshot拒绝2例定向通过（原19 skipped复用）。教师partial source仅加载已完成测量facts，保留完整scope验证；未接受当前Form不要求不存在的facts，终态/已接受损坏仍严拒，真实教师HTTP场景待执行。消费者19个不同测试的2失败→14定向复验与旧5复用来源完整归档。
 
 受影响tsc重emit成功，1397 runtime输入前后SHA一致，5133 dist文件摘要已存。checkpoint04 archive包含升级公共结果/输入manifest、两次build记录和上述分项原始测试证据，不含private配置、dump、原答案或凭据。HTTP、并发、revocation、media、CSV/分析和C19新格式恢复尚未取得资格。
+
+### Checkpoint 05：中断后恢复并冻结 HTTP harness
+
+执行窗口中断后，22:07 UTC已核对 worktree 全部成果仍在、state01已停机/无监听/postmaster.pid、state02尚未创建。未重新执行合格upgrade。6个源文件增量来自实现者的public discovery窄修；7个HTTP/restore脚本和test-plan来自harness worker冻结交付，归属已核对。
+
+public list/info在任一flow标志非null或未加载时不返回候选union；flow的estimatedModules为null，前端明确显示“按作答路径逐步呈现”，不暴露候选总数或伪称执行数。遗留session实际exit0：新增marker4例通过、原21例skip；CourseDetail6例通过；backend emit/frontend app tsc成功。源文件恢复时SHA已记录，缺少这轮开始前的独立SHA文件，因此仅作为开发检查记录，不反填不可变输入资格。harness的Node24 --check/Python AST再次静态通过，尚未启动HTTP动态阶段。
+
+下一步从state01只读复制独立state02，按冻结producer依次执行main/branches/race/consumers/restore，复用upgrade。额外shared-storage开关的canonical科学身份/实际child对照、revocation未达拒绝/已达恢复及四native完整越权组合仍待补充；不要求含attemptId和随机cipher的封装hash跨attempt相等，不新增公共digest字段。
