@@ -1,0 +1,375 @@
+{
+  "passed": true,
+  "priorRuntimeEvidenceSha256": "4a79cfb50dfd933fdd16af76fe1d0a1316fe85a8612097e1646c128fa64d91d6",
+  "phase": "whole",
+  "runtimeFingerprint": {
+    "schemaVersion": 1,
+    "nodeVersion": "v24.21.0",
+    "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+    "dist": {
+      "files": 4949,
+      "sha256": "5d9f43382bb7e2353b5b03576924d100db4206cbeae43517d145202d28509f8b"
+    },
+    "files": {
+      "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+      "prisma/schema.prisma": "f4024a069e078f2d03ce09a30a89c2311d454e1de6be32282d4cd2e29aec6f6f",
+      "node_modules/.prisma/client/schema.prisma": "881fa942b6757ebf3cf0f4b1c01274b240994e46b8c242b0320e813aeb46f10b",
+      "node_modules/.prisma/client/index.js": "276cfbd992ed391456cb9d8b5e3abe32008d51aacca4d550fc8878b87b5de30c"
+    },
+    "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+  },
+  "enabledWholeSubmit": true,
+  "head": "c32678c78bbae194eb69ad9f7388deb4a6525067",
+  "harnessSha256": "57e0ef327cb0388521b8488b9f0b65e2e77c6031b3c06d8e4bbd04cbdc6564a7",
+  "http": {
+    "passed": true,
+    "requests": 46,
+    "checks": [
+      "section plus whole Scale receipt/replay and real worker report retain the same typed facts",
+      "typed export remains explicitly unavailable until C07"
+    ],
+    "observations": [
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 102,
+        "durationMs": 57
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 131,
+        "responseBytes": 318,
+        "durationMs": 105
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 102,
+        "durationMs": 2
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 131,
+        "responseBytes": 318,
+        "durationMs": 79
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 185,
+        "responseBytes": 1065,
+        "durationMs": 43
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 243,
+        "responseBytes": 2247,
+        "durationMs": 47
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 228,
+        "responseBytes": 3402,
+        "durationMs": 34
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 194,
+        "responseBytes": 4489,
+        "durationMs": 30
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 211,
+        "responseBytes": 5610,
+        "durationMs": 30
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 206,
+        "responseBytes": 6721,
+        "durationMs": 30
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 212,
+        "responseBytes": 7844,
+        "durationMs": 37
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 101,
+        "responseBytes": 8643,
+        "durationMs": 30
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 87,
+        "responseBytes": 9052,
+        "durationMs": 42
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 9052,
+        "durationMs": 20
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 14,
+        "responseBytes": 412,
+        "durationMs": 17
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 14,
+        "responseBytes": 9078,
+        "durationMs": 32
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 2,
+        "responseBytes": 11002,
+        "durationMs": 45
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 259,
+        "responseBytes": 358,
+        "durationMs": 24
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 259,
+        "responseBytes": 279,
+        "durationMs": 9
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 10942,
+        "durationMs": 11
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 14060,
+        "responseBytes": 358,
+        "durationMs": 17
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 14060,
+        "responseBytes": 279,
+        "durationMs": 9
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 10904,
+        "durationMs": 11
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 270,
+        "responseBytes": 358,
+        "durationMs": 13
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 270,
+        "responseBytes": 279,
+        "durationMs": 6
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 10917,
+        "durationMs": 10
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 265,
+        "responseBytes": 358,
+        "durationMs": 12
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 265,
+        "responseBytes": 279,
+        "durationMs": 6
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 10908,
+        "durationMs": 11
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 262,
+        "responseBytes": 358,
+        "durationMs": 14
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 262,
+        "responseBytes": 279,
+        "durationMs": 7
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 10911,
+        "durationMs": 10
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 262,
+        "responseBytes": 358,
+        "durationMs": 15
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 262,
+        "responseBytes": 279,
+        "durationMs": 7
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 10746,
+        "durationMs": 10
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 272,
+        "responseBytes": 358,
+        "durationMs": 12
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 272,
+        "responseBytes": 279,
+        "durationMs": 6
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 10956,
+        "durationMs": 14
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 921,
+        "durationMs": 10
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 391,
+        "responseBytes": 508,
+        "durationMs": 13
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 391,
+        "responseBytes": 507,
+        "durationMs": 4
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 451,
+        "durationMs": 7
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 454,
+        "durationMs": 7
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 469,
+        "durationMs": 7
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 16193,
+        "durationMs": 11
+      },
+      {
+        "method": "GET",
+        "status": 400,
+        "requestBytes": 0,
+        "responseBytes": 104,
+        "durationMs": 6
+      }
+    ],
+    "longTextCharacters": 4800
+  },
+  "cleanup": [
+    {
+      "service": "report-worker",
+      "stopped": true
+    },
+    {
+      "service": "api",
+      "stopped": true
+    },
+    {
+      "service": "redis",
+      "stopped": true
+    },
+    {
+      "service": "postgres",
+      "stopped": true
+    }
+  ]
+}

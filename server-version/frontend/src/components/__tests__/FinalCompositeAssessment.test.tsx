@@ -312,3 +312,28 @@ describe('C04 typed FINAL persistence', () => {
     expect(submit.mock.calls[1][2]).toEqual(payload)
   })
 })
+
+
+describe('C04 negative and large text draft restoration', () => {
+  it.each([
+    { type: 'NUMBER' as const, value: -1.25 },
+    { type: 'LONG_TEXT' as const, value: '中文长文本\n'.repeat(800) },
+  ])('preserves $type across local save, unmount and FINAL', async ({ type, value }) => {
+    const q = { itemKey: 'q_typed', type, prompt: '恢复题', required: true, options: [], rows: [], ...(type === 'NUMBER' ? { min: -10, max: 10, precision: 2 } : { maxLength: 10000 }) }
+    const current: CompositeCurrentItem = { ...formItem, formAnswers: [{ ...formItem.formAnswers![0], required: true, type: type.toLowerCase(), label: q.prompt, formDefinition: q, value: null }] }
+    const submit = vi.fn().mockResolvedValue({ code: 0 })
+    const props = { ...sharedProps, state: makeState(current), submitFormSection: submit, submitScale: vi.fn() }
+    const first = render(<FinalCompositeAssessment {...props} />)
+    const input = await screen.findByLabelText(q.prompt)
+    await waitFor(() => expect(input).toBeEnabled())
+    const { fireEvent } = await import('@testing-library/react')
+    fireEvent.change(input, { target: { value: String(value) } })
+    await waitFor(async () => expect((await finalDraftStore.listAnswers('composite-form-section:composite-attempt-1:composite-form-section-1'))[0].value).toEqual(value))
+    first.unmount()
+    render(<FinalCompositeAssessment {...props} />)
+    await waitFor(() => expect(screen.getByLabelText(q.prompt)).toHaveValue(value))
+    await userEvent.click(screen.getByRole('button', { name: '提交整个区段' }))
+    await waitFor(() => expect(submit).toHaveBeenCalledTimes(1))
+    expect(submit.mock.calls[0][2].answers).toEqual([{ formItemId: 'form-item-1', value }])
+  })
+})
