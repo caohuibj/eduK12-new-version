@@ -120,3 +120,11 @@ Scale source discovery不再读取可编辑definition.scores。按已授权课�
 新37例通过，原相关discovery4例首轮2通过、2因旧SJT fixture遗漏flow markers而UNKNOWN失败；只局部补参数化两个fixture的真实null，受影响2例续验通过，未改生产failclosed。build10 tsc通过且输入前后一致，input SHA `e4f48388658551a0e937c93df61ce263a9fe2f1f21994a918449c219a5057da0`，dist manifest SHA `eb62e59d6e5b673f0c68d994feadd3000187aa19aac5c2710ecbc28a696c94d7`。原失败与全部producer保留在checkpoint11归档，不将重叠例相加。
 
 新增Scale分支上限100任务、6000child/flow snapshot；一次child findMany（nested parent select的实际SQL可能多于1条）、shared slot及runtime artifact各至多一批、flow snapshots至多一批。mock调用数不冒充真实SQL/吞吐。另确认既有SJT discovery在新flow下每row未批传snapshot导致实际N+1，须在C19收口前局部合并本请求批量scope读取，不能仅推给C26。该后续修复尚未纳入当前构建/资格；state07也未运行。ON/OFF launcher现已静态WIP，五个prior SHA必填，未创建clone或服务。
+
+### Checkpoint 12：SJT flow discovery 消除逐row查询
+
+仅SJT flow discovery局部批量化：current-epoch父集合一次有界all-unit snapshot查询，逐父一次scope解析，后续每个SJT row必须通过原request-local WeakMap的身份/epoch/publication/config/context/slot/candidate/path绑定核验；并将该row完整header、cipher及completedAt与已验证batch对齐。非flow保留原逻辑、不加flow查询或宽松cache。上限6000，超限拒绝。混合Scale/SJT目前每个域各一个有界snapshot batch，均无按child/row再查；未宣称跨域去重收益或容量资格。
+
+新15例首轮在共同fixture构建时缺mandatory SJT runtimeIdentity而全部失败，原记录保留；只补真实冻结identity，不放宽生产断言。随后新15及直接受影响旧SJT2例通过，tsc通过。build12输入前后完全一致，input SHA `5eb76251114149fc00dc7c5973d95d66a8fcd1e4e01b0d331dbd801a83fd0360`，dist manifest SHA `a5539b931ebe00c0a56f9ccdab340ef95fb682cfe62dac2846e8b0e98caadcd8`。Scale字典函数和37例文件未改，其此前成功仅按原生产者和直接影响闭包复用，不标为新source整套重跑。checkpoint12归档包含失败、受影响续验及固定输入/产物摘要。
+
+analysis-only续验已独立静态核无阻断，尚待本新增源码独立审查及state07实际执行；ON/OFF/native/revocation和最终新格式restore仍未运行。

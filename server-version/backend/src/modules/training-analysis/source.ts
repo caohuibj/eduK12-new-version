@@ -12,7 +12,7 @@ import { typedCompositeFormQuestion } from '../assessment-runtime/typed-form'
 import { parseCanonicalUnitResultEnvelope, type CanonicalUnitResultEnvelopeV1 } from '../assessment-runtime/unit-result'
 import { preloadCompositeReportFacts } from '../composite/composite-report-read-batch'
 import { loadTrainingVariantExportGraph } from '../composite/training-variant-export'
-import { applyTrainingAttemptScope, resolveTrainingAttemptScope, buildTrainingVariantUnion, type TrainingAttemptScope } from '../composite/training-variant-scope'
+import { applyTrainingAttemptScope, resolveTrainingAttemptScope, assertVerifiedTrainingAttemptScope, buildTrainingVariantUnion, type TrainingAttemptScope } from '../composite/training-variant-scope'
 import { loadSituationalExportSlotSets } from '../composite/situational-canonical-export'
 import { CompositeServiceError, compositeBadRequest, compositeConflict, compositeNotFound } from '../composite/composite.errors'
 import { readScaleResult, resolveProjectionPolicyForAssessment } from '../scale/scale-workflow.service'
@@ -568,13 +568,43 @@ export async function listTrainingAnalysisSources(tx: Prisma.TransactionClient, 
     ...(auth.visibility ? {AND: [auth.visibility]} : {}),
   }}}, include: {compositeAttempt: true}, orderBy: {id: 'asc'}, take: TRAINING_ANALYSIS_SOURCE_LIMIT + 1}) : []
   if (sjtRows.length > TRAINING_ANALYSIS_SOURCE_LIMIT) throw compositeBadRequest('情境测量来源超过 6000 条，请缩小课程范围')
+  for (const row of sjtRows) if (!row.compositeAttempt || row.compositeAttemptId !== row.compositeAttempt.id) invalid('情境指标父记录绑定不一致')
   const sjtParents = [...new Map(sjtRows.map(row => [row.compositeAttempt.id, row.compositeAttempt])).values()]
   const sjtSlots = await loadSituationalExportSlotSets(sjtParents, tx), sjtMetrics = new Map<string, Array<{itemId: string; metricKey: string; label: string}>>()
+  // Flow authorization is parent-scoped, not SJT-row-scoped. Batch the complete
+  // accepted header set once; every reused scope retains its original binding.
+  const currentSjtParentIds = new Set(sjtRows.filter(row => row.attemptEpoch === row.compositeAttempt.attemptEpoch).map(row => row.compositeAttemptId))
+  const sjtFlowParents = sjtParents.filter(parent => currentSjtParentIds.has(parent.id)
+    && sjtTasks.find(task => task.id === parent.compositeAssessmentId)?.trainingFlowFrozen != null)
+  const sjtFlowSnapshots = new Map<string, any[]>(sjtFlowParents.map(parent => [parent.id, []]))
+  if (sjtFlowParents.length) {
+    const accepted = await tx.assessmentUnitSnapshot.findMany({where: {OR: sjtFlowParents.map(parent => ({compositeAttemptId: parent.id, attemptEpoch: parent.attemptEpoch}))},
+      orderBy: {id: 'asc'}, take: TRAINING_ANALYSIS_SOURCE_LIMIT + 1})
+    if (accepted.length > TRAINING_ANALYSIS_SOURCE_LIMIT) throw compositeBadRequest('情境流程来源超过 6000 条，请缩小课程范围')
+    const epochs = new Map(sjtFlowParents.map(parent => [parent.id, parent.attemptEpoch]))
+    for (const row of accepted) {
+      if (!row.compositeAttemptId || epochs.get(row.compositeAttemptId) !== row.attemptEpoch) invalid('情境流程快照不在发现范围')
+      sjtFlowSnapshots.get(row.compositeAttemptId)!.push(row)
+    }
+  }
+  const sjtFlowScopes = new Map<string, TrainingAttemptScope>()
   for (const row of sjtRows) {
     const parent = row.compositeAttempt, task = sjtTasks.find(task => task.id === parent.compositeAssessmentId)
     if (!task || parent.deliveryCourseId !== courseId) invalid('情境指标发现来源不一致')
     if (row.attemptEpoch !== parent.attemptEpoch) continue
-    const scope = await resolveTrainingAttemptScope(parent, task, {db: tx, frozenSlotSets: sjtSlots})
+    let scope = sjtFlowScopes.get(parent.id)
+    if (scope) assertVerifiedTrainingAttemptScope(parent, task, scope)
+    else {
+      scope = await resolveTrainingAttemptScope(parent, task, {db: tx, frozenSlotSets: sjtSlots, flowSnapshots: sjtFlowSnapshots})
+      if (scope.flow) sjtFlowScopes.set(parent.id, scope)
+    }
+    if (scope.flow) {
+      const accepted = scope.flow.snapshots.find(snapshot => snapshot.slotKey === row.slotKey)
+      const headerFields = ['id', 'compositeAttemptId', 'attemptEpoch', 'slotKey', 'unitType', 'terminalState', 'payloadKind',
+        'sourceType', 'sourceAttemptId', 'sourceSubmissionId', 'sourceDefinitionHash', 'compiledRuntimeHash', 'canonicalResultEncrypted', 'collectionFactsEncrypted']
+      if (!accepted || headerFields.some(key => (accepted[key] ?? null) !== (row[key] ?? null))
+        || iso(accepted.completedAt) !== iso(row.completedAt)) invalid('情境指标与流程已接受来源不一致')
+    }
     const item = scope.items.find(item => item.type === 'SITUATIONAL' && compositeItemSlotKey(item.id, item.type) === row.slotKey)
     if (!item) invalid('情境指标不在已分配范围')
     const envelope = acceptedEnvelope(parent, item, [row], sjtSlots.get(parent.id)!)
