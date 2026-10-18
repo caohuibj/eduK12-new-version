@@ -6,6 +6,7 @@ vi.mock('../../config/database', () => ({ prisma: { $transaction: mocks.transact
 vi.mock('../../config/queue', () => ({ exportQueue: { getJob: vi.fn().mockResolvedValue(null), add: mocks.add } }))
 import { enqueueExportJob, formatsForRequest, exportArtifactUrl } from '../../services/exportJobService'
 import { courseId, actor, exportOptions } from './export-fixtures'
+import { trainingManifestHash } from '../../modules/training-analysis/manifest'
 
 const request = () => ({ resourceType: 'TRAINING_ANALYSIS' as const, resourceId: courseId,
   createdBy: actor.id, anonymized: true, format: 'zip', recordCount: 2, requestKey: randomUUID(),
@@ -31,6 +32,24 @@ describe('Training analysis durable original ExportBatch intent', () => {
     expect(mocks.add).toHaveBeenCalledWith({ batchId: result.batchId }, { jobId: `export-${result.batchId}` })
     expect(result.artifacts[0].downloadUrl).toBe(`/api/courses/${courseId}/training-analysis/export/artifacts/${artifacts[0].id}`)
     expect(JSON.stringify(result)).not.toContain('sourceHashes')
+  })
+  it('preserves an authenticated historical non-UUID creator without identity normalization', async () => {
+    const input = request(); input.createdBy = 'legacy-authenticated-teacher'
+    const {manifestHash: _old, ...unsigned} = input.options.trainingAnalysis.manifest
+    unsigned.actor = {...unsigned.actor, id: input.createdBy}
+    input.options.trainingAnalysis.manifest = {...unsigned, manifestHash: trainingManifestHash(unsigned)}
+    await enqueueExportJob(input)
+    expect(batches[0].createdBy).toBe(input.createdBy)
+    expect(artifacts[0].provenance.trainingAnalysis.manifest.actor.id).toBe(input.createdBy)
+    await expect(enqueueExportJob({...input, requestKey:randomUUID(), createdBy:' '+input.createdBy})).rejects.toThrow('Training export identity changed')
+  })
+  it.each(['', 'x'.repeat(201)])('rejects an empty or oversized internal creator identity before persistence', async id => {
+    const input = request(); input.createdBy = id
+    const {manifestHash: _old, ...unsigned} = input.options.trainingAnalysis.manifest
+    unsigned.actor = {...unsigned.actor, id}
+    input.options.trainingAnalysis.manifest = {...unsigned, manifestHash: trainingManifestHash(unsigned)}
+    await expect(enqueueExportJob(input)).rejects.toThrow()
+    expect(mocks.transaction).not.toHaveBeenCalled()
   })
   it('replays identical intent without recreating files and rejects reusing its key for changed table', async () => {
     const input = request(), first = await enqueueExportJob(input), replay = await enqueueExportJob(input)

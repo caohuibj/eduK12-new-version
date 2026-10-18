@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "phase": "ADDITIONAL_HTTP_BOUNDARIES_PASSED_EXPORT_PENDING",
+  "acceptedRuntimeSource": "92b14b2f0830e10bcd3453cb698eb96e18478a24",
+  "change": "Internal manifest actor.id follows bounded nonempty actual User.id; no trim/normalization, exact authenticated creator comparison retained. Resource IDs remain UUID.",
+  "targetedTests": 3,
+  "limits": [
+    "HTTP04 first export registration failed schema validation; no export jobs created.",
+    "Statistics/source/SQL logic unchanged; passed HTTP03 and HTTP04 phases retained.",
+    "Queue/CAS/quality stale artifacts/nonempty restore still pending."
+  ],
+  "files": [
+    {
+      "file": "c16-backend-tsc-legacy-actor.log",
+      "bytes": 155,
+      "sha256": "d603d8b4d24d9d077653bf4cbb12610f8f90c2f719b49acdb6e4c25d1cf7b349"
+    },
+    {
+      "file": "c16-export-legacy-actor.log",
+      "bytes": 270,
+      "sha256": "9378b15ae482770fac07f812711c8ecc0786e4a5a2e36eb954a6604aa3b9c82b"
+    },
+    {
+      "file": "c16-http04-summary.json",
+      "bytes": 5609,
+      "sha256": "9dc4874a5438d2b2593bd4a04597770f7d7c4a8e46d6206164a93ae8c64b0e4a"
+    }
+  ]
+}

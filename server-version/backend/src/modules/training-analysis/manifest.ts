@@ -56,7 +56,8 @@ const dictionaryColumn = z.object({
 }).strict()
 export const trainingAnalysisManifestSchema = z.object({
   schemaVersion: z.literal(1), kind: z.literal('TRAINING_ANALYSIS'),
-  courseId: z.string().uuid(), actor: z.object({id:z.string().uuid(),role:z.enum(['ADMIN','TEACHER'])}).strict(),
+  // User.id includes authenticated historical identifiers; preserve bytes exactly.
+  courseId: z.string().uuid(), actor: z.object({id:key,role:z.enum(['ADMIN','TEACHER'])}).strict(),
   selector: trainingAnalysisSelectorSchema,
   definitionHash: hash, sourceHash: hash, authorityHash: hash, qualityHash: hash,
   sourceCutoff: z.string().datetime(), manifestHash: hash,

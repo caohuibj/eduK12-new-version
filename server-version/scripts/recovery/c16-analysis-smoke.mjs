@@ -19,6 +19,7 @@ const {closeQueues,exportQueue}=require(path.join(backend,'dist/config/queue.js'
 const {runExportBatch}=require(path.join(backend,'dist/workers/exportBatchTask.js'))
 const {loadTrainingAnalysisSources}=require(path.join(backend,'dist/modules/training-analysis/source.js'))
 const {analyzeTrainingCourse}=require(path.join(backend,'dist/modules/training-analysis/service.js'))
+const {trainingManifestSummary}=require(path.join(backend,'dist/modules/training-analysis/manifest.js'))
 const {decryptUnifiedRuntimePayload}=require(path.join(backend,'dist/modules/assessment-runtime/security.js'))
 const {loadStoredCanonicalUnitResult}=require(path.join(backend,'dist/modules/assessment-runtime/compact-assessment-storage.js'))
 const state=process.argv[2],status=JSON.parse(fs.readFileSync(path.join(state,'status.json'))),credentials=JSON.parse(fs.readFileSync(path.join(state,'fixture-private.json')))
@@ -91,18 +92,27 @@ let fixture,otherId
 try{
  await teacher.login(credentials.teacher);const owner=await prisma.user.findUniqueOrThrow({where:{username:credentials.teacher.username}}),password=await prisma.user.findUniqueOrThrow({where:{username:credentials.student.username}})
  const continuationPath=path.join(state,'c16-continuation.json'),continuation=fs.existsSync(continuationPath)?JSON.parse(fs.readFileSync(continuationPath)):null
- let current
+ let current,allQuality
  if(continuation){
-  assert.equal(continuation.stage,'AFTER_NUMERICAL_SQL_AUTHORITY');assert.equal(continuation.reusedChecks.length,3)
+  assert.ok(['AFTER_NUMERICAL_SQL_AUTHORITY','AFTER_QUALITY_LIST'].includes(continuation.stage));assert.equal(continuation.reusedChecks.length,3)
   fixture=JSON.parse(fs.readFileSync(path.join(state,'prior-c16-fixture-private.json')));assert.equal(fixture.participants.length,50)
   const share=await prisma.courseShare.findFirstOrThrow({where:{courseId:fixture.courseId,sharedBy:owner.id}}),otherAccount=await prisma.user.findUniqueOrThrow({where:{id:share.sharedTo}});otherId=otherAccount.id
   await other.login({username:otherAccount.username,password:credentials.student.password});await student.login(credentials.student,'STUDENT')
-  result.reusedEvidence=continuation;current=await analyze(fixture)
+  result.reusedEvidence=continuation
+  if(continuation.stage==='AFTER_QUALITY_LIST'){
+   // Refresh the frozen intent and review-row context once; do not replay the
+   // previously accepted HTTP pagination, membership or SQL measurements.
+   const context=await analyzeTrainingCourse({actor:{id:owner.id,role:'TEACHER'},courseId:fixture.courseId,selector:fixture.selector})
+   current={manifest:trainingManifestSummary(context.manifest),analysis:context.analysis};allQuality=context.quality
+   result.continuationContext={sourceHash:context.manifest.sourceHash,sourceCount:context.manifest.sources.length,qualityRows:context.quality.length}
+  }else{
+  current=await analyze(fixture)
   sqlFamilyTrace={scope:'SUPPLEMENTAL_SAME_50_SOURCE_QUERY_FAMILIES_NOT_COLD_HOT_OR_NUMERIC_REQUALIFICATION',sqlEvents:0,sqlDurationMs:0,families:{},tableMentions:{}}
   const groupStart=performance.now(),grouped=await analyzeTrainingCourse({actor:{id:owner.id,role:'TEACHER'},courseId:fixture.courseId,selector:fixture.selector}),groupTrace=sqlFamilyTrace;sqlFamilyTrace=null
   assert.equal(grouped.manifest.sourceHash,current.manifest.sourceHash);assert.equal(grouped.manifest.sources.length,100);assert.equal(grouped.manifest.observationCount,400);assert.equal(groupTrace.tableMentions.course_students??0,0)
   result.sqlQueryFamilies={...groupTrace,elapsedMs:performance.now()-groupStart,sourceHash:grouped.manifest.sourceHash,sourceCount:100,observationCount:400,parametersRecorded:false,rawSqlRecorded:false}
   console.log('PASS supplemental same50 source-bound SQL family observer',JSON.stringify(result.sqlQueryFamilies))
+  }
   fs.writeFileSync(path.join(state,'c16-fixture-private.json'),JSON.stringify(fixture),{mode:0o600})
  }else{
  const otherAccount=await prisma.user.create({data:{username:'c16-other-'+randomUUID(),passwordHash:password.passwordHash,role:'TEACHER',accountDomain:'TRAINING',teacherApproved:true,mustChangePassword:false}});otherId=otherAccount.id
@@ -123,11 +133,13 @@ try{
  await prisma.courseShare.create({data:{courseId:fixture.courseId,sharedBy:owner.id,sharedTo:otherId}});await other.request(root(fixture),'POST',{selector:fixture.selector},deny)
  check('Owner discovers/analyzes current Training course; nonowner, student and CourseShare-only teacher denied')
  }
+ if(continuation?.stage!=='AFTER_QUALITY_LIST'){
  const alias=structuredClone(fixture.selector);alias.waves[1]={...alias.waves[0],waveKey:'alias'};await teacher.request(root(fixture),'POST',{selector:alias},409)
  const full=await teacher.request(root(fixture),'POST',{selector:{...fixture.selector,mode:'FULL_CASE'}});golden(full.analysis,50,fixture);assert.equal(full.analysis.metrics[0].countKind,'COMPLETE_CASE')
  check('Same publication alias rejected 409; full-case mode retains the same explicitly matched 50 participants')
  const departed=fixture.participants[0];assert.equal((await prisma.courseStudent.deleteMany({where:{courseId:fixture.courseId,studentId:departed.id}})).count,1);const afterDeparture=await analyze(fixture);golden(afterDeparture.analysis,50,fixture);assert.equal(afterDeparture.manifest.sourceHash,current.manifest.sourceHash);assert.equal(afterDeparture.manifest.qualityHash,current.manifest.qualityHash);assert.equal(afterDeparture.manifest.sourceCount,100);check('Removing one synthetic current enrollment retains all50 historical participants and100 frozen sources; SQL diagnostics show zero CourseStudent reads')
- const allQuality=await qualityRows(fixture,current);assert.equal(allQuality.length,100);check('Bounded quality list paginates 25 rows with exact 100-source manifest binding')
+ allQuality=await qualityRows(fixture,current);assert.equal(allQuality.length,100);check('Bounded quality list paginates 25 rows with exact 100-source manifest binding')
+ }
  const long=await exportReady(fixture,current),wide=await exportReady(fixture,current,'wide'),dict=await exportReady(fixture,current,'dictionary'),zip=await exportReady(fixture,current,'long','zip')
  const L=parseCsv(long.bytes),W=parseCsv(wide.bytes),D=parseCsv(dict.bytes),Z=unzip(zip.bytes);assert.equal(L.rows.length,400);assert.equal(W.rows.length,50);assert.equal(D.rows.length,8)
  for(const row of L.rows){const expected=fixture.attempts.find(attempt=>attempt.id===row.attemptId);assert.ok(expected);assert.equal(Number(row.value),expected.metrics[row.metricKey]);assert.equal(row.reason,'');assert.equal(row.originalFinalStatus,'COMPLETED');assert.equal(row.taskSatisfied,'true')}
