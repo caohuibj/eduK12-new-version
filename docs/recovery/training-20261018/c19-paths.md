@@ -64,3 +64,11 @@ contextHash proof受影响finalizer19例通过，另追加pending current Form�
 public list/info在任一flow标志非null或未加载时不返回候选union；flow的estimatedModules为null，前端明确显示“按作答路径逐步呈现”，不暴露候选总数或伪称执行数。遗留session实际exit0：新增marker4例通过、原21例skip；CourseDetail6例通过；backend emit/frontend app tsc成功。源文件恢复时SHA已记录，缺少这轮开始前的独立SHA文件，因此仅作为开发检查记录，不反填不可变输入资格。harness的Node24 --check/Python AST再次静态通过，尚未启动HTTP动态阶段。
 
 下一步从state01只读复制独立state02，按冻结producer依次执行main/branches/race/consumers/restore，复用upgrade。额外shared-storage开关的canonical科学身份/实际child对照、revocation未达拒绝/已达恢复及四native完整越权组合仍待补充；不要求含attemptId和随机cipher的封装hash跨attempt相等，不新增公共digest字段。
+
+### Checkpoint 06：state02真实失败与精确续验（未运行）
+
+state02按641ee904冻结输入运行，成功复用upgrade。main完成合成资源准备/独立ADMIN review+grant且没有parent/native/facts/job，合法流程保存却400。原因是harness将教师section.items（没有native `type`属性）传入unitKey，误生成item_而非section_，业务compiler正确拒绝。只修formRows显式FORM，生产后端不改。新增纯回归执行真实fixture声明并调用原生产compiler，三题型条件编译通过。
+
+失败state02已停止，cleanup/source/priorSource/inputs全部true；main-result SHA `84d3f4d212a02e0227c9eba5c65dfa1993193b541051139a61227b2ded2a9841`，runtime-result SHA `1388c8fef6d03254672507d1e31277c719ebbb846ea0f1aec44e384549053901`，frozen-inputs SHA `24b59af02808494ba52a840ced4c75333d81f09c012e1c2804789b49ad7567a5`。原失败档案保留，不覆盖、不重跑seed或已完成negative probes。
+
+新c19-flow-continue.py及main-continuation只允许固定state02失败生产者，逐文件物理克隆精确校验、原4054行/guard校验，新增完整pre-continuation DB快照；查明恰一个六item DRAFT且无attempt后，从修正后的合法发布继续。未接受任何FINAL，不存在重新计分。原升级producer不变。尚未执行：free8.738GiB，复制约0.424GiB与512MiB保留后7.815GiB低于8GiB停线，已向root报告，未创建state03、未删任何DB/证据。

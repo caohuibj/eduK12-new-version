@@ -10,7 +10,7 @@ import {deflateSync} from 'node:zlib'
 import {prisma,backend,require,products,normalizeProduct} from './c19-flow-client.mjs'
 const {trainingFlowUnitKey,trainingFlowItemKey}=require(path.join(backend,'dist/modules/assessment-core/flow/training.js'))
 export const unitKey=item=>item.type==='FORM'?trainingFlowUnitKey(item.formSectionId):trainingFlowItemKey(item.id)
-export const formRows=product=>product.formSections.flatMap(section=>section.items.map(item=>({...item,formSectionId:section.id})))
+export const formRows=product=>product.formSections.flatMap(section=>section.items.map(item=>({...item,type:'FORM',formSectionId:section.id})))
 export const expiry=()=>new Date(Date.now()+3600000).toISOString()
 export const condition=(item,op,value)=>({op,field:{source:'ANSWER',instrumentKey:unitKey(item),itemKey:item.formDefinition.itemKey},...(value===undefined?{}:{value})})
 export function form(label,type='SINGLE',required=true){const options=(label==='route'?['full','screen','early']:['yes','no']).map(optionKey=>({optionKey,label:optionKey}));return {type:'FORM',formType:{SINGLE:'single_choice',MULTIPLE:'multiple_choice',LIKERT:'likert'}[type],formLabel:label,required,formOptions:options.map(option=>({value:option.optionKey,label:option.label})),formPolicy:{version:3,requiredRefusal:'ALLOW_SUBMIT',hiddenRequired:'EXEMPT'},formDefinition:{type,prompt:label,required,options,rows:[],allowRefusal:true}}}
