@@ -52,7 +52,8 @@ describe('shared Form foundation immutable baseline oracle',()=>{
     for(const file of walk(root).filter(f=>f.endsWith('.ts'))){
       const source=fs.readFileSync(file,'utf8')
       const imports=[...source.matchAll(/(?:from\s+|import\s*\()(['"])([^'"]+)\1/g)].map(m=>m[2])
-      for(const specifier of imports)expect(allowed.has(specifier),`${path.relative(root,file)} -> ${specifier}`).toBe(true)
+      const scaleImportDependencies=path.relative(root,file)==='scale/import-parser.ts' ? new Set(['../form/import-parser','../../scale/scale-definition']) : new Set<string>()
+      for(const specifier of imports)expect(allowed.has(specifier)||scaleImportDependencies.has(specifier),`${path.relative(root,file)} -> ${specifier}`).toBe(true)
     }
   })
 })

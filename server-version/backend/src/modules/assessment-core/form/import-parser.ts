@@ -45,7 +45,7 @@ export const parseText=(input:string):{rows:ImportRow[];issues:ImportIssue[]}=>{
   return {rows,issues}
 }
 /** Quoted CSV, including embedded commas/newlines and doubled quote escaping. */
-const parseCsvRows=(content:string):Array<{cells:string[];sourceLine:number}>=>{
+export const parseCsvRows=(content:string):Array<{cells:string[];sourceLine:number}>=>{
   const rows:Array<{cells:string[];sourceLine:number}>=[]
   let line:string[]=[],field='',quoted=false
   let currentLine=1,rowLine=1
