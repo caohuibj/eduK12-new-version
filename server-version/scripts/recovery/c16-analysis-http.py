@@ -74,19 +74,28 @@ def main():
         assert resumed_result['passed'] is False and all(resumed_result[key] is True for key in ['cleanupVerified', 'sourceUnchanged', 'inputsUnchanged'])
         assert resumed_result['phases']['upgrade']['passed'] is True and resumed_http['passed'] is False
         if continuation:
-            assert len(resumed_http['checks']) == 3 and resumed_http['exports'] == []
+            assert len(resumed_http['checks']) in [1, 3]
             if resumed_http['checks'][0].startswith('Real HTTP two-wave 10/20/50 synthetic four-tool numeric facts'):
+                assert resumed_http['exports'] == []
                 assert resumed_http['checks'][1].startswith('Actual PostgreSQL SQL-event counts remain batch-bounded')
                 assert resumed_http['checks'][2].startswith('Owner discovers/analyzes current Training course')
                 assert resumed_http['requests'][-1]['status'] == 500
                 continuation_stage = 'AFTER_NUMERICAL_SQL_AUTHORITY'
-            else:
+            elif resumed_http['checks'][0].startswith('Same publication alias'):
+                assert resumed_http['exports'] == []
                 assert resumed_http['checks'][0].startswith('Same publication alias rejected 409')
                 assert resumed_http['checks'][1].startswith('Removing one synthetic current enrollment retains all50')
                 assert resumed_http['checks'][2].startswith('Bounded quality list paginates 25 rows')
                 assert resumed_http['requests'][-1]['status'] == 400
                 assert resumed_http['reusedEvidence']['stage'] == 'AFTER_NUMERICAL_SQL_AUTHORITY'
                 continuation_stage = 'AFTER_QUALITY_LIST'
+            else:
+                assert len(resumed_http['checks']) == 1 and len(resumed_http['exports']) == 4
+                assert resumed_http['checks'][0].startswith('Original Redis queue + dist export consumer')
+                assert resumed_http['qualityRace']['actualPgWaiters'] == 2
+                assert sorted(row['status'] for row in resumed_http['requests'][-2:]) == [200, 409]
+                assert resumed_http['reusedEvidence']['stage'] == 'AFTER_QUALITY_LIST'
+                continuation_stage = 'AFTER_EXPORT_CAS'
             assert resumed_result.get('resumeSourceUnchanged', True) is True
         else:
             assert resumed_http['checks'] == []
@@ -220,7 +229,7 @@ def main():
             if continuation:
                 for name in ['c16-fixture-private.json', 'c16-http-result.json']:
                     shutil.copyfile(resume / name, state / ('prior-' + name))
-                evidence = {'stage': continuation_stage, 'priorHead': resumed_result['head'], 'priorRuntimeResultSha256': sha_file(resume / 'c16-runtime-result.json'), 'priorHttpResultSha256': sha_file(resume / 'c16-http-result.json'), 'priorSourceInputsSha256': resumed_result['sourceInputsSha256'], 'reusedChecks': resumed_http['checks'], 'reusedMeasurements': resumed_http['measurements'], 'priorReusedEvidence': resumed_http.get('reusedEvidence'), 'reusedSqlQueryFamilies': resumed_http.get('sqlQueryFamilies')}
+                evidence = {'stage': continuation_stage, 'priorHead': resumed_result['head'], 'priorRuntimeResultSha256': sha_file(resume / 'c16-runtime-result.json'), 'priorHttpResultSha256': sha_file(resume / 'c16-http-result.json'), 'priorSourceInputsSha256': resumed_result['sourceInputsSha256'], 'reusedChecks': resumed_http['checks'], 'reusedMeasurements': resumed_http['measurements'], 'priorReusedEvidence': resumed_http.get('reusedEvidence'), 'reusedSqlQueryFamilies': resumed_http.get('sqlQueryFamilies'), 'reusedExports': resumed_http['exports'], 'reusedQualityRace': resumed_http.get('qualityRace')}
                 (state / 'c16-continuation.json').write_text(json.dumps(evidence, indent=2))
                 result['reusedHttp'] = evidence
         copy_source = resume or source

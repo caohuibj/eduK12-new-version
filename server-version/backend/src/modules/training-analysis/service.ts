@@ -110,6 +110,9 @@ export async function setTrainingAnalysisQuality(input:{actor:TrainingAnalysisAc
       if(changed.count!==1) fail(409,'TRAINING_ANALYSIS_QUALITY_CONFLICT','复核发生并发变化')
     }else await tx.trainingAnalysisQuality.create({data:{id,...where,...data}})
     await tx.trainingAnalysisQualityAudit.create({data:{id:randomUUID(),reviewId:id,...where,...data,previousVerdict:old?.verdict??'INCLUDE'}})
+    // Surface this deferred integrity check while the transaction callback is
+    // still awaited: some Prisma engines log a failed COMMIT but resolve it.
+    await tx.$executeRaw`SET CONSTRAINTS training_analysis_quality_requires_audit IMMEDIATE`
     return {...where,...data}
   },{isolationLevel:Prisma.TransactionIsolationLevel.Serializable}).catch((error:unknown)=>{
     // PostgreSQL may detect the losing CAS at the serialization/unique fence.
