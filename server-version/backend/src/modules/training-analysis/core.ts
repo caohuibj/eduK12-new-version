@@ -80,7 +80,7 @@ const prepare = (request: TrainingAnalysisRequestV1, source: TrainingAnalysisSou
     if (!wave || waveScope(wave) !== waveScope(original)
       || !wave.metrics.some((metric) => metric.metricKey === original.metricKey && metric.itemId === original.itemId)) fail('Observation lies outside the exact selected publication/configuration/variant')
     if (!nonempty(original.participantKey) || !['USER', 'STUDY_LOCAL'].includes(original.participantKind)) fail('Stable authorized participant identity is required')
-    if (original.reason !== null && !TRAINING_ANALYSIS_REASONS.includes(original.reason)) fail('Unknown missingness reason')
+    if (original.reason !== null && ![...TRAINING_ANALYSIS_REASONS,'RESEARCH_CONSENT_UNKNOWN','RESEARCH_WITHDRAWAL_PENDING','RESEARCH_EXCLUDED','RESEARCH_SCOPE_NOT_COVERED'].includes(original.reason)) fail('Unknown missingness reason')
     if (original.reason === 'NO_OBSERVATION') fail('An export-only absent cell cannot enter the observed source population')
     if (!(original.attemptId === null || nonempty(original.attemptId)) || !(original.attemptEpoch === null
       || (Number.isSafeInteger(original.attemptEpoch) && original.attemptEpoch >= 0))) fail('Invalid source attempt identity')
@@ -129,7 +129,7 @@ const prepare = (request: TrainingAnalysisRequestV1, source: TrainingAnalysisSou
       waveKey: wave.waveKey, taskId: wave.taskId, publication: wave.publication,
       configDigest: wave.configDigest, variantKey: wave.variantKey, ...metric,
       measurement: identities.get(groupKey(wave.waveKey, metric.metricKey))!, valueType: 'NUMBER' as const,
-      missingReasons: [...TRAINING_ANALYSIS_REASONS],
+      missingReasons: [...TRAINING_ANALYSIS_REASONS,...(source.observations.some(row=>row.participantKind==='STUDY_LOCAL')?['RESEARCH_CONSENT_UNKNOWN','RESEARCH_WITHDRAWAL_PENDING','RESEARCH_EXCLUDED','RESEARCH_SCOPE_NOT_COVERED'] as TrainingObservationReason[]:[])],
     }))
   ))
   // Wide exports include value, reason, attempt, epoch, immutable hashes and FINAL status

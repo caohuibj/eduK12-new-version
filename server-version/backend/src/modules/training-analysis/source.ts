@@ -32,7 +32,12 @@ export interface TrainingAnalysisSourceManifestV1 {
   authoritySnapshot: unknown
   exclusions: {IDENTITY_UNAVAILABLE: number}
 }
+export interface TrainingResearchGovernance {
+  attemptId:string;taskId:string;attemptEpoch:number;studyId:string;participantId:string|null;acceptanceId:string|null;
+  acceptedVersionId:string|null;bodyHash:string|null;scopeHash:string|null;dataCategories:string[]|null;status:string|null;revision:number;
+}
 export interface LoadedTrainingAnalysisSources {
+  researchGovernance: TrainingResearchGovernance[];
   source: TrainingAnalysisSourceV1; manifest: TrainingAnalysisSourceManifestV1
   authorityHash: string; sourceFingerprint: string; dictionary: TrainingAnalysisSourceManifestV1['dictionary']
 }
@@ -99,23 +104,29 @@ async function participantIdentities(tx: Prisma.TransactionClient, actor: Traini
     if (userId) ids.set(attempt.id, {participantKey: `user:${userId}`, participantKind: 'USER'})
   }
   const anonymous = attempts.filter(attempt => !attempt.userId && !attempt.assignmentRef)
-  if (!anonymous.length) return ids
+  if (!anonymous.length) return {ids,researchGovernance:[] as TrainingResearchGovernance[]}
   const anonymousIds = new Set(anonymous.map(row => row.id))
-  const links = await tx.$queryRaw<Array<{attemptId: string; studyId: string; participantId: string}>>`
-    SELECT a.id AS "attemptId",p.study_id AS "studyId",p.id AS "participantId"
-    FROM anonymous_study_attempts sa JOIN anonymous_study_participants p ON p.id=sa.participant_id AND p.study_id=sa.study_id
-    JOIN anonymous_studies s ON s.id=p.study_id JOIN anonymous_study_waves w ON w.id=sa.wave_id AND w.study_id=s.id
-    JOIN composite_assessment_attempts a ON a.id=sa.attempt_id AND a.access_token_id=w.access_token_id
+  const links = await tx.$queryRaw<TrainingResearchGovernance[]>`
+    SELECT a.id AS "attemptId",a.composite_assessment_id AS "taskId",a.attempt_epoch AS "attemptEpoch",s.id AS "studyId",p.id AS "participantId",
+      r.acceptance_id AS "acceptanceId",ac.version_id AS "acceptedVersionId",ac.body_hash AS "bodyHash",cv.scope_hash AS "scopeHash",cv.scope->'dataCategories' AS "dataCategories",r.status,COALESCE(r.revision,0) AS revision
+    FROM composite_assessment_attempts a
+    JOIN anonymous_study_waves w ON w.access_token_id=a.access_token_id
+    JOIN anonymous_studies s ON s.id=w.study_id
     JOIN composite_assessment_access_tokens t ON t.id=w.access_token_id AND t.composite_assessment_id=a.composite_assessment_id
     JOIN composite_assessments c ON c.id=a.composite_assessment_id
+    LEFT JOIN anonymous_study_attempts sa ON sa.attempt_id=a.id AND sa.study_id=s.id AND sa.wave_id=w.id
+    LEFT JOIN anonymous_study_participants p ON p.id=sa.participant_id AND p.study_id=s.id
+    LEFT JOIN anonymous_study_research_states r ON r.participant_id=p.id AND r.study_id=s.id
+    LEFT JOIN anonymous_study_consent_acceptances ac ON ac.id=r.acceptance_id AND ac.participant_id=p.id AND ac.study_id=s.id
+    LEFT JOIN anonymous_study_consent_versions cv ON cv.id=ac.version_id AND cv.study_id=s.id
     WHERE a.id IN (${Prisma.join(anonymous.map(row => row.id))}) AND a.user_id IS NULL AND a.assignment_ref IS NULL
       AND c.created_by=s.owner_user_id AND t.created_by=s.owner_user_id
       AND (${actor.role === UserRole.ADMIN} OR s.owner_user_id=${actor.userId})`
   for (const link of links) {
     if (!anonymousIds.has(link.attemptId) || ids.has(link.attemptId)) invalid('研究内身份绑定不一致')
-    ids.set(link.attemptId, {participantKey: `study:${link.studyId}:${link.participantId}`, participantKind: 'STUDY_LOCAL'})
+    if(link.participantId) ids.set(link.attemptId, {participantKey: `study:${link.studyId}:${link.participantId}`, participantKind: 'STUDY_LOCAL'})
   }
-  return ids
+  return {ids,researchGovernance:links.sort((a,b)=>a.attemptId.localeCompare(b.attemptId))}
 }
 
 function acceptedEnvelope(attempt: any, item: any, snapshots: any[], slots: FrozenActiveSlotSetV1, canonicalByCipher?: ReadonlyMap<string, CanonicalUnitResultEnvelopeV1>): CanonicalUnitResultEnvelopeV1 | null {
@@ -169,7 +180,7 @@ function cognitivePermission(item: any, key: string, actor: TrainingAnalysisActo
  * including shared plans/templates/facts, uses that exact client. No current
  * CourseStudent join is used: departed students keep their historical records. */
 export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, actor: TrainingAnalysisActor, selector: TrainingAnalysisRequestV1,
-  options: {fixedManifest?: {attempts: TrainingAnalysisManifestAttemptV1[]}; sourceCutoff?: string} = {}): Promise<LoadedTrainingAnalysisSources> {
+  options: {fixedManifest?: {attempts: TrainingAnalysisManifestAttemptV1[];researchSources?:Array<{taskId:string;attemptId:string;attemptEpoch:number}>}; sourceCutoff?: string} = {}): Promise<LoadedTrainingAnalysisSources> {
   const cutoff = options.sourceCutoff ? new Date(options.sourceCutoff) : null
   if (cutoff && !Number.isFinite(cutoff.getTime())) throw compositeBadRequest('来源截止时间无效')
   const auth = await authority(tx, actor, selector.courseId)
@@ -188,7 +199,7 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
     taskAuthority.push({id: task.id, createdBy: task.createdBy, productKind: task.productKind})
     const filters: Prisma.CompositeAssessmentAttemptWhereInput[] = [
       ...(auth.visibility ? [auth.visibility] : []),
-      ...(fixed ? [{OR: fixed.filter(row => row.waveKey === wave.waveKey).map(row => ({id: row.attemptId, attemptEpoch: row.attemptEpoch}))}] : []),
+      ...(fixed ? [{OR: [...fixed.filter(row => row.waveKey === wave.waveKey),...(options.fixedManifest?.researchSources??[]).filter(row=>row.taskId===wave.taskId)].map(row => ({id: row.attemptId, attemptEpoch: row.attemptEpoch}))}] : []),
       ...(cutoff ? [{startedAt: {lte: cutoff}}, {OR: [{completedAt: null}, {completedAt: {lte: cutoff}}]}] : []),
     ]
     const where = {compositeAssessmentId: task.id, deliveryCourseId: selector.courseId, ...(filters.length ? {AND: filters} : {})}
@@ -219,7 +230,7 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
     if (governed.length) unavailable()
   }
   if (entries.reduce((count, entry) => count + entry.wave.metrics.length, 0) > 50000) throw compositeBadRequest('数值观测超过 50000 条，请缩小指标范围')
-  const identities = await participantIdentities(tx, actor, entries.map(entry => entry.attempt))
+  const {ids:identities,researchGovernance} = await participantIdentities(tx, actor, entries.map(entry => entry.attempt))
   const selected = entries.filter(entry => identities.has(entry.attempt.id))
   const final = selected.filter(entry => entry.attempt.status === 'COMPLETED' && entry.attempt.deliveryMode === 'FINAL_ONLY' && entry.attempt.runtimeGeneration === 'UNIFIED_V1' && entry.slots)
   const finalSet = new Set(final.map(entry => entry.attempt))
@@ -372,7 +383,7 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
           sourceHashes[item.id] = envelope.resultHash
         }
       }
-      attemptObservations.push({...participant, waveKey: wave.waveKey, taskId: wave.taskId, publication: wave.publication, configDigest: wave.configDigest, variantKey: wave.variantKey,
+      attemptObservations.push({...participant,...(participant.participantKind==='STUDY_LOCAL'?{researchCategory:item?.type==='SITUATIONAL'?'SJT':item?.type}:{}), waveKey: wave.waveKey, taskId: wave.taskId, publication: wave.publication, configDigest: wave.configDigest, variantKey: wave.variantKey,
         attemptId: attempt.id, attemptEpoch: attempt.attemptEpoch, sourceHashes, metricKey: metric.metricKey, itemId: metric.itemId, measurement, value, reason,
         originalFinalStatus: attempt.status, taskSatisfied: attempt.taskSatisfaction === 'SATISFIED' ? true : attempt.taskSatisfaction === 'NOT_SATISFIED' ? false : null})
     }
@@ -395,7 +406,7 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
     exclusions: {IDENTITY_UNAVAILABLE: entries.length - selected.length}}
   // If a frozen parent disappeared, moved, changed epoch or lost authority,
   // rereading can only shrink its sample and must change this fingerprint.
-  return {source: {schemaVersion: 1, courseId: selector.courseId, observations}, manifest, dictionary,
+  return {researchGovernance,source: {schemaVersion: 1, courseId: selector.courseId, observations}, manifest, dictionary,
     authorityHash: hash(authoritySnapshot), sourceFingerprint: hash({selector: manifest.selectorHash, attempts: manifests, dictionary})}
 }
 const taskIdOf = (attempt: any) => attempt.compositeAssessmentId

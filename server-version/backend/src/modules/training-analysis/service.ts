@@ -58,7 +58,7 @@ export async function analyzeTrainingCourse(input:{actor:TrainingAnalysisActor;c
     await lockAuthority(tx,input.actor,input.courseId)
     const sourceCutoff=expected?.sourceCutoff??input.sourceCutoff??new Date().toISOString()
     const loaded=await loadTrainingAnalysisSources(tx,{userId:input.actor.id,role:input.actor.role},selector,
-      expected ? {fixedManifest:{attempts:expected.sources},sourceCutoff} : {sourceCutoff})
+      expected ? {fixedManifest:{attempts:expected.sources,...(expected.schemaVersion===2?{researchSources:expected.researchSources}:{})},sourceCutoff} : {sourceCutoff})
     const sources=sortedSources(loaded.manifest.attempts)
     const {quality,qualityHash}=await readQuality(tx,input.courseId,sources)
     return {loaded,sources,sourceCutoff,quality,qualityHash}
@@ -66,17 +66,25 @@ export async function analyzeTrainingCourse(input:{actor:TrainingAnalysisActor;c
   // Pure statistics/table construction happens after releasing the DB snapshot.
   // The precise source list cannot grow and every later export use is rechecked.
   const excluded=new Set(frozen.quality.filter(row=>row.verdict==='EXCLUDE').map(row=>`${row.attemptId}:${row.attemptEpoch}`))
-  const source={...frozen.loaded.source,observations:frozen.loaded.source.observations.map(row=>
-    row.attemptId && excluded.has(`${row.attemptId}:${row.attemptEpoch}`)
-      ? {...row,value:null,reason:'QUALITY_EXCLUDED' as const} : row)}
+  const governance=new Map(frozen.loaded.researchGovernance.map(row=>[row.attemptId,row]))
+  const source={...frozen.loaded.source,observations:frozen.loaded.source.observations.map(row=>{
+    const research=row.attemptId?governance.get(row.attemptId):undefined
+    const reason=research ? research.status==='WITHDRAWAL_PENDING'?'RESEARCH_WITHDRAWAL_PENDING' as const
+      : research.status==='EXCLUDED'?'RESEARCH_EXCLUDED' as const
+      : research.status!=='CONSENTED'||!research.acceptanceId?'RESEARCH_CONSENT_UNKNOWN' as const
+      : !row.researchCategory||!research.dataCategories?.includes(row.researchCategory)?'RESEARCH_SCOPE_NOT_COVERED' as const : null : null
+    if(reason)return {...row,value:null,reason}
+    return row.attemptId && excluded.has(`${row.attemptId}:${row.attemptEpoch}`)?{...row,value:null,reason:'QUALITY_EXCLUDED' as const}:row
+  })}
   const analysis=buildTrainingAnalysis(selector,source)
   const dictionary=buildTrainingDictionary(selector,source)
-  const unsigned:Omit<TrainingAnalysisManifestV1,'manifestHash'>={schemaVersion:1,kind:'TRAINING_ANALYSIS',
+  const unsigned={schemaVersion:(frozen.loaded.researchGovernance.length?2:1) as 1|2,kind:'TRAINING_ANALYSIS' as const,
+    ...(frozen.loaded.researchGovernance.length?{researchGovernanceHash:canonicalHash(frozen.loaded.researchGovernance),researchSources:frozen.loaded.researchGovernance.map(({attemptId,taskId,attemptEpoch})=>({attemptId,taskId,attemptEpoch}))}:{}),
     courseId:input.courseId,actor:input.actor,selector,definitionHash:canonicalHash(selector),
     sourceHash:canonicalHash(frozen.sources),authorityHash:frozen.loaded.authorityHash,qualityHash:frozen.qualityHash,
     sourceCutoff:frozen.sourceCutoff,sources:frozen.sources,dictionary,
     observationCount:source.observations.length}
-  const manifest:TrainingAnalysisManifestV1={...unsigned,manifestHash:trainingManifestHash(unsigned)}
+  const manifest=assertTrainingManifest({...unsigned,manifestHash:trainingManifestHash(unsigned)})
   if(expected && expected.manifestHash!==manifest.manifestHash) stale()
   let cachedTables: ReturnType<typeof buildTrainingAnalysisTables> | undefined
   return {manifest,analysis,get tables(){return cachedTables??(cachedTables=buildTrainingAnalysisTables(selector,source))},quality:frozen.quality}

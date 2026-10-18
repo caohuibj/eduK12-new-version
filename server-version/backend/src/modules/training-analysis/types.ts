@@ -26,12 +26,14 @@ export interface TrainingMetricIdentityV1 {
   version: string
 }
 export type TrainingObservationReason =
+  | 'RESEARCH_SCOPE_NOT_COVERED' | 'RESEARCH_CONSENT_UNKNOWN' | 'RESEARCH_WITHDRAWAL_PENDING' | 'RESEARCH_EXCLUDED'
   | 'QUALITY_EXCLUDED' | 'NOT_COMPARABLE' | 'NOT_ASSIGNED' | 'UNANSWERED'
   | 'NON_FINAL' | 'NOT_ATTEMPTED' | 'INVALID_VALUE' | 'MISSING_SOURCE'
   | 'LEGACY_UNSCOPED' | 'IDENTITY_UNAVAILABLE' | 'NO_OBSERVATION' | 'NOT_CALCULABLE'
 /** Only an authorized adapter may create this source. Never use an anonymous
  * response token or demographic attribute as a stable participant identity. */
 export interface TrainingNumericObservationV1 {
+  researchCategory?: string
   participantKey: string
   participantKind: 'USER' | 'STUDY_LOCAL'
   waveKey: string

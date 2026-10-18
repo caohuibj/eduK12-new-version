@@ -27,7 +27,8 @@ export interface TrainingAnalysisSource {
 }
 export interface TrainingAnalysisSources { list: TrainingAnalysisSource[]; total: number; canQuality: boolean; canExport: boolean }
 export interface TrainingAnalysisManifest {
-  schemaVersion: 1
+  schemaVersion: 1 | 2
+  researchGovernanceHash?: string
   manifestHash: string
   definitionHash: string
   sourceHash: string

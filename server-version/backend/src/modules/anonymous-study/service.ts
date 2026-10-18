@@ -235,20 +235,24 @@ export async function revokeStudyIdentity(studyId:string,credential:string) {
 }
 export async function waveStatistics(userId:string,studyId:string) {
   await currentOwner(prisma,userId,studyId)
-  const list=await prisma.$queryRaw<Array<{id:string;title:string;ordinal:number;tokenId:string;participants:number;completedParticipants:number;attempts:number;completedAttempts:number;abandonedAttempts:number}>>`
+  const list=await prisma.$queryRaw<Array<{id:string;title:string;ordinal:number;tokenId:string;participants:number;completedParticipants:number;attempts:number;completedAttempts:number;abandonedAttempts:number;researchEligibleParticipants:number;researchWithdrawnParticipants:number;researchUnknownParticipants:number}>>`
     SELECT w.id,w.title,w.ordinal,w.access_token_id AS "tokenId",count(DISTINCT COALESCE(sa.participant_id,a.participant_key))::int AS participants,
       count(DISTINCT COALESCE(sa.participant_id,a.participant_key)) FILTER(WHERE a.status='COMPLETED')::int AS "completedParticipants",
       count(a.id)::int AS attempts,count(a.id) FILTER(WHERE a.status='COMPLETED')::int AS "completedAttempts",
-      count(a.id) FILTER(WHERE a.status='ABANDONED')::int AS "abandonedAttempts"
+      count(a.id) FILTER(WHERE a.status='ABANDONED')::int AS "abandonedAttempts",
+      count(DISTINCT sa.participant_id) FILTER(WHERE r.status='CONSENTED' AND r.acceptance_id IS NOT NULL)::int AS "researchEligibleParticipants",
+      count(DISTINCT sa.participant_id) FILTER(WHERE r.status IN ('WITHDRAWAL_PENDING','EXCLUDED'))::int AS "researchWithdrawnParticipants",
+      count(DISTINCT COALESCE(sa.participant_id,a.participant_key)) FILTER(WHERE r.status IS NULL)::int AS "researchUnknownParticipants"
     FROM anonymous_study_waves w JOIN anonymous_studies s ON s.id=w.study_id
     JOIN composite_assessment_access_tokens t ON t.id=w.access_token_id JOIN composite_assessments c ON c.id=t.composite_assessment_id
     LEFT JOIN composite_assessment_attempts a ON a.access_token_id=w.access_token_id AND a.user_id IS NULL AND a.assignment_ref IS NULL
     LEFT JOIN anonymous_study_attempts sa ON sa.attempt_id=a.id AND sa.wave_id=w.id AND sa.study_id=w.study_id
+    LEFT JOIN anonymous_study_research_states r ON r.participant_id=sa.participant_id AND r.study_id=w.study_id
     WHERE w.study_id=${studyId} AND t.created_by=${userId} AND c.created_by=${userId}
     GROUP BY w.id,w.title,w.ordinal,w.access_token_id ORDER BY w.ordinal LIMIT 100
   `
   await currentOwner(prisma,userId,studyId)
-  return {list,countMeaning:'人数按研究内身份去重；单次访客仅按本次随机身份计数，不能识别同一人换设备或重复参与。CSV 仅含该波次已完成作答。'}
+  return {list,countMeaning:'人数按研究内身份去重；单次访客仅按本次随机身份计数，不能识别同一人换设备或重复参与。CSV 是该波次已完成教育记录，不是研究样本。研究同意人数仅表示具有固定范围同意；具体指标仍按已同意的数据类型筛选，退出或未知同意不纳入研究分析。'}
 }
 export async function exportWaveCsv(userId:string,role:UserRole,studyId:string,waveId:string) {
   await currentOwner(prisma,userId,studyId)

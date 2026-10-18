@@ -54,7 +54,7 @@ const dictionaryColumn = z.object({
   measurement: z.object({instrumentKey:key,scoreKey:key,scoringDigest:key,responseSignature:key,respondentType:key,unit:z.string().nullable(),version:key}).strict().nullable(),
   valueType: z.literal('NUMBER'), missingReasons: z.array(z.string()).max(32),
 }).strict()
-export const trainingAnalysisManifestSchema = z.object({
+const trainingAnalysisManifestV1Schema = z.object({
   schemaVersion: z.literal(1), kind: z.literal('TRAINING_ANALYSIS'),
   // User.id includes authenticated historical identifiers; preserve bytes exactly.
   courseId: z.string().uuid(), actor: z.object({id:key,role:z.enum(['ADMIN','TEACHER'])}).strict(),
@@ -65,13 +65,16 @@ export const trainingAnalysisManifestSchema = z.object({
   dictionary: z.array(dictionaryColumn).max(512),
   observationCount: z.number().int().nonnegative().max(384000),
 }).strict()
+// V1 is unchanged for education-only sources. V2 explicitly binds study governance.
+export const trainingAnalysisManifestSchema = z.union([trainingAnalysisManifestV1Schema,
+  trainingAnalysisManifestV1Schema.extend({schemaVersion:z.literal(2),researchGovernanceHash:hash,researchSources:z.array(z.object({taskId:z.string().uuid(),attemptId:z.string().uuid(),attemptEpoch:z.number().int().positive()}).strict()).max(6000)})])
 export type TrainingAnalysisManifestV1 = z.infer<typeof trainingAnalysisManifestSchema>
 export type TrainingAnalysisActor = TrainingAnalysisManifestV1['actor']
-export const trainingManifestHash = (manifest: Omit<TrainingAnalysisManifestV1,'manifestHash'>): string => canonicalHash(manifest)
+export const trainingManifestHash = (manifest: Omit<TrainingAnalysisManifestV1,'manifestHash'> & {researchGovernanceHash?:string;researchSources?:Array<{taskId:string;attemptId:string;attemptEpoch:number}>}): string => canonicalHash(manifest)
 export function trainingManifestSummary(manifest: TrainingAnalysisManifestV1) {
-  return {schemaVersion:1 as const,manifestHash:manifest.manifestHash,definitionHash:manifest.definitionHash,
+  return {schemaVersion:manifest.schemaVersion,manifestHash:manifest.manifestHash,definitionHash:manifest.definitionHash,
     sourceHash:manifest.sourceHash,qualityHash:manifest.qualityHash,authorityHash:manifest.authorityHash,
-    sourceCutoff:manifest.sourceCutoff,sourceCount:manifest.sources.length,observationCount:manifest.observationCount}
+    ...(manifest.schemaVersion===2?{researchGovernanceHash:manifest.researchGovernanceHash}:{}),sourceCutoff:manifest.sourceCutoff,sourceCount:manifest.sources.length,observationCount:manifest.observationCount}
 }
 export function assertTrainingManifest(value: unknown): TrainingAnalysisManifestV1 {
   const manifest = trainingAnalysisManifestSchema.parse(value)

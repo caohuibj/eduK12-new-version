@@ -15,9 +15,10 @@ const respondError = (res:Response,err:unknown) => {
   return res.status(status).json({code:error.code??'TRAINING_ANALYSIS_FAILED',
     message:status===500?'分析暂时不可用':err instanceof z.ZodError?'请求格式无效':error.message,data:null})
 }
-const frozenSummarySchema=z.object({schemaVersion:z.literal(1),manifestHash:z.string().regex(/^[a-f0-9]{64}$/),
+const frozenSummaryV1Schema=z.object({schemaVersion:z.literal(1),manifestHash:z.string().regex(/^[a-f0-9]{64}$/),
   sourceCutoff:z.string().datetime(),definitionHash:z.string(),sourceHash:z.string(),qualityHash:z.string(),authorityHash:z.string(),
   sourceCount:z.number().int().nonnegative(),observationCount:z.number().int().nonnegative()}).strict()
+const frozenSummarySchema=z.union([frozenSummaryV1Schema,frozenSummaryV1Schema.extend({schemaVersion:z.literal(2),researchGovernanceHash:z.string().regex(/^[a-f0-9]{64}$/)})])
 async function reproduce(req:Request) {
   const summary=frozenSummarySchema.parse(req.body?.manifest)
   if(new Date(summary.sourceCutoff).getTime()>Date.now()) throw Object.assign(new Error('分析时间无效'),{statusCode:400})
