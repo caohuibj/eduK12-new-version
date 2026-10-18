@@ -117,6 +117,21 @@ describe('course-first training workspaces', () => {
     expect(get).toHaveBeenCalledWith('/courses/course-1/training-assessments')
   })
 
+  it('loads authorized analysis sources only when the trainer opens its data-analysis tab', async () => {
+    const original = get.getMockImplementation()!
+    get.mockImplementation((url: string) => url === '/courses/course-1/training-analysis/sources'
+      ? Promise.resolve({ code: 0, data: { list: [], total: 0, canQuality: false, canExport: false } })
+      : original(url))
+    mount('/courses/course-1/detail', '/courses/:courseId/detail', TrainingTrainerCourse)
+    await screen.findByRole('heading', { name: course.title })
+    expect(get).not.toHaveBeenCalledWith('/courses/course-1/training-analysis/sources')
+    fireEvent.click(screen.getByRole('button', { name: '数据分析' }))
+    expect(await screen.findByText(/当前没有可分析的授权数值来源/)).toBeVisible()
+    expect(get).toHaveBeenCalledWith('/courses/course-1/training-analysis/sources')
+    fireEvent.click(screen.getByRole('button', { name: '作业' }))
+    expect(screen.getByRole('link', { name: /发布作业/ })).toHaveAttribute('href', '/assignments?create=true&courseId=course-1')
+  })
+
   it('keeps course code operations in a low-frequency settings section with explicit confirmation', async () => {
     mount('/courses/course-1/detail', '/courses/:courseId/detail', TrainingTrainerCourse)
     expect(await screen.findByRole('heading', { name: course.title })).toBeInTheDocument()

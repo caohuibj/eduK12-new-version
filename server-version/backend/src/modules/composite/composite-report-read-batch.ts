@@ -4,7 +4,7 @@ import { createSharedScaleRuntimeStore, isSharedScaleRuntimeReference, type Shar
 import { parseVersionedFrozenScaleRuntimeSnapshot, type VersionedFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { publicTemplates, type PublicTemplateStore } from '../assessment-runtime/public-templates'
+import { publicTemplates, publicTemplatesForDatabase, type PublicTemplateStore } from '../assessment-runtime/public-templates'
 import { loadScaleFactRecords, isScaleFactsReference } from '../assessment-runtime/scale-fact-records'
 import { decodeScaleFacts, assertScaleFactsBinding, prefetchCompactScaleTemplates, restoreCompactScaleFacts } from '../assessment-runtime/compact-scale-facts'
 import { mapCompositeSection } from '../assessment-runtime/form-section-definition'
@@ -50,14 +50,16 @@ const identity = (attempt: any) => canonicalHash({
 
 /** Only already-authorized, projected parents enter this request-local batch.
  * Every source still passes the single-reader's parent/epoch/definition checks. */
-export async function preloadCompositeReportFacts(attempts: any[]): Promise<CompositeReportFactsReader> {
-  const templates = createReportReadTemplateStore(), contexts = new Map<any, {identity: string; facts: CompositeReportFacts}>()
+export async function preloadCompositeReportFacts(attempts: any[], db: Prisma.TransactionClient = prisma, options?: { selectedItemIds?: Map<string, Set<string>>; numericOnly?: boolean }): Promise<CompositeReportFactsReader> {
+  const templates = createReportReadTemplateStore(publicTemplatesForDatabase(db)), contexts = new Map<any, {identity: string; facts: CompositeReportFacts}>()
   const sectionsByAttempt = new Map<any, ReturnType<typeof mapCompositeSection>[]>()
   for (const attempt of attempts) {
-    const scope = await resolveTrainingAttemptScope(attempt)
+    const scope = await resolveTrainingAttemptScope(attempt, attempt.compositeAssessment, {db})
     if (scope.items.length !== attempt.compositeAssessment.items.length || attempt.compositeAssessment.items.some((item: any) => !scope.itemIds.has(item.id))) throw new Error('Report batch requires projected selection')
-    const sections = (attempt.compositeAssessment.formSections ?? []).map(mapCompositeSection).filter((section: ReturnType<typeof mapCompositeSection>) => section.items.some(item => item.formDefinition != null))
-    const typedCount = attempt.compositeAssessment.items.filter((item: any) => item.type === 'FORM' && item.formDefinition != null).length
+    const requested = options?.selectedItemIds?.get(attempt.id)
+    const sections = (attempt.compositeAssessment.formSections ?? []).map(mapCompositeSection).filter((section: ReturnType<typeof mapCompositeSection>) => section.items.some(item => item.formDefinition != null) && (!requested || section.items.some(item => requested.has(item.id))))
+    const sectionItemIds = new Set(sections.flatMap((section: ReturnType<typeof mapCompositeSection>) => section.items.map(item => item.id)))
+    const typedCount = attempt.compositeAssessment.items.filter((item: any) => item.type === 'FORM' && item.formDefinition != null && (!requested || sectionItemIds.has(item.id))).length
     if (typedCount && (!sections.length || sections.reduce((n: number, section: ReturnType<typeof mapCompositeSection>) => n + section.items.filter(item => item.formDefinition != null).length, 0) !== typedCount)) throw new Error('Report batch typed sections missing')
     sectionsByAttempt.set(attempt, sections)
     for (const row of attempt.scaleAssessments) if (row.compositeAttemptId !== attempt.id || row.attemptEpoch !== attempt.attemptEpoch || !scope.itemIds.has(row.compositeItemId)) throw new Error('Report batch scale ownership/version mismatch')
@@ -76,9 +78,9 @@ export async function preloadCompositeReportFacts(attempts: any[]): Promise<Comp
     }catch{runtimes.set(record,undefined)}
   }
   const [rows, snapshots, artifacts] = await Promise.all([
-    loadScaleFactRecords(references.map(row => ({id: row.id, attemptEpoch: row.result.e}))),
-    snapshotWhere.length ? prisma.assessmentUnitSnapshot.findMany({where: {OR: snapshotWhere}}) : [],
-    artifactHashes.size?prisma.$queryRaw<SharedScaleArtifactRecord[]>`SELECT artifact_hash AS "artifactHash",format_version AS "formatVersion",plaintext_bytes AS "plaintextBytes",payload_encrypted AS "payloadEncrypted"
+    loadScaleFactRecords(references.map(row => ({id: row.id, attemptEpoch: row.result.e})), db),
+    snapshotWhere.length ? db.assessmentUnitSnapshot.findMany({where: {OR: snapshotWhere}}) : [],
+    artifactHashes.size?db.$queryRaw<SharedScaleArtifactRecord[]>`SELECT artifact_hash AS "artifactHash",format_version AS "formatVersion",plaintext_bytes AS "plaintextBytes",payload_encrypted AS "payloadEncrypted"
       FROM assessment_runtime_artifacts WHERE artifact_hash IN (${Prisma.join([...artifactHashes])})`:[],
   ])
   const artifactRows=new Map(artifacts.map(row=>[row.artifactHash,row]))
@@ -109,7 +111,7 @@ export async function preloadCompositeReportFacts(attempts: any[]): Promise<Comp
         catch{context.scaleRuntimes.set(record,undefined)} // Existing frozen-policy reader denies on unavailable/invalid runtime.
       }
       const facts = decoded.get(record)
-      context.scaleResults.set(record, facts ? (await restoreCompactScaleFacts(facts, {canonical: false}, templates)).result : record.result)
+      context.scaleResults.set(record, facts ? (await restoreCompactScaleFacts(facts, {canonical: false, ...(options?.numericOnly ? {reportOnly: true} : {})}, templates)).result : record.result)
     }
     const sections = sectionsByAttempt.get(attempt)!
     if (sections.length) context.typedFormValues = readLoadedCompositeTypedFormValues(attempt, sections, snapshotsByAttempt.get(attempt.id) ?? [], context.typedFormStates)

@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client'
 import { isTaskSatisfied } from '../assessment-runtime/form-policy'
 import { parseCompiledWeightedVariants } from '../assessment-core/weighted-variants'
 import { compositeBadRequest } from './composite.errors'
@@ -52,13 +53,13 @@ export function trainingVariantExportStrata(attempts: any[], scopes: Map<string,
 
 /** The lightweight marker keeps null legacy exports byte-compatible. For a
  * variant, resolve one graph/plan batch before counting or reading child data. */
-export async function loadTrainingVariantExportGraph(assessmentId: string, where: any, options: CompositeExportOptions, headersOnly = false) {
-  const marker = await prisma.$queryRaw<Array<{id: string}>>`SELECT c.id FROM composite_assessments c
+export async function loadTrainingVariantExportGraph(assessmentId: string, where: any, options: CompositeExportOptions, headersOnly = false, db: Prisma.TransactionClient = prisma) {
+  const marker = await db.$queryRaw<Array<{id: string}>>`SELECT c.id FROM composite_assessments c
     WHERE c.id=${assessmentId} AND (c.training_variant_frozen IS NOT NULL OR c.training_variant_digest IS NOT NULL
       OR c.training_variant_draft IS NOT NULL OR EXISTS (SELECT 1 FROM composite_assessment_attempts a
         WHERE a.composite_assessment_id=c.id AND (a.training_variant_allocation_encrypted IS NOT NULL OR a.training_variant_allocation_hash IS NOT NULL)))`
   if (!marker.length) return null
-  const template: any = await prisma.compositeAssessment.findUnique({ where: { id: assessmentId }, include: {
+  const template: any = await db.compositeAssessment.findUnique({ where: { id: assessmentId }, include: {
     items: { orderBy: { position: 'asc' }, include: {
       scale: { select: { id: true, code: true, name: true, instrumentClass: true, instrumentVersion: true, definition: true } },
       cognitiveAssignment: { select: { title: true, profile: true, resolvedReportSnapshotEncrypted: true,
@@ -72,9 +73,9 @@ export async function loadTrainingVariantExportGraph(assessmentId: string, where
   const config = parseCompiledWeightedVariants(template.trainingVariantFrozen)
   if (config.configDigest !== template.trainingVariantDigest || config.unionDigest !== canonicalHash({kind: 'WEIGHTED_VARIANT_UNION', schemaVersion: 1, units: buildTrainingVariantUnion(template).units})) throw compositeBadRequest('分卷发布配置不一致')
   assertExportLimits({records: template.attempts.length})
-  const frozenSlotSets = await loadSituationalExportSlotSets(template.attempts)
+  const frozenSlotSets = await loadSituationalExportSlotSets(template.attempts, db)
   const scopes = new Map<string, TrainingAttemptScope>()
-  for (const attempt of template.attempts) scopes.set(attempt.id, await resolveTrainingAttemptScope(attempt, template, {frozenSlotSets}))
+  for (const attempt of template.attempts) scopes.set(attempt.id, await resolveTrainingAttemptScope(attempt, template, {frozenSlotSets, db}))
   if (headersOnly) return {template, scopes, frozenSlotSets}
   // Group by the immutable selection and current epoch, avoiding one OR
   // predicate per participant and quadratic child-to-parent attachment.
@@ -98,22 +99,22 @@ export async function loadTrainingVariantExportGraph(assessmentId: string, where
   const full = options.detail === 'full'
   if (full && cognitiveWhere.OR.length) {
     const [legacy, unified] = await Promise.all([
-      prisma.cognitiveTrial.count({where: {session: {is: {...cognitiveWhere, AND: [{OR: [{runtimeGeneration: null}, {runtimeGeneration: {not: 'UNIFIED_V1'}}]}]}}}}),
-      prisma.cognitiveRawSubmission.aggregate({where: {OR: cognitiveWhere.OR.map(condition => ({
+      db.cognitiveTrial.count({where: {session: {is: {...cognitiveWhere, AND: [{OR: [{runtimeGeneration: null}, {runtimeGeneration: {not: 'UNIFIED_V1'}}]}]}}}}),
+      db.cognitiveRawSubmission.aggregate({where: {OR: cognitiveWhere.OR.map(condition => ({
         attemptEpoch: condition.attemptNo as number, session: {is: condition},
       }))}, _sum: {trialCount: true}}),
     ])
     assertExportLimits({trials: legacy + (unified._sum.trialCount ?? 0)})
   }
   const [scales, sessions, forms] = template.attempts.length ? await Promise.all([
-    scaleWhere.OR.length ? prisma.assessment.findMany({where: scaleWhere, select: {compositeAttemptId: true, compositeItemId: true,
+    scaleWhere.OR.length ? db.assessment.findMany({where: scaleWhere, select: {compositeAttemptId: true, compositeItemId: true,
       timingEncrypted: true, id: true, attemptEpoch: true, submissionId: true, submissionPayloadHash: true, answers: true, result: true}}) : [],
-    cognitiveWhere.OR.length ? prisma.cognitiveSession.findMany({where: cognitiveWhere, include: {
+    cognitiveWhere.OR.length ? db.cognitiveSession.findMany({where: cognitiveWhere, include: {
       assignment: {select: {title: true, profile: true, resolvedReportSnapshotEncrypted: true}},
       ...(full ? {trials: {orderBy: {trialIndex: 'asc' as const}, take: EXPORT_MAX_TRIALS + 1, select: {trialIndex: true, payloadEncrypted: true}},
         rawSubmissions: {select: {attemptEpoch: true, trialCount: true, payloadEncrypted: true, payloadSchemaVersion: true, encodingVersion: true}}} : {}),
     }}) : [],
-    formWhere.OR.length ? prisma.compositeFormAnswer.findMany({where: formWhere}) : [],
+    formWhere.OR.length ? db.compositeFormAnswer.findMany({where: formWhere}) : [],
   ]) : [[], [], []]
   const grouped = <T>(rows: T[], key: (row:T)=>string|null) => {
     const result = new Map<string,T[]>()

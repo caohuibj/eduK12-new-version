@@ -1,4 +1,5 @@
 import { provenanceSchema } from './assessmentExportArtifact'
+import { trainingAnalysisExportOptionsSchema, trainingAnalysisProvenanceSchema, assertTrainingAnalysisExportIdentity, type TrainingAnalysisExportOptions } from '../modules/training-analysis/export'
 import { randomUUID } from 'crypto'
 import { ExportArtifactStatus, Prisma } from '@prisma/client'
 import { exportQueue } from '../config/queue'
@@ -9,9 +10,11 @@ import { assertExportLimits, EXPORT_RETENTION_HOURS } from './exportStorage'
 import { logger } from '../utils/logger'
 
 export type ExportJobFormat = 'csv' | 'sav' | 'sps' | 'xlsx' | 'zip'
+export type ExportJobResourceType = 'SCALE' | 'QUESTIONNAIRE' | 'COGNITIVE' | 'COMPOSITE' | 'TRAINING_ANALYSIS'
 
 export type ExportJobOptions = {
   creatorRole?: 'ADMIN' | 'TEACHER'
+  trainingAnalysis?: TrainingAnalysisExportOptions
   projectionFingerprint?: string
   detail?: 'summary' | 'full' | 'research'
   anonymize: boolean
@@ -40,15 +43,20 @@ export type ExportBatchResponse = {
 }
 
 export const exportArtifactUrl = (type: string, id: string, artifactId: string): string =>
-  type === 'COGNITIVE' ? `/api/cognitive/assignments/${id}/export/artifacts/${artifactId}`
+  type === 'TRAINING_ANALYSIS' ? `/api/courses/${id}/training-analysis/export/artifacts/${artifactId}`
+  : type === 'COGNITIVE' ? `/api/cognitive/assignments/${id}/export/artifacts/${artifactId}`
   : type === 'COMPOSITE' ? `/api/composite-assessments/${id}/export/artifacts/${artifactId}`
   : `/api/${type === 'SCALE' ? 'scales' : 'questionnaires'}/exports/${artifactId}`
 
 const ACTIVE_JOB_STATES = new Set(['active', 'waiting', 'delayed', 'paused'])
 const REQUEST_KEY = /^[A-Za-z0-9_-]{16,160}$/
 
-export const formatsForRequest = (resourceType: 'SCALE' | 'QUESTIONNAIRE' | 'COGNITIVE' | 'COMPOSITE', format: unknown): ExportJobFormat[] => {
+export const formatsForRequest = (resourceType: ExportJobResourceType, format: unknown): ExportJobFormat[] => {
   const normalized = typeof format === 'string' ? format.toLowerCase() : 'csv'
+  if (resourceType === 'TRAINING_ANALYSIS') {
+    if (normalized === 'csv' || normalized === 'zip') return [normalized]
+    throw Object.assign(new Error('Training 分析仅支持 CSV 或 ZIP 导出'), { statusCode: 400 })
+  }
   if (resourceType === 'SCALE' && normalized === 'spss') return ['csv', 'sps']
   if (resourceType === 'COGNITIVE' && (normalized === 'zip' || normalized === 'xlsx')) return [normalized]
   if (resourceType === 'COMPOSITE' && normalized === 'zip') return ['zip']
@@ -61,6 +69,7 @@ const pendingStorageKey = (resourceType: string, resourceId: string, batchId: st
 
 const normalizeOptions = (options: ExportJobOptions): ExportJobOptions => ({
   anonymize: Boolean(options.anonymize),
+  ...(options.trainingAnalysis ? { trainingAnalysis: trainingAnalysisExportOptionsSchema.parse(options.trainingAnalysis) } : {}),
   ...(options.creatorRole ? { creatorRole: options.creatorRole } : {}),
   ...(options.projectionFingerprint ? { projectionFingerprint: options.projectionFingerprint } : {}),
   ...(options.detail ? { detail: options.detail } : {}),
@@ -126,7 +135,7 @@ export const ensureExportBatchEnqueued = async (batchId: string): Promise<boolea
 }
 
 export const enqueueExportJob = async (params: {
-  resourceType: 'SCALE' | 'QUESTIONNAIRE' | 'COGNITIVE' | 'COMPOSITE'
+  resourceType: ExportJobResourceType
   resourceId: string
   createdBy: string
   anonymized: boolean
@@ -138,6 +147,13 @@ export const enqueueExportJob = async (params: {
   assertExportLimits({ records: params.recordCount })
   const formats = formatsForRequest(params.resourceType, params.format)
   const options = normalizeOptions(params.options)
+  if (params.resourceType === 'TRAINING_ANALYSIS') {
+    const trainingAnalysis = trainingAnalysisExportOptionsSchema.parse(options.trainingAnalysis)
+    assertTrainingAnalysisExportIdentity(trainingAnalysis, { courseId: params.resourceId, createdBy: params.createdBy, creatorRole: options.creatorRole })
+    if (!params.anonymized || !options.anonymize) throw Object.assign(new Error('Training 分析仅支持匿名导出'), { statusCode: 400 })
+  } else if (options.trainingAnalysis) {
+    throw Object.assign(new Error('Training 导出清单不能用于其他资源'), { statusCode: 400 })
+  }
   const requestKey = params.requestKey || randomUUID()
   if (!REQUEST_KEY.test(requestKey)) throw Object.assign(new Error('导出请求标识格式无效'), { statusCode: 400 })
 
@@ -185,7 +201,16 @@ export const enqueueExportJob = async (params: {
         },
       })
       for (const format of formats) {
-        if (params.resourceType === 'COGNITIVE' || params.resourceType === 'COMPOSITE') {
+        if (params.resourceType === 'TRAINING_ANALYSIS') {
+          const provenance = trainingAnalysisProvenanceSchema.parse({
+            version: 2, resourceType: 'TRAINING_ANALYSIS', generation: batchId,
+            creatorRole: options.creatorRole, audience: 'teacher', trainingAnalysis: options.trainingAnalysis,
+          })
+          await tx.exportArtifact.create({ data: { resourceType: params.resourceType, resourceId: params.resourceId,
+            createdBy: params.createdBy, format, anonymized: true,
+            storageKey: pendingStorageKey(params.resourceType, params.resourceId, batchId, format),
+            status: ExportArtifactStatus.PROCESSING, batchId, expiresAt, provenance } })
+        } else if (params.resourceType === 'COGNITIVE' || params.resourceType === 'COMPOSITE') {
           const provenance = provenanceSchema.parse({ version: 1, generation: batchId,
             creatorRole: options.creatorRole, audience: 'teacher', detail: options.detail ?? 'summary',
             dateRange: options.dateRange ?? {}, projectionFingerprint: options.projectionFingerprint, attemptIds: [] })
@@ -240,7 +265,7 @@ export const enqueueExportJob = async (params: {
 export type ClaimedExportBatch = {
   batchId: string
   generation: number
-  resourceType: 'SCALE' | 'QUESTIONNAIRE' | 'COGNITIVE' | 'COMPOSITE'
+  resourceType: ExportJobResourceType
   resourceId: string
   options: ExportJobOptions
   createdBy: string
@@ -277,7 +302,7 @@ export const claimExportBatch = async (batchId: string, jobId: string): Promise<
     return {
       batchId,
       generation,
-      resourceType: current.resourceType as 'SCALE' | 'QUESTIONNAIRE' | 'COGNITIVE' | 'COMPOSITE',
+      resourceType: current.resourceType as ExportJobResourceType,
       resourceId: current.resourceId,
       createdBy: current.createdBy, createdAt: current.createdAt,
       options: current.options as unknown as ExportJobOptions,

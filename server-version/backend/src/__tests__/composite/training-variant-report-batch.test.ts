@@ -31,7 +31,7 @@ async function fixture(){
   const [layout]=await write.saveMany([{kind:'COMPOSITE_REPORT_LAYOUT',value:{version:1,root:{assessmentId:'composite',name:'Report'},units:[{itemId:'scale-item',type:'SCALE'},{itemId:'cog-item',type:'COGNITIVE'}]}}])
   const binding={attemptId:parent,attemptEpoch:1,slotSetHash:'b'.repeat(64),contextHash:null,aggregateInputHash:'d'.repeat(64)}
   inputs.push({binding,encrypted:encryptCompactField({kind:'COMPOSITE_REPORT_FACTS',version:2,binding,layout,personal:{id:parent,backgroundValues:[]},units:[{assessmentId:id,sourceResultHash:row.sourceResultHash},{type:'COGNITIVE',sessionId:session.id,sourceCipherHash:createHash('sha256').update(session.resultSnapshotEncrypted).digest('hex')}]})})
-  attempts.push({id:parent,attemptEpoch:1,runtimeGeneration:'UNIFIED_V1',compositeAssessment:{id:'composite',items:[{id:'scale-item',type:'SCALE'}],formSections:[]},scaleAssessments:[{...row,result:{k:'SFF1',e:1}}]})
+  attempts.push({id:parent,attemptEpoch:1,runtimeGeneration:'UNIFIED_V1',trainingVariantAllocationEncrypted:null,trainingVariantAllocationHash:null,compositeAssessment:{id:'composite',trainingVariantDraft:null,trainingVariantFrozen:null,trainingVariantDigest:null,items:[{id:'scale-item',type:'SCALE'}],formSections:[]},scaleAssessments:[{...row,result:{k:'SFF1',e:1}}]})
  }
  db.$queryRaw.mockImplementation(async(parts:TemplateStringsArray)=>parts.join('').includes('FROM cognitive_sessions')?cognitive:sources)
  return {sources,cognitive,inputs,attempts,repo,result,write,read:createPublicTemplateStore(repo,{entries:1,bytes:1024})}

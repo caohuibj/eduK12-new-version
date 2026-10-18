@@ -6,9 +6,10 @@ import { internalReturnTo } from '../components/app-shell/access'
 import { useAuth } from '../contexts/AuthContext'
 import { useCognitiveEnabled } from '../contexts/CapabilitiesContext'
 import TrainingCourseSettings from './TrainingCourseSettings'
+import TrainingCourseAnalysis from './TrainingCourseAnalysis'
 import type { Course, Assignment, Checkin } from '../types'
 
-type Section = 'assignments' | 'checkins' | 'assessments'
+type Section = 'assignments' | 'checkins' | 'assessments' | 'analysis'
 type CourseAssessment = {
   id: string; key: string; kind: string; typeLabel: string
   name: string; description: string | null; status: string
@@ -101,7 +102,7 @@ export default function TrainingTrainerCourse() {
             <div className="training-course-layout"><div className="training-course-work">
             <nav className="training-section-switch" aria-label="课程管理内容">
               {([
-                ['assignments', '作业'], ['checkins', '打卡'], ['assessments', '测评'],
+                ['assignments', '作业'], ['checkins', '打卡'], ['assessments', '测评'], ['analysis', '数据分析'],
               ] as const).map(([value, label]) =>
                 <button key={value} type="button" aria-pressed={section === value} onClick={() => setSection(value)}>{label}</button>)}
             </nav>
@@ -157,6 +158,7 @@ export default function TrainingTrainerCourse() {
                       </article>
                     })}</div>}
             </section>}
+            {section === 'analysis' && <TrainingCourseAnalysis key={course.id} courseId={course.id} />}
 </div><aside className="training-course-sidebar"><section className="training-side-panel"><h2>课程管理</h2>              <div className="training-trainer-shortcuts">
                 <Link to={'/courses/' + encoded + '/students'}>管理学员 <ArrowRight size={15} aria-hidden="true" /></Link>
                 <Link to={'/assessment-workbench?courseId=' + encoded}>查看培训结果 <ArrowRight size={15} aria-hidden="true" /></Link>

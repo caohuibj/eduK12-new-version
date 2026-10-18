@@ -1,8 +1,8 @@
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { parseFrozenActiveSlotSet, type FrozenActiveSlotSetV1 } from '../assessment-runtime/slot-set'
-import { publicTemplates } from '../assessment-runtime/public-templates'
+import { publicTemplatesForDatabase } from '../assessment-runtime/public-templates'
 import { createHash } from 'node:crypto'
-import type { AssessmentUnitSnapshot } from '@prisma/client'
+import type { AssessmentUnitSnapshot, Prisma } from '@prisma/client'
 import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { parseCanonicalUnitResultEnvelope, type CanonicalUnitResultEnvelopeV1 } from '../assessment-runtime/unit-result'
 import type { CompositeExportField } from './composite-export.service'
@@ -16,7 +16,7 @@ type ExportParent = {
 
 /** Resolve all immutable shared plan references in one batch, never per parent.
  * These are accepted frozen slot plans, not live SJT authoring templates. */
-export async function loadSituationalExportSlotSets(attempts: ReadonlyArray<ExportParent>): Promise<Map<string, FrozenActiveSlotSetV1>> {
+export async function loadSituationalExportSlotSets(attempts: ReadonlyArray<ExportParent>, db?: Pick<Prisma.TransactionClient, '$queryRaw'>): Promise<Map<string, FrozenActiveSlotSetV1>> {
   const decoded = attempts.map(attempt => {
     if (attempt.runtimeGeneration !== 'UNIFIED_V1' || !attempt.frozenActiveSlotSetEncrypted || !attempt.frozenActiveSlotSetHash) throw new Error('SJT export frozen slots missing')
     const value = decryptUnifiedRuntimePayload<any>(attempt.frozenActiveSlotSetEncrypted)
@@ -25,7 +25,7 @@ export async function loadSituationalExportSlotSets(attempts: ReadonlyArray<Expo
     return value
   })
   const hashes = [...new Set<string>(decoded.filter(value => value?.k === 'FSP2').map(value => value.p))]
-  const plans = hashes.length ? await publicTemplates.loadMany(hashes.map(hash => ({ hash, kind: 'FROZEN_SLOT_PLAN' as const }))) : []
+  const plans = hashes.length ? await publicTemplatesForDatabase(db).loadMany(hashes.map(hash => ({ hash, kind: 'FROZEN_SLOT_PLAN' as const }))) : []
   const byHash = new Map(hashes.map((hash, index) => [hash, plans[index]]))
   return new Map(attempts.map((attempt, index) => {
     const value = decoded[index]

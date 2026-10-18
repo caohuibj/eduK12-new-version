@@ -3740,3 +3740,41 @@ model SurveyCognitiveResult {
   @@index([projectId,waveId,attemptId],map:"survey_cognitive_result_scope_idx")
   @@map("survey_cognitive_results")
 }
+
+// Analysis eligibility is independent of the accepted FINAL and task status.
+model TrainingAnalysisQuality {
+  id           String   @id @default(uuid())
+  courseId     String   @map("course_id")
+  attemptId    String   @map("attempt_id")
+  attemptEpoch Int      @map("attempt_epoch")
+  sourceHash   String   @map("source_hash")
+  verdict      String
+  reason       String
+  reviewerId   String   @map("reviewer_id")
+  revision     Int      @default(1)
+  reviewedAt   DateTime @default(now()) @map("reviewed_at") @db.Timestamptz(6)
+
+  @@unique([courseId, attemptId, attemptEpoch, sourceHash], map: "training_analysis_quality_scope_key")
+  @@index([courseId, attemptId])
+  @@map("training_analysis_quality")
+}
+
+// Append-only decisions, including the previous verdict and revision.
+model TrainingAnalysisQualityAudit {
+  id           String   @id @default(uuid())
+  reviewId     String   @map("review_id")
+  courseId     String   @map("course_id")
+  attemptId    String   @map("attempt_id")
+  attemptEpoch Int      @map("attempt_epoch")
+  sourceHash   String   @map("source_hash")
+  verdict      String
+  previousVerdict String @map("previous_verdict")
+  reason       String
+  reviewerId   String   @map("reviewer_id")
+  revision     Int
+  reviewedAt   DateTime @default(now()) @map("reviewed_at") @db.Timestamptz(6)
+
+  @@unique([reviewId, revision])
+  @@index([courseId, attemptId])
+  @@map("training_analysis_quality_audit")
+}

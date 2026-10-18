@@ -205,6 +205,8 @@
     "teacher_codes": "RUNTIME_RW",
     "users": "RUNTIME_RW",
     "videos": "RUNTIME_RW",
-    "survey_tool_grants": "RUNTIME_RW"
+    "survey_tool_grants": "RUNTIME_RW",
+    "training_analysis_quality": "RUNTIME_RW",
+    "training_analysis_quality_audit": "RUNTIME_RW"
   }
 }

@@ -1,0 +1,33 @@
+/* Only the course-analysis surface and its added workspace entry. */
+.training-course-analysis { padding-bottom:24px; overflow-wrap:anywhere; }
+.training-course-analysis h2 { margin:20px 0 12px; font-size:20px; }
+.training-course-analysis h3 { margin:20px 0 12px; font-size:18px; }
+.training-course-analysis h4 { font-size:16px; margin:0 0 8px; }
+.training-course-analysis p { line-height:1.7; margin:10px 0; font-size:14px; }
+.training-analysis-waves { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr)); gap:16px; margin:20px 0; }
+.training-analysis-wave,.training-analysis-quality-row { min-width:0; border:1px solid var(--training-border,#dce3d8); border-radius:6px; padding:14px; }
+.training-course-analysis legend { padding:0 4px; font-weight:600; }
+.training-course-analysis label { display:flex; flex-direction:column; gap:6px; font-size:14px; margin-bottom:12px; min-width:0; }
+.training-course-analysis :is(input:not([type=checkbox]),select) { width:100%; min-height:44px; padding:8px; border:1px solid var(--training-border,#dce3d8); border-radius:4px; color:var(--training-ink,#1f403b); background:var(--training-surface,#fffdf9); }
+.training-course-analysis button { min-height:44px; padding:8px 12px; border:1px solid var(--training-border,#dce3d8); border-radius:4px; }
+.training-course-analysis button:disabled { cursor:not-allowed; opacity:.6; }
+.training-course-analysis :is(button,input,select):focus-visible { outline:3px solid var(--training-bamboo,#1f4d3b); outline-offset:3px; }
+.training-analysis-metrics { border:0; padding:8px 0; min-width:0; }
+.training-analysis-metrics label { flex-direction:row; align-items:flex-start; gap:8px; }
+.training-analysis-metrics input { width:18px; height:18px; flex:none; margin-top:2px; }
+.training-analysis-controls { display:flex; flex-wrap:wrap; align-items:end; gap:12px; margin:16px 0; }
+.training-analysis-controls label { margin:0; flex:1 1 160px; }
+.training-analysis-controls button { flex:none; }
+.training-analysis-results,.training-analysis-export,.training-analysis-quality { margin-top:24px; padding-top:4px; border-top:1px solid var(--training-border,#dce3d8); }
+.training-analysis-table { max-width:100%; overflow:auto; margin:16px 0; }
+.training-analysis-table table { border-collapse:collapse; width:100%; font-size:13px; }
+.training-analysis-table caption { text-align:left; font-weight:600; margin-bottom:8px; }
+.training-analysis-table :is(th,td) { text-align:left; padding:10px; border-bottom:1px solid var(--training-border,#dce3d8); min-width:95px; }
+.training-analysis-table small { display:block; font-weight:400; }
+.training-analysis-matched { margin:12px 0; padding:14px; background:var(--training-paper,#f8f5ee); border-radius:4px; }
+.training-analysis-quality-row { margin:14px 0; }
+.training-course-analysis details { margin:16px 0; }
+.training-course-analysis summary { cursor:pointer; min-height:44px; padding-block:10px; }
+.training-course-analysis [role=alert] { border-left:3px solid #a33e2b; padding-left:12px; }
+.hui-training.hui-app--standard.training-workspace-shell .training-trainer-course .training-section-switch { flex-wrap:wrap; padding-right:142px; column-gap:20px; row-gap:0; }
+.hui-training.hui-app--standard.training-workspace-shell .training-trainer-course .training-section-switch button { white-space:nowrap; }

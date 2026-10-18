@@ -1,0 +1,63 @@
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/eduk12_c16_20261018/server-version/backend
+
+ ❯ src/__tests__/composite/training-variant-report-batch.test.ts (9 tests | 3 failed) 534ms
+     × loads fallback scale facts once and binds preloaded values to each exact parent 8ms
+     × preloads shared runtime artifacts in one source query and retains their original per-attempt bindings 13ms
+     × keeps legacy compact materialization free of a null variant field 473ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/composite/training-variant-report-batch.test.ts > bounded report source batches > loads fallback scale facts once and binds preloaded values to each exact parent
+CompositeServiceError: 概率分卷来源标志未加载，不能推断旧模式
+ ❯ compositeForbidden src/modules/composite/composite.errors.ts:12:63
+     10|
+     11| export const compositeNotFound = (message = '综合测评不存在') => new Composit…
+     12| export const compositeForbidden = (message = '无权限操作此综合测评') => new Comp…
+       |                                                               ^
+     13| export const compositeBadRequest = (message: string) => new CompositeS…
+     14| export const compositeConflict = (message: string) => new CompositeSer…
+ ❯ resolveTrainingAttemptScope src/modules/composite/training-variant-scope.ts:43:70
+ ❯ Module.preloadCompositeReportFacts src/modules/composite/composite-report-read-batch.ts:57:25
+ ❯ src/__tests__/composite/training-variant-report-batch.test.ts:61:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/__tests__/composite/training-variant-report-batch.test.ts > bounded report source batches > preloads shared runtime artifacts in one source query and retains their original per-attempt bindings
+CompositeServiceError: 概率分卷来源标志未加载，不能推断旧模式
+ ❯ compositeForbidden src/modules/composite/composite.errors.ts:12:63
+     10|
+     11| export const compositeNotFound = (message = '综合测评不存在') => new Composit…
+     12| export const compositeForbidden = (message = '无权限操作此综合测评') => new Comp…
+       |                                                               ^
+     13| export const compositeBadRequest = (message: string) => new CompositeS…
+     14| export const compositeConflict = (message: string) => new CompositeSer…
+ ❯ resolveTrainingAttemptScope src/modules/composite/training-variant-scope.ts:43:70
+ ❯ Module.preloadCompositeReportFacts src/modules/composite/composite-report-read-batch.ts:57:25
+ ❯ src/__tests__/composite/training-variant-report-batch.test.ts:79:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/__tests__/composite/training-variant-report-batch.test.ts > bounded report source batches > keeps legacy compact materialization free of a null variant field
+CompositeServiceError: 概率分卷来源标志未加载，不能推断旧模式
+ ❯ compositeForbidden src/modules/composite/composite.errors.ts:12:63
+     10|
+     11| export const compositeNotFound = (message = '综合测评不存在') => new Composit…
+     12| export const compositeForbidden = (message = '无权限操作此综合测评') => new Comp…
+       |                                                               ^
+     13| export const compositeBadRequest = (message: string) => new CompositeS…
+     14| export const compositeConflict = (message: string) => new CompositeSer…
+ ❯ resolveTrainingAttemptScope src/modules/composite/training-variant-scope.ts:43:70
+ ❯ applyTrainingAttemptScope src/modules/composite/training-variant-scope.ts:87:21
+ ❯ materializeCompactReportFromFacts src/modules/composite/composite.service.ts:5211:19
+ ❯ materializeCompositeQuestionnaireReport src/modules/composite/composite.service.ts:5268:25
+ ❯ src/__tests__/composite/training-variant-report-batch.test.ts:95:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  3 failed | 54 passed (57)
+   Start at  22:18:16
+   Duration  6.35s (transform 2.86s, setup 0ms, import 3.74s, tests 2.20s, environment 0ms)
+
