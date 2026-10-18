@@ -1,6 +1,7 @@
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { resolveTrainingFlowScope, trainingFlowMarkerState, trainingFlowProvenance, hasTrainingFlowDefinitionMarkers } from './training-flow-scope'
 import { buildTrainingFlowUnits } from './training-flow-definition'
+import { freezeTrainingFlowAssignment } from './training-flow-assignment-snapshot'
 import { compileTrainingFlow, trainingFlowUnitKey, trainingFlowItemKey } from '../assessment-core/flow/training'
 import { assertTrainingFlowAuthoringScope } from '../questionnaire-product/training-flow-authoring'
 import { preloadCompositeReportFacts, type CompositeReportFactsReader } from './composite-report-read-batch'
@@ -2532,7 +2533,7 @@ const freezeTrainingFlowCandidates = async (db:Db, attempt:any, composite:any, p
     }else if(item.type==='COGNITIVE'){
       const frozen=prepared.cognitive.get(item.id)!
       references[item.id]=(await cognitiveSessionService.persistPreparedUnifiedCognitiveSessionConfigSnapshot(frozen,db)).encrypted
-      if(prepared.assignments.has(item.id))assignments[item.id]=prepared.assignments.get(item.id)
+      if(prepared.assignments.has(item.id))assignments[item.id]=freezeTrainingFlowAssignment(prepared.assignments.get(item.id)!)
       runtime.cognitive.push({compositeItemId:item.id,testType:item.cognitiveAssignment.config.testType,instrumentVersion:frozen.compiledRuntime.instrumentVersion,sourceDefinitionHash:frozen.compiledRuntime.sourceDefinitionHash,compiledRuntimeHash:frozen.compiledRuntime.compiledRuntimeHash})
     }else if(item.type==='SITUATIONAL'){
       const snapshot=releases.get(situationalReleaseKey(situationalItemIdentity(item)))!.snapshot

@@ -37,7 +37,7 @@ def main():
     parser.add_argument('--source-state', type=Path, required=True)
     parser.add_argument('--state', type=Path, required=True)
     parser.add_argument('--expected-head', required=True, help='Explicit frozen full commit; business source must be clean')
-    parser.add_argument('--phase', choices=[*PHASES, 'all'], default='main')
+    parser.add_argument('--phase', choices=[*PHASES, 'all'], default='main-continuation')
     parser.add_argument('--from-state', type=Path, help='Read-only stopped C19 state with complete matching earlier phases')
     args = parser.parse_args()
     requested=PHASES if args.phase=='all' else PHASES[:PHASES.index(args.phase)+1]
