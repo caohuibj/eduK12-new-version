@@ -44,10 +44,13 @@ async function createTyped(withScale=false){
   // C03 intentionally does not enable advanced authoring. Configure only this
   // synthetic DRAFT before publication, then use production publish/FINAL HTTP.
   const items=await prisma.compositeAssessmentItem.findMany({where:{compositeAssessmentId:draft.id,type:'FORM'},orderBy:{position:'asc'}})
+  const sectionId=items[0].formSectionId
+  assert.ok(sectionId)
   for(const [i,item] of items.entries()){
     const {formType,value,...q}=typedDefinitions[i]
-    await prisma.compositeAssessmentItem.update({where:{id:item.id},data:{formType,required:q.required,formDefinition:{itemKey:'q_'+item.id.replaceAll('-','_'),options:[],rows:[],...q}}})
+    await prisma.compositeAssessmentItem.update({where:{id:item.id},data:{formType,required:q.required,formSectionId:sectionId,formSectionPosition:i,formDefinition:{itemKey:'q_'+item.id.replaceAll('-','_'),options:[],rows:[],...q}}})
   }
+  await prisma.compositeFormSection.deleteMany({where:{compositeAssessmentId:draft.id,id:{not:sectionId},items:{none:{}}}})
   const preflight=await teacher.request(`/questionnaire-products/${draft.id}/preflight`,'POST',{revision:draft.revision});assert.equal(preflight.ok,true)
   await teacher.request(`/questionnaire-products/${draft.id}/publish`,'POST',{revision:draft.revision})
   const {attempt}=await student.request(`/composite-assessments/${draft.id}/attempts`,'POST',{})
