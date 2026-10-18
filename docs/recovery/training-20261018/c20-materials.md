@@ -42,3 +42,13 @@ Training开发定向：6文件137 tests通过，覆盖新V2纯流/包身份和�
 全部真实PG生产dist HTTP分项脚本已编写，不能以语法通过代替运行。当前未获得C20功能GO、正式role/非空恢复/竞态/成本资格。C19动态suppressed独立断言、已测longCSV逐列assert和新fresh/browser/selected-video仍留C25，C26容量另验。
 
 c20-frontend-03：原inventory与session-auth门、app/cognitive两套tsc、Vite production build均通过，sourceUnchanged=true；只有既有chunk>500kB提示。路由派生修正的三个输入相对remote58完全未变，App最后变更为085fddd9（C10），保留历史深链接的局部授权和服务端新准入限制，未改运行路由。App/OrganizationRoutes/generator SHA分别af47d7ac8670aa45cdcc5dea2f34d00e0fe44af550d0eba5a7ffa7c5130d8114、7ff4d523067cd480a58a4c83a681628b61271eed29af392569e2f6e0fdd76f19、20c3239789f1f5fcb5fdf67cf506642ee779bee2f5e6f373d0de82cd0327d222。
+
+## Checkpoint 03：首个真实主链及有限复用
+
+state01全库升级通过：211→215表、174→175迁移；pinned C19 dump精确恢复、原事实及guards保留、正式restricted runtime role apply/verify通过。main首次因harness大写groupKey被官方schema正确拒绝，仅已有资源fixture/六item draft，无parent/FINAL；失败原件保留。修小写keys后纯schema预检14正向配置，另列非法负例，此项仅准备检查。
+
+state02为准确续验，绑定state01 receipt、失败result、私有fixture和既有draft，无seed/旧FINAL重交。真实Form→Scale→120-trial Cognitive→SJT四FINAL及精确重放成功，共4facts+1原outbox；按需准入、未达工具/whole/media拒绝、quota及最终GET/report闭环通过。cleanup/source/input均true。其原receipt SHA370ea04c56130cc9947df0008de81232b4da1ae5716c4c64f37f8759b139f935；不冒原main producer全部重新成功。
+
+后续launcher增加phaseProducers保留实际argv/脚本SHA/冻结输入/父receipt。state02历史main只能按明确continuation+唯一新phase导入，历史argv=null；upgrade明确为已验证receipt引用。旧结果及旧phasehash原样不回写。独立两review均对业务源码限定GO；动态匿名/KEEP/竞态/故障/消费者/恢复仍待。
+
+成本脚本冻结为固定51主体、a50/b1、两publication102parents/204FINAL，按a层10/20/50与真实导出总n+b分别测。另以固定anchor比较同task1/2目标组，API最少2waves；FULL_CASE互斥组空匹配不能解释为优化收益。同task不同group每wave仍重复graph是有界P3，记录SQL/返回行/解密量，不宣称跨组一次load或C26容量资格。

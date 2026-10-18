@@ -1,0 +1,82 @@
+"""Pure receipt provenance validation. Never infer historical argv from phase names."""
+import copy
+import hashlib
+import json
+import re
+from pathlib import Path
+
+
+def digest(value):
+    return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+
+
+def sha_file(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def source_sha(frozen, filename):
+    assert re.fullmatch(r'c20-[a-z0-9-]+\.(mjs|py)', filename), 'unsafe producer filename'
+    entries = [e for e in frozen['sourceInputs'] if e['path'] == 'server-version/scripts/recovery/' + filename]
+    assert len(entries) == 1, 'producer missing or duplicated in frozen inputs'
+    return entries[0]['sha256']
+
+
+def import_receipt(state, expected_sha):
+    state = Path(state)
+    receipt_sha = sha_file(state / 'c20-runtime-result.json')
+    assert expected_sha and receipt_sha == expected_sha, 'exact prior runtime receipt required'
+    receipt = json.loads((state / 'c20-runtime-result.json').read_text())
+    frozen = json.loads((state / 'frozen-inputs.json').read_text())
+    assert digest(frozen['sourceInputs']) == frozen['sourceInputsSha256'] == receipt['sourceInputsSha256']
+    assert frozen['phaseInputHashes'] == receipt['phaseInputHashes']
+    assert all(receipt.get(k) is True for k in ['cleanupVerified', 'sourceUnchanged', 'inputsUnchanged'])
+    assert receipt.get('priorSourceUnchanged', True)
+    reused = set(receipt.get('reusedPhases', []))
+    phases = receipt['phases']
+    assert reused <= set(phases)
+    new = set(phases) - reused
+    continuation = receipt.get('continuation')
+    markers = {p for p, r in phases.items() if p not in reused and r.get('priorProducer', {}).get('continuation')}
+    if markers:
+        assert continuation, 'continuation result is missing producer marker'
+    if continuation:
+        assert len(new) == 1, 'legacy continuation must identify exactly one newly executed phase'
+        phase = next(iter(new))
+        assert markers == {phase}, 'continuation phase result marker missing'
+        assert source_sha(frozen, continuation['file']) == continuation['sha256'], 'continuation SHA differs from frozen inputs'
+        assert phases[phase]['priorProducer']['runtimeSha256'] == continuation['priorRuntimeSha256']
+    records = {}
+    for phase, value in phases.items():
+        if value.get('passed') is not True:
+            continue
+        assert json.loads((state / f'c20-{phase}-result.json').read_text()) == value, 'phase result differs from runtime receipt'
+        existing = receipt.get('phaseProducers', {}).get(phase)
+        if existing:
+            record = copy.deepcopy(existing)
+            assert record['nominalPhaseInputHash'] == receipt['phaseInputHashes'][phase]
+            assert record['phaseResultSha256'] == digest(value)
+            if phase not in reused:
+                assert record['sourceInputsSha256'] == frozen['sourceInputsSha256']
+                assert source_sha(frozen, record['file']) == record['sha256']
+                assert record.get('argv'), 'new producer lacks actual argv'
+        else:
+            record = {'schemaVersion': 1, 'nominalPhaseInputHash': receipt['phaseInputHashes'][phase],
+                      'phaseResultSha256': digest(value), 'sourceInputsSha256': frozen['sourceInputsSha256'],
+                      'evidenceReceiptSha256': receipt_sha, 'evidenceFrozenInputsSha256': sha_file(state / 'frozen-inputs.json')}
+            if continuation and phase in new:
+                record.update(qualification='LEGACY_EXPLICIT_CONTINUATION', file=continuation['file'], sha256=continuation['sha256'],
+                              continuation=copy.deepcopy(continuation), argv=None,
+                              evidence='Unique newly executed phase plus explicit top-level continuation and frozen source entry; historical argv was not recorded.')
+            else:
+                record.update(qualification='LEGACY_ACCEPTED_RECEIPT_REFERENCE', argv=None,
+                              evidence='Reused from verified receipt; actual historical producer is not asserted.' if phase in reused else 'Accepted legacy receipt; actual historical producer is not asserted.')
+        record.setdefault('receiptChain', []).append(receipt_sha)
+        records[phase] = record
+    return receipt, records
+
+
+def executed_producer(phase, file, argv, frozen, phase_result):
+    return {'schemaVersion': 1, 'qualification': 'RECORDED_EXECUTION', 'file': file,
+            'sha256': source_sha(frozen, file), 'argv': list(map(str, argv)),
+            'nominalPhaseInputHash': frozen['phaseInputHashes'][phase],
+            'sourceInputsSha256': frozen['sourceInputsSha256'], 'phaseResultSha256': digest(phase_result), 'receiptChain': []}

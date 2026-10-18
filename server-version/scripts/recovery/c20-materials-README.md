@@ -140,3 +140,30 @@ this launcher deliberately refuses to silently replay incompatible phases.
 
 Only sanitized results/manifests may be published. Private runtime, journals,
 credentials, raw rows, answers, dumps, uploads and operation files remain local.
+
+## Exact phase producer receipt chain
+
+Every `--from-state` requires `--expected-prior-runtime-sha256`, including ordinary
+reuse without a continuation. The read-only importer checks that exact receipt,
+its frozen source manifest digest, phase hashes, and each accepted phase result.
+New executions record `phaseProducers` with the actual command argv, producer
+file/SHA, nominal phase-input hash, source-input digest, and phase-result digest.
+Later reuse preserves that producer and appends the accepted receipt SHA.
+The nominal phase-input hash is not relabeled as proof of a different producer.
+
+State02 compatibility is deliberately narrow: the sole newly executed phase and
+its explicit top-level continuation must agree with the phase result marker and
+frozen source entry. Its main producer is `LEGACY_EXPLICIT_CONTINUATION`, with
+historical argv left null. Its reused upgrade is
+`LEGACY_ACCEPTED_RECEIPT_REFERENCE`: it was imported from the verified receipt,
+and no historical executable or argv is inferred. Original result files and
+phase hashes remain unchanged. This permits continuation provenance to survive
+subsequent `all` reuse without claiming that the nominal main script ran.
+
+`python3 server-version/scripts/recovery/c20-materials-receipts-check.py` performs
+seven pure temporary-file checks, including absent continuation markers, wrong
+producer hashes, multiple newly executed phases, exact-receipt mismatch, and
+second-generation preservation. These checks are preparation evidence only.
+The receipt helper is included in launcher frozen inputs, not the per-phase
+business input set, so this provenance-only patch does not invalidate prior
+upgrade/main execution hashes.

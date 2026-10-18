@@ -25,6 +25,7 @@ BASE = Path(__file__).resolve().parent; BACKEND = BASE.parents[1] / 'backend'; R
 def module(name, file):
     spec=importlib.util.spec_from_file_location(name, BASE / file); result=importlib.util.module_from_spec(spec); spec.loader.exec_module(result); return result
 m = module('c20_db', 'c20-materials-db.py'); support = module('c20_support', 'c18-study-http.py')
+receipts = module('c20_receipts', 'c20-materials-receipts.py')
 sha_file, digest, manifest, stopped = m.sha_file, m.digest, support.manifest, support.stopped
 FLOOR = 8 * 1024 ** 3
 PHASES = ['upgrade', 'main', 'anonymous', 'linked', 'race', 'rollback', 'branches', 'revocation', 'consumers', 'consumer-cost', 'cost', 'guards', 'restore']
@@ -43,6 +44,9 @@ def main():
     parser.add_argument('--continuation-sha256')
     parser.add_argument('--expected-prior-runtime-sha256')
     args = parser.parse_args()
+    if args.from_state:
+        assert args.expected_prior_runtime_sha256, 'all from-state imports require exact prior receipt SHA'
+        assert sha_file(args.from_state/'c20-runtime-result.json') == args.expected_prior_runtime_sha256
     if args.continuation_script:
         assert args.from_state and args.phase not in ['all','upgrade','restore']
         assert re.fullmatch(r'c20-[a-z0-9-]+[.]mjs',args.continuation_script)
@@ -51,7 +55,7 @@ def main():
         prior_receipt=json.loads((args.from_state/'c20-runtime-result.json').read_text())
         assert sha_file(args.from_state/'c20-final-db-snapshot.json')==prior_receipt['finalSnapshotSha256']
     requested=PHASES if args.phase=='all' else PHASES[:PHASES.index(args.phase)+1]
-    consumed_c20={'c20-materials-http.py','c20-materials-db.py'} | {'c20-materials-'+phase+('.py' if phase in ['upgrade','restore'] else '.mjs') for phase in requested}
+    consumed_c20={'c20-materials-http.py','c20-materials-db.py','c20-materials-receipts.py'} | {'c20-materials-'+phase+('.py' if phase in ['upgrade','restore'] else '.mjs') for phase in requested}
     if args.continuation_script: consumed_c20.add(args.continuation_script)
     if any(phase not in ['upgrade','restore'] for phase in requested): consumed_c20 |= COMMON_HTTP
     tools, source, state = [p.resolve() for p in [args.tools, args.source_state, args.state]]
@@ -80,7 +84,7 @@ def main():
     dump = source/'c19-new-format-restore/c19-http-new-format.dump'; assert sha_file(dump) == m.PINNED_DUMP_SHA256
     prior_result = None
     if prior:
-        stopped(prior); prior_result = json.loads((prior/'c20-runtime-result.json').read_text())
+        stopped(prior); prior_result, prior_producers = receipts.import_receipt(prior, args.expected_prior_runtime_sha256)
         assert all(prior_result.get(k) is True for k in ['cleanupVerified','sourceUnchanged','inputsUnchanged'])
         assert prior_result.get('priorSourceUnchanged',True)
         assert prior_result['pinnedC19DumpSha256'] == m.PINNED_DUMP_SHA256
@@ -99,7 +103,8 @@ def main():
     assert shutil.disk_usage(state.parent).free-copy_bytes-512*1024**2>=FLOOR, 'clone reserve crosses 8GiB stop line; no history is deleted'
     os.umask(0o077); state.mkdir(mode=0o700)
     env={'PATH':f'{node.parent}:{pg}:/usr/bin:/bin','HOME':str(state),'TMPDIR':str(state),'TZ':'UTC','LANG':'C.UTF-8','NODE_ENV':'test','PYTHONDONTWRITEBYTECODE':'1'}
-    result={'passed':False,'qualificationScope':'C20_FLOW_'+args.phase.upper(),'phases':{},'reusedPhases':[],'pinnedC19DumpSha256':m.PINNED_DUMP_SHA256,'pinnedC19ResultSha256':m.PINNED_RESULT_SHA256,'sourceHead':source_status['head'],'freshPrisma':fresh,'cloneBytes':copy_bytes}
+    result={'passed':False,'qualificationScope':'C20_FLOW_'+args.phase.upper(),'phases':{},'phaseProducers':{},'reusedPhases':[],'pinnedC19DumpSha256':m.PINNED_DUMP_SHA256,'pinnedC19ResultSha256':m.PINNED_RESULT_SHA256,'sourceHead':source_status['head'],'freshPrisma':fresh,'cloneBytes':copy_bytes}
+    if prior: result['acceptedPriorRuntimeSha256']=args.expected_prior_runtime_sha256
     status={'state':'preparing','ports':{},'pids':{},'startedAt':time.time()}
     children, logs=[],[]; pinned=source_manifest=prior_manifest=None
     def record():
@@ -183,6 +188,7 @@ def main():
                 if phase in requested and prior_result['phases'].get(phase,{}).get('passed'):
                     assert prior_result['phaseInputHashes'][phase]==pinned['phaseInputHashes'][phase], f'accepted {phase} inputs changed; no automatic replay'
                     result['phases'][phase]=prior_result['phases'][phase]; result['reusedPhases'].append(phase)
+                    result['phaseProducers'][phase]=prior_producers[phase]
                 elif (prior/f'c20-{phase}-result.json').exists():
                     failed=json.loads((prior/f'c20-{phase}-result.json').read_text())
                     assert not failed.get('checks') or (args.continuation_script and phase==args.phase), 'partial successful phase needs exact reviewed continuation, never rerun'
@@ -226,9 +232,11 @@ def main():
         for phase in requested:
             if phase in result['reusedPhases']: continue
             verify()
+            producer_file = args.continuation_script if args.continuation_script and phase==args.phase else f'c20-materials-{phase}.' + ('py' if phase in ['upgrade','restore'] else 'mjs')
+            producer_argv = ['python3',BASE/producer_file,'--tools',tools,'--state',state] if phase in ['upgrade','restore'] else [node,'--require',BASE/'loopback-only.cjs',BASE/producer_file,state]
             if phase in ['upgrade','restore']:
                 status['state']='upgrading' if phase=='upgrade' else 'restoring'; record()
-                run(['python3',BASE/f'c20-materials-{phase}.py','--tools',tools,'--state',state],'c20-'+phase,timeout=300)
+                run(producer_argv,'c20-'+phase,timeout=300)
             else:
                 if not http_started:
                     redis_process=start([redis,'--bind','127.0.0.1','--port',redisport,'--dir',state,'--save','','--appendonly','no','--maxmemory','128mb','--maxmemory-policy','noeviction'],'redis'); ready(redisport,redis_process)
@@ -238,10 +246,11 @@ def main():
                         with urllib.request.urlopen(status['apiUrl']+'/'+endpoint,timeout=8) as response: assert response.status==200
                     http_started=True
                 status['state']='running'; record()
-                run([node,'--require',BASE/'loopback-only.cjs',BASE/(args.continuation_script if args.continuation_script and phase==args.phase else f'c20-materials-{phase}.mjs'),state],'c20-'+phase,public_runtime)
+                run(producer_argv,'c20-'+phase,public_runtime)
                 db.original_rows_unchanged(json.loads((state/'c20-original-rows-private.json').read_text()))
                 (state/f'c20-{phase}-post-state.json').write_text(json.dumps(db.snapshot(),indent=2))
             result['phases'][phase]=json.loads((state/f'c20-{phase}-result.json').read_text()); assert result['phases'][phase]['passed'] is True
+            result['phaseProducers'][phase]=receipts.executed_producer(phase,producer_file,producer_argv,pinned,result['phases'][phase])
             verify(); guard()
         result['passed']=all(result['phases'].get(p,{}).get('passed') is True for p in requested)
     except BaseException as error:
