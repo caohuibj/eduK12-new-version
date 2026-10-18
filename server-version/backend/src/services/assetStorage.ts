@@ -196,10 +196,11 @@ export const storeAssetFromFile = async (input: StoreAssetFileInput) => {
  * Retention and soft deletion acquire ONLY these rows; never take a content or
  * physical lock while holding them. Re-read authorization/identity after locking.
  */
-export const lockStoredAssetRows = async (db: AssetDatabase, assetIds: readonly string[]): Promise<void> => {
+export const lockStoredAssetRows = async (db: AssetDatabase, assetIds: readonly string[], mode: 'share' | 'update' = 'share'): Promise<void> => {
   const ids = [...new Set(assetIds)].sort()
   if (!ids.length) return
-  await db.$queryRaw(Prisma.sql`SELECT id FROM stored_assets WHERE id IN (${Prisma.join(ids)}) ORDER BY id FOR UPDATE`)
+  const lockMode = mode === 'update' ? Prisma.sql`FOR UPDATE` : Prisma.sql`FOR SHARE`
+  await db.$queryRaw(Prisma.sql`SELECT id FROM stored_assets WHERE id IN (${Prisma.join(ids)}) ORDER BY id ${lockMode}`)
 }
 
 /** Reuse the caller's transaction so parent facts and retention commit together. */
@@ -214,7 +215,7 @@ export const softDeleteStoredAsset = async (params: {
   authorize: (asset: Prisma.StoredAssetGetPayload<{}>, tx: Prisma.TransactionClient) => Promise<boolean>
   db?: AssetDatabase
 }): Promise<SoftDeleteAssetResult> => inAssetTransaction(params.db || prisma, async tx => {
-  await lockStoredAssetRows(tx, [params.assetId])
+  await lockStoredAssetRows(tx, [params.assetId], 'update')
   const asset = await tx.storedAsset.findUnique({ where: { id: params.assetId } })
   if (!asset) return 'missing'
   if (!await params.authorize(asset, tx)) return 'forbidden'
@@ -224,6 +225,58 @@ export const softDeleteStoredAsset = async (params: {
   // safe and preserves shared COS bytes; controlled GC owns physical cleanup.
   return 'deleted'
 })
+
+export interface AssetReferenceWrite {
+  assetId: string
+  entityType: string
+  entityId: string
+  field: string
+}
+
+/** Internal trusted batch writer. Caller MUST hold SHARE (or UPDATE) locks for
+ * the entire set and validate every catalog identity in this same transaction.
+ * Sorted insertion also orders unique-key conflicts for identical owners.
+ */
+const attachLockedAssetReferenceBatch = async (
+  references: readonly AssetReferenceWrite[], db: Prisma.TransactionClient,
+): Promise<void> => {
+  if (!references.length) return
+  const key = (reference: AssetReferenceWrite) => JSON.stringify([
+    reference.assetId, reference.entityType, reference.entityId, reference.field,
+  ])
+  const unique = new Map(references.map(reference => [key(reference), reference]))
+  const data = [...unique.entries()].sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0).map(([, reference]) => reference)
+  await db.assetReference.createMany({ data, skipDuplicates: true })
+}
+
+const readLockedAssets = (db: Prisma.TransactionClient, ids: readonly string[]) => db.storedAsset.findMany({
+  where: { id: { in: [...new Set(ids)] } },
+  select: { id: true, objectKey: true, storageObjectKey: true, provider: true, mimeType: true,
+    sizeBytes: true, sha256: true, deletedAt: true },
+})
+const assertLockedAssetsActive = (ids: readonly string[], assets: readonly StoredAssetContent[]): void => {
+  if (assets.length !== new Set(ids).size || assets.some(asset => asset.deletedAt))
+    throw new AssetReferenceValidationError('附件不存在或已删除')
+}
+
+/** A single lock/read/batch-write transaction. Optional domain validation uses
+ * the already-read catalog, never an unchecked writer or a cross-request cache.
+ * The active/missing guard is mandatory even when domain validation is supplied.
+ */
+export const attachAssetReferences = async (
+  references: readonly AssetReferenceWrite[], db: AssetDatabase = prisma,
+  validateLockedAssets?: (assets: readonly StoredAssetContent[]) => void | Promise<void>,
+): Promise<void> => {
+  if (!references.length) return
+  await inAssetTransaction(db, async tx => {
+    const ids = references.map(reference => reference.assetId)
+    await lockStoredAssetRows(tx, ids)
+    const assets = await readLockedAssets(tx, ids)
+    await validateLockedAssets?.(assets)
+    assertLockedAssetsActive(ids, assets)
+    await attachLockedAssetReferenceBatch(references, tx)
+  })
+}
 
 export const attachAssetReference = async (params: {
   assetId: string
@@ -257,7 +310,7 @@ export const discardUnreferencedAsset = async (asset: {
   let stored: Prisma.StoredAssetGetPayload<{}> | null
   try {
     stored = await prisma.$transaction(async tx => {
-      await lockStoredAssetRows(tx, [asset.id])
+      await lockStoredAssetRows(tx, [asset.id], 'update')
       const current = await tx.storedAsset.findUnique({ where: { id: asset.id } })
       if (!current || current.objectKey !== asset.objectKey || current.provider !== asset.provider
         || current.duplicateCleanupPending || await tx.assetReference.count({ where: { assetId: asset.id } })) return null
@@ -321,18 +374,15 @@ export const syncAssetReferences = async (params: {
     // Lock the entire incoming set once; per-reference locking alone can reverse
     // order when two content updates contain the same assets in different orders.
     await lockStoredAssetRows(db, references.map(reference => reference.assetId))
+    const ids = references.map(reference => reference.assetId)
+    if (ids.length) assertLockedAssetsActive(ids, await readLockedAssets(db, ids))
     await db.assetReference.deleteMany({
       where: { entityType: params.entityType, entityId: params.entityId },
     })
-
-    for (const reference of references) {
-      await attachAssetReference({
-        assetId: reference.assetId,
-        entityType: params.entityType,
-        entityId: params.entityId,
-        field: reference.field,
-      }, db)
-    }
+    await attachLockedAssetReferenceBatch(references.map(reference => ({
+      assetId: reference.assetId, entityType: params.entityType,
+      entityId: params.entityId, field: reference.field,
+    })), db)
   })
 }
 

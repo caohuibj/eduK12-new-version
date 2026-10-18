@@ -1,0 +1,1832 @@
+{
+  "passed": false,
+  "harnessInputs": {
+    "scripts/recovery/c13-sjt-http.py": "6cb36e755ad276211dd4ff7d613313e19e834f3e3c5b87f42e0ae4a5125bb391",
+    "scripts/recovery/c13-sjt-smoke.mjs": "92197f768ce36655d50d08190bb7682e2b68ebb4f429e7ea80c78082ccd87b03",
+    "scripts/recovery/c13-sjt-restore.py": "9375301c8d2075ae2b5ee1237a05fee2392b0f94d76322e770efdadde308acec",
+    "e2e/questionnaire-products-fixture.ts": "f5a1f97986a60c937f6bc299d73f83cb10a448701f5dcc751c70077a11c7e1ac",
+    "backend/src/modules/situational/authoring/examples/online-hand-calculated.json": "a8e9eb897bd7705c785a86bc0de16d0bce7c7e28e90611542ac2e0c79ccf7e5a",
+    "backend/src/modules/situational/instruments/sjt-assertiveness-golden/1.0.0/instrument.json": "e0ef7c315cf42db521ba9d9fc19b4a11408473f487c2bd0f2e9ad1811214f1fb",
+    "scripts/recovery/local-stack.py": "6e2be9037719977a502dbd5eb9a7aeac04e06b2d22f5cf41eb7e767f6b3eb79b",
+    "scripts/recovery/runtime-fingerprint.cjs": "d03a5fdafa8718657ae974e11b52f71f5a77623aac32e243eb729cc338791ce2",
+    "backend/src/__tests__/integration/sjt-image-retention.postgres.integration.test.ts": "e7c9c9a6b1b71a817ec9a3bb52f803e52b97ff2860fa66da597e5852c6bea0cd"
+  },
+  "sourceHead": "5d8d8b9d745e7eaead140e21242dc09dae6a19b9",
+  "runtimeFingerprint": {
+    "schemaVersion": 1,
+    "nodeVersion": "v24.21.0",
+    "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+    "dist": {
+      "files": 5049,
+      "sha256": "fae14194c64b2ad270a09e3b523b18f36e31e8cacb5d1b72f86fcc77f189b222"
+    },
+    "files": {
+      "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+      "prisma/schema.prisma": "e3c8b6fc37d31fbb15907a9bcd792b82b00132b966ce3ba87ecb8bcbce17797d",
+      "node_modules/.prisma/client/schema.prisma": "c5cf9c1fe0e678ace372a369a3efe9b327080fb3078f5bfda0a4b744e14c04fa",
+      "node_modules/.prisma/client/index.js": "0a64489bf61221c6115d4832878799dfa310d619bcc0962be1504c719cdbe90f"
+    },
+    "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+  },
+  "phases": {
+    "sjt": {
+      "passed": true,
+      "checks": [
+        "Real HTTP actors and restricted NOSUPERUSER/NOCREATEDB/NOCREATEROLE/NOBYPASSRLS runtime",
+        "Private <=2 MB image HTTP upload, owner proxy, MIME/size/rights/hash/foreign-use rejection, independent immutable release and retention",
+        "Grant wrong key rejected without attempt artifacts",
+        "Grant wrong version rejected without attempt artifacts",
+        "Grant wrong hash rejected without attempt artifacts",
+        "Grant wrong digest rejected without attempt artifacts",
+        "Grant wrong teacher rejected without attempt artifacts",
+        "Grant wrong course rejected without attempt artifacts",
+        "Grant wrong purpose rejected without attempt artifacts",
+        "Grant expired rejected without attempt artifacts",
+        "Controlled release cannot be granted to a non-Training course",
+        "Controlled release rejects GENERAL anonymous publishing",
+        "Controlled release rejects unbound COURSE publishing",
+        "Controlled release rejects multi-course publishing",
+        "Exact course grant rejects another course",
+        "Nonmember/other teacher/standalone admission rejected",
+        "Revocation rejects a new eligible student without parent/child/job/raw/canonical residue",
+        "Revocation rejects fresh anonymous admission in the authorized single-course delivery",
+        "Exact frozen grant receipt survives revocation for member and single-course anonymous users: resume/image/FINAL/report; both fresh admission paths denied",
+        "Original export queue csv: exact canonical identities/metrics, no raw responses, owner-only download",
+        "Original export queue zip: exact canonical identities/metrics, no raw responses, owner-only download",
+        "Expired grant denies fresh eligible admission without artifacts",
+        "Expiry preserves previously admitted image/FINAL/report recovery",
+        "Future grant cannot authorize publishing",
+        "Future grant cannot authorize new admission",
+        "ADAPT alone cannot authorize source distribution",
+        "ADAPT exact grant version mismatch cannot create a draft",
+        "ADAPT exact source hash mismatch cannot create a draft",
+        "ADAPT exact source version mismatch cannot create a draft",
+        "ADAPT exact course mismatch cannot create a draft",
+        "ADAPT exact grant id mismatch cannot create a draft",
+        "New adapted release requires its own DISTRIBUTE grant",
+        "ADAPT makes independent reviewed version with new manual golden; immutable original unchanged; revoked ADAPT blocks new/unpublished source-draft access",
+        "Real grant row lock: revoke-first commits before admission; zero attempt artifacts",
+        "Real grant\u2192asset row locks: admission-first commits frozen attempt before revoke",
+        "Admission-first still rejects a later new student after revoke",
+        "Real publication race: revoke-first leaves original product DRAFT",
+        "Real publication race: publish-first commits then revoke denies later admission",
+        "Publish-first then revoked grant denies new admission",
+        "Teacher freezes while scope SHARE waits: committed account state rejects HTTP admission without artifacts",
+        "Expiry while waiting for real grant row lock rejects admission without artifacts",
+        "Legacy null-policy multi-course anonymous start/resume/FINAL/replay/report remains compatible without injected grant receipt"
+      ],
+      "requests": [
+        {
+          "route": "/auth/csrf",
+          "method": "GET",
+          "status": 200,
+          "bytes": 102
+        },
+        {
+          "route": "/auth/training-login",
+          "method": "POST",
+          "status": 200,
+          "bytes": 284
+        },
+        {
+          "route": "/auth/csrf",
+          "method": "GET",
+          "status": 200,
+          "bytes": 102
+        },
+        {
+          "route": "/auth/login",
+          "method": "POST",
+          "status": 200,
+          "bytes": 312
+        },
+        {
+          "route": "/auth/csrf",
+          "method": "GET",
+          "status": 200,
+          "bytes": 102
+        },
+        {
+          "route": "/auth/training-login",
+          "method": "POST",
+          "status": 200,
+          "bytes": 318
+        },
+        {
+          "route": "/auth/csrf",
+          "method": "GET",
+          "status": 200,
+          "bytes": 102
+        },
+        {
+          "route": "/auth/training-login",
+          "method": "POST",
+          "status": 200,
+          "bytes": 284
+        },
+        {
+          "route": "/auth/csrf",
+          "method": "GET",
+          "status": 200,
+          "bytes": 102
+        },
+        {
+          "route": "/auth/training-login",
+          "method": "POST",
+          "status": 200,
+          "bytes": 284
+        },
+        {
+          "route": "/auth/csrf",
+          "method": "GET",
+          "status": 200,
+          "bytes": 102
+        },
+        {
+          "route": "/auth/training-login",
+          "method": "POST",
+          "status": 200,
+          "bytes": 284
+        },
+        {
+          "route": "/auth/csrf",
+          "method": "GET",
+          "status": 200,
+          "bytes": 102
+        },
+        {
+          "route": "/auth/training-login",
+          "method": "POST",
+          "status": 200,
+          "bytes": 284
+        },
+        {
+          "route": "/situational/authoring/media/images",
+          "method": "POST",
+          "status": 200,
+          "bytes": 239
+        },
+        {
+          "route": "/situational/authoring/media/images/639733cd-656c-44ee-b96a-580976d88957/content",
+          "method": "GET",
+          "status": 200,
+          "bytes": 68
+        },
+        {
+          "route": "/situational/authoring/media/images/639733cd-656c-44ee-b96a-580976d88957/content",
+          "method": "GET",
+          "status": 404,
+          "bytes": 69
+        },
+        {
+          "route": "/situational/authoring/media/images",
+          "method": "POST",
+          "status": 400,
+          "bytes": 57
+        },
+        {
+          "route": "/situational/authoring/media/images",
+          "method": "POST",
+          "status": 400,
+          "bytes": 57
+        },
+        {
+          "route": "/situational/authoring/online/drafts",
+          "method": "POST",
+          "status": 200,
+          "bytes": 4933
+        },
+        {
+          "route": "/situational/authoring/online/drafts",
+          "method": "POST",
+          "status": 403,
+          "bytes": 124
+        },
+        {
+          "route": "/situational/authoring/online/drafts",
+          "method": "POST",
+          "status": 422,
+          "bytes": 193
+        },
+        {
+          "route": "/situational/authoring/online/drafts",
+          "method": "POST",
+          "status": 422,
+          "bytes": 190
+        },
+        {
+          "route": "/situational/authoring/online/drafts",
+          "method": "POST",
+          "status": 403,
+          "bytes": 137
+        },
+        {
+          "route": "/situational/authoring/drafts/e40b4d6f-1df8-48d9-b6a3-df350c46061a/review",
+          "method": "POST",
+          "status": 403,
+          "bytes": 70
+        },
+        {
+          "route": "/situational/authoring/drafts/e40b4d6f-1df8-48d9-b6a3-df350c46061a/media/639733cd-656c-44ee-b96a-580976d88957/content",
+          "method": "GET",
+          "status": 200,
+          "bytes": 68
+        },
+        {
+          "route": "/situational/authoring/drafts/e40b4d6f-1df8-48d9-b6a3-df350c46061a/request-review",
+          "method": "POST",
+          "status": 200,
+          "bytes": 4937
+        },
+        {
+          "route": "/situational/authoring/drafts/e40b4d6f-1df8-48d9-b6a3-df350c46061a/review",
+          "method": "POST",
+          "status": 200,
+          "bytes": 4937
+        },
+        {
+          "route": "/situational/authoring/drafts/e40b4d6f-1df8-48d9-b6a3-df350c46061a",
+          "method": "GET",
+          "status": 200,
+          "bytes": 15070
+        },
+        {
+          "route": "/situational/authoring/media/images/639733cd-656c-44ee-b96a-580976d88957",
+          "method": "DELETE",
+          "status": 409,
+          "bytes": 93
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/grants",
+          "method": "POST",
+          "status": 409,
+          "bytes": 91
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/grants",
+          "method": "POST",
+          "status": 409,
+          "bytes": 91
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/grants",
+          "method": "POST",
+          "status": 409,
+          "bytes": 91
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/grants",
+          "method": "POST",
+          "status": 409,
+          "bytes": 91
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/grants",
+          "method": "POST",
+          "status": 403,
+          "bytes": 98
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/grants",
+          "method": "POST",
+          "status": 403,
+          "bytes": 98
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/grants",
+          "method": "POST",
+          "status": 400,
+          "bytes": 61
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/grants",
+          "method": "POST",
+          "status": 400,
+          "bytes": 79
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/grants",
+          "method": "POST",
+          "status": 403,
+          "bytes": 98
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/grants",
+          "method": "POST",
+          "status": 403,
+          "bytes": 75
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/grants",
+          "method": "POST",
+          "status": 200,
+          "bytes": 851
+        },
+        {
+          "route": "/questionnaire-products",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1124
+        },
+        {
+          "route": "/questionnaire-products/aef46d98-2ef3-450d-991c-74a62af5991d/items",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1530
+        },
+        {
+          "route": "/questionnaire-products/aef46d98-2ef3-450d-991c-74a62af5991d/preflight",
+          "method": "POST",
+          "status": 200,
+          "bytes": 412
+        },
+        {
+          "route": "/questionnaire-products/aef46d98-2ef3-450d-991c-74a62af5991d/publish",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1556
+        },
+        {
+          "route": "/situational/authoring/releases",
+          "method": "GET",
+          "status": 200,
+          "bytes": 516
+        },
+        {
+          "route": "/situational/authoring/drafts/e40b4d6f-1df8-48d9-b6a3-df350c46061a",
+          "method": "GET",
+          "status": 403,
+          "bytes": 67
+        },
+        {
+          "route": "/situational/authoring/drafts/e40b4d6f-1df8-48d9-b6a3-df350c46061a/media/639733cd-656c-44ee-b96a-580976d88957/content",
+          "method": "GET",
+          "status": 403,
+          "bytes": 63
+        },
+        {
+          "route": "/situational/authoring/drafts/e40b4d6f-1df8-48d9-b6a3-df350c46061a/preview",
+          "method": "POST",
+          "status": 403,
+          "bytes": 67
+        },
+        {
+          "route": "/situational/authoring/drafts/e40b4d6f-1df8-48d9-b6a3-df350c46061a/policy",
+          "method": "PUT",
+          "status": 409,
+          "bytes": 70
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/adapt",
+          "method": "POST",
+          "status": 403,
+          "bytes": 77
+        },
+        {
+          "route": "/questionnaire-products",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1145
+        },
+        {
+          "route": "/questionnaire-products/8ca1e588-6540-4950-abda-ea2bf31c705e/items",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1551
+        },
+        {
+          "route": "/questionnaire-products/8ca1e588-6540-4950-abda-ea2bf31c705e/preflight",
+          "method": "POST",
+          "status": 200,
+          "bytes": 412
+        },
+        {
+          "route": "/questionnaire-products/8ca1e588-6540-4950-abda-ea2bf31c705e/publish",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1577
+        },
+        {
+          "route": "/auth/csrf",
+          "method": "GET",
+          "status": 200,
+          "bytes": 102
+        },
+        {
+          "route": "/composite-assessments/8ca1e588-6540-4950-abda-ea2bf31c705e/public-tokens",
+          "method": "POST",
+          "status": 200,
+          "bytes": 208
+        },
+        {
+          "route": "/public/composite-assessments/[token]/start",
+          "method": "POST",
+          "status": 200,
+          "bytes": 7713
+        },
+        {
+          "route": "/questionnaire-products",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1004
+        },
+        {
+          "route": "/questionnaire-products/308b9387-781b-4a8e-84f7-27e251c9412d/items",
+          "method": "POST",
+          "status": 403,
+          "bytes": 72
+        },
+        {
+          "route": "/questionnaire-products",
+          "method": "POST",
+          "status": 200,
+          "bytes": 979
+        },
+        {
+          "route": "/questionnaire-products/51b413b4-d375-4fa2-b93c-d7428bad80f3/items",
+          "method": "POST",
+          "status": 403,
+          "bytes": 72
+        },
+        {
+          "route": "/questionnaire-products",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1346
+        },
+        {
+          "route": "/questionnaire-products/403e4e82-0c58-4e9d-a693-097ee4817d32/items",
+          "method": "POST",
+          "status": 403,
+          "bytes": 72
+        },
+        {
+          "route": "/questionnaire-products",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1152
+        },
+        {
+          "route": "/questionnaire-products/2154cefc-4ed7-4efe-8db4-f88e6d9af626/items",
+          "method": "POST",
+          "status": 403,
+          "bytes": 75
+        },
+        {
+          "route": "/composite-assessments/aef46d98-2ef3-450d-991c-74a62af5991d/attempts",
+          "method": "POST",
+          "status": 403,
+          "bytes": 75
+        },
+        {
+          "route": "/composite-assessments/aef46d98-2ef3-450d-991c-74a62af5991d/attempts",
+          "method": "POST",
+          "status": 403,
+          "bytes": 54
+        },
+        {
+          "route": "/situational/attempts",
+          "method": "POST",
+          "status": 400,
+          "bytes": 72
+        },
+        {
+          "route": "/composite-assessments/aef46d98-2ef3-450d-991c-74a62af5991d/attempts",
+          "method": "POST",
+          "status": 200,
+          "bytes": 7642
+        },
+        {
+          "route": "/situational/authoring/grants/9794625f-4263-4913-b3b8-353d73d1e8eb/revoke",
+          "method": "POST",
+          "status": 200,
+          "bytes": 947
+        },
+        {
+          "route": "/composite-assessments/aef46d98-2ef3-450d-991c-74a62af5991d/attempts",
+          "method": "POST",
+          "status": 403,
+          "bytes": 75
+        },
+        {
+          "route": "/auth/csrf",
+          "method": "GET",
+          "status": 200,
+          "bytes": 102
+        },
+        {
+          "route": "/public/composite-assessments/[token]/start",
+          "method": "POST",
+          "status": 403,
+          "bytes": 75
+        },
+        {
+          "route": "/composite-assessments/aef46d98-2ef3-450d-991c-74a62af5991d/attempts",
+          "method": "POST",
+          "status": 200,
+          "bytes": 7642
+        },
+        {
+          "route": "/composite-assessments/attempts/6916ec2b-1de4-4fd7-9efb-32d08ef7312d",
+          "method": "GET",
+          "status": 200,
+          "bytes": 7600
+        },
+        {
+          "route": "/composite-assessments/attempts/6916ec2b-1de4-4fd7-9efb-32d08ef7312d/items/d6b900ee-ff46-48d9-9be4-7826bf08ec3f/situational/9194e7ac-6e3b-4e69-b2e1-6faff009ecf8/assets/639733cd-656c-44ee-b96a-580976d88957/content",
+          "method": "GET",
+          "status": 200,
+          "bytes": 68
+        },
+        {
+          "route": "/composite-assessments/attempts/6916ec2b-1de4-4fd7-9efb-32d08ef7312d/items/d6b900ee-ff46-48d9-9be4-7826bf08ec3f/situational/9194e7ac-6e3b-4e69-b2e1-6faff009ecf8/assets/639733cd-656c-44ee-b96a-580976d88957/content",
+          "method": "GET",
+          "status": 403,
+          "bytes": 94
+        },
+        {
+          "route": "/composite-assessments/attempts/6916ec2b-1de4-4fd7-9efb-32d08ef7312d/items/d6b900ee-ff46-48d9-9be4-7826bf08ec3f/situational/9194e7ac-6e3b-4e69-b2e1-6faff009ecf8",
+          "method": "GET",
+          "status": 200,
+          "bytes": 6940
+        },
+        {
+          "route": "/composite-assessments/attempts/6916ec2b-1de4-4fd7-9efb-32d08ef7312d/items/d6b900ee-ff46-48d9-9be4-7826bf08ec3f/situational/9194e7ac-6e3b-4e69-b2e1-6faff009ecf8/submit",
+          "method": "POST",
+          "status": 200,
+          "bytes": 129
+        },
+        {
+          "route": "/composite-assessments/attempts/6916ec2b-1de4-4fd7-9efb-32d08ef7312d/items/d6b900ee-ff46-48d9-9be4-7826bf08ec3f/situational/9194e7ac-6e3b-4e69-b2e1-6faff009ecf8/submit",
+          "method": "POST",
+          "status": 200,
+          "bytes": 131
+        },
+        {
+          "route": "/composite-assessments/attempts/6916ec2b-1de4-4fd7-9efb-32d08ef7312d/report-status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 380
+        },
+        {
+          "route": "/composite-assessments/attempts/6916ec2b-1de4-4fd7-9efb-32d08ef7312d/report-status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 380
+        },
+        {
+          "route": "/composite-assessments/attempts/6916ec2b-1de4-4fd7-9efb-32d08ef7312d/report-status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 398
+        },
+        {
+          "route": "/composite-assessments/attempts/6916ec2b-1de4-4fd7-9efb-32d08ef7312d/report",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1619
+        },
+        {
+          "route": "/composite-assessments/attempts/6916ec2b-1de4-4fd7-9efb-32d08ef7312d/report",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1619
+        },
+        {
+          "route": "/public/composite-assessments/[token]/start",
+          "method": "POST",
+          "status": 200,
+          "bytes": 7653
+        },
+        {
+          "route": "/public/composite-assessments/attempts/272fdd67-155f-4c13-9f53-0efa058b4c23/items/61b9db28-69c0-4128-850a-25d02392ca31/situational/67001f38-7b92-4536-9270-9ff0027131fe/assets/639733cd-656c-44ee-b96a-580976d88957/content",
+          "method": "GET",
+          "status": 200,
+          "bytes": 68
+        },
+        {
+          "route": "/public/composite-assessments/attempts/272fdd67-155f-4c13-9f53-0efa058b4c23/items/61b9db28-69c0-4128-850a-25d02392ca31/situational/67001f38-7b92-4536-9270-9ff0027131fe",
+          "method": "GET",
+          "status": 200,
+          "bytes": 6940
+        },
+        {
+          "route": "/public/composite-assessments/attempts/272fdd67-155f-4c13-9f53-0efa058b4c23/items/61b9db28-69c0-4128-850a-25d02392ca31/situational/67001f38-7b92-4536-9270-9ff0027131fe/submit",
+          "method": "POST",
+          "status": 200,
+          "bytes": 135
+        },
+        {
+          "route": "/public/composite-assessments/attempts/272fdd67-155f-4c13-9f53-0efa058b4c23/report-status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 380
+        },
+        {
+          "route": "/public/composite-assessments/attempts/272fdd67-155f-4c13-9f53-0efa058b4c23/report-status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 380
+        },
+        {
+          "route": "/public/composite-assessments/attempts/272fdd67-155f-4c13-9f53-0efa058b4c23/report-status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 398
+        },
+        {
+          "route": "/public/composite-assessments/attempts/272fdd67-155f-4c13-9f53-0efa058b4c23/report",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1632
+        },
+        {
+          "route": "/public/composite-assessments/attempts/272fdd67-155f-4c13-9f53-0efa058b4c23/report",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1632
+        },
+        {
+          "route": "/composite-assessments/aef46d98-2ef3-450d-991c-74a62af5991d/export",
+          "method": "POST",
+          "status": 200,
+          "bytes": 490
+        },
+        {
+          "route": "/composite-assessments/aef46d98-2ef3-450d-991c-74a62af5991d/export/artifacts/b5aaa3fa-6711-426d-8e41-1a7379b9933a/status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 437
+        },
+        {
+          "route": "/composite-assessments/aef46d98-2ef3-450d-991c-74a62af5991d/export/artifacts/b5aaa3fa-6711-426d-8e41-1a7379b9933a/status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 437
+        },
+        {
+          "route": "/composite-assessments/aef46d98-2ef3-450d-991c-74a62af5991d/export/artifacts/b5aaa3fa-6711-426d-8e41-1a7379b9933a/status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 437
+        },
+        {
+          "route": "/composite-assessments/aef46d98-2ef3-450d-991c-74a62af5991d/export/artifacts/b5aaa3fa-6711-426d-8e41-1a7379b9933a/status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 437
+        },
+        {
+          "route": "/composite-assessments/aef46d98-2ef3-450d-991c-74a62af5991d/export/artifacts/b5aaa3fa-6711-426d-8e41-1a7379b9933a/status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 437
+        },
+        {
+          "route": "/composite-assessments/aef46d98-2ef3-450d-991c-74a62af5991d/export/artifacts/b5aaa3fa-6711-426d-8e41-1a7379b9933a/status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 446
+        },
+        {
+          "route": "/composite-assessments/aef46d98-2ef3-450d-991c-74a62af5991d/export/artifacts/b5aaa3fa-6711-426d-8e41-1a7379b9933a",
+          "method": "GET",
+          "status": 200,
+          "bytes": 926
+        },
+        {
+          "route": "/composite-assessments/aef46d98-2ef3-450d-991c-74a62af5991d/export/artifacts/b5aaa3fa-6711-426d-8e41-1a7379b9933a",
+          "method": "GET",
+          "status": 404,
+          "bytes": 51
+        },
+        {
+          "route": "/composite-assessments/aef46d98-2ef3-450d-991c-74a62af5991d/export",
+          "method": "POST",
+          "status": 200,
+          "bytes": 490
+        },
+        {
+          "route": "/composite-assessments/aef46d98-2ef3-450d-991c-74a62af5991d/export/artifacts/3a6591a4-4cb9-45ab-a19c-3ef5923b2170/status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 437
+        },
+        {
+          "route": "/composite-assessments/aef46d98-2ef3-450d-991c-74a62af5991d/export/artifacts/3a6591a4-4cb9-45ab-a19c-3ef5923b2170/status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 437
+        },
+        {
+          "route": "/composite-assessments/aef46d98-2ef3-450d-991c-74a62af5991d/export/artifacts/3a6591a4-4cb9-45ab-a19c-3ef5923b2170/status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 437
+        },
+        {
+          "route": "/composite-assessments/aef46d98-2ef3-450d-991c-74a62af5991d/export/artifacts/3a6591a4-4cb9-45ab-a19c-3ef5923b2170/status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 437
+        },
+        {
+          "route": "/composite-assessments/aef46d98-2ef3-450d-991c-74a62af5991d/export/artifacts/3a6591a4-4cb9-45ab-a19c-3ef5923b2170/status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 437
+        },
+        {
+          "route": "/composite-assessments/aef46d98-2ef3-450d-991c-74a62af5991d/export/artifacts/3a6591a4-4cb9-45ab-a19c-3ef5923b2170/status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 446
+        },
+        {
+          "route": "/composite-assessments/aef46d98-2ef3-450d-991c-74a62af5991d/export/artifacts/3a6591a4-4cb9-45ab-a19c-3ef5923b2170",
+          "method": "GET",
+          "status": 200,
+          "bytes": 8565
+        },
+        {
+          "route": "/composite-assessments/aef46d98-2ef3-450d-991c-74a62af5991d/export/artifacts/3a6591a4-4cb9-45ab-a19c-3ef5923b2170",
+          "method": "GET",
+          "status": 404,
+          "bytes": 51
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/grants",
+          "method": "POST",
+          "status": 200,
+          "bytes": 851
+        },
+        {
+          "route": "/questionnaire-products",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1124
+        },
+        {
+          "route": "/questionnaire-products/0836212d-6045-4768-8293-44a512a5cb61/items",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1530
+        },
+        {
+          "route": "/questionnaire-products/0836212d-6045-4768-8293-44a512a5cb61/preflight",
+          "method": "POST",
+          "status": 200,
+          "bytes": 412
+        },
+        {
+          "route": "/questionnaire-products/0836212d-6045-4768-8293-44a512a5cb61/publish",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1556
+        },
+        {
+          "route": "/composite-assessments/0836212d-6045-4768-8293-44a512a5cb61/attempts",
+          "method": "POST",
+          "status": 200,
+          "bytes": 7642
+        },
+        {
+          "route": "/composite-assessments/0836212d-6045-4768-8293-44a512a5cb61/attempts",
+          "method": "POST",
+          "status": 403,
+          "bytes": 75
+        },
+        {
+          "route": "/composite-assessments/0836212d-6045-4768-8293-44a512a5cb61/attempts",
+          "method": "POST",
+          "status": 200,
+          "bytes": 7642
+        },
+        {
+          "route": "/composite-assessments/attempts/23da4b0f-8172-4f79-8c20-13560c49ccff/items/05715272-343a-43d1-835d-05dfe738c6ca/situational/99f3cf9c-2fb0-4cb2-aa40-ad1b40addfbf/assets/639733cd-656c-44ee-b96a-580976d88957/content",
+          "method": "GET",
+          "status": 200,
+          "bytes": 68
+        },
+        {
+          "route": "/composite-assessments/attempts/23da4b0f-8172-4f79-8c20-13560c49ccff/items/05715272-343a-43d1-835d-05dfe738c6ca/situational/99f3cf9c-2fb0-4cb2-aa40-ad1b40addfbf",
+          "method": "GET",
+          "status": 200,
+          "bytes": 6940
+        },
+        {
+          "route": "/composite-assessments/attempts/23da4b0f-8172-4f79-8c20-13560c49ccff/items/05715272-343a-43d1-835d-05dfe738c6ca/situational/99f3cf9c-2fb0-4cb2-aa40-ad1b40addfbf/submit",
+          "method": "POST",
+          "status": 200,
+          "bytes": 129
+        },
+        {
+          "route": "/composite-assessments/attempts/23da4b0f-8172-4f79-8c20-13560c49ccff/report-status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 383
+        },
+        {
+          "route": "/composite-assessments/attempts/23da4b0f-8172-4f79-8c20-13560c49ccff/report-status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 398
+        },
+        {
+          "route": "/composite-assessments/attempts/23da4b0f-8172-4f79-8c20-13560c49ccff/report",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1621
+        },
+        {
+          "route": "/composite-assessments/attempts/23da4b0f-8172-4f79-8c20-13560c49ccff/report",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1621
+        },
+        {
+          "route": "/situational/authoring/grants/8590270e-8282-41b5-aeb3-0b60736298e8/revoke",
+          "method": "POST",
+          "status": 200,
+          "bytes": 947
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/grants",
+          "method": "POST",
+          "status": 200,
+          "bytes": 851
+        },
+        {
+          "route": "/questionnaire-products",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1151
+        },
+        {
+          "route": "/questionnaire-products/ad726ae8-bd2a-40ed-8edb-2a261c5cc6fb/items",
+          "method": "POST",
+          "status": 403,
+          "bytes": 75
+        },
+        {
+          "route": "/composite-assessments/0836212d-6045-4768-8293-44a512a5cb61/attempts",
+          "method": "POST",
+          "status": 403,
+          "bytes": 75
+        },
+        {
+          "route": "/situational/authoring/grants/b73c6fc2-844f-451e-af16-3563c17fc3f6/revoke",
+          "method": "POST",
+          "status": 200,
+          "bytes": 947
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/grants",
+          "method": "POST",
+          "status": 200,
+          "bytes": 846
+        },
+        {
+          "route": "/questionnaire-products",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1159
+        },
+        {
+          "route": "/questionnaire-products/f31d5100-5ed8-4252-a006-137f6014ab94/items",
+          "method": "POST",
+          "status": 403,
+          "bytes": 75
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/adapt",
+          "method": "POST",
+          "status": 409,
+          "bytes": 82
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/adapt",
+          "method": "POST",
+          "status": 409,
+          "bytes": 94
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/adapt",
+          "method": "POST",
+          "status": 409,
+          "bytes": 94
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/adapt",
+          "method": "POST",
+          "status": 403,
+          "bytes": 77
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/adapt",
+          "method": "POST",
+          "status": 409,
+          "bytes": 82
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/adapt",
+          "method": "POST",
+          "status": 200,
+          "bytes": 3344
+        },
+        {
+          "route": "/situational/authoring/drafts/7969b0c3-0fbe-4e20-bcb8-26be77cc6e82/media/639733cd-656c-44ee-b96a-580976d88957/content",
+          "method": "GET",
+          "status": 200,
+          "bytes": 68
+        },
+        {
+          "route": "/situational/authoring/drafts/7969b0c3-0fbe-4e20-bcb8-26be77cc6e82/request-review",
+          "method": "POST",
+          "status": 422,
+          "bytes": 1543
+        },
+        {
+          "route": "/situational/authoring/drafts/7969b0c3-0fbe-4e20-bcb8-26be77cc6e82",
+          "method": "PUT",
+          "status": 200,
+          "bytes": 5754
+        },
+        {
+          "route": "/situational/authoring/drafts/7969b0c3-0fbe-4e20-bcb8-26be77cc6e82/request-review",
+          "method": "POST",
+          "status": 200,
+          "bytes": 5758
+        },
+        {
+          "route": "/situational/authoring/drafts/7969b0c3-0fbe-4e20-bcb8-26be77cc6e82/review",
+          "method": "POST",
+          "status": 200,
+          "bytes": 5758
+        },
+        {
+          "route": "/situational/authoring/drafts/7969b0c3-0fbe-4e20-bcb8-26be77cc6e82",
+          "method": "GET",
+          "status": 200,
+          "bytes": 18471
+        },
+        {
+          "route": "/questionnaire-products",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1164
+        },
+        {
+          "route": "/questionnaire-products/4672be09-37a1-43d8-9335-7ecbbf78b272/items",
+          "method": "POST",
+          "status": 403,
+          "bytes": 75
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/adapt",
+          "method": "POST",
+          "status": 200,
+          "bytes": 3344
+        },
+        {
+          "route": "/situational/authoring/grants/5c168edc-d328-4327-8cf1-4082340495af/revoke",
+          "method": "POST",
+          "status": 200,
+          "bytes": 942
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/adapt",
+          "method": "POST",
+          "status": 403,
+          "bytes": 77
+        },
+        {
+          "route": "/situational/authoring/drafts/c5c2f79e-9a3c-419c-b388-39ef3ea03f38",
+          "method": "GET",
+          "status": 403,
+          "bytes": 77
+        },
+        {
+          "route": "/situational/authoring/drafts/c5c2f79e-9a3c-419c-b388-39ef3ea03f38/media/639733cd-656c-44ee-b96a-580976d88957/content",
+          "method": "GET",
+          "status": 403,
+          "bytes": 73
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/grants",
+          "method": "POST",
+          "status": 200,
+          "bytes": 851
+        },
+        {
+          "route": "/questionnaire-products",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1124
+        },
+        {
+          "route": "/questionnaire-products/1074e3ac-fe24-46e2-9c74-f0792eff557c/items",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1530
+        },
+        {
+          "route": "/questionnaire-products/1074e3ac-fe24-46e2-9c74-f0792eff557c/preflight",
+          "method": "POST",
+          "status": 200,
+          "bytes": 412
+        },
+        {
+          "route": "/questionnaire-products/1074e3ac-fe24-46e2-9c74-f0792eff557c/publish",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1556
+        },
+        {
+          "route": "/situational/authoring/grants/f494e09b-a59a-403d-bce5-a51d75b43fee/revoke",
+          "method": "POST",
+          "status": 200,
+          "bytes": 947
+        },
+        {
+          "route": "/composite-assessments/1074e3ac-fe24-46e2-9c74-f0792eff557c/attempts",
+          "method": "POST",
+          "status": 403,
+          "bytes": 75
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/grants",
+          "method": "POST",
+          "status": 200,
+          "bytes": 851
+        },
+        {
+          "route": "/questionnaire-products",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1124
+        },
+        {
+          "route": "/questionnaire-products/a097d6bb-d05d-41f2-8800-d80215f0e0b3/items",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1530
+        },
+        {
+          "route": "/questionnaire-products/a097d6bb-d05d-41f2-8800-d80215f0e0b3/preflight",
+          "method": "POST",
+          "status": 200,
+          "bytes": 412
+        },
+        {
+          "route": "/questionnaire-products/a097d6bb-d05d-41f2-8800-d80215f0e0b3/publish",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1556
+        },
+        {
+          "route": "/situational/authoring/grants/7c8bcbd9-20c2-4279-81c3-fe478edad84f/revoke",
+          "method": "POST",
+          "status": 200,
+          "bytes": 947
+        },
+        {
+          "route": "/composite-assessments/a097d6bb-d05d-41f2-8800-d80215f0e0b3/attempts",
+          "method": "POST",
+          "status": 200,
+          "bytes": 7642
+        },
+        {
+          "route": "/composite-assessments/a097d6bb-d05d-41f2-8800-d80215f0e0b3/attempts",
+          "method": "POST",
+          "status": 200,
+          "bytes": 7642
+        },
+        {
+          "route": "/composite-assessments/a097d6bb-d05d-41f2-8800-d80215f0e0b3/attempts",
+          "method": "POST",
+          "status": 403,
+          "bytes": 75
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/grants",
+          "method": "POST",
+          "status": 200,
+          "bytes": 851
+        },
+        {
+          "route": "/questionnaire-products",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1124
+        },
+        {
+          "route": "/questionnaire-products/6875bc05-e185-4b68-acb4-0017e71ef3ba/items",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1530
+        },
+        {
+          "route": "/situational/authoring/grants/70cf534f-63c2-42fa-87ee-4aa251a921bf/revoke",
+          "method": "POST",
+          "status": 200,
+          "bytes": 947
+        },
+        {
+          "route": "/questionnaire-products/6875bc05-e185-4b68-acb4-0017e71ef3ba/publish",
+          "method": "POST",
+          "status": 403,
+          "bytes": 75
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/grants",
+          "method": "POST",
+          "status": 200,
+          "bytes": 851
+        },
+        {
+          "route": "/questionnaire-products",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1124
+        },
+        {
+          "route": "/questionnaire-products/0ccfc283-b83a-4cb4-8424-11add71dd282/items",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1530
+        },
+        {
+          "route": "/situational/authoring/grants/04294568-4285-44da-8759-78a817acf233/revoke",
+          "method": "POST",
+          "status": 200,
+          "bytes": 947
+        },
+        {
+          "route": "/questionnaire-products/0ccfc283-b83a-4cb4-8424-11add71dd282/publish",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1556
+        },
+        {
+          "route": "/composite-assessments/0ccfc283-b83a-4cb4-8424-11add71dd282/attempts",
+          "method": "POST",
+          "status": 403,
+          "bytes": 75
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/grants",
+          "method": "POST",
+          "status": 200,
+          "bytes": 851
+        },
+        {
+          "route": "/questionnaire-products",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1124
+        },
+        {
+          "route": "/questionnaire-products/e395d3e6-6055-4f29-a110-8b03d35abb63/items",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1530
+        },
+        {
+          "route": "/questionnaire-products/e395d3e6-6055-4f29-a110-8b03d35abb63/preflight",
+          "method": "POST",
+          "status": 200,
+          "bytes": 412
+        },
+        {
+          "route": "/questionnaire-products/e395d3e6-6055-4f29-a110-8b03d35abb63/publish",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1556
+        },
+        {
+          "route": "/composite-assessments/e395d3e6-6055-4f29-a110-8b03d35abb63/attempts",
+          "method": "POST",
+          "status": 403,
+          "bytes": 91
+        },
+        {
+          "route": "/situational/authoring/grants/fa7b668b-f969-4150-b3b2-388c78615157/revoke",
+          "method": "POST",
+          "status": 200,
+          "bytes": 947
+        },
+        {
+          "route": "/situational/authoring/releases/a53ae450-2c70-4df6-a23f-5e604ea3201c/grants",
+          "method": "POST",
+          "status": 200,
+          "bytes": 851
+        },
+        {
+          "route": "/questionnaire-products",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1124
+        },
+        {
+          "route": "/questionnaire-products/118ab451-3119-4cca-ba18-a767d26b04b3/items",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1530
+        },
+        {
+          "route": "/questionnaire-products/118ab451-3119-4cca-ba18-a767d26b04b3/preflight",
+          "method": "POST",
+          "status": 200,
+          "bytes": 412
+        },
+        {
+          "route": "/questionnaire-products/118ab451-3119-4cca-ba18-a767d26b04b3/publish",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1556
+        },
+        {
+          "route": "/composite-assessments/118ab451-3119-4cca-ba18-a767d26b04b3/attempts",
+          "method": "POST",
+          "status": 403,
+          "bytes": 75
+        },
+        {
+          "route": "/questionnaire-products",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1330
+        },
+        {
+          "route": "/questionnaire-products/7728b3b2-9515-4c36-bdc6-29e301aa6899/items",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1720
+        },
+        {
+          "route": "/questionnaire-products/7728b3b2-9515-4c36-bdc6-29e301aa6899/preflight",
+          "method": "POST",
+          "status": 200,
+          "bytes": 412
+        },
+        {
+          "route": "/questionnaire-products/7728b3b2-9515-4c36-bdc6-29e301aa6899/publish",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1746
+        },
+        {
+          "route": "/auth/csrf",
+          "method": "GET",
+          "status": 200,
+          "bytes": 102
+        },
+        {
+          "route": "/composite-assessments/7728b3b2-9515-4c36-bdc6-29e301aa6899/public-tokens",
+          "method": "POST",
+          "status": 200,
+          "bytes": 208
+        },
+        {
+          "route": "/public/composite-assessments/[token]/start",
+          "method": "POST",
+          "status": 200,
+          "bytes": 5650
+        },
+        {
+          "route": "/public/composite-assessments/[token]/start",
+          "method": "POST",
+          "status": 200,
+          "bytes": 5590
+        },
+        {
+          "route": "/public/composite-assessments/attempts/c6bf298f-4d87-47d5-9047-36be386e0e13/items/6bcb6a07-41a1-4a17-9ebc-ecdb556fdb6e/situational/6eb6e036-0e43-4252-96dd-6463dd0e2d7b",
+          "method": "GET",
+          "status": 200,
+          "bytes": 4871
+        },
+        {
+          "route": "/public/composite-assessments/attempts/c6bf298f-4d87-47d5-9047-36be386e0e13/items/6bcb6a07-41a1-4a17-9ebc-ecdb556fdb6e/situational/6eb6e036-0e43-4252-96dd-6463dd0e2d7b/submit",
+          "method": "POST",
+          "status": 200,
+          "bytes": 135
+        },
+        {
+          "route": "/public/composite-assessments/attempts/c6bf298f-4d87-47d5-9047-36be386e0e13/items/6bcb6a07-41a1-4a17-9ebc-ecdb556fdb6e/situational/6eb6e036-0e43-4252-96dd-6463dd0e2d7b/submit",
+          "method": "POST",
+          "status": 200,
+          "bytes": 137
+        },
+        {
+          "route": "/public/composite-assessments/attempts/c6bf298f-4d87-47d5-9047-36be386e0e13/report-status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 380
+        },
+        {
+          "route": "/public/composite-assessments/attempts/c6bf298f-4d87-47d5-9047-36be386e0e13/report-status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 398
+        },
+        {
+          "route": "/public/composite-assessments/attempts/c6bf298f-4d87-47d5-9047-36be386e0e13/report",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1382
+        },
+        {
+          "route": "/public/composite-assessments/attempts/c6bf298f-4d87-47d5-9047-36be386e0e13/report",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1382
+        },
+        {
+          "route": "/public/composite-assessments/attempts/c6bf298f-4d87-47d5-9047-36be386e0e13/report",
+          "method": "GET",
+          "status": 400,
+          "bytes": 60
+        }
+      ],
+      "counts": [
+        {
+          "name": "Grant wrong key rejected without attempt artifacts",
+          "before": {
+            "parents": 0,
+            "children": 0,
+            "jobs": 0,
+            "raw": 0,
+            "snapshots": 0
+          },
+          "after": {
+            "parents": 0,
+            "children": 0,
+            "jobs": 0,
+            "raw": 0,
+            "snapshots": 0
+          }
+        },
+        {
+          "name": "Grant wrong version rejected without attempt artifacts",
+          "before": {
+            "parents": 0,
+            "children": 0,
+            "jobs": 0,
+            "raw": 0,
+            "snapshots": 0
+          },
+          "after": {
+            "parents": 0,
+            "children": 0,
+            "jobs": 0,
+            "raw": 0,
+            "snapshots": 0
+          }
+        },
+        {
+          "name": "Grant wrong hash rejected without attempt artifacts",
+          "before": {
+            "parents": 0,
+            "children": 0,
+            "jobs": 0,
+            "raw": 0,
+            "snapshots": 0
+          },
+          "after": {
+            "parents": 0,
+            "children": 0,
+            "jobs": 0,
+            "raw": 0,
+            "snapshots": 0
+          }
+        },
+        {
+          "name": "Grant wrong digest rejected without attempt artifacts",
+          "before": {
+            "parents": 0,
+            "children": 0,
+            "jobs": 0,
+            "raw": 0,
+            "snapshots": 0
+          },
+          "after": {
+            "parents": 0,
+            "children": 0,
+            "jobs": 0,
+            "raw": 0,
+            "snapshots": 0
+          }
+        },
+        {
+          "name": "Grant wrong teacher rejected without attempt artifacts",
+          "before": {
+            "parents": 0,
+            "children": 0,
+            "jobs": 0,
+            "raw": 0,
+            "snapshots": 0
+          },
+          "after": {
+            "parents": 0,
+            "children": 0,
+            "jobs": 0,
+            "raw": 0,
+            "snapshots": 0
+          }
+        },
+        {
+          "name": "Grant wrong course rejected without attempt artifacts",
+          "before": {
+            "parents": 0,
+            "children": 0,
+            "jobs": 0,
+            "raw": 0,
+            "snapshots": 0
+          },
+          "after": {
+            "parents": 0,
+            "children": 0,
+            "jobs": 0,
+            "raw": 0,
+            "snapshots": 0
+          }
+        },
+        {
+          "name": "Grant wrong purpose rejected without attempt artifacts",
+          "before": {
+            "parents": 0,
+            "children": 0,
+            "jobs": 0,
+            "raw": 0,
+            "snapshots": 0
+          },
+          "after": {
+            "parents": 0,
+            "children": 0,
+            "jobs": 0,
+            "raw": 0,
+            "snapshots": 0
+          }
+        },
+        {
+          "name": "Grant expired rejected without attempt artifacts",
+          "before": {
+            "parents": 0,
+            "children": 0,
+            "jobs": 0,
+            "raw": 0,
+            "snapshots": 0
+          },
+          "after": {
+            "parents": 0,
+            "children": 0,
+            "jobs": 0,
+            "raw": 0,
+            "snapshots": 0
+          }
+        },
+        {
+          "name": "Controlled release cannot be granted to a non-Training course",
+          "before": {
+            "parents": 0,
+            "children": 0,
+            "jobs": 0,
+            "raw": 0,
+            "snapshots": 0
+          },
+          "after": {
+            "parents": 0,
+            "children": 0,
+            "jobs": 0,
+            "raw": 0,
+            "snapshots": 0
+          }
+        },
+        {
+          "name": "Nonmember/other teacher/standalone admission rejected",
+          "before": {
+            "parents": 1,
+            "children": 1,
+            "jobs": 0,
+            "raw": 0,
+            "snapshots": 0
+          },
+          "after": {
+            "parents": 1,
+            "children": 1,
+            "jobs": 0,
+            "raw": 0,
+            "snapshots": 0
+          }
+        },
+        {
+          "name": "Revocation rejects a new eligible student without parent/child/job/raw/canonical residue",
+          "before": {
+            "parents": 2,
+            "children": 2,
+            "jobs": 0,
+            "raw": 0,
+            "snapshots": 0
+          },
+          "after": {
+            "parents": 2,
+            "children": 2,
+            "jobs": 0,
+            "raw": 0,
+            "snapshots": 0
+          }
+        },
+        {
+          "name": "Revocation rejects fresh anonymous admission in the authorized single-course delivery",
+          "before": {
+            "parents": 2,
+            "children": 2,
+            "jobs": 0,
+            "raw": 0,
+            "snapshots": 0
+          },
+          "after": {
+            "parents": 2,
+            "children": 2,
+            "jobs": 0,
+            "raw": 0,
+            "snapshots": 0
+          }
+        },
+        {
+          "name": "Expired grant denies fresh eligible admission without artifacts",
+          "before": {
+            "parents": 3,
+            "children": 3,
+            "jobs": 2,
+            "raw": 2,
+            "snapshots": 2
+          },
+          "after": {
+            "parents": 3,
+            "children": 3,
+            "jobs": 2,
+            "raw": 2,
+            "snapshots": 2
+          }
+        },
+        {
+          "name": "Future grant cannot authorize new admission",
+          "before": {
+            "parents": 3,
+            "children": 3,
+            "jobs": 3,
+            "raw": 3,
+            "snapshots": 3
+          },
+          "after": {
+            "parents": 3,
+            "children": 3,
+            "jobs": 3,
+            "raw": 3,
+            "snapshots": 3
+          }
+        },
+        {
+          "name": "Admission-first still rejects a later new student after revoke",
+          "before": {
+            "parents": 4,
+            "children": 4,
+            "jobs": 3,
+            "raw": 3,
+            "snapshots": 3
+          },
+          "after": {
+            "parents": 4,
+            "children": 4,
+            "jobs": 3,
+            "raw": 3,
+            "snapshots": 3
+          }
+        },
+        {
+          "name": "Publish-first then revoked grant denies new admission",
+          "before": {
+            "parents": 4,
+            "children": 4,
+            "jobs": 3,
+            "raw": 3,
+            "snapshots": 3
+          },
+          "after": {
+            "parents": 4,
+            "children": 4,
+            "jobs": 3,
+            "raw": 3,
+            "snapshots": 3
+          }
+        },
+        {
+          "name": "Teacher freezes while scope SHARE waits: committed account state rejects HTTP admission without artifacts",
+          "before": {
+            "parents": 4,
+            "children": 4,
+            "jobs": 3,
+            "raw": 3,
+            "snapshots": 3
+          },
+          "after": {
+            "parents": 4,
+            "children": 4,
+            "jobs": 3,
+            "raw": 3,
+            "snapshots": 3
+          }
+        },
+        {
+          "name": "Expiry while waiting for real grant row lock rejects admission without artifacts",
+          "before": {
+            "parents": 4,
+            "children": 4,
+            "jobs": 3,
+            "raw": 3,
+            "snapshots": 3
+          },
+          "after": {
+            "parents": 4,
+            "children": 4,
+            "jobs": 3,
+            "raw": 3,
+            "snapshots": 3
+          }
+        }
+      ],
+      "races": [
+        {
+          "table": "sjt_release_grants",
+          "pid": 209,
+          "waitEvent": "transactionid",
+          "blockers": [
+            362
+          ]
+        },
+        {
+          "table": "sjt_release_grants",
+          "pid": 210,
+          "waitEvent": "tuple",
+          "blockers": [
+            209
+          ]
+        },
+        {
+          "table": "stored_assets",
+          "pid": 210,
+          "waitEvent": "transactionid",
+          "blockers": [
+            364
+          ]
+        },
+        {
+          "table": "sjt_release_grants",
+          "pid": 209,
+          "waitEvent": "transactionid",
+          "blockers": [
+            210
+          ]
+        },
+        {
+          "table": "sjt_release_grants",
+          "pid": 210,
+          "waitEvent": "transactionid",
+          "blockers": [
+            366
+          ]
+        },
+        {
+          "table": "sjt_release_grants",
+          "pid": 209,
+          "waitEvent": "tuple",
+          "blockers": [
+            210
+          ]
+        },
+        {
+          "table": "stored_assets",
+          "pid": 209,
+          "waitEvent": "transactionid",
+          "blockers": [
+            368
+          ]
+        },
+        {
+          "table": "sjt_release_grants",
+          "pid": 210,
+          "waitEvent": "transactionid",
+          "blockers": [
+            209
+          ]
+        },
+        {
+          "table": "users",
+          "pid": 209,
+          "waitEvent": "transactionid",
+          "blockers": [
+            370
+          ]
+        },
+        {
+          "table": "sjt_release_grants",
+          "pid": 210,
+          "waitEvent": "transactionid",
+          "blockers": [
+            372
+          ]
+        }
+      ],
+      "receipts": [
+        {
+          "attemptId": "67001f38-7b92-4536-9270-9ff0027131fe",
+          "runtimeSnapshotSha256": "7dae9944d45331f983f1fc3ffe490ca43eb11a7ddd854af7d68a3b1b13e7df9b",
+          "receipt": {
+            "policy": "COURSE_GRANT_V1",
+            "grantId": "9794625f-4263-4913-b3b8-353d73d1e8eb",
+            "grantVersion": 1,
+            "permission": "DISTRIBUTE",
+            "releaseId": "a53ae450-2c70-4df6-a23f-5e604ea3201c",
+            "instrumentKey": "c13-f4f29c11-54f9-48a7-9bd2-2ae968c962c1",
+            "instrumentVersion": "1.0.0",
+            "definitionHash": "441c33cb7c0fb403ac51f7f0ae93d86864ced903e8d0eeab6b9cb3b1c9f4ea57",
+            "contentDigest": "8fbf096131337b7989bd109735379ce82934de9418de36c88e3ddeff18dbdec4",
+            "granteeTeacherId": "4111b17f-372d-4f09-b424-49b194195968",
+            "courseId": "feaedeec-4aab-4060-80cc-c6921ac5859f",
+            "purpose": "TRAINING_COURSE",
+            "validFrom": "2026-10-18T11:21:50.625Z",
+            "expiresAt": "2026-10-18T12:22:50.625Z",
+            "admittedAt": "2026-10-18T11:22:50.936Z"
+          }
+        },
+        {
+          "attemptId": "9194e7ac-6e3b-4e69-b2e1-6faff009ecf8",
+          "runtimeSnapshotSha256": "a37069494521add89cb2a8762bf2b539ffb4e633de7fcc6559ac01bd20ae65fd",
+          "receipt": {
+            "policy": "COURSE_GRANT_V1",
+            "grantId": "9794625f-4263-4913-b3b8-353d73d1e8eb",
+            "grantVersion": 1,
+            "permission": "DISTRIBUTE",
+            "releaseId": "a53ae450-2c70-4df6-a23f-5e604ea3201c",
+            "instrumentKey": "c13-f4f29c11-54f9-48a7-9bd2-2ae968c962c1",
+            "instrumentVersion": "1.0.0",
+            "definitionHash": "441c33cb7c0fb403ac51f7f0ae93d86864ced903e8d0eeab6b9cb3b1c9f4ea57",
+            "contentDigest": "8fbf096131337b7989bd109735379ce82934de9418de36c88e3ddeff18dbdec4",
+            "granteeTeacherId": "4111b17f-372d-4f09-b424-49b194195968",
+            "courseId": "feaedeec-4aab-4060-80cc-c6921ac5859f",
+            "purpose": "TRAINING_COURSE",
+            "validFrom": "2026-10-18T11:21:50.625Z",
+            "expiresAt": "2026-10-18T12:22:50.625Z",
+            "admittedAt": "2026-10-18T11:22:51.133Z"
+          }
+        },
+        {
+          "attemptId": "99f3cf9c-2fb0-4cb2-aa40-ad1b40addfbf",
+          "runtimeSnapshotSha256": "f15cdeba54bfcf2fa627960ae6a30d2e681540669574bda9de6b0334fbce930c",
+          "receipt": {
+            "policy": "COURSE_GRANT_V1",
+            "grantId": "8590270e-8282-41b5-aeb3-0b60736298e8",
+            "grantVersion": 1,
+            "permission": "DISTRIBUTE",
+            "releaseId": "a53ae450-2c70-4df6-a23f-5e604ea3201c",
+            "instrumentKey": "c13-f4f29c11-54f9-48a7-9bd2-2ae968c962c1",
+            "instrumentVersion": "1.0.0",
+            "definitionHash": "441c33cb7c0fb403ac51f7f0ae93d86864ced903e8d0eeab6b9cb3b1c9f4ea57",
+            "contentDigest": "8fbf096131337b7989bd109735379ce82934de9418de36c88e3ddeff18dbdec4",
+            "granteeTeacherId": "4111b17f-372d-4f09-b424-49b194195968",
+            "courseId": "feaedeec-4aab-4060-80cc-c6921ac5859f",
+            "purpose": "TRAINING_COURSE",
+            "validFrom": "2026-10-18T11:21:55.268Z",
+            "expiresAt": "2026-10-18T11:22:59.768Z",
+            "admittedAt": "2026-10-18T11:22:55.416Z"
+          }
+        },
+        {
+          "attemptId": "795978da-74b2-4da8-90ac-c5c0416006a5",
+          "runtimeSnapshotSha256": "01b1f345c83790eb8eaf240e36563b3b34c9a7a1d0fbd3395de609069090792a",
+          "receipt": {
+            "policy": "COURSE_GRANT_V1",
+            "grantId": "7c8bcbd9-20c2-4279-81c3-fe478edad84f",
+            "grantVersion": 1,
+            "permission": "DISTRIBUTE",
+            "releaseId": "a53ae450-2c70-4df6-a23f-5e604ea3201c",
+            "instrumentKey": "c13-f4f29c11-54f9-48a7-9bd2-2ae968c962c1",
+            "instrumentVersion": "1.0.0",
+            "definitionHash": "441c33cb7c0fb403ac51f7f0ae93d86864ced903e8d0eeab6b9cb3b1c9f4ea57",
+            "contentDigest": "8fbf096131337b7989bd109735379ce82934de9418de36c88e3ddeff18dbdec4",
+            "granteeTeacherId": "4111b17f-372d-4f09-b424-49b194195968",
+            "courseId": "feaedeec-4aab-4060-80cc-c6921ac5859f",
+            "purpose": "TRAINING_COURSE",
+            "validFrom": "2026-10-18T11:22:00.825Z",
+            "expiresAt": "2026-10-18T12:23:00.825Z",
+            "admittedAt": "2026-10-18T11:23:00.985Z"
+          }
+        }
+      ]
+    }
+  },
+  "errorType": "CalledProcessError",
+  "cleanupVerified": true
+}

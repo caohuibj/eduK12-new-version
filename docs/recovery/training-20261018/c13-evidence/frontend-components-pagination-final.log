@@ -1,0 +1,166 @@
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/eduk12_c13_20261018/server-version/frontend
+
+ ❯ src/modules/situational/__tests__/OnlineImageField.test.tsx (7 tests | 1 failed) 1232ms
+     × loads more private assets without dropping already loaded choices 1012ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/modules/situational/__tests__/OnlineImageField.test.tsx > private online author images > loads more private assets without dropping already loaded choices
+TestingLibraryElementError: Unable to find role="option" and name `/classroom.png/`
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<fieldset[39m
+      [33mclass[39m=[32m"border rounded-lg p-3 space-y-3"[39m
+    [36m>[39m
+      [36m<legend[39m
+        [33mclass[39m=[32m"text-sm font-semibold"[39m
+      [36m>[39m
+        [0m情境图片（可选）[0m
+      [36m</legend>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"text-xs text-slate-600"[39m
+      [36m>[39m
+        [0m仅限作者私有素材库中的静态图片。发布前须核实图片版权与本次展示授权；不要上传含个人隐私的材料。[0m
+      [36m</p>[39m
+      [36m<label[39m
+        [33mclass[39m=[32m"text-sm block"[39m
+      [36m>[39m
+        [0m上传情境图片（不超过 2MB）[0m
+        [36m<input[39m
+          [33maccept[39m=[32m"image/png,image/jpeg,image/webp"[39m
+          [33mclass[39m=[32m"block mt-1 max-w-full"[39m
+          [33mtype[39m=[32m"file"[39m
+        [36m/>[39m
+      [36m</label>[39m
+      [36m<button[39m
+        [33maria-controls[39m=[32m":r5:"[39m
+        [33maria-expanded[39m=[32m"true"[39m
+        [33mclass[39m=[32m"btn-secondary"[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [0m收起作者素材库[0m
+      [36m</button>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"space-y-2"[39m
+        [33mid[39m=[32m":r5:"[39m
+      [36m>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"text-red-700 text-sm"[39m
+          [33mrole[39m=[32m"alert"[39m
+        [36m>[39m
+          [0mURL is not a constructor[0m
+        [36m</p>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"btn-secondary"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0m重试读取素材库[0m
+        [36m</button>[39m
+        [36m<label[39m
+          [33mclass[39m=[32m"text-sm block"[39m
+        [36m>[39m
+          [0m从作者素材库选择[0m
+          [36m<select[39m
+            [33mclass[39m=[32m"input block w-full"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0m不使用图片[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+    [36m</fieldset>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<fieldset[39m
+      [33mclass[39m=[32m"border rounded-lg p-3 space-y-3"[39m
+    [36m>[39m
+      [36m<legend[39m
+        [33mclass[39m=[32m"text-sm font-semibold"[39m
+      [36m>[39m
+        [0m情境图片（可选）[0m
+      [36m</legend>[39m
+      [36m<p[39m
+        [33mclass[39m=[32m"text-xs text-slate-600"[39m
+      [36m>[39m
+        [0m仅限作者私有素材库中的静态图片。发布前须核实图片版权与本次展示授权；不要上传含个人隐私的材料。[0m
+      [36m</p>[39m
+      [36m<label[39m
+        [33mclass[39m=[32m"text-sm block"[39m
+      [36m>[39m
+        [0m上传情境图片（不超过 2MB）[0m
+        [36m<input[39m
+          [33maccept[39m=[32m"image/png,image/jpeg,image/webp"[39m
+          [33mclass[39m=[32m"block mt-1 max-w-full"[39m
+          [33mtype[39m=[32m"file"[39m
+        [36m/>[39m
+      [36m</label>[39m
+      [36m<button[39m
+        [33maria-controls[39m=[32m":r5:"[39m
+        [33maria-expanded[39m=[32m"true"[39m
+        [33mclass[39m=[32m"btn-secondary"[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [0m收起作者素材库[0m
+      [36m</button>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"space-y-2"[39m
+        [33mid[39m=[32m":r5:"[39m
+      [36m>[39m
+        [36m<p[39m
+          [33mclass[39m=[32m"text-red-700 text-sm"[39m
+          [33mrole[39m=[32m"alert"[39m
+        [36m>[39m
+          [0mURL is not a constructor[0m
+        [36m</p>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"btn-secondary"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [0m重试读取素材库[0m
+        [36m</button>[39m
+        [36m<label[39m
+          [33mclass[39m=[32m"text-sm block"[39m
+        [36m>[39m
+          [0m从作者素材库选择[0m
+          [36m<select[39m
+            [33mclass[39m=[32m"input block w-full"[39m
+          [36m>[39m
+            [36m<option[39m
+              [33mvalue[39m=[32m""[39m
+            [36m>[39m
+              [0m不使用图片[0m
+            [36m</option>[39m
+          [36m</select>[39m
+        [36m</label>[39m
+      [36m</div>[39m
+    [36m</fieldset>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/modules/situational/__tests__/OnlineImageField.test.tsx:97:18
+     95|     render(<OnlineImageField onChange={vi.fn()}/>)
+     96|     fireEvent.click(screen.getByRole('button', { name: '打开作者素材库' }))
+     97|     await screen.findByRole('option', { name: /classroom.png/ })
+       |                  ^
+     98|     fireEvent.click(screen.getByRole('button', { name: '加载更多素材' }))
+     99|     await screen.findByRole('option', { name: /hallway.png/ })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 17 passed (18)
+   Start at  20:13:23
+   Duration  3.51s (transform 165ms, setup 303ms, import 180ms, tests 1.69s, environment 903ms)
+

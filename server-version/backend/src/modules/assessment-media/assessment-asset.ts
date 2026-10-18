@@ -1,8 +1,6 @@
 import { prisma } from '../../config/database'
 import {
-  attachAssetReference,
-  lockStoredAssetRows,
-  inAssetTransaction,
+  attachAssetReferences,
   type AssetDatabase,
   type StoredAssetContent,
 } from '../../services/assetStorage'
@@ -61,22 +59,13 @@ const invalidCatalogRecord = (asset: StoredAssetRecord | undefined): boolean => 
   || !['local', 'cos'].includes(asset.provider)
 )
 
-export const validateAssessmentAssetReferences = async (
-  references: readonly AssessmentAssetIdentityV1[],
-  db: AssetDatabase = prisma,
-): Promise<AssessmentAssetValidation> => {
-  const normalizedReferences = [...references]
-  const assetIds = [...new Set(normalizedReferences.map((reference) => reference.assetId))]
-  if (!assetIds.length) return { valid: true, issues: [], references: normalizedReferences }
-
-  const assets = await db.storedAsset.findMany({
-    where: { id: { in: assetIds } },
-    select: assessmentAssetSelect,
-  })
+const validateAssessmentAssetCatalog = (
+  references: readonly AssessmentAssetIdentityV1[], assets: readonly StoredAssetRecord[],
+): AssessmentAssetValidation => {
   const byId = new Map<string, StoredAssetRecord>(assets.map((asset) => [asset.id, asset]))
   const issues: AssessmentAssetIssue[] = []
 
-  normalizedReferences.forEach((reference, index) => {
+  references.forEach((reference, index) => {
     const asset = byId.get(reference.assetId)
     const path = `references.${index}`
     if (invalidCatalogRecord(asset)) {
@@ -91,8 +80,20 @@ export const validateAssessmentAssetReferences = async (
     }
   })
 
-  return { valid: issues.length === 0, issues, references: normalizedReferences }
+  return { valid: issues.length === 0, issues, references: [...references] }
 }
+export const validateAssessmentAssetReferences = async (
+  references: readonly AssessmentAssetIdentityV1[],
+  db: AssetDatabase = prisma,
+): Promise<AssessmentAssetValidation> => {
+  const assetIds = [...new Set(references.map(reference => reference.assetId))]
+  if (!assetIds.length) return { valid: true, issues: [], references: [...references] }
+  const assets = await db.storedAsset.findMany({
+    where: { id: { in: assetIds } }, select: assessmentAssetSelect,
+  })
+  return validateAssessmentAssetCatalog(references, assets)
+}
+
 
 export const assertAssessmentAssetReferencesReady = async (
   references: readonly AssessmentAssetIdentityV1[],
@@ -126,21 +127,15 @@ export const retainAssessmentAssetReferences = async (params: {
   db?: AssetDatabase
 }): Promise<void> => {
   if (!params.references.length) return
-  await inAssetTransaction(params.db || prisma, async db => {
-    // Serialize with soft deletion on stable logical identities, not mutable
-    // content hashes. Validation must happen AFTER the potentially waiting lock.
-    await lockStoredAssetRows(db, params.references.map(reference => reference.assetId))
-    await assertAssessmentAssetReferencesReady(params.references, db)
-    const uniqueReferences = params.references.filter((reference, index, all) => (
-      all.findIndex((candidate) => candidate.assetId === reference.assetId) === index
-    ))
-    for (const reference of uniqueReferences) {
-      await attachAssetReference({
-        assetId: reference.assetId,
-        entityType: params.owner.entityType,
-        entityId: params.owner.entityId,
-        field: params.owner.field,
-      }, db)
-    }
+  await attachAssetReferences(params.references.map(reference => ({
+    assetId: reference.assetId,
+    entityType: params.owner.entityType,
+    entityId: params.owner.entityId,
+    field: params.owner.field,
+  })), params.db || prisma, assets => {
+    // Called only after the shared stable-ID locks and a fresh catalog read.
+    const validation = validateAssessmentAssetCatalog(params.references, assets)
+    if (!validation.valid) throw new AssessmentAssetValidationError(
+      'Assessment asset references failed catalog validation', validation.issues)
   })
 }

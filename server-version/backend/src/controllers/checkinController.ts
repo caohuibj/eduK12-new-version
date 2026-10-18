@@ -17,6 +17,7 @@ import {
   AssetDatabase,
   AssetReferenceValidationError,
   attachAssetReference,
+  attachAssetReferences,
   discardUnreferencedAsset,
   signKnownAsset,
   hydrateAssetReferences,
@@ -375,15 +376,12 @@ const syncSubmissionAssetReferences = async (
   }
 
   const existingKeys = new Set(existing.map((reference: { assetId: string; field: string }) => `${reference.assetId}:${reference.field}`))
-  await Promise.all(
+  await attachAssetReferences(
     desired
       .filter((reference) => !existingKeys.has(`${reference.assetId}:${reference.field}`))
-      .map((reference) => attachAssetReference({
-        assetId: reference.assetId,
-        entityType: 'CheckinSubmission',
-        entityId: submissionId,
-        field: reference.field,
-      }, db)),
+      .map((reference) => ({ assetId: reference.assetId, entityType: 'CheckinSubmission',
+        entityId: submissionId, field: reference.field })),
+    db,
   )
 }
 

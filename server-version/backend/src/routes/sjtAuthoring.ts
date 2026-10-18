@@ -40,7 +40,7 @@ import {
 import { scoreSituationalModel } from '../modules/situational/situation-model-resolver'
 import { buildSjtNarrative } from '../modules/situational/authoring/narrative'
 import { createSjtReleaseGrant, revokeSjtReleaseGrant, listSjtReleaseGrants,
-  listSjtControlledReleases } from '../modules/situational/authoring/grants'
+  listSjtControlledReleases, sjtGrantListQuerySchema } from '../modules/situational/authoring/grants'
 import sjtAuthoringMediaRouter from './sjtAuthoringMedia'
 
 const router = Router()
@@ -328,8 +328,14 @@ router.put('/drafts/:id/policy', handle(async (req, res) => {
     authorizationPolicy: z.literal('COURSE_GRANT_V1').nullable() }).strict().parse(req.body)
   send(res, await setSjtDraftPolicy(actor(req), req.params.id, body.revision, body.authorizationPolicy))
 }))
-router.get('/releases', handle(async (req, res) => send(res, await listSjtControlledReleases(actor(req)))))
-router.get('/releases/:id/grants', handle(async (req, res) => send(res, await listSjtReleaseGrants(actor(req), req.params.id))))
+router.get('/releases', handle(async (req, res) => {
+  const query = sjtGrantListQuerySchema.parse(req.query)
+  send(res, await listSjtControlledReleases(actor(req), query))
+}))
+router.get('/releases/:id/grants', handle(async (req, res) => {
+  const query = sjtGrantListQuerySchema.parse(req.query)
+  send(res, await listSjtReleaseGrants(actor(req), req.params.id, query))
+}))
 router.post('/releases/:id/grants', handle(async (req, res) => {
   const body = exactRelease.extend({
     granteeTeacherId: z.string().uuid(), courseId: z.string().uuid(), purpose: z.literal('TRAINING_COURSE'),

@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client'
-import { assertSjtCourseGrants, type SjtCourseGrantScope, type SjtCourseGrantReceipt } from './authoring/grants'
+import { lockSjtGrantScope, assertSjtCourseGrants, type SjtCourseGrantScope, type SjtCourseGrantReceipt } from './authoring/grants'
 import { prisma } from '../../config/database'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import { freezeSituationalRuntimeAtAttemptStart } from '../assessment-runtime/situational-runtime-snapshot'
@@ -25,6 +25,7 @@ export async function inspectSituationalReleases(identities: SituationalReleaseI
   const unique = [...new Map(identities.map(identity => [situationalReleaseKey(identity), identity])).values()]
   const builtins = listSituationPackages()
   const uploaded = unique.filter(identity => !builtins.some(pkg => pkg.key === identity.instrumentKey))
+  if (lock && uploaded.length && scope) await lockSjtGrantScope(db, scope)
   if (lock && uploaded.length) {
     await db.$queryRaw(Prisma.sql`SELECT "id" FROM "sjt_author_releases" WHERE ${Prisma.join(uploaded.map(identity => Prisma.sql`("instrument_key" = ${identity.instrumentKey} AND "instrument_version" = ${identity.instrumentVersion})`), ' OR ')} ORDER BY "id" FOR SHARE`)
   }

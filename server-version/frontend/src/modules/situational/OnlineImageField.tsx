@@ -3,9 +3,11 @@ import { sessionFetch } from '../../api/client'
 import AssessmentImagePresentation from '../assessment-media/AssessmentImagePresentation'
 import { useAssessmentImageAssets } from '../assessment-media/useAssessmentImageAssets'
 import type { AssessmentImage, AssessmentStaticImageAssetIdentityV1 } from '../assessment-media/types'
+import { useAuthorCursorList } from './useAuthorCursorList'
 
 export type AuthorImageAsset = { asset: AssessmentStaticImageAssetIdentityV1; name: string | null; sizeBytes: number }
 const base = '/api/situational/authoring'
+const imageKey = (item: AuthorImageAsset) => item.asset.assetId
 export const authorImageContentPath = (assetId: string, draftId?: string) => draftId
   ? `${base}/drafts/${encodeURIComponent(draftId)}/media/${encodeURIComponent(assetId)}/content`
   : `${base}/media/images/${encodeURIComponent(assetId)}/content`
@@ -28,18 +30,18 @@ export function OnlineImageField({ image, onChange, draftId, readOnly = false, o
   readOnly?: boolean
   onBusyChange?: (busy: boolean) => void
 }) {
-  const [library, setLibrary] = useState<AuthorImageAsset[]>([])
-  const [open, setOpen] = useState(false), [loading, setLoading] = useState(false)
+  const [open, setOpen] = useState(false)
+  const library = useAuthorCursorList<AuthorImageAsset>(open ? '/media/images' : null, imageKey, 30)
   const [uploading, setUploading] = useState(false), [error, setError] = useState('')
   const [selectedAssetId, setSelectedAssetId] = useState<string | null>(null)
-  const request = useRef<AbortController | null>(null), uploadRequest = useRef<AbortController | null>(null)
+  const uploadRequest = useRef<AbortController | null>(null)
   const mounted = useRef(true), libraryId = useId()
   const change = useRef(onChange); change.current = onChange
   const busyChange = useRef(onBusyChange); busyChange.current = onBusyChange
   const readOnlyNow = useRef(readOnly); readOnlyNow.current = readOnly
   useEffect(() => {
     mounted.current = true
-    return () => { mounted.current = false; request.current?.abort(); uploadRequest.current?.abort(); busyChange.current?.(false) }
+    return () => { mounted.current = false; uploadRequest.current?.abort(); busyChange.current?.(false) }
   }, [])
   const items = useMemo(() => image ? [{ asset: image.asset, altText: image.altText, caption: image.caption }] : [], [image])
   // Newly selected assets have not yet been saved into a draft, so use the owner's library proxy.
@@ -52,19 +54,6 @@ export function OnlineImageField({ image, onChange, draftId, readOnly = false, o
     if (readOnlyNow.current) return
     setSelectedAssetId(item?.asset.assetId ?? null)
     change.current(item ? reference(item) : undefined)
-  }
-  const loadLibrary = async () => {
-    request.current?.abort()
-    const controller = new AbortController(); request.current = controller
-    setLoading(true); setError(''); setLibrary([])
-    try {
-      const response = await sessionFetch(`${base}/media/images`, { cache: 'no-store', signal: controller.signal })
-      const body = await response.json()
-      if (!response.ok || body.code !== 0 || !body.data) throw new Error(body.message || '素材库读取失败')
-      if (!controller.signal.aborted && mounted.current) setLibrary(body.data.items)
-    } catch (reason) {
-      if (!controller.signal.aborted && mounted.current) setError(reason instanceof Error ? reason.message : '素材库读取失败')
-    } finally { if (!controller.signal.aborted && mounted.current) setLoading(false) }
   }
   const upload = async (file: File) => {
     if (readOnlyNow.current || uploadRequest.current) return
@@ -80,7 +69,7 @@ export function OnlineImageField({ image, onChange, draftId, readOnly = false, o
       if (!response.ok || result.code !== 0 || !result.data) throw new Error(result.message || '图片上传失败')
       if (controller.signal.aborted || !mounted.current) return
       const item = result.data as AuthorImageAsset
-      setLibrary(xs => [item, ...xs.filter(x => x.asset.assetId !== item.asset.assetId)])
+      library.prepend(item)
       choose(item)
     } catch (reason) {
       if (!controller.signal.aborted && mounted.current) setError(reason instanceof Error ? reason.message : '图片上传失败')
@@ -98,20 +87,21 @@ export function OnlineImageField({ image, onChange, draftId, readOnly = false, o
       {uploading && <p role="status">正在上传图片…</p>}
       <button type="button" className="btn-secondary" disabled={uploading} aria-expanded={open} aria-controls={libraryId}
         onClick={() => {
-          if (open) { request.current?.abort(); setOpen(false); setLibrary([]); setLoading(false); setError('') }
-          else { setOpen(true); void loadLibrary() }
+          setOpen(!open); setError('')
         }}>{open ? '收起作者素材库' : '打开作者素材库'}</button>
       <div id={libraryId} hidden={!open} className="space-y-2">{open && <>
-        {loading && <p role="status">正在读取作者素材库…</p>}
-        {error && <button type="button" className="btn-secondary" disabled={loading || uploading} onClick={() => void loadLibrary()}>重试读取素材库</button>}
+        {library.loading && <p role="status">正在读取作者素材库…</p>}
+        {library.error && <><p role="alert" className="text-red-700 text-sm">{library.error}</p>
+          <button type="button" className="btn-secondary" disabled={library.loading || uploading} onClick={() => void library.retry()}>重试读取素材库</button></>}
         <label className="text-sm block">从作者素材库选择
-          <select className="input block w-full" value={image?.asset.assetId || ''} disabled={loading || uploading || !!error}
-            onChange={e => choose(library.find(x => x.asset.assetId === e.target.value))}>
+          <select className="input block w-full" value={image?.asset.assetId || ''} disabled={uploading || (!library.items.length && library.loading)}
+            onChange={e => choose(library.items.find(x => x.asset.assetId === e.target.value))}>
             <option value="">不使用图片</option>
-            {image && !library.some(x => x.asset.assetId === image.asset.assetId) && <option value={image.asset.assetId}>当前情境图片</option>}
-            {library.map(item => <option key={item.asset.assetId} value={item.asset.assetId}>{item.name || item.asset.assetId} · {Math.round(item.sizeBytes / 1024)} KB</option>)}
+            {image && !library.items.some(x => x.asset.assetId === image.asset.assetId) && <option value={image.asset.assetId}>当前情境图片</option>}
+            {library.items.map(item => <option key={item.asset.assetId} value={item.asset.assetId}>{item.name || item.asset.assetId} · {Math.round(item.sizeBytes / 1024)} KB</option>)}
           </select>
         </label>
+        {library.nextCursor && <button type="button" className="btn-secondary" disabled={library.loading || uploading} onClick={() => void library.loadMore()}>加载更多素材</button>}
       </>}</div>
     </>}
     {image && <div className="space-y-2">

@@ -1,4 +1,5 @@
 import { Prisma, type SjtReleaseGrant } from '@prisma/client'
+import { z } from 'zod'
 import { prisma } from '../../../config/database'
 import { SJT_COURSE_GRANT_POLICY, sjtCourseGrantReceiptSchema, sjtCourseGrantScopeSchema,
   type SjtCourseGrantReceipt, type SjtCourseGrantScope, type SjtGrantPermission } from './grant-contract'
@@ -48,11 +49,22 @@ async function assertScope(tx: Prisma.TransactionClient, scope: SjtCourseGrantSc
     || !course || course.isLibrary || course.creatorId !== scope.teacherId || course.courseType !== 'TRAINING_COURSE')
     throw problem('SJT 授权仅限真实教师及其拥有的培训课程')
 }
+/** Existing aggregate/draft parent locks must precede this scope lock. Every
+ * mutable authorization principal uses user -> course -> release -> grant. */
+export async function lockSjtGrantScope(tx: Prisma.TransactionClient,
+  scope: SjtCourseGrantScope | null | undefined): Promise<void> {
+  if (!scope) return
+  if (!sjtCourseGrantScopeSchema.safeParse(scope).success)
+    throw problem('受控题包需要明确的培训课程授权范围')
+  await tx.$queryRaw`SELECT id FROM users WHERE id=${scope.teacherId} FOR SHARE`
+  await tx.$queryRaw`SELECT id FROM courses WHERE id=${scope.courseId} FOR SHARE`
+}
 /** One operation-local batch. Null policy is legacy-compatible. A controlled
  * release has no standalone/global grant. Call within the existing parent
- * transaction; lock order is parent, release id, grant id, managed asset id.
+ * transaction; lock order is parent, scope user/course, release id, grant id, managed asset id.
  * releaseLocked may be set only after the caller locks and revalidates every
- * supplied release's exact scalar identity in that same transaction. */
+ * supplied release's exact scalar identity in that same transaction, after
+ * lockSjtGrantScope protects its teacher/course scope. */
 export async function assertSjtCourseGrants(
   tx: Prisma.TransactionClient, releases: readonly SjtGrantRelease[],
   scope: SjtCourseGrantScope | null | undefined, permission: SjtGrantPermission = 'DISTRIBUTE',
@@ -70,10 +82,11 @@ export async function assertSjtCourseGrants(
   const controlled = [...byId.values()].filter(r => r.authorizationPolicy === SJT_COURSE_GRANT_POLICY)
   if (!controlled.length) return results
   if (!scope || !['DISTRIBUTE', 'ADAPT'].includes(permission)) throw problem('受控题包需要课程专属授权')
-  const now = options.now ?? new Date()
-  await assertScope(tx, scope, now)
+  if (!sjtCourseGrantScopeSchema.safeParse(scope).success)
+    throw problem('受控题包需要明确的培训课程授权范围')
   const ids = controlled.map(r => r.id).sort()
   if (options.lock && !options.releaseLocked) {
+    await lockSjtGrantScope(tx, scope)
     await tx.$queryRaw(Prisma.sql`SELECT id FROM sjt_author_releases WHERE id IN (${Prisma.join(ids)}) ORDER BY id FOR SHARE`)
   }
   if (!options.releaseLocked) {
@@ -92,6 +105,9 @@ export async function assertSjtCourseGrants(
       ORDER BY id FOR SHARE`)
   }
   const admittedAt = options.now ?? new Date()
+  // The grant wait may cross account expiry, suspension or an ownership change.
+  // Read the locked real scope once after all release/grant waits complete.
+  await assertScope(tx, scope, admittedAt)
   const grants = await tx.sjtReleaseGrant.findMany({ where: { releaseId: { in: ids },
     granteeTeacherId: scope.teacherId, courseId: scope.courseId, purpose: scope.purpose,
     permission, status: 'ACTIVE', validFrom: { lte: admittedAt }, expiresAt: { gt: admittedAt } }, orderBy: { id: 'asc' } })
@@ -118,15 +134,16 @@ export async function createSjtReleaseGrant(actor: SjtGrantActor, releaseId: str
     if (!['DISTRIBUTE', 'ADAPT'].includes(input.permission) || !Number.isFinite(input.validFrom.getTime())
       || !Number.isFinite(input.expiresAt.getTime()) || input.expiresAt <= input.validFrom
       || input.expiresAt <= now || !input.note.trim()) throw problem('授权用途、时限或说明无效', 400)
-    // Course ownership is protected before the release/grant locks.
-    await tx.$queryRaw`SELECT id FROM courses WHERE id=${input.courseId} FOR SHARE`
-    await assertScope(tx, { teacherId: input.granteeTeacherId, courseId: input.courseId, purpose: input.purpose }, now)
+    const scope = { teacherId: input.granteeTeacherId, courseId: input.courseId, purpose: input.purpose }
+    await lockSjtGrantScope(tx, scope)
     await tx.$queryRaw`SELECT id FROM sjt_author_releases WHERE id=${releaseId} FOR SHARE`
     const release = await tx.sjtAuthorRelease.findUnique({ where: { id: releaseId }, select: releaseSelect })
     if (!release || release.status !== 'PUBLISHED' || release.authorizationPolicy !== SJT_COURSE_GRANT_POLICY
       || !sameRelease(release, { ...input, id: releaseId, authorizationPolicy: SJT_COURSE_GRANT_POLICY }))
       throw problem('只能授权精确匹配的受控已发布版本', 409)
-    if (input.expiresAt <= new Date()) throw problem('授权有效期已结束', 409)
+    const currentTime = new Date()
+    if (input.expiresAt <= currentTime) throw problem('授权有效期已结束', 409)
+    await assertScope(tx, scope, currentTime)
     const grant = await tx.sjtReleaseGrant.create({ data: { releaseId,
       instrumentKey: release.instrumentKey, instrumentVersion: release.instrumentVersion,
       definitionHash: release.definitionHash, contentDigest: release.contentDigest,
@@ -158,14 +175,53 @@ export async function revokeSjtReleaseGrant(actor: SjtGrantActor, id: string, ve
     return grant
   })
 }
-export async function listSjtReleaseGrants(actor: SjtGrantActor, releaseId: string) {
-  return prisma.sjtReleaseGrant.findMany({ where: { releaseId,
-    ...(actor.admin ? {} : { granteeTeacherId: actor.userId }) }, orderBy: { createdAt: 'desc' }, take: 200 })
+export const sjtGrantListQuerySchema = z.object({
+  cursor: z.string().min(1).max(1024).regex(/^[A-Za-z0-9_-]+$/).optional(),
+  pageSize: z.union([z.number(), z.string().regex(/^[1-9]\d{0,2}$/).transform(Number)])
+    .pipe(z.number().int().min(1).max(100)).default(50),
+}).strict()
+export type SjtGrantListQuery = { cursor?: string; pageSize?: number }
+const cursorSchema = z.object({ id: z.string().min(1).max(128), scope: z.string().min(1).max(512) }).strict()
+function listPage(query: SjtGrantListQuery, scope: string) {
+  const request = sjtGrantListQuerySchema.safeParse(query)
+  if (!request.success) throw problem('分页参数无效', 400)
+  if (!request.data.cursor) return { pageSize: request.data.pageSize }
+  try {
+    const bytes = Buffer.from(request.data.cursor, 'base64url')
+    if (bytes.toString('base64url') !== request.data.cursor) throw new Error('Non-canonical cursor')
+    const cursor = cursorSchema.parse(JSON.parse(bytes.toString('utf8')))
+    if (cursor.scope !== scope) throw new Error('Wrong cursor scope')
+    return { pageSize: request.data.pageSize, cursor: { id: cursor.id } }
+  } catch { throw problem('分页游标无效或不属于此目录', 400) }
 }
-export async function listSjtControlledReleases(actor: SjtGrantActor) {
-  // Lightweight scalar catalog: no package, template, answer key, or grantor audit blobs.
-  return prisma.sjtAuthorRelease.findMany({ where: { authorizationPolicy: SJT_COURSE_GRANT_POLICY,
+function listResult<T extends { id: string }>(rows: T[], pageSize: number, scope: string) {
+  const items = rows.slice(0, pageSize)
+  return { items, nextCursor: rows.length > pageSize
+    ? Buffer.from(JSON.stringify({ id: items[items.length - 1].id, scope })).toString('base64url') : null }
+}
+const grantMetadataSelect = { id: true, releaseId: true, instrumentKey: true, instrumentVersion: true,
+  definitionHash: true, contentDigest: true, granteeTeacherId: true, courseId: true, purpose: true,
+  permission: true, validFrom: true, expiresAt: true, status: true, version: true,
+  grantorId: true, note: true, revokedAt: true, revokedBy: true, revokeNote: true, createdAt: true } as const
+export async function listSjtReleaseGrants(actor: SjtGrantActor, releaseId: string, query: SjtGrantListQuery = {}) {
+  const scope = JSON.stringify(['grants', actor.userId, actor.admin, releaseId])
+  const page = listPage(query, scope)
+  const rows = await prisma.sjtReleaseGrant.findMany({ where: { releaseId,
+    ...(actor.admin ? {} : { granteeTeacherId: actor.userId }) }, select: grantMetadataSelect,
+    orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], take: page.pageSize + 1,
+    ...(page.cursor ? { cursor: page.cursor, skip: 1 } : {}) })
+  return listResult(rows, page.pageSize, scope)
+}
+export async function listSjtControlledReleases(actor: SjtGrantActor, query: SjtGrantListQuery = {}) {
+  const scope = JSON.stringify(['releases', actor.userId, actor.admin])
+  const page = listPage(query, scope)
+  // One metadata-only page, no nested grant expansion, package, template or audit blobs.
+  // Prisma resolves cursor timestamps in SQL, avoiding JS millisecond truncation
+  // of PostgreSQL's microsecond grant created_at values at equal-time boundaries.
+  const rows = await prisma.sjtAuthorRelease.findMany({ where: { authorizationPolicy: SJT_COURSE_GRANT_POLICY,
     ...(actor.admin ? {} : { grants: { some: { granteeTeacherId: actor.userId } } }) },
-    select: { ...releaseSelect, authorId: true, grants: { where: actor.admin ? {} : { granteeTeacherId: actor.userId },
-      orderBy: { createdAt: 'desc' }, take: 200 } }, orderBy: { createdAt: 'desc' }, take: 200 })
+    select: { ...releaseSelect, authorId: true, createdAt: true },
+    orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], take: page.pageSize + 1,
+    ...(page.cursor ? { cursor: page.cursor, skip: 1 } : {}) })
+  return listResult(rows, page.pageSize, scope)
 }

@@ -1,4 +1,6 @@
 import type { Request, Response } from 'express'
+import { lockStoredAssetRows } from '../services/assetStorage'
+import { assessmentVideoPresentationAssetReferences } from '../modules/assessment-media/assessment-video'
 import { legacyQuestionnaireDb as prisma } from '../services/legacyQuestionnaireDatabase'
 import { validateContextFormItems } from '../modules/assessment-context'
 import { formSectionIdentityHash } from '../modules/assessment-runtime/attempt-runtime'
@@ -122,16 +124,26 @@ export const questionnaireImageController = {
       if (contextIssues.length > 0) return error(res, contextIssues[0].message)
 
       const updated = await prisma.$transaction(async (tx) => {
-        for (const section of sections) {
+        const media = sections.map(section => ({
+          section,
+          references: questionnaireFormSectionImageReferences(section),
+          presentations: questionnaireFormSectionVideoPresentations(section),
+        }))
+        // Every section and media kind participates in one ordered lock set.
+        // Locking each section separately can invert A/B across two publications.
+        await lockStoredAssetRows(tx as never, media.flatMap(entry => [
+          ...entry.references, ...entry.presentations.flatMap(assessmentVideoPresentationAssetReferences),
+        ]).map(reference => reference.assetId))
+        for (const { section, references, presentations } of media) {
           const owner = publishedFormMediaOwner('QUESTIONNAIRE', id, formSectionIdentityHash(section))
           await retainFormSectionImages({
             owner,
-            references: questionnaireFormSectionImageReferences(section),
+            references,
             db: tx as never,
           })
           await retainFormSectionVideos({
             owner,
-            presentations: questionnaireFormSectionVideoPresentations(section),
+            presentations,
             db: tx as never,
           })
         }

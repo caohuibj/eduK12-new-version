@@ -1,18 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { mockDb, mockAttachAssetReference } = vi.hoisted(() => ({
+const { mockDb, mockAttachAssetReferences } = vi.hoisted(() => ({
   mockDb: {
     storedAsset: { findMany: vi.fn() },
     assetReference: { upsert: vi.fn() },
   },
-  mockAttachAssetReference: vi.fn(),
+  mockAttachAssetReferences: vi.fn(),
 }))
 
 vi.mock('../../config/database', () => ({ prisma: mockDb }))
 vi.mock('../../services/assetStorage', () => ({
-  attachAssetReference: mockAttachAssetReference,
-  lockStoredAssetRows: vi.fn(),
-  inAssetTransaction: async (db: unknown, run: (tx: unknown) => Promise<unknown>) => run(db),
+  attachAssetReferences: mockAttachAssetReferences,
 }))
 
 import {
@@ -74,7 +72,10 @@ describe('Assessment asset identity', () => {
 describe('Assessment asset catalog and retention', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockAttachAssetReference.mockResolvedValue({})
+    mockAttachAssetReferences.mockImplementation(async (_references, db, validate) => {
+      const assets = await db.storedAsset.findMany({})
+      await validate(assets)
+    })
   })
 
   it('accepts a complete immutable catalog record', async () => {
@@ -115,11 +116,8 @@ describe('Assessment asset catalog and retention', () => {
       db: mockDb as never,
     })
 
-    expect(mockAttachAssetReference).toHaveBeenCalledTimes(1)
-    expect(mockAttachAssetReference).toHaveBeenCalledWith({
-      assetId: 'asset-1',
-      ...owner,
-    }, mockDb)
+    expect(mockAttachAssetReferences).toHaveBeenCalledTimes(1)
+    expect(mockAttachAssetReferences).toHaveBeenCalledWith([{ assetId: 'asset-1', ...owner }, { assetId: 'asset-1', ...owner }], mockDb, expect.any(Function))
   })
 
   it('does nothing for a text-only frozen definition with no asset references', async () => {
@@ -133,7 +131,7 @@ describe('Assessment asset catalog and retention', () => {
       db: mockDb as never,
     })
     expect(mockDb.storedAsset.findMany).not.toHaveBeenCalled()
-    expect(mockAttachAssetReference).not.toHaveBeenCalled()
+    expect(mockAttachAssetReferences).not.toHaveBeenCalled()
   })
 
   it('does not retain an identity that fails catalog validation', async () => {
@@ -147,6 +145,6 @@ describe('Assessment asset catalog and retention', () => {
       references: [identity()],
       db: mockDb as never,
     })).rejects.toMatchObject({ name: 'AssessmentAssetValidationError' })
-    expect(mockAttachAssetReference).not.toHaveBeenCalled()
+    expect(mockAttachAssetReferences).toHaveBeenCalledTimes(1)
   })
 })

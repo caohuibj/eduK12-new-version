@@ -7,7 +7,7 @@ import {
   type SituationPackage,
 } from '../situation-package.registry'
 import { compileSjtAuthorDocument, assertSjtAuthorReleaseReady } from './dispatcher'
-import { assertSjtCourseGrants, SJT_COURSE_GRANT_POLICY, sjtAdaptationSourceSchema,
+import { assertSjtCourseGrants, lockSjtGrantScope, SJT_COURSE_GRANT_POLICY, sjtAdaptationSourceSchema,
   type SjtGrantExactInput, type SjtAdaptationSource } from './grants'
 import { assertSjtAuthorMedia, retainSjtAuthorReleaseMedia, type SjtAuthorMediaOptions } from './media'
 
@@ -387,6 +387,7 @@ export async function adaptSjtRelease(actor: SjtAuthorActor, releaseId: string,
   input: SjtGrantExactInput & { courseId: string; grantId: string; grantVersion: number;
     newInstrumentKey: string; newInstrumentVersion: string }) {
   return prisma.$transaction(async tx => {
+    await lockSjtGrantScope(tx, { teacherId: actor.userId, courseId: input.courseId, purpose: 'TRAINING_COURSE' })
     await tx.$queryRaw`SELECT id FROM sjt_author_releases WHERE id=${releaseId} FOR SHARE`
     const release = await tx.sjtAuthorRelease.findUnique({ where: { id: releaseId } })
     if (!release || release.status !== 'PUBLISHED' || release.authorizationPolicy !== SJT_COURSE_GRANT_POLICY

@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/eduk12_c13_20261018/server-version/backend
+
+
+ Test Files  3 passed (3)
+      Tests  66 passed (66)
+   Start at  20:06:46
+   Duration  4.26s (transform 1.30s, setup 0ms, import 2.52s, tests 1.35s, environment 0ms)
+

@@ -14,10 +14,11 @@ const { db, media } = vi.hoisted(() => ({
 vi.mock('../../config/database', () => ({ prisma: db }))
 vi.mock('../../modules/situational/authoring/media', () => media)
 import { assertSjtCourseGrants, createSjtReleaseGrant, revokeSjtReleaseGrant,
-  listSjtControlledReleases, sjtCourseGrantReceiptSchema } from '../../modules/situational/authoring/grants'
+  listSjtControlledReleases, listSjtReleaseGrants, sjtGrantListQuerySchema, sjtCourseGrantReceiptSchema } from '../../modules/situational/authoring/grants'
 import { adaptSjtRelease, getSjtDraft, setSjtDraftPolicy, requestSjtReview,
   listUploadedSjtPackages } from '../../modules/situational/authoring/service'
 
+const sqlText = (value: any) => (value.strings ?? value).join('')
 const now = new Date('2026-10-18T12:00:00.000Z')
 const teacher = { role: 'TEACHER', isActive: true, isFrozen: false, teacherApproved: true, expiresAt: null }
 const scope = { teacherId: 'teacher', courseId: 'course', purpose: 'TRAINING_COURSE' as const }
@@ -74,11 +75,17 @@ describe('C13 exact course permission gate', () => {
       permission: 'DISTRIBUTE', ...exactInput, courseId: 'course', granteeTeacherId: 'teacher', admittedAt: now.toISOString() })
     expect(db.sjtAuthorRelease.findMany).toHaveBeenCalledTimes(1)
     expect(db.sjtReleaseGrant.findMany).toHaveBeenCalledTimes(1)
-    expect(db.$queryRaw).toHaveBeenCalledTimes(2)
-    expect(db.$queryRaw.mock.calls[0][0].strings.join('')).toContain('sjt_author_releases')
-    expect(db.$queryRaw.mock.calls[1][0].strings.join('')).toContain('sjt_release_grants')
-    expect(db.$queryRaw.mock.calls[1][0].strings.join('')).toContain('ORDER BY id FOR SHARE')
-    expect(db.$queryRaw.mock.invocationCallOrder[1]).toBeLessThan(db.sjtReleaseGrant.findMany.mock.invocationCallOrder[0])
+    expect(db.$queryRaw).toHaveBeenCalledTimes(4)
+    expect(sqlText(db.$queryRaw.mock.calls[0][0])).toContain('FROM users')
+    expect(sqlText(db.$queryRaw.mock.calls[1][0])).toContain('FROM courses')
+    expect(sqlText(db.$queryRaw.mock.calls[2][0])).toContain('sjt_author_releases')
+    expect(sqlText(db.$queryRaw.mock.calls[3][0])).toContain('sjt_release_grants')
+    expect(sqlText(db.$queryRaw.mock.calls[3][0])).toContain('ORDER BY id FOR SHARE')
+    expect(db.$queryRaw.mock.invocationCallOrder[3]).toBeLessThan(db.sjtReleaseGrant.findMany.mock.invocationCallOrder[0])
+    expect(db.$queryRaw.mock.invocationCallOrder[3]).toBeLessThan(db.user.findUnique.mock.invocationCallOrder[0])
+    expect(db.$queryRaw.mock.invocationCallOrder[3]).toBeLessThan(db.course.findUnique.mock.invocationCallOrder[0])
+    expect(db.user.findUnique).toHaveBeenCalledTimes(1)
+    expect(db.course.findUnique).toHaveBeenCalledTimes(1)
     expect(db.sjtAuthorRelease.findMany.mock.calls[0][0].select).not.toHaveProperty('package')
   })
   it('reuses already-locked exact release facts without redundant release reads or locks', async () => {
@@ -115,11 +122,30 @@ describe('C13 exact course permission gate', () => {
   })
   it('samples permission time after lock waits, rejecting an expiry crossed while blocked', async () => {
     db.$queryRaw.mockImplementation(async (query) => {
-      if (query.strings.join('').includes('sjt_release_grants')) vi.setSystemTime(new Date(now.getTime() + 2000))
+      if (sqlText(query).includes('sjt_release_grants')) vi.setSystemTime(new Date(now.getTime() + 2000))
       return []
     })
     await expect(assertSjtCourseGrants(db as any, [release], scope, 'DISTRIBUTE', { lock: true })).rejects.toMatchObject({ statusCode: 403 })
     expect(db.sjtReleaseGrant.findMany.mock.calls[0][0].where.expiresAt.gt).toEqual(new Date(now.getTime() + 2000))
+  })
+  it.each(['frozen', 'expired', 'owner', 'library'])('rechecks real scope once after lock wait: %s', async defect => {
+    db.sjtReleaseGrant.findMany.mockResolvedValue([{ ...grant, expiresAt: new Date(now.getTime() + 10000) }])
+    db.$queryRaw.mockImplementation(async query => {
+      if (sqlText(query).includes('sjt_release_grants')) {
+        if (defect === 'frozen') db.user.findUnique.mockResolvedValue({ ...teacher, isFrozen: true })
+        if (defect === 'expired') {
+          db.user.findUnique.mockResolvedValue({ ...teacher, expiresAt: new Date(now.getTime() + 1000) })
+          vi.setSystemTime(new Date(now.getTime() + 2000))
+        }
+        if (defect === 'owner') db.course.findUnique.mockResolvedValue({ creatorId: 'other', courseType: 'TRAINING_COURSE', isLibrary: false })
+        if (defect === 'library') db.course.findUnique.mockResolvedValue({ creatorId: 'teacher', courseType: 'TRAINING_COURSE', isLibrary: true })
+      }
+      return []
+    })
+    await expect(assertSjtCourseGrants(db as any, [release], scope, 'DISTRIBUTE', { lock: true })).rejects.toMatchObject({ statusCode: 403 })
+    expect(db.user.findUnique).toHaveBeenCalledTimes(1)
+    expect(db.course.findUnique).toHaveBeenCalledTimes(1)
+    expect(db.sjtReleaseGrant.findMany).not.toHaveBeenCalled()
   })
   it('frozen receipts remain readable later but cannot claim admission outside their original interval', async () => {
     const receipt = (await assertSjtCourseGrants(db as any, [release], scope)).get('release')!
@@ -165,6 +191,46 @@ describe('C13 grant administration and adaptation', () => {
     expect(db.sjtAuthorRelease.findMany.mock.calls[0][0].select).not.toHaveProperty('sourceDraft')
     await listUploadedSjtPackages()
     expect(db.sjtAuthorRelease.findMany.mock.calls[1][0].where).toEqual({ status: 'PUBLISHED', authorizationPolicy: null })
+  })
+  it('paginates release metadata with an opaque actor-bound cursor and no nested grant expansion', async () => {
+    db.sjtAuthorRelease.findMany.mockResolvedValueOnce([{ ...release, id: 'newer' }, { ...release, id: 'older' }])
+    const first = await listSjtControlledReleases(actor, { pageSize: 1 })
+    expect(first.items).toHaveLength(1)
+    expect(first.nextCursor).toEqual(expect.any(String))
+    expect(db.sjtAuthorRelease.findMany.mock.calls[0][0]).toMatchObject({ take: 2,
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }] })
+    expect(db.sjtAuthorRelease.findMany.mock.calls[0][0].select).not.toHaveProperty('grants')
+    db.sjtAuthorRelease.findMany.mockResolvedValueOnce([{ ...release, id: 'older' }])
+    const second = await listSjtControlledReleases(actor, { pageSize: 1, cursor: first.nextCursor! })
+    expect(second.items[0].id).toBe('older'); expect(second.nextCursor).toBeNull()
+    expect(db.sjtAuthorRelease.findMany.mock.calls[1][0]).toMatchObject({ cursor: { id: 'newer' }, skip: 1,
+      where: { grants: { some: { granteeTeacherId: 'teacher' } } } })
+    await expect(listSjtControlledReleases({ userId: 'other', admin: false }, { cursor: first.nextCursor! })).rejects.toMatchObject({ statusCode: 400 })
+    await expect(listSjtReleaseGrants(actor, 'release', { cursor: first.nextCursor! })).rejects.toMatchObject({ statusCode: 400 })
+    expect(db.sjtAuthorRelease.findMany).toHaveBeenCalledTimes(2)
+  })
+  it('paginates grants within one exact release and retains recipient filtering on every page', async () => {
+    db.sjtReleaseGrant.findMany.mockResolvedValueOnce([{ ...grant, id: 'first-grant' }, { ...grant, id: 'next-grant' }])
+    const first = await listSjtReleaseGrants(actor, 'release', { pageSize: 1 })
+    expect(first.items).toHaveLength(1)
+    const selection = db.sjtReleaseGrant.findMany.mock.calls[0][0].select
+    expect(selection).not.toHaveProperty('audits'); expect(selection).not.toHaveProperty('snapshot')
+    expect(selection).not.toHaveProperty('release')
+    db.sjtReleaseGrant.findMany.mockResolvedValueOnce([{ ...grant, id: 'next-grant' }])
+    const second = await listSjtReleaseGrants(actor, 'release', { pageSize: 1, cursor: first.nextCursor! })
+    expect(second.nextCursor).toBeNull()
+    expect(db.sjtReleaseGrant.findMany.mock.calls[1][0]).toMatchObject({
+      where: { releaseId: 'release', granteeTeacherId: 'teacher' }, cursor: { id: 'first-grant' }, skip: 1,
+    })
+    await expect(listSjtReleaseGrants(actor, 'other-release', { cursor: first.nextCursor! })).rejects.toMatchObject({ statusCode: 400 })
+  })
+  it('strictly rejects unknown, malformed or unbounded pagination input before DB work', async () => {
+    expect(sjtGrantListQuerySchema.parse({ pageSize: '100' })).toEqual({ pageSize: 100 })
+    for (const query of [{ pageSize: '101' }, { pageSize: ['1'] }, { pageSize: 0 }, { all: 'true' }, { cursor: 'bad=' }])
+      expect(sjtGrantListQuerySchema.safeParse(query).success).toBe(false)
+    await expect(listSjtControlledReleases(actor, { cursor: 'not_json' })).rejects.toMatchObject({ statusCode: 400 })
+    await expect(listSjtControlledReleases(actor, { pageSize: 1000 })).rejects.toMatchObject({ statusCode: 400 })
+    expect(db.sjtAuthorRelease.findMany).not.toHaveBeenCalled()
   })
   it('does not let a distribution grantee read an author template or create an adaptation', async () => {
     await expect(getSjtDraft(actor, sourceDraft.id)).rejects.toMatchObject({ statusCode: 403 })

@@ -1,4 +1,5 @@
 import { Router, type Request, type Response, type RequestHandler } from 'express'
+import { z } from 'zod'
 import { prisma } from '../config/database'
 import { UserRole } from '../types'
 import { boundedUpload, uploadPrincipalRateLimit } from '../middleware/uploadAdmission'
@@ -16,6 +17,7 @@ const problem = (statusCode: number, message: string) => Object.assign(new Error
 const handle = (fn: (req: Request, res: Response) => Promise<unknown>): RequestHandler => async (req, res) => {
   try { await fn(req, res) } catch (error) {
     if (res.headersSent) { res.destroy(); return }
+    if (error instanceof z.ZodError) { res.status(400).json({ code: 'SJT_MEDIA_ERROR', message: '图片分页参数无效' }); return }
     const status = error instanceof AssessmentImageDeliveryError ? 404 : Number((error as { statusCode?: number }).statusCode ?? 500)
     res.status(status).json({ code: 'SJT_MEDIA_ERROR', message: status < 500 ? (error as Error).message : '图片服务暂时不可用' })
   }
@@ -38,13 +40,29 @@ router.post('/media/images', uploadPrincipalRateLimit,
       throw error
     }
   })))
+const pageQuery = z.object({
+  pageSize: z.string().regex(/^[1-9]\d{0,2}$/u).transform(Number).pipe(z.number().int().max(100)).optional(),
+  cursor: z.string().min(1).max(512).regex(/^[A-Za-z0-9_-]+$/u).optional(),
+}).strict()
+const cursorSchema = z.object({ createdAt: z.string().datetime(), id: z.string().min(1).max(200) }).strict()
 router.get('/media/images', handle(async (req, res) => {
-  const items = await prisma.storedAsset.findMany({ where: {
+  const query = pageQuery.parse(req.query), pageSize = query.pageSize ?? 30
+  let cursor: z.infer<typeof cursorSchema> | undefined
+  if (query.cursor) {
+    try { cursor = cursorSchema.parse(JSON.parse(Buffer.from(query.cursor, 'base64url').toString('utf8'))) }
+    catch { throw problem(400, '图片分页游标无效') }
+  }
+  const rows = await prisma.storedAsset.findMany({ where: {
     ownerId: req.user!.userId, accessScope: 'PRIVATE', scopeId: SJT_AUTHOR_MEDIA_SCOPE, deletedAt: null,
     mimeType: { in: [...ASSESSMENT_STATIC_IMAGE_MIME_TYPES] }, sizeBytes: { gt: 0, lte: SJT_AUTHOR_MAX_IMAGE_BYTES },
-  }, orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], take: 100,
-  select: { id: true, sha256: true, mimeType: true, originalName: true, sizeBytes: true } })
-  send(res, { items: items.map(portable) })
+    ...(cursor ? { OR: [{ createdAt: { lt: new Date(cursor.createdAt) } },
+      { createdAt: new Date(cursor.createdAt), id: { lt: cursor.id } }] } : {}),
+  }, orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], take: pageSize + 1,
+  select: { id: true, sha256: true, mimeType: true, originalName: true, sizeBytes: true, createdAt: true } })
+  const items = rows.slice(0, pageSize), last = items[items.length - 1]
+  const nextCursor = rows.length > pageSize && last
+    ? Buffer.from(JSON.stringify({ createdAt: last.createdAt.toISOString(), id: last.id })).toString('base64url') : null
+  send(res, { items: items.map(portable), nextCursor })
 }))
 router.get('/media/images/:assetId/content', handle(async (req, res) => {
   const asset = await prisma.storedAsset.findFirst({ where: {

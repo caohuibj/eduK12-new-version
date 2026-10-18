@@ -53,7 +53,7 @@ describe('private online author images', () => {
     expect(screen.getByLabelText('图片版权状态')).toBeDisabled()
   })
   it('selects only listed private assets and initializes unverified rights', async () => {
-    vi.mocked(sessionFetch).mockImplementation(async url => String(url).endsWith('/media/images') ? json({ items: [stored] }) : blob())
+    vi.mocked(sessionFetch).mockImplementation(async url => String(url).includes('/media/images?') ? json({ items: [stored], nextCursor: null }) : blob())
     render(<Editor/>)
     fireEvent.click(screen.getByRole('button', { name: '打开作者素材库' }))
     await screen.findByRole('option', { name: /classroom.png/ })
@@ -67,7 +67,7 @@ describe('private online author images', () => {
     const change = vi.fn(), view = render(<OnlineImageField onChange={change}/>)
     fireEvent.click(screen.getByRole('button', { name: '打开作者素材库' }))
     fireEvent.click(screen.getByRole('button', { name: '收起作者素材库' }))
-    await act(async () => resolve(json({ items: [stored] })))
+    await act(async () => resolve(json({ items: [stored], nextCursor: null })))
     expect(screen.queryByRole('option', { name: /classroom.png/ })).not.toBeInTheDocument()
     fireEvent.change(screen.getByLabelText('上传情境图片（不超过 2MB）'), { target: { files: [new File(['x'], 'x.png', { type: 'image/png' })] } })
     view.unmount()
@@ -84,4 +84,22 @@ describe('private online author images', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: '预览作答' })).toBeEnabled())
     expect(screen.getByRole('img', { name: '教室情境' })).toHaveAttribute('src', 'blob:private-image')
   })
+  it('loads more private assets without dropping already loaded choices', async () => {
+    const second = { ...stored, asset: { ...stored.asset, assetId: 'second-image' }, name: 'hallway.png' }
+    vi.mocked(sessionFetch).mockImplementation(async url => {
+      const request = new URLSearchParams(String(url).split('?')[1] || '')
+      return request.has('cursor')
+        ? json({ items: [stored, second], nextCursor: null })
+        : json({ items: [stored], nextCursor: 'asset-cursor+/=' })
+    })
+    render(<OnlineImageField onChange={vi.fn()}/>)
+    fireEvent.click(screen.getByRole('button', { name: '打开作者素材库' }))
+    await screen.findByRole('option', { name: /classroom.png/ })
+    fireEvent.click(screen.getByRole('button', { name: '加载更多素材' }))
+    await screen.findByRole('option', { name: /hallway.png/ })
+    expect(screen.getAllByRole('option', { name: /classroom.png/ })).toHaveLength(1)
+    expect(screen.queryByRole('button', { name: '加载更多素材' })).not.toBeInTheDocument()
+    expect(new URLSearchParams(String(vi.mocked(sessionFetch).mock.calls[1]![0]).split('?')[1] || '').get('cursor')).toBe('asset-cursor+/=')
+  })
+
 })

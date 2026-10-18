@@ -15,7 +15,7 @@ describe('SJT author workbench course policy', () => {
     vi.mocked(sessionFetch).mockImplementation(async (url, init) => {
       if (String(url).endsWith('/online/drafts') && init?.method === 'POST') return json(draft('COURSE_GRANT_V1'))
       if (String(url).endsWith('/drafts/draft-1')) return json(draft('COURSE_GRANT_V1'))
-      return json([])
+      return String(url).includes('/releases?') ? json({ items: [], nextCursor: null }) : json([])
     })
     render(<SjtAuthoring/>)
     fireEvent.click(screen.getByRole('button', { name: '在线创建图文题包' }))
@@ -32,7 +32,7 @@ describe('SJT author workbench course policy', () => {
       if (String(url).endsWith('/policy') && init?.method === 'PUT') { controlled = true; return json(draft('COURSE_GRANT_V1')) }
       if (String(url).endsWith('/drafts')) return json([draft(controlled ? 'COURSE_GRANT_V1' : null)])
       if (String(url).endsWith('/drafts/draft-1')) return json(draft(controlled ? 'COURSE_GRANT_V1' : null))
-      return json([])
+      return String(url).includes('/releases?') ? json({ items: [], nextCursor: null }) : json([])
     })
     render(<SjtAuthoring/>)
     fireEvent.click(await screen.findByRole('button', { name: '打开题包 online-new 1.0.0' }))

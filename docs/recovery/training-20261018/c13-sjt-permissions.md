@@ -16,14 +16,14 @@
 
 ## 锁协议
 
-- 业务操作保留既有父/草稿锁，随后精确release按id、grant按id、最后asset按id。撤销只锁grant，同一事务决定新准入先后；过有效期的判断在锁取得后重新取时间。
+- 业务操作保留既有父/草稿锁，随后user SHARE → course SHARE → 精确release按id SHARE → grant按id SHARE → asset按id SHARE（retain）或UPDATE（delete/discard）。撤销按release SHARE → grant UPDATE，同一事务决定新准入先后；grant等待后重新读取教师冻结/有效期与课程归属/library状态，并重新取有效期判断时间。旧null不新增资格校验。
 - 父准入/发布预先收集全部SJT、Scale和Form媒体identity，以assetId去重排序锁定，然后子retain重入这些锁，避免课程内容顺序造成跨工具反序。
 - 现COS写入链为content advisory → physical-object advisory → logical StoredAsset。retain/soft-delete仅使用最后的logical行锁，不持logical锁再取physical/content锁。
-- retain与soft-delete锁内重读identity/deleted/owner/references，使用原transaction。软删只标逻辑行，保留物理体；补偿删除先完成逻辑事务，再由既有physical保护重查全部逻辑引用。绝不以单逻辑asset无引用删除共享COS体。
+- retain间SHARE兼容，soft-delete/discard使用UPDATE排他锁。retain与soft-delete锁内重读identity/deleted/owner/references，使用原transaction。软删只标逻辑行，保留物理体；补偿删除先完成逻辑事务，再由既有physical保护重查全部逻辑引用。绝不以单逻辑asset无引用删除共享COS体。
 
 ## 当前状态
 
-实施中，尚未取得C13阶段验收。独立backend/frontend官方registry npm ci与fresh Prisma成功。首backend原build前置全部通过；首次tsc发现3处新媒体类型窄化问题，保留失败日志，针对修复后待复验。迁移、真实PG/HTTP、前端最终证据待执行，不能称CI成功。
+实施及本批限定验证完成，等待根线程阶段验收。独立backend/frontend官方registry npm ci与fresh Prisma成功，原build前置与最终完整backend/frontend TypeScript通过。首次类型失败、测试URL桩失败、非法fixture转换和PG观测SQL失败均保留原记录；修复后只复验受影响输入。详见 [证据索引](c13-evidence/README.md)，不称CI成功。
 
 ## 首源码检查点（11:08 UTC）
 
@@ -32,3 +32,25 @@
 - 前端应用TypeScript及定向组件通过，最后工作台小修复正在作输入绑定复核。没有运行浏览器。
 - 新PG/HTTP/升级harness编写中，尚未执行。下一步先补新增目录cursor/UI加载更多，以及grant锁后teacher/course有效性复核窗口，然后真实PG竞争与升级，独立源码审查。
 - 跨代素材不自动转授：ADAPT仅接受直接源release明确授权的素材且核实际原owner；不满足时明确拒绝，不能静默丢图。
+
+## 第二源码检查点（11:13 UTC）
+
+- `1babfd77d6338409b97315f3ce8cbf5b902b1631` 冻结scope锁序修复、作者目录分页API与四个C13验证脚本。grant受影响42项与媒体目录13项通过；等待真实HTTP/PG结果。
+- 新目录采用显式opaque cursor、pageSize、items/nextCursor；release不内嵌grant全集。前端加载更多增量单独复验。
+- 复制原停机C12 PGdata再升级，原目录前/后逐文件path/size/SHA fingerprint完全相同。202张旧业务表全列投影不变，新增nullable字段均null，不回填。202明确排除`_prisma_migrations`，但包含两张legacy import表；迁移后202+ledger1+grant/audit2=205表、1sequence，受限角色复核通过。
+- migration ledger从169到170。升级后dump→新DB restore全表全列（含密文）相等，ledger另行精确比较；cleanupVerified=true。该阶段新grant为空，不冒充新格式非空恢复证据。
+- baseline dump SHA256 `8b326c5b229be25d23692d739db0b7f500eef2a48ad401af64b8e8fecff58396`；升级dump SHA256 `f4cb74a51b0d8c012e827a456611e3c022d62fccc3c314160ee03d384836a9b0`。dump仅本地私有保留，不提交。
+- 独立审查发现旧两个问卷图片controller及多Scale helper跨section/snapshot分批retain会破坏新增全序，正在收窄补全部引用预锁和真实PG反序用例。
+
+## 合成fixture约束与保留失败
+
+首次C13 HTTP初始化错误地尝试把旧LEGACY课程更新为TRAINING，既有 `20261010100000_campus_activity_course_type` 触发器正确拒绝。该触发器禁止改变 `course_type` / `organization_id`；`isLibrary`不在该不可变集合。修复只在harness中直接新建 `courseType=TRAINING_COURSE` 的合成课程，再建立合成student membership，不更改触发器或业务策略。后续C14等应复用合法建课方式，不能先建默认LEGACY再update产品域。首次失败服务已清理，cleanupVerified=true；失败日志保留。
+
+## 最终限定结果（11:27 UTC）
+
+- 权限与共享资产锁独立源码审查通过；权限HTTP与旧库迁移获得独立限定动态GO。
+- 真实HTTP42检查/212请求通过，含10次实际PG等待观测、18组无父子/job/raw/canonical新增核对、4条冻结授权收据。原CSV/ZIP下载链、学生与唯一课程匿名历史恢复/FINAL/report/image、新准入拒绝均覆盖。
+- 共享资产PG覆盖按原4通过+补6通过接纳；补测恰6pass/4skip。补测只改观测PID的`::int`，业务source及dist指纹不变。原失败整体job仍false，未改写成功或重跑已通过项。
+- 旧C12状态复制升级202旧业务表不变、205表dump/restore；另实际非空C13新格式205表全列恢复相等（10 grants/19 audits），4个receipt密文与1私有图片副本hash/size精确，受限role复核通过。两个源停机目录均未修改，所有自建服务cleanupVerified=true。
+- 共享热路径retain采用SHARE并行，delete/discard采用UPDATE；一次目录读取与纯identity校验后私有稳定顺序batch写refs。没有逐图lock/find/upsert，不宣称CPU性能收益。
+- 明确限制：新受控release只支持单一真实Training课程；跨代素材许可不推断；正式browser C25、完整压力对照C26。共享helper只做受影响入口契约及真实并发回归，不扩大为全平台验收。
