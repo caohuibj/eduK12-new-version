@@ -24,6 +24,13 @@ NEW_TABLES = sorted(['anonymous_study_consent_versions', 'anonymous_study_consen
                     'anonymous_study_research_states', 'anonymous_study_research_audit'])
 QUALITY_TABLES = ['training_analysis_quality', 'training_analysis_quality_audit']
 PINNED_DUMP_SHA256 = '8918ed028d494ff2a90f6199b363c636efd643b18036a96f19a43863025db6f9'
+# Exact PostgreSQL 16.15 deparser differences proven on the pinned C16 dump.
+# These names AND both byte hashes must match before the server reparses either.
+CHECK_REPARSE_PAIRS = {
+    ('campus_accounts', 'campus_accounts_login_shape_check'): ('855b235948c36a9806c6213046ac17aa2bc70029714b3f19f1c48a2f45c98b47', '93b022fa58f7051ce183e52b28a8184162e08ddfe625b6a6c4092e8091570c4c'),
+    ('huiteacher_improvement_actions', 'huiteacher_improvement_actions_cipher_check'): ('19946c6089ad0c8fa464199b6e3d3971a0d6d50f8183c564950e5f60355e67fe', '5d353e51dfb5482d8f48ab3c4deb4436eb65c39d439bc5a63b1b9fd24cd38d29'),
+    ('survey_accounts', 'survey_login_shape_check'): ('855b235948c36a9806c6213046ac17aa2bc70029714b3f19f1c48a2f45c98b47', '93b022fa58f7051ce183e52b28a8184162e08ddfe625b6a6c4092e8091570c4c'),
+}
 
 
 def sha_file(path):
@@ -104,10 +111,11 @@ def restored_column_equivalence(expected, actual):
     return differences
 
 
-def restored_snapshot_equivalence(expected, actual):
+def restored_snapshot_equivalence(expected, actual, db, database):
     differences = restored_column_equivalence(expected['columnMetadata'], actual['columnMetadata'])
-    assert {k: v for k, v in expected.items() if k != 'columnMetadata'} == {k: v for k, v in actual.items() if k != 'columnMetadata'}, 'restored logical rows/schema/constraints/guards differ'
-    return differences
+    constraint_reparses = db.restored_constraint_equivalence(expected['constraints'], actual['constraints'], database)
+    assert {k: v for k, v in expected.items() if k not in ['columnMetadata', 'constraints']} == {k: v for k, v in actual.items() if k not in ['columnMetadata', 'constraints']}, 'restored logical rows/schema/guards differ'
+    return {'columnOrdinals': differences, 'constraintReparses': constraint_reparses}
 
 
 class Database(_old.Database):
@@ -142,9 +150,46 @@ class Database(_old.Database):
 
     def constraints(self, database='eduk12_recovery'):
         return json.loads(self.sql("""SELECT coalesce(jsonb_agg(jsonb_build_object('table',c.conrelid::regclass::text,
-          'name',c.conname,'type',c.contype,'validated',c.convalidated,'definition',pg_get_constraintdef(c.oid))
+          'name',c.conname,'type',c.contype,'validated',c.convalidated,'definition',pg_get_constraintdef(c.oid),
+          'deferrable',c.condeferrable,'initiallyDeferred',c.condeferred,'isLocal',c.conislocal,
+          'inheritCount',c.coninhcount,'noInherit',c.connoinherit,'updateAction',c.confupdtype,
+          'deleteAction',c.confdeltype,'matchType',c.confmatchtype,
+          'referenceTable',CASE WHEN c.confrelid=0 THEN NULL ELSE c.confrelid::regclass::text END,
+          'columns',(SELECT jsonb_agg(a.attname ORDER BY k.ordinality) FROM unnest(c.conkey) WITH ORDINALITY k(attnum,ordinality)
+            JOIN pg_attribute a ON a.attrelid=c.conrelid AND a.attnum=k.attnum),
+          'referenceColumns',(SELECT jsonb_agg(a.attname ORDER BY k.ordinality) FROM unnest(c.confkey) WITH ORDINALITY k(attnum,ordinality)
+            JOIN pg_attribute a ON a.attrelid=c.confrelid AND a.attnum=k.attnum))
           ORDER BY c.conrelid::regclass::text,c.conname),'[]'::jsonb) FROM pg_constraint c
           JOIN pg_namespace n ON n.oid=c.connamespace WHERE n.nspname='public' AND c.conrelid<>0""", database))
+
+    def restored_constraint_equivalence(self, expected, actual, database):
+        assert len(expected) == len(actual), 'restored constraint count changed'
+        evidence = []
+        for before, after in zip(expected, actual):
+            assert {k: v for k, v in before.items() if k != 'definition'} == {k: v for k, v in after.items() if k != 'definition'}, 'restored constraint identity/semantic attributes changed'
+            if before['definition'] == after['definition']:
+                continue
+            key = (before['table'], before['name'])
+            hashes = tuple(hashlib.sha256(row['definition'].encode()).hexdigest() for row in [before, after])
+            assert before['type'] == 'c' and CHECK_REPARSE_PAIRS.get(key) == hashes, 'unrecognized restored constraint definition difference'
+            # PostgreSQL itself parses both exact captured CHECK definitions on
+            # the SAME temporary visible-column layout. No regex/parser or broad
+            # definition normalization is trusted, and no persistent DDL remains.
+            temporary = 'c18_check_reparse_' + uuid.uuid4().hex
+            definitions = json.loads(self.sql(f"""BEGIN;
+              CREATE TEMPORARY TABLE {quote(temporary)} (LIKE public.{quote(before['table'])} EXCLUDING CONSTRAINTS) ON COMMIT DROP;
+              ALTER TABLE {quote(temporary)} ADD CONSTRAINT c18_source_check {before['definition']};
+              ALTER TABLE {quote(temporary)} ADD CONSTRAINT c18_restored_check {after['definition']};
+              SELECT jsonb_object_agg(conname,pg_get_constraintdef(oid)) FROM pg_constraint
+                WHERE conrelid='pg_temp.{temporary}'::regclass AND conname IN ('c18_source_check','c18_restored_check');
+              ROLLBACK;""", database))
+            assert definitions['c18_source_check'] == definitions['c18_restored_check'], 'PostgreSQL parser did not prove exact normalized CHECK equivalence'
+            assert self.sql(f"SELECT to_regclass('pg_temp.{temporary}') IS NULL", database) == 't'
+            evidence.append({'table': key[0], 'name': key[1], 'sourceDefinitionSha256': hashes[0],
+                             'restoredDefinitionSha256': hashes[1],
+                             'postgresReparsedDefinitionSha256': hashlib.sha256(definitions['c18_source_check'].encode()).hexdigest(),
+                             'postgresReparsedDefinitionsIdentical': True, 'temporaryDdlRolledBack': True})
+        return evidence
 
     def snapshot(self, database='eduk12_recovery'):
         columns = self.columns(database)

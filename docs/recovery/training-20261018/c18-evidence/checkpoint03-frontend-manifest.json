@@ -1,0 +1,50 @@
+[
+  {
+    "file": "frontend03-app-input-recheck-03.log.gz",
+    "sourceSha256": "352236ed7c2a5d8387fe445119123d8a59eb02f077378810c313290a61d62a42",
+    "gzipSha256": "34995a2f6ca45c5feea3b77dd48697388c6d57318736d2482b3dd58e9b326084",
+    "bytes": 44365
+  },
+  {
+    "file": "frontend03-app-input-sha256-03.txt.gz",
+    "sourceSha256": "714340d73965d9582be4a5ba5d53af4625a7524580d0399762571c713c65cb7e",
+    "gzipSha256": "d256b4bd0fd65dc7f0eebf7c45094243a821b845fb11525736ed0a0539a01055",
+    "bytes": 99669
+  },
+  {
+    "file": "frontend03-dist-sha256-03.txt.gz",
+    "sourceSha256": "c127fd870a0d91cc1016875e7d4e79db6e52bc8615725af57a489ae93022ead1",
+    "gzipSha256": "c16d81643d236a8363852a153b3ba09f81e74b7a769531169114829480f120d3",
+    "bytes": 39843
+  },
+  {
+    "file": "frontend03-eslint-manager-03.log.gz",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "gzipSha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+    "bytes": 0
+  },
+  {
+    "file": "frontend03-input-sha256-03.txt.gz",
+    "sourceSha256": "eb3ffb9588d5a503c4ce01800601bf993590a30c097cfc42bbef2482469ce45b",
+    "gzipSha256": "f233870029dbf5c784bf227397af83e4ac4cd35c66b973b51ebbc5d3c0296e20",
+    "bytes": 641
+  },
+  {
+    "file": "frontend03-status-03.txt.gz",
+    "sourceSha256": "44ae54f266cf2a79780ee240afedc9a231661391e703e81c020e2d0ab76ad685",
+    "gzipSha256": "54230eb1c5571c2ed6c635c85de4f2c0031f9f5734eeeb280bbe80706eff3fde",
+    "bytes": 63
+  },
+  {
+    "file": "frontend03-vite-build-03.log.gz",
+    "sourceSha256": "c698814edaeaf21413963aa77ad613c0eb74332cc61a6d3a2a403e5fae1adfec",
+    "gzipSha256": "a8ddf46286f2c8b5d4aa225fc71220e27988d389d8df7efddc32354e5062ffea",
+    "bytes": 18315
+  },
+  {
+    "file": "frontend03-vitest-manager-03.log.gz",
+    "sourceSha256": "d132a2d95a815fbe6131ab19213f661432bdaa70c8ebdb61a0bf63995504c562",
+    "gzipSha256": "84a11de2c39681355deab245bbf677fead31bf07eb01598790596bbb4f38a720",
+    "bytes": 266
+  }
+]

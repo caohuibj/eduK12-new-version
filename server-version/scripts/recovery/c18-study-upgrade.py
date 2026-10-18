@@ -45,7 +45,7 @@ def main():
         result['pinnedRestoreColumnOrdinals'] = {'differenceCount': len(ordinal_differences), 'differencesSha256': module.digest(ordinal_differences), 'comparison': 'EXACT_COLUMN_PROPERTIES_AND_VISIBLE_ORDER; PHYSICAL_DROPPED_SLOTS_RECORDED'}
         assert db.projection(old_columns, restored) == before
         assert db.guards(module.QUALITY_TABLES, restored) == quality_guards
-        assert db.constraints(restored) == old_constraints
+        result['pinnedRestoreConstraintReparses'] = db.restored_constraint_equivalence(old_constraints, db.constraints(restored), restored)
         result['checks'].append('Pinned nonempty C16 dump equals all 207 cloned logical tables, exact logical old column definitions and visible order, recorded historic dropped-slot ordinal differences, 5 quality/7 audit/17 export pairs and original quality guards')
         original = {'columns': old_columns, 'columnMetadata': metadata, 'rows': db.rows(old_columns)}
         (args.state / 'c18-original-rows-private.json').write_text(json.dumps(original, separators=(',', ':')))

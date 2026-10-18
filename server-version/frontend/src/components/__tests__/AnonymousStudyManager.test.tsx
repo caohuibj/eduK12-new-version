@@ -195,7 +195,7 @@ it('keeps educational totals and shows research qualification counts separately 
  render(<AnonymousStudyManager compositeId="c" links={[]}/>);await screen.findByRole('option',{name:'Research'})
  fireEvent.change(screen.getByLabelText('选择本人的研究'),{target:{value:'s'}})
  expect(await screen.findByText(/参与人数 5.*完成人数 4/)).toBeInTheDocument()
- expect(screen.getByText('研究合格人数 2 · 退出或排除人数 1 · 同意未知人数 2')).toBeInTheDocument()
+ expect(screen.getByText('研究有效同意人数 2 · 退出或排除人数 1 · 同意未知人数 2')).toBeInTheDocument()
  expect(screen.getByRole('button',{name:'导出教育完成记录（非研究样本CSV）'})).toBeInTheDocument()
  expect(screen.getByText(/教育 CSV 保留原授权教育记录，不作为研究样本/)).toBeInTheDocument()
 })

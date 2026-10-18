@@ -40,7 +40,9 @@ def main():
         restored = 'eduk12_c18_http_restore'
         db.restore(restored, dump, 'restore-c18')
         restored_snapshot = db.snapshot(restored)
-        ordinal_differences = module.restored_snapshot_equivalence(snapshot, restored_snapshot)
+        equivalence = module.restored_snapshot_equivalence(snapshot, restored_snapshot, db, restored)
+        ordinal_differences = equivalence['columnOrdinals']
+        result['restoredConstraintReparses'] = equivalence['constraintReparses']
         (out / 'column-ordinal-differences.json').write_text(json.dumps(ordinal_differences, indent=2))
         result['restoredColumnOrdinals'] = {'differenceCount': len(ordinal_differences), 'differencesSha256': module.digest(ordinal_differences), 'comparison': 'EXACT_COLUMN_PROPERTIES_AND_VISIBLE_ORDER; PHYSICAL_DROPPED_SLOTS_RECORDED'}
         assert db.sql("SELECT count(*) FROM pg_proc WHERE proname ~ '^c(16|18)_test_'", restored) == '0'
