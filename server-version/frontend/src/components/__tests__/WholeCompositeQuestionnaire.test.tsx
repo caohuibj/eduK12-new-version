@@ -72,6 +72,28 @@ describe('whole questionnaire durable browser submission', () => {
     expect(client.submitWhole.mock.calls[1][1]).toEqual(sealed)
     expect(await finalDraftStore.get(key)).toBeNull()
   })
+  it('replays exactly the sealed optional timing after response loss and reload', async () => {
+    const d = definition([2]), client = api()
+    d.units[0].trainingTiming={schemaVersion:1,contract:'BROWSER_ACTIVE_SCALE_V1',snapshotHash:'t'.repeat(64)}
+    client.wholeDefinition.mockResolvedValue({code:0,data:d})
+    await seed(d)
+    const first = view(client)
+    client.submitWhole.mockRejectedValueOnce(Object.assign(new Error('busy'), { status: 503, code: 'COMPLETION_BUSY' }))
+    await lastQuestion(2)
+    fireEvent.click(screen.getByRole('button', { name: '提交整份问卷' }))
+    await waitFor(() => expect(screen.getByRole('button', { name: '重试并确认整卷提交' })).not.toBeDisabled())
+    const sealed = (await finalDraftStore.get(key))!.sealedSubmission!.payload
+    expect((sealed as WholeQuestionnaireInput).units[0].itemTimings).toBeDefined()
+    expect((await finalDraftStore.get(key))!.status).toBe('RETRY_PENDING')
+    first.unmount()
+    client.wholeDefinition.mockClear(); client.reportStatus.mockClear(); client.wholeDefinition.mockRejectedValue(Object.assign(new Error('enrollment disabled'), { status: 409 }))
+    view(client)
+    fireEvent.click(await screen.findByRole('button', { name: '重试并确认整卷提交' }))
+    await screen.findByRole('heading', { name: '交卷成功' })
+    expect(client.wholeDefinition).not.toHaveBeenCalled(); expect(client.reportStatus).not.toHaveBeenCalled()
+    expect(client.submitWhole.mock.calls[1][1]).toEqual(sealed)
+    expect(await finalDraftStore.get(key)).toBeNull()
+  })
 
   it('does not seal or submit an incomplete draft', async () => {
     const d = definition([1, 1]), client = api(); client.wholeDefinition.mockResolvedValue({ code: 0, data: d })

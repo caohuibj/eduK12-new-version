@@ -29,6 +29,7 @@ export interface CompositeExportProjectionBindingV1 {
   audience: ScaleDisclosureAudience
   scales: CompositeExportScaleBindingV1[]
   fingerprint: string
+  timingExportEnabled?: boolean
 }
 
 type CompositeScaleItem = {
@@ -78,6 +79,9 @@ export const buildCompositeExportProjectionBinding = (input: {
   resourceId: string
   audience?: ScaleDisclosureAudience
   items: CompositeScaleItem[]
+  timingExportEnabled?: boolean
+  trainingTimingPolicy?: unknown
+  timingExportRevision?:number
 }): CompositeExportProjectionBindingV1 => {
   // Composite wide-export routes are teacher/admin product surfaces. ADMIN is
   // authorization, not a researcher/raw-data disclosure audience.
@@ -91,6 +95,7 @@ export const buildCompositeExportProjectionBinding = (input: {
     resourceId: input.resourceId,
     audience,
     scales,
+    ...(input.timingExportEnabled ? {timingExportEnabled:true,trainingTimingPolicy:input.trainingTimingPolicy??null,timingExportRevision:input.timingExportRevision??0} : {}),
     ...(input.items.some(item=>item.formDefinition!=null)?{typedFormExport:{version:'training-form-export-v1',definitions:input.items.filter(item=>item.formDefinition!=null).map(item=>({id:item.id,definition:item.formDefinition,policy:item.formPolicy??null}))}}:{}),
   }
   return { ...identity, fingerprint: canonicalHash(identity) }
@@ -104,6 +109,7 @@ export const resolveCompositeExportProjectionBinding = async (
     where: { id: resourceId },
     select: {
       id: true,
+      timingExportEnabled:true,trainingTimingPolicy:true,productKind:true,revision:true,
       items: {
         orderBy: { position: 'asc' },
         select: {
@@ -116,7 +122,7 @@ export const resolveCompositeExportProjectionBinding = async (
     },
   })
   if (!composite) throw new Error('综合测评不存在')
-  return buildCompositeExportProjectionBinding({ resourceId: composite.id, audience, items: composite.items })
+  return buildCompositeExportProjectionBinding({ resourceId: composite.id, audience, items: composite.items,timingExportEnabled:composite.productKind==='QUESTIONNAIRE'&&composite.timingExportEnabled,trainingTimingPolicy:composite.trainingTimingPolicy,timingExportRevision:composite.revision })
 }
 
 const scaleFieldAllowed = (suffix: string, caps: DisclosureCapabilitiesV1): boolean => {
@@ -142,7 +148,9 @@ const fieldAllowed = (field: CompositeExportField, binding: CompositeExportProje
   if (!scalePrefixMatch) return true
   const scale = binding.scales.find((candidate) => candidate.prefix === scalePrefixMatch[1])
   if (!scale) return false
-  return scaleFieldAllowed(field.name.slice(scale.prefix.length), scale.capabilities)
+  const suffix=field.name.slice(scale.prefix.length)
+  if(suffix.startsWith('TIMING_'))return binding.timingExportEnabled===true
+  return scaleFieldAllowed(suffix, scale.capabilities)
 }
 
 export const projectCompositeExportData = (

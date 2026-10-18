@@ -1,4 +1,4 @@
-import {useEffect,useRef} from 'react'
+import {useScaleTimingLifecycle} from '../modules/scale/useScaleTimingLifecycle'
 import {SurveyScaleTimingTracker,type SurveyScaleTimings} from './survey-scale-timing'
 
 export type SurveyTimedScaleUnit={
@@ -20,38 +20,7 @@ export function SurveyTimedScale({unit,answer,onAnswer,tracker,onTiming,index,on
 }){
   const current=unit.items[Math.min(index,unit.items.length-1)]
   const currentKey=current?.itemKey
-  const timingCallback=useRef(onTiming)
-  timingCallback.current=onTiming
-  const pausedState=useRef(paused)
-  pausedState.current=paused||readOnly
-  useEffect(()=>{
-    if(paused||readOnly)tracker.pause()
-    else if(document.visibilityState!=='hidden'&&document.hasFocus())tracker.resume()
-  },[paused,readOnly,tracker])
-  useEffect(()=>{
-    // Reviewing locked prerequisites is navigation, not another administration.
-    if(!currentKey||readOnly)return
-    tracker.enter(currentKey,!pausedState.current&&document.visibilityState!=='hidden'&&document.hasFocus())
-    timingCallback.current(tracker.snapshot())
-    const suspend=()=>{tracker.suspend();timingCallback.current(tracker.snapshot())}
-    const resume=()=>{
-      if(!pausedState.current&&document.visibilityState!=='hidden'&&document.hasFocus())tracker.resume()
-      timingCallback.current(tracker.snapshot())
-    }
-    const visibility=()=>document.visibilityState==='hidden'?suspend():resume()
-    document.addEventListener('visibilitychange',visibility)
-    window.addEventListener('pagehide',suspend)
-    window.addEventListener('blur',suspend)
-    window.addEventListener('focus',resume)
-    return ()=>{
-      document.removeEventListener('visibilitychange',visibility)
-      window.removeEventListener('pagehide',suspend)
-      window.removeEventListener('blur',suspend)
-      window.removeEventListener('focus',resume)
-      tracker.leave()
-      timingCallback.current(tracker.snapshot())
-    }
-  },[currentKey,readOnly,tracker])
+  useScaleTimingLifecycle(tracker,currentKey,paused,readOnly,onTiming)
   if(!current)return <section className="rounded border p-4">
     <h3>{unit.title}</h3><p role="alert">此量表没有可作答的冻结题目。</p>
   </section>

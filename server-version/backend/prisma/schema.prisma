@@ -703,6 +703,7 @@ model Scale {
 
 // 测评记录表
 model Assessment {
+  timingEncrypted String? @map("timing_encrypted")
   resultFacts AssessmentResultFact[]
   id                        String                 @id @default(uuid())
   scaleId                   String                 @map("scale_id")
@@ -1123,6 +1124,8 @@ enum CompositeAnalysisSnapshotGenerationReason {
 
 // 综合测评模板。发布后项目配置不可修改，历史测评通过子记录保存各自的结果快照。
 model CompositeAssessment {
+  trainingTimingPolicy Json? @map("training_timing_policy")
+  timingExportEnabled Boolean @default(false) @map("timing_export_enabled")
   compositionTemplates AssessmentCompositionTemplate[]
   productKind         String @default("LEGACY_COMPOSITE") @map("product_kind")
   questionnaireType   QuestionnaireType? @map("questionnaire_type")
@@ -1263,6 +1266,7 @@ model CompositeFormSection {
 
 // 一次学生/匿名参与记录。recoveryTokenHash 只存哈希，原始恢复凭证只在创建时返回一次。
 model CompositeAssessmentAttempt {
+  trainingTimingSnapshot Json? @map("training_timing_snapshot")
   taskSatisfaction String? @map("task_satisfaction")
   frozenControlBindings AssessmentFrozenBinding[]
   // Set atomically with the first durable report outbox event; survives disabling new admission.

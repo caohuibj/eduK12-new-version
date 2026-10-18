@@ -1,3 +1,4 @@
+import {readTrainingTimingSnapshot,type TrainingTimingSnapshot} from '../assessment-runtime/training-scale-timing'
 import { loadStoredVersionedUnitAdmission } from '../assessment-runtime/unit-admission'
 import { withSerializableScaleTransaction } from './deployment/transactions'
 import { type Prisma, type PrismaClient } from '@prisma/client'
@@ -108,6 +109,7 @@ export type ScaleAdmissionChildRow = {
 // composite attempt row. The unified attempt-state reader holds an already
 // loaded superset row and passes it in to skip the redundant read.
 export type CompositeScaleAdmissionParent = {
+  trainingTimingSnapshot?: unknown
   id: string
   userId: string | null
   recoveryTokenHash: string | null
@@ -307,6 +309,7 @@ export const createScaleAdmissionForRuntime = async (input: {
   respondentType?: string | null
   subjectUserId?: string | null
   respondentUserId?: string | null
+  trainingTiming?: TrainingTimingSnapshot
   legacyRequiresContext?: boolean
 }): Promise<VersionedFrozenUnitAdmission> => {
   if (input.runtime.instrumentKey !== input.scale.code || input.runtime.instrumentVersion !== input.scale.instrumentVersion) {
@@ -316,6 +319,7 @@ export const createScaleAdmissionForRuntime = async (input: {
   if (input.runtime.schemaVersion === 1) {
     return createFrozenUnitAdmission({
       attemptEpoch: input.attemptEpoch,
+      ...(input.trainingTiming ? {trainingTiming:input.trainingTiming} : {}),
       scale: input.scale,
       principal: input.principal,
       parent: input.parent,
@@ -401,6 +405,7 @@ export const createScaleAdmissionForRuntime = async (input: {
 
   return createFrozenUnitAdmissionV2({
     attemptEpoch: input.attemptEpoch,
+    ...(input.trainingTiming ? {trainingTiming:input.trainingTiming} : {}),
     scale: input.scale,
     principal: input.principal,
     parent: input.parent,
@@ -642,6 +647,7 @@ const activateUnstoredScaleAdmission = async (
         id: true,
         userId: true,
         recoveryTokenHash: true,
+        trainingTimingSnapshot: true,
         deliveryMode: true,
         attemptEpoch: true,
         contextSnapshotEncrypted: true,
@@ -690,6 +696,7 @@ const activateUnstoredScaleAdmission = async (
       },
       runtime,
       requestedMode: 'COMPOSITE',
+      ...(loaded.trainingTimingSnapshot ? {trainingTiming:readTrainingTimingSnapshot(loaded.trainingTimingSnapshot)!} : {}),
       contextSnapshotHash: loaded.contextSnapshotHash,
       contextValues: context.context?.values ?? null,
       contextFrozenAt: context.context?.frozenAt ?? null,

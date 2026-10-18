@@ -1,3 +1,4 @@
+import {freezeTrainingTimingPolicy,readTrainingTimingPolicy} from '../assessment-runtime/training-scale-timing'
 import { remapTrainingFormDefinition } from '../assessment-runtime/form-policy'
 import { typedCompositeFormQuestion } from '../assessment-runtime/typed-form'
 import { assertCognitiveProductEligible, isCognitiveProductEligible } from '../cognitive/product-eligibility'
@@ -26,6 +27,7 @@ const owner = (a: Actor, row: { createdBy: string | null }) => {
   if (a.role !== 'ADMIN' && row.createdBy !== a.userId) throw compositeForbidden()
 }
 const metadata = {
+  trainingTimingEnabled: z.boolean().optional(),
   name: z.string().trim().min(1, '请填写问卷名称').max(200, '问卷名称不能超过200字'), description: z.string().max(5000).nullable().optional(),
   instruction: z.string().max(10000).nullable().optional(), courseIds: z.array(z.string().min(1)).max(100).default([]),
   publicEnabled: z.boolean().default(false), opensAt: z.string().datetime().nullable().optional(), expiresAt: z.string().datetime().nullable().optional(),
@@ -47,6 +49,21 @@ async function courses(tx: Tx, actor: Actor, ids: string[], type: string) {
   if (type === 'GENERAL' && ids.length) throw compositeBadRequest('通用问卷不绑定课程')
   const rows = await tx.course.findMany({ where: { id: { in: ids } } })
   if (rows.length !== ids.length || rows.some(r => r.isLibrary || (actor.role !== 'ADMIN' && r.creatorId !== actor.userId))) throw compositeForbidden('只能投放到有管理权限的非库课程')
+}
+async function timingPolicy(tx:Tx, row:any, enabled:boolean) {
+ if(!enabled)return Prisma.DbNull
+ if(row.questionnaireType!=='COURSE'||row.productKind!=='QUESTIONNAIRE'||row.reportPackageKey||row.analysisProtocolKey)throw compositeBadRequest('计时仅支持 Training 课程普通问卷')
+ const ids=(row.questionnaireCourses??[]).map((x:any)=>x.courseId)
+ const facts=await tx.course.findMany({where:{id:{in:ids}},select:{id:true,courseType:true,isLibrary:true}})
+ if(facts.length!==ids.length)throw compositeBadRequest('计时课程来源缺失')
+ return freezeTrainingTimingPolicy(facts,row.publicEnabled)
+}
+export async function updateTimingExport(actor:Actor,id:string,raw:unknown){
+ const input=z.object({revision:z.number().int().nonnegative(),enabled:z.boolean()}).strict().parse(raw)
+ return mutate(actor,id,input.revision,async(tx,row)=>{
+  await tx.compositeAssessment.update({where:{id},data:{timingExportEnabled:input.enabled}})
+  await tx.assessmentManagementEvent.create({data:{actorId:actor.userId,resourceId:id,action:'TRAINING_TIMING_EXPORT_POLICY',metadata:{previous:row.timingExportEnabled,enabled:input.enabled,revision:row.revision+1}}})
+ },false)
 }
 export async function detail(actor: Actor, id: string) {
   const row = await prisma.compositeAssessment.findUnique({ where: { id } })
@@ -71,6 +88,7 @@ export async function create(actor: Actor, raw: unknown) {
     return (await tx.compositeAssessment.create({ data: {
       code: 'Q-' + randomUUID(), name: input.name, description: input.description, instruction: input.instruction,
       productKind: 'QUESTIONNAIRE', questionnaireType: input.questionnaireType, createdBy: actor.userId,
+      trainingTimingPolicy: await timingPolicy(tx,{productKind:'QUESTIONNAIRE',questionnaireType:input.questionnaireType,questionnaireCourses:input.courseIds.map(courseId=>({courseId})),publicEnabled:input.publicEnabled},input.trainingTimingEnabled===true),
       creationKey, creationHash, publicEnabled: input.publicEnabled, opensAt: date(input.opensAt), expiresAt: date(input.expiresAt),
       questionnaireCourses: { create: input.courseIds.map(courseId => ({ courseId })) },
     } })).id
@@ -105,6 +123,7 @@ export async function update(actor: Actor, id: string, raw: unknown) {
     await tx.questionnaireCourseDelivery.deleteMany({ where: { compositeId: id } })
     await tx.questionnaireCourseDelivery.createMany({ data: input.courseIds.map(courseId => ({ compositeId: id, courseId })) })
     await tx.compositeAssessment.update({ where: { id }, data: {
+      trainingTimingPolicy: await timingPolicy(tx,{...row,questionnaireCourses:input.courseIds.map(courseId=>({courseId})),publicEnabled:input.publicEnabled},input.trainingTimingEnabled??Boolean(row.trainingTimingPolicy)),
       name: input.name, description: input.description ?? null, instruction: input.instruction ?? null,
       publicEnabled: input.publicEnabled, opensAt: date(input.opensAt), expiresAt: date(input.expiresAt),
     } })
@@ -234,6 +253,7 @@ export async function preflight(actor: Actor, id: string, raw: unknown) {
     if (checks.some(check => check.key === 'content' && check.status === 'failed')) {
       for (const section of row.formSections.filter(section => !section.items.length)) checks.push({ key: 'section:' + section.id, label: section.title, status: 'failed', message: '移除空区段或在当前草稿补齐字段，再重新自检。', targetId: section.id })
     }
+    if(row.trainingTimingPolicy){try{await timingPolicy(tx,row,true);checks.push({key:'timing',label:'可选计时来源',status:'passed',message:'通过'})}catch(cause:any){if(!(cause.statusCode>=400&&cause.statusCode<500))throw cause;checks.push({key:'timing',label:'可选计时来源',status:'failed',message:cause.message})}}
     return { revision, ok: checks.every(check => check.status === 'passed'), checks, reportMode: 'COLLECTION_ONLY' }
   }, { timeout: 30000 })
 }
@@ -267,6 +287,7 @@ export async function publish(actor: Actor, id: string, raw: unknown) {
       await retainFormSectionImages({ owner: mediaOwner, references: compositeFormSectionImageReferences(definition), db: tx })
       await retainFormSectionVideos({ owner: mediaOwner, presentations: compositeFormSectionVideoPresentations(definition), db: tx })
     }
+    if(row.trainingTimingPolicy){readTrainingTimingPolicy(row.trainingTimingPolicy);await tx.compositeAssessment.update({where:{id},data:{trainingTimingPolicy:await timingPolicy(tx,row,true)}})}
     await publishComposite(actor.userId, actor.role, id, tx)
   })
 }
@@ -365,6 +386,7 @@ export async function copy(actor: Actor, id: string, raw: unknown) {
     const target = await tx.compositeAssessment.create({ data: {
       code: 'Q-' + randomUUID(), name: source.name + '（副本）', description: source.description, instruction: source.instruction,
       productKind: 'QUESTIONNAIRE', questionnaireType, createdBy: actor.userId, creationKey, creationHash,
+      trainingTimingPolicy:await timingPolicy(tx,{productKind:'QUESTIONNAIRE',questionnaireType,questionnaireCourses:sourceCourses.map(courseId=>({courseId})),publicEnabled:false},Boolean(composite?.trainingTimingPolicy)),
       questionnaireCourses: { create: sourceCourses.map(courseId => ({ courseId })) },
     } })
     const sectionIds = new Map<string, string>()

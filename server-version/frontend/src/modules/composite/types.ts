@@ -1,3 +1,4 @@
+export type TrainingTimingBinding={schemaVersion:1;contract:'BROWSER_ACTIVE_SCALE_V1';snapshotHash:string}
 import type { FormQuestion } from '../assessment-core/form/types'
 import type { CognitiveSession } from '../cognitive/types'
 import type { FormBackgroundReport } from '../reporting/types'
@@ -59,6 +60,7 @@ export interface CompositeScale {
 }
 
 export interface CompositeCurrentItem {
+  trainingTiming?:TrainingTimingBinding
   id: string
   type: CompositeItemType
   position: number
@@ -136,14 +138,14 @@ export interface WholeQuestionnaireDefinition {
   attemptEpoch: number
   slotSetHash: string
   contextSnapshotHash: string | null
-  units: Array<{ itemId: string; scaleAssessmentId: string; definitionHash: string; scale: CompositeScale }>
+  units: Array<{ trainingTiming?:TrainingTimingBinding; itemId: string; scaleAssessmentId: string; definitionHash: string; scale: CompositeScale }>
 }
 export interface WholeQuestionnaireInput {
   submissionId: string
   attemptEpoch: number
   slotSetHash: string
   contextSnapshotHash: string | null
-  units: Array<{ itemId: string; definitionHash: string; deviceInputProvenance?: DeviceInputProvenanceV1;
+  units: Array<{ itemTimings?:Record<string,unknown>; itemId: string; definitionHash: string; deviceInputProvenance?: DeviceInputProvenanceV1;
     answers: Array<{ itemCode: string; responseValue: string | number; responseTimeMs?: number; changeCount?: number }> }>
 }
 export interface WholeQuestionnaireReceipt {

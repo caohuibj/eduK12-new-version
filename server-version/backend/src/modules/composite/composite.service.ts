@@ -1,3 +1,5 @@
+import {withTrainingTimingReport} from './training-timing-report'
+import {freezeTrainingTimingSnapshot,readTrainingTimingPolicy} from '../assessment-runtime/training-scale-timing'
 import { typedFormPresentation } from '../reporting/typed-form-presentation'
 import { sharedControlWritesEnabled } from '../assessment-runtime/shared-control-records'
 import { readCommittedScaleFacts } from '../assessment-runtime/scale-fact-records'
@@ -957,6 +959,7 @@ export const getCompositeForTeacher = async (userId: string, role: UserRole, id:
     id: composite.id,
     productKind: composite.productKind,
     questionnaireType: composite.questionnaireType,
+    trainingTimingPolicy:composite.trainingTimingPolicy??null,timingExportEnabled:composite.timingExportEnabled===true,
     revision: composite.revision,
     questionnaireCourses: composite.questionnaireCourses,
     code: composite.code,
@@ -1298,7 +1301,8 @@ export const listAttemptsForTeacher = async (
         completedItems: true,
         runtimeGeneration: true,
         attemptEpoch: true,
-        frozenActiveSlotSetEncrypted: true,
+        trainingTimingSnapshot: true,
+  frozenActiveSlotSetEncrypted: true,
         frozenActiveSlotSetHash: true,
         startedAt: true,
         lastSavedAt: true,
@@ -2233,7 +2237,7 @@ const assertStudentEligibility = async (composite: any, userId: string) => {
   if (composite.productKind === 'QUESTIONNAIRE') {
     if (composite.questionnaireType !== 'COURSE') throw compositeForbidden('此问卷请通过公开链接访问')
     const eligible = await prisma.courseStudent.findFirst({
-      where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false },
+      where: { studentId: userId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false,...(composite.trainingTimingPolicy?{courseType:'TRAINING_COURSE'}:{}) },
         courseId: { in: (composite.questionnaireCourses ?? []).map((row: any) => row.courseId) } },
       orderBy: { courseId: 'asc' },
     })
@@ -2477,7 +2481,7 @@ const createAttempt = async (
     if (current.opensAt && current.opensAt.getTime() > Date.now()) throw compositeBadRequest('问卷尚未开始')
     if (current.expiresAt && current.expiresAt.getTime() <= Date.now()) throw compositeBadRequest('问卷已过期')
     if (userId && !await db.courseStudent.findFirst({ where: {
-      studentId: userId, courseId: composite.productKind === 'QUESTIONNAIRE' ? composite.deliveryCourseId : composite.courseId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false },
+      studentId: userId, courseId: composite.productKind === 'QUESTIONNAIRE' ? composite.deliveryCourseId : composite.courseId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false,...(composite.trainingTimingPolicy?{courseType:'TRAINING_COURSE'}:{}) },
     } })) throw compositeForbidden('不是问卷投放课程的有效学生')
   }
   if (composite.productKind === 'ASSESSMENT_BUNDLE') {
@@ -2514,9 +2518,13 @@ const createAttempt = async (
   const progress = totalUnits === 0
     ? 100
     : Math.round((completedItems / totalUnits) * 100)
+  if(composite.trainingTimingPolicy && (composite.productKind!=='QUESTIONNAIRE'||composite.questionnaireType!=='COURSE'||!finalOnly||relationalIdentity||composite.reportPackageKey||composite.analysisProtocolKey)) throw compositeBadRequest('此投放不支持可选计时')
+  const trainingTimingSnapshot=freezeTrainingTimingSnapshot(composite.trainingTimingPolicy,composite.deliveryCourseId??null,attemptEpoch,!userId)
+  if(trainingTimingSnapshot&&!userId){const course=await db.course.findUnique({where:{id:trainingTimingSnapshot.course.courseId},select:{courseType:true,isLibrary:true}});if(!course||course.courseType!=='TRAINING_COURSE'||course.isLibrary)throw compositeBadRequest('新匿名计时准入的 Training 课程来源已不可用')}
   const attempt = await db.compositeAssessmentAttempt.create({
     data: {
       compositeAssessmentId: composite.id,
+      ...(trainingTimingSnapshot ? {trainingTimingSnapshot} : {}),
       ...(composite.productKind === 'QUESTIONNAIRE' ? { deliveryCourseId: composite.deliveryCourseId ?? null } : {}),
       userId,
       accessTokenId,
@@ -3187,6 +3195,7 @@ const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
   contextSnapshotEncrypted: true,
   contextSnapshotHash: true,
   contextFrozenAt: true,
+  trainingTimingSnapshot: true,
   frozenActiveSlotSetEncrypted: true,
   frozenActiveSlotSetHash: true,
   compositeAssessment: {
@@ -3460,13 +3469,14 @@ const getUnifiedCompositeAttemptState = async (
         || runtime.sourceDefinitionHash !== slot.sourceDefinitionIdentity.hash
         || runtime.compiledRuntime.compiledRuntimeHash !== child.compiledRuntimeHash
       ) throw new Error('Scale runtime identity mismatch')
-      await ensureScaleAdmissionAtDelivery(child.id, attempt, child)
+      const admission=await ensureScaleAdmissionAtDelivery(child.id, attempt, child)
       currentItem = {
         id: item.id,
         type: 'SCALE',
         position: item.position,
         required: item.required,
         scaleAssessmentId: child.id,
+        ...(admission.trainingTiming ? {trainingTiming:admission.trainingTiming} : {}),
         definitionHash: runtime.legacyDefinitionHash,
         answers: [],
         scale: {
@@ -3982,7 +3992,8 @@ export const finalizeCompositeAttemptIfReady = async (attemptId: string, options
   const route = options.preloadedParent ?? await prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId },
     select: { ...REPORT_PARENT_SELECT, startedAt: true, completedItems: true,
-      frozenActiveSlotSetEncrypted: true, contextSnapshotEncrypted: true, compiledBundleRuntimeHash: true },
+      trainingTimingSnapshot: true,
+  frozenActiveSlotSetEncrypted: true, contextSnapshotEncrypted: true, compiledBundleRuntimeHash: true },
   })
   if (route && options.reportJob) assertReportJobIdentity(route, options.reportJob)
   // Already enrolled attempts stay asynchronous while new enrollment is off.
@@ -4812,7 +4823,7 @@ const projectHttpReport = async (
       attempt.id, audience === 'researcher' ? 'admin' : audience === 'teacher' ? 'teacher' : 'student', snapshotId) }
   }
   const packageContext = await readPackageSnapshotForReport(attempt, snapshotId)
-  if (!packageContext) return projectCompositeCollectionReport(report, audience)
+  if (!packageContext) return withTrainingTimingReport(projectCompositeCollectionReport(report, audience),attempt,audience)
   return projectCompositeReport({
     report,
     packageSnapshot: packageContext.packageSnapshot,
@@ -4852,8 +4863,8 @@ const packageAnalysisExportContextFor = async (
 }
 
 const reportReadHeaderSelect = {
-  ...REPORT_PARENT_SELECT, compositeAssessmentId: true, userId: true, recoveryTokenHash: true,
-  compositeAssessment: { select: { id: true, productKind: true, items: { select: { type: true } } } },
+  ...REPORT_PARENT_SELECT, compositeAssessmentId: true, userId: true, recoveryTokenHash: true,trainingTimingSnapshot:true,
+  compositeAssessment: { select: { id: true, productKind: true,timingExportEnabled:true,revision:true, items: { select: { type: true } } } },
 } as const
 
 const loadReportReadHeader = async (attemptId: string) => {
@@ -4947,7 +4958,7 @@ const materializedReportForHeader = async (parent: any, audience: CompositeRepor
   const report = await decryptCompactCompositeReport(job.reportEncrypted, reportBinding) ?? decryptCompositeCollectionReport(job.reportEncrypted, reportBinding)
   // HTTP projection is applied to the CURRENT audience on every read. No
   // participant/teacher projection or authorization decision is globally cached.
-  return projectCompositeCollectionReport({...report,taskSatisfaction:parent.taskSatisfaction??null,taskSatisfied:isTaskSatisfied(parent)}, audience)
+  return withTrainingTimingReport(projectCompositeCollectionReport({...report,taskSatisfaction:parent.taskSatisfaction??null,taskSatisfied:isTaskSatisfied(parent)}, audience),parent,audience)
 }
 
 

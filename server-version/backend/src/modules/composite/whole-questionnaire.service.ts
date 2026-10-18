@@ -1,3 +1,4 @@
+import {readTrainingTimingSnapshot,normalizeTrainingScaleTiming,type TrainingTimingSnapshot} from '../assessment-runtime/training-scale-timing'
 import { withSharedControlContext, storeSharedWholeValidation, loadSharedWholeValidation } from '../assessment-runtime/shared-control-records'
 import { compactAssessmentStorageEnabled } from '../assessment-runtime/compact-field-codec'
 import { packWholeRawEnvelope, unpackWholeRawEnvelope } from '../assessment-runtime/compact-raw'
@@ -44,6 +45,7 @@ export type WholeQuestionnaireReportContext = {
 
 const wholeParentSelect = {
   ...REPORT_PARENT_SELECT, userId: true, recoveryTokenHash: true,
+  trainingTimingSnapshot: true,
   contextSnapshotEncrypted: true, frozenActiveSlotSetEncrypted: true,
   compositeAssessment: { select: { productKind: true, reportPackageKey: true, analysisProtocolKey: true,
     items: { select: { id: true, position: true } },
@@ -169,10 +171,12 @@ export const getWholeQuestionnaireDefinition = async (attemptId: string, princip
     const compiled = manifest.schemaVersion === 2 ? compileWholeRules(runtime.legacyDefinitionHash, ruleItems) : null
     const rule = compiled && wholeRules.has(compiled.hash) ? { rulesHash: compiled.hash } : { items: ruleItems }
     manifest.units.push({ itemId: child.compositeItemId!, assessmentId: child.id, definitionHash: runtime.legacyDefinitionHash,
+      ...(admission.trainingTiming ? {trainingTiming:admission.trainingTiming} : {}),
       admissionHash: admission.snapshotHash, deadlineMs: admission.schemaVersion === 2 && admission.scalePolicy?.deployment?.completionDeadline
         ? Date.parse(admission.scalePolicy.deployment.completionDeadline) : null,
       ...rule })
     units.push({ itemId: child.compositeItemId!, scaleAssessmentId: child.id, definitionHash: runtime.legacyDefinitionHash,
+      ...(admission.trainingTiming ? {trainingTiming:admission.trainingTiming} : {}),
       scale: { id: child.scale.id, name: child.scale.name, instruction: child.scale.instruction, instrumentVersion: child.scale.instrumentVersion,
         definition: runnerDefinition(runtime.definition) } })
   }
@@ -183,7 +187,8 @@ export const getWholeQuestionnaireDefinition = async (attemptId: string, princip
     contextSnapshotHash: parent.contextSnapshotHash, units }
 })
 
-const logicalPayload = (attemptId: string, input: WholeQuestionnaireSubmitInput) => ({
+const logicalPayload = (attemptId: string, input: WholeQuestionnaireSubmitInput, timingSnapshotHash?:string) => ({
+  ...(timingSnapshotHash ? {trainingTimingSnapshotHash:timingSnapshotHash} : {}),
   attemptId, attemptEpoch: input.attemptEpoch, slotSetHash: input.slotSetHash, contextSnapshotHash: input.contextSnapshotHash,
   units: [...input.units].sort((a, b) => a.itemId.localeCompare(b.itemId)).map(unit => ({ ...unit,
     answers: [...unit.answers].sort((a, b) => a.itemCode.localeCompare(b.itemCode)) })),
@@ -197,7 +202,7 @@ const receiptResponse = (attemptId: string, submissionId: string, payloadHash: s
 
 type WholeSubmissionHeader = Prisma.CompositeAssessmentAttemptGetPayload<{
   select: typeof REPORT_PARENT_SELECT & { userId: true; recoveryTokenHash: true };
-}> & { consentId: string | null }
+}> & { consentId: string | null;trainingTimingSnapshot:unknown }
 /** One fresh read of ownership, product eligibility and the current receipt. */
 const loadWholeSubmissionContext = async (attemptId: string) => {
   const rows = await prisma.$queryRaw<Array<Omit<WholeSubmissionHeader, 'compositeAssessment'> & {
@@ -220,6 +225,7 @@ const loadWholeSubmissionContext = async (attemptId: string) => {
       parent."aggregate_input_hash" AS "aggregateInputHash",
       parent."assignment_ref" AS "assignmentRef", parent."consent_id" AS "consentId",
       parent."delivery_course_id" AS "deliveryCourseId",
+      parent."training_timing_snapshot" AS "trainingTimingSnapshot",
       parent."user_id" AS "userId",
       parent."recovery_token_hash" AS "recoveryTokenHash",
       product."product_kind" AS "productKind", product."report_package_key" AS "reportPackageKey",
@@ -266,7 +272,10 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
   }
   if (input.attemptEpoch !== parent.attemptEpoch || input.slotSetHash !== parent.frozenActiveSlotSetHash
     || input.contextSnapshotHash !== parent.contextSnapshotHash) throw failure('交卷版本与当前问卷不匹配')
-  const canonical = traceAssessmentPhaseSync('whole.payload_hash', () => prepareCanonicalSubmission(logicalPayload(attemptId, input)))
+  const timingSnapshot=readTrainingTimingSnapshot(parent.trainingTimingSnapshot)
+  if(timingSnapshot&&timingSnapshot.attemptEpoch!==parent.attemptEpoch)throw failure('计时冻结版本不匹配')
+  const timingSnapshotHash=timingSnapshot?.snapshotHash
+  const canonical = traceAssessmentPhaseSync('whole.payload_hash', () => prepareCanonicalSubmission(logicalPayload(attemptId, input,timingSnapshotHash)))
   assertCanonicalSubmissionPayloadSize(canonical, 1536 * 1024, '整份问卷')
   const prior = context!.prior
   if (prior?.wholeSubmissionId) {
@@ -285,11 +294,12 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
     || manifest.binding.attemptId !== parent.id || manifest.binding.attemptEpoch !== parent.attemptEpoch
     || manifest.binding.slotSetHash !== parent.frozenActiveSlotSetHash || manifest.binding.contextHash !== parent.contextSnapshotHash
     || manifest.binding.userId !== parent.userId || manifest.binding.recoveryTokenHash !== parent.recoveryTokenHash) throw failure('问卷交付校验与当前作答绑定不匹配')
+  if(manifest.units.some(unit=>unit.trainingTiming?.snapshotHash!==timingSnapshotHash))throw failure('计时策略与整卷准入不匹配')
   await traceAssessmentPhase('whole.validation_rules_resolve', () => ensureWholeRules(attemptId, principal, manifest))
   const prepared = traceAssessmentPhaseSync('whole.integrity_check', () => prepareFromWholeManifest(input, manifest, principal, receivedAtMs))
   const encrypted = traceAssessmentPhaseSync('whole.envelope_encrypt', () => encryptWholeRawPayload({ schemaVersion: 1, binding: { attemptId, attemptEpoch: input.attemptEpoch,
     slotSetHash: input.slotSetHash, contextHash: input.contextSnapshotHash }, payloadHash: canonical.hash,
-    units: prepared }))
+    ...(timingSnapshotHash?{timingSnapshotHash}:{}),units: prepared }))
   const receipt = await registerWholeQuestionnaireReceipt(parent, {
     submissionId: input.submissionId, payloadHash: canonical.hash, answersEncrypted: encrypted, acceptedAt: new Date(receivedAtMs),
     requiredFormSlots: manifest.requiredFormSlots, validationHash: prior.wholeValidationHash,
@@ -308,13 +318,14 @@ export const processWholeQuestionnaireAnswers = async (job: CompositeReportJob,
   if (!job.leaseToken || receipt.status !== 'PROCESSING' || !receipt.wholeAnswersEncrypted || !receipt.wholeAcceptedAt) throw failure('整份交卷处理租约已改变')
   const execution: WholeReceiptExecution = { submissionId: receipt.wholeSubmissionId, leaseToken: job.leaseToken, acceptedAtMs: receipt.wholeAcceptedAt.getTime() }
   const envelope = unpackWholeRawEnvelope(decryptUnifiedRuntimePayload<{ schemaVersion: number; binding: { attemptId: string; attemptEpoch: number; slotSetHash: string; contextHash: string | null };
-    payloadHash: string; units: Array<Parameters<typeof submitUnifiedScaleAssessmentFinal>[0] & { itemId: string }> }>(receipt.wholeAnswersEncrypted))
+    timingSnapshotHash?:string; payloadHash: string; units: Array<Parameters<typeof submitUnifiedScaleAssessmentFinal>[0] & { itemId: string }> }>(receipt.wholeAnswersEncrypted))
   if (envelope.schemaVersion !== 1 || envelope.binding.attemptId !== job.attemptId || envelope.binding.attemptEpoch !== job.attemptEpoch
     || envelope.binding.slotSetHash !== job.slotSetHash || envelope.binding.contextHash !== job.contextHash
     || envelope.payloadHash !== receipt.wholePayloadHash || prepareCanonicalSubmission(logicalPayload(job.attemptId, { submissionId: receipt.wholeSubmissionId,
       attemptEpoch: job.attemptEpoch, slotSetHash: job.slotSetHash, contextSnapshotHash: job.contextHash,
       units: envelope.units.map(unit => ({ itemId: unit.itemId, definitionHash: unit.definitionHash, answers: unit.answers,
-        ...(unit.deviceInputProvenance ? { deviceInputProvenance: unit.deviceInputProvenance } : {}) })) })).hash !== receipt.wholePayloadHash) throw failure('整份答案封存内容无法验证')
+        ...(unit.itemTimings!==undefined ? {itemTimings:unit.itemTimings} : {}),
+        ...(unit.deviceInputProvenance ? { deviceInputProvenance: unit.deviceInputProvenance } : {}) })) },envelope.timingSnapshotHash)).hash !== receipt.wholePayloadHash) throw failure('整份答案封存内容无法验证')
   const principal = envelope.units[0]?.userId ? { userId: envelope.units[0].userId } : { recoveryTokenHash: envelope.units[0]?.recoveryTokenHash }
   const reuseCommitted = process.env.ASSESSMENT_REPORT_COMMITTED_CONTEXT_ENABLED === 'true'
   const { parent, children, frozen, reportParent } = await traceAssessmentPhase('report.frozen_context_load', async () => {
@@ -363,11 +374,13 @@ type WholeValidationManifest = {
     userId: string | null; recoveryTokenHash: string | null };
   requiredFormSlots: string[];
   units: Array<{ itemId: string; assessmentId: string; definitionHash: string; admissionHash: string;
-    deadlineMs: number | null; rulesHash?: string; items?: WholeRuleItem[] }>;
+    trainingTiming?: TrainingTimingSnapshot; deadlineMs: number | null; rulesHash?: string; items?: WholeRuleItem[] }>;
 }
 const responseKey = (value: string | number) => typeof value + ':' + String(value)
 const prepareFromWholeManifest = (input: WholeQuestionnaireSubmitInput, manifest: WholeValidationManifest, principal: Principal, receivedAtMs: number) => {
   if (input.units.length !== manifest.units.length || new Set(input.units.map(unit => unit.itemId)).size !== input.units.length) throw failure('问卷量表缺失或重复', 400)
+  const timingEntries=input.units.flatMap(unit=>Object.entries(unit.itemTimings??{}))
+  if(timingEntries.length>3000||Buffer.byteLength(JSON.stringify(timingEntries),'utf8')>400000)throw failure('整卷计时超过3000题或400KB预算',400)
   const prepared = []
   for (const unit of manifest.units) {
     const sent = input.units.find(candidate => candidate.itemId === unit.itemId)
@@ -383,6 +396,7 @@ const prepareFromWholeManifest = (input: WholeQuestionnaireSubmitInput, manifest
       answers.set(answer.itemCode, answer)
     }
     if (plan.items.some(item => item.required && !answers.has(item.itemCode))) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '问卷有必答题未完成', 409)
+    normalizeTrainingScaleTiming(unit.trainingTiming,plan.items.map(item=>item.itemCode),[...answers.keys()],sent.itemTimings)
     prepared.push({ ...sent, assessmentId: unit.assessmentId, compositeAttemptId: manifest.binding.attemptId,
       submissionId: childSubmissionId(input.submissionId, unit.itemId), attemptEpoch: input.attemptEpoch,
       contextSnapshotHash: input.contextSnapshotHash, ...principal,

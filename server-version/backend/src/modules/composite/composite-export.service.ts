@@ -1,3 +1,5 @@
+import {projectTrainingTimingFact} from '../assessment-runtime/training-scale-timing'
+import {decryptUnifiedRuntimePayload} from '../assessment-runtime/security'
 import { legacyFormValueProjection } from '../assessment-runtime/typed-form'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { typedFormExportColumns, type TypedFormColumnSource } from './typed-form-export'
@@ -240,6 +242,7 @@ export const getExportData = async (
           scaleAssessments: {
             select: {
               compositeItemId: true,
+              timingEncrypted:true,id:true,attemptEpoch:true,submissionId:true,submissionPayloadHash:true,
               answers: true,
               result: true,
             },
@@ -302,6 +305,11 @@ export const getExportData = async (
       const v2Scores = Array.isArray(definition?.scoring?.scores) ? definition.scoring.scores : []
       if (v2Items.length === 0 || v2Scores.length === 0) {
         throw new Error(`量表 ${item.scale.code || item.scale.id} 没有有效的 ScaleDefinitionV2`)
+      }
+      if(template.productKind==='QUESTIONNAIRE'&&template.timingExportEnabled){
+        builder.add(`${prefix}TIMING_scope`,'计时课程来源','string',24)
+        builder.add(`${prefix}TIMING_status`,'计时采集状态','string',32)
+        for(const question of v2Items)for(const [key,label] of [['firstResponseMs','首次反应毫秒'],['activeTimeMs','有效前台毫秒'],['changeCount','修改次数'],['revisitCount','重访次数'],['status','计时状态']])builder.add(fieldName(`${prefix}TIMING_${key}_`,question.itemCode),`[${scaleLabel}] ${question.itemCode} ${label}`,key==='status'?'string':'numeric',key==='status'?32:12)
       }
       if (detail === 'full') {
         v2Items.forEach((scaleItem: any) => {
@@ -407,6 +415,18 @@ export const getExportData = async (
         const definition = item.scale.definition && typeof item.scale.definition === 'object' ? item.scale.definition as any : null
         const v2Items = Array.isArray(definition?.items) ? definition.items : []
         const v2Scores = Array.isArray(definition?.scoring?.scores) ? definition.scoring.scores : []
+        if(template.productKind==='QUESTIONNAIRE'&&template.timingExportEnabled){
+          const timing=projectTrainingTimingFact(attempt.trainingTimingSnapshot,result?.timingEncrypted?decryptUnifiedRuntimePayload(result.timingEncrypted):null)
+          row[`${prefix}TIMING_scope`]=timing.scope;row[`${prefix}TIMING_status`]=timing.status
+          const scaleLabel=packageSlotLabels.get(item.position)??item.scale.name
+          for(const question of v2Items){
+            const observed=(timing.items as Record<string,any>)[question.itemCode]
+            for(const [key,label] of [['firstResponseMs','首次反应毫秒'],['activeTimeMs','有效前台毫秒'],['changeCount','修改次数'],['revisitCount','重访次数'],['status','计时状态']]){
+              const value=key==='status'?(timing.status==='NOT_COLLECTED'?'NOT_COLLECTED':!observed?'MISSING':observed.recoveredWithoutClock?'RECOVERED_NO_FIRST_RESPONSE':observed.interrupted?'INTERRUPTED':'RECORDED'):observed?.[key]??null
+              row[builder.resolve(fieldName(`${prefix}TIMING_${key}_`,question.itemCode),`[${scaleLabel}] ${question.itemCode} ${label}`)]=value
+            }
+          }
+        }
         const scaleResult = (await loadScaleResult(result?.result, result)).result
         const decodedAnswers = (await loadScaleAnswers(result?.answers, result))
         const answers = detail === 'full' ? decodedAnswers.answers : []

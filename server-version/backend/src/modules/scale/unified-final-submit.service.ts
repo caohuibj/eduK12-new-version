@@ -1,3 +1,4 @@
+import {normalizeTrainingScaleTiming} from '../assessment-runtime/training-scale-timing'
 import { rethrowScaleSubmissionIdConflict, rethrowConfirmedScaleBatchSubmissionConflict } from './scale-final-submit-conflict'
 import { loadScaleAnswers } from './scale-workflow.service'
 import { compactAssessmentStorageEnabled } from '../assessment-runtime/compact-field-codec'
@@ -52,6 +53,7 @@ export type UnifiedScaleFinalSubmitInput = {
   attemptEpoch: number
   definitionHash: string
   contextSnapshotHash?: string | null
+  itemTimings?: Record<string,unknown>
   deviceInputProvenance?: DeviceInputProvenanceV1
   answers: Array<{
     itemCode: string
@@ -235,9 +237,11 @@ export const prepareUnifiedScaleFinalSubmission = async (
   const answers = measureRequestPhaseSync('final_submit_payload_validation', () => normalizeAnswers(snapshot.definition, input.answers))
   const missing = missingRequiredScaleItemCodes(snapshot.definition, answers)
   if (missing.length > 0) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', `还有 ${missing.length} 道必答题未作答`, 409)
+  const timing=normalizeTrainingScaleTiming(admission.trainingTiming,snapshot.definition.items.map(item=>item.itemCode),answers.map(answer=>answer.itemCode),input.itemTimings)
   const canonical = measureRequestPhaseSync('final_submit_serialization', () => {
     const bytes = measureRequestPhaseSync('final_submit_payload_hash', () => canonicalJsonBytes({
       answers,
+      ...(timing ? {trainingTiming:timing} : {}),
       ...(input.deviceInputProvenance ? { deviceInputProvenance: input.deviceInputProvenance } : {}),
     }))
     return { bytes: bytes.byteLength, hash: createHash('sha256').update(bytes).digest('hex') }
@@ -249,7 +253,7 @@ export const prepareUnifiedScaleFinalSubmission = async (
     && referenceTimeMs > Date.parse(admission.scalePolicy.deployment.completionDeadline)) {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '本轮测评已超过冻结完成期限，请重新开始', 409)
   }
-  return { submissionId, admission, snapshot, answers, payloadHash }
+  return { submissionId, admission, snapshot, answers, payloadHash, timing }
 }
 
 type PreparedScaleSubmission = Awaited<ReturnType<typeof prepareUnifiedScaleFinalSubmission>>
@@ -296,13 +300,14 @@ const prepareUnifiedScaleWrite = async (
     return { result: encryptScaleResult(result), canonicalResult: envelope ? encryptUnifiedRuntimePayload(envelope) : null }
   })
 
-  return { result, canonical: envelope, compactFact: compactFact as ScaleFactRecord | null, persistedProvenance, encryptedAnswers, encrypted, completedAt }
+  const timingEncrypted=prepared.timing ? encryptUnifiedRuntimePayload(prepared.timing) : null
+  return { timingEncrypted, result, canonical: envelope, compactFact: compactFact as ScaleFactRecord | null, persistedProvenance, encryptedAnswers, encrypted, completedAt }
 }
 
 export const submitUnifiedScaleAssessmentFinal = async (
   input: UnifiedScaleFinalSubmitInput, child: ScaleAdmissionChildRow, wholeReceipt?: WholeReceiptExecution, referenceDb?: FrozenReferenceDb,
 ) => {
-  const { submissionId, admission, snapshot, answers, payloadHash } = await prepareUnifiedScaleFinalSubmission(input, child, wholeReceipt?.acceptedAtMs)
+  const { submissionId, admission, snapshot, answers, payloadHash, timing } = await prepareUnifiedScaleFinalSubmission(input, child, wholeReceipt?.acceptedAtMs)
 
   if (child.status === 'COMPLETED') {
     const replay = assertSubmissionReplay(child, submissionId, payloadHash)
@@ -318,7 +323,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
   }
 
   const { result, compactFact, persistedProvenance, encryptedAnswers, encrypted, completedAt } = await prepareUnifiedScaleWrite(
-    input, child, { submissionId, admission, snapshot, answers, payloadHash }, wholeReceipt, referenceDb)
+    input, child, { submissionId, admission, snapshot, answers, payloadHash, timing }, wholeReceipt, referenceDb)
 
   const committed = await withFinalOnlyCompletionTransaction(async (tx) => {
     const current = await tx.assessment.findUnique({
@@ -368,6 +373,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
         submissionId,
         submissionPayloadHash: payloadHash,
         submissionCompletedAt: completedAt,
+        ...(timing ? {timingEncrypted:encryptUnifiedRuntimePayload(timing)} : {}),
       },
     }).catch(rethrowScaleSubmissionIdConflict)
     if (updated.count !== 1) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评状态已变化，请重试', 409)
@@ -422,6 +428,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
         submissionId,
         submissionPayloadHash: payloadHash,
         submissionCompletedAt: completedAt,
+        ...(timing ? {timingEncrypted:encryptUnifiedRuntimePayload(timing)} : {}),
       },
     }
   })
@@ -533,7 +540,7 @@ export const submitUnifiedScaleCollectionBatch = async (
       if (!encrypted.canonicalResult) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表缺少权威结果', 409)
       const totalTime = Math.max(0, completedAt.getTime() - current.startedAt.getTime())
       writes.push({ id: current.id, submissionId, payloadHash, answers: encryptedAnswers, result: encrypted.result,
-        completedAt: completedAt.toISOString(), totalTime })
+        completedAt: completedAt.toISOString(), totalTime, timingEncrypted:unit.write.timingEncrypted })
       if (unit.write.compactFact) facts.push({ ...unit.write.compactFact, totalTime })
       snapshots.push({ compositeAttemptId: job.attemptId, attemptEpoch: job.attemptEpoch, slotKey: admission.parent!.slotKey,
         unitType: 'SCALE', terminalState: 'COMPLETED', payloadKind: 'UNIT_RESULT', sourceType: 'ASSESSMENT',
@@ -547,10 +554,10 @@ export const submitUnifiedScaleCollectionBatch = async (
         UPDATE "assessments" child SET "status" = 'COMPLETED', "answers" = source."answers", "result" = source."result",
           "progress" = 100, "completed_at" = source."completedAt", "total_time" = source."totalTime",
           "submission_id" = source."submissionId", "submission_payload_hash" = source."payloadHash",
-          "submission_completed_at" = source."completedAt"
+          "submission_completed_at" = source."completedAt", "timing_encrypted" = source."timingEncrypted"
         FROM jsonb_to_recordset(${JSON.stringify(writes)}::jsonb) AS source(
           "id" text, "answers" jsonb, "result" jsonb, "completedAt" timestamp,
-          "totalTime" integer, "submissionId" text, "payloadHash" text)
+          "totalTime" integer, "submissionId" text, "payloadHash" text, "timingEncrypted" text)
         WHERE child."id" = source."id" AND child."composite_attempt_id" = ${job.attemptId}
           AND child."attempt_epoch" = ${job.attemptEpoch} AND child."status" = 'IN_PROGRESS'
           AND child."submission_id" IS NULL AND child."delivery_mode" = 'FINAL_ONLY' AND child."runtime_generation" = 'UNIFIED_V1'

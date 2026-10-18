@@ -182,6 +182,7 @@ export function QuestionnaireProductEdit() {
   const [kind, setKind] = useState('COURSE')
   const [courseIds, setCourseIds] = useState<string[]>([])
   const [publicEnabled, setPublic] = useState(false)
+  const [timingEnabled,setTimingEnabled]=useState(false)
   const [expiresAt, setExpiry] = useState('')
   const [opensAt, setOpens] = useState('')
   const [type, setType] = useState('SCALE')
@@ -225,6 +226,7 @@ export function QuestionnaireProductEdit() {
     setKind(row.questionnaireType)
     setCourseIds((row.questionnaireCourses || []).map((v: any) => v.courseId))
     setPublic(row.publicEnabled)
+    setTimingEnabled(Boolean(row.trainingTimingPolicy))
     setExpiry(row.expiresAt || '')
     setOpens(row.opensAt || '')
   }
@@ -280,6 +282,7 @@ export function QuestionnaireProductEdit() {
     description,
     courseIds: kind === 'GENERAL' ? [] : courseIds,
     publicEnabled,
+    ...(timingEnabled||detail?.trainingTimingPolicy?{trainingTimingEnabled:timingEnabled}:{}),
     expiresAt: expiresAt ? parseLocalDateTime(expiresAt)?.toISOString() : null,
     opensAt: opensAt ? parseLocalDateTime(opensAt)?.toISOString() : null,
   })
@@ -425,6 +428,7 @@ export function QuestionnaireProductEdit() {
         instruction !== (detail.instruction || '') ||
         description !== (detail.description || '') ||
         publicEnabled !== detail.publicEnabled ||
+        timingEnabled!==Boolean(detail.trainingTimingPolicy)||
         (opensAt ? parseLocalDateTime(opensAt)?.toISOString() || opensAt : null) !==
           (detail.opensAt || null) ||
         (expiresAt ? parseLocalDateTime(expiresAt)?.toISOString() || expiresAt : null) !==
@@ -494,6 +498,8 @@ export function QuestionnaireProductEdit() {
               />{' '}
               允许通过公开链接作答
             </label>
+            <label className="block"><input type="checkbox" checked={timingEnabled} disabled={kind!=='COURSE'||!draft} onChange={e=>setTimingEnabled(e.target.checked)}/> 可选：记录 Scale 浏览器有效前台时间</label>
+            <p className="text-sm">默认关闭，仅支持明确 Training 课程投放；公开链接必须唯一绑定一个课程。时间仅作描述，不改变评分，后台及暂停时间不计入。发布后采集策略冻结。</p>
             </div><div className="questionnaire-delivery-window"><div className="questionnaire-date-grid"><label className="block">
               开始时间
               {!draft && !opensAt ? <p className="questionnaire-window-summary">发布后立即开放</p> : <LocalDateTimeInput picker className="input w-full"
@@ -536,6 +542,7 @@ export function QuestionnaireProductEdit() {
       />
       <Link to="/questionnaires">返回组合测评列表</Link>
       {feedback}
+      {detail&&<section aria-label="计时披露权限"><label><input type="checkbox" disabled={busy||dirty} checked={Boolean(detail.timingExportEnabled)} onChange={e=>{const enabled=e.target.checked;void action(async()=>{hydrate(await request('/'+id+'/timing-export-policy',{revision:detail.revision,enabled}))})}}/>允许有权限的教师报告与 CSV/ZIP 导出计时</label><p>默认关闭，独立于原始回答权限；摘要也可导出计时，撤销后旧计时产物不可下载。学员反馈不显示计时。</p></section>}
       {id === 'new' && <p className="questionnaire-publish-hint" role="status">先创建草稿，再添加测评内容、设置投放范围，最后正式发布。</p>}
       {detail && !draft && <section className="questionnaire-publish-panel" aria-label="发布状态"><div className="questionnaire-publish-summary"><div><h2>{labels[detail.status] || detail.status} · {detail.name}</h2><p>当前版本的内容与投放设置已锁定。如需调整，请复制为新草稿后重新编制。</p></div><Link className="hui-button hui-button--primary" to={'/composite-assessments/' + id + '/results'}>查看作答与结果</Link></div></section>}
       {detail && draft && <section id="questionnaire-publish" aria-label="正式发布" className="questionnaire-publish-panel">
