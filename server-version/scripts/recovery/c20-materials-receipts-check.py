@@ -105,6 +105,14 @@ def main():
         checks.append('storage tail preserves both failures and reuses accepted functional tail')
         bad=copy.deepcopy(storage);bad['storageTail']['failedResultSha256']='0'*64;rejects('storage tail wrong failure hash rejected',bad)
         bad=copy.deepcopy(storage);bad['storageTail']['phase']='cost';rejects('storage tail cannot relabel failed cost as accepted',bad)
+        combined=copy.deepcopy(storage)
+        combined['reusedPhases'].append('storage-functional')
+        combined['storageTail'].update(reused=True,evidenceReceiptSha256=old)
+        combined['continuation']={'phase':'guards','file':filename,'sha256':'2'*64,'priorRuntimeSha256':old,'priorFailedResultSha256':'c'*64}
+        combined['phases']['guards']={'passed':True,'priorProducer':{'runtimeSha256':old,'resultSha256':'c'*64,'continuation':'Only remaining rollback probes'}}
+        frozen['phaseInputHashes']['guards']='d'*64;combined['phaseInputHashes']=copy.deepcopy(frozen['phaseInputHashes'])
+        _,accepted=m.import_receipt(root,write(combined));assert 'guards' in accepted and 'cost' not in accepted and 'consumer-cost' not in accepted
+        checks.append('guard continuation composes with both retained functional tails')
     print(json.dumps({'passed': True, 'scope': 'STATIC_RECEIPT_VALIDATION_ONLY', 'checks': checks}, indent=2))
 
 if __name__ == '__main__': main()

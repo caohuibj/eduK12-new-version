@@ -72,3 +72,28 @@ consumer-cost 原失败原样保留：51真实主体(a50/b1)、两publication102
 state06：独立consumer-functional通过，精确保留state05的51主体/102父/204快照/102READY；A50=1、B1=0独立手算、两publication显式分层、固定anchor的同task一/两组来源集合正确，前后目标facts/raw/report/claim/binding哈希及census不变。原consumer-cost false未提升。
 
 cost尾项失败保留：cold首claim/warm恢复/已有start/restart/linked新发布/满额拒绝六窗口依次观测API SQL94/39/50/92/93/32，耗时97.98/33.35/43.04/75.01/71.78/30.09ms。两份真实2/8组准入中candidate明文等长、无材料正文断言通过，但跨不同随机身份内容的cipher精确等长断言失败（2组919B，8组911B）。既有ekc1使用gzip level1再AES-GCM/base64，UUID/hash内容导致压缩长度差；固定IV/tag长度的随机nonce本身不会改变总长。此断言不能作业务失败或用猜测容差改成通过。下一明确只读storage-functional检查精确codec长度公式、严格最小候选字段/规范化结构和仅已选材料；不重建两份准入、不重跑六窗口，仍保留cost原false。guards/restore尚未运行，功能checkpoint仍未完成。state06全部服务停止、源及输入未变。
+
+state07：storage-functional真实只读通过，原2/8组candidate严格顶层及assignment键、空工具refs、相同materialDigest、已选材料与规范化结构一致；每条header声明明文字节/digest、gzip生产参数及固定28字节IV+tag的base64长度公式准确解释919/911。原六窗口仅引用，原两失败维持false。
+
+guards完成前17项：四表受限role UPDATE/DELETE、初始counter/cap/group/config、claim缺ordinal/跨config/跨bucket、counter漏claim/跳2均正确拒绝。duplicate ordinal实际由PG SQLSTATE23505拒绝，Prisma返回完整五列key冲突详情，但harness误要求消息含constraint名，故原aggregate失败；不扩大为业务缺陷。只读比对storage-functional-post-state和最终DB snapshot严格相等，所有guard事务无残留。下一精确guards续验核正式pg_catalog唯一索引/列及结构化SQLSTATE，再above-count与restore；不重跑前17项、不放宽数据库规则。所有服务已停/输入源不变，尚无完整功能GO。
+
+state08：在任何新应用phase执行前，TCP端口可连但PG尚处starting up，首次只读snapshot收到FATAL。launcher缺少数据库协议级就绪等待，失败单独保存；最终snapshot字节SHA仍073393eb60ace3423cdfe33b3f7b1f8d0eb0eb873f156de0297f037c14312389，与原state07严格相同。未重新执行17旧guard或新增FINAL/准入。后续仅补有界认证SELECT1就绪，结构SQLSTATE57P03可重试，其他错误不吞；从原state07精确续guards/restore。所有服务清理和源/输入不变已核，仍待完整功能资格。
+
+## 功能 checkpoint：state09 分项链收口（效率优化前）
+
+state09 已完成全部13项功能/存储/恢复producer链，functionalCheckpointPassed=true；原consumer-cost效率失败及cost测试的无效cipher等长断言仍原字节/原SHA保存，因此顶层passed=false、efficiencyQualificationPassed=false。该标记设计不伪造旧失败为通过，独立storage-functional已以实际codec精确公式关闭存储功能问题。这里的13项是producer阶段，不是13个独立测试用例；不相加HTTP次数或复跑次数。
+
+- 真实生产dist四工具Form→Scale→120trial Cognitive→SJT主链、原FINAL/outbox/replay、候选/path/分组provenance；普通null/V1及V2匿名稳定主体和凭证轮换、旧父/native及cross-ID能力撤销。
+- 登录KEEP_LINKED跨publication继承/满组拒绝、跨teacher-course同名隔离、maxAttempts与ABANDONED计数；最后1quota、同原attempt双restart、同主体首次KEEP绑定均有真实PG waiter证据；故障事务quota/token/native回滚。
+- 条件/材料/END与拒答、已达恢复/未达撤权拒绝；真实报告/CSV/ZIP/analysis分组来源与下载撤权。原51主体a50/b1、102父、204FINAL/快照、102READY原outbox保持；A=1/B=0手算分层与同task一/两组固定anchor来源集合已独立验证。
+- 受限eduk12_runtime真实19项guard边界由原17项及最后2项分项producer组成；正式五列reservation UNIQUE索引结构/23505重复ordinal、P0001超已预留ordinal与全四表回滚projection核验通过。不会把重复执行第18项算作另一用例。
+- 非空四新表恢复：136 claims、19 experiments、48 quota buckets、70 bindings。全215表projection、104 public guards及列/约束一致，正式runtime role恢复验证通过；仅沿原73项跨dump ordinal差异和3项CHECK PostgreSQL重解析白名单，同库比较始终严格。
+- 本期源为C19 state08，211表4310原行全部保留，historicalRows SHA308cf3673338aa5754d2f0a43ad25afb35f6517a7227f66aa02c51b2bd80fe9c，原guards/constraints不变，仅白名单3个加法identity guards。4054是更早历史子集，不能与本期4310混写。
+
+实际执行HEAD dc3ba73e9f915bf24ee14396836b3daa09bdfb7f，业务源码/Prisma自92986ff1后未改；runtime.sourceHead仍表示C19 seed，不是当前执行HEAD。state09 runtime receipt SHA2c2b36735802dedcba5cf905bdce1c8430b1756cc86f8f78c8e127f7c15f77a5；非空私有dump c20-new-format-restore/c20-http-new-format.dump SHA ceee3749d21dead15d1c838d945131fd18c3b7d6accfa58212fce287c4bfdb9c。原C19固定dump SHA c93890e3958e905304254225c9c94879690a0c37da13755a462fc77103c6dd15保持。全部服务停止，cleanupVerified/sourceUnchanged/inputsUnchanged/priorSourceUnchanged均true。
+
+功能限定证据归档checkpoint10包含20个脱敏原结果/frozen/schema projection成员及原/压缩SHA/size，不包含私有DB、runtime凭据或HTTP私有journal。schema projection只有计数/hash和数据库结构，不是原行数据。所有先前失败均留存。独立源码/测试/恢复review由root归档；本功能checkpoint不含完整新fresh/browser/selected-video、CPU/RSS广义资源或C26容量资格。C19旧动态suppressed与已测longCSV逐列两个缺口仍留其后续验收范围。
+
+下一阶段按用户最新顺序：先保护本功能提交，再以同51主体精确stage ID/dateRange基线做云端CPU/内存/数据库/存储/访问数及单次/并发2资源观测，明确Cognitive/SJT独立新四工具probe而不外推Scale/Form；只优化已证实Scale导出2N读取及证据支持的问题，第二次提交后停止新功能，交root启CI和合并。C21及后续新功能暂停。既有导出SQL40/61/121失败不得改写，analysis40/40/40与单报告22/22/22只是既有串行观察，不代表恒定读取bytes或批吞吐。
+
+启动就绪新门是有界认证SELECT1，仅结构57P03可retry；60秒循环末次子进程最多8秒，另有前置TCP等待，不能描述为整个启动严格60秒。state09真实首轮认证成功，静态分类不冒充真实57P03分支运行。

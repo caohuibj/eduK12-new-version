@@ -32,6 +32,11 @@ PHASES = ['upgrade', 'main', 'anonymous', 'linked', 'race', 'rollback', 'branche
 COMMON_DB = {'c20-materials-db.py','c19-flow-db.py','c18-study-db.py','c16-analysis-db.py'}
 COMMON_HTTP = {'c20-materials-client.mjs','c20-materials-fixture.mjs','loopback-only.cjs'}
 
+def postgres_readiness_status(returncode, payload):
+    if returncode == 0 and payload == {'ready':True}: return True
+    if returncode == 75 and payload == {'code':'57P03'}: return False
+    raise RuntimeError(f'authenticated PostgreSQL readiness failed: {payload.get("code", "invalid-driver-result")}')
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--tools', type=Path, required=True)
@@ -54,7 +59,8 @@ def main():
         assert args.expected_prior_runtime_sha256, 'all from-state imports require exact prior receipt SHA'
         assert sha_file(args.from_state/'c20-runtime-result.json') == args.expected_prior_runtime_sha256
     if args.functional_tail:
-        assert args.from_state and args.phase=='all' and not args.continuation_script
+        assert args.from_state and args.phase=='all'
+        if args.continuation_script: assert args.continuation_phase=='guards' and args.storage_tail_sha256
         assert sha_file(BASE/'c20-materials-consumer-functional-continuation.mjs')==args.functional_tail_sha256
         assert sha_file(args.from_state/'c20-consumer-cost-result.json')==args.expected_failed_cost_sha256
     if args.storage_tail_sha256:
@@ -128,6 +134,9 @@ def main():
             failed_receipt=json.loads(failed_path.read_text())
             assert failed_receipt.get('phase')==continuation_phase and failed_receipt.get('passed') is False
             assert not prior_result['phases'].get(continuation_phase,{}).get('passed'), 'cannot relabel an accepted phase as failed'
+            if args.functional_tail and continuation_phase=='guards':
+                assert prior_result['phases'].get('storage-functional',{}).get('passed') is True
+                assert json.loads((prior/'c20-final-db-snapshot.json').read_text())==json.loads((prior/'c20-storage-functional-post-state.json').read_text()), 'failed rollback-only guard phase must leave the entire same-database snapshot unchanged'
     copy_source = prior or source
     source_runtime = json.loads((copy_source/'runtime-private.json').read_text())
     copy_status = json.loads((copy_source/'status.json').read_text())
@@ -152,6 +161,8 @@ def main():
     if args.storage_tail_sha256:
         result['functionalTail']={**prior_result['functionalTail'],'reused':True,'evidenceReceiptSha256':args.expected_prior_runtime_sha256}
         result['storageTail']={'phase':'storage-functional','file':phase_file('storage-functional'),'sha256':args.storage_tail_sha256,'priorRuntimeSha256':args.expected_prior_runtime_sha256,'failedPhase':'cost','failedResultSha256':args.expected_failed_storage_sha256}
+    if args.storage_tail_sha256 and prior_result['phases'].get('storage-functional',{}).get('passed'):
+        result['storageTail']={**prior_result['storageTail'],'reused':True,'evidenceReceiptSha256':args.expected_prior_runtime_sha256}
     if prior: result['acceptedPriorRuntimeSha256']=args.expected_prior_runtime_sha256
     status={'state':'preparing','ports':{},'pids':{},'startedAt':time.time()}
     children, logs=[],[]; pinned=source_manifest=prior_manifest=None
@@ -182,7 +193,7 @@ def main():
             else:
                 inputs={'source':http_source,'runtime':fingerprint,'tools':binaries,'config':configuration_hash}
             hashes[phase]=digest({**inputs,'script':sha_file(script)})
-        return {'head':subprocess.check_output(['git','rev-parse','HEAD'],cwd=REPO,text=True).strip(),'sourceInputs':entries,'sourceInputsSha256':digest(entries),'runtimeFingerprint':fingerprint,'toolExecutables':binaries,'generatedClientManifestSha256':digest(manifest(BACKEND/'node_modules/.prisma/client')),'runtimeConfigurationSha256':configuration_hash,'phaseInputHashes':hashes}
+        return {'head':subprocess.check_output(['git','rev-parse','HEAD'],cwd=REPO,text=True).strip(),'sourceInputs':entries,'sourceInputsSha256':digest(entries),'runtimeFingerprint':fingerprint,'toolExecutables':binaries,'generatedClientManifestSha256':digest(manifest(BACKEND/'node_modules/.prisma/client')),'runtimeConfigurationSha256':configuration_hash,'phaseInputHashes':hashes,'readinessDriver':json.loads(subprocess.check_output([node,'-e',"require('pg');const fs=require('fs'),c=require('crypto');process.stdout.write(JSON.stringify(Object.keys(require.cache).sort().map(p=>({path:p,sha256:c.createHash('sha256').update(fs.readFileSync(p)).digest('hex')}))))"],cwd=BACKEND,text=True))}
     def guard():
         assert shutil.disk_usage(state).free>=FLOOR, 'disk below 8GiB stop line'
         assert next(int(line.split()[1])*1024 for line in Path('/proc/meminfo').read_text().splitlines() if line.startswith('MemAvailable:'))>=2*1024**3
@@ -216,6 +227,21 @@ def main():
                     result.setdefault('actualServiceExecutables',{})[str(p.pid)]={'path':str(actual),'sha256':sha_file(actual)}; return
             except OSError: time.sleep(.2)
         raise TimeoutError('60-second readiness budget exceeded')
+    def postgres_ready(port):
+        # Structural PostgreSQL SQLSTATE, never prose or generic connectivity retry.
+        driver="""const {Client}=require('pg');const client=new Client({connectionString:process.env.DATABASE_URL_OWNER,connectionTimeoutMillis:2000,query_timeout:3000});(async()=>{try{await client.connect();const r=await client.query('SELECT 1 AS ready');if(r.rows.length!==1||r.rows[0].ready!==1)throw Object.assign(new Error('invalid readiness result'),{code:'INVALID_RESULT'});process.stdout.write(JSON.stringify({ready:true}));}catch(e){process.stdout.write(JSON.stringify({code:typeof e.code==='string'?e.code:'UNKNOWN'}));process.exitCode=e.code==='57P03'?75:1;}finally{await client.end();}})().catch(()=>{process.exitCode=1;});"""
+        deadline=time.monotonic()+60; polls=[]
+        while time.monotonic()<deadline:
+            guard()
+            probe=subprocess.run([str(node),'--require',str(BASE/'loopback-only.cjs'),'-e',driver],cwd=BACKEND,env={**env,'DATABASE_URL_OWNER':runtime['DATABASE_URL_OWNER']},capture_output=True,text=True,timeout=8)
+            payload=json.loads(probe.stdout)
+            polls.append({'exit':probe.returncode,'result':payload})
+            (state/'postgres-readiness.json').write_text(json.dumps(polls,indent=2))
+            if postgres_readiness_status(probe.returncode,payload):
+                result['postgresReadiness']={'polls':len(polls),'authenticatedSelectOne':True,'retrySqlstateOnly':'57P03'}
+                return
+            time.sleep(.2)
+        raise TimeoutError('60-second authenticated PostgreSQL accepting-connections budget exceeded')
     def verify():
         assert binding()==pinned, 'frozen source/runtime/tool input changed'
         if 'privateRuntimeFileSha256' in result: assert sha_file(state/'runtime-private.json')==result['privateRuntimeFileSha256']
@@ -275,7 +301,7 @@ def main():
         assert not any(str(root) in str(v) for root in [source]+([prior] if prior else []) for v in runtime.values())
         (state/'runtime-private.json').write_text(json.dumps(runtime)); result['privateRuntimeFileSha256']=sha_file(state/'runtime-private.json')
         public_runtime={k:v for k,v in runtime.items() if k!='DATABASE_URL_OWNER'}
-        pg_process=start([pg/'postgres','-D',state/'pgdata','-h','127.0.0.1','-p',dbport,'-k','','-c','timezone=UTC','-c','shared_buffers=128MB','-c','max_connections=40'],'postgres'); ready(dbport,pg_process)
+        pg_process=start([pg/'postgres','-D',state/'pgdata','-h','127.0.0.1','-p',dbport,'-k','','-c','timezone=UTC','-c','shared_buffers=128MB','-c','max_connections=40'],'postgres'); ready(dbport,pg_process); postgres_ready(dbport)
         status.update(head=pinned['head'],node='v24.21.0',runtimeFingerprint=pinned['runtimeFingerprint']); record()
         db=m.Database(tools,state)
         if prior:
@@ -284,7 +310,7 @@ def main():
             assert db.snapshot()==json.loads(checkpoint.read_text()), 'prior clone differs from frozen stopped checkpoint'
             if args.continuation_script:
                 assert continuation_phase not in result['reusedPhases'], 'cannot continue an already accepted phase'
-                assert all(p in result['reusedPhases'] for p in requested if PHASES.index(p)<PHASES.index(continuation_phase)), 'continuation requires accepted predecessor phases'
+                assert all(p in result['reusedPhases'] for p in requested if requested.index(p)<requested.index(continuation_phase)), 'continuation requires accepted predecessor phases'
                 result['continuation']={'phase':continuation_phase,'file':args.continuation_script,'sha256':args.continuation_sha256,'priorRuntimeSha256':args.expected_prior_runtime_sha256,'priorFailedResultSha256':sha_file(prior/f'c20-{continuation_phase}-result.json')}
         http_started=False
         for phase in requested:

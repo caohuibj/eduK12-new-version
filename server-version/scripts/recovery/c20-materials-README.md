@@ -161,7 +161,7 @@ phase hashes remain unchanged. This permits continuation provenance to survive
 subsequent `all` reuse without claiming that the nominal main script ran.
 
 `python3 server-version/scripts/recovery/c20-materials-receipts-check.py` performs
-twenty-one pure temporary-file checks, including absent continuation markers, wrong
+twenty-two pure temporary-file checks, including absent continuation markers, wrong
 producer hashes, multiple newly executed phases, exact-receipt mismatch, and
 second-generation preservation. These checks are preparation evidence only.
 The receipt helper is included in launcher frozen inputs, not the per-phase
@@ -266,3 +266,16 @@ bytes without asserting equality or inventing a tolerance. Only explicitly
 listed identity/hash fields are normalized for a separate exact structural
 comparison; materialDigest and every other field must remain equal. No new
 admission, FINAL, quota, or six-window SQL measurement is issued.
+
+## Remaining restricted-role guard continuation
+
+Functional-tail/storage-tail may be combined with an explicit reviewed
+`--continuation-phase guards` producer. Both previously accepted functional
+tails retain their original provenance and are reused. Before services start,
+the failed guard state's entire final same-database snapshot must exactly equal
+the preceding storage-functional checkpoint. The guard continuation pins the
+17 accepted probe results and only finishes the duplicate-ordinal structural
+SQLSTATE/unique-index assertion and the not-yet-issued above-count probe, with
+exact four-table projections before/after. The original restore producer then
+runs. No prior admission, FINAL, SQL observation, or accepted guard probe is
+replayed; both earlier cost failures remain unqualified.

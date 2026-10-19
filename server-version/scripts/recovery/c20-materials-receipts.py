@@ -58,7 +58,8 @@ def import_receipt(state, expected_sha):
         failed_path=state/'c20-cost-result.json'
         assert sha_file(failed_path)==storage['failedResultSha256']
         assert json.loads(failed_path.read_text()).get('passed') is False
-        assert receipt.get('acceptedPriorRuntimeSha256')==storage['priorRuntimeSha256']
+        assert receipt.get('acceptedPriorRuntimeSha256')==(storage['evidenceReceiptSha256'] if storage.get('reused') else storage['priorRuntimeSha256'])
+        if storage.get('reused'): assert 'storage-functional' in reused
         assert source_sha(frozen,storage['file'])==storage['sha256']
         target=phases.get('storage-functional')
         if target:
