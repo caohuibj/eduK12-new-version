@@ -208,7 +208,7 @@ class SyntheticArtifacts:
                                expected_backend_receipt_sha256=self.receipt_sha['backend'], expected_frontend_receipt_sha256=self.receipt_sha['frontend'],
                                expected_head=self.head, descriptor=descriptor_path, expected_descriptor_sha256=c.sha_file(descriptor_path))
         scope = {'a': args, 'preflight': facade, 'BACKEND': self.backend, 'FRONTEND': self.frontend, 'BASE': self.harness,
-                 'Path': Path, 'json': json, 'subprocess': c.subprocess, 'node': self.node, 'tools': self.tools,
+                 'Path': Path, 'sys': sys, 'json': json, 'subprocess': c.subprocess, 'node': self.node, 'tools': self.tools,
                  'pg': self.pg, 'redis': self.redis, 'sha_file': c.sha_file, 'digest': c.digest,
                  'effective': {'syntheticRuntime': True}, 'requested': list(c.PHASES), 'descriptor': {'syntheticDescriptor': True},
                  'source_contract': SimpleNamespace(assert_unchanged=lambda *_: None)}
@@ -283,7 +283,7 @@ class EmissionAndScopeContracts(unittest.TestCase):
                     self.assertEqual(c.component_inputs(component, fixture.repo), baseline)
 
     def test_complete_requires_exact_six_phases_and_all_final_invariants(self):
-        result = {'phases': {phase: {'passed': True} for phase in c.PHASES},
+        result = {'phases': {phase: {'passed': True} for phase in c.PHASES}, 'apiStoppedAfterScheduled': True, 'apiLifetime': {'stopped': True, 'expired': False},
                   **dict.fromkeys(['cleanupVerified', 'sourceUnchanged', 'inputsUnchanged', 'finalSnapshotVerified'], True)}
         self.assertEqual(c.PHASES, ['upgrade', 'prepare', 'scheduled', 'guards', 'consumers', 'restore'])
         self.assertTrue(c.complete(result))
@@ -294,11 +294,14 @@ class EmissionAndScopeContracts(unittest.TestCase):
             bad = copy.deepcopy(result)
             bad['phases'][phase]['passed'] = False
             self.assertFalse(c.complete(bad))
-        for field in ['cleanupVerified', 'sourceUnchanged', 'inputsUnchanged', 'finalSnapshotVerified']:
+        for field in ['cleanupVerified', 'sourceUnchanged', 'inputsUnchanged', 'finalSnapshotVerified', 'apiStoppedAfterScheduled']:
             self.assertFalse(c.complete({**result, field: False}))
         bad = copy.deepcopy(result)
         bad['phases']['unapproved-extra'] = {'passed': True}
         self.assertFalse(c.complete(bad))
+
+        for lifetime in [{}, {'stopped': False, 'expired': False}, {'stopped': True, 'expired': True}]:
+            self.assertFalse(c.complete({**result, 'apiLifetime': lifetime}))
 
 
 class ArtifactReceiptContracts(unittest.TestCase):
@@ -484,6 +487,98 @@ class DualLauncherBindingContracts(unittest.TestCase):
             path.write_text('mutated library bytes')
             with self.assertRaisesRegex(AssertionError, 'frozen sources/artifacts/tools/config changed'):
                 scope['verify']()
+
+
+class RuntimePythonContracts(unittest.TestCase):
+    def test_actual_child_python_path_bytes_identity_and_version_are_frozen(self):
+        with SyntheticArtifacts() as fixture:
+            scope=fixture.launcher_scope()
+            first=fixture.evidence/'python-first';second=fixture.evidence/'python-second'
+            first.write_bytes(b'synthetic interpreter one');second.write_bytes(b'synthetic interpreter two')
+            alias=fixture.evidence/'python-current';alias.symlink_to(first)
+            scope['sys']=SimpleNamespace(executable=str(alias),version='synthetic 3.x')
+            scope['pinned']=c.accepted_binding(scope['binding'],scope['validate_build'],fixture.head)
+            self.assertEqual(scope['pinned']['launcherPython'],{'path':str(alias),'realpath':str(first.resolve()),'sha256':c.sha_file(first),'version':'synthetic 3.x'})
+            mutations=[(lambda:first.write_bytes(b'changed interpreter'),lambda:first.write_bytes(b'synthetic interpreter one')),
+                       (lambda:setattr(scope['sys'],'version','changed version'),lambda:setattr(scope['sys'],'version','synthetic 3.x')),
+                       (lambda:setattr(scope['sys'],'executable',str(second)),lambda:setattr(scope['sys'],'executable',str(alias)))]
+            for mutate,restore in mutations:
+                mutate();cloned=[]
+                with self.assertRaisesRegex(AssertionError,'frozen sources/artifacts/tools/config changed'):
+                    scope['verify']();cloned.append(True)
+                self.assertEqual(cloned,[]);restore()
+            alias.unlink();alias.symlink_to(second)
+            with self.assertRaisesRegex(AssertionError,'frozen sources/artifacts/tools/config changed'):scope['verify']()
+            alias.unlink();alias.symlink_to(first)
+            original=scope['validate_build']
+            def drift_inside_validation():
+                original();first.write_bytes(b'changed during validation')
+            with self.assertRaisesRegex(AssertionError,'inputs changed across accepted binding'):
+                c.accepted_binding(scope['binding'],drift_inside_validation,fixture.head)
+        tree=ast.parse((BASE/'c25-http.py').read_text())
+        commands=[node for node in ast.walk(tree) if isinstance(node,ast.List) and len(node.elts)>1
+                  and isinstance(node.elts[1],ast.BinOp) and isinstance(node.elts[1].right,ast.Constant)
+                  and node.elts[1].right.value=='c25-db.py']
+        self.assertEqual(len(commands),2)
+        for command in commands:self.assertEqual(ast.unparse(command.elts[0]),'sys.executable')
+
+
+class ApiLifetimeContracts(unittest.TestCase):
+    def test_independent_monotonic_deadline_interrupts_without_phase_polling(self):
+        now=[100.0];scheduled=[];terminated=[]
+        lifetime=c.ApiLifetime(lambda:now[0],scheduled.append,lambda:terminated.append('writers'))
+        lifetime.start();self.assertEqual(scheduled,[2700]);self.assertEqual(lifetime.deadline,2800)
+        now[0]=2799;lifetime.interrupt();self.assertEqual(scheduled[-1],1);self.assertEqual(lifetime.deadline,2800)
+        self.assertEqual(terminated,[])
+        now[0]=2800
+        with self.assertRaises(TimeoutError):lifetime.interrupt()
+        self.assertEqual(terminated,['writers']);self.assertEqual(scheduled[-1],0);self.assertTrue(lifetime.expired)
+        with self.assertRaises(AssertionError):lifetime.start()
+
+    def test_normal_stop_cancels_interrupt_and_forbids_restart_or_extension(self):
+        now=[1.0];scheduled=[];terminated=[]
+        lifetime=c.ApiLifetime(lambda:now[0],scheduled.append,lambda:terminated.append(True))
+        lifetime.start();now[0]=302;lifetime.stop();self.assertEqual(scheduled[-1],0)
+        now[0]=4000;lifetime.interrupt();self.assertEqual(terminated,[]);self.assertFalse(lifetime.expired)
+        with self.assertRaises(AssertionError):lifetime.start()
+        with self.assertRaises(AssertionError):c.ApiLifetime(lambda:0,scheduled.append,lambda:None,2701)
+
+    def test_actual_launcher_stops_api_after_scheduled_and_timeout_kills_only_writers(self):
+        class Process:
+            def __init__(self,pid):self.pid=pid;self.returncode=None
+            def poll(self):return self.returncode
+            def wait(self,timeout):return self.returncode
+        processes={name:Process(i+1) for i,name in enumerate(['postgres','redis','api','c25-scheduled'])}
+        calls=[]
+        def killpg(pid,sig):
+            calls.append((pid,sig))
+            next(proc for proc in processes.values() if proc.pid==pid).returncode=0 if sig==15 else -9
+        timer=c.ApiLifetime(lambda:0,lambda _:None,lambda:None);timer.start()
+        scope={'result':{'passed':True},'children':[(name,proc,name in ['postgres','redis','api']) for name,proc in processes.items()],
+               'os':SimpleNamespace(killpg=killpg),'signal':SimpleNamespace(SIGKILL=9,SIGINT=2,SIGTERM=15),
+               'subprocess':c.subprocess,'preflight':c,'expected_stopped':set(),'cleanup':[],'api_lifetime':timer,
+               'http':True,'time':SimpleNamespace(time=lambda:123),'status':{'state':'running'},'record':lambda:None,
+               'resources':lambda *_:None,'state':Path('/no-stopping-file'),'Path':Path}
+        tree=ast.parse((BASE/'c25-http.py').read_text());main=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='main')
+        names={'stop_child','stop_api_after_scheduled','terminate_api_writers','guard'}
+        nodes=[n for n in main.body if isinstance(n,ast.FunctionDef) and n.name in names]
+        self.assertEqual({n.name for n in nodes},names)
+        exec(compile(ast.Module(body=nodes,type_ignores=[]),'actual-c25-api-lifetime','exec'),scope)
+        scope['stop_api_after_scheduled']()
+        self.assertEqual(processes['api'].returncode,0);self.assertEqual(scope['expected_stopped'],{'api'})
+        self.assertTrue(scope['result']['apiStoppedAfterScheduled']);self.assertTrue(timer.stopped)
+        scope['guard']();scope['stop_child']('api',processes['api']);self.assertEqual(scope['cleanup'],[])
+        with self.assertRaises(AssertionError):scope['stop_api_after_scheduled']()
+        scope['terminate_api_writers']()
+        self.assertIsNone(processes['postgres'].returncode)
+        self.assertEqual(processes['redis'].returncode,-9);self.assertEqual(processes['c25-scheduled'].returncode,-9)
+        self.assertFalse(scope['result']['passed']);self.assertTrue(scope['result']['apiLifetimeExpired'])
+        source=(BASE/'c25-http.py').read_text()
+        self.assertIn('signal.signal(signal.SIGALRM,api_lifetime.interrupt)',source)
+        self.assertIn('signal.setitimer(signal.ITIMER_REAL,seconds)',source)
+        self.assertIn('api_lifetime.start();ready(aport,api)',source)
+        self.assertLess(source.index("if phase=='scheduled':stop_api_after_scheduled()"),source.index("audit('preserve','c25-audit-preserve-'+phase)"))
+        self.assertEqual(source.count("api=start("),1)
 
 
 class PrivateDestinationContracts(unittest.TestCase):

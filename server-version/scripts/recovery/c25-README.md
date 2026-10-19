@@ -113,7 +113,15 @@ one legitimate B row and its projection/query shape, not dynamic N+1 scaling.
 Planned phases: upgrade 600s; prepare 300s; scheduled 600s; guards 300s;
 consumer evidence finalization 300s; nonempty restore 600s. Each baseline,
 post-phase preservation and final audit has its own aggregate 300-second tracked
-child deadline. Writers stop before the final snapshot; PostgreSQL stops even if
+child deadline. API lifetime has an independent fixed monotonic 2,700-second deadline, armed
+with a process interrupt so audits or synchronous binding work cannot postpone
+it. Expiry stops active writer groups, fails the attempt and never restarts API.
+API stops normally immediately after the scheduled phase (the last HTTP-dependent
+phase), before its preservation audit and the DB-only guards/file-only consumer
+finalization/restore. This prevents the product's separate one-hour cleanup timer
+from touching historical expired checkpoints even when background workers are
+disabled. Completion requires that planned stop and a non-expired lifetime.
+Writers stop before the final snapshot; PostgreSQL stops even if
 that snapshot fails, and overall PASS requires it. Phase failure is retained and
 stops the attempt without automatic restart/continuation. Services and clients
 must share one persistent execution namespace.
@@ -131,6 +139,8 @@ frontend emit with the same current-client verification receipt. Old dist, if
 present, must be retained via recoverable same-filesystem rename. Bind exact
 current source/helper/config/environment/dependency/client/compiler/tool bytes
 before and after; missing/failed final producer results cannot qualify artifacts.
+The launcher and every DB audit/phase use the same absolute `sys.executable`;
+its actual path, resolved path, SHA-256 and version are frozen and rechecked.
 The launcher rechecks a coherent reviewed build+client+source snapshot immediately
 before and after binding, including expected HEAD and clean inputs, before clone.
 The prepared producer/launcher still await immutable independent review and execution approval.
@@ -185,10 +195,25 @@ no runtime, producer, database or browser was invoked by these tests.
   (old HTTP03/C21/failed evidence/tools/repo paths, existing/nested targets and
   aliases rejected) and parses the changed launcher/producer syntax;
   receipt `f3d3a8361354c7581c3958b8dc65e9ff4a6caf1a8ee460ecae2a420e166e69d9`.
-- `consumer-contract-01/`: 14 new transparent-decrypt, actual-SQL-observation
+- `consumer-contract-01/`: 13 new transparent-decrypt, actual-SQL-observation
   acceptance, clock/window, immutable-identity and hash-linked aggregation fault
   tests; also syntax-only parsing of not-yet-executed phase/launcher scripts.
   Receipt `8f9ddf747d561058ba1e0f58bdb25a7668a7ccbd605b06e21c21948ed5c2d69c`.
+
+- `producer-contract-04/`: Python interpreter drift, independent API lifetime and
+  affected completion checks: four passed; one newly added fake-process test
+  failed because its synthetic status omitted `state`. No service was started.
+  Failed receipt is retained:
+  `063888b5acf6089885d425c36da3728be096065bc853e8c045bc1cdba161aafe`.
+- `producer-contract-05/`: only that test reran after adding the missing fixture
+  field and passed, with no runtime/production change. Receipt:
+  `a0734c0fa87acf743cd0b4ab63825a0ca809a5fecbf754d7f39b2a9d85d40561`.
+  Both attempts retain exact input copies and equal before/after inventories;
+  the four unaffected successful checks were not rerun.
+
+The earlier README/hand-off count of 14 consumer tests was incorrect: the raw
+TAP and frozen test file contain **13**, as reported above; no test was added or
+rerun to change that count.
 
 These successful receipts bind equal before/after inputs. Later targeted receipts
 retain exact consumed source copies; unchanged prior checks are not replayed.

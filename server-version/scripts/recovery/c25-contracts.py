@@ -226,7 +226,51 @@ def validate_build(path, expected_sha, kind, expected_head, node, repo=REPO):
     return receipt
 
 
+class ApiLifetime:
+    """Independent elapsed-time interrupt; phase/audit polling is insufficient.
+
+    Signal scheduling/clock/writer termination are injected so fault tests never
+    start a service, wait 45 minutes, send a real signal or modify the OS clock.
+    """
+    def __init__(self, clock, schedule, terminate_writers, seconds=2700):
+        assert 0 < seconds <= 2700
+        self.clock, self.schedule, self.terminate_writers = clock, schedule, terminate_writers
+        self.seconds, self.started, self.deadline = seconds, None, None
+        self.stopped = self.expired = False
+
+    def start(self):
+        assert self.started is None and not self.stopped, 'API lifetime cannot restart or extend its deadline'
+        self.started = self.clock()
+        self.deadline = self.started + self.seconds
+        self.schedule(self.seconds)
+
+    def interrupt(self, *_):
+        if self.deadline is None or self.stopped:
+            return
+        remaining = self.deadline - self.clock()
+        if remaining > 0:
+            self.schedule(remaining)  # An early external signal never moves T0.
+            return
+        self.expired = True
+        self.schedule(0)
+        try:
+            self.terminate_writers()
+        finally:
+            raise TimeoutError('independent API lifetime deadline exceeded')
+
+    def stop(self):
+        self.schedule(0)
+        self.stopped = True
+
+    def evidence(self):
+        return {'limitSeconds': self.seconds, 'startedMonotonic': self.started,
+                'deadlineMonotonic': self.deadline, 'stopped': self.stopped,
+                'expired': self.expired, 'restartAllowed': False}
+
+
 def complete(result):
     return (set(result.get('phases', {})) == set(PHASES)
             and all(result['phases'][phase].get('passed') is True for phase in PHASES)
-            and all(result.get(key) is True for key in ['cleanupVerified', 'sourceUnchanged', 'inputsUnchanged', 'finalSnapshotVerified']))
+            and all(result.get(key) is True for key in ['cleanupVerified', 'sourceUnchanged', 'inputsUnchanged', 'finalSnapshotVerified', 'apiStoppedAfterScheduled'])
+            and result.get('apiLifetime', {}).get('stopped') is True
+            and result.get('apiLifetime', {}).get('expired') is False)

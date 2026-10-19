@@ -50,7 +50,16 @@ def main():
   u=urlparse(effective[key]);effective[key]=u._replace(netloc=f'{u.username}:{u.password}@127.0.0.1:0').geturl()
  env={'PATH':f'{node.parent}:{pg}:/usr/bin:/bin','HOME':str(state),'TMPDIR':str(state),'LANG':'C.UTF-8','TZ':'UTC','NODE_ENV':'test','PYTHONDONTWRITEBYTECODE':'1'}
  result={'passed':False,'scope':'C25_C22_OVER_C23_LOCAL_SYNTHETIC_CORE_NOT_COMPLETE_RELEASE_OR_CAPACITY','phases':{},'sourceReceiptSha256':source_contract.RECEIPT_SHA256,'sourceSnapshotSha256':source_contract.SNAPSHOT_SHA256,'descriptorSha256':a.expected_descriptor_sha256,'cloneBytes':copybytes,'budget':budget,'backendBuildReceiptSha256':a.expected_backend_receipt_sha256,'frontendBuildReceiptSha256':a.expected_frontend_receipt_sha256,'notCovered':['C19 missing-only analysis/CSV and selected-video supplement','native IndexedDB and C24 browser acceptance','CPU/throughput/capacity']}
- status={'state':'preparing','ports':{},'pids':{},'startedAt':time.time()};children=[];logs=[];pinned=before=None
+ status={'state':'preparing','ports':{},'pids':{},'startedAt':time.time()};children=[];logs=[];pinned=before=None;cleanup=[];expected_stopped=set()
+ def terminate_api_writers():
+  result.update(passed=False,apiLifetimeExpired=True)
+  for name,proc,_ in reversed(children):
+   if name!='postgres' and proc.poll() is None:
+    try:os.killpg(proc.pid,signal.SIGKILL)
+    except ProcessLookupError:pass
+    result.setdefault('apiDeadlineKilledGroups',[]).append({'name':name,'pid':proc.pid})
+ api_lifetime=preflight.ApiLifetime(time.monotonic,lambda seconds:signal.setitimer(signal.ITIMER_REAL,seconds),terminate_api_writers)
+ signal.signal(signal.SIGALRM,api_lifetime.interrupt)
  def record():
   t=state/'status.tmp';t.write_text(json.dumps(status,indent=2));t.replace(state/'status.json')
  def receipt_references():
@@ -65,6 +74,7 @@ def main():
    'backendDist':preflight.file_inventory(BACKEND,'dist'),'frontendDist':preflight.file_inventory(FRONTEND,'dist'),
    'backendDependenciesSha256':digest(preflight.dependency_inventory(BACKEND)),'frontendDependenciesSha256':digest(preflight.dependency_inventory(FRONTEND)),
    'generatedClient':preflight.file_inventory(BACKEND,'node_modules/.prisma/client'),
+   'launcherPython':{'path':sys.executable,'realpath':str(Path(sys.executable).resolve()),'sha256':sha_file(Path(sys.executable).resolve()),'version':sys.version},
    'runtimeFingerprint':json.loads(subprocess.check_output([node,BASE/'runtime-fingerprint.cjs',BACKEND],text=True,timeout=30)),
    'tools':{str(v.relative_to(tools)):sha_file(v) for v in [node,pg/'postgres',pg/'psql',pg/'pg_dump',pg/'pg_restore',pg/'pg_controldata',redis]},
    'postgresLibraryBytes':{str(v.relative_to(tools)):{'realpath':str(v.resolve()),'sha256':sha_file(v)} for v in sorted((tools/'postgresql/lib').rglob('*')) if v.is_file()},
@@ -77,7 +87,7 @@ def main():
  def guard():
   resources(status['state'])
   for name,proc,service in children:
-   if service:assert proc.poll() is None,name+' exited'
+   if service and name not in expected_stopped:assert proc.poll() is None,name+' exited'
    if name=='api' and proc.poll() is None:
     rss=next(int(l.split()[1])*1024 for l in Path(f'/proc/{proc.pid}/status').read_text().splitlines() if l.startswith('VmRSS:'));result['maxApiRssBytes']=max(result.get('maxApiRssBytes',0),rss);assert rss<1024**3
   if (state/'stop').exists():raise KeyboardInterrupt
@@ -90,7 +100,7 @@ def main():
   try:preflight.wait_child(proc,timeout,monitor or guard)
   finally:(state/(name+'.exit')).write_text(str(proc.returncode)+'\n')
  def audit(mode,label,monitor=None):
-  argv=['python3',BASE/'c25-db.py','--tools',tools,'--state',state,'--audit',mode,'--label',label]
+  argv=[sys.executable,BASE/'c25-db.py','--tools',tools,'--state',state,'--audit',mode,'--label',label]
   if mode=='baseline':argv+=['--expected-snapshot',descriptor['files']['finalSnapshot']['path']]
   run(argv,label,timeout=300,monitor=monitor)
   evidence=json.loads((state/(label+'-result.json')).read_text())
@@ -111,6 +121,29 @@ def main():
   assert sha_file(a.descriptor)==a.expected_descriptor_sha256
   source_contract.assert_unchanged(descriptor,pg/'pg_controldata')
   assert preflight.accepted_binding(binding,validate_build,a.expected_head)==pinned,'frozen sources/artifacts/tools/config changed'
+ def stop_child(name,proc):
+  try:
+   if name in ['postgres','redis','api'] and proc.poll() is not None and name not in expected_stopped:
+    cleanup.append({'name':name,'error':'UnexpectedServiceExitBeforeShutdown'})
+   if proc.poll() is None:
+    os.killpg(proc.pid,signal.SIGINT if name=='postgres' else signal.SIGTERM)
+    try:proc.wait(timeout=25)
+    except subprocess.TimeoutExpired:
+     cleanup.append({'name':name,'error':'GracefulShutdownTimeout'});os.killpg(proc.pid,signal.SIGKILL);proc.wait(timeout=5)
+  except ProcessLookupError:proc.poll()
+  except Exception as error:cleanup.append({'name':name,'error':type(error).__name__})
+  if name in ['postgres','redis','api']:
+   try:preflight.service_exit(name,proc.returncode)
+   except AssertionError:cleanup.append({'name':name,'error':'UnexpectedShutdownExit','returncode':proc.returncode})
+  if name=='api' and proc.poll() is not None:api_lifetime.stop()
+ def stop_api_after_scheduled():
+  assert http and 'api' not in expected_stopped
+  api=next(proc for name,proc,_ in children if name=='api')
+  stop_child('api',api)
+  assert not cleanup and api.returncode==0,'API did not stop cleanly after its last dependent phase'
+  expected_stopped.add('api')
+  result['apiStoppedAfterScheduled']=True;result['apiLifetime']=api_lifetime.evidence()
+  status['apiStoppedAt']=time.time();record()
  def interrupted(*_):raise KeyboardInterrupt
  pinned=preflight.accepted_binding(binding,validate_build,a.expected_head)
  if a.preflight_only:
@@ -151,13 +184,13 @@ def main():
   for phase in requested:
    verify();guard()
    if phase in ['upgrade','restore']:
-    status['state']='upgrading' if phase=='upgrade' else 'restoring';record();argv=['python3',BASE/'c25-db.py','--tools',tools,'--state',state,'--phase',phase];
+    status['state']='upgrading' if phase=='upgrade' else 'restoring';record();argv=[sys.executable,BASE/'c25-db.py','--tools',tools,'--state',state,'--phase',phase];
     if phase=='upgrade':argv+=['--expected-snapshot',descriptor['files']['finalSnapshot']['path']]
     run(argv,'c25-'+phase,timeout=preflight.PHASE_SECONDS[phase])
    else:
     if not http:
      rp=start([redis,'--bind','127.0.0.1','--port',rport,'--dir',state,'--save','','--appendonly','no','--maxmemory','128mb','--maxmemory-policy','noeviction'],'redis');ready(rport,rp)
-     api=start([node,'--require',BASE/'loopback-only.cjs','dist/index.js'],'api',public);ready(aport,api);status['apiUrl']=f'http://127.0.0.1:{aport}'
+     api=start([node,'--require',BASE/'loopback-only.cjs','dist/index.js'],'api',public);api_lifetime.start();ready(aport,api);status['apiUrl']=f'http://127.0.0.1:{aport}'
      for endpoint in ['health','ready']:
       with urllib.request.urlopen(status['apiUrl']+'/'+endpoint,timeout=8) as response:assert response.status==200
      http=True
@@ -166,6 +199,7 @@ def main():
     run(argv,'c25-'+phase,public,timeout=preflight.PHASE_SECONDS[phase])
    result['phases'][phase]=json.loads((state/f'c25-{phase}-result.json').read_text());assert result['phases'][phase]['passed'] is True
    result.setdefault('phaseProducers',{})[phase]={'argv':list(map(str,argv)),'inputBindingSha256':result['frozenInputsSha256'],'resultSha256':sha_file(state/f'c25-{phase}-result.json')}
+   if phase=='scheduled':stop_api_after_scheduled()
    audit('preserve','c25-audit-preserve-'+phase);verify();guard();resources('after-'+phase,True)
   result['passed']=set(result['phases'])==set(PHASES)
   result['requestedPrefixPassed']=True
@@ -177,25 +211,11 @@ def main():
  finally:
   for sig in [signal.SIGINT,signal.SIGTERM,signal.SIGHUP]:signal.signal(sig,signal.SIG_IGN)
   result['finalSnapshotVerified']=False
-  cleanup=[]
-  def stop_child(name,proc):
-   try:
-    if name in ['postgres','redis','api'] and proc.poll() is not None:
-     cleanup.append({'name':name,'error':'UnexpectedServiceExitBeforeShutdown'})
-    if proc.poll() is None:
-     os.killpg(proc.pid,signal.SIGINT if name=='postgres' else signal.SIGTERM)
-     try:proc.wait(timeout=25)
-     except subprocess.TimeoutExpired:
-      cleanup.append({'name':name,'error':'GracefulShutdownTimeout'});os.killpg(proc.pid,signal.SIGKILL);proc.wait(timeout=5)
-   except ProcessLookupError:proc.poll()
-   except Exception as error:cleanup.append({'name':name,'error':type(error).__name__})
-   if name in ['postgres','redis','api']:
-    try:preflight.service_exit(name,proc.returncode)
-    except AssertionError:cleanup.append({'name':name,'error':'UnexpectedShutdownExit','returncode':proc.returncode})
   # Quiesce every writer before calling a snapshot final. PostgreSQL remains
   # available solely for the bounded read-only snapshot, then stops last.
   for name,proc,_ in reversed(children):
    if name!='postgres':stop_child(name,proc)
+  api_lifetime.stop();result['apiLifetime']=api_lifetime.evidence()
   writers_stopped=all(proc.poll() is not None for name,proc,_ in children if name!='postgres')
   def final_guard():
    resources('final-snapshot')
