@@ -1,4 +1,6 @@
 import { readFileSync } from 'node:fs'
+import { Prisma } from '@prisma/client'
+import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { freezeTrainingPersistenceSnapshot, parseTrainingPersistencePolicy, trainingCheckpointExpiry, trainingPersistenceMetadata } from '../../modules/composite/training-persistence.policy'
@@ -93,6 +95,41 @@ describe('Training admission snapshot unit contracts', () => {
 })
 
 describe('C23 compact admission projection source contracts', () => {
+  it('types the shared configured-policy projection against real model fields and retains the runtime LEGACY guard', () => {
+    const file = ts.createSourceFile('composite.service.ts', composite, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS)
+    const declarations: ts.VariableDeclaration[] = []
+    const calls: ts.CallExpression[] = []
+    const visit = (node: ts.Node) => {
+      if (ts.isVariableDeclaration(node) && node.name.getText(file) === 'configuredPolicySelect') declarations.push(node)
+      if (ts.isCallExpression(node) && node.expression.getText(file) === 'publicationReader.compositeAssessment.findUnique') calls.push(node)
+      ts.forEachChild(node, visit)
+    }
+    visit(file)
+    expect(declarations).toHaveLength(1)
+    expect(calls).toHaveLength(1)
+    const initializer = declarations[0].initializer!
+    expect(ts.isSatisfiesExpression(initializer)).toBe(true)
+    const constraint = initializer as ts.SatisfiesExpression
+    expect(constraint.type.getText(file)).toBe('Prisma.CompositeAssessmentSelect')
+    const selected = (constraint.expression as ts.ObjectLiteralExpression).properties.map((node) => node.name!.getText(file))
+    const args = calls[0].arguments[0] as ts.ObjectLiteralExpression
+    const select = args.properties.find((node) => ts.isPropertyAssignment(node) && node.name.getText(file) === 'select') as ts.PropertyAssignment
+    expect(select.initializer.getText(file)).toBe('configuredPolicySelect')
+    // Generated metadata supplies the actual schema; no mock invents deliveryMode.
+    const model = Prisma.dmmf.datamodel.models.find((entry) => entry.name === 'CompositeAssessment')!
+    expect(selected.filter((name) => !model.fields.some((field) => field.name === name))).toEqual([])
+    expect(selected).not.toContain('deliveryMode')
+    expect(selected).toContain('questionnaireCourses')
+    expect(selected).toContain('trainingFeedbackPolicy')
+    expect(selected).toContain('trainingFeedbackPolicyHash')
+    expect(admission).toContain("const publicationReader: Pick<Prisma.TransactionClient, 'compositeAssessment'> = db")
+    const enabled = admission.slice(admission.indexOf('if (persistence?.checkpoint'), admission.indexOf('const courseIds'))
+    expect(enabled).toContain('|| feedbackConfigured')
+    expect(enabled).toContain("composite.deliveryMode === 'LEGACY'")
+    expect(enabled).not.toContain('current.deliveryMode')
+    expect(enabled).not.toContain("deliveryMode === 'FINAL_ONLY'")
+  })
+
   it('keeps legacy/off policy on a compact locked header without course/blob reads', () => {
     const header=admission.slice(admission.indexOf('const current ='),admission.indexOf('if (persistence?.checkpoint'))
     expect(header).toContain('select: { status: true, publicEnabled: true, opensAt: true, expiresAt: true,')
