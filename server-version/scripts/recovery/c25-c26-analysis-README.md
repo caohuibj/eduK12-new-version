@@ -153,3 +153,16 @@ helpers are unchanged. Execution prepare-03 adds one targeted two-branch contrac
 snapshot/close cross multiple real resource-timer ticks and complete normally;
 a propagated probe fault still stops the block and preserves a false result.
 The seven prior contracts keep their own raw identities and were not rerun.
+
+The first real analysis ABBA attempt reached all 15 responses in its first A
+block, then failed because a resource tick parsed API VmRSS during normal block
+close. Its actual /proc status frame was not retained; no specific terminal
+state is inferred. Both databases, all 39 material files and inputs passed the
+final protection checks; the API/observer exited 0 and all services stopped.
+The attempt remains false, with no B block or A/B performance conclusion.
+
+Only the new entry is adjusted: block-close and final cleanup inspect global
+resource floors without requesting API RSS. Active API RSS remains strict, and
+final probe/actual exit/group-quiescence proofs remain mandatory. Execution
+prepare-04 passes one new two-branch timer contract for normal closing and
+active malformed RSS rejection. No old parser or safety ownership is changed.

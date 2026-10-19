@@ -6,6 +6,7 @@ import path from 'node:path'
 import {spawnSync} from 'node:child_process'
 import {createHash} from 'node:crypto'
 import {analysisEnvelope,createAnalysisHttp,runAnalysisExperiment} from './c25-c26-analysis-entry.mjs'
+import {apiRssObservation} from './c25-c26-a-entry.mjs'
 import {analysisManifestOracle} from './c25-c26-analysis-abba.mjs'
 import {C26_ANALYSIS_IDS as I,analysisBindingHash as hash} from './c25-c26-analysis-scope.mjs'
 import {INLINE_PYTHON as DB,invocation as dbInvocation} from './c25-c26-analysis-db.mjs'
@@ -86,5 +87,20 @@ test('active probe and normal block close may overlap resource inspection while 
   if(injectFault){await assert.rejects(f.run(),/actual entry propagated probe fault/);assert.equal(f.written.get('c25-c26-analysis-driver-result-private.json').passed,false);assert.equal(f.calls.filter(x=>x.stage==='api-open').length,1)}
   else{const result=await f.run();assert.equal(result.passed,true);assert.equal(result.workloadComplete,true);assert.ok(sampledProbe>=4);assert.ok(sampledClose>=8)}
   assert.equal(f.calls.filter(x=>x.stage==='api-close').length,injectFault?1:4);assert.equal(f.calls.filter(x=>x.stage==='observer-close').length,injectFault?1:4)
+ }
+})
+
+test('closing and cleanup inspect global floors without API RSS while active malformed RSS still rejects',async()=>{
+ for(const badActive of [false,true]){
+  let retiring=false,activeChecks=0,closingChecks=0,globalChecks=0
+  const f=fixture(({options,dependencies})=>{
+   const read=options.readResources,apiStart=dependencies.startApi,sessionStart=dependencies.startSession
+   options.readResources=identity=>{globalChecks++;if(retiring){closingChecks++;assert.equal(identity,undefined,'retiring API must not be sampled for RSS')}if(identity){activeChecks++;apiRssObservation(identity.pid,()=>badActive?'Name:\tapi\nState:\tR (running)\n':'Name:\tapi\nState:\tR (running)\nVmRSS:\t1024 kB\n')}return read()}
+   dependencies.startApi=async args=>{const api=await apiStart(args);let first=true;return {...api,async snapshot(){if(first){first=false;await new Promise(r=>setTimeout(r,160))}return api.snapshot()},async stop(){retiring=true;try{await new Promise(r=>setTimeout(r,160));return await api.stop()}finally{retiring=false}}}}
+   dependencies.startSession=async args=>{const session=await sessionStart(args);return {...session,async close(){retiring=true;try{await new Promise(r=>setTimeout(r,160));return await session.close()}finally{retiring=false}}}}
+  })
+  if(badActive){await assert.rejects(f.run(),/API RSS status malformed/);assert.equal(f.written.get('c25-c26-analysis-driver-result-private.json').passed,false);assert.equal(f.calls.filter(x=>x.stage==='api-open').length,1)}
+  else{const value=await f.run();assert.equal(value.passed,true);assert.equal(value.workloadComplete,true)}
+  assert.ok(activeChecks>=1);assert.ok(closingChecks>=1);assert.ok(globalChecks>closingChecks);assert.equal(f.calls.filter(x=>x.stage==='api-close').length,badActive?1:4)
  }
 })
