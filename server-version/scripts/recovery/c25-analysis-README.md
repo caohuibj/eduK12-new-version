@@ -83,3 +83,12 @@ Raw logs, private journals, credentials and source evidence are not committed.
 
 Selected-video, native IndexedDB lifecycle, C24 browser acceptance, and C26
 capacity remain outside this supplement.
+
+A subsequent read-only comparison against the actual accepted receipt found
+`finalOriginalRowsPreserved` is the complete preservation object, not a Boolean.
+The contract now compares that object exactly to the final audit. Four affected
+contract checks (including one new check consuming the five pinned actual JSON
+artifacts) passed in `/tmp/c25-analysis-contract-02/targeted-tests.log`; receipt
+`34d3e8f9d00afa169eb0ce54f319fc320303aeedf3afe4949de6f2b138467de8` retains 13 equal
+before/after inputs and six source/runner copies. The unaffected oracle/driver
+and path-rejection tests were not rerun. No runtime attempt occurred.

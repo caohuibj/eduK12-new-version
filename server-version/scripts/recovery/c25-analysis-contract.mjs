@@ -20,7 +20,7 @@ const files={
  'frozen-inputs.json':'62d8155e8b609f5271b94242be6cd23172d6c179512d0d58c3f078bc0fc16eaa',
 }
 const phases=['missing-open','missing-probe','missing-consumers','missing-guards','missing-restore']
-const coreFlags=['apiStoppedAfterProbe','requestedPrefixPassed','finalSnapshotVerified','allPriorRowsPreserved','finalOriginalRowsPreserved','cleanupVerified','sourceUnchanged','inputsUnchanged','failureEvidenceUnchanged','priorContinuationEvidenceUnchanged','recoveryArchiveVerified']
+const coreFlags=['apiStoppedAfterProbe','requestedPrefixPassed','finalSnapshotVerified','allPriorRowsPreserved','cleanupVerified','sourceUnchanged','inputsUnchanged','failureEvidenceUnchanged','priorContinuationEvidenceUnchanged','recoveryArchiveVerified']
 function retained(value){
  assert.equal(value.retainedFacts.allOriginalRowsRetained,true);assert.equal(value.retainedFacts.oldRows,6529);assert.equal(value.retainedFacts.originalCheckpointRowsRetained,16)
  assert.equal(value.continuationRetainedFacts.allFailedRowsRetained,true);assert.equal(value.continuationRetainedFacts.oldRows,6582);assert.equal(value.continuationRetainedFacts.checkpointRows,17)
@@ -38,6 +38,7 @@ export function validateCoreFacts({receipt,snapshot,audit,restore,status}){
  assert.equal(Object.keys(snapshot.columns).length,217);assert.deepEqual(Object.keys(snapshot.projection).sort(),Object.keys(snapshot.columns).sort())
  assert.equal(Object.values(snapshot.projection).reduce((n,x)=>n+x.rows,0),6667)
  for(const [table,count]of Object.entries({training_attempt_checkpoints:21,composite_report_jobs:148,export_batches:42,export_artifacts:42,submission_idempotency_receipts:0,checkin_submission_idempotency_receipts:0}))assert.equal(snapshot.projection[table].rows,count,table)
+ assert.deepEqual(receipt.finalOriginalRowsPreserved,audit.retainedFacts);
  assert.equal(audit.passed,true);assert.equal(audit.mode,'final');assert.equal(audit.snapshotSha256,coreSnapshotSha256);retained(audit)
  assert.equal(restore.passed,true);assert.equal(restore.phase,'missing-restore');assert.equal(restore.currentRows,6667);retained(restore)
  assert.deepEqual(restore.restoredFullRows,{firstFailedRunFullRowsRetained:6582,secondFailedRunFullRowsRetained:6651,originalHTTP03FullRowsRetained:6529,allPostContinuationFullRowsEqual:true,tables:217,postContinuationRows:6667})
