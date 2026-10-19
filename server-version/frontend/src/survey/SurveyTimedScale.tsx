@@ -57,12 +57,13 @@ export function SurveyTimedScale({unit,answer,onAnswer,tracker,onTiming,index,on
   </section>
   const selected=Object.prototype.hasOwnProperty.call(answer,current.itemKey)
     ?answer[current.itemKey]:undefined
-  return <section className="rounded-xl border bg-slate-50 p-4 my-5 space-y-4"
+  return <section className="rounded-xl border bg-slate-50 p-4 my-5 space-y-4 survey-answer-panel"
     aria-label={'逐题施测：'+unit.title}>
     <h3 className="text-lg font-semibold">{unit.title}</h3>
     <p className="text-sm text-slate-600" role="status">
-      第 {index+1} / {unit.items.length} 题 · 本次按冻结的逐题施测协议记录浏览器观察时间
+      第 {index+1} / {unit.items.length} 题 · 本量表逐题呈现，并记录本次作答的浏览器时间
     </p>
+    <p className="survey-answer-guide">请选择符合实际情况的一项。可用“上一题”和“下一题”检查答案；切换题目不代表正式提交。</p>
     <progress className="w-full" max={Math.max(1,unit.items.length)}
       value={index+1} aria-label="量表施测进度"/>
     <fieldset className="rounded-lg border bg-white p-4 space-y-2">

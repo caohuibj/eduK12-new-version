@@ -1,0 +1,167 @@
+{
+  "browser": "Mac in-app Chromium; supplemental only",
+  "layouts": [
+    {
+      "page": "FORM",
+      "viewport": [
+        390,
+        900,
+        1
+      ],
+      "documentOverflow": false,
+      "questionFontPx": 16,
+      "optionOrFieldFontPx": 16,
+      "buttonHeights": [
+        44,
+        44,
+        44
+      ]
+    },
+    {
+      "page": "FORM",
+      "viewport": [
+        768,
+        900,
+        1
+      ],
+      "documentOverflow": false,
+      "questionFontPx": 16,
+      "optionOrFieldFontPx": 16,
+      "buttonHeights": [
+        44,
+        44,
+        44
+      ]
+    },
+    {
+      "page": "FORM",
+      "viewport": [
+        1440,
+        900,
+        1
+      ],
+      "documentOverflow": false,
+      "questionFontPx": 16,
+      "optionOrFieldFontPx": 16,
+      "buttonHeights": [
+        44,
+        44,
+        44
+      ]
+    },
+    {
+      "page": "SCALE",
+      "viewport": [
+        390,
+        900,
+        1
+      ],
+      "documentOverflow": false,
+      "questionFontPx": 16,
+      "optionOrFieldFontPx": 16,
+      "buttonHeights": [
+        44,
+        44,
+        44,
+        44
+      ]
+    },
+    {
+      "page": "SCALE",
+      "viewport": [
+        768,
+        900,
+        1
+      ],
+      "documentOverflow": false,
+      "questionFontPx": 16,
+      "optionOrFieldFontPx": 16,
+      "buttonHeights": [
+        44,
+        44,
+        44,
+        44
+      ]
+    },
+    {
+      "page": "SCALE",
+      "viewport": [
+        1440,
+        900,
+        1
+      ],
+      "documentOverflow": false,
+      "questionFontPx": 16,
+      "optionOrFieldFontPx": 16,
+      "buttonHeights": [
+        44,
+        44,
+        44,
+        44
+      ]
+    },
+    {
+      "page": "SJT",
+      "viewport": [
+        390,
+        900,
+        1
+      ],
+      "documentOverflow": false,
+      "questionFontPx": 16,
+      "optionOrFieldFontPx": 16,
+      "buttonHeights": [
+        44
+      ]
+    },
+    {
+      "page": "SJT",
+      "viewport": [
+        768,
+        900,
+        1
+      ],
+      "documentOverflow": false,
+      "questionFontPx": 16,
+      "optionOrFieldFontPx": 16,
+      "buttonHeights": [
+        44
+      ]
+    },
+    {
+      "page": "SJT",
+      "viewport": [
+        1440,
+        900,
+        1
+      ],
+      "documentOverflow": false,
+      "questionFontPx": 16,
+      "optionOrFieldFontPx": 16,
+      "buttonHeights": [
+        44
+      ]
+    }
+  ],
+  "focus": {
+    "element": "SJT refusal checkbox reached by Tab",
+    "outline": "rgb(15, 107, 104) solid 3px",
+    "offset": "3px"
+  },
+  "form": [
+    "Empty FINAL rejected by real API: answers.form.matrix.r1：必答题目未完成",
+    "Two selected matrix rows and synthetic textarea persisted through same-tab refresh and explicit resume",
+    "Complete FINAL confirmed by server",
+    "Refresh and explicit resume read existing completion receipt, no submit button"
+  ],
+  "scale": [
+    "Incomplete current tool blocked with original error",
+    "Both choices retained through previous/next navigation",
+    "Complete synthetic FINAL confirmed by server"
+  ],
+  "sjt": [
+    "Explicit refusal followed by ordinary choice exercised; awaiting final DOM confirmation"
+  ],
+  "nativeBlock": "Mac locked again before any S03 after PNG; native after screenshots/flows remain pending",
+  "artifactNote": "IAB fullPage image placed an offscreen fixed skip link inside its export. Read-only DOM showed active BODY, :focus false, transform translateY(-96px), link rect y=-86; exported fullPage painting is not proof of a viewport overlap."
+}

@@ -15,6 +15,7 @@ import { SurveyParticipantImage,type SurveyImageProof } from './SurveyParticipan
 import { resolveClientSurveyFlow,type PublicFlow } from './flow.client'
 import { resolveSurveyCheckpointDraft,sameSurveyCheckpointAnswers } from './checkpoint-recovery'
 import { readRecruitmentEntry, rememberRecruitmentEntry, clearRecruitmentEntry, isRecruitmentEntryToken } from './recruitment-entry'
+import './survey-participant.css'
 
 type ApiResult<T>={code:number|string;message:string;data:T|null}
 type Wave={id:string;title:string;ordinal:number;status:string;consentText:string;consentVersion:number;
@@ -199,8 +200,11 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purp
         onChange={e=>onChange(q.itemKey,e.target.value)}/>}
     </fieldset>
   }
-  return <section className="border rounded-xl bg-slate-50 p-4 my-5">
+  return <section className={'border rounded-xl bg-slate-50 p-4 my-5'+(purpose==='SURVEY'?' survey-answer-panel':'')}>
     <h3 className="text-lg font-semibold">{unit.title}</h3>
+    {purpose==='SURVEY'&&<p className="survey-answer-guide">{unit.kind==='SJT'
+      ?'请先阅读情境，再选择你的回答。标有 * 的内容为必答；如提供“不愿回答”，可按自身意愿选择。'
+      :'请按实际情况作答。标有 * 的内容为必答；矩阵题请逐行检查。翻页不代表正式提交。'}</p>}
     {unit.kind==='FORM'&&<div>
       <p className="text-sm mt-3" role="status">第 {activePage?currentIndex+1:0} / {visiblePages.length} 页
         （{purpose==='HUITEACHER'?'所有页面完成后一次性提交正式评价':'本研究所有页面完成后只提交一次正式答卷'}）</p>
@@ -828,17 +832,24 @@ export default function SurveyPublicApp(){
     })
     setHome(data.waves);setSelectedWave(null);setGeneral(null);setCompletion(null);setTask(null)
   })
+  // Timed cognitive administration retains the exact existing ancestor layout.
+  // Only peripheral siblings opt in, and that opt-in stops while a runner is active.
+  const panel=(base:string)=>cognitiveRunning?base:base+' survey-participant-panel'
+  const message=(base:string)=>cognitiveRunning?base:base+' survey-participant-message'
+  const action=(base:string)=>cognitiveRunning?base:base+' survey-participant-action'
   return <div className="min-h-screen bg-slate-50 text-slate-800">
+    {!cognitiveRunning&&<a className="survey-participant-skip" href="#survey-participant-content">跳至研究内容</a>}
     <header className="border-b bg-white"><div className="max-w-3xl mx-auto p-5">
       <h1 className="text-2xl font-semibold">Huisurvey</h1>
       <p className="text-sm text-slate-500">观风知微 · 研究参与</p></div></header>
-    <main className="max-w-3xl mx-auto p-4 sm:p-7 space-y-5">
+    <main id={cognitiveRunning?undefined:'survey-participant-content'} tabIndex={cognitiveRunning?undefined:-1}
+      className="max-w-3xl mx-auto p-4 sm:p-7 space-y-5">
       {loading&&<p role="status">正在读取研究说明…</p>}
-      {error&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{error}</p>}
-      {notice&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{notice}</p>}
-      {revoked&&!withdrawn&&<section className="border p-4 rounded-lg bg-white">
+      {error&&<p role="alert" className={message('border-l-4 border-red-600 bg-red-50 p-3')}>{error}</p>}
+      {notice&&<p role="status" className={message('border-l-4 border-teal-600 bg-teal-50 p-3')}>{notice}</p>}
+      {revoked&&!withdrawn&&<section className={panel('border p-4 rounded-lg bg-white')}>
         <p role="status">访问已撤销；仍可申请撤回研究数据。</p>
-        <button type="button" className="btn-secondary" disabled={busy} onClick={withdraw}>申请排除历史研究数据</button>
+        <button type="button" className={action('btn-secondary')} disabled={busy} onClick={withdraw}>申请排除历史研究数据</button>
       </section>}
       {withdrawn&&<p role="status" className="border-l-4 border-teal-600 p-4">
         您的研究数据撤回请求已被记录。后续统计和新导出将排除可定位回答。
@@ -847,9 +858,9 @@ export default function SurveyPublicApp(){
         <input className="input block w-full mt-2" autoComplete="off"
           aria-label="重新输入研究邀请凭证" value={entryToken}
           onChange={event=>setEntryToken(event.target.value.trim())}/>
-      </label><button type="button" className="btn-secondary" disabled={busy||!safePattern.test(publicId)}
+      </label><button type="button" className={action('btn-secondary')} disabled={busy||!safePattern.test(publicId)}
         onClick={recoverWithoutInvitation}>已有私密凭据 · 恢复作答或撤回数据</button></section>}
-      {info&&<><section className="bg-white rounded-xl border p-5">
+      {info&&<><section className={panel('bg-white rounded-xl border p-5')}>
         <h2 className="text-xl font-semibold">{info.project.name}</h2>
         <p className="my-3 whitespace-pre-wrap">{info.project.description}</p>
         <p className="text-sm">{info.project.collectionMode==='LINKED_WAVES'
@@ -862,7 +873,7 @@ export default function SurveyPublicApp(){
           })}（{groupWave.groupIpPolicy.timeZone}）。请在截止前完成提交；到期无宽限，暂停不延长窗口。
         </p>}
       </section>
-      {info.project.collectionMode==='LINKED_WAVES'&&!home&&!task&&!general&&!completion&&!revoked&&<section className="bg-white rounded-xl border p-5">
+      {info.project.collectionMode==='LINKED_WAVES'&&!home&&!task&&!general&&!completion&&!revoked&&<section className={panel('bg-white rounded-xl border p-5')}>
         <h3 className="font-semibold text-lg">已有研究编号 · 继续参加后续波次</h3>
         <p className="text-sm my-2">公开研究编号不是登录密码，必须同时提供本人私密恢复凭证。</p>
         <form onSubmit={recover} className="grid gap-3">
@@ -870,31 +881,31 @@ export default function SurveyPublicApp(){
             onChange={e=>setResearchCode(e.target.value)} autoComplete="off" placeholder="R-…"/></label>
           <label>私密恢复凭证<input className="input block w-full" type="password" autoComplete="off"
             value={accessCredential} onChange={e=>setAccessCredential(e.target.value)}/></label>
-          <button className="btn-primary" disabled={busy||!researchCode||!accessCredential}>读取我的波次任务</button>
+          <button className={action('btn-primary')} disabled={busy||!researchCode||!accessCredential}>读取我的波次任务</button>
         </form>
-        <button type="button" className="btn-secondary mt-3" disabled={busy||!researchCode||!accessCredential}
+        <button type="button" className={action('btn-secondary mt-3')} disabled={busy||!researchCode||!accessCredential}
           onClick={withdraw}>持原有研究凭证申请数据撤回（包括已撤销访问者）</button>
       </section>}
-      {info.project.collectionMode==='LINKED_WAVES'&&proofReceived&&<section className="bg-white rounded-xl border-2 border-teal-600 p-5">
+      {info.project.collectionMode==='LINKED_WAVES'&&proofReceived&&<section className={panel('bg-white rounded-xl border-2 border-teal-600 p-5')}>
         <h3 className="font-semibold text-lg">请保存研究身份</h3>
         <p className="text-sm">研究编号可供本项目数据匹配；<strong>私密恢复凭证不可交给研究者或其他人</strong>。页面关闭后不再显示原始密钥。</p>
         <p className="mt-3">研究编号</p><code className="block bg-slate-100 p-3 break-all">{researchCode}</code>
         <p className="mt-3">私密恢复凭证</p><code className="block bg-slate-100 p-3 break-all">{accessCredential}</code>
-        <button className="btn-secondary mt-3" type="button" onClick={()=>setProofReceived(false)}>
+        <button className={action('btn-secondary mt-3')} type="button" onClick={()=>setProofReceived(false)}>
           我已分别保存这两个凭证</button>
       </section>}
       {info.project.collectionMode==='SINGLE_UNLINKED'&&singleResume&&!task&&!general&&!completion&&
-        <section className="bg-white border rounded-xl p-4">
+        <section className={panel('bg-white border rounded-xl p-4')}>
           <h3 className="font-semibold">恢复本次单次匿名作答</h3>
           <p className="text-sm my-2">仅此浏览器标签可尝试恢复短期作答；不建立跨波次身份。公共设备请在完成后关闭标签。</p>
-          <button className="btn-secondary" type="button" disabled={busy} onClick={resumeSingle}>
+          <button className={action('btn-secondary')} type="button" disabled={busy} onClick={resumeSingle}>
             恢复本次作答／查看已完成回执</button>
         </section>}
       {home&&!task&&!general&&!completion&&info.project.collectionMode==='LINKED_WAVES'&&
-        <button type="button" className="btn-secondary" disabled={busy} onClick={revokeAccess}>
+        <button type="button" className={action('btn-secondary')} disabled={busy} onClick={revokeAccess}>
           停止后续研究参与并撤销未来访问权限（已收集数据不自动删除）
         </button>}
-      {!task&&!general&&!completion&&!revoked&&<section className="bg-white rounded-xl border p-5">
+      {!task&&!general&&!completion&&!revoked&&<section className={panel('bg-white rounded-xl border p-5')}>
         <h3 className="font-semibold text-lg">研究波次</h3>
         {!validEntry&&<label className="block text-sm my-3">缺少有效邀请凭证？从原研究邀请中复制 43 位凭证到这里。
           <input className="input block w-full mt-2" autoComplete="off"
@@ -907,7 +918,7 @@ export default function SurveyPublicApp(){
             <p className="text-sm text-slate-500">{wave.status==='OPEN'?'开放采集中':wave.status==='CLOSED'?'已结束':'尚未开放'}
               {wave.attempt?' · '+(wave.attempt.status==='COMPLETED'?'已完成':wave.attempt.status==='SCREENED_OUT'?'已筛除':'进行中'):''}</p>
           </div>
-          <button className="btn-secondary" disabled={busy||wave.attempt?.status==='SCREENED_OUT'||(wave.status!=='OPEN'&&!wave.attempt)}
+          <button className={action('btn-secondary')} disabled={busy||wave.attempt?.status==='SCREENED_OUT'||(wave.status!=='OPEN'&&!wave.attempt)}
             onClick={()=>chooseWave(wave)}>{wave.attempt?.status==='COMPLETED'?'查看回执':'选择本轮'}</button>
         </div>)}
         {selectedWave&&<div className="bg-slate-50 border rounded-lg p-4 mt-4 space-y-3">
@@ -919,23 +930,25 @@ export default function SurveyPublicApp(){
             onChange={e=>setAgreed(e.target.checked)}/>
             我已阅读并同意本轮研究说明及相应的数据关联范围。</label>
           {info.project.collectionMode==='LINKED_WAVES'&&!researchCode&&<button
-            className="btn-secondary" disabled={busy||!agreed||!validEntry}
+            className={action('btn-secondary')} disabled={busy||!agreed||!validEntry}
             onClick={()=>join(selectedWave)}>首次参加 · 领取随机研究编号</button>}
-          <button className="btn-primary" disabled={busy||!agreed||
+          <button className={action('btn-primary')} disabled={busy||!agreed||
             (info.project.collectionMode==='LINKED_WAVES'?(!researchCode||!accessCredential):!validEntry)}
             onClick={start}>{selectedWave.attempt?.status==='COMPLETED'?'查看完成情况':'开始或恢复本轮作答'}</button>
         </div>}
       </section>}
       {task&&!general&&<form className="space-y-5" onSubmit={submit}>
         <fieldset disabled={busy||finalSealed} className="space-y-5 min-w-0 border-0 p-0">
-        <div className="bg-white border rounded-xl p-4"><h3 className="font-semibold">本轮研究作答</h3>
+        <div className={panel('bg-white border rounded-xl p-4')}><h3 className="font-semibold">本轮研究作答</h3>
           <p className="text-sm text-slate-500">请按实际情况回答。研究内部计分不作为个人诊断反馈。</p>
-          <p className="text-xs text-slate-500 mt-2">未提交答案仅在当前浏览器标签页暂存，至多两小时；
-            关闭标签、使用其他设备或清理浏览器数据后无法恢复。公共电脑建议完成后立即退出。</p></div>
-        {task.checkpointPolicy?.enabled&&<section className="bg-white border rounded-xl p-4 space-y-2">
+          <p className="text-xs text-slate-500 mt-2">{task.checkpointPolicy?.enabled&&!cognitiveRunning
+            ?'本标签页会短期暂存未提交答案。若需在其他设备恢复，请先主动保存加密临时进度，并保管原有私密凭证。公共电脑建议完成后立即退出。'
+            :<>未提交答案仅在当前浏览器标签页暂存，至多两小时；
+              关闭标签、使用其他设备或清理浏览器数据后无法恢复。公共电脑建议完成后立即退出。</>}</p></div>
+        {task.checkpointPolicy?.enabled&&<section className={panel('bg-white border rounded-xl p-4 space-y-2')}>
           <p className="text-sm">此研究启用了可选服务器加密暂存：您可主动保存尚未完成的内容。
             每次最多 64KB，保存期 {task.checkpointPolicy.ttlHours} 小时；不计入研究 FINAL。</p>
-          <button type="button" className="btn-secondary" disabled={busy||cognitiveRunning} onClick={saveCheckpoint}>
+          <button type="button" className={action('btn-secondary')} disabled={busy||cognitiveRunning} onClick={saveCheckpoint}>
             保存加密临时进度（第 {checkpointRevision+1} 版）</button>
           <p className="text-xs text-slate-500">研究者不会通过此按钮获得正式作答，取消、撤回或最终提交后将按策略清理。
             仅拥有本研究合法私密凭证的当前参与者可以恢复。</p>
@@ -944,32 +957,39 @@ export default function SurveyPublicApp(){
         {cognitiveRunning&&<p role="status" className="text-sm">认知任务运行／提交期间不能切换外层研究步骤。请勿刷新或离开页面。</p>}
         {task.flow&&currentFlow?<>
           <p className="text-xs text-slate-500">研究流程 · 步骤 {Math.min(flowStep+1,currentFlow.blocks.length)} / {currentFlow.blocks.length}</p>
-          {flowBlock?.kind==='MATERIAL'&&<section className="bg-white border rounded-xl p-5 space-y-3">
+          {flowBlock?.kind==='MATERIAL'&&<section className={panel('bg-white border rounded-xl p-5 space-y-3')}>
             <h4 className="font-semibold">{flowBlock.title||'研究材料'}</h4>
             <p className="whitespace-pre-wrap text-sm">{flowBlock.body}</p>
           </section>}
           {flowBlock?.kind==='INSTRUMENT'&&flowUnit&&renderSurveyTask(flowUnit)}
-          {flowBlock?.kind==='END'&&<section className="bg-white border rounded-xl p-5">
+          {flowBlock?.kind==='END'&&<section className={panel('bg-white border rounded-xl p-5')}>
             <h4 className="font-semibold">{flowBlock.title||'本轮流程结束'}</h4>
             <p className="text-sm">{flowBlock.termination==='SCREEN_OUT'
               ?'当前路径为资格筛除，不形成测量 FINAL。'
               :'后续研究工具按冻结规则不予呈现，并标记为 NOT_SHOWN。'}</p>
           </section>}
-          {!finalFlowStep&&<button type="button" className="btn-secondary" disabled={busy||cognitiveRunning}
+          {!finalFlowStep&&<button type="button" className={action('btn-secondary')} disabled={busy||cognitiveRunning}
             onClick={advanceFlow}>确认当前步骤，继续研究</button>}
         </>:timedSequence&&flowUnit?<section className="space-y-3">
           <p className="text-xs text-slate-600" role="status">研究工具 {toolStep+1} / {task.units.length}</p>
           {renderSurveyTask(flowUnit)}
           <nav aria-label="研究工具导航" className="flex flex-wrap gap-3">
-            <button type="button" className="btn-secondary" disabled={toolStep===0||cognitiveRunning}
+            <button type="button" className={action('btn-secondary')} disabled={toolStep===0||cognitiveRunning}
               onClick={()=>{setError('');setToolStep(i=>Math.max(0,i-1))}}>上一工具</button>
-            {!finalFlowStep&&<button type="button" className="btn-secondary" disabled={cognitiveRunning}
+            {!finalFlowStep&&<button type="button" className={action('btn-secondary')} disabled={cognitiveRunning}
               onClick={advanceFlow}>确认当前工具，继续</button>}
           </nav>
         </section>:task.units.map(renderSurveyTask)}
         </fieldset>
-        {finalSealed&&<p role="status">本次答案已封存。结果未确认时请重试原提交，暂不能修改答案。</p>}
-        {(finalSealed||finalFlowStep)&&<button className="btn-primary" disabled={busy||cognitiveRunning||(!finalSealed&&!task.flow&&!task.units.every(unit=>{
+        {!cognitiveRunning&&!finalSealed&&<aside className="survey-submit-guide" aria-label="提交前检查">
+          <h3>提交前请检查</h3>
+          <p>{(currentFlow||timedSequence)&&!canAdvanceFlow()
+            ?'当前工具还有待完成的内容。请检查必答题、全部页面及任务提交状态，再继续。'
+            :'请检查所有必答题、矩阵每一行及全部页面。只有服务器确认整轮提交后，才会显示完成回执。'}</p>
+          <p>工具完成、临时暂存与整轮正式提交分别确认；这份提示不代替提交时的完整检查。</p>
+        </aside>}
+        {finalSealed&&<p role="status" className={message('')}>本次答案已封存。结果未确认时请重试原提交，暂不能修改答案。</p>}
+        {(finalSealed||finalFlowStep)&&<button className={action('btn-primary')} disabled={busy||cognitiveRunning||(!finalSealed&&!task.flow&&!task.units.every(unit=>{
           if(unit.kind!=='FORM')return true
           const vis=visibleFormKeys(unit.pages?.flatMap(p=>p.questions)||[],
             own(answers,unit.instrumentKey)??{})
@@ -977,23 +997,25 @@ export default function SurveyPublicApp(){
           return (own(formPages,unit.instrumentKey)??0)>=pages.length-1
         }))}>{currentFlow?.termination==='SCREEN_OUT'?'完成资格筛选':'提交本轮正式回答'}</button>}
       </form>}
-      {screenedOut&&!task&&<section className="bg-white border rounded-xl p-5 space-y-3">
+      {screenedOut&&!task&&<section className={panel('bg-white border rounded-xl p-5 space-y-3')}>
         <h2 className="text-lg font-semibold">本轮资格筛选已结束</h2>
         <p className="text-sm">未产生完整研究 FINAL；筛选路径不会作为有效测量样本统计。</p>
         {info.project.collectionMode==='LINKED_WAVES'
-          ?<button type="button" className="btn-secondary" disabled={busy}
+          ?<button type="button" className={action('btn-secondary')} disabled={busy}
               onClick={returnHome}>返回我的研究波次</button>
-          :<button type="button" className="btn-secondary" disabled={busy}
+          :<button type="button" className={action('btn-secondary')} disabled={busy}
               onClick={withdraw}>撤回本轮筛选记录</button>}
       </section>}
-      {completion&&!general&&<section className="bg-white border rounded-xl p-5 space-y-3">
+      {completion&&!general&&<section className={panel('bg-white border rounded-xl p-5 space-y-3')}>
         <h2 className="text-xl font-semibold">本轮研究已提交</h2>
+        <p className="survey-completion-state">整轮正式回答已由服务器确认保存</p>
         <p>正式回答已保存，完成回执尚未读取。</p>
-        <button type="button" className="btn-secondary" disabled={busy}
+        <button type="button" className={action('btn-secondary')} disabled={busy}
           onClick={()=>void run(()=>readCompletion(completion.attemptId,completion.proof))}>重试读取完成回执</button>
       </section>}
-      {general&&<section className="bg-white border rounded-xl p-5 space-y-3">
+      {general&&<section className={panel('bg-white border rounded-xl p-5 space-y-3')}>
         <h2 className="text-xl font-semibold">本轮研究已提交</h2>
+        <p className="survey-completion-state">整轮正式回答已由服务器确认保存</p>
         <p className="whitespace-pre-wrap">{general.text}</p>
         <p className="text-sm text-slate-600">{general.disclaimer}</p>
         {general.kind==='DESCRIPTIVE'&&<section className="border rounded-lg p-3 space-y-3" aria-label="本次表现描述性反馈">
@@ -1008,11 +1030,11 @@ export default function SurveyPublicApp(){
         <p className="text-xs">完成时间：{new Date(general.completedAt).toLocaleString('zh-CN')}</p>
         <div className="flex flex-wrap gap-3">
           {info.project.collectionMode==='LINKED_WAVES'&&<>
-            <button className="btn-secondary" disabled={busy} onClick={returnHome}>返回我的研究波次</button>
-            <button type="button" className="btn-secondary" disabled={busy} onClick={revokeAccess}>
+            <button className={action('btn-secondary')} disabled={busy} onClick={returnHome}>返回我的研究波次</button>
+            <button type="button" className={action('btn-secondary')} disabled={busy} onClick={revokeAccess}>
               只撤销未来访问（保留研究数据）</button>
           </>}
-          <button className="btn-secondary" type="button" disabled={busy} onClick={withdraw}>
+          <button className={action('btn-secondary')} type="button" disabled={busy} onClick={withdraw}>
             申请撤回本研究数据（排除未来统计）</button>
         </div>
       </section>}
