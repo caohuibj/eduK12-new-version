@@ -95,3 +95,37 @@ test('fixed read-only CLI and inherited process-group deadline are bound',()=>{
  assert.equal(inlinePythonSha256,createHash('sha256').update(INLINE_PYTHON).digest('hex'))
  for(const [index,value]of [[5,'/tmp/other'],[7,'restore'],[9,'c25-c26-audit-final']]){const bad=[...args];bad[index]=value;assert.throws(()=>invocation(bad))}
 })
+
+test('historical 73 ordinals and three exact parser definitions admit only the restored live snapshot once',()=>python(String.raw`
+source_file = ROOT / 'eduk12_c25_continuation_02/c25-missing-final-db-snapshot.json'
+receipt_file = ROOT / RESTORE_RECEIPT
+assert sha_file(source_file) == CORE_SNAPSHOT_SHA256 and sha_file(receipt_file) == RESTORE_RECEIPT_SHA256
+source, receipt = json.loads(source_file.read_text()), json.loads(receipt_file.read_text())
+expected = expected_restored_snapshot(source, receipt)
+assert expected != source
+assert expected['columnMetadata']['scales'][6]['ordinal'] == 7
+assert source['columnMetadata']['scales'][6]['ordinal'] == 8
+# Only the historical 73 physical ordinals and three full deparser byte strings.
+assert helper.old.old.old.old.restored_column_equivalence(source['columnMetadata'], expected['columnMetadata']) == receipt['restoreEquivalence']['columnOrdinals']
+changed = [(a, b) for a, b in zip(source['constraints'], expected['constraints']) if a != b]
+assert len(changed) == 3
+assert {k: v for k, v in source.items() if k not in ['columnMetadata', 'constraints']} == {k: v for k, v in expected.items() if k not in ['columnMetadata', 'constraints']}
+for field in ['columnMetadata', 'constraints', 'allPublicUserGuards']:
+    bad = copy.deepcopy(expected)
+    if field == 'columnMetadata': bad[field]['scales'][6]['ordinal'] = 8
+    elif field == 'constraints': bad[field][0]['definition'] += ' '
+    else: bad[field].append({'unknown': True})
+    reject(lambda: assert_schema(expected, bad), 'live schema changed')
+for field in ['columnOrdinals', 'constraintReparses']:
+    bad = copy.deepcopy(receipt); bad['restoreEquivalence'][field].pop()
+    reject(lambda: expected_restored_snapshot(source, bad), 'unknown historical')
+p, primary = fixtures()
+with tempfile.TemporaryDirectory() as temporary:
+    state = Path(temporary); private_json(state / PROTECTED_FILE, p)
+    admission = {'sourceSnapshotSha256': CORE_SNAPSHOT_SHA256, 'restoreReceiptSha256': RESTORE_RECEIPT_SHA256, 'actualWorkingSnapshotSha256': digest(p['snapshot']), 'historicalOrdinalDifferences': 73, 'historicalParserDifferences': 3, 'parserDdlExecuted': False}
+    private_json(state / (BASELINE_LABEL + '-result.json'), {'passed': True, 'mode': 'baseline', 'scope': SCOPE, 'protectedRowsFile': binding(state / PROTECTED_FILE), 'admission': admission})
+    assert read_protected(state, source, primary)[0] == p
+    # Subsequent protection is exact against the admitted actual schema.
+    bad = copy.deepcopy(p); bad['snapshot']['columnMetadata']['facts'][0]['ordinal'] += 1
+    reject(lambda: summary(p, primary, current=bad), 'live schema changed')
+`))

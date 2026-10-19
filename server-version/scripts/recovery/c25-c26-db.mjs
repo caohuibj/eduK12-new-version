@@ -15,6 +15,8 @@ export const CORE_SNAPSHOT_SHA256='2116f582580ab67d0c5f69330d73300b026a3eaeeacf9
 export const PRIMARY_SNAPSHOT_SHA256='f4e761419f5faf4a84befef265b4edff45d49d5a1d16a89cc09d039b1eed34b4'
 export const INLINE_PYTHON=String.raw`
 import argparse
+import copy
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -32,12 +34,15 @@ BASELINE_LABEL, PROTECTED_FILE = ${JSON.stringify(BASELINE_LABEL)}, 'c25-c26-pro
 WORKING, PRIMARY = 'eduk12_c25_joint_restore', 'eduk12_recovery'
 QUEUE, CHECKPOINTS = 'composite_report_queue_budget', 'training_attempt_checkpoints'
 SCOPE = 'C26_A_WORKING_6667_FULL_ROW_AND_PRIMARY_6708_EXACT_PROTECTION'
+RESTORE_RECEIPT = 'eduk12_c25_continuation_02/c25-missing-restore-result.json'
+RESTORE_RECEIPT_SHA256 = '6a57f6ae2d261a58b93fde9d1561282df1c6095bad0e7e9b00a85ae1076d868d'
 PINNED = {
     'eduk12_c25_continuation_02/c25-missing-final-db-snapshot.json': CORE_SNAPSHOT_SHA256,
     'eduk12_c25_analysis_02/c25-analysis-resume-final-db-snapshot.json': PRIMARY_SNAPSHOT_SHA256,
     'eduk12_c25_http_01/c25-original-rows-private.json': '0948a2bedad3c87c6dc27f4cd325f59d866c92e659332cdf427800a428d0697c',
     'eduk12_c25_continuation_01/c25-continuation-protected-rows-private.json': '231c52d48d8533d17ebbb9c9563b56c7be7652bdd99a061e20f82ebe8b725f16',
     'eduk12_c25_continuation_02/c25-missing-protected-rows-private.json': 'd149f7203b0f9b01bc7d80a2d422674b2b6af7cc2213b7435192087e63889304',
+    RESTORE_RECEIPT: RESTORE_RECEIPT_SHA256,
 }
 
 def private_json(file, value):
@@ -65,7 +70,7 @@ def evidence_inputs(state):
     original['validate_accepted_snapshot'](expected[0])
     assert len(expected[1]['columns']) == 217 and sum(v['rows'] for v in expected[1]['projection'].values()) == 6708
     assert expected[1]['projection'][CHECKPOINTS]['rows'] == 21
-    return expected[0], expected[1], references
+    return expected[0], expected[1], references, json.loads((ROOT / RESTORE_RECEIPT).read_text())
 
 def capture_live(db, state, label, mode):
     # Both full working captures are durable BEFORE any preservation assertion.
@@ -86,6 +91,38 @@ def primary_snapshot(db, state, label):
 
 def assert_quiescent(db):
     assert db.sql("SELECT count(*) FROM pg_stat_activity WHERE datname IN ('eduk12_c25_joint_restore','eduk12_recovery') AND pid<>pg_backend_pid()", 'postgres') == '0', 'API, driver, observer or another DB connection is still running'
+
+def expected_restored_snapshot(source, receipt):
+    # Admission only. The historical server already proved these exact parser
+    # pairs; no TEMP DDL or normalization is performed by this read-only audit.
+    assert receipt['passed'] is True and receipt['restrictedRoleVerified'] is True and receipt['sourceUnchangedDuringRestore'] is True
+    assert receipt['currentSnapshotSha256'] == digest(source), 'restore receipt source snapshot differs'
+    proof = receipt['restoreEquivalence']
+    assert set(proof) == {'columnOrdinals', 'constraintReparses'}
+    assert len(proof['columnOrdinals']) == 73 and digest(proof['columnOrdinals']) == 'a805204ce99aeafcd5ec97857f19a5ad02e05d2396f9f34324d03bf3b5b8838a', 'unknown historical ordinal proof'
+    assert len(proof['constraintReparses']) == 3 and digest(proof['constraintReparses']) == 'dc87f23a38b0498793dc094f39683fa34e3a4f6571bd38fde0cc5d6fe09595cc', 'unknown historical parser proof'
+    expected = copy.deepcopy(source)
+    for difference in proof['columnOrdinals']:
+        column = expected['columnMetadata'][difference['table']][difference['visibleRank'] - 1]
+        assert column['column'] == difference['column'] and column['ordinal'] == difference['sourceOrdinal']
+        assert difference['restoredOrdinal'] == difference['visibleRank']
+        column['ordinal'] = difference['restoredOrdinal']
+    login = "CHECK (((length(login_name) >= 4) AND (length(login_name) <= 32) AND (normalized_login = lower(TRIM(BOTH FROM login_name))) AND (normalized_login ~ '^[a-z0-9_.-]{4,32}$'::text)))"
+    definitions = {
+        ('campus_accounts', 'campus_accounts_login_shape_check'): login,
+        ('survey_accounts', 'survey_login_shape_check'): login,
+        ('huiteacher_improvement_actions', 'huiteacher_improvement_actions_cipher_check'): 'CHECK (((length(goal_cipher) >= 30) AND (length(goal_cipher) <= 30000) AND ((length(plan_cipher) >= 30) AND (length(plan_cipher) <= 100000))))',
+    }
+    for difference in proof['constraintReparses']:
+        matches = [c for c in expected['constraints'] if (c['table'], c['name']) == (difference['table'], difference['name'])]
+        assert len(matches) == 1
+        constraint = matches[0]
+        assert constraint['type'] == 'c' and hashlib.sha256(constraint['definition'].encode()).hexdigest() == difference['sourceDefinitionSha256']
+        definition = definitions[(difference['table'], difference['name'])]
+        assert hashlib.sha256(definition.encode()).hexdigest() == difference['restoredDefinitionSha256'] == difference['postgresReparsedDefinitionSha256']
+        assert difference['postgresReparsedDefinitionsIdentical'] is True and difference['temporaryDdlRolledBack'] is True
+        constraint['definition'] = definition
+    return expected
 
 def validate_baseline(protected, expected, primary, expected_primary):
     result = original['validate_protected'](protected, expected)
@@ -125,7 +162,10 @@ def read_protected(state, expected, expected_primary):
     file = private_file(state / PROTECTED_FILE)
     assert receipt['protectedRowsFile'] == binding(file), 'working baseline binding changed'
     protected = json.loads(file.read_text())
-    validate_baseline(protected, expected, expected_primary, expected_primary)
+    # Trust only the hash-bound successful admission's actual live snapshot.
+    # Future audits compare this exact schema; never reapply restore exceptions.
+    assert receipt['admission'] == {'sourceSnapshotSha256': CORE_SNAPSHOT_SHA256, 'restoreReceiptSha256': RESTORE_RECEIPT_SHA256, 'actualWorkingSnapshotSha256': digest(protected['snapshot']), 'historicalOrdinalDifferences': 73, 'historicalParserDifferences': 3, 'parserDdlExecuted': False}
+    validate_baseline(protected, protected['snapshot'], expected_primary, expected_primary)
     return protected, {str(receipt_file): sha_file(receipt_file), str(file): sha_file(file)}
 
 def main():
@@ -146,7 +186,7 @@ def main():
         'migrationRerun': False, 'newDatabaseRestoreExecuted': False, 'historicalBaselinesCopied': False}
     db, failure = None, None
     try:
-        expected, expected_primary, references = evidence_inputs(args.state)
+        expected, expected_primary, references, restore_receipt = evidence_inputs(args.state)
         result['inheritedEvidence'] = references
         helper = load_helper(DB_HELPER)
         db = helper.Database(args.tools, args.state)
@@ -159,7 +199,9 @@ def main():
         primary, result['primarySnapshotFile'] = primary_snapshot(db, args.state, args.label)
         assert_quiescent(db)
         if args.mode == 'baseline':
-            result['capture'] = validate_baseline(current, expected, primary, expected_primary)
+            admitted = expected_restored_snapshot(expected, restore_receipt)
+            result['capture'] = validate_baseline(current, admitted, primary, expected_primary)
+            result['admission'] = {'sourceSnapshotSha256': CORE_SNAPSHOT_SHA256, 'restoreReceiptSha256': RESTORE_RECEIPT_SHA256, 'actualWorkingSnapshotSha256': digest(current['snapshot']), 'historicalOrdinalDifferences': 73, 'historicalParserDifferences': 3, 'parserDdlExecuted': False}
             result['protectedRowsFile'] = rows_binding
         else:
             protected, baseline_bindings = read_protected(args.state, expected, expected_primary)
