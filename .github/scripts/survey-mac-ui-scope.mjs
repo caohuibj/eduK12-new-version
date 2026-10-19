@@ -11,6 +11,10 @@ export const surveyMacTools = [
 const sha = s => /^[a-f0-9]{40}$/.test(s || '');
 const git = args => execFileSync('git', args, {encoding:'utf8'}).trim();
 const object = (ref,path='') => git(['rev-parse',ref+':'+path]);
+export const knownSurveyManual = (event,ref) => event==='workflow_dispatch'&&ref==='refs/heads/survey/mac-visual-s01-20261019';
+export function rejectSurveyManual(env=process.env) {
+  if(knownSurveyManual(env.CI_EVENT,env.GITHUB_REF)) throw Error('Known Survey Mac candidate refuses every manual full/probe entry; only independently reviewed PR qualification is supported');
+}
 export function rawSurveyDiff(base,head) {
   const raw = execFileSync('git',['diff','--no-ext-diff','--no-textconv','--no-renames','--raw','--abbrev=40','-z',base,head,'--'],{encoding:'utf8'});
   if (!raw) return [];
@@ -67,8 +71,10 @@ export function surveyMacPlan(entries,base,head,env=process.env,io={}) {
   const inputs=Object.fromEntries(closurePaths.map(path=>[path,get(head,path)]));
   for(const path of closurePaths) if(inputs[path]!==get(reviewed,path)) return refuse('tools closure '+path);
   const selection=io.selection??JSON.parse(readFileSync(new URL('./survey-mac-ui-test-selection.json',import.meta.url),'utf8'));
-  const tests=b.files.filter(f=>f.category==='test').map(f=>f.path.replace('server-version/frontend/',''));
-  if(selection.schema!==1||tests.length!==11||JSON.stringify(selection.frontendTests)!==JSON.stringify(tests)||!selection.requiredRecoveryCases?.length) return refuse('test selection');
+  const tests=b.affectedFrontendTests?.map(f=>f.file)??[];
+  if(selection.schema!==1||tests.length!==21||new Set(tests).size!==21||JSON.stringify(selection.frontendTests)!==JSON.stringify(tests)||!selection.requiredRecoveryCases?.length) return refuse('test selection');
+  if(b.files.filter(f=>f.category==='test').some(f=>!tests.includes(f.path.replace('server-version/frontend/','')))) return refuse('changed test missing');
+  for(const test of b.affectedFrontendTests) if(!/^src\/.+\.test\.tsx?$/.test(test.file)||get(head,'server-version/frontend/'+test.file)!==test.blob) return refuse('affected test input '+test.file);
   return {schema:1,route:'survey-mac-ui',base,head,sourceHead:source,reviewedHead:reviewed,tree:get(head),productHead:b.productHead,
     frontendTree:b.frontendTree,changed:['frontend'],changes:full,inputs,frontendTests:tests,required:surveyMacRequired};
 }
@@ -78,7 +84,7 @@ export function validSurveyMacPlan(p) {
   return Boolean(p?.schema===1&&p.route==='survey-mac-ui'&&[p.base,p.head,p.sourceHead,p.reviewedHead,p.tree,p.productHead,p.frontendTree].every(sha)
     &&p.sourceHead===p.reviewedHead&&JSON.stringify(p.changed)==='["frontend"]'&&p.changes?.length===322
     &&p.base===b.base&&p.productHead===b.productHead&&p.frontendTree===b.frontendTree
-    &&p.frontendTests?.length===11&&JSON.stringify(p.frontendTests)===JSON.stringify(b.files.filter(f=>f.category==='test').map(f=>f.path.replace('server-version/frontend/','')))
+    &&p.frontendTests?.length===21&&JSON.stringify(p.frontendTests)===JSON.stringify(b.affectedFrontendTests.map(f=>f.file))
     &&p.inputs&&Object.keys(p.inputs).length===keys.length&&keys.every(k=>sha(p.inputs[k]))
     &&p.inputs['server-version/frontend']===b.frontendTree&&p.inputs['server-version/scripts/release']===b.protected['server-version/scripts/release']
     &&Object.entries(b.externalFixtures).every(([k,v])=>p.inputs[k]===v)

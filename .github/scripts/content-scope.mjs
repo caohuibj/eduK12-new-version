@@ -1,4 +1,4 @@
-import {surveyMacPlan} from './survey-mac-ui-scope.mjs';
+import {surveyMacPlan,rejectSurveyManual} from './survey-mac-ui-scope.mjs';
 import {reviewedCandidatePlan} from './reviewed-candidate-scope.mjs';
 import {surveyCandidatePlan} from './survey-candidate-scope.mjs';
 import {sharedAssetStoragePlan} from './shared-asset-storage-scope.mjs';
@@ -223,6 +223,7 @@ export function runnerPlan({ profile = 'hosted', scenario = 'platform' } = {}) {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const event = process.env.CI_EVENT;
   const base = process.env.CI_BASE_SHA;
+  rejectSurveyManual();
   // Admission is also checked in job.if before checkout.
   if (event === 'pull_request' && process.env.CI_PR_REPOSITORY !== process.env.GITHUB_REPOSITORY)
     throw new Error('External PRs require a separately approved isolated workflow');

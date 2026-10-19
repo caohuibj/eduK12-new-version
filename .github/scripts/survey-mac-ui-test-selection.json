@@ -1,16 +1,26 @@
 {
   "schema": 1,
   "frontendTests": [
+    "src/pages/admin/SurveyCatalogGrants.boundary.test.tsx",
+    "src/pages/admin/SurveyCatalogGrants.test.tsx",
     "src/pages/admin/SurveyResearchersAdmin.links.test.tsx",
     "src/pages/admin/SurveyResearchersAdmin.workspace.test.tsx",
+    "src/survey/ResearchCatalog.test.tsx",
     "src/survey/SurveyAnalyticsWorkspace.download.test.tsx",
     "src/survey/SurveyAnalyticsWorkspace.recovery.test.tsx",
     "src/survey/SurveyApp.admin-entry.test.tsx",
     "src/survey/SurveyApp.entry.test.tsx",
     "src/survey/SurveyAuthoringGuidance.test.tsx",
     "src/survey/SurveyBuilder.test.tsx",
+    "src/survey/SurveyFormPagination.test.tsx",
     "src/survey/SurveyImportIssueLocations.test.tsx",
     "src/survey/SurveyMatrixNames.test.tsx",
+    "src/survey/SurveyMeasurement.extension.test.tsx",
+    "src/survey/SurveyPublicApp.cognitive.test.tsx",
+    "src/survey/SurveyPublicApp.final.test.tsx",
+    "src/survey/SurveyPublicApp.group-ip.test.tsx",
+    "src/survey/SurveyTimedScale.test.tsx",
+    "src/survey/SurveyWorkspace.lifecycle.test.tsx",
     "src/survey/SurveyWorkspace.requests.test.tsx"
   ],
   "requiredRecoveryCases": [

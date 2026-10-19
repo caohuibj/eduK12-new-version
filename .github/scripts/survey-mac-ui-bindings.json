@@ -2808,5 +2808,161 @@
   "externalFixtures": {
     "server-version/cognitive-randomization-golden-v1.json": "5b3cb7c11138044ad6a85626e74004bea2a3e62a",
     "server-version/backend/src/modules/cognitive/generated/identities.json": "dc7aa603721cdea46de7e0ed93f04ba9679a02e4"
-  }
+  },
+  "affectedFrontendTests": [
+    {
+      "file": "src/pages/admin/SurveyCatalogGrants.boundary.test.tsx",
+      "blob": "2046f6a0b421e2fc9986d15c0ecca8b08bc183cc",
+      "directImports": [
+        "src/pages/admin/SurveyCatalogGrants.tsx"
+      ]
+    },
+    {
+      "file": "src/pages/admin/SurveyCatalogGrants.test.tsx",
+      "blob": "08f580929833ed183a6f7acbd7d612fadf33580c",
+      "directImports": [
+        "src/pages/admin/SurveyCatalogGrants.tsx"
+      ]
+    },
+    {
+      "file": "src/pages/admin/SurveyResearchersAdmin.links.test.tsx",
+      "blob": "957862c9fdaf72eb9878ae50e09134814f4c7ec5",
+      "directImports": [
+        "src/pages/admin/SurveyResearchersAdmin.tsx"
+      ]
+    },
+    {
+      "file": "src/pages/admin/SurveyResearchersAdmin.workspace.test.tsx",
+      "blob": "894db70f0f9a154259c218c5a5c15f04d1f3895a",
+      "directImports": [
+        "src/pages/admin/SurveyResearchersAdmin.tsx",
+        "src/pages/admin/SurveyCatalogGrants.tsx"
+      ]
+    },
+    {
+      "file": "src/survey/ResearchCatalog.test.tsx",
+      "blob": "3e9f3d737b49d6489f5a9466e3b62dfaa76cd1c6",
+      "directImports": [
+        "src/pages/admin/SurveyCatalogGrants.tsx",
+        "src/survey/SurveyBuilder.tsx"
+      ]
+    },
+    {
+      "file": "src/survey/SurveyAnalyticsWorkspace.download.test.tsx",
+      "blob": "33eea2985741fd15fa4d52a5b45f5c4a53a9b721",
+      "directImports": [
+        "src/survey/SurveyAnalyticsWorkspace.tsx"
+      ]
+    },
+    {
+      "file": "src/survey/SurveyAnalyticsWorkspace.recovery.test.tsx",
+      "blob": "4c72b6f83bf99705058e61722b25b6e17487aa08",
+      "directImports": [
+        "src/survey/SurveyAnalyticsWorkspace.tsx"
+      ]
+    },
+    {
+      "file": "src/survey/SurveyApp.admin-entry.test.tsx",
+      "blob": "0ee50ffa70d71b385fadb786a9ed8a53f83d5d5d",
+      "directImports": [
+        "src/survey/SurveyApp.tsx"
+      ]
+    },
+    {
+      "file": "src/survey/SurveyApp.entry.test.tsx",
+      "blob": "5c96f593ff69e0ebd896294046a158cc294cef28",
+      "directImports": [
+        "src/survey/SurveyApp.tsx"
+      ]
+    },
+    {
+      "file": "src/survey/SurveyAuthoringGuidance.test.tsx",
+      "blob": "efbacd7d97710af73ad06985f7485cddd88c5adf",
+      "directImports": [
+        "src/survey/SurveyBuilder.tsx"
+      ]
+    },
+    {
+      "file": "src/survey/SurveyBuilder.test.tsx",
+      "blob": "569dc6368349fb6ef0723b2018a073c91def1fde",
+      "directImports": [
+        "src/survey/ResearchPreview.tsx"
+      ]
+    },
+    {
+      "file": "src/survey/SurveyFormPagination.test.tsx",
+      "blob": "47d3d5c61e4d6dda8cf8fb3b7ce39ead4339f018",
+      "directImports": [
+        "src/survey/SurveyPublicApp.tsx"
+      ]
+    },
+    {
+      "file": "src/survey/SurveyImportIssueLocations.test.tsx",
+      "blob": "6158e5b37d8fc4889264baf4a417d9f8ed365a46",
+      "directImports": [
+        "src/survey/SurveyBuilder.tsx",
+        "src/survey/ResearchIssueList.tsx",
+        "src/survey/authoring-issue-location.ts"
+      ]
+    },
+    {
+      "file": "src/survey/SurveyMatrixNames.test.tsx",
+      "blob": "8ee54c76f84e6746a44d876f1a404d8bcefcf117",
+      "directImports": [
+        "src/survey/ResearchPreview.tsx",
+        "src/survey/SurveyPublicApp.tsx"
+      ]
+    },
+    {
+      "file": "src/survey/SurveyMeasurement.extension.test.tsx",
+      "blob": "4dd5920257b53832b865f85839af8ffbec823a4a",
+      "directImports": [
+        "src/survey/ResearchPreview.tsx",
+        "src/survey/SurveyPublicApp.tsx"
+      ]
+    },
+    {
+      "file": "src/survey/SurveyPublicApp.cognitive.test.tsx",
+      "blob": "62f038d92291a41f5dd27d937ba21a9e4c177cab",
+      "directImports": [
+        "src/survey/SurveyPublicApp.tsx"
+      ]
+    },
+    {
+      "file": "src/survey/SurveyPublicApp.final.test.tsx",
+      "blob": "5c82eb7719464edd571c55a4d9ac928f17abf587",
+      "directImports": [
+        "src/survey/SurveyPublicApp.tsx"
+      ]
+    },
+    {
+      "file": "src/survey/SurveyPublicApp.group-ip.test.tsx",
+      "blob": "5cf3fce83661b3f2506ecf84c26830d396872486",
+      "directImports": [
+        "src/survey/SurveyPublicApp.tsx"
+      ]
+    },
+    {
+      "file": "src/survey/SurveyTimedScale.test.tsx",
+      "blob": "ba0bdddec1ee219ed3935dfdaea6bda53980fd26",
+      "directImports": [
+        "src/survey/SurveyTimedScale.tsx"
+      ]
+    },
+    {
+      "file": "src/survey/SurveyWorkspace.lifecycle.test.tsx",
+      "blob": "429da79213ce47870ce271639a21b0517052d4a6",
+      "directImports": [
+        "src/survey/SurveyBuilder.tsx",
+        "src/survey/SurveyAnalyticsWorkspace.tsx"
+      ]
+    },
+    {
+      "file": "src/survey/SurveyWorkspace.requests.test.tsx",
+      "blob": "353b8abc835835caad435bb225c652778ccc5c20",
+      "directImports": [
+        "src/survey/SurveyApp.tsx"
+      ]
+    }
+  ]
 }

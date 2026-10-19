@@ -35,7 +35,8 @@ async function scene(mode,width=1440){
  contexts.push(ctx);const page=await ctx.newPage();lastPage=page;page.setDefaultTimeout(12000);
  const s={calls:[],errors:[],posts:[],reads:[],downloads:[],tickets:new Map(),serial:0,readMode:null,postMode:null,delay:null,cutoff:'2031-12-31T23:59:59.000Z',revision:7};
  page.on('pageerror',e=>s.errors.push(e.message));
- await page.clock.install({time:new Date('2032-01-02T03:04:05.000Z')});
+ await page.clock.install({time:new Date('2032-01-02T03:04:04.000Z')});
+ await page.clock.pauseAt(new Date('2032-01-02T03:04:05.000Z'));
  await ctx.route('**/*',async route=>{
   const req=route.request(),u=new URL(req.url()),method=req.method();
   let body;try{body=req.postData()?req.postDataJSON():undefined;}catch{body='NON_JSON';}
@@ -51,6 +52,7 @@ async function scene(mode,width=1440){
    if(key==='GET /api/survey/auth/csrf'){emptyBody(method,body);return response({csrfToken:'synthetic-csrf'});}
    if(key==='POST /api/survey/auth/mfa/step-up'){assert.deepEqual(body,{code:'123456'});return response({verified:true});}
    if(key==='GET /api/survey/projects?page=1'){emptyBody(method,body);return response({list:[project]});}
+   if(key==='GET '+prefix){emptyBody(method,body);return response(project);}
    if(key==='GET '+prefix+'/instruments?page=1'){emptyBody(method,body);return response({list:[form]});}
    if(key==='GET '+prefix+'/catalog?page=1'){emptyBody(method,body);return response({list:[]});}
    if(key==='GET '+prefix+'/waves?page=1'){emptyBody(method,body);return response({list:[wave]});}
@@ -78,6 +80,7 @@ async function scene(mode,width=1440){
     return response({id:ticket.id,format:ticket.format,csv,codebook:{variables:[{key:'trial'},{key:'value'}]},manifest:ticket.manifest});
    }
    if(key==='GET /api/auth/me'){emptyBody(method,body);return response({id:1,username:'synthetic-admin',name:'合成管理员',role:'ADMIN',mustChangePassword:false});}
+   if(key==='GET /api/capabilities'){emptyBody(method,body);return response({cognitive:true,parentPortal:false});}
    if(key==='GET /api/platform/survey/researchers?page=1'){emptyBody(method,body);return response({list:[{id:'r1',username:'合成研究者',status:'ACTIVE',createdAt:'2032-01-01T00:00:00Z'}]});}
    if(key==='GET /api/platform/survey/researcher-invitations?page=1'){emptyBody(method,body);return response({list:[]});}
    if(key==='GET /api/platform/survey/source-catalog?kind=SCALE&page=1'){emptyBody(method,body);return response({list:[],page:1,hasMore:false,terminalReason:'END_OF_CATALOG'});}
@@ -107,8 +110,11 @@ async function openResearch(width=1440){
  const v=await scene('researcher',width);await v.page.goto(survey+'/workspace');
  await v.page.getByRole('button',{name:'查看/编辑',exact:true}).click();
  await v.page.getByRole('tab',{name:'研究数据',exact:true}).click();
- await v.page.getByLabel('数据格式',{exact:true}).selectOption('COGNITIVE_TRIAL_LONG');
- await v.page.getByLabel('波次',{exact:true}).selectOption(waveId);
+ const exportPanel=v.page.getByRole('heading',{name:'匿名科研数据导出',exact:true}).locator('..');
+ assert.equal(await exportPanel.count(),1,'one heading-identified export panel');
+ assert.equal(await exportPanel.getByLabel('波次',{exact:true}).count(),1,'one export wave selector');
+ await exportPanel.getByLabel('数据格式',{exact:true}).selectOption('COGNITIVE_TRIAL_LONG');
+ await exportPanel.getByLabel('波次',{exact:true}).selectOption(waveId);
  return v;
 }
 const click=(page,name)=>page.getByRole('button',{name,exact:true}).click();

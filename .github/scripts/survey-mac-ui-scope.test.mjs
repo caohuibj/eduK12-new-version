@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {admitsSurveyMac,surveyMacTools,surveyMacRequired,validSurveyMacPlan,surveyMacPlan} from './survey-mac-ui-scope.mjs';
+import {admitsSurveyMac,surveyMacTools,surveyMacRequired,validSurveyMacPlan,surveyMacPlan,knownSurveyManual,rejectSurveyManual} from './survey-mac-ui-scope.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const sha='a'.repeat(40), other='b'.repeat(40);
 const bindings={schema:1,files:[{path:'docs/synthetic-evidence.py.txt',status:'A',oldMode:'000000',newMode:'100644',before:'0'.repeat(40),after:sha},
@@ -36,7 +36,7 @@ test('full frozen inventory closes protected inputs, checkout/source/tree and al
     if(path in b.protected)return b.protected[path];
     if(path in b.externalFixtures)return b.externalFixtures[path];
     const f=b.files.find(f=>f.path===path);
-    return f?(ref===b.base?f.before:f.after):sha;
+    return f?(ref===b.base?f.before:f.after):(b.affectedFrontendTests.find(t=>'server-version/frontend/'+t.file===path)?.blob??sha);
   };
   const io={bindings:b,selection,object,diff:()=>full};
   const plan=surveyMacPlan(full,b.base,head,env,io);assert.ok(validSurveyMacPlan(plan));
@@ -49,13 +49,17 @@ test('full frozen inventory closes protected inputs, checkout/source/tree and al
   assert.throws(()=>surveyMacPlan(full,b.base,head,env,{...io,object:(ref,file)=>ref===head&&file==='.github'?other:object(ref,file)}),/tools closure/);
   assert.throws(()=>surveyMacPlan(full.slice(1),b.base,head,env,io),/incomplete supplied diff/);
   assert.throws(()=>surveyMacPlan(full,b.base,head,env,{...io,selection:{...selection,frontendTests:[]}}),/test selection/);
+  assert.equal(plan.frontendTests.length,21);
+  const unchanged=b.affectedFrontendTests.find(t=>!b.files.some(f=>f.path==='server-version/frontend/'+t.file));
+  assert.ok(unchanged);
+  assert.throws(()=>surveyMacPlan(full,b.base,head,env,{...io,object:(ref,path)=>ref===head&&path==='server-version/frontend/'+unchanged.file?other:object(ref,path)}),/affected test input/);
   const push=surveyMacPlan(full,b.base,head,{...env,CI_EVENT:'push',CI_SURVEY_MAC_SOURCE_HEAD:undefined},io);assert.equal(push.sourceHead,reviewed);
 });
 const fixed=JSON.parse(readFileSync(new URL('./survey-mac-ui-bindings.json',import.meta.url)));
 const p={schema:1,route:'survey-mac-ui',base:fixed.base,head:sha,sourceHead:sha,reviewedHead:sha,tree:sha,productHead:fixed.productHead,frontendTree:fixed.frontendTree,
   changed:['frontend'],changes:[...fixed.files.map(f=>({...f,file:f.path})),...surveyMacTools.map(file=>({file,status:'M',oldMode:'100644',newMode:'100644',before:other,after:sha}))],
   inputs:{'.github':sha,'server-version/frontend':fixed.frontendTree,'server-version/scripts/release':fixed.protected['server-version/scripts/release'],...fixed.externalFixtures},
-  frontendTests:fixed.files.filter(f=>f.category==='test').map(f=>f.path.replace('server-version/frontend/','')),required:surveyMacRequired};
+  frontendTests:fixed.affectedFrontendTests.map(f=>f.file),required:surveyMacRequired};
 const outputs={application_route:'survey-mac-ui',scenario:'survey-mac-ui',survey_mac_ui_plan:JSON.stringify(p),codeql:'true',runner_profile:'hosted',media_selection:'[]',media_groups:'[]',
   ...Object.fromEntries(['frontend_build','ui_required','visual_hosted','maintenance','content','presentation','frontend','frontend_test','documentation','scale','cognitive','situational','bundle','media2','media7','situational_video','situational_branching','video_core','app_shell','canonical_visual','perf_smoke','ops'].map(k=>[k,'false']))};
 const needs={scope:{result:'success',outputs},'survey-mac-ui':{result:'success'},codeql:{result:'success'}};
@@ -86,4 +90,46 @@ test('workflow topology preserves main-only pushes and confines exact Survey qua
   assert.match(route,/HIGH,CRITICAL/);assert.match(route,/chromium, webkit/);
   assert.match(route,/result !== 'success'/);assert.match(route,/runtime\.tar/);
   assert.doesNotMatch(route,/local-validation|backend-candidate|migrate deploy/);
+});
+test('browser fixture binds the export wave to its real heading panel and exact project-detail DTO',()=>{
+  const browser=readFileSync(new URL('./survey-mac-ui-browser.mjs',import.meta.url),'utf8');
+  const workspace=readFileSync(new URL('../../server-version/frontend/src/survey/SurveyAnalyticsWorkspace.tsx',import.meta.url),'utf8');
+  const studio=readFileSync(new URL('../../server-version/frontend/src/survey/SurveyWaveStudio.tsx',import.meta.url),'utf8');
+  assert.match(workspace,/<h3[^>]*>匿名科研数据导出<\/h3>/);
+  assert.match(browser,/const exportPanel=v\.page\.getByRole\('heading',\{name:'匿名科研数据导出',exact:true\}\)\.locator\('\.\.'\)/);
+  assert.match(browser,/exportPanel\.getByLabel\('波次',\{exact:true\}\)\.count\(\),1/);
+  assert.match(browser,/await exportPanel\.getByLabel\('波次',\{exact:true\}\)\.selectOption\(waveId\)/);
+  assert.doesNotMatch(browser,/v\.page\.getByLabel\('波次'/);
+  assert.match(studio,/surveyApi<Project>\(path\)/);
+  assert.match(browser,/if\(key==='GET '\+prefix\)\{emptyBody\(method,body\);return response\(project\);\}/);
+  assert.match(browser,/const project=\{id,title:'合成研究',description:'合成测试，不含真实被试',collectionMode:'SINGLE_UNLINKED',status:'DRAFT',revision:7\}/);
+});
+test('browser initialization has exact admin capability DTO and pauses a whole-second clock before navigation',()=>{
+  const browser=readFileSync(new URL('./survey-mac-ui-browser.mjs',import.meta.url),'utf8');
+  const capabilities=readFileSync(new URL('../../server-version/frontend/src/contexts/CapabilitiesContext.tsx',import.meta.url),'utf8');
+  assert.match(capabilities,/typeof response\.data\?\.cognitive !== 'boolean'/);
+  assert.match(capabilities,/typeof response\.data\?\.parentPortal !== 'boolean'/);
+  assert.match(browser,/if\(key==='GET \/api\/capabilities'\)\{emptyBody\(method,body\);return response\(\{cognitive:true,parentPortal:false\}\);\}/);
+  const install=browser.indexOf("await page.clock.install({time:new Date('2032-01-02T03:04:04.000Z')})");
+  const pause=browser.indexOf("await page.clock.pauseAt(new Date('2032-01-02T03:04:05.000Z'))");
+  assert.ok(install>=0&&pause>install&&pause<browser.indexOf("await ctx.route('**/*'"));
+  assert.match(browser,/noAutomatic\(v,900001\)/);assert.match(browser,/noAutomatic\(v,120001\)/);
+});
+test('known Survey PR remains eligible but every manual full/probe entry refuses before heavy jobs',()=>{
+  const ref='refs/heads/survey/mac-visual-s01-20261019';
+  for(const event of ['pull_request','push'])assert.equal(knownSurveyManual(event,ref),false);
+  for(const inputs of [{full_acceptance:'true',step_probe:'none'},...['images','frontend','backend','browser','maintenance','cognitive'].map(step_probe=>({step_probe}))]) {
+    assert.equal(knownSurveyManual('workflow_dispatch',ref),true);
+    assert.throws(()=>rejectSurveyManual({CI_EVENT:'workflow_dispatch',GITHUB_REF:ref,...inputs}),/refuses every manual full\/probe/);
+    assert.doesNotThrow(()=>rejectSurveyManual({CI_EVENT:'workflow_dispatch',GITHUB_REF:'refs/heads/other',...inputs}));
+  }
+  const ci=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+  assert.match(ci,/known-survey-manual-refusal:\n    if: github\.event_name == 'workflow_dispatch' && github\.ref == 'refs\/heads\/survey\/mac-visual-s01-20261019'/);
+  const jobs=[...ci.matchAll(/^  ([a-z][a-z0-9-]*):\n([\s\S]*?)(?=^  [a-z][a-z0-9-]*:\n|$(?![\s\S]))/gm)];
+  const protectedJobs=jobs.filter(j=>j[1].startsWith('probe-')||['scope','merge-gate'].includes(j[1]));
+  assert.equal(protectedJobs.length,17);
+  for(const [,name,body] of protectedJobs) {
+    const condition=body.split('\n').find(line=>line.startsWith('    if:'));
+    assert.ok(condition?.includes("!(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019')"),name);
+  }
 });
