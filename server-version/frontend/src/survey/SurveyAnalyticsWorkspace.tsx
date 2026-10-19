@@ -96,6 +96,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
   const [format,setFormat]=useState<ExportFormat>('RAW_WAVE'),[waveId,setWaveId]=useState('')
   const [exportWaveId,setExportWaveId]=useState('')
   const [downloadsStarted,setDownloadsStarted]=useState<Partial<Record<DownloadPart,boolean>>>({})
+  const [downloadIssue,setDownloadIssue]=useState<string|null>(null)
   const [completedFrom,setCompletedFrom]=useState(''),[completedBefore,setCompletedBefore]=useState('')
   const [otp,setOtp]=useState(''),[busy,setBusy]=useState(false)
   const [includeFreeText,setIncludeFreeText]=useState(false),[message,setMessage]=useState('')
@@ -127,7 +128,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
       .catch(e=>setError(e instanceof Error?e.message:'研究分析尚不可用'))
   },[projectId])
   const execute=async(fn:()=>Promise<void>)=>{
-    setBusy(true);setError('');setMessage('')
+    setBusy(true);setError('');setMessage('');setDownloadIssue(null)
     try{await fn()}catch(e){setError(e instanceof Error?e.message:'请求未完成')}finally{setBusy(false)}
   }
   const loadQuality=async(page=qualityPage)=>{
@@ -219,6 +220,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
       :'第 '+(result.pageNumber||1)+' 批有效 FINAL 已生成；逐批下载并保留 Manifest。')
   })
   const download=(part:DownloadPart)=>{if(!ticket)return;void execute(async()=>{
+    try{
     const label=downloadParts.find(([key])=>key===part)![1]
     let artifact:Artifact
     try{
@@ -239,11 +241,12 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
     }catch{throw new Error(label+' 下载发起结果未确认，请先核对浏览器下载列表，再重试此文件。')}
     setDownloadsStarted(previous=>({...previous,[part]:true}))
     setMessage('已发起 '+filename+' 下载。请在浏览器下载列表核对是否保存；网页无法确认文件已落盘。若被取消或拦截，请重试此文件。')
+    }catch(e){setDownloadIssue(e instanceof Error?e.message:'文件下载结果未确认，请核对浏览器下载列表。');throw e}
   })}
   return <section className="border rounded-xl bg-white p-4 sm:p-6 my-5 space-y-4" aria-label="研究数据">
     <header><h2 className="text-xl font-semibold">研究数据 · Wave Analytics</h2>
       <p className="text-sm text-slate-600">完成与配对统计只来源于可核对的加密 Survey FINAL；研究编号数不等于经过实名验证的自然人数。</p></header>
-    {error&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{error}</p>}
+    {error&&(!downloadIssue||!ticket)&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{error}</p>}
     {message&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{message}</p>}
     <fieldset disabled={busy} className="min-w-0 border-0 p-0 space-y-4" aria-label="研究数据操作">
     <button className="btn-secondary" disabled={busy} onClick={()=>void execute(reload)}>刷新完成进度</button>
@@ -492,13 +495,14 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
             onChange={e=>{setIncludeFreeText(e.target.checked);setTicket(null)}}/>
           包含自由文本原始回答（可能含姓名、班级或间接身份线索）。默认不导出，需要确认本项目知情同意覆盖该用途，并妥善控制保存与共享。
         </label>}
-        {ticket&&<div className="border rounded-lg p-3 space-y-2">
+        {ticket&&<div role="region" aria-label="当前导出批次" className="border rounded-lg p-3 space-y-2">
           <p className="text-sm">导出 {ticket.format} · 第 {ticket.pageNumber||1} 批 · {ticket.manifest.rowCount} 行 ·
             {ticket.manifest.columnCount} 列</p>
           <p className="text-xs">到期：{new Date(ticket.expiresAt).toLocaleString('zh-CN')}</p>
           {isCompactAttendance(ticket)&&
             <p className="text-xs text-amber-800">本批为独立参与状态表，不是逐题答案；请保留 Manifest 的关联说明。</p>}
           <p className="text-xs">本批提供 3 个独立文件：CSV、变量编码字典 Codebook、Manifest。逐个点击下载；浏览器可能要求许可或选择保存位置。</p>
+          {downloadIssue&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{downloadIssue}</p>}
           <div className="flex flex-wrap gap-2">{downloadParts.map(([part,label])=><div key={part}>
             <button type="button" className="btn-secondary" disabled={busy} onClick={()=>download(part)}>
               {downloadsStarted[part]?'重新发起 ':'下载 '}{label}</button>

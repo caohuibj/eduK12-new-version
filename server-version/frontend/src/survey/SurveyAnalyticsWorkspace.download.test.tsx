@@ -1,4 +1,4 @@
-import {fireEvent,render,screen,waitFor} from '@testing-library/react'
+import {fireEvent,render,screen,waitFor,within} from '@testing-library/react'
 import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest'
 import {SurveyAnalyticsWorkspace} from './SurveyAnalyticsWorkspace'
 
@@ -197,6 +197,8 @@ describe('Survey analytics artifact downloads',()=>{
     fireEvent.click(await screen.findByRole('button',{name:'创建受控导出'}))
     fireEvent.click(await screen.findByRole('button',{name:'下载 Codebook'}))
     expect(await screen.findByRole('alert')).toHaveTextContent('Codebook 内容获取失败，尚未发起本次文件下载')
+    expect(within(screen.getByRole('region',{name:'当前导出批次'})).getByRole('alert')).toHaveTextContent('Codebook 内容获取失败')
+    expect(screen.getAllByRole('alert')).toHaveLength(1)
     expect(downloads).toHaveLength(0)
     expect(screen.getByText('Codebook：尚未发起')).toBeInTheDocument()
     expect(requests.filter(r=>r.method==='POST'&&r.url===base+'/exports')).toHaveLength(1)
