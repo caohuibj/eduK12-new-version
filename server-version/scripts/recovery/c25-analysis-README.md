@@ -92,3 +92,85 @@ artifacts) passed in `/tmp/c25-analysis-contract-02/targeted-tests.log`; receipt
 `34d3e8f9d00afa169eb0ce54f319fc320303aeedf3afe4949de6f2b138467de8` retains 13 equal
 before/after inputs and six source/runner copies. The unaffected oracle/driver
 and path-rejection tests were not rerun. No runtime attempt occurred.
+
+## Frozen coordinator and later authorized commands
+
+The coordinator `c25-analysis.mjs` uses the original `c25-contracts.py`
+acceptance functions without replacing them. It rechecks clean actual HEAD,
+source/helper inventory, both source/dist/dependency trees, generated client,
+compiler/tool receipts, actual Python identity, inline programs and runtime
+configuration before/after. Admission needs a newly issued normal HTTP03
+source descriptor and a separately verified current 6,667-row recovery point;
+older 6,582/6,651-row archives cannot stand in for current rollback.
+
+`c25-analysis-archive.mjs` prepares only the three mutable directories
+`pgdata/uploads/exports` under `eduk12_c25_http_01`. The planned private output is
+`/tmp/c25-analysis-recovery-01`. Its 600-second aggregate limit includes real
+compression, gzip integrity, complete extraction, every file SHA/path/mode/owner/
+mtime/xattr/link comparison, stopped PG control comparison and fsync. It preserves
+all original nondata evidence, both prior continuation directories, source05/06
+and both older recovery archives. This is a node-local temporary recovery point;
+it is not a durable backup. Actual ACL/xattr support must be reported from the
+run, not inferred from prior archives.
+
+`c25-analysis-db.mjs` has only baseline/preserve/final modes. Before API startup,
+its live snapshot must equal the pinned 6,667-row snapshot, and it captures one
+full 217-table baseline. Every subsequent audit preserves all columns/rows and
+exactly the same 21 checkpoints. Immediate startup cleanup receipt tables must
+be empty. Each audit is a tracked child bounded to 300 seconds; the adapter has
+an additional 295-second bound. API and clients stop before final audit; PG stops
+in the original finally-protected routine, even on failure. The inherited
+6,529/6,582/6,651 facts are identified as inherited and included within the newly
+protected 6,667 rows. No historical 53 MB baseline copies, restore rerun or global
+cleanup are performed. A failed partial state can still receive an actual final
+snapshot, but cannot pass the supplement.
+
+The following are command templates only, requiring separate execution approval.
+Use the actual clean reviewed HEAD and returned hashes, never placeholders:
+
+```sh
+ROOT=/workspace/scratch/5a77e8bdc1ae
+BASE="$ROOT/eduk12_c22_20261019/server-version/scripts/recovery"
+TOOLS="$ROOT/eduk12_tools_20261018"
+NODE="$TOOLS/node_modules/node/bin/node"
+PY=/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3
+
+# Separate read-only source issuance, after final helper freeze.
+"$PY" -B "$BASE/c25-source.py" issue --tools "$TOOLS" \
+  --output /tmp/c25-source-07 --expected-head REVIEWED_HEAD
+
+# Separate stopped archive/real extraction verification approval.
+"$NODE" "$BASE/c25-analysis-archive.mjs" --python "$PY" --tools "$TOOLS" \
+  --output /tmp/c25-analysis-recovery-01 \
+  --descriptor /tmp/c25-source-07/c25-source-descriptor.json \
+  --expected-head REVIEWED_HEAD --expected-descriptor-sha256 SOURCE_SHA
+
+# One runtime only after independent recovery-point review and explicit GO.
+"$NODE" "$BASE/c25-analysis.mjs" --python "$PY" --tools "$TOOLS" \
+  --state "$ROOT/eduk12_c25_analysis_01" \
+  --failure-state "$ROOT/eduk12_c25_http_01" \
+  --continuation-state "$ROOT/eduk12_c25_continuation_01" \
+  --core-state "$ROOT/eduk12_c25_continuation_02" \
+  --descriptor /tmp/c25-source-07/c25-source-descriptor.json \
+  --expected-descriptor-sha256 SOURCE_SHA --expected-head REVIEWED_HEAD \
+  --recovery-descriptor /tmp/c25-analysis-recovery-01/c25-analysis-recovery-descriptor.json \
+  --expected-recovery-sha256 RECOVERY_SHA \
+  --backend-receipt "$ROOT/c25-build-evidence/backend-01/backend-build.receipt.json" \
+  --expected-backend-receipt-sha256 ffca85332844b7f9caeac3252119e1354c498e9de11e757c5763e525d2bf8d95 \
+  --frontend-receipt "$ROOT/c25-build-evidence/frontend-01/frontend-build.receipt.json" \
+  --expected-frontend-receipt-sha256 7064d220540d1faf8851cec0e6c8ba4151070a61163ed60bf8f5d895f0415f5a
+```
+
+Second preparation batch: 15 new coordinator/archive/database contract cases
+ran in `/tmp/c25-analysis-coordinator-03/new-contract-tests.log`: 14 passed and
+one test failed because its broad `.dump(` string ban also matched legitimate
+`json.dump` receipt serialization. The unchanged adapter had no DB dump/restore
+call. This failed receipt is retained:
+`4d813c4695d82481f0369872b2fa12cd3d9ec9b9259abf058e03cd8316f48dbb`.
+Only that assertion was corrected to reject actual `db.dump`/`db.restore` calls;
+the affected single test and previously unrun new HTTP-entry syntax parse passed
+in `/tmp/c25-analysis-coordinator-04/`, receipt
+`6b99ce3b7811e5a87d56f353f1579f97ca773ebadad7f6f6a719f30693c335d9`.
+Both receipts retain 212 before/after inputs and 210 exact source/runner copies;
+the unaffected 14 were not rerun. These checks use synthetic or immutable JSON
+fixtures; no service, real archive, database or producer was executed.
