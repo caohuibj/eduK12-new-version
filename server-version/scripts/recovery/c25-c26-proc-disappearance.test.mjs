@@ -193,3 +193,48 @@ finally:
  child.stdin.write('x');child.stdin.flush();assert child.wait(timeout=2)==0;child.stdin.close();child.stdout.close()
 print(json.dumps({'ownedStatErrnos':[2,3],'oldParentCandidateAndPidfdProofsPreserved':True,'signalGranted':False}))
 `))
+
+test('known missing nonleader cannot disappear through group filtering and legal PG setsid is committed before direct signal',()=>python('outer',String.raw`
+from unittest import mock
+root=proc(os.getpid());leader={'pid':2147483000,'startTicks':'10','processGroupId':2147483000,'parentPid':root['pid'],'state':'S'}
+member={**leader,'pid':2147483001,'startTicks':'11','parentPid':leader['pid']}
+for operation in ['members','signal']:
+ for changed in [{**member,'processGroupId':2147483002},{**member,'parentPid':2147483003},{**member,'startTicks':'reused'}]:
+  owned=OwnedGroups();owned.root=root;owned.register(leader,'synthetic');owned.member_pins[member['pid']]=member
+  rows=ProcessTable({leader['pid']:leader});rows.disappearances=[{'pid':member['pid'],'path':str(Path('/proc',str(member['pid']),'stat')),'operation':'READ_STAT_DURING_ENUMERATION','errno':3,'atMonotonicNs':str(time.monotonic_ns())}]
+  with mock.patch.dict(owned.members.__globals__,process_table=lambda:rows,proc=lambda _:changed),mock.patch('os.killpg') as kill,mock.patch('os.pidfd_open') as pidfd:
+   try:
+    if operation=='members':owned.members()
+    else:owned.signal(signal.SIGTERM)
+   except AssertionError:pass
+   else:raise AssertionError('known nonleader drift was filtered away')
+   kill.assert_not_called();pidfd.assert_not_called();assert owned.enumeration_observations[-1]['disposition']=='REJECTED'
+script="""import os,sys,json
+r,w=os.pipe();child=os.fork()
+if child==0:
+ os.close(w);print(json.dumps({'ready':os.getpid()}),flush=True);assert os.read(r,1)==b's';os.setsid();print(json.dumps({'setsid':os.getpid()}),flush=True);assert os.read(r,1)==b'q';os._exit(0)
+else:
+ os.close(r);assert sys.stdin.readline().strip()=='setsid';os.write(w,b's');assert sys.stdin.readline().strip()=='quit';os.write(w,b'q');assert os.waitpid(child,0)[1]==0
+"""
+owned=OwnedGroups(sys.executable);children=[]
+master,pin=spawn_registered(owned,children,'postgres',[sys.executable,'-B','-c',script],stdin=subprocess.PIPE,stdout=subprocess.PIPE,text=True,start_new_session=True)
+transitioned=[False]
+try:
+ child=json.loads(master.stdout.readline())['ready'];owned.capture_descendants(root);assert child in owned.pg_lineage and child not in owned.groups
+ real_proc=proc
+ def missing_then_fresh(pid):
+  if pid==child and not transitioned[0]:
+   transitioned[0]=True;master.stdin.write('setsid\n');master.stdin.flush();assert json.loads(master.stdout.readline())=={'setsid':child}
+   raise OSError(errno.ESRCH,'exact enumeration/fresh transition',str(Path('/proc',str(pid),'stat')))
+  return real_proc(pid)
+ with mock.patch.dict(owned.signal.__globals__,proc=missing_then_fresh),mock.patch('os.killpg') as kill:
+  owned.signal(signal.SIGTERM,True,roles={'postgres_child'})
+  kill.assert_called_once_with(child,signal.SIGTERM)
+ assert len(owned.pg_transitions)==1 and owned.groups[child]['role']=='postgres_child'
+ assert owned.pg_lineage[child]['identity']['processGroupId']==child
+ assert child in {row['pid'] for row in owned.members(True)}
+ print(json.dumps({'nonleaderGroupParentReuseRejectedAtBothEntries':True,'actualSetsidConsumedBeforeSignal':owned.pg_transitions,'freshObservations':owned.enumeration_observations}))
+finally:
+ if not transitioned[0]:master.stdin.write('setsid\n');master.stdin.flush();assert json.loads(master.stdout.readline())=={'setsid':child}
+ master.stdin.write('quit\n');master.stdin.flush();assert master.wait(timeout=2)==0;master.stdin.close();master.stdout.close()
+`))

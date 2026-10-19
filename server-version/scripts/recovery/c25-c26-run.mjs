@@ -98,7 +98,18 @@ class OwnedGroups:
      observation['disposition']='KNOWN_IDENTITY_DIRECTORY_ABSENT';continue
     observation['freshIdentity']=dict(fresh)
     assert fresh['pid']==pin['pid'] and fresh['startTicks']==pin['startTicks'],'known missing PID was reused'
-    # Reinsert, then preserve all original group/parent/PG-lineage checks.
+    pg_pin=self.pg_lineage.get(fresh['pid'])
+    if pg_pin is None:
+     assert fresh['processGroupId']==pin['processGroupId'],'known non-PG member changed group'
+     assert fresh['parentPid']==pin['parentPid'] or (self.root is not None and fresh['parentPid']==self.root['pid']),'known non-PG member changed parent'
+    elif any(pg_pin['identity'][k]!=fresh[k] for k in ['processGroupId','parentPid']):
+     # Consume the existing complete lineage proof/setsid commit BEFORE group
+     # filtering; a mere permitted-transition boolean would lose the member.
+     rows[fresh['pid']]=fresh
+     proof=self.postgres_candidate(fresh,rows,require_existing=True)
+     if proof is None:
+      rows.pop(fresh['pid']);observation['disposition']='KNOWN_PG_PROOF_CONFIRMED_ABSENT';continue
+     fresh=proof['identity'];observation['freshIdentity']=dict(fresh)
     rows[fresh['pid']]=fresh;observation['disposition']='KNOWN_IDENTITY_FRESH_REINSERTED'
    except BaseException as error:
     observation.update(disposition='REJECTED',errorType=type(error).__name__,error=str(error));raise
@@ -306,7 +317,7 @@ class OwnedGroups:
   return leader,members
  def signal(self,name,include_postgres=False,roles=None):
   with self.mutex:
-   entries=list(self.groups.values());rows=self.read_table();failures=[]
+   rows=self.read_table();entries=list(self.groups.values());failures=[]
    for row in reversed(entries):
     try:
      if row['role'] in ['postgres','postgres_child','postgres_terminal_candidate'] and not include_postgres:
