@@ -91,3 +91,55 @@ before and after; it does not retroactively recreate the old measurements.
 The real HTTP bridge must separately retain and check HTTP status, code, message,
 and the exact envelope before handing data to this oracle. No HTTP acceptance
 is implied by these pure contracts.
+
+## Analysis-only execution adapter preparation
+
+The next batch provides three analysis-specific adapters and seven new no-service
+contracts. It does not execute the ABBA experiment.
+
+* `analysis-entry.mjs` connects the accepted algorithm to the actual transport,
+  full HTTP envelope checks, existing owner/other-teacher/student identities,
+  selected A/B API leaf and PG observation session. The current frozen two-wave
+  selector and actor are identical across all four blocks. Positive responses
+  and the exact 404/403 envelopes are retained before the data oracle runs.
+* Each block opens a fresh API and observer session. Startup/auth/permission
+  checks, each warm-up and each formal serial/pair operation have separate
+  windows. The planned 60 windows comprise four startup windows, 12 warm-ups,
+  and 44 formal windows containing 48 formal responses. API process CPU/heap/
+  callback SQL are observed per window; concurrent requests share their process
+  window. PG totals include the observer and remain sampled lower bounds.
+* `analysis-db.mjs` uses the unchanged read-only Database implementation. It
+  captures complete rows and schemas before assertions, requires the current
+  primary 6708 and working 6719 facts, then freezes that actual admission for the
+  final exact audit. No old ordinal/parser normalization applies and no new rows
+  are permitted. The original A07 false and the separate two-file repair remain
+  historical facts.
+* `analysis-run.mjs` consumes the unchanged reviewed ownership, process signal,
+  cleanup, resource and deadline definitions through exact AST selection. The
+  adapted controller preserves startup/readiness/durable-status ordering and
+  writer-stop, database audit, material audit and PG shutdown ordering. Changed
+  seams are artifact/input selection, the analysis entry, exact current baseline
+  and analysis result validation. The historical controller is not edited.
+* A separate supervisor holds the measurement lock and watches the controller
+  independently of its Python/Node execution. All processes share the same
+  1200-second start, with work ending at 720 and driver cleanup at 780; final
+  audit/material/stop reserves stay inside that total. The actual controller exit
+  is durable before lock release/reacquisition. Only the outer Python exit plus
+  final resource/deadline/I/O checks can publish the separate acceptance file.
+  Controller/workload receipts alone never confer the final qualification.
+
+`/tmp/c25-c26-analysis-execution-prepare-01` records six passing new contracts
+and one failed assertion that searched JSON-escaped stdin source as plain text.
+The real shared-AST and absolute-deadline checks had already completed; the
+assertion is corrected to decode and compare the entire exact program.
+`prepare-02` reruns only that single affected contract and passes. Both rounds
+explicitly bind all twelve selected harness files before and after and retain
+input copies. The six unaffected successes retain their first-round identity.
+
+The tests exercise actual transport/algorithm code with boundary replacements,
+real private frozen rows without SQL, and real synthetic Python child exits,
+including a detached-descendant timeout. They also verify real temporary lock
+release before publication and post-write resource failure. They do not claim
+real HTTP authorization, database startup or performance results. The future
+runtime still requires a clean current HEAD, full A/B/recovery inputs, actual
+logical admission, full final protection and a separate execution approval.
