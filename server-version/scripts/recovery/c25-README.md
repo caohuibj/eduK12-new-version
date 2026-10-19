@@ -1040,8 +1040,11 @@ actual API/worker/coordinator integration and A measurement remain outstanding.
 C26 worker preparation uses a separate fixed leaf CLI. Each child processes one
 original report claim/process or one queued composite export task, with no global
 processor import, queue mutation or retry. The report's other-job row-lock gate
-shares the child's exact application name and stays connected until the parent's
-fresh `prepareOwnerClose` proof permits all client disconnections. The export
+shares the child's exact application name. On the successful observation path,
+it stays connected until the parent's fresh `prepareOwnerClose` proof permits
+all client disconnections. On a failed IPC/ownership path, bounded cleanup still
+tries to disconnect; the run remains false and receives no successful attribution
+or terminal qualification. The export
 forwards the real Redis payload, job ID and retry metadata; its enqueue row has
 `recordCount=0`, while the completed single-parent export must have `recordCount=1`.
 Direct task invocation does not certify Bull scheduler completion.
@@ -1063,3 +1066,23 @@ no-service boundary. They exercise report/export success, private exception
 retention, a hung task, an unreturned fresh-PG permission and journal failure.
 They are preparation evidence; actual services, socket/PG adapters and the final
 A coordinator still require their remaining wiring and independent review.
+
+The Linux process/socket adapter enumerates explicit owned processes and every
+direct postmaster child, retaining PID/startTicks/PGID/parent, socket inode and
+fd ownership, native-endian IPv4/IPv6, and explicit Unix/UDP/listener inventory.
+One complete resnapshot is allowed only for a recorded fd/child-list race within
+the same 100ms budget; unknown identities, namespaces, permissions and continuing
+races fail. Exact worker Z/X terminal stat observations preserve real CPU and
+state without fabricated RSS. They do not replace the observer's prepared-close
+permission or actual terminal/close/group-quiescence proof.
+
+The dedicated PG adapter uses one owner connection to the exact joint-restore
+database. Read-only mode, 200ms statement timeout and uncached statistics are
+startup parameters, verified in every response. Only fixed observer SELECTs are
+accepted, with no transaction/SET/reset/write/retry. Abort or timeout ends that
+existing connection instead of opening an unattributed cancel connection.
+Physical cluster, server 16.15, role, port and application name must match. An
+absent pg_stat_statements view is explicitly unsupported; an existing view is
+required and permission failure stops. Connection/query/close overhead is kept
+separate from business SQL. These adapters remain service-free preparation until
+the approved measurement coordinator actually consumes them.
