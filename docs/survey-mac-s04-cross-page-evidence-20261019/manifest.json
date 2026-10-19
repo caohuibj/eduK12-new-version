@@ -1,0 +1,26 @@
+{
+  "source-binding.json": {
+    "bytes": 767,
+    "sha256": "81f31e0022ce135d4b3c111792dd5f28f1ad130a4fd4162156767cffc3014579"
+  },
+  "targeted.json": {
+    "bytes": 6450,
+    "sha256": "ee9990aa38d29e8b27be61d70da2cdd490d77a8a128fa09d9cdbad23e37614e1"
+  },
+  "s04-cross-page-lint.log": {
+    "bytes": 473,
+    "sha256": "701652a4f12c91ea59f619d00454565d593881cad6dff48b24a4c5b39f96a480"
+  },
+  "s04-cross-page-targeted.log": {
+    "bytes": 106,
+    "sha256": "4e6368addc3d931edf3d3a9a55d157e5f2e1a074393ee400fafedb56f3d09020"
+  },
+  "s04-cross-page-types.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "s04-cross-page-run.py.txt": {
+    "bytes": 1049,
+    "sha256": "bdbc63cd34026436c21cbcd4b429e6eac69e5a60ea9cb51faf62c28b00ad7fdb"
+  }
+}

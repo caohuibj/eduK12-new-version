@@ -1,0 +1,6 @@
+{"utc": "2026-10-19T08:17:42.688291+00:00", "operation": "stop", "port": 3197, "oldPid": 67610, "scope": "task API only; same code/env on restart; PG/Redis and original user services untouched"}
+{"utc": "2026-10-19T08:18:12.100642+00:00", "operation": "start", "port": 3197, "oldPid": 67610, "scope": "task API only; same code/env on restart; PG/Redis and original user services untouched"}
+{"utc": "2026-10-19T08:41:23.745051+00:00", "operation": "stop", "port": 3197, "oldPid": 84136, "scope": "task API only; same code/env on restart; PG/Redis and original user services untouched"}
+{"utc": "2026-10-19T08:41:55.350127+00:00", "operation": "start", "port": 3197, "oldPid": 84136, "scope": "task API only; same code/env on restart; PG/Redis and original user services untouched"}
+{"utc": "2026-10-19T08:47:34.878575+00:00", "operation": "stop", "port": 3197, "oldPid": 85947, "scope": "task API only; same code/env on restart; PG/Redis and original user services untouched"}
+{"utc": "2026-10-19T08:47:57.455485+00:00", "operation": "start", "port": 3197, "oldPid": 85947, "scope": "task API only; same code/env on restart; PG/Redis and original user services untouched"}

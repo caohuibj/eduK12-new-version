@@ -1,0 +1,7 @@
+{
+  "parent": "9a9c3094c09a68e29bdca04d8163a8e99c748567",
+  "files": {
+    "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.tsx": "2a3e3ebc052d0de38d963b3bd1b35d22bc0703cabc619d425c57f3ec5c65c832",
+    "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.download.test.tsx": "07f4f2a0fe3366991d2668965bc9a876c1a024c95aecc797dea2e9f3d4d48d62"
+  }
+}

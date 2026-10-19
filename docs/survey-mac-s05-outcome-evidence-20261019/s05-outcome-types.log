@@ -1,0 +1,2 @@
+src/pages/admin/SurveyResearchersAdmin.workspace.test.tsx(26,44): error TS2352: Conversion of type '{ ok: true; status: number; json: () => Promise<never>; }' to type 'Response' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ ok: true; status: number; json: () => Promise<never>; }' is missing the following properties from type 'Response': headers, redirected, statusText, type, and 8 more.

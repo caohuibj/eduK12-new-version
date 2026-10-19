@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend
+
+
+ Test Files  2 passed (2)
+      Tests  27 passed (27)
+   Start at  19:17:58
+   Duration  9.63s (transform 236ms, setup 424ms, import 212ms, tests 5.22s, environment 1.70s)
+

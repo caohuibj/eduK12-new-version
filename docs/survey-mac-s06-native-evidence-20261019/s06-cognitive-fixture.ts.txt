@@ -1,0 +1,43 @@
+// Synthetic export-content fixture, NOT a browser or cognitive timing measurement.
+// Uses existing HTTP admission, child FINAL and parent FINAL validators unchanged.
+import fs from 'node:fs'
+import path from 'node:path'
+import {randomUUID,createHash} from 'node:crypto'
+import {gonogoSequence} from '../survey-worktree/server-version/backend/src/modules/cognitive/randomization'
+import {createTrialEnvelope} from '../survey-worktree/server-version/backend/src/modules/cognitive/v2/trial-envelope'
+const root=path.resolve(__dirname,'..'),out=path.join(root,'evidence/s06/cognitive-fixture.json')
+const journal=path.join(root,'runtime/private/s06-cognitive-fixture-progress.json')
+const source=JSON.parse(fs.readFileSync(path.join(root,'evidence/s03/public-fixture.json'),'utf8'))
+if(source.projectId!=='871d81fa-58a5-4ccc-b92d-3ebcd5f1bf25'||source.syntheticOnly!==true)throw Error('Explicit synthetic scope required')
+const wave=source.waves.find((w:{kind:string})=>w.kind==='COGNITIVE')
+const origin='http://survey.localhost:5197',base='http://127.0.0.1:3197/api/public/survey'
+const requests:{path:string;status:number;responseBytes:number}[]=[]
+const post=async(endpoint:string,body:unknown)=>{
+ const r=await fetch(base+endpoint,{method:'POST',headers:{'Content-Type':'application/json',Origin:origin,Host:'survey.localhost:5197'},body:JSON.stringify(body)})
+ const text=await r.text();requests.push({path:endpoint,status:r.status,responseBytes:Buffer.byteLength(text)})
+ const data=JSON.parse(text)
+ if(!r.ok||data.code!==0)throw Error('Synthetic fixture request rejected '+r.status+' '+data.message)
+ return data.data
+}
+async function main(){
+ if(fs.existsSync(out))throw Error('Fixture already recorded; reuse it')
+ let progress:any=fs.existsSync(journal)?JSON.parse(fs.readFileSync(journal,'utf8')):{}
+ const save=()=>fs.writeFileSync(journal,JSON.stringify(progress),{mode:0o600})
+ if(!progress.attempt){progress.attempt=await post('/r/'+wave.publicId+'/waves/'+wave.id+'/start-unlinked',{consent:true,consentVersion:1,entryToken:wave.entryToken});save()}
+ const attempt=progress.attempt,proof={accessCredential:attempt.accessCredential}
+ const prefix='/r/'+wave.publicId+'/attempts/'+attempt.attemptId
+ const task=await post(prefix+'/task',proof)
+ if(!task.units.some((u:{kind:string;instrumentKey:string})=>u.kind==='COGNITIVE'&&u.instrumentKey==='cognitive'))throw Error('Expected cognitive-only task')
+ const provenance={schemaVersion:1,deviceClass:'DESKTOP_LAPTOP',administrationMode:'KEYBOARD_MOUSE'}
+ if(!progress.session){progress.session=await post(prefix+'/cognitive/cognitive/start',{...proof,priorAnswers:{},administrationProvenance:provenance});save()}
+ const session=progress.session
+ if(!progress.payload){progress.payload={...proof,submissionId:randomUUID(),attemptEpoch:session.attemptEpoch,definitionHash:session.definitionHash,
+  trials:gonogoSequence(session.randomSeed,120,0.25).map((trialType,index)=>createTrialEnvelope({trialIndex:index,phase:'test',startedAtPerfMs:index*1300,endedAtPerfMs:index*1300+800,payload:{trialType,responded:trialType==='go',rtMs:trialType==='go'?320:null,interrupted:false}})),administrationProvenance:provenance};save()}
+ if(!progress.child){progress.child=await post(prefix+'/cognitive/cognitive/'+session.sessionId+'/final',progress.payload);save()}
+ // A prior explicit 400 rejected the incomplete empty unit map before commit.
+ if(!progress.parentInput||Object.keys(progress.parentInput.answers).length===0){progress.parentInput={...proof,submissionId:randomUUID(),answers:{cognitive:{}},cognitiveReferences:[progress.child.resultReference]};save()}
+ if(!progress.parent){progress.parent=await post(prefix+'/final',progress.parentInput);save()}
+ const result={syntheticOnly:true,source:'generated contract fixture through unchanged HTTP APIs; not native timing/collection evidence',projectId:source.projectId,waveId:wave.id,attemptId:attempt.attemptId,sessionId:session.sessionId,receiptId:progress.parent.receiptId,trialCount:120,trialFixtureSha256:createHash('sha256').update(JSON.stringify(progress.payload.trials)).digest('hex'),parentStatus:progress.parent.status,requests}
+ fs.writeFileSync(out,JSON.stringify(result,null,2)+'\n',{flag:'wx'});console.log(JSON.stringify(result))
+}
+main().catch(e=>{console.error(e.message);process.exitCode=1})

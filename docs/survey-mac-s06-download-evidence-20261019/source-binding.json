@@ -1,0 +1,15 @@
+{
+  "base": "929e7c8",
+  "uniqueDownloadCases": 15,
+  "originalDownloadCases": 14,
+  "newResetCase": 1,
+  "typeCheck": "final test input passed",
+  "lint": "0 errors / 0 warnings for five selected files; last test-only addition separately passed",
+  "native": "not yet executed",
+  "source": {
+    "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.tsx": "8dbac71d87f99281cf2e77da3cdc4dadcbf3c9440203f3d7c4eee087a478f0f5",
+    "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.download.test.tsx": "46c263e51ab941b58604b54cb58eed7bf55877605c5e3a6b71869bb38e73ed40",
+    "server-version/backend/src/modules/survey/analytics.export.routes.ts": "2a11515798d957e47e55629977d57de1e33b2ad7b523cdd6e4804ec76f375c6c",
+    "server-version/backend/src/modules/survey/analytics.export.service.ts": "6bbe44cdd25eac88a6c8e9505ef84478fab1e712a4c24afafa212f3771261c5e"
+  }
+}

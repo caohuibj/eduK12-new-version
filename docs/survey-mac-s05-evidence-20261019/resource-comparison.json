@@ -1,0 +1,39 @@
+{
+  "environment": "Native Mac Chrome, same Vite server, cold-cache dev reload; not production asset or performance qualification",
+  "before": {
+    "requests": 400,
+    "transferredBytes": 15483048,
+    "resourceBytes": 15360261,
+    "finishSeconds": 3.66
+  },
+  "after": {
+    "requests": 401,
+    "transferredBytes": 15525785,
+    "resourceBytes": 15402707,
+    "finishSeconds": 2.57
+  },
+  "delta": {
+    "requests": 1,
+    "transferredBytes": 42737,
+    "resourceBytes": 42446
+  },
+  "panelSwitchObserved": {
+    "requests": 3,
+    "paths": [
+      "/api/auth/me",
+      "/api/capabilities",
+      "/api/organizations?page=1&pageSize=100"
+    ],
+    "surveyManagementRequests": 0
+  },
+  "focusOnlyControl": {
+    "requests": 3,
+    "paths": [
+      "/api/auth/me",
+      "/api/capabilities",
+      "/api/organizations?page=1&pageSize=100"
+    ],
+    "surveyManagementRequests": 0
+  },
+  "noLatencyOrSQLImprovementClaim": true
+}

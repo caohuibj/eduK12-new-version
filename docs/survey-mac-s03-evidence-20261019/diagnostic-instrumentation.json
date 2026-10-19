@@ -1,0 +1,22 @@
+{
+  "source": "server-version/frontend/src/survey/SurveyPublicApp.final.test.tsx",
+  "originalSha256": "0c52493669253b32115689f086f2899749dba31280b4ad85a797ccab46c57be9",
+  "instrumentedSha256": "02579e47871635759be1b533ebefa7ed050816a0a27c873a2156981e80da75d5",
+  "purpose": "Observe first-success/error subset in original file order, query durations, mock route counts, pending queries and before-case DOM roots. No source assertion, mock result, timeout, application or timing behavior changes.",
+  "testNamePattern": "renders the controlled first-success|uses current-authorized GENERAL|reauthorizes GENERAL after an ambiguous retry|does not display receipt data from a rejected FINAL",
+  "runType": "Diagnostic instrumentation; does not replace unchanged-input acceptance evidence",
+  "command": [
+    "/Users/Qiang/.codex/.chatgpt-projects/g-p-6a840946ce648191881d2c7f0f84c85f/artifacts/migration-execution-20261002/tools/node-v24.21.0-darwin-arm64/bin/node",
+    "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/vitest/vitest.mjs",
+    "run",
+    "src/survey/SurveyPublicApp.final.test.tsx",
+    "-t",
+    "renders the controlled first-success|uses current-authorized GENERAL|reauthorizes GENERAL after an ambiguous retry|does not display receipt data from a rejected FINAL",
+    "--maxWorkers=1",
+    "--reporter=verbose",
+    "--reporter=json",
+    "--outputFile=/Users/Qiang/Documents/Codex/2026-10-19/task/evidence/s03/diagnostic-order-tests.json"
+  ],
+  "exitCode": 0,
+  "exactSourceBytesRestored": true
+}

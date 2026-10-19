@@ -1,0 +1,77 @@
+/* Survey peripheral surfaces only. Never attach these classes to a cognitive
+   runner, focus stage, or its ancestors. SurveyPublicApp removes peripheral
+   sibling opt-ins while cognitiveRunning; the formal ancestor baseline is checked. */
+.survey-participant-panel,
+.survey-answer-panel,
+.survey-submit-guide {
+  color: #173b50;
+  background: #fff;
+  border-color: #cbd9e0;
+  border-radius: 14px;
+  font-size: 16px;
+  line-height: 1.65;
+}
+.survey-participant-panel p,
+.survey-answer-panel .survey-answer-guide { color: #476271; }
+.survey-participant-panel :is(.text-xs, .text-sm),
+.survey-answer-panel :is(p.text-xs, p.text-sm) { font-size: 14px; line-height: 1.65; }
+.survey-participant-panel :is(h2, h3, h4),
+.survey-answer-panel :is(h3, h4) { color: #173b50; line-height: 1.5; }
+.survey-participant-panel h3,
+.survey-answer-panel > h3 { font-size: 20px; }
+.survey-answer-guide { margin: 12px 0 20px; font-size: 14px; }
+.survey-answer-panel fieldset { border-color: #cbd9e0; }
+.survey-answer-panel legend { padding: 0 4px; font-size: 16px; line-height: 1.65; }
+.survey-answer-panel label { min-height: 44px; padding-top: 10px; padding-bottom: 10px; font-size: 16px; }
+.survey-answer-panel :is(input[type='radio'], input[type='checkbox']) { accent-color: #234a65; }
+.survey-answer-panel table { min-width: 280px; border-collapse: collapse; font-size: 16px; }
+.survey-answer-panel :is(th, td) { padding: 12px 8px; border-bottom: 1px solid #dce5ea; }
+.survey-answer-panel table :is(input[type='radio'], input[type='checkbox']) { width: 20px; height: 20px; }
+.survey-participant-panel .input,
+.survey-answer-panel .input { min-height: 44px; font-size: 16px; border-color: #718895; border-radius: 8px; }
+.survey-participant-panel :is(.btn-primary, .btn-secondary),
+.survey-answer-panel :is(.btn-primary, .btn-secondary),
+.survey-participant-action { min-height: 44px; max-width: 100%; font-size: 16px; line-height: 1.5; }
+.survey-participant-panel .btn-primary,
+.survey-answer-panel .btn-primary,
+.survey-participant-action.btn-primary { background: #234a65; color: #fff; }
+.survey-participant-panel .btn-secondary,
+.survey-answer-panel .btn-secondary,
+.survey-participant-action.btn-secondary { color: #234a65; border-color: #718895; }
+.survey-participant-panel :is(a, button, input, textarea, select):focus-visible,
+.survey-answer-panel :is(a, button, input, textarea, select, fieldset):focus-visible,
+.survey-participant-action:focus-visible {
+  outline: 3px solid #0f6b68;
+  outline-offset: 3px;
+  box-shadow: none;
+}
+.survey-answer-panel nav { flex-wrap: wrap; }
+.survey-participant-message,
+.survey-answer-panel [role='alert'] { padding: 16px; border-radius: 8px; font-size: 16px; line-height: 1.65; overflow-wrap: anywhere; }
+.survey-participant-message[role='alert'],
+.survey-answer-panel [role='alert'] { color: #9f2635; border-left: 4px solid #9f2635; background: #fff3f3; }
+.survey-submit-guide { padding: 20px; border: 1px solid #cbd9e0; border-left: 4px solid #75a8b3; }
+.survey-submit-guide h3 { margin: 0 0 10px; font-size: 18px; font-weight: 600; }
+.survey-submit-guide p { margin: 8px 0 0; color: #476271; font-size: 14px; }
+.survey-completion-state { color: #0f6b68; font-size: 14px; font-weight: 600; }
+.survey-participant-skip { position: fixed; top: 10px; left: 10px; z-index: 60; padding: 12px 18px; transform: translateY(-200%); color: #fff; background: #234a65; border-radius: 8px; }
+.survey-participant-skip:focus { transform: translateY(0); outline: 3px solid #0f6b68; outline-offset: 3px; }
+
+/* The device gate unmounts before CognitiveRunner is rendered. It is never an
+   ancestor of a timed stimulus, and its existing key/storage checks are unchanged. */
+section[aria-label='认知任务设备检查'] { border-color: #cbd9e0; font-size: 16px; line-height: 1.65; }
+section[aria-label='认知任务设备检查'] :is(p, label) { font-size: 14px; line-height: 1.65; }
+section[aria-label='认知任务设备检查'] .input { min-height: 44px; font-size: 16px; border-color: #718895; }
+section[aria-label='认知任务设备检查'] button { min-height: 44px; font-size: 16px; background: #234a65; }
+section[aria-label='认知任务设备检查'] :is(input, button):focus-visible { outline: 3px solid #0f6b68; outline-offset: 3px; box-shadow: none; }
+
+@media (max-width: 600px) {
+  .survey-participant-panel,
+  .survey-answer-panel,
+  .survey-submit-guide { padding: 16px; }
+}
+@media (forced-colors: active) {
+  .survey-participant-panel :focus-visible,
+  .survey-answer-panel :focus-visible,
+  .survey-participant-skip:focus { outline-color: Highlight; }
+}

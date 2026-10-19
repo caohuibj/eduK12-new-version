@@ -1,0 +1,43 @@
+{
+  "head": "72c3234a412e3fd581444b6ecdf4a69804489a41",
+  "workingTreeClean": true,
+  "mode": "read-only preparation; no tests, business API calls, product changes, native runs or permission changes",
+  "sources": {
+    "server-version/frontend/src/survey/ResearchPreview.tsx": {
+      "bytes": 14126,
+      "sha256": "44e3d9cc0636b9aca946b6a72d8f03a75cdb89b4531505f338503e8f7a26bcc0"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.tsx": {
+      "bytes": 72051,
+      "sha256": "12f1a445a7b5bc10fe755343f2b6ef9b7fb72c69f54ed75572f10897c7e90b26"
+    },
+    "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.tsx": {
+      "bytes": 35278,
+      "sha256": "6986cc97a96c70ea6f370387358f38eb4d8caf1eed6aefa6874f4d762f95d248"
+    },
+    "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.download.test.tsx": {
+      "bytes": 10245,
+      "sha256": "995eef4d3d7f21acb1db92ff5e5c7d50b484de0fb442669eb115103c621c4481"
+    },
+    "server-version/frontend/src/modules/assessment-core/form/ProfessionalFormAnswer.tsx": {
+      "bytes": 6813,
+      "sha256": "1ea1fcf183f1d3f90b831131378446d72b1a5e6f9b67eeec49d40b1b3f677673"
+    },
+    "server-version/backend/src/modules/survey/analytics.export.routes.ts": {
+      "bytes": 2814,
+      "sha256": "2a11515798d957e47e55629977d57de1e33b2ad7b523cdd6e4804ec76f375c6c"
+    },
+    "server-version/backend/src/modules/survey/analytics.export.service.ts": {
+      "bytes": 20710,
+      "sha256": "6bbe44cdd25eac88a6c8e9505ef84478fab1e712a4c24afafa212f3771261c5e"
+    },
+    "server-version/backend/src/modules/survey/analytics.export-format.ts": {
+      "bytes": 15304,
+      "sha256": "9fca657c0222edab43efae95b441fcb5bdd39a390833f89d66800d82c1df083e"
+    }
+  },
+  "report": {
+    "bytes": 12231,
+    "sha256": "90d648ab2618e3420dcf3b54c618a2688990c8330863e1dc52426866cb5e53f3"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "sourceCommit": "f6df9c5b21c5a0d50853d5e6e2d1bfd79389dcd0",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "node": "24.21.0",
+  "postgres": "16.15",
+  "redis": "8.4.0",
+  "chrome": "155.0.8059.82",
+  "safari": "27.0",
+  "newPorts": {
+    "frontend": 5197,
+    "backend": 3197,
+    "postgres": 5557,
+    "redis": 6397
+  },
+  "oldPortsPreserved": [
+    5190,
+    3190,
+    5549,
+    6389
+  ],
+  "runtimeRole": {
+    "ok": true,
+    "runtimeTables": 203,
+    "runtimeSequences": 1,
+    "restrictedRuntimeRole": true,
+    "migrationCount": 166,
+    "migrationFingerprint": "517bfffb16e24332ce90a6da574178df44567bd79c04879d4d1a011f45c0e3e0"
+  },
+  "modelEffortSpeedMetadata": "not exposed by available host tools; no claim of changed model/effort/speed tier",
+  "localShellNode": "25.2.1 (not used to launch project)"
+}

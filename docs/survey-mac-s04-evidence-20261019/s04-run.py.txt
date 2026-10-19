@@ -1,0 +1,17 @@
+from pathlib import Path
+import runpy,sys
+mode=sys.argv[1]
+sys.argv=['runtime.py','helper']
+x=runpy.run_path(str(Path(__file__).with_name('runtime.py')),run_name='helper')
+n=x['NODE'];r=x['ROOT'];b=x['BASE']
+if mode=='nav-tests':x['call']([n,r/'frontend/node_modules/vitest/vitest.mjs','run','src/survey/SurveyWorkspace.requests.test.tsx','--maxWorkers=1','--reporter=json','--outputFile='+str(b/'evidence/s04/nav-tests.json')],cwd=r/'frontend',name='s04-nav-tests')
+if mode=='navigation-new':x['call']([n,r/'frontend/node_modules/vitest/vitest.mjs','run','src/survey/SurveyWorkspace.requests.test.tsx','-t','retains unsaved settings','--maxWorkers=1','--reporter=json','--outputFile='+str(b/'evidence/s04/navigation-new.json')],cwd=r/'frontend',name='s04-navigation-new')
+if mode=='authoring-tests':x['call']([n,r/'frontend/node_modules/vitest/vitest.mjs','run','src/survey/SurveyBuilder.test.tsx','src/survey/SurveyWorkspace.lifecycle.test.tsx','--maxWorkers=1','--reporter=json','--outputFile='+str(b/'evidence/s04/authoring-tests.json')],cwd=r/'frontend',name='s04-authoring-tests')
+if mode=='guidance-new':x['call']([n,r/'frontend/node_modules/vitest/vitest.mjs','run','src/survey/SurveyAuthoringGuidance.test.tsx','--maxWorkers=1','--reporter=json','--outputFile='+str(b/'evidence/s04/guidance-new.json')],cwd=r/'frontend',name='s04-guidance-new')
+if mode=='templates':x['call']([n,'--import',r/'backend/node_modules/tsx/dist/loader.mjs',b/'tools/s04-template-check.ts'],cwd=b/'tools',name='s04-templates')
+
+if mode=='guidance-csv-retry':x['call']([n,r/'frontend/node_modules/vitest/vitest.mjs','run','src/survey/SurveyAuthoringGuidance.test.tsx','-t','selects the reported CSV line','--maxWorkers=1','--reporter=json','--outputFile='+str(b/'evidence/s04/guidance-csv-retry.json')],cwd=r/'frontend',name='s04-guidance-csv-retry')
+if mode=='types':x['call']([n,r/'frontend/node_modules/typescript/bin/tsc','-p','tsconfig.app.json','--noEmit'],cwd=r/'frontend',name='s04-types')
+if mode=='lint':x['call']([n,r/'frontend/node_modules/eslint/bin/eslint.js','src/survey/SurveyApp.tsx','src/survey/SurveyWorkspaceNav.tsx','src/survey/SurveyWorkspace.requests.test.tsx','src/survey/SurveyBuilder.tsx','src/survey/ResearchAuthoringGuide.tsx','src/survey/ResearchIssueList.tsx','src/survey/authoring-import-template.ts','src/survey/authoring-issue-location.ts','src/survey/SurveyAuthoringGuidance.test.tsx'],cwd=r/'frontend',name='s04-lint')
+if mode=='authoring-final':x['call']([n,r/'frontend/node_modules/vitest/vitest.mjs','run','src/survey/SurveyBuilder.test.tsx','src/survey/SurveyWorkspace.lifecycle.test.tsx','src/survey/SurveyAuthoringGuidance.test.tsx','--maxWorkers=1','--reporter=json','--outputFile='+str(b/'evidence/s04/authoring-final.json')],cwd=r/'frontend',name='s04-authoring-final')
+if mode=='requests-final':x['call']([n,r/'frontend/node_modules/vitest/vitest.mjs','run','src/survey/SurveyWorkspace.requests.test.tsx','--maxWorkers=1','--reporter=json','--outputFile='+str(b/'evidence/s04/requests-final.json')],cwd=r/'frontend',name='s04-requests-final')

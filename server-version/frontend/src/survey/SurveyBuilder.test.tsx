@@ -129,7 +129,7 @@ describe('Survey Research Builder editing widgets',()=>{
     expect(field).toBeDisabled()
     fireEvent.click(refusal)
     expect(refusal).not.toBeChecked()
-    expect(screen.getByRole('radio',{name:'不愿回答：课堂参与'})).toBeInTheDocument()
+    expect(screen.getByRole('radio',{name:'多行评价 · 课堂参与 · 不愿回答'})).toBeInTheDocument()
   })
   it('offers preview of a form without creating real responses',()=>{
     const draft:ResearchDraft={

@@ -17,7 +17,7 @@ describe('Survey administrator entry link',()=>{
     const fetcher=vi.fn(async()=>({ok:false,json:async()=>({code:401,message:'anonymous'})}))
     vi.stubGlobal('fetch',fetcher)
     render(<SurveyApp/> )
-    await screen.findByRole('heading',{name:'Researcher 登录'})
+    await screen.findByRole('heading',{name:'研究者登录'})
     if(admin)expect(screen.getByRole('link',{name:'系统管理员入口：研究者与工具授权'})).toHaveAttribute('href',admin+'/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers')
     else{
       expect(screen.queryByRole('link',{name:'系统管理员入口：研究者与工具授权'})).not.toBeInTheDocument()

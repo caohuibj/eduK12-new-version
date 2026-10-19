@@ -1,0 +1,32 @@
+{
+  "reports": {
+    "busy-new.json": {
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 7,
+      "success": true
+    },
+    "grant-read.json": {
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 8,
+      "success": true
+    },
+    "components.json": {
+      "numPassedTests": 16,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "success": true
+    },
+    "status-wrap.json": {
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 8,
+      "success": true
+    }
+  },
+  "uniqueCasesPassed": 18,
+  "types": "frozen input passed",
+  "lint": "changed-file stages passed",
+  "formalCIQualification": false
+}

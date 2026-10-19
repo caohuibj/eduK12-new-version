@@ -1,0 +1,1113 @@
+{
+  "checkedAtUTC": "2026-10-19T01:01:23.686530+00:00",
+  "roots": {
+    "task_frontend": {
+      "path": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules",
+      "isSymlink": false,
+      "target": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules",
+      "mode": "0o755",
+      "symlinkCount": 25,
+      "symlinks": [
+        {
+          "path": "survey-worktree/server-version/frontend/node_modules/.bin/jsesc",
+          "link": "../jsesc/bin/jsesc",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/jsesc/bin/jsesc",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/frontend/node_modules/.bin/tldts",
+          "link": "../tldts/bin/cli.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/tldts/bin/cli.js",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/frontend/node_modules/.bin/browserslist",
+          "link": "../browserslist/cli.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/browserslist/cli.js",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/frontend/node_modules/.bin/jiti",
+          "link": "../jiti/lib/jiti-cli.mjs",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/jiti/lib/jiti-cli.mjs",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/frontend/node_modules/.bin/loose-envify",
+          "link": "../loose-envify/cli.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/loose-envify/cli.js",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/frontend/node_modules/.bin/tsserver",
+          "link": "../typescript/bin/tsserver",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/typescript/bin/tsserver",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/frontend/node_modules/.bin/autoprefixer",
+          "link": "../autoprefixer/bin/autoprefixer",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/autoprefixer/bin/autoprefixer",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/frontend/node_modules/.bin/nanoid",
+          "link": "../nanoid/bin/nanoid.cjs",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/nanoid/bin/nanoid.cjs",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/frontend/node_modules/.bin/acorn",
+          "link": "../acorn/bin/acorn",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/acorn/bin/acorn",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/frontend/node_modules/.bin/vitest",
+          "link": "../vitest/vitest.mjs",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/vitest/vitest.mjs",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/frontend/node_modules/.bin/node-which",
+          "link": "../which/bin/node-which",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/which/bin/node-which",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/frontend/node_modules/.bin/baseline-browser-mapping",
+          "link": "../baseline-browser-mapping/dist/cli.cjs",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/baseline-browser-mapping/dist/cli.cjs",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/frontend/node_modules/.bin/tsc",
+          "link": "../typescript/bin/tsc",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/typescript/bin/tsc",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/frontend/node_modules/.bin/js-yaml",
+          "link": "../js-yaml/bin/js-yaml.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/js-yaml/bin/js-yaml.js",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/frontend/node_modules/.bin/parser",
+          "link": "../@babel/parser/bin/babel-parser.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/@babel/parser/bin/babel-parser.js",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/frontend/node_modules/.bin/semver",
+          "link": "../semver/bin/semver.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/semver/bin/semver.js",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/frontend/node_modules/.bin/vite",
+          "link": "../vite/bin/vite.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/vite/bin/vite.js",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/frontend/node_modules/.bin/rollup",
+          "link": "../rollup/dist/bin/rollup",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/rollup/dist/bin/rollup",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/frontend/node_modules/.bin/json5",
+          "link": "../json5/lib/cli.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/json5/lib/cli.js",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/frontend/node_modules/.bin/update-browserslist-db",
+          "link": "../update-browserslist-db/cli.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/update-browserslist-db/cli.js",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/frontend/node_modules/.bin/eslint",
+          "link": "../eslint/bin/eslint.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/eslint/bin/eslint.js",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/frontend/node_modules/.bin/why-is-node-running",
+          "link": "../why-is-node-running/cli.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/why-is-node-running/cli.js",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/frontend/node_modules/.bin/esbuild",
+          "link": "../esbuild/bin/esbuild",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/esbuild/bin/esbuild",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/frontend/node_modules/.bin/lz-string",
+          "link": "../lz-string/bin/bin.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/lz-string/bin/bin.js",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/frontend/node_modules/@typescript-eslint/typescript-estree/node_modules/.bin/semver",
+          "link": "../semver/bin/semver.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/@typescript-eslint/typescript-estree/node_modules/semver/bin/semver.js",
+          "external": false
+        }
+      ]
+    },
+    "task_backend": {
+      "path": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules",
+      "isSymlink": false,
+      "target": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules",
+      "mode": "0o755",
+      "symlinkCount": 28,
+      "symlinks": [
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/prebuild-install",
+          "link": "../prebuild-install/bin.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/prebuild-install/bin.js",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/tsserver",
+          "link": "../typescript/bin/tsserver",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/typescript/bin/tsserver",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/playwright-core",
+          "link": "../playwright-core/cli.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/playwright-core/cli.js",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/node-gyp-build-optional-packages-optional",
+          "link": "../node-gyp-build-optional-packages/optional.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/node-gyp-build-optional-packages/optional.js",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/rimraf",
+          "link": "../rimraf/bin.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/rimraf/bin.js",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/nanoid",
+          "link": "../nanoid/bin/nanoid.cjs",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/nanoid/bin/nanoid.cjs",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/vitest",
+          "link": "../vitest/vitest.mjs",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/vitest/vitest.mjs",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/tsx",
+          "link": "../tsx/dist/cli.mjs",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/tsx/dist/cli.mjs",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/sshpk-conv",
+          "link": "../sshpk/bin/sshpk-conv",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/sshpk/bin/sshpk-conv",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/tsc",
+          "link": "../typescript/bin/tsc",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/typescript/bin/tsc",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/prisma",
+          "link": "../prisma/build/index.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/prisma/build/index.js",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/crc32",
+          "link": "../crc-32/bin/crc32.njs",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/crc-32/bin/crc32.njs",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/node-gyp-build-optional-packages",
+          "link": "../node-gyp-build-optional-packages/bin.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/node-gyp-build-optional-packages/bin.js",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/semver",
+          "link": "../semver/bin/semver.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/semver/bin/semver.js",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/vite",
+          "link": "../vite/bin/vite.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/vite/bin/vite.js",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/sshpk-verify",
+          "link": "../sshpk/bin/sshpk-verify",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/sshpk/bin/sshpk-verify",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/rollup",
+          "link": "../rollup/dist/bin/rollup",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/rollup/dist/bin/rollup",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/mime",
+          "link": "../mime/cli.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/mime/cli.js",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/download-msgpackr-prebuilds",
+          "link": "../msgpackr-extract/bin/download-prebuilds.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/msgpackr-extract/bin/download-prebuilds.js",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/sshpk-sign",
+          "link": "../sshpk/bin/sshpk-sign",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/sshpk/bin/sshpk-sign",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/why-is-node-running",
+          "link": "../why-is-node-running/cli.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/why-is-node-running/cli.js",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/esbuild",
+          "link": "../esbuild/bin/esbuild",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/esbuild/bin/esbuild",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/fxparser",
+          "link": "../cos-fast-xml-parser/src/cli/cli.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/cos-fast-xml-parser/src/cli/cli.js",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/uuid",
+          "link": "../uuid/dist/esm/bin/uuid",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/uuid/dist/esm/bin/uuid",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/rc",
+          "link": "../rc/cli.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/rc/cli.js",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/node-gyp-build-optional-packages-test",
+          "link": "../node-gyp-build-optional-packages/build-test.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/node-gyp-build-optional-packages/build-test.js",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/which",
+          "link": "../which/bin/which",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/which/bin/which",
+          "external": false
+        },
+        {
+          "path": "survey-worktree/server-version/backend/node_modules/.bin/mkdirp",
+          "link": "../mkdirp/bin/cmd.js",
+          "resolved": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/mkdirp/bin/cmd.js",
+          "external": false
+        }
+      ],
+      "prismaGenerated": {
+        "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/.prisma/client/schema.prisma": {
+          "realpath": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/.prisma/client/schema.prisma",
+          "isSymlink": false,
+          "sha256": "72e8fe6193b8334ea495fe0c78ff4996cd8317466e87f244c824c28685c6eb21",
+          "mtimeUTC": "2026-10-19T00:44:17.071777+00:00"
+        },
+        "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/.prisma/client/index.js": {
+          "realpath": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/.prisma/client/index.js",
+          "isSymlink": false,
+          "sha256": "b0d48e30684c70c297b4706bc9f5bd1f4ad6cdb0af79b256b27d1fc503129b87",
+          "mtimeUTC": "2026-10-19T00:44:17.024111+00:00"
+        },
+        "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/@prisma/client/index.js": {
+          "realpath": "/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/backend/node_modules/@prisma/client/index.js",
+          "isSymlink": false,
+          "sha256": "98ebb7453444d223cacae7a3d8ad655f29997523d9a1646d383f852b10ba70fa",
+          "mtimeUTC": "2026-10-10T14:26:08.290379+00:00"
+        }
+      }
+    },
+    "original_main_frontend": {
+      "path": "/Users/Qiang/Projects/eduk12-main-20261018/server-version/frontend/node_modules",
+      "isSymlink": true,
+      "target": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules",
+      "mode": "0o755"
+    },
+    "original_main_backend": {
+      "path": "/Users/Qiang/Projects/eduk12-main-20261018/server-version/backend/node_modules",
+      "isSymlink": false,
+      "target": "/Users/Qiang/Projects/eduk12-main-20261018/server-version/backend/node_modules",
+      "mode": "0o755",
+      "prismaGenerated": {
+        "/Users/Qiang/Projects/eduk12-main-20261018/server-version/backend/node_modules/.prisma/client/schema.prisma": {
+          "realpath": "/Users/Qiang/Projects/eduk12-main-20261018/server-version/backend/node_modules/.prisma/client/schema.prisma",
+          "isSymlink": false,
+          "sha256": "c39251f82a75b5ab2a43c387d363988681fc3bc8abe5f966ef726e417edccb0a",
+          "mtimeUTC": "2026-10-17T15:54:10.039527+00:00"
+        },
+        "/Users/Qiang/Projects/eduk12-main-20261018/server-version/backend/node_modules/.prisma/client/index.js": {
+          "realpath": "/Users/Qiang/Projects/eduk12-main-20261018/server-version/backend/node_modules/.prisma/client/index.js",
+          "isSymlink": false,
+          "sha256": "dd1334ca4c44e463481622fbe67dac1915d8eb8ec838cad2a665b08e3625d377",
+          "mtimeUTC": "2026-10-17T15:54:09.851664+00:00"
+        },
+        "/Users/Qiang/Projects/eduk12-main-20261018/server-version/backend/node_modules/@prisma/client/index.js": {
+          "realpath": "/Users/Qiang/Projects/eduk12-main-20261018/server-version/backend/node_modules/@prisma/client/index.js",
+          "isSymlink": false,
+          "sha256": "98ebb7453444d223cacae7a3d8ad655f29997523d9a1646d383f852b10ba70fa",
+          "mtimeUTC": "2026-10-10T14:26:08.290379+00:00"
+        }
+      }
+    },
+    "target_frontend": {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules",
+      "isSymlink": false,
+      "target": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules",
+      "mode": "0o755"
+    }
+  },
+  "externalTaskLinks": [],
+  "externalCacheFilesInWindow": [
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/_metadata.json",
+      "bytes": 7347,
+      "mtimeUTC": "2026-10-19T00:44:29.853533+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.853533+00:00",
+      "sha256": "3c817f05c49f373ad984278e3e86c4c9e6ffa5f94e9ca30c7a5fb576e6bf7ca3"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-SIBJGJ3Y.js.map",
+      "bytes": 57418,
+      "mtimeUTC": "2026-10-19T00:44:29.791156+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.791156+00:00",
+      "sha256": "aeb4edfd099d375dcaef7dfbbcc5a9976e8c5f878b827817f0de42c5450a10bd"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/antd.js",
+      "bytes": 3571744,
+      "mtimeUTC": "2026-10-19T00:44:29.792603+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.792603+00:00",
+      "sha256": "e45fd5fcfa938a04b3ed9e78f07e9f33e56eb4defd989928dfebde115d4b24f6"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/qrcode__react.js.map",
+      "bytes": 72378,
+      "mtimeUTC": "2026-10-19T00:44:29.784655+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.784655+00:00",
+      "sha256": "e974654b5c99fef50bf115970a154de5cd9f7f5d1c8729fdd3a3fceb7078afcc"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/qrcode__react.js",
+      "bytes": 44316,
+      "mtimeUTC": "2026-10-19T00:44:29.784739+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.784739+00:00",
+      "sha256": "52e6ec16bf586e0267b41903df71c6e98d562856a78d013dd1be1edc20ecfba1"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/@noble_hashes_sha256.js.map",
+      "bytes": 44954,
+      "mtimeUTC": "2026-10-19T00:44:29.788193+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.788193+00:00",
+      "sha256": "77fb92d619985285e4579677eb289e5e755df027a4472fdfec1b8d9c9ff4654a"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/hls__js.js.map",
+      "bytes": 2481390,
+      "mtimeUTC": "2026-10-19T00:44:29.787442+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.787442+00:00",
+      "sha256": "7bc79ea4b0b5134a45d2b1b6ef61f3f26d42b901c5f6870300aabf9c8acba097"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/axios.js",
+      "bytes": 127842,
+      "mtimeUTC": "2026-10-19T00:44:29.791071+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.791071+00:00",
+      "sha256": "00905e88b716246cedd673e21e614030803973e8914846826250ad7d60a41d47"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-ZWW7WL2E.js.map",
+      "bytes": 1397432,
+      "mtimeUTC": "2026-10-19T00:44:29.791830+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.791830+00:00",
+      "sha256": "f6a594a058c824984704d9e4d569fd3ed55302b1f1dfa5022db49efb0c8b61f2"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/hls__js.js",
+      "bytes": 1117167,
+      "mtimeUTC": "2026-10-19T00:44:29.789596+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.789596+00:00",
+      "sha256": "db05218ab7ac22a91fba41dc50107d3af794e49a657cbc1befd686db2233ebcf"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/@noble_hashes_utils.js",
+      "bytes": 1043,
+      "mtimeUTC": "2026-10-19T00:44:29.850495+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.850495+00:00",
+      "sha256": "4d2d16158c45ee416ad4093d9ebe9514701a67ed5279015f18cb7c6a8feef7d7"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-SIBJGJ3Y.js",
+      "bytes": 29108,
+      "mtimeUTC": "2026-10-19T00:44:29.791995+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.791995+00:00",
+      "sha256": "29230111d2fc2dc5348157fc066c1a090967e1d3e4c81100f64717db5da84518"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/react-dom_client.js",
+      "bytes": 179,
+      "mtimeUTC": "2026-10-19T00:44:29.849535+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.849535+00:00",
+      "sha256": "9f6d5aa46edf65b66a7d305fb61234565068d3be59d0a149dbddcee652c81b1f"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/echarts.js",
+      "bytes": 60974,
+      "mtimeUTC": "2026-10-19T00:44:29.795301+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.795301+00:00",
+      "sha256": "dc2eb8cb9743c755df3d5eb3eb354437001bca450c50e9285ec56b5265c91a16"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/react_jsx-dev-runtime.js",
+      "bytes": 37251,
+      "mtimeUTC": "2026-10-19T00:44:29.796851+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.796851+00:00",
+      "sha256": "d122d5c6ac2a3f67b8e458974de39e1882b7565749847d09330ed3e273559239"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-WOOG5QLI.js.map",
+      "bytes": 93,
+      "mtimeUTC": "2026-10-19T00:44:29.791255+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.791255+00:00",
+      "sha256": "ed562b0bba7ee7214e56ac7f728054b3496bec4597c94a4eb7b4179e6f5cb1c9"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/react.js",
+      "bytes": 117,
+      "mtimeUTC": "2026-10-19T00:44:29.851114+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.851114+00:00",
+      "sha256": "20930b8805765b7d1d7019afc4e89e14f02c22e4d08f24e6b41c548857b60799"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/react-dom_client.js.map",
+      "bytes": 93,
+      "mtimeUTC": "2026-10-19T00:44:29.785120+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.785120+00:00",
+      "sha256": "ed562b0bba7ee7214e56ac7f728054b3496bec4597c94a4eb7b4179e6f5cb1c9"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/dayjs.js",
+      "bytes": 125,
+      "mtimeUTC": "2026-10-19T00:44:29.851495+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.851495+00:00",
+      "sha256": "4aafa9c040787441e8a7ec16416680711d81e076b1096b82d6781ba1db7bc651"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-V63TNJ6M.js.map",
+      "bytes": 67426,
+      "mtimeUTC": "2026-10-19T00:44:29.784858+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.784858+00:00",
+      "sha256": "e0ef32c60d9f0ea2c6c3fd46a5764d6c3b77839253e7fefda2a3553eec7df6ef"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-YWADR3KQ.js",
+      "bytes": 78068,
+      "mtimeUTC": "2026-10-19T00:44:29.787802+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.787802+00:00",
+      "sha256": "6c5c7e9e6115543b6a3622c6e95ea5ec7ff65d30c14abfab2a330303f1789fbd"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/echarts_renderers.js",
+      "bytes": 237,
+      "mtimeUTC": "2026-10-19T00:44:29.850866+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.850866+00:00",
+      "sha256": "40fdc9ae725acaac6576dec0685f9becb131db07f36a29c19c2328cea7e2908a"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-5ESWUC3K.js.map",
+      "bytes": 1422726,
+      "mtimeUTC": "2026-10-19T00:44:29.797637+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.797637+00:00",
+      "sha256": "21c4d62029dd0df6590fd995089b653f01bf2a46d3f2a1691964b501f09986ca"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-6PL5AEEJ.js.map",
+      "bytes": 53233,
+      "mtimeUTC": "2026-10-19T00:44:29.794314+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.794314+00:00",
+      "sha256": "7b594037a808afea1237a7a8b1a37df42e946cb43ccd1ee8c9a58e8d6e18aab9"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/react-dom.js.map",
+      "bytes": 93,
+      "mtimeUTC": "2026-10-19T00:44:29.795316+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.795316+00:00",
+      "sha256": "ed562b0bba7ee7214e56ac7f728054b3496bec4597c94a4eb7b4179e6f5cb1c9"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-OR63GD7B.js",
+      "bytes": 932440,
+      "mtimeUTC": "2026-10-19T00:44:29.794412+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.794412+00:00",
+      "sha256": "f5f8ac2be3590feac09d093f36a04dd5dc6df1e5ceb9702b0bc548aaade69433"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/echarts-wordcloud.js",
+      "bytes": 37784,
+      "mtimeUTC": "2026-10-19T00:44:29.794453+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.794453+00:00",
+      "sha256": "901b76a3a335f75737f65fad0050ab128b19f6a8af569d6871f0ee4b509da03f"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-OR63GD7B.js.map",
+      "bytes": 1493186,
+      "mtimeUTC": "2026-10-19T00:44:29.789696+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.789696+00:00",
+      "sha256": "62c97dde163f0f38b2c15ebd492cec6c3abb1e18e4f60e4b755acbbe10759ebf"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-LJKLFD2W.js",
+      "bytes": 336349,
+      "mtimeUTC": "2026-10-19T00:44:29.793975+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.793975+00:00",
+      "sha256": "fbefd67f83b70b0eef082e02e4c16b45fe96fac9c13b505240494627d5b190d9"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/socket__io-client.js",
+      "bytes": 110620,
+      "mtimeUTC": "2026-10-19T00:44:29.788152+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.788152+00:00",
+      "sha256": "9d6d10f62b0373fb46de1dc215ce791db554b43d2aa8b9f5e66a761c451fb74f"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/echarts_core.js.map",
+      "bytes": 93,
+      "mtimeUTC": "2026-10-19T00:44:29.784734+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.784734+00:00",
+      "sha256": "ed562b0bba7ee7214e56ac7f728054b3496bec4597c94a4eb7b4179e6f5cb1c9"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-XZZ464UM.js.map",
+      "bytes": 1299,
+      "mtimeUTC": "2026-10-19T00:44:29.797076+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.797076+00:00",
+      "sha256": "6a9d6dfd18a040bbbff101ba1117c73e24a9b5fe6a9b30a74868eec97cf99ee3"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-XZZ464UM.js",
+      "bytes": 1123,
+      "mtimeUTC": "2026-10-19T00:44:29.796804+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.796804+00:00",
+      "sha256": "a0f2c91041d72909035eb9d499e3396b1ed129db2d1ffb061017fbfec0a20150"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-7KBYTWHJ.js",
+      "bytes": 7277,
+      "mtimeUTC": "2026-10-19T00:44:29.791352+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.791352+00:00",
+      "sha256": "16eaa099ffdd467805dbc2e8b0c102292f99d8ab9d1d953c2ffed0b79db6bd95"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-PNBN2SVF.js.map",
+      "bytes": 692425,
+      "mtimeUTC": "2026-10-19T00:44:29.791894+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.791894+00:00",
+      "sha256": "1cd611afa3452bd0c2b541529b32a481d25e72fa932b4e417c42162234a03894"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-WOOG5QLI.js",
+      "bytes": 2841,
+      "mtimeUTC": "2026-10-19T00:44:29.851661+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.851661+00:00",
+      "sha256": "ad2f67b1fff4281c5c25a4edbdd3d3c689ebd36287ecea414c26943228cc4e64"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/react_jsx-runtime.js.map",
+      "bytes": 62085,
+      "mtimeUTC": "2026-10-19T00:44:29.796065+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.796065+00:00",
+      "sha256": "32d18cc0ef009a84cac9471a5c63f7af90ac6f9702a7efdbd8a56d13e93e717e"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-6PL5AEEJ.js",
+      "bytes": 22661,
+      "mtimeUTC": "2026-10-19T00:44:29.795314+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.795314+00:00",
+      "sha256": "e8a57817a346a8ffa3a8890cc51ff787e01312967ac5e190e8979e4c0763fe4b"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/echarts_charts.js.map",
+      "bytes": 93,
+      "mtimeUTC": "2026-10-19T00:44:29.795358+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.795358+00:00",
+      "sha256": "ed562b0bba7ee7214e56ac7f728054b3496bec4597c94a4eb7b4179e6f5cb1c9"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/echarts_components.js",
+      "bytes": 1950,
+      "mtimeUTC": "2026-10-19T00:44:29.850628+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.850628+00:00",
+      "sha256": "aabf92336bbf8dc81c868660f4fb67c6823fa852ffb49591ffaca97686ee2cd4"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-V63TNJ6M.js",
+      "bytes": 30953,
+      "mtimeUTC": "2026-10-19T00:44:29.785324+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.785324+00:00",
+      "sha256": "1804519c7606cf6dbec85583d987a4ddbbad3e81738a53d6c259b505954a21e9"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/@noble_hashes_sha256.js",
+      "bytes": 18305,
+      "mtimeUTC": "2026-10-19T00:44:29.789701+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.789701+00:00",
+      "sha256": "989e3282b6b010e22094cedacd11b24a954b92a0121b6f2048e4077a0c0402b7"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-5ESWUC3K.js",
+      "bytes": 635293,
+      "mtimeUTC": "2026-10-19T00:44:29.797061+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.797061+00:00",
+      "sha256": "eff6017624623292cacc91ff134396e9e277f1452680604370f4ed1831dbb98c"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/react-router-dom.js",
+      "bytes": 477396,
+      "mtimeUTC": "2026-10-19T00:44:29.785560+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.785560+00:00",
+      "sha256": "d14f9aace507b751ba1f655ad03077f140c1fa0a122ed97bf95662c1cb029a68"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/react_jsx-runtime.js",
+      "bytes": 37590,
+      "mtimeUTC": "2026-10-19T00:44:29.798638+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.798638+00:00",
+      "sha256": "49ebcd832b8cddc2ec1759a2e90be976e4579a615e2875cbee9456b3d3f98f35"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/echarts_core.js",
+      "bytes": 2451,
+      "mtimeUTC": "2026-10-19T00:44:29.850019+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.850019+00:00",
+      "sha256": "7c2374c0f88d01ea22b6c11ada000845a73b0f18de82befe6b9743c15293de3f"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-6E5BZNGP.js.map",
+      "bytes": 5049,
+      "mtimeUTC": "2026-10-19T00:44:29.788998+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.788998+00:00",
+      "sha256": "f34c5d26dd5f63315e7a19a463577b1de453eb47d6842f6f26ed7afcea8eb205"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/package.json",
+      "bytes": 23,
+      "mtimeUTC": "2026-10-19T00:44:27.046118+00:00",
+      "ctimeUTC": "2026-10-19T00:44:27.046118+00:00",
+      "sha256": "3ca9d4afd21425087cf31893b8f9f63c81b0b8408db5e343ca76e5f8aa26ab9a"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/@ant-design_icons.js",
+      "bytes": 1722367,
+      "mtimeUTC": "2026-10-19T00:44:29.796333+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.796333+00:00",
+      "sha256": "052b397ad5c89a1f7d761977898f033ae5f4254baf266a8a1ca55cc94ac8732d"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/echarts_charts.js",
+      "bytes": 1094,
+      "mtimeUTC": "2026-10-19T00:44:29.850336+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.850336+00:00",
+      "sha256": "2126221865ea9f0ed673201d0805ca420eb33137123575452e46caa3fdc48314"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/@ant-design_icons.js.map",
+      "bytes": 3344785,
+      "mtimeUTC": "2026-10-19T00:44:29.796695+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.796695+00:00",
+      "sha256": "5d4d324f8883dab7cf1528ef1420bdd99d1edcb2ebad9af36c2eac7e3aea446c"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-2KALUT56.js",
+      "bytes": 569232,
+      "mtimeUTC": "2026-10-19T00:44:29.793075+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.793075+00:00",
+      "sha256": "cdbcd9ae740d91942c6c65ddfde4b5ec6b4b35d7ea6c3cd86551450f3083b43c"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/echarts.js.map",
+      "bytes": 124019,
+      "mtimeUTC": "2026-10-19T00:44:29.794419+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.794419+00:00",
+      "sha256": "3b47cf2d3ecbad1106b1c4cdd69ab874e9f1032bc1a28b5c59202fb064b9b35b"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-7KBYTWHJ.js.map",
+      "bytes": 20148,
+      "mtimeUTC": "2026-10-19T00:44:29.791170+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.791170+00:00",
+      "sha256": "c0a01010b8a96c0b76da0aa11bff30a49cf338c9bf6b6b46f04ea33b5de448f1"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/lucide-react.js",
+      "bytes": 1153553,
+      "mtimeUTC": "2026-10-19T00:44:29.785965+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.785965+00:00",
+      "sha256": "3d254e10c6b80c9c2799865c79d35cc15e8b40e2bdbc6e4edea7a6b3a8a51a02"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/react-dom.js",
+      "bytes": 155,
+      "mtimeUTC": "2026-10-19T00:44:29.851274+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.851274+00:00",
+      "sha256": "d5d0bb582afb07b67c272ea55984d4e73142bc5e2ab78911d76320cafd9c0d89"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/echarts_components.js.map",
+      "bytes": 93,
+      "mtimeUTC": "2026-10-19T00:44:29.789961+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.789961+00:00",
+      "sha256": "ed562b0bba7ee7214e56ac7f728054b3496bec4597c94a4eb7b4179e6f5cb1c9"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/react-router-dom.js.map",
+      "bytes": 829245,
+      "mtimeUTC": "2026-10-19T00:44:29.786390+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.786390+00:00",
+      "sha256": "4ff76bbfe2eaf117ff06080cc20b8dce95e052d8dbb5cb6e1b73da94bcfbfe1c"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/axios.js.map",
+      "bytes": 263574,
+      "mtimeUTC": "2026-10-19T00:44:29.789976+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.789976+00:00",
+      "sha256": "3fd7ddf0fd809262b401366069bb82c72d8db150346111a3e7aeaf703cb50747"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/pdfjs-dist.js",
+      "bytes": 924587,
+      "mtimeUTC": "2026-10-19T00:44:29.785259+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.785259+00:00",
+      "sha256": "432aab1ad496d568ef0482d2fed1a44d37f0e7173537cede1def56a9e19c2924"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/echarts_renderers.js.map",
+      "bytes": 93,
+      "mtimeUTC": "2026-10-19T00:44:29.788998+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.788998+00:00",
+      "sha256": "ed562b0bba7ee7214e56ac7f728054b3496bec4597c94a4eb7b4179e6f5cb1c9"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/react.js.map",
+      "bytes": 93,
+      "mtimeUTC": "2026-10-19T00:44:29.793212+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.793212+00:00",
+      "sha256": "ed562b0bba7ee7214e56ac7f728054b3496bec4597c94a4eb7b4179e6f5cb1c9"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/pdfjs-dist.js.map",
+      "bytes": 1839154,
+      "mtimeUTC": "2026-10-19T00:44:29.785032+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.785032+00:00",
+      "sha256": "7193b01937115fd38bce165ad4b52742e33315e4defdc0ce2f9bde40b25c9983"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/dayjs.js.map",
+      "bytes": 93,
+      "mtimeUTC": "2026-10-19T00:44:29.792672+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.792672+00:00",
+      "sha256": "ed562b0bba7ee7214e56ac7f728054b3496bec4597c94a4eb7b4179e6f5cb1c9"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/react_jsx-dev-runtime.js.map",
+      "bytes": 61258,
+      "mtimeUTC": "2026-10-19T00:44:29.795628+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.795628+00:00",
+      "sha256": "6b09cac7f33cc8eadfa2767b6c903618aaf1c8b581cf6a0e5724b310715a5f6e"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/@noble_hashes_utils.js.map",
+      "bytes": 93,
+      "mtimeUTC": "2026-10-19T00:44:29.785767+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.785767+00:00",
+      "sha256": "ed562b0bba7ee7214e56ac7f728054b3496bec4597c94a4eb7b4179e6f5cb1c9"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/lucide-react.js.map",
+      "bytes": 3373615,
+      "mtimeUTC": "2026-10-19T00:44:29.785962+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.785962+00:00",
+      "sha256": "01da099b49af9ad901ef95a7d19874e2c2a241d35dd8905cb7c8059fd0f8800d"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-J3SPLNAL.js.map",
+      "bytes": 267413,
+      "mtimeUTC": "2026-10-19T00:44:29.796540+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.796540+00:00",
+      "sha256": "c6ae5a83c3d53697586c14a8e979fe779e2bfd829ea5aa7f65e6ea023074e750"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/antd.js.map",
+      "bytes": 6379184,
+      "mtimeUTC": "2026-10-19T00:44:29.793769+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.793769+00:00",
+      "sha256": "d7597e15d0f6153ee0e8fb76fa980f8858c8a2a82a51295a2d5512a4057119bc"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/dompurify.js",
+      "bytes": 67489,
+      "mtimeUTC": "2026-10-19T00:44:29.790878+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.790878+00:00",
+      "sha256": "0864358b86a4772920db856b762a9528ea58ab2449a04335a6b02faae2e3be7e"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-ZWW7WL2E.js",
+      "bytes": 605343,
+      "mtimeUTC": "2026-10-19T00:44:29.792569+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.792569+00:00",
+      "sha256": "6d56948033ed4e67bb2ed7e8ad22144095bb371c3100e0225385e1c8496e3947"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-J3SPLNAL.js",
+      "bytes": 146529,
+      "mtimeUTC": "2026-10-19T00:44:29.795923+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.795923+00:00",
+      "sha256": "4ec75cc42ac1e34af3f32a2b6d3e814db88ae3d656774e075e08d22d014b61f8"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-LJKLFD2W.js.map",
+      "bytes": 665495,
+      "mtimeUTC": "2026-10-19T00:44:29.794322+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.794322+00:00",
+      "sha256": "23ddabcb3e76e64f5d51fe8cadda44455bf2cbf02e7faf31986979dcf6c3c92b"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-3NXSRCCS.js",
+      "bytes": 12832,
+      "mtimeUTC": "2026-10-19T00:44:29.790174+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.790174+00:00",
+      "sha256": "e441af09c5c7893cbacd5031352c8070a64b574b482f8bca8fae87d5e8eec0d4"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/dompurify.js.map",
+      "bytes": 185166,
+      "mtimeUTC": "2026-10-19T00:44:29.790652+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.790652+00:00",
+      "sha256": "1cc22faef8b09dcaae1c239663faac5af06561b7382fb0e48b0217155e2dc0bf"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-PNBN2SVF.js",
+      "bytes": 310270,
+      "mtimeUTC": "2026-10-19T00:44:29.791545+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.791545+00:00",
+      "sha256": "2f941d853e604441c0501f9955ce5de671839e6740df23774370cd99c4a2bb4d"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/socket__io-client.js.map",
+      "bytes": 228274,
+      "mtimeUTC": "2026-10-19T00:44:29.786601+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.786601+00:00",
+      "sha256": "aee0bba5b242191c135794a1e2987f93759539479383dc373d60968f6174859e"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-3NXSRCCS.js.map",
+      "bytes": 19165,
+      "mtimeUTC": "2026-10-19T00:44:29.789802+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.789802+00:00",
+      "sha256": "fce00449d70bffd173c42f28cd6e1fa7512f0e821468b4883831d319dedb79b0"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-6E5BZNGP.js",
+      "bytes": 1950,
+      "mtimeUTC": "2026-10-19T00:44:29.789829+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.789829+00:00",
+      "sha256": "774aa4211492dfe9cae8fbcebe0a3290b6fc645da1b962acce30dd0c835ba302"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-QJAVXTCT.js.map",
+      "bytes": 100271,
+      "mtimeUTC": "2026-10-19T00:44:29.790874+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.790874+00:00",
+      "sha256": "e269dcdd202cb69d6999c50df049a5e91401d7d9295faba88291e7bcdc108408"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-YWADR3KQ.js.map",
+      "bytes": 125777,
+      "mtimeUTC": "2026-10-19T00:44:29.798648+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.798648+00:00",
+      "sha256": "6f5bd9a605c1db6f0adf9fdea2e68c9cb856ff5399cf73a66847f3d4fa8c5a4d"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-QJAVXTCT.js",
+      "bytes": 51357,
+      "mtimeUTC": "2026-10-19T00:44:29.791019+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.791019+00:00",
+      "sha256": "547dd49ad480365fc24e1275e69b487cf4090b408d61c573048258167d6def43"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/chunk-2KALUT56.js.map",
+      "bytes": 1277716,
+      "mtimeUTC": "2026-10-19T00:44:29.791740+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.791740+00:00",
+      "sha256": "092c454ad00e144673a6644119e4a93d43ed7fdd9687942aceb4cd845175921f"
+    },
+    {
+      "path": "/Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/.vite/deps/echarts-wordcloud.js.map",
+      "bytes": 77954,
+      "mtimeUTC": "2026-10-19T00:44:29.793330+00:00",
+      "ctimeUTC": "2026-10-19T00:44:29.793330+00:00",
+      "sha256": "82832e1748a0cf14198b063bb89ab893c554a92d0780dd5f8ededef54e55a165"
+    }
+  ],
+  "task": {
+    "head": {
+      "exit": 0,
+      "stdout": "f6df9c5b21c5a0d50853d5e6e2d1bfd79389dcd0",
+      "stderr": ""
+    },
+    "status": {
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "trackedDiff": {
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "trackedFiles": {
+      "server-version/frontend/package-lock.json": {
+        "sha256": "5288a377ebdd829533561cf2383cd2bcd20e15bd12e6d15762b36a05f7bec1ca",
+        "gitBlob": "9fc33dd617ce75766564786d880e588142c11eed",
+        "headBlob": "9fc33dd617ce75766564786d880e588142c11eed"
+      },
+      "server-version/frontend/package.json": {
+        "sha256": "bab361f2eeff284f8638eab14b7152dfa2ebdc67df5f7fa0ec4595d039e0827d",
+        "gitBlob": "4a287572dfb7d636477ea34985fab7a0b12fae53",
+        "headBlob": "4a287572dfb7d636477ea34985fab7a0b12fae53"
+      },
+      "server-version/backend/package-lock.json": {
+        "sha256": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+        "gitBlob": "9f423e13b7f131ab399d2d8f44601545f869d607",
+        "headBlob": "9f423e13b7f131ab399d2d8f44601545f869d607"
+      },
+      "server-version/backend/prisma/schema.prisma": {
+        "sha256": "a36ffd77d90c9e26259b739f33f80f0910399a60569c8501332251e558f7d2b8",
+        "gitBlob": "dae74c7d3c1d981bd29eb0d85298f0591162ae1b",
+        "headBlob": "dae74c7d3c1d981bd29eb0d85298f0591162ae1b"
+      }
+    }
+  },
+  "original_main": {
+    "head": {
+      "exit": 0,
+      "stdout": "0c41f07cb8c6104ad7c88448d948682baf24cf37",
+      "stderr": ""
+    },
+    "status": {
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "trackedDiff": {
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "trackedFiles": {
+      "server-version/frontend/package-lock.json": {
+        "sha256": "5288a377ebdd829533561cf2383cd2bcd20e15bd12e6d15762b36a05f7bec1ca",
+        "gitBlob": "9fc33dd617ce75766564786d880e588142c11eed",
+        "headBlob": "9fc33dd617ce75766564786d880e588142c11eed"
+      },
+      "server-version/frontend/package.json": {
+        "sha256": "bab361f2eeff284f8638eab14b7152dfa2ebdc67df5f7fa0ec4595d039e0827d",
+        "gitBlob": "4a287572dfb7d636477ea34985fab7a0b12fae53",
+        "headBlob": "4a287572dfb7d636477ea34985fab7a0b12fae53"
+      },
+      "server-version/backend/package-lock.json": {
+        "sha256": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+        "gitBlob": "9f423e13b7f131ab399d2d8f44601545f869d607",
+        "headBlob": "9f423e13b7f131ab399d2d8f44601545f869d607"
+      },
+      "server-version/backend/prisma/schema.prisma": {
+        "sha256": "174ad13366e92fa22d8f01ce598d8e90fa59f2adf6d3a0356fda0580961dbacc",
+        "gitBlob": "36afa36b2b045d9c25e5fa2e15d551478f195db3",
+        "headBlob": "36afa36b2b045d9c25e5fa2e15d551478f195db3"
+      }
+    }
+  },
+  "dependency_target_worktree": {
+    "head": {
+      "exit": 0,
+      "stdout": "f268cea03f5848029be559bed71251977b323f9c",
+      "stderr": ""
+    },
+    "status": {
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "trackedDiff": {
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "trackedFiles": {
+      "server-version/frontend/package-lock.json": {
+        "sha256": "5288a377ebdd829533561cf2383cd2bcd20e15bd12e6d15762b36a05f7bec1ca",
+        "gitBlob": "9fc33dd617ce75766564786d880e588142c11eed",
+        "headBlob": "9fc33dd617ce75766564786d880e588142c11eed"
+      },
+      "server-version/frontend/package.json": {
+        "sha256": "bab361f2eeff284f8638eab14b7152dfa2ebdc67df5f7fa0ec4595d039e0827d",
+        "gitBlob": "4a287572dfb7d636477ea34985fab7a0b12fae53",
+        "headBlob": "4a287572dfb7d636477ea34985fab7a0b12fae53"
+      },
+      "server-version/backend/package-lock.json": {
+        "sha256": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+        "gitBlob": "9f423e13b7f131ab399d2d8f44601545f869d607",
+        "headBlob": "9f423e13b7f131ab399d2d8f44601545f869d607"
+      },
+      "server-version/backend/prisma/schema.prisma": {
+        "sha256": "899bc550a4818527a13f9a69f735ad05008a0b876af63f85be7d8192ee4f4bda",
+        "gitBlob": "8dbccc0b2d7d2234e3ddabf29bbeac52e7bff0bf",
+        "headBlob": "8dbccc0b2d7d2234e3ddabf29bbeac52e7bff0bf"
+      }
+    }
+  },
+  "limits": [
+    "No pre-operation byte snapshot of external ignored dependency cache exists",
+    "Current git cleanliness proves current tracked source/lock equality to HEAD; cannot prove every ignored file or past service state unchanged",
+    "84 cache files have mtime/ctime in first Vite optimization window; old bytes unknown; no content-before/after claim",
+    "No outside cache deleted, overwritten or rolled back during correction"
+  ]
+}

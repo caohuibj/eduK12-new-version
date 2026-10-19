@@ -1,0 +1,47 @@
+{
+  "syntheticOnly": true,
+  "readOnly": true,
+  "scope": "two explicitly named task projects; metadata counts only, no answer decryption",
+  "waves": [
+    {
+      "id": "871d81fa-58a5-4ccc-b92d-3ebcd5f1bf25",
+      "title": "S03 合成研究 · 外围界面检查",
+      "revision": 2,
+      "wave_id": "7c79441f-308d-4c59-a844-8b18ab7cf3c8",
+      "wave_title": "S03 合成 FORM",
+      "status": "OPEN",
+      "final_count": 6,
+      "cognitive_result_count": 0
+    },
+    {
+      "id": "871d81fa-58a5-4ccc-b92d-3ebcd5f1bf25",
+      "title": "S03 合成研究 · 外围界面检查",
+      "revision": 2,
+      "wave_id": "5758238a-15fa-4304-9685-4ccdca64c65e",
+      "wave_title": "S03 合成 SCALE",
+      "status": "OPEN",
+      "final_count": 3,
+      "cognitive_result_count": 0
+    },
+    {
+      "id": "871d81fa-58a5-4ccc-b92d-3ebcd5f1bf25",
+      "title": "S03 合成研究 · 外围界面检查",
+      "revision": 2,
+      "wave_id": "d6bc7281-5f33-4e96-97ad-090d94d9aab1",
+      "wave_title": "S03 合成 SJT",
+      "status": "OPEN",
+      "final_count": 3,
+      "cognitive_result_count": 0
+    },
+    {
+      "id": "871d81fa-58a5-4ccc-b92d-3ebcd5f1bf25",
+      "title": "S03 合成研究 · 外围界面检查",
+      "revision": 2,
+      "wave_id": "2b42e3d5-9e12-4626-90da-81914cdcff37",
+      "wave_title": "S03 合成 COGNITIVE",
+      "status": "OPEN",
+      "final_count": 0,
+      "cognitive_result_count": 0
+    }
+  ]
+}

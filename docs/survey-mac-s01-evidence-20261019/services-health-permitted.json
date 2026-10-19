@@ -1,0 +1,64 @@
+{
+  "checkedAtUTC": "2026-10-19T01:02:11.848696+00:00",
+  "http": [
+    {
+      "port": 3190,
+      "path": "/health",
+      "status": 200,
+      "bytes": 54,
+      "health": {
+        "status": "ok"
+      }
+    },
+    {
+      "port": 3190,
+      "path": "/ready",
+      "status": 200,
+      "bytes": 133,
+      "health": {
+        "status": "ok",
+        "dependencies": {
+          "database": "ready",
+          "socketRedis": "ready",
+          "cacheRedis": "ready"
+        }
+      }
+    },
+    {
+      "port": 5190,
+      "path": "/",
+      "status": 200,
+      "bytes": 619
+    },
+    {
+      "port": 3197,
+      "path": "/ready",
+      "status": 200,
+      "bytes": 133,
+      "health": {
+        "status": "ok",
+        "dependencies": {
+          "database": "ready",
+          "socketRedis": "ready",
+          "cacheRedis": "ready"
+        }
+      }
+    },
+    {
+      "port": 5197,
+      "path": "/",
+      "status": 200,
+      "bytes": 619
+    }
+  ],
+  "old_pg": {
+    "exit": 0,
+    "stdout": "127.0.0.1:5549 - accepting connections",
+    "stderr": ""
+  },
+  "old_redis": {
+    "exit": 0,
+    "stdout": "PONG",
+    "stderr": ""
+  }
+}

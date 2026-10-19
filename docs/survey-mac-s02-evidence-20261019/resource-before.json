@@ -1,0 +1,28 @@
+{
+  "phase": "before",
+  "commit": "8ca617efd3c94da4ae1309dba9004dee70887324",
+  "productBase": "f6df9c5b21c5a0d50853d5e6e2d1bfd79389dcd0",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "browser": "Mac in-app Chromium; supplemental, not native Safari/Chrome acceptance",
+  "mode": "Vite/TSX; cache disabled; no throttling; anonymous; networkIdle boundary",
+  "truncated": false,
+  "networkIdle": true,
+  "requests": 375,
+  "finished": 375,
+  "transferredBytes": 15372098,
+  "failed": [],
+  "api": [
+    {
+      "path": "/api/survey/auth/me",
+      "status": 401
+    },
+    {
+      "path": "/api/survey/auth/me",
+      "status": 401
+    }
+  ],
+  "discardedAttempt": "Earlier event read was truncated; excluded from counts. Streaming capture retained all 375 responses and completions."
+}

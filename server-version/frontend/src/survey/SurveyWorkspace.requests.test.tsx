@@ -74,12 +74,13 @@ function fixture({many=false,empty=false,waveCount=1}={}){
   }
 }
 const base='/api/survey/projects/p1'
-const builder=()=>within(screen.getByRole('region',{name:'Survey Research Builder'}))
-const studio=()=>within(screen.getByRole('region',{name:'研究波次'}))
+const builder=()=>{fireEvent.click(screen.getByRole('tab',{name:'研究工具'}));return within(screen.getByRole('region',{name:'Survey Research Builder'}))}
+const studio=()=>{const tab=screen.queryByRole('tab',{name:'发布与采集'});if(tab)fireEvent.click(tab);return within(screen.getByRole('region',{name:'研究波次'}))}
 async function openWorkspace(strict=false){
   window.history.replaceState(null,'','/workspace')
   render(strict?<StrictMode><SurveyApp/></StrictMode>:<SurveyApp/>)
   fireEvent.click((await screen.findAllByRole('button',{name:'查看/编辑'}))[0])
+  fireEvent.click(screen.getByRole('tab',{name:'发布与采集'}))
   await screen.findByRole('region',{name:'研究波次'})
 }
 afterEach(()=>{vi.unstubAllGlobals();window.history.replaceState(null,'','/')})
@@ -360,4 +361,35 @@ describe('shared Survey workspace instruments requests',()=>{
     expect(api.count(base)).toBe(operation==='preflight'?1:2)
   })
 
+})
+
+describe('S04 workspace section navigation',()=>{
+  it('retains unsaved settings, tool and wave edits across sections without any new request',async()=>{
+    const api=fixture();await openWorkspace()
+    fireEvent.change(studio().getByLabelText('波次标题'),{target:{value:'未保存的采集计划'}})
+    fireEvent.click(screen.getByRole('tab',{name:'研究设置'}))
+    fireEvent.change(screen.getByLabelText('研究名称'),{target:{value:'未保存的研究名称'}})
+    fireEvent.click(await builder().findByRole('button',{name:/^工具1 FORM/}))
+    fireEvent.change(await builder().findByLabelText('研究工具名称'),{target:{value:'未保存工具'}})
+    fireEvent.change(builder().getByLabelText('题干'),{target:{value:'未保存题干'}})
+    const requests=api.fetcher.mock.calls.length
+    await act(async()=>{
+      fireEvent.click(screen.getByRole('tab',{name:'研究数据'}))
+      fireEvent.click(screen.getByRole('tab',{name:'发布与采集'}))
+      fireEvent.click(screen.getByRole('tab',{name:'研究设置'}))
+    })
+    expect(screen.getByLabelText('研究名称')).toHaveValue('未保存的研究名称')
+    expect(studio().getByLabelText('波次标题')).toHaveValue('未保存的采集计划')
+    expect(builder().getByLabelText('研究工具名称')).toHaveValue('未保存工具')
+    expect(builder().getByLabelText('题干')).toHaveValue('未保存题干')
+    expect(builder().getByRole('button',{name:'保存草稿'})).toBeEnabled()
+    const tools=screen.getByRole('tab',{name:'研究工具'});tools.focus()
+    fireEvent.keyDown(tools,{key:'ArrowRight'})
+    expect(screen.getByRole('tab',{name:'发布与采集'})).toHaveFocus()
+    expect(screen.getByRole('tab',{name:'发布与采集'})).toHaveAttribute('aria-selected','true')
+    fireEvent.keyDown(screen.getByRole('tab',{name:'发布与采集'}),{key:'End'})
+    expect(screen.getByRole('tab',{name:'研究数据'})).toHaveFocus()
+    expect(screen.getByRole('region',{name:'研究数据状态'})).toBeVisible()
+    expect(api.fetcher.mock.calls).toHaveLength(requests)
+  })
 })

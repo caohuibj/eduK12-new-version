@@ -1,0 +1,17 @@
+
+ RUN  v4.1.11 /Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend
+
+ ✓ src/survey/SurveyAnalyticsWorkspace.download.test.tsx (15 tests) 4365ms
+     ✓ labels and downloads ATTENDANCE_COMPACT_V1 as a separate attendance relation  1024ms
+     ✓ labels and downloads ATTENDANCE_COMPACT_V2 as a separate attendance relation  642ms
+     ✓ preserves native CSV and JSON downloads with includeFreeText=false  342ms
+     ✓ hands the exact signed cursor to the next batch only after three explicit file actions  369ms
+ ✓ src/survey/SurveyAnalyticsWorkspace.recovery.test.tsx (15 tests) 3413ms
+     ✓ keeps page 14 after GET 41 is rate limited, waits through expiry, then explicitly rebuilds its incoming cursor  1683ms
+
+ Test Files  2 passed (2)
+      Tests  30 passed (30)
+   Start at  19:20:57
+   Duration  14.06s (transform 418ms, setup 721ms, import 356ms, tests 7.78s, environment 2.45s)
+
+JSON report written to /Users/Qiang/Documents/Codex/2026-10-19/task/evidence/s07-p2-implementation/tests-final.json

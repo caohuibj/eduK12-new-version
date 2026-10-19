@@ -1,0 +1,21 @@
+.survey-workspace [role="tabpanel"][hidden] { display: none !important; }
+.survey-workspace-nav { margin: 1.5rem 0; padding: 1.25rem; border: 1px solid #cfdee3; border-radius: 1rem; background: #fff; }
+.survey-workspace-eyebrow { margin: 0 0 .35rem; color: #526a78; font-size: .875rem; }
+.survey-workspace-nav h2 { margin: 0 0 .65rem; font-size: 1.5rem; font-weight: 700; color: #193e50; overflow-wrap: anywhere; }
+.survey-workspace-nav > p:not(.survey-workspace-eyebrow) { color: #526a78; line-height: 1.7; }
+.survey-workspace-nav [role="tablist"] { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .65rem; margin-top: 1rem; }
+.survey-workspace-nav [role="tab"] { min-height: 64px; padding: .8rem; text-align: left; border: 1px solid #c9d8de; border-radius: .65rem; background: #fff; color: #23495c; }
+.survey-workspace-nav [role="tab"] strong,.survey-workspace-nav [role="tab"] span { display: block; }
+.survey-workspace-nav [role="tab"] span { margin-top: .25rem; font-size: .875rem; line-height: 1.5; }
+.survey-workspace-nav [role="tab"][aria-selected="true"] { background: #edf8f6; border-color: #176c67; box-shadow: inset 0 0 0 1px #176c67; color: #174d49; }
+.survey-workspace-nav [role="tab"]:focus-visible,.survey-authoring-help button:focus-visible,.survey-authoring-help a:focus-visible,.survey-issue-list button:focus-visible,.survey-authoring-target:focus { outline: 3px solid #16746e; outline-offset: 3px; }
+.survey-authoring-help { padding: 1rem; border: 1px solid #cfdee3; border-radius: .75rem; background: #f7fbfc; line-height: 1.7; }
+.survey-authoring-help summary { cursor: pointer; min-height: 44px; font-weight: 600; }
+.survey-authoring-help table { width: 100%; text-align: left; border-collapse: collapse; font-size: .875rem; }
+.survey-authoring-help th,.survey-authoring-help td { padding: .6rem; border-bottom: 1px solid #d5e2e6; vertical-align: top; }
+.survey-authoring-help textarea { width: 100%; font-size: 1rem; }
+.survey-issue-list { border-left: 4px solid #b43c35; background: #fff7f6; padding: 1rem; border-radius: .5rem; }
+.survey-issue-list li { margin: .5rem 0; }
+.survey-issue-list button { min-height: 44px; text-align: left; text-decoration: underline; color: #9e322c; }
+.survey-issue-list details { font-size: .875rem; overflow-wrap: anywhere; }
+@media (min-width: 48rem) { .survey-workspace-nav [role="tablist"] { grid-template-columns: repeat(4,minmax(0,1fr)); } }

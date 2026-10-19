@@ -1,0 +1,20 @@
+{
+  "sourceCommit": "f6df9c5b21c5a0d50853d5e6e2d1bfd79389dcd0",
+  "mode": "macOS native Vite/TSX development preview; not production artifact",
+  "observedAtUTC": "2026-10-19T00:56:05.830673+00:00",
+  "browser": "Google Chrome 155.0.8059.82 native DevTools Network",
+  "page": "http://survey.localhost:5197/",
+  "cache": "Disable cache checked; page reload; network filter excluded all rows, so total is the denominator",
+  "requests": 378,
+  "transferredBytes": 15552973,
+  "resourceBytes": 15439341,
+  "finishSeconds": 2.69,
+  "domContentLoadedSeconds": 2.42,
+  "loadSeconds": 2.61,
+  "caveats": [
+    "Vite module/React development overhead included",
+    "Not production bundle size, performance qualification or comparison",
+    "Frontend dependencies later corrected from copied symlink to a true independent directory; this observation predates correction",
+    "No SQL count or heap measurement for this S01 baseline; S07 must measure after candidate is fixed"
+  ]
+}

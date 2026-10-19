@@ -1,0 +1,64 @@
+{
+  "reports": {
+    "authoring-final.json": {
+      "numTotalTests": 19,
+      "numPassedTests": 19,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "success": true
+    },
+    "authoring-tests.json": {
+      "numTotalTests": 15,
+      "numPassedTests": 15,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "success": true
+    },
+    "guidance-csv-retry.json": {
+      "numTotalTests": 4,
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 3,
+      "success": true
+    },
+    "guidance-new.json": {
+      "numTotalTests": 4,
+      "numPassedTests": 3,
+      "numFailedTests": 1,
+      "numPendingTests": 0,
+      "success": false
+    },
+    "nav-tests.json": {
+      "numTotalTests": 20,
+      "numPassedTests": 20,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "success": true
+    },
+    "navigation-new.json": {
+      "numTotalTests": 21,
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 20,
+      "success": true
+    },
+    "requests-final.json": {
+      "numTotalTests": 21,
+      "numPassedTests": 21,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "success": true
+    }
+  },
+  "types": {
+    "result": "passed",
+    "log": "s04-types.log",
+    "source": "bf21cab input; source binding preserved"
+  },
+  "lint": {
+    "result": "passed",
+    "log": "s04-lint.log",
+    "source": "bf21cab input; source binding preserved"
+  },
+  "formalActionsQualification": false
+}

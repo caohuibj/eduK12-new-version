@@ -37,7 +37,7 @@ describe('Survey public entry and existing authentication transitions', () => {
   it('keeps direct workspace access behind the existing session lookup', async () => {
     window.history.replaceState(null, '', '/workspace')
     render(<SurveyApp />)
-    expect(await screen.findByRole('heading', { name: 'Researcher 登录' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: '研究者登录' })).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: '我的研究' })).not.toBeInTheDocument()
   })
 
@@ -47,7 +47,7 @@ describe('Survey public entry and existing authentication transitions', () => {
       render(<SurveyApp />)
       expect(screen.getByRole('main')).toBeInTheDocument()
       expect(screen.getByRole('link', { name: '返回平台介绍' })).toHaveAttribute('href', '/#survey-features')
-      expect(screen.queryByRole('heading', { name: 'Researcher 登录' })).not.toBeInTheDocument()
+      expect(screen.queryByRole('heading', { name: '研究者登录' })).not.toBeInTheDocument()
     },
   )
 
@@ -64,7 +64,7 @@ describe('Survey public entry and existing authentication transitions', () => {
     })
     vi.stubGlobal('fetch', fetcher)
     render(<SurveyApp />)
-    await screen.findByRole('heading', { name: 'Researcher 登录' })
+    await screen.findByRole('heading', { name: '研究者登录' })
     fireEvent.change(screen.getByLabelText('研究者登录名'), { target: { value: 'invited' } })
     fireEvent.change(screen.getByLabelText('密码'), { target: { value: 'test-password' } })
     fireEvent.click(screen.getByRole('button', { name: '进入双因素验证' }))
@@ -127,7 +127,7 @@ describe('Survey public entry and existing authentication transitions', () => {
     fireEvent.click(screen.getByRole('button',{name:'确认修改密码'}))
     await waitFor(()=>expect(calls.find(x=>x.url.endsWith('/auth/change-password'))?.body)
       .toEqual({oldPassword:'OldPass1234',newPassword:'NewPass1234',code:'123456'}))
-    expect(await screen.findByRole('heading',{name:'Researcher 登录'})).toBeInTheDocument()
+    expect(await screen.findByRole('heading',{name:'研究者登录'})).toBeInTheDocument()
   })
 
 })

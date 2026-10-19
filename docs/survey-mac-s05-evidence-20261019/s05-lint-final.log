@@ -1,0 +1,6 @@
+
+/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/src/pages/admin/SurveyResearchersAdmin.tsx
+  52:95  warning  React Hook useEffect has a missing dependency: 'refresh'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+✖ 1 problem (0 errors, 1 warning)
+

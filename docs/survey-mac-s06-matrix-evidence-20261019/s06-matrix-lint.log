@@ -1,0 +1,6 @@
+
+/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/src/survey/ResearchPreview.tsx
+  25:83  warning  React Hook useEffect has a missing dependency: 'initialAnswers'. Either include it or remove the dependency array. If 'setAnswers' needs the current value of 'initialAnswers', you can also switch to useReducer instead of useState and read 'initialAnswers' in the reducer  react-hooks/exhaustive-deps
+
+✖ 1 problem (0 errors, 1 warning)
+

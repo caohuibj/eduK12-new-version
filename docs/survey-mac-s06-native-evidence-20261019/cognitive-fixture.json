@@ -1,0 +1,24 @@
+{
+  "syntheticOnly": true,
+  "source": "generated contract fixture through unchanged HTTP APIs; not native timing/collection evidence",
+  "projectId": "871d81fa-58a5-4ccc-b92d-3ebcd5f1bf25",
+  "waveId": "2b42e3d5-9e12-4626-90da-81914cdcff37",
+  "attemptId": "e89e44be-0d4b-4422-97c2-b4b9d6315c36",
+  "sessionId": "257473b8-07e4-4912-a7a5-73dc4ff4a4fd",
+  "receiptId": "4d7b28a3-8a30-42eb-988f-f8d4f782ca0a",
+  "trialCount": 120,
+  "trialFixtureSha256": "516ec239e2164b9370b0e37b6189766bc091dab3294e711fd7732026e3d9fda1",
+  "parentStatus": "COMPLETED",
+  "requests": [
+    {
+      "path": "/r/e747807b-07c7-4f15-b018-d8f1e77fab8b/attempts/e89e44be-0d4b-4422-97c2-b4b9d6315c36/task",
+      "status": 200,
+      "responseBytes": 1153
+    },
+    {
+      "path": "/r/e747807b-07c7-4f15-b018-d8f1e77fab8b/attempts/e89e44be-0d4b-4422-97c2-b4b9d6315c36/final",
+      "status": 200,
+      "responseBytes": 639
+    }
+  ]
+}

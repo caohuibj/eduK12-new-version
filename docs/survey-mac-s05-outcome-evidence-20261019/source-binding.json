@@ -1,0 +1,24 @@
+{
+  "base": "ffb2424a800bd8d1c3794b547158085c450a016c",
+  "files": {
+    "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.tsx": {
+      "bytes": 15855,
+      "sha256": "05cc0a48057293e7bfe0f6f266336a4749e50c013ffc4ba88c078084553d6ce3"
+    },
+    "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.workspace.test.tsx": {
+      "bytes": 16480,
+      "sha256": "d529034fcfdeae192eda702e55af8cc76981d548aab92cd97b1ac1c63cf43fae"
+    }
+  },
+  "requestContractSnippetsUnchanged": [
+    "fetch('/api/auth/csrf',{credentials:'same-origin'})",
+    "headers['X-CSRF-Token']=decodeURIComponent(csrf)",
+    "fetch('/api/platform/survey'+path,{method,headers,credentials:'same-origin',",
+    "body===undefined?{}:{body:JSON.stringify(body)}"
+  ],
+  "backendOrPermissionOrAuthPathChanged": false,
+  "nativeBrowserRerun": false,
+  "resourceRerun": false,
+  "uniqueTargetedCases": 9,
+  "qualification": "local review evidence; not CI"
+}

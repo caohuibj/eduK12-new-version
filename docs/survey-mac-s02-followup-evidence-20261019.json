@@ -1,0 +1,146 @@
+{
+  "atUTC": "2026-10-19T02:02:21.581045+00:00",
+  "productCommit": "6b19767ee5a536d3f8f17942cb55eebb7e5a08fb",
+  "sourceUnchanged": true,
+  "unlock": "Native Safari and Chrome task windows readable and actionable after human unlock",
+  "SafariAnomaly": {
+    "historical": "First S02 error-login observation included Web Crash Explanation Banner. Not retracted. Cause unknown.",
+    "priorRetry": "One native typing retry did not show a new banner.",
+    "newRetry": "One clean reload, same synthetic invalid username/password, same AX field setting method, same local endpoint; expected error shown; no banner before/after. Browser Save Password prompt declined with Not Now.",
+    "inferenceLimit": "Non-reproduction does not exclude an intermittent browser or application fault. No root cause established."
+  },
+  "zoomCorrection": "A later page Page Menu was observed at 100% after a prior page had confirmed 200%. The cause of this state transition is unproven. Old cross-page assumptions are withdrawn, including 100%-observed projects in the first followup attempt. New Safari captures each confirmed current-page 200%.",
+  "ChromeAdditional200": [
+    "/features/research-tools",
+    "/features/research-projects",
+    "/features/research-participation",
+    "/features/research-data",
+    "/claim",
+    "/reset-password"
+  ],
+  "ChromeMethod": "Normal native task window; toolbar Zoom:200% observed in each route; scrolled to bottom; screenshots shown in CUA history only, no added Chrome PNG files. Home/login were already separately observed.",
+  "SafariAdditional200": [
+    "/features/research-participation",
+    "/features/research-data",
+    "/features/research-projects",
+    "/features/research-tools",
+    "/claim",
+    "/reset-password",
+    "/"
+  ],
+  "SafariMethod": "Each route Page Menu 200% explicitly confirmed; native Inspector screenshots below. Login already has explicitly confirmed 200% S02 capture. Inspector may alter available height and add transparent margins; no exact CSS viewport claimed.",
+  "restored": "Native Chrome and Safari both explicitly restored to 100% on task site.",
+  "remaining": [
+    "No physical iPhone/iPad browser coverage",
+    "No complete viewport × zoom × route cross-product or screen-reader audit",
+    "Valid-account credential-change flows not performed",
+    "Safari historical reload anomaly remains unexplained",
+    "S06 export/permissions/Numbers not started"
+  ],
+  "screenshots": [
+    {
+      "file": "safari-claim-zoom200-confirmed.png",
+      "bytes": 466805,
+      "sha256": "4407fc251426ef18c42f61e912197fa4296732f47600effe9dac458683391115",
+      "pixels": [
+        2846,
+        3662
+      ],
+      "nativeBrowser": "Safari 27; CUA + native Web Inspector",
+      "zoom": 200,
+      "confirmation": "Current page Page Menu observed at 200% before Inspector capture",
+      "originalUnmodified": true
+    },
+    {
+      "file": "safari-data-zoom200-confirmed.png",
+      "bytes": 607712,
+      "sha256": "3fd00c7ecfcb55f52ad87ffea3908fea84a21d9a7c63f5024161f25675451a29",
+      "pixels": [
+        2846,
+        3602
+      ],
+      "nativeBrowser": "Safari 27; CUA + native Web Inspector",
+      "zoom": 200,
+      "confirmation": "Current page Page Menu observed at 200% before Inspector capture",
+      "originalUnmodified": true
+    },
+    {
+      "file": "safari-home-zoom200-confirmed.png",
+      "bytes": 3666025,
+      "sha256": "e61f9eb7e803edcf28f6aef085b9c1ef45f9ee06b6737f2ed13563ab022c5019",
+      "pixels": [
+        4842,
+        4116
+      ],
+      "nativeBrowser": "Safari 27; CUA + native Web Inspector",
+      "zoom": 200,
+      "confirmation": "Current page Page Menu observed at 200% before Inspector capture",
+      "originalUnmodified": true
+    },
+    {
+      "file": "safari-login-error-followup-100.png",
+      "bytes": 267635,
+      "sha256": "829edc67aa544895eef332abfc45e95dbb91a8c25198479ef3d709dfac64a842",
+      "pixels": [
+        2846,
+        1996
+      ],
+      "nativeBrowser": "Safari 27; CUA + native Web Inspector",
+      "zoom": 100,
+      "confirmation": "Synthetic wrong login; explicit clean start and AX field set + one submit; no new reload banner",
+      "originalUnmodified": true
+    },
+    {
+      "file": "safari-participation-zoom200-confirmed.png",
+      "bytes": 625352,
+      "sha256": "a10d06defc9a51f9a6843817dd7be898802e93c0f22322bc573d8f89285bfee2",
+      "pixels": [
+        2846,
+        3772
+      ],
+      "nativeBrowser": "Safari 27; CUA + native Web Inspector",
+      "zoom": 200,
+      "confirmation": "Current page Page Menu observed at 200% before Inspector capture",
+      "originalUnmodified": true
+    },
+    {
+      "file": "safari-projects-zoom200-confirmed.png",
+      "bytes": 533249,
+      "sha256": "f341ce8ee8394880d3d2ee54c2367fe6d00f0e0d30f90004d4e0cc017962af43",
+      "pixels": [
+        2846,
+        3496
+      ],
+      "nativeBrowser": "Safari 27; CUA + native Web Inspector",
+      "zoom": 200,
+      "confirmation": "Current page Page Menu observed at 200% before Inspector capture",
+      "originalUnmodified": true
+    },
+    {
+      "file": "safari-reset-zoom200-confirmed.png",
+      "bytes": 426289,
+      "sha256": "31649df2b476f709004128f5bf9e0ab5e09b217638f3e596eb76cda802a4e92f",
+      "pixels": [
+        2846,
+        3260
+      ],
+      "nativeBrowser": "Safari 27; CUA + native Web Inspector",
+      "zoom": 200,
+      "confirmation": "Current page Page Menu observed at 200% before Inspector capture",
+      "originalUnmodified": true
+    },
+    {
+      "file": "safari-tools-zoom200-confirmed.png",
+      "bytes": 609052,
+      "sha256": "4b73280ff2b8af8ad84504715493fb79eaf76056efb2dc7bd2b11ce8f6307645",
+      "pixels": [
+        2846,
+        3772
+      ],
+      "nativeBrowser": "Safari 27; CUA + native Web Inspector",
+      "zoom": 200,
+      "confirmation": "Current page Page Menu observed at 200% before Inspector capture",
+      "originalUnmodified": true
+    }
+  ]
+}

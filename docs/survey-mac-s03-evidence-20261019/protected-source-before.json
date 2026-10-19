@@ -1,0 +1,883 @@
+{
+  "productCommit": "6b19767ee5a536d3f8f17942cb55eebb7e5a08fb",
+  "purpose": "Freeze actual Go/No-Go frame runner, event response timing, input collection, shared cognitive layout, local persistence and fixed Survey template. No claim of measured hardware timing.",
+  "files": [
+    {
+      "path": "server-version/backend/src/modules/survey/cognitive.definition.ts",
+      "sha256": "a7b655dbdabafd40217aa0b363e15d5f3686dd6864fea86bf7e34e036e61448a"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/CognitiveMagazineReport.tsx",
+      "sha256": "ff03d3c0a40cf629dd5194e81db4cbd9cc4efe1098bb41bbd092483ff01ba2bc"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/CognitiveProfessionalReport.tsx",
+      "sha256": "be44238df63b1ea326c0943b43f156d40202729f35591e90eb12106a8b9259b6"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/CognitiveProfessionalReports.tsx",
+      "sha256": "1ad1d091b56a03750f40ad589e0d31ac6bae2abdcc5ff376d25337b36e2547b3"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/CognitiveReportReadingCard.tsx",
+      "sha256": "6fc4d32eee9651beeb7100154e33ed23bd852bb557dc466992fa77f5a0d66c4a"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/CognitiveReportRecord.tsx",
+      "sha256": "74c032455bc1189ccf43a22fdf4214c59ff2ceeb7b60c63088fba168a6924784"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/CognitiveReportVisual.tsx",
+      "sha256": "40d69d9a352d6b90ce19edb41be901e534d29d3c03f771ab7a79f512bcc76dd8"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/CognitiveSingleTaskReportCard.tsx",
+      "sha256": "b2d95b66428e37dcf996060b2903a37d271bf9b744d2e176f4344caf52defe3b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/CognitiveV2ReportCard.tsx",
+      "sha256": "bd7b8356ac3b89489a9f1cdbd18f8ec2dc32d446a6f82f794e99791081e0706e"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/CognitiveImagePresentation.test.tsx",
+      "sha256": "64260942da6907f238eb79544f7ab6fbab4c303c37a12286296decac79fe340a"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/CognitivePublicEntry.test.tsx",
+      "sha256": "f885a83953e3f2d7d851e3c9f1f913ae9949bb6ffd3e52586bd3a66177a3d9e3"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/CognitiveReportAudiences.test.tsx",
+      "sha256": "aaa5108ced42fa0e828f7d917edfeeaf9cbff679b275d9104a0a80ed3a0f2d50"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/CognitiveReportReadingCard.test.tsx",
+      "sha256": "bcd2b707266d991d3f1a3987c751ab52e61f6306baaa806d2b67fcf379808a7f"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/CognitiveResult.test.tsx",
+      "sha256": "3110ac81ad9e5f355281851cb039d33a64c90a5d83427da6538a9806204d5240"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/CognitiveRunner.fe07a.test.tsx",
+      "sha256": "c340409eaec9ef9cebe4bcd3cfbfb66c92fd282ff38910834c137f54876033f9"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/CognitiveRunner.test.tsx",
+      "sha256": "701de6167f7408f23bd7cf9a2f1552ca06bd31f5f30f280e6d0b11f00a118883"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/CognitiveSingleTaskReportCard.heading.test.tsx",
+      "sha256": "5af11baaae251790f99cf3d3ee447caf8a235e0cdb8149fc157b6966ec367395"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/CognitiveTaskPresentation.test.tsx",
+      "sha256": "e4fa2d9739bfb5461085ef9a69648bf4fe5945303797ab3dd9285ddf040694dc"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/CognitiveVideoPresentation.test.tsx",
+      "sha256": "6488dd2a2805449b1284b4119b96556a03b9d7c4b88730849837612484f7bedf"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/FakeTask.test.tsx",
+      "sha256": "d34c247c3a67558a88f9d7d0e3a12f7ed1deb94f9aa9a4b54dfd3a3d89f95162"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/FlankerPublishPrep.test.tsx",
+      "sha256": "7b74deea77b767a0dc58e9701c923f30e54f7899a96cf15d883c05dc587a122f"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/FrameInputTiming.test.tsx",
+      "sha256": "c8a1842b4cb48d655ba13cd0b75577dc4be58a202c5f0269b88856f2b3149e12"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/GonogoCptFrameTiming.test.tsx",
+      "sha256": "b848c72ed7929d5a0607047180c3b463cbe065a2c601e4c5bb07a185a789b3b7"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/GonogoCptTask.test.tsx",
+      "sha256": "b65d0b6e5971868440a9290ae967c4b64c3f48ea2ad1f8110097b054899b558c"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/MemoryLearningPackTask.test.tsx",
+      "sha256": "482c2dd8bb9e96d4eba8233354b982d987ed387b2a5fb4fbe79759ed5ccc7cc6"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/NbackCorsiTask.test.tsx",
+      "sha256": "b00971ae2ab4c9e1e958063ebe34ae7abbdb224148d04a6ec50b1325b7747cd1"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/PatternFlankerCardsortTask.test.tsx",
+      "sha256": "30d491eafa14ebe36fff9e749633df687eb16950eb39451013043273e010f0f0"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/PatterncomparePublishPrep.test.tsx",
+      "sha256": "5a4ff390d92f157431b2c6d329089daf6018a290be384b628cba5022a96b8c28"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/Pr12Tasks.test.tsx",
+      "sha256": "9eabe5db86407539c3b199e064aac5498bffceafe1ea2a46863521690ad97fb0"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/Pr13Tasks.test.tsx",
+      "sha256": "b053228a9ee8475fd5068603d0580bd6ac8e05d0ac0fe5f87bf0d1d0c3d5361c"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/Pr14ReleaseGate.test.ts",
+      "sha256": "7ac3c8db0dd4a79cec6d167faa733f88639dcb30337ba1e375cae4beaba1d4d9"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/PublicCognitiveAssignment.test.tsx",
+      "sha256": "f7e9bd021049c08d33ebfc0ed2c8d8281765fa5e72bab776c71f29bcc16c3413"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/ReasoningPlanningPackTask.test.tsx",
+      "sha256": "4193a26a675aa2a8f853cf59ef5d32a05d354cc3f0328d079a492ba496e6a552"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/SstTaskswitchTask.test.tsx",
+      "sha256": "29462df198bcde17e22c1bcabbd77d35a79b772e49683036aca298a51bd286ed"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/TaskPresentation.test.tsx",
+      "sha256": "3bd3c9ef67b707ff07dc19db94792bb3e0a72bba570719881f47bb934f451198"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/UnknownOnboardingTask.test.tsx",
+      "sha256": "2a560d5de30b9111223aded58926147ceac4cd36b22fcdf4d506b64f597fbb72"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/api.test.ts",
+      "sha256": "a7e21846beac00a8efdfe114f30fc1f61bd6cff706815029bc122d071a0063e7"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/capabilities-context.test.tsx",
+      "sha256": "5dbc4aafd497391a31718f544d9184af016c2237cf6971279deee3f0970ab61c"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/composite-save-api.test.ts",
+      "sha256": "09b9f3d035ad067cd469184b9d0a2df0eafb525c7ba9571876a03c758fa3abe6"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/entry-action.test.ts",
+      "sha256": "31351aa0ed62a14de27164012ba9d8368087dd899387d6efc4d55248badc916e"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/fixtures/unknown-runner.ts",
+      "sha256": "528333cc3d2b5a1a472f46728cb58c90200110c17ca91520c0d1d210a06bb659"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/public-api.test.ts",
+      "sha256": "07b960c7ccf38f8ac7ef4b2d69b9e8147fa3f6bbc122b526aa8dc91804b1da1b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/registry.test.ts",
+      "sha256": "e8f1753d2b9a018ddb91a875da094a0b38b3b16b8234dc10bf5b67f1bdf9103a"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/runner.state.test.ts",
+      "sha256": "7a9a044fc8a421c8059673e3c020f16d58fb6020f98b4b414c291e02c06470b1"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/trial-envelope.test.ts",
+      "sha256": "3b7b4ecfdbbacbdb64e9926f48fde6b2343d49eac72fd95f531e4c1f9bc667f4"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/useCognitiveInstructionVideoCompletion.test.tsx",
+      "sha256": "6be10b05cb763e29e7db30175b062c609f339091f716f2f2c20e2df94332d8e1"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/api.ts",
+      "sha256": "45e573063d54a8a6fa9f27899ab7b66de2564dbcaf68f5c99b4e2e3f1ab0cfa5"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/cognitive-report-audiences.css",
+      "sha256": "cbf39f1ee5c1e672576a70f29bd578a9f44c85db064f0d4323550ac3e28d97d4"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/cognitive-report-reading.css",
+      "sha256": "92c2ffb26e03334a839a2daa2ae12ef867cf8b02fd5f39ca6dac951974da70e4"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/__tests__/administration-provenance.test.ts",
+      "sha256": "93f82d15fe16cbca3002928421ae22fc6530571b9adb8b00917197b6ee8e5a0c"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/__tests__/readiness.test.ts",
+      "sha256": "a05235889b5a63bbd46f6e2307b3d6dbf0b09acd9ef0d1bc8d2ef6aaef08260f"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/__tests__/response-timing.test.ts",
+      "sha256": "0d4fa4d1a5d75749e53d4992484cf126724f94a8581bff4487fec87a5cbe09b2"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/__tests__/task-timing-diagnostics.test.ts",
+      "sha256": "f17d182729c9cd10c49748f6a0a803db21b74395ca9f81745a025342ce8cb9c4"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/__tests__/timing.test.ts",
+      "sha256": "5284df481470ef61a4529c8ee4050cf5426cd11e910e116312ada318a1d0bfef"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/__tests__/useAdministrationProvenance.test.tsx",
+      "sha256": "ca29ceb60f788a8036178a957110ce4c75c59ec03276766e3b96d63c758ec532"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/__tests__/useCognitiveSession.test.tsx",
+      "sha256": "ed4fe998127e131b901a87f71d086195ec99ef1b03ae31737f77a9c4ba03dc8f"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/administration-provenance.ts",
+      "sha256": "b85adf8d4a0702ebb85d861f33d88f3343bb99d7e4d712213d45aaf134a3aa84"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/readiness.ts",
+      "sha256": "5d2e480d132d7b98097629afd262a6689cc136a048f20d1598bf958c6ebd95e0"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/recovery-credential.ts",
+      "sha256": "d434b0a25e320db16745a4c629e769b693f790c5832effafe1738930660b1a68"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/response-timing.ts",
+      "sha256": "bde6544ca80cfad2461ef405a643a48e4a2f097e8dd626d96425a18e6a321180"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/runner.state.ts",
+      "sha256": "69a1661f8f7771c941ad267715e752442dfd611f8fae0a2cc4c099ca05c2da7c"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/runner.types.ts",
+      "sha256": "ce4bb69617fa2df3e59ac11a1bc77decc52b4b2a8d46fbfa5d123e6bb76a6c56"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/session-ledger.ts",
+      "sha256": "23b0f5774fbefd1622adafa4cab83f8e08bea909bb58a0a5afbd1429ea9a2fe2"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/start-intent.ts",
+      "sha256": "6944f953a44b92d91b8766d2ef3899f2d39e36ddbf36f00bb56cef2ba17f1445"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/task-timing-diagnostics.ts",
+      "sha256": "a60324979fd18735be5b6626f19ad3a4097cca93df4d597fdb11066b2597e1d3"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/timing.ts",
+      "sha256": "81d398c1dfee3181af20ba41855de42e73a312c8f20e52b105f4c089b29ec635"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/trial-envelope.ts",
+      "sha256": "23a68f7bc76f01fac4cfc67df3498a9157f0f51efa5b1915cc7e8eed3968bd60"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/useAdministrationProvenance.ts",
+      "sha256": "98cf4b30a2b4f8c41065b38eb6d6cb0e9ad5885f863045c59a77c19997e5cd29"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/core/useCognitiveSession.ts",
+      "sha256": "f800297c67582f37de24ff46827406d579ce5a2b41756772b3379f6fae2245a6"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/entry-action.ts",
+      "sha256": "7764413084c0ac3da1bc62542c93af74a01cdda1e5f5b086fac184ec514325bc"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/feature.ts",
+      "sha256": "d2d3461f84bb0869556b96c7829077fb413510b8123b6d79797c75e56905b75d"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/generated/runners.ts",
+      "sha256": "12cbc67755b414ff5def7d5596fd4910a5139000af07e80c20cf3123f22e3d5f"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/legacy-single-presentation.ts",
+      "sha256": "efb62889de0bdfa7714f817765fa0096524db1f6a6b62aa6c98bef91a4ce18ac"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/legacy-v2-presentation.ts",
+      "sha256": "28a9cb4a3a40e47d0880376a0f4be74c42d82a37a7c1af584d95edfbce0bb23d"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/pages/CognitiveAssignmentEntry.tsx",
+      "sha256": "0063974949023a80b4e07c7615d66f711d05d4a077a71d559302afb173c99450"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/pages/CognitiveCredentialReset.tsx",
+      "sha256": "acb6c36e0c3bc1bdc2ec52378d6b8fd016e599841da35864310363e0cf7c6140"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/pages/CognitiveHistory.tsx",
+      "sha256": "e7932cbd073c372d46158b7182c2b1d72947a600556f24f9ee38a97b0ee99467"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/pages/CognitiveHome.tsx",
+      "sha256": "866f8f33e1628596a9056b6d2c6b57c733cf23fc2c1f934cbbdfc68026a62c02"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/pages/CognitiveResult.tsx",
+      "sha256": "1b92317e29fda997feb91ef3a3fa2b0a239bf67707d9b865ff266c46b6968b0b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/pages/CognitiveRunner.tsx",
+      "sha256": "4d465a2dc58e1d158ad8205c36184145cc6437229aa1d3201155f19ef4b769cc"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/pages/CognitiveSessionEntry.tsx",
+      "sha256": "11fb73f198de20afcfb19708ab31c4e70f600f6201496ed9ead84fa6b8723524"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/pages/PublicCognitiveAssignment.tsx",
+      "sha256": "1705c95bfc0bbf87e1710a95687ae8af50b6a34b8d7dac753f163c14e64dc436"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/registry.ts",
+      "sha256": "609a1469f6987979013dad01e6d30862ca1b3595f343fa4d2ee379e6093ca274"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/report-record.ts",
+      "sha256": "da1dc38fa71d196ba4d8fe4c06b4497996694cd3e987eebb6f405448f67ecf59"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/bart/BartTask.tsx",
+      "sha256": "6200e01557bc5b0d26175f14444485d4e0cadb29cbbbf811cf34df36409b904f"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/bart/bart.registry.ts",
+      "sha256": "157c1ff15b00d0b29931abbe0fa42ac5127e5d522d550ae26d99d55c98a41b24"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/cardsort/CardsortTask.tsx",
+      "sha256": "ae22ab7bd734d1b840fbf30f05602f65cc493c937799050f09b270afab4f7f83"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/cardsort/cardsort.registry.ts",
+      "sha256": "047c95df0c4c0f793c148ad4346a5e63fdc32849448c8441370d4e039b680651"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/corsi/CorsiTask.tsx",
+      "sha256": "5a9480e8f8988f6099eff0ed239dd6980fe9a96a31bd3d4efe59a304fa81cd61"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/corsi/corsi.registry.ts",
+      "sha256": "9c857ad39102f819e8ca08a534312f9818e946f54d16aa8519568415a2a16128"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/cpt/CptFrameTask.tsx",
+      "sha256": "b3c77ca44d36c78f5796532fc209ea22b9515bb5fc69be3ed8d4861c40d94aff"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/cpt/CptTask.tsx",
+      "sha256": "4e1098c050f192331ec3e058828fa17c6fb8215675524d118d87aa6e804a477a"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/cpt/cpt.registry.ts",
+      "sha256": "23c9f59dfcc0cb321eee3fba49b9d10e327d7a520d5440d10b886daabd571d75"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/digitbackward/DigitbackwardTask.tsx",
+      "sha256": "b2afc98264b99c1146fd8c69b353eeb9c80d9706c97e9a90693e9e57480accc5"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/digitbackward/digitbackward.registry.ts",
+      "sha256": "97c574f548fdbef395cb2942d53fd6cd67c587a2dc0e1f49e319090bebfdc2e5"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/emotionrecognition/EmotionrecognitionTask.tsx",
+      "sha256": "47a45d3296a7e7714d3fac461b8807c25ff1a76ad6a53999e18f2a893bf039ee"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/emotionrecognition/emotionAssets.ts",
+      "sha256": "d28f51a3fdcb63e43750276b008cf3894c94fc8556c5000593566e8887fa077f"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/emotionrecognition/emotionrecognition.registry.ts",
+      "sha256": "2affe70d1169c4b9e4d16ddbcf4ebb218d34977dee361a42c1c149e6513713d5"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/fake/FakeTask.tsx",
+      "sha256": "b4fe7e2bbc05a0bef9c77c2fa0650cd3d8a3cb320a7fc4cfdb42509c616cc0b2"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/fake/fake.registry.ts",
+      "sha256": "c9583e1a7428a9c0af552c240991591f6ae4c0e754c49b77c4646ae53d1990fb"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/flanker/FlankerTask.tsx",
+      "sha256": "022e17196ed8feef857145a39d54dc8d399e13d581ce43d5bdccd2c2903d9671"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/flanker/flanker.registry.ts",
+      "sha256": "2e27e36340f8ab7aef9a9d2bada0d399ea6304b07006d793e7da04c07f6cf5c9"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/gonogo/GonogoFrameTask.tsx",
+      "sha256": "09751629802d6dc646b66161684230ab08387f3c063505ac2118b31dc35f34cd"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/gonogo/GonogoTask.tsx",
+      "sha256": "e1132c60623ceac1b0aeb97bdbb136092431f4c23b012fdd9c7c4df6231ee6a9"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/gonogo/gonogo.registry.ts",
+      "sha256": "521ec68178a11daada5fa09f4c362a3cb997b14cf82988e50355365895a188b5"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/lexicaldecision/LexicaldecisionTask.tsx",
+      "sha256": "5cd15141d96397d1d7da6dd0b65be9bd66c34bfdc2c12b4bb5e95346db1c8ab2"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/lexicaldecision/lexicaldecision.registry.ts",
+      "sha256": "52167a82a837c9eb62195b38db23e02f02ad6caf17b619632872c53c4e86ca2c"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/matrix/MatrixTask.tsx",
+      "sha256": "284c74e84c75241a10c8eaf51037083d736ce58e8c097b33739c64b1006a3324"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/matrix/matrix-layout.css",
+      "sha256": "b1b8391ca47675df58b3ef4ddba7e3627f7750c03e1c393cef163c3c79c82f7d"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/matrix/matrix.registry.ts",
+      "sha256": "4e7b7d8472cfd4ccfaac8c674a122b828838524b62efdd830068e51264f6899e"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/memory/MemoryTask.tsx",
+      "sha256": "5cec4836b354cea284f9dcada648e2ac724b9772f11e58a6c41aaec67d6fbea8"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/memory/__tests__/MemoryTask.test.tsx",
+      "sha256": "0b6707f517ffcea9cf27bd0dfdd6f960a23d7522804984baf1be024ca025bc0d"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/memory/__tests__/prng.test.ts",
+      "sha256": "74fd041b41d4c5b42d42d409d2f461ba033c23be02a99bd7a3cc436d21b30e16"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/memory/memory.registry.ts",
+      "sha256": "ae9cfadd620623bfd3bb93e00c9333fef26435f1683635ee36f52e7fb1de392f"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/memory/prng.ts",
+      "sha256": "5aca4e6072a7e3284856a20767c9a62b3e80cb428cf307f36163e430d49bf8fc"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/mentalrotation/MentalrotationTask.tsx",
+      "sha256": "19895f334b0654db234b703da85461f15a4b7de8b15065412e568fd872db9692"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/mentalrotation/mentalrotation.registry.ts",
+      "sha256": "277d213d057f47dbc3a32c539521a9663d2eb72c51e45a1303b0043142150423"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/nback/NbackTask.tsx",
+      "sha256": "2b141041490dae9e8c7e84a7aadec2d51d200e4da4c8dcf970d02689e54aa958"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/nback/nback.registry.ts",
+      "sha256": "395d40f43757257a25a7167403a4884b7dbba11a477a352362ba92f7faa0149f"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/pairedassociate/PairedassociateTask.tsx",
+      "sha256": "f4652381c59f7b8fbc4509eb74dd5a7c0111b2620c0331bbf5f3d456a0a16d39"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/pairedassociate/pairedassociate.registry.ts",
+      "sha256": "06a8b49606a7858832076dae375867d4dfd6cd63c3c53af073292c0304562586"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/patterncompare/PatterncompareTask.tsx",
+      "sha256": "9e09f03afdd3102eebba61a8840c635526b14a9ae8a5e85f3f23fd70a71c5694"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/patterncompare/patterncompare.registry.ts",
+      "sha256": "cf817eb5decb79c503af0d96ea50a80cdda114752c79bca9f243f6ff876df5b5"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/picturesequence/PicturesequenceTask.tsx",
+      "sha256": "00b8809ef9d87c99e3b57a68cb0a3cbdfeaa93769fd51cf2dd61242c76b702ee"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/picturesequence/picturesequence.registry.ts",
+      "sha256": "15c919275770964b4c129a4f4f34ee8dc41c36dd3860024537130d2bd8b4a9d9"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/reaction/ReactionFrameTask.tsx",
+      "sha256": "1a061366be59137582213f3ac5e8cb5fc55fb10eb99b904786edb7e06cefbebe"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/reaction/ReactionTask.tsx",
+      "sha256": "b82246680aaf96342b7e863c676cc122fb65271374c3fffc381557b0610ee27e"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/reaction/__tests__/ReactionTask.test.tsx",
+      "sha256": "dbe024ff213e5f252d1b295663fdd207189dfacd06ed3ce2ffb4180685abff5c"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/reaction/prng.ts",
+      "sha256": "98992a8c2c7e142fb64e7d51b834b21baf3555dc5028d94a9c82f16d96b042d4"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/reaction/reaction.registry.ts",
+      "sha256": "bad8e468faf0bfaa70ef8e9ac15702ffdf79089005418b1a3c68ff8687e7cefa"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/reversallearning/ReversallearningTask.tsx",
+      "sha256": "bc1f5240af6cd771ca8b6c1e47d5ce9b6c8539f19c2a16043127fb579fb78d1c"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/reversallearning/reversallearning.registry.ts",
+      "sha256": "e0783723fa4f00c02d30e3b02ee3557ced5eb8198e3b56126bfbd3c30cd6b4e7"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/shared/CognitiveFocusStage.tsx",
+      "sha256": "f24c35aa5900d9304efcc06de8cc40d262ff5f5bd90699656c2f7674ffe42cb6"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/shared/CognitiveTaskPresentation.tsx",
+      "sha256": "5fe222b76f9fe03dc3bacf99c6a2a48a36e861da3bbfe7721b11319f24752276"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/shared/cognitive-task-presentation.css",
+      "sha256": "716ebec7fb3a762952c4c752e7517277a70d8976099ee3f37ceb5e409e0787dc"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/shared/pr13LexicalBank.ts",
+      "sha256": "18b3004c9bfbb9fed9f5d73e738debbbb5aa54919b6c793a762bf4b62e87685f"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/shared/pr13Stimuli.ts",
+      "sha256": "cac82824fa6c83f4c6bdca009ac18d99b51b5138418940886cde463eed76f23b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/shared/practice.ts",
+      "sha256": "1b4ae7e1a7923c858add862367085eccaac351911f2608b5a3722fc13c509d08"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/shared/prng.ts",
+      "sha256": "657834cca5ab705609dce8505dbf8e76c86a5a3f8c3cfec8f252acd8a57a11e7"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/sst/SstTask.tsx",
+      "sha256": "5a537837953d7bfc57643cfcd0ff70debf83e5b75a2e6294839203ad927b79c6"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/sst/sst.registry.ts",
+      "sha256": "a760b39238fbb4c592f817c29a20500f5a54e0d0cca379f78bb726fbb20bd93e"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/stroop/StroopTask.tsx",
+      "sha256": "a0b9dfc11001b011fb77263d57d97a5f58fe04aec2359c2dbfbe521a92bae91f"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/stroop/__tests__/StroopTask.test.tsx",
+      "sha256": "63a49441a4ca2e12755765817bb59b489be5137bc43d99e1bf3d0a9e62ce1856"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/stroop/__tests__/prng.test.ts",
+      "sha256": "4de1592e7a650ea6bfd7435a9917936d592263c639a161079c660e0a6b4f659f"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/stroop/prng.ts",
+      "sha256": "76ffbed556b4ee2783f118317d594e61ba3db37ef09e777893d6a991434d18f0"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/stroop/stroop.registry.ts",
+      "sha256": "c93e9e2793583e087832c2132dae2cd0beb19d29de32d88b94ec96dda2c26369"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/taskswitch/TaskswitchTask.tsx",
+      "sha256": "b9ff63c72ddb504a47453a30afb8aae9eb8a1afdb94559a117a53a1958af4929"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/taskswitch/taskswitch.registry.ts",
+      "sha256": "b55c4d96b8bacb603c6774dac01a0d4ac75aaf3ed69eefff645d3e137c869599"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/tower/TowerTask.tsx",
+      "sha256": "de83b4bb32f1bbdf0e72d38c31a0a546498d03a1507c3bb281caa57a04a1f187"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/tower/tower.registry.ts",
+      "sha256": "9525e94875e87cc3e5f3bc9e6ad3d390ca45f02a0813d8539731294791f96738"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/trailmaking/TrailmakingTask.tsx",
+      "sha256": "3209e2fd2cd1bfef0e0677b5973477df7512dcbb4a61ea86faf75863dcf32772"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/trailmaking/trailmaking.registry.ts",
+      "sha256": "7a53b45d609668e5a1523cbcc865b691c036db2d46144c4bee35d0dcd9b6abfd"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/wordlist/WordlistTask.tsx",
+      "sha256": "6e49e8c6ccf024b13f08da425082513411b9910d9cc7cccdbc65fac7ac1e20b1"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/wordlist/wordlist.registry.ts",
+      "sha256": "be669e930b6c50dfdbe653b3a784a700a42abcb26f21d74090dc23cdf1d49aa2"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/tasks/wordlist/wordlist.utils.ts",
+      "sha256": "d8cfac19c81a73afd0a7629bee6898b2e568f0c7eb5f2493e507570f7ada4b29"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/types.ts",
+      "sha256": "f719689641cd90d30393f20ff2e29af159b1d331da17a7711af90f1ede855b4b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/useCognitiveInstructionVideoCompletion.ts",
+      "sha256": "c42b207f9716d3e0c5ee87d49b3e53be3a242d36d5bf1df88203b2d8d006b8d4"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/useCognitiveVideoSources.ts",
+      "sha256": "4847ece08b3e92ca3f2ee04c022bb8d57f31d635a3a862d62141528212790a19"
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/video-presentation.ts",
+      "sha256": "20954c2c722e71aaca32612c2833dd72eb801ae8b12401aabd32ab018c2b7a7c"
+    },
+    {
+      "path": "server-version/frontend/src/services/persistence/__tests__/checkpointPersistence.test.ts",
+      "sha256": "0c12a7d8a5db87b84491f295c54c56f03afeffdab37942e85ff33955706b5862"
+    },
+    {
+      "path": "server-version/frontend/src/services/persistence/__tests__/finalDraftCapacityRetry.test.ts",
+      "sha256": "2d1de35680e2ff7383e72004169f7699be80bee1d56396bda31aae7499eb562c"
+    },
+    {
+      "path": "server-version/frontend/src/services/persistence/__tests__/finalDraftStore.test.ts",
+      "sha256": "12c2db44fe93f9e220f2b8028c1133ffad19d3f59a3bffaef55eefc1eb521674"
+    },
+    {
+      "path": "server-version/frontend/src/services/persistence/__tests__/finalDraftSurveyRetention.test.ts",
+      "sha256": "0faac44d2d2d05164f71ad93608c66d5eb811a14bd0379cd7e04080e8fad4735"
+    },
+    {
+      "path": "server-version/frontend/src/services/persistence/__tests__/finalSubmissionFailure.test.ts",
+      "sha256": "42a1d35ee719bce743f5e6a5eae154b28dbafe3838eea8f5f7ff4aab28a51dda"
+    },
+    {
+      "path": "server-version/frontend/src/services/persistence/checkpointScheduler.ts",
+      "sha256": "e4ec525d4d17bee28715a7cc3e006543c4f86977f3f368d3824d15fa4c68b638"
+    },
+    {
+      "path": "server-version/frontend/src/services/persistence/checkpointStore.ts",
+      "sha256": "f2a5acff1c8cdf6958a047e8cf649e21d26d6ae99fa5d4b951f337a5c6689aa2"
+    },
+    {
+      "path": "server-version/frontend/src/services/persistence/checkpointTypes.ts",
+      "sha256": "a10ee99f9e9e0acc4a3058017cccb8b9d90de1dd7705250cde99b28a33d31647"
+    },
+    {
+      "path": "server-version/frontend/src/services/persistence/finalDraftCapacityRetry.ts",
+      "sha256": "cadc57a7a2d1d713480b902a835c1f1bffb7d7ca3a058bf8fdbed5b3a7f311eb"
+    },
+    {
+      "path": "server-version/frontend/src/services/persistence/finalDraftStore.ts",
+      "sha256": "d210171f7049cb0a31c48acb21d328db53208d2fb650b25d7cfddf7f2fd983db"
+    },
+    {
+      "path": "server-version/frontend/src/services/persistence/finalSubmissionFailure.ts",
+      "sha256": "fd021ccbd62334d4c588fd526567c645426d5b07bc3dedd4a35ff620fc390ad6"
+    },
+    {
+      "path": "server-version/frontend/src/services/persistence/flushLifecycle.ts",
+      "sha256": "9adfbee92adf08f003e9ccc0d2976ec0f0bf296c11a1becbdf137dbd5319eeac"
+    },
+    {
+      "path": "server-version/frontend/src/services/persistence/indexedDbStore.ts",
+      "sha256": "73f0c156b030c82d476521a7b7193b7d2337b4d402f63d57190dcad3e3836fde"
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyCognitiveDeviceGate.tsx",
+      "sha256": "854339776250c351b137986c62b3ea8fdc7d3f458c6cbee759fa219efa4100e7"
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyCognitiveUnit.tsx",
+      "sha256": "bbcdcf4424cff33c52ead8354656baea431ed35abf64084aaa9c10aeef0e5e4d"
+    },
+    {
+      "path": "server-version/frontend/src/survey/survey-cognitive-api.ts",
+      "sha256": "f7d19fccb22b67bc500ea4d96aa20d4ef340277b89e67c2859ef74320e2e0852"
+    },
+    {
+      "path": "server-version/frontend/src/survey/survey-cognitive-local.ts",
+      "sha256": "6e8a175fc68076644a3b62b5c03af4487af8b5d496e4f70bf363fb3201eb5c31"
+    },
+    {
+      "path": "server-version/frontend/src/survey/survey-cognitive-retention.ts",
+      "sha256": "e2c46052325e4e6b7a2c2599482c7e95c709edaae7cf5d31da4c370283d3eafa"
+    },
+    {
+      "path": "server-version/frontend/src/survey/survey-scale-timing.ts",
+      "sha256": "87035cc7155f890ed794a4b4020eeef9200e44692bd418a8d9694986a311f19d"
+    },
+    {
+      "path": "server-version/frontend/examples/product-ui.css",
+      "sha256": "c695f2d5349e72c5201c7d4c142472889c0f82265dade17183d72e459b57abcf"
+    },
+    {
+      "path": "server-version/frontend/package-lock.json",
+      "sha256": "5288a377ebdd829533561cf2383cd2bcd20e15bd12e6d15762b36a05f7bec1ca"
+    },
+    {
+      "path": "server-version/frontend/package.json",
+      "sha256": "bab361f2eeff284f8638eab14b7152dfa2ebdc67df5f7fa0ec4595d039e0827d"
+    },
+    {
+      "path": "server-version/frontend/src/components/app-shell/app-shell.css",
+      "sha256": "3e569dba4eb218046d1e68da30862d8a70fc4ba6e8264cfc9350eef48159a377"
+    },
+    {
+      "path": "server-version/frontend/src/components/assessment-ui/assessment-ui.css",
+      "sha256": "913ec5db00d5302a498953fdd7bdc083d2f37154f9a24611df69d414ea6a9287"
+    },
+    {
+      "path": "server-version/frontend/src/components/auth/auth-shell.css",
+      "sha256": "c9f6668fbc3ddb2cd7ddb206c8acb7d7b7152a26fe8fe1bbfc726413563e4440"
+    },
+    {
+      "path": "server-version/frontend/src/components/classroom-ui/classroom-ui.css",
+      "sha256": "6749caeaca1e8ec7f3a3dc1b12a79e9c057bb2f61ced2ba0d499923d9208988e"
+    },
+    {
+      "path": "server-version/frontend/src/components/parent-ui/parent-ui.css",
+      "sha256": "0c00e8623711fa1813492a1821d91b9d238a94420ecf7a11e206aae4efba22ea"
+    },
+    {
+      "path": "server-version/frontend/src/components/product-ui/design-tokens.css",
+      "sha256": "c61e4daeee0d29172cd548540f347a6859d095a7b765dc262e7ecc071db42f40"
+    },
+    {
+      "path": "server-version/frontend/src/components/product-ui/product-ui.css",
+      "sha256": "cbd059f5698834e208a0ccf5e4bcbcce5de727b5490a0bdde2b950511a6019ef"
+    },
+    {
+      "path": "server-version/frontend/src/components/public-ui/public-ui.css",
+      "sha256": "c85be5596e4f32b7a4c07daabbb0bb054acf748281625b97dbe205cb7bad4347"
+    },
+    {
+      "path": "server-version/frontend/src/components/question-editor.css",
+      "sha256": "fa4c21cd4dfd3071f585174b37339be4beaaf5dafce4d1332da8d69036789491"
+    },
+    {
+      "path": "server-version/frontend/src/components/report-privacy/report-privacy.css",
+      "sha256": "5ae2da77e490c54c41b2213df7f6a52574a44fdfdcb5393e039a44f4d927d840"
+    },
+    {
+      "path": "server-version/frontend/src/components/shared-ui/shared-surfaces.css",
+      "sha256": "052b341447907db357376f02f0d230da52e53ef8159c056ea5eb9d91e9e3c7b5"
+    },
+    {
+      "path": "server-version/frontend/src/components/staff-ui/staff-ui.css",
+      "sha256": "7c91597c8609cc8a10735f5e7c588289c83274039ad441a8661c87a378731a2e"
+    },
+    {
+      "path": "server-version/frontend/src/components/student-ui/student-ui.css",
+      "sha256": "0d1bc75c67c1fff379c76fe8bff460a67ea13e0a224d6bea3c2e3bb9fe8fefa9"
+    },
+    {
+      "path": "server-version/frontend/src/huiteacher/huiteacher-landing.css",
+      "sha256": "5d403ff31912be1e816c98c1e3b8d066ff1df17566e6ba803c155c2372308a60"
+    },
+    {
+      "path": "server-version/frontend/src/huiteacher/huiteacher.css",
+      "sha256": "d1ab75e6a3f4bbca2623260b584ee0463057ebe96e0c03be8c0cc2e67fa7e722"
+    },
+    {
+      "path": "server-version/frontend/src/index.css",
+      "sha256": "0270ed02f5fa33108c04479d30e3ae8c55a506e661ffad01728b042631a5bba6"
+    },
+    {
+      "path": "server-version/frontend/src/modules/reporting/report-ui.css",
+      "sha256": "043340caa080d471d0faf2fc5fd69eec41ad8b87ba2ae71f4a1fa18b9aa42eec"
+    },
+    {
+      "path": "server-version/frontend/src/pages/ScaleEdit.css",
+      "sha256": "27c89bf6b02f628b63698b2adf57635845d3844633817ca633ff907ede3c10d2"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/admin-training.css",
+      "sha256": "3507a10aef7bb46046a4011c516ca6c8d409738fe6b05064d0917307457beb5b"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/education-products.css",
+      "sha256": "b36b8796b9d3dce8afc2f84082e042041b9b661acfd859e48f4006e2a5229303"
+    },
+    {
+      "path": "server-version/frontend/src/pages/dev/design-system-lab.css",
+      "sha256": "d613841c39796cc4976fdce5994ccff9a54f74b54b07056a7dcb6aad5075d79e"
+    },
+    {
+      "path": "server-version/frontend/src/pages/organization/organization-ui.css",
+      "sha256": "cf04dc2491ba27babbb74bd9ad11f765154b877c4d7205729f232e00564e06c3"
+    },
+    {
+      "path": "server-version/frontend/src/pages/questionnaire/questionnaire-products.css",
+      "sha256": "7a4f17eebc76d845911aaea3b836432da4a475c772a11db7388e21d0f7ab4785"
+    },
+    {
+      "path": "server-version/frontend/src/pages/teacher/assessment-workbench.css",
+      "sha256": "acf7665dc7813e05285f5235d0a239dc433bcdc4219f9a75582583300a796d12"
+    },
+    {
+      "path": "server-version/frontend/src/school/school-landing.css",
+      "sha256": "80869440032e6abb509a8cd547e465697d93408e480e14044f2b67e8518e73c2"
+    },
+    {
+      "path": "server-version/frontend/src/school/school-workspace.css",
+      "sha256": "6ac8939a88dbc5912272dfa5079670951f2eb1ac9bc40695fb9b87135feb4caa"
+    },
+    {
+      "path": "server-version/frontend/src/school/school.css",
+      "sha256": "e8eeecaf1d94da04dbfe7d4e00c79b9ca1260b1bbf053e89c7dd0a81386935e0"
+    },
+    {
+      "path": "server-version/frontend/src/survey/survey-landing.css",
+      "sha256": "a2a45f6dc2cb18b73f5667781da9700581d90d6109d0cafb75200e9af14cf474"
+    },
+    {
+      "path": "server-version/frontend/src/training/paper-ink.css",
+      "sha256": "41a74477fbdcdb996958bf0da33bc836ce2341561c6884b6fc762b9facf67b21"
+    },
+    {
+      "path": "server-version/frontend/src/training/training-auth-refresh.css",
+      "sha256": "48fda69d25eb1ffffc74a792bab59bf274832d666b33b1fe6832a381b033b9cb"
+    },
+    {
+      "path": "server-version/frontend/src/training/training-brand.css",
+      "sha256": "b42a9de57cc9e53f143f67587d2bcc9e5d51141d40189a9d1f081851446f875e"
+    },
+    {
+      "path": "server-version/frontend/src/training/training-form-surface.css",
+      "sha256": "7ef2af7a1dfe990c84a7607738e77cad1a58bf6220fa09a7915f687f5e75c7b6"
+    },
+    {
+      "path": "server-version/frontend/src/training/training-home-brand.css",
+      "sha256": "bfb0c5614dc839ceaf760b654f6d136b1af4217fb977a20fdfe520b4fb0c9844"
+    },
+    {
+      "path": "server-version/frontend/src/training/training-portal-refresh.css",
+      "sha256": "9a863d855de49efc88ba8267bf8bb295c66d5c6ec92e463ac40807ed1922abad"
+    },
+    {
+      "path": "server-version/frontend/src/training/training-subpages-refresh.css",
+      "sha256": "cc3d2aa81d5045c0efbcca5802e46f0e5a45348ced79728ce83df0ae7417d090"
+    },
+    {
+      "path": "server-version/frontend/src/training/training-workspace-refresh.css",
+      "sha256": "9921cae2d44a5703843f835356b48ddcbdf2b4eb1fbd3ebbd11e8af2ecd94fe6"
+    },
+    {
+      "path": "server-version/frontend/tsconfig.app.json",
+      "sha256": "97ed0e951ac068a9b2d08635b327932db8e41193f9c82e8291a919b7c68bd62e"
+    },
+    {
+      "path": "server-version/frontend/vite.config.ts",
+      "sha256": "8392c66655f644b0a19c6689333117884ceb5b0183116211b24bbb4a8e2be887"
+    }
+  ],
+  "addedInputProvenance": "Global CSS, locks and compiler config recovered from immutable 6b19767 and verified byte-identical on disk before main integration."
+}

@@ -1,0 +1,17 @@
+from pathlib import Path
+import runpy,sys
+mode=sys.argv[1];sys.argv=['runtime.py','helper']
+x=runpy.run_path(str(Path(__file__).with_name('runtime.py')),run_name='helper')
+n=x['NODE'];r=x['ROOT'];b=x['BASE'];out=b/'evidence/s05';out.mkdir(exist_ok=True)
+if mode=='components':x['call']([n,r/'frontend/node_modules/vitest/vitest.mjs','run','src/pages/admin/SurveyResearchersAdmin.workspace.test.tsx','src/pages/admin/SurveyResearchersAdmin.links.test.tsx','src/pages/admin/SurveyCatalogGrants.test.tsx','src/pages/admin/SurveyCatalogGrants.boundary.test.tsx','--maxWorkers=1','--reporter=json','--outputFile='+str(out/'components.json')],cwd=r/'frontend',name='s05-components')
+if mode=='busy-new':x['call']([n,r/'frontend/node_modules/vitest/vitest.mjs','run','src/pages/admin/SurveyResearchersAdmin.workspace.test.tsx','-t','in-flight verification','--maxWorkers=1','--reporter=json','--outputFile='+str(out/'busy-new.json')],cwd=r/'frontend',name='s05-busy-new')
+if mode=='grant-read':x['call']([n,r/'frontend/node_modules/vitest/vitest.mjs','run','src/pages/admin/SurveyResearchersAdmin.workspace.test.tsx','-t','failed grant read','--maxWorkers=1','--reporter=json','--outputFile='+str(out/'grant-read.json')],cwd=r/'frontend',name='s05-grant-read')
+if mode=='status-wrap':x['call']([n,r/'frontend/node_modules/vitest/vitest.mjs','run','src/pages/admin/SurveyResearchersAdmin.workspace.test.tsx','-t','existing researcher status restrictions','--maxWorkers=1','--reporter=json','--outputFile='+str(out/'status-wrap.json')],cwd=r/'frontend',name='s05-status-wrap')
+if mode=='types-freeze':x['call']([n,r/'frontend/node_modules/typescript/bin/tsc','-p','tsconfig.app.json','--noEmit'],cwd=r/'frontend',name='s05-types-freeze')
+if mode=='lint-freeze':x['call']([n,r/'frontend/node_modules/eslint/bin/eslint.js','src/pages/admin/SurveyResearchersAdmin.tsx','src/pages/admin/SurveyResearchersAdmin.workspace.test.tsx'],cwd=r/'frontend',name='s05-lint-freeze')
+if mode=='types-wrap':x['call']([n,r/'frontend/node_modules/typescript/bin/tsc','-p','tsconfig.app.json','--noEmit'],cwd=r/'frontend',name='s05-types-wrap')
+if mode=='lint-wrap':x['call']([n,r/'frontend/node_modules/eslint/bin/eslint.js','src/pages/admin/SurveyCatalogGrants.tsx','src/pages/admin/SurveyResearchersAdmin.workspace.test.tsx'],cwd=r/'frontend',name='s05-lint-wrap')
+if mode=='types-final':x['call']([n,r/'frontend/node_modules/typescript/bin/tsc','-p','tsconfig.app.json','--noEmit'],cwd=r/'frontend',name='s05-types-final')
+if mode=='lint-final':x['call']([n,r/'frontend/node_modules/eslint/bin/eslint.js','src/pages/admin/SurveyResearchersAdmin.tsx','src/pages/admin/SurveyResearchersAdmin.workspace.test.tsx'],cwd=r/'frontend',name='s05-lint-final')
+if mode=='types':x['call']([n,r/'frontend/node_modules/typescript/bin/tsc','-p','tsconfig.app.json','--noEmit'],cwd=r/'frontend',name='s05-types')
+if mode=='lint':x['call']([n,r/'frontend/node_modules/eslint/bin/eslint.js','src/pages/admin/SurveyResearchersAdmin.tsx','src/pages/admin/SurveyCatalogGrants.tsx','src/pages/admin/SurveyResearchersAdmin.workspace.test.tsx','src/pages/admin/SurveyResearchersAdmin.links.test.tsx'],cwd=r/'frontend',name='s05-lint')

@@ -1,0 +1,39 @@
+// Task-only loopback observer. Never persist headers, credentials, or answers.
+const http=require('node:http'),fs=require('node:fs'),crypto=require('node:crypto')
+const path=require('node:path'),base=path.resolve(__dirname,'..')
+const log=path.join(base,'evidence/s04-safari-final/requests.jsonl')
+const arm=path.join(base,'runtime/private/s04-drop-one-final')
+const allowed=/^\/api\/public\/survey\/r\/e747807b-07c7-4f15-b018-d8f1e77fab8b\/attempts\/[a-f0-9-]{36}\/final$/
+fs.mkdirSync(path.dirname(log),{recursive:true})
+const record=value=>fs.appendFileSync(log,JSON.stringify(value)+'\n')
+http.createServer((req,res)=>{
+ const route=req.url.split('?')[0],observed=req.method==='POST'&&allowed.test(route)
+ const id=crypto.randomUUID(),start=process.hrtime.bigint(),hash=crypto.createHash('sha256')
+ let bytes=0,digest=null,dropped=false
+ const controlled=observed&&fs.existsSync(arm)
+ if(controlled)fs.unlinkSync(arm)
+ if(observed){record({event:'request',id,at:new Date().toISOString(),method:req.method,route,controlledResponseLoss:controlled})
+  req.on('data',b=>{bytes+=b.length;hash.update(b)})
+  req.on('end',()=>{digest=hash.digest('hex');record({event:'request-body-fingerprint',id,bytes,sha256:digest})})}
+ const upstream=http.request({hostname:'127.0.0.1',port:3197,path:req.url,method:req.method,
+  headers:{...req.headers,host:'127.0.0.1:3197'}},response=>{
+  const chunks=[];let size=0
+  if(observed)response.on('data',b=>{size+=b.length;if(size<65536)chunks.push(b)})
+  if(!controlled){res.writeHead(response.statusCode,response.headers);response.pipe(res)}
+  else response.resume()
+  response.on('end',()=>{
+   if(observed){let summary={};try{const e=JSON.parse(Buffer.concat(chunks).toString('utf8')),d=e.data||{};
+    summary={envelopeCode:e.code,status:d.status,attemptId:d.attemptId,receiptId:d.receiptId,
+     completedAt:d.completedAt,idempotent:d.idempotent,hasGeneralReceipt:!!d.generalReceipt}
+   }catch{summary={parseableEnvelope:false}}
+   record({event:'upstream-response',id,at:new Date().toISOString(),httpStatus:response.statusCode,
+    durationMs:Number(process.hrtime.bigint()-start)/1e6,responseBytes:size,...summary,
+    deliveredToBrowser:!controlled,controlledResponseLoss:controlled})}
+   if(controlled){dropped=true;res.destroy()}
+  })
+ })
+ upstream.on('error',()=>{if(observed)record({event:'upstream-transport-error',id});res.destroy()})
+ req.on('aborted',()=>{if(observed)record({event:'browser-aborted',id});upstream.destroy()})
+ res.on('close',()=>{if(observed)record({event:'browser-connection-closed',id,controlledDrop:dropped,finished:res.writableFinished})})
+ req.pipe(upstream)
+}).listen(3198,'127.0.0.1',()=>console.log('Task-only observer: 127.0.0.1:3198 -> 3197; FINAL metadata only'))

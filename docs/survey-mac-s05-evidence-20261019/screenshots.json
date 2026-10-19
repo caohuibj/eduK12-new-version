@@ -1,0 +1,119 @@
+{
+  "s05-chrome-200.jpg": {
+    "bytes": 326260,
+    "sha256": "0696d94ad3225d473339037fbcd269229cb2a61435482f91660726a1d3ab30fb",
+    "codec": "JPEG",
+    "dimensions": [
+      2880,
+      1592
+    ]
+  },
+  "s05-chrome-390-tools.jpg": {
+    "bytes": 348759,
+    "sha256": "2392752a517ef2db02a5d9311decaa592ba656b3d8a6c02ecc0979751b08514f",
+    "codec": "JPEG",
+    "dimensions": [
+      2880,
+      1592
+    ]
+  },
+  "s05-chrome-390.jpg": {
+    "bytes": 340658,
+    "sha256": "b1e644ac701adef2681e1dc1214995968a3238934590c2d2049a8f10d9ba9d98",
+    "codec": "JPEG",
+    "dimensions": [
+      2880,
+      1592
+    ]
+  },
+  "s05-chrome-768.jpg": {
+    "bytes": 367836,
+    "sha256": "38eafd5eb2c85d663dc0cbe3177724a0f03d8cbf92efdf0cb8c4c3469dee1c18",
+    "codec": "JPEG",
+    "dimensions": [
+      2880,
+      1592
+    ]
+  },
+  "s05-chrome-desktop-after.jpg": {
+    "bytes": 441548,
+    "sha256": "1a8c2c2076c641ae9691c4b6bdea1ba16268c9b848dee891f1a4f986e4fde7e9",
+    "codec": "JPEG",
+    "dimensions": [
+      2880,
+      1592
+    ]
+  },
+  "s05-chrome-resources-after.jpg": {
+    "bytes": 669740,
+    "sha256": "e94965c39cc7decd0f2b5f2502279f723824764f14ee285cc5ca7300ca68dda6",
+    "codec": "JPEG",
+    "dimensions": [
+      2880,
+      1592
+    ]
+  },
+  "s05-chrome-resources-final.jpg": {
+    "bytes": 668163,
+    "sha256": "8246449deedc58830233df0406bcf7fab9bb9351646eab9f5e8685d0581108d4",
+    "codec": "JPEG",
+    "dimensions": [
+      2880,
+      1592
+    ]
+  },
+  "s05-chrome-resources-frozen.jpg": {
+    "bytes": 671350,
+    "sha256": "efe346dc5317f6a0779804cb5f0e5131487bc973aa1364e191f912a59c15d853",
+    "codec": "JPEG",
+    "dimensions": [
+      2880,
+      1592
+    ]
+  },
+  "s05-safari-200-indicator.jpg": {
+    "bytes": 481606,
+    "sha256": "d4d815af8eb8af7e751e7a61cacea200af04b391663713af579086f4a6dc15b9",
+    "codec": "JPEG",
+    "dimensions": [
+      2880,
+      1592
+    ]
+  },
+  "s05-safari-200.jpg": {
+    "bytes": 475384,
+    "sha256": "f6de798aa5fb92f9f6d6bf48a676f30b13b660fe4fee9bf3882054841d2f3187",
+    "codec": "JPEG",
+    "dimensions": [
+      2880,
+      1592
+    ]
+  },
+  "s05-safari-390.jpg": {
+    "bytes": 262169,
+    "sha256": "0e539940b24ed48a5a22b94dcaecdfdb2d71fb30cb63cb75b6f3929d5b99801e",
+    "codec": "JPEG",
+    "dimensions": [
+      2880,
+      1592
+    ]
+  },
+  "s05-safari-768.jpg": {
+    "bytes": 319388,
+    "sha256": "9279344f0b217a80a33bf689f66ef53ea12bdf711a4d3d66efc82510a3dc99a7",
+    "codec": "JPEG",
+    "dimensions": [
+      2880,
+      1592
+    ]
+  },
+  "s05-safari-tools-desktop.jpg": {
+    "bytes": 474628,
+    "sha256": "cec4cd34b85162c30e8f872cc9351165cc6b7202a37d2a98fc17df9a78084176",
+    "codec": "JPEG",
+    "dimensions": [
+      2880,
+      1592
+    ]
+  }
+}

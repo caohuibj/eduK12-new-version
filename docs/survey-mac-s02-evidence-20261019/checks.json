@@ -1,0 +1,72 @@
+{
+  "executor": "Mac local; Node 24.21.0; task-local dependency trees; no CI or production build",
+  "uniqueComponentTests": 14,
+  "runs": [
+    {
+      "name": "s02-entry-tests",
+      "files": [
+        "SurveyApp.entry.test.tsx",
+        "SurveyApp.admin-entry.test.tsx"
+      ],
+      "result": "11 passed; 3 failed because the admin-entry test still queried the old English heading. No permission assertion was weakened.",
+      "report": "entry-tests.json"
+    },
+    {
+      "name": "s02-admin-entry-retry",
+      "files": [
+        "SurveyApp.admin-entry.test.tsx"
+      ],
+      "result": "3 passed after changing only the queried heading to 研究者登录. The 11 already passing entry tests were not repeated.",
+      "report": "admin-entry-retry.json"
+    },
+    {
+      "name": "s02-types",
+      "command": "node typescript/bin/tsc -p tsconfig.app.json --noEmit",
+      "exitCode": 0
+    },
+    {
+      "name": "s02-lint",
+      "command": "eslint src/survey/SurveyApp.tsx src/survey/SurveyLanding.tsx src/survey/survey-features.ts src/survey/SurveyApp.entry.test.tsx",
+      "exitCode": 0
+    },
+    {
+      "name": "s02-lint-admin",
+      "command": "eslint src/survey/SurveyApp.admin-entry.test.tsx",
+      "exitCode": 0
+    }
+  ],
+  "reusedOnly": "S01 70 tests are historical baseline evidence; not rerun or represented as S02 tests.",
+  "binding": [
+    {
+      "path": "server-version/frontend/src/survey/SurveyApp.admin-entry.test.tsx",
+      "bytes": 1751,
+      "sha256": "ec921968479f3408a0e4eb1a893409b3f5eb382823d0af587e99bded9b29049f"
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyApp.entry.test.tsx",
+      "bytes": 8261,
+      "sha256": "9950b7af261821306f958201012250187e003c2f574dc8b641fb4771a7a9311b"
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyApp.tsx",
+      "bytes": 18040,
+      "sha256": "eca9e5240e5c45a559371a9cc7beee8a6af48443d925feab9b650c315d0d2f3f"
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyLanding.tsx",
+      "bytes": 2421,
+      "sha256": "269751e3844a51eb64ae60bd84da221b54debd1f665fafd321a85e959b1fdf05"
+    },
+    {
+      "path": "server-version/frontend/src/survey/survey-features.ts",
+      "bytes": 3219,
+      "sha256": "f29009897bc02da4358a15f0cfa65b74e90eb955353bb723c81988cd2504d646"
+    },
+    {
+      "path": "server-version/frontend/src/survey/survey-landing.css",
+      "bytes": 11586,
+      "sha256": "a2a45f6dc2cb18b73f5667781da9700581d90d6109d0cafb75200e9af14cf474"
+    }
+  ],
+  "limits": "Types/lint completed before a final CSS-only focus fallback preservation; TS/TSX inputs remained unchanged except the separately linted admin test heading. No formal CI acceptance claimed."
+}
