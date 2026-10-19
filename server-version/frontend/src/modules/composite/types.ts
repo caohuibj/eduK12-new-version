@@ -133,6 +133,15 @@ export interface CompositeReportJobState {
   completedAt: string | null
 }
 
+export type TrainingFeedbackPolicy =
+  | { schemaVersion: 1; mode: 'IMMEDIATE' }
+  | { schemaVersion: 1; mode: 'SCHEDULED'; releaseAt: string }
+
+export interface ParticipantFeedbackStatus {
+  state: 'WAITING_SUBMISSION' | 'REPORT_PROCESSING' | 'GENERATED_NOT_RELEASED' | 'AVAILABLE' | 'UNAVAILABLE'
+  releaseAt: string | null
+}
+
 
 export interface WholeQuestionnaireDefinition {
   attemptId: string
@@ -161,6 +170,8 @@ export interface WholeQuestionnaireReceipt {
 }
 
 export interface CompositeReportStatus {
+  /** Absent on legacy records. Report generation and participant access are separate. */
+  participantFeedback?: ParticipantFeedbackStatus | null
   feedbackWaitMs?: number
   feedbackPollProfile?: 'FAST_START' | 'QUEUED'
   wholeSubmissionReceived?: boolean

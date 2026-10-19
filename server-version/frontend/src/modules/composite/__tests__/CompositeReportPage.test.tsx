@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import CompositeReportPage from '../CompositeReportPage'
+import type { CompositeReportStatus, ParticipantFeedbackStatus } from '../types'
 
 const { mockCompositeApi, authState, trainingHost } = vi.hoisted(() => ({
   trainingHost: vi.fn(() => false),
@@ -463,6 +464,100 @@ describe('asynchronous report feedback', () => {
     page.unmount(); sessionStorage.removeItem('composite:recovery:attempt:conflict')
   })
 
+})
+
+describe('Training participant report release', () => {
+  const releaseAt = '2026-10-19T12:00:00.000Z'
+  const status = (state: ParticipantFeedbackStatus['state'], generation: CompositeReportStatus['reportStatus']['state'] = 'READY') => ({ code: 0, data: {
+    attemptId: 'feedback', attemptEpoch: 1, status: generation === 'READY' ? 'COMPLETED' : 'IN_PROGRESS', hasAcceptedSubmission: state !== 'WAITING_SUBMISSION',
+    participantFeedback: { state, releaseAt },
+    reportStatus: { state: generation, jobId: 'feedback-job', retryAfterSeconds: 2, errorCode: null, completedAt: generation === 'READY' ? releaseAt : null },
+  } })
+  const mountParticipant = (surface: string, query = '') => render(
+    <MemoryRouter initialEntries={[`/${surface}/composite/attempts/feedback/report${query}`]}>
+      <Routes><Route path="/:surface/composite/attempts/:attemptId/report" element={<CompositeReportPage />} /></Routes>
+    </MemoryRouter>,
+  )
+  afterEach(() => {
+    vi.useRealTimers()
+    sessionStorage.removeItem('composite:recovery:attempt:feedback')
+  })
+
+  it.each(['student', 'public'])('keeps generated %s feedback stable until an explicit refresh confirms release', async surface => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-10-19T11:59:00.000Z'))
+    sessionStorage.setItem('composite:recovery:attempt:feedback', 'synthetic-feedback-recovery')
+    mockCompositeApi.reportStatus.mockResolvedValue(status('GENERATED_NOT_RELEASED'))
+    mockCompositeApi.report.mockResolvedValue({ code: 0, data: { name: '已开放报告', backgroundValues: [], unitReports: [] } })
+    const page = mountParticipant(surface, '?snapshotId=untrusted-snapshot&partial=1')
+    await act(async () => {})
+    expect(screen.getByText('测评已完成，报告尚未开放')).toBeInTheDocument()
+    expect(screen.getByText(/作答已保存，报告已生成/)).toHaveTextContent('无需重新交卷')
+    expect(screen.queryByText(/报告生成中/)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /重新生成|导出|下载/ })).not.toBeInTheDocument()
+    expect(screen.queryByTestId('composite-snapshot-controls')).not.toBeInTheDocument()
+    expect(mockCompositeApi.report).not.toHaveBeenCalled()
+    expect(mockCompositeApi.partialReport).not.toHaveBeenCalled()
+    expect(mockCompositeApi.snapshots).not.toHaveBeenCalled()
+    await act(async () => { await vi.advanceTimersByTimeAsync(0) })
+    expect(vi.getTimerCount()).toBe(0)
+    // Passing the scheduled wall time never opens a cached report or starts polling.
+    await act(async () => { await vi.advanceTimersByTimeAsync(120_000) })
+    expect(mockCompositeApi.reportStatus).toHaveBeenCalledTimes(1)
+    expect(mockCompositeApi.report).not.toHaveBeenCalled()
+    expect(mockCompositeApi.retryReport).not.toHaveBeenCalled()
+    mockCompositeApi.reportStatus.mockResolvedValue(status('AVAILABLE'))
+    await act(async () => { fireEvent.click(screen.getByRole('button', { name: '刷新开放状态' })) })
+    expect(screen.getByText('已开放报告')).toBeInTheDocument()
+    expect(mockCompositeApi.reportStatus).toHaveBeenCalledTimes(2)
+    expect(mockCompositeApi.report).toHaveBeenCalledTimes(1)
+    page.unmount()
+  })
+
+  it('requires the entire submission even when a generation state is already ready', async () => {
+    mockCompositeApi.reportStatus.mockResolvedValue(status('WAITING_SUBMISSION'))
+    const page = mountParticipant('student')
+    expect(await screen.findByText('作答尚未全部完成')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '继续作答' })).toBeInTheDocument()
+    expect(mockCompositeApi.report).not.toHaveBeenCalled()
+    page.unmount()
+  })
+
+  it('still waits for generation after the scheduled release time', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-10-19T13:00:00.000Z'))
+    mockCompositeApi.reportStatus.mockResolvedValue(status('REPORT_PROCESSING', 'PROCESSING'))
+    const page = mountParticipant('student')
+    await act(async () => {})
+    expect(screen.getByText('作答记录已保存，报告生成中')).toBeInTheDocument()
+    expect(screen.queryByText('测评已完成，报告尚未开放')).not.toBeInTheDocument()
+    expect(mockCompositeApi.report).not.toHaveBeenCalled()
+    await act(async () => { await vi.advanceTimersByTimeAsync(3000) })
+    expect(mockCompositeApi.reportStatus).toHaveBeenCalledTimes(2)
+    expect(mockCompositeApi.report).not.toHaveBeenCalled()
+    page.unmount()
+  })
+
+  it.each(['READY', 'PROCESSING', 'FAILED'] as const)('fails closed for unavailable feedback with generation %s without triggering generation or downloads', async generation => {
+    mockCompositeApi.reportStatus.mockResolvedValue(status('UNAVAILABLE', generation))
+    const page = mountParticipant('student')
+    expect(await screen.findByText('报告暂时不可用')).toBeInTheDocument()
+    expect(mockCompositeApi.report).not.toHaveBeenCalled()
+    expect(mockCompositeApi.retryReport).not.toHaveBeenCalled()
+    expect(mockCompositeApi.downloadAnalysisExport).not.toHaveBeenCalled()
+    expect(screen.queryByRole('button', { name: '重新生成报告' })).not.toBeInTheDocument()
+    page.unmount()
+  })
+
+  it('preserves teacher report access while participant feedback is scheduled', async () => {
+    authState.user = { role: 'TEACHER' }
+    mockCompositeApi.teacherReportStatus.mockResolvedValue(status('GENERATED_NOT_RELEASED'))
+    mockCompositeApi.teacherReport.mockResolvedValue({ code: 0, data: { name: '教师原有报告', backgroundValues: [], unitReports: [] } })
+    render(<MemoryRouter initialEntries={['/composite-assessments/q/attempts/feedback/report']}><Routes><Route path="/composite-assessments/:id/attempts/:attemptId/report" element={<CompositeReportPage />} /></Routes></MemoryRouter>)
+    expect(await screen.findByText('教师原有报告')).toBeInTheDocument()
+    expect(mockCompositeApi.teacherReport).toHaveBeenCalledWith('q', 'feedback', undefined)
+    expect(screen.queryByText('测评已完成，报告尚未开放')).not.toBeInTheDocument()
+  })
 })
 
 it.each(['student', 'public'])('shows submitted unsatisfied %s reports and all canonical V3 states without score inference', async (surface) => {

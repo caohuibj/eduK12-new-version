@@ -2,6 +2,7 @@ import { TypedFormExportActions } from '../../modules/composite/TypedFormExportA
 import { StructuredFormConstraints } from '../../modules/assessment-core/form/StructuredFormConstraints'
 import { BasicFormConstraints } from '../../modules/assessment-core/form/BasicFormConstraints'
 import type { FormQuestion } from '../../modules/assessment-core/form/types'
+import type { TrainingFeedbackPolicy } from '../../modules/composite/types'
 import { isTrainingHost } from '../../training/context'
 import '../../training/training-form-surface.css'
 import { apiErrorMessage } from '../../utils/apiErrorMessage'
@@ -188,6 +189,10 @@ export function QuestionnaireProductEdit() {
   const [kind, setKind] = useState('COURSE')
   const [courseIds, setCourseIds] = useState<string[]>([])
   const [publicEnabled, setPublic] = useState(false)
+  const [feedbackMode, setFeedbackMode] = useState<TrainingFeedbackPolicy['mode']>('IMMEDIATE')
+  const [feedbackReleaseAt, setFeedbackReleaseAt] = useState('')
+  const [feedbackChanged, setFeedbackChanged] = useState(false)
+  const [feedbackError, setFeedbackError] = useState('')
   const [timingEnabled,setTimingEnabled]=useState(false)
   const [checkpointEnabled,setCheckpointEnabled]=useState(false)
   const [checkpointHours,setCheckpointHours]=useState(24)
@@ -245,6 +250,10 @@ export function QuestionnaireProductEdit() {
     setKind(row.questionnaireType)
     setCourseIds((row.questionnaireCourses || []).map((v: any) => v.courseId))
     setPublic(row.publicEnabled)
+    setFeedbackMode(row.trainingFeedbackPolicy?.mode ?? 'IMMEDIATE')
+    setFeedbackReleaseAt(row.trainingFeedbackPolicy?.releaseAt ?? '')
+    setFeedbackChanged(false)
+    setFeedbackError('')
     setTimingEnabled(Boolean(row.trainingTimingPolicy))
     setCheckpointEnabled(row.trainingPersistencePolicy?.checkpoint?.enabled===true)
     setCheckpointHours(row.trainingPersistencePolicy?.checkpoint?.ttlHours??24)
@@ -307,12 +316,17 @@ export function QuestionnaireProductEdit() {
     }
   }
   const persistencePolicy = () => ({schemaVersion:1,checkpoint:checkpointEnabled?{enabled:true,ttlHours:checkpointHours}:null,localCognitive:localCognitiveEnabled?{enabled:true,ttlHours:localCognitiveHours}:null})
+  const feedbackPolicy = (): TrainingFeedbackPolicy => feedbackMode === 'SCHEDULED'
+    ? { schemaVersion: 1, mode: 'SCHEDULED', releaseAt: parseLocalDateTime(feedbackReleaseAt)?.toISOString() ?? feedbackReleaseAt }
+    : { schemaVersion: 1, mode: 'IMMEDIATE' }
   const metadata = () => ({
     name: name.trim(),
     instruction,
     description,
     courseIds: kind === 'GENERAL' ? [] : courseIds,
     publicEnabled,
+    ...(feedbackScopeCleared ? { trainingFeedbackPolicy: null }
+      : (id === 'new' && trainingEligible) || feedbackDefaultsOnBinding || feedbackDirty ? { trainingFeedbackPolicy: feedbackPolicy() } : {}),
     ...(checkpointEnabled||localCognitiveEnabled||detail?.trainingPersistencePolicy?{trainingPersistencePolicy:persistencePolicy()}:{}),
     ...(timingEnabled||detail?.trainingTimingPolicy?{trainingTimingEnabled:timingEnabled}:{}),
     expiresAt: expiresAt ? parseLocalDateTime(expiresAt)?.toISOString() : null,
@@ -320,6 +334,15 @@ export function QuestionnaireProductEdit() {
   })
   const save = () => {
     if ((checkpointEnabled && (!Number.isInteger(checkpointHours)||checkpointHours<1||checkpointHours>48)) || (localCognitiveEnabled && (!Number.isInteger(localCognitiveHours)||localCognitiveHours<1||localCognitiveHours>48))) { setError('草稿保留时间必须为 1–48 的整数小时。'); return }
+    if (feedbackDirty && !trainingEligible && !feedbackScopeCleared) {
+      setError('学员报告开放设置仅支持真实 Training 课程投放；公开链接须唯一绑定一个课程。')
+      return
+    }
+    if (trainingEligible && feedbackMode === 'SCHEDULED' && (id === 'new' || feedbackDirty) && !parseLocalDateTime(feedbackReleaseAt)) {
+      setFeedbackError('请选择有效的报告开放时间。')
+      document.getElementById('questionnaire-feedback-release')?.focus()
+      return
+    }
 
     const invalidName = !name.trim()
       ? '请填写测评名称'
@@ -497,12 +520,22 @@ export function QuestionnaireProductEdit() {
         after = payload.next
       } while (after)
     })
+  const trainingEligible = kind === 'COURSE' && !detail?.reportPackage && !detail?.analysisProtocol &&
+    (!detail?.productKind || detail.productKind === 'QUESTIONNAIRE') && courseIds.length > 0 && courseIds.length <= 100 &&
+    courseIds.every(courseId => catalog.courses.some((course: { id: string; courseType?: string; isLibrary?: boolean }) => course.id === courseId && course.courseType === 'TRAINING_COURSE' && !course.isLibrary)) &&
+    (!publicEnabled || courseIds.length === 1)
+  const feedbackDirty = feedbackChanged && JSON.stringify(feedbackPolicy()) !== JSON.stringify(detail?.trainingFeedbackPolicy ?? null)
+  const feedbackDefaultsOnBinding = Boolean(detail && !detail.trainingFeedbackPolicy && !feedbackChanged && !detail.questionnaireCourses?.length && trainingEligible)
+  const deliveryScopeChanged = detail && (publicEnabled !== detail.publicEnabled || kind !== detail.questionnaireType ||
+    JSON.stringify([...courseIds].sort()) !== JSON.stringify((detail.questionnaireCourses || []).map((course: { courseId: string }) => course.courseId).sort()))
+  const feedbackScopeCleared = Boolean((detail?.trainingFeedbackPolicy || feedbackChanged) && (id === 'new' || deliveryScopeChanged) && !trainingEligible)
   const metadataDirty = Boolean(
     detail &&
       (name !== detail.name ||
         instruction !== (detail.instruction || '') ||
         description !== (detail.description || '') ||
         publicEnabled !== detail.publicEnabled ||
+        feedbackDirty || feedbackScopeCleared ||
         timingEnabled!==Boolean(detail.trainingTimingPolicy)||
         checkpointEnabled!==Boolean(detail.trainingPersistencePolicy?.checkpoint?.enabled)||
         localCognitiveEnabled!==Boolean(detail.trainingPersistencePolicy?.localCognitive?.enabled)||
@@ -525,10 +558,6 @@ export function QuestionnaireProductEdit() {
   ))
   const flowDirty = Boolean(detail && (trainingFlowText !== formatTrainingFlow(detail.trainingFlowDraft ?? null) || (isMaterialFlowText(trainingFlowText) && maxAttempts !== (detail.maxAttempts ?? 1))))
   const dirty = metadataDirty || variantsDirty || flowDirty
-  const trainingEligible = kind === 'COURSE' && !detail?.reportPackage && !detail?.analysisProtocol &&
-    (!detail?.productKind || detail.productKind === 'QUESTIONNAIRE') && courseIds.length > 0 && courseIds.length <= 100 &&
-    courseIds.every(courseId => catalog.courses.some((course: { id: string; courseType?: string; isLibrary?: boolean }) => course.id === courseId && course.courseType === 'TRAINING_COURSE' && !course.isLibrary)) &&
-    (!publicEnabled || courseIds.length === 1)
   const variantsEligible = trainingEligible && !trainingFlowText.trim() && !detail?.trainingFlowFrozen
   const flowEligible = trainingEligible && !trainingVariantDraft && !detail?.trainingVariantFrozen &&
     !detail?.anonymousStudy && !detail?.anonymousStudyId && !detail?.assignmentRef &&
@@ -601,6 +630,19 @@ export function QuestionnaireProductEdit() {
             </fieldset>
             <label className="block"><input type="checkbox" checked={timingEnabled} disabled={kind!=='COURSE'||!draft} onChange={e=>setTimingEnabled(e.target.checked)}/> 可选：记录 Scale 浏览器有效前台时间</label>
             <p className="text-sm">默认关闭，仅支持明确 Training 课程投放；公开链接必须唯一绑定一个课程。时间仅作描述，不改变评分，后台及暂停时间不计入。发布后采集策略冻结。</p>
+            {(trainingEligible || detail?.trainingFeedbackPolicy || feedbackChanged) && <fieldset className="space-y-2 rounded border p-3" disabled={busy || !draft || !trainingEligible}>
+              <legend>学员报告开放（发布后冻结）</legend>
+              <label className="block"><input type="radio" name="training-feedback-mode" value="IMMEDIATE" checked={feedbackMode === 'IMMEDIATE'} onChange={() => { setFeedbackMode('IMMEDIATE'); setFeedbackChanged(true); setFeedbackError('') }} /> 整份测评完成且报告生成后即可查看（默认）</label>
+              <label className="block"><input type="radio" name="training-feedback-mode" value="SCHEDULED" checked={feedbackMode === 'SCHEDULED'} onChange={() => { setFeedbackMode('SCHEDULED'); setFeedbackChanged(true); setFeedbackError('') }} /> 预设时间开放</label>
+              {feedbackMode === 'SCHEDULED' && <label className="block">报告开放时间<LocalDateTimeInput picker id="questionnaire-feedback-release" className="input w-full" value={feedbackReleaseAt}
+                aria-invalid={Boolean(feedbackError)} aria-describedby={feedbackError ? 'questionnaire-feedback-release-error' : 'questionnaire-feedback-timezone'}
+                onChange={event => { setFeedbackReleaseAt(event.target.value); setFeedbackChanged(true); setFeedbackError('') }} /></label>}
+              {feedbackMode === 'SCHEDULED' && <p id="questionnaire-feedback-timezone" className="text-sm">按设备时区（{Intl.DateTimeFormat().resolvedOptions().timeZone}）设置；到时仍须完成整份测评并生成报告。</p>}
+              {feedbackError && <p id="questionnaire-feedback-release-error" role="alert">{feedbackError}</p>}
+              <p className="text-sm">仅在统一讲解或保护测评过程时选择预设时间。教师原有的报告查看、分析和导出不受此设置影响。</p>
+              {detail && !detail.trainingFeedbackPolicy && !feedbackChanged && !feedbackDefaultsOnBinding && <p className="text-sm">历史未配置记录沿用原有反馈方式；其他设置的保存不会改变它。</p>}
+              {feedbackScopeCleared && <p role="status">当前投放已不符合 Training 课程范围，保存时将清除学员报告开放设置。</p>}
+            </fieldset>}
             </div><div className="questionnaire-delivery-window"><div className="questionnaire-date-grid"><label className="block">
               开始时间
               {!draft && !opensAt ? <p className="questionnaire-window-summary">发布后立即开放</p> : <LocalDateTimeInput picker className="input w-full"

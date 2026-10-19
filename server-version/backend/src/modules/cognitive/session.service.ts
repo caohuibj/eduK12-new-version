@@ -305,12 +305,14 @@ const toRunnerPayload = async (session: {
 }, nextTrialIndex?: number, exposeAnonymousCode = false, frozenReport?: FrozenReportSnapshot | null) => {
   const selectedParent = await assertTrainingChildSelected(session as any)
   const { ensureCognitiveAdmissionAtDelivery, loadStoredCognitiveAdmission } = await import('./cognitive-admission.service')
-  let admission = (session as any).frozenAdmissionSnapshotEncrypted ? await loadStoredCognitiveAdmission(session as any) : null
+  let admission: Awaited<ReturnType<typeof loadStoredCognitiveAdmission>> = null
   const persistence = session.compositeAttempt ? trainingPersistenceMetadata(session.compositeAttempt as any) : undefined
   // Authorized delivery establishes admission once. Completed history remains a pure frozen read.
   if (session.status === 'IN_PROGRESS' && !isCognitiveNewAdmissionEnabled() && !(session as any).frozenAdmissionSnapshotHash) assertCognitiveNewAdmissionEnabled()
   if (session.status === 'IN_PROGRESS' && (session as any).runtimeGeneration === 'UNIFIED_V1') {
     admission = await ensureCognitiveAdmissionAtDelivery(session.id, selectedParent, session as import('./cognitive-admission.service').CognitiveAdmissionChildRow)
+  } else if ((session as any).frozenAdmissionSnapshotEncrypted) {
+    admission = await loadStoredCognitiveAdmission(session as any)
   }
   const storedConfig = await loadCognitiveSessionConfig(session.configSnapshotEncrypted)
   const validatedConfig = storedConfig.config
