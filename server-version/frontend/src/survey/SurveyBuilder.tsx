@@ -5,7 +5,7 @@ import { ResearchScaleEditor } from './ResearchScaleEditor'
 import { ResearchCognitiveEditor } from './ResearchCognitiveEditor'
 import { ResearchCognitivePreview, type CognitivePreviewSnapshot } from './ResearchCognitivePreview'
 import { ResearchSjtEditor } from './ResearchSjtEditor'
-import { ResearchPreview } from './ResearchPreview'
+import { ResearchPreview,type PreviewFocusRequest } from './ResearchPreview'
 import type { ResearchDraft, Kind, Definition, FormDraft, ScaleDraft, SjtDraft, CognitiveDraft, Issue } from './builder.types'
 import { researchKey } from './builder.types'
 import { ResearchAuthoringGuide,ResearchImportGuide } from './ResearchAuthoringGuide'
@@ -60,6 +60,8 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
   const [preview,setPreview]=useState<Preview|null>(null),[showPreview,setShowPreview]=useState(false)
   const [answerReview,setAnswerReview]=useState<{ok:boolean;issues:Issue[];
     missing:{itemKey:string;reason:string}[]}|null>(null)
+  const [previewFocus,setPreviewFocus]=useState<PreviewFocusRequest|null>(null)
+  const previewFocusSequence=useRef(0)
   const [bulkText,setBulkText]=useState(''),[bulkFormat,setBulkFormat]=useState<'TEXT'|'CSV'>('TEXT')
   const [bulkTargetPageKey,setBulkTargetPageKey]=useState('')
   const [bulk,setBulk]=useState<{batch:BulkBatch;result:BulkResult}|null>(null)
@@ -74,7 +76,7 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
   // and must never invite another create/import with a fresh request ID.
   const refreshAfterWrite=(page:number)=>refreshList(page,true).catch(()=>{})
   const clearReview=()=>{
-    setPreview(null);setShowPreview(false);setAnswerReview(null)
+    setPreview(null);setShowPreview(false);setAnswerReview(null);setPreviewFocus(null)
     setBulk(null);setUndo(null);setBulkTargetPageKey('')
   }
   const select=async(id:string)=>{
@@ -106,7 +108,7 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
     if(readOnly)return
     editGeneration.current++
     setActive(old=>old?{...old,definition}:old)
-    setDirty(true);setPreview(null);setBulk(null);setUndo(null);setAnswerReview(null);setApiIssues([])
+    setDirty(true);setPreview(null);setBulk(null);setUndo(null);setAnswerReview(null);setPreviewFocus(null);setApiIssues([])
   }
   const save=()=>{if(!active||readOnly||!dirty)return;const snapshot=active,generation=editGeneration.current;void run(async()=>{
     const updated=await api<ResearchDraft>(prefix+'/'+snapshot.id,'PATCH',{
@@ -139,7 +141,7 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
       setAnswerReview(result)
       setNotice(result.ok?'正式 Form 校验通过；未产生正式答卷':'请修正高亮题目后再试提交')
       const first=result.issues[0]?.path.match(/^answers\.([a-z][a-z0-9_-]*)/i)?.[1]
-      if(first)window.requestAnimationFrame(()=>document.getElementById('survey-preview-'+first)?.focus())
+      setPreviewFocus(first?{itemKey:first,sequence:++previewFocusSequence.current}:null)
     })
   }
   const duplicate=()=>{if(!active)return;void run(async()=>{
@@ -181,6 +183,10 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
     if(!active)return
     const target=authoringIssueTarget(active,issue,context)
     if(!target.targetId)return
+    if(active.kind==='FORM'&&target.targetId.startsWith('survey-preview-')){
+      setPreviewFocus({itemKey:target.targetId.slice('survey-preview-'.length),sequence:++previewFocusSequence.current})
+      return
+    }
     if('sceneIndex' in target&&target.sceneIndex!==undefined){
       // Reuse the existing scene selector; shared SJT editor/runtime stays intact.
       editorRoot.current?.querySelectorAll('nav[aria-label="情境列表"] > div')[target.sceneIndex]
@@ -312,7 +318,7 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
         <button type="button" className="btn-secondary" onClick={()=>setShowPreview(x=>!x)}>
           {showPreview?'收起模拟作答':'展开模拟作答'}</button>
         {showPreview&&<>{active.kind==='COGNITIVE'?<ResearchCognitivePreview snapshot={preview.cognitivePreview}/>:<ResearchPreview draft={active} onSimulate={simulate} onValidateForm={validateFormAnswers}
-            errorPath={answerReview?.issues[0]?.path}/>}
+            errorPath={answerReview?.issues[0]?.path} focusRequest={previewFocus}/>}
           {answerReview&&<div role="status" className="border rounded-lg p-3 my-3 space-y-2">
             <p className="font-medium">{answerReview.ok?'Form 试提交通过':'Form 试提交未通过'}</p>
             <ResearchIssueList draft={active} issues={answerReview.issues} onLocate={locateIssue}/>

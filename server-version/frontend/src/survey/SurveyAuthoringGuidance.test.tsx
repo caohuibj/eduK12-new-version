@@ -10,7 +10,7 @@ const form:ResearchDraft={id:'form1',projectId:'p1',instrumentKey:'form',kind:'F
     {pageKey:'page1',title:'第一页',questions:[{itemKey:'q1',type:'SHORT_TEXT',prompt:'第一题',required:true,options:[],rows:[]}]},
     {pageKey:'page2',title:'第二页',questions:[{itemKey:'q2',type:'SHORT_TEXT',prompt:'',required:true,options:[],rows:[]}]},
   ]}}
-function setup(draft:ResearchDraft,{patchError=false,bulk=false,answerIssue}:{patchError?:boolean;bulk?:boolean;answerIssue?:'missing'|'invalid'}={}){
+function setup(draft:ResearchDraft,{patchError=false,bulk=false,answerIssue}:{patchError?:boolean;bulk?:boolean;answerIssue?:'missing'|'invalid'|'multiple'}={}){
   const fetcher=vi.fn(async(url:string,init?:RequestInit)=>{
     let data:unknown=null,status=200
     if(url==='/api/survey/auth/csrf')data={csrfToken:'synthetic'}
@@ -18,7 +18,9 @@ function setup(draft:ResearchDraft,{patchError=false,bulk=false,answerIssue}:{pa
     else if(url===base+'/assets')data={assets:[]}
     else if(url===base+'/catalog?page=1')data={list:[]}
     else if(url===base+'/instruments/'+draft.id+'/form-dry-run'&&answerIssue)data={ok:false,
-      issues:[{path:'answers.q2',message:answerIssue==='missing'?'请填写必答题':'请输入有效数值',severity:'error'}],
+      issues:answerIssue==='multiple'?[{path:'answers.q1',message:'文本超过长度限制',severity:'error'},
+        {path:'answers.q2',message:'数值低于下限',severity:'error'}]
+        :[{path:'answers.q2',message:answerIssue==='missing'?'请填写必答题':'请输入有效数值',severity:'error'}],
       missing:answerIssue==='missing'?[{itemKey:'q2',reason:'unanswered'}]:[]}
     else if(url===base+'/instruments/'+draft.id+'/validate')data=answerIssue?{revision:1,kind:'FORM',ok:true,issues:[]}:{revision:1,kind:draft.kind,ok:false,issues:[{
       path:draft.kind==='SJT'?'scenes.1.questions.0.prompt':'pages.1.questions.0.prompt',message:'请填写题干',severity:'error',
@@ -71,6 +73,38 @@ describe('S04 authoring guidance and issue locations',()=>{
     expect(submitted.q1).toBe('合成有效回答')
     if(answerIssue==='invalid')expect(submitted.q2).toBe(-1)
     else expect(submitted.q2).toBeUndefined()
+    expect(fetcher.mock.calls.some(([url,init])=>init?.method==='PATCH'||url.endsWith('/preview'))).toBe(false)
+  })
+  it('switches between two pages with simultaneous trial errors before focusing, retaining answers without requests',async()=>{
+    const user=userEvent.setup(),definition=structuredClone(form.definition) as FormDraft
+    definition.pages[0].questions[0].maxLength=3
+    definition.pages[1].questions[0]={...definition.pages[1].questions[0],type:'NUMBER',prompt:'第二题数值',min:0}
+    const fetcher=setup({...form,definition},{answerIssue:'multiple'})
+    fireEvent.click(await screen.findByRole('button',{name:/合成表单 FORM/}))
+    fireEvent.click(await screen.findByRole('button',{name:'结构检查与编译预览'}))
+    await screen.findByRole('region',{name:'研究工具试答预览'})
+    fireEvent.change(document.getElementById('survey-preview-q1')!.querySelector('textarea')!,{target:{value:'保留第一题答案'}})
+    fireEvent.click(within(screen.getByRole('navigation',{name:'试答分页'})).getByRole('button',{name:'下一页'}))
+    fireEvent.change(document.getElementById('survey-preview-q2')!.querySelector('input')!,{target:{value:'-1'}})
+    fireEvent.click(screen.getByRole('button',{name:'按正式 FINAL 规则试提交（不保存数据）'}))
+    const first=await screen.findByRole('button',{name:'第 1 页 · 第 1 题：文本超过长度限制'})
+    const second=screen.getByRole('button',{name:'第 2 页 · 第 1 题：数值低于下限'})
+    await waitFor(()=>expect(document.getElementById('survey-preview-q1')).toHaveFocus())
+    expect(document.getElementById('survey-preview-q2')).toBeNull()
+    const requestCount=fetcher.mock.calls.length
+    second.focus();await user.tab({shift:true});await user.tab();expect(second).toHaveFocus()
+    await user.keyboard('{Enter}')
+    await waitFor(()=>expect(document.getElementById('survey-preview-q2')).toHaveFocus())
+    expect(document.getElementById('survey-preview-q1')).toBeNull()
+    expect(document.getElementById('survey-preview-q2')!.querySelector('input')).toHaveValue(-1)
+    fireEvent.click(first)
+    await waitFor(()=>expect(document.getElementById('survey-preview-q1')).toHaveFocus())
+    expect(document.getElementById('survey-preview-q1')!.querySelector('textarea')).toHaveValue('保留第一题答案')
+    // A repeated request for the same page must focus again without a resubmit.
+    first.focus();await user.keyboard('{Enter}')
+    await waitFor(()=>expect(document.getElementById('survey-preview-q1')).toHaveFocus())
+    expect(fetcher.mock.calls).toHaveLength(requestCount)
+    expect(fetcher.mock.calls.filter(([url])=>url.endsWith('/form-dry-run'))).toHaveLength(1)
     expect(fetcher.mock.calls.some(([url,init])=>init?.method==='PATCH'||url.endsWith('/preview'))).toBe(false)
   })
   it('retains a rejected unsaved edit and exposes the server issue as an actionable location',async()=>{
