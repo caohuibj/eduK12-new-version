@@ -1,0 +1,2812 @@
+{
+  "schema": 1,
+  "base": "6aeba71d6cad70725d5164598f8dc854d11c1c89",
+  "productHead": "6a0393636aa9e833550ecd7e257d5957661d9fb0",
+  "frontendTree": "e075e96ae57028fc3de9ce9d77fa2187e0791be8",
+  "files": [
+    {
+      "path": "docs/survey-mac-s01-20261019.md",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "84cd190554c5c92370e14391ea614a0cf02fb566"
+    },
+    {
+      "path": "docs/survey-mac-s01-evidence-20261019/asset-inventory.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "8dee5e40fb5ce5c68ab8c56fa943905052ede82d"
+    },
+    {
+      "path": "docs/survey-mac-s01-evidence-20261019/entry-regression-first-attempt.txt",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "921a0bf2038070a2bdcb5b521c809cc0712796a2"
+    },
+    {
+      "path": "docs/survey-mac-s01-evidence-20261019/entry-regression-stdout.txt",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "6aaf4c4688d7d3c975e49f4cf6117967210ccfcf"
+    },
+    {
+      "path": "docs/survey-mac-s01-evidence-20261019/environment.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "a5d3ed9c7a99751583bb0436a7f0a2441c3a9134"
+    },
+    {
+      "path": "docs/survey-mac-s01-evidence-20261019/home-dev-network.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "9341e13aa5bca09b8ee21c82db366557f0d2ad57"
+    },
+    {
+      "path": "docs/survey-mac-s01-evidence-20261019/isolation-audit.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "c049673cd5f012ebcc4a92238584ddeee7dc6b11"
+    },
+    {
+      "path": "docs/survey-mac-s01-evidence-20261019/prisma-normalization.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "34ce27f2750301607a8912967f7e6e83cfa4e595"
+    },
+    {
+      "path": "docs/survey-mac-s01-evidence-20261019/screenshots.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "9821ef75530071816ced9a152143ad1d203d438c"
+    },
+    {
+      "path": "docs/survey-mac-s01-evidence-20261019/services-health-permitted.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "898425fcdcc0be24f36287ec40629f7446f40e05"
+    },
+    {
+      "path": "docs/survey-mac-s01-evidence-20261019/services-health.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "499ff28a3ddac34b5a46cb107e4ec2edf04a219a"
+    },
+    {
+      "path": "docs/survey-mac-s01-evidence-20261019/source-inventory.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "49779a80cf1ca6c6bd09c36afe1939f441b8b564"
+    },
+    {
+      "path": "docs/survey-mac-s01-pages.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "89a4c2fccaa78b9a95c300f0af53a066c07044cb"
+    },
+    {
+      "path": "docs/survey-mac-s02-20261019.md",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "87a8a405ab9f75c6b7a6223d9cbede1b64d1c703"
+    },
+    {
+      "path": "docs/survey-mac-s02-evidence-20261019/before-inputs.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e0b35e44338fe3f8fda34cfd2893c77336369293"
+    },
+    {
+      "path": "docs/survey-mac-s02-evidence-20261019/checks.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "1b5f4da8c65f94b1287d95fe6ccedd5840e963e9"
+    },
+    {
+      "path": "docs/survey-mac-s02-evidence-20261019/input-after.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "76d8ece764c17a5c057728973635ae2765642849"
+    },
+    {
+      "path": "docs/survey-mac-s02-evidence-20261019/keyboard-supplemental.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "d4c2cb72e62355d0ae3e74c5786d77f5128ce05d"
+    },
+    {
+      "path": "docs/survey-mac-s02-evidence-20261019/layout-after.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "96979273e51c81d18349e376a8c3db016041929f"
+    },
+    {
+      "path": "docs/survey-mac-s02-evidence-20261019/layout-before.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "0dc5ece22fcc180dca897992f62ba4a41aae5b1c"
+    },
+    {
+      "path": "docs/survey-mac-s02-evidence-20261019/native-browser-checks.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f8e6b0013300ea82dba5fa8cd65ffea7147674d6"
+    },
+    {
+      "path": "docs/survey-mac-s02-evidence-20261019/resource-after.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "720c44e050768836a28fb9957ae431f0adb48c9f"
+    },
+    {
+      "path": "docs/survey-mac-s02-evidence-20261019/resource-before.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "93b6d378b47ffe4829601095dad6b2ff366616d7"
+    },
+    {
+      "path": "docs/survey-mac-s02-evidence-20261019/screenshots.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "ff090e33deb34e67a9ff02bbcee6091964487362"
+    },
+    {
+      "path": "docs/survey-mac-s02-followup-20261019.md",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "27557f0793b8661ce5e479eb07573bacfacdf081"
+    },
+    {
+      "path": "docs/survey-mac-s02-followup-evidence-20261019.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "c3eae32797b74b01851be814c784f03a4ea76924"
+    },
+    {
+      "path": "docs/survey-mac-s03-20261019.md",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "34a05dc587a6739c8722fd68664fff23cdca90be"
+    },
+    {
+      "path": "docs/survey-mac-s03-evidence-20261019/cognitive-baseline-before.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "a78146f3589f15807fdd7ff079f7062f92b7d5e9"
+    },
+    {
+      "path": "docs/survey-mac-s03-evidence-20261019/cognitive-comparison.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "bfdbba88e6bb72f5fe055f2b926b7d5fb2613343"
+    },
+    {
+      "path": "docs/survey-mac-s03-evidence-20261019/contract-source-comparison.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "7cfb05737f8dd3e037f9b5fb79b1813b86cb1b49"
+    },
+    {
+      "path": "docs/survey-mac-s03-evidence-20261019/diagnostic-instrumentation.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "d658f148d37212c575c59074d54699ece1d31f7a"
+    },
+    {
+      "path": "docs/survey-mac-s03-evidence-20261019/existing-synthetic-final-metadata.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "aae117640ec85c608645a95aa7f9dead2117312a"
+    },
+    {
+      "path": "docs/survey-mac-s03-evidence-20261019/final-failure-diagnosis.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "d93024fa243414b0fd01b17eb07434ed821792f7"
+    },
+    {
+      "path": "docs/survey-mac-s03-evidence-20261019/integrated-browser-observations.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "22bf91e1a95667cb55f88e4ffc1e9fd66b80d189"
+    },
+    {
+      "path": "docs/survey-mac-s03-evidence-20261019/integrated-cognitive-comparison.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "9c387947aec86773675f450d74efa5243c1a74d3"
+    },
+    {
+      "path": "docs/survey-mac-s03-evidence-20261019/integrated-contract-source-comparison.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "cfee0802bcfd19fd49a4c6282c4b9d0be7280401"
+    },
+    {
+      "path": "docs/survey-mac-s03-evidence-20261019/integrated-protected-source.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "25d4c4046a6122a93ebd01eff29dbfef73ecd552"
+    },
+    {
+      "path": "docs/survey-mac-s03-evidence-20261019/main-runtime-integration.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "bdfb5dde0b9e032c4b3196ac14a7c3f263e9b473"
+    },
+    {
+      "path": "docs/survey-mac-s03-evidence-20261019/peripheral-observations.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "c061c95bcdfee44bda45ec91c9fdd16a47cd107d"
+    },
+    {
+      "path": "docs/survey-mac-s03-evidence-20261019/protected-source-before.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "55b7681c75fa409a18d5f6b90099705d3c1bbbf1"
+    },
+    {
+      "path": "docs/survey-mac-s03-evidence-20261019/retained-cognitive-after.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e0e83de1103ab8e9f80fd021f14f412957c866ad"
+    },
+    {
+      "path": "docs/survey-mac-s03-evidence-20261019/retained-cognitive-before.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "8d997ad4d2feaf0230c7d1bea54f9b0f953b673c"
+    },
+    {
+      "path": "docs/survey-mac-s03-evidence-20261019/retained-cognitive-raw-export-check.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "be59fd0896e0ee4a0092b53f2a5d0e8f14542d7c"
+    },
+    {
+      "path": "docs/survey-mac-s03-evidence-20261019/retained-cognitive-raw.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "ea798a8aabcd3c9fc056033036c74565fa3d3a2d"
+    },
+    {
+      "path": "docs/survey-mac-s03-native-20261019.md",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "7a5644daf21283002ebd2105a6112427240a4d4e"
+    },
+    {
+      "path": "docs/survey-mac-s03-native-evidence-20261019/manifest.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "84a8c8a408fbd29d0b80a65f269d602305158ad1"
+    },
+    {
+      "path": "docs/survey-mac-s03-native-evidence-20261019/native-ax-filtered.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f2a84f1f62bee7c9e1f4c4ab37b2935eb1df2f73"
+    },
+    {
+      "path": "docs/survey-mac-s03-native-evidence-20261019/synthetic-final-metadata.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "03227a25dc614db346e2f609ef4053edbf92b57e"
+    },
+    {
+      "path": "docs/survey-mac-s03-review-followup-20261019.md",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "15bc82d7c31c00f1735f118b5e01124037035443"
+    },
+    {
+      "path": "docs/survey-mac-s04-cross-page-evidence-20261019/manifest.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e461e7619992ab71ecc9e25438c72ff34cc3b4e9"
+    },
+    {
+      "path": "docs/survey-mac-s04-cross-page-evidence-20261019/s04-cross-page-lint.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "eb0caf43f19399393830eee66c57534c54ed7c1b"
+    },
+    {
+      "path": "docs/survey-mac-s04-cross-page-evidence-20261019/s04-cross-page-run.py.txt",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "87a9dcdceb89bcd2ad7e683eab14580a78f350e1"
+    },
+    {
+      "path": "docs/survey-mac-s04-cross-page-evidence-20261019/s04-cross-page-targeted.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f9b1e7118f9e44ea35feb5c111b5f663051645ca"
+    },
+    {
+      "path": "docs/survey-mac-s04-cross-page-evidence-20261019/s04-cross-page-types.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/survey-mac-s04-cross-page-evidence-20261019/source-binding.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "396a9d5f4ae8110844c21466c08e0b43ec4832f8"
+    },
+    {
+      "path": "docs/survey-mac-s04-cross-page-evidence-20261019/targeted.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "ae06883c571361ddbf808fe6fce4332638009281"
+    },
+    {
+      "path": "docs/survey-mac-s04-cross-page-review-fix-20261019.md",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "06d57030ae482fec8d899df6331861b354301c7c"
+    },
+    {
+      "path": "docs/survey-mac-s04-evidence-20261019/authoring-final.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "3e3d5b3e2b5f8676e9d1482dfbe438c701cb248c"
+    },
+    {
+      "path": "docs/survey-mac-s04-evidence-20261019/authoring-tests.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "247bfda4ca2bb8a9fa7892cce9e6e0eea479ca97"
+    },
+    {
+      "path": "docs/survey-mac-s04-evidence-20261019/checks-summary.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "15f59d28137fd3fda9abb13f9ef75fee48a2e3eb"
+    },
+    {
+      "path": "docs/survey-mac-s04-evidence-20261019/guidance-csv-retry.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "a3df43a025ccb4f18ac1c40a8dd2731d255e200b"
+    },
+    {
+      "path": "docs/survey-mac-s04-evidence-20261019/guidance-new.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "8efe11c681dca6c08c356560aca6655d6f823f44"
+    },
+    {
+      "path": "docs/survey-mac-s04-evidence-20261019/manifest.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "9d669487aee4ecaf5427e1aed306cae344c7a8a4"
+    },
+    {
+      "path": "docs/survey-mac-s04-evidence-20261019/native-authoring-ax.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "dda385b6372964876355798e3d408b26e86b5b4a"
+    },
+    {
+      "path": "docs/survey-mac-s04-evidence-20261019/nav-tests.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "516380da289a977b73bd33ec9f3f8f193886d35d"
+    },
+    {
+      "path": "docs/survey-mac-s04-evidence-20261019/navigation-new.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "b2331358006c0da8da0ed8926f7e40456fcf6b17"
+    },
+    {
+      "path": "docs/survey-mac-s04-evidence-20261019/requests-final.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "2ce8aceb6a13cf74daa89862e481dbc8e06d9308"
+    },
+    {
+      "path": "docs/survey-mac-s04-evidence-20261019/s04-authoring-final.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "7a7e9beb964e1d3fe7d3d0ed116e68696f79480a"
+    },
+    {
+      "path": "docs/survey-mac-s04-evidence-20261019/s04-authoring-tests.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "c51aa1b4596386b6240c04b77d06423357195262"
+    },
+    {
+      "path": "docs/survey-mac-s04-evidence-20261019/s04-guidance-csv-retry.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "1c07a3815b03f5e3ea7832d781a928790b04bbce"
+    },
+    {
+      "path": "docs/survey-mac-s04-evidence-20261019/s04-guidance-new.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "32cca148853c6fa770cd8ce8cc73cf91c091d87c"
+    },
+    {
+      "path": "docs/survey-mac-s04-evidence-20261019/s04-lint.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/survey-mac-s04-evidence-20261019/s04-nav-tests.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "d2646e31b188a1c7fdb877b1c9c5e710f720757c"
+    },
+    {
+      "path": "docs/survey-mac-s04-evidence-20261019/s04-navigation-new.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e5229ccf9c808e3880d233fb351e6c9c28ec7309"
+    },
+    {
+      "path": "docs/survey-mac-s04-evidence-20261019/s04-requests-final.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "6c1f9ef35b8e3695f888411914b73c5605434535"
+    },
+    {
+      "path": "docs/survey-mac-s04-evidence-20261019/s04-run.py.txt",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "735db2933ebb5a621856a7a0648b32c1f93d01ee"
+    },
+    {
+      "path": "docs/survey-mac-s04-evidence-20261019/s04-template-check.ts.txt",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "c86caf4eab3fa393d552e22075dcf912ef1a373e"
+    },
+    {
+      "path": "docs/survey-mac-s04-evidence-20261019/s04-templates.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "776a094ff367a1b3d249db6a49c079913df5dd27"
+    },
+    {
+      "path": "docs/survey-mac-s04-evidence-20261019/s04-types.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/survey-mac-s04-evidence-20261019/screenshots.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "fbb052a6b6870b762de63267b5c1cad60653c2cb"
+    },
+    {
+      "path": "docs/survey-mac-s04-evidence-20261019/source-binding-final.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "95ea53c8ad02f1afd99aceb80f042a82281e38e4"
+    },
+    {
+      "path": "docs/survey-mac-s04-evidence-20261019/source-binding.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "d310d90ca77647f3ec90fe54a5f28b1bb5ce2834"
+    },
+    {
+      "path": "docs/survey-mac-s04-evidence-20261019/templates-real-parser.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "dc6be2dfd43d1f58af87c4adbb6bd3173b1184a2"
+    },
+    {
+      "path": "docs/survey-mac-s04-location-fix-evidence-20261019/checks-summary.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "50ba0e475a7220b5375b818b5f02522251a79825"
+    },
+    {
+      "path": "docs/survey-mac-s04-location-fix-evidence-20261019/fixed.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "5eb494b8851d2abd359366a564c7abbf72875f44"
+    },
+    {
+      "path": "docs/survey-mac-s04-location-fix-evidence-20261019/form-final.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "74e850d4096de61b5b59446a000480be96abf502"
+    },
+    {
+      "path": "docs/survey-mac-s04-location-fix-evidence-20261019/imports-final.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "12d85387d2502603a0bd56d30e1d819128f620a2"
+    },
+    {
+      "path": "docs/survey-mac-s04-location-fix-evidence-20261019/imports.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "a898f1d9f1e9fcef7f367612c423c58cb0cb42b9"
+    },
+    {
+      "path": "docs/survey-mac-s04-location-fix-evidence-20261019/manifest.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "ffe90250b12f5b3d855e59e749a9f6fbc3dca531"
+    },
+    {
+      "path": "docs/survey-mac-s04-location-fix-evidence-20261019/red.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "df4681774857e01d902ac412cd48462db1c34288"
+    },
+    {
+      "path": "docs/survey-mac-s04-location-fix-evidence-20261019/s04-review-fix-fixed.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "058d0ac82d2a7b506e9b820acfc24e3d1e8f8760"
+    },
+    {
+      "path": "docs/survey-mac-s04-location-fix-evidence-20261019/s04-review-fix-form-final.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e3ae10a32059426f41b5c23b12be7595701b4605"
+    },
+    {
+      "path": "docs/survey-mac-s04-location-fix-evidence-20261019/s04-review-fix-imports-final.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "ed5ae5fb3ae0a224a2589b692687b9ba1db6dd09"
+    },
+    {
+      "path": "docs/survey-mac-s04-location-fix-evidence-20261019/s04-review-fix-imports.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "b525ce57c7073c9fd6ce4c3283b01f238c8d7cea"
+    },
+    {
+      "path": "docs/survey-mac-s04-location-fix-evidence-20261019/s04-review-fix-lint-final.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/survey-mac-s04-location-fix-evidence-20261019/s04-review-fix-lint-test-current.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/survey-mac-s04-location-fix-evidence-20261019/s04-review-fix-lint.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/survey-mac-s04-location-fix-evidence-20261019/s04-review-fix-real-sources.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f9dfb3e8ac9d7d9db1bb9f3e89a10e2badbf31b5"
+    },
+    {
+      "path": "docs/survey-mac-s04-location-fix-evidence-20261019/s04-review-fix-red.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "9a1de5139da526606beee92e6829ab98b389d501"
+    },
+    {
+      "path": "docs/survey-mac-s04-location-fix-evidence-20261019/s04-review-fix-run.py.txt",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "192e53aea1bea2a40845c20d3320fdcf21c5dd73"
+    },
+    {
+      "path": "docs/survey-mac-s04-location-fix-evidence-20261019/s04-review-fix-types-current.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/survey-mac-s04-location-fix-evidence-20261019/s04-review-fix-types-final.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/survey-mac-s04-location-fix-evidence-20261019/s04-review-fix-types.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e3c1df736d037dbed926f619ab7c7da5dcf420e9"
+    },
+    {
+      "path": "docs/survey-mac-s04-location-fix-evidence-20261019/s04-review-fixtures.ts.txt",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "0c50789456b4b28fe2ce57b8fa33d9212623d7a7"
+    },
+    {
+      "path": "docs/survey-mac-s04-location-fix-evidence-20261019/source-binding.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "989b6a27e49521a7db43b01e90c9cf7e2e1e0183"
+    },
+    {
+      "path": "docs/survey-mac-s04-location-review-fix-20261019.md",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "70194fac4151bd40b4b4495b31b9ce071f8a8e3b"
+    },
+    {
+      "path": "docs/survey-mac-s04-review-20261019.md",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "a9afd7ecda274ea4277cfc83aa7fe3da3d78bd1a"
+    },
+    {
+      "path": "docs/survey-mac-s04-safari-evidence-20261019/comparison.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "eb6edeaf1d2fc8e7b287e4d45203e9879457db9c"
+    },
+    {
+      "path": "docs/survey-mac-s04-safari-evidence-20261019/manifest.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "fdb63a58c101a1835a7de41a8f6a7eb6fa172fa7"
+    },
+    {
+      "path": "docs/survey-mac-s04-safari-evidence-20261019/observer.cjs.txt",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "bba0ad3383e75ad09aab2e6ffffb1ac1d1d4268a"
+    },
+    {
+      "path": "docs/survey-mac-s04-safari-evidence-20261019/requests.jsonl",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "c53b0f05da5be46ea08555f9b31ad9be92f6f5ee"
+    },
+    {
+      "path": "docs/survey-mac-s04-safari-evidence-20261019/safari-first-and-retry-ax.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "7aacdd68480eab1305ead9c6c22f3ae5e823f34a"
+    },
+    {
+      "path": "docs/survey-mac-s04-safari-followup-20261019.md",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "78003761a69b321cb60206005097b2b75c7551dd"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/busy-new.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "d02d5d59ef0275155a5ab322703a71aaa69f017a"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/checks-summary.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "c34ac22ec2e4396ae0fff2a545c33ebc7bea5264"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/components.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "82b0a5bedc651d53f8f1aa0286a286b6e39336fa"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/grant-read.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "edd83205ff66c6f7bfee574f4bd7b0dcbd81c432"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/manifest.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "37e6e871a0ba321ac95aeda82da42cb508b91012"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/resource-comparison-final.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "4108eede42f973e7654b47ac260fdadc17144401"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/resource-comparison.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "50e6bbc9d4d44ab757bb90d8738c7e99874050db"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/s05-busy-new.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "fdb0acb112f50b5efb6fbcb308be923d0c29de39"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/s05-components.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f53c6faf5e3ee256eecfa8ade70406e21b13a6f6"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/s05-grant-read.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "25389d903d193ca70448df00b98e6d29a5941739"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/s05-lint-final.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "83f1d12c2034e3ee2a9cd2a0566689a30884208b"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/s05-lint-freeze.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "83f1d12c2034e3ee2a9cd2a0566689a30884208b"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/s05-lint-wrap.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/s05-lint.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "83f1d12c2034e3ee2a9cd2a0566689a30884208b"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/s05-native-after-ax.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "763cadec8acb587f8dd0fabf02a7c9122fe7a37c"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/s05-native-final-ax.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "6b9339082dcddb3647402824f6416519314a8b3c"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/s05-native-frozen-ax.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "7fd92fdc1679f3f48d2de761ac2e388ecc78478c"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/s05-run.py.txt",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "472b9b8a2fbff4f95841b578ba359a0041750d71"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/s05-status-wrap.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "d26131768d55893a550945f064820fbae5105088"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/s05-types-final.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/s05-types-freeze.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/s05-types-wrap.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/s05-types.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/screenshots.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "4765593262861852967e0c37f487d3c9d3280ec5"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/source-binding-final.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "eecef8e227b3a92db07d948ba20832adfee58dc7"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/source-binding.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "7f25bc30dc6cdaa60978f40f64a3e5df1df5edca"
+    },
+    {
+      "path": "docs/survey-mac-s05-evidence-20261019/status-wrap.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "cf85a39126b36845eeb7870c4b6897a9160d3edf"
+    },
+    {
+      "path": "docs/survey-mac-s05-outcome-evidence-20261019/checks-summary.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f5fa4db5624dd9ae9c8f8de59eb426d05a9deec8"
+    },
+    {
+      "path": "docs/survey-mac-s05-outcome-evidence-20261019/links.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "c52424c94a2c5a487ae1dcff06a8ace2fd0f140f"
+    },
+    {
+      "path": "docs/survey-mac-s05-outcome-evidence-20261019/manifest.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "d24d6631737c7d6abb36e0135d8047c6aa060c7c"
+    },
+    {
+      "path": "docs/survey-mac-s05-outcome-evidence-20261019/non-json-final.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "7b0f3dc2e6f418038d9fbc6137bdbb018cb3c2a0"
+    },
+    {
+      "path": "docs/survey-mac-s05-outcome-evidence-20261019/s05-outcome-links.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "b27a663c2cddee4c264ddd354edf629aa969b001"
+    },
+    {
+      "path": "docs/survey-mac-s05-outcome-evidence-20261019/s05-outcome-lint-test-final.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/survey-mac-s05-outcome-evidence-20261019/s05-outcome-lint.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f128bd7889803a0f627f0a3cfef6d7f3e37e84f2"
+    },
+    {
+      "path": "docs/survey-mac-s05-outcome-evidence-20261019/s05-outcome-non-json-final.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "8bfabdc9aee2b6e8f42adee196334bf2ddf4bf4c"
+    },
+    {
+      "path": "docs/survey-mac-s05-outcome-evidence-20261019/s05-outcome-run.py.txt",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "32b8b32e0d11c4b3c086b02dfffec81a809dd935"
+    },
+    {
+      "path": "docs/survey-mac-s05-outcome-evidence-20261019/s05-outcome-targeted.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "615bff64259b7589899c5628d44b34421d1d1b33"
+    },
+    {
+      "path": "docs/survey-mac-s05-outcome-evidence-20261019/s05-outcome-types-final.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/survey-mac-s05-outcome-evidence-20261019/s05-outcome-types.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "5154d77d9b59f2f7b72fab09890abd6140320c66"
+    },
+    {
+      "path": "docs/survey-mac-s05-outcome-evidence-20261019/source-binding.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "0ded59dec87c81237530b3504203e1b12ea787ba"
+    },
+    {
+      "path": "docs/survey-mac-s05-outcome-evidence-20261019/targeted.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "927af59044fbc7f408a5b5f75bcf86e42d2bb2d8"
+    },
+    {
+      "path": "docs/survey-mac-s05-outcome-review-fix-20261019.md",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "64a0190ff75d6f56f523c714540e754d068097a3"
+    },
+    {
+      "path": "docs/survey-mac-s05-review-20261019.md",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "7f489022d5fd87534aad3bbfaadc33fc0b41aa23"
+    },
+    {
+      "path": "docs/survey-mac-s06-download-evidence-20261019/download-reset.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "eaa68f91a6ec1fd2cf9dea825ef3a1290f61dd4e"
+    },
+    {
+      "path": "docs/survey-mac-s06-download-evidence-20261019/downloads.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "b3a1e27f4fd5c797d420a650a6d770b0cb8c72c3"
+    },
+    {
+      "path": "docs/survey-mac-s06-download-evidence-20261019/s06-download-final-lint.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/survey-mac-s06-download-evidence-20261019/s06-download-reset.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "b565eafd829136a2ddee9df2ca7ed8d72640baac"
+    },
+    {
+      "path": "docs/survey-mac-s06-download-evidence-20261019/s06-downloads.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "5b3f91a06bd81631065bed966b3cba13d731cc00"
+    },
+    {
+      "path": "docs/survey-mac-s06-download-evidence-20261019/s06-lint.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "deebcb85f4ff00beb03201bb6baf83cc0ee56316"
+    },
+    {
+      "path": "docs/survey-mac-s06-download-evidence-20261019/s06-run.py.txt",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e9b89bfe57ca972178bf06df7a540fcf8abd7167"
+    },
+    {
+      "path": "docs/survey-mac-s06-download-evidence-20261019/s06-types.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/survey-mac-s06-download-evidence-20261019/source-binding.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "04f1fdd22a7a9a46cd6d454faf96774393281a52"
+    },
+    {
+      "path": "docs/survey-mac-s06-download-review-20261019.md",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "bc627c4b3662516ab110ea2af6f862242d82fc66"
+    },
+    {
+      "path": "docs/survey-mac-s06-error-copy-evidence-20261019/download-local-error.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "9b328051eb40a63c92cac70d6ea8e864acb9b07f"
+    },
+    {
+      "path": "docs/survey-mac-s06-error-copy-evidence-20261019/download-network-copy.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "a389d511650ae879ef2138f06b3bc60d52ba9b33"
+    },
+    {
+      "path": "docs/survey-mac-s06-error-copy-evidence-20261019/s06-download-local-error.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "3299906d67c15e429d9e076108fe9ddb8b6d935d"
+    },
+    {
+      "path": "docs/survey-mac-s06-error-copy-evidence-20261019/s06-download-network-copy.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "5e542f3f3a7aadc5fb466e468e4bc3987798fb9f"
+    },
+    {
+      "path": "docs/survey-mac-s06-error-copy-evidence-20261019/s06-lint-local-error.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "a24b44d56bd9e312249945c165ff35d76e45d5b5"
+    },
+    {
+      "path": "docs/survey-mac-s06-error-copy-evidence-20261019/s06-types-local-error.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/survey-mac-s06-error-copy-evidence-20261019/source-binding.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "fe392df95791402751fa0bea874318a98930d236"
+    },
+    {
+      "path": "docs/survey-mac-s06-error-copy-review-20261019.md",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "198a4dc3662539fe80e5799d8ab813c09754ab98"
+    },
+    {
+      "path": "docs/survey-mac-s06-local-error-evidence-20261019/download-local-error.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "2cc9325a75fefa2b4d2f3bfd76dc8540a0b36714"
+    },
+    {
+      "path": "docs/survey-mac-s06-local-error-evidence-20261019/s06-download-local-error.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "b2bf4941a5e34e16e72f6959da22d4fd881cc990"
+    },
+    {
+      "path": "docs/survey-mac-s06-local-error-evidence-20261019/s06-lint-local-error.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "c3251095ff3f4ac4cae8ed5a2652d227c8f61435"
+    },
+    {
+      "path": "docs/survey-mac-s06-local-error-evidence-20261019/s06-types-local-error.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/survey-mac-s06-local-error-evidence-20261019/source-binding.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "6c8088ce0bdf7bac4b0f01465fa7049f79acfd3e"
+    },
+    {
+      "path": "docs/survey-mac-s06-local-error-review-20261019.md",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "eca3f05aab6494598cad4c99712cf196c09f9d26"
+    },
+    {
+      "path": "docs/survey-mac-s06-matrix-evidence-20261019/matrix-existing.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "652234f377ed9e69f9485d1d0f6ec721c13fc8d1"
+    },
+    {
+      "path": "docs/survey-mac-s06-matrix-evidence-20261019/matrix.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "3db7692cefedfaddab9673afec7df45837a9bd8d"
+    },
+    {
+      "path": "docs/survey-mac-s06-matrix-evidence-20261019/s06-matrix-existing.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "9598e4d438dae0d09c29cea6933afc17d7d47e32"
+    },
+    {
+      "path": "docs/survey-mac-s06-matrix-evidence-20261019/s06-matrix-lint.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "eb0caf43f19399393830eee66c57534c54ed7c1b"
+    },
+    {
+      "path": "docs/survey-mac-s06-matrix-evidence-20261019/s06-matrix.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "612ac63d006697b00f71ca75ac9a13bbad1780bf"
+    },
+    {
+      "path": "docs/survey-mac-s06-matrix-evidence-20261019/source-binding.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "534ceb02efebbc003544dbe976dbb309bbad76e7"
+    },
+    {
+      "path": "docs/survey-mac-s06-matrix-review-20261019.md",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "c0a3063c0300e6258de1a18ae71b6197f0805710"
+    },
+    {
+      "path": "docs/survey-mac-s06-native-evidence-20261019/S06-readonly-preparation.md",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "24f3d6b8ddb7e63779c1f9b40a0b77a039ad0bf5"
+    },
+    {
+      "path": "docs/survey-mac-s06-native-evidence-20261019/S06-readonly-source-binding.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "2a3496b803892f66a6fe7da40e41b5e3e090909d"
+    },
+    {
+      "path": "docs/survey-mac-s06-native-evidence-20261019/backend-network-scenario.jsonl",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "5f077a0e15138bf8eec8197a90b5bc29b3cc9947"
+    },
+    {
+      "path": "docs/survey-mac-s06-native-evidence-20261019/capture-integrity.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "d21fad627a0ff5eb038f5b4968057f056d347a1f"
+    },
+    {
+      "path": "docs/survey-mac-s06-native-evidence-20261019/checks-summary.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "9ed3379cd559bc0bcf560857c4d8fb1d57a98904"
+    },
+    {
+      "path": "docs/survey-mac-s06-native-evidence-20261019/cleanup-receipt.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f4e9f87eaad4b3746d5afa89a2897f39a47f074b"
+    },
+    {
+      "path": "docs/survey-mac-s06-native-evidence-20261019/cognitive-fixture-history.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "562d70e0660be4166832b0819750f74b13b34c56"
+    },
+    {
+      "path": "docs/survey-mac-s06-native-evidence-20261019/cognitive-fixture-initial-failure.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "7c1aed84d3b85b0aea63bf5475358fe86de178a4"
+    },
+    {
+      "path": "docs/survey-mac-s06-native-evidence-20261019/cognitive-fixture.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "bb2523f94a56e680e8c841b5484ea1162949d6c7"
+    },
+    {
+      "path": "docs/survey-mac-s06-native-evidence-20261019/data-inventory.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "3e77a9918b5ca0549523ffb509566c7cd1a1c598"
+    },
+    {
+      "path": "docs/survey-mac-s06-native-evidence-20261019/export-audit.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "bbf902a5451574728490439b021dbc53df671505"
+    },
+    {
+      "path": "docs/survey-mac-s06-native-evidence-20261019/final-source-binding.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "59d9e64840e08cba8bafa3ce6e6b050b372f597b"
+    },
+    {
+      "path": "docs/survey-mac-s06-native-evidence-20261019/manifest.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "7f7b8132088e4c728fed27b828d7ff8f79f1f061"
+    },
+    {
+      "path": "docs/survey-mac-s06-native-evidence-20261019/native-files-final-check.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "75943d0de38c1d6d2ce0176a8ada01589e28bfa2"
+    },
+    {
+      "path": "docs/survey-mac-s06-native-evidence-20261019/native-observations.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "7dcfbc3e088d316258fad3de4db725bd5f1d97ef"
+    },
+    {
+      "path": "docs/survey-mac-s06-native-evidence-20261019/s06-backend-control.py.txt",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "915c2aaedf400e262037912032ddf9f576c80c1f"
+    },
+    {
+      "path": "docs/survey-mac-s06-native-evidence-20261019/s06-cognitive-fixture.ts.txt",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "cf733296850338b00fac4f070e4c1766e92a89ff"
+    },
+    {
+      "path": "docs/survey-mac-s06-native-evidence-20261019/s06-data-inventory.py.txt",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "1134481aac52b6f08d38880de8530a44e782021d"
+    },
+    {
+      "path": "docs/survey-mac-s06-native-evidence-20261019/s06-evidence-collector.py.txt",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "5813613f2ac3acdcbe78613eca653720aa7b70af"
+    },
+    {
+      "path": "docs/survey-mac-s06-native-evidence-20261019/s06-export-audit.py.txt",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "4df813467a065fa33649ea62a12ff0e93ab48579"
+    },
+    {
+      "path": "docs/survey-mac-s06-native-evidence-20261019/screenshots.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "2cf5717884c6c6ad43b04fa7112e90520bcfbb8e"
+    },
+    {
+      "path": "docs/survey-mac-s06-review-20261019.md",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "b692a81205eb00a6a924471125ab5feb71a397fc"
+    },
+    {
+      "path": "docs/survey-mac-s06-safari-error-evidence-20261019/s06-lint-safari-error.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "c3251095ff3f4ac4cae8ed5a2652d227c8f61435"
+    },
+    {
+      "path": "docs/survey-mac-s06-safari-error-evidence-20261019/s06-safari-error-retry.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "957457d0d844581e2f7c4844364fa17624219367"
+    },
+    {
+      "path": "docs/survey-mac-s06-safari-error-evidence-20261019/s06-safari-error.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "c0df4a7a0abe2db1e7849af5c8be859a0e1f51d5"
+    },
+    {
+      "path": "docs/survey-mac-s06-safari-error-evidence-20261019/s06-types-safari-error.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/survey-mac-s06-safari-error-evidence-20261019/safari-error-retry.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "da13ecbc61f8be8ed12e207b4fd2f42d34bd5737"
+    },
+    {
+      "path": "docs/survey-mac-s06-safari-error-evidence-20261019/safari-error.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "7d5e8c73b4416d9c298463a27caea11ba16b2b9e"
+    },
+    {
+      "path": "docs/survey-mac-s06-safari-error-evidence-20261019/source-binding.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "89be9d1b30e6d4b7e013e5c570f6a44ef671908f"
+    },
+    {
+      "path": "docs/survey-mac-s06-safari-error-review-20261019.md",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "1f05ee95aea6311c5fe437724ace0e70db8ae421"
+    },
+    {
+      "path": "docs/survey-mac-s07-cursor-review-20261019.md",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "207ec67853e38306e772836be35776496e73c119"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/backend-network-scenario.jsonl",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "94151b6ab15a5988b3f7346365b8895450254511"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/chain-metadata.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "3005891f403ed9bcb64585aea8cbf713b38268f2"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/chain-native-files-check.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "b23271c38de8cc721e5eb7b29ca955897a05e573"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/cleanup-receipt.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "34bb8e63846b82c76096befd262eca513561da6a"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/cursor-handoff.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "5b4151a4079c3253fbfc7f5af96bd7ca2d282324"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/cursor-source-binding.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "eb3c373fd4d9d1ea7cf0838162d3c6ae90ed02be"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/export-audit.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "93aeb4989c3071afc51f1b72c82c4c1764461aa5"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/export-cost-final-redacted.py.txt",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "3fc09890f469b84df176a7e61bfe42e6171cb311"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/export-cost-final-redacted.py.txt.binding.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "cf80f56d4ba13fe8d7f8bd268fb4b2e45cf390e6"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/export-cost-final.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "55702335722676b359b978baf32140844815e645"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/export-cost-initial-audit.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "9c543345203b880a5679d25e6c334610b5510ee0"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/export-cost-initial-redacted.py.txt",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "ec089752d0143766f5c634e580ac6f27392279ac"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/export-cost-initial-redacted.py.txt.binding.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "2929d78d4d0664e2ed123b6d46bded14a8f30618"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/export-cost-initial.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "fe900eaf0c174f7339d95605784f01621b9c1f6a"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/final-source-binding.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "d6f08e0250dd031deeb540958bf49d06bbaa5af4"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/inactive-admin-fixture.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "3d72d1d1a49f00bdbb7390c615ebe71bd0e3fd0e"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/inactive-admin-fixture.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "d3ebbc36151e606601ecf1402d9cd8197ecf9622"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/manifest.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "d844d9d38f340debb90e67d236d830bd803d0ead"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/native-receipts.jsonl",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "29f78397299872d55ef6962493f1fd69ab441502"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/native-task-observations.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "7c38690f6f99ad6a739d6b8a6a4bced1f98b9975"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/prior-evidence-index.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e3c44496c75a616f46b78a5972afc4cd8cf89630"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/process-memory.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "2ed95a54bb2eeb438c598ab564dc7804f39b5662"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/s06-original-materials.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "8522f639095a0a0dafaa1259bbfa3f13e7f3bb6b"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/s07-chain-metadata.py.txt",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "9f1b3c5992ec0795446de9921ed2cd8733cd55cd"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/s07-cursor-handoff.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "fa5d08377b86fcdbe5ec01ff375f961cfc8018ca"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/s07-cursor-lint.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/s07-cursor-types.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/s07-evidence-collector.py.txt",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "0b9b619073ebce3728f5af51951ba8f4c2e70e9e"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/s07-inactive-admin-fixture.ts.txt",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "06be0d6556701b77123ee09976a16889d0bfe1eb"
+    },
+    {
+      "path": "docs/survey-mac-s07-evidence-20261019/screenshots.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "54807300c38cbebfd8ca647792c6473b6af1e1c7"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-evidence-20261019/lint-final.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "201e9d250935761ef114e26ab024e5b847f35621"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-evidence-20261019/lint-final.receipt.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "a65d02fdc368319974f126bbfbdca296612ee3f1"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-evidence-20261019/lint-first.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "09d343b72996eb6ccdc4583518618bcb7a185ec5"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-evidence-20261019/lint-qualified.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "a32538784c91e9b85b2c8b231081302676710ae2"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-evidence-20261019/lint-qualified.receipt.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "9c3c8be1ccf7b79af4dc9417cfa5673e9aed3c78"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-evidence-20261019/manifest.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "cd91e1e5b778b093e8d792df9002ed674c628347"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-evidence-20261019/recovery-final.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "b102c277b0262d20d836784b26e36f70200cce65"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-evidence-20261019/recovery-final.receipt.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "d8572b7718359210f401254152a213b1c591e335"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-evidence-20261019/recovery-first-run.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "4d030f8a8f5d17f117ea23920b5417e232e459f0"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-evidence-20261019/source-binding.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "d31f45dcd0e9efb527a8a572b7726802d74e46bf"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-evidence-20261019/tests-final.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "c384035437f74cf8f72056271308fcc2ebd138da"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-evidence-20261019/tests-qualified.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "cc196d2d30cdcbff8efe3496d9f12977b29320a0"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-evidence-20261019/tests-qualified.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "279a89b62947d622052b7471ebb9362767fb1faa"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-evidence-20261019/tests-qualified.receipt.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "3e9b75519f82c637f0ac48066dffa927e9b10e4d"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-evidence-20261019/types-final.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-evidence-20261019/types-final.receipt.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f01d98249fa00f755da44d65a12738df12141543"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-evidence-20261019/types-first.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "0ca43f3dd43bb53286367cea9489d024859746fe"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-evidence-20261019/types-qualified.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-evidence-20261019/types-qualified.receipt.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "111e56195de776a1d206f03c18ed710c3029fcc9"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-reminder-evidence-20261019/lint-receipt.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "58da3e25f5a7dfacb079133d5b6db7b0cfd2af8e"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-reminder-evidence-20261019/lint.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "a32538784c91e9b85b2c8b231081302676710ae2"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-reminder-evidence-20261019/manifest.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "1962d16e17c9ab686b026a010e7319b54969d7cb"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-reminder-evidence-20261019/tests-receipt.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "706f34072a14984198639d34b5bdf3c9440c3c69"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-reminder-evidence-20261019/tests.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "b35e2fcc92ff5703ae57091bdab6604d1a44f945"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-reminder-evidence-20261019/tests.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "7e1d7140c2b3f87bc6e48f387f959daaf9b4a698"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-reminder-evidence-20261019/types-receipt.json",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "17511a09948db24d1757fd93a43815ff36e430df"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-reminder-evidence-20261019/types.log",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-reminder-review-20261019.md",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "6ce8961302521db3dfc6366f5772c7db0d281011"
+    },
+    {
+      "path": "docs/survey-mac-s07-p2-review-20261019.md",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "437bb62c63f422e60b49677cdbddf84d79ee1329"
+    },
+    {
+      "path": "docs/survey-mac-s07-readonly-plan-20261019.md",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "1637b821897419bb6b88ba56139fd7e91e6679db"
+    },
+    {
+      "path": "docs/survey-mac-s07-review-20261019.md",
+      "category": "evidence",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e13a2a34b92a72b3205a58707e0826c55067e608"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/SurveyCatalogGrants.tsx",
+      "category": "application",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e528341cbfd0e5701c01b0ae7155d91f30ce14f9",
+      "after": "3680b94d12bf74b8d6f10cc1f9829d45ab16a7a6"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.links.test.tsx",
+      "category": "test",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ff5cb7a86323558b784a91a767a0682b263edd3e",
+      "after": "957862c9fdaf72eb9878ae50e09134814f4c7ec5"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.tsx",
+      "category": "application",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "cb7f8acbbec7ec6ff2cce79c669710fdc2736f9e",
+      "after": "8d82cfee7bda564ded3aed409180da95c1cc4a43"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.workspace.test.tsx",
+      "category": "test",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "894db70f0f9a154259c218c5a5c15f04d1f3895a"
+    },
+    {
+      "path": "server-version/frontend/src/pages/admin/survey-admin.css",
+      "category": "application",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "b704659aac43bbbb210aca17a616a0a55e7822f4"
+    },
+    {
+      "path": "server-version/frontend/src/survey/ResearchAuthoringGuide.tsx",
+      "category": "application",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e3fe0a826b70466a15ce17a5a7266ed6d36aba36"
+    },
+    {
+      "path": "server-version/frontend/src/survey/ResearchIssueList.tsx",
+      "category": "application",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "da94f1044806f9b22c4336583e3a6d2241d53e3a"
+    },
+    {
+      "path": "server-version/frontend/src/survey/ResearchPreview.tsx",
+      "category": "application",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5708a6dca94c3710cb7c921d8321b2dcbd87d3d4",
+      "after": "99b40724fa8482d1a865f2e64fc20dcc75da6ddf"
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.download.test.tsx",
+      "category": "test",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "759ac09ef2d9de4ac1e8146937bfe10e6d41470a",
+      "after": "33eea2985741fd15fa4d52a5b45f5c4a53a9b721"
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.recovery.test.tsx",
+      "category": "test",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "4c72b6f83bf99705058e61722b25b6e17487aa08"
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.tsx",
+      "category": "application",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "37351a5c5fca2d03e22c43b1ce677ab30403b534",
+      "after": "0233555c21f27cf3ea85505ac69087cea0bffee2"
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyApp.admin-entry.test.tsx",
+      "category": "test",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "cf3f79fca1158059e9ca2c13a82050818f0b0842",
+      "after": "0ee50ffa70d71b385fadb786a9ed8a53f83d5d5d"
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyApp.entry.test.tsx",
+      "category": "test",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5665909aa462b68684492f393ff0d10c2e81974b",
+      "after": "5c96f593ff69e0ebd896294046a158cc294cef28"
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyApp.tsx",
+      "category": "application",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b3b6134d7b57466df0e7cbba6666b2f99f41a009",
+      "after": "542c21fd87fad6f49599ee1f8ecce6006f43ad0a"
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyAuthoringGuidance.test.tsx",
+      "category": "test",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "efbacd7d97710af73ad06985f7485cddd88c5adf"
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyBuilder.test.tsx",
+      "category": "test",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f3d37bdbeb8a45b5b6c75aa65a59f7cdc958379a",
+      "after": "569dc6368349fb6ef0723b2018a073c91def1fde"
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyBuilder.tsx",
+      "category": "application",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "751034cdc4282ec65f3dbc7a34907ebbefd1305b",
+      "after": "e52174ac20623cadeac1c2dfd519978f83e8ceac"
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyImportIssueLocations.test.tsx",
+      "category": "test",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "6158e5b37d8fc4889264baf4a417d9f8ed365a46"
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyLanding.tsx",
+      "category": "application",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4460c1ede053144ed9594f8068e2f71e5035e69a",
+      "after": "419ef0ea0ba65dceb6930dcd3900dce838a183fb"
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyMatrixNames.test.tsx",
+      "category": "test",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "8ee54c76f84e6746a44d876f1a404d8bcefcf117"
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyPublicApp.tsx",
+      "category": "application",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f1c16a1e77ea8341718e3c8b50d70f0c9082a714",
+      "after": "babfa40117314f66fd621aea37182f4e4de8922e"
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyTimedScale.tsx",
+      "category": "application",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ec9c6686c1247c46914c3a840357a74adf0b0404",
+      "after": "a82fc4c8278029f877f5e95da8cab6552e997e80"
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyWorkspace.requests.test.tsx",
+      "category": "test",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f683b2c6de9727938448f724c3bb78a6b0ea0ea8",
+      "after": "353b8abc835835caad435bb225c652778ccc5c20"
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyWorkspaceNav.tsx",
+      "category": "application",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "058d238190303e1da2a4148e0b2aa5414ef24bcb"
+    },
+    {
+      "path": "server-version/frontend/src/survey/authoring-import-template.ts",
+      "category": "application",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "a4c197177e79e3fe9fef7a4b5f1174804878fdbb"
+    },
+    {
+      "path": "server-version/frontend/src/survey/authoring-issue-location.ts",
+      "category": "application",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "48da3d7e42a1df795e3934bd8c1e3432c99e2b3c"
+    },
+    {
+      "path": "server-version/frontend/src/survey/survey-features.ts",
+      "category": "application",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "1c3962a3147e49d7a4920ecb42c1915dc9e16ffd",
+      "after": "a371237010809921ca33206e4afa3acf12ad0c2d"
+    },
+    {
+      "path": "server-version/frontend/src/survey/survey-landing.css",
+      "category": "application",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c0109c7ed2d570452369bf3a5cb0f7775e56726e",
+      "after": "c7ad64b3fa5df6ab7b1e23df5f849847263b6957"
+    },
+    {
+      "path": "server-version/frontend/src/survey/survey-participant.css",
+      "category": "application",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "30e5dc1328b1854967d48be316a2dfe169837565"
+    },
+    {
+      "path": "server-version/frontend/src/survey/survey-workspace.css",
+      "category": "application",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "46d0e56e0be13cca97c1e2e8f8712d309acd4f58"
+    },
+    {
+      "path": "server-version/frontend/src/survey/test-fixtures/s04-import-failure-sources.json",
+      "category": "test-fixture",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": "0000000000000000000000000000000000000000",
+      "after": "07457e9fac9a13d3baad488676cb04e55849488d"
+    }
+  ],
+  "protected": {
+    "server-version/backend": "74720e530d99efe1135103951fdc9a256318e9ec",
+    "server-version/frontend/src/modules": "4d1dbe6055471f31248bf72abbca925880537b63",
+    "server-version/frontend/src/services": "e92fa41d83c1eaa333a28dc1ead034c3ffadfc3f",
+    "server-version/frontend/package.json": "4a287572dfb7d636477ea34985fab7a0b12fae53",
+    "server-version/frontend/package-lock.json": "9fc33dd617ce75766564786d880e588142c11eed",
+    "server-version/frontend/Dockerfile": "45dd87f6a8ed5a5bf45d3ea1e4126ce5e8d9f8b4",
+    "server-version/ops": "58907294c6240ff753b89fcf4d8941674586d80e",
+    "server-version/scripts/release": "08c76028c2f7b8201eb4a76abbd1d05b6cd44a00"
+  },
+  "externalFixtures": {
+    "server-version/cognitive-randomization-golden-v1.json": "5b3cb7c11138044ad6a85626e74004bea2a3e62a",
+    "server-version/backend/src/modules/cognitive/generated/identities.json": "dc7aa603721cdea46de7e0ed93f04ba9679a02e4"
+  }
+}

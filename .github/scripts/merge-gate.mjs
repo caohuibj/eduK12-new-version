@@ -1,3 +1,4 @@
+import {validSurveyMacPlan,recheckSurveyMac} from './survey-mac-ui-scope.mjs';
 import {validReviewedCandidatePlan} from './reviewed-candidate-scope.mjs';
 import { pathToFileURL } from 'node:url';
 import { openSync, closeSync, fstatSync, readSync, constants } from 'node:fs';
@@ -33,6 +34,7 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if (scope.application_route === 'survey-mac-ui') return ['scope','survey-mac-ui','codeql'];
   if (scope.application_route === 'reviewed-candidate') return ['scope','reviewed-candidate','codeql'];
   if (scope.application_route === 'survey-candidate') return ['scope','survey-candidate','codeql'];
   if (scope.application_route === 'assessment-capacity') return ['scope',...(!draft?['assessment-capacity','codeql']:[])];
@@ -83,6 +85,14 @@ export function requiredChecks(needs, draft) {
 export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if (scope.application_route === 'survey-mac-ui') {
+    let p; try { p=JSON.parse(scope.survey_mac_ui_plan); } catch {}
+    if(draft||!validSurveyMacPlan(p)||scope.scenario!=='survey-mac-ui'||scope.codeql!=='true'
+      ||scope.frontend_build!=='false'||scope.ui_required!=='false'||scope.runner_profile!=='hosted'||scope.visual_hosted!=='false'
+      ||scope.media_selection!=='[]'||scope.media_groups!=='[]'
+      ||['maintenance','content','presentation','frontend','frontend_test','documentation','scale','cognitive','situational','bundle',...Object.keys(acceptanceJobs)].some(k=>scope[k]!=='false')) failed.push('scope');
+    return [...new Set(failed)];
+  }
   if (scope.application_route === 'reviewed-candidate') {
     let plan; try { plan = JSON.parse(scope.reviewed_candidate_plan); } catch {}
     if (draft || !validReviewedCandidatePlan(plan) || scope.scenario !== 'reviewed-candidate'
@@ -232,6 +242,10 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const needs = readNeeds();
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
+  if(needs.scope?.outputs?.application_route==='survey-mac-ui') {
+    try { recheckSurveyMac(JSON.parse(needs.scope.outputs.survey_mac_ui_plan)); }
+    catch { failed.push('recomputed-survey-mac-ui-plan'); }
+  }
   if (['A','B'].includes(needs.scope?.outputs?.application_route) || needs.scope?.outputs?.scenario === 'release-tooling') {
     const {plan,toolingOnly}=await import('../../server-version/scripts/release/policy.mjs');
     const p=JSON.parse(needs.scope.outputs.release_plan);

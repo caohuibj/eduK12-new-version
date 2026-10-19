@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "frontendTests": [
+    "src/pages/admin/SurveyResearchersAdmin.links.test.tsx",
+    "src/pages/admin/SurveyResearchersAdmin.workspace.test.tsx",
+    "src/survey/SurveyAnalyticsWorkspace.download.test.tsx",
+    "src/survey/SurveyAnalyticsWorkspace.recovery.test.tsx",
+    "src/survey/SurveyApp.admin-entry.test.tsx",
+    "src/survey/SurveyApp.entry.test.tsx",
+    "src/survey/SurveyAuthoringGuidance.test.tsx",
+    "src/survey/SurveyBuilder.test.tsx",
+    "src/survey/SurveyImportIssueLocations.test.tsx",
+    "src/survey/SurveyMatrixNames.test.tsx",
+    "src/survey/SurveyWorkspace.requests.test.tsx"
+  ],
+  "requiredRecoveryCases": [
+    "remembers launched earlier pages after completion filter invalidates an untouched next page",
+    "remembers launched earlier pages after workspace refresh invalidates an untouched next page",
+    "keeps page 14 after GET 41 is rate limited, waits through expiry, then explicitly rebuilds its incoming cursor",
+    "requires confirmation for a new-watermark first-page restart and preserves canceled/old file state",
+    "requires explicit recovery after MFA, with no automatic POST after step-up",
+    "honors an HTTP-date Retry-After even for a non-JSON 429 without automatic requests",
+    "does not duplicate a recovery POST on rapid clicks or after an unknown network result",
+    "rejects a recovered ticket from another source revision rather than replacing the current page",
+    "ignores a stale recovery response after project changes, without leaking its page or cursor",
+    "never launches a late ticket response after the workspace unmounts"
+  ]
+}
