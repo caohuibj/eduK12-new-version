@@ -189,7 +189,8 @@ export interface CognitiveHistoryItem {
   scoringVersion: string
   finishedAt: string | null
   score: number | null
-  qualityState: 'interpretable' | 'limited' | 'invalid'
+  qualityState: 'interpretable' | 'limited' | 'invalid' | null
+  feedbackDeferred?: boolean
 }
 
 export interface CognitiveHistoryPage {
