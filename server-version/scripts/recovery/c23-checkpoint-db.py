@@ -36,12 +36,43 @@ def validate_upgrade(before, after):
     assert all(g['enabled'] == 'O' for g in current.values())
     assert all(c in after['constraints'] for c in before['constraints']), 'old constraint changed'
 
+def audit(db, state, mode, label, expected_snapshot=None):
+    """Read-only multi-table work; the launcher's child deadline covers ALL calls."""
+    assert re.fullmatch(r'c23-audit-[a-z-]+', label)
+    target = state / (label+'-result.json'); assert not target.exists()
+    result = {'passed': False, 'mode': mode}
+    try:
+        if mode == 'baseline':
+            assert expected_snapshot is not None
+            snapshot = db.snapshot()
+            assert snapshot == json.loads(expected_snapshot.read_text()), 'clone differs from accepted C21 snapshot'
+            result['acceptedSnapshotSha256'] = sha_file(expected_snapshot)
+        else:
+            original = json.loads((state/'c23-original-rows-private.json').read_text())
+            result['retainedFacts'] = db.original_rows_unchanged(original)
+            if mode == 'final':
+                snapshot = db.snapshot()
+                destination = state/'c23-final-db-snapshot.json'; assert not destination.exists()
+                destination.write_text(json.dumps(snapshot))
+                result['snapshotSha256'] = sha_file(destination)
+        result['passed'] = True
+    except BaseException as error:
+        result['errorType'] = type(error).__name__; raise
+    finally:
+        result['processExits'] = db.exits; target.write_text(json.dumps(result, indent=2))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--tools', type=Path, required=True)
     parser.add_argument('--state', type=Path, required=True)
-    parser.add_argument('--phase', choices=['upgrade', 'restore'], required=True)
+    choice = parser.add_mutually_exclusive_group(required=True)
+    choice.add_argument('--phase', choices=['upgrade', 'restore'])
+    choice.add_argument('--audit', choices=['baseline', 'preserve', 'final'])
+    parser.add_argument('--label'); parser.add_argument('--expected-snapshot', type=Path)
     a = parser.parse_args(); os.umask(0o077); db = Database(a.tools, a.state)
+    if a.audit:
+        audit(db, a.state, a.audit, a.label, a.expected_snapshot); return
     target = a.state / f'c23-{a.phase}-result.json'; assert not target.exists()
     result = {'passed': False, 'checks': []}
     try:

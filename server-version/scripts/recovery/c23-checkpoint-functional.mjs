@@ -22,13 +22,23 @@ try{
  h.check('Authenticated owner HTTP save/read, cross-owner/stale epoch/frozen hashes rejected atomically')
  const anon=retain(f,'anonymous-null-round',await anonymous(h,teacher,p)),nenv=await envelope(anon)
  await save(anon,nenv,0);assert.equal((await row(anon)).roundId,null)
- const wrong=h.client();await wrong.request('/auth/csrf');wrong.recovery=randomUUID()
- for(const method of ['GET','PUT','DELETE'])await wrong.request(checkpoint(anon),method,method==='GET'?undefined:method==='PUT'?{expectedRevision:1,attemptEpoch:1,envelope:nenv}:{expectedRevision:1,attemptEpoch:1},[400,401,403,404])
- await auth.client.request(`${prefix}/attempts/${anon.attempt.id}/checkpoint`,'GET',undefined,[403,404])
  const bound=retain(f,'anonymous-bound-round',await anonymous(h,teacher,p,{round:true})),benv=await envelope(bound)
  await save(bound,benv,0);assert.equal((await row(bound)).roundId,bound.token.roundId);assert.ok(bound.token.roundId)
  assert.deepEqual((await read(bound)).envelope,benv)
- h.check('Anonymous recovery ownership, null-round and exact bound-round checkpoint behavior')
+ // This second token is proven valid on its OWN real attempt before cross-use.
+ assert.notEqual(bound.attempt.id,anon.attempt.id);assert.notEqual(bound.client.recovery,anon.client.recovery)
+ const anonymousBefore=await row(anon),boundBefore=await row(bound)
+ const wrong=h.client();await wrong.request('/auth/csrf');wrong.recovery=randomUUID()
+ for(const [client,status] of [[wrong,[400,401,403,404]],[bound.client,403]]){
+  for(const method of ['GET','PUT','DELETE']){
+   await client.request(checkpoint(anon),method,method==='GET'?undefined:method==='PUT'?{expectedRevision:1,attemptEpoch:anon.attempt.attemptEpoch,envelope:nenv}:{expectedRevision:1,attemptEpoch:anon.attempt.attemptEpoch},status)
+   assert.deepEqual(await row(anon),anonymousBefore,'denial must preserve every target checkpoint field')
+   assert.deepEqual(await row(bound),boundBefore,'cross-attempt denial must not mutate token owner checkpoint')
+  }
+ }
+ await auth.client.request(`${prefix}/attempts/${anon.attempt.id}/checkpoint`,'GET',undefined,[403,404])
+ assert.deepEqual(await row(anon),anonymousBefore)
+ h.check('Anonymous valid foreign-attempt recovery token denied for GET/PUT/DELETE with exact row preservation; null-round and exact bound-round checkpoint behavior')
  const roundExpiry=retain(f,'natural-round-closure',await anonymous(h,teacher,p,{round:true,expiresAt:iso(12000)}))
  await save(roundExpiry,await envelope(roundExpiry),0)
  const roundDeadline=new Date(roundExpiry.token.groupIpWindow.closesAt).getTime()

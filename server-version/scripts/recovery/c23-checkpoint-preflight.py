@@ -36,3 +36,49 @@ def complete(result):
     return (set(result.get('phases', {})) == set(PHASES) and
             all(result['phases'][p].get('passed') is True for p in PHASES) and
             all(result.get(k) is True for k in ['cleanupVerified', 'sourceUnchanged', 'inputsUnchanged', 'finalSnapshotVerified']))
+
+
+def accepted_binding(binding, validate, expected_head):
+    """Validate the captured bytes, rejecting mutations before/during the capture."""
+    before = binding()
+    assert before['head'] == expected_head, 'captured HEAD differs from reviewed HEAD'
+    validate()  # Clean source and ALL build/client/dependency inventories vs receipts.
+    after = binding()
+    assert after['head'] == expected_head and before == after, 'inputs changed across accepted binding'
+    return before
+
+
+def wait_child(proc, timeout, check, *, clock=None, pause=None, killpg=None):
+    """One aggregate deadline for the child AND its inherited SQL process group."""
+    import os, signal, time
+    clock, pause, killpg = clock or time.monotonic, pause or time.sleep, killpg or os.killpg
+    deadline = clock() + timeout
+    try:
+        while proc.poll() is None:
+            if clock() >= deadline: raise TimeoutError('aggregate child deadline exceeded')
+            check()
+            pause(.2)
+        assert proc.returncode == 0, 'bounded child failed; private raw log retained'
+    except BaseException:
+        try: killpg(proc.pid, signal.SIGKILL)
+        except ProcessLookupError: pass
+        proc.wait(timeout=5)
+        raise
+
+
+def finish_database(audit, stop, result):
+    """A failed/timed-out final audit can never skip PostgreSQL shutdown."""
+    result['finalSnapshotVerified'] = False
+    try:
+        evidence = audit()
+        assert evidence['passed'] is True and evidence['mode'] == 'final'
+        assert evidence['retainedFacts']['allOriginalRowsRetained'] is True
+        assert len(evidence['snapshotSha256']) == 64
+        result['finalOriginalRowsPreserved'] = evidence['retainedFacts']
+        result['finalSnapshotSha256'] = evidence['snapshotSha256']
+        result['finalSnapshotVerified'] = True
+    except BaseException as error:
+        result['finalSnapshotError'] = type(error).__name__
+        result['passed'] = False
+    finally:
+        stop()

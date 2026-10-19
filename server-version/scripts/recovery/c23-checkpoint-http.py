@@ -22,38 +22,19 @@ def main():
  for item in descriptor['files'].values():assert sha_file(Path(item['path']))==item['sha256'] and Path(item['path']).stat().st_size==item['bytes']
  tools,state=a.tools.resolve(),a.state.resolve();requested=PHASES[:PHASES.index(a.through)+1]
  assert re.fullmatch('[0-9a-f]{40}',a.expected_head)
- assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=REPO,text=True).strip()==a.expected_head
  business=['server-version/backend/src','server-version/backend/prisma','server-version/backend/scripts','server-version/backend/package.json','server-version/backend/package-lock.json','server-version/backend/tsconfig.json']
  qualification_sources=[*business,'server-version/scripts/recovery']
- assert subprocess.run(['git','diff','--quiet','HEAD','--',*qualification_sources],cwd=REPO).returncode==0,'commit business and qualification harness/helper sources before qualification'
- assert not subprocess.check_output(['git','ls-files','--others','--exclude-standard','--',*qualification_sources],cwd=REPO).strip(),'untracked qualification source is not part of the reviewed HEAD'
+ def validate_source():
+  assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=REPO,text=True).strip()==a.expected_head
+  assert subprocess.run(['git','diff','--quiet','HEAD','--',*qualification_sources],cwd=REPO).returncode==0,'commit business and qualification harness/helper sources before qualification'
+  assert not subprocess.check_output(['git','ls-files','--others','--exclude-standard','--',*qualification_sources],cwd=REPO).strip(),'untracked qualification source is not part of the reviewed HEAD'
+ validate_source()
  assert not state.exists() and source!=state and source not in state.parents and state not in source.parents and REPO not in state.parents
  node=tools/'node_modules/node/bin/node';pg=tools/'postgresql/bin';redis=tools/'redis/bin/redis-server'
  assert subprocess.check_output([node,'--version'],text=True).strip()=='v24.21.0'
  assert '16.15' in subprocess.check_output([pg/'postgres','--version'],text=True)
  assert 'v=7.4.11 ' in subprocess.check_output([redis,'--version'],text=True)
- assert sha_file(a.build_receipt)==a.expected_build_receipt_sha256
- build=json.loads(a.build_receipt.read_text());assert build['nodeVersion']=='v24.21.0' and build['nodeSha256']==sha_file(node) and build['inputsUnchanged'] is True
- assert subprocess.run(['git','merge-base','--is-ancestor',build['head'],a.expected_head],cwd=REPO).returncode==0,'compiler producer is not an ancestor'
- changed=subprocess.check_output(['git','diff','--name-only',build['head'],a.expected_head],cwd=REPO,text=True).splitlines()
- migration_prefix='server-version/backend/prisma/migrations/'
- preflight.build_changes(changed)
- assert build['steps'] and all(step['exitCode']==0 for step in build['steps'])
- preflight.emitted_build(build['steps'],BACKEND,node)
- tsconfig=json.loads((BACKEND/'tsconfig.json').read_text());assert tsconfig['compilerOptions'].get('noEmit',False) is False and tsconfig['compilerOptions'].get('emitDeclarationOnly',False) is False and tsconfig['compilerOptions']['outDir']=='./dist'
- assert build['dependenciesUnchanged'] is True and build['clientUnchanged'] is True
- prior_prisma=build.get('prismaClientReceipt',build.get('priorPrismaReceipt'));assert prior_prisma;prior_prisma_path=Path(prior_prisma['path']);assert sha_file(prior_prisma_path)==prior_prisma['sha256']
- generated=json.loads(prior_prisma_path.read_text());assert generated['inputsUnchanged'] is True and generated['client']==build['client']
- assert generated['inputs']['prisma/schema.prisma']==build['inputs']['prisma/schema.prisma']
- if generated.get('scope')=='EXISTING_GENERATED_CLIENT_VERIFIED_NOT_GENERATION_PROVENANCE':
-  assert generated['passed'] is True and generated['clientUnchanged'] is True and generated['dependenciesUnchanged'] is True
-  assert generated['dependencies']==build['dependencies']
-  assert generated['verificationToolSha256']==sha_file(BASE/'c23-checkpoint-verify-client.py')
-  assert generated['schemaAgreement']['schemaTokensMatch'] is True and generated['runtimeMetadata']['inlineSchemaExact'] is True and generated['runtimeMetadata']['runtimeFieldMetadataMatches'] is True and generated['runtimeMetadata']['modelMappingsMatch'] is True and generated['runtimeMetadata']['enumValuesAndMappingsMatch'] is True and generated['installedNativeEngineMatches'] is True
- else:
-  assert any('prisma' in step['name'] and step['exitCode']==0 for step in generated['steps'])
- assert generated['nodeSha256']==build['nodeSha256'] and generated['nodeVersion']==build['nodeVersion']
- assert subprocess.run(['git','merge-base','--is-ancestor',generated['head'],build['head']],cwd=REPO).returncode==0
+ build=json.loads(a.build_receipt.read_text());prior_prisma=build.get('prismaClientReceipt',build.get('priorPrismaReceipt'));assert prior_prisma;prior_prisma_path=Path(prior_prisma['path'])
  def dependency_manifest():
   entries={}
   for directory,dirs,files in os.walk(BACKEND/'node_modules',followlinks=True):
@@ -62,24 +43,52 @@ def main():
     f=Path(directory)/name
     if f.is_file():entries[str(f.relative_to(BACKEND))]={'realpath':str(f.resolve()),'sha256':sha_file(f)}
   return entries
- assert dependency_manifest()==build['dependencies'],'compiler dependency closure differs'
- assert set(build['compiler'])=={'node_modules/typescript/bin/tsc','node_modules/typescript/lib/_tsc.js','node_modules/typescript/package.json'}
- assert all(sha_file(BACKEND/relative)==expected for relative,expected in build['compiler'].items())
- current_inputs={str(f.relative_to(BACKEND)) for root in ['src','prisma'] for f in (BACKEND/root).rglob('*') if f.is_file() and '/__tests__/' not in str(f)}|{'package.json','package-lock.json','tsconfig.json'}
- assert current_inputs==set(build['inputs']),'compiler source inventory changed, including extra files'
- migration_changes=[]
- for section in ['inputs','dist','client']:
-  assert build[section]
-  for relative,expected in build[section].items():
-   actual=sha_file(BACKEND/relative)
-   if actual!=expected:
-    assert section=='inputs' and relative.startswith('prisma/migrations/') and 'server-version/backend/'+relative in changed,relative+' differs from compiler receipt'
-    migration_changes.append({'path':relative,'compilerProducerSha256':expected,'runtimeSha256':actual})
- assert {str(f.relative_to(BACKEND)) for f in (BACKEND/'dist').rglob('*') if f.is_file()}==set(build['dist'])
- assert {str(f.relative_to(BACKEND)) for f in (BACKEND/'node_modules/.prisma/client').rglob('*') if f.is_file()}==set(build['client'])
- compiler_reuse={'producerHead':build['head'],'executionHead':a.expected_head,'receiptSha256':a.expected_build_receipt_sha256,'changedGitPaths':changed,'changedMigrations':migration_changes,'runtimeMigrations':{relative:sha_file(BACKEND/relative) for relative in current_inputs if relative.startswith('prisma/migrations/')},'compilerInputsDistClientUnchanged':True,'compilerSha256':digest(build['compiler']),'dependencyClosureSha256':digest(build['dependencies']),'dependencyFiles':len(build['dependencies']),'prismaClientReceiptSha256':prior_prisma['sha256'],'prismaEvidenceScope':generated.get('scope','ORIGINAL_GENERATION_RECEIPT')}
- client_verifier=module('c23_existing_client','c23-checkpoint-verify-client.py')
- fresh=client_verifier.schema_agreement(BACKEND);support.stopped(source)
+ def validate_build():
+  validate_source()
+  assert sha_file(a.build_receipt)==a.expected_build_receipt_sha256
+  build=json.loads(a.build_receipt.read_text());assert build['nodeVersion']=='v24.21.0' and build['nodeSha256']==sha_file(node) and build['inputsUnchanged'] is True
+  assert subprocess.run(['git','merge-base','--is-ancestor',build['head'],a.expected_head],cwd=REPO).returncode==0,'compiler producer is not an ancestor'
+  changed=subprocess.check_output(['git','diff','--name-only',build['head'],a.expected_head],cwd=REPO,text=True).splitlines()
+  migration_prefix='server-version/backend/prisma/migrations/'
+  preflight.build_changes(changed)
+  assert build['steps'] and all(step['exitCode']==0 for step in build['steps'])
+  preflight.emitted_build(build['steps'],BACKEND,node)
+  tsconfig=json.loads((BACKEND/'tsconfig.json').read_text());assert tsconfig['compilerOptions'].get('noEmit',False) is False and tsconfig['compilerOptions'].get('emitDeclarationOnly',False) is False and tsconfig['compilerOptions']['outDir']=='./dist'
+  assert build['dependenciesUnchanged'] is True and build['clientUnchanged'] is True
+  prior_prisma=build.get('prismaClientReceipt',build.get('priorPrismaReceipt'));assert prior_prisma;prior_prisma_path=Path(prior_prisma['path']);assert sha_file(prior_prisma_path)==prior_prisma['sha256']
+  generated=json.loads(prior_prisma_path.read_text());assert generated['inputsUnchanged'] is True and generated['client']==build['client']
+  assert generated['inputs']['prisma/schema.prisma']==build['inputs']['prisma/schema.prisma']
+  if generated.get('scope')=='EXISTING_GENERATED_CLIENT_VERIFIED_NOT_GENERATION_PROVENANCE':
+   assert generated['passed'] is True and generated['clientUnchanged'] is True and generated['dependenciesUnchanged'] is True
+   assert generated['dependencies']==build['dependencies']
+   assert generated['verificationToolSha256']==sha_file(BASE/'c23-checkpoint-verify-client.py')
+   assert generated['schemaAgreement']['schemaTokensMatch'] is True and generated['runtimeMetadata']['inlineSchemaExact'] is True and generated['runtimeMetadata']['runtimeFieldMetadataMatches'] is True and generated['runtimeMetadata']['modelMappingsMatch'] is True and generated['runtimeMetadata']['enumValuesAndMappingsMatch'] is True and generated['installedNativeEngineMatches'] is True
+  else:
+   assert any('prisma' in step['name'] and step['exitCode']==0 for step in generated['steps'])
+  assert generated['nodeSha256']==build['nodeSha256'] and generated['nodeVersion']==build['nodeVersion']
+  assert subprocess.run(['git','merge-base','--is-ancestor',generated['head'],build['head']],cwd=REPO).returncode==0
+  assert dependency_manifest()==build['dependencies'],'compiler dependency closure differs'
+  assert set(build['compiler'])=={'node_modules/typescript/bin/tsc','node_modules/typescript/lib/_tsc.js','node_modules/typescript/package.json'}
+  assert all(sha_file(BACKEND/relative)==expected for relative,expected in build['compiler'].items())
+  current_inputs={str(f.relative_to(BACKEND)) for root in ['src','prisma'] for f in (BACKEND/root).rglob('*') if f.is_file() and '/__tests__/' not in str(f)}|{'package.json','package-lock.json','tsconfig.json'}
+  assert current_inputs==set(build['inputs']),'compiler source inventory changed, including extra files'
+  migration_changes=[]
+  for section in ['inputs','dist','client']:
+   assert build[section]
+   for relative,expected in build[section].items():
+    actual=sha_file(BACKEND/relative)
+    if actual!=expected:
+     assert section=='inputs' and relative.startswith('prisma/migrations/') and 'server-version/backend/'+relative in changed,relative+' differs from compiler receipt'
+     migration_changes.append({'path':relative,'compilerProducerSha256':expected,'runtimeSha256':actual})
+  assert {str(f.relative_to(BACKEND)) for f in (BACKEND/'dist').rglob('*') if f.is_file()}==set(build['dist'])
+  assert {str(f.relative_to(BACKEND)) for f in (BACKEND/'node_modules/.prisma/client').rglob('*') if f.is_file()}==set(build['client'])
+  compiler_reuse={'producerHead':build['head'],'executionHead':a.expected_head,'receiptSha256':a.expected_build_receipt_sha256,'changedGitPaths':changed,'changedMigrations':migration_changes,'runtimeMigrations':{relative:sha_file(BACKEND/relative) for relative in current_inputs if relative.startswith('prisma/migrations/')},'compilerInputsDistClientUnchanged':True,'compilerSha256':digest(build['compiler']),'dependencyClosureSha256':digest(build['dependencies']),'dependencyFiles':len(build['dependencies']),'prismaClientReceiptSha256':prior_prisma['sha256'],'prismaEvidenceScope':generated.get('scope','ORIGINAL_GENERATION_RECEIPT')}
+  client_verifier=module('c23_existing_client','c23-checkpoint-verify-client.py')
+  if generated.get('scope')=='EXISTING_GENERATED_CLIENT_VERIFIED_NOT_GENERATION_PROVENANCE':
+   assert generated['pythonHelpersUnchanged'] is True and generated['pythonHelperClosure']==client_verifier.python_helper_closure(BASE),'current-client Python helper closure differs'
+  fresh=client_verifier.schema_agreement(BACKEND)
+  return compiler_reuse,fresh
+ compiler_reuse,fresh=validate_build();support.stopped(source)
  receipt=Path(descriptor['files']['finalReceipt']['path']);assert sha_file(receipt)==a.expected_source_receipt_sha256
  prior=json.loads(receipt.read_text());preflight.source_receipt(prior,sha_file(Path(descriptor['files']['finalSnapshot']['path'])))
  mem_available=next(int(l.split()[1])*1024 for l in Path('/proc/meminfo').read_text().splitlines() if l.startswith('MemAvailable:'))
@@ -88,9 +97,6 @@ def main():
  assert copybytes==descriptor['plannedCloneBytes']
  budget=preflight.clone_budget(shutil.disk_usage(state.parent).free,copybytes,mem_available)
  assert {d:manifest(source/d) for d in ['pgdata','uploads','exports']}==json.loads(Path(descriptor['files']['resumedDataManifest']['path']).read_text()),'C21 stopped data differs from accepted manifest'
- if a.preflight_only:
-  print(json.dumps({'status':'PREFLIGHT_ONLY_NOT_QUALIFIED','head':a.expected_head,'buildReceiptSha256':a.expected_build_receipt_sha256,'descriptorSha256':a.expected_descriptor_sha256,'budget':budget}));lock.close();return
- os.umask(0o077);state.mkdir(mode=0o700)
  runtime=json.loads(Path(descriptor['files']['runtimeTemplatePrivate']['path']).read_text())
  for key,role in [('DATABASE_URL_OWNER','eduk12_owner'),('DATABASE_URL','eduk12_runtime'),('DATABASE_URL_RUNTIME','eduk12_runtime')]:
   u=urlparse(runtime[key]);assert u.hostname=='127.0.0.1' and u.username==role and u.path=='/eduk12_recovery'
@@ -109,7 +115,7 @@ def main():
   inputs=[]
   for name in sorted(set(tracked+extra)-{b''}):
    file=REPO/os.fsdecode(name);assert file.is_file() and not file.is_symlink();inputs.append({'path':os.fsdecode(name),'mode':file.stat().st_mode&0o777,'sha256':sha_file(file)})
-  return {'head':subprocess.check_output(['git','rev-parse','HEAD'],cwd=REPO,text=True).strip(),'sourceInputs':inputs,'sourceInputsSha256':digest(inputs),'runtimeFingerprint':json.loads(subprocess.check_output([node,BASE/'runtime-fingerprint.cjs',BACKEND],text=True)),'generatedClientManifestSha256':digest(manifest(BACKEND/'node_modules/.prisma/client')),'tools':{str(v.relative_to(tools)):sha_file(v) for v in [node,pg/'postgres',pg/'psql',pg/'pg_dump',pg/'pg_restore',redis]},'postgresLibraryBytes':{str(v.relative_to(tools)):{'realpath':str(v.resolve()),'sha256':sha_file(v)} for v in sorted((tools/'postgresql/lib').rglob('*')) if v.is_file()},'installedDependencyLockSha256':sha_file(BACKEND/'node_modules/.package-lock.json') if (BACKEND/'node_modules/.package-lock.json').is_file() else None,'runtimeConfigurationSha256':digest(effective),'performanceConfigurationSha256':digest(perf_env),'phases':requested}
+  return {'head':subprocess.check_output(['git','rev-parse','HEAD'],cwd=REPO,text=True).strip(),'sourceInputs':inputs,'sourceInputsSha256':digest(inputs),'runtimeFingerprint':json.loads(subprocess.check_output([node,BASE/'runtime-fingerprint.cjs',BACKEND],text=True)),'generatedClientManifestSha256':digest(manifest(BACKEND/'node_modules/.prisma/client')),'tools':{str(v.relative_to(tools)):sha_file(v) for v in [node,pg/'postgres',pg/'psql',pg/'pg_dump',pg/'pg_restore',redis]},'postgresLibraryBytes':{str(v.relative_to(tools)):{'realpath':str(v.resolve()),'sha256':sha_file(v)} for v in sorted((tools/'postgresql/lib').rglob('*')) if v.is_file()},'dependencyClosureSha256':digest(dependency_manifest()),'installedDependencyLockSha256':sha_file(BACKEND/'node_modules/.package-lock.json') if (BACKEND/'node_modules/.package-lock.json').is_file() else None,'runtimeConfigurationSha256':digest(effective),'performanceConfigurationSha256':digest(perf_env),'phases':requested}
  def guard():
   assert shutil.disk_usage(state).free>=FLOOR,'8GiB disk floor'
   assert next(int(l.split()[1])*1024 for l in Path('/proc/meminfo').read_text().splitlines() if l.startswith('MemAvailable:'))>=2*1024**3
@@ -121,11 +127,19 @@ def main():
   log=(state/(name+'.log')).open('w');logs.append(log);proc=subprocess.Popen(list(map(str,argv)),cwd=BACKEND,env={**env,**(extra or {})},stdout=log,stderr=log,start_new_session=True);children.append((name,proc,service))
   if service:status['pids'][name]=proc.pid
   record();return proc
- def run(argv,name,extra=None,timeout=600):
-  proc=start(argv,name,extra,False);deadline=time.monotonic()+timeout
-  while proc.poll() is None:
-   guard();assert time.monotonic()<deadline,name+' timeout';time.sleep(.2)
-  (state/(name+'.exit')).write_text(str(proc.returncode)+'\n');assert proc.returncode==0,name+' failed; private raw logs retained'
+ def run(argv,name,extra=None,timeout=600,monitor=None):
+  proc=start(argv,name,extra,False)
+  try:preflight.wait_child(proc,timeout,monitor or guard)
+  finally:(state/(name+'.exit')).write_text(str(proc.returncode)+'\n')
+ def audit(mode,label,monitor=None):
+  argv=['python3',BASE/'c23-checkpoint-db.py','--tools',tools,'--state',state,'--audit',mode,'--label',label]
+  if mode=='baseline':argv+=['--expected-snapshot',descriptor['files']['finalSnapshot']['path']]
+  run(argv,label,timeout=300,monitor=monitor)
+  evidence=json.loads((state/(label+'-result.json')).read_text())
+  assert evidence['passed'] is True and evidence['mode']==mode
+  if mode=='final':assert sha_file(state/'c23-final-db-snapshot.json')==evidence['snapshotSha256']
+  result.setdefault('auditProducers',{})[label]={'argv':list(map(str,argv)),'timeoutSeconds':300,'resultSha256':sha_file(state/(label+'-result.json'))}
+  return evidence
  def ready(port,proc):
   deadline=time.monotonic()+60
   while time.monotonic()<deadline:
@@ -138,15 +152,20 @@ def main():
  def verify():
   assert sha_file(a.descriptor)==a.expected_descriptor_sha256
   assert all(sha_file(Path(item['path']))==item['sha256'] for item in descriptor['files'].values()),'accepted source evidence changed'
-  assert binding()==pinned,'frozen source, artifact, tools or config changed'
+  assert preflight.accepted_binding(binding,validate_build,a.expected_head)==pinned,'frozen source, artifact, tools or config changed'
   assert sha_file(a.build_receipt)==a.expected_build_receipt_sha256,'build receipt changed'
  def interrupted(*_):raise KeyboardInterrupt
+ pinned=preflight.accepted_binding(binding,validate_build,a.expected_head)
+ if a.preflight_only:
+  print(json.dumps({'status':'PREFLIGHT_ONLY_NOT_QUALIFIED','head':pinned['head'],'buildReceiptSha256':a.expected_build_receipt_sha256,'descriptorSha256':a.expected_descriptor_sha256,'frozenInputsSha256':digest(pinned),'budget':budget}));lock.close();return
+ os.umask(0o077);state.mkdir(mode=0o700)
  for sig in [signal.SIGINT,signal.SIGTERM,signal.SIGHUP]:signal.signal(sig,interrupted)
  try:
-  record();pinned=binding();(state/'frozen-inputs.json').write_text(json.dumps(pinned,indent=2));result['frozenInputsSha256']=sha_file(state/'frozen-inputs.json')
+  record();(state/'frozen-inputs.json').write_text(json.dumps(pinned,indent=2));result['frozenInputsSha256']=sha_file(state/'frozen-inputs.json')
   before=manifest(source)
   assert {d:manifest(source/d) for d in ['pgdata','uploads','exports']}==json.loads(Path(descriptor['files']['resumedDataManifest']['path']).read_text()),'C21 stopped data differs from final accepted manifest'
   (state/'source-byte-manifest-before.json').write_text(json.dumps(before));result['sourceManifestSha256']=digest(before)
+  verify()
   for d in ['pgdata','uploads','exports']:
    original=manifest(source/d);shutil.copytree(source/d,state/d,copy_function=shutil.copy2);assert manifest(state/d)==original;guard()
   shutil.copy2(Path(descriptor['files']['legacyFixturePrivate']['path']),state/'fixture-private.json')
@@ -168,10 +187,10 @@ def main():
    probe=subprocess.run([node,'--require',BASE/'loopback-only.cjs','-e',driver],cwd=BACKEND,env={**env,'DATABASE_URL_OWNER':runtime['DATABASE_URL_OWNER']},text=True,capture_output=True,timeout=8);polls.append({'exit':probe.returncode,'result':probe.stdout});(state/'postgres-readiness.json').write_text(json.dumps(polls))
    if probe.returncode==0 and probe.stdout=='ready':break
    assert probe.returncode==75 and probe.stdout=='57P03';guard();assert time.monotonic()<deadline;time.sleep(.2)
-  status.update(head=a.expected_head,node='v24.21.0',runtimeFingerprint=pinned['runtimeFingerprint']);record();db=m.Database(tools,state)
+  status.update(head=a.expected_head,node='v24.21.0',runtimeFingerprint=pinned['runtimeFingerprint']);record()
   public={k:v for k,v in runtime.items() if k!='DATABASE_URL_OWNER'}
   result['privateRuntimeFileSha256']=sha_file(state/'runtime-private.json')
-  assert db.snapshot()==json.loads(Path(descriptor['files']['finalSnapshot']['path']).read_text()),'stopped clone does not match bound source checkpoint'
+  audit('baseline','c23-audit-baseline')
   http=False
   for phase in requested:
    verify();guard()
@@ -187,7 +206,7 @@ def main():
     status['state']='running';record();argv=[node,'--require',BASE/'loopback-only.cjs',BASE/f'c23-checkpoint-{phase}.mjs',state];run(argv,'c23-'+phase,public,timeout=600 if phase=='functional' else 300)
    result['phases'][phase]=json.loads((state/f'c23-{phase}-result.json').read_text());assert result['phases'][phase]['passed'] is True
    result.setdefault('phaseProducers',{})[phase]={'argv':list(map(str,argv)),'inputBindingSha256':result['frozenInputsSha256'],'resultSha256':sha_file(state/f'c23-{phase}-result.json')}
-   db.original_rows_unchanged(json.loads((state/'c23-original-rows-private.json').read_text()));verify();guard()
+   audit('preserve','c23-audit-preserve-'+phase);verify();guard()
   result['passed']=set(result['phases'])==set(PHASES)
   result['requestedPrefixPassed']=True
  except BaseException as e:
@@ -218,14 +237,18 @@ def main():
   for name,proc,_ in reversed(children):
    if name!='postgres':stop_child(name,proc)
   writers_stopped=all(proc.poll() is not None for name,proc,_ in children if name!='postgres')
-  if 'db' in locals() and writers_stopped and not cleanup:
-   try:
-    original=state/'c23-original-rows-private.json'
-    if original.exists():result['finalOriginalRowsPreserved']=db.original_rows_unchanged(json.loads(original.read_text()))
-    (state/'c23-final-db-snapshot.json').write_text(json.dumps(db.snapshot()));result['finalSnapshotSha256']=sha_file(state/'c23-final-db-snapshot.json');result['finalSnapshotVerified']=True
-   except Exception as error:result['finalSnapshotError']=type(error).__name__;result['passed']=False
-  for name,proc,_ in reversed(children):
-   if name=='postgres':stop_child(name,proc)
+  def final_guard():
+   assert shutil.disk_usage(state).free>=FLOOR,'8GiB disk floor during final snapshot'
+   assert next(int(l.split()[1])*1024 for l in Path('/proc/meminfo').read_text().splitlines() if l.startswith('MemAvailable:'))>=2*1024**3
+   assert any(name=='postgres' and proc.poll() is None for name,proc,_ in children),'PostgreSQL exited during final snapshot'
+  def final_audit():
+   assert writers_stopped and not cleanup,'writers did not stop cleanly'
+   assert (state/'c23-original-rows-private.json').is_file(),'no completed original-row inventory'
+   return audit('final','c23-audit-final',monitor=final_guard)
+  def stop_postgres():
+   for name,proc,_ in reversed(children):
+    if name=='postgres':stop_child(name,proc)
+  preflight.finish_database(final_audit,stop_postgres,result)
   for log in logs:log.close()
   for name,port in status['ports'].items():
    try:
@@ -236,7 +259,7 @@ def main():
   try:
    after=manifest(source);(state/'source-byte-manifest-after.json').write_text(json.dumps(after));result['sourceUnchanged']=before is not None and after==before and not (source/'pgdata/postmaster.pid').exists()
   except Exception:result['sourceUnchanged']=False
-  try:result['inputsUnchanged']=pinned is not None and binding()==pinned and sha_file(state/'runtime-private.json')==result['privateRuntimeFileSha256'] and sha_file(a.build_receipt)==a.expected_build_receipt_sha256 and sha_file(prior_prisma_path)==prior_prisma['sha256'] and dependency_manifest()==build['dependencies'] and sha_file(a.descriptor)==a.expected_descriptor_sha256 and all(sha_file(Path(item['path']))==item['sha256'] for item in descriptor['files'].values())
+  try:result['inputsUnchanged']=pinned is not None and preflight.accepted_binding(binding,validate_build,a.expected_head)==pinned and sha_file(state/'runtime-private.json')==result['privateRuntimeFileSha256'] and sha_file(a.build_receipt)==a.expected_build_receipt_sha256 and sha_file(prior_prisma_path)==prior_prisma['sha256'] and dependency_manifest()==build['dependencies'] and sha_file(a.descriptor)==a.expected_descriptor_sha256 and all(sha_file(Path(item['path']))==item['sha256'] for item in descriptor['files'].values())
   except Exception:result['inputsUnchanged']=False
   isolation=all(result[k] for k in ['cleanupVerified','sourceUnchanged','inputsUnchanged','finalSnapshotVerified']);result['passed']=result['passed'] and preflight.complete(result)
   status.update(state='stopped',cleanupVerified=result['cleanupVerified'],cleanupErrors=cleanup,endedAt=time.time());record();(state/'c23-runtime-result.json').write_text(json.dumps(result,indent=2));lock.close()

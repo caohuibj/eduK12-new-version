@@ -2,10 +2,27 @@
 """Verify existing generated Prisma bytes without generating or connecting to DB.
 This is current-artifact verification, never reconstructed generation provenance.
 """
-import argparse, importlib.util, json, os, re, subprocess, sys
+import argparse, hashlib, importlib.util, json, os, re, subprocess, sys
 from pathlib import Path
 sys.dont_write_bytecode=True
 BASE=Path(__file__).resolve().parent
+
+def python_helper_closure(base=BASE):
+    # Capture before loading the transitive C23/C21/C20/C19/C18/C16 helpers.
+    entries={}
+    for file in sorted(base.rglob('*.py')):
+        assert file.is_file() and not file.is_symlink(), 'Python helper must be a regular source file'
+        entries[str(file.relative_to(base))]={'realpath':str(file.resolve()),'mode':file.stat().st_mode&0o777,
+                                             'sha256':hashlib.sha256(file.read_bytes()).hexdigest()}
+    return entries
+
+IMPORTED_PYTHON_HELPERS=python_helper_closure()
+
+def unchanged_python_helpers(expected, base=BASE):
+    current=python_helper_closure(base)
+    assert current==expected, 'consumed Python helper closure changed'
+    return current
+
 spec=importlib.util.spec_from_file_location('c23_client_db',BASE/'c23-checkpoint-db.py')
 db=importlib.util.module_from_spec(spec);spec.loader.exec_module(db)
 
@@ -79,7 +96,13 @@ def main():
     parser.add_argument('--expected-head',required=True);parser.add_argument('--receipt',type=Path,required=True)
     a=parser.parse_args();os.umask(0o077);backend=a.backend.resolve();repo=backend.parents[1]
     assert not a.receipt.exists();assert re.fullmatch('[a-f0-9]{40}',a.expected_head)
-    assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=repo,text=True).strip()==a.expected_head
+    def clean_helper_sources():
+        assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=repo,text=True).strip()==a.expected_head
+        paths=['server-version/scripts/recovery']
+        assert subprocess.run(['git','diff','--quiet','HEAD','--',*paths],cwd=repo).returncode==0, 'commit recovery helpers before verifying client'
+        assert not subprocess.check_output(['git','ls-files','--others','--exclude-standard','--',*paths],cwd=repo).strip(), 'untracked recovery helper source'
+    clean_helper_sources()
+    python_helpers=unchanged_python_helpers(IMPORTED_PYTHON_HELPERS)
     assert subprocess.check_output([a.node,'--version'],text=True).strip()=='v24.21.0'
     node_before=db.sha_file(a.node);tool_before=db.sha_file(Path(__file__))
     inputs={name:db.sha_file(backend/name) for name in ['prisma/schema.prisma','package.json','package-lock.json']}
@@ -97,10 +120,10 @@ def main():
     assert closure(backend,'node_modules')==dependencies
     assert {name:db.sha_file(backend/name) for name in inputs}==inputs
     assert db.sha_file(a.node)==node_before and db.sha_file(Path(__file__))==tool_before
-    assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=repo,text=True).strip()==a.expected_head
+    clean_helper_sources();unchanged_python_helpers(python_helpers)
     result={'scope':'EXISTING_GENERATED_CLIENT_VERIFIED_NOT_GENERATION_PROVENANCE','passed':True,
             'head':a.expected_head,'nodeVersion':'v24.21.0','nodeSha256':db.sha_file(a.node),
-            'verificationToolSha256':db.sha_file(Path(__file__)),'inputs':inputs,'client':client,'dependencies':dependencies,
+            'verificationToolSha256':db.sha_file(Path(__file__)),'pythonHelperClosure':python_helpers,'pythonHelpersUnchanged':True,'inputs':inputs,'client':client,'dependencies':dependencies,
             'inputsUnchanged':True,'clientUnchanged':True,'dependenciesUnchanged':True,
             'schemaAgreement':matched,'runtimeMetadata':metadata,'installedNativeEngineMatches':True,
             'steps':[{'name':'verify-existing-prisma-client','exitCode':0}],

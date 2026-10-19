@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """No-service fault tests for actual launcher/upgrade acceptance functions."""
-import copy, importlib.util, pathlib, sys, unittest, json, ast, types, signal, subprocess
+import copy, importlib.util, pathlib, sys, unittest, json, ast, types, signal, subprocess, tempfile, os
 sys.dont_write_bytecode = True
 BASE = pathlib.Path(__file__).resolve().parent
 
@@ -111,6 +111,96 @@ class AcceptanceFaults(unittest.TestCase):
         exec(compile(ast.Module(body=[function],type_ignores=[]),'actual-stop-child','exec'),scope)
         scope['stop_child']('postgres',Exiting())
         self.assertEqual(errors,[{'name':'postgres','error':'UnexpectedShutdownExit','returncode':1}])
+
+    def test_actual_build_validation_rejects_interval_mutations_before_clone(self):
+        source=ast.parse((BASE/'c23-checkpoint-http.py').read_text())
+        names={'validate_source','dependency_manifest','validate_build'}
+        functions=[n for n in ast.walk(source) if isinstance(n,ast.FunctionDef) and n.name in names]
+        with tempfile.TemporaryDirectory() as directory:
+            root=pathlib.Path(directory);backend=root/'backend';backend.mkdir();node=root/'node';node.write_text('official node test bytes')
+            files={'src/index.ts':'source','prisma/schema.prisma':'schema','package.json':'{}','package-lock.json':'{}',
+                   'tsconfig.json':json.dumps({'compilerOptions':{'outDir':'./dist'}}),'dist/index.js':'compiled',
+                   'node_modules/.prisma/client/index.js':'client','node_modules/typescript/bin/tsc':'compiler',
+                   'node_modules/typescript/lib/_tsc.js':'compiler library','node_modules/typescript/package.json':'{}'}
+            for relative,value in files.items():
+                file=backend/relative;file.parent.mkdir(parents=True,exist_ok=True);file.write_text(value)
+            current={'head':'a'*40,'clean':True};args=types.SimpleNamespace(expected_head=current['head'],build_receipt=root/'build.json')
+            def output(command,**_):
+                if command[1:3]==['rev-parse','HEAD']:return current['head']+'\n'
+                if command[1]=='ls-files':return b''
+                return ''
+            def run(command,**_):return types.SimpleNamespace(returncode=0 if command[1]!='diff' or current['clean'] else 1)
+            scope={'BACKEND':backend,'REPO':root,'BASE':BASE,'Path':pathlib.Path,'os':os,'json':json,'a':args,'node':node,
+                   'sha_file':db.sha_file,'digest':db.digest,'preflight':p,'qualification_sources':['source'],
+                   'subprocess':types.SimpleNamespace(check_output=output,run=run),
+                   'module':lambda *_:types.SimpleNamespace(schema_agreement=lambda *_:{'schemaTokensMatch':True})}
+            exec(compile(ast.Module(body=functions,type_ignores=[]),'actual-build-validator','exec'),scope)
+            inputs={name:db.sha_file(backend/name) for name in files if not name.startswith(('dist/','node_modules/'))}
+            client={'node_modules/.prisma/client/index.js':db.sha_file(backend/'node_modules/.prisma/client/index.js')}
+            generated={'inputsUnchanged':True,'inputs':inputs,'client':client,'nodeVersion':'v24.21.0','nodeSha256':db.sha_file(node),'head':current['head'],'steps':[{'name':'prisma','exitCode':0}]}
+            generated_path=root/'generated.json';generated_path.write_text(json.dumps(generated))
+            build={**generated,'dependenciesUnchanged':True,'clientUnchanged':True,'dependencies':scope['dependency_manifest'](),
+                   'compiler':{name:db.sha_file(backend/name) for name in files if name.startswith('node_modules/typescript/')},
+                   'dist':{'dist/index.js':db.sha_file(backend/'dist/index.js')},
+                   'priorPrismaReceipt':{'path':str(generated_path),'sha256':db.sha_file(generated_path)},
+                   'steps':[{'command':[str(node),'node_modules/typescript/bin/tsc'],'cwd':str(backend),'exitCode':0}]}
+            args.build_receipt.write_text(json.dumps(build));args.expected_build_receipt_sha256=db.sha_file(args.build_receipt)
+            validate=scope['validate_build']
+            def binding():return {'head':current['head'],'bytes':{str(f.relative_to(backend)):db.sha_file(f) for f in backend.rglob('*') if f.is_file()}}
+            validate();self.assertEqual(p.accepted_binding(binding,validate,args.expected_head)['head'],args.expected_head)
+            # Every mutation occurs AFTER earlier successful validation, BEFORE the baseline capture.
+            for relative in ['src/index.ts','dist/index.js','node_modules/.prisma/client/index.js','node_modules/typescript/lib/_tsc.js','node_modules/extra.js']:
+                with self.subTest(interval_mutation=relative):
+                    file=backend/relative;original=file.read_bytes() if file.exists() else None;file.write_text('intervening edit')
+                    cloned=[]
+                    with self.assertRaises(AssertionError):
+                        p.accepted_binding(binding,validate,args.expected_head);cloned.append(True)
+                    self.assertEqual(cloned,[])
+                    if original is None:file.unlink()
+                    else:file.write_bytes(original)
+            for field,value in [('head','b'*40),('clean',False)]:
+                original=current[field];current[field]=value
+                with self.assertRaises(AssertionError):p.accepted_binding(binding,validate,args.expected_head)
+                current[field]=original
+
+    def test_binding_rejects_mutation_during_validation(self):
+        current={'head':'a'*40,'dist':'accepted'}
+        def validate():current['dist']='edited during validation'
+        with self.assertRaises(AssertionError):p.accepted_binding(lambda:copy.deepcopy(current),validate,current['head'])
+
+    def test_aggregate_timeout_kills_sql_group_and_always_stops_postgres(self):
+        events=[];ticks=iter([0,299,300])
+        class Hung:
+            pid=123;returncode=None
+            def poll(self):return self.returncode
+            def wait(self,timeout):events.append(('reap',timeout));self.returncode=-9
+        proc=Hung();result={'passed':True}
+        def audit():
+            p.wait_child(proc,300,lambda:events.append('guard'),clock=lambda:next(ticks),pause=lambda _:None,killpg=lambda pid,sig:events.append(('kill',pid,sig)))
+            self.fail('timed-out helper cannot yield snapshot evidence')
+        p.finish_database(audit,lambda:events.append('stop-postgres'),result)
+        self.assertEqual(events,['guard',('kill',123,signal.SIGKILL),('reap',5),'stop-postgres'])
+        self.assertFalse(result['passed']);self.assertFalse(result['finalSnapshotVerified']);self.assertEqual(result['finalSnapshotError'],'TimeoutError')
+        self.assertNotIn('finalSnapshotSha256',result)
+
+    def test_final_audit_failure_never_fabricates_snapshot(self):
+        for evidence in [{'passed':False,'mode':'final'},{'passed':True,'mode':'preserve'},
+                         {'passed':True,'mode':'final','retainedFacts':{'allOriginalRowsRetained':False}}]:
+            result={'passed':True};stopped=[]
+            p.finish_database(lambda:evidence,lambda:stopped.append(True),result)
+            self.assertFalse(result['passed']);self.assertFalse(result['finalSnapshotVerified']);self.assertEqual(stopped,[True])
+            self.assertNotIn('finalSnapshotSha256',result)
+
+    def test_client_receipt_rejects_consumed_python_helper_mutation(self):
+        verify=load('client_helper_closure_tested','c23-checkpoint-verify-client.py')
+        with tempfile.TemporaryDirectory() as directory:
+            base=pathlib.Path(directory);helper=base/'transitive-helper.py';helper.write_text('accepted helper bytes')
+            before=verify.python_helper_closure(base)
+            self.assertEqual(verify.unchanged_python_helpers(before,base),before)
+            helper.write_text('intervening helper mutation')
+            with self.assertRaises(AssertionError):verify.unchanged_python_helpers(before,base)
+            helper.write_text('accepted helper bytes');(base/'extra-helper.py').write_text('unexpected helper')
+            with self.assertRaises(AssertionError):verify.unchanged_python_helpers(before,base)
 
     def test_shared_helpers_import_without_clone_or_services(self):
         launcher=load('launcher_tested','c23-checkpoint-http.py')
