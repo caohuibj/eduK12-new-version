@@ -21,7 +21,7 @@ const survey='https://survey.eduk12.top',admin='https://training.eduk12.top';
 const id='abcdef01-1111-4111-8111-111111111111',waveId='11111111-2222-4333-8444-555555555555';
 const publicId='22222222-2222-4222-8222-222222222222',attemptId='33333333-3333-4333-8333-333333333333';
 const prefix='/api/survey/projects/'+id;
-const records=[],unknown=[],contexts=[];let browser,lastPage;
+const records=[],unknown=[],contexts=[];let browser,lastPage,lastState,lastLayout;
 const axe=readFileSync('.github/release-tools/node_modules/axe-core/axe.min.js','utf8');
 mkdirSync(E+'/screenshots',{recursive:true});
 const wave={id:waveId,projectId:id,title:'合成波次',ordinal:1,status:'OPEN',revision:7,instrumentIds:[],consentText:'仅供界面测试的合成知情同意。',generalText:'谢谢',consentVersion:1,allowNewParticipants:true,opensAt:null,closesAt:null};
@@ -35,7 +35,8 @@ async function scene(mode,width=1440,{recovery=false}={}){
  contexts.push(ctx);const page=await ctx.newPage();lastPage=page;
  if(recovery)await page.clock.install({time:new Date('2032-01-02T03:04:04.000Z')});
  page.setDefaultTimeout(12000);
- const s={calls:[],errors:[],posts:[],reads:[],downloads:[],tickets:new Map(),serial:0,readMode:null,postMode:null,delay:null,cutoff:'2031-12-31T23:59:59.000Z',revision:7};
+ const s={calls:[],errors:[],posts:[],reads:[],downloads:[],events:[],onPostRegistered:null,tickets:new Map(),serial:0,readMode:null,postMode:null,delay:null,cutoff:'2031-12-31T23:59:59.000Z',revision:7};lastState=s;
+ page.on('request',r=>{if(r.method()==='POST'&&r.url()===survey+prefix+'/exports')s.events.push({event:'export-request',index:s.events.filter(e=>e.event==='export-request').length+1});});
  page.on('pageerror',e=>s.errors.push(e.message));
  await ctx.route('**/*',async route=>{
   const req=route.request(),u=new URL(req.url()),method=req.method();
@@ -65,6 +66,7 @@ async function scene(mode,width=1440,{recovery=false}={}){
     if(body.cursor)assert.match(body.cursor,/^synthetic-incoming-[2-9]$/);
     if(body.completedFrom)assert.equal(body.completedFrom,'2031-06-01T09:00:00.000Z');
     s.posts.push(structuredClone(body));
+    s.events.push({event:'export-post-registered',count:s.posts.length});s.onPostRegistered?.(s.posts.length);
     if(s.delay)await s.delay;
     if(s.postMode)return response(null,s.postMode);
     const pageNumber=body.cursor?Number(body.cursor.split('-').at(-1)):1;
@@ -101,9 +103,19 @@ async function checkLayout(page,name,width){
  await page.evaluate(()=>document.fonts.ready);
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false,name+' overflow');
  await page.addScriptTag({url:new URL('/survey-ci-axe.js',page.url()).href});
- const result=await page.evaluate(async()=>{const r=await window.axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}});return{passes:r.passes.length,violations:r.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>n.target)}))};});
- assert.ok(result.passes>0);assert.deepEqual(result.violations,[],name+' WCAG');
+ const result=await page.evaluate(async()=>{
+  const r=await window.axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}});
+  const check=c=>({id:c.id,impact:c.impact,message:c.message,data:Object.fromEntries(Object.entries(c.data??{}).filter(([key])=>['fgColor','bgColor','contrastRatio','expectedContrastRatio','fontSize','fontWeight','messageKey'].includes(key))),relatedNodes:(c.relatedNodes??[]).map(n=>({target:n.target}))});
+  return{passes:r.passes.length,violations:r.violations.map(v=>({id:v.id,impact:v.impact,help:v.help,helpUrl:v.helpUrl,nodes:v.nodes.map(n=>({target:n.target,impact:n.impact,failureSummary:n.failureSummary,any:n.any.map(check),all:n.all.map(check),none:n.none.map(check)}))}))};
+ });
+ const computed=await page.evaluate(violations=>violations.flatMap(v=>v.nodes.map(n=>{
+  const el=typeof n.target[0]==='string'?document.querySelector(n.target[0]):null;if(!el)return{target:n.target,unresolved:true};
+  const s=getComputedStyle(el),ancestors=[];for(let p=el;p;p=p.parentElement){const a=getComputedStyle(p);ancestors.push({tag:p.tagName,color:a.color,backgroundColor:a.backgroundColor,backgroundImage:a.backgroundImage,opacity:a.opacity});}
+  return{target:n.target,color:s.color,backgroundColor:s.backgroundColor,fontSize:s.fontSize,fontWeight:s.fontWeight,hover:el.matches(':hover'),focusVisible:el.matches(':focus-visible'),focused:document.activeElement===el,ancestors};
+ })),result.violations);
+ lastLayout={name,width,wcag:result,computed};
  await page.screenshot({path:`${E}/screenshots/${engine}-${name}-${width}.png`,fullPage:false});
+ assert.ok(result.passes>0);assert.deepEqual(result.violations,[],name+' WCAG');
  records.push({name,width,wcag:result});
 }
 async function openResearch(width=1440,{recovery=false}={}){
@@ -147,7 +159,7 @@ async function secondPage(){
 }
 const counts=v=>({posts:v.s.posts.length,reads:v.s.reads.length,downloads:v.s.downloads.length});
 async function noAutomatic(v,ms){const before=counts(v);await v.page.clock.fastForward(ms);assert.deepEqual(counts(v),before);}
-function saveContract(v,name){assert.deepEqual(v.s.errors,[]);assert.deepEqual(unknown,[]);records.push({name,requests:v.s.calls,counts:counts(v),downloads:v.s.downloads});}
+function saveContract(v,name){assert.deepEqual(v.s.errors,[]);assert.deepEqual(unknown,[]);records.push({name,requests:v.s.calls,counts:counts(v),downloads:v.s.downloads,events:v.s.events});}
 
 try{
  execFileSync('openssl',['req','-x509','-newkey','rsa:2048','-nodes','-days','1','-subj','/CN=survey.eduk12.top','-addext','subjectAltName=DNS:survey.eduk12.top,DNS:training.eduk12.top','-keyout',tls+'/key.pem','-out',tls+'/cert.pem'],{stdio:'pipe'});
@@ -199,17 +211,20 @@ try{
  }
  {
   const v=await secondPage();await noAutomatic(v,600001);let release;v.s.delay=new Promise(r=>release=r);const n=v.s.posts.length;
+  const registered=new Promise(resolve=>{v.s.onPostRegistered=resolve;});
   const posted=v.page.waitForRequest(r=>r.method()==='POST'&&r.url()===survey+prefix+'/exports');
   await v.page.getByRole('button',{name:'重新生成当前第 2 批',exact:true}).evaluate(button=>{button.click();button.click();});
-  await posted;assert.equal(v.s.posts.length,n+1);
+  await posted;v.s.events.push({event:'request-wait-resolved',posts:v.s.posts.length});assert.equal(await registered,n+1);assert.equal(v.s.posts.length,n+1);v.s.events.push({event:'registration-wait-resolved',posts:v.s.posts.length});
   await v.page.getByRole('tab',{name:'研究设置',exact:true}).click();await click(v.page,'新建其他项目');
+  v.s.events.push({event:'editor-unmounted',posts:v.s.posts.length});
   const completed=v.page.waitForResponse(r=>r.request().method()==='POST'&&r.url()===survey+prefix+'/exports');release();await completed;
-  assert.equal(v.s.reads.length,3);assert.equal(v.s.downloads.length,3);assert.equal(await v.page.getByRole('region',{name:'当前导出批次'}).count(),0);saveContract(v,'duplicate-click-and-unmount-no-late-download');await v.close();
+  v.s.events.push({event:'delayed-response-completed',posts:v.s.posts.length});
+  assert.equal(v.s.reads.length,3);assert.equal(v.s.downloads.length,3);assert.equal(await v.page.getByRole('region',{name:'当前导出批次'}).count(),0);assert.equal(v.s.posts.length,n+1);assert.equal(v.s.events.filter(e=>e.event==='export-request').length,n+1);saveContract(v,'duplicate-click-and-unmount-no-late-download');await v.close();
  }
  assert.deepEqual(unknown,[]);assert.ok(records.length>=6);
  writeFileSync(`${E}/browser-${engine}.json`,JSON.stringify({head:p.head,tree:p.tree,frontendTree:p.frontendTree,image:build.images.runtime.id,engine,records,unknown,status:'success',authority:'strict frontend DTO simulation on production runtime; WebKit is not native Safari; backend permission/scoring not revalidated'},null,2));
 }catch(error){
- writeFileSync(`${E}/browser-${engine}-failure.json`,JSON.stringify({error:String(error),unknown,records,status:'failure'},null,2));
+ writeFileSync(`${E}/browser-${engine}-failure.json`,JSON.stringify({error:String(error),unknown,records,lastLayout,lastEvents:lastState?.events,lastCounts:lastState?{posts:lastState.posts.length,reads:lastState.reads.length,downloads:lastState.downloads.length}:null,status:'failure'},null,2));
  if(lastPage&&!lastPage.isClosed())await lastPage.screenshot({path:`${E}/screenshots/${engine}-failure.png`}).catch(()=>{});
  throw error;
 }finally{
