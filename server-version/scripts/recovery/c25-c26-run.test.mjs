@@ -403,3 +403,110 @@ with tempfile.TemporaryDirectory() as tmp:
  assert len(observed)==1 and result['passed'] is False and result['postWriteResourceFailure']=='AssertionError'
  assert result['lateFinalEvidence'] is False and private_read(file)==result and stat.S_IMODE(file.stat().st_mode)==0o600
 `))
+test('fresh PG candidate identity accepts real short exits but rejects live missing exe reuse permissions and group drift',()=>{
+ const output=python(String.raw`
+from unittest import mock
+os.umask(0o077);enable_subreaper();root=proc(os.getpid());observations=[]
+script="""import os,sys,signal,time
+pid=os.fork()
+if pid==0:
+ os.setsid()
+ while True:time.sleep(.01)
+else:
+ print(pid,flush=True);reaped=False
+ try:
+  for command in sys.stdin:
+   if command.strip()=='reap':
+    _,status=os.waitpid(pid,0);reaped=True;print(status,flush=True)
+   elif command.strip()=='exit':break
+ finally:
+  if not reaped:
+   try:os.kill(pid,signal.SIGKILL)
+   except ProcessLookupError:pass
+   os.waitpid(pid,0)
+"""
+for disposition in ['ABSENT','TERMINAL']:
+ leader=subprocess.Popen([sys.executable,'-B','-c',script],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True,start_new_session=True)
+ child=None;owned=OwnedGroups(sys.executable);real_resolve=Path.resolve;seen=[]
+ try:
+  owned.register(proc(leader.pid),'postgres');child=int(leader.stdout.readline());end=time.monotonic()+3
+  while proc(child)['processGroupId']!=child:assert time.monotonic()<end;time.sleep(.001)
+  before=proc(child);target=Path('/proc',str(child),'exe')
+  def exit_before_exe(file,*args,**kwargs):
+   if file==target:
+    assert not seen;seen.append(True);os.kill(child,signal.SIGTERM)
+    until=time.monotonic()+3
+    while proc(child)['state'] not in ['Z','X','x']:assert time.monotonic()<until;time.sleep(.001)
+    if disposition=='ABSENT':
+     leader.stdin.write('reap\n');leader.stdin.flush();assert os.WIFSIGNALED(int(leader.stdout.readline()))
+     assert not Path('/proc',str(child)).exists()
+   return real_resolve(file,*args,**kwargs)
+  with mock.patch.object(Path,'resolve',exit_before_exe):owned.capture_descendants(root)
+  assert len(owned.identity_observations)==1;event=owned.identity_observations[0]
+  assert event['disposition']==disposition and event['exeVerifiedForActiveProcess'] is False and event['exeObserved'] is None and event['cpu']=='NOT_OBSERVED'
+  assert all(event['before'][k]==before[k] for k in ['pid','startTicks','processGroupId','parentPid'])
+  if disposition=='ABSENT':assert child not in owned.groups and event['after'] is None
+  else:
+   assert owned.groups[child]['role']=='postgres_terminal_candidate' and event['after']['state']=='Z'
+   assert owned.members(False)==[] # Not an active executable-verified writer.
+   # The exact subreaper adoption is legal and its terminal status is reaped
+   # through the original per-PID wait, without stealing the Popen's exit.
+   leader.kill();assert leader.wait(timeout=2)==-signal.SIGKILL
+   proof=reclaim_owned(owned,root,[('postgres',leader)],time.monotonic_ns()+2*10**9,True,grace_seconds=.05)
+   assert proof['passed'] and proof['members']==[] and proof['popenExits']['postgres']==-signal.SIGKILL
+   assert any(x['pid']==child and os.WIFSIGNALED(x['waitStatus']) for x in proof['reapedOrphans'])
+  observations.append(event)
+ finally:
+  if leader.poll() is None:
+   leader.stdin.write('exit\n');leader.stdin.flush();assert leader.wait(timeout=2)==0
+  leader.stdin.close();leader.stdout.close()
+  if child is not None:
+   try:os.kill(child,signal.SIGKILL)
+   except ProcessLookupError:pass
+   try:os.waitpid(child,os.WNOHANG)
+   except ChildProcessError:pass
+row={'pid':2147483000,'startTicks':'17','processGroupId':2147483000,'parentPid':os.getpid(),'state':'S'}
+rejections=[]
+faults=[('live-missing-exe',FileNotFoundError('missing'),dict(row)),('reused-pid',FileNotFoundError('missing'),{**row,'startTicks':'18'}),('moved-group',FileNotFoundError('missing'),{**row,'processGroupId':2147483001}),('moved-parent',FileNotFoundError('missing'),{**row,'parentPid':1}),('permission',PermissionError('denied'),dict(row)),('parse',FileNotFoundError('missing'),ValueError('bad stat')),('exe-proof-pid-reuse',str(Path(sys.executable).resolve()),{**row,'startTicks':'18'}),('wrong-executable','/wrong/executable',dict(row))]
+for name,exe,fresh in faults:
+ owned=OwnedGroups(sys.executable)
+ def resolve(*a,**k):
+  if isinstance(exe,Exception):raise exe
+  return Path(exe)
+ def read(pid):
+  if isinstance(fresh,Exception):raise fresh
+  return fresh
+ with mock.patch.object(Path,'resolve',resolve),mock.patch.dict(owned.postgres_candidate.__globals__,proc=read):
+  try:owned.postgres_candidate(row)
+  except (AssertionError,FileNotFoundError,PermissionError,ValueError):rejections.append(name)
+  else:raise AssertionError('invalid candidate accepted: '+name)
+ assert owned.identity_observations==[]
+# A terminal leader never grants ownership to a live/unpinned group member.
+owned=OwnedGroups(sys.executable);owned.root=root;terminal={**row,'state':'Z'};owned.register(terminal,'postgres_terminal_candidate');owned.member_pins[row['pid']]=terminal
+for bad in [{**terminal,'state':'S'},{**terminal,'parentPid':1},{**terminal,'startTicks':'19'}]:
+ try:owned.verified_members(owned.groups[row['pid']],{row['pid']:bad})
+ except AssertionError:pass
+ else:raise AssertionError('terminal identity drift accepted')
+foreign={**row,'pid':2147483001,'parentPid':1}
+try:owned.verified_members(owned.groups[row['pid']],{row['pid']:terminal,foreign['pid']:foreign})
+except AssertionError:pass
+else:raise AssertionError('live member hidden by terminal group leader')
+print(json.dumps({'actualExitObservations':observations,'strictRejectedFaults':rejections,'terminalGroupCannotHideLiveMember':True}))
+`,{timeout:15000})
+ console.log(output.trim())
+})
+test('failed command cleanup rejects reused owned identity and still bounded waits its Popen',()=>python(String.raw`
+from unittest import mock
+row={'pid':2147483000,'startTicks':'17','processGroupId':2147483000,'parentPid':os.getpid(),'state':'S'}
+owned=OwnedGroups();owned.register(row,'readiness-contract');child=mock.Mock(pid=row['pid']);child.wait.return_value=7
+with mock.patch.dict(owned.signal.__globals__,process_table=lambda:{row['pid']:{**row,'startTicks':'18'}}),mock.patch('os.killpg') as kill:
+ try:stop_failed_command(owned,child,row,'readiness-contract',time.monotonic_ns()+10**9)
+ except AssertionError:pass
+ else:raise AssertionError('reused command process group was signalled')
+ kill.assert_not_called();child.wait.assert_called_once();assert 0<child.wait.call_args.kwargs['timeout']<=1
+child.wait.reset_mock()
+with mock.patch.dict(owned.signal.__globals__,process_table=lambda:{row['pid']:row},proc=lambda pid:row),mock.patch('os.killpg') as kill:
+ stop_failed_command(owned,child,row,'readiness-contract',time.monotonic_ns()+10**9)
+ kill.assert_called_once_with(row['pid'],signal.SIGKILL);child.wait.assert_called_once()
+print(json.dumps({'reusedGroupSignalDenied':True,'waitStillCalled':True,'exactOwnedSignalPermitted':True}))
+`))

@@ -65,7 +65,26 @@ def process_table():
   assert row['pid']==int(p.name);rows[row['pid']]=row
  return rows
 class OwnedGroups:
- def __init__(self,postgres_executable=None):self.groups={};self.events=[];self.member_pins={};self.empty_groups=set();self.root=None;self.mutex=threading.RLock();self.postgres_executable=str(Path(postgres_executable).resolve()) if postgres_executable else None
+ def __init__(self,postgres_executable=None):self.groups={};self.events=[];self.identity_observations=[];self.member_pins={};self.empty_groups=set();self.root=None;self.mutex=threading.RLock();self.postgres_executable=str(Path(postgres_executable).resolve()) if postgres_executable else None
+ def postgres_candidate(self,row):
+  # A short-lived backend may exit after the complete /proc stat scan. An
+  # absent exe alone proves nothing: bracket it with the same full identity.
+  observed_exe=None;missing_exe=None
+  try:observed_exe=str(Path('/proc',str(row['pid']),'exe').resolve(strict=True))
+  except FileNotFoundError as error:missing_exe=error
+  if observed_exe is not None:assert observed_exe==self.postgres_executable,'unproved PostgreSQL descendant executable'
+  try:after=proc(row['pid'])
+  except FileNotFoundError:
+   assert not Path('/proc',str(row['pid'])).exists(),'live candidate has unreadable stat'
+   after=None
+  if after is not None:
+   assert all(after[k]==row[k] for k in ['pid','startTicks','processGroupId','parentPid']),'PostgreSQL candidate identity changed during exe proof'
+  if after is None or after['state'] in ['Z','X','x']:
+   self.identity_observations.append({'kind':'PG_CANDIDATE_EXIT_DURING_IDENTITY_PROOF','before':dict(row),'after':after,'exeObserved':observed_exe,'exeVerifiedForActiveProcess':False,'disposition':'ABSENT' if after is None else 'TERMINAL','observedMonotonicNs':str(time.monotonic_ns()),'cpu':'NOT_OBSERVED'})
+   return None if after is None else 'postgres_terminal_candidate'
+  if missing_exe is not None:raise missing_exe
+  assert self.postgres_executable is not None and observed_exe==self.postgres_executable
+  return 'postgres_child'
  def register(self,row,role):
   assert row['pid']==row['processGroupId'] and row['pid']!=os.getpgrp(),'only a detached owned group'
   key=(row['pid'],row['startTicks'])
@@ -84,7 +103,7 @@ class OwnedGroups:
    added={pid for pid,row in rows.items() if row['parentPid'] in descendants}
    if added<=descendants:break
    descendants|=added
-  pg_family={pid for pid,row in self.groups.items() if row['role'] in ['postgres','postgres_child']}
+  pg_family={pid for pid,row in self.groups.items() if row['role'] in ['postgres','postgres_child','postgres_terminal_candidate']}
   while True:
    added={pid for pid,row in rows.items() if row['parentPid'] in pg_family}
    if added<=pg_family:break
@@ -96,9 +115,12 @@ class OwnedGroups:
    self.member_pins[pid]=dict(row)
    if row['processGroupId']==pid:
     if pid in self.groups:assert self.groups[pid]['startTicks']==row['startTicks'],'descendant PID reused'
+    if pid in self.groups and self.groups[pid]['role']=='postgres_terminal_candidate':
+     group=self.groups[pid];assert row['state'] in ['Z','X','x'] and row['processGroupId']==group['processGroupId'],'terminal PostgreSQL candidate became live or moved group'
+     assert row['parentPid']==group['parentPid'] or row['parentPid']==root['pid'],'terminal PostgreSQL candidate parent drift'
     if pid in pg_family and pid not in self.groups:
-     assert self.postgres_executable is not None and str(Path('/proc',str(pid),'exe').resolve(strict=True))==self.postgres_executable,'unproved PostgreSQL descendant executable'
-     self.register(row,'postgres_child')
+     role=self.postgres_candidate(row)
+     if role is not None:self.register(row,role)
     elif pid not in self.groups:self.register(row,'descendant-before-registration')
    elif row['processGroupId'] not in self.groups:raise AssertionError('unowned descendant process group')
  def import_registry(self,file,driver):
@@ -113,18 +135,25 @@ class OwnedGroups:
   if group['pid'] in self.empty_groups:assert not members,'proved-empty PGID was reused'
   if leader is not None:
    assert leader['startTicks']==group['startTicks'] and leader['processGroupId']==group['pid'],'group leader PID reused'
+   if group['role']=='postgres_terminal_candidate':assert leader['state'] in ['Z','X','x'],'terminal PostgreSQL candidate became live'
   else:
    for row in members:
     pin=self.member_pins.get(row['pid'])
     assert pin is not None and all(pin[k]==row[k] for k in ['pid','startTicks','processGroupId']),'leaderless member has no exact owned identity'
     assert row['parentPid']==pin['parentPid'] or (self.root is not None and row['parentPid']==self.root['pid']),'leaderless member parent drift'
+  if group['role']=='postgres_terminal_candidate':
+   for row in members:
+    pin=self.member_pins.get(row['pid'])
+    assert pin is not None and all(pin[k]==row[k] for k in ['pid','startTicks','processGroupId']),'unproved terminal-group member'
+    assert row['parentPid']==pin['parentPid'] or (self.root is not None and row['parentPid']==self.root['pid']),'terminal-group member parent drift'
+    if row['state'] not in ['Z','X','x']:assert row['pid']!=group['pid'] and self.postgres_candidate(row)=='postgres_child','unproved active member of terminal PG group'
   if not members:self.empty_groups.add(group['pid'])
   return leader,members
  def signal(self,name,include_postgres=False,roles=None):
   with self.mutex:
    entries=list(self.groups.values());rows=process_table();failures=[]
    for row in reversed(entries):
-    if (row['role'] in ['postgres','postgres_child'] and not include_postgres) or (roles is not None and row['role'] not in roles):continue
+    if (row['role'] in ['postgres','postgres_child','postgres_terminal_candidate'] and not include_postgres) or (roles is not None and row['role'] not in roles):continue
     try:
      leader,members=self.verified_members(row,rows)
      if not members:continue
@@ -153,7 +182,7 @@ class OwnedGroups:
   with self.mutex:
    rows=process_table();result=[]
    for group in self.groups.values():
-    if include_postgres or group['role'] not in ['postgres','postgres_child']:result.extend(self.verified_members(group,rows)[1])
+    if include_postgres or group['role'] not in ['postgres','postgres_child','postgres_terminal_candidate']:result.extend(self.verified_members(group,rows)[1])
    return result
 
 def spawn_registered(owned,children,name,argv,**options):
@@ -163,6 +192,19 @@ def spawn_registered(owned,children,name,argv,**options):
   child=subprocess.Popen(argv,**options);children.append((name,child))
   identity=proc(child.pid);assert identity['parentPid']==os.getpid()
   owned.register(identity,name);return child,identity
+
+def stop_failed_command(owned,child,identity,role,end):
+ # Never signal the old numerical PGID directly after a guard/exit failure.
+ # Even a rejected ownership proof must still collect this Popen's real exit.
+ try:
+  with owned.mutex:
+   group=owned.groups.get(child.pid)
+   assert group is not None and group['role']==role and all(group[k]==identity[k] for k in ['pid','startTicks','processGroupId','parentPid'])
+   assert {pid for pid,row in owned.groups.items() if row['role']==role}=={child.pid}
+   owned.signal(signal.SIGKILL,roles={role})
+ finally:
+  try:child.wait(timeout=min(3,max(.001,(end-time.monotonic_ns())/1e9)))
+  except subprocess.TimeoutExpired:pass
 
 def reclaim_owned(owned,root,children,end,include_postgres=False,clock=time.monotonic_ns,grace_seconds=25):
  # First stop a still-running driver, so it cannot continue creating detached
@@ -375,15 +417,13 @@ def main():
   guard();log=(STATE/(name+'.log')).open('x');logs.append(log);p,identity=spawn_registered(owned,children,name,list(map(str,argv)),cwd=BACKEND,env={**env,**(extra or {})},stdin=subprocess.DEVNULL,stdout=log,stderr=log,start_new_session=True)
   result['processes'].append({'name':name,'argv':list(map(str,argv)),'identity':identity});return p,identity
  def run(argv,name,seconds,end=None,extra=None,allowed_exits=(0,)):
-  allowed=min(seconds,budget.remaining(end));cutoff=min(budget.overall if end is None else end,budget.clock()+int(allowed*10**9));p,_=start(argv,name,extra)
+  allowed=min(seconds,budget.remaining(end));cutoff=min(budget.overall if end is None else end,budget.clock()+int(allowed*10**9));p,identity=start(argv,name,extra)
   try:
    while p.poll() is None:guard(cutoff);time.sleep(.05)
    guard(cutoff);assert p.returncode in allowed_exits,name+' failed'
   except BaseException:
-   try:os.killpg(p.pid,signal.SIGKILL)
-   except ProcessLookupError:pass
-   try:p.wait(timeout=min(3,max(.001,(budget.overall-budget.clock())/10**9)))
-   except subprocess.TimeoutExpired:pass
+   try:stop_failed_command(owned,p,identity,name,budget.overall)
+   except BaseException as cleanup:errors.append({'stage':'failed-command-stop:'+name,'errorType':type(cleanup).__name__})
    raise
   finally:private_json(STATE/(name+'-process-result.json'),{'exitCode':p.poll(),'argv':list(map(str,argv)),'deadlineMonotonicNs':str(cutoff),'finishedMonotonicNs':str(budget.clock())})
   return p
@@ -491,7 +531,7 @@ def main():
   result['watchdogClose']=finish_watchdog(done,watcher,budget,errors)
   try:sample();budget.remaining()
   except BaseException as error:errors.append({'stage':'final-resources','errorType':type(error).__name__})
-  result['signals']=owned.events;result['processExits']={n:p.poll() for n,p in children};result['cleanupErrors']=errors;result['outerFailureTypes']=[type(e).__name__ for e in failure]
+  result['signals']=owned.events;result['processIdentityObservations']=owned.identity_observations;result['processExits']={n:p.poll() for n,p in children};result['cleanupErrors']=errors;result['outerFailureTypes']=[type(e).__name__ for e in failure]
   result['passed']=not failure and not errors and result.get('driverExecuted') is True and result['finalSnapshotVerified'] is True and result.get('materials',{}).get('passed') is True and all(result.get('inputVerification',{}).get(k) is True for k in ['passed','inputsUnchanged','sourceUnchanged','recoveryEvidenceUnchanged']) and result.get('cleanupVerified') is True and result.get('postgresReadyVerified') is True and all(type(c)is int and (c==0 or (n.startswith('c25-c26-readiness-') and c==75)) for n,c in result['processExits'].items())
   for log in logs:log.flush();os.fsync(log.fileno());log.close()
   result['elapsedSeconds']=(budget.clock()-budget.started)/1e9
