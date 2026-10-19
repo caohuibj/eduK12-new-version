@@ -196,7 +196,9 @@ try{
   await click(v.page,'下载 CSV');await v.page.getByText(/剩余 120 秒/).waitFor();await noAutomatic(v,120001);v.s.readMode=null;await download(v,'CSV');saveContract(v,'http-date-non-json-429-explicit-original-retry');await v.close();
  }
  {
-  const v=await secondPage();v.s.readMode={status:404};await click(v.page,'下载 CSV');await v.page.getByRole('button',{name:'重新生成当前第 2 批',exact:true}).waitFor();v.s.readMode=null;v.s.postMode=403;
+  const v=await secondPage();v.s.readMode={status:404};
+  const unexpectedDownloads=[];v.page.on('download',file=>{unexpectedDownloads.push(file.suggestedFilename());v.s.events.push({event:'unexpected-mfa-download',filename:file.suggestedFilename()});});
+  await click(v.page,'下载 CSV');await v.page.getByRole('button',{name:'重新生成当前第 2 批',exact:true}).waitFor();v.s.readMode=null;v.s.postMode=403;
   await click(v.page,'重新生成当前第 2 批');await v.page.getByText(/需要最近五分钟的 TOTP 二次验证/).first().waitFor();const before=counts(v);
   assert.deepEqual(before,{posts:3,reads:4,downloads:3});
   await v.page.getByLabel('最新 TOTP 动态验证码').fill('123456');
@@ -204,7 +206,7 @@ try{
   await click(v.page,'完成五分钟内二次认证');const stepResponse=await stepped;await stepResponse.finished();assert.deepEqual((await stepResponse.json()).data,{verified:true});
   v.s.events.push({event:'mfa-success-response',status:stepResponse.status(),...counts(v)});
   await v.page.getByRole('status').filter({hasText:/^已完成最新 TOTP 二次认证；敏感导出仅在接下来的五分钟内有效。$/}).waitFor();
-  assert.deepEqual(counts(v),before);v.s.events.push({event:'mfa-success-applied-no-automatic-export',...counts(v)});v.s.postMode=null;
+  assert.deepEqual(counts(v),before);assert.equal(unexpectedDownloads.length,0);v.s.events.push({event:'mfa-success-applied-no-automatic-export',unexpectedDownloads:unexpectedDownloads.length,...counts(v)});v.s.postMode=null;
   const original=structuredClone(v.s.posts[1]),registered=new Promise(resolve=>{v.s.onPostRegistered=resolve;});
   const recovered=v.page.waitForResponse(r=>r.request().method()==='POST'&&r.url()===survey+prefix+'/exports'&&r.status()===200);
   await click(v.page,'重新生成当前第 2 批');assert.equal(await registered,4);assert.equal(v.s.posts.length,4);assert.deepEqual(v.s.posts[3],original);
@@ -214,8 +216,8 @@ try{
   await v.page.getByRole('status').filter({hasText:/^已重新生成当前第 2 批。/}).waitFor();
   await v.page.getByRole('button',{name:'重新生成当前第 2 批',exact:true}).waitFor({state:'detached'});
   for(const part of ['CSV','Codebook','Manifest']){const button=v.page.getByRole('button',{name:'下载 '+part,exact:true});await button.waitFor();assert.equal(await button.count(),1);assert.equal(await button.isEnabled(),true);}
-  assert.deepEqual(counts(v),{posts:4,reads:4,downloads:3});assert.equal(v.s.events.filter(e=>e.event==='export-request').length,4);
-  v.s.events.push({event:'mfa-recovery-receipt-applied-no-automatic-download',...counts(v)});saveContract(v,'expired-ticket-mfa-explicit-recovery');await v.close();
+  assert.deepEqual(counts(v),{posts:4,reads:4,downloads:3});assert.equal(v.s.events.filter(e=>e.event==='export-request').length,4);assert.equal(unexpectedDownloads.length,0);
+  v.s.events.push({event:'mfa-recovery-receipt-applied-no-automatic-download',unexpectedDownloads:unexpectedDownloads.length,...counts(v)});saveContract(v,'expired-ticket-mfa-explicit-recovery');await v.close();
  }
  {
   const v=await secondPage();await noAutomatic(v,600001);v.s.revision=8;await click(v.page,'重新生成当前第 2 批');await v.page.getByText(/重建回执与原批次页号或冻结来源不一致/).first().waitFor();assert.equal(v.s.reads.length,3);saveContract(v,'recovered-revision-rejected');await v.close();
