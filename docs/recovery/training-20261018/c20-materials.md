@@ -58,3 +58,17 @@ state03（失败aggregate保留）：匿名V2四first-native恢复/restart/旧�
 新增显式continuation-phase可与all共用，严格绑定失败phase/旧receipt/已过子项，逐phase记录实际producer；旧state02无phase仍唯一new-main规则。显式续验自身若失败，保留failed结果SHA且仅验证导入，绝不列accepted。静态receipt校验目前15项通过仅有工具transcript，未冒原生保存日志；新V1官方schema/有界token准备检查同样不计动态功能。下一state04尚待运行。
 
 state04失败aggregate保留：null双真实PGwaiter、主体/凭证与旧native拒绝及replacement新FINAL执行后，原epoch2报告job已真实处理至READY。harness共用drainReports最后固定epoch1查询导致No CompositeReportJob found；不改业务、不造job、不重交该FINAL/重跑worker。state05精确绑定失败result+私有journal，先只读核epoch2事实/READY，再补既有四V2旧credential访问replacement拒绝；新V1局部按实际epoch处理原outbox，随后未运行KEEP首binding及余下分项。共用client保留，避免失效已合格输入。state05尚待实测。
+
+## Checkpoint 06：真实消费通过，导出效率预算失败保留
+
+state05 的 race 精确续验通过：旧null replacement epoch2 completion只读确认；四V2旧credential跨replacement拒绝、新credential读取成功；新V1普通匿名稳定主体/轮换及实际epoch2原outbox；跨两publication同登录主体首KEEP绑定竞争观察两个真实PG waiter，最终一个随机、一个继承、一个binding。noWrites只覆盖census与quota/token hash，并非全部facts字节比较。rollback、branches、revocation及consumers通过，包含真实报告/Redis导出/分层分析和撤权下载。C19旧suppressed/longCSV缺口仍未因本期新用例自动关闭。
+
+consumer-cost 原失败原样保留：51真实主体(a50/b1)、两publication102parents/204FINAL已完成；在a10/20/50人口阶段，实际导出总人数11/21/51，SQL为40/61/121，严格预算拒绝。analysis SQL40/40/40；单份teacher report22/22/22（不是批报告吞吐）。导出两个按人SQL形状精确对应既有Scale loadScaleResult与loadScaleAnswers各自单身份loadScaleFactRecords，2N查询；另1条SELECT 1为连接探活，非分块阶跃，也非材料history扫描。graph/snapshot/Scale/FormAnswer批次数固定。原生产输入/服务清理均已验证，sourceHead仍是C19 seed，实际执行HEAD为567622ec。
+
+观测只代表单串行真实PG输入：analysis耗时108.79/147.57/251.80ms，解密126/246/606次、明文185241/360139/884801 bytes；单报告17.90/17.14/13.78ms，解密3次5175bytes；导出65.19/90.25/128.88ms，解密44/84/204次58920/112488/273168bytes。不从固定SQL推断固定行/字节，不作为容量结论。当前尚未收集CPU/峰值RSS等完整效率数据。
+
+最新执行顺序：先完成剩余C20功能/guards/restore并提交功能checkpoint，保留此效率失败；随后同原51主体数据独立做云端CPU、内存、数据库、存储和访问成本测试/优化，再第二次提交。C21及后续新功能暂停。当前cost（准入/恢复/继承成本与2/8候选材料存储形状）、guards和restore未运行；失败后未到达的组别手算/最终计数由明确独立functional-tail补齐，不把consumer-cost失败变成通过，不重造fixture或重交FINAL。
+
+state06：独立consumer-functional通过，精确保留state05的51主体/102父/204快照/102READY；A50=1、B1=0独立手算、两publication显式分层、固定anchor的同task一/两组来源集合正确，前后目标facts/raw/report/claim/binding哈希及census不变。原consumer-cost false未提升。
+
+cost尾项失败保留：cold首claim/warm恢复/已有start/restart/linked新发布/满额拒绝六窗口依次观测API SQL94/39/50/92/93/32，耗时97.98/33.35/43.04/75.01/71.78/30.09ms。两份真实2/8组准入中candidate明文等长、无材料正文断言通过，但跨不同随机身份内容的cipher精确等长断言失败（2组919B，8组911B）。既有ekc1使用gzip level1再AES-GCM/base64，UUID/hash内容导致压缩长度差；固定IV/tag长度的随机nonce本身不会改变总长。此断言不能作业务失败或用猜测容差改成通过。下一明确只读storage-functional检查精确codec长度公式、严格最小候选字段/规范化结构和仅已选材料；不重建两份准入、不重跑六窗口，仍保留cost原false。guards/restore尚未运行，功能checkpoint仍未完成。state06全部服务停止、源及输入未变。

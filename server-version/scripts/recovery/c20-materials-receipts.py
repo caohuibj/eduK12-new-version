@@ -36,7 +36,36 @@ def import_receipt(state, expected_sha):
     assert reused <= set(phases)
     new = set(phases) - reused
     continuation = receipt.get('continuation')
-    markers = {p for p, r in phases.items() if p not in reused and r.get('priorProducer', {}).get('continuation')}
+    functional = receipt.get('functionalTail')
+    if functional:
+        assert functional['phase']=='consumer-functional' and functional['failedPhase']=='consumer-cost'
+        assert receipt.get('passed') is False and receipt.get('efficiencyQualificationPassed') is False
+        assert 'consumer-cost' not in reused and not phases.get('consumer-cost',{}).get('passed')
+        failed_path=state/'c20-consumer-cost-result.json'
+        assert sha_file(failed_path)==functional['failedResultSha256']
+        assert json.loads(failed_path.read_text()).get('passed') is False
+        assert receipt.get('acceptedPriorRuntimeSha256')==(functional['evidenceReceiptSha256'] if functional.get('reused') else functional['priorRuntimeSha256'])
+        if functional.get('reused'): assert 'consumer-functional' in reused
+        assert source_sha(frozen,functional['file'])==functional['sha256']
+        target=phases.get('consumer-functional')
+        if target:
+            assert target['priorProducer']['runtimeSha256']==functional['priorRuntimeSha256']
+            assert target['priorProducer']['resultSha256']==functional['failedResultSha256']
+    storage = receipt.get('storageTail')
+    if storage:
+        assert functional and storage['phase']=='storage-functional' and storage['failedPhase']=='cost'
+        assert 'cost' not in reused and not phases.get('cost',{}).get('passed')
+        failed_path=state/'c20-cost-result.json'
+        assert sha_file(failed_path)==storage['failedResultSha256']
+        assert json.loads(failed_path.read_text()).get('passed') is False
+        assert receipt.get('acceptedPriorRuntimeSha256')==storage['priorRuntimeSha256']
+        assert source_sha(frozen,storage['file'])==storage['sha256']
+        target=phases.get('storage-functional')
+        if target:
+            assert target['priorProducer']['runtimeSha256']==storage['priorRuntimeSha256']
+            assert target['priorProducer']['resultSha256']==storage['failedResultSha256']
+    auxiliary=({'consumer-functional'} if functional else set())|({'storage-functional'} if storage else set())
+    markers = {p for p, r in phases.items() if p not in reused and p not in auxiliary and r.get('priorProducer', {}).get('continuation')}
     if markers:
         assert continuation, 'continuation result is missing producer marker'
     if continuation:

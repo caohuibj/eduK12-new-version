@@ -44,10 +44,23 @@ def main():
     parser.add_argument('--continuation-sha256')
     parser.add_argument('--continuation-phase', choices=[p for p in PHASES if p not in ['upgrade','restore']], help='Explicit failed phase filled before proceeding with remaining requested phases')
     parser.add_argument('--expected-prior-runtime-sha256')
+    parser.add_argument('--functional-tail', action='store_true', help='Preserve failed efficiency qualification and run only remaining functional assertions and tail phases')
+    parser.add_argument('--functional-tail-sha256')
+    parser.add_argument('--expected-failed-cost-sha256')
+    parser.add_argument('--storage-tail-sha256', help='Exact read-only storage-functional producer SHA after a retained cost-phase failure')
+    parser.add_argument('--expected-failed-storage-sha256')
     args = parser.parse_args()
     if args.from_state:
         assert args.expected_prior_runtime_sha256, 'all from-state imports require exact prior receipt SHA'
         assert sha_file(args.from_state/'c20-runtime-result.json') == args.expected_prior_runtime_sha256
+    if args.functional_tail:
+        assert args.from_state and args.phase=='all' and not args.continuation_script
+        assert sha_file(BASE/'c20-materials-consumer-functional-continuation.mjs')==args.functional_tail_sha256
+        assert sha_file(args.from_state/'c20-consumer-cost-result.json')==args.expected_failed_cost_sha256
+    if args.storage_tail_sha256:
+        assert args.functional_tail
+        assert sha_file(BASE/'c20-materials-storage-functional-continuation.mjs')==args.storage_tail_sha256
+        assert sha_file(args.from_state/'c20-cost-result.json')==args.expected_failed_storage_sha256
     continuation_phase=args.continuation_phase or args.phase
     if args.continuation_phase: assert args.continuation_script
     if args.continuation_script:
@@ -59,7 +72,10 @@ def main():
         prior_receipt=json.loads((args.from_state/'c20-runtime-result.json').read_text())
         assert sha_file(args.from_state/'c20-final-db-snapshot.json')==prior_receipt['finalSnapshotSha256']
     requested=PHASES if args.phase=='all' else PHASES[:PHASES.index(args.phase)+1]
-    consumed_c20={'c20-materials-http.py','c20-materials-db.py','c20-materials-receipts.py'} | {'c20-materials-'+phase+('.py' if phase in ['upgrade','restore'] else '.mjs') for phase in requested}
+    if args.functional_tail: requested=[p if p!='consumer-cost' else 'consumer-functional' for p in requested]
+    if args.storage_tail_sha256: requested=[p if p!='cost' else 'storage-functional' for p in requested]
+    def phase_file(phase): return 'c20-materials-storage-functional-continuation.mjs' if phase=='storage-functional' else 'c20-materials-consumer-functional-continuation.mjs' if phase=='consumer-functional' else 'c20-materials-'+phase+('.py' if phase in ['upgrade','restore'] else '.mjs')
+    consumed_c20={'c20-materials-http.py','c20-materials-db.py','c20-materials-receipts.py'} | {phase_file(phase) for phase in requested}
     if args.continuation_script: consumed_c20.add(args.continuation_script)
     if any(phase not in ['upgrade','restore'] for phase in requested): consumed_c20 |= COMMON_HTTP
     tools, source, state = [p.resolve() for p in [args.tools, args.source_state, args.state]]
@@ -92,6 +108,20 @@ def main():
         assert all(prior_result.get(k) is True for k in ['cleanupVerified','sourceUnchanged','inputsUnchanged'])
         assert prior_result.get('priorSourceUnchanged',True)
         assert prior_result['pinnedC19DumpSha256'] == m.PINNED_DUMP_SHA256
+        if args.functional_tail:
+            failed_cost=json.loads((prior/'c20-consumer-cost-result.json').read_text())
+            assert failed_cost.get('passed') is False and failed_cost.get('phase')=='consumer-cost'
+            assert prior_result.get('failedPhaseResultsSha256',{}).get('consumer-cost')==args.expected_failed_cost_sha256
+            assert not prior_result['phases'].get('consumer-cost',{}).get('passed')
+            assert all(prior_result['phases'].get(p,{}).get('passed') is True for p in PHASES[:PHASES.index('consumer-cost')])
+            assert sha_file(prior/'c20-final-db-snapshot.json')==prior_result['finalSnapshotSha256']
+            if args.storage_tail_sha256:
+                assert prior_result['phases'].get('consumer-functional',{}).get('passed') is True
+                assert prior_result.get('functionalTail',{}).get('failedResultSha256')==args.expected_failed_cost_sha256
+                storage_failure=json.loads((prior/'c20-cost-result.json').read_text())
+                assert storage_failure.get('phase')=='cost' and storage_failure.get('passed') is False
+                assert prior_result.get('failedPhaseResultsSha256',{}).get('cost')==args.expected_failed_storage_sha256
+                assert not prior_result['phases'].get('cost',{}).get('passed')
         if args.continuation_script:
             failed_path=prior/f'c20-{continuation_phase}-result.json'
             assert failed_path.is_file(), 'explicit continuation phase has no failed result'
@@ -114,6 +144,14 @@ def main():
     os.umask(0o077); state.mkdir(mode=0o700)
     env={'PATH':f'{node.parent}:{pg}:/usr/bin:/bin','HOME':str(state),'TMPDIR':str(state),'TZ':'UTC','LANG':'C.UTF-8','NODE_ENV':'test','PYTHONDONTWRITEBYTECODE':'1'}
     result={'passed':False,'qualificationScope':'C20_FLOW_'+args.phase.upper(),'phases':{},'phaseProducers':{},'reusedPhases':[],'pinnedC19DumpSha256':m.PINNED_DUMP_SHA256,'pinnedC19ResultSha256':m.PINNED_RESULT_SHA256,'sourceHead':source_status['head'],'freshPrisma':fresh,'cloneBytes':copy_bytes}
+    if args.functional_tail:
+        result['qualificationScope']='C20_FUNCTIONAL_CHECKPOINT_WITH_PRESERVED_EFFICIENCY_FAILURE'
+        result['functionalCheckpointPassed']=False
+        result['efficiencyQualificationPassed']=False
+        result['functionalTail']={'phase':'consumer-functional','file':phase_file('consumer-functional'),'sha256':args.functional_tail_sha256,'priorRuntimeSha256':args.expected_prior_runtime_sha256,'failedPhase':'consumer-cost','failedResultSha256':args.expected_failed_cost_sha256}
+    if args.storage_tail_sha256:
+        result['functionalTail']={**prior_result['functionalTail'],'reused':True,'evidenceReceiptSha256':args.expected_prior_runtime_sha256}
+        result['storageTail']={'phase':'storage-functional','file':phase_file('storage-functional'),'sha256':args.storage_tail_sha256,'priorRuntimeSha256':args.expected_prior_runtime_sha256,'failedPhase':'cost','failedResultSha256':args.expected_failed_storage_sha256}
     if prior: result['acceptedPriorRuntimeSha256']=args.expected_prior_runtime_sha256
     status={'state':'preparing','ports':{},'pids':{},'startedAt':time.time()}
     children, logs=[],[]; pinned=source_manifest=prior_manifest=None
@@ -137,7 +175,7 @@ def main():
         client_manifest=digest(manifest(BACKEND/'node_modules/.prisma/client'))
         hashes={}
         for phase in requested:
-            script=BASE/('c20-materials-'+phase+('.py' if phase in ['upgrade','restore'] else '.mjs'))
+            script=BASE/phase_file(phase)
             if not script.exists(): continue
             if phase in ['upgrade','restore']:
                 inputs={'source':db_source,'client':client_manifest,'tools':{k:v for k,v in binaries.items() if 'redis' not in k}}
@@ -194,18 +232,27 @@ def main():
             prior_manifest=manifest(prior); result['priorManifestSha256']=digest(prior_manifest)
             (state/'prior-byte-manifest-before.json').write_text(json.dumps(prior_manifest,indent=2))
             assert prior_result['sourceManifestSha256']==result['sourceManifestSha256']
-            for phase in PHASES:
+            for phase in [*PHASES,'consumer-functional','storage-functional']:
                 if phase in requested and prior_result['phases'].get(phase,{}).get('passed'):
                     assert prior_result['phaseInputHashes'][phase]==pinned['phaseInputHashes'][phase], f'accepted {phase} inputs changed; no automatic replay'
                     result['phases'][phase]=prior_result['phases'][phase]; result['reusedPhases'].append(phase)
                     result['phaseProducers'][phase]=prior_producers[phase]
-                elif (prior/f'c20-{phase}-result.json').exists():
+                elif (prior/f'c20-{phase}-result.json').exists() and prior_result['phases'].get(phase,{}).get('passed') is not True:
                     failed=json.loads((prior/f'c20-{phase}-result.json').read_text())
-                    assert not failed.get('checks') or (args.continuation_script and phase==continuation_phase), 'partial successful phase needs exact reviewed continuation, never rerun'
+                    assert not failed.get('checks') or (args.continuation_script and phase==continuation_phase) or (args.functional_tail and phase=='consumer-cost') or (args.storage_tail_sha256 and phase=='cost'), 'partial successful phase needs exact reviewed continuation, never rerun'
             assert any(p not in result['reusedPhases'] for p in requested)
             for file in prior.glob('c20-*.json'):
                 if file.name not in ['c20-runtime-result.json'] and ('private' in file.name or any(file.name.startswith(f'c20-{phase}-') for phase in result['reusedPhases'])): shutil.copy2(file,state/file.name)
             for journal in prior.glob('c20-*-private.jsonl'): shutil.copy2(journal,state/journal.name)
+            if args.functional_tail:
+                shutil.copy2(prior/'c20-consumer-cost-result.json',state/'c20-consumer-cost-result.json')
+                if args.storage_tail_sha256: shutil.copy2(prior/'c20-cost-result.json',state/'c20-cost-result.json')
+                if not args.storage_tail_sha256:
+                    shutil.copy2(prior/'frozen-inputs.json',state/'c20-functional-prior-frozen-inputs-private.json')
+                    shutil.copy2(prior/'c20-runtime-result.json',state/'c20-functional-prior-runtime-result-private.json')
+                else:
+                    for name in ['c20-functional-prior-frozen-inputs-private.json','c20-functional-prior-runtime-result-private.json']:
+                        assert sha_file(state/name)==sha_file(prior/name), 'preserve original accepted functional producer dependencies'
             if args.continuation_script:
                 failed=prior/f'c20-{continuation_phase}-result.json'
                 assert failed.is_file();shutil.copy2(failed,state/f'c20-prior-{continuation_phase}-failed-result.json')
@@ -233,7 +280,7 @@ def main():
         db=m.Database(tools,state)
         if prior:
             assert result['reusedPhases']; latest=result['reusedPhases'][-1]
-            checkpoint=prior/'c20-final-db-snapshot.json' if args.continuation_script else prior/f'c20-{latest}-post-state.json'
+            checkpoint=prior/'c20-final-db-snapshot.json' if args.continuation_script or args.functional_tail else prior/f'c20-{latest}-post-state.json'
             assert db.snapshot()==json.loads(checkpoint.read_text()), 'prior clone differs from frozen stopped checkpoint'
             if args.continuation_script:
                 assert continuation_phase not in result['reusedPhases'], 'cannot continue an already accepted phase'
@@ -243,7 +290,7 @@ def main():
         for phase in requested:
             if phase in result['reusedPhases']: continue
             verify()
-            producer_file = args.continuation_script if args.continuation_script and phase==continuation_phase else f'c20-materials-{phase}.' + ('py' if phase in ['upgrade','restore'] else 'mjs')
+            producer_file = args.continuation_script if args.continuation_script and phase==continuation_phase else phase_file(phase)
             producer_argv = ['python3',BASE/producer_file,'--tools',tools,'--state',state] if phase in ['upgrade','restore'] else [node,'--require',BASE/'loopback-only.cjs',BASE/producer_file,state]
             if phase in ['upgrade','restore']:
                 status['state']='upgrading' if phase=='upgrade' else 'restoring'; record()
@@ -263,7 +310,13 @@ def main():
             result['phases'][phase]=json.loads((state/f'c20-{phase}-result.json').read_text()); assert result['phases'][phase]['passed'] is True
             result['phaseProducers'][phase]=receipts.executed_producer(phase,producer_file,producer_argv,pinned,result['phases'][phase])
             verify(); guard()
-        result['passed']=all(result['phases'].get(p,{}).get('passed') is True for p in requested)
+        complete=all(result['phases'].get(p,{}).get('passed') is True for p in requested)
+        if args.functional_tail:
+            assert sha_file(state/'c20-consumer-cost-result.json')==args.expected_failed_cost_sha256
+            if args.storage_tail_sha256: assert sha_file(state/'c20-cost-result.json')==args.expected_failed_storage_sha256
+            result['functionalCheckpointPassed']=complete
+            result['efficiencyQualificationPassed']=False
+        result['passed']=complete and not args.functional_tail
     except BaseException as error:
         result['errorType']=type(error).__name__; raise
     finally:
@@ -299,9 +352,10 @@ def main():
         except Exception: result['inputsUnchanged']=False
         isolation=all(result.get(k) is True for k in ['cleanupVerified','sourceUnchanged','inputsUnchanged']) and result.get('priorSourceUnchanged',True)
         result['passed']=result['passed'] and isolation
+        if args.functional_tail: result['functionalCheckpointPassed']=result.get('functionalCheckpointPassed',False) and isolation
         status.update(state='stopped',cleanupVerified=result['cleanupVerified'],cleanupErrors=cleanup,endedAt=time.time()); record()
         result['failedPhaseResultsSha256']={}
-        for phase in requested:
+        for phase in set(requested)|({'consumer-cost'} if args.functional_tail else set())|({'cost'} if args.storage_tail_sha256 else set()):
             failed_file=state/f'c20-{phase}-result.json'
             if failed_file.is_file() and json.loads(failed_file.read_text()).get('passed') is False:
                 result['failedPhaseResultsSha256'][phase]=sha_file(failed_file)

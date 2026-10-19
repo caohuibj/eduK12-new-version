@@ -161,7 +161,7 @@ phase hashes remain unchanged. This permits continuation provenance to survive
 subsequent `all` reuse without claiming that the nominal main script ran.
 
 `python3 server-version/scripts/recovery/c20-materials-receipts-check.py` performs
-fifteen pure temporary-file checks, including absent continuation markers, wrong
+twenty-one pure temporary-file checks, including absent continuation markers, wrong
 producer hashes, multiple newly executed phases, exact-receipt mismatch, and
 second-generation preservation. These checks are preparation evidence only.
 The receipt helper is included in launcher frozen inputs, not the per-phase
@@ -222,3 +222,47 @@ cross-ID check too. Use state04 exact receipt
 and `--continuation-phase race --phase all` with the epoch continuation's exact
 SHA. The new script's official pure config/token checks can be run by passing
 its filename to `c20-materials-race-precheck.mjs`.
+
+## Functional checkpoint with preserved failed efficiency qualification
+
+The explicit `--functional-tail` mode requires `--phase all`, a stopped
+`--from-state`, `--expected-prior-runtime-sha256`,
+`--expected-failed-cost-sha256`, and `--functional-tail-sha256`. It accepts only
+a failed consumer-cost result with every preceding phase accepted. The original
+consumer-cost result is copied byte-for-byte and never enters accepted phases.
+The independently recorded `consumer-functional` producer fills the remaining
+functional assertions from existing participants/FINALs, then the unchanged
+cost, guards and restore producers execute in that same clone.
+
+The aggregate has `functionalCheckpointPassed` as a separate field. Overall
+`passed` and `efficiencyQualificationPassed` remain false even when all remaining
+functional phases pass. `functionalTail` records the original efficiency
+failure and exact producer/receipt hashes; imports verify that evidence and
+never reinterpret consumer-cost as passed. A future optimization uses a separate
+producer and receipt while reusing the original population, not this checkpoint
+as efficiency qualification. The original frozen manifest and runtime receipt
+are provided to the tail under `c20-functional-prior-*-private.json`; the clone's
+service ports and current manifest remain independently frozen.
+
+## Exact compact storage continuation
+
+When the later cost producer has already admitted its two storage cases but
+failed cross-record cipher equality, `--storage-tail-sha256` plus
+`--expected-failed-storage-sha256` extends explicit functional-tail mode. It
+requires an accepted consumer-functional phase and the exact failed cost file.
+That file remains false and byte-identical. The independent storage-functional
+producer reads the existing two candidates and original path responses, then
+guards and restore run normally. Both original failures remain excluded from
+accepted phases, and overall/efficiency qualification stays false.
+
+The compact codec uses gzip level1 before encryption. Different fixed-length
+UUIDs and hashes can have different compressed sizes. The storage continuation
+checks strict candidate and assignment keys, empty tool reference maps, no
+material bodies/groups, selected-only equal display material, equal candidate
+plaintext bytes and expanded published config. It calculates each record's
+exact production gzip parameters, declared plaintext length/digest, header and
+`headerBytes + 4*ceil((28+payloadBytes)/3)` size. It retains the observed 919/911
+bytes without asserting equality or inventing a tolerance. Only explicitly
+listed identity/hash fields are normalized for a separate exact structural
+comparison; materialDigest and every other field must remain equal. No new
+admission, FINAL, quota, or six-window SQL measurement is issued.

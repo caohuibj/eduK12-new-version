@@ -78,6 +78,33 @@ def main():
         checks.append('failed explicit continuation imports only previously accepted phases')
         bad = copy.deepcopy(partial); bad['failedPhaseResultsSha256']['main'] = '0' * 64
         rejects('failed continuation file hash mismatch rejected', bad)
+        functional = copy.deepcopy(second)
+        functional.update(passed=False, functionalCheckpointPassed=True, efficiencyQualificationPassed=False, acceptedPriorRuntimeSha256=old)
+        functional['phaseInputHashes']=copy.deepcopy(frozen['phaseInputHashes'])
+        failed_cost={'phase':'consumer-cost','passed':False,'checks':['functional population reached'],'error':{'message':'budget exceeded'}}
+        (root/'c20-consumer-cost-result.json').write_text(json.dumps(failed_cost))
+        failed_sha=m.sha_file(root/'c20-consumer-cost-result.json')
+        functional['functionalTail']={'phase':'consumer-functional','file':filename,'sha256':'2'*64,'priorRuntimeSha256':old,'failedPhase':'consumer-cost','failedResultSha256':failed_sha}
+        functional['phases']['consumer-functional']={'passed':True,'priorProducer':{'runtimeSha256':old,'resultSha256':failed_sha,'continuation':'Remaining functional assertions only'}}
+        frozen['phaseInputHashes']['consumer-functional']='a'*64
+        functional['phaseInputHashes']=copy.deepcopy(frozen['phaseInputHashes'])
+        _,accepted=m.import_receipt(root,write(functional))
+        assert 'consumer-cost' not in accepted and 'consumer-functional' in accepted
+        checks.append('functional checkpoint preserves false efficiency and excludes failed cost')
+        bad=copy.deepcopy(functional);bad['passed']=True;rejects('functional checkpoint cannot claim overall pass',bad)
+        bad=copy.deepcopy(functional);bad['functionalTail']['failedResultSha256']='0'*64;rejects('functional checkpoint failed-result pin mismatch rejected',bad)
+        storage = copy.deepcopy(functional)
+        storage['reusedPhases'].append('consumer-functional')
+        storage['functionalTail'].update(reused=True,evidenceReceiptSha256=old)
+        failed_storage={'phase':'cost','passed':False,'error':{'message':'911 != 919'}}
+        (root/'c20-cost-result.json').write_text(json.dumps(failed_storage));storage_sha=m.sha_file(root/'c20-cost-result.json')
+        storage['storageTail']={'phase':'storage-functional','file':filename,'sha256':'2'*64,'priorRuntimeSha256':old,'failedPhase':'cost','failedResultSha256':storage_sha}
+        storage['phases']['storage-functional']={'passed':True,'priorProducer':{'runtimeSha256':old,'resultSha256':storage_sha,'continuation':'Exact codec explanation only'}}
+        frozen['phaseInputHashes']['storage-functional']='b'*64;storage['phaseInputHashes']=copy.deepcopy(frozen['phaseInputHashes'])
+        _,accepted=m.import_receipt(root,write(storage));assert 'cost' not in accepted and 'consumer-cost' not in accepted and 'storage-functional' in accepted
+        checks.append('storage tail preserves both failures and reuses accepted functional tail')
+        bad=copy.deepcopy(storage);bad['storageTail']['failedResultSha256']='0'*64;rejects('storage tail wrong failure hash rejected',bad)
+        bad=copy.deepcopy(storage);bad['storageTail']['phase']='cost';rejects('storage tail cannot relabel failed cost as accepted',bad)
     print(json.dumps({'passed': True, 'scope': 'STATIC_RECEIPT_VALIDATION_ONLY', 'checks': checks}, indent=2))
 
 if __name__ == '__main__': main()

@@ -1,0 +1,35 @@
+{
+  "head": "43460d1a8c4e62312939f964a907dc8b7bea7a14",
+  "qualification": "Partial functionality; consumer-functional passed; cost cipher equality assertion FAILED (8 groups 911 bytes, 2 groups 919 bytes); guards/restore not executed; original consumer-cost failed; no C20 overall GO",
+  "members": {
+    "state06/c20-consumer-functional-result.json": {
+      "size": 5730,
+      "sha256": "47f71850ddb466910074c9feb84ad46ea5a6dd5cef97408c51e87fa5d938f4e8",
+      "gzipSize": 1868,
+      "gzipSha256": "c5bf9e6d5d4029c5a47d382eb43a161ed7e8e7aa2755122d0e1aebc229870fca"
+    },
+    "state06/c20-cost-result.json": {
+      "size": 15942,
+      "sha256": "bcba3893df12d893004db0e2c91a93138bb7fe30118c31876f138824de27b2f3",
+      "gzipSize": 1847,
+      "gzipSha256": "ff91fb0f822c8cb20dff364693532529967421839135416cc49071d110d2c7a3"
+    },
+    "state06/c20-runtime-result.json": {
+      "size": 289997,
+      "sha256": "14aff9859ce69b8c4358b4dd3fd012e1e00946725943971fe4d29359c7c8fdb4",
+      "gzipSize": 32613,
+      "gzipSha256": "86b2de5cf8d340d964dfa7d4e116d6d79058c83696240e1198914a5885c2d850"
+    },
+    "state06/frozen-inputs.json": {
+      "size": 358861,
+      "sha256": "2257e9fb08d62b7b79489805e89cba684c02c57c790c9990d9a72385ad791625",
+      "gzipSize": 86756,
+      "gzipSha256": "052ed516c6e94b4060ac332d51b7ae5a6c4d04bc462d81bf23fa578779a87948"
+    }
+  },
+  "archive": {
+    "name": "checkpoint07-runtime-partial.tar.gz",
+    "size": 122538,
+    "sha256": "aa55b8288a000931d7ccf5925a23cc5c79e0243ace5fba652a678f250afa992f"
+  }
+}
