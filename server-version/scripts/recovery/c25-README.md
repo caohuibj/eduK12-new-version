@@ -952,3 +952,11 @@ Uncertain or failed writes retain issued intent and stop without resubmission.
 Preparation is capped at 2MiB new tools plus 8MiB private evidence. Targeted tests
 run under the exclusive measurement lock with a 90s aggregate command limit.
 No measurement database or future 1,200s run is authorized by this documentation.
+
+The bounded child adapter also scans its verified owned PGID after the leader
+closes. Any live descendant permanently fails the observation, even if subsequent
+bounded group cleanup succeeds. Scan/permission/parse failures do not mean an
+empty group. Cleanup records actual members and requires no live member before
+settlement; retained Z/X entries are not falsely described as waitpid-reaped.
+The scan shares the original aggregate deadline. The targeted descendant fault
+uses real same-group processes and covers both normal and abnormal leader close.

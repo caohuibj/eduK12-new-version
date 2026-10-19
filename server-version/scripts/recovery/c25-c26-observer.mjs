@@ -109,9 +109,10 @@ export function observeResourceChild(child,{nonce,role,deadlineMs=5000,killGrace
  assert.ok(child&&Number.isSafeInteger(child.pid)&&child.pid>0&&child.connected,'live IPC child required')
  const owned=procIdentity(child.pid);assert.equal(owned.processGroupId,child.pid,'detached owned process group required')
  return new Promise((resolve,reject)=>{
-  let start,terminal,failure,done=false,killer,reaper,startAck=false,terminalAck=false
-  const lifecycle={pid:child.pid,processGroupId:owned.processGroupId,startTicks:owned.startTicks,nonce,role,closeObserved:false,code:null,signal:null,terminationSignals:[]}
-  const finish=()=>{if(done)return;done=true;clearTimeout(timer);clearTimeout(killer);clearTimeout(reaper);child.off('message',message);child.off('error',fail);child.off('close',closed);if(failure){failure.lifecycle={...lifecycle};reject(failure)}else resolve({start,terminal,lifecycle:{...lifecycle,startAck,terminalAck}})}
+  let start,terminal,failure,done=false,killer,reaper,groupPoll,startAck=false,terminalAck=false
+  const hardDeadline=performance.now()+deadlineMs+killGraceMs+reapMs
+  const lifecycle={pid:child.pid,processGroupId:owned.processGroupId,startTicks:owned.startTicks,nonce,role,closeObserved:false,code:null,signal:null,terminationSignals:[],groupQuiescent:false}
+  const finish=()=>{if(done)return;done=true;clearTimeout(timer);clearTimeout(killer);clearTimeout(reaper);clearTimeout(groupPoll);child.off('message',message);child.off('error',fail);child.off('close',closed);if(failure){failure.lifecycle={...lifecycle};reject(failure)}else resolve({start,terminal,lifecycle:{...lifecycle,startAck,terminalAck}})}
   const signal=name=>{let sent=false;try{process.kill(-owned.processGroupId,name);sent=true}catch(error){if(error.code!=='ESRCH')failure??=error}lifecycle.terminationSignals.push({signal:name,sent})}
   const fail=error=>{
    if(done||failure)return
@@ -130,12 +131,39 @@ export function observeResourceChild(child,{nonce,role,deadlineMs=5000,killGrace
     child.send(ack,error=>{if(error)fail(error);else if(phase==='start')startAck=true;else terminalAck=true})
    }catch(error){fail(error)}
   }
+  const groupMembers=()=>{
+   const members=[]
+   for(const name of fs.readdirSync('/proc'))if(/^[1-9][0-9]*$/.test(name)){
+    try{const member=procIdentity(Number(name));if(member.processGroupId===owned.processGroupId)members.push(member)}
+    catch(error){if(!['ENOENT','ESRCH'].includes(error.code))throw error}
+   }
+   return members.sort((a,b)=>a.pid-b.pid)
+  }
+  const liveMembers=members=>members.filter(member=>!['Z','X','x'].includes(member.state))
   const closed=(code,signalName)=>{
    lifecycle.closeObserved=true;lifecycle.code=code;lifecycle.signal=signalName
    failure??=code!==0||signalName?new Error('resource child abnormal close'):!start||!terminal?new Error('missing start or terminal resource sample'):!startAck||!terminalAck?new Error('missing resource ACK'):null
-   // Do not cancel escalation merely because the leader closed before its group.
-   if(failure&&!lifecycle.terminationSignals.some(entry=>entry.signal==='SIGKILL'))signal('SIGKILL')
-   finish()
+   // Reaping the leader does not prove its owned session/process group is idle.
+   clearTimeout(timer);clearTimeout(killer);clearTimeout(reaper)
+   const groupStarted=performance.now(),groupDeadline=Math.min(hardDeadline,groupStarted+reapMs)
+   try{
+    lifecycle.groupMembersAtClose=groupMembers()
+    if(liveMembers(lifecycle.groupMembersAtClose).length){
+     failure??=new Error('live descendant remained after resource leader close')
+     signal('SIGKILL')
+    }
+   }catch(error){failure??=error;signal('SIGKILL')}
+   const settle=()=>{
+    try{
+     lifecycle.finalGroupMembers=groupMembers()
+     lifecycle.groupQuiescent=liveMembers(lifecycle.finalGroupMembers).length===0
+     lifecycle.groupWaitMs=performance.now()-groupStarted
+     if(lifecycle.groupQuiescent){finish();return}
+     if(performance.now()>=groupDeadline){failure??=new Error('owned process group still live after bounded cleanup');finish();return}
+     groupPoll=setTimeout(settle,20)
+    }catch(error){failure??=error;finish()}
+   }
+   settle()
   }
   const timer=setTimeout(()=>fail(new Error('resource child deadline exceeded')),deadlineMs)
   child.on('message',message);child.on('error',fail);child.once('close',closed)
@@ -172,7 +200,7 @@ export function summarizeProcesses(samples,hz,{children=[],requiredChildren=[]}=
   const {start,terminal,lifecycle}=child,id=identityKey(start)
   assert.ok(!terminalIds.has(id),'duplicate terminal physical account');terminalIds.add(id)
   validateNodeResourceSample(terminal,{nonce:start.nonce,role:start.role,pid:start.pid,startTicks:start.startTicks,phase:'terminal',previous:start})
-  assert.ok(lifecycle?.closeObserved&&lifecycle.startAck&&lifecycle.terminalAck,'missing terminal handshake/close')
+  assert.ok(lifecycle?.closeObserved&&lifecycle.startAck&&lifecycle.terminalAck&&lifecycle.groupQuiescent,'missing terminal handshake/close or owned group still live')
   assert.equal(lifecycle.code,0);assert.equal(lifecycle.signal,null);assert.equal(lifecycle.pid,start.pid);assert.equal(lifecycle.nonce,start.nonce);assert.equal(lifecycle.role,start.role)
   const entry=accounts.get(id)??{id,pid:start.pid,startTicks:start.startTicks,roles:new Set()}
   entry.roles.add(start.role);entry.child=child;accounts.set(id,entry)
