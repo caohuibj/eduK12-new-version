@@ -33,6 +33,21 @@ export const loadScaleFactRecords=async(identities:Array<{id:string;attemptEpoch
   ${withRaw?Prisma.sql`raw_answers_encrypted`:Prisma.sql`NULL::text`} AS "rawAnswersEncrypted",raw_receipt_attempt_id AS "rawReceiptAttemptId",completed_at AS "completedAt",total_time AS "totalTime"
   FROM assessment_result_facts WHERE (assessment_id,attempt_epoch) IN (${Prisma.join(unique.map(x=>Prisma.sql`(${x.id},${x.attemptEpoch})`))})`
 }
+// Metadata only: budget ciphertext plus declared compact plaintext before fetching it.
+export type ScaleFactRecordSize={id:string;attemptEpoch:number;submissionId:string;submissionPayloadHash:string;sizeBytes:bigint|number;rawReceiptAttemptId:string|null}
+export const storedScaleFieldSizeSql=(field:Prisma.Sql):Prisma.Sql=>Prisma.sql`COALESCE(octet_length(${field}),0)+CASE
+ WHEN ${field} LIKE 'ekc1:%' AND split_part(${field},':',4) ~ '^[0-9]{1,15}$'
+ THEN split_part(${field},':',4)::bigint ELSE 0 END`
+export const loadScaleFactRecordSizes=async(identities:Array<{id:string;attemptEpoch:number}>,db:Pick<Prisma.TransactionClient,'$queryRaw'>=prisma):Promise<ScaleFactRecordSize[]>=>{
+ if(!identities.length)return []
+ const unique=[...new Map(identities.map(x=>[JSON.stringify([x.id,x.attemptEpoch]),x])).values()]
+ for(const x of unique)if(typeof x.id!=='string'||!x.id||!Number.isSafeInteger(x.attemptEpoch)||x.attemptEpoch<1)throw new Error('Invalid result fact identity')
+ return db.$queryRaw<ScaleFactRecordSize[]>`SELECT assessment_id AS id,attempt_epoch AS "attemptEpoch",submission_id AS "submissionId",payload_hash AS "submissionPayloadHash",
+  (${storedScaleFieldSizeSql(Prisma.sql`facts_encrypted`)}+${storedScaleFieldSizeSql(Prisma.sql`raw_answers_encrypted`)}) AS "sizeBytes",
+  raw_receipt_attempt_id AS "rawReceiptAttemptId" FROM assessment_result_facts
+  WHERE (assessment_id,attempt_epoch) IN (${Prisma.join(unique.map(x=>Prisma.sql`(${x.id},${x.attemptEpoch})`))})`
+}
+
 export const persistScaleFactRecords=async(db:FactDb,rows:ScaleFactRecord[]):Promise<void>=>{
  if(!rows.length)return
  const data=rows.map(row=>({id:row.id,attemptEpoch:row.attemptEpoch,submissionId:row.submissionId,payloadHash:row.submissionPayloadHash,

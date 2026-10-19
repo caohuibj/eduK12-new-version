@@ -9,6 +9,7 @@ exact optimization and unchanged comparison inputs are separately frozen.
 """
 import argparse
 import fcntl
+import hashlib
 import importlib.util
 import json
 import os
@@ -44,6 +45,12 @@ PINNED_HEAD = '11feee924fd2def2c7e2f6ae849d66ab59e3e2da'
 PINNED_PLAN = '22b822ea37eb2dabcce618be1d78f534f054c3a781ce226bb7343edbf0681304'
 PINNED_RUNTIME = '2c2b36735802dedcba5cf905bdce1c8430b1756cc86f8f78c8e127f7c15f77a5'
 PINNED_DUMP = 'ceee3749d21dead15d1c838d945131fd18c3b7d6accfa58212fce287c4bfdb9c'
+PINNED_BEFORE_RUNTIME = 'ba9a08e16b6acfebb3a4c2a61e31ebffd14ea00ce312d5beb5e71b9fbd0fcd6c'
+AFTER_BUSINESS_PATHS = {
+    'server-version/backend/src/modules/assessment-runtime/compact-assessment-storage.ts',
+    'server-version/backend/src/modules/assessment-runtime/scale-fact-records.ts',
+    'server-version/backend/src/modules/composite/composite-export.service.ts',
+}
 PRODUCERS = {'consumers': 'c20-efficiency-consumers.mjs', 'chains': 'c20-efficiency-chains.mjs'}
 SUPPORT = {
     'c20-efficiency-http.py', 'c20-efficiency-observer.mjs',
@@ -69,10 +76,29 @@ def selected_scenarios(scenario):
     return ['consumers', 'chains'] if scenario == 'all' else ['consumers']
 
 
-def validate_phase(phase, head):
-    assert phase == 'before', 'after mode is reserved: exact approved changed-source/comparison contract has not been implemented'
+def validate_phase(phase, head, contract=None):
+    assert phase in ['before', 'after']
+    if phase == 'after':
+        assert contract and contract.get('schemaVersion') == 1 and contract.get('phase') == 'after', 'after requires explicit frozen optimization contract'
+        assert contract.get('beforeRuntimeSha256') == PINNED_BEFORE_RUNTIME
+        assert contract.get('businessChanges') and set(contract['businessChanges']) <= AFTER_BUSINESS_PATHS
+        assert re.fullmatch(r'[0-9a-f]{64}', contract.get('runtimeFingerprintSha256', ''))
+        for hashes in contract['businessChanges'].values():
+            assert set(hashes) == {'beforeSha256', 'afterSha256'}
+            assert all(re.fullmatch(r'[0-9a-f]{64}', value) for value in hashes.values())
+    else:
+        assert contract is None
     assert re.fullmatch(r'[0-9a-f]{40}', head), 'execution HEAD must be an explicit full commit'
     # The main entry separately proves no BUSINESS diff from PINNED_HEAD.
+
+
+def validate_before_instrumentation(before_result, before_frozen):
+    assert digest(before_frozen['sourceInputs']) == before_result['sourceInputsSha256'], 'before frozen source digest mismatch'
+    assert before_frozen['sourceInputsSha256'] == before_result['sourceInputsSha256']
+    originals = {item['path']: item['sha256'] for item in before_frozen['sourceInputs']}
+    consumer = 'server-version/scripts/recovery/c20-efficiency-consumers.mjs'
+    assert originals[consumer] == before_result['scenarios']['consumers']['producerSha256'], 'before consumer producer identity mismatch'
+    return originals
 
 
 def main():
@@ -85,8 +111,18 @@ def main():
     parser.add_argument('--expected-head', required=True)
     parser.add_argument('--phase', choices=['before', 'after'], default='before')
     parser.add_argument('--scenario', choices=['all', 'consumers'], default='all')
+    parser.add_argument('--after-contract', type=Path)
+    parser.add_argument('--expected-after-contract-sha256')
     args = parser.parse_args()
-    validate_phase(args.phase, args.expected_head)
+    contract = None
+    if args.phase == 'after':
+        assert args.after_contract and args.expected_after_contract_sha256
+        assert sha_file(args.after_contract) == args.expected_after_contract_sha256
+        contract = json.loads(args.after_contract.read_text())
+        assert args.scenario == 'consumers', 'new resource FINALs are never replayed after optimization'
+    else:
+        assert not args.after_contract and not args.expected_after_contract_sha256
+    validate_phase(args.phase, args.expected_head, contract)
     tools, source, state, plan_file = [p.resolve() for p in [args.tools, args.source_state, args.state, args.plan]]
     assert args.expected_plan_sha256 == PINNED_PLAN and sha_file(plan_file) == PINNED_PLAN
     plan = json.loads(plan_file.read_text())
@@ -96,7 +132,16 @@ def main():
     assert plan['sourceDumpSha256'] == PINNED_DUMP
     assert re.fullmatch(r'[0-9a-f]{40}', args.expected_head)
     assert subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=REPO, text=True).strip() == args.expected_head
-    assert subprocess.run(['git', 'diff', '--quiet', PINNED_HEAD, args.expected_head, '--', *BUSINESS], cwd=REPO).returncode == 0, 'execution commit changes functional baseline BUSINESS inputs'
+    if args.phase == 'before':
+        assert subprocess.run(['git', 'diff', '--quiet', PINNED_HEAD, args.expected_head, '--', *BUSINESS], cwd=REPO).returncode == 0, 'execution commit changes functional baseline BUSINESS inputs'
+    else:
+        changed = {file for file in git_paths('diff', '--name-only', '-z', PINNED_HEAD, args.expected_head, '--', *BUSINESS) if business_input(file)}
+        assert changed == set(contract['businessChanges']) <= AFTER_BUSINESS_PATHS
+        for file, hashes in contract['businessChanges'].items():
+            original = subprocess.check_output(['git', 'show', PINNED_HEAD + ':' + file], cwd=REPO)
+            assert hashlib.sha256(original).hexdigest() == hashes['beforeSha256']
+            assert sha_file(REPO / file) == hashes['afterSha256']
+
     assert not [file for file in git_paths('diff', '--name-only', '-z', 'HEAD', '--', *BUSINESS) if business_input(file)], 'uncommitted baseline business input'
     assert not [file for file in git_paths('ls-files', '--others', '--exclude-standard', '-z', '--', *BUSINESS) if business_input(file)], 'untracked baseline business input'
     assert state.parent.is_dir() and not state.exists()
@@ -128,6 +173,25 @@ def main():
         url = urlparse(effective[key])
         effective[key] = url._replace(netloc=f'{url.username}:{url.password}@127.0.0.1:0').geturl()
     configuration_hash = digest(effective)
+    baseline_binding = None
+    if contract:
+        before_state = Path(contract['beforeState']).resolve()
+        assert before_state != state and before_state != source
+        stopped(before_state)
+        assert sha_file(before_state / 'c20-efficiency-runtime-result.json') == PINNED_BEFORE_RUNTIME
+        before_result = json.loads((before_state / 'c20-efficiency-runtime-result.json').read_text())
+        assert all(before_result.get(key) is True for key in ['passed', 'cleanupVerified', 'sourceUnchanged', 'inputsUnchanged'])
+        baseline_binding = before_state / 'c20-efficiency-consumers-binding-private.json'
+        assert sha_file(baseline_binding) == contract['beforeBindingSha256']
+        baseline = json.loads(baseline_binding.read_text())
+        assert baseline['passed'] is True and baseline['phase'] == 'before' and len(baseline['stages']) == 6
+        assert {item['artifactName']: item['directSha256'] for item in baseline['stages']} == contract['beforeCsvSha256']
+        for name, expected in contract['beforeCsvSha256'].items():
+            assert Path(name).name == name and sha_file(before_state / name) == expected
+        before_frozen = json.loads((before_state / 'frozen-inputs.json').read_text())
+        originals = validate_before_instrumentation(before_result, before_frozen)
+        for name in ['c20-efficiency-consumers.mjs', 'c20-efficiency-observer.mjs', 'c20-materials-client.mjs', 'c20-materials-fixture.mjs', 'c20-efficiency-probes-precheck.mjs']:
+            assert sha_file(BASE / name) == originals[str((BASE / name).relative_to(REPO))], 'comparison instrumentation changed'
     scenarios = selected_scenarios(args.scenario)
     consumed = SUPPORT | {PRODUCERS[scenario] for scenario in scenarios}
     # The consumer's shared pure input-contract helper is consumed explicitly.
@@ -164,7 +228,7 @@ def main():
             entries.append({'path': str(file.relative_to(REPO)), 'mode': file.stat().st_mode & 0o777, 'sha256': sha_file(file)})
         fingerprint = json.loads(subprocess.check_output([node, BASE / 'runtime-fingerprint.cjs', BACKEND], text=True))
         driver = json.loads(subprocess.check_output([node, '-e', "require('pg');const fs=require('fs'),c=require('crypto');process.stdout.write(JSON.stringify(Object.keys(require.cache).sort().map(p=>({path:p,sha256:c.createHash('sha256').update(fs.readFileSync(p)).digest('hex')}))))"], cwd=BACKEND, text=True))
-        return {'head': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=REPO, text=True).strip(), 'sourceInputs': entries, 'sourceInputsSha256': digest(entries), 'runtimeFingerprint': fingerprint, 'toolExecutables': {str(file.relative_to(tools)): sha_file(file) for file in [node, pg / 'postgres', pg / 'psql', pg / 'pg_dump', pg / 'pg_restore', redis]}, 'generatedClientManifestSha256': digest(manifest(BACKEND / 'node_modules/.prisma/client')), 'runtimeConfigurationSha256': configuration_hash, 'readinessDriver': driver, 'planSha256': sha_file(plan_file)}
+        return {'head': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=REPO, text=True).strip(), 'sourceInputs': entries, 'sourceInputsSha256': digest(entries), 'runtimeFingerprint': fingerprint, 'toolExecutables': {str(file.relative_to(tools)): sha_file(file) for file in [node, pg / 'postgres', pg / 'psql', pg / 'pg_dump', pg / 'pg_restore', redis]}, 'generatedClientManifestSha256': digest(manifest(BACKEND / 'node_modules/.prisma/client')), 'runtimeConfigurationSha256': configuration_hash, 'readinessDriver': driver, 'planSha256': sha_file(plan_file), 'afterContractSha256': sha_file(args.after_contract) if contract else None}
 
     def verify():
         assert binding() == pinned, 'frozen efficiency source/runtime/tool input changed'
@@ -246,11 +310,26 @@ def main():
         record()
         pinned = binding()
         # Exact runtime and generated client, not simply a similarly named build.
-        assert pinned['runtimeFingerprint'] == source_result['runtimeFingerprint'], 'baseline runtime dist differs from accepted functional source'
+        if not contract:
+            assert pinned['runtimeFingerprint'] == source_result['runtimeFingerprint'], 'baseline runtime dist differs from accepted functional source'
+        else:
+            assert digest(pinned['runtimeFingerprint']) == contract['runtimeFingerprintSha256'], 'after dist differs from frozen reviewed build'
+            write('after-contract-private.json', contract)
+
         assert pinned['generatedClientManifestSha256'] == source_result['generatedClientManifestSha256']
         old_source = {entry['path']: entry for entry in json.loads((source / 'frozen-inputs.json').read_text())['sourceInputs'] if entry['path'].startswith('server-version/backend/')}
         current_source = {entry['path']: entry for entry in pinned['sourceInputs'] if entry['path'].startswith('server-version/backend/')}
-        assert current_source == old_source, 'baseline business source differs from accepted functional source'
+        if not contract:
+            assert current_source == old_source, 'baseline business source differs from accepted functional source'
+        else:
+            assert set(current_source) == set(old_source)
+            actual_changes = {name for name in current_source if current_source[name] != old_source[name]}
+            assert actual_changes == set(contract['businessChanges'])
+            for name in actual_changes:
+                assert current_source[name]['mode'] == old_source[name]['mode']
+                assert current_source[name]['sha256'] == contract['businessChanges'][name]['afterSha256']
+                assert old_source[name]['sha256'] == contract['businessChanges'][name]['beforeSha256']
+
         write('frozen-inputs.json', pinned)
         result.update({key: value for key, value in pinned.items() if key != 'sourceInputs'})
         source_manifest = manifest(source)
@@ -308,7 +387,10 @@ def main():
             verify()
             status.update(state='running', activeScenario=scenario)
             record()
-            run([node, '--require', BASE / 'loopback-only.cjs', BASE / PRODUCERS[scenario], state, '--phase', args.phase], 'producer-' + scenario, public_runtime)
+            producer_argv = [node, '--require', BASE / 'loopback-only.cjs', BASE / PRODUCERS[scenario], state, '--phase', args.phase]
+            if baseline_binding:
+                producer_argv += ['--baseline', baseline_binding]
+            run(producer_argv, 'producer-' + scenario, public_runtime)
             receipt = state / ('c20-efficiency-' + scenario + '-result.json')
             parsed = json.loads(receipt.read_text())
             assert parsed.get('passed') is True, scenario + ' did not produce passed resource receipt'
@@ -316,7 +398,17 @@ def main():
             if scenario == 'consumers':
                 assert count == initial_final_count, 'consumer baseline must not create new accepted FINAL snapshots'
             assert 0 <= count - initial_final_count <= 10, 'resource fixture exceeded ten accepted FINAL snapshots'
-            result['scenarios'][scenario] = {'passed': True, 'resultSha256': sha_file(receipt), 'newAcceptedSnapshots': count - initial_final_count, 'producerSha256': sha_file(BASE / PRODUCERS[scenario]), 'resourceWindows': len(parsed.get('resourceMeasurements', []))}
+            if contract:
+                projected = [row for row in parsed['consumerMeasurements'] if row['label'].startswith('direct_export_projection_')]
+                assert len(projected) == 6
+                for wave in [0, 1]:
+                    rows = sorted([row for row in projected if row['wave'] == wave], key=lambda row: row['selectedPerWave'])
+                    assert [row['selectedPerWave'] for row in rows] == [11, 21, 51]
+                    assert all(row['sqlCount'] <= 26 and row['modelCalls'].get('RAW.queryRaw', 0) <= 8 for row in rows), 'bounded batch SQL budget failed'
+                    assert max(row['sqlCount'] for row in rows) - min(row['sqlCount'] for row in rows) <= 2, 'unexpected per-person SQL growth within one batch'
+                result['affectedExportSqlBudgetPassed'] = True
+                result['comparisonScope'] = 'SAME_STATE09_START_AND_ORDERED_51_FIXTURES; SQL_BATCH_BUDGET_ONLY; CPU_RSS_RAW_OBSERVATIONS_NOT_CAPACITY'
+            result['scenarios'][scenario] = {'passed': True, 'resultSha256': sha_file(receipt), 'newAcceptedSnapshots': count - initial_final_count, 'producerSha256': sha_file(BASE / PRODUCERS[scenario]), 'argv': list(map(str, producer_argv)), 'resourceWindows': len(parsed.get('resourceMeasurements', []))}
             assert result['scenarios'][scenario]['resourceWindows'] > 0, 'resource observation is missing'
             write('c20-efficiency-checkpoint.json', {'at': time.time(), 'completedScenarios': result['scenarios'], 'sourceInputsSha256': pinned['sourceInputsSha256'], 'restartPolicy': 'NO_AUTOMATIC_FINAL_REPLAY'})
             verify()

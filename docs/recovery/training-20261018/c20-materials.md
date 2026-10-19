@@ -115,3 +115,30 @@ state09 已完成全部13项功能/存储/恢复producer链，functionalCheckpoi
 实际新链：单次准入137.28ms、并发2外层准入144.42ms、四工具准入142.65ms；120合成trial Cognitive FINAL87.61ms，SJT FINAL116.17ms。报告worker在producer中执行，drain窗口还包含test-only非目标job行锁隔离的setup/release，因此不是纯worker成本。最后两个约30秒idle窗口，API末RSS376487936/376496128B，producer末RSS345702400/345710592B；不据此证明无泄漏或长期稳定性，不模拟浏览器/人工作答时间。
 
 checkpoint12保留两个独立observer原始accounting JSONL的逐字节副本、全部63窗口资源值、冻结输入及就绪/总结果。消费者/chain结果仅移除request route字符串，并明确记录原文件SHA和变换版本；不包含runtime凭据、HTTP正文、DB或私有CSV。每窗observer通常另有20个查询，三次全库relation-size/stat快照及250ms activity均计入原始PG/WAL/IO；自身CPU/query开销单列，不简单扣除。before原始数据库来源是state09；after须从相同state09起点按同消费者序列和精确IDs执行，不能拿含新增10FINAL/artifact的state10尾库当等价起点。
+
+## 效率 checkpoint：有界 Scale 导出读取与 state11 同输入验证
+
+业务实现冻结于 f37d95b31aad69b8fde706b90f01705f3ccb0c50，仅修改 assessment-runtime/compact-assessment-storage.ts、assessment-runtime/scale-fact-records.ts 和 composite/composite-export.service.ts。授权及选定 graph/scope 之后，按原顺序请求内预载最多64条、估计最多1MiB的 facts/raw；先用长度投影规划，再读取正文。1MiB是密文加声明明文的预算，不是 JavaScript heap 上限。已有 graph 和输出 rows 仍整体物化。超大单行、legacy引用、metadata/批量读取失败沿原逐行路径，不新增拒绝；完整 whole parser、身份/epoch/submission/payload绑定及逐行错误语义保留。只有已经纳入预算的 receipt 才缓存 whole 解码 body，未规划 legacy fallback 不驻留；每批及最终均释放请求内引用，不使用跨请求/跨actor缓存。超过64条或字节预算按有界分块增加SQL，legacy/oversize/fallback不承诺固定查询数。
+
+最终同源资格为 build-03 的9个直接受影响测试文件、185项通过，以及 build-02 的当前 f37 TypeScript emission和新launcher篡改 frozen-inputs负例。build-01 的8258输入184项、build-02重复定向14项/13跳过仅作为各自历史记录，不相加为最终用例数。七项未变build前置的425文件保守输入闭包与原成功记录逐SHA一致，保留复用证明；本次执行的是等价官方tsc阶段，不能称重新执行了整个npm build入口。after绑定同时验证固定before runtime、before sourceInputs digest及原consumer producer SHA。
+
+state11从同一state09源重新克隆，执行相同30个消费者观察窗口、同actor/精确IDs/dateRange/选项/顺序及同仪器。未新增FINAL；原51主体、102父、204事实及source/assignment绑定保持。六份direct/download CSV均与before实际字节一致。runtime receipt SHA c9569b14b5d182d09ff3e4006e98bac90f2ca270b44b3b609f26da4477e7a373；passed、affectedExportSqlBudgetPassed、cleanupVerified、sourceUnchanged、inputsUnchanged均true。原state05 consumer-cost及state06 cost失败仍原SHA/false留存，新资格不改写旧结果。
+
+| 实际人数/波次 | 原始SQL before→after | 仅去SELECT1的SQL | producer CPU μs | 耗时 ms | 100ms采样RSS峰 B before→after |
+| --- | --- | --- | --- | --- | --- |
+| 11/0 | 40→20 | 40→20 | 71834→75382 | 68.71→71.75 | 267243520→266584064 |
+| 11/1 | 41→21 | 41→21 | 45138→45903 | 43.98→46.60 | 273260544→277049344 |
+| 21/0 | 61→21 | 60→20 | 89240→75183 | 68.88→61.68 | 295542784→318193664 |
+| 21/1 | 60→21 | 60→20 | 78342→53546 | 78.42→52.87 | 315539456→319176704 |
+| 51/0 | 120→20 | 120→20 | 208728→137748 | 193.52→117.11 | 334135296→337108992 |
+| 51/1 | 120→20 | 120→20 | 146383→92290 | 143.14→85.18 | 340578304→338087936 |
+
+补正上节“SELECT1造成±1”的概括：实际SELECT1只出现在before的21/0及after的21/0、21/1窗口。11/1还有一条 assessment_public_templates 的单hash读取，形状SHA a00f6366d60309ad467627c565c8985267c4d3f88cb98c743bc1f0bf759af621，不能把所有常数差都归因于探活。原始及仅去SELECT1口径均保留，不删除真实公共模板读取成本。
+
+六窗口facts密文读取分别21844/21804/41716/41676/101284/101212B降为10922/10902/20858/20838/50642/50606B；raw读取仍3762/3762/7182/7182/17442/17442B。返回顶层行数70/71/130/130/310/310未变，长度metadata行替代重复facts读取，不能把facts密文减半描述为全部网络字节减半。两侧30窗口包络数据库分配量均72801303→72809495B，增长8192B；六份CSV artifact合计均102784B；observer自身均601查询，原始PG/WAL/IO保留其开销和窗口间活动，不盲目扣除。
+
+这些是同序列、渐暖缓存、带observer扰动的单次匹配窗口观察。11人两波都略慢且CPU略增，RSS结果混合，21/0增加22650880B，51/0也增加；不宣称全面更快、更省内存、统计显著收益或容量GO。100ms采样可能漏峰，VmHWM是进程lifetime，PG新建/退出backend首末采样可能漏CPU。可靠限定结论是本次相同51主体范围内六次导出SQL由40–120降为20–21、重复facts密文读取减半，科学输出/授权绑定保持。state10另含单次、并发2和一条四工具新链的资源审计，覆盖发布/准入/state/FINAL/report/analysis/export观察；其合成120trial不是人工作答或浏览器时序，after没有重放这些未受影响新链。
+
+checkpoint13-efficiency-after.tar.gz含24个脱敏成员，1404676B，SHA f3323cee26956a95f57cb8ec5f5f170df6b9929099c7a088ef1d2d49f28b105b。包括state11原始observer、冻结输入/结果、精确原after contract、前后比较、最终及历史测试日志/源绑定和前置复用证明；消费者结果仅移除request route并记录原SHA。不含私有DB、凭据、HTTP正文或私有CSV。before的checkpoint12及全部旧失败继续保留。
+
+功能与受影响导出效率的独立review收口后，交root保护提交并运行获准的正式受影响CI/PR流程。本轮停止新功能；C21及后续暂停。browser、新fresh/selected-video、C26容量及既有C19两个独立缺口不在本次效率资格内。

@@ -21,6 +21,38 @@ class EfficiencyLauncherContract(unittest.TestCase):
             with self.assertRaises(AssertionError):
                 launcher.validate_phase(phase, head)
 
+    def test_after_requires_exact_bounded_contract(self):
+        contract = {'schemaVersion': 1, 'phase': 'after', 'beforeRuntimeSha256': launcher.PINNED_BEFORE_RUNTIME,
+                    'runtimeFingerprintSha256': 'a' * 64,
+                    'businessChanges': {next(iter(launcher.AFTER_BUSINESS_PATHS)): {'beforeSha256': 'b' * 64, 'afterSha256': 'c' * 64}}}
+        launcher.validate_phase('after', '1' * 40, contract)
+        for change in [{'beforeRuntimeSha256': 'd' * 64}, {'businessChanges': {}},
+                       {'businessChanges': {'server-version/backend/prisma/schema.prisma': {'beforeSha256': 'b' * 64, 'afterSha256': 'c' * 64}}},
+                       {'runtimeFingerprintSha256': 'missing'}]:
+            with self.assertRaises(AssertionError):
+                launcher.validate_phase('after', '1' * 40, {**contract, **change})
+        with self.assertRaises(AssertionError):
+            launcher.validate_phase('before', '1' * 40, contract)
+        source = (BASE / 'c20-efficiency-http.py').read_text()
+        self.assertIn("args.scenario == 'consumers'", source)
+        self.assertIn("'comparison instrumentation changed'", source)
+        self.assertIn("'--baseline', baseline_binding", source)
+        self.assertIn("row['sqlCount'] <= 26", source)
+        self.assertIn("max(row['sqlCount']", source)
+
+    def test_before_instrumentation_rejects_tampered_frozen_inputs(self):
+        path = 'server-version/scripts/recovery/c20-efficiency-consumers.mjs'
+        inputs = [{'path': path, 'mode': 420, 'sha256': 'a' * 64}]
+        digest = launcher.digest(inputs)
+        receipt = {'sourceInputsSha256': digest, 'scenarios': {'consumers': {'producerSha256': 'a' * 64}}}
+        frozen = {'sourceInputs': inputs, 'sourceInputsSha256': digest}
+        self.assertEqual(launcher.validate_before_instrumentation(receipt, frozen)[path], 'a' * 64)
+        for changed in [{'sourceInputs': [{**inputs[0], 'sha256': 'b' * 64}]}, {'sourceInputsSha256': 'b' * 64}]:
+            with self.assertRaises(AssertionError):
+                launcher.validate_before_instrumentation(receipt, {**frozen, **changed})
+        with self.assertRaises(AssertionError):
+            launcher.validate_before_instrumentation({**receipt, 'scenarios': {'consumers': {'producerSha256': 'b' * 64}}}, frozen)
+
     def test_structural_readiness_policy(self):
         self.assertTrue(launcher.old.postgres_readiness_status(0, {'ready': True}))
         self.assertFalse(launcher.old.postgres_readiness_status(75, {'code': '57P03'}))

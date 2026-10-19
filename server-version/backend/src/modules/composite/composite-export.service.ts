@@ -9,6 +9,7 @@ import { readLoadedCompositeTypedFormValues } from '../assessment-runtime/typed-
 import { mapCompositeSection } from '../assessment-runtime/form-section-definition'
 import { protectCsvCell } from '../../utils/exportCsvCell'
 import { loadScaleResult } from '../scale/scale-workflow.service'
+import { createStoredScaleExportReader } from '../assessment-runtime/compact-assessment-storage'
 import { loadScaleAnswers } from '../scale/scale-workflow.service'
 import { compositeForbidden, compositeBadRequest } from './composite.errors'
 import { wideExportPackage } from '../../services/wideExportPackage'
@@ -418,6 +419,19 @@ export const getExportData = async (
   })
   const rows: Record<string, unknown>[] = []
   let trialCount = 0
+  // Only the already-authorized, selected graph may enter the request-local
+  // reader. Its order matches projection below, including multi-Scale attempts.
+  const orderedScaleRecords: any[] = []
+  for (const attempt of template.attempts as any[]) {
+    const scope = variantGraph?.scopes.get(attempt.id)
+    for (const item of template.items) {
+      if (item.type !== 'SCALE' || (scope && !scope.itemIds.has(item.id))) continue
+      const record = attempt.scaleAssessments.find((assessment: any) => assessment.compositeItemId === item.id)
+      if (record) orderedScaleRecords.push(record)
+    }
+  }
+  const scaleReader = createStoredScaleExportReader(orderedScaleRecords)
+  try {
   for (const attempt of template.attempts as any[]) {
     const scope = variantGraph?.scopes.get(attempt.id)
     const selectedFormItems = scope ? formItems.filter((item: any) => scope.itemIds.has(item.id)) : formItems
@@ -489,6 +503,7 @@ export const getExportData = async (
             }
           }
         }
+        if (result) await scaleReader.prepare(result)
         const scaleResult = (await loadScaleResult(result?.result, result)).result
         const decodedAnswers = (await loadScaleAnswers(result?.answers, result))
         const answers = detail === 'full' ? decodedAnswers.answers : []
@@ -610,6 +625,10 @@ export const getExportData = async (
       }
     }
     rows.push(row)
+  }
+  } finally {
+    // Raw/fact/whole-receipt batches are released even if projection fails.
+    await scaleReader.close()
   }
 
   // 动态字段在遍历数据时才会出现，确保每一行具有稳定列集合。
