@@ -2,11 +2,13 @@
  * historical NULL write. No C23 guard/budget/CAS replay or accepted fact edit. */
 import assert from 'node:assert/strict'
 import {randomUUID} from 'node:crypto'
+import path from 'node:path'
+import {fileURLToPath} from 'node:url'
 import {harness,runtime,publicPostgresFailure,sha} from './c25-client.mjs'
-const h=await harness('guards',120);let error,connection
+export async function runGuardBody(h){
+let connection
 try{
  const {require,prisma,backend}=await runtime(),{Client}=require('pg'),{canonicalHash}=require(backend+'/dist/modules/assessment-runtime/canonical.js'),f=h.read('c25-fixture-private.json')
- assert.equal(h.read('c25-prepare-result.json').passed,true);assert.equal(h.read('c25-scheduled-result.json').passed,true)
  const url=new URL(process.env.DATABASE_URL);url.searchParams.delete('connection_limit');url.searchParams.delete('pool_timeout');url.searchParams.set('application_name','c25_new_feedback_guard_transactions')
  connection=new Client({connectionString:url.toString()});await connection.connect()
  const q=(sql,values=[])=>connection.query(sql,values)
@@ -61,4 +63,14 @@ try{
  assert.deepEqual(await rows(),baseline);h.write('c25-guards-after-private.json',await rows())
  h.result.preservedC23Evidence={replayed:false,scope:'C23 guards/CAS/budget remain unchanged; prior evidence retained by launcher'}
  h.result.passed=true;h.check('New C22 nullable pairs/hash shape, immutable publication/snapshot/identity, old-binary omission and mismatched new bindings reject with complete rollback')
-}catch(e){error=e}finally{if(connection){await connection.query('ROLLBACK').catch(()=>{});await connection.end()}await h.finish(error)}
+}finally{if(connection){await connection.query('ROLLBACK').catch(()=>{});await connection.end()}}
+}
+
+export function requireOriginalGuardPrerequisites(h){
+ assert.equal(h.read('c25-prepare-result.json').passed,true);assert.equal(h.read('c25-scheduled-result.json').passed,true)
+}
+
+if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
+ const h=await harness('guards',120);let error
+ try{requireOriginalGuardPrerequisites(h);await runGuardBody(h)}catch(e){error=e}finally{await h.finish(error)}
+}

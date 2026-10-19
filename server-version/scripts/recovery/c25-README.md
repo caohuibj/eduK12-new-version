@@ -541,6 +541,46 @@ The old 13 consumer tests were not replayed. Future missing-only runtime work
 needs its own reviewed receipt/adapter, protection of the new 6,651-row state,
 and separate authorization; old false receipts cannot be rewritten as passed.
 
+## Missing-only preparation after the second failure
+
+The new `c25-missing-*` adapters keep both historical overall-false receipts.
+They accept only exact, separately identified successful subchecks: HTTP01
+upgrade/immediate A; continuation01 fixture preparation, eight child FINALs,
+actual shared drain/replays, teacher CSV and its 81 closed-matrix requests within
+143 recorded HTTP requests. The real catch-time PG bound remains separate;
+missing `closedFinishedAt` and failed scheduled/consumer phases are not promoted.
+
+The prepared execution scope is old B/C current-open reads and original A/B/C/D
+OPEN-only compiled observations, then a distinct new E authenticated student and
+Cognitive-only scheduled publication. E uses one 120-trial FINAL and one original
+isolated report claim, a legal **empty** encrypted checkpoint envelope, and a
+real T0+300-second release. Its history query is unfiltered and must contain
+exactly E. E's own closed/open identity and result-cipher observer evidence are
+paired; they never stand in for the missing old closed observation. No A HTTP
+read, old FINAL, teacher export, or old checkpoint GET is replayed. B/C read
+operations preserve their full accepted rows before/after.
+
+Three protection layers remain mandatory: HTTP03 6,529 rows/16 checkpoints,
+HTTP01 6,582/17, and continuation01 6,651/20. One new full-row baseline is captured;
+the prior 6,582-row file is SHA-bound and read in place. Restore requires a
+stopped API, no other source connection, a new restore database, the unchanged
+73-ordinal/three-parser equivalence checks, original four-case fixtures,
+historical NULLs, restricted-role verification and equality of every current
+source/restored row including E. The original guard SQL body is exported without
+changing its bytes; its old CLI still requires its original passed prerequisites.
+
+Only 29 new no-service contracts ran, all passed (4.72 seconds); no old passing
+suite was replayed. Evidence: `/tmp/c25-missing-foundation-01/receipt.json`, SHA
+`70bfefcd0c69164a03df543088a2f107fd413675cbb7acfa2ddba819dcfbdadf`; raw log
+`new-contract-tests.log`, SHA
+`f5cf84c9206c741e49ce9d971e507c0efc559f9851ca75b398e6e88edf7cb613`.
+Exact source copies and equal input before/after inventories are retained; all
+72 Python helpers still match the accepted current-client receipt. The draft
+archive/coordinator are explicitly excluded from this test result. This is
+preparation evidence only. A newly frozen current descriptor and a fully verified
+6,651-row filesystem recovery point must be reviewed before a separately approved
+missing-only runtime; existing producer bytes are reused, not re-emitted.
+
 ## Remaining C25 release work
 
 These core scripts do not close C19 missing-only checks: suppressed analysis,
