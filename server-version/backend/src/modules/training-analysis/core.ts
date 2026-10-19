@@ -193,7 +193,8 @@ const flowFor = (waves: MatchedNumericWaveV1[], floor: number, validCaseN?: numb
   })
 )
 
-const analysisFromPrepared = (request: TrainingAnalysisRequestV1, prepared: PreparedSource): TrainingAnalysisProjectionV1 => {
+export const buildTrainingAnalysis = (request: TrainingAnalysisRequestV1, source: TrainingAnalysisSourceV1): TrainingAnalysisProjectionV1 => {
+  const prepared = prepare(request, source)
   const floor = sourceFloor(prepared.rows)
   const metricKeys = [...new Set(request.waves.flatMap((wave) => wave.metrics.map((metric) => metric.metricKey)))].sort(compare)
   const metrics: TrainingMatchedMetricV1[] = []
@@ -249,10 +250,6 @@ const analysisFromPrepared = (request: TrainingAnalysisRequestV1, prepared: Prep
   }
 }
 
-export const buildTrainingAnalysis = (request: TrainingAnalysisRequestV1, source: TrainingAnalysisSourceV1): TrainingAnalysisProjectionV1 => (
-  analysisFromPrepared(request, prepare(request, source))
-)
-
 export const buildTrainingDictionary = (request: TrainingAnalysisRequestV1, source: TrainingAnalysisSourceV1): TrainingAnalysisDictionaryColumnV1[] => prepare(request, source).dictionary
 
 const identityFields = (measurement: TrainingMetricIdentityV1 | null) => ({
@@ -274,7 +271,8 @@ const exportParticipantKey = (courseId: string, participantKind: string, partici
 /** Tables are for the separately authorized research-export surface. Participant
  * identifiers are course-scoped pseudonyms; retained attempt provenance means
  * this is pseudonymization, not an assertion of absolute de-identification. */
-const tablesFromPrepared = (request: TrainingAnalysisRequestV1, prepared: PreparedSource): TrainingAnalysisTablesV1 => {
+export const buildTrainingAnalysisTables = (request: TrainingAnalysisRequestV1, source: TrainingAnalysisSourceV1): TrainingAnalysisTablesV1 => {
+  const prepared = prepare(request, source)
   const materialColumns = request.waves.some(wave => wave.materialGroupKey !== undefined) ? ['materialGroupKey'] : []
   const columns = new Map(prepared.dictionary.map((column) => [groupKey(column.waveKey, column.metricKey), column]))
   const metricIdentities = new Map<string, Set<string>>()
@@ -339,26 +337,6 @@ const tablesFromPrepared = (request: TrainingAnalysisRequestV1, prepared: Prepar
     valueType: column.valueType, ...identityFields(column.measurement), missingReasons: canonicalJsonString(column.missingReasons),
   })) }
   return { long, wide, dictionary }
-}
-
-export const buildTrainingAnalysisTables = (request: TrainingAnalysisRequestV1, source: TrainingAnalysisSourceV1): TrainingAnalysisTablesV1 => (
-  tablesFromPrepared(request, prepare(request, source))
-)
-
-/** One request-local validation, with no caller-supplied prepared-state shortcut.
- * Keep the prepared graph private: callers may mutate their inputs or returned
- * analysis/dictionary before the independently authorized lazy table access. */
-export const buildTrainingAnalysisView = (request: TrainingAnalysisRequestV1, source: TrainingAnalysisSourceV1) => {
-  const prepared = prepare(request, source)
-  const frozenRequest = { ...request, waves: request.waves.map(wave => ({ ...wave,
-    metrics: wave.metrics.map(metric => ({ ...metric })),
-  })) }
-  for (const row of prepared.rows) if (row.measurement) row.measurement = { ...row.measurement }
-  for (const column of prepared.dictionary) if (column.measurement) column.measurement = { ...column.measurement }
-  const analysis = structuredClone(analysisFromPrepared(frozenRequest, prepared))
-  const dictionary = structuredClone(prepared.dictionary)
-  let tables: TrainingAnalysisTablesV1 | undefined
-  return { analysis, dictionary, get tables() { return tables ?? (tables = tablesFromPrepared(frozenRequest, prepared)) } }
 }
 
 export const trainingAnalysisTableToCsv = (table: TrainingAnalysisTableV1): string => {

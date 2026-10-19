@@ -192,3 +192,60 @@ and its seven drift/safety rejection branches, plus only the affected existing
 ABBA01 and its false result remain unchanged; ABBA02 uses fresh state/launch
 roots and still needs separate runtime authorization. This bridge does not
 claim a new logical restore test or an A/B performance result.
+
+## C26 analysis comparison closeout and rejected optimization
+
+The one complete ABBA02 workload ran at
+`0f0d28f429e4a673ee1e517071f0e6f9e8ff9dac`. All four fresh API blocks
+(A/B/B/A), 60 positive analysis responses and four permission negatives were
+observed. Each arm contributed 20 formal serial calls and two concurrent pairs;
+three warmups per block were separate. Full response/manifest equivalence was
+independently checked. No new fixture, parent, FINAL, report or export was made.
+This repeated one existing small-N, suppressed-analysis selector, not independent
+participant samples, a full unsuppressed workload or a capacity test.
+
+The finite observations did not show a benefit from request-local preparation
+reuse. Formal serial API CPU mean/median were A 35.460/33.060 ms versus
+B 50.395/37.029 ms; HTTP means were A 47.306 ms versus B 57.030 ms. Both arms
+recorded 622 mirrored production SQL events. Concurrent-pair shared API CPU
+means were A 54.340 ms and B 63.466 ms. All observations, including B's slow
+outliers, are retained; their cause is not established. The small sample and
+runtime noise do not establish a general regression or universal equivalence.
+There is no positive performance or capacity claim. PostgreSQL CPU is only an
+observed family lower bound including its observer backend; observer overhead,
+unobserved exit-tail CPU and unreliable kernel HWM remain disclosed.
+
+The original controller and acceptance remain **false**, with actual outer Node
+exit 1. A watchdog retained one AssertionError type without its first timestamp,
+message or traceback. Its exact cause is unresolved. Control flow supports a
+post-workload tail/cleanup interval: the driver had exited 0, all response/window
+validation passed and the last business guard returned before driverExecuted
+became true. This is a phase inference, not reconstructed missing raw evidence.
+No KILL was recorded; all four API/observer pairs and service/audit processes
+exited 0. Actual primary 6708 and working 6719 rows/schema were exactly equal
+before/after; all 39 material files, inputs and final cleanup were verified.
+These separate facts do not rewrite the original overall result into PASS.
+
+Frozen evidence: `/tmp/c25-c26-analysis-abba-diagnostic-02/review-index.json`,
+SHA256 `57f7da496566b7e4222bd9c970f1629534c78d4f9c11a904702e2af60429b278`;
+73 files, 253,809,321 bytes. No further performance experiment is planned.
+
+Because no benefit was observed, the four-file product change from `1d35dd5f`
+is reversed in a new commit: core/service and the existing service test return
+to their exact pre-optimization/A bytes; the optimization-only test is removed
+from the active candidate but retained in history and evidence. The A immutable
+ref, B source/build identities, both artifact sets and every C26 harness/raw
+record remain available. Current source is no longer claimed to match the
+historical B producer; the final integrated candidate requires its own build/CI.
+The restored existing core/service suites pass all 54 tests, one worker, in
+1.01 seconds, without services or emit. Full before/after source/dependency and
+A/B artifact checks are retained in
+`/tmp/c25-c26-analysis-revert-pure-01/receipt.json`, SHA256
+`7c8ccbe45734883d16fb6cd753d8975809dcb435e3e783cce1e15997e8a396de`.
+
+Selected Training SJT video, native Training IndexedDB/Web Locks and C24 real
+browser scenarios remain pending. Existing mock/native generic/Survey evidence
+is not substituted for these Training checks. They will use the final candidate's
+scoped official CI services/browser, with input review and actual retained raw
+results; no new cloud-browser service or repeat of accepted core qualification
+is implied by this closeout.

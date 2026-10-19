@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { buildTrainingAnalysisView } from './core'
+import { buildTrainingAnalysis, buildTrainingAnalysisTables, buildTrainingDictionary } from './core'
 import { loadTrainingAnalysisSources, listTrainingAnalysisSources } from './source'
 import { assertTrainingManifest, parseTrainingAnalysisSelector, trainingManifestHash,
   type TrainingAnalysisActor, type TrainingAnalysisManifestV1 } from './manifest'
@@ -76,8 +76,8 @@ export async function analyzeTrainingCourse(input:{actor:TrainingAnalysisActor;c
     if(reason)return {...row,value:null,reason}
     return row.attemptId && excluded.has(`${row.attemptId}:${row.attemptEpoch}`)?{...row,value:null,reason:'QUALITY_EXCLUDED' as const}:row
   })}
-  const view=buildTrainingAnalysisView(selector,source)
-  const {analysis,dictionary}=view
+  const analysis=buildTrainingAnalysis(selector,source)
+  const dictionary=buildTrainingDictionary(selector,source)
   const unsigned={schemaVersion:(frozen.loaded.researchGovernance.length?2:1) as 1|2,kind:'TRAINING_ANALYSIS' as const,
     ...(frozen.loaded.researchGovernance.length?{researchGovernanceHash:canonicalHash(frozen.loaded.researchGovernance),researchSources:frozen.loaded.researchGovernance.map(({attemptId,taskId,attemptEpoch})=>({attemptId,taskId,attemptEpoch}))}:{}),
     courseId:input.courseId,actor:input.actor,selector,definitionHash:canonicalHash(selector),
@@ -86,7 +86,8 @@ export async function analyzeTrainingCourse(input:{actor:TrainingAnalysisActor;c
     observationCount:source.observations.length}
   const manifest=assertTrainingManifest({...unsigned,manifestHash:trainingManifestHash(unsigned)})
   if(expected && expected.manifestHash!==manifest.manifestHash) stale()
-  return {manifest,analysis,get tables(){return view.tables},quality:frozen.quality}
+  let cachedTables: ReturnType<typeof buildTrainingAnalysisTables> | undefined
+  return {manifest,analysis,get tables(){return cachedTables??(cachedTables=buildTrainingAnalysisTables(selector,source))},quality:frozen.quality}
 }
 
 export async function revalidateTrainingAnalysisManifest(actor:TrainingAnalysisActor,manifest:TrainingAnalysisManifestV1):Promise<void> {
