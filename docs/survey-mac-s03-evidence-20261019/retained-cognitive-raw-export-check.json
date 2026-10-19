@@ -1,0 +1,9 @@
+{
+  "source": "CUA persistent raw arrays, exported after captures; no new browser measurement",
+  "encoding": "Lossless base plus leaf replacements; full 17-node 32-property values independently reconstructable for every state",
+  "canonicalCharacters": 9322,
+  "canonicalFNV1a32": "92483827",
+  "transcriptionMatchesBrowserExport": true,
+  "canonicalSha256": "14287f8c252a375f3a357d95e928dba56cda276f0943d211a76ddd1e22878eba",
+  "note": "The saved baseline snapshot shared the measured common values. Two recorded first-node gray fields and all state deltas were transcribed from the fresh export; canonical verification covers every exported field, not a claim inferred from the old difference summary."
+}

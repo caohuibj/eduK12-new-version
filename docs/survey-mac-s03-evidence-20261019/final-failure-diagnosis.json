@@ -1,0 +1,89 @@
+{
+  "sourceHead": "42540d16b0bfe2d3bdb20b62d766c6f6b4547bcb",
+  "productHead": "509130b4d7d0d157e472e6d227f6f3564450b619",
+  "initialFailedCases": [
+    {
+      "test": "reauthorizes GENERAL after an ambiguous retry even if that retry creates the first FINAL",
+      "durationMs": 7573.007833000003,
+      "recordedStackFirstLine": "Error: STACK_TRACE_ERROR"
+    },
+    {
+      "test": "does not display receipt data from a rejected FINAL (400)",
+      "durationMs": 6566.752542000002,
+      "recordedStackFirstLine": "Error: STACK_TRACE_ERROR"
+    },
+    {
+      "test": "does not display receipt data from a rejected FINAL (403)",
+      "durationMs": 7820.380416,
+      "recordedStackFirstLine": "Error: STACK_TRACE_ERROR"
+    },
+    {
+      "test": "does not display receipt data from a rejected FINAL (409)",
+      "durationMs": 5435.387500000004,
+      "recordedStackFirstLine": "Error: STACK_TRACE_ERROR"
+    }
+  ],
+  "installedVersions": {
+    "vitest": "4.1.11",
+    "node": "24.21.0",
+    "environment": "jsdom25.0.1",
+    "workers": 1,
+    "testTimeoutMs": 5000,
+    "testingLibraryAsyncTimeoutMs": 1000
+  },
+  "runnerSourceEvidence": [
+    {
+      "path": "node_modules/@vitest/runner/dist/chunk-artifact.js",
+      "sha256": "bf6af6d2f4469911879a67e83b8f9e7b20332cf42795032c53457b10ccc1c617",
+      "fromLine": 2247,
+      "toLine": 2318,
+      "excerpt": "const now$2 = globalThis.performance ? globalThis.performance.now.bind(globalThis.performance) : Date.now;\nconst collectorContext = {\n\ttasks: [],\n\tcurrentSuite: null\n};\nfunction collectTask(task) {\n\tcollectorContext.currentSuite?.tasks.push(task);\n}\nasync function runWithSuite(suite, fn) {\n\tconst prev = collectorContext.currentSuite;\n\tcollectorContext.currentSuite = suite;\n\tawait fn();\n\tcollectorContext.currentSuite = prev;\n}\nfunction withTimeout(fn, timeout, isHook = false, stackTraceError, onTimeout) {\n\tif (timeout <= 0 || timeout === Number.POSITIVE_INFINITY) {\n\t\treturn fn;\n\t}\n\tconst { setTimeout, clearTimeout } = getSafeTimers();\n\t// this function name is used to filter error in test/cli/test/fails.test.ts\n\treturn (function runWithTimeout(...args) {\n\t\tconst startTime = now$2();\n\t\tconst runner = getRunner();\n\t\trunner._currentTaskStartTime = startTime;\n\t\trunner._currentTaskTimeout = timeout;\n\t\treturn new Promise((resolve_, reject_) => {\n\t\t\tconst timer = setTimeout(() => {\n\t\t\t\tclearTimeout(timer);\n\t\t\t\trejectTimeoutError();\n\t\t\t}, timeout);\n\t\t\t// `unref` might not exist in browser\n\t\t\ttimer.unref?.();\n\t\t\tfunction rejectTimeoutError() {\n\t\t\t\tconst error = makeTimeoutError(isHook, timeout, stackTraceError);\n\t\t\t\tonTimeout?.(args, error);\n\t\t\t\treject_(error);\n\t\t\t}\n\t\t\tfunction resolve(result) {\n\t\t\t\trunner._currentTaskStartTime = undefined;\n\t\t\t\trunner._currentTaskTimeout = undefined;\n\t\t\t\tclearTimeout(timer);\n\t\t\t\t// if test/hook took too long in microtask, setTimeout won't be triggered,\n\t\t\t\t// but we still need to fail the test, see\n\t\t\t\t// https://github.com/vitest-dev/vitest/issues/2920\n\t\t\t\tif (now$2() - startTime >= timeout) {\n\t\t\t\t\trejectTimeoutError();\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\tresolve_(result);\n\t\t\t}\n\t\t\tfunction reject(error) {\n\t\t\t\trunner._currentTaskStartTime = undefined;\n\t\t\t\trunner._currentTaskTimeout = undefined;\n\t\t\t\tclearTimeout(timer);\n\t\t\t\treject_(error);\n\t\t\t}\n\t\t\t// sync test/hook will be caught by try/catch\n\t\t\ttry {\n\t\t\t\tconst result = fn(...args);\n\t\t\t\t// the result is a thenable, we don't wrap this in Promise.resolve\n\t\t\t\t// to avoid creating new promises\n\t\t\t\tif (typeof result === \"object\" && result != null && typeof result.then === \"function\") {\n\t\t\t\t\tresult.then(resolve, reject);\n\t\t\t\t} else {\n\t\t\t\t\tresolve(result);\n\t\t\t\t}\n\t\t\t} \n\t\t\t// user sync test/hook throws an error\ncatch (error) {\n\t\t\t\treject(error);\n\t\t\t}\n\t\t});"
+    },
+    {
+      "path": "node_modules/@vitest/runner/dist/chunk-artifact.js",
+      "sha256": "bf6af6d2f4469911879a67e83b8f9e7b20332cf42795032c53457b10ccc1c617",
+      "fromLine": 2404,
+      "toLine": 2412,
+      "excerpt": "function makeTimeoutError(isHook, timeout, stackTraceError) {\n\tconst message = `${isHook ? \"Hook\" : \"Test\"} timed out in ${timeout}ms.\\nIf this is a long-running ${isHook ? \"hook\" : \"test\"}, pass a timeout value as the last argument or configure it globally with \"${isHook ? \"hookTimeout\" : \"testTimeout\"}\".`;\n\tconst error = new Error(message);\n\tif (stackTraceError?.stack) {\n\t\terror.stack = stackTraceError.stack.replace(error.message, stackTraceError.message);\n\t}\n\treturn error;\n}\n"
+    },
+    {
+      "path": "node_modules/vitest/dist/chunks/coverage.DM_a_rWm.js",
+      "sha256": "e509f3cc1bd81ae6426265253fa926cbde02be5cebfe35b1df422017bffdca31",
+      "fromLine": 537,
+      "toLine": 539,
+      "excerpt": "\t}\n\tresolved.testTimeout ??= resolved.browser.enabled ? 15e3 : 5e3;\n\tresolved.hookTimeout ??= resolved.browser.enabled ? 3e4 : 1e4;"
+    },
+    {
+      "path": "node_modules/vitest/dist/chunks/index.UpGiHP7g.js",
+      "sha256": "cdafaf8e508042dddba72f8c7bbae84e2836ddb6b06c7026520c35d91af4e798",
+      "fromLine": 3567,
+      "toLine": 3575,
+      "excerpt": "\t\t\t\treturn {\n\t\t\t\t\tancestorTitles,\n\t\t\t\t\tfullName: t.name ? [...ancestorTitles, t.name].join(\" \") : ancestorTitles.join(\" \"),\n\t\t\t\t\tstatus: StatusMap[t.result?.state || t.mode] || \"skipped\",\n\t\t\t\t\ttitle: t.name,\n\t\t\t\t\tduration: t.result?.duration,\n\t\t\t\t\tfailureMessages: t.result?.errors?.map((e) => e.stack || e.message) || [],\n\t\t\t\t\tlocation: t.location,\n\t\t\t\t\tmeta: filterMeta ? (() => {"
+    }
+  ],
+  "mechanismProbe": "runner-timeout-mechanism.json executes exact installed withTimeout/makeTimeoutError in isolated VM; both timer expiry and over-deadline resolution produce a real timeout message with STACK_TRACE_ERROR stack; not a historical contention reproduction",
+  "historicalClassification": "Source-backed timeout-path inference, stronger than string matching; original error.message and per-step event-loop/CPU trace were not captured. Exact first-failure trigger is unresolved. Resource contention, waiting-query phase and cascading timeout effects are not established.",
+  "diagnosticSubset": {
+    "selected": 14,
+    "passed": 14,
+    "order": "First 9 receipt scenarios, the 4 originally failed cases, adjacent 503 control in original file order; no other cases run",
+    "allBeforeCaseRootCountsZero": true,
+    "allNoPendingQueries": true,
+    "allFetchMocked": true,
+    "allRealTimers": true,
+    "wallMsRange": [
+      152.04387497901917,
+      618.5215411186218
+    ],
+    "originalSourceExactlyRestored": true,
+    "limitations": "Observation wrappers add overhead and may affect scheduling. This present diagnostic does not exclude an intermittent historical race. No assertion, timeout, application source or mock response changed."
+  },
+  "sourceAudit": {
+    "isolation": "Vitest isolate true; file cases sequential; explicit global RTL cleanup plus local restore/unstub; fixture/sessionStorage/finalCalls reset before each case",
+    "async": "openTask findBy/waitFor and post-submit findBy are awaited; no fake timers; fetch routes are Promise-resolved/rejected in memory with unexpected-route throw; no DB or real network needed by these four cases",
+    "timing": "Application performance.now stub does not replace Vitest bound real clock captured during runner module evaluation; trace uses process.hrtime.bigint",
+    "mockRoutes": "Retry: info/task/final/final/general. Rejected statuses: info/task/final only; no unauthorized GENERAL.",
+    "cache": "Current isolated .vite/vitest results cache has latest aggregate duration/failed fields only; no recoverable first error.message; old cache is not acceptance evidence."
+  },
+  "nextStep": "Do not broaden reruns or change production logic. On a necessary recurrence keep verbose/raw error fields plus per-phase traces before diagnosis; native final Chrome/Safari validation still pending manual unlock."
+}
