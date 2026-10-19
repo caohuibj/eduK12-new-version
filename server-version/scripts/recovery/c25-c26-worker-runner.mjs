@@ -59,18 +59,18 @@ export async function runObservedWorker({directory,kind,input,node,env,remaining
   child.on('message',value=>{
    if(value?.type!=='c26:worker')return
    try{
-    assert.equal(value.nonce,nonce);assert.equal(value.pid,identity.pid);assert.ok(['LOADED','TASK_DONE','CLEANED'].includes(value.stage));assert.equal(value.sequence,lastSequence+1);lastSequence=value.sequence
-    assert.deepEqual(Object.keys(value).sort(),(value.stage==='LOADED'?['nonce','pid','sequence','stage','type']:['nonce','passed','pid','sequence','stage','type']).sort())
-    if(value.stage!=='LOADED')assert.equal(typeof value.passed,'boolean')
+    assert.equal(value.nonce,nonce);assert.equal(value.pid,identity.pid);assert.ok(['BOOTED','LOADED','TASK_DONE','CLEANED'].includes(value.stage));assert.equal(value.sequence,lastSequence+1);lastSequence=value.sequence
+    assert.deepEqual(Object.keys(value).sort(),(['BOOTED','LOADED'].includes(value.stage)?['nonce','pid','sequence','stage','type']:['nonce','passed','pid','sequence','stage','type']).sort())
+    if(!['BOOTED','LOADED'].includes(value.stage))assert.equal(typeof value.passed,'boolean')
     journal({stage:'CHILD_'+value.stage,pid:value.pid,sequence:value.sequence,passed:value.passed,observedMonotonicNs:process.hrtime.bigint().toString()})
-    if(waiting){const current=waiting;waiting=null;clearTimeout(current.timer);current.resolve(value)}else{assert.ok(queue.length<3);queue.push(value)}
+    if(waiting){const current=waiting;waiting=null;clearTimeout(current.timer);current.resolve(value)}else{assert.ok(queue.length<4);queue.push(value)}
    }catch(error){stop(error)}
   })
   child.once('close',()=>{closed=true;if(waiting){const current=waiting;waiting=null;clearTimeout(current.timer);current.reject(new Error('worker closed before lifecycle completion'))}})
   for(const stream of [child.stdout,child.stderr])stream.on('data',bytes=>{try{logBytes+=bytes.length;assert.ok(logBytes<=1024*1024,'worker log cap');fs.writeSync(log,bytes)}catch(error){stop(error)}})
   channel=createProbeChannel(child,{nonce,role:kind,identity,bindings:PINNED,remainingMs:remaining,record:value=>{record(value);receipt.probe.push(value)},onFault:stop})
   if(abortSignal){if(abortSignal.aborted)aborted();else abortSignal.addEventListener('abort',aborted,{once:true})}
-  await bounded(()=>hooks.register(identity))
+  await bounded(()=>hooks.register(identity));const booted=await waitStage('BOOTED');await permit(booted,'LOAD')
   const loaded=await waitStage('LOADED');await channel.ready();await bounded(()=>hooks.loaded(identity));receipt.initialProbe=await channel.request();await permit(loaded,'WORK')
   const done=await waitStage('TASK_DONE')
   await bounded(()=>hooks.prepareClose(identity)) // A real fresh PG+proc query, not cached owners.

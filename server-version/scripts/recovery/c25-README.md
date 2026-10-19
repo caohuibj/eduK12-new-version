@@ -1111,3 +1111,15 @@ receive only the original one complete retry, with both failures retained. The
 selected path, full-scan count/row count/elapsed time and observer CPU are explicit
 observation costs. This is costlier than the native children interface; a later
 real A measurement must assess the 100ms sampler rather than hide that overhead.
+
+C26's worker BOOTED/LOAD gate now precedes every production client import: the
+parent must finish exact PID registration before granting load. The API uses a
+separate leaf with the same ordering, the unchanged compiled index, pinned
+production SQL preload and exact PM2 `ready` demultiplexing. Parent IPC samples
+retain SQL/process counters and probe overhead; final-sample-to-close wall time
+is bounded and recorded, but that exit-tail CPU is not measured. API stop first
+closes the observation, then TERM/KILLs its owned group under the caller's
+reserved aggregate tail. Malformed IPC, duplicate readiness, late SQL, missed
+deadlines or surviving descendants keep the whole run false even after cleanup.
+These real-child contracts replace only the index/task I/O boundaries, start no
+listener or database, and do not yet qualify the final A coordinator.

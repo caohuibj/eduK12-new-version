@@ -49,6 +49,7 @@ export async function workerMain(){
  process.on('message',message);process.on('disconnect',disconnected)
  try{
   await reportNodeResources({...ackOptions(),phase:'start'})
+  await permission('BOOTED','LOAD') // Registration is complete before any client constructor/import.
   api=await import('./c20-materials-client.mjs')
   await permission('LOADED','WORK')
   try{result.task=await (kind==='report'?runReportTask:runExportTask)(api,invocation.input,{remaining,registerCleanup:fn=>cleanups.push(fn)})}catch(error){primaryError=error}

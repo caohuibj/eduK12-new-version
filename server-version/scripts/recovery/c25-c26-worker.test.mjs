@@ -12,10 +12,10 @@ const input={report:{attemptEpoch:1,attemptId:'parent-new',jobId:'job-new',oldJo
 const modes={NODE_ENV:'test',BACKGROUND_WORKERS_ENABLED:'false',ASSESSMENT_REPORT_ASYNC_ENABLED:'true',HEAVY_PROCESSING_ENABLED:'false',VIDEO_PROCESSING_ENABLED:'false'}
 function state(kind,mode){const root=process.env.C26_PREPARE_EVIDENCE_ROOT;assert.ok(root&&fs.statSync(root).isDirectory());const directory=fs.mkdtempSync(path.join(root,`worker-${kind}-${mode}-`));fs.chmodSync(directory,0o700);workerWrite(path.join(directory,'fixture-config.json'),{scope:'NO_SERVICE_WORKER_BOUNDARY',kind,mode});return directory}
 async function run(kind,mode,extra={}){
- const directory=state(kind,mode),events=[],faults=[];let identity,retired=null,expired=false
+ const directory=state(kind,mode),events=[],faults=[];let identity,retired=null,expired=false,registrationRelease;const registration=new Promise(resolve=>registrationRelease=resolve)
  const budget=extra.budget??7000,end=performance.now()+budget
- const record=value=>{events.push(value);if(extra.journalFault&&value.stage==='CHILD_TASK_DONE')throw new Error('SYNTHETIC_JOURNAL_FAILURE')}
- const hooks={register:value=>{identity=value;events.push({stage:'registered',pid:value.pid})},loaded:async value=>{assert.equal(value,identity);events.push({stage:'loaded'})},prepareClose:async value=>{
+ const record=value=>{events.push(value);if(extra.holdRegistration&&value.stage==='CHILD_BOOTED'){const raw=fs.readFileSync(path.join(directory,'fixture-events.jsonl'),'utf8');assert.ok(!raw.includes('real-production-consumer-loaded'),'client import preceded ownership registration');workerWrite(path.join(directory,'registration-proof.json'),{consumerLoaded:false,booted:true});registrationRelease()};if(extra.journalFault&&value.stage==='CHILD_TASK_DONE')throw new Error('SYNTHETIC_JOURNAL_FAILURE')}
+ const hooks={register:async value=>{identity=value;if(extra.holdRegistration)await registration;events.push({stage:'registered',pid:value.pid})},loaded:async value=>{assert.equal(value,identity);events.push({stage:'loaded'})},prepareClose:async value=>{
   assert.equal(value,identity);events.push({stage:'prepare-enter'})
   if(extra.holdPrepare)await new Promise(()=>{})
   // An actual asynchronous boundary; permission cannot be sent first.
@@ -62,4 +62,10 @@ test('retire hook returning after the shared deadline cannot produce a late PASS
  const r=await run('report','success',{expireRetire:true});assert.ok(r.error);assert.equal(r.saved.passed,false);assert.match(r.saved.error.stack,/aggregate deadline/)
  assert.ok(r.retired);assert.equal(r.saved.resources.lifecycle.closeObserved,true);assert.equal(r.saved.resources.lifecycle.groupQuiescent,true);assert.equal(r.saved.resources.lifecycle.code,0)
  assert.equal(workerRead(path.join(r.directory,'result-private.json')).passed,true,'completed child is retained separately from failed parent acceptance')
+})
+
+test('actual worker cannot load production client or connect before asynchronous PID registration completes',{timeout:7000},async()=>{
+ const r=await run('report','success',{holdRegistration:true});assert.ifError(r.error);assert.equal(r.saved.passed,true)
+ assert.deepEqual(workerRead(path.join(r.directory,'registration-proof.json')),{consumerLoaded:false,booted:true})
+ assert.ok(r.events.findIndex(x=>x.stage==='CHILD_BOOTED')<r.events.findIndex(x=>x.stage==='registered'));assert.ok(r.events.findIndex(x=>x.stage==='registered')<r.events.findIndex(x=>x.stage==='CHILD_LOADED'))
 })
