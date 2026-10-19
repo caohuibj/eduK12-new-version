@@ -65,7 +65,7 @@ def process_table():
   assert row['pid']==int(p.name);rows[row['pid']]=row
  return rows
 class OwnedGroups:
- def __init__(self,postgres_executable=None):self.groups={};self.events=[];self.mutex=threading.RLock();self.postgres_executable=str(Path(postgres_executable).resolve()) if postgres_executable else None
+ def __init__(self,postgres_executable=None):self.groups={};self.events=[];self.member_pins={};self.empty_groups=set();self.root=None;self.mutex=threading.RLock();self.postgres_executable=str(Path(postgres_executable).resolve()) if postgres_executable else None
  def register(self,row,role):
   assert row['pid']==row['processGroupId'] and row['pid']!=os.getpgrp(),'only a detached owned group'
   key=(row['pid'],row['startTicks'])
@@ -77,6 +77,8 @@ class OwnedGroups:
  def _capture_descendants(self,root):
   rows=process_table();current=rows.get(root['pid'])
   assert current is not None and current['startTicks']==root['startTicks'],'launcher PID changed'
+  if self.root is not None:assert self.root['pid']==root['pid'] and self.root['startTicks']==root['startTicks']
+  self.root=dict(root)
   descendants={root['pid']}
   while True:
    added={pid for pid,row in rows.items() if row['parentPid'] in descendants}
@@ -89,6 +91,9 @@ class OwnedGroups:
    pg_family|=added
   for pid in descendants-{root['pid']}:
    row=rows[pid]
+   prior=self.member_pins.get(pid);assert prior is None or prior['startTicks']==row['startTicks'],'owned member PID reused'
+   assert row['processGroupId'] not in self.empty_groups,'proved-empty PGID reappeared; ownership cannot be reused'
+   self.member_pins[pid]=dict(row)
    if row['processGroupId']==pid:
     if pid in self.groups:assert self.groups[pid]['startTicks']==row['startTicks'],'descendant PID reused'
     if pid in pg_family and pid not in self.groups:
@@ -103,27 +108,61 @@ class OwnedGroups:
    if row['role'] in ['driver','pg_postmaster','redis','pg_background']:continue
    assert row['role'] in ['api','observer','report_worker','export_worker'] and row['parentPid']==driver['pid']
    self.register(row,row['role'])
+ def verified_members(self,group,rows):
+  leader=rows.get(group['pid']);members=[row for row in rows.values() if row['processGroupId']==group['pid']]
+  if group['pid'] in self.empty_groups:assert not members,'proved-empty PGID was reused'
+  if leader is not None:
+   assert leader['startTicks']==group['startTicks'] and leader['processGroupId']==group['pid'],'group leader PID reused'
+  else:
+   for row in members:
+    pin=self.member_pins.get(row['pid'])
+    assert pin is not None and all(pin[k]==row[k] for k in ['pid','startTicks','processGroupId']),'leaderless member has no exact owned identity'
+    assert row['parentPid']==pin['parentPid'] or (self.root is not None and row['parentPid']==self.root['pid']),'leaderless member parent drift'
+  if not members:self.empty_groups.add(group['pid'])
+  return leader,members
  def signal(self,name,include_postgres=False,roles=None):
-  with self.mutex:entries=list(self.groups.values())
-  failures=[]
-  for row in reversed(entries):
-   if (row['role'] in ['postgres','postgres_child'] and not include_postgres) or (roles is not None and row['role'] not in roles):continue
-   try:
+  with self.mutex:
+   entries=list(self.groups.values());rows=process_table();failures=[]
+   for row in reversed(entries):
+    if (row['role'] in ['postgres','postgres_child'] and not include_postgres) or (roles is not None and row['role'] not in roles):continue
     try:
-     current=proc(row['pid']);assert current['startTicks']==row['startTicks'] and current['processGroupId']==row['pid'],'refuse to signal reused/unowned PID'
-    except FileNotFoundError:pass # A proved group can outlive its leader.
-    try:os.killpg(row['pid'],name);sent=True
-    except ProcessLookupError:sent=False
-    self.events.append({'pid':row['pid'],'startTicks':row['startTicks'],'signal':int(name),'sent':sent,'at':time.monotonic_ns()})
-   except BaseException as error:failures.append(error)
-  if failures:raise failures[0] # Other safely owned groups were still attempted.
+     leader,members=self.verified_members(row,rows)
+     if not members:continue
+     if leader is not None:
+      current=proc(row['pid']);assert current['startTicks']==row['startTicks'] and current['processGroupId']==row['pid'],'refuse to signal reused/unowned PID'
+      try:os.killpg(row['pid'],name);sent=True
+      except ProcessLookupError:sent=False
+      self.events.append({'pid':row['pid'],'startTicks':row['startTicks'],'signal':int(name),'sent':sent,'method':'VERIFIED_LIVE_LEADER_GROUP','at':time.monotonic_ns()})
+     else:
+      # Never killpg a stale numerical group after its leader has disappeared.
+      # A pidfd pins each previously proved member against PID/PGID reuse.
+      for member in members:
+       try:fd=os.pidfd_open(member['pid'],0)
+       except ProcessLookupError:continue
+       try:
+        try:current=proc(member['pid'])
+        except FileNotFoundError:continue
+        assert all(current[k]==member[k] for k in ['pid','startTicks','processGroupId','parentPid']),'leaderless member changed before pidfd signal'
+        try:signal.pidfd_send_signal(fd,name,None,0);sent=True
+        except ProcessLookupError:sent=False
+        self.events.append({'pid':member['pid'],'startTicks':member['startTicks'],'processGroupId':row['pid'],'signal':int(name),'sent':sent,'method':'PINNED_LEADERLESS_MEMBER_PIDFD','at':time.monotonic_ns()})
+       finally:os.close(fd)
+    except BaseException as error:failures.append(error)
+   if failures:raise failures[0] # Other safely owned groups were still attempted.
  def members(self,include_postgres=False):
-  rows=process_table()
-  with self.mutex:entries=list(self.groups.values())
-  for group in entries:
-   if group['pid'] in rows:assert rows[group['pid']]['startTicks']==group['startTicks'],'group leader PID reused'
-  ids={r['pid'] for r in entries if include_postgres or r['role'] not in ['postgres','postgres_child']}
-  return [r for r in rows.values() if r['processGroupId'] in ids]
+  with self.mutex:
+   rows=process_table();result=[]
+   for group in self.groups.values():
+    if include_postgres or group['role'] not in ['postgres','postgres_child']:result.extend(self.verified_members(group,rows)[1])
+   return result
+
+def spawn_registered(owned,children,name,argv,**options):
+ # Capture cannot classify the new postmaster/driver as unknown between spawn
+ # and its exact role binding. Dynamic children remain registry-verified later.
+ with owned.mutex:
+  child=subprocess.Popen(argv,**options);children.append((name,child))
+  identity=proc(child.pid);assert identity['parentPid']==os.getpid()
+  owned.register(identity,name);return child,identity
 
 def reclaim_owned(owned,root,children,end,include_postgres=False,clock=time.monotonic_ns,grace_seconds=25):
  # First stop a still-running driver, so it cannot continue creating detached
@@ -220,14 +259,16 @@ def admitted_baseline_bindings(state,baseline):
 def assert_baseline_unchanged(bindings):
  assert bindings and all(sha_file(Path(p))==h for p,h in bindings.items()),'admitted live baseline changed'
 
-def persist_final(file,value,budget):
+def persist_final(file,value,budget,check_resources=resources):
  # Required fsync is part of the original deadline. A late durable write can
  # never leave a green receipt, even when no async timer got CPU during I/O.
  value['elapsedSeconds']=(budget.clock()-budget.started)/1e9
  if budget.clock()>=budget.overall:value['passed']=False;value['lateFinalEvidence']=True
  private_json(file,value)
- if budget.clock()>=budget.overall:
-  value['passed']=False;value['lateFinalEvidence']=True;value['elapsedSeconds']=(budget.clock()-budget.started)/1e9;update_json(file,value)
+ try:check_resources()
+ except BaseException as error:value['passed']=False;value['postWriteResourceFailure']=type(error).__name__
+ if budget.clock()>=budget.overall or value.get('postWriteResourceFailure'):
+  value['passed']=False;value['lateFinalEvidence']=budget.clock()>=budget.overall;value['elapsedSeconds']=(budget.clock()-budget.started)/1e9;update_json(file,value)
  return value
 
 def finish_watchdog(done,watcher,budget,errors):
@@ -319,7 +360,7 @@ def main():
  watcher=threading.Thread(target=monitor,daemon=True);watcher.start()
  env={'PATH':f'{node.parent}:{pg}:/usr/bin:/bin','HOME':str(STATE),'TMPDIR':str(STATE),'LANG':'C.UTF-8','TZ':'UTC','NODE_ENV':'test','PYTHONDONTWRITEBYTECODE':'1'}
  def start(argv,name,extra=None):
-  guard();log=(STATE/(name+'.log')).open('x');logs.append(log);p=subprocess.Popen(list(map(str,argv)),cwd=BACKEND,env={**env,**(extra or {})},stdin=subprocess.DEVNULL,stdout=log,stderr=log,start_new_session=True);children.append((name,p));identity=proc(p.pid);assert identity['parentPid']==os.getpid();owned.register(identity,name)
+  guard();log=(STATE/(name+'.log')).open('x');logs.append(log);p,identity=spawn_registered(owned,children,name,list(map(str,argv)),cwd=BACKEND,env={**env,**(extra or {})},stdin=subprocess.DEVNULL,stdout=log,stderr=log,start_new_session=True)
   result['processes'].append({'name':name,'argv':list(map(str,argv)),'identity':identity});return p,identity
  def run(argv,name,seconds,end=None,extra=None,allowed_exits=(0,)):
   allowed=min(seconds,budget.remaining(end));cutoff=min(budget.overall if end is None else end,budget.clock()+int(allowed*10**9));p,_=start(argv,name,extra)
@@ -443,7 +484,7 @@ def main():
   for log in logs:log.flush();os.fsync(log.fileno());log.close()
   result['elapsedSeconds']=(budget.clock()-budget.started)/1e9
   if result['elapsedSeconds']>=TOTAL:result['passed']=False
-  status.update(state='stopped',cleanupVerified=result.get('cleanupVerified',False),cleanupErrors=errors,endedAt=time.time());record_status();persist_final(STATE/'c25-c26-a-overall-result.json',result,budget)
+  status.update(state='stopped',cleanupVerified=result.get('cleanupVerified',False),cleanupErrors=errors,endedAt=time.time());record_status();persist_final(STATE/'c25-c26-a-overall-result.json',result,budget,sample)
   lock.close()
   for sig,handler in previous.items():signal.signal(sig,handler)
   print(json.dumps({'passed':result['passed'],'cleanupVerified':result.get('cleanupVerified',False),'resultSha256':sha_file(STATE/'c25-c26-a-overall-result.json')}),flush=True)

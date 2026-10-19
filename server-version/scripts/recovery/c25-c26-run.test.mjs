@@ -102,7 +102,7 @@ try:groups.register(real,'driver')
 except AssertionError:pass
 else:raise AssertionError('current shared group accepted')
 row={'pid':2147483000,'startTicks':'17','processGroupId':2147483000,'parentPid':os.getpid(),'state':'S'};groups.register(row,'driver')
-with mock.patch.dict(groups.signal.__globals__,proc=lambda pid:{**row,'startTicks':'18'}),mock.patch('os.killpg') as kill:
+with mock.patch.dict(groups.signal.__globals__,proc=lambda pid:{**row,'startTicks':'18'},process_table=lambda:{row['pid']:{**row,'startTicks':'18'}}),mock.patch('os.killpg') as kill:
  try:groups.signal(signal.SIGKILL)
  except AssertionError:pass
  else:raise AssertionError('reused PID was signalled')
@@ -220,4 +220,138 @@ try:
  proof=finish_watchdog(threading.Event(),watcher,budget,errors)
  assert proof['joined'] is False and any(e['errorType']=='WatchdogNotJoined' for e in errors)
 finally:release.set();watcher.join(timeout=1)
+`))
+test('launcher spawn registration blocks capture at the real identity gap before PG child classification',()=>{
+ const output=python(String.raw`
+import tempfile
+from unittest import mock
+os.umask(0o077);enable_subreaper();root=proc(os.getpid());owned=OwnedGroups(sys.executable);children=[]
+identity_gap=threading.Event();capture_attempt=threading.Event();release_identity=threading.Event();captured=threading.Event();values={};errors=[];real_proc=proc
+class ObservableLock:
+ def __init__(self,lock):self.lock=lock
+ def __enter__(self):
+  if threading.current_thread().name=='monitor-contract':capture_attempt.set()
+  self.lock.acquire();return self
+ def __exit__(self,*args):self.lock.release()
+owned.mutex=ObservableLock(owned.mutex)
+with tempfile.TemporaryDirectory() as tmp:
+ marker=Path(tmp)/'ready.json'
+ script="""import os,sys,time,signal,json
+pid=os.fork()
+if pid==0:
+ os.setsid()
+ with open(sys.argv[1],'x') as f:json.dump({'pid':os.getpid()},f);f.flush();os.fsync(f.fileno())
+ while True:time.sleep(.01)
+else:
+ def done(sig,frame):
+  os.killpg(pid,signal.SIGTERM);os.waitpid(pid,0);sys.exit(0)
+ signal.signal(signal.SIGINT,done)
+ while True:time.sleep(.01)
+"""
+ def paused_proc(pid):
+  if threading.current_thread().name=='spawn-contract':
+   until=time.monotonic()+3
+   while not marker.exists():assert time.monotonic()<until;time.sleep(.005)
+   identity_gap.set();assert release_identity.wait(3)
+  return real_proc(pid)
+ def spawn_task():
+  try:values['spawn']=spawn_registered(owned,children,'postgres',[sys.executable,'-B','-c',script,str(marker)],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
+  except BaseException as error:errors.append(error)
+ def capture_task():
+  try:owned.capture_descendants(root);captured.set()
+  except BaseException as error:errors.append(error)
+ spawn_thread=threading.Thread(target=spawn_task,name='spawn-contract');monitor=threading.Thread(target=capture_task,name='monitor-contract')
+ try:
+  with mock.patch.dict(spawn_registered.__globals__,proc=paused_proc):
+   spawn_thread.start();assert identity_gap.wait(3);monitor.start();assert capture_attempt.wait(3)
+   assert not captured.is_set() and not owned.groups,'capture must block while exact role has not been bound'
+   release_identity.set();spawn_thread.join(3);monitor.join(3)
+   assert not spawn_thread.is_alive() and not monitor.is_alive() and not errors and captured.is_set()
+  leader,identity=values['spawn'];child=json.loads(marker.read_text())['pid']
+  assert owned.groups[leader.pid]['role']=='postgres' and owned.groups[child]['role']=='postgres_child'
+  assert not any(row['role']=='descendant-before-registration' for row in owned.groups.values())
+  owned.signal(signal.SIGTERM);assert leader.poll() is None and real_proc(child)['state'] not in ['Z','X','x']
+  proof=reclaim_owned(owned,root,children,time.monotonic_ns()+3*10**9,True,grace_seconds=1)
+  assert proof['passed'] and proof['popenExits']=={'postgres':0} and proof['members']==[]
+  print(json.dumps({'captureBlockedInsideSpawnIdentityGap':True,'postmasterRoleExact':True,'childRoleExact':True,'leaderPid':leader.pid,'childPid':child,'exitCode':leader.returncode}))
+ finally:
+  release_identity.set();spawn_thread.join(3)
+  if monitor.ident is not None:monitor.join(3)
+  for _,child in children:
+   if child.poll() is None:
+    try:os.killpg(child.pid,signal.SIGKILL)
+    except ProcessLookupError:pass
+   child.wait(timeout=2)
+  for pid in list(owned.groups):
+   try:os.killpg(pid,signal.SIGKILL)
+   except ProcessLookupError:pass
+`,{timeout:15000})
+ console.log(output.trim())
+})
+test('leaderless members require pinned identity, use real pidfd, and reject a reused empty PGID',()=>{
+ const output=python(String.raw`
+import tempfile
+from unittest import mock
+os.umask(0o077);enable_subreaper();root=proc(os.getpid());owned=OwnedGroups();children=[]
+with tempfile.TemporaryDirectory() as tmp:
+ marker=Path(tmp)/'member.json'
+ script="""import os,sys,time,signal,json
+pid=os.fork()
+if pid==0:
+ signal.signal(signal.SIGTERM,signal.SIG_IGN)
+ with open(sys.argv[1],'x') as f:json.dump({'pid':os.getpid()},f);f.flush();os.fsync(f.fileno())
+ while True:time.sleep(.01)
+else:
+ until=time.monotonic()+3
+ while not os.path.exists(sys.argv[1]):
+  assert time.monotonic()<until;time.sleep(.005)
+ sys.exit(7)
+"""
+ leader,identity=spawn_registered(owned,children,'driver',[sys.executable,'-B','-c',script,str(marker)],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
+ try:
+  assert leader.wait(timeout=4)==7;member=json.loads(marker.read_text())['pid'];owned.capture_descendants(root)
+  current=proc(member);assert current['parentPid']==root['pid'] and current['processGroupId']==leader.pid and not Path('/proc',str(leader.pid)).exists()
+  assert owned.member_pins[member]['startTicks']==current['startTicks']
+  with mock.patch('os.killpg',side_effect=AssertionError('leaderless killpg forbidden')):
+   owned.signal(signal.SIGTERM);owned.signal(signal.SIGKILL)
+   result=reclaim_owned(owned,root,children,time.monotonic_ns()+2*10**9,grace_seconds=.1)
+  assert result['passed'] and result['popenExits']=={'driver':7} and result['members']==[]
+  assert any(r['pid']==member and r['decodedExitCode']==-signal.SIGKILL for r in result['reapedOrphans'])
+  assert all(e['method']=='PINNED_LEADERLESS_MEMBER_PIDFD' for e in owned.events)
+  assert leader.pid in owned.empty_groups
+  foreign={**current,'pid':2147483001,'startTicks':'999','parentPid':1,'state':'S'}
+  # A new unrelated group can outlive its newly reused leader. No signal API
+  # may be called merely because its numerical PGID matches our old group.
+  with mock.patch.dict(owned.signal.__globals__,process_table=lambda:{foreign['pid']:foreign}),mock.patch('os.killpg') as group_kill,mock.patch('os.pidfd_open') as open_pid:
+   try:owned.signal(signal.SIGKILL)
+   except AssertionError:pass
+   else:raise AssertionError('reused empty PGID was accepted')
+   group_kill.assert_not_called();open_pid.assert_not_called()
+  fresh=OwnedGroups();fresh.register(identity,'driver')
+  for rows in [{foreign['pid']:foreign},{member:{**current,'startTicks':'999'}}]:
+   with mock.patch.dict(fresh.signal.__globals__,process_table=lambda:rows),mock.patch('os.killpg') as group_kill,mock.patch('os.pidfd_open') as open_pid:
+    try:fresh.signal(signal.SIGKILL)
+    except AssertionError:pass
+    else:raise AssertionError('unproved leaderless member was accepted')
+    group_kill.assert_not_called();open_pid.assert_not_called()
+  print(json.dumps({'leaderPid':leader.pid,'leaderExit':leader.returncode,'memberPid':member,'pidfdSignalMethods':[e['method'] for e in owned.events],'orphanWaitStatuses':result['reapedOrphans'],'emptyGroupReuseRejected':True}))
+ finally:
+  for pid in [member] if 'member' in globals() else []:
+   try:os.kill(pid,signal.SIGKILL)
+   except ProcessLookupError:pass
+  leader.wait(timeout=2)
+`,{timeout:15000})
+ console.log(output.trim())
+})
+test('mandatory final write rechecks actual resource callback and persists false on floor failure',()=>python(String.raw`
+import tempfile
+budget=Deadline();observed=[]
+with tempfile.TemporaryDirectory() as tmp:
+ file=Path(tmp)/'final.json'
+ def changed_resources():
+  assert file.exists() and private_read(file)['passed'] is True
+  value={'diskBytes':preflight.FLOOR-1,'memoryBytes':preflight.MEMORY,'tmpBytes':preflight.RESERVE};observed.append(value);return assert_resources(value)
+ result=persist_final(file,{'passed':True},budget,changed_resources)
+ assert len(observed)==1 and result['passed'] is False and result['postWriteResourceFailure']=='AssertionError'
+ assert result['lateFinalEvidence'] is False and private_read(file)==result and stat.S_IMODE(file.stat().st_mode)==0o600
 `))
