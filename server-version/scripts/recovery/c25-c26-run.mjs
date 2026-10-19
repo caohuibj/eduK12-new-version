@@ -5,7 +5,7 @@ import path from 'node:path'
 import {spawn} from 'node:child_process'
 import {fileURLToPath} from 'node:url'
 import {MATERIAL_PYTHON as oldMaterials} from './c25-analysis-resume.mjs'
-export const MATERIAL_PROGRAM=oldMaterials.replaceAll('eduk12_c25_analysis_02/c25-analysis-resume-material-audit-result.json','eduk12_c26_a_05/c25-c26-material-audit-result.json').replaceAll('ARCHIVE_PYTHON','pythonProgram')
+export const MATERIAL_PROGRAM=oldMaterials.replaceAll('eduk12_c25_analysis_02/c25-analysis-resume-material-audit-result.json','eduk12_c26_a_06/c25-c26-material-audit-result.json').replaceAll('ARCHIVE_PYTHON','pythonProgram')
 export const RUN_PYTHON=String.raw`
 MATERIAL_PROGRAM=${JSON.stringify(MATERIAL_PROGRAM)}
 import argparse,ctypes,errno,fcntl,hashlib,importlib.util,json,os,re,shutil,signal,socket,stat,subprocess,sys,threading,time,traceback
@@ -18,7 +18,7 @@ def module(name,file):
  spec=importlib.util.spec_from_file_location(name,BASE/file);value=importlib.util.module_from_spec(spec);spec.loader.exec_module(value);return value
 preflight=module('c26_preflight','c25-contracts.py');source_contract=module('c26_source','c25-source.py')
 ROOT,REPO,BACKEND,FRONTEND=preflight.REPO.parent,preflight.REPO,preflight.BACKEND,preflight.FRONTEND
-STATE=ROOT/'eduk12_c26_a_05';DATA=ROOT/'eduk12_c25_http_01';CORE=ROOT/'eduk12_c25_continuation_02'
+STATE=ROOT/'eduk12_c26_a_06';DATA=ROOT/'eduk12_c25_http_01';CORE=ROOT/'eduk12_c25_continuation_02'
 sha_file,digest=preflight.sha_file,preflight.digest
 TOTAL,FINAL_AUDIT,MATERIAL,FINAL_STOP_VERIFY,DRIVER_CLEANUP=1200,300,60,60,60
 SEED=ROOT/'eduk12_c21_http_01/fixture-private.json';SEED_SHA='86287a00e4a34810c5e8e71afd70dac2f45c89750b9f04560aad67b4506d9239'
@@ -509,7 +509,7 @@ def finish_watchdog(done,watcher,budget,errors):
  return {'joined':not watcher.is_alive(),'observedMonotonicNs':str(budget.clock())}
 
 def archive_library(node):
- file=BASE/'c25-c26-archive.mjs';code=subprocess.check_output([node,'--input-type=module','-e',"import {pythonProgram} from "+json.dumps(file.as_uri())+";process.stdout.write(pythonProgram)"],text=True,timeout=10)
+ file=BASE/'c25-c26-recovery-carry.mjs';code=subprocess.check_output([node,'--input-type=module','-e',"import {pythonProgram} from "+json.dumps(file.as_uri())+";process.stdout.write(pythonProgram)"],text=True,timeout=10)
  archive={'__name__':'c26_recovery_library'};exec(compile(code,str(file),'exec'),archive);return archive,hashlib.sha256(code.encode()).hexdigest()
 def validate_build(a,node):
  values=[preflight.validate_build(a.backend_receipt,a.expected_backend_receipt_sha256,'backend',a.expected_head,node),preflight.validate_build(a.frontend_receipt,a.expected_frontend_receipt_sha256,'frontend',a.expected_head,node)]
@@ -680,7 +680,7 @@ def main():
    if recovery:
     try:
      item=recovery['files']['dataManifest'];out=STATE/'c25-c26-material-audit-result.json'
-     argv=[sys.executable,'-B','-c',MATERIAL_PROGRAM,str(node),str(BASE/'c25-c26-archive.mjs'),item['path'],item['sha256'],str(DATA),str(out)]
+     argv=[sys.executable,'-B','-c',MATERIAL_PROGRAM,str(node),str(BASE/'c25-c26-recovery-carry.mjs'),item['path'],item['sha256'],str(DATA),str(out)]
      run(argv,'c25-c26-material-audit',MATERIAL,budget.overall-FINAL_STOP_VERIFY*10**9);value=private_read(out);assert value['passed'] is True and value['sourceDataManifest']==item;result['materials']={'passed':True,'resultSha256':sha_file(out),'inlinePythonSha256':hashlib.sha256(MATERIAL_PROGRAM.encode()).hexdigest(),'argv':argv}
     except BaseException as error:errors.append({'stage':'material-audit','errorType':type(error).__name__})
   except BaseException as error:errors.append({'stage':'writer-cleanup','errorType':type(error).__name__})

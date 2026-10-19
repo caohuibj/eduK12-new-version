@@ -1229,3 +1229,28 @@ missing stat alone never supplies successful close evidence. JS measurement
 sampling, its original single bounded snapshot retry, children-interface
 ENOENT-only fallback and FD snapshot-race semantics are unchanged. This is
 no-service tool preparation, with no new recovery point or A retry.
+
+### C26 A05 observer failure and proposed A06 rollback identity
+
+A05 reached SQL readiness and the first actual primary-6708 / restored-6667
+logical admission, including the exact historical 73 ordinal and 3 parser
+proof. API readiness was observed; no fixture, attempt, FINAL or business HTTP
+was issued. The observer rejected ambiguous network inode candidates; its
+asynchronous fault for completed RPC 3 was masked by the parent's in-flight
+RPC 4 check. A05 remains overall false. The final audit remains false because
+the driver did not complete, although all old-row protection facts were true,
+there were no added rows, and before/after working rows and both DB snapshots
+were identical. No A performance result was accepted.
+
+The new carry contract is preparation only. It references the complete,
+previously extracted and verified recovery05 archive as a
+`LOGICALLY_EQUIVALENT_OLDER_PHYSICAL_ROLLBACK`. The current A05 physical manifest
+and all 33 exact before/after changed objects are separately pinned; numeric
+relations, catalogs, configuration and materials remain identical. The archive
+is not described as matching current WAL, control, statistics or metadata.
+Recovery means restoring the whole consistent recovery05 pgdata, uploads and
+exports, never mixing its files with current WAL. Original A05 and prior failed
+receipts and all archives remain unchanged. Current HEAD/source/producer identity
+is separately required; the old validator is not claimed to accept a new HEAD.
+A06/source14/carry06 have separate output identities. Issuance and runtime each
+still require approval, resource admission and independent evidence review.

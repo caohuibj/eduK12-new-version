@@ -1,0 +1,87 @@
+/** Pure contracts using frozen JSON evidence. No services, archive, extraction,
+ * descriptor issuance or producer execution. No original Python bytes change. */
+import assert from 'node:assert/strict'
+import test from 'node:test'
+import {spawnSync} from 'node:child_process'
+import {pythonProgram,invocation} from './c25-c26-recovery-carry.mjs'
+const python=body=>{
+ const code="import json,sys\nfrom unittest import mock\np=json.load(sys.stdin)\ns={'__name__':'carry_contract'}\nwith mock.patch('subprocess.Popen',side_effect=AssertionError('no subprocess')):exec(compile(p['source'],'<carry>','exec'),s)\nexec(compile(p['body'],'<contract>','exec'),s)"
+ const r=spawnSync(process.env.C25_TEST_PYTHON,['-B','-c',code],{input:JSON.stringify({source:pythonProgram,body}),encoding:'utf8',timeout:15000,maxBuffer:1024**2,env:{PATH:'/usr/bin:/bin',PYTHONDONTWRITEBYTECODE:'1'}});assert.ifError(r.error);assert.equal(r.status,0,r.stderr||r.stdout)
+}
+test('carry matches all 33 exact old/new objects and rejects numeric relations, config, materials or metadata drift',()=>python(String.raw`
+import copy
+before=json.loads((OUTPUT/NAMES['fullSourceManifest']).read_text());after=json.loads(CURRENT_FULL.read_text())
+assert sha_file(CURRENT_FULL)==PINNED[str(CURRENT_FULL)]
+proof=exact_physical_delta(before,after);assert proof['count']==33 and proof['allOtherObjectsEqual'] is True
+for where,field in [('pgdata/base/16384/2600','sha256'),('pgdata/postgresql.conf','sha256'),('pgdata/pg_xact/0000','sha256'),('exports','mode'),('pgdata/global/pg_control','mtimeNs')]:
+    bad=copy.deepcopy(after)
+    candidates=[r for r in bad if r['path']==where]
+    if not candidates and where=='pgdata/base/16384/2600':candidates=[r for r in bad if r['path'].startswith('pgdata/base/16384/') and r['path'].rsplit('/',1)[1].isdigit()]
+    assert candidates,where
+    target=candidates[0];target[field]='0'*64 if field=='sha256' else target[field]+1
+    try:exact_physical_delta(before,bad)
+    except AssertionError:pass
+    else:raise AssertionError('non-equivalent physical state accepted')
+for bad in [after[:-1],after+[copy.deepcopy(after[-1])],before]:
+    try:exact_physical_delta(before,bad)
+    except AssertionError:pass
+    else:raise AssertionError('missing/duplicate/old-current state accepted')
+assert not CARRY_OUTPUT.exists()
+`))
+test('carry uses actual A05 logical preservation while keeping overall and final qualification false',()=>python(String.raw`
+import copy
+load=lambda n:json.loads((A05/n).read_text())
+base,final,overall,driver=[load(n) for n in ['c25-c26-audit-baseline-result.json','c25-c26-audit-final-result.json','c25-c26-a-overall-result.json','c25-c26-a-driver-result-private.json']]
+diag=json.loads((A05_DIAGNOSTIC/'receipt.json').read_text());facts=logical_facts(base,final,overall,driver,diag)
+assert facts['oldRowProtectionPassed'] is True and facts['originalOverallPassed'] is False and facts['originalFinalAuditPassed'] is False and facts['businessWritesObserved']==0
+for change in ['business','prisma','rows','schema','budget','missing-baseline','final-green','overall-green','new-attempt']:
+    values=copy.deepcopy([base,final,overall,driver,diag]);b,f,o,d,x=values
+    if change=='business':d['http']=[{'method':'POST'}]
+    elif change=='prisma':d['prismaBusiness']={'issued':1}
+    elif change=='rows':f['protectedCoreFacts']['addedRowsByTable']={'users':1}
+    elif change=='schema':f['currentSnapshotFile']['sha256']='0'*64
+    elif change=='budget':f['protectedCoreFacts']['originalReportsSingletonExact']=False
+    elif change=='missing-baseline':b['passed']=False
+    elif change=='final-green':f['passed']=True
+    elif change=='overall-green':o['passed']=True
+    else:x['newAttempts']=1
+    try:logical_facts(*values)
+    except AssertionError:pass
+    else:raise AssertionError('unsupported logical equivalence admitted')
+`))
+test('carry consumer requires explicit kind, current producer HEAD and whole historical rollback semantics',()=>python(String.raw`
+import copy
+head='a'*40;producer={'head':head,'closure':'current'};contract={'files':{'dataManifest':{'path':'historical05'}}}
+value={'schemaVersion':1,'kind':CARRY_KIND,'scope':CARRY_SCOPE,'head':head,'producer':producer,'contract':contract,'files':contract['files'],'sourceRoot':str(SOURCE),'archiveBytesEqualCurrentPhysicalState':False,'logicalRollbackEquivalent':True,'newArchiveCreated':False,'newRoundTripExecuted':False,'durableBackup':False,'servicesStarted':False,'restorePolicy':'RESTORE_WHOLE_RECOVERY05_PGDATA_UPLOADS_EXPORTS; NEVER_MIX_CURRENT_WAL','passed':True}
+validate_carry_envelope(value,head,producer,contract)
+for key,bad_value in [('kind','PHYSICALLY_IDENTICAL'),('head','b'*40),('producer',{'head':'b'*40}),('contract',{}),('archiveBytesEqualCurrentPhysicalState',True),('newRoundTripExecuted',True),('restorePolicy','MIX_CURRENT_WAL'),('passed',False)]:
+    bad=copy.deepcopy(value);bad[key]=bad_value
+    try:validate_carry_envelope(bad,head,producer,contract)
+    except (AssertionError,KeyError):pass
+    else:raise AssertionError('forged carry identity accepted')
+assert OUTPUT==Path('/tmp/c25-c26-recovery-05') and CARRY_OUTPUT==Path('/tmp/c25-c26-carry-06')
+assert PRODUCER==BASE/'c25-c26-recovery-carry.mjs' and callable(verify_recovery_descriptor)
+`))
+test('carry checks current full before startup and still checks A05 history in final immutable verification',()=>python(String.raw`
+from unittest import mock
+old=json.loads(OLD_DESCRIPTOR.read_text());current=json.loads(CURRENT_FULL.read_text());calls=[]
+def historical():calls.append('historical05');return old,{'old':True}
+def accepted():calls.append('A05-evidence');return {'accepted':True}
+patches={'historical_rollback':historical,'accepted_a05_evidence':accepted,'stopped_current':lambda *_:calls.append('stopped'),'stopped_a05':lambda *_:calls.append('stopped-a05')}
+with mock.patch.dict(current_contract.__globals__,patches),mock.patch.dict(current_contract.__globals__,frozen_failure_manifest=lambda *_:current):
+    before=current_contract(ROOT/'eduk12_tools_20261018',True)
+    assert calls==['historical05','A05-evidence','stopped','stopped-a05'];calls.clear()
+    final=current_contract(ROOT/'eduk12_tools_20261018',False)
+    assert before==final and calls==['historical05','A05-evidence']
+with mock.patch.dict(current_contract.__globals__,patches),mock.patch.dict(current_contract.__globals__,frozen_failure_manifest=lambda *_:current[:-1]):
+    try:current_contract(ROOT/'eduk12_tools_20261018',True)
+    except AssertionError as e:assert str(e)=='current stopped tree differs from frozen A05'
+    else:raise AssertionError('new current physical drift accepted')
+assert not CARRY_OUTPUT.exists()
+`))
+test('carry CLI only names a fresh A06 carry output and cannot issue into historical archives',()=>{
+ const values={python:process.env.C25_TEST_PYTHON,tools:'/workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018',output:'/tmp/c25-c26-carry-06',descriptor:'/tmp/c25-source-14/c25-source-descriptor.json','expected-head':'a'.repeat(40),'expected-descriptor-sha256':'b'.repeat(64)},args=x=>Object.entries(x).flatMap(([k,v])=>['--'+k,v])
+ const r=invocation(args(values));assert.equal(r.python,values.python);assert.equal(r.args[2],pythonProgram)
+ for(const output of ['/tmp/c25-c26-recovery-05','/tmp/c25-c26-carry-05','/tmp/c25-c26-carry-06/nested'])assert.throws(()=>invocation(args({...values,output})))
+ assert.ok(pythonProgram.includes("__name__='historical_c26_library'"));assert.ok(pythonProgram.includes("if __name__=='__main__':carry_main()"))
+})
