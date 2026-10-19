@@ -198,8 +198,24 @@ try{
  {
   const v=await secondPage();v.s.readMode={status:404};await click(v.page,'下载 CSV');await v.page.getByRole('button',{name:'重新生成当前第 2 批',exact:true}).waitFor();v.s.readMode=null;v.s.postMode=403;
   await click(v.page,'重新生成当前第 2 批');await v.page.getByText(/需要最近五分钟的 TOTP 二次验证/).first().waitFor();const before=counts(v);
-  await v.page.getByLabel('最新 TOTP 动态验证码').fill('123456');await click(v.page,'完成五分钟内二次认证');assert.deepEqual(counts(v),before);v.s.postMode=null;
-  await click(v.page,'重新生成当前第 2 批');await v.page.getByText('CSV：尚未发起',{exact:true}).waitFor();assert.deepEqual(v.s.posts.at(-1),v.s.posts[1]);saveContract(v,'expired-ticket-mfa-explicit-recovery');await v.close();
+  assert.deepEqual(before,{posts:3,reads:4,downloads:3});
+  await v.page.getByLabel('最新 TOTP 动态验证码').fill('123456');
+  const stepped=v.page.waitForResponse(r=>r.request().method()==='POST'&&r.url()===survey+'/api/survey/auth/mfa/step-up'&&r.status()===200);
+  await click(v.page,'完成五分钟内二次认证');const stepResponse=await stepped;await stepResponse.finished();assert.deepEqual((await stepResponse.json()).data,{verified:true});
+  v.s.events.push({event:'mfa-success-response',status:stepResponse.status(),...counts(v)});
+  await v.page.getByRole('status').filter({hasText:/^已完成最新 TOTP 二次认证；敏感导出仅在接下来的五分钟内有效。$/}).waitFor();
+  assert.deepEqual(counts(v),before);v.s.events.push({event:'mfa-success-applied-no-automatic-export',...counts(v)});v.s.postMode=null;
+  const original=structuredClone(v.s.posts[1]),registered=new Promise(resolve=>{v.s.onPostRegistered=resolve;});
+  const recovered=v.page.waitForResponse(r=>r.request().method()==='POST'&&r.url()===survey+prefix+'/exports'&&r.status()===200);
+  await click(v.page,'重新生成当前第 2 批');assert.equal(await registered,4);assert.equal(v.s.posts.length,4);assert.deepEqual(v.s.posts[3],original);
+  v.s.events.push({event:'mfa-recovery-post-registered',...counts(v)});
+  const recoveryResponse=await recovered;await recoveryResponse.finished();const receipt=(await recoveryResponse.json()).data;assert.equal(receipt.pageNumber,2);assert.equal(receipt.status,'READY');
+  v.s.events.push({event:'mfa-recovery-200-response',status:recoveryResponse.status(),pageNumber:receipt.pageNumber,...counts(v)});
+  await v.page.getByRole('status').filter({hasText:/^已重新生成当前第 2 批。/}).waitFor();
+  await v.page.getByRole('button',{name:'重新生成当前第 2 批',exact:true}).waitFor({state:'detached'});
+  for(const part of ['CSV','Codebook','Manifest']){const button=v.page.getByRole('button',{name:'下载 '+part,exact:true});await button.waitFor();assert.equal(await button.count(),1);assert.equal(await button.isEnabled(),true);}
+  assert.deepEqual(counts(v),{posts:4,reads:4,downloads:3});assert.equal(v.s.events.filter(e=>e.event==='export-request').length,4);
+  v.s.events.push({event:'mfa-recovery-receipt-applied-no-automatic-download',...counts(v)});saveContract(v,'expired-ticket-mfa-explicit-recovery');await v.close();
  }
  {
   const v=await secondPage();await noAutomatic(v,600001);v.s.revision=8;await click(v.page,'重新生成当前第 2 批');await v.page.getByText(/重建回执与原批次页号或冻结来源不一致/).first().waitFor();assert.equal(v.s.reads.length,3);saveContract(v,'recovered-revision-rejected');await v.close();
