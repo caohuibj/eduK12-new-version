@@ -17,7 +17,7 @@ import {driverDeadlineContract,apiRssObservation} from './c25-c26-a-entry.mjs'
 import {probeDelta,classifyMetricCoverage,installPrismaBusinessGate} from './c25-c26-a-driver.mjs'
 import {assertResources} from './c25-c26-contract.mjs'
 const require=createRequire(import.meta.url),{selectAnalysisArtifact,BACKEND}=require('./c25-c26-analysis-artifacts.cjs')
-export const STATE='/workspace/scratch/5a77e8bdc1ae/eduk12_c26_analysis_abba_01'
+export const STATE='/workspace/scratch/5a77e8bdc1ae/eduk12_c26_analysis_abba_02'
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex'),proc=pid=>parseProcStat(fs.readFileSync(`/proc/${pid}/stat`,'utf8'))
 const sample=()=>({monotonicNs:process.hrtime.bigint().toString(),cpu:process.cpuUsage(),memory:process.memoryUsage()})
 export function analysisEnvelope(bytes,status,expected=200){

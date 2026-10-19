@@ -9,7 +9,7 @@ import {spawn} from 'node:child_process'
 import {fileURLToPath} from 'node:url'
 import {RUN_PYTHON as oldRun} from './c25-c26-run.mjs'
 import {MATERIAL_PYTHON as oldMaterials} from './c25-analysis-resume.mjs'
-export const MATERIAL_PROGRAM=oldMaterials.replaceAll('ARCHIVE_PYTHON','pythonProgram').replaceAll('eduk12_c25_analysis_02/c25-analysis-resume-material-audit-result.json','eduk12_c26_analysis_abba_01/c25-c26-material-audit-result.json')
+export const MATERIAL_PROGRAM=oldMaterials.replaceAll('ARCHIVE_PYTHON','pythonProgram').replaceAll('eduk12_c25_analysis_02/c25-analysis-resume-material-audit-result.json','eduk12_c26_analysis_abba_02/c25-c26-material-audit-result.json')
 export const RUN_PYTHON=String.raw`
 import argparse,ast,ctypes,errno,fcntl,hashlib,importlib.util,json,os,re,shutil,signal,socket,stat,subprocess,sys,threading,time,traceback
 from pathlib import Path
@@ -25,13 +25,56 @@ assert {n.name for n in nodes}==SHARED_NAMES
 exec(compile(ast.Module(body=nodes,type_ignores=[]),'<unchanged-owned-deadline-helpers>','exec'),globals())
 preflight=module('analysis_contracts','c25-contracts.py');source_contract=module('analysis_source','c25-source.py')
 ROOT,REPO,BACKEND,FRONTEND=preflight.REPO.parent,preflight.REPO,preflight.BACKEND,preflight.FRONTEND
-STATE=ROOT/'eduk12_c26_analysis_abba_01';LAUNCH=ROOT/'c25-build-evidence/c26-analysis-abba-launch-01';DATA=ROOT/'eduk12_c25_http_01';CORE=ROOT/'eduk12_c25_continuation_02'
+STATE=ROOT/'eduk12_c26_analysis_abba_02';LAUNCH=ROOT/'c25-build-evidence/c26-analysis-abba-launch-02';DATA=ROOT/'eduk12_c25_http_01';CORE=ROOT/'eduk12_c25_continuation_02'
 TOOLS=ROOT/'eduk12_tools_20261018';NODE=TOOLS/'node_modules/node/bin/node'
 sha_file,digest=preflight.sha_file,preflight.digest
 TOTAL,FINAL_AUDIT,MATERIAL,FINAL_STOP_VERIFY,DRIVER_CLEANUP=1200,300,60,60,60
 ARCHIVE_HEAD='394731e684dcaa99070b609f052d16c849aa3204'
 RECOVERY=ROOT/'c25-build-evidence/c26-analysis-recovery-01/recovery-descriptor.json';RECOVERY_SHA='b2d78a9adaa3b24ccbfd035a9cc6a0cb322368474d041c6bbc42e55a497e0756'
 SEED=ROOT/'eduk12_c25_continuation_02/c25-fixture-private.json';SEED_SHA='e1015179f1c4494c3448000b9c62fb0d18ab82a382c43a43ebb29d0bc7fc4e28'
+
+PRIOR=ROOT/'eduk12_c26_analysis_abba_01';DIAGNOSTIC=Path('/tmp/c25-c26-analysis-abba-diagnostic-01')
+LINEAGE_PINS={
+ DIAGNOSTIC/'review-index.json':'20f844b876bf8f9907e0b6d53e529aa7dfd3c07c8a75a88d2297d94e598a846d',
+ DIAGNOSTIC/'current-stopped-full-manifest.json':'b9c6d671c30f9318cd93127da2301e3426e9b8cbbd8ee0476e59e8493b1aca42',
+ DIAGNOSTIC/'physical-changes-from-recovery-private.json':'6b61e879c103cb0c34c04da32ea9d37402b9ebc4f9352164fbb0b397428a69df'}
+
+def assert_readonly_prior(baseline,final,controller,materials,api,observer):
+ for mode,value in [('baseline',baseline),('final',final)]:
+  assert value['passed'] is True and value['mode']==mode and value['scope']=='ANALYSIS_ONLY_EXACT_CURRENT_6708_6719';validate_final_facts(value)
+  assert all(code==0 for code in value['processExits'].values())
+  assert value['rowsFile']['sha256']=='f64d11468d872ffb55a84978162f05110baf226812bb4c5d5ca12b13256565e3'
+  assert value['snapshotSha256']=='f3b2837a0d6079899405f917a6231151d74536061809e171c09e7b5cf35b1728'
+  assert value['primarySnapshotFile']['sha256']=='f4e761419f5faf4a84befef265b4edff45d49d5a1d16a89cc09d039b1eed34b4'
+ assert controller['passed'] is False and controller['workloadComplete'] is False and controller['finalSnapshotVerified'] is True and controller['cleanupVerified'] is True and controller['cleanupErrors']==[]
+ assert controller['inputVerification']['passed'] is True and controller['protectedCoreFacts']==final['protectedCoreFacts']
+ assert materials['passed'] is True and materials['files']==39 and materials['allOldMaterialFilesRetained'] is True
+ for value in [api,observer]:assert value['closeObserved'] is True and value['groupQuiescent'] is True and value['exit']=={'code':0,'signal':None}
+ assert observer['passed'] is True and api['passed'] is False
+
+def assert_lineage_objects(original,current,expected,delta):
+ assert current==expected,'current tree differs from exact failed ABBA01 lineage'
+ old={r['path']:r for r in original};now={r['path']:r for r in current};assert len(old)==len(original) and len(now)==len(current)
+ changes=[{'path':p,'before':old.get(p),'after':now.get(p)} for p in sorted(old.keys()|now.keys()) if old.get(p)!=now.get(p)]
+ assert changes==delta and len(changes)==47,'not the fixed 47 complete physical changes'
+ # This explicitly accepts only the pinned observed transition. It is not a
+ # general WAL/catalog/relfilenode exception and grants no future drift.
+ return len(changes)
+
+def verify_readonly_lineage(archive,recovery,check_data):
+ assert type(check_data)is bool
+ for p,h in LINEAGE_PINS.items():assert archive['file_binding'](p)['sha256']==h
+ index=private_read(DIAGNOSTIC/'review-index.json');assert index['head']=='d647b326a3179d8b31e29584557596fb43443867' and index['runtimePassed'] is False and index['workloadComplete'] is False and index['lockReleasedNonblockingVerified'] is True
+ for p,item in index['files'].items():assert archive['file_binding'](Path(p))==item,'prior failed runtime evidence changed'
+ read=lambda n:private_read(PRIOR/n)
+ assert_readonly_prior(read('c25-c26-audit-baseline-result.json'),read('c25-c26-audit-final-result.json'),read('c25-c26-analysis-controller-result.json'),read('c25-c26-material-audit-result.json'),read('block-1-api/api-lifecycle-private.json'),read('block-1-observer/observer-session-private.json'))
+ old=private_read(Path(recovery['files']['fullSourceManifest']['path']));expected=private_read(DIAGNOSTIC/'current-stopped-full-manifest.json');delta=private_read(DIAGNOSTIC/'physical-changes-from-recovery-private.json')
+ assert_lineage_objects(old,expected,expected,delta)
+ if check_data:
+  assert not (DATA/'pgdata/postmaster.pid').exists()
+  assert_lineage_objects(old,archive['frozen_failure_manifest'](DATA),expected,delta)
+ return {'kind':'ONE_FIXED_READ_ONLY_RETRY_LINEAGE','priorOverallPassed':False,'logicalRowsBeforeAfterExact':True,'physicalChanges':47,'currentPhysicalTreeRechecked':check_data,'evidence':{str(p):h for p,h in LINEAGE_PINS.items()},'rollback':'RESTORE_ONLY_THE_COMPLETE_ORIGINAL_394_ARCHIVE; NEVER_MIX_CURRENT_WAL_OR_CONTROL','archiveEqualsCurrentPhysicalBytes':False}
+
 
 def deadline_from(started):
  b=Deadline();assert type(started)is int and started<=b.started and (b.started-started)<1200*10**9
@@ -53,7 +96,8 @@ def collect_binding(a,effective,archive_sha):
 
 def final_input_verification(a,archive,archive_sha):
  before=private_read(STATE/'c25-c26-frozen-inputs.json');effective=private_read(STATE/'c25-c26-effective-runtime-private.json');assert collect_binding(a,effective,archive_sha)==before
- archive['verify_recovery_descriptor'](a.recovery_descriptor,a.expected_recovery_sha256,a.tools,ARCHIVE_HEAD,check_data=False)
+ recovery=archive['verify_recovery_descriptor'](a.recovery_descriptor,a.expected_recovery_sha256,a.tools,ARCHIVE_HEAD,check_data=False)
+ verify_readonly_lineage(archive,recovery,False)
  pins=private_read(STATE/'c25-c26-input-bindings-private.json');assert sha_file(STATE/'c25-c26-frozen-inputs.json')==pins['frozenInputsSha256']
  assert sha_file(STATE/'runtime-private.json')==pins['runtimeSha256'] and sha_file(STATE/'c25-c26-effective-runtime-private.json')==pins['effectiveRuntimeSha256']
  private_json(STATE/'c25-c26-input-verification-result.json',{'passed':True,'sourceUnchanged':True,'inputsUnchanged':True,'recoveryEvidenceUnchanged':True})
@@ -171,7 +215,8 @@ def main():
  try:
   record_status();result['subreaper']=enable_subreaper();assert subprocess.check_output([node,'--version'],text=True,timeout=10).strip()=='v24.21.0';assert '16.15' in subprocess.check_output([pg/'postgres','--version'],text=True,timeout=10);assert 'v=7.4.11 ' in subprocess.check_output([redis,'--version'],text=True,timeout=10)
   archive,archive_sha=archive_library(node)
-  recovery=archive['verify_recovery_descriptor'](a.recovery_descriptor,a.expected_recovery_sha256,a.tools,ARCHIVE_HEAD,check_data=True)
+  recovery=archive['verify_recovery_descriptor'](a.recovery_descriptor,a.expected_recovery_sha256,a.tools,ARCHIVE_HEAD,check_data=False)
+  result['recoveryLineage']=verify_readonly_lineage(archive,recovery,True);private_json(STATE/'c25-c26-readonly-lineage-admission.json',result['recoveryLineage'])
   held=[]
   for name in ['postgres','redis','api']:
    sock=socket.socket();sock.bind(('127.0.0.1',0));held.append(sock);status['ports'][name]=sock.getsockname()[1]
@@ -326,7 +371,7 @@ if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.ur
  const c=invocation(process.argv.slice(2)),p=spawn(c.python,c.args,{stdio:['pipe','inherit','inherit']});let spawnError,closed=false
  const handlers=Object.fromEntries(['SIGTERM','SIGINT','SIGHUP'].map(s=>[s,()=>{if(!closed)p.kill(s)}]));for(const[s,h]of Object.entries(handlers))process.on(s,h)
  p.stdin.on('error',e=>{spawnError??=e});p.stdin.end(c.input);p.on('error',e=>{spawnError??=e;process.exitCode=1})
- p.on('close',(code,signal)=>{closed=true;for(const[s,h]of Object.entries(handlers))process.off(s,h);const root='/workspace/scratch/5a77e8bdc1ae',dir=root+'/c25-build-evidence/c26-analysis-abba-launch-01',hash=p=>createHash('sha256').update(fs.readFileSync(p)).digest('hex')
+ p.on('close',(code,signal)=>{closed=true;for(const[s,h]of Object.entries(handlers))process.off(s,h);const root='/workspace/scratch/5a77e8bdc1ae',dir=root+'/c25-build-evidence/c26-analysis-abba-launch-02',hash=p=>createHash('sha256').update(fs.readFileSync(p)).digest('hex')
   const save=(name,value)=>{const fd=fs.openSync(dir+'/'+name,'wx',0o600);try{fs.writeFileSync(fd,JSON.stringify(value));fs.fsyncSync(fd)}finally{fs.closeSync(fd)}const d=fs.openSync(dir,'r');fs.fsyncSync(d);fs.closeSync(d)}
   const result={schemaVersion:1,passed:false,exitCode:code,signal,error:spawnError?.name??null,lockReleased:false};try{
    save('outer-python-exit.json',{pid:p.pid,code,signal,observedMonotonicNs:process.hrtime.bigint().toString(),error:result.error});const prior=JSON.parse(fs.readFileSync(dir+'/overall-result.json'));assert.equal(code,0);assert.equal(signal,null);assert.ok(!spawnError);assert.equal(prior.passed,true);assert.equal(prior.lockReleased,true)

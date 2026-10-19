@@ -166,3 +166,29 @@ resource floors without requesting API RSS. Active API RSS remains strict, and
 final probe/actual exit/group-quiescence proofs remain mandatory. Execution
 prepare-04 passes one new two-branch timer contract for normal closing and
 active malformed RSS rejection. No old parser or safety ownership is changed.
+
+Analysis ABBA02 has a one-time, explicit read-only lineage admission from the
+failed ABBA01. The original 394731e6 full XZ archive, descriptor and actual
+round-trip evidence retain their original consumer validation with
+`check_data=False`. They are a consistent whole rollback set, not a claim that
+current WAL/control or physical bytes still match that archive.
+
+The new entry binds the entire frozen ABBA01 false index, both actual full
+before/after rows and schemas (primary 6708, working 6719), 39 material files,
+actual API/observer exit 0, and completed cleanup. It additionally binds current
+full manifest b9c6d671 and all 47 complete old/new object differences from the
+original recovery manifest. That exact transition includes two numeric relation
+files; no general relation/WAL exception or future drift is authorized. Before
+startup, the entire stopped tree must equal this fixed current manifest. The
+new HEAD and A/B artifacts are separately bound, and a fresh exact logical
+baseline still precedes API startup. Final checks revalidate all immutable prior
+evidence without demanding that another PostgreSQL session leave physical
+metadata unchanged. Recovery means restoring the whole original archive; it
+never permits mixing its files with current WAL or control files.
+
+Execution prepare-05 passes the new actual frozen-evidence/current-tree contract
+and its seven drift/safety rejection branches, plus only the affected existing
+6719-row/schema admission contract. It executes no SQL, archive or service.
+ABBA01 and its false result remain unchanged; ABBA02 uses fresh state/launch
+roots and still needs separate runtime authorization. This bridge does not
+claim a new logical restore test or an A/B performance result.

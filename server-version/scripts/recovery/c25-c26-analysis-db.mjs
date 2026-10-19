@@ -5,7 +5,7 @@ import path from 'node:path'
 import {spawnSync} from 'node:child_process'
 import {fileURLToPath} from 'node:url'
 import {INLINE_PYTHON as oldProgram} from './c25-c26-db.mjs'
-export const STATE='/workspace/scratch/5a77e8bdc1ae/eduk12_c26_analysis_abba_01'
+export const STATE='/workspace/scratch/5a77e8bdc1ae/eduk12_c26_analysis_abba_02'
 export const INLINE_PYTHON=String.raw`
 import argparse,hashlib,json,os,sys,traceback
 from pathlib import Path
