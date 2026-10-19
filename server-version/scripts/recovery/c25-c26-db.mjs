@@ -9,7 +9,7 @@ import {fileURLToPath} from 'node:url'
 import {INLINE_PYTHON as ANALYSIS_INLINE_PYTHON} from './c25-analysis-db.mjs'
 
 const directory=path.dirname(fileURLToPath(import.meta.url)),root=path.resolve(directory,'../../../..')
-export const STATE=path.join(root,'eduk12_c26_a_01')
+export const STATE=path.join(root,'eduk12_c26_a_02')
 export const BASELINE_LABEL='c25-c26-audit-baseline',DB_TIMEOUT_MS=295000
 export const CORE_SNAPSHOT_SHA256='2116f582580ab67d0c5f69330d73300b026a3eaeeacf94a47f268aa16b244e85'
 export const PRIMARY_SNAPSHOT_SHA256='f4e761419f5faf4a84befef265b4edff45d49d5a1d16a89cc09d039b1eed34b4'

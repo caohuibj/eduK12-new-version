@@ -5,6 +5,8 @@ import test from 'node:test'
 import {spawnSync} from 'node:child_process'
 import {fileURLToPath} from 'node:url'
 import {RUN_PYTHON,MATERIAL_PROGRAM,invocation} from './c25-c26-run.mjs'
+import {STATE as databaseState,invocation as databaseInvocation} from './c25-c26-db.mjs'
+import {STATE as entryState,main as driverEntry} from './c25-c26-a-entry.mjs'
 const base=fileURLToPath(new URL('.',import.meta.url))
 function python(body,{timeout=15000}={}){
  const bootstrap=`import json,sys\nfrom unittest import mock\np=json.load(sys.stdin)\nsys.argv=['c26-contract',p['base']]\nscope={'__name__':'c26_outer_contract'}\nexec(compile(p['source'],'<real-outer-controller>','exec'),scope)\nexec(compile(p['body'],'<new-contract>','exec'),scope)`
@@ -49,6 +51,15 @@ with tempfile.TemporaryDirectory() as tmp:
   assert called==[]
  print(json.dumps({'originalEmptyPortRejected':True,'actualUnchangedConstructorAccepted':True,'runtimeMismatchRejected':True,'durabilityFailureBlockedAudit':True}))
 `))
+test('A02 evidence identity agrees across the actual entry audit controller and material reader and rejects A01',async()=>{
+ const current='/workspace/scratch/5a77e8bdc1ae/eduk12_c26_a_02',old=current.replace('_02','_01')
+ assert.equal(entryState,current);assert.equal(databaseState,current)
+ const args=['--python','/usr/bin/python3','--tools','/tools','--state',current,'--mode','baseline','--label','c25-c26-audit-baseline']
+ assert.equal(databaseInvocation(args).state,current);assert.throws(()=>databaseInvocation(args.map(x=>x===current?old:x)))
+ const previous=process.argv
+ try{process.argv=[previous[0],previous[1],old];await assert.rejects(driverEntry(),/eduk12_c26_a_0[12]/)}finally{process.argv=previous}
+ python("assert STATE==ROOT/'eduk12_c26_a_02'\nassert 'eduk12_c26_a_02/c25-c26-material-audit-result.json' in MATERIAL_PROGRAM\nassert 'eduk12_c26_a_01' not in MATERIAL_PROGRAM")
+})
 test('one original budget fixes work/driver/final audit tails before preflight and rejects late durable PASS',()=>python(String.raw`
 import tempfile
 from unittest import mock
@@ -183,12 +194,12 @@ for key in ['originalReportsSingletonExact','primarySnapshotExact','allColumnsPr
 test('fixed archive export and adapted material reader load actual frozen libraries without service I/O',()=>python(String.raw`
 node=ROOT/'eduk12_tools_20261018/node_modules/node/bin/node'
 archive,inline_sha=archive_library(node)
-assert archive['SOURCE']==DATA and archive['OUTPUT']==Path('/tmp/c25-c26-recovery-01')
+assert archive['SOURCE']==DATA and archive['OUTPUT']==Path('/tmp/c25-c26-recovery-02')
 assert archive['PRODUCER']==BASE/'c25-c26-archive.mjs'
 assert archive['SEED_FIXTURE']==SEED and archive['SEED_FIXTURE_SHA']==SEED_SHA
 assert re.fullmatch('[a-f0-9]{64}',inline_sha)
 assert 'import {pythonProgram}' in MATERIAL_PROGRAM and 'process.stdout.write(pythonProgram)' in MATERIAL_PROGRAM
-assert 'eduk12_c26_a_01/c25-c26-material-audit-result.json' in MATERIAL_PROGRAM
+assert 'eduk12_c26_a_02/c25-c26-material-audit-result.json' in MATERIAL_PROGRAM
 scope={'__name__':'material_library'};exec(compile(MATERIAL_PROGRAM,'<materials>','exec'),scope)
 assert callable(scope['verify_old_materials'])
 `))
