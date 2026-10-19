@@ -137,7 +137,7 @@ export function createProcSocketReader({registry,remainingMs,record,io=realIo,no
      const all=ids.map(value=>{const p=stat(Number(value));return {pid:p.pid,startTicks:p.startTicks,parentPid:p.parentPid,processGroupId:p.processGroupId}})
      check();readCount++;const after=io.readdir('/proc');assert.ok(Array.isArray(after)&&after.length<=8192,'global proc directory bound');const afterIds=after.filter(x=>typeof x==='string'&&/^[1-9][0-9]*$/.test(x)).sort((a,b)=>Number(a)-Number(b))
      if(!same(ids,afterIds))race('global process set changed during child enumeration')
-     const children=all.filter(p=>p.parentPid===postmaster.pid);assert.ok(children.length<=MAX_PROCESSES,'PG child bound')
+     const children=all.filter(p=>p.parentPid===postmaster.pid);assert.ok(children.length<=MAX_PROCESSES,'PG child bound');for(const child of children)pin(child) // Bind the FIRST PPID scan, before sample(pid) can observe a reused PID.
      globalProcScans++;globalProcRows+=all.length;globalProcElapsedMs+=clock()-scanAt;check()
      return {method:childEnumerationMethod,tids,pids:children.map(p=>p.pid),globalIdentities:all}
     }

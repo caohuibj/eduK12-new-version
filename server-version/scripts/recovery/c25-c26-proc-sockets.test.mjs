@@ -122,3 +122,9 @@ test('explicitly absent children interface uses bounded complete PPID enumeratio
   if(mode==='churn'||mode==='missing')assert.equal(bad.events.filter(e=>e.kind==='proc_socket_snapshot_failure').length,2)
  }
 })
+
+test('PPID first scan pins child identity before the second stat and forbids PID reuse as a retry',()=>{
+ const h=fixture();h.texts.delete('/proc/10/task/10/children');h.dirs.set('/proc',['10','20','30','40','50','11','102','103'])
+ h.before=(op,path,count)=>{if(op==='text'&&path==='/proc/102/stat'&&count===2)h.texts.set(path,stat(102,{parentPid:10,processGroupId:10,startTicks:'999'}))}
+ assert.throws(()=>h.read(),/PID reused or process group\/parent changed/);assert.equal(h.events.length,1);assert.equal(h.events[0].retryAllowed,false);assert.equal(h.counts.get('text:/proc/102/stat'),2)
+})
