@@ -1,0 +1,22 @@
+from pathlib import Path
+from urllib.parse import urlparse,unquote
+import json,subprocess,os
+b=Path(__file__).resolve().parents[1]
+cfg=json.loads((b/'runtime/private/environment.json').read_text());u=urlparse(cfg['DATABASE_URL_RUNTIME'])
+assert cfg['NODE_ENV']=='test' and (u.hostname,u.port,u.path,u.username)==('127.0.0.1',5557,'/survey_s01_test','survey_s01_runtime')
+sql="""BEGIN READ ONLY;
+SELECT coalesce(json_agg(x),'[]'::json) FROM (
+SELECT p.id,p.title,p.revision,w.id AS wave_id,w.title AS wave_title,w.status,
+(SELECT count(*) FROM survey_wave_finals f WHERE f.project_id=p.id AND f.wave_id=w.id) AS final_count,
+(SELECT count(*) FROM survey_cognitive_results c WHERE c.project_id=p.id AND c.wave_id=w.id) AS cognitive_result_count
+FROM survey_projects p JOIN users u ON u.id=p.owner_user_id JOIN survey_waves w ON w.project_id=p.id
+WHERE u.username='s01_researcher' AND p.title IN ('S01 合成研究 · 学习体验','S03 合成研究 · 外围界面检查')
+ORDER BY p.title,w.ordinal) x;
+COMMIT;"""
+p=subprocess.run(['/opt/homebrew/opt/postgresql@16/bin/psql','-X','-h','127.0.0.1','-p','5557','-U',u.username,'-d','survey_s01_test','-Atq','-v','ON_ERROR_STOP=1'],input=sql,text=True,capture_output=True,env=dict(os.environ,PGPASSWORD=unquote(u.password)))
+if p.returncode:
+ print(json.dumps({'exitCode':p.returncode,'sandboxOperationDenied':'Operation not permitted' in p.stderr,'permissionDenied':'permission denied' in p.stderr,'relationMissing':'does not exist' in p.stderr,'sqlError':'ERROR:' in p.stderr}))
+ raise SystemExit(1)
+result={'syntheticOnly':True,'readOnly':True,'scope':'two explicitly named task projects; metadata counts only, no answer decryption','waves':json.loads(p.stdout)}
+(b/'evidence/s06/data-inventory.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps(result,ensure_ascii=False,indent=2))

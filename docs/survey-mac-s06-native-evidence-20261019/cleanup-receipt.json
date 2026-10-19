@@ -1,0 +1,15 @@
+{
+  "utc": "2026-10-19T08:32:02.078226+00:00",
+  "collector3198Stopped": true,
+  "pid": 84242,
+  "reason": "evidence saved; Mac locked; no additional native UI actions",
+  "taskApi3197RestoredPreviously": true,
+  "browserCollectorTabClose": "not performed after lock; server stopped",
+  "afterUnlock": {
+    "utc": "2026-10-19T08:48:41.163252+00:00",
+    "collectorStoppedPid": 85450,
+    "ownCollectorTabClosed": true,
+    "apiRestoredPid": 86564,
+    "safariDownloadPreference": "Downloads restored in original native pass; unchanged during final supplement"
+  }
+}

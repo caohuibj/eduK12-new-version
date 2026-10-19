@@ -1,0 +1,249 @@
+{
+  "collectorVerified": true,
+  "actualReceipts": [
+    {
+      "name": "s06-native-ax-complete.json",
+      "bytes": 384547,
+      "fnv1a32": "1dd41908",
+      "sha256": "6c7550622db6af114f9bf11687e758b1b2a3c2ed353053c1a13383b7a46d7722",
+      "saved": true
+    },
+    {
+      "name": "chrome-raw-csv-after-cancel-retry.jpg",
+      "bytes": 559147,
+      "fnv1a32": "ab58ef06",
+      "sha256": "970df21acc88820704829fdf0fbe06eb10121a33378d5b08b1a4f7e752bd1c50",
+      "saved": true
+    },
+    {
+      "name": "chrome-raw-three-files.jpg",
+      "bytes": 580837,
+      "fnv1a32": "1144055c",
+      "sha256": "5df683fb66d0b79d6e1f7c43ad8587f87da59743d2b93c745d3a496748d50336",
+      "saved": true
+    },
+    {
+      "name": "chrome-cognitive-three-files.jpg",
+      "bytes": 546225,
+      "fnv1a32": "8b0e5886",
+      "sha256": "aabc89ac327ab001205365543ac2be28cfffbbe7c4ff7bbd177d134c9ccc755c",
+      "saved": true
+    },
+    {
+      "name": "numbers-chrome-raw.jpg",
+      "bytes": 505218,
+      "fnv1a32": "4d9558f4",
+      "sha256": "b5caa95dabc3c52c401911cfbd73c284be189529f291159694ee608a0521b3df",
+      "saved": true
+    },
+    {
+      "name": "safari-raw-save-cancel-dialog.jpg",
+      "bytes": 208678,
+      "fnv1a32": "e29ddac2",
+      "sha256": "a08e3b850ecb32a03f90c2c97f78b13ce8bedc2409eccc0153aae9875fd3bdec",
+      "saved": true
+    },
+    {
+      "name": "chrome-cognitive-read-failure.jpg",
+      "bytes": 544598,
+      "fnv1a32": "95a4fce5",
+      "sha256": "6404d15da0a72911142de188acc74059d86d5a38bc2899508d7382be0fe4924b",
+      "saved": true
+    },
+    {
+      "name": "safari-raw-three-files.jpg",
+      "bytes": 503929,
+      "fnv1a32": "3958daed",
+      "sha256": "f0e659cdd962a7478dc0160b3be01dd167512ac423475181993c1319e8032421",
+      "saved": true
+    },
+    {
+      "name": "numbers-chrome-cognitive.jpg",
+      "bytes": 489804,
+      "fnv1a32": "f5eb23fa",
+      "sha256": "9a060c9ac36c7bff8b973b44703276ee82362a61c642041efbf02e1ee403841c",
+      "saved": true
+    },
+    {
+      "name": "safari-raw-read-failure.jpg",
+      "bytes": 503016,
+      "fnv1a32": "a8b142b5",
+      "sha256": "7982738c25990a3ae4b8a01e00f8c2e88bc0d37ffaa23785db7f656d47e4cfab",
+      "saved": true
+    },
+    {
+      "name": "numbers-chrome-cognitive-loaded.jpg",
+      "bytes": 861281,
+      "fnv1a32": "23660ce6",
+      "sha256": "faadb783fe1ba8686518b6945337745209bf2c81cc765436803f52e7c3ffb9d9",
+      "saved": true
+    },
+    {
+      "name": "safari-cognitive-three-files.jpg",
+      "bytes": 544754,
+      "fnv1a32": "1a7ca94a",
+      "sha256": "53b1b72db5a5475fce5e70aa6e661e054857027de05875c2b9ee7a29d4b86c10",
+      "saved": true
+    },
+    {
+      "name": "numbers-safari-raw.jpg",
+      "bytes": 489260,
+      "fnv1a32": "ea9a7e9f",
+      "sha256": "e4d1077d870f1cd0ce971c65ef7138d2e9f63933334955dde4a49a7b5202904b",
+      "saved": true
+    },
+    {
+      "name": "numbers-safari-cognitive.jpg",
+      "bytes": 876206,
+      "fnv1a32": "9936c66e",
+      "sha256": "c957fc6fd0c498fa33c559fc38755af5e2cd5838f32effbf0f519bb9cee2b508",
+      "saved": true
+    },
+    {
+      "name": "chrome-raw-chinese-files.jpg",
+      "bytes": 530811,
+      "fnv1a32": "48c810ae",
+      "sha256": "a9701297ff7bfb9e4fbc77d606c5ff0b4f17980830b0aefae8d89bad9dd0366c",
+      "saved": true
+    },
+    {
+      "name": "safari-matrix-final.jpg",
+      "bytes": 347901,
+      "fnv1a32": "9ffc8d57",
+      "sha256": "a1b73d09abb7dfc306c6897a28858a7beb9e6815cc16709a81d165515258c0ac",
+      "saved": true
+    },
+    {
+      "name": "chrome-matrix-final.jpg",
+      "bytes": 378581,
+      "fnv1a32": "1295e20d",
+      "sha256": "1938f8366f716029175bdeb7bbe5e0bc3e7fffb45111c4674be982ae25fa2c24",
+      "saved": true
+    },
+    {
+      "name": "safari-download-local-network-error-final.jpg",
+      "bytes": 517084,
+      "fnv1a32": "00bef054",
+      "sha256": "974282b32fdb858504100feda67b1922459696528147eeedfa573e4bc8e79a60",
+      "saved": true
+    },
+    {
+      "name": "chrome-download-local-network-error-final.jpg",
+      "bytes": 515435,
+      "fnv1a32": "81a8788c",
+      "sha256": "55b22bca24d424e5937b56826d72d8836318c504f8144f075493069e68451292",
+      "saved": true
+    },
+    {
+      "name": "chrome-download-network-retry-final.jpg",
+      "bytes": 532580,
+      "fnv1a32": "65a4659a",
+      "sha256": "96ebc299b7b46c1f82410fe8d88de5f06b2de9f0aac9e0815618feea3c2bc628",
+      "saved": true
+    },
+    {
+      "name": "safari-download-network-retry-final.jpg",
+      "bytes": 500888,
+      "fnv1a32": "3ad066c9",
+      "sha256": "8e8db419892ae8945997f5082e0d1a7f7cb653146a4210de1520f00d86007535",
+      "saved": true
+    },
+    {
+      "name": "s06-native-ax-final.json",
+      "bytes": 132338,
+      "fnv1a32": "a14f99c4",
+      "sha256": "bd84a3a74c5ba1c5164586ee9815d2ee3ed9af1ae210e7e73814d43c265fe14d",
+      "saved": true
+    },
+    {
+      "name": "numbers-chinese-content-final.jpg",
+      "bytes": 742152,
+      "fnv1a32": "29b7d089",
+      "sha256": "037f3074c8940d1e59ec569d89215fc33535bd20b042a27f8ae7b89777a7150f",
+      "saved": true
+    },
+    {
+      "name": "safari-error-copy-gap-before-fix.jpg",
+      "bytes": 516469,
+      "fnv1a32": "277e43b9",
+      "sha256": "9e7952b0f1ab03c34c92eb973ce6b69840a516b7f0524fe8d87d5ee3932f4bc5",
+      "saved": true
+    },
+    {
+      "name": "chrome-error-copy-final.jpg",
+      "bytes": 516914,
+      "fnv1a32": "8aabc79d",
+      "sha256": "1e7be5723ac7408c34b5909928e0d7b48ffa58bb22e5c1b7060dcaa87fbb027d",
+      "saved": true
+    },
+    {
+      "name": "s06-native-copy-gap-and-chinese.json",
+      "bytes": 65930,
+      "fnv1a32": "156c9879",
+      "sha256": "1c8b6bc9e993b09b7b03d4a854dc6d62d037f8144d2fade19dff1fac3ff425be",
+      "saved": true
+    },
+    {
+      "name": "safari-error-copy-fixed-final.jpg",
+      "bytes": 522300,
+      "fnv1a32": "fc6d2d5c",
+      "sha256": "4b77c1bdd3ab1af0cb2913ac6ae8df8a3657094099d433e9e1e83f9f2a19147a",
+      "saved": true
+    },
+    {
+      "name": "s06-native-safari-copy-fixed.json",
+      "bytes": 20558,
+      "fnv1a32": "f6673b2e",
+      "sha256": "f6024474cc7cb36d1b3acad40419138ec73a0a53d0eb763452984ca46707b791",
+      "saved": true
+    }
+  ],
+  "originalMissingAfterKernelReset": [
+    {
+      "name": "safari-cognitive-read-failure.jpg",
+      "bytes": 540008,
+      "fnv1a32": "e8d3da2e"
+    },
+    {
+      "name": "chrome-matrix-native-names.jpg",
+      "bytes": 380193,
+      "fnv1a32": "98d99d2e"
+    },
+    {
+      "name": "safari-matrix-native-names.jpg",
+      "bytes": 317330,
+      "fnv1a32": "0a00cfb1"
+    },
+    {
+      "name": "safari-matrix-keyboard-focused.jpg",
+      "bytes": 302888,
+      "fnv1a32": "45ec1f78"
+    }
+  ],
+  "replacements": [
+    "chrome-matrix-final.jpg",
+    "safari-matrix-final.jpg",
+    "chrome-download-local-network-error-final.jpg",
+    "safari-download-local-network-error-final.jpg"
+  ],
+  "wrongIntermediateNumbersImage": "numbers-chrome-cognitive.jpg still shows preceding RAW table; do not count as cognitive-open pass; use numbers-chrome-cognitive-loaded.jpg",
+  "oldErrorImages": "error banners above viewport; AX proves earlier errors, use final local-network-error images for visible nearby errors",
+  "failedDataUrlJson": {
+    "file": "s06-native-ax-data-url-truncated.failed.json",
+    "bytes": 383978,
+    "sha256": "1b494a8459fd958886bf42fbf12f0104f6b4291a45c6bf93b112dc21ea00f43f",
+    "accepted": false
+  },
+  "canonicalSourceFNV": {
+    "s06-native-ax-complete.json": "1dd41908",
+    "s06-native-ax-final.json": "a14f99c4"
+  },
+  "afterUnlockSupplement": {
+    "originalJpegsAdded": 4,
+    "rawAxAdded": 2,
+    "safariEnglishGapPreserved": true,
+    "safariFixedChineseVerified": "6db06f6",
+    "chromeChineseVerified": "9a9c309; final Safari-only compatibility change does not change Chrome branch",
+    "numbersChineseVisible": true
+  }
+}

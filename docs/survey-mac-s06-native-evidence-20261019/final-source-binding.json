@@ -1,0 +1,43 @@
+{
+  "finalProductHead": "6db06f628b3a1cc163389f816140424f6cd487ca",
+  "nativeInitialProductHead": "9289136da15bbf3ed44b3567e0d299060dd224b9",
+  "nativeNetworkAndErrorPositionHead": "f16e258c557fe3c3d5ecd5d15578daa081eb658a",
+  "finalProductFiles": {
+    "server-version/frontend/src/survey/ResearchPreview.tsx": {
+      "bytes": 14209,
+      "sha256": "c6bd7950fcdee89b8ba7c576592472729e7d0a8b946d4bf2bc4d970c0891c2f1"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.tsx": {
+      "bytes": 72134,
+      "sha256": "c3e185870cffc9092a9c8bb63721ab9b8095c04e2603576e0b790f96089d19d1"
+    },
+    "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.tsx": {
+      "bytes": 37438,
+      "sha256": "2a3e3ebc052d0de38d963b3bd1b35d22bc0703cabc619d425c57f3ec5c65c832"
+    }
+  },
+  "unchangedContracts": {
+    "server-version/backend": {
+      "before": "74720e530d99efe1135103951fdc9a256318e9ec",
+      "after": "74720e530d99efe1135103951fdc9a256318e9ec"
+    },
+    "server-version/frontend/src/modules": {
+      "before": "4d1dbe6055471f31248bf72abbca925880537b63",
+      "after": "4d1dbe6055471f31248bf72abbca925880537b63"
+    },
+    "server-version/frontend/package.json": {
+      "before": "4a287572dfb7d636477ea34985fab7a0b12fae53",
+      "after": "4a287572dfb7d636477ea34985fab7a0b12fae53"
+    },
+    "server-version/frontend/package-lock.json": {
+      "before": "9fc33dd617ce75766564786d880e588142c11eed",
+      "after": "9fc33dd617ce75766564786d880e588142c11eed"
+    }
+  },
+  "scope": "backend, permissions/scoring/runtime/shared cognitive modules/dependencies unchanged; source-evidence only, not CI or production",
+  "newNativeShots": 20,
+  "nativeLiteralCopyHeads": {
+    "Chrome": "9a9c3094c09a68e29bdca04d8163a8e99c748567",
+    "Safari": "6db06f628b3a1cc163389f816140424f6cd487ca"
+  }
+}

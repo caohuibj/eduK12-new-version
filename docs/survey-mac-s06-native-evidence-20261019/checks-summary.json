@@ -1,0 +1,65 @@
+{
+  "reports": {
+    "matrix": {
+      "numPassedTests": 2,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "success": true
+    },
+    "matrix-existing": {
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 7,
+      "success": true
+    },
+    "downloads": {
+      "numPassedTests": 14,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "success": true
+    },
+    "download-reset": {
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 14,
+      "success": true
+    },
+    "download-local-error": {
+      "numPassedTests": 7,
+      "numFailedTests": 0,
+      "numPendingTests": 8,
+      "success": true
+    },
+    "download-network-copy": {
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 14,
+      "success": true
+    },
+    "safari-error": {
+      "numPassedTests": 1,
+      "numFailedTests": 1,
+      "numPendingTests": 14,
+      "success": false
+    },
+    "safari-error-retry": {
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 15,
+      "success": true
+    }
+  },
+  "distinctCasesAcrossAffectedPhases": 19,
+  "matrixDistinct": 3,
+  "downloadDistinct": 16,
+  "finalAffectedErrorCases": 7,
+  "finalNetworkFixtureRerun": 1,
+  "finalTypes": "passed; 6db06f6 inputs",
+  "finalLint": "exit 0, inherited useEffect warning 1",
+  "noCiQualification": true,
+  "nativeFinalLiteralCopy": "after unlock: Chrome passed at 9a9c309; Safari failed at 9a9c309 and passed at 6db06f6; Numbers Chinese visible",
+  "finalNativeLiteralCopy": {
+    "Chrome": "9a9c309 visible; native Chrome with existing DevTools responsive emulation 1440x1244 at 50%; not responsive/200% qualification",
+    "Safari": "6db06f6 visible after DOMException compatibility fix"
+  }
+}

@@ -1,0 +1,18 @@
+"""Stop/resume only the task's exact API3197 process for a native read-failure scenario."""
+from pathlib import Path
+import runpy,sys,os,signal,subprocess,socket,json,datetime
+mode=sys.argv[1];sys.argv=['runtime.py','helper'];x=runpy.run_path(str(Path(__file__).with_name('runtime.py')),run_name='helper')
+b=x['BASE'];r=x['ROOT'];pid=int((b/'runtime/backend.pid').read_text())
+cmd=subprocess.check_output(['ps','-p',str(pid),'-o','command='],text=True).strip() if mode=='stop' else ''
+if mode=='stop':
+ assert str(r/'backend/src/index.ts') in cmd and str(b/'tools/loopback.cjs') in cmd
+ os.kill(pid,signal.SIGTERM)
+elif mode=='start':
+ s=socket.socket();s.settimeout(1)
+ assert s.connect_ex(('127.0.0.1',3197))!=0,'API3197 already listens; refuse duplicate'
+ s.close()
+ x['start']([x['NODE'],'--require',b/'tools/loopback.cjs','--import','tsx',r/'backend/src/index.ts'],r/'backend','backend',{'DATABASE_URL':x['cfg']['DATABASE_URL_RUNTIME']})
+else:raise SystemExit('Invalid mode')
+event={'utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'operation':mode,'port':3197,'oldPid':pid,'scope':'task API only; same code/env on restart; PG/Redis and original user services untouched'}
+with (b/'evidence/s06/backend-network-scenario.jsonl').open('a') as f:f.write(json.dumps(event)+'\n')
+print(json.dumps(event))
