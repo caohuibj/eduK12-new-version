@@ -29,3 +29,7 @@ Actual verification: 78 routing tests passed; YAML, syntax and whitespace checks
 ### Pre-push context correction
 
 Root review caught that `runner.temp` is unavailable in job-level `env`. Removed that expression before pushing: the materializer now resolves `RUNNER_TEMP` inside its Node step and exports only the short pathname through `GITHUB_ENV`. The complete payload remains in the exclusive mode-0600 file. The topology regression executes the actual materializer and consumes its exported pathname; all 13 cases passed on Node 24.21.0 (2026-10-19). This is local contract evidence, not a claim of a successful new GitHub run.
+
+### CodeQL bounded execution budget
+
+The original successful run 39183230206 required 11m36s of the 12-minute job budget. Runs 39186199340 and 39187305565 were cancelled at that bound; the former was still progressing through 80/89 queries immediately before cancellation. Increase only this job's deadline to 20 minutes. Keep the same query selection, paths, CodeQL action, two threads, 3500 MiB analysis budget and mandatory success gate. No cancelled run is accepted as a pass. Formal analysis at the new head remains required; no production configuration changes.
