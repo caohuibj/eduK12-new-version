@@ -894,12 +894,15 @@ bytes are unchanged. Existing functional acceptance remains scoped above.
 
 The planned A workload is exact: one newly authorized parent, one native FINAL
 for each Form/Scale/Cognitive/SJT, one actual report job/drain invocation and
-one queued export/task. It is not four whole-assessment submissions. Afterwards,
-24 serial requests mean four individual read requests in each of six categories;
-six waves mean two concurrent individual reads per category (12 requests).
+one queued export/task. It is not four whole-assessment submissions. The new
+checkpoint is saved once; four serial recovery GETs and one two-read wave then
+run before any FINAL. After the four FINALs, original report task and new export,
+the other five categories each run four serial reads followed by one two-read
+wave. Totals are 24 serial requests and six two-read waves (12 requests).
 The categories are checkpoint recovery read, report status, full report,
 Cognitive result-or-history, teacher analysis, and existing artifact download.
-The exact route and fixture identity must still be frozen before execution;
+The driver fixes one route per category; actual fixture identities and authority
+must still be frozen before execution;
 setup/login/admission/native reads are separately counted, not hidden in those
 36 read requests. Concurrent SQL belongs to the complete wave, not either
 request. No automatic retries, extra FINALs or automatic B experiment are allowed.
@@ -941,8 +944,9 @@ missing-tail/error/timeout rejection and owned process-group TERM/KILL/reap.
 A terminal sample includes process startup through the final sample; subsequent
 ACK/exit CPU is explicitly excluded. RSS is sampled and lifetime high-water data
 is labeled as such. Role references overlap and cannot be added together.
-Actual worker integration, periodic /proc and PG activity/WAL collection remain
-to be implemented and reviewed; these helpers do not establish capacity gains.
+Actual worker/API integration, the Linux process/socket reader, dedicated PG
+connection adapter and aggregate coordinator remain to be implemented and
+reviewed; these helpers do not establish capacity gains.
 
 The proposed aggregate A budget remains 1,200s including setup/audits, with 60s
 reserved for bounded cleanup, 30s idle and 60s tail, and child budgets at most
@@ -960,3 +964,59 @@ empty group. Cleanup records actual members and requires no live member before
 settlement; retained Z/X entries are not falsely described as waitpid-reaped.
 The scan shares the original aggregate deadline. The targeted descendant fault
 uses real same-group processes and covers both normal and abnormal leader close.
+
+
+### C26 next tool batch: inert transport, driver and PG observation contracts
+
+The new modules still have no executable service entry. Their targeted tests
+inject HTTP, SQL, process frames, timers and runtime boundaries; they do not
+connect to PostgreSQL/Redis or start an application. Previously passed first-batch
+checks are inherited under their original hashes rather than executed again.
+
+The raw HTTP transport never calls `/metrics` and never automatically retries.
+An issued write with an uncertain response permanently stops the workload. Two
+reads use distinct journal entries and a common failure latch; both settle before
+another window starts. The sole POST classified as a read is the exact frozen
+Training analysis course route and selector-body hash. IPC requires the pinned
+production preload's PID/startTicks, nonce, role, module bindings and monotonic
+SQL/CPU counters. Missing/late/disconnected replies and journal failures stop the
+coordinator; no zero-counter fallback is accepted.
+
+The finite workload has one new parent and four native unit FINAL requests,
+not four whole-parent submissions. Setup is recorded separately. Checkpoint
+reads precede FINAL; all other category reads follow report/export completion.
+There is no extra warmup, replay or second attempt. `cold` field names are retained
+as ledger labels only: the claim is the first measured new chain, not cold OS,
+PG buffers or application process. Per-category and phase latencies remain
+separate; concurrent SQL is attributed to the whole two-request wave.
+
+The teacher-analysis samples are an independent, read-only workload over the
+accepted joint-restore A/B Scale waves. They are not an analysis of the new
+four-tool parent. The coordinator must bind the real original teacher/course
+permissions, two selectors, source hashes and complete rows, and protect those
+old rows before/after. No old checkpoint is read, no old publication/grant/TTL
+is changed, and no extra publication or FINAL is created for analysis. A later
+optimization comparison must use exactly the same analysis selector and data.
+
+The PG observer contract uses a dedicated read-only connection with autocommit
+SELECTs, server statement timeout at most 200ms and `stats_fetch_consistency=none`.
+It records 100ms process samples, 250ms PG activity/stat samples, before/operation
+end/settled boundaries and at least 1100ms stats settlement, all within its one
+aggregate window (at most 90s). Required SQL/permission/counter-reset failures
+stop. `pg_stat_statements` is either explicitly required or explicitly marked
+unsupported; required failures are never converted to unsupported. Observation
+query counts/time/CPU and process-sampling costs are disclosed, not subtracted
+from raw totals. Tuple counts are not SQL counts, query duration is not CPU,
+and WAL/background costs remain cluster-wide, including the protected primary.
+
+Every backend requires both its actual owning process/socket and matching
+application name; PID/startTicks, physical cluster, postmaster and database must
+match. Unknown or ambiguous clients, foreign-database activity, PID reuse,
+missing required process data and sampling overruns stop. Dynamic report/export
+closing uses an explicit preparation notification before permitting actual
+cleanup/disconnect, then a bounded fresh PG check and identity-bound child
+terminal/close/group-quiescence proof. Only the previously attributed worker's
+exact retiring backend identities are considered; missing CPU is recorded as
+unobserved, never zero-filled. The same window deadline remains in force and
+cannot finish while retirement is pending. The real child lifecycle handshake
+and process/socket adapter must consume this contract in the next reviewed batch.
