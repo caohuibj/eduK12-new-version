@@ -1,3 +1,5 @@
+import { freezeTrainingPersistenceSnapshot, readTrainingPersistencePolicy, trainingPersistenceMetadata } from './training-persistence.policy'
+import { trainingRoundPublicationIdentity, prepareTrainingPublicRound, assertTrainingTokenRound, publicRoundMetadata, trainingRoundSelect, type TrainingRoundInput } from './training-public-round'
 import { allocateTrainingMaterial, materialRestartClaim } from './training-material-allocation'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { resolveTrainingFlowScope, trainingFlowMarkerState, trainingFlowProvenance, hasTrainingFlowDefinitionMarkers } from './training-flow-scope'
@@ -1004,6 +1006,7 @@ export const getCompositeForTeacher = async (userId: string, role: UserRole, id:
     questionnaireType: composite.questionnaireType,
     trainingFlowDraft:composite.trainingFlowDraft??null,trainingFlowFrozen:composite.trainingFlowFrozen??null,trainingFlowDigest:composite.trainingFlowDigest??null,
     trainingVariantDraft:composite.trainingVariantDraft??null,trainingVariantFrozen:composite.trainingVariantFrozen??null,trainingVariantDigest:composite.trainingVariantDigest??null,
+    trainingPersistencePolicy:composite.trainingPersistencePolicy??null,trainingPersistencePolicyHash:composite.trainingPersistencePolicyHash??null,
     trainingTimingPolicy:composite.trainingTimingPolicy??null,timingExportEnabled:composite.timingExportEnabled===true,
     revision: composite.revision,
     questionnaireCourses: composite.questionnaireCourses,
@@ -1702,7 +1705,7 @@ const compositeSectionHasContext = (section: any) => (
   Boolean(section.contextSection) || Boolean(section.items?.some((item: any) => item.contextKey))
 )
 
-const compositeFormSectionRuntimeDefinition = (section: any) => {
+export const compositeFormSectionRuntimeDefinition = (section: any) => {
   const items = [...(section.items ?? [])]
     .sort((left: any, right: any) => (left.formSectionPosition ?? left.position) - (right.formSectionPosition ?? right.position))
     .map((item: any) => ({
@@ -1896,6 +1899,7 @@ export const prepareCompositePublication = async (userId: string, role: UserRole
   const composite = await loadComposite(id, true, prisma)
   assertOwner(composite, userId, role)
   assertDraft(composite)
+  const persistenceFields = composite.trainingPersistencePolicy == null ? {} : await (await import('../questionnaire-product/service')).validateTrainingPersistenceAuthoring(prisma as Prisma.TransactionClient, composite, composite.trainingPersistencePolicy)
   if(composite.trainingVariantDraft!=null)await assertTrainingVariantAuthoringScope(prisma as any,composite)
   if (composite.items.length === 0) throw compositeBadRequest(composite.productKind === 'QUESTIONNAIRE'
     ? '问卷内容为空，请先添加表单题或测评项再发布。' : '综合测评至少需要一个模块')
@@ -2085,7 +2089,7 @@ export const prepareCompositePublication = async (userId: string, role: UserRole
     const frozen = compileWeightedVariants(composite.trainingVariantDraft, buildTrainingVariantUnion(composite))
     variantFields = { trainingVariantFrozen: frozen as any, trainingVariantDigest: frozen.configDigest }
   } else if (composite.trainingVariantFrozen != null || composite.trainingVariantDigest != null) throw compositeBadRequest('概率分卷草稿与冻结配置不一致')
-  return { analysisProtocolSnapshotEncrypted, reportPackageSnapshotEncrypted, ...variantFields, ...flowFields }
+  return { analysisProtocolSnapshotEncrypted, reportPackageSnapshotEncrypted, ...variantFields, ...flowFields, ...persistenceFields }
 }
 
 const publishCompositeInTransaction = async (userId: string, role: UserRole, id: string, db: Db, resolvedSituational?: Map<string, ResolvedSituationalRelease>) => {
@@ -2117,8 +2121,12 @@ const assertCompositeWindow = (composite: { opensAt: Date | null; expiresAt: Dat
   if (composite.expiresAt && composite.expiresAt.getTime() < Date.now()) throw compositeBadRequest('综合测评已过期')
 }
 
-export const createAccessTokenForComposite = async (userId: string, role: UserRole, compositeId: string, expiresAt: string, maxUses: number, db: Db = prisma) => {
+export const createAccessTokenForComposite = async (userId: string, role: UserRole, compositeId: string, expiresAt: string, maxUses: number, db: Db = prisma, roundInput:TrainingRoundInput = {}):Promise<any> => {
   assertTeacher(role)
+  if((roundInput.groupIpPolicy!==undefined||roundInput.roundId)&&db===defaultPrisma)
+    return defaultPrisma.$transaction(tx=>createAccessTokenForComposite(userId,role,compositeId,expiresAt,maxUses,tx,roundInput))
+  if(roundInput.groupIpPolicy!==undefined||roundInput.roundId)
+    await db.$queryRaw`SELECT id FROM composite_assessments WHERE id=${compositeId} FOR UPDATE`
   if (!Number.isSafeInteger(maxUses) || maxUses < 0 || maxUses > MAX_TOKEN_USES) throw compositeBadRequest('最大参与次数无效')
   const composite = await loadComposite(compositeId, true, db)
   assertOwner(composite, userId, role)
@@ -2129,10 +2137,12 @@ export const createAccessTokenForComposite = async (userId: string, role: UserRo
   if (!publicAccessExpiryWithinPolicy(expiry, { upperBound: composite.expiresAt })) {
     throw compositeBadRequest('公开链接有效期必须在未来一年内，且不能晚于综合测评有效期')
   }
+  const round=await prepareTrainingPublicRound(db as Prisma.TransactionClient,composite,userId,roundInput,expiry)
   const rawToken = createAccessToken()
   const record = await db.compositeAssessmentAccessToken.create({
     data: {
       compositeAssessmentId: compositeId,
+      ...(round?{trainingRoundId:round.id}:{}),
       token: null,
       tokenHash: hashPublicAccessToken(rawToken),
       tokenEncrypted: encryptPublicAccessToken(rawToken),
@@ -2141,7 +2151,7 @@ export const createAccessTokenForComposite = async (userId: string, role: UserRo
       maxUses,
     },
   })
-  return { id: record.id, token: rawToken, expiresAt: record.expiresAt, maxUses: record.maxUses, usedCount: record.usedCount }
+  return { id: record.id, token: rawToken, expiresAt: record.expiresAt, maxUses: record.maxUses, usedCount: record.usedCount, ...publicRoundMetadata({...record,trainingRound:round}) }
 }
 
 export const listAccessTokens = async (userId: string, role: UserRole, compositeId: string) => {
@@ -2151,9 +2161,9 @@ export const listAccessTokens = async (userId: string, role: UserRole, composite
   const records = await prisma.compositeAssessmentAccessToken.findMany({
     where: { compositeAssessmentId: compositeId },
     orderBy: { createdAt: 'desc' },
-    select: { id: true, expiresAt: true, maxUses: true, usedCount: true, isActive: true, createdAt: true },
+    select: { id: true, expiresAt: true, maxUses: true, usedCount: true, isActive: true, createdAt: true, trainingRoundId:true,trainingRound:{select:trainingRoundSelect} },
   })
-  return records.map((record) => ({ ...record, token: null }))
+  return records.map(({trainingRound,trainingRoundId,...record}) => ({ ...record, token: null, ...publicRoundMetadata({trainingRound,trainingRoundId}) }))
 }
 
 export const revealAccessToken = async (userId: string, role: UserRole, compositeId: string, tokenId: string) => {
@@ -2162,7 +2172,7 @@ export const revealAccessToken = async (userId: string, role: UserRole, composit
   assertOwner(composite, userId, role)
   const record = await prisma.compositeAssessmentAccessToken.findFirst({
     where: { id: tokenId, compositeAssessmentId: compositeId },
-    select: { id: true, token: true, tokenEncrypted: true, expiresAt: true, maxUses: true, usedCount: true, isActive: true, createdAt: true },
+    select: { id: true, token: true, tokenEncrypted: true, expiresAt: true, maxUses: true, usedCount: true, isActive: true, createdAt: true,trainingRoundId:true,trainingRound:{select:trainingRoundSelect} },
   })
   if (!record) throw compositeNotFound('公开链接不存在')
   const token = record.token || (record.tokenEncrypted ? decryptPublicAccessToken(record.tokenEncrypted) : null)
@@ -2170,6 +2180,7 @@ export const revealAccessToken = async (userId: string, role: UserRole, composit
   logger.info('Public composite link bearer revealed', { compositeId, tokenId, actorUserId: userId })
   return {
     id: record.id,
+    ...publicRoundMetadata(record),
     token,
     expiresAt: record.expiresAt,
     maxUses: record.maxUses,
@@ -2618,15 +2629,52 @@ const createAttempt = async (
   restartMaterialClaimId?: string,
 ) => {
   assertSupportedComposite(composite)
+  let persistenceBinding: { publicationIdentity: Record<string, unknown>; courseId: string; roundId: string | null; cutoffs: Array<Date | null> } | null = null
   if(composite.items.some((item:any)=>item.formPolicy!=null) && (composite.productKind!=='QUESTIONNAIRE' || composite.deliveryMode==='LEGACY' || relationalIdentity || composite.reportPackageKey || composite.analysisProtocolKey)) throw compositeBadRequest('Form V3 只支持普通问卷的统一 FINAL 运行时')
   if (['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(composite.productKind)) {
     // Serialize new admission against archive; never trust the pre-lock read.
     await db.$queryRawUnsafe('SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR UPDATE', composite.id)
     const current = await db.compositeAssessment.findUnique({ where: { id: composite.id },
-      select: { status: true, publicEnabled: true, opensAt: true, expiresAt: true } })
+      include: { questionnaireCourses: true } })
     if (!current || current.status !== 'PUBLISHED' || (!userId && !current.publicEnabled)) throw compositeForbidden('问卷已停止接收新作答')
     if (current.opensAt && current.opensAt.getTime() > Date.now()) throw compositeBadRequest('问卷尚未开始')
     if (current.expiresAt && current.expiresAt.getTime() <= Date.now()) throw compositeBadRequest('问卷已过期')
+    // Read the publication-owned policy under the same admission lock as status.
+    composite = { ...composite, trainingPersistencePolicy: current.trainingPersistencePolicy,
+      trainingPersistencePolicyHash: current.trainingPersistencePolicyHash }
+    const persistence = readTrainingPersistencePolicy(current.trainingPersistencePolicy)
+    if (persistence?.checkpoint || persistence?.localCognitive) {
+      if (current.productKind !== 'QUESTIONNAIRE' || current.questionnaireType !== 'COURSE' || current.deliveryMode === 'LEGACY' || relationalIdentity || current.reportPackageKey || current.analysisProtocolKey || !current.publishedAt)
+        throw compositeBadRequest('此投放不支持 Training 草稿策略')
+      const courseIds = current.questionnaireCourses.map((entry: { courseId: string }) => entry.courseId)
+      const courseId = userId ? composite.deliveryCourseId : (courseIds.length === 1 ? courseIds[0] : null)
+      if (!courseId || !courseIds.includes(courseId) || (!userId && composite.deliveryCourseId && composite.deliveryCourseId !== courseId))
+        throw compositeBadRequest('草稿策略缺少明确授权的 Training 投放课程')
+      const facts = await (db as Prisma.TransactionClient).$queryRaw<Array<{ id: string; endedAt: Date | null }>>`SELECT c.id,c.ended_at AS "endedAt"
+        FROM courses c JOIN users u ON u.id=${current.createdBy}
+        WHERE c.id=${courseId} AND c.course_type='TRAINING_COURSE' AND NOT c.is_library AND c.status::text='PUBLISHED'
+        AND (u.role::text='ADMIN' OR (u.role::text='TEACHER' AND c.creator_id=u.id)) FOR SHARE OF c,u`
+      if (facts.length !== 1 || (facts[0].endedAt && new Date(facts[0].endedAt).getTime() <= Date.now()))
+        throw compositeForbidden('Training 课程已关闭或投放权限无效')
+      const publicationIdentity = trainingRoundPublicationIdentity(current, courseId)
+      let roundId: string | null = null
+      let roundCutoff: Date | null = null
+      if (accessTokenId) {
+        const token = await db.compositeAssessmentAccessToken.findUnique({ where: { id: accessTokenId }, include: { trainingRound: true } })
+        if (!token || token.compositeAssessmentId !== current.id) throw compositeForbidden('草稿策略公开链接绑定无效')
+        if (token.trainingRoundId) {
+          const round = token.trainingRound
+          if (!round || round.compositeId !== current.id || round.courseId !== courseId || round.publicationHash !== canonicalHash(publicationIdentity) || canonicalHash(round.publicationIdentity) !== round.publicationHash)
+            throw compositeForbidden('草稿策略轮次发布绑定无效')
+          await assertTrainingTokenRound(db as Prisma.TransactionClient, token)
+          roundId = round.id
+          roundCutoff = round.closesAt
+        }
+      }
+      composite = { ...composite, deliveryCourseId: courseId }
+      persistenceBinding = { publicationIdentity, courseId, roundId, cutoffs: [facts[0].endedAt, current.expiresAt, roundCutoff] }
+    }
+
     if (userId && !await db.courseStudent.findFirst({ where: {
       studentId: userId, courseId: composite.productKind === 'QUESTIONNAIRE' ? composite.deliveryCourseId : composite.courseId, status: { in: ['ACTIVE', 'APPROVED'] }, course: { isLibrary: false,...(composite.trainingTimingPolicy?{courseType:'TRAINING_COURSE'}:{}) },
     } })) throw compositeForbidden('不是问卷投放课程的有效学生')
@@ -2769,9 +2817,15 @@ const createAttempt = async (
   if(composite.trainingTimingPolicy && (composite.productKind!=='QUESTIONNAIRE'||composite.questionnaireType!=='COURSE'||!finalOnly||relationalIdentity||composite.reportPackageKey||composite.analysisProtocolKey)) throw compositeBadRequest('此投放不支持可选计时')
   const trainingTimingSnapshot=freezeTrainingTimingSnapshot(composite.trainingTimingPolicy,composite.deliveryCourseId??null,attemptEpoch,!userId)
   if(trainingTimingSnapshot&&!userId){const course=await db.course.findUnique({where:{id:trainingTimingSnapshot.course.courseId},select:{courseType:true,isLibrary:true}});if(!course||course.courseType!=='TRAINING_COURSE'||course.isLibrary)throw compositeBadRequest('新匿名计时准入的 Training 课程来源已不可用')}
+  const trainingPersistenceSnapshot = persistenceBinding ? freezeTrainingPersistenceSnapshot({
+    policy: composite.trainingPersistencePolicy, policyHash: composite.trainingPersistencePolicyHash,
+    attemptId: newAttemptId, attemptEpoch, compositeId: composite.id, ...persistenceBinding,
+  }) : null
   const attempt = await db.compositeAssessmentAttempt.create({
     data: {
       id: newAttemptId,
+      ...(trainingPersistenceSnapshot ? { trainingPersistenceSnapshot: trainingPersistenceSnapshot as Prisma.InputJsonValue,
+        trainingPersistenceSnapshotHash: canonicalHash(trainingPersistenceSnapshot) } : {}),
       ...(variantAllocation ? {trainingVariantAllocationEncrypted:encryptUnifiedRuntimePayload(variantAllocation),trainingVariantAllocationHash:variantAllocation.allocationHash} : {}),
       compositeAssessmentId: composite.id,
       ...(trainingTimingSnapshot ? {trainingTimingSnapshot} : {}),
@@ -3013,6 +3067,7 @@ const findPublicToken = async (tokenValue: string, db: Db = prisma) => {
   let token = await db.compositeAssessmentAccessToken.findUnique({
     where: { tokenHash },
     include: {
+      trainingRound:{select:trainingRoundSelect},
       compositeAssessment: {
         select: {
           id: true,
@@ -3032,6 +3087,7 @@ const findPublicToken = async (tokenValue: string, db: Db = prisma) => {
     token = await db.compositeAssessmentAccessToken.findUnique({
       where: { token: tokenValue },
       include: {
+        trainingRound:{select:trainingRoundSelect},
         compositeAssessment: {
           select: {
             id: true,
@@ -3058,6 +3114,7 @@ export const getPublicCompositeInfo = async (tokenValue: string, db: Db = prisma
   const token = await findPublicToken(tokenValue, db)
   assertSupportedComposite(token.compositeAssessment)
   assertTokenWindow(token)
+  await assertTrainingTokenRound(db as Prisma.TransactionClient,token)
   const composite = token.compositeAssessment
   assertCompositeWindow(composite)
   // Pure-read (write-time invariant): the public info path never lazily
@@ -3091,6 +3148,7 @@ export const getPublicCompositeInfo = async (tokenValue: string, db: Db = prisma
     name: current.name,
     description: current.description,
     instruction: current.instruction,
+    ...publicRoundMetadata(token),
     expiresAt: token.expiresAt,
     maxUses: token.maxUses,
     usedCount: token.usedCount,
@@ -3144,12 +3202,13 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
       return existing
     }
     assertTokenWindow(token)
+    const roundCourseId=await assertTrainingTokenRound(tx,token)
     const claimed = await tx.compositeAssessmentAccessToken.updateMany({
       where: { id: token.id, isActive: true, expiresAt: { gt: new Date() }, OR: [{ maxUses: 0 }, { usedCount: { lt: token.maxUses } }] },
       data: { usedCount: { increment: 1 } },
     })
     if (claimed.count !== 1) throw compositeConflict('公开链接已达到最大参与次数')
-    const admitted = await createAttempt(tx, composite, null, token.id, credential)
+    const admitted = await createAttempt(tx, roundCourseId?{...composite,deliveryCourseId:roundCourseId}:composite, null, token.id, credential)
     if (study) await study.afterAdmission(tx, admitted.id)
     return admitted
   })
@@ -3198,8 +3257,9 @@ export const restartPublicAttempt = async (attemptId: string, recoveryTokenHash:
 
   const next = await prisma.$transaction(async (tx: Db) => {
     await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${composite.id} FOR UPDATE`
-    const tokens=await tx.$queryRaw<Array<{isActive:boolean;expiresAt:Date}>>`SELECT is_active AS "isActive",expires_at AS "expiresAt" FROM composite_assessment_access_tokens WHERE id=${existing.accessTokenId} AND composite_assessment_id=${composite.id} FOR UPDATE`
+    const tokens=await tx.$queryRaw<Array<{isActive:boolean;expiresAt:Date;trainingRoundId:string|null}>>`SELECT is_active AS "isActive",expires_at AS "expiresAt",training_round_id AS "trainingRoundId" FROM composite_assessment_access_tokens WHERE id=${existing.accessTokenId} AND composite_assessment_id=${composite.id} FOR UPDATE`
     if(tokens.length!==1||!tokens[0].isActive||new Date(tokens[0].expiresAt).getTime()<=Date.now())throw compositeForbidden('公开链接已失效')
+    const roundCourseId=await assertTrainingTokenRound(tx as Prisma.TransactionClient,{...tokens[0],compositeAssessmentId:composite.id})
     await lockCompositeAttempt(tx, attemptId)
     if(composite.trainingVariantFrozen != null || composite.trainingFlowFrozen?.schemaVersion===2){
       const used=await tx.compositeAssessmentAttempt.count({where:{compositeAssessmentId:composite.id,...(existing.userId?{userId:existing.userId}:{participantKey:(existing as any).participantKey})}})
@@ -3231,7 +3291,7 @@ export const restartPublicAttempt = async (attemptId: string, recoveryTokenHash:
     })
     return createAttempt(
       tx,
-      composite,
+      roundCourseId?{...composite,deliveryCourseId:roundCourseId}:composite,
       null,
       current.accessTokenId,
       credential,
@@ -3359,7 +3419,9 @@ export const freezeContext = async (attemptId: string, context: { userId?: strin
   })
 }
 
-const cognitiveRunnerPayload = async (session: any, contextSnapshotHash?: string | null, feedbackDeferred = false) => {
+const cognitiveRunnerPayload = async (session: any, contextSnapshotHash?: string | null, feedbackDeferred = false, parent?: any, deliveredAdmission?: { attemptEpoch: number }) => {
+  const admission = deliveredAdmission ?? (session.frozenAdmissionSnapshotEncrypted ? await (await import('../cognitive/cognitive-admission.service')).loadStoredCognitiveAdmission(session) : null)
+  const persistence = parent ? trainingPersistenceMetadata(parent) : undefined
   const storedConfig = await cognitiveSessionService.loadCognitiveSessionConfig(session.configSnapshotEncrypted)
   const config = storedConfig.config
   const resultSnapshot = !feedbackDeferred && session.status === 'COMPLETED' && session.resultSnapshotEncrypted
@@ -3383,6 +3445,8 @@ const cognitiveRunnerPayload = async (session: any, contextSnapshotHash?: string
     : undefined
   return {
     sessionId: session.id,
+    ...(admission ? { sessionEpoch: admission.attemptEpoch } : {}),
+    ...(persistence ? { trainingPersistence: persistence } : {}),
     assignmentId: session.assignmentId,
     testType: session.testType,
     attemptNo: session.attemptNo,
@@ -3490,6 +3554,7 @@ const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
   contextSnapshotEncrypted: true,
   contextSnapshotHash: true,
   contextFrozenAt: true,
+  trainingPersistenceSnapshot: true, trainingPersistenceSnapshotHash: true, deliveryCourseId: true,
   trainingTimingSnapshot: true,
   frozenActiveSlotSetEncrypted: true,
   frozenActiveSlotSetHash: true,
@@ -3805,13 +3870,13 @@ const getUnifiedCompositeAttemptState = async (
       throw compositeConflict('认知任务冻结运行时不可用，请重启测评')
     }
     try {
-      await ensureCognitiveAdmissionAtDelivery(child.id, attempt, child)
+      const admission = await ensureCognitiveAdmissionAtDelivery(child.id, attempt, child)
       currentItem = {
         id: currentUnit.item.id,
         type: 'COGNITIVE',
         position: currentUnit.item.position,
         required: currentUnit.item.required,
-        cognitiveSession: await cognitiveRunnerPayload(child, attempt.contextSnapshotHash, attempt.status !== 'COMPLETED'),
+        cognitiveSession: await cognitiveRunnerPayload(child, attempt.contextSnapshotHash, attempt.status !== 'COMPLETED', attempt, admission),
       }
     } catch (error) {
       if (isInstrumentFinalSubmitError(error)) throw error
@@ -3866,6 +3931,7 @@ const getUnifiedCompositeAttemptState = async (
   })
   return {
     id: attempt.id,
+    ...(trainingPersistenceMetadata(attempt) ? { trainingPersistence: trainingPersistenceMetadata(attempt), checkpointDefinitionHash: attempt.frozenActiveSlotSetHash } : {}),
     assessmentId: attempt.compositeAssessment.id,
     name: attempt.compositeAssessment.name,
     ...(attempt.compositeAssessment.productKind === 'QUESTIONNAIRE' ? { productKind: 'QUESTIONNAIRE' as const, reportMode: 'COLLECTION_ONLY' as const } : {}),
@@ -4501,10 +4567,11 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
     }
   } else if (current?.type === 'COGNITIVE') {
     const session = cognitiveMap.get(current.id)
-    currentItem = { id: current.id, type: current.type, position: current.position, required: current.required, cognitiveSession: session ? await cognitiveRunnerPayload(session, attempt.contextSnapshotHash, attempt.status !== 'COMPLETED') : null }
+    currentItem = { id: current.id, type: current.type, position: current.position, required: current.required, cognitiveSession: session ? await cognitiveRunnerPayload(session, attempt.contextSnapshotHash, attempt.status !== 'COMPLETED', attempt) : null }
   }
   return {
     id: attempt.id,
+    ...(trainingPersistenceMetadata(attempt) ? { trainingPersistence: trainingPersistenceMetadata(attempt), checkpointDefinitionHash: attempt.frozenActiveSlotSetHash } : {}),
     assessmentId: attempt.compositeAssessment.id,
     name: attempt.compositeAssessment.name,
     ...(attempt.compositeAssessment.productKind === 'QUESTIONNAIRE' ? { productKind: 'QUESTIONNAIRE' as const, reportMode: 'COLLECTION_ONLY' as const } : {}),

@@ -231,6 +231,8 @@ export interface CognitivePresentationDefinitionV1 {
 }
 
 export interface CognitiveSession {
+  trainingPersistence?: import('../../training/training-cognitive-retention').TrainingPersistenceDescriptor
+  sessionEpoch?: number
   feedbackDeferred?: boolean
   sessionId: string
   assignmentId: string | null

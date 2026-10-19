@@ -1,3 +1,4 @@
+import { cleanupExpiredTrainingCheckpoints } from './modules/composite/training-checkpoint.service'
 import { organizationInvitationsRouter } from './modules/organization/invitations'
 import { parentAccountsRouter, platformUsersRouter } from './modules/parent-portal/accounts.routes'
 import { parentToolPolicyRouter } from './modules/parent-portal/tool-policy.routes'
@@ -479,6 +480,9 @@ const startServer = async (): Promise<void> => {
   exportCleanupTimer = setInterval(() => {
     void cleanupStaleUploadDirectories()
     void cleanupStalePublicUploadAssets().catch(err => logger.warn('过期上传暂存清理失败', err))
+    void cleanupExpiredTrainingCheckpoints().then(cleared=>{
+      if(cleared)logger.info('过期 Training 加密临时存档已清除',{cleared})
+    }).catch(e=>logger.warn('Training 临时存档清理失败',e))
     void cleanupExpiredSurveyCheckpoints().then(removed=>{
       if(removed)logger.info('过期 Survey 加密临时存档已清除',{removed})
     }).catch(e=>logger.warn('Survey 临时存档清理失败',e))

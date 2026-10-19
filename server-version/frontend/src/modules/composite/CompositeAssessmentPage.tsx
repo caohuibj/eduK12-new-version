@@ -457,6 +457,7 @@ const CompositeAssessmentContent: React.FC = () => {
         <input value={recoveryInput} onChange={(event) => setRecoveryInput(event.target.value)} className="w-full border rounded px-3 py-2 mb-4" placeholder="粘贴保存时获得的恢复凭证（可选）" />
         {error && <p role="alert" className="text-red-500 text-sm mb-4">{error}</p>}
         {!params.attemptId && !publicInfo && <p className="mb-4 text-sm">当前入口不能开始新作答。已有恢复凭证可继续尝试恢复原记录。</p>}
+        {publicInfo?.groupIpWindow && <p className="mb-4 text-sm">同 IP 集体作答窗口：{new Date(publicInfo.groupIpWindow.opensAt).toLocaleString()} 至 {new Date(publicInfo.groupIpWindow.closesAt).toLocaleString()}（{Intl.DateTimeFormat().resolvedOptions().timeZone}），最长 48 小时。到期不再接受新参与者；已有恢复凭证仍按原作答规则恢复。轮次提示不能代替凭证。</p>}
         {publicInfo?.studyEntryPath && <Link className="block mb-4 text-action" to={publicInfo.studyEntryPath}>选择单次访客或保存研究内身份码</Link>}
         <button
           onClick={() => {

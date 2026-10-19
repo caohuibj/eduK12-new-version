@@ -1,3 +1,4 @@
+import { TrainingCheckpointPanel } from '../modules/composite/TrainingCheckpointPanel'
 import {TrainingTimingBoundary,restoreTrainingTiming} from '../modules/scale/TrainingTimingBoundary'
 import {SurveyScaleTimingTracker,sealObservedScaleTimings} from '../modules/scale/item-timing'
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
@@ -45,6 +46,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
   const [loading, setLoading] = useState(true)
   const [useFallback, setUseFallback] = useState(false)
   const [accepted, setAccepted] = useState(false)
+  const [checkpointBusy, setCheckpointBusy] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loadRound, setLoadRound] = useState(0)
@@ -58,7 +60,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
   const { flush, schedule } = local
   const questions = useMemo(() => definition?.units.flatMap(unit => unit.scale.definition!.items.map(question => ({ unit, question }))) ?? [], [definition])
   const current = questions[index]
-  const locked = Boolean(meta && (meta.status !== 'DRAFT' || meta.sealedSubmission))
+  const locked = checkpointBusy || Boolean(meta && (meta.status !== 'DRAFT' || meta.sealedSubmission))
   useEffect(() => { questionStart.current = Date.now() }, [index, draftKey])
   useEffect(() => {
     if (submitStartedAt === null) { setSubmitElapsedSeconds(0); return }
@@ -157,13 +159,13 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
     await schedule(key, async () => {await finalDraftStore.putAnswer({ draftKey, itemKey: key, value: answer, updatedAt: now });if(Object.keys(timingRef.current).length)await finalDraftStore.setInstrumentMetadata(draftKey,{wholeScaleTiming:timingMetadata()})})
   }
   const saveAndExit = async () => {
-    if (submitting.current || busy) return
+    if (submitting.current || busy || checkpointBusy) return
     setBusy(true)
     try { Object.values(timingRef.current).forEach(tracker=>tracker.pause()); if(!locked&&Object.keys(timingRef.current).length)await finalDraftStore.setInstrumentMetadata(draftKey,{wholeScaleTiming:timingMetadata()});await flush(); onExit() } catch (cause) { setError(normalizeApiError(cause).message) }
     finally { setBusy(false) }
   }
   const submit = async () => {
-    if (!meta || submitting.current || busy || accepted || meta.status === 'CONFLICT') return
+    if (!meta || submitting.current || busy || checkpointBusy || accepted || meta.status === 'CONFLICT') return
     if (!meta.sealedSubmission) {
       const missing = questions.findIndex(({ unit, question }) => question.required && answers[wholeAnswerKey(unit.itemId, question.itemCode)]?.responseValue === undefined)
       if (missing >= 0) { setIndex(missing); setError('还有必答题未作答，请完成后提交整份问卷。'); return }
@@ -240,7 +242,24 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
     progress={definition ? { kind: 'count', completed: Object.keys(answers).length, total: questions.length, label: '整卷作答进度' } : undefined}
     saveStatus={local.status}
     submissionStatus={accepted ? { state: 'committed', message: '整份问卷已可靠保存，正在生成报告。' } : busy ? { state: 'submitting', message: submitElapsedSeconds >= 8 ? `已等待 ${submitElapsedSeconds} 秒，正在确认服务器保存；请勿关闭，本机草稿仍保留。` : '正在提交并确认保存…' } : locked ? { state: 'pending', message: '整卷已封存，重试将使用相同内容。' } : { state: 'ready' }}
-    actions={<button type="button" className="btn-secondary min-h-11" disabled={busy} onClick={() => void saveAndExit()}>保存并退出</button>}>
+    actions={<button type="button" className="btn-secondary min-h-11" disabled={busy || checkpointBusy} onClick={() => void saveAndExit()}>保存并退出</button>}>
+    {definition && meta && !accepted ? <TrainingCheckpointPanel policy={state.trainingPersistence} definitionHash={state.checkpointDefinitionHash} publicMode={publicMode} recoveryToken={recoveryToken}
+      disabled={busy || meta.status !== 'DRAFT' || !!meta.sealedSubmission} onBusy={setCheckpointBusy} activeSlotKeys={definition.units.map(unit=>`scale:${unit.itemId}`)}
+      getDrafts={async()=>{await flush();return definition.units.map(unit=>({slotKey:`scale:${unit.itemId}`,answers:Object.fromEntries(unit.scale.definition!.items.filter(q=>answers[wholeAnswerKey(unit.itemId,q.itemCode)]!==undefined).map(q=>[q.itemCode,answers[wholeAnswerKey(unit.itemId,q.itemCode)]])),...(timingRef.current[unit.itemId]?{itemTimings:timingRef.current[unit.itemId].snapshot()}: {})}))}}
+      restore={async rows=>{
+        await flush()
+        const currentMeta=await finalDraftStore.get(draftKey)
+        if(currentMeta?.status!=='DRAFT'||currentMeta.sealedSubmission)throw new Error('本机草稿已封存，不能替换。')
+        const next:Record<string,Answer>={}
+        for(const unit of definition.units){const row=rows.find(row=>row.slotKey===`scale:${unit.itemId}`);if(!row)continue
+          for(const q of unit.scale.definition!.items)if(Object.prototype.hasOwnProperty.call(row.answers,q.itemCode))next[wholeAnswerKey(unit.itemId,q.itemCode)]=readAnswer(row.answers[q.itemCode])
+          if(unit.trainingTiming)timingRef.current[unit.itemId]=new SurveyScaleTimingTracker(row.itemTimings??{},Object.fromEntries(Object.entries(row.answers).map(([key,value])=>[key,readAnswer(value).responseValue])))
+        }
+        const old=await finalDraftStore.listAnswers(draftKey)
+        try{for(const [itemKey,value]of Object.entries(next))await finalDraftStore.putAnswer({draftKey,itemKey,value,updatedAt:Date.now()});await finalDraftStore.deleteAnswers(draftKey,old.filter(row=>!Object.prototype.hasOwnProperty.call(next,row.itemKey)).map(row=>row.itemKey));await finalDraftStore.setInstrumentMetadata(draftKey,{wholeScaleTiming:timingMetadata()})}
+        catch(cause){for(const row of old)await finalDraftStore.putAnswer(row);throw cause}
+        setAnswers(next);setIndex(0)
+      }}/>:null}
     {error ? <p role="alert" className="mb-4 text-red-700">{error}</p> : null}
     {publicMode && recoveryToken ? <details className="mb-4 rounded border p-3"><summary>保存匿名恢复凭证</summary><p className="my-2 text-sm">恢复凭证用于已提交进度；未提交答案仍保存在当前浏览器。</p><code className="break-all select-all">{recoveryToken}</code></details> : null}
     {accepted ? <div className="space-y-4"><h2 className="text-xl font-semibold">交卷成功</h2><p>答案已保存。可以离开页面，稍后查看报告；报告失败不需要重新交卷。</p><button className="btn-primary min-h-11" type="button" onClick={onCompleted}>查看报告进度</button></div>

@@ -385,7 +385,7 @@ export const compositeController = {
     try {
       if (!req.user) return unauthorized(res)
       const input = createCompositeTokenSchema.parse(req.body)
-      const data = await service.createAccessTokenForComposite(req.user.userId, req.user.role, req.params.id, input.expiresAt, input.maxUses)
+      const data = await service.createAccessTokenForComposite(req.user.userId, req.user.role, req.params.id, input.expiresAt, input.maxUses, undefined, {groupIpPolicy:input.groupIpPolicy,roundId:input.roundId})
       return success(res, data, '公开链接创建成功')
     } catch (err) { return handleError(res, err) }
   },
@@ -439,7 +439,9 @@ export const compositeController = {
         && await isCompositeParticipantFeedbackDeferred(req.params.attemptId)
       const suppressResult = feedbackDeferred || (runtime.row.status === 'COMPLETED'
         && await isRelationalCohortOnlyCompositeAttempt(req.params.attemptId))
-      return success(res, situationalAttemptForResponse(runtime.row, runtime.snapshot, { suppressResult, feedbackDeferred }))
+      return success(res, { ...situationalAttemptForResponse(runtime.row, runtime.snapshot, { suppressResult, feedbackDeferred }),
+        ...(runtime.trainingPersistence ? { trainingPersistence: runtime.trainingPersistence, checkpointDefinitionHash: runtime.checkpointDefinitionHash } : {}),
+      })
     } catch (err) {
       if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
       return handleError(res, err)
@@ -729,7 +731,9 @@ export const compositeController = {
       )
       const suppressResult = runtime.row.status === 'COMPLETED'
         && await isCompositeParticipantFeedbackDeferred(req.params.attemptId)
-      return success(res, situationalAttemptForResponse(runtime.row, runtime.snapshot, { suppressResult, feedbackDeferred: suppressResult }))
+      return success(res, { ...situationalAttemptForResponse(runtime.row, runtime.snapshot, { suppressResult, feedbackDeferred: suppressResult }),
+        ...(runtime.trainingPersistence ? { trainingPersistence: runtime.trainingPersistence, checkpointDefinitionHash: runtime.checkpointDefinitionHash } : {}),
+      })
     } catch (err) {
       if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
       return handleError(res, err)
@@ -928,4 +932,22 @@ async function handleWholeReceipt(req: Request, res: Response, publicMode: boole
     res.setHeader('Cache-Control', 'no-store')
     return success(res, await recoverWholeQuestionnaireReceipt(req.params.attemptId, query.submissionId, query.attemptEpoch, principal))
   } catch (err) { return handleError(res, err) }
+}
+
+// Explicit checkpoint boundary; disabled legacy /save routes remain untouched.
+export const trainingCheckpointHandler = (publicMode:boolean,operation:'read'|'save'|'clear') => async(req:Request,res:Response) => {
+  try {
+    const checkpoints=await import('./training-checkpoint.service')
+    const principal=publicMode ? {recoveryTokenHash:hashRecoveryToken(recoveryFromRequest(req))} : {userId:req.user!.userId}
+    let result:any
+    if(operation==='read') result=await checkpoints.readTrainingCheckpoint(req.params.attemptId,principal)
+    else if(operation==='save') {
+      checkpoints.assertTrainingCheckpointBounds(req.body)
+      result=await checkpoints.saveTrainingCheckpoint(req.params.attemptId,principal,checkpoints.trainingCheckpointSaveSchema.parse(req.body))
+    }
+    else result=await checkpoints.clearTrainingCheckpoint(req.params.attemptId,principal,z.object({expectedRevision:z.number().int().min(0),attemptEpoch:z.number().int().min(1)}).strict().parse(req.body))
+    if(result.closed) return res.status(403).json({success:false,message:'课程或草稿期限已结束'})
+    if(result.conflict) return res.status(409).json({success:false,message:'Checkpoint 已过期，请明确选择恢复版本',data:result})
+    return success(res,result)
+  } catch(err) { return handleError(res,err) }
 }

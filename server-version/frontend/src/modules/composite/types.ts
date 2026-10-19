@@ -1,3 +1,4 @@
+import type { TrainingPersistence } from './training-checkpoint'
 export type TrainingTimingBinding={schemaVersion:1;contract:'BROWSER_ACTIVE_SCALE_V1';snapshotHash:string}
 import type { FormQuestion } from '../assessment-core/form/types'
 import type { CognitiveSession } from '../cognitive/types'
@@ -179,6 +180,9 @@ export type TrainingFlowState = {
 }
 
 export interface CompositeAttemptState {
+  trainingPersistence?: TrainingPersistence
+  checkpointDefinitionHash?: string
+
   trainingFlow?: TrainingFlowState
   taskSatisfaction?: string | null
   taskSatisfied?: boolean
@@ -217,6 +221,8 @@ export interface CompositeMutationAck {
 }
 
 export interface CompositePublicInfo {
+  roundId?: string | null
+  groupIpWindow?: { opensAt: string; closesAt: string } | null
   id: string
   name: string
   description: string | null
@@ -229,6 +235,8 @@ export interface CompositePublicInfo {
 }
 
 export interface CompositePublicAccessToken {
+  roundId?: string | null
+  groupIpWindow?: { opensAt: string; closesAt: string } | null
   id: string
   token: string | null
   expiresAt: string

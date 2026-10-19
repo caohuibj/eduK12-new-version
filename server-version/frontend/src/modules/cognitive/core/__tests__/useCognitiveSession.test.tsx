@@ -1,7 +1,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { CognitiveSession } from '../../types'
-import { createFinalDraftMeta, finalDraftStore } from '../../../../services/persistence/finalDraftStore'
+import { createFinalDraftMeta, finalDraftStore, trainingCognitiveDraftKey } from '../../../../services/persistence/finalDraftStore'
 
 const { mockScheduler } = vi.hoisted(() => ({
   mockScheduler: {
@@ -266,4 +266,75 @@ describe('useCognitiveSession checkpoint conflict propagation', () => {
     }finally{spy.mockRestore();unmount();await finalDraftStore.delete('cognitive:'+finalSession.sessionId)}
   })
 
+})
+
+
+describe('Training retention lease before recovery', () => {
+  it('does not ensure or load trials until lease acquisition and holds until unmount', async () => {
+    const original = Object.getOwnPropertyDescriptor(navigator, 'locks')
+    let enter: (() => void) | undefined
+    let held = false
+    const request = vi.fn(async (_name: string, options: LockOptions, callback: (lock: unknown) => Promise<void>) => {
+      if (options.mode === 'exclusive') return callback(null)
+      await new Promise<void>(resolve => { enter = resolve })
+      held = true
+      try { await callback({}) } finally { held = false }
+    })
+    Object.defineProperty(navigator, 'locks', { configurable: true, value: { request } })
+    const trainingSession: CognitiveSession = { ...session, sessionId: 'training-lease-session',
+      deliveryMode: 'FINAL_ONLY', definitionHash: 'training-definition', attemptEpoch: 1, sessionEpoch: 1,
+      trainingPersistence: { snapshotHash: 'policy-hash', attemptId: 'parent-attempt', attemptEpoch: 3,
+        courseId: 'course', checkpoint: null,
+        localCognitive: { enabled: true, ttlHours: 1 } } }
+    const finalApi = { ...api, getSession: vi.fn().mockResolvedValue({ code: 0, data: trainingSession }), submitFinal: vi.fn() }
+    const ensure = vi.spyOn(finalDraftStore, 'ensure')
+    const key = trainingCognitiveDraftKey({ attemptId: 'parent-attempt', attemptEpoch: 3, sessionId: trainingSession.sessionId, sessionEpoch: 1 })
+    try {
+      const { result, unmount } = renderHook(() => useCognitiveSession(trainingSession.sessionId, finalApi))
+      await waitFor(() => expect(enter).toBeDefined())
+      expect(ensure).not.toHaveBeenCalled()
+      await act(async () => { enter!() })
+      await waitFor(() => expect(result.current.state.status).toBe('READY'))
+      expect(ensure).toHaveBeenCalledWith(expect.objectContaining({ draftKey: key, trainingRetention: expect.objectContaining({ attemptEpoch: 3, sessionEpoch: 1 }) }))
+      expect(held).toBe(true)
+      unmount()
+      await waitFor(() => expect(held).toBe(false))
+    } finally {
+      ensure.mockRestore(); await finalDraftStore.delete(key)
+      if (original) Object.defineProperty(navigator, 'locks', original); else Reflect.deleteProperty(navigator, 'locks')
+    }
+  })
+})
+
+describe('Training inactive-age entry', () => {
+  it('expires an inactive overdue draft before recovery and never recreates its payload', async () => {
+    const original = Object.getOwnPropertyDescriptor(navigator, 'locks')
+    const request = vi.fn(async (_name: string, _options: LockOptions, callback: (lock: unknown) => Promise<void>) => callback({}))
+    Object.defineProperty(navigator, 'locks', { configurable: true, value: { request } })
+    const now = Date.now()
+    const trainingSession: CognitiveSession = { ...session, sessionId: 'training-inactive-expired',
+      deliveryMode: 'FINAL_ONLY', definitionHash: 'definition', attemptEpoch: 1, sessionEpoch: 1,
+      trainingPersistence: { snapshotHash: 'policy', attemptId: 'inactive-parent', attemptEpoch: 1,
+        courseId: 'course', checkpoint: null, localCognitive: { enabled: true, ttlHours: 1 } } }
+    const retention = { schemaVersion: 1 as const, snapshotHash: 'policy', attemptId: 'inactive-parent', attemptEpoch: 1,
+      sessionId: trainingSession.sessionId, sessionEpoch: 1, ttlHours: 1, lastWriteAt: now }
+    const key = trainingCognitiveDraftKey(retention)
+    await finalDraftStore.ensure(createFinalDraftMeta({ draftKey: key, instrument: 'cognitive', attemptId: trainingSession.sessionId,
+      attemptEpoch: 1, definitionHash: 'definition', contextSnapshotHash: null, deliveryMode: 'final_only', submissionId: 'old', trainingRetention: retention }))
+    await finalDraftStore.putTrial({ draftKey: key, trialIndex: 0, payload: 'old-response', createdAt: now })
+    const clock = vi.spyOn(Date, 'now').mockReturnValue(now + 3600001)
+    try {
+      const finalApi = { ...api, getSession: vi.fn().mockResolvedValue({ code: 0, data: trainingSession }), submitFinal: vi.fn() }
+      const { result, unmount } = renderHook(() => useCognitiveSession(trainingSession.sessionId, finalApi))
+      await waitFor(() => expect(result.current.state.status).toBe('ERROR'))
+      expect((await finalDraftStore.get(key))?.trainingRetention?.expiredAt).toBe(now + 3600001)
+      expect(await finalDraftStore.listTrials(key)).toEqual([])
+      expect(finalApi.submitFinal).not.toHaveBeenCalled()
+      expect(request.mock.calls[0][1]).toMatchObject({ mode: 'exclusive', ifAvailable: true })
+      unmount()
+    } finally {
+      clock.mockRestore()
+      if (original) Object.defineProperty(navigator, 'locks', original); else Reflect.deleteProperty(navigator, 'locks')
+    }
+  })
 })

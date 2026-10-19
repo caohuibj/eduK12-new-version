@@ -1124,6 +1124,8 @@ enum CompositeAnalysisSnapshotGenerationReason {
 
 // 综合测评模板。发布后项目配置不可修改，历史测评通过子记录保存各自的结果快照。
 model CompositeAssessment {
+  trainingPersistencePolicy Json? @map("training_persistence_policy")
+  trainingPersistencePolicyHash String? @map("training_persistence_policy_hash")
   trainingFlowDraft Json? @map("training_flow_draft")
   trainingFlowFrozen Json? @map("training_flow_frozen")
   trainingFlowDigest String? @map("training_flow_digest")
@@ -1272,6 +1274,9 @@ model CompositeFormSection {
 
 // 一次学生/匿名参与记录。recoveryTokenHash 只存哈希，原始恢复凭证只在创建时返回一次。
 model CompositeAssessmentAttempt {
+  trainingPersistenceSnapshot Json? @map("training_persistence_snapshot")
+  trainingPersistenceSnapshotHash String? @map("training_persistence_snapshot_hash")
+  trainingCheckpoint TrainingAttemptCheckpoint?
   trainingFlowSnapshotEncrypted String? @map("training_flow_snapshot_encrypted")
   trainingFlowSnapshotHash String? @map("training_flow_snapshot_hash")
   trainingFlowPathEncrypted String? @map("training_flow_path_encrypted")
@@ -1419,6 +1424,8 @@ model CompositeFormSectionAttempt {
 }
 
 model CompositeAssessmentAccessToken {
+  trainingRoundId       String? @map("training_round_id")
+  trainingRound         TrainingPublicRound? @relation(fields:[trainingRoundId], references:[id], onDelete:Restrict, onUpdate:NoAction)
   id                    String   @id @default(uuid())
   compositeAssessmentId String   @map("composite_assessment_id")
   // Legacy plaintext is nullable during the resumable application backfill.
@@ -1441,6 +1448,7 @@ model CompositeAssessmentAccessToken {
   @@index([isActive, expiresAt])
   @@index([token])
   @@map("composite_assessment_access_tokens")
+  @@index([trainingRoundId])
 }
 
 // ==================== 文档库模块 ====================
@@ -3842,4 +3850,40 @@ model TrainingMaterialAllocationClaim {
   @@index([experimentId, participantKey], map: "training_material_claim_subject_idx")
   @@index([compositeId, publicationKey, configDigest, groupKey], map: "training_material_claim_quota_idx")
   @@map("training_material_allocation_claims")
+}
+
+// Explicit immutable public recruitment round; historical tokens remain null.
+model TrainingPublicRound {
+  id String @id @default(uuid())
+  compositeId String @map("composite_id")
+  courseId String @map("course_id")
+  createdBy String @map("created_by")
+  publishedAt DateTime @map("published_at")
+  publicationHash String @map("publication_hash")
+  publicationIdentity Json @map("publication_identity")
+  groupIpPolicy Json @map("group_ip_policy")
+  opensAt DateTime @map("opens_at")
+  closesAt DateTime @map("closes_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  tokens CompositeAssessmentAccessToken[]
+  @@index([compositeId])
+  @@index([courseId])
+  @@map("training_public_rounds")
+}
+
+// Retained identity/counters; clearing payload never renews the per-attempt budget.
+model TrainingAttemptCheckpoint {
+  attemptId String @id @map("attempt_id")
+  snapshotHash String @map("snapshot_hash")
+  definitionHash String @map("definition_hash")
+  attemptEpoch Int @map("attempt_epoch")
+  roundId String? @map("round_id")
+  revision Int @default(0)
+  successfulSaveCount Int @default(0) @map("successful_save_count")
+  payloadEncrypted String? @map("payload_encrypted")
+  payloadHash String? @map("payload_hash")
+  expiresAt DateTime? @map("expires_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  attempt CompositeAssessmentAttempt @relation(fields:[attemptId],references:[id],onDelete:Restrict)
+  @@map("training_attempt_checkpoints")
 }

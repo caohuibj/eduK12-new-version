@@ -189,6 +189,10 @@ export function QuestionnaireProductEdit() {
   const [courseIds, setCourseIds] = useState<string[]>([])
   const [publicEnabled, setPublic] = useState(false)
   const [timingEnabled,setTimingEnabled]=useState(false)
+  const [checkpointEnabled,setCheckpointEnabled]=useState(false)
+  const [checkpointHours,setCheckpointHours]=useState(24)
+  const [localCognitiveEnabled,setLocalCognitiveEnabled]=useState(false)
+  const [localCognitiveHours,setLocalCognitiveHours]=useState(24)
   const [trainingVariantDraft, setTrainingVariantDraft] = useState<TrainingVariantConfig | null>(null)
   const [trainingFlowText, setTrainingFlowText] = useState('')
   const [trainingFlowError, setTrainingFlowError] = useState('')
@@ -242,6 +246,10 @@ export function QuestionnaireProductEdit() {
     setCourseIds((row.questionnaireCourses || []).map((v: any) => v.courseId))
     setPublic(row.publicEnabled)
     setTimingEnabled(Boolean(row.trainingTimingPolicy))
+    setCheckpointEnabled(row.trainingPersistencePolicy?.checkpoint?.enabled===true)
+    setCheckpointHours(row.trainingPersistencePolicy?.checkpoint?.ttlHours??24)
+    setLocalCognitiveEnabled(row.trainingPersistencePolicy?.localCognitive?.enabled===true)
+    setLocalCognitiveHours(row.trainingPersistencePolicy?.localCognitive?.ttlHours??24)
     setTrainingVariantDraft(row.trainingVariantDraft ?? null)
     setTrainingFlowText(formatTrainingFlow(row.trainingFlowDraft ?? null))
     setTrainingFlowError('')
@@ -298,17 +306,21 @@ export function QuestionnaireProductEdit() {
       setBusy(false)
     }
   }
+  const persistencePolicy = () => ({schemaVersion:1,checkpoint:checkpointEnabled?{enabled:true,ttlHours:checkpointHours}:null,localCognitive:localCognitiveEnabled?{enabled:true,ttlHours:localCognitiveHours}:null})
   const metadata = () => ({
     name: name.trim(),
     instruction,
     description,
     courseIds: kind === 'GENERAL' ? [] : courseIds,
     publicEnabled,
+    ...(checkpointEnabled||localCognitiveEnabled||detail?.trainingPersistencePolicy?{trainingPersistencePolicy:persistencePolicy()}:{}),
     ...(timingEnabled||detail?.trainingTimingPolicy?{trainingTimingEnabled:timingEnabled}:{}),
     expiresAt: expiresAt ? parseLocalDateTime(expiresAt)?.toISOString() : null,
     opensAt: opensAt ? parseLocalDateTime(opensAt)?.toISOString() : null,
   })
   const save = () => {
+    if ((checkpointEnabled && (!Number.isInteger(checkpointHours)||checkpointHours<1||checkpointHours>48)) || (localCognitiveEnabled && (!Number.isInteger(localCognitiveHours)||localCognitiveHours<1||localCognitiveHours>48))) { setError('草稿保留时间必须为 1–48 的整数小时。'); return }
+
     const invalidName = !name.trim()
       ? '请填写测评名称'
       : name.trim().length > 200
@@ -492,6 +504,10 @@ export function QuestionnaireProductEdit() {
         description !== (detail.description || '') ||
         publicEnabled !== detail.publicEnabled ||
         timingEnabled!==Boolean(detail.trainingTimingPolicy)||
+        checkpointEnabled!==Boolean(detail.trainingPersistencePolicy?.checkpoint?.enabled)||
+        localCognitiveEnabled!==Boolean(detail.trainingPersistencePolicy?.localCognitive?.enabled)||
+        (checkpointEnabled&&checkpointHours!==detail.trainingPersistencePolicy?.checkpoint?.ttlHours)||
+        (localCognitiveEnabled&&localCognitiveHours!==detail.trainingPersistencePolicy?.localCognitive?.ttlHours)||
         (opensAt ? parseLocalDateTime(opensAt)?.toISOString() || opensAt : null) !==
           (detail.opensAt || null) ||
         (expiresAt ? parseLocalDateTime(expiresAt)?.toISOString() || expiresAt : null) !==
@@ -575,6 +591,14 @@ export function QuestionnaireProductEdit() {
               />{' '}
               允许通过公开链接作答
             </label>
+            <fieldset disabled={kind!=='COURSE'||!draft||busy} className="space-y-2 rounded border p-3">
+              <legend>可选草稿保留策略（发布后冻结）</legend>
+              <label className="block"><input type="checkbox" checked={checkpointEnabled} onChange={e=>setCheckpointEnabled(e.target.checked)}/> 启用服务器草稿</label>
+              {checkpointEnabled?<label className="block">服务器草稿保留小时数（1–48）<input aria-label="服务器草稿保留小时数" type="number" min={1} max={48} step={1} required className="input" value={checkpointHours} onChange={e=>setCheckpointHours(Number(e.target.value))}/></label>:null}
+              <label className="block"><input type="checkbox" checked={localCognitiveEnabled} onChange={e=>setLocalCognitiveEnabled(e.target.checked)}/> 启用认知任务本机草稿到期清理</label>
+              {localCognitiveEnabled?<label className="block">认知本机草稿保留小时数（1–48）<input aria-label="认知本机草稿保留小时数" type="number" min={1} max={48} step={1} required className="input" value={localCognitiveHours} onChange={e=>setLocalCognitiveHours(Number(e.target.value))}/></label>:null}
+              <p className="text-sm">两项默认关闭，分别设置。适用于本次新发布的登录学员和匿名作答；公开投放须绑定唯一 Training 课程。服务器最多成功保存 100 次，清除不重置；保留时间不延长课程或任务截止时间。认知本机清理保护正在进行、已封存和待确认提交。</p>
+            </fieldset>
             <label className="block"><input type="checkbox" checked={timingEnabled} disabled={kind!=='COURSE'||!draft} onChange={e=>setTimingEnabled(e.target.checked)}/> 可选：记录 Scale 浏览器有效前台时间</label>
             <p className="text-sm">默认关闭，仅支持明确 Training 课程投放；公开链接必须唯一绑定一个课程。时间仅作描述，不改变评分，后台及暂停时间不计入。发布后采集策略冻结。</p>
             </div><div className="questionnaire-delivery-window"><div className="questionnaire-date-grid"><label className="block">
@@ -1051,6 +1075,9 @@ export function QuestionnaireProductEdit() {
                   family="COMPOSITE"
                   resourceId={id}
                   maximumExpiry={detail.expiresAt}
+                  groupIpEligible={detail.productKind === 'QUESTIONNAIRE' && detail.questionnaireType === 'COURSE' &&
+                    detail.questionnaireCourses?.length === 1 && catalog.courses.some((course: {id: string; courseType?: string; isLibrary?: boolean}) =>
+                      course.id === detail.questionnaireCourses[0].courseId && course.courseType === 'TRAINING_COURSE' && !course.isLibrary)}
                 />
               )}
             </>

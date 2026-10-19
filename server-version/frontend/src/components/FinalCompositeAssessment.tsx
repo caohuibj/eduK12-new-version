@@ -1,3 +1,4 @@
+import { TrainingCheckpointPanel } from '../modules/composite/TrainingCheckpointPanel'
 import {TrainingTimingBoundary,restoreTrainingTiming} from '../modules/scale/TrainingTimingBoundary'
 import {SurveyScaleTimingTracker,sealObservedScaleTimings} from '../modules/scale/item-timing'
 import { isTrainingHost } from '../training/context'
@@ -87,6 +88,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
   const [scaleValues, setScaleValues] = useState<Record<string, ResponseValue>>({})
   const [meta, setMeta] = useState<FinalDraftMeta | null>(null)
   const [loadingDraft, setLoadingDraft] = useState(true)
+  const [checkpointBusy, setCheckpointBusy] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [requiresRestart, setRequiresRestart] = useState(false)
@@ -101,7 +103,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
       ? `composite-scale:${scaleId}`
       : null
   const unitKey = `${state.id}:${item?.type || 'complete'}:${item?.id || ''}`
-  const draftLocked = Boolean(meta && (meta.status !== 'DRAFT' || meta.sealedSubmission))
+  const draftLocked = checkpointBusy || Boolean(meta && (meta.status !== 'DRAFT' || meta.sealedSubmission))
   const { schedule: scheduleLocalSave, flush: flushLocalSaves, status: localSaveStatus } = useLocalDraftSaveQueue(draftKey)
   const [exiting, setExiting] = useState(false)
 
@@ -265,7 +267,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
   }, [state.status, onCompleted])
 
   const saveForm = async (itemId: string, value: FormValue) => {
-    if (!draftKey || submitting || exiting || draftLocked) return
+    if (!draftKey || checkpointBusy || submitting || exiting || draftLocked) return
     const fields = item?.type==='FORM_SECTION' ? (item.formAnswers || (item.answers || []).filter(a=>a.formItemId)) as any[] : []
     const pendingValues = {...formValuesRef.current,[itemId]:value}
     const nextValues = sanitizeTrainingFormValues(fields,pendingValues)
@@ -279,7 +281,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
   }
 
   const saveScale = async (itemCode: string, value: ResponseValue) => {
-    if (!draftKey || submitting || exiting || draftLocked) return
+    if (!draftKey || checkpointBusy || submitting || exiting || draftLocked) return
     timingRef.current?.answer(itemCode,scaleValues[itemCode],value)
     setScaleValues((previous) => ({ ...previous, [itemCode]: value }))
     await scheduleLocalSave(`scale:${itemCode}`, async () => {
@@ -289,7 +291,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
   }
 
   const saveAndExit = async () => {
-    if (exiting || submitting) return
+    if (exiting || submitting || checkpointBusy) return
     setExiting(true)
     try {
       timingRef.current?.pause()
@@ -302,7 +304,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
   }
 
   const submitSection = async () => {
-    if (!item || item.type !== 'FORM_SECTION' || !sectionId || !draftKey || !meta || submitting) return
+    if (!item || item.type !== 'FORM_SECTION' || !sectionId || !draftKey || !meta || submitting || checkpointBusy) return
     const formAnswers = item.formAnswers || (item.answers || []).filter((answer) => Boolean(answer.formItemId)).map((answer) => ({
       formItemId: answer.formItemId!,
       type: answer.type || 'text_input',
@@ -383,7 +385,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
   }
 
   const submitScaleNow = async () => {
-    if (!item || item.type !== 'SCALE' || !item.scaleAssessmentId || !draftKey || !meta || submitting) return
+    if (!item || item.type !== 'SCALE' || !item.scaleAssessmentId || !draftKey || !meta || submitting || checkpointBusy) return
     const items = item.scale?.definition?.items || []
     const missing = items.filter((question) => question.required && scaleValues[question.itemCode] === undefined)
     if (missing.length > 0) {
@@ -501,7 +503,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
       submissionStatus={submissionStatus}
       recoveryState={recoveryState}
       actions={(
-        <button type="button" onClick={() => void saveAndExit()} disabled={exiting || submitting} className="btn-secondary min-h-11">
+        <button type="button" onClick={() => void saveAndExit()} disabled={exiting || submitting || checkpointBusy} className="btn-secondary min-h-11">
           <Save className="mr-1 inline h-4 w-4" />{exiting ? '正在保存…' : '保存并退出'}
         </button>
       )}
@@ -533,6 +535,26 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
           })()}>复制恢复凭证</button>
         </details>
       </div> : null}
+      {!campusMode && draftKey && item && meta ? <TrainingCheckpointPanel policy={state.trainingPersistence} definitionHash={state.checkpointDefinitionHash} publicMode={publicMode} recoveryToken={recoveryToken || (publicMode ? sessionStorage.getItem(`composite:recovery:attempt:${state.id}`) || undefined : undefined)}
+        disabled={submitting || exiting || meta.status !== 'DRAFT' || !!meta.sealedSubmission} onBusy={setCheckpointBusy}
+        activeSlotKeys={(state.units||state.items).filter(unit=>!unit.completed).map(unit=>unit.type==='FORM_SECTION'?`form-section:${'formSectionId' in unit ? unit.formSectionId || unit.id : unit.id}`:`${unit.type.toLowerCase()}:${unit.id}`)}
+        getDrafts={async()=>{await flushLocalSaves();const stored=await finalDraftStore.listAnswers(draftKey);return [{slotKey:sectionId?`form-section:${sectionId}`:`scale:${item.id}`,answers:Object.fromEntries(stored.map(row=>[row.itemKey,row.value])),...(timingRef.current?{itemTimings:timingRef.current.snapshot()}: {})}]}}
+        restore={async rows=>{
+          await flushLocalSaves();const currentMeta=await finalDraftStore.get(draftKey)
+          if(currentMeta?.status!=='DRAFT'||currentMeta.sealedSubmission)throw new Error('本机草稿已封存，不能替换。')
+          const row=rows.find(row=>row.slotKey===(sectionId?`form-section:${sectionId}`:`scale:${item.id}`))
+          if(!row)throw new Error('服务器没有当前未提交单元的草稿，本机内容保持不变。')
+          const old=await finalDraftStore.listAnswers(draftKey)
+          const nextForm=sectionId?sanitizeTrainingFormValues((item.formAnswers||item.answers||[]) as any[],row.answers as Record<string,FormValue>):{}
+          const values=sectionId?nextForm:row.answers
+          try{for(const [itemKey,value]of Object.entries(values))await finalDraftStore.putAnswer({draftKey,itemKey,value,updatedAt:Date.now()});await finalDraftStore.deleteAnswers(draftKey,old.filter(answer=>!Object.prototype.hasOwnProperty.call(values,answer.itemKey)).map(answer=>answer.itemKey))}
+          catch(cause){for(const answer of old)await finalDraftStore.putAnswer(answer);throw cause}
+          if(sectionId){formValuesRef.current=nextForm;setFormValues(nextForm);setSectionIndex(0)}else{
+            const nextScale=Object.fromEntries(Object.entries(values).map(([key,value])=>[key,typeof value==='object'&&value!==null&&'responseValue' in value?value.responseValue as ResponseValue:value as ResponseValue]))
+            setScaleValues(nextScale);setScaleIndex(0)
+            if(item.trainingTiming){timingRef.current=new SurveyScaleTimingTracker(row.itemTimings??{},nextScale);await finalDraftStore.setInstrumentMetadata(draftKey,{trainingScaleTiming:{snapshotHash:item.trainingTiming.snapshotHash,items:timingRef.current.snapshot()}})}
+          }
+        }}/>:null}
       {error ? <p role="alert" className="mb-4 text-sm text-red-600">{error}</p> : null}
       {requiresRestart && onRestart ? (
         <div className="mb-4 flex items-center justify-between gap-3 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">

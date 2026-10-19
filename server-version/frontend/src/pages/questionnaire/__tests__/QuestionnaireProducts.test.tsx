@@ -387,3 +387,9 @@ describe('C20 material flow editor and attempt budget', () => {
     expect(JSON.parse((screen.getByLabelText('流程 JSON（高级编辑）') as HTMLTextAreaElement).value)).toEqual(config)
   })
 })
+
+describe('Training persistence authoring', () => {
+  beforeEach(() => { vi.resetAllMocks(); capabilities.enabled=true; api.get.mockResolvedValue({code:0,data:{scales:[],cognitive:[],situational:[],courses:[]}}) })
+  it('starts both independent retention controls off',async()=>{mount();await screen.findByRole('checkbox',{name:'启用服务器草稿'});expect(screen.getByRole('checkbox',{name:'启用服务器草稿'})).not.toBeChecked();expect(screen.getByRole('checkbox',{name:'启用认知任务本机草稿到期清理'})).not.toBeChecked();fireEvent.click(screen.getByRole('checkbox',{name:'启用服务器草稿'}));expect(screen.getByLabelText('服务器草稿保留小时数')).toHaveValue(24);expect(screen.queryByLabelText('认知本机草稿保留小时数')).not.toBeInTheDocument()})
+  it('freezes both settings after publication',async()=>{const row={name:'冻结策略',status:'PUBLISHED',revision:1,questionnaireType:'COURSE',questionnaireCourses:[],items:[],formSections:[],publicEnabled:false,trainingPersistencePolicy:{schemaVersion:1,checkpoint:{enabled:true,ttlHours:48},localCognitive:{enabled:true,ttlHours:1}}};api.get.mockImplementation(async path=>({code:0,data:path.endsWith('/resources')?{scales:[],cognitive:[],situational:[],courses:[]}:row}));mount('saved');await screen.findByDisplayValue('冻结策略');expect(screen.getByRole('checkbox',{name:'启用服务器草稿'})).toBeDisabled();expect(screen.getByLabelText('服务器草稿保留小时数')).toHaveValue(48);expect(screen.getByLabelText('认知本机草稿保留小时数')).toHaveValue(1);expect(screen.getByLabelText('认知本机草稿保留小时数')).toBeDisabled()})
+})

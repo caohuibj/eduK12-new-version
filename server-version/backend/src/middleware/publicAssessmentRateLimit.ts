@@ -1,3 +1,4 @@
+import { createTrainingGroupIpResolver } from './trainingPublicGroupRate'
 import crypto from 'node:crypto'
 import type { Request, RequestHandler } from 'express'
 import { rateLimit } from 'express-rate-limit'
@@ -61,12 +62,14 @@ export const createBudgetLimiter = (options: {
   budget: PublicAssessmentBudget
   limit: number
   key: (req: Request) => string | null
+  onExceeded?:RequestHandler
 }): RequestHandler => {
   const local = rateLimit({
   windowMs: config.publicAssessmentWindowMs,
   limit: options.limit,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
+  ...(options.onExceeded?{handler:options.onExceeded}:{}),
   // Custom keys intentionally hash IP/token/recovery material; disable the
   // default IPv6 subnet fallback check that assumes raw req.ip keys.
   validate: { keyGeneratorIpFallback: false },
@@ -95,6 +98,7 @@ export const createBudgetLimiter = (options: {
     res.setHeader('RateLimit-Policy', `${options.limit};w=${windowSeconds}`)
     res.setHeader('RateLimit', `limit=${options.limit}, remaining=${result.remaining}, reset=${result.retryAfterSeconds}`)
     if (!result.allowed) {
+      if(options.onExceeded){await options.onExceeded(req,res,next);return}
       res.setHeader('Retry-After', String(result.retryAfterSeconds))
       res.status(429).json({ code: -1, message: '请求过于频繁，请稍后再试' })
       return
@@ -104,6 +108,7 @@ export const createBudgetLimiter = (options: {
 }
 
 const ipKey = (req: Request): string => req.ip || req.socket.remoteAddress || 'unknown'
+const groupIpException=createTrainingGroupIpResolver()
 
 /**
  * Check-in-style multi-dimension public assessment limiter:
@@ -142,11 +147,15 @@ export const publicAssessmentRateLimiters: RequestHandler[] = [
     budget: 'get',
     limit: config.publicAssessmentIpGetLimit,
     key: ipKey,
+    // Ordinary accepted requests never read policy. Verify only this IP rejection.
+    onExceeded:groupIpException,
   }),
   createBudgetLimiter({
     name: 'public-assessment-ip-final',
     budget: 'final',
     limit: config.publicAssessmentIpFinalLimit,
     key: ipKey,
+    // Ordinary accepted requests never read policy. Verify only this IP rejection.
+    onExceeded:groupIpException,
   }),
 ]

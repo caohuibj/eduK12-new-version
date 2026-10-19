@@ -1,3 +1,4 @@
+import { trainingPersistenceMetadata } from '../composite/training-persistence.policy'
 import { assertTrainingChildSelected, TRAINING_VARIANT_PARENT_MARKER_SELECT } from '../composite/training-variant-child-scope'
 import { storeSharedCognitiveRuntime, loadSharedCognitiveRuntime } from '../assessment-runtime/shared-cognitive-runtime'
 import { assertCognitiveProductEligible, assertCognitiveNewAdmissionEnabled, isCognitiveNewAdmissionEnabled } from './product-eligibility'
@@ -303,11 +304,13 @@ const toRunnerPayload = async (session: {
   compositeAttempt?: { contextSnapshotHash?: string | null } | null
 }, nextTrialIndex?: number, exposeAnonymousCode = false, frozenReport?: FrozenReportSnapshot | null) => {
   const selectedParent = await assertTrainingChildSelected(session as any)
+  const { ensureCognitiveAdmissionAtDelivery, loadStoredCognitiveAdmission } = await import('./cognitive-admission.service')
+  let admission = (session as any).frozenAdmissionSnapshotEncrypted ? await loadStoredCognitiveAdmission(session as any) : null
+  const persistence = session.compositeAttempt ? trainingPersistenceMetadata(session.compositeAttempt as any) : undefined
   // Authorized delivery establishes admission once. Completed history remains a pure frozen read.
   if (session.status === 'IN_PROGRESS' && !isCognitiveNewAdmissionEnabled() && !(session as any).frozenAdmissionSnapshotHash) assertCognitiveNewAdmissionEnabled()
   if (session.status === 'IN_PROGRESS' && (session as any).runtimeGeneration === 'UNIFIED_V1') {
-    const { ensureCognitiveAdmissionAtDelivery } = await import('./cognitive-admission.service')
-    await ensureCognitiveAdmissionAtDelivery(session.id, selectedParent, session as import('./cognitive-admission.service').CognitiveAdmissionChildRow)
+    admission = await ensureCognitiveAdmissionAtDelivery(session.id, selectedParent, session as import('./cognitive-admission.service').CognitiveAdmissionChildRow)
   }
   const storedConfig = await loadCognitiveSessionConfig(session.configSnapshotEncrypted)
   const validatedConfig = storedConfig.config
@@ -316,6 +319,8 @@ const toRunnerPayload = async (session: {
   const entry = report ? null : requireCognitiveRegistryEntry(session.testType, session.engineVersion, session.scoringVersion)
   return {
     sessionId: session.id,
+    ...(admission ? { sessionEpoch: admission.attemptEpoch } : {}),
+    ...(persistence ? { trainingPersistence: persistence } : {}),
     assignmentId: session.assignmentId,
     testType: session.testType,
     attemptNo: session.attemptNo,
@@ -350,7 +355,7 @@ export const createSession = async (userId: string, assignmentId: string) => {
   // 与 D5 "Trial 写入不重查资格" 的冻结思想一致）。
   const existing = await prisma.cognitiveSession.findFirst({
     where: { assignmentId, participantKey, status: 'IN_PROGRESS' },
-    include: { assignment: { select: { resolvedReportSnapshotEncrypted: true } }, compositeAttempt: { select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, contextSnapshotHash: true } } },
+    include: { assignment: { select: { resolvedReportSnapshotEncrypted: true } }, compositeAttempt: { select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, trainingPersistenceSnapshot: true, trainingPersistenceSnapshotHash: true, deliveryCourseId: true, attemptEpoch: true, contextSnapshotHash: true } } },
   })
   if (existing) {
     const assignment = await prisma.cognitiveAssignment.findUnique({ where: { id: assignmentId } })
@@ -384,7 +389,7 @@ export const createSession = async (userId: string, assignmentId: string) => {
       await lockCognitiveQuota(tx, userId, source.id)
       const resumed = await tx.cognitiveSession.findFirst({
         where: { assignmentId, participantKey, status: 'IN_PROGRESS' },
-        include: { assignment: { select: { resolvedReportSnapshotEncrypted: true } }, compositeAttempt: { select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, contextSnapshotHash: true } } },
+        include: { assignment: { select: { resolvedReportSnapshotEncrypted: true } }, compositeAttempt: { select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, trainingPersistenceSnapshot: true, trainingPersistenceSnapshotHash: true, deliveryCourseId: true, attemptEpoch: true, contextSnapshotHash: true } } },
       })
       if (resumed) return resumed
       await admitCognitiveAttempt(tx, userId, assignmentId)
@@ -416,7 +421,7 @@ export const createSession = async (userId: string, assignmentId: string) => {
       // @@unique([assignmentId, participantKey, attemptNo]) 并发冲突 → 重读当前 session（不引 Redis lock）。
       const current = await prisma.cognitiveSession.findFirst({
         where: { assignmentId, participantKey, status: 'IN_PROGRESS' },
-        include: { assignment: { select: { resolvedReportSnapshotEncrypted: true } }, compositeAttempt: { select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, contextSnapshotHash: true } } },
+        include: { assignment: { select: { resolvedReportSnapshotEncrypted: true } }, compositeAttempt: { select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, trainingPersistenceSnapshot: true, trainingPersistenceSnapshotHash: true, deliveryCourseId: true, attemptEpoch: true, contextSnapshotHash: true } } },
       })
       if (current) return await toRunnerPayload(current)
       throw CONFLICT('Session already exists for this attempt')
@@ -430,7 +435,7 @@ export const getSession = async (userId: string, sessionId: string) => {
     where: { id: sessionId },
     include: {
       assignment: { select: { resolvedReportSnapshotEncrypted: true } },
-      compositeAttempt: { select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, contextSnapshotHash: true, status: true } },
+      compositeAttempt: { select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, trainingPersistenceSnapshot: true, trainingPersistenceSnapshotHash: true, deliveryCourseId: true, attemptEpoch: true, contextSnapshotHash: true, status: true } },
       trials: {
         orderBy: { trialIndex: 'desc' },
         take: 1,
@@ -532,7 +537,7 @@ export const getPublicSession = async (recoveryTokenHash: string, sessionId: str
     where: { id: sessionId },
     include: {
       assignment: { select: { resolvedReportSnapshotEncrypted: true } },
-      compositeAttempt: { select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, recoveryTokenHash: true, userId: true, contextSnapshotHash: true, status: true } },
+      compositeAttempt: { select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, trainingPersistenceSnapshot: true, trainingPersistenceSnapshotHash: true, deliveryCourseId: true, attemptEpoch: true, recoveryTokenHash: true, userId: true, contextSnapshotHash: true, status: true } },
       trials: {
         orderBy: { trialIndex: 'desc' },
         take: 1,
