@@ -4,9 +4,10 @@
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
-import {harness,prisma,require,backend,pub,pause,sha} from './c23-checkpoint-client.mjs'
+import {harness,prisma,require,backend,pub,pause,sha,drainReports} from './c23-checkpoint-client.mjs'
 import {publicPostgresFailure} from './c21-error-redaction.mjs'
 import {pathsToGate,descendants} from './c23-checkpoint-barrier.mjs'
+import {completeTerminalCheckpoint} from './c23-checkpoint-terminal.mjs'
 import {actors,anonymous,envelope,checkpoint,save,clear,read,row,retain,expire,product} from './c23-checkpoint-fixture.mjs'
 import {formBody} from './c20-materials-fixture.mjs'
 const h=harness('races'),f=h.read('c23-fixture-private.json'),connections=new Set(),{Client}=require('pg')
@@ -53,6 +54,9 @@ async function reject(label,sql,values,pattern){
  h.result.measurements.push({case:label,rejected:true,code:rejected.code})
 }
 try{
+ assert.equal(process.env.ASSESSMENT_REPORT_ASYNC_ENABLED,'true');assert.equal(process.env.BACKGROUND_WORKERS_ENABLED,'false')
+ const phaseBaseline={queue:await prisma.compositeReportQueueBudget.findUnique({where:{id:'reports'}}),otherJobs:await prisma.compositeReportJob.findMany({orderBy:{id:'asc'}})}
+ privateLog('terminal',{stage:'phase-baseline',rows:phaseBaseline});assert.ok(phaseBaseline.queue,'phase queue singleton must exist')
  observer=await connect('observer');const {teacher}=await actors(h,f),p=await teacher.request('/questionnaire-products/'+f.productId)
  const newCase=async name=>retain(f,name,await anonymous(h,teacher,p))
  const cas=await newCase('race-save-save'),cenv=await envelope(cas)
@@ -87,11 +91,19 @@ try{
  assert.equal(projected.envelope.drafts.length,1);assert.ok(!projected.envelope.drafts.some(d=>d.slotKey===accepted[0].slotKey));assert.deepEqual(projected.discardedTerminalSlotKeys,[accepted[0].slotKey]);assert.ok(retained.payloadEncrypted);assert.ok(retained.revision>=2)
  await save(child,drafts,1,409)
  h.check('Real HTTP child FINAL versus checkpoint bumps CAS and projects accepted slot away while retaining the other draft')
- // Complete through the actual final path, requiring the database trigger to erase payload.
+ // Child FINAL is asynchronous here; a 200/null-parent response is not parent completion.
  const next=await child.client.request(`${pub}/attempts/${child.attempt.id}`);assert.equal(next.status,'IN_PROGRESS')
- const beforeTerminal=await row(child);await child.client.request(`${pub}/attempts/${child.attempt.id}/form-sections/${next.currentItem.id}/submit`,'POST',formBody(next,'yes'))
- const terminal=await row(child);assert.equal(terminal.payloadEncrypted,null);assert.equal(terminal.payloadHash,null);assert.equal(terminal.expiresAt,null);assert.equal(terminal.successfulSaveCount,beforeTerminal.successfulSaveCount);assert.ok(terminal.revision>beforeTerminal.revision)
- assert.equal((await prisma.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:child.attempt.id}})).status,'COMPLETED')
+ await child.client.request(`${pub}/attempts/${child.attempt.id}/form-sections/${next.currentItem.id}/submit`,'POST',formBody(next,'yes'))
+ const readTerminalFacts=async()=>({
+  parent:await prisma.compositeAssessmentAttempt.findUnique({where:{id:child.attempt.id}}),
+  job:await prisma.compositeReportJob.findUnique({where:{attemptId_attemptEpoch:{attemptId:child.attempt.id,attemptEpoch:child.attempt.attemptEpoch}}}),
+  snapshots:await prisma.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:child.attempt.id},orderBy:{slotKey:'asc'}}),
+  queue:await prisma.compositeReportQueueBudget.findUnique({where:{id:'reports'}}),checkpoint:await prisma.trainingAttemptCheckpoint.findUnique({where:{attemptId:child.attempt.id}}),
+  otherJobs:await prisma.compositeReportJob.findMany({where:{attemptId:{not:child.attempt.id}},orderBy:{id:'asc'}}),
+ })
+ const terminalProof=await completeTerminalCheckpoint({attemptId:child.attempt.id,attemptEpoch:child.attempt.attemptEpoch,slotKeys:drafts.drafts.map(d=>d.slotKey),baseline:phaseBaseline,
+  readFacts:readTerminalFacts,record:(stage,rows)=>privateLog('terminal',{stage,rows}),drain:attemptIds=>drainReports(h,attemptIds)})
+ h.result.measurements.push(terminalProof)
  await child.client.request(checkpoint(child),'GET',undefined,409)
  const abandoned=await newCase('parent-abandoned-cleanup');await save(abandoned,await envelope(abandoned),0)
  await prisma.compositeAssessmentAttempt.update({where:{id:abandoned.attempt.id},data:{status:'ABANDONED'}})
