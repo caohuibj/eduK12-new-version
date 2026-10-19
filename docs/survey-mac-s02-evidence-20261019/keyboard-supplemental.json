@@ -1,0 +1,37 @@
+[
+  {
+    "path": "/",
+    "skipFocusId": "survey-intro",
+    "outline": "rgb(15, 107, 104) solid 3px",
+    "outlineOffset": "5px",
+    "nextLink": "产品功能"
+  },
+  {
+    "path": "/features/research-tools",
+    "skipFocusId": "survey-feature-content",
+    "outline": "rgb(15, 107, 104) solid 3px",
+    "outlineOffset": "5px",
+    "nextLink": "产品功能"
+  },
+  {
+    "path": "/login",
+    "skipFocusId": "survey-entry-content",
+    "outline": "rgb(15, 107, 104) solid 3px",
+    "outlineOffset": "3px",
+    "nextLink": "返回首页"
+  },
+  {
+    "path": "/claim",
+    "skipFocusId": "survey-entry-content",
+    "outline": "rgb(15, 107, 104) solid 3px",
+    "outlineOffset": "3px",
+    "nextLink": "返回首页"
+  },
+  {
+    "path": "/reset-password",
+    "skipFocusId": "survey-entry-content",
+    "outline": "rgb(15, 107, 104) solid 3px",
+    "outlineOffset": "3px",
+    "nextLink": "返回首页"
+  }
+]

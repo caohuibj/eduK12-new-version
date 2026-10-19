@@ -135,30 +135,42 @@ export default function SurveyApp(){
       type={type} autoComplete={type==='password'?'off':'on'} value={value} onChange={e=>change(e.target.value)}/></label>
   if(screen==='home')return <SurveyLanding signedIn={user!==null}/>
   if(screen==='feature'&&activeFeature)return <SurveyFeaturePage feature={activeFeature} signedIn={user!==null}/>
-  return <div className="min-h-screen bg-slate-50 text-slate-800">
-    <header className="border-b border-slate-200 bg-white"><div className="max-w-5xl mx-auto p-5 flex justify-between items-center">
+  // Entry styling deliberately stops before MFA, the workspace and all timed tasks.
+  const entryScreen=screen==='login'||screen==='claim'||screen==='reset'
+  return <div className={entryScreen?'survey-entry':'min-h-screen bg-slate-50 text-slate-800'}>
+    {entryScreen&&<a className="survey-skip-link" href="#survey-entry-content">跳至主要内容</a>}
+    <header className="border-b border-slate-200 bg-white"><div className={entryScreen?'survey-entry-header':'max-w-5xl mx-auto p-5 flex justify-between items-center'}>
       <SurveyBrand/>
       {user&&<button className="btn-secondary" disabled={busy} onClick={logout}>退出</button>}
     </div></header>
-    <main className="max-w-4xl mx-auto px-4 py-8">
+    <main id={entryScreen?'survey-entry-content':undefined} tabIndex={entryScreen?-1:undefined}
+      className={entryScreen?'survey-entry-main':'max-w-4xl mx-auto px-4 py-8'}>
       {loading&&<p role="status">正在核对研究者会话…</p>}
       {error&&<p role="alert" className="p-4 border-l-4 border-red-600 bg-red-50">{error}</p>}
       {notice&&<p role="status" className="p-4 border-l-4 border-teal-600 bg-teal-50">{notice}</p>}
-      {!loading&&(screen==='claim'||screen==='reset')&&<section className="bg-white rounded-xl border p-6 my-4">
-        <h2 className="text-xl font-semibold">{screen==='claim'?'激活研究者身份':'恢复 Survey 密码'}</h2>
-        <form onSubmit={activate}>{field('一次性邀请凭证',invite,setInvite,'password')}
+      {!loading&&(screen==='claim'||screen==='reset')&&<section className="survey-entry-panel">
+        <a className="survey-back" href="/">返回首页</a>
+        <h1>{screen==='claim'?'激活研究者身份':'恢复 Survey 密码'}</h1>
+        <p className="survey-entry-intro">{screen==='claim'
+          ?'使用管理员提供的一次性邀请，设置独立研究账号，然后绑定验证器。'
+          :'使用管理员提供的密码恢复邀请设置新密码，再完成双因素验证。'}</p>
+        <form onSubmit={activate} aria-busy={busy}>{field('一次性邀请凭证',invite,setInvite,'password')}
           {screen==='claim'&&field('研究者登录名',username,setUsername)}
           {field('新密码（至少 8 位，字母与数字组合）',password,setPassword,'password')}
           <button className="btn-primary" disabled={busy}>确认并绑定验证器</button></form>
+        <p className="survey-entry-help">没有有效凭证，或凭证已失效？请联系为你开通账号的管理员。</p>
       </section>}
-      {!loading&&screen==='login'&&<section className="bg-white rounded-xl border p-6 my-4 max-w-xl mx-auto">
-        <a className="text-sm underline underline-offset-4" href="/">返回首页</a>
-        <h2 className="text-xl font-semibold">Researcher 登录</h2>
-        <p>研究者仅由系统管理员邀请开通，账户与培训和校园系统相互独立。</p>
-        {surveyAdminLoginUrl() ? <a className="text-sm underline" href={surveyAdminLoginUrl()!}>系统管理员入口：研究者与工具授权</a> : <p className="text-sm">当前地址未配置管理员入口。</p>}
-        <form onSubmit={login}>{field('研究者登录名',username,setUsername)}
+      {!loading&&screen==='login'&&<section className="survey-entry-panel">
+        <a className="survey-back" href="/">返回首页</a>
+        <h1>研究者登录</h1>
+        <p className="survey-entry-intro">研究者仅由系统管理员邀请开通，账户与培训和校园系统相互独立。</p>
+        <form onSubmit={login} aria-busy={busy}>{field('研究者登录名',username,setUsername)}
           {field('密码',password,setPassword,'password')}
           <button className="btn-primary" disabled={busy}>进入双因素验证</button></form>
+        <p className="survey-entry-help">登录后还需输入验证器动态码。需要激活账号或恢复密码，请使用管理员提供的一次性邀请。</p>
+        <div className="survey-entry-admin">{surveyAdminLoginUrl()
+          ?<a href={surveyAdminLoginUrl()!}>系统管理员入口：研究者与工具授权</a>
+          :<p>当前地址未配置管理员入口。</p>}</div>
       </section>}
       {!loading&&screen==='mfa'&&<section className="bg-white rounded-xl border p-6 my-4 max-w-xl mx-auto">
         <h2 className="text-xl font-semibold">{enrolled?'双因素验证':'绑定 TOTP 验证器'}</h2>

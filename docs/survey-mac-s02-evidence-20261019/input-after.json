@@ -1,0 +1,72 @@
+{
+  "checkedAtUTC": "2026-10-19T01:48:20.716254+00:00",
+  "baseCommit": "8ca617efd3c94da4ae1309dba9004dee70887324",
+  "files": [
+    {
+      "path": "server-version/frontend/src/survey/SurveyApp.admin-entry.test.tsx",
+      "bytes": 1751,
+      "sha256": "ec921968479f3408a0e4eb1a893409b3f5eb382823d0af587e99bded9b29049f"
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyApp.entry.test.tsx",
+      "bytes": 8261,
+      "sha256": "9950b7af261821306f958201012250187e003c2f574dc8b641fb4771a7a9311b"
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyApp.tsx",
+      "bytes": 18040,
+      "sha256": "eca9e5240e5c45a559371a9cc7beee8a6af48443d925feab9b650c315d0d2f3f"
+    },
+    {
+      "path": "server-version/frontend/src/survey/SurveyLanding.tsx",
+      "bytes": 2421,
+      "sha256": "269751e3844a51eb64ae60bd84da221b54debd1f665fafd321a85e959b1fdf05"
+    },
+    {
+      "path": "server-version/frontend/src/survey/survey-features.ts",
+      "bytes": 3219,
+      "sha256": "f29009897bc02da4358a15f0cfa65b74e90eb955353bb723c81988cd2504d646"
+    },
+    {
+      "path": "server-version/frontend/src/survey/survey-landing.css",
+      "bytes": 11586,
+      "sha256": "a2a45f6dc2cb18b73f5667781da9700581d90d6109d0cafb75200e9af14cf474"
+    }
+  ],
+  "assets": [
+    {
+      "path": "public/survey/wind-observation.webp",
+      "bytes": 91862,
+      "sha256": "0aa01932c58140afc0d51df469144ddff6dd1593e8158d85fadb34e1792f4ef6",
+      "unchanged": true
+    },
+    {
+      "path": "public/survey/huisurvey-w2-emblem.png",
+      "bytes": 46298,
+      "sha256": "758f412f397a0142f236e0f9de50cb24942175081d7f556a51058ae0889868f2",
+      "unchanged": true
+    },
+    {
+      "path": "public/survey/wind-observation-small.webp",
+      "bytes": 24592,
+      "sha256": "a2e95e6a83293305270d5b777cf8c78617b5c08406072c5fd4ff08da367edacc",
+      "unchanged": true
+    },
+    {
+      "path": "public/survey/asset-provenance.json",
+      "bytes": 2572,
+      "sha256": "312bc8de817e31c38916fe2e90efabeb43c2dcb3ac145cb90e085c9fd0573e92",
+      "unchanged": true
+    },
+    {
+      "path": "public/survey/huisurvey-w2-emblem.svg",
+      "bytes": 131232,
+      "sha256": "7c9582bb49f465d7a48191c47034b6feb730007f88ee6d7f05a83c38dfb21455",
+      "unchanged": true
+    }
+  ],
+  "nodeModulesAreRealDirectories": true,
+  "dependencySymlinks": 53,
+  "externalSymlinks": [],
+  "outOfScope": "No backend, dependency, lockfile, database, MFA rendering block, participant runtime, cognition stimulus/timing/input, shared component or Training source changed."
+}

@@ -1,0 +1,33 @@
+{
+  "phase": "after",
+  "baseCommit": "8ca617efd3c94da4ae1309dba9004dee70887324",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "browser": "Mac in-app Chromium; supplemental, not native Safari/Chrome acceptance",
+  "mode": "Vite/TSX; cache disabled; no throttling; anonymous; networkIdle boundary",
+  "truncated": false,
+  "networkIdle": true,
+  "requests": 375,
+  "finished": 375,
+  "transferredBytes": 15384649,
+  "failed": [],
+  "api": [
+    {
+      "path": "/api/survey/auth/me",
+      "status": 401
+    },
+    {
+      "path": "/api/survey/auth/me",
+      "status": 401
+    }
+  ],
+  "completion": "Initial streaming capture finished all 375 requests; one continuation read observed networkAlmostIdle, firstMeaningfulPaint, networkIdle, InteractiveTime and no further network responses. Neither read was truncated.",
+  "delta": {
+    "requests": 0,
+    "transferredBytes": 12551,
+    "percent": 0.08165
+  },
+  "limits": "Development-mode observation only. No production bundle, SQL query count, memory comparison or speed improvement claimed."
+}

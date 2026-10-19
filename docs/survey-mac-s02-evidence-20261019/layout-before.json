@@ -1,0 +1,225 @@
+{
+  "source": "Mac in-app browser read-only DOM/computed style observations before edits",
+  "phase": "before",
+  "viewportHeight": 900,
+  "dpr": 1,
+  "records": [
+    {
+      "path": "/features/research-tools",
+      "viewportWidth": 1440,
+      "mainHeight": 704.984375,
+      "mainWidth": 820,
+      "textSizes": [
+        "18px",
+        "16px",
+        "14px"
+      ],
+      "overflow": false,
+      "inputFontSize": null,
+      "inputHeight": null
+    },
+    {
+      "path": "/login",
+      "viewportWidth": 1440,
+      "mainHeight": 462,
+      "mainWidth": 896,
+      "textSizes": [
+        "16px",
+        "14px"
+      ],
+      "overflow": false,
+      "inputFontSize": "14px",
+      "inputHeight": 44
+    },
+    {
+      "path": "/claim",
+      "viewportWidth": 1440,
+      "mainHeight": 470,
+      "mainWidth": 896,
+      "textSizes": [
+        "14px"
+      ],
+      "overflow": false,
+      "inputFontSize": "14px",
+      "inputHeight": 44
+    },
+    {
+      "path": "/reset-password",
+      "viewportWidth": 1440,
+      "mainHeight": 390,
+      "mainWidth": 896,
+      "textSizes": [
+        "14px"
+      ],
+      "overflow": false,
+      "inputFontSize": "14px",
+      "inputHeight": 44
+    },
+    {
+      "path": "/",
+      "viewportWidth": 390,
+      "mainHeight": 790,
+      "mainWidth": 375,
+      "textSizes": [
+        "15px",
+        "11px"
+      ],
+      "overflow": false,
+      "inputFontSize": null,
+      "inputHeight": null
+    },
+    {
+      "path": "/features/research-projects",
+      "viewportWidth": 390,
+      "mainHeight": 751.171875,
+      "mainWidth": 390,
+      "textSizes": [
+        "16px",
+        "14px"
+      ],
+      "overflow": false,
+      "inputFontSize": null,
+      "inputHeight": null
+    },
+    {
+      "path": "/features/research-tools",
+      "viewportWidth": 390,
+      "mainHeight": 781.5703125,
+      "mainWidth": 390,
+      "textSizes": [
+        "16px",
+        "14px"
+      ],
+      "overflow": false,
+      "inputFontSize": null,
+      "inputHeight": null
+    },
+    {
+      "path": "/features/research-participation",
+      "viewportWidth": 390,
+      "mainHeight": 808.1640625,
+      "mainWidth": 390,
+      "textSizes": [
+        "16px",
+        "14px"
+      ],
+      "overflow": false,
+      "inputFontSize": null,
+      "inputHeight": null
+    },
+    {
+      "path": "/features/research-data",
+      "viewportWidth": 390,
+      "mainHeight": 720.7734375,
+      "mainWidth": 390,
+      "textSizes": [
+        "16px",
+        "14px"
+      ],
+      "overflow": false,
+      "inputFontSize": null,
+      "inputHeight": null
+    },
+    {
+      "path": "/login",
+      "viewportWidth": 390,
+      "mainHeight": 486,
+      "mainWidth": 390,
+      "textSizes": [
+        "16px",
+        "14px"
+      ],
+      "overflow": false,
+      "inputFontSize": "14px",
+      "inputHeight": 44
+    },
+    {
+      "path": "/claim",
+      "viewportWidth": 390,
+      "mainHeight": 470,
+      "mainWidth": 390,
+      "textSizes": [
+        "14px"
+      ],
+      "overflow": false,
+      "inputFontSize": "14px",
+      "inputHeight": 44
+    },
+    {
+      "path": "/reset-password",
+      "viewportWidth": 390,
+      "mainHeight": 390,
+      "mainWidth": 390,
+      "textSizes": [
+        "14px"
+      ],
+      "overflow": false,
+      "inputFontSize": "14px",
+      "inputHeight": 44
+    },
+    {
+      "path": "/",
+      "viewportWidth": 768,
+      "mainHeight": 850,
+      "mainWidth": 753,
+      "textSizes": [
+        "17px",
+        "12px"
+      ],
+      "overflow": false,
+      "inputFontSize": null,
+      "inputHeight": null
+    },
+    {
+      "path": "/features/research-tools",
+      "viewportWidth": 768,
+      "mainHeight": 694.984375,
+      "mainWidth": 768,
+      "textSizes": [
+        "18px",
+        "16px",
+        "14px"
+      ],
+      "overflow": false,
+      "inputFontSize": null,
+      "inputHeight": null
+    },
+    {
+      "path": "/login",
+      "viewportWidth": 768,
+      "mainHeight": 462,
+      "mainWidth": 768,
+      "textSizes": [
+        "16px",
+        "14px"
+      ],
+      "overflow": false,
+      "inputFontSize": "14px",
+      "inputHeight": 44
+    },
+    {
+      "path": "/claim",
+      "viewportWidth": 768,
+      "mainHeight": 470,
+      "mainWidth": 768,
+      "textSizes": [
+        "14px"
+      ],
+      "overflow": false,
+      "inputFontSize": "14px",
+      "inputHeight": 44
+    },
+    {
+      "path": "/reset-password",
+      "viewportWidth": 768,
+      "mainHeight": 390,
+      "mainWidth": 768,
+      "textSizes": [
+        "14px"
+      ],
+      "overflow": false,
+      "inputFontSize": "14px",
+      "inputHeight": 44
+    }
+  ]
+}

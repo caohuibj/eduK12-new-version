@@ -1,0 +1,19 @@
+{
+  "host": "User Mac; macOS 27 arm64",
+  "Chrome": {
+    "version": "155.0.8059.82",
+    "method": "Native Chrome UI through CUA; incognito task window; native DevTools screenshots",
+    "responsive": "Nine paired captures: home 1440/390, tools feature 1440, projects/participation/data features 390, login/claim/reset 390. Device simulation is not physical mobile hardware.",
+    "zoom200": "Native browser UI confirmed Zoom: 200%; home and login observed with scroll to controls; then restored to 100%. This is distinct from the DevTools 50% preview scale. No persisted Chrome-200 PNG.",
+    "functional": "Empty submit focused researcher name and displayed Please fill out this field. A deliberately nonexistent local synthetic login displayed 用户名或密码错误. No real credentials or user account changed."
+  },
+  "Safari": {
+    "version": "27",
+    "method": "Native Safari UI through CUA; Web Inspector element screenshots; not Playwright WebKit",
+    "zoom200": "Page Menu confirmed 200%. Home, research-tools feature, login, claim and reset observed; scrolling reached feature details and primary actions. Persisted home and login full-page PNGs. Restored via Page Menu to confirmed 100%. Exact CSS viewport was not recorded, so screenshots are labeled native desktop only.",
+    "functional": "Empty submit focused researcher name and displayed Fill out this field. First error-login observation also showed Web Crash Explanation Banner / This webpage was reloaded because a problem occurred. The login page then showed 用户名或密码错误. After one explicit reload and dismissal of the retained browser banner, one retry using native typing displayed the same expected error without a new banner.",
+    "anomaly": "One native browser reload banner retained as unresolved observation; exact cause unproven. No recent Safari/WebContent diagnostic file found in the shallow local DiagnosticReports listing. Do not label the Safari flow as unconditionally clean."
+  },
+  "lastBlocker": "During attempted extra Safari home capture, CUA reported the Mac locked and automatic unlock unavailable. No subsequent native UI actions attempted. Manual unlock is required for additional native checks.",
+  "coverageLimit": "No valid-account activation/password change, browser permissions/downloads, Numbers, participant submission, backend authorization changes or S06 export acceptance performed. 200% observations are representative states, not an exhaustive all-route/all-browser accessibility audit."
+}

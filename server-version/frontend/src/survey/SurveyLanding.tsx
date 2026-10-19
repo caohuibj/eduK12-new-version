@@ -17,6 +17,7 @@ export function SurveyLanding({ signedIn = false }: { signedIn?: boolean }) {
       <div className="survey-landing-copy">
         <h1><span>风过有迹，</span><span>细微可察。</span></h1>
         <p><span>从问题出发，</span><span>在数据中寻找理解的线索。</span></p>
+        <p className="survey-landing-summary">编制研究工具，安排参与采集，整理研究数据。</p>
         <a className="survey-enter" href={signedIn ? '/workspace' : '/login'}>
           <span>{signedIn ? '进入研究工作台' : '研究者登录'}</span>
           <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none">
