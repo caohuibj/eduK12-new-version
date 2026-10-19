@@ -1139,3 +1139,21 @@ monotonic counter or trusted kernel high-water mark. Sampled RSS maximum is a
 lower bound on the true peak, with no value clamping. CPU counters and process
 identity checks are unchanged. Explicit GC was used only in that diagnostic;
 A/B measurement does not request GC. This observation is not a performance result.
+
+C26 A's readonly database adapter binds the accepted joint-restore snapshot
+(217 tables / 6667 rows / 21 checkpoints) and the separate current primary
+snapshot (217 tables / 6708 rows). It captures full current rows before asserting
+preservation, retains every old logical column including the complete reports
+budget singleton, and permits exactly one fixture-bound cleared checkpoint only
+when the actual driver succeeds. Historical 6529/6582/6651 full-row files remain
+hash references, without duplicate copies. This adapter performs no new restore.
+
+The independent existing A/B Scale analysis uses the accepted teacher/course,
+two original authenticated observations and unchanged scientific identities.
+Anonymous C/D remain excluded from pairing. Its six requests reuse the exact
+wave_a/wave_b selector and verify 2 sources / 2 observations / 2 quality entries,
+canonical scientific hashes and suppressed analysis fields. Manifest/quality
+metadata counts are allowed; sourceCutoff and manifestHash may vary per request.
+This separate historical analysis is not part of the new four-tool parent.
+These adapters are preparation contracts; A measurement still requires the final
+coordinator, new recovery/source binding, independent review and runtime approval.
