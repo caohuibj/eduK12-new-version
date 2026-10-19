@@ -1,0 +1,59 @@
+{
+  "versions": {
+    "chrome": {
+      "CFBundleShortVersionString": "155.0.8059.82",
+      "CFBundleVersion": "8059.82"
+    },
+    "safari": {
+      "CFBundleShortVersionString": "27.0",
+      "CFBundleVersion": "22625.1.29.11.27"
+    },
+    "macOS": "27.0",
+    "sourceHead": "7d4f1b0db3969c585c2bcda5dbc819103b1f824d",
+    "sourceStatus": ""
+  },
+  "screenshots": [
+    {
+      "name": "chrome-scale-completed-restored-full.png",
+      "bytes": 170217,
+      "width": 1046,
+      "height": 1400,
+      "sha256": "7efe40ee2490dab97188f60d212b329f8d238266b521b922415739b7ad79de73"
+    },
+    {
+      "name": "chrome-scale-completed-restored-viewport.png",
+      "bytes": 292868,
+      "width": 2122,
+      "height": 1419,
+      "sha256": "2220ee3a78f60d11bd61c69688388d72808ca0bc099c6155ba21edde694944fa"
+    },
+    {
+      "name": "chrome-sjt-answer-initial.png",
+      "bytes": 403767,
+      "width": 780,
+      "height": 2720,
+      "sha256": "87531b82b35625df1c6cdb20d46f2a15147b22863bed752f6121e31a33d89ead"
+    },
+    {
+      "name": "chrome-sjt-complete-200.png",
+      "bytes": 268746,
+      "width": 2122,
+      "height": 1419,
+      "sha256": "7c289f6ed95ef3cb7dced15d90e9fef597b2db68586a53662222c49d36c9538c"
+    },
+    {
+      "name": "safari-form-completed-200.png",
+      "bytes": 561378,
+      "width": 2846,
+      "height": 2660,
+      "sha256": "36f2fc44d3a3ec3f8fd869ad273a2e32579a1e9128abb3d282d9be80c4a3f2a0"
+    },
+    {
+      "name": "safari-scale-restored-capture.png",
+      "bytes": 542192,
+      "width": 2846,
+      "height": 2814,
+      "sha256": "71fb42529bc2e22614e5701b20e47a5ab6119f5f4a3a07be1e7e259b7b1a0548"
+    }
+  ]
+}

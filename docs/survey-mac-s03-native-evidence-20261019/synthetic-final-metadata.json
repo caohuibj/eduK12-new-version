@@ -1,0 +1,88 @@
+{
+  "currentRole": "survey_s01_runtime",
+  "syntheticProject": "S03 合成研究 · 外围界面检查",
+  "projectId": "871d81fa-58a5-4ccc-b92d-3ebcd5f1bf25",
+  "existingFinals": [
+    {
+      "waveId": "7c79441f-308d-4c59-a844-8b18ab7cf3c8",
+      "wave": "S03 合成 FORM",
+      "receiptId": "8fc33c7a-71b8-4a4a-9e1e-ca755f1b355f",
+      "attemptId": "962f9e71-b216-44f9-8534-0f77d2771386",
+      "attemptStatus": "COMPLETED",
+      "completedAtUTC": "2026-10-19T02:23:35.316000Z"
+    },
+    {
+      "waveId": "7c79441f-308d-4c59-a844-8b18ab7cf3c8",
+      "wave": "S03 合成 FORM",
+      "receiptId": "7498f33c-6ea4-42c0-ac3a-9f86133060f3",
+      "attemptId": "a4d5dc2f-e07e-4448-9efd-45c25868e0b1",
+      "attemptStatus": "COMPLETED",
+      "completedAtUTC": "2026-10-19T02:40:30.377000Z"
+    },
+    {
+      "waveId": "7c79441f-308d-4c59-a844-8b18ab7cf3c8",
+      "wave": "S03 合成 FORM",
+      "receiptId": "ba17249f-e85e-4f42-8ae3-ee403f0cb751",
+      "attemptId": "4406b92c-760c-4d89-a0e8-ff25c6990d9e",
+      "attemptStatus": "COMPLETED",
+      "completedAtUTC": "2026-10-19T04:29:15.758000Z"
+    },
+    {
+      "waveId": "7c79441f-308d-4c59-a844-8b18ab7cf3c8",
+      "wave": "S03 合成 FORM",
+      "receiptId": "9965bcb7-e76a-418e-ae9a-160ee99fd855",
+      "attemptId": "0298c64f-6316-460a-9063-9b3d9875bad5",
+      "attemptStatus": "COMPLETED",
+      "completedAtUTC": "2026-10-19T04:41:35.701000Z"
+    },
+    {
+      "waveId": "5758238a-15fa-4304-9685-4ccdca64c65e",
+      "wave": "S03 合成 SCALE",
+      "receiptId": "581efb31-d56e-4765-8986-49894e27e2d7",
+      "attemptId": "c19a4e58-66a1-461f-9e5f-d9a3bb2770ef",
+      "attemptStatus": "COMPLETED",
+      "completedAtUTC": "2026-10-19T02:25:08.631000Z"
+    },
+    {
+      "waveId": "5758238a-15fa-4304-9685-4ccdca64c65e",
+      "wave": "S03 合成 SCALE",
+      "receiptId": "5a815e63-8f97-4578-b827-e1ad7d7cf42d",
+      "attemptId": "d66df8af-1d57-48ef-9f03-4008f6a9a778",
+      "attemptStatus": "COMPLETED",
+      "completedAtUTC": "2026-10-19T04:34:33.601000Z"
+    },
+    {
+      "waveId": "5758238a-15fa-4304-9685-4ccdca64c65e",
+      "wave": "S03 合成 SCALE",
+      "receiptId": "90da04a5-030b-46e5-be69-b9d60d742677",
+      "attemptId": "e65b225c-ad80-405b-b3c0-01caa501a8c4",
+      "attemptStatus": "COMPLETED",
+      "completedAtUTC": "2026-10-19T04:34:35.542000Z"
+    },
+    {
+      "waveId": "d6bc7281-5f33-4e96-97ad-090d94d9aab1",
+      "wave": "S03 合成 SJT",
+      "receiptId": "3408a379-bf0b-427f-89a3-c94cb4e6f3a5",
+      "attemptId": "a5b8f131-d058-449f-a9e6-4daf11289f91",
+      "attemptStatus": "COMPLETED",
+      "completedAtUTC": "2026-10-19T02:26:18.434000Z"
+    },
+    {
+      "waveId": "d6bc7281-5f33-4e96-97ad-090d94d9aab1",
+      "wave": "S03 合成 SJT",
+      "receiptId": "2f74487e-648f-4cf6-bebb-76f7d6b5d707",
+      "attemptId": "ad869b5f-1815-449e-9262-d5c08a3d2107",
+      "attemptStatus": "COMPLETED",
+      "completedAtUTC": "2026-10-19T04:22:43.163000Z"
+    },
+    {
+      "waveId": "d6bc7281-5f33-4e96-97ad-090d94d9aab1",
+      "wave": "S03 合成 SJT",
+      "receiptId": "5c8e464e-ca0b-46f9-a309-bc28a6c29ca6",
+      "attemptId": "85f2bb8e-7281-4ff2-bbb7-aeee79582bf2",
+      "attemptStatus": "COMPLETED",
+      "completedAtUTC": "2026-10-19T04:40:24.279000Z"
+    }
+  ],
+  "evidenceScope": "Native followup new read-only inspection of existing synthetic FINAL metadata. No answers/results decryption; no new submission; not a historical browser DOM capture or merged-main Scale/SJT flow acceptance."
+}
