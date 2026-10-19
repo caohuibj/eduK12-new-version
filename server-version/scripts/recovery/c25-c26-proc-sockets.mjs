@@ -82,7 +82,7 @@ export function createProcSocketReader({registry,remainingMs,record,io=realIo,no
   const pin=p=>{const old=seen.get(p.pid);if(old)assert.ok(old.startTicks===p.startTicks&&old.processGroupId===p.processGroupId&&old.parentPid===p.parentPid,'PID reused or process group/parent changed');else{assert.ok(seen.size<2048,'proc identity history bound');seen.set(p.pid,{startTicks:p.startTicks,processGroupId:p.processGroupId,parentPid:p.parentPid})}}
   const attempts=[]
   for(let attempt=1;attempt<=2;attempt++){
-   const processes=[],missingProcessIdentities=[],terminatedProcessObservations=[],terminatedPgChildObservations=[]
+   const processes=[],missingProcessIdentities=[],terminatedProcessObservations=[],terminatedPgChildObservations=[];let socketAttribution=null
    try{
     check();const owners=registry.entries();assert.ok(Array.isArray(owners)&&owners.length>0&&owners.length<=MAX_PROCESSES,'owned process bound');const ownerPids=new Set()
     for(const owner of owners){identity(owner);integer(owner.processGroupId,'owned process group',true);assert.ok(ROLES.has(owner.role),'unknown owned role');assert.ok(!ownerPids.has(owner.pid),'duplicate owner PID');ownerPids.add(owner.pid)}
@@ -150,27 +150,43 @@ export function createProcSocketReader({registry,remainingMs,record,io=realIo,no
       for(const fd of fds){const link=readlink(`/proc/${p.pid}/fd/${fd}`);if(link.startsWith('socket:')){const match=link.match(/^socket:\[([1-9][0-9]*)\]$/);assert.ok(match,'invalid socket inode link');found.push({ownerPid:p.pid,ownerStartTicks:p.startTicks,ownerProcessGroupId:p.processGroupId,ownerFd:integer(Number(fd),'fd'),inode:match[1]})}}
      }return found
     }
-    const firstFds=descriptors(),table=[]
-    for(const protocol of ['tcp','udp'])for(const family of [4,6])table.push(...parseProcInet(readText(`/proc/net/${protocol}${family===6?'6':''}`,MAX_TEXT),{family,protocol,byteOrder}))
-    table.push(...parseProcUnix(readText('/proc/net/unix',MAX_TEXT)))
-    const byInode=new Map();for(const row of table)if(row.inode!=='0'){assert.ok(!byInode.has(row.inode),'ambiguous socket inode across network tables');byInode.set(row.inode,row)}
-    const socketInventory=firstFds.map(fd=>{const row=byInode.get(fd.inode);if(!row)race('owned socket inode absent from supported network tables');return {...row,...fd}})
-    if(!same(firstFds,descriptors()))race('socket fd/inode set changed during sample')
+    const firstFds=descriptors(),ownedInodes=new Set(firstFds.map(fd=>fd.inode)),table=[]
+    const addTable=(name,text,rows)=>{
+     const lines=text.trimEnd().split('\n').slice(1);assert.equal(lines.length,rows.length)
+     for(let i=0;i<rows.length;i++)table.push({normalized:rows[i],table:name,line:i+2,raw:lines[i],...(name==='unix'?{unixEndpoint:lines[i].trim().split(/\s+/).slice(7).join(' ')}:{})})
+    }
+    // Bound and parse EVERY row, but only this pinned frame's FD inodes can
+    // participate in attribution. Unrelated namespace churn is not ownership.
+    for(const protocol of ['tcp','udp'])for(const family of [4,6]){const name=`${protocol}${family===6?'6':''}`,text=readText(`/proc/net/${name}`,MAX_TEXT);addTable(name,text,parseProcInet(text,{family,protocol,byteOrder}))}
+    const unixText=readText('/proc/net/unix',MAX_TEXT);addTable('unix',unixText,parseProcUnix(unixText))
+    const candidates=new Map();let ignoredRows=0,equivalentOwnedRows=0
+    for(const row of table){const inode=row.normalized.inode;if(inode==='0'||!ownedInodes.has(inode)){ignoredRows++;continue}if(!candidates.has(inode))candidates.set(inode,[]);candidates.get(inode).push(row)}
+    const byInode=new Map(),conflicts=[]
+    for(const [inode,rows] of candidates){
+     const variants=new Map();for(const row of rows){const key=JSON.stringify({normalized:row.normalized,unixEndpoint:row.unixEndpoint??null});if(variants.has(key))equivalentOwnedRows++;else variants.set(key,row.normalized)}
+     if(variants.size!==1)conflicts.push({inode,owners:firstFds.filter(fd=>fd.inode===inode),candidates:rows})
+     else byInode.set(inode,variants.values().next().value)
+    }
+    if(conflicts.length)socketAttribution={observation:'NOT_OBSERVED',measurementComplete:false,reason:'OWNED_SOCKET_INODE_AMBIGUOUS',conflicts,fdBefore:firstFds,fdAfter:null,identityBefore:structuredClone(processes),identityAfter:[],bracketVerified:false}
+    const afterFds=descriptors();if(socketAttribution)socketAttribution.fdAfter=afterFds
+    if(!same(firstFds,afterFds))race('socket fd/inode set changed during sample')
     if(!same(firstChildren,children()))race('postmaster child/task set changed during sample')
-    for(const p of processes){const end=stat(p.pid);assert.equal(identity(end),identity(p),'PID reused after socket sample');assert.equal(end.processGroupId,p.processGroupId,'process group changed after socket sample');assert.equal(end.parentPid,p.parentPid,'parent changed after socket sample');assert.ok(end.userTicks>=p.userTicks&&end.systemTicks>=p.systemTicks,'CPU counter went backwards after sockets');pin(end);if(terminated(end,owners.find(owner=>owner.pid===p.pid)))continue;assert.equal(readlink(`/proc/${p.pid}/ns/net`),namespace,'network namespace changed');Object.assign(p,end)}
+    for(const p of processes){const end=stat(p.pid);if(socketAttribution)socketAttribution.identityAfter.push({...end});assert.equal(identity(end),identity(p),'PID reused after socket sample');assert.equal(end.processGroupId,p.processGroupId,'process group changed after socket sample');assert.equal(end.parentPid,p.parentPid,'parent changed after socket sample');assert.ok(end.userTicks>=p.userTicks&&end.systemTicks>=p.systemTicks,'CPU counter went backwards after sockets');pin(end);if(terminated(end,owners.find(owner=>owner.pid===p.pid)))continue;assert.equal(readlink(`/proc/${p.pid}/ns/net`),namespace,'network namespace changed');Object.assign(p,end)}
     for(const observation of [...terminatedProcessObservations,...terminatedPgChildObservations]){try{const end=stat(observation.pid);assert.equal(identity(end),identity(observation),'terminated PID reused');assert.equal(end.processGroupId,observation.processGroupId);assert.equal(end.parentPid,observation.parentPid);assert.ok(['Z','X','x'].includes(end.state),'terminated owner reappeared alive');assert.ok(end.userTicks>=observation.userTicks&&end.systemTicks>=observation.systemTicks);Object.assign(observation,end)}catch(error){if(!missing(error))throw error}}
     const terminatedIds=new Set([...terminatedProcessObservations,...terminatedPgChildObservations].map(identity));for(let i=processes.length-1;i>=0;i--)if(terminatedIds.has(identity(processes[i])))processes.splice(i,1)
     for(const id of missingProcessIdentities.filter(id=>!terminatedIds.has(id))){const pid=Number(id.split(':')[0]);try{const returned=stat(pid);assert.equal(identity(returned),id,'owned PID reused after disappearance');assert.equal(returned.processGroupId,owners.find(p=>p.pid===pid).processGroupId,'owned process group changed after disappearance');race('missing owner reappeared after sample')}catch(error){if(!missing(error))throw error}}
     assert.ok(same(owners,registry.entries()),'owned registry changed during proc read');check()
+    if(socketAttribution){socketAttribution.bracketVerified=true;const error=new Error('ambiguous owned socket inode across network tables');error.code='OWNED_SOCKET_ATTRIBUTION_NOT_OBSERVED';throw error}
+    const socketInventory=firstFds.map(fd=>{const row=byInode.get(fd.inode);if(!row)race('owned socket inode absent from supported network tables');return {...row,...fd}})
     const enumeratedPgChildIdentities=firstChildren.pids.map(pid=>{const p=processes.find(p=>p.pid===pid)??terminatedPgChildObservations.find(p=>p.pid===pid);assert.ok(p,'enumerated PG child omitted');return {pid,startTicks:p.startTicks,processGroupId:p.processGroupId,parentPid:p.parentPid}})
     const pgChildren=enumeratedPgChildIdentities.filter(p=>!terminatedIds.has(identity(p))).map(({parentPid,...p})=>p)
-    const evidence={kind:'proc_socket_snapshot',attempts:attempt,elapsedMs:clock()-started,readCount,bytesRead,childEnumerationMethod,globalProcScans,globalProcRows,globalProcElapsedMs,observerCpu:process.cpuUsage(cpuStarted),missingProcessIdentities,terminatedProcessObservations,terminatedPgChildObservations,enumeratedPgChildIdentities,discardedAttempts:attempts}
+    const evidence={kind:'proc_socket_snapshot',networkRowsParsed:table.length,unreferencedOrZeroRows:ignoredRows,equivalentOwnedRows,attempts:attempt,elapsedMs:clock()-started,readCount,bytesRead,childEnumerationMethod,globalProcScans,globalProcRows,globalProcElapsedMs,observerCpu:process.cpuUsage(cpuStarted),missingProcessIdentities,terminatedProcessObservations,terminatedPgChildObservations,enumeratedPgChildIdentities,discardedAttempts:attempts}
     record(evidence);check();const sockets=socketInventory.filter(row=>row.protocol==='tcp'&&row.state==='ESTABLISHED'&&!terminatedIds.has(`${row.ownerPid}:${row.ownerStartTicks}`));return {processes,sockets,socketInventory,pgChildren,missingProcessIdentities,terminatedProcessObservations,terminatedPgChildObservations,enumeratedPgChildIdentities,snapshotEvidence:evidence}
    }catch(error){
     // A disappearance after a successful initial stat/fd listing is a snapshot
     // race, not permission to omit a row. Exactly one whole resnapshot follows.
     if(missing(error)&&/^\/proc\/[1-9][0-9]*\//.test(error.procPath??'')){const original=error;error=new SnapshotRace('proc entry disappeared during snapshot');error.procPath=original.procPath}
-    const evidence={attempt,reason:error.code??error.name,detail:error.message,procPath:error.procPath??null,childEnumerationMethod,globalProcScans,globalProcRows,globalProcElapsedMs,observerCpu:process.cpuUsage(cpuStarted),processes,missingProcessIdentities,terminatedProcessObservations,terminatedPgChildObservations,elapsedMs:clock()-started}
+    const evidence={attempt,...(socketAttribution?{socketAttribution}:{}),reason:error.code??error.name,detail:error.message,procPath:error.procPath??null,childEnumerationMethod,globalProcScans,globalProcRows,globalProcElapsedMs,observerCpu:process.cpuUsage(cpuStarted),processes,missingProcessIdentities,terminatedProcessObservations,terminatedPgChildObservations,elapsedMs:clock()-started}
     attempts.push(evidence);record({kind:'proc_socket_snapshot_failure',...evidence,retryAllowed:error instanceof SnapshotRace&&attempt===1})
     if(!(error instanceof SnapshotRace)||attempt===2)throw error
    }finally{for(const handle of directoryHandles.reverse())handle.close();directoryHandles=[]}

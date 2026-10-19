@@ -15,7 +15,7 @@ const event=value=>fs.appendFileSync(path.join(directory,'fixture-events-private
 const inetHeader='  sl local_address rem_address st tx_queue rx_queue tr tm->when retrnsmt uid timeout inode\n',unixHeader='Num RefCount Protocol Flags Type St Inode Path\n'
 const databaseKeys=['xact_commit','xact_rollback','blks_read','blks_hit','tup_returned','tup_fetched','tup_inserted','tup_updated','tup_deleted','temp_files','temp_bytes','deadlocks'],walKeys=['wal_records','wal_fpi','wal_bytes','wal_buffers_full','wal_write','wal_sync']
 await runPgSessionChild({createIo:({registry,config,self})=>{
- let clients=0,queries=0,closed=false,connections=new Map(),nextBackend=9000001
+ let clients=0,queries=0,closed=false,connections=new Map(),nextBackend=9000001,barrierUsed=false
  const controls=()=>JSON.parse(fs.readFileSync(path.join(directory,'fixture-control.json'),'utf8'))
  const ownerId=p=>`${p.pid}:${p.startTicks}`
  const active=()=>{
@@ -62,5 +62,15 @@ await runPgSessionChild({createIo:({registry,config,self})=>{
  // Snapshot consistency is real parser/reader behavior: the synthetic tables
  // are rebuilt for each read, so control changes can produce actual races.
  const get=(kind,name)=>{const map=tree()[kind];if(!map.has(name))throw Object.assign(new Error(`fixture proc path absent: ${name}`),{code:'ENOENT'});return map.get(name)}
- return {Client,procIo:{readText:name=>get('texts',name),readlink:name=>get('links',name),readdir:name=>get('dirs',name)}}
+ const readText=name=>{
+  if(fixture.mode.startsWith('async-fault-')&&!barrierUsed&&name==='/proc/net/unix'&&fs.existsSync(path.join(directory,'fault-arm'))){
+   barrierUsed=true;event({stage:'ASYNC_FAULT_BARRIER_ENTERED'});fs.writeFileSync(path.join(directory,'fault-entered'),'entered',{mode:0o600})
+   const until=performance.now()+1000
+   while(!fs.existsSync(path.join(directory,'fault-release'))){assert.ok(performance.now()<until,'fixture barrier deadline');Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),0,0,1)}
+   event({stage:'ASYNC_FAULT_BARRIER_RELEASED'});const inode=active().find(p=>p.owner.pid===self.pid).inode
+   return unixHeader+`0000000000000000: 00000003 00000000 00000000 0001 03 ${inode}\n`
+  }
+  return get('texts',name)
+ }
+ return {Client,procIo:{readText,readlink:name=>get('links',name),readdir:name=>get('dirs',name)}}
 }})

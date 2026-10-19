@@ -45,6 +45,7 @@ export async function startPgObserverSession({directory,node,env={},registry,rem
  const journalFd=fs.openSync(journalPath,'wx',0o600),digest=createHash('sha256')
  const receipt={schemaVersion:1,nonce,applicationName,initialAggregateMs:initial,identity:null,signals:[],closeObserved:false,groupQuiescent:false,passed:false,windows:0,terminalToCloseCpu:'NOT_OBSERVED; NO_FULL_EXIT_CPU_CLAIM',apiStopScope:'AFTER_OBSERVER_CLOSE; OUTSIDE_MEASURED_WINDOWS'}
  let child,identity,sequence=0,eventSequence=0,pending=null,booted=false,connected=false,windowDeadline=null,windowPhase='none',closing=false,closeAck=false,failure=null,faultNotified=false,journalBytes=0,journalClosed=false,finished=false,killTimer,hardTimer,lifetimeTimer,groupTimer,closeResult=null,bootResolve,doneResolve
+ const issuedHistory=new Map()
  const bootPromise=new Promise(resolve=>bootResolve=resolve),done=new Promise(resolve=>doneResolve=resolve)
  const remaining=()=>{const value=Math.min(remainingMs(),aggregateEnd-performance.now());assert.ok(Number.isFinite(value)&&value>0,'observer session aggregate deadline');return value}
  const workRemaining=()=>{const value=Math.min(remaining()-reserveMs,windowDeadline===null?Infinity:windowDeadline-performance.now());assert.ok(value>0,'observer session/window work deadline');return value}
@@ -54,10 +55,10 @@ export async function startPgObserverSession({directory,node,env={},registry,rem
   assert.ok(windowEndAt===null||performance.now()<windowEndAt,'observer original window deadline exceeded')
   assert.ok(endAt===null||performance.now()<endAt,'observer RPC deadline exceeded after callback')
  }
- const raw=value=>{
+ const raw=(value,{failureEvidence=false}={})=>{
   assert.ok(!journalClosed,'observer parent journal closed');const bytes=Buffer.from(JSON.stringify(value)+'\n');assert.ok(journalBytes+bytes.length<=maxJournalBytes,'observer parent journal limit')
   fs.writeFileSync(journalFd,bytes);digest.update(bytes);journalBytes+=bytes.length
-  const result=record(structuredClone(value));assert.ok(!result?.then,'observer record must be synchronous');successRemaining()
+  const result=record(structuredClone(value));assert.ok(!result?.then,'observer record must be synchronous');if(!failureEvidence)successRemaining()
  }
  const membersOf=pgid=>{
   const names=fs.readdirSync('/proc');assert.ok(names.length<=8192,'observer cleanup proc enumeration bound')
@@ -125,12 +126,15 @@ export async function startPgObserverSession({directory,node,env={},registry,rem
  const rpc=async(op,payload={},limit=90000)=>{
   try{
    check();assert.ok(booted&&!pending&&!closing,'single outstanding observer semantic command required')
+   assert.ok(issuedHistory.size<4096,'observer issued history bound')
    const seq=++sequence,left=Math.floor(Math.min(limit,op==='close'?remaining():workRemaining()));assert.ok(left>0)
    if(op==='close')closing=true
    const endNs=(process.hrtime.bigint()+BigInt(left)*1000000n).toString()
    return await new Promise((resolve,reject)=>{
     pending={seq,op,resolve,reject,endAt:performance.now()+left,timer:setTimeout(()=>fault(new Error(`observer ${op} RPC deadline`)),left)}
+    const issued={seq,op,issuedMonotonicNs:process.hrtime.bigint().toString()}
     child.send({type:PG_SESSION_PROTOCOL,kind:'command',nonce,seq,op,deadlineNs:endNs,payload},error=>{if(error)fault(error)})
+    issuedHistory.set(seq,issued);raw({stage:'OBSERVER_RPC_ISSUED',...issued})
    })
   }catch(error){throw fault(error)}
  }
@@ -163,7 +167,16 @@ export async function startPgObserverSession({directory,node,env={},registry,rem
      keys(value,['type','kind','nonce','seq','op','pid','startTicks','value']);assert.equal(value.op,'record');assert.equal(value.seq,eventSequence+1);eventSequence=value.seq;raw({stage:'OBSERVER_RAW',sequence:eventSequence,value:value.value});return
     }
     if(value.kind==='fault'){
-     keys(value,['type','kind','nonce','seq','op','pid','startTicks','error']);assert.equal(value.seq,sequence);assert.ok(value.op===(pending?.op??receipt.lastOperation),'fault RPC operation mismatch');keys(value.error,['name','message']);throw new Error(`observer child ${value.error.name}: ${value.error.message}`)
+     keys(value,['type','kind','nonce','seq','op','pid','startTicks','error']);keys(value.error,['name','message']);assert.equal(typeof value.error.name,'string');assert.equal(typeof value.error.message,'string')
+     // Identity was authenticated above. Preserve the actual fault BEFORE
+     // matching its semantic history or clearing the in-flight command. An
+     // asynchronous sample can fail at completed RPC3 while RPC4 is in transit.
+     const context={stage:'OBSERVER_CHILD_FAULT',receivedMonotonicNs:process.hrtime.bigint().toString(),envelope:structuredClone(value),pending:pending?{seq:pending.seq,op:pending.op}:null,issuedHistory:[...issuedHistory.values()],lastCompletedOperation:receipt.lastOperation??null}
+     receipt.childFault=context
+     try{raw(context,{failureEvidence:true})}catch(error){receipt.childFaultEvidenceError={name:error.name,message:error.message};throw error}
+     assert.ok(Number.isSafeInteger(value.seq)&&issuedHistory.has(value.seq),'fault refers to unissued/future RPC')
+     assert.equal(value.op,issuedHistory.get(value.seq).op,'fault issued RPC operation mismatch')
+     throw new Error(`observer child ${value.error.name}: ${value.error.message}`)
     }
     keys(value,['type','kind','nonce','seq','op','pid','startTicks','result']);assert.equal(value.kind,'reply');assert.ok(pending,'unsolicited observer reply');assert.equal(value.seq,pending.seq);assert.equal(value.op,pending.op);assert.ok(performance.now()<pending.endAt,'observer reply arrived after RPC deadline');if(value.op==='close')remaining();else workRemaining()
     const current=pending;raw({stage:'OBSERVER_RPC_COMPLETED',seq:value.seq,op:value.op,result:value.result});successRemaining({endAt:current.endAt,work:value.op!=='close'});assert.equal(pending,current,'observer RPC changed during mandatory record')

@@ -128,3 +128,33 @@ test('PPID first scan pins child identity before the second stat and forbids PID
  h.before=(op,path,count)=>{if(op==='text'&&path==='/proc/102/stat'&&count===2)h.texts.set(path,stat(102,{parentPid:10,processGroupId:10,startTicks:'999'}))}
  assert.throws(()=>h.read(),/PID reused or process group\/parent changed/);assert.equal(h.events.length,1);assert.equal(h.events[0].retryAllowed,false);assert.equal(h.counts.get('text:/proc/102/stat'),2)
 })
+
+test('owned socket selection ignores unrelated duplicates, deduplicates identical candidates and still parses every row',()=>{
+ const h=fixture()
+ h.texts.set('/proc/net/tcp',h.texts.get('/proc/net/tcp')+inetRow('200')+inetRow('999')+inetRow('0'))
+ h.texts.set('/proc/net/udp',h.texts.get('/proc/net/udp')+inetRow('999',{state:'07'})+inetRow('0',{state:'07'}))
+ const frame=h.read();assert.equal(frame.socketInventory.length,6);assert.equal(frame.sockets.length,3);assert.equal(frame.snapshotEvidence.equivalentOwnedRows,1);assert.equal(frame.snapshotEvidence.unreferencedOrZeroRows,4)
+ assert.equal(frame.socketInventory.some(row=>['0','999'].includes(row.inode)),false);assert.equal(frame.snapshotEvidence.networkRowsParsed,11)
+ const malformed=fixture();malformed.texts.set('/proc/net/udp6',inetHeader+'0: broken unreferenced row\n');assert.throws(()=>malformed.read(),/truncated/);assert.equal(malformed.events[0].retryAllowed,false)
+})
+
+test('owned socket conflicts preserve raw candidates and identity bracket without fabricated attribution or zero metrics',()=>{
+ for(const variant of ['protocol','family','endpoint','state','unix-endpoint']){
+  const h=fixture()
+  if(variant==='protocol')h.texts.set('/proc/net/udp',h.texts.get('/proc/net/udp')+inetRow('200'))
+  if(variant==='family')h.texts.set('/proc/net/tcp6',h.texts.get('/proc/net/tcp6')+inetRow('200',{local:'00000000000000000000000001000000:9CA6',remote:'00000000000000000000000001000000:1539'}))
+  if(variant==='endpoint')h.texts.set('/proc/net/tcp',h.texts.get('/proc/net/tcp')+inetRow('200',{remote:'0200007F:1539'}))
+  if(variant==='state')h.texts.set('/proc/net/tcp',h.texts.get('/proc/net/tcp')+inetRow('200',{state:'08'}))
+  if(variant==='unix-endpoint')h.texts.set('/proc/net/unix',h.texts.get('/proc/net/unix')+'0: 00000003 00000000 00000000 0001 03 400 /different-endpoint\n')
+  assert.throws(()=>h.read(),error=>error.code==='OWNED_SOCKET_ATTRIBUTION_NOT_OBSERVED')
+  assert.equal(h.events.length,1);const event=h.events[0],proof=event.socketAttribution
+  assert.equal(event.retryAllowed,false);assert.equal(proof.observation,'NOT_OBSERVED');assert.equal(proof.measurementComplete,false);assert.equal(proof.bracketVerified,true);assert.equal(proof.conflicts.length,1);assert.equal(proof.conflicts[0].candidates.length,2)
+  assert.ok(proof.conflicts[0].candidates.every(x=>x.raw&&x.table&&x.line>=2&&x.normalized.inode===proof.conflicts[0].inode))
+  assert.deepEqual(proof.fdBefore,proof.fdAfter);assert.equal(proof.identityBefore.length,proof.identityAfter.length);assert.ok(proof.conflicts[0].owners.every(fd=>proof.identityBefore.some(p=>p.pid===fd.ownerPid&&p.startTicks===fd.ownerStartTicks)))
+  assert.equal('sockets' in event,false);assert.equal('measurementCpu' in event,false)
+ }
+ // An ambiguous candidate never excuses identity reuse during its bracket.
+ const reused=fixture();reused.texts.set('/proc/net/udp',reused.texts.get('/proc/net/udp')+inetRow('200'))
+ reused.before=(op,name,count)=>{if(op==='text'&&name==='/proc/20/stat'&&count===3)reused.texts.set(name,stat(20,{startTicks:'201'}))}
+ assert.throws(()=>reused.read(),/PID reused/);assert.equal(reused.events[0].socketAttribution.bracketVerified,false);assert.equal(reused.events[0].socketAttribution.identityAfter.find(p=>p.pid===20).startTicks,'201')
+})

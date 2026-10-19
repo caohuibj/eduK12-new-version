@@ -36,6 +36,7 @@ async function run(mode,action=async h=>h.session.close(),options={}){
  try{
   h.session=await startPgObserverSession({directory,node,env:{PATH:process.env.PATH},registry,remainingMs:()=>Math.min(h.externalLeft,end-performance.now()),record:value=>{events.push(value);if(h.failRecord)throw new Error('Synthetic mandatory record failure');options.onRecord?.(value,h)},onFault:value=>faults.push(value),...(options.maxJournalBytes?{maxJournalBytes:options.maxJournalBytes}:{})},{spawnChild:(exe,argv,opts)=>{
    child=spawn(exe,[fixture,argv[1]],opts)
+   if(mode==='async-fault-future'||mode==='async-fault-wrong-operation'){const emit=child.emit;child.emit=function(name,...args){if(name==='message'&&args[0]?.kind==='fault')args[0]={...args[0],...(mode==='async-fault-future'?{seq:5}:{seq:2})};return Reflect.apply(emit,this,[name,...args])}}
    if(mode==='wrong-sequence'||mode==='missing-close'){
     const emit=child.emit;child.emit=function(name,...args){if(mode==='wrong-sequence'&&name==='message'&&args[0]?.kind==='reply'&&args[0]?.op==='connect')args[0]={...args[0],seq:args[0].seq+1};if(mode==='missing-close'&&name==='close'){write(path.join(directory,'actual-dropped-close.json'),{code:args[0],signal:args[1]});return false}return Reflect.apply(emit,this,[name,...args])}
    }
@@ -115,4 +116,33 @@ test('last settled record and final journal fsync cannot qualify past their orig
   })
  }finally{fs.fsyncSync=originalFsync}
  assert.equal(expired,true);assert.match(finish.error.message,/deadline/);assert.equal(finish.receipt.passed,false);assert.equal(finish.receipt.closeObserved,true);assert.equal(finish.receipt.groupQuiescent,true);assert.equal(finish.faults.length,1);assert.deepEqual(liveGroup(finish.receipt.identity.processGroupId),[])
+})
+
+async function asynchronousFault(h){
+ await h.session.begin({maxWindowMs:3000});const api=await h.add('api');await h.session.register(api.identity)
+ fs.writeFileSync(path.join(h.directory,'fault-arm'),'armed',{mode:0o600})
+ const until=performance.now()+1200
+ while(!fs.existsSync(path.join(h.directory,'fault-entered'))){assert.ok(performance.now()<until,'parent barrier deadline');await delay(1)}
+ // rpc() sends synchronously before its first await. The real child is blocked
+ // inside its periodic read at seq3, so command4 cannot yet be consumed.
+ const pending=h.session.operationEnd();fs.writeFileSync(path.join(h.directory,'fault-release'),'release',{mode:0o600})
+ return pending
+}
+test('actual CLI asynchronous fault3 while RPC4 is pending preserves the original owned-socket failure and cleans up',{timeout:10000},async()=>{
+ const r=await run('async-fault-history',asynchronousFault)
+ assert.match(r.error.message,/observer child Error: ambiguous owned socket inode across network tables/);assert.equal(r.faults.length,1);assert.equal(r.faults[0].message,r.error.message)
+ const context=r.receipt.childFault;assert.equal(context.envelope.seq,3);assert.equal(context.envelope.op,'register');assert.deepEqual(context.pending,{seq:4,op:'operationEnd'});assert.deepEqual(context.issuedHistory.map(({seq,op})=>({seq,op})),[{seq:1,op:'connect'},{seq:2,op:'begin'},{seq:3,op:'register'},{seq:4,op:'operationEnd'}]);assert.ok(context.issuedHistory.every(x=>!('payload' in x)))
+ const completed3=r.events.findIndex(x=>x.stage==='OBSERVER_RPC_COMPLETED'&&x.seq===3),issued4=r.events.findIndex(x=>x.stage==='OBSERVER_RPC_ISSUED'&&x.seq===4),fault=r.events.findIndex(x=>x.stage==='OBSERVER_CHILD_FAULT')
+ assert.ok(completed3>=0&&issued4>completed3&&fault>issued4);assert.equal(r.events.some(x=>x.stage==='OBSERVER_RPC_COMPLETED'&&x.seq===4),false)
+ const raw=rows(path.join(r.directory,'observer-child-raw-private.jsonl')),evidence=raw.find(x=>x.value?.socketAttribution)?.value??raw.find(x=>x.socketAttribution)
+ assert.ok(evidence,'actual leaf must retain conflict candidates');assert.equal(evidence.socketAttribution.observation,'NOT_OBSERVED');assert.equal(evidence.socketAttribution.bracketVerified,true)
+ assert.equal(r.receipt.passed,false);assert.equal(r.receipt.closeObserved,true);assert.equal(r.receipt.groupQuiescent,true);assert.deepEqual(liveGroup(r.receipt.identity.processGroupId),[])
+ assert.ok(rows(path.join(r.directory,'observer-parent-raw-private.jsonl')).some(x=>x.stage==='OBSERVER_CHILD_FAULT'&&x.envelope.seq===3))
+})
+test('actual CLI fault history rejects unissued future and mismatched historical operation without losing raw error',{timeout:15000},async()=>{
+ for(const mode of ['async-fault-future','async-fault-wrong-operation']){
+  const r=await run(mode,asynchronousFault);assert.match(r.error.message,mode==='async-fault-future'?/unissued\/future RPC/:/issued RPC operation mismatch/)
+  assert.match(r.receipt.childFault.envelope.error.message,/ambiguous owned socket inode/);assert.deepEqual(r.receipt.childFault.pending,{seq:4,op:'operationEnd'});assert.equal(r.receipt.childFault.envelope.seq,mode==='async-fault-future'?5:2)
+  assert.equal(r.receipt.passed,false);assert.equal(r.receipt.closeObserved,true);assert.equal(r.receipt.groupQuiescent,true);assert.equal(r.faults.length,1);assert.deepEqual(liveGroup(r.receipt.identity.processGroupId),[])
+ }
 })
