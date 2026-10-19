@@ -581,6 +581,71 @@ preparation evidence only. A newly frozen current descriptor and a fully verifie
 6,651-row filesystem recovery point must be reviewed before a separately approved
 missing-only runtime; existing producer bytes are reused, not re-emitted.
 
+### Missing-only coordinator and recovery-point gate
+
+The separate `c25-missing.mjs` launcher accepts only new
+`eduk12_c25_continuation_02` evidence, reuses the stopped mutable data roots under
+HTTP01, and reads continuation01 evidence without changing it. It binds the
+actual launcher Python, all source/helper/tool/client/compiler/dependency bytes,
+both accepted producers, both false receipts and current source/recovery
+descriptors before and after. A coherent accepted binding and the exact
+6,651-row final snapshot are checked before API startup. Old assignment/checkin
+receipt tables must still be empty because API startup cleanup is unconditional.
+
+The five newly executed phases are `missing-open` (180s), `missing-probe` (600s),
+`missing-consumers` finalization (60s), `missing-guards` (120s), and
+`missing-restore` (600s). Baseline, each phase preservation and final audit each
+have a separate 300s aggregate child deadline. The API stops immediately after
+the E probe, before its preservation audit and restore; the independent 2,700s
+API lifetime guard covers earlier audits/binding waits, allows no restart, and
+cleanup ignores/cancels alarms before bounded API-first shutdown and final PG
+shutdown. Consumer children inherit the owned phase process group.
+
+`c25-missing-archive.mjs` prepares a new `/tmp/c25-missing-recovery-01` recovery
+point only after a new current-HEAD HTTP03 descriptor is issued in a separate
+`/tmp/c25-source-06` directory. It reuses the already reviewed archive primitives
+without changing Python files. Its 600s aggregate deadline covers tar/gzip,
+complete extraction, every file's content/metadata/xattr/ACL/link comparison,
+PG control state and fsync. Both false-evidence roots and the historical source05
+and continuation recovery files are captured and preserved. Raw data is retained;
+only the newly created verification extraction may be removed after full success.
+This tmpfs recovery point is node-local and temporary, not a durable backup.
+
+Entry still requires workspace free ≥8GiB+512MiB, MemAvailable ≥2GiB and tmp free
+≥512MiB plus archive/extraction coexistence budget. Runtime keeps the unchanged
+8GiB/2GiB/512MiB floors. A single additional full-row baseline and one byte-exact
+original-row copy consume the existing reserve; prior full-row evidence is read
+in place. Archive and runtime each need separate authorization after review.
+Only these prepared argv are intended (all SHA/HEAD values must be the independently
+reviewed exact values, never placeholders at execution):
+
+```text
+NODE c25-missing-archive.mjs --python ABSOLUTE_PYTHON --tools TOOLS
+  --output /tmp/c25-missing-recovery-01 --descriptor /tmp/c25-source-06/c25-source-descriptor.json
+  --expected-head FROZEN_HEAD --expected-descriptor-sha256 SOURCE_SHA
+NODE c25-missing.mjs --python ABSOLUTE_PYTHON --tools TOOLS
+  --descriptor /tmp/c25-source-06/c25-source-descriptor.json --expected-descriptor-sha256 SOURCE_SHA
+  --state SCRATCH/eduk12_c25_continuation_02 --expected-head FROZEN_HEAD
+  --failure-state SCRATCH/eduk12_c25_http_01 --continuation-state SCRATCH/eduk12_c25_continuation_01
+  --recovery-descriptor /tmp/c25-missing-recovery-01/c25-missing-recovery-descriptor.json
+  --expected-recovery-sha256 RECOVERY_SHA
+  --backend-receipt SCRATCH/c25-build-evidence/backend-01/backend-build.receipt.json
+  --expected-backend-receipt-sha256 ffca85332844b7f9caeac3252119e1354c498e9de11e757c5763e525d2bf8d95
+  --frontend-receipt SCRATCH/c25-build-evidence/frontend-01/frontend-build.receipt.json
+  --expected-frontend-receipt-sha256 7064d220540d1faf8851cec0e6c8ba4151070a61163ed60bf8f5d895f0415f5a
+```
+
+Five additional new no-service archive/coordinator contracts passed in 0.810s,
+with full input copies, equal before/after closure and the unchanged 72 Python
+helper inventory. Receipt `/tmp/c25-missing-coordinator-01/receipt.json` SHA
+`0723678084620dc35cd533b333ec408d42af46de9f34482a5da6a31768348409`;
+raw `new-contract-tests.log` SHA
+`36cd96da9dc4efccd90afaaedd6b29e7bd17ca7db75a9365c3562c9ac937f2ae`.
+The earlier 29 contracts were not replayed. No new descriptor, archive, database,
+HTTP runtime or producer was executed during this preparation. The old A
+publication expiry does not enter its read-only compact feedback projection;
+A HTTP admission/report work is not repeated and its dates remain unchanged.
+
 ## Remaining C25 release work
 
 These core scripts do not close C19 missing-only checks: suppressed analysis,
