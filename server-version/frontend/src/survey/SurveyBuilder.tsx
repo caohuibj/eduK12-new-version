@@ -8,6 +8,10 @@ import { ResearchSjtEditor } from './ResearchSjtEditor'
 import { ResearchPreview } from './ResearchPreview'
 import type { ResearchDraft, Kind, Definition, FormDraft, ScaleDraft, SjtDraft, CognitiveDraft, Issue } from './builder.types'
 import { researchKey } from './builder.types'
+import { ResearchAuthoringGuide,ResearchImportGuide } from './ResearchAuthoringGuide'
+import { ResearchIssueList } from './ResearchIssueList'
+import { authoringIssueTarget,type AuthoringIssue } from './authoring-issue-location'
+import './survey-workspace.css'
 import { useInstrumentLibrary, type InstrumentLibrary } from './instrument-library'
 
 type Envelope<T>={code:number|string;message:string;data:T|null}
@@ -16,6 +20,9 @@ type Preview={revision:number;ok:boolean;issues:Issue[];definitionDigest?:string
 type BulkBatch={batchId:string;format:'TEXT'|'CSV';content:string;pageKey?:string;dimensionKey?:string}
 type BulkResult={revision:number;count:number;ok:boolean;digest:string;issues:{line:number;message:string}[];
   items:{type:string;prompt:string;options:string[]}[]}
+class BuilderApiError extends Error {
+  constructor(message:string,readonly issues:AuthoringIssue[]){super(message)}
+}
 const getCookie=(name:string)=>document.cookie.split('; ').find(v=>v.startsWith(encodeURIComponent(name)+'='))?.split('=').slice(1).join('=')||''
 async function api<T>(path:string,method='GET',payload?:unknown):Promise<T>{
   const headers:Record<string,string>={'Content-Type':'application/json'}
@@ -32,11 +39,10 @@ async function api<T>(path:string,method='GET',payload?:unknown):Promise<T>{
   }
   const response=await fetch('/api/survey'+path,{method,headers,credentials:'same-origin',
     ...(payload===undefined?{}:{body:JSON.stringify(payload)})})
-  const data=await response.json() as Envelope<T|{issues:Issue[]}>
+  const data=await response.json() as Envelope<T|{issues:AuthoringIssue[]}>
   if(!response.ok||data.code!==0){
-    const more=data.data as {issues?:Issue[]}|null
-    const issues=more?.issues?.map(x=>x.path+': '+x.message).join('；')
-    throw new Error(issues||data.message||'操作失败')
+    const more=data.data as {issues?:AuthoringIssue[]}|null
+    throw new BuilderApiError(data.message||'操作失败',more?.issues??[])
   }
   return data.data as T
 }
@@ -47,6 +53,8 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
   const [active,setActive]=useState<ResearchDraft|null>(null),[dirty,setDirty]=useState(false)
   const readOnly=Boolean(active?.readOnly||active?.catalogGrantId)
   const editGeneration=useRef(0)
+  const editorRoot=useRef<HTMLDivElement>(null)
+  const [apiIssues,setApiIssues]=useState<AuthoringIssue[]>([])
   const [newKind,setNewKind]=useState<Kind>('FORM'),[newTitle,setNewTitle]=useState('')
   const [busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('')
   const [preview,setPreview]=useState<Preview|null>(null),[showPreview,setShowPreview]=useState(false)
@@ -58,8 +66,8 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
   const [undo,setUndo]=useState<{definition:Definition;title:string}|null>(null)
   useEffect(()=>{setActive(null);setPreview(null);setError('');setBulk(null)},[projectId])
   const run=async(task:()=>Promise<void>)=>{
-    setBusy(true);setError('');setNotice('')
-    try{await task()}catch(e){setError(e instanceof Error?e.message:'操作失败')}
+    setBusy(true);setError('');setNotice('');setApiIssues([])
+    try{await task()}catch(e){setError(e instanceof Error?e.message:'操作失败');if(e instanceof BuilderApiError)setApiIssues(e.issues)}
     finally{setBusy(false)}
   }
   // The write is already acknowledged. List failures have their own retry UI
@@ -98,7 +106,7 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
     if(readOnly)return
     editGeneration.current++
     setActive(old=>old?{...old,definition}:old)
-    setDirty(true);setPreview(null);setBulk(null);setUndo(null);setAnswerReview(null)
+    setDirty(true);setPreview(null);setBulk(null);setUndo(null);setAnswerReview(null);setApiIssues([])
   }
   const save=()=>{if(!active||readOnly||!dirty)return;const snapshot=active,generation=editGeneration.current;void run(async()=>{
     const updated=await api<ResearchDraft>(prefix+'/'+snapshot.id,'PATCH',{
@@ -169,11 +177,33 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
     setUndo(null);setActive(updated);setPreview(null);setDirty(false)
     await refreshAfterWrite(instrumentPage);setNotice('已撤销上一批导入')
   })}
-  return <section className="bg-white border rounded-xl p-4 sm:p-6 my-5 space-y-5" aria-label="Survey Research Builder">
+  const locateIssue=(issue:AuthoringIssue)=>{
+    if(!active)return
+    const target=authoringIssueTarget(active,issue)
+    if('sceneIndex' in target&&target.sceneIndex!==undefined){
+      // Reuse the existing scene selector; shared SJT editor/runtime stays intact.
+      editorRoot.current?.querySelectorAll('nav[aria-label="情境列表"] > div')[target.sceneIndex]
+        ?.querySelector<HTMLButtonElement>('button')?.click()
+    }
+    window.requestAnimationFrame(()=>{
+      const element=document.getElementById(target.targetId)
+      if(!element)return
+      element.classList.add('survey-authoring-target');element.focus()
+      element.scrollIntoView?.({block:'center'})
+      if(element instanceof HTMLTextAreaElement&&'line' in target&&target.line){
+        const lines=element.value.split('\n'),line=Math.max(0,Math.min(target.line-1,lines.length-1))
+        const start=lines.slice(0,line).reduce((n,text)=>n+text.length+1,0)
+        element.setSelectionRange(start,start+lines[line].length)
+      }
+    })
+  }
+  return <section className="survey-builder-shell bg-white border rounded-xl p-4 sm:p-6 my-5 space-y-5" aria-label="Survey Research Builder">
     <header><h2 className="text-xl font-semibold">研究工具 · Builder</h2>
       <p className="text-sm text-slate-600">创建表单、心理量表、情境测验和受控认知任务。研究工具仅限本人项目；不进入正式科学量表目录。</p>
     </header>
-    {error&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{error}</p>}
+    {error&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{apiIssues.length?'工具还有待修正字段，请按下方提示定位。':error}</p>}
+    {active&&<ResearchIssueList draft={active} issues={apiIssues} onLocate={locateIssue}/>}
+    <ResearchAuthoringGuide/>
     {listError&&<div role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{listError}
       <button type="button" className="btn-secondary" disabled={listLoading} onClick={()=>void run(()=>refreshList(instrumentPage))}>重试研究工具列表</button></div>}
     {notice&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{notice}</p>}
@@ -216,7 +246,7 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
           <input className="input block w-full" value={active.title} readOnly={readOnly} maxLength={200} onChange={e=>{
             if(readOnly)return
             editGeneration.current++
-            setActive(d=>d?{...d,title:e.target.value}:d);setDirty(true);setPreview(null)
+            setActive(d=>d?{...d,title:e.target.value}:d);setDirty(true);setPreview(null);setApiIssues([])
           }}/></label>
         <div className="flex flex-wrap gap-2">
           {!readOnly&&<button className="btn-primary" type="button" disabled={busy||!dirty||active.status==='ARCHIVED'} onClick={save}>保存草稿</button>}
@@ -227,15 +257,19 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
         </div>
         {dirty&&<p className="text-xs text-amber-700">请先保存。若另一个标签已经更新，服务器将拒绝旧 revision 的覆盖，本地内容不会被自动清除。</p>}
       </div>
-      {!readOnly&&active.status==='DRAFT'&&<>
+      {!readOnly&&active.status==='DRAFT'&&<div ref={editorRoot} id="survey-authoring-definition" tabIndex={-1} className="survey-authoring-target">
         {active.kind==='FORM'&&<ResearchFormEditor key={active.id} value={active.definition as FormDraft} onChange={change} projectId={projectId}/>}
         {active.kind==='SCALE'&&<ResearchScaleEditor key={active.id} value={active.definition as ScaleDraft} onChange={change}/>}
         {active.kind==='COGNITIVE'&&<ResearchCognitiveEditor value={active.definition as CognitiveDraft} onChange={change}/>}
         {active.kind==='SJT'&&<ResearchSjtEditor key={active.id} value={active.definition as SjtDraft} onChange={change} projectId={projectId}/>}
-      </>}
+      </div>}
       {!readOnly&&(active.kind==='FORM'||active.kind==='SCALE')&&active.status==='DRAFT'&&<div className="border rounded-xl p-4 space-y-3">
         <h3 className="font-semibold">批量录入</h3>
-        <p className="text-xs text-slate-600 break-words">文本：每道题用空行分隔，第一行是题干，后续行是选项。CSV：type,prompt,required,options,rows,dimension,reverse；Form V2 可导入 DATE/TIME/RANK_ORDER/SLIDER/CONSTANT_SUM/MATRIX_MULTIPLE，数值列 min,max,step,precision,total,min_selections,max_selections,integer_only,time_zone；选项与矩阵行用 || 分隔。</p>
+        <p className="text-sm text-slate-600">先解析预览，确认后整批写入。文本题块用空行分隔，首行为题干，后续行为选项；完整题型和配置请使用 CSV 模板。</p>
+        <ResearchImportGuide draft={active} onUse={csv=>{
+          if(bulkText.trim()&&!window.confirm('用完整模板替换导入框内的内容？尚未导入的文本会被替换。'))return
+          setBulkText(csv);setBulkFormat('CSV');setBulk(null)
+        }}/>
         <label className="text-sm">输入格式<select className="input block" value={bulkFormat} onChange={e=>{
           setBulkFormat(e.target.value as 'TEXT'|'CSV');setBulk(null)}}>
           <option value="TEXT">多行文本</option><option value="CSV">标准 CSV</option></select></label>
@@ -248,12 +282,12 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
                 <option key={page.pageKey} value={page.pageKey}>{page.title||page.pageKey}</option>)}
             </select>
           </label>}
-        <textarea className="input block w-full" rows={7} value={bulkText} onChange={e=>{setBulkText(e.target.value);setBulk(null)}}
-          placeholder={bulkFormat==='TEXT'?'今天上课我能集中注意力\nA. 从不\nB. 有时\nC. 经常\n\n今天我愿意主动提问\nA. 从不\nB. 有时\nC. 经常':'type,prompt,required,options,dimension\nSINGLE,今天我愿意提问,true,从不||有时||经常,'}/>
+        <label className="block text-sm">待解析的导入内容<textarea id="survey-bulk-input" className="input block w-full" rows={7} value={bulkText} onChange={e=>{setBulkText(e.target.value);setBulk(null)}}
+          placeholder={bulkFormat==='TEXT'?'今天上课我能集中注意力\nA. 从不\nB. 有时\nC. 经常\n\n今天我愿意主动提问\nA. 从不\nB. 有时\nC. 经常':'type,prompt,required,options,dimension\nSINGLE,今天我愿意提问,true,从不||有时||经常,'}/></label>
         <button type="button" className="btn-secondary" disabled={busy||dirty||!bulkText.trim()} onClick={bulkPreview}>解析并预览（不保存）</button>
         {bulk&&<div className="border rounded-lg p-3 space-y-2">
           <p className="font-semibold text-sm">候选题数：{bulk.result.count}</p>
-          {bulk.result.issues.map((issue,i)=><p key={i} role="alert" className="text-sm text-red-700">第 {issue.line} 行：{issue.message}</p>)}
+          <ResearchIssueList draft={active} issues={bulk.result.issues} onLocate={locateIssue}/>
           {bulk.result.items.slice(0,50).map((item,i)=><p key={i} className="text-sm">{i+1}. {item.prompt}（{item.type}，{item.options.length} 个选项）</p>)}
           {bulk.result.ok&&<button className="btn-primary" type="button" disabled={busy||dirty||active.revision!==bulk.result.revision}
             onClick={bulkApply}>确认导入全部题目</button>}
@@ -261,8 +295,8 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
       </div>}
       {!readOnly&&preview&&<div className="border rounded-xl p-4 space-y-2">
         <h3 className="font-semibold">{preview.ok?'编译校验通过':'编译与结构问题'}</h3>
-        <p className="text-xs break-words">草稿修订：{preview.revision} · 内容摘要：{preview.definitionDigest||'未计算'}</p>
-        {preview.issues.map((issue,i)=><p key={i} className="text-sm text-red-700">{issue.path}：{issue.message}</p>)}
+        <details className="text-xs break-words"><summary>查看修订与内容摘要</summary>草稿修订：{preview.revision} · 内容摘要：{preview.definitionDigest||'未计算'}</details>
+        <ResearchIssueList draft={active} issues={preview.issues} onLocate={locateIssue}/>
         {preview.score&&<div className="text-sm">
           <p className="font-semibold">研究内部模拟计分（不对被试开放）</p>
           {(preview.score.scores||preview.score.metrics||[]).map((s,i)=><p key={i}>{s.key}：{s.value??'不可计算'}</p>)}
@@ -275,8 +309,7 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
             errorPath={answerReview?.issues[0]?.path}/>}
           {answerReview&&<div role="status" className="border rounded-lg p-3 my-3 space-y-2">
             <p className="font-medium">{answerReview.ok?'Form 试提交通过':'Form 试提交未通过'}</p>
-            {answerReview.issues.map((issue,i)=><p role="alert" className="text-red-700 text-sm" key={i}>
-              {issue.path}：{issue.message}</p>)}
+            <ResearchIssueList draft={active} issues={answerReview.issues} onLocate={locateIssue}/>
             {answerReview.missing.length>0&&<p className="text-sm">缺失语义：
               {answerReview.missing.map(row=>row.itemKey+' ('+row.reason+')').join('，')}</p>}
           </div>}</>}
