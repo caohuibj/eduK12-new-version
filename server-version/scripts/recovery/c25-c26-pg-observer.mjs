@@ -91,7 +91,7 @@ function timeoutMs(value){
  assert.ok(match,'unreadable server statement_timeout')
  const result=Number(match[1])*({ms:1,s:1000,min:60000}[match[2]??'ms']);assert.ok(result>0&&Number.isFinite(result),'unbounded server statement_timeout');return result
 }
-function validateIdentity(row,target,budget){
+export function validateIdentity(row,target,budget){
  assert.equal(row.databaseName,TARGET_DATABASE,'wrong observer database')
  assert.equal(row.observerBackendPid,target.observerBackendPid,'observer backend PID changed')
  assert.equal(row.systemIdentifier,target.systemIdentifier,'wrong physical PG cluster')
@@ -101,7 +101,7 @@ function validateIdentity(row,target,budget){
  assert.equal(row.statsFetchConsistency,'none','stats snapshot cache is not disabled')
  assert.ok(timeoutMs(row.statementTimeout)<=budget,'server statement_timeout exceeds remaining query budget')
 }
-function validateStats(row,previous){
+export function validateStats(row,previous){
  for(const [section,keys,times]of [['database',DATABASE_COUNTERS,['blk_read_time','blk_write_time']],['wal',WAL_COUNTERS,['wal_write_time','wal_sync_time']]]){
   const stats=row[section];assert.ok(stats&&typeof stats==='object',`missing required ${section} stats`)
   assert.ok(stats.stats_reset===null||(typeof stats.stats_reset==='string'&&stats.stats_reset.length>0),'missing stats_reset')

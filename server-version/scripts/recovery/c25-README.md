@@ -1284,3 +1284,16 @@ are unchanged. Targeted contracts use synthetic proc files and one actual short
 Node child, with no database/API service. Session integration, explicit
 workloadComplete/metricCoverage, actual measurements and any new rollback
 identity still require their own preparation and review.
+
+The next pure cluster-window module reuses the existing fixed read-only SELECTs
+and exact cluster/database/timeout/stat-reset checks. Its SQL snapshots and proc
+samples are independent observations; a SQL backend absent from a proc frame is
+not assigned a fabricated role. Queries remain serialized within the original
+100 ms proc / 250 ms SQL / 1100 ms settle / 90 s window bounds. Normal proc gaps
+and unreliable counter intervals return explicit metric coverage. Required SQL,
+identity/protocol, evidence or deadline failures still latch failure.
+
+Worker prepare/retire in that module uses the registered Node identity and real
+terminal/close/group-quiescence proof. It adds no SQL refresh or backend-socket
+closure condition. This remains a pure window contract until the actual session
+and driver are switched and their affected CLI contracts are reviewed.
