@@ -6,6 +6,8 @@ import { SurveyBuilder } from './SurveyBuilder'
 import { createInstrumentLibrary } from './instrument-library'
 import { SurveyWaveStudio } from './SurveyWaveStudio'
 import { SurveyAnalyticsWorkspace } from './SurveyAnalyticsWorkspace'
+import { SurveyWorkspaceNav,type WorkspaceSection } from './SurveyWorkspaceNav'
+import './survey-workspace.css'
 import { SurveyBrand } from './SurveyBrand'
 import { SurveyLanding } from './SurveyLanding'
 import { SurveyFeaturePage } from './SurveyFeaturePage'
@@ -49,6 +51,7 @@ export default function SurveyApp(){
   const [error,setError]=useState(''),[notice,setNotice]=useState('')
   const [projects,setProjects]=useState<Project[]>([]),[selected,setSelected]=useState<Project|null>(null)
   const [projectPage,setProjectPage]=useState(1)
+  const [workspaceSection,setWorkspaceSection]=useState<WorkspaceSection>('settings')
   const [available,setAvailable]=useState<{analytics:boolean;publication:boolean}|null>(null)
   const selectedProjectId=selected?.id
   const instrumentLibrary=useMemo(()=>selectedProjectId?createInstrumentLibrary(selectedProjectId):undefined,[selectedProjectId])
@@ -119,7 +122,7 @@ export default function SurveyApp(){
     const p=await api<Project>('/projects','POST',{requestId:crypto.randomUUID(),title,description,collectionMode:mode})
     await loadProjects(1);choose(p);setNotice('研究草稿已创建')
   })}
-  const choose=(p:Project)=>{setSelected(p);setTitle(p.title);setDescription(p.description);setMode(p.collectionMode)}
+  const choose=(p:Project)=>{if(selected?.id!==p.id)setWorkspaceSection('settings');setSelected(p);setTitle(p.title);setDescription(p.description);setMode(p.collectionMode)}
   const save=(e:FormEvent)=>{e.preventDefault();if(!selected)return;void work(async()=>{
     const p=await api<Project>('/projects/'+selected.id,'PATCH',
       {revision:selected.revision,title,description,collectionMode:mode})
@@ -194,7 +197,7 @@ export default function SurveyApp(){
         <h2 className="font-semibold text-xl">首次登录 · 修改研究者密码</h2>
         <ProductPasswordChange product="survey" forced busy={busy} onChangePassword={changeAccountPassword}/>
       </section>}
-      {!loading&&user&&screen==='work'&&!user.mustChangePassword&&<><section className="bg-white rounded-xl border p-6 my-4">
+      {!loading&&user&&screen==='work'&&!user.mustChangePassword&&<div className="survey-workspace"><section className="bg-white rounded-xl border p-6 my-4">
         <h2 className="text-xl font-semibold">我的研究</h2><p className="text-sm text-slate-500">Researcher：{user.username}</p>
         <details className="border rounded-lg p-4 my-4"><summary>账号安全 · 修改密码</summary>
           <ProductPasswordChange product="survey" busy={busy} onChangePassword={changeAccountPassword}/>
@@ -215,7 +218,11 @@ export default function SurveyApp(){
             onClick={()=>void work(()=>loadProjects(projectPage+1))}>下一页</button>
         </div>
         {projects.length===0&&projectPage===1&&<p>尚无研究项目。可以先创建研究草稿。</p>}
-      </section><section className="bg-white rounded-xl border p-6 my-4">
+      </section>{selected&&<SurveyWorkspaceNav active={workspaceSection} onChange={setWorkspaceSection} title={selected.title}/>}
+      <section className="bg-white rounded-xl border p-6 my-4"
+        id="survey-workspace-settings" role={selected?'tabpanel':undefined}
+        aria-labelledby={selected?'survey-workspace-tab-settings':undefined}
+        hidden={!!selected&&workspaceSection!=='settings'}>
         <h2 className="text-xl font-semibold">{selected?'编辑研究草稿':'创建研究项目'}</h2>
         <form onSubmit={selected?save:createProject}>{field('研究名称',title,setTitle)}
           <label className="block my-3 text-sm">研究说明<textarea className="input block mt-1 w-full" rows={3} value={description} onChange={e=>setDescription(e.target.value)}/></label>
@@ -225,11 +232,13 @@ export default function SurveyApp(){
           <div className="flex flex-wrap gap-3 mt-4"><button className="btn-primary" disabled={busy||(selected!==null&&selected.status!=='DRAFT')}>{selected?'保存修改':'创建研究'}</button>
             {selected&&<button type="button" className="btn-secondary" onClick={()=>{setSelected(null);setTitle('');setDescription('')}}>新建其他项目</button>}</div>
         </form><p className="text-sm text-slate-500 mt-4">研究工具编辑、研究专用发布、匿名参与与科研分析可按功能开关使用；正式生产开通须完成独立部署验收。</p>
-      </section>{selected&&<><SurveyBuilder key={'builder-'+selected.id} projectId={selected.id} instrumentLibrary={instrumentLibrary}/><SurveyWaveStudio key={'waves-'+selected.id} projectId={selected.id} instrumentLibrary={instrumentLibrary} onProjectChanged={projectChanged}/>
+      </section>{selected&&<><div id="survey-workspace-tools" role="tabpanel" aria-labelledby="survey-workspace-tab-tools" hidden={workspaceSection!=='tools'}><SurveyBuilder key={'builder-'+selected.id} projectId={selected.id} instrumentLibrary={instrumentLibrary}/></div>
+        <div id="survey-workspace-publish" role="tabpanel" aria-labelledby="survey-workspace-tab-publish" hidden={workspaceSection!=='publish'}><SurveyWaveStudio key={'waves-'+selected.id} projectId={selected.id} instrumentLibrary={instrumentLibrary} onProjectChanged={projectChanged}/></div>
+        <div id="survey-workspace-data" role="tabpanel" aria-labelledby="survey-workspace-tab-data" hidden={workspaceSection!=='data'}>
           {available?.analytics
             ?<SurveyAnalyticsWorkspace key={'analysis-'+selected.id} projectId={selected.id}/>
             :<section className="rounded-xl border bg-white p-4" aria-label="研究数据状态">
               研究数据分析暂未在当前环境启用；项目和研究工具仍可使用。
-            </section>}</>}</>}
+            </section>}</div></>}</div>}
     </main></div>
 }
