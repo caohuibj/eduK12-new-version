@@ -189,8 +189,9 @@ describe('Survey analytics artifact downloads',()=>{
     expect(exportRequests()).toHaveLength(1)
   })
 
-  it.each(['network','non-json',403,404,409,429])('keeps the original ticket after %s read failure and retries only the selected file',async failure=>{
+  it.each(['network','non-json','safari-non-json',403,404,409,429])('keeps the original ticket after %s read failure and retries only the selected file',async failure=>{
     downloadReply=()=>failure==='network'?Promise.reject(new TypeError('synthetic connection lost')):
+      failure==='safari-non-json'?Promise.reject(new DOMException('The string did not match the expected pattern.','SyntaxError')):
       failure==='non-json'?Promise.resolve(new Response('<html>synthetic failure</html>',{status:200})):
       Promise.resolve(new Response(JSON.stringify({code:-1,message:'synthetic rejection '+failure,data:null}),{status:Number(failure)}))
     render(<SurveyAnalyticsWorkspace projectId={projectId}/>)
@@ -199,7 +200,7 @@ describe('Survey analytics artifact downloads',()=>{
     expect(await screen.findByRole('alert')).toHaveTextContent('Codebook 内容获取失败，尚未发起本次文件下载')
     expect(within(screen.getByRole('region',{name:'当前导出批次'})).getByRole('alert')).toHaveTextContent('Codebook 内容获取失败')
     expect(screen.getAllByRole('alert')).toHaveLength(1)
-    if(failure==='network'||failure==='non-json')expect(screen.getByRole('alert')).toHaveTextContent('未能读取服务器文件内容，请检查连接后重试此文件')
+    if(failure==='network'||failure==='non-json'||failure==='safari-non-json')expect(screen.getByRole('alert')).toHaveTextContent('未能读取服务器文件内容，请检查连接后重试此文件')
     expect(downloads).toHaveLength(0)
     expect(screen.getByText('Codebook：尚未发起')).toBeInTheDocument()
     expect(requests.filter(r=>r.method==='POST'&&r.url===base+'/exports')).toHaveLength(1)

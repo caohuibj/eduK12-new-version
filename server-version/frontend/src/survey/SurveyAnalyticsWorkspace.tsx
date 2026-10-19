@@ -230,6 +230,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
         throw new Error('导出回执与当前批次不一致或内容不完整')
     }catch(e){
       const reason=e instanceof TypeError||e instanceof SyntaxError
+        ||(e instanceof DOMException&&e.name==='SyntaxError')
         ?'未能读取服务器文件内容，请检查连接后重试此文件。'
         :e instanceof Error?e.message:'请重试原批次。'
       throw new Error(label+' 内容获取失败，尚未发起本次文件下载。'+reason)
