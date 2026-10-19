@@ -2635,7 +2635,8 @@ const createAttempt = async (
     // Serialize new admission against archive; never trust the pre-lock read.
     await db.$queryRawUnsafe('SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR UPDATE', composite.id)
     const current = await db.compositeAssessment.findUnique({ where: { id: composite.id },
-      include: { questionnaireCourses: true } })
+      select: { status: true, publicEnabled: true, opensAt: true, expiresAt: true,
+        trainingPersistencePolicy: true, trainingPersistencePolicyHash: true } })
     if (!current || current.status !== 'PUBLISHED' || (!userId && !current.publicEnabled)) throw compositeForbidden('问卷已停止接收新作答')
     if (current.opensAt && current.opensAt.getTime() > Date.now()) throw compositeBadRequest('问卷尚未开始')
     if (current.expiresAt && current.expiresAt.getTime() <= Date.now()) throw compositeBadRequest('问卷已过期')
@@ -2644,6 +2645,15 @@ const createAttempt = async (
       trainingPersistencePolicyHash: current.trainingPersistencePolicyHash }
     const persistence = readTrainingPersistencePolicy(current.trainingPersistencePolicy)
     if (persistence?.checkpoint || persistence?.localCognitive) {
+      // The same publication lock still protects this opt-in-only projection.
+      // Legacy/off admissions never load course relations or large definition blobs.
+      const current = await db.compositeAssessment.findUnique({ where: { id: composite.id }, select: {
+        id: true, productKind: true, questionnaireType: true, deliveryMode: true,
+        reportPackageKey: true, analysisProtocolKey: true, publishedAt: true, createdBy: true,
+        trainingFlowDigest: true, trainingVariantDigest: true, expiresAt: true,
+        questionnaireCourses: { select: { courseId: true } },
+      } })
+      if (!current) throw compositeForbidden('问卷已停止接收新作答')
       if (current.productKind !== 'QUESTIONNAIRE' || current.questionnaireType !== 'COURSE' || current.deliveryMode === 'LEGACY' || relationalIdentity || current.reportPackageKey || current.analysisProtocolKey || !current.publishedAt)
         throw compositeBadRequest('此投放不支持 Training 草稿策略')
       const courseIds = current.questionnaireCourses.map((entry: { courseId: string }) => entry.courseId)

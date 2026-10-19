@@ -388,3 +388,30 @@ describe('restartSession', () => {
     await expect(restartSession('student-1', 'session-1')).rejects.toMatchObject({ statusCode: 400 })
   })
 })
+
+describe('C23 single admission decode', () => {
+  it('uses delivery admission directly for an active unified session', async () => {
+    const admission = await import('../../modules/cognitive/cognitive-admission.service')
+    const stored = vi.spyOn(admission, 'loadStoredCognitiveAdmission').mockResolvedValue({ attemptEpoch: 4 } as any)
+    const ensure = vi.spyOn(admission, 'ensureCognitiveAdmissionAtDelivery').mockResolvedValue({ attemptEpoch: 4 } as any)
+    try {
+      mockPrisma.cognitiveSession.findUnique.mockResolvedValue(sessionRow({ runtimeGeneration: 'UNIFIED_V1', frozenAdmissionSnapshotEncrypted: 'fixture', frozenAdmissionSnapshotHash: 'known' }))
+      const result = await getSession('student-1', 'session-1')
+      expect(result.sessionEpoch).toBe(4)
+      expect(ensure).toHaveBeenCalledTimes(1)
+      expect(stored).not.toHaveBeenCalled()
+    } finally { stored.mockRestore(); ensure.mockRestore() }
+  })
+  it('loads terminal admission once without activating it again', async () => {
+    const admission = await import('../../modules/cognitive/cognitive-admission.service')
+    const stored = vi.spyOn(admission, 'loadStoredCognitiveAdmission').mockResolvedValue({ attemptEpoch: 4 } as any)
+    const ensure = vi.spyOn(admission, 'ensureCognitiveAdmissionAtDelivery').mockResolvedValue({ attemptEpoch: 4 } as any)
+    try {
+      mockPrisma.cognitiveSession.findUnique.mockResolvedValue(sessionRow({ status: 'COMPLETED', runtimeGeneration: 'UNIFIED_V1', frozenAdmissionSnapshotEncrypted: 'fixture', frozenAdmissionSnapshotHash: 'known' }))
+      const result = await getSession('student-1', 'session-1')
+      expect(result.sessionEpoch).toBe(4)
+      expect(stored).toHaveBeenCalledTimes(1)
+      expect(ensure).not.toHaveBeenCalled()
+    } finally { stored.mockRestore(); ensure.mockRestore() }
+  })
+})

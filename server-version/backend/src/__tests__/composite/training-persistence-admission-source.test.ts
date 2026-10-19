@@ -91,3 +91,16 @@ describe('Training admission snapshot unit contracts', () => {
     })
   }
 })
+
+describe('C23 compact admission projection source contracts', () => {
+  it('keeps legacy/off policy on a compact locked header without course/blob reads', () => {
+    const header=admission.slice(admission.indexOf('const current ='),admission.indexOf('if (persistence?.checkpoint'))
+    expect(header).toContain('select: { status: true, publicEnabled: true, opensAt: true, expiresAt: true,')
+    expect(header).toContain('trainingPersistencePolicy: true, trainingPersistencePolicyHash: true')
+    expect(header).not.toContain('include:')
+    expect(header).not.toContain('questionnaireCourses:')
+    const enabled=admission.slice(admission.indexOf('if (persistence?.checkpoint'),admission.indexOf('const courseIds'))
+    expect(enabled).toContain('questionnaireCourses: { select: { courseId: true } }')
+    expect(enabled).not.toContain('include:')
+  })
+})
