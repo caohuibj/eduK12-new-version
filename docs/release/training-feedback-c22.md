@@ -84,3 +84,31 @@ flock "$TOOLS/.measurement.lock" python3 "$EVIDENCE/run-node-integrity.py"
 "$TOOLS/node_modules/node/bin/node" --import "$BACKEND/node_modules/tsx/dist/loader.mjs" \
   "$EVIDENCE/check-loaded-binding.ts" "$EVIDENCE/joined-context.json"
 ```
+
+## 运行时与界面补充验证
+
+运行时冻结检查点：`596520a9a9a5eb64a9d94e3030182d5eb06cae34`。其中 `86d856671a80034417eca38020d063ddfc40be89` 是 C23 紧凑准入/单次认知 admission decode 优化的保留导入，原提交 `213c35ffd030f2a6e7230738381ee1ac663ebe57`；C22 未恢复无条件宽表投影。
+
+全部命令使用 Node 24.21.0 和同一测量锁，Vitest 单 worker。表中不同执行存在重叠，不能相加成独立总数：
+
+| 受影响检查 | 结果 | 原始日志 |
+|---|---|---|
+| 共享 FINAL 投影及父级报告边界 | 2 文件，35 通过；覆盖同步/异步、精确时间边界、旧/错误绑定、首次/重放收据、缓存开关及下载/包入口 | `c22-report-boundaries-01.log` |
+| 原生 Cognitive 与 C23 准入源码契约 | 2 文件，17 通过 | `c22-native-admission-01.log` |
+| 原生 Scale / SJT | 2 文件，7 通过；已有 parent 投影复用、错误密文不解密、时间边界、归属与终态收据 | `c22-native-scale-sjt-01.log` |
+| 教师权限/导出和路由源码契约 | 2 文件，10 通过；教师历史投影仍去除受限元数据，其他教师仍拒绝 | `c22-teacher-wiring-01.log` |
+| 原 getSession / C23 单次 decode 受影响分支 | 显式 `COGNITIVE_MODULE_ENABLED=true`，4 通过、21 未选 | `c22-native-cognitive-compat-02.log` |
+| 首轮 Cognitive 失败定向复核 | 同一显式开关；覆盖原 9 个失败的选择模式实际命中 10 项，10 通过、15 未选；未修改原测试 | `c22-native-cognitive-failure-diagnosis-03.log` |
+| backend no-emit TypeScript | `tsc --noEmit --incremental false`，exit 0；没有 emit build | `c22-backend-types-02.log` |
+| 问卷编制界面 | 最终受影响文件 42 通过 | `c22-frontend-feedback-authoring-02.log` |
+| 报告延迟开放界面 | 修正测试 fake-clock 微任务排空后定向 2 通过；UNAVAILABLE 的 READY/PROCESSING/FAILED 矩阵 3 通过 | `c22-frontend-feedback-report-02.log`、`c22-frontend-feedback-unavailable-03.log` |
+| frontend no-emit TypeScript | 5 个变更 root 与现有声明的依赖闭包 432 源文件，0 诊断；保留 tsconfig.app 原编译选项 | `c22-frontend-feedback-types-01.log` |
+| frontend 五文件 ESLint | 0 error；1 条在 UI 修改前已存在的 `epoch.current` cleanup warning | `c22-frontend-feedback-lint-01.log` |
+
+首轮 backend 5 文件执行为 56 通过 / 9 失败（`c22-runtime-core-01.log`），未显式开启 Cognitive 准入开关；保留全部原失败。随后仅定向复核受影响 getSession/C23 分支以及原失败集合，不把原失败日志改成通过，也不宣称全套 Cognitive 回归已通过。
+
+首轮 frontend 为 62 通过 / 2 失败（`c22-frontend-feedback-01.log`）。两条延迟开放断言把 React fake-clock 微任务当作轮询计时器，修正测试中的 0ms 排空后只复测这两条；未通过关闭产品计时逻辑或弱化断言来消除失败。未修改的已通过分支复用原证据；新增/变更分支分别记录，不宣称最终 25 条报告文件在单次执行中全部通过。
+
+独立只读出口复核未发现已映射路径的反馈时间绕过。报告生成状态与开放状态独立；整份 FINAL 已接收、生成中时保留 processing/重试语义；已生成但等待日期时没有自动轮询/定时器，仅手动刷新。现有 `/api` middleware 已统一关闭 ETag 并设置 no-store/no-cache，包含整份 FINAL 和恢复收据。更严格的关系测评披露与教师权限保留。
+
+边界：上述服务/控制器测试使用 mock DB 或 mock API；源码断言不是实际 HTTP/数据库并发证明。除前述最小合成 PostgreSQL 外，未运行完整数据库迁移、真实应用 HTTP、浏览器、负载/CPU 对比、生产恢复或 CI/发布资格检查。
