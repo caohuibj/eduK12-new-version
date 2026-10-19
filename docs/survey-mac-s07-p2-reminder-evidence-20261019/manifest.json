@@ -1,0 +1,30 @@
+{
+  "lint-receipt.json": {
+    "bytes": 687,
+    "sha256": "3b345e2888084edafedc5ef54d83d43664239d22ce0eb555121b83f6af3c0a79"
+  },
+  "lint.log": {
+    "bytes": 337,
+    "sha256": "4ae53ce5a3a2cd1cc5ee0b3a01af28bc0f3f54f1b31d187efee28daf42314f3c"
+  },
+  "tests-receipt.json": {
+    "bytes": 871,
+    "sha256": "a4f59114530666386bb55f3bffc82ad0033dab640ae1dea482b13cb34829168f"
+  },
+  "tests.json": {
+    "bytes": 8228,
+    "sha256": "80ca589e43a55e9a3bc0110d216048ab2756a001196a256b14fd11bb4d9d1583"
+  },
+  "tests.log": {
+    "bytes": 697,
+    "sha256": "75a834ed6dcf3450838a5248d2dbb651b6e164f87a0ec6c79ee81993fb1c7dd5"
+  },
+  "types-receipt.json": {
+    "bytes": 629,
+    "sha256": "8d929e81a6c9e85b01efe494768c6aaa27a050cefe25a509c828d8c9903f88ca"
+  },
+  "types.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

@@ -82,6 +82,28 @@ beforeEach(()=>{
 afterEach(()=>{vi.restoreAllMocks();vi.unstubAllGlobals();vi.useRealTimers()})
 
 describe('bounded export recovery contracts (component simulation, not real Redis/browser)',()=>{
+  it.each(['completion filter','workspace refresh'])('remembers launched earlier pages after %s invalidates an untouched next page',async invalidation=>{
+    await secondPage()
+    expect(card().getByText(/第 2 批 ·/)).toBeInTheDocument()
+    expect(card().getByText('CSV：尚未发起')).toBeInTheDocument()
+    if(invalidation==='completion filter'){
+      fireEvent.change(screen.getByLabelText('完成时间起点（含）'),{target:{value:'2031-06-01T09:00'}})
+    }else await click('刷新完成进度')
+    expect(screen.queryByRole('region',{name:'当前导出批次'})).toBeNull()
+    expect(screen.getByText(/旧票据 .*第 1 批.*CSV、Codebook、Manifest 曾发起/)).toBeInTheDocument()
+    vi.mocked(window.confirm).mockReturnValue(false)
+    await click('创建受控导出')
+    expect(window.confirm).toHaveBeenCalledWith(expect.stringContaining('旧的部分文件不能与新导出混作同一批'))
+    expect(posts()).toHaveLength(2);expect(reads()).toHaveLength(3);expect(files).toHaveLength(3)
+    vi.mocked(window.confirm).mockReturnValue(true)
+    await click('创建受控导出')
+    expect(posts()).toHaveLength(3)
+    expect(last(posts())?.body).toMatchObject({format:'COGNITIVE_TRIAL_LONG',waveId:wave})
+    expect(last(posts())?.body).not.toHaveProperty('cursor')
+    if(invalidation==='completion filter')expect(last(posts())?.body?.completedFrom).toBe(new Date('2031-06-01T09:00').toISOString())
+    expect(reads()).toHaveLength(3);expect(files).toHaveLength(3)
+  })
+
   it('keeps page 14 after GET 41 is rate limited, waits through expiry, then explicitly rebuilds its incoming cursor',async()=>{
     readReply=t=>Date.now()<start+900000&&readCount>40
       ?reject(429,'请求过于频繁，请稍后再试',{'Retry-After':'900'}):reply(artifact(t))

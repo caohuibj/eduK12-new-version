@@ -307,7 +307,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
         if(!isCurrent())return
         if(recovering&&!sameFrozenPage(ticket!,result))
           throw new SurveyApiError('重建回执与原批次页号或冻结来源不一致，已停止此分页导出。',409,null)
-        if(recovering||!continuing)rememberFiles()
+        rememberFiles()
         exportEpoch.current++;currentTicket.current=result.id
         setTicket(result);setExportRequest({selection,...(cursor?{cursor}:{})})
         setDownloadsStarted({});setTicketUnavailable(false);setContinuationStopped(false);setClock(Date.now())
