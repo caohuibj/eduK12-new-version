@@ -78,7 +78,7 @@
 - state11 从相同 state09 独立副本、相同消费者与仪表、相同顺序和精确 ID/选项执行 30 个消费窗口，新增 FINAL 为 0，原事实保持，六份 CSV 逐字一致。六窗口 SQL 为 20/21、21/21、20/20，对应 before 为 40/41、61/60、120/120；51 人计分 fact 密文读取字节减半，raw 字节不变。51 人两次 CPU/耗时观察下降，但 11 人耗时略增，RSS 有升有降；不作总体资源、统计或容量结论。
 - 最终受影响 9 文件共 185 项测试与同源类型检查/产物生成通过；旧 184 项记录不混作新计数。七项未变科学前置仅在精确输入闭合后复用。两域源码及动态证据限定 review 已通过，原失败记录不改绿。详见 [C20 原始说明及证据](c20-materials.md)。
 
-## 本轮截止与后续任务
+## 本轮截止与后续任务（C20 时点历史记录）
 
 本轮 Training 以 C20 加上述效率专项为截止。优化提交后停止新增功能，执行必要正式 CI，全部所选门禁真实通过后合并；不部署生产。用户已明确允许对缺少正式执行来源的受影响应用检查在 CI 必要复验，历史云端 JSON 不伪装成官方门禁。
 
@@ -87,6 +87,51 @@ CI 准备已覆盖三项新增 PostgreSQL suite 的 opt-in 与非跳过/非空�
 C21 同 IP 短窗口、C22 延迟反馈、C23 checkpoint/本地草稿、C24 Training 全界面、原计划 C25/C26 完整验收与容量项目未完成，不由本次范围冒领。Form 重复 snapshot/解密以及旧格式逐行回退仍为已记录的潜在成本，未凭代码重复贸然重写。
 
 用户另外明确授权 Survey S01–S07 在 Mac 的独立 Codex 任务并行推进。其目录、分支和合成数据与云端 Training 分开；共享组件在最终整合时协调。系统/入口管理员权限重构仍在后续，不混入本 PR。
+
+## C23：独立于 C22 的 checkpoint 动态资格（2026-10-19 UTC）
+
+状态：HTTP03 的完整 fresh-clone 本地合成资格真实通过；最终独立运行证据复核通过，无 P1/P2，限定 C23 本地合成资格 PASS。本节仅覆盖 C23 over accepted C21，不将整个 C23、本地认知浏览器或 C25/C26 标记为完成。
+
+- 固定运行 HEAD `83621ccee3b3d552cfb7539781f603c7b8ef7011`。仅 harness 三文件变化，按已审查闭包复用 `83496451e8715c3d4aed74a446ad0e451b5f952a` 的单次 emitting build 和 current-client receipt；没有重编译或 Prisma regenerate。客户端证据是现有生成客户端一致性核验，不具备原始历史生成的前后溯源。
+- 修改范围与故障：C23 加密 checkpoint 的授权、CAS、累计预算、清理及非空恢复；主要位置为当前云端一个持续 exec 命名空间内的真实 PG/HTTP。独占 measurement lock，官方 Node 24.21.0 / PG 16.15 / Redis 7.4.11；upgrade/functional/races/restore 上限分别 600/600/300/600 秒，各全表 audit 另有 300 秒总截止。未运行 CI、PR、合并或生产操作。
+
+### 保留的两次失败与最小修复
+
+1. HTTP01，HEAD `8fa754ee`：升级通过，首个已认证 start 返回 500，非法 `CompositeAssessment.select.deliveryMode`；功能、竞态及恢复未通过。产品修复 `fd1a568e7c4a97d030935f8c8e8e035617b90e8d` 删除无效字段，用局部 Prisma typed delegate / `satisfies` 约束投影，保留显式 LEGACY 拒绝和缺省 FINAL_ONLY；未改 schema/migration/client。`83496451` 新增 13 个实际 service 的 schema-aware mock 回归及受影响 no-emit，通过后产物重新生成一次。
+2. HTTP02，HEAD `83496451`：升级、198 请求功能和前五个 PG race 场景通过；第二子 FINAL 的 HTTP 200 返回 parent=null，harness 过早断言父完成。异步报告开启、后台消费者关闭时遗漏原 `drainReports`，随后 queue 旧行审计失败；overall=false、无合格 final snapshot、restore 未运行。失败现场没有完整 parent/job/queue 行，原诊断保留为代码与响应支持的推断。`83621cce` 仅修复 harness：对新 fixture 调用原 claim/process，其他 job 行锁隔离，完整记录并断言 drain 前后真实 DB 行；6 个新定向无服务测试通过。
+
+两次失败 receipt 均保持 false。各 stopped pgdata 已分别完成完整内容/元数据归档及实际恢复核验，再经授权可恢复替换；原 receipt、日志、快照及归档不改写，第三轮未续跑失败 clone。
+
+### HTTP03 已执行并通过的范围
+
+- 从 accepted C21 stopped 数据和完整 manifest 创建全新 `eduk12_c23_http_03`。只增 C23 migration：1 张表、4 个 nullable 字段、5 个精确 guard，历史零回填；升级及恢复均应用并验证正式 restricted-role policy。
+- 功能 198 次 HTTP、8 组检查；竞态 48 次 HTTP、6 组检查。请求数不等同测试用例数。覆盖 authenticated/anonymous ownership、真实异 attempt recovery token 的 GET/PUT/DELETE 拒绝且目标整行不变、stale epoch/hash、publication、null/bound round/closure、clear/expiry 后累计 100 次预算不重置、retention/immutable guard 原子拒绝。
+- 真实 PG wait graph 验证 save/save、save/clear、expiry-read/save、maintenance SKIP LOCKED/save、child FINAL/checkpoint；已接受 child 从恢复投影移除而另一 draft 保留，父完成/abandonment 清 payload 仍保留身份和计数。
+- 异步实际行事实：parent IN_PROGRESS→COMPLETED；job PENDING、attemptCount=0、budgetHeld=true → READY、1、false；两份已接受 unit snapshot 与其余 143 个 job 完整行不变；queue pending 0→1→0；checkpoint revision 4→5、successfulSaveCount 保持 2，payload/hash/expiry 全部置空。原始行仅保存在 0600 私有 journal，不入 Git。
+- 非空 dump/restore 含 16 条 checkpoint：7 个加密 payload、9 个 tombstone、2 个 bound round、1 个累计 100 saves；完整表/逻辑快照/guard 比对及受限角色通过，精确沿用 C19 的 73-column ordinal / 3-parser whitelist。216 张旧表的 6,382 条已接受完整行保留，最终 audit 再次通过。
+- 四阶段、final snapshot、源码/工具/依赖/client/dist 前后闭包、C21 原始字节、两轮失败证据保护和 cleanup 全 true；13 个服务/阶段/audit 进程 exit=0，源与 clone PG 均 shut down、无 postmaster.pid，服务 PID 已消失。C21 源清单 19,799 项前后相同，SHA-256 `fa35cccf331b59a0f62b90f5731268d2140031c8fdce26ecc1d4e1eccd017013`。
+- 锁下启动 free=10,067,083,264 B；扣除 clone 741,623,858 B 和 512 MiB reserve 后 8,788,588,494 B。每秒资源样本含最终样本的最低 free=9,172,897,792 B、MemAvailable=7,143,993,344 B；不是连续极值。仅证明运行保护线未触发，未采集可比较 CPU/吞吐证据，不构成资源下降或容量提升结论。
+
+### 可核验证据索引（原始文件保持私有）
+
+下列路径相对于此次云端工作根 `/workspace/scratch/5a77e8bdc1ae`；Git 只记录路径/哈希/结论，不收录 private journal、SQL 行、连接配置或数据库。复核索引绑定 79 份本轮原始材料，并记录旧失败证据前后相等。
+
+| 证据 | 路径 | SHA-256 |
+| --- | --- | --- |
+| HTTP01 原失败 | `eduk12_c23_http_01/c23-runtime-result.json` | `2d216a51eda7ffeed48114b6181a280800ea72b253736ce7c240ff2ecb6c39b2` |
+| HTTP02 原失败 | `eduk12_c23_http_02/c23-runtime-result.json` | `faa589380c09d3d670b8a93f31d1f5e2d7d20fa2a1eaf2a641c62c7b0dc5084d` |
+| HTTP03 完整通过 | `eduk12_c23_http_03/c23-runtime-result.json` | `c81cd9219d12abc1f591c84f877ec21155076546ac0027b9536f1231e67e3c1e` |
+| HTTP03 最终快照 | `eduk12_c23_http_03/c23-final-db-snapshot.json` | `4dd59702b756e0d16cf9fe1c2b821118ba1aa5587f0408a9ccb8527d3d8a01e5` |
+| HTTP03 复核索引 | `c23-build-evidence/frozen-83496451-01/runtime-attempt-03/review-index.json` | `5f3f9d873f86373f5bfa78e61d0dc3754efc47be5d57495ca02b311e52c6734a` |
+| HTTP03 异步真实行（私有） | `eduk12_c23_http_03/c23-races-terminal-private.jsonl` | `0465eea892d7f19521720cbff2ae4a25288f75de886a3b99472ac87de05cb67a` |
+| 复用 build | `c23-build-evidence/frozen-83496451-01/build.receipt.json` | `90182d841660c8ef241755a7489b9365d52c4a33c2eed1e4a2e5c781e19b1c3a` |
+| 复用 current-client | `c23-build-evidence/frozen-83496451-01/current-client.receipt.json` | `4640bd88542aa785d0bcd9e8ba62eb77bacd560533dc2b3a8a3f03fc256b7eda` |
+
+### 未完成边界
+
+- native IndexedDB 的真实浏览器 TTL、跨标签 lease/tombstone、防复活和 sealed/retry 历史保护仍待；组件/source/mock 证据不替代 native IDB。
+- C22 延迟反馈仍在独立分支，尚未与 C23 整合；整合会改变源及 migration 输入，须另做受影响的 migration/restore 证据，不能复用本次为整合资格。
+- 本次不是 C26 CPU/内存优化、持续负载或容量验收，也不包含正式 CI、C25 浏览器全链或生产发布。
 
 ## 已知测试环境约束
 
