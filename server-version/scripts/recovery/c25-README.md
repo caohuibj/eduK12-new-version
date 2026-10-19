@@ -648,13 +648,14 @@ A HTTP admission/report work is not repeated and its dates remain unchanged.
 
 ## Remaining C25 release work
 
-These core scripts do not close C19 missing-only checks: suppressed analysis,
-exact long-CSV cells/headers and selected-video capability/hash/range denial.
-Those need their own reviewed minimal supplement, not a replay of C19 suites.
-Browser native IndexedDB/WebLocks lifecycle, C24 focus/interaction acceptance,
-and real selected-video playback remain open; DTO metadata is not browser proof.
-The previous browser startup restriction remains reported until an authorized
-working browser is available. No capacity/throughput conclusion is supported.
+The bounded C19 suppressed-analysis / exact long-CSV supplement below has now
+passed independent evidence review. Selected-video capability/hash/range denial,
+native Training IndexedDB/Web Locks lifecycle, C24 browser interactions and
+real selected-video playback remain open. DTO metadata and mock DOM results do
+not substitute for these browser checks. The existing cloud Chromium was
+controllable, but two browser-to-loopback attempts were refused; native IDB,
+Web Locks, picker and visual checks did not run. A reachable, supported browser
+or official CI environment is still required. No capacity conclusion is supported.
 
 ## C19 existing-job continuation preparation
 
@@ -762,3 +763,122 @@ raw `physical-manifest-linkage-tests.log` SHA
 `71a4e8f60786c5a38b74dac2157f2dad3c507b9ade535970cc6d4ea7c2174a62`.
 The 230-input / 227-copy before/after closure and unchanged 72 Python helpers
 are retained. This is preparation evidence; no actual archive ran.
+
+## C19 remaining analysis / CSV acceptance (2026-10-19 UTC)
+
+The separately authorized run used clean runtime HEAD
+216027f248d9320d4825d5dea962ceaa50578052 on
+work/training-c25-c19-supplement-20261019, with unchanged product, schema,
+72 Python helpers and previously accepted client/backend/frontend producers.
+The integration ref remains at 662075ca; its documentation differences are not
+represented as runtime-tested inputs. This documentation-only commit is later
+than the actual runtime HEAD.
+
+Independent final evidence review accepted the limited
+C25_C19_EXISTING_THREE_JOBS_REMAINING_ANALYSIS_CSV_COMPOSITION scope with no
+remaining P1/P2. The original failed analysis_01 receipt above remains false,
+including its failed queue-row audit and absent final snapshot. Existing three
+attempts, four FINALs and the accepted core are inherited, not replayed. The new
+analysis_02 phase created zero courses, publications, attempts or FINALs.
+It drained exactly the three existing jobs once through the real claim/process
+path and enqueued/executed one new export through the original task.
+
+- Admission first saved complete private rows/schema/snapshot, then observed
+  217 tables / 6,704 current rows. All original 6,666 unaffected rows were exact;
+  the sole reports queue change pending=0→3 was explained by the three exact
+  PENDING/count=0/budget-held jobs. All 148 older jobs were retained and isolated.
+- The three jobs became READY/count=1/budget-released, and their parents became
+  COMPLETED. Authenticated flow-path plaintext and canonical hash stayed equal
+  across legitimate ciphertext re-encryption. Four accepted unit snapshots and
+  all Form/Scale facts remained exact; only the documented parent/job columns
+  changed. No independent recomputation of aggregateInputHash is claimed.
+- Actual N=1 paired analysis suppressed its statistics/count domain. Legitimate
+  manifest/source/quality metadata remained available. This does not dynamically
+  qualify the N=4/5 threshold boundary.
+- Twenty real HTTP requests returned 16×200, 3×404 and 1×403, including login;
+  these are request counts, not 20 separate test cases. The four permission
+  negatives were other-teacher analysis, artifact status and download, plus
+  student analysis. The authorized teacher downloaded a 3,662-byte, 4×24 CSV;
+  all 96 cells matched the independent oracle: MA=1, MB=0, SA=NOT_ASSIGNED,
+  SB=NO_OBSERVATION, including exact attempt/measurement provenance. This is
+  authorized row-level pseudonymized data, not absolute anonymity.
+- Report/export child receipts record real argv/PID, close with code=0, no
+  timeout or termination signal (about 1.889s / 2.201s respectively). Export
+  passed the queued job's actual retry metadata into the original task. Redis
+  remained waiting before/after: this proves the real task result and download,
+  not Bull scheduler completion.
+- Preserve/final audits both passed. All original 6,667 rows, including the
+  queue restored exactly to pending=0, were retained without exemptions. The
+  6,704-row partial baseline was protected by the explicit column contract.
+  Final state: 217 tables / 6,708 rows / 21 checkpoints, with exactly two report
+  layouts, one export batch and one artifact appended. All 36 older material
+  files (7,288,316 bytes), their file metadata and six directories were retained;
+  only directory mtime may change when adding a file.
+- The API stopped after its dependent phase; all nine recorded processes and
+  both report/export children exited successfully. Final read-only checks found
+  recorded PIDs absent, ports closed, no postmaster PID, clean runtime HEAD and
+  the measurement lock released. Original HTTP03, failed receipts and every
+  retained recovery point remained unchanged. The new 6,708-row database was
+  not subjected to a new full database restore; the earlier 6,667-row restore
+  remains explicitly inherited.
+
+Exact private evidence references (raw material is not committed):
+
+- Overall eduk12_c25_analysis_02/c25-analysis-resume-overall-result.json SHA:
+  7605c14677befe44709d66be4177a3e28944a79d49a40aade716073cdf2c27ac.
+- Final DB snapshot **file SHA**:
+  f4e761419f5faf4a84befef265b4edff45d49d5a1d16a89cc09d039b1eed34b4;
+  its **normalized logical hash** is
+  13a4c74414346816e9786ca2f12337af7ff8ff68b7fa8cce57b8d51112b91eb2.
+- /tmp/c25-analysis-resume-runtime-launch-01/review-index.json SHA:
+  4cc690eb2e4d0219d97743d501be0c1d3842c27326c1f00d6d7ad851c9e878a6,
+  binding all 61 state files and seven launch files. Post-runtime stopping and
+  reference check SHA:
+  32af113aa069bc65f3f5d4d7c237bf4606b0fc2fc92f5e0bee8b62c8696ea4ec.
+- Source08 descriptor SHA:
+  307165c3e57b60f0dd5b737e4c846c701dce610b9d936913a8db1f4c3bd0cc7c;
+  partial recovery descriptor SHA:
+  c1ab1f0803a97bc0a140f408ea0b9948e1feaa241a347612eaa819ccf77b7a8f.
+  Its 271,910,360-byte archive SHA is
+  fbb6a36448235b50112b96cec206515525103247e75339b8dfe440a680fbb582.
+  Full physical lineage matched the frozen failed manifest exactly; all 23,305
+  data entries / 888,287,967 bytes were extracted and compared. Source xattrs
+  were empty; 23,305 basic-ACL and 46 default-ACL ENOTSUP warnings are retained.
+  This is a node-local temporary recovery point, not durable backup or proof of
+  nontrivial ACL restoration. Its pre-run logical counts remained unknown until
+  the actual admission audit; no count was retrospectively invented.
+
+Locked entry disk was 9,204,518,912 B with the unchanged 8GiB+512MiB admission
+requirement. The 512MiB entry buffer was consumable. Recorded runtime minima
+were disk 8,999,563,264 B, available memory 5,429,190,656 B and tmp 3,065,589,760 B;
+post-output disk was 8,999,424,000 B. Hard runtime floors remained disk 8GiB,
+memory 2GiB and tmp 512MiB. Peak observed API RSS was 333,934,592 B. These are
+resource guards for this local synthetic run, not CPU/throughput/capacity gains.
+Further heavy execution requires a fresh resource gate and separate approval.
+
+### Still-open minimal C25 browser/media work
+
+1. Selected Training video: a formally admitted/reached SJT video fixture with
+   authenticated/public access, actual selected bytes/hash and correct binding;
+   HEAD, valid single-range 206 and invalid-range rejection; non-owner, wrong
+   parent/epoch/hash and unreached/revoked access must fail. A real browser must
+   load metadata, play and seek the native video/track. Existing generic media
+   helpers can support this, but generic capability checks do not qualify the
+   Training route binding.
+2. Native Training Cognitive persistence: real IndexedDB reload, TTL cleanup
+   across all three stores, two-tab active lease protection/release, tombstone
+   preventing an old tab from reviving expired data, and sealed/retry/unrelated
+   or legacy-history protection. The Survey browser architecture is reusable
+   only after exact input review; Survey results are not Training acceptance.
+3. C24 changed interactions: inbox/submission/checkin error focus and late
+   response focus stability, real picker cancel/failure and PDF/preview focus
+   return, keyboard use plus 390/1440 long-text/touch/contrast screenshots.
+   Previously disclosed shared MediaRenderer keyboard access and course
+   settings/analysis error-focus gaps need a separate scoped fix decision.
+
+A reachable supported Playwright/official CI environment can run these missing
+scenarios with exact product/helper/browser bindings and retained raw evidence,
+without replaying the accepted core or this supplement. The current scripts and
+CI routing do not already grant these new Training checks a pass. Native browser,
+selected-video, dynamic N=4/5 and C26 measurement remain unaccepted; C25 as a whole
+is not declared complete.
