@@ -1,0 +1,26 @@
+{
+  "reports": {
+    "targeted.json": {
+      "numPassedTests": 7,
+      "numFailedTests": 0,
+      "numPendingTests": 7,
+      "success": true
+    },
+    "links.json": {
+      "numPassedTests": 2,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "success": true
+    },
+    "non-json-final.json": {
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 13,
+      "success": true
+    }
+  },
+  "uniqueCasesPassed": 9,
+  "finalTypes": "passed",
+  "lint": "exit 0; one inherited hooks warning retained",
+  "initialTypeFailure": "test Response shape; original log preserved"
+}

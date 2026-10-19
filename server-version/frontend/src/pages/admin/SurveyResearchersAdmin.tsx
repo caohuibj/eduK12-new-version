@@ -7,10 +7,14 @@ type Envelope<T>={code:number|string;message:string;data:T}
 type Researcher={id:string;username:string;status:string;createdAt:string}
 type Invitation={id:string;kind:'INVITE';createdBy:string;createdAt:string;expiresAt:string;
   status:'PENDING'|'EXPIRED'}
+class PlatformRequestError extends Error {
+  constructor(message:string,readonly outcome:'REJECTED'|'NOT_SENT'|'UNCONFIRMED'){super(message)}
+}
 const cookie=(key:string)=>document.cookie.split('; ').find(v=>v.startsWith(key+'='))?.split('=').slice(1).join('=')||''
 async function platformApi<T>(path:string,method='GET',body?:unknown):Promise<T>{
   const headers:Record<string,string>={'Content-Type':'application/json'}
   if(method!=='GET'){
+    try{
     let csrf=cookie('ptool_csrf')
     if(!csrf){
       const response=await fetch('/api/auth/csrf',{credentials:'same-origin'})
@@ -20,11 +24,22 @@ async function platformApi<T>(path:string,method='GET',body?:unknown):Promise<T>
     }
     if(!csrf)throw new Error('管理员安全令牌不可用')
     headers['X-CSRF-Token']=decodeURIComponent(csrf)
+    }catch(e){throw new PlatformRequestError(e instanceof Error?e.message:'管理员安全令牌不可用','NOT_SENT')}
   }
-  const response=await fetch('/api/platform/survey'+path,{method,headers,credentials:'same-origin',
-    ...(body===undefined?{}:{body:JSON.stringify(body)})})
-  const envelope=await response.json() as Envelope<T>
-  if(!response.ok||envelope.code!==0)throw new Error(envelope.message||'操作失败')
+  let response:Response,envelope:Envelope<T>
+  try{
+    response=await fetch('/api/platform/survey'+path,{method,headers,credentials:'same-origin',
+      ...(body===undefined?{}:{body:JSON.stringify(body)})})
+    envelope=await response.json() as Envelope<T>
+  }catch{throw new PlatformRequestError('未收到可解析的服务器回执','UNCONFIRMED')}
+  if(!envelope||!['number','string'].includes(typeof envelope.code))
+    throw new PlatformRequestError('服务器回执格式无法确认','UNCONFIRMED')
+  if(!response.ok||envelope.code!==0){
+    const rejected=envelope.code!==0&&(response.ok||(response.status>=400&&response.status<500))
+    throw new PlatformRequestError(envelope.message||'服务器未确认操作',rejected?'REJECTED':'UNCONFIRMED')
+  }
+  if(!envelope.data||typeof envelope.data!=='object')
+    throw new PlatformRequestError('成功回执缺少可确认的结果','UNCONFIRMED')
   return envelope.data
 }
 export default function SurveyResearchersAdmin(){
@@ -35,6 +50,7 @@ export default function SurveyResearchersAdmin(){
   const [busy,setBusy]=useState(false)
   const [loading,setLoading]=useState(true),[section,setSection]=useState<'researchers'|'invitations'|'tools'>('researchers')
   const [linkContext,setLinkContext]=useState('')
+  const [unconfirmed,setUnconfirmed]=useState<string|null>(null)
   const origins=productOrigins()
   const sections=[['researchers','研究者','资格、认证与恢复'],['invitations','邀请','签发与未领取状态'],['tools','工具授权','对象与精确版本']] as const
   const statusLabel=(status:string)=>(({ACTIVE:'已激活',PENDING_MFA:'待绑定双因素认证',SUSPENDED:'已暂停',REVOKED:'已永久撤销',UNAVAILABLE:'资格不可用'} as Record<string,string>)[status]||'状态待核对')
@@ -53,10 +69,13 @@ export default function SurveyResearchersAdmin(){
   const act=async(path:string,context:string)=>{
     if(!productOrigins()){setError('当前地址不支持生成 Survey 链接');return}
     if(!password){setError('请输入当前系统管理员密码');return}
-    setBusy(true);setError('');setNotice('');setLink('')
+    setBusy(true);setError('');setNotice('');setLink('');setUnconfirmed(null)
     let acknowledged=false
+    const invitation=path==='/researcher-invitations'||path.endsWith('/password-reset-invitations')
     try{
       const result=await platformApi<{id?:string;token?:string;kind?:string}>(path,'POST',{currentPassword:password})
+      if(invitation&&(!result.token||result.kind!==(path==='/researcher-invitations'?'INVITE':'PASSWORD_RESET')))
+        throw new PlatformRequestError('邀请回执缺少一次性链接或类型','UNCONFIRMED')
       acknowledged=true
       if(result.token){
         const endpoint=result.kind==='PASSWORD_RESET'?'reset-password':'claim'
@@ -67,7 +86,21 @@ export default function SurveyResearchersAdmin(){
         setNotice(context+'已签发。一次性链接仅在本次操作显示，请通过受控渠道交付。')
       }else setNotice(context+'已完成。')
       await refresh(1,1)
-    }catch(e){setError((acknowledged?'操作已完成，但列表刷新失败；请仅重试刷新列表。':'操作未完成：')+(e instanceof Error?e.message:'请稍后重试'))}finally{setBusy(false)}
+    }catch(e){
+      if(acknowledged)setError('操作已完成，但列表刷新失败；请仅重试刷新列表。'+(e instanceof Error?e.message:''))
+      else if(e instanceof PlatformRequestError&&e.outcome==='REJECTED')setError('操作已被拒绝：'+e.message)
+      else if(e instanceof PlatformRequestError&&e.outcome==='NOT_SENT')setError('操作未提交：'+e.message)
+      else{
+        setUnconfirmed(context)
+        setError(context+'：操作结果未确认，不能判断服务器是否已执行。请先核对当前列表与状态，不要直接重复提交。'
+          +(invitation?'一次性邀请链接不会再次回显，刷新列表不能重新取得已丢失的链接；请勿直接再次签发。':''))
+      }
+    }finally{setBusy(false)}
+  }
+  const refreshForReview=async()=>{
+    if(!unconfirmed)setError('')
+    try{await refresh();if(unconfirmed)setNotice(unconfirmed+'：列表已更新，请核对当前状态；本次核对未重发操作，原操作结果仍需人工确认。')}
+    catch(e){setError((unconfirmed?'核对列表失败，原操作结果仍未确认：':'列表刷新失败：')+(e instanceof Error?e.message:''))}
   }
   const cancelled=(context:string)=>{setError('');setNotice('已取消'+context+'，未提交变更。')}
   const copyLink=async()=>{try{await navigator.clipboard.writeText(link);setError('');setNotice(linkContext+'链接已复制到剪贴板。')}
@@ -90,7 +123,7 @@ export default function SurveyResearchersAdmin(){
     <div className="survey-admin-verification"><label>当前管理员密码（敏感操作再次验证）
       <input className="input" type="password" autoComplete="off" disabled={busy} value={password} onChange={e=>setPassword(e.target.value)}/>
     </label><p>浏览列表无需再次输入密码；提交资格、邀请或授权变更时，后台仍会核对当前管理员身份与密码。分区切换会保留本页输入，离开页面不保存。</p>
-      <button className="btn-secondary" type="button" disabled={busy||loading} onClick={()=>{setError('');void refresh().catch(e=>setError('列表刷新失败：'+String(e)))}}>刷新管理列表</button>
+      <button className="btn-secondary" type="button" disabled={busy||loading} onClick={()=>void refreshForReview()}>{unconfirmed?'核对当前列表与状态':'刷新管理列表'}</button>
     </div>
     {loading&&<p role="status">正在加载研究者与邀请列表…</p>}
     {link&&<div className="survey-admin-card"><p><strong>{linkContext}</strong> · 新签发的一次性链接：</p>
