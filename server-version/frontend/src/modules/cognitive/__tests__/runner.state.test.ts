@@ -85,6 +85,21 @@ describe('runner state machine', () => {
     expect(s.error?.code).toBe('404')
   })
 
+  it('retains verified recovery navigation without entering READY or creating a task context', () => {
+    const recoverySession: CognitiveSession = { ...session, trainingPersistence: {
+      attemptId: 'parent', attemptEpoch: 1, snapshotHash: 'policy', courseId: 'course',
+      checkpoint: null, localCognitive: { enabled: true, ttlHours: 1 },
+    } }
+    const s = act(initialRunnerState, { type: 'RECOVERY_REQUIRED', session: recoverySession,
+      error: { code: 'FINAL_DRAFT_EXPIRED', message: '本地草稿已过期' } })
+    expect(s.status).toBe('RECOVERY_REQUIRED')
+    expect(s.session).toBe(recoverySession)
+    expect(s.taskContext).toBeNull()
+    expect(act(s, { type: 'START_RUN' })).toBe(s)
+    expect(act(s, { type: 'TRIAL_SUBMIT_START' })).toBe(s)
+    expect(act(s, { type: 'COMPLETE_START' })).toBe(s)
+  })
+
   it('RUNNING → COMPLETE_START → COMPLETING → COMPLETE_SUCCESS → COMPLETED with server result', () => {
     let s = act(initialRunnerState, { type: 'SESSION_LOADED', session, trialIndex: 3 })
     s = act(s, { type: 'START_RUN' })

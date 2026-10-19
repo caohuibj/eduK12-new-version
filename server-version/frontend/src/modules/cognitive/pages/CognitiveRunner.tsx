@@ -17,6 +17,7 @@ import type { AssessmentImagePresentationItem, AssessmentVideoCapabilitySources 
 import { cognitiveVideoPresentationEntries } from '../video-presentation'
 import { useCognitiveInstructionVideoCompletion } from '../useCognitiveInstructionVideoCompletion'
 import { useCognitiveVideoSources } from '../useCognitiveVideoSources'
+import { compositeParentAttemptPath } from '../../composite/child-route-context'
 
 const presentationItems = (
   presentation: NonNullable<import('../types').CognitiveSession['presentation']> | undefined,
@@ -146,7 +147,7 @@ export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding; 
   const total = typeof totalValue === 'number' && Number.isFinite(totalValue) ? totalValue : 0
 
   const handleRestart = async () => {
-    if (campus) return // Parent owns immutable child lifecycle and recovery.
+    if (campus || state.session?.trainingPersistence?.attemptId) return // Parent owns immutable child lifecycle and recovery.
     setRestarting(true)
     setRestartError(null)
     try {
@@ -166,7 +167,12 @@ export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding; 
   }
 
   const cognitiveFallback = campus ? '/school' : isPublic ? '/' : relationalMode ? '/relational/tasks' : '/student/cognitive'
-  const parentTarget = campus ? cognitiveFallback : parentReturnTo(
+  // A direct child link need not carry returnTo. Use only the parent identity
+  // from the authorized session read; never infer it from a local draft.
+  const trainingParent = state.session?.trainingPersistence?.attemptId
+  const parentTarget = campus ? cognitiveFallback : trainingParent
+    ? compositeParentAttemptPath(isPublic, trainingParent)
+    : parentReturnTo(
     searchParams.get('returnTo'),
     isPublic,
     cognitiveFallback,
@@ -399,6 +405,7 @@ export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding; 
         recoveryState={{ state: 'blocked', message: state.error?.message || '检测到未完成的测评，但无法证明安全恢复点。本地草稿仍会保留。' }}
         actions={recoveryActions}
       >
+        {publicCredentialNotice}
         <p className="text-center text-slate-600">{hasParentReturn ? '请返回上层综合测评并从那里处理恢复。' : '可以创建新的整份提交测评。'}</p>
         {restartError ? <p role="alert" className="mt-3 text-center text-sm text-red-600">{restartError}</p> : null}
       </AssessmentShell>
