@@ -12,6 +12,43 @@ function python(body,{timeout=15000}={}){
  assert.ifError(result.error);assert.equal(result.signal,null);assert.equal(result.status,0,result.stderr||result.stdout)
  return result.stdout
 }
+test('baseline persists actual ports and PG identity before the unchanged Database constructor reads them',()=>python(String.raw`
+import tempfile
+from unittest import mock
+helper=module('c26_actual_unchanged_db_constructor','c25-db.py')
+with tempfile.TemporaryDirectory() as tmp:
+ state=Path(tmp);identity={'pid':12345,'startTicks':'67890','processGroupId':12345,'parentPid':os.getpid(),'state':'S'}
+ status={'state':'preflight','ports':{},'pids':{}}
+ private_json(state/'status.json',status)
+ runtime={'DATABASE_URL_OWNER':'postgresql://eduk12_owner:synthetic@127.0.0.1:54329/eduk12_recovery','DATABASE_URL':'postgresql://eduk12_runtime:synthetic@127.0.0.1:54329/eduk12_recovery'}
+ private_json(state/'runtime-private.json',runtime)
+ with mock.patch('subprocess.Popen',side_effect=AssertionError('no process or database connection')):
+  try:helper.Database(ROOT/'eduk12_tools_20261018',state)
+  except KeyError as e:assert e.args==('postgres',)
+  else:raise AssertionError('original empty-port failure was not reproduced')
+  status.update(ports={'postgres':54329,'redis':54330,'api':54331},pids={'postgres':identity['pid']})
+  events=[];real_fsync=os.fsync
+  def fsync(fd):
+   events.append('directory-fsync' if stat.S_ISDIR(os.fstat(fd).st_mode) else 'file-fsync');return real_fsync(fd)
+  def actual_audit(mode,cutoff):
+   assert events==['file-fsync','directory-fsync'] and mode=='baseline' and cutoff==987654
+   stored=private_read(state/'status.json');assert stored==status and stored['postgresIdentity']==identity
+   db=helper.Database(ROOT/'eduk12_tools_20261018',state)
+   assert db.status==stored and db.owner.port==db.role.port==54329 and db.exits=={}
+   return {'actualConstructorRead':True}
+  with mock.patch('os.fsync',side_effect=fsync):assert audit_baseline_with_status(state,status,identity,actual_audit,987654)=={'actualConstructorRead':True}
+  bad={**runtime,'DATABASE_URL':runtime['DATABASE_URL'].replace(':54329/',':54328/')};update_json(state/'runtime-private.json',bad)
+  try:helper.Database(ROOT/'eduk12_tools_20261018',state)
+  except AssertionError:pass
+  else:raise AssertionError('runtime/status port mismatch admitted')
+  called=[]
+  with mock.patch('os.fsync',side_effect=OSError('synthetic durability failure')):
+   try:audit_baseline_with_status(state,status,identity,lambda *a:called.append(a),987654)
+   except OSError:pass
+   else:raise AssertionError('failed fsync permitted baseline')
+  assert called==[]
+ print(json.dumps({'originalEmptyPortRejected':True,'actualUnchangedConstructorAccepted':True,'runtimeMismatchRejected':True,'durabilityFailureBlockedAudit':True}))
+`))
 test('one original budget fixes work/driver/final audit tails before preflight and rejects late durable PASS',()=>python(String.raw`
 import tempfile
 from unittest import mock

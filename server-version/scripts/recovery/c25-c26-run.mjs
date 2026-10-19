@@ -259,6 +259,18 @@ def admitted_baseline_bindings(state,baseline):
 def assert_baseline_unchanged(bindings):
  assert bindings and all(sha_file(Path(p))==h for p,h in bindings.items()),'admitted live baseline changed'
 
+def audit_baseline_with_status(state,status,postgres_identity,audit,cutoff):
+ # The unchanged Database constructor reads status.json before its first SQL.
+ assert set(status['ports'])=={'postgres','redis','api'}
+ assert all(type(p)is int and 0<p<65536 for p in status['ports'].values())
+ assert status['pids']['postgres']==postgres_identity['pid']
+ status.update(state='baseline',postgresIdentity=postgres_identity)
+ update_json(state/'status.json',status)
+ directory=os.open(state,os.O_RDONLY|os.O_DIRECTORY)
+ try:os.fsync(directory)
+ finally:os.close(directory)
+ return audit('baseline',cutoff)
+
 def persist_final(file,value,budget,check_resources=resources):
  # Required fsync is part of the original deadline. A late durable write can
  # never leave a green receipt, even when no async timer got CPU during I/O.
@@ -422,7 +434,7 @@ def main():
    guard(until);name='c25-c26-readiness-'+str(len(readiness)+1);p=run([node,'--require',BASE/'loopback-only.cjs','-e',bootstrap],name,8,until,{'DATABASE_URL_OWNER':runtime['DATABASE_URL_OWNER']},(0,75));output=(STATE/(name+'.log')).read_text();readiness.append({'exit':p.returncode,'stdout':output});update_json(STATE/'c25-c26-readiness-private.json',readiness)
    if p.returncode==0:system_identifier=json.loads(output)['system_identifier'];assert re.fullmatch('[0-9]+',system_identifier);result['postgresReadyVerified']=True;break
    assert p.returncode==75 and output=='57P03';time.sleep(.1)
-  baseline=audit('baseline',budget.work)
+  baseline=audit_baseline_with_status(STATE,status,pg_identity,audit,budget.work)
   baseline_bindings=admitted_baseline_bindings(STATE,baseline);private_json(STATE/'c25-c26-admitted-baseline-bindings.json',baseline_bindings)
   redis_child,redis_identity=start([redis,'--bind','127.0.0.1','--port',status['ports']['redis'],'--dir',STATE,'--save','','--appendonly','no','--maxmemory','128mb','--maxmemory-policy','noeviction'],'redis');status['pids']['redis']=redis_child.pid;ready(status['ports']['redis'],redis_child)
   invocation={**budget.invocation(),'schemaVersion':1,'parentPid':os.getpid(),'scope':'A_ONCE_NO_AUTOMATIC_B','database':'eduk12_c25_joint_restore','baseIdentities':[{**pg_identity,'role':'pg_postmaster'},{**redis_identity,'role':'redis'}],'connectionOptions':{'ownerUrl':urlparse(runtime['DATABASE_URL_OWNER'])._replace(path='/eduk12_c25_joint_restore').geturl(),'port':status['ports']['postgres'],'expectedSystemIdentifier':system_identifier,'primaryDatabase':'eduk12_recovery'}}
