@@ -136,3 +136,16 @@ flock "$TOOLS/.measurement.lock" python3 "$EVIDENCE/run-node-integrity.py"
 邻近出口只读复核：Scale/SJT 历史明确排除 embedded 作答，SJT research export 拒绝 embedded，认知任务发现为 standalone，教师 workbench/export 仍按原权限，整份提交/恢复仅返回收据与任务元数据。未发现另一个结果数据绕过。保留的低优先级一致性问题是 `assessment-policy/inbox.ts` 把已提交课程测评标记为 `resultAvailability='REPORT'`，未单独区分等待开放；其链接指向受保护的状态页，不返回分数或质量，也未通过删除完成状态来规避。按范围决策留待 C24 处理标签/文案，不为此增加反馈查询；实际开放页继续作为权威状态。
 
 最终边界仍是定向 mock 服务/UI、源码与有限 no-emit 检查，加上此前明确为部分 SQL 成功的最小合成迁移及单独 Node 补执行；没有真实应用 HTTP、完整迁移/恢复、并发 race、浏览器、性能、CI、合并或生产资格声明。
+
+## 共享准入投影后续修正
+
+C23 的实际 HTTP 检查后来发现共用准入路径请求了不存在的 `CompositeAssessment.deliveryMode` 列，Prisma 因非法 select 返回错误；C22 的反馈或持久化配置分支也包含该投影。`Db=any` 和先前返回完整对象的 mock 未捕获这一问题。因此 `33c4aa05` 的完成检查点仍需本节修正，不能把此前类型/服务检查当作该真实准入路径已验证。
+
+修复提交 `19dad8b654125c64b5d8f810c17a67018f4b58bc` 只改配置启用分支的窄投影：移除该非法字段，以 `satisfies Prisma.CompositeAssessmentSelect` 和局部 typed delegate 同时约束查询与推断返回值。`LEGACY` 拒绝仍读取已有 `composite.deliveryMode` 运行时上下文；数据库行没有该属性时保持原 `FINAL_ONLY` 默认，不新增“必须显式等于 FINAL_ONLY”的要求。publication 锁、状态/公开开关/时间窗口、课程及教师权限、学生资格、token/round 身份和快照写入约束均保留；未更改 schema、migration 或生成客户端。
+
+新增回归直接调用实际 `startUserAttempt`，mock 投影依据生成 Prisma DMMF 拒绝不存在的字段，正例不虚构 `deliveryMode`；测试在原子插入调用处截获数据，不冒充完整数据库准入或 HTTP 测试。覆盖反馈单独启用、持久化单独启用、二者同时启用、旧空配置的默认 FINAL_ONLY、显式 LEGACY 拒绝、锁内状态/窗口/课程变化及资格丢失。配置分支仍只读取一次窄 header 与一次配置课程投影，关闭分支不增加课程投影。
+
+- 修复前最小复现：1 失败、12 未选，错误为 `Unknown CompositeAssessment select field: deliveryMode`；原始 `c22-admission-projection-repro-01.log` 保留。
+- 修复后受影响 3 文件：26 通过（13 新服务回归、9 持久化/准入契约、4 C22 运行时源码契约）；`c22-admission-projection-fix-02.log`。
+- 含变化源码/测试与既有全局 augmentation 的 no-emit 类型依赖闭包：1214 文件、0 诊断；`c22-admission-projection-types-01.log`。
+- Node 24.21.0、共享锁与资源预检执行；锁已释放供 C23 检查接续。等待锁期间未启动的检查不计为失败。本 C22 补修未执行 PostgreSQL、真实 HTTP、完整构建或 CI，也不改变前述有限迁移/恢复资格。
