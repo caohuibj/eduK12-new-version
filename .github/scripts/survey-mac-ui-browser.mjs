@@ -35,8 +35,6 @@ async function scene(mode,width=1440){
  contexts.push(ctx);const page=await ctx.newPage();lastPage=page;page.setDefaultTimeout(12000);
  const s={calls:[],errors:[],posts:[],reads:[],downloads:[],tickets:new Map(),serial:0,readMode:null,postMode:null,delay:null,cutoff:'2031-12-31T23:59:59.000Z',revision:7};
  page.on('pageerror',e=>s.errors.push(e.message));
- await page.clock.install({time:new Date('2032-01-02T03:04:04.000Z')});
- await page.clock.pauseAt(new Date('2032-01-02T03:04:05.000Z'));
  await ctx.route('**/*',async route=>{
   const req=route.request(),u=new URL(req.url()),method=req.method();
   let body;try{body=req.postData()?req.postDataJSON():undefined;}catch{body='NON_JSON';}
@@ -111,10 +109,18 @@ async function openResearch(width=1440){
  await v.page.getByRole('button',{name:'查看/编辑',exact:true}).click();
  await v.page.getByRole('tab',{name:'研究数据',exact:true}).click();
  const exportPanel=v.page.getByRole('heading',{name:'匿名科研数据导出',exact:true}).locator('..');
+ await exportPanel.waitFor({state:'visible'});
  assert.equal(await exportPanel.count(),1,'one heading-identified export panel');
  assert.equal(await exportPanel.getByLabel('波次',{exact:true}).count(),1,'one export wave selector');
  await exportPanel.getByLabel('数据格式',{exact:true}).selectOption('COGNITIVE_TRIAL_LONG');
  await exportPanel.getByLabel('波次',{exact:true}).selectOption(waveId);
+ return v;
+}
+async function openRecovery(){
+ const v=await openResearch();
+ await v.page.clock.install({time:new Date('2032-01-02T03:04:04.000Z')});
+ const now=await v.page.evaluate(()=>Date.now());
+ await v.page.clock.pauseAt(new Date(Math.ceil((now+1000)/1000)*1000));
  return v;
 }
 const click=(page,name)=>page.getByRole('button',{name,exact:true}).click();
@@ -130,7 +136,7 @@ async function download(v,name){
  v.s.downloads.push({name,filename:file.suggestedFilename(),bytes:bytes.length});
 }
 async function secondPage(){
- const v=await openResearch();await v.page.getByLabel('完成时间起点（含）').fill('2031-06-01T09:00');
+ const v=await openRecovery();await v.page.getByLabel('完成时间起点（含）').fill('2031-06-01T09:00');
  await click(v.page,'创建受控导出');for(const n of ['CSV','Codebook','Manifest'])await download(v,n);
  await click(v.page,'生成下一批（请先核对本批文件）');
  await v.page.getByText(/第 2 批 ·/).waitFor();assert.equal(v.s.posts.length,2);return v;
@@ -159,7 +165,7 @@ try{
   v=await scene('admin',width);await v.page.goto(admin+'/admin/survey-researchers');await v.page.getByRole('heading',{name:'合成研究者',exact:true}).waitFor();
   await checkLayout(v.page,'admin-researchers',width);const pass=v.page.getByLabel('当前管理员密码（敏感操作再次验证）');await pass.fill('synthetic-not-a-credential');const n=v.s.calls.length;
   await v.page.getByRole('tab',{name:/^邀请 /}).click();await checkLayout(v.page,'admin-invitations',width);assert.equal(await pass.inputValue(),'synthetic-not-a-credential');assert.equal(v.s.calls.length,n);await v.close();
-  v=await scene('participant',width);await v.ctx.addInitScript(({publicId,attemptId})=>sessionStorage.setItem('huisurvey:v1:single:'+publicId,JSON.stringify({attemptId,accessCredential:'x'.repeat(43),createdAt:Date.parse('2032-01-02T03:04:05.000Z')})),{publicId,attemptId});
+  v=await scene('participant',width);await v.ctx.addInitScript(({publicId,attemptId})=>sessionStorage.setItem('huisurvey:v1:single:'+publicId,JSON.stringify({attemptId,accessCredential:'x'.repeat(43),createdAt:Date.now()})),{publicId,attemptId});
   await v.page.goto(survey+'/r/'+publicId);await v.page.getByRole('button',{name:/恢复本次作答/}).click();await v.page.getByRole('radio',{name:'同意',exact:true}).check();await checkLayout(v.page,'participant',width);await v.page.reload();await v.page.getByRole('button',{name:/恢复本次作答/}).click();assert.equal(await v.page.getByRole('radio',{name:'同意',exact:true}).isChecked(),true);await v.close();
  }
  // Both engines exercise each targeted recovery contract with explicit DTOs.
@@ -170,7 +176,7 @@ try{
   assert.equal(v.s.reads.length,5);for(const n of ['CSV','Codebook','Manifest'])await download(v,n);saveContract(v,'numeric-429-expiry-same-incoming-cursor-frozen-filter');await v.close();
  }
  {
-  const v=await openResearch();await click(v.page,'创建受控导出');const now=await v.page.evaluate(()=>Date.now());v.s.readMode={status:429,raw:true,headers:{'Retry-After':new Date(now+120000).toUTCString()}};
+  const v=await openRecovery();await click(v.page,'创建受控导出');const now=await v.page.evaluate(()=>Date.now());v.s.readMode={status:429,raw:true,headers:{'Retry-After':new Date(now+120000).toUTCString()}};
   await click(v.page,'下载 CSV');await v.page.getByText(/剩余 120 秒/).waitFor();await noAutomatic(v,120001);v.s.readMode=null;await download(v,'CSV');saveContract(v,'http-date-non-json-429-explicit-original-retry');await v.close();
  }
  {
@@ -183,7 +189,7 @@ try{
   const v=await secondPage();await noAutomatic(v,600001);v.s.revision=8;await click(v.page,'重新生成当前第 2 批');await v.page.getByText(/重建回执与原批次页号或冻结来源不一致/).first().waitFor();assert.equal(v.s.reads.length,3);saveContract(v,'recovered-revision-rejected');await v.close();
  }
  {
-  const v=await openResearch();await click(v.page,'创建受控导出');await download(v,'CSV');await noAutomatic(v,600001);
+  const v=await openRecovery();await click(v.page,'创建受控导出');await download(v,'CSV');await noAutomatic(v,600001);
   const canceled=v.page.waitForEvent('dialog');const first=click(v.page,'重新开始完整导出（新水位）');const dialog=await canceled;assert.match(dialog.message(),/旧的部分文件不能与新导出混作同一批/);await dialog.dismiss();await first;assert.equal(v.s.posts.length,1);
   const accepted=v.page.waitForEvent('dialog');const second=click(v.page,'重新开始完整导出（新水位）');await (await accepted).accept();await second;await v.page.getByText('CSV：尚未发起',{exact:true}).waitFor();assert.equal(v.s.posts.length,2);assert.equal(v.s.posts.at(-1).cursor,undefined);assert.equal(v.s.reads.length,1);saveContract(v,'first-page-new-watermark-cancel-confirm-no-auto-download');await v.close();
  }

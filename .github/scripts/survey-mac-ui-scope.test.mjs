@@ -97,6 +97,7 @@ test('browser fixture binds the export wave to its real heading panel and exact 
   const studio=readFileSync(new URL('../../server-version/frontend/src/survey/SurveyWaveStudio.tsx',import.meta.url),'utf8');
   assert.match(workspace,/<h3[^>]*>匿名科研数据导出<\/h3>/);
   assert.match(browser,/const exportPanel=v\.page\.getByRole\('heading',\{name:'匿名科研数据导出',exact:true\}\)\.locator\('\.\.'\)/);
+  assert.match(browser,/await exportPanel\.waitFor\(\{state:'visible'\}\);\n assert\.equal\(await exportPanel\.count\(\),1/);
   assert.match(browser,/exportPanel\.getByLabel\('波次',\{exact:true\}\)\.count\(\),1/);
   assert.match(browser,/await exportPanel\.getByLabel\('波次',\{exact:true\}\)\.selectOption\(waveId\)/);
   assert.doesNotMatch(browser,/v\.page\.getByLabel\('波次'/);
@@ -104,15 +105,20 @@ test('browser fixture binds the export wave to its real heading panel and exact 
   assert.match(browser,/if\(key==='GET '\+prefix\)\{emptyBody\(method,body\);return response\(project\);\}/);
   assert.match(browser,/const project=\{id,title:'合成研究',description:'合成测试，不含真实被试',collectionMode:'SINGLE_UNLINKED',status:'DRAFT',revision:7\}/);
 });
-test('browser initialization has exact admin capability DTO and pauses a whole-second clock before navigation',()=>{
+test('browser initialization has exact admin capability DTO and scopes a whole-second clock to recovery only',()=>{
   const browser=readFileSync(new URL('./survey-mac-ui-browser.mjs',import.meta.url),'utf8');
   const capabilities=readFileSync(new URL('../../server-version/frontend/src/contexts/CapabilitiesContext.tsx',import.meta.url),'utf8');
   assert.match(capabilities,/typeof response\.data\?\.cognitive !== 'boolean'/);
   assert.match(capabilities,/typeof response\.data\?\.parentPortal !== 'boolean'/);
   assert.match(browser,/if\(key==='GET \/api\/capabilities'\)\{emptyBody\(method,body\);return response\(\{cognitive:true,parentPortal:false\}\);\}/);
-  const install=browser.indexOf("await page.clock.install({time:new Date('2032-01-02T03:04:04.000Z')})");
-  const pause=browser.indexOf("await page.clock.pauseAt(new Date('2032-01-02T03:04:05.000Z'))");
-  assert.ok(install>=0&&pause>install&&pause<browser.indexOf("await ctx.route('**/*'"));
+  assert.doesNotMatch(browser.slice(browser.indexOf('async function scene('),browser.indexOf('async function checkLayout(')),/clock\.(?:install|pauseAt)/);
+  const recovery=browser.slice(browser.indexOf('async function openRecovery('),browser.indexOf('const click='));
+  assert.match(recovery,/await v\.page\.clock\.install/);
+  assert.match(recovery,/await v\.page\.clock\.pauseAt\(new Date\(Math\.ceil\(\(now\+1000\)\/1000\)\*1000\)\)/);
+  assert.match(browser,/async function secondPage\(\)\{\n const v=await openRecovery\(\)/);
+  const contracts=browser.slice(browser.indexOf('// Both engines exercise'));
+  assert.doesNotMatch(contracts,/await openResearch\(/);
+  assert.doesNotMatch(contracts,/checkLayout\(/);
   assert.match(browser,/noAutomatic\(v,900001\)/);assert.match(browser,/noAutomatic\(v,120001\)/);
 });
 test('known Survey PR remains eligible but every manual full/probe entry refuses before heavy jobs',()=>{
