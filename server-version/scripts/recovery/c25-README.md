@@ -1157,3 +1157,42 @@ metadata counts are allowed; sourceCutoff and manifestHash may vary per request.
 This separate historical analysis is not part of the new four-tool parent.
 These adapters are preparation contracts; A measurement still requires the final
 coordinator, new recovery/source binding, independent review and runtime approval.
+
+C26's final outer launcher is `c25-c26-run.mjs`; it remains preparation-only
+until a frozen HEAD, a new matching HTTP03 source descriptor and the newly
+reviewed C26 recovery archive are supplied and runtime is separately approved.
+It holds the shared measurement lock, rechecks the original entry/run resource
+floors and the exact existing backend/frontend/client/tool closures, including
+the actual C21 seed fixture. It never emits products, regenerates a client,
+clones a database or starts an automatic B run.
+
+One monotonic 1200s budget starts before preflight. Work ends at start+720s;
+driver cleanup ends at +780s, reserving its actual 60s. The remaining 420s contain
+the final dual-database audit (at most 300s), old uploads/exports protection (at
+most 60s), and final input verification plus PostgreSQL shutdown (60s). These
+are reservations inside the original total, not additional budgets. Required
+journal/fsync work is included; a late final write cannot leave a passing receipt.
+The initial accepted 73-ordinal/3-parser restore identity is checked read-only,
+and the actual working rows, live schema and admission receipt are immediately
+SHA-bound for every final audit. The primary 6708 and old working 6667 full rows,
+21 checkpoints, complete reports singleton and every old material file remain
+protected. The changed final working database has no new full-restore claim.
+
+The launcher is a process-local Linux child-subreaper. It captures actual
+PID/startTicks/PPID/PGID descendants, including detached children spawned before
+registry publication, stops a still-running driver before reclaiming writers,
+and requires bounded repeated quiescence. Popen children retain their own exact
+wait/poll exit status. Only individually verified reparented orphans are reaped
+with waitpid; their raw wait status is retained. PostgreSQL children can have
+separate sessions (PG16 `InitPostmasterChild` calls setsid); exact ancestry plus
+the bound PostgreSQL executable identifies that family, which is stopped
+separately after writer shutdown and audits. Unknown/reused/unreadable identities
+or unproved quiet groups keep the run failed. Watchdog full-proc scanning, wall
+and thread CPU costs are recorded separately from business measurements.
+
+The new outer contracts use synthetic processes and pure evidence fixtures only:
+original deadlines, late fsync rejection, admitted-baseline tampering, fixed
+workload/worker/journal/final-audit conjunctions, actual orphan exit ownership,
+PostgreSQL-family isolation and the actual archive/material export boundary.
+They do not connect to a database, start a business service, or establish A/B
+performance, browser or selected-video qualification.
