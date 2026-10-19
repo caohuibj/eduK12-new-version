@@ -91,6 +91,12 @@ const row = (id: string, generationReason: 'COMPLETION' | 'REANALYSIS', createdA
 
 const attempt = () => ({
   id: 'attempt-1',
+  trainingFlowSnapshotEncrypted: null,
+  trainingFlowSnapshotHash: null,
+  trainingFlowPathEncrypted: null,
+  trainingFlowPathHash: null,
+  trainingVariantAllocationEncrypted: null,
+  trainingVariantAllocationHash: null,
   compositeAssessmentId: 'composite-1',
   userId: 'student-1',
   recoveryTokenHash: null,
@@ -99,6 +105,12 @@ const attempt = () => ({
   completedAt: new Date('2026-08-25T00:00:00Z'),
   totalTime: 100,
   compositeAssessment: {
+    trainingFlowDraft: null,
+    trainingFlowFrozen: null,
+    trainingFlowDigest: null,
+    trainingVariantDraft: null,
+    trainingVariantFrozen: null,
+    trainingVariantDigest: null,
     id: 'composite-1',
     name: '综合测评',
     reportPackageKey: 'attention_stability_v1',

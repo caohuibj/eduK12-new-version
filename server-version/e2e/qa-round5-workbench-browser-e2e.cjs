@@ -52,7 +52,7 @@ async function run(browser, engine, width) {
     await screenshot('editor')
     await page.goto(base + '/assessment-workbench?courseId=' + sampleCourse.id)
     await page.getByText('合成参与者 · 合成认知任务').waitFor()
-    await page.getByText(/已完成 · 质量受限 ·/).waitFor()
+    await page.getByText(/已交卷 · 质量受限 ·/).waitFor()
     assert.match(await page.getByRole('link', { name: '按权限查看单项结果' }).getAttribute('href'), /^\/composite-assessments\//)
     await screenshot('overview')
     await page.goto(base + '/assessment-templates')

@@ -49,11 +49,23 @@ describe('shared Form foundation immutable baseline oracle',()=>{
     const root=path.resolve('src/modules/assessment-core')
     const walk=(dir:string):string[]=>fs.readdirSync(dir,{withFileTypes:true}).flatMap(x=>x.isDirectory()?walk(path.join(dir,x.name)):[path.join(dir,x.name)])
     const allowed=new Set(['zod','../assessment-media/assessment-image','../../assessment-runtime/canonical','../definition-primitives','./definition','./answers'])
+    // Keep new shared pure modules explicit; no adapter/database/HTTP directory allowances.
+    const moduleDependencies:Record<string,readonly string[]>={
+      'flow/training.ts':['../materials/definition','./compiler'],
+      'materials/definition.ts':['../flow/compiler','../flow/definition'],
+      'scale/import-parser.ts':['../form/import-parser','../../scale/scale-definition'],
+      'sjt/compiler.ts':['../../situational/situation-branching','./selection','./structure'],
+      'sjt/runtime.ts':['../../situational/situation-branching','../../situational/situation-scoring',
+        '../../situational/situation-model-resolver','../../situational/situation-runtime-definition','./selection','./structure'],
+      'sjt/structure.ts':['./selection'],
+      'sjt/validation.ts':['./selection'],
+      'weighted-variants.ts':['node:crypto','../assessment-runtime/canonical','./definition-primitives'],
+    }
     for(const file of walk(root).filter(f=>f.endsWith('.ts'))){
       const source=fs.readFileSync(file,'utf8')
       const imports=[...source.matchAll(/(?:from\s+|import\s*\()(['"])([^'"]+)\1/g)].map(m=>m[2])
-      const scaleImportDependencies=path.relative(root,file)==='scale/import-parser.ts' ? new Set(['../form/import-parser','../../scale/scale-definition']) : new Set<string>()
-      for(const specifier of imports)expect(allowed.has(specifier)||scaleImportDependencies.has(specifier),`${path.relative(root,file)} -> ${specifier}`).toBe(true)
+      const pureModuleDependencies=new Set(moduleDependencies[path.relative(root,file)]??[])
+      for(const specifier of imports)expect(allowed.has(specifier)||pureModuleDependencies.has(specifier),`${path.relative(root,file)} -> ${specifier}`).toBe(true)
     }
   })
 })

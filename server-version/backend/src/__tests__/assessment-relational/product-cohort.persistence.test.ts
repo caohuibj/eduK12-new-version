@@ -408,6 +408,8 @@ describe.skipIf(!enabled)('RA-02 Student-to-Teacher cohort persistence', () => {
       inProgress: 0,
       completed: 0,
       abandoned: 0,
+      satisfied: 0,
+      notSatisfied: 0,
     })
     const wideExport = await compositeExportService.getExportData(COMPOSITE_ID, {
       detail: 'summary',

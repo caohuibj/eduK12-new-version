@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "scope": "PR314 AppShell Cognitive OFF browser fixture correction",
+  "failedRunId": 39183230206,
+  "failedJobId": 117840490493,
+  "failedHead": "c2e329d0535500386016e33b82644ef7e389fe50",
+  "originalSourceSha256": "0beae5f670023609c46e90bc9effc8fd900f793a3897fd23d0e9b9c2532bd624",
+  "sourcePath": "server-version/e2e/app-shell-browser-e2e.cjs",
+  "correctedSourceSha256": "7b02f5e467b4775ab1b9dd4f952f284b0f0a59ff88b2620636fa2259e2e65174",
+  "nodeVersion": "24.21.0",
+  "checks": [
+    { "command": "node --check server-version/e2e/app-shell-browser-e2e.cjs", "exitCode": 0 },
+    { "command": "git diff --check", "exitCode": 0 }
+  ],
+  "browserExecutedLocally": false,
+  "officialBrowserQualification": "pending corrected-head CI execution",
+  "failedArtifactId": 12157151125,
+  "failedCaseDomOrScreenshotAvailable": false,
+  "productSourceChanged": false,
+  "gatesOrAssertionsSkipped": false
+}

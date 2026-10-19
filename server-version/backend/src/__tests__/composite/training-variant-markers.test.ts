@@ -7,16 +7,23 @@ import {
 } from '../../modules/composite/training-variant-markers'
 
 const legacy = (): TrainingVariantParentMarkers => ({
-  id: 'attempt', trainingVariantAllocationEncrypted: null, trainingVariantAllocationHash: null,
-  compositeAssessment: { trainingVariantDraft: null, trainingVariantFrozen: null, trainingVariantDigest: null },
+  id: 'attempt',
+  trainingFlowSnapshotEncrypted: null, trainingFlowSnapshotHash: null,
+  trainingFlowPathEncrypted: null, trainingFlowPathHash: null,
+  trainingVariantAllocationEncrypted: null, trainingVariantAllocationHash: null,
+  compositeAssessment: { trainingFlowDraft: null, trainingFlowFrozen: null, trainingFlowDigest: null,
+    trainingVariantDraft: null, trainingVariantFrozen: null, trainingVariantDigest: null },
 })
 const fields = [
+  ['parent', 'trainingFlowSnapshotEncrypted'], ['parent', 'trainingFlowSnapshotHash'],
+  ['parent', 'trainingFlowPathEncrypted'], ['parent', 'trainingFlowPathHash'],
+  ['definition', 'trainingFlowDraft'], ['definition', 'trainingFlowFrozen'], ['definition', 'trainingFlowDigest'],
   ['parent', 'trainingVariantAllocationEncrypted'], ['parent', 'trainingVariantAllocationHash'],
   ['definition', 'trainingVariantDraft'], ['definition', 'trainingVariantFrozen'], ['definition', 'trainingVariantDigest'],
 ] as const
 
 describe('Training variant marker projection contract', () => {
-  it('requires all five explicit nulls for LEGACY', () => {
+  it('requires all twelve explicit nulls for LEGACY', () => {
     expect(trainingVariantMarkerState(legacy())).toBe('LEGACY')
     expect(trainingVariantMarkerState(null)).toBe('UNKNOWN')
     expect(trainingVariantMarkerState({})).toBe('UNKNOWN')
@@ -51,7 +58,9 @@ describe('Training variant marker projection contract', () => {
   })
   it('keeps both generated Prisma selectors on the complete marker shape', () => {
     expect(Object.keys(TRAINING_VARIANT_DEFINITION_MARKER_SELECT)).toEqual(fields.filter(([owner]) => owner === 'definition').map(([, field]) => field))
-    expect(TRAINING_VARIANT_PARENT_MARKER_SELECT).toEqual({ id: true, trainingVariantAllocationEncrypted: true,
+    expect(TRAINING_VARIANT_PARENT_MARKER_SELECT).toEqual({ id: true,
+      trainingFlowSnapshotEncrypted: true, trainingFlowSnapshotHash: true,
+      trainingFlowPathEncrypted: true, trainingFlowPathHash: true, trainingVariantAllocationEncrypted: true,
       trainingVariantAllocationHash: true, compositeAssessment: { select: TRAINING_VARIANT_DEFINITION_MARKER_SELECT } })
   })
 })

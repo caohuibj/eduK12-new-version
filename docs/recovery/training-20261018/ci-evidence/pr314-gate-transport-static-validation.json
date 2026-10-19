@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "scope": "PR314 complete merge-gate needs transport, no gate selection changes",
+  "failedRunId": 39183230206,
+  "failedJobId": 117843033195,
+  "failedHead": "c2e329d0535500386016e33b82644ef7e389fe50",
+  "sourceSha256": {
+    ".github/workflows/ci.yml": "48859031f1cb679286ab677acdd7b7a4c748b37ed5ad9dfd5bdfd1464f2e06ac",
+    ".github/scripts/merge-gate.mjs": "7baeb6b63dc63e7190bdc279afb70678520b978829ffb82c5114c7e44e93c436",
+    ".github/scripts/ci-topology.test.mjs": "13294c3fe4cff62bb888df9020cd7ff61a0097fed60561506a6585c5560ebb4b"
+  },
+  "nodeVersion": "24.21.0",
+  "executions": [
+    {
+      "command": "node --test .github/scripts/ci-topology.test.mjs",
+      "passed": 12,
+      "failed": 1,
+      "skipped": 0,
+      "durationMs": 811.160042,
+      "retainedFailure": "New large-transport test: synthetic platform fixture omitted required flags, so the unchanged gate correctly rejected it (expected CLI status 0, actual 1).",
+      "initialTestFixtureHash": "not separately recorded; this execution predates the fixture-only correction in the large-transport case"
+    },
+    {
+      "command": "node --test --test-name-pattern='merge-gate large full-object' .github/scripts/ci-topology.test.mjs",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "durationMs": 414.437772,
+      "continuation": "Corrected only that synthetic platform fixture; other twelve test bodies and their consumed implementation inputs were unchanged."
+    },
+    {
+      "command": "node --test .github/scripts/content-scope.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/maintenance-routing.test.mjs .github/scripts/dependency-routing.test.mjs",
+      "passed": 78,
+      "failed": 0,
+      "skipped": 0,
+      "durationMs": 2102.131324,
+      "logSha256": "11caded0a974ed30e1e95706f125723a99586b05720e9599fc9802b7085b0b04"
+    }
+  ],
+  "syntaxAndYamlAndWhitespaceChecks": "passed",
+  "officialNewHeadCiExecuted": false,
+  "requiredResultChecksChanged": false,
+  "planRecomputationChanged": false,
+  "frozenTrainingScopeExpanded": false
+}

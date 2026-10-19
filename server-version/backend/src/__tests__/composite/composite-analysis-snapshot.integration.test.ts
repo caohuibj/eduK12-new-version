@@ -36,6 +36,12 @@ import {
 
 const makeState = (overrides: Record<string, unknown> = {}) => ({
   id: 'attempt-1',
+  trainingFlowSnapshotEncrypted: null,
+  trainingFlowSnapshotHash: null,
+  trainingFlowPathEncrypted: null,
+  trainingFlowPathHash: null,
+  trainingVariantAllocationEncrypted: null,
+  trainingVariantAllocationHash: null,
   attemptEpoch: 1,
   asyncReportEpoch: null,
   compositeAssessmentId: 'composite-1',
@@ -50,6 +56,12 @@ const makeState = (overrides: Record<string, unknown> = {}) => ({
   completedAt: null,
   totalTime: null,
   compositeAssessment: {
+    trainingFlowDraft: null,
+    trainingFlowFrozen: null,
+    trainingFlowDigest: null,
+    trainingVariantDraft: null,
+    trainingVariantFrozen: null,
+    trainingVariantDigest: null,
     id: 'composite-1',
     name: 'collection-only',
     instruction: null,

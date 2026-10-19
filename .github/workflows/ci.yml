@@ -881,7 +881,6 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 8
     env:
-      NEEDS_JSON: ${{ toJSON(needs) }}
       IS_DRAFT: ${{ github.event.pull_request.draft == true && vars.CI_FORCE_FULL != 'true' }}
     steps:
       - uses: actions/checkout@v4
@@ -890,6 +889,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+      - name: materialize complete merge-gate inputs
+        shell: node {0}
+        run: |
+          const fs = require('node:fs');
+          // The generated Node script receives a JSON string literal, never shell code.
+          const serialized = ${{ toJSON(toJSON(needs)) }};
+          if (Buffer.byteLength(serialized, 'utf8') > 4 * 1024 * 1024) throw new Error('Merge-gate inputs exceed 4 MiB');
+          const path = require('node:path');
+          const file = path.join(process.env.RUNNER_TEMP, `merge-gate-needs-${process.env.GITHUB_RUN_ID}-${process.env.GITHUB_RUN_ATTEMPT}.json`);
+          if (/[\r\n]/.test(file)) throw new Error('Invalid merge-gate input path');
+          fs.writeFileSync(file, serialized, { mode: 0o600, flag: 'wx' });
+          fs.appendFileSync(process.env.GITHUB_ENV, `NEEDS_JSON_FILE=${file}\n`);
       - name: install pinned release classification tools
         if: needs.scope.outputs.documentation != 'true' && needs.scope.outputs.scenario != 'release-tooling'
         run: npm ci --ignore-scripts --prefix .github/release-tools

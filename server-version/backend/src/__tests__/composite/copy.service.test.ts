@@ -269,10 +269,24 @@ describe('copyComposite', () => {
     mockPrisma.courseStudent.findUnique.mockResolvedValue({ status: 'ACTIVE' })
     mockPrisma.compositeAssessmentAttempt.create.mockResolvedValue({ id: 'attempt-1', anonymousCode: null })
     mockPrisma.compositeAssessmentAttempt.findUnique.mockResolvedValue({
+      trainingFlowSnapshotEncrypted: null,
+      trainingFlowSnapshotHash: null,
+      trainingFlowPathEncrypted: null,
+      trainingFlowPathHash: null,
+      trainingVariantAllocationEncrypted: null,
+      trainingVariantAllocationHash: null,
       id: 'attempt-1',
       userId: 'student-1',
       status: 'IN_PROGRESS',
-      compositeAssessment: { items: [] },
+      compositeAssessment: {
+        trainingFlowDraft: null,
+        trainingFlowFrozen: null,
+        trainingFlowDigest: null,
+        trainingVariantDraft: null,
+        trainingVariantFrozen: null,
+        trainingVariantDigest: null,
+        items: [],
+      },
       scaleAssessments: [],
       cognitiveSessions: [],
       formAnswers: [],
@@ -769,7 +783,25 @@ describe('Training timed start recovery boundary', () => {
     mockPrisma.compositeAssessment.findUnique.mockResolvedValue(composite())
     mockPrisma.courseStudent.findFirst.mockResolvedValue({courseId:'course-t',status:'ACTIVE'})
     mockPrisma.compositeAssessmentAttempt.findFirst.mockResolvedValue({id:'attempt-1'})
-    mockPrisma.compositeAssessmentAttempt.findUnique.mockResolvedValue({id:'attempt-1',userId:'student-1',status:'IN_PROGRESS',compositeAssessment:{items:[]},scaleAssessments:[],cognitiveSessions:[],formAnswers:[]})
+    mockPrisma.compositeAssessmentAttempt.findUnique.mockResolvedValue({
+      trainingFlowSnapshotEncrypted: null,
+      trainingFlowSnapshotHash: null,
+      trainingFlowPathEncrypted: null,
+      trainingFlowPathHash: null,
+      trainingVariantAllocationEncrypted: null,
+      trainingVariantAllocationHash: null,
+      id: 'attempt-1', userId: 'student-1', status: 'IN_PROGRESS',
+      compositeAssessment: {
+        trainingFlowDraft: null,
+        trainingFlowFrozen: null,
+        trainingFlowDigest: null,
+        trainingVariantDraft: null,
+        trainingVariantFrozen: null,
+        trainingVariantDigest: null,
+        items: [],
+      },
+      scaleAssessments: [], cognitiveSessions: [], formAnswers: [],
+    })
     await startUserAttempt('student-1','source-1')
     expect(mockPrisma.courseStudent.findFirst.mock.calls[0][0].where).toMatchObject({studentId:'student-1',course:{isLibrary:false}})
     expect(mockPrisma.courseStudent.findFirst.mock.calls[0][0].where.course).not.toHaveProperty('courseType')

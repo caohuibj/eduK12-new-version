@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, writeFileSync, rmSync, symlinkSync, readFileSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, rmSync, symlinkSync, readFileSync, statSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
@@ -9,7 +9,65 @@ import { treeDigest, verifyManifest } from './ci-artifact.mjs';
 import { mediaPlan, validateMediaPlan } from './ci-media-plan.mjs';
 import { assertRunnerTemp } from './mac-ci-cleanup.mjs';
 import { assertMediaServices } from './ci-reset-media-services.mjs';
+import { readNeeds, MAX_NEEDS_BYTES, requiredChecks, failedChecks } from './merge-gate.mjs';
 const capacity={macEnabled:true,os:'darwin',freeBytes:10*1024**3};
+function mergeGateWriter() {
+  const workflow=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+  const gate=workflow.split('  merge-gate:\n')[1];
+  assert.ok(gate);
+  assert.doesNotMatch(gate,/\bNEEDS_JSON:/);
+  assert.doesNotMatch(gate.split('    steps:')[0], /runner\./, 'runner context is unavailable in job-level env');
+  const block=gate.split('      - name: materialize complete merge-gate inputs\n')[1]?.split('      - name:')[0];
+  assert.match(block??'',/shell: node \{0\}/);
+  assert.match(block,/const serialized = \$\{\{ toJSON\(toJSON\(needs\)\) \}\};/);
+  return block.split('        run: |\n')[1].split('\n').map(line=>line.replace(/^          /,'')).join('\n');
+}
+test('merge-gate large full-object transport preserves hostile strings with a small process environment',()=>{
+  const dir=mkdtempSync(join(tmpdir(),'merge-gate-input-'));
+  const file=join(dir,'merge-gate-needs-123-1.json'), script=join(dir,'write.cjs'), sentinel=join(dir,'injected'), githubEnv=join(dir,'github-env');
+  const env={...process.env,RUNNER_TEMP:dir,GITHUB_RUN_ID:'123',GITHUB_RUN_ATTEMPT:'1',GITHUB_ENV:githubEnv,IS_DRAFT:'false'};delete env.NEEDS_JSON;delete env.NEEDS_JSON_FILE;
+  const payload=`\"; require('node:fs').writeFileSync(${JSON.stringify(sentinel)},'bad'); //\n\`\${process.exit(19)}\`\n$(touch ${sentinel})\nEOF\n'`;
+  const outputs={application_route:'legacy',scenario:'platform',runner_profile:'hosted',release_plan:JSON.stringify({changes:[{file:payload,padding:'x'.repeat(200*1024)}]})};
+  for(const flag of ['maintenance','frontend_test','content','presentation','frontend','documentation'])outputs[flag]='false';
+  for(const flag of ['frontend_build','ui_required','visual_hosted','codeql','media2','media7','situational_video','situational_branching','video_core','app_shell','canonical_visual','perf_smoke','ops'])outputs[flag]='true';
+  outputs.media_selection=JSON.stringify(['media2','video_core','media7','situational_video','situational_branching']);
+  outputs.media_groups=JSON.stringify(['images-video','cognitive-situational']);
+  const needs={scope:{result:'success',outputs}};
+  for(const key of requiredChecks(needs,false))if(key!=='scope')needs[key]={result:'success',outputs:{preserved:payload}};
+  const serialize=value=>JSON.stringify(JSON.stringify(value));
+  const write=value=>{writeFileSync(script,mergeGateWriter().replace('${{ toJSON(toJSON(needs)) }}',serialize(value)));return spawnSync(process.execPath,[script],{env,encoding:'utf8'});};
+  const cli=()=>spawnSync(process.execPath,[new URL('./merge-gate.mjs',import.meta.url).pathname],{env,encoding:'utf8'});
+  try {
+    assert.ok(Buffer.byteLength(JSON.stringify(needs))>128*1024);
+    assert.equal(spawnSync(process.execPath,['--version'],{env,encoding:'utf8'}).status,0,'checkout-equivalent Node launch keeps large payload out of env');
+    const written=write(needs);assert.equal(written.status,0,written.stderr);
+    assert.equal(readFileSync(githubEnv,'utf8'), `NEEDS_JSON_FILE=${file}\n`);
+    env.NEEDS_JSON_FILE=readFileSync(githubEnv,'utf8').trim().slice('NEEDS_JSON_FILE='.length);
+    assert.equal(statSync(file).mode&0o777,0o600);
+    assert.deepEqual(readNeeds(env),needs,'all fields and nested JSON plan bytes survive unchanged');
+    assert.equal(existsSync(sentinel),false,'quotes, backticks, shell substitutions and newlines remain data');
+    const accepted=cli();assert.equal(accepted.status,0,accepted.stderr||accepted.stdout);
+    assert.notEqual(write(needs).status,0,'exclusive file creation refuses stale input overwrite');
+    needs['backend-regression'].result='failure';writeFileSync(file,JSON.stringify(needs));
+    assert.deepEqual(failedChecks(readNeeds(env),false),['backend-regression']);
+    const failed=cli();assert.equal(failed.status,1);assert.deepEqual(JSON.parse(failed.stdout).failed,['backend-regression']);
+    rmSync(file);
+    const oversized=write({padding:'x'.repeat(MAX_NEEDS_BYTES)});assert.notEqual(oversized.status,0);assert.equal(existsSync(file),false);
+  } finally {rmSync(dir,{recursive:true,force:true});}
+});
+test('merge-gate configured file rejects missing, malformed, oversized and non-object data without env fallback',()=>{
+  const dir=mkdtempSync(join(tmpdir(),'merge-gate-invalid-')), file=join(dir,'needs.json');
+  const env={NEEDS_JSON_FILE:file,NEEDS_JSON:JSON.stringify({scope:{result:'success',outputs:{}}})};
+  try {
+    assert.throws(()=>readNeeds(env));
+    assert.throws(()=>readNeeds({...env,NEEDS_JSON_FILE:''}));
+    for(const data of ['', '{broken', '[]', 'null', '"string"', 'x'.repeat(MAX_NEEDS_BYTES+1)]) {
+      writeFileSync(file,data);assert.throws(()=>readNeeds(env),data.slice(0,20));
+    }
+    rmSync(file);symlinkSync(join(dir,'missing'),file);assert.throws(()=>readNeeds(env));
+    assert.deepEqual(readNeeds({NEEDS_JSON:env.NEEDS_JSON}),JSON.parse(env.NEEDS_JSON),'existing env callers retain their protocol');
+  } finally {rmSync(dir,{recursive:true,force:true});}
+});
 test('Draft maintenance and all component probes use hosted Ubuntu',()=>{
   const workflow=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
   const maintenance=workflow.split('  maintenance:\n')[1]?.split('\n  documentation:')[0];

@@ -1,3 +1,4 @@
+import { TRAINING_VARIANT_PARENT_MARKER_SELECT, TRAINING_VARIANT_DEFINITION_MARKER_SELECT } from '../../modules/composite/training-variant-markers'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import type { PrismaClient } from '@prisma/client'
 import { integrationDatabaseUrl } from '../integration/integration-env'
@@ -171,6 +172,10 @@ suite('Work C Query Budget (real PostgreSQL)', { timeout: 30_000 }, () => {
       // Own fixtures by the unique suite user, including rows left behind when
       // an assertion fails before a test reaches its inline cleanup.
       if (teacherId) {
+        // A failed admission assertion can leave children and their owned Scale.
+        // Delete only this suite's descendants before their parent/creator.
+        await prisma.assessment.deleteMany({ where: { compositeAttempt: { compositeAssessment: { createdBy: teacherId } } } })
+        await prisma.cognitiveSession.deleteMany({ where: { compositeAttempt: { compositeAssessment: { createdBy: teacherId } } } })
         await prisma.compositeAssessmentAttempt.deleteMany({
           where: { compositeAssessment: { createdBy: teacherId } },
         })
@@ -193,7 +198,10 @@ suite('Work C Query Budget (real PostgreSQL)', { timeout: 30_000 }, () => {
         await prisma.questionnaireAccessToken.deleteMany({ where: { questionnaireId: id } })
         await prisma.questionnaire.deleteMany({ where: { id } })
       }
-      if (teacherId) await prisma.user.delete({ where: { id: teacherId } })
+      if (teacherId) {
+        await prisma.scale.deleteMany({ where: { creatorId: teacherId } })
+        await prisma.user.delete({ where: { id: teacherId } })
+      }
     } finally {
       await prisma?.$disconnect()
     }
@@ -545,7 +553,7 @@ suite('Work C Query Budget (real PostgreSQL)', { timeout: 30_000 }, () => {
     const parent = await prisma.compositeAssessmentAttempt.findUnique({
       where: { id: attempt.id },
       select: {
-        id: true,
+        ...TRAINING_VARIANT_PARENT_MARKER_SELECT,
         userId: true,
         recoveryTokenHash: true,
         deliveryMode: true,
@@ -555,7 +563,7 @@ suite('Work C Query Budget (real PostgreSQL)', { timeout: 30_000 }, () => {
         frozenActiveSlotSetEncrypted: true,
         frozenActiveSlotSetHash: true,
         compositeAssessment: {
-          select: { formSections: { select: { contextSection: true, items: { select: { contextKey: true } } } } },
+          select: { ...TRAINING_VARIANT_DEFINITION_MARKER_SELECT, formSections: { select: { contextSection: true, items: { select: { contextKey: true } } } } },
         },
       },
     })
@@ -684,7 +692,7 @@ suite('Work C Query Budget (real PostgreSQL)', { timeout: 30_000 }, () => {
     const parent = await prisma.compositeAssessmentAttempt.findUnique({
       where: { id: attempt.id },
       select: {
-        id: true,
+        ...TRAINING_VARIANT_PARENT_MARKER_SELECT,
         userId: true,
         recoveryTokenHash: true,
         deliveryMode: true,
@@ -694,7 +702,7 @@ suite('Work C Query Budget (real PostgreSQL)', { timeout: 30_000 }, () => {
         frozenActiveSlotSetEncrypted: true,
         frozenActiveSlotSetHash: true,
         compositeAssessment: {
-          select: { formSections: { select: { contextSection: true, items: { select: { contextKey: true } } } } },
+          select: { ...TRAINING_VARIANT_DEFINITION_MARKER_SELECT, formSections: { select: { contextSection: true, items: { select: { contextKey: true } } } } },
         },
       },
     })

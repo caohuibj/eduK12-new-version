@@ -142,3 +142,18 @@ state11从同一state09源重新克隆，执行相同30个消费者观察窗口�
 checkpoint13-efficiency-after.tar.gz含24个脱敏成员，1404676B，SHA f3323cee26956a95f57cb8ec5f5f170df6b9929099c7a088ef1d2d49f28b105b。包括state11原始observer、冻结输入/结果、精确原after contract、前后比较、最终及历史测试日志/源绑定和前置复用证明；消费者结果仅移除request route并记录原SHA。不含私有DB、凭据、HTTP正文或私有CSV。before的checkpoint12及全部旧失败继续保留。
 
 功能与受影响导出效率的独立review收口后，交root保护提交并运行获准的正式受影响CI/PR流程。本轮停止新功能；C21及后续暂停。browser、新fresh/selected-video、C26容量及既有C19两个独立缺口不在本次效率资格内。
+
+## PR314 正式CI遗留测试合同修正
+
+正式run39183230206/head c2e329d0 的backend regression job117840318483报告16文件63失败；原artifact12157825007及失败栈保留。单独新增材料、SJT retention和Scale import真实PG套件已分别11/10/6通过，未重跑。本次只修16个测试文件，生产源码、权限、canonical校验、schema与查询预算未变。
+
+- 旧mock未提供全部12个flow/variant来源标志，不能被当作legacy。仅合法旧行fixture补显式null，中央marker测试扩至全部12字段缺失/undefined/non-null；原partial/cipher拒绝断言保留。
+- materialGrant mock通过importOriginal保留真实SCALE_USE_AUTHORIZATION_SELECT；原授权mock和断言不变。公共核心依赖oracle增加逐文件精确纯依赖，未放开adapter/database/HTTP目录。
+- hotpath原失败是Prisma父findUnique逻辑次数0→2，不是rawSQL预算：测试传入parent漏markers导致必要补读。改用中央完整select后仍要求额外父读0。afterAll仅清理suite-owner children→parent→ownedScale→user，修失败前遗留Scale的creator FK，未移除约束。
+- V32手造嵌入parent漏id/markers，先触发身份错误；补中央select后原epoch变化STALE_ATTEMPT409及零raw写入断言通过。Form fixture的无公共definition非法text改为原合法text_input。SJT旧400断言改为中央release合同INSTRUMENT_NOT_AVAILABLE/404并加强零parent残留；cohort零统计补C06 satisfied/notSatisfied两个0字段。
+
+固定输入HEAD43ee9e23、test patch SHA ba5a214a56271aa639050a84cf5be72c6433c80e52a970851b578a8b358652af。独立小型PG16.15/Redis7.4.11及Node24.21、measurement lock、真实175迁移，未读取或修改原已接受DB。run01完整受影响16文件244项中215通过/29失败，失败因本地runner漏官方COGNITIVE_MODULE_ENABLED=true及后续copy mock队列连锁，原失败保留。run02只续5个失败文件，85项全部通过，copy原41项全过且未新增队列响应。
+
+最终按文件producer去重为run01的11文件159项加run02的5文件85项，共16文件244项。不得将215+85相加。复用的completion/integration/composite-report/results与snapshot PG在本套件显式配置认知开关；其余纯扫描/marker、context freeze、Scale-only whole/batch、cohort隐私统计路径不依赖认知新准入开关。重试仅纠正相关业务开关；本地端口/密码及合成crypto fixture值保持隔离，不称全部环境与CI逐字相同。两run源码manifest前后相同、服务清理成功，无新生产构建或整套回归资格。
+
+checkpoint14-ci-fixture-fixes.tar.gz含18成员，533759B，SHA 5e07b3ebf70703be955a2371d2ae4fc908db10e6b9cd23cc11de609951d0beeb。保存原失败inventory、两轮测试结果/日志、输入patch/源码manifest、明确producer资格和runner；排除PG数据、口令与私有配置。独立源码review已完成，正式CI重验与PR合并由root执行；本定向通过不代表整套CI已经通过。

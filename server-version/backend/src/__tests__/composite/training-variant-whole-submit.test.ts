@@ -11,7 +11,10 @@ import {encryptUnifiedRuntimePayload} from '../../modules/assessment-runtime/sec
 import {prepareCanonicalSubmission} from '../../services/instrumentFinalSubmit'
 import {clearWholeValidationRulesForTest,submitWholeQuestionnaire} from '../../modules/composite/whole-questionnaire.service'
 
-const markerFields=['trainingVariantAllocationEncrypted','trainingVariantAllocationHash','trainingVariantDraft','trainingVariantFrozen','trainingVariantDigest'] as const
+const variantMarkerFields=['trainingVariantAllocationEncrypted','trainingVariantAllocationHash','trainingVariantDraft','trainingVariantFrozen','trainingVariantDigest'] as const
+const flowMarkerFields=['trainingFlowSnapshotEncrypted','trainingFlowSnapshotHash','trainingFlowPathEncrypted','trainingFlowPathHash','trainingFlowDraft','trainingFlowFrozen','trainingFlowDigest'] as const
+const markerFields=[...flowMarkerFields,...variantMarkerFields] as const
+const markerOwner=(parent:any,field:typeof markerFields[number])=>field.startsWith('trainingVariantAllocation')||field.startsWith('trainingFlowSnapshot')||field.startsWith('trainingFlowPath')?parent:parent.compositeAssessment
 beforeEach(()=>{
  vi.clearAllMocks();vi.stubEnv('DATA_ENCRYPTION_KEY','e'.repeat(64));vi.stubEnv('ASSESSMENT_REPORT_ASYNC_ENABLED','true');vi.stubEnv('ASSESSMENT_WHOLE_SUBMIT_ENABLED','true');vi.stubEnv('ASSESSMENT_WHOLE_REQUEST_CONTEXT_REUSE_ENABLED','false')
  clearWholeValidationRulesForTest();mocks.register.mockImplementation(async(_parent,input)=>({acceptedAt:input.acceptedAt,replayed:false,queueDepth:0}));mocks.storage.mockResolvedValue(undefined)
@@ -19,9 +22,10 @@ beforeEach(()=>{
 function fixture(variant=false){
  const rules=[{itemCode:'q1',required:true,values:[1,2]}],definitionHash='d'.repeat(64),sourceHash='e'.repeat(64),compiledHash='c'.repeat(64)
  const items=[0,1].map(index=>({id:`item-${index}`,type:'SCALE',position:index,required:true,scaleId:`scale-${index}`}))
- const composite:any={id:'composite',productKind:'QUESTIONNAIRE',reportPackageKey:null,analysisProtocolKey:null,publishedAt:new Date('2026-10-18T00:00:00Z'),items,formSections:[],trainingVariantDraft:null,trainingVariantFrozen:null,trainingVariantDigest:null}
+ const composite:any={id:'composite',productKind:'QUESTIONNAIRE',reportPackageKey:null,analysisProtocolKey:null,publishedAt:new Date('2026-10-18T00:00:00Z'),items,formSections:[],trainingFlowDraft:null,trainingFlowFrozen:null,trainingFlowDigest:null,trainingVariantDraft:null,trainingVariantFrozen:null,trainingVariantDigest:null}
  const slots=createFrozenActiveSlotSet({schemaVersion:1,runtimeGeneration:'UNIFIED_V1',attemptEpoch:1,slots:[{slotKey:'scale:item-0',unitType:'SCALE',required:true,sourceDefinitionIdentity:{key:'scale-key',version:'1',hash:sourceHash},sourceBinding:{compositeItemId:'item-0',compiledRuntimeHash:compiledHash}}]})
  const parent:any={id:'parent',status:'IN_PROGRESS',runtimeGeneration:'UNIFIED_V1',deliveryMode:'FINAL_ONLY',attemptEpoch:1,asyncReportEpoch:1,participantKey:'user',userId:'user',recoveryTokenHash:null,contextSnapshotHash:null,trainingTimingSnapshot:null,
+  trainingFlowSnapshotEncrypted:null,trainingFlowSnapshotHash:null,trainingFlowPathEncrypted:null,trainingFlowPathHash:null,
   trainingVariantAllocationEncrypted:null,trainingVariantAllocationHash:null,frozenActiveSlotSetEncrypted:encryptFrozenActiveSlotSet(slots),frozenActiveSlotSetHash:slots.snapshotHash,compositeAssessment:composite,
   scaleAssessments:[{id:'scale-child',compositeAttemptId:'parent',compositeItemId:'item-0',attemptEpoch:1,runtimeGeneration:'UNIFIED_V1'}]}
  if(variant){
@@ -41,10 +45,10 @@ function fixture(variant=false){
 }
 const submit=(f:ReturnType<typeof fixture>)=>submitWholeQuestionnaire('parent',f.input,{userId:'user'})
 describe('whole receipt variant authorization before cached rules and replay',()=>{
- it('retains one-header legacy V1 and cached V2 submission paths with all five explicit nulls',async()=>{
+ it('retains one-header legacy V1 and cached V2 submission paths with all twelve explicit nulls',async()=>{
   const f=fixture();await expect(submit(f)).resolves.toMatchObject({status:'ACCEPTED'});f.compact();await expect(submit(f)).resolves.toMatchObject({status:'ACCEPTED'})
   expect(mocks.db.compositeAssessmentAttempt.findUnique).not.toHaveBeenCalled();expect(mocks.register).toHaveBeenCalledTimes(2)
-  const sql=mocks.db.$queryRaw.mock.calls[0][0].join('');for(const field of ['training_variant_allocation_encrypted','training_variant_allocation_hash','training_variant_draft','training_variant_frozen','training_variant_digest'])expect(sql).toContain(field)
+  const sql=mocks.db.$queryRaw.mock.calls[0][0].join('');for(const field of ['training_flow_snapshot_encrypted','training_flow_snapshot_hash','training_flow_path_encrypted','training_flow_path_hash','training_flow_draft','training_flow_frozen','training_flow_digest','training_variant_allocation_encrypted','training_variant_allocation_hash','training_variant_draft','training_variant_frozen','training_variant_digest'])expect(sql).toContain(field)
  })
  it('validates selected allocation once and reuses that graph to reconstruct a cold V2 rule cache',async()=>{
   const f=fixture(true);f.compact();await expect(submit(f)).resolves.toMatchObject({status:'ACCEPTED'})
@@ -56,8 +60,8 @@ describe('whole receipt variant authorization before cached rules and replay',()
   const f=fixture(true);f.compact();f.parent.trainingVariantAllocationHash=f.header.trainingVariantAllocationHash='f'.repeat(64)
   await expect(submit(f)).rejects.toMatchObject({statusCode:403});expect(mocks.register).not.toHaveBeenCalled();expect(mocks.storage).not.toHaveBeenCalled()
  })
- it.each(markerFields)('rejects partial %s before accepting inline V1 answers or writing a receipt',async field=>{
-  const f=fixture();f.header[field]='present';(field.startsWith('trainingVariantAllocation')?f.parent:f.parent.compositeAssessment)[field]='present'
+ it.each(variantMarkerFields)('rejects partial %s before accepting inline V1 answers or writing a receipt',async field=>{
+  const f=fixture();f.header[field]='present';markerOwner(f.parent,field)[field]='present'
   await expect(submit(f)).rejects.toMatchObject({statusCode:403});expect(mocks.db.compositeAssessmentAttempt.findUnique).toHaveBeenCalledTimes(1);expect(mocks.register).not.toHaveBeenCalled();expect(mocks.storage).not.toHaveBeenCalled()
  })
  it('refuses a replay ACK when the frozen allocation disappeared after its prior receipt',async()=>{
@@ -66,7 +70,7 @@ describe('whole receipt variant authorization before cached rules and replay',()
   await expect(submit(f)).rejects.toMatchObject({statusCode:403});expect(mocks.register).not.toHaveBeenCalled()
  })
  it('does not interpret an all-undefined header/full graph as a legacy questionnaire',async()=>{
-  const f=fixture();for(const field of markerFields){delete f.header[field];delete (field.startsWith('trainingVariantAllocation')?f.parent:f.parent.compositeAssessment)[field]}
+  const f=fixture();for(const field of markerFields){delete f.header[field];delete markerOwner(f.parent,field)[field]}
   await expect(submit(f)).rejects.toMatchObject({statusCode:403});expect(mocks.db.compositeAssessmentAttempt.findUnique).toHaveBeenCalledTimes(1);expect(mocks.register).not.toHaveBeenCalled()
  })
 })

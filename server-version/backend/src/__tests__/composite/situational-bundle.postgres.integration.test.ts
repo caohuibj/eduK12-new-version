@@ -679,7 +679,8 @@ suite('Situational Bundle PostgreSQL integration', () => {
       for (const input of rejectedCases) {
         const fixture = await createCompositeFixture(input)
         await expect(compositeService.startUserAttempt(fixture.userId, fixture.compositeId))
-          .rejects.toMatchObject({ statusCode: 400 })
+          .rejects.toMatchObject({ code: 'INSTRUMENT_NOT_AVAILABLE', statusCode: 404 })
+        expect(await db!.compositeAssessmentAttempt.count({ where: { compositeAssessmentId: fixture.compositeId } })).toBe(0)
       }
 
       const publishedFixture = await createCompositeFixture({

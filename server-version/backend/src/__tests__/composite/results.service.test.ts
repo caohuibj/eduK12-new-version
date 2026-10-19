@@ -90,6 +90,12 @@ const makeScaleResult = (input: {
 })
 
 const compositeRow = (overrides: Record<string, unknown> = {}) => ({
+  trainingFlowDraft: null,
+  trainingFlowFrozen: null,
+  trainingFlowDigest: null,
+  trainingVariantDraft: null,
+  trainingVariantFrozen: null,
+  trainingVariantDigest: null,
   id: 'composite-1',
   code: 'C-1',
   name: '综合测评 1',
@@ -110,6 +116,12 @@ const compositeRow = (overrides: Record<string, unknown> = {}) => ({
 })
 
 const attemptRow = (overrides: Record<string, unknown> = {}) => ({
+  trainingFlowSnapshotEncrypted: null,
+  trainingFlowSnapshotHash: null,
+  trainingFlowPathEncrypted: null,
+  trainingFlowPathHash: null,
+  trainingVariantAllocationEncrypted: null,
+  trainingVariantAllocationHash: null,
   id: 'attempt-1',
   status: 'COMPLETED',
   progress: 100,
@@ -125,6 +137,12 @@ const attemptRow = (overrides: Record<string, unknown> = {}) => ({
 })
 
 const completedAttemptForReport = (overrides: Record<string, unknown> = {}) => ({
+  trainingFlowSnapshotEncrypted: null,
+  trainingFlowSnapshotHash: null,
+  trainingFlowPathEncrypted: null,
+  trainingFlowPathHash: null,
+  trainingVariantAllocationEncrypted: null,
+  trainingVariantAllocationHash: null,
   id: 'attempt-1',
   compositeAssessmentId: 'composite-1',
   userId: 'student-1',
@@ -134,6 +152,12 @@ const completedAttemptForReport = (overrides: Record<string, unknown> = {}) => (
   completedAt: new Date('2026-08-20T01:05:00Z'),
   totalTime: 300000,
   compositeAssessment: {
+    trainingFlowDraft: null,
+    trainingFlowFrozen: null,
+    trainingFlowDigest: null,
+    trainingVariantDraft: null,
+    trainingVariantFrozen: null,
+    trainingVariantDigest: null,
     id: 'composite-1',
     name: '综合测评 1',
     items: [
@@ -386,6 +410,12 @@ describe('composite cognitive single-task report', () => {
   it('hides the product index when quality is insufficient', async () => {
     const built = (await buildCompositeReport(completedAttemptForReport({
       compositeAssessment: {
+        trainingFlowDraft: null,
+        trainingFlowFrozen: null,
+        trainingFlowDigest: null,
+        trainingVariantDraft: null,
+        trainingVariantFrozen: null,
+        trainingVariantDigest: null,
         id: 'composite-1',
         name: '综合测评 1',
         items: [{
@@ -422,6 +452,12 @@ describe('composite cognitive single-task report', () => {
   it('renders frozen Chinese labels and the experience caveat', async () => {
     const built = (await buildCompositeReport(completedAttemptForReport({
       compositeAssessment: {
+        trainingFlowDraft: null,
+        trainingFlowFrozen: null,
+        trainingFlowDigest: null,
+        trainingVariantDraft: null,
+        trainingVariantFrozen: null,
+        trainingVariantDigest: null,
         id: 'composite-1',
         name: '综合测评 1',
         items: [{
@@ -482,6 +518,12 @@ describe('composite cognitive single-task report', () => {
     }
     const attempt = completedAttemptForReport({
       compositeAssessment: {
+        trainingFlowDraft: null,
+        trainingFlowFrozen: null,
+        trainingFlowDigest: null,
+        trainingVariantDraft: null,
+        trainingVariantFrozen: null,
+        trainingVariantDigest: null,
         id: 'composite-1',
         name: '综合测评 1',
         items: [{ id: 'item-cog', type: 'COGNITIVE', scale: null, cognitiveAssignment: assignment }],
@@ -528,6 +570,12 @@ describe('collection-only mixed unit reports', () => {
     const scale = { id: 'scale-a', code: 'adexi_v1', name: '量表 A', instrumentVersion: '2.0.0' }
     const internalComposite = (await buildCompositeReport(completedAttemptForReport({
       compositeAssessment: {
+        trainingFlowDraft: null,
+        trainingFlowFrozen: null,
+        trainingFlowDigest: null,
+        trainingVariantDraft: null,
+        trainingVariantFrozen: null,
+        trainingVariantDigest: null,
         id: 'composite-1',
         name: '综合测评 1',
         items: [{ id: 'item-scale-a', type: 'SCALE', scaleId: 'scale-a', scale, cognitiveAssignment: null }],
@@ -549,6 +597,12 @@ describe('collection-only mixed unit reports', () => {
   it('keeps two Scale and two Cognitive slots ordered with zero/null values intact', async () => {
     const built = (await buildCompositeReport(completedAttemptForReport({
       compositeAssessment: {
+        trainingFlowDraft: null,
+        trainingFlowFrozen: null,
+        trainingFlowDigest: null,
+        trainingVariantDraft: null,
+        trainingVariantFrozen: null,
+        trainingVariantDigest: null,
         id: 'composite-1',
         name: '混合容器',
         items: [
