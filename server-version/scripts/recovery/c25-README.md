@@ -297,6 +297,156 @@ python3 server-version/scripts/recovery/c25-http.py \
 
 No command uploads private files, starts CI, pushes, merges or touches production.
 
+## Explicit continuation preparation (separate approval required)
+
+The continuation is a new run identity, not a rewrite or resumption of HTTP01's
+failed receipt. It reuses the stopped, owned HTTP01 database only after a
+separately approved complete reversible archive. The old `overall=false`, raw
+journals, fixture, snapshots, receipts and every other nondata byte remain at
+their original paths. Only the three explicitly approved data roots `pgdata`,
+`uploads` and `exports` may acquire new runtime bytes. HTTP03 and C21 remain
+read-only accepted sources.
+
+`c25-continuation.mjs` embeds its exact Python program rather than modifying any
+of the 72 Python helpers consumed by the reviewed client receipt. Its frozen
+binding includes all tracked recovery source, all embedded programs, the actual
+Python realpath/SHA/version, existing helper closure, Node/PostgreSQL/Redis
+executables and libraries, component inputs/dependencies/generated client/dist,
+and the exact dual producer/client/source/recovery receipt references. Build
+reuse is limited to committed C25 harness changes under the unchanged validator;
+no emit or Prisma generation is needed for this adapter. The new frozen HEAD
+still needs a freshly issued HTTP03 descriptor: source-03 retains its historical
+7f49852a identity and must not bypass the strict current-HEAD assertion.
+
+The prior passing upgrade and prepare/A results are inherited by exact SHA:
+
+- upgrade: `baaa49cbab8351e5da7930667a127746743afb0284695be8e0caf38f8349011f`
+- prepare/A: `e2fac92a430680d0e671df6d890a3ef41b1b3cc2bfb57d5301aa4cbbbb4fc001`
+- failed final snapshot: `4ab9189d33c04e7aae7cd1b80d6e390246672eaa9841b5dac887bbbb1fbcc3b1`
+
+The new receipt lists inherited versus newly executed phases separately. It
+never repeats migration, A FINAL/replay or A drain. Its independent evidence
+root must be a new direct sibling `eduk12_c25_continuation_NN`, not nested inside
+any accepted source, old failure, tool directory, evidence root or Git worktree.
+
+### Recovery point and resource contract
+
+The separately approved archive command is `c25-continuation-archive.mjs`, with
+an absolute `--python`, exact HTTP01 source and exact new destination
+`/tmp/c25-continuation-recovery-01`. It owns the measurement lock and has a
+600-second aggregate deadline (archive child 300 seconds, extraction 180 seconds,
+integrity 60 seconds). All child groups are killed/reaped on timeout or resource
+failure. A 1 GiB hard archive size bound and conservative extraction allocation
+are checked before writing. Archive and verification extraction coexist in the
+independent `/tmp` tmpfs, with at least 512 MiB free there and 2 GiB MemAvailable;
+tmpfs use is included in the memory budget. Workspace admission remains
+8 GiB + 512 MiB, with the unchanged 8 GiB runtime floor.
+
+The archive preserves every data path, file byte/SHA, type, mode, owner/group,
+mtime to nanoseconds, xattr and ACL. Current zero-link topology is explicitly
+validated; any symlink, hardlink, special file, foreign owner or nested mount
+rejects issuance. Full extraction into a new private directory must match every
+entry and stopped PostgreSQL control output, then files/manifests/receipt and
+recovery descriptor are fsynced. Only that newly created verified extraction is
+removed; original raw data is retained. Archive failure material remains private,
+and no failed/partial descriptor can authorize continuation.
+
+The retained archive is a **node-local temporary recovery point**, not a durable
+backup: `/tmp` is tmpfs and is lost on host restart. The compressed archive and
+metadata stay throughout the run. Restoring it requires separate authorization,
+stopped writers and extraction to a fresh directory; never overwrite data in
+place. Nondata evidence is protected by a complete manifest whose traversal
+prunes the three mutable roots before hashing, including while PostgreSQL runs.
+
+Before creating the new working evidence or starting services, the locked
+launcher rechecks the recovery point, HTTP03 full stopped manifest, current
+inputs and workspace >= 8 GiB + 512 MiB. Planning allows <= 300 MiB new workspace
+peak, including one original 52 MB row-evidence copy, one approximately 53 MB
+failed-run full-row baseline and restore/dump outputs. Per-phase row baselines
+are not copied repeatedly. This estimate does not replace sampled floors or
+promise completion with narrow headroom.
+
+### New work and dual full-row preservation
+
+The first read-only database operation requires the complete live 217-table
+snapshot to equal the pinned failed final snapshot, then captures all current
+columns and all **6,582 rows / 17 checkpoints** once. Both immediate startup
+receipt-cleanup tables must have zero rows; otherwise API startup is forbidden.
+The original **6,529 rows / 16 checkpoints** evidence is copied byte-for-byte and
+remains a separate protection layer. All old rows, including A, old published
+scheduled policy, partial old B, jobs, accepted snapshots, checkpoints and shared
+queue singleton, must remain present as full logical-row multisets after each
+phase and at finalization. There are no table/column exemptions, global cleanup
+calls or HTTP reads of old checkpoints.
+
+The new fixture retains A and actor/course identities but removes old B and the
+old scheduled publication from only the new fixture manifest. It prepares one
+new scheduled publication and new B/C/D with a new T0. The fixed replacement SJT
+uses the same synthetic scientific template and teacher-owned image asset,
+creates a new instrument identity through the formal draft/review/admin-publish
+APIs, and creates a new release-specific DISTRIBUTE grant for the existing
+synthetic teacher/course. All release/hash/grant values come from real API
+responses. Old release/grant/asset rows are read-only and compared before/after;
+only new draft rows may transition. No old grant extension, old-release regrant,
+clock change or expiry-dependent fallback is permitted. New grant admission
+requires at least 1,200 seconds on the actual PostgreSQL clock.
+
+New phases, each with an aggregate process-group deadline:
+
+1. continuation-prepare: 300 seconds, new fixture and formal SJT resource only;
+2. scheduled: 600 seconds, original T0+300 natural release contract, shared
+   B/C drain, 180-second submission/drain and 60-second closed matrix budgets,
+   all closed responses before T0+240; real closed/open consumer observations;
+3. guards: 300 seconds, original restricted-role rollback cases;
+4. consumers: 300 seconds, finalize actual scheduled consumer evidence;
+5. restore: 600 seconds, unchanged full C25 restore plus exact full-row equality
+   of every current row and retention of both old baselines.
+
+Baseline/preservation/final audits each have an independent 300-second aggregate
+child deadline. API has the unchanged independent 2,700-second hard lifetime,
+including synchronous audits/binding waits. It starts once and stops normally
+immediately after scheduled, before later audit/guard/restore work. Cleanup first
+ignores/cancels its alarm, then bounded API-first writer shutdown, bounded final
+read-only audit and PostgreSQL shutdown in `finally`. Failed/timeout snapshots
+cannot become PASS. The independent result is
+`c25-continuation-result.json`; HTTP01 remains overall false even if this later
+continuation passes.
+
+Preparation evidence is private under `c25-build-evidence/`:
+`continuation-contract-01` ran 28 Node tests (27 passed, one positive test fixture
+omitted the required `--python` flag) plus seven passing inline Python archive
+contracts. Its complete input copies and equal before/after closure are retained;
+receipt `67d6241cb1bbb4eec7252903ab404674fdd07655d924204cf2a0393ac87341af`.
+Only that test argv was corrected. `continuation-contract-02` reran that one
+previously failed check and passed, receipt
+`f275583c318e517b43917bacf13f591502b7bebcf3696042ad453216697e8f0d`.
+The other 27 Node checks and seven Python checks were not replayed. Both attempts
+verified the existing client's exact 72-file Python closure unchanged. Neither
+attempt created an archive or ran a database, application service or producer.
+
+Prepared commands, only after the corresponding explicit approval. `$PYTHON`
+must be the exact Python command path consumed by the reviewed backend producer
+(`/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3`),
+not merely another alias to the same executable; existing exact argv checks stay
+unchanged:
+
+```sh
+"$NODE" server-version/scripts/recovery/c25-continuation-archive.mjs \
+  --python "$PYTHON" --tools "$TOOLS" --failure-state "$SCRATCH/eduk12_c25_http_01" \
+  --output /tmp/c25-continuation-recovery-01 --expected-head "$HEAD" \
+  --descriptor "$DESCRIPTOR" --expected-descriptor-sha256 "$DESCRIPTOR_SHA"
+"$NODE" server-version/scripts/recovery/c25-continuation.mjs \
+  --python "$PYTHON" --tools "$TOOLS" --failure-state "$SCRATCH/eduk12_c25_http_01" \
+  --state "$SCRATCH/eduk12_c25_continuation_01" --expected-head "$HEAD" \
+  --descriptor "$DESCRIPTOR" --expected-descriptor-sha256 "$DESCRIPTOR_SHA" \
+  --recovery-descriptor "$RECOVERY_DESCRIPTOR" --expected-recovery-sha256 "$RECOVERY_SHA" \
+  --backend-receipt "$BACKEND_RECEIPT" --expected-backend-receipt-sha256 "$BACKEND_SHA" \
+  --frontend-receipt "$FRONTEND_RECEIPT" --expected-frontend-receipt-sha256 "$FRONTEND_SHA"
+```
+
+Pure fault tests are preparation evidence only; neither these commands nor this
+document authorize archive creation, database startup or qualification.
+
 ## Remaining C25 release work
 
 These core scripts do not close C19 missing-only checks: suppressed analysis,
