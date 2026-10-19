@@ -41,6 +41,8 @@ type Ticket={id:string;status:'READY';format:ExportFormat;expiresAt:string;
 const isCompactAttendance=(ticket:Ticket)=>['ATTENDANCE_COMPACT_V1','ATTENDANCE_COMPACT_V2']
   .includes(ticket.manifest.batch?.representation??'')
 type Artifact={id:string;format:ExportFormat;csv:string;codebook:unknown;manifest:unknown}
+type DownloadPart='csv'|'codebook'|'manifest'
+const downloadParts:[DownloadPart,string][]=[['csv','CSV'],['codebook','Codebook'],['manifest','Manifest']]
 const kindOptions:Record<ExportFormat,string>={
   RAW_WAVE:'单波次逐题原始数据',
   RAW_LONG:'全部波次逐题 Long',
@@ -76,8 +78,8 @@ const downloadBlob=(filename:string,value:string,mime:string)=>{
   const url=URL.createObjectURL(blob)
   const anchor=document.createElement('a')
   anchor.href=url;anchor.download=filename
-  document.body.append(anchor);anchor.click();anchor.remove()
-  window.setTimeout(()=>URL.revokeObjectURL(url),3000)
+  try{document.body.append(anchor);anchor.click()}
+  finally{anchor.remove();window.setTimeout(()=>URL.revokeObjectURL(url),3000)}
 }
 export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
   const [overview,setOverview]=useState<Overview|null>(null)
@@ -92,7 +94,8 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
   const [groupItem,setGroupItem]=useState(''),[groupScore,setGroupScore]=useState('')
   const [groupResult,setGroupResult]=useState<GroupResult|null>(null)
   const [format,setFormat]=useState<ExportFormat>('RAW_WAVE'),[waveId,setWaveId]=useState('')
-  const [exportWaveId,setExportWaveId]=useState(''),[batchDownloaded,setBatchDownloaded]=useState(false)
+  const [exportWaveId,setExportWaveId]=useState('')
+  const [downloadsStarted,setDownloadsStarted]=useState<Partial<Record<DownloadPart,boolean>>>({})
   const [completedFrom,setCompletedFrom]=useState(''),[completedBefore,setCompletedBefore]=useState('')
   const [otp,setOtp]=useState(''),[busy,setBusy]=useState(false)
   const [includeFreeText,setIncludeFreeText]=useState(false),[message,setMessage]=useState('')
@@ -105,7 +108,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
   }|null>(null)
   const base='/projects/'+projectId
   const changeWave=(id:string)=>{
-    setWaveId(id);setTicket(null);setBatchDownloaded(false)
+    setWaveId(id);setTicket(null);setDownloadsStarted({})
     setItemStats(null);setPairedScore(null);setGroupResult(null);setGroupItem('');setGroupScore('')
     setBoundedVariables([]);setBoundedItemKey('');setBoundedItem(null)
   }
@@ -145,7 +148,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
       await api(base+'/analytics/quality/attempts/'+row.attemptId,'POST',{
         revision:row.revision,verdict,reason:qualityReason.trim(),
       })
-      setQualityReason('');setTicket(null);setBatchDownloaded(false)
+      setQualityReason('');setTicket(null);setDownloadsStarted({})
       await Promise.all([reload(),loadQuality(qualityPage)])
       setMessage('样本质量决定已记录审计，旧的未下载导出已失效。')
     })
@@ -210,24 +213,32 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
       }:{}),
       ...(cursor?{cursor}:{}),
     })
-    setTicket(result);setBatchDownloaded(false)
+    setTicket(result);setDownloadsStarted({})
     setMessage(isCompactAttendance(result)
       ?'已生成紧凑参与状态表；每人每波次一行。按研究编号及波次关联 FINAL CSV，切勿直接拼接两种 CSV。'
       :'第 '+(result.pageNumber||1)+' 批有效 FINAL 已生成；逐批下载并保留 Manifest。')
   })
-  const download=()=>{if(!ticket)return;void execute(async()=>{
-    const artifact=await api<Artifact>(base+'/exports/'+ticket.id+'/download')
+  const download=(part:DownloadPart)=>{if(!ticket)return;void execute(async()=>{
+    const label=downloadParts.find(([key])=>key===part)![1]
+    let artifact:Artifact
+    try{
+      artifact=await api<Artifact>(base+'/exports/'+ticket.id+'/download')
+      if(artifact.id!==ticket.id||artifact.format!==ticket.format||typeof artifact.csv!=='string'
+        ||!artifact.codebook||typeof artifact.codebook!=='object'||!artifact.manifest||typeof artifact.manifest!=='object')
+        throw new Error('导出回执与当前批次不一致或内容不完整')
+    }catch(e){throw new Error(label+' 内容获取失败，尚未发起本次文件下载。'+(e instanceof Error?e.message:'请重试原批次。'))}
     const batchLabel=String(ticket.pageNumber??1).padStart(3,'0')
     const baseName='survey_'+projectId.slice(0,8)+'_'+artifact.format.toLowerCase()
       +'_batch'+batchLabel+(isCompactAttendance(ticket)
         ?'_attendance':'')+'_'+ticket.id.slice(0,8)
-    downloadBlob(baseName+'.csv','\uFEFF'+artifact.csv,'text/csv;charset=utf-8')
-    downloadBlob(baseName+'_codebook.json',JSON.stringify(artifact.codebook,null,2),'application/json;charset=utf-8')
-    downloadBlob(baseName+'_manifest.json',JSON.stringify(artifact.manifest,null,2),'application/json;charset=utf-8')
-    setBatchDownloaded(true)
-    setMessage(isCompactAttendance(ticket)
-      ?'已下载参与状态 CSV 和 Manifest；按状态表 research_code / wave_id 对应 FINAL 的 research_code_or_attempt / wave_id 关联，不能直接拼接行。'
-      :'已下载当前批次 CSV、变量编码字典和 Manifest，请保管敏感数据。')
+    const filename=baseName+(part==='csv'?'.csv':'_'+part+'.json')
+    try{
+      downloadBlob(filename,part==='csv'?'\uFEFF'+artifact.csv:
+        JSON.stringify(part==='codebook'?artifact.codebook:artifact.manifest,null,2),
+      part==='csv'?'text/csv;charset=utf-8':'application/json;charset=utf-8')
+    }catch{throw new Error(label+' 下载发起结果未确认，请先核对浏览器下载列表，再重试此文件。')}
+    setDownloadsStarted(previous=>({...previous,[part]:true}))
+    setMessage('已发起 '+filename+' 下载。请在浏览器下载列表核对是否保存；网页无法确认文件已落盘。若被取消或拦截，请重试此文件。')
   })}
   return <section className="border rounded-xl bg-white p-4 sm:p-6 my-5 space-y-4" aria-label="研究数据">
     <header><h2 className="text-xl font-semibold">研究数据 · Wave Analytics</h2>
@@ -487,11 +498,16 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
           <p className="text-xs">到期：{new Date(ticket.expiresAt).toLocaleString('zh-CN')}</p>
           {isCompactAttendance(ticket)&&
             <p className="text-xs text-amber-800">本批为独立参与状态表，不是逐题答案；请保留 Manifest 的关联说明。</p>}
-          <button type="button" className="btn-secondary" disabled={busy} onClick={download}>
-            下载当前批次 CSV、Codebook 与 Manifest</button>
+          <p className="text-xs">本批提供 3 个独立文件：CSV、变量编码字典 Codebook、Manifest。逐个点击下载；浏览器可能要求许可或选择保存位置。</p>
+          <div className="flex flex-wrap gap-2">{downloadParts.map(([part,label])=><div key={part}>
+            <button type="button" className="btn-secondary" disabled={busy} onClick={()=>download(part)}>
+              {downloadsStarted[part]?'重新发起 ':'下载 '}{label}</button>
+            <p className="text-xs">{label}：{downloadsStarted[part]?'已发起，请核对保存':'尚未发起'}</p>
+          </div>)}</div>
           {ticket.nextCursor&&<button className="btn-secondary" type="button"
-            disabled={busy||!batchDownloaded} onClick={()=>createExport(ticket.nextCursor!)}>
-            当前批次已下载，生成下一批</button>}
+            disabled={busy||!downloadParts.every(([part])=>downloadsStarted[part])} onClick={()=>createExport(ticket.nextCursor!)}>
+            生成下一批（请先核对本批文件）</button>}
+          {ticket.nextCursor&&<p className="text-xs">三个文件均发起后可继续。发起不等于保存成功；继续前请自行核对本批文件，取消或失败时先重试相应文件。</p>}
           {ticket.nextCursor&&<p className="text-xs">分批数据以同一时间水位和研究修订版本固定样本范围；
             FINAL 页可合并，独立参与状态页按研究编号与波次关联；不要将两类 CSV 直接拼接。</p>}
         </div>}

@@ -31,6 +31,7 @@ let requests:Request[]
 let blobs:Blob[]
 let downloads:Download[]
 let artifact:{id:string;format:string;csv:string;codebook:unknown;manifest:unknown}
+let downloadReply:(()=>Promise<Response>)|undefined
 
 const readBytes=(blob:Blob)=>new Promise<Uint8Array>((resolve,reject)=>{
   const reader=new FileReader()
@@ -40,7 +41,8 @@ const readBytes=(blob:Blob)=>new Promise<Uint8Array>((resolve,reject)=>{
 })
 
 beforeEach(()=>{
-  requests=[];blobs=[];downloads=[];responseTicket=structuredClone(ticket)
+  requests=[];blobs=[];downloads=[];responseTicket=structuredClone(ticket);downloadReply=undefined
+  artifact={id:ticketId,format:'RAW_WAVE',csv:csvHeader+ordinaryRows,codebook,manifest:ticket.manifest}
   // Keep the real DOM Blob and FileReader; only the browser's URL/download
   // boundary is mocked so the test can inspect actual encoded file contents.
   vi.stubGlobal('URL',class extends URL {
@@ -67,7 +69,7 @@ beforeEach(()=>{
     if(url===base+'/analytics/quality/attempts?page=1'&&method==='GET')return response({list:[]})
     if(url===base+'/analytics/waves/'+waveId+'/items')return response({waveId,items:[],note:'仅为描述',completedFinals:3,fullCompletionAttempts:2,earlyCompletionAttempts:1,descriptiveScores:[{instrumentKey:'cog',scoreKey:'goMedianRtMs',validN:2,mean:320,sampleSd:20,unit:'ms',qualityCounts:{interpretable:1,limited:1},completionCounts:{COMPLETE:2},provenance:{kind:'COGNITIVE',measurementDigest:'digest-frozen',scoringVersion:'1.0.0',engineVersion:'1.0.0',timingPolicy:'software-frame-v1'}}]})
     if(url===base+'/exports'&&method==='POST')return response(responseTicket)
-    if(url===base+'/exports/'+ticketId+'/download'&&method==='GET')return response(artifact)
+    if(url===base+'/exports/'+ticketId+'/download'&&method==='GET')return downloadReply?downloadReply():response(artifact)
     throw new Error('Unexpected request '+method+' '+url)
   }))
 })
@@ -87,8 +89,17 @@ describe('Survey analytics artifact downloads',()=>{
     fireEvent.click(await screen.findByRole('button',{name:'创建受控导出'}))
     expect(await screen.findByText(/已生成紧凑参与状态表/)).toBeInTheDocument()
     expect(screen.getByText(/本批为独立参与状态表/)).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button',{name:'下载当前批次 CSV、Codebook 与 Manifest'}))
-    await screen.findByText(/已下载参与状态 CSV 和 Manifest/)
+    for(const label of ['CSV','Codebook','Manifest']){
+      fireEvent.click(screen.getByRole('button',{name:'下载 '+label}))
+      await screen.findByRole('button',{name:'重新发起 '+label})
+    }
+    expect(downloads).toHaveLength(3)
+    expect(downloads.map(d=>d.filename)).toEqual([
+      'survey_abcdef01_raw_wave_batch007_attendance_export01.csv',
+      'survey_abcdef01_raw_wave_batch007_attendance_export01_codebook.json',
+      'survey_abcdef01_raw_wave_batch007_attendance_export01_manifest.json',
+    ])
+    expect(screen.getByRole('status')).toHaveTextContent('网页无法确认文件已落盘')
     expect(downloads[0].filename).toBe('survey_abcdef01_raw_wave_batch007_attendance_export01.csv')
     const bytes=await readBytes(blobs[0])
     expect([...bytes.slice(3)]).toEqual([...new TextEncoder().encode(artifact.csv)])
@@ -108,7 +119,7 @@ describe('Survey analytics artifact downloads',()=>{
     fireEvent.change(screen.getByLabelText('数据格式'),{target:{value:'COGNITIVE_TRIAL_LONG'}})
     expect(screen.queryByRole('checkbox',{name:/包含自由文本原始回答/})).toBeNull()
     fireEvent.click(screen.getByRole('button',{name:'创建受控导出'}))
-    await screen.findByRole('button',{name:'下载当前批次 CSV、Codebook 与 Manifest'})
+    await screen.findByRole('button',{name:'下载 CSV'})
     expect(requests.filter(r=>r.url===base+'/exports')[0].body).toEqual({format:'COGNITIVE_TRIAL_LONG',waveId})
     expect(screen.getByText(/认知试次按行与字节预算分批导出/)).toBeInTheDocument()
   })
@@ -130,9 +141,9 @@ describe('Survey analytics artifact downloads',()=>{
       expect(freeText).toBeChecked()
     }
     fireEvent.click(create)
-    const download=await screen.findByRole('button',{name:'下载当前批次 CSV、Codebook 与 Manifest'})
+    const download=await screen.findByRole('button',{name:'下载 CSV'})
     await waitFor(()=>expect(download).toBeEnabled())
-    const nextPage=screen.getByRole('button',{name:'当前批次已下载，生成下一批'})
+    const nextPage=screen.getByRole('button',{name:'生成下一批（请先核对本批文件）'})
     expect(nextPage).toBeDisabled()
     const exportRequests=()=>requests.filter(r=>r.url===base+'/exports')
     expect(exportRequests()).toEqual([{url:base+'/exports',method:'POST',
@@ -140,12 +151,20 @@ describe('Survey analytics artifact downloads',()=>{
     }])
 
     fireEvent.click(download)
-    await screen.findByText('已下载当前批次 CSV、变量编码字典和 Manifest，请保管敏感数据。')
-    expect(nextPage).toBeEnabled()
+    await screen.findByRole('button',{name:'重新发起 CSV'})
+    expect(downloads).toHaveLength(1)
+    expect(nextPage).toBeDisabled()
+    expect(screen.getByRole('status')).toHaveTextContent('请在浏览器下载列表核对是否保存')
     expect(exportRequests()).toHaveLength(1)
     expect(requests.filter(r=>r.url.endsWith('/download'))).toEqual([{
       url:base+'/exports/'+ticketId+'/download',method:'GET',body:undefined,
     }])
+    for(const label of ['Codebook','Manifest']){
+      fireEvent.click(screen.getByRole('button',{name:'下载 '+label}))
+      await screen.findByRole('button',{name:'重新发起 '+label})
+    }
+    expect(nextPage).toBeEnabled()
+    expect(requests.filter(r=>r.url.endsWith('/download'))).toHaveLength(3)
     expect(downloads).toEqual([
       {filename:baseName+'.csv',url:'blob:survey-download-1',attached:true},
       {filename:baseName+'_codebook.json',url:'blob:survey-download-2',attached:true},
@@ -168,5 +187,67 @@ describe('Survey analytics artifact downloads',()=>{
     expect(JSON.parse(new TextDecoder().decode(codebookBytes))).toEqual(codebook)
     expect(JSON.parse(new TextDecoder().decode(manifestBytes))).toEqual(manifest)
     expect(exportRequests()).toHaveLength(1)
+  })
+
+  it.each(['network','non-json',403,404,409,429])('keeps the original ticket after %s read failure and retries only the selected file',async failure=>{
+    downloadReply=()=>failure==='network'?Promise.reject(new Error('synthetic connection lost')):
+      failure==='non-json'?Promise.resolve(new Response('<html>synthetic failure</html>',{status:200})):
+      Promise.resolve(new Response(JSON.stringify({code:-1,message:'synthetic rejection '+failure,data:null}),{status:Number(failure)}))
+    render(<SurveyAnalyticsWorkspace projectId={projectId}/>)
+    fireEvent.click(await screen.findByRole('button',{name:'创建受控导出'}))
+    fireEvent.click(await screen.findByRole('button',{name:'下载 Codebook'}))
+    expect(await screen.findByRole('alert')).toHaveTextContent('Codebook 内容获取失败，尚未发起本次文件下载')
+    expect(downloads).toHaveLength(0)
+    expect(screen.getByText('Codebook：尚未发起')).toBeInTheDocument()
+    expect(requests.filter(r=>r.method==='POST'&&r.url===base+'/exports')).toHaveLength(1)
+    downloadReply=undefined
+    fireEvent.click(screen.getByRole('button',{name:'下载 Codebook'}))
+    await screen.findByRole('button',{name:'重新发起 Codebook'})
+    expect(downloads.map(d=>d.filename)).toEqual([baseName+'_codebook.json'])
+    expect(requests.filter(r=>r.url.endsWith('/download'))).toHaveLength(2)
+    expect(requests.filter(r=>r.method==='POST'&&r.url===base+'/exports')).toHaveLength(1)
+    expect(screen.getByRole('button',{name:'生成下一批（请先核对本批文件）'})).toBeDisabled()
+  })
+
+  it('does not launch a file from a mismatched export receipt',async()=>{
+    artifact={...artifact,id:'different-ticket'}
+    render(<SurveyAnalyticsWorkspace projectId={projectId}/>)
+    fireEvent.click(await screen.findByRole('button',{name:'创建受控导出'}))
+    fireEvent.click(await screen.findByRole('button',{name:'下载 CSV'}))
+    expect(await screen.findByRole('alert')).toHaveTextContent('导出回执与当前批次不一致或内容不完整')
+    expect(blobs).toHaveLength(0)
+    expect(screen.queryByRole('button',{name:'重新发起 CSV'})).toBeNull()
+  })
+
+  it('clears per-file launch status when creating a different format without automatically fetching files',async()=>{
+    render(<SurveyAnalyticsWorkspace projectId={projectId}/>)
+    fireEvent.click(await screen.findByRole('button',{name:'创建受控导出'}))
+    fireEvent.click(await screen.findByRole('button',{name:'下载 CSV'}))
+    await screen.findByRole('button',{name:'重新发起 CSV'})
+    fireEvent.change(screen.getByLabelText('数据格式'),{target:{value:'COGNITIVE_TRIAL_LONG'}})
+    expect(screen.queryByRole('button',{name:'重新发起 CSV'})).toBeNull()
+    responseTicket={...ticket,format:'COGNITIVE_TRIAL_LONG'}
+    fireEvent.click(screen.getByRole('button',{name:'创建受控导出'}))
+    await screen.findByRole('button',{name:'下载 CSV'})
+    expect(screen.getByText('CSV：尚未发起')).toBeInTheDocument()
+    expect(screen.getByRole('button',{name:'生成下一批（请先核对本批文件）'})).toBeDisabled()
+    expect(downloads).toHaveLength(1)
+    expect(requests.filter(r=>r.url.endsWith('/download'))).toHaveLength(1)
+  })
+
+  it('cleans a failed browser launch and allows an explicit original-file retry without false saved status',async()=>{
+    vi.mocked(HTMLAnchorElement.prototype.click).mockImplementationOnce(()=>{throw new Error('synthetic browser launch failure')})
+    render(<SurveyAnalyticsWorkspace projectId={projectId}/>)
+    fireEvent.click(await screen.findByRole('button',{name:'创建受控导出'}))
+    fireEvent.click(await screen.findByRole('button',{name:'下载 CSV'}))
+    expect(await screen.findByRole('alert')).toHaveTextContent('下载发起结果未确认')
+    expect(document.querySelectorAll('a[download]')).toHaveLength(0)
+    expect(vi.mocked(window.setTimeout)).toHaveBeenCalledWith(expect.any(Function),3000)
+    expect(screen.queryByRole('button',{name:'重新发起 CSV'})).toBeNull()
+    fireEvent.click(screen.getByRole('button',{name:'下载 CSV'}))
+    await screen.findByRole('button',{name:'重新发起 CSV'})
+    expect(downloads).toHaveLength(1)
+    expect(requests.filter(r=>r.method==='POST'&&r.url===base+'/exports')).toHaveLength(1)
+    expect(screen.getByRole('status')).toHaveTextContent('网页无法确认文件已落盘')
   })
 })
