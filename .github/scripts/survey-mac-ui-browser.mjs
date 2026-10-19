@@ -30,9 +30,11 @@ const form={id:'form',projectId:id,title:'合成表单',kind:'FORM',instrumentKe
 const csv='"trial","value"\r\n"1","合成数据"\r\n';
 const emptyBody=(method,body)=>{assert.equal(method,'GET');assert.equal(body,undefined);};
 
-async function scene(mode,width=1440){
+async function scene(mode,width=1440,{recovery=false}={}){
  const ctx=await browser.newContext({viewport:{width,height:1000},reducedMotion:'reduce',serviceWorkers:'block',ignoreHTTPSErrors:true,acceptDownloads:true});
- contexts.push(ctx);const page=await ctx.newPage();lastPage=page;page.setDefaultTimeout(12000);
+ contexts.push(ctx);const page=await ctx.newPage();lastPage=page;
+ if(recovery)await page.clock.install({time:new Date('2032-01-02T03:04:04.000Z')});
+ page.setDefaultTimeout(12000);
  const s={calls:[],errors:[],posts:[],reads:[],downloads:[],tickets:new Map(),serial:0,readMode:null,postMode:null,delay:null,cutoff:'2031-12-31T23:59:59.000Z',revision:7};
  page.on('pageerror',e=>s.errors.push(e.message));
  await ctx.route('**/*',async route=>{
@@ -104,8 +106,8 @@ async function checkLayout(page,name,width){
  await page.screenshot({path:`${E}/screenshots/${engine}-${name}-${width}.png`,fullPage:false});
  records.push({name,width,wcag:result});
 }
-async function openResearch(width=1440){
- const v=await scene('researcher',width);await v.page.goto(survey+'/workspace');
+async function openResearch(width=1440,{recovery=false}={}){
+ const v=await scene('researcher',width,{recovery});await v.page.goto(survey+'/workspace');
  await v.page.getByRole('button',{name:'查看/编辑',exact:true}).click();
  await v.page.getByRole('tab',{name:'研究数据',exact:true}).click();
  const exportPanel=v.page.getByRole('heading',{name:'匿名科研数据导出',exact:true}).locator('..');
@@ -117,8 +119,7 @@ async function openResearch(width=1440){
  return v;
 }
 async function openRecovery(){
- const v=await openResearch();
- await v.page.clock.install({time:new Date('2032-01-02T03:04:04.000Z')});
+ const v=await openResearch(1440,{recovery:true});
  const now=await v.page.evaluate(()=>Date.now());
  await v.page.clock.pauseAt(new Date(Math.ceil((now+1000)/1000)*1000));
  return v;
