@@ -312,6 +312,7 @@ describe('Training inactive-age entry', () => {
     const request = vi.fn(async (_name: string, _options: LockOptions, callback: (lock: unknown) => Promise<void>) => callback({}))
     Object.defineProperty(navigator, 'locks', { configurable: true, value: { request } })
     const now = Date.now()
+    const clock = vi.spyOn(Date, 'now').mockReturnValue(now)
     const trainingSession: CognitiveSession = { ...session, sessionId: 'training-inactive-expired',
       deliveryMode: 'FINAL_ONLY', definitionHash: 'definition', attemptEpoch: 1, sessionEpoch: 1,
       trainingPersistence: { snapshotHash: 'policy', attemptId: 'inactive-parent', attemptEpoch: 1,
@@ -322,17 +323,51 @@ describe('Training inactive-age entry', () => {
     await finalDraftStore.ensure(createFinalDraftMeta({ draftKey: key, instrument: 'cognitive', attemptId: trainingSession.sessionId,
       attemptEpoch: 1, definitionHash: 'definition', contextSnapshotHash: null, deliveryMode: 'final_only', submissionId: 'old', trainingRetention: retention }))
     await finalDraftStore.putTrial({ draftKey: key, trialIndex: 0, payload: 'old-response', createdAt: now })
-    const clock = vi.spyOn(Date, 'now').mockReturnValue(now + 3600001)
+    clock.mockReturnValue(now + 3600001)
+    const ensure = vi.spyOn(finalDraftStore, 'ensure')
+    const remove = vi.spyOn(finalDraftStore, 'delete')
+    const putTrial = vi.spyOn(finalDraftStore, 'putTrial')
+    const seal = vi.spyOn(finalDraftStore, 'sealForSubmission')
     try {
-      const finalApi = { ...api, getSession: vi.fn().mockResolvedValue({ code: 0, data: trainingSession }), submitFinal: vi.fn() }
-      const { result, unmount } = renderHook(() => useCognitiveSession(trainingSession.sessionId, finalApi))
-      await waitFor(() => expect(result.current.state.status).toBe('ERROR'))
+      const finalApi = { ...api, getSession: vi.fn().mockResolvedValue({ code: 0, data: trainingSession }), submitFinal: vi.fn(), restartSession: vi.fn() }
+      const statuses: string[] = []
+      const { result, unmount } = renderHook(() => {
+        const controller = useCognitiveSession(trainingSession.sessionId, finalApi)
+        statuses.push(controller.state.status)
+        return controller
+      })
+      await waitFor(() => expect(result.current.state.status).toBe('RECOVERY_REQUIRED'))
+      expect(result.current.state.error?.code).toBe('FINAL_DRAFT_EXPIRED')
+      expect(result.current.state.session).toEqual(trainingSession)
+      expect(result.current.state.taskContext).toBeNull()
       expect((await finalDraftStore.get(key))?.trainingRetention?.expiredAt).toBe(now + 3600001)
       expect(await finalDraftStore.listTrials(key)).toEqual([])
+
+      // Neither stale task callbacks nor another read may resurrect trial zero.
+      await act(async () => {
+        result.current.start()
+        expect(await result.current.appendTrial({ response: 'new-response' })).toBe(false)
+        await result.current.complete()
+        await expect(result.current.restart()).rejects.toThrow('请返回上层综合测评')
+      })
+      act(() => result.current.reload())
+      await waitFor(() => {
+        expect(ensure).toHaveBeenCalledTimes(2)
+        expect(result.current.state.status).toBe('RECOVERY_REQUIRED')
+      })
+      expect(statuses).not.toContain('READY')
+      expect(statuses).not.toContain('RUNNING')
+      expect(putTrial).not.toHaveBeenCalled()
+      expect(seal).not.toHaveBeenCalled()
+      expect(remove).not.toHaveBeenCalled()
       expect(finalApi.submitFinal).not.toHaveBeenCalled()
+      expect(finalApi.restartSession).not.toHaveBeenCalled()
+      expect((await finalDraftStore.get(key))?.trainingRetention?.expiredAt).toBe(now + 3600001)
+      expect(await finalDraftStore.listTrials(key)).toEqual([])
       expect(request.mock.calls[0][1]).toMatchObject({ mode: 'exclusive', ifAvailable: true })
       unmount()
     } finally {
+      ensure.mockRestore(); remove.mockRestore(); putTrial.mockRestore(); seal.mockRestore()
       clock.mockRestore()
       if (original) Object.defineProperty(navigator, 'locks', original); else Reflect.deleteProperty(navigator, 'locks')
     }

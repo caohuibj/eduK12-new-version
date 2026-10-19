@@ -49,6 +49,7 @@ export interface FinalCompositeAssessmentProps {
   onEnterCognitive: (item: CompositeCurrentItem) => void
   onEnterSituational: (item: CompositeCurrentItem) => void
   onRestart?: () => Promise<void> | void
+  cognitiveRecovery?: { reason: 'LOCAL_DRAFT_EXPIRED'; restarting: boolean; restartError: string | null }
   /** School-only canonical Run transport; the legacy API remains unchanged. */
   campusMode?: boolean
   campusVideoLoader?: (path:string)=>Promise<import('../modules/assessment-media/types').AssessmentVideoCapabilitySources>
@@ -78,8 +79,9 @@ const responseError = (response: ApiResponse<unknown>) => {
   return error
 }
 
-const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ state, publicMode = false, recoveryToken, submitFormSection, submitScale, onReload, onExit, onCompleted, onEnterCognitive, onEnterSituational, onRestart, campusMode=false, campusVideoLoader }) => {
+const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ state, publicMode = false, recoveryToken, submitFormSection, submitScale, onReload, onExit, onCompleted, onEnterCognitive, onEnterSituational, onRestart, cognitiveRecovery, campusMode=false, campusVideoLoader }) => {
   const item = state.currentItem
+  const expiredCognitive = item?.type === 'COGNITIVE' && cognitiveRecovery?.reason === 'LOCAL_DRAFT_EXPIRED'
   const [sectionIndex, setSectionIndex] = useState(0)
   const timingRef=useRef<SurveyScaleTimingTracker|null>(null)
   const [scaleIndex, setScaleIndex] = useState(0)
@@ -477,7 +479,9 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
         : meta?.status === 'COMPLETED'
           ? { state: 'committed' as const, message: '服务器已确认当前单元的权威结果。' }
           : { state: 'ready' as const }
-  const recoveryState = requiresRestart || meta?.status === 'CONFLICT'
+  const recoveryState = expiredCognitive
+    ? { state: 'blocked' as const, message: '当前认知任务的本机试次草稿已过期，不能继续原试次。' }
+    : requiresRestart || meta?.status === 'CONFLICT'
     ? { state: 'blocked' as const, message: '本地草稿已保留。当前测评版本已变化，需要重启后继续。' }
     : { state: 'none' as const }
   const formFields = item?.type === 'FORM_SECTION'
@@ -496,14 +500,15 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
         <div className="space-y-2">
           {state.instruction ? <p>{state.instruction}</p> : null}
           <p>当前单元：{currentUnit?.label || item?.type || '—'}</p>
-          <p>{contextText} 浏览器重开后可以继续恢复。</p>
+          {expiredCognitive ? <p>请先处理本机认知试次过期状态，已接受的单元记录不受影响。</p>
+            : <p>{contextText} 浏览器重开后可以继续恢复。</p>}
         </div>
       )}
       progress={{ kind: 'count', completed: state.completedItems, total: state.totalItems, label: '综合测评单元进度' }}
       submissionStatus={submissionStatus}
       recoveryState={recoveryState}
       actions={(
-        <button type="button" onClick={() => void saveAndExit()} disabled={exiting || submitting || checkpointBusy} className="btn-secondary min-h-11">
+        <button type="button" onClick={() => void saveAndExit()} disabled={exiting || submitting || checkpointBusy || cognitiveRecovery?.restarting} className="btn-secondary min-h-11">
           <Save className="mr-1 inline h-4 w-4" />{exiting ? '正在保存…' : '保存并退出'}
         </button>
       )}
@@ -540,20 +545,19 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
         activeSlotKeys={(state.units||state.items).filter(unit=>!unit.completed).map(unit=>unit.type==='FORM_SECTION'?`form-section:${'formSectionId' in unit ? unit.formSectionId || unit.id : unit.id}`:`${unit.type.toLowerCase()}:${unit.id}`)}
         getDrafts={async()=>{await flushLocalSaves();const stored=await finalDraftStore.listAnswers(draftKey);return [{slotKey:sectionId?`form-section:${sectionId}`:`scale:${item.id}`,answers:Object.fromEntries(stored.map(row=>[row.itemKey,row.value])),...(timingRef.current?{itemTimings:timingRef.current.snapshot()}: {})}]}}
         restore={async rows=>{
-          await flushLocalSaves();const currentMeta=await finalDraftStore.get(draftKey)
-          if(currentMeta?.status!=='DRAFT'||currentMeta.sealedSubmission)throw new Error('本机草稿已封存，不能替换。')
-          const row=rows.find(row=>row.slotKey===(sectionId?`form-section:${sectionId}`:`scale:${item.id}`))
-          if(!row)throw new Error('服务器没有当前未提交单元的草稿，本机内容保持不变。')
-          const old=await finalDraftStore.listAnswers(draftKey)
-          const nextForm=sectionId?sanitizeTrainingFormValues((item.formAnswers||item.answers||[]) as any[],row.answers as Record<string,FormValue>):{}
-          const values=sectionId?nextForm:row.answers
-          try{for(const [itemKey,value]of Object.entries(values))await finalDraftStore.putAnswer({draftKey,itemKey,value,updatedAt:Date.now()});await finalDraftStore.deleteAnswers(draftKey,old.filter(answer=>!Object.prototype.hasOwnProperty.call(values,answer.itemKey)).map(answer=>answer.itemKey))}
-          catch(cause){for(const answer of old)await finalDraftStore.putAnswer(answer);throw cause}
-          if(sectionId){formValuesRef.current=nextForm;setFormValues(nextForm);setSectionIndex(0)}else{
-            const nextScale=Object.fromEntries(Object.entries(values).map(([key,value])=>[key,typeof value==='object'&&value!==null&&'responseValue' in value?value.responseValue as ResponseValue:value as ResponseValue]))
-            setScaleValues(nextScale);setScaleIndex(0)
-            if(item.trainingTiming){timingRef.current=new SurveyScaleTimingTracker(row.itemTimings??{},nextScale);await finalDraftStore.setInstrumentMetadata(draftKey,{trainingScaleTiming:{snapshotHash:item.trainingTiming.snapshotHash,items:timingRef.current.snapshot()}})}
-          }
+          await flushLocalSaves()
+          const row = rows.find(row => row.slotKey === (sectionId ? `form-section:${sectionId}` : `scale:${item.id}`))
+          if (!row) throw new Error('服务器没有当前未提交单元的草稿，本机内容保持不变。')
+          const nextForm = sectionId ? sanitizeTrainingFormValues((item.formAnswers || item.answers || []) as any[], row.answers as Record<string, FormValue>) : {}
+          const values = sectionId ? nextForm : row.answers
+          const nextScale = sectionId ? {} : Object.fromEntries(Object.entries(values).map(([key, value]) => [key,
+            typeof value === 'object' && value !== null && 'responseValue' in value ? value.responseValue as ResponseValue : value as ResponseValue]))
+          const nextTiming = !sectionId && item.trainingTiming ? new SurveyScaleTimingTracker(row.itemTimings ?? {}, nextScale) : null
+          const timingMetadata = nextTiming ? { trainingScaleTiming: { snapshotHash: item.trainingTiming!.snapshotHash, items: nextTiming.snapshot() } } : undefined
+          await finalDraftStore.replaceAnswers(meta, Object.entries(values).map(([itemKey, value]) => ({ draftKey, itemKey, value, updatedAt: Date.now() })), timingMetadata)
+          // Do not publish recovered values or timer refs until durable commit.
+          if (sectionId) { formValuesRef.current = nextForm; setFormValues(nextForm); setSectionIndex(0) }
+          else { timingRef.current = nextTiming; setScaleValues(nextScale); setScaleIndex(0) }
         }}/>:null}
       {error ? <p role="alert" className="mb-4 text-sm text-red-600">{error}</p> : null}
       {requiresRestart && onRestart ? (
@@ -569,8 +573,15 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
       {item?.type === 'COGNITIVE' ? (
         <div className="card p-8 text-center">
           <h2 className="mb-3 text-xl font-semibold">{currentUnit?.label || '认知任务'}</h2>
-          <p className="mb-6 text-gray-600">认知测验会逐试次写入本地，完成时一次提交全部试次。</p>
-          <button type="button" onClick={() => onEnterCognitive(item)} className="btn-primary min-h-11">开始/继续认知任务</button>
+          {expiredCognitive ? <>
+            <p className="mb-4 text-gray-600">可请求服务器重启整份测评；是否允许重启由服务器核对。获准后会创建新的整份作答并计入作答次数。已接受的作答记录会保留，旧认知草稿不会重新开始计时。</p>
+            {cognitiveRecovery.restartError ? <p role="alert" className="mb-4 text-red-600">{cognitiveRecovery.restartError} 请联系老师核对本次记录并处理恢复，不要再次进入已过期的认知任务。</p>
+              : onRestart ? <button type="button" onClick={() => void onRestart()} disabled={cognitiveRecovery.restarting} className="btn-primary min-h-11">{cognitiveRecovery.restarting ? '正在请求重启…' : '请求重启整份测评'}</button>
+                : <p role="alert">当前入口不能重启整份测评，请联系老师处理恢复。</p>}
+          </> : <>
+            <p className="mb-6 text-gray-600">认知测验会逐试次写入本地，完成时一次提交全部试次。</p>
+            <button type="button" onClick={() => onEnterCognitive(item)} className="btn-primary min-h-11">开始/继续认知任务</button>
+          </>}
         </div>
       ) : null}
 

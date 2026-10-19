@@ -248,17 +248,22 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
       getDrafts={async()=>{await flush();return definition.units.map(unit=>({slotKey:`scale:${unit.itemId}`,answers:Object.fromEntries(unit.scale.definition!.items.filter(q=>answers[wholeAnswerKey(unit.itemId,q.itemCode)]!==undefined).map(q=>[q.itemCode,answers[wholeAnswerKey(unit.itemId,q.itemCode)]])),...(timingRef.current[unit.itemId]?{itemTimings:timingRef.current[unit.itemId].snapshot()}: {})}))}}
       restore={async rows=>{
         await flush()
-        const currentMeta=await finalDraftStore.get(draftKey)
-        if(currentMeta?.status!=='DRAFT'||currentMeta.sealedSubmission)throw new Error('本机草稿已封存，不能替换。')
-        const next:Record<string,Answer>={}
-        for(const unit of definition.units){const row=rows.find(row=>row.slotKey===`scale:${unit.itemId}`);if(!row)continue
-          for(const q of unit.scale.definition!.items)if(Object.prototype.hasOwnProperty.call(row.answers,q.itemCode))next[wholeAnswerKey(unit.itemId,q.itemCode)]=readAnswer(row.answers[q.itemCode])
-          if(unit.trainingTiming)timingRef.current[unit.itemId]=new SurveyScaleTimingTracker(row.itemTimings??{},Object.fromEntries(Object.entries(row.answers).map(([key,value])=>[key,readAnswer(value).responseValue])))
+        const next: Record<string, Answer> = {}
+        const nextTiming: Record<string, SurveyScaleTimingTracker> = {}
+        for (const unit of definition.units) {
+          const row = rows.find(row => row.slotKey === `scale:${unit.itemId}`)
+          // This is one logical whole-draft replacement. A partial server
+          // checkpoint cannot authorize discarding the other local units.
+          if (!row) throw new Error('服务器整卷草稿不完整，本机内容保持不变。')
+          for (const q of unit.scale.definition!.items) if (Object.prototype.hasOwnProperty.call(row.answers, q.itemCode)) next[wholeAnswerKey(unit.itemId, q.itemCode)] = readAnswer(row.answers[q.itemCode])
+          if (unit.trainingTiming) nextTiming[unit.itemId] = new SurveyScaleTimingTracker(row.itemTimings ?? {}, Object.fromEntries(Object.entries(row.answers).map(([key, value]) => [key, readAnswer(value).responseValue])))
         }
-        const old=await finalDraftStore.listAnswers(draftKey)
-        try{for(const [itemKey,value]of Object.entries(next))await finalDraftStore.putAnswer({draftKey,itemKey,value,updatedAt:Date.now()});await finalDraftStore.deleteAnswers(draftKey,old.filter(row=>!Object.prototype.hasOwnProperty.call(next,row.itemKey)).map(row=>row.itemKey));await finalDraftStore.setInstrumentMetadata(draftKey,{wholeScaleTiming:timingMetadata()})}
-        catch(cause){for(const row of old)await finalDraftStore.putAnswer(row);throw cause}
-        setAnswers(next);setIndex(0)
+        const wholeScaleTiming = Object.fromEntries(definition.units.filter(unit => unit.trainingTiming).map(unit => [unit.itemId,
+          { snapshotHash: unit.trainingTiming!.snapshotHash, items: nextTiming[unit.itemId].snapshot() }]))
+        await finalDraftStore.replaceAnswers(meta, Object.entries(next).map(([itemKey, value]) => ({ draftKey, itemKey, value, updatedAt: Date.now() })), { wholeScaleTiming })
+        // Every unit's answers and timing committed together before UI/ref changes.
+        timingRef.current = nextTiming
+        setAnswers(next); setIndex(0)
       }}/>:null}
     {error ? <p role="alert" className="mb-4 text-red-700">{error}</p> : null}
     {publicMode && recoveryToken ? <details className="mb-4 rounded border p-3"><summary>保存匿名恢复凭证</summary><p className="my-2 text-sm">恢复凭证用于已提交进度；未提交答案仍保存在当前浏览器。</p><code className="break-all select-all">{recoveryToken}</code></details> : null}

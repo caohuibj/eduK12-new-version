@@ -232,7 +232,7 @@ export function useCognitiveSession(
               ? { surveyRetention: { schemaVersion: 1 as const, lastWriteAt: Date.now() } } : {}),
           }))
           if (meta.status === 'CONFLICT') {
-            dispatch({ type: 'RECOVERY_REQUIRED' })
+            dispatch({ type: 'RECOVERY_REQUIRED', session })
             return
           }
           if (session.status !== 'IN_PROGRESS') {
@@ -276,7 +276,7 @@ export function useCognitiveSession(
                 message: friendlyError(error).message,
               }).catch(() => undefined)
               if (status === 'CONFLICT') {
-                dispatch({ type: 'RECOVERY_REQUIRED' })
+                dispatch({ type: 'RECOVERY_REQUIRED', session })
               } else {
                 dispatch({
                   type: 'SESSION_ERROR',
@@ -300,7 +300,10 @@ export function useCognitiveSession(
           const nextTrialIndex = trials.reduce((max, trial) => Math.max(max, trial.trialIndex + 1), 0)
           dispatch({ type: 'SESSION_LOADED', session, trialIndex: nextTrialIndex })
         } catch (error) {
-          dispatch({ type: 'SESSION_ERROR', error: friendlyError(error) })
+          const recoveryError = friendlyError(error)
+          dispatch(recoveryError.code === 'FINAL_DRAFT_EXPIRED'
+            ? { type: 'RECOVERY_REQUIRED', session, error: recoveryError }
+            : { type: 'SESSION_ERROR', error: recoveryError })
         }
         return
       }
@@ -335,7 +338,7 @@ export function useCognitiveSession(
         return Math.max(nextIndex, payload.trialIndex + 1)
       }, 0)
       if (!ledger && session.nextTrialIndex === undefined && pendingNextTrialIndex === 0) {
-        dispatch({ type: 'RECOVERY_REQUIRED' })
+        dispatch({ type: 'RECOVERY_REQUIRED', session })
         return
       }
       const trialIndex = Math.max(
@@ -366,6 +369,7 @@ export function useCognitiveSession(
 
   const appendTrial = useCallback(
     async (payload: Record<string, unknown>): Promise<boolean> => {
+      if (stateRef.current.status === 'RECOVERY_REQUIRED') return false
       const nextIndex = stateRef.current.trialIndex
       dispatch({ type: 'TRIAL_SUBMIT_START' })
       try {
@@ -415,6 +419,7 @@ export function useCognitiveSession(
   )
 
   const complete = useCallback(async (administrationProvenance?: AdministrationProvenanceV1) => {
+    if (stateRef.current.status === 'RECOVERY_REQUIRED') return
     dispatch({ type: 'COMPLETE_START' })
     let finalDraftKey: string | null = null
     try {
@@ -546,6 +551,9 @@ export function useCognitiveSession(
   }, [load])
 
   const restart = useCallback(async (): Promise<CognitiveSession | null> => {
+    if (stateRef.current.session?.trainingPersistence?.attemptId) {
+      throw new Error('请返回上层综合测评并从那里处理恢复')
+    }
     if (!api.restartSession) throw new Error('该认知测评不支持重启')
     const response = await api.restartSession(sessionId)
     if (response.code !== 0 || !response.data) throw new Error(response.message || '重启认知测评失败')
