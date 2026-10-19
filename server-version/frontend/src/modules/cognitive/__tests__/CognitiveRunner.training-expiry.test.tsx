@@ -1,25 +1,52 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { CognitiveRunner } from '../pages/CognitiveRunner'
 import type { CognitiveSession } from '../types'
 import { createFinalDraftMeta, finalDraftStore, trainingCognitiveDraftKey } from '../../../services/persistence/finalDraftStore'
 import { readCognitiveRecoveryCredential, saveCognitiveRecoveryCredential } from '../core/recovery-credential'
+import CompositeAssessmentPage from '../../composite/CompositeAssessmentPage'
+import type { CompositeAttemptState } from '../../composite/types'
 
 const mocks = vi.hoisted(() => {
   const api = {
     getSession: vi.fn(), appendTrial: vi.fn(), appendTrials: vi.fn(),
     completeSession: vi.fn(), submitFinal: vi.fn(), restartSession: vi.fn(),
   }
-  return { api, publicApi: vi.fn(() => api) }
+  const parentApi = { getAttempt: vi.fn(), restart: vi.fn() }
+  return { api, publicApi: vi.fn(() => api), parentApi, parentPublicApi: vi.fn(() => parentApi) }
 })
 
 vi.mock('../api', () => ({ cognitiveApi: mocks.api, publicCognitiveApi: mocks.publicApi }))
+vi.mock('../../composite/api', () => ({ compositeApi: mocks.parentApi, publicCompositeApi: mocks.parentPublicApi }))
 
 const ParentLocation = () => {
   const location = useLocation()
   return <p data-testid="parent-location">{location.pathname}{location.search}</p>
 }
+
+const parentState = (session: CognitiveSession, id = session.trainingPersistence!.attemptId, accepted = false): CompositeAttemptState => ({
+  id, assessmentId: 'assessment', name: '课程综合测评', instruction: null,
+  status: 'IN_PROGRESS', progress: accepted ? 50 : 0, completedItems: accepted ? 1 : 0,
+  totalItems: accepted ? 2 : 1, currentIndex: accepted ? 1 : 0,
+  startedAt: '2026-10-19T00:00:00Z', lastSavedAt: '2026-10-19T00:00:00Z', completedAt: null, anonymousCode: null,
+  deliveryMode: 'FINAL_ONLY', attemptEpoch: id === session.trainingPersistence!.attemptId ? 1 : 2,
+  trainingPersistence: { ...session.trainingPersistence!, attemptId: id },
+  items: [
+    ...(accepted ? [{ id: 'accepted-scale', type: 'SCALE' as const, position: 0, label: '已接受的量表', completed: true, index: 0 }] : []),
+    { id: 'cognitive-slot', type: 'COGNITIVE', position: accepted ? 1 : 0, label: '认知任务', completed: false, index: accepted ? 1 : 0 },
+  ],
+  currentItem: { id: 'cognitive-slot', type: 'COGNITIVE', position: accepted ? 1 : 0, required: true,
+    cognitiveSession: id === session.trainingPersistence!.attemptId ? session : { ...session, sessionId: `new-${session.sessionId}` } },
+})
+
+const renderRecoveryRoute = (surface: string, path: string) => render(<MemoryRouter initialEntries={[path]}>
+  <ParentLocation />
+  <Routes>
+    <Route path={`/${surface}/cognitive/sessions/:sessionId`} element={<CognitiveRunner />} />
+    <Route path={`/${surface}/composite/attempts/:attemptId`} element={<CompositeAssessmentPage />} />
+  </Routes>
+</MemoryRouter>)
 
 const originalLocks = Object.getOwnPropertyDescriptor(navigator, 'locks')
 
@@ -69,18 +96,16 @@ describe('Training cognitive expiry recovery navigation', () => {
   ])('returns $name to the server-verified parent without restarting the child', async ({ surface, query, name }) => {
     const { session, key, expiredAt } = await expiredSession(name)
     const parentId = session.trainingPersistence!.attemptId
+    const nextId = `new-${parentId}`
+    mocks.parentApi.getAttempt.mockImplementation(async (id: string) => ({ code: 0, data: parentState(session, id) }))
+    mocks.parentApi.restart.mockResolvedValue({ code: 0, data: { attempt: parentState(session, nextId), recoveryToken: 'new-parent-credential' } })
     saveCognitiveRecoveryCredential(session.sessionId, 'child-credential')
     sessionStorage.setItem(`composite:recovery:attempt:${parentId}`, 'parent-credential')
     const remove = vi.spyOn(finalDraftStore, 'delete')
     const putTrial = vi.spyOn(finalDraftStore, 'putTrial')
     const seal = vi.spyOn(finalDraftStore, 'sealForSubmission')
 
-    render(<MemoryRouter initialEntries={[`/${surface}/cognitive/sessions/${session.sessionId}${query}`]}>
-      <Routes>
-        <Route path={`/${surface}/cognitive/sessions/:sessionId`} element={<CognitiveRunner />} />
-        <Route path={`/${surface}/composite/attempts/:attemptId`} element={<ParentLocation />} />
-      </Routes>
-    </MemoryRouter>)
+    renderRecoveryRoute(surface, `/${surface}/cognitive/sessions/${session.sessionId}${query}`)
 
     const back = await screen.findByRole('button', { name: '返回上层测评' })
     expect(screen.getByText('需要处理恢复状态')).toBeTruthy()
@@ -95,9 +120,23 @@ describe('Training cognitive expiry recovery navigation', () => {
     } else expect(mocks.publicApi).not.toHaveBeenCalled()
 
     fireEvent.click(back)
-    expect(await screen.findByTestId('parent-location')).toHaveTextContent(`/${surface}/composite/attempts/${parentId}`)
+    const restart = await screen.findByRole('button', { name: '请求重启整份测评' })
+    expect(screen.getByTestId('parent-location')).toHaveTextContent(`/${surface}/composite/attempts/${parentId}?recovery=cognitive-draft-expired&sessionId=${session.sessionId}`)
+    expect(screen.queryByRole('button', { name: '开始/继续认知任务' })).toBeNull()
+    expect(mocks.parentApi.restart).not.toHaveBeenCalled()
     expect(readCognitiveRecoveryCredential(session.sessionId)).toBe('child-credential')
     expect(sessionStorage.getItem(`composite:recovery:attempt:${parentId}`)).toBe('parent-credential')
+    if (surface === 'public') expect(mocks.parentPublicApi).toHaveBeenCalledWith('parent-credential')
+
+    fireEvent.click(restart)
+    expect(await screen.findByRole('button', { name: '开始/继续认知任务' })).toBeTruthy()
+    expect(mocks.parentApi.restart).toHaveBeenCalledExactlyOnceWith(parentId)
+    expect(screen.getByTestId('parent-location').textContent).toBe(`/${surface}/composite/attempts/${nextId}`)
+    expect(mocks.parentApi.getAttempt).toHaveBeenCalledWith(nextId)
+    if (surface === 'public') {
+      expect(sessionStorage.getItem(`composite:recovery:attempt:${nextId}`)).toBe('new-parent-credential')
+      expect(mocks.parentPublicApi).toHaveBeenCalledWith('new-parent-credential')
+    }
     expect((await finalDraftStore.get(key))?.trainingRetention?.expiredAt).toBe(expiredAt)
     expect(await finalDraftStore.listTrials(key)).toEqual([])
     expect(remove).not.toHaveBeenCalled()
@@ -107,6 +146,52 @@ describe('Training cognitive expiry recovery navigation', () => {
     expect(mocks.api.restartSession).not.toHaveBeenCalled()
     expect(mocks.api.appendTrial).not.toHaveBeenCalled()
     expect(mocks.api.appendTrials).not.toHaveBeenCalled()
+  })
+
+  it.each(['student', 'public'])('shows actionable %s parent recovery when accepted facts prevent restart', async (surface) => {
+    const { session, key, expiredAt } = await expiredSession(`blocked-${surface}`)
+    const parentId = session.trainingPersistence!.attemptId
+    const accepted = parentState(session, parentId, true)
+    const before = JSON.stringify(accepted)
+    mocks.parentApi.getAttempt.mockResolvedValue({ code: 0, data: accepted })
+    let refuse!: (value: unknown) => void
+    mocks.parentApi.restart.mockImplementation(() => new Promise(resolve => { refuse = resolve }))
+    saveCognitiveRecoveryCredential(session.sessionId, 'child-credential')
+    sessionStorage.setItem(`composite:recovery:attempt:${parentId}`, 'parent-credential')
+    const remove = vi.spyOn(finalDraftStore, 'delete')
+    renderRecoveryRoute(surface, `/${surface}/cognitive/sessions/${session.sessionId}`)
+    fireEvent.click(await screen.findByRole('button', { name: '返回上层测评' }))
+    const restart = await screen.findByRole('button', { name: '请求重启整份测评' })
+    expect(screen.getByText('1. 已接受的量表')).toBeTruthy()
+    expect(mocks.parentApi.restart).not.toHaveBeenCalled()
+    fireEvent.click(restart)
+    fireEvent.click(restart)
+    expect(mocks.parentApi.restart).toHaveBeenCalledExactlyOnceWith(parentId)
+    expect(screen.getByRole('button', { name: '正在请求重启…' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: '保存并退出' })).toBeDisabled()
+    refuse({ code: 409, message: '此概率分卷已接收 FINAL 作答，请继续原作答；不能重启重新抽签' })
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('请联系老师核对本次记录并处理恢复'))
+    expect(screen.getByRole('alert')).toHaveTextContent('已接收 FINAL 作答')
+    expect(screen.queryByRole('button', { name: '开始/继续认知任务' })).toBeNull()
+    expect(screen.queryByRole('button', { name: '请求重启整份测评' })).toBeNull()
+    expect(screen.getByRole('button', { name: '保存并退出' })).toBeEnabled()
+    expect(JSON.stringify(accepted)).toBe(before)
+    expect(sessionStorage.getItem(`composite:recovery:attempt:${parentId}`)).toBe('parent-credential')
+    expect((await finalDraftStore.get(key))?.trainingRetention?.expiredAt).toBe(expiredAt)
+    expect(remove).not.toHaveBeenCalled()
+    expect(mocks.api.restartSession).not.toHaveBeenCalled()
+    expect(mocks.api.submitFinal).not.toHaveBeenCalled()
+  })
+
+  it('does not apply a recovery hint for a different child or create an attempt from query data', async () => {
+    const { session } = await expiredSession('untrusted-hint')
+    const parentId = session.trainingPersistence!.attemptId
+    mocks.parentApi.getAttempt.mockResolvedValue({ code: 0, data: parentState(session) })
+    renderRecoveryRoute('student', `/student/composite/attempts/${parentId}?recovery=cognitive-draft-expired&sessionId=unrelated-child`)
+    expect(await screen.findByRole('button', { name: '开始/继续认知任务' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: '请求重启整份测评' })).toBeNull()
+    expect(mocks.parentApi.restart).not.toHaveBeenCalled()
+    expect(mocks.api.restartSession).not.toHaveBeenCalled()
   })
 
   it('keeps embedded campus recovery on its parent callback', async () => {

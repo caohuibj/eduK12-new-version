@@ -178,7 +178,15 @@ export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding; 
     cognitiveFallback,
   )
   const hasParentReturn = Boolean(campus) || parentTarget !== cognitiveFallback
-  const leaveParent = () => { if (campus) campus.onExit(); else navigate(parentTarget) }
+  const leaveParent = () => {
+    if (campus) { campus.onExit(); return }
+    if (trainingParent && state.error?.code === 'FINAL_DRAFT_EXPIRED' && state.session) {
+      // This hint requests a recovery screen only. The parent rebinds the child
+      // to its authorized read, and only its server restart can issue an attempt.
+      const query = new URLSearchParams({ recovery: 'cognitive-draft-expired', sessionId: state.session.sessionId })
+      navigate(`${parentTarget}?${query}`)
+    } else navigate(parentTarget)
+  }
   const leaveList = () => { if (campus) campus.onExit(); else navigate(cognitiveFallback) }
   const recoveryActions = (
     <div className="flex flex-wrap justify-center gap-3">
