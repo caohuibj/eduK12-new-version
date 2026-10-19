@@ -29,6 +29,9 @@ def emitted_build(steps, backend, node):
         if Path(command[0]).resolve()==Path(node).resolve() and compiler.resolve()==expected and command[2:] in [[],['--project','tsconfig.json']]:return
     raise AssertionError('missing exact successful emitting tsc producer; noEmit is not a runtime build')
 
+def service_exit(name, returncode):
+    assert name in ['postgres','redis','api'] and returncode == 0, 'service did not exit cleanly after requested shutdown'
+
 def complete(result):
     return (set(result.get('phases', {})) == set(PHASES) and
             all(result['phases'][p].get('passed') is True for p in PHASES) and

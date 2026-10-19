@@ -39,10 +39,20 @@ def inspect_metadata(schema,index,versions):
     assert inline==schema, 'client inline schema differs from generated schema'
     runtime=json.loads(json.loads(re.search(r'^config\.runtimeDataModel = JSON\.parse\('+literal+r'\)',index,re.M).group(1)))
     models={name:body for name,body in re.findall(r'^model\s+(\w+)\s*\{(.*?)^\}',schema,re.M|re.S)}
-    enums={name for name in re.findall(r'^enum\s+(\w+)\s*\{',schema,re.M)}
+    enum_bodies=dict(re.findall(r'^enum\s+(\w+)\s*\{(.*?)^\}',schema,re.M|re.S));enums=set(enum_bodies)
     assert set(models)==set(runtime['models']) and enums==set(runtime['enums'])
+    def read_mapping(body,model=False):
+        found=re.search((r'^\s*@@map' if model else r'@map')+r'\('+literal+r'\)',body,re.M)
+        return json.loads(found.group(1)) if found else None
+    for name,body in enum_bodies.items():
+        values=[]
+        for line in body.splitlines():
+            match=re.match(r'^\s*(\w+)(?:\s+|$)(.*)',line)
+            if match:values.append({'name':match.group(1),'dbName':read_mapping(match.group(2))})
+        assert runtime['enums'][name]['values']==values and runtime['enums'][name].get('dbName')==read_mapping(body,True),name+': enum values/mappings differ'
     fields=0
     for name,body in models.items():
+        assert runtime['models'][name].get('dbName')==read_mapping(body,True),name+': model table mapping differs'
         expected=[]
         for line in body.splitlines():
             field=re.match(r'^\s*(\w+)\s+([A-Za-z_]\w*)(\[\]|\?)?(?:\s+|$)(.*)',line)
@@ -61,7 +71,7 @@ def inspect_metadata(schema,index,versions):
     assert engine_version==versions['engineCommit']
     return {'models':len(models),'enums':len(enums),'fields':fields,'clientVersion':client_version,'engineVersion':engine_version,
             'inlineSchemaSha256':__import__('hashlib').sha256(inline.encode()).hexdigest(),
-            'runtimeDataModelSha256':db.digest(runtime),'inlineSchemaExact':True,'runtimeFieldMetadataMatches':True}
+            'runtimeDataModelSha256':db.digest(runtime),'inlineSchemaExact':True,'runtimeFieldMetadataMatches':True,'modelMappingsMatch':True,'enumValuesAndMappingsMatch':True}
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)

@@ -49,7 +49,7 @@ def main():
   assert generated['passed'] is True and generated['clientUnchanged'] is True and generated['dependenciesUnchanged'] is True
   assert generated['dependencies']==build['dependencies']
   assert generated['verificationToolSha256']==sha_file(BASE/'c23-checkpoint-verify-client.py')
-  assert generated['schemaAgreement']['schemaTokensMatch'] is True and generated['runtimeMetadata']['inlineSchemaExact'] is True and generated['runtimeMetadata']['runtimeFieldMetadataMatches'] is True and generated['installedNativeEngineMatches'] is True
+  assert generated['schemaAgreement']['schemaTokensMatch'] is True and generated['runtimeMetadata']['inlineSchemaExact'] is True and generated['runtimeMetadata']['runtimeFieldMetadataMatches'] is True and generated['runtimeMetadata']['modelMappingsMatch'] is True and generated['runtimeMetadata']['enumValuesAndMappingsMatch'] is True and generated['installedNativeEngineMatches'] is True
  else:
   assert any('prisma' in step['name'] and step['exitCode']==0 for step in generated['steps'])
  assert generated['nodeSha256']==build['nodeSha256'] and generated['nodeVersion']==build['nodeVersion']
@@ -210,6 +210,9 @@ def main():
       cleanup.append({'name':name,'error':'GracefulShutdownTimeout'});os.killpg(proc.pid,signal.SIGKILL);proc.wait(timeout=5)
    except ProcessLookupError:proc.poll()
    except Exception as error:cleanup.append({'name':name,'error':type(error).__name__})
+   if name in ['postgres','redis','api']:
+    try:preflight.service_exit(name,proc.returncode)
+    except AssertionError:cleanup.append({'name':name,'error':'UnexpectedShutdownExit','returncode':proc.returncode})
   # Quiesce every writer before calling a snapshot final. PostgreSQL remains
   # available solely for the bounded read-only snapshot, then stops last.
   for name,proc,_ in reversed(children):

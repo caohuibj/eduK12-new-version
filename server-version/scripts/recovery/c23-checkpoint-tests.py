@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """No-service fault tests for actual launcher/upgrade acceptance functions."""
-import copy, importlib.util, pathlib, sys, unittest, json
+import copy, importlib.util, pathlib, sys, unittest, json, ast, types, signal, subprocess
 sys.dont_write_bytecode = True
 BASE = pathlib.Path(__file__).resolve().parent
 
@@ -78,6 +78,39 @@ class AcceptanceFaults(unittest.TestCase):
         with self.assertRaises(AssertionError):verify.inspect_metadata(schema,index,{**versions,'engineCommit':'wrong'})
         bad=index.replace('String','Int',1)
         with self.assertRaises(AssertionError):verify.inspect_metadata(schema,bad,versions)
+
+    def test_model_enum_mapping_mismatch_rejected(self):
+        verify=load('mapping_verify_tested','c23-checkpoint-verify-client.py')
+        schema='model Sample {\n  id String @id\n  @@map("sample_table")\n}\nmodel Second {\n  id String @id\n}\nenum Choice {\n  YES @map("yes")\n  @@map("choice_enum")\n}\n'
+        metadata={'models':{'Sample':{'dbName':'sample_table','fields':[{'name':'id','type':'String','kind':'scalar','isList':False,'isRequired':True}]}},'enums':{'Choice':{'dbName':'choice_enum','values':[{'name':'YES','dbName':'yes'}]}}}
+        metadata['models']['Second']={'fields':[{'name':'id','type':'String','kind':'scalar','isList':False,'isRequired':True}]}
+        versions={'prisma':'5.22.0','@prisma/client':'5.22.0','@prisma/engines':'5.22.0','engineCommit':'abc'}
+        def index(value):return '  "inlineSchema": '+json.dumps(schema)+',\n  "clientVersion": "5.22.0",\n  "engineVersion": "abc",\nconfig.runtimeDataModel = JSON.parse('+json.dumps(json.dumps(value))+')'
+        self.assertTrue(verify.inspect_metadata(schema,index(metadata),versions)['modelMappingsMatch'])
+        for where,key,value in [('model','dbName','wrong_table'),('enum','dbName','wrong_enum'),('enum','values',[{'name':'NO','dbName':'yes'}])]:
+            bad=copy.deepcopy(metadata);bad['models' if where=='model' else 'enums']['Sample' if where=='model' else 'Choice'][key]=value
+            with self.assertRaises(AssertionError):verify.inspect_metadata(schema,index(bad),versions)
+
+    def test_service_shutdown_nonzero_never_passes(self):
+        for name in ['postgres','redis','api']:
+            p.service_exit(name,0)
+            for code in [1,-9,-15,None]:
+                with self.assertRaises(AssertionError):p.service_exit(name,code)
+
+    def test_process_lookup_shutdown_race_validates_real_helper_exit(self):
+        source=ast.parse((BASE/'c23-checkpoint-http.py').read_text())
+        function=next(n for n in ast.walk(source) if isinstance(n,ast.FunctionDef) and n.name=='stop_child')
+        class Exiting:
+            pid=123;returncode=None;calls=0
+            def poll(self):
+                self.calls+=1
+                if self.calls>=3:self.returncode=1
+                return self.returncode
+        def vanished(*_):raise ProcessLookupError()
+        errors=[];scope={'cleanup':errors,'preflight':p,'os':types.SimpleNamespace(killpg=vanished),'signal':signal,'subprocess':subprocess}
+        exec(compile(ast.Module(body=[function],type_ignores=[]),'actual-stop-child','exec'),scope)
+        scope['stop_child']('postgres',Exiting())
+        self.assertEqual(errors,[{'name':'postgres','error':'UnexpectedShutdownExit','returncode':1}])
 
     def test_shared_helpers_import_without_clone_or_services(self):
         launcher=load('launcher_tested','c23-checkpoint-http.py')

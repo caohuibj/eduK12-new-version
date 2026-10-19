@@ -36,7 +36,7 @@ Backend source, schema, scripts and all recovery helpers must be committed and c
 
 The recorded `prisma-02.log` says generation succeeded, but its old ledger explicitly lacks original before/after closure. Never represent it as such. `c23-checkpoint-verify-client.py` can instead produce `EXISTING_GENERATED_CLIENT_VERIFIED_NOT_GENERATION_PROVENANCE`. It does not generate files, load the client or connect to PostgreSQL.
 
-It freezes all current installed dependency, compiler/Prisma/tool/native-engine and generated-client bytes before and after. Generated native engine bytes must equal the installed Prisma engine. The `index.js` inline schema must exactly equal generated `schema.prisma`; all runtime model/enum identities and field names, types, list/nullability and database mappings are checked. Its recorded limitation is explicit: this is consistency verification of current bytes, not historical generation provenance or dynamic behavior qualification.
+It freezes all current installed dependency, compiler/Prisma/tool/native-engine and generated-client bytes before and after. Generated native engine bytes must equal the installed Prisma engine. The `index.js` inline schema must exactly equal generated `schema.prisma`; all runtime model identities/table mappings, enum identities/ordered values/mappings, and field names, types, list/nullability and database mappings are checked. Its recorded limitation is explicit: this is consistency verification of current bytes, not historical generation provenance or dynamic behavior qualification.
 
 Exact source/generated schema SHA-256 equality is preferred. The only reviewed nonidentical pair accepted here is:
 
@@ -80,7 +80,7 @@ Appending `--preflight-only` checks these prerequisites and source manifests und
 
 All raw service/SQL/HTTP diagnostics, credentials, payloads, source manifests and DB snapshots remain in the 0700 state directory; newly written files use 0600. Public errors use fixed messages/SQLSTATE only and token paths/query strings are redacted. A failed attempt keeps its original private journal and failed receipt. Investigate the exact phase; any continuation needs its own explicit bounded review and does not rewrite the original result.
 
-Final success requires all four phases, writer quiescence before final snapshot creation, unchanged build/dependency/client/tool/source evidence, unchanged stopped source bytes, complete process/port cleanup, and no surviving postmaster PID. A missing or failed final snapshot cannot pass.
+Final success requires all four phases, writer quiescence before final snapshot creation, unchanged build/dependency/client/tool/source evidence, unchanged stopped source bytes, complete process/port cleanup with exit 0 for PostgreSQL/Redis/API (including process-exit races), and no surviving postmaster PID. A missing or failed final snapshot cannot pass.
 
 ## No-service preparation checks
 
