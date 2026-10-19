@@ -424,6 +424,34 @@ The other 27 Node checks and seven Python checks were not replayed. Both attempt
 verified the existing client's exact 72-file Python closure unchanged. Neither
 attempt created an archive or ran a database, application service or producer.
 
+The first separately approved archive attempt stopped before creating its
+output directory or running compression/extraction: the official installed Node
+has exactly two package hardlinks, whereas the initial generic evidence binding
+required one link. The private failure receipt is
+`/tmp/c25-continuation-archive-launch-01/receipt.json`, SHA
+`0cb82a39304affd43978541e439b4e73191310a314fdb35ae83650e817edbd28`.
+No service started and the old raw state was not modified.
+
+The tool-only fix binds canonical/realpath, device/inode, uid/gid, mode, size,
+full SHA and exact nlink. Only the two explicit installed Node paths may have
+nlink=2, must share an inode, and must match all three original client/backend/
+frontend receipt hashes. Data and private evidence still reject hardlinks. One
+new targeted fault accepts that exact topology and rejects data aliases and
+byte/inode/link-count drift; receipt `continuation-contract-03/receipt.json`,
+SHA `3aed1d8c16505056247e6684c30193bd329d90378553bbc1f87bd3d6f8e7b956`.
+Earlier successful checks were not replayed; no archive retry has occurred.
+
+After this fix is frozen and reviewed, the newly approved descriptor destination
+is `/tmp/c25-source-05`, using the unchanged issuer and validator with their full
+normal manifests. Existing `destination_path` accepts this independent new
+non-Git path without any whitelist change; all original source/tool/old-evidence
+protections still apply. This costs approximately 14 MB of independent tmpfs,
+not overlay admission reserve. It is node-local temporary evidence and must
+remain with the recovery point throughout continuation. Existing descriptors
+01–04 retain their exact original identities and bytes. No alternate descriptor
+format, historical HEAD rebinding, shared manifest alias or validator exception
+is introduced.
+
 Prepared commands, only after the corresponding explicit approval. `$PYTHON`
 must be the exact Python command path consumed by the reviewed backend producer
 (`/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3`),

@@ -99,6 +99,46 @@ def file_binding(path):
     assert stable_stat(before) == stable_stat(after), 'file changed during binding'
     return result
 
+def tool_binding(path, expected_links=1):
+    """Executable topology is explicit; data/evidence still use file_binding."""
+    path = canonical(path); before = path.lstat()
+    assert stat.S_ISREG(before.st_mode) and before.st_nlink == expected_links, 'unexpected tool link topology'
+    result = {'path': str(path), 'realpath': str(path.resolve()), 'device': before.st_dev,
+              'inode': before.st_ino, 'uid': before.st_uid, 'gid': before.st_gid,
+              'bytes': before.st_size, 'mode': stat.S_IMODE(before.st_mode),
+              'links': before.st_nlink, 'sha256': sha_file(path)}
+    assert stable_stat(before) == stable_stat(path.lstat()), 'tool changed during binding'
+    return result
+
+def node_tool_bindings(tools):
+    paths = [Path(tools) / 'node_modules/node/bin/node',
+             Path(tools) / 'node_modules/node/node_modules/node-linux-x64/bin/node']
+    bindings = {str(path): tool_binding(path, 2) for path in paths}
+    assert os.path.samefile(*paths), 'official Node package aliases must share one inode'
+    assert bindings[str(paths[0])]['sha256'] == bindings[str(paths[1])]['sha256']
+    assert_tools_unchanged(bindings)
+    return bindings
+
+def assert_tools_unchanged(bindings):
+    assert all(tool_binding(Path(name), binding['links']) == binding
+               for name, binding in bindings.items()), 'tool bytes or topology changed'
+
+def accepted_node_receipts(node_binding):
+    refs = {}
+    for relative, expected in [
+        ('backend-01/current-client.receipt.json', '435ac0e5c1cbf4534f289f732643145f512b84e530c3f5efe344f7a82d7aed3e'),
+        ('backend-01/backend-build.receipt.json', 'ffca85332844b7f9caeac3252119e1354c498e9de11e757c5763e525d2bf8d95'),
+        ('frontend-01/frontend-build.receipt.json', '7064d220540d1faf8851cec0e6c8ba4151070a61163ed60bf8f5d895f0415f5a'),
+    ]:
+        path = ROOT / 'c25-build-evidence' / relative
+        binding = file_binding(path); assert binding['sha256'] == expected
+        receipt = json.loads(path.read_text())
+        assert receipt.get('passed') is True and receipt['nodeVersion'] == 'v24.21.0'
+        assert receipt['nodeSha256'] == node_binding['sha256'], 'Node differs from accepted client/build producers'
+        assert file_binding(path) == binding
+        refs[str(path)] = binding
+    return refs
+
 def stable_stat(info):
     return (info.st_dev, info.st_ino, info.st_mode, info.st_uid, info.st_gid, info.st_nlink,
             info.st_size, info.st_mtime_ns, info.st_ctime_ns)
@@ -226,9 +266,11 @@ def producer_binding(tools, expected_head):
     assert not contracts.git('ls-files', '--others', '--exclude-standard', '-z'), 'untracked source is not reviewed'
     paths = [Path(sys.executable).resolve(), tools / 'node_modules/node/bin/node', Path('/usr/bin/tar'),
              Path('/usr/bin/gzip'), Path('/usr/bin/prlimit'), tools / 'postgresql/bin/pg_controldata']
-    bindings = {str(path): file_binding(path) for path in paths}
-    env = {'PATH': '/usr/bin:/bin', 'LANG': 'C', 'LC_ALL': 'C', 'TZ': 'UTC', 'PYTHONDONTWRITEBYTECODE': '1'}
     node = paths[1]
+    bindings = {str(path): tool_binding(path) for path in paths if path != node}
+    bindings.update(node_tool_bindings(tools))
+    node_receipts = accepted_node_receipts(bindings[str(node)])
+    env = {'PATH': '/usr/bin:/bin', 'LANG': 'C', 'LC_ALL': 'C', 'TZ': 'UTC', 'PYTHONDONTWRITEBYTECODE': '1'}
     assert subprocess.check_output([node, '--version'], text=True, timeout=10, env=env).strip() == 'v24.21.0'
     script = "import {createHash} from 'node:crypto';import {pythonProgram} from " + json.dumps(PRODUCER.as_uri()) + ";process.stdout.write(createHash('sha256').update(pythonProgram).digest('hex'))"
     inline_sha = subprocess.check_output([node, '--input-type=module', '-e', script], text=True, timeout=10, env=env)
@@ -237,8 +279,9 @@ def producer_binding(tools, expected_head):
     assert len(python_helpers) == 72, 'existing 72-file Python helper closure required'
     result = {'head': expected_head, 'producer': file_binding(PRODUCER), 'inlinePythonSha256': inline_sha,
               'pythonVersion': sys.version, 'pythonHelperClosure': python_helpers,
-              'recoverySources': contracts.source_inventory(REPO, ['server-version/scripts/recovery']), 'tools': bindings}
-    assert all(file_binding(Path(name)) == binding for name, binding in bindings.items()), 'tool changed during binding'
+              'recoverySources': contracts.source_inventory(REPO, ['server-version/scripts/recovery']),
+              'tools': bindings, 'acceptedNodeReceipts': node_receipts}
+    assert_tools_unchanged(bindings)
     return result
 
 def resource_snapshot():

@@ -188,3 +188,44 @@ test('actual inline archive helpers pass only synthetic filesystem and mocked-pr
  assert.ifError(result.error);assert.equal(result.status,0,result.stderr||result.stdout)
  assert.match(result.stderr,/Ran 7 tests/);assert.match(result.stderr,/\bOK\b/)
 })
+
+test('official two-link Node tools bind exact topology while data rejects aliases and later drift',()=>{
+ const program=String.raw`
+import os,pathlib,sys,tempfile
+scope={'__name__':'c25_tool_link_contract'}
+exec(compile(sys.stdin.read(),'<actual archive definitions>','exec'),scope)
+def reject(fn):
+ try:fn()
+ except AssertionError:return
+ raise AssertionError('unexpected alias/drift accepted')
+with tempfile.TemporaryDirectory() as directory:
+ root=pathlib.Path(directory)
+ one=root/'node_modules/node/bin/node';two=root/'node_modules/node/node_modules/node-linux-x64/bin/node'
+ one.parent.mkdir(parents=True);two.parent.mkdir(parents=True)
+ one.write_bytes(b'official-synthetic-node');os.link(one,two)
+ binding=scope['node_tool_bindings'](root)
+ assert len(binding)==2
+ for item in binding.values():
+  assert item['links']==2 and item['realpath']==item['path']
+  assert {'device','inode','uid','gid','mode','bytes','sha256'}<=set(item)
+ reject(lambda:scope['file_binding'](one))
+ reject(lambda:scope['inventory'](root))
+ scope['assert_tools_unchanged'](binding)
+ one.write_bytes(b'mutated-tool');reject(lambda:scope['assert_tools_unchanged'](binding))
+ one.write_bytes(b'official-synthetic-node');scope['assert_tools_unchanged'](binding)
+ extra=root/'third-alias';os.link(one,extra);reject(lambda:scope['node_tool_bindings'](root));reject(lambda:scope['assert_tools_unchanged'](binding));extra.unlink()
+ replacement=root/'replacement';replacement.write_bytes(one.read_bytes());old_inode=one.stat().st_ino
+ one.unlink();two.unlink();os.rename(replacement,one);os.link(one,two)
+ assert one.stat().st_ino!=old_inode
+ reject(lambda:scope['assert_tools_unchanged'](binding))
+ current=scope['node_tool_bindings'](root)
+ assert all(item['inode']!=binding[name]['inode'] for name,item in current.items())
+ plain=root/'ordinary';plain.write_bytes(b'ordinary')
+ assert scope['tool_binding'](plain)['links']==1
+ assert scope['file_binding'](plain)['sha256']==scope['tool_binding'](plain)['sha256']
+print('PASS exact two-link tool identity; unchanged one-link evidence rule; byte/inode/link-count drift rejected')
+`
+ const result=spawnSync(process.env.C25_TEST_PYTHON??'python3',['-B','-c',program],{input:pythonProgram,encoding:'utf8',timeout:10000,maxBuffer:1024*1024})
+ process.stdout.write(result.stdout??'');process.stderr.write(result.stderr??'')
+ assert.ifError(result.error);assert.equal(result.status,0,result.stderr||result.stdout)
+})
