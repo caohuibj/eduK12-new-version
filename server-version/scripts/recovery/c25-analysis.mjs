@@ -4,6 +4,48 @@ import {spawn} from 'node:child_process'
 import {fileURLToPath,pathToFileURL} from 'node:url'
 import path from 'node:path'
 import assert from 'node:assert/strict'
+export const MATERIAL_PYTHON=String.raw`
+import json,sys,subprocess,os
+from pathlib import Path
+
+def verify_old_materials(source,baseline,inventory):
+    counts={'files':0,'bytes':0,'directories':0}
+    for name in ['uploads','exports']:
+        expected=baseline[name];assert expected and expected[0]['path']=='.' and expected[0]['type']=='directory'
+        actual=inventory(source/name);indexed={row['path']:row for row in actual}
+        assert len(indexed)==len(actual) and len({row['path'] for row in expected})==len(expected)
+        for old in expected:
+            assert old['path'] in indexed,'accepted attachment/export path was removed'
+            current=indexed[old['path']]
+            assert old['type'] in ['file','directory'] and current['type']==old['type']
+            if old['type']=='file':
+                assert current==old,'accepted attachment/export bytes or file metadata changed'
+                counts['files']+=1;counts['bytes']+=old['size']
+            else:
+                # New artifact creation may change a parent directory's mtime;
+                # its identity/type/mode/owner/xattrs and link prohibition stay.
+                assert {k:v for k,v in current.items() if k!='mtimeNs'}=={k:v for k,v in old.items() if k!='mtimeNs'}
+                counts['directories']+=1
+    return {'passed':True,'allOldMaterialFilesRetained':True,'allowedNewFiles':True,'directoryMtimeExcluded':True,**counts}
+
+def main():
+    node,module,manifest,expected_sha,source,output=sys.argv[1:];source=Path(source);manifest=Path(manifest);output=Path(output)
+    code="import {ARCHIVE_PYTHON} from "+json.dumps(Path(module).as_uri())+";process.stdout.write(ARCHIVE_PYTHON)"
+    library=subprocess.check_output([node,'--input-type=module','-e',code],text=True,timeout=10)
+    archive={'__name__':'analysis_material_archive_library'};exec(compile(library,module,'exec'),archive)
+    assert source==archive['SOURCE'] and Path(module)==archive['PRODUCER']
+    assert Path(node)==archive['ROOT']/'eduk12_tools_20261018/node_modules/node/bin/node'
+    assert output==archive['ROOT']/'eduk12_c25_analysis_01/c25-analysis-material-audit-result.json'
+    assert manifest==archive['OUTPUT']/archive['NAMES']['dataManifest']
+    binding=archive['file_binding'](manifest);assert binding['sha256']==expected_sha and binding['mode']==0o600
+    baseline=json.loads(manifest.read_text())
+    result=verify_old_materials(source,baseline,archive['inventory'])
+    assert archive['file_binding'](manifest)==binding
+    result['sourceDataManifest']=binding
+    archive['sync_json'](output,result)
+    print(json.dumps(result))
+if __name__=='__main__':main()
+`
 export const ANALYSIS_PYTHON=String.raw`#!/usr/bin/env python3
 """C19 missing analysis supplement; both failed receipts remain false and immutable.
 Separate archive/runtime GO is required. No implicit retry or capacity claim.
@@ -22,6 +64,7 @@ sha_file,digest,manifest=preflight.sha_file,preflight.digest,source_contract.man
 FLOOR=preflight.FLOOR
 PHASES=['analysis-execute']
 PHASE_SECONDS={'analysis-execute':300}
+MATERIAL_PYTHON=${JSON.stringify(MATERIAL_PYTHON)}
 CORE_RECEIPT_SHA='94949c13018705e3413f9cffa3aa810fc1d0720f173363f60cd16dffa96d76ba'
 CORE_SNAPSHOT_SHA='2116f582580ab67d0c5f69330d73300b026a3eaeeacf94a47f268aa16b244e85'
 def analysis_budget(free,memory,tmp_free):
@@ -48,7 +91,7 @@ def analysis_complete(result):
   and evidence.get('suppression',{}).get('state')=='suppressed'
   and proof.get('rowCount')==4 and proof.get('columnCount')==24 and proof.get('pairedValidN')==1
   and proof.get('measuredValues')=={'MA':1,'MB':0} and proof.get('missingReasons')=={'SA':'NOT_ASSIGNED','SB':'NO_OBSERVATION'}
-  and all(result.get(k) is True for k in ['cleanupVerified','sourceUnchanged','inputsUnchanged','finalSnapshotVerified','apiStoppedAfterAnalysis','failureEvidenceUnchanged','priorContinuationEvidenceUnchanged','coreEvidenceUnchanged','recoveryArchiveVerified','allPriorRowsPreserved'])
+  and all(result.get(k) is True for k in ['cleanupVerified','sourceUnchanged','inputsUnchanged','finalSnapshotVerified','apiStoppedAfterAnalysis','failureEvidenceUnchanged','priorContinuationEvidenceUnchanged','coreEvidenceUnchanged','recoveryArchiveVerified','allPriorRowsPreserved','oldMaterialFilesPreserved'])
   and result.get('apiLifetime',{}).get('stopped') is True and result['apiLifetime'].get('expired') is False
   and result.get('protectedCoreFacts',{}).get('oldRows')==6667 and result['protectedCoreFacts'].get('checkpointRows')==21
   and result['protectedCoreFacts'].get('allCoreRowsRetained') is True
@@ -289,7 +332,24 @@ def main():
   def final_audit():
    assert writers_stopped and not cleanup,'writers did not stop cleanly'
    assert (state/'c25-analysis-protected-rows-private.json').is_file(),'no completed6667full-row inventory'
-   return audit('final','c25-analysis-audit-final',monitor=final_guard)
+   evidence=None;failure=None
+   try:evidence=audit('final','c25-analysis-audit-final',monitor=final_guard)
+   except BaseException as error:failure=error;result['finalDatabaseAuditErrorType']=type(error).__name__
+   item=recovery['files']['dataManifest']
+   argv=[sys.executable,'-B','-c',MATERIAL_PYTHON,str(node),str(archive_file),item['path'],item['sha256'],str(failed),str(state/'c25-analysis-material-audit-result.json')]
+   result['materialAudit']={'argv':list(map(str,argv)),'timeoutSeconds':60,'inlinePythonSha256':__import__('hashlib').sha256(MATERIAL_PYTHON.encode()).hexdigest(),'launcherPython':pinned['launcherPython'],'nodeSha256':sha_file(node)}
+   try:
+    run(argv,'c25-analysis-material-audit',timeout=60,monitor=final_guard)
+    materials=json.loads((state/'c25-analysis-material-audit-result.json').read_text())
+    assert materials['passed'] is True and materials['allOldMaterialFilesRetained'] is True
+    assert materials['sourceDataManifest']==item
+    result['oldMaterialFilesPreserved']=True
+    result['materialAudit'].update(resultSha256=sha_file(state/'c25-analysis-material-audit-result.json'),files=materials['files'],bytes=materials['bytes'],directories=materials['directories'])
+   except BaseException as error:
+    result['oldMaterialFilesPreserved']=False;result['materialAuditErrorType']=type(error).__name__
+    if failure is None:failure=error
+   if failure is not None:raise failure
+   return evidence
   def stop_postgres():
    for name,proc,_ in reversed(children):
     if name=='postgres':stop_child(name,proc)
@@ -312,7 +372,7 @@ def main():
    result['coreEvidenceUnchanged']=archive['inventory'](core)==core_evidence
    archive['verify_recovery_descriptor'](a.recovery_descriptor,a.expected_recovery_sha256,tools,failed,a.expected_head,check_data=False);result['recoveryArchiveVerified']=True
   except BaseException:result.update(failureEvidenceUnchanged=False,priorContinuationEvidenceUnchanged=False,coreEvidenceUnchanged=False,recoveryArchiveVerified=False)
-  isolation=all(result.get(k) is True for k in ['cleanupVerified','sourceUnchanged','inputsUnchanged','finalSnapshotVerified','failureEvidenceUnchanged','priorContinuationEvidenceUnchanged','coreEvidenceUnchanged','recoveryArchiveVerified','allPriorRowsPreserved']);result['passed']=result['passed'] and analysis_complete(result)
+  isolation=all(result.get(k) is True for k in ['cleanupVerified','sourceUnchanged','inputsUnchanged','finalSnapshotVerified','failureEvidenceUnchanged','priorContinuationEvidenceUnchanged','coreEvidenceUnchanged','recoveryArchiveVerified','allPriorRowsPreserved','oldMaterialFilesPreserved']);result['passed']=result['passed'] and analysis_complete(result)
   try:resources('after-cleanup',True)
   except BaseException as error:result.update(passed=False,finalResourceError=type(error).__name__);isolation=False
   status.update(state='stopped',cleanupVerified=result['cleanupVerified'],cleanupErrors=cleanup,endedAt=time.time());record();(state/'c25-analysis-result.json').write_text(json.dumps(result,indent=2));lock.close()

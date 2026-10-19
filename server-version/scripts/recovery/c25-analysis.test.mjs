@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import fs from 'node:fs'
 import {spawnSync} from 'node:child_process'
-import {ANALYSIS_PYTHON,analysisArgv} from './c25-analysis.mjs'
+import {ANALYSIS_PYTHON,MATERIAL_PYTHON,analysisArgv} from './c25-analysis.mjs'
 function python(body){
  const setup=String.raw`
 import ast,copy,tempfile,os
@@ -33,7 +33,7 @@ assert analysis_budget(FLOOR+preflight.RESERVE,preflight.MEMORY,preflight.RESERV
 for values in [(FLOOR+preflight.RESERVE-1,preflight.MEMORY,preflight.RESERVE),(FLOOR+preflight.RESERVE,preflight.MEMORY-1,preflight.RESERVE),(FLOOR+preflight.RESERVE,preflight.MEMORY,preflight.RESERVE-1)]:reject(lambda:analysis_budget(*values))
 `))
 test('completion consumes actual suppression/download proofs, inherited restore and full baseline instead of a passed flag',()=>python(String.raw`
-flags=['cleanupVerified','sourceUnchanged','inputsUnchanged','finalSnapshotVerified','apiStoppedAfterAnalysis','failureEvidenceUnchanged','priorContinuationEvidenceUnchanged','coreEvidenceUnchanged','recoveryArchiveVerified','allPriorRowsPreserved']
+flags=['cleanupVerified','sourceUnchanged','inputsUnchanged','finalSnapshotVerified','apiStoppedAfterAnalysis','failureEvidenceUnchanged','priorContinuationEvidenceUnchanged','coreEvidenceUnchanged','recoveryArchiveVerified','allPriorRowsPreserved','oldMaterialFilesPreserved']
 e={'publications':2,'attempts':3,'finals':4,'acceptedSnapshots':4,'noCheckpointCreated':True,'originalScaleUnchanged':True,'newAcceptedFactsUnchangedAcrossConsumers':True,'suppression':{'state':'suppressed'},'export':{'proof':{'rowCount':4,'columnCount':24,'pairedValidN':1,'measuredValues':{'MA':1,'MB':0},'missingReasons':{'SA':'NOT_ASSIGNED','SB':'NO_OBSERVATION'}}}}
 r={'phases':{'analysis-execute':{'phase':'analysis-execute','passed':True,'analysisSupplement':e}},'executedPhases':['analysis-execute'],'inheritedCore':{'sourceRows':6667,'sourceCheckpoints':21,'accepted':{'inheritedRestoreRows':6667}},'newDatabaseRestoreExecuted':False,'apiLifetime':{'stopped':True,'expired':False},'protectedCoreFacts':{'allCoreRowsRetained':True,'oldRows':6667,'checkpointRows':21},'processExits':{'owned':0},**dict.fromkeys(flags,True)}
 assert analysis_complete(r)
@@ -61,4 +61,47 @@ test('HTTP entry validates exact accepted prerequisite before loading runtime an
  assert.ok(text.includes("path.join(coreState,'c25-missing-restore-result.json')"))
  assert.ok(text.includes('await runAnalysisSupplement(h,source,E)'));assert.ok(text.includes('finally{await h.finish(error)}'))
  assert.ok(!text.includes('restore('));assert.ok(!text.includes('c25-scheduled'))
+})
+
+test('old upload/export bytes and metadata survive new files while directory mtime alone may change',()=>{
+ const program=String.raw`
+import ast,copy
+from pathlib import Path
+scope={'__name__':'materials_fault'};exec(compile(SOURCE,'<actual-material-check>','exec'),scope)
+file={'path':'old.csv','type':'file','mode':384,'uid':1000,'gid':1000,'mtimeNs':1,'linkTarget':None,'xattrs':{},'size':3,'links':1,'sha256':'a'*64}
+directory={'path':'.','type':'directory','mode':448,'uid':1000,'gid':1000,'mtimeNs':1,'linkTarget':None,'xattrs':{}}
+baseline={name:[copy.deepcopy(directory),copy.deepcopy(file)] for name in ['uploads','exports']}
+actual=copy.deepcopy(baseline)
+for rows in actual.values():rows[0]['mtimeNs']=2;rows.append({**file,'path':'new.csv','sha256':'b'*64})
+check=lambda:scope['verify_old_materials'](Path('/source'),baseline,lambda path:actual[path.name])
+assert check()=={'passed':True,'allOldMaterialFilesRetained':True,'allowedNewFiles':True,'directoryMtimeExcluded':True,'files':2,'bytes':6,'directories':2}
+for field,value in [('sha256','changed'),('size',4),('type','directory'),('mode',420),('uid',1),('gid',1),('mtimeNs',3),('linkTarget','elsewhere'),('links',2),('xattrs',{'acl':'changed'})]:
+ before=copy.deepcopy(actual);actual['exports'][1][field]=value
+ try:check()
+ except AssertionError:pass
+ else:raise AssertionError('old material change accepted: '+field)
+ actual=before
+before=copy.deepcopy(actual);actual['exports'].pop(1)
+try:check()
+except AssertionError:pass
+else:raise AssertionError('old material deletion accepted')
+actual=before;actual['uploads'][0]['mode']=493
+try:check()
+except AssertionError:pass
+else:raise AssertionError('old directory security metadata accepted')
+`
+ const run=spawnSync(process.env.C25_TEST_PYTHON??'python3',['-B','-c',program.replace('SOURCE',JSON.stringify(MATERIAL_PYTHON))],{encoding:'utf8',timeout:20000,maxBuffer:2*1024*1024});assert.ifError(run.error);assert.equal(run.status,0,run.stderr||run.stdout)
+ assert.ok(ANALYSIS_PYTHON.includes("'oldMaterialFilesPreserved'"))
+ const body=ANALYSIS_PYTHON.slice(ANALYSIS_PYTHON.indexOf('  def final_audit():'))
+ assert.ok(body.includes("run(argv,'c25-analysis-material-audit',timeout=60,monitor=final_guard)"))
+ assert.ok(body.indexOf('return evidence')<body.indexOf('preflight.finish_database(final_audit,stop_postgres,result)'))
+ assert.ok(MATERIAL_PYTHON.includes("archive['file_binding'](manifest)==binding"))
+ // Rerun only this affected completion contract, not its prior independent suite.
+ python(String.raw`
+r={'phases':{'analysis-execute':{'passed':True,'phase':'analysis-execute','analysisSupplement':{'publications':2,'attempts':3,'finals':4,'acceptedSnapshots':4,'noCheckpointCreated':True,'originalScaleUnchanged':True,'newAcceptedFactsUnchangedAcrossConsumers':True,'suppression':{'state':'suppressed'},'export':{'proof':{'rowCount':4,'columnCount':24,'pairedValidN':1,'measuredValues':{'MA':1,'MB':0},'missingReasons':{'SA':'NOT_ASSIGNED','SB':'NO_OBSERVATION'}}}}}},'executedPhases':['analysis-execute'],'inheritedCore':{'sourceRows':6667,'sourceCheckpoints':21,'accepted':{'inheritedRestoreRows':6667}},'newDatabaseRestoreExecuted':False,'apiLifetime':{'stopped':True,'expired':False},'protectedCoreFacts':{'allCoreRowsRetained':True,'oldRows':6667,'checkpointRows':21},'processExits':{'owned':0}}
+for key in ['cleanupVerified','sourceUnchanged','inputsUnchanged','finalSnapshotVerified','apiStoppedAfterAnalysis','failureEvidenceUnchanged','priorContinuationEvidenceUnchanged','coreEvidenceUnchanged','recoveryArchiveVerified','allPriorRowsPreserved']:r[key]=True
+assert not analysis_complete(r)
+r['oldMaterialFilesPreserved']=False;assert not analysis_complete(r)
+r['oldMaterialFilesPreserved']=True;assert analysis_complete(r)
+`)
 })

@@ -174,3 +174,26 @@ in `/tmp/c25-analysis-coordinator-04/`, receipt
 Both receipts retain 212 before/after inputs and 210 exact source/runner copies;
 the unaffected 14 were not rerun. These checks use synthetic or immutable JSON
 fixtures; no service, real archive, database or producer was executed.
+
+Independent review additionally required physical preservation of old attachment
+and export files, beyond their protected SQL rows. After all writers stop, the
+coordinator now runs a separate 60-second tracked read-only child under the same
+finally-protected PG shutdown. It compares every old `uploads/exports` file with
+the recovery point's hash-bound manifest: exact bytes/SHA, type, mode, owner,
+mtime, xattrs/ACLs and link topology. Existing directories compare all recorded
+fields except mtime; newly created artifacts are allowed. The original inventory
+still rejects symlink/hardlink and foreign-filesystem paths. The 300-second final
+DB audit and 60-second material audit retain separate result/error identities;
+both must pass, with argv, inline/tool hashes and result SHA in the final receipt.
+
+Only the new material-preservation fault was run. Its first attempt completed
+file-mutation checks but failed on a missing brace in its synthetic completion
+fixture (no runtime): `/tmp/c25-analysis-materials-05/`, false receipt
+`14a0ed9f18ba7de913951528d338091a4b9702c1ac9222b754b1be5196fd89a2`.
+After correcting that test fixture, the one affected test passed:
+`/tmp/c25-analysis-materials-06/`, receipt
+`586f7109c05d86df8ed065c1b427c9db42dbc0cd70594c4e3b1c1ee59dcd2b49`.
+Both retain 212 before/after input bindings and 210 source/runner copies. Coverage
+includes overwrite/deletion, metadata/link mutations, permitted new files and
+directory mtime, plus refusal of completion when material proof is missing/false.
+Previously passed independent tests were not rerun.
