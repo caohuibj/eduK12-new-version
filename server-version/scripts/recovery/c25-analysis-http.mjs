@@ -87,7 +87,7 @@ export function buildSelector(sources,fixture){
  assert.notEqual(waves[0].taskId,waves[1].taskId)
  return {schemaVersion:1,courseId:fixture.courseId,mode:'PAIRWISE',waves}
 }
-async function readFacts(h,ids){
+export async function readFacts(h,ids){
  h.remaining();const {prisma}=await runtime()
  return prisma.$transaction(async tx=>{
   await tx.$executeRawUnsafe('SET LOCAL statement_timeout = 8000')
@@ -104,8 +104,9 @@ async function readFacts(h,ids){
    otherJobs:await tx.compositeReportJob.findMany({where:{attemptId:{notIn:ids}},orderBy:{id:'asc'}})}
  },{maxWait:1000,timeout:Math.floor(Math.min(20000,h.remaining()))})
 }
-export function assertAnalysisDrain({baseline,before,after,fixture}){
+export function assertAnalysisDrain({baseline,before,after,fixture,pathProofs}){
  assert.equal(baseline.otherJobs.length,148);assert.equal(before.cases.length,3);assert.equal(after.cases.length,3)
+ if(pathProofs){assert.equal(pathProofs.length,3);assert.equal(new Set(pathProofs.map(row=>row.attemptId)).size,3)}
  assert.deepEqual(before.otherJobs,baseline.otherJobs);assert.deepEqual(after.otherJobs,baseline.otherJobs)
  assert.deepEqual(before.queue,{...baseline.queue,pending:baseline.queue.pending+3});assert.deepEqual(after.queue,baseline.queue)
  const specs={MA:{types:['FORM_SECTION','SCALE'],forms:1,scales:1,revision:2,satisfaction:'SATISFIED'},
@@ -128,10 +129,36 @@ export function assertAnalysisDrain({baseline,before,after,fixture}){
    for(const snapshot of fact.snapshots){assert.equal(snapshot.compositeAttemptId,identity.attemptId);assert.equal(snapshot.attemptEpoch,identity.attemptEpoch);assert.equal(snapshot.terminalState,'COMPLETED')}
   }
   assert.deepEqual(a.snapshots,b.snapshots,'Accepted unit snapshots must remain byte-exact through the original drain')
-  for(const key of ['trainingFlowSnapshotEncrypted','trainingFlowSnapshotHash','trainingFlowPathEncrypted','trainingFlowPathHash','frozenActiveSlotSetEncrypted','frozenActiveSlotSetHash','contextSnapshotHash'])assert.equal(a.parent[key],b.parent[key],key)
+  for(const key of ['forms','scales','cognitive','sjt','checkpoints'])assert.deepEqual(a[key],b[key],'Accepted '+key+' must remain exact through the original drain')
+  for(const key of ['trainingFlowSnapshotEncrypted','trainingFlowSnapshotHash','trainingFlowPathHash','frozenActiveSlotSetEncrypted','frozenActiveSlotSetHash','contextSnapshotHash'])assert.equal(a.parent[key],b.parent[key],key)
+  if(pathProofs){
+   const proof=pathProofs.find(row=>row.attemptId===identity.attemptId);assert.ok(proof)
+   assert.equal(proof.beforeCiphertextSha256,sha(b.parent.trainingFlowPathEncrypted));assert.equal(proof.afterCiphertextSha256,sha(a.parent.trainingFlowPathEncrypted))
+   assert.deepEqual(proof.after,proof.before,'Re-encryption must preserve the entire decrypted canonical flow path')
+   assert.equal(proof.beforeCanonicalSha256,b.parent.trainingFlowPathHash);assert.equal(proof.afterCanonicalSha256,a.parent.trainingFlowPathHash)
+   assert.equal(identityHash(proof.before),b.parent.trainingFlowPathHash);assert.equal(identityHash(proof.after),a.parent.trainingFlowPathHash)
+  }else assert.equal(a.parent.trainingFlowPathEncrypted,b.parent.trainingFlowPathEncrypted,'Changed path ciphertext requires a runtime-decrypted continuity proof')
  }
  assert.equal(after.cases.reduce((n,row)=>n+row.snapshots.length,0),4)
  return true
+}
+
+/** The real finalizer re-encrypts unchanged scope.evidence with a fresh nonce.
+ * Verify the actual plaintext and its retained canonical hash, never weaken
+ * continuity to the mere presence of a ciphertext or a hash string. */
+export async function verifyAnalysisDrain(h,context){
+ h.remaining();const {require,backend}=await runtime()
+ const {decryptUnifiedRuntimePayload}=require(path.join(backend,'dist/modules/assessment-runtime/security.js'))
+ const {canonicalHash}=require(path.join(backend,'dist/modules/assessment-runtime/canonical.js'))
+ const pathProofs=context.before.cases.map(b=>{
+  const a=context.after.cases.find(row=>row.parent.id===b.parent.id);assert.ok(a)
+  const before=decryptUnifiedRuntimePayload(b.parent.trainingFlowPathEncrypted),after=decryptUnifiedRuntimePayload(a.parent.trainingFlowPathEncrypted)
+  return {attemptId:b.parent.id,beforeCiphertextSha256:sha(b.parent.trainingFlowPathEncrypted),afterCiphertextSha256:sha(a.parent.trainingFlowPathEncrypted),
+   beforeCanonicalSha256:canonicalHash(before),afterCanonicalSha256:canonicalHash(after),before,after}
+ })
+ assertAnalysisDrain({...context,pathProofs})
+ h.write('c25-analysis-flow-path-continuity-private.json',{schemaVersion:1,pathProofs})
+ return pathProofs
 }
 
 /** One shared drain. The original selector uses SKIP LOCKED while exactly 148
@@ -266,13 +293,21 @@ export async function runAnalysisSupplement(h,sourceFixture,EFixture){
  h.write('c25-analysis-before-drain-private.json',before)
  const drain=await runAnalysisChild(h,'report',{attempts:before.cases.map(row=>({attemptId:row.parent.id,attemptEpoch:row.parent.attemptEpoch,jobId:row.job.id})),oldJobIds:baseline.otherJobs.map(row=>row.id)})
  const after=await readFacts(h,ids);h.write('c25-analysis-after-drain-private.json',after)
- assertAnalysisDrain({baseline,before,after,fixture})
+ return runAnalysisConsumers(h,{fixture,actors,clients,baseline,before,after,drain,scale})
+}
+
+/** The original remaining HTTP/scientific/CSV oracles, shared without creating
+ * a course, publication, attempt or FINAL. The resume coordinator supplies the
+ * original fixture and the actual once-drained facts. */
+export async function runAnalysisConsumers(h,{fixture,actors,clients,baseline,before,after,drain,scale,pathProofs}){
+ const {prisma}=await runtime(),course={id:fixture.courseId},ids=['MA','SA','MB'].map(name=>fixture.cases[name].attemptId)
+ if(pathProofs)assertAnalysisDrain({baseline,before,after,fixture,pathProofs});else await verifyAnalysisDrain(h,{baseline,before,after,fixture})
  for(const name of ['MA','SA','MB']){
   const actor=name==='SA'?'S':'M',attempt=await clients[actor].request(`${prefix}/attempts/${fixture.cases[name].attemptId}`)
   assert.equal(attempt.status,'COMPLETED');assert.equal(attempt.currentItem,null)
   assert.equal(attempt.trainingFlow.termination,name==='SA'?'SCREEN_OUT':'COMPLETE')
  }
- h.check('Two new publications and three attempts accepted exactly four FINALs; the three original jobs were drained once with all 148 old jobs locked and retained')
+ h.check(h.result.inheritedAnalysis?'Three inherited attempts and four inherited FINALs retained; their three original jobs were drained once with all 148 old jobs locked and retained':'Two new publications and three attempts accepted exactly four FINALs; the three original jobs were drained once with all 148 old jobs locked and retained')
  const measurement=await acceptedMeasurement(h,after,fixture),sources=await clients.teacher.request(`/courses/${course.id}/training-analysis/sources`)
  const selector=buildSelector(sources,fixture),route=`/courses/${course.id}/training-analysis`
  const analyzed=await clients.teacher.request(route,'POST',{selector})
@@ -292,7 +327,8 @@ export async function runAnalysisSupplement(h,sourceFixture,EFixture){
  h.check('One actual queued long CSV download is verified cell-by-cell for 1, 0, NOT_ASSIGNED and NO_OBSERVATION; exact non-owner and student denials hold')
  const summary={schemaVersion:1,scope:fixture.scope,courseId:course.id,publications:2,attempts:3,finals:4,acceptedSnapshots:4,
   reportChild:{file:drain.file,sha256:drain.sha256},suppression,export:exportEvidence,noCheckpointCreated:true,
-  originalScaleUnchanged:true,newAcceptedFactsUnchangedAcrossConsumers:true}
+  originalScaleUnchanged:true,newAcceptedFactsUnchangedAcrossConsumers:true,
+  ...(h.result.inheritedAnalysis?{inheritedAttempts:3,inheritedFinals:4,attemptsCreatedThisRun:0,finalsSubmittedThisRun:0}:{})}
  h.write('c25-analysis-summary-private.json',summary);h.result.analysisSupplement=summary
  return {fixture,selector,analyzed,exportEvidence,summary}
 }

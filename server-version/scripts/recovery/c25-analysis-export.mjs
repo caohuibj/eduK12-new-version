@@ -142,8 +142,9 @@ export async function childMain(){
  assert.equal(process.argv[3],'--child');assert.ok(Object.hasOwn(CHILD_LIMITS,kind))
  // This prerequisite is supplied by the coordinator module. It executes before
  // the lazy runtime import and does not itself start services or credentials.
- const {readAnalysisPrerequisites}=await import('./c25-analysis-contract.mjs')
- readAnalysisPrerequisites(state)
+ if(path.resolve(state)===path.resolve(directory,'../../../..','eduk12_c25_analysis_02')){
+  const {readAnalysisResumePrerequisites}=await import('./c25-analysis-resume-contract.mjs');readAnalysisResumePrerequisites(state)
+ }else{const {readAnalysisPrerequisites}=await import('./c25-analysis-contract.mjs');readAnalysisPrerequisites(state)}
  process.umask(0o077)
  const stem='c25-analysis-'+kind+'-child',file=path.join(state,stem+'-invocation-private.json'),info=fs.lstatSync(file)
  assert.ok(info.isFile()&&!info.isSymbolicLink()&&info.nlink===1);assert.equal(info.mode&0o777,0o600)

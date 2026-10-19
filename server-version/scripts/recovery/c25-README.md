@@ -655,3 +655,93 @@ Browser native IndexedDB/WebLocks lifecycle, C24 focus/interaction acceptance,
 and real selected-video playback remain open; DTO metadata is not browser proof.
 The previous browser startup restriction remains reported until an authorized
 working browser is available. No capacity/throughput conclusion is supported.
+
+## C19 existing-job continuation preparation
+
+The first C19 supplement remains failed: its overall receipt is
+`efffe632f5d7f56db83b56dd41cfb10aa00e9903da356baf31af9a3b38530394`.
+It accepted three attempts / four FINALs (31 successful HTTP responses), but
+its report child stalled on the now-reproduced ESM top-level-await cycle.
+The final database audit also failed on the reports budget row; no final
+snapshot was retained. Old material files passed their separate audit. These
+facts do not constitute analysis or CSV acceptance. Fix `929637f4` separates
+the CLI entry; its seven real Node/no-service contracts are separate evidence.
+
+Prepared `c25-analysis-resume-*` uses a new `eduk12_c25_analysis_02` evidence
+directory and the same owned, stopped physical cluster. It inherits the three
+attempts and four FINALs, submits none again, and calls the three original
+report jobs once through original claim/process, followed only by the remaining
+analysis/download and permission checks. Its independent overall receipt is
+`c25-analysis-resume-overall-result.json`; the executed phase is
+`analysis-resume`. The old 37-file failed evidence set is hash-pinned, including
+the original false receipt, before-drain facts, and original full 6,667 rows.
+
+Admission must first persist current full rows, schema/columns and snapshot
+privately (0600, exclusive creation, fsync), then prove all 6,666 unaffected
+original rows exact. The one original `reports` row must be exactly pending
+0→3, independently explained by the three full frozen PENDING jobs, each
+attemptCount=0/budgetHeld=true, and all 148 old jobs. The actual current row count
+is observed at admission; it is not inferred from the absent failed final
+snapshot. A single partial baseline is retained. Capture failures or semantic
+failures retain their raw facts and a false audit receipt.
+
+Preserve/final audits restore the entire original 6,667-row protection,
+including reports pending=0 and the exact original 21 checkpoints. Every
+partial-baseline row also remains exact except these source-derived columns
+on the exact three new parent/job IDs:
+
+- Parent: status, progress, completed_items, completed_at, total_time,
+  last_saved_at, aggregate_input_hash, task_satisfaction,
+  training_flow_path_encrypted. Completion values come from the four accepted
+  snapshots; path hash is unchanged, and authenticated before/after path
+  plaintext and canonical hashes must agree despite legitimate re-encryption.
+- Job: status, claimed_revision, attempt_count, budget_held, next_attempt_at,
+  report_encrypted, aggregate_input_hash,
+  completed_at, updated_at. Final status READY, attemptCount=1 and released
+  budget are mandatory. Lease/error fields remain exactly NULL across the
+  baseline/final comparison. The four snapshots and Form/Scale accepted facts have
+  no exceptions.
+- Only the actual new report-manifest-referenced, authenticated layout
+  templates and at most one course/teacher-bound CSV batch/artifact may append.
+  Overall success separately requires exactly one downloaded 4×24 CSV proof.
+
+The remaining phase has one aggregate 300s deadline, sharing the original
+120s report and 60s export child limits; baseline/preserve/final audits each
+have 300s and the old uploads/exports file-subset check has 60s. The API is
+stopped immediately after the sole dependent phase and still has its independent
+45-minute lifetime ceiling. PostgreSQL stops in finally even if either final
+DB or materials protection fails. Original source/build/client/tool bindings,
+72 unchanged Python helpers, lock and resource floors are retained. Entry
+requires disk 8GiB+512MiB; the 512MiB buffer is consumable, while runtime disk
+8GiB, memory 2GiB and tmp 512MiB remain hard floors.
+
+The new archive adapter only prepares a separate
+`/tmp/c25-analysis-resume-recovery-01` recovery point. It labels current logical
+counts unknown, inherits accepted-core counts explicitly, preserves the failed
+analysis and all earlier recovery/evidence, and uses the existing full metadata
+roundtrip/fsync/600s contract. It does not overwrite the pre-failure 6,667-row
+archive. Descriptor issuance, archive execution and continuation runtime each
+still need approval after the frozen preparation review. No new full database
+restore, threshold N=4/5, selected-video, browser or capacity claim is added.
+
+New no-service preparation evidence: 23 contracts passed once in 12.223s;
+`/tmp/c25-analysis-resume-08/receipt.json` SHA
+`204bdf0960adb3afa0eeb8fc6899291b246d5b859ab249ba86a9584be76be8fc`,
+raw `new-resume-contract-tests.log` SHA
+`ed6110d3aa728c0412c91c7c58722eb3553e097fb1796db2615f28d315f0bab6`.
+Its 229 inputs / 226 copies and equal before/after closure are retained; the
+separate read-only frozen-failure contract also passed. Four additional compact
+encoding contracts passed in 1.669s using the exact frozen production compact
+codec/canonical modules, with synthetic values and no application services.
+`/tmp/c25-analysis-resume-09/receipt.json` SHA
+`e0a6d6d58777275f0f0e242bafc3d97a172232b914bfd70286813d10efb3410b`,
+raw `new-compact-contract-tests.log` SHA
+`f64980714f2d94df0f12bd0a6569d6cbfbcc939f3c09ed13f51b6443440e0271`.
+Its 235 inputs / 232 copies are retained with equal before/after closure; all
+four embedded Python programs compiled without execution. The earlier 23
+contracts were not repeated. Both receipts verify the original 72 Python
+helper bytes against the existing current-client receipt. The aggregate input
+hash is computed by the original finalizer and authenticated across
+parent/job/report; this adapter does not claim independent recomputation.
+No new descriptor, archive, database, HTTP runtime, emit or restore ran in this
+preparation. Raw/private evidence remains outside Git.

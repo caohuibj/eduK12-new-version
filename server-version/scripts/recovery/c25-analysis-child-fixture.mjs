@@ -25,10 +25,16 @@ export function readAnalysisPrerequisites(value){
  event('prerequisites-read');return {scope:config.scope}
 }
 
+export function readAnalysisResumePrerequisites(value){
+ assert.equal(value,state);assert.equal(config.scope,'SYNTHETIC_CLI_LIFECYCLE_ONLY')
+ event('resume-prerequisites-read');return {scope:config.scope}
+}
+
 if(!new URL(import.meta.url).search){
  const replacements=new Map([
   [new URL('c20-materials-client.mjs',base).href,new URL('c25-analysis-child-runtime-fixture.mjs',ownUrl).href],
   [new URL('c25-analysis-contract.mjs',base).href,ownUrl+'?prerequisites'],
+  [new URL('c25-analysis-resume-contract.mjs',base).href,ownUrl+'?resume-prerequisites'],
  ])
  const observed=new Set(['c25-analysis-export.mjs','c25-analysis-http.mjs','c25-analysis-child.mjs'].map(name=>new URL(name,base).href))
  registerHooks({
