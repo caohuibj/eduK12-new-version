@@ -1,8 +1,8 @@
-import {fireEvent,render,screen,waitFor} from '@testing-library/react'
+import {fireEvent,render,screen,waitFor,within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {afterEach,describe,expect,it,vi} from 'vitest'
 import {SurveyBuilder} from './SurveyBuilder'
-import type {ResearchDraft,SjtDraftV2} from './builder.types'
+import type {FormDraft,ResearchDraft,SjtDraftV2} from './builder.types'
 
 const base='/api/survey/projects/p1'
 const form:ResearchDraft={id:'form1',projectId:'p1',instrumentKey:'form',kind:'FORM',title:'合成表单',
@@ -10,14 +10,17 @@ const form:ResearchDraft={id:'form1',projectId:'p1',instrumentKey:'form',kind:'F
     {pageKey:'page1',title:'第一页',questions:[{itemKey:'q1',type:'SHORT_TEXT',prompt:'第一题',required:true,options:[],rows:[]}]},
     {pageKey:'page2',title:'第二页',questions:[{itemKey:'q2',type:'SHORT_TEXT',prompt:'',required:true,options:[],rows:[]}]},
   ]}}
-function setup(draft:ResearchDraft,{patchError=false,bulk=false}={}){
+function setup(draft:ResearchDraft,{patchError=false,bulk=false,answerIssue}:{patchError?:boolean;bulk?:boolean;answerIssue?:'missing'|'invalid'}={}){
   const fetcher=vi.fn(async(url:string,init?:RequestInit)=>{
     let data:unknown=null,status=200
     if(url==='/api/survey/auth/csrf')data={csrfToken:'synthetic'}
     else if(url===base+'/instruments?page=1')data={list:[draft]}
     else if(url===base+'/assets')data={assets:[]}
     else if(url===base+'/catalog?page=1')data={list:[]}
-    else if(url===base+'/instruments/'+draft.id+'/validate')data={revision:1,kind:draft.kind,ok:false,issues:[{
+    else if(url===base+'/instruments/'+draft.id+'/form-dry-run'&&answerIssue)data={ok:false,
+      issues:[{path:'answers.q2',message:answerIssue==='missing'?'请填写必答题':'请输入有效数值',severity:'error'}],
+      missing:answerIssue==='missing'?[{itemKey:'q2',reason:'unanswered'}]:[]}
+    else if(url===base+'/instruments/'+draft.id+'/validate')data=answerIssue?{revision:1,kind:'FORM',ok:true,issues:[]}:{revision:1,kind:draft.kind,ok:false,issues:[{
       path:draft.kind==='SJT'?'scenes.1.questions.0.prompt':'pages.1.questions.0.prompt',message:'请填写题干',severity:'error',
     }]}
     else if(url===base+'/instruments/'+draft.id+'/bulk-import/preview'&&bulk)data={revision:1,count:1,ok:false,digest:'synthetic',
@@ -42,6 +45,34 @@ describe('S04 authoring guidance and issue locations',()=>{
     expect(screen.getAllByLabelText('题干')[0]).toHaveValue('第一题')
     expect(fetcher.mock.calls.filter(([,init])=>init?.method==='PATCH')).toHaveLength(0)
   })
+  it.each(['missing','invalid'] as const)('locates %s trial answers in preview controls by keyboard, separately from authoring',async(answerIssue)=>{
+    const user=userEvent.setup(),definition=structuredClone(form.definition) as FormDraft
+    definition.pages[1].questions[0]={...definition.pages[1].questions[0],type:'NUMBER',prompt:'第二题数值',min:0}
+    const fetcher=setup({...form,definition},{answerIssue})
+    fireEvent.click(await screen.findByRole('button',{name:/合成表单 FORM/}))
+    fireEvent.click(await screen.findByRole('button',{name:'结构检查与编译预览'}))
+    await screen.findByRole('region',{name:'研究工具试答预览'})
+    fireEvent.change(document.getElementById('survey-preview-q1')!.querySelector('textarea')!,{target:{value:'合成有效回答'}})
+    if(answerIssue==='invalid'){
+      fireEvent.click(within(screen.getByRole('navigation',{name:'试答分页'})).getByRole('button',{name:'下一页'}))
+      fireEvent.change(document.getElementById('survey-preview-q2')!.querySelector('input')!,{target:{value:'-1'}})
+    }
+    fireEvent.click(screen.getByRole('button',{name:'按正式 FINAL 规则试提交（不保存数据）'}))
+    const location=await screen.findByRole('button',{name:'第 2 页 · 第 1 题：'+(answerIssue==='missing'?'请填写必答题':'请输入有效数值')})
+    const previewTarget=await waitFor(()=>{
+      const element=document.getElementById('survey-preview-q2');expect(element).not.toBeNull();return element!
+    })
+    location.focus();await user.keyboard('{Enter}')
+    await waitFor(()=>expect(previewTarget).toHaveFocus())
+    expect(document.getElementById('survey-form-q2')).not.toHaveFocus()
+    if(answerIssue==='invalid')expect(previewTarget.querySelector('input')).toHaveValue(-1)
+    expect(fetcher.mock.calls.filter(([url])=>url.endsWith('/form-dry-run'))).toHaveLength(1)
+    const submitted=JSON.parse(fetcher.mock.calls.find(([url])=>url.endsWith('/form-dry-run'))![1]!.body as string).answers
+    expect(submitted.q1).toBe('合成有效回答')
+    if(answerIssue==='invalid')expect(submitted.q2).toBe(-1)
+    else expect(submitted.q2).toBeUndefined()
+    expect(fetcher.mock.calls.some(([url,init])=>init?.method==='PATCH'||url.endsWith('/preview'))).toBe(false)
+  })
   it('retains a rejected unsaved edit and exposes the server issue as an actionable location',async()=>{
     setup(form,{patchError:true});fireEvent.click(await screen.findByRole('button',{name:/合成表单 FORM/}))
     fireEvent.change(await screen.findByLabelText('研究工具名称'),{target:{value:'未保存的名称'}})
@@ -57,7 +88,7 @@ describe('S04 authoring guidance and issue locations',()=>{
     const input=screen.getByLabelText('待解析的导入内容') as HTMLTextAreaElement
     fireEvent.change(input,{target:{value:'type,prompt\nTEXT,第一行\nBAD,出错行'}})
     fireEvent.click(screen.getByRole('button',{name:'解析并预览（不保存）'}))
-    fireEvent.click(await screen.findByRole('button',{name:'导入位置 3：未知题型'}))
+    fireEvent.click(await screen.findByRole('button',{name:'导入源文件第 3 行：未知题型'}))
     await waitFor(()=>expect(input).toHaveFocus())
     expect(input.value.slice(input.selectionStart,input.selectionEnd)).toBe('BAD,出错行')
     expect(screen.queryByRole('button',{name:'确认导入全部题目'})).toBeNull()

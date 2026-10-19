@@ -1,0 +1,1 @@
+src/survey/SurveyBuilder.tsx(197,65): error TS2339: Property 'line' does not exist on type 'never'.

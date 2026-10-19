@@ -10,7 +10,7 @@ import type { ResearchDraft, Kind, Definition, FormDraft, ScaleDraft, SjtDraft, 
 import { researchKey } from './builder.types'
 import { ResearchAuthoringGuide,ResearchImportGuide } from './ResearchAuthoringGuide'
 import { ResearchIssueList } from './ResearchIssueList'
-import { authoringIssueTarget,type AuthoringIssue } from './authoring-issue-location'
+import { authoringIssueTarget,type AuthoringIssue,type ImportIssueContext } from './authoring-issue-location'
 import './survey-workspace.css'
 import { useInstrumentLibrary, type InstrumentLibrary } from './instrument-library'
 
@@ -19,7 +19,7 @@ type Preview={revision:number;ok:boolean;issues:Issue[];definitionDigest?:string
   kind:Kind;cognitivePreview?:CognitivePreviewSnapshot;score?:{scores?:{key:string;value:number|null;status:string}[];metrics?:{key:string;value:number|null}[]}|null}
 type BulkBatch={batchId:string;format:'TEXT'|'CSV';content:string;pageKey?:string;dimensionKey?:string}
 type BulkResult={revision:number;count:number;ok:boolean;digest:string;issues:{line:number;message:string}[];
-  items:{type:string;prompt:string;options:string[]}[]}
+  items:{type:string;prompt:string;options:string[];sourceLine?:number;dimensionKey?:string}[]}
 class BuilderApiError extends Error {
   constructor(message:string,readonly issues:AuthoringIssue[]){super(message)}
 }
@@ -177,9 +177,10 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
     setUndo(null);setActive(updated);setPreview(null);setDirty(false)
     await refreshAfterWrite(instrumentPage);setNotice('已撤销上一批导入')
   })}
-  const locateIssue=(issue:AuthoringIssue)=>{
+  const locateIssue=(issue:AuthoringIssue,context?:ImportIssueContext)=>{
     if(!active)return
-    const target=authoringIssueTarget(active,issue)
+    const target=authoringIssueTarget(active,issue,context)
+    if(!target.targetId)return
     if('sceneIndex' in target&&target.sceneIndex!==undefined){
       // Reuse the existing scene selector; shared SJT editor/runtime stays intact.
       editorRoot.current?.querySelectorAll('nav[aria-label="情境列表"] > div')[target.sceneIndex]
@@ -191,9 +192,12 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
       element.classList.add('survey-authoring-target');element.focus()
       element.scrollIntoView?.({block:'center'})
       if(element instanceof HTMLTextAreaElement&&'line' in target&&target.line){
-        const lines=element.value.split('\n'),line=Math.max(0,Math.min(target.line-1,lines.length-1))
+        const lines=element.value.split('\n'),line=target.line-1
+        if(line<0||line>=lines.length)return
+        const endLine=target.endLine
         const start=lines.slice(0,line).reduce((n,text)=>n+text.length+1,0)
-        element.setSelectionRange(start,start+lines[line].length)
+        const end=lines.slice(0,endLine).join('\n').length
+        element.setSelectionRange(start,end)
       }
     })
   }
@@ -287,7 +291,9 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
         <button type="button" className="btn-secondary" disabled={busy||dirty||!bulkText.trim()} onClick={bulkPreview}>解析并预览（不保存）</button>
         {bulk&&<div className="border rounded-lg p-3 space-y-2">
           <p className="font-semibold text-sm">候选题数：{bulk.result.count}</p>
-          <ResearchIssueList draft={active} issues={bulk.result.issues} onLocate={locateIssue}/>
+          <ResearchIssueList draft={active} issues={bulk.result.issues}
+            importContext={{...bulk.batch,items:bulk.result.items}}
+            onLocate={issue=>locateIssue(issue,{...bulk.batch,items:bulk.result.items})}/>
           {bulk.result.items.slice(0,50).map((item,i)=><p key={i} className="text-sm">{i+1}. {item.prompt}（{item.type}，{item.options.length} 个选项）</p>)}
           {bulk.result.ok&&<button className="btn-primary" type="button" disabled={busy||dirty||active.revision!==bulk.result.revision}
             onClick={bulkApply}>确认导入全部题目</button>}

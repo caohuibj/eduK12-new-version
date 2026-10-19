@@ -1,0 +1,35 @@
+{
+  "reviewBase": "402b13d5e8d37f3b1ea8da1fc0fc04bed1246fe2",
+  "cumulativeRecoveryBase": "7d4f1b0db3969c585c2bcda5dbc819103b1f824d",
+  "finalFiles": {
+    "server-version/frontend/src/survey/ResearchIssueList.tsx": {
+      "bytes": 1080,
+      "sha256": "f15399586abaa45003e9d04db1506174eb925b1e595c9c37b1968e1a3ae862c1"
+    },
+    "server-version/frontend/src/survey/SurveyAuthoringGuidance.test.tsx": {
+      "bytes": 9082,
+      "sha256": "3e0b468446f38ca8e7eea2afa71a67314d0823d9a72005f10aa54a3d41609e47"
+    },
+    "server-version/frontend/src/survey/SurveyBuilder.tsx": {
+      "bytes": 27237,
+      "sha256": "002b39605b6c00472d4ace1600680a05ce23c511014028703231e5a4bddc92b0"
+    },
+    "server-version/frontend/src/survey/authoring-issue-location.ts": {
+      "bytes": 4606,
+      "sha256": "9f866425033bc3ce6b233410d24243c3048654f4710bc3371d572c206a74b88f"
+    },
+    "server-version/frontend/src/survey/SurveyImportIssueLocations.test.tsx": {
+      "bytes": 4047,
+      "sha256": "34683e8fd456f29d876cd15516383d88af1ae676db01bdd61475449312567155"
+    },
+    "server-version/frontend/src/survey/test-fixtures/s04-import-failure-sources.json": {
+      "bytes": 5687,
+      "sha256": "119d3e9de5e7a241963cd09112a3782049cdf24e19d200ca2d09aa949f6d17db"
+    }
+  },
+  "backendChanged": false,
+  "permissionsAndScoringChanged": false,
+  "ciRun": false,
+  "nativeBrowserRerun": false,
+  "reuse": "Earlier whole-suite and native screenshots keep original source binding. This fix claims only targeted results; initial fixed.json authoring case reused after a type-only removal of an unreachable CSV branch."
+}
