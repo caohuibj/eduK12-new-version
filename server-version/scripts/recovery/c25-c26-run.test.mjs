@@ -51,17 +51,17 @@ with tempfile.TemporaryDirectory() as tmp:
   assert called==[]
  print(json.dumps({'originalEmptyPortRejected':True,'actualUnchangedConstructorAccepted':True,'runtimeMismatchRejected':True,'durabilityFailureBlockedAudit':True}))
 `))
-test('A03 evidence identity agrees across entry audit controller and materials and rejects both failed roots',async()=>{
- const current='/workspace/scratch/5a77e8bdc1ae/eduk12_c26_a_03'
+test('A04 evidence identity agrees across entry audit controller and materials and rejects all three failed roots',async()=>{
+ const current='/workspace/scratch/5a77e8bdc1ae/eduk12_c26_a_04'
  assert.equal(entryState,current);assert.equal(databaseState,current)
  const args=['--python','/usr/bin/python3','--tools','/tools','--state',current,'--mode','baseline','--label','c25-c26-audit-baseline']
  assert.equal(databaseInvocation(args).state,current)
- for(const suffix of ['01','02']){
-  const old=current.replace('_03','_'+suffix);assert.throws(()=>databaseInvocation(args.map(x=>x===current?old:x)))
+ for(const suffix of ['01','02','03']){
+  const old=current.replace('_04','_'+suffix);assert.throws(()=>databaseInvocation(args.map(x=>x===current?old:x)))
   const previous=process.argv
-  try{process.argv=[previous[0],previous[1],old];await assert.rejects(driverEntry(),/eduk12_c26_a_0[123]/)}finally{process.argv=previous}
+  try{process.argv=[previous[0],previous[1],old];await assert.rejects(driverEntry(),/eduk12_c26_a_0[1234]/)}finally{process.argv=previous}
  }
- python("assert STATE==ROOT/'eduk12_c26_a_03'\nassert 'eduk12_c26_a_03/c25-c26-material-audit-result.json' in MATERIAL_PROGRAM\nassert 'eduk12_c26_a_01' not in MATERIAL_PROGRAM and 'eduk12_c26_a_02' not in MATERIAL_PROGRAM")
+ python("assert STATE==ROOT/'eduk12_c26_a_04'\nassert 'eduk12_c26_a_04/c25-c26-material-audit-result.json' in MATERIAL_PROGRAM\nassert 'eduk12_c26_a_01' not in MATERIAL_PROGRAM and 'eduk12_c26_a_02' not in MATERIAL_PROGRAM and 'eduk12_c26_a_03' not in MATERIAL_PROGRAM")
 })
 test('one original budget fixes work/driver/final audit tails before preflight and rejects late durable PASS',()=>python(String.raw`
 import tempfile
@@ -197,12 +197,12 @@ for key in ['originalReportsSingletonExact','primarySnapshotExact','allColumnsPr
 test('fixed archive export and adapted material reader load actual frozen libraries without service I/O',()=>python(String.raw`
 node=ROOT/'eduk12_tools_20261018/node_modules/node/bin/node'
 archive,inline_sha=archive_library(node)
-assert archive['SOURCE']==DATA and archive['OUTPUT']==Path('/tmp/c25-c26-recovery-03')
+assert archive['SOURCE']==DATA and archive['OUTPUT']==Path('/tmp/c25-c26-recovery-04')
 assert archive['PRODUCER']==BASE/'c25-c26-archive.mjs'
 assert archive['SEED_FIXTURE']==SEED and archive['SEED_FIXTURE_SHA']==SEED_SHA
 assert re.fullmatch('[a-f0-9]{64}',inline_sha)
 assert 'import {pythonProgram}' in MATERIAL_PROGRAM and 'process.stdout.write(pythonProgram)' in MATERIAL_PROGRAM
-assert 'eduk12_c26_a_03/c25-c26-material-audit-result.json' in MATERIAL_PROGRAM
+assert 'eduk12_c26_a_04/c25-c26-material-audit-result.json' in MATERIAL_PROGRAM
 scope={'__name__':'material_library'};exec(compile(MATERIAL_PROGRAM,'<materials>','exec'),scope)
 assert callable(scope['verify_old_materials'])
 `))

@@ -5,7 +5,7 @@ import path from 'node:path'
 import {spawn} from 'node:child_process'
 import {fileURLToPath} from 'node:url'
 import {MATERIAL_PYTHON as oldMaterials} from './c25-analysis-resume.mjs'
-export const MATERIAL_PROGRAM=oldMaterials.replaceAll('eduk12_c25_analysis_02/c25-analysis-resume-material-audit-result.json','eduk12_c26_a_03/c25-c26-material-audit-result.json').replaceAll('ARCHIVE_PYTHON','pythonProgram')
+export const MATERIAL_PROGRAM=oldMaterials.replaceAll('eduk12_c25_analysis_02/c25-analysis-resume-material-audit-result.json','eduk12_c26_a_04/c25-c26-material-audit-result.json').replaceAll('ARCHIVE_PYTHON','pythonProgram')
 export const RUN_PYTHON=String.raw`
 MATERIAL_PROGRAM=${JSON.stringify(MATERIAL_PROGRAM)}
 import argparse,ctypes,fcntl,hashlib,importlib.util,json,os,re,shutil,signal,socket,stat,subprocess,sys,threading,time,traceback
@@ -18,7 +18,7 @@ def module(name,file):
  spec=importlib.util.spec_from_file_location(name,BASE/file);value=importlib.util.module_from_spec(spec);spec.loader.exec_module(value);return value
 preflight=module('c26_preflight','c25-contracts.py');source_contract=module('c26_source','c25-source.py')
 ROOT,REPO,BACKEND,FRONTEND=preflight.REPO.parent,preflight.REPO,preflight.BACKEND,preflight.FRONTEND
-STATE=ROOT/'eduk12_c26_a_03';DATA=ROOT/'eduk12_c25_http_01';CORE=ROOT/'eduk12_c25_continuation_02'
+STATE=ROOT/'eduk12_c26_a_04';DATA=ROOT/'eduk12_c25_http_01';CORE=ROOT/'eduk12_c25_continuation_02'
 sha_file,digest=preflight.sha_file,preflight.digest
 TOTAL,FINAL_AUDIT,MATERIAL,FINAL_STOP_VERIFY,DRIVER_CLEANUP=1200,300,60,60,60
 SEED=ROOT/'eduk12_c21_http_01/fixture-private.json';SEED_SHA='86287a00e4a34810c5e8e71afd70dac2f45c89750b9f04560aad67b4506d9239'
