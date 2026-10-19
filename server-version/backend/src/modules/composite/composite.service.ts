@@ -2655,15 +2655,19 @@ const createAttempt = async (
     if (persistence?.checkpoint || persistence?.localCognitive || feedbackConfigured) {
       // The same publication lock protects this configured-policy projection.
       // Legacy/off admissions never load course relations or definition blobs.
-      const current = await db.compositeAssessment.findUnique({ where: { id: composite.id }, select: {
-        id: true, status: true, productKind: true, questionnaireType: true, deliveryMode: true,
+      const configuredPolicySelect = {
+        id: true, status: true, productKind: true, questionnaireType: true,
         reportPackageKey: true, analysisProtocolKey: true, publishedAt: true, createdBy: true,
         trainingFlowDigest: true, trainingVariantDigest: true, expiresAt: true,
         trainingFeedbackPolicy: true, trainingFeedbackPolicyHash: true,
         questionnaireCourses: { select: { courseId: true } },
-      } })
+      } satisfies Prisma.CompositeAssessmentSelect
+      const publicationReader: Pick<Prisma.TransactionClient, 'compositeAssessment'> = db
+      const current = await publicationReader.compositeAssessment.findUnique({ where: { id: composite.id }, select: configuredPolicySelect })
       if (!current) throw compositeForbidden('问卷已停止接收新作答')
-      if (current.productKind !== 'QUESTIONNAIRE' || current.questionnaireType !== 'COURSE' || current.deliveryMode === 'LEGACY' || relationalIdentity || current.reportPackageKey || current.analysisProtocolKey || !current.publishedAt)
+      // deliveryMode belongs to the attempt/runtime context, not the publication.
+      // An absent override keeps the existing default FINAL_ONLY admission.
+      if (current.productKind !== 'QUESTIONNAIRE' || current.questionnaireType !== 'COURSE' || composite.deliveryMode === 'LEGACY' || relationalIdentity || current.reportPackageKey || current.analysisProtocolKey || !current.publishedAt)
         throw compositeBadRequest('此投放不支持 Training 冻结策略')
       const courseIds = current.questionnaireCourses.map((entry: { courseId: string }) => entry.courseId)
       const courseId = userId ? composite.deliveryCourseId : (courseIds.length === 1 ? courseIds[0] : null)
