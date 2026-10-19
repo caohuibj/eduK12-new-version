@@ -2647,14 +2647,15 @@ const createAttempt = async (
     if (persistence?.checkpoint || persistence?.localCognitive) {
       // The same publication lock still protects this opt-in-only projection.
       // Legacy/off admissions never load course relations or large definition blobs.
-      const current = await db.compositeAssessment.findUnique({ where: { id: composite.id }, select: {
-        id: true, productKind: true, questionnaireType: true, deliveryMode: true,
+      const persistenceDefinitions: Prisma.TransactionClient['compositeAssessment'] = db.compositeAssessment
+      const current = await persistenceDefinitions.findUnique({ where: { id: composite.id }, select: {
+        id: true, productKind: true, questionnaireType: true,
         reportPackageKey: true, analysisProtocolKey: true, publishedAt: true, createdBy: true,
         trainingFlowDigest: true, trainingVariantDigest: true, expiresAt: true,
         questionnaireCourses: { select: { courseId: true } },
-      } })
+      } satisfies Prisma.CompositeAssessmentSelect })
       if (!current) throw compositeForbidden('问卷已停止接收新作答')
-      if (current.productKind !== 'QUESTIONNAIRE' || current.questionnaireType !== 'COURSE' || current.deliveryMode === 'LEGACY' || relationalIdentity || current.reportPackageKey || current.analysisProtocolKey || !current.publishedAt)
+      if (current.productKind !== 'QUESTIONNAIRE' || current.questionnaireType !== 'COURSE' || composite.deliveryMode === 'LEGACY' || relationalIdentity || current.reportPackageKey || current.analysisProtocolKey || !current.publishedAt)
         throw compositeBadRequest('此投放不支持 Training 草稿策略')
       const courseIds = current.questionnaireCourses.map((entry: { courseId: string }) => entry.courseId)
       const courseId = userId ? composite.deliveryCourseId : (courseIds.length === 1 ? courseIds[0] : null)

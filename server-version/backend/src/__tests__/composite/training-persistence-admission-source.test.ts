@@ -1,4 +1,6 @@
 import { readFileSync } from 'node:fs'
+import { Prisma } from '@prisma/client'
+import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { freezeTrainingPersistenceSnapshot, parseTrainingPersistencePolicy, trainingCheckpointExpiry, trainingPersistenceMetadata } from '../../modules/composite/training-persistence.policy'
@@ -93,6 +95,33 @@ describe('Training admission snapshot unit contracts', () => {
 })
 
 describe('C23 compact admission projection source contracts', () => {
+  it('types the persistence projection against real model fields and retains the normalized LEGACY guard', () => {
+    const file = ts.createSourceFile('composite.service.ts', composite, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS)
+    const calls: ts.CallExpression[] = []
+    const visit = (node: ts.Node) => {
+      if (ts.isCallExpression(node) && node.expression.getText(file) === 'persistenceDefinitions.findUnique') calls.push(node)
+      ts.forEachChild(node, visit)
+    }
+    visit(file)
+    expect(calls).toHaveLength(1)
+    const args = calls[0].arguments[0] as ts.ObjectLiteralExpression
+    const select = args.properties.find((node) => ts.isPropertyAssignment(node) && node.name.getText(file) === 'select') as ts.PropertyAssignment
+    expect(ts.isSatisfiesExpression(select.initializer)).toBe(true)
+    const constraint = select.initializer as ts.SatisfiesExpression
+    expect(constraint.type.getText(file)).toBe('Prisma.CompositeAssessmentSelect')
+    const selected = (constraint.expression as ts.ObjectLiteralExpression).properties.map((node) => node.name!.getText(file))
+    // Generated metadata supplies the actual schema; no mock invents deliveryMode.
+    const model = Prisma.dmmf.datamodel.models.find((entry) => entry.name === 'CompositeAssessment')!
+    expect(selected.filter((name) => !model.fields.some((field) => field.name === name))).toEqual([])
+    expect(selected).not.toContain('deliveryMode')
+    expect(selected).toContain('questionnaireCourses')
+    expect(admission).toContain("const persistenceDefinitions: Prisma.TransactionClient['compositeAssessment'] = db.compositeAssessment")
+    const enabled = admission.slice(admission.indexOf('if (persistence?.checkpoint'), admission.indexOf('const courseIds'))
+    expect(enabled).toContain("composite.deliveryMode === 'LEGACY'")
+    expect(enabled).not.toContain('current.deliveryMode')
+    expect(enabled).not.toContain("deliveryMode === 'FINAL_ONLY'")
+  })
+
   it('keeps legacy/off policy on a compact locked header without course/blob reads', () => {
     const header=admission.slice(admission.indexOf('const current ='),admission.indexOf('if (persistence?.checkpoint'))
     expect(header).toContain('select: { status: true, publicEnabled: true, opensAt: true, expiresAt: true,')
