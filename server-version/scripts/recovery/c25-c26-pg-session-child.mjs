@@ -24,7 +24,7 @@ export async function runPgSessionChild({createIo}={}){
  const totalRemaining=()=>{const left=Number(BigInt(config.deadlineNs)-process.hrtime.bigint())/1e6;assert.ok(left>0&&left<=1200000,'observer leaf aggregate deadline');return left}
  const remaining=()=>{const left=totalRemaining()-config.reserveMs;assert.ok(left>0,'observer leaf work deadline');return left}
  const journal=fs.openSync(path.join(directory,'observer-child-raw-private.jsonl'),'wx',0o600),hash=createHash('sha256')
- let journalBytes=0,journalClosed=false,eventSequence=0,currentSequence=0,currentOperation='boot',busy=false,failure=null,connection=null,registry=null,readProc=null,lastCompleteProc=null,procReadSequence=0,observer=null,windowPhase='none',windows=0,commandTimer,ackTimer,closing=false,normalDisconnect=false,sendBytes=0,sending=false,queued=[],drainers=[],closeAckResolve,sessionTimer
+ let journalBytes=0,journalClosed=false,eventSequence=0,currentSequence=0,currentOperation='boot',busy=false,failure=null,connection=null,registry=null,readProc=null,lastCompleteProc=null,procReadSequence=0,observer=null,windowPhase='none',windows=0,commandTimer,ackTimer,closing=false,normalDisconnect=false,sendBytes=0,sending=false,queued=[],drainers=[],closeAckResolve,sessionTimer,currentDeadline=null
  const wire=extra=>({type:TYPE,nonce:config.nonce,pid:self.pid,startTicks:self.startTicks,...extra})
  const flush=()=>sending||queued.length?new Promise((resolve,reject)=>drainers.push({resolve,reject})):failure?Promise.reject(failure):Promise.resolve()
  function pump(){
@@ -41,8 +41,10 @@ export async function runPgSessionChild({createIo}={}){
  const record=value=>{
   if(failure)throw failure;assert.ok(!journalClosed,'observer raw journal closed');const copy=structuredClone(value),bytes=Buffer.from(JSON.stringify(copy)+'\n');assert.ok(journalBytes+bytes.length<=config.maxJournalBytes,'observer child journal limit')
   fs.writeFileSync(journal,bytes);hash.update(bytes);journalBytes+=bytes.length
+  commandHealthy(currentDeadline)
   void send(wire({kind:'event',seq:++eventSequence,op:'record',value:copy})).catch(fault)
  }
+ const commandHealthy=deadline=>{if(failure)throw failure;if(closing)totalRemaining();else remaining();assert.ok(deadline===null||process.hrtime.bigint()<deadline,'observer command deadline exceeded after callback')}
  const healthy=()=>{if(failure)throw failure;remaining();sameIdentity(proc(process.pid),self);assert.equal(process.ppid,config.parentPid)}
  function fault(error){
   if(failure)return failure
@@ -119,20 +121,20 @@ export async function runPgSessionChild({createIo}={}){
    if(failure)return
    if(value?.kind==='ack'){
     keys(value,['type','kind','nonce','seq','op','pid','startTicks']);assert.equal(value.type,TYPE);assert.equal(value.nonce,config.nonce);assert.ok(closing&&closeAckResolve,'unexpected terminal ACK');assert.equal(value.seq,currentSequence);assert.equal(value.op,'close');assert.equal(value.pid,self.pid);assert.equal(value.startTicks,self.startTicks)
-    const resolve=closeAckResolve;closeAckResolve=null;clearTimeout(ackTimer);resolve();return
+    commandHealthy(currentDeadline);const resolve=closeAckResolve;closeAckResolve=null;clearTimeout(ackTimer);resolve();return
    }
    keys(value,['type','kind','nonce','seq','op','deadlineNs','payload']);assert.equal(value.type,TYPE);assert.equal(value.kind,'command');assert.equal(value.nonce,config.nonce);assert.equal(value.seq,currentSequence+1);assert.ok(!busy&&!closing,'single outstanding observer command required');assert.ok(['connect','begin','operationEnd','settledEnd','register','prepareClose','retire','close'].includes(value.op));assert.match(value.deadlineNs,/^[0-9]+$/)
    const deadline=BigInt(value.deadlineNs);assert.ok(deadline<=BigInt(config.deadlineNs),'RPC exceeds aggregate deadline');const left=Number(deadline-process.hrtime.bigint())/1e6;assert.ok(left>0&&left<=90000,'RPC deadline outside bound')
-   busy=true;currentSequence=value.seq;currentOperation=value.op;commandTimer=setTimeout(()=>fault(new Error('observer child RPC deadline')),left)
+   busy=true;currentDeadline=deadline;currentSequence=value.seq;currentOperation=value.op;commandTimer=setTimeout(()=>fault(new Error('observer child RPC deadline')),left)
    void (async()=>{
-    const result=await execute(value.op,value.payload);if(failure)throw failure;await flush();assert.ok(process.hrtime.bigint()<deadline,'RPC expired before response')
+    const result=await execute(value.op,value.payload);commandHealthy(deadline);await flush();commandHealthy(deadline)
     if(value.op==='close'){
      const ack=new Promise(resolve=>closeAckResolve=resolve)
      ackTimer=setTimeout(()=>fault(new Error('observer terminal ACK deadline')),Math.max(1,Number(deadline-process.hrtime.bigint())/1e6))
-     await send(wire({kind:'reply',seq:value.seq,op:value.op,result}));clearTimeout(commandTimer);await ack;clearTimeout(ackTimer)
-     busy=false;normalDisconnect=true;process.disconnect();return
+     await send(wire({kind:'reply',seq:value.seq,op:value.op,result}));commandHealthy(deadline);clearTimeout(commandTimer);await ack;commandHealthy(deadline);clearTimeout(ackTimer)
+     busy=false;currentDeadline=null;normalDisconnect=true;process.disconnect();return
     }
-    clearTimeout(commandTimer);busy=false;await send(wire({kind:'reply',seq:value.seq,op:value.op,result}))
+    await send(wire({kind:'reply',seq:value.seq,op:value.op,result}));commandHealthy(deadline);clearTimeout(commandTimer);busy=false;currentDeadline=null
    })().catch(fault)
   }catch(error){fault(error)}
  })

@@ -48,10 +48,16 @@ export async function startPgObserverSession({directory,node,env={},registry,rem
  const bootPromise=new Promise(resolve=>bootResolve=resolve),done=new Promise(resolve=>doneResolve=resolve)
  const remaining=()=>{const value=Math.min(remainingMs(),aggregateEnd-performance.now());assert.ok(Number.isFinite(value)&&value>0,'observer session aggregate deadline');return value}
  const workRemaining=()=>{const value=Math.min(remaining()-reserveMs,windowDeadline===null?Infinity:windowDeadline-performance.now());assert.ok(value>0,'observer session/window work deadline');return value}
+ const successRemaining=({endAt=null,windowEndAt=windowDeadline,work=!closing}={})=>{
+  if(failure)throw failure
+  if(work)workRemaining();else remaining()
+  assert.ok(windowEndAt===null||performance.now()<windowEndAt,'observer original window deadline exceeded')
+  assert.ok(endAt===null||performance.now()<endAt,'observer RPC deadline exceeded after callback')
+ }
  const raw=value=>{
   assert.ok(!journalClosed,'observer parent journal closed');const bytes=Buffer.from(JSON.stringify(value)+'\n');assert.ok(journalBytes+bytes.length<=maxJournalBytes,'observer parent journal limit')
   fs.writeFileSync(journalFd,bytes);digest.update(bytes);journalBytes+=bytes.length
-  const result=record(structuredClone(value));assert.ok(!result?.then,'observer record must be synchronous')
+  const result=record(structuredClone(value));assert.ok(!result?.then,'observer record must be synchronous');successRemaining()
  }
  const membersOf=pgid=>{
   const names=fs.readdirSync('/proc');assert.ok(names.length<=8192,'observer cleanup proc enumeration bound')
@@ -86,8 +92,18 @@ export async function startPgObserverSession({directory,node,env={},registry,rem
   if(!receipt.passed)failure??=new Error('observer lifecycle incomplete')
   try{fs.fsyncSync(journalFd)}catch(error){failure??=error;receipt.passed=false}
   try{fs.closeSync(journalFd)}catch(error){failure??=error;receipt.passed=false}journalClosed=true;receipt.journalSha256=digest.digest('hex')
+  if(!failure)try{successRemaining({work:false})}catch(error){failure=error;receipt.passed=false}
   if(failure){receipt.error={name:failure.name,message:failure.message};notifyFault(failure)}
-  try{writePrivate(path.join(directory,'observer-session-private.json'),receipt)}catch(error){failure??=error;receipt.passed=false;notifyFault(error)}
+  const receiptPath=path.join(directory,'observer-session-private.json')
+  try{
+   writePrivate(receiptPath,receipt)
+   if(!failure)try{successRemaining({work:false})}catch(error){
+    // Mandatory receipt I/O is inside the original aggregate. A late write is
+    // corrected to false; this failure-only diagnostic never creates a PASS.
+    failure=error;receipt.passed=false;receipt.error={name:error.name,message:error.message};notifyFault(error)
+    const fd=fs.openSync(receiptPath,'r+');try{fs.ftruncateSync(fd,0);fs.writeFileSync(fd,JSON.stringify(receipt)+'\n');fs.fsyncSync(fd)}finally{fs.closeSync(fd)}
+   }
+  }catch(error){failure??=error;receipt.passed=false;notifyFault(error)}
   if(failure)failure.observerLifecycle=structuredClone(receipt)
   doneResolve(receipt)
  }
@@ -104,7 +120,7 @@ export async function startPgObserverSession({directory,node,env={},registry,rem
  const check=()=>{if(failure)throw failure;assert.ok(!finished,'observer session closed');remaining();pin(identity,{owned:true})}
  const awaitBoot=()=>new Promise((resolve,reject)=>{
   const timer=setTimeout(()=>{const error=fault(new Error('observer boot deadline'));reject(error)},Math.min(3000,workRemaining()))
-  bootPromise.then(()=>{clearTimeout(timer);if(failure)reject(failure);else resolve()});done.then(()=>{clearTimeout(timer);if(!booted)reject(failure??new Error('observer closed before boot'))})
+  bootPromise.then(()=>{clearTimeout(timer);try{successRemaining();resolve()}catch(error){reject(fault(error))}});done.then(()=>{clearTimeout(timer);if(!booted)reject(failure??new Error('observer closed before boot'))})
  })
  const rpc=async(op,payload={},limit=90000)=>{
   try{
@@ -150,12 +166,12 @@ export async function startPgObserverSession({directory,node,env={},registry,rem
      keys(value,['type','kind','nonce','seq','op','pid','startTicks','error']);assert.equal(value.seq,sequence);assert.ok(value.op===(pending?.op??receipt.lastOperation),'fault RPC operation mismatch');keys(value.error,['name','message']);throw new Error(`observer child ${value.error.name}: ${value.error.message}`)
     }
     keys(value,['type','kind','nonce','seq','op','pid','startTicks','result']);assert.equal(value.kind,'reply');assert.ok(pending,'unsolicited observer reply');assert.equal(value.seq,pending.seq);assert.equal(value.op,pending.op);assert.ok(performance.now()<pending.endAt,'observer reply arrived after RPC deadline');if(value.op==='close')remaining();else workRemaining()
-    raw({stage:'OBSERVER_RPC_COMPLETED',seq:value.seq,op:value.op,result:value.result});const current=pending
+    const current=pending;raw({stage:'OBSERVER_RPC_COMPLETED',seq:value.seq,op:value.op,result:value.result});successRemaining({endAt:current.endAt,work:value.op!=='close'});assert.equal(pending,current,'observer RPC changed during mandatory record')
     if(value.op==='close'){
      assert.equal(value.result?.terminal?.pid,identity.pid);assert.equal(value.result.terminal.startTicks,identity.startTicks);assert.match(value.result.terminal.monotonicNs,/^[0-9]+$/)
      for(const key of ['user','system'])assert.ok(Number.isSafeInteger(value.result.terminal.cpu?.[key])&&value.result.terminal.cpu[key]>=0)
      closeResult=value.result;child.send({type:PG_SESSION_PROTOCOL,kind:'ack',nonce,seq:value.seq,op:'close',pid:identity.pid,startTicks:identity.startTicks},error=>{
-      if(error){fault(error);return}if(!current||performance.now()>=current.endAt){fault(new Error('observer terminal ACK exceeded RPC deadline'));return}closeAck=true;if(pending===current){clearTimeout(current.timer);pending=null;receipt.lastOperation=value.op;current.resolve(value.result)}
+      try{if(error)throw error;successRemaining({endAt:current.endAt,work:false});assert.equal(pending,current,'observer terminal ACK lost RPC');closeAck=true;clearTimeout(current.timer);pending=null;receipt.lastOperation=value.op;current.resolve(value.result)}catch(error){fault(error)}
      });return
     }
     clearTimeout(current.timer);pending=null;receipt.lastOperation=value.op;current.resolve(value.result)
@@ -166,7 +182,7 @@ export async function startPgObserverSession({directory,node,env={},registry,rem
   lifetimeTimer=setTimeout(()=>fault(new Error('observer aggregate work deadline')),Math.max(1,Math.floor(workRemaining())))
   if(abortSignal){if(abortSignal.aborted)aborted();else abortSignal.addEventListener('abort',aborted,{once:true})}
   await awaitBoot();check()
-  const guarded=fn=>async(...args)=>{try{check();assert.ok(!pending&&!closing,'single outstanding observer semantic command required');return await fn(...args)}catch(error){throw fault(error)}}
+  const guarded=fn=>async(...args)=>{try{check();assert.ok(!pending&&!closing,'single outstanding observer semantic command required');const originalWindowEnd=windowDeadline,result=await fn(...args);check();successRemaining({windowEndAt:originalWindowEnd,work:true});return result}catch(error){throw fault(error)}}
   return Object.freeze({
    identity,
    connect:guarded(async options=>{assert.ok(!connected);keys(options,['ownerUrl','port','expectedSystemIdentifier','primaryDatabase']);const result=await rpc('connect',{...options,identity,registry:registry.entries()},4000);connected=true;return result}),
@@ -186,7 +202,7 @@ export async function startPgObserverSession({directory,node,env={},registry,rem
      await rpc('close',{},Math.max(1,Math.floor(closeBudget-500)))
     }catch(error){fault(error)}
     if(failure&&!finished){signal('SIGTERM')}
-    const result=await done;if(failure)throw failure;return result
+    const result=await done;if(failure)throw failure;successRemaining({work:false});return result
    },
    assertHealthy(){try{check();workRemaining()}catch(error){throw fault(error)}},
   })

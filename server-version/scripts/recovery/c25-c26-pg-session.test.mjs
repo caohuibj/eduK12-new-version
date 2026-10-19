@@ -1,4 +1,4 @@
-/** Six targeted SERVICE-FREE CLI contracts. Real detached Node children, IPC,
+/** Targeted SERVICE-FREE CLI contracts. Real detached Node children, IPC,
  * journals, timers and group cleanup; no listener, PostgreSQL, Redis, business
  * consumer or application service. Each run has one <=7s aggregate; all runs
  * together have <90s aggregate allowance. Not an integration/acceptance claim.
@@ -34,7 +34,7 @@ async function run(mode,action=async h=>h.session.close(),options={}){
  const events=[],faults=[],end=performance.now()+7000,h={directory,registry,events,faults,externalLeft:Infinity,failRecord:false,session:null,connect:null,async add(role){const own=await holder(role);holders.push(own);return own},connectOwner(own,on=true){const current=JSON.parse(fs.readFileSync(path.join(directory,'fixture-control.json'))),id=`${own.identity.pid}:${own.identity.startTicks}`;current.connected=current.connected.filter(value=>value!==id);if(on)current.connected.push(id);write(path.join(directory,'fixture-control.json'),current)}}
  let result,error,child
  try{
-  h.session=await startPgObserverSession({directory,node,env:{PATH:process.env.PATH},registry,remainingMs:()=>Math.min(h.externalLeft,end-performance.now()),record:value=>{events.push(value);if(h.failRecord)throw new Error('Synthetic mandatory record failure')},onFault:value=>faults.push(value),...(options.maxJournalBytes?{maxJournalBytes:options.maxJournalBytes}:{})},{spawnChild:(exe,argv,opts)=>{
+  h.session=await startPgObserverSession({directory,node,env:{PATH:process.env.PATH},registry,remainingMs:()=>Math.min(h.externalLeft,end-performance.now()),record:value=>{events.push(value);if(h.failRecord)throw new Error('Synthetic mandatory record failure');options.onRecord?.(value,h)},onFault:value=>faults.push(value),...(options.maxJournalBytes?{maxJournalBytes:options.maxJournalBytes}:{})},{spawnChild:(exe,argv,opts)=>{
    child=spawn(exe,[fixture,argv[1]],opts)
    if(mode==='wrong-sequence'||mode==='missing-close'){
     const emit=child.emit;child.emit=function(name,...args){if(mode==='wrong-sequence'&&name==='message'&&args[0]?.kind==='reply'&&args[0]?.op==='connect')args[0]={...args[0],seq:args[0].seq+1};if(mode==='missing-close'&&name==='close'){write(path.join(directory,'actual-dropped-close.json'),{code:args[0],signal:args[1]});return false}return Reflect.apply(emit,this,[name,...args])}
@@ -94,4 +94,25 @@ test('required SELECT failure and original aggregate exhaustion cannot reset a w
 test('bounded stuck connection escalation and missing close retain explicit failed lifecycle and unknown exit tail',{timeout:15000},async()=>{
  const stuck=await run('hang-connect-ignore-term');assert.ok(stuck.error);assert.equal(stuck.receipt.passed,false);assert.equal(stuck.receipt.closeObserved,true);assert.equal(stuck.receipt.groupQuiescent,true);assert.ok(stuck.receipt.signals.some(s=>s.name==='SIGKILL'&&s.sent));assert.deepEqual(liveGroup(stuck.receipt.identity.processGroupId),[])
  const missing=await run('missing-close');assert.ok(missing.error);assert.equal(missing.receipt.passed,false);assert.equal(missing.receipt.closeObserved,false);assert.equal(missing.receipt.closedMonotonicNs,null);assert.equal(missing.receipt.terminalToCloseWallNs,null);assert.deepEqual(JSON.parse(fs.readFileSync(path.join(missing.directory,'actual-dropped-close.json'))),{code:0,signal:null})
+})
+
+
+test('last settled record and final journal fsync cannot qualify past their original deadlines',{timeout:15000},async()=>{
+ // Actual session/leaf and RPC, with a synchronous mandatory-record stall only
+ // after the real settled reply has arrived. The original window must survive
+ // the handler's otherwise-successful phase transition.
+ let stalled=false
+ const late=await run('success',async h=>{await h.session.begin({maxWindowMs:1700});await h.session.operationEnd();await delay(1120);await h.session.settledEnd();assert.fail('late settled reply must not resolve')},{onRecord(value){if(value.stage==='OBSERVER_RPC_COMPLETED'&&value.op==='settledEnd'){stalled=true;Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),0,0,900)}}})
+ assert.equal(stalled,true);assert.match(late.error.message,/deadline/);assert.equal(late.receipt.passed,false);assert.equal(late.receipt.closeObserved,true);assert.equal(late.receipt.groupQuiescent,true);assert.equal(late.faults.length,1);assert.deepEqual(liveGroup(late.receipt.identity.processGroupId),[])
+ // The final mandatory I/O itself succeeds. Its injected elapsed budget is
+ // exhausted after the real fsync, before the final success decision.
+ let expired=false,finish
+ const originalFsync=fs.fsyncSync
+ try{
+  finish=await run('success',async h=>{
+   fs.fsyncSync=function(fd){const value=Reflect.apply(originalFsync,this,[fd]);if(fs.readlinkSync(`/proc/self/fd/${fd}`)===path.join(h.directory,'observer-parent-raw-private.jsonl')){expired=true;h.externalLeft=0}return value}
+   return h.session.close()
+  })
+ }finally{fs.fsyncSync=originalFsync}
+ assert.equal(expired,true);assert.match(finish.error.message,/deadline/);assert.equal(finish.receipt.passed,false);assert.equal(finish.receipt.closeObserved,true);assert.equal(finish.receipt.groupQuiescent,true);assert.equal(finish.faults.length,1);assert.deepEqual(liveGroup(finish.receipt.identity.processGroupId),[])
 })
