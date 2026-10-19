@@ -18,7 +18,8 @@ import {
   shouldClearIdempotencyKey,
 } from '../../utils/idempotency'
 
-type CheckinFeedback = { kind: 'success' | 'error'; message: string }
+type FeedbackFocusToken = { sequence: number; origin: HTMLElement; page: HTMLElement }
+type CheckinFeedback = { kind: 'success' | 'error'; message: string; focusToken?: FeedbackFocusToken | null }
 
 interface OtherSubmission {
   id: string
@@ -66,9 +67,24 @@ const CheckinSubmit: React.FC = () => {
   const previewCloseRef = useRef<HTMLButtonElement | null>(null)
   const feedbackRef = useRef<HTMLDivElement>(null)
   const imageInputRef = useRef<HTMLInputElement>(null)
+  const interactionSequence = useRef(0)
+
+  const recordInteraction = () => { interactionSequence.current += 1 }
+  const captureFeedbackFocus = (control: HTMLElement): FeedbackFocusToken | null => {
+    if (!isTrainingHost()) return null
+    const page = control.closest<HTMLElement>('.hui-checkin-submit')
+    const origin = document.activeElement
+    if (!page || !(origin instanceof HTMLElement) || !page.contains(origin)) return null
+    return { sequence: interactionSequence.current, origin, page }
+  }
 
   useEffect(() => {
-    if (feedback?.kind === 'error' && isTrainingHost()) feedbackRef.current?.focus()
+    const token = feedback?.focusToken
+    // A late failure must not interrupt subsequent typing or a document preview.
+    if (feedback?.kind !== 'error' || !isTrainingHost() || !token) return
+    if (token.sequence !== interactionSequence.current || !token.page.isConnected || !token.origin.isConnected) return
+    if (!token.page.contains(token.origin) || document.activeElement !== token.origin) return
+    feedbackRef.current?.focus()
   }, [feedback])
 
   useEffect(() => {
@@ -112,6 +128,7 @@ const CheckinSubmit: React.FC = () => {
     const file = e.target.files?.[0]
     if (!file) return
 
+    const focusToken = captureFeedbackFocus(e.currentTarget)
     setUploading(true)
     setFeedback(null)
     const formData = new FormData()
@@ -130,11 +147,11 @@ const CheckinSubmit: React.FC = () => {
             : current
         ))
       } else {
-        setFeedback({ kind: 'error', message: '图片上传失败，请重试。' })
+        setFeedback({ kind: 'error', message: '图片上传失败，请重试。', focusToken })
       }
     } catch (error) {
       console.error('图片上传失败:', error)
-      setFeedback({ kind: 'error', message: '图片上传失败，请重试。' })
+      setFeedback({ kind: 'error', message: '图片上传失败，请重试。', focusToken })
     } finally {
       setUploading(false)
     }
@@ -144,10 +161,11 @@ const CheckinSubmit: React.FC = () => {
     setImages(images.filter((_, i) => i !== index))
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!checkin || submitInFlightRef.current) return
 
+    const focusToken = captureFeedbackFocus(e.currentTarget)
     submitInFlightRef.current = true
     setSubmitting(true)
     setFeedback(null)
@@ -181,7 +199,7 @@ const CheckinSubmit: React.FC = () => {
         void fetchCheckinDetail()
       } else {
         submitIdempotencyKeyRef.current = null
-        setFeedback({ kind: 'error', message: response.message || '打卡失败' })
+        setFeedback({ kind: 'error', message: response.message || '打卡失败', focusToken })
       }
     } catch (error: any) {
       // Only an explicit, non-retryable 4xx rejection invalidates this key.
@@ -190,7 +208,7 @@ const CheckinSubmit: React.FC = () => {
       if (shouldClearIdempotencyKey(error)) {
         submitIdempotencyKeyRef.current = null
       }
-      setFeedback({ kind: 'error', message: submissionErrorMessage(error, '打卡失败') })
+      setFeedback({ kind: 'error', message: submissionErrorMessage(error, '打卡失败'), focusToken })
     } finally {
       submitInFlightRef.current = false
       setSubmitting(false)
@@ -234,7 +252,14 @@ const CheckinSubmit: React.FC = () => {
   const hasSubmitted = !!submission
 
   return (
-    <ProductPage width="reading" className="hui-student-page hui-student-submission hui-checkin-submit">
+    <ProductPage
+      width="reading"
+      className="hui-student-page hui-student-submission hui-checkin-submit"
+      onPointerDownCapture={recordInteraction}
+      onKeyDownCapture={recordInteraction}
+      onInputCapture={recordInteraction}
+      onFocusCapture={recordInteraction}
+    >
       <ProductButton className="student-submit-back" onClick={() => navigate(-1)}>
         <ArrowLeft className="w-4 h-4" aria-hidden="true" />
         返回

@@ -176,6 +176,42 @@ it.each([true, false])('preserves pending and same-payload retry identity while 
 })
 
 it.each([
+  ['upload', 'typing'], ['submit', 'typing'], ['upload', 'preview'], ['submit', 'preview'],
+] as const)('does not steal focus after a pending %s when the user continues %s', async (operation, interaction) => {
+  const user = userEvent.setup()
+  const doc = { id: 'document-1', title: '等待期间查看的附件', fileName: 'notes.pdf', url: '/api/assets/document-1/content', allowDownload: false }
+  load({ ...checkin, documents: [doc] })
+  const { container } = show()
+  const content = await screen.findByRole('textbox', { name: '打卡内容' })
+  await user.type(content, '原有学习记录')
+  let reject!: (reason: unknown) => void
+  mocks.post.mockImplementationOnce(() => new Promise((_, fail) => { reject = fail }))
+  content.focus()
+  if (operation === 'upload') uploadFile(fileInput(container), 'delayed.png')
+  else fireEvent.submit(content.closest('form')!)
+  expect(mocks.post).toHaveBeenCalledTimes(1)
+
+  let intendedFocus: HTMLElement = content
+  if (interaction === 'typing') {
+    // The focus stays on the same element: an activeElement-only guard is insufficient.
+    await user.type(content, '，继续编辑', { skipClick: true })
+    expect(content).toHaveFocus()
+  } else {
+    await user.click(screen.getByRole('button', { name: /等待期间查看的附件/ }))
+    intendedFocus = await screen.findByRole('button', { name: '关闭合成文档' })
+    intendedFocus.focus()
+    expect(screen.getByRole('dialog', { name: doc.title })).toBeInTheDocument()
+  }
+  await act(async () => reject({ status: 500, message: '延迟失败' }))
+  const alert = await screen.findByRole('alert')
+  expect(alert).toHaveTextContent(operation === 'upload' ? '图片上传失败，请重试。' : '延迟失败')
+  expect(intendedFocus).toHaveFocus()
+  expect(alert.parentElement).not.toHaveFocus()
+  expect(content).toHaveValue(interaction === 'typing' ? '原有学习记录，继续编辑' : '原有学习记录')
+  expect(mocks.post).toHaveBeenCalledTimes(1)
+})
+
+it.each([
   [true, true], [false, true], [true, false],
 ])('keeps accepted-write success through hydration without refocusing or resubmitting (Training=%s, hydration=%s)', async (training, hydrates) => {
   mocks.training.mockReturnValue(training)
