@@ -745,3 +745,20 @@ hash is computed by the original finalizer and authenticated across
 parent/job/report; this adapter does not claim independent recomputation.
 No new descriptor, archive, database, HTTP runtime, emit or restore ran in this
 preparation. Raw/private evidence remains outside Git.
+
+The resume archive also requires its newly captured full physical manifest to
+match the already frozen failed-scene manifest exactly, before creating the
+output directory or invoking tar. The fixed historical manifest SHA is
+`25130fcbd3376031533e54e9d9ad7e1b8a6261e9590a891e44585b3035414415`;
+its identity is rechecked after reading and recorded in both recovery receipt
+and descriptor. Thus intervening additions, deletion, bytes or metadata drift
+cannot silently become a new recovery baseline. Runtime descriptor validation
+keeps this original binding while allowing only the subsequently authorized
+mutable data roots to change. One new drift/read-race fault group and the
+single affected descriptor contract passed; no other tests were repeated.
+`/tmp/c25-analysis-resume-10/receipt.json` SHA
+`5696d39b5009d82e031cd3f1d64493e9920a2337e1c082bc2a64acd7b1041e30`;
+raw `physical-manifest-linkage-tests.log` SHA
+`71a4e8f60786c5a38b74dac2157f2dad3c507b9ade535970cc6d4ea7c2174a62`.
+The 230-input / 227-copy before/after closure and unchanged 72 Python helpers
+are retained. This is preparation evidence; no actual archive ran.

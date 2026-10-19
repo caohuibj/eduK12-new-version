@@ -26,6 +26,8 @@ CORE_SCOPE='C25_MISSING_ONLY_COMPOSED_SUBCHECKS_NOT_A_SINGLE_FRESH_RUN_OR_CAPACI
 SCOPE='C25_ANALYSIS_FAILED_PARTIAL_NODE_LOCAL_TEMPORARY_RECOVERY_NOT_DURABLE_BACKUP'
 FAILED_ANALYSIS=ROOT/'eduk12_c25_analysis_01';RESUME_CONTRACT=BASE/'c25-analysis-resume-contract.mjs'
 FAILED_RECEIPT_SHA='efffe632f5d7f56db83b56dd41cfb10aa00e9903da356baf31af9a3b38530394'
+FROZEN_PARTIAL_MANIFEST=Path('/tmp/c25-analysis-failure-diagnostic-01/current-stopped-http01-full-manifest.json')
+FROZEN_PARTIAL_MANIFEST_SHA='25130fcbd3376031533e54e9d9ad7e1b8a6261e9590a891e44585b3035414415'
 HISTORICAL_ROOTS=(Path('/tmp/c25-source-05'),Path('/tmp/c25-source-06'),Path('/tmp/c25-continuation-recovery-01'),Path('/tmp/c25-missing-recovery-01'),Path('/tmp/c25-source-07'),Path('/tmp/c25-analysis-recovery-01'),FAILED_ANALYSIS,Path('/tmp/c25-analysis-runtime-launch-01'),Path('/tmp/c25-analysis-failure-diagnostic-01'))
 NAMES={'archive':'c25-analysis-resume-data.tar.gz','dataManifest':'data-manifest.json','fullSourceManifest':'http01-full-manifest.json','frozenSourceManifest':'http01-nondata-manifest.json','priorContinuationManifest':'continuation01-manifest.json','coreContinuationManifest':'continuation02-manifest.json','historicalRecoveryManifest':'historical-recovery-manifest.json','archiveReceipt':'archive-receipt.json','restoreInstructions':'RESTORE.txt','descriptor':'c25-analysis-resume-recovery-descriptor.json'}
 ENV={'PATH':'/usr/bin:/bin','LANG':'C','LC_ALL':'C','TZ':'UTC','PYTHONDONTWRITEBYTECODE':'1'}
@@ -130,6 +132,14 @@ def stopped_evidence(root):
     assert file_binding(root/'status.json')==before
     return {'statusSha256':before['sha256'],'processesAndPortsStopped':True}
 
+def assert_frozen_partial_source(full):
+    before=file_binding(FROZEN_PARTIAL_MANIFEST)
+    assert before['mode']==0o600 and before['sha256']==FROZEN_PARTIAL_MANIFEST_SHA,'frozen failed physical manifest identity changed'
+    expected=json.loads(FROZEN_PARTIAL_MANIFEST.read_text())
+    assert full==expected,'stopped failed source differs from its original frozen full physical manifest'
+    assert file_binding(FROZEN_PARTIAL_MANIFEST)==before,'frozen failed physical manifest changed while reading'
+    return before
+
 def validate_failed_analysis(tools):
     node=Path(tools)/'node_modules/node/bin/node';before=file_binding(RESUME_CONTRACT)
     code='import {captureAnalysisFailure} from '+json.dumps(RESUME_CONTRACT.as_uri())+';process.stdout.write(JSON.stringify(captureAnalysisFailure()))'
@@ -182,6 +192,7 @@ def verify_recovery_descriptor(descriptor_path,expected_sha,tools,failure_state,
     read=lambda name:json.loads((OUTPUT/NAMES[name]).read_text())
     data,full,frozen,prior,core,historical,receipt=[read(n) for n in ['dataManifest','fullSourceManifest','frozenSourceManifest','priorContinuationManifest','coreContinuationManifest','historicalRecoveryManifest','archiveReceipt']]
     assert set(data)==set(DATA_DIRS) and data_projection(full)==data and [row for row in full if not A['mutable_path'](row['path'])]==frozen
+    assert value['frozenFailurePhysicalManifest']==receipt['frozenFailurePhysicalManifest']==assert_frozen_partial_source(full)
     assert nondata_manifest(SOURCE)==frozen and inventory(PRIOR)==prior and inventory(CORE)==core and historical_recovery_manifest()==historical
     assert receipt['passed'] is True and receipt['scope']==SCOPE and receipt['archive']==value['archive'] and receipt['producer']==value['producer']
     assert receipt['acceptedCorePassed'] is True and receipt['acceptedCoreScope']==CORE_SCOPE
@@ -218,6 +229,7 @@ def main():
             source,_=A['helpers']();source.validate_descriptor(args.descriptor,args.expected_descriptor_sha256,tools/'postgresql/bin/pg_controldata');http03=file_binding(args.descriptor)
             failures=validate_historical_failures();accepted_core=validate_core(tools);failed_analysis=validate_failed_analysis(tools);stopped=stopped_current(tools)
             full,data=frozen_failure_manifest(SOURCE),data_manifests(SOURCE);assert data_projection(full)==data
+            frozen_partial_binding=assert_frozen_partial_source(full)
             frozen=nondata_manifest(SOURCE);assert [r for r in full if not A['mutable_path'](r['path'])]==frozen
             prior,core,historical=inventory(PRIOR),inventory(CORE),historical_recovery_manifest();budget=recovery_budget(data,guard.check())
             output.mkdir(mode=0o700);created=True;fsync_directory(output.parent)
@@ -244,9 +256,9 @@ def main():
             guard.check();assert restore.parent==output and restore.name=='verification-restore' and private_directory(output)==output
             shutil.rmtree(restore);fsync_directory(output);assert not os.path.lexists(archive);os.rename(partial,archive);fsync_directory(output)
             archive_binding=file_binding(archive)
-            result.update(passed=True,roundTripVerified=True,sourceUnchangedDuringArchive=True,nonDataEvidencePreserved=True,priorContinuationEvidencePreserved=True,coreContinuationEvidencePreserved=True,historicalRecoveryMaterialsPreserved=True,restoreMaterialFsynced=True,temporaryVerificationCopyRemoved=True,archive=archive_binding,manifestSha256=sha_file(output/NAMES['dataManifest']),sourceEvidenceSha256=sha_file(output/NAMES['frozenSourceManifest']),coreEvidenceSha256=sha_file(output/NAMES['coreContinuationManifest']),symlinkCount=0,hardlinkGroups=[],producer=producer,budget=budget,steps=steps,elapsedSeconds=time.monotonic()-started,minimumObserved=guard.minimum,comparedMetadata=['path','type','mode','uid','gid','mtime_ns','size','SHA256','all xattrs and ACLs','zero links'])
+            result.update(passed=True,frozenFailurePhysicalManifest=frozen_partial_binding,roundTripVerified=True,sourceUnchangedDuringArchive=True,nonDataEvidencePreserved=True,priorContinuationEvidencePreserved=True,coreContinuationEvidencePreserved=True,historicalRecoveryMaterialsPreserved=True,restoreMaterialFsynced=True,temporaryVerificationCopyRemoved=True,archive=archive_binding,manifestSha256=sha_file(output/NAMES['dataManifest']),sourceEvidenceSha256=sha_file(output/NAMES['frozenSourceManifest']),coreEvidenceSha256=sha_file(output/NAMES['coreContinuationManifest']),symlinkCount=0,hardlinkGroups=[],producer=producer,budget=budget,steps=steps,elapsedSeconds=time.monotonic()-started,minimumObserved=guard.minimum,comparedMetadata=['path','type','mode','uid','gid','mtime_ns','size','SHA256','all xattrs and ACLs','zero links'])
             sync_json(output/NAMES['archiveReceipt'],result);fsync_directory(output)
-            value={'schemaVersion':3,'scope':SCOPE,'sourceRoot':str(SOURCE),'priorContinuationRoot':str(PRIOR),'coreContinuationRoot':str(CORE),'acceptedCorePassed':True,'acceptedCoreScope':CORE_SCOPE,'coreReceiptSha256':CORE_RECEIPT,'coreSnapshotSha256':CORE_SNAPSHOT,'observedTables':None,'observedRows':None,'observedCheckpoints':None,'inheritedCoreRows':6667,'inheritedCoreCheckpoints':21,'failedAnalysis':failed_analysis,'failureReceiptSha256':FAILED_RECEIPT_SHA,'allowedMutableRoots':list(DATA_DIRS),'priorReceiptSha256':PRIOR_RECEIPT,'priorSnapshotSha256':PRIOR_SNAPSHOT,'head':args.expected_head,'producer':producer,'historicalFailureFiles':failures,'acceptedCore':accepted_core,'http03Descriptor':http03,'stoppedEvidence':stopped,'archive':archive_binding,'files':{name:file_binding(output/NAMES[name]) for name in set(NAMES)-{'archive','descriptor'}},**{name:result[name] for name in ['roundTripVerified','sourceUnchangedDuringArchive','nonDataEvidencePreserved','priorContinuationEvidencePreserved','coreContinuationEvidencePreserved','historicalRecoveryMaterialsPreserved','rawSourceRetained','restoreMaterialFsynced','servicesStarted','durableBackup']}}
+            value={'schemaVersion':3,'scope':SCOPE,'sourceRoot':str(SOURCE),'priorContinuationRoot':str(PRIOR),'coreContinuationRoot':str(CORE),'acceptedCorePassed':True,'acceptedCoreScope':CORE_SCOPE,'coreReceiptSha256':CORE_RECEIPT,'coreSnapshotSha256':CORE_SNAPSHOT,'observedTables':None,'observedRows':None,'observedCheckpoints':None,'inheritedCoreRows':6667,'inheritedCoreCheckpoints':21,'failedAnalysis':failed_analysis,'failureReceiptSha256':FAILED_RECEIPT_SHA,'frozenFailurePhysicalManifest':frozen_partial_binding,'allowedMutableRoots':list(DATA_DIRS),'priorReceiptSha256':PRIOR_RECEIPT,'priorSnapshotSha256':PRIOR_SNAPSHOT,'head':args.expected_head,'producer':producer,'historicalFailureFiles':failures,'acceptedCore':accepted_core,'http03Descriptor':http03,'stoppedEvidence':stopped,'archive':archive_binding,'files':{name:file_binding(output/NAMES[name]) for name in set(NAMES)-{'archive','descriptor'}},**{name:result[name] for name in ['roundTripVerified','sourceUnchangedDuringArchive','nonDataEvidencePreserved','priorContinuationEvidencePreserved','coreContinuationEvidencePreserved','historicalRecoveryMaterialsPreserved','rawSourceRetained','restoreMaterialFsynced','servicesStarted','durableBackup']}}
             guard.check();sync_json(output/NAMES['descriptor'],value);fsync_directory(output)
             print(json.dumps({'passed':True,'descriptorPath':str(output/NAMES['descriptor']),'descriptorSha256':sha_file(output/NAMES['descriptor']),'archiveSha256':archive_binding['sha256']}),flush=True)
         except BaseException as error:
