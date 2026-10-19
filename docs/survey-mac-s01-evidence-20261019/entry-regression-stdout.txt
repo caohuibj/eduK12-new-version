@@ -1,0 +1,17 @@
+
+ RUN  v4.1.11 /Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend
+
+ ✓ src/products/origins.test.ts (40 tests) 19ms
+ ✓ src/survey/SurveyWaveStudio.links.test.tsx (4 tests) 1084ms
+     ✓ uses the environment at http://survey.localhost:5173 for both open and rotate  550ms
+ ✓ src/components/app-shell/__tests__/SurveyAdminOrigin.test.tsx (12 tests) 470ms
+ ✓ src/pages/AdminLogin.test.tsx (9 tests) 1263ms
+     ✓ selects explicit generic auth and a reachable admin fallback for /admin/login  465ms
+ ✓ src/api/__tests__/auth.test.ts (5 tests) 47ms
+
+ Test Files  5 passed (5)
+      Tests  70 passed (70)
+   Start at  09:53:45
+   Duration  12.10s (transform 2.44s, setup 3.10s, import 2.85s, tests 2.88s, environment 7.05s)
+
+JSON report written to /Users/Qiang/Documents/Codex/2026-10-19/task/evidence/s01/entry-regression.json

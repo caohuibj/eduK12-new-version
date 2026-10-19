@@ -1,0 +1,27 @@
+[
+  {
+    "path": "public/survey/wind-observation.webp",
+    "bytes": 91862,
+    "sha256": "0aa01932c58140afc0d51df469144ddff6dd1593e8158d85fadb34e1792f4ef6"
+  },
+  {
+    "path": "public/survey/huisurvey-w2-emblem.png",
+    "bytes": 46298,
+    "sha256": "758f412f397a0142f236e0f9de50cb24942175081d7f556a51058ae0889868f2"
+  },
+  {
+    "path": "public/survey/wind-observation-small.webp",
+    "bytes": 24592,
+    "sha256": "a2e95e6a83293305270d5b777cf8c78617b5c08406072c5fd4ff08da367edacc"
+  },
+  {
+    "path": "public/survey/asset-provenance.json",
+    "bytes": 2572,
+    "sha256": "312bc8de817e31c38916fe2e90efabeb43c2dcb3ac145cb90e085c9fd0573e92"
+  },
+  {
+    "path": "public/survey/huisurvey-w2-emblem.svg",
+    "bytes": 131232,
+    "sha256": "7c9582bb49f465d7a48191c47034b6feb730007f88ee6d7f05a83c38dfb21455"
+  }
+]
