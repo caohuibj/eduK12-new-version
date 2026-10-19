@@ -197,3 +197,50 @@ Both retain 212 before/after input bindings and 210 source/runner copies. Covera
 includes overwrite/deletion, metadata/link mutations, permitted new files and
 directory mtime, plus refusal of completion when material proof is missing/false.
 Previously passed independent tests were not rerun.
+
+## First supplement runtime failure and child-entry repair
+
+The separately authorized run at `cd8484e91129cdc79c953d666c0b53f9d648d941`
+used source07 and the verified 6,667-row stopped recovery point. Its original
+`eduk12_c25_analysis_01/c25-analysis-result.json` remains **overall false**, SHA
+`efffe632f5d7f56db83b56dd41cfb10aa00e9903da356baf31af9a3b38530394`.
+All 31 recorded HTTP responses were 200. Before draining, actual private DB
+facts showed three new PENDING jobs, attemptCount 0 and budgetHeld true, four
+accepted unit snapshots (2 + 1 + 1), and 148 unchanged older jobs. The queue's
+recorded pending count increased from 0 to 3. Analysis and CSV were not reached.
+
+The report child hit its shared deadline. Its zero-byte reservation proves the
+prerequisite/nonce/environment checks ran; it is not proof that no entry ran.
+The old CLI's top-level await awaited a dynamic HTTP-module import, whose static
+import pointed back to that still-evaluating CLI. An actual Node subprocess test
+now reproduces that frozen import cycle without a service or database.
+
+API, Redis and PG stopped with exit 0. The final DB audit correctly failed on
+the changed `composite_report_queue_budget` row; no final snapshot was produced,
+and complete final old-row preservation is not claimed. The final full queue
+row was not retained, so the earlier pending=3 observation is not relabeled as
+a final DB observation. The 36 older attachment/export files (7,288,316 bytes)
+passed their separate audit. Source, inputs, both older failed receipts, accepted
+core evidence and recovery archives remained unchanged. The frozen failure index
+is `/tmp/c25-analysis-runtime-launch-01/review-index.json`, SHA
+`f098946ebba956598378523b8850f0def492e2b17908b225593a68043958be25`.
+
+The repair only moves CLI startup to `c25-analysis-child.mjs`. The shared export
+module finishes evaluation before childMain imports HTTP; existing work,
+prerequisites and 120s/60s limits stay unchanged. A private process receipt now
+records the exact argv/PID, monotonic start/close times, exit code/signal, deadline
+and termination signals after close. It is hash-bound on successful return.
+
+Seven new actual-CLI contracts passed under the measurement lock: report/export
+success, thrown errors and forced timeout/reap, plus bounded reproduction of the
+original cycle. Only prerequisite and business-runtime I/O are synthetic; the
+CLI/export/HTTP module bytes and import graph are real. Raw output:
+`/tmp/c25-analysis-child-07/real-cli-contract-tests.log`, SHA
+`0bf819a6fab6b71f3f2aa00a481353420fc34dc20d96e7e325a2ebedc10c2970`.
+Receipt SHA `b2dddb0a1eb983e48560fb3a587a4d26cddf0cc36b3df8c4d973d6f76a9abbfc`
+retains 218 equal before/after inputs and 220 source/runner/historical-graph
+copies. All 72 Python helper bytes still match the original client receipt.
+These seven checks are service-free lifecycle evidence, not a runtime retry.
+Any later continuation needs separate review, a recovery point for the partial
+state and execution approval; it must not resubmit the accepted four FINALs or
+silently exempt the queue row from protection.

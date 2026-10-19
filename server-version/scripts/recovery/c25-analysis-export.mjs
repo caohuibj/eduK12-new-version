@@ -35,29 +35,40 @@ export function realExportInvocation(job,batchId){
 }
 export async function runAnalysisChild(h,kind,input){
  const budget=childBudget(kind,h.remaining()),stem='c25-analysis-'+kind+'-child'
- const invocation={schemaVersion:1,kind,phasePid:process.pid,nonce:randomUUID(),input,budget,issuedAt:new Date().toISOString()}
+ const nonce=randomUUID(),argv=[process.execPath,'--require',path.join(directory,'loopback-only.cjs'),path.join(directory,'c25-analysis-child.mjs'),h.state,'--child',kind,nonce]
+ const invocation={schemaVersion:1,kind,phasePid:process.pid,nonce,input,budget,argv,issuedAt:new Date().toISOString()}
  privateJson(path.join(h.state,stem+'-invocation-private.json'),invocation)
  const log=path.join(h.state,stem+'-process-private.log'),fd=fs.openSync(log,'wx',0o600)
  try{
   await new Promise((resolve,reject)=>{
-   const child=spawn(process.execPath,['--require',path.join(directory,'loopback-only.cjs'),fileURLToPath(import.meta.url),h.state,'--child',kind,invocation.nonce],{env:process.env,stdio:['ignore',fd,fd],detached:false})
+   const lifecycle={schemaVersion:1,kind,phasePid:process.pid,nonce,argv,issuedMonotonicMs:performance.now(),timedOut:false,interrupted:false,terminationSignals:[]}
+   const child=spawn(argv[0],argv.slice(1),{env:process.env,stdio:['ignore',fd,fd],detached:false})
+   lifecycle.pid=child.pid??null
    let failure=null,killer=null,settled=false
-   const signal=which=>{try{child.kill(which)}catch(error){if(error.code!=='ESRCH')failure??=error}}
-   const stop=()=>{failure??=new Error('Analysis '+kind+' child exceeded its shared deadline or was interrupted');signal('SIGTERM');killer??=setTimeout(()=>signal('SIGKILL'),budget.killGrace)}
-   const timer=setTimeout(stop,budget.work),interrupt=()=>stop()
+   const signal=which=>{const event={signal:which,atMonotonicMs:performance.now()};try{event.sent=child.kill(which)}catch(error){event.errorCode=error.code??null;if(error.code!=='ESRCH')failure??=error}lifecycle.terminationSignals.push(event)}
+   const stop=reason=>{lifecycle[reason==='deadline'?'timedOut':'interrupted']=true;failure??=new Error('Analysis '+kind+' child exceeded its shared deadline or was interrupted');signal('SIGTERM');killer??=setTimeout(()=>signal('SIGKILL'),budget.killGrace)}
+   const timer=setTimeout(()=>stop('deadline'),budget.work),interrupt=()=>stop('interrupt')
    process.once('SIGINT',interrupt);process.once('SIGTERM',interrupt)
    const finish=error=>{if(settled)return;settled=true;clearTimeout(timer);if(killer)clearTimeout(killer);process.removeListener('SIGINT',interrupt);process.removeListener('SIGTERM',interrupt);error?reject(error):resolve()}
-   child.once('error',error=>finish(error))
+   child.once('error',error=>{failure??=error;lifecycle.spawnError={name:error.name,code:error.code??null}})
    // Await close, rather than just exit: stdout/stderr descriptors and the
    // actual child are reaped before the coordinator can finalize the phase.
-   child.once('close',(code,signalName)=>finish(failure??(code===0&&!signalName?null:new Error('Analysis '+kind+' child failed; inspect its private journal'))))
+   child.once('close',(code,signalName)=>{
+    lifecycle.closedMonotonicMs=performance.now();lifecycle.code=code;lifecycle.signal=signalName;lifecycle.closeObserved=true
+    try{privateJson(path.join(h.state,stem+'-process-result-private.json'),lifecycle)}catch(error){failure??=error}
+    finish(failure??(code===0&&!signalName?null:new Error('Analysis '+kind+' child failed; inspect its private journal')))
+   })
   })
  }finally{fs.closeSync(fd)}
  h.remaining()
  const file=stem+'-result-private.json',bytes=fs.readFileSync(path.join(h.state,file)),result=JSON.parse(bytes)
  assert.equal(result.passed,true);assert.equal(result.kind,kind);assert.equal(result.nonce,invocation.nonce)
  assert.equal(result.phasePid,process.pid);assert.notEqual(result.pid,process.pid)
- return {file,sha256:sha(bytes),result}
+ const processFile=stem+'-process-result-private.json',processBytes=fs.readFileSync(path.join(h.state,processFile)),closed=JSON.parse(processBytes)
+ assert.equal(closed.pid,result.pid);assert.equal(closed.nonce,nonce);assert.deepEqual(closed.argv,argv)
+ assert.equal(closed.closeObserved,true);assert.equal(closed.code,0);assert.equal(closed.signal,null)
+ assert.equal(closed.timedOut,false);assert.equal(closed.interrupted,false)
+ return {file,sha256:sha(bytes),result,process:{file:processFile,sha256:sha(processBytes)}}
 }
 
 async function exportChild(input){
@@ -125,7 +136,7 @@ export async function processOneAnalysisExport(h,{teacher,otherTeacher,courseId,
  return evidence
 }
 
-async function childMain(){
+export async function childMain(){
  assert.equal(process.argv.length,6,'Exact single-child arguments required')
  const state=process.argv[2],kind=process.argv[4],nonce=process.argv[5]
  assert.equal(process.argv[3],'--child');assert.ok(Object.hasOwn(CHILD_LIMITS,kind))
@@ -158,6 +169,3 @@ async function childMain(){
  }
  if(error)process.exitCode=1
 }
-if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url))await childMain().catch(error=>{
- console.error(JSON.stringify(publicFailure(error)));process.exitCode=1
-})
