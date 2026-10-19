@@ -18,7 +18,7 @@ for name in ['sha_file','canonical','private_directory','file_binding','tool_bin
 ROOT,REPO,BASE,SOURCE,DATA_DIRS=[A[name] for name in ['ROOT','REPO','BASE','SOURCE','DATA_DIRS']]
 PRIOR,CORE=R['PRIOR'],R['CORE']
 FINAL=ROOT/'eduk12_c25_analysis_02'
-OUTPUT=Path('/tmp/c25-c26-recovery-04');PRODUCER=BASE/'c25-c26-archive.mjs'
+OUTPUT=Path('/tmp/c25-c26-recovery-05');PRODUCER=BASE/'c25-c26-archive.mjs'
 FAILED_A01=ROOT/'eduk12_c26_a_01'
 FAILED_A01_RECEIPT_SHA='719f9e412b591fe1f3c171715f55eb8d4bcc64e3da66b4bd39684454052094c7'
 FROZEN_A01=Path('/tmp/c25-c26-a01-diagnostic-01/current-stopped-full-manifest.json')
@@ -31,6 +31,10 @@ FAILED_A03=ROOT/'eduk12_c26_a_03'
 FAILED_A03_RECEIPT_SHA='95c14a1bd2dfaf362414d24231dae5941ae847cd9013140e48106c725aa5db54'
 FROZEN_A03=Path('/tmp/c25-c26-a03-diagnostic-01/current-stopped-full-manifest.json')
 FROZEN_A03_SHA='2cd17b9b5b5ce1d362b0fb081c7eca133af31eac5747b51badc85e1da0291381'
+FAILED_A04=ROOT/'eduk12_c26_a_04'
+FAILED_A04_RECEIPT_SHA='b2a839a86fd5771ff4f42b3b2483242251c7c3899cdbb3572fea35f899f87259'
+FROZEN_A04=Path('/tmp/c25-c26-a04-diagnostic-01/current-stopped-full-manifest.json')
+FROZEN_A04_SHA='4c4547abf4bbaad5c36cca9437163a650ff5fea5cbe2c6f1974fccc5bcabeb8e'
 SCOPE='C26_STOPPED_PRIMARY_6708_JOINT_RESTORE_6667_NODE_LOCAL_TEMPORARY_RECOVERY'
 SNAPSHOTS={
  'eduk12_recovery':{'path':str(FINAL/'c25-analysis-resume-final-db-snapshot.json'),'sha256':'f4e761419f5faf4a84befef265b4edff45d49d5a1d16a89cc09d039b1eed34b4','acceptedRows':6708,'acceptedTables':217,'acceptedCheckpoints':21},
@@ -40,7 +44,7 @@ RESTORE_RECEIPT_SHA='6a57f6ae2d261a58b93fde9d1561282df1c6095bad0e7e9b00a85ae1076
 SEED_FIXTURE=ROOT/'eduk12_c21_http_01/fixture-private.json'
 SEED_FIXTURE_SHA='86287a00e4a34810c5e8e71afd70dac2f45c89750b9f04560aad67b4506d9239'
 FINAL_RECEIPT_SHA='7605c14677befe44709d66be4177a3e28944a79d49a40aade716073cdf2c27ac'
-HISTORICAL_ROOTS=(FAILED_A03,FROZEN_A03.parent,Path('/tmp/c25-source-11'),Path('/tmp/c25-source-issuance-11'),Path('/tmp/c25-c26-recovery-03'),Path('/tmp/c25-c26-archive-launch-03'),Path('/tmp/c25-c26-runtime-launch-03'),FAILED_A02,FROZEN_A02.parent,Path('/tmp/c25-source-10'),Path('/tmp/c25-source-issuance-10'),Path('/tmp/c25-c26-recovery-02'),Path('/tmp/c25-c26-archive-launch-02'),Path('/tmp/c25-c26-runtime-launch-02'),FAILED_A01,FROZEN_A01.parent,Path('/tmp/c25-source-09'),Path('/tmp/c25-source-issuance-09'),Path('/tmp/c25-c26-recovery-01'),Path('/tmp/c25-c26-archive-launch-01'),Path('/tmp/c25-c26-runtime-launch-01'),*R['HISTORICAL_ROOTS'],Path('/tmp/c25-source-08'),R['OUTPUT'],Path('/tmp/c25-analysis-resume-runtime-launch-01'),Path('/tmp/c25-analysis-resume-archive-launch-01'),FINAL)
+HISTORICAL_ROOTS=(FAILED_A04,FROZEN_A04.parent,Path('/tmp/c25-source-12'),Path('/tmp/c25-source-issuance-12'),Path('/tmp/c25-c26-recovery-04'),Path('/tmp/c25-c26-archive-launch-04'),Path('/tmp/c25-c26-runtime-launch-04'),FAILED_A03,FROZEN_A03.parent,Path('/tmp/c25-source-11'),Path('/tmp/c25-source-issuance-11'),Path('/tmp/c25-c26-recovery-03'),Path('/tmp/c25-c26-archive-launch-03'),Path('/tmp/c25-c26-runtime-launch-03'),FAILED_A02,FROZEN_A02.parent,Path('/tmp/c25-source-10'),Path('/tmp/c25-source-issuance-10'),Path('/tmp/c25-c26-recovery-02'),Path('/tmp/c25-c26-archive-launch-02'),Path('/tmp/c25-c26-runtime-launch-02'),FAILED_A01,FROZEN_A01.parent,Path('/tmp/c25-source-09'),Path('/tmp/c25-source-issuance-09'),Path('/tmp/c25-c26-recovery-01'),Path('/tmp/c25-c26-archive-launch-01'),Path('/tmp/c25-c26-runtime-launch-01'),*R['HISTORICAL_ROOTS'],Path('/tmp/c25-source-08'),R['OUTPUT'],Path('/tmp/c25-analysis-resume-runtime-launch-01'),Path('/tmp/c25-analysis-resume-archive-launch-01'),FINAL)
 NAMES={**R['NAMES'],'archive':'c25-c26-data.tar.gz','descriptor':'c25-c26-recovery-descriptor.json'}
 ENV=R['ENV']
 ${STAGED_ARCHIVE_PYTHON}
@@ -97,11 +101,20 @@ def failed_a03_binding():
     assert file_binding(Path(binding['path']))==binding
     return binding
 
-def assert_frozen_a03(full):
-    binding=file_binding(FROZEN_A03)
-    assert binding['mode']==0o600 and binding['sha256']==FROZEN_A03_SHA,'frozen A03 failed physical manifest identity changed'
-    assert json.loads(FROZEN_A03.read_text())==full,'current tree differs from frozen stopped A03 physical state'
-    assert file_binding(FROZEN_A03)==binding
+def failed_a04_binding():
+    binding=file_binding(FAILED_A04/'c25-c26-a-overall-result.json');assert binding['sha256']==FAILED_A04_RECEIPT_SHA
+    result=json.loads(Path(binding['path']).read_text())
+    assert result['passed'] is False and result['cleanupVerified'] is True and result['finalSnapshotVerified'] is False
+    assert result.get('driverExecuted') is not True and result['cleanupErrors']==[] and result['audits']=={}
+    assert result['processExits']=={'postgres':0,'c25-c26-readiness-1':0,'c25-c26-audit-baseline':-9,'c25-c26-material-audit':0,'c25-c26-final-inputs':0}
+    assert file_binding(Path(binding['path']))==binding
+    return binding
+
+def assert_frozen_a04(full):
+    binding=file_binding(FROZEN_A04)
+    assert binding['mode']==0o600 and binding['sha256']==FROZEN_A04_SHA,'frozen A04 failed physical manifest identity changed'
+    assert json.loads(FROZEN_A04.read_text())==full,'current tree differs from frozen stopped A04 physical state'
+    assert file_binding(FROZEN_A04)==binding
     return binding
 
 def stopped_failed_a01():
@@ -137,6 +150,17 @@ def stopped_failed_a03():
     assert file_binding(FAILED_A03/'status.json')==before
     return {'status':before,'processesAndPortsStopped':True,'acceptedLogicalBaselineObserved':False}
 
+def stopped_failed_a04():
+    before=file_binding(FAILED_A04/'status.json');status=json.loads(Path(before['path']).read_text())
+    assert status['state']=='stopped' and status['cleanupVerified'] is True and status['cleanupErrors']==[]
+    assert set(status['pids'])=={'postgres'} and set(status['ports'])=={'postgres','redis','api'}
+    for pid in status['pids'].values():assert type(pid)is int and pid>1 and not Path('/proc',str(pid)).exists()
+    for port in status['ports'].values():
+        assert type(port)is int and 0<port<65536
+        with socket.socket() as sock:sock.settimeout(.2);assert sock.connect_ex(('127.0.0.1',port))!=0
+    assert file_binding(FAILED_A04/'status.json')==before
+    return {'status':before,'processesAndPortsStopped':True,'acceptedLogicalBaselineObserved':False}
+
 def validate_current():
     files={name:file_binding(Path(item['path'])) for name,item in SNAPSHOTS.items()}
     assert all(files[name]['sha256']==item['sha256'] for name,item in SNAPSHOTS.items())
@@ -149,10 +173,10 @@ def validate_current():
     proof=json.loads(RESTORE_RECEIPT.read_text());assert proof['passed'] is True and proof['restrictedRoleVerified'] is True and proof['sourceUnchangedDuringRestore'] is True
     assert len(proof['restoreEquivalence']['columnOrdinals'])==73 and len(proof['restoreEquivalence']['constraintReparses'])==3
     assert file_binding(RESTORE_RECEIPT)==restore and file_binding(SEED_FIXTURE)==seed
-    return {'snapshots':files,'acceptedFinalReceipt':receipt,'acceptedRestoreReceipt':restore,'seedFixture':seed,'jointSnapshotIdentity':'PRE_RESTORE_SOURCE; EXACT_73_ORDINAL_3_PARSER_ADMISSION_REQUIRED','logicalCountsObservedDuringArchive':False,'precedingFailedA01':failed_a01_binding(),'precedingFailedA02':failed_a02_binding(),'precedingFailedA03':failed_a03_binding()}
+    return {'snapshots':files,'acceptedFinalReceipt':receipt,'acceptedRestoreReceipt':restore,'seedFixture':seed,'jointSnapshotIdentity':'PRE_RESTORE_SOURCE; EXACT_73_ORDINAL_3_PARSER_ADMISSION_REQUIRED','logicalCountsObservedDuringArchive':False,'precedingFailedA01':failed_a01_binding(),'precedingFailedA02':failed_a02_binding(),'precedingFailedA03':failed_a03_binding(),'precedingFailedA04':failed_a04_binding()}
 
 def stopped_current(tools):
-    return {**R['stopped_current'](tools),'acceptedFinal':R['stopped_evidence'](FINAL),'failedA01':stopped_failed_a01(),'failedA02':stopped_failed_a02(),'failedA03':stopped_failed_a03()}
+    return {**R['stopped_current'](tools),'acceptedFinal':R['stopped_evidence'](FINAL),'failedA01':stopped_failed_a01(),'failedA02':stopped_failed_a02(),'failedA03':stopped_failed_a03(),'failedA04':stopped_failed_a04()}
 def historical_recovery_manifest():return {str(folder):inventory(folder) for folder in HISTORICAL_ROOTS}
 def output_path(path,descriptor):
     path=canonical(path);assert path==OUTPUT and not os.path.lexists(path)
@@ -162,7 +186,7 @@ def output_path(path,descriptor):
     assert matches and matches[-1][matches[-1].index('-')+1]=='tmpfs'
     return path
 def restore_instructions():
-    return A['restore_instructions']()+'Current stopped C26 recovery, containing both databases in the same physical cluster.\nAccepted logical snapshots are primary6708 and joint_restore6667; no SQL was run during archiving.\nThe next authorized startup must compare primary exactly and admit joint_restore using the fixed historical 73-ordinal/3-parser proof, then freeze its actual schema before measuring A.\nA01 and A02 stopped before their first logical baseline query; both failed receipts and changed physical states are retained. A02 server readiness did not prove SQL readiness; its SQL probe exited -9. A03 SQL readiness passed, but its baseline process exited -9 before any successful logical baseline; no API or driver ran. The current physical tree is bound to the frozen A03 manifest. No logical preservation is inferred from A01-A03.\nNo new full logical backup/restore qualification is claimed. All historical failures and recovery points remain.\n'
+    return A['restore_instructions']()+'Current stopped C26 recovery, containing both databases in the same physical cluster.\nAccepted logical snapshots are primary6708 and joint_restore6667; no SQL was run during archiving.\nThe next authorized startup must compare primary exactly and admit joint_restore using the fixed historical 73-ordinal/3-parser proof, then freeze its actual schema before measuring A.\nA01 and A02 stopped before their first logical baseline query; both failed receipts and changed physical states are retained. A02 server readiness did not prove SQL readiness; its SQL probe exited -9. A03 and A04 SQL readiness passed, but each baseline process exited -9 before any successful logical baseline; no API or driver ran. A04 failed on an outer proc enumeration ESRCH; its failing PID was not observed. The current physical tree is bound to the frozen A04 manifest. No logical preservation is inferred from A01-A04.\nNo new full logical backup/restore qualification is claimed. All historical failures and recovery points remain.\n'
 
 def verify_recovery_descriptor(descriptor_path,expected_sha,tools,failure_state,expected_head,check_data=True):
     assert type(check_data)is bool and canonical(failure_state)==SOURCE and re.fullmatch('[a-f0-9]{64}',expected_sha)
@@ -178,10 +202,10 @@ def verify_recovery_descriptor(descriptor_path,expected_sha,tools,failure_state,
     assert value['archive']==file_binding(OUTPUT/NAMES['archive']) and value['archive']['bytes']<=A['ARCHIVE_CAP'] and value['archive']['mode']==0o600
     read=lambda key:json.loads((OUTPUT/NAMES[key]).read_text())
     data,full,frozen,prior,core,historical,receipt=[read(k) for k in ['dataManifest','fullSourceManifest','frozenSourceManifest','priorContinuationManifest','coreContinuationManifest','historicalRecoveryManifest','archiveReceipt']]
-    assert value['frozenFailedA03Manifest']==assert_frozen_a03(full)
+    assert value['frozenFailedA04Manifest']==assert_frozen_a04(full)
     assert data_projection(full)==data and [row for row in full if not A['mutable_path'](row['path'])]==frozen
     assert nondata_manifest(SOURCE)==frozen and inventory(PRIOR)==prior and inventory(CORE)==core and historical_recovery_manifest()==historical
-    assert receipt['frozenFailedA03Manifest']==value['frozenFailedA03Manifest']
+    assert receipt['frozenFailedA04Manifest']==value['frozenFailedA04Manifest']
     assert receipt['passed'] is True and receipt['scope']==SCOPE and receipt['archive']==value['archive'] and receipt['producer']==value['producer']
     assert receipt['watcherClose']['joined'] is True and receipt['watcherClose']['remainingAggregateSeconds']>0 and receipt['elapsedSeconds']<600
     budget=receipt['budget'];assert budget['schemaVersion']==2 and budget['bounds']==staged_bounds(data)
@@ -238,7 +262,7 @@ def main():
             source,_=A['helpers']();source.validate_descriptor(args.descriptor,args.expected_descriptor_sha256,tools/'postgresql/bin/pg_controldata');http03=file_binding(args.descriptor)
             accepted=validate_current();stopped=stopped_current(tools)
             full,data=frozen_failure_manifest(SOURCE),data_manifests(SOURCE);assert data_projection(full)==data
-            lineage=assert_frozen_a03(full)
+            lineage=assert_frozen_a04(full)
             frozen=nondata_manifest(SOURCE);assert [r for r in full if not A['mutable_path'](r['path'])]==frozen
             prior,core,historical=inventory(PRIOR),inventory(CORE),historical_recovery_manifest();bounds=staged_bounds(data)
             budget={'schemaVersion':2,'bounds':bounds,'compressionAdmission':staged_admission(bounds,guard.check(),'COMPRESS'),'extractionAdmission':None}
@@ -274,10 +298,10 @@ def main():
             shutil.rmtree(restore);fsync_directory(output);assert not os.path.lexists(archive);os.rename(partial,archive);fsync_directory(output)
             archive_binding=file_binding(archive)
             result['watcherClose']=stop_archive_guard_before_publication(guard,started+600);watcher_joined=True
-            result.update(passed=True,frozenFailedA03Manifest=lineage,acceptedEvidence=accepted,roundTripVerified=True,sourceUnchangedDuringArchive=True,nonDataEvidencePreserved=True,priorContinuationEvidencePreserved=True,coreContinuationEvidencePreserved=True,historicalRecoveryMaterialsPreserved=True,restoreMaterialFsynced=True,temporaryVerificationCopyRemoved=True,archive=archive_binding,manifestSha256=sha_file(output/NAMES['dataManifest']),sourceEvidenceSha256=sha_file(output/NAMES['frozenSourceManifest']),coreEvidenceSha256=sha_file(output/NAMES['coreContinuationManifest']),symlinkCount=0,hardlinkGroups=[],producer=producer,budget=budget,steps=steps,elapsedSeconds=time.monotonic()-started,minimumObserved=guard.minimum,comparedMetadata=['path','type','mode','uid','gid','mtime_ns','size','SHA256','all xattrs and ACLs','zero links'])
+            result.update(passed=True,frozenFailedA04Manifest=lineage,acceptedEvidence=accepted,roundTripVerified=True,sourceUnchangedDuringArchive=True,nonDataEvidencePreserved=True,priorContinuationEvidencePreserved=True,coreContinuationEvidencePreserved=True,historicalRecoveryMaterialsPreserved=True,restoreMaterialFsynced=True,temporaryVerificationCopyRemoved=True,archive=archive_binding,manifestSha256=sha_file(output/NAMES['dataManifest']),sourceEvidenceSha256=sha_file(output/NAMES['frozenSourceManifest']),coreEvidenceSha256=sha_file(output/NAMES['coreContinuationManifest']),symlinkCount=0,hardlinkGroups=[],producer=producer,budget=budget,steps=steps,elapsedSeconds=time.monotonic()-started,minimumObserved=guard.minimum,comparedMetadata=['path','type','mode','uid','gid','mtime_ns','size','SHA256','all xattrs and ACLs','zero links'])
             result['evidenceAllocationBeforeFinalReceipts']=writer.summary()
             writer.json(output/NAMES['archiveReceipt'],result);fsync_directory(output)
-            value={'schemaVersion':1,'scope':SCOPE,'sourceRoot':str(SOURCE),'allowedMutableRoots':list(DATA_DIRS),'head':args.expected_head,'frozenFailedA03Manifest':lineage,'producer':producer,'acceptedEvidence':accepted,'acceptedSnapshotBindings':SNAPSHOTS,'logicalCountsObservedDuringArchive':False,'http03Descriptor':http03,'stoppedEvidence':stopped,'archive':archive_binding,'files':{name:file_binding(output/NAMES[name]) for name in set(NAMES)-{'archive','descriptor'}},**{name:result[name] for name in ['roundTripVerified','sourceUnchangedDuringArchive','nonDataEvidencePreserved','priorContinuationEvidencePreserved','coreContinuationEvidencePreserved','historicalRecoveryMaterialsPreserved','rawSourceRetained','restoreMaterialFsynced','servicesStarted','durableBackup']}}
+            value={'schemaVersion':1,'scope':SCOPE,'sourceRoot':str(SOURCE),'allowedMutableRoots':list(DATA_DIRS),'head':args.expected_head,'frozenFailedA04Manifest':lineage,'producer':producer,'acceptedEvidence':accepted,'acceptedSnapshotBindings':SNAPSHOTS,'logicalCountsObservedDuringArchive':False,'http03Descriptor':http03,'stoppedEvidence':stopped,'archive':archive_binding,'files':{name:file_binding(output/NAMES[name]) for name in set(NAMES)-{'archive','descriptor'}},**{name:result[name] for name in ['roundTripVerified','sourceUnchangedDuringArchive','nonDataEvidencePreserved','priorContinuationEvidencePreserved','coreContinuationEvidencePreserved','historicalRecoveryMaterialsPreserved','rawSourceRetained','restoreMaterialFsynced','servicesStarted','durableBackup']}}
             guard.check();writer.json(output/NAMES['descriptor'],value);fsync_directory(output);guard.check();assert time.monotonic()-started<600
             print(json.dumps({'passed':True,'descriptorPath':str(output/NAMES['descriptor']),'descriptorSha256':sha_file(output/NAMES['descriptor']),'archiveSha256':archive_binding['sha256']}),flush=True)
         except BaseException as error:
@@ -301,7 +325,7 @@ export function parseArchiveArgs(argv){
  assert.equal(argv.length,keys.length*2)
  for(let i=0;i<argv.length;i+=2){const k=argv[i].slice(2);assert.ok(argv[i].startsWith('--')&&keys.includes(k)&&!(k in values));assert.ok(argv[i+1]&&!argv[i+1].startsWith('--'));values[k]=argv[i+1]}
  for(const k of ['python','tools','output','descriptor'])assert.ok(path.isAbsolute(values[k])&&path.resolve(values[k])===values[k])
- assert.equal(values.output,'/tmp/c25-c26-recovery-04');assert.match(values['expected-head'],/^[a-f0-9]{40}$/);assert.match(values['expected-descriptor-sha256'],/^[a-f0-9]{64}$/)
+ assert.equal(values.output,'/tmp/c25-c26-recovery-05');assert.match(values['expected-head'],/^[a-f0-9]{40}$/);assert.match(values['expected-descriptor-sha256'],/^[a-f0-9]{64}$/)
  return values
 }
 export function archivePythonArgv(values,bindings){
