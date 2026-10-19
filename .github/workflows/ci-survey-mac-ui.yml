@@ -1,0 +1,204 @@
+name: Survey Mac UI qualification
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+  PLAN: ${{ inputs.plan }}
+  CI_EVENT: ${{ github.event_name }}
+  CI_SURVEY_MAC_REQUIRED: 'true'
+  CI_SURVEY_MAC_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+  SURVEY_MAC_UI_REVIEWED_HEAD: ${{ vars.SURVEY_MAC_UI_REVIEWED_HEAD }}
+
+jobs:
+  producer:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - uses: docker/setup-buildx-action@v3
+      - name: one frontend compile and runtime from its cached stage
+        run: python3 -B .github/scripts/survey-mac-ui-candidate.py build
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: survey-mac-builder-${{ github.run_id }}-${{ github.sha }}
+          path: survey-mac-ui-evidence/builder.tar
+          if-no-files-found: error
+          retention-days: 3
+          overwrite: true
+          compression-level: 1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: survey-mac-runtime-${{ github.run_id }}-${{ github.sha }}
+          path: survey-mac-ui-evidence/runtime.tar
+          if-no-files-found: error
+          retention-days: 3
+          overwrite: true
+          compression-level: 1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: survey-mac-producer-${{ github.run_id }}-${{ github.sha }}
+          path: |
+            survey-mac-ui-plan.json
+            survey-mac-ui-evidence/build.json
+            survey-mac-ui-evidence/build-receipt.json
+          if-no-files-found: error
+          retention-days: 3
+          overwrite: true
+
+  checks:
+    needs: producer
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        phase: [lint, types, tests, audit]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - uses: actions/download-artifact@v4
+        with:
+          name: survey-mac-producer-${{ github.run_id }}-${{ github.sha }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: survey-mac-builder-${{ github.run_id }}-${{ github.sha }}
+          path: survey-mac-ui-evidence
+      - name: real qualification against the same builder
+        env:
+          PHASE: ${{ matrix.phase }}
+        run: python3 -B .github/scripts/survey-mac-ui-candidate.py "$PHASE"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: survey-mac-${{ matrix.phase }}-${{ github.run_id }}-${{ github.sha }}
+          path: |
+            survey-mac-ui-evidence/*-receipt.json
+            survey-mac-ui-evidence/tests.json
+            survey-mac-ui-evidence/audit.json
+          if-no-files-found: error
+          retention-days: 3
+          overwrite: true
+
+  scan:
+    needs: producer
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - uses: actions/download-artifact@v4
+        with:
+          name: survey-mac-producer-${{ github.run_id }}-${{ github.sha }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: survey-mac-runtime-${{ github.run_id }}-${{ github.sha }}
+          path: survey-mac-ui-evidence
+      - run: python3 -B .github/scripts/survey-mac-ui-candidate.py runtime-load
+      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        with:
+          version: v0.70.0
+          cache: false
+      - name: scan the exact production runtime
+        env:
+          CHECKOUT_HEAD: ${{ github.sha }}
+        run: trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output survey-mac-ui-evidence/runtime-scan.json "eduk12-survey-mac:$CHECKOUT_HEAD"
+      - name: require a nonempty scan report for the exact runtime
+        shell: node {0}
+        run: |
+          const fs = require('node:fs');
+          const scan = JSON.parse(fs.readFileSync('survey-mac-ui-evidence/runtime-scan.json','utf8'));
+          const build = JSON.parse(fs.readFileSync('survey-mac-ui-evidence/build.json','utf8'));
+          if (scan.Metadata?.ImageID !== build.images.runtime.id || !Array.isArray(scan.Results) || !scan.Results.length)
+            throw new Error('Missing or mismatched runtime scan report');
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: survey-mac-scan-${{ github.run_id }}-${{ github.sha }}
+          path: |
+            survey-mac-ui-evidence/runtime-scan.json
+            survey-mac-ui-evidence/runtime-load-receipt.json
+          if-no-files-found: error
+          retention-days: 3
+          overwrite: true
+
+  browser:
+    needs: producer
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [chromium, webkit]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - uses: actions/download-artifact@v4
+        with:
+          name: survey-mac-producer-${{ github.run_id }}-${{ github.sha }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: survey-mac-runtime-${{ github.run_id }}-${{ github.sha }}
+          path: survey-mac-ui-evidence
+      - run: python3 -B .github/scripts/survey-mac-ui-candidate.py runtime-load
+      - run: npm ci --ignore-scripts --prefix .github/release-tools
+      - name: install official engine
+        env:
+          ENGINE: ${{ matrix.engine }}
+        run: node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps "$ENGINE"
+      - name: isolate canonical test hosts on this disposable runner
+        run: echo '127.0.0.1 survey.eduk12.top training.eduk12.top' | sudo tee -a /etc/hosts
+      - name: same runtime targeted UI and strict synthetic DTOs
+        env:
+          ENGINE: ${{ matrix.engine }}
+        run: node .github/scripts/survey-mac-ui-browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: survey-mac-browser-${{ matrix.engine }}-${{ github.run_id }}-${{ github.sha }}
+          path: |
+            survey-mac-ui-evidence/browser-*.json
+            survey-mac-ui-evidence/screenshots/
+          if-no-files-found: error
+          retention-days: 3
+          overwrite: true
+
+  ready:
+    if: always()
+    needs: [producer, checks, scan, browser]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: every selected qualification must actually succeed
+        shell: node {0}
+        run: |
+          const needs = ${{ toJSON(needs) }};
+          const expected = ['producer','checks','scan','browser'];
+          if (Object.keys(needs).length !== expected.length || expected.some(k => needs[k]?.result !== 'success'))
+            throw new Error('Survey Mac qualification missing, failed, cancelled or skipped');
