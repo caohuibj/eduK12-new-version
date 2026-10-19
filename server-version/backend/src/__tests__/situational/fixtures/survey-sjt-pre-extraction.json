@@ -1,0 +1,1007 @@
+{
+  "baseCommit": "8f4a5288dbe17387d4dad96e1cdf854412c4e009",
+  "instrumentKey": "compatibility-study",
+  "sourceBlobs": {
+    "server-version/backend/src/modules/survey/builder.compiler.ts": "6a15c7cc1f185d507193c059cc82ee9557e663ce",
+    "server-version/backend/src/modules/survey/builder.definition.ts": "5a566ea81be938ac7b644fc93e7a9530a2f76368",
+    "server-version/backend/src/modules/survey/sjt-v2.compiler.ts": "418025883a9d60661d525d2de3871d8e7cabaf45",
+    "server-version/backend/src/modules/survey/sjt-v2.validation.ts": "e07e0df52c4f496219ca5051804c7345cf7548e4",
+    "server-version/backend/src/modules/survey/sjt-runtime.ts": "0830bf73057167947904a4a3949b987e4cea350e",
+    "server-version/backend/src/modules/survey/sjt-selection.ts": "a74c0ece9a81e9a7901708985bf4f1c495fee95a",
+    "server-version/backend/src/modules/survey/sjt-structure.ts": "fd37f35b5f49860082ee70af5cc09f6dced744ba"
+  },
+  "fixtures": [
+    {
+      "name": "v1",
+      "input": {
+        "schemaVersion": 1,
+        "respondentType": "student_self_report",
+        "scenarioKey": "discussion",
+        "title": "独立手算双情境三题",
+        "stimulus": "小组讨论一个共同问题。",
+        "author": "合成验收作者",
+        "sourceNote": "原创合成测试，非真实被试",
+        "licenseStatus": "self_authored",
+        "redistribution": "allowed",
+        "metrics": [
+          {
+            "metricKey": "cooperation",
+            "label": "合作",
+            "direction": "descriptive"
+          }
+        ],
+        "questions": [
+          {
+            "questionKey": "first",
+            "prompt": "选择合适的行动",
+            "responseType": "MULTIPLE",
+            "options": [
+              {
+                "optionKey": "a",
+                "label": "行动甲",
+                "contributions": {
+                  "cooperation": 1
+                }
+              },
+              {
+                "optionKey": "b",
+                "label": "行动乙",
+                "contributions": {
+                  "cooperation": 1
+                }
+              }
+            ],
+            "aggregationPolicy": "SUM",
+            "minSelections": 1,
+            "maxSelections": 2
+          },
+          {
+            "questionKey": "second",
+            "prompt": "选择合适的行动",
+            "responseType": "SINGLE",
+            "options": [
+              {
+                "optionKey": "a",
+                "label": "行动甲",
+                "contributions": {
+                  "cooperation": 4
+                }
+              },
+              {
+                "optionKey": "b",
+                "label": "行动乙",
+                "contributions": {
+                  "cooperation": 0
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "output": {
+        "template": {
+          "templateVersion": "sjt-upload-v1",
+          "instrumentKey": "research-0a079371c20a646187040865",
+          "instrumentVersion": "0.1.0",
+          "title": "独立手算双情境三题",
+          "respondentType": "student_self_report",
+          "entryNodeKey": "first",
+          "author": "合成验收作者",
+          "sourceNote": "原创合成测试，非真实被试",
+          "disclaimer": "研究者自编探索性工具。结果用于本项目科研记录，无常模或诊断效力；被试只接收获准的通用反馈。",
+          "licenseStatus": "self_authored",
+          "redistribution": "allowed",
+          "nodes": [
+            {
+              "nodeKey": "first",
+              "motherSceneKey": "discussion",
+              "title": "独立手算双情境三题",
+              "stimulus": "小组讨论一个共同问题。"
+            },
+            {
+              "nodeKey": "second",
+              "motherSceneKey": "discussion",
+              "title": "独立手算双情境三题",
+              "stimulus": "小组讨论一个共同问题。"
+            }
+          ],
+          "questions": [
+            {
+              "nodeKey": "first",
+              "questionKey": "first",
+              "prompt": "选择合适的行动",
+              "kind": "CORE",
+              "purpose": "BEHAVIOR_TENDENCY",
+              "required": true,
+              "order": 0
+            },
+            {
+              "nodeKey": "second",
+              "questionKey": "second",
+              "prompt": "选择合适的行动",
+              "kind": "CORE",
+              "purpose": "BEHAVIOR_TENDENCY",
+              "required": true,
+              "order": 0
+            }
+          ],
+          "options": [
+            {
+              "questionKey": "first",
+              "optionKey": "m7008c5d22e7ac8dc55a9eb",
+              "label": "行动甲"
+            },
+            {
+              "questionKey": "first",
+              "optionKey": "m9dc06974ba74ad34cd6a53",
+              "label": "行动甲＋行动乙"
+            },
+            {
+              "questionKey": "first",
+              "optionKey": "ma438dbad238dd8c58b0f28",
+              "label": "行动乙"
+            },
+            {
+              "questionKey": "second",
+              "optionKey": "a",
+              "label": "行动甲"
+            },
+            {
+              "questionKey": "second",
+              "optionKey": "b",
+              "label": "行动乙"
+            }
+          ],
+          "transitions": [
+            {
+              "nodeKey": "first",
+              "optionKey": "m7008c5d22e7ac8dc55a9eb",
+              "nextNodeKey": "second",
+              "bridgeText": ""
+            },
+            {
+              "nodeKey": "first",
+              "optionKey": "m9dc06974ba74ad34cd6a53",
+              "nextNodeKey": "second",
+              "bridgeText": ""
+            },
+            {
+              "nodeKey": "first",
+              "optionKey": "ma438dbad238dd8c58b0f28",
+              "nextNodeKey": "second",
+              "bridgeText": ""
+            },
+            {
+              "nodeKey": "second",
+              "optionKey": "a",
+              "nextNodeKey": "END",
+              "bridgeText": ""
+            },
+            {
+              "nodeKey": "second",
+              "optionKey": "b",
+              "nextNodeKey": "END",
+              "bridgeText": ""
+            }
+          ],
+          "metrics": [
+            {
+              "metricKey": "cooperation",
+              "label": "合作",
+              "construct": "cooperation",
+              "role": "primary"
+            }
+          ],
+          "opportunities": [
+            {
+              "nodeKey": "first",
+              "metricKey": "cooperation",
+              "applicability": "OPPORTUNITY"
+            },
+            {
+              "nodeKey": "second",
+              "metricKey": "cooperation",
+              "applicability": "OPPORTUNITY"
+            }
+          ],
+          "scores": [
+            {
+              "nodeKey": "first",
+              "optionKey": "m7008c5d22e7ac8dc55a9eb",
+              "metricKey": "cooperation",
+              "contribution": 1
+            },
+            {
+              "nodeKey": "first",
+              "optionKey": "m9dc06974ba74ad34cd6a53",
+              "metricKey": "cooperation",
+              "contribution": 2
+            },
+            {
+              "nodeKey": "first",
+              "optionKey": "ma438dbad238dd8c58b0f28",
+              "metricKey": "cooperation",
+              "contribution": 1
+            },
+            {
+              "nodeKey": "second",
+              "optionKey": "a",
+              "metricKey": "cooperation",
+              "contribution": 4
+            },
+            {
+              "nodeKey": "second",
+              "optionKey": "b",
+              "metricKey": "cooperation",
+              "contribution": 0
+            }
+          ],
+          "feedback": [
+            {
+              "questionKey": "first",
+              "optionKey": "m7008c5d22e7ac8dc55a9eb",
+              "kind": "ACTION",
+              "text": "仅记录研究选择，不构成正确或错误的个人评价。"
+            },
+            {
+              "questionKey": "first",
+              "optionKey": "m9dc06974ba74ad34cd6a53",
+              "kind": "ACTION",
+              "text": "仅记录研究选择，不构成正确或错误的个人评价。"
+            },
+            {
+              "questionKey": "first",
+              "optionKey": "ma438dbad238dd8c58b0f28",
+              "kind": "ACTION",
+              "text": "仅记录研究选择，不构成正确或错误的个人评价。"
+            },
+            {
+              "questionKey": "second",
+              "optionKey": "a",
+              "kind": "ACTION",
+              "text": "仅记录研究选择，不构成正确或错误的个人评价。"
+            },
+            {
+              "questionKey": "second",
+              "optionKey": "b",
+              "kind": "ACTION",
+              "text": "仅记录研究选择，不构成正确或错误的个人评价。"
+            }
+          ],
+          "comparisons": [],
+          "cases": []
+        },
+        "package": {
+          "key": "research-0a079371c20a646187040865",
+          "instrumentVersion": "0.1.0",
+          "releaseStatus": "DRAFT",
+          "definition": {
+            "schemaVersion": 2,
+            "respondentType": "student_self_report",
+            "source": {
+              "title": "独立手算双情境三题",
+              "citation": "合成验收作者；原创合成测试，非真实被试"
+            },
+            "license": {
+              "status": "self_authored",
+              "redistribution": "allowed",
+              "note": "原创合成测试，非真实被试"
+            },
+            "sampling": {
+              "strategy": "BRANCH_REACHABLE"
+            },
+            "scenes": [
+              {
+                "sceneKey": "first_12ae32cb1ec0",
+                "title": "独立手算双情境三题",
+                "sortOrder": 0,
+                "stimulus": {
+                  "type": "TEXT_V1",
+                  "text": "小组讨论一个共同问题。"
+                },
+                "primaryConstruct": "cooperation",
+                "secondaryConstructs": [],
+                "situationFeatures": {},
+                "channels": [
+                  {
+                    "channelKey": "first",
+                    "purpose": "BEHAVIOR_TENDENCY",
+                    "responseType": "SINGLE_CHOICE",
+                    "prompt": "选择合适的行动",
+                    "options": [
+                      {
+                        "optionKey": "m7008c5d22e7ac8dc55a9eb",
+                        "label": "行动甲"
+                      },
+                      {
+                        "optionKey": "m9dc06974ba74ad34cd6a53",
+                        "label": "行动甲＋行动乙"
+                      },
+                      {
+                        "optionKey": "ma438dbad238dd8c58b0f28",
+                        "label": "行动乙"
+                      }
+                    ]
+                  }
+                ],
+                "measurementBundle": {
+                  "contractVersion": "measurement-bundle-v1",
+                  "maxRequiredResponses": 1,
+                  "maxOptionalDiagnosticResponses": 0,
+                  "maxTotalResponses": 1,
+                  "estimatedSeconds": 120
+                }
+              },
+              {
+                "sceneKey": "second_12ae32cb1ec0",
+                "title": "独立手算双情境三题",
+                "sortOrder": 1,
+                "stimulus": {
+                  "type": "TEXT_V1",
+                  "text": "小组讨论一个共同问题。"
+                },
+                "primaryConstruct": "cooperation",
+                "secondaryConstructs": [],
+                "situationFeatures": {},
+                "channels": [
+                  {
+                    "channelKey": "second",
+                    "purpose": "BEHAVIOR_TENDENCY",
+                    "responseType": "SINGLE_CHOICE",
+                    "prompt": "选择合适的行动",
+                    "options": [
+                      {
+                        "optionKey": "a",
+                        "label": "行动甲"
+                      },
+                      {
+                        "optionKey": "b",
+                        "label": "行动乙"
+                      }
+                    ]
+                  }
+                ],
+                "measurementBundle": {
+                  "contractVersion": "measurement-bundle-v1",
+                  "maxRequiredResponses": 1,
+                  "maxOptionalDiagnosticResponses": 0,
+                  "maxTotalResponses": 1,
+                  "estimatedSeconds": 120
+                }
+              }
+            ],
+            "scoring": {
+              "scoringVersion": "author-key-sum-v1",
+              "model": {
+                "contractVersion": "situational-model-v1",
+                "modelKey": "AUTHOR_KEY_SUM",
+                "modelVersion": "1",
+                "expertKey": [
+                  {
+                    "sceneKey": "first_12ae32cb1ec0",
+                    "channelKey": "first",
+                    "optionKey": "m7008c5d22e7ac8dc55a9eb",
+                    "metricKey": "cooperation",
+                    "contribution": 1
+                  },
+                  {
+                    "sceneKey": "first_12ae32cb1ec0",
+                    "channelKey": "first",
+                    "optionKey": "m9dc06974ba74ad34cd6a53",
+                    "metricKey": "cooperation",
+                    "contribution": 2
+                  },
+                  {
+                    "sceneKey": "first_12ae32cb1ec0",
+                    "channelKey": "first",
+                    "optionKey": "ma438dbad238dd8c58b0f28",
+                    "metricKey": "cooperation",
+                    "contribution": 1
+                  },
+                  {
+                    "sceneKey": "second_12ae32cb1ec0",
+                    "channelKey": "second",
+                    "optionKey": "a",
+                    "metricKey": "cooperation",
+                    "contribution": 4
+                  },
+                  {
+                    "sceneKey": "second_12ae32cb1ec0",
+                    "channelKey": "second",
+                    "optionKey": "b",
+                    "metricKey": "cooperation",
+                    "contribution": 0
+                  }
+                ]
+              },
+              "choiceScores": [],
+              "publishedMetrics": [
+                {
+                  "key": "cooperation",
+                  "label": "合作",
+                  "construct": "cooperation",
+                  "channelKey": "core",
+                  "direction": "descriptive",
+                  "role": "primary",
+                  "displayPrecision": 0
+                }
+              ]
+            },
+            "report": {
+              "narrative": {
+                "version": "sjt-narrative-v1",
+                "fragments": [
+                  {
+                    "sceneKey": "first_12ae32cb1ec0",
+                    "channelKey": "first",
+                    "optionKey": "m7008c5d22e7ac8dc55a9eb",
+                    "text": "仅记录研究选择，不构成正确或错误的个人评价。",
+                    "kind": "ACTION"
+                  },
+                  {
+                    "sceneKey": "first_12ae32cb1ec0",
+                    "channelKey": "first",
+                    "optionKey": "m9dc06974ba74ad34cd6a53",
+                    "text": "仅记录研究选择，不构成正确或错误的个人评价。",
+                    "kind": "ACTION"
+                  },
+                  {
+                    "sceneKey": "first_12ae32cb1ec0",
+                    "channelKey": "first",
+                    "optionKey": "ma438dbad238dd8c58b0f28",
+                    "text": "仅记录研究选择，不构成正确或错误的个人评价。",
+                    "kind": "ACTION"
+                  },
+                  {
+                    "sceneKey": "second_12ae32cb1ec0",
+                    "channelKey": "second",
+                    "optionKey": "a",
+                    "text": "仅记录研究选择，不构成正确或错误的个人评价。",
+                    "kind": "ACTION"
+                  },
+                  {
+                    "sceneKey": "second_12ae32cb1ec0",
+                    "channelKey": "second",
+                    "optionKey": "b",
+                    "text": "仅记录研究选择，不构成正确或错误的个人评价。",
+                    "kind": "ACTION"
+                  }
+                ],
+                "comparisons": []
+              },
+              "reportVersion": "sjt-narrative-v1",
+              "primaryMetricKeys": [
+                "cooperation"
+              ],
+              "metricOrder": [
+                "cooperation"
+              ],
+              "interpretations": [],
+              "limitations": [
+                "作者暂定评分键，尚未完成独立专家评审和实证校准。",
+                "行为意向及辅助回答仅用于低风险反思，不用于教师选聘或能力等级判定。"
+              ],
+              "disclaimer": "研究者自编探索性工具。结果用于本项目科研记录，无常模或诊断效力；被试只接收获准的通用反馈。"
+            },
+            "referencePolicy": {
+              "type": "none"
+            },
+            "flow": {
+              "strategy": "BRANCHING_DAG_V1",
+              "entryNodeKey": "first_12ae32cb1ec0",
+              "nodes": [
+                {
+                  "nodeType": "SCENE",
+                  "nodeKey": "first_12ae32cb1ec0",
+                  "sceneKey": "first_12ae32cb1ec0",
+                  "motherSceneKey": "discussion",
+                  "roundKey": "first",
+                  "stepKey": "first_12ae32cb1ec0",
+                  "interactionRole": "DECISION",
+                  "channelPolicies": [
+                    {
+                      "channelKey": "first",
+                      "measurementRole": "SCORED",
+                      "required": true,
+                      "interactionRole": "DECISION"
+                    }
+                  ],
+                  "responseStages": [
+                    {
+                      "stageKey": "choice",
+                      "kind": "CHOICE",
+                      "channelKeys": [
+                        "first"
+                      ]
+                    }
+                  ],
+                  "transition": {
+                    "type": "DECISION",
+                    "channelKey": "first",
+                    "branches": [
+                      {
+                        "optionKey": "m7008c5d22e7ac8dc55a9eb",
+                        "nextNodeKey": "second_12ae32cb1ec0"
+                      },
+                      {
+                        "optionKey": "m9dc06974ba74ad34cd6a53",
+                        "nextNodeKey": "second_12ae32cb1ec0"
+                      },
+                      {
+                        "optionKey": "ma438dbad238dd8c58b0f28",
+                        "nextNodeKey": "second_12ae32cb1ec0"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "nodeType": "SCENE",
+                  "nodeKey": "second_12ae32cb1ec0",
+                  "sceneKey": "second_12ae32cb1ec0",
+                  "motherSceneKey": "discussion",
+                  "roundKey": "second",
+                  "stepKey": "second_12ae32cb1ec0",
+                  "interactionRole": "DECISION",
+                  "channelPolicies": [
+                    {
+                      "channelKey": "second",
+                      "measurementRole": "SCORED",
+                      "required": true,
+                      "interactionRole": "DECISION"
+                    }
+                  ],
+                  "responseStages": [
+                    {
+                      "stageKey": "choice",
+                      "kind": "CHOICE",
+                      "channelKeys": [
+                        "second"
+                      ]
+                    }
+                  ],
+                  "transition": {
+                    "type": "DECISION",
+                    "channelKey": "second",
+                    "branches": [
+                      {
+                        "optionKey": "a",
+                        "nextNodeKey": "END"
+                      },
+                      {
+                        "optionKey": "b",
+                        "nextNodeKey": "END"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "nodeType": "TERMINAL",
+                  "nodeKey": "END"
+                }
+              ]
+            }
+          },
+          "goldenCases": []
+        },
+        "contentDigest": "99f709ecbd4180cc67622004d8de0ad5e4fe4254642bf2f57b891a8fe9063482",
+        "definitionHash": "d0f308f267453e35af4190506b1fa212b3524cdb90577b4772b4ca1e7b94edef"
+      },
+      "serializedSha256": "00c323576922259b13792e0c32e29113c898f77f97919683a591a638daedffbb"
+    },
+    {
+      "name": "v2",
+      "input": {
+        "schemaVersion": 2,
+        "respondentType": "student_self_report",
+        "title": "独立手算双情境三题",
+        "author": "合成验收作者",
+        "sourceNote": "原创合成测试，非真实被试",
+        "licenseStatus": "self_authored",
+        "redistribution": "allowed",
+        "orderPolicy": "FIXED",
+        "metrics": [
+          {
+            "metricKey": "cooperation",
+            "label": "合作",
+            "direction": "descriptive"
+          }
+        ],
+        "scoring": {
+          "modelKey": "AUTHOR_KEY_SUM",
+          "modelVersion": "1",
+          "sourceNote": "独立人工验收键"
+        },
+        "scenes": [
+          {
+            "sceneKey": "discussion",
+            "title": "小组讨论",
+            "stimulus": "小组讨论一个共同问题。",
+            "questions": [
+              {
+                "questionKey": "first",
+                "prompt": "选择合适的行动",
+                "responseType": "MULTIPLE",
+                "required": false,
+                "allowRefusal": true,
+                "options": [
+                  {
+                    "optionKey": "a",
+                    "label": "行动甲",
+                    "contributions": {
+                      "cooperation": 1
+                    }
+                  },
+                  {
+                    "optionKey": "b",
+                    "label": "行动乙",
+                    "contributions": {
+                      "cooperation": 1
+                    }
+                  }
+                ],
+                "aggregationPolicy": "SUM",
+                "minSelections": 1,
+                "maxSelections": 2
+              },
+              {
+                "questionKey": "second",
+                "prompt": "选择合适的行动",
+                "responseType": "SINGLE",
+                "required": false,
+                "allowRefusal": true,
+                "options": [
+                  {
+                    "optionKey": "a",
+                    "label": "行动甲",
+                    "contributions": {
+                      "cooperation": 4
+                    }
+                  },
+                  {
+                    "optionKey": "b",
+                    "label": "行动乙",
+                    "contributions": {
+                      "cooperation": 0
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "sceneKey": "planning",
+            "title": "下一步计划",
+            "stimulus": "团队需要准备下一步计划。",
+            "questions": [
+              {
+                "questionKey": "third",
+                "prompt": "选择合适的行动",
+                "responseType": "MULTIPLE",
+                "required": false,
+                "allowRefusal": true,
+                "options": [
+                  {
+                    "optionKey": "a",
+                    "label": "行动甲",
+                    "contributions": {
+                      "cooperation": 3
+                    }
+                  },
+                  {
+                    "optionKey": "b",
+                    "label": "行动乙",
+                    "contributions": {
+                      "cooperation": 5
+                    }
+                  }
+                ],
+                "aggregationPolicy": "MEAN",
+                "minSelections": 1,
+                "maxSelections": 2
+              }
+            ]
+          }
+        ]
+      },
+      "output": {
+        "package": {
+          "key": "research-0a079371c20a646187040865",
+          "instrumentVersion": "0.2.0",
+          "releaseStatus": "DRAFT",
+          "definition": {
+            "schemaVersion": 2,
+            "respondentType": "student_self_report",
+            "source": {
+              "title": "独立手算双情境三题",
+              "citation": "合成验收作者；原创合成测试，非真实被试；独立人工验收键"
+            },
+            "license": {
+              "status": "self_authored",
+              "redistribution": "allowed",
+              "note": "原创合成测试，非真实被试"
+            },
+            "sampling": {
+              "strategy": "BRANCH_REACHABLE"
+            },
+            "scenes": [
+              {
+                "sceneKey": "survey_q_first",
+                "title": "小组讨论",
+                "sortOrder": 0,
+                "stimulus": {
+                  "type": "TEXT_V1",
+                  "text": "小组讨论一个共同问题。"
+                },
+                "primaryConstruct": "cooperation",
+                "secondaryConstructs": [],
+                "situationFeatures": {},
+                "channels": [
+                  {
+                    "channelKey": "first",
+                    "purpose": "BEHAVIOR_TENDENCY",
+                    "responseType": "SINGLE_CHOICE",
+                    "prompt": "选择合适的行动",
+                    "options": [
+                      {
+                        "optionKey": "m7008c5d22e7ac8dc55a9eb",
+                        "label": "行动甲"
+                      },
+                      {
+                        "optionKey": "m9dc06974ba74ad34cd6a53",
+                        "label": "行动甲＋行动乙"
+                      },
+                      {
+                        "optionKey": "ma438dbad238dd8c58b0f28",
+                        "label": "行动乙"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "sceneKey": "survey_q_second",
+                "title": "小组讨论",
+                "sortOrder": 1,
+                "stimulus": {
+                  "type": "TEXT_V1",
+                  "text": "小组讨论一个共同问题。"
+                },
+                "primaryConstruct": "cooperation",
+                "secondaryConstructs": [],
+                "situationFeatures": {},
+                "channels": [
+                  {
+                    "channelKey": "second",
+                    "purpose": "BEHAVIOR_TENDENCY",
+                    "responseType": "SINGLE_CHOICE",
+                    "prompt": "选择合适的行动",
+                    "options": [
+                      {
+                        "optionKey": "a",
+                        "label": "行动甲"
+                      },
+                      {
+                        "optionKey": "b",
+                        "label": "行动乙"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "sceneKey": "survey_q_third",
+                "title": "下一步计划",
+                "sortOrder": 2,
+                "stimulus": {
+                  "type": "TEXT_V1",
+                  "text": "团队需要准备下一步计划。"
+                },
+                "primaryConstruct": "cooperation",
+                "secondaryConstructs": [],
+                "situationFeatures": {},
+                "channels": [
+                  {
+                    "channelKey": "third",
+                    "purpose": "BEHAVIOR_TENDENCY",
+                    "responseType": "SINGLE_CHOICE",
+                    "prompt": "选择合适的行动",
+                    "options": [
+                      {
+                        "optionKey": "m696204a5df58f6e3af60d4",
+                        "label": "行动甲"
+                      },
+                      {
+                        "optionKey": "mfeff163510104c024589c8",
+                        "label": "行动甲＋行动乙"
+                      },
+                      {
+                        "optionKey": "m9238a5c0a764a05d97c12f",
+                        "label": "行动乙"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "scoring": {
+              "scoringVersion": "survey-sjt-v2-author-sum-1",
+              "model": {
+                "contractVersion": "situational-model-v1",
+                "modelKey": "AUTHOR_KEY_SUM",
+                "modelVersion": "1",
+                "expertKey": [
+                  {
+                    "sceneKey": "survey_q_first",
+                    "channelKey": "first",
+                    "optionKey": "m7008c5d22e7ac8dc55a9eb",
+                    "metricKey": "cooperation",
+                    "contribution": 1
+                  },
+                  {
+                    "sceneKey": "survey_q_first",
+                    "channelKey": "first",
+                    "optionKey": "m9dc06974ba74ad34cd6a53",
+                    "metricKey": "cooperation",
+                    "contribution": 2
+                  },
+                  {
+                    "sceneKey": "survey_q_first",
+                    "channelKey": "first",
+                    "optionKey": "ma438dbad238dd8c58b0f28",
+                    "metricKey": "cooperation",
+                    "contribution": 1
+                  },
+                  {
+                    "sceneKey": "survey_q_second",
+                    "channelKey": "second",
+                    "optionKey": "a",
+                    "metricKey": "cooperation",
+                    "contribution": 4
+                  },
+                  {
+                    "sceneKey": "survey_q_second",
+                    "channelKey": "second",
+                    "optionKey": "b",
+                    "metricKey": "cooperation",
+                    "contribution": 0
+                  },
+                  {
+                    "sceneKey": "survey_q_third",
+                    "channelKey": "third",
+                    "optionKey": "m696204a5df58f6e3af60d4",
+                    "metricKey": "cooperation",
+                    "contribution": 3
+                  },
+                  {
+                    "sceneKey": "survey_q_third",
+                    "channelKey": "third",
+                    "optionKey": "mfeff163510104c024589c8",
+                    "metricKey": "cooperation",
+                    "contribution": 4
+                  },
+                  {
+                    "sceneKey": "survey_q_third",
+                    "channelKey": "third",
+                    "optionKey": "m9238a5c0a764a05d97c12f",
+                    "metricKey": "cooperation",
+                    "contribution": 5
+                  }
+                ]
+              },
+              "choiceScores": [],
+              "publishedMetrics": [
+                {
+                  "key": "cooperation",
+                  "label": "合作",
+                  "construct": "cooperation",
+                  "channelKey": "survey_response",
+                  "direction": "descriptive",
+                  "role": "primary",
+                  "displayPrecision": 2
+                }
+              ]
+            },
+            "report": {
+              "reportVersion": "survey-sjt-private-v2",
+              "primaryMetricKeys": [
+                "cooperation"
+              ],
+              "metricOrder": [
+                "cooperation"
+              ],
+              "interpretations": [
+                {
+                  "metricKey": "cooperation",
+                  "headline": "合作",
+                  "summary": "描述本次研究作答的冻结贡献；不作常模、诊断或等级解释。",
+                  "bands": [],
+                  "guidance": []
+                }
+              ],
+              "limitations": [
+                "作者贡献按问题求和；不提供自动跨维度总分或部分作答校正。",
+                "缺失、拒答或不适用使相关指标不可计算，不补零；独立情境按原情境分组统计。"
+              ],
+              "disclaimer": "研究自编探索性工具，仅描述本次研究条件下的作答；不提供常模、诊断或能力等级。"
+            },
+            "referencePolicy": {
+              "type": "none"
+            },
+            "flow": {
+              "strategy": "BRANCHING_DAG_V1",
+              "entryNodeKey": "survey_q_first",
+              "nodes": [
+                {
+                  "nodeType": "SCENE",
+                  "nodeKey": "survey_q_first",
+                  "sceneKey": "survey_q_first",
+                  "motherSceneKey": "discussion",
+                  "roundKey": "discussion",
+                  "stepKey": "first",
+                  "channelPolicies": [
+                    {
+                      "channelKey": "first",
+                      "measurementRole": "SCORED",
+                      "required": false
+                    }
+                  ],
+                  "transition": {
+                    "type": "NEXT",
+                    "nextNodeKey": "survey_q_second"
+                  }
+                },
+                {
+                  "nodeType": "SCENE",
+                  "nodeKey": "survey_q_second",
+                  "sceneKey": "survey_q_second",
+                  "motherSceneKey": "discussion",
+                  "roundKey": "discussion",
+                  "stepKey": "second",
+                  "channelPolicies": [
+                    {
+                      "channelKey": "second",
+                      "measurementRole": "SCORED",
+                      "required": false
+                    }
+                  ],
+                  "transition": {
+                    "type": "NEXT",
+                    "nextNodeKey": "survey_q_third"
+                  }
+                },
+                {
+                  "nodeType": "SCENE",
+                  "nodeKey": "survey_q_third",
+                  "sceneKey": "survey_q_third",
+                  "motherSceneKey": "planning",
+                  "roundKey": "planning",
+                  "stepKey": "third",
+                  "channelPolicies": [
+                    {
+                      "channelKey": "third",
+                      "measurementRole": "SCORED",
+                      "required": false
+                    }
+                  ],
+                  "transition": {
+                    "type": "NEXT",
+                    "nextNodeKey": "END"
+                  }
+                },
+                {
+                  "nodeType": "TERMINAL",
+                  "nodeKey": "END"
+                }
+              ]
+            }
+          },
+          "goldenCases": []
+        },
+        "compilerVersion": "survey-sjt-fixed-v2.1",
+        "contentDigest": "317e708357e7aaef27718dfa2716c5201acc24eaec84f4223bee76b043a643d7",
+        "definitionHash": "7bac42d6486cf40e85c7c070fd301b1a68397611dffd2c2da918e2b73183c04e"
+      },
+      "serializedSha256": "46cebd61a4de8aa6b49dc7579247bc1ec2f63158e3acc563af86d13c053bed58"
+    }
+  ]
+}

@@ -8,6 +8,8 @@ import { UserRole } from '../types'
 import { uploadPrincipalRateLimit, withUploadAdmission } from '../middleware/uploadAdmission'
 import { createTemporaryUploadStorage } from '../utils/uploadTemp'
 import { SjtTemplateError, compileSjtTemplate } from '../modules/situational/authoring/template'
+import { compileSjtAuthorDocument } from '../modules/situational/authoring/dispatcher'
+import { publicSjtOnlineMetadata, normalizeSjtOnlineResponses } from '../modules/situational/authoring/online'
 import { readSjtWorkbook, locateSjtWorkbookIssues } from '../modules/situational/authoring/workbook'
 import {
   createSjtDraft,
@@ -19,6 +21,8 @@ import {
   diffSjtTemplates,
   restoreSjtRevision,
   retireSjtRelease,
+  setSjtDraftPolicy,
+  adaptSjtRelease,
 } from '../modules/situational/authoring/service'
 import {
   runnerSituationRuntimeDefinition,
@@ -35,9 +39,13 @@ import {
 } from '../modules/situational/situation-trajectory'
 import { scoreSituationalModel } from '../modules/situational/situation-model-resolver'
 import { buildSjtNarrative } from '../modules/situational/authoring/narrative'
+import { createSjtReleaseGrant, revokeSjtReleaseGrant, listSjtReleaseGrants,
+  listSjtControlledReleases, sjtGrantListQuerySchema } from '../modules/situational/authoring/grants'
+import sjtAuthoringMediaRouter from './sjtAuthoringMedia'
 
 const router = Router()
 router.use(authenticate, requireTeacher)
+router.use(sjtAuthoringMediaRouter)
 const actor = (req: Request) => ({
   userId: req.user!.userId,
   admin: req.user!.role === UserRole.ADMIN,
@@ -152,6 +160,12 @@ router.get(
 )
 router.post('/validate', uploadPrincipalRateLimit, uploadHandler(false))
 router.post('/drafts', uploadPrincipalRateLimit, uploadHandler(true))
+router.post('/online/drafts', uploadPrincipalRateLimit, handle(async (req, res) => {
+  // The service compiles exactly once. The route only selects the explicit protocol.
+  const body = z.object({ template: z.object({ templateVersion: z.literal('sjt-online-v1') }).passthrough(),
+    authorizationPolicy: z.literal('COURSE_GRANT_V1').nullable().optional() }).strict().parse(req.body)
+  send(res, await createSjtDraft(actor(req), body.template, { authorizationPolicy: body.authorizationPolicy }))
+}))
 router.get(
   '/drafts',
   handle(async (req, res) => send(res, await listSjtDrafts(actor(req)))),
@@ -160,9 +174,10 @@ router.get(
   '/drafts/:id',
   handle(async (req, res) => {
     const d = await getSjtDraft(actor(req), req.params.id),
-      c = compileSjtTemplate(d.template)
+      c = compileSjtAuthorDocument(d.template)
     send(res, {
       ...d,
+      ...(c.package.online ? { online: publicSjtOnlineMetadata(c.package.online) } : {}),
       runner: runnerSituationRuntimeDefinition(c.package.definition),
       changes: d.audits.find((a) => a.template && a.revision < d.revision)?.template
         ? diffSjtTemplates(
@@ -213,7 +228,18 @@ router.post(
   '/drafts/:id/preview',
   handle(async (req, res) => {
     const d = await getSjtDraft(actor(req), req.params.id),
-      c = compileSjtTemplate(d.template)
+      c = compileSjtAuthorDocument(d.template)
+    if (c.package.online) {
+      const body = z.object({ responseProtocol: z.literal('sjt-online-response-v1'), responses: z.array(z.unknown()).max(100) }).strict().parse(req.body)
+      const normalized = normalizeSjtOnlineResponses(c.package.online.display, c.package.definition as import('../modules/situational/situation-branching').SituationDefinitionV2, body.responses)
+      const definition = c.package.definition
+      const result = scoreSituationalModel(asLinearSituationDefinition(definition), normalized.responses, {
+        responsesValidated: true,
+        independentSceneKeyBySceneKey: definition.schemaVersion === 2 ? Object.fromEntries(definition.flow.nodes.flatMap(n => n.nodeType === 'SCENE' ? [[n.sceneKey, n.motherSceneKey]] : [])) : {},
+      })
+      send(res, { ...result, previewOnly: true })
+      return
+    }
     const body = z
       .object({
         responses: z
@@ -293,4 +319,42 @@ router.post(
     send(res, { retired: true })
   }),
 )
+const exactRelease = z.object({
+  instrumentKey: z.string().min(1).max(80), instrumentVersion: z.string().min(1).max(40),
+  definitionHash: z.string().regex(/^[a-f0-9]{64}$/), contentDigest: z.string().regex(/^[a-f0-9]{64}$/),
+}).strict()
+router.put('/drafts/:id/policy', handle(async (req, res) => {
+  const body = z.object({ revision: z.number().int().positive(),
+    authorizationPolicy: z.literal('COURSE_GRANT_V1').nullable() }).strict().parse(req.body)
+  send(res, await setSjtDraftPolicy(actor(req), req.params.id, body.revision, body.authorizationPolicy))
+}))
+router.get('/releases', handle(async (req, res) => {
+  const query = sjtGrantListQuerySchema.parse(req.query)
+  send(res, await listSjtControlledReleases(actor(req), query))
+}))
+router.get('/releases/:id/grants', handle(async (req, res) => {
+  const query = sjtGrantListQuerySchema.parse(req.query)
+  send(res, await listSjtReleaseGrants(actor(req), req.params.id, query))
+}))
+router.post('/releases/:id/grants', handle(async (req, res) => {
+  const body = exactRelease.extend({
+    granteeTeacherId: z.string().uuid(), courseId: z.string().uuid(), purpose: z.literal('TRAINING_COURSE'),
+    permission: z.enum(['DISTRIBUTE', 'ADAPT']), validFrom: z.string().datetime({ offset: true }),
+    expiresAt: z.string().datetime({ offset: true }), note: z.string().trim().min(1).max(2000),
+  }).strict().parse(req.body)
+  send(res, await createSjtReleaseGrant(actor(req), req.params.id, { ...body,
+    validFrom: new Date(body.validFrom), expiresAt: new Date(body.expiresAt) }))
+}))
+router.post('/grants/:id/revoke', handle(async (req, res) => {
+  const body = z.object({ version: z.number().int().positive(), note: z.string().trim().min(1).max(2000) }).strict().parse(req.body)
+  send(res, await revokeSjtReleaseGrant(actor(req), req.params.id, body.version, body.note))
+}))
+router.post('/releases/:id/adapt', handle(async (req, res) => {
+  const body = exactRelease.extend({
+    courseId: z.string().uuid(), grantId: z.string().uuid(), grantVersion: z.number().int().positive(),
+    newInstrumentKey: z.string().max(80).regex(/^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/),
+    newInstrumentVersion: z.string().max(40).regex(/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/),
+  }).strict().parse(req.body)
+  send(res, await adaptSjtRelease(actor(req), req.params.id, body))
+}))
 export default router

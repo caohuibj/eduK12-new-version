@@ -126,6 +126,75 @@ const assertWaveScope = (waves: ReportingSeriesWaveRecordV1[]): ReportingSeriesW
   return sorted
 }
 
+/** Product-neutral numeric kernel. Identity and authorization are resolved by
+ * product adapters before entering this function. No organizational facade or
+ * implicit latest-attempt selection belongs in this layer. */
+export interface MatchedNumericWaveV1 {
+  waveId: string
+  waveKey: string
+  observations: Array<{ participantKey: string; value: number | null }>
+}
+export interface MatchedNumericSelectionV1 {
+  matchedEligibleN: number
+  cases: Array<{ participantKey: string; values: Record<string, number> }>
+}
+export const selectMatchedNumericCases = (waves: MatchedNumericWaveV1[]): MatchedNumericSelectionV1 => {
+  if (waves.length < 2) reportingFail('REPORT_LONGITUDINAL_WAVES_REQUIRED', 'matched analysis requires at least two Waves', 400)
+  const ids = new Set<string>()
+  const populations = waves.map((wave) => {
+    if (ids.has(wave.waveId)) reportingFail('REPORT_WAVE_CONFLICT', 'duplicate Wave in matched analysis', 409)
+    ids.add(wave.waveId)
+    const population = new Map<string, number | null>()
+    for (const observation of wave.observations) {
+      if (population.has(observation.participantKey)) {
+        reportingFail('AMBIGUOUS_OBSERVATION', 'Wave contains more than one observation for the same stable participant', 409)
+      }
+      population.set(observation.participantKey, finiteReportingNumber(observation.value))
+    }
+    return population
+  })
+  const [first, ...rest] = populations
+  const matched = [...first.keys()].filter((key) => rest.every((population) => population.has(key))).sort()
+  const cases: MatchedNumericSelectionV1['cases'] = []
+  for (const participantKey of matched) {
+    const values: Record<string, number> = Object.create(null)
+    let complete = true
+    waves.forEach((wave, index) => {
+      const value = populations[index].get(participantKey)
+      if (value === null || value === undefined) complete = false
+      else values[wave.waveId] = value
+    })
+    if (complete) cases.push({ participantKey, values })
+  }
+  return { matchedEligibleN: matched.length, cases }
+}
+
+const numericWavesFor = (waves: ReportingSeriesWaveRecordV1[], rule?: ReportingMetricRuleV1): MatchedNumericWaveV1[] => {
+  // Preserve the organizational wrapper's historical eligibility semantics:
+  // resolve each matched user in Wave order and stop at the first absent value.
+  // A later Wave's metrics were never inspected for an already incomplete case.
+  // This compatibility adapter does not change the strict generic kernel.
+  const common = intersectStableUsers(waves)
+  const populations = waves.map(populationByUser)
+  const resolved = waves.map(resolvedByUser)
+  const values = waves.map(() => new Map<string, number | null>())
+  if (rule) for (const participantKey of common) {
+    for (let index = 0; index < waves.length; index += 1) {
+      const value = eligibleMetricValue(resolved[index].get(participantKey), rule)
+      values[index].set(participantKey, value)
+      if (value === null) break
+    }
+  }
+  return waves.map((wave, index) => ({
+    waveId: wave.id,
+    waveKey: wave.waveKey,
+    observations: [...populations[index].keys()].map((participantKey) => ({
+      participantKey,
+      value: values[index].get(participantKey) ?? null,
+    })),
+  }))
+}
+
 const intersectStableUsers = (waves: ReportingSeriesWaveRecordV1[]): string[] => {
   const populations = waves.map(populationByUser)
   const [first, ...rest] = populations
@@ -137,28 +206,17 @@ export const selectMatchedMetricCases = (input: {
   rule: ReportingMetricRuleV1
 }): ReportingMatchedMetricSelectionV1 => {
   const waves = assertWaveScope(input.waves)
-  const matchedUsers = intersectStableUsers(waves)
+  const selection = selectMatchedNumericCases(numericWavesFor(waves, input.rule))
   const populations = new Map(waves.map((wave) => [wave.id, populationByUser(wave)]))
-  const resolved = new Map(waves.map((wave) => [wave.id, resolvedByUser(wave)]))
-  const cases: ReportingMatchedMetricCaseV1[] = []
-  for (const userId of matchedUsers) {
-    const memberships: Record<string, string> = {}
-    const values: Record<string, number> = {}
-    let complete = true
-    for (const wave of waves) {
-      const membership = populations.get(wave.id)!.get(userId)
-      if (!membership) return reportingFail('REPORT_RESULT_INTEGRITY', 'matched population intersection became inconsistent', 500)
-      memberships[wave.id] = membership.membershipId
-      const value = eligibleMetricValue(resolved.get(wave.id)!.get(userId), input.rule)
-      if (value === null) {
-        complete = false
-        break
-      }
-      values[wave.id] = value
-    }
-    if (complete) cases.push({ userId, memberships, values })
+  return {
+    metricId: input.rule.metricId,
+    matchedEligibleN: selection.matchedEligibleN,
+    cases: selection.cases.map((item) => ({
+      userId: item.participantKey,
+      memberships: Object.fromEntries(waves.map((wave) => [wave.id, populations.get(wave.id)!.get(item.participantKey)!.membershipId])),
+      values: { ...item.values },
+    })),
   }
-  return { metricId: input.rule.metricId, matchedEligibleN: matchedUsers.length, cases }
 }
 
 const ruleForPair = (input: {
@@ -192,6 +250,49 @@ const finiteDelta = (left: number, right: number): number => (
   requireFiniteStatistic(right - left, 'REPORT_STATISTIC_OVERFLOW', 'matched delta produced a non-finite result')
 )
 
+/** Applies the caller's frozen privacy thresholds to one complete-case set.
+ * Comparability decisions stay explicit; numeric deltas cannot be inferred from
+ * matching display labels, resource keys or adjacent Wave positions. */
+export const buildMatchedNumericProjection = (input: {
+  waves: MatchedNumericWaveV1[]
+  mode: ReportingMatchedModeV1
+  minimumCohortN: number
+  minimumContributorN: number
+  comparability: (left: MatchedNumericWaveV1, right: MatchedNumericWaveV1) => ReportingComparabilityDecisionV1
+}): ReportingMatchedMetricProjectionV1 => {
+  if (input.mode === 'PAIRWISE' && input.waves.length !== 2) {
+    reportingFail('REPORT_LONGITUDINAL_PAIR_REQUIRED', 'PAIRWISE analysis requires exactly two Waves', 400)
+  }
+  const selected = selectMatchedNumericCases(input.waves)
+  if (selected.matchedEligibleN < input.minimumCohortN || selected.cases.length < input.minimumContributorN) return { state: 'suppressed' }
+  const waveMeans = input.waves.map((wave) => {
+    const values = selected.cases.map((item) => item.values[wave.waveId])
+    if (values.some((value) => value === undefined)) reportingFail('REPORT_RESULT_INTEGRITY', 'complete case is missing a Wave value', 500)
+    const aggregations = reportingAggregations({ values, aggregations: ['MEAN'], distributionCellFloor: input.minimumContributorN })
+    return { waveId: wave.waveId, waveKey: wave.waveKey, mean: requireFiniteStatistic(aggregations.mean, 'REPORT_STATISTIC', 'matched mean is unavailable') }
+  })
+  const comparisons: NonNullable<ReportingMatchedMetricProjectionV1['comparisons']> = []
+  for (let index = 0; index < input.waves.length - 1; index += 1) {
+    const left = input.waves[index], right = input.waves[index + 1]
+    const comparability = input.comparability(left, right)
+    const comparison: NonNullable<ReportingMatchedMetricProjectionV1['comparisons']>[number] = {
+      fromWaveId: left.waveId, toWaveId: right.waveId, comparability,
+    }
+    if (comparability.allowedOperations.includes('NUMERIC_DELTA')) {
+      assertNumericDeltaAllowed(comparability)
+      comparison.delta = finiteDelta(waveMeans[index].mean, waveMeans[index + 1].mean)
+    }
+    comparisons.push(comparison)
+  }
+  return {
+    state: 'present',
+    countKind: input.mode === 'PAIRWISE' ? 'PAIRED_VALID' : 'COMPLETE_CASE',
+    validCaseN: selected.cases.length,
+    waveMeans,
+    comparisons,
+  }
+}
+
 export const buildMatchedLongitudinalProjection = (input: {
   waves: ReportingSeriesWaveRecordV1[]
   spec: ReportingMatchedLongitudinalSpecV1
@@ -209,50 +310,23 @@ export const buildMatchedLongitudinalProjection = (input: {
   const metrics: Record<string, ReportingMatchedMetricProjectionV1> = {}
 
   for (const rule of input.spec.metricRules) {
-    const selected = selectMatchedMetricCases({ waves, rule })
-    if (selected.matchedEligibleN !== matchedEligibleN) reportingFail('REPORT_RESULT_INTEGRITY', 'metric selection changed matched population identity', 500)
     const effectiveFloor = Math.max(
       input.spec.minimumContributorN,
       rule.minimumMetricN,
       ...waves.map((wave) => wave.inputManifest.resource.minimumN ?? 0),
     )
-    if (!overallPresent || selected.cases.length < effectiveFloor) {
-      metrics[rule.metricId] = { state: 'suppressed' }
-      continue
-    }
-    const waveMeans: Array<{ waveId: string; waveKey: string; mean: number }> = waves.map((wave) => {
-      const values = selected.cases.map((item) => item.values[wave.id])
-      if (values.some((value) => value === undefined)) reportingFail('REPORT_RESULT_INTEGRITY', 'complete case is missing a Wave value', 500)
-      const aggregations = reportingAggregations({ values: values as number[], aggregations: ['MEAN'], distributionCellFloor: effectiveFloor })
-      const mean = requireFiniteStatistic(aggregations.mean, 'REPORT_STATISTIC', 'matched mean is unavailable')
-      return { waveId: wave.id, waveKey: wave.waveKey, mean }
+    metrics[rule.metricId] = buildMatchedNumericProjection({
+      waves: numericWavesFor(waves, rule),
+      mode: input.mode,
+      minimumCohortN: input.spec.minimumCohortN,
+      minimumContributorN: effectiveFloor,
+      comparability: (left, right) => ruleForPair({
+        spec: input.spec,
+        metricId: rule.metricId,
+        left: waves.find((wave) => wave.id === left.waveId)!,
+        right: waves.find((wave) => wave.id === right.waveId)!,
+      }),
     })
-    const comparisons: NonNullable<ReportingMatchedMetricProjectionV1['comparisons']> = []
-    for (let index = 0; index < waves.length - 1; index += 1) {
-      const left = waves[index]
-      const right = waves[index + 1]
-      const leftMean = waveMeans[index]
-      const rightMean = waveMeans[index + 1]
-      if (!leftMean || !rightMean) reportingFail('REPORT_RESULT_INTEGRITY', 'matched Wave mean pair is unavailable', 500)
-      const comparability = ruleForPair({ spec: input.spec, metricId: rule.metricId, left, right })
-      const comparison: NonNullable<ReportingMatchedMetricProjectionV1['comparisons']>[number] = {
-        fromWaveId: left.id,
-        toWaveId: right.id,
-        comparability,
-      }
-      if (comparability.allowedOperations.includes('NUMERIC_DELTA')) {
-        assertNumericDeltaAllowed(comparability)
-        comparison.delta = finiteDelta(leftMean.mean, rightMean.mean)
-      }
-      comparisons.push(comparison)
-    }
-    metrics[rule.metricId] = {
-      state: 'present',
-      countKind: input.mode === 'PAIRWISE' ? 'PAIRED_VALID' : 'COMPLETE_CASE',
-      validCaseN: selected.cases.length,
-      waveMeans,
-      comparisons,
-    }
   }
 
   const evidenceInputs = waves.flatMap((wave) => wave.inputManifest.resolved)

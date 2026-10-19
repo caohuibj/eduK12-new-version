@@ -19,6 +19,8 @@ describe('authenticated compact control references',()=>{
   {kind:'SHARED_SCALE_RUNTIME',storageVersion:2,artifactHash:h,frozenAt:when},
   {kind:'SHARED_COGNITIVE_RUNTIME',storageVersion:1,artifactHash:h,frozenAt:when},
   {k:'WVP2',p:h,b:{attemptId:uuid,userId:'owner',contextHash:h},u:[[uuid,h],['custom-scale-id','cd'.repeat(32)]]},
+  {k:'WVP2',p:h,b:{attemptId:uuid},u:[[uuid,h,{schemaVersion:1,course:{courseId:'private-training-course'},snapshotHash:h}]]},
+  {k:'UAR2',p:h,b:'12',x:{frozenAt:when,governance:{status:'READY',holdReason:null},trainingTiming:{course:{courseId:'private-course'},snapshotHash:h}}},
  ]
  for(const [i,value]of cases.entries())it('losslessly preserves reference variant '+i,()=>{
   const encrypted=encryptControlReference(value)

@@ -11,11 +11,23 @@ import { resolveCompositeExportProjectionBinding, projectCompositeExportData } f
 import type { ClaimedExportBatch } from './exportJobService'
 import { provenanceSchema } from './assessmentExportArtifact'
 import { exportIntentDateRange } from './exportIntentDateRange'
-export const revalidateAssessmentExport = async (claim: ClaimedExportBatch, ids?: string[]) => {
+import { trainingAnalysisExportOptionsSchema, trainingAnalysisProvenanceSchema, assertTrainingAnalysisExportIdentity, saveTrainingAnalysisExport } from '../modules/training-analysis/export'
+const authorizeCurrentExportPrincipal = async (claim: ClaimedExportBatch) => {
   const principal = await loadCurrentPrincipal(claim.createdBy)
   if (!principal || inactiveAccountMessage(principal) || principal.mustChangePassword || principal.role !== claim.options.creatorRole
     || (!claim.options.anonymize && principal.role !== UserRole.ADMIN)) throw new Error('Export authority revoked')
-  if (claim.resourceType === 'COGNITIVE') {
+  return principal
+}
+
+export const revalidateAssessmentExport = async (claim: ClaimedExportBatch, ids?: string[]) => {
+  const principal = await authorizeCurrentExportPrincipal(claim)
+  if (claim.resourceType === 'TRAINING_ANALYSIS') {
+    const options = trainingAnalysisExportOptionsSchema.parse(claim.options.trainingAnalysis)
+    assertTrainingAnalysisExportIdentity(options, { courseId: claim.resourceId, createdBy: claim.createdBy, creatorRole: principal.role })
+    if (!claim.options.anonymize) throw new Error('Training analysis export must be anonymized')
+    const { revalidateTrainingAnalysisManifest } = await import('../modules/training-analysis/service')
+    await revalidateTrainingAnalysisManifest({ id: principal.userId, role: options.manifest.actor.role }, options.manifest)
+  } else if (claim.resourceType === 'COGNITIVE') {
     const assignment = await assignmentService.getAssignmentForTeacher(principal.userId, principal.role, claim.resourceId)
     if (isCompositeWrapper(assignment)) throw new Error('Standalone wrapper export forbidden')
   } else {
@@ -32,6 +44,27 @@ export const revalidateAssessmentExport = async (claim: ClaimedExportBatch, ids?
   return { userId: principal.userId, role: principal.role }
 }
 export const prepareAssessmentExport = async (claim: ClaimedExportBatch) => {
+  if (claim.resourceType === 'TRAINING_ANALYSIS') {
+    const principal = await authorizeCurrentExportPrincipal(claim)
+    const actor = { userId: principal.userId, role: principal.role }
+    const trainingAnalysis = trainingAnalysisExportOptionsSchema.parse(claim.options.trainingAnalysis)
+    assertTrainingAnalysisExportIdentity(trainingAnalysis, { courseId: claim.resourceId, createdBy: claim.createdBy, creatorRole: actor.role })
+    if (!claim.options.anonymize) throw new Error('Training analysis export must be anonymized')
+    // analyzeTrainingCourse validates live authority and the exact manifest in
+    // its single source load. The worker still revalidates after serialization.
+    const { analyzeTrainingCourse } = await import('../modules/training-analysis/service')
+    const result = await analyzeTrainingCourse({ actor: { id: actor.userId, role: actor.role as 'ADMIN' | 'TEACHER' },
+      courseId: claim.resourceId, selector: trainingAnalysis.selector, expectedManifest: trainingAnalysis.manifest })
+    // The exact manifest survives prepare, retries, serialization, publication,
+    // and download. A cutoff alone cannot freeze the authorized sample.
+    if (result.manifest.manifestHash !== trainingAnalysis.manifest.manifestHash) throw new Error('Training analysis manifest changed')
+    const table = result.tables[trainingAnalysis.table]
+    const data = { rows: table.rows, fields: table.columns.map(name => ({ name, label: name, type: 'string' as const })) }
+    const provenance = trainingAnalysisProvenanceSchema.parse({ version: 2, resourceType: 'TRAINING_ANALYSIS',
+      generation: claim.batchId, creatorRole: actor.role, audience: 'teacher', trainingAnalysis })
+    return { data, provenance, save: async (format: string) => saveTrainingAnalysisExport({ options: trainingAnalysis,
+      tables: result.tables, format, batchId: claim.batchId, generation: claim.generation }) }
+  }
   const actor = await revalidateAssessmentExport(claim)
   // Upper bound fixed by durable intent, so late completions cannot enlarge retries.
   const dateRange = exportIntentDateRange(claim.createdAt, claim.options.dateRange)

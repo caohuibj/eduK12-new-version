@@ -1,0 +1,356 @@
+{
+  "passed": false,
+  "checks": [
+    "Online create/CAS/digest, independent review, immutable release; wrong and empty manual golden/self-review/nonowner rejected",
+    "Nonmember and cross-course admission rejected",
+    "Nonowner read and FINAL denied"
+  ],
+  "requests": [
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 318
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 312
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 318
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 284
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 284
+    },
+    {
+      "route": "/situational/authoring/online/drafts",
+      "method": "POST",
+      "status": 200,
+      "bytes": 2166
+    },
+    {
+      "route": "/situational/authoring/drafts/28083ad0-341a-48f1-842f-9bba665c39b3/request-review",
+      "method": "POST",
+      "status": 422,
+      "bytes": 1543
+    },
+    {
+      "route": "/situational/authoring/online/drafts",
+      "method": "POST",
+      "status": 422,
+      "bytes": 200
+    },
+    {
+      "route": "/situational/authoring/online/drafts",
+      "method": "POST",
+      "status": 200,
+      "bytes": 4574
+    },
+    {
+      "route": "/situational/authoring/drafts/46db3179-9be3-44c9-a143-f296e1813568/request-review",
+      "method": "POST",
+      "status": 200,
+      "bytes": 4578
+    },
+    {
+      "route": "/situational/authoring/drafts/46db3179-9be3-44c9-a143-f296e1813568/review",
+      "method": "POST",
+      "status": 403,
+      "bytes": 82
+    },
+    {
+      "route": "/situational/authoring/online/drafts",
+      "method": "POST",
+      "status": 200,
+      "bytes": 4576
+    },
+    {
+      "route": "/situational/authoring/drafts/900c4e9d-8e86-4402-a0a9-f3602cb12f30",
+      "method": "GET",
+      "status": 403,
+      "bytes": 67
+    },
+    {
+      "route": "/situational/authoring/drafts/900c4e9d-8e86-4402-a0a9-f3602cb12f30",
+      "method": "PUT",
+      "status": 200,
+      "bytes": 4576
+    },
+    {
+      "route": "/situational/authoring/drafts/900c4e9d-8e86-4402-a0a9-f3602cb12f30",
+      "method": "PUT",
+      "status": 409,
+      "bytes": 76
+    },
+    {
+      "route": "/situational/authoring/drafts/900c4e9d-8e86-4402-a0a9-f3602cb12f30/request-review",
+      "method": "POST",
+      "status": 409,
+      "bytes": 64
+    },
+    {
+      "route": "/situational/authoring/drafts/900c4e9d-8e86-4402-a0a9-f3602cb12f30/request-review",
+      "method": "POST",
+      "status": 200,
+      "bytes": 4580
+    },
+    {
+      "route": "/situational/authoring/drafts/900c4e9d-8e86-4402-a0a9-f3602cb12f30/review",
+      "method": "POST",
+      "status": 200,
+      "bytes": 4580
+    },
+    {
+      "route": "/situational/authoring/drafts/900c4e9d-8e86-4402-a0a9-f3602cb12f30",
+      "method": "PUT",
+      "status": 409,
+      "bytes": 88
+    },
+    {
+      "route": "/questionnaire-products/resources",
+      "method": "GET",
+      "status": 200,
+      "bytes": 1362
+    },
+    {
+      "route": "/questionnaire-products",
+      "method": "POST",
+      "status": 200,
+      "bytes": 1157
+    },
+    {
+      "route": "/questionnaire-products/6fb4520b-bb7a-486f-932d-5089cbacd384/items",
+      "method": "POST",
+      "status": 200,
+      "bytes": 1563
+    },
+    {
+      "route": "/questionnaire-products/6fb4520b-bb7a-486f-932d-5089cbacd384/preflight",
+      "method": "POST",
+      "status": 200,
+      "bytes": 412
+    },
+    {
+      "route": "/questionnaire-products/6fb4520b-bb7a-486f-932d-5089cbacd384/publish",
+      "method": "POST",
+      "status": 200,
+      "bytes": 1589
+    },
+    {
+      "route": "/questionnaire-products",
+      "method": "POST",
+      "status": 200,
+      "bytes": 1157
+    },
+    {
+      "route": "/questionnaire-products/d092af67-9aa6-4b07-9e96-6ab294e80a46/items",
+      "method": "POST",
+      "status": 200,
+      "bytes": 1563
+    },
+    {
+      "route": "/questionnaire-products/d092af67-9aa6-4b07-9e96-6ab294e80a46/preflight",
+      "method": "POST",
+      "status": 200,
+      "bytes": 412
+    },
+    {
+      "route": "/questionnaire-products/d092af67-9aa6-4b07-9e96-6ab294e80a46/publish",
+      "method": "POST",
+      "status": 200,
+      "bytes": 1589
+    },
+    {
+      "route": "/composite-assessments/6fb4520b-bb7a-486f-932d-5089cbacd384/attempts",
+      "method": "POST",
+      "status": 403,
+      "bytes": 75
+    },
+    {
+      "route": "/composite-assessments/d092af67-9aa6-4b07-9e96-6ab294e80a46/attempts",
+      "method": "POST",
+      "status": 403,
+      "bytes": 75
+    },
+    {
+      "route": "/composite-assessments/6fb4520b-bb7a-486f-932d-5089cbacd384/attempts",
+      "method": "POST",
+      "status": 200,
+      "bytes": 7006
+    },
+    {
+      "route": "/composite-assessments/6fb4520b-bb7a-486f-932d-5089cbacd384/attempts",
+      "method": "POST",
+      "status": 200,
+      "bytes": 7006
+    },
+    {
+      "route": "/composite-assessments/attempts/7598640b-24dd-4d5f-ae36-257b3c9ca48c",
+      "method": "GET",
+      "status": 200,
+      "bytes": 6964
+    },
+    {
+      "route": "/composite-assessments/attempts/7598640b-24dd-4d5f-ae36-257b3c9ca48c/items/40ba3713-3499-4f85-bb61-65c293251450/situational/7a2c294a-71cb-4be0-8b9c-d524a6473923",
+      "method": "GET",
+      "status": 200,
+      "bytes": 6306
+    },
+    {
+      "route": "/composite-assessments/attempts/7598640b-24dd-4d5f-ae36-257b3c9ca48c/items/40ba3713-3499-4f85-bb61-65c293251450/situational/7a2c294a-71cb-4be0-8b9c-d524a6473923",
+      "method": "GET",
+      "status": 403,
+      "bytes": 94
+    },
+    {
+      "route": "/composite-assessments/attempts/7598640b-24dd-4d5f-ae36-257b3c9ca48c/items/40ba3713-3499-4f85-bb61-65c293251450/situational/7a2c294a-71cb-4be0-8b9c-d524a6473923/submit",
+      "method": "POST",
+      "status": 403,
+      "bytes": 94
+    },
+    {
+      "route": "/composite-assessments/attempts/7598640b-24dd-4d5f-ae36-257b3c9ca48c/items/40ba3713-3499-4f85-bb61-65c293251450/situational/7a2c294a-71cb-4be0-8b9c-d524a6473923/submit",
+      "method": "POST",
+      "status": 400,
+      "bytes": 88
+    },
+    {
+      "route": "/composite-assessments/attempts/7598640b-24dd-4d5f-ae36-257b3c9ca48c/items/40ba3713-3499-4f85-bb61-65c293251450/situational/7a2c294a-71cb-4be0-8b9c-d524a6473923/submit",
+      "method": "POST",
+      "status": 400,
+      "bytes": 88
+    },
+    {
+      "route": "/composite-assessments/attempts/7598640b-24dd-4d5f-ae36-257b3c9ca48c/items/40ba3713-3499-4f85-bb61-65c293251450/situational/7a2c294a-71cb-4be0-8b9c-d524a6473923/submit",
+      "method": "POST",
+      "status": 400,
+      "bytes": 111
+    },
+    {
+      "route": "/composite-assessments/attempts/7598640b-24dd-4d5f-ae36-257b3c9ca48c/items/40ba3713-3499-4f85-bb61-65c293251450/situational/7a2c294a-71cb-4be0-8b9c-d524a6473923/submit",
+      "method": "POST",
+      "status": 400,
+      "bytes": 49
+    },
+    {
+      "route": "/composite-assessments/attempts/7598640b-24dd-4d5f-ae36-257b3c9ca48c/items/40ba3713-3499-4f85-bb61-65c293251450/situational/7a2c294a-71cb-4be0-8b9c-d524a6473923/submit",
+      "method": "POST",
+      "status": 200,
+      "bytes": 129
+    },
+    {
+      "route": "/composite-assessments/attempts/7598640b-24dd-4d5f-ae36-257b3c9ca48c/items/40ba3713-3499-4f85-bb61-65c293251450/situational/7a2c294a-71cb-4be0-8b9c-d524a6473923/submit",
+      "method": "POST",
+      "status": 200,
+      "bytes": 131
+    },
+    {
+      "route": "/composite-assessments/attempts/7598640b-24dd-4d5f-ae36-257b3c9ca48c/report-status",
+      "method": "GET",
+      "status": 200,
+      "bytes": 380
+    },
+    {
+      "route": "/composite-assessments/attempts/7598640b-24dd-4d5f-ae36-257b3c9ca48c/report-status",
+      "method": "GET",
+      "status": 200,
+      "bytes": 398
+    },
+    {
+      "route": "/composite-assessments/attempts/7598640b-24dd-4d5f-ae36-257b3c9ca48c/report",
+      "method": "GET",
+      "status": 200,
+      "bytes": 1617
+    },
+    {
+      "route": "/composite-assessments/attempts/7598640b-24dd-4d5f-ae36-257b3c9ca48c/report",
+      "method": "GET",
+      "status": 200,
+      "bytes": 1617
+    },
+    {
+      "route": "/composite-assessments/6fb4520b-bb7a-486f-932d-5089cbacd384/attempts/7598640b-24dd-4d5f-ae36-257b3c9ca48c/report",
+      "method": "GET",
+      "status": 200,
+      "bytes": 1617
+    },
+    {
+      "route": "/composite-assessments/attempts/7598640b-24dd-4d5f-ae36-257b3c9ca48c/report",
+      "method": "GET",
+      "status": 403,
+      "bytes": 72
+    }
+  ],
+  "counts": [
+    {
+      "name": "Nonmember and cross-course admission rejected",
+      "before": {
+        "parents": 0,
+        "children": 0,
+        "jobs": 0
+      },
+      "after": {
+        "parents": 0,
+        "children": 0,
+        "jobs": 0
+      }
+    },
+    {
+      "name": "Nonowner read and FINAL denied",
+      "before": {
+        "parents": 1,
+        "children": 1,
+        "jobs": 0
+      },
+      "after": {
+        "parents": 1,
+        "children": 1,
+        "jobs": 0
+      }
+    }
+  ]
+}

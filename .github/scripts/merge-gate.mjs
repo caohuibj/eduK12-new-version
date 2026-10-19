@@ -1,6 +1,28 @@
 import {validReviewedCandidatePlan} from './reviewed-candidate-scope.mjs';
 import { pathToFileURL } from 'node:url';
+import { openSync, closeSync, fstatSync, readSync, constants } from 'node:fs';
 import { mediaPlan } from './ci-media-plan.mjs';
+
+export const MAX_NEEDS_BYTES = 4 * 1024 * 1024;
+export function readNeeds(env = process.env) {
+  let serialized;
+  if (Object.hasOwn(env, 'NEEDS_JSON_FILE')) {
+    if (!env.NEEDS_JSON_FILE) throw new Error('Missing merge-gate input file path');
+    const fd = openSync(env.NEEDS_JSON_FILE, constants.O_RDONLY | constants.O_NOFOLLOW);
+    try {
+      const stat = fstatSync(fd);
+      if (!stat.isFile() || stat.size < 2 || stat.size > MAX_NEEDS_BYTES) throw new Error('Invalid merge-gate input file size/type');
+      const buffer = Buffer.alloc(stat.size + 1);
+      const bytes = readSync(fd, buffer, 0, buffer.length, 0);
+      if (bytes !== stat.size) throw new Error('Merge-gate input file changed while reading');
+      serialized = buffer.subarray(0, bytes).toString('utf8');
+    } finally { closeSync(fd); }
+  } else serialized = env.NEEDS_JSON;
+  if (typeof serialized !== 'string' || Buffer.byteLength(serialized, 'utf8') > MAX_NEEDS_BYTES) throw new Error('Missing or oversized merge-gate inputs');
+  const needs = JSON.parse(serialized);
+  if (!needs || typeof needs !== 'object' || Array.isArray(needs)) throw new Error('Merge-gate inputs must be an object');
+  return needs;
+}
 
 const acceptanceJobs = {
   media2: 'accept-media', media7: 'accept-media',
@@ -207,7 +229,7 @@ export function failedChecks(needs, draft) {
   return failed;
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const needs = JSON.parse(process.env.NEEDS_JSON);
+  const needs = readNeeds();
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
   if (['A','B'].includes(needs.scope?.outputs?.application_route) || needs.scope?.outputs?.scenario === 'release-tooling') {

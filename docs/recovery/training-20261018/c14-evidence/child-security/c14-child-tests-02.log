@@ -1,0 +1,228 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/backend
+
+ ❯ src/__tests__/composite/training-variant-child-scope.test.ts (20 tests | 14 failed) 52ms
+     × projects the selected group without mutating the publication union and reuses one parent read 11ms
+     × rejects unselected child form-b 7ms
+     × rejects unselected child scale-b 3ms
+     × rejects unselected child cognitive-b 2ms
+     × rejects unselected child sjt-b 2ms
+     × rejects unselected child unknown 2ms
+     × reloads narrow caller parents rather than treating missing metadata as a legacy allocation 2ms
+     × rejects an unselected Form before creating or loading any section child 2ms
+     × does not let a preexisting frozen Form admission bypass selected section membership 2ms
+     × checks selection before stored SCALE admission decoding 2ms
+     × checks selection before stored COGNITIVE admission decoding 2ms
+     × blocks authenticated Cognitive images and video before decoding or looking up media 2ms
+     × blocks recovery-owned Cognitive media before decoding or looking up media 2ms
+     × blocks direct and embedded SJT runtime before decoding its frozen content 2ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 14 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > projects the selected group without mutating the publication union and reuses one parent read
+CompositeServiceError: 概率分卷作答的冻结配置、分配或单元不一致
+ ❯ compositeForbidden src/modules/composite/composite.errors.ts:12:63
+     10|
+     11| export const compositeNotFound = (message = '综合测评不存在') => new Composit…
+     12| export const compositeForbidden = (message = '无权限操作此综合测评') => new Comp…
+       |                                                               ^
+     13| export const compositeBadRequest = (message: string) => new CompositeS…
+     14| export const compositeConflict = (message: string) => new CompositeSer…
+ ❯ resolveTrainingAttemptScope src/modules/composite/training-variant-scope.ts:74:23
+ ❯ scopedParent src/modules/composite/training-variant-child-scope.ts:32:17
+ ❯ Module.assertTrainingChildSelected src/modules/composite/training-variant-child-scope.ts:43:20
+ ❯ src/__tests__/composite/training-variant-child-scope.test.ts:54:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/14]⎯
+
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > rejects unselected child form-b
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > rejects unselected child scale-b
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > rejects unselected child cognitive-b
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > rejects unselected child sjt-b
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > rejects unselected child unknown
+AssertionError: expected CompositeServiceError: 概率分卷作答的冻结配置、分配或单元不… { statusCode: … } to match object { statusCode: 404 }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "statusCode": 404,
++ CompositeServiceError {
++   "statusCode": 403,
+  }
+
+ ❯ src/__tests__/composite/training-variant-child-scope.test.ts:63:113
+     61|   it.each(['form-b', 'scale-b', 'cognitive-b', 'sjt-b', 'unknown'])('r…
+     62|     const parent = fixture()
+     63|     await expect(assertTrainingChildSelected({ compositeAttemptId: 'at…
+       |                                                                                                                 ^
+     64|     expect(mocks.parent).not.toHaveBeenCalled()
+     65|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/14]⎯
+
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > reloads narrow caller parents rather than treating missing metadata as a legacy allocation
+AssertionError: expected CompositeServiceError: 概率分卷作答的冻结配置、分配或单元不… { statusCode: … } to match object { statusCode: 404 }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "statusCode": 404,
++ CompositeServiceError {
++   "statusCode": 403,
+  }
+
+ ❯ src/__tests__/composite/training-variant-child-scope.test.ts:68:145
+     66|   it('reloads narrow caller parents rather than treating missing metad…
+     67|     mocks.parent.mockResolvedValue(fixture())
+     68|     await expect(assertTrainingSectionSelected('attempt', 'section-b',…
+       |                                                                                                                                                 ^
+     69|     expect(mocks.parent).toHaveBeenCalledTimes(1)
+     70|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/14]⎯
+
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > rejects an unselected Form before creating or loading any section child
+AssertionError: expected CompositeServiceError: 概率分卷作答的冻结配置、分配或单元不… { statusCode: … } to match object { statusCode: 404 }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "statusCode": 404,
++ CompositeServiceError {
++   "statusCode": 403,
+  }
+
+ ❯ src/__tests__/composite/training-variant-child-scope.test.ts:88:74
+     86|   it('rejects an unselected Form before creating or loading any sectio…
+     87|     const parent = fixture(); mocks.parent.mockResolvedValue(parent)
+     88|     await expect(ensureCompositeSectionAttempt('attempt', 'section-b',…
+       |                                                                          ^
+     89|     expect(mocks.sectionFind).not.toHaveBeenCalled(); expect(mocks.sec…
+     90|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/14]⎯
+
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > does not let a preexisting frozen Form admission bypass selected section membership
+AssertionError: expected CompositeServiceError: 概率分卷作答的冻结配置、分配或单元不… { statusCode: … } to match object { statusCode: 404 }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "statusCode": 404,
++ CompositeServiceError {
++   "statusCode": 403,
+  }
+
+ ❯ src/__tests__/composite/training-variant-child-scope.test.ts:93:145
+     91|   it('does not let a preexisting frozen Form admission bypass selected…
+     92|     await expect(activateCompositeFormAdmission({ parent: fixture(), s…
+     93|       child: { id: 'forged', attemptEpoch: 1, frozenAdmissionSnapshotE…
+       |                                                                                                                                                 ^
+     94|   })
+     95|   it.each(['SCALE', 'COGNITIVE'])('checks selection before stored %s a…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/14]⎯
+
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > checks selection before stored SCALE admission decoding
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > checks selection before stored COGNITIVE admission decoding
+AssertionError: expected CompositeServiceError: 概率分卷作答的冻结配置、分配或单元不… { statusCode: … } to match object { statusCode: 404 }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "statusCode": 404,
++ CompositeServiceError {
++   "statusCode": 403,
+  }
+
+ ❯ src/__tests__/composite/training-variant-child-scope.test.ts:98:22
+     96|     const parent = fixture(), child: any = { compositeAttemptId: 'atte…
+     97|     const call = type === 'SCALE' ? activateScaleAdmission(child, pare…
+     98|     await expect(call).rejects.toMatchObject({ statusCode: 404 })
+       |                      ^
+     99|   })
+    100|   it('blocks authenticated Cognitive images and video before decoding …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/14]⎯
+
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > blocks authenticated Cognitive images and video before decoding or looking up media
+AssertionError: expected CompositeServiceError: 概率分卷作答的冻结配置、分配或单元不… { statusCode: … } to match object { statusCode: 404 }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "statusCode": 404,
++ CompositeServiceError {
++   "statusCode": 403,
+  }
+
+ ❯ src/__tests__/composite/training-variant-child-scope.test.ts:103:118
+    101|     mocks.parent.mockImplementation(async () => fixture())
+    102|     mocks.cognitive.mockResolvedValue({ userId: 'user', compositeAttem…
+    103|     await expect(serveCognitiveSessionImage({ userId: 'user', sessionI…
+       |                                                                                                                      ^
+    104|     await expect(issueCognitiveSessionVideoCapabilities({ userId: 'use…
+    105|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/14]⎯
+
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > blocks recovery-owned Cognitive media before decoding or looking up media
+AssertionError: expected CompositeServiceError: 概率分卷作答的冻结配置、分配或单元不… { statusCode: … } to match object { statusCode: 404 }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "statusCode": 404,
++ CompositeServiceError {
++   "statusCode": 403,
+  }
+
+ ❯ src/__tests__/composite/training-variant-child-scope.test.ts:110:123
+    108|     mocks.parent.mockResolvedValue(fixture())
+    109|     mocks.cognitive.mockResolvedValue({ userId: null, recoveryTokenHas…
+    110|     await expect(servePublicCognitiveSessionImage({ recoveryToken, ses…
+       |                                                                                                                           ^
+    111|   })
+    112|   it('blocks direct and embedded SJT runtime before decoding its froze…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/14]⎯
+
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > blocks direct and embedded SJT runtime before decoding its frozen content
+AssertionError: expected CompositeServiceError: 概率分卷作答的冻结配置、分配或单元不… { statusCode: … } to match object { statusCode: 404 }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "statusCode": 404,
++ CompositeServiceError {
++   "statusCode": 403,
+  }
+
+ ❯ src/__tests__/composite/training-variant-child-scope.test.ts:117:64
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/14]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  14 failed | 6 passed (20)
+   Start at  20:40:58
+   Duration  3.14s (transform 2.16s, setup 0ms, import 2.93s, tests 52ms, environment 0ms)
+

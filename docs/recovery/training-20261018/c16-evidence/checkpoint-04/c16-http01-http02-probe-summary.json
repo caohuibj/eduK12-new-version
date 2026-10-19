@@ -1,0 +1,216 @@
+{
+  "schemaVersion": 1,
+  "scope": "C16_ONLY_FAILURE_HISTORY_AND_REUSABLE_UPGRADE",
+  "upgrade": {
+    "passed": true,
+    "oldTableCount": 205,
+    "oldMigrationCount": 171,
+    "newMigrationCount": 172,
+    "addedTables": [
+      "training_analysis_quality",
+      "training_analysis_quality_audit"
+    ],
+    "courseStudentColumnsUnchanged": true,
+    "historicalProjectionSha256": "b98fb7879fd096313531a32e1f3fee6dafaa9fa8a469d2755bc45780793dfd7d",
+    "processExits": {
+      "restore-pinned-c14": 0,
+      "migrate-c16": 0,
+      "eduk12_recovery-acl": 0,
+      "eduk12_recovery-runtime-role": 0
+    },
+    "pinnedC14DumpSha256": "a40b5f82ea2058a507140a9735bab4666c9babb96900e0622f279a3a58b0cde6",
+    "resultSha256": "7e3149697f5b87180806264e651f279d1218efa58864435b937e0c5c9c930878",
+    "scope": "Real PG stopped-copy + pinned dump equality, additive migration and restricted runtime role only; HTTP failures do not rewrite this successful phase"
+  },
+  "httpFailures": [
+    {
+      "run": "HTTP01",
+      "phase": "FIRST_TWO_WAVE_FOUR_TOOL_ANALYSIS_N10",
+      "passed": false,
+      "httpStatus": 404,
+      "publicError": "数据源不存在或当前不可用于此分析",
+      "diagnosedBoundary": "V1 CUSTOM_DESCRIPTIVE fallback lacked already-loaded authoritative scale.instrumentClass; UNKNOWN policy correctly denied numericScores",
+      "checksPassed": 0,
+      "httpRequestCount": 7,
+      "sourceHead": "596dae2f9b1e16c60c9e4c1539c0f431d4395518",
+      "sourceInputsSha256": "0819c7ca2107e966451d8e53994e7768693271de81541ab1715ccbd74fc96b8c",
+      "runtimeFingerprintSha256": "e66da0e36af0924fb1774e5465b7bb045e51e6559d3cc2ac2a7de074eddea2f9",
+      "nodeVersion": "v24.21.0",
+      "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+      "processExits": {
+        "postgres": 0,
+        "c16-upgrade": 0,
+        "redis": 0,
+        "api": 0,
+        "c16-http": 1
+      },
+      "invariants": {
+        "cleanupVerified": true,
+        "sourceUnchanged": true,
+        "inputsUnchanged": true
+      },
+      "privateEvidenceSha256": {
+        "c16-runtime-result.json": "9e66391825e1b5dff5bdf05b4ac40a823bd0811f9640051c7634946b972d9108",
+        "c16-http-result.json": "40e18c2fb592c17637b5f0e5d0de1319c8438bd45d29ac813fd08ec23f7ab6a4",
+        "current-source-inputs.json": "b73e2d45d31c176e9da61c5fe9f79cb5b6e3bb3616986c523467ece169f37276",
+        "c16-fixture-private.json": "384314de94292546479031bf9077f914dcb1b3cd53f6bbe0a213ca58acf0f4b9",
+        "c16-original-rows-private.json": "87fb4f80c87516ddee1fa70c9785450c01c4d9208281278232dfe392fab3d787",
+        "c16-http.log": "46439c22c84bbcfd4957c6e3375d1d405ec3c327f8a2a4ecc8a7e1b7276b2462"
+      },
+      "privateEvidenceCopied": false
+    },
+    {
+      "run": "HTTP02",
+      "phase": "FIRST_TWO_WAVE_FOUR_TOOL_ANALYSIS_N10",
+      "passed": false,
+      "httpStatus": 500,
+      "publicError": "分析暂时不可用",
+      "diagnosedBoundary": "CanonicalJsonError: $ must not contain symbol keys; source hash attempted canonicalHash on symbol-marked compact report view",
+      "checksPassed": 0,
+      "httpRequestCount": 7,
+      "sourceHead": "fba90421e93b6defb6311e0558d7e52c2260b92f",
+      "sourceInputsSha256": "1ecbec97b2f31b99ddf7eb50480c4b91d4f6ff782bc6e67417760fdb59015ebb",
+      "runtimeFingerprintSha256": "b4c3bfaf04b41842ee966bf81cef0d64c8219d803304c259912de4b411d31f60",
+      "nodeVersion": "v24.21.0",
+      "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+      "processExits": {
+        "postgres": 0,
+        "redis": 0,
+        "api": 0,
+        "c16-http": 1
+      },
+      "invariants": {
+        "cleanupVerified": true,
+        "sourceUnchanged": true,
+        "inputsUnchanged": true,
+        "resumeSourceUnchanged": true
+      },
+      "privateEvidenceSha256": {
+        "c16-runtime-result.json": "33d98d6f4f9ab030927944712c1f4ff3278a00b2ceba8574bdfea0b8694a9e2c",
+        "c16-http-result.json": "bd8d0f3a7f3f804e5cdbcee46bdc3078476e1009c26ec649b8a20eb259c3faf8",
+        "current-source-inputs.json": "ec118fb2ea25d86556a7856dde615860af4c028c3f1c63f2c34b061ad9777f55",
+        "c16-fixture-private.json": "0810641d9b5f1b947077cb6d788dd88b80eaf2abae558ec492ac45defb741287",
+        "c16-original-rows-private.json": "87fb4f80c87516ddee1fa70c9785450c01c4d9208281278232dfe392fab3d787",
+        "c16-http.log": "9652a732f37aa99c9d758d6d1d66da60ea054957a2e054092fab6406ab6333d3"
+      },
+      "privateEvidenceCopied": false,
+      "reusedUpgrade": {
+        "source": "HTTP01",
+        "upgradeResultSha256": "7e3149697f5b87180806264e651f279d1218efa58864435b937e0c5c9c930878",
+        "replayed": false
+      }
+    }
+  ],
+  "probes": [
+    {
+      "probe": "Selected metric diagnostic",
+      "passed": false,
+      "exactErrorOrFinding": "Scale policy rejected; Form/Cognitive/SJT adapters each loaded20 observations",
+      "scope": "READ_ONLY_ADAPTER_DIAGNOSTIC_NOT_STATISTICAL_QUALIFICATION",
+      "privateLogSha256": "cf0bee579e8ace6545971234fca4e4fb04b921c90b4467d3bee86fe875b6964c",
+      "privateLogCopied": false,
+      "processExits": {
+        "postgres": 0,
+        "redis": 0
+      },
+      "allOwnProcessesStopped": true,
+      "sourceHead": null,
+      "scriptSha256": null,
+      "privateResultSha256": "a6aa8b0a36fc165f3cd15dadd142f2db7a7223a1be03d300b2a70cb2b69a473d",
+      "probeProcessExit": 0
+    },
+    {
+      "probe": "V1 policy diagnostic",
+      "passed": true,
+      "exactErrorOrFinding": "V1 CUSTOM_DESCRIPTIVE: no scale metadata -> UNKNOWN/numericScores=false; real scale metadata -> LEGACY_PROFILE/numericScores=true; snapshotError=false in both",
+      "scope": "READ_ONLY_POLICY_DIAGNOSTIC",
+      "privateLogSha256": "3a4815935d2c89c8a21a8d3bb520e04935f0acdbfb44f40a4e6892ce6ef82e34",
+      "privateLogCopied": false,
+      "inputBindingLimitation": "Early diagnostic did not persist a separate runtime fingerprint; it is diagnostic-only, not accepted qualification evidence",
+      "probeProcessExit": 0
+    },
+    {
+      "probe": "Compact report view failure",
+      "passed": false,
+      "exactErrorOrFinding": "CanonicalJsonError: $ must not contain symbol keys",
+      "scope": "READ_ONLY_SERVICE_DIAGNOSTIC",
+      "privateLogSha256": "fc37a8da851810b645781abd5745a98675427cea65e1fd0f485a3b8518dfca5d",
+      "privateLogCopied": false,
+      "processExits": {
+        "postgres": 0,
+        "redis": 0
+      },
+      "allOwnProcessesStopped": true,
+      "sourceHead": "fba90421e93b6defb6311e0558d7e52c2260b92f",
+      "scriptSha256": "771ea5cca4b857579c8501489f230c8d13fb406eb84ff5167ae1ff881dacaac4",
+      "privateResultSha256": "b77bb49cf82ec1495a13a197987fde8afe43da0dcfbe4f9e7b8e32dc1673dd6e",
+      "probeProcessExit": 0
+    },
+    {
+      "probe": "Disclosure seed attempt",
+      "passed": false,
+      "exactErrorOrFinding": "PostgreSQL23514 organization_memberships_org_role_check rejected STUDENT; valid role is MEMBER",
+      "scope": "SYNTHETIC_DB_SHAPE_ONLY",
+      "privateLogSha256": "65923613a14e102f7ed0770898537c950768f17fc1f658896fbfa6d4d95cb523",
+      "privateLogCopied": false,
+      "processExits": {
+        "postgres": 0,
+        "redis": 0
+      },
+      "allOwnProcessesStopped": true,
+      "sourceHead": "fba90421e93b6defb6311e0558d7e52c2260b92f",
+      "scriptSha256": "7ad2323d329f63f299bd3a62ef692b29cbf3c77a8e2a0ba6c30e6a6c17bbfaec",
+      "privateResultSha256": "bc350c4a1579b42828ded77d31650588183e0a6cee19721e8188401ca628ed98",
+      "probeProcessExit": 1
+    },
+    {
+      "probe": "Disclosure fix and poison seed attempt",
+      "passed": false,
+      "exactErrorOrFinding": "Disclosure seed passed; original other-variant Scale canonical decrypts to SCF2 reference, direct inline parser raised ZodError (missing core/resultHash/completedAt/persistenceProvenance)",
+      "scope": "SYNTHETIC_DB_SHAPE_ONLY",
+      "privateLogSha256": "2a75a6b1cc80cdb9d8fb199d9da436f3b3e85dae640fb98e8046d8dce57144a1",
+      "privateLogCopied": false,
+      "processExits": {
+        "postgres": 0,
+        "redis": 0
+      },
+      "allOwnProcessesStopped": true,
+      "sourceHead": "fba90421e93b6defb6311e0558d7e52c2260b92f",
+      "scriptSha256": "7ad2323d329f63f299bd3a62ef692b29cbf3c77a8e2a0ba6c30e6a6c17bbfaec",
+      "privateResultSha256": "bc350c4a1579b42828ded77d31650588183e0a6cee19721e8188401ca628ed98",
+      "probeProcessExit": 1
+    },
+    {
+      "probe": "Poison seed via existing canonical loader",
+      "passed": true,
+      "exactErrorOrFinding": "Five selected parents plus one other-group poison and independent empty follow-up seeded successfully",
+      "scope": "SYNTHETIC_DB_SHAPE_ONLY_NOT_HTTP_OR_ANALYSIS_QUALIFICATION",
+      "privateLogSha256": "a3755b5588a15f9c1d503daaf7deb4667804e5210637523e2eabb4961b342fa5",
+      "privateLogCopied": false,
+      "processExits": {
+        "postgres": 0,
+        "redis": 0
+      },
+      "allOwnProcessesStopped": true,
+      "sourceHead": "fba90421e93b6defb6311e0558d7e52c2260b92f",
+      "scriptSha256": "f96276342f0f27e8adc0e0eec6169ed1443aa4e4f7e0d259a458a838d8fc805d",
+      "privateResultSha256": "80ba97ea6c4615b3aca796286c3f34568f971d5dd307132899cea01c11d719a8",
+      "probeProcessExit": 0
+    }
+  ],
+  "seedInputBinding": {
+    "head": "fba90421e93b6defb6311e0558d7e52c2260b92f",
+    "helperHashes": {
+      "server-version/scripts/recovery/c16-analysis-boundaries.mjs": "5479046cf6d9f9333206bafd852082fc3d9e4ea434b6bb1701b229fc7ac67e1a",
+      "server-version/scripts/recovery/c16-analysis-fourtool.mjs": "78eed5faf6a4fcfef0b0749c0c64c844e2f4d9d223c6cf9f67351621cacb6b6a"
+    },
+    "runtimeFingerprintSha256": "b4c3bfaf04b41842ee966bf81cef0d64c8219d803304c259912de4b411d31f60",
+    "qualificationScope": "SYNTHETIC_SEED_DB_SHAPE_ONLY_NOT_HTTP_OR_ANALYSIS_QUALIFICATION",
+    "privateBindingSha256": "d92b09a405ddd1bd7970dc94a1ad886c797ee4431b77cc66d8423fb94eefc310"
+  },
+  "privateFixturesOrRuntimeCopied": false,
+  "unqualified": [
+    "C16 numerical analysis and actual SQL scaling still pending after compact source fix",
+    "No browser or capacity qualification claimed"
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "scope": "C19 state06 three original queued CSV exports succeeded before the preserved missing Scale discovery metric assertion. No analysis POST or restore ran; final accepted-fact fingerprint assertion was not reached. New analysis-only continuation and boundaries scripts are static WIP, not dynamically qualified.",
+  "members": [
+    {
+      "name": "eduk12_c19_http_06-c19-exports-continuation-result.json.gz",
+      "rawSha256": "7befacb3128c86e7a48b7bedeccd601d0412974e628ef4fa8d9b00ccccb32669",
+      "rawBytes": 8942,
+      "gzipSha256": "ac7fd90e387077c38fdfb77a921ed21500856328b7c92d4ddd7e3f8d24018fb5",
+      "gzipBytes": 1773
+    },
+    {
+      "name": "eduk12_c19_http_06-c19-runtime-result.json.gz",
+      "rawSha256": "c43577bb9acad245204ffae51c5af6e22560fc44492b9b242cd25f442ba51811",
+      "rawBytes": 27532,
+      "gzipSha256": "5424adc67ee812e11e5c7ebb0a1e11d0d2f85e977115a80dcc9f57fe19aae65a",
+      "gzipBytes": 4924
+    },
+    {
+      "name": "eduk12_c19_http_06-frozen-inputs.json.gz",
+      "rawSha256": "aa6f11af170e2612bddb259fa63d5e13efda4708c0d461d96c83d2ceb31ccb9a",
+      "rawBytes": 350513,
+      "gzipSha256": "b2b3cd846efa24c645e73fe39645197f914c9b92f9dac40de6c35797d4451c79",
+      "gzipBytes": 84459
+    },
+    {
+      "name": "eduk12_c19_http_06-c19-exports-continuation.log.gz",
+      "rawSha256": "097bf6efe5e505b6fdcfae37ef090efb8646f61668199f8d8027e8471b1de289",
+      "rawBytes": 935,
+      "gzipSha256": "c0d369a16770e2afd1cd1b7777f6a0a428d76da651718fb33a7c3c8f3296f3eb",
+      "gzipBytes": 597
+    },
+    {
+      "name": "eduk12_c19_http_06-c19-accepted-history.json.gz",
+      "rawSha256": "8046e4abe38aa61d7fc375b364a257e247fcb3caac73b9bf5fda3376fe527bce",
+      "rawBytes": 1120,
+      "gzipSha256": "9f38d8742a02a2d742123b3ec93b25a13b1018276b61650748970457abb1a3bc",
+      "gzipBytes": 486
+    },
+    {
+      "name": "eduk12_c19_http_06-source-byte-manifest-before.json.gz",
+      "rawSha256": "05c5dbc8ca6f9a34bf2a391132fcca3f0888214f44927ac905daace839f2ed0c",
+      "rawBytes": 2042502,
+      "gzipSha256": "267cc5579947643779b298515729b2fc50840b7104b9bdfdad6ae0c693b3901f",
+      "gzipBytes": 389918
+    },
+    {
+      "name": "eduk12_c19_http_06-source-byte-manifest-after.json.gz",
+      "rawSha256": "05c5dbc8ca6f9a34bf2a391132fcca3f0888214f44927ac905daace839f2ed0c",
+      "rawBytes": 2042502,
+      "gzipSha256": "267cc5579947643779b298515729b2fc50840b7104b9bdfdad6ae0c693b3901f",
+      "gzipBytes": 389918
+    },
+    {
+      "name": "eduk12_c19_http_06-prior-byte-manifest-before.json.gz",
+      "rawSha256": "c753cb9cfe841c498cfebcd04fbb641f8ccb20a4d2f7a87b74ee434e9a22f34d",
+      "rawBytes": 2352873,
+      "gzipSha256": "7b37db0c63b9a76a2881a90634dc11ad8d3bef5097fd616613971ea6414256c1",
+      "gzipBytes": 448619
+    },
+    {
+      "name": "eduk12_c19_http_06-prior-byte-manifest-after.json.gz",
+      "rawSha256": "c753cb9cfe841c498cfebcd04fbb641f8ccb20a4d2f7a87b74ee434e9a22f34d",
+      "rawBytes": 2352873,
+      "gzipSha256": "7b37db0c63b9a76a2881a90634dc11ad8d3bef5097fd616613971ea6414256c1",
+      "gzipBytes": 448619
+    }
+  ],
+  "archive": {
+    "file": "checkpoint10-state06-csv-analysis-failure.tar.gz",
+    "sha256": "2276af6906b21b2536407d264f08ffa07f624fc17f743d3307c4f2c23d8e637a",
+    "bytes": 1769375
+  }
+}

@@ -5,6 +5,7 @@ import { authenticate, requireTeacher } from '../../middleware/auth'
 import { hashRecoveryToken } from '../../services/anonymousAccess'
 import { success, error } from '../../utils/response'
 import * as service from './service'
+import * as governance from './governance'
 
 const id=z.string().uuid(), title=z.string().trim().min(1).max(120)
 const credential=(req:Request) => {
@@ -31,6 +32,7 @@ anonymousStudyRouter.get('/:studyId/statistics',wrap(async(req,res)=>success(res
 anonymousStudyRouter.get('/:studyId/waves/:waveId/export.csv',wrap(async(req,res)=>{
   const csv=await service.exportWaveCsv(req.user!.userId,req.user!.role,id.parse(req.params.studyId),id.parse(req.params.waveId))
   res.setHeader('Content-Disposition',`attachment; filename="wave-${req.params.waveId}.csv"`)
+  res.setHeader('X-Export-Purpose','EDUCATION_RECORDS_NOT_RESEARCH_SAMPLE')
   res.type('text/csv').send(csv)
 }))
 export const publicAnonymousStudyRouter=Router()
@@ -48,3 +50,12 @@ publicAnonymousStudyRouter.get('/:studyId',wrap(async(req,res)=>success(res,awai
 publicAnonymousStudyRouter.post('/:studyId/waves/:waveId/start',wrap(async(req,res)=>success(res,await service.startStudyWave(id.parse(req.params.studyId),id.parse(req.params.waveId),credential(req)))))
 publicAnonymousStudyRouter.post('/:studyId/waves/:waveId/recover',wrap(async(req,res)=>success(res,await service.recoverStudyWave(id.parse(req.params.studyId),id.parse(req.params.waveId),credential(req)))))
 publicAnonymousStudyRouter.post('/:studyId/revoke',wrap(async(req,res)=>success(res,await service.revokeStudyIdentity(id.parse(req.params.studyId),credential(req)))))
+
+anonymousStudyRouter.get('/:studyId/research-consent',wrap(async(req,res)=>success(res,await governance.ownerStudyConsent(req.user!.userId,id.parse(req.params.studyId)))))
+anonymousStudyRouter.post('/:studyId/research-consent',wrap(async(req,res)=>success(res,await governance.publishStudyConsent(req.user!.userId,id.parse(req.params.studyId),z.object({requestId:id,expectedVersionId:id.nullable(),body:z.string().min(20).max(20000),scope:z.object({purpose:z.string().trim().min(2).max(1000),dataCategories:z.array(z.enum(['FORM','SCALE','COGNITIVE','SJT'])).min(1).max(4)}).strict()}).strict().parse(req.body)))))
+anonymousStudyRouter.post('/:studyId/participants/:participantId/research-withdrawal/review',wrap(async(req,res)=>success(res,await governance.reviewStudyWithdrawal(req.user!.userId,id.parse(req.params.studyId),id.parse(req.params.participantId),z.object({requestId:id,expectedRevision:z.number().int().positive(),reason:z.string().min(2).max(1000)}).strict().parse(req.body)))))
+publicAnonymousStudyRouter.get('/:studyId/research-consent',wrap(async(req,res)=>success(res,await governance.participantStudyConsent(id.parse(req.params.studyId),credential(req)))))
+publicAnonymousStudyRouter.post('/:studyId/research-consent/accept',wrap(async(req,res)=>success(res,await governance.acceptStudyConsent(id.parse(req.params.studyId),credential(req),z.object({requestId:id,versionId:id,bodyHash:z.string().regex(/^[0-9a-f]{64}$/)}).strict().parse(req.body)))))
+publicAnonymousStudyRouter.post('/:studyId/research-withdrawal',wrap(async(req,res)=>success(res,await governance.withdrawStudyResearch(id.parse(req.params.studyId),credential(req),z.object({requestId:id,expectedRevision:z.number().int().nonnegative()}).strict().parse(req.body)))))
+
+anonymousStudyRouter.get('/:studyId/research-withdrawals',wrap(async(req,res)=>success(res,await governance.listStudyWithdrawals(req.user!.userId,id.parse(req.params.studyId),z.coerce.number().int().min(1).max(240).default(1).parse(req.query.page)))))

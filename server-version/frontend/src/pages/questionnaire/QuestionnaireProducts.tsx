@@ -1,3 +1,7 @@
+import { TypedFormExportActions } from '../../modules/composite/TypedFormExportActions'
+import { StructuredFormConstraints } from '../../modules/assessment-core/form/StructuredFormConstraints'
+import { BasicFormConstraints } from '../../modules/assessment-core/form/BasicFormConstraints'
+import type { FormQuestion } from '../../modules/assessment-core/form/types'
 import { isTrainingHost } from '../../training/context'
 import '../../training/training-form-surface.css'
 import { apiErrorMessage } from '../../utils/apiErrorMessage'
@@ -6,10 +10,15 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams, useLocation } from 'react-router-dom'
 import apiClient from '../../api/client'
 import { resolveTrainingCoursePrefill } from '../../training/resolveCoursePrefill'
+import { useCognitiveEnabled } from '../../contexts/CapabilitiesContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { useStaffFeedback } from '../../components/staff-ui/useStaffFeedback'
 import LocalDateTimeInput, { localDateTimeValue, parseLocalDateTime } from '../../components/LocalDateTimeInput'
 import './questionnaire-products.css'
+import { TrainingVariantEditor } from './TrainingVariantEditor'
+import { TrainingFlowEditor, trainingFlowEditorId } from './TrainingFlowEditor'
+import { formatTrainingFlow, isMaterialFlowText, trainingFlowRequest, parseTrainingFlow, type TrainingFlowConfig } from './trainingFlow'
+import { validateTrainingVariants, type TrainingVariantConfig } from './trainingVariants'
 import {
   ProductPage,
   PageHeader,
@@ -21,6 +30,11 @@ import {
   serializeDelimitedOptions,
 } from '../../modules/assessment-context/options'
 
+const typedFormTypes: Record<string, FormQuestion<never>['type']> = {
+  number: 'NUMBER', long_text: 'LONG_TEXT', date: 'DATE', time: 'TIME', likert: 'LIKERT',
+  matrix: 'MATRIX', matrix_multiple: 'MATRIX_MULTIPLE', rank_order: 'RANK_ORDER', slider: 'SLIDER', constant_sum: 'CONSTANT_SUM',
+}
+const structuredOptionTypes = ['LIKERT', 'MATRIX', 'MATRIX_MULTIPLE', 'RANK_ORDER', 'CONSTANT_SUM']
 const base = '/questionnaire-products'
 async function request(
   path: string,
@@ -153,6 +167,7 @@ export function QuestionnaireProductList() {
 }
 
 export function QuestionnaireProductEdit() {
+  const cognitiveEnabled = useCognitiveEnabled()
   const { user } = useAuth()
   const { feedback, confirm: confirmManagement } = useStaffFeedback()
   const { id = 'new' } = useParams()
@@ -173,10 +188,19 @@ export function QuestionnaireProductEdit() {
   const [kind, setKind] = useState('COURSE')
   const [courseIds, setCourseIds] = useState<string[]>([])
   const [publicEnabled, setPublic] = useState(false)
+  const [timingEnabled,setTimingEnabled]=useState(false)
+  const [trainingVariantDraft, setTrainingVariantDraft] = useState<TrainingVariantConfig | null>(null)
+  const [trainingFlowText, setTrainingFlowText] = useState('')
+  const [trainingFlowError, setTrainingFlowError] = useState('')
+  const [maxAttempts, setMaxAttempts] = useState(1)
   const [expiresAt, setExpiry] = useState('')
   const [opensAt, setOpens] = useState('')
   const [type, setType] = useState('SCALE')
   const [selected, setSelected] = useState('')
+  useEffect(() => {
+    if (!cognitiveEnabled && type === 'COGNITIVE') { setType('SCALE'); setSelected('') }
+  }, [cognitiveEnabled, type])
+
   const [formLabel, setFormLabel] = useState('')
   const [editingUnit, setEditingUnit] = useState('')
   const location = useLocation()
@@ -191,11 +215,20 @@ export function QuestionnaireProductEdit() {
     }
   }, [location.hash, hasDetail, id])
   const [formType, setFormType] = useState('text_input')
+  const [formConstraints, setFormConstraints] = useState<Partial<FormQuestion<never>>>({})
+  const [policyEnabled,setPolicyEnabled] = useState(false)
+  const [targetFormSection,setTargetFormSection] = useState('')
+  const [requiredRefusal,setRequiredRefusal] = useState<'BLOCK_SUBMIT'|'ALLOW_SUBMIT'>('BLOCK_SUBMIT')
+  const [hiddenRequired,setHiddenRequired] = useState<'EXEMPT'|'NOT_SATISFIED'>('EXEMPT')
+  const typedFormType = typedFormTypes[formType] ?? (policyEnabled ? ({single_choice:'SINGLE',multiple_choice:'MULTIPLE',text_input:'SHORT_TEXT',fill_blank:'SHORT_TEXT'} as const)[formType as 'single_choice'] : undefined)
+  const conditionSources = (detail?.formSections?.find((s:any)=>s.id===targetFormSection)?.items ?? []).filter((item:any)=>['SINGLE','MULTIPLE'].includes(item.formDefinition?.type))
+  const [matrixRows, setMatrixRows] = useState('')
   const [options, setOptions] = useState('')
   const [contextKey, setContext] = useState('')
   const [required, setRequired] = useState(true)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const actionInFlight = useRef(false)
   const [preflight, setPreflight] = useState<{ revision: number; ok: boolean; checks: Array<{ key: string; label: string; status: string; message: string; targetId?: string }> } | null>(null)
   const [nameError, setNameError] = useState('')
   const [expiryError, setExpiryError] = useState('')
@@ -208,6 +241,11 @@ export function QuestionnaireProductEdit() {
     setKind(row.questionnaireType)
     setCourseIds((row.questionnaireCourses || []).map((v: any) => v.courseId))
     setPublic(row.publicEnabled)
+    setTimingEnabled(Boolean(row.trainingTimingPolicy))
+    setTrainingVariantDraft(row.trainingVariantDraft ?? null)
+    setTrainingFlowText(formatTrainingFlow(row.trainingFlowDraft ?? null))
+    setTrainingFlowError('')
+    setMaxAttempts(row.maxAttempts ?? 1)
     setExpiry(row.expiresAt || '')
     setOpens(row.opensAt || '')
   }
@@ -247,6 +285,8 @@ export function QuestionnaireProductEdit() {
     return () => { active = false }
   }, [id, preselectedScaleId, preselectedCourseId, user?.id])
   const action = async (fn: () => Promise<void>) => {
+    if (actionInFlight.current) return
+    actionInFlight.current = true
     setBusy(true)
     setError('')
     try {
@@ -254,6 +294,7 @@ export function QuestionnaireProductEdit() {
     } catch (e) {
       setError(message(e))
     } finally {
+      actionInFlight.current = false
       setBusy(false)
     }
   }
@@ -263,6 +304,7 @@ export function QuestionnaireProductEdit() {
     description,
     courseIds: kind === 'GENERAL' ? [] : courseIds,
     publicEnabled,
+    ...(timingEnabled||detail?.trainingTimingPolicy?{trainingTimingEnabled:timingEnabled}:{}),
     expiresAt: expiresAt ? parseLocalDateTime(expiresAt)?.toISOString() : null,
     opensAt: opensAt ? parseLocalDateTime(opensAt)?.toISOString() : null,
   })
@@ -287,6 +329,25 @@ export function QuestionnaireProductEdit() {
         ?.focus()
       return
     }
+    if (variantsDirty && trainingVariantDraft) {
+      const variantError = !variantsEligible
+        ? '随机分组仅支持真实 Training 课程投放；公开链接须唯一绑定一个课程。'
+        : validateTrainingVariants(trainingVariantDraft, maxAttempts, units)
+      if (variantError) { setError(variantError); return }
+    }
+    let flowConfig: TrainingFlowConfig | null = null
+    if (flowDirty) {
+      try {
+        flowConfig = parseTrainingFlow(trainingFlowText, units)
+        trainingFlowRequest(detail?.revision ?? 0, flowConfig, maxAttempts)
+        if (flowConfig && !flowEligible) throw new Error('条件流程仅支持真实 Training 课程投放，且不能与随机分组或其他投放策略组合。')
+        setTrainingFlowError('')
+      } catch (cause) {
+        setTrainingFlowError(message(cause))
+        document.getElementById(trainingFlowEditorId)?.focus()
+        return
+      }
+    }
     return action(async () => {
       if (id === 'new') {
         const row = await request('', {
@@ -295,14 +356,36 @@ export function QuestionnaireProductEdit() {
           requestId,
         })
         navigate(base + '/' + row.id + (preselectedScaleId ? '?scaleId=' + encodeURIComponent(preselectedScaleId) : ''), { replace: true })
-      } else
-        hydrate(
-          await request(
-            '/' + id,
-            { ...metadata(), revision: detail.revision },
-            'put',
-          ),
-        )
+      } else {
+        let row = detail
+        // Disable first so delivery can leave Training without an active config.
+        // Keep each successful revision if a later save fails; local edits remain.
+        if (variantsDirty && !trainingVariantDraft) {
+          row = await request('/' + id + '/training-variants', { revision: row.revision, config: null })
+          setDetail(row)
+        }
+        if (flowDirty && !flowConfig) {
+          row = await request('/' + id + '/training-flow', { revision: row.revision, config: null })
+          setDetail(row)
+        }
+        if (metadataDirty) {
+          row = await request('/' + id, { ...metadata(), revision: row.revision }, 'put')
+          setDetail(row)
+        }
+        if (variantsDirty && trainingVariantDraft) {
+          row = await request('/' + id + '/training-variants', { revision: row.revision, config: trainingVariantDraft, maxAttempts })
+        }
+        if (flowDirty && flowConfig) {
+          try {
+            row = await request('/' + id + '/training-flow', trainingFlowRequest(row.revision, flowConfig, maxAttempts))
+          } catch (cause) {
+            setTrainingFlowError(message(cause))
+            requestAnimationFrame(() => document.getElementById(trainingFlowEditorId)?.focus())
+            throw cause
+          }
+        }
+        hydrate(row)
+      }
     })
   }
   const add = () =>
@@ -320,13 +403,15 @@ export function QuestionnaireProductEdit() {
         Object.assign(item, {
           formLabel,
           formType,
+          ...(typedFormType ? { formDefinition: { ...formConstraints, type: typedFormType, prompt: formLabel, required, options: [...structuredOptionTypes,'SINGLE','MULTIPLE'].includes(typedFormType) ? parseDelimitedOptions(options).map(option => ({ optionKey: option.value, label: option.label })) : [], rows: ['MATRIX', 'MATRIX_MULTIPLE'].includes(typedFormType) ? parseDelimitedOptions(matrixRows).map(row => ({ rowKey: row.value, label: row.label })) : [], ...(typedFormType === 'CONSTANT_SUM' ? { total: formConstraints.total ?? 100 } : {}), ...(typedFormType === 'TIME' ? { timeZone: formConstraints.timeZone ?? 'Asia/Shanghai' } : {}) } } : {}),
+          ...(policyEnabled ? {formPolicy:{version:3,requiredRefusal,hiddenRequired}}:{}),
           contextKey: contextKey || null,
           formOptions: ['single_choice', 'multiple_choice'].includes(formType)
             ? parseDelimitedOptions(options)
             : null,
         })
       hydrate(
-        await request('/' + id + '/items', { revision: detail.revision, item }),
+        await request('/' + id + '/items', { revision: detail.revision, item, ...(type==='FORM'&&targetFormSection?{formSectionId:targetFormSection}:{}) }),
       )
       setSelected('')
       setFormLabel('')
@@ -400,12 +485,13 @@ export function QuestionnaireProductEdit() {
         after = payload.next
       } while (after)
     })
-  const dirty = Boolean(
+  const metadataDirty = Boolean(
     detail &&
       (name !== detail.name ||
         instruction !== (detail.instruction || '') ||
         description !== (detail.description || '') ||
         publicEnabled !== detail.publicEnabled ||
+        timingEnabled!==Boolean(detail.trainingTimingPolicy)||
         (opensAt ? parseLocalDateTime(opensAt)?.toISOString() || opensAt : null) !==
           (detail.opensAt || null) ||
         (expiresAt ? parseLocalDateTime(expiresAt)?.toISOString() || expiresAt : null) !==
@@ -417,6 +503,20 @@ export function QuestionnaireProductEdit() {
               .sort(),
           )),
   )
+  const variantsDirty = Boolean(detail && (
+    JSON.stringify(trainingVariantDraft) !== JSON.stringify(detail.trainingVariantDraft ?? null) ||
+    (trainingVariantDraft && maxAttempts !== (detail.maxAttempts ?? 1))
+  ))
+  const flowDirty = Boolean(detail && (trainingFlowText !== formatTrainingFlow(detail.trainingFlowDraft ?? null) || (isMaterialFlowText(trainingFlowText) && maxAttempts !== (detail.maxAttempts ?? 1))))
+  const dirty = metadataDirty || variantsDirty || flowDirty
+  const trainingEligible = kind === 'COURSE' && !detail?.reportPackage && !detail?.analysisProtocol &&
+    (!detail?.productKind || detail.productKind === 'QUESTIONNAIRE') && courseIds.length > 0 && courseIds.length <= 100 &&
+    courseIds.every(courseId => catalog.courses.some((course: { id: string; courseType?: string; isLibrary?: boolean }) => course.id === courseId && course.courseType === 'TRAINING_COURSE' && !course.isLibrary)) &&
+    (!publicEnabled || courseIds.length === 1)
+  const variantsEligible = trainingEligible && !trainingFlowText.trim() && !detail?.trainingFlowFrozen
+  const flowEligible = trainingEligible && !trainingVariantDraft && !detail?.trainingVariantFrozen &&
+    !detail?.anonymousStudy && !detail?.anonymousStudyId && !detail?.assignmentRef &&
+    !detail?.deliveryPolicy && !detail?.selectionPolicy && !detail?.routingPolicy && !detail?.randomizationPolicy
   const draft = id === 'new' || detail?.status === 'DRAFT'
   const choices =
     type === 'SCALE'
@@ -475,6 +575,8 @@ export function QuestionnaireProductEdit() {
               />{' '}
               允许通过公开链接作答
             </label>
+            <label className="block"><input type="checkbox" checked={timingEnabled} disabled={kind!=='COURSE'||!draft} onChange={e=>setTimingEnabled(e.target.checked)}/> 可选：记录 Scale 浏览器有效前台时间</label>
+            <p className="text-sm">默认关闭，仅支持明确 Training 课程投放；公开链接必须唯一绑定一个课程。时间仅作描述，不改变评分，后台及暂停时间不计入。发布后采集策略冻结。</p>
             </div><div className="questionnaire-delivery-window"><div className="questionnaire-date-grid"><label className="block">
               开始时间
               {!draft && !opensAt ? <p className="questionnaire-window-summary">发布后立即开放</p> : <LocalDateTimeInput picker className="input w-full"
@@ -517,6 +619,7 @@ export function QuestionnaireProductEdit() {
       />
       <Link to="/questionnaires">返回组合测评列表</Link>
       {feedback}
+      {detail&&<section aria-label="计时披露权限"><label><input type="checkbox" disabled={busy||dirty} checked={Boolean(detail.timingExportEnabled)} onChange={e=>{const enabled=e.target.checked;void action(async()=>{hydrate(await request('/'+id+'/timing-export-policy',{revision:detail.revision,enabled}))})}}/>允许有权限的教师报告与 CSV/ZIP 导出计时</label><p>默认关闭，独立于原始回答权限；摘要也可导出计时，撤销后旧计时产物不可下载。学员反馈不显示计时。</p></section>}
       {id === 'new' && <p className="questionnaire-publish-hint" role="status">先创建草稿，再添加测评内容、设置投放范围，最后正式发布。</p>}
       {detail && !draft && <section className="questionnaire-publish-panel" aria-label="发布状态"><div className="questionnaire-publish-summary"><div><h2>{labels[detail.status] || detail.status} · {detail.name}</h2><p>当前版本的内容与投放设置已锁定。如需调整，请复制为新草稿后重新编制。</p></div><Link className="hui-button hui-button--primary" to={'/composite-assessments/' + id + '/results'}>查看作答与结果</Link></div></section>}
       {detail && draft && <section id="questionnaire-publish" aria-label="正式发布" className="questionnaire-publish-panel">
@@ -704,7 +807,7 @@ export function QuestionnaireProductEdit() {
                         setSelected('')
                       }}
                     >
-                      {['SCALE', 'COGNITIVE', 'SITUATIONAL', 'FORM'].map(
+                      {['SCALE', ...(cognitiveEnabled ? ['COGNITIVE'] : []), 'SITUATIONAL', 'FORM'].map(
                         (t) => (
                           <option key={t} value={t}>
                             {labels[t]}
@@ -746,7 +849,7 @@ export function QuestionnaireProductEdit() {
                           aria-label="题型"
                           className="input ml-2 max-w-full"
                           value={formType}
-                          onChange={(e) => setFormType(e.target.value)}
+                          onChange={(e) => { setFormType(e.target.value); if(e.target.value==='year_month')setPolicyEnabled(false); setFormConstraints(e.target.value === 'slider' ? { min: 0, max: 100 } : {}); setOptions(''); setMatrixRows(''); if (typedFormTypes[e.target.value]) setContext('') }}
                         >
                           {[
                             'text_input',
@@ -754,6 +857,7 @@ export function QuestionnaireProductEdit() {
                             'single_choice',
                             'multiple_choice',
                             'year_month',
+                            'number', 'long_text', 'date', 'time', 'likert', 'matrix', 'matrix_multiple', 'rank_order', 'slider', 'constant_sum',
                           ].map((t) => (
                             <option key={t} value={t}>
                               {
@@ -764,6 +868,7 @@ export function QuestionnaireProductEdit() {
                                     single_choice: '单选',
                                     multiple_choice: '多选',
                                     year_month: '年月',
+                                    number: '数值', long_text: '长文本', date: '日期', time: '时间', likert: 'Likert', matrix: '矩阵单选', matrix_multiple: '矩阵多选', rank_order: '排序', slider: '滑块', constant_sum: '恒定总和',
                                   } as any
                                 )[t]
                               }
@@ -771,9 +876,25 @@ export function QuestionnaireProductEdit() {
                           ))}
                         </select>
                       </label>
-                      {['single_choice', 'multiple_choice'].includes(
-                        formType,
-                      ) && (
+                      <label className="block">加入表单区段<select aria-label="加入表单区段" value={targetFormSection} onChange={e=>{setTargetFormSection(e.target.value);setFormConstraints(previous=>({...previous,displayIf:undefined}))}}><option value="">创建新区段</option>{(detail?.formSections??[]).filter((s:any)=>!s.contextSection).map((s:any)=><option key={s.id} value={s.id} disabled={Math.max(...(s.items??[]).map((i:any)=>i.position))!==Math.max(...(detail?.items??[]).map((i:any)=>i.position))}>{s.title}（{s.items?.length??0}题；仅尾部连续段可追加）</option>)}</select></label>
+                      {formType!=='year_month'&&!contextKey ? <label className="block"><input type="checkbox" checked={policyEnabled} onChange={e=>{setPolicyEnabled(e.target.checked);if(!e.target.checked)setFormConstraints(previous=>({...previous,allowRefusal:undefined,displayIf:undefined,otherOptionKey:undefined,otherMaxLength:undefined,exclusiveOptionKeys:undefined}))}}/>启用新表单策略（V3）</label>:null}
+                      {policyEnabled && <fieldset className="space-y-3 rounded border p-3"><legend>本次新发布的表单策略</legend>
+                        <label className="block"><input type="checkbox" checked={formConstraints.allowRefusal===true} onChange={e=>setFormConstraints(previous=>({...previous,allowRefusal:e.target.checked}))}/>允许明确拒答</label>
+                        <label className="block">必答拒答<select aria-label="必答拒答" value={requiredRefusal} onChange={e=>setRequiredRefusal(e.target.value as typeof requiredRefusal)}><option value="BLOCK_SUBMIT">拒答后不能交卷</option><option value="ALLOW_SUBMIT">允许交卷但不达成任务</option></select></label>
+                        <label className="block">隐藏必答题<select aria-label="隐藏必答题" value={hiddenRequired} onChange={e=>setHiddenRequired(e.target.value as typeof hiddenRequired)}><option value="EXEMPT">本次不适用，不要求作答</option><option value="NOT_SATISFIED">本次任务未达成</option></select></label>
+                        <label className="block">显示条件<select aria-label="显示条件" value={formConstraints.displayIf?.itemKey??''} onChange={e=>{const source=conditionSources.find((s:any)=>s.formDefinition.itemKey===e.target.value)?.formDefinition;setFormConstraints(previous=>({...previous,displayIf:source?{itemKey:source.itemKey,operator:source.type==='MULTIPLE'?'INCLUDES':'EQUALS',optionKey:source.options[0]?.optionKey??''}:undefined}))}}><option value="">始终显示</option>{conditionSources.map((source:any)=><option key={source.id} value={source.formDefinition.itemKey}>{source.formLabel}</option>)}</select></label>
+                        {formConstraints.displayIf ? <label className="block">前题选项<select aria-label="前题选项" value={formConstraints.displayIf.optionKey} onChange={e=>setFormConstraints(previous=>({...previous,displayIf:{...previous.displayIf!,optionKey:e.target.value}}))}>{(conditionSources.find((source:any)=>source.formDefinition.itemKey===formConstraints.displayIf?.itemKey)?.formDefinition.options??[]).map((option:any)=><option key={option.optionKey} value={option.optionKey}>{option.label}</option>)}</select></label>:null}
+                        {['single_choice','multiple_choice'].includes(formType)?<><label className="block">其他填写选项<select aria-label="其他填写选项" value={formConstraints.otherOptionKey??''} onChange={e=>setFormConstraints(previous=>({...previous,otherOptionKey:e.target.value||undefined,...(!e.target.value?{otherMaxLength:undefined}:{})}))}><option value="">不启用</option>{parseDelimitedOptions(options).map(option=><option key={option.value} value={option.value}>{option.label}</option>)}</select></label>{formConstraints.otherOptionKey?<label className="block">其他文本上限<input type="number" min="1" max="2000" value={formConstraints.otherMaxLength??300} onChange={e=>setFormConstraints(previous=>({...previous,otherMaxLength:Number(e.target.value)}))}/></label>:null}</>:null}
+                        {formType==='multiple_choice'?<fieldset><legend>互斥选项</legend>{parseDelimitedOptions(options).map(option=><label key={option.value} className="block"><input type="checkbox" checked={formConstraints.exclusiveOptionKeys?.includes(option.value)??false} onChange={e=>setFormConstraints(previous=>({...previous,exclusiveOptionKeys:e.target.checked?[...(previous.exclusiveOptionKeys??[]),option.value]:(previous.exclusiveOptionKeys??[]).filter(key=>key!==option.value)}))}/>{option.label}</label>)}</fieldset>:null}
+                        {['text_input','fill_blank','long_text'].includes(formType)?<label className="block">文本格式<select aria-label="文本格式" value={formConstraints.textValidation??''} onChange={e=>setFormConstraints(previous=>({...previous,textValidation:(e.target.value||undefined) as FormQuestion<never>['textValidation']}))}><option value="">不限</option><option value="EMAIL">电子邮箱</option><option value="DIGITS">仅数字</option><option value="ALPHANUMERIC">英文字母及数字</option></select></label>:null}
+                        <p className="text-sm">条件只引用同区段的前置单选、多选题。隐藏答案会清除；拒答独立记录，不计有效回答。已发布版本不可修改。</p>
+                      </fieldset>}
+                      {typedFormType && <BasicFormConstraints question={{ ...formConstraints, type: typedFormType }} onChange={patch => setFormConstraints(previous => ({ ...previous, ...patch }))} />}
+                      {typedFormType && <StructuredFormConstraints question={{ ...formConstraints, type: typedFormType }} onChange={patch => setFormConstraints(previous => ({ ...previous, ...patch }))} />}
+                      {['matrix', 'matrix_multiple'].includes(formType) && <label className="block">矩阵行（编码=标签，以逗号分隔）
+                        <input value={matrixRows} onChange={e => setMatrixRows(e.target.value)} />
+                      </label>}
+                      {(['single_choice', 'multiple_choice'].includes(formType) || structuredOptionTypes.includes(typedFormType)) && (
                         <label className="block">
                           选项（值=标签，以逗号分隔）
                           <input
@@ -792,6 +913,8 @@ export function QuestionnaireProductEdit() {
                             setContext(e.target.value)
                             setRequired(true)
                             if (e.target.value) {
+                              setPolicyEnabled(false)
+                              setTargetFormSection('')
                               setFormType(
                                 e.target.value === 'birthYearMonth'
                                   ? 'year_month'
@@ -848,6 +971,26 @@ export function QuestionnaireProductEdit() {
               )}
               </div></div>
               {deliverySettings}
+              {(draft ? variantsEligible || trainingVariantDraft || detail.trainingVariantDraft : detail.trainingVariantFrozen) && <TrainingVariantEditor
+                config={trainingVariantDraft}
+                frozen={detail.trainingVariantFrozen ?? null}
+                maxAttempts={maxAttempts}
+                units={units}
+                draft={draft}
+                eligible={variantsEligible}
+                busy={busy}
+                dirty={variantsDirty}
+                onChange={setTrainingVariantDraft}
+                onMaxAttemptsChange={setMaxAttempts}
+                onSave={() => void save()}
+              />}
+              {(draft ? trainingEligible || trainingFlowText || detail.trainingFlowDraft : detail.trainingFlowFrozen) && <TrainingFlowEditor
+                text={trainingFlowText} frozen={detail.trainingFlowFrozen ?? null} units={units}
+                maxAttempts={maxAttempts} onMaxAttemptsChange={setMaxAttempts}
+                draft={draft} eligible={flowEligible} busy={busy} dirty={flowDirty} error={trainingFlowError}
+                onChange={text => { setTrainingFlowText(text); setTrainingFlowError('') }}
+                onError={setTrainingFlowError} onSave={() => void save()}
+              />}
               <div className="flex flex-wrap gap-4 my-5">
                 <ProductButton
                   disabled={busy}
@@ -868,6 +1011,7 @@ export function QuestionnaireProductEdit() {
                 <ProductButton disabled={busy} onClick={() => void exportAll()}>
                   导出独立报告（JSON）
                 </ProductButton>
+                {detail.items?.some((item:{form?:{formDefinition?:unknown}})=>item.form?.formDefinition!=null) && <TypedFormExportActions key={id} assessmentId={id} />}
                 {detail.status === 'PUBLISHED' && (
                   <ProductButton variant="danger"
                     disabled={busy || dirty}

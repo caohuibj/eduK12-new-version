@@ -1,0 +1,41 @@
+{
+  "functionalBaselineHead": "11feee924fd2def2c7e2f6ae849d66ab59e3e2da",
+  "qualification": "PREPARATION ONLY: 10 pure observer/launcher tests plus schema/exact selection precheck; no service or resource baseline execution",
+  "members": {
+    "preparation/launcher-python-test.txt": {
+      "size": 103,
+      "sha256": "2d014bb427120fb1a5014d7499096989061fd0fdf40acb471c2e2667de60e71e",
+      "gzipSize": 54,
+      "gzipSha256": "6a39a175c497de0a7019d82c7f9b4f5ad0913b4e2d8d11a01b07753c3f61de54"
+    },
+    "preparation/measurement-plan.json": {
+      "size": 5377,
+      "sha256": "22b822ea37eb2dabcce618be1d78f534f054c3a781ce226bb7343edbf0681304",
+      "gzipSize": 2605,
+      "gzipSha256": "bf738957b55593a21679435e4fa2d376a84568e2adfe03555ab4ca86a5cb9bc2"
+    },
+    "preparation/observer-node-test.txt": {
+      "size": 623,
+      "sha256": "2daf9936de979cd2ddf97db1f8198635e491fc6c8ff1f8d8c2c4ce66175e1a94",
+      "gzipSize": 407,
+      "gzipSha256": "ec7c53bca57a666a989c4abe53c103990da87d77bdf578438cc3e590f8816f73"
+    },
+    "preparation/observer-result.json": {
+      "size": 965,
+      "sha256": "f91c2913fefbdf543297bcfc6bca220cefd6cdb296277ea8f481c42d60e30490",
+      "gzipSize": 574,
+      "gzipSha256": "0ba159f31adf756fb9c7fbbb2ccd79b1a8c48d2227759537a0a01de820bf0a9e"
+    },
+    "preparation/probe-precheck.json": {
+      "size": 590,
+      "sha256": "d1338824038fc135cb7b272b93a6a0188d1fea0108ff2e0f9f780ef02944f232",
+      "gzipSize": 429,
+      "gzipSha256": "57fefa9f07ed138e81e67caea8fbea9186a27a6a5ada8f37ebc0371c72f45338"
+    }
+  },
+  "archive": {
+    "path": "checkpoint11-efficiency-preparation.tar.gz",
+    "size": 4063,
+    "sha256": "d2d14956b79c0458e5211358be3163dbc9ba9fe3ad0253d3ab414cc321228c74"
+  }
+}

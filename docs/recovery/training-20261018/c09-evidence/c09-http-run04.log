@@ -1,0 +1,26 @@
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/eduk12_c09_timing_worktree/server-version/backend
+
+ ❯ src/__tests__/assessment-runtime/control-reference-codec.test.ts (18 tests | 1 failed) 22ms
+     × retains all digest bits and materially reduces a small reference 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/assessment-runtime/control-reference-codec.test.ts > authenticated compact control references > retains all digest bits and materially reduces a small reference
+AssertionError: expected 269 to be less than 180
+ ❯ src/__tests__/assessment-runtime/control-reference-codec.test.ts:49:20
+     47|   const a=encryptControlReference(cases[0]),b=encryptControlReference(…
+     48|   expect((decryptControlReference(a)as any).p).toBe(h);expect((decrypt…
+     49|   expect(a.length).toBeLessThan(180)
+       |                    ^
+     50|  })
+     51| })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 17 passed (18)
+   Start at  19:06:08
+   Duration  245ms (transform 75ms, setup 0ms, import 93ms, tests 22ms, environment 0ms)
+

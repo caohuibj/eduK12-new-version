@@ -1,12 +1,8 @@
 import { z } from 'zod'
 import type { FrozenSurveyFlow } from './flow.definition'
-import { surveyKeySchema } from './builder.definition'
-
-export const groupQuotaPolicySchema=z.object({
-  schemaVersion:z.literal(1),
-  groupLimits:z.record(surveyKeySchema,z.number().int().min(1).max(10000)),
-}).strict()
-export type SurveyGroupQuotaPolicy=z.infer<typeof groupQuotaPolicySchema>
+import { groupQuotaPolicySchema,compileMaterialQuotaPolicy,type MaterialQuotaPolicy } from '../assessment-core/materials/definition'
+export { groupQuotaPolicySchema }
+export type SurveyGroupQuotaPolicy=MaterialQuotaPolicy
 export const surveyCheckpointPolicySchema=z.object({
   schemaVersion:z.literal(1),enabled:z.literal(true),
   ttlHours:z.number().int().min(1).max(48),
@@ -17,19 +13,7 @@ export class SurveyOperationsDefinitionError extends Error{
 }
 export const compileGroupQuotaPolicy=(raw:unknown,
   flow:FrozenSurveyFlow|undefined):SurveyGroupQuotaPolicy|undefined=>{
-  if(raw===null||raw===undefined)return undefined
-  const parsed=groupQuotaPolicySchema.safeParse(raw)
-  if(!parsed.success)throw new SurveyOperationsDefinitionError('条件配额配置结构不合法')
-  const policy=parsed.data
-  if(!flow?.experiment)
-    throw new SurveyOperationsDefinitionError('条件配额要求同一冻结 Flow 定义实验分组')
-  if(flow.experiment.mode==='QUESTIONNAIRE_VARIANTS')
-    throw new SurveyOperationsDefinitionError('问卷子版本使用独立概率分配，不支持条件配额或保证人数')
-  const codes=Object.keys(policy.groupLimits)
-  const groups=flow.experiment.groups.map(g=>g.groupKey)
-  if(codes.length!==groups.length||codes.some(code=>!groups.includes(code)))
-    throw new SurveyOperationsDefinitionError('每个实验组必须且只能设置一个明确的配额上限')
-  return policy
+  return compileMaterialQuotaPolicy(raw,flow?.experiment,message=>{throw new SurveyOperationsDefinitionError(message)})
 }
 export const compileCheckpointPolicy=(raw:unknown):SurveyCheckpointPolicy|undefined=>{
   if(raw===null||raw===undefined)return undefined

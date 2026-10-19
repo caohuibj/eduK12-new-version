@@ -1,0 +1,308 @@
+{
+  "passed": true,
+  "qualificationScope": "COLD_FINAL_ONLY",
+  "productId": "0e8fa2c4-3b90-4991-bae0-494c51656bef",
+  "attemptIds": [
+    "084e3ab9-fca0-466b-a6f2-eacf4822c60d",
+    "80f13f59-ab3b-46c6-89b2-a8890f2b1d12",
+    "34dab3b2-7443-4639-b35d-222b01160602",
+    "7cb4171c-1360-4d7c-8e90-a6e6eb6323ee",
+    "415941a1-4d91-4978-ae66-d2208849855b",
+    "3d929f3d-c903-4f04-9b1e-2a227098bdac"
+  ],
+  "completed": [
+    {
+      "attemptId": "084e3ab9-fca0-466b-a6f2-eacf4822c60d",
+      "submissionId": "c491c4ec-40af-4752-8ac2-924689f5658f",
+      "snapshotId": "f58afff1-659d-4b9c-8b2b-fdc8ec694db5",
+      "jobId": "da27bdbb-0dae-4de6-bcc5-19319d9d0b48",
+      "jobAttemptCount": 1
+    },
+    {
+      "attemptId": "80f13f59-ab3b-46c6-89b2-a8890f2b1d12",
+      "submissionId": "6eee87ab-ee7b-4c65-908d-7b0659fcf960",
+      "snapshotId": "21610d03-9441-481a-b6e0-22d66e69bc9d",
+      "jobId": "2e790244-48a9-4aae-9b85-cc71113aa73f",
+      "jobAttemptCount": 1
+    },
+    {
+      "attemptId": "34dab3b2-7443-4639-b35d-222b01160602",
+      "submissionId": "77d54ce3-1e4e-4f48-ae5f-75c282b4672f",
+      "snapshotId": "31c08033-dd27-45a0-93b7-9dfef1e0888d",
+      "jobId": "38b572b0-dd35-4d76-b213-2424bd03179d",
+      "jobAttemptCount": 1
+    },
+    {
+      "attemptId": "7cb4171c-1360-4d7c-8e90-a6e6eb6323ee",
+      "submissionId": "afdc91d9-ab6b-4bb5-b197-426719a91902",
+      "snapshotId": "c0ccd68a-b616-4c36-a351-f36e7cd65e2a",
+      "jobId": "99242132-f93c-416c-9ace-a4c1bbf5afcc",
+      "jobAttemptCount": 1
+    },
+    {
+      "attemptId": "415941a1-4d91-4978-ae66-d2208849855b",
+      "submissionId": "84bdbf49-5642-447e-98e5-93edf5697166",
+      "snapshotId": "e025c5d5-8e68-4d4d-ab35-f95ae070506b",
+      "jobId": "b7ccfbe1-d926-439b-878b-90b63e5e6b9b",
+      "jobAttemptCount": 1
+    },
+    {
+      "attemptId": "3d929f3d-c903-4f04-9b1e-2a227098bdac",
+      "submissionId": "dc1e8569-eb2a-43b7-aad2-9876dc435dcf",
+      "snapshotId": "e19e307e-d81d-4f46-b7d4-d9f35d3689ba",
+      "jobId": "6b73fc64-cb21-4090-bccf-0d5aaff0f3c3",
+      "jobAttemptCount": 1
+    }
+  ],
+  "checks": [
+    "Six first FINAL ACKs on six distinct parents after actual API restart; no state/start/template reads warmed FSP2 before submit",
+    "Original worker completed all six Form facts and outbox reports exactly once; other-tool quota and old facts unchanged"
+  ],
+  "requests": [
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 289
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 289
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 289
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 289
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 289
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 289
+    },
+    {
+      "route": "/composite-assessments/attempts/3d929f3d-c903-4f04-9b1e-2a227098bdac/form-sections/f9b5076f-409f-4f87-8288-1feb091e10d7/submit",
+      "method": "POST",
+      "status": 200,
+      "bytes": 358
+    },
+    {
+      "route": "/composite-assessments/attempts/084e3ab9-fca0-466b-a6f2-eacf4822c60d/form-sections/f9b5076f-409f-4f87-8288-1feb091e10d7/submit",
+      "method": "POST",
+      "status": 200,
+      "bytes": 358
+    },
+    {
+      "route": "/composite-assessments/attempts/7cb4171c-1360-4d7c-8e90-a6e6eb6323ee/form-sections/f9b5076f-409f-4f87-8288-1feb091e10d7/submit",
+      "method": "POST",
+      "status": 200,
+      "bytes": 358
+    },
+    {
+      "route": "/composite-assessments/attempts/80f13f59-ab3b-46c6-89b2-a8890f2b1d12/form-sections/f9b5076f-409f-4f87-8288-1feb091e10d7/submit",
+      "method": "POST",
+      "status": 200,
+      "bytes": 358
+    },
+    {
+      "route": "/composite-assessments/attempts/415941a1-4d91-4978-ae66-d2208849855b/form-sections/f9b5076f-409f-4f87-8288-1feb091e10d7/submit",
+      "method": "POST",
+      "status": 200,
+      "bytes": 358
+    },
+    {
+      "route": "/composite-assessments/attempts/34dab3b2-7443-4639-b35d-222b01160602/form-sections/f9b5076f-409f-4f87-8288-1feb091e10d7/submit",
+      "method": "POST",
+      "status": 200,
+      "bytes": 358
+    },
+    {
+      "route": "/composite-assessments/attempts/084e3ab9-fca0-466b-a6f2-eacf4822c60d/report-status",
+      "method": "GET",
+      "status": 200,
+      "bytes": 380
+    },
+    {
+      "route": "/composite-assessments/attempts/084e3ab9-fca0-466b-a6f2-eacf4822c60d/report-status",
+      "method": "GET",
+      "status": 200,
+      "bytes": 398
+    },
+    {
+      "route": "/composite-assessments/attempts/084e3ab9-fca0-466b-a6f2-eacf4822c60d/report",
+      "method": "GET",
+      "status": 200,
+      "bytes": 564
+    },
+    {
+      "route": "/composite-assessments/attempts/084e3ab9-fca0-466b-a6f2-eacf4822c60d",
+      "method": "GET",
+      "status": 200,
+      "bytes": 1898
+    },
+    {
+      "route": "/composite-assessments/attempts/80f13f59-ab3b-46c6-89b2-a8890f2b1d12/report-status",
+      "method": "GET",
+      "status": 200,
+      "bytes": 398
+    },
+    {
+      "route": "/composite-assessments/attempts/80f13f59-ab3b-46c6-89b2-a8890f2b1d12/report",
+      "method": "GET",
+      "status": 200,
+      "bytes": 564
+    },
+    {
+      "route": "/composite-assessments/attempts/80f13f59-ab3b-46c6-89b2-a8890f2b1d12",
+      "method": "GET",
+      "status": 200,
+      "bytes": 1898
+    },
+    {
+      "route": "/composite-assessments/attempts/34dab3b2-7443-4639-b35d-222b01160602/report-status",
+      "method": "GET",
+      "status": 200,
+      "bytes": 398
+    },
+    {
+      "route": "/composite-assessments/attempts/34dab3b2-7443-4639-b35d-222b01160602/report",
+      "method": "GET",
+      "status": 200,
+      "bytes": 564
+    },
+    {
+      "route": "/composite-assessments/attempts/34dab3b2-7443-4639-b35d-222b01160602",
+      "method": "GET",
+      "status": 200,
+      "bytes": 1898
+    },
+    {
+      "route": "/composite-assessments/attempts/7cb4171c-1360-4d7c-8e90-a6e6eb6323ee/report-status",
+      "method": "GET",
+      "status": 200,
+      "bytes": 398
+    },
+    {
+      "route": "/composite-assessments/attempts/7cb4171c-1360-4d7c-8e90-a6e6eb6323ee/report",
+      "method": "GET",
+      "status": 200,
+      "bytes": 564
+    },
+    {
+      "route": "/composite-assessments/attempts/7cb4171c-1360-4d7c-8e90-a6e6eb6323ee",
+      "method": "GET",
+      "status": 200,
+      "bytes": 1898
+    },
+    {
+      "route": "/composite-assessments/attempts/415941a1-4d91-4978-ae66-d2208849855b/report-status",
+      "method": "GET",
+      "status": 200,
+      "bytes": 398
+    },
+    {
+      "route": "/composite-assessments/attempts/415941a1-4d91-4978-ae66-d2208849855b/report",
+      "method": "GET",
+      "status": 200,
+      "bytes": 564
+    },
+    {
+      "route": "/composite-assessments/attempts/415941a1-4d91-4978-ae66-d2208849855b",
+      "method": "GET",
+      "status": 200,
+      "bytes": 1898
+    },
+    {
+      "route": "/composite-assessments/attempts/3d929f3d-c903-4f04-9b1e-2a227098bdac/report-status",
+      "method": "GET",
+      "status": 200,
+      "bytes": 398
+    },
+    {
+      "route": "/composite-assessments/attempts/3d929f3d-c903-4f04-9b1e-2a227098bdac/report",
+      "method": "GET",
+      "status": 200,
+      "bytes": 564
+    },
+    {
+      "route": "/composite-assessments/attempts/3d929f3d-c903-4f04-9b1e-2a227098bdac",
+      "method": "GET",
+      "status": 200,
+      "bytes": 1898
+    }
+  ],
+  "apiRestart": {
+    "oldPid": 136,
+    "newPid": 281,
+    "oldPort": 40395,
+    "port": 40395,
+    "source": "owned-wrapper-cold-final"
+  },
+  "coldCacheEvidence": {
+    "nullPolicy": true,
+    "persistedUnitAdmission": true,
+    "slotPlanHashes": [
+      "a90dada97e1782acb7d6c80232b9ca7215acae28bcfa006668b3a1cd17687462"
+    ],
+    "admissionPlanHashes": [
+      "7e0780430e2c06b22ff3eb57116ebe048052c1be84a132b8e00321da5ce57403"
+    ],
+    "preFinalApiRoutes": "Only auth/csrf and auth/training-login after restart",
+    "firstFspRead": "Source-path inference from null markers and stored UAR2 fast path: original FINAL outbox transaction; PG PUBLIC_TEMPLATE class alone cannot distinguish FSP2/UAR2 hashes",
+    "lockBarrier": "c14-cold-final-barrier.json requires six API-owned transactions simultaneously blocked before release",
+    "poolLimit": 6,
+    "transactionTimeoutUnchanged": true
+  },
+  "scope": "Bounded real correctness diagnosis only; no latency/CPU/load qualification"
+}

@@ -1,0 +1,13 @@
+{
+  "qualification": "DIAGNOSTIC_ONLY_ORIGINAL_DIST_EXPECTED_FAILURE",
+  "compiledSource": "e90550c534cca1024011a55f8ea1ee82abed99b1",
+  "distSha256": "bdb62c4e56cd7c9805223ad84d1acd1eb90cb081d145559ebe21be0ba0f7802e",
+  "currentSourceIncludesFixButNotCompiled": true,
+  "elapsedMs": 5087,
+  "cpuSeconds": 0.41999999999999993,
+  "poolLimit": 6,
+  "stallSamples": 214,
+  "stallFirstMs": 82,
+  "stallLastMs": 5040,
+  "oldDistManifestSha256": "ba90983154dc680c9ce984c9a5fa16c01ade4fe816df77b5e51155175521c6b8"
+}

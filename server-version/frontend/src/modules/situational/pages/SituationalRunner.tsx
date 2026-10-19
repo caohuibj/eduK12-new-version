@@ -1,3 +1,5 @@
+import { OnlineAnswerField } from '../OnlineAnswerField'
+import { withOnlineRunner, onlineResponses } from '../online'
 import { situationalBasePath } from '../paths'
 import { situationalHistoryIdentities, invalidateChangedSituationalHistory } from '../history'
 import { researchEventsFromTrials, missingResearchExposureEvents, appendResearchEvents, currentResponseStage, eventTime, researchCapture, researchEnabled, restoreResearchAnswers, type SituationalResearchEvent } from '../research'
@@ -185,7 +187,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
         const response = attemptId
           ? await client.resume(attemptId)
           : await client.start({ instrumentKey: decodeURIComponent(instrumentKey as string) })
-        const next = apiDataOrThrow(response)
+        const next = withOnlineRunner(apiDataOrThrow(response))
         if (next.attempt.status === 'COMPLETED') {
           await finalDraftStore.delete(situationalDraftKey(next.attempt.id)).catch(() => undefined)
           if(campus)campus.onCompleted()
@@ -367,7 +369,8 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
   const persistAnswer = (
     scene: SituationalRunnerScene,
     channel: SituationalRunnerChannel,
-    responseValue: string | number,
+    responseValue: string | number | string[],
+    status?: 'ANSWERED' | 'REFUSED' | 'BLANK',
   ): Promise<void> => {
     if (!data || submitting || submissionLocked) return Promise.resolve()
     const currentData = data
@@ -383,14 +386,14 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
       .catch(() => undefined)
       .then(async () => {
         const previous = responsesRef.current
-        if (previous[key]?.responseValue === responseValue) return
+        if (JSON.stringify(previous[key]?.responseValue) === JSON.stringify(responseValue) && previous[key]?.status === status) return
         const definition = currentData.instrument.definition
         const node = definition.schemaVersion === 2 ? definition.flow.nodes.find(n => n.nodeType === 'SCENE' && n.sceneKey === scene.sceneKey) : undefined
         const historyIdentity = situationalHistoryIdentities(definition, previous)[scene.sceneKey] ?? '[]'
         const stage = node?.nodeType === 'SCENE' ? currentResponseStage(node, historyIdentity, researchEventsRef.current) : null
         if (node?.nodeType === 'SCENE' && node.responseStages && !stage?.channelKeys.includes(channel.channelKey)) throw new Error('已确认的作答不能在后续信息披露后修改。')
         const answer: SituationalDraftAnswer = {
-          responseValue, responseTimeMs, answeredAt,
+          responseValue, responseTimeMs, answeredAt, ...(status ? {status} : {}),
           ...(definition.schemaVersion === 2 ? { historyIdentity, responseRevision: (previous[key]?.responseRevision ?? 0) + 1 } : {}),
         }
         const invalidated = invalidateChangedSituationalHistory(definition, previous, { ...previous, [key]: answer })
@@ -474,7 +477,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
     if (!data || !client) return false
     try {
       const response = await client.result(data.attempt.id)
-      const next = apiDataOrThrow(response)
+      const next = withOnlineRunner(apiDataOrThrow(response))
       if (next.attempt.status !== 'COMPLETED') return false
       await finalDraftStore.delete(situationalDraftKey(data.attempt.id)).catch(() => undefined)
       if(campus)campus.onCompleted()
@@ -513,9 +516,10 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
         snapshot.answers.forEach((answer) => {
           if (!answer.value || typeof answer.value !== 'object') return
           const value = answer.value as Partial<SituationalDraftAnswer>
-          if (typeof value.responseValue !== 'string' && typeof value.responseValue !== 'number') return
+          if (typeof value.responseValue !== 'string' && typeof value.responseValue !== 'number' && !(Array.isArray(value.responseValue) && value.responseValue.every(v=>typeof v==='string'))) return
           sealedResponses[answer.itemKey] = {
             responseValue: value.responseValue,
+            ...(value.status ? {status:value.status} : {}),
             ...(typeof value.responseTimeMs === 'number' ? { responseTimeMs: value.responseTimeMs } : {}),
             ...(typeof value.answeredAt === 'string' ? { answeredAt: value.answeredAt } : {}),
             ...(typeof value.historyIdentity === 'string' ? { historyIdentity: value.historyIdentity } : {}),
@@ -540,7 +544,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
           compiledRuntimeHash: data.attempt.compiledRuntimeHash,
           scoringVersion: data.attempt.scoringVersion,
           ...(researchEnabled(data) ? { researchCapture: researchCapture(data, events) } : {}),
-          responses: situationalResponsesFromDraft(data.instrument.definition, finalResponses),
+          ...(data.instrument.online ? {responseProtocol:data.instrument.online.responseProtocol,responses:onlineResponses(data.instrument.definition, finalResponses)} : {responses: situationalResponsesFromDraft(data.instrument.definition, finalResponses)}),
         }
       })
       if (!sealed) throw new Error('本地作答草稿不存在，请返回后重新进入测评。')
@@ -558,7 +562,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
         },
         operation: () => client.submit(data.attempt.id, sealed.payload),
       })
-      const next = apiDataOrThrow(response)
+      const next = withOnlineRunner(apiDataOrThrow(response))
       await finalDraftStore.setStatus(draftKey, 'COMPLETED')
       await finalDraftStore.delete(draftKey)
       if(campus)campus.onCompleted()
@@ -702,9 +706,10 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
             const answer = responseValueFor(responses, currentScene, channel)
             const fieldName = responseKey(currentScene.sceneKey, channel.channelKey)
             return (
-              <fieldset key={fieldName} className="space-y-3" disabled={submitting || mediaBusy || submissionLocked || Boolean(currentFlowNode?.responseStages?.some(stage => stage.channelKeys.includes(channel.channelKey) && stage.stageKey !== responseStage?.stageKey))}>
+              <fieldset key={fieldName} className="space-y-3" disabled={submitting || mediaBusy || submissionLocked || (channel.online && saving) || Boolean(currentFlowNode?.responseStages?.some(stage => stage.channelKeys.includes(channel.channelKey) && stage.stageKey !== responseStage?.stageKey))}>
                 <legend className="text-base font-semibold text-gray-900">{channel.prompt}{channel.required === false ? <span className="ml-2 text-sm font-normal text-gray-500">（可选）</span> : null}</legend>
-                {channel.responseType === 'SINGLE_CHOICE' && (channel.options ?? []).map((option) => (
+                {channel.online && <OnlineAnswerField channel={channel} answer={answer} name={fieldName} onChange={(value,status)=>void persistAnswer(currentScene,channel,value,status)}/>}
+                {!channel.online && channel.responseType === 'SINGLE_CHOICE' && (channel.options ?? []).map((option) => (
                   <label key={option.optionKey} className={`flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border p-4 transition ${answer?.responseValue === option.optionKey ? 'border-indigo-500 bg-indigo-50 ring-1 ring-indigo-500' : 'border-gray-200 hover:border-indigo-300'}`}>
                     <input type="radio" name={fieldName} value={option.optionKey} checked={answer?.responseValue === option.optionKey} onChange={() => void persistAnswer(currentScene, channel, option.optionKey)} className="mt-1 h-5 w-5 text-indigo-600 focus:ring-indigo-500" aria-label={option.label} />
                     <span className="text-sm leading-6 text-gray-700">{option.label}</span>

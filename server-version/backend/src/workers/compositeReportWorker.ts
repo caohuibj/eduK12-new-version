@@ -55,7 +55,7 @@ export const processCompositeReportJob = async (job: CompositeReportJob): Promis
       else outcome = { kind: 'ready', ...await traceAssessmentPhase('report.aggregate_materialize', () => materializeCompositeQuestionnaireReport(job.attemptId, {
         attemptEpoch: job.attemptEpoch, slotSetHash: job.slotSetHash, contextHash: job.contextHash,
       }, reportContext, committedParent && result.aggregateInputHash && result.totalTime !== undefined
-        ? { ...committedParent, status: 'COMPLETED', progress: 100, completedAt: result.completedAt,
+        ? { ...committedParent, status: 'COMPLETED', progress: 100, completedAt: result.completedAt, taskSatisfaction:'taskSatisfaction' in result ? result.taskSatisfaction : committedParent.taskSatisfaction,
             aggregateInputHash: result.aggregateInputHash, totalTime: result.totalTime } : undefined)) }
     }
   } catch (error) {

@@ -1,0 +1,11 @@
+{
+  "scope": "STATIC_ONLY_NO_SERVICE",
+  "input": "server-version/scripts/recovery/c20-materials-http.py",
+  "sha256": "19d97e3509d0cdf3ca3419001eb1c19e313712559b4ac9e367b004261de92a8f",
+  "checks": [
+    "authenticated success only",
+    "only structured 57P03/exit75 retry",
+    "auth/refused/timeout/unknown/malformed fail"
+  ],
+  "passed": true
+}

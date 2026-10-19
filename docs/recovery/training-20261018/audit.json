@@ -1,0 +1,1066 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-18T07:03:53.391146+00:00",
+  "scope": "Static recovery and baseline only; no functional or performance pass asserted",
+  "base": {
+    "exitCode": 0,
+    "stdout": "f6df9c5b21c5a0d50853d5e6e2d1bfd79389dcd0 fb2923854c3881b0ca54b8e31a9e961c6d9ed885 Merge pull request #313 from caohuibj/feat/training-copy-publish-20261018",
+    "stderr": ""
+  },
+  "originalStatus": {
+    "exitCode": 0,
+    "stdout": "## work",
+    "stderr": ""
+  },
+  "worktrees": {
+    "exitCode": 0,
+    "stdout": "worktree /workspace/eduK12-new-version\nHEAD f6df9c5b21c5a0d50853d5e6e2d1bfd79389dcd0\nbranch refs/heads/work\n\nworktree /workspace/eduK12-cognitive-report-upgrade\nHEAD 979fee01a76e44d66fe8fd8c30ed97aacc349e37\nbranch refs/heads/feat/cognitive-review-fixes-local",
+    "stderr": ""
+  },
+  "originalPathExists": false,
+  "refCount": 239,
+  "refs": [
+    "f26223b5e806876081fdcd9e4926bd428433b3d5 refs/heads/design/cognitive-report-upgrade-plan",
+    "d220633ed8194a8d227240f1fb587ce19f92c145 refs/heads/feat/cognitive-report-upgrade-local",
+    "979fee01a76e44d66fe8fd8c30ed97aacc349e37 refs/heads/feat/cognitive-review-fixes-local",
+    "f6df9c5b21c5a0d50853d5e6e2d1bfd79389dcd0 refs/heads/work",
+    "16a246a2c04639f961d3c4d99fa2a4bc64500a81 refs/remotes/origin/HEAD",
+    "c5b6230d3bdb51ac35067a15cd8440d6954f6bf1 refs/remotes/origin/archive/dev-final-20260826",
+    "68cdbfefa1ef72fe6ac588f2e37ace7a4fd0d03b refs/remotes/origin/archive/main-before-dev",
+    "eb3769d3bcdca5ce25ddc5ba933f30fe62b651e6 refs/remotes/origin/chore/ci-gating-optimization",
+    "8e897df80a63a3c6c3a73c2b959008767fd7af31 refs/remotes/origin/chore/mainline-development",
+    "46e7eb5ed88ae6d9d3b319ee95f1b2a1ff90bebc refs/remotes/origin/chore/org-reporting-v2.1-g0",
+    "6acc01e8ac8a0e5778ef43a0143a0a98c6f20e29 refs/remotes/origin/chore/pilot-release-baseline",
+    "ca5a3e5ea0bdbf919f29edc0d8089e1fdddd5c8f refs/remotes/origin/chore/situational-browser-debug",
+    "e8f1df8e855a3aedbeb003c8e5667f0b33db5aa4 refs/remotes/origin/chore/verification-gate-simplification",
+    "976c0202996ef42d015276d6fd2da77f98b87305 refs/remotes/origin/ci/bundle-content-validation",
+    "d113a6aeef38ccad58a3a4a97216085c63141aa7 refs/remotes/origin/ci/draft-throttle-main",
+    "513a2dcbcec87a850fd69b0a24a2aa4ab4b8e586 refs/remotes/origin/ci/frontend-vitest-worker-cap",
+    "240f573f036f4095bf8f3af75fc09fe1f08fe7c4 refs/remotes/origin/ci/frontend-vitest-worker-cap-test-ignore",
+    "240f573f036f4095bf8f3af75fc09fe1f08fe7c4 refs/remotes/origin/ci/frontend-vitest-worker-cap-test-ignore2",
+    "1cf8837b28cd4bdcae1025ba910c8c853c6f0af7 refs/remotes/origin/ci/required-gate-throughput",
+    "6737aae5cfdca3094d673ecff33bc1e37906c4c2 refs/remotes/origin/ci/scale-content-fast-path",
+    "a3a0167deb42246a68a2da886deb7975cbdffa54 refs/remotes/origin/ci/self-hosted-runner-migration",
+    "bd298c3b101becf720e1d5712b2374c3687f55c7 refs/remotes/origin/codex/anonymous-delivery-closure",
+    "2099ba3ed5479821ffe8f05a96cf2a303f4464d1 refs/remotes/origin/codex/reporting-cohort-longitudinal",
+    "ce36399258984bc41aab375a3e21d35a4c3c8c31 refs/remotes/origin/codex/reporting-individual-longitudinal",
+    "8854c2641d9dc6392d74187b7dad59395bbccd8b refs/remotes/origin/codex/reporting-plan-closure",
+    "04b10757d607e53caf73a0cdd7351fa46d3fcf69 refs/remotes/origin/codex/reporting-review-fixes",
+    "211004949226785aa7a5bf82d72b6a79d8d87190 refs/remotes/origin/content/cognitive-expansion",
+    "f3e12b551b6e8afa748b2f59f52d6439039d9924 refs/remotes/origin/content/scale-expansion",
+    "afec8395927de44195b8b8b70b013a3608d21a54 refs/remotes/origin/content/student-traits-pilot-batch-2",
+    "57909890479147f9840ad38a12ac026d762ac023 refs/remotes/origin/content/teacher-scale-batch-1",
+    "0a520e7e614043a2851ddc0e5369d1c2a9f54085 refs/remotes/origin/content/teacher-scales-pilot-batch-1-v2",
+    "fe18fb4ab209b6f5b4babd044c28051220f41cdc refs/remotes/origin/content/tipi-standard-pilot",
+    "5707b840f87bb90a4318bb6d1d1f5d2bec2fd17c refs/remotes/origin/design/classroom-authoring-control-presentation",
+    "53fd9d0bde34b5cc39064e8ec8dc5bd845aa49d2 refs/remotes/origin/design/code-native-ui-lab",
+    "5740ffff6055467e042905ce6afe0fa8a136432b refs/remotes/origin/design/cognitive-design-kit",
+    "91544ac18108f6922c027867acfa286297f57540 refs/remotes/origin/design/cognitive-runner-presentation",
+    "da16794d2535fdb56eccf0790545488be07e16d3 refs/remotes/origin/design/design-system-convergence",
+    "f5b2e31fa4d98c889b139ff9c48e1ec0e5492815 refs/remotes/origin/design/final-visual-accessibility-cleanup",
+    "e60da235cc19412eecdbc69e2a7026d7fb224216 refs/remotes/origin/design/legacy-surface-migration",
+    "3878a63d761a25ca75cc96bf5edeed38e613064a refs/remotes/origin/design/modern-education-classroom-participant",
+    "4b31c4a5d15cbc3371422ad33f5ee48a6eeffbe6 refs/remotes/origin/design/modern-education-entry-auth",
+    "7d9ca88cbdc713824a6e773ce2f8bf5e6a343081 refs/remotes/origin/design/modern-education-parent",
+    "71e2b5a789448dc836989da80b5a3c47a302b7c3 refs/remotes/origin/design/modern-education-public",
+    "19abb629807fef4e9ab21e5d5ee6d923cbc26da0 refs/remotes/origin/design/modern-education-shared-surfaces",
+    "90286bbb7924d376dbac591fc70cffc811761f16 refs/remotes/origin/design/modern-education-staff",
+    "fd0229306116e3daf9a6c885a4172c9c16d9ccae refs/remotes/origin/design/organization-report-reading-convergence",
+    "d1f75fc1339f3c72b7aeeed9d4701a77963a0a85 refs/remotes/origin/design/public-participation-convergence",
+    "2530bcff5b02f67bf39f72742f4d19767adb418a refs/remotes/origin/design/report-reading-system",
+    "b2d152693d2f0575bc9c0a94b4f2b389b1885b49 refs/remotes/origin/design/report-visualization-system",
+    "b1fec643a586fdd704411e634dd02b983bb480b8 refs/remotes/origin/design/staff-complex-controller-presentation",
+    "a41bd953342cd4984b35afd8b1ab3342d6bcf5f6 refs/remotes/origin/design/student-submission-experience",
+    "c5b6230d3bdb51ac35067a15cd8440d6954f6bf1 refs/remotes/origin/dev",
+    "f7cb55e30e093c28ebd3b074b7b4b549fb4d1549 refs/remotes/origin/docs/g0-closeout-evidence",
+    "d9ff73f630412ccfec7cae0cb9f9e7a444e4f720 refs/remotes/origin/feat-fe-05-report-shell",
+    "a09c4e46459543995afb02590eac760027f3ccbb refs/remotes/origin/feat-fe-06-situational-migration",
+    "938178c8f2c5e88aa18e609254e98399d6e23373 refs/remotes/origin/feat-fe-07a-cognitive-shell-readiness",
+    "c32e6504c0359e35f0cc6da6032800bbab3cad5c refs/remotes/origin/feat-fe-07b-cognitive-timing",
+    "bad8d88fc886d9fb6c14304c1464443994e2da60 refs/remotes/origin/feat-fe-08-form-questionnaire-migration",
+    "bfa6711eb59e5f332f032d6fa46e0b02344d7eee refs/remotes/origin/feat-fe-09-bundle-product-integration",
+    "d1048769efe42d7c9dbf01c947c4246bd987ef35 refs/remotes/origin/feat-fe-10-discovery-history-export",
+    "532bd911344fad35300c24de95a0605d99ec84ea refs/remotes/origin/feat-fe-10b-remaining-pages",
+    "202f3c3f5d5c9c853bcc2bacd350e331dd6644d8 refs/remotes/origin/feat-fe-11-unified-journey-gate",
+    "278185e9d60ce4ba92fa97363b488f85d671909d refs/remotes/origin/feat/anonymous-study-waves-pr4",
+    "8aaf367507561eed1af0e2a7732031a44e14c0a7 refs/remotes/origin/feat/assessment-journey-authority-pr1",
+    "7641595f2fb1e4f17aaab2135f9724837bd02dd8 refs/remotes/origin/feat/bundle-declarative-onboarding",
+    "66c7a67166c069be25ee2cdb7db26a0c59761037 refs/remotes/origin/feat/bundle-v3-production",
+    "98078c40c57256eff4602c3a97c2be53e109be96 refs/remotes/origin/feat/cognitive-assessment-v2-foundation",
+    "154569fc90858d6decf4dc40b63806673f226fad refs/remotes/origin/feat/cognitive-device-input-provenance-v1",
+    "b41032abe6a2c87e991880ee5e46a10533a8b652 refs/remotes/origin/feat/cognitive-library-pilot-catalog",
+    "e052d59965277c4d7bd03ac09951eb02ae0b6ab7 refs/remotes/origin/feat/cognitive-onboarding-gates",
+    "82ad4f34c2f4e2e814e87beb2d593ceb1c247434 refs/remotes/origin/feat/cognitive-pilot-reference-v1",
+    "d220633ed8194a8d227240f1fb587ce19f92c145 refs/remotes/origin/feat/cognitive-report-upgrade-local",
+    "979fee01a76e44d66fe8fd8c30ed97aacc349e37 refs/remotes/origin/feat/cognitive-review-fixes-local",
+    "cf35834bf4eb16d8eac044ab108d43cb9bc113c2 refs/remotes/origin/feat/cognitive-round2-pr16",
+    "1b7a731d5f3b81664cc70bb3d69ada788a48249b refs/remotes/origin/feat/cognitive-scoring-plane-budget-v1",
+    "15acac4c493123a8574c124e98368177f86ed09d refs/remotes/origin/feat/fe-01-product-ui-foundation",
+    "8dd8df7642b24ee736fd9841149c305830fb2973 refs/remotes/origin/feat/fe-02-app-shell",
+    "2d306fcd6296bb43876c4b2d44c1fb6ecbb0b629 refs/remotes/origin/feat/fe-03a-sealed-unit-submission",
+    "1d8464b61297b3859774d5491bbf1718e07464a5 refs/remotes/origin/feat/fe-03b-required-video-completion",
+    "3a800796a29bb14065cdf5478d5b88930646925b refs/remotes/origin/feat/fe-03c-scale-reference-journey",
+    "269b90013fe103b96be2b614d365501f0ab79f30 refs/remotes/origin/feat/fe-04-assessment-shell-v1",
+    "46cd1bfc04d2ffba864512cabd7dc1d1583669ef refs/remotes/origin/feat/instrument-final-submit-indexeddb",
+    "3e8f2d74ef89b857ba29a1bc45062bd454f9e16c refs/remotes/origin/feat/media-1-universal-assessment-image-core",
+    "f8a2bae9578ae9d09a31963d75b3cd465443f1fb refs/remotes/origin/feat/media-2-scale-form-image-adapter",
+    "388e55ee680cca65e73dbf222d8832cae085ce00 refs/remotes/origin/feat/media-3-cognitive-image-adapter",
+    "deec549372562f4e413998fd285f385107fc215b refs/remotes/origin/feat/media-4-universal-video-core",
+    "a79746fa06ad4bca5f2a097c60a8249451af3066 refs/remotes/origin/feat/media-5-situational-video-adapter",
+    "60c0339b97a37ce5f24bb3e5867ad0689c92ed18 refs/remotes/origin/feat/media-6-scale-form-video-adapter",
+    "2f9c40c8a28d0458fd5717cbacd933ee827f076d refs/remotes/origin/feat/media-7-cognitive-video-cross-runtime",
+    "bba5cdfe4192b63318eb6f3b0b8ec6299a1b166f refs/remotes/origin/feat/mental-health-bundle-v1",
+    "bcaf18ee74bdc4a0e03eedb793aeffce3d2bc379 refs/remotes/origin/feat/modal-task-accessibility-closure",
+    "f409aed8f9115e1638a5193709696a873377e6fa refs/remotes/origin/feat/multi-role-delivery-inbox-pr2",
+    "2c17dbbfc0420e57c0225e10321ff91a512d0109 refs/remotes/origin/feat/org-01-identity-access",
+    "ac62ee70403e131d5386c279ed2e95379df00405 refs/remotes/origin/feat/org-02-structure-run-orchestration",
+    "8cb03a5576e492f7b901539cd06b743173160096 refs/remotes/origin/feat/org-03-reporting-core",
+    "f2b1f778303359bb7bf4fad881791f2422d67e37 refs/remotes/origin/feat/org-04-longitudinal-feedback-safety",
+    "ee631006695e31107df74101d05ad4d0b0e40bb8 refs/remotes/origin/feat/org-05-product-integration",
+    "9aed32d076412cd1c541341ef9a82fff273fe7fa refs/remotes/origin/feat/org-05-product-integration-checkpoint",
+    "9aed32d076412cd1c541341ef9a82fff273fe7fa refs/remotes/origin/feat/org-05-product-integration-temp-check",
+    "58b1a6194eb8c73a6a1823b61bdf9a322e2ef688 refs/remotes/origin/feat/questionnaire-four-type-collection",
+    "2e2c83b1f52ec95670777fe263a5db8c9777b97d refs/remotes/origin/feat/ra-01-relational-assessment-core",
+    "e94f7592ef410156b841c1fce968c09810594f38 refs/remotes/origin/feat/ra-02-relational-product-integration",
+    "b273915e36b8773448e1b168dcfe18e1e974a531 refs/remotes/origin/feat/reporting-analytics-backend-foundation",
+    "e6c3f84bcc2bf134bcbe86bfa30912dc470a2589 refs/remotes/origin/feat/reporting-cohort-selector-v2",
+    "631a107ad7d2b270aa3ea4b0a543930d45312fa1 refs/remotes/origin/feat/result-disclosure-longitudinal-pr3",
+    "305f8c3b946da840fdbce2600e0d0a3aaf18a879 refs/remotes/origin/feat/scale-assessment-v2-foundation",
+    "af5e1cd934ae0054ea02526a7ffd0bfcf6845ed8 refs/remotes/origin/feat/scale-library-catalog-v1",
+    "e9fa178fe995e7f8735ce9b59e29b4a25b0fa9f3 refs/remotes/origin/feat/scale-library-pilot-governance-v1",
+    "894c2040a479d140171160b0b004852faf9a73eb refs/remotes/origin/feat/scale-library-wave0-mvp",
+    "59296d57a45e4fdfb462476498a130ab8d5c3544 refs/remotes/origin/feat/scale-onboarding-closeout",
+    "3f74fb530d8db33bbd0990f18f98d210b7a20f12 refs/remotes/origin/feat/scale-onboarding-pr2",
+    "1488d284aede8e42a001e57c1e3483c591d4df15 refs/remotes/origin/feat/scale-onboarding-pr3",
+    "48306d72c0614a62b4dfe735194c1894e97ac0a2 refs/remotes/origin/feat/scale-onboarding-pr3-check",
+    "4c5c6a1cba167f008750443487a4ed03ef181399 refs/remotes/origin/feat/scale-onboarding-pr4",
+    "04e151075575bfaedbc5f57d044df80c0549ca5e refs/remotes/origin/feat/scale-response-device-provenance-v1",
+    "11b14e740d296b6ef439788c3456e7d3a3cd6caf refs/remotes/origin/feat/scale-wave1-content",
+    "3c9e3d852c91ab063530f64cce527f46267d4f83 refs/remotes/origin/feat/scale-wave1-governance",
+    "8d0fdd21e95fa0fcb646b9865f96f49cbdc17c0e refs/remotes/origin/feat/scale-wave1-reports",
+    "55d9d0c4c3dc7f58054e97f8d40533131111d89b refs/remotes/origin/feat/scientific-maturity-research-ready",
+    "6abbe37d46dcefe8ed6dc7360be218b2bb0d991e refs/remotes/origin/feat/situational-bundle-integration-v1",
+    "b350fb9be4455606c31d60a584c6a618658eba77 refs/remotes/origin/feat/situational-runtime-text-pilot-v1",
+    "040b519d2c16cb3125eb99231dcaf2bc92884e14 refs/remotes/origin/feat/situational-static-visual-v1",
+    "9c617d54202b2fc9b244a9d8e795329690357248 refs/remotes/origin/feat/situational-text-pilot-product-v1",
+    "3f9403afd3b8d0c341edff379dc75da457c1d989 refs/remotes/origin/feat/situational-v1-domain",
+    "be5879bd834e87fa7223b66162d3b3e17e14feb7 refs/remotes/origin/feat/situational-v2-a-branch-graph-contract",
+    "e653243077cec40fc32a24290ffeeddc00db5791 refs/remotes/origin/feat/situational-v2-b-branch-traversal-draft",
+    "5e746e9aae37aefd50d669b13b095bf9f2b63870 refs/remotes/origin/feat/situational-v2-c-authoritative-trajectory-final",
+    "b585923d338c6be841b4713f1bf9e075b460c1f5 refs/remotes/origin/feat/situational-v2-d-diagnostic-multiround",
+    "2634d3f1d674c0063c31331b5f3a3a3e6ff9e8a1 refs/remotes/origin/feat/sjt-scientific-governance",
+    "05a96e73538c67643141b6bab53b9f441f28b3f5 refs/remotes/origin/feat/sjt-zero-core-onboarding",
+    "213b46b0cee4290c29264676ac118d1230705f84 refs/remotes/origin/feat/staff-experience-upgrade",
+    "015547194d087c706229e8577dc3c3a6ccab9a1b refs/remotes/origin/feat/unified-runtime-v32-4-boundary",
+    "c13b8a5013432dae90ee35e9023d34170bd0cd87 refs/remotes/origin/feat/unified-runtime-v32-governance",
+    "3584028fff977e8bf67c27111e89ba346ef65a03 refs/remotes/origin/feat/ux-reading-refinement",
+    "7fa4952c79fe50f2d7ed676864178f9e0462aefd refs/remotes/origin/feature/cognitive-core",
+    "696e76efb3326bf810febf35fc80798148d6845f refs/remotes/origin/feature/cognitive-export",
+    "d34b19253af090588439b592667df5a280a4e15a refs/remotes/origin/feature/cognitive-reaction",
+    "2a7155214cc01f22395bbca8dd9fdd43c190c9e5 refs/remotes/origin/feature/cognitive-runner",
+    "aebc8aab89954739f1b01fd49ad0542bec67394b refs/remotes/origin/feature/composite-assessment",
+    "bad600a7e922ab0293aeacde2b2f96df96f98d92 refs/remotes/origin/feature/docker-baseline",
+    "56f2c2d1643784f5dc4925c854236c679ad299de refs/remotes/origin/feature/unified-assessment-bundle-v1",
+    "0c38e22aeada17c3e580c7c8e655c9277388c4bf refs/remotes/origin/fix/aggregate-report-postgres-flake",
+    "f3d50d3086a766c2fe5761143db63bbf04bfb671 refs/remotes/origin/fix/assessment-runtime-consistency-pr25",
+    "a3504cee0e0bf9e4c8cced972ef3d08e2a8ce384 refs/remotes/origin/fix/ci-runner-stability-v2",
+    "31c4cf17b76529a0cea95ee065000757c4b8c64f refs/remotes/origin/fix/ci-two-host-lanes",
+    "4ef274c14f6e6d62a1780e6312f4b4c8020cf8ff refs/remotes/origin/fix/code-review-remediation-20260826",
+    "40cecbcce020ef769ba5372d3a3ccba6579a29fc refs/remotes/origin/fix/cognitive-report-content-completion",
+    "328db6c8f0f4420ef2207a7b5cc3e03d431840ca refs/remotes/origin/fix/frontend-eslint-baseline",
+    "be43235a3a406596c35e6714cff4bf9848382997 refs/remotes/origin/fix/frontend-notification-test-teardown",
+    "5411f81101455c82597857ebb21c881a752fda3e refs/remotes/origin/fix/frontend-typecheck-cleanup",
+    "11716dec1c2923c47854a89b7c297ef2343c3db3 refs/remotes/origin/fix/grant-loading-and-legacy-modals",
+    "b7356ea01e9a86b805b1f2008c03992f374d5538 refs/remotes/origin/fix/huisurvey-pr1-pr2-review",
+    "84ede092e8165d3e05c6ce2d45a5c01a74700a6e refs/remotes/origin/fix/material-questionnaire-recovery",
+    "f74fe48fbd402a2fa68f18bea21d76757b8c5ca6 refs/remotes/origin/fix/ops-supported-runtime-bounded-workers",
+    "820b6348b3ad6c8cd87509eb4422700646b20fb0 refs/remotes/origin/fix/post-merge-consistency-pr26",
+    "0bf7d6f3fb43f1248446c2b5ad46c98ab58c4db6 refs/remotes/origin/fix/post-merge-review-20260827",
+    "e8c0ba7d1e6c810e08394b1d07986dfe99c545dc refs/remotes/origin/fix/pr202-ux-cleanup-current-main",
+    "23dd6d3e723e30ac5ce5e5d9c629cb4c3da3db4c refs/remotes/origin/fix/pr5-response-body-race",
+    "38af1999d61917cafe0d82a77e2c3a9377b28d5d refs/remotes/origin/fix/prelaunch-security-closure",
+    "b7f613a4bba62b090001b38679824316f053fe20 refs/remotes/origin/fix/prelaunch-ux-deployment-closure",
+    "de1251d64f2d9ead7b26276b199f7579506e6124 refs/remotes/origin/fix/production-security-hardening",
+    "718daf2dccf05a8d0bee31009e887d2145b14f06 refs/remotes/origin/fix/ra-01-consent-binding-authority",
+    "4eb454d6402800f94d807df096632e5dc35ebd33 refs/remotes/origin/fix/release-gate-20260829",
+    "f20f520c31701948970e2419b3c57ebea31a9999 refs/remotes/origin/fix/release-hardening-pr27",
+    "0b9bfc762be8cdcd713077d9455bb9c86f81308f refs/remotes/origin/fix/release-hardening-review-20260828",
+    "d11aadfcd4f317f57e0e5341fef0dd5be37fe4b0 refs/remotes/origin/fix/release-security-functional-20260830",
+    "acfb679a4c49eed67169764e47359dc8717e17d5 refs/remotes/origin/fix/reporting-runtime-privacy-hardening",
+    "87a54bc3f9fb8ed51efce1491e2938d850f7381b refs/remotes/origin/fix/reporting-security-query-efficiency",
+    "76fa50ff801221411bda63c5021660d28d4303e3 refs/remotes/origin/fix/scale-auto-advance",
+    "7d8bd1b4bff7574483b3eac583163d7500b37c1e refs/remotes/origin/fix/scale-onboarding-extensible-regression",
+    "5ba98b693407c7ce349bcd5ee9a8c32e6eaaf619 refs/remotes/origin/fix/scale-onboarding-wave0-test-scope",
+    "cfae306cd772ad870ab03585185a4a65ffe70afb refs/remotes/origin/fix/security-authorization-boundary-pr24",
+    "31a66b2095ae21f953542e44f9b7615516b00d39 refs/remotes/origin/fix/student-registration-course-verification",
+    "a1acc7b2d71f1347cea69853e4f6e76c71fd049f refs/remotes/origin/fix/teacher-course-detail-loading",
+    "09078a68f42f7ec0c1cbda92a453d29a95c147de refs/remotes/origin/fix/visual-interaction-consistency",
+    "774b34bdb8a93a73911d1f1fb8f844373d50446a refs/remotes/origin/frontend/product-convergence-scale-slice",
+    "48306d72c0614a62b4dfe735194c1894e97ac0a2 refs/remotes/origin/ignore-me",
+    "8fb30f6cd2a8de8b3c68ca439e68692ecd00b9d6 refs/remotes/origin/import/server-version",
+    "fea13a6d68ede48ca1e6b87e637ddbf9a1aa15d9 refs/remotes/origin/integration/cognitive-onboarding-main",
+    "5ec9a8be2842957248e65dac6f0dc18126888485 refs/remotes/origin/integration/scale-onboarding-main",
+    "16a246a2c04639f961d3c4d99fa2a4bc64500a81 refs/remotes/origin/main",
+    "e244797882a116d1d25a13ea6d4c3808fe3ddf04 refs/remotes/origin/perf/assessment-tail-latency-observability",
+    "8bae45e999557309f6a204af35b9f9b57e7ec92d refs/remotes/origin/perf/ci-browser-build-handoff",
+    "c0dbd72a99b3dab6c2a11251eddcab74577ddb39 refs/remotes/origin/perf/ci-runner-local-caches",
+    "d31c40771a2141ff7532e8bc46759b8c95f9f357 refs/remotes/origin/perf/gate-e-public-limiter-and-capacity",
+    "9493212d6f5375eed6f28cee657f06f4775c7dd3 refs/remotes/origin/perf/isolate-background-workers-from-submit",
+    "d86b8793be69f94d7f14818bab7077e4f964e6ae refs/remotes/origin/perf/measurement-baseline-v1",
+    "1d9087c41f637afb984d3d4f3b4a5579a7429849 refs/remotes/origin/perf/o1-form-strict-hot-path",
+    "5b144091524005e2cc3e5d56eab184228a8893b4 refs/remotes/origin/perf/o2-cognitive-frozen-identity",
+    "f4abcf933f34e7ddf0b4bf5cb248b7ee0edfb199 refs/remotes/origin/perf/o3-aggregate-read-normalization",
+    "3d336551009614fcbeeea9e8fd5b099d0d8fb19c refs/remotes/origin/perf/o4-complete-load-once-dispatch",
+    "2df651c7dcdeb354d20021652add97911e5b044e refs/remotes/origin/perf/post-work-c-calibration",
+    "b1c1a1f9b0041c571d92456388df9e16f4e30953 refs/remotes/origin/perf/pr39-finalization-convergence",
+    "8d4d6e7ba976b97c83df2ca49ad7ed7317911761 refs/remotes/origin/perf/prelaunch-heavy-work-closure",
+    "70c750d14ab0905d5f6625f037df454bfbb268b3 refs/remotes/origin/perf/profile-assessment-hot-path",
+    "c21587bdc57a2510dba91adff3dc2750ad0729d5 refs/remotes/origin/perf/questionnaire-completion-finalization",
+    "997f54c6bfb6e81b63952c83bf99cbbc63ae1923 refs/remotes/origin/perf/questionnaire-form-answer-bulk-mutation",
+    "ed79407aa99667a25ca6e439b906f4ba36d81480 refs/remotes/origin/perf/questionnaire-form-answer-true-batch",
+    "7da24abacf124b42ffc74a35f0a5084438900b21 refs/remotes/origin/perf/questionnaire-start-burst",
+    "67eb70ad1b12634c1ba329ee3952f7baf6fbdbef refs/remotes/origin/perf/runtime-hotpath-v1",
+    "8c073d395a67a5ec4d2e68e45116e1b9025abd81 refs/remotes/origin/perf/runtime-prelaunch-serialization-reporting",
+    "f5f5c6d734a220dd5eb759671d846c3e740391b9 refs/remotes/origin/perf/stage1r-fixture-repair",
+    "0f5f07e8b93f49e16d3570d3c61bf6ed8dbdafad refs/remotes/origin/perf/submission-persistence-optimization",
+    "e7bd12916bf79c1fa1efca53c1c56f829a884055 refs/remotes/origin/perf/v32-capacity-reconciliation-hardening",
+    "598d19d46ab71935ead0c53c1f883819ba82363b refs/remotes/origin/rebase-fe-06-on-3a654229",
+    "7bb6fc64783d5a3221cb51073bfaa27a3e66131b refs/remotes/origin/refactor/assessment-qualification-governance",
+    "ff4f73550cca1eb2089935e8a0b4d6e59e0ccf94 refs/remotes/origin/refactor/cognitive-onboarding-hardening",
+    "d4046bacb6be5ac9eaff1f87c60626ad44b19ff0 refs/remotes/origin/refactor/cognitive-release-single-truth",
+    "39f014a19f6017e322d9aea643ca9f5cb11e8d5a refs/remotes/origin/refactor/cognitive-scientific-maturity-orthogonality",
+    "b6c7c6db831c46ad5a68d3d86f2f76a82504288a refs/remotes/origin/refactor/cognitive-task-owned-onboarding-pr1",
+    "7f253fa39ee30368593c97ef619253aa60d24332 refs/remotes/origin/refactor/cognitive-task-packages",
+    "06011969da7ca704c39397e14cb1a53724a25be9 refs/remotes/origin/refactor/scale-onboarding-pr1",
+    "e83428fae66ca72d5e2c6b354457d4f209e78230 refs/remotes/origin/refactor/unified-runtime-v32-aggregate",
+    "60acd0327026bd626fc6cb38251b2cd683305e9f refs/remotes/origin/refactor/unified-runtime-v32-unit",
+    "af3af3c23dac2059add5fb435b9f2b6fcf453197 refs/remotes/origin/release/cognitive-round2-pilot-promotion",
+    "13c32877bb054224248e3e6b9ebe67345d9d4a48 refs/remotes/origin/release/flanker-publish-prep",
+    "f77808f5b4c0a825f7ac7a2a09614341e2a7d6bb refs/remotes/origin/release/patterncompare-publish-prep",
+    "335fac9a9f909aede8fb338e431f23a96d1087f8 refs/remotes/origin/release/v1.0.0",
+    "11681a6977a1b1845089799be6afce7bc30fdb3f refs/remotes/origin/scale/zh-cn-sdq-texi-draft",
+    "a435c36285ffe55fd232a1217f95ee6292fa5046 refs/remotes/origin/security/classroom-production-hardening",
+    "f05343601576ae355685addb387d9c6957ff2fa8 refs/remotes/origin/staging/media-2-finalize-20260910",
+    "9a13cedf72deca371c0a156b7a95ac30b8ed0cf5 refs/remotes/origin/test/scientific-maturity-qualification-invariant",
+    "61e54c96d1c7105b2133618d2a73a12d4cbba294 refs/remotes/origin/test/situational-v2-e-branching-acceptance",
+    "edb1e17dbfc5ca945cdfbb19874208e50ff92bce refs/remotes/origin/test/visual-qa-canonical-screens",
+    "af22abe8611bda9710b5e42789986b883e70b43a refs/remotes/origin/tmp-noop",
+    "e1aef2675779380d7792e282ed50e018443ec0fc refs/remotes/origin/tmp-noop-pr3",
+    "a24d5eba274bbbba82c2249e28c7c63db59893d1 refs/remotes/origin/tmp/ra-c3-base",
+    "23f03cde42d2905029b2ae9029dc2e2e5a53046d refs/remotes/origin/tmp/ra-c4-base",
+    "e03bf1185a513f11e8e36f2bec88b9264988adb3 refs/remotes/origin/tmp/ra-c5-base",
+    "a23988ecb70b01186d3df7cde3717531f26e0962 refs/remotes/origin/tmp/ra-c6-base",
+    "e8beee60b83c7cf288216ef078615b4390e0ecab refs/remotes/origin/tmp/ra-c7-base",
+    "21e1fbb874c3e0e88e8675e3b52d0934876651e5 refs/remotes/origin/tmp/ra-fix-build-1",
+    "8ee90d7a3041de3fc72d1e6e8175fed21de0e39d refs/remotes/origin/trae/agent-o8kbT2",
+    "b6c7c6db831c46ad5a68d3d86f2f76a82504288a refs/remotes/origin/validation/cognitive-onboarding-pr1",
+    "13c32877bb054224248e3e6b9ebe67345d9d4a48 refs/remotes/origin/validation/flanker-publish-prep",
+    "9cd87e7f76833aafa50f2f0840975335d00b7a09 refs/remotes/origin/validation/scale-onboarding-pr2",
+    "1488d284aede8e42a001e57c1e3483c591d4df15 refs/remotes/origin/validation/scale-onboarding-pr3",
+    "4c5c6a1cba167f008750443487a4ed03ef181399 refs/remotes/origin/validation/scale-onboarding-pr4",
+    "ccea56cf90a0dfd506e303459816963e1b2e4cc4 refs/remotes/origin/work-c-hotpath-convergence"
+  ],
+  "reflogCount": 999,
+  "reflogInventorySha256": "53ba2b9be375f8aef8ef045c2414dc3f99672ff0eb8abb72c2018bcbca51be59",
+  "objectCounts": {
+    "blob": 14630,
+    "tree": 29297,
+    "commit": 4514
+  },
+  "objectInventorySha256": "98cda2886768af8cfd5b8d7c4191a35ac0d9a999c6cf5945a15b86d865af2ba6",
+  "fsck": {
+    "exitCode": 0,
+    "stdout": "unreachable blob 8b10325c3f2ee79cbbee9806092b01974eef2664\nunreachable blob f21deebaa849c6484bafa4a18f44b321a0fb82d8\nunreachable blob 45731e93f75998fce38903990868aa21b140ac40\nunreachable blob 45a1ccc98945e37b8454b0aa1ec8aa5816328758\nunreachable blob f2a4d08cb0d3deeffa3d0ddb3d66125c401cd12c\nunreachable blob 32ac48b0f10e14ec535afecc71b6505321957b15\nunreachable blob bdef38f00529e5730027a49ac4690035ecaee015\nunreachable blob 6f4cc710fe54be1113396601957d982c4c97742b\nunreachable blob 7159178be8f66e1a16dbb11f5d430c5d86ed98f2\nunreachable blob c381fdb8e4349ba3e3d20819018a5b970b6358d9\nunreachable blob a08eb970af92ccc78969ba71ebb6777492837953\nunreachable blob 70a1b710cc3219a699289c8ec70515c36fe7d91c\nunreachable blob 7facd7f1bc084c64b9fb92af4476a8acb709ce7e\nunreachable blob 16b773c1e36b276126c07f2551ff74dbfc57d535\nunreachable blob 64d633a844df249a8200aa22dd4704115c1e7b29\nunreachable blob d5e06f13ad3e089332ccbadd22939f0ac5b7f0de\nunreachable blob d8f4a5d9f25136f2d2d8873fdf45a40effb7ddc9",
+    "stderr": ""
+  },
+  "missingObjectChecks": {
+    "7bb472565fdb9a356a226bcf6f91f1f8d6c2226c": {
+      "exitCode": 128,
+      "stdout": "",
+      "stderr": "fatal: git cat-file: could not get object info"
+    },
+    "82f78f8bcede97b85ae0cb6b047182ede3acc5f0": {
+      "exitCode": 128,
+      "stdout": "",
+      "stderr": "fatal: git cat-file: could not get object info"
+    },
+    "2f559de58a227f878a25197183c2c913704e1623": {
+      "exitCode": 128,
+      "stdout": "",
+      "stderr": "fatal: git cat-file: could not get object info"
+    },
+    "dc65d1142dbfe656a830ffd51d3ae43e92dbcd0d": {
+      "exitCode": 128,
+      "stdout": "",
+      "stderr": "fatal: git cat-file: could not get object info"
+    }
+  },
+  "remoteRefs": {
+    "exitCode": 0,
+    "stdout": "f6df9c5b21c5a0d50853d5e6e2d1bfd79389dcd0\trefs/heads/main",
+    "stderr": ""
+  },
+  "workflowCount": 41,
+  "workflowHashes": {
+    ".github/workflows/assessment-video-core-acceptance.yml": "093c09cdf4eee77f4c3664e2ce769443cce44a33b5b8435d6a3b4bf5ced09db4",
+    ".github/workflows/ci-access-efficiency.yml": "8a3fe7ab449b30561e69ed3945ac936dc640dc5f01f2e6c069bcf086dcaeb36b",
+    ".github/workflows/ci-assessment-capacity.yml": "97da3542483704c18edff91d6d64f2ab41240132897298df0ee09f6a2c987e8e",
+    ".github/workflows/ci-backend-browser-build.yml": "26016800298cd9fb776a90acbc8c0f2e980b79ceee9922953e7699d70f334133",
+    ".github/workflows/ci-backend-regression.yml": "6ce81f13abc96cc27c70e60f2b37a996991b7c845a2f4e402ee80eebab650fc6",
+    ".github/workflows/ci-backend-security-efficiency.yml": "868a7f958be9132f4c7bfcd17fb5af826946766d0956a9305332ab3dedc7e4e3",
+    ".github/workflows/ci-backend.yml": "3e80bac494069abdd7ed0cc04985ff578f76d63dbb02af4fcc052de226c736e7",
+    ".github/workflows/ci-browser.yml": "75c7702a553e960efb8e48b9a6523d404551e8828ac6f1cf95f27530b9fbbce6",
+    ".github/workflows/ci-campus.yml": "caacce84e7f14abce42591e5d27b4e373f9cdd8f89230d130d5b2b3875538015",
+    ".github/workflows/ci-cognitive-step.yml": "27cc26684b2f5064b5980a6c0f53e0ee5e17edd4ae886126c790cf7334e5c54f",
+    ".github/workflows/ci-frontend-build.yml": "bcbfaec1ba5bf821a21809e14a90b9d5c0a8683df14b7e4089b53319993fa9c3",
+    ".github/workflows/ci-frontend.yml": "603fda8f59283981913217677576591f7b725c8e4bfd1e4e048ea44508e675d6",
+    ".github/workflows/ci-homepage-copy.yml": "9bbb25a6020b656255bf4f2c90763ef4f1527798403470f0e65da559e34bf767",
+    ".github/workflows/ci-images.yml": "3153e4204c8da73be45a91d1306dee4005e98161e429fc7a27821b1cbccd3aab",
+    ".github/workflows/ci-maintenance.yml": "9bbc57b4a50a6f9f5b9165262e20bba8fc56b66fc85bf3e162b9533f15abf55a",
+    ".github/workflows/ci-media.yml": "9b44be4c54811d324dc9a9f399a55ff0a64c9f3840fa82a4a0a09df5190f280d",
+    ".github/workflows/ci-release-tools.yml": "76ee266225dbae0d628a46d19f2a5cc3898877c634fc42844ccdcce1ae312db9",
+    ".github/workflows/ci-reviewed-candidate.yml": "e116d2f3d4d65f194063350aca04071d3ea04aa9da893166cc5a2dd059e72cd0",
+    ".github/workflows/ci-scoped-release.yml": "b0f6d0b4eaa06607c9b305a0eca7f039390247a3088793f5daf733d4c25779b7",
+    ".github/workflows/ci-shared-assessment-foundation.yml": "bd6daf5eeaaeb7e16da2f10558f9b5f62256a47c3e291bf232593e2c130f7e6d",
+    ".github/workflows/ci-shared-asset-storage.yml": "d210abfc82a3bf2d4305ec9e0858d8a14724108d91d83568f84efdd1a7204483",
+    ".github/workflows/ci-survey-candidate.yml": "6361a9397658d39336812ab13cc134bbd93cdea6412b8401e19317eb3c8faaff",
+    ".github/workflows/ci-survey-home.yml": "d14b38b2e864d98d4a28a206e7850f688c21c5920c3dbbfcaecd132e76b39971",
+    ".github/workflows/ci-survey-pr1.yml": "25f43c4f042be4f851baaefc7910032adf89903efe8acaf5873649e75cc4f5dd",
+    ".github/workflows/ci-teacher-home.yml": "ed5001df4a1795a33a8d750a3fe611f27ed8b967357b5710754757a842089add",
+    ".github/workflows/ci-teacher-survey.yml": "cd22db5cc5cc3ef0d0e1bb6e31be4b233a1a0a84ff167254481c9452aa6356ad",
+    ".github/workflows/ci-ui.yml": "608dfd9f6af4914e1e1c6b65bbabde5b8bac03ec41e275a9516b473b1cb91509",
+    ".github/workflows/ci.yml": "f3298afe6cc3ccf3ed8592c86095d22217a19da09be4b783b68c70f686624b44",
+    ".github/workflows/fe-11-app-shell-acceptance.yml": "f3e04aa50832b5addd6490bdd64b2998f9114eb66680364d4988c2de8f4c2bb1",
+    ".github/workflows/media-2-acceptance.yml": "bfddbb60db2db6455669db9eedf2af7e804f30ea832304af2bba1735bd009f37",
+    ".github/workflows/media-7-cross-runtime-acceptance.yml": "e1c37b4775518d49b33b1b4136a6037429f96560a9b9507932100e44bdda9ac6",
+    ".github/workflows/ops-prelaunch.yml": "cf417844e586570a77af8a41c9f5e0601d8cb75fc97fe228c92de9b8b118226c",
+    ".github/workflows/perf-phase0-closure.yml": "686e814c60f8b0ddab1dc55313086b6aae0aa2b4c65a4874b9c73703a0ef5f4b",
+    ".github/workflows/perf-phase0-exploratory.yml": "20e43c4141de3eefb0545ef8d62ce12d295f37e295fd0c8c1ff341e840525702",
+    ".github/workflows/perf-phase0-smoke.yml": "a8605108c2aa1e422d67ebb1558e029831105a4e5f64ca7df48b2600e85e4aed",
+    ".github/workflows/scale-onboarding-boundary.yml": "177e2eb063d4f2b8c54862c3c76ad52c7de205b5053afd7cb58d709ebe6c5ccd",
+    ".github/workflows/situational-branching-acceptance.yml": "fdd4114d759f5b115370c4cda41eebe9f62f89fc5845d7fd12c00f8ea710d3e8",
+    ".github/workflows/situational-browser-debug.yml": "ebbd4071656698ea6fe6e2a86e467d5c94d9bfbc83141b0335e2ac96d714a342",
+    ".github/workflows/situational-publication.yml": "59f70ed57ac332f1019824df9eda8bfde0144f811fba890080b593a176079d06",
+    ".github/workflows/situational-video-acceptance.yml": "2d4b91718fab830a198e30e25e4c89ebb1a50d79c90c4e02f792304a4aba6aa4",
+    ".github/workflows/visual-canonical-qa.yml": "6f990eddde59f147721a77a0e2d1d63623d2286a94a93a52caaa2bf12613bd48"
+  },
+  "workflowTriggers": {
+    ".github/workflows/assessment-video-core-acceptance.yml": {
+      "workflow_call": {
+        "inputs": {
+          "runner_profile": {
+            "type": "string",
+            "default": "hosted"
+          },
+          "use_build_artifacts": {
+            "type": "boolean",
+            "default": "false"
+          }
+        }
+      },
+      "workflow_dispatch": {
+        "inputs": {
+          "runner_profile": {
+            "type": "choice",
+            "options": [
+              "hosted"
+            ],
+            "default": "hosted"
+          }
+        }
+      }
+    },
+    ".github/workflows/ci-access-efficiency.yml": {
+      "workflow_call": {
+        "inputs": {
+          "plan": {
+            "type": "string",
+            "required": "true"
+          }
+        }
+      }
+    },
+    ".github/workflows/ci-assessment-capacity.yml": {
+      "workflow_call": {
+        "inputs": {
+          "plan": {
+            "type": "string",
+            "required": "true"
+          }
+        }
+      }
+    },
+    ".github/workflows/ci-backend-browser-build.yml": {
+      "workflow_call": {
+        "inputs": {
+          "runner_labels": {
+            "type": "string",
+            "required": "true"
+          }
+        }
+      }
+    },
+    ".github/workflows/ci-backend-regression.yml": {
+      "workflow_call": {
+        "inputs": {
+          "runner_labels": {
+            "type": "string",
+            "required": "true"
+          },
+          "focus": {
+            "type": "string",
+            "default": "full"
+          }
+        }
+      }
+    },
+    ".github/workflows/ci-backend-security-efficiency.yml": {
+      "workflow_call": {
+        "inputs": {
+          "plan": {
+            "type": "string",
+            "required": "true"
+          }
+        }
+      }
+    },
+    ".github/workflows/ci-backend.yml": {
+      "workflow_call": {
+        "inputs": {
+          "runner_labels": {
+            "type": "string",
+            "required": "true"
+          }
+        }
+      }
+    },
+    ".github/workflows/ci-browser.yml": {
+      "workflow_call": {
+        "inputs": {
+          "runner_labels": {
+            "type": "string",
+            "required": "true"
+          },
+          "groups": {
+            "type": "string",
+            "default": "[\"foundation\",\"products\",\"security\"]"
+          }
+        }
+      }
+    },
+    ".github/workflows/ci-campus.yml": {
+      "workflow_call": {
+        "inputs": {
+          "plan": {
+            "type": "string",
+            "required": "true"
+          },
+          "pr_number": {
+            "type": "number",
+            "required": "true"
+          }
+        }
+      }
+    },
+    ".github/workflows/ci-cognitive-step.yml": {
+      "workflow_call": "",
+      "workflow_dispatch": ""
+    },
+    ".github/workflows/ci-frontend-build.yml": {
+      "workflow_call": {
+        "inputs": {
+          "runner_labels": {
+            "type": "string",
+            "required": "true"
+          },
+          "ui_runner_labels": {
+            "type": "string",
+            "default": ""
+          },
+          "ui_lab": {
+            "type": "boolean",
+            "default": "false"
+          }
+        }
+      }
+    },
+    ".github/workflows/ci-frontend.yml": {
+      "workflow_call": {
+        "inputs": {
+          "runner_labels": {
+            "type": "string",
+            "required": "true"
+          }
+        }
+      }
+    },
+    ".github/workflows/ci-homepage-copy.yml": {
+      "workflow_call": {
+        "inputs": {
+          "plan": {
+            "type": "string",
+            "required": "true"
+          }
+        }
+      }
+    },
+    ".github/workflows/ci-images.yml": {
+      "workflow_call": {
+        "inputs": {
+          "frontend_only": {
+            "type": "boolean",
+            "default": "false"
+          }
+        }
+      },
+      "workflow_dispatch": {
+        "inputs": {
+          "frontend_only": {
+            "type": "boolean",
+            "default": "false",
+            "description": "Build/scan frontend only; false includes backend and worker"
+          }
+        }
+      }
+    },
+    ".github/workflows/ci-maintenance.yml": {
+      "workflow_call": {
+        "inputs": {
+          "merge_proof": {
+            "description": "Qualify the reviewed PR 292 official operations evidence with exact consumer inputs",
+            "type": "boolean",
+            "default": "false"
+          },
+          "runner_labels": {
+            "type": "string",
+            "default": "[\"ubuntu-24.04\"]"
+          }
+        }
+      },
+      "workflow_dispatch": {
+        "inputs": {
+          "ops_followup": {
+            "description": "Successful cache-policy follow-up run; qualify unchanged foundations and check affected operations only",
+            "required": "false",
+            "type": "string",
+            "default": ""
+          },
+          "cache_policy_followup": {
+            "description": "Successful same-repository CI run for the exact fanal cache whitelist follow-up",
+            "required": "false",
+            "type": "string",
+            "default": ""
+          }
+        }
+      }
+    },
+    ".github/workflows/ci-media.yml": {
+      "workflow_call": {
+        "inputs": {
+          "runner_labels": {
+            "type": "string",
+            "required": "true"
+          },
+          "selected": {
+            "type": "string",
+            "required": "true"
+          },
+          "groups": {
+            "type": "string",
+            "required": "true"
+          },
+          "use_build_artifacts": {
+            "type": "boolean",
+            "default": "true"
+          }
+        }
+      }
+    },
+    ".github/workflows/ci-release-tools.yml": {
+      "workflow_call": ""
+    },
+    ".github/workflows/ci-reviewed-candidate.yml": {
+      "workflow_call": {
+        "inputs": {
+          "plan": {
+            "type": "string",
+            "required": "true"
+          }
+        }
+      }
+    },
+    ".github/workflows/ci-scoped-release.yml": {
+      "workflow_call": {
+        "inputs": {
+          "plan": {
+            "type": "string",
+            "required": "true"
+          }
+        }
+      }
+    },
+    ".github/workflows/ci-shared-assessment-foundation.yml": {
+      "push": {
+        "branches": [
+          "fix/shared-assessment-foundation-20261017"
+        ]
+      }
+    },
+    ".github/workflows/ci-shared-asset-storage.yml": {
+      "workflow_call": {
+        "inputs": {
+          "plan": {
+            "type": "string",
+            "required": "true"
+          }
+        }
+      }
+    },
+    ".github/workflows/ci-survey-candidate.yml": {
+      "workflow_call": {
+        "inputs": {
+          "plan": {
+            "type": "string",
+            "required": "true"
+          }
+        }
+      }
+    },
+    ".github/workflows/ci-survey-home.yml": {
+      "workflow_call": {
+        "inputs": {
+          "plan": {
+            "type": "string",
+            "required": "true"
+          }
+        }
+      }
+    },
+    ".github/workflows/ci-survey-pr1.yml": {
+      "workflow_dispatch": ""
+    },
+    ".github/workflows/ci-teacher-home.yml": {
+      "workflow_call": {
+        "inputs": {
+          "plan": {
+            "type": "string",
+            "required": "true"
+          }
+        }
+      }
+    },
+    ".github/workflows/ci-teacher-survey.yml": {
+      "workflow_call": {
+        "inputs": {
+          "plan": {
+            "type": "string",
+            "required": "true"
+          }
+        }
+      }
+    },
+    ".github/workflows/ci-ui.yml": {
+      "workflow_call": {
+        "inputs": {
+          "runner_labels": {
+            "type": "string",
+            "required": "true"
+          },
+          "engine": {
+            "type": "string",
+            "default": "chromium"
+          },
+          "canonical": {
+            "type": "boolean",
+            "default": "true"
+          },
+          "app_shell": {
+            "type": "boolean",
+            "default": "false"
+          },
+          "qa_round3": {
+            "type": "boolean",
+            "default": "false"
+          },
+          "use_build_artifacts": {
+            "type": "boolean",
+            "default": "true"
+          }
+        }
+      }
+    },
+    ".github/workflows/ci.yml": {
+      "push": {
+        "branches": [
+          "main"
+        ]
+      },
+      "pull_request": {
+        "types": [
+          "opened",
+          "synchronize",
+          "reopened",
+          "ready_for_review"
+        ],
+        "branches": [
+          "main",
+          "refactor/unified-runtime-v32-unit",
+          "content/cognitive-expansion"
+        ]
+      },
+      "workflow_dispatch": {
+        "inputs": {
+          "runner_profile": {
+            "type": "choice",
+            "options": [
+              "hosted"
+            ],
+            "default": "hosted",
+            "description": "Use GitHub-hosted Ubuntu for every CI job"
+          },
+          "step_probe": {
+            "type": "choice",
+            "options": [
+              "none",
+              "images",
+              "cognitive",
+              "frontend",
+              "backend",
+              "backend-regression",
+              "assessment-repair",
+              "reporting",
+              "browser",
+              "media",
+              "ui",
+              "ui-chromium",
+              "qa-ui",
+              "ops",
+              "maintenance",
+              "perf"
+            ],
+            "default": "none",
+            "description": "Run one CI component without full CI or CodeQL"
+          },
+          "probe_frontend_only": {
+            "type": "boolean",
+            "default": "false",
+            "description": "Image probe: frontend only; false builds backend/worker/frontend"
+          },
+          "complete_training": {
+            "type": "boolean",
+            "default": "false",
+            "description": "Approved frozen Training evidence receipt; no application tests rerun"
+          },
+          "full_acceptance": {
+            "type": "boolean",
+            "default": "false",
+            "description": "Explicitly opt into whole-platform CI; otherwise choose a step_probe"
+          }
+        }
+      }
+    },
+    ".github/workflows/fe-11-app-shell-acceptance.yml": {
+      "workflow_call": {
+        "inputs": {
+          "runner_profile": {
+            "type": "string",
+            "default": "hosted"
+          },
+          "use_build_artifacts": {
+            "type": "boolean",
+            "default": "false"
+          }
+        }
+      },
+      "workflow_dispatch": ""
+    },
+    ".github/workflows/media-2-acceptance.yml": {
+      "workflow_call": {
+        "inputs": {
+          "runner_profile": {
+            "type": "string",
+            "default": "hosted"
+          },
+          "use_build_artifacts": {
+            "type": "boolean",
+            "default": "false"
+          }
+        }
+      },
+      "workflow_dispatch": {
+        "inputs": {
+          "runner_profile": {
+            "type": "choice",
+            "options": [
+              "hosted"
+            ],
+            "default": "hosted"
+          }
+        }
+      }
+    },
+    ".github/workflows/media-7-cross-runtime-acceptance.yml": {
+      "workflow_call": {
+        "inputs": {
+          "runner_profile": {
+            "type": "string",
+            "default": "hosted"
+          },
+          "use_build_artifacts": {
+            "type": "boolean",
+            "default": "false"
+          }
+        }
+      },
+      "workflow_dispatch": {
+        "inputs": {
+          "runner_profile": {
+            "type": "choice",
+            "options": [
+              "hosted"
+            ],
+            "default": "hosted"
+          }
+        }
+      }
+    },
+    ".github/workflows/ops-prelaunch.yml": {
+      "workflow_call": {
+        "inputs": {
+          "runner_profile": {
+            "type": "string",
+            "default": "hosted"
+          }
+        }
+      },
+      "workflow_dispatch": {
+        "inputs": {
+          "runner_profile": {
+            "type": "choice",
+            "options": [
+              "hosted"
+            ],
+            "default": "hosted"
+          }
+        }
+      }
+    },
+    ".github/workflows/perf-phase0-closure.yml": {
+      "workflow_dispatch": {
+        "inputs": {
+          "runner_profile": {
+            "type": "choice",
+            "options": [
+              "hosted"
+            ],
+            "default": "hosted"
+          },
+          "ab_groups": {
+            "description": "Space-separated steady groups for same-host A/B",
+            "required": "true",
+            "default": "scaleTypicalSteady cognitiveNbackStandardSteady cognitiveCptStandardSteady sjtLinear30Steady sjtLinear60Steady mixedSteady",
+            "type": "string"
+          },
+          "scope": {
+            "description": "Evidence scope",
+            "required": "true",
+            "default": "ab-only",
+            "type": "choice",
+            "options": [
+              "ab-only",
+              "full"
+            ]
+          }
+        }
+      }
+    },
+    ".github/workflows/perf-phase0-exploratory.yml": {
+      "workflow_dispatch": {
+        "inputs": {
+          "runner_profile": {
+            "type": "choice",
+            "options": [
+              "hosted"
+            ],
+            "default": "hosted"
+          }
+        }
+      }
+    },
+    ".github/workflows/perf-phase0-smoke.yml": {
+      "workflow_call": {
+        "inputs": {
+          "runner_profile": {
+            "type": "string",
+            "default": "hosted"
+          }
+        }
+      },
+      "workflow_dispatch": {
+        "inputs": {
+          "runner_profile": {
+            "type": "choice",
+            "options": [
+              "hosted"
+            ],
+            "default": "hosted"
+          }
+        }
+      }
+    },
+    ".github/workflows/scale-onboarding-boundary.yml": {
+      "workflow_call": {
+        "inputs": {
+          "runner_profile": {
+            "type": "string",
+            "default": "hosted"
+          },
+          "scale": {
+            "type": "boolean",
+            "required": "true"
+          },
+          "cognitive": {
+            "type": "boolean",
+            "required": "true"
+          },
+          "situational": {
+            "type": "boolean",
+            "required": "true"
+          },
+          "bundle": {
+            "type": "boolean",
+            "required": "true"
+          },
+          "base": {
+            "type": "string",
+            "required": "true"
+          }
+        }
+      }
+    },
+    ".github/workflows/situational-branching-acceptance.yml": {
+      "workflow_call": {
+        "inputs": {
+          "runner_profile": {
+            "type": "string",
+            "default": "hosted"
+          },
+          "use_build_artifacts": {
+            "type": "boolean",
+            "default": "false"
+          }
+        }
+      },
+      "workflow_dispatch": {
+        "inputs": {
+          "runner_profile": {
+            "type": "choice",
+            "options": [
+              "hosted"
+            ],
+            "default": "hosted"
+          }
+        }
+      }
+    },
+    ".github/workflows/situational-browser-debug.yml": {
+      "workflow_dispatch": {
+        "inputs": {
+          "runner_profile": {
+            "type": "choice",
+            "options": [
+              "hosted"
+            ],
+            "default": "hosted"
+          },
+          "target_ref": {
+            "description": "Optional branch, tag, or commit SHA to debug; defaults to the dispatched ref",
+            "required": "false",
+            "type": "string"
+          }
+        }
+      }
+    },
+    ".github/workflows/situational-publication.yml": {
+      "pull_request": {
+        "branches": [
+          "main"
+        ],
+        "types": [
+          "opened",
+          "synchronize",
+          "reopened",
+          "ready_for_review"
+        ]
+      },
+      "pull_request_review": {
+        "types": [
+          "submitted",
+          "dismissed"
+        ]
+      }
+    },
+    ".github/workflows/situational-video-acceptance.yml": {
+      "workflow_call": {
+        "inputs": {
+          "runner_profile": {
+            "type": "string",
+            "default": "hosted"
+          },
+          "use_build_artifacts": {
+            "type": "boolean",
+            "default": "false"
+          }
+        }
+      },
+      "workflow_dispatch": {
+        "inputs": {
+          "runner_profile": {
+            "type": "choice",
+            "options": [
+              "hosted"
+            ],
+            "default": "hosted"
+          }
+        }
+      }
+    },
+    ".github/workflows/visual-canonical-qa.yml": {
+      "workflow_call": {
+        "inputs": {
+          "runner_profile": {
+            "type": "string",
+            "default": "hosted"
+          },
+          "engine": {
+            "type": "string",
+            "default": "all"
+          },
+          "use_build_artifacts": {
+            "type": "boolean",
+            "default": "false"
+          }
+        }
+      },
+      "workflow_dispatch": {
+        "inputs": {
+          "engine": {
+            "type": "choice",
+            "options": [
+              "all",
+              "chromium",
+              "firefox",
+              "webkit"
+            ],
+            "default": "all"
+          }
+        }
+      }
+    }
+  },
+  "networkPolicy": "No PR or dispatch; normal recovery branch push only after recheck",
+  "oldResultsAccepted": false,
+  "functionalValidation": "NOT_RUN",
+  "performanceValidation": "NOT_RUN",
+  "hostSnapshotPermanentlyLost": "UNKNOWN"
+}

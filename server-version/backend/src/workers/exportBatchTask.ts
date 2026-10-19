@@ -27,7 +27,7 @@ const PROJECTION_MARKER = '__projection_v1_'
 const generationStorageKey = (storageKey: string, generation: number): string => {
   const marker = storageKey.indexOf(PROJECTION_MARKER)
   if (marker < 1) {
-    if (!/^(cognitive|composite)_/.test(storageKey)) throw new Error('导出 artifact 缺少 projection binding')
+    if (!/^(cognitive|composite|training_analysis)_/.test(storageKey)) throw new Error('导出 artifact 缺少 projection binding')
     const ext = path.extname(storageKey)
     return `${storageKey.slice(0, -ext.length)}__generation_${generation}${ext}`
   }
@@ -60,7 +60,7 @@ export const runExportBatch = async (job: any) => {
     const temporaryPaths: string[] = []
     const generationPaths: string[] = []
     try {
-      const assessment = claim.resourceType === 'COGNITIVE' || claim.resourceType === 'COMPOSITE'
+      const assessment = claim.resourceType === 'COGNITIVE' || claim.resourceType === 'COMPOSITE' || claim.resourceType === 'TRAINING_ANALYSIS'
         ? await prepareAssessmentExport(claim) : null
       const data = assessment?.data ?? (claim.resourceType === 'SCALE'
         ? await getScaleExportData(claim.resourceId, { ...claim.options, actor: { userId: claim.createdBy } })
@@ -85,7 +85,7 @@ export const runExportBatch = async (job: any) => {
         publishedKeys.push({ artifactId: artifact.id, storageKey, ...(assessment ? { provenance: { ...assessment.provenance, generation: randomUUID() } } : {}) })
       }
 
-      if (assessment) await revalidateAssessmentExport(claim, assessment.provenance.attemptIds)
+      if (assessment) await revalidateAssessmentExport(claim, 'attemptIds' in assessment.provenance ? assessment.provenance.attemptIds : undefined)
       const published = await publishExportBatch({
         batchId: claim.batchId,
         generation: claim.generation,

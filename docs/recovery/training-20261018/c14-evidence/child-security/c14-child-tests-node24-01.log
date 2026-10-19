@@ -1,0 +1,184 @@
+v24.21.0
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/backend
+
+ ❯ src/__tests__/cognitive/session.service.test.ts (23 tests | 9 failed) 37ms
+     × creates a session with participantKey, encrypted snapshots, randomSeed, attemptNo=1 6ms
+     × copies the assignment resolved snapshot instead of re-merging live config 1ms
+     × returns the existing IN_PROGRESS session without creating a new one 1ms
+     × rejects when maxAttempts reached 5ms
+     × advances attemptNo after completed/abandoned sessions 1ms
+     × D6.1: resumes an existing IN_PROGRESS session without re-checking eligibility (past-due assignment) 1ms
+     × returns run info with decrypted config and randomSeed, no score/metrics for IN_PROGRESS 1ms
+     × locks the session row, abandons the old session and creates attemptNo+1 1ms
+     × rejects restart when maxAttempts reached 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/cognitive/session.service.test.ts > createSession data > creates a session with participantKey, encrypted snapshots, randomSeed, attemptNo=1
+CognitiveServiceError: 认知模块暂不可用，尚未准入的任务请在重新开启后继续
+ ❯ BAD_REQUEST src/modules/cognitive/cognitive.errors.ts:17:45
+     15| export const NOT_FOUND = (msg: string) => new CognitiveServiceError(ms…
+     16| export const FORBIDDEN = (msg: string) => new CognitiveServiceError(ms…
+     17| export const BAD_REQUEST = (msg: string) => new CognitiveServiceError(…
+       |                                             ^
+     18| export const CONFLICT = (msg: string) => new CognitiveServiceError(msg…
+     19| export const SERVER_ERROR = (msg: string) => new CognitiveServiceError…
+ ❯ assertCognitiveNewAdmissionEnabled src/modules/cognitive/product-eligibility.ts:7:48
+ ❯ assertCognitiveProductEligible src/modules/cognitive/product-eligibility.ts:15:3
+ ❯ loadStartableAssignment src/modules/cognitive/session.service.ts:221:3
+ ❯ Module.createSession src/modules/cognitive/session.service.ts:353:15
+ ❯ src/__tests__/cognitive/session.service.test.ts:215:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+ FAIL  src/__tests__/cognitive/session.service.test.ts > createSession data > copies the assignment resolved snapshot instead of re-merging live config
+CognitiveServiceError: 认知模块暂不可用，尚未准入的任务请在重新开启后继续
+ ❯ BAD_REQUEST src/modules/cognitive/cognitive.errors.ts:17:45
+     15| export const NOT_FOUND = (msg: string) => new CognitiveServiceError(ms…
+     16| export const FORBIDDEN = (msg: string) => new CognitiveServiceError(ms…
+     17| export const BAD_REQUEST = (msg: string) => new CognitiveServiceError(…
+       |                                             ^
+     18| export const CONFLICT = (msg: string) => new CognitiveServiceError(msg…
+     19| export const SERVER_ERROR = (msg: string) => new CognitiveServiceError…
+ ❯ assertCognitiveNewAdmissionEnabled src/modules/cognitive/product-eligibility.ts:7:48
+ ❯ assertCognitiveProductEligible src/modules/cognitive/product-eligibility.ts:15:3
+ ❯ loadStartableAssignment src/modules/cognitive/session.service.ts:221:3
+ ❯ Module.createSession src/modules/cognitive/session.service.ts:353:15
+ ❯ src/__tests__/cognitive/session.service.test.ts:262:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
+
+ FAIL  src/__tests__/cognitive/session.service.test.ts > createSession data > returns the existing IN_PROGRESS session without creating a new one
+CognitiveServiceError: 认知模块暂不可用，尚未准入的任务请在重新开启后继续
+ ❯ BAD_REQUEST src/modules/cognitive/cognitive.errors.ts:17:45
+     15| export const NOT_FOUND = (msg: string) => new CognitiveServiceError(ms…
+     16| export const FORBIDDEN = (msg: string) => new CognitiveServiceError(ms…
+     17| export const BAD_REQUEST = (msg: string) => new CognitiveServiceError(…
+       |                                             ^
+     18| export const CONFLICT = (msg: string) => new CognitiveServiceError(msg…
+     19| export const SERVER_ERROR = (msg: string) => new CognitiveServiceError…
+ ❯ assertCognitiveNewAdmissionEnabled src/modules/cognitive/product-eligibility.ts:7:48
+ ❯ toRunnerPayload src/modules/cognitive/session.service.ts:293:127
+ ❯ Module.createSession src/modules/cognitive/session.service.ts:349:12
+ ❯ src/__tests__/cognitive/session.service.test.ts:276:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
+
+ FAIL  src/__tests__/cognitive/session.service.test.ts > createSession data > rejects when maxAttempts reached
+AssertionError: expected CognitiveServiceError: 认知模块暂不可用，尚未准入的任务请在… { statusCode: … } to match object { statusCode: 409 }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "statusCode": 409,
++ CognitiveServiceError {
++   "statusCode": 400,
+  }
+
+ ❯ src/__tests__/cognitive/session.service.test.ts:284:53
+    282|     mockPrisma.cognitiveSession.findFirst.mockResolvedValue(null)
+    283|     mockPrisma.cognitiveSession.count.mockResolvedValue(2) // maxAttem…
+    284|     await expect(createSession('student-1', 'asg-1')).rejects.toMatchO…
+       |                                                     ^
+    285|   })
+    286|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/9]⎯
+
+ FAIL  src/__tests__/cognitive/session.service.test.ts > createSession data > advances attemptNo after completed/abandoned sessions
+CognitiveServiceError: 认知模块暂不可用，尚未准入的任务请在重新开启后继续
+ ❯ BAD_REQUEST src/modules/cognitive/cognitive.errors.ts:17:45
+     15| export const NOT_FOUND = (msg: string) => new CognitiveServiceError(ms…
+     16| export const FORBIDDEN = (msg: string) => new CognitiveServiceError(ms…
+     17| export const BAD_REQUEST = (msg: string) => new CognitiveServiceError(…
+       |                                             ^
+     18| export const CONFLICT = (msg: string) => new CognitiveServiceError(msg…
+     19| export const SERVER_ERROR = (msg: string) => new CognitiveServiceError…
+ ❯ assertCognitiveNewAdmissionEnabled src/modules/cognitive/product-eligibility.ts:7:48
+ ❯ assertCognitiveProductEligible src/modules/cognitive/product-eligibility.ts:15:3
+ ❯ loadStartableAssignment src/modules/cognitive/session.service.ts:221:3
+ ❯ Module.createSession src/modules/cognitive/session.service.ts:353:15
+ ❯ src/__tests__/cognitive/session.service.test.ts:297:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/9]⎯
+
+ FAIL  src/__tests__/cognitive/session.service.test.ts > createSession data > D6.1: resumes an existing IN_PROGRESS session without re-checking eligibility (past-due assignment)
+CognitiveServiceError: Assignment is past due
+ ❯ BAD_REQUEST src/modules/cognitive/cognitive.errors.ts:17:45
+     15| export const NOT_FOUND = (msg: string) => new CognitiveServiceError(ms…
+     16| export const FORBIDDEN = (msg: string) => new CognitiveServiceError(ms…
+     17| export const BAD_REQUEST = (msg: string) => new CognitiveServiceError(…
+       |                                             ^
+     18| export const CONFLICT = (msg: string) => new CognitiveServiceError(msg…
+     19| export const SERVER_ERROR = (msg: string) => new CognitiveServiceError…
+ ❯ loadStartableAssignment src/modules/cognitive/session.service.ts:216:11
+ ❯ Module.createSession src/modules/cognitive/session.service.ts:353:15
+ ❯ src/__tests__/cognitive/session.service.test.ts:308:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/9]⎯
+
+ FAIL  src/__tests__/cognitive/session.service.test.ts > getSession > returns run info with decrypted config and randomSeed, no score/metrics for IN_PROGRESS
+CognitiveServiceError: 认知模块暂不可用，尚未准入的任务请在重新开启后继续
+ ❯ BAD_REQUEST src/modules/cognitive/cognitive.errors.ts:17:45
+     15| export const NOT_FOUND = (msg: string) => new CognitiveServiceError(ms…
+     16| export const FORBIDDEN = (msg: string) => new CognitiveServiceError(ms…
+     17| export const BAD_REQUEST = (msg: string) => new CognitiveServiceError(…
+       |                                             ^
+     18| export const CONFLICT = (msg: string) => new CognitiveServiceError(msg…
+     19| export const SERVER_ERROR = (msg: string) => new CognitiveServiceError…
+ ❯ assertCognitiveNewAdmissionEnabled src/modules/cognitive/product-eligibility.ts:7:48
+ ❯ toRunnerPayload src/modules/cognitive/session.service.ts:293:127
+ ❯ Module.getSession src/modules/cognitive/session.service.ts:509:10
+ ❯ src/__tests__/cognitive/session.service.test.ts:326:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/9]⎯
+
+ FAIL  src/__tests__/cognitive/session.service.test.ts > restartSession > locks the session row, abandons the old session and creates attemptNo+1
+CognitiveServiceError: 认知模块暂不可用，尚未准入的任务请在重新开启后继续
+ ❯ BAD_REQUEST src/modules/cognitive/cognitive.errors.ts:17:45
+     15| export const NOT_FOUND = (msg: string) => new CognitiveServiceError(ms…
+     16| export const FORBIDDEN = (msg: string) => new CognitiveServiceError(ms…
+     17| export const BAD_REQUEST = (msg: string) => new CognitiveServiceError(…
+       |                                             ^
+     18| export const CONFLICT = (msg: string) => new CognitiveServiceError(msg…
+     19| export const SERVER_ERROR = (msg: string) => new CognitiveServiceError…
+ ❯ assertCognitiveNewAdmissionEnabled src/modules/cognitive/product-eligibility.ts:7:48
+ ❯ assertCognitiveProductEligible src/modules/cognitive/product-eligibility.ts:15:3
+ ❯ loadStartableAssignment src/modules/cognitive/session.service.ts:221:3
+ ❯ Module.restartSession src/modules/cognitive/session.service.ts:610:15
+ ❯ src/__tests__/cognitive/session.service.test.ts:345:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/9]⎯
+
+ FAIL  src/__tests__/cognitive/session.service.test.ts > restartSession > rejects restart when maxAttempts reached
+AssertionError: expected CognitiveServiceError: 认知模块暂不可用，尚未准入的任务请在… { statusCode: … } to match object { statusCode: 409 }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "statusCode": 409,
++ CognitiveServiceError {
++   "statusCode": 400,
+  }
+
+ ❯ src/__tests__/cognitive/session.service.test.ts:383:58
+    381|     mockPrisma.cognitiveSession.findUnique.mockResolvedValue(sessionRo…
+    382|     mockPrisma.cognitiveSession.count.mockResolvedValue(2)
+    383|     await expect(restartSession('student-1', 'session-1')).rejects.toM…
+       |                                                          ^
+    384|   })
+    385|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/9]⎯
+
+
+ Test Files  1 failed | 12 passed (13)
+      Tests  9 failed | 116 passed (125)
+   Start at  20:43:28
+   Duration  3.64s (transform 12.48s, setup 0ms, import 20.89s, tests 586ms, environment 1ms)
+

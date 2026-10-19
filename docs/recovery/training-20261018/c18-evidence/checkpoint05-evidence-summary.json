@@ -1,0 +1,8 @@
+{
+  "archive": "checkpoint05-evidence.tar.gz",
+  "sha256": "29b3a97d151d7684243cc3f39a283dbc5d7a5a2c8735f3aabde6fdd036ce2957",
+  "bytes": 28520,
+  "manifestSha256": "76dd920a0126842e7d6fd4a2b075a8613c9cd73418bf578a38bafb87673a1448",
+  "members": 16,
+  "memberHashAndSizeVerificationPassed": true
+}

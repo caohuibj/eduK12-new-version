@@ -64,6 +64,8 @@ export async function addWave(userId:string,role:UserRole,studyId:string, input:
   return prisma.$transaction(tx=>insertWave(tx,userId,studyId,input,randomUUID(),token.token))
 }
 async function insertWave(tx:Db,userId:string,studyId:string,input:{compositeId:string;tokenId:string;title:string},id:string,token:string) {
+    await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${input.compositeId} FOR UPDATE`
+    await assertWaveCompatibleDefinition(tx,input.compositeId)
     await tx.$queryRaw`SELECT id FROM anonymous_studies WHERE id=${studyId} FOR UPDATE`
     const study=await currentOwner(tx,userId,studyId)
     if(study.status!=='ACTIVE') throw compositeForbidden('研究已结束')
@@ -81,6 +83,15 @@ async function insertWave(tx:Db,userId:string,studyId:string,input:{compositeId:
     await tx.$executeRaw`INSERT INTO anonymous_study_waves(id,study_id,access_token_id,title,ordinal) VALUES(${id},${studyId},${input.tokenId},${input.title},${ordinal})`
     return {id,studyId,title:input.title,ordinal,tokenId:input.tokenId,entryPath:`/public/studies/waves/${id}/${encodeURIComponent(token)}`}
 }
+async function assertWaveCompatibleDefinition(tx:Db,id:string) {
+  const definition=await tx.compositeAssessment.findUnique({where:{id},select:{
+    trainingVariantDraft:true,trainingVariantFrozen:true,trainingVariantDigest:true,
+    trainingFlowDraft:true,trainingFlowFrozen:true,trainingFlowDigest:true,
+  }})
+  if(!definition) return hidden()
+  if(definition.trainingVariantDraft!=null||definition.trainingVariantFrozen!=null||definition.trainingVariantDigest!=null)throw compositeBadRequest('概率分卷暂不能与匿名研究波次组合')
+  if(definition.trainingFlowDraft!=null||definition.trainingFlowFrozen!=null||definition.trainingFlowDigest!=null)throw compositeBadRequest('跨工具流程暂不能与匿名研究波次组合')
+}
 /** One durable request creates both objects or neither. A lost response can
  * replay the same UUID without consuming another link or wave ordinal. */
 export async function createWaveWithLink(userId:string,role:UserRole,studyId:string,input:{requestId:string;compositeId:string;title:string;expiresAt:string;maxUses:number}) {
@@ -88,9 +99,12 @@ export async function createWaveWithLink(userId:string,role:UserRole,studyId:str
   if(!Number.isFinite(parsedExpiry.getTime())) throw compositeBadRequest('请选择有效的波次有效期')
   const expiresAt=parsedExpiry.toISOString()
   return prisma.$transaction(async tx=>{
+    // Match addWave and authoring: parent definition precedes study/token locks.
+    await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${input.compositeId} FOR UPDATE`
     await tx.$queryRaw`SELECT id FROM anonymous_studies WHERE id=${studyId} FOR UPDATE`
     const study=await currentOwner(tx,userId,studyId)
     if(study.status!=='ACTIVE') throw compositeForbidden('研究已结束')
+    await assertWaveCompatibleDefinition(tx,input.compositeId)
     const previous=await tx.$queryRaw<Array<{studyId:string;compositeId:string;title:string;ordinal:number;tokenId:string;token:string|null;tokenEncrypted:string|null;expiresAt:Date;maxUses:number}>>`
       SELECT w.study_id AS "studyId",t.composite_assessment_id AS "compositeId",w.title,w.ordinal,t.id AS "tokenId",t.token,t.token_encrypted AS "tokenEncrypted",t.expires_at AS "expiresAt",t.max_uses AS "maxUses"
       FROM anonymous_study_waves w JOIN composite_assessment_access_tokens t ON t.id=w.access_token_id WHERE w.id=${input.requestId}
@@ -102,7 +116,6 @@ export async function createWaveWithLink(userId:string,role:UserRole,studyId:str
       if(!token) return hidden()
       return {id:input.requestId,studyId,title:row.title,ordinal:row.ordinal,tokenId:row.tokenId,entryPath:`/public/studies/waves/${input.requestId}/${encodeURIComponent(token)}`}
     }
-    await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${input.compositeId} FOR UPDATE`
     const token=await composite.createAccessTokenForComposite(userId,role,input.compositeId,expiresAt,input.maxUses,tx)
     await composite.getPublicCompositeInfo(token.token,tx)
     return insertWave(tx,userId,studyId,{compositeId:input.compositeId,tokenId:token.id,title:input.title},input.requestId,token.token)
@@ -232,20 +245,24 @@ export async function revokeStudyIdentity(studyId:string,credential:string) {
 }
 export async function waveStatistics(userId:string,studyId:string) {
   await currentOwner(prisma,userId,studyId)
-  const list=await prisma.$queryRaw<Array<{id:string;title:string;ordinal:number;tokenId:string;participants:number;completedParticipants:number;attempts:number;completedAttempts:number;abandonedAttempts:number}>>`
+  const list=await prisma.$queryRaw<Array<{id:string;title:string;ordinal:number;tokenId:string;participants:number;completedParticipants:number;attempts:number;completedAttempts:number;abandonedAttempts:number;researchEligibleParticipants:number;researchWithdrawnParticipants:number;researchUnknownParticipants:number}>>`
     SELECT w.id,w.title,w.ordinal,w.access_token_id AS "tokenId",count(DISTINCT COALESCE(sa.participant_id,a.participant_key))::int AS participants,
       count(DISTINCT COALESCE(sa.participant_id,a.participant_key)) FILTER(WHERE a.status='COMPLETED')::int AS "completedParticipants",
       count(a.id)::int AS attempts,count(a.id) FILTER(WHERE a.status='COMPLETED')::int AS "completedAttempts",
-      count(a.id) FILTER(WHERE a.status='ABANDONED')::int AS "abandonedAttempts"
+      count(a.id) FILTER(WHERE a.status='ABANDONED')::int AS "abandonedAttempts",
+      count(DISTINCT sa.participant_id) FILTER(WHERE r.status='CONSENTED' AND r.acceptance_id IS NOT NULL)::int AS "researchEligibleParticipants",
+      count(DISTINCT sa.participant_id) FILTER(WHERE r.status IN ('WITHDRAWAL_PENDING','EXCLUDED'))::int AS "researchWithdrawnParticipants",
+      count(DISTINCT COALESCE(sa.participant_id,a.participant_key)) FILTER(WHERE r.status IS NULL)::int AS "researchUnknownParticipants"
     FROM anonymous_study_waves w JOIN anonymous_studies s ON s.id=w.study_id
     JOIN composite_assessment_access_tokens t ON t.id=w.access_token_id JOIN composite_assessments c ON c.id=t.composite_assessment_id
     LEFT JOIN composite_assessment_attempts a ON a.access_token_id=w.access_token_id AND a.user_id IS NULL AND a.assignment_ref IS NULL
     LEFT JOIN anonymous_study_attempts sa ON sa.attempt_id=a.id AND sa.wave_id=w.id AND sa.study_id=w.study_id
+    LEFT JOIN anonymous_study_research_states r ON r.participant_id=sa.participant_id AND r.study_id=w.study_id
     WHERE w.study_id=${studyId} AND t.created_by=${userId} AND c.created_by=${userId}
     GROUP BY w.id,w.title,w.ordinal,w.access_token_id ORDER BY w.ordinal LIMIT 100
   `
   await currentOwner(prisma,userId,studyId)
-  return {list,countMeaning:'人数按研究内身份去重；单次访客仅按本次随机身份计数，不能识别同一人换设备或重复参与。CSV 仅含该波次已完成作答。'}
+  return {list,countMeaning:'人数按研究内身份去重；单次访客仅按本次随机身份计数，不能识别同一人换设备或重复参与。CSV 是该波次已完成教育记录，不是研究样本。研究同意人数仅表示具有固定范围同意；具体指标仍按已同意的数据类型筛选，退出或未知同意不纳入研究分析。'}
 }
 export async function exportWaveCsv(userId:string,role:UserRole,studyId:string,waveId:string) {
   await currentOwner(prisma,userId,studyId)

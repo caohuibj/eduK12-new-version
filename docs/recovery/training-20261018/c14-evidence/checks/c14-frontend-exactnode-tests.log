@@ -1,0 +1,14 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> frontend@0.0.0 test
+> vitest run --maxWorkers=2 --run src/pages/questionnaire/__tests__/TrainingVariantAuthoring.test.tsx src/pages/questionnaire/__tests__/trainingVariants.test.ts src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx
+
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/frontend
+
+
+ Test Files  3 passed (3)
+      Tests  57 passed (57)
+   Start at  20:42:30
+   Duration  3.27s (transform 534ms, setup 274ms, import 804ms, tests 3.75s, environment 852ms)
+

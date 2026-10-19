@@ -1,0 +1,7 @@
+{"resultPath": "/workspace/scratch/5a77e8bdc1ae/eduk12_c07_http_02/c07-runtime-result.json", "passed": false, "cleanupVerified": true}
+Traceback (most recent call last):
+  File "/workspace/scratch/5a77e8bdc1ae/eduk12_c07_export_worktree/server-version/scripts/recovery/c07-export-http.py", line 31, in <module>
+    subprocess.run([str(node),str(script),str(state)],cwd=backend,env={**env,**runtime},stdout=log,stderr=log,check=True,timeout=360)
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['/workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/node_modules/node/bin/node', '/workspace/scratch/5a77e8bdc1ae/eduk12_c07_export_worktree/server-version/scripts/recovery/c07-export-smoke.mjs', '/workspace/scratch/5a77e8bdc1ae/eduk12_c07_http_02']' returned non-zero exit status 1.

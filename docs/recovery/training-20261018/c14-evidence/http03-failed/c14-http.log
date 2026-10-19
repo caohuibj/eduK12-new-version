@@ -1,0 +1,38 @@
+PASS Real restricted runtime; independent owner-authored SJT releases/images and exact grants; group-exclusive four-tool synthetic resources
+PASS Owner revisioned config validation and immutable publication; one parent union, no per-group composite products
+PASS Candidate a Scale deployment DENY prevents every group draw for member/public
+PASS Candidate a decryptable invalid resolved Cognitive config prevents every group draw for member/public
+PASS Candidate b Scale deployment DENY prevents every group draw for member/public
+PASS Candidate b decryptable invalid resolved Cognitive config prevents every group draw for member/public
+PASS /composite-assessments FORM_SECTION: first durable FINAL ACK prevents restart before replay/state/report
+PASS /composite-assessments SCALE: first durable FINAL ACK prevents restart before replay/state/report
+PASS /composite-assessments COGNITIVE: first durable FINAL ACK prevents restart before replay/state/report
+PASS /composite-assessments SITUATIONAL: first durable FINAL ACK prevents restart before replay/state/report
+AssertionError [ERR_ASSERTION]: active unit required
+    at finish (file:///workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/scripts/recovery/c14-variants-smoke.mjs:101:137)
+    at async candidateFailureChecks (file:///workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/scripts/recovery/c14-variants-smoke.mjs:145:120)
+    at async file:///workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/scripts/recovery/c14-variants-smoke.mjs:237:2 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: null,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: active unit required
+    at finish (file:///workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/scripts/recovery/c14-variants-smoke.mjs:101:137)
+    at async candidateFailureChecks (file:///workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/scripts/recovery/c14-variants-smoke.mjs:145:120)
+    at async file:///workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/scripts/recovery/c14-variants-smoke.mjs:237:2 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: null,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+
+Node.js v24.21.0

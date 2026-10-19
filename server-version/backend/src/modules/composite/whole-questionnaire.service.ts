@@ -1,3 +1,5 @@
+import { applyTrainingAttemptScope, hasTrainingVariantMetadata } from './training-variant-scope'
+import {readTrainingTimingSnapshot,normalizeTrainingScaleTiming,type TrainingTimingSnapshot} from '../assessment-runtime/training-scale-timing'
 import { withSharedControlContext, storeSharedWholeValidation, loadSharedWholeValidation } from '../assessment-runtime/shared-control-records'
 import { compactAssessmentStorageEnabled } from '../assessment-runtime/compact-field-codec'
 import { packWholeRawEnvelope, unpackWholeRawEnvelope } from '../assessment-runtime/compact-raw'
@@ -44,21 +46,24 @@ export type WholeQuestionnaireReportContext = {
 
 const wholeParentSelect = {
   ...REPORT_PARENT_SELECT, userId: true, recoveryTokenHash: true,
+  trainingTimingSnapshot: true, participantKey: true, trainingVariantAllocationEncrypted: true, trainingFlowSnapshotEncrypted:true,trainingFlowSnapshotHash:true,trainingFlowPathEncrypted:true,trainingFlowPathHash:true,trainingVariantAllocationHash:true,
   contextSnapshotEncrypted: true, frozenActiveSlotSetEncrypted: true,
-  compositeAssessment: { select: { productKind: true, reportPackageKey: true, analysisProtocolKey: true,
-    items: { select: { id: true, position: true } },
-    formSections: { select: { contextSection: true, items: { select: { contextKey: true } } } } } },
+  compositeAssessment: { select: { id: true, productKind: true, reportPackageKey: true, analysisProtocolKey: true,
+    publishedAt: true, trainingVariantDraft: true, trainingVariantFrozen: true, trainingFlowDraft:true,trainingFlowFrozen:true,trainingFlowDigest:true,trainingVariantDigest:true,
+    items: true, formSections: { include: {items: true} } } },
   scaleAssessments: { select: { ...UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
     scale: { select: { ...UNIFIED_SCALE_CHILD_ADMISSION_SELECT.scale.select, instruction: true } } } },
 } as const
 // Worker-only superset: a single read supplies frozen admission, aggregate
-// metadata and collection rendering. Participant delivery keeps its old select.
+// metadata and collection rendering. Both paths include frozen variant binding.
 const wholeReportParentSelect = {
   ...wholeParentSelect, anonymousCode: true, totalTime: true, startedAt: true,
+  formSectionAttempts: {select:{sectionId:true,attemptEpoch:true,status:true,taskSatisfaction:true}},
   completedItems: true, compiledBundleRuntimeHash: true,
   formAnswers: { select: { itemId: true, value: true } },
   compositeAssessment: { select: {
     id: true, name: true, productKind: true, reportPackageKey: true, analysisProtocolKey: true,
+    publishedAt: true, trainingVariantDraft: true, trainingVariantFrozen: true, trainingFlowDraft:true,trainingFlowFrozen:true,trainingFlowDigest:true,trainingVariantDigest:true,
     reportPackageVersion: true, reportPackageProfile: true, reportPackageSnapshotEncrypted: true,
     items: { orderBy: { position: 'asc' }, include: {
       scale: { select: { id: true, code: true, name: true, instrumentVersion: true, instrumentClass: true } },
@@ -66,7 +71,7 @@ const wholeReportParentSelect = {
     formSections: { orderBy: { position: 'asc' }, select: {
       id: true, title: true, description: true, position: true, contextSection: true,
       items: { orderBy: [{ formSectionPosition: 'asc' }, { position: 'asc' }], select: {
-        id: true, formType: true, formLabel: true, formPlaceholder: true, formOptions: true,
+        id: true, formType: true, formLabel: true, formPlaceholder: true, formOptions: true, formDefinition: true, formPolicy: true,
         contextKey: true, required: true, position: true, formSectionPosition: true,
       } },
     } },
@@ -74,13 +79,25 @@ const wholeReportParentSelect = {
 } satisfies Prisma.CompositeAssessmentAttemptSelect
 type WholeReportParent = Prisma.CompositeAssessmentAttemptGetPayload<{ select: typeof wholeReportParentSelect }>
 
+/** Keep the verified full publication in the internal committed carrier. Each
+ * later shallow copy can then revalidate allocation/union identity rather than
+ * treating an in-memory scope field as authority. Participant DTOs still use
+ * loadParent's selected projection. */
+export const copyWholeCommittedReportParent = (parent: WholeReportParent,
+  scaleAssessments: NonNullable<Awaited<ReturnType<typeof submitUnifiedScaleCollectionBatch>>>) => ({
+  ...parent, scaleAssessments, cognitiveSessions: [] as [], situationalAttempts: [] as [],
+})
+
 const failure = (message: string, status = 409) => new InstrumentFinalSubmitError('STALE_ATTEMPT', message, status)
 const loadParent = async (attemptId: string, principal: Principal, preloaded?: WholeReportParent) => {
-  const parent = preloaded ?? await prisma.compositeAssessmentAttempt.findUnique({ where: { id: attemptId }, select: wholeParentSelect })
-  if (!parent) throw failure('问卷作答不存在', 404)
+  const loaded = preloaded ?? await prisma.compositeAssessmentAttempt.findUnique({ where: { id: attemptId }, select: wholeParentSelect })
+  if (!loaded) throw failure('问卷作答不存在', 404)
+  let parent = loaded
   const owned = principal.userId ? parent.userId === principal.userId
     : parent.userId === null && Boolean(principal.recoveryTokenHash && parent.recoveryTokenHash === principal.recoveryTokenHash)
   if (!owned) throw failure('无权限操作此问卷', 403)
+  if(parent.trainingFlowSnapshotHash!=null||parent.compositeAssessment.trainingFlowFrozen!=null)throw failure('条件流程必须按当前工具逐项提交')
+  parent = await applyTrainingAttemptScope(parent) as typeof loaded
   if (parent.asyncReportEpoch !== parent.attemptEpoch && !acceptsAsyncCompositeReport(parent)) throw failure('此问卷尚未启用整份交卷')
   if (!parent.frozenActiveSlotSetEncrypted || !parent.frozenActiveSlotSetHash) throw failure('问卷冻结内容缺失')
   const frozen = await loadFrozenActiveSlotSet(parent.frozenActiveSlotSetEncrypted)
@@ -131,11 +148,12 @@ const rulesFor = (unit: WholeValidationManifest['units'][number]): WholeRules =>
   if (!plan || plan.definitionHash !== unit.definitionHash) throw failure('冻结的整卷校验规则不可用')
   return plan
 }
-const ensureWholeRules = async (attemptId: string, principal: Principal, manifest: WholeValidationManifest) => {
+const ensureWholeRules = async (attemptId: string, principal: Principal, manifest: WholeValidationManifest,
+  verifiedParent?: Awaited<ReturnType<typeof loadParent>>) => {
   if (manifest.schemaVersion !== 2 || manifest.units.every(unit => Boolean(unit.items || (unit.rulesHash && wholeRules.has(unit.rulesHash))))) return
   // Redis/local-cache loss is harmless: reconstruct once from the persisted,
   // frozen admissions and validate every rule hash. Never require resubmission.
-  const { parent, children } = await loadParent(attemptId, principal)
+  const { parent, children } = verifiedParent ?? await loadParent(attemptId, principal)
   assertReportJobIdentity(parent, manifest.binding)
   for (const unit of manifest.units) {
     if (unit.items) continue
@@ -168,10 +186,12 @@ export const getWholeQuestionnaireDefinition = async (attemptId: string, princip
     const compiled = manifest.schemaVersion === 2 ? compileWholeRules(runtime.legacyDefinitionHash, ruleItems) : null
     const rule = compiled && wholeRules.has(compiled.hash) ? { rulesHash: compiled.hash } : { items: ruleItems }
     manifest.units.push({ itemId: child.compositeItemId!, assessmentId: child.id, definitionHash: runtime.legacyDefinitionHash,
+      ...(admission.trainingTiming ? {trainingTiming:admission.trainingTiming} : {}),
       admissionHash: admission.snapshotHash, deadlineMs: admission.schemaVersion === 2 && admission.scalePolicy?.deployment?.completionDeadline
         ? Date.parse(admission.scalePolicy.deployment.completionDeadline) : null,
       ...rule })
     units.push({ itemId: child.compositeItemId!, scaleAssessmentId: child.id, definitionHash: runtime.legacyDefinitionHash,
+      ...(admission.trainingTiming ? {trainingTiming:admission.trainingTiming} : {}),
       scale: { id: child.scale.id, name: child.scale.name, instruction: child.scale.instruction, instrumentVersion: child.scale.instrumentVersion,
         definition: runnerDefinition(runtime.definition) } })
   }
@@ -182,7 +202,8 @@ export const getWholeQuestionnaireDefinition = async (attemptId: string, princip
     contextSnapshotHash: parent.contextSnapshotHash, units }
 })
 
-const logicalPayload = (attemptId: string, input: WholeQuestionnaireSubmitInput) => ({
+const logicalPayload = (attemptId: string, input: WholeQuestionnaireSubmitInput, timingSnapshotHash?:string) => ({
+  ...(timingSnapshotHash ? {trainingTimingSnapshotHash:timingSnapshotHash} : {}),
   attemptId, attemptEpoch: input.attemptEpoch, slotSetHash: input.slotSetHash, contextSnapshotHash: input.contextSnapshotHash,
   units: [...input.units].sort((a, b) => a.itemId.localeCompare(b.itemId)).map(unit => ({ ...unit,
     answers: [...unit.answers].sort((a, b) => a.itemCode.localeCompare(b.itemCode)) })),
@@ -196,12 +217,16 @@ const receiptResponse = (attemptId: string, submissionId: string, payloadHash: s
 
 type WholeSubmissionHeader = Prisma.CompositeAssessmentAttemptGetPayload<{
   select: typeof REPORT_PARENT_SELECT & { userId: true; recoveryTokenHash: true };
-}> & { consentId: string | null }
+}> & { consentId: string | null;trainingTimingSnapshot:unknown;
+  trainingVariantAllocationEncrypted: string | null; trainingVariantAllocationHash: string | null;
+  compositeAssessment: { trainingVariantDraft: unknown; trainingVariantFrozen: unknown; trainingVariantDigest: string | null } }
 /** One fresh read of ownership, product eligibility and the current receipt. */
 const loadWholeSubmissionContext = async (attemptId: string) => {
   const rows = await prisma.$queryRaw<Array<Omit<WholeSubmissionHeader, 'compositeAssessment'> & {
     productKind: WholeSubmissionHeader['compositeAssessment']['productKind'];
     reportPackageKey: string | null; analysisProtocolKey: string | null;
+    trainingFlowDraft: Prisma.JsonValue;trainingFlowFrozen:Prisma.JsonValue;trainingFlowDigest:string|null;
+    trainingVariantDraft: unknown; trainingVariantFrozen: unknown; trainingVariantDigest: string | null;
     jobId: string | null; jobStatus: string | null; leaseToken: string | null;
     wholeSubmissionId: string | null; wholePayloadHash: string | null; wholeAcceptedAt: Date | null;
     wholeValidationEncrypted: string | null; wholeValidationHash: string | null;
@@ -219,10 +244,19 @@ const loadWholeSubmissionContext = async (attemptId: string) => {
       parent."aggregate_input_hash" AS "aggregateInputHash",
       parent."assignment_ref" AS "assignmentRef", parent."consent_id" AS "consentId",
       parent."delivery_course_id" AS "deliveryCourseId",
+      parent."training_timing_snapshot" AS "trainingTimingSnapshot",
+      parent."training_flow_snapshot_encrypted" AS "trainingFlowSnapshotEncrypted", parent."training_flow_snapshot_hash" AS "trainingFlowSnapshotHash",
+      parent."training_flow_path_encrypted" AS "trainingFlowPathEncrypted", parent."training_flow_path_hash" AS "trainingFlowPathHash",
+      parent."training_variant_allocation_encrypted" AS "trainingVariantAllocationEncrypted",
+      parent."training_variant_allocation_hash" AS "trainingVariantAllocationHash",
       parent."user_id" AS "userId",
       parent."recovery_token_hash" AS "recoveryTokenHash",
       product."product_kind" AS "productKind", product."report_package_key" AS "reportPackageKey",
       product."analysis_protocol_key" AS "analysisProtocolKey",
+      product."training_variant_draft" AS "trainingVariantDraft",
+      product."training_variant_frozen" AS "trainingVariantFrozen",
+      product."training_variant_digest" AS "trainingVariantDigest",
+      product."training_flow_draft" AS "trainingFlowDraft", product."training_flow_frozen" AS "trainingFlowFrozen", product."training_flow_digest" AS "trainingFlowDigest",
       job."id" AS "jobId", job."status" AS "jobStatus", job."lease_token" AS "leaseToken",
       job."whole_submission_id" AS "wholeSubmissionId", job."whole_payload_hash" AS "wholePayloadHash",
       job."whole_accepted_at" AS "wholeAcceptedAt",
@@ -236,6 +270,8 @@ const loadWholeSubmissionContext = async (attemptId: string) => {
   if (!row) return null
   const parent: WholeSubmissionHeader = { ...row, compositeAssessment: {
     productKind: row.productKind, reportPackageKey: row.reportPackageKey, analysisProtocolKey: row.analysisProtocolKey,
+    trainingFlowDraft:row.trainingFlowDraft,trainingFlowFrozen:row.trainingFlowFrozen,trainingFlowDigest:row.trainingFlowDigest,
+    trainingVariantDraft: row.trainingVariantDraft, trainingVariantFrozen: row.trainingVariantFrozen, trainingVariantDigest: row.trainingVariantDigest,
   } }
   const prior: WholeQuestionnaireReceipt | null = row.jobId ? {
     id: row.jobId, status: row.jobStatus!, leaseToken: row.leaseToken, wholeSubmissionId: row.wholeSubmissionId,
@@ -265,7 +301,20 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
   }
   if (input.attemptEpoch !== parent.attemptEpoch || input.slotSetHash !== parent.frozenActiveSlotSetHash
     || input.contextSnapshotHash !== parent.contextSnapshotHash) throw failure('交卷版本与当前问卷不匹配')
-  const canonical = traceAssessmentPhaseSync('whole.payload_hash', () => prepareCanonicalSubmission(logicalPayload(attemptId, input)))
+  // A cached validation manifest is scientific data, never allocation authority.
+  // Check all partial markers before receipt replay or registration; ordinary
+  // questionnaires retain their single-header fast path.
+  const verifiedParent = hasTrainingVariantMetadata(parent)
+    ? await traceAssessmentPhase('whole.variant_scope', () => loadParent(attemptId, principal)) : undefined
+  if (verifiedParent) {
+    if (!hasTrainingVariantMetadata(verifiedParent.parent)) throw failure('概率分卷冻结来源已改变')
+    assertReportJobIdentity(verifiedParent.parent, { attemptEpoch: parent.attemptEpoch,
+      slotSetHash: parent.frozenActiveSlotSetHash!, contextHash: parent.contextSnapshotHash })
+  }
+  const timingSnapshot=readTrainingTimingSnapshot(parent.trainingTimingSnapshot)
+  if(timingSnapshot&&timingSnapshot.attemptEpoch!==parent.attemptEpoch)throw failure('计时冻结版本不匹配')
+  const timingSnapshotHash=timingSnapshot?.snapshotHash
+  const canonical = traceAssessmentPhaseSync('whole.payload_hash', () => prepareCanonicalSubmission(logicalPayload(attemptId, input,timingSnapshotHash)))
   assertCanonicalSubmissionPayloadSize(canonical, 1536 * 1024, '整份问卷')
   const prior = context!.prior
   if (prior?.wholeSubmissionId) {
@@ -284,11 +333,12 @@ export const submitWholeQuestionnaire = async (attemptId: string, input: WholeQu
     || manifest.binding.attemptId !== parent.id || manifest.binding.attemptEpoch !== parent.attemptEpoch
     || manifest.binding.slotSetHash !== parent.frozenActiveSlotSetHash || manifest.binding.contextHash !== parent.contextSnapshotHash
     || manifest.binding.userId !== parent.userId || manifest.binding.recoveryTokenHash !== parent.recoveryTokenHash) throw failure('问卷交付校验与当前作答绑定不匹配')
-  await traceAssessmentPhase('whole.validation_rules_resolve', () => ensureWholeRules(attemptId, principal, manifest))
+  if(manifest.units.some(unit=>unit.trainingTiming?.snapshotHash!==timingSnapshotHash))throw failure('计时策略与整卷准入不匹配')
+  await traceAssessmentPhase('whole.validation_rules_resolve', () => ensureWholeRules(attemptId, principal, manifest, verifiedParent))
   const prepared = traceAssessmentPhaseSync('whole.integrity_check', () => prepareFromWholeManifest(input, manifest, principal, receivedAtMs))
   const encrypted = traceAssessmentPhaseSync('whole.envelope_encrypt', () => encryptWholeRawPayload({ schemaVersion: 1, binding: { attemptId, attemptEpoch: input.attemptEpoch,
     slotSetHash: input.slotSetHash, contextHash: input.contextSnapshotHash }, payloadHash: canonical.hash,
-    units: prepared }))
+    ...(timingSnapshotHash?{timingSnapshotHash}:{}),units: prepared }))
   const receipt = await registerWholeQuestionnaireReceipt(parent, {
     submissionId: input.submissionId, payloadHash: canonical.hash, answersEncrypted: encrypted, acceptedAt: new Date(receivedAtMs),
     requiredFormSlots: manifest.requiredFormSlots, validationHash: prior.wholeValidationHash,
@@ -307,20 +357,22 @@ export const processWholeQuestionnaireAnswers = async (job: CompositeReportJob,
   if (!job.leaseToken || receipt.status !== 'PROCESSING' || !receipt.wholeAnswersEncrypted || !receipt.wholeAcceptedAt) throw failure('整份交卷处理租约已改变')
   const execution: WholeReceiptExecution = { submissionId: receipt.wholeSubmissionId, leaseToken: job.leaseToken, acceptedAtMs: receipt.wholeAcceptedAt.getTime() }
   const envelope = unpackWholeRawEnvelope(decryptUnifiedRuntimePayload<{ schemaVersion: number; binding: { attemptId: string; attemptEpoch: number; slotSetHash: string; contextHash: string | null };
-    payloadHash: string; units: Array<Parameters<typeof submitUnifiedScaleAssessmentFinal>[0] & { itemId: string }> }>(receipt.wholeAnswersEncrypted))
+    timingSnapshotHash?:string; payloadHash: string; units: Array<Parameters<typeof submitUnifiedScaleAssessmentFinal>[0] & { itemId: string }> }>(receipt.wholeAnswersEncrypted))
   if (envelope.schemaVersion !== 1 || envelope.binding.attemptId !== job.attemptId || envelope.binding.attemptEpoch !== job.attemptEpoch
     || envelope.binding.slotSetHash !== job.slotSetHash || envelope.binding.contextHash !== job.contextHash
     || envelope.payloadHash !== receipt.wholePayloadHash || prepareCanonicalSubmission(logicalPayload(job.attemptId, { submissionId: receipt.wholeSubmissionId,
       attemptEpoch: job.attemptEpoch, slotSetHash: job.slotSetHash, contextSnapshotHash: job.contextHash,
       units: envelope.units.map(unit => ({ itemId: unit.itemId, definitionHash: unit.definitionHash, answers: unit.answers,
-        ...(unit.deviceInputProvenance ? { deviceInputProvenance: unit.deviceInputProvenance } : {}) })) })).hash !== receipt.wholePayloadHash) throw failure('整份答案封存内容无法验证')
+        ...(unit.itemTimings!==undefined ? {itemTimings:unit.itemTimings} : {}),
+        ...(unit.deviceInputProvenance ? { deviceInputProvenance: unit.deviceInputProvenance } : {}) })) },envelope.timingSnapshotHash)).hash !== receipt.wholePayloadHash) throw failure('整份答案封存内容无法验证')
   const principal = envelope.units[0]?.userId ? { userId: envelope.units[0].userId } : { recoveryTokenHash: envelope.units[0]?.recoveryTokenHash }
   const reuseCommitted = process.env.ASSESSMENT_REPORT_COMMITTED_CONTEXT_ENABLED === 'true'
   const { parent, children, frozen, reportParent } = await traceAssessmentPhase('report.frozen_context_load', async () => {
     const reportParent = reuseCommitted ? await prisma.compositeAssessmentAttempt.findUnique({
       where: { id: job.attemptId }, select: wholeReportParentSelect,
     }) : undefined
-    return { ...await loadParent(job.attemptId, principal, reportParent ?? undefined), reportParent }
+    const loaded = await loadParent(job.attemptId, principal, reportParent ?? undefined)
+    return { ...loaded, reportParent: reportParent ?? undefined }
   })
   assertReportJobIdentity(parent, { attemptEpoch: job.attemptEpoch, slotSetHash: job.slotSetHash, contextHash: job.contextHash })
   if (children.length !== envelope.units.length) throw failure('整份交卷单元数量不匹配')
@@ -347,10 +399,9 @@ export const processWholeQuestionnaireAnswers = async (job: CompositeReportJob,
     // cognitive/situational modules and any replay retain database recovery.
     ...(reportParent && reportParent.status === 'IN_PROGRESS' && committedScales
       && frozen.slots.every(slot => ['SCALE', 'FORM_SECTION'].includes(slot.unitType))
-      && reportParent.compositeAssessment.items.every(item => ['SCALE', 'FORM'].includes(item.type))
+      && parent.compositeAssessment.items.every(item => ['SCALE', 'FORM'].includes(item.type))
       ? { committed: { submissionId: execution.submissionId, leaseToken: execution.leaseToken,
-          parent: { ...reportParent, scaleAssessments: committedScales,
-            cognitiveSessions: [] as [], situationalAttempts: [] as [] } } } : {}),
+          parent: copyWholeCommittedReportParent(reportParent, committedScales) } } : {}),
     units: new Map(children.map(({ child, runtime }) => [child.id, { attemptEpoch: child.attemptEpoch,
       runtimeSnapshotEncrypted: child.runtimeSnapshotEncrypted!, runtime }])) })
   return true
@@ -362,11 +413,13 @@ type WholeValidationManifest = {
     userId: string | null; recoveryTokenHash: string | null };
   requiredFormSlots: string[];
   units: Array<{ itemId: string; assessmentId: string; definitionHash: string; admissionHash: string;
-    deadlineMs: number | null; rulesHash?: string; items?: WholeRuleItem[] }>;
+    trainingTiming?: TrainingTimingSnapshot; deadlineMs: number | null; rulesHash?: string; items?: WholeRuleItem[] }>;
 }
 const responseKey = (value: string | number) => typeof value + ':' + String(value)
 const prepareFromWholeManifest = (input: WholeQuestionnaireSubmitInput, manifest: WholeValidationManifest, principal: Principal, receivedAtMs: number) => {
   if (input.units.length !== manifest.units.length || new Set(input.units.map(unit => unit.itemId)).size !== input.units.length) throw failure('问卷量表缺失或重复', 400)
+  const timingEntries=input.units.flatMap(unit=>Object.entries(unit.itemTimings??{}))
+  if(timingEntries.length>3000||Buffer.byteLength(JSON.stringify(timingEntries),'utf8')>400000)throw failure('整卷计时超过3000题或400KB预算',400)
   const prepared = []
   for (const unit of manifest.units) {
     const sent = input.units.find(candidate => candidate.itemId === unit.itemId)
@@ -382,6 +435,7 @@ const prepareFromWholeManifest = (input: WholeQuestionnaireSubmitInput, manifest
       answers.set(answer.itemCode, answer)
     }
     if (plan.items.some(item => item.required && !answers.has(item.itemCode))) throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '问卷有必答题未完成', 409)
+    normalizeTrainingScaleTiming(unit.trainingTiming,plan.items.map(item=>item.itemCode),[...answers.keys()],sent.itemTimings)
     prepared.push({ ...sent, assessmentId: unit.assessmentId, compositeAttemptId: manifest.binding.attemptId,
       submissionId: childSubmissionId(input.submissionId, unit.itemId), attemptEpoch: input.attemptEpoch,
       contextSnapshotHash: input.contextSnapshotHash, ...principal,

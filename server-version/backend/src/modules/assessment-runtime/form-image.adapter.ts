@@ -82,6 +82,10 @@ const compositeFormSectionVideoReferences = (definition: unknown) => {
   })
 }
 
+export const compositeFormSectionMediaReferences = (definition: unknown) => [
+  ...compositeFormSectionImageReferences(definition), ...compositeFormSectionVideoReferences(definition),
+]
+
 export const frozenFormSectionImageReferences = (admission: FrozenUnitAdmissionV1) => {
   const frozen = admission.formSection
   if (!frozen) return []

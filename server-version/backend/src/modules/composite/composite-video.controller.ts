@@ -17,13 +17,16 @@ const recoveryHashFromRequest = (req: Request): string | null => {
 }
 
 const authorizedState = async (req: Request, publicMode: boolean) => {
+  const requestedUnit = req.params.sectionId
+    ? { sectionId: req.params.sectionId }
+    : { itemId: req.params.itemId }
   if (!publicMode) {
     if (!req.user) return null
-    return service.getAttemptState(req.params.attemptId, { userId: req.user.userId })
+    return service.getAttemptState(req.params.attemptId, { userId: req.user.userId }, requestedUnit)
   }
   const recoveryTokenHash = recoveryHashFromRequest(req)
   if (!recoveryTokenHash) return null
-  return service.getAttemptState(req.params.attemptId, { recoveryTokenHash })
+  return service.getAttemptState(req.params.attemptId, { recoveryTokenHash }, requestedUnit)
 }
 
 const parseOptionIndex = (value: string): number | null => {

@@ -1,0 +1,69 @@
+{
+  "kind": "C14_SELECTED_AGGREGATE_LOCAL_EVIDENCE",
+  "createdAt": "2026-10-18T12:18:24.207504+00:00",
+  "gitHeadAtRecord": "9aa8b7690c3970e60de6f5d5d3bf3f8403a8e689",
+  "nodeExecutable": "/workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/node_modules/node/bin/node",
+  "nodeVersion": "v24.21.0",
+  "nodeExecutableSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+  "measurementLock": "/workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/.measurement.lock",
+  "sourceAndInputs": [
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/unified-aggregate-finalizer.service.ts",
+      "sha256": "528f3f7c4d266df8ce30b6a67f569b7a6b26a9fd574535f312ca143003c98f51"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/whole-questionnaire.service.ts",
+      "sha256": "b7e03c4b3e086ef47f827199b13e5590dc2a1ba05557fef7dab57cef92cdd858"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-runtime/training-variant-aggregate-finalizer.test.ts",
+      "sha256": "593f0f2f50b1ff3dc67a22dea91717c5b432d05a11af9f9f660da517e8020e92"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-variant-scope.ts",
+      "sha256": "920a57d2b49f7f21a06c2b74b63a0eee8707c5417fd13b73ac74729ec5804cd8"
+    },
+    {
+      "path": "server-version/backend/package-lock.json",
+      "sha256": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6"
+    },
+    {
+      "path": "server-version/backend/vitest.config.ts",
+      "sha256": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b"
+    }
+  ],
+  "checks": [
+    {
+      "log": "c14-selected-aggregate-test-01.log",
+      "command": "flock /workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/.measurement.lock /workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/__tests__/assessment-runtime/training-variant-aggregate-finalizer.test.ts",
+      "result": "passed",
+      "tests": 6,
+      "exitCode": 0,
+      "coverage": [
+        "Selected required Form V3 finalization does not require unselected required Form facts",
+        "Original accepted snapshot ciphertext and aggregate identity unchanged",
+        "Already-verified projected committed graph reuse",
+        "Allocation/publication/selected definition/foreign snapshot rejection"
+      ]
+    },
+    {
+      "log": "c14-selected-aggregate-test-02.log",
+      "command": "flock /workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/.measurement.lock /workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/__tests__/assessment-runtime/training-variant-aggregate-finalizer.test.ts -t \"ordinary null|copied committed graph|missing-config\"",
+      "result": "passed",
+      "tests": 3,
+      "skipped": 6,
+      "exitCode": 0,
+      "coverage": [
+        "Ordinary null path retains accepted aggregate identity",
+        "Actual whole carrier helper copy → finalize → worker shallow copy → selected scope revalidation",
+        "Allocation present but missing configuration fails closed"
+      ],
+      "selectionReason": "Only newly added cases run; unchanged first six are retained, not repeated."
+    }
+  ],
+  "limitations": [
+    "No PostgreSQL service started by this worker; parent owns real HTTP/PG validation and compilation.",
+    "No accepted facts, existing aggregate hash algorithm, scoring, or report permissions changed.",
+    "Local targeted evidence only; no CI, deployment, CPU/RSS benefit, or complete training qualification claim."
+  ]
+}

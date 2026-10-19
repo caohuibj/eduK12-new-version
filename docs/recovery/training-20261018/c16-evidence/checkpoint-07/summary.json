@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "phase": "FOUR_TOOL_EXPORTS_PASSED_QUALITY_COMMIT_FENCE_RETEST_PENDING",
+  "acceptedRuntimeSource": "9b813b6c375801dbc37a8f8a2162024dce0b0df7",
+  "sourceChange": "After audit INSERT and before returning, await SET CONSTRAINTS training_analysis_quality_requires_audit IMMEDIATE in the same Serializable transaction. No ALL/global policy change.",
+  "targetedTests": 3,
+  "backendTscExit": 0,
+  "limits": [
+    "Actual Prisma missing-audit transaction resolves despite deferred COMMIT failure; independent PG confirms full rollback. New await-stage fence requires real HTTP fault and normal/CAS qualification.",
+    "Analysis SQL remains unchanged; quality writes add one necessary integrity-check statement.",
+    "During-generation quality/owner revocation, remaining source boundaries and final restore still pending."
+  ],
+  "files": [
+    {
+      "file": "c16-backend-tsc-immediate-audit.log",
+      "bytes": 155,
+      "sha256": "129929b27d78b0a9e7676cf10827059d497d3981309d33b224925261014cd85b"
+    },
+    {
+      "file": "c16-http05-summary.json",
+      "bytes": 4771,
+      "sha256": "e87b234a83453ad9644d95297139fd89d55e082d7979fafd8e7cad84c557e40b"
+    },
+    {
+      "file": "c16-quality-immediate-audit.log",
+      "bytes": 271,
+      "sha256": "b5c8259ff05c504ba057503830a8c4c7f72df41bdbd55618e51af6a6ef8ead6c"
+    }
+  ]
+}

@@ -20,7 +20,9 @@ export interface CognitiveAssignmentSummary {
   maxAttempts: number
   usedAttempts?: number
   remainingAttempts?: number
+  admissionPaused?: boolean
   continueHref?: string | null
+  latestCompletedSessionId?: string | null
   required: boolean
   listedStandalone?: boolean
   reportPackageLocked?: boolean

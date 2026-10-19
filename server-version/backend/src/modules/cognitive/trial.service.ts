@@ -1,3 +1,4 @@
+import { assertTrainingChildSelected } from '../composite/training-variant-child-scope'
 import { prisma } from '../../config/database'
 import { encryptCognitivePayload, hashTrialPayload } from './cognitive.security'
 import { requireCognitiveRegistryEntry } from './cognitive.registry'
@@ -52,6 +53,7 @@ const appendTrialsWithPrincipal = async (
       }
       if (session.userId !== null || !allowed) throw FORBIDDEN('Recovery credential does not own this session')
     }
+    await assertTrainingChildSelected(session, { db: tx })
     if (session.status !== 'IN_PROGRESS') throw BAD_REQUEST('Session is not IN_PROGRESS')
     if (session.runtimeGeneration === 'UNIFIED_V1') {
       throw BAD_REQUEST('统一认知测评必须通过最终提交接口一次性提交全部试次')

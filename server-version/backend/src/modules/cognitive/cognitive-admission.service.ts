@@ -1,3 +1,5 @@
+import { assertTrainingChildSelected, loadTrainingChildAdmissionParent, TRAINING_VARIANT_PARENT_MARKER_SELECT } from '../composite/training-variant-child-scope'
+import { isCognitiveNewAdmissionEnabled } from './product-eligibility'
 import { loadStoredUnitAdmission } from '../assessment-runtime/unit-admission'
 import { prisma } from '../../config/database'
 import { assertAttemptEpoch, assertFinalOnly, InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
@@ -21,6 +23,7 @@ export const UNIFIED_COGNITIVE_CHILD_ADMISSION_SELECT = {
   userId: true,
   compositeAttemptId: true,
   compositeItemId: true,
+  compositeAttempt: { select: TRAINING_VARIANT_PARENT_MARKER_SELECT },
   recoveryTokenHash: true,
   testType: true,
   attemptNo: true,
@@ -46,6 +49,7 @@ export type CognitiveAdmissionChildRow = {
   userId: string | null
   compositeAttemptId: string | null
   compositeItemId: string | null
+  compositeAttempt?: any
   recoveryTokenHash: string | null
   testType: string
   attemptNo: number
@@ -168,8 +172,11 @@ export const activateCognitiveAdmission = async (
   row: CognitiveAdmissionChildRow,
   parent?: CompositeCognitiveAdmissionParent,
 ): Promise<FrozenUnitAdmissionV1> => {
+  parent = await assertTrainingChildSelected(row, { parent }) ?? parent
   const stored = await loadStoredCognitiveAdmission(row)
   if (stored) return stored
+  // A session shell is not admission. Never activate one while new admission is disabled.
+  if (!isCognitiveNewAdmissionEnabled()) throw new InstrumentFinalSubmitError('INSTRUMENT_NOT_AVAILABLE', '认知模块暂不可用，尚未准入的任务请在重新开启后继续', 409)
   assertFinalOnly(row.deliveryMode)
   const configHash = await configHashFrom(row.configSnapshotEncrypted)
   const cognitive = {
@@ -180,24 +187,7 @@ export const activateCognitiveAdmission = async (
   }
 
   if (row.compositeAttemptId) {
-    const loaded = parent ?? await prisma.compositeAssessmentAttempt.findUnique({
-      where: { id: row.compositeAttemptId },
-      select: {
-        id: true,
-        userId: true,
-        recoveryTokenHash: true,
-        deliveryMode: true,
-        attemptEpoch: true,
-        contextSnapshotEncrypted: true,
-        contextSnapshotHash: true,
-        frozenActiveSlotSetEncrypted: true,
-        frozenActiveSlotSetHash: true,
-        compositeAssessment: {
-          select: { formSections: { select: { contextSection: true, items: { select: { contextKey: true } } } } },
-        },
-      },
-    })
-    if (!loaded) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '上级测评记录不存在', 404)
+    const loaded = await loadTrainingChildAdmissionParent(row.compositeAttemptId, parent)
     assertFinalOnly(loaded.deliveryMode)
     assertAttemptEpoch(loaded.attemptEpoch, row.attemptNo)
     if (!row.compositeItemId) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '认知任务未绑定到当前测评单元', 409)

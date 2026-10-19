@@ -60,3 +60,56 @@ export const parseFormSectionCollectionFacts = (value: unknown): FormSectionColl
   canonicalJsonBytes(facts)
   return facts
 }
+
+/** V2 is used only by an explicitly typed frozen Training definition. V1 stays
+ * byte-compatible; historical rows are never upgraded or regenerated. */
+import type { TypedFormValue } from './typed-form'
+export interface FormSectionCollectionFactsV2 {
+  schemaVersion: 2
+  sectionKey: string
+  items: Array<{ key: string; label: string; value: TypedFormValue }>
+}
+export type FormSectionCollectionFacts = FormSectionCollectionFactsV1 | FormSectionCollectionFactsV2 | FormSectionCollectionFactsV3
+export const typedFormValueSchema = z.union([
+  z.string(), z.number().finite(), z.array(z.string()),
+  z.record(z.union([z.string(), z.number().finite(), z.array(z.string())])), z.null(),
+])
+const typedFactsSchema = z.object({
+  schemaVersion: z.literal(2), sectionKey: z.string().min(1),
+  items: z.array(z.object({ key: z.string().min(1), label: z.string().min(1), value: typedFormValueSchema }).strict()).max(500),
+}).strict()
+export const createTypedFormSectionCollectionFacts = (input: Omit<FormSectionCollectionFactsV2, 'schemaVersion'>): FormSectionCollectionFactsV2 => {
+  const facts = typedFactsSchema.parse({ ...input, schemaVersion: 2 })
+  if (new Set(facts.items.map(item => item.key)).size !== facts.items.length) throw new Error('Form section fact keys must be unique')
+  if (canonicalJsonBytes(facts).byteLength > 512000) throw new Error('Form section facts exceed 500 KB')
+  return facts
+}
+
+/** Shared reader for encrypted canonical snapshots; never consult String projections. */
+export const readFormSectionCollectionFacts = (value: unknown): FormSectionCollectionFacts => {
+  if(value && typeof value === "object" && (value as {schemaVersion?:unknown}).schemaVersion===3) return createPolicyFormSectionCollectionFacts(v3FactsSchema.parse(value))
+  if (value && typeof value === 'object' && (value as {schemaVersion?: unknown}).schemaVersion === 2) {
+    const parsed = typedFactsSchema.parse(value)
+    return createTypedFormSectionCollectionFacts(parsed)
+  }
+  return parseFormSectionCollectionFacts(value)
+}
+
+const factState = z.enum(['ANSWERED','REFUSED','SHOWN_MISSING','NOT_SHOWN'])
+const refusalSchema = z.object({_surveyRefusal:z.literal(true)}).strict()
+// Reject reserved keys before Zod record parsing can discard __proto__.
+export const trainingFormWireValueSchema = z.unknown().superRefine((value,ctx)=>{
+  if (!value || typeof value!=='object' || Array.isArray(value)) return
+  for (const key of Object.keys(value)) if (['__proto__','constructor','prototype'].includes(key)) ctx.addIssue({code:'custom',message:'不允许的表单对象键',path:[key]})
+}).pipe(z.union([typedFormValueSchema, refusalSchema, z.record(z.union([z.string(),z.number().finite(),z.array(z.string()),refusalSchema]))]))
+const v3FactsSchema = z.object({schemaVersion:z.literal(3),sectionKey:z.string().min(1),items:z.array(z.object({
+  key:z.string().min(1),label:z.string().min(1),value:typedFormValueSchema,state:factState,
+  rowStates:z.record(factState).optional(),otherText:z.string().optional(),
+}).strict()).max(500)}).strict()
+export type FormSectionCollectionFactsV3 = z.infer<typeof v3FactsSchema>
+export const createPolicyFormSectionCollectionFacts = (input: Omit<FormSectionCollectionFactsV3,'schemaVersion'>): FormSectionCollectionFactsV3 => {
+  const facts = v3FactsSchema.parse({...input,schemaVersion:3})
+  if(new Set(facts.items.map(item=>item.key)).size!==facts.items.length)throw new Error('Form section fact keys must be unique')
+  if(canonicalJsonBytes(facts).byteLength>512000)throw new Error('Form section facts exceed 500 KB')
+  return facts
+}

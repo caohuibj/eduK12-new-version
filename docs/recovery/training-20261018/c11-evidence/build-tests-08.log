@@ -1,0 +1,20 @@
+
+ RUN  v4.1.11 [cloud-workspace]/eduk12_c11_20261018/server-version/backend
+
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > batches and deduplicates exact releases, locking before loading and freezing once 114ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > fails closed for retired 4ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > fails closed for missing 4ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > fails closed for hash 97ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > fails closed for version 4ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > fails closed for package-status 4ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > retains exact success and failure outcomes for one preflight operation without reloading 114ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > does not query uploads for builtin-only or empty operations 3ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > selects standalone latest using headers then only resolves the exact chosen version 113ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > rejects uploaded teacher self-report from student composite admission 219ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > projects uploaded management metadata in one header-only batch, including retired releases 1ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > projects resource headers without answer keys or templates and rejects corrupt metadata 1ms
+
+ Test Files  1 passed (1)
+      Tests  12 passed (12)
+   Start at  19:31:28
+   Duration  4.22s (transform 2.35s, setup 0ms, import 3.41s, tests 681ms, environment 0ms)

@@ -1,3 +1,4 @@
+import { TRAINING_VARIANT_PARENT_MARKER_SELECT, TRAINING_VARIANT_DEFINITION_MARKER_SELECT } from '../../modules/composite/training-variant-markers'
 import { randomUUID } from 'node:crypto'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { Prisma, PrismaClient } from '@prisma/client'
@@ -637,6 +638,7 @@ suite('V32-1 additive PostgreSQL migration and constraints', () => {
         submissionPayloadHash: true,
         compositeAttempt: {
           select: {
+            ...TRAINING_VARIANT_PARENT_MARKER_SELECT,
             userId: true,
             recoveryTokenHash: true,
             status: true,
@@ -647,6 +649,7 @@ suite('V32-1 additive PostgreSQL migration and constraints', () => {
             frozenActiveSlotSetHash: true,
             compositeAssessment: {
               select: {
+                ...TRAINING_VARIANT_DEFINITION_MARKER_SELECT,
                 formSections: { select: { contextSection: true, items: { select: { contextKey: true } } } },
               },
             },

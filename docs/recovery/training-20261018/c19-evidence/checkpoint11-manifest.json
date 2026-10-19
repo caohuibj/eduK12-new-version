@@ -1,0 +1,94 @@
+{
+  "scope": "Frozen Scale source-list runtime-only compatibility repair: 37 new tests passed; old discovery 2 passed and 2 marker-fixture failures preserved, then the two targeted continuations and tsc passed. No state07 HTTP qualification; SJT flow per-row snapshot query batching still pending.",
+  "members": [
+    {
+      "name": "c19-build09-result.json.gz",
+      "rawSha256": "57adf1d4dfe87dae156e5e47781bff5542c13e0d49d56b93416c26215b11bb70",
+      "rawBytes": 1352,
+      "gzipSha256": "cf124ab0bf705f96d34734e98ce7001e0dc78d32cb86513a9121a247d0415e1b",
+      "gzipBytes": 574
+    },
+    {
+      "name": "c19-build09-input.json.gz",
+      "rawSha256": "18e856800787fe287fb35c87652d4a97a3dc15fd047f98002ea9bc3398f1a7a2",
+      "rawBytes": 422390,
+      "gzipSha256": "210a722841a4356667643cb103beee31f00d4296c6d469fdfe9a43f3acd401d3",
+      "gzipBytes": 127401
+    },
+    {
+      "name": "c19-build09-dist.json.gz",
+      "rawSha256": "43a4f171f4f9b278cd5ea0d809922d2d658f2dbe50c938dcc98250c9bf8eb607",
+      "rawBytes": 896818,
+      "gzipSha256": "b97fde5959ccdc6a89e17e971e390fdb4dd33ee34f0431a8f324c638fd5b128c",
+      "gzipBytes": 243841
+    },
+    {
+      "name": "c19-build09-scale-source-discovery.log.gz",
+      "rawSha256": "b86f55c2f5732fefdd72c3416f21dea6668cf95631b74c859b253280450bb68f",
+      "rawBytes": 261,
+      "gzipSha256": "16ccddb50f823a97b9c41b5cf87327d769d944f3c95aecb077faefbd3622549c",
+      "gzipBytes": 216
+    },
+    {
+      "name": "c19-build09-existing-discovery.log.gz",
+      "rawSha256": "95d7b7943e183ec6e79dc4c94976684a1529e62ed4de3e68dba1874a7437c5bc",
+      "rawBytes": 1844,
+      "gzipSha256": "45f35b0898102ca1a0cc66abbdaa3e1278a1d54610d6a1d93b773a9cec8f6582",
+      "gzipBytes": 798
+    },
+    {
+      "name": "c19-build10-result.json.gz",
+      "rawSha256": "aae3580efb27a80510f2e9d68b19d4b172bf7c11c8998c6f2d7cd1ecf099e4aa",
+      "rawBytes": 1161,
+      "gzipSha256": "daa01ba38aaf8b654724b43f15dd498f0c921dbabaf46f9af24a11e8796caecd",
+      "gzipBytes": 528
+    },
+    {
+      "name": "c19-build10-input.json.gz",
+      "rawSha256": "e4f48388658551a0e937c93df61ce263a9fe2f1f21994a918449c219a5057da0",
+      "rawBytes": 422390,
+      "gzipSha256": "f700842c80eeb905244cbed9f1a9bc5139feef2e5ef8f41320bdff9f71d3664e",
+      "gzipBytes": 127404
+    },
+    {
+      "name": "c19-build10-dist.json.gz",
+      "rawSha256": "eb62e59d6e5b673f0c68d994feadd3000187aa19aac5c2710ecbc28a696c94d7",
+      "rawBytes": 896818,
+      "gzipSha256": "be1a63b232332e87b872b0cc1e37f12f96b8c804b835f47e92f46d3b7a77211e",
+      "gzipBytes": 243838
+    },
+    {
+      "name": "c19-build10-sjt-discovery-continuation.log.gz",
+      "rawSha256": "4f790f70ee87c733fc3569af122dbfe09a3aad03b44ec946bbe762870c18d6ef",
+      "rawBytes": 272,
+      "gzipSha256": "f4bfb3abf77d01c709807d57f15c7a6344adbb3ee350385611db782b804cd9c2",
+      "gzipBytes": 222
+    },
+    {
+      "name": "c19-build10-tsc.log.gz",
+      "rawSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytes": 0,
+      "gzipSha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+      "gzipBytes": 20
+    },
+    {
+      "name": "tmp-c19-build09.py.gz",
+      "rawSha256": "34ce6ff3136541db3e91e835ab7fc3ab7ca840e0ec611a1ea5510647942a4038",
+      "rawBytes": 2447,
+      "gzipSha256": "4bd3f21a8b0f8e4ed6034116ee6ae8870b9260b02ab42d7dbf8ffa43e7d5aa57",
+      "gzipBytes": 1101
+    },
+    {
+      "name": "tmp-c19-build10.py.gz",
+      "rawSha256": "6ad20eab4707dc9535c12a0c3d0dcb71629f8a46583b0f2795726ea7def9efda",
+      "rawBytes": 2227,
+      "gzipSha256": "052bd01a80491f364d068895c076b7bbc8f943d04261c59f6e74a35eae8b8264",
+      "gzipBytes": 1049
+    }
+  ],
+  "archive": {
+    "file": "checkpoint11-source-discovery-repair.tar.gz",
+    "sha256": "7cd4ee7cfd8f3278745bf6fe76bc0600caa59ca910a84a4727448598f02df17d",
+    "bytes": 748121
+  }
+}

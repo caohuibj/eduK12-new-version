@@ -1,0 +1,38 @@
+{
+  "passed": true,
+  "productId": "a33ef06a-ab12-4331-a484-e222e48a2ca9",
+  "detail": "full",
+  "sampleSize": 1,
+  "recordCount": 7,
+  "fieldCount": 594,
+  "variantExport": {
+    "version": "training-weighted-variant-export-v1",
+    "pooling": "STRATIFIED_ONLY",
+    "strata": [
+      {
+        "stratumKey": "635a6b1c7c6cc9dd98a21113c0a9501e948a84f5dce5f4791c7107ba47a38b9f",
+        "configDigest": "328bd26dcd54afa969907794e7fb05a6344ac26f3ca406fe1d634cd305ffc75d",
+        "unionDigest": "8b3a79697f097901ebde449f5cc3d41a68c33fa17ab947101ada1f91c0233a9c",
+        "publishedAt": "2026-10-18T12:12:45.605Z",
+        "variantKey": "b",
+        "algorithm": "WEIGHTED_RANDOM_INT_V1",
+        "selectedItemIds": [
+          "49dbc2ba-c128-4843-9b93-fab61fd44bf2",
+          "94ba59bb-2b0b-4b26-8dcb-6289c6e475c2",
+          "ea600253-8311-4b67-b8d2-7d34bc0775d3",
+          "959d871d-5824-47bf-8b80-bbc4d5fa5ae2"
+        ],
+        "selectedSectionIds": [
+          "f696d3c4-9d4d-44dc-8d8b-ef25f97bae7c"
+        ],
+        "recordCount": 1,
+        "completedCount": 1,
+        "inProgressCount": 0,
+        "abandonedCount": 0,
+        "taskSatisfiedCount": 1,
+        "taskNotSatisfiedCount": 0
+      }
+    ]
+  },
+  "scope": "Existing completed inputs; metadata-only sampled full preview plus non-owner denial. NOT_SHOWN/blank-value evidence remains the original CSV/ZIP and builder checks."
+}

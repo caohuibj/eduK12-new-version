@@ -1,3 +1,4 @@
+import {trainingTimingSnapshotSchema,readTrainingTimingSnapshot,type TrainingTimingSnapshot} from './training-scale-timing'
 import { z } from 'zod'
 import { canonicalHash } from './canonical'
 import { decryptUnifiedRuntimePayload, encryptUnifiedRuntimePayload } from './security'
@@ -30,6 +31,7 @@ export interface FrozenUnitAdmissionV2 {
   schemaVersion: 2
   runtimeGeneration: 'UNIFIED_V1'
   frozenAt: string
+  trainingTiming?: TrainingTimingSnapshot
   attemptEpoch: number
   scale?: FrozenUnitAdmissionV1['scale']
   cognitive?: FrozenUnitAdmissionV1['cognitive']
@@ -79,6 +81,7 @@ const frozenUnitAdmissionV2Schema = z.object({
   schemaVersion: z.literal(2),
   runtimeGeneration: z.literal('UNIFIED_V1'),
   frozenAt: z.string().datetime({ offset: true }),
+  trainingTiming: trainingTimingSnapshotSchema.optional(),
   attemptEpoch: z.number().int().positive(),
   scale: z.object({
     id: z.string().min(1),
@@ -143,6 +146,7 @@ const unsignedV2 = (input: Omit<FrozenUnitAdmissionV2, 'snapshotHash'>) => {
     contextValues: input.contextValues,
     governance: input.governance,
   }
+  if (input.trainingTiming) unsigned.trainingTiming = readTrainingTimingSnapshot(input.trainingTiming)
   if (input.scale) unsigned.scale = input.scale
   if (input.cognitive) unsigned.cognitive = input.cognitive
   if (input.formSection) unsigned.formSection = input.formSection
@@ -153,6 +157,7 @@ const unsignedV2 = (input: Omit<FrozenUnitAdmissionV2, 'snapshotHash'>) => {
 export const hashFrozenUnitAdmissionV2 = (snapshot: FrozenUnitAdmissionV2): string => canonicalHash(unsignedV2(snapshot))
 
 export const createFrozenUnitAdmissionV2 = (input: {
+  trainingTiming?: TrainingTimingSnapshot
   attemptEpoch: number
   scale?: FrozenUnitAdmissionV1['scale']
   cognitive?: FrozenUnitAdmissionV1['cognitive']
@@ -182,6 +187,7 @@ export const createFrozenUnitAdmissionV2 = (input: {
     runtimeGeneration: v1.runtimeGeneration,
     frozenAt: v1.frozenAt,
     attemptEpoch: v1.attemptEpoch,
+    ...(v1.trainingTiming ? {trainingTiming:v1.trainingTiming} : {}),
     ...(v1.scale ? { scale: v1.scale } : {}),
     ...(v1.cognitive ? { cognitive: v1.cognitive } : {}),
     ...(v1.formSection ? { formSection: v1.formSection } : {}),
@@ -212,6 +218,7 @@ export const parseFrozenUnitAdmissionV2 = (value: unknown): FrozenUnitAdmissionV
     runtimeGeneration: snapshot.runtimeGeneration,
     frozenAt: snapshot.frozenAt,
     attemptEpoch: snapshot.attemptEpoch,
+    ...(snapshot.trainingTiming ? {trainingTiming:snapshot.trainingTiming} : {}),
     ...(snapshot.scale ? { scale: snapshot.scale } : {}),
     ...(snapshot.cognitive ? { cognitive: snapshot.cognitive } : {}),
     ...(snapshot.formSection ? { formSection: snapshot.formSection } : {}),

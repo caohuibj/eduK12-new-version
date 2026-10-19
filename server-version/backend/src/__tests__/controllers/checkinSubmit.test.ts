@@ -8,8 +8,8 @@ const { mockPrisma } = vi.hoisted(() => ({
     $queryRaw: vi.fn(),
     checkinSubmission: { findFirst: vi.fn(), findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
     checkinSubmissionIdempotencyReceipt: { findFirst: vi.fn(), create: vi.fn() },
-    storedAsset: { findMany: vi.fn() },
-    assetReference: { deleteMany: vi.fn(), upsert: vi.fn(), findMany: vi.fn(), count: vi.fn() },
+    storedAsset: { findMany: vi.fn(), findUnique: vi.fn() },
+    assetReference: { deleteMany: vi.fn(), createMany: vi.fn(), upsert: vi.fn(), findMany: vi.fn(), count: vi.fn() },
     $executeRaw: vi.fn(),
     $transaction: vi.fn(),
   },
@@ -54,6 +54,7 @@ describe('logged-in checkin submit endTime', () => {
     mockPrisma.$queryRaw.mockResolvedValue([{ allowed:false }])
     mockPrisma.courseStudent.findFirst.mockResolvedValue({ id: 'membership-1' })
     mockPrisma.storedAsset.findMany.mockResolvedValue([])
+    mockPrisma.storedAsset.findUnique.mockResolvedValue({ id: 'asset-1', deletedAt: null })
     mockPrisma.assetReference.deleteMany.mockResolvedValue({ count: 0 })
     mockPrisma.assetReference.upsert.mockResolvedValue({})
     mockPrisma.assetReference.findMany.mockResolvedValue([])
@@ -333,9 +334,9 @@ describe('logged-in checkin submit endTime', () => {
         scopeId: 'course-1',
       }),
     }))
-    expect(mockPrisma.assetReference.upsert).toHaveBeenCalledWith(expect.objectContaining({
-      create: expect.objectContaining({ assetId: 'asset-1', entityId: 'sub-asset' }),
-    }))
+    expect(mockPrisma.assetReference.createMany).toHaveBeenCalledWith({
+      data: [expect.objectContaining({ assetId: 'asset-1', entityId: 'sub-asset' })], skipDuplicates: true,
+    })
   })
 
   it('rejects an asset that is not owned by the submitting student', async () => {

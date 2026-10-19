@@ -1,0 +1,158 @@
+{
+  "sourceCheckpoint": "36318b8d4a248c441dd08b41a0228fef655dce8b",
+  "sourceTree": "10df5c2e9f82c6e42df0425fb6b60e77c0d95c9f",
+  "productionFilesSha256": {
+    "server-version/backend/src/modules/assessment-runtime/typed-form.ts": "1eb87548518005984701ba35382565c608c48fb455ba201636228f02183d1975",
+    "server-version/backend/src/modules/composite/composite.schema.ts": "940c7b9c58599c1480b3fe3cef6952b9258ec23811c5ac90d44a66c17c4befb5",
+    "server-version/frontend/src/components/FinalCompositeAssessment.tsx": "1b2e5ec664cd9cd90e3b57fed59e4f83ad8ec727ddbd40fab16d8ef4aefe6030",
+    "server-version/frontend/src/components/FinalQuestionnaireAssessment.tsx": "641e68183206e1aa354130997f64356322efc81bf44b9d3ae3a71fa8e270a5a4",
+    "server-version/frontend/src/components/questionnaire/FormPlayer.tsx": "cd485ca9db8483bc0b0fcf090b74cbacfb75e1706346b089012a265559d4877b",
+    "server-version/frontend/src/modules/assessment-core/form/ProfessionalFormAnswer.tsx": "1ea1fcf183f1d3f90b831131378446d72b1a5e6f9b67eeec49d40b1b3f677673",
+    "server-version/frontend/src/modules/assessment-core/form/StructuredFormConstraints.tsx": "9e1dcf3f6015c154d597eafdedd85fca7dae77c6e5f184f24cc453a73f6ec53a",
+    "server-version/frontend/src/modules/composite/api.ts": "bad724fc7a3bbdee28635442795d347877ef62c4b48eb7ac6df7b72e7843926b",
+    "server-version/frontend/src/modules/composite/types.ts": "c03d63f0797a87d0f946abccab935342374134056be4afa35811144a748a720b",
+    "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx": "da913d31230c3d3ea62535128f50badcab05e322adc121952bb1f1053caa474d",
+    "server-version/frontend/src/survey/ResearchFormEditor.tsx": "5fd6267a8cd0cb47f594adc553cb7df37d88777d811099dfe4abc80246bee53c"
+  },
+  "runtimeFingerprint": {
+    "schemaVersion": 1,
+    "nodeVersion": "v24.21.0",
+    "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+    "dist": {
+      "files": 4949,
+      "sha256": "cc3f4b1eecb00ede8fa2a6a7490c61d35452fca013461a48a2d0ab3e9e0cc093"
+    },
+    "files": {
+      "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+      "prisma/schema.prisma": "f4024a069e078f2d03ce09a30a89c2311d454e1de6be32282d4cd2e29aec6f6f",
+      "node_modules/.prisma/client/schema.prisma": "881fa942b6757ebf3cf0f4b1c01274b240994e46b8c242b0320e813aeb46f10b",
+      "node_modules/.prisma/client/index.js": "0f900be2bdab8b59caabffbd51f82138edff766c6d5d0a44130f2df0b6dd3977"
+    },
+    "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+  },
+  "startupConsumerFingerprintEqual": true,
+  "http": {
+    "passed": true,
+    "requests": 315,
+    "passedGroups": 6,
+    "checks": [
+      "strict structured schema rejects empty options/rows, duplicate keys, invalid bounds and unopened policies before any write",
+      "logged-in author/publish/section FINAL preserves six structured values, optional null, zero-sum and legacy facts; exact replay immutable and changed replay rejected",
+      "anonymous recovery author/publish/section FINAL preserves six structured values, optional null, zero-sum and legacy facts; exact replay immutable and changed replay rejected",
+      "logged-in section + whole Scale receipt/replay and real worker report consume identical structured V2 facts",
+      "anonymous section + whole Scale receipt/replay and real worker report consume identical structured V2 facts",
+      "typed exports remain explicitly unavailable until C07"
+    ],
+    "harnessSha256": "56cda98789d4e803ca425a99bec769f2ad4ac3692b05eda87b51b0603170e18f",
+    "runtimeHarnessMatchesCurrentSource": true
+  },
+  "checks": {
+    "backendUniquePassed": 46,
+    "frontendUniquePassed": 116,
+    "backendTsc": "passed",
+    "backendBuild": "passed",
+    "frontendAppTsc": "passed",
+    "frontendViteBuild": "passed",
+    "changedSourceEslint": "passed"
+  },
+  "failureHistory": [
+    "The first new golden-subset assertion inadvertently selected zero questions. Corrected to assert five eligible source questions with original golden values and rerun that test only; the empty-loop result is not claimed as golden coverage.",
+    "First type check after new structured restoration fixtures failed on TypeScript union inference introducing optional undefined properties. Explicit existing FormPlayerValue annotation fixed the fixture; subsequent app type checks passed."
+  ],
+  "observationsOnly": {
+    "requestBytes": 62393,
+    "responseBytes": 2381329,
+    "requestDurationMsMedian": 11,
+    "requestDurationMsP95": 33,
+    "encryptedSnapshotBytes": [
+      {
+        "kind": "storage",
+        "publicMode": false,
+        "snapshots": 14,
+        "encryptedFactBytes": 6730
+      },
+      {
+        "kind": "storage",
+        "publicMode": true,
+        "snapshots": 14,
+        "encryptedFactBytes": 6730
+      }
+    ],
+    "processPeakRssBytes": {
+      "api": 358387712,
+      "report-worker": 214982656
+    },
+    "scope": "Sequential synthetic functional fixture; API/worker RSS sampled from /proc at 1-second intervals after readiness, not an exact peak. No baseline comparison, concurrent capacity, CPU or SQL-count measurement, or performance improvement claim."
+  },
+  "cleanupVerified": true,
+  "browser": "not attempted; established C04 node IPC restriction, defer actual browser UI to C25 authorized HTTPS wrapper",
+  "reusedEvidence": [
+    "C03 schema migration and old V1 history: schema unchanged",
+    "C04 wrong recovery/cross-attempt read-submit-report protections: authorization source unchanged; current C05 anonymous recovery exercised",
+    "C03 canonical facts no String-shadow fallback: reader and report source unchanged; C05 structured report values verified over real API",
+    "Scale whole receipt/side-effect idempotency: unchanged Scale runtime. C05 confirms repeat whole HTTP acceptance and unchanged Form snapshots; it does not independently count all Scale side effects."
+  ],
+  "notClaimed": [
+    "CI",
+    "PR",
+    "deployment",
+    "browser UI/responsive/accessibility qualification",
+    "C07 typed export or structured report layout",
+    "performance optimization/capacity or SQL-count improvement"
+  ],
+  "rawLogSha256": {
+    "backend-tests.log": "0d6897428622fb5378839580ac82b83507b68d8409e0d61d803947415c7a3e94",
+    "golden-test.log": "0e31796796550ff9bbb35616d2cba169a7a3a059319a7b7821343ba63fa44651",
+    "backend-tsc.log": "7d61cb2e2deb776dfec4d6f54693f9edeed0af5c4da52f091c53c995d862fb65",
+    "backend-build.log": "7d61cb2e2deb776dfec4d6f54693f9edeed0af5c4da52f091c53c995d862fb65",
+    "frontend-tests.log": "e473656ccdd04086c10abe05d1ea7b2e6d19200c6f3be56c9b93845f4216d8ef",
+    "frontend-tsc.log": "7d61cb2e2deb776dfec4d6f54693f9edeed0af5c4da52f091c53c995d862fb65",
+    "frontend-tsc2.log": "61a6a873b20c50a8f3da479659582e9d6e53a95534c6733c3adde70be2cd9f69",
+    "frontend-tsc3.log": "7d61cb2e2deb776dfec4d6f54693f9edeed0af5c4da52f091c53c995d862fb65",
+    "survey-tests.log": "d0c8b612a8f4277dbaf847e7301c5744822890751e6d3f24871c6199295525f4",
+    "lint.log": "7125f194612fcff2f454c05d848e7cb71facc1967b4d5017e25b34fdee3ba74f",
+    "editor-error-test.log": "f46a186f77043f107ee1f98bc024f2d678467ef1feb921197b8daea0576452e8",
+    "frontend-build.log": "84b7c2cfa10d8c13817722a7b7286db7dcdf8e17e3f448fe60e6438e4e247975",
+    "survey-constraints-test.log": "ad1aeb15844e2b469cb99778a8879bf9ce50a177bfebf51c48febb31a9582270",
+    "frontend-final-tsc.log": "7d61cb2e2deb776dfec4d6f54693f9edeed0af5c4da52f091c53c995d862fb65",
+    "http-run.log": "ff2d7d1565a8856c9db279a6cfef0db1d3c03388eedd9aa4d7c0d4eccd5c792a"
+  },
+  "rawArtifactsSha256": {
+    "backend-build.log.gz": "549ead21e93c97e625dee672da3c2c1a0d28d075e1f95c1164ba0ffdd749a64e",
+    "backend-tests.log.gz": "831f4dc5744ebed44d509220fe136bf9b0508984c59b8f5ddec161f2124d95c2",
+    "backend-tsc.log.gz": "549ead21e93c97e625dee672da3c2c1a0d28d075e1f95c1164ba0ffdd749a64e",
+    "editor-error-test.log.gz": "7066f9a2ef6e687111da2fc11fed3820218f9e7964453658f59266e9cac0642b",
+    "frontend-build-manifest.json": "5eea04e3b0e3457303ad3dd5c4f5eb8c84404ec4c7e2b4a183368625f18555e5",
+    "frontend-build.log.gz": "3a9f1b304f76e34a1bcf7b643aa0c9b0052257f2ace547b10a3a72df15763aa6",
+    "frontend-final-tsc.log.gz": "549ead21e93c97e625dee672da3c2c1a0d28d075e1f95c1164ba0ffdd749a64e",
+    "frontend-tests.log.gz": "6b7414355a7e3749f3b07b6160b833cb14f7a8c8bc403e84f3ee88dc699c613b",
+    "frontend-tsc.log.gz": "549ead21e93c97e625dee672da3c2c1a0d28d075e1f95c1164ba0ffdd749a64e",
+    "frontend-tsc2.log.gz": "834c28a6495f78aaf03fee664a51bc79c61c31aa55509e0e0c62f280ed680c6b",
+    "frontend-tsc3.log.gz": "549ead21e93c97e625dee672da3c2c1a0d28d075e1f95c1164ba0ffdd749a64e",
+    "golden-test.log.gz": "a4243fae41e45ed382be93c53246b45bfbfa35f709d4d2114f58c472ed9ec793",
+    "http-run.log.gz": "864fb3d89858bfad467d1dbf61f15fbe89a547a103b69792f03e0616a80e7562",
+    "lint.log.gz": "934a9d56e1b77b540f21becd97102d1b7088e8e2eba852118cfc29df5c6f4bb7",
+    "runtime.json": "d9cca83da92a7c5da3cb1bf3ae4b624e459f64f1a8f3e980c629b5d5a3c4796b",
+    "stack-status.json": "77a7dd74964e398ad172d3b6b37b84ad5c6a6d823f5168bbbc3480fec4a16ccc",
+    "survey-constraints-test.log.gz": "24b5135a978eb1c54019ca4c294e3b23580429fea0624fa02f9ca133b4d8f4c7",
+    "survey-tests.log.gz": "d16f1fa435a447424996b7ed0290bfedad234b3760f8ff788dc00025ec7d65c0"
+  },
+  "testFilesSha256": {
+    "server-version/backend/src/__tests__/composite/training-basic-form.test.ts": "3b8ce228f18cb1095b4b1eee95581a2a518c697df8c1f14919b8b2ede97a79f6",
+    "server-version/backend/src/__tests__/composite/training-structured-form.test.ts": "ea40442452c7eed4904e3eb23ffdf565f4ff435dfcae9e398cfe5d124c6175d6",
+    "server-version/frontend/src/components/__tests__/FinalCompositeAssessment.test.tsx": "4641bcbbe46f52bf6dfb5eb36a90bf86ea939f93a24cfdc11847e3fd1e498662",
+    "server-version/frontend/src/components/questionnaire/__tests__/FormPlayer.test.tsx": "2d96fdbc87e87509473f49d7cf49822e6de963940d236f5a43b7ec8a1cb2db93",
+    "server-version/frontend/src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx": "3fa0b39061c5c013d8f8398bf002d4372c86d27aef38362778244cc4b4f457cd",
+    "server-version/frontend/src/survey/SurveyBuilder.test.tsx": "d4a54aa7df609c56d44b866d87cdd38ef4f5ca8fe06c9b7edb08092b2ab20a8c"
+  },
+  "executionContext": {
+    "node": "24.21.0",
+    "postgres": "16.15",
+    "postgresSessionTimezone": "UTC",
+    "redis": "7.4.11",
+    "prismaClient": "5.22.0",
+    "registry": "https://registry.npmjs.org",
+    "measurementLock": "shared current-node exclusive lock",
+    "formalCi": false
+  }
+}

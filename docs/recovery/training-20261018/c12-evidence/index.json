@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "564f2f60a391aa1bb4d631e0d9c3c7e7a0de5b9f",
+  "sourceTree": "aea6f5901677651449fe435294aa65ea881804f3",
+  "scope": "C12 online SJT targeted source/component and real isolated HTTP evidence; not CI/browser/performance qualification",
+  "backend": {
+    "baselinePrerequisites": "passed before first tsc; unchanged generated contracts",
+    "finalTypes": "passed",
+    "targetedPhases": [
+      {
+        "files": 8,
+        "tests": 73,
+        "log": "c12-backend-targeted-2.log"
+      },
+      {
+        "files": 5,
+        "tests": 34,
+        "log": "c12-backend-affected-1.log"
+      },
+      {
+        "files": 7,
+        "tests": 54,
+        "log": "c12-backend-review-fixes-1.log"
+      }
+    ],
+    "countsAreNotAdditive": true
+  },
+  "frontend": {
+    "types": "passed",
+    "initialTargeted": 29,
+    "newRunner": 1,
+    "finalProjectionFile": 6,
+    "countsAreNotAdditive": true,
+    "browser": "not executed; C25"
+  },
+  "http": {
+    "first": "failed at harness canonical/full-result coverage distinction; partial successful requests preserved",
+    "final": "passed; 126 requests/12 groups; cleanupVerified=true",
+    "diagnosticsOnly": true
+  },
+  "files": {
+    "c12-backend-affected-1.log": {
+      "bytes": 261,
+      "sha256": "eacb88e60daaeff163fa8588140c842365a162337ca5574beddb9d776438d216"
+    },
+    "c12-backend-build-1.log": {
+      "bytes": 33017,
+      "sha256": "c2443a3ab2bf859d02bbe1e3abbe02491f3433478bff9a01258f13915ae42cf7"
+    },
+    "c12-backend-review-fixes-1.log": {
+      "bytes": 261,
+      "sha256": "bd0f12e7108dd884e17fa3e743981f667fa0d63c03bc469eff46be1a5173fdf4"
+    },
+    "c12-backend-targeted-1.log": {
+      "bytes": 788,
+      "sha256": "c6255d3a5f4453e597288de70b4d70f859e1bb17ad30975502b4860568f6f219"
+    },
+    "c12-backend-targeted-2.log": {
+      "bytes": 261,
+      "sha256": "d9fc6dfbdb0bc07304525490357ff172a3a21f0b48f64fadefb5de6ef12d4dde"
+    },
+    "c12-frontend-online-projection.log": {
+      "bytes": 262,
+      "sha256": "f52b66f54453b50abc9da2e25d77ab415c07f88a58d177a6e40a9c2f5b6f8d6d"
+    },
+    "c12-frontend-online-runner-final.log": {
+      "bytes": 278,
+      "sha256": "5ef80732eea65d5421add9f0a51ec45bee6752b817e6d580e8f27637f9724f6c"
+    },
+    "c12-frontend-online-runner-retry.log": {
+      "bytes": 278,
+      "sha256": "bdbcf043888c21984be9b06c3c9650a63cc5ee8945336e536f9c9b23e4568fbd"
+    },
+    "c12-frontend-online-runner.log": {
+      "bytes": 1649,
+      "sha256": "698251bfa39f58413755854f3ba05a71fe549b587d3a76e1efa8ea5ab0b73808"
+    },
+    "c12-frontend-targeted.log": {
+      "bytes": 266,
+      "sha256": "942a49566eba851cd44d9386025ea01bddb4ca942cca12ef656f03b58f18ba60"
+    },
+    "c12-frontend-typecheck-final.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "c12-frontend-typecheck.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "run-1-c12-http-result.json": {
+      "bytes": 9707,
+      "sha256": "cefdc10acd457e551cb1fa34ba455e4ee6857f3f9d0c980de2699fcb54552693"
+    },
+    "run-1-c12-http.log": {
+      "bytes": 999,
+      "sha256": "164f4df2bd1038afa9b0cb0f1a12599905b5cc04753ac3ddd56af071c9abc1d0"
+    },
+    "run-1-c12-runtime-result.json": {
+      "bytes": 1669,
+      "sha256": "73fdfec48d908ee1e5b39a476b9525e41832a98376627d456f54b35c77045a16"
+    },
+    "run-1-status.json": {
+      "bytes": 1372,
+      "sha256": "4fc0dbf7b2a5099e80d75c4969c2d993ba2226f0074f181da1f679bc4e6854a3"
+    },
+    "run-2-c12-http-result.json": {
+      "bytes": 24694,
+      "sha256": "a040e53b7f172617b4bf6d700e60fe540135e97399cecde60947a4b3a115c977"
+    },
+    "run-2-c12-http.log": {
+      "bytes": 1072,
+      "sha256": "177e835fc05999f64462e29e27d956a1194fa381837ca8f43b61c0526d08b600"
+    },
+    "run-2-c12-runtime-result.json": {
+      "bytes": 29588,
+      "sha256": "b513db1bb5bcaba98919948a46bdf2b90c532f2372d0b711f8ede75fe07b3dd0"
+    },
+    "run-2-status.json": {
+      "bytes": 1371,
+      "sha256": "2a0a8b5df052bc9ede56dad2fa430b44168eed66226575cdbf0ac0e6722f030f"
+    }
+  }
+}

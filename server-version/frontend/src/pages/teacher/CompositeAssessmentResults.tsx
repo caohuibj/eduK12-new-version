@@ -12,7 +12,7 @@ import type {
 
 const statusLabel: Record<CompositeAttemptListStatus, string> = {
   IN_PROGRESS: '进行中',
-  COMPLETED: '已完成',
+  COMPLETED: '已交卷',
   ABANDONED: '已放弃',
 }
 
@@ -91,8 +91,9 @@ const CompositeAssessmentResultsContent: React.FC<{ id: string }> = ({ id }) => 
       <div className="grid grid-cols-3 gap-3 mb-5">
         <div className="card p-4"><p className="text-sm text-gray-500">已开始</p><p className="text-2xl font-semibold">{counts?.started ?? 0}</p></div>
         <div className="card p-4"><p className="text-sm text-gray-500">进行中</p><p className="text-2xl font-semibold">{counts?.inProgress ?? 0}</p></div>
-        <div className="card p-4"><p className="text-sm text-gray-500">已完成</p><p className="text-2xl font-semibold">{counts?.completed ?? 0}</p></div>
+        <div className="card p-4"><p className="text-sm text-gray-500">已交卷</p><p className="text-2xl font-semibold">{counts?.completed ?? 0}</p></div>
       </div>
+      <p className="text-sm text-gray-600">按作答次数统计；已交卷中任务达成 {counts?.satisfied ?? counts?.completed ?? 0} 次，未达成 {counts?.notSatisfied ?? 0} 次。重复作答不去重为人数。</p>
       <div className="card p-5 mb-5">
         <form
           className="flex flex-wrap gap-3 items-end"
@@ -114,7 +115,7 @@ const CompositeAssessmentResultsContent: React.FC<{ id: string }> = ({ id }) => 
             >
               <option value="">全部</option>
               <option value="IN_PROGRESS">进行中</option>
-              <option value="COMPLETED">已完成</option>
+              <option value="COMPLETED">已交卷</option>
               <option value="ABANDONED">已放弃</option>
             </select>
           </label>
@@ -156,7 +157,7 @@ const CompositeAssessmentResultsContent: React.FC<{ id: string }> = ({ id }) => 
                     {row.username != null && <div className="text-xs text-gray-400">{row.username}</div>}
                   </td>
                   <td className="px-4 py-3 text-gray-600">{row.isAnonymous ? '匿名' : '登录'}</td>
-                  <td className="px-4 py-3 text-gray-600">{statusLabel[row.status]}</td>
+                  <td className="px-4 py-3 text-gray-600">{statusLabel[row.status]}{row.status === 'COMPLETED' && <div className="text-xs">{row.taskSatisfied === false ? '任务未达成' : '任务已达成'}</div>}</td>
                   <td className="px-4 py-3 text-gray-600" title={row.progressUnavailableReason || undefined}>{row.progressUnavailableReason ? '进度待核对' : `${row.progress}%`}</td>
                   <td className="px-4 py-3 text-gray-600">{formatTime(row.startedAt)}</td>
                   <td className="px-4 py-3 text-gray-600">{formatTime(row.completedAt)}</td>

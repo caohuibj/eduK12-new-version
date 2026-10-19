@@ -1,3 +1,4 @@
+import { situationalOnlineResponseSchema, type SituationalOnlineResponse } from './situational-final-submit.schema'
 import { researchCaptureSchema, type SituationalResearchCapture } from './situation-scientific-contract'
 import { z } from 'zod'
 import type { SituationalResponse } from './situation-scoring'
@@ -43,6 +44,26 @@ export const createSituationalRawSubmissionPayload = (input: {
   ...(input.researchCapture ? { researchCapture: input.researchCapture } : {}),
 })
 
-export const parseSituationalRawSubmissionPayload = (value: unknown): SituationalRawSubmissionPayloadV1 => (
-  situationalRawSubmissionPayloadSchema.parse(value)
+export const SITUATIONAL_ONLINE_RAW_ENCODING_VERSION = 'situational-raw-submit-v2' as const
+export const situationalOnlineRawSubmissionPayloadSchema = z.object({
+  schemaVersion: z.literal(2),
+  attemptEpoch: z.number().int().positive(),
+  responseProtocol: z.literal('sjt-online-response-v1'),
+  researchCapture: researchCaptureSchema.optional(),
+  // Derived scorer inputs are retained for existing research reconstruction.
+  responses: z.array(situationalResponseSchema).max(1000),
+  // Authoritative participant selections, never derived combination option keys.
+  rawResponses: z.array(situationalOnlineResponseSchema).max(1000),
+}).strict()
+export type SituationalRawSubmissionPayloadV2 = z.infer<typeof situationalOnlineRawSubmissionPayloadSchema>
+export const createSituationalOnlineRawSubmissionPayload = (input: {
+  attemptEpoch: number
+  responses: SituationalResponse[]
+  rawResponses: SituationalOnlineResponse[]
+  researchCapture?: SituationalResearchCapture
+}): SituationalRawSubmissionPayloadV2 => situationalOnlineRawSubmissionPayloadSchema.parse({
+  ...input, schemaVersion: 2, responseProtocol: 'sjt-online-response-v1',
+})
+export const parseSituationalRawSubmissionPayload = (value: unknown): SituationalRawSubmissionPayloadV1 | SituationalRawSubmissionPayloadV2 => (
+  z.union([situationalRawSubmissionPayloadSchema, situationalOnlineRawSubmissionPayloadSchema]).parse(value)
 )

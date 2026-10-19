@@ -1,3 +1,5 @@
+import {TrainingTimingBoundary,restoreTrainingTiming} from '../modules/scale/TrainingTimingBoundary'
+import {SurveyScaleTimingTracker,sealObservedScaleTimings} from '../modules/scale/item-timing'
 import { isTrainingHost } from '../training/context'
 import '../training/training-form-surface.css'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
@@ -12,8 +14,10 @@ import { assessmentImageItems, assessmentOptionImageItems } from '../modules/ass
 import { formOptionVideoPresentations, scaleItemVideoPresentation } from '../modules/assessment-media/video-adapter'
 import { requestAssessmentVideoCapabilities } from '../modules/assessment-media/video-capability-client'
 import CompositeUnitRequirements from '../modules/composite/CompositeUnitRequirements'
+import { TrainingFlowBoundary } from '../modules/composite/TrainingFlowBoundary'
 import { AssessmentShell } from './assessment-shell'
-import FormPlayer from './questionnaire/FormPlayer'
+import { trainingVisibleFields, sanitizeTrainingFormValues } from '../modules/assessment-core/form/training-policy'
+import FormPlayer, { type FormPlayerValue } from './questionnaire/FormPlayer'
 import ScalePlayer from './questionnaire/ScalePlayer'
 import { useLocalDraftSaveQueue } from './questionnaire/useLocalDraftSaveQueue'
 import { checkpointId } from '../services/persistence/checkpointTypes'
@@ -29,15 +33,15 @@ import {
 } from '../modules/scale/device-input-provenance'
 
 type ResponseValue = string | number
-type FormValue = string | string[] | null
+type FormValue = FormPlayerValue
 type FormOption = { value: string; label: string; images?: unknown; video?: unknown }
 
 export interface FinalCompositeAssessmentProps {
   state: CompositeAttemptState
   publicMode?: boolean
   recoveryToken?: string
-  submitFormSection: (attemptId: string, sectionId: string, input: { submissionId: string; attemptEpoch: number; definitionHash: string; contextSnapshotHash?: string | null; answers: Array<{ formItemId: string; value: FormValue }> }) => Promise<ApiResponse<unknown>>
-  submitScale: (attemptId: string, itemId: string, input: { submissionId: string; attemptEpoch: number; definitionHash: string; contextSnapshotHash?: string | null; answers: Array<{ itemCode: string; responseValue: ResponseValue; responseTimeMs?: number }>; deviceInputProvenance?: DeviceInputProvenanceV1 }) => Promise<ApiResponse<unknown>>
+  submitFormSection: (attemptId: string, sectionId: string, input: { submissionId: string; attemptEpoch: number; definitionHash: string; contextSnapshotHash?: string | null; itemTimings?:Record<string,unknown>; answers: Array<{ formItemId: string; value: FormValue; otherText?: string }> }) => Promise<ApiResponse<unknown>>
+  submitScale: (attemptId: string, itemId: string, input: { submissionId: string; attemptEpoch: number; definitionHash: string; contextSnapshotHash?: string | null; itemTimings?:Record<string,unknown>; answers: Array<{ itemCode: string; responseValue: ResponseValue; responseTimeMs?: number }>; deviceInputProvenance?: DeviceInputProvenanceV1 }) => Promise<ApiResponse<unknown>>
   onReload: () => Promise<void>
   onExit: () => void
   onCompleted: () => void
@@ -76,8 +80,10 @@ const responseError = (response: ApiResponse<unknown>) => {
 const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ state, publicMode = false, recoveryToken, submitFormSection, submitScale, onReload, onExit, onCompleted, onEnterCognitive, onEnterSituational, onRestart, campusMode=false, campusVideoLoader }) => {
   const item = state.currentItem
   const [sectionIndex, setSectionIndex] = useState(0)
+  const timingRef=useRef<SurveyScaleTimingTracker|null>(null)
   const [scaleIndex, setScaleIndex] = useState(0)
   const [formValues, setFormValues] = useState<Record<string, FormValue>>({})
+  const formValuesRef = useRef<Record<string, FormValue>>({})
   const [scaleValues, setScaleValues] = useState<Record<string, ResponseValue>>({})
   const [meta, setMeta] = useState<FinalDraftMeta | null>(null)
   const [loadingDraft, setLoadingDraft] = useState(true)
@@ -224,7 +230,12 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
           }
         })
         setMeta(nextMeta)
-        setFormValues(nextForm)
+        const fields = item?.type==='FORM_SECTION' ? (item.formAnswers || (item.answers || []).filter(a=>a.formItemId)) as any[] : []
+        const cleaned = sanitizeTrainingFormValues(fields,nextForm)
+        if (nextMeta.status==='DRAFT') await finalDraftStore.deleteAnswers(draftKey,Object.keys(nextForm).filter(key=>!(key in cleaned)))
+        formValuesRef.current = cleaned
+        setFormValues(cleaned)
+        timingRef.current=item.trainingTiming ? new SurveyScaleTimingTracker(restoreTrainingTiming(nextMeta.instrumentMetadata,item.trainingTiming.snapshotHash),nextScale) : null
         setScaleValues(nextScale)
         setRequiresRestart(nextMeta.status === 'CONFLICT')
         if (nextMeta.status === 'CONFLICT') {
@@ -255,17 +266,25 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
 
   const saveForm = async (itemId: string, value: FormValue) => {
     if (!draftKey || submitting || exiting || draftLocked) return
-    setFormValues((previous) => ({ ...previous, [itemId]: value }))
+    const fields = item?.type==='FORM_SECTION' ? (item.formAnswers || (item.answers || []).filter(a=>a.formItemId)) as any[] : []
+    const pendingValues = {...formValuesRef.current,[itemId]:value}
+    const nextValues = sanitizeTrainingFormValues(fields,pendingValues)
+    formValuesRef.current = nextValues
+    setFormValues(nextValues)
+    setSectionIndex(index=>Math.min(index,Math.max(0,trainingVisibleFields(fields,nextValues).length-1)))
     await scheduleLocalSave(`form:${itemId}`, async () => {
       await finalDraftStore.putAnswer({ draftKey, itemKey: itemId, value, updatedAt: Date.now() })
+      await finalDraftStore.deleteAnswers(draftKey,Object.keys(pendingValues).filter(key=>!(key in nextValues)))
     })
   }
 
   const saveScale = async (itemCode: string, value: ResponseValue) => {
     if (!draftKey || submitting || exiting || draftLocked) return
+    timingRef.current?.answer(itemCode,scaleValues[itemCode],value)
     setScaleValues((previous) => ({ ...previous, [itemCode]: value }))
     await scheduleLocalSave(`scale:${itemCode}`, async () => {
       await finalDraftStore.putAnswer({ draftKey, itemKey: itemCode, value: { responseValue: value }, updatedAt: Date.now() })
+      if(item?.trainingTiming&&timingRef.current)await finalDraftStore.setInstrumentMetadata(draftKey,{trainingScaleTiming:{snapshotHash:item.trainingTiming.snapshotHash,items:timingRef.current.snapshot()}})
     })
   }
 
@@ -273,6 +292,8 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     if (exiting || submitting) return
     setExiting(true)
     try {
+      timingRef.current?.pause()
+      if(draftKey&&item?.trainingTiming&&timingRef.current&&!draftLocked)await finalDraftStore.setInstrumentMetadata(draftKey,{trainingScaleTiming:{snapshotHash:item.trainingTiming.snapshotHash,items:timingRef.current.snapshot()}})
       await flushLocalSaves()
       onExit()
     } catch (cause) {
@@ -290,11 +311,13 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
       options: answer.options || null,
       required: answer.required !== false,
       contextKey: answer.contextKey || null,
+      formDefinition: answer.formDefinition,
       value: answer.value ?? null,
     }))
-    const missing = formAnswers.filter((answer) => answer.required && emptyValue(formValues[answer.formItemId]))
+    const visibleAnswers = trainingVisibleFields(formAnswers,formValues)
+    const missing = visibleAnswers.filter((answer) => answer.required && emptyValue(formValues[answer.formItemId]))
     if (missing.length > 0) {
-      setSectionIndex(Math.max(0, formAnswers.findIndex((answer) => answer.required && emptyValue(formValues[answer.formItemId]))))
+      setSectionIndex(Math.max(0, visibleAnswers.findIndex((answer) => answer.required && emptyValue(formValues[answer.formItemId]))))
       setError(`还有 ${missing.length} 个必填字段未完成`)
       return
     }
@@ -302,17 +325,20 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     try {
       setSubmitting(true)
       setError(null)
+      timingRef.current?.pause()
       await flushLocalSaves()
       const sealed = await finalDraftStore.sealForSubmission(draftKey, (snapshot) => {
         const answerMap = new Map(snapshot.answers.map((answer) => [answer.itemKey, answer.value as FormValue] as const))
-        const missingStored = formAnswers.filter((answer) => answer.required && emptyValue(answerMap.get(answer.formItemId)))
+        const cleanMap = sanitizeTrainingFormValues(formAnswers,Object.fromEntries(answerMap))
+        const visibleStored = trainingVisibleFields(formAnswers,cleanMap)
+        const missingStored = visibleStored.filter((answer) => answer.required && emptyValue(answerMap.get(answer.formItemId)))
         if (missingStored.length > 0) throw new Error(`还有 ${missingStored.length} 个必填字段尚未保存，请确认后再提交`)
         return {
           submissionId: snapshot.meta.submissionId,
           attemptEpoch: snapshot.meta.attemptEpoch,
           definitionHash: snapshot.meta.definitionHash,
           contextSnapshotHash: snapshot.meta.contextSnapshotHash,
-          answers: formAnswers.map((answer) => ({ formItemId: answer.formItemId, value: !answer.required && emptyValue(answerMap.get(answer.formItemId)) ? null : answerMap.get(answer.formItemId) ?? null })),
+          answers: visibleStored.map((answer) => ({ formItemId: answer.formItemId, value: !answer.required && emptyValue(cleanMap[answer.formItemId]) ? null : cleanMap[answer.formItemId] ?? null, ...(typeof cleanMap[answer.formItemId+':other']==='string'?{otherText:cleanMap[answer.formItemId+':other'] as string}:{}) })),
         }
       })
       if (!sealed) throw new Error('本地综合表单草稿不存在，请重新加载')
@@ -369,6 +395,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     try {
       setSubmitting(true)
       setError(null)
+      timingRef.current?.pause()
       await flushLocalSaves()
       const sealed = await finalDraftStore.sealForSubmission(draftKey, (snapshot) => {
         const answerMap = new Map(snapshot.answers.map((answer) => {
@@ -388,6 +415,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
           answers: items
             .filter((question) => answerMap.get(question.itemCode) !== undefined)
             .map((question) => ({ itemCode: question.itemCode, responseValue: answerMap.get(question.itemCode) as ResponseValue })),
+          ...(item.trainingTiming&&timingRef.current ? {itemTimings:sealObservedScaleTimings(items.map(q=>q.itemCode),Object.fromEntries(answerMap),timingRef.current.snapshot())} : {}),
           ...(deviceInputProvenance ? { deviceInputProvenance } : {}),
         }
       })
@@ -451,7 +479,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     ? { state: 'blocked' as const, message: '本地草稿已保留。当前测评版本已变化，需要重启后继续。' }
     : { state: 'none' as const }
   const formFields = item?.type === 'FORM_SECTION'
-    ? (item.formAnswers || (item.answers || []).filter((answer) => Boolean(answer.formItemId))) as any[]
+    ? trainingVisibleFields((item.formAnswers || (item.answers || []).filter((answer) => Boolean(answer.formItemId))) as any[], formValues)
     : []
   const scaleItems = item?.type === 'SCALE'
     ? (item.scale?.definition?.items || []) as Array<(NonNullable<NonNullable<CompositeCurrentItem['scale']>['definition']>['items'][number]) & { images?: unknown; video?: unknown }>
@@ -561,10 +589,14 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
                       label: field.label,
                       placeholder: field.placeholder,
                       required: Boolean(field.required),
+                      formDefinition: field.formDefinition,
+                      formPolicy: field.formPolicy,
                     }}
                     allowSkip
                     options={options}
                     value={value}
+                    otherText={typeof formValues[field.formItemId+':other']==='string'?formValues[field.formItemId+':other'] as string:undefined}
+                    onOtherTextChange={text=>void saveForm(field.formItemId+':other',text)}
                     navigationDisabled={exiting}
                     answerDisabled={draftLocked || exiting}
                     submitDisabled={requiresRestart || exiting}
@@ -606,7 +638,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
                   loadSources={() => loadCompositeVideoCapability(`${publicMode ? '/api/public/composite-assessments' : '/api/composite-assessments'}/attempts/${encodeURIComponent(state.id)}/items/${encodeURIComponent(item.id)}/scale/items/${encodeURIComponent(question.itemCode)}/video-capability`)}
                   ariaLabel={`${question.content} 视频内容`}
                 >
-                  <ScalePlayer
+                  {(() => { const player=(<ScalePlayer
                     key={question.itemCode}
                     item={question}
                     value={scaleValues[question.itemCode]}
@@ -622,7 +654,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
                       : undefined}
                     onSubmit={scaleIndex === scaleItems.length - 1 ? submitScaleNow : undefined}
                     submitting={submitting}
-                  />
+                  />);return item.trainingTiming&&timingRef.current ? <TrainingTimingBoundary tracker={timingRef.current} itemKey={question.itemCode} locked={draftLocked||submitting||exiting} onTiming={rows=>{if(draftKey&&!draftLocked&&!submitting&&!exiting)void scheduleLocalSave('scale-timing',()=>finalDraftStore.setInstrumentMetadata(draftKey,{trainingScaleTiming:{snapshotHash:item.trainingTiming!.snapshotHash,items:rows}}).then(()=>undefined)).catch(()=>undefined)}}>{player}</TrainingTimingBoundary>:player })()}
                 </ScaleFormVideoGate>
               </AssessmentImageGate>
             )
@@ -633,4 +665,8 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
   )
 }
 
-export default FinalCompositeAssessment
+export default function FinalCompositeShell(props: FinalCompositeAssessmentProps) {
+  return <TrainingFlowBoundary state={props.state} onExit={props.onExit} onCompleted={props.onCompleted} onReload={props.onReload}>
+    <FinalCompositeAssessment {...props} />
+  </TrainingFlowBoundary>
+}

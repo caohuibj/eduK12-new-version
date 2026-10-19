@@ -1,12 +1,16 @@
 import {beforeEach,expect,it,vi} from 'vitest'
 import {fireEvent,render,screen,waitFor} from '@testing-library/react'
-import {MemoryRouter,Route,Routes} from 'react-router-dom'
+import {Link,MemoryRouter,Route,Routes} from 'react-router-dom'
 import AnonymousStudyPage from '../AnonymousStudyPage'
-const api=vi.hoisted(()=>({info:vi.fn(),join:vi.fn(),home:vi.fn(),start:vi.fn(),recover:vi.fn(),revoke:vi.fn()}))
+const api=vi.hoisted(()=>({info:vi.fn(),join:vi.fn(),home:vi.fn(),start:vi.fn(),recover:vi.fn(),revoke:vi.fn(),researchConsent:vi.fn(),acceptResearchConsent:vi.fn(),requestResearchWithdrawal:vi.fn()}))
 vi.mock('../../../api/anonymousStudy',()=>({publicStudyApi:()=>api,studyIdentityKey:(s:string)=>`anonymous-study:identity:${s}`}))
+const version={id:'11111111-1111-4111-8111-111111111111',studyId:'s',version:1,body:'服务端发布的研究说明：研究自愿参与，可以随时申请退出。',bodyHash:'server-body-hash',publishedAt:'2026-10-18T12:00:00.000Z',scope:{purpose:'研究目的',dataCategories:['FORM'],waveCoverage:'EXISTING_AND_FUTURE'},scopeId:'s',scopeHash:'scope-hash'}
+const unknown={version,acceptedVersion:null,acceptance:null,state:'UNKNOWN',revision:0,eligible:false,reason:'CURRENT_CONSENT_REQUIRED'}
+const consented={...unknown,acceptedVersion:version,acceptance:{id:'accepted',versionId:version.id,bodyHash:version.bodyHash,acceptedAt:'2026-10-18T13:00:00.000Z'},state:'CONSENTED',revision:1,eligible:true,reason:null}
+const withdrawn={...consented,state:'WITHDRAWAL_PENDING',revision:2,eligible:false,reason:'WITHDRAWAL_PENDING'}
 const home={studyId:'s',title:'Research',displayCode:'P-DISPLAY',waves:[{id:'w',title:'One',ordinal:1,attemptId:'attempt',state:'COMPLETED',completedAt:null,accepting:true}],limitations:['研究内关联']}
-function show(path='/public/studies/waves/w/token'){return render(<MemoryRouter initialEntries={[path]}><Routes><Route path="/public/studies/waves/:waveId/:token" element={<AnonymousStudyPage/>}/><Route path="/public/studies/:studyId" element={<AnonymousStudyPage/>}/><Route path="/public/composite/attempts/:attemptId/report" element={<p>Own report</p>}/></Routes></MemoryRouter>)}
-beforeEach(()=>{vi.resetAllMocks();sessionStorage.clear();api.info.mockResolvedValue({studyId:'s',studyTitle:'Research',title:'One',accepting:true});api.home.mockResolvedValue(home)})
+function show(path='/public/studies/waves/w/token'){return render(<MemoryRouter initialEntries={[path]}><Link to="/public/studies/other">换研究</Link><Routes><Route path="/public/studies/waves/:waveId/:token" element={<AnonymousStudyPage/>}/><Route path="/public/studies/:studyId" element={<AnonymousStudyPage/>}/><Route path="/public/composite/attempts/:attemptId/report" element={<p>Own report</p>}/></Routes></MemoryRouter>)}
+beforeEach(()=>{vi.restoreAllMocks();vi.resetAllMocks();sessionStorage.clear();api.info.mockResolvedValue({studyId:'s',studyTitle:'Research',title:'One',accepting:true});api.home.mockResolvedValue(home);api.researchConsent.mockResolvedValue({...unknown,version:null})})
 it('offers A guest participation and requires consent before creating B identity',async()=>{
  show();await screen.findByText('One');expect(screen.getByRole('link',{name:'以单次访客开始'})).toHaveAttribute('href','/public/composite/token')
  const button=screen.getByRole('button',{name:'创建研究内身份码'});expect(button).toBeDisabled()
@@ -36,4 +40,128 @@ it('keeps identity restoration available through an expired wave entry',async()=
  expect(await screen.findByText(/已有身份码仍可恢复研究历史/)).toBeInTheDocument();expect(screen.queryByRole('button',{name:'创建研究内身份码'})).not.toBeInTheDocument()
  fireEvent.change(screen.getByLabelText('已有身份码，恢复研究任务'),{target:{value:'credential'}});fireEvent.click(screen.getByRole('button',{name:'用身份码进入'}))
  await waitFor(()=>expect(screen.getByRole('button',{name:'查看本次个人报告'})).toBeInTheDocument())
+})
+
+it('keeps identity acknowledgement separate from explicit server-version research consent',async()=>{
+ api.join.mockResolvedValue({studyId:'s',credential:'FULL-CREDENTIAL',displayCode:'P-DISPLAY'});api.researchConsent.mockResolvedValue(unknown)
+ show();await screen.findByText('One')
+ fireEvent.click(screen.getByRole('checkbox'));fireEvent.click(screen.getByRole('button',{name:'创建研究内身份码'}))
+ await screen.findByText('FULL-CREDENTIAL');fireEvent.click(screen.getByRole('button',{name:'进入我的研究测评'}))
+ expect(await screen.findByText(version.body)).toBeInTheDocument()
+ expect(screen.getByRole('checkbox',{name:/我已阅读第 1 版研究同意正文/})).not.toBeChecked()
+ expect(screen.getByRole('button',{name:'确认研究同意'})).toBeDisabled()
+ expect(api.acceptResearchConsent).not.toHaveBeenCalled()
+})
+
+it('accepts the exact server version and withdrawal preserves education history and credentials',async()=>{
+ sessionStorage.setItem('anonymous-study:identity:s','credential');sessionStorage.setItem('composite:recovery:attempt:attempt','saved-report')
+ api.researchConsent.mockResolvedValue(unknown);api.acceptResearchConsent.mockResolvedValue(consented);api.requestResearchWithdrawal.mockResolvedValue(withdrawn)
+ vi.spyOn(window,'confirm').mockReturnValue(true)
+ show('/public/studies/s');await screen.findByText(version.body)
+ fireEvent.click(screen.getByRole('checkbox',{name:/我已阅读/}));fireEvent.click(screen.getByRole('button',{name:'确认研究同意'}))
+ expect(await screen.findByText('已明确同意第 1 版研究说明。')).toBeInTheDocument()
+ expect(api.acceptResearchConsent).toHaveBeenCalledWith('s',{requestId:expect.any(String),versionId:version.id,bodyHash:version.bodyHash})
+ fireEvent.click(screen.getByRole('button',{name:'申请退出研究'}))
+ expect(await screen.findByText(/退出申请待审核；已立即从研究分析与研究导出中排除/)).toBeInTheDocument()
+ expect(api.requestResearchWithdrawal).toHaveBeenCalledWith('s',{requestId:expect.any(String),expectedRevision:1})
+ expect(screen.getByRole('button',{name:'查看本次个人报告'})).toBeEnabled()
+ expect(screen.getByText('已完成')).toBeInTheDocument()
+ expect(screen.getByText(/已下载文件无法收回/)).toBeInTheDocument()
+ expect(sessionStorage.getItem('anonymous-study:identity:s')).toBe('credential')
+ expect(sessionStorage.getItem('composite:recovery:attempt:attempt')).toBe('saved-report')
+ expect(api.revoke).not.toHaveBeenCalled()
+})
+
+it('does not gate an old education home on missing research versions or failed research loading',async()=>{
+ sessionStorage.setItem('anonymous-study:identity:s','credential');api.researchConsent.mockRejectedValueOnce(new Error('Research unavailable'))
+ show('/public/studies/s')
+ expect(await screen.findByRole('button',{name:'查看本次个人报告'})).toBeEnabled()
+ expect(await screen.findByText('研究同意状态暂不可用。你仍可作答和查看个人报告。')).toBeInTheDocument()
+ expect(screen.getByText('研究状态未知，尚不能确认已同意。')).toBeInTheDocument()
+ expect(screen.queryByRole('button',{name:'确认研究同意'})).not.toBeInTheDocument()
+ fireEvent.click(screen.getByRole('button',{name:'刷新研究状态'}))
+ expect(await screen.findByText('研究者尚未发布版本化研究同意正文。')).toBeInTheDocument()
+ expect(screen.getByRole('button',{name:'查看本次个人报告'})).toBeEnabled()
+})
+
+it('deduplicates rapid acceptance and retries the exact request after an uncertain response',async()=>{
+ sessionStorage.setItem('anonymous-study:identity:s','credential');api.researchConsent.mockResolvedValue(unknown)
+ let reject!:(error:Error)=>void
+ api.acceptResearchConsent.mockImplementationOnce(()=>new Promise((_,r)=>{reject=r})).mockResolvedValueOnce(consented)
+ show('/public/studies/s');await screen.findByText(version.body)
+ fireEvent.click(screen.getByRole('checkbox',{name:/我已阅读/}));const button=screen.getByRole('button',{name:'确认研究同意'})
+ fireEvent.click(button);fireEvent.click(button)
+ expect(api.acceptResearchConsent).toHaveBeenCalledTimes(1)
+ const first=api.acceptResearchConsent.mock.calls[0][1]
+ reject(new Error('Response lost'))
+ expect(await screen.findByRole('alert')).toHaveTextContent('操作结果尚未确认')
+ expect(screen.getByText('研究状态未知，尚不能确认已同意。')).toBeInTheDocument()
+ expect(screen.getByRole('button',{name:'查看本次个人报告'})).toBeEnabled()
+ fireEvent.click(screen.getByRole('button',{name:'确认研究同意'}))
+ await screen.findByText('已明确同意第 1 版研究说明。')
+ expect(api.acceptResearchConsent).toHaveBeenLastCalledWith('s',first)
+})
+
+it('retries withdrawal with the same revision and request without inventing a confirmed status',async()=>{
+ sessionStorage.setItem('anonymous-study:identity:s','credential');api.researchConsent.mockResolvedValue(consented)
+ let reject!:(error:Error)=>void
+ api.requestResearchWithdrawal.mockImplementationOnce(()=>new Promise((_,r)=>{reject=r})).mockResolvedValueOnce(withdrawn)
+ vi.spyOn(window,'confirm').mockReturnValue(true)
+ show('/public/studies/s');await screen.findByText('已明确同意第 1 版研究说明。')
+ const button=screen.getByRole('button',{name:'申请退出研究'});fireEvent.click(button);fireEvent.click(button)
+ expect(api.requestResearchWithdrawal).toHaveBeenCalledTimes(1)
+ const first=api.requestResearchWithdrawal.mock.calls[0][1];reject(new Error('Response lost'))
+ await screen.findByRole('alert')
+ expect(screen.getByText('研究状态未知，尚不能确认已同意。')).toBeInTheDocument()
+ expect(screen.queryByRole('button',{name:'确认研究同意'})).not.toBeInTheDocument()
+ fireEvent.click(screen.getByRole('button',{name:'申请退出研究'}))
+ await screen.findByText(/退出申请待审核/)
+ expect(api.requestResearchWithdrawal).toHaveBeenLastCalledWith('s',first)
+})
+
+it('ignores a late consent response after navigation and resets explicit consent for the next study',async()=>{
+ sessionStorage.setItem('anonymous-study:identity:s','credential');sessionStorage.setItem('anonymous-study:identity:other','other-credential')
+ api.researchConsent.mockResolvedValueOnce(unknown).mockResolvedValueOnce({...unknown,version:{...version,id:'other-version',studyId:'other',body:'第二项研究的独立正文，不沿用上一研究的勾选。'}})
+ api.home.mockResolvedValueOnce(home).mockResolvedValueOnce({...home,studyId:'other',title:'Other Research'})
+ let resolve!:(value:unknown)=>void;api.acceptResearchConsent.mockImplementationOnce(()=>new Promise(r=>{resolve=r}))
+ show('/public/studies/s');await screen.findByText(version.body)
+ fireEvent.click(screen.getByRole('checkbox',{name:/我已阅读/}));fireEvent.click(screen.getByRole('button',{name:'确认研究同意'}))
+ fireEvent.click(screen.getByRole('link',{name:'换研究'}))
+ expect(await screen.findByText('第二项研究的独立正文，不沿用上一研究的勾选。')).toBeInTheDocument()
+ resolve(consented)
+ await waitFor(()=>expect(screen.queryByText('已明确同意第 1 版研究说明。')).not.toBeInTheDocument())
+ expect(screen.getByRole('checkbox',{name:/我已阅读/})).not.toBeChecked()
+ expect(screen.getByRole('button',{name:'确认研究同意'})).toBeDisabled()
+ expect(screen.queryByText(version.body)).not.toBeInTheDocument()
+})
+
+it('retains an existing consent when the server reports it eligible after a new publication',async()=>{
+ sessionStorage.setItem('anonymous-study:identity:s','credential')
+ api.researchConsent.mockResolvedValue({...consented,version:{...version,id:'new-version',version:2,body:'新的研究正文仅用于新的接受，不改写已有接受记录。'}})
+ show('/public/studies/s')
+ expect(await screen.findByText('已明确同意第 1 版研究说明。')).toBeInTheDocument()
+ expect(screen.getByText(version.body)).toBeInTheDocument()
+ expect(screen.getByText('查看当前第 2 版补充说明（不改变原同意范围）')).toBeInTheDocument()
+ expect(screen.queryByRole('button',{name:'确认研究同意'})).not.toBeInTheDocument()
+ expect(api.acceptResearchConsent).not.toHaveBeenCalled()
+})
+
+it.each([401,403,404])('reports a rejected research capability (%s) without a short-code withdrawal bypass',async status=>{
+ sessionStorage.setItem('anonymous-study:identity:s','credential')
+ api.researchConsent.mockRejectedValue(Object.assign(new Error('Forbidden'),{status}))
+ show('/public/studies/s')
+ expect(await screen.findByRole('alert')).toHaveTextContent('请联系原研究发布方')
+ expect(screen.getByRole('alert')).toHaveTextContent('不能用短显示码办理退出')
+ expect(screen.queryByRole('button',{name:'申请退出研究'})).not.toBeInTheDocument()
+ expect(api.requestResearchWithdrawal).not.toHaveBeenCalled()
+})
+
+it('keeps identity deactivation a separate action and warns to request research withdrawal first',async()=>{
+ sessionStorage.setItem('anonymous-study:identity:s','credential');api.researchConsent.mockResolvedValue(consented)
+ const confirm=vi.spyOn(window,'confirm').mockReturnValue(false)
+ show('/public/studies/s');await screen.findByText('已明确同意第 1 版研究说明。')
+ fireEvent.click(screen.getByRole('button',{name:'停用身份码'}))
+ expect(confirm).toHaveBeenCalledWith(expect.stringContaining('请先提交研究退出申请'))
+ expect(api.revoke).not.toHaveBeenCalled();expect(api.requestResearchWithdrawal).not.toHaveBeenCalled()
+ expect(sessionStorage.getItem('anonymous-study:identity:s')).toBe('credential')
 })

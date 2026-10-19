@@ -1,9 +1,14 @@
+import { SjtReleasePermissions } from '../SjtReleasePermissions'
+import { AuthorPreviewMedia } from '../AuthorPreviewMedia'
+import { OnlineAnswerField } from '../OnlineAnswerField'
+import { onlineRunnerDefinition, onlineResponses, onlineAnswerComplete } from '../online'
 import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../../contexts/AuthContext'
 import { sessionFetch } from '../../../api/client'
 import { ProductPage, PageHeader, ProductStatus } from '../../../components/product-ui'
 import type { SituationalRunnerDefinition, SituationalDraftAnswer } from '../types'
 import { deriveReachableTrajectory } from '../traversal'
+import { OnlineAuthorEditor, newOnlineDocument, type OnlineDocument } from '../OnlineAuthorEditor'
 
 type Draft = {
   id: string
@@ -11,8 +16,9 @@ type Draft = {
   revision: number
   status: string
   contentDigest: string
-  template: { title: string; instrumentKey: string; instrumentVersion: string }
-  release?: { status: string } | null
+  authorizationPolicy?: 'COURSE_GRANT_V1' | null
+  template: { title: string; instrumentKey: string; instrumentVersion: string; templateVersion?:string } & Partial<OnlineDocument>
+  release?: { id: string; status: string } | null
   runner?: SituationalRunnerDefinition
   audits?: Array<{ action: string; revision: number; note?: string; template?: unknown }>
   changes?: string[]
@@ -73,6 +79,11 @@ const download = (name: string, text: string) => {
 
 export default function SjtAuthoring() {
   const { user } = useAuth()
+  const [online, setOnline] = useState<OnlineDocument>(newOnlineDocument)
+  const [showOnline, setShowOnline] = useState(false)
+  const [newDraftEpoch, setNewDraftEpoch] = useState(0)
+  const [mediaBusy, setMediaBusy] = useState(false)
+  const [policyChoice, setPolicyChoice] = useState<'LEGACY' | 'COURSE_GRANT_V1'>('COURSE_GRANT_V1')
   const [drafts, setDrafts] = useState<Draft[]>([]),
     [selected, setSelected] = useState<Draft | null>(null)
   const [file, setFile] = useState<File | null>(null),
@@ -110,7 +121,11 @@ export default function SjtAuthoring() {
     }
   }
   async function open(id: string) {
-    setSelected(await call<Draft>(`/drafts/${id}`))
+    const draft = await call<Draft>(`/drafts/${id}`)
+    if (draft.template.templateVersion === 'sjt-online-v1' && draft.template.display) draft.runner = onlineRunnerDefinition({responseProtocol:'sjt-online-response-v1',compilerVersion:'',definitionHash:'',displayHash:'',display:draft.template.display})
+    setSelected(draft)
+    setPolicyChoice(draft.authorizationPolicy === 'COURSE_GRANT_V1' ? 'COURSE_GRANT_V1' : 'LEGACY')
+    if (draft.template.templateVersion === 'sjt-online-v1') { setOnline(draft.template as OnlineDocument); setShowOnline(true) } else setShowOnline(false)
     setPreview(false)
     setParagraphs([])
   }
@@ -167,6 +182,33 @@ export default function SjtAuthoring() {
         description="填写模板，检查内容并预览作答；审核通过后发布试点版本。"
       />
       <section className="card my-5 space-y-4 p-6">
+        <button className="btn-primary" disabled={busy || mediaBusy} onClick={()=>{setNewDraftEpoch(x=>x+1);setSelected(null);setOnline(newOnlineDocument());setPolicyChoice('COURSE_GRANT_V1');setShowOnline(true);setPreview(false)}}>在线创建图文题包</button>
+        <p className="text-sm">在线编辑图文情境、单选／多选、拒答与评分矩阵，并独立录入人工验收样例。图片须来自私有作者素材库，完成替代文字与版权说明后保存。</p>
+        {(showOnline || selected) && <fieldset className="border rounded-lg p-4 space-y-3" disabled={busy || mediaBusy || Boolean(selected && (!owned || selected.status === 'PUBLISHED'))}>
+            <legend className="font-semibold">发布使用策略</legend>
+            <label className="block">题包发布策略<select className="input block w-full" value={policyChoice}
+              disabled={selected?.authorizationPolicy === 'COURSE_GRANT_V1'} onChange={e => setPolicyChoice(e.target.value as typeof policyChoice)}>
+              <option value="COURSE_GRANT_V1">COURSE_GRANT_V1 · 指定课程授权</option>
+              <option value="LEGACY">保留旧版使用策略</option>
+            </select></label>
+            <p className="text-sm">指定课程授权绑定培训师、单一培训课程、用途与有效期；多课程需分别投放并授权。保存为指定课程授权后不可切回旧策略，已发布版本不可修改。</p>
+            {selected && selected.authorizationPolicy !== 'COURSE_GRANT_V1' && policyChoice === 'COURSE_GRANT_V1' && <>
+              <p className="text-sm">保存策略会增加修订并退回草稿，已有审核失效。未保存的编辑内容不会随此操作保存。</p>
+              <button type="button" className="btn-secondary" onClick={() => void run(async () => {
+                await call(`/drafts/${selected.id}/policy`, 'PUT', { revision: selected.revision, authorizationPolicy: 'COURSE_GRANT_V1' })
+                await open(selected.id); await refresh(); setNotice('指定课程授权策略已保存，需重新审核。')
+              })}>保存课程授权策略</button>
+            </>}
+          </fieldset>}
+        {showOnline && <>
+          <OnlineAuthorEditor key={selected ? `${selected.id}:${selected.revision}` : `new:${newDraftEpoch}`} draftId={selected?.id} onMediaBusyChange={setMediaBusy} value={online} onChange={setOnline} disabled={busy || Boolean(selected && (!owned || selected.status==='PUBLISHED'))}/>
+          {(!selected || (owned && selected.status!=='PUBLISHED')) && <button className="btn-primary" disabled={busy || mediaBusy || Boolean(selected && policyChoice !== (selected.authorizationPolicy === 'COURSE_GRANT_V1' ? 'COURSE_GRANT_V1' : 'LEGACY'))} onClick={()=>void run(async()=>{
+            const saved = selected ? await call<Draft>(`/drafts/${selected.id}`,'PUT',{revision:selected.revision,template:online}) : await call<Draft>('/online/drafts','POST',{template:online,authorizationPolicy:policyChoice === 'COURSE_GRANT_V1' ? policyChoice : null})
+            await refresh(); await open(selected?.id??saved.id);setNotice('在线题包已保存。人工验收通过后可提交独立审核。')
+          })}>{selected?'保存在线修订':'保存在线新草稿'}</button>}
+        </>}
+      </section>
+      <section className="card my-5 space-y-4 p-6">
         <div className="flex flex-wrap gap-3">
         <a href={`${base}/template`} className="btn-secondary inline-flex">
           下载空白 Excel 模板
@@ -204,7 +246,7 @@ export default function SjtAuthoring() {
           >
             保存新草稿
           </button>
-          {owned && selected?.status !== 'PUBLISHED' ? (
+          {owned && selected?.template.templateVersion !== 'sjt-online-v1' && selected?.status !== 'PUBLISHED' ? (
             <button
               disabled={busy}
               className="btn-secondary"
@@ -247,6 +289,7 @@ export default function SjtAuthoring() {
           {drafts.map((d) => (
             <button
               key={d.id}
+              disabled={busy || mediaBusy}
               aria-label={`打开题包 ${d.template.instrumentKey} ${d.template.instrumentVersion}`}
               className="mb-2 block w-full break-words rounded-lg border p-3 text-left"
               onClick={() => void run(() => open(d.id))}
@@ -407,9 +450,7 @@ export default function SjtAuthoring() {
       {preview && selected && scene ? (
         <section className="card my-5 space-y-4 p-6">
           <h2 className="text-lg font-semibold">预览 · {scene.title}</h2>
-          <p className="whitespace-pre-wrap">
-            {scene.stimulus.type === 'TEXT_V1' ? scene.stimulus.text : ''}
-          </p>
+          <AuthorPreviewMedia draftId={selected.id} stimulus={scene.stimulus} disabled={busy}>
           <p className="text-sm text-gray-500">
             {stage === 'CHOICE' ? '确认行动后才显示追问。' : '追问可跳过；确认后继续下一情境。'}
             预览不会创建正式作答记录。
@@ -417,7 +458,7 @@ export default function SjtAuthoring() {
           {channels.map((c) => (
             <fieldset key={c.channelKey}>
               <legend>{c.prompt}</legend>
-              {c.responseType === 'SINGLE_CHOICE' ? (
+              {c.online ? <OnlineAnswerField channel={c} answer={answers[`${scene.sceneKey}:${c.channelKey}`]} name={`${scene.sceneKey}:${c.channelKey}`} onChange={(responseValue,status)=>setAnswers(a=>({...a,[`${scene.sceneKey}:${c.channelKey}`]:{responseValue,status}}))}/> : c.responseType === 'SINGLE_CHOICE' ? (
                 c.options?.map((o) => (
                   <label key={o.optionKey} className="my-2 block rounded-lg border p-3">
                     <input
@@ -455,7 +496,7 @@ export default function SjtAuthoring() {
             disabled={
               busy ||
               channels.some(
-                (c) => c.required !== false && !answers[`${scene.sceneKey}:${c.channelKey}`],
+                (c) => c.online ? !onlineAnswerComplete(c,answers[`${scene.sceneKey}:${c.channelKey}`]) : c.required !== false && !answers[`${scene.sceneKey}:${c.channelKey}`],
               )
             }
             className="btn-primary"
@@ -478,7 +519,8 @@ export default function SjtAuthoring() {
                   `/drafts/${selected.id}/preview`,
                   'POST',
                   {
-                    responses: Object.entries(answers)
+                    ...(selected.template.templateVersion==='sjt-online-v1'?{responseProtocol:'sjt-online-response-v1'}:{}),
+                    responses: selected.template.templateVersion==='sjt-online-v1'&&selected.runner ? onlineResponses(selected.runner,answers) : Object.entries(answers)
                       .filter(([, a]) => String(a.responseValue).trim())
                       .map(([pair, a]) => ({
                         sceneKey: pair.split(':')[0],
@@ -494,8 +536,12 @@ export default function SjtAuthoring() {
           >
             {stage === 'CHOICE' ? '确认行动' : '确认追问并继续'}
           </button>
+          </AuthorPreviewMedia>
         </section>
       ) : null}
+      <SjtReleasePermissions admin={user?.role === 'ADMIN'} userId={user?.id}
+        refreshKey={selected?.release ? `${selected.release.id}:${selected.release.status}` : ''}
+        onAdapt={async id => { await refresh(); await open(id) }}/>
       {paragraphs.length ? (
         <section className="card my-5 space-y-3 p-6">
           <h2>预览报告</h2>

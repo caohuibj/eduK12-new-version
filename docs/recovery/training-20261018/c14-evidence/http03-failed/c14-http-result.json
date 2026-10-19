@@ -1,0 +1,984 @@
+{
+  "passed": false,
+  "checks": [
+    "Real restricted runtime; independent owner-authored SJT releases/images and exact grants; group-exclusive four-tool synthetic resources",
+    "Owner revisioned config validation and immutable publication; one parent union, no per-group composite products",
+    "Candidate a Scale deployment DENY prevents every group draw for member/public",
+    "Candidate a decryptable invalid resolved Cognitive config prevents every group draw for member/public",
+    "Candidate b Scale deployment DENY prevents every group draw for member/public",
+    "Candidate b decryptable invalid resolved Cognitive config prevents every group draw for member/public",
+    "/composite-assessments FORM_SECTION: first durable FINAL ACK prevents restart before replay/state/report",
+    "/composite-assessments SCALE: first durable FINAL ACK prevents restart before replay/state/report",
+    "/composite-assessments COGNITIVE: first durable FINAL ACK prevents restart before replay/state/report",
+    "/composite-assessments SITUATIONAL: first durable FINAL ACK prevents restart before replay/state/report"
+  ],
+  "requests": [
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 312
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 318
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 290
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 284
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 284
+    },
+    {
+      "route": "/situational/authoring/media/images",
+      "method": "POST",
+      "status": 200,
+      "bytes": 243
+    },
+    {
+      "route": "/situational/authoring/online/drafts",
+      "method": "POST",
+      "status": 200,
+      "bytes": 4918
+    },
+    {
+      "route": "/situational/authoring/drafts/38cf91bc-3494-4b43-8a0d-a763fe44505c/request-review",
+      "method": "POST",
+      "status": 200,
+      "bytes": 4922
+    },
+    {
+      "route": "/situational/authoring/drafts/38cf91bc-3494-4b43-8a0d-a763fe44505c/review",
+      "method": "POST",
+      "status": 200,
+      "bytes": 4922
+    },
+    {
+      "route": "/situational/authoring/drafts/38cf91bc-3494-4b43-8a0d-a763fe44505c",
+      "method": "GET",
+      "status": 200,
+      "bytes": 15021
+    },
+    {
+      "route": "/situational/authoring/releases/be318b96-5699-4b5d-a2cd-4343cee6f3b1/grants",
+      "method": "POST",
+      "status": 200,
+      "bytes": 863
+    },
+    {
+      "route": "/situational/authoring/media/images",
+      "method": "POST",
+      "status": 200,
+      "bytes": 243
+    },
+    {
+      "route": "/situational/authoring/online/drafts",
+      "method": "POST",
+      "status": 200,
+      "bytes": 4918
+    },
+    {
+      "route": "/situational/authoring/drafts/f1d29d11-5847-4f26-a3ac-0d2793b69731/request-review",
+      "method": "POST",
+      "status": 200,
+      "bytes": 4922
+    },
+    {
+      "route": "/situational/authoring/drafts/f1d29d11-5847-4f26-a3ac-0d2793b69731/review",
+      "method": "POST",
+      "status": 200,
+      "bytes": 4922
+    },
+    {
+      "route": "/situational/authoring/drafts/f1d29d11-5847-4f26-a3ac-0d2793b69731",
+      "method": "GET",
+      "status": 200,
+      "bytes": 15021
+    },
+    {
+      "route": "/situational/authoring/releases/3ddad525-706d-4762-98e3-6bb0a343dce3/grants",
+      "method": "POST",
+      "status": 200,
+      "bytes": 863
+    },
+    {
+      "route": "/questionnaire-products",
+      "method": "POST",
+      "status": 200,
+      "bytes": 1254
+    },
+    {
+      "route": "/questionnaire-products/a33ef06a-ab12-4331-a484-e222e48a2ca9/items",
+      "method": "POST",
+      "status": 200,
+      "bytes": 2076
+    },
+    {
+      "route": "/questionnaire-products/a33ef06a-ab12-4331-a484-e222e48a2ca9/items",
+      "method": "POST",
+      "status": 200,
+      "bytes": 2504
+    },
+    {
+      "route": "/questionnaire-products/a33ef06a-ab12-4331-a484-e222e48a2ca9/items",
+      "method": "POST",
+      "status": 200,
+      "bytes": 3107
+    },
+    {
+      "route": "/questionnaire-products/a33ef06a-ab12-4331-a484-e222e48a2ca9/items",
+      "method": "POST",
+      "status": 200,
+      "bytes": 3517
+    },
+    {
+      "route": "/questionnaire-products/a33ef06a-ab12-4331-a484-e222e48a2ca9/items",
+      "method": "POST",
+      "status": 200,
+      "bytes": 4342
+    },
+    {
+      "route": "/questionnaire-products/a33ef06a-ab12-4331-a484-e222e48a2ca9/items",
+      "method": "POST",
+      "status": 200,
+      "bytes": 4770
+    },
+    {
+      "route": "/questionnaire-products/a33ef06a-ab12-4331-a484-e222e48a2ca9/items",
+      "method": "POST",
+      "status": 200,
+      "bytes": 5373
+    },
+    {
+      "route": "/questionnaire-products/a33ef06a-ab12-4331-a484-e222e48a2ca9/items",
+      "method": "POST",
+      "status": 200,
+      "bytes": 5783
+    },
+    {
+      "route": "/questionnaire-products/a33ef06a-ab12-4331-a484-e222e48a2ca9/training-variants",
+      "method": "POST",
+      "status": 403,
+      "bytes": 66
+    },
+    {
+      "route": "/questionnaire-products/a33ef06a-ab12-4331-a484-e222e48a2ca9/training-variants",
+      "method": "POST",
+      "status": 409,
+      "bytes": 87
+    },
+    {
+      "route": "/questionnaire-products/a33ef06a-ab12-4331-a484-e222e48a2ca9/training-variants",
+      "method": "POST",
+      "status": 400,
+      "bytes": 77
+    },
+    {
+      "route": "/questionnaire-products/a33ef06a-ab12-4331-a484-e222e48a2ca9/training-variants",
+      "method": "POST",
+      "status": 400,
+      "bytes": 68
+    },
+    {
+      "route": "/questionnaire-products/a33ef06a-ab12-4331-a484-e222e48a2ca9/training-variants",
+      "method": "POST",
+      "status": 400,
+      "bytes": 72
+    },
+    {
+      "route": "/questionnaire-products/a33ef06a-ab12-4331-a484-e222e48a2ca9/training-variants",
+      "method": "POST",
+      "status": 400,
+      "bytes": 105
+    },
+    {
+      "route": "/questionnaire-products/a33ef06a-ab12-4331-a484-e222e48a2ca9/training-variants",
+      "method": "POST",
+      "status": 400,
+      "bytes": 84
+    },
+    {
+      "route": "/questionnaire-products/a33ef06a-ab12-4331-a484-e222e48a2ca9/training-variants",
+      "method": "POST",
+      "status": 400,
+      "bytes": 78
+    },
+    {
+      "route": "/questionnaire-products/a33ef06a-ab12-4331-a484-e222e48a2ca9",
+      "method": "GET",
+      "status": 200,
+      "bytes": 5783
+    },
+    {
+      "route": "/questionnaire-products/a33ef06a-ab12-4331-a484-e222e48a2ca9/training-variants",
+      "method": "POST",
+      "status": 200,
+      "bytes": 6421
+    },
+    {
+      "route": "/questionnaire-products/a33ef06a-ab12-4331-a484-e222e48a2ca9/preflight",
+      "method": "POST",
+      "status": 200,
+      "bytes": 539
+    },
+    {
+      "route": "/questionnaire-products/a33ef06a-ab12-4331-a484-e222e48a2ca9/publish",
+      "method": "POST",
+      "status": 200,
+      "bytes": 9210
+    },
+    {
+      "route": "/questionnaire-products/a33ef06a-ab12-4331-a484-e222e48a2ca9/training-variants",
+      "method": "POST",
+      "status": 409,
+      "bytes": 87
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 284
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/public-tokens",
+      "method": "POST",
+      "status": 200,
+      "bytes": 208
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+      "method": "POST",
+      "status": 400,
+      "bytes": 96
+    },
+    {
+      "route": "/public/composite-assessments/[token]/start",
+      "method": "POST",
+      "status": 400,
+      "bytes": 96
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+      "method": "POST",
+      "status": 400,
+      "bytes": 96
+    },
+    {
+      "route": "/public/composite-assessments/[token]/start",
+      "method": "POST",
+      "status": 400,
+      "bytes": 96
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+      "method": "POST",
+      "status": 400,
+      "bytes": 96
+    },
+    {
+      "route": "/public/composite-assessments/[token]/start",
+      "method": "POST",
+      "status": 400,
+      "bytes": 96
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+      "method": "POST",
+      "status": 400,
+      "bytes": 96
+    },
+    {
+      "route": "/public/composite-assessments/[token]/start",
+      "method": "POST",
+      "status": 400,
+      "bytes": 96
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+      "method": "POST",
+      "status": 400,
+      "bytes": 81
+    },
+    {
+      "route": "/public/composite-assessments/[token]/start",
+      "method": "POST",
+      "status": 400,
+      "bytes": 81
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+      "method": "POST",
+      "status": 400,
+      "bytes": 81
+    },
+    {
+      "route": "/public/composite-assessments/[token]/start",
+      "method": "POST",
+      "status": 400,
+      "bytes": 81
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+      "method": "POST",
+      "status": 400,
+      "bytes": 81
+    },
+    {
+      "route": "/public/composite-assessments/[token]/start",
+      "method": "POST",
+      "status": 400,
+      "bytes": 81
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+      "method": "POST",
+      "status": 400,
+      "bytes": 81
+    },
+    {
+      "route": "/public/composite-assessments/[token]/start",
+      "method": "POST",
+      "status": 400,
+      "bytes": 81
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+      "method": "POST",
+      "status": 400,
+      "bytes": 96
+    },
+    {
+      "route": "/public/composite-assessments/[token]/start",
+      "method": "POST",
+      "status": 400,
+      "bytes": 96
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+      "method": "POST",
+      "status": 400,
+      "bytes": 96
+    },
+    {
+      "route": "/public/composite-assessments/[token]/start",
+      "method": "POST",
+      "status": 400,
+      "bytes": 96
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+      "method": "POST",
+      "status": 400,
+      "bytes": 96
+    },
+    {
+      "route": "/public/composite-assessments/[token]/start",
+      "method": "POST",
+      "status": 400,
+      "bytes": 96
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+      "method": "POST",
+      "status": 400,
+      "bytes": 96
+    },
+    {
+      "route": "/public/composite-assessments/[token]/start",
+      "method": "POST",
+      "status": 400,
+      "bytes": 96
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+      "method": "POST",
+      "status": 400,
+      "bytes": 81
+    },
+    {
+      "route": "/public/composite-assessments/[token]/start",
+      "method": "POST",
+      "status": 400,
+      "bytes": 81
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+      "method": "POST",
+      "status": 400,
+      "bytes": 81
+    },
+    {
+      "route": "/public/composite-assessments/[token]/start",
+      "method": "POST",
+      "status": 400,
+      "bytes": 81
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+      "method": "POST",
+      "status": 400,
+      "bytes": 81
+    },
+    {
+      "route": "/public/composite-assessments/[token]/start",
+      "method": "POST",
+      "status": 400,
+      "bytes": 81
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+      "method": "POST",
+      "status": 400,
+      "bytes": 81
+    },
+    {
+      "route": "/public/composite-assessments/[token]/start",
+      "method": "POST",
+      "status": 400,
+      "bytes": 81
+    },
+    {
+      "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+      "method": "POST",
+      "status": 200,
+      "bytes": 3444
+    },
+    {
+      "route": "/composite-assessments/attempts/81c52ecf-dc02-4d1c-97ce-de614c58c8cc/form-sections/f696d3c4-9d4d-44dc-8d8b-ef25f97bae7c/submit",
+      "method": "POST",
+      "status": 200,
+      "bytes": 358
+    },
+    {
+      "route": "/composite-assessments/attempts/81c52ecf-dc02-4d1c-97ce-de614c58c8cc/restart",
+      "method": "POST",
+      "status": 409,
+      "bytes": 121
+    },
+    {
+      "route": "/composite-assessments/attempts/81c52ecf-dc02-4d1c-97ce-de614c58c8cc/form-sections/f696d3c4-9d4d-44dc-8d8b-ef25f97bae7c/submit",
+      "method": "POST",
+      "status": 200,
+      "bytes": 279
+    },
+    {
+      "route": "/composite-assessments/attempts/81c52ecf-dc02-4d1c-97ce-de614c58c8cc",
+      "method": "GET",
+      "status": 200,
+      "bytes": 3608
+    },
+    {
+      "route": "/composite-assessments/attempts/81c52ecf-dc02-4d1c-97ce-de614c58c8cc/items/94ba59bb-2b0b-4b26-8dcb-6289c6e475c2/scale/submit",
+      "method": "POST",
+      "status": 200,
+      "bytes": 243
+    },
+    {
+      "route": "/composite-assessments/attempts/81c52ecf-dc02-4d1c-97ce-de614c58c8cc/restart",
+      "method": "POST",
+      "status": 409,
+      "bytes": 121
+    },
+    {
+      "route": "/composite-assessments/attempts/81c52ecf-dc02-4d1c-97ce-de614c58c8cc/items/94ba59bb-2b0b-4b26-8dcb-6289c6e475c2/scale/submit",
+      "method": "POST",
+      "status": 200,
+      "bytes": 245
+    },
+    {
+      "route": "/composite-assessments/attempts/81c52ecf-dc02-4d1c-97ce-de614c58c8cc",
+      "method": "GET",
+      "status": 200,
+      "bytes": 3938
+    },
+    {
+      "route": "/cognitive/sessions/0190027b-4320-4834-95ff-885eafc929e1/submit",
+      "method": "POST",
+      "status": 200,
+      "bytes": 246
+    },
+    {
+      "route": "/composite-assessments/attempts/81c52ecf-dc02-4d1c-97ce-de614c58c8cc/restart",
+      "method": "POST",
+      "status": 409,
+      "bytes": 121
+    },
+    {
+      "route": "/cognitive/sessions/0190027b-4320-4834-95ff-885eafc929e1/submit",
+      "method": "POST",
+      "status": 200,
+      "bytes": 251
+    },
+    {
+      "route": "/composite-assessments/attempts/81c52ecf-dc02-4d1c-97ce-de614c58c8cc",
+      "method": "GET",
+      "status": 200,
+      "bytes": 9323
+    },
+    {
+      "route": "/composite-assessments/attempts/81c52ecf-dc02-4d1c-97ce-de614c58c8cc/items/959d871d-5824-47bf-8b80-bbc4d5fa5ae2/situational/c09bb67c-cfab-4392-9149-71136a6197ab",
+      "method": "GET",
+      "status": 200,
+      "bytes": 6925
+    },
+    {
+      "route": "/composite-assessments/attempts/81c52ecf-dc02-4d1c-97ce-de614c58c8cc/items/959d871d-5824-47bf-8b80-bbc4d5fa5ae2/situational/c09bb67c-cfab-4392-9149-71136a6197ab/assets/a92c8167-2d7c-43c6-a968-1803370ff3c2/content",
+      "method": "GET",
+      "status": 200,
+      "bytes": 70
+    },
+    {
+      "route": "/composite-assessments/attempts/81c52ecf-dc02-4d1c-97ce-de614c58c8cc/items/959d871d-5824-47bf-8b80-bbc4d5fa5ae2/situational/c09bb67c-cfab-4392-9149-71136a6197ab/submit",
+      "method": "POST",
+      "status": 200,
+      "bytes": 129
+    },
+    {
+      "route": "/composite-assessments/attempts/81c52ecf-dc02-4d1c-97ce-de614c58c8cc/restart",
+      "method": "POST",
+      "status": 409,
+      "bytes": 121
+    },
+    {
+      "route": "/composite-assessments/attempts/81c52ecf-dc02-4d1c-97ce-de614c58c8cc/items/959d871d-5824-47bf-8b80-bbc4d5fa5ae2/situational/c09bb67c-cfab-4392-9149-71136a6197ab/submit",
+      "method": "POST",
+      "status": 200,
+      "bytes": 131
+    },
+    {
+      "route": "/composite-assessments/attempts/81c52ecf-dc02-4d1c-97ce-de614c58c8cc",
+      "method": "GET",
+      "status": 200,
+      "bytes": 3002
+    }
+  ],
+  "counts": [
+    {
+      "name": "Candidate a Scale deployment DENY prevents every group draw for member/public",
+      "before": {
+        "definitions": 1,
+        "parents": 0,
+        "forms": 0,
+        "formAnswers": 0,
+        "scales": 0,
+        "cognitive": 0,
+        "sjt": 0,
+        "rawScale": 0,
+        "rawCognitive": 0,
+        "rawSjt": 0,
+        "snapshots": 0,
+        "jobs": 0,
+        "tokens": [
+          {
+            "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+            "usedCount": 0
+          }
+        ]
+      },
+      "after": {
+        "definitions": 1,
+        "parents": 0,
+        "forms": 0,
+        "formAnswers": 0,
+        "scales": 0,
+        "cognitive": 0,
+        "sjt": 0,
+        "rawScale": 0,
+        "rawCognitive": 0,
+        "rawSjt": 0,
+        "snapshots": 0,
+        "jobs": 0,
+        "tokens": [
+          {
+            "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+            "usedCount": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Candidate a decryptable invalid resolved Cognitive config prevents every group draw for member/public",
+      "before": {
+        "definitions": 1,
+        "parents": 0,
+        "forms": 0,
+        "formAnswers": 0,
+        "scales": 0,
+        "cognitive": 0,
+        "sjt": 0,
+        "rawScale": 0,
+        "rawCognitive": 0,
+        "rawSjt": 0,
+        "snapshots": 0,
+        "jobs": 0,
+        "tokens": [
+          {
+            "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+            "usedCount": 0
+          }
+        ]
+      },
+      "after": {
+        "definitions": 1,
+        "parents": 0,
+        "forms": 0,
+        "formAnswers": 0,
+        "scales": 0,
+        "cognitive": 0,
+        "sjt": 0,
+        "rawScale": 0,
+        "rawCognitive": 0,
+        "rawSjt": 0,
+        "snapshots": 0,
+        "jobs": 0,
+        "tokens": [
+          {
+            "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+            "usedCount": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Candidate b Scale deployment DENY prevents every group draw for member/public",
+      "before": {
+        "definitions": 1,
+        "parents": 0,
+        "forms": 0,
+        "formAnswers": 0,
+        "scales": 0,
+        "cognitive": 0,
+        "sjt": 0,
+        "rawScale": 0,
+        "rawCognitive": 0,
+        "rawSjt": 0,
+        "snapshots": 0,
+        "jobs": 0,
+        "tokens": [
+          {
+            "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+            "usedCount": 0
+          }
+        ]
+      },
+      "after": {
+        "definitions": 1,
+        "parents": 0,
+        "forms": 0,
+        "formAnswers": 0,
+        "scales": 0,
+        "cognitive": 0,
+        "sjt": 0,
+        "rawScale": 0,
+        "rawCognitive": 0,
+        "rawSjt": 0,
+        "snapshots": 0,
+        "jobs": 0,
+        "tokens": [
+          {
+            "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+            "usedCount": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "Candidate b decryptable invalid resolved Cognitive config prevents every group draw for member/public",
+      "before": {
+        "definitions": 1,
+        "parents": 0,
+        "forms": 0,
+        "formAnswers": 0,
+        "scales": 0,
+        "cognitive": 0,
+        "sjt": 0,
+        "rawScale": 0,
+        "rawCognitive": 0,
+        "rawSjt": 0,
+        "snapshots": 0,
+        "jobs": 0,
+        "tokens": [
+          {
+            "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+            "usedCount": 0
+          }
+        ]
+      },
+      "after": {
+        "definitions": 1,
+        "parents": 0,
+        "forms": 0,
+        "formAnswers": 0,
+        "scales": 0,
+        "cognitive": 0,
+        "sjt": 0,
+        "rawScale": 0,
+        "rawCognitive": 0,
+        "rawSjt": 0,
+        "snapshots": 0,
+        "jobs": 0,
+        "tokens": [
+          {
+            "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+            "usedCount": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "/composite-assessments FORM_SECTION: first durable FINAL ACK prevents restart before replay/state/report",
+      "before": {
+        "definitions": 1,
+        "parents": 1,
+        "forms": 1,
+        "formAnswers": 1,
+        "scales": 1,
+        "cognitive": 1,
+        "sjt": 1,
+        "rawScale": 0,
+        "rawCognitive": 0,
+        "rawSjt": 0,
+        "snapshots": 1,
+        "jobs": 1,
+        "tokens": [
+          {
+            "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+            "usedCount": 0
+          }
+        ]
+      },
+      "after": {
+        "definitions": 1,
+        "parents": 1,
+        "forms": 1,
+        "formAnswers": 1,
+        "scales": 1,
+        "cognitive": 1,
+        "sjt": 1,
+        "rawScale": 0,
+        "rawCognitive": 0,
+        "rawSjt": 0,
+        "snapshots": 1,
+        "jobs": 1,
+        "tokens": [
+          {
+            "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+            "usedCount": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "/composite-assessments SCALE: first durable FINAL ACK prevents restart before replay/state/report",
+      "before": {
+        "definitions": 1,
+        "parents": 1,
+        "forms": 1,
+        "formAnswers": 1,
+        "scales": 1,
+        "cognitive": 1,
+        "sjt": 1,
+        "rawScale": 0,
+        "rawCognitive": 0,
+        "rawSjt": 0,
+        "snapshots": 2,
+        "jobs": 1,
+        "tokens": [
+          {
+            "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+            "usedCount": 0
+          }
+        ]
+      },
+      "after": {
+        "definitions": 1,
+        "parents": 1,
+        "forms": 1,
+        "formAnswers": 1,
+        "scales": 1,
+        "cognitive": 1,
+        "sjt": 1,
+        "rawScale": 0,
+        "rawCognitive": 0,
+        "rawSjt": 0,
+        "snapshots": 2,
+        "jobs": 1,
+        "tokens": [
+          {
+            "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+            "usedCount": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "/composite-assessments COGNITIVE: first durable FINAL ACK prevents restart before replay/state/report",
+      "before": {
+        "definitions": 1,
+        "parents": 1,
+        "forms": 1,
+        "formAnswers": 1,
+        "scales": 1,
+        "cognitive": 1,
+        "sjt": 1,
+        "rawScale": 0,
+        "rawCognitive": 1,
+        "rawSjt": 0,
+        "snapshots": 3,
+        "jobs": 1,
+        "tokens": [
+          {
+            "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+            "usedCount": 0
+          }
+        ]
+      },
+      "after": {
+        "definitions": 1,
+        "parents": 1,
+        "forms": 1,
+        "formAnswers": 1,
+        "scales": 1,
+        "cognitive": 1,
+        "sjt": 1,
+        "rawScale": 0,
+        "rawCognitive": 1,
+        "rawSjt": 0,
+        "snapshots": 3,
+        "jobs": 1,
+        "tokens": [
+          {
+            "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+            "usedCount": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "/composite-assessments SITUATIONAL: first durable FINAL ACK prevents restart before replay/state/report",
+      "before": {
+        "definitions": 1,
+        "parents": 1,
+        "forms": 1,
+        "formAnswers": 1,
+        "scales": 1,
+        "cognitive": 1,
+        "sjt": 1,
+        "rawScale": 0,
+        "rawCognitive": 1,
+        "rawSjt": 1,
+        "snapshots": 4,
+        "jobs": 1,
+        "tokens": [
+          {
+            "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+            "usedCount": 0
+          }
+        ]
+      },
+      "after": {
+        "definitions": 1,
+        "parents": 1,
+        "forms": 1,
+        "formAnswers": 1,
+        "scales": 1,
+        "cognitive": 1,
+        "sjt": 1,
+        "rawScale": 0,
+        "rawCognitive": 1,
+        "rawSjt": 1,
+        "snapshots": 4,
+        "jobs": 1,
+        "tokens": [
+          {
+            "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+            "usedCount": 0
+          }
+        ]
+      }
+    }
+  ],
+  "races": [],
+  "allocations": [
+    {
+      "attemptId": "81c52ecf-dc02-4d1c-97ce-de614c58c8cc",
+      "allocationHash": "12fbd5e5be5adefd483888c9b83f2e5bfb143190897a9ed756a5bcf62c2fe384",
+      "ciphertextSha256": "c3ff8f3194727d4e4e8d55c3ea7d65f59a21fecb884c242e9f6eebcd13edde96",
+      "configDigest": "328bd26dcd54afa969907794e7fb05a6344ac26f3ca406fe1d634cd305ffc75d",
+      "variantKey": "b",
+      "selectedItemIds": [
+        "49dbc2ba-c128-4843-9b93-fab61fd44bf2",
+        "94ba59bb-2b0b-4b26-8dcb-6289c6e475c2",
+        "ea600253-8311-4b67-b8d2-7d34bc0775d3",
+        "959d871d-5824-47bf-8b80-bbc4d5fa5ae2"
+      ],
+      "selectedSectionIds": [
+        "f696d3c4-9d4d-44dc-8d8b-ef25f97bae7c"
+      ]
+    }
+  ],
+  "completed": [],
+  "qualification": {
+    "browser": false,
+    "load": false,
+    "cpuOrLatency": false,
+    "sampling": "Natural production crypto draws; bounded at 16; both groups must be observed and every sampled attempt fully answered",
+    "mediaLimit": "Hidden SJT probes exercise cross-slot denial; no successful selected-video capability fixture or independent hidden-child HTTP selection-guard claim"
+  }
+}

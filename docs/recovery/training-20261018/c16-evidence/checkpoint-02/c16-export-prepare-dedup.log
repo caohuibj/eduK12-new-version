@@ -1,0 +1,19 @@
+2026-10-18T13:23:35Z
+bfc96bebfdde642e54bd9d97136f5599ccc36871
+v24.21.0
+4b23ce95d26238f16d93d1c1c59b4c3b5f713cc94a8c624bff272e11ea55649d  src/services/assessmentExportWorker.ts
+9e26566029cfc188a44c7b1dc6442153e351d0a1795c050850d136ad0ec2a75b  src/workers/exportBatchTask.ts
+2e0657ba1a419499b404b8cc68f4c129497d6d1f00dbca167d9e172d249963a6  src/modules/training-analysis/core.ts
+8d2a07eabae613e97bd85e83b16b4117ad2574d07d840ef3b0d4b4f12815989f  src/modules/training-analysis/export.ts
+4bdaa908457d352b85d1a0e1a45dc83ef5de97c5cc87cd035aae86e8e9d23111  src/modules/training-analysis/manifest.ts
+217abd8b98753c2b767ac17e78bc90f4ac4e062d71716f9810d43dc9b31e0e28  src/__tests__/training-analysis/export-worker.test.ts
+41c12a2c75d75c37bf7df9b0fa23056fe92ad85484f537ba5451ac735b6a8449  src/__tests__/training-analysis/export-fixtures.ts
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/eduk12_c16_20261018/server-version/backend
+
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  22:23:35
+   Duration  1.26s (transform 790ms, setup 0ms, import 1.11s, tests 23ms, environment 0ms)
+

@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "checks": [
+    "Pinned C14 FULL02 stopped clone matches exact nonempty new-format dump, including all ciphertexts, FINAL hashes, results and jobs",
+    "C16 additive quality/audit migration preserves every old column and row without CourseStudent revision expansion; new tables empty; restricted role verified"
+  ],
+  "oldTableCount": 205,
+  "addedTables": [
+    "training_analysis_quality",
+    "training_analysis_quality_audit"
+  ],
+  "oldMigrationCount": 171,
+  "newMigrationCount": 172,
+  "historicalProjectionSha256": "b98fb7879fd096313531a32e1f3fee6dafaa9fa8a469d2755bc45780793dfd7d",
+  "courseStudentColumnsUnchanged": true,
+  "processExits": {
+    "restore-pinned-c14": 0,
+    "migrate-c16": 0,
+    "eduk12_recovery-acl": 0,
+    "eduk12_recovery-runtime-role": 0
+  }
+}

@@ -1,3 +1,5 @@
+import { assertTrainingChildSelected, loadTrainingChildAdmissionParent, TRAINING_VARIANT_PARENT_MARKER_SELECT } from '../composite/training-variant-child-scope'
+import {readTrainingTimingSnapshot,type TrainingTimingSnapshot} from '../assessment-runtime/training-scale-timing'
 import { loadStoredVersionedUnitAdmission } from '../assessment-runtime/unit-admission'
 import { withSerializableScaleTransaction } from './deployment/transactions'
 import { type Prisma, type PrismaClient } from '@prisma/client'
@@ -55,6 +57,7 @@ export const UNIFIED_SCALE_CHILD_ADMISSION_SELECT = {
   questionnaireAssessmentId: true,
   compositeAttemptId: true,
   compositeItemId: true,
+  compositeAttempt: { select: TRAINING_VARIANT_PARENT_MARKER_SELECT },
   scaleId: true,
   subjectUserId: true,
   respondentUserId: true,
@@ -89,6 +92,7 @@ export type ScaleAdmissionChildRow = {
   questionnaireAssessmentId: string | null
   compositeAttemptId: string | null
   compositeItemId: string | null
+  compositeAttempt?: any
   scaleId: string
   subjectUserId: string | null
   respondentUserId: string | null
@@ -108,6 +112,7 @@ export type ScaleAdmissionChildRow = {
 // composite attempt row. The unified attempt-state reader holds an already
 // loaded superset row and passes it in to skip the redundant read.
 export type CompositeScaleAdmissionParent = {
+  trainingTimingSnapshot?: unknown
   id: string
   userId: string | null
   recoveryTokenHash: string | null
@@ -142,7 +147,7 @@ const readRequiredScaleSlot = async (input: {
   attemptEpoch: number
   slotKey: string
   scale: ScaleAdmissionChildRow['scale']
-}): Promise<FrozenActiveSlotV1> => {
+}, db?: Db): Promise<FrozenActiveSlotV1> => {
   let slot: FrozenActiveSlotV1
   try {
     slot = await loadFrozenActiveSlot({
@@ -150,7 +155,7 @@ const readRequiredScaleSlot = async (input: {
       storedHash: input.storedHash,
       attemptEpoch: input.attemptEpoch,
       slotKey: input.slotKey,
-    })
+    }, db)
   } catch (error) {
     throw new InstrumentFinalSubmitError(
       'DEFINITION_MISMATCH',
@@ -307,6 +312,7 @@ export const createScaleAdmissionForRuntime = async (input: {
   respondentType?: string | null
   subjectUserId?: string | null
   respondentUserId?: string | null
+  trainingTiming?: TrainingTimingSnapshot
   legacyRequiresContext?: boolean
 }): Promise<VersionedFrozenUnitAdmission> => {
   if (input.runtime.instrumentKey !== input.scale.code || input.runtime.instrumentVersion !== input.scale.instrumentVersion) {
@@ -316,6 +322,7 @@ export const createScaleAdmissionForRuntime = async (input: {
   if (input.runtime.schemaVersion === 1) {
     return createFrozenUnitAdmission({
       attemptEpoch: input.attemptEpoch,
+      ...(input.trainingTiming ? {trainingTiming:input.trainingTiming} : {}),
       scale: input.scale,
       principal: input.principal,
       parent: input.parent,
@@ -401,6 +408,7 @@ export const createScaleAdmissionForRuntime = async (input: {
 
   return createFrozenUnitAdmissionV2({
     attemptEpoch: input.attemptEpoch,
+    ...(input.trainingTiming ? {trainingTiming:input.trainingTiming} : {}),
     scale: input.scale,
     principal: input.principal,
     parent: input.parent,
@@ -594,7 +602,7 @@ const activateUnstoredScaleAdmission = async (
       attemptEpoch: row.attemptEpoch,
       slotKey,
       scale: row.scale,
-    })
+    }, db)
     const compiledRuntimeHash = compiledRuntimeHashFrom(slot, row.compiledRuntimeHash)
     if (compiledRuntimeHash !== runtime.compiledRuntime.compiledRuntimeHash) {
       throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结单元运行时哈希不匹配', 409)
@@ -636,24 +644,8 @@ const activateUnstoredScaleAdmission = async (
   }
 
   if (row.compositeAttemptId) {
-    const loaded = parent ?? await db.compositeAssessmentAttempt.findUnique({
-      where: { id: row.compositeAttemptId },
-      select: {
-        id: true,
-        userId: true,
-        recoveryTokenHash: true,
-        deliveryMode: true,
-        attemptEpoch: true,
-        contextSnapshotEncrypted: true,
-        contextSnapshotHash: true,
-        frozenActiveSlotSetEncrypted: true,
-        frozenActiveSlotSetHash: true,
-        compositeAssessment: {
-          select: { formSections: { select: { contextSection: true, items: { select: { contextKey: true } } } } },
-        },
-      },
-    })
-    if (!loaded) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '上级测评记录不存在', 404)
+    const scoped = await assertTrainingChildSelected(row, { parent, db })
+    const loaded = await loadTrainingChildAdmissionParent(row.compositeAttemptId, scoped, db)
     assertFinalOnly(loaded.deliveryMode)
     assertAttemptEpoch(loaded.attemptEpoch, row.attemptEpoch)
     if (!row.compositeItemId) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表未绑定到当前测评单元', 409)
@@ -664,7 +656,7 @@ const activateUnstoredScaleAdmission = async (
       attemptEpoch: row.attemptEpoch,
       slotKey,
       scale: row.scale,
-    })
+    }, db)
     const compiledRuntimeHash = compiledRuntimeHashFrom(slot, row.compiledRuntimeHash)
     if (compiledRuntimeHash !== runtime.compiledRuntime.compiledRuntimeHash) {
       throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表冻结单元运行时哈希不匹配', 409)
@@ -690,6 +682,7 @@ const activateUnstoredScaleAdmission = async (
       },
       runtime,
       requestedMode: 'COMPOSITE',
+      ...(loaded.trainingTimingSnapshot ? {trainingTiming:readTrainingTimingSnapshot(loaded.trainingTimingSnapshot)!} : {}),
       contextSnapshotHash: loaded.contextSnapshotHash,
       contextValues: context.context?.values ?? null,
       contextFrozenAt: context.context?.frozenAt ?? null,
@@ -726,6 +719,7 @@ export const activateScaleAdmission = async (
   parent?: CompositeScaleAdmissionParent,
   referenceTimeMs = Date.now(),
 ): Promise<VersionedFrozenUnitAdmission> => {
+  parent = await assertTrainingChildSelected(row, { parent }) ?? parent
   const stored = await loadStoredScaleAdmission(row)
   if (stored) return (await validateStoredAgainstRuntime(row, stored, referenceTimeMs))
   assertFinalOnly(row.deliveryMode)

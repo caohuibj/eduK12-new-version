@@ -1,0 +1,71 @@
+{
+  "passed": false,
+  "requests": 9,
+  "checks": [],
+  "observations": [
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 102,
+      "durationMs": 30
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 131,
+      "responseBytes": 318,
+      "durationMs": 122
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 102,
+      "durationMs": 2
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 131,
+      "responseBytes": 318,
+      "durationMs": 82
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 182,
+      "responseBytes": 1093,
+      "durationMs": 35
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 198,
+      "responseBytes": 2185,
+      "durationMs": 37
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 204,
+      "responseBytes": 3292,
+      "durationMs": 33
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 190,
+      "responseBytes": 4371,
+      "durationMs": 29
+    },
+    {
+      "method": "POST",
+      "status": 400,
+      "requestBytes": 208,
+      "responseBytes": 98,
+      "durationMs": 5
+    }
+  ],
+  "error": "AssertionError [ERR_ASSERTION]: POST /questionnaire-products/8a88b02f-1065-45e9-bd7e-c3def36ad77a/items: {\"code\":-1,\"message\":\"Number must be less than or equal to 10000; 表单定义无效\",\"data\":null}\n\n400 !== 200\n"
+}

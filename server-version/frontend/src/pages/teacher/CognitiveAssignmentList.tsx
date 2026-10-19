@@ -1,4 +1,5 @@
 import { isTrainingHost } from '../../training/context'
+import { useCognitiveEnabled } from '../../contexts/CapabilitiesContext'
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Brain, Plus, Settings } from 'lucide-react'
@@ -42,6 +43,7 @@ const statusLabel: Record<string, string> = {
 }
 
 const CognitiveAssignmentList: React.FC = () => {
+  const cognitiveEnabled = useCognitiveEnabled()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const { user } = useAuth()
@@ -113,14 +115,14 @@ const CognitiveAssignmentList: React.FC = () => {
   // preselection when its id is among this account's authorized courses.
   useEffect(() => {
     const requested = searchParams.get('courseId')
-    if (searchParams.get('create') !== 'true' || !requested) return
+    if (!cognitiveEnabled || searchParams.get('create') !== 'true' || !requested) return
     if (!selectableCourses.some(course => course.id === requested)) return
     setForm(current => ({ ...current, courseId: requested }))
     setShowForm(true)
     const next = new URLSearchParams(searchParams)
     next.delete('create')
     setSearchParams(next, { replace: true })
-  }, [courses, isAdmin, searchParams, setSearchParams])
+  }, [courses, isAdmin, searchParams, setSearchParams, cognitiveEnabled])
 
   const create = async () => {
     try {
@@ -164,7 +166,7 @@ const CognitiveAssignmentList: React.FC = () => {
       <PageHeader
         title="认知任务"
         description="创建、发布和管理认知任务，按任务要求选择测验档位与参与方式。"
-        actions={
+        actions={cognitiveEnabled &&
           <button
             type="button"
             onClick={() => setShowForm(true)}
@@ -179,7 +181,7 @@ const CognitiveAssignmentList: React.FC = () => {
 
       {error && <p role="alert" className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</p>}
 
-      {showForm && (
+      {cognitiveEnabled && showForm && (
         <section id="cognitive-assignment-create" className="staff-panel staff-panel--padded p-6" aria-labelledby="cognitive-assignment-create-title">
           <div className="flex items-center gap-2 mb-4">
             <Brain className="w-5 h-5 text-action" aria-hidden="true" />

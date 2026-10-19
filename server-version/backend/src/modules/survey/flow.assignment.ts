@@ -1,3 +1,4 @@
+import { chooseMaterialGroup,findLinkedMaterialAssignment,planMaterialAllocation } from '../assessment-core/materials/allocation'
 import { randomInt,createHash } from 'node:crypto'
 import type { Prisma } from '@prisma/client'
 import { canonicalHash } from '../assessment-runtime/canonical'
@@ -21,20 +22,8 @@ export class SurveyAssignmentError extends Error{
   constructor(message:string){super(message)}
 }
 function fail(message:string):never{throw new SurveyAssignmentError(message)}
-export const chooseSurveyGroup=(flow:FrozenSurveyFlow,draw:(max:number)=>number=randomInt)=>{
-  const groups=flow.experiment?.groups
-  if(!groups)return null
-  const total=groups.reduce((sum,g)=>sum+g.weight,0)
-  const selected=draw(total)
-  if(!Number.isSafeInteger(selected)||selected<0||selected>=total)
-    return fail('实验随机数源超出受控范围')
-  let position=selected
-  for(const group of groups){
-    if(position<group.weight)return group.groupKey
-    position-=group.weight
-  }
-  return fail('实验分配无法匹配冻结权重')
-}
+export const chooseSurveyGroup=(flow:FrozenSurveyFlow,draw:(max:number)=>number=randomInt)=>
+  chooseMaterialGroup(flow.experiment,draw,fail)
 export const assignmentDigest=(value:SurveyFlowAssignment)=>canonicalHash(value)
 /** Reuse frozen group provenance hashes across a bounded analytics request.
  * Each stored assignment is still checked in full; no cross-request cache. */
@@ -123,24 +112,20 @@ export async function ensureSurveyFlowAssignment(tx:Prisma.TransactionClient,inp
     assertSurveyFlowAssignment(flow,prior)
     return prior
   }
-  let groupKey:string|null=null
-  let inheritedFromAttemptId:string|undefined
+  let inherited:ReturnType<typeof findLinkedMaterialAssignment>
   if(experiment?.linkedPolicy==='KEEP_LINKED'&&input.participantId){
     const old=await tx.surveyWaveAttempt.findMany({where:{
       projectId:input.projectId,participantId:input.participantId,
       flowAssignmentCipher:{not:null},id:{not:input.attemptId},
     },orderBy:[{startedAt:'asc'},{id:'asc'}],
       select:{id:true,flowAssignmentCipher:true},take:100})
-    for(const item of old){
-      const assignment=decryptUnifiedRuntimePayload<SurveyFlowAssignment>(item.flowAssignmentCipher!)
-      if(assignment.schemaVersion!==1||assignment.experimentKey!==experiment.experimentKey)
-        continue
-      if(!assignment.groupKey||!experiment.groups.some(g=>g.groupKey===assignment.groupKey))
-        fail('保持分组要求沿用此前合法实验组；新波次的组别定义不一致')
-      groupKey=assignment.groupKey
-      inheritedFromAttemptId=item.id
-      break
+    function* priorAssignments(){
+      for(const item of old){
+        const assignment=decryptUnifiedRuntimePayload<SurveyFlowAssignment>(item.flowAssignmentCipher!)
+        yield {...assignment,id:item.id}
+      }
     }
+    inherited=findLinkedMaterialAssignment(experiment,priorAssignments(),fail)
   }
   // A quota bucket represents assignment reservations, not number of FINALs.
   // Wave admission already holds a Wave UPDATE lock; an atomic counter CAS
@@ -148,49 +133,25 @@ export async function ensureSurveyFlowAssignment(tx:Prisma.TransactionClient,inp
   const policy=input.snapshot.quotaPolicy
   if(experiment?.mode==='QUESTIONNAIRE_VARIANTS'&&(policy||experiment.linkedPolicy!=='RERANDOMIZE'))
     fail('问卷子版本只支持每波次独立概率分配')
-  let quotaBucket:{groupKey:string;maxAssigned:number;assignedCount:number}|undefined
-  if(policy){
-    if(!experiment)fail('研究条件配额要求冻结的实验定义')
-    const buckets=await tx.surveyExperimentQuotaBucket.findMany({where:{
-      projectId:input.projectId,waveId:input.waveId,
-    },select:{groupKey:true,maxAssigned:true,assignedCount:true}})
-    if(buckets.length!==experiment.groups.length||
-      buckets.some(b=>policy.groupLimits[b.groupKey]!==b.maxAssigned))
-      fail('实验配额计数器与冻结发布定义不一致')
-    if(groupKey){
-      quotaBucket=buckets.find(b=>b.groupKey===groupKey)
-      if(!quotaBucket||quotaBucket.assignedCount>=quotaBucket.maxAssigned)
-        fail('既有研究实验组本轮名额已满，不允许随机改变纵向分组')
-    }else{
-      const candidates=experiment.groups.filter(g=>{
-        const b=buckets.find(x=>x.groupKey===g.groupKey)
-        return !!b&&b.assignedCount<b.maxAssigned
-      })
-      if(!candidates.length)fail('本波次全部实验组名额已用尽')
-      const total=candidates.reduce((acc,g)=>acc+g.weight,0)
-      let draw=randomInt(total)
-      const picked=candidates.find(g=>{
-        if(draw<g.weight)return true
-        draw-=g.weight
-        return false
-      })
-      if(!picked)fail('条件实验分配无法在配额预算内完成')
-      groupKey=picked.groupKey
-      quotaBucket=buckets.find(b=>b.groupKey===groupKey)
-    }
-    if(!quotaBucket)fail('实验条件配额读取失败')
+  if(policy&&!experiment)fail('研究条件配额要求冻结的实验定义')
+  const buckets=policy?await tx.surveyExperimentQuotaBucket.findMany({where:{
+    projectId:input.projectId,waveId:input.waveId,
+  },select:{groupKey:true,maxAssigned:true,assignedCount:true}}):undefined
+  const {groupKey,algorithm,inheritedFromAttemptId,quotaBucket}=planMaterialAllocation({
+    experiment,policy,buckets,inherited,draw:randomInt,
+  },fail)
+  if(quotaBucket){
     const updated=await tx.surveyExperimentQuotaBucket.updateMany({
       where:{projectId:input.projectId,waveId:input.waveId,groupKey:quotaBucket.groupKey,
         assignedCount:quotaBucket.assignedCount,maxAssigned:quotaBucket.maxAssigned},
       data:{assignedCount:{increment:1}},
     })
     if(updated.count!==1)fail('本组名额正在由其他参与者领取，请重新进入')
-  }else if(!groupKey)groupKey=chooseSurveyGroup(flow)
+  }
   const value:SurveyFlowAssignment={
     schemaVersion:1,flowDigest:flow.flowDigest,
     experimentKey:experiment?.experimentKey??null,groupKey,
-    algorithm:inheritedFromAttemptId?'LINKED_INHERIT_V1':
-      experiment?(policy?'CRYPTO_QUOTA_WEIGHTED_V1':'CRYPTO_RANDOM_INT_V1'):'NO_EXPERIMENT',
+    algorithm,
     assignedAt:new Date().toISOString(),
     ...(inheritedFromAttemptId?{inheritedFromAttemptId}:{}),
   }

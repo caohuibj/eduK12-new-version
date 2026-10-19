@@ -1,0 +1,59 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/backend
+
+ ❯ src/__tests__/composite/training-variant-export.test.ts (10 tests | 9 failed) 16ms
+     × exports only selected canonical form facts; other-group values are null with NOT_SHOWN and independent strata 6ms
+     × retains variant provenance and strata in the same CSV/ZIP artifact dictionary 1ms
+     × previews count the full exact scope while sampling rows 1ms
+     × fails closed for allocation drift before child payload reads 1ms
+     × fails closed for slot drift before child payload reads 1ms
+     × fails closed for publication drift before child payload reads 1ms
+     × fails closed for definition drift before child payload reads 1ms
+     × provides usable stratified administration counts without reading answers or excluding uncompleted attempts 1ms
+     × rejects cached report provenance or union leakage before compact source reads 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/composite/training-variant-export.test.ts > weighted variant export scope > exports only selected canonical form facts; other-group values are null with NOT_SHOWN and independent strata
+ FAIL  src/__tests__/composite/training-variant-export.test.ts > weighted variant export scope > retains variant provenance and strata in the same CSV/ZIP artifact dictionary
+ FAIL  src/__tests__/composite/training-variant-export.test.ts > weighted variant export scope > previews count the full exact scope while sampling rows
+ FAIL  src/__tests__/composite/training-variant-export.test.ts > weighted variant export scope > fails closed for allocation drift before child payload reads
+ FAIL  src/__tests__/composite/training-variant-export.test.ts > weighted variant export scope > fails closed for slot drift before child payload reads
+ FAIL  src/__tests__/composite/training-variant-export.test.ts > weighted variant export scope > fails closed for publication drift before child payload reads
+ FAIL  src/__tests__/composite/training-variant-export.test.ts > weighted variant export scope > fails closed for definition drift before child payload reads
+ FAIL  src/__tests__/composite/training-variant-export.test.ts > weighted variant export scope > provides usable stratified administration counts without reading answers or excluding uncompleted attempts
+ FAIL  src/__tests__/composite/training-variant-export.test.ts > weighted variant export scope > rejects cached report provenance or union leakage before compact source reads
+CanonicalJsonError: $.items[0].formOptions must not be undefined
+ ❯ normalize src/modules/assessment-runtime/canonical.ts:25:34
+     23|   }
+     24|
+     25|   if (value === undefined) throw new CanonicalJsonError(`${path} must …
+       |                                  ^
+     26|   if (typeof value === 'bigint') throw new CanonicalJsonError(`${path}…
+     27|   if (typeof value === 'function') throw new CanonicalJsonError(`${pat…
+ ❯ src/modules/assessment-runtime/canonical.ts:50:23
+ ❯ normalize src/modules/assessment-runtime/canonical.ts:49:8
+ ❯ src/modules/assessment-runtime/canonical.ts:35:42
+ ❯ normalize src/modules/assessment-runtime/canonical.ts:35:20
+ ❯ src/modules/assessment-runtime/canonical.ts:50:23
+ ❯ normalize src/modules/assessment-runtime/canonical.ts:49:8
+ ❯ canonicalJsonString src/modules/assessment-runtime/canonical.ts:59:34
+ ❯ canonicalJsonBytes src/modules/assessment-runtime/canonical.ts:64:75
+ ❯ encodedValue src/modules/assessment-runtime/canonical.ts:82:68
+ ❯ Module.canonicalHash src/modules/assessment-runtime/canonical.ts:84:86
+ ❯ src/__tests__/composite/training-variant-export.test.ts:40:75
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  9 failed | 70 passed (79)
+   Start at  20:40:50
+   Duration  2.88s (transform 6.02s, setup 0ms, import 9.53s, tests 153ms, environment 1ms)
+
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+npm notice To update run: npm install -g npm@12.2.0
+npm notice

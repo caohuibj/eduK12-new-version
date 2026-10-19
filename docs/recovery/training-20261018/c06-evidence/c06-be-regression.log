@@ -1,0 +1,93 @@
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/eduk12_c06_form_worktree/server-version/backend
+
+ ✓ src/__tests__/composite/form-v3-policy.test.ts > Training V3 section policy > distinguishes hidden, refusal, answered and shown missing in authoritative facts 13ms
+ ✓ src/__tests__/composite/form-v3-policy.test.ts > Training V3 section policy > freezes required refusal and hidden qualification independently 3ms
+ ✓ src/__tests__/composite/form-v3-policy.test.ts > Training V3 section policy > validates other text, exclusivity and unknown side fields 6ms
+ ✓ src/__tests__/composite/form-v3-policy.test.ts > Training V3 section policy > keeps matrix row refusal distinct and refuses unauthorized rows 2ms
+ ✓ src/__tests__/composite/form-v3-policy.test.ts > Training V3 section policy > rejects forward, dangling, cross-section and Likert condition sources 1ms
+ ✓ src/__tests__/composite/form-v3-policy.test.ts > Training V3 section policy > remaps references by exact keys without touching labels/options 2ms
+ ✓ src/__tests__/composite/form-v3-policy.test.ts > does not treat unknown qualifications as task satisfaction 0ms
+ ✓ src/__tests__/composite/form-v3-policy.test.ts > rejects prototype keys and side-channel text on legacy questions 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > v2-normalized-draft 4ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > v2-all-13-types 2ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > v2-frozen-final 3ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > optional-all-missing 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > optional-empty-multiselect 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > answer-number-None 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > answer-number- 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > answer-single-{'_surveyRefusal': True} 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > answer-long-{'_surveyRefusal': True} 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > answer-single-other 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > answer-multiple-['none', 'a'] 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > answer-date-2023-02-29 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > answer-date-0000-01-01 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > answer-time-24:00 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > answer-rank-['a', 'a'] 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > answer-number-0.1 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > answer-slider-0.1 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > answer-sum-{'a': 0, 'b': 9} 0ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > answer-matrix-{} 0ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > answer-matrix_multi:first-['a', 'a'] 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > answer-hidden-injected 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > answer-extra-injected 0ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > selected-other 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > other-without-selection 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > refusal-with-other 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > invalid-schemaVersion-3 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > invalid-schemaVersion-1 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > schema-type 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > schema-itemKey 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > schema-required 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > schema-minSelections 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > schema-unknown 0ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > issue-order 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > required-empty 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > refusal-disallowed 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > v1-operator-authoring 0ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > v1-frozen-operator 0ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > v1-valid-digest 0ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > v1-final 0ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > empty-v1 0ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > empty-v2 0ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > import-text 5ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > import-csv 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > import-bad-csv 0ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > import-duplicate-headers 0ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > import-unknown-type 0ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > import-v2-csv 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > keeps the legacy schema and exception exports as the same objects 1ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > uses one definition parse for strict preview and one for frozen answer validation 4ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > lets a non-Survey adapter consume the exact validator and answer engine 4ms
+ ✓ src/__tests__/assessment-core/form-foundation.contract.test.ts > shared Form foundation immutable baseline oracle > keeps all shared runtime imports away from entry adapters, database and HTTP 1ms
+ ✓ src/__tests__/composite/typed-form-facts.test.ts > Training typed Form facts foundation > preserves NUMBER from definition to canonical encrypted snapshot and reader 7ms
+ ✓ src/__tests__/composite/typed-form-facts.test.ts > Training typed Form facts foundation > preserves LONG_TEXT from definition to canonical encrypted snapshot and reader 2ms
+ ✓ src/__tests__/composite/typed-form-facts.test.ts > Training typed Form facts foundation > preserves DATE from definition to canonical encrypted snapshot and reader 2ms
+ ✓ src/__tests__/composite/typed-form-facts.test.ts > Training typed Form facts foundation > preserves TIME from definition to canonical encrypted snapshot and reader 1ms
+ ✓ src/__tests__/composite/typed-form-facts.test.ts > Training typed Form facts foundation > preserves RANK_ORDER from definition to canonical encrypted snapshot and reader 2ms
+ ✓ src/__tests__/composite/typed-form-facts.test.ts > Training typed Form facts foundation > preserves CONSTANT_SUM from definition to canonical encrypted snapshot and reader 2ms
+ ✓ src/__tests__/composite/typed-form-facts.test.ts > Training typed Form facts foundation > preserves MATRIX from definition to canonical encrypted snapshot and reader 2ms
+ ✓ src/__tests__/composite/typed-form-facts.test.ts > Training typed Form facts foundation > preserves MATRIX_MULTIPLE from definition to canonical encrypted snapshot and reader 1ms
+ ✓ src/__tests__/composite/typed-form-facts.test.ts > Training typed Form facts foundation > preserves SLIDER from definition to canonical encrypted snapshot and reader 2ms
+ ✓ src/__tests__/composite/typed-form-facts.test.ts > Training typed Form facts foundation > preserves LIKERT from definition to canonical encrypted snapshot and reader 2ms
+ ✓ src/__tests__/composite/typed-form-facts.test.ts > Training typed Form facts foundation > rejects invalid NUMBER without coercion 1ms
+ ✓ src/__tests__/composite/typed-form-facts.test.ts > Training typed Form facts foundation > rejects invalid NUMBER without coercion 0ms
+ ✓ src/__tests__/composite/typed-form-facts.test.ts > Training typed Form facts foundation > rejects invalid DATE without coercion 1ms
+ ✓ src/__tests__/composite/typed-form-facts.test.ts > Training typed Form facts foundation > rejects invalid TIME without coercion 1ms
+ ✓ src/__tests__/composite/typed-form-facts.test.ts > Training typed Form facts foundation > rejects invalid RANK_ORDER without coercion 1ms
+ ✓ src/__tests__/composite/typed-form-facts.test.ts > Training typed Form facts foundation > rejects invalid CONSTANT_SUM without coercion 1ms
+ ✓ src/__tests__/composite/typed-form-facts.test.ts > Training typed Form facts foundation > rejects invalid MATRIX without coercion 1ms
+ ✓ src/__tests__/composite/typed-form-facts.test.ts > Training typed Form facts foundation > preserves optional null and requires required values 2ms
+ ✓ src/__tests__/composite/typed-form-facts.test.ts > Training typed Form facts foundation > rejects unsupported C06/media, mismatched definitions and repeated stable keys 3ms
+ ✓ src/__tests__/composite/typed-form-facts.test.ts > Training typed Form facts foundation > rejects duplicate IDs, injected fields and whole payload budget violations 3ms
+ ✓ src/__tests__/composite/typed-form-facts.test.ts > Training typed Form facts foundation > preserves historical null/absent definition hashes and V1 facts bytes 1ms
+ ✓ src/__tests__/composite/typed-form-facts.test.ts > Training typed Form facts foundation > binds V2 values to definition and refuses V1 downgrade and noncanonical snapshots 2ms
+ ✓ src/__tests__/composite/typed-form-facts.test.ts > Training typed Form facts foundation > reads typed values from snapshots, with no String fallback 3ms
+ ✓ src/__tests__/composite/typed-form-facts.test.ts > Training typed Form facts foundation > rejects typed export before enqueue and preserves lightweight legacy context 1ms
+ ✓ src/__tests__/composite/typed-form-facts.test.ts > Training typed Form facts foundation > expands only the composite wire contract 12ms
+
+ Test Files  3 passed (3)
+      Tests  84 passed (84)
+   Start at  17:43:13
+   Duration  3.26s (transform 4.95s, setup 0ms, import 7.91s, tests 138ms, environment 0ms)
+

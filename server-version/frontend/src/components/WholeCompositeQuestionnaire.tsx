@@ -1,3 +1,5 @@
+import {TrainingTimingBoundary,restoreTrainingTiming} from '../modules/scale/TrainingTimingBoundary'
+import {SurveyScaleTimingTracker,sealObservedScaleTimings} from '../modules/scale/item-timing'
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { readMatchingWholeReceipt, rememberWholeReceipt, isRecoverableReceiptError, type WholeReceiptLookup } from '../modules/composite/receipt-recovery'
 import { sessionFetch } from '../api/client'
@@ -34,7 +36,7 @@ const responseError = (response: ApiResponse<unknown>) => Object.assign(new Erro
 const readAnswer = (value: unknown): Answer => typeof value === 'object' && value !== null && 'responseValue' in value
   ? value as Answer : { responseValue: value as string | number }
 
-export default function WholeCompositeQuestionnaire({ state, api, publicMode = false, recoveryToken, fallback, onExit, onCompleted }: Props) {
+function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, recoveryToken, fallback, onExit, onCompleted }: Props) {
   const draftKey = wholeDraftKey(state.id, state.attemptEpoch ?? 1)
   const [definition, setDefinition] = useState<WholeQuestionnaireDefinition | null>(null)
   const [meta, setMeta] = useState<FinalDraftMeta | null>(null)
@@ -50,6 +52,8 @@ export default function WholeCompositeQuestionnaire({ state, api, publicMode = f
   const [submitElapsedSeconds, setSubmitElapsedSeconds] = useState(0)
   const submitting = useRef(false)
   const questionStart = useRef(Date.now())
+  const timingRef=useRef<Record<string,SurveyScaleTimingTracker>>({})
+  const timingMetadata=()=>Object.fromEntries((definition?.units??[]).filter(unit=>unit.trainingTiming&&timingRef.current[unit.itemId]).map(unit=>[unit.itemId,{snapshotHash:unit.trainingTiming!.snapshotHash,items:timingRef.current[unit.itemId].snapshot()}]))
   const local = useLocalDraftSaveQueue(draftKey)
   const { flush, schedule } = local
   const questions = useMemo(() => definition?.units.flatMap(unit => unit.scale.definition!.items.map(question => ({ unit, question }))) ?? [], [definition])
@@ -125,7 +129,15 @@ export default function WholeCompositeQuestionnaire({ state, api, publicMode = f
           nextMeta = (await finalDraftStore.get(draftKey))!
         }
         const restored = Object.fromEntries((await finalDraftStore.listAnswers(draftKey)).map(answer => [answer.itemKey, readAnswer(answer.value)]))
-        if (!cancelled) { setDefinition(next); setMeta(nextMeta); setAnswers(restored); setIndex(0) }
+        if (!cancelled) {
+          timingRef.current=Object.fromEntries(next.units.filter(unit=>unit.trainingTiming).map(unit=>{
+            const saved=(nextMeta.instrumentMetadata?.wholeScaleTiming as Record<string,unknown>|undefined)?.[unit.itemId]
+            const old=oldDrafts[next.units.indexOf(unit)]
+            const restoredTiming=restoreTrainingTiming(saved?{trainingScaleTiming:saved}:old?.instrumentMetadata,unit.trainingTiming!.snapshotHash)
+            const initial=Object.fromEntries(unit.scale.definition!.items.filter(q=>restored[wholeAnswerKey(unit.itemId,q.itemCode)]!==undefined).map(q=>[q.itemCode,restored[wholeAnswerKey(unit.itemId,q.itemCode)].responseValue]))
+            return [unit.itemId,new SurveyScaleTimingTracker(restoredTiming,initial)]
+          }))
+          setDefinition(next); setMeta(nextMeta); setAnswers(restored); setIndex(0) }
       } catch (cause) { if (!cancelled) setError(normalizeApiError(cause).message) }
       finally { if (!cancelled) setLoading(false) }
     }
@@ -136,17 +148,18 @@ export default function WholeCompositeQuestionnaire({ state, api, publicMode = f
   const saveAnswer = async (value: string | number) => {
     if (!current || locked || busy || submitting.current) return
     const key = wholeAnswerKey(current.unit.itemId, current.question.itemCode), previous = answers[key]
+    timingRef.current[current.unit.itemId]?.answer(current.question.itemCode,previous?.responseValue,value)
     const now = Date.now(), answer: Answer = { responseValue: value,
       responseTimeMs: (previous?.responseTimeMs ?? 0) + Math.max(0, now - questionStart.current),
       changeCount: (previous?.changeCount ?? 0) + (previous && previous.responseValue !== value ? 1 : 0) }
     questionStart.current = now
     setAnswers(prior => ({ ...prior, [key]: answer }))
-    await schedule(key, () => finalDraftStore.putAnswer({ draftKey, itemKey: key, value: answer, updatedAt: now }))
+    await schedule(key, async () => {await finalDraftStore.putAnswer({ draftKey, itemKey: key, value: answer, updatedAt: now });if(Object.keys(timingRef.current).length)await finalDraftStore.setInstrumentMetadata(draftKey,{wholeScaleTiming:timingMetadata()})})
   }
   const saveAndExit = async () => {
     if (submitting.current || busy) return
     setBusy(true)
-    try { await flush(); onExit() } catch (cause) { setError(normalizeApiError(cause).message) }
+    try { Object.values(timingRef.current).forEach(tracker=>tracker.pause()); if(!locked&&Object.keys(timingRef.current).length)await finalDraftStore.setInstrumentMetadata(draftKey,{wholeScaleTiming:timingMetadata()});await flush(); onExit() } catch (cause) { setError(normalizeApiError(cause).message) }
     finally { setBusy(false) }
   }
   const submit = async () => {
@@ -155,6 +168,7 @@ export default function WholeCompositeQuestionnaire({ state, api, publicMode = f
       const missing = questions.findIndex(({ unit, question }) => question.required && answers[wholeAnswerKey(unit.itemId, question.itemCode)]?.responseValue === undefined)
       if (missing >= 0) { setIndex(missing); setError('还有必答题未作答，请完成后提交整份问卷。'); return }
     }
+    Object.values(timingRef.current).forEach(tracker=>tracker.pause())
     submitting.current = true; setBusy(true); setError(null); setSubmitStartedAt(Date.now())
     let confirmed = false
     try {
@@ -168,6 +182,7 @@ export default function WholeCompositeQuestionnaire({ state, api, publicMode = f
         return { submissionId: snapshot.meta.submissionId, attemptEpoch: snapshot.meta.attemptEpoch,
           slotSetHash: snapshot.meta.definitionHash, contextSnapshotHash: snapshot.meta.contextSnapshotHash,
           units: definition.units.map(unit => ({ itemId: unit.itemId, definitionHash: unit.definitionHash,
+            ...(unit.trainingTiming&&timingRef.current[unit.itemId]?{itemTimings:sealObservedScaleTimings(unit.scale.definition!.items.map(q=>q.itemCode),Object.fromEntries(unit.scale.definition!.items.filter(q=>saved.has(wholeAnswerKey(unit.itemId,q.itemCode))).map(q=>[q.itemCode,saved.get(wholeAnswerKey(unit.itemId,q.itemCode))!.responseValue])),timingRef.current[unit.itemId].snapshot())}:{}),
             answers: unit.scale.definition!.items.flatMap(question => {
               const answer = saved.get(wholeAnswerKey(unit.itemId, question.itemCode))
               return answer?.responseValue === undefined ? [] : [{ itemCode: question.itemCode, ...answer }]
@@ -236,13 +251,20 @@ export default function WholeCompositeQuestionnaire({ state, api, publicMode = f
           <p className="mb-4 text-sm text-slate-600">整卷第 {index + 1} / {questions.length} 题</p>
           <AssessmentImageGate items={assessmentImageItems((current.question as { images?: unknown }).images)} loadAsset={loadImage} disabled={busy}>
             <ScaleFormVideoGate presentation={scaleItemVideoPresentation(current.question)} loadSources={() => requestAssessmentVideoCapabilities(`${unitPath}/items/${encodeURIComponent(current.question.itemCode)}/video-capability`, publicMode ? { headers: { 'X-Recovery-Token': recoveryToken || '' } } : undefined)}>
-              <ScalePlayer item={current.question} value={answers[wholeAnswerKey(current.unit.itemId, current.question.itemCode)]?.responseValue}
+              {(()=>{const player=(<ScalePlayer item={current.question} value={answers[wholeAnswerKey(current.unit.itemId, current.question.itemCode)]?.responseValue}
                 answerDisabled={locked || busy} navigationDisabled={busy} submitDisabled={busy || meta?.status === 'CONFLICT'}
                 position={index + 1} total={questions.length} onChange={saveAnswer} onPrevious={() => setIndex(prior => Math.max(0, prior - 1))}
                 onNext={index + 1 < questions.length ? () => setIndex(prior => prior + 1) : undefined}
-                onSubmit={index + 1 === questions.length ? submit : undefined} submitLabel="提交整份问卷" submitting={busy} />
+                onSubmit={index + 1 === questions.length ? submit : undefined} submitLabel="提交整份问卷" submitting={busy} />);const tracker=timingRef.current[current.unit.itemId];return current.unit.trainingTiming&&tracker?<TrainingTimingBoundary tracker={tracker} itemKey={current.question.itemCode} locked={locked||busy} onTiming={()=>{if(!locked&&!busy&&!submitting.current)void schedule('whole-timing',()=>finalDraftStore.setInstrumentMetadata(draftKey,{wholeScaleTiming:timingMetadata()}).then(()=>undefined)).catch(()=>undefined)}}>{player}</TrainingTimingBoundary>:player})()}
             </ScaleFormVideoGate>
           </AssessmentImageGate>
         </div> : <button type="button" className="btn-secondary min-h-11" onClick={() => setLoadRound(prior => prior + 1)}>重新加载整卷草稿</button>}
   </AssessmentShell>
+}
+
+/** Conditional paths must submit only the current accepted unit, even if a
+ * stale whole-questionnaire draft happens to exist in this browser. */
+export default function WholeCompositeQuestionnaire(props: Props) {
+  if (props.state.trainingFlow) return <>{props.fallback}</>
+  return <WholeCompositeQuestionnaireRunner {...props} />
 }

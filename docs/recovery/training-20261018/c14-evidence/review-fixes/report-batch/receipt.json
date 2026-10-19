@@ -1,0 +1,102 @@
+{
+  "kind": "C14_REPORT_BATCH_REVIEW_LOCAL_EVIDENCE",
+  "sourceFrozenAt": "2026-10-18T12:00:35Z",
+  "createdAt": "2026-10-18T12:01:48.921145+00:00",
+  "location": "local disposable workspace",
+  "gitHeadAtRecord": "b53284b525080386cc38a0067c1ba152e51cdf7c",
+  "node": "v24.19.0",
+  "files": [
+    {
+      "path": "server-version/backend/src/modules/composite/composite-report-read-batch.ts",
+      "sha256": "b5ace74abe0462c5cfb2ec026e01da7d5931172b660abb1f97665898f19ce06c"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/compact-composite-report.ts",
+      "sha256": "4b72fbbd9a16990ef68a568868e8dcf3d3a9e9ce66a9c5718564214e915623d3"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/composite.service.ts",
+      "sha256": "3d40bf5a396273413e6c44b5f3f6fff2c3fda7ae4ba97c4b9593913834ae051a"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-variant-export.ts",
+      "sha256": "4fc98b8fc6cfa75587eafbcd274ce7607c038ad4cbcc1d4ad652f63f77e10052"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-timing-report.ts",
+      "sha256": "3eff4a5d459905fcd4bc6fa7acc7acf146d17efa41573c69834f0f851037086c"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/composite/training-variant-report-batch.test.ts",
+      "sha256": "22cfa4350c6d8f2734de22e84bb20c67094118827c589335aa6f34de32850b60"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/composite/training-variant-export.test.ts",
+      "sha256": "5cfa583d7f5421f568c0e80e80fc1a930f80e8f9c9cf7c7ea0be264e8db3de20"
+    }
+  ],
+  "checks": [
+    {
+      "log": "c14-report-review-types.log",
+      "command": "npx tsc --noEmit --pretty false",
+      "result": "failed",
+      "reason": "Two concurrent cognitive/session.service.ts projection type errors; no report errors. Kept as failed evidence.",
+      "qualification": "DIAGNOSTIC_ONLY_WRONG_RUNTIME",
+      "acceptedAsValidationEvidence": false
+    },
+    {
+      "log": "c14-report-review-tests.log",
+      "command": "npx vitest run src/__tests__/composite/training-variant-report-batch.test.ts src/__tests__/composite/training-variant-export.test.ts -t 'bounded report source batches|variant report page canonical batches|full preview'",
+      "result": "passed",
+      "tests": 12,
+      "skipped": 19,
+      "qualification": "DIAGNOSTIC_ONLY_WRONG_RUNTIME",
+      "acceptedAsValidationEvidence": false
+    },
+    {
+      "log": "c14-report-review-runtime-tests.log",
+      "command": "npx vitest run src/__tests__/composite/training-variant-report-batch.test.ts src/__tests__/composite/training-variant-export.test.ts -t 'fallback scale facts|preloads shared runtime artifacts|variant report page canonical batches'",
+      "result": "passed",
+      "tests": 6,
+      "skipped": 26,
+      "reason": "Only new runtime artifact coverage and readers impacted by stronger identity binding were rerun.",
+      "qualification": "DIAGNOSTIC_ONLY_WRONG_RUNTIME",
+      "acceptedAsValidationEvidence": false
+    },
+    {
+      "log": "c14-report-review-legacy-tests.log",
+      "command": "npx vitest run src/__tests__/composite/training-variant-report-batch.test.ts -t 'legacy compact materialization'",
+      "result": "passed",
+      "tests": 1,
+      "skipped": 8,
+      "qualification": "DIAGNOSTIC_ONLY_WRONG_RUNTIME",
+      "acceptedAsValidationEvidence": false
+    },
+    {
+      "log": "c14-report-review-final-types.log",
+      "command": "npx tsc --noEmit --pretty false",
+      "result": "passed",
+      "exitCode": 0,
+      "qualification": "DIAGNOSTIC_ONLY_WRONG_RUNTIME",
+      "acceptedAsValidationEvidence": false
+    },
+    {
+      "log": "c14-report-review-compact-compat.log",
+      "command": "npx vitest run src/__tests__/assessment-runtime/compact-assessment-storage.test.ts -t 'report manifests'",
+      "result": "passed",
+      "tests": 1,
+      "skipped": 33,
+      "qualification": "DIAGNOSTIC_ONLY_WRONG_RUNTIME",
+      "acceptedAsValidationEvidence": false
+    }
+  ],
+  "limits": [
+    "Targeted local evidence, not official CI or deployment.",
+    "Only removal of per-report database source reads is established; no CPU/RSS/load benefit claimed.",
+    "Previously passing unaffected tests were not repeated.",
+    "TypeScript excludes src/__tests__; test files are executed by Vitest."
+  ],
+  "qualification": "DIAGNOSTIC_ONLY_WRONG_RUNTIME",
+  "acceptedAsValidationEvidence": false,
+  "disqualificationReason": "These original commands used ambient Node v24.19.0 and npx, not the required pinned Node v24.21.0. Execution results are retained as diagnosis only, including failures; none establishes candidate qualification."
+}

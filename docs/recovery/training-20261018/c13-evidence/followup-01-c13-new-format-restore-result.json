@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "checks": [
+    "Real HTTP-written nonempty C13 grants/audits/releases/attempts/raw/canonical/retained assets and all other table columns survive pg_dump\u2192new DB restore exactly",
+    "Every actual HTTP-admitted exact grant receipt retains its byte-identical encrypted runtime snapshot",
+    "New private image bytes copied separately and matched against restored asset identity/hash/size; retained references exact",
+    "Restored C13 new-format DB passes unchanged restricted runtime role contract; no API/old HTTP replay"
+  ],
+  "dumpSha256": "6e8c25425e04cce31814a00215e4fc4e7d6c6ac3b5106f2bf0cd8163859d8d84",
+  "verifiedFrozenReceipts": 4,
+  "verifiedPrivateImageCopies": 1,
+  "tableCount": 205,
+  "projectionSha256": "31e2c82d804c76953a6eb195441e55a4d9b611a7aee6c1917467d7995c05f48e"
+}

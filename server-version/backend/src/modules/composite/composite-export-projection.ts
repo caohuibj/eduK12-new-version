@@ -1,3 +1,6 @@
+import { parseCompiledWeightedVariants } from '../assessment-core/weighted-variants'
+import { compositeForbidden } from './composite.errors'
+import { SITUATIONAL_CANONICAL_EXPORT_VERSION, situationalSummaryFieldAllowed } from './situational-canonical-export'
 import { randomBytes } from 'crypto'
 import * as fs from 'fs'
 import * as path from 'path'
@@ -29,11 +32,16 @@ export interface CompositeExportProjectionBindingV1 {
   audience: ScaleDisclosureAudience
   scales: CompositeExportScaleBindingV1[]
   fingerprint: string
+  timingExportEnabled?: boolean
+  trainingVariantExport?: {version: string; configDigest: string; publishedAt: string; frozenHash: string}
+  situationalExport?: { version: string; slots: Array<{ itemId: string; prefix: string }> }
 }
 
 type CompositeScaleItem = {
   id: string
   type: string
+  formDefinition?: unknown
+  formPolicy?: unknown
   scale?: {
     id?: string | null
     code?: string | null
@@ -76,6 +84,14 @@ export const buildCompositeExportProjectionBinding = (input: {
   resourceId: string
   audience?: ScaleDisclosureAudience
   items: CompositeScaleItem[]
+  timingExportEnabled?: boolean
+  trainingTimingPolicy?: unknown
+  timingExportRevision?:number
+  trainingVariantDigest?: string | null
+  trainingFlowFrozen?:unknown
+  trainingFlowDigest?:string|null
+  trainingVariantFrozen?: unknown
+  publishedAt?: Date | string | null
 }): CompositeExportProjectionBindingV1 => {
   // Composite wide-export routes are teacher/admin product surfaces. ADMIN is
   // authorization, not a researcher/raw-data disclosure audience.
@@ -89,6 +105,11 @@ export const buildCompositeExportProjectionBinding = (input: {
     resourceId: input.resourceId,
     audience,
     scales,
+    ...(input.trainingFlowDigest!=null||input.trainingFlowFrozen!=null?{trainingFlowExport:{version:'training-flow-export-v1',configDigest:input.trainingFlowDigest??'',frozenHash:canonicalHash(input.trainingFlowFrozen??null)}}:{}),
+    ...(input.trainingVariantDigest != null || input.trainingVariantFrozen != null ? {trainingVariantExport: {version: 'training-weighted-variant-export-v1', configDigest: input.trainingVariantDigest ?? '', publishedAt: input.publishedAt ? new Date(input.publishedAt).toISOString() : '', frozenHash: canonicalHash(input.trainingVariantFrozen ?? null)}} : {}),
+    ...(input.items.some(item => item.type === 'SITUATIONAL') ? { situationalExport: { version: SITUATIONAL_CANONICAL_EXPORT_VERSION, slots: input.items.flatMap((item, index) => item.type === 'SITUATIONAL' ? [{ itemId: item.id, prefix: `J${String(index + 1).padStart(3, '0')}_` }] : []) } } : {}),
+    ...(input.timingExportEnabled ? {timingExportEnabled:true,trainingTimingPolicy:input.trainingTimingPolicy??null,timingExportRevision:input.timingExportRevision??0} : {}),
+    ...(input.items.some(item=>item.formDefinition!=null)?{typedFormExport:{version:'training-form-export-v1',definitions:input.items.filter(item=>item.formDefinition!=null).map(item=>({id:item.id,definition:item.formDefinition,policy:item.formPolicy??null}))}}:{}),
   }
   return { ...identity, fingerprint: canonicalHash(identity) }
 }
@@ -101,18 +122,36 @@ export const resolveCompositeExportProjectionBinding = async (
     where: { id: resourceId },
     select: {
       id: true,
+      timingExportEnabled:true,trainingTimingPolicy:true,productKind:true,revision:true,
+      trainingVariantDraft:true,trainingFlowDraft:true,trainingFlowFrozen:true,trainingFlowDigest:true,trainingVariantDigest:true,trainingVariantFrozen:true,publishedAt:true,
       items: {
         orderBy: { position: 'asc' },
         select: {
           id: true,
           type: true,
+          formDefinition: true, formPolicy: true,
           scale: { select: { id: true, code: true, instrumentVersion: true, instrumentClass: true } },
         },
       },
     },
   })
   if (!composite) throw new Error('综合测评不存在')
-  return buildCompositeExportProjectionBinding({ resourceId: composite.id, audience, items: composite.items })
+  if ([composite.trainingVariantDraft,composite.trainingVariantFrozen,composite.trainingVariantDigest].some(value=>value===undefined))
+    throw compositeForbidden('导出来源的分卷标志未加载')
+  if ([composite.trainingVariantDraft,composite.trainingVariantFrozen,composite.trainingVariantDigest].some(value=>value!=null)) {
+    try {
+      if(!composite.trainingVariantFrozen||!composite.trainingVariantDigest||!composite.publishedAt
+        ||parseCompiledWeightedVariants(composite.trainingVariantFrozen).configDigest!==composite.trainingVariantDigest) throw new Error('incomplete publication')
+    } catch { throw compositeForbidden('导出来源的分卷冻结配置不完整') }
+  }
+  if([composite.trainingFlowDraft,composite.trainingFlowFrozen,composite.trainingFlowDigest].some(v=>v===undefined))throw compositeForbidden('流程导出来源未加载')
+  if([composite.trainingFlowDraft,composite.trainingFlowFrozen,composite.trainingFlowDigest].some(v=>v!=null)){
+    const frozen:any=composite.trainingFlowFrozen
+    if(!frozen||!composite.trainingFlowDigest||frozen.flowDigest!==composite.trainingFlowDigest)throw compositeForbidden('流程导出来源不完整')
+    const {flowDigest,...definition}=frozen
+    if(canonicalHash(definition)!==flowDigest)throw compositeForbidden('流程导出摘要不匹配')
+  }
+  return buildCompositeExportProjectionBinding({ resourceId: composite.id, audience, items: composite.items,timingExportEnabled:composite.productKind==='QUESTIONNAIRE'&&composite.timingExportEnabled,trainingTimingPolicy:composite.trainingTimingPolicy,timingExportRevision:composite.revision, trainingFlowDigest:composite.trainingFlowDigest,trainingFlowFrozen:composite.trainingFlowFrozen,trainingVariantDigest:composite.trainingVariantDigest, trainingVariantFrozen:composite.trainingVariantFrozen, publishedAt:composite.publishedAt })
 }
 
 const scaleFieldAllowed = (suffix: string, caps: DisclosureCapabilitiesV1): boolean => {
@@ -134,11 +173,17 @@ const scaleFieldAllowed = (suffix: string, caps: DisclosureCapabilitiesV1): bool
 }
 
 const fieldAllowed = (field: CompositeExportField, binding: CompositeExportProjectionBindingV1): boolean => {
+  const sjtPrefix = /^(J\d{3}_)/.exec(field.name)?.[1]
+  if (sjtPrefix) return binding.situationalExport?.version === SITUATIONAL_CANONICAL_EXPORT_VERSION
+    && binding.situationalExport.slots.some(slot => slot.prefix === sjtPrefix)
+    && situationalSummaryFieldAllowed(field.name.slice(sjtPrefix.length))
   const scalePrefixMatch = /^(S\d{3}_)/.exec(field.name)
   if (!scalePrefixMatch) return true
   const scale = binding.scales.find((candidate) => candidate.prefix === scalePrefixMatch[1])
   if (!scale) return false
-  return scaleFieldAllowed(field.name.slice(scale.prefix.length), scale.capabilities)
+  const suffix=field.name.slice(scale.prefix.length)
+  if(suffix.startsWith('TIMING_'))return binding.timingExportEnabled===true
+  return scaleFieldAllowed(suffix, scale.capabilities)
 }
 
 export const projectCompositeExportData = (

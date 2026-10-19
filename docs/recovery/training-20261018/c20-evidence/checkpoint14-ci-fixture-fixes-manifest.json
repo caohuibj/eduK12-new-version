@@ -1,0 +1,102 @@
+{
+  "inputHead": "43ee9e2388416c318b0f1ba85fdeb2663e0bc81f",
+  "inputPatchSha256": "ba5a214a56271aa639050a84cf5be72c6433c80e52a970851b578a8b358652af",
+  "scope": "test-only CI fixture/oracle repair; 16 files/244 unique tests",
+  "members": [
+    {
+      "name": "official-failure-inventory.json",
+      "size": 98260,
+      "sha256": "b30d4df6197954806d4f21ff499ddeff036930a9c8c78e1c2fb391795389b3e5"
+    },
+    {
+      "name": "qualification.json",
+      "size": 3215,
+      "sha256": "720ba2da69fd9fc008bc6c33f9f576d920128740bf143bfe347560ec695c4eb2"
+    },
+    {
+      "name": "run01/affected-tests.log",
+      "size": 49908,
+      "sha256": "a4a7f7b1f0b06b2e89dfcf53cd28b74eeaeb90c882c48473536274ed356fd755"
+    },
+    {
+      "name": "run01/input.patch",
+      "size": 39089,
+      "sha256": "ba5a214a56271aa639050a84cf5be72c6433c80e52a970851b578a8b358652af"
+    },
+    {
+      "name": "run01/migrations.log",
+      "size": 24817,
+      "sha256": "8ba0d3e25a3cb633af58af940f260e5e377b2367854a032c40a303704ef0acf4"
+    },
+    {
+      "name": "run01/result.json",
+      "size": 3391,
+      "sha256": "f508fb6b045ffc00f29e9020ef441da1d6fa7ff60ee242151c24a713c43fb7ae"
+    },
+    {
+      "name": "run01/source-after.json",
+      "size": 361342,
+      "sha256": "4ca7aa287c82dd29d0682cb8cab791ee844ee2389c9e45fac5a347ffb945cda3"
+    },
+    {
+      "name": "run01/source-before.json",
+      "size": 361342,
+      "sha256": "4ca7aa287c82dd29d0682cb8cab791ee844ee2389c9e45fac5a347ffb945cda3"
+    },
+    {
+      "name": "run01/tests.json",
+      "size": 118468,
+      "sha256": "99978ebae4af396c9a0afa8065773d9394a02440b9c30b3f11d30de5e47ba755"
+    },
+    {
+      "name": "run02/affected-tests.log",
+      "size": 2909,
+      "sha256": "dd215356899f031315b852ec55473a5135a0429883fb223aba46a5cb30d27e87"
+    },
+    {
+      "name": "run02/input.patch",
+      "size": 39089,
+      "sha256": "ba5a214a56271aa639050a84cf5be72c6433c80e52a970851b578a8b358652af"
+    },
+    {
+      "name": "run02/migrations.log",
+      "size": 24817,
+      "sha256": "701f1810bf2630fb3232ad77bee31e95fdf2087f76cb63db91f9792f58f0eaeb"
+    },
+    {
+      "name": "run02/result.json",
+      "size": 2798,
+      "sha256": "f09e5d34a31ef6058685a260f3821b1fda36fc654690964c4e7ee6a2a099ae62"
+    },
+    {
+      "name": "run02/source-after.json",
+      "size": 361342,
+      "sha256": "4ca7aa287c82dd29d0682cb8cab791ee844ee2389c9e45fac5a347ffb945cda3"
+    },
+    {
+      "name": "run02/source-before.json",
+      "size": 361342,
+      "sha256": "4ca7aa287c82dd29d0682cb8cab791ee844ee2389c9e45fac5a347ffb945cda3"
+    },
+    {
+      "name": "run02/tests.json",
+      "size": 30698,
+      "sha256": "b7525af21fc80779b721ee4d68032930cc0cc724166f4d4e3ec96f6133cb1010"
+    },
+    {
+      "name": "runner01.py",
+      "size": 4552,
+      "sha256": "f05f753adb17ebe09547e1510bc618af69d6d286ecacd1ea16f8ad449c4ad640"
+    },
+    {
+      "name": "runner02.py",
+      "size": 4941,
+      "sha256": "280c4a587c77b5c5404c05f0d81be768106cdc43f96db07744e4741a5d1e60c0"
+    }
+  ],
+  "archive": {
+    "name": "checkpoint14-ci-fixture-fixes.tar.gz",
+    "size": 533759,
+    "sha256": "5e07b3ebf70703be955a2371d2ae4fc908db10e6b9cd23cc11de609951d0beeb"
+  }
+}

@@ -1,0 +1,336 @@
+{
+  "templateVersion": "sjt-online-v1",
+  "instrumentKey": "online-sjt-hand-calculated",
+  "instrumentVersion": "1.0.0",
+  "title": "独立手算双情境三题",
+  "display": {
+    "schemaVersion": 2,
+    "respondentType": "student_self_report",
+    "title": "独立手算双情境三题",
+    "author": "合成验收作者",
+    "sourceNote": "原创合成测试，非真实被试",
+    "licenseStatus": "self_authored",
+    "redistribution": "allowed",
+    "orderPolicy": "FIXED",
+    "metrics": [
+      {
+        "metricKey": "cooperation",
+        "label": "合作",
+        "direction": "descriptive"
+      }
+    ],
+    "scoring": {
+      "modelKey": "AUTHOR_KEY_SUM",
+      "modelVersion": "1",
+      "sourceNote": "独立人工验收键"
+    },
+    "scenes": [
+      {
+        "sceneKey": "discussion",
+        "title": "小组讨论",
+        "stimulus": "小组讨论一个共同问题。",
+        "questions": [
+          {
+            "questionKey": "first",
+            "prompt": "选择合适的行动",
+            "responseType": "MULTIPLE",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "a",
+                "label": "行动甲",
+                "contributions": {
+                  "cooperation": 1
+                }
+              },
+              {
+                "optionKey": "b",
+                "label": "行动乙",
+                "contributions": {
+                  "cooperation": 1
+                }
+              }
+            ],
+            "aggregationPolicy": "SUM",
+            "minSelections": 1,
+            "maxSelections": 2
+          },
+          {
+            "questionKey": "second",
+            "prompt": "选择合适的行动",
+            "responseType": "SINGLE",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "a",
+                "label": "行动甲",
+                "contributions": {
+                  "cooperation": 4
+                }
+              },
+              {
+                "optionKey": "b",
+                "label": "行动乙",
+                "contributions": {
+                  "cooperation": 0
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "planning",
+        "title": "下一步计划",
+        "stimulus": "团队需要准备下一步计划。",
+        "questions": [
+          {
+            "questionKey": "third",
+            "prompt": "选择合适的行动",
+            "responseType": "MULTIPLE",
+            "required": false,
+            "allowRefusal": true,
+            "options": [
+              {
+                "optionKey": "a",
+                "label": "行动甲",
+                "contributions": {
+                  "cooperation": 3
+                }
+              },
+              {
+                "optionKey": "b",
+                "label": "行动乙",
+                "contributions": {
+                  "cooperation": 5
+                }
+              }
+            ],
+            "aggregationPolicy": "MEAN",
+            "minSelections": 1,
+            "maxSelections": 2
+          }
+        ]
+      }
+    ]
+  },
+  "goldenCases": [
+    {
+      "name": "手算总和9",
+      "responses": [
+        {
+          "sceneKey": "sjt_q_first",
+          "channelKey": "first",
+          "status": "ANSWERED",
+          "responseValue": [
+            "b",
+            "a"
+          ]
+        },
+        {
+          "sceneKey": "sjt_q_second",
+          "channelKey": "second",
+          "status": "ANSWERED",
+          "responseValue": "a"
+        },
+        {
+          "sceneKey": "sjt_q_third",
+          "channelKey": "third",
+          "status": "ANSWERED",
+          "responseValue": [
+            "a"
+          ]
+        }
+      ],
+      "expected": {
+        "cooperation": 9
+      }
+    },
+    {
+      "name": "第一题单甲8",
+      "responses": [
+        {
+          "sceneKey": "sjt_q_first",
+          "channelKey": "first",
+          "status": "ANSWERED",
+          "responseValue": [
+            "a"
+          ]
+        },
+        {
+          "sceneKey": "sjt_q_second",
+          "channelKey": "second",
+          "status": "ANSWERED",
+          "responseValue": "a"
+        },
+        {
+          "sceneKey": "sjt_q_third",
+          "channelKey": "third",
+          "status": "ANSWERED",
+          "responseValue": [
+            "a"
+          ]
+        }
+      ],
+      "expected": {
+        "cooperation": 8
+      }
+    },
+    {
+      "name": "第一题单乙8",
+      "responses": [
+        {
+          "sceneKey": "sjt_q_first",
+          "channelKey": "first",
+          "status": "ANSWERED",
+          "responseValue": [
+            "b"
+          ]
+        },
+        {
+          "sceneKey": "sjt_q_second",
+          "channelKey": "second",
+          "status": "ANSWERED",
+          "responseValue": "a"
+        },
+        {
+          "sceneKey": "sjt_q_third",
+          "channelKey": "third",
+          "status": "ANSWERED",
+          "responseValue": [
+            "a"
+          ]
+        }
+      ],
+      "expected": {
+        "cooperation": 8
+      }
+    },
+    {
+      "name": "第二题乙5",
+      "responses": [
+        {
+          "sceneKey": "sjt_q_first",
+          "channelKey": "first",
+          "status": "ANSWERED",
+          "responseValue": [
+            "a",
+            "b"
+          ]
+        },
+        {
+          "sceneKey": "sjt_q_second",
+          "channelKey": "second",
+          "status": "ANSWERED",
+          "responseValue": "b"
+        },
+        {
+          "sceneKey": "sjt_q_third",
+          "channelKey": "third",
+          "status": "ANSWERED",
+          "responseValue": [
+            "a"
+          ]
+        }
+      ],
+      "expected": {
+        "cooperation": 5
+      }
+    },
+    {
+      "name": "第三题乙11",
+      "responses": [
+        {
+          "sceneKey": "sjt_q_first",
+          "channelKey": "first",
+          "status": "ANSWERED",
+          "responseValue": [
+            "a",
+            "b"
+          ]
+        },
+        {
+          "sceneKey": "sjt_q_second",
+          "channelKey": "second",
+          "status": "ANSWERED",
+          "responseValue": "a"
+        },
+        {
+          "sceneKey": "sjt_q_third",
+          "channelKey": "third",
+          "status": "ANSWERED",
+          "responseValue": [
+            "b"
+          ]
+        }
+      ],
+      "expected": {
+        "cooperation": 11
+      }
+    },
+    {
+      "name": "第三题均值10",
+      "responses": [
+        {
+          "sceneKey": "sjt_q_first",
+          "channelKey": "first",
+          "status": "ANSWERED",
+          "responseValue": [
+            "a",
+            "b"
+          ]
+        },
+        {
+          "sceneKey": "sjt_q_second",
+          "channelKey": "second",
+          "status": "ANSWERED",
+          "responseValue": "a"
+        },
+        {
+          "sceneKey": "sjt_q_third",
+          "channelKey": "third",
+          "status": "ANSWERED",
+          "responseValue": [
+            "b",
+            "a"
+          ]
+        }
+      ],
+      "expected": {
+        "cooperation": 10
+      }
+    },
+    {
+      "name": "全部选填缺失",
+      "responses": [],
+      "expected": {
+        "cooperation": null
+      }
+    },
+    {
+      "name": "明确拒答",
+      "responses": [
+        {
+          "sceneKey": "sjt_q_first",
+          "channelKey": "first",
+          "status": "REFUSED"
+        },
+        {
+          "sceneKey": "sjt_q_second",
+          "channelKey": "second",
+          "status": "REFUSED"
+        },
+        {
+          "sceneKey": "sjt_q_third",
+          "channelKey": "third",
+          "status": "REFUSED"
+        }
+      ],
+      "expected": {
+        "cooperation": null
+      }
+    }
+  ]
+}

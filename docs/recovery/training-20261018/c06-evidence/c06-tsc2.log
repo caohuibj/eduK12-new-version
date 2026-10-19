@@ -1,0 +1,15 @@
+src/modules/assessment-runtime/typed-form-facts.ts(23,64): error TS2345: Argument of type '{ otherText?: {} | null | undefined; formItemId: string; value: TypedFormValue; }[]' is not assignable to parameter of type '{ formItemId: string; value: TypedFormValue; otherText?: string | undefined; }[]'.
+  Type '{ otherText?: {} | null | undefined; formItemId: string; value: TypedFormValue; }' is not assignable to type '{ formItemId: string; value: TypedFormValue; otherText?: string | undefined; }'.
+    Types of property 'otherText' are incompatible.
+      Type '{} | null | undefined' is not assignable to type 'string | undefined'.
+        Type 'null' is not assignable to type 'string | undefined'.
+src/modules/assessment-runtime/unified-aggregate-finalizer.service.ts(1377,21): error TS2339: Property 'taskSatisfaction' does not exist on type '{ parent: any; frozenSlots: FrozenActiveSlotSetV1; headers: AggregateSnapshotHeader[]; aggregateInputHash: string; aggregateReportEncrypted: string; }'.
+src/modules/assessment-runtime/unified-aggregate-finalizer.service.ts(1377,64): error TS2339: Property 'taskSatisfaction' does not exist on type '{ parent: any; frozenSlots: FrozenActiveSlotSetV1; headers: AggregateSnapshotHeader[]; aggregateInputHash: string; aggregateReportEncrypted: string; }'.
+src/modules/assessment-runtime/unified-form-section-final-submit.service.ts(97,119): error TS2322: Type '{ otherText?: string | undefined; rowStates?: Record<string, FormFactState> | undefined; state: FormFactState; key: string; label: string; value: TypedFormValue; }[]' is not assignable to type '{ key: string; value: string | number | string[] | Record<string, string | number | string[]> | null; state: "ANSWERED" | "NOT_SHOWN" | "SHOWN_MISSING" | "REFUSED"; label: string; rowStates?: Record<...> | undefined; otherText?: string | undefined; }[]'.
+  Type '{ otherText?: string | undefined; rowStates?: Record<string, FormFactState> | undefined; state: FormFactState; key: string; label: string; value: TypedFormValue; }' is not assignable to type '{ key: string; value: string | number | string[] | Record<string, string | number | string[]> | null; state: "ANSWERED" | "NOT_SHOWN" | "SHOWN_MISSING" | "REFUSED"; label: string; rowStates?: Record<...> | undefined; otherText?: string | undefined; }'.
+    Types of property 'value' are incompatible.
+      Type 'TypedFormValue' is not assignable to type 'string | number | string[] | Record<string, string | number | string[]> | null'.
+        Type 'ExplicitFormRefusal' is not assignable to type 'string | number | string[] | Record<string, string | number | string[]> | null'.
+          Type 'ExplicitFormRefusal' is not assignable to type 'Record<string, string | number | string[]>'.
+            Property '_surveyRefusal' is incompatible with index signature.
+              Type 'boolean' is not assignable to type 'string | number | string[]'.

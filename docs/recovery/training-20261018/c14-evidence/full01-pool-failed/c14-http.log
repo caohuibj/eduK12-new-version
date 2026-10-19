@@ -1,0 +1,33 @@
+PASS /composite-assessments b: HTTP03 accepted facts retained; report-only continuation, four canonical facts and original reports
+PASS HTTP03 checkpoint resumed read-only accepted facts plus original report queue; fixture, bad candidates and existing FINAL/replay inputs were not rerun
+PASS Nonmember cannot allocate any group
+AssertionError [ERR_ASSERTION]: POST /composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts: 500 {"code":-1,"message":"服务器内部错误","data":null}
+    at Object.request (file:///workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/scripts/recovery/c14-variants-smoke.mjs:42:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async Promise.all (index 1)
+    at async file:///workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/scripts/recovery/c14-variants-smoke.mjs:304:93 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: POST /composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts: 500 {"code":-1,"message":"服务器内部错误","data":null}
+    at Object.request (file:///workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/scripts/recovery/c14-variants-smoke.mjs:42:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async Promise.all (index 1)
+    at async file:///workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/scripts/recovery/c14-variants-smoke.mjs:304:93 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+
+Node.js v24.21.0

@@ -1,3 +1,7 @@
+import { lockTrainingFlowFinalAdmission, requiresTrainingFlowFinalLock } from '../composite/training-variant-child-scope'
+import { onlineSituationalTaskSatisfied, SJT_ONLINE_PROTOCOL_FLAG, SJT_ONLINE_UNSATISFIED_FLAG } from './situational-task-satisfaction'
+import { normalizeSjtOnlineResponses } from './authoring/online'
+import { situationalLegacyFinalSubmitSchema, situationalOnlineFinalSubmitSchema } from './situational-final-submit.schema'
 import { buildSjtNarrative } from './authoring/narrative'
 import { deriveSituationalAssignment, assignedSituationalDefinition } from './situation-assignment'
 import { situationalResponseHistoryIdentities, validateSituationalResearchCapture } from './situation-research-capture'
@@ -28,8 +32,9 @@ import { encryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { insertCompletedUnitSnapshot } from '../assessment-runtime/persistence'
 import {
   createSituationalRawSubmissionPayload,
+  createSituationalOnlineRawSubmissionPayload,
+  SITUATIONAL_ONLINE_RAW_ENCODING_VERSION,
   SITUATIONAL_RAW_ENCODING_VERSION,
-  SITUATIONAL_RAW_PAYLOAD_SCHEMA_VERSION,
 } from './situational-raw-submission'
 import {
   createSituationalResponseValidator,
@@ -87,6 +92,7 @@ const normalizedResponse = (response: SituationalResponse): SituationalResponse 
 const normalizeSituationalSubmission = (
   definition: SituationRuntimeDefinition,
   input: SituationalResponse[],
+  options: { requiredValidated?: boolean } = {},
 ): { responses: SituationalResponse[]; trajectory: AuthoritativeSituationalTrajectory } => {
   const scientificDefinition = asLinearSituationDefinition(definition)
   const byPair = measureRequestPhaseSync('sjt.validation_index', () => {
@@ -143,7 +149,7 @@ const normalizeSituationalSubmission = (
 
   const requiredKeys = requiredReachableSituationalResponseKeys(definition, trajectory)
   const missing = requiredKeys.filter((pairKey) => !byPair.has(pairKey))
-  if (missing.length > 0) {
+  if (missing.length > 0 && !options.requiredValidated) {
     throw new InstrumentFinalSubmitError(
       'SUBMISSION_PAYLOAD_CONFLICT',
       `还有 ${missing.length} 个当前分支必答通道未作答`,
@@ -209,6 +215,11 @@ const transactionRow = async (
   })
 )
 
+const inputForValidation = (input: SituationalFinalSubmitServiceInput) => {
+  const { attemptId: _attemptId, userId: _userId, embedded: _embedded, ...payload } = input
+  return payload
+}
+
 const persistSituationalAttemptFinal = async (
   input: SituationalFinalSubmitServiceInput,
 ) => {
@@ -239,17 +250,35 @@ const persistSituationalAttemptFinal = async (
 
   const assignment = deriveSituationalAssignment(snapshot.definition, row.id, snapshot.definitionHash)
   const assignedDefinition = assignedSituationalDefinition(snapshot.definition, assignment)
-  const normalized = normalizeSituationalSubmission(assignedDefinition, input.responses)
+  // Protocol authority belongs to the frozen release, never the request.
+  const onlineInput = snapshot.online ? situationalOnlineFinalSubmitSchema.safeParse(inputForValidation(input)) : undefined
+  const legacyInput = !snapshot.online ? situationalLegacyFinalSubmitSchema.safeParse(inputForValidation(input)) : undefined
+  if (onlineInput && !onlineInput.success || legacyInput && !legacyInput.success) {
+    throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', '提交协议与冻结运行时不一致', 400)
+  }
+  let onlineNormalized: ReturnType<typeof normalizeSjtOnlineResponses> | undefined
+  try {
+    if (snapshot.online && onlineInput?.success) onlineNormalized = normalizeSjtOnlineResponses(snapshot.online.display, assignedDefinition, onlineInput.data.responses)
+  } catch (error) {
+    throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', error instanceof Error ? error.message : '在线回答不合法', 400)
+  }
+  const normalized = normalizeSituationalSubmission(assignedDefinition, onlineNormalized?.responses ?? (legacyInput?.success ? legacyInput.data.responses : []), { requiredValidated: Boolean(onlineNormalized) })
   let researchCapture: typeof input.researchCapture
   try { researchCapture = validateSituationalResearchCapture({ definition: assignedDefinition, definitionHash: snapshot.definitionHash, assignment, responses: normalized.responses, capture: input.researchCapture }) }
   catch (error) { throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', String(error), 400) }
   const responses = normalized.responses
-  const canonical = prepareCanonicalSubmission({ responses, ...(researchCapture ? { researchCapture } : {}) })
+  const canonical = prepareCanonicalSubmission({ responses, ...(onlineNormalized ? { responseProtocol: 'sjt-online-response-v1', rawResponses: onlineNormalized.rawResponses } : {}), ...(researchCapture ? { researchCapture } : {}) })
   assertCanonicalSubmissionPayloadSize(canonical, FINAL_SUBMISSION_MAX_BYTES.situational, '情境化测评提交数据')
   const payloadHash = canonical.hash
 
   if (row.status === 'COMPLETED') {
     if (assertSubmissionReplay(row, submissionId, payloadHash) === 'replay') {
+      if (requiresTrainingFlowFinalLock(row.compositeAttemptId, row.compositeAttempt)) {
+        await withFinalOnlyCompletionTransaction(async tx => {
+          const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, { attemptId: row.compositeAttemptId, parent: row.compositeAttempt, attemptEpoch: input.attemptEpoch, itemId: row.compositeItemId, sourceAttemptId: row.id, submissionId })
+          assertFlowFinal(true)
+        })
+      }
       return {
         data: situationalAttemptForResponse(row, snapshot, { replayed: true }),
         parentAttemptId: embedded?.compositeAttemptId ?? null,
@@ -273,6 +302,11 @@ const persistSituationalAttemptFinal = async (
     runtime: snapshot.compiledRuntime,
     contextHash: row.compositeAttempt?.contextSnapshotHash ?? null,
   })
+  if (onlineNormalized) {
+    canonicalCore.quality.flags.push(SJT_ONLINE_PROTOCOL_FLAG)
+    if (!onlineSituationalTaskSatisfied(assignedDefinition, responses, snapshot.online!.display.scenes.flatMap(scene => scene.questions.filter(question => question.required).map(question => question.questionKey)))) canonicalCore.quality.flags.push(SJT_ONLINE_UNSATISFIED_FLAG)
+    canonicalCore.quality.flags.sort()
+  }
   const completedAt = new Date()
   const canonicalResult = createCanonicalUnitResultEnvelope({
     core: canonicalCore,
@@ -284,7 +318,10 @@ const persistSituationalAttemptFinal = async (
     },
     bundleBridge: buildSituationalBundleBridge(result),
   })
-  const rawPayload = createSituationalRawSubmissionPayload({
+  const rawPayload = onlineNormalized ? createSituationalOnlineRawSubmissionPayload({
+    attemptEpoch: row.attemptEpoch, responses, rawResponses: onlineNormalized.rawResponses,
+    ...(researchCapture ? { researchCapture } : {}),
+  }) : createSituationalRawSubmissionPayload({
     attemptEpoch: row.attemptEpoch,
     responses,
     ...(researchCapture ? { researchCapture } : {}),
@@ -296,6 +333,7 @@ const persistSituationalAttemptFinal = async (
 
   const committed = await withFinalOnlyCompletionTransaction(async (tx) => {
     if (embedded) await lockEmbeddedCompositeAttempt(tx, embedded.compositeAttemptId)
+    const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, { attemptId: row.compositeAttemptId, parent: row.compositeAttempt, attemptEpoch: input.attemptEpoch, itemId: row.compositeItemId, sourceAttemptId: row.id, submissionId, parentLocked: Boolean(embedded) })
     await lockSituationalAttempt(tx, input.attemptId)
     const current = await transactionRow(tx, input.attemptId)
     if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评记录不存在', 404)
@@ -312,11 +350,13 @@ const persistSituationalAttemptFinal = async (
 
     if (current.status === 'COMPLETED') {
       if (assertSubmissionReplay(current, submissionId, payloadHash) === 'replay') {
+        assertFlowFinal(true)
         return { kind: 'replay' as const, row: current }
       }
       throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', 'submissionId 已用于其他提交内容', 409)
     }
 
+    assertFlowFinal(false)
     const update = await tx.situationalAttempt.updateMany({
       where: {
         id: input.attemptId,
@@ -345,11 +385,11 @@ const persistSituationalAttemptFinal = async (
       data: {
         attemptId: input.attemptId,
         attemptEpoch: row.attemptEpoch,
-        responseCount: rawPayload.responses.length,
+        responseCount: rawPayload.schemaVersion === 2 ? rawPayload.rawResponses.length : rawPayload.responses.length,
         payloadEncrypted: encryptedRawPayload,
         payloadHash,
-        payloadSchemaVersion: SITUATIONAL_RAW_PAYLOAD_SCHEMA_VERSION,
-        encodingVersion: SITUATIONAL_RAW_ENCODING_VERSION,
+        payloadSchemaVersion: rawPayload.schemaVersion,
+        encodingVersion: rawPayload.schemaVersion === 2 ? SITUATIONAL_ONLINE_RAW_ENCODING_VERSION : SITUATIONAL_RAW_ENCODING_VERSION,
       },
     })
     if (embedded) {

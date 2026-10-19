@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/eduk12_c13_20261018/server-version/frontend
+
+
+ Test Files  4 passed (4)
+      Tests  17 passed (17)
+   Start at  20:12:10
+   Duration  3.31s (transform 275ms, setup 370ms, import 408ms, tests 826ms, environment 1.16s)
+

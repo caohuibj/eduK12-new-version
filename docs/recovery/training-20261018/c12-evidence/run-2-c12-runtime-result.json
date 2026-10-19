@@ -1,0 +1,843 @@
+{
+  "passed": true,
+  "harnessInputs": {
+    "scripts/recovery/c12-sjt-http.py": "1369c5ec6151e580008002b36c551e9ee3964cd67f2e61e665ff1305d6a5ad86",
+    "scripts/recovery/c12-sjt-smoke.mjs": "332c5744178ccde74924ad282bb3a9ce421d265f8f4f7aad9982ce410f7b951d",
+    "e2e/questionnaire-products-fixture.ts": "f5a1f97986a60c937f6bc299d73f83cb10a448701f5dcc751c70077a11c7e1ac",
+    "backend/src/modules/situational/authoring/examples/online-hand-calculated.json": "a8e9eb897bd7705c785a86bc0de16d0bce7c7e28e90611542ac2e0c79ccf7e5a",
+    "backend/src/modules/situational/instruments/sjt-assertiveness-golden/1.0.0/instrument.json": "e0ef7c315cf42db521ba9d9fc19b4a11408473f487c2bd0f2e9ad1811214f1fb"
+  },
+  "sourceHead": "564f2f60a391aa1bb4d631e0d9c3c7e7a0de5b9f",
+  "runtimeFingerprint": {
+    "schemaVersion": 1,
+    "nodeVersion": "v24.21.0",
+    "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+    "dist": {
+      "files": 5033,
+      "sha256": "cb245fa67e346bfe470739771f0f566934b56b0bb349fbea7eeb5b6df9a8bf89"
+    },
+    "files": {
+      "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+      "prisma/schema.prisma": "33e2a793329c331f3ee5813bc21811688f9aae1e70aaffc44d9341ad4a9fc6fb",
+      "node_modules/.prisma/client/schema.prisma": "3786095e6b9a5477273b36a1842ca7b144daa23aa33fccb0fb3da2c95a16d822",
+      "node_modules/.prisma/client/index.js": "7fcb0b1b1bd5a7941668e2749df16880622b0b67c5838d4f44f10ab793fa5bbb"
+    },
+    "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+  },
+  "phases": {
+    "sjt": {
+      "passed": true,
+      "checks": [
+        "Online create/CAS/digest, independent review, immutable release; wrong and empty manual golden/self-review/nonowner rejected",
+        "Nonmember and cross-course admission rejected",
+        "Nonowner read and FINAL denied",
+        "Two scenes/three questions real multiselect SUM+MEAN, raw FINAL/replay, common scorer yields manual 9 and two independent scenes",
+        "Original export queue csv: exact canonical identities/metrics, no raw responses, owner-only download",
+        "Original export queue zip: exact canonical identities/metrics, no raw responses, owner-only download",
+        "New empty FINAL null score with independently correct persisted task qualification",
+        "New refused FINAL null score with independently correct persisted task qualification",
+        "New partial FINAL null score with independently correct persisted task qualification",
+        "Required blank rejected on explicit new protocol",
+        "Old empty FINAL and client-driven protocol upgrade rejected without raw writes",
+        "Standalone new empty FINAL projects unsatisfied inbox; record actual canonical and response bytes"
+      ],
+      "requests": [
+        {
+          "route": "/auth/csrf",
+          "method": "GET",
+          "status": 200,
+          "bytes": 102
+        },
+        {
+          "route": "/auth/training-login",
+          "method": "POST",
+          "status": 200,
+          "bytes": 318
+        },
+        {
+          "route": "/auth/csrf",
+          "method": "GET",
+          "status": 200,
+          "bytes": 102
+        },
+        {
+          "route": "/auth/login",
+          "method": "POST",
+          "status": 200,
+          "bytes": 312
+        },
+        {
+          "route": "/auth/csrf",
+          "method": "GET",
+          "status": 200,
+          "bytes": 102
+        },
+        {
+          "route": "/auth/training-login",
+          "method": "POST",
+          "status": 200,
+          "bytes": 318
+        },
+        {
+          "route": "/auth/csrf",
+          "method": "GET",
+          "status": 200,
+          "bytes": 102
+        },
+        {
+          "route": "/auth/training-login",
+          "method": "POST",
+          "status": 200,
+          "bytes": 284
+        },
+        {
+          "route": "/auth/csrf",
+          "method": "GET",
+          "status": 200,
+          "bytes": 102
+        },
+        {
+          "route": "/auth/training-login",
+          "method": "POST",
+          "status": 200,
+          "bytes": 284
+        },
+        {
+          "route": "/situational/authoring/online/drafts",
+          "method": "POST",
+          "status": 200,
+          "bytes": 2166
+        },
+        {
+          "route": "/situational/authoring/drafts/3cd0e0b8-7efb-4dc8-a8a1-1267475cf7f9/request-review",
+          "method": "POST",
+          "status": 422,
+          "bytes": 1543
+        },
+        {
+          "route": "/situational/authoring/online/drafts",
+          "method": "POST",
+          "status": 422,
+          "bytes": 200
+        },
+        {
+          "route": "/situational/authoring/online/drafts",
+          "method": "POST",
+          "status": 200,
+          "bytes": 4574
+        },
+        {
+          "route": "/situational/authoring/drafts/2dafd1ce-c752-4e92-a9a3-0c07eaf38234/request-review",
+          "method": "POST",
+          "status": 200,
+          "bytes": 4578
+        },
+        {
+          "route": "/situational/authoring/drafts/2dafd1ce-c752-4e92-a9a3-0c07eaf38234/review",
+          "method": "POST",
+          "status": 403,
+          "bytes": 82
+        },
+        {
+          "route": "/situational/authoring/online/drafts",
+          "method": "POST",
+          "status": 200,
+          "bytes": 4576
+        },
+        {
+          "route": "/situational/authoring/drafts/8edab944-b26f-487a-8e44-b62518723b03",
+          "method": "GET",
+          "status": 403,
+          "bytes": 67
+        },
+        {
+          "route": "/situational/authoring/drafts/8edab944-b26f-487a-8e44-b62518723b03",
+          "method": "PUT",
+          "status": 200,
+          "bytes": 4576
+        },
+        {
+          "route": "/situational/authoring/drafts/8edab944-b26f-487a-8e44-b62518723b03",
+          "method": "PUT",
+          "status": 409,
+          "bytes": 76
+        },
+        {
+          "route": "/situational/authoring/drafts/8edab944-b26f-487a-8e44-b62518723b03/request-review",
+          "method": "POST",
+          "status": 409,
+          "bytes": 64
+        },
+        {
+          "route": "/situational/authoring/drafts/8edab944-b26f-487a-8e44-b62518723b03/request-review",
+          "method": "POST",
+          "status": 200,
+          "bytes": 4580
+        },
+        {
+          "route": "/situational/authoring/drafts/8edab944-b26f-487a-8e44-b62518723b03/review",
+          "method": "POST",
+          "status": 200,
+          "bytes": 4580
+        },
+        {
+          "route": "/situational/authoring/drafts/8edab944-b26f-487a-8e44-b62518723b03",
+          "method": "PUT",
+          "status": 409,
+          "bytes": 88
+        },
+        {
+          "route": "/questionnaire-products/resources",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1362
+        },
+        {
+          "route": "/questionnaire-products",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1157
+        },
+        {
+          "route": "/questionnaire-products/5c972f09-7d78-482a-ba07-c32bfd69c957/items",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1563
+        },
+        {
+          "route": "/questionnaire-products/5c972f09-7d78-482a-ba07-c32bfd69c957/preflight",
+          "method": "POST",
+          "status": 200,
+          "bytes": 412
+        },
+        {
+          "route": "/questionnaire-products/5c972f09-7d78-482a-ba07-c32bfd69c957/publish",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1589
+        },
+        {
+          "route": "/questionnaire-products",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1157
+        },
+        {
+          "route": "/questionnaire-products/fbefe711-7ad3-45ac-9e82-c514771d3f2e/items",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1563
+        },
+        {
+          "route": "/questionnaire-products/fbefe711-7ad3-45ac-9e82-c514771d3f2e/preflight",
+          "method": "POST",
+          "status": 200,
+          "bytes": 412
+        },
+        {
+          "route": "/questionnaire-products/fbefe711-7ad3-45ac-9e82-c514771d3f2e/publish",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1589
+        },
+        {
+          "route": "/composite-assessments/5c972f09-7d78-482a-ba07-c32bfd69c957/attempts",
+          "method": "POST",
+          "status": 403,
+          "bytes": 75
+        },
+        {
+          "route": "/composite-assessments/fbefe711-7ad3-45ac-9e82-c514771d3f2e/attempts",
+          "method": "POST",
+          "status": 403,
+          "bytes": 75
+        },
+        {
+          "route": "/composite-assessments/5c972f09-7d78-482a-ba07-c32bfd69c957/attempts",
+          "method": "POST",
+          "status": 200,
+          "bytes": 7006
+        },
+        {
+          "route": "/composite-assessments/5c972f09-7d78-482a-ba07-c32bfd69c957/attempts",
+          "method": "POST",
+          "status": 200,
+          "bytes": 7006
+        },
+        {
+          "route": "/composite-assessments/attempts/338efa0e-2905-4fa7-aad9-6cb5d92f689f",
+          "method": "GET",
+          "status": 200,
+          "bytes": 6964
+        },
+        {
+          "route": "/composite-assessments/attempts/338efa0e-2905-4fa7-aad9-6cb5d92f689f/items/57eab703-e020-43b9-889a-c794af3f6d26/situational/06dd52a8-704c-4b17-afd2-2776a958cb13",
+          "method": "GET",
+          "status": 200,
+          "bytes": 6306
+        },
+        {
+          "route": "/composite-assessments/attempts/338efa0e-2905-4fa7-aad9-6cb5d92f689f/items/57eab703-e020-43b9-889a-c794af3f6d26/situational/06dd52a8-704c-4b17-afd2-2776a958cb13",
+          "method": "GET",
+          "status": 403,
+          "bytes": 94
+        },
+        {
+          "route": "/composite-assessments/attempts/338efa0e-2905-4fa7-aad9-6cb5d92f689f/items/57eab703-e020-43b9-889a-c794af3f6d26/situational/06dd52a8-704c-4b17-afd2-2776a958cb13/submit",
+          "method": "POST",
+          "status": 403,
+          "bytes": 94
+        },
+        {
+          "route": "/composite-assessments/attempts/338efa0e-2905-4fa7-aad9-6cb5d92f689f/items/57eab703-e020-43b9-889a-c794af3f6d26/situational/06dd52a8-704c-4b17-afd2-2776a958cb13/submit",
+          "method": "POST",
+          "status": 400,
+          "bytes": 88
+        },
+        {
+          "route": "/composite-assessments/attempts/338efa0e-2905-4fa7-aad9-6cb5d92f689f/items/57eab703-e020-43b9-889a-c794af3f6d26/situational/06dd52a8-704c-4b17-afd2-2776a958cb13/submit",
+          "method": "POST",
+          "status": 400,
+          "bytes": 88
+        },
+        {
+          "route": "/composite-assessments/attempts/338efa0e-2905-4fa7-aad9-6cb5d92f689f/items/57eab703-e020-43b9-889a-c794af3f6d26/situational/06dd52a8-704c-4b17-afd2-2776a958cb13/submit",
+          "method": "POST",
+          "status": 400,
+          "bytes": 111
+        },
+        {
+          "route": "/composite-assessments/attempts/338efa0e-2905-4fa7-aad9-6cb5d92f689f/items/57eab703-e020-43b9-889a-c794af3f6d26/situational/06dd52a8-704c-4b17-afd2-2776a958cb13/submit",
+          "method": "POST",
+          "status": 400,
+          "bytes": 49
+        },
+        {
+          "route": "/composite-assessments/attempts/338efa0e-2905-4fa7-aad9-6cb5d92f689f/items/57eab703-e020-43b9-889a-c794af3f6d26/situational/06dd52a8-704c-4b17-afd2-2776a958cb13/submit",
+          "method": "POST",
+          "status": 200,
+          "bytes": 129
+        },
+        {
+          "route": "/composite-assessments/attempts/338efa0e-2905-4fa7-aad9-6cb5d92f689f/items/57eab703-e020-43b9-889a-c794af3f6d26/situational/06dd52a8-704c-4b17-afd2-2776a958cb13/submit",
+          "method": "POST",
+          "status": 200,
+          "bytes": 131
+        },
+        {
+          "route": "/composite-assessments/attempts/338efa0e-2905-4fa7-aad9-6cb5d92f689f/report-status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 380
+        },
+        {
+          "route": "/composite-assessments/attempts/338efa0e-2905-4fa7-aad9-6cb5d92f689f/report-status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 398
+        },
+        {
+          "route": "/composite-assessments/attempts/338efa0e-2905-4fa7-aad9-6cb5d92f689f/report",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1617
+        },
+        {
+          "route": "/composite-assessments/attempts/338efa0e-2905-4fa7-aad9-6cb5d92f689f/report",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1617
+        },
+        {
+          "route": "/composite-assessments/5c972f09-7d78-482a-ba07-c32bfd69c957/attempts/338efa0e-2905-4fa7-aad9-6cb5d92f689f/report",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1617
+        },
+        {
+          "route": "/composite-assessments/attempts/338efa0e-2905-4fa7-aad9-6cb5d92f689f/report",
+          "method": "GET",
+          "status": 403,
+          "bytes": 72
+        },
+        {
+          "route": "/composite-assessments/5c972f09-7d78-482a-ba07-c32bfd69c957/export",
+          "method": "POST",
+          "status": 200,
+          "bytes": 490
+        },
+        {
+          "route": "/composite-assessments/5c972f09-7d78-482a-ba07-c32bfd69c957/export/artifacts/5a1d8a95-e474-48c0-b04e-1b9d1e869bbe/status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 437
+        },
+        {
+          "route": "/composite-assessments/5c972f09-7d78-482a-ba07-c32bfd69c957/export/artifacts/5a1d8a95-e474-48c0-b04e-1b9d1e869bbe/status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 437
+        },
+        {
+          "route": "/composite-assessments/5c972f09-7d78-482a-ba07-c32bfd69c957/export/artifacts/5a1d8a95-e474-48c0-b04e-1b9d1e869bbe/status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 437
+        },
+        {
+          "route": "/composite-assessments/5c972f09-7d78-482a-ba07-c32bfd69c957/export/artifacts/5a1d8a95-e474-48c0-b04e-1b9d1e869bbe/status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 437
+        },
+        {
+          "route": "/composite-assessments/5c972f09-7d78-482a-ba07-c32bfd69c957/export/artifacts/5a1d8a95-e474-48c0-b04e-1b9d1e869bbe/status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 446
+        },
+        {
+          "route": "/composite-assessments/5c972f09-7d78-482a-ba07-c32bfd69c957/export/artifacts/5a1d8a95-e474-48c0-b04e-1b9d1e869bbe",
+          "method": "GET",
+          "status": 200,
+          "bytes": 924
+        },
+        {
+          "route": "/composite-assessments/5c972f09-7d78-482a-ba07-c32bfd69c957/export/artifacts/5a1d8a95-e474-48c0-b04e-1b9d1e869bbe",
+          "method": "GET",
+          "status": 404,
+          "bytes": 51
+        },
+        {
+          "route": "/composite-assessments/5c972f09-7d78-482a-ba07-c32bfd69c957/export",
+          "method": "POST",
+          "status": 200,
+          "bytes": 490
+        },
+        {
+          "route": "/composite-assessments/5c972f09-7d78-482a-ba07-c32bfd69c957/export/artifacts/cae482bf-9fbd-4404-9130-90f96fe247d8/status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 437
+        },
+        {
+          "route": "/composite-assessments/5c972f09-7d78-482a-ba07-c32bfd69c957/export/artifacts/cae482bf-9fbd-4404-9130-90f96fe247d8/status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 437
+        },
+        {
+          "route": "/composite-assessments/5c972f09-7d78-482a-ba07-c32bfd69c957/export/artifacts/cae482bf-9fbd-4404-9130-90f96fe247d8/status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 437
+        },
+        {
+          "route": "/composite-assessments/5c972f09-7d78-482a-ba07-c32bfd69c957/export/artifacts/cae482bf-9fbd-4404-9130-90f96fe247d8/status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 437
+        },
+        {
+          "route": "/composite-assessments/5c972f09-7d78-482a-ba07-c32bfd69c957/export/artifacts/cae482bf-9fbd-4404-9130-90f96fe247d8/status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 446
+        },
+        {
+          "route": "/composite-assessments/5c972f09-7d78-482a-ba07-c32bfd69c957/export/artifacts/cae482bf-9fbd-4404-9130-90f96fe247d8",
+          "method": "GET",
+          "status": 200,
+          "bytes": 8563
+        },
+        {
+          "route": "/composite-assessments/5c972f09-7d78-482a-ba07-c32bfd69c957/export/artifacts/cae482bf-9fbd-4404-9130-90f96fe247d8",
+          "method": "GET",
+          "status": 404,
+          "bytes": 51
+        },
+        {
+          "route": "/questionnaire-products",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1157
+        },
+        {
+          "route": "/questionnaire-products/4c300864-7ed1-405c-8b2b-f1fb185b2387/items",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1563
+        },
+        {
+          "route": "/questionnaire-products/4c300864-7ed1-405c-8b2b-f1fb185b2387/preflight",
+          "method": "POST",
+          "status": 200,
+          "bytes": 412
+        },
+        {
+          "route": "/questionnaire-products/4c300864-7ed1-405c-8b2b-f1fb185b2387/publish",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1589
+        },
+        {
+          "route": "/composite-assessments/4c300864-7ed1-405c-8b2b-f1fb185b2387/attempts",
+          "method": "POST",
+          "status": 200,
+          "bytes": 7006
+        },
+        {
+          "route": "/composite-assessments/attempts/304836bd-50e8-4af9-93b3-6e0a0c811825/items/7cdb866c-03df-448d-ba3d-24c1a9f90d04/situational/59b305d5-694b-4ce1-97e6-fbc71d823563",
+          "method": "GET",
+          "status": 200,
+          "bytes": 6306
+        },
+        {
+          "route": "/composite-assessments/attempts/304836bd-50e8-4af9-93b3-6e0a0c811825/items/7cdb866c-03df-448d-ba3d-24c1a9f90d04/situational/59b305d5-694b-4ce1-97e6-fbc71d823563/submit",
+          "method": "POST",
+          "status": 200,
+          "bytes": 129
+        },
+        {
+          "route": "/composite-assessments/attempts/304836bd-50e8-4af9-93b3-6e0a0c811825/items/7cdb866c-03df-448d-ba3d-24c1a9f90d04/situational/59b305d5-694b-4ce1-97e6-fbc71d823563/submit",
+          "method": "POST",
+          "status": 200,
+          "bytes": 131
+        },
+        {
+          "route": "/composite-assessments/attempts/304836bd-50e8-4af9-93b3-6e0a0c811825/report-status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 380
+        },
+        {
+          "route": "/composite-assessments/attempts/304836bd-50e8-4af9-93b3-6e0a0c811825/report-status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 398
+        },
+        {
+          "route": "/composite-assessments/attempts/304836bd-50e8-4af9-93b3-6e0a0c811825/report",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1671
+        },
+        {
+          "route": "/composite-assessments/attempts/304836bd-50e8-4af9-93b3-6e0a0c811825/report",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1671
+        },
+        {
+          "route": "/questionnaire-products",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1157
+        },
+        {
+          "route": "/questionnaire-products/2d09c946-700d-49f3-b3eb-0bbbc0c80b76/items",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1563
+        },
+        {
+          "route": "/questionnaire-products/2d09c946-700d-49f3-b3eb-0bbbc0c80b76/preflight",
+          "method": "POST",
+          "status": 200,
+          "bytes": 412
+        },
+        {
+          "route": "/questionnaire-products/2d09c946-700d-49f3-b3eb-0bbbc0c80b76/publish",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1589
+        },
+        {
+          "route": "/composite-assessments/2d09c946-700d-49f3-b3eb-0bbbc0c80b76/attempts",
+          "method": "POST",
+          "status": 200,
+          "bytes": 7006
+        },
+        {
+          "route": "/composite-assessments/attempts/dc601b76-3420-4fe8-bbba-6442e598857c/items/14d702e3-00c3-47e4-8871-2429e90f3448/situational/42f0e206-e249-44f9-9c38-1ed9896680cb",
+          "method": "GET",
+          "status": 200,
+          "bytes": 6306
+        },
+        {
+          "route": "/composite-assessments/attempts/dc601b76-3420-4fe8-bbba-6442e598857c/items/14d702e3-00c3-47e4-8871-2429e90f3448/situational/42f0e206-e249-44f9-9c38-1ed9896680cb/submit",
+          "method": "POST",
+          "status": 200,
+          "bytes": 129
+        },
+        {
+          "route": "/composite-assessments/attempts/dc601b76-3420-4fe8-bbba-6442e598857c/items/14d702e3-00c3-47e4-8871-2429e90f3448/situational/42f0e206-e249-44f9-9c38-1ed9896680cb/submit",
+          "method": "POST",
+          "status": 200,
+          "bytes": 131
+        },
+        {
+          "route": "/composite-assessments/attempts/dc601b76-3420-4fe8-bbba-6442e598857c/report-status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 380
+        },
+        {
+          "route": "/composite-assessments/attempts/dc601b76-3420-4fe8-bbba-6442e598857c/report-status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 398
+        },
+        {
+          "route": "/composite-assessments/attempts/dc601b76-3420-4fe8-bbba-6442e598857c/report",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1671
+        },
+        {
+          "route": "/composite-assessments/attempts/dc601b76-3420-4fe8-bbba-6442e598857c/report",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1671
+        },
+        {
+          "route": "/questionnaire-products",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1157
+        },
+        {
+          "route": "/questionnaire-products/46bb1f7d-cf75-454d-8d90-63b8a0037c24/items",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1563
+        },
+        {
+          "route": "/questionnaire-products/46bb1f7d-cf75-454d-8d90-63b8a0037c24/preflight",
+          "method": "POST",
+          "status": 200,
+          "bytes": 412
+        },
+        {
+          "route": "/questionnaire-products/46bb1f7d-cf75-454d-8d90-63b8a0037c24/publish",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1589
+        },
+        {
+          "route": "/composite-assessments/46bb1f7d-cf75-454d-8d90-63b8a0037c24/attempts",
+          "method": "POST",
+          "status": 200,
+          "bytes": 7006
+        },
+        {
+          "route": "/composite-assessments/attempts/8e1e0ca9-be44-4c51-81ad-1511919342c6/items/a27644a7-9c9f-45d2-a340-e4815f0ab974/situational/edf4064a-085e-4488-8f71-d511bd475ed7",
+          "method": "GET",
+          "status": 200,
+          "bytes": 6306
+        },
+        {
+          "route": "/composite-assessments/attempts/8e1e0ca9-be44-4c51-81ad-1511919342c6/items/a27644a7-9c9f-45d2-a340-e4815f0ab974/situational/edf4064a-085e-4488-8f71-d511bd475ed7/submit",
+          "method": "POST",
+          "status": 200,
+          "bytes": 129
+        },
+        {
+          "route": "/composite-assessments/attempts/8e1e0ca9-be44-4c51-81ad-1511919342c6/items/a27644a7-9c9f-45d2-a340-e4815f0ab974/situational/edf4064a-085e-4488-8f71-d511bd475ed7/submit",
+          "method": "POST",
+          "status": 200,
+          "bytes": 131
+        },
+        {
+          "route": "/composite-assessments/attempts/8e1e0ca9-be44-4c51-81ad-1511919342c6/report-status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 380
+        },
+        {
+          "route": "/composite-assessments/attempts/8e1e0ca9-be44-4c51-81ad-1511919342c6/report-status",
+          "method": "GET",
+          "status": 200,
+          "bytes": 398
+        },
+        {
+          "route": "/composite-assessments/attempts/8e1e0ca9-be44-4c51-81ad-1511919342c6/report",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1634
+        },
+        {
+          "route": "/composite-assessments/attempts/8e1e0ca9-be44-4c51-81ad-1511919342c6/report",
+          "method": "GET",
+          "status": 200,
+          "bytes": 1634
+        },
+        {
+          "route": "/situational/authoring/online/drafts",
+          "method": "POST",
+          "status": 200,
+          "bytes": 4664
+        },
+        {
+          "route": "/situational/authoring/drafts/edbc436a-30be-4f56-b4bd-523c7348e0d4/request-review",
+          "method": "POST",
+          "status": 200,
+          "bytes": 4668
+        },
+        {
+          "route": "/situational/authoring/drafts/edbc436a-30be-4f56-b4bd-523c7348e0d4/review",
+          "method": "POST",
+          "status": 200,
+          "bytes": 4668
+        },
+        {
+          "route": "/questionnaire-products",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1157
+        },
+        {
+          "route": "/questionnaire-products/0d86b0af-9818-4861-8a02-9cb2f30068eb/items",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1563
+        },
+        {
+          "route": "/questionnaire-products/0d86b0af-9818-4861-8a02-9cb2f30068eb/preflight",
+          "method": "POST",
+          "status": 200,
+          "bytes": 412
+        },
+        {
+          "route": "/questionnaire-products/0d86b0af-9818-4861-8a02-9cb2f30068eb/publish",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1589
+        },
+        {
+          "route": "/composite-assessments/0d86b0af-9818-4861-8a02-9cb2f30068eb/attempts",
+          "method": "POST",
+          "status": 200,
+          "bytes": 7005
+        },
+        {
+          "route": "/composite-assessments/attempts/79952159-0fbe-4777-8c88-8dd533653dc6/items/86de8e16-cb3c-4749-b0f5-1046b564b29e/situational/35f908bc-ed6a-4b21-a7ca-7dc65cd3921e",
+          "method": "GET",
+          "status": 200,
+          "bytes": 6305
+        },
+        {
+          "route": "/composite-assessments/attempts/79952159-0fbe-4777-8c88-8dd533653dc6/items/86de8e16-cb3c-4749-b0f5-1046b564b29e/situational/35f908bc-ed6a-4b21-a7ca-7dc65cd3921e/submit",
+          "method": "POST",
+          "status": 400,
+          "bytes": 88
+        },
+        {
+          "route": "/questionnaire-products",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1157
+        },
+        {
+          "route": "/questionnaire-products/6961d2ec-9ac5-4ef8-9aa2-05608f6febb7/items",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1547
+        },
+        {
+          "route": "/questionnaire-products/6961d2ec-9ac5-4ef8-9aa2-05608f6febb7/preflight",
+          "method": "POST",
+          "status": 200,
+          "bytes": 412
+        },
+        {
+          "route": "/questionnaire-products/6961d2ec-9ac5-4ef8-9aa2-05608f6febb7/publish",
+          "method": "POST",
+          "status": 200,
+          "bytes": 1573
+        },
+        {
+          "route": "/composite-assessments/6961d2ec-9ac5-4ef8-9aa2-05608f6febb7/attempts",
+          "method": "POST",
+          "status": 200,
+          "bytes": 5577
+        },
+        {
+          "route": "/composite-assessments/attempts/4d2f01ea-75d5-47f0-8787-a613eb0879d2/items/85965cea-dbe0-4ea0-90a0-92acc3af2ba0/situational/3576ebac-3352-4bfb-b3c4-df61065558ab",
+          "method": "GET",
+          "status": 200,
+          "bytes": 4871
+        },
+        {
+          "route": "/composite-assessments/attempts/4d2f01ea-75d5-47f0-8787-a613eb0879d2/items/85965cea-dbe0-4ea0-90a0-92acc3af2ba0/situational/3576ebac-3352-4bfb-b3c4-df61065558ab/submit",
+          "method": "POST",
+          "status": 400,
+          "bytes": 76
+        },
+        {
+          "route": "/composite-assessments/attempts/4d2f01ea-75d5-47f0-8787-a613eb0879d2/items/85965cea-dbe0-4ea0-90a0-92acc3af2ba0/situational/3576ebac-3352-4bfb-b3c4-df61065558ab/submit",
+          "method": "POST",
+          "status": 400,
+          "bytes": 102
+        },
+        {
+          "route": "/situational/attempts",
+          "method": "POST",
+          "status": 200,
+          "bytes": 6286
+        },
+        {
+          "route": "/situational/attempts/7f81c68e-be02-443b-a99e-9d3db8d651bc/submit",
+          "method": "POST",
+          "status": 200,
+          "bytes": 8725
+        },
+        {
+          "route": "/my-assessments",
+          "method": "GET",
+          "status": 200,
+          "bytes": 7170
+        }
+      ],
+      "counts": [
+        {
+          "name": "Nonmember and cross-course admission rejected",
+          "before": {
+            "parents": 0,
+            "children": 0,
+            "jobs": 0
+          },
+          "after": {
+            "parents": 0,
+            "children": 0,
+            "jobs": 0
+          }
+        },
+        {
+          "name": "Nonowner read and FINAL denied",
+          "before": {
+            "parents": 1,
+            "children": 1,
+            "jobs": 0
+          },
+          "after": {
+            "parents": 1,
+            "children": 1,
+            "jobs": 0
+          }
+        }
+      ],
+      "diagnostics": [
+        {
+          "name": "single online standalone inbox qualification",
+          "onlineResultRows": 1,
+          "encryptedCanonicalBytes": 3050,
+          "plaintextCanonicalBytes": 1464,
+          "httpResponseBytes": 7170,
+          "note": "diagnostic only; not throughput or memory qualification"
+        }
+      ]
+    }
+  },
+  "cleanupVerified": true
+}

@@ -1,3 +1,5 @@
+import { loadTrainingChildParent } from '../modules/composite/training-variant-child-scope'
+import { resolveTrainingAttemptScope } from '../modules/composite/training-variant-scope'
 import { Prisma } from '@prisma/client'
 import {
   buildAssessmentContext,
@@ -162,6 +164,8 @@ export const freezeCompositeAttemptContext = async (
     include: { compositeAssessment: { include: { items: { orderBy: { position: 'asc' } } } }, formAnswers: true },
   })
   if (!attempt) throw new AssessmentContextServiceError('综合测评记录不存在', 404)
+  const parent = await loadTrainingChildParent(attemptId, attempt, db)
+  const scope = await resolveTrainingAttemptScope(parent, parent.compositeAssessment, { db })
   if (attempt.contextSnapshotEncrypted && attempt.contextSnapshotHash) {
     try {
       const context = decryptAssessmentContext(attempt.contextSnapshotEncrypted)
@@ -171,7 +175,7 @@ export const freezeCompositeAttemptContext = async (
       throw new AssessmentContextServiceError('人口学上下文无法读取，请联系管理员', 500)
     }
   }
-  const formItems = attempt.compositeAssessment.items
+  const formItems = scope.items
     .filter((item) => item.type === 'FORM')
     .map((item) => ({
       id: item.id,
@@ -182,7 +186,7 @@ export const freezeCompositeAttemptContext = async (
       contextKey: item.contextKey,
       options: item.formOptions,
     }))
-  const context = buildOrThrow(formItems, attempt.formAnswers as unknown as Array<Record<string, unknown>>, frozenAt)
+  const context = buildOrThrow(formItems, attempt.formAnswers.filter(answer => scope.itemIds.has(answer.itemId)) as unknown as Array<Record<string, unknown>>, frozenAt)
   if (attempt.subjectUserId) context.subjectUserId = attempt.subjectUserId
   const hash = hashAssessmentContext(context)
   const updated = await db.compositeAssessmentAttempt.updateMany({

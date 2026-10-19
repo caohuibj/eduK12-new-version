@@ -439,7 +439,7 @@ const CompositeAssessmentList: React.FC = () => {
                     )}
                   </div>
                   <p className="text-sm text-gray-500 mt-1">{item.code} · {item.itemCount || 0} 个模块 · {item.status}</p>
-                  <p className="text-sm text-gray-600 mt-1">已开始 {item.attemptCounts?.started ?? 0} · 已完成 {item.attemptCounts?.completed ?? 0}</p>
+                  <p className="text-sm text-gray-600 mt-1">已开始 {item.attemptCounts?.started ?? 0} · 已交卷 {item.attemptCounts?.completed ?? 0} · 任务达成 {item.attemptCounts?.satisfied ?? item.attemptCounts?.completed ?? 0}</p>
                   {item.course && <p className="text-xs text-gray-400 mt-1">课程：{item.course.title}{item.course.courseCode ? `（${item.course.courseCode}）` : ''}</p>}
                 </div>
                 <div className="flex gap-2 shrink-0">

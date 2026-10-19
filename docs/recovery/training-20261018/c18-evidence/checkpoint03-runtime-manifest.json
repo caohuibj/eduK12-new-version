@@ -1,0 +1,161 @@
+[
+  {
+    "file": "runtime03-c18-upgrade-result.json.gz",
+    "sourceSha256": "47a61714c6957893860da1f98fec4cd916b532d7268f7347c0dbf0d520ef0212",
+    "gzipSha256": "5308f8f943446bcba6a3fed583958567e675a5b28237947ee9f6d8dd7806cb37",
+    "bytes": 4998
+  },
+  {
+    "file": "runtime03-c18-http-result.json.gz",
+    "sourceSha256": "951d5ad8cdb91dba631fe04c7ca8c8719c79e2400bd7c99e79b883806d1b25f1",
+    "gzipSha256": "9db3d30d65c4b6bdc273e96f7e3a88e2b1c86dbec444bb1d1f5ba21ea1121aad",
+    "bytes": 52236
+  },
+  {
+    "file": "runtime03-c18-runtime-result.json.gz",
+    "sourceSha256": "8abfaa300b42c63c16ba410cf77cc38b9701358a7e6aa2120c47ba3098ac9605",
+    "gzipSha256": "33b67dec5fb4727d04717e9f8ba293f996219a74771fa2860ca5dd70e112bd3d",
+    "bytes": 9393
+  },
+  {
+    "file": "runtime03-eduk12_recovery-runtime-role.log.gz",
+    "sourceSha256": "e67efd9c4405f88e7ab52e3d6b09267d0a58e28f4064dbd2acdeedb70805fe65",
+    "gzipSha256": "477496d4fe6ef577d7e5f3673a680ab29f9b26e1cf0f2d2e21ef86dda07f3bc9",
+    "bytes": 193
+  },
+  {
+    "privateLogName": "api.log",
+    "sourceSha256": "e223ae54728605b53c2aa5be30be13a55cb3bb4d4f106fc21250f3ace5eaaade",
+    "bytes": 4589
+  },
+  {
+    "privateLogName": "c18-delete-anonymous_study_consent_acceptances.log",
+    "sourceSha256": "610519f7db122d553061f77de09883d4b856c25d5fb0724566155267968880c0",
+    "bytes": 144
+  },
+  {
+    "privateLogName": "c18-delete-anonymous_study_consent_versions.log",
+    "sourceSha256": "610519f7db122d553061f77de09883d4b856c25d5fb0724566155267968880c0",
+    "bytes": 144
+  },
+  {
+    "privateLogName": "c18-delete-anonymous_study_research_audit.log",
+    "sourceSha256": "610519f7db122d553061f77de09883d4b856c25d5fb0724566155267968880c0",
+    "bytes": 144
+  },
+  {
+    "privateLogName": "c18-fault-cleanup.log",
+    "sourceSha256": "2345067a62a8e8d8200856ed0abe0c3ce9138a52e60ce4f316c06a1f13fd141a",
+    "bytes": 27
+  },
+  {
+    "privateLogName": "c18-fault-independent.log",
+    "sourceSha256": "5336f386d2dd4b7e4642d9c7cdbd80c6713aef067896e450273c5c70ccac009b",
+    "bytes": 66
+  },
+  {
+    "privateLogName": "c18-fault-install.log",
+    "sourceSha256": "4847e9e2a8a635cfaa83a118d1cc1ce2955eb3cd546c81905a8eff41a39613c6",
+    "bytes": 31
+  },
+  {
+    "privateLogName": "c18-guards-after.log",
+    "sourceSha256": "b9dea7af551968009d7c5e28a060be4481bd36d33432a2ec6833420390945ac9",
+    "bytes": 3092
+  },
+  {
+    "privateLogName": "c18-guards-before.log",
+    "sourceSha256": "b9dea7af551968009d7c5e28a060be4481bd36d33432a2ec6833420390945ac9",
+    "bytes": 3092
+  },
+  {
+    "privateLogName": "c18-http.log",
+    "sourceSha256": "8fc4c8ac16334adf77f5b1b373a4fc7b810ce87c899bd03d61f7114cc47e75fc",
+    "bytes": 2930
+  },
+  {
+    "privateLogName": "c18-immutable-anonymous_study_consent_acceptances.log",
+    "sourceSha256": "610519f7db122d553061f77de09883d4b856c25d5fb0724566155267968880c0",
+    "bytes": 144
+  },
+  {
+    "privateLogName": "c18-immutable-anonymous_study_consent_versions.log",
+    "sourceSha256": "610519f7db122d553061f77de09883d4b856c25d5fb0724566155267968880c0",
+    "bytes": 144
+  },
+  {
+    "privateLogName": "c18-immutable-anonymous_study_research_audit.log",
+    "sourceSha256": "610519f7db122d553061f77de09883d4b856c25d5fb0724566155267968880c0",
+    "bytes": 144
+  },
+  {
+    "privateLogName": "c18-missing-audit.log",
+    "sourceSha256": "03e1e9ccf95617a28a8a6a534964f46e6d05a6f71fe7afd556ea258dcbd2a1fd",
+    "bytes": 152
+  },
+  {
+    "privateLogName": "c18-upgrade.log",
+    "sourceSha256": "6392040b976ab2b367449ab97fb5c933e7f37c5a7cb30d2b5330190fe274d1e5",
+    "bytes": 30
+  },
+  {
+    "privateLogName": "eduk12_recovery-acceptance-immutable.log",
+    "sourceSha256": "65ed0433acc193242146fb52697c23c027be916cf656fc75b4bcadb69a6539f2",
+    "bytes": 222
+  },
+  {
+    "privateLogName": "eduk12_recovery-acl.log",
+    "sourceSha256": "1876d8f8c9b2c076b36677deedcd1f96d61a3006f479b64ce63c4eb6414dc76e",
+    "bytes": 14791
+  },
+  {
+    "privateLogName": "eduk12_recovery-audit-binding.log",
+    "sourceSha256": "7b3af925dbac8ddee95b60f9da8cf79905936b21482c6cb15598a86985fdea06",
+    "bytes": 219
+  },
+  {
+    "privateLogName": "eduk12_recovery-audit-immutable.log",
+    "sourceSha256": "65ed0433acc193242146fb52697c23c027be916cf656fc75b4bcadb69a6539f2",
+    "bytes": 222
+  },
+  {
+    "privateLogName": "eduk12_recovery-consent-immutable.log",
+    "sourceSha256": "65ed0433acc193242146fb52697c23c027be916cf656fc75b4bcadb69a6539f2",
+    "bytes": 222
+  },
+  {
+    "privateLogName": "eduk12_recovery-runtime-role.log",
+    "sourceSha256": "e67efd9c4405f88e7ab52e3d6b09267d0a58e28f4064dbd2acdeedb70805fe65",
+    "bytes": 193
+  },
+  {
+    "privateLogName": "eduk12_recovery-state-retained.log",
+    "sourceSha256": "41eb2a1819e4627aa317e820ec879daa4c8c21a09f1972dc629108d1a496f17e",
+    "bytes": 215
+  },
+  {
+    "privateLogName": "eduk12_recovery-unaudited-commit.log",
+    "sourceSha256": "f1823d88142aa045d8745d1eede94258420083f5fca9bf6be48818750c7b820b",
+    "bytes": 221
+  },
+  {
+    "privateLogName": "migrate-c18.log",
+    "sourceSha256": "7f58625d1bc1ca05291089922f5bf47b3aaccc2546948024ab84214706b77482",
+    "bytes": 438
+  },
+  {
+    "privateLogName": "postgres.log",
+    "sourceSha256": "53808f250fecfe52d0d6ecc1a5534d4a0a6b52de83495add58663bf29212da01",
+    "bytes": 6517
+  },
+  {
+    "privateLogName": "redis.log",
+    "sourceSha256": "882feed0846463c1510a9f18c579af8f0a8f996fde7d8173288039c5f25269a1",
+    "bytes": 1040
+  },
+  {
+    "privateLogName": "restore-pinned-c16.log",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0
+  }
+]

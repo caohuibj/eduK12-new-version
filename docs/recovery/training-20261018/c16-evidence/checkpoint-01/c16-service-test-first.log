@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/eduk12_c16_20261018/server-version/backend
+
+No test files found, exiting with code 1
+
+filter: src/__tests__/training-analysis/service.test.ts
+include: src/__tests__/**/*.test.ts
+exclude:  **/node_modules/**, **/.git/**
+

@@ -13,7 +13,7 @@ export interface InboxTask {
   subject?: { role: string; displayName?: string }; consentState: string; runTask?: AssignedRunTask
 }
 export interface AssessmentInbox { list: InboxTask[]; pendingCount: number; truncated: boolean }
-const stateLabels: Record<string, string> = { OPEN: '待完成', ASSIGNED: '待完成', PENDING: '待完成', STARTED: '进行中', IN_PROGRESS: '进行中', COMPLETED: '已完成', EXPIRED: '已过期', REVOKED: '已撤回', CANCELLED: '已取消', UPCOMING: '尚未开始', UNAVAILABLE: '暂不可用' }
+const stateLabels: Record<string, string> = { OPEN: '待完成', ASSIGNED: '待完成', PENDING: '待完成', STARTED: '进行中', IN_PROGRESS: '进行中', COMPLETED: '已完成', SUBMITTED_NOT_SATISFIED: '已交卷，任务未达成', EXPIRED: '已过期', REVOKED: '已撤回', CANCELLED: '已取消', UPCOMING: '尚未开始', UNAVAILABLE: '暂不可用' }
 
 interface CatalogCard { title: string; launchTarget: string; journey: { resource: { family: string; key: string; version: string }; initiationModes: string[] } }
 
@@ -86,6 +86,7 @@ export default function MyAssessments() {
           {task.reportTarget && <Link to={task.reportTarget}>我的报告</Link>}
         </div>
         {summaries[task.taskId]?.metrics && <div className="space-y-1">{Object.values(summaries[task.taskId].metrics!).map((value,index) => <p key={index}>指标 {index+1}：{value ?? '暂无可用结果'}</p>)}</div>}
+        {task.state === 'SUBMITTED_NOT_SATISFIED' && <p role="status">本次作答已保存并计入次数，可查看本次报告。</p>}
         {task.state === 'COMPLETED' && <div role="status" className="space-y-1 rounded-lg bg-slate-50 p-3"><p className="font-medium">{task.feedback?.title ?? '你已完成本次测评'}</p><p>{task.feedback?.message ?? '本次作答已保存。可提供的反馈按本测评的说明展示。'}</p></div>}
       </article>)}
     </section>)}</div>

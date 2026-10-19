@@ -49,11 +49,12 @@ interface CompositeAssessment {
   name: string
   description: string | null
   instruction: string | null
-  estimatedModules: number
+  estimatedModules: number | null
   items: Array<{ type: string; label: string | null }>
   course: { id: string; title: string; courseCode: string } | null
   attempt: { id: string; status: 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED'; progress: number } | null
-  latestCompletedAttempt: { id: string; status: 'COMPLETED'; progress: number } | null
+  hasSatisfiedAttempt?: boolean
+  latestCompletedAttempt: { id: string; status: 'COMPLETED'; progress: number; taskSatisfied?: boolean } | null
   opensAt: string | null
   expiresAt: string | null
   maxAttempts: number
@@ -220,7 +221,7 @@ const CourseDetail: React.FC = () => {
   const uncompletedQuestionnaires = questionnaires.filter(q => !q.completed).length
   const uncompletedComposites = composites.filter((item) => {
     const hasActiveAttempt = item.canContinue || item.attempt?.status === 'IN_PROGRESS'
-    const hasCompletedAttempt = Boolean(item.latestCompletedAttempt || item.attempt?.status === 'COMPLETED')
+    const hasCompletedAttempt = item.hasSatisfiedAttempt ?? Boolean(item.latestCompletedAttempt || item.attempt?.status === 'COMPLETED')
     return hasActiveAttempt || (!hasCompletedAttempt && item.canStartNewAttempt)
   }).length
 
@@ -565,8 +566,10 @@ const CourseDetail: React.FC = () => {
                       <h3 className="text-lg font-semibold text-gray-800 mb-2">{composite.name}</h3>
                       {composite.description && <p className="text-gray-600 text-sm mb-3">{composite.description}</p>}
                       <div className="flex items-center space-x-4 text-sm text-gray-500">
-                        <span>{composite.estimatedModules} 个模块</span>
-                        {attempt && <span>{attempt.status === 'COMPLETED' ? '已完成' : `已完成 ${attempt.progress}%`}</span>}
+                        <span>{composite.estimatedModules == null ? '按作答路径逐步呈现' : `${composite.estimatedModules} 个模块`}</span>
+                        {attempt && <span>{attempt.status === 'COMPLETED' ? '已交卷' : `已完成 ${attempt.progress}%`}</span>}
+                        {canViewReport && <span>{composite.hasSatisfiedAttempt === false ? '任务未达成（已计入次数）' : '任务已达成'}</span>}
+                        {composite.hasSatisfiedAttempt && composite.latestCompletedAttempt?.taskSatisfied === false && <span>本次未达成，历史达成仍保留</span>}
                         <span className={composite.availability === 'OPEN' ? 'text-green-600' : 'text-amber-600'}>{availabilityLabel}</span>
                         {composite.maxAttempts > 1 && <span>已使用 {composite.attemptsUsed} / {composite.maxAttempts} 次</span>}
                       </div>

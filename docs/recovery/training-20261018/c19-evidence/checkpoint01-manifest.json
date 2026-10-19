@@ -1,0 +1,191 @@
+{
+  "qualification": "DEVELOPMENT_ONLY_NOT_C19_ACCEPTANCE",
+  "archiveSha256": "7e1a993f35b2ab3fa0eb7eb19d9527a1546314311cd9a9af42306f28a2c2ade8",
+  "archiveBytes": 24013,
+  "members": [
+    {
+      "member": "00-differential-inputs.sha256.gz",
+      "producerFileName": "differential-inputs.sha256",
+      "rawSha256": "10f62828f12cfd80ce0f5ff5907882611020931607e178062b8d92efedba90a0",
+      "rawBytes": 323,
+      "compressedSha256": "a3ca32c752960b5ab708a00249fea07a09eb4805721883a2955accdd6dacc6c7",
+      "compressedBytes": 224
+    },
+    {
+      "member": "01-differential-loader.log.gz",
+      "producerFileName": "differential-loader.log",
+      "rawSha256": "8454aeff4d2d4f57095a6e7a6e1894b390ec5a9becb1ae98debda965896e1c45",
+      "rawBytes": 7419,
+      "compressedSha256": "8258fb01702b289d55754d396559c0fbb098e631b9dfacf33512d4f24aea3b64",
+      "compressedBytes": 3374
+    },
+    {
+      "member": "02-differential.log.gz",
+      "producerFileName": "differential.log",
+      "rawSha256": "bb2dd00d100eabda8a251176aeb1800fd0c4b64d40a577097deb0f9e674c07e2",
+      "rawBytes": 889,
+      "compressedSha256": "4d9813763dfdbe669b28a98079b94a0454b866813a55e50fa6bd011b84b530a8",
+      "compressedBytes": 432
+    },
+    {
+      "member": "03-differential.ts.gz",
+      "producerFileName": "differential.ts",
+      "rawSha256": "fea7b3ad77d8588fe506a25539951c56f9348954a7547dbae034881e5119e06a",
+      "rawBytes": 4172,
+      "compressedSha256": "71c8778b689c0703013fb5daad37837b48c3724d426466828dc1f0fd6968d5cc",
+      "compressedBytes": 1575
+    },
+    {
+      "member": "04-evidence.sha256.gz",
+      "producerFileName": "evidence.sha256",
+      "rawSha256": "55d82faaff9f7e78d0f0bdfa5eb6bd2f857c237b34ec493852ba0e2fa075b8d7",
+      "rawBytes": 1114,
+      "compressedSha256": "18364671916fbb86aeaec268643cdc3d15ae91fdbaa4cae8e7c8d7112a51e0a6",
+      "compressedBytes": 560
+    },
+    {
+      "member": "05-execution-history.json.gz",
+      "producerFileName": "execution-history.json",
+      "rawSha256": "81d1921c78c425da2d14c41d91d87b42888c5fc316adbe1eefd8b5432dc34249",
+      "rawBytes": 2325,
+      "compressedSha256": "3cfffe12a298bae52a1a79c4c7b35bff5d67fabaa98cd7c6f7a85c547b7c170a",
+      "compressedBytes": 915
+    },
+    {
+      "member": "06-final-inputs.sha256.gz",
+      "producerFileName": "final-inputs.sha256",
+      "rawSha256": "3df689eec10214f698388abaf9a5fe7b8cf0762ad86e08ffa8d30a1e846871c9",
+      "rawBytes": 755,
+      "compressedSha256": "0c188d23387f746467d3a8dee0ab26068d0413d4f3cf1d967aa5419926ca0247",
+      "compressedBytes": 434
+    },
+    {
+      "member": "07-pre-typefix-inputs.sha256.gz",
+      "producerFileName": "pre-typefix-inputs.sha256",
+      "rawSha256": "cccdca67d63a5fe00f00f5adbd50751921f8e0881a2cf7080fcd04832028ad2b",
+      "rawBytes": 755,
+      "compressedSha256": "78c12f31a3c3b2712d41d3b70a254c138bb43f6b2411be87a706a5041d1a39b7",
+      "compressedBytes": 433
+    },
+    {
+      "member": "08-survey-original-executable.ts.gz",
+      "producerFileName": "survey-original-executable.ts",
+      "rawSha256": "2847951f976621d726c982737287d99d00787ab71e3cba073f879d8575e1d6c6",
+      "rawBytes": 18847,
+      "compressedSha256": "3eecfbd241e77030b0bc4cb97c187c5b620efad4eddec97354e9ca358df75866",
+      "compressedBytes": 6237
+    },
+    {
+      "member": "09-training-tests-final.log.gz",
+      "producerFileName": "training-tests-final.log",
+      "rawSha256": "c97496a8109fd7ed15b1d3a70c4d7b66f153c8eb8cf0417e69a119c73622f62c",
+      "rawBytes": 260,
+      "compressedSha256": "eb3359ef2d5a2424425ad17cdf6bd625e8a93f96a2100e7d949004962a566d50",
+      "compressedBytes": 215
+    },
+    {
+      "member": "10-types-final.log.gz",
+      "producerFileName": "types-final.log",
+      "rawSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytes": 0,
+      "compressedSha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+      "compressedBytes": 20
+    },
+    {
+      "member": "11-c19-flow-authoring-copy-retest-02.log.gz",
+      "producerFileName": "c19-flow-authoring-copy-retest-02.log",
+      "rawSha256": "4bb9a7a9948f7edae57e3c6183d35dde6f4da629ed83f3e7737c716e729ce39c",
+      "rawBytes": 272,
+      "compressedSha256": "1760b9ed476242b943fa3a154d29e9d3f9c76da6e6197d3a235822b425ae3422",
+      "compressedBytes": 223
+    },
+    {
+      "member": "12-c19-flow-authoring-tests-01.log.gz",
+      "producerFileName": "c19-flow-authoring-tests-01.log",
+      "rawSha256": "fd72b647cba9352dc282d64d2bd538af0941a101655aafdbe664edcff0afc971",
+      "rawBytes": 1763,
+      "compressedSha256": "0afb96c14d569c78c6372015755ced369b3001111f74680c96a0fb3d1d35ad31",
+      "compressedBytes": 763
+    },
+    {
+      "member": "13-c19-aggregate01.log.gz",
+      "producerFileName": "c19-aggregate01.log",
+      "rawSha256": "4724840715013c1e1e82b68b3e700d047a7186c6ec5b66d19a5b1f556ff591fe",
+      "rawBytes": 5009,
+      "compressedSha256": "907717fcb5eb0118ebabb51a32597685ee62d8634f8986af8769a8b870ef44ca",
+      "compressedBytes": 1157
+    },
+    {
+      "member": "14-c19-aggregate02.log.gz",
+      "producerFileName": "c19-aggregate02.log",
+      "rawSha256": "12cb6233d49c3df0fcf37f28fc21fe57653f9f85c9f0df255a9a016211da656b",
+      "rawBytes": 10374,
+      "compressedSha256": "e3dbf89c20bf51ec88a1149c71681eadc1c99e42017b8cd1ca309a17c92a9dd1",
+      "compressedBytes": 1234
+    },
+    {
+      "member": "15-c19-aggregate03.log.gz",
+      "producerFileName": "c19-aggregate03.log",
+      "rawSha256": "c17cad2c00cfd2b55a38b05ddffb6f8030f359e5c5ce81b3186ab9ed91bd2ef8",
+      "rawBytes": 10374,
+      "compressedSha256": "58d5e46344551935bbb4bacd4bd2d57345dd2db4eb72b27e1e6a008dfcb240b0",
+      "compressedBytes": 1233
+    },
+    {
+      "member": "16-c19-aggregate04.log.gz",
+      "producerFileName": "c19-aggregate04.log",
+      "rawSha256": "2b78c754d76ed67463f96a0f7121f467cb4d086b3a3fc32c03a97ff608e36fa5",
+      "rawBytes": 4285,
+      "compressedSha256": "70030921dfade85b4155df2d695faf2e077a055594b16e40c2a3a950905be382",
+      "compressedBytes": 822
+    },
+    {
+      "member": "17-c19-aggregate05.log.gz",
+      "producerFileName": "c19-aggregate05.log",
+      "rawSha256": "d539537b7f1c5ccbfdaf1b3da0510160d7a4b4c917ea01d9d41dfef5d841dfe0",
+      "rawBytes": 271,
+      "compressedSha256": "eae0fd18047673933d4a5e597b44c1c62553f39bbeec591d2fa23711c6479305",
+      "compressedBytes": 222
+    },
+    {
+      "member": "18-c19-aggregate06.log.gz",
+      "producerFileName": "c19-aggregate06.log",
+      "rawSha256": "6122cb5f8826bef20d2cab609a4203bb48f187e21ef96d4c92b0bea56763ab47",
+      "rawBytes": 271,
+      "compressedSha256": "9570b5f0bb53328e64786b208cfbf70e148fa7f2a88b89fa1afcc4e1211f0b21",
+      "compressedBytes": 224
+    },
+    {
+      "member": "19-c19-aggregate07.log.gz",
+      "producerFileName": "c19-aggregate07.log",
+      "rawSha256": "3e551c920e69510fc50ae1da1371a3667dc767e5e554d6ece7bf099d390bef3c",
+      "rawBytes": 271,
+      "compressedSha256": "072dfab9f76d91ed7a1aaced310d55f68289493b2aec07d09ace69fb2e836f33",
+      "compressedBytes": 222
+    },
+    {
+      "member": "20-c19-aggregate-development-bindings.json.gz",
+      "producerFileName": "c19-aggregate-development-bindings.json",
+      "rawSha256": "e17fdfa178b556c36fc3a225ac281b53ff53a3fddacfa7002c29dbce6fc93307",
+      "rawBytes": 4327,
+      "compressedSha256": "fdd8d5c1281781e742764f98d8c0e78071cebb65dd41c9d632ca975c209ef220",
+      "compressedBytes": 1941
+    },
+    {
+      "member": "21-c19-tsc-01.log.gz",
+      "producerFileName": "c19-tsc-01.log",
+      "rawSha256": "ebc30784099529ea0ebd0a20f45a3efd05af2da12e4aaf9ce4b1650acc9b6260",
+      "rawBytes": 4712,
+      "compressedSha256": "d52aeda3ef10e51dae2bae1090b81032a9422c08eea9008cb597da4a53c1984e",
+      "compressedBytes": 831
+    },
+    {
+      "member": "22-c19-tsc-02.log.gz",
+      "producerFileName": "c19-tsc-02.log",
+      "rawSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytes": 0,
+      "compressedSha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+      "compressedBytes": 20
+    }
+  ]
+}

@@ -1,6 +1,12 @@
+import { FormChoiceExtras, toggleFormMultiple } from '../../modules/assessment-core/form/FormChoiceExtras'
+import type { TrainingFormPolicy } from '../../modules/assessment-core/form/training-policy'
+import { ProfessionalFormAnswer } from '../../modules/assessment-core/form/ProfessionalFormAnswer'
+import type { ProfessionalAnswer } from '../../modules/assessment-core/form/types'
+import { BasicFormAnswer } from '../../modules/assessment-core/form/BasicFormAnswer'
+import type { FormQuestion } from '../../modules/assessment-core/form/types'
 import type { ChangeEvent } from 'react'
 
-export type FormPlayerValue = string | string[] | null
+export type FormPlayerValue = string | number | string[] | Record<string, string | number | string[] | {_surveyRefusal:true}> | {_surveyRefusal:true} | null
 
 export interface FormPlayerOption {
   value: string
@@ -13,12 +19,16 @@ export interface FormPlayerItem {
   label: string
   placeholder?: string | null
   required: boolean
+  formDefinition?: FormQuestion<never> | null
+  formPolicy?: TrainingFormPolicy | null
 }
 
 export interface FormPlayerProps {
   item: FormPlayerItem
   options: FormPlayerOption[]
   value: FormPlayerValue | undefined
+  otherText?: string
+  onOtherTextChange?: (text:string)=>void
   disabled?: boolean
   answerDisabled?: boolean
   navigationDisabled?: boolean
@@ -73,6 +83,7 @@ export function FormPlayer({
   item,
   options,
   value,
+  otherText, onOtherTextChange,
   disabled = false,
   answerDisabled = false,
   navigationDisabled = false,
@@ -94,6 +105,27 @@ export function FormPlayer({
   const answerControlsDisabled = disabled || answerDisabled || submitting
   const navigationControlsDisabled = disabled || navigationDisabled || submitting
   const submitControlsDisabled = disabled || submitDisabled || submitting
+
+  const q = item.formDefinition
+  const matrix = q?.type === 'MATRIX' || q?.type === 'MATRIX_MULTIPLE'
+  // The shared renderer uses independent row keys; Training wire/storage uses one
+  // typed object per DB item. Preserve row keys rather than serializing the object.
+  const rowValues: Record<string,string|number|string[]|{_surveyRefusal:true}> = value && typeof value === 'object' && !Array.isArray(value) && !('_surveyRefusal' in value) ? value : {}
+  const professionalAnswers: Record<string, ProfessionalAnswer> = q
+    ? matrix ? Object.fromEntries(Object.entries(rowValues).map(([key, answer]) => [q.itemKey + ':' + key, answer]))
+      : { [q.itemKey]: value as ProfessionalAnswer ?? null }
+    : {}
+  const professionalChange = (key: string, next: ProfessionalAnswer) => {
+    if (!q) return
+    if (matrix) {
+      const row = q.rows.find(row => key === q.itemKey + ':' + row.rowKey)
+      if (!row || (next !== null && typeof next !== 'string' && !Array.isArray(next) && !(typeof next==='object' && '_surveyRefusal' in next))) return
+      const updated = { ...rowValues }
+      if (next === null) delete updated[row.rowKey]
+      else updated[row.rowKey] = next as string|string[]|{_surveyRefusal:true}
+      void onChange(Object.keys(updated).length ? updated : null)
+    } else void onChange(next as FormPlayerValue)
+  }
 
   const handleTextChange = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     void onChange(event.target.value)
@@ -148,9 +180,7 @@ export function FormPlayer({
                   checked={checked}
                   disabled={answerControlsDisabled}
                   describedBy={describedBy}
-                  onChange={() => void onChange(checked
-                    ? multipleValues.filter((entry) => entry !== option.value)
-                    : [...multipleValues, option.value])}
+                  onChange={() => void onChange(toggleFormMultiple(multipleValues,option.value,!checked,q?.exclusiveOptionKeys))}
                 />
               )
             })}
@@ -174,7 +204,26 @@ export function FormPlayer({
         </div>
       ) : null}
 
-      {(item.type === 'fill_blank' || item.type === 'text_input' || !['single_choice', 'multiple_choice', 'year_month'].includes(item.type)) ? (
+      {item.formDefinition && ['NUMBER', 'SHORT_TEXT', 'LONG_TEXT', 'DATE', 'TIME'].includes(item.formDefinition.type) ? (
+        <div>
+          <label htmlFor={inputId(item.id)} className="mb-3 block text-lg font-semibold text-slate-900">{prompt}</label>
+          <BasicFormAnswer question={item.formDefinition} id={inputId(item.id)}
+            value={typeof value === 'string' || typeof value === 'number' ? value : null}
+            disabled={answerControlsDisabled} describedBy={describedBy} invalid={Boolean(errorMessage)}
+            placeholder={item.placeholder || '请输入'} onChange={next => void onChange(next)}
+            className="min-h-11 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-200 disabled:bg-slate-100" />
+        </div>
+      ) : null}
+
+      {q && ['LIKERT', 'MATRIX', 'MATRIX_MULTIPLE', 'RANK_ORDER', 'SLIDER', 'CONSTANT_SUM'].includes(q.type) ? (
+        <fieldset disabled={answerControlsDisabled} aria-describedby={describedBy}>
+          <legend className="mb-3 text-lg font-semibold text-slate-900">{prompt}</legend>
+          <ProfessionalFormAnswer question={q} answers={professionalAnswers}
+            prefix={inputId(item.id)} onAnswer={professionalChange} />
+        </fieldset>
+      ) : null}
+
+      {(!item.formDefinition && (item.type === 'fill_blank' || item.type === 'text_input' || !['single_choice', 'multiple_choice', 'year_month'].includes(item.type))) ? (
         <div>
           <label htmlFor={inputId(item.id)} className="mb-3 block text-lg font-semibold text-slate-900">{prompt}</label>
           <textarea
@@ -190,6 +239,9 @@ export function FormPlayer({
         </div>
       ) : null}
 
+      {q?.otherOptionKey && onOtherTextChange ? <fieldset disabled={answerControlsDisabled}><FormChoiceExtras question={q} answers={{[q.itemKey]:value as ProfessionalAnswer,[q.itemKey+':other']:otherText??''}} onChange={(_,next)=>onOtherTextChange(typeof next==='string'?next:'')} /></fieldset> : null}
+      {q?.allowRefusal && !matrix ? <label className="mt-4 flex gap-2"><input type="checkbox" disabled={answerControlsDisabled} checked={Boolean(value && typeof value==='object' && '_surveyRefusal' in value)} onChange={e=>void onChange(e.target.checked?{_surveyRefusal:true}:null)}/>我选择不回答这一题</label> : null}
+      {q?.allowRefusal ? <p className="mt-2 text-sm text-slate-600">明确拒答会单独记录，不计有效回答。{item.required ? item.formPolicy?.requiredRefusal==='ALLOW_SUBMIT'?'此必答题可拒答交卷，但本次任务不会标记为达成。':'此必答题拒答后不能交卷。':''}</p> : null}
       {errorMessage ? <p id={errorId(item.id)} role="alert" className="mt-3 text-sm text-red-700">{errorMessage}</p> : null}
 
       <div className="mt-6 flex flex-wrap justify-between gap-3">

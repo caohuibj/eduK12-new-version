@@ -1,0 +1,3 @@
+src/modules/composite/typed-form-export.ts(30,80): error TS2322: Type '{ exportVersion: string; itemId: string; itemKey: string; questionType: string; definitionHash: string; factsSchemaVersion: 2 | 3; encoding: "TEXT" | "NUMBER" | "JSON_STRING_ARRAY" | "JSON_OBJECT" | "STATE"; ... 4 more ...; formulaGuard: "EXCEL_APOSTROPHE_PREFIX"; }' is not assignable to type 'TypedFormColumnSource'.
+  Types of property 'exportVersion' are incompatible.
+    Type 'string' is not assignable to type '"training-form-export-v1"'.

@@ -1,3 +1,4 @@
+import { scaleImportController } from '../controllers/scaleImportController'
 import { Router } from 'express'
 import { scaleController } from '../controllers/scaleController'
 import { scaleImageController } from '../controllers/scaleImageController'
@@ -68,6 +69,9 @@ router.post('/:id/copy', authenticate, requireTeacher, scaleController.copy)
 
 // 更新量表
 router.put('/:id', authenticate, requireTeacher, scaleController.update)
+
+router.post('/:id/import/preview', authenticate, requireTeacher, scaleImportController.preview)
+router.post('/:id/import/confirm', authenticate, requireTeacher, scaleImportController.confirm)
 
 // v2 聚合 definition 管理
 router.put('/:id/definition', authenticate, requireTeacher, scaleController.updateDefinition)

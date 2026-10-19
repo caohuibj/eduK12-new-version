@@ -1,0 +1,60 @@
+
+ RUN  v4.1.11 [cloud-workspace]/eduk12_c11_20261018/server-version/backend
+
+ ✓ src/__tests__/composite/copy.service.test.ts > copyable PATCH > rejects a teacher setting copyable 3ms
+ ✓ src/__tests__/composite/copy.service.test.ts > copyable PATCH > rejects ADMIN copyable on a DRAFT 0ms
+ ✓ src/__tests__/composite/copy.service.test.ts > copyable PATCH > rejects ADMIN copyable on a teacher-created composite 0ms
+ ✓ src/__tests__/composite/copy.service.test.ts > copyable PATCH > rejects ADMIN copyable when the course is not a library course 0ms
+ ✓ src/__tests__/composite/copy.service.test.ts > copyable PATCH > lets ADMIN set copyable on a published library template 2ms
+ ✓ src/__tests__/composite/copy.service.test.ts > list/detail copyable fields > sets canSetCopyable for ADMIN on a library template and false for a teacher row 1ms
+ ✓ src/__tests__/composite/copy.service.test.ts > list/detail copyable fields > returns the same copyable fields on detail 1ms
+ ✓ src/__tests__/composite/copy.service.test.ts > listLibraryTemplates > only returns admin library templates and omits courseId 1ms
+ ✓ src/__tests__/composite/copy.service.test.ts > copyComposite > forbids copying a non-library teacher template 1ms
+ ✓ src/__tests__/composite/copy.service.test.ts > copyComposite > forbids copying a teacher-owned row even if copyable is dirty 0ms
+ ✓ src/__tests__/composite/copy.service.test.ts > copyComposite > requires a teaching course when copying a library template 0ms
+ ✓ src/__tests__/composite/copy.service.test.ts > copyComposite > copies a frozen cognitive snapshot into composite child sessions 6ms
+ ✓ src/__tests__/composite/copy.service.test.ts > copyComposite > rejects a library course as the copy target 0ms
+ ✓ src/__tests__/composite/copy.service.test.ts > copyComposite > copies a library template into a teacher DRAFT with a new cognitive wrapper 2ms
+ ✓ src/__tests__/composite/copy.service.test.ts > copyComposite > reuses an existing wrapper on a second copy of the same config and course 1ms
+ ✓ src/__tests__/composite/copy.service.test.ts > copyComposite > does not persist an assignment when the composite code collides 0ms
+ ✓ src/__tests__/composite/copy.service.test.ts > copyComposite > copies a GRANT config from a library template without requiring a material grant 0ms
+ ✓ src/__tests__/composite/copy.service.test.ts > copyComposite > lets ADMIN publish a draft bound to a library course 1ms
+ ✓ src/__tests__/composite/copy.service.test.ts > copyComposite > rejects ADMIN publishing a draft with an orphan FORM module 0ms
+ ✓ src/__tests__/composite/copy.service.test.ts > copyComposite > forbids ADMIN from copying onto another teacher’s course 0ms
+ ✓ src/__tests__/composite/copy.service.test.ts > copyComposite > self-copies a published composite without requiring copyable 0ms
+ ✓ src/__tests__/composite/copy.service.test.ts > copyComposite > self-copies with omitted courseId and keeps the source course 0ms
+ ✓ src/__tests__/composite/copy.service.test.ts > copyComposite > rejects self-copy of a cognitive template without a course 0ms
+ ✓ src/__tests__/composite/copy.service.test.ts > copyComposite > copies experience freeze identity instead of remelting standard 1ms
+ ✓ src/__tests__/composite/copy.service.test.ts > copyComposite > does not reuse a standard wrapper when copying a research template 1ms
+ ✓ src/__tests__/composite/copy.service.test.ts > copyComposite > does not reuse a wrapper when the report snapshot differs 0ms
+ ✓ src/__tests__/composite/copy.service.test.ts > copyComposite > rejects a partially frozen source instead of writing a null legacy wrapper 0ms
+ ✓ src/__tests__/composite/copy.service.test.ts > copyComposite > keeps the source freeze ciphertext when live registry metadata would differ 0ms
+ ✓ src/__tests__/composite/copy.service.test.ts > copyComposite > copies a legacy unfrozen source without inventing standard 1ms
+ ✓ src/__tests__/composite/copy.service.test.ts > library composites are not takeable > returns attempt counts and explicit availability windows for students 1ms
+ ✓ src/__tests__/composite/copy.service.test.ts > library composites are not takeable > keeps an active attempt exclusive while preserving the latest completed report 0ms
+ ✓ src/__tests__/composite/copy.service.test.ts > library composites are not takeable > excludes library courses for legacy composites, Bundles and questionnaires 0ms
+ ✓ src/__tests__/composite/copy.service.test.ts > library composites are not takeable > rejects student start on a library composite 0ms
+ ✓ src/__tests__/composite/copy.service.test.ts > library composites are not takeable > rejects public tokens on a library composite 0ms
+ ✓ src/__tests__/composite/copy.service.test.ts > library composites are not takeable > rejects public info for a historical token on a library composite 0ms
+ ✓ src/__tests__/composite/copy.service.test.ts > C06 student satisfaction projection > preserves historical satisfaction null independently of the latest report with one light batch 1ms
+ ✓ src/__tests__/composite/copy.service.test.ts > C06 student satisfaction projection > preserves historical satisfaction SATISFIED independently of the latest report with one light batch 0ms
+ ✓ src/__tests__/composite/copy.service.test.ts > C06 student satisfaction projection > never reopens a submitted NOT_SATISFIED attempt or grants additional attempts 0ms
+ ✓ src/__tests__/composite/copy.service.test.ts > C06 student satisfaction projection > never reopens a submitted CORRUPT attempt or grants additional attempts 0ms
+ ✓ src/__tests__/composite/copy.service.test.ts > Training timed start recovery boundary > keeps original membership/library checks but does not re-gate existing timing by current type 0ms
+ ✓ src/__tests__/composite/copy.service.test.ts > Training timed start recovery boundary > does not bypass original membership authorization for an existing attempt 0ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > batches and deduplicates exact releases, locking before loading and freezing once 113ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > fails closed for retired 4ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > fails closed for missing 3ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > fails closed for hash 90ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > fails closed for version 3ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > fails closed for package-status 3ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > retains exact success and failure outcomes for one preflight operation without reloading 113ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > does not query uploads for builtin-only or empty operations 3ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > selects standalone latest using headers then only resolves the exact chosen version 113ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > rejects uploaded teacher self-report from student composite admission 215ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > projects resource headers without answer keys or templates and rejects corrupt metadata 1ms
+
+ Test Files  2 passed (2)
+      Tests  52 passed (52)
+   Start at  19:25:44
+   Duration  5.23s (transform 2.49s, setup 0ms, import 4.28s, tests 694ms, environment 0ms)

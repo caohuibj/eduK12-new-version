@@ -1,0 +1,157 @@
+{
+  "scope": "C19 state05 real native chain, END/recovery/copy and PG race passed; partial/report consumer checks passed before preserved SJT CSV failure. Export repair targeted tests and affected build evidence, not resumed HTTP or restore qualification.",
+  "members": [
+    {
+      "name": "eduk12_c19_http_05-c19-main-remaining-result.json.gz",
+      "rawSha256": "949efda914c824beec2f17e8931349e7bff95f9fc8384bc7d42c204554f5db8a",
+      "rawBytes": 15384,
+      "gzipSha256": "81d385a47da7e86f12ef10236559533b9773ea565d3ec4c538ced9e513816ed8",
+      "gzipBytes": 2813
+    },
+    {
+      "name": "eduk12_c19_http_05-c19-branches-result.json.gz",
+      "rawSha256": "03ed00cae87624b757eedf494bba2394b93363543806d5e95641cc366d4834b6",
+      "rawBytes": 29370,
+      "gzipSha256": "1eec033605a5a70d8ea632e22743c01ca0c9911c60732957dc8305d02ffe3f55",
+      "gzipBytes": 4061
+    },
+    {
+      "name": "eduk12_c19_http_05-c19-race-result.json.gz",
+      "rawSha256": "8b5010f6b47e7f6cab9766ff251385a67de2ac832fbee47f1e3b94183631f980",
+      "rawBytes": 4282,
+      "gzipSha256": "24d56e440cbcbaf2e6fcbb5367a7dd460380607dc98ad0b8fa432592101c9bec",
+      "gzipBytes": 1139
+    },
+    {
+      "name": "eduk12_c19_http_05-c19-consumers-result.json.gz",
+      "rawSha256": "3e5bb8a511bc625d4c7ee59e6c511b66aa45c7aeaaab298af1da36ec4a52e46b",
+      "rawBytes": 24863,
+      "gzipSha256": "994a8c58eefbdbf51530ddb21666621e7e66841f66b3fe6914c6699d570cde0a",
+      "gzipBytes": 2526
+    },
+    {
+      "name": "eduk12_c19_http_05-c19-runtime-result.json.gz",
+      "rawSha256": "a06536002435e07b668a7bd9ae579004f538091cd98d3fb3ce55d831e227b60c",
+      "rawBytes": 81732,
+      "gzipSha256": "cadbaf8d637c36f01ed91bbb6e810026c10b5906661b757d31536f7354e6a964",
+      "gzipBytes": 11543
+    },
+    {
+      "name": "eduk12_c19_http_05-frozen-inputs.json.gz",
+      "rawSha256": "68a36ee50421cc828bfaa391da4f240d5faa90852a2920d844b3b23019ba0337",
+      "rawBytes": 351304,
+      "gzipSha256": "fc8c35164e9356756491dbd6f651848ab7f35c830d38553fef3b547887b078b5",
+      "gzipBytes": 84740
+    },
+    {
+      "name": "eduk12_c19_http_05-c19-main-remaining.log.gz",
+      "rawSha256": "26c33ffc401f542283bae6e66b6d686a6294da306f27e1805c67e81245bfe301",
+      "rawBytes": 3845,
+      "gzipSha256": "da986b862f655369bd9d3d2508d29a2b6711e40d511034e6f5c670c7eae1676e",
+      "gzipBytes": 1373
+    },
+    {
+      "name": "eduk12_c19_http_05-c19-branches.log.gz",
+      "rawSha256": "39073ddb2da32c5bdbade6c926b7771246a308ec797564d0a3d612f14ac379e1",
+      "rawBytes": 15669,
+      "gzipSha256": "dc5c9c34fe19d0316e1456ce66715eb150baa12d26923bab57b306fbd8ccf98d",
+      "gzipBytes": 3298
+    },
+    {
+      "name": "eduk12_c19_http_05-c19-race.log.gz",
+      "rawSha256": "e444026b2eec7f08c4651918a1f46ccb2f0cff824c3163bb67d8d748673de98b",
+      "rawBytes": 3201,
+      "gzipSha256": "c36c6fe0557a458638f93659b3db13bfd424130103cd3aa77b1b8a89bd4e0f56",
+      "gzipBytes": 1165
+    },
+    {
+      "name": "eduk12_c19_http_05-c19-consumers.log.gz",
+      "rawSha256": "b004d41d24a01efd245f55d8e0b3af91bba99b57393f65fc67d69da70df4fc24",
+      "rawBytes": 5434,
+      "gzipSha256": "cf5e76379892fbe21a9ad5112aa20a8d52f08b38d6848622ca8d96516561741a",
+      "gzipBytes": 1828
+    },
+    {
+      "name": "c19-build07-dist.json.gz",
+      "rawSha256": "61ceaa9efbb9a2c255cdc163fe9ee64da22e145c247622828c28d195c2c9f5db",
+      "rawBytes": 896817,
+      "gzipSha256": "eb0c041c656086071b525b02f4946e03e344cf3054e1f4dc8a2d81c7a2ba3e36",
+      "gzipBytes": 243833
+    },
+    {
+      "name": "c19-build07-export-scope-tests.log.gz",
+      "rawSha256": "9ca834dcb0703ccc98af9b86b1df6acdaf440a42c86e49789f879ea9b773d081",
+      "rawBytes": 3301,
+      "gzipSha256": "1d073aa635660b9a247350097d867d0b5eb6d7b291a61911e816997c63152fe5",
+      "gzipBytes": 1200
+    },
+    {
+      "name": "c19-build07-input.json.gz",
+      "rawSha256": "ee78a5f97e7294da4547ed071a5f94581c67fcf9be8897d6e5d7a4b549bb1c5a",
+      "rawBytes": 422202,
+      "gzipSha256": "1029f202c0ce915f95632295c7b5e40265023113483686abb4f814e85f67f9f0",
+      "gzipBytes": 127341
+    },
+    {
+      "name": "c19-build07-result.json.gz",
+      "rawSha256": "a07fd326c7d74c300839030a3cb4286ed661e267214fdf37c0a2170cb6c802fd",
+      "rawBytes": 1025,
+      "gzipSha256": "f1742da6a8e0023b789ace6a5639bfb6e54f291940b443b83756d93b3a6d928a",
+      "gzipBytes": 516
+    },
+    {
+      "name": "c19-build08-dist.json.gz",
+      "rawSha256": "43a4f171f4f9b278cd5ea0d809922d2d658f2dbe50c938dcc98250c9bf8eb607",
+      "rawBytes": 896818,
+      "gzipSha256": "b97fde5959ccdc6a89e17e971e390fdb4dd33ee34f0431a8f324c638fd5b128c",
+      "gzipBytes": 243841
+    },
+    {
+      "name": "c19-build08-export-scope-continuation.log.gz",
+      "rawSha256": "3adcc92b969ad3a9229265889fba0e9e367d3ea5f7f0c17e23fc4f0713673abb",
+      "rawBytes": 274,
+      "gzipSha256": "531ea852503b7d4cd0b36c17c63013ac89ad1410f077d778f3656c8a1d6e0d21",
+      "gzipBytes": 224
+    },
+    {
+      "name": "c19-build08-input.json.gz",
+      "rawSha256": "74ef4f3d4b55e3df3b1824d625d670afbdbf4d069e91f1fc8fd2f537b2f854cb",
+      "rawBytes": 422202,
+      "gzipSha256": "870e7aee701e6f2a57a29f256f50f30cff2cd5cc991cba4154a9f743e4298d19",
+      "gzipBytes": 127340
+    },
+    {
+      "name": "c19-build08-result.json.gz",
+      "rawSha256": "389f97dc9c413532ac82d0c133cc61902b543cb418ea177d5aa6bde9c4e8903d",
+      "rawBytes": 1341,
+      "gzipSha256": "b973b79359042e4b1d838d094464e096aca4c199f4afa0240d41a640f56e02c8",
+      "gzipBytes": 616
+    },
+    {
+      "name": "c19-build08-tsc.log.gz",
+      "rawSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytes": 0,
+      "gzipSha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+      "gzipBytes": 20
+    },
+    {
+      "name": "c19-build07-producer.py.gz",
+      "rawSha256": "322e81104b3fe4c293c7a412adf671cbfa55ba0356a2bacd0dfad317ca9c7b5b",
+      "rawBytes": 2372,
+      "gzipSha256": "3c96c2dae97e09acd81c0a3f7134652ca4558e7148a18078c71626857e68fb61",
+      "gzipBytes": 1065
+    },
+    {
+      "name": "c19-build08-producer.py.gz",
+      "rawSha256": "36b0ec7080df8645815336403252c508c29fa8847db81a669a2942bbbbc3111d",
+      "rawBytes": 2398,
+      "gzipSha256": "fec100f2472ac24dc97ca7ab8655ee9b7b8017fa328fc3758c66723a93e8e917",
+      "gzipBytes": 1131
+    }
+  ],
+  "archive": {
+    "name": "checkpoint09-state05-export-repair.tar.gz",
+    "sha256": "347983e1fb5c5e627fa45ec048a8b9cf45e7762f8be6a1e5a3b9370f89e87012",
+    "bytes": 863180
+  }
+}

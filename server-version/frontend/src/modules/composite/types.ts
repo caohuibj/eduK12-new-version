@@ -1,3 +1,5 @@
+export type TrainingTimingBinding={schemaVersion:1;contract:'BROWSER_ACTIVE_SCALE_V1';snapshotHash:string}
+import type { FormQuestion } from '../assessment-core/form/types'
 import type { CognitiveSession } from '../cognitive/types'
 import type { FormBackgroundReport } from '../reporting/types'
 import type { SafeScaleUnitReport } from '../reporting/ScaleUnitReportCard'
@@ -58,6 +60,7 @@ export interface CompositeScale {
 }
 
 export interface CompositeCurrentItem {
+  trainingTiming?:TrainingTimingBinding
   id: string
   type: CompositeItemType
   position: number
@@ -84,7 +87,7 @@ export interface CompositeCurrentItem {
       options: Array<{ value: string; label: string }> | string | null
       required: boolean
       contextKey: string | null
-      value: string | string[] | null
+      value: import("../../components/questionnaire/FormPlayer").FormPlayerValue
     }>
   }
   form?: { type: string; label: string; placeholder: string | null; options: Array<{ value: string; label: string }> | null; value: string | null; contextKey?: string | null }
@@ -95,16 +98,17 @@ export interface CompositeCurrentItem {
     responseValue?: CompositeScaleResponseValue
     responseTimeMs?: number
     changeCount?: number
+    formDefinition?: FormQuestion<never> | null; formPolicy?: import("../assessment-core/form/training-policy").TrainingFormPolicy | null
     formItemId?: string
     required?: boolean
     type?: string
     label?: string
     placeholder?: string | null
     options?: Array<{ value: string; label: string }> | string | null
-    value?: string | string[] | null
+    value?: import("../../components/questionnaire/FormPlayer").FormPlayerValue
     contextKey?: string | null
   }>
-  formAnswers?: Array<{ formItemId: string; type: string; label: string; placeholder: string | null; options: Array<{ value: string; label: string }> | string | null; required: boolean; contextKey: string | null; value: string | string[] | null }>
+  formAnswers?: Array<{ formDefinition?: FormQuestion<never> | null; formPolicy?: import("../assessment-core/form/training-policy").TrainingFormPolicy | null; formItemId: string; type: string; label: string; placeholder: string | null; options: Array<{ value: string; label: string }> | string | null; required: boolean; contextKey: string | null; value: import("../../components/questionnaire/FormPlayer").FormPlayerValue }>
   cognitiveSession?: CognitiveSession
   situationalAttemptId?: string
   situationalInstrumentKey?: string
@@ -134,14 +138,14 @@ export interface WholeQuestionnaireDefinition {
   attemptEpoch: number
   slotSetHash: string
   contextSnapshotHash: string | null
-  units: Array<{ itemId: string; scaleAssessmentId: string; definitionHash: string; scale: CompositeScale }>
+  units: Array<{ trainingTiming?:TrainingTimingBinding; itemId: string; scaleAssessmentId: string; definitionHash: string; scale: CompositeScale }>
 }
 export interface WholeQuestionnaireInput {
   submissionId: string
   attemptEpoch: number
   slotSetHash: string
   contextSnapshotHash: string | null
-  units: Array<{ itemId: string; definitionHash: string; deviceInputProvenance?: DeviceInputProvenanceV1;
+  units: Array<{ itemTimings?:Record<string,unknown>; itemId: string; definitionHash: string; deviceInputProvenance?: DeviceInputProvenanceV1;
     answers: Array<{ itemCode: string; responseValue: string | number; responseTimeMs?: number; changeCount?: number }> }>
 }
 export interface WholeQuestionnaireReceipt {
@@ -167,7 +171,17 @@ export interface CompositeReportStatus {
   reportStatus: CompositeReportJobState
 }
 
+export type TrainingFlowState = {
+  materials: Array<{ blockKey: string; kind: 'MATERIAL'; title?: string; body: string }>
+  termination: 'PENDING' | 'COMPLETE' | 'SCREEN_OUT' | 'COMPLETE_EARLY'
+  currentInstrumentKey: string | null
+  pathHash: string
+}
+
 export interface CompositeAttemptState {
+  trainingFlow?: TrainingFlowState
+  taskSatisfaction?: string | null
+  taskSatisfied?: boolean
   allUnitsSubmitted?: boolean
   reportStatus?: CompositeReportJobState
   productKind?: string
@@ -308,7 +322,20 @@ export interface CompositePackageReport {
   provenance?: Record<string, string>
 }
 
+export interface TrainingFlowReportSummary {
+  schemaVersion: 1
+  configDigest: string
+  pathHash: string
+  termination: TrainingFlowState['termination']
+  taskSatisfaction: 'PENDING' | 'SATISFIED' | 'NOT_SATISFIED'
+  executedUnitCount: number
+  skippedUnitCount: number
+}
+
 export interface CompositeReport {
+  trainingFlow?: TrainingFlowReportSummary
+  taskSatisfaction?: string | null
+  taskSatisfied?: boolean
   reportState?: 'PARTIAL'
   productKind?: 'QUESTIONNAIRE' | 'ASSESSMENT_BUNDLE'
   bundleReport?: import('../../pages/bundle/BundleReport').BundleReportData
@@ -322,7 +349,7 @@ export interface CompositeReport {
   backgroundValues: FormBackgroundReport[]
   packageReport?: CompositePackageReport
   unitReports: Array<
-    | SafeScaleUnitReport
+    | (SafeScaleUnitReport & { trainingTiming?: import('./TrainingTimingReport').TrainingTimingReportValue })
     | (Record<string, unknown> & {
         itemId: string
         type: 'COGNITIVE'
@@ -353,6 +380,8 @@ export interface CompositeReport {
 }
 
 export interface CompositeAttemptCounts {
+  satisfied?: number
+  notSatisfied?: number
   started: number
   inProgress: number
   completed: number
@@ -362,6 +391,8 @@ export interface CompositeAttemptCounts {
 export type CompositeAttemptListStatus = 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED'
 
 export interface CompositeTeacherAttemptRow {
+  taskSatisfaction?: string | null
+  taskSatisfied?: boolean
   partialReportAvailable?: boolean
   partialReportUnitCount?: number
   id: string

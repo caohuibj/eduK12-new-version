@@ -1,0 +1,19 @@
+{
+  "ok": true,
+  "count": 1
+}
+{
+  "ok": true,
+  "packages": [
+    {
+      "key": "example_descriptive_v1",
+      "hash": "397e6febab7bb4a1ed7120f17993657639b1fb6076c8966dbeffcdc8697e672d"
+    }
+  ]
+}
+PASS
+sjt-anxiety-golden: PUBLISHED, eligible=true, contentDigest=b77f282466eee822cd92f74987f5055828ae03ef032de5c09ca751d5d1d7a38f
+sjt-assertiveness-golden: PUBLISHED, eligible=true, contentDigest=ecb1ec38d236e6fd4aeaff4964cc70df5901d0ac468c1a269216e9afa4359db8
+sjt-responsibility-golden: PUBLISHED, eligible=true, contentDigest=f92428f35fa47b048d3529277950fe9714bf2e9ee053339d9eefe64a8468111a
+{"mode":"content","ok":true}
+Scale source qualification and scorer registrations verified

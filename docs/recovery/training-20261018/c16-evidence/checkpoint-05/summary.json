@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "phase": "NUMERIC_SQL_AUTHORITY_PASSED_REMAINING_HTTP_PENDING",
+  "acceptedRuntimeSource": "94d2a1fb87399cbee9aa8d240efb711fbdf1da17",
+  "newChange": "Pure selector admission rejects exact source/metric cross-wave aliases before opening a transaction; distinct tasks/variants remain allowed. Source/statistical implementation unchanged.",
+  "targetedTests": 2,
+  "backendTscExit": 0,
+  "limitations": [
+    "No completed queue/CAS/download/restore qualification yet.",
+    "25 SQL events at 10/20/50 only proves batch-bounded query count for these fixed sources; one cold/hot timing each, no throughput/p95/capacity claim.",
+    "Actual alias HTTP500 preserved; exact original-dist stack not captured, later probe stopped on measurement lock. New409 must pass real HTTP."
+  ],
+  "files": [
+    {
+      "file": "c16-backend-tsc-alias-preflight.log",
+      "bytes": 155,
+      "sha256": "49aab6e573d82f461b3bb72a72fae1399f305e7e99cbf00328b41bcd58616dc4"
+    },
+    {
+      "file": "c16-http01-http02-probe-summary.json",
+      "bytes": 10117,
+      "sha256": "8a9a01cd94dd091d5c9903d63cf6c8fed4a987b55cf6e3cc1f297d5ad45d15b5"
+    },
+    {
+      "file": "c16-http03-summary.json",
+      "bytes": 4756,
+      "sha256": "d26cccb9ab88d65cd18c19168b0657abb91e7cb54bf55aaa0c900a2c7c2aad6a"
+    },
+    {
+      "file": "c16-selector-alias-preflight.log",
+      "bytes": 271,
+      "sha256": "3f76cc9e31e347b8d628d3087b5b181ddfaa952b5e6255a26fe282b2e5b65c92"
+    }
+  ]
+}

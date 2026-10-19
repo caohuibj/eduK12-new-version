@@ -1,3 +1,4 @@
+import { assertTrainingChildSelected } from '../composite/training-variant-child-scope'
 import { prisma } from '../../config/database'
 import {
   encryptCognitivePayload,
@@ -250,6 +251,7 @@ const completeSessionWithPrincipal = async (userId: string | null, sessionId: st
       }
       if (session.userId !== null || !allowed) throw FORBIDDEN('Recovery credential does not own this session')
     }
+    await assertTrainingChildSelected(session, { db: tx })
 
     // COMPLETED：幂等返回已存结果（不要求 completionKey）。
     if (session.status === 'COMPLETED') {

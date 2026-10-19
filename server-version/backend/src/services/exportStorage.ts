@@ -65,7 +65,7 @@ export const cleanupExpiredExportFiles = (
  * are intentionally not used for artifact cleanup: an operator can safely
  * keep unrelated legacy exports without them being guessed or deleted.
  */
-const GENERATION_FILE = /^(?:scale|questionnaire|cognitive|composite)_[A-Za-z0-9-]+_([0-9a-f-]{36})(?:__generation_\d+)?(?:__projection_v1_[A-Za-z]+_[0-9a-f]{24})?\.(?:csv|sav|sps|xlsx|zip)(?:\.tmp-[A-Za-z0-9_-]+)?$/
+const GENERATION_FILE = /^(?:scale|questionnaire|cognitive|composite|training_analysis)_[A-Za-z0-9-]+_([0-9a-f-]{36})(?:__generation_\d+)?(?:__projection_v1_[A-Za-z]+_[0-9a-f]{24})?\.(?:csv|sav|sps|xlsx|zip)(?:\.tmp-[A-Za-z0-9_-]+)?$/
 
 const cleanupStaleOrphanExportFiles = async (
   db: typeof prisma,

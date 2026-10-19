@@ -1,3 +1,4 @@
+import { useCognitiveEnabled } from '../../../contexts/CapabilitiesContext'
 import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { LockKeyhole, Play } from 'lucide-react'
@@ -9,6 +10,7 @@ const accessRecoveryKey = (token: string) => `cognitive:recovery:access:${token}
 const messageFor = (error: unknown, fallback: string) => error instanceof Error ? error.message : fallback
 
 const PublicCognitiveAssignment: React.FC = () => {
+  const cognitiveEnabled = useCognitiveEnabled()
   const { token = '' } = useParams<{ token: string }>()
   const navigate = useNavigate()
   const generation = useRef(0)
@@ -121,10 +123,10 @@ const PublicCognitiveAssignment: React.FC = () => {
     <label htmlFor="cognitive-public-recovery" className="block text-sm text-gray-600 mb-2">已有恢复凭证？</label>
     <input id="cognitive-public-recovery" value={recoveryInput} onChange={(event) => setRecoveryInput(event.target.value)}
       disabled={starting} className="w-full border rounded px-3 py-2 mb-4" placeholder="可选，粘贴后继续上次作答" />
-    <button onClick={() => void start()} disabled={starting || (!info && !recoveryInput.trim() && !startIntent)} className="btn-primary w-full">
+    <button onClick={() => void start()} disabled={starting || ((!cognitiveEnabled || !info) && !recoveryInput.trim() && !startIntent)} className="btn-primary w-full">
       <Play className="w-4 h-4 inline mr-1" />{recoveryInput ? '继续测评' : '开始匿名测评'}
     </button>
-    {(startIntent || recoveryInput) && info && <div className="mt-4 text-sm text-gray-600 space-y-2">
+    {cognitiveEnabled && (startIntent || recoveryInput) && info && <div className="mt-4 text-sm text-gray-600 space-y-2">
       <p>恢复凭证可恢复服务器中的测评身份，但未提交草稿及已封存、尚未送达的最终提交只保存在原设备。换设备不能恢复这些本地内容。本设备会保留本次匿名作答的恢复记录。由另一位参与者使用前，请明确开始新的作答，并保存原参与者的恢复凭证。</p>
       <button type="button" disabled={starting} onClick={() => void newParticipant()} className="btn-secondary w-full">为另一位参与者开始新作答</button>
     </div>}

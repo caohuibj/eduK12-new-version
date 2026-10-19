@@ -1,0 +1,70 @@
+{
+  "kind": "C14_WHOLE_VARIANT_MARKER_LOCAL_EVIDENCE",
+  "createdAt": "2026-10-18T12:23:09.924529+00:00",
+  "gitHeadAtRecord": "9aa8b7690c3970e60de6f5d5d3bf3f8403a8e689",
+  "nodeExecutable": "/workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/node_modules/node/bin/node",
+  "nodeVersion": "v24.21.0",
+  "nodeExecutableSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+  "measurementLock": "/workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/.measurement.lock",
+  "sourceAndInputs": [
+    {
+      "path": "server-version/backend/src/modules/composite/whole-questionnaire.service.ts",
+      "sha256": "d1fd0551632555a9954442dca74db6df89f9b7ad21f14e5912439be7e15e8272"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-variant-scope.ts",
+      "sha256": "17869565d909579fe24b72a076fec9de2544bbd6b87cd588bf26bfa7e89c09b9"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-variant-markers.ts",
+      "sha256": "5355e19c6ad0f6b14564aeefb18e98cbf29dfe317550db32304a9b7b2fa6f4f7"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/unified-aggregate-finalizer.service.ts",
+      "sha256": "528f3f7c4d266df8ce30b6a67f569b7a6b26a9fd574535f312ca143003c98f51"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/composite/training-variant-whole-submit.test.ts",
+      "sha256": "78fe4bb08ffaec61afc4d1855e443d526af20ea78617e003f309cf5d7f0a1468"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-runtime/training-variant-aggregate-finalizer.test.ts",
+      "sha256": "24f14313820f81d05d5ad2fe8379c3f3c67d3a5185042e0cd15c45a078c9509e"
+    },
+    {
+      "path": "server-version/backend/package-lock.json",
+      "sha256": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6"
+    },
+    {
+      "path": "server-version/backend/vitest.config.ts",
+      "sha256": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b"
+    }
+  ],
+  "checks": [
+    {
+      "log": "c14-whole-marker-test-01.log",
+      "command": "flock /workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/.measurement.lock /workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/__tests__/composite/training-variant-whole-submit.test.ts src/__tests__/assessment-runtime/training-variant-aggregate-finalizer.test.ts",
+      "startedAt": "2026-10-18T12:22:31Z",
+      "finishedAt": "2026-10-18T12:22:35Z",
+      "result": "passed",
+      "tests": 19,
+      "exitCode": 0,
+      "selectionReason": "New whole-submit authorization cases (10) plus 9 directly affected aggregate cases because shared scope now rejects any missing/undefined marker; ordinary fixtures now explicitly load five null markers. No unrelated tests repeated.",
+      "coverage": [
+        "Whole raw header selects all five markers",
+        "Legacy V1 and warm V2 remain one-header with zero full graph loads",
+        "Valid variant V2 cold cache uses one verified full graph and one runtime load",
+        "Warm V2 corrupt allocation rejects before storage admission or receipt write",
+        "Each partial marker rejects before receipt write",
+        "Prior receipt replay cannot bypass missing allocation",
+        "All-undefined header and graph cannot become legacy",
+        "Selected aggregate and copied full-union carrier preserve accepted facts and hash identity under strict markers"
+      ]
+    }
+  ],
+  "limitations": [
+    "Local targeted evidence only; no CI, deployment, whole-system qualification or performance claim.",
+    "No PostgreSQL/HTTP instance started; parent owns pinned compilation and real HTTP checks.",
+    "Earlier selected-aggregate evidence kept unchanged and superseded for affected strict-marker inputs by this run."
+  ]
+}

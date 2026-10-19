@@ -1,0 +1,89 @@
+{
+  "passed": true,
+  "gatePid": 366,
+  "apiPid": 281,
+  "elapsedMs": 52,
+  "apiConnectionCount": 6,
+  "waitingTransactions": [
+    {
+      "pid": 305,
+      "clientPort": 40444,
+      "state": "active",
+      "waitType": "Lock",
+      "waitEvent": "transactionid",
+      "blockers": [
+        366
+      ],
+      "inTransaction": true,
+      "transactionAgeSeconds": 0.01465,
+      "queryClass": "OTHER"
+    },
+    {
+      "pid": 306,
+      "clientPort": 40460,
+      "state": "active",
+      "waitType": "Lock",
+      "waitEvent": "transactionid",
+      "blockers": [
+        366
+      ],
+      "inTransaction": true,
+      "transactionAgeSeconds": 0.009981,
+      "queryClass": "OTHER"
+    },
+    {
+      "pid": 369,
+      "clientPort": 44052,
+      "state": "active",
+      "waitType": "Lock",
+      "waitEvent": "transactionid",
+      "blockers": [
+        366
+      ],
+      "inTransaction": true,
+      "transactionAgeSeconds": 0.016596,
+      "queryClass": "OTHER"
+    },
+    {
+      "pid": 368,
+      "clientPort": 44046,
+      "state": "active",
+      "waitType": "Lock",
+      "waitEvent": "transactionid",
+      "blockers": [
+        366
+      ],
+      "inTransaction": true,
+      "transactionAgeSeconds": 0.0085,
+      "queryClass": "OTHER"
+    },
+    {
+      "pid": 370,
+      "clientPort": 44070,
+      "state": "active",
+      "waitType": "Lock",
+      "waitEvent": "transactionid",
+      "blockers": [
+        366
+      ],
+      "inTransaction": true,
+      "transactionAgeSeconds": 0.012856,
+      "queryClass": "OTHER"
+    },
+    {
+      "pid": 371,
+      "clientPort": 44066,
+      "state": "active",
+      "waitType": "Lock",
+      "waitEvent": "transactionid",
+      "blockers": [
+        366
+      ],
+      "inTransaction": true,
+      "transactionAgeSeconds": 0.009109,
+      "queryClass": "OTHER"
+    }
+  ],
+  "releaseCondition": "Six API-owned in-transaction lock waiters blocked by one separately connected parent-row gate",
+  "apiTransactionTimeoutChanged": false
+}

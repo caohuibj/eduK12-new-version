@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "scope": "PR314 workbench submitted-label browser expectation correction",
+  "failedRunId": 39183230206,
+  "failedJobIds": [117840490453, 117840490553, 117840490557],
+  "failedHead": "c2e329d0535500386016e33b82644ef7e389fe50",
+  "sourcePath": "server-version/e2e/qa-round5-workbench-browser-e2e.cjs",
+  "originalSourceSha256": "002fa1cb9353bff21bb391d4689e7361b66ba91773b1587b5a76a9bde3538cd2",
+  "correctedSourceSha256": "a71d6f753264387c6f97f98b7589cd025885faddb808951194b9b434823281a2",
+  "nodeVersion": "24.21.0",
+  "checks": [
+    { "command": "node --check server-version/e2e/qa-round5-workbench-browser-e2e.cjs", "exitCode": 0 },
+    { "command": "git diff --check", "exitCode": 0 }
+  ],
+  "browserExecutedLocally": false,
+  "officialBrowserQualification": "pending corrected-head execution in Chromium, Firefox and WebKit",
+  "failedCaseDomAvailable": true,
+  "productSourceChanged": false,
+  "fixtureFactsChanged": false,
+  "gatesOrAssertionsSkipped": false
+}

@@ -1,0 +1,156 @@
+{
+  "baseline": "75fb1ef1898d34e0991752515067c0483ab675d4",
+  "node": "24.21.0",
+  "measurementLock": "Shared measurement lock used for Node24.21 runs",
+  "securitySuite": {
+    "passed": 23,
+    "failed": 0,
+    "log": "docs/recovery/training-20261018/c14-evidence/child-security/c14-child-tests-node24-02.log"
+  },
+  "regression": {
+    "files": 13,
+    "passed": 116,
+    "failed": 9,
+    "status": "failed_with_exact_baseline_failures",
+    "failureNamesEqual": true,
+    "failures": [
+      " FAIL  src/__tests__/cognitive/session.service.test.ts > createSession data > creates a session with participantKey, encrypted snapshots, randomSeed, attemptNo=1",
+      " FAIL  src/__tests__/cognitive/session.service.test.ts > createSession data > copies the assignment resolved snapshot instead of re-merging live config",
+      " FAIL  src/__tests__/cognitive/session.service.test.ts > createSession data > returns the existing IN_PROGRESS session without creating a new one",
+      " FAIL  src/__tests__/cognitive/session.service.test.ts > createSession data > rejects when maxAttempts reached",
+      " FAIL  src/__tests__/cognitive/session.service.test.ts > createSession data > advances attemptNo after completed/abandoned sessions",
+      " FAIL  src/__tests__/cognitive/session.service.test.ts > createSession data > D6.1: resumes an existing IN_PROGRESS session without re-checking eligibility (past-due assignment)",
+      " FAIL  src/__tests__/cognitive/session.service.test.ts > getSession > returns run info with decrypted config and randomSeed, no score/metrics for IN_PROGRESS",
+      " FAIL  src/__tests__/cognitive/session.service.test.ts > restartSession > locks the session row, abandons the old session and creates attemptNo+1",
+      " FAIL  src/__tests__/cognitive/session.service.test.ts > restartSession > rejects restart when maxAttempts reached"
+    ]
+  },
+  "baselineComparison": {
+    "source": "git archive of fixed baseline backend sources; same session test SHA-256",
+    "testSha256": "dd84ed1b39dbc69711cb032354c21b53cd42a5602deb6f6c8966618df7ae5720",
+    "passed": 14,
+    "failed": 9
+  },
+  "logs": [
+    {
+      "path": "docs/recovery/training-20261018/c14-evidence/child-security/c14-child-tests-01.log",
+      "sha256": "9ff029bc174d0f68d19294f1d4e1bdf9e042c1d70a43dd1ceec4ef148f8717aa",
+      "node": "24.19.0",
+      "qualification": "diagnostic_only"
+    },
+    {
+      "path": "docs/recovery/training-20261018/c14-evidence/child-security/c14-child-tests-02.log",
+      "sha256": "90ca2b2d93cbfa22676594e62ac37533b754dffe5538f2082e7652a4456e2c43",
+      "node": "24.19.0",
+      "qualification": "diagnostic_only"
+    },
+    {
+      "path": "docs/recovery/training-20261018/c14-evidence/child-security/c14-child-regression-01.log",
+      "sha256": "48773746912a033658352f6e406f7fe713543f31913f161adb54c87f55da3200",
+      "node": "24.19.0",
+      "qualification": "diagnostic_only"
+    },
+    {
+      "path": "docs/recovery/training-20261018/c14-evidence/child-security/c14-child-tests-node24-01.log",
+      "sha256": "e4a8b632f1afcf893c447efa8f4f6d75f00fe148bbde10e1de0d95fcd19ea732",
+      "node": "24.21.0",
+      "qualification": "targeted"
+    },
+    {
+      "path": "docs/recovery/training-20261018/c14-evidence/child-security/c14-child-tests-node24-02.log",
+      "sha256": "b011bf938a09bf582975bb2d179f80b162d5a1455ab5dbfb13b243205f9492a6",
+      "node": "24.21.0",
+      "qualification": "targeted"
+    },
+    {
+      "path": "docs/recovery/training-20261018/c14-evidence/child-security/c14-child-session-baseline-node24.log",
+      "sha256": "784bb59c7a677abf89dd086f5a60d78fa871c15ce41a0d83064c023be6878518",
+      "node": "24.21.0",
+      "qualification": "targeted"
+    }
+  ],
+  "ownedSources": [
+    {
+      "path": "server-version/backend/src/services/assessmentContextService.ts",
+      "sha256": "41dcd87be36c2f99eec66ce06351d974fcb665b5f15d0b4e24e13f0e1196ea2a"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/training-variant-child-scope.ts",
+      "sha256": "bbd9818e349ebb1ed9b1d949e3c8a24e64852b664164d25bce2ad96820d18484"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/composite-image.controller.ts",
+      "sha256": "867e20ea68f28b808c223c8bf7263de49d7dcf6ee19bf6dc36f61cd9d86fa7b2"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/composite-video.controller.ts",
+      "sha256": "3cbdfde08236277f452c6f9c2844d84be799d7349f4ef0fcbe3cfc565c35c958"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/final-submit.service.ts",
+      "sha256": "0064433a0c46306f46d2fc79c800c8bd364776a56d6329c5316b231216f123e0"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/form-admission.service.ts",
+      "sha256": "8d82c51a5397349b9fb044fda1d5f04b3ae234784c6d0b113be5ef641e1c7d24"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/unified-form-section-final-submit.service.ts",
+      "sha256": "751ebe2915bfd1a0387338598b20109d5751ae50ce4df830f5aab568e1ad0ca0"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-admission.service.ts",
+      "sha256": "54529e4a1fd739c733647943e92a7343bc6bece1024c318d8bf734e73470d5a5"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/scale-final-submit.service.ts",
+      "sha256": "86278dca683c8c45ac3a8f0db488aa5b5d842fa7ffa1791b52c8d1adee310476"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/cognitive-admission.service.ts",
+      "sha256": "5ef49307d180e630c54a698387be7e96dd37a74b3d8c15aa9596f319f359625f"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/cognitive-image.service.ts",
+      "sha256": "88eccddf971b943e3a99aabeeaa8c7d04e773290d06140de8779ff95a0537062"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/cognitive-video.service.ts",
+      "sha256": "da210ecbaac9afbd01307ee8d6b64879248e63d6e1fd3195dbd4facbf5864ec0"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/completion.service.ts",
+      "sha256": "4fb1bb3dac20f1af42f4268bba7184d258ce3887c6f322860b274028e80d7078"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/final-submit.service.ts",
+      "sha256": "99d5144e583ce10f738aecc3278424e3664ac79b244a5cc62397252ab605e453"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/session.service.ts",
+      "sha256": "7c4b2fab2689705d59e1ccb0918894bc7fc7cffe49feb49bf03e8f61376155c0"
+    },
+    {
+      "path": "server-version/backend/src/modules/cognitive/trial.service.ts",
+      "sha256": "7f1a09bc5642b8e5ad5a3d0cefabe4690ec3f92ce7bbf5993f6bf6c9035e49df"
+    },
+    {
+      "path": "server-version/backend/src/modules/situational/situational-runtime.service.ts",
+      "sha256": "1a4c0d0e64ca4bb6c9f7d39389a510bb67a7a898dac19f3f1dcb3537d810a86d"
+    },
+    {
+      "path": "server-version/backend/src/controllers/scaleController.ts",
+      "sha256": "a54361bbcd1950e14a417dfe6f6fd08bc59cd7baa695dc466d09c6800a0aadc8"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/composite/training-variant-child-scope.test.ts",
+      "sha256": "27a10cddab45a5f9246a51d64893dc9a6ba0a626d4127aff48096cf340737ecf"
+    }
+  ],
+  "limitations": [
+    "Targeted unit and contract checks only; no CI, deployment, browser, real database, or performance claim.",
+    "Regression aggregate is failed, not a green gate. The unchanged cognitive/session.service suite reproduces the exact failures on fixed baseline with default Cognitive switch disabled.",
+    "Earlier Node24.19 runs and synthetic fixture construction failures retained as diagnostic evidence only.",
+    "Later edits to shared scope or these owned files require input-bound affected revalidation."
+  ]
+}

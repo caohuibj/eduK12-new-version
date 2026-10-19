@@ -1,3 +1,8 @@
+import { applyTrainingAttemptScope } from '../composite/training-variant-scope'
+import { resolveTrainingFlowScope } from '../composite/training-flow-scope'
+import { mergeRequiredSituationalTaskSatisfaction } from '../situational/situational-task-satisfaction'
+import { assertTypedCompositeFormFacts } from './typed-form-facts'
+import { mapCompositeSection } from './form-section-definition'
 import { compactAssessmentStorageEnabled } from './compact-field-codec'
 import { encryptCompactQuestionnaireReport } from '../reporting/compact-questionnaire-report'
 import { loadStoredCanonicalUnitResults } from './compact-assessment-storage'
@@ -35,10 +40,11 @@ import type {
 } from '../cognitive-analysis/cognitive-analysis.types'
 import {
   decryptUnifiedRuntimePayload,
+  encryptUnifiedRuntimePayload,
 } from './security'
 import {
-  parseFormSectionCollectionFacts,
-  type FormSectionCollectionFactsV1,
+  readFormSectionCollectionFacts,
+  type FormSectionCollectionFacts,
 } from './form-facts'
 import {
   parseStoredCanonicalUnitResult,
@@ -109,6 +115,9 @@ export const unifiedCompletionDispatchSelect = {
 } as const
 
 const compositeParentHeaderSelect = {
+  trainingFlowSnapshotEncrypted: true, trainingFlowSnapshotHash: true,
+  trainingFlowPathEncrypted: true, trainingFlowPathHash: true,
+  taskSatisfaction: true,
   id: true,
   status: true,
   deliveryMode: true,
@@ -128,6 +137,11 @@ const compositeParentHeaderSelect = {
 } as const
 
 const compositeParentGraphSelect = {
+  trainingFlowSnapshotEncrypted: true, trainingFlowSnapshotHash: true,
+  trainingFlowPathEncrypted: true, trainingFlowPathHash: true,
+  participantKey: true, trainingVariantAllocationEncrypted: true, trainingVariantAllocationHash: true,
+  taskSatisfaction: true,
+  formSectionAttempts: {select:{sectionId:true,attemptEpoch:true,status:true,taskSatisfaction:true}},
   id: true,
   status: true,
   deliveryMode: true,
@@ -136,6 +150,9 @@ const compositeParentGraphSelect = {
   startedAt: true,
   completedAt: true,
   progress: true,
+  completedItems: true,
+  deliveryCourseId: true,
+  assignmentRef: true,
   aggregateInputHash: true,
   compiledBundleRuntimeHash: true,
   contextSnapshotEncrypted: true,
@@ -147,6 +164,8 @@ const compositeParentGraphSelect = {
       id: true,
       productKind: true,
       bundleInstance: true,
+      publishedAt: true, trainingVariantDraft: true, trainingVariantFrozen: true, trainingVariantDigest: true,
+      trainingFlowDraft: true, trainingFlowFrozen: true, trainingFlowDigest: true,
       reportPackageKey: true,
       reportPackageVersion: true,
       reportPackageProfile: true,
@@ -158,6 +177,9 @@ const compositeParentGraphSelect = {
           type: true,
           position: true,
           required: true,
+          formSectionId: true,
+          formType: true, formLabel: true, formOptions: true, formPolicy: true,
+          scaleId: true, cognitiveAssignmentId: true, situationalInstrumentKey: true, situationalInstrumentVersion: true, formDefinition: true,
           scale: { select: { id: true, code: true, name: true, instrumentVersion: true } },
           cognitiveAssignment: {
             select: {
@@ -180,7 +202,7 @@ const compositeParentGraphSelect = {
           contextSection: true,
           items: {
             orderBy: [{ formSectionPosition: 'asc' }, { position: 'asc' }],
-            select: { id: true, formType: true, formLabel: true, formPlaceholder: true, formOptions: true, contextKey: true, required: true, position: true, formSectionPosition: true },
+            select: { id: true, formType: true, formLabel: true, formPlaceholder: true, formOptions: true, formDefinition: true, formPolicy: true, contextKey: true, required: true, position: true, formSectionPosition: true },
           },
         },
       },
@@ -229,6 +251,11 @@ const questionnaireParentGraphSelect = {
 }
 
 export type UnifiedParentHeader = {
+  trainingFlowSnapshotEncrypted?: string | null
+  trainingFlowSnapshotHash?: string | null
+  trainingFlowPathEncrypted?: string | null
+  trainingFlowPathHash?: string | null
+  taskSatisfaction?: string | null
   id: string
   status: string
   deliveryMode: string
@@ -255,8 +282,9 @@ type TerminalProbe =
   | { kind: 'incomplete'; parent: UnifiedParentHeader; frozenSlots: FrozenActiveSlotSetV1; headers: AggregateSnapshotHeader[]; snapshotRows?: AggregateSnapshotRow[]; completeness: ReturnType<typeof evaluateCompleteness> }
   | { kind: 'ready'; parent: UnifiedParentHeader; frozenSlots: FrozenActiveSlotSetV1; headers: AggregateSnapshotHeader[]; snapshotRows?: AggregateSnapshotRow[]; completeness: ReturnType<typeof evaluateCompleteness> }
 
-const terminalFromParent = (parent: Pick<UnifiedParentHeader, 'status' | 'progress' | 'completedAt'>): CompletionResult => ({
+const terminalFromParent = (parent: Pick<UnifiedParentHeader, 'status' | 'progress' | 'completedAt' | 'taskSatisfaction'>): CompletionResult => ({
   status: parent.status,
+  ...(parent.taskSatisfaction!=null?{taskSatisfaction:parent.taskSatisfaction}:{}),
   progress: parent.status === 'COMPLETED' ? 100 : parent.progress,
   completedAt: parent.completedAt,
 })
@@ -304,6 +332,7 @@ const probeUnifiedParent = async (input: {
 
 const snapshotPayloadSelect = {
   ...snapshotHeaderSelect,
+  compositeAttemptId: true,
   canonicalResultEncrypted: true,
   collectionFactsEncrypted: true,
 } as const
@@ -317,10 +346,11 @@ type AggregateSnapshotRow = AggregateSnapshotHeader & {
 type CanonicalPayload = {
   header: AggregateSnapshotRow
   envelope?: CanonicalUnitResultEnvelopeV1
-  facts?: FormSectionCollectionFactsV1
+  facts?: FormSectionCollectionFacts
 }
 
 type CompletionResult = {
+  taskSatisfaction?: string | null
   status: string
   progress: number
   completedAt: Date | null
@@ -391,13 +421,14 @@ const readFrozenSlotSet = async (
     frozenActiveSlotSetEncrypted: string | null
     frozenActiveSlotSetHash: string | null
   },
+  db?: Prisma.TransactionClient,
 ): Promise<FrozenActiveSlotSetV1> => {
  try {
   if (row.runtimeGeneration !== unifiedRuntimeGeneration) throw new Error('parent runtimeGeneration 不是 UNIFIED_V1')
   if (!row.frozenActiveSlotSetEncrypted || !row.frozenActiveSlotSetHash) {
     throw new Error('parent 缺少 FrozenActiveSlotSet')
   }
-  const slots = await loadFrozenActiveSlotSet(row.frozenActiveSlotSetEncrypted)
+  const slots = await loadFrozenActiveSlotSet(row.frozenActiveSlotSetEncrypted, db)
   if (slots.snapshotHash !== row.frozenActiveSlotSetHash) throw new Error('FrozenActiveSlotSet hash 不匹配')
   if (slots.attemptEpoch !== row.attemptEpoch) throw new Error('FrozenActiveSlotSet epoch 不匹配')
   if (slots.runtimeGeneration !== unifiedRuntimeGeneration) throw new Error('FrozenActiveSlotSet runtimeGeneration 不匹配')
@@ -482,7 +513,7 @@ const validateCanonicalPayload = (input: {
 const validateCollectionFacts = (input: {
   row: AggregateSnapshotRow
   slot: FrozenActiveSlotV1
-  facts: FormSectionCollectionFactsV1
+  facts: FormSectionCollectionFacts
 }) => {
   const sectionId = (input.slot.sourceBinding as Record<string, unknown>).sectionId
   if (typeof sectionId !== 'string' || input.facts.sectionKey !== sectionId) {
@@ -511,11 +542,12 @@ const loadSnapshotPayloads = async (input: {
   attemptEpoch: number
   composite: boolean
   ids?: string[]
+  db?: Prisma.TransactionClient
 }): Promise<AggregateSnapshotRow[]> => {
   const where = input.composite
     ? { compositeAttemptId: input.parentId, attemptEpoch: input.attemptEpoch, ...(input.ids ? { id: { in: input.ids } } : {}) }
     : { questionnaireAssessmentId: input.parentId, attemptEpoch: input.attemptEpoch, ...(input.ids ? { id: { in: input.ids } } : {}) }
-  return measureRequestPhase('aggregate.payload_db', () => prisma.assessmentUnitSnapshot.findMany({
+  return measureRequestPhase('aggregate.payload_db', () => (input.db ?? prisma).assessmentUnitSnapshot.findMany({
     where,
     select: snapshotPayloadSelect,
   })) as Promise<AggregateSnapshotRow[]>
@@ -530,25 +562,28 @@ const decryptCompletedPayloads = async (input: {
   contextHash: string | null
   snapshotRows?: AggregateSnapshotRow[]
   committedRecords?: any[]
+  db?: Prisma.TransactionClient
+  includeOptionalSlots?: boolean
 }): Promise<{ payloads: CanonicalPayload[]; entries: AggregateInputHashEntry[] }> => {
   const rows = input.snapshotRows ?? await loadSnapshotPayloads({
     parentId: input.parentId,
     attemptEpoch: input.attemptEpoch,
     composite: input.composite,
     ids: input.headers.map((header) => header.id as string),
+    db: input.db,
   })
   const rowsBySlot = new Map(rows.map((row) => [row.slotKey, row]))
-  const requiredSlots = input.slots.filter((candidate) => candidate.required)
+  const requiredSlots = input.slots.filter((candidate) => input.includeOptionalSlots || candidate.required)
 
   type ParsedSlot = {
     slot: FrozenActiveSlotV1
     row: AggregateSnapshotRow
-    facts?: FormSectionCollectionFactsV1
+    facts?: FormSectionCollectionFacts
     envelope?: CanonicalUnitResultEnvelopeV1
   }
 
   const canonicalCiphers = rows.flatMap(row => row.canonicalResultEncrypted ? [row.canonicalResultEncrypted] : [])
-  const canonicalViews = await measureRequestPhase('aggregate.payload_db', () => loadStoredCanonicalUnitResults(canonicalCiphers, prisma, input.committedRecords))
+  const canonicalViews = await measureRequestPhase('aggregate.payload_db', () => loadStoredCanonicalUnitResults(canonicalCiphers, input.db ?? prisma, input.committedRecords))
   const canonicalByCipher = new Map(canonicalCiphers.map((cipher,index) => [cipher,canonicalViews[index]]))
   const parsed = measureRequestPhaseSync('aggregate.decrypt_parse', () => {
     const headersBySlot = new Map<string, AggregateSnapshotHeader>()
@@ -566,7 +601,7 @@ const decryptCompletedPayloads = async (input: {
       if (slot.unitType === 'FORM_SECTION') {
         const facts = withAggregateDefinitionBoundary(() => {
           if (!row.collectionFactsEncrypted) throw new Error('collection facts 加密载荷缺失')
-          return parseFormSectionCollectionFacts(decryptUnifiedRuntimePayload<unknown>(row.collectionFactsEncrypted))
+          return readFormSectionCollectionFacts(decryptUnifiedRuntimePayload<unknown>(row.collectionFactsEncrypted))
         })
         out.push({ slot, row, facts })
         continue
@@ -797,7 +832,7 @@ const readCasLoser = async (input: {
   const row: any = input.composite
     ? await prisma.compositeAssessmentAttempt.findUnique({
         where: { id: input.parentId },
-        select: { status: true, progress: true, completedAt: true, runtimeGeneration: true, attemptEpoch: true, aggregateInputHash: true, compiledBundleRuntimeHash: true },
+        select: { status: true, progress: true, completedAt: true, runtimeGeneration: true, attemptEpoch: true, aggregateInputHash: true, compiledBundleRuntimeHash: true, taskSatisfaction:true },
       })
     : await prisma.questionnaireAssessment.findUnique({
         where: { id: input.parentId },
@@ -983,8 +1018,99 @@ export const persistObservedAggregateProgressForTests = async (input: {
       })
 }
 
+/** Flow readiness and its final evidence are read and written under the same
+ * parent lock as accepted unit FINALs. The immutable candidate slots and every
+ * accepted snapshot remain untouched; skipped units never become fake facts. */
+const finalizeTrainingFlowCompositeUnified = async (attemptId: string, expected: ReportJobIdentity): Promise<CompletionResult | null> => (
+  measureRequestPhase('aggregate.persist', () => prisma.$transaction(async tx => {
+    const locked = await tx.$queryRaw<Array<{ id: string }>>`
+      SELECT "id" FROM "composite_assessment_attempts" WHERE "id" = ${attemptId} FOR UPDATE
+    `
+    if (!locked.length) return null
+    const parent = await tx.compositeAssessmentAttempt.findUnique({
+      where: { id: attemptId }, select: compositeParentGraphSelect as any,
+    }) as any
+    if (!parent) return null
+    assertReportJobIdentity(parent, expected)
+    if (parent.status !== 'IN_PROGRESS') return terminalFromParent(parent)
+    const assessment = parent.compositeAssessment
+    if (assessment.productKind === 'ASSESSMENT_BUNDLE' || parent.assignmentRef
+      || [assessment.reportPackageKey, assessment.reportPackageVersion,
+        assessment.reportPackageProfile, assessment.reportPackageSnapshotEncrypted].some(value => value != null)
+      || parent.compiledBundleRuntimeHash != null) throw aggregateInputError('流程不能与报告包或关系测评混用')
+
+    const frozenSlots = await readFrozenSlotSet(parent, tx)
+    const snapshotRows = await loadSnapshotPayloads({ parentId: attemptId,
+      attemptEpoch: parent.attemptEpoch, composite: true, db: tx })
+    const scope = await resolveTrainingFlowScope(parent, assessment, { db: tx, snapshotRows, frozenSlots })
+    if (!scope) throw aggregateInputError('流程冻结信息缺失')
+    const headers = snapshotRows.map(headerFromRow)
+    const completeness = evaluateCompleteness({ slots: frozenSlots.slots, snapshots: headers,
+      attemptEpoch: parent.attemptEpoch, pathPolicy: scope.aggregatePathPolicy })
+    if (completeness.invalidSlotKeys.length) throw aggregateInputError(`流程存在非法快照槽位：${completeness.invalidSlotKeys.join(',')}`)
+    const guard = { ...parentGuard(parent), trainingFlowSnapshotHash: parent.trainingFlowSnapshotHash,
+      trainingFlowPathHash: parent.trainingFlowPathHash ?? null }
+    if (!completeness.ready) {
+      const progress = Math.max(parent.progress, completeness.progress)
+      const completedItems = Math.max(parent.completedItems, completeness.completedSlotCount)
+      if (progress !== parent.progress || completedItems !== parent.completedItems) {
+        const updated = await tx.compositeAssessmentAttempt.updateMany({ where: guard,
+          data: { progress, completedItems, lastSavedAt: new Date() } })
+        if (updated.count !== 1) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '流程作答状态已变化', 409)
+      }
+      return { status: 'IN_PROGRESS', progress, completedAt: null }
+    }
+    const executedSlots = frozenSlots.slots.filter(slot => scope.executedSlotKeys.has(slot.slotKey))
+    const context = readAggregateContext(parent, true)
+    const completed = await decryptCompletedPayloads({ parentId: attemptId, attemptEpoch: parent.attemptEpoch,
+      composite: true, slots: executedSlots, headers, contextHash: context.hash,
+      snapshotRows, db: tx, includeOptionalSlots: true })
+    const payloadsBySlot = new Map(completed.payloads.map(payload => [payload.header.slotKey, payload]))
+    for (const section of assessment.formSections) {
+      const key = formSectionSlotKey(section.id)
+      if (!scope.executedSlotKeys.has(key)) continue
+      const slot = executedSlots.find(candidate => candidate.slotKey === key)
+      const payload = payloadsBySlot.get(key)
+      if (!slot || !payload?.facts) throw aggregateInputError(`流程表单区段 ${section.id} 的事实缺失`)
+      const qualification = validateCompositeFactsAgainstSection(section, payload.facts)
+      if (qualification != null) {
+        const accepted = parent.formSectionAttempts.find((row: any) => row.sectionId === section.id
+          && row.attemptEpoch === parent.attemptEpoch && row.status === 'COMPLETED')
+        if (accepted?.taskSatisfaction !== qualification) throw aggregateInputError('流程 Form V3 任务资格与权威事实不匹配')
+      }
+      if (slot.sourceDefinitionIdentity.hash !== canonicalHash(compositeSectionDefinition(section))) {
+        throw aggregateInputError(`流程表单区段 ${section.id} 定义 hash 不匹配`)
+      }
+    }
+    const taskSatisfaction = scope.path.taskSatisfaction
+    if (taskSatisfaction !== 'SATISFIED' && taskSatisfaction !== 'NOT_SATISFIED') throw aggregateInputError('流程终态缺少任务资格')
+    if (scope.path.termination === 'SCREEN_OUT' && taskSatisfaction !== 'NOT_SATISFIED') throw aggregateInputError('筛出路径不能满足任务')
+    const aggregateInputHash = buildAggregateInputHash({ attemptEpoch: parent.attemptEpoch,
+      contextHash: context.hash, compiledBundleRuntimeHash: null, entries: completed.entries,
+      trainingFlowPath: { pathHash: scope.pathHash, evidence: scope.evidence } })
+    const completedAt = maxRequiredSnapshotCompletedAt(executedSlots.map(slot => ({ ...slot, required: true })), headers, new Date())
+    const totalTime = Math.max(0, completedAt.getTime() - new Date(parent.startedAt).getTime())
+    const updated = await tx.compositeAssessmentAttempt.updateMany({ where: guard, data: {
+      status: 'COMPLETED', progress: 100, completedItems: completed.payloads.length, completedAt,
+      totalTime, lastSavedAt: completedAt, aggregateInputHash, taskSatisfaction,
+      trainingFlowPathEncrypted: encryptUnifiedRuntimePayload(scope.evidence), trainingFlowPathHash: scope.pathHash,
+    } })
+    if (updated.count !== 1) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '流程终态已变化', 409)
+    return { status: 'COMPLETED', progress: 100, completedAt, aggregateInputHash, taskSatisfaction, totalTime }
+  }, { isolationLevel: 'ReadCommitted' }))
+)
+
 const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?: UnifiedParentHeader, reportJob?: ReportJobIdentity, preloadedGraph?: any): Promise<CompletionResult | null> => {
-  const probe = await probeUnifiedParent({ parentId: attemptId, composite: true, preloadedParent, reportJob })
+  const route = preloadedParent ?? await measureRequestPhase('aggregate.parent_probe_db', () => prisma.compositeAssessmentAttempt.findUnique({
+    where: { id: attemptId }, select: compositeParentHeaderSelect,
+  }))
+  if (!route) return null
+  if ([route.trainingFlowSnapshotEncrypted, route.trainingFlowSnapshotHash,
+    route.trainingFlowPathEncrypted, route.trainingFlowPathHash].some(value => value != null)) {
+    return finalizeTrainingFlowCompositeUnified(attemptId, reportJob ?? { attemptEpoch: route.attemptEpoch,
+      slotSetHash: route.frozenActiveSlotSetHash as string, contextHash: route.contextSnapshotHash })
+  }
+  const probe = await probeUnifiedParent({ parentId: attemptId, composite: true, preloadedParent: route, reportJob })
   if (probe.kind === 'missing') return null
   if (probe.kind === 'terminal') return probe.result
   if (probe.kind === 'incomplete') return updateIncompleteComposite(probe.parent, probe.completeness)
@@ -994,7 +1120,7 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?:
     && preloadedGraph.frozenActiveSlotSetHash === reportJob.slotSetHash
     && preloadedGraph.contextSnapshotHash === reportJob.contextHash
     && preloadedGraph.status === 'IN_PROGRESS'
-  const parent = reusable ? preloadedGraph : await measureRequestPhase('aggregate.definition_db', () => prisma.compositeAssessmentAttempt.findUnique({
+  let parent = reusable ? preloadedGraph : await measureRequestPhase('aggregate.definition_db', () => prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId }, select: compositeParentGraphSelect as any,
   })) as any
   if (!parent) return null
@@ -1003,6 +1129,10 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?:
   assertReportJobIdentity(parent, reportJob ?? { attemptEpoch: probe.parent.attemptEpoch,
     slotSetHash: probe.parent.frozenActiveSlotSetHash as string, contextHash: probe.parent.contextSnapshotHash })
   const { frozenSlots, headers } = probe
+  // Readiness already used the selected frozen slots. Validate the allocation
+  // against the full publication, then apply that same selection before Form
+  // facts/qualification checks. Accepted snapshots and their hashes stay intact.
+  parent = await applyTrainingAttemptScope(parent, {frozenSlotSets: new Map([[parent.id, frozenSlots]])})
   const context = readAggregateContext(parent, true)
   const completed = await decryptCompletedPayloads({
     parentId: attemptId,
@@ -1022,7 +1152,11 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?:
       const slot = frozenSlots.slots.find((candidate) => candidate.slotKey === formSectionSlotKey(section.id))
       const payload = slot ? payloadBySlot.get(slot.slotKey) : undefined
       if (!slot || !payload?.facts) throw aggregateInputError(`综合测评表单区段 ${section.id} 的 collection facts 缺失`)
-      validateCompositeFactsAgainstSection(section, payload.facts)
+      const expectedQualification = validateCompositeFactsAgainstSection(section, payload.facts)
+      if (expectedQualification != null) {
+        const accepted = (parent.formSectionAttempts??[]).find((row:any)=>row.sectionId===section.id && row.attemptEpoch===parent.attemptEpoch && row.status==='COMPLETED')
+        if (accepted?.taskSatisfaction!==expectedQualification) throw aggregateInputError('Form V3 任务资格与权威事实不匹配')
+      }
       const expectedDefinitionHash = canonicalHash(compositeSectionDefinition(section))
       if (slot.sourceDefinitionIdentity.hash !== expectedDefinitionHash) {
         throw aggregateInputError(`综合测评表单区段 ${section.id} 定义 hash 不匹配`)
@@ -1078,10 +1212,18 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?:
     aggregateInputHash,
     packageAnalysis,
     payloadEncrypted,
+    taskSatisfaction: mergeRequiredSituationalTaskSatisfaction(assessment.formSections.some((section:any)=>section.items.some((item:any)=>item.formPolicy!=null))
+      ? (()=> {
+        const required = assessment.formSections.filter((section:any)=>section.items.some((item:any)=>item.formPolicy!=null))
+        const states = required.map((section:any)=>(parent.formSectionAttempts??[]).find((row:any)=>row.sectionId===section.id && row.attemptEpoch===parent.attemptEpoch && row.status==='COMPLETED')?.taskSatisfaction)
+        if(states.some((state:any)=>state!=='SATISFIED'&&state!=='NOT_SATISFIED'))throw aggregateInputError('Form V3 已接受区段缺少任务资格')
+        return states.includes('NOT_SATISFIED')?'NOT_SATISFIED':'SATISFIED'
+      })() : null, frozenSlots.slots, completed.payloads),
   })
 }
 
 const persistCompositeCompletion = async (input: {
+  taskSatisfaction: string | null
   parent: any
   frozenSlots: FrozenActiveSlotSetV1
   headers: AggregateSnapshotHeader[]
@@ -1106,6 +1248,7 @@ const persistCompositeCompletion = async (input: {
           totalTime: Math.max(0, completedAt.getTime() - new Date(input.parent.startedAt).getTime()),
           lastSavedAt: completedAt,
           aggregateInputHash: input.aggregateInputHash,
+          ...(input.taskSatisfaction ? {taskSatisfaction:input.taskSatisfaction}: {}),
         },
       })
       if (updated.count !== 1) throw new AggregateCasLost()
@@ -1165,7 +1308,7 @@ const persistCompositeCompletion = async (input: {
           update: {},
         })
       }
-      return { status: 'COMPLETED', progress: 100, completedAt, aggregateInputHash: input.aggregateInputHash,
+      return { status: 'COMPLETED', progress: 100, completedAt, aggregateInputHash: input.aggregateInputHash, taskSatisfaction:input.taskSatisfaction,
         totalTime: Math.max(0, completedAt.getTime() - new Date(input.parent.startedAt).getTime()) }
     }, { isolationLevel: 'ReadCommitted' }))
   } catch (error) {
@@ -1219,13 +1362,16 @@ const compositeSectionDefinition = (section: any) => ({
       placeholder: item.formPlaceholder ?? null,
       required: item.required !== false,
       formOptions: item.formOptions,
+      ...(item.formDefinition != null ? { formDefinition: item.formDefinition } : {}),
+      ...(item.formPolicy != null ? { formPolicy: item.formPolicy } : {}),
       contextKey: item.contextKey ?? null,
       position: item.position,
       formSectionPosition: item.formSectionPosition ?? null,
     })),
 })
 
-const validateQuestionnaireFactsAgainstSection = (section: any, facts: FormSectionCollectionFactsV1) => {
+const validateQuestionnaireFactsAgainstSection = (section: any, facts: FormSectionCollectionFacts) => {
+  if (facts.schemaVersion !== 1) throw aggregateInputError('旧 Questionnaire 不支持 typed Form facts')
   const expected = new Map(section.items.map((item: any) => [item.id, item.label]))
   if (facts.items.length !== expected.size) throw aggregateInputError(`表单区段 ${section.id} facts 数量不匹配`)
   for (const fact of facts.items) {
@@ -1235,7 +1381,8 @@ const validateQuestionnaireFactsAgainstSection = (section: any, facts: FormSecti
   }
 }
 
-const validateCompositeFactsAgainstSection = (section: any, facts: FormSectionCollectionFactsV1) => {
+const validateCompositeFactsAgainstSection = (section: any, facts: FormSectionCollectionFacts) => {
+  const qualification = assertTypedCompositeFormFacts(mapCompositeSection(section), facts)
   const expected = new Map(section.items.map((item: any) => [item.id, item.formLabel]))
   if (facts.items.length !== expected.size) throw aggregateInputError(`综合测评表单区段 ${section.id} facts 数量不匹配`)
   for (const fact of facts.items) {
@@ -1243,6 +1390,7 @@ const validateCompositeFactsAgainstSection = (section: any, facts: FormSectionCo
       throw aggregateInputError(`综合测评表单区段 ${section.id} facts identity 不匹配`)
     }
   }
+  return qualification
 }
 
 const finalizeQuestionnaireUnifiedImpl = async (assessmentId: string, preloadedParent?: UnifiedParentHeader): Promise<CompletionResult | null> => {

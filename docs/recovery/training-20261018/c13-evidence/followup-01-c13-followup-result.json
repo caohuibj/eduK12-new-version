@@ -1,0 +1,74 @@
+{
+  "passed": true,
+  "originalAggregatePassed": false,
+  "checks": [
+    "Original HTTP runtime fingerprint and every business source/config/schema/dependency byte match; only repaired PG test source differs",
+    "Stopped source PGdata path/size/SHA unchanged across copy; clone byte-identical before startup",
+    "Exactly original six failed PG observations passed with corrected parameter cast; original four passed cases were not run"
+  ],
+  "sourceHead": "5d8d8b9d745e7eaead140e21242dc09dae6a19b9",
+  "sourceStatusSha256": "e1167d9db395eae74cb2b190288f50c6337840d6cb914d188b037144959adb6c",
+  "sourceAggregateSha256": "89fd41c1a6673e9905ac48b0c1afcfc12644e73190946d70d4b19b2b60910698",
+  "sourceHttpResultSha256": "ced95b5815ed4e226dfc69cea796be61d92964ab02b0bb6de5c555e96e8d1914",
+  "sourcePostgresResultSha256": "c83e682aef91c0f5ba9babcc38e7b318a871c92e6c00ccdc0e148f415029ddbd",
+  "reusedHttp": {
+    "checks": 42,
+    "requests": 212,
+    "frozenReceipts": 4
+  },
+  "reusedPostgresPassedNames": [
+    "SJT publish and attempt retain serialize with soft deletion on stable asset rows retains shared physical COS bytes across soft deletion and canonical compensation",
+    "SJT publish and attempt retain serialize with soft deletion on stable asset rows concurrent duplicate retains of the same owner insert reversed asset sets idempotently",
+    "SJT publish and attempt retain serialize with soft deletion on stable asset rows GENERAL publishes two objects with reversed shared sections and a complete shared image/video lock set",
+    "SJT publish and attempt retain serialize with soft deletion on stable asset rows COURSE publishes two objects with reversed shared sections and a complete shared image/video lock set"
+  ],
+  "retriedPostgresFailedNames": [
+    "SJT publish and attempt retain serialize with soft deletion on stable asset rows publish retain first: deletion blocks, rechecks and refuses without losing the image",
+    "SJT publish and attempt retain serialize with soft deletion on stable asset rows publish deletion first: retention blocks then rejects the deleted identity, with no retained fact",
+    "SJT publish and attempt retain serialize with soft deletion on stable asset rows attempt retain first: deletion blocks, rechecks and refuses without losing the image",
+    "SJT publish and attempt retain serialize with soft deletion on stable asset rows attempt deletion first: retention blocks then rejects the deleted identity, with no retained fact",
+    "SJT publish and attempt retain serialize with soft deletion on stable asset rows rechecks ownership after a waiting delete acquires the row lock",
+    "SJT publish and attempt retain serialize with soft deletion on stable asset rows two different retain owners hold SHARE together while deletion waits for both"
+  ],
+  "harnessSha256": "662f6081a71b82e9355f74939cd7e0a717b8dae59a92c8b479473a9acec0a41d",
+  "candidateHead": "a3b9e73ab1afce4dd050ba39ba30e8453989eee7",
+  "runtimeFingerprint": {
+    "schemaVersion": 1,
+    "nodeVersion": "v24.21.0",
+    "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+    "dist": {
+      "files": 5049,
+      "sha256": "fae14194c64b2ad270a09e3b523b18f36e31e8cacb5d1b72f86fcc77f189b222"
+    },
+    "files": {
+      "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+      "prisma/schema.prisma": "e3c8b6fc37d31fbb15907a9bcd792b82b00132b966ce3ba87ecb8bcbce17797d",
+      "node_modules/.prisma/client/schema.prisma": "c5cf9c1fe0e678ace372a369a3efe9b327080fb3078f5bfda0a4b744e14c04fa",
+      "node_modules/.prisma/client/index.js": "0a64489bf61221c6115d4832878799dfa310d619bcc0962be1504c719cdbe90f"
+    },
+    "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+  },
+  "businessSourceManifestSha256": "2100e3a327460ca064a34d2a7d248111f0d48428544229b923e382cd158d108e",
+  "businessSourceFileCount": 2316,
+  "testSourceBeforeSha256": "e7c9c9a6b1b71a817ec9a3bb52f803e52b97ff2860fa66da597e5852c6bea0cd",
+  "testSourceAfterSha256": "dcd47802749b79231d8bb0cc7ac74a8eb641cd786bb3b2e233ac8f4c14051102",
+  "sourcePgdataManifestSha256": "056a9c89f79d6c98ace05fc7f6ba384e5e5128f3191ee3824f46acfa3e91cbd8",
+  "newPostgresPassed": 6,
+  "previousPostgresNotRerun": 4,
+  "newFormatRestore": {
+    "passed": true,
+    "checks": [
+      "Real HTTP-written nonempty C13 grants/audits/releases/attempts/raw/canonical/retained assets and all other table columns survive pg_dump\u2192new DB restore exactly",
+      "Every actual HTTP-admitted exact grant receipt retains its byte-identical encrypted runtime snapshot",
+      "New private image bytes copied separately and matched against restored asset identity/hash/size; retained references exact",
+      "Restored C13 new-format DB passes unchanged restricted runtime role contract; no API/old HTTP replay"
+    ],
+    "dumpSha256": "6e8c25425e04cce31814a00215e4fc4e7d6c6ac3b5106f2bf0cd8163859d8d84",
+    "verifiedFrozenReceipts": 4,
+    "verifiedPrivateImageCopies": 1,
+    "tableCount": 205,
+    "projectionSha256": "31e2c82d804c76953a6eb195441e55a4d9b611a7aee6c1917467d7995c05f48e"
+  },
+  "cleanupVerified": true,
+  "sourceUnchanged": true
+}

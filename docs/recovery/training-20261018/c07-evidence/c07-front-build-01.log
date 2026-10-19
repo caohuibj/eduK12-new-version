@@ -1,0 +1,213 @@
+vite v6.4.3 building for production...
+transforming...
+✓ 5909 modules transformed.
+rendering chunks...
+[plugin vite:reporter] 
+(!) /workspace/scratch/5a77e8bdc1ae/eduk12_c07_export_worktree/server-version/frontend/src/modules/cognitive/pages/CognitiveRunner.tsx is dynamically imported by /workspace/scratch/5a77e8bdc1ae/eduk12_c07_export_worktree/server-version/frontend/src/App.tsx but also statically imported by /workspace/scratch/5a77e8bdc1ae/eduk12_c07_export_worktree/server-version/frontend/src/school/SchoolCompositeRunner.tsx, /workspace/scratch/5a77e8bdc1ae/eduk12_c07_export_worktree/server-version/frontend/src/survey/SurveyCognitiveUnit.tsx, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) /workspace/scratch/5a77e8bdc1ae/eduk12_c07_export_worktree/server-version/frontend/src/modules/situational/pages/SituationalRunner.tsx is dynamically imported by /workspace/scratch/5a77e8bdc1ae/eduk12_c07_export_worktree/server-version/frontend/src/App.tsx but also statically imported by /workspace/scratch/5a77e8bdc1ae/eduk12_c07_export_worktree/server-version/frontend/src/school/SchoolCompositeRunner.tsx, dynamic import will not move module into another chunk.
+
+computing gzip size...
+dist/index.html                                            0.46 kB │ gzip:   0.32 kB
+dist/assets/huischool-a1-emblem-BNEzhrHA.svg              23.73 kB │ gzip:   8.58 kB
+dist/assets/sheet-04-CO0eAOUW.avif                        98.74 kB
+dist/assets/sheet-03-C5dUNgDJ.avif                       101.92 kB
+dist/assets/sheet-05-Y2ofx4UQ.avif                       106.61 kB
+dist/assets/sheet-02-BTGLJI9z.avif                       110.84 kB
+dist/assets/sheet-01-BGwkLkW2.avif                       157.90 kB
+dist/assets/sheet-05-DemlNPB7.webp                       165.91 kB
+dist/assets/training-landscape-v2-Cse4yhq7.webp          174.89 kB
+dist/assets/sheet-02-aSO7qL_q.webp                       179.65 kB
+dist/assets/sheet-01-CRd3WIc5.webp                       336.55 kB
+dist/assets/sheet-04-C0sM0BMi.webp                       402.59 kB
+dist/assets/sheet-03-zOdI74rv.webp                       433.13 kB
+dist/assets/pdf.worker.min-B_fnEKel.mjs                1,239.05 kB
+dist/assets/sheet-05-Kd6NgXkk.png                      2,368.78 kB
+dist/assets/sheet-02-D1Vk__Au.png                      2,525.43 kB
+dist/assets/huischool-campus-sunlight-DrR_QSBY.png     2,540.40 kB
+dist/assets/sheet-01-C8sHgmuz.png                      2,578.77 kB
+dist/assets/sheet-03-BZU7tmVB.png                      2,752.88 kB
+dist/assets/sheet-04-BV4b_l_Q.png                      2,802.58 kB
+dist/assets/AssessmentWorkbench-D8vfUZS-.css               0.49 kB │ gzip:   0.25 kB
+dist/assets/AssignmentList-CdiYpkz5.css                    1.35 kB │ gzip:   0.51 kB
+dist/assets/EducationProductGovernance-jLD48_T1.css        1.52 kB │ gzip:   0.66 kB
+dist/assets/ScaleEdit-D-Y3x-Vf.css                         3.21 kB │ gzip:   0.76 kB
+dist/assets/QuestionnaireProducts-cM_yCAnY.css             4.81 kB │ gzip:   1.23 kB
+dist/assets/TrainingPortal--DEgU5Z0.css                   10.30 kB │ gzip:   2.47 kB
+dist/assets/cognitive-report-audiences-CR0dEEDW.css       22.53 kB │ gzip:   4.10 kB
+dist/assets/index-B9L8ldLC.css                           358.75 kB │ gzip:  59.45 kB
+dist/assets/TrainingAuthRedirect-ayjlaTGi.js               0.14 kB │ gzip:   0.15 kB
+dist/assets/ActionBar-8_ZeF4iL.js                          0.21 kB │ gzip:   0.18 kB
+dist/assets/useRunnerSaveState-CXaOBAlz.js                 0.26 kB │ gzip:   0.21 kB
+dist/assets/square-BjA4UpaC.js                             0.32 kB │ gzip:   0.26 kB
+dist/assets/plus-9MynYyxh.js                               0.33 kB │ gzip:   0.25 kB
+dist/assets/clock-Cq96h8pA.js                              0.34 kB │ gzip:   0.27 kB
+dist/assets/resolveCoursePrefill-BiFTgl5k.js               0.36 kB │ gzip:   0.29 kB
+dist/assets/user-Div_y44y.js                               0.36 kB │ gzip:   0.28 kB
+dist/assets/lock-B-mkalhr.js                               0.37 kB │ gzip:   0.29 kB
+dist/assets/circle-x-C6_-GgZh.js                           0.38 kB │ gzip:   0.28 kB
+dist/assets/upload-COdgmFoB.js                             0.40 kB │ gzip:   0.30 kB
+dist/assets/copy-DRuxkXZ7.js                               0.40 kB │ gzip:   0.31 kB
+dist/assets/download-DgEo7zxE.js                           0.41 kB │ gzip:   0.30 kB
+dist/assets/history-pwygxchk.js                            0.41 kB │ gzip:   0.30 kB
+dist/assets/video-D2tSzu0U.js                              0.42 kB │ gzip:   0.32 kB
+dist/assets/eye-DLMDD1v1.js                                0.42 kB │ gzip:   0.30 kB
+dist/assets/external-link-DHktT_HD.js                      0.42 kB │ gzip:   0.30 kB
+dist/assets/lock-keyhole-C-J_nhQl.js                       0.43 kB │ gzip:   0.32 kB
+dist/assets/calendar-DCdNsnf0.js                           0.43 kB │ gzip:   0.31 kB
+dist/assets/key-D-QjbRBs.js                                0.43 kB │ gzip:   0.32 kB
+dist/assets/image-CIqUT-O4.js                              0.44 kB │ gzip:   0.33 kB
+dist/assets/pen-line-CtYCV_BQ.js                           0.45 kB │ gzip:   0.33 kB
+dist/assets/clipboard-check-DulXJ2wK.js                    0.47 kB │ gzip:   0.33 kB
+dist/assets/user-plus-DWCdoCOn.js                          0.48 kB │ gzip:   0.34 kB
+dist/assets/square-pen-DrcWM0VP.js                         0.49 kB │ gzip:   0.34 kB
+dist/assets/trash-2-BlzYrzEK.js                            0.50 kB │ gzip:   0.32 kB
+dist/assets/camera-QVIUacR-.js                             0.51 kB │ gzip:   0.35 kB
+dist/assets/grip-vertical-B_F8Vk3c.js                      0.54 kB │ gzip:   0.30 kB
+dist/assets/file-play-oOK9bQDo.js                          0.58 kB │ gzip:   0.38 kB
+dist/assets/eye-off-BG8Y-vfY.js                            0.60 kB │ gzip:   0.38 kB
+dist/assets/useLatestRequest-B43eIcpa.js                   0.61 kB │ gzip:   0.38 kB
+dist/assets/keyboard-DBNDlgIy.js                           0.63 kB │ gzip:   0.36 kB
+dist/assets/completionRetry-aPO8Hqhf.js                    0.63 kB │ gzip:   0.43 kB
+dist/assets/settings-Cu6ZIc_S.js                           0.66 kB │ gzip:   0.36 kB
+dist/assets/brain-DkmpKh8a.js                              0.75 kB │ gzip:   0.42 kB
+dist/assets/qr-code-Coa5yket.js                            0.82 kB │ gzip:   0.42 kB
+dist/assets/answerLabels-scf8d0VU.js                       0.91 kB │ gzip:   0.55 kB
+dist/assets/sparkles-CdRDMn8m.js                           0.96 kB │ gzip:   0.44 kB
+dist/assets/questionnaireResume-BOZ28-Ka.js                1.00 kB │ gzip:   0.41 kB
+dist/assets/useCursorList-CJU7ah3c.js                      1.09 kB │ gzip:   0.64 kB
+dist/assets/receipt-recovery-B48WZOGs.js                   1.12 kB │ gzip:   0.71 kB
+dist/assets/materialGrants-Blav7NBL.js                     1.22 kB │ gzip:   0.64 kB
+dist/assets/TrainingPortal-DnhqydT2.js                     1.35 kB │ gzip:   0.62 kB
+dist/assets/DiscoveryCard-h20x-poW.js                      1.37 kB │ gzip:   0.61 kB
+dist/assets/anonymousStudy-BtaSihC4.js                     1.40 kB │ gzip:   0.56 kB
+dist/assets/ParentHome-ClCXl-LY.js                         1.40 kB │ gzip:   0.75 kB
+dist/assets/useEditorGuard-BBXhNYNL.js                     1.45 kB │ gzip:   0.87 kB
+dist/assets/ParentChildrenPage-fQIvSb6Z.js                 1.51 kB │ gzip:   0.86 kB
+dist/assets/options-C0hjwGL8.js                            1.51 kB │ gzip:   0.81 kB
+dist/assets/ReportShell-CIPicGcB.js                        1.58 kB │ gzip:   0.69 kB
+dist/assets/mediaUtils-DcVDHCm8.js                         1.74 kB │ gzip:   0.88 kB
+dist/assets/TagFilter-C5LPiX9v.js                          1.80 kB │ gzip:   0.88 kB
+dist/assets/publicCapabilityClient-C6Zb3FAi.js             1.87 kB │ gzip:   1.02 kB
+dist/assets/ParentProfile-CPaW9QVC.js                      1.93 kB │ gzip:   0.99 kB
+dist/assets/TrainingLogin-BGVT7rNO.js                      2.11 kB │ gzip:   1.11 kB
+dist/assets/ParentChildReportPage-CErsoHfM.js              2.23 kB │ gzip:   1.21 kB
+dist/assets/ParentChildPage-C4fmKxm_.js                    2.27 kB │ gzip:   1.19 kB
+dist/assets/OrganizationInvitationPage-BAyK24sb.js         2.27 kB │ gzip:   1.27 kB
+dist/assets/StudentCheckins-BTib5cuS.js                    2.31 kB │ gzip:   1.22 kB
+dist/assets/ClassroomQRCode-Crqu7tn7.js                    2.37 kB │ gzip:   1.22 kB
+dist/assets/TrainingRegister-C3sG3VWJ.js                   2.37 kB │ gzip:   1.37 kB
+dist/assets/StudentScales-avr2L3vQ.js                      2.54 kB │ gzip:   1.30 kB
+dist/assets/StudentAssignments-DWo6m2vl.js                 2.56 kB │ gzip:   1.32 kB
+dist/assets/DeleteOutlined-CuPsstv6.js                     2.57 kB │ gzip:   1.08 kB
+dist/assets/CognitiveHome-2e6842bA.js                      2.58 kB │ gzip:   1.34 kB
+dist/assets/TemporaryPasswordHandoff-Du9LZhcb.js           2.60 kB │ gzip:   1.45 kB
+dist/assets/QuestionnaireResult-Bfd0dRs7.js                2.68 kB │ gzip:   1.37 kB
+dist/assets/ClassroomEdit-hDZ-_Urm.js                      2.75 kB │ gzip:   1.21 kB
+dist/assets/SituationalHome-BXAX7jVU.js                    2.94 kB │ gzip:   1.65 kB
+dist/assets/MaterialGrantModal-BepQ90DL.js                 3.10 kB │ gzip:   1.52 kB
+dist/assets/MoreActions-Ds7dApHj.js                        3.11 kB │ gzip:   1.40 kB
+dist/assets/ClassroomCreate-BzkgkN5V.js                    3.11 kB │ gzip:   1.49 kB
+dist/assets/GeneralQuestionnaireCreate-DpKibsB9.js         3.21 kB │ gzip:   1.51 kB
+dist/assets/ParentConsentPage-C7ysQyM7.js                  3.28 kB │ gzip:   1.74 kB
+dist/assets/CognitiveHistory-CHxKsHYS.js                   3.40 kB │ gzip:   1.79 kB
+dist/assets/SituationalHistory-C-YpP04D.js                 3.41 kB │ gzip:   1.84 kB
+dist/assets/StudentQuestionnaires-CIiD3xAG.js              3.46 kB │ gzip:   1.74 kB
+dist/assets/AdminTrainingWorkspace-Bmbz-Acb.js             3.52 kB │ gzip:   1.87 kB
+dist/assets/AssessmentTemplates-DxSZQS4F.js                3.60 kB │ gzip:   1.92 kB
+dist/assets/ScaleResult-D435wBtd.js                        3.61 kB │ gzip:   1.69 kB
+dist/assets/useMergedMask-Dof_m8q6.js                      3.64 kB │ gzip:   1.79 kB
+dist/assets/PublicQuestionnaireResult-BoBRnFUU.js          3.69 kB │ gzip:   1.69 kB
+dist/assets/ClassroomJoin-B0Rf55vL.js                      3.84 kB │ gzip:   1.47 kB
+dist/assets/MaterialGrants-miMnw4Zh.js                     3.89 kB │ gzip:   1.69 kB
+dist/assets/ClassroomEnter-C11YBOzZ.js                     4.13 kB │ gzip:   1.65 kB
+dist/assets/CognitiveAssignmentEntry-BtR8b1vi.js           4.25 kB │ gzip:   2.03 kB
+dist/assets/TrainingLearnerHome-Fd3D9x_s.js                4.34 kB │ gzip:   1.77 kB
+dist/assets/PublicQuestionnaire-D7BEOiU3.js                4.39 kB │ gzip:   2.07 kB
+dist/assets/cognitive-report-audiences-CTxI45tX.js         4.69 kB │ gzip:   1.99 kB
+dist/assets/TeacherCodeList-CuGv0FTv.js                    4.74 kB │ gzip:   1.93 kB
+dist/assets/AssessmentManagement-mN0uYkTQ.js               5.03 kB │ gzip:   2.44 kB
+dist/assets/ParentToolPoliciesPage-BayWoj_A.js             5.19 kB │ gzip:   2.43 kB
+dist/assets/PublicCognitiveAssignment-QrbLpz5m.js          5.31 kB │ gzip:   2.62 kB
+dist/assets/ParentLinksPage-BbY-binS.js                    5.66 kB │ gzip:   2.57 kB
+dist/assets/GeneralQuestionnaireList-B0GO5Sq9.js           5.69 kB │ gzip:   2.43 kB
+dist/assets/TrainingTrainerHome-BL_2ds7G.js                5.71 kB │ gzip:   2.29 kB
+dist/assets/LegacyArchive-vRtqDpft.js                      5.94 kB │ gzip:   2.40 kB
+dist/assets/ParentAccountsPage-BH4akNnc.js                 5.94 kB │ gzip:   2.65 kB
+dist/assets/EducationProductGovernance-DS-_QI09.js         5.95 kB │ gzip:   2.57 kB
+dist/assets/AnonymousStudyPage-DvP5lqyO.js                 6.29 kB │ gzip:   2.72 kB
+dist/assets/CompositeAssessmentResults-C865zt6p.js         6.79 kB │ gzip:   2.57 kB
+dist/assets/SituationalReportCard-DfS8gmRi.js              6.95 kB │ gzip:   2.84 kB
+dist/assets/AssessmentWorkbench-UaZJMa5l.js                7.03 kB │ gzip:   3.21 kB
+dist/assets/api-B-j1VyZf.js                                7.24 kB │ gzip:   1.76 kB
+dist/assets/SituationalResult-CmFuQAvS.js                  7.32 kB │ gzip:   3.20 kB
+dist/assets/CognitiveSingleTaskReportCard-Buh9KDWI.js      7.63 kB │ gzip:   3.31 kB
+dist/assets/idempotency-BW80Mc1i.js                        7.64 kB │ gzip:   2.70 kB
+dist/assets/BundleAuthoring-BUSH0P0s.js                    7.67 kB │ gzip:   3.32 kB
+dist/assets/FormSectionManager-B50TJW1f.js                 7.97 kB │ gzip:   2.78 kB
+dist/assets/ClassroomQuestionEdit-DP5ctzAp.js              8.13 kB │ gzip:   2.86 kB
+dist/assets/ClassroomList-COCUqIKl.js                      8.21 kB │ gzip:   3.00 kB
+dist/assets/InstrumentAuthorization-srhD5Roa.js            8.51 kB │ gzip:   3.03 kB
+dist/assets/BundleProducts-Dcn9jMYX.js                     8.70 kB │ gzip:   3.69 kB
+dist/assets/TeacherCourseDetail-D34uex2T.js                8.78 kB │ gzip:   2.65 kB
+dist/assets/TeacherProfile-o1mlsBEd.js                     8.87 kB │ gzip:   2.70 kB
+dist/assets/StudentProfile-BeFkJRlT.js                     8.89 kB │ gzip:   2.71 kB
+dist/assets/ClassroomAnswer-CoqVGnIm.js                    8.91 kB │ gzip:   2.99 kB
+dist/assets/UserList-C7yHNvuB.js                           9.00 kB │ gzip:   3.05 kB
+dist/assets/CognitiveAssignmentList-CWD9jNQl.js            9.02 kB │ gzip:   3.44 kB
+dist/assets/ScaleUnitReportCard-Caxn1ouC.js                9.44 kB │ gzip:   3.51 kB
+dist/assets/ReportingContent-BSSNLRUV.js                   9.62 kB │ gzip:   4.07 kB
+dist/assets/StudentHome-TKAZphMK.js                        9.80 kB │ gzip:   3.88 kB
+dist/assets/DocumentLibrary-9LJsa5h3.js                   10.28 kB │ gzip:   4.16 kB
+dist/assets/CourseStudents-DzEHTVVG.js                    10.46 kB │ gzip:   3.64 kB
+dist/assets/AssignmentSubmit-CX5S0G7m.js                  10.88 kB │ gzip:   4.06 kB
+dist/assets/SjtAuthoring-tNE3fQ01.js                      11.16 kB │ gzip:   4.46 kB
+dist/assets/ImageLibrary-CrNltQdV.js                      11.51 kB │ gzip:   4.33 kB
+dist/assets/TrainingLearnerCourse-DqAVJj-I.js             11.71 kB │ gzip:   4.04 kB
+dist/assets/SurveyResearchersAdmin-5Wzq9oJM.js            12.09 kB │ gzip:   4.37 kB
+dist/assets/CheckinSubmit-DurG1E8U.js                     12.46 kB │ gzip:   4.54 kB
+dist/assets/TrainingTrainerCourse-BE_oAJ1c.js             12.64 kB │ gzip:   4.27 kB
+dist/assets/QuestionnaireList-BvUROv6Z.js                 14.09 kB │ gzip:   4.47 kB
+dist/assets/StudentManagement-LFX4WTqs.js                 14.31 kB │ gzip:   4.27 kB
+dist/assets/CourseDetail-BYC7aWTW.js                      14.74 kB │ gzip:   3.99 kB
+dist/assets/ClassroomControl-RTo_GULJ.js                  15.33 kB │ gzip:   5.33 kB
+dist/assets/CompositeAssessmentList-CVzu1cAN.js           15.43 kB │ gzip:   4.87 kB
+dist/assets/PublicDeliveryManager-apJLZ9qL.js             15.49 kB │ gzip:   5.80 kB
+dist/assets/GeneralQuestionnaireEdit-CkB2-ltg.js          16.58 kB │ gzip:   5.36 kB
+dist/assets/FinalQuestionnaireAssessment-_7GHdkON.js      16.86 kB │ gzip:   6.02 kB
+dist/assets/ScaleList-CLKsJcLR.js                         16.89 kB │ gzip:   5.55 kB
+dist/assets/ScaleAssessment-rJTzuFqL.js                   16.94 kB │ gzip:   6.89 kB
+dist/assets/PublicQuestionnaireAssessment-QZbumNuT.js     17.52 kB │ gzip:   5.13 kB
+dist/assets/CognitiveAssignmentEdit-B1g-zvFG.js           17.91 kB │ gzip:   6.98 kB
+dist/assets/QuestionnaireAssessment-DXiua00Q.js           18.38 kB │ gzip:   5.14 kB
+dist/assets/RelationalTasksPage-C-8IKwpv.js               18.38 kB │ gzip:   5.19 kB
+dist/assets/CompositeAssessmentEdit-CUqtTjek.js           18.69 kB │ gzip:   6.44 kB
+dist/assets/CourseList-DPysmSb3.js                        19.01 kB │ gzip:   6.33 kB
+dist/assets/QuestionnaireEdit-COmfECwS.js                 19.74 kB │ gzip:   5.81 kB
+dist/assets/VideoLibrary-DRgHjOHN.js                      21.96 kB │ gzip:   7.07 kB
+dist/assets/attachmentUpdate-CT9KFfrs.js                  22.97 kB │ gzip:   6.76 kB
+dist/assets/ScaleLibrary-DLy1wY_k.js                      24.75 kB │ gzip:   7.75 kB
+dist/assets/CompositeAssessmentPage-Cl2nHDdd.js           27.66 kB │ gzip:   9.94 kB
+dist/assets/ScaleEdit-BtaGHn7c.js                         28.50 kB │ gzip:   8.84 kB
+dist/assets/sanitize-BPuL_dHQ.js                          29.25 kB │ gzip:  11.25 kB
+dist/assets/AssignmentList-DvPENrXx.js                    31.01 kB │ gzip:   9.04 kB
+dist/assets/CompositeReportPage-B1AeC6G8.js               31.29 kB │ gzip:  10.76 kB
+dist/assets/CognitiveResult-D7zafggP.js                   31.66 kB │ gzip:   9.92 kB
+dist/assets/QuestionnaireProducts-DZ1fIfO2.js             31.76 kB │ gzip:  10.81 kB
+dist/assets/Addon-BWzslOkG.js                             31.77 kB │ gzip:   9.23 kB
+dist/assets/useClassroomSocket-C567xSFp.js                44.59 kB │ gzip:  14.16 kB
+dist/assets/PublicCheckin-T9VoyFYg.js                     84.10 kB │ gzip:  29.10 kB
+dist/assets/ScaleSelector-gIeBckv_.js                    199.30 kB │ gzip:  64.20 kB
+dist/assets/index-Cmj7Ay4O.js                            217.27 kB │ gzip:  75.69 kB
+dist/assets/CheckinList-DJC4O9zk.js                      296.65 kB │ gzip:  78.45 kB
+dist/assets/PdfViewer-ppPjZ1xX.js                        452.88 kB │ gzip: 134.46 kB
+dist/assets/SecureVideoPlayer-vskg5Ju0.js                526.04 kB │ gzip: 163.13 kB
+dist/assets/BigScreen-BdvJZHgM.js                        602.99 kB │ gzip: 197.13 kB
+dist/assets/index-C5TRifc-.js                          1,939.82 kB │ gzip: 595.74 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 15.32s

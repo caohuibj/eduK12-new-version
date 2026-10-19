@@ -553,6 +553,7 @@ const projectReportEnvelope = (
   context: 'collection' | 'package' = 'package',
 ) => ({
   id: report.id,
+  ...(typeof report.taskSatisfied==='boolean'?{taskSatisfied:report.taskSatisfied,taskSatisfaction:report.taskSatisfaction??null}:{}),
   assessmentId: report.assessmentId,
   name: report.name,
   anonymousCode: report.anonymousCode ?? null,
@@ -566,6 +567,8 @@ const projectReportEnvelope = (
         label: typeof background.label === 'string' ? background.label : null,
         value: typeof background.value === 'string' ? background.value : null,
         ...(typeof background.displayValue === 'string' ? { displayValue: background.displayValue } : {}),
+        ...(background.presentation && Object.prototype.hasOwnProperty.call(background,'typedValue') ? {typedValue:background.typedValue,presentation:background.presentation}:{}),
+        ...(['ANSWERED','REFUSED','SHOWN_MISSING','NOT_SHOWN'].includes(background.state)?{state:background.state,...(background.rowStates?{rowStates:background.rowStates}:{}),...(typeof background.otherText==='string'?{otherText:background.otherText}:{})}:{}),
       }))
     : [],
   unitReports: projectCompositeUnitReports(report.unitReports ?? [], audience, context),

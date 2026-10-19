@@ -1,3 +1,4 @@
+import { assertTrainingChildSelected, TRAINING_VARIANT_PARENT_MARKER_SELECT } from '../composite/training-variant-child-scope'
 import type { Response } from 'express'
 import { prisma } from '../../config/database'
 import { hashRecoveryToken } from '../../services/anonymousAccess'
@@ -62,10 +63,11 @@ export const serveCognitiveSessionImage = async (params: {
 }): Promise<Response | void> => {
   const session = await prisma.cognitiveSession.findUnique({
     where: { id: params.sessionId },
-    select: { userId: true, configSnapshotEncrypted: true },
+    select: { userId: true, compositeAttemptId: true, compositeItemId: true, configSnapshotEncrypted: true, compositeAttempt: { select: TRAINING_VARIANT_PARENT_MARKER_SELECT } },
   })
   if (!session) throw NOT_FOUND('CognitiveSession not found')
   if (session.userId !== params.userId) throw FORBIDDEN('Not the owner of this Cognitive session')
+  await assertTrainingChildSelected(session)
   return serveFrozenCognitiveImage({
     snapshot: snapshotFromEncrypted(session.configSnapshotEncrypted),
     assetId: params.assetId,
@@ -85,8 +87,9 @@ export const servePublicCognitiveSessionImage = async (params: {
     select: {
       userId: true,
       recoveryTokenHash: true,
+      compositeAttemptId: true, compositeItemId: true,
       configSnapshotEncrypted: true,
-      compositeAttempt: { select: { recoveryTokenHash: true } },
+      compositeAttempt: { select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, recoveryTokenHash: true } },
     },
   })
   if (!session) throw NOT_FOUND('CognitiveSession not found')
@@ -95,6 +98,7 @@ export const servePublicCognitiveSessionImage = async (params: {
     || session.compositeAttempt?.recoveryTokenHash === recoveryTokenHash
   )
   if (!allowed) throw FORBIDDEN('Recovery credential does not own this Cognitive session')
+  await assertTrainingChildSelected(session)
   return serveFrozenCognitiveImage({
     snapshot: snapshotFromEncrypted(session.configSnapshotEncrypted),
     assetId: params.assetId,

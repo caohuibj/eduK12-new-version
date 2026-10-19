@@ -1,0 +1,15 @@
+src/components/__tests__/FinalCompositeAssessment.test.tsx(351,181): error TS2322: Type 'FormPlayerValue' is not assignable to type 'string | number | string[] | Record<string, string | number | string[]> | null'.
+  Type 'Record<string, string | number | string[] | { _surveyRefusal: true; }>' is not assignable to type 'string | number | string[] | Record<string, string | number | string[]> | null'.
+    Type 'Record<string, string | number | string[] | { _surveyRefusal: true; }>' is missing the following properties from type 'string[]': length, pop, push, concat, and 28 more.
+src/components/questionnaire/FormPlayer.tsx(124,33): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ [x: string]: string | number | string[] | { _surveyRefusal: true; }; } | { _surveyRefusal: true; }'.
+  No index signature with a parameter of type 'string' was found on type '{ [x: string]: string | number | string[] | { _surveyRefusal: true; }; } | { _surveyRefusal: true; }'.
+src/components/questionnaire/FormPlayer.tsx(125,12): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ [x: string]: string | number | string[] | { _surveyRefusal: true; }; } | { _surveyRefusal: true; }'.
+  No index signature with a parameter of type 'string' was found on type '{ [x: string]: string | number | string[] | { _surveyRefusal: true; }; } | { _surveyRefusal: true; }'.
+src/modules/composite/CompositeAssessmentPage.tsx(508,96): error TS2345: Argument of type '{ submissionId: string; attemptEpoch: number; definitionHash: string; contextSnapshotHash?: string | null | undefined; answers: { formItemId: string; value: FormPlayerValue; otherText?: string | undefined; }[]; }' is not assignable to parameter of type '{ submissionId: string; attemptEpoch: number; definitionHash: string; contextSnapshotHash?: string | null | undefined; answers: { formItemId: string; value: string | number | string[] | Record<...> | null; }[]; }'.
+  Types of property 'answers' are incompatible.
+    Type '{ formItemId: string; value: FormPlayerValue; otherText?: string | undefined; }[]' is not assignable to type '{ formItemId: string; value: string | number | string[] | Record<string, string | number | string[]> | null; }[]'.
+      Type '{ formItemId: string; value: FormPlayerValue; otherText?: string | undefined; }' is not assignable to type '{ formItemId: string; value: string | number | string[] | Record<string, string | number | string[]> | null; }'.
+        Types of property 'value' are incompatible.
+          Type 'FormPlayerValue' is not assignable to type 'string | number | string[] | Record<string, string | number | string[]> | null'.
+            Type 'Record<string, string | number | string[] | { _surveyRefusal: true; }>' is not assignable to type 'string | number | string[] | Record<string, string | number | string[]> | null'.
+              Type 'Record<string, string | number | string[] | { _surveyRefusal: true; }>' is missing the following properties from type 'string[]': length, pop, push, concat, and 28 more.

@@ -1,3 +1,4 @@
+import { useCognitiveEnabled } from '../../../contexts/CapabilitiesContext'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Play, RotateCcw } from 'lucide-react'
@@ -21,6 +22,7 @@ import type { CognitiveAssignmentSummary, CognitiveSession } from '../types'
  */
 
 const CognitiveAssignmentEntry: React.FC = () => {
+  const cognitiveEnabled = useCognitiveEnabled()
   const { assignmentId } = useParams<{ assignmentId: string }>()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
@@ -146,7 +148,8 @@ const CognitiveAssignmentEntry: React.FC = () => {
           )}
         </div>
 
-        {entryAction.kind === 'reconcile' ? (
+        {assignment.admissionPaused && <p role="status" className="mb-4">认知测评暂不可用，重新开放后可继续原记录。</p>}
+        {cognitiveEnabled && entryAction.kind === 'reconcile' ? (
           <p className="mb-4 text-sm text-slate-600">
             进入时会先核对服务器上的进行中尝试；如已存在则继续原尝试，否则才创建新尝试。
           </p>
@@ -160,7 +163,7 @@ const CognitiveAssignmentEntry: React.FC = () => {
           ) : (
             <button
               onClick={entryAction.kind === 'continue' ? handleResume : handleStart}
-              disabled={submitting || (assignment.remainingAttempts === 0 && entryAction.kind !== 'continue')}
+              disabled={submitting || assignment.admissionPaused || !cognitiveEnabled || (assignment.remainingAttempts === 0 && entryAction.kind !== 'continue')}
               className="btn-primary"
             >
               {entryAction.kind === 'continue' ? (

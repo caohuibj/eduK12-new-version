@@ -2,6 +2,8 @@ import { render, screen, fireEvent, act, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route, Link } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+const capabilities = vi.hoisted(() => ({ enabled: true }))
+vi.mock('../../../contexts/CapabilitiesContext', () => ({ useCognitiveEnabled: () => capabilities.enabled }))
 const api = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), put: vi.fn() }))
 vi.mock('../../../api/client', () => ({ default: api }))
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'teacher-1', role: 'TEACHER' } }) }))
@@ -23,6 +25,7 @@ function mount(id = 'new', search = '') {
 }
 describe('questionnaire draft feedback', () => {
   beforeEach(() => {
+    capabilities.enabled = true
     vi.resetAllMocks()
     api.get.mockResolvedValue({
       code: 0,
@@ -34,6 +37,16 @@ describe('questionnaire draft feedback', () => {
       },
     })
   })
+  it('hides the cognitive authoring type while disabled and preserves stored cognitive content', async () => {
+    capabilities.enabled = false
+    const row = { name: '历史认知问卷', status: 'DRAFT', revision: 1, questionnaireType: 'COURSE', questionnaireCourses: [], items: [{ id:'cog', type:'COGNITIVE', position:0, cognitiveAssignment:{ title:'历史认知任务' } }], formSections: [], publicEnabled:false }
+    api.get.mockImplementation(async path => ({ code:0, data:path.endsWith('/resources') ? { scales:[], cognitive:[], situational:[], courses:[] } : row }))
+    mount('saved')
+    await screen.findByDisplayValue('历史认知问卷')
+    expect(screen.queryByRole('option', { name:'认知测验' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '配置第 1 项：1. 历史认知任务' })).toBeInTheDocument()
+  })
+
   it('exposes the active composition section to keyboard and screen-reader users', async () => {
     mount()
     const steps = screen.getByRole('navigation', { name: '编制步骤' })
@@ -169,4 +182,208 @@ describe('questionnaire draft feedback', () => {
     expect(api.post).toHaveBeenCalledWith('/questionnaire-products/saved/items', { revision: 7, item: expect.objectContaining({ type: 'FORM', required: false, contextKey: null, formLabel: '选填意见' }) })
   })
 
+})
+
+describe('C04 typed authoring', () => {
+  it.each(['number', 'long_text', 'date', 'time'])('creates %s using the public Form definition without a client itemKey', async type => {
+    capabilities.enabled = true
+    vi.resetAllMocks()
+    const row = { name: '基础题型', status: 'DRAFT', revision: 4, questionnaireType: 'COURSE', questionnaireCourses: [], items: [], formSections: [], publicEnabled: false }
+    api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? { scales: [], cognitive: [], situational: [], courses: [] } : row }))
+    api.post.mockResolvedValue({ code: 0, data: { ...row, revision: 5 } })
+    mount('typed')
+    await screen.findByDisplayValue('基础题型')
+    const user = userEvent.setup()
+    await user.selectOptions(screen.getByLabelText('测评类型'), 'FORM')
+    await user.type(screen.getByLabelText('题目文字'), '合成题')
+    await user.selectOptions(screen.getByLabelText('题型'), type)
+    await user.click(screen.getByLabelText('必填'))
+    if (type === 'number') {
+      await user.type(screen.getByLabelText('最小值'), '0')
+      await user.type(screen.getByLabelText('最大值'), '100')
+      await user.type(screen.getByLabelText('最大小数位（留空表示不限制）'), '2')
+    }
+    if (type === 'time') await user.selectOptions(screen.getByLabelText('时间时区'), 'UTC')
+    if (type === 'long_text') await user.type(screen.getByLabelText('字数上限'), '500')
+    await user.click(screen.getByRole('button', { name: '添加到测评' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalled())
+    const [url, body] = api.post.mock.calls[0]
+    expect(url).toBe('/questionnaire-products/typed/items')
+    expect(body.revision).toBe(4)
+    expect(body.item).toMatchObject({ type: 'FORM', formType: type, formLabel: '合成题', required: false, contextKey: null,
+      formDefinition: { type: type.toUpperCase(), prompt: '合成题', required: false, options: [], rows: [] } })
+    expect(body.item.formDefinition).not.toHaveProperty('itemKey')
+    if (type === 'number') expect(body.item.formDefinition).toMatchObject({ min: 0, max: 100, precision: 2 })
+    if (type === 'time') expect(body.item.formDefinition.timeZone).toBe('UTC')
+    if (type === 'long_text') expect(body.item.formDefinition.maxLength).toBe(500)
+  })
+})
+
+describe('C05 structured authoring', () => {
+  it.each(['likert', 'matrix', 'matrix_multiple', 'rank_order', 'slider', 'constant_sum'])('creates %s as one public FormQuestion', async type => {
+    capabilities.enabled = true
+    vi.resetAllMocks()
+    const row = { name: '结构化题型', status: 'DRAFT', revision: 4, questionnaireType: 'COURSE', questionnaireCourses: [], items: [], formSections: [], publicEnabled: false }
+    api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? { scales: [], cognitive: [], situational: [], courses: [] } : row }))
+    api.post.mockResolvedValue({ code: 0, data: { ...row, revision: 5 } })
+    mount('typed')
+    await screen.findByDisplayValue('结构化题型')
+    const user = userEvent.setup()
+    await user.selectOptions(screen.getByLabelText('测评类型'), 'FORM')
+    await user.type(screen.getByLabelText('题目文字'), '结构化题')
+    await user.selectOptions(screen.getByLabelText('题型'), type)
+    if (type !== 'slider') await user.type(screen.getByLabelText('选项（值=标签，以逗号分隔）'), 'a=甲,b=乙')
+    if (type.startsWith('matrix')) await user.type(screen.getByLabelText('矩阵行（编码=标签，以逗号分隔）'), 'r1=第一行,r2=第二行')
+    if (type === 'matrix_multiple') await user.type(screen.getByLabelText('最多选择（留空不限）'), '2')
+    if (type === 'constant_sum') { await user.clear(screen.getByLabelText('指定总和')); await user.type(screen.getByLabelText('指定总和'), '0') }
+    await user.click(screen.getByRole('button', { name: '添加到测评' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalled())
+    const definition = api.post.mock.calls[0][1].item.formDefinition
+    expect(definition).toMatchObject({ type: type.toUpperCase(), prompt: '结构化题', required: true })
+    expect(definition).not.toHaveProperty('itemKey')
+    if (type === 'slider') expect(definition).toMatchObject({ min: 0, max: 100, options: [], rows: [] })
+    else expect(definition.options).toEqual([{ optionKey: 'a', label: '甲' }, { optionKey: 'b', label: '乙' }])
+    if (type.startsWith('matrix')) expect(definition.rows).toEqual([{ rowKey: 'r1', label: '第一行' }, { rowKey: 'r2', label: '第二行' }])
+    if (type === 'matrix_multiple') expect(definition.maxSelections).toBe(2)
+    if (type === 'constant_sum') expect(definition.total).toBe(0)
+  })
+})
+
+describe('C05 incomplete single question stays editable', () => {
+  it('retains title, options and matrix rows when the server rejects adding an incomplete question', async () => {
+    capabilities.enabled = true
+    vi.resetAllMocks()
+    const row = { name: '结构化草稿', status: 'DRAFT', revision: 4, questionnaireType: 'COURSE', questionnaireCourses: [], items: [], formSections: [], publicEnabled: false }
+    api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? { scales: [], cognitive: [], situational: [], courses: [] } : row }))
+    api.post.mockResolvedValue({ code: 400, message: '矩阵题至少需要一行' })
+    mount('typed')
+    await screen.findByDisplayValue('结构化草稿')
+    const user = userEvent.setup()
+    await user.selectOptions(screen.getByLabelText('测评类型'), 'FORM')
+    await user.type(screen.getByLabelText('题目文字'), '未完成矩阵')
+    await user.selectOptions(screen.getByLabelText('题型'), 'matrix')
+    await user.type(screen.getByLabelText('选项（值=标签，以逗号分隔）'), 'a=甲,b=乙')
+    await user.click(screen.getByRole('button', { name: '添加到测评' }))
+    expect(await screen.findByText('矩阵题至少需要一行')).toBeInTheDocument()
+    expect(screen.getByLabelText('题目文字')).toHaveValue('未完成矩阵')
+    expect(screen.getByLabelText('选项（值=标签，以逗号分隔）')).toHaveValue('a=甲,b=乙')
+    expect(screen.getByLabelText('矩阵行（编码=标签，以逗号分隔）')).toHaveValue('')
+    expect(api.post).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('C06 stable policy authoring',()=>{
+ it('adds a conditional question to the chosen existing section using its stable source key',async()=>{
+  vi.resetAllMocks()
+  const source={id:'db-source',position:0,formSectionId:'section',formType:'single_choice',formLabel:'先前选择',formDefinition:{itemKey:'q_stable_source',type:'SINGLE',options:[{optionKey:'yes',label:'是'},{optionKey:'no',label:'否'}]}}
+  const row={name:'策略问卷',status:'DRAFT',revision:9,questionnaireType:'COURSE',questionnaireCourses:[],items:[source],formSections:[{id:'section',title:'连续表单',items:[source],contextSection:false}],publicEnabled:false}
+  api.get.mockImplementation(async path=>({code:0,data:path.endsWith('/resources')?{scales:[],cognitive:[],situational:[],courses:[]}:row}));api.post.mockResolvedValue({code:0,data:{...row,revision:10}})
+  mount('policy');await screen.findByDisplayValue('策略问卷');const user=userEvent.setup()
+  await user.selectOptions(screen.getByLabelText('测评类型'),'FORM');await user.type(screen.getByLabelText('题目文字'),'后续文本')
+  await user.click(screen.getByLabelText('启用新表单策略（V3）'));await user.selectOptions(screen.getByLabelText('加入表单区段'),'section');await user.selectOptions(screen.getByLabelText('显示条件'),'q_stable_source');await user.selectOptions(screen.getByLabelText('文本格式'),'EMAIL')
+  await user.click(screen.getByRole('button',{name:'添加到测评'}));await waitFor(()=>expect(api.post).toHaveBeenCalled())
+  expect(api.post.mock.calls[0][1]).toMatchObject({revision:9,formSectionId:'section',item:{formPolicy:{version:3,requiredRefusal:'BLOCK_SUBMIT',hiddenRequired:'EXEMPT'},formDefinition:{type:'SHORT_TEXT',textValidation:'EMAIL',displayIf:{itemKey:'q_stable_source',operator:'EQUALS',optionKey:'yes'}}}})
+ })
+})
+
+it('shows typed export actions from the actual nested teacher form DTO',async()=>{
+  const row={id:'typed-export',name:'导出问卷',status:'PUBLISHED',revision:1,questionnaireType:'COURSE',questionnaireCourses:[],publicEnabled:false,formSections:[],items:[{id:'number',type:'FORM',position:0,required:false,form:{type:'number',label:'数值',formDefinition:{itemKey:'q_number',type:'NUMBER',prompt:'数值',required:false,options:[],rows:[]}}}]}
+  api.get.mockImplementation(async path=>({code:0,data:path.endsWith('/resources')?{scales:[],cognitive:[],situational:[],courses:[]}:row}))
+  mount('typed-export');expect(await screen.findByRole('button',{name:'完整表单与字段字典（ZIP）'})).toBeTruthy();expect(screen.getByText(/暂不支持 SAV/)).toBeTruthy()
+})
+
+describe('C19 Training conditional flow authoring', () => {
+  const section = { id: 'section-1', title: '筛选', position: 0, contextSection: false, items: [{ id: 'form-1', type: 'FORM', formLabel: '资格', formDefinition: { itemKey: 'eligible', type: 'SINGLE', prompt: '资格', options: [{ optionKey: 'yes', label: '是' }, { optionKey: 'no', label: '否' }], rows: [], required: true } }] }
+  const row = { name: '课程条件流程', status: 'DRAFT', productKind: 'QUESTIONNAIRE', revision: 7, questionnaireType: 'COURSE', questionnaireCourses: [{ courseId: 'training-course' }], items: [{ id: 'scale-1', type: 'SCALE', position: 1, required: true, scale: { name: '量表' } }], formSections: [section], publicEnabled: false, trainingFlowDraft: null }
+  beforeEach(() => {
+    vi.resetAllMocks()
+    api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? { scales: [], cognitive: [], situational: [], courses: [{ id: 'training-course', title: 'Training 课程', courseType: 'TRAINING_COURSE', isLibrary: false }] } : row }))
+  })
+  it('saves with the latest revision after metadata and blocks publication until successful', async () => {
+    api.put.mockImplementation(async (_path, body) => ({ code: 0, data: { ...row, name: body.name, revision: 8 } }))
+    api.post.mockImplementation(async (_path, body) => ({ code: 0, data: { ...row, name: '已改名', revision: 9, trainingFlowDraft: body.config } }))
+    mount('flow')
+    const user = userEvent.setup()
+    await user.click(await screen.findByRole('checkbox', { name: '启用跨工具条件流程' }))
+    fireEvent.change(screen.getByLabelText('测评名称'), { target: { value: '已改名' } })
+    expect(screen.getByRole('button', { name: '发布组合测评' })).toBeDisabled()
+    await user.click(screen.getByRole('button', { name: '添加条件结束模板' }))
+    await user.click(screen.getByRole('button', { name: '添加材料模板' }))
+    await user.click(screen.getByRole('button', { name: '保存流程设置' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith('/questionnaire-products/flow/training-flow', { revision: 8, config: expect.objectContaining({ schemaVersion: 1, blocks: expect.arrayContaining([expect.objectContaining({ kind: 'END', termination: 'SCREEN_OUT' }), expect.objectContaining({ kind: 'MATERIAL' })]) }) }))
+    await waitFor(() => expect(screen.getByRole('button', { name: '发布组合测评' })).toBeEnabled())
+  })
+  it('focuses invalid flow JSON and keeps unsaved edits after server conflict', async () => {
+    mount('flow')
+    const user = userEvent.setup()
+    await user.click(await screen.findByRole('checkbox', { name: '启用跨工具条件流程' }))
+    const input = screen.getByLabelText('流程 JSON（高级编辑）')
+    const valid = (input as HTMLTextAreaElement).value
+    fireEvent.change(input, { target: { value: '{broken' } })
+    await user.click(screen.getByRole('button', { name: '保存流程设置' }))
+    expect(input).toHaveFocus()
+    expect(input).toHaveAttribute('aria-invalid', 'true')
+    expect(api.post).not.toHaveBeenCalled()
+    fireEvent.change(input, { target: { value: valid } })
+    api.post.mockRejectedValue(new Error('草稿修订号已变化，请重新读取'))
+    await user.click(screen.getByRole('button', { name: '保存流程设置' }))
+    await waitFor(() => expect(screen.getAllByText('草稿修订号已变化，请重新读取').length).toBeGreaterThan(0))
+    expect(input).toHaveValue(valid)
+    expect(screen.getByRole('button', { name: '发布组合测评' })).toBeDisabled()
+  })
+})
+
+describe('C20 material flow editor and attempt budget', () => {
+  const config = { schemaVersion: 2, experiment: { experimentKey: 'lesson', linkedPolicy: 'KEEP_LINKED', groups: [
+    { groupKey: 'a', weight: 1, materialTitle: 'A', materialBody: '正文 A' },
+    { groupKey: 'b', weight: 2, materialTitle: 'B', materialBody: '正文 B' },
+  ] }, blocks: [{ blockKey: 'tool_1', kind: 'INSTRUMENT', instrumentKey: 'item_scale_1' }] }
+  const row = { id: 'materials', name: '材料实验', status: 'DRAFT', productKind: 'QUESTIONNAIRE', revision: 3, maxAttempts: 4, questionnaireType: 'COURSE', questionnaireCourses: [{ courseId: 'training-course' }], items: [{ id: 'scale-1', type: 'SCALE', position: 0, required: true, scale: { name: '量表' } }], formSections: [], publicEnabled: false, trainingFlowDraft: config }
+  const resources = { scales: [], cognitive: [], situational: [], courses: [{ id: 'training-course', title: 'Training 课程', courseType: 'TRAINING_COURSE', isLibrary: false }] }
+  beforeEach(() => {
+    vi.resetAllMocks()
+    api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? resources : row }))
+    api.post.mockImplementation(async (_path, body) => ({ code: 0, data: { ...row, revision: 4, trainingFlowDraft: body.config, maxAttempts: body.maxAttempts } }))
+  })
+  it('loads the saved budget and sends budget-only changes with V2 config', async () => {
+    mount('materials')
+    const input = await screen.findByLabelText('最多作答次数（材料实验）')
+    expect(input).toHaveValue(4)
+    expect(screen.getByRole('button', { name: '保存流程设置' })).toBeDisabled()
+    fireEvent.change(input, { target: { value: '8' } })
+    fireEvent.click(screen.getByRole('button', { name: '保存流程设置' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith('/questionnaire-products/materials/training-flow', { revision: 3, config, maxAttempts: 8 }))
+    await waitFor(() => expect(screen.getByRole('button', { name: '保存流程设置' })).toBeDisabled())
+    expect(screen.getByText(/SCREEN_OUT 不退还配额/)).toBeInTheDocument()
+    expect(screen.getByText(/新链接不代表同一关联身份/)).toBeInTheDocument()
+  })
+  it('upgrades the existing V1 blocks only explicitly and adds an editable quota sample', async () => {
+    const v1 = { schemaVersion: 1, blocks: config.blocks }
+    api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? resources : { ...row, trainingFlowDraft: v1 } }))
+    mount('materials')
+    const input = await screen.findByLabelText('流程 JSON（高级编辑）')
+    expect(screen.queryByLabelText('最多作答次数（材料实验）')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '启用两组材料实验' }))
+    const upgraded = JSON.parse((input as HTMLTextAreaElement).value)
+    expect(upgraded.schemaVersion).toBe(2)
+    expect(upgraded.blocks).toEqual(config.blocks)
+    expect(upgraded.quotaPolicy).toBeUndefined()
+    fireEvent.click(screen.getByRole('button', { name: '添加配额示例' }))
+    expect(JSON.parse((input as HTMLTextAreaElement).value).quotaPolicy).toEqual({ schemaVersion: 1, groupLimits: { group_a: 100, group_b: 100 } })
+    fireEvent.change(screen.getByLabelText('最多作答次数（材料实验）'), { target: { value: '0' } })
+    fireEvent.click(screen.getByRole('button', { name: '保存流程设置' }))
+    expect(api.post).not.toHaveBeenCalled()
+    expect(input).toHaveFocus()
+    expect(screen.getByText('最多作答次数须为 1–100 的整数。')).toBeInTheDocument()
+  })
+  it('hydrates copied V2 config and budget from the returned draft detail', async () => {
+    const published = { ...row, status: 'PUBLISHED', trainingFlowDraft: null, trainingFlowFrozen: config }
+    api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? resources : path.endsWith('/copied') ? { ...row, id: 'copied' } : published }))
+    api.post.mockResolvedValue({ code: 0, data: { id: 'copied' } })
+    mount('materials')
+    await screen.findByText('每位作答者最多作答 4 次。')
+    fireEvent.click(screen.getByRole('button', { name: '复制为新草稿' }))
+    expect(await screen.findByLabelText('最多作答次数（材料实验）')).toHaveValue(4)
+    expect(JSON.parse((screen.getByLabelText('流程 JSON（高级编辑）') as HTMLTextAreaElement).value)).toEqual(config)
+  })
 })

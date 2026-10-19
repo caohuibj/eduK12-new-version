@@ -1,0 +1,157 @@
+{
+  "passed": false,
+  "requests": 21,
+  "checks": [
+    "public authoring rejects malformed constraints, timezone, identities and unopened policies without writes"
+  ],
+  "observations": [
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 102,
+      "durationMs": 52
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 131,
+      "responseBytes": 318,
+      "durationMs": 99
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 102,
+      "durationMs": 2
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 131,
+      "responseBytes": 318,
+      "durationMs": 79
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 177,
+      "responseBytes": 1057,
+      "durationMs": 34
+    },
+    {
+      "method": "POST",
+      "status": 400,
+      "requestBytes": 240,
+      "responseBytes": 93,
+      "durationMs": 8
+    },
+    {
+      "method": "POST",
+      "status": 400,
+      "requestBytes": 194,
+      "responseBytes": 84,
+      "durationMs": 4
+    },
+    {
+      "method": "POST",
+      "status": 400,
+      "requestBytes": 100,
+      "responseBytes": 132,
+      "durationMs": 3
+    },
+    {
+      "method": "POST",
+      "status": 400,
+      "requestBytes": 263,
+      "responseBytes": 104,
+      "durationMs": 3
+    },
+    {
+      "method": "POST",
+      "status": 400,
+      "requestBytes": 266,
+      "responseBytes": 76,
+      "durationMs": 3
+    },
+    {
+      "method": "POST",
+      "status": 400,
+      "requestBytes": 243,
+      "responseBytes": 207,
+      "durationMs": 2
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 1057,
+      "durationMs": 18
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 187,
+      "responseBytes": 1067,
+      "durationMs": 25
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 243,
+      "responseBytes": 2249,
+      "durationMs": 30
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 228,
+      "responseBytes": 3404,
+      "durationMs": 30
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 194,
+      "responseBytes": 4491,
+      "durationMs": 27
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 211,
+      "responseBytes": 5612,
+      "durationMs": 28
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 206,
+      "responseBytes": 6723,
+      "durationMs": 30
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 212,
+      "responseBytes": 7846,
+      "durationMs": 32
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 101,
+      "responseBytes": 8645,
+      "durationMs": 28
+    },
+    {
+      "method": "POST",
+      "status": 409,
+      "requestBytes": 21,
+      "responseBytes": 106,
+      "durationMs": 3
+    }
+  ],
+  "error": "AssertionError [ERR_ASSERTION]: POST /composite-assessments/3e7f969b-e12c-4574-b4ab-6f2823143a8b/form-sections/5de7a6d6-b6ab-4965-84a6-f6741bf14f7f/items/6d003dc5-c42c-4aea-b7d5-bbb87df4af6e: {\"code\":\"QUESTIONNAIRE_REVISION_REQUIRED\",\"message\":\"请从问卷编制页面修改此问卷\",\"data\":null}\n\n409 !== 200\n"
+}

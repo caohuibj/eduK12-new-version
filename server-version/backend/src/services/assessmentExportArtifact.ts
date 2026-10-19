@@ -6,6 +6,9 @@ import { z } from 'zod'
 import { prisma } from '../config/database'
 import { validateStorageKey, type ExportActor } from './exportArtifactService'
 import { EXPORT_RETENTION_HOURS, EXPORT_MAX_RECORDS } from './exportStorage'
+import { trainingAnalysisProvenanceSchema, assertTrainingAnalysisExportIdentity } from '../modules/training-analysis/export'
+import { loadCurrentPrincipal } from '../modules/organization/principal'
+import { inactiveAccountMessage } from '../utils/accountStatus'
 
 export const provenanceSchema = z.object({
   version: z.literal(1),
@@ -55,8 +58,8 @@ export async function registerAssessmentExport(input: {
  * pre-migration exports fail closed. The caller must also perform its existing
  * live assignment/Composite authority check before invoking this resolver. */
 export async function resolveAssessmentExport(input: {
-  resourceType: ResourceType; resourceId: string; actor: ExportActor;
-  fileName: string; projectionFingerprint: string; metadataOnly?: boolean;
+  resourceType: ResourceType | 'TRAINING_ANALYSIS'; resourceId: string; actor: ExportActor;
+  fileName: string; projectionFingerprint?: string; metadataOnly?: boolean;
 }): Promise<string | null> {
   if (path.basename(input.fileName) !== input.fileName) return null
   const artifact = await prisma.exportArtifact.findFirst({ where: {
@@ -66,6 +69,25 @@ export async function resolveAssessmentExport(input: {
     || !Number.isFinite(artifact.expiresAt.getTime()) || artifact.expiresAt.getTime() <= Date.now()
     || artifact.resourceType !== input.resourceType || artifact.resourceId !== input.resourceId
     || artifact.storageKey !== input.fileName) return null
+  if (input.resourceType === 'TRAINING_ANALYSIS') {
+    const parsed = trainingAnalysisProvenanceSchema.safeParse(artifact.provenance)
+    if (!parsed.success || !artifact.anonymized || artifact.createdBy !== input.actor.userId
+      || parsed.data.creatorRole !== input.actor.role) return null
+    try {
+      assertTrainingAnalysisExportIdentity(parsed.data.trainingAnalysis, { courseId: input.resourceId,
+        createdBy: input.actor.userId, creatorRole: input.actor.role })
+      const principal = await loadCurrentPrincipal(input.actor.userId)
+      if (!principal || inactiveAccountMessage(principal) || principal.mustChangePassword
+        || principal.role !== input.actor.role) return null
+      const { revalidateTrainingAnalysisManifest } = await import('../modules/training-analysis/service')
+      await revalidateTrainingAnalysisManifest({ id: principal.userId, role: parsed.data.creatorRole }, parsed.data.trainingAnalysis.manifest)
+      if (input.metadataOnly) return artifact.storageKey
+      const filePath = validateStorageKey(artifact.storageKey)
+      if ((artifact.format !== 'csv' && artifact.format !== 'zip') || path.extname(filePath) !== `.${artifact.format}`) return null
+      if (!(await fs.stat(filePath)).isFile()) return null
+      return filePath
+    } catch { return null }
+  }
   const parsed = provenanceSchema.safeParse(artifact.provenance)
   if (!parsed.success || parsed.data.projectionFingerprint !== input.projectionFingerprint) return null
   if (input.actor.role !== UserRole.ADMIN && (

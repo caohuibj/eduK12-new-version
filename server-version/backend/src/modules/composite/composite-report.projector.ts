@@ -153,9 +153,9 @@ export const projectCompositeReport = (input: CompositeReportProjectionInput): R
 export const projectCompositeCollectionReport = (
   report: Record<string, any>,
   audience: CompositeReportAudience,
-): Record<string, any> => replaceScaleUnits(
+): Record<string, any> => ({...replaceScaleUnits(
   legacy.projectCompositeCollectionReport(report, audience),
   report,
   audience,
   'collection',
-)
+), ...(report.trainingFlow?{trainingFlow:{schemaVersion:report.trainingFlow.schemaVersion,...(audience!=='participant'&&report.trainingFlow.materialAssignment?{materialAssignment:{assignmentHash:report.trainingFlow.materialAssignment.assignmentHash,configDigest:report.trainingFlow.materialAssignment.configDigest,groupKey:report.trainingFlow.materialAssignment.groupKey,materialDigest:report.trainingFlow.materialAssignment.materialDigest}}:{}),configDigest:report.trainingFlow.configDigest,pathHash:report.trainingFlow.pathHash,termination:report.trainingFlow.termination,taskSatisfaction:report.trainingFlow.taskSatisfaction,executedUnitCount:report.trainingFlow.executedUnitCount,skippedUnitCount:report.trainingFlow.skippedUnitCount}}:{}), ...(report.trainingVariant ? {trainingVariant: report.trainingVariant} : {})})

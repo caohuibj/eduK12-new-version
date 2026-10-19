@@ -1,0 +1,29 @@
+C16 existing batch fixture failure: static baseline evidence, not a product behavior change
+Baseline commit:
+825170d223e23aac4093c7a1513b541b0a9b67a7
+Baseline preload calls the same strict scope resolver:
+/** Only already-authorized, projected parents enter this request-local batch.
+ * Every source still passes the single-reader's parent/epoch/definition checks. */
+export async function preloadCompositeReportFacts(attempts: any[]): Promise<CompositeReportFactsReader> {
+  const templates = createReportReadTemplateStore(), contexts = new Map<any, {identity: string; facts: CompositeReportFacts}>()
+  const sectionsByAttempt = new Map<any, ReturnType<typeof mapCompositeSection>[]>()
+  for (const attempt of attempts) {
+    const scope = await resolveTrainingAttemptScope(attempt)
+    if (scope.items.length !== attempt.compositeAssessment.items.length || attempt.compositeAssessment.items.some((item: any) => !scope.itemIds.has(item.id))) throw new Error('Report batch requires projected selection')
+    const sections = (attempt.compositeAssessment.formSections ?? []).map(mapCompositeSection).filter((section: ReturnType<typeof mapCompositeSection>) => section.items.some(item => item.formDefinition != null))
+    const typedCount = attempt.compositeAssessment.items.filter((item: any) => item.type === 'FORM' && item.formDefinition != null).length
+Baseline scope UNKNOWN denial:
+export async function resolveTrainingAttemptScope(attempt:any,composite:any=attempt.compositeAssessment,options?:TrainingAttemptScopeOptions):Promise<TrainingAttemptScope>{
+  const known=scopes.get(attempt)
+  if(known)return known
+  if(!composite)throw compositeForbidden('作答缺少冻结问卷来源')
+  if(trainingVariantMarkerState(attempt,composite)==='UNKNOWN')throw compositeForbidden('概率分卷来源标志未加载，不能推断旧模式')
+  const configured=composite.trainingVariantFrozen!=null||composite.trainingVariantDigest!=null
+  if(!configured){
+    if(attempt.trainingVariantAllocationEncrypted!=null||attempt.trainingVariantAllocationHash!=null||composite.trainingVariantDraft!=null)
+      throw compositeForbidden('概率分卷冻结来源不完整')
+    return {items:composite.items??[],formSections:composite.formSections??[],itemIds:new Set((composite.items??[]).map((i:any)=>i.id)),sectionIds:new Set((composite.formSections??[]).map((s:any)=>s.id)),variant:null}
+  }
+Baseline fixture omits required loaded null markers:
+  attempts.push({id:parent,attemptEpoch:1,runtimeGeneration:'UNIFIED_V1',compositeAssessment:{id:'composite',items:[{id:'scale-item',type:'SCALE'}],formSections:[]},scaleAssessments:[{...row,result:{k:'SFF1',e:1}}]})
+Only fixture added explicit null marker fields; production UNKNOWN denial unchanged.

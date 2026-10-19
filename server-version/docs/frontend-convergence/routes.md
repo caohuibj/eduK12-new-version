@@ -58,8 +58,8 @@ Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx
 | /composite-assessments/:id/results | CompositeAssessmentResults | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-09 | FE-02 chrome; domain UI retained |
 | /composite-assessments/:id/attempts/:attemptId/report | CompositeReportPage | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-09 | FE-02 chrome; domain UI retained |
 | /composite-assessments/:id | CompositeAssessmentEdit | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-09 | FE-02 chrome; domain UI retained |
-| /cognitive-assignments | CognitiveAssignmentList | TEACHER / ADMIN | Cognitive capability | AppShell (outside guards) | standard | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
-| /cognitive-assignments/:id | CognitiveAssignmentEdit | TEACHER / ADMIN | Cognitive capability | AppShell (outside guards) | standard | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
+| /cognitive-assignments | CognitiveAssignmentList | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
+| /cognitive-assignments/:id | CognitiveAssignmentEdit | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
 | /teacher/classrooms | ClassroomList | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /teacher/classrooms/create | ClassroomCreate | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /teacher/classrooms/:id/control | ClassroomControl | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
@@ -112,14 +112,14 @@ Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx
 | /student/composite/attempts/:attemptId | CompositeAssessmentPage | STUDENT | — | AppShell (outside guards) | focused | FE-02 + FE-09 | FE-02 chrome; domain UI retained |
 | /student/composite/attempts/:attemptId/report | CompositeReportPage | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-09 | FE-02 chrome; domain UI retained |
 | /student/cognitive | CognitiveHome | STUDENT | Cognitive capability | AppShell (outside guards) | standard | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
-| /student/cognitive/assignments/:assignmentId | CognitiveAssignmentEntry | STUDENT | Cognitive capability | AppShell (outside guards) | standard | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
-| /student/cognitive/history | CognitiveHistory | STUDENT | Cognitive capability | AppShell (outside guards) | standard | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
-| /student/cognitive/sessions/:sessionId | CognitiveRunner | STUDENT | Cognitive capability | AppShell (outside guards) | focused | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
-| /student/cognitive/sessions/:sessionId/result | CognitiveResult | STUDENT | Cognitive capability | AppShell (outside guards) | standard | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
-| /relational/cognitive/sessions/:sessionId | CognitiveRunner | Authenticated; exact server resource authority | Cognitive capability | AppShell (outside guards) | focused | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
-| /public/cognitive/assignments/:token | PublicCognitiveAssignment | Public / unguarded | Cognitive capability | AppShell (outside guards) | public | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
-| /public/cognitive/sessions/:sessionId | CognitiveRunner | Public / unguarded | Cognitive capability | AppShell (outside guards) | focused | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
-| /public/cognitive/sessions/:sessionId/result | CognitiveResult | Public / unguarded | Cognitive capability | AppShell (outside guards) | public | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
+| /student/cognitive/assignments/:assignmentId | CognitiveAssignmentEntry | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
+| /student/cognitive/history | CognitiveHistory | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
+| /student/cognitive/sessions/:sessionId | CognitiveRunner | STUDENT | — | AppShell (outside guards) | focused | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
+| /student/cognitive/sessions/:sessionId/result | CognitiveResult | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
+| /relational/cognitive/sessions/:sessionId | CognitiveRunner | Authenticated; exact server resource authority | — | AppShell (outside guards) | focused | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
+| /public/cognitive/assignments/:token | PublicCognitiveAssignment | Public / unguarded | — | AppShell (outside guards) | public | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
+| /public/cognitive/sessions/:sessionId | CognitiveRunner | Public / unguarded | — | AppShell (outside guards) | focused | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
+| /public/cognitive/sessions/:sessionId/result | CognitiveResult | Public / unguarded | — | AppShell (outside guards) | public | FE-02 + FE-07A/B | FE-02 chrome; domain UI retained |
 | /public/composite/situational/:attemptId | SituationalRunner | Public / unguarded | — | AppShell (outside guards) | focused | FE-02 + FE-06 | FE-02 chrome; domain UI retained |
 | /public/studies/waves/:waveId/:token | AnonymousStudyPage | Public / unguarded | — | AppShell (outside guards) | public | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /public/studies/:studyId | AnonymousStudyPage | Public / unguarded | — | AppShell (outside guards) | public | FE-02 + FE-10 | FE-02 chrome; domain UI retained |

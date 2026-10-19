@@ -1,0 +1,21 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: POST /questionnaire-products/ec488c00-7e9f-44fd-b922-fcf48288499c/items: {"code":-1,"message":"新增题型必须提供公共表单定义，请使用已开放的基础或结构化题型","data":null}
+
+400 !== 200
+
+    at Object.request (file:///workspace/scratch/5a77e8bdc1ae/eduk12_c07_export_worktree/server-version/scripts/recovery/c07-export-smoke.mjs:25:10)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async create (file:///workspace/scratch/5a77e8bdc1ae/eduk12_c07_export_worktree/server-version/scripts/recovery/c07-export-smoke.mjs:39:39)
+    at async file:///workspace/scratch/5a77e8bdc1ae/eduk12_c07_export_worktree/server-version/scripts/recovery/c07-export-smoke.mjs:104:11 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 400,
+  expected: 200,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.21.0

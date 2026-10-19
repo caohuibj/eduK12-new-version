@@ -1,0 +1,48 @@
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/eduk12_c06_form_worktree/server-version/frontend
+
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > FormPlayer > uses native radio semantics for single-choice fields 92ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > FormPlayer > uses native checkbox semantics and preserves array values for multiple-choice fields 37ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > FormPlayer > associates text fields and validation errors with the visible label 39ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > FormPlayer > keeps month input native and exposes the final-unit submit action 23ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > FormPlayer > preserves Chinese composition events without submitting or navigating 8ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > typed basic FormPlayer > keeps 0 numeric, clears to null and exposes frozen constraints 15ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > typed basic FormPlayer > renders DATE with typed restoration and disabled guards 5ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > typed basic FormPlayer > renders TIME with typed restoration and disabled guards 6ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > typed basic FormPlayer > renders LONG_TEXT with typed restoration and disabled guards 3ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > C05 structured typed adapters > renders Likert through shared choices and clears optional answers to null 50ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > C05 structured typed adapters > adapts matrix row keys without dropping another row 39ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > C05 structured typed adapters > adapts multiple matrix row arrays and enforces max selections in controls 27ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > C05 structured typed adapters > requires explicit ranking confirmation and returns a complete order 33ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > C05 structured typed adapters > keeps unconfirmed slider distinct from numeric zero 25ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > C05 structured typed adapters > retains numeric zero and an incomplete constant sum without filling blanks 7ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > C05 structured typed adapters > locks every LIKERT answer control inside the parent disabled fieldset 3ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > C05 structured typed adapters > locks every MATRIX answer control inside the parent disabled fieldset 3ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > C05 structured typed adapters > locks every MATRIX_MULTIPLE answer control inside the parent disabled fieldset 3ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > C05 structured typed adapters > locks every RANK_ORDER answer control inside the parent disabled fieldset 2ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > C05 structured typed adapters > locks every SLIDER answer control inside the parent disabled fieldset 2ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > C05 structured typed adapters > locks every CONSTANT_SUM answer control inside the parent disabled fieldset 2ms
+ ✓ src/components/__tests__/FinalCompositeAssessment.test.tsx > historical empty sections > submits an explicit empty FINAL for an ordinary frozen section 102ms
+ ✓ src/components/__tests__/FinalCompositeAssessment.test.tsx > historical empty sections > explains recovery for an invalid frozen context instead of silently skipping it 14ms
+ ✓ src/components/__tests__/FinalCompositeAssessment.test.tsx > FinalCompositeAssessment durable selection and exit > waits for the current item write before exiting and preserves both item answers 118ms
+ ✓ src/components/__tests__/FinalCompositeAssessment.test.tsx > FinalCompositeAssessment durable selection and exit > restores saved item selections without advancing or bleeding into the next item 51ms
+ ✓ src/components/__tests__/FinalCompositeAssessment.test.tsx > FinalCompositeAssessment durable selection and exit > keeps the page and current selection when durable storage fails 99ms
+ ✓ src/components/__tests__/FinalCompositeAssessment.test.tsx > FinalCompositeAssessment provenance sibling placement > sends one top-level provenance object for a Scale child 52ms
+ ✓ src/components/__tests__/FinalCompositeAssessment.test.tsx > FinalCompositeAssessment provenance sibling placement > keeps Scale provenance out of a Form child submit 27ms
+ ✓ src/components/__tests__/FinalCompositeAssessment.test.tsx > durable submission confirmation > does not relabel an accepted submission as failed when loading the next screen fails 39ms
+ ✓ src/components/__tests__/FinalCompositeAssessment.test.tsx > C04 typed FINAL persistence > restores numeric zero and retries the identical sealed typed payload (public=false) 63ms
+ ✓ src/components/__tests__/FinalCompositeAssessment.test.tsx > C04 typed FINAL persistence > restores numeric zero and retries the identical sealed typed payload (public=true) 61ms
+ ✓ src/components/__tests__/FinalCompositeAssessment.test.tsx > C04 negative and large text draft restoration > preserves 'NUMBER' across local save, unmount and FINAL 43ms
+ ✓ src/components/__tests__/FinalCompositeAssessment.test.tsx > C04 negative and large text draft restoration > preserves 'LONG_TEXT' across local save, unmount and FINAL 33ms
+ ✓ src/components/__tests__/FinalCompositeAssessment.test.tsx > C05 structured FINAL persistence > restores 'LIKERT' and replays identical sealed typed payload across reload 49ms
+ ✓ src/components/__tests__/FinalCompositeAssessment.test.tsx > C05 structured FINAL persistence > restores 'MATRIX' and replays identical sealed typed payload across reload 57ms
+ ✓ src/components/__tests__/FinalCompositeAssessment.test.tsx > C05 structured FINAL persistence > restores 'MATRIX_MULTIPLE' and replays identical sealed typed payload across reload 57ms
+ ✓ src/components/__tests__/FinalCompositeAssessment.test.tsx > C05 structured FINAL persistence > restores 'RANK_ORDER' and replays identical sealed typed payload across reload 58ms
+ ✓ src/components/__tests__/FinalCompositeAssessment.test.tsx > C05 structured FINAL persistence > restores 'SLIDER' and replays identical sealed typed payload across reload 45ms
+ ✓ src/components/__tests__/FinalCompositeAssessment.test.tsx > C05 structured FINAL persistence > restores 'CONSTANT_SUM' and replays identical sealed typed payload across reload 51ms
+
+ Test Files  2 passed (2)
+      Tests  39 passed (39)
+   Start at  17:43:17
+   Duration  2.20s (transform 522ms, setup 221ms, import 783ms, tests 1.45s, environment 644ms)
+

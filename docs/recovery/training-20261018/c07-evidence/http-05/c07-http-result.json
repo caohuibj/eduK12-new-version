@@ -1,0 +1,490 @@
+{
+  "passed": false,
+  "requests": 64,
+  "checks": [
+    "{\"v3\":false,\"publicMode\":false} canonical report/cache and original queue CSV/ZIP exact values/dictionary/summary/SAV rejection/revoked download"
+  ],
+  "observations": [
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 102,
+      "durationMs": 53
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 131,
+      "responseBytes": 318,
+      "durationMs": 99
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 102,
+      "durationMs": 2
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 131,
+      "responseBytes": 318,
+      "durationMs": 84
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 182,
+      "responseBytes": 1093,
+      "durationMs": 36
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 198,
+      "responseBytes": 2185,
+      "durationMs": 37
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 259,
+      "responseBytes": 2945,
+      "durationMs": 28
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 245,
+      "responseBytes": 3677,
+      "durationMs": 26
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 263,
+      "responseBytes": 4445,
+      "durationMs": 29
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 251,
+      "responseBytes": 5189,
+      "durationMs": 27
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 257,
+      "responseBytes": 5945,
+      "durationMs": 28
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 230,
+      "responseBytes": 6507,
+      "durationMs": 25
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 310,
+      "responseBytes": 7369,
+      "durationMs": 24
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 371,
+      "responseBytes": 8353,
+      "durationMs": 28
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 399,
+      "responseBytes": 9395,
+      "durationMs": 53
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 325,
+      "responseBytes": 10288,
+      "durationMs": 26
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 287,
+      "responseBytes": 11105,
+      "durationMs": 27
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 236,
+      "responseBytes": 11820,
+      "durationMs": 25
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 253,
+      "responseBytes": 12569,
+      "durationMs": 28
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 307,
+      "responseBytes": 13426,
+      "durationMs": 28
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 15,
+      "responseBytes": 413,
+      "durationMs": 17
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 15,
+      "responseBytes": 13452,
+      "durationMs": 34
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 2,
+      "responseBytes": 21019,
+      "durationMs": 40
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 12478,
+      "responseBytes": 358,
+      "durationMs": 37
+    },
+    {
+      "kind": "accepted-storage",
+      "v3": false,
+      "bytes": 25146
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 12478,
+      "responseBytes": 279,
+      "durationMs": 12
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 380,
+      "durationMs": 7
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 380,
+      "durationMs": 7
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 398,
+      "durationMs": 7
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 26154,
+      "durationMs": 8
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 26154,
+      "durationMs": 5
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 32144,
+      "durationMs": 26
+    },
+    {
+      "method": "POST",
+      "status": 400,
+      "requestBytes": 32,
+      "responseBytes": 107,
+      "durationMs": 5
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 32,
+      "responseBytes": 490,
+      "durationMs": 17
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 437,
+      "durationMs": 7
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 437,
+      "durationMs": 8
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 437,
+      "durationMs": 9
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 437,
+      "durationMs": 8
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 446,
+      "durationMs": 11
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 65641,
+      "durationMs": 13
+    },
+    {
+      "kind": "artifact",
+      "format": "zip",
+      "detail": "full",
+      "downloadBytes": 65587,
+      "csvBytes": 12897,
+      "storageBytes": 65587,
+      "fields": 45
+    },
+    {
+      "method": "POST",
+      "status": 400,
+      "requestBytes": 35,
+      "responseBytes": 107,
+      "durationMs": 5
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 35,
+      "responseBytes": 490,
+      "durationMs": 13
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 437,
+      "durationMs": 8
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 437,
+      "durationMs": 14
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 437,
+      "durationMs": 9
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 437,
+      "durationMs": 9
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 446,
+      "durationMs": 11
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 46655,
+      "durationMs": 9
+    },
+    {
+      "kind": "artifact",
+      "format": "zip",
+      "detail": "summary",
+      "downloadBytes": 46597,
+      "csvBytes": 798,
+      "storageBytes": 46597,
+      "fields": 39
+    },
+    {
+      "method": "POST",
+      "status": 400,
+      "requestBytes": 32,
+      "responseBytes": 107,
+      "durationMs": 4
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 32,
+      "responseBytes": 490,
+      "durationMs": 11
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 437,
+      "durationMs": 7
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 437,
+      "durationMs": 9
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 437,
+      "durationMs": 8
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 437,
+      "durationMs": 9
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 446,
+      "durationMs": 10
+    },
+    {
+      "method": "GET",
+      "status": 200,
+      "requestBytes": 0,
+      "responseBytes": 12897,
+      "durationMs": 8
+    },
+    {
+      "kind": "artifact",
+      "format": "csv",
+      "detail": "full",
+      "downloadBytes": 12897,
+      "csvBytes": 12897,
+      "storageBytes": 12897,
+      "fields": 45
+    },
+    {
+      "method": "GET",
+      "status": 404,
+      "requestBytes": 0,
+      "responseBytes": 51,
+      "durationMs": 5
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 220,
+      "responseBytes": 1114,
+      "durationMs": 18
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 284,
+      "responseBytes": 2378,
+      "durationMs": 24
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 345,
+      "responseBytes": 3310,
+      "durationMs": 23
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 331,
+      "responseBytes": 4214,
+      "durationMs": 24
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 349,
+      "responseBytes": 5154,
+      "durationMs": 23
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 339,
+      "responseBytes": 6074,
+      "durationMs": 23
+    },
+    {
+      "method": "POST",
+      "status": 200,
+      "requestBytes": 345,
+      "responseBytes": 7006,
+      "durationMs": 30
+    },
+    {
+      "method": "POST",
+      "status": 400,
+      "requestBytes": 401,
+      "responseBytes": 113,
+      "durationMs": 6
+    }
+  ],
+  "error": "AssertionError [ERR_ASSERTION]: POST /questionnaire-products/fb58ea14-4197-4f14-a2ff-7d57cb8cbf3d/items: {\"code\":-1,\"message\":\"公共定义与兼容选项不匹配; 选择题必须提供至少一个选项\",\"data\":null}\n\n400 !== 200\n"
+}

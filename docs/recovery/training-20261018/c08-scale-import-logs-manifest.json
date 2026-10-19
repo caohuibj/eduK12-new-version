@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "purpose": "C08 original allowlisted qualification and failure logs; no tests rerun",
+  "qualifiedSourceHead": "1d9ef730244b8bdbb3a2498d5b5a1165c89c94b9",
+  "sourceRoots": {
+    "check_logs": "/tmp/c08-logs",
+    "state_01": "/workspace/scratch/5a77e8bdc1ae/eduk12_c08_http_01",
+    "state_02": "/workspace/scratch/5a77e8bdc1ae/eduk12_c08_http_02"
+  },
+  "existingEvidence": {
+    "path": "c08-scale-import-evidence.json",
+    "sha256": "f73743b828aa27a6caa95e045735777eb047ddd30d0e6bae1a509479e3fc6012",
+    "relation": "Existing JSON is the exact successful state_02/c08-runtime-result.json; archive preserves accompanying full logs and statuses, plus failed state_01 result."
+  },
+  "entries": [
+    {
+      "archivePath": "check_logs/parser-tests.log",
+      "sourceRoot": "check_logs",
+      "originalRelativePath": "parser-tests.log",
+      "bytes": 2645,
+      "sha256": "83eb81b59411b08e452d75cd0fb1a060e4c6e35a8784a8a6b59f61c2c6310bdc",
+      "redacted": false
+    },
+    {
+      "archivePath": "check_logs/targeted-tests.log",
+      "sourceRoot": "check_logs",
+      "originalRelativePath": "targeted-tests.log",
+      "bytes": 1459,
+      "sha256": "a8bd60082a03b0b80853c3e4280425c73979a79c4d79321f39d6333c6d21c180",
+      "redacted": false
+    },
+    {
+      "archivePath": "check_logs/backend-types.log",
+      "sourceRoot": "check_logs",
+      "originalRelativePath": "backend-types.log",
+      "bytes": 307,
+      "sha256": "7d61cb2e2deb776dfec4d6f54693f9edeed0af5c4da52f091c53c995d862fb65",
+      "redacted": false
+    },
+    {
+      "archivePath": "check_logs/signed-proof-build.log",
+      "sourceRoot": "check_logs",
+      "originalRelativePath": "signed-proof-build.log",
+      "bytes": 19770,
+      "sha256": "082fb62965690f94ae959a2406afd83d6d2d12cb62e712b7a2ae7f6f21aa5143",
+      "redacted": false
+    },
+    {
+      "archivePath": "check_logs/frontend-lint.log",
+      "sourceRoot": "check_logs",
+      "originalRelativePath": "frontend-lint.log",
+      "bytes": 99,
+      "sha256": "7125f194612fcff2f454c05d848e7cb71facc1967b4d5017e25b34fdee3ba74f",
+      "redacted": false
+    },
+    {
+      "archivePath": "check_logs/http-01.log",
+      "sourceRoot": "check_logs",
+      "originalRelativePath": "http-01.log",
+      "bytes": 1068,
+      "sha256": "792bde8d3789cc86de8fe590db91eb264cb1175d6dfb8940bf5eab0ccfb8141f",
+      "redacted": false
+    },
+    {
+      "archivePath": "check_logs/http-02.log",
+      "sourceRoot": "check_logs",
+      "originalRelativePath": "http-02.log",
+      "bytes": 134,
+      "sha256": "ef2f16eba172ae72f883259d7a42b7c3f225d5501adf1e124c82be75f1ff90ab",
+      "redacted": false
+    },
+    {
+      "archivePath": "state_01/c08-postgres-tests.log",
+      "sourceRoot": "state_01",
+      "originalRelativePath": "c08-postgres-tests.log",
+      "bytes": 3099,
+      "sha256": "9a064a8b5e41502ac6afa129ecbee9471965ce338c5f8b6a45198077542aa5b2",
+      "redacted": false
+    },
+    {
+      "archivePath": "state_01/status.json",
+      "sourceRoot": "state_01",
+      "originalRelativePath": "status.json",
+      "bytes": 1661,
+      "sha256": "87b85e319772fe3bbbb5751cefee84665edff1775e6ecf4792bfa97cf776affa",
+      "redacted": false
+    },
+    {
+      "archivePath": "state_01/c08-runtime-result.json",
+      "sourceRoot": "state_01",
+      "originalRelativePath": "c08-runtime-result.json",
+      "bytes": 977,
+      "sha256": "d03244739418650a36834c3b40ed9550b396980523f3d995918b93419bb08ee7",
+      "redacted": false
+    },
+    {
+      "archivePath": "state_02/c08-postgres-tests.log",
+      "sourceRoot": "state_02",
+      "originalRelativePath": "c08-postgres-tests.log",
+      "bytes": 958,
+      "sha256": "08f6b20b2a81ffd7538001db0ef80002e864b16a94039e67d826cda3b1419d3d",
+      "redacted": false
+    },
+    {
+      "archivePath": "state_02/c08-http.log",
+      "sourceRoot": "state_02",
+      "originalRelativePath": "c08-http.log",
+      "bytes": 379,
+      "sha256": "249a8fb0a9ec18d8b5a3cd10c935db5c07b0ba6c148257ad335a1fd9e4d7d283",
+      "redacted": false
+    },
+    {
+      "archivePath": "state_02/status.json",
+      "sourceRoot": "state_02",
+      "originalRelativePath": "status.json",
+      "bytes": 1661,
+      "sha256": "37e320f586788a72320c327679244f541808036cf06c73bfd2750f54a4f59986",
+      "redacted": false
+    }
+  ],
+  "exclusions": [
+    "database files",
+    "private keys",
+    "environment/runtime-private.json",
+    "fixture credentials",
+    "raw CSV",
+    "pg-password",
+    "API/worker application logs"
+  ],
+  "notes": [
+    "Original bytes unchanged, including ANSI colour sequences and unsuccessful checks.",
+    "Typecheck tools are silent on success; signed-proof-build.log came from the recorded && chain: backend tsc, affected frontend tests, frontend tsc, frontend Vite build.",
+    "Status peakRssBytes are incidental launcher observations, not C26 performance qualification."
+  ]
+}

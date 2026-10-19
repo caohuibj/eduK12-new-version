@@ -1,0 +1,32 @@
+PASS Formal upload and separate-admin publication; admin self-review and nonowner access rejected
+PASS teacher_self_report rejected by course authoring without attempt writes
+AssertionError [ERR_ASSERTION]: POST /questionnaire-products/4c3221b0-5e67-4512-8b88-cdf769e6dc4a/items: 500 {"code":-1,"message":"服务器内部错误","data":null}
+    at Object.request (file://[cloud-workspace]/eduk12_c11_20261018/server-version/scripts/recovery/c11-sjt-smoke.mjs:65:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async composition (file://[cloud-workspace]/eduk12_c11_20261018/server-version/scripts/recovery/c11-sjt-smoke.mjs:76:365)
+    at async file://[cloud-workspace]/eduk12_c11_20261018/server-version/scripts/recovery/c11-sjt-smoke.mjs:96:16 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: POST /questionnaire-products/4c3221b0-5e67-4512-8b88-cdf769e6dc4a/items: 500 {"code":-1,"message":"服务器内部错误","data":null}
+    at Object.request (file://[cloud-workspace]/eduk12_c11_20261018/server-version/scripts/recovery/c11-sjt-smoke.mjs:65:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async composition (file://[cloud-workspace]/eduk12_c11_20261018/server-version/scripts/recovery/c11-sjt-smoke.mjs:76:365)
+    at async file://[cloud-workspace]/eduk12_c11_20261018/server-version/scripts/recovery/c11-sjt-smoke.mjs:96:16 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+
+Node.js v24.21.0

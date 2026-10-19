@@ -1,0 +1,100 @@
+
+ RUN  v4.1.11 [cloud-workspace]/eduk12_c11_20261018/server-version/backend
+
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > batches and deduplicates exact releases, locking before loading and freezing once 110ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > fails closed for retired 4ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > fails closed for missing 3ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > fails closed for hash 95ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > fails closed for version 3ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > fails closed for package-status 3ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > retains exact success and failure outcomes for one preflight operation without reloading 114ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > does not query uploads for builtin-only or empty operations 3ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > selects standalone latest using headers then only resolves the exact chosen version 110ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > rejects uploaded teacher self-report from student composite admission 214ms
+ ✓ src/__tests__/situational/situational-release.test.ts > exact SJT release resolution > projects resource headers without answer keys or templates and rejects corrupt metadata 1ms
+ ✓ src/__tests__/composite/export.service.test.ts > writes the projected composite data and dictionary into one ZIP without rebuilding disclosure 5ms
+ ✓ src/__tests__/composite/export.service.test.ts > composite export service > rejects governed Run data before generic bulk export materialization 3ms
+ ✓ src/__tests__/composite/export.service.test.ts > composite export service > rejects an oversized attempt scope before loading the composite graph 0ms
+ ✓ src/__tests__/composite/export.service.test.ts > composite export service > rejects an oversized full-export trial scope before loading nested trials 0ms
+ ✓ src/__tests__/composite/export.service.test.ts > composite export service > exports a stable mixed summary row with repeated slots, provenance, frozen labels, zero and null 7ms
+ ✓ src/__tests__/composite/export.service.test.ts > composite export service > predeclares frozen scalar columns even with zero attempts and keeps SAV nullability typed 4ms
+ ✓ src/__tests__/composite/export.service.test.ts > composite export service > exports summary metrics without raw trials 2ms
+ ✓ src/__tests__/composite/export.service.test.ts > composite export service > omits the product-index score column for a frozen BART report 1ms
+ ✓ src/__tests__/composite/export.service.test.ts > composite export service > exports v2 metrics and three-state quality without a generic score 2ms
+ ✓ src/__tests__/composite/export.service.test.ts > composite export service > uses the frozen package slot label instead of a live wrapper title 1ms
+ ✓ src/__tests__/composite/export.service.test.ts > composite export service > exports each cognitive trial value in full mode 1ms
+ ✓ src/__tests__/composite/export.service.test.ts > composite export service > keeps normalized dynamic keys distinct 1ms
+ ✓ src/__tests__/composite/export.service.test.ts > composite export service > keeps frozen metric values distinct when normalized keys collide 1ms
+ ✓ src/__tests__/composite/export.service.test.ts > composite export service > keeps frozen metric names distinct after long-name truncation 1ms
+ ✓ src/__tests__/composite/export.service.test.ts > composite export service > keeps dimension values distinct when scale dimension codes normalize to one name 2ms
+ ✓ src/__tests__/composite/export.service.test.ts > composite export service > neutralizes spreadsheet formulas in CSV values 0ms
+ ✓ src/__tests__/composite/export.service.test.ts > composite export service > keeps negative numeric values numeric in CSV output 0ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > keeps numeric zero distinct from null, quality, versions and hash, excluding facts/bridge/raw 6ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > has identity fields without records and fills absent metrics with null 0ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > fails closed for mismatched accepted identity {"attemptEpoch":1} 1ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > fails closed for mismatched accepted identity {"compositeAttemptId":"other"} 0ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > fails closed for mismatched accepted identity {"sourceAttemptId":"other"} 1ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > fails closed for mismatched accepted identity {"sourceSubmissionId":"other"} 1ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > fails closed for mismatched accepted identity {"sourceDefinitionHash":"other"} 0ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > fails closed for mismatched accepted identity {"compiledRuntimeHash":"other"} 0ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > fails closed for mismatched accepted identity {"canonicalResultEncrypted":null} 0ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > fails closed for mismatched accepted identity {"payloadKind":"NONE"} 0ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > fails closed for mismatched accepted identity {"sourceType":"ASSESSMENT"} 0ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > rejects altered content, context, duplicate slots/metrics and nonnumeric metrics 2ms
+ × src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > preserves explicit terminal missingness without synthesizing results 4ms
+   → [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "snapshotHash"
+    ],
+    "path": [],
+    "message": "Unrecognized key(s) in object: 'snapshotHash'"
+  }
+]
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > uses the bounded snapshot path and retains standalone embedded/raw rejection 1ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > requires every frozen required SJT and rejects a self-consistent different instrument/runtime 2ms
+ ✓ src/__tests__/composite/situational-canonical-export.test.ts > batch-resolves shared slot plans once and binds each parent epoch/hash 3ms
+ ✓ src/__tests__/assessment-bundle/situational-bundle.test.ts > Situational Bundle integration contract > projects only canonical Construct × Channel metrics into Bundle evidence 6ms
+ ✓ src/__tests__/assessment-bundle/situational-bundle.test.ts > Situational Bundle integration contract > fails closed on a mismatched frozen instrument identity 3ms
+ ✓ src/__tests__/situational/situational-runtime-admission.test.ts > Situational participant runtime admission > exposes all executable-complete production packages regardless of PILOT maturity 8ms
+ ✓ src/__tests__/situational/situational-runtime-admission.test.ts > Situational participant runtime admission > rejects unknown, DRAFT or RETIRED products at admission without using a real product as a fixture 1ms
+ ✓ src/__tests__/situational/situational-runtime-admission.test.ts > Situational participant runtime admission > selects only PUBLISHED packages and orders numeric versions correctly 0ms
+ ✓ src/__tests__/scale/composite-export-projection.test.ts > Composite wide Scale export projection > keeps FULL_REPORT item scores but removes raw answers and device provenance 3ms
+ ✓ src/__tests__/scale/composite-export-projection.test.ts > Composite wide Scale export projection > reduces EDUCATIONAL_ONLY Scale columns to non-result identity fields 1ms
+ ✓ src/__tests__/scale/composite-export-projection.test.ts > Composite wide Scale export projection > binds artifacts to audience and policy fingerprint and rejects old/stale names 1ms
+ ✓ src/__tests__/scale/composite-export-projection.test.ts > Composite SJT summary projection fingerprint > invalidates legacy artifacts and binds slot position without expanding raw access 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/composite/situational-canonical-export.test.ts > Composite SJT accepted canonical summary > preserves explicit terminal missingness without synthesizing results
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "snapshotHash"
+    ],
+    "path": [],
+    "message": "Unrecognized key(s) in object: 'snapshotHash'"
+  }
+]
+ ❯ Object.get error [as error] node_modules/zod/v3/types.js:39:31
+ ❯ ZodObject.parse node_modules/zod/v3/types.js:114:22
+ ❯ Module.createFrozenActiveSlotSet src/modules/assessment-runtime/slot-set.ts:127:67
+    125|
+    126| export const createFrozenActiveSlotSet = (input: Omit<FrozenActiveSlot…
+    127|   const parsed = frozenSlotSetSchema.omit({ snapshotHash: true }).pars…
+       |                                                                   ^
+    128|   assertFrozenSlotContents(parsed)
+    129|   const unsigned = unsignedSlotSet(parsed)
+ ❯ src/__tests__/composite/situational-canonical-export.test.ts:79:22
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { issues: [ { code: 'unrecognized_keys', keys: [ 'snapshotHash' ], path: [], message: 'Unrecognized key(s) in object: \'snapshotHash\'' } ], addIssue: 'Function<anonymous>', addIssues: 'Function<anonymous>', errors: [ { code: 'unrecognized_keys', keys: [ 'snapshotHash' ], path: [], message: 'Unrecognized key(s) in object: \'snapshotHash\'' } ], format: 'Function<format>', isEmpty: false, flatten: 'Function<flatten>', formErrors: { formErrors: [ 'Unrecognized key(s) in object: \'snapshotHash\'' ], fieldErrors: {} } }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 5 passed (6)
+      Tests  1 failed | 52 passed (53)
+   Start at  19:27:06
+   Duration  6.50s (transform 2.56s, setup 0ms, import 4.96s, tests 746ms, environment 1ms)

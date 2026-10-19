@@ -1,4 +1,7 @@
 import { z } from 'zod'
+import { trainingFormPolicySchema } from '../assessment-runtime/form-policy'
+import { formQuestionSchema } from '../assessment-core/form/definition'
+import { typedCompositeFormQuestion } from '../assessment-runtime/typed-form'
 import { MAX_TOKEN_USES } from '../../constants'
 import { deviceInputProvenanceV1Schema } from '../scale/device-input-provenance'
 
@@ -68,12 +71,30 @@ export const addCompositeItemSchema = z.object({
   cognitiveAssignmentId: z.string().min(1).optional(),
   situationalInstrumentKey: z.string().min(1).max(120).optional(),
   situationalInstrumentVersion: z.string().regex(/^\d+\.\d+\.\d+$/, '必须指定精确情境化题包版本').optional(),
-  formType: z.enum(['fill_blank', 'single_choice', 'multiple_choice', 'text_input', 'year_month']).optional(),
+  formType: z.enum(['fill_blank', 'single_choice', 'multiple_choice', 'text_input', 'year_month', 'number', 'long_text', 'date', 'time', 'likert', 'matrix', 'matrix_multiple', 'rank_order', 'slider', 'constant_sum']).optional(),
   formLabel: z.string().min(1).max(500).optional(),
+  // Stable itemKey is assigned by the server from the new database UUID.
+  formDefinition: formQuestionSchema.omit({ itemKey: true }).optional(),
+  formPolicy: trainingFormPolicySchema.optional(),
   formPlaceholder: z.string().nullable().optional(),
   formOptions: z.array(formOption).nullable().optional(),
   contextKey: z.enum(['birthYearMonth', 'sexAtBirth', 'gradeLevel', 'primaryLanguage', 'countryOrRegion']).nullable().optional(),
 }).strict().superRefine((input, ctx) => {
+  const advanced = ['number', 'long_text', 'date', 'time', 'likert', 'matrix', 'matrix_multiple', 'rank_order', 'slider', 'constant_sum'].includes(input.formType ?? '')
+  // V3 acceptance policy is explicit and frozen with the typed definition.
+  if (input.formPolicy && !input.formDefinition) ctx.addIssue({code:'custom',path:['formPolicy'],message:'V3 策略必须绑定 typed 定义'})
+  if (input.formDefinition || advanced) {
+    if (input.type !== 'FORM' || (!advanced && !input.formPolicy) || !input.formDefinition) {
+      ctx.addIssue({ code: 'custom', path: ['formDefinition'], message: '新增题型必须提供公共表单定义，请使用已开放的基础或结构化题型' })
+    } else {
+      try {
+        typedCompositeFormQuestion({ ...input, id: 'new', formDefinition: { ...input.formDefinition, itemKey: 'q_new' }, placeholder: input.formPlaceholder ?? null, contextKey: input.contextKey ?? null, position: input.position ?? 0, formSectionPosition: null } as any)
+      } catch (error) {
+        ctx.addIssue({ code: 'custom', path: ['formDefinition'], message: error instanceof Error ? error.message : '公共表单定义无效' })
+      }
+    }
+  }
+
   if (input.type === 'FORM' && (!input.formType || !input.formLabel)) {
     ctx.addIssue({ code: 'custom', path: ['formLabel'], message: '表单模块必须提供 formType 和 formLabel' })
   }

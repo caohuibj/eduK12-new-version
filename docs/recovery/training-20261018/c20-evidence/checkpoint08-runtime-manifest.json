@@ -1,0 +1,41 @@
+{
+  "head": "a9864088719daebc27b11339bf50a9d10d21d0a7",
+  "qualification": "Partial functionality; storage-functional passed; guards 17 checks passed, duplicate ordinal actually SQLSTATE23505 but assertion expected unavailable constraint name; restore not executed; original cost failures preserved; no C20 overall GO",
+  "members": {
+    "state07/c20-guards-result.json": {
+      "size": 1371,
+      "sha256": "b0126ef206e694166c7fef3553fffe0bdd4ffae203b69e2788cd14ba71db0e44",
+      "gzipSize": 446,
+      "gzipSha256": "48169f81b0cbbb52dd75d385abd6d9533c0ce120f4d0df3aa1ac842d65ba77c9"
+    },
+    "state07/c20-guards.log": {
+      "size": 5549,
+      "sha256": "b919f406d03ff18fefae8beb52617b889c4f93cf99f5889e7fa2e9ea54f8a9c2",
+      "gzipSize": 1127,
+      "gzipSha256": "48b9e94293befe66936a88856a7559d29feae99f9c275eff9b696ff88c70132d"
+    },
+    "state07/c20-runtime-result.json": {
+      "size": 296027,
+      "sha256": "3823be7cc5b32bf4d5c8f80a636556b430b7a344ec3381795ff551a615e962ad",
+      "gzipSize": 33807,
+      "gzipSha256": "dbff058ac5db5dff715706bfecf2cc10fcf164268d78a8c0b9f8c1eb8bae3c44"
+    },
+    "state07/c20-storage-functional-result.json": {
+      "size": 3174,
+      "sha256": "f07196435a02177a4afdf4a5e8589a5e9e6204a1ed539384b8c9980990b20aaa",
+      "gzipSize": 1197,
+      "gzipSha256": "a4389555991fd7a596c59730c5593096ecb668fbb9408081f5f621b3f80c9655"
+    },
+    "state07/frozen-inputs.json": {
+      "size": 358902,
+      "sha256": "d762313a160dba81ea8c5495d86c92ed628d782057b29425211052e70923eddd",
+      "gzipSize": 86757,
+      "gzipSha256": "8ff89f6f49b70b2a42e307eefe4cfff2984e65f2154cbc54cf2a5b35c10484fd"
+    }
+  },
+  "archive": {
+    "name": "checkpoint08-runtime-partial.tar.gz",
+    "size": 122107,
+    "sha256": "f36b6ac8ab800464d9a02cba786d024780c878e17f0a4da03cd90083b63a15c5"
+  }
+}

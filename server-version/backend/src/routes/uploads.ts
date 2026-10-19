@@ -11,7 +11,7 @@ import { config } from '../config'
 import { imageQueue } from '../config/queue'
 import { isCOSEnabled, uploadToCOS, deleteFromCOS } from '../utils/cos'
 import { logger } from '../utils/logger'
-import { discardUnreferencedAsset, getLocalAssetPath, legacyAssetOwnerIds, signKnownAsset, storeAsset } from '../services/assetStorage'
+import { discardUnreferencedAsset, softDeleteStoredAsset, legacyAssetOwnerIds, signKnownAsset, storeAsset } from '../services/assetStorage'
 import { prisma } from '../config/database'
 import { UserRole } from '../types'
 import { detectMimeType } from '../utils/fileValidator'
@@ -182,20 +182,17 @@ router.delete('/images/:filename', async (req, res) => {
 
     const asset = await prisma.storedAsset.findUnique({ where: { id: filename } })
     if (asset) {
-      if (!(await canManageAsset(req, asset.ownerId))) return error(res, '无权限删除此图片', -1, 403)
-      const deleted = await prisma.storedAsset.updateMany({
-        where: {
-          id: asset.id,
-          references: { none: {} },
+      const deleted = await softDeleteStoredAsset({
+        assetId: asset.id,
+        authorize: async (current, tx) => {
+          if (!current.ownerId) return false
+          if (current.ownerId === req.user?.userId) return true
+          return req.user?.role === UserRole.ADMIN && (await legacyAssetOwnerIds([current.ownerId], tx)).has(current.ownerId)
         },
-        data: { deletedAt: new Date() },
       })
-      if (deleted.count !== 1) {
-        return error(res, '文件仍被课程内容引用，请先移除引用', -1, 409)
-      }
-      if (asset.provider === 'local') {
-        await fs.promises.rm(getLocalAssetPath(asset.objectKey), { force: true }).catch(() => undefined)
-      }
+      if (deleted === 'forbidden') return error(res, '无权限删除此图片', -1, 403)
+      if (deleted === 'missing') return error(res, '图片不存在', -1, 404)
+      if (deleted === 'referenced') return error(res, '文件仍被内容或测评引用，请先移除引用', -1, 409)
       return success(res, null, '删除成功')
     }
 

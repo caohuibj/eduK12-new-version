@@ -144,3 +144,22 @@ describe('Survey Research Builder editing widgets',()=>{
     expect(screen.queryByText('真实 FINAL')).toBeNull()
   })
 })
+
+it('C05 shared structured constraints preserve Survey V2 total zero and row choice bounds', () => {
+  function StructuredHost() {
+    const [value, setValue] = useState<FormDraft>({ schemaVersion: 2, pages: [{ pageKey: 'p', title: '结构化', questions: [
+      { itemKey: 'sum', type: 'CONSTANT_SUM', prompt: '总和', required: true, options: [{ optionKey: 'a', label: '甲' }, { optionKey: 'b', label: '乙' }], rows: [], total: 100 },
+      { itemKey: 'matrix', type: 'MATRIX_MULTIPLE', prompt: '矩阵', required: true, options: [{ optionKey: 'a', label: '甲' }, { optionKey: 'b', label: '乙' }], rows: [{ rowKey: 'r', label: '行' }], minSelections: 1, maxSelections: 2 },
+    ] }] })
+    return <><ResearchFormEditor value={value} onChange={setValue} /><output data-testid="structured-survey">{JSON.stringify(value)}</output></>
+  }
+  render(<StructuredHost />)
+  fireEvent.change(screen.getByLabelText('指定总和'), { target: { value: '0' } })
+  fireEvent.click(screen.getByLabelText('每项必须为整数'))
+  fireEvent.change(screen.getByLabelText('最多选择（留空不限）'), { target: { value: '1' } })
+  fireEvent.change(screen.getByLabelText('最少选择（留空不限）'), { target: { value: '' } })
+  const questions = JSON.parse(screen.getByTestId('structured-survey').textContent || '{}').pages[0].questions
+  expect(questions[0]).toMatchObject({ itemKey: 'sum', total: 0, integerOnly: true })
+  expect(questions[1]).toMatchObject({ itemKey: 'matrix', maxSelections: 1, rows: [{ rowKey: 'r', label: '行' }] })
+  expect(questions[1]).not.toHaveProperty('minSelections')
+})

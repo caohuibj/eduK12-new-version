@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "qualification": "backend TypeScript emit",
+  "runtimeVersion": "v24.21.0",
+  "nodeExecutable": "/workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/node_modules/node/bin/node",
+  "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+  "command": "flock /workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/.measurement.lock /workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/node_modules/node/bin/node node_modules/typescript/bin/tsc",
+  "cwd": "server-version/backend",
+  "log": "c14-types-review-emit-02.log",
+  "observedExitCode": 0,
+  "observedExecutionSession": 11061,
+  "sourceCommit": "bbabf040eeb59a6fc3d018418c3eecf8897995e3",
+  "note": "Exit 0 observed from command completion; empty compiler output alone is not the assertion. Existing generator/check prerequisites have unchanged inputs and prior passing logs."
+}

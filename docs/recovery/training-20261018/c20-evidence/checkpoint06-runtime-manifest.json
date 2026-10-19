@@ -1,0 +1,59 @@
+{
+  "head": "567622ecca1ab18c76d9590996f165f4ff1a5fcb",
+  "qualification": "Partial functionality; consumer-cost FAILED 40/61/121 SQL; cost/guards/restore not executed; no C20 overall GO",
+  "members": {
+    "state05/c20-branches-result.json": {
+      "size": 24086,
+      "sha256": "4f491e06f6054582f090a22739879548bcb322ddfe347c291a3d11230fd70ddf",
+      "gzipSize": 3369,
+      "gzipSha256": "2a5728e6ae947910e4c87556f383c2d8ee41ad16287ee537a1aa0afd17f81d65"
+    },
+    "state05/c20-consumer-cost-result.json": {
+      "size": 242989,
+      "sha256": "1b3418fe18b511285d12f47926d1d4af896f9d10ddb2b1c66984f96795cb3136",
+      "gzipSize": 20490,
+      "gzipSha256": "f86637c212bf21f0385a6c44caf4d38dfa53f21f4697d975cd533cd74fa59c0b"
+    },
+    "state05/c20-consumers-result.json": {
+      "size": 47202,
+      "sha256": "93b8d5e47cda2d20e14a61edd3137fd4691b1093fb4c4d58d3d34379223f0543",
+      "gzipSize": 5932,
+      "gzipSha256": "135de73f76b613f69dbb66630259c79f03113c5224baf8ff4de53026a92c4671"
+    },
+    "state05/c20-race-result.json": {
+      "size": 28878,
+      "sha256": "00112b2bf291a6010aacec86cfb8bd306f319ed0f7e02db402d1375bd77edb8e",
+      "gzipSize": 3771,
+      "gzipSha256": "f34932203f61ff796153a496f8f6ea3edffafa0ec2617e39e09add6e26a930c1"
+    },
+    "state05/c20-revocation-result.json": {
+      "size": 23222,
+      "sha256": "e95406c822ef01db6e67b7b2424c0f38d4f4de08625eb8c0da9e58de3b92e34c",
+      "gzipSize": 3068,
+      "gzipSha256": "2dd61de2e0e25990ba2d6e67e9d49471c1f161227470d0db2f41ba992221e197"
+    },
+    "state05/c20-rollback-result.json": {
+      "size": 9772,
+      "sha256": "3735f7b73c44a0f30c6a53e37a655e63fc6063c3de1baf8d960378c10cbbfb99",
+      "gzipSize": 1050,
+      "gzipSha256": "8c0c447516e6c1b2dfeb454c73fd5fd744434f5fd4dcb029ee70ef147827ad28"
+    },
+    "state05/c20-runtime-result.json": {
+      "size": 281599,
+      "sha256": "f70ad54240610032c3decd2b52354e56116ac82e0cbdf9f2d275df23943da81b",
+      "gzipSize": 30928,
+      "gzipSha256": "02f846649bf890ef6116a3fa5f401e5e4fe95cd87245a70b9746049b7fa56b02"
+    },
+    "state05/frozen-inputs.json": {
+      "size": 359042,
+      "sha256": "eb2f89e2889b595e48e51bcc2d674a8e7240ee90096d8b08300d520ac6e89e33",
+      "gzipSize": 86791,
+      "gzipSha256": "8dff784fc16b568245e7722cf5b836ec8e6bd48c16705bb9d36efe443d8fedf4"
+    }
+  },
+  "archive": {
+    "name": "checkpoint06-runtime-partial.tar.gz",
+    "size": 153657,
+    "sha256": "eab9174a0f403864af04ff1d12cdcea05339412fd22ec8f35268cd6a5c5c2500"
+  }
+}

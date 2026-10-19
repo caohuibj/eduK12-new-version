@@ -243,3 +243,25 @@ describe('updateComposite course change with cognitive items', () => {
     expect(mockPrisma.compositeAssessment.update).toHaveBeenCalled()
   })
 })
+
+describe('C04 direct composite typed authoring', () => {
+  it('generates the database UUID and matching stable key in one insert for an optional typed field', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(draftComposite())
+    await addItem('teacher-a', TEACHER, 'composite-1', {
+      type: 'FORM', formType: 'number', formLabel: '数值', required: false,
+      formDefinition: { type: 'NUMBER', prompt: '数值', required: false, options: [], rows: [], min: -10, max: 10 },
+    })
+    const data = mockPrisma.compositeAssessmentItem.create.mock.calls[0][0].data
+    expect(data.id).toMatch(/^[0-9a-f-]{36}$/)
+    expect(data.formDefinition.itemKey).toBe('q_' + data.id)
+    expect(data.required).toBe(false)
+    expect(data.formDefinition.min).toBe(-10)
+    expect(mockPrisma.compositeAssessmentItem.create).toHaveBeenCalledTimes(1)
+  })
+  it('does not relax legacy composite optional authoring as a side effect', async () => {
+    await expect(addItem('teacher-a', TEACHER, 'composite-1', {
+      type: 'FORM', formType: 'text_input', formLabel: '旧题', required: false,
+    })).rejects.toMatchObject({ statusCode: 400 })
+    expect(mockPrisma.compositeAssessmentItem.create).not.toHaveBeenCalled()
+  })
+})

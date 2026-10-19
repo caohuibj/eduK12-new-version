@@ -1,0 +1,17 @@
+measurement_lock=/workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/.measurement.lock
+started_at=2026-10-18T12:04:26Z
+node_executable=/workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/node_modules/node/bin/node
+v24.21.0
+cwd=/workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/backend
+command=/workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/__tests__/composite/training-variant-report-batch.test.ts src/__tests__/composite/training-variant-export.test.ts src/__tests__/assessment-runtime/compact-assessment-storage.test.ts -t bounded report source batches|variant report page canonical batches|full preview|report manifests
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/backend
+
+
+ Test Files  3 passed (3)
+      Tests  15 passed | 52 skipped (67)
+   Start at  21:04:26
+   Duration  3.18s (transform 4.69s, setup 0ms, import 5.02s, tests 2.35s, environment 0ms)
+
+exit_code=0
+finished_at=2026-10-18T12:04:29Z

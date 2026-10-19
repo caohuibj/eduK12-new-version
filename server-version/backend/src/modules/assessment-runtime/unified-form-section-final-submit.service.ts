@@ -1,3 +1,4 @@
+import { assertTrainingSectionSelected, loadTrainingChildParent, assertTrainingFormFinalPrincipal, lockTrainingFlowFinalAdmission } from '../composite/training-variant-child-scope'
 import { createHash } from 'node:crypto'
 import type { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -26,7 +27,8 @@ import {
   type CompositeSection,
 } from '../composite/final-submit.service'
 import { encryptUnifiedRuntimePayload } from './security'
-import { createFormSectionCollectionFacts } from './form-facts'
+import { createFormSectionCollectionFacts, createTypedFormSectionCollectionFacts, createPolicyFormSectionCollectionFacts, typedFormValueSchema } from './form-facts'
+import type { TypedFormValue } from './typed-form'
 import { insertCompletedUnitSnapshot } from './persistence'
 import { formSectionSlotKey } from './slot-set'
 import { canonicalJsonBytes } from './canonical'
@@ -52,8 +54,13 @@ type NormalizedSectionEntry = {
     required: boolean
     options?: unknown
     formOptions?: unknown
+    formDefinition?: unknown
+    formPolicy?: unknown
   }
-  normalizedValue: string | string[] | null
+  state?: import("./form-policy").FormFactState
+  rowStates?: Record<string,import("./form-policy").FormFactState>
+  otherText?: string
+  normalizedValue: TypedFormValue
   storedValue: string | null
   status?: string
   completed?: boolean
@@ -86,14 +93,13 @@ const contextForEntries = (entries: NormalizedSectionEntry[], input: {
   return contextForNormalizedFormEntries(entries, items)
 }
 
-const formFactsFor = (sectionKey: string, entries: NormalizedSectionEntry[]) => createFormSectionCollectionFacts({
-  sectionKey,
-  items: entries.map((entry) => ({
-    key: entry.item.id,
-    label: entry.item.label ?? entry.item.formLabel ?? entry.item.id,
-    value: entry.normalizedValue,
-  })),
-})
+export const formFactsFor = (sectionKey: string, entries: NormalizedSectionEntry[]) => {
+  const input = { sectionKey, items: entries.map(entry => ({ key: entry.item.id, label: entry.item.label ?? entry.item.formLabel ?? entry.item.id, value: entry.normalizedValue })) }
+  if (entries.some(entry => entry.item.formPolicy != null)) return createPolicyFormSectionCollectionFacts({sectionKey,items:input.items.map((item,i)=>({...item,value:typedFormValueSchema.parse(item.value),state:entries[i].state ?? (item.value===null?"SHOWN_MISSING":"ANSWERED"), ...(entries[i].rowStates?{rowStates:entries[i].rowStates}:{}), ...(entries[i].otherText!==undefined?{otherText:entries[i].otherText}:{})}))})
+  if (entries.some(entry => entry.item.formDefinition != null)) return createTypedFormSectionCollectionFacts(input)
+  // Legacy normalization admits only this unchanged V1 value domain.
+  return createFormSectionCollectionFacts(input as Parameters<typeof createFormSectionCollectionFacts>[0])
+}
 
 const questionnaireContextItems = (section: SectionRow) => section.items.map((item) => ({
   id: item.id,
@@ -288,11 +294,16 @@ export const submitUnifiedQuestionnaireFormSectionFinal = async (
 export const submitUnifiedCompositeFormSectionFinal = async (
   input: CompositeSectionSubmitInput,
   _parent?: unknown,
+  selectedParent?: unknown,
 ) => {
   const submissionId = validateSubmissionId(input.submissionId)
-  const child = await ensureCompositeSectionAttempt(input.attemptId, input.sectionId, input.attemptEpoch)
+  const principalParent = await loadTrainingChildParent(input.attemptId, selectedParent)
+  assertTrainingFormFinalPrincipal(principalParent, input)
+  const parent = await assertTrainingSectionSelected(input.attemptId, input.sectionId, { parent: principalParent })
+  const child = await ensureCompositeSectionAttempt(input.attemptId, input.sectionId, input.attemptEpoch, parent)
   const admission = await measureRequestPhase('final_submit_admission', () => activateStoredOrCatalogCompositeFormAdmission({
     parentId: input.attemptId,
+    parent,
     sectionId: input.sectionId,
     child,
   }))
@@ -321,6 +332,9 @@ export const submitUnifiedCompositeFormSectionFinal = async (
   void _parent
 
   const committed = await measureRequestPhase('final_submit_db_query', () => withCompositeFormUnitTransaction(async (tx) => {
+    const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, {
+      attemptId: input.attemptId, parent, attemptEpoch: input.attemptEpoch, sectionId: input.sectionId, sourceAttemptId: child.id, submissionId,
+    })
     const currentSection = await tx.compositeFormSectionAttempt.findUnique({
       where: { id: child.id },
       select: {
@@ -339,9 +353,11 @@ export const submitUnifiedCompositeFormSectionFinal = async (
     }
     const replay = assertSubmissionReplay(currentSection, submissionId, payloadHash)
     if (replay === 'replay' && currentSection.status === 'COMPLETED') {
+      assertFlowFinal(true)
       return { replayed: true, sectionAttemptId: currentSection.id, contextSnapshotHash: admission.contextSnapshotHash }
     }
     if (currentSection.status !== 'IN_PROGRESS') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '表单区段已结束，请重试', 409)
+    assertFlowFinal(false)
     await persistCompositeFormSection(tx, input.attemptId, currentSection.id, normalized.normalized.map((entry: any) => ({ itemId: entry.item.id, value: entry.storedValue })))
     let contextSnapshotHash = admission.contextSnapshotHash
     if (context) {
@@ -375,7 +391,7 @@ export const submitUnifiedCompositeFormSectionFinal = async (
           },
         },
       },
-      data: { status: 'COMPLETED', submissionId, submissionPayloadHash: payloadHash, submittedAt: completedAt },
+      data: { status: 'COMPLETED', submissionId, submissionPayloadHash: payloadHash, submittedAt: completedAt, ...(normalized.taskSatisfaction ? {taskSatisfaction:normalized.taskSatisfaction}: {}) },
     } as any)
     if (updated.count !== 1) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评状态已变化，请重试', 409)
     await insertCompletedUnitSnapshot(tx, {

@@ -1,0 +1,86 @@
+{
+  "node": "24.21.0",
+  "measurementLock": "Shared measurement lock held for both affected test runs",
+  "baselineCheckpoint": "b53284b525080386cc38a0067c1ba152e51cdf7c",
+  "runtimeSourceFrozenAt": "2026-10-18T11:59:58Z",
+  "tests": [
+    {
+      "log": "c14-child-null-path-01.log",
+      "files": 6,
+      "passed": 80,
+      "failed": 0,
+      "scope": [
+        "child selection security (30 cases at this run)",
+        "context freeze",
+        "Cognitive trial/completion row lock",
+        "Scale FINAL conflict",
+        "SJT admission"
+      ]
+    },
+    {
+      "log": "c14-child-null-path-02.log",
+      "files": 1,
+      "passed": 31,
+      "failed": 0,
+      "reason": "Only changed security test rerun after adding configured-definition/null-allocation fail-closed case and JSON diagnostic output"
+    }
+  ],
+  "diagnostic": {
+    "sample": "two groups, four tools, null variant metadata",
+    "node": "v24.21.0",
+    "previousAdditionalPrismaParentCallsPerGuard": 1,
+    "currentAdditionalPrismaParentCallsPerGuard": 0,
+    "previousFullParentResultJsonBytes": 5287,
+    "currentAdditionalParentResultJsonBytes": 0,
+    "markerJsonBytesAddedToExistingOwnerRead": 204,
+    "scope": "Synthetic service-call/read-shape diagnostic only; not SQL wire bytes, physical SQL counts, or C26 capacity evidence"
+  },
+  "behavior": [
+    "Existing owner/attempt reads project explicit variant metadata. Null legacy metadata avoids all extra parent and union fetches in the guard.",
+    "Configured narrow metadata expands the full graph once, with shared scope reuse through child and section checks.",
+    "Incomplete metadata is loaded narrowly; null allocation on a configured definition cannot masquerade as legacy.",
+    "Legacy Form FINAL routing and context freezing retain narrow/original graph projections.",
+    "Cognitive trial/completion row lock carries variant metadata in the same SQL statement."
+  ],
+  "limitations": [
+    "Prisma parent-call counts and JSON result bytes are synthetic service-level diagnostics, not physical SQL or database-wire measurements, nor C26 performance evidence.",
+    "Integrated TypeScript emit and HTTP qualification are parent-owned.",
+    "Earlier session.service baseline failures remain documented in result.json; this followup did not rerun that unchanged failing baseline suite."
+  ],
+  "logs": [
+    {
+      "path": "docs/recovery/training-20261018/c14-evidence/child-security/c14-child-null-path-01.log",
+      "sha256": "1879cb46adb01bb7261a0e9d9a421cddfef37bf972c9b918bb3af875578e6028"
+    },
+    {
+      "path": "docs/recovery/training-20261018/c14-evidence/child-security/c14-child-null-path-02.log",
+      "sha256": "cb36da684938629b7da110a2250e6c6eca3fd9839b2193d1586de12c7189c0fc"
+    },
+    {
+      "path": "docs/recovery/training-20261018/c14-evidence/child-security/c14-child-null-read-diagnostic.json",
+      "sha256": "1f73ed27bc1b8aa006058259bb1f7d3b835915f8ee3c97e49b30854d44fdf4e0"
+    }
+  ],
+  "ownedSources": {
+    "server-version/backend/src/__tests__/composite/training-variant-child-scope.test.ts": "e1b1ad31ef779f9291ea8420c501a666b3286e8e7c9d92a66ab126d0dbe19ce0",
+    "server-version/backend/src/controllers/scaleController.ts": "72360d69dd0df091c45d40f3a1d42da3cbcf171de2b27a26908cb077fc555186",
+    "server-version/backend/src/modules/assessment-runtime/form-admission.service.ts": "bbe2790e55022ace4bfe8709942434d34de463e63b8306b8dda461bcc8e53e44",
+    "server-version/backend/src/modules/assessment-runtime/unified-form-section-final-submit.service.ts": "751ebe2915bfd1a0387338598b20109d5751ae50ce4df830f5aab568e1ad0ca0",
+    "server-version/backend/src/modules/cognitive/cognitive-admission.service.ts": "ad56331b1ca4525e088a3afc6959f4537f4e05200800d21f2d114c54d79cda6b",
+    "server-version/backend/src/modules/cognitive/cognitive-image.service.ts": "e9d788beadd41e7814a5e0e5289c9843a6542ef8dc22ff50d1ea2e7cbdc7696a",
+    "server-version/backend/src/modules/cognitive/cognitive-video.service.ts": "064989769c0db34d5dc136f512b488f4f49cf5a57dad06eca0ab617c8f93366b",
+    "server-version/backend/src/modules/cognitive/completion.service.ts": "4fb1bb3dac20f1af42f4268bba7184d258ce3887c6f322860b274028e80d7078",
+    "server-version/backend/src/modules/cognitive/final-submit.service.ts": "99d5144e583ce10f738aecc3278424e3664ac79b244a5cc62397252ab605e453",
+    "server-version/backend/src/modules/cognitive/session-lock.ts": "5bfe7736d1a7f2dbc24bd62ba6e6b6398f363251715ffb10044535d59ffd10f5",
+    "server-version/backend/src/modules/cognitive/session.service.ts": "c05a61d08b180821645fe3391484ec18210e72a286e455035bccddccb00529bd",
+    "server-version/backend/src/modules/cognitive/trial.service.ts": "7f1a09bc5642b8e5ad5a3d0cefabe4690ec3f92ce7bbf5993f6bf6c9035e49df",
+    "server-version/backend/src/modules/composite/composite-image.controller.ts": "867e20ea68f28b808c223c8bf7263de49d7dcf6ee19bf6dc36f61cd9d86fa7b2",
+    "server-version/backend/src/modules/composite/composite-video.controller.ts": "3cbdfde08236277f452c6f9c2844d84be799d7349f4ef0fcbe3cfc565c35c958",
+    "server-version/backend/src/modules/composite/final-submit.service.ts": "e9c1552e2965bee7e310d74af4da08a4ef5729f216236ee4339c889b47c3db59",
+    "server-version/backend/src/modules/composite/training-variant-child-scope.ts": "e24242ce37c6e73a9f047a5869c7196020d04434a524192d6b0e04e58b75764a",
+    "server-version/backend/src/modules/scale/scale-admission.service.ts": "c3f710e220132f5b1546b8f3865f9cba4fc2a7fbf76cfe7a9bf971eb6dbdca41",
+    "server-version/backend/src/modules/scale/scale-final-submit.service.ts": "86278dca683c8c45ac3a8f0db488aa5b5d842fa7ffa1791b52c8d1adee310476",
+    "server-version/backend/src/modules/situational/situational-runtime.service.ts": "3b4d85104b4db0f435e63752211bb13aabe1f1bfbd4090df53060fe5cbf97dc6",
+    "server-version/backend/src/services/assessmentContextService.ts": "18b1a0e89330337fff89ae668e3934edd12a2eb0b219da703c699a1da7b9d197"
+  }
+}

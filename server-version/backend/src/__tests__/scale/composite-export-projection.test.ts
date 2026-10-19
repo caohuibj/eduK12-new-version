@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { DISCLOSURE_PRESETS } from '../../modules/scale/policy/disclosure'
 import {
   bindCompositeExportFileName,
+  buildCompositeExportProjectionBinding,
   compositeExportFileNameMatchesProjection,
   projectCompositeExportData,
   type CompositeExportProjectionBindingV1,
@@ -95,4 +96,28 @@ describe('Composite wide Scale export projection', () => {
     expect(compositeExportFileNameMatchesProjection(legacy, current)).toBe(false)
     expect(compositeExportFileNameMatchesProjection(bound, binding(DISCLOSURE_PRESETS.FULL_REPORT(), 'b'.repeat(64)))).toBe(false)
   })
+})
+
+
+describe('Composite SJT summary projection fingerprint', () => {
+  it('invalidates legacy artifacts and binds slot position without expanding raw access', () => {
+    const legacy = buildCompositeExportProjectionBinding({ resourceId: data.assessmentId, items: [] })
+    const current = buildCompositeExportProjectionBinding({ resourceId: data.assessmentId, items: [{ id: 'sjt', type: 'SITUATIONAL' }] })
+    const moved = buildCompositeExportProjectionBinding({ resourceId: data.assessmentId, items: [{ id: 'form', type: 'FORM' }, { id: 'sjt', type: 'SITUATIONAL' }] })
+    expect(current.fingerprint).not.toBe(legacy.fingerprint)
+    expect(current.fingerprint).not.toBe(moved.fingerprint)
+    const file = bindCompositeExportFileName('composite_12345678_full_2026-09-21T03-00-00_00000000-0000-0000-0000-000000000000.csv', legacy, 'abcdef0')
+    expect(compositeExportFileNameMatchesProjection(file, current)).toBe(false)
+    const sjtData = { ...data, fields: ['J001_result_hash', 'J001_quality_status', 'J001_raw_responses', 'J002_result_hash'].map(name => ({ name, label: name, type: 'string' as const })), rows: [{ J001_result_hash: 'accepted', J001_quality_status: 'limited', J001_raw_responses: 'SECRET', J002_result_hash: 'other' }] }
+    expect(projectCompositeExportData(sjtData, current).rows).toEqual([{ J001_result_hash: 'accepted', J001_quality_status: 'limited' }])
+    expect(projectCompositeExportData(sjtData, legacy).fields).toEqual([])
+  })
+})
+
+it('invalidates a variant artifact if every publication variant marker is cleared',()=>{
+  const variant=buildCompositeExportProjectionBinding({resourceId:'composite-12345678',items:[],trainingVariantFrozen:{schemaVersion:1,configDigest:'a'.repeat(64)},trainingVariantDigest:'a'.repeat(64),publishedAt:new Date('2026-10-18T00:00:00Z')})
+  const cleared=buildCompositeExportProjectionBinding({resourceId:'composite-12345678',items:[],trainingVariantFrozen:null,trainingVariantDigest:null,publishedAt:new Date('2026-10-18T00:00:00Z')})
+  const artifact=bindCompositeExportFileName('composite_12345678_full_2026-10-18T00-00-00_00000000-0000-0000-0000-000000000000.csv',variant,'abcdef0')
+  expect(cleared.fingerprint).not.toBe(variant.fingerprint)
+  expect(compositeExportFileNameMatchesProjection(artifact,cleared)).toBe(false)
 })

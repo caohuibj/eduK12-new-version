@@ -125,6 +125,7 @@ router.delete('/:id/public-tokens/:tokenId', authenticate, requireTeacher, compo
 
 router.get('/:id/export/artifacts/:artifactId/status', authenticate, requireTeacher, assessmentExportHttp('COMPOSITE', true))
 router.get('/:id/export/artifacts/:artifactId', authenticate, requireTeacher, assessmentExportHttp('COMPOSITE', false))
+router.get('/:id/variant-analysis', authenticate, requireTeacher, compositeExportController.variantAnalysis)
 router.get('/:id/export/preview', authenticate, requireTeacher, compositeExportController.preview)
 router.post('/:id/export', authenticate, requireTeacher, compositeExportController.export)
 router.get('/:id/export/files/:fileName', authenticate, requireTeacher, compositeExportController.download)

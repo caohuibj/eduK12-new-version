@@ -153,6 +153,7 @@ describe('CompositeReportPage cognitive module', () => {
             scaleId: 'scale-a',
             scaleCode: 'S-A',
             scaleName: '量表 A',
+            trainingTiming: {scope:'TRAINING_COURSE',status:'MISSING',unit:'ms',items:{}},
             dimensionScores: [{ dimensionId: 'd-a', dimensionCode: 'A', dimensionName: '维度 A', rawScore: 0, normalizedScore: 0, level: 'low', itemCount: 1, minScore: 0, maxScore: 10 }],
             feedback: { overall: '', dimensions: [{ dimensionId: 'd-a', dimensionCode: 'A', dimensionName: '维度 A', score: 0, minScore: 0, maxScore: 10, level: 'low', interpretation: '', suggestions: [] }] },
             caveats: ['量表测试注意事项'],
@@ -202,7 +203,9 @@ describe('CompositeReportPage cognitive module', () => {
     expect(screen.getByText('量表测试注意事项')).toBeTruthy()
     expect(screen.queryByText(/averageScore|overallScore|整体评估|聚合测评报告/)).toBeNull()
 
+    expect(screen.queryByText('浏览器有效作答计时')).toBeNull()
     participantView.unmount()
+    authState.user = { role: 'TEACHER' }
     const teacherView = render(
       <MemoryRouter initialEntries={['/composite-assessments/c1/attempts/attempt-mixed/report']}>
         <Routes>
@@ -216,6 +219,7 @@ describe('CompositeReportPage cognitive module', () => {
     expect(screen.getByText('认知 B')).toBeTruthy()
     expect(screen.getAllByTestId(/composite-unit-report-/)).toHaveLength(4)
     expect(screen.getByText('表单回答')).toBeTruthy()
+    expect(screen.getByText('浏览器有效作答计时')).toBeTruthy()
     teacherView.unmount()
 
     window.sessionStorage.setItem('composite:recovery:attempt:attempt-mixed', 'recovery-token-for-test')
@@ -459,4 +463,25 @@ describe('asynchronous report feedback', () => {
     page.unmount(); sessionStorage.removeItem('composite:recovery:attempt:conflict')
   })
 
+})
+
+it.each(['student', 'public'])('shows submitted unsatisfied %s reports and all canonical V3 states without score inference', async (surface) => {
+  if (surface === 'public') window.sessionStorage.setItem('composite:recovery:attempt:attempt-1', 'c06-test-recovery')
+  mockCompositeApi.report.mockResolvedValue({ code: 0, data: {
+    id: 'attempt-1', assessmentId: 'q', name: 'V3报告', taskSatisfaction: 'NOT_SATISFIED', taskSatisfied: false,
+    productKind: 'QUESTIONNAIRE', reportMode: 'COLLECTION_ONLY', completedAt: '2026-10-18T00:00:00Z', totalTime: 1000,
+    anonymousCode: surface === 'public' ? 'ANON-1' : null, unitReports: [],
+    backgroundValues: [
+      { itemId: 'a', type: 'FORM', label: '回答', value: '其他', state: 'ANSWERED', otherText: '自定义说明' },
+      { itemId: 'r', type: 'FORM', label: '拒答', value: null, state: 'REFUSED' },
+      { itemId: 'm', type: 'FORM', label: '缺失', value: null, state: 'SHOWN_MISSING' },
+      { itemId: 'h', type: 'FORM', label: '隐藏', value: null, state: 'NOT_SHOWN', rowStates: { row1: 'NOT_SHOWN' } },
+    ],
+  } })
+  render(<MemoryRouter initialEntries={[`/${surface}/composite/attempts/attempt-1/report`]}><Routes><Route path={`/${surface}/composite/attempts/:attemptId/report`} element={<CompositeReportPage />} /></Routes></MemoryRouter>)
+  expect(await screen.findByText('已交卷，任务未达成')).toBeInTheDocument()
+  for (const label of ['已回答', '明确拒答', '已显示未填写', '未显示', '其他说明：自定义说明', 'row1：未显示']) expect(screen.getByText(label)).toBeInTheDocument()
+  expect(screen.queryByText('未作答')).not.toBeInTheDocument()
+  expect(mockCompositeApi.report).toHaveBeenCalledTimes(1)
+  expect(mockCompositeApi.reanalyze).not.toHaveBeenCalled()
 })

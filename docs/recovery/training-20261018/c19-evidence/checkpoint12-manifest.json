@@ -1,0 +1,94 @@
+{
+  "scope": "SJT flow source-list N+1 bounded batch repair. Fifteen initial fixture-construction failures preserved; fixed runtimeIdentity fixture then 15 new and 2 affected legacy SJT tests plus tsc passed. No HTTP analysis or shared-mode qualification.",
+  "members": [
+    {
+      "name": "c19-build11-result.json.gz",
+      "rawSha256": "2fa8072202a04e2ae81d6a8e351d5fcb56f26ea4caf2311c8e4417a8539498e4",
+      "rawBytes": 835,
+      "gzipSha256": "1760f3fb36af594e2a18309c0057b05631be01c036836903e5b3a6e2b06de3c3",
+      "gzipBytes": 484
+    },
+    {
+      "name": "c19-build11-input.json.gz",
+      "rawSha256": "d8bf77266839398f7f0d72265a1cef8ef71fb450613d2ff361d638f31b3e4aa5",
+      "rawBytes": 422581,
+      "gzipSha256": "f716aac08a42bbd87655a80c688f79e46c0c333f29a48858c107173fa9c077b6",
+      "gzipBytes": 127459
+    },
+    {
+      "name": "c19-build11-dist.json.gz",
+      "rawSha256": "eb62e59d6e5b673f0c68d994feadd3000187aa19aac5c2710ecbc28a696c94d7",
+      "rawBytes": 896818,
+      "gzipSha256": "be1a63b232332e87b872b0cc1e37f12f96b8c804b835f47e92f46d3b7a77211e",
+      "gzipBytes": 243838
+    },
+    {
+      "name": "c19-build11-sjt-flow-source-discovery.log.gz",
+      "rawSha256": "5538f27322f0020866137db6529c6ac708bcf32e81381a6c3b286b0cf2007e83",
+      "rawBytes": 13299,
+      "gzipSha256": "7f5b108ef7e227240f4f8f85efa65e4bbe88808078813fe908070e97e2f35ccd",
+      "gzipBytes": 1259
+    },
+    {
+      "name": "c19-build12-result.json.gz",
+      "rawSha256": "d2a722683a5fe4ece5b9e6ac5473a51435e72a468a893bde92ddfb896debeb73",
+      "rawBytes": 1587,
+      "gzipSha256": "166c8f1f8a4b6e9331ab04be2a7ac87147d3601d955dee33aa4fb5d1e974c499",
+      "gzipBytes": 548
+    },
+    {
+      "name": "c19-build12-input.json.gz",
+      "rawSha256": "5eb76251114149fc00dc7c5973d95d66a8fcd1e4e01b0d331dbd801a83fd0360",
+      "rawBytes": 422581,
+      "gzipSha256": "cb8e554ecba861d3d0a86fc81e3a9ae63752b30901f8ecafddc0c787ae039912",
+      "gzipBytes": 127459
+    },
+    {
+      "name": "c19-build12-dist.json.gz",
+      "rawSha256": "a5539b931ebe00c0a56f9ccdab340ef95fb682cfe62dac2846e8b0e98caadcd8",
+      "rawBytes": 896818,
+      "gzipSha256": "4ec1f5f77f2c97da80afaf9b1d7489bd67121928a02c8129d7828b4c956cccb7",
+      "gzipBytes": 243845
+    },
+    {
+      "name": "c19-build12-sjt-flow-source-discovery.log.gz",
+      "rawSha256": "5248c5718db4e08342f2ab304d3a3547c30618f6a31a7a20ede4e921cff545f2",
+      "rawBytes": 260,
+      "gzipSha256": "60dc7fc83e802912b659798000513c53645df012f75fc25a2fe882039f6224cd",
+      "gzipBytes": 213
+    },
+    {
+      "name": "c19-build12-sjt-existing-discovery.log.gz",
+      "rawSha256": "2863015d07050a2c71a1db2e4440359e9c948cb5349d89a0921a0eec83ac0475",
+      "rawBytes": 272,
+      "gzipSha256": "b3b2f0ef2e735e4adc9a1a4c32ab49f901586fa3d7d65fb65ed8fc5092b5e851",
+      "gzipBytes": 223
+    },
+    {
+      "name": "c19-build12-tsc.log.gz",
+      "rawSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytes": 0,
+      "gzipSha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+      "gzipBytes": 20
+    },
+    {
+      "name": "tmp-c19-build11.py.gz",
+      "rawSha256": "bc500ba24cc5740efd841f3ed718d3467e6242c17a2d0e29eda2600fad27c7be",
+      "rawBytes": 2392,
+      "gzipSha256": "9adde6abc4edfaff06c03c48a5312420efe9273b0e442262718499781524c81d",
+      "gzipBytes": 1065
+    },
+    {
+      "name": "tmp-c19-build12.py.gz",
+      "rawSha256": "2adf7182e141fe889d47bc27fc5cc7dfab142d8b7546c6a6a2041627fae05a7b",
+      "rawBytes": 2392,
+      "gzipSha256": "2185c1485fbbf8a3cc2785f21d33289cccd438c7039b1e7de250a1b3adb4c2fd",
+      "gzipBytes": 1066
+    }
+  ],
+  "archive": {
+    "file": "checkpoint12-sjt-discovery-batch.tar.gz",
+    "sha256": "4dd2abd69ce5fe0cbe6212ca0fd95ba70f92a4a46d3e78ccbc2ba55a0f761bc0",
+    "bytes": 748484
+  }
+}
