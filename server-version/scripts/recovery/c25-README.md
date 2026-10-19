@@ -1297,3 +1297,29 @@ Worker prepare/retire in that module uses the registered Node identity and real
 terminal/close/group-quiescence proof. It adds no SQL refresh or backend-socket
 closure condition. This remains a pure window contract until the actual session
 and driver are switched and their affected CLI contracts are reviewed.
+
+
+The following integration batch switches the actual observer child to one new
+cluster reader and series per window. Its original single read-only connection,
+IPC identity/deadlines and private raw journal remain in place. Targeted real
+Node CLI contracts cover two sequential windows with missing RSS and actual
+worker terminal/close/group-quiescence. PG socket disappearance no longer gates
+Node cleanup. The original socket-based implementation remains historical and
+is no longer selected by this child.
+
+Actual activity labels still check isolation: client backends on a foreign
+database or a non-loopback/unobserved client address mark the window
+`CONTAMINATED` and prohibit comparison. Passing these observed label checks
+alone does not prove connection ownership. PG totals include observer and
+background activity; separate observer CPU/SQL cost must not be subtracted to
+claim pure-business PG CPU.
+
+Driver and launcher results now separate `workloadComplete` from
+`metricCoverage`. Completed operation facts survive later measurement failures.
+Successful functional work and safe cleanup do not imply full performance
+qualification. A missing PG metric or contaminated window is retained explicitly
+and cannot be compared as complete performance evidence. Actual product/worker
+and cleanup assertions, fixed 1 parent/4 FINAL/36 reads, shared budgets, external
+owned-process signal protections and full dual-database/material audits remain
+mandatory. This batch contains no new business run, source/carry issuance or
+performance result. A06 and all earlier failures retain their original scope.

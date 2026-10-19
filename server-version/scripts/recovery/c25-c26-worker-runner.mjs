@@ -74,8 +74,8 @@ export async function runObservedWorker({directory,kind,input,node,env,remaining
   await bounded(()=>hooks.register(identity));const booted=await waitStage('BOOTED');await permit(booted,'LOAD')
   const loaded=await waitStage('LOADED');await channel.ready();await bounded(()=>hooks.loaded(identity));receipt.initialProbe=await channel.request();await permit(loaded,'WORK')
   const done=await waitStage('TASK_DONE')
-  await bounded(()=>hooks.prepareClose(identity)) // A real fresh PG+proc query, not cached owners.
-  journal({stage:'FRESH_PREPARE_CLOSE_GRANTED',pid:identity.pid,monotonicNs:process.hrtime.bigint().toString()});await permit(done,'DISCONNECT')
+  await bounded(()=>hooks.prepareClose(identity)) // Exact live Node identity; PG family sampling is independent.
+  journal({stage:'NODE_PREPARE_CLOSE_GRANTED',pid:identity.pid,monotonicNs:process.hrtime.bigint().toString()});await permit(done,'DISCONNECT')
   const cleaned=await waitStage('CLEANED');receipt.finalProbe=await channel.request('close');await permit(cleaned,'FINISH')
   resourceResult=await resources;channel.assertHealthy()
   const proof={pid:identity.pid,startTicks:identity.startTicks,closeObserved:resourceResult.lifecycle.closeObserved,terminalObserved:!!resourceResult.terminal,groupQuiescent:resourceResult.lifecycle.groupQuiescent,terminalCpu:{pid:identity.pid,startTicks:identity.startTicks,...resourceResult.terminal.cpu}}

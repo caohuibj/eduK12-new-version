@@ -173,10 +173,16 @@ for category in categories:
 children=[{'kind':kind,'passed':True,'result':{'passed':True},'resources':{'terminal':{'real':'contract fixture'},'lifecycle':{'closeObserved':True,'groupQuiescent':True,'startAck':True,'terminalAck':True,'code':0,'signal':None}}} for kind in ['report','export']]
 counts={'phase':'A','cold':{'parentAttempts':1,'formFinals':1,'scaleFinals':1,'cognitiveFinals':1,'sjtFinals':1,'reportDrainInvocations':1,'reportJobs':1,'exportEnqueues':1,'exportTasks':1},'serialRequests':24,'concurrentWaves':6,'concurrentRequests':12,'maxConcurrency':2,'extraFinals':0,'automaticRetries':0}
 value={'schemaVersion':1,'phase':'A','passed':True,'automaticB':False,'automaticRetries':0,'workload':{'counts':counts},'readSchedule':{'serialRequests':24,'waves':6,'concurrentRequests':12},'prismaBusiness':{'pending':0,'uncertain':0},'cleanup':[{'passed':True}],'children':children,'windows':windows,'tail':[{'seconds':30},{'seconds':60}]}
+value.update(workloadComplete=True,acceptanceScope='FIXED_WORKLOAD_AND_SAFE_CLEANUP; METRIC_COVERAGE_SEPARATE')
+coverage={'contract':'C26_CLUSTER_TOTALS_V1','performanceQualification':'NOT_IMPLIED_BY_WORKLOAD_COMPLETION','pgConnectionRoles':'NOT_OBSERVED_BY_DESIGN','windows':[],'workers':[{'kind':kind,'initialAndFinalProbeObserved':True,'terminalObserved':True,'exitTail':'NOT_OBSERVED'} for kind in ['report','export']]}
+for i,w in enumerate(windows):
+ pg={'pgCluster':{'status':'NOT_OBSERVED'},'pgReadonlyStats':'OBSERVED','pgConnectionRoles':'NOT_OBSERVED_BY_DESIGN','activityIsolation':{'status':'CONTAMINATED'},'comparisonEligible':False}
+ w.update(sequence=i+1,operationComplete=True,pgSettled={'metricCoverage':pg});coverage['windows'].append({'sequence':i+1,'operationComplete':True,'pg':pg})
+value['metricCoverage']=coverage
 with tempfile.TemporaryDirectory() as tmp:
  file=Path(tmp)/'raw';file.write_text('actual journal bytes');journal={'passed':True,'sha256':sha_file(file),'bytes':file.stat().st_size}
  assert validate_driver(value,journal,file)['serialRequests']==24
- changes=[lambda v:v['windows'][0].update(passed=False),lambda v:v['windows'][0]['operation'].update(requests=2),lambda v:v['children'][0]['resources']['lifecycle'].update(groupQuiescent=False),lambda v:v['prismaBusiness'].update(pending=1),lambda v:v['workload']['counts'].update(extraFinals=1)]
+ changes=[lambda v:v.update(workloadComplete=False),lambda v:v['metricCoverage']['windows'][0]['pg'].update(comparisonEligible=True),lambda v:v['windows'][0].update(operationComplete=False),lambda v:v['windows'][0].update(passed=False),lambda v:v['windows'][0]['operation'].update(requests=2),lambda v:v['children'][0]['resources']['lifecycle'].update(groupQuiescent=False),lambda v:v['prismaBusiness'].update(pending=1),lambda v:v['workload']['counts'].update(extraFinals=1)]
  for change in changes:
   bad=copy.deepcopy(value);change(bad)
   try:validate_driver(bad,journal,file)

@@ -54,6 +54,29 @@ async function run(mode,action=async h=>h.session.close(),options={}){
 }
 async function window(session){await session.begin({maxWindowMs:3000});await session.operationEnd();await delay(1120);return session.settledEnd()}
 
+test('cluster CLI uses fresh per-window readers and keeps RSS gaps separate from actual lifecycle success',{timeout:10000},async()=>{
+ const r=await run('cluster-rss-gap',async h=>{
+  const first=await window(h.session),second=await window(h.session)
+  for(const result of [first,second]){
+   assert.equal(result.before.procSample.sequence,1);assert.equal(result.metricCoverage.pgCluster.status,'INCOMPLETE_SAMPLED_LOWER_BOUND');assert.equal(result.metricCoverage.pgConnectionRoles,'NOT_OBSERVED_BY_DESIGN');assert.equal(result.cluster.metricCoverage.includesObserverBackend,true)
+   assert.ok(result.cluster.processes.some(p=>p.firstObservation.rssBytes===null));assert.equal(result.observerCost.observerProcessIdentity,`${h.session.identity.pid}:${h.session.identity.startTicks}`)
+  }
+  return h.session.close()
+ })
+ assert.ifError(r.error);assert.equal(r.faults.length,0);assert.equal(r.receipt.passed,true);assert.equal(r.receipt.windows,2);assert.equal(r.receipt.closeObserved,true);assert.equal(r.receipt.groupQuiescent,true);assert.equal(r.fixtureEvents.filter(e=>e.stage==='CLIENT_ENDED').length,1)
+ const raw=rows(path.join(r.directory,'observer-child-raw-private.jsonl'));assert.ok(raw.some(e=>e.scope==='CONTROLLED_POSTMASTER_AND_DIRECT_CHILDREN_INCLUDES_OBSERVER_BACKEND'));assert.equal(raw.some(e=>e.kind==='proc_socket_snapshot'),false)
+})
+
+test('cluster CLI accepts only real Node terminal close and quiet proof without PG socket refresh',{timeout:10000},async()=>{
+ const r=await run('cluster-node-retirement',async h=>{
+  await h.session.begin({maxWindowMs:4000});const own=await h.add('report_worker');await h.session.register(own.identity);h.connectOwner(own)
+  const prepared=await h.session.prepareClose(own.identity);assert.equal(prepared.prepared,true);assert.match(prepared.scope,/NODE_LIFECYCLE_ONLY/)
+  const proof=await own.close(),retired=await h.session.retire(proof);assert.equal(retired.terminalCpu.user,proof.terminalCpu.user);assert.equal(retired.status,'CLOSED_VERIFIED_BY_NODE_TERMINAL_CLOSE_GROUP_QUIESCENCE');assert.equal(h.registry.entries().some(p=>p.pid===own.identity.pid),false)
+  await h.session.operationEnd();await delay(1120);const result=await h.session.settledEnd();assert.equal(result.retirements.length,1);return h.session.close()
+ })
+ assert.ifError(r.error);assert.equal(r.receipt.passed,true);assert.equal(r.receipt.closeObserved,true);assert.equal(r.receipt.groupQuiescent,true);assert.equal(r.faults.length,0)
+})
+
 test('gated separate process reuses one readonly connection across sequential real-clock windows',{timeout:10000},async()=>{
  const r=await run('success',async h=>{const a=await window(h.session),b=await window(h.session);assert.equal(a.observerCost.observerProcessIdentity,`${h.session.identity.pid}:${h.session.identity.startTicks}`);assert.equal(b.observerCost.observerProcessIdentity,a.observerCost.observerProcessIdentity);assert.ok(a.observerCost.cpuMicroseconds.user+a.observerCost.cpuMicroseconds.system>0);return h.session.close()})
  assert.ifError(r.error);assert.equal(r.receipt.passed,true);assert.equal(r.receipt.windows,2);assert.equal(r.fixtureEvents.filter(e=>e.stage==='CLIENT_CONSTRUCTED').length,1);assert.equal(r.fixtureEvents.filter(e=>e.stage==='CLIENT_CONNECTED').length,1);assert.equal(r.fixtureEvents.filter(e=>e.stage==='CLIENT_ENDED').length,1);assert.equal(r.faults.length,0)

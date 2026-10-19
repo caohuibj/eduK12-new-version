@@ -38,6 +38,10 @@ export function measuredWorkerHooks(session,remaining){
  return {register:identity=>session.register(identity),loaded:async()=>{session.assertHealthy();remaining()},prepareClose:identity=>session.prepareClose(identity),retire:proof=>session.retire(proof)}
 }
 
+export function classifyMetricCoverage(windows,children){
+ return {contract:'C26_CLUSTER_TOTALS_V1',performanceQualification:'NOT_IMPLIED_BY_WORKLOAD_COMPLETION',pgConnectionRoles:'NOT_OBSERVED_BY_DESIGN',cpuExitTail:'NOT_OBSERVED_AFTER_FINAL_NODE_PROBE',observerCosts:'REPORTED_SEPARATELY_NEVER_SUBTRACTED',windows:windows.map(window=>({sequence:window.sequence,operationComplete:window.operationComplete===true,apiCallbackCpuHeap:window.before?.api&&window.after?.api?'OBSERVED_PROCESS_WINDOW':'NOT_OBSERVED_FOR_BOTH_BOUNDARIES',pg:window.pgSettled?.metricCoverage??{pgCluster:{status:'NOT_OBSERVED'},pgReadonlyStats:'INCOMPLETE_WINDOW',pgConnectionRoles:'NOT_OBSERVED_BY_DESIGN',comparisonEligible:false}})),workers:children.map(child=>({kind:child.kind,initialAndFinalProbeObserved:!!(child.initialProbe&&child.finalProbe),terminalObserved:!!child.resources?.terminal,exitTail:'NOT_OBSERVED'}))}
+}
+
 const gatedClients=new WeakSet()
 /** Installed before the first driver query on the production singleton. All
  * model/raw calls are gated, including reads; $disconnect remains cleanup-only.
@@ -66,7 +70,7 @@ export async function runC26MeasuredA({directory,node,env,baseIdentities,connect
  assert.equal(fs.realpathSync(directory),directory);assert.equal(fs.statSync(directory).mode&0o777,0o700)
  assert.ok(!env.NODE_OPTIONS&&!env.C26_RUNTIME_PROBE_ENABLE);assert.equal(env.NODE_ENV,'test');assert.equal(env.BACKGROUND_WORKERS_ENABLED,'false')
  const initial=remainingMs();assert.ok(initial>60000&&initial<=C26_LIMITS.totalMs)
- const end=clock()+initial,abort=new AbortController(),windows=[],children=[],checks=[],scope={schemaVersion:1,phase:'A',passed:false,windows,children,checks,automaticB:false,automaticRetries:0,apiExitCpu:'NOT_OBSERVED_AFTER_FINAL_PROBE',gaps:'SETUP_AND_VALIDATION_GAPS_HAVE_DRIVER_PROCESS_BOUNDARIES; NO_PER_OPERATION_PG_ATTRIBUTION_OUTSIDE_WINDOWS'}
+ const end=clock()+initial,abort=new AbortController(),windows=[],children=[],checks=[],scope={schemaVersion:1,phase:'A',passed:false,workloadComplete:false,acceptanceScope:'FIXED_WORKLOAD_AND_SAFE_CLEANUP; METRIC_COVERAGE_SEPARATE',windows,children,checks,automaticB:false,automaticRetries:0,apiExitCpu:'NOT_OBSERVED_AFTER_FINAL_PROBE',gaps:'SETUP_AND_VALIDATION_GAPS_HAVE_DRIVER_PROCESS_BOUNDARIES; NO_PER_OPERATION_PG_ATTRIBUTION_OUTSIDE_WINDOWS'}
  let failure=null,session,api,runtime,h,prismaGate,active=null,setup=false,watchdog,resourcesTimer,cleaning=false
  const totalRemain=()=>{const left=Math.min(remainingMs(),end-clock());assert.ok(left>0,'A driver total deadline');return left}
  const workRemain=()=>{if(failure)throw failure;const left=Math.min(workRemainingMs(),totalRemain()-C26_LIMITS.cleanupReserveMs);assert.ok(left>0,'A driver work deadline preserves 60s cleanup');return left}
@@ -98,12 +102,12 @@ export async function runC26MeasuredA({directory,node,env,baseIdentities,connect
  async function measure(operation,perform){
   if(setup){assert.equal(operation.phase,'setup','only setup HTTP may share setup window');safeRecord({stage:'SETUP_HTTP_WITHIN_WINDOW',operation});return perform()}
   assert.equal(active,null,'measurement windows cannot overlap');remain();assert.ok(windows.length<100,'fixed measurement cap')
-  active=operation;const operationEnd=clock()+Math.min(90000,remain());const entry={sequence:windows.length+1,operation:structuredClone(operation),passed:false,issuedMonotonicNs:process.hrtime.bigint().toString()};windows.push(entry)
+  active=operation;const operationEnd=clock()+Math.min(90000,remain());const entry={sequence:windows.length+1,operation:structuredClone(operation),passed:false,operationComplete:false,issuedMonotonicNs:process.hrtime.bigint().toString()};windows.push(entry)
   try{
    return await bounded(async()=>{
     entry.pgBefore=await session.begin({maxWindowMs:budget()});entry.before=await snapshot()
     const started=clock();entry.operationStartedMonotonicNs=process.hrtime.bigint().toString()
-    const value=await perform();entry.operationElapsedMs=clock()-started;entry.operationEndedMonotonicNs=process.hrtime.bigint().toString()
+    const value=await perform();entry.operationElapsedMs=clock()-started;entry.operationEndedMonotonicNs=process.hrtime.bigint().toString();entry.operationComplete=true
     entry.after=await snapshot();entry.pgOperationEnd=await session.operationEnd();await wait(C26_LIMITS.pgSettleMs);entry.pgSettled=await session.settledEnd()
     if(entry.before.api&&entry.after.api)entry.apiDelta=probeDelta(entry.before.api,entry.after.api)
     entry.passed=true;return value
@@ -141,7 +145,7 @@ export async function runC26MeasuredA({directory,node,env,baseIdentities,connect
   scope.tail=[]
   await measure({id:'tail-no-work',phase:'tail',requests:0},async()=>{for(const seconds of [30,60]){await wait(30000);scope.tail.push({seconds,at:await snapshot()})}})
   assert.equal(children.length,2);assert.deepEqual(children.map(c=>c.kind),['report','export']);assert.ok(windows.every(w=>w.passed))
-  scope.driverEndBeforeCleanup=ownSample();remain()
+  scope.driverEndBeforeCleanup=ownSample();remain();scope.workloadComplete=true
  }catch(error){stop(error);scope.error={name:error.name,stack:String(error.stack??error)}}
  finally{
   cleaning=true;clearInterval(resourcesTimer);clearTimeout(watchdog);scope.cleanup=[]
@@ -155,7 +159,7 @@ export async function runC26MeasuredA({directory,node,env,baseIdentities,connect
   if(runtime){await clean('driver-queues',()=>runtime.closeQueues());await clean('driver-prisma',()=>runtime.prisma.$disconnect())}
   scope.driverAfterCleanup=ownSample();scope.prismaBusiness=prismaGate?.snapshot()??null;resources();if(!failure){try{remain();assert.ok(scope.cleanup.every(x=>x.passed));assert.equal(scope.prismaBusiness?.pending,0);scope.passed=true}catch(error){failure=error}}
   if(failure){scope.passed=false;scope.error??={name:failure.name,stack:String(failure.stack??failure)}}
-  scope.http=h?.result.requests??[]
+  scope.http=h?.result.requests??[];scope.metricCoverage=classifyMetricCoverage(windows,children)
   try{write('c25-c26-a-driver-result-private.json',scope);if(scope.passed)remain()}catch(error){failure??=error;scope.passed=false;scope.error??={name:error.name,stack:String(error.stack??error)};try{write('c25-c26-a-driver-result-private.json',scope)}catch{}}
  }
  if(failure)throw failure

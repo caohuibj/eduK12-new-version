@@ -435,8 +435,27 @@ def reclaim_owned(owned,root,children,end,include_postgres=False,clock=time.mono
  report['passed']=not report['errors'] and all(value is not None for value in report['popenExits'].values()) and report['members'] is not None and not any(r['state'] not in ['Z','X','x'] for r in report['members']) and clock()<end
  return report
 
+def validate_metric_coverage(value):
+ assert value['workloadComplete'] is True
+ assert value['acceptanceScope']=='FIXED_WORKLOAD_AND_SAFE_CLEANUP; METRIC_COVERAGE_SEPARATE'
+ coverage=value['metricCoverage'];assert coverage['contract']=='C26_CLUSTER_TOTALS_V1'
+ assert coverage['performanceQualification']=='NOT_IMPLIED_BY_WORKLOAD_COMPLETION' and coverage['pgConnectionRoles']=='NOT_OBSERVED_BY_DESIGN'
+ assert len(coverage['windows'])==len(value['windows'])
+ for actual,summary in zip(value['windows'],coverage['windows']):
+  assert actual['operationComplete'] is True and summary['operationComplete'] is True and summary['sequence']==actual['sequence']
+  assert summary['pg']==actual['pgSettled']['metricCoverage']
+  pg=summary['pg'];assert pg['pgConnectionRoles']=='NOT_OBSERVED_BY_DESIGN' and pg['pgReadonlyStats']=='OBSERVED'
+  assert pg['pgCluster']['status'] in ['SAMPLED_LOWER_BOUND','INCOMPLETE_SAMPLED_LOWER_BOUND','NOT_OBSERVED']
+  assert isinstance(pg['comparisonEligible'],bool)
+  assert pg['activityIsolation']['status'] in ['OBSERVED_ACTIVITY_LABEL_CHECKS_PASSED','CONTAMINATED']
+  if pg['activityIsolation']['status']=='CONTAMINATED' or pg['pgCluster']['status']=='NOT_OBSERVED':assert pg['comparisonEligible'] is False
+ assert [w['kind'] for w in coverage['workers']]==['report','export']
+ assert all(w['initialAndFinalProbeObserved'] is True and w['terminalObserved'] is True and w['exitTail']=='NOT_OBSERVED' for w in coverage['workers'])
+ return coverage
+
 def validate_driver(value,journal,journal_file):
  assert value['schemaVersion']==1 and value['phase']=='A' and value['passed'] is True and value['automaticB'] is False and value['automaticRetries']==0
+ validate_metric_coverage(value)
  assert journal['passed'] is True and journal['sha256']==sha_file(journal_file) and journal['bytes']==journal_file.stat().st_size
  expected={'phase':'A','cold':{'parentAttempts':1,'formFinals':1,'scaleFinals':1,'cognitiveFinals':1,'sjtFinals':1,'reportDrainInvocations':1,'reportJobs':1,'exportEnqueues':1,'exportTasks':1},'serialRequests':24,'concurrentWaves':6,'concurrentRequests':12,'maxConcurrency':2,'extraFinals':0,'automaticRetries':0}
  assert value['workload']['counts']==expected and value['readSchedule']=={'serialRequests':24,'waves':6,'concurrentRequests':12}
@@ -553,7 +572,7 @@ def main():
   assert STATE.is_dir();archive,archive_sha=archive_library(node);final_input_verification(a,archive,archive_sha);return
  assert not os.path.lexists(STATE);source_contract.destination_path(STATE,protected=[DATA,CORE,REPO,a.tools,a.descriptor.parent,a.recovery_descriptor.parent,SEED.parent])
  lock=(a.tools/'.measurement.lock').open('rb');fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB);entry=resources(True)
- STATE.mkdir(mode=0o700);result={'schemaVersion':1,'scope':'C26_A_ONCE_SYNTHETIC_MEASUREMENT','passed':False,'entryResources':entry,'minimumResources':dict(entry),'deadline':budget.invocation(),'newDatabaseRestoreExecuted':False,'automaticB':False,'processes':[],'audits':{},'finalSnapshotVerified':False,'outerObserverCost':{'samples':0,'threadCpuNs':0,'wallNs':0,'scope':'LAUNCHER_WATCHDOG_RESOURCES_AND_FULL_PROC_DESCENDANT_SCANS; NOT_BUSINESS_CPU'}};status={'state':'preflight','pids':{},'ports':{},'startedAt':time.time()}
+ STATE.mkdir(mode=0o700);result={'schemaVersion':1,'scope':'C26_A_ONCE_SYNTHETIC_MEASUREMENT','workloadComplete':False,'performanceQualification':'NOT_IMPLIED_BY_OVERALL_PASS','passed':False,'entryResources':entry,'minimumResources':dict(entry),'deadline':budget.invocation(),'newDatabaseRestoreExecuted':False,'automaticB':False,'processes':[],'audits':{},'finalSnapshotVerified':False,'outerObserverCost':{'samples':0,'threadCpuNs':0,'wallNs':0,'scope':'LAUNCHER_WATCHDOG_RESOURCES_AND_FULL_PROC_DESCENDANT_SCANS; NOT_BUSINESS_CPU'}};status={'state':'preflight','pids':{},'ports':{},'startedAt':time.time()}
  owned=OwnedGroups(pg/'postgres');root_identity=proc(os.getpid());children=[];logs=[];errors=[];failure=[];done=threading.Event();driver_identity=None;pinned=None;frozen_sha=None;baseline_bindings=None;archive=None;recovery=None;cleaning=False;supervising=False
  def record_status():update_json(STATE/'status.json',status)
  def sample():
@@ -659,7 +678,7 @@ def main():
   guard(budget.driver);assert driver.returncode==0;result['driver']=private_read(STATE/'c25-c26-a-driver-result-private.json');result['driverResultSha256']=sha_file(STATE/'c25-c26-a-driver-result-private.json');result['driverJournal']=private_read(STATE/'c25-c26-driver-journal-result.json')
   result['driverProof']=validate_driver(result['driver'],result['driverJournal'],STATE/'c25-c26-driver-events-private.jsonl');result['driverJournalResultSha256']=sha_file(STATE/'c25-c26-driver-journal-result.json')
   guard(budget.driver)
-  result['driverExecuted']=True
+  result['driverExecuted']=True;result['workloadComplete']=result['driver']['workloadComplete'];result['metricCoverage']=result['driver']['metricCoverage'];result['acceptanceScope']=result['driver']['acceptanceScope']
  except BaseException as error:
   failure.append(error);private_json(STATE/'c25-c26-launcher-error-private.json',{'errorType':type(error).__name__,'traceback':traceback.format_exc()})
  finally:

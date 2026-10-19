@@ -57,12 +57,14 @@ await runPgSessionChild({createIo:({registry,config,self})=>{
   texts.set('/proc/net/tcp',inetHeader+backends.map((p,index)=>` ${index}: 0100007F:${hex(p.port)} 0100007F:${hex(config.port)} 01 00000000:00000000 00:00000000 00000000 1000 0 ${p.inode}\n`).join(''))
   for(const name of ['tcp6','udp','udp6'])texts.set('/proc/net/'+name,inetHeader)
   texts.set('/proc/net/unix',unixHeader)
+  dirs.set('/proc',[...texts.keys()].filter(p=>p.endsWith('/stat')).map(p=>p.split('/')[2]))
   return {texts,links,dirs}
  }
  // Snapshot consistency is real parser/reader behavior: the synthetic tables
  // are rebuilt for each read, so control changes can produce actual races.
  const get=(kind,name)=>{const map=tree()[kind];if(!map.has(name))throw Object.assign(new Error(`fixture proc path absent: ${name}`),{code:'ENOENT'});return map.get(name)}
  const readText=name=>{
+  if(fixture.mode==='cluster-rss-gap'&&/^\/proc\/9[0-9]{6}\/status$/.test(name))throw Object.assign(new Error('synthetic metric RSS absent'),{code:'ESRCH'})
   if(fixture.mode.startsWith('async-fault-')&&!barrierUsed&&name==='/proc/net/unix'&&fs.existsSync(path.join(directory,'fault-arm'))){
    barrierUsed=true;event({stage:'ASYNC_FAULT_BARRIER_ENTERED'});fs.writeFileSync(path.join(directory,'fault-entered'),'entered',{mode:0o600})
    const until=performance.now()+1000

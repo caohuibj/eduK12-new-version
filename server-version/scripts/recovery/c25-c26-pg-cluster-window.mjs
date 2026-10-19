@@ -20,6 +20,7 @@ export function createPgClusterWindow({query,readProc,registry,target,remainingM
  const observer=registry.entries().find(p=>p.role==='observer');assert.ok(observer)
  const series=createPgClusterSeries({maxEvidenceBytes}),snapshots={},retirements=[]
  const cost={issued:0,completed:0,failed:0,queryElapsedMs:0,procSamples:0,pgSamples:0,boundaryCoveredPgTicks:0}
+ const isolationFindings=[]
  let phase='new',failure=null,started,lastNow=-Infinity,cpuBefore,endAt,procTimer,pgTimer,deadlineTimer,pending=null,controller=null,periodicPending=false,boundary=false,prepared=null,previousStats=null,evidenceBytes=0,metricFault=null
  const clock=()=>{const value=now();assert.ok(Number.isFinite(value)&&value>=lastNow,'cluster window clock reversed');lastNow=value;return value}
  const clear=()=>{timers.clearInterval(procTimer);timers.clearInterval(pgTimer);timers.clearTimeout(deadlineTimer)}
@@ -46,6 +47,10 @@ export function createPgClusterWindow({query,readProc,registry,target,remainingM
   assert.ok(Array.isArray(row.activity)&&row.activity.length<=512);assert.equal(new Set(row.activity.map(p=>p.pid)).size,row.activity.length)
   for(const entry of row.activity){exactNumber(entry.pid);assert.ok(entry.pid>0);assert.ok(typeof entry.backend_type==='string'&&entry.backend_type.length>0);assert.ok(typeof entry.backend_start==='string'&&entry.backend_start.length>0)}
   assert.ok(row.activity.some(p=>p.pid===target.observerBackendPid),'observer backend absent from actual activity')
+  for(const entry of row.activity.filter(p=>p.backend_type==='client backend')){
+   const reasons=[];if(entry.datname!==TARGET_DATABASE)reasons.push('FOREIGN_DATABASE_CLIENT');if(!['127.0.0.1','::1'].includes(entry.client_addr))reasons.push('NON_LOOPBACK_OR_UNOBSERVED_CLIENT_ADDRESS')
+   if(reasons.length){assert.ok(isolationFindings.length<2048,'activity isolation evidence bound');isolationFindings.push({elapsedMs:clock()-started,pid:entry.pid,backend_start:entry.backend_start,datname:entry.datname??null,client_addr:entry.client_addr??null,reasons})}
+  }
   if(isBoundary){decimal(row.databaseBytes);assert.ok(Array.isArray(row.relations)&&row.relations.length<=2048);for(const p of row.relations){decimal(p.oid);for(const key of ['heap_bytes','index_bytes','total_bytes'])decimal(p[key])}}
   cost.pgSamples++;const procSample=sample(),value={elapsedMs:clock()-started,...row,procSample,activityScope:'ALL_CLUSTER_ACTIVITY; NO_API_OR_WORKER_CONNECTION_ATTRIBUTION',walScope:'PHYSICAL_CLUSTER_INCLUDES_OBSERVER_AND_BACKGROUND'}
   emit({kind:isBoundary?'pg_cluster_boundary':'pg_cluster_activity',...value});return value
@@ -61,7 +66,8 @@ export function createPgClusterWindow({query,readProc,registry,target,remainingM
   // Full samples already streamed into private raw; reply only bounded summary.
   const summary={scope:all.scope,metricCoverage:all.metricCoverage,sampledCpuDeltaTicksLowerBound:all.sampledCpuDeltaTicksLowerBound,sampledRssSumPeakBytes:all.sampledRssSumPeakBytes,frameCount:all.frames.length,gapFrameCount:all.gaps.length,processes:all.processes.map(({observations,intervals,gaps,...p})=>({...p,observationCount:observations.length,intervalCount:intervals.length,gapCount:gaps.length,firstObservation:observations[0],lastObservation:observations.at(-1)})),observerReadCost:all.observerReadCost,readCostScope:all.readCostScope}
   if(metricFault){summary.metricCoverage={...summary.metricCoverage,status:'NOT_OBSERVED'};summary.sampledCpuDeltaTicksLowerBound=null;summary.metricFault=metricFault}
-  return {cluster:summary,metricCoverage:{pgCluster:summary.metricCoverage,pgReadonlyStats:'OBSERVED',pgConnectionRoles:'NOT_OBSERVED_BY_DESIGN'},observerCost:{...cost,observerProcessIdentity:id(observer),cpuMicroseconds:{user:cpu.user-cpuBefore.user,system:cpu.system-cpuBefore.system},scope:'OBSERVER_NODE_AND_OWN_QUERY_EVENTS; NEVER_SUBTRACT_FROM_PG_TOTALS',cpuTail:'AFTER_THIS_SAMPLE_SERIALIZATION_ACK_EXIT_NOT_OBSERVED'}}
+  const isolation={status:isolationFindings.length?'CONTAMINATED':'OBSERVED_ACTIVITY_LABEL_CHECKS_PASSED',findings:structuredClone(isolationFindings),connectionOwnership:'NOT_PROVEN_BY_ACTIVITY_LABELS'}
+  return {cluster:summary,metricCoverage:{pgCluster:summary.metricCoverage,pgReadonlyStats:'OBSERVED',pgConnectionRoles:'NOT_OBSERVED_BY_DESIGN',activityIsolation:isolation,comparisonEligible:!isolationFindings.length&&summary.metricCoverage.status!=='NOT_OBSERVED'},observerCost:{...cost,observerProcessIdentity:id(observer),cpuMicroseconds:{user:cpu.user-cpuBefore.user,system:cpu.system-cpuBefore.system},scope:'OBSERVER_NODE_AND_OWN_QUERY_EVENTS; NEVER_SUBTRACT_FROM_PG_TOTALS',cpuTail:'AFTER_THIS_SAMPLE_SERIALIZATION_ACK_EXIT_NOT_OBSERVED'}}
  }
  return Object.freeze({
   async begin(){

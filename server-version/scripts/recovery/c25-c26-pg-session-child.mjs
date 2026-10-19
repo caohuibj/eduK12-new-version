@@ -7,9 +7,10 @@ import path from 'node:path'
 import {fileURLToPath} from 'node:url'
 import {createHash} from 'node:crypto'
 import {parseProcStat} from './c25-c26-observer.mjs'
-import {createOwnedPidRegistry,createPgObserver} from './c25-c26-pg-observer.mjs'
+import {createOwnedPidRegistry} from './c25-c26-pg-observer.mjs'
 import {openReadonlyPgObserver} from './c25-c26-pg-connection.mjs'
-import {createProcSocketReader} from './c25-c26-proc-sockets.mjs'
+import {createPgClusterReader} from './c25-c26-pg-cluster.mjs'
+import {createPgClusterWindow} from './c25-c26-pg-cluster-window.mjs'
 const TYPE='c26:pg-session:v1'
 const keys=(value,expected)=>{assert.ok(value&&typeof value==='object'&&!Array.isArray(value));assert.deepEqual(Object.keys(value).sort(),expected.slice().sort(),'unexpected observer command fields')}
 const proc=pid=>parseProcStat(fs.readFileSync(`/proc/${pid}/stat`,'utf8'))
@@ -24,7 +25,7 @@ export async function runPgSessionChild({createIo}={}){
  const totalRemaining=()=>{const left=Number(BigInt(config.deadlineNs)-process.hrtime.bigint())/1e6;assert.ok(left>0&&left<=1200000,'observer leaf aggregate deadline');return left}
  const remaining=()=>{const left=totalRemaining()-config.reserveMs;assert.ok(left>0,'observer leaf work deadline');return left}
  const journal=fs.openSync(path.join(directory,'observer-child-raw-private.jsonl'),'wx',0o600),hash=createHash('sha256')
- let journalBytes=0,journalClosed=false,eventSequence=0,currentSequence=0,currentOperation='boot',busy=false,failure=null,connection=null,registry=null,readProc=null,lastCompleteProc=null,procReadSequence=0,observer=null,windowPhase='none',windows=0,commandTimer,ackTimer,closing=false,normalDisconnect=false,sendBytes=0,sending=false,queued=[],drainers=[],closeAckResolve,sessionTimer,currentDeadline=null
+ let journalBytes=0,journalClosed=false,eventSequence=0,currentSequence=0,currentOperation='boot',busy=false,failure=null,connection=null,registry=null,readProc=null,makeReadProc=null,lastCompleteProc=null,procReadSequence=0,observer=null,windowPhase='none',windows=0,commandTimer,ackTimer,closing=false,normalDisconnect=false,sendBytes=0,sending=false,queued=[],drainers=[],closeAckResolve,sessionTimer,currentDeadline=null
  const wire=extra=>({type:TYPE,nonce:config.nonce,pid:self.pid,startTicks:self.startTicks,...extra})
  const flush=()=>sending||queued.length?new Promise((resolve,reject)=>drainers.push({resolve,reject})):failure?Promise.reject(failure):Promise.resolve()
  function pump(){
@@ -86,23 +87,25 @@ export async function runPgSessionChild({createIo}={}){
    const io=createIo?createIo({registry,config:payload,self,directory}):{}
    keys(io,Object.keys(io));assert.ok(Object.keys(io).every(key=>['Client','procIo'].includes(key)),'only PG/proc I/O may be replaced')
    connection=await openReadonlyPgObserver({...payload,applicationName:payload.identity.applicationName,remainingMs:remaining,record,onFault:fault},{...(io.Client?{Client:io.Client}:{})})
-   const readCompleteFrame=createProcSocketReader({registry,remainingMs:remaining,record,...(io.procIo?{io:io.procIo}:{})})
-   readProc=()=>{
+   makeReadProc=()=>{
+   const readCompleteFrame=createPgClusterReader({postmaster:registry.entries().find(p=>p.role==='pg_postmaster'),remainingMs:remaining,record,...(io.procIo?{io:io.procIo}:{})})
+   return ()=>{
     const sequence=++procReadSequence,frame=readCompleteFrame()
     // Keep one exact complete raw frame. Normal sampling writes no duplicate;
     // the original observer may reject a counter BEFORE emitting its proc row.
     lastCompleteProc={sequence,window:windows,completedMonotonicNs:process.hrtime.bigint().toString(),frame:structuredClone(frame)}
     return frame
-   }
+   }}
    return {target:connection.target,pgStatStatements:connection.pgStatStatements,observerIdentity:payload.identity}
   }
-  assert.ok(connection&&registry&&readProc,'connect required before observer commands')
+  assert.ok(connection&&registry&&makeReadProc,'connect required before observer commands')
   if(op==='register'){keys(payload,['entry']);validateEntry(payload.entry);registry.register(payload.entry);record({stage:'OBSERVER_OWNER_REGISTERED',identity:payload.entry,consumerPermission:'PARENT_MAY_NOW_GRANT_LOAD'});return {registered:true,identity:payload.entry}}
   if(op==='begin'){
    keys(payload,['maxWindowMs']);assert.ok(['none','settled'].includes(windowPhase),'previous window not settled');assert.ok(Number.isSafeInteger(payload.maxWindowMs)&&payload.maxWindowMs>1100&&payload.maxWindowMs<=90000)
    if(observer)await observer.stop()
    const maxWindowMs=Math.floor(Math.min(payload.maxWindowMs,remaining()));assert.ok(maxWindowMs>1100)
-   observer=createPgObserver({query:connection.query,readProc,registry,target:connection.target,remainingMs:remaining,record,onStop:observerStopped,maxWindowMs,pgStatStatements:connection.pgStatStatements})
+   readProc=makeReadProc();lastCompleteProc=null
+   observer=createPgClusterWindow({query:connection.query,readProc,registry,target:connection.target,remainingMs:remaining,record,onStop:observerStopped,maxWindowMs,pgStatStatements:connection.pgStatStatements})
    windows++;windowPhase='running';record({stage:'OBSERVER_WINDOW_BEGIN',window:windows,maxWindowMs,observerPid:process.pid});return observer.begin()
   }
   if(op==='operationEnd'){keys(payload,[]);assert.equal(windowPhase,'running');const result=await observer.operationEnd();windowPhase='settling';return result}
