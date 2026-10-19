@@ -3,6 +3,8 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import {spawnSync} from 'node:child_process'
+import {createHash} from 'node:crypto'
+import {fileURLToPath} from 'node:url'
 import {pythonProgram,invocation} from './c25-c26-recovery-carry.mjs'
 const python=body=>{
  const code="import json,sys\nfrom unittest import mock\np=json.load(sys.stdin)\ns={'__name__':'carry_contract'}\nwith mock.patch('subprocess.Popen',side_effect=AssertionError('no subprocess')):exec(compile(p['source'],'<carry>','exec'),s)\nexec(compile(p['body'],'<contract>','exec'),s)"
@@ -80,8 +82,22 @@ with mock.patch.dict(current_contract.__globals__,patches),mock.patch.dict(curre
 assert not CARRY_OUTPUT.exists()
 `))
 test('carry CLI only names a fresh A06 carry output and cannot issue into historical archives',()=>{
- const values={python:process.env.C25_TEST_PYTHON,tools:'/workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018',output:'/tmp/c25-c26-carry-06',descriptor:'/tmp/c25-source-14/c25-source-descriptor.json','expected-head':'a'.repeat(40),'expected-descriptor-sha256':'b'.repeat(64)},args=x=>Object.entries(x).flatMap(([k,v])=>['--'+k,v])
- const r=invocation(args(values));assert.equal(r.python,values.python);assert.equal(r.args[2],pythonProgram)
+ const values={python:process.env.C25_TEST_PYTHON,tools:'/workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018',output:'/tmp/c25-c26-carry-06',descriptor:'/tmp/c25-source-15/c25-source-descriptor.json','expected-head':'a'.repeat(40),'expected-descriptor-sha256':'b'.repeat(64)},args=x=>Object.entries(x).flatMap(([k,v])=>['--'+k,v])
+ const r=invocation(args(values));assert.equal(r.python,values.python);assert.equal(r.input,pythonProgram);assert.deepEqual(r.args.slice(0,2),['-B','-'])
  for(const output of ['/tmp/c25-c26-recovery-05','/tmp/c25-c26-carry-05','/tmp/c25-c26-carry-06/nested'])assert.throws(()=>invocation(args({...values,output})))
  assert.ok(pythonProgram.includes("__name__='historical_c26_library'"));assert.ok(pythonProgram.includes("if __name__=='__main__':carry_main()"))
+})
+test('real Node carry CLI transports the complete oversized inline source over stdin before safe fixed-path rejection',()=>{
+ const values={python:process.env.C25_TEST_PYTHON,tools:'/tools',output:'/tmp/c25-c26-carry-06',descriptor:'/tmp/c25-source-15/c25-source-descriptor.json','expected-head':'a'.repeat(40),'expected-descriptor-sha256':'b'.repeat(64)}
+ const argv=Object.entries(values).flatMap(([k,v])=>['--'+k,v]),command=invocation(argv)
+ assert.ok(Buffer.byteLength(pythonProgram)>128*1024)
+ assert.ok(command.args.every(s=>Buffer.byteLength(s)<4096))
+ const result=spawnSync(process.execPath,[fileURLToPath(new URL('./c25-c26-recovery-carry.mjs',import.meta.url)),...argv],{encoding:'utf8',timeout:15000,maxBuffer:1024**2,env:{PATH:'/usr/bin:/bin',PYTHONDONTWRITEBYTECODE:'1'}})
+ assert.ifError(result.error);assert.equal(result.status,1);assert.match(result.stderr,/Traceback/);assert.match(result.stderr,/carry_main/);assert.match(result.stderr,/AssertionError/);assert.doesNotMatch(result.stderr,/E2BIG/)
+ // The same complete stdin bytes and unchanged business argument positions are
+ // independently checked by real Python; executing definitions is inert.
+ const verifier="import hashlib,json,sys\nraw=sys.stdin.buffer.read()\nexpected=sys.argv[sys.argv.index('--expected-inline-sha256')+1]\nassert hashlib.sha256(raw).hexdigest()==expected\nscope={'__name__':'carry_transport_contract'}\nexec(compile(raw,'<complete-carry-stdin>','exec'),scope)\nassert callable(scope['carry_main'])\nprint(json.dumps({'sha256':hashlib.sha256(raw).hexdigest(),'bytes':len(raw),'argv':sys.argv[1:]}))"
+ const checked=spawnSync(command.python,['-B','-c',verifier,...command.args.slice(2)],{input:command.input,encoding:'utf8',timeout:15000,maxBuffer:1024**2,env:{PATH:'/usr/bin:/bin',PYTHONDONTWRITEBYTECODE:'1'}})
+ assert.ifError(checked.error);assert.equal(checked.status,0,checked.stderr)
+ const actual=JSON.parse(checked.stdout);assert.equal(actual.sha256,createHash('sha256').update(pythonProgram).digest('hex'));assert.equal(actual.bytes,Buffer.byteLength(pythonProgram));assert.deepEqual(actual.argv,command.args.slice(2))
 })

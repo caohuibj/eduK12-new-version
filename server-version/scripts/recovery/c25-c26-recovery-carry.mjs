@@ -14,7 +14,7 @@ export const pythonProgram=`_carry_module_name=__name__\n__name__='historical_c2
 PRODUCER=BASE/'c25-c26-recovery-carry.mjs'
 CARRY_OUTPUT=Path('/tmp/c25-c26-carry-06')
 CARRY_DESCRIPTOR='c25-c26-carry-descriptor.json'
-CURRENT_SOURCE_DESCRIPTOR=Path('/tmp/c25-source-14/c25-source-descriptor.json')
+CURRENT_SOURCE_DESCRIPTOR=Path('/tmp/c25-source-15/c25-source-descriptor.json')
 CARRY_KIND='LOGICALLY_EQUIVALENT_OLDER_PHYSICAL_ROLLBACK'
 CARRY_SCOPE='C26_A06_EXPLICIT_A05_LOGICAL_EQUIVALENCE_TO_RECOVERY05'
 OLD_DESCRIPTOR=OUTPUT/NAMES['descriptor']
@@ -205,11 +205,11 @@ export function invocation(argv){
  assert.equal(argv.length,names.length*2)
  for(let i=0;i<argv.length;i+=2){const key=argv[i].slice(2);assert.ok(argv[i].startsWith('--')&&names.includes(key)&&!Object.hasOwn(values,key));values[key]=argv[i+1]}
  for(const key of ['python','tools','output','descriptor'])assert.ok(path.isAbsolute(values[key])&&path.resolve(values[key])===values[key])
- assert.equal(values.output,'/tmp/c25-c26-carry-06');assert.equal(values.descriptor,'/tmp/c25-source-14/c25-source-descriptor.json');assert.match(values['expected-head'],/^[a-f0-9]{40}$/);assert.match(values['expected-descriptor-sha256'],/^[a-f0-9]{64}$/)
+ assert.equal(values.output,'/tmp/c25-c26-carry-06');assert.equal(values.descriptor,'/tmp/c25-source-15/c25-source-descriptor.json');assert.match(values['expected-head'],/^[a-f0-9]{40}$/);assert.match(values['expected-descriptor-sha256'],/^[a-f0-9]{64}$/)
  const hash=b=>createHash('sha256').update(b).digest('hex')
- return {python:values.python,args:['-B','-c',pythonProgram,...names.filter(n=>n!=='python').flatMap(n=>['--'+n,values[n]]),'--expected-producer-sha256',hash(fs.readFileSync(fileURLToPath(import.meta.url))),'--expected-inline-sha256',hash(pythonProgram),'--expected-python-sha256',hash(fs.readFileSync(fs.realpathSync(values.python)))]}
+ return {python:values.python,input:pythonProgram,args:['-B','-',...names.filter(n=>n!=='python').flatMap(n=>['--'+n,values[n]]),'--expected-producer-sha256',hash(fs.readFileSync(fileURLToPath(import.meta.url))),'--expected-inline-sha256',hash(pythonProgram),'--expected-python-sha256',hash(fs.readFileSync(fs.realpathSync(values.python)))]}
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
- const command=invocation(process.argv.slice(2)),result=spawnSync(command.python,command.args,{stdio:'inherit',env:{PATH:'/usr/bin:/bin',LANG:'C',LC_ALL:'C',TZ:'UTC',PYTHONDONTWRITEBYTECODE:'1'}})
+ const command=invocation(process.argv.slice(2)),result=spawnSync(command.python,command.args,{input:command.input,stdio:['pipe','inherit','inherit'],env:{PATH:'/usr/bin:/bin',LANG:'C',LC_ALL:'C',TZ:'UTC',PYTHONDONTWRITEBYTECODE:'1'}})
  if(result.error)throw result.error;process.exitCode=result.status??1
 }
