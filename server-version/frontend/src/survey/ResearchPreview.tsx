@@ -102,10 +102,11 @@ export function ResearchPreview({draft,onSimulate,onValidateForm,errorPath,focus
         <thead><tr><th scope="col">题目行</th>{q.options.map(o=><th scope="col" key={o.optionKey}>{o.label}</th>)}{q.allowRefusal&&<th scope="col">不愿回答</th>}</tr></thead>
         <tbody>{q.rows.map(row=><tr key={row.rowKey}><th scope="row" className="text-left">{row.label}</th>
           {q.options.map(o=><td className="text-center" key={o.optionKey}><input type="radio"
+            aria-label={q.prompt+' · '+row.label+' · '+o.label}
             name={q.itemKey+':'+row.rowKey} checked={answers[q.itemKey+':'+row.rowKey]===o.optionKey}
             onChange={()=>choose(q.itemKey+':'+row.rowKey,o.optionKey)}/></td>)}
           {q.allowRefusal&&<td className="text-center"><input type="radio"
-            aria-label={'不愿回答：'+row.label} name={q.itemKey+':'+row.rowKey}
+            aria-label={q.prompt+' · '+row.label+' · 不愿回答'} name={q.itemKey+':'+row.rowKey}
             checked={isRefusal(answers[q.itemKey+':'+row.rowKey])}
             onChange={()=>choose(q.itemKey+':'+row.rowKey,refusal())}/></td>}</tr>)}</tbody></table></div>}
       {['SHORT_TEXT','LONG_TEXT'].includes(q.type)&&<BasicFormAnswer question={{...q,prompt:q.prompt||'文本回答'}} rows={q.type==='SHORT_TEXT'?1:4} value={typeof answers[q.itemKey]==='string'?answers[q.itemKey] as string:null} disabled={isRefusal(answers[q.itemKey])} onChange={value=>choose(q.itemKey,value)}/>}

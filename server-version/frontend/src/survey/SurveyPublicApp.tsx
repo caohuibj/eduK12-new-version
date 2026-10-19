@@ -175,11 +175,12 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purp
           {q.allowRefusal&&<th scope="col">不愿回答</th>}</tr></thead>
         <tbody>{(q.rows||[]).map(row=><tr key={row.rowKey}><th scope="row">{row.label}</th>{q.options.map(o=><td className="text-center" key={o.optionKey}>
           <input type="radio" name={unit.instrumentKey+'-'+q.itemKey+'-'+row.rowKey}
+            aria-label={q.prompt+' · '+row.label+' · '+o.label}
             checked={answer[q.itemKey+':'+row.rowKey]===o.optionKey}
             onChange={()=>onChange(q.itemKey+':'+row.rowKey,o.optionKey)}/>
         </td>)}
         {q.allowRefusal&&<td className="text-center"><input type="radio"
-          aria-label={'不愿回答：'+row.label}
+          aria-label={q.prompt+' · '+row.label+' · 不愿回答'}
           name={unit.instrumentKey+'-'+q.itemKey+'-'+row.rowKey}
           checked={isRefusal(answer[q.itemKey+':'+row.rowKey])}
           onChange={()=>onChange(q.itemKey+':'+row.rowKey,refusal())}/></td>}</tr>)}</tbody></table></div>}

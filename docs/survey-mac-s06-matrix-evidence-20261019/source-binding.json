@@ -1,0 +1,15 @@
+{
+  "base": "76f1cea",
+  "scope": "Survey MATRIX names only; no shared renderers, backend, scoring or runtime changes",
+  "cases": {
+    "new": 2,
+    "affectedExisting": 1,
+    "existingUnselected": 7
+  },
+  "source": {
+    "ResearchPreview.tsx": "c6bd7950fcdee89b8ba7c576592472729e7d0a8b946d4bf2bc4d970c0891c2f1",
+    "SurveyPublicApp.tsx": "c3e185870cffc9092a9c8bb63721ab9b8095c04e2603576e0b790f96089d19d1",
+    "SurveyMatrixNames.test.tsx": "3a0d63c6933ecb63e3e39fe0fd693fd913f41f29d46ed7f4770332373e50b694",
+    "SurveyBuilder.test.tsx": "328534e46eb099b85a54a2a5d4ddf68d38aad991b4f7a250e808feb8bcd5e556"
+  }
+}
