@@ -143,3 +143,13 @@ release before publication and post-write resource failure. They do not claim
 real HTTP authorization, database startup or performance results. The future
 runtime still requires a clean current HEAD, full A/B/recovery inputs, actual
 logical admission, full final protection and a separate execution approval.
+
+The execution review identified one active/idle channel overlap: the 100ms
+resource inspection could call the API's idle-only health assertion while a
+legitimate probe RPC was pending, or while an observer/API block was closing.
+The entry now marks only those active operations; resources, original deadlines
+and the existing RPC/onFault paths remain checked. Historical probe and session
+helpers are unchanged. Execution prepare-03 adds one targeted two-branch contract:
+snapshot/close cross multiple real resource-timer ticks and complete normally;
+a propagated probe fault still stops the block and preserves a false result.
+The seven prior contracts keep their own raw identities and were not rerun.

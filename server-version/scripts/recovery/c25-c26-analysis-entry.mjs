@@ -60,7 +60,7 @@ async function loadExpected(rows,fixture,{remaining,record,stop}){
 export async function runAnalysisExperiment(options,dependencies={}){
  const {directory,node,env,baseIdentities,connectionOptions,remainingMs,workRemainingMs,rows,fixture,record,write,readResources,ownedRegistryChanged}=options
  const {startApi=startObservedAnalysisApi,startSession=startPgObserverSession,decode=loadExpected,fetchImpl=fetch,readIdentity=proc,wait=ms=>new Promise(r=>setTimeout(r,ms))}=dependencies
- let failure,api,session,http,owner,active=false,cleaning=false,timer,resourceTimer;const abort=new AbortController(),windows=[],blocks=[],seenArms=new Set(),result={schemaVersion:1,scope:'ANALYSIS_ONLY_ABBA',passed:false,workloadComplete:false,windows,blocks,automaticRetries:0,newFixtureOrFinals:0}
+ let failure,api,session,http,owner,active=false,probePending=false,blockClosing=false,cleaning=false,timer,resourceTimer;const abort=new AbortController(),windows=[],blocks=[],seenArms=new Set(),result={schemaVersion:1,scope:'ANALYSIS_ONLY_ABBA',passed:false,workloadComplete:false,windows,blocks,automaticRetries:0,newFixtureOrFinals:0}
  const total=()=>{const left=remainingMs();assert.ok(left>0&&left<=780000);return left}
  const work=()=>{if(failure)throw failure;const left=Math.min(workRemainingMs(),total()-60000);assert.ok(left>0&&left<=720000);return left}
  const remaining=()=>cleaning?total():work()
@@ -68,20 +68,21 @@ export async function runAnalysisExperiment(options,dependencies={}){
  const retain=value=>{record(value);remaining()}
  const fault=new Promise((_,reject)=>abort.signal.addEventListener('abort',()=>reject(failure),{once:true}));fault.catch(()=>{})
  const bounded=async(fn,limit=90000)=>{remaining();const end=performance.now()+Math.min(limit,remaining());let t;try{const value=await Promise.race([Promise.resolve().then(fn),...(!cleaning?[fault]:[]),new Promise((_,reject)=>t=setTimeout(()=>reject(stop(Error('analysis operation deadline'))),Math.max(1,end-performance.now())))]);remaining();assert.ok(performance.now()<end);return value}finally{clearTimeout(t)}}
- const resources=()=>{try{const value=readResources(api?.identity);assertResources(value);result.minimumResources??={...value};for(const [k,n]of Object.entries(value))result.minimumResources[k]=Math.min(result.minimumResources[k]??n,n);remaining();if(!cleaning){api?.assertHealthy();session?.assertHealthy()}}catch(e){stop(e)}}
+ const resources=()=>{try{const value=readResources(api?.identity);assertResources(value);result.minimumResources??={...value};for(const [k,n]of Object.entries(value))result.minimumResources[k]=Math.min(result.minimumResources[k]??n,n);remaining();if(!cleaning&&!blockClosing){if(!probePending)api?.assertHealthy();session?.assertHealthy()}}catch(e){stop(e)}}
  const identity={...readIdentity(process.pid),role:'driver',applicationName:`c26:driver:${randomBytes(8).toString('hex')}`}
  const url=new URL(env.DATABASE_URL);assert.equal(url.pathname,'/eduk12_c25_joint_restore');assert.equal(url.hostname,'127.0.0.1');assert.equal(url.username,'eduk12_runtime');url.searchParams.set('application_name',identity.applicationName)
  process.env.DATABASE_URL=url.toString();process.env.DATABASE_URL_RUNTIME=url.toString();const runtime={...env,DATABASE_URL:url.toString(),DATABASE_URL_RUNTIME:url.toString()}
  const dir=name=>{const value=path.join(directory,name);fs.mkdirSync(value,{mode:0o700});return value}
+ async function probe(){assert.equal(probePending,false);probePending=true;try{return await api.snapshot()}finally{probePending=false}}
  async function observe(operation,fn,{apiAfter=true}={}){
   assert.equal(active,false);active=true;const end=performance.now()+Math.min(90000,work()),row={sequence:windows.length+1,operation,passed:false,operationComplete:false};windows.push(row)
-  try{await bounded(async()=>{row.pgBefore=await session.begin({maxWindowMs:Math.floor(Math.min(90000,work()))});row.before={driver:sample(),api:api?await api.snapshot():null};const at=performance.now();row.value=await fn();row.elapsedMs=performance.now()-at;row.operationComplete=true;row.after={driver:sample(),api:apiAfter&&api?await api.snapshot():null};row.pgOperationEnd=await session.operationEnd();await wait(1100);row.pgSettled=await session.settledEnd();if(row.before.api&&row.after.api)row.apiDelta=probeDelta(row.before.api,row.after.api)},90000);row.passed=true;return row}
+  try{await bounded(async()=>{row.pgBefore=await session.begin({maxWindowMs:Math.floor(Math.min(90000,work()))});row.before={driver:sample(),api:api?await probe():null};const at=performance.now();row.value=await fn();row.elapsedMs=performance.now()-at;row.operationComplete=true;row.after={driver:sample(),api:apiAfter&&api?await probe():null};row.pgOperationEnd=await session.operationEnd();await wait(1100);row.pgSettled=await session.settledEnd();if(row.before.api&&row.after.api)row.apiDelta=probeDelta(row.before.api,row.after.api)},90000);row.passed=true;return row}
   catch(e){row.error={name:e.name,stack:String(e.stack??e)};throw stop(e)}
   finally{active=false;write('c25-c26-analysis-windows-private.json',{schemaVersion:1,windows});if(row.passed){work();assert.ok(performance.now()<end)}}
  }
  async function closeBlock(){
-  const closingApi=api;let observerProof,apiProof,error
-  try{if(session)observerProof=await session.close()}catch(e){error=e;stop(e)}finally{session=null;try{if(closingApi)apiProof=await closingApi.stop()}catch(e){error??=e;stop(e)}api=null}
+  blockClosing=true;const closingApi=api;let observerProof,apiProof,error
+  try{if(session)observerProof=await session.close()}catch(e){error=e;stop(e)}finally{session=null;try{if(closingApi)apiProof=await closingApi.stop()}catch(e){error??=e;stop(e)}api=null;blockClosing=false}
   if(error)throw error;assert.equal(observerProof.passed,true);assert.equal(apiProof.passed,true);return {...apiProof,observer:observerProof}
  }
  try{

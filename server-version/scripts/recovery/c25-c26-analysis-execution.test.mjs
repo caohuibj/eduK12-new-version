@@ -67,3 +67,24 @@ test('independent supervisor records real success nonzero exit and hung detached
 test('supervisor durable exit and real lock release precede successful publication and late resource failure revokes success',()=>{
  python('publication-order-contract',loadRun+`import json,sys,time,fcntl,os\nfrom pathlib import Path\nroot=Path(${pyString(OUT)})\nfor failing in [False,True]:\n case=root/('publication-'+str(failing));case.mkdir(mode=0o700);tools=case/'tools';tools.mkdir();(tools/'.measurement.lock').touch();state=case/'state';launch=case/'launch';data=case/'data';(data/'pgdata').mkdir(parents=True)\n g.update(TOOLS=tools,STATE=state,LAUNCH=launch,DATA=data)\n original_private=g['private_json'];original_resources=g['resources'];events=[]\n def save(file,value):\n  if file.name=='overall-result.json':\n   assert (launch/'controller-exit.json').exists() and (launch/'lock-release.json').exists()\n   with (tools/'.measurement.lock').open('rb') as lock:fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)\n  events.append(file.name);original_private(file,value)\n def controller(argv,text,output,budget):\n  state.mkdir();value={'passed':True,'qualificationPublished':False,'workloadComplete':True,'finalSnapshotVerified':True,'materials':{'passed':True},'cleanupVerified':True,'inputVerification':{'passed':True},'metricCoverage':{}};original_private(state/'c25-c26-analysis-controller-result.json',value);proof={'passed':True,'exitCode':0};original_private(launch/'controller-exit.json',proof);return proof\n def resource(entry=False):\n  if failing and (launch/'overall-result.json').exists():raise AssertionError('injected final I/O resource decline')\n  return original_resources(entry)\n g.update(private_json=save,supervise_controller=controller,resources=resource)\n # persist_final's existing default is fixed at definition; pass-through wrapper\n # supplies the current resource callback without altering its implementation.\n original_persist=g['persist_final'];g['persist_final']=lambda file,value,budget:original_persist(file,value,budget,resource)\n sys.argv=['pure','--expected-head','a'*40]\n try:g['supervise']()\n except SystemExit as e:assert failing and e.code==1\n result=json.loads((launch/'overall-result.json').read_text());assert result['passed']==(not failing);assert result['lockReleased'] is True;assert events.index('lock-release.json')<events.index('overall-result.json')\n g.update(private_json=original_private,resources=original_resources,persist_final=original_persist)\nprint(json.dumps({'passed':True,'realTemporaryLock':True,'servicesStarted':False,'postWriteResourceFault':True}))\n`)
 })
+
+// The real entry's 100ms resource timer must not mistake a legitimate outstanding
+// probe or an intentional close for an idle-channel health failure.
+test('active probe and normal block close may overlap resource inspection while real faults still stop the entry',async()=>{
+ for(const injectFault of [false,true]){
+  let pending=false,apiClosing=false,observerClosing=false,sampledProbe=0,sampledClose=0
+  const f=fixture(({options,dependencies})=>{
+   const apiStart=dependencies.startApi,sessionStart=dependencies.startSession,read=options.readResources
+   options.readResources=(...args)=>{if(pending)sampledProbe++;if(apiClosing||observerClosing)sampledClose++;return read(...args)}
+   dependencies.startApi=async args=>{const api=await apiStart(args);let first=true;return {...api,
+    async snapshot(){pending=true;try{if(first){first=false;if(injectFault)setTimeout(()=>args.onFault(Error('actual entry propagated probe fault')),30);await new Promise(r=>setTimeout(r,160))}return await api.snapshot()}finally{pending=false}},
+    assertHealthy(){assert.equal(pending,false,'idle channel checked during active snapshot');assert.equal(apiClosing,false,'closed API checked as idle');api.assertHealthy()},
+    async stop(){apiClosing=true;try{await new Promise(r=>setTimeout(r,160));return await api.stop()}finally{apiClosing=false}},
+   }}
+   dependencies.startSession=async args=>{const session=await sessionStart(args);return {...session,assertHealthy(){assert.equal(observerClosing,false,'closing session checked as idle');session.assertHealthy()},async close(){observerClosing=true;try{await new Promise(r=>setTimeout(r,160));return await session.close()}finally{observerClosing=false}}}}
+  })
+  if(injectFault){await assert.rejects(f.run(),/actual entry propagated probe fault/);assert.equal(f.written.get('c25-c26-analysis-driver-result-private.json').passed,false);assert.equal(f.calls.filter(x=>x.stage==='api-open').length,1)}
+  else{const result=await f.run();assert.equal(result.passed,true);assert.equal(result.workloadComplete,true);assert.ok(sampledProbe>=4);assert.ok(sampledClose>=8)}
+  assert.equal(f.calls.filter(x=>x.stage==='api-close').length,injectFault?1:4);assert.equal(f.calls.filter(x=>x.stage==='observer-close').length,injectFault?1:4)
+ }
+})
