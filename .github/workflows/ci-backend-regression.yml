@@ -40,6 +40,9 @@ jobs:
       SITUATIONAL_BUNDLE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       INSTRUMENT_FINAL_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      # C20 creates a UUID-isolated schema in this disposable job service only.
+      TRAINING_MATERIAL_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      TRAINING_MATERIAL_ISOLATED_DB: '1'
       # Outbox fixtures require this exact disposable job DB; full suites run serially.
       REPORT_OUTBOX_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
       UPLOAD_DIR: /tmp/eduk12-ci-uploads
@@ -194,6 +197,9 @@ jobs:
           src/__tests__/integration/qa-round3-data-loop.postgres.integration.test.ts
           src/__tests__/integration/registered-resource-longitudinal.postgres.integration.test.ts
           src/__tests__/migration/legacy-import.postgres.integration.test.ts
+          src/__tests__/migration/training-material-allocation.postgres.integration.test.ts
+          src/__tests__/integration/sjt-image-retention.postgres.integration.test.ts
+          src/__tests__/scale/scale-import.postgres.integration.test.ts
           src/__tests__/migration/public-token-backfill.cli.integration.test.ts
           src/__tests__/questionnaire/legacy-authoring.postgres.integration.test.ts
           src/__tests__/assessment-runtime/v32-1.postgres.integration.test.ts

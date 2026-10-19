@@ -97,3 +97,11 @@ state09 已完成全部13项功能/存储/恢复producer链，functionalCheckpoi
 下一阶段按用户最新顺序：先保护本功能提交，再以同51主体精确stage ID/dateRange基线做云端CPU/内存/数据库/存储/访问数及单次/并发2资源观测，明确Cognitive/SJT独立新四工具probe而不外推Scale/Form；只优化已证实Scale导出2N读取及证据支持的问题，第二次提交后停止新功能，交root启CI和合并。C21及后续新功能暂停。既有导出SQL40/61/121失败不得改写，analysis40/40/40与单报告22/22/22只是既有串行观察，不代表恒定读取bytes或批吞吐。
 
 启动就绪新门是有界认证SELECT1，仅结构57P03可retry；60秒循环末次子进程最多8秒，另有前置TCP等待，不能描述为整个启动严格60秒。state09真实首轮认证成功，静态分类不冒充真实57P03分支运行。
+
+## 独立效率基线准备（功能 checkpoint 之后）
+
+本次新增 recovery-only observer、launcher 与两个 producer；业务源码、Prisma 和已接受 dist 保持功能基线。执行 HEAD 与功能基线 11feee92 分别冻结，只有精确业务输入一致才可运行 before。原 state09 只读，独立克隆；先读取原 51 主体固定 11/21/51 每发布样本，再至多新增三个 Form/Scale 资源链（单次一条、并发二条）及一条四工具链，共最多十个新 FINAL。旧 102 父、204 FINAL 和原 outbox 不重交、不重放。若旧四工具发布/授权过期，仅允许通过原测试 API 新建等价合成资源发布与合法授权，记录不同身份，不能延长旧记录或冒用其功能资格。
+
+观察窗口分别记录 API、直接 producer、在 producer 内实际执行的原 report/export worker，以及 PG/Redis/独立 observer 的 CPU 与采样 RSS；返回行、分层解密/读取密文字节、响应/CSV/artifact 字节、关系/索引/数据库分配量和 PG 累积计数另列。统一 runtime 解密计数只是该层子集，不与嵌套底层重复求和。100ms 峰值可能漏掉短峰，CPU tick 有量化误差，PG 统计有延迟；observer 自身原始开销不盲目扣除。已有输出 rows 仍整体物化，不声称流式或容量收益。
+
+固定消费顺序、actor、选项、精确 ID/dateRange、事实及 assignment hashes；前后 CSV 必须逐字节相同，无自动 metadata 豁免。已知 2N 原失败保留，before 收集该缺陷而不把效率预算标为通过。之后仅对受影响导出做有界请求内批量读取优化及同输入 after；超出批大小应按分块阶跃解释，不能用无限 raw 常驻换固定 SQL。当前仅为已冻结准备范围，尚无本阶段动态 CPU/RSS/效率结果。

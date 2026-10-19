@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, writeFileSync, rmSync, symlinkSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import { spawnSync } from 'node:child_process';
 import { runnerPlan } from './content-scope.mjs';
 import { treeDigest, verifyManifest } from './ci-artifact.mjs';
 import { mediaPlan, validateMediaPlan } from './ci-media-plan.mjs';
@@ -38,6 +39,34 @@ test('hosted platform consumers preserve independent lanes and full visual cover
   for(const lane of ['regression_runner','browser_runner','media_runner','codeql_runner','frontend_runner','heavy_runner','docker_runner'])
     assert.deepEqual(plan[lane],['ubuntu-24.04']);
   assert.equal(plan.visual_hosted,true);
+});
+test('Training PostgreSQL additions execute against the disposable service and cannot silently skip',()=>{
+  const regression=readFileSync(new URL('../workflows/ci-backend-regression.yml',import.meta.url),'utf8');
+  const database='postgresql://ptool:ptool123@localhost:5432/ptool?schema=public';
+  for(const variable of ['TRAINING_MATERIAL_TEST_DATABASE_URL','RELEASE_INTEGRATION_DATABASE_URL','INSTRUMENT_FINAL_INTEGRATION_DATABASE_URL'])
+    assert.ok(regression.includes(`${variable}: ${database}`),`${variable} must select the isolated job database`);
+  assert.match(regression,/TRAINING_MATERIAL_ISOLATED_DB: '1'/);
+  const required=regression.split('name: hosted critical integration suites must not skip')[1]?.split('      - name:')[0]??'';
+  assert.match(required,/if: inputs\.focus == 'full'/);
+  assert.match(required,/node scripts\/assert-release-test-report\.mjs \/tmp\/eduk12-backend-vitest\.json/);
+  for(const file of ['migration/training-material-allocation','integration/sjt-image-retention','scale/scale-import'])
+    assert.ok(required.includes(`src/__tests__/${file}.postgres.integration.test.ts`),`${file} must be present and non-skipped`);
+});
+test('mandatory integration report rejects collected suites without executed assertions',()=>{
+  const dir=mkdtempSync(join(tmpdir(),'ci-required-suite-'));
+  const required='src/__tests__/integration/required.postgres.integration.test.ts';
+  const script=new URL('../../server-version/backend/scripts/assert-release-test-report.mjs',import.meta.url).pathname;
+  try {
+    for(const [assertions,expected] of [[undefined,1],[[],1],[[{status:'skipped'}],1],[[{status:'pending'}],1],[[{status:'passed'}],0]]) {
+      const report=join(dir,'report.json');
+      writeFileSync(report,JSON.stringify({testResults:[{name:required,assertionResults:assertions}]}));
+      const result=spawnSync(process.execPath,[script,report,required],{encoding:'utf8'});
+      assert.equal(result.status,expected,result.stderr||result.stdout);
+      const receipt=JSON.parse(result.stdout);
+      assert.equal(receipt.ok,expected===0);
+      if(!assertions?.length)assert.deepEqual(receipt.empty,[required]);
+    }
+  } finally {rmSync(dir,{recursive:true,force:true});}
 });
 test('scoped scenarios retain their existing visual topology on hosted Ubuntu',()=>{
   for(const scenario of ['content','content-frontend','frontend','presentation','documentation','dependencies']) {

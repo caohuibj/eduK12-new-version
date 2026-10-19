@@ -1,0 +1,18 @@
+{
+  "kind": "local-test-execution-record",
+  "officialCiQualification": false,
+  "sourceBase": "aeb271830a450fb79d205092af63ca754a65a64c",
+  "recordedAtUtc": "2026-10-19T00:30:28.181955+00:00",
+  "command": "/workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/node_modules/node/bin/node --test .github/scripts/ci-topology.test.mjs",
+  "exitCode": 0,
+  "tests": 9,
+  "passed": 9,
+  "failed": 0,
+  "skipped": 0,
+  "durationMs": 109.299853,
+  "inputs": {
+    ".github/workflows/ci-backend-regression.yml": "1b22e126da8727c25b267a76b7d0312512d74b737497c961edeb2e3dc158abe9",
+    ".github/scripts/ci-topology.test.mjs": "f9a7b00cb27472a326ef55491f8e3192603ef87dd0673c81e28cb8e49479a8d2"
+  },
+  "note": "Recorded from the completed local tool execution output; not an official artifact, signature, or application integration qualification. No PostgreSQL/browser tests executed."
+}
