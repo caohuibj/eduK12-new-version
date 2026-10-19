@@ -12,7 +12,7 @@ const input={report:{attemptEpoch:1,attemptId:'parent-new',jobId:'job-new',oldJo
 const modes={NODE_ENV:'test',BACKGROUND_WORKERS_ENABLED:'false',ASSESSMENT_REPORT_ASYNC_ENABLED:'true',HEAVY_PROCESSING_ENABLED:'false',VIDEO_PROCESSING_ENABLED:'false'}
 function state(kind,mode){const root=process.env.C26_PREPARE_EVIDENCE_ROOT;assert.ok(root&&fs.statSync(root).isDirectory());const directory=fs.mkdtempSync(path.join(root,`worker-${kind}-${mode}-`));fs.chmodSync(directory,0o700);workerWrite(path.join(directory,'fixture-config.json'),{scope:'NO_SERVICE_WORKER_BOUNDARY',kind,mode});return directory}
 async function run(kind,mode,extra={}){
- const directory=state(kind,mode),events=[],faults=[];let identity,retired=null
+ const directory=state(kind,mode),events=[],faults=[];let identity,retired=null,expired=false
  const budget=extra.budget??7000,end=performance.now()+budget
  const record=value=>{events.push(value);if(extra.journalFault&&value.stage==='CHILD_TASK_DONE')throw new Error('SYNTHETIC_JOURNAL_FAILURE')}
  const hooks={register:value=>{identity=value;events.push({stage:'registered',pid:value.pid})},loaded:async value=>{assert.equal(value,identity);events.push({stage:'loaded'})},prepareClose:async value=>{
@@ -20,9 +20,9 @@ async function run(kind,mode,extra={}){
   if(extra.holdPrepare)await new Promise(()=>{})
   // An actual asynchronous boundary; permission cannot be sent first.
   await new Promise(resolve=>setImmediate(resolve));workerWrite(path.join(directory,'close-permission.json'),{pid:value.pid,prepared:true});events.push({stage:'prepare-return'})
- },retire:async proof=>{assert.equal(proof.pid,identity.pid);assert.equal(proof.startTicks,identity.startTicks);for(const key of ['closeObserved','terminalObserved','groupQuiescent'])assert.equal(proof[key],true);assert.ok(proof.terminalCpu.user>0);retired=proof;events.push({stage:'retired'})}}
+ },retire:async proof=>{assert.equal(proof.pid,identity.pid);assert.equal(proof.startTicks,identity.startTicks);for(const key of ['closeObserved','terminalObserved','groupQuiescent'])assert.equal(proof[key],true);assert.ok(proof.terminalCpu.user>0);retired=proof;events.push({stage:'retired'});if(extra.expireRetire)expired=true}}
  let receipt,error
- try{receipt=await runObservedWorker({directory,kind,input:input[kind],node:process.execPath,env:{PATH:process.env.PATH,...modes,DATABASE_URL:'postgresql://eduk12_runtime:synthetic@127.0.0.1:54399/eduk12_c25_joint_restore',C26_WORKER_FIXTURE_DIRECTORY:directory},remainingMs:()=>end-performance.now(),record,onFault:error=>faults.push(error.name),hooks},
+ try{receipt=await runObservedWorker({directory,kind,input:input[kind],node:process.execPath,env:{PATH:process.env.PATH,...modes,DATABASE_URL:'postgresql://eduk12_runtime:synthetic@127.0.0.1:54399/eduk12_c25_joint_restore',C26_WORKER_FIXTURE_DIRECTORY:directory},remainingMs:()=>expired?0:end-performance.now(),record,onFault:error=>faults.push(error.name),hooks},
  {spawnChild:(node,argv,options)=>spawn(node,['--import',fixture,...argv],options)})}catch(caught){error=caught}
  const saved=workerRead(path.join(directory,'runner-private.json')),raw=fs.readFileSync(path.join(directory,'fixture-events.jsonl'),'utf8').trim().split('\n').map(x=>JSON.parse(x))
  return {directory,receipt,saved,error,events,raw,faults,retired}
@@ -56,4 +56,10 @@ test('held fresh PG preparation cannot escape aggregate deadline or grant discon
 })
 test('private journal failure after task completion latches a stop and still reaps the real child',{timeout:7000},async()=>{
  const r=await run('export','success',{journalFault:true});assert.ok(r.error);assert.match(r.saved.error.stack,/SYNTHETIC_JOURNAL_FAILURE/);assert.equal(r.saved.passed,false);assert.equal(r.saved.failedLifecycle.closeObserved,true);assert.equal(r.saved.failedLifecycle.groupQuiescent,true);assert.equal(r.raw.filter(x=>x.name==='export-process').length,1)
+})
+
+test('retire hook returning after the shared deadline cannot produce a late PASS after child close',{timeout:7000},async()=>{
+ const r=await run('report','success',{expireRetire:true});assert.ok(r.error);assert.equal(r.saved.passed,false);assert.match(r.saved.error.stack,/aggregate deadline/)
+ assert.ok(r.retired);assert.equal(r.saved.resources.lifecycle.closeObserved,true);assert.equal(r.saved.resources.lifecycle.groupQuiescent,true);assert.equal(r.saved.resources.lifecycle.code,0)
+ assert.equal(workerRead(path.join(r.directory,'result-private.json')).passed,true,'completed child is retained separately from failed parent acceptance')
 })

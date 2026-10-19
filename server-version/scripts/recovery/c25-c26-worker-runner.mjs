@@ -35,7 +35,7 @@ export async function runObservedWorker({directory,kind,input,node,env,remaining
   if(controller.signal.aborted){abort();return}
   controller.signal.addEventListener('abort',abort,{once:true})
   timer=setTimeout(()=>stop(new Error('worker callback aggregate deadline')),Math.max(1,Math.floor(remaining())))
-  Promise.resolve().then(run).then(value=>{clearTimeout(timer);controller.signal.removeEventListener('abort',abort);resolve(value)},error=>{clearTimeout(timer);controller.signal.removeEventListener('abort',abort);reject(error)})
+  Promise.resolve().then(run).then(value=>{clearTimeout(timer);controller.signal.removeEventListener('abort',abort);try{remaining();if(failure)throw failure;assert.ok(!controller.signal.aborted,'worker callback returned after abort');resolve(value)}catch(error){stop(error);reject(error)}},error=>{clearTimeout(timer);controller.signal.removeEventListener('abort',abort);reject(error)})
  })
  const waitStage=stage=>{
   if(failure)return Promise.reject(failure)
@@ -82,7 +82,7 @@ export async function runObservedWorker({directory,kind,input,node,env,remaining
   const result=workerRead(path.join(directory,'result-private.json'));assert.equal(result.nonce,nonce);assert.equal(result.pid,child.pid);assert.equal(result.parentPid,process.pid);assert.equal(result.inputSha256,inputSha256)
   assert.equal(done.passed,true);assert.equal(cleaned.passed,true);assert.equal(result.passed,true);assert.ok(result.cleanup.every(row=>row.closed))
   assert.deepEqual(workerRead(invocationFile),invocation);receipt.resultSha256=workerSha(fs.readFileSync(path.join(directory,'result-private.json')))
-  receipt.passed=true;receipt.result=result
+  remaining();if(failure)throw failure;assert.ok(!controller.signal.aborted,'worker aborted before final PASS');receipt.passed=true;receipt.result=result
  }catch(error){failure??=error;stop(failure)}
  finally{
   abortSignal?.removeEventListener('abort',aborted)
