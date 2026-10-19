@@ -24,7 +24,8 @@ if(!here.search){
  if(config.mode==='descendant'){
   const {spawn}=require('node:child_process');const descendant=spawn(process.execPath,['-e',"process.on('SIGTERM',()=>{});setInterval(()=>{},1000);process.send({ready:true})"],{stdio:['ignore','ignore','ignore','ipc']});await new Promise((resolve,reject)=>{descendant.once('message',value=>value.ready?resolve():reject(new Error('descendant not ready')));descendant.once('error',reject)});fs.writeFileSync(path.join(directory,'descendant.json'),JSON.stringify({pid:descendant.pid}),{mode:0o600})
  }
- if(config.mode==='bad-ipc')process.send({type:1})
+ if(config.mode==='unknown-ipc')process.send({type:'unexpected'})
+ else if(config.mode==='bad-ipc')process.send({type:1})
  else{process.send('ready');if(config.mode==='duplicate-ready')process.send('ready')}
  setInterval(()=>{},1000)
 }
