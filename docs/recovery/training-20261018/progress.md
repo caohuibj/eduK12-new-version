@@ -139,6 +139,12 @@ C21 同 IP 短窗口、C22 延迟反馈、C23 checkpoint/本地草稿、C24 Trai
 
 本轮新检查为 14 通过、9 未选，后端 scoped no-emit 1215 sources/0 diagnostics；前端组合 no-emit 438 sources/0 diagnostics。相同输入旧证据限定复用，native IndexedDB 阻塞、C22 部分合成 PG 的 overall FAILED、C23 HTTP01/02 原失败均保留。上述 C23 HTTP03 PASS 仍只属于 C23 over C21；不升级为 C22+C23 联合动态资格。C24 在独立集成复核后开始，联合 migration/restore 与真实反馈 HTTP 待 C25 的单独授权和预算。具体 provenance、输入匹配、未完成项和下一步顺序见 [集成检查点](../../release/training-c22-c23-integration.md)。
 
+## C24：普通页面最小源码批次（2026-10-19 UTC）
+
+集成检查点 `def1b658` 独立复核通过后，`0b8117a1` 将 Training COURSE 的入口改为中性测评状态/报告文案；`f0b242de` 增加两提交页的 Training-only 错误焦点及共享原生文档/上传按钮、label/aria 语义。共用 School 页的键盘语义改善已明确批准，不复制 JSX/handler；接口、权限、幂等/pending、assetId/九张、原生 alert 和成功回读保留。共享组件、CSS、认知时序、课程设置/分析未改。
+
+第一批新 6 项通过、6 未选，no-emit 294 sources/0 diagnostics；第二批初版新 19 项通过、5 未选，no-emit 421 sources/0 diagnostics。独立复核随后发现打卡晚到失败抢焦点 P2，新定向回归实际 4 failed/12 skipped，原 FAILED 记录保留。`4bfb0536` 以局部交互序号和各操作焦点 token 修复，只在无后续操作且焦点仍属于发起流程时移动；正文与预览仍可使用。修复后定向 8 passed/8 skipped，no-emit 416 sources/0 diagnostics，不把历史 19 项称为最终重验通过。单 worker、共享锁、Node 24.21.0，输入前后闭合，无 emit。结果仅为受影响 mock DOM/类型证据；原生截图、真实 picker/PDF 焦点、触控/对比度/换行仍待 C25。共享 MediaRenderer 图片键盘缺口及课程设置/分析操作失败焦点明确留后续，不把首批源码交付说成完整 C24 视觉验收。详见 [C24 原始证据与边界](../../release/training-c24-ui.md)。
+
 ## 已知测试环境约束
 
 - 固定 Node 24.21.0；不要以全局 Node 24.19 或未固定 npx 的记录代替目标资格。
