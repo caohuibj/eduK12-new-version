@@ -210,6 +210,14 @@ no runtime, producer, database or browser was invoked by these tests.
   `a0734c0fa87acf743cd0b4ab63825a0ca809a5fecbf754d7f39b2a9d85d40561`.
   Both attempts retain exact input copies and equal before/after inventories;
   the four unaffected successful checks were not rerun.
+- `producer-contract-06/`: one new cleanup-entry alarm fault passed. It executes
+  the actual launcher cleanup with fake processes, injects a pending alarm both
+  before and at the deadline, and verifies API-first bounded writer shutdown,
+  PostgreSQL shutdown despite failed final audit, expired failure preservation
+  and no restart. Cleanup ignores then cancels the run alarm before any waits;
+  synchronous expiry handling cannot throw past PostgreSQL shutdown. Receipt:
+  `2f9388a77a3a4b5cf2fe52304e4e02de2efabb5412bc8eca1ecd437d8b0b1ce7`.
+  Earlier successful checks were not replayed; no service was started.
 
 The earlier README/hand-off count of 14 consumer tests was incorrect: the raw
 TAP and frozen test file contain **13**, as reported above; no test was added or

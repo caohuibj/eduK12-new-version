@@ -524,6 +524,56 @@ class RuntimePythonContracts(unittest.TestCase):
 
 
 class ApiLifetimeContracts(unittest.TestCase):
+    def test_cleanup_entry_alarm_cannot_skip_bounded_writer_or_postgres_shutdown(self):
+        tree=ast.parse((BASE/'c25-http.py').read_text())
+        main=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='main')
+        final=next(n.finalbody for n in main.body if isinstance(n,ast.Try) and n.finalbody)
+        finish=next(i for i,n in enumerate(final) if isinstance(n,ast.Expr)
+                    and isinstance(n.value,ast.Call) and isinstance(n.value.func,ast.Attribute)
+                    and n.value.func.attr=='finish_database')
+        functions=[n for n in main.body if isinstance(n,ast.FunctionDef)
+                   and n.name in {'stop_child','terminate_api_writers'}]
+        for expired_at_entry in [False,True]:
+            with self.subTest(expired_at_entry=expired_at_entry):
+                events=[];now=[0.0];handlers={};timer=[]
+                class Process:
+                    def __init__(self,pid):self.pid=pid;self.returncode=None
+                    def poll(self):return self.returncode
+                    def wait(self,timeout):
+                        events.append(('wait',self.pid,timeout));self.returncode=0;return 0
+                processes={name:Process(i+1) for i,name in enumerate(['postgres','api','phase-client'])}
+                def killpg(pid,sig):events.append(('kill',pid,sig))
+                def set_signal(number,handler):handlers[number]=handler
+                def pending_alarm():
+                    events.append(('pending-alarm',))
+                    self.assertEqual(handlers[14],0,'cleanup must ignore the pending deadline signal')
+                    if callable(handlers[14]):handlers[14]()
+                def set_timer(which,seconds):
+                    self.assertEqual((which,seconds),(0,0));pending_alarm();timer.append(seconds)
+                lifetime=c.ApiLifetime(lambda:now[0],timer.append,lambda:None);lifetime.start()
+                handlers[14]=lifetime.interrupt;now[0]=2700 if expired_at_entry else 2699
+                scope={'signal':SimpleNamespace(SIGALRM=14,SIG_IGN=0,SIGINT=2,SIGTERM=15,SIGHUP=1,SIGKILL=9,
+                                               ITIMER_REAL=0,signal=set_signal,setitimer=set_timer),
+                       'time':SimpleNamespace(monotonic=lambda:now[0]),'os':SimpleNamespace(killpg=killpg),
+                       'result':{'passed':False,'errorType':'OriginalPhaseFailure'},
+                       'children':[(name,proc,False) for name,proc in processes.items()],
+                       'cleanup':[],'expected_stopped':set(),'api_lifetime':lifetime,'preflight':c,
+                       'subprocess':c.subprocess,'resources':lambda *_:None,'state':Path('/missing-test-inventory')}
+                exec(compile(ast.Module(body=functions,type_ignores=[]),'actual-cleanup-functions','exec'),scope)
+                lifetime.terminate_writers=scope['terminate_api_writers']
+                real_stop=scope['stop_child']
+                def stop(name,proc):
+                    events.append(('stop',name));pending_alarm();real_stop(name,proc)
+                scope['stop_child']=stop
+                exec(compile(ast.Module(body=final[:finish+1],type_ignores=[]),'actual-cleanup-entry','exec'),scope)
+                self.assertEqual([v[1] for v in events if v[0]=='stop'],['api','phase-client','postgres'])
+                self.assertTrue(all(proc.poll() is not None for proc in processes.values()))
+                self.assertTrue(all(v[2]==25 for v in events if v[0]=='wait'))
+                self.assertTrue(lifetime.stopped);self.assertEqual(lifetime.expired,expired_at_entry)
+                self.assertFalse(scope['result']['passed']);self.assertFalse(scope['result']['finalSnapshotVerified'])
+                self.assertEqual(scope['result'].get('apiLifetimeExpired',False),expired_at_entry)
+                with self.assertRaises(AssertionError):lifetime.start()
+
     def test_independent_monotonic_deadline_interrupts_without_phase_polling(self):
         now=[100.0];scheduled=[];terminated=[]
         lifetime=c.ApiLifetime(lambda:now[0],scheduled.append,lambda:terminated.append('writers'))

@@ -209,12 +209,24 @@ def main():
   (state/'c25-launcher-error-private.log').write_text(traceback.format_exc())
   raise
  finally:
+  # The run deadline must not throw a second asynchronous exception through
+  # cleanup and skip PostgreSQL shutdown. Pending alarms are ignored before
+  # cancelling the timer; child shutdown retains its independent 25s + 5s bound.
+  signal.signal(signal.SIGALRM,signal.SIG_IGN)
+  signal.setitimer(signal.ITIMER_REAL,0)
   for sig in [signal.SIGINT,signal.SIGTERM,signal.SIGHUP]:signal.signal(sig,signal.SIG_IGN)
   result['finalSnapshotVerified']=False
+  if not api_lifetime.stopped and api_lifetime.deadline is not None and time.monotonic()>=api_lifetime.deadline:
+   api_lifetime.expired=True
+   try:terminate_api_writers()
+   except Exception as error:cleanup.append({'name':'api-deadline','error':type(error).__name__});result['passed']=False
   # Quiesce every writer before calling a snapshot final. PostgreSQL remains
-  # available solely for the bounded read-only snapshot, then stops last.
+  # available solely for the bounded read-only snapshot, then stops last. Stop
+  # API first, without leaving its cleanup timer alive through another wait.
+  for name,proc,_ in children:
+   if name=='api':stop_child(name,proc)
   for name,proc,_ in reversed(children):
-   if name!='postgres':stop_child(name,proc)
+   if name not in ['postgres','api']:stop_child(name,proc)
   api_lifetime.stop();result['apiLifetime']=api_lifetime.evidence()
   writers_stopped=all(proc.poll() is not None for name,proc,_ in children if name!='postgres')
   def final_guard():
