@@ -1254,3 +1254,33 @@ receipts and all archives remain unchanged. Current HEAD/source/producer identit
 is separately required; the old validator is not claimed to accept a new HEAD.
 A06/source14/carry06 have separate output identities. Issuance and runtime each
 still require approval, resource admission and independent evidence review.
+
+### C26 cluster measurement preparation after A06
+
+A06 passed real dual-database admission and API readiness. Independent-analysis
+setup issued three successful `queryRaw` calls and GET csrf returned 200. POST
+training-login was issued and remains UNCERTAIN after the observer rejected an
+unstable FD set. No new fixture, parent, attempt or FINAL was reached. Overall
+and final audit remain false; the actual old-row protection facts were true,
+with no added rows and exact before/after working rows/schema and primary
+snapshot. The original failure and complete stopped evidence are retained.
+
+The first replacement measurement module is intentionally not wired into the
+session or runtime yet. `c25-c26-pg-cluster.mjs` samples the pinned postmaster and
+its direct children using one bounded PPID enumeration, without FD/network
+reads or a stable-child-set requirement. Dynamic births/exits yield observed
+intervals and explicit gaps. CPU deltas use only actual same-PID/startTicks
+counter pairs. Missing first/last counters remain missing; short-lived children
+entirely between samples are not observable. Summed intervals are a sampled CPU
+lower bound. RSS retains missing-member counts and individual sampled peaks;
+sequential subset sums are neither atomic cluster RSS nor a bound on the true
+simultaneous cluster peak. Raw VmHWM remains an unreliable diagnostic.
+
+PG totals include the observer backend. Sampler CPU/read counts/wall time are
+reported separately, with no subtraction to invent pure-business PG cost. This
+module has no signal or cleanup authority. External owned-process lifecycle,
+dual-database/material protection, product inputs and fixed workload/budgets
+are unchanged. Targeted contracts use synthetic proc files and one actual short
+Node child, with no database/API service. Session integration, explicit
+workloadComplete/metricCoverage, actual measurements and any new rollback
+identity still require their own preparation and review.
