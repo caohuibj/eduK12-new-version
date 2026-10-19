@@ -254,3 +254,19 @@ test('prepared missing owner cannot complete the window without genuine close pr
  const h=harness();await h.observer.begin();await h.observer.prepareOwnerClose({pid:40,startTicks:'400'});removeReportOwner(h);h.setTime(100);h.fireInterval(100);await flush()
  await assert.rejects(h.observer.operationEnd(),/await owner retirement refresh/);assert.equal(h.stops.length,1)
 })
+
+
+test('reported cloud VmHWM may fall without clamping; RSS sampled peak and CPU identity remain strict',async()=>{
+ const h=harness();await h.observer.begin();h.setTime(10)
+ for(const p of h.frame.processes){p.vmHwmLifetimeBytes=5000;p.rssBytes=3000}
+ await h.observer.operationEnd();h.setTime(1110);const result=await h.observer.settledEnd()
+ const frames=h.events.filter(x=>x.kind==='proc');assert.ok(frames.length>=2)
+ assert.equal(frames[0].processes[0].vmHwmLifetimeBytes,8192);assert.equal(frames.at(-1).processes[0].vmHwmLifetimeBytes,5000)
+ assert.equal(frames.at(-1).vmHwmReliability,'UNRELIABLE_ENVIRONMENT_REPORTED_VALUE_ONLY');assert.match(result.limitations.join(' '),/VmHWM is unreliable/)
+ const {summarizeProcesses}=await import('./c25-c26-observer.mjs')
+ const justApi=frames.map(f=>({...f,processes:f.processes.filter(p=>p.role==='api')})),summary=summarizeProcesses(justApi,100)
+ assert.equal(summary.physical[0].proc.reportedVmHwmEndBytes,5000);assert.equal(summary.physical[0].proc.rssSampledPeakBytes,4096)
+ assert.match(summary.physical[0].proc.rssPeakScope,/LOWER_BOUND/);assert.equal(summary.physical[0].proc.vmHwmLifetimeEndBytes,undefined)
+ const bad=structuredClone(justApi);bad.at(-1).processes[0].userTicks=0;assert.throws(()=>summarizeProcesses(bad,100),/counter went backwards/)
+ const cpu=harness();await cpu.observer.begin();cpu.frame.processes[0].userTicks=0;await assert.rejects(cpu.observer.operationEnd(),/counter went backwards/);await cpu.observer.stop()
+})

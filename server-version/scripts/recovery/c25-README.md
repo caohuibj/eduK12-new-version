@@ -1123,3 +1123,19 @@ reserved aggregate tail. Malformed IPC, duplicate readiness, late SQL, missed
 deadlines or surviving descendants keep the whole run false even after cleanup.
 These real-child contracts replace only the index/task I/O boundaries, start no
 listener or database, and do not yet qualify the final A coordinator.
+
+C26 now uses one separately owned observer process and one readonly connection
+across sequential windows. API/worker registration must reach that process before
+LOAD permission; each window keeps the original 90s ceiling, 100/250ms sampling
+and at least 1100ms settle. Observer IPC, query, journal, deadline or group-close
+failures stop the coordinator. Only the exact registered task may retire after
+fresh PG/proc proof and actual terminal/close/group quiescence. ACK/exit CPU tails
+remain unobserved; they are never included as measured whole-exit CPU.
+
+A separate no-service environment diagnostic found actual same-PID VmHWM falling
+from 123480 to 123240 KiB after a 64MiB allocation was released. Raw VmHWM remains
+in the journal but is labelled UNRELIABLE in this cloud environment; it is not a
+monotonic counter or trusted kernel high-water mark. Sampled RSS maximum is a
+lower bound on the true peak, with no value clamping. CPU counters and process
+identity checks are unchanged. Explicit GC was used only in that diagnostic;
+A/B measurement does not request GC. This observation is not a performance result.

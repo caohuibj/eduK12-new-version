@@ -196,7 +196,7 @@ export function summarizeProcesses(samples,hz,{children=[],requiredChildren=[]}=
    frameAccounts.set(id,proc)
    const entry=accounts.get(id)
    if(!entry)accounts.set(id,{id,pid:proc.pid,startTicks:proc.startTicks,roles:new Set([proc.role]),first:proc,last:proc,firstMs:frame.elapsedMs,lastMs:frame.elapsedMs,peak:proc.rssBytes})
-   else{monotonic({userTicks:entry.last.userTicks,systemTicks:entry.last.systemTicks,vmHwmLifetimeBytes:entry.last.vmHwmLifetimeBytes},proc,'proc');entry.roles.add(proc.role);entry.last=proc;entry.lastMs=frame.elapsedMs;entry.peak=Math.max(entry.peak,proc.rssBytes)}
+   else{monotonic({userTicks:entry.last.userTicks,systemTicks:entry.last.systemTicks},proc,'proc');entry.roles.add(proc.role);entry.last=proc;entry.lastMs=frame.elapsedMs;entry.peak=Math.max(entry.peak,proc.rssBytes)}
   }
  }
  const terminalIds=new Set()
@@ -212,10 +212,10 @@ export function summarizeProcesses(samples,hz,{children=[],requiredChildren=[]}=
  for(const required of requiredChildren)assert.ok(terminalIds.has(identityKey(required)),'required child missing terminal resource sample')
  const physical=[...accounts.values()].map(entry=>{
   if([...entry.roles].some(role=>['report_worker','export_worker'].includes(role))&&!entry.roles.has('driver'))assert.ok(entry.child,'worker missing terminal resource sample')
-  const {first,last,child}=entry,proc=first?{userTicks:last.userTicks-first.userTicks,systemTicks:last.systemTicks-first.systemTicks,firstMs:entry.firstMs,lastMs:entry.lastMs,rssStartBytes:first.rssBytes,rssEndBytes:last.rssBytes,rssSampledPeakBytes:entry.peak,vmHwmLifetimeEndBytes:last.vmHwmLifetimeBytes}:null
+  const {first,last,child}=entry,proc=first?{userTicks:last.userTicks-first.userTicks,systemTicks:last.systemTicks-first.systemTicks,firstMs:entry.firstMs,lastMs:entry.lastMs,rssStartBytes:first.rssBytes,rssEndBytes:last.rssBytes,rssSampledPeakBytes:entry.peak,reportedVmHwmEndBytes:last.vmHwmLifetimeBytes,vmHwmReliability:'UNRELIABLE_ENVIRONMENT_REPORTED_VALUE_ONLY',rssPeakScope:'SAMPLED_PEAK_LOWER_BOUND_NOT_KERNEL_HIGH_WATER'}:null
   const cpu=child?{user:child.terminal.cpu.user,system:child.terminal.cpu.system}:{user:proc.userTicks*1e6/hz,system:proc.systemTicks*1e6/hz}
   for(const role of entry.roles)roles[role].physicalIdentities.push(entry.id)
   return {identity:entry.id,pid:entry.pid,startTicks:entry.startTicks,roles:[...entry.roles],sharedPhysicalProcess:entry.roles.size>1,cpuMicroseconds:cpu,cpuScope:child?'PROCESS_START_TO_TERMINAL_SAMPLE; ACK_EXIT_TAIL_EXCLUDED':'FIRST_TO_LAST_PROC_SAMPLE; EXIT_TAIL_MAY_BE_MISSING',proc,child:child??null}
  })
- return {physical,roles,physicalTotals:physical.reduce((sum,entry)=>({userMicroseconds:sum.userMicroseconds+entry.cpuMicroseconds.user,systemMicroseconds:sum.systemMicroseconds+entry.cpuMicroseconds.system}),{userMicroseconds:0,systemMicroseconds:0}),limitations:['Role references overlap; sum only physical accounts. Different coverage intervals remain explicit.','Node terminal counters include startup and work through sampling, not subsequent ACK/exit overhead.','RSS is sampled; VmHWM/resource.maxRSS are lifetime high water. maxRSS uses KiB; memoryUsage uses bytes.','Below-tick CPU does not establish zero cost. No actual report/export, API, PG or Redis workload is executed by this module.']}
+ return {physical,roles,physicalTotals:physical.reduce((sum,entry)=>({userMicroseconds:sum.userMicroseconds+entry.cpuMicroseconds.user,systemMicroseconds:sum.systemMicroseconds+entry.cpuMicroseconds.system}),{userMicroseconds:0,systemMicroseconds:0}),limitations:['Role references overlap; sum only physical accounts. Different coverage intervals remain explicit.','Node terminal counters include startup and work through sampling, not subsequent ACK/exit overhead.','RSS peak is a sampled lower bound. This environment reports nonmonotonic VmHWM: retain raw diagnostics, never claim reliable kernel high water. resource.maxRSS is reported separately in KiB; memoryUsage uses bytes.','Below-tick CPU does not establish zero cost. No actual report/export, API, PG or Redis workload is executed by this module.']}
 }
