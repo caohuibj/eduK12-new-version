@@ -47,7 +47,8 @@ import {
 } from '../assessment-media/assessment-asset'
 import { assertSituationalAssetReferencesReady } from './situational-asset.service'
 import { isRelationalCohortOnlyCompositeAttempt } from '../assessment-relational/result-authority'
-import { isCompositeParticipantFeedbackDeferred } from '../assessment-policy/participant-feedback'
+import { isLoadedCompositeParticipantFeedbackDeferred } from '../assessment-policy/participant-feedback'
+import { trainingFeedbackAttemptSelect, trainingFeedbackParentSelect } from '../composite/training-feedback-binding'
 
 export const SITUATIONAL_ATTEMPT_SELECT = {
   id: true,
@@ -100,6 +101,18 @@ export const SITUATIONAL_ATTEMPT_SELECT = {
       situationalInstrumentVersion: true,
     },
   },
+} as const
+
+// Participant runtime reads carry release identity on their existing parent
+// relation. Do not widen the commit/write projection or re-read the parent.
+const SITUATIONAL_FEEDBACK_READ_SELECT = {
+  ...SITUATIONAL_ATTEMPT_SELECT,
+  compositeAttempt: { select: {
+    ...SITUATIONAL_ATTEMPT_SELECT.compositeAttempt.select, ...trainingFeedbackAttemptSelect,
+    compositeAssessment: { select: {
+      ...TRAINING_VARIANT_PARENT_MARKER_SELECT.compositeAssessment.select, ...trainingFeedbackParentSelect,
+    } },
+  } },
 } as const
 
 export type SituationalAttemptRow = Prisma.SituationalAttemptGetPayload<{
@@ -234,7 +247,7 @@ export const loadSituationalAttemptRuntime = async (
 ): Promise<SituationalAttemptRuntime> => {
   const row = await prisma.situationalAttempt.findUnique({
     where: { id: attemptId },
-    select: SITUATIONAL_ATTEMPT_SELECT,
+    select: SITUATIONAL_FEEDBACK_READ_SELECT,
   })
   if (!row) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评记录不存在', 404)
   assertSituationalAttemptOwner(row, userId)
@@ -256,9 +269,9 @@ export const loadEmbeddedSituationalAttemptRuntime = async (
   const row = await prisma.situationalAttempt.findUnique({
     where: { id: attemptId },
     select: {
-      ...SITUATIONAL_ATTEMPT_SELECT,
+      ...SITUATIONAL_FEEDBACK_READ_SELECT,
       compositeAttempt: { select: {
-        ...SITUATIONAL_ATTEMPT_SELECT.compositeAttempt.select,
+        ...SITUATIONAL_FEEDBACK_READ_SELECT.compositeAttempt.select,
         compositeAssessmentId: true, deliveryCourseId: true,
         trainingPersistenceSnapshot: true, trainingPersistenceSnapshotHash: true,
         frozenActiveSlotSetHash: true,
@@ -617,8 +630,8 @@ export const createEmbeddedSituationalAttempt = async (
 
 export const resumeSituationalAttempt = async (attemptId: string, userId: string) => {
   const runtime = await loadSituationalAttemptRuntime(attemptId, userId)
-  const feedbackDeferred = runtime.row.status === 'COMPLETED'
-    && await isCompositeParticipantFeedbackDeferred(runtime.row.compositeAttemptId)
+  const feedbackDeferred = runtime.row.status === 'COMPLETED' && Boolean(runtime.row.compositeAttemptId)
+    && await isLoadedCompositeParticipantFeedbackDeferred(runtime.row.compositeAttempt)
   const suppressResult = feedbackDeferred || (runtime.row.status === 'COMPLETED'
     && await isRelationalCohortOnlyCompositeAttempt(runtime.row.compositeAttemptId))
   return situationalAttemptForResponse(runtime.row, runtime.snapshot, { suppressResult, feedbackDeferred })

@@ -1,3 +1,5 @@
+import { isLoadedCompositeParticipantFeedbackDeferred } from '../assessment-policy/participant-feedback'
+import { trainingFeedbackAttemptSelect, trainingFeedbackParentSelect } from '../composite/training-feedback-binding'
 import { trainingPersistenceMetadata } from '../composite/training-persistence.policy'
 import { assertTrainingChildSelected, TRAINING_VARIANT_PARENT_MARKER_SELECT } from '../composite/training-variant-child-scope'
 import { storeSharedCognitiveRuntime, loadSharedCognitiveRuntime } from '../assessment-runtime/shared-cognitive-runtime'
@@ -437,7 +439,9 @@ export const getSession = async (userId: string, sessionId: string) => {
     where: { id: sessionId },
     include: {
       assignment: { select: { resolvedReportSnapshotEncrypted: true } },
-      compositeAttempt: { select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, trainingPersistenceSnapshot: true, trainingPersistenceSnapshotHash: true, deliveryCourseId: true, attemptEpoch: true, contextSnapshotHash: true, status: true } },
+      compositeAttempt: { select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, ...trainingFeedbackAttemptSelect,
+        compositeAssessment: { select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT.compositeAssessment.select, ...trainingFeedbackParentSelect } },
+        trainingPersistenceSnapshot: true, trainingPersistenceSnapshotHash: true, deliveryCourseId: true, attemptEpoch: true, contextSnapshotHash: true, status: true } },
       trials: {
         orderBy: { trialIndex: 'desc' },
         take: 1,
@@ -452,7 +456,7 @@ export const getSession = async (userId: string, sessionId: string) => {
     // Relational cohort-only attempts expose terminal state but never an
     // individual Cognitive result. The parent cohort projection is authoritative.
     const runnerPayload = await toRunnerPayload(session)
-    if (session.compositeAttemptId && session.compositeAttempt?.status !== 'COMPLETED') {
+    if (session.compositeAttemptId && await isLoadedCompositeParticipantFeedbackDeferred(session.compositeAttempt)) {
       return { ...runnerPayload, status: session.status, finishedAt: session.finishedAt, feedbackDeferred: true }
     }
     if (
@@ -539,7 +543,9 @@ export const getPublicSession = async (recoveryTokenHash: string, sessionId: str
     where: { id: sessionId },
     include: {
       assignment: { select: { resolvedReportSnapshotEncrypted: true } },
-      compositeAttempt: { select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, trainingPersistenceSnapshot: true, trainingPersistenceSnapshotHash: true, deliveryCourseId: true, attemptEpoch: true, recoveryTokenHash: true, userId: true, contextSnapshotHash: true, status: true } },
+      compositeAttempt: { select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, ...trainingFeedbackAttemptSelect,
+        compositeAssessment: { select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT.compositeAssessment.select, ...trainingFeedbackParentSelect } },
+        trainingPersistenceSnapshot: true, trainingPersistenceSnapshotHash: true, deliveryCourseId: true, attemptEpoch: true, recoveryTokenHash: true, userId: true, contextSnapshotHash: true, status: true } },
       trials: {
         orderBy: { trialIndex: 'desc' },
         take: 1,
@@ -557,7 +563,7 @@ export const getPublicSession = async (recoveryTokenHash: string, sessionId: str
   const nextTrialIndex = (session.trials?.[0]?.trialIndex ?? -1) + 1
   const runnerPayload = await toRunnerPayload(session, nextTrialIndex, true)
   if (session.status !== 'COMPLETED') return runnerPayload
-  if (session.compositeAttemptId && session.compositeAttempt?.status !== 'COMPLETED') {
+  if (session.compositeAttemptId && await isLoadedCompositeParticipantFeedbackDeferred(session.compositeAttempt)) {
     return { ...runnerPayload, finishedAt: session.finishedAt, feedbackDeferred: true }
   }
 

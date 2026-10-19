@@ -50,7 +50,7 @@ import { submitSituationalAttemptFinal } from '../situational/situational-final-
 import { situationalFinalSubmitSchema } from '../situational/situational-final-submit.schema'
 import { compositeItemSlotKey } from '../assessment-runtime/slot-set'
 import { isRelationalCohortOnlyCompositeAttempt, projectRelationalUnitFinalResponse } from '../assessment-relational/result-authority'
-import { isCompositeParticipantFeedbackDeferred } from '../assessment-policy/participant-feedback'
+import { isLoadedCompositeParticipantFeedbackDeferred } from '../assessment-policy/participant-feedback'
 import {
   assignCompositeFormItemToSection,
   createCompositeFormSection,
@@ -113,6 +113,7 @@ export const compositeController = {
   async publicWholeSubmit(req: Request, res: Response) { return handleWholeSubmit(req, res, true) },
 
   async reportStatus(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     const abort = new AbortController(); const closed = () => abort.abort(); res.once('close', closed)
     try { return success(res, await service.getCompositeReportStatus(req.params.attemptId, { userId: req.user!.userId },
       { waitMs: Number(req.query.waitMs) || 0, signal: abort.signal })) }
@@ -120,10 +121,12 @@ export const compositeController = {
     finally { res.off('close', closed) }
   },
   async retryReport(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try { return success(res, await service.retryCompositeQuestionnaireReport(req.params.attemptId, { userId: req.user!.userId })) }
     catch (err) { return handleError(res, err) }
   },
   async publicReportStatus(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     const abort = new AbortController(); const closed = () => abort.abort(); res.once('close', closed)
     try { return success(res, await service.getCompositeReportStatus(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) },
       { waitMs: Number(req.query.waitMs) || 0, signal: abort.signal })) }
@@ -131,6 +134,7 @@ export const compositeController = {
     finally { res.off('close', closed) }
   },
   async publicRetryReport(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try { return success(res, await service.retryCompositeQuestionnaireReport(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) })) }
     catch (err) { return handleError(res, err) }
   },
@@ -422,6 +426,7 @@ export const compositeController = {
   },
 
   async getAttempt(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try {
       if (!req.user) return unauthorized(res)
       return success(res, await service.getAttemptState(req.params.attemptId, { userId: req.user.userId }))
@@ -429,6 +434,7 @@ export const compositeController = {
   },
 
   async getEmbeddedSituational(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try {
       if (!req.user) return unauthorized(res)
       const runtime = await loadEmbeddedSituationalAttemptRuntime(
@@ -436,7 +442,7 @@ export const compositeController = {
         embeddedSituationalAccess(req, { userId: req.user.userId }),
       )
       const feedbackDeferred = runtime.row.status === 'COMPLETED'
-        && await isCompositeParticipantFeedbackDeferred(req.params.attemptId)
+        && await isLoadedCompositeParticipantFeedbackDeferred(runtime.row.compositeAttempt)
       const suppressResult = feedbackDeferred || (runtime.row.status === 'COMPLETED'
         && await isRelationalCohortOnlyCompositeAttempt(req.params.attemptId))
       return success(res, { ...situationalAttemptForResponse(runtime.row, runtime.snapshot, { suppressResult, feedbackDeferred }),
@@ -467,6 +473,7 @@ export const compositeController = {
   },
 
   async submitEmbeddedSituational(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try {
       if (!req.user) return unauthorized(res)
       const parsed = situationalFinalSubmitSchema.safeParse(req.body)
@@ -528,6 +535,7 @@ export const compositeController = {
   },
 
   async submitFinalFormSection(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try {
       if (!req.user) return unauthorized(res)
       const input = finalCompositeFormSectionSubmitSchema.parse(req.body)
@@ -548,6 +556,7 @@ export const compositeController = {
   },
 
   async submitFinalScale(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try {
       if (!req.user) return unauthorized(res)
       const input = finalScaleSubmitSchema.parse(req.body)
@@ -570,6 +579,7 @@ export const compositeController = {
   },
 
   async report(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try {
       if (!req.user) return unauthorized(res)
       const query = compositeReportQuerySchema.parse(req.query)
@@ -579,6 +589,7 @@ export const compositeController = {
   },
 
   async analysisExport(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try {
       if (!req.user) return unauthorized(res)
       const query = compositeParticipantAnalysisExportQuerySchema.parse(req.query)
@@ -720,17 +731,19 @@ export const compositeController = {
   },
 
   async publicAttempt(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try { return success(res, await service.getAttemptState(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) })) } catch (err) { return handleError(res, err) }
   },
 
   async publicEmbeddedSituational(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try {
       const runtime = await loadEmbeddedSituationalAttemptRuntime(
         req.params.situationalAttemptId,
         embeddedSituationalAccess(req, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) }),
       )
       const suppressResult = runtime.row.status === 'COMPLETED'
-        && await isCompositeParticipantFeedbackDeferred(req.params.attemptId)
+        && await isLoadedCompositeParticipantFeedbackDeferred(runtime.row.compositeAttempt)
       return success(res, { ...situationalAttemptForResponse(runtime.row, runtime.snapshot, { suppressResult, feedbackDeferred: suppressResult }),
         ...(runtime.trainingPersistence ? { trainingPersistence: runtime.trainingPersistence, checkpointDefinitionHash: runtime.checkpointDefinitionHash } : {}),
       })
@@ -758,6 +771,7 @@ export const compositeController = {
   },
 
   async publicSubmitEmbeddedSituational(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try {
       const parsed = situationalFinalSubmitSchema.safeParse(req.body)
       if (!parsed.success) return error(res, firstSituationalValidationMessage(parsed.error))
@@ -815,6 +829,7 @@ export const compositeController = {
   },
 
   async publicSubmitFinalFormSection(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try {
       const input = finalCompositeFormSectionSubmitSchema.parse(req.body)
       const data = await submitCompositeFormSectionFinal({
@@ -835,6 +850,7 @@ export const compositeController = {
   },
 
   async publicSubmitFinalScale(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try {
       const input = finalScaleSubmitSchema.parse(req.body)
       const { submitCompositeScaleFinal } = await import('../scale/scale-final-submit.service')
@@ -856,16 +872,20 @@ export const compositeController = {
   },
 
   async retryBundle(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try { return success(res, await service.retryBundleForParticipant(req.params.attemptId, { userId: req.user!.userId })) } catch (err) { return handleError(res, err) }
   },
   async publicRetryBundle(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try { return success(res, await service.retryBundleForParticipant(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) })) } catch (err) { return handleError(res, err) }
   },
   async publicReport(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try { return success(res, await service.getReport(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) })) } catch (err) { return handleError(res, err) }
   },
 
   async publicAnalysisExport(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try {
       const query = compositeParticipantAnalysisExportQuerySchema.parse(req.query)
       const context = await service.getAnalysisExportForParticipant(
