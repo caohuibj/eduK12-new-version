@@ -1,0 +1,37 @@
+{
+  "files": {
+    "s06-native-ax-complete.json": {
+      "bytes": 384547,
+      "sha256": "6c7550622db6af114f9bf11687e758b1b2a3c2ed353053c1a13383b7a46d7722",
+      "validJSON": true,
+      "qualification": "unchanged original local AX bytes; includes browser UI metadata; no credentials or real participants"
+    },
+    "s06-native-ax-final.json": {
+      "bytes": 132338,
+      "sha256": "bd84a3a74c5ba1c5164586ee9815d2ee3ed9af1ae210e7e73814d43c265fe14d",
+      "validJSON": true,
+      "qualification": "unchanged original local AX bytes; includes browser UI metadata; no credentials or real participants"
+    },
+    "s06-native-copy-gap-and-chinese.json": {
+      "bytes": 65930,
+      "sha256": "1c8b6bc9e993b09b7b03d4a854dc6d62d037f8144d2fade19dff1fac3ff425be",
+      "validJSON": true,
+      "qualification": "unchanged original local AX bytes; includes browser UI metadata; no credentials or real participants"
+    },
+    "s06-native-safari-copy-fixed.json": {
+      "bytes": 20558,
+      "sha256": "f6024474cc7cb36d1b3acad40419138ec73a0a53d0eb763452984ca46707b791",
+      "validJSON": true,
+      "qualification": "unchanged original local AX bytes; includes browser UI metadata; no credentials or real participants"
+    },
+    "s06-native-ax-data-url-truncated.failed.json": {
+      "bytes": 383978,
+      "sha256": "1b494a8459fd958886bf42fbf12f0104f6b4291a45c6bf93b112dc21ea00f43f",
+      "validJSON": false,
+      "qualification": "failed transport payload only; not accepted AX"
+    }
+  },
+  "archiveFolder": "raw-native-s06/",
+  "receipts": "Original S06 cumulative package had 24 JPEGs but omitted four accepted raw AX files and one failed truncated payload. It did not permit independent cloud recomputation of all 28 accepted receipts. The new S07 package supplies these exact original bytes, preserving old receipts and failed transfer status.",
+  "correctedSafariTaskAxContainsChineseError": true
+}

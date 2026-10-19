@@ -13,3 +13,8 @@ SurveyAnalyticsWorkspace 保持原生成 POST、票据／签名游标与 Artifac
 最终应用类型检查通过。五个相关 Survey 产品／新增名称测试／下载测试 lint 无错误或警告；最后测试追加后单独 lint 通过。矩阵旧 Builder 用例另在第一小批记录。原始报告、日志与源码 SHA-256 见 download-evidence 目录。没有重跑无关后端／完整历史套件、没有 CI／PR／合并。
 
 本提交冻结产品，下一步在真实 Mac Chrome、Safari 及 Numbers 验收并单独保存证据。S05 原生非空列表／授权状态、Safari 历史登录／首次提交和首轮四项失败继续保留到 S07，不在本批猜测关闭。
+
+
+## S07 证据勘误
+
+早期下载五文件 lint 为0错误、2条继承的 hook 依赖警告（ResearchPreview initialAnswers；Analytics loadQuality/reload）。最终仅两下载文件 lint 为0错误、1警告。 不改原日志，也不重新运行已通过检查。

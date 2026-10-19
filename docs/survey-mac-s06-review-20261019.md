@@ -53,7 +53,7 @@ Safari 兼容新增项首轮超时（6291ms，报告仅有 STACK_TRACE_ERROR）�
 
 - 仓库证据目录：`docs/survey-mac-s06-native-evidence-20261019/`。`native-observations.json` 去除浏览器无关标签列表，保留任务网页／Numbers内容；记录原始本机文件SHA。
 - 本机原始截图：`/Users/Qiang/Documents/Codex/2026-10-19/task/evidence/s06/native/screenshots/`，24个原始JPEG，未裁剪或转码。CSV／JSON在相邻 `chrome/`、`safari/` 子目录。
-- 28条接收回执的字节数与SHA均按实际文件重算。早期data-URL传输截断失败文件、本轮CUA重置丢失的4张内存截图、首个Numbers认知截图尚未加载完成等情况在 capture-integrity 中逐项保留。不存在的原图不补造；替代图注明后续输入。
+- 本机28条接收回执曾按实际文件核对，但S06原累计包未携带4份原始AX和失败截断载荷，不能声称云端可独立回算全部28条；S07补交现存原始字节及清单。最初共享的Safari最终AX抽取在换行处过早结束，未含错误区域；该次中文错误首先由真实截图证明，S07补正确抽取及原AX。早期data-URL传输截断失败文件、本轮CUA重置丢失的4张内存截图、首个Numbers认知截图尚未加载完成等情况在 capture-integrity 中逐项保留。不存在的原图不补造；替代图注明后续输入。
 - 最终API3197恢复原配置，PID86564，就绪HTTP200。截图接收器3198已停止，任务接收标签已关闭。Safari临时保存位置 Ask for each download 在原流程结束已恢复 Downloads，最终补证未再改设置。
 
 ## 留给父任务／S07

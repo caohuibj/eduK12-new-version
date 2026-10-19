@@ -52,8 +52,8 @@
     "sha256": "7664ab526f493dc2d6c7a16dc6f55b1e2b2d6620d809b7f12532e4dbf0957189"
   },
   "native-observations.json": {
-    "bytes": 497277,
-    "sha256": "3497af75a005d91b673a16488464757e6947e4944a5879c5c5ea1f0614a46f47"
+    "bytes": 509874,
+    "sha256": "8a9d4cfe46d4adced3c7c74d1a4c063c144197d3562b5a137d4a240ab308cae1"
   },
   "s06-backend-control.py.txt": {
     "bytes": 1318,
