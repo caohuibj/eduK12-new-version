@@ -87,7 +87,7 @@ flock "$TOOLS/.measurement.lock" python3 "$EVIDENCE/run-node-integrity.py"
 
 ## 运行时与界面补充验证
 
-运行时冻结检查点：`596520a9a9a5eb64a9d94e3030182d5eb06cae34`。其中 `86d856671a80034417eca38020d063ddfc40be89` 是 C23 紧凑准入/单次认知 admission decode 优化的保留导入，原提交 `213c35ffd030f2a6e7230738381ee1ac663ebe57`；C22 未恢复无条件宽表投影。
+首轮运行时检查点：`596520a9a9a5eb64a9d94e3030182d5eb06cae34`。此检查点后来被独立审查发现的认知历史出口遗漏和模板生命周期回归补充，不能作为全部出口已通过的结论；修复与关闭记录见下节。其中 `86d856671a80034417eca38020d063ddfc40be89` 是 C23 紧凑准入/单次认知 admission decode 优化的保留导入，原提交 `213c35ffd030f2a6e7230738381ee1ac663ebe57`；C22 未恢复无条件宽表投影。
 
 全部命令使用 Node 24.21.0 和同一测量锁，Vitest 单 worker。表中不同执行存在重叠，不能相加成独立总数：
 
@@ -109,6 +109,30 @@ flock "$TOOLS/.measurement.lock" python3 "$EVIDENCE/run-node-integrity.py"
 
 首轮 frontend 为 62 通过 / 2 失败（`c22-frontend-feedback-01.log`）。两条延迟开放断言把 React fake-clock 微任务当作轮询计时器，修正测试中的 0ms 排空后只复测这两条；未通过关闭产品计时逻辑或弱化断言来消除失败。未修改的已通过分支复用原证据；新增/变更分支分别记录，不宣称最终 25 条报告文件在单次执行中全部通过。
 
-独立只读出口复核未发现已映射路径的反馈时间绕过。报告生成状态与开放状态独立；整份 FINAL 已接收、生成中时保留 processing/重试语义；已生成但等待日期时没有自动轮询/定时器，仅手动刷新。现有 `/api` middleware 已统一关闭 ETag 并设置 no-store/no-cache，包含整份 FINAL 和恢复收据。更严格的关系测评披露与教师权限保留。
+首轮仅复核已映射路径，未覆盖认知历史列表和保存模板后的再实例化；原“未发现已映射路径绕过”的范围不足以证明全部出口安全。报告生成状态与开放状态独立；整份 FINAL 已接收、生成中时保留 processing/重试语义；已生成但等待日期时没有自动轮询/定时器，仅手动刷新。现有 `/api` middleware 已统一关闭 ETag 并设置 no-store/no-cache，包含整份 FINAL 和恢复收据。更严格的关系测评披露与教师权限保留。
 
 边界：上述服务/控制器测试使用 mock DB 或 mock API；源码断言不是实际 HTTP/数据库并发证明。除前述最小合成 PostgreSQL 外，未运行完整数据库迁移、真实应用 HTTP、浏览器、负载/CPU 对比、生产恢复或 CI/发布资格检查。
+
+
+## 独立审查发现与修复（后续检查点）
+
+独立审查确认以下两项真实缺口，已分别修复并按不可变提交关闭。早先 `596520a9` / `43453927` 的检查点和原始日志仍保留，不把原先遗漏改写成当时已覆盖。
+
+1. **P1：认知历史列表提前披露。** 普通学员认证的 `GET /api/cognitive/history` 原来仅检查父测评完成，然后解密 v2 结果或返回旧版分数/质量状态，未检查冻结反馈策略和当前异步生成身份。修复提交 `a1a5cc1fc3012f11dfc61448a5dbeabf39eeb82c`：复用已加载父级紧凑字段与共享策略判断；仅对时间已满足且需要当前异步状态的父级，按 parent ID/epoch 去重后查询一次 job header 批次，再核对 epoch、slot、context、aggregate 身份。未来、错误或旧 epoch 不增加逐条查询。未开放行在结果解密之前返回完成元数据、空分数/质量及父级状态页地址；界面也抑制任何陈旧分数/质量。原归属与变式/流程筛选保留，无等待日期轮询。独立审查已对该不可变提交关闭 P1。
+2. **P2：保存模板后无法再次实例化。** 新的默认反馈策略与既有 persistence/timing 设置保留在已移除课程绑定的模板定义上，普通 copy 的严格课程范围校验会拒绝实例化。修复提交 `8418252ec2cb458edeb3ae1f5d73fe3ff478fcbb`：只在现有锁定、未使用的私有 DRAFT 副本上，删除课程投放后清除 feedback/persistence 的策略与哈希，以及课程级 `BROWSER_ACTIVE_SCALE_V1` timing 策略（其哈希内嵌，未单设列）。不清除认知刺激时序、科学配置、题目/计分定义；原发布和普通有课程 copy 不变，严格编制校验未放宽。界面提交 `c5bb59d9d3f11841ed9577fee47c39c564c6b981` 在保存及实例化前说明：反馈时间、草稿保留和课程级作答计时需为新课程重新选择。独立审查已关闭后端 P2 和该界面补充。
+
+| 新增受影响检查 | 实际结果 | 原始日志 |
+|---|---|---|
+| Cognitive 历史服务/旧兼容/API | 3 文件，22 通过（16 新用例、4 原服务、2 API）；覆盖时间前/边界、异步未就绪/旧 epoch、旧 NULL、归属、查询数量与未开放不解密 | `c22-history-release-01.log` |
+| Cognitive 历史界面 | 9 通过；完成回执保留、陈旧结果抑制、父级状态入口、旧展示兼容 | `c22-frontend-history-tests-01.log` |
+| 历史变更类型/lint | backend no-emit exit 0；frontend 294 文件依赖闭包 0 诊断、受影响 ESLint 0 诊断 | `c22-history-backend-types-01.log`、`c22-frontend-history-types-01.log`、`c22-frontend-history-lint-01.log` |
+| 真实 service/workbench 模板生命周期（mock DB） | 11 新用例 + 27 原编制用例，共 38 通过；save→copy→instantiate→新课程绑定、三策略并存、源不变、幂等、普通复制保留、非法范围仍拒绝 | `c22-feedback-template-authoring-01.log` |
+| 保存/实例化界面说明与原请求幂等契约 | 2 文件，3 通过、3 未选；不把未选用例计为通过 | `c22-template-ui-01.log` |
+| 模板界面类型/lint | 420 文件依赖闭包 0 诊断、受影响 ESLint 0 诊断 | `c22-template-ui-types-01.log`、`c22-template-ui-lint-01.log` |
+| 模板后端 scoped no-emit TypeScript | 补全既有全局 augmentation 根文件后，1168 文件依赖闭包 0 诊断 | `c22-template-backend-types-02.log` |
+
+这些检查复用 Node 24.21.0、单 worker 和共享锁；未重放已完成的 PostgreSQL 检查或原有全部测试。最终模板后端 scoped TypeScript 首次根文件选择遗漏既有 Express `Request.user` augmentation，导致 `assetStorage.ts:691` 的 TS2339；保留 `c22-template-backend-types-01.log`，无产品源码修补。后续只把现有全局 augmentation 文件加入受影响根集合，1168 文件依赖闭包为 0 诊断；不把首轮失败计为通过，也不将两次相加。
+
+邻近出口只读复核：Scale/SJT 历史明确排除 embedded 作答，SJT research export 拒绝 embedded，认知任务发现为 standalone，教师 workbench/export 仍按原权限，整份提交/恢复仅返回收据与任务元数据。未发现另一个结果数据绕过。保留的低优先级一致性问题是 `assessment-policy/inbox.ts` 把已提交课程测评标记为 `resultAvailability='REPORT'`，未单独区分等待开放；其链接指向受保护的状态页，不返回分数或质量，也未通过删除完成状态来规避。按范围决策留待 C24 处理标签/文案，不为此增加反馈查询；实际开放页继续作为权威状态。
+
+最终边界仍是定向 mock 服务/UI、源码与有限 no-emit 检查，加上此前明确为部分 SQL 成功的最小合成迁移及单独 Node 补执行；没有真实应用 HTTP、完整迁移/恢复、并发 race、浏览器、性能、CI、合并或生产资格声明。
