@@ -24,7 +24,9 @@ function boundedText(path,maxBytes){
  const fd=fs.openSync(path,'r'),buffer=Buffer.allocUnsafe(maxBytes+1);let used=0
  try{while(used<buffer.length){const n=fs.readSync(fd,buffer,used,buffer.length-used,null);if(n===0)break;used+=n}assert.ok(used<=maxBytes,'oversized proc file');return buffer.toString('utf8',0,used)}finally{fs.closeSync(fd)}
 }
-const realIo=Object.freeze({readText:boundedText,readdir:path=>fs.readdirSync(path),readlink:path=>fs.readlinkSync(path)})
+const realIo=Object.freeze({readText:boundedText,readdir:path=>fs.readdirSync(path),readlink:path=>fs.readlinkSync(path),
+ openDirectory(path,max){const handle=fs.opendirSync(path);const entries=[];try{let entry;while((entry=handle.readSync())){entries.push(entry.name);assert.ok(entries.length<=max,'proc directory bound')}return {entries,close:()=>handle.closeSync()}}catch(error){handle.closeSync();throw error}},
+})
 function address(hex,family,byteOrder){
  assert.ok(['LE','BE'].includes(byteOrder),'unknown native byte order');assert.match(hex,new RegExp(`^[0-9A-Fa-f]{${family===4?8:32}}$`),'invalid proc address')
  const bytes=[]
@@ -68,19 +70,19 @@ export function parseProcUnix(text){
 export function createProcSocketReader({registry,remainingMs,record,io=realIo,now=()=>performance.now(),maxReadMs=100,byteOrder=os.endianness()}){
  assert.equal(typeof registry?.entries,'function');for(const fn of [remainingMs,record,now,io.readText,io.readdir,io.readlink])assert.equal(typeof fn,'function')
  assert.ok(Number.isSafeInteger(maxReadMs)&&maxReadMs>0&&maxReadMs<=100,'proc budget exceeds sample interval');assert.ok(['LE','BE'].includes(byteOrder))
- const seen=new Map();let lastNow=-Infinity
+ const seen=new Map();let lastNow=-Infinity,childEnumerationMethod=null
  return function readProc(){
   const clock=()=>{const value=now();assert.ok(Number.isFinite(value)&&value>=lastNow,'proc clock went backwards');lastNow=value;return value}
-  const started=clock();let readCount=0,bytesRead=0
+  const started=clock(),cpuStarted=process.cpuUsage();let readCount=0,bytesRead=0,globalProcScans=0,globalProcRows=0,globalProcElapsedMs=0;let directoryHandles=[]
   const check=()=>{const left=remainingMs();assert.ok(Number.isFinite(left)&&left>0&&clock()-started<maxReadMs,'proc sample deadline exhausted');assert.ok(readCount<=12000,'proc read count bound')}
   const readText=(path,max=65536)=>{check();readCount++;let value;try{value=io.readText(path,max)}catch(error){error.procPath=path;throw error}assert.equal(typeof value,'string');const bytes=Buffer.byteLength(value);assert.ok(bytes<=max,'oversized proc input');bytesRead+=bytes;assert.ok(bytesRead<=8*MAX_TEXT,'proc input byte bound');return value}
   const readlink=path=>{check();readCount++;let value;try{value=io.readlink(path)}catch(error){error.procPath=path;throw error}assert.ok(typeof value==='string'&&value.length<=4096,'invalid proc symlink');return value}
-  const directory=(path,max)=>{check();readCount++;let entries;try{entries=io.readdir(path)}catch(error){error.procPath=path;throw error}assert.ok(Array.isArray(entries)&&entries.length<=max,'proc directory bound');assert.ok(entries.every(x=>typeof x==='string'&&/^(0|[1-9][0-9]*)$/.test(x)),'invalid proc directory name');assert.equal(new Set(entries).size,entries.length,'duplicate proc entry');return entries.sort((a,b)=>Number(a)-Number(b))}
+  const directory=(path,max)=>{check();readCount++;let entries;try{if(io.openDirectory){const opened=io.openDirectory(path,max);directoryHandles.push(opened);entries=opened.entries}else entries=io.readdir(path)}catch(error){error.procPath=path;throw error}assert.ok(Array.isArray(entries)&&entries.length<=max,'proc directory bound');assert.ok(entries.every(x=>typeof x==='string'&&/^(0|[1-9][0-9]*)$/.test(x)),'invalid proc directory name');assert.equal(new Set(entries).size,entries.length,'duplicate proc entry');return entries.sort((a,b)=>Number(a)-Number(b))}
   const stat=pid=>{const p=parseProcStat(readText(`/proc/${pid}/stat`));assert.equal(p.pid,pid,'proc PID mismatch');assert.match(p.state,/^[RSDTtZXxKWPI]$/,'unknown process state');integer(p.processGroupId,'process group',true);return p}
   const pin=p=>{const old=seen.get(p.pid);if(old)assert.ok(old.startTicks===p.startTicks&&old.processGroupId===p.processGroupId&&old.parentPid===p.parentPid,'PID reused or process group/parent changed');else{assert.ok(seen.size<2048,'proc identity history bound');seen.set(p.pid,{startTicks:p.startTicks,processGroupId:p.processGroupId,parentPid:p.parentPid})}}
   const attempts=[]
   for(let attempt=1;attempt<=2;attempt++){
-   const processes=[],missingProcessIdentities=[],terminatedProcessObservations=[]
+   const processes=[],missingProcessIdentities=[],terminatedProcessObservations=[],terminatedPgChildObservations=[]
    try{
     check();const owners=registry.entries();assert.ok(Array.isArray(owners)&&owners.length>0&&owners.length<=MAX_PROCESSES,'owned process bound');const ownerPids=new Set()
     for(const owner of owners){identity(owner);integer(owner.processGroupId,'owned process group',true);assert.ok(ROLES.has(owner.role),'unknown owned role');assert.ok(!ownerPids.has(owner.pid),'duplicate owner PID');ownerPids.add(owner.pid)}
@@ -88,7 +90,8 @@ export function createProcSocketReader({registry,remainingMs,record,io=realIo,no
     const namespace=readlink('/proc/self/ns/net');assert.match(namespace,/^net:\[\d+\]$/,'invalid network namespace')
     const terminated=(p,owner)=>{
      if(!['Z','X','x'].includes(p.state))return false
-     assert.ok(owner&&['report_worker','export_worker'].includes(owner.role),'required process became terminal')
+     if(!owner){assert.equal(p.parentPid,postmaster.pid,'terminal PG child parent changed');pin(p);terminatedPgChildObservations.push({...p});return true}
+     assert.ok(['report_worker','export_worker'].includes(owner.role),'required process became terminal')
      assert.equal(identity(p),identity(owner));assert.equal(p.processGroupId,owner.processGroupId);if(owner.parentPid!==undefined)assert.equal(p.parentPid,owner.parentPid);pin(p)
      const id=identity(owner);if(!missingProcessIdentities.includes(id))missingProcessIdentities.push(id)
      terminatedProcessObservations.push({...p,rssObservation:'NOT_AVAILABLE_AFTER_TERMINATION',terminalCloseProof:'STILL_REQUIRED_BY_PG_OBSERVER'})
@@ -114,12 +117,33 @@ export function createProcSocketReader({registry,remainingMs,record,io=realIo,no
     for(const owner of owners)sample(owner.pid,owner)
     const children=()=>{
      const tids=directory(`/proc/${postmaster.pid}/task`,MAX_PROCESSES);assert.ok(tids.includes(String(postmaster.pid)),'postmaster task missing');const pids=[]
-     for(const tid of tids){const text=readText(`/proc/${postmaster.pid}/task/${tid}/children`).trim();if(text)for(const value of text.split(/\s+/)){assert.match(value,/^[1-9][0-9]*$/,'invalid PG child PID');pids.push(integer(Number(value),'PG child PID',true))}}
-     assert.ok(pids.length<=MAX_PROCESSES,'PG child bound');assert.equal(new Set(pids).size,pids.length,'duplicate PG child');return {tids,pids:pids.sort((a,b)=>a-b)}
+     if(childEnumerationMethod!=='COMPLETE_PROC_PPID'){
+      try{
+       for(const tid of tids){const text=readText(`/proc/${postmaster.pid}/task/${tid}/children`).trim();if(text)for(const value of text.split(/\s+/)){assert.match(value,/^[1-9][0-9]*$/,'invalid PG child PID');pids.push(integer(Number(value),'PG child PID',true))}}
+       childEnumerationMethod='TASK_CHILDREN';assert.ok(pids.length<=MAX_PROCESSES,'PG child bound');assert.equal(new Set(pids).size,pids.length,'duplicate PG child');return {method:childEnumerationMethod,tids,pids:pids.sort((a,b)=>a-b)}
+      }catch(error){
+       // Only a genuinely absent children interface permits this alternative.
+       // A previously available interface disappearing remains a snapshot race.
+       if(childEnumerationMethod||error.code!=='ENOENT'||!/^\/proc\/[0-9]+\/task\/[0-9]+\/children$/.test(error.procPath??''))throw error
+       const still=stat(postmaster.pid);assert.equal(identity(still),identity(postmaster));assert.equal(still.processGroupId,postmaster.processGroupId)
+       assert.ok(directory(`/proc/${postmaster.pid}/task`,MAX_PROCESSES).includes(String(postmaster.pid)),'postmaster disappeared during interface detection')
+       childEnumerationMethod='COMPLETE_PROC_PPID'
+      }
+     }
+     // This kernel omits task/<tid>/children. Enumerate every numeric /proc PID;
+     // no missing stat, permission error or parse error may be treated as empty.
+     const scanAt=clock();check();readCount++;const raw=io.readdir('/proc');assert.ok(Array.isArray(raw)&&raw.length<=8192,'global proc directory bound')
+     const ids=raw.filter(x=>typeof x==='string'&&/^[1-9][0-9]*$/.test(x)).sort((a,b)=>Number(a)-Number(b));assert.ok(ids.length<=2048,'global process bound');assert.equal(new Set(ids).size,ids.length,'duplicate global PID')
+     const all=ids.map(value=>{const p=stat(Number(value));return {pid:p.pid,startTicks:p.startTicks,parentPid:p.parentPid,processGroupId:p.processGroupId}})
+     check();readCount++;const after=io.readdir('/proc');assert.ok(Array.isArray(after)&&after.length<=8192,'global proc directory bound');const afterIds=after.filter(x=>typeof x==='string'&&/^[1-9][0-9]*$/.test(x)).sort((a,b)=>Number(a)-Number(b))
+     if(!same(ids,afterIds))race('global process set changed during child enumeration')
+     const children=all.filter(p=>p.parentPid===postmaster.pid);assert.ok(children.length<=MAX_PROCESSES,'PG child bound')
+     globalProcScans++;globalProcRows+=all.length;globalProcElapsedMs+=clock()-scanAt;check()
+     return {method:childEnumerationMethod,tids,pids:children.map(p=>p.pid),globalIdentities:all}
     }
     const firstChildren=children();for(const pid of firstChildren.pids)if(!ownerPids.has(pid))sample(pid)
     assert.ok(processes.length<=MAX_PROCESSES,'combined process bound')
-    for(const pid of firstChildren.pids)assert.equal(processes.find(p=>p.pid===pid)?.parentPid,postmaster.pid,'registered PG child parent mismatch')
+    for(const pid of firstChildren.pids)assert.equal((processes.find(p=>p.pid===pid)??terminatedPgChildObservations.find(p=>p.pid===pid))?.parentPid,postmaster.pid,'registered PG child parent mismatch')
     const descriptors=()=>{
      const found=[];let total=0
      for(const p of processes){const fds=directory(`/proc/${p.pid}/fd`,MAX_FDS);total+=fds.length;assert.ok(total<=MAX_FDS,'combined fd bound')
@@ -133,22 +157,23 @@ export function createProcSocketReader({registry,remainingMs,record,io=realIo,no
     const socketInventory=firstFds.map(fd=>{const row=byInode.get(fd.inode);if(!row)race('owned socket inode absent from supported network tables');return {...row,...fd}})
     if(!same(firstFds,descriptors()))race('socket fd/inode set changed during sample')
     if(!same(firstChildren,children()))race('postmaster child/task set changed during sample')
-    for(const p of processes){const end=stat(p.pid);assert.equal(identity(end),identity(p),'PID reused after socket sample');assert.equal(end.processGroupId,p.processGroupId,'process group changed after socket sample');assert.equal(end.parentPid,p.parentPid,'parent changed after socket sample');assert.equal(readlink(`/proc/${p.pid}/ns/net`),namespace,'network namespace changed');assert.ok(end.userTicks>=p.userTicks&&end.systemTicks>=p.systemTicks,'CPU counter went backwards after sockets');pin(end);if(terminated(end,owners.find(owner=>owner.pid===p.pid)))continue;Object.assign(p,end)}
-    for(const observation of terminatedProcessObservations){try{const end=stat(observation.pid);assert.equal(identity(end),identity(observation),'terminated PID reused');assert.equal(end.processGroupId,observation.processGroupId);assert.equal(end.parentPid,observation.parentPid);assert.ok(['Z','X','x'].includes(end.state),'terminated owner reappeared alive');assert.ok(end.userTicks>=observation.userTicks&&end.systemTicks>=observation.systemTicks);Object.assign(observation,end)}catch(error){if(!missing(error))throw error}}
-    const terminatedIds=new Set(terminatedProcessObservations.map(identity));for(let i=processes.length-1;i>=0;i--)if(terminatedIds.has(identity(processes[i])))processes.splice(i,1)
+    for(const p of processes){const end=stat(p.pid);assert.equal(identity(end),identity(p),'PID reused after socket sample');assert.equal(end.processGroupId,p.processGroupId,'process group changed after socket sample');assert.equal(end.parentPid,p.parentPid,'parent changed after socket sample');assert.ok(end.userTicks>=p.userTicks&&end.systemTicks>=p.systemTicks,'CPU counter went backwards after sockets');pin(end);if(terminated(end,owners.find(owner=>owner.pid===p.pid)))continue;assert.equal(readlink(`/proc/${p.pid}/ns/net`),namespace,'network namespace changed');Object.assign(p,end)}
+    for(const observation of [...terminatedProcessObservations,...terminatedPgChildObservations]){try{const end=stat(observation.pid);assert.equal(identity(end),identity(observation),'terminated PID reused');assert.equal(end.processGroupId,observation.processGroupId);assert.equal(end.parentPid,observation.parentPid);assert.ok(['Z','X','x'].includes(end.state),'terminated owner reappeared alive');assert.ok(end.userTicks>=observation.userTicks&&end.systemTicks>=observation.systemTicks);Object.assign(observation,end)}catch(error){if(!missing(error))throw error}}
+    const terminatedIds=new Set([...terminatedProcessObservations,...terminatedPgChildObservations].map(identity));for(let i=processes.length-1;i>=0;i--)if(terminatedIds.has(identity(processes[i])))processes.splice(i,1)
     for(const id of missingProcessIdentities.filter(id=>!terminatedIds.has(id))){const pid=Number(id.split(':')[0]);try{const returned=stat(pid);assert.equal(identity(returned),id,'owned PID reused after disappearance');assert.equal(returned.processGroupId,owners.find(p=>p.pid===pid).processGroupId,'owned process group changed after disappearance');race('missing owner reappeared after sample')}catch(error){if(!missing(error))throw error}}
     assert.ok(same(owners,registry.entries()),'owned registry changed during proc read');check()
-    const pgChildren=firstChildren.pids.map(pid=>{const p=processes.find(p=>p.pid===pid);return {pid,startTicks:p.startTicks,processGroupId:p.processGroupId}})
-    const evidence={kind:'proc_socket_snapshot',attempts:attempt,elapsedMs:clock()-started,readCount,bytesRead,missingProcessIdentities,terminatedProcessObservations,discardedAttempts:attempts}
-    record(evidence);check();const sockets=socketInventory.filter(row=>row.protocol==='tcp'&&row.state==='ESTABLISHED'&&!terminatedIds.has(`${row.ownerPid}:${row.ownerStartTicks}`));return {processes,sockets,socketInventory,pgChildren,missingProcessIdentities,terminatedProcessObservations,snapshotEvidence:evidence}
+    const enumeratedPgChildIdentities=firstChildren.pids.map(pid=>{const p=processes.find(p=>p.pid===pid)??terminatedPgChildObservations.find(p=>p.pid===pid);assert.ok(p,'enumerated PG child omitted');return {pid,startTicks:p.startTicks,processGroupId:p.processGroupId,parentPid:p.parentPid}})
+    const pgChildren=enumeratedPgChildIdentities.filter(p=>!terminatedIds.has(identity(p))).map(({parentPid,...p})=>p)
+    const evidence={kind:'proc_socket_snapshot',attempts:attempt,elapsedMs:clock()-started,readCount,bytesRead,childEnumerationMethod,globalProcScans,globalProcRows,globalProcElapsedMs,observerCpu:process.cpuUsage(cpuStarted),missingProcessIdentities,terminatedProcessObservations,terminatedPgChildObservations,enumeratedPgChildIdentities,discardedAttempts:attempts}
+    record(evidence);check();const sockets=socketInventory.filter(row=>row.protocol==='tcp'&&row.state==='ESTABLISHED'&&!terminatedIds.has(`${row.ownerPid}:${row.ownerStartTicks}`));return {processes,sockets,socketInventory,pgChildren,missingProcessIdentities,terminatedProcessObservations,terminatedPgChildObservations,enumeratedPgChildIdentities,snapshotEvidence:evidence}
    }catch(error){
     // A disappearance after a successful initial stat/fd listing is a snapshot
     // race, not permission to omit a row. Exactly one whole resnapshot follows.
-    if(missing(error)&&/^\/proc\/[1-9][0-9]*\//.test(error.procPath??''))error=new SnapshotRace('proc entry disappeared during snapshot')
-    const evidence={attempt,reason:error.code??error.name,detail:error.message,processes,missingProcessIdentities,terminatedProcessObservations,elapsedMs:clock()-started}
+    if(missing(error)&&/^\/proc\/[1-9][0-9]*\//.test(error.procPath??'')){const original=error;error=new SnapshotRace('proc entry disappeared during snapshot');error.procPath=original.procPath}
+    const evidence={attempt,reason:error.code??error.name,detail:error.message,procPath:error.procPath??null,childEnumerationMethod,globalProcScans,globalProcRows,globalProcElapsedMs,observerCpu:process.cpuUsage(cpuStarted),processes,missingProcessIdentities,terminatedProcessObservations,terminatedPgChildObservations,elapsedMs:clock()-started}
     attempts.push(evidence);record({kind:'proc_socket_snapshot_failure',...evidence,retryAllowed:error instanceof SnapshotRace&&attempt===1})
     if(!(error instanceof SnapshotRace)||attempt===2)throw error
-   }
+   }finally{for(const handle of directoryHandles.reverse())handle.close();directoryHandles=[]}
   }
   throw new Error('unreachable proc snapshot state')
  }

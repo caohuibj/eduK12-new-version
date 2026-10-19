@@ -14,7 +14,7 @@ function fixture(fault){
   async end(){this.ends++;events.push({stage:'fake-end'});heldResolve?.({command:'SELECT',rowCount:1,rows:[identity]})}
  }
  const opts={ownerUrl:'postgresql://eduk12_owner:synthetic@127.0.0.1:54321/eduk12_c25_joint_restore?application_name=untrusted&options=-c%20default_transaction_read_only=off',port:54321,applicationName:identity.applicationName,expectedSystemIdentifier:'456',primaryDatabase:'eduk12_recovery',remainingMs:()=>5000,record:x=>events.push(x),onFault:error=>events.push({stage:'fault',errorClass:error.name})}
- return {events,queries,clients,open:()=>openReadonlyPgObserver(opts,{Client})}
+ return {events,queries,clients,opts,open:()=>openReadonlyPgObserver(opts,{Client})}
 }
 const request=signal=>({text:PG_OBSERVER_SQL.activity,values:[],statementTimeoutMs:200,remainingMs:1000,readOnly:true,signal})
 test('real PG adapter creates one exact read-only startup and only pinned single SELECTs without SET/reset/metrics SQL',async()=>{
@@ -38,4 +38,9 @@ test('unreviewed SQL, too-short server budget and overlapping requests fail clos
 test('installed statement view is required and an actual query deadline fails the same connection within 200ms',{timeout:2000},async()=>{
  const available=fixture('extension'),a=await available.open();assert.deepEqual(a.pgStatStatements,{mode:'required'});await a.close()
  const f=fixture('hold'),c=await f.open(),at=performance.now();await assert.rejects(c.query(request()),/deadline/);assert.ok(performance.now()-at<1000);await assert.rejects(c.close());assert.equal(f.clients[0].ends,1)
+})
+
+test('expired remaining budget still initiates exactly one same-socket end and rejects qualification',async()=>{
+ const expired=fixture();let left=5000;expired.opts.remainingMs=()=>left;const connection=await expired.open();left=0
+ await assert.rejects(connection.close(),/aggregate deadline/);assert.equal(expired.clients.length,1);assert.equal(expired.clients[0].ends,1)
 })

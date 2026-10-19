@@ -21,7 +21,7 @@ export async function openReadonlyPgObserver({ownerUrl,port,applicationName,expe
  function end(){
   if(ending)return ending
   // pg 8.16.3 Client.end destroys its own socket when an active query exists.
-  closed=true;ending=Promise.resolve().then(()=>client.end());ending.catch(()=>{});return ending
+  closed=true;try{ending=Promise.resolve(client.end())}catch(error){ending=Promise.reject(error)}ending.catch(()=>{});return ending
  }
  const bounded=async(fn,ms,signal)=>{
   assert.ok(!signal?.aborted,'PG query already cancelled')
@@ -54,7 +54,7 @@ export async function openReadonlyPgObserver({ownerUrl,port,applicationName,expe
    async query({text,values,statementTimeoutMs,remainingMs:left,signal,readOnly}){
     try{assert.ok(Object.values(PG_OBSERVER_SQL).includes(text),'unreviewed observer SQL');assert.deepEqual(values,[]);assert.equal(readOnly,true);assert.equal(statementTimeoutMs,200,'fixed server timeout cannot fit shortened remaining window');assert.ok(left>=200);return await queryOne(text,signal,200)}catch(error){stop(error);void end();throw error}
    },
-   async close(){try{await bounded(()=>end(),Math.min(1000,Math.floor(remaining())));record({stage:'PG_ADAPTER_CLOSED',connected,issued,completed,previousFailure:!!failure});assert.ok(!failure,'PG observer previously failed');return {closed:true,issued,completed}}catch(error){stop(error);throw error}},
+   async close(){const pending=end();try{await bounded(()=>pending,Math.min(1000,Math.floor(remaining())));record({stage:'PG_ADAPTER_CLOSED',connected,issued,completed,previousFailure:!!failure});assert.ok(!failure,'PG observer previously failed');return {closed:true,issued,completed}}catch(error){stop(error);throw error}},
   })
- }catch(error){stop(error);try{await bounded(()=>end(),Math.max(1,Math.min(1000,Math.floor(remaining()))))}catch{};throw error}
+ }catch(error){stop(error);const pending=end();try{await bounded(()=>pending,Math.max(1,Math.min(1000,Math.floor(remaining()))))}catch{};throw error}
 }

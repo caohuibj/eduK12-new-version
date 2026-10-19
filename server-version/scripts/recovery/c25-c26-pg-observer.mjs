@@ -9,9 +9,15 @@
  * raw CPU/RSS stays in pending evidence until fresh SQL proves ownership.
  * prepareOwnerClose is asynchronous: await its fresh attribution proof before
  * sending any child cleanup/disconnect permission. It drains existing refreshes.
- * readProc() synchronously returns {processes, sockets, pgChildren}. Socket
+ * readProc() synchronously returns {processes, sockets, pgChildren}; terminated
+ * PG children require terminatedPgChildObservations plus complete
+ * enumeratedPgChildIdentities (live + terminated, exact PID/startTicks/PGID/parent).
+ * Only a fresh-bound prepared owner's backend may lose its FD or become Z/X;
+ * raw live/terminal CPU remains visible and final disappearance is still required.
+ * Socket
  * evidence comes from the owner's /proc/PID/fd inode plus net/tcp{,6}, never
- * guessed application_name. pgChildren is the COMPLETE postmaster child list.
+ * guessed application_name. pgChildren lists live children; the complete list
+ * also includes the explicitly retained terminal PG identities.
  * Before authorizing child prisma.$disconnect/cleanup, await
  * prepareOwnerClose({pid,startTicks}); only its freshly-attributed PG backends
  * may disappear pending a bounded fresh query. The exact prepared worker is
@@ -183,7 +189,7 @@ export function createPgObserver({query,readProc,registry,target,remainingMs,rec
  target=Object.freeze({...target})
  const observerProcess=registry.entries().find(entry=>entry.role==='observer');assert.ok(observerProcess,'missing observer process identity')
  let phase='new',failure=null,started,lastNow=-Infinity,procTimer,pgTimer,deadlineTimer,inFlight=null,collectionPending=null,currentCollection=null,boundaryPending=false,retirementPending=null,closureRefresh=null,attributionPending=null,attributionRefresh=null,refreshTail=null,controller=null,previousStats=null,activity=null,frame=null,evidenceBytes=0,endAt=null,cpuBefore=null
- const snapshots={},cost={issued:0,completed:0,failed:0,queryElapsedMs:0,returnedRows:0,procSamples:0,pgSamples:0,boundaryCoveredPgTicks:0,retirementCoveredPgTicks:0,retirementRefreshes:0,attributionRefreshes:0,attributionCoveredPgTicks:0,closePreparationRefreshes:0},bindings=new Map(),backendPids=new Map(),procCounters=new Map(),retirements=[],attributionResolutions=[]
+ const snapshots={},cost={issued:0,completed:0,failed:0,queryElapsedMs:0,returnedRows:0,procSamples:0,pgSamples:0,boundaryCoveredPgTicks:0,retirementCoveredPgTicks:0,retirementRefreshes:0,attributionRefreshes:0,attributionCoveredPgTicks:0,closePreparationRefreshes:0},bindings=new Map(),backendPids=new Map(),procCounters=new Map(),retirements=[],attributionResolutions=[],terminatedPgHistory=new Map()
  const clock=()=>{const value=now();assert.ok(Number.isFinite(value)&&value>=lastNow,'observer clock went backwards');lastNow=value;return value}
  const clear=()=>{for(const timer of [procTimer,pgTimer])if(timer!==undefined)timers.clearInterval(timer);if(deadlineTimer!==undefined)timers.clearTimeout(deadlineTimer)}
  const fail=error=>{if(!failure){failure=error;phase='failed';clear();controller?.abort();try{onStop(error)}catch(stopError){failure=new AggregateError([error,stopError],'observer and stop callback failed')}}return failure}
@@ -201,24 +207,76 @@ export function createPgObserver({query,readProc,registry,target,remainingMs,rec
   // mandatory before a boundary or the original deadline can complete.
   return {entries:()=>registry.entries().filter(p=>identity(p)!==identity(owner))}
  }
+ const validatePgTerminations=next=>{
+  const terminated=list(next.terminatedPgChildObservations??[],'terminated PG children'),all=next.enumeratedPgChildIdentities
+  const terminalPids=new Set(),postmaster=registry.entries().find(p=>p.role==='pg_postmaster')
+  for(const p of terminated){
+   const id=identity(p);assert.ok(!terminalPids.has(p.pid),'duplicate terminated PG child');terminalPids.add(p.pid)
+   const candidate=retirementPending?.prepared&&retirementPending.backends.find(b=>identity(b)===id),bound=retirementPending?.backendProcesses?.find(b=>identity(b)===id)
+   assert.ok(candidate&&bound,'unknown or unprepared terminated PG child');assert.match(p.state,/^[ZXx]$/,'invalid terminated PG child state')
+   assert.equal(p.parentPid,postmaster?.pid,'terminated PG child parent mismatch');assert.equal(p.parentPid,bound.parentPid,'terminated PG child parent changed');positive(bound.processGroupId,'prepared PG process group');assert.equal(p.processGroupId,bound.processGroupId,'terminated PG child process group changed')
+   assert.ok(!next.processes.some(live=>live.pid===p.pid)&&!next.pgChildren.some(live=>live.pid===p.pid),'terminated PG child also marked live')
+   assert.ok(p.rssBytes===undefined&&p.vmHwmLifetimeBytes===undefined,'terminated PG RSS cannot be synthesized')
+   const before=terminatedPgHistory.get(id)??procCounters.get(id);assert.ok(before,'terminated PG child has no observed CPU baseline')
+   for(const key of ['userTicks','systemTicks']){integer(p[key],`terminated ${key}`);assert.ok(p[key]>=before[key],'terminated PG CPU counter went backwards')}
+   terminatedPgHistory.set(id,{...clone(p),observedElapsedMs:clock()-started})
+  }
+  for(const live of next.pgChildren)assert.ok(!terminatedPgHistory.has(identity(live)),'terminated PG child reappeared live')
+  if(terminated.length||all!==undefined){
+   const complete=list(all,'enumerated PG children'),seen=new Set(),expected=[...next.pgChildren,...terminated]
+   assert.equal(complete.length,expected.length,'incomplete live plus terminated PG child enumeration')
+   for(const p of complete){const id=identity(p);assert.ok(!seen.has(p.pid),'duplicate enumerated PG child');seen.add(p.pid);const actual=expected.find(item=>identity(item)===id);assert.ok(actual,'unknown enumerated PG child');const proc=terminalPids.has(p.pid)?actual:next.processes.find(item=>identity(item)===id);assert.ok(proc,'enumerated PG child CPU identity missing');assert.equal(p.parentPid,postmaster?.pid,'enumerated PG parent mismatch');assert.equal(p.parentPid,proc.parentPid);positive(proc.processGroupId,'PG process group');assert.equal(p.processGroupId,proc.processGroupId,'enumerated PG process group mismatch')}
+  }
+ }
+ const closingSocketLoss=(candidate,next)=>{
+  const originals=retirementPending.preparedSockets.filter(socket=>socket.localPort===candidate.client_port&&socket.localAddress===candidate.client_addr)
+  assert.ok(originals.length,'missing prepared socket binding')
+  if(next.sockets.some(socket=>originals.some(old=>['ownerPid','ownerStartTicks','ownerFd','inode','localPort','localAddress','remotePort','remoteAddress'].every(key=>socket[key]===old[key]))&&socket.state==='ESTABLISHED')){assert.ok(!retirementPending.socketLossAt.has(identity(candidate)),'prepared closing socket reappeared established');return false}
+  const inventory=next.socketInventory??next.sockets
+  for(const socket of list(inventory,'socket inventory',2048)){
+   const endpoint=socket.localPort===candidate.client_port&&socket.localAddress===candidate.client_addr
+   const oldFd=originals.some(old=>socket.ownerPid===old.ownerPid&&socket.ownerFd===old.ownerFd)
+   const oldInode=originals.some(old=>socket.inode===old.inode)
+   if(!endpoint&&!oldFd&&!oldInode)continue
+   const exact=originals.some(old=>['ownerPid','ownerStartTicks','ownerFd','inode','localPort','localAddress','remotePort','remoteAddress'].every(key=>socket[key]===old[key]))
+   assert.ok(exact,'prepared closing socket identity/endpoint changed')
+   if(socket.protocol!==undefined)assert.equal(socket.protocol,'tcp','prepared socket protocol changed')
+   for(const key of ['family','ownerProcessGroupId']){const old=originals.find(old=>old.ownerFd===socket.ownerFd&&old.inode===socket.inode);if(old[key]!==undefined)assert.equal(socket[key],old[key],`prepared socket ${key} changed`)}
+   assert.ok(['ESTABLISHED','FIN_WAIT1','FIN_WAIT2','CLOSE_WAIT','LAST_ACK','CLOSING','TIME_WAIT','CLOSE'].includes(socket.state),'invalid prepared closing socket state')
+  }
+  return true
+ }
+ const closingState=(candidate,next)=>next.terminatedPgChildObservations?.some(p=>identity(p)===identity(candidate))?'TERMINATED':!next.processes.some(p=>p.pid===candidate.pid)?'ABSENT':closingSocketLoss(candidate,next)?'SOCKET_CLOSING':'LIVE'
  const attributeCurrent=(rows,next,{verifyRetirement=false,verifyClosureProgress=false}={})=>{
   if(!retirementPending)return attributeActivity(rows,next,registry,target)
-  const candidates=retirementPending.backends,excluded=new Set()
+  assert.equal(new Set(list(rows,'cluster activity').map(row=>row.pid)).size,rows.length,'duplicate backend')
+  const candidates=retirementPending.backends,excluded=new Set(),closingRows=[]
   for(const candidate of candidates){
-   const id=identity(candidate),live=next.processes.find(p=>p.pid===candidate.pid),child=next.pgChildren.find(p=>p.pid===candidate.pid),row=rows.find(p=>p.pid===candidate.pid)
+   const id=identity(candidate),live=next.processes.find(p=>p.pid===candidate.pid),child=next.pgChildren.find(p=>p.pid===candidate.pid),row=rows.find(p=>p.pid===candidate.pid),terminal=next.terminatedPgChildObservations?.find(p=>p.pid===candidate.pid)
    if(live)assert.equal(live.startTicks,candidate.startTicks,'retiring PG backend PID reused')
    if(child)assert.equal(child.startTicks,candidate.startTicks,'retiring PG child PID reused')
-   if(row)for(const key of ['backend_start','application_name','client_port','datname'])assert.equal(row[key],candidate[key],'retiring backend identity changed')
+   if(row){for(const key of ['backend_start','application_name','client_port','client_addr','datname','backend_type'])assert.equal(row[key],candidate[key],'retiring backend identity changed');assert.ok(['active','idle','idle in transaction','idle in transaction (aborted)','fastpath function call'].includes(row.state),'unknown retiring backend state')}
    if(verifyRetirement||retirementPending.closedAt.has(id)){
-    assert.ok(!row&&!live&&!child,'retired owner backend did not disappear in fresh PG/proc snapshot');excluded.add(candidate.pid)
+    assert.ok(!row&&!live&&!child&&!terminal,'retired owner backend did not disappear in fresh PG/proc snapshot');excluded.add(candidate.pid)
     if(verifyRetirement&&!retirementPending.closedAt.has(id))retirementPending.closedAt.set(id,clock()-started)
-   }else if(verifyClosureProgress){
-    if(!row&&!live&&!child){retirementPending.closedAt.set(id,clock()-started);excluded.add(candidate.pid)}
-    else assert.ok(row&&live&&child,'inconsistent fresh partial-close PG/proc snapshot')
-   }else if(!live&&!child)excluded.add(candidate.pid)
+   }else if(terminal){excluded.add(candidate.pid);if(verifyClosureProgress)retirementPending.closureVerifiedStates.set(id,'TERMINATED')}
+   else if(!live&&!child){
+    excluded.add(candidate.pid)
+    if(verifyClosureProgress){assert.ok(!row,'inconsistent fresh partial-close PG/proc snapshot');retirementPending.closedAt.set(id,clock()-started);retirementPending.closureVerifiedStates.set(id,'ABSENT')}
+   }else{
+    assert.ok(live&&child&&row,'inconsistent fresh partial-close PG/proc snapshot')
+    if(retirementPending.prepared&&closingSocketLoss(candidate,next)){
+     const bound=retirementPending.backendProcesses.find(p=>identity(p)===id);assert.ok(bound,'missing prepared backend process binding');assert.equal(live.parentPid,bound.parentPid,'closing backend parent changed');positive(bound.processGroupId,'prepared PG process group');assert.equal(live.processGroupId,bound.processGroupId,'closing backend process group changed')
+     excluded.add(candidate.pid);closingRows.push({...row,startTicks:live.startTicks,role:candidate.role,ownerIdentity:candidate.ownerIdentity,ownerRole:candidate.ownerRole,isObserver:false,connectionAttribution:'PREPARED_CLOSE_SOCKET_LOSS'})
+     if(!retirementPending.socketLossAt.has(id))retirementPending.socketLossAt.set(id,clock()-started)
+     if(verifyClosureProgress)retirementPending.closureVerifiedStates.set(id,'SOCKET_CLOSING')
+    }
+   }
   }
-  // Still-live pool members retain full application/socket/PID attribution.
-  return attributeActivity(rows.filter(p=>!excluded.has(p.pid)),{...next,processes:next.processes.filter(p=>!excluded.has(p.pid)),pgChildren:next.pgChildren.filter(p=>!excluded.has(p.pid))},registryForFrame(next),target)
+  // Only exact prepared closing backends bypass a now-absent client FD. Their
+  // actual live CPU rows remain in raw proc evidence; no synthetic socket exists.
+  const result=attributeActivity(rows.filter(p=>!excluded.has(p.pid)),{...next,processes:next.processes.filter(p=>!excluded.has(p.pid)),pgChildren:next.pgChildren.filter(p=>!excluded.has(p.pid))},registryForFrame(next),target)
+  result.rows.push(...closingRows);result.rows.sort((a,b)=>a.pid-b.pid);result.businessActive=result.rows.filter(row=>row.backend_type==='client backend'&&!row.isObserver&&row.state==='active');return result
  }
  const addedPgChildren=next=>{
   const owned=registry.entries(),postmaster=owned.find(p=>p.role==='pg_postmaster'),seen=new Set(),added=[]
@@ -243,14 +301,14 @@ export function createPgObserver({query,readProc,registry,target,remainingMs,rec
   if(!attributionRefresh)queueAttributionRefresh()
  }
  const sampleProc=()=>{
-  healthy();budget();const next=readProc();assert.ok(next&&!next.then,'proc reader must be synchronous');processMap(next,registryForFrame(next))
+  healthy();budget();const next=readProc();assert.ok(next&&!next.then,'proc reader must be synchronous');processMap(next,registryForFrame(next));validatePgTerminations(next)
   for(const proc of next.processes){const key=identity(proc),old=procCounters.get(key);if(old)for(const field of ['userTicks','systemTicks','vmHwmLifetimeBytes'])assert.ok(proc[field]>=old[field],`process ${field} counter went backwards`);procCounters.set(key,{...clone(proc),observedElapsedMs:clock()-started})}
   if(activity){
    rememberPendingChildren(addedPgChildren(next))
    attributeCached(activity.rows,next)
   }
-  if(retirementPending?.prepared&&!closureRefresh&&retirementPending.backends.some(p=>!retirementPending.closedAt.has(identity(p))&&!next.processes.some(live=>live.pid===p.pid)))queueClosureRefresh()
-  frame=clone(next);cost.procSamples++;const owned=registry.entries();const processes=frame.processes.map(p=>({...p,role:owned.find(o=>identity(o)===identity(p))?.role??activity?.rows.find(a=>a.pid===p.pid&&a.startTicks===p.startTicks)?.role??retirementPending?.backends.find(a=>a.pid===p.pid&&a.startTicks===p.startTicks)?.role??null,attribution:attributionPending?.children.some(child=>identity(child)===identity(p))?'PENDING_FRESH_PG':'VERIFIED'}));assert.ok(processes.every(p=>p.role||p.attribution==='PENDING_FRESH_PG'),'unknown process role');emit({kind:'proc',elapsedMs:clock()-started,processes,retiringOwnerIdentity:retirementPending?.ownerIdentity??null,missingOwnerIdentities:retirementPending?.prepared&&!frame.processes.some(p=>identity(p)===retirementPending.ownerIdentity)?[retirementPending.ownerIdentity]:[],missingOwnerProofPolicy:'EXACT_PREPARED_OWNER_ONLY; REAL_TERMINAL_CLOSE_REAP_STILL_REQUIRED',missingBackendIdentities:(retirementPending?.backends??[]).filter(p=>!frame.processes.some(live=>live.pid===p.pid)).map(identity),pendingPgChildIdentities:(attributionPending?.children??[]).map(identity),missingCpuPolicy:'NOT_OBSERVED; NEVER_IMPUTE_ZERO'});return frame
+  if(retirementPending?.prepared&&!closureRefresh&&retirementPending.backends.some(p=>!retirementPending.closedAt.has(identity(p))&&closingState(p,next)!=='LIVE'&&retirementPending.closureVerifiedStates.get(identity(p))!==closingState(p,next)))queueClosureRefresh()
+  frame=clone(next);cost.procSamples++;const owned=registry.entries();const processes=frame.processes.map(p=>({...p,role:owned.find(o=>identity(o)===identity(p))?.role??activity?.rows.find(a=>a.pid===p.pid&&a.startTicks===p.startTicks)?.role??retirementPending?.backends.find(a=>a.pid===p.pid&&a.startTicks===p.startTicks)?.role??null,attribution:attributionPending?.children.some(child=>identity(child)===identity(p))?'PENDING_FRESH_PG':'VERIFIED'}));assert.ok(processes.every(p=>p.role||p.attribution==='PENDING_FRESH_PG'),'unknown process role');emit({kind:'proc',elapsedMs:clock()-started,processes,retiringOwnerIdentity:retirementPending?.ownerIdentity??null,missingOwnerIdentities:retirementPending?.prepared&&!frame.processes.some(p=>identity(p)===retirementPending.ownerIdentity)?[retirementPending.ownerIdentity]:[],missingOwnerProofPolicy:'EXACT_PREPARED_OWNER_ONLY; REAL_TERMINAL_CLOSE_REAP_STILL_REQUIRED',missingBackendIdentities:(retirementPending?.backends??[]).filter(p=>!frame.processes.some(live=>live.pid===p.pid)).map(identity),pendingPgChildIdentities:(attributionPending?.children??[]).map(identity),terminatedPgChildObservations:clone(next.terminatedPgChildObservations??[]),enumeratedPgChildIdentities:clone(next.enumeratedPgChildIdentities??null),preparedSocketLosses:[...(retirementPending?.socketLossAt??new Map())].map(([identity,observedAtMs])=>({identity,observedAtMs})),missingCpuPolicy:'NOT_OBSERVED; NEVER_IMPUTE_ZERO'});return frame
  }
  const sql=async kind=>{
   healthy();assert.equal(inFlight,null,'overlapping PG query')
@@ -268,7 +326,7 @@ export function createPgObserver({query,readProc,registry,target,remainingMs,rec
  }
  const collectNow=async(boundary,{verifyRetirement=false,verifyClosureProgress=false,verifyAttribution=false}={})=>{
   const row=await sql(boundary?'boundary':'activity');validateStats(row,previousStats);previousStats=clone(row)
-  const next=readProc();if(activity&&!verifyAttribution)rememberPendingChildren(addedPgChildren(next).filter(child=>!row.activity.some(row=>row.pid===child.pid)))
+  const next=readProc();validatePgTerminations(next);if(activity&&!verifyAttribution)rememberPendingChildren(addedPgChildren(next).filter(child=>!row.activity.some(row=>row.pid===child.pid)))
   const observed=attributeCached(row.activity,next,{verifyRetirement,verifyClosureProgress,verifyAttribution})
   for(const backend of observed.rows){assert.ok(!backendPids.has(backend.pid)||backendPids.get(backend.pid)===backend.startTicks,'PG backend PID reused across snapshots');backendPids.set(backend.pid,backend.startTicks);const key=`${backend.pid}:${backend.startTicks}`,binding=JSON.stringify([backend.backend_start,backend.role,backend.ownerIdentity,backend.application_name]);assert.ok(!bindings.has(key)||bindings.get(key)===binding,'backend role/owner binding changed');bindings.set(key,binding)}
   activity=observed;sampleProc();cost.pgSamples++
@@ -348,8 +406,8 @@ export function createPgObserver({query,readProc,registry,target,remainingMs,rec
    await collect(false);cost.closePreparationRefreshes++;await drainRefreshes();healthy()
    assert.ok(registry.entries().some(p=>identity(p)===identity(owner)&&p.role===owner.role),'prepare-close owner binding changed')
    const backends=activity.rows.filter(p=>p.ownerIdentity===identity(owner))
-   const remaining=budget();retirementPending={ownerIdentity:identity(owner),backends:clone(backends),prepared:true,closedAt:new Map(),preparedAt:clock()}
-   emit({kind:'owner_close_prepared',ownerIdentity:identity(owner),backendIdentities:backends.map(identity),terminalProofRequired:true,remainingMs:remaining,preparationElapsedMs:clock()-preparingAt,budgetPolicy:'EXISTING_AGGREGATE_AND_WINDOW_DEADLINE_NOT_RESET'})
+   const remaining=budget();retirementPending={ownerIdentity:identity(owner),backends:clone(backends),backendProcesses:clone(frame.processes.filter(p=>backends.some(b=>identity(b)===identity(p)))),preparedSockets:clone(frame.sockets.filter(socket=>`${socket.ownerPid}:${socket.ownerStartTicks}`===identity(owner))),socketLossAt:new Map(),closureVerifiedStates:new Map(),prepared:true,closedAt:new Map(),preparedAt:clock()}
+   emit({kind:'owner_close_prepared',ownerIdentity:identity(owner),backendIdentities:backends.map(identity),backendProcessBindings:retirementPending.backendProcesses.map(({pid,startTicks,parentPid,processGroupId})=>({pid,startTicks,parentPid,processGroupId})),backendSocketBindings:retirementPending.preparedSockets.filter(socket=>backends.some(backend=>socket.localPort===backend.client_port&&socket.localAddress===backend.client_addr)),terminalProofRequired:true,remainingMs:remaining,preparationElapsedMs:clock()-preparingAt,budgetPolicy:'EXISTING_AGGREGATE_AND_WINDOW_DEADLINE_NOT_RESET'})
    boundaryPending=false;return {prepared:true,ownerIdentity:identity(owner),remainingMs:remaining}
   }),
   retireOwner:proof=>guarded(async()=>{
@@ -359,10 +417,10 @@ export function createPgObserver({query,readProc,registry,target,remainingMs,rec
    assert.equal(proof.terminalCpu?.pid,owner.pid,'terminal CPU PID mismatch');assert.equal(proof.terminalCpu?.startTicks,owner.startTicks,'terminal CPU identity mismatch')
    for(const key of ['user','system'])integer(proof.terminalCpu[key],`terminal CPU ${key}`)
    const backends=retirementPending?.backends??(activity?.rows??[]).filter(p=>p.ownerIdentity===identity(owner));assert.ok(backends.every(p=>p.ownerRole===owner.role),'retirement backend role mismatch')
-   const at=clock(),preparedAt=retirementPending?.preparedAt??null,closedAt=retirementPending?.closedAt??new Map();registry.retire(proof);retirementPending={ownerIdentity:identity(owner),backends:clone(backends),prepared:false,closedAt}
+   const at=clock(),preparedAt=retirementPending?.preparedAt??null,closedAt=retirementPending?.closedAt??new Map(),previousRetirement=retirementPending;registry.retire(proof);retirementPending={...previousRetirement,ownerIdentity:identity(owner),backends:clone(backends),prepared:false,closedAt,closureVerifiedStates:previousRetirement?.closureVerifiedStates??new Map()}
    emit({kind:'owner_retirement_pending',ownerIdentity:identity(owner),backendIdentities:backends.map(identity),terminalCpu:clone(proof.terminalCpu),closeObserved:true,terminalObserved:true,groupQuiescent:true})
    if(collectionPending)await collectionPending;await drainRefreshes();healthy();await collect(false,{verifyRetirement:true});cost.retirementRefreshes++
-   const result={ownerIdentity:identity(owner),role:owner.role,backendIdentities:backends.map(identity),terminalCpu:clone(proof.terminalCpu),status:'CLOSED_VERIFIED_BY_FRESH_PG_AND_PROC',refreshElapsedMs:clock()-at,closePreparationElapsedMs:preparedAt===null?null:clock()-preparedAt,backendTailIntervals:backends.map(backend=>{const last=procCounters.get(identity(backend));assert.ok(last,'missing prior backend CPU sample');return {identity:identity(backend),lastObservedAtMs:last.observedElapsedMs,absenceVerifiedAtMs:closedAt.get(identity(backend)),lastUserTicks:last.userTicks,lastSystemTicks:last.systemTicks,tailCpu:'NOT_OBSERVED'}}),backendCpuExitTail:'NOT_OBSERVED; PRIOR_SAMPLES_PRESERVED; NEVER_IMPUTE_ZERO'}
+   const result={ownerIdentity:identity(owner),role:owner.role,backendIdentities:backends.map(identity),terminalCpu:clone(proof.terminalCpu),status:'CLOSED_VERIFIED_BY_FRESH_PG_AND_PROC',refreshElapsedMs:clock()-at,closePreparationElapsedMs:preparedAt===null?null:clock()-preparedAt,backendTailIntervals:backends.map(backend=>{const last=procCounters.get(identity(backend));assert.ok(last,'missing prior backend CPU sample');return {identity:identity(backend),lastObservedAtMs:last.observedElapsedMs,absenceVerifiedAtMs:closedAt.get(identity(backend)),lastUserTicks:last.userTicks,lastSystemTicks:last.systemTicks,tailCpu:'NOT_OBSERVED'}}),terminatedPgChildObservations:backends.map(b=>terminatedPgHistory.get(identity(b))).filter(Boolean).map(clone),backendCpuExitTail:'NOT_OBSERVED; PRIOR_SAMPLES_PRESERVED; NEVER_IMPUTE_ZERO'}
    retirements.push(result);emit({kind:'owner_retirement_verified',...result});retirementPending=null;return clone(result)
   }),
   async stop(){clear();controller?.abort();if(inFlight)await inFlight.catch(()=>{});if(collectionPending)await collectionPending;if(currentCollection)await currentCollection.catch(()=>{});if(closureRefresh)await closureRefresh;if(attributionRefresh)await attributionRefresh;if(!failure)phase='closed';return {phase,failure:failure?.message??null,evidenceBytes}},

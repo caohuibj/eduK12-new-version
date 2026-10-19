@@ -1086,3 +1086,28 @@ absent pg_stat_statements view is explicitly unsupported; an existing view is
 required and permission failure stops. Connection/query/close overhead is kept
 separate from business SQL. These adapters remain service-free preparation until
 the approved measurement coordinator actually consumes them.
+
+C26 prepared disconnect attribution retains a fresh-bound backend after its
+client FD closes first, without inventing a replacement socket. Exact original
+owner/endpoint/inode/fd and SQL identity drift still fail. A terminated PG child
+keeps its actual Z/X stat CPU separately, without RSS; only an exact previously
+prepared backend is eligible, and complete live-plus-terminal child enumeration
+remains mandatory. Every new closing state uses the same bounded serial refresh
+lane. Final retirement still requires fresh SQL and process disappearance plus
+the real worker terminal/close/group proof. Unknown terminal children fail.
+
+The real process reader holds directory iteration handles open while classifying
+FDs, preventing its own self-scandir FD from disappearing. Other ENOENT races
+still use only the original one-resnapshot budget. Its targeted real Node/proc
+contract opens no listener or database connection. Observer-connection cleanup
+initiates the same client's end even when no observation budget remains; that
+expired path remains failed. These changes do not authorize A measurement.
+
+This cloud kernel omits `/proc/<pid>/task/<tid>/children`. Only that explicit
+absence selects a complete, bounded numeric `/proc` stat scan by actual PPID.
+Every stat must be readable and parseable; global PID/identity sets and the
+postmaster task/child sets must remain equal across the sample. Fork/exit races
+receive only the original one complete retry, with both failures retained. The
+selected path, full-scan count/row count/elapsed time and observer CPU are explicit
+observation costs. This is costlier than the native children interface; a later
+real A measurement must assess the 100ms sampler rather than hide that overhead.

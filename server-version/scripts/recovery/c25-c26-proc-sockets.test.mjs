@@ -99,3 +99,26 @@ test('exact prepared-capable worker terminal stat preserves real CPU without inv
  const reused=fixture();reused.texts.set('/proc/40/stat',stat(40,{state:'Z'}));reused.before=(op,path,count)=>{if(op==='text'&&path==='/proc/40/stat'&&count===2)reused.texts.set(path,stat(40,{state:'Z',startTicks:'401'}))};assert.throws(()=>reused.read(),/terminated PID reused/)
  const api=fixture();api.texts.set('/proc/20/stat',stat(20,{state:'Z'}));assert.throws(()=>api.read(),/required process became terminal/)
 })
+
+test('real terminal PG child stat is separately preserved with complete child enumeration for observer rejection or exact retirement proof',()=>{
+ const h=fixture();h.texts.set('/proc/102/stat',stat(102,{state:'Z',parentPid:10,processGroupId:10,userTicks:21,systemTicks:8}))
+ const frame=h.read();assert.equal(frame.processes.some(p=>p.pid===102),false);assert.equal(frame.pgChildren.some(p=>p.pid===102),false)
+ assert.deepEqual(frame.enumeratedPgChildIdentities.map(p=>p.pid),[11,102,103]);const ended=frame.terminatedPgChildObservations[0];assert.equal(ended.pid,102);assert.equal(ended.startTicks,'1020');assert.equal(ended.userTicks,21);assert.equal(ended.systemTicks,8);assert.equal(ended.state,'Z');assert.equal('rssBytes' in ended,false)
+ const reused=fixture();reused.texts.set('/proc/102/stat',stat(102,{state:'Z',parentPid:10,processGroupId:10}));reused.before=(op,path,count)=>{if(op==='text'&&path==='/proc/102/stat'&&count===2)reused.texts.set(path,stat(102,{state:'Z',parentPid:10,processGroupId:10,startTicks:'1021'}))};assert.throws(()=>reused.read(),/terminated PID reused/)
+})
+
+test('explicitly absent children interface uses bounded complete PPID enumeration; churn, missing stat and denied interfaces never become empty',()=>{
+ const setup=()=>{const h=fixture();h.texts.delete('/proc/10/task/10/children');h.dirs.set('/proc',['self','net','10','20','30','40','50','11','102','103']);return h}
+ const good=setup(),frame=good.read();assert.equal(frame.snapshotEvidence.childEnumerationMethod,'COMPLETE_PROC_PPID');assert.equal(frame.snapshotEvidence.globalProcScans,2);assert.equal(frame.snapshotEvidence.globalProcRows,16);assert.deepEqual(frame.pgChildren.map(p=>p.pid),[11,102,103])
+ for(const mode of ['churn','missing','permission','parse','pid-reuse']){
+  const bad=setup()
+  if(mode==='churn')bad.before=(op,path,count)=>{if(op==='dir'&&path==='/proc')bad.dirs.set('/proc',count%2?['10','20','30','40','50','11','102','103']:['10','20','30','40','50','11','102'])}
+  if(mode==='missing')bad.dirs.get('/proc').push('999')
+  if(mode==='permission')bad.before=(op,path)=>{if(path==='/proc/10/task/10/children')throw Object.assign(new Error('denied children interface'),{code:'EACCES'})}
+  if(mode==='parse')bad.texts.set('/proc/103/stat','broken')
+  if(mode==='pid-reuse')bad.before=(op,path,count)=>{if(op==='text'&&path==='/proc/102/stat'&&count===5)bad.texts.set(path,stat(102,{parentPid:10,processGroupId:10,startTicks:'999'}))}
+  assert.throws(()=>bad.read());assert.ok(bad.events.filter(e=>e.kind==='proc_socket_snapshot_failure').length<=2)
+  if(mode==='permission')assert.equal(bad.counts.has('dir:/proc'),false)
+  if(mode==='churn'||mode==='missing')assert.equal(bad.events.filter(e=>e.kind==='proc_socket_snapshot_failure').length,2)
+ }
+})

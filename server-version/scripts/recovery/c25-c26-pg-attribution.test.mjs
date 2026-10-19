@@ -119,8 +119,8 @@ test('two owned pool backends may close separately before genuine owner retireme
 
 test('still-live member of a closing pool retains actual socket validation',async()=>{
  const h=harness();addBackend(h,{ownerPid:40,app:'c26:report'});await h.observer.begin();await h.observer.prepareOwnerClose({pid:40,startTicks:'400'})
- removeBackend(h,104);h.frame.sockets=h.frame.sockets.filter(p=>p.localPort!==40106);h.setTime(100);h.fireInterval(100)
- assert.match(h.observer.state().failure,/socket ownership/);assert.equal(h.stops.length,1)
+ removeBackend(h,104);h.frame.sockets.find(p=>p.localPort===40106).inode='49999';h.setTime(100);h.fireInterval(100)
+ assert.match(h.observer.state().failure,/socket.*(identity|ownership)|inode/);assert.equal(h.stops.length,1)
 })
 
 test('final retirement still requires every previously attributed backend gone',async()=>{
