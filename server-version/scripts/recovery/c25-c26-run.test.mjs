@@ -510,3 +510,18 @@ with mock.patch.dict(owned.signal.__globals__,process_table=lambda:{row['pid']:r
  kill.assert_called_once_with(row['pid'],signal.SIGKILL);child.wait.assert_called_once()
 print(json.dumps({'reusedGroupSignalDenied':True,'waitStillCalled':True,'exactOwnedSignalPermitted':True}))
 `))
+test('actual capture rejects live hidden members of a terminal PG group before any following audit',()=>python(String.raw`
+from unittest import mock
+root=proc(os.getpid());terminal={'pid':2147483000,'startTicks':'17','processGroupId':2147483000,'parentPid':root['pid'],'state':'Z'}
+live={'pid':2147483001,'startTicks':'18','processGroupId':terminal['pid'],'parentPid':terminal['pid'],'state':'S'}
+for outside in [False,True]:
+ owned=OwnedGroups(sys.executable);owned.root=root;owned.register(terminal,'postgres_terminal_candidate');owned.member_pins[terminal['pid']]=terminal
+ child={**live,'parentPid':1} if outside else live
+ rows={root['pid']:root,terminal['pid']:terminal,child['pid']:child};following=[]
+ with mock.patch.dict(owned.capture_descendants.__globals__,process_table=lambda:rows,proc=lambda pid:rows[pid]),mock.patch.object(Path,'resolve',return_value=Path('/unproved/writer')):
+  try:owned.capture_descendants(root);following.append('audit')
+  except AssertionError:pass
+  else:raise AssertionError('capture hid a live writer behind terminal PG role')
+ assert following==[]
+print(json.dumps({'wrongExecutableDescendantRejectedDuringCapture':True,'unpinnedOutsideMemberRejectedDuringCapture':True,'auditNotReached':True}))
+`))

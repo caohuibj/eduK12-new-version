@@ -81,10 +81,10 @@ class OwnedGroups:
    assert all(after[k]==row[k] for k in ['pid','startTicks','processGroupId','parentPid']),'PostgreSQL candidate identity changed during exe proof'
   if after is None or after['state'] in ['Z','X','x']:
    self.identity_observations.append({'kind':'PG_CANDIDATE_EXIT_DURING_IDENTITY_PROOF','before':dict(row),'after':after,'exeObserved':observed_exe,'exeVerifiedForActiveProcess':False,'disposition':'ABSENT' if after is None else 'TERMINAL','observedMonotonicNs':str(time.monotonic_ns()),'cpu':'NOT_OBSERVED'})
-   return None if after is None else 'postgres_terminal_candidate'
+   return None if after is None else {'role':'postgres_terminal_candidate','identity':after}
   if missing_exe is not None:raise missing_exe
   assert self.postgres_executable is not None and observed_exe==self.postgres_executable
-  return 'postgres_child'
+  return {'role':'postgres_child','identity':after}
  def register(self,row,role):
   assert row['pid']==row['processGroupId'] and row['pid']!=os.getpgrp(),'only a detached owned group'
   key=(row['pid'],row['startTicks'])
@@ -119,10 +119,16 @@ class OwnedGroups:
      group=self.groups[pid];assert row['state'] in ['Z','X','x'] and row['processGroupId']==group['processGroupId'],'terminal PostgreSQL candidate became live or moved group'
      assert row['parentPid']==group['parentPid'] or row['parentPid']==root['pid'],'terminal PostgreSQL candidate parent drift'
     if pid in pg_family and pid not in self.groups:
-     role=self.postgres_candidate(row)
-     if role is not None:self.register(row,role)
+     proof=self.postgres_candidate(row)
+     if proof is not None:
+      rows[pid]=proof['identity'];self.member_pins[pid]=dict(proof['identity']);self.register(proof['identity'],proof['role'])
+     else:rows.pop(pid)
     elif pid not in self.groups:self.register(row,'descendant-before-registration')
    elif row['processGroupId'] not in self.groups:raise AssertionError('unowned descendant process group')
+  # A terminal leader cannot hide an active same-PGID descendant until the
+  # final PG stop. Check every such member during each capture, before audit.
+  for group in self.groups.values():
+   if group['role']=='postgres_terminal_candidate':self.verified_members(group,rows)
  def import_registry(self,file,driver):
   if not file.exists():return
   value=private_read(file);assert value['schemaVersion']==1 and value['parentPid']==driver['pid']
@@ -142,11 +148,18 @@ class OwnedGroups:
     assert pin is not None and all(pin[k]==row[k] for k in ['pid','startTicks','processGroupId']),'leaderless member has no exact owned identity'
     assert row['parentPid']==pin['parentPid'] or (self.root is not None and row['parentPid']==self.root['pid']),'leaderless member parent drift'
   if group['role']=='postgres_terminal_candidate':
+   checked=[]
    for row in members:
     pin=self.member_pins.get(row['pid'])
     assert pin is not None and all(pin[k]==row[k] for k in ['pid','startTicks','processGroupId']),'unproved terminal-group member'
     assert row['parentPid']==pin['parentPid'] or (self.root is not None and row['parentPid']==self.root['pid']),'terminal-group member parent drift'
-    if row['state'] not in ['Z','X','x']:assert row['pid']!=group['pid'] and self.postgres_candidate(row)=='postgres_child','unproved active member of terminal PG group'
+    if row['state'] not in ['Z','X','x']:
+     assert row['pid']!=group['pid'],'terminal group leader became live'
+     proof=self.postgres_candidate(row)
+     if proof is None:continue # This exact member was freshly proved absent.
+     row=proof['identity']
+    checked.append(row)
+   members=checked
   if not members:self.empty_groups.add(group['pid'])
   return leader,members
  def signal(self,name,include_postgres=False,roles=None):
