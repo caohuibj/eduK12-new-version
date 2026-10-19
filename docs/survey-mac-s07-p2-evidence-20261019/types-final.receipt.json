@@ -1,0 +1,13 @@
+{
+  "check": "types-final",
+  "exit": 0,
+  "startedUtc": "2026-10-19T10:20:46.108333+00:00",
+  "finishedUtc": "2026-10-19T10:21:55.736953+00:00",
+  "command": [
+    "/Users/Qiang/.codex/.chatgpt-projects/g-p-6a840946ce648191881d2c7f0f84c85f/artifacts/migration-execution-20261002/tools/node-v24.21.0-darwin-arm64/bin/node",
+    "node_modules/typescript/bin/tsc",
+    "-p",
+    "tsconfig.app.json",
+    "--noEmit"
+  ]
+}

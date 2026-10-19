@@ -1,0 +1,33 @@
+{
+  "head": "14de2d7bedaf7d04ca08885ebd040d57dfb5d2de",
+  "before": "792cc1c99946b4c1c35fec7f3528fec7d86ca9a6",
+  "productFiles": {
+    "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.tsx": {
+      "bytes": 46540,
+      "sha256": "2e4b8eb9ca6adfc1b892e5656290de13901244011dca034606cfdbb8deba3f92"
+    },
+    "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.download.test.tsx": {
+      "bytes": 17698,
+      "sha256": "9a251217f5ea06bb9030157bcca554ff9b7ce2a52a08656d01e9fe987d802aa7"
+    },
+    "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.recovery.test.tsx": {
+      "bytes": 15845,
+      "sha256": "de2c129350d26bbfe652967548cedf54017a1f8b3837b7c9a3b18ac1064942fa"
+    }
+  },
+  "unchangedTrees": {
+    "server-version/backend": "74720e530d99efe1135103951fdc9a256318e9ec",
+    "server-version/frontend/src/modules": "4d1dbe6055471f31248bf72abbca925880537b63",
+    "server-version/frontend/package.json": "4a287572dfb7d636477ea34985fab7a0b12fae53",
+    "server-version/frontend/package-lock.json": "9fc33dd617ce75766564786d880e588142c11eed"
+  },
+  "node": "24.21.0",
+  "testRunner": "Vitest 4.1.11",
+  "qualification": "30 deterministic component cases, application types, 0 lint errors/1 inherited missing-dependency warning. No real Mac browser/Redis/production/CI execution in this P2 increment.",
+  "tests": {
+    "recovery": 15,
+    "adaptedExistingDownloads": 15,
+    "passed": 30
+  },
+  "failedHistory": "First tsc failed on new test Array.at against ES2020; corrected with compatible indexing. Intermediate cleanup lint warning removed, original loadQuality/reload warning remains. Intermediate green runs are not final-source qualification."
+}
