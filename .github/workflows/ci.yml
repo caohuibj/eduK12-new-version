@@ -295,8 +295,19 @@ jobs:
           const {execFileSync} = require('node:child_process');
           const reviewed = process.env.REVIEWED_HEAD;
           if (!/^[a-f0-9]{40}$/.test(reviewed || '')) throw new Error('Independent Survey Mac tools review HEAD required');
-          for (const sha of [reviewed,'6a0393636aa9e833550ecd7e257d5957661d9fb0'])
-            execFileSync('git',['fetch','--no-tags','--depth=1','origin',sha],{stdio:'inherit'});
+          const fetchExact = sha => execFileSync('git',['fetch','--no-tags','--depth=1','origin',sha],{stdio:'inherit'});
+          fetchExact(reviewed);
+          const binding = JSON.parse(execFileSync('git',['show',reviewed+':.github/scripts/survey-mac-ui-bindings.json'],{encoding:'utf8'}));
+          const productHead = binding.productHead;
+          if (!/^[a-f0-9]{40}$/.test(productHead || '')) throw new Error('Exact Survey Mac productHead required');
+          if (!/^[a-f0-9]{40}$/.test(binding.frontendTree || '')) throw new Error('Exact Survey Mac frontendTree required');
+          fetchExact(productHead);
+          for (const sha of [reviewed,productHead]) {
+            const type = execFileSync('git',['cat-file','-t',sha],{encoding:'utf8'}).trim();
+            if (type !== 'commit') throw new Error('Exact Survey Mac commit object required');
+            const tree = execFileSync('git',['rev-parse',sha+':server-version/frontend'],{encoding:'utf8'}).trim();
+            if (tree !== binding.frontendTree) throw new Error('Survey Mac frontendTree differs from reviewed binding');
+          }
       - id: documentation-scope
         name: select dependency-free documentation or tooling classification
         env:

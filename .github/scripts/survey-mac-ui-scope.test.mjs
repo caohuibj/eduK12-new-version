@@ -1,6 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {readFileSync,mkdtempSync,mkdirSync,writeFileSync,rmSync} from 'node:fs';
+import {execFileSync} from 'node:child_process';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {pathToFileURL} from 'node:url';
 import {admitsSurveyMac,surveyMacTools,surveyMacRequired,validSurveyMacPlan,surveyMacPlan,knownSurveyManual,rejectSurveyManual} from './survey-mac-ui-scope.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const sha='a'.repeat(40), other='b'.repeat(40);
@@ -158,4 +162,40 @@ test('known Survey PR remains eligible but every manual full/probe entry refuses
     const condition=body.split('\n').find(line=>line.startsWith('    if:'));
     assert.ok(condition?.includes("!(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019')"),name);
   }
+});
+test('Survey shallow bootstrap fetches the product bound by the reviewed source, with full-history validation consumers',()=>{
+  const ci=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+  const step=ci.split('      - name: fetch exact Survey Mac reviewed source and frozen product\n')[1].split('      - id: documentation-scope')[0];
+  const script=step.split('        run: |\n')[1].trimEnd().split('\n').map(line=>line.slice(10)).join('\n');
+  assert.match(script,/\['show',reviewed\+':\.github\/scripts\/survey-mac-ui-bindings\.json'\]/);
+  assert.match(script,/const productHead = binding\.productHead/);assert.match(script,/fetchExact\(productHead\)/);
+  const consumers=readFileSync(new URL('../workflows/ci-survey-mac-ui.yml',import.meta.url),'utf8');
+  assert.equal((consumers.match(/checkout@v4\n        with:\n          fetch-depth: 0/g)??[]).length,4);
+  assert.match(ci.split('  merge-gate:\n')[1],/checkout@v4\n        with:\n          fetch-depth: 0/);
+  const dir=mkdtempSync(join(tmpdir(),'survey-shallow-contract-')),origin=join(dir,'origin'),checkout=join(dir,'checkout');
+  const git=(cwd,...args)=>execFileSync('git',['-c','core.hooksPath=/dev/null',...args],{cwd,encoding:'utf8',stdio:'pipe'}).trim();
+  try {
+    mkdirSync(origin);git(origin,'init','-b','fixture');
+    mkdirSync(join(origin,'server-version/frontend'),{recursive:true});
+    writeFileSync(join(origin,'server-version/frontend/product.txt'),'synthetic product');git(origin,'add','.');
+    git(origin,'-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','product');
+    const product=git(origin,'rev-parse','HEAD'),frontendTree=git(origin,'rev-parse','HEAD:server-version/frontend');mkdirSync(join(origin,'.github/scripts'),{recursive:true});
+    writeFileSync(join(origin,'.github/scripts/survey-mac-ui-bindings.json'),JSON.stringify({productHead:product,frontendTree}));git(origin,'add','.');
+    git(origin,'-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','reviewed source');
+    const source=git(origin,'rev-parse','HEAD');git(dir,'clone','--depth=1',pathToFileURL(origin).href,checkout);
+    assert.throws(()=>git(checkout,'cat-file','-e',product+'^{commit}'));
+    execFileSync(process.execPath,['-e',script],{cwd:checkout,env:{...process.env,REVIEWED_HEAD:source},stdio:'pipe'});
+    assert.equal(git(checkout,'cat-file','-t',product),'commit');assert.equal(git(checkout,'cat-file','-t',source),'commit');
+    assert.equal(JSON.parse(git(checkout,'show',source+':.github/scripts/survey-mac-ui-bindings.json')).productHead,product);
+    assert.equal(git(checkout,'rev-parse',product+':server-version/frontend'),frontendTree);
+    for(const [invalid,message] of [
+      [{productHead:'--invalid-ref',frontendTree},/Exact Survey Mac productHead required/],
+      [{productHead:product,frontendTree:'0'.repeat(40)},/frontendTree differs from reviewed binding/],
+    ]) {
+      writeFileSync(join(origin,'.github/scripts/survey-mac-ui-bindings.json'),JSON.stringify(invalid));git(origin,'add','.');
+      git(origin,'-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-m','negative binding fixture');
+      const bad=git(origin,'rev-parse','HEAD');
+      assert.throws(()=>execFileSync(process.execPath,['-e',script],{cwd:checkout,env:{...process.env,REVIEWED_HEAD:bad},stdio:'pipe'}),message);
+    }
+  } finally {rmSync(dir,{recursive:true,force:true});}
 });
