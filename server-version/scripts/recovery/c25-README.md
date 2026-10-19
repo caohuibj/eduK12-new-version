@@ -98,7 +98,11 @@ reports plus FORM background data. Actual parent/job/budget/claim-count/checkpoi
 revision/saveCount and phase queue baseline are asserted before and after drain.
 
 Whole positive receipt/replay belongs only to A's real submissionId + epoch;
-B/C child-final has NOT_RECEIVED whole status. Partial report is authenticated
+B/C child-final has NOT_RECEIVED whole status. Exact original FINAL bodies are
+retained only in the private fixture and replayed again after parent completion
+in both closed and open windows; accepted facts/jobs/checkpoints must not change.
+A also replays its original whole body after completion and compares all durable
+receipt fields (the actual receipt API generates `committedAt` at read time). Partial report is authenticated
 `?partial=1`; public routes do not implement that query. Native routes and
 teacher/export permissions follow actual auth/public availability, with a fresh
 synthetic ADMIN for formal SJT approval. No invented public Scale/SJT-history route.
@@ -129,7 +133,13 @@ current source/helper/config/environment/dependency/client/compiler/tool bytes
 before and after; missing/failed final producer results cannot qualify artifacts.
 The launcher rechecks a coherent reviewed build+client+source snapshot immediately
 before and after binding, including expected HEAD and clean inputs, before clone.
-Current source, producer and launcher still await immutable independent review.
+The prepared producer/launcher still await immutable independent review and execution approval.
+Producer outputs must be new direct children of `c25-build-evidence`; runtime
+state must be a new direct child of the scratch root named `eduk12_c25_http_NN`.
+These restrictions, symlink rejection, real Git discovery and protected source/
+evidence/tools checks run before mkdir/clone. Descriptor issuance also uses a new
+direct child of that same verified C25 evidence root; never choose an old source,
+failed-attempt or historical evidence directory as its parent.
 
 ## New foundation tests and retained evidence
 
@@ -147,7 +157,91 @@ Only new no-service tests ran under the measurement lock:
   outside the product repository. Second receipt binds equal full Python/schema/
   migration/tool input inventories. The first attempt's 14 unaffected passes
   plus the three affected passes cover the 17 source tests; no source test failure
-  is erased. Raw logs, journals, source manifests and credentials stay out of Git.
+  is erased. The first failed runner did not persist `inputs-after`; no complete
+  first-run after closure is claimed. Its two previous sources were reconstructed
+  later and matched their recorded input SHA exactly, with an explicitly labelled
+  reconstruction receipt and exact diff; this only supports unaffected-test reuse.
+  Raw logs, journals, source manifests and credentials stay out of Git.
+
+
+## Second-batch targeted preparation evidence
+
+All paths below are under the private `c25-build-evidence/` sibling of the repo;
+no runtime, producer, database or browser was invoked by these tests.
+
+- `http-contract-01/`: 10 pure HTTP/window/terminal/redaction contracts;
+  receipt `af69f4a98ddd7e5d12aa69b93f097b7de62c72257ad83b1768dac4b1ac3eb431`.
+- `http-contract-02/`: only the added post-terminal original-body/fact-preservation
+  source contract and changed phase syntax, not the prior 10; receipt
+  `811c2b011c9cdb8424686ddc446b578ae6b923888cbf6c0bbfd3615623df52a8`.
+- `producer-contract-01/`: 17 new dual-artifact and actual launcher-binding
+  mutation tests; receipt
+  `31433a20a3ec420359fb047d64a73a192838c4cb642b92b52a1cfc9bd3061d7f`.
+- Source inspection found the new client receipt also binds `tsconfig.json`.
+  `producer-contract-02/` runs only the added four-input positive/missing/mutation
+  test, not the previous 17; receipt
+  `a9e5045705fd1119459ebffa479deb9ce33dd434d507d4891bd36bbc8b98dce5`.
+- `producer-contract-03/` runs only the new dedicated-destination boundary test
+  (old HTTP03/C21/failed evidence/tools/repo paths, existing/nested targets and
+  aliases rejected) and parses the changed launcher/producer syntax;
+  receipt `f3d3a8361354c7581c3958b8dc65e9ff4a6caf1a8ee460ecae2a420e166e69d9`.
+- `consumer-contract-01/`: 14 new transparent-decrypt, actual-SQL-observation
+  acceptance, clock/window, immutable-identity and hash-linked aggregation fault
+  tests; also syntax-only parsing of not-yet-executed phase/launcher scripts.
+  Receipt `8f9ddf747d561058ba1e0f58bdb25a7668a7ccbd605b06e21c21948ed5c2d69c`.
+
+These successful receipts bind equal before/after inputs. Later targeted receipts
+retain exact consumed source copies; unchanged prior checks are not replayed.
+The consumer records actual production results/SQL only when later authorized;
+its pure synthetic tests are never reported as dynamic query/decrypt evidence.
+Finalization accepts scheduled-phase hash references to both separate child
+results and their private raw observations, revalidates their proofs without
+connecting to a database, and refuses missing/tampered/cross-input evidence.
+
+## Command sequence after the corresponding approval
+
+Freeze every C25 helper first. Descriptor issuance is read-only to the accepted
+source; its output belongs in the verified dedicated evidence root. Issuance owns
+the measurement lock itself. Do not hold a second outer flock around it.
+
+```sh
+python3 server-version/scripts/recovery/c25-source.py issue \
+  --tools "$TOOLS" --expected-head "$HEAD" \
+  --source "$SCRATCH/eduk12_c23_http_03" \
+  --output "$SCRATCH/c25-build-evidence/source-01"
+```
+
+After independent source/descriptor review and separate producer GO, backend
+producer runs current-client verification once followed by one fresh emit;
+frontend consumes its exact receipt and emits once. Do not run these preparation
+commands before approval. Both own the same measurement lock.
+
+```sh
+python3 server-version/scripts/recovery/c25-produce.py --kind backend \
+  --tools "$TOOLS" --descriptor "$DESCRIPTOR" \
+  --expected-descriptor-sha256 "$DESCRIPTOR_SHA" --expected-head "$HEAD" \
+  --output "$SCRATCH/c25-build-evidence/backend-01"
+python3 server-version/scripts/recovery/c25-produce.py --kind frontend \
+  --tools "$TOOLS" --descriptor "$DESCRIPTOR" \
+  --expected-descriptor-sha256 "$DESCRIPTOR_SHA" --expected-head "$HEAD" \
+  --client-receipt "$CLIENT_RECEIPT" --expected-client-receipt-sha256 "$CLIENT_SHA" \
+  --output "$SCRATCH/c25-build-evidence/frontend-01"
+```
+
+After producer review and separate runtime GO, one persistent exec namespace
+runs the launcher through restore. A preflight-only call is not qualification;
+the real run repeats the coherent checks under its own uninterrupted lock.
+
+```sh
+python3 server-version/scripts/recovery/c25-http.py \
+  --tools "$TOOLS" --descriptor "$DESCRIPTOR" --expected-descriptor-sha256 "$DESCRIPTOR_SHA" \
+  --expected-head "$HEAD" --state "$SCRATCH/eduk12_c25_http_01" \
+  --backend-receipt "$BACKEND_RECEIPT" --expected-backend-receipt-sha256 "$BACKEND_SHA" \
+  --frontend-receipt "$FRONTEND_RECEIPT" --expected-frontend-receipt-sha256 "$FRONTEND_SHA" \
+  --through restore
+```
+
+No command uploads private files, starts CI, pushes, merges or touches production.
 
 ## Remaining C25 release work
 

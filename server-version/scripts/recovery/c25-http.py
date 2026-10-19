@@ -1,0 +1,229 @@
+#!/usr/bin/env python3
+"""C25 C22-over-C23 local synthetic core; prepared launcher, separate runtime GO.
+No C23 whitelist edits, automatic retries, historical cleanup or capacity claim.
+"""
+import argparse,fcntl,importlib.util,json,os,re,shutil,signal,socket,subprocess,sys,time,urllib.request
+from pathlib import Path
+from urllib.parse import urlparse
+sys.dont_write_bytecode=True
+BASE=Path(__file__).resolve().parent
+def module(name,file):
+ spec=importlib.util.spec_from_file_location(name,BASE/file);m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m);return m
+preflight=module('c25_contracts','c25-contracts.py')
+source_contract=module('c25_source','c25-source.py')
+REPO,BACKEND,FRONTEND=preflight.REPO,preflight.BACKEND,preflight.FRONTEND
+sha_file,digest,manifest=preflight.sha_file,preflight.digest,source_contract.manifest
+FLOOR,PHASES=preflight.FLOOR,preflight.PHASES
+
+def main():
+ os.umask(0o077)
+ p=argparse.ArgumentParser(description=__doc__)
+ for name in ['tools','descriptor','state','backend-receipt','frontend-receipt']:p.add_argument('--'+name,type=Path,required=True)
+ for name in ['expected-descriptor-sha256','expected-head','expected-backend-receipt-sha256','expected-frontend-receipt-sha256']:p.add_argument('--'+name,required=True)
+ p.add_argument('--through',choices=PHASES,default='restore');p.add_argument('--preflight-only',action='store_true');a=p.parse_args()
+ assert re.fullmatch('[0-9a-f]{40}',a.expected_head)
+ tools,state=a.tools.resolve(),preflight.private_run_path(a.state,'runtime');requested=PHASES[:PHASES.index(a.through)+1]
+ lock=(tools/'.measurement.lock').open('a');fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+ node=tools/'node_modules/node/bin/node';pg=tools/'postgresql/bin';redis=tools/'redis/bin/redis-server'
+ assert subprocess.check_output([node,'--version'],text=True,timeout=10).strip()=='v24.21.0'
+ assert '16.15' in subprocess.check_output([pg/'postgres','--version'],text=True,timeout=10)
+ assert 'v=7.4.11 ' in subprocess.check_output([redis,'--version'],text=True,timeout=10)
+ descriptor=source_contract.validate_descriptor(a.descriptor,a.expected_descriptor_sha256,pg/'pg_controldata',destination=state)
+ source=Path(descriptor['dataRoot']);evidence=Path(descriptor['evidenceRoot'])
+ assert REPO not in state.parents
+ def validate_build():
+  backend=preflight.validate_build(a.backend_receipt,a.expected_backend_receipt_sha256,'backend',a.expected_head,node)
+  frontend=preflight.validate_build(a.frontend_receipt,a.expected_frontend_receipt_sha256,'frontend',a.expected_head,node)
+  assert backend['prismaClientReceipt']==frontend['prismaClientReceipt'],'two producers must consume identical client verification'
+  return backend,frontend
+ backend_build,frontend_build=validate_build()
+ memory=next(int(l.split()[1])*1024 for l in Path('/proc/meminfo').read_text().splitlines() if l.startswith('MemAvailable:'))
+ copybytes=sum(p.stat().st_size for d in source_contract.DATA_DIRS for p in (source/d).rglob('*') if p.is_file())
+ assert copybytes==descriptor['plannedCloneBytes']
+ budget=preflight.clone_budget(shutil.disk_usage(state.parent).free,copybytes,memory)
+ runtime=json.loads(Path(descriptor['files']['runtimeTemplatePrivate']['path']).read_text())
+ for key,role in [('DATABASE_URL_OWNER','eduk12_owner'),('DATABASE_URL','eduk12_runtime'),('DATABASE_URL_RUNTIME','eduk12_runtime')]:
+  u=urlparse(runtime[key]);assert u.hostname=='127.0.0.1' and u.username==role and u.path=='/eduk12_recovery'
+ runtime.update(PUBLIC_ASSESSMENT_IP_GET_LIMIT='10000',PUBLIC_ASSESSMENT_IP_FINAL_LIMIT='10000',PUBLIC_ASSESSMENT_TOKEN_GET_LIMIT='10000',PUBLIC_ASSESSMENT_TOKEN_FINAL_LIMIT='10000',PUBLIC_ASSESSMENT_RECOVERY_GET_LIMIT='10000',PUBLIC_ASSESSMENT_RECOVERY_FINAL_LIMIT='10000',BACKGROUND_WORKERS_ENABLED='false',HEAVY_PROCESSING_ENABLED='false',VIDEO_PROCESSING_ENABLED='false',ASSESSMENT_REPORT_ASYNC_ENABLED='true',ASSESSMENT_WHOLE_SUBMIT_ENABLED='true',PERF_ISOLATED_TEST_MODE='1',PERF_SQL_EVENT_COUNT='1')
+ effective={**runtime,'PORT':'0','REDIS_URL':'redis://127.0.0.1:0','UPLOAD_DIR':'<state>/uploads','EXPORT_DIR':'<state>/exports'}
+ for key in ['DATABASE_URL_OWNER','DATABASE_URL','DATABASE_URL_RUNTIME']:
+  u=urlparse(effective[key]);effective[key]=u._replace(netloc=f'{u.username}:{u.password}@127.0.0.1:0').geturl()
+ env={'PATH':f'{node.parent}:{pg}:/usr/bin:/bin','HOME':str(state),'TMPDIR':str(state),'LANG':'C.UTF-8','TZ':'UTC','NODE_ENV':'test','PYTHONDONTWRITEBYTECODE':'1'}
+ result={'passed':False,'scope':'C25_C22_OVER_C23_LOCAL_SYNTHETIC_CORE_NOT_COMPLETE_RELEASE_OR_CAPACITY','phases':{},'sourceReceiptSha256':source_contract.RECEIPT_SHA256,'sourceSnapshotSha256':source_contract.SNAPSHOT_SHA256,'descriptorSha256':a.expected_descriptor_sha256,'cloneBytes':copybytes,'budget':budget,'backendBuildReceiptSha256':a.expected_backend_receipt_sha256,'frontendBuildReceiptSha256':a.expected_frontend_receipt_sha256,'notCovered':['C19 missing-only analysis/CSV and selected-video supplement','native IndexedDB and C24 browser acceptance','CPU/throughput/capacity']}
+ status={'state':'preparing','ports':{},'pids':{},'startedAt':time.time()};children=[];logs=[];pinned=before=None
+ def record():
+  t=state/'status.tmp';t.write_text(json.dumps(status,indent=2));t.replace(state/'status.json')
+ def receipt_references():
+  refs={str(a.backend_receipt):sha_file(a.backend_receipt),str(a.frontend_receipt):sha_file(a.frontend_receipt),str(a.descriptor):sha_file(a.descriptor)}
+  for receipt in [backend_build,frontend_build]:
+   for item in [receipt['prismaClientReceipt'],*receipt['closureEvidence'].values()]:refs[item['path']]=sha_file(item['path'])
+   refs[receipt['producerResultPath']]=sha_file(receipt['producerResultPath'])
+  return refs
+ def binding():
+  return {'head':preflight.git('rev-parse','HEAD').decode().strip(),'sourceInputs':preflight.source_inventory(),
+   'backendInputs':preflight.component_inputs(BACKEND),'frontendInputs':preflight.component_inputs(FRONTEND),
+   'backendDist':preflight.file_inventory(BACKEND,'dist'),'frontendDist':preflight.file_inventory(FRONTEND,'dist'),
+   'backendDependenciesSha256':digest(preflight.dependency_inventory(BACKEND)),'frontendDependenciesSha256':digest(preflight.dependency_inventory(FRONTEND)),
+   'generatedClient':preflight.file_inventory(BACKEND,'node_modules/.prisma/client'),
+   'runtimeFingerprint':json.loads(subprocess.check_output([node,BASE/'runtime-fingerprint.cjs',BACKEND],text=True,timeout=30)),
+   'tools':{str(v.relative_to(tools)):sha_file(v) for v in [node,pg/'postgres',pg/'psql',pg/'pg_dump',pg/'pg_restore',pg/'pg_controldata',redis]},
+   'postgresLibraryBytes':{str(v.relative_to(tools)):{'realpath':str(v.resolve()),'sha256':sha_file(v)} for v in sorted((tools/'postgresql/lib').rglob('*')) if v.is_file()},
+   'receiptReferences':receipt_references(),'runtimeConfigurationSha256':digest(effective),'phases':requested}
+ def resources(label,retain=False):
+  free=shutil.disk_usage(state).free;memory=next(int(l.split()[1])*1024 for l in Path('/proc/meminfo').read_text().splitlines() if l.startswith('MemAvailable:'))
+  result['minFreeBytes']=min(result.get('minFreeBytes',free),free);result['minMemAvailableBytes']=min(result.get('minMemAvailableBytes',memory),memory)
+  if retain:result.setdefault('resources',[]).append({'stage':label,'at':time.time(),'freeBytes':free,'memAvailableBytes':memory})
+  assert free>=FLOOR,'8GiB disk floor';assert memory>=preflight.MEMORY,'2GiB available-memory floor'
+ def guard():
+  resources(status['state'])
+  for name,proc,service in children:
+   if service:assert proc.poll() is None,name+' exited'
+   if name=='api' and proc.poll() is None:
+    rss=next(int(l.split()[1])*1024 for l in Path(f'/proc/{proc.pid}/status').read_text().splitlines() if l.startswith('VmRSS:'));result['maxApiRssBytes']=max(result.get('maxApiRssBytes',0),rss);assert rss<1024**3
+  if (state/'stop').exists():raise KeyboardInterrupt
+ def start(argv,name,extra=None,service=True):
+  log=(state/(name+'.log')).open('w');logs.append(log);proc=subprocess.Popen(list(map(str,argv)),cwd=BACKEND,env={**env,**(extra or {})},stdout=log,stderr=log,start_new_session=True);children.append((name,proc,service))
+  if service:status['pids'][name]=proc.pid
+  record();return proc
+ def run(argv,name,extra=None,timeout=600,monitor=None):
+  proc=start(argv,name,extra,False)
+  try:preflight.wait_child(proc,timeout,monitor or guard)
+  finally:(state/(name+'.exit')).write_text(str(proc.returncode)+'\n')
+ def audit(mode,label,monitor=None):
+  argv=['python3',BASE/'c25-db.py','--tools',tools,'--state',state,'--audit',mode,'--label',label]
+  if mode=='baseline':argv+=['--expected-snapshot',descriptor['files']['finalSnapshot']['path']]
+  run(argv,label,timeout=300,monitor=monitor)
+  evidence=json.loads((state/(label+'-result.json')).read_text())
+  assert evidence['passed'] is True and evidence['mode']==mode
+  if mode=='final':assert sha_file(state/'c25-final-db-snapshot.json')==evidence['snapshotSha256']
+  result.setdefault('auditProducers',{})[label]={'argv':list(map(str,argv)),'timeoutSeconds':300,'resultSha256':sha_file(state/(label+'-result.json'))}
+  return evidence
+ def ready(port,proc):
+  deadline=time.monotonic()+60
+  while time.monotonic()<deadline:
+   guard()
+   try:
+    with socket.create_connection(('127.0.0.1',port),timeout=.3):
+     executable=Path(f'/proc/{proc.pid}/exe').resolve();assert executable in [node.resolve(),(pg/'postgres').resolve(),redis.resolve()];result.setdefault('serviceExecutables',{})[str(proc.pid)]={'path':str(executable),'sha256':sha_file(executable)};return
+   except OSError:time.sleep(.2)
+  raise TimeoutError('readiness exceeded 60 seconds')
+ def verify():
+  assert sha_file(a.descriptor)==a.expected_descriptor_sha256
+  source_contract.assert_unchanged(descriptor,pg/'pg_controldata')
+  assert preflight.accepted_binding(binding,validate_build,a.expected_head)==pinned,'frozen sources/artifacts/tools/config changed'
+ def interrupted(*_):raise KeyboardInterrupt
+ pinned=preflight.accepted_binding(binding,validate_build,a.expected_head)
+ if a.preflight_only:
+  print(json.dumps({'status':'PREFLIGHT_ONLY_NOT_QUALIFIED','head':pinned['head'],'backendBuildReceiptSha256':a.expected_backend_receipt_sha256,'frontendBuildReceiptSha256':a.expected_frontend_receipt_sha256,'descriptorSha256':a.expected_descriptor_sha256,'frozenInputsSha256':digest(pinned),'budget':budget}));lock.close();return
+ os.umask(0o077);state.mkdir(mode=0o700)
+ for sig in [signal.SIGINT,signal.SIGTERM,signal.SIGHUP]:signal.signal(sig,interrupted)
+ try:
+  record();resources('before-clone',True);(state/'frozen-inputs.json').write_text(json.dumps(pinned,indent=2));result['frozenInputsSha256']=sha_file(state/'frozen-inputs.json')
+  before=manifest(source)
+  assert {d:manifest(source/d) for d in ['pgdata','uploads','exports']}==json.loads(Path(descriptor['files']['resumedDataManifest']['path']).read_text()),'C23 HTTP03 stopped data differs from final accepted manifest'
+  (state/'source-byte-manifest-before.json').write_text(json.dumps(before));result['sourceManifestSha256']=digest(before)
+  verify()
+  for d in ['pgdata','uploads','exports']:
+   original=manifest(source/d);shutil.copytree(source/d,state/d,copy_function=shutil.copy2,symlinks=True);assert manifest(state/d)==original;guard()
+  shutil.copy2(Path(descriptor['files']['legacyFixturePrivate']['path']),state/'fixture-private.json')
+  held=[]
+  for name in ['postgres','redis','api']:
+   sock=socket.socket();sock.bind(('127.0.0.1',0));held.append(sock);status['ports'][name]=sock.getsockname()[1]
+  for sock in held:sock.close()
+  dbport,rport,aport=[status['ports'][k] for k in ['postgres','redis','api']]
+  for key in ['DATABASE_URL_OWNER','DATABASE_URL','DATABASE_URL_RUNTIME']:
+   u=urlparse(runtime[key]);runtime[key]=u._replace(netloc=f'{u.username}:{u.password}@127.0.0.1:{dbport}').geturl()
+  runtime.update(PORT=str(aport),REDIS_URL=f'redis://127.0.0.1:{rport}',UPLOAD_DIR=str(state/'uploads'),EXPORT_DIR=str(state/'exports'))
+  (state/'runtime-private.json').write_text(json.dumps(runtime));result['privateRuntimeFileSha256']=sha_file(state/'runtime-private.json');public={k:v for k,v in runtime.items() if k!='DATABASE_URL_OWNER'}
+  postgres=start([pg/'postgres','-D',state/'pgdata','-h','127.0.0.1','-p',dbport,'-k','','-c','timezone=UTC','-c','shared_buffers=128MB','-c','max_connections=40'],'postgres');ready(dbport,postgres)
+  # Retry only the structured startup SQLSTATE; never suppress auth/config errors.
+  driver="const {Client}=require('pg');const c=new Client({connectionString:process.env.DATABASE_URL_OWNER,connectionTimeoutMillis:2000});(async()=>{try{await c.connect();await c.query('SELECT 1');process.stdout.write('ready')}catch(e){process.stdout.write(e.code||'UNKNOWN');process.exitCode=e.code==='57P03'?75:1}finally{await c.end()}})()"
+  deadline=time.monotonic()+60;polls=[]
+  while True:
+   probe=subprocess.run([node,'--require',BASE/'loopback-only.cjs','-e',driver],cwd=BACKEND,env={**env,'DATABASE_URL_OWNER':runtime['DATABASE_URL_OWNER']},text=True,capture_output=True,timeout=8);polls.append({'exit':probe.returncode,'result':probe.stdout});(state/'postgres-readiness.json').write_text(json.dumps(polls))
+   if probe.returncode==0 and probe.stdout=='ready':break
+   assert probe.returncode==75 and probe.stdout=='57P03';guard();assert time.monotonic()<deadline;time.sleep(.2)
+  status.update(head=a.expected_head,node='v24.21.0',runtimeFingerprint=pinned['runtimeFingerprint']);record()
+  public={k:v for k,v in runtime.items() if k!='DATABASE_URL_OWNER'}
+  result['privateRuntimeFileSha256']=sha_file(state/'runtime-private.json')
+  audit('baseline','c25-audit-baseline')
+  http=False
+  for phase in requested:
+   verify();guard()
+   if phase in ['upgrade','restore']:
+    status['state']='upgrading' if phase=='upgrade' else 'restoring';record();argv=['python3',BASE/'c25-db.py','--tools',tools,'--state',state,'--phase',phase];
+    if phase=='upgrade':argv+=['--expected-snapshot',descriptor['files']['finalSnapshot']['path']]
+    run(argv,'c25-'+phase,timeout=preflight.PHASE_SECONDS[phase])
+   else:
+    if not http:
+     rp=start([redis,'--bind','127.0.0.1','--port',rport,'--dir',state,'--save','','--appendonly','no','--maxmemory','128mb','--maxmemory-policy','noeviction'],'redis');ready(rport,rp)
+     api=start([node,'--require',BASE/'loopback-only.cjs','dist/index.js'],'api',public);ready(aport,api);status['apiUrl']=f'http://127.0.0.1:{aport}'
+     for endpoint in ['health','ready']:
+      with urllib.request.urlopen(status['apiUrl']+'/'+endpoint,timeout=8) as response:assert response.status==200
+     http=True
+    status['state']='running';record();argv=[node,'--require',BASE/'loopback-only.cjs',BASE/f'c25-{phase}.mjs',state];
+    if phase=='consumers':argv+=['--mode','finalize']
+    run(argv,'c25-'+phase,public,timeout=preflight.PHASE_SECONDS[phase])
+   result['phases'][phase]=json.loads((state/f'c25-{phase}-result.json').read_text());assert result['phases'][phase]['passed'] is True
+   result.setdefault('phaseProducers',{})[phase]={'argv':list(map(str,argv)),'inputBindingSha256':result['frozenInputsSha256'],'resultSha256':sha_file(state/f'c25-{phase}-result.json')}
+   audit('preserve','c25-audit-preserve-'+phase);verify();guard();resources('after-'+phase,True)
+  result['passed']=set(result['phases'])==set(PHASES)
+  result['requestedPrefixPassed']=True
+ except BaseException as e:
+  result['errorType']=type(e).__name__
+  import traceback
+  (state/'c25-launcher-error-private.log').write_text(traceback.format_exc())
+  raise
+ finally:
+  for sig in [signal.SIGINT,signal.SIGTERM,signal.SIGHUP]:signal.signal(sig,signal.SIG_IGN)
+  result['finalSnapshotVerified']=False
+  cleanup=[]
+  def stop_child(name,proc):
+   try:
+    if name in ['postgres','redis','api'] and proc.poll() is not None:
+     cleanup.append({'name':name,'error':'UnexpectedServiceExitBeforeShutdown'})
+    if proc.poll() is None:
+     os.killpg(proc.pid,signal.SIGINT if name=='postgres' else signal.SIGTERM)
+     try:proc.wait(timeout=25)
+     except subprocess.TimeoutExpired:
+      cleanup.append({'name':name,'error':'GracefulShutdownTimeout'});os.killpg(proc.pid,signal.SIGKILL);proc.wait(timeout=5)
+   except ProcessLookupError:proc.poll()
+   except Exception as error:cleanup.append({'name':name,'error':type(error).__name__})
+   if name in ['postgres','redis','api']:
+    try:preflight.service_exit(name,proc.returncode)
+    except AssertionError:cleanup.append({'name':name,'error':'UnexpectedShutdownExit','returncode':proc.returncode})
+  # Quiesce every writer before calling a snapshot final. PostgreSQL remains
+  # available solely for the bounded read-only snapshot, then stops last.
+  for name,proc,_ in reversed(children):
+   if name!='postgres':stop_child(name,proc)
+  writers_stopped=all(proc.poll() is not None for name,proc,_ in children if name!='postgres')
+  def final_guard():
+   resources('final-snapshot')
+   assert any(name=='postgres' and proc.poll() is None for name,proc,_ in children),'PostgreSQL exited during final snapshot'
+  def final_audit():
+   assert writers_stopped and not cleanup,'writers did not stop cleanly'
+   assert (state/'c25-original-rows-private.json').is_file(),'no completed original-row inventory'
+   return audit('final','c25-audit-final',monitor=final_guard)
+  def stop_postgres():
+   for name,proc,_ in reversed(children):
+    if name=='postgres':stop_child(name,proc)
+  preflight.finish_database(final_audit,stop_postgres,result)
+  for log in logs:log.close()
+  for name,port in status['ports'].items():
+   try:
+    with socket.create_connection(('127.0.0.1',port),timeout=.2):cleanup.append({'name':name,'error':'PortStillOpen'})
+   except OSError:pass
+  if (state/'pgdata/postmaster.pid').exists():cleanup.append({'name':'postgres','error':'PostmasterPidStillPresent'})
+  result['cleanupVerified']=not cleanup and all(p.poll() is not None for _,p,_ in children);result['processExits']={n:p.returncode for n,p,_ in children}
+  try:
+   after=manifest(source);(state/'source-byte-manifest-after.json').write_text(json.dumps(after));result['sourceUnchanged']=before is not None and after==before and not (source/'pgdata/postmaster.pid').exists()
+  except Exception:result['sourceUnchanged']=False
+  try:result['inputsUnchanged']=pinned is not None and preflight.accepted_binding(binding,validate_build,a.expected_head)==pinned and sha_file(state/'runtime-private.json')==result['privateRuntimeFileSha256'] and sha_file(a.descriptor)==a.expected_descriptor_sha256
+  except Exception:result['inputsUnchanged']=False
+  isolation=all(result[k] for k in ['cleanupVerified','sourceUnchanged','inputsUnchanged','finalSnapshotVerified']);result['passed']=result['passed'] and preflight.complete(result)
+  try:resources('after-cleanup',True)
+  except BaseException as error:result.update(passed=False,finalResourceError=type(error).__name__);isolation=False
+  status.update(state='stopped',cleanupVerified=result['cleanupVerified'],cleanupErrors=cleanup,endedAt=time.time());record();(state/'c25-runtime-result.json').write_text(json.dumps(result,indent=2));lock.close()
+  print(json.dumps({k:result[k] for k in ['passed','cleanupVerified','sourceUnchanged','inputsUnchanged']}),flush=True)
+  if not isolation:raise RuntimeError('C25 isolation or cleanup validation failed')
+if __name__=='__main__':main()
