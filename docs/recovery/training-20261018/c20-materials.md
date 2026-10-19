@@ -105,3 +105,13 @@ state09 已完成全部13项功能/存储/恢复producer链，functionalCheckpoi
 观察窗口分别记录 API、直接 producer、在 producer 内实际执行的原 report/export worker，以及 PG/Redis/独立 observer 的 CPU 与采样 RSS；返回行、分层解密/读取密文字节、响应/CSV/artifact 字节、关系/索引/数据库分配量和 PG 累积计数另列。统一 runtime 解密计数只是该层子集，不与嵌套底层重复求和。100ms 峰值可能漏掉短峰，CPU tick 有量化误差，PG 统计有延迟；observer 自身原始开销不盲目扣除。已有输出 rows 仍整体物化，不声称流式或容量收益。
 
 固定消费顺序、actor、选项、精确 ID/dateRange、事实及 assignment hashes；前后 CSV 必须逐字节相同，无自动 metadata 豁免。已知 2N 原失败保留，before 收集该缺陷而不把效率预算标为通过。之后仅对受影响导出做有界请求内批量读取优化及同输入 after；超出批大小应按分块阶跃解释，不能用无限 raw 常驻换固定 SQL。当前仅为已冻结准备范围，尚无本阶段动态 CPU/RSS/效率结果。
+
+### state10：优化前资源基线已完成
+
+执行 HEAD931dd90c，runtime receipt SHA ba9a08e16b6acfebb3a4c2a61e31ebffd14ea00ce312d5beb5e71b9fbd0fcd6c；passed、cleanupVerified、sourceUnchanged、inputsUnchanged均true。消费者30窗口、资源链/idle33窗口是63个观察窗口，不是独立用例、重复统计样本或容量GO。原51主体/102父/204 FINAL全行及相关facts/outbox哈希保持；另四个新资源父正好十个FINAL，单次、并发2和四工具各已READY/report。四工具因旧授权临近过期采用新course/new publication/exact-release grant，同原Scale/Cognitive来源及原quota计数，旧publication/grant整行哈希不变。
+
+固定渐暖顺序下，两波11/21/51人的direct导出SQL分别40/41、61/60、120/120；探活SELECT1造成±1，Scale facts/raw两个按人读取仍存在。51人两波实际返回facts密文字节101284/101212、raw均17442，直接producer CPU(user+system)208728/146383μs、耗时193.52/143.14ms、100ms sampled RSS峰334135296/340578304B。这些是同序列受扰动原始观察，不能用两波差异声称优化或规模因果关系。旧40/61/121失败仍保留。
+
+实际新链：单次准入137.28ms、并发2外层准入144.42ms、四工具准入142.65ms；120合成trial Cognitive FINAL87.61ms，SJT FINAL116.17ms。报告worker在producer中执行，drain窗口还包含test-only非目标job行锁隔离的setup/release，因此不是纯worker成本。最后两个约30秒idle窗口，API末RSS376487936/376496128B，producer末RSS345702400/345710592B；不据此证明无泄漏或长期稳定性，不模拟浏览器/人工作答时间。
+
+checkpoint12保留两个独立observer原始accounting JSONL的逐字节副本、全部63窗口资源值、冻结输入及就绪/总结果。消费者/chain结果仅移除request route字符串，并明确记录原文件SHA和变换版本；不包含runtime凭据、HTTP正文、DB或私有CSV。每窗observer通常另有20个查询，三次全库relation-size/stat快照及250ms activity均计入原始PG/WAL/IO；自身CPU/query开销单列，不简单扣除。before原始数据库来源是state09；after须从相同state09起点按同消费者序列和精确IDs执行，不能拿含新增10FINAL/artifact的state10尾库当等价起点。

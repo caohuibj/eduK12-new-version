@@ -17,6 +17,10 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 HOST = 'training.eduk12.top'
 PORT = 5443
 ORIGIN = f'https://{HOST}:{PORT}'
+SCENARIOS = {
+    'optional-form': 'e2e/training-optional-form-browser.cjs',
+    'materials': 'e2e/training-materials-browser.cjs',
+}
 HOP = {'connection', 'keep-alive', 'proxy-authenticate', 'proxy-authorization',
        'te', 'trailer', 'transfer-encoding', 'upgrade'}
 
@@ -66,6 +70,8 @@ def main():
     assert os.environ.get('CORS_ORIGIN') == ORIGIN
     assert os.environ.get('COOKIE_SECURE') == 'true'
     assert shutil.which('certutil'), 'Install official libnss3-tools before running'
+    scenario = os.environ.get('TRAINING_HTTPS_SCENARIO', 'optional-form')
+    assert scenario in SCENARIOS, 'Unknown Training HTTPS scenario'
     browser = None
     temporary = tempfile.TemporaryDirectory(prefix='training-browser-private-')
     directory = temporary.name
@@ -90,7 +96,7 @@ def main():
         server.socket = context.wrap_socket(server.socket, server_side=True)
         threading.Thread(target=server.serve_forever, daemon=True).start()
         try:
-            browser = subprocess.Popen(['node', 'e2e/training-optional-form-browser.cjs'], env={**os.environ, 'HOME': str(home)}, start_new_session=True)
+            browser = subprocess.Popen(['node', SCENARIOS[scenario]], env={**os.environ, 'HOME': str(home)}, start_new_session=True)
             code = browser.wait(timeout=240)
             if code:
                 raise RuntimeError(f'Training browser failed with exit {code}')

@@ -68,6 +68,32 @@ test('mandatory integration report rejects collected suites without executed ass
     }
   } finally {rmSync(dir,{recursive:true,force:true});}
 });
+test('C20 products acceptance retains tested artifacts, strict HTTPS and private restore scratch',()=>{
+  const workflow=readFileSync(new URL('../workflows/ci-browser.yml',import.meta.url),'utf8');
+  const step=workflow.split('name: Training material lifecycle and populated restore acceptance')[1]?.split('      - name:')[0]??'';
+  assert.match(step,/if: matrix\.group == 'products'/);
+  assert.match(step,/CI_POSTGRES_SERVICE_ID: \$\{\{ job\.services\.postgres\.id \}\}/);
+  assert.match(step,/TRAINING_HTTPS_SCENARIO: materials/);
+  for(const command of ['node e2e/training-materials-fixture.cjs bootstrap','node scripts/runtime-role-contract.mjs verify-current','node backend/dist/index.js','python3 e2e/training-optional-https.py','node e2e/training-materials-restore.mjs'])
+    assert.ok(step.includes(command),command);
+  assert.doesNotMatch(step,/npm (?:run build|ci)|continue-on-error|scripts\/recovery\//);
+  assert.match(workflow,/name: Training optional Form authenticated browser and CSV acceptance/);
+  const https=readFileSync(new URL('../../server-version/e2e/training-optional-https.py',import.meta.url),'utf8');
+  assert.match(https,/'optional-form': 'e2e\/training-optional-form-browser\.cjs'/);
+  assert.match(https,/'materials': 'e2e\/training-materials-browser\.cjs'/);
+  assert.match(https,/assert scenario in SCENARIOS/);
+  assert.match(https,/get\('TRAINING_HTTPS_SCENARIO', 'optional-form'\)/);
+  const browser=readFileSync(new URL('../../server-version/e2e/training-materials-browser.cjs',import.meta.url),'utf8');
+  assert.doesNotMatch(https+browser,/ignoreHTTPSErrors|ignore-certificate-errors|NODE_TLS_REJECT_UNAUTHORIZED|route\.fulfill/);
+  const upload=workflow.split('name: upload seeded browser evidence')[1]?.split('      - name:')[0]??'';
+  assert.match(upload,/\/tmp\/eduk12-training-materials-e2e/);
+  assert.doesNotMatch(upload,/PRIVATE_DIR|fixture\.json|populated\.dump|training-materials-private/);
+  const fixture=readFileSync(new URL('../../server-version/e2e/training-materials-fixture.cjs',import.meta.url),'utf8');
+  assert.match(fixture,/FROM pg_index x/);
+  assert.match(fixture,/training_material_claim_reservation_key/);
+  assert.match(fixture,/return \{ rows, functions, triggers, constraints, indexes \}/);
+  assert.match(fixture,/\['composite_id', 'publication_key', 'config_digest', 'group_key', 'reservation_ordinal'\]/);
+});
 test('scoped scenarios retain their existing visual topology on hosted Ubuntu',()=>{
   for(const scenario of ['content','content-frontend','frontend','presentation','documentation','dependencies']) {
     const plan=runnerPlan({...capacity,profile:'local',scenario});

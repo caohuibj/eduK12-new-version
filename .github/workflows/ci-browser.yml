@@ -373,6 +373,68 @@ jobs:
             timeout -k 10s 120s sudo -n apt-get install -y --no-install-recommends libnss3-tools
           fi
           python3 e2e/training-optional-https.py
+      - name: Training material lifecycle and populated restore acceptance
+        if: matrix.group == 'products'
+        timeout-minutes: 10
+        env:
+          QUESTIONNAIRE_PRODUCT_ISOLATED_DB: '1'
+          QUESTIONNAIRE_PRODUCT_TEST_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+          TRAINING_MATERIALS_PRIVATE_DIR: ${{ runner.temp }}/training-materials-private
+          TRAINING_MATERIALS_EVIDENCE: /tmp/eduk12-training-materials-e2e
+          TRAINING_HTTPS_SCENARIO: materials
+          TRAINING_MATERIALS_PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          ASSESSMENT_REPORT_ASYNC_ENABLED: 'true'
+          CORS_ORIGIN: https://training.eduk12.top:5443
+          COOKIE_SECURE: 'true'
+          TRAINING_OPTIONAL_EPHEMERAL_CA_APPROVED: 'true'
+        run: |
+          set -euo pipefail
+          # Existing products job, exact downloaded dist, fresh C20 resources only.
+          # The original optional Form scenario above retains its original identity.
+          owner_url="$DATABASE_URL"
+          cleanup_materials() {
+            if [ -f /tmp/eduk12-situational-bundle-backend.pid ]; then
+              kill -- -$(cat /tmp/eduk12-situational-bundle-backend.pid) 2>/dev/null || true
+            fi
+            rm -rf -- "$TRAINING_MATERIALS_PRIVATE_DIR"
+            test ! -e "$TRAINING_MATERIALS_PRIVATE_DIR"
+          }
+          trap cleanup_materials EXIT
+          node e2e/training-materials-fixture.cjs bootstrap
+          kill -- -$(cat /tmp/eduk12-situational-bundle-backend.pid)
+          for attempt in $(seq 1 30); do
+            if ! curl --fail --silent http://127.0.0.1:3000/ready >/dev/null; then break; fi
+            sleep 1
+          done
+          if curl --fail --silent http://127.0.0.1:3000/ready >/dev/null; then exit 1; fi
+          export DATABASE_URL="$(node -e "process.stdout.write(JSON.parse(require('fs').readFileSync(process.env.TRAINING_MATERIALS_PRIVATE_DIR+'/fixture.json')).runtimeUrl)")"
+          export QUESTIONNAIRE_PRODUCT_TEST_DATABASE_URL="$DATABASE_URL"
+          export DATABASE_URL_RUNTIME="$DATABASE_URL"
+          export RUNTIME_ROLE_REQUIRED=true
+          export ASSESSMENT_REPORT_ASYNC_COURSE_IDS="$(node -e "process.stdout.write(JSON.parse(require('fs').readFileSync(process.env.TRAINING_MATERIALS_PRIVATE_DIR+'/fixture.json')).courseId)")"
+          (cd backend && node scripts/runtime-role-contract.mjs verify-current)
+          # API logs remain private and are removed, never uploaded with evidence.
+          nohup setsid node backend/dist/index.js >"$TRAINING_MATERIALS_PRIVATE_DIR/backend.log" 2>&1 &
+          echo $! >/tmp/eduk12-situational-bundle-backend.pid
+          ready=false
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/ready >/dev/null; then ready=true; break; fi
+            sleep 1
+          done
+          test "$ready" = true
+          python3 e2e/training-optional-https.py
+          kill -- -$(cat /tmp/eduk12-situational-bundle-backend.pid)
+          for attempt in $(seq 1 30); do
+            if ! kill -0 $(cat /tmp/eduk12-situational-bundle-backend.pid) 2>/dev/null; then break; fi
+            sleep 1
+          done
+          if kill -0 $(cat /tmp/eduk12-situational-bundle-backend.pid) 2>/dev/null; then exit 1; fi
+          # Consume the same actually populated source once; do not replay its lifecycle.
+          export DATABASE_URL="$owner_url"
+          export QUESTIONNAIRE_PRODUCT_TEST_DATABASE_URL="$owner_url"
+          unset DATABASE_URL_RUNTIME RUNTIME_ROLE_REQUIRED
+          node e2e/training-materials-restore.mjs
       - name: enforced production CSP browser acceptance
         if: matrix.group == 'security'
         run: |
@@ -399,6 +461,7 @@ jobs:
             /tmp/eduk12-questionnaire-public-e2e
             /tmp/eduk12-training-optional-e2e
             /tmp/eduk12-training-optional-backend.log
+            /tmp/eduk12-training-materials-e2e
             /tmp/reporting-v22-evidence
             /tmp/eduk12-bundle-products-backend.log
           if-no-files-found: ignore
