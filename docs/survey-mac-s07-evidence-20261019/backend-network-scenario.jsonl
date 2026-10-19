@@ -1,0 +1,2 @@
+{"utc": "2026-10-19T09:12:33.331938+00:00", "operation": "stop", "port": 3197, "oldPid": 86564, "scope": "task API only; same code/env on restart; PG/Redis and original user services untouched"}
+{"utc": "2026-10-19T09:12:57.470308+00:00", "operation": "start", "port": 3197, "oldPid": 86564, "scope": "task API only; same code/env on restart; PG/Redis and original user services untouched"}

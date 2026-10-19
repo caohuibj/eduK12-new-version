@@ -1,0 +1,32 @@
+{
+  "projectId": "871d81fa-58a5-4ccc-b92d-3ebcd5f1bf25",
+  "project": "S03 合成研究 · 外围界面检查",
+  "owner": "s01_researcher",
+  "researcherStatus": "ACTIVE",
+  "waveId": "7c79441f-308d-4c59-a844-8b18ab7cf3c8",
+  "wave": "S03 合成 FORM",
+  "totalFinals": 7,
+  "newFinals": [
+    {
+      "receiptId": "aa6ed828-c774-44a5-a8b1-1cff7433240e",
+      "attemptId": "c661559a-fc4b-40bd-8218-92ebf8575e35",
+      "completedAtUTC": "2026-10-19T09:32:08.242000Z",
+      "status": "COMPLETED",
+      "publicationId": "6340f74b-48af-4f8c-8d65-23d616b014be",
+      "sourceFinalHash": "db943574cb7eab2bc05eb5bef1cb094b54e6ff7b7610b55a876f46e47d2f75b0"
+    }
+  ],
+  "export": {
+    "id": "5301178b-67fe-4549-a8bf-769043750a7a",
+    "format": "RAW_WAVE",
+    "createdAuditCount": 1,
+    "readAuditCount": 2
+  },
+  "readOnly": true,
+  "syntheticOnly": true,
+  "answersDecrypted": false,
+  "csvRowsMatchingNewFinal": 2,
+  "csvRowCount": 14,
+  "csvColumnCount": 17,
+  "scope": "One newly submitted synthetic FORM via native Safari; one server FINAL and its two non-free-text rows matched by results hash. No real participant data or credential/answer ciphertext read."
+}

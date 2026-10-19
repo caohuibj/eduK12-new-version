@@ -1,0 +1,23 @@
+{
+  "definition": "macOS ps RSS KiB for task API process; total resident process memory, not JS heap, decrypt allocation or per-request isolated cost",
+  "samples": [
+    {
+      "stage": "before-final-native-chain",
+      "utc": "2026-10-19T09:26:54.888457+00:00",
+      "pid": 90350,
+      "rssKiB": 8848
+    },
+    {
+      "stage": "after-final-native-chain",
+      "utc": "2026-10-19T09:36:23.320718+00:00",
+      "pid": 90350,
+      "rssKiB": 6624,
+      "listenerPids": [
+        90350
+      ]
+    }
+  ],
+  "sameProcess": true,
+  "deltaRssKiB": -2224,
+  "qualification": "One aggregate process-RSS interval across scoped native chain, not per-GET or decrypt memory. No browser heap, peak allocation, causal attribution or memory improvement claim."
+}

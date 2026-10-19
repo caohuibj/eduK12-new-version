@@ -1,0 +1,185 @@
+{
+  "measuredUtc": "2026-10-19T09:02:01.404781+00:00",
+  "head": "8b72b1cbe0f5ef90efd0eb440ff76b365df1c823",
+  "scope": "One pre-existing synthetic FORM wave: 6 FINAL, 12 rows x17, no free text; one new ticket, three sequential existing full Artifact GETs",
+  "execution": "Python HTTPConnection through unchanged Vite5197 proxy to API3197, same-origin Host/Origin, ordinary login+TOTP+CSRF, one kept-alive connection, Accept-Encoding identity; not native-browser wall-clock or production/TLS benchmark",
+  "byteDefinition": "Actual received HTTP response BODY octets, including JSON envelope and entire Artifact; no HTTP headers/framing/TLS, no browser Blob disk bytes",
+  "setup": [
+    {
+      "method": "GET",
+      "path": "/api/survey/auth/csrf",
+      "httpStatus": 200,
+      "responseBodyBytes": 102,
+      "responseBodySha256": "1e13b8e51c56ed7a465b44fa2cf90bcd3803655b7f384c46677cfa3002c80e27",
+      "ttfbMs": 452.484,
+      "totalMs": 452.548,
+      "contentType": "application/json; charset=utf-8",
+      "contentEncoding": "identity",
+      "cacheControl": "no-store",
+      "contentLength": "102"
+    },
+    {
+      "method": "POST",
+      "path": "/api/survey/auth/login",
+      "httpStatus": 200,
+      "responseBodyBytes": 91,
+      "responseBodySha256": "f51d851731ae0dc7463d9185339263dabe1751ae0e6d395610ee22dff63b6a92",
+      "ttfbMs": 711.685,
+      "totalMs": 711.735,
+      "contentType": "application/json; charset=utf-8",
+      "contentEncoding": "identity",
+      "cacheControl": "no-store",
+      "contentLength": "91"
+    },
+    {
+      "method": "POST",
+      "path": "/api/survey/auth/mfa/verify",
+      "httpStatus": 200,
+      "responseBodyBytes": 65,
+      "responseBodySha256": "39c2af698903f46094ae84bc3869695353af3c8e7a355093eabb7683b3f5741a",
+      "ttfbMs": 65.199,
+      "totalMs": 65.246,
+      "contentType": "application/json; charset=utf-8",
+      "contentEncoding": "identity",
+      "cacheControl": "no-store",
+      "contentLength": "65"
+    },
+    {
+      "method": "GET",
+      "path": "/api/survey/auth/me",
+      "httpStatus": 200,
+      "responseBodyBytes": 188,
+      "responseBodySha256": "cf342c349673b10b7d3035ca8dae5ea0dddf47485da09e2331b6d917890881d2",
+      "ttfbMs": 55.866,
+      "totalMs": 55.946,
+      "contentType": "application/json; charset=utf-8",
+      "contentEncoding": "identity",
+      "cacheControl": "no-store",
+      "contentLength": "188"
+    },
+    {
+      "method": "GET",
+      "path": "/api/survey/projects?page=1",
+      "httpStatus": 200,
+      "responseBodyBytes": 1795,
+      "responseBodySha256": "0a0c309d533bfd083c608a01b78c37ba335f4f036cdf77c02473c2b14c0816e4",
+      "ttfbMs": 34.928,
+      "totalMs": 34.97,
+      "contentType": "application/json; charset=utf-8",
+      "contentEncoding": "identity",
+      "cacheControl": "no-store, no-cache, must-revalidate, proxy-revalidate",
+      "contentLength": "1795"
+    },
+    {
+      "method": "GET",
+      "path": "/api/survey/projects/871d81fa-58a5-4ccc-b92d-3ebcd5f1bf25/analytics/overview",
+      "httpStatus": 200,
+      "responseBodyBytes": 1146,
+      "responseBodySha256": "56fa88a82f147e4c27e4cc25f424a113bc81fff05538fb2709d3fd94373c7896",
+      "ttfbMs": 46.582,
+      "totalMs": 46.626,
+      "contentType": "application/json; charset=utf-8",
+      "contentEncoding": "identity",
+      "cacheControl": "no-store",
+      "contentLength": "1146"
+    },
+    {
+      "method": "GET",
+      "path": "/api/survey/auth/csrf",
+      "httpStatus": 200,
+      "responseBodyBytes": 102,
+      "responseBodySha256": "b751deb157bf836d234cac079c26b0177cee2a88a80ccf365f14f07c0bb8b892",
+      "ttfbMs": 8.352,
+      "totalMs": 8.479,
+      "contentType": "application/json; charset=utf-8",
+      "contentEncoding": "identity",
+      "cacheControl": "no-store",
+      "contentLength": "102"
+    }
+  ],
+  "exportCreation": {
+    "method": "POST",
+    "path": "/api/survey/projects/871d81fa-58a5-4ccc-b92d-3ebcd5f1bf25/exports",
+    "httpStatus": 200,
+    "responseBodyBytes": 2088,
+    "responseBodySha256": "19e029291d6fe08840917a4cb8d07645e5c950b8695ed8f6a254a42a74188064",
+    "ttfbMs": 149.725,
+    "totalMs": 149.759,
+    "contentType": "application/json; charset=utf-8",
+    "contentEncoding": "identity",
+    "cacheControl": "no-store",
+    "contentLength": "2088"
+  },
+  "exportId": "7234fcde-9b65-4cf9-ab94-ab3f276f6a0f",
+  "reads": [
+    {
+      "method": "GET",
+      "path": "/api/survey/projects/871d81fa-58a5-4ccc-b92d-3ebcd5f1bf25/exports/7234fcde-9b65-4cf9-ab94-ab3f276f6a0f/download",
+      "httpStatus": 200,
+      "responseBodyBytes": 7451,
+      "responseBodySha256": "840986511e767bf1b73ff60a015e0ae356fbb88e5fbad05043a76b09db73c8a4",
+      "ttfbMs": 23.523,
+      "totalMs": 23.586,
+      "contentType": "application/json; charset=utf-8",
+      "contentEncoding": "identity",
+      "cacheControl": "no-store",
+      "contentLength": "7451",
+      "selectedFile": "CSV"
+    },
+    {
+      "method": "GET",
+      "path": "/api/survey/projects/871d81fa-58a5-4ccc-b92d-3ebcd5f1bf25/exports/7234fcde-9b65-4cf9-ab94-ab3f276f6a0f/download",
+      "httpStatus": 200,
+      "responseBodyBytes": 7451,
+      "responseBodySha256": "840986511e767bf1b73ff60a015e0ae356fbb88e5fbad05043a76b09db73c8a4",
+      "ttfbMs": 13.329,
+      "totalMs": 13.367,
+      "contentType": "application/json; charset=utf-8",
+      "contentEncoding": "identity",
+      "cacheControl": "no-store",
+      "contentLength": "7451",
+      "selectedFile": "Codebook"
+    },
+    {
+      "method": "GET",
+      "path": "/api/survey/projects/871d81fa-58a5-4ccc-b92d-3ebcd5f1bf25/exports/7234fcde-9b65-4cf9-ab94-ab3f276f6a0f/download",
+      "httpStatus": 200,
+      "responseBodyBytes": 7451,
+      "responseBodySha256": "840986511e767bf1b73ff60a015e0ae356fbb88e5fbad05043a76b09db73c8a4",
+      "ttfbMs": 11.903,
+      "totalMs": 11.957,
+      "contentType": "application/json; charset=utf-8",
+      "contentEncoding": "identity",
+      "cacheControl": "no-store",
+      "contentLength": "7451",
+      "selectedFile": "Manifest"
+    }
+  ],
+  "oneFile": {
+    "requestSubset": [
+      1
+    ],
+    "getRequests": 1,
+    "responseBodyBytes": 7451,
+    "totalMs": 23.586,
+    "notSeparateFourthRead": true
+  },
+  "threeFiles": {
+    "requestSubset": [
+      1,
+      2,
+      3
+    ],
+    "getRequests": 3,
+    "responseBodyBytes": 22353,
+    "sumRequestTotalMs": 48.91,
+    "seriesElapsedMs": 49.882
+  },
+  "byteRatioThreeOverOne": 3,
+  "safety": "No caching, authorization grants, permission changes, backend modification or automatic write retry. Existing per-read ownership/MFA/revision/hash/rate/audit path retained. No credential/header/answer payload retained.",
+  "limits": "Single small loopback sample; order/connection/cache/noise affect latency. Does not measure SQL statements, decrypt CPU duration, peak memory, disk persistence or browser permission behavior. A 3x body/request/audit count does not imply 3x wall time or zero additional queries.",
+  "logout": {
+    "httpStatus": 200,
+    "sessionRevoked": true
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "recordedBeforeFinalDocsCommit": "e475444d6c6d7edd8b1b6b49799d8f4b897735af",
+  "nativeRuntimeProductHead": "6db06f628b3a1cc163389f816140424f6cd487ca",
+  "productFiles": {
+    "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.tsx": {
+      "bytes": 37438,
+      "sha256": "2a3e3ebc052d0de38d963b3bd1b35d22bc0703cabc619d425c57f3ec5c65c832"
+    },
+    "server-version/frontend/src/survey/ResearchPreview.tsx": {
+      "bytes": 14209,
+      "sha256": "c6bd7950fcdee89b8ba7c576592472729e7d0a8b946d4bf2bc4d970c0891c2f1"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.tsx": {
+      "bytes": 72134,
+      "sha256": "c3e185870cffc9092a9c8bb63721ab9b8095c04e2603576e0b790f96089d19d1"
+    },
+    "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.tsx": {
+      "bytes": 15855,
+      "sha256": "05cc0a48057293e7bfe0f6f266336a4749e50c013ffc4ba88c078084553d6ce3"
+    },
+    "server-version/frontend/src/pages/admin/SurveyCatalogGrants.tsx": {
+      "bytes": 8848,
+      "sha256": "e281533f216e046a6533b543bcc5ea695f4904a5448c72d01604495e646159b5"
+    },
+    "server-version/frontend/src/pages/admin/survey-admin.css": {
+      "bytes": 3716,
+      "sha256": "ce737083a2b0236e2c964927fecef61dc9b11c45e842ec783ef0e1a2e4072a3a"
+    }
+  },
+  "unchangedTrees": {
+    "server-version/backend": {
+      "before": "74720e530d99efe1135103951fdc9a256318e9ec",
+      "after": "74720e530d99efe1135103951fdc9a256318e9ec"
+    },
+    "server-version/frontend/src/modules": {
+      "before": "4d1dbe6055471f31248bf72abbca925880537b63",
+      "after": "4d1dbe6055471f31248bf72abbca925880537b63"
+    },
+    "server-version/frontend/package.json": {
+      "before": "4a287572dfb7d636477ea34985fab7a0b12fae53",
+      "after": "4a287572dfb7d636477ea34985fab7a0b12fae53"
+    },
+    "server-version/frontend/package-lock.json": {
+      "before": "9fc33dd617ce75766564786d880e588142c11eed",
+      "after": "9fc33dd617ce75766564786d880e588142c11eed"
+    }
+  },
+  "S07ProductChanges": false,
+  "testChange": "One added cursor-handoff test; reports separately bound.",
+  "nativeSnapshots": {
+    "s07-native-stage-one-ax.json": {
+      "bytes": 473237,
+      "sha256": "a9aa6cb4c148de633a4023387b7fca44dbdd5875853e9869cce0e23ea2b1289e"
+    },
+    "s07-native-stage-three-ax.json": {
+      "bytes": 611247,
+      "sha256": "989a36d29a37abafdea836cba81528ed636dc900566bcf47d2190dae61e0ef93"
+    },
+    "s07-native-stage-two-ax.json": {
+      "bytes": 590332,
+      "sha256": "4ec4fdf0a36a6de036aaa705c1385450d4184677487f19dbb269038c475b5c88"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+from pathlib import Path
+from urllib.parse import urlparse,unquote
+import json,os,subprocess,csv,datetime
+B=Path(__file__).resolve().parents[1];cfg=json.loads((B/'runtime/private/environment.json').read_text());u=urlparse(cfg['DATABASE_URL_RUNTIME'])
+assert cfg['NODE_ENV']=='test' and (u.hostname,u.port,u.path,u.username)==('127.0.0.1',5557,'/survey_s01_test','survey_s01_runtime')
+sql="""BEGIN READ ONLY;
+SELECT json_build_object('projectId',p.id,'project',p.title,'owner',u.username,'researcherStatus',g.status,'waveId',w.id,'wave',w.title,
+'totalFinals',(SELECT count(*) FROM survey_wave_finals WHERE wave_id=w.id),
+'newFinals',(SELECT json_agg(json_build_object('receiptId',f.id,'attemptId',f.attempt_id,'completedAtUTC',to_char(f.completed_at AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"'),'status',a.status,'publicationId',f.publication_id,'sourceFinalHash',f.results_hash)) FROM survey_wave_finals f JOIN survey_wave_attempts a ON a.id=f.attempt_id WHERE f.wave_id=w.id AND f.completed_at>='2026-10-19T09:31:00Z'),
+'export',(SELECT json_build_object('id',t.id,'format',t.format,'createdAuditCount',(SELECT count(*) FROM survey_events WHERE metadata->>'exportId'=t.id AND action='RESEARCH_EXPORT_CREATED'),'readAuditCount',(SELECT count(*) FROM survey_events WHERE metadata->>'exportId'=t.id AND action='RESEARCH_EXPORT_DOWNLOADED')) FROM survey_export_tickets t WHERE t.project_id=p.id AND t.id LIKE '5301178b-%'))
+FROM survey_projects p JOIN users u ON u.id=p.owner_user_id JOIN survey_researcher_grants g ON g.user_id=u.id JOIN survey_waves w ON w.project_id=p.id
+WHERE p.id='871d81fa-58a5-4ccc-b92d-3ebcd5f1bf25' AND p.title='S03 合成研究 · 外围界面检查' AND u.username='s01_researcher' AND w.id='7c79441f-308d-4c59-a844-8b18ab7cf3c8';
+COMMIT;"""
+p=subprocess.run(['/opt/homebrew/opt/postgresql@16/bin/psql','-X','-h','127.0.0.1','-p','5557','-U',u.username,'-d','survey_s01_test','-Atq','-v','ON_ERROR_STOP=1'],input=sql,text=True,capture_output=True,env=dict(os.environ,PGPASSWORD=unquote(u.password)))
+assert p.returncode==0,'Scoped metadata read failed'
+x=json.loads(p.stdout);assert len(x['newFinals'])==1 and x['totalFinals']==7 and x['newFinals'][0]['status']=='COMPLETED'
+assert x['export']['createdAuditCount']==1 and x['export']['readAuditCount']==2
+file=B/'evidence/s07-final/native/files/survey_871d81fa_raw_wave_batch001_5301178b.csv'
+rows=list(csv.DictReader(file.open(encoding='utf-8-sig',newline='')))
+matched=[r for r in rows if r['source_final_hash']==x['newFinals'][0]['sourceFinalHash']]
+assert len(rows)==14 and len(matched)==2 and {r['value'] for r in matched}=={'a','b'}
+x.update(readOnly=True,syntheticOnly=True,answersDecrypted=False,csvRowsMatchingNewFinal=2,csvRowCount=14,csvColumnCount=17,scope='One newly submitted synthetic FORM via native Safari; one server FINAL and its two non-free-text rows matched by results hash. No real participant data or credential/answer ciphertext read.')
+(B/'evidence/s07-final/chain-metadata.json').write_text(json.dumps(x,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps({k:x[k] for k in ['totalFinals','csvRowsMatchingNewFinal','export']},indent=2))

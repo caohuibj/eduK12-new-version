@@ -1,0 +1,214 @@
+{
+  "measuredUtc": "2026-10-19T09:37:01.844878+00:00",
+  "head": "a2915a817a6adc6b86412f6e9fc2dea387d28252",
+  "scope": "Same synthetic FORM wave after one final native chain: 7 FINAL, 14 rows x17, no free text; one new ticket, three sequential existing full Artifact GETs",
+  "execution": "Python HTTPConnection through unchanged Vite5197 proxy to API3197, same-origin Host/Origin, ordinary login+TOTP+CSRF, one kept-alive connection, Accept-Encoding identity; not native-browser wall-clock or production/TLS benchmark",
+  "byteDefinition": "Actual received HTTP response BODY octets, including JSON envelope and entire Artifact; no HTTP headers/framing/TLS, no browser Blob disk bytes",
+  "memory": {
+    "definition": "macOS ps RSS KiB for task API listener process; sample between reads; not JS heap, peak memory or decrypt allocation",
+    "samples": [
+      {
+        "stage": "before-three-reads",
+        "apiPid": 90350,
+        "rssKiB": 79136
+      },
+      {
+        "stage": "after-CSV",
+        "apiPid": 90350,
+        "rssKiB": 79088
+      },
+      {
+        "stage": "after-Codebook",
+        "apiPid": 90350,
+        "rssKiB": 79808
+      },
+      {
+        "stage": "after-Manifest",
+        "apiPid": 90350,
+        "rssKiB": 80000
+      }
+    ],
+    "deltaRssKiB": 864,
+    "noCausalOrImprovementClaim": true
+  },
+  "setup": [
+    {
+      "method": "GET",
+      "path": "/api/survey/auth/csrf",
+      "httpStatus": 200,
+      "responseBodyBytes": 102,
+      "responseBodySha256": "a79c9b053ae7887f848ab5d290a703c82aa69bdd4829de91036fa513176bdfda",
+      "ttfbMs": 68.873,
+      "totalMs": 68.92,
+      "contentType": "application/json; charset=utf-8",
+      "contentEncoding": "identity",
+      "cacheControl": "no-store",
+      "contentLength": "102"
+    },
+    {
+      "method": "POST",
+      "path": "/api/survey/auth/login",
+      "httpStatus": 200,
+      "responseBodyBytes": 91,
+      "responseBodySha256": "f51d851731ae0dc7463d9185339263dabe1751ae0e6d395610ee22dff63b6a92",
+      "ttfbMs": 294.596,
+      "totalMs": 294.639,
+      "contentType": "application/json; charset=utf-8",
+      "contentEncoding": "identity",
+      "cacheControl": "no-store",
+      "contentLength": "91"
+    },
+    {
+      "method": "POST",
+      "path": "/api/survey/auth/mfa/verify",
+      "httpStatus": 200,
+      "responseBodyBytes": 65,
+      "responseBodySha256": "39c2af698903f46094ae84bc3869695353af3c8e7a355093eabb7683b3f5741a",
+      "ttfbMs": 42.501,
+      "totalMs": 42.628,
+      "contentType": "application/json; charset=utf-8",
+      "contentEncoding": "identity",
+      "cacheControl": "no-store",
+      "contentLength": "65"
+    },
+    {
+      "method": "GET",
+      "path": "/api/survey/auth/me",
+      "httpStatus": 200,
+      "responseBodyBytes": 188,
+      "responseBodySha256": "cf342c349673b10b7d3035ca8dae5ea0dddf47485da09e2331b6d917890881d2",
+      "ttfbMs": 16.844,
+      "totalMs": 16.869,
+      "contentType": "application/json; charset=utf-8",
+      "contentEncoding": "identity",
+      "cacheControl": "no-store",
+      "contentLength": "188"
+    },
+    {
+      "method": "GET",
+      "path": "/api/survey/projects?page=1",
+      "httpStatus": 200,
+      "responseBodyBytes": 1795,
+      "responseBodySha256": "0a0c309d533bfd083c608a01b78c37ba335f4f036cdf77c02473c2b14c0816e4",
+      "ttfbMs": 7.976,
+      "totalMs": 8.001,
+      "contentType": "application/json; charset=utf-8",
+      "contentEncoding": "identity",
+      "cacheControl": "no-store, no-cache, must-revalidate, proxy-revalidate",
+      "contentLength": "1795"
+    },
+    {
+      "method": "GET",
+      "path": "/api/survey/projects/871d81fa-58a5-4ccc-b92d-3ebcd5f1bf25/analytics/overview",
+      "httpStatus": 200,
+      "responseBodyBytes": 1147,
+      "responseBodySha256": "da53925a20e639ad368d579166b99fb7c9e1f621190c9293364c7352e49c2333",
+      "ttfbMs": 18.0,
+      "totalMs": 18.028,
+      "contentType": "application/json; charset=utf-8",
+      "contentEncoding": "identity",
+      "cacheControl": "no-store",
+      "contentLength": "1147"
+    },
+    {
+      "method": "GET",
+      "path": "/api/survey/auth/csrf",
+      "httpStatus": 200,
+      "responseBodyBytes": 102,
+      "responseBodySha256": "4ad65a416dec83a1c59d698fd9c826b6ad779cf46fd1e7d4f7dd85b216f70de6",
+      "ttfbMs": 1.747,
+      "totalMs": 1.765,
+      "contentType": "application/json; charset=utf-8",
+      "contentEncoding": "identity",
+      "cacheControl": "no-store",
+      "contentLength": "102"
+    }
+  ],
+  "exportCreation": {
+    "method": "POST",
+    "path": "/api/survey/projects/871d81fa-58a5-4ccc-b92d-3ebcd5f1bf25/exports",
+    "httpStatus": 200,
+    "responseBodyBytes": 2088,
+    "responseBodySha256": "a8e57abaa91c5fdedfcf3a824d1be55dcc08ef46a2e7071e592381207daeafd1",
+    "ttfbMs": 81.653,
+    "totalMs": 81.679,
+    "contentType": "application/json; charset=utf-8",
+    "contentEncoding": "identity",
+    "cacheControl": "no-store",
+    "contentLength": "2088"
+  },
+  "exportId": "f539b433-80a4-47e1-b31f-bcb1e6eae0aa",
+  "reads": [
+    {
+      "method": "GET",
+      "path": "/api/survey/projects/871d81fa-58a5-4ccc-b92d-3ebcd5f1bf25/exports/f539b433-80a4-47e1-b31f-bcb1e6eae0aa/download",
+      "httpStatus": 200,
+      "responseBodyBytes": 8105,
+      "responseBodySha256": "3b579b104260d9c3a1f5706be77f27d2a2979f98a384daa4c32e2efb043dd31a",
+      "ttfbMs": 10.924,
+      "totalMs": 10.957,
+      "contentType": "application/json; charset=utf-8",
+      "contentEncoding": "identity",
+      "cacheControl": "no-store",
+      "contentLength": "8105",
+      "selectedFile": "CSV"
+    },
+    {
+      "method": "GET",
+      "path": "/api/survey/projects/871d81fa-58a5-4ccc-b92d-3ebcd5f1bf25/exports/f539b433-80a4-47e1-b31f-bcb1e6eae0aa/download",
+      "httpStatus": 200,
+      "responseBodyBytes": 8105,
+      "responseBodySha256": "3b579b104260d9c3a1f5706be77f27d2a2979f98a384daa4c32e2efb043dd31a",
+      "ttfbMs": 11.693,
+      "totalMs": 11.726,
+      "contentType": "application/json; charset=utf-8",
+      "contentEncoding": "identity",
+      "cacheControl": "no-store",
+      "contentLength": "8105",
+      "selectedFile": "Codebook"
+    },
+    {
+      "method": "GET",
+      "path": "/api/survey/projects/871d81fa-58a5-4ccc-b92d-3ebcd5f1bf25/exports/f539b433-80a4-47e1-b31f-bcb1e6eae0aa/download",
+      "httpStatus": 200,
+      "responseBodyBytes": 8105,
+      "responseBodySha256": "3b579b104260d9c3a1f5706be77f27d2a2979f98a384daa4c32e2efb043dd31a",
+      "ttfbMs": 6.99,
+      "totalMs": 7.019,
+      "contentType": "application/json; charset=utf-8",
+      "contentEncoding": "identity",
+      "cacheControl": "no-store",
+      "contentLength": "8105",
+      "selectedFile": "Manifest"
+    }
+  ],
+  "oneFile": {
+    "requestSubset": [
+      1
+    ],
+    "getRequests": 1,
+    "responseBodyBytes": 8105,
+    "totalMs": 10.957,
+    "notSeparateFourthRead": true
+  },
+  "threeFiles": {
+    "requestSubset": [
+      1,
+      2,
+      3
+    ],
+    "getRequests": 3,
+    "responseBodyBytes": 24315,
+    "sumRequestTotalMs": 29.702,
+    "seriesElapsedMsIncludingRssSampling": 46.349
+  },
+  "byteRatioThreeOverOne": 3,
+  "safety": "No caching, authorization grants, permission changes, backend modification or automatic write retry. Existing per-read ownership/MFA/revision/hash/rate/audit path retained. No credential/header/answer payload retained.",
+  "limits": "Single small loopback sample; order/connection/cache/noise affect latency. Does not measure SQL statements, decrypt CPU duration, peak memory, disk persistence or browser permission behavior. A 3x body/request/audit count does not imply 3x wall time or zero additional queries.",
+  "logout": {
+    "httpStatus": 200,
+    "sessionRevoked": true
+  },
+  "applicationProductHead": "6db06f628b3a1cc163389f816140424f6cd487ca",
+  "workingTreeAtMeasurement": "Only a new cursor-handoff test was uncommitted; no product/runtime files changed."
+}
