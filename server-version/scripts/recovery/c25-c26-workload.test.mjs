@@ -6,7 +6,7 @@ import fs from 'node:fs'
 import {READ_CATEGORIES,COLD_COUNTS} from './c25-c26-contract.mjs'
 import {NATIVE_TYPES,PERSISTENCE,c26ExecutionPlan,freezeIndependentReadScope,nativeFinalSpec,readRouteSpecs,assertCheckpointRecovery,assertAcceptedSnapshots,assertOriginalReportDrain,createC26Workload,runC26Workload} from './c25-c26-workload.mjs'
 
-const H='a'.repeat(64),H2='b'.repeat(64),expiry='2026-10-19T16:00:00.000Z',copy=value=>structuredClone(value)
+const H='a'.repeat(64),H2='b'.repeat(64),C='c'.repeat(64),expiry='2026-10-19T16:00:00.000Z',copy=value=>structuredClone(value)
 const selector=()=>({schemaVersion:1,courseId:'old-course',mode:'PAIRWISE',waves:['a','b'].map(key=>({waveKey:'wave_'+key,taskId:'old-task-'+key,publication:'2026-10-18T12:00:00.000Z',configDigest:null,variantKey:null,metrics:[{itemId:'old-scale-'+key,metricKey:'total'}]}))})
 const independent=teacher=>({route:'/courses/old-course/training-analysis',selector:selector(),teacher,sourceIdentity:{scope:'ACCEPTED_JOINT_RESTORE_C25_AB',sourceSha256:H,rowsSha256:H2,teacherId:'old-teacher'},assertResponse:value=>assert.deepEqual(value,{analysis:'accepted-two-wave-suppression'})})
 const persistence=row=>({snapshotHash:row.trainingPersistenceSnapshotHash,attemptId:row.id,attemptEpoch:row.attemptEpoch,courseId:row.deliveryCourseId,checkpoint:copy(PERSISTENCE.checkpoint),localCognitive:copy(PERSISTENCE.localCognitive)})
@@ -20,7 +20,7 @@ function fixture({failRoute,changeCheckpointRead=false}={}){
   {id:'cognitive-item',type:'COGNITIVE',cognitiveSession:{sessionId:'cognitive-child',attemptEpoch:1,definitionHash:H,contextSnapshotHash:null,randomSeed:42,config:{totalTrials:120,nogoRatio:0.2}}},
   {id:'sjt-item',type:'SITUATIONAL',situationalAttemptId:'sjt-child'}]
  const state=()=>({id:'new-attempt',attemptEpoch:1,status:parent.status,currentItem:copy(units[phaseIndex]??null),contextSnapshotHash:null,trainingPersistence:persistence(parent)})
- const loadedSjt={instrument:{online:{responseProtocol:'sjt-online-response-v1'}},attempt:{attemptEpoch:1,definitionHash:H,compiledRuntimeHash:H2,scoringVersion:'1.0.0'}}
+ const loadedSjt={instrument:{online:{responseProtocol:'sjt-online-response-v1'}},attempt:{attemptEpoch:1,definitionHash:H,compiledRuntimeHash:C,scoringVersion:'1.0.0'}}
  const envelope={schemaVersion:1,snapshotHash:H,definitionHash:H2,drafts:['form','scale','sjt'].map(slotKey=>({slotKey,answers:slotKey==='form'?{'form-item':'yes'}:{}})),cognitiveResults:[]}
  const finals=[
   '/composite-assessments/attempts/new-attempt/form-sections/form-section/submit',
@@ -31,8 +31,12 @@ function fixture({failRoute,changeCheckpointRead=false}={}){
  function commit(spec,index){
   assert.equal(index,phaseIndex);assert.equal(spec.submissionId,'submission-'+(index+1))
   const key=['forms','scales','cognitive','sjt'][index],child=children[key][0]
+  const retained=writes.get(`c25-c26-final-${NATIVE_TYPES[index].toLowerCase().replaceAll('_','-')}-private.json`)
+  assert.equal(retained.identityProof.sourceAttemptId,child.id,'Identity proof must be persisted before FINAL issues')
+  assert.equal(retained.identityProof.requestDefinitionHash,spec.definitionHash)
+  assert.equal(retained.identityProof.sourceDefinitionHash,[H,H2,H2,H][index]);assert.equal(child.status,'IN_PROGRESS')
   child.status='COMPLETED';child.submissionId=spec.submissionId
-  snapshots.push({id:'snapshot-'+index,unitType:NATIVE_TYPES[index],slotKey:['form','scale','cognitive','sjt'][index],compositeAttemptId:parent.id,attemptEpoch:1,terminalState:'COMPLETED',sourceAttemptId:child.id,sourceSubmissionId:spec.submissionId,sourceDefinitionHash:H,
+  snapshots.push({id:'snapshot-'+index,unitType:NATIVE_TYPES[index],slotKey:['form-section:form-section','scale:scale-item','cognitive:cognitive-item','situational:sjt-item'][index],compositeAttemptId:parent.id,attemptEpoch:1,terminalState:'COMPLETED',sourceAttemptId:child.id,sourceSubmissionId:spec.submissionId,sourceDefinitionHash:[H,H2,H2,H][index],compiledRuntimeHash:index===0?null:C,
    ...(index===0?{collectionFactsEncrypted:'form-cipher'}:{canonicalResultEncrypted:NATIVE_TYPES[index]})})
   if(index===0)raw.formAnswers.push({id:'form-answer',attemptId:parent.id,value:'yes'})
   if(index===1)raw.scaleFacts.push({id:'scale-fact',assessmentId:child.id})
@@ -52,8 +56,8 @@ function fixture({failRoute,changeCheckpointRead=false}={}){
      if(route.startsWith('/auth/'))return {}
      if(route==='/composite-assessments/new-product/attempts'){
       assert.equal(method,'POST');assert.deepEqual(body,{});assert.equal(started,false);started=true
-      parent={id:'new-attempt',attemptEpoch:1,status:'IN_PROGRESS',userId:'new-student',compositeAssessmentId:'new-product',deliveryCourseId:'new-course',contextSnapshotHash:null,asyncReportEpoch:1,trainingPersistenceSnapshotHash:H,trainingPersistenceSnapshot:{policy:copy(PERSISTENCE)},trainingFeedbackSnapshot:{policy:{schemaVersion:1,mode:'IMMEDIATE'}}}
-      for(const [key,childId]of [['forms','form-child'],['scales','scale-child'],['cognitive','cognitive-child'],['sjt','sjt-child']])children[key].push({id:childId,status:'IN_PROGRESS',submissionId:null})
+      parent={id:'new-attempt',attemptEpoch:1,status:'IN_PROGRESS',userId:'new-student',compositeAssessmentId:'new-product',deliveryCourseId:'new-course',contextSnapshotHash:null,asyncReportEpoch:1,frozenActiveSlotSetHash:H,frozenActiveSlotSetEncrypted:'slots-cipher',trainingPersistenceSnapshotHash:H,trainingPersistenceSnapshot:{policy:copy(PERSISTENCE)},trainingFeedbackSnapshot:{policy:{schemaVersion:1,mode:'IMMEDIATE'}}}
+      for(const [key,childId]of [['forms','form-child'],['scales','scale-child'],['cognitive','cognitive-child'],['sjt','sjt-child']])children[key].push({id:childId,status:'IN_PROGRESS',submissionId:null,...(key==='forms'?{attemptId:parent.id,sectionId:'form-section',attemptEpoch:1}:{compositeAttemptId:parent.id,compositeItemId:{scales:'scale-item',cognitive:'cognitive-item',sjt:'sjt-item'}[key],compiledRuntimeHash:C,...(key==='cognitive'?{attemptNo:1,configSnapshotEncrypted:'cognitive-cipher'}:{attemptEpoch:1,runtimeSnapshotEncrypted:key+'-cipher'}),...(key==='sjt'?{definitionHash:H}:{})})})
       return {attempt:state()}
      }
      if(route==='/composite-assessments/attempts/new-attempt/checkpoint'){
@@ -100,7 +104,11 @@ function fixture({failRoute,changeCheckpointRead=false}={}){
   exportArtifact:{findMany:async({where}={})=>copy(where?[artifact]:[...oldArtifacts,...(artifact?[artifact]:[])])},
  }
  for(const [model,key]of [['compositeFormAnswer','formAnswers'],['assessmentResultFact','scaleFacts'],['cognitiveRawSubmission','cognitiveRaw'],['situationalRawSubmission','situationalRaw']])prisma[model]={findMany:async()=>copy(raw[key])}
- const api={prisma,children:async()=>copy({...children,snapshots,jobs}),cognitiveFinal:session=>({submissionId:'generator-id',attemptEpoch:session.attemptEpoch,definitionHash:session.definitionHash,contextSnapshotHash:session.contextSnapshotHash,trials:Array.from({length:120},(_,trialIndex)=>({schemaVersion:1,trialIndex,phase:'test',startedAtPerfMs:trialIndex*1500,endedAtPerfMs:trialIndex*1500+800,durationMs:800,flags:{timeout:false,premature:false},qualityEvents:[],payload:{trialType:'go',responded:true,rtMs:300,interrupted:false}}))}),
+ const api={prisma,
+  loadFrozenActiveSlotSet:async cipher=>{assert.equal(cipher,'slots-cipher');return {snapshotHash:H,attemptEpoch:1,slots:NATIVE_TYPES.map((unitType,index)=>({slotKey:['form-section:form-section','scale:scale-item','cognitive:cognitive-item','situational:sjt-item'][index],unitType,sourceDefinitionIdentity:{key:'source-'+index,version:'1',hash:[H,H2,H2,H][index]},sourceBinding:index===0?{sectionId:'form-section'}:{compositeItemId:units[index].id,compiledRuntimeHash:C}}))}},
+  loadFrozenScaleRuntimeSnapshot:async cipher=>{assert.equal(cipher,'scales-cipher');return {legacyDefinitionHash:H,sourceDefinitionHash:H2,compiledRuntime:{compiledRuntimeHash:C}}},
+  loadCognitiveSessionConfig:async cipher=>{assert.equal(cipher,'cognitive-cipher');return {snapshot:{runtimeGeneration:'UNIFIED_V1',configHash:H},compiledRuntime:{instrumentType:'COGNITIVE',sourceDefinitionHash:H2,compiledRuntimeHash:C}}},
+  children:async()=>copy({...children,snapshots,jobs}),cognitiveFinal:session=>({submissionId:'generator-id',attemptEpoch:session.attemptEpoch,definitionHash:session.definitionHash,contextSnapshotHash:session.contextSnapshotHash,trials:Array.from({length:120},(_,trialIndex)=>({schemaVersion:1,trialIndex,phase:'test',startedAtPerfMs:trialIndex*1500,endedAtPerfMs:trialIndex*1500+800,durationMs:800,flags:{timeout:false,premature:false},qualityEvents:[],payload:{trialType:'go',responded:true,rtMs:300,interrupted:false}}))}),
   loadStoredCanonicalUnitResult:async type=>({resultHash:H,core:{unitType:type,metrics:[{key:{SCALE:'total',COGNITIVE:'correct',SITUATIONAL:'cooperation'}[type],value:{SCALE:1,COGNITIVE:120,SITUATIONAL:9}[type]}]}}),
   parseCsv:bytes=>{const [head,row]=bytes.toString().trim().split('\n'),columns=head.split(',');return {columns,rows:[Object.fromEntries(row.split(',').map((value,index)=>[columns[index],value]))]}}}
  const h={result:{},remaining:()=>100000,check:value=>events.push(value),read:name=>{assert.equal(name,'fixture-private.json');return {}},write:(name,value)=>writes.set(name,copy(value)),client:()=>client()}
@@ -207,6 +215,10 @@ test('checkpoint mutation and accepted source-submission mismatch fail before mo
  const steps=NATIVE_TYPES.map(type=>good.writes.get(`c25-c26-final-${type.toLowerCase().replaceAll('_','-')}-private.json`))
  assertAcceptedSnapshots(before,steps);assertOriginalReportDrain({baseline,before,after,steps})
  const altered=copy(after);altered.snapshots[0].sourceSubmissionId='other-submission';assert.throws(()=>assertAcceptedSnapshots(altered,steps))
+ for(const mutate of [x=>x.snapshots[2].sourceDefinitionHash=H,x=>x.snapshots[2].compiledRuntimeHash=H2,x=>x.snapshots[2].slotKey='cognitive:other',x=>x.snapshots[2].sourceAttemptId='other-child',x=>x.cognitive[0].compiledRuntimeHash=H2,x=>x.cognitive[0].compositeItemId='other-item',x=>x.cognitive[0].attemptNo=2,x=>x.parent.frozenActiveSlotSetHash=H2]){
+  const changed=copy(after);mutate(changed);assert.throws(()=>assertAcceptedSnapshots(changed,steps))
+ }
+ const alteredRequest=copy(steps);alteredRequest[2].body.definitionHash=H2;assert.throws(()=>assertAcceptedSnapshots(after,alteredRequest))
  const retried=copy(after);retried.jobs[0].attemptCount=2;assert.throws(()=>assertOriginalReportDrain({baseline,before,after:retried,steps}))
  const uncleared=copy(after);uncleared.checkpoint.payloadEncrypted='old-payload';assert.throws(()=>assertOriginalReportDrain({baseline,before,after:uncleared,steps}))
 })

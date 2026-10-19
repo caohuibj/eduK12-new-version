@@ -15,8 +15,9 @@ export function createProbeChannel(child,{nonce,role,identity,bindings,remaining
   try{onFault(error)}catch{}
  }
  function message(value){
-  if(!value?.type?.startsWith('c26-runtime-probe'))return
   try{
+   assert.ok(value&&typeof value==='object'&&!Array.isArray(value)&&typeof value.type==='string','malformed IPC message type')
+   if(!value.type.startsWith('c26-runtime-probe'))return
    assert.equal(value.nonce,nonce,'probe nonce mismatch')
    if(value.type==='c26-runtime-probe-fault')throw new Error('runtime probe fault after close or instrumentation')
    if(value.type==='c26-runtime-probe-ready'){

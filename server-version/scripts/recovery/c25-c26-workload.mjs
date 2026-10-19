@@ -91,6 +91,51 @@ export function assertCheckpointRecovery(value,{envelope,parent,checkpoint}){
  assert.equal(new Date(value.expiresAt).toISOString(),new Date(checkpoint.expiresAt).toISOString())
  assert.deepEqual(value.trainingPersistence,metadata(parent));return true
 }
+/** Freeze request and scientific source identities before FINAL. Cognitive's
+ * request configHash and Scale's legacyDefinitionHash are not the canonical
+ * runtime source-definition hash stored by the accepted unit snapshot. */
+export function bindFinalIdentity({parent,slotSet,unit,body,child,runtimeIdentity}){
+ assert.equal(slotSet.snapshotHash,parent.frozenActiveSlotSetHash);assert.equal(slotSet.attemptEpoch,parent.attemptEpoch)
+ const slotKey=unit.type==='FORM_SECTION'?`form-section:${unit.id}`:`${{SCALE:'scale',COGNITIVE:'cognitive',SITUATIONAL:'situational'}[unit.type]}:${unit.id}`
+ const slots=slotSet.slots.filter(slot=>slot.slotKey===slotKey);assert.equal(slots.length,1)
+ const slot=slots[0];assert.equal(slot.unitType,unit.type);sha(slot.sourceDefinitionIdentity.hash)
+ assert.equal(slot.sourceBinding[unit.type==='FORM_SECTION'?'sectionId':'compositeItemId'],unit.id)
+ assert.equal(child[unit.type==='FORM_SECTION'?'attemptId':'compositeAttemptId'],parent.id)
+ assert.equal(child[unit.type==='FORM_SECTION'?'sectionId':'compositeItemId'],unit.id)
+ assert.equal(child[unit.type==='COGNITIVE'?'attemptNo':'attemptEpoch'],parent.attemptEpoch)
+ assert.equal(body.attemptEpoch,parent.attemptEpoch);id(child.id)
+ if(unit.type!=='FORM_SECTION')assert.equal(child.id,unit.type==='SCALE'?unit.scaleAssessmentId:unit.type==='COGNITIVE'?unit.cognitiveSession.sessionId:unit.situationalAttemptId)
+ sha(body.definitionHash);sha(runtimeIdentity.requestDefinitionHash);sha(runtimeIdentity.sourceDefinitionHash)
+ assert.equal(body.definitionHash,runtimeIdentity.requestDefinitionHash,'request definition differs from frozen request identity')
+ assert.equal(runtimeIdentity.sourceDefinitionHash,slot.sourceDefinitionIdentity.hash,'runtime source differs from frozen slot')
+ if(unit.type==='FORM_SECTION')assert.equal(runtimeIdentity.compiledRuntimeHash,null)
+ else{sha(runtimeIdentity.compiledRuntimeHash);assert.equal(runtimeIdentity.compiledRuntimeHash,child.compiledRuntimeHash);assert.equal(runtimeIdentity.compiledRuntimeHash,slot.sourceBinding.compiledRuntimeHash)}
+ return frozen({schemaVersion:1,attemptId:parent.id,attemptEpoch:parent.attemptEpoch,slotKey,unitId:unit.id,unitType:unit.type,sourceAttemptId:child.id,
+  frozenActiveSlotSetHash:parent.frozenActiveSlotSetHash,sourceDefinitionIdentity:clone(slot.sourceDefinitionIdentity),
+  requestDefinitionHash:runtimeIdentity.requestDefinitionHash,sourceDefinitionHash:runtimeIdentity.sourceDefinitionHash,compiledRuntimeHash:runtimeIdentity.compiledRuntimeHash})
+}
+export async function freezeFinalIdentity(api,attempt,spec,loadedSjt){
+ const parent=await api.prisma.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:attempt.id}}),unit=attempt.currentItem
+ assert.equal(parent.attemptEpoch,attempt.attemptEpoch)
+ const slotSet=await api.loadFrozenActiveSlotSet(parent.frozenActiveSlotSetEncrypted,api.prisma),children=await api.children(parent.id)
+ const key={FORM_SECTION:'forms',SCALE:'scales',COGNITIVE:'cognitive',SITUATIONAL:'sjt'}[unit.type]
+ const matches=children[key].filter(row=>row[unit.type==='FORM_SECTION'?'sectionId':'compositeItemId']===unit.id);assert.equal(matches.length,1)
+ const child=matches[0];let runtimeIdentity
+ if(unit.type==='SCALE'){
+  const snapshot=await api.loadFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted,api.prisma)
+  assert.equal(unit.definitionHash,snapshot.legacyDefinitionHash)
+  runtimeIdentity={requestDefinitionHash:snapshot.legacyDefinitionHash,sourceDefinitionHash:snapshot.sourceDefinitionHash,compiledRuntimeHash:snapshot.compiledRuntime.compiledRuntimeHash}
+ }else if(unit.type==='COGNITIVE'){
+  const stored=await api.loadCognitiveSessionConfig(child.configSnapshotEncrypted,api.prisma)
+  assert.equal(stored.snapshot?.runtimeGeneration,'UNIFIED_V1');assert.equal(stored.compiledRuntime?.instrumentType,'COGNITIVE')
+  assert.equal(unit.cognitiveSession.definitionHash,stored.snapshot.configHash)
+  runtimeIdentity={requestDefinitionHash:stored.snapshot.configHash,sourceDefinitionHash:stored.compiledRuntime.sourceDefinitionHash,compiledRuntimeHash:stored.compiledRuntime.compiledRuntimeHash}
+ }else if(unit.type==='SITUATIONAL'){
+  assert.equal(loadedSjt.attempt.definitionHash,child.definitionHash);assert.equal(loadedSjt.attempt.compiledRuntimeHash,child.compiledRuntimeHash)
+  runtimeIdentity={requestDefinitionHash:loadedSjt.attempt.definitionHash,sourceDefinitionHash:child.definitionHash,compiledRuntimeHash:child.compiledRuntimeHash}
+ }else runtimeIdentity={requestDefinitionHash:unit.definitionHash,sourceDefinitionHash:unit.definitionHash,compiledRuntimeHash:null}
+ return bindFinalIdentity({parent,slotSet,unit,body:spec.body,child,runtimeIdentity})
+}
 export function assertAcceptedSnapshots(facts,steps){
  assert.deepEqual(steps.map(step=>step.type),NATIVE_TYPES.slice(0,steps.length))
  assert.equal(facts.snapshots.length,steps.length);assert.equal(new Set(facts.snapshots.map(row=>row.slotKey)).size,steps.length)
@@ -98,10 +143,15 @@ export function assertAcceptedSnapshots(facts,steps){
   const snapshot=facts.snapshots.find(row=>row.unitType===step.type);assert.ok(snapshot)
   assert.equal(snapshot.compositeAttemptId,facts.parent.id);assert.equal(snapshot.attemptEpoch,facts.parent.attemptEpoch)
   assert.equal(snapshot.terminalState,'COMPLETED');assert.equal(snapshot.sourceSubmissionId,step.body.submissionId)
-  assert.equal(snapshot.sourceDefinitionHash,step.body.definitionHash)
+  const proof=step.identityProof;assert.ok(proof,'Pre-FINAL identity proof required')
+  assert.equal(proof.attemptId,facts.parent.id);assert.equal(proof.attemptEpoch,facts.parent.attemptEpoch);assert.equal(proof.frozenActiveSlotSetHash,facts.parent.frozenActiveSlotSetHash)
+  assert.equal(proof.unitType,step.type);assert.equal(proof.requestDefinitionHash,step.body.definitionHash);assert.equal(proof.sourceDefinitionHash,proof.sourceDefinitionIdentity.hash)
+  assert.equal(snapshot.slotKey,proof.slotKey);assert.equal(snapshot.sourceAttemptId,proof.sourceAttemptId);assert.equal(snapshot.sourceDefinitionHash,proof.sourceDefinitionHash);assert.equal(snapshot.compiledRuntimeHash,proof.compiledRuntimeHash)
   const rows=facts[{FORM_SECTION:'forms',SCALE:'scales',COGNITIVE:'cognitive',SITUATIONAL:'sjt'}[step.type]]
   assert.equal(rows.length,1);assert.equal(rows[0].status,'COMPLETED');assert.equal(rows[0].submissionId,step.body.submissionId)
   assert.equal(snapshot.sourceAttemptId,rows[0].id)
+  const child=rows[0];assert.equal(child[step.type==='FORM_SECTION'?'sectionId':'compositeItemId'],proof.unitId);assert.equal(child[step.type==='FORM_SECTION'?'attemptId':'compositeAttemptId'],proof.attemptId);assert.equal(child[step.type==='COGNITIVE'?'attemptNo':'attemptEpoch'],proof.attemptEpoch)
+  if(step.type!=='FORM_SECTION')assert.equal(child.compiledRuntimeHash,proof.compiledRuntimeHash)
   assert.ok(step.type==='FORM_SECTION'?snapshot.collectionFactsEncrypted:snapshot.canonicalResultEncrypted)
  }
  return true
@@ -142,7 +192,9 @@ export function readRouteSpecs({attemptId,sessionId,artifactId,productId,student
 async function defaultRuntime(){
  const {runtime}=await import('./c25-client.mjs'),api=await runtime()
  const {loadStoredCanonicalUnitResult}=api.require(path.join(api.backend,'dist/modules/assessment-runtime/compact-assessment-storage.js'))
- return {...api,loadStoredCanonicalUnitResult}
+ const {loadFrozenScaleRuntimeSnapshot}=api.require(path.join(api.backend,'dist/modules/assessment-runtime/runtime-snapshot.js'))
+ const {loadCognitiveSessionConfig}=api.require(path.join(api.backend,'dist/modules/cognitive/session.service.js'))
+ return {...api,loadStoredCanonicalUnitResult,loadFrozenScaleRuntimeSnapshot,loadCognitiveSessionConfig}
 }
 const defaultFixture=()=>import('./c25-fixture.mjs')
 async function readNewFacts(api,attemptId){
@@ -257,6 +309,7 @@ export function createC26Workload(h,{measure,reportChild,exportChild,independent
     }
     if(type==='SITUATIONAL')loadedSjt=await request(student,{route:`${prefix}/attempts/${attempt.id}/items/${id(unit.id)}/situational/${id(unit.situationalAttemptId)}`},{id:'cold-sjt-native-read',phase:'cold'})
     const spec=nativeFinalSpec(attempt,{sjtResponses:f.sjtResponses,loadedSjt,cognitiveFinal:api.cognitiveFinal,submissionId:uuid()})
+    spec.identityProof=await freezeFinalIdentity(api,attempt,spec,loadedSjt)
     privateWrite(`c25-c26-final-${type.toLowerCase().replaceAll('_','-')}-private.json`,spec)
     const response=await request(student,spec,{id:`cold-${type.toLowerCase().replaceAll('_','-')}-final`,phase:'cold'})
     assert.equal(response.replayed,false,'No FINAL replay is permitted');steps.push(spec)
