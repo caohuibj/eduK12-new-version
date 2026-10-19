@@ -9,7 +9,7 @@ import {fileURLToPath} from 'node:url'
 import {runC26MeasuredA} from './c25-c26-a-driver.mjs'
 import {loadC26IndependentAnalysis} from './c25-c26-analysis-scope.mjs'
 const ROOT='/workspace/scratch/5a77e8bdc1ae'
-export const STATE=ROOT+'/eduk12_c26_a_06'
+export const STATE=ROOT+'/eduk12_c26_a_07'
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex')
 const privateRead=file=>{const stat=fs.lstatSync(file);assert.ok(stat.isFile()&&!stat.isSymbolicLink());assert.equal(stat.nlink,1);assert.equal(stat.mode&0o777,0o600);assert.equal(stat.uid,process.getuid());return JSON.parse(fs.readFileSync(file,'utf8'))}
 export function driverDeadlineContract(invocation,now=()=>process.hrtime.bigint()){

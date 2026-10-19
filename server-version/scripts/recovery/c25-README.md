@@ -1332,3 +1332,24 @@ observed-interval comparison after A/B sampling contracts and coverage windows
 are independently shown comparable. `completePgCpuOrGainComparison` is always
 false: differently incomplete lower bounds cannot establish overall PG savings.
 API and worker self-observed measurements retain their own independent scope.
+
+
+### A07 logical rollback preparation
+
+A07/source16/carry07 are new output identities. The direct recovery05 archive
+manifest to frozen A06 current manifest comparison fixes all 45 complete changed
+objects (including metadata) and their exact digest. This is independently
+computed, rather than reusing the A05-to-A06 count. Every other object, including
+numeric relations/catalogs/configuration and materials, must remain identical.
+
+The A05 zero-HTTP preservation evidence remains a separate historical fact.
+A06 instead binds its exact journal: three resolved queryRaw calls, GET csrf 200,
+and an issued POST training-login with UNCERTAIN outcome. No fixture, attempt or
+FINAL was reached. The basis for logical rollback equivalence is the actual
+writer-quiescent dual-database full rows/schema and material equality, not an
+assertion that no HTTP write was issued. A06 overall/final qualification stay
+false. Any changed authentication path, missing uncertainty, assessment write,
+new fixture, row/schema/material change or unclassified physical difference
+rejects this carry contract. The historical whole recovery05 remains the rollback
+unit; its WAL cannot be mixed with current files. Issuance and actual A07 still
+require separate approval and current resource/input gates.

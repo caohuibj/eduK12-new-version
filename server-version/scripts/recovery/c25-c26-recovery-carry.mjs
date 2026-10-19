@@ -12,24 +12,32 @@ export const pythonProgram=`_carry_module_name=__name__\n__name__='historical_c2
 # The inherited physical verifier is intentionally NOT called with a forged
 # HEAD. Its exact historical receipt/bytes and current carry identity are distinct.
 PRODUCER=BASE/'c25-c26-recovery-carry.mjs'
-CARRY_OUTPUT=Path('/tmp/c25-c26-carry-06')
+CARRY_OUTPUT=Path('/tmp/c25-c26-carry-07')
 CARRY_DESCRIPTOR='c25-c26-carry-descriptor.json'
-CURRENT_SOURCE_DESCRIPTOR=Path('/tmp/c25-source-15/c25-source-descriptor.json')
+CURRENT_SOURCE_DESCRIPTOR=Path('/tmp/c25-source-16/c25-source-descriptor.json')
 CARRY_KIND='LOGICALLY_EQUIVALENT_OLDER_PHYSICAL_ROLLBACK'
-CARRY_SCOPE='C26_A06_EXPLICIT_A05_LOGICAL_EQUIVALENCE_TO_RECOVERY05'
+CARRY_SCOPE='C26_A07_EXPLICIT_A06_POST_AUTH_QUIESCENT_LOGICAL_EQUIVALENCE_TO_RECOVERY05'
 OLD_DESCRIPTOR=OUTPUT/NAMES['descriptor']
 A05=ROOT/'eduk12_c26_a_05'
 A05_DIAGNOSTIC=Path('/tmp/c25-c26-a05-diagnostic-01')
-CURRENT_FULL=A05_DIAGNOSTIC/'current-stopped-full-manifest.json'
+A06=ROOT/'eduk12_c26_a_06'
+A06_DIAGNOSTIC=Path('/tmp/c25-c26-a06-diagnostic-01')
+CURRENT_FULL=A06_DIAGNOSTIC/'current-stopped-full-manifest.json'
 PINNED={
   "/tmp/c25-c26-recovery-05/c25-c26-recovery-descriptor.json": "d94f330100cd2f8795f1aabdde9e3e266f646721bb39fbe4aa2ac97d0019f8a0",
   "/tmp/c25-c26-recovery-05/archive-receipt.json": "58198f284441c13cbd9fe7a315faf147c8edd5497e9560f422adb9d1246f8ca8",
   "/tmp/c25-c26-a05-diagnostic-01/current-stopped-full-manifest.json": "7b426055512c0070a3528bdfc5c45b2d6ea82d8172f96b986869dd1154fca785",
   "/tmp/c25-c26-a05-diagnostic-01/receipt.json": "e0da66d9733eb7e6270cb06f048c1a18dac3bcac16548e741c2dd3aff1f4e9c0",
-  "/tmp/c25-c26-a05-diagnostic-01/review-index.json": "46a8eef537a6aec7cb87e318fbd327cc2acff5032dce0b5e55c91789e4fc0a8e"
+  "/tmp/c25-c26-a05-diagnostic-01/review-index.json": "46a8eef537a6aec7cb87e318fbd327cc2acff5032dce0b5e55c91789e4fc0a8e",
+  "/tmp/c25-c26-a06-diagnostic-01/receipt.json": "885919a296429cbd88fb050acb775950df853dd73f8ec6d1b32a26858d7363ac",
+  "/tmp/c25-c26-a06-diagnostic-01/review-index.json": "2c96b39ad8da15de347999c137a90b9d8727e6aa8b850b0c8a43b0e6bc670b14",
+  "/tmp/c25-c26-a06-diagnostic-01/current-stopped-full-manifest.json": "46250ad15448a8515ea5bda463e68b38910531d5498a613e3f63f9fdfaaaaecc",
+  "/tmp/c25-c26-carry-06/c25-c26-carry-descriptor.json": "f141d7fda99ab35df4bd86313b6d41c6b06434faee71be3051785d621bdc5917",
+  "/tmp/c25-c26-carry-06/carry-receipt.json": "013da96bc9886f33e9e5f661eb6afcb20bf12b969f9766fff0b20aa4afaaedbb",
+  "/tmp/c25-source-15/c25-source-descriptor.json": "1eead39d8966f297df4b78fc4c04fc4402d0398ebeea4fbae2e9d36c632f8250"
 }
-EXPECTED_DELTA_SHA='c9c70fde9322fa00ab62222e4cbfc8d42147dfa3fe6dc16aa52b5157472c1ddd'
-EXPECTED_DELTA_PATHS=["pgdata", "pgdata/base/107106", "pgdata/base/107106/pg_internal.init", "pgdata/base/16384", "pgdata/base/16384/pg_internal.init", "pgdata/base/5", "pgdata/base/5/pg_internal.init", "pgdata/base/57461", "pgdata/base/57461/pg_internal.init", "pgdata/base/65318", "pgdata/base/65318/pg_internal.init", "pgdata/base/73151", "pgdata/base/73151/pg_internal.init", "pgdata/base/81608", "pgdata/base/81608/pg_internal.init", "pgdata/base/90079", "pgdata/base/90079/pg_internal.init", "pgdata/base/98575", "pgdata/base/98575/pg_internal.init", "pgdata/base/pgsql_tmp", "pgdata/global", "pgdata/global/pg_control", "pgdata/global/pg_internal.init", "pgdata/pg_logical", "pgdata/pg_logical/replorigin_checkpoint", "pgdata/pg_multixact/members/0000", "pgdata/pg_multixact/offsets/0000", "pgdata/pg_stat", "pgdata/pg_stat/pgstat.stat", "pgdata/pg_subtrans/0000", "pgdata/pg_wal/000000010000000000000029", "pgdata/pg_xact/0000", "pgdata/postmaster.opts"]
+EXPECTED_DELTA_SHA='d8ae82a2c25e9bd84384d088c5c037f96064264a41119a9f960c8c2e97173b50'
+EXPECTED_DELTA_PATHS=["pgdata", "pgdata/base/1", "pgdata/base/1/pg_internal.init", "pgdata/base/107106", "pgdata/base/107106/pg_internal.init", "pgdata/base/16384", "pgdata/base/16384/pg_internal.init", "pgdata/base/22379", "pgdata/base/22379/pg_internal.init", "pgdata/base/28272", "pgdata/base/28272/pg_internal.init", "pgdata/base/35058", "pgdata/base/35058/pg_internal.init", "pgdata/base/41871", "pgdata/base/41871/pg_internal.init", "pgdata/base/49701", "pgdata/base/49701/pg_internal.init", "pgdata/base/5", "pgdata/base/5/pg_internal.init", "pgdata/base/57461", "pgdata/base/57461/pg_internal.init", "pgdata/base/65318", "pgdata/base/65318/pg_internal.init", "pgdata/base/73151", "pgdata/base/73151/pg_internal.init", "pgdata/base/81608", "pgdata/base/81608/pg_internal.init", "pgdata/base/90079", "pgdata/base/90079/pg_internal.init", "pgdata/base/98575", "pgdata/base/98575/pg_internal.init", "pgdata/base/pgsql_tmp", "pgdata/global", "pgdata/global/pg_control", "pgdata/global/pg_internal.init", "pgdata/pg_logical", "pgdata/pg_logical/replorigin_checkpoint", "pgdata/pg_multixact/members/0000", "pgdata/pg_multixact/offsets/0000", "pgdata/pg_stat", "pgdata/pg_stat/pgstat.stat", "pgdata/pg_subtrans/0000", "pgdata/pg_wal/000000010000000000000029", "pgdata/pg_xact/0000", "pgdata/postmaster.opts"]
 def logical_digest(value):return __import__('hashlib').sha256(json.dumps(value,sort_keys=True,separators=(',',':')).encode()).hexdigest()
 def pinned_json(file):
     binding=file_binding(file);assert binding['mode']==0o600 and binding['sha256']==PINNED[str(file)],'pinned carry input changed'
@@ -40,15 +48,15 @@ def exact_physical_delta(before,after):
     left={row['path']:row for row in before};right={row['path']:row for row in after}
     assert len(left)==len(before) and len(right)==len(after),'duplicate physical manifest path'
     changes=[{'path':p,'before':left.get(p),'after':right.get(p)} for p in sorted(set(left)|set(right)) if left.get(p)!=right.get(p)]
-    assert [c['path'] for c in changes]==EXPECTED_DELTA_PATHS and len(changes)==33,'unclassified physical change'
+    assert [c['path'] for c in changes]==EXPECTED_DELTA_PATHS and len(changes)==45,'unclassified physical change'
     assert logical_digest(changes)==EXPECTED_DELTA_SHA,'physical difference objects changed'
     for p in ['pgdata/pg_xact/0000','pgdata/pg_subtrans/0000','pgdata/pg_multixact/members/0000','pgdata/pg_multixact/offsets/0000','pgdata/pg_logical/replorigin_checkpoint']:
         assert left[p]['sha256']==right[p]['sha256']
     # Every numeric relation/catalog/config/material object is unchanged; the
-    # only additions are the exact seven already observed pg_internal.init files.
-    return {'count':33,'sha256':EXPECTED_DELTA_SHA,'changes':changes,'allOtherObjectsEqual':True}
+    # only differences are the fixed control/WAL/stats/init objects and metadata.
+    return {'count':45,'sha256':EXPECTED_DELTA_SHA,'changes':changes,'allOtherObjectsEqual':True}
 
-def logical_facts(baseline,final,overall,driver,diagnostic):
+def protected_logical_facts(baseline,final,overall):
     assert baseline['passed'] is True and baseline['mode']=='baseline' and baseline['currentRows']==6667
     assert baseline['admission']['historicalOrdinalDifferences']==73 and baseline['admission']['historicalParserDifferences']==3 and baseline['admission']['parserDdlExecuted'] is False
     assert final['passed'] is False and final['mode']=='final' and final['driverPassed'] is False and final['currentRows']==6667
@@ -64,6 +72,9 @@ def logical_facts(baseline,final,overall,driver,diagnostic):
     assert overall['passed'] is False and overall['finalSnapshotVerified'] is False and overall['cleanupVerified'] is True
     assert overall['cleanupErrors']==[{'stage':'final-audit','errorType':'AssertionError'}]
     assert overall['materials']['passed'] is True and overall['inputVerification']['passed'] is True
+
+def logical_facts(baseline,final,overall,driver,diagnostic):
+    protected_logical_facts(baseline,final,overall)
     assert driver['passed'] is False and driver['http']==[] and driver['prismaBusiness'] is None and driver['children']==[] and driver['checks']==[]
     assert diagnostic['passed'] is True and diagnostic['runtimePassed'] is False and diagnostic['baselinePassed'] is True
     assert diagnostic['fixtureCreated'] is False and diagnostic['newAttempts']==diagnostic['newFinalSubmissions']==diagnostic['businessHttpRequests']==0
@@ -87,6 +98,46 @@ def accepted_a05_evidence():
     for file,digest in admitted.items():assert bindings[file]['sha256']==digest
     assert file_binding(A05_DIAGNOSTIC/'receipt.json')==diag_binding and file_binding(A05_DIAGNOSTIC/'review-index.json')==index_binding
     return {'diagnostic':diag_binding,'index':index_binding,'files':bindings,'facts':facts}
+
+def a06_logical_facts(baseline,final,overall,driver,diagnostic,events):
+    protected_logical_facts(baseline,final,overall)
+    assert driver['passed'] is False and driver['children']==[] and driver['checks']==[]
+    assert driver['prismaBusiness']=={'issued':3,'pending':0,'uncertain':0}
+    assert [w['operation']['id'] for w in driver['windows']]==['api-startup','idle-baseline','driver-setup']
+    assert [w['passed'] for w in driver['windows']]==[True,True,False]
+    assert len(driver['http'])==1 and driver['http'][0]['route']=='/auth/csrf' and driver['http'][0]['method']=='GET' and driver['http'][0]['status']==200
+    issued=[e for e in events if e.get('stage')=='HTTP_ISSUED'];received=[e for e in events if e.get('stage')=='HTTP_RECEIVED']
+    assert [(e['id'],e['route'],e['method']) for e in issued]==[(1,'/auth/csrf','GET'),(2,'/auth/training-login','POST')]
+    assert [(e['id'],e['route'],e['method'],e['status']) for e in received]==[(1,'/auth/csrf','GET',200)]
+    uncertain=[e for e in events if e.get('stage')=='UNCERTAIN'];assert len(uncertain)==1 and uncertain[0]['id']==2 and uncertain[0]['kind']=='write'
+    assert events.index(issued[0])<events.index(received[0])<events.index(issued[1])<events.index(uncertain[0])
+    prisma=[e for e in events if e.get('stage','').startswith('DRIVER_PRISMA_')]
+    assert [(e['stage'],e['id'],e.get('model'),e.get('action')) for e in prisma]==[(stage,n,None,'queryRaw') for n in [1,2,3] for stage in ['DRIVER_PRISMA_ISSUED','DRIVER_PRISMA_RESOLVED']]
+    assert diagnostic['passed'] is True and diagnostic['runtimePassed'] is False and diagnostic['baselinePassed'] is True
+    assert diagnostic['fixtureCreated'] is False and diagnostic['newAttempts']==diagnostic['newFinalSubmissions']==diagnostic['assessmentHttpRequests']==diagnostic['driverPrismaCreateCalls']==0
+    assert diagnostic['httpRequestsIssued']==2 and diagnostic['httpResponsesReceived']==1 and diagnostic['uncertainAuthenticationPost'] is True and diagnostic['driverPrismaQueriesIssued']==3
+    assert diagnostic['primaryRows']==6708 and diagnostic['workingRows']==6667 and diagnostic['rawEvidenceUnchanged'] is True
+    assert overall['stopProofs'] and all(p['passed'] is True for p in overall['stopProofs'])
+    return {'primaryRows':6708,'workingRows':6667,'oldCheckpointRows':21,'sameWorkingRowsAndSchema':True,'samePrimarySnapshot':True,'authenticationPostOutcome':'UNCERTAIN','authenticationPostIssued':True,'assessmentHttpRequests':0,'fixtureCreated':False,'newAttempts':0,'newFinalSubmissions':0,'driverQueryRawResolved':3,'originalOverallPassed':False,'originalFinalAuditPassed':False,'oldRowProtectionPassed':True,'equivalenceBasis':'EXACT_POST_WRITER_QUIESCENCE_ROWS_SCHEMA_AND_MATERIALS; NOT_ZERO_HTTP_WRITES','nextStartupMustReadmitBothDatabases':True}
+
+def accepted_a06_evidence():
+    diagnostic,diag_binding=pinned_json(A06_DIAGNOSTIC/'receipt.json');index,index_binding=pinned_json(A06_DIAGNOSTIC/'review-index.json')
+    for file,item in index['files'].items():assert file_binding(Path(file))==item,'A06 diagnostic index drift'
+    bindings=diagnostic['rawEvidence']
+    for file,item in bindings.items():assert file_binding(Path(file))==item,'A06 evidence drift'
+    assert {str(p) for p in A06.rglob('*') if p.is_file()}=={p for p in bindings if Path(p).is_relative_to(A06)},'A06 evidence path set changed'
+    for p in A06.rglob('*'):assert not p.is_symlink(),'A06 evidence link'
+    load=lambda name:json.loads((A06/name).read_text())
+    base,final,overall,driver=[load(n) for n in ['c25-c26-audit-baseline-result.json','c25-c26-audit-final-result.json','c25-c26-a-overall-result.json','c25-c26-a-driver-result-private.json']]
+    events=[json.loads(line) for line in (A06/'c25-c26-driver-events-private.jsonl').read_text().splitlines()]
+    facts=a06_logical_facts(base,final,overall,driver,diagnostic,events)
+    for receipt in [base,final]:
+        for key in ['currentRowsFile','currentSnapshotFile','primarySnapshotFile']:
+            ref=receipt[key];assert (A06/ref['name']).parent==A06 and bindings[str(A06/ref['name'])]['sha256']==ref['sha256']
+    for file,digest in load('c25-c26-admitted-baseline-bindings.json').items():assert bindings[file]['sha256']==digest
+    assert file_binding(A06_DIAGNOSTIC/'receipt.json')==diag_binding and file_binding(A06_DIAGNOSTIC/'review-index.json')==index_binding
+    prior={str(p):pinned_json(p)[1] for p in [Path('/tmp/c25-c26-carry-06/c25-c26-carry-descriptor.json'),Path('/tmp/c25-c26-carry-06/carry-receipt.json'),Path('/tmp/c25-source-15/c25-source-descriptor.json')]}
+    return {'diagnostic':diag_binding,'index':index_binding,'files':bindings,'facts':facts,'priorCarryAndSourceHistoricalOnly':prior}
 
 def historical_rollback():
     old,descriptor_binding=pinned_json(OLD_DESCRIPTOR);receipt,receipt_binding=pinned_json(OUTPUT/NAMES['archiveReceipt'])
@@ -113,11 +164,11 @@ def current_contract(tools,check_data):
     before=json.loads((OUTPUT/NAMES['fullSourceManifest']).read_text());delta=exact_physical_delta(before,current)
     assert data_projection(before)==json.loads((OUTPUT/NAMES['dataManifest']).read_text())
     assert [r for r in current if not A['mutable_path'](r['path'])]==json.loads((OUTPUT/NAMES['frozenSourceManifest']).read_text())
-    accepted=accepted_a05_evidence()
+    accepted=accepted_a05_evidence();accepted06=accepted_a06_evidence()
     if check_data:
-        assert frozen_failure_manifest(SOURCE)==current,'current stopped tree differs from frozen A05'
-        stopped_current(tools);stopped_a05(tools)
-    return {'historicalRollback':history,'currentFull':binding,'exactDelta':delta,'acceptedA05':accepted,'files':old['files']}
+        assert frozen_failure_manifest(SOURCE)==current,'current stopped tree differs from frozen A06'
+        stopped_current(tools);stopped_a05(tools);stopped_a06(tools)
+    return {'historicalRollback':history,'currentFull':binding,'exactDelta':delta,'acceptedA05':accepted,'acceptedA06':accepted06,'files':old['files']}
 
 def stopped_a05(tools):
     status=json.loads((A05/'status.json').read_text());assert status['state']=='stopped' and status['cleanupVerified'] is True
@@ -130,6 +181,18 @@ def stopped_a05(tools):
     for port in status['ports'].values():
         with socket.socket() as sock:sock.settimeout(.2);assert sock.connect_ex(('127.0.0.1',port))!=0
     return {'status':file_binding(A05/'status.json'),'pids':pids,'ports':status['ports'],'allStopped':True}
+
+def stopped_a06(tools):
+    status=json.loads((A06/'status.json').read_text());assert status['state']=='stopped' and status['cleanupVerified'] is True
+    assert status['cleanupErrors']==[{'stage':'final-audit','errorType':'AssertionError'}]
+    pids=list(status['pids'].values())
+    for sub,file in [('api','api-lifecycle-private.json'),('pg-observer','observer-session-private.json')]:
+        value=json.loads((A06/sub/file).read_text());assert value['closeObserved'] is True and value['groupQuiescent'] is True;pids.append(value['identity']['pid'])
+    assert not (SOURCE/'pgdata/postmaster.pid').exists()
+    for pid in pids:assert type(pid)is int and pid>1 and not Path('/proc',str(pid)).exists()
+    for port in status['ports'].values():
+        with socket.socket() as sock:sock.settimeout(.2);assert sock.connect_ex(('127.0.0.1',port))!=0
+    return {'status':file_binding(A06/'status.json'),'pids':pids,'ports':status['ports'],'allStopped':True}
 
 def validate_carry_envelope(value,head,producer,contract):
     assert value['schemaVersion']==1 and value['kind']==CARRY_KIND and value['scope']==CARRY_SCOPE
@@ -164,7 +227,7 @@ def carry_main():
     assert tools==ROOT/'eduk12_tools_20261018' and sha_file(Path(sys.executable).resolve())==args.expected_python_sha256
     assert sha_file(PRODUCER)==args.expected_producer_sha256 and canonical(args.output)==CARRY_OUTPUT and not os.path.lexists(CARRY_OUTPUT)
     assert canonical(args.descriptor)==CURRENT_SOURCE_DESCRIPTOR
-    source,_=A['helpers']();source.destination_path(CARRY_OUTPUT,protected=[SOURCE,CORE,PRIOR,FINAL,REPO,tools,ROOT/'eduk12_c21_http_01',ROOT/'eduk12_c23_http_03',ROOT/'c25-build-evidence',A05,A05_DIAGNOSTIC,OUTPUT,Path(args.descriptor).parent,*HISTORICAL_ROOTS])
+    source,_=A['helpers']();source.destination_path(CARRY_OUTPUT,protected=[SOURCE,CORE,PRIOR,FINAL,REPO,tools,ROOT/'eduk12_c21_http_01',ROOT/'eduk12_c23_http_03',ROOT/'c25-build-evidence',A05,A05_DIAGNOSTIC,A06,A06_DIAGNOSTIC,Path('/tmp/c25-c26-carry-06'),OUTPUT,Path(args.descriptor).parent,*HISTORICAL_ROOTS])
     assert CARRY_OUTPUT.parent.stat().st_dev!=SOURCE.stat().st_dev
     with (tools/'.measurement.lock').open('rb') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB);started=time.monotonic();guard=ResourceGuard();created=False;joined=False
@@ -174,7 +237,7 @@ def carry_main():
             guard.start();assert guard.check()['workspaceFreeBytes']>=A['FLOOR']+A['RESERVE']
             producer=producer_binding(tools,args.expected_head);assert producer['inlinePythonSha256']==args.expected_inline_sha256
             source.validate_descriptor(args.descriptor,args.expected_descriptor_sha256,tools/'postgresql/bin/pg_controldata');http03=file_binding(args.descriptor)
-            contract=current_contract(tools,True);stopped=stopped_a05(tools)
+            contract=current_contract(tools,True);stopped=stopped_a06(tools)
             assert producer_binding(tools,args.expected_head)==producer and current_contract(tools,True)==contract
             source.validate_descriptor(args.descriptor,args.expected_descriptor_sha256,tools/'postgresql/bin/pg_controldata');assert file_binding(args.descriptor)==http03
             close=stop_archive_guard_before_publication(guard,started+600);joined=True
@@ -205,7 +268,7 @@ export function invocation(argv){
  assert.equal(argv.length,names.length*2)
  for(let i=0;i<argv.length;i+=2){const key=argv[i].slice(2);assert.ok(argv[i].startsWith('--')&&names.includes(key)&&!Object.hasOwn(values,key));values[key]=argv[i+1]}
  for(const key of ['python','tools','output','descriptor'])assert.ok(path.isAbsolute(values[key])&&path.resolve(values[key])===values[key])
- assert.equal(values.output,'/tmp/c25-c26-carry-06');assert.equal(values.descriptor,'/tmp/c25-source-15/c25-source-descriptor.json');assert.match(values['expected-head'],/^[a-f0-9]{40}$/);assert.match(values['expected-descriptor-sha256'],/^[a-f0-9]{64}$/)
+ assert.equal(values.output,'/tmp/c25-c26-carry-07');assert.equal(values.descriptor,'/tmp/c25-source-16/c25-source-descriptor.json');assert.match(values['expected-head'],/^[a-f0-9]{40}$/);assert.match(values['expected-descriptor-sha256'],/^[a-f0-9]{64}$/)
  const hash=b=>createHash('sha256').update(b).digest('hex')
  return {python:values.python,input:pythonProgram,args:['-B','-',...names.filter(n=>n!=='python').flatMap(n=>['--'+n,values[n]]),'--expected-producer-sha256',hash(fs.readFileSync(fileURLToPath(import.meta.url))),'--expected-inline-sha256',hash(pythonProgram),'--expected-python-sha256',hash(fs.readFileSync(fs.realpathSync(values.python)))]}
 }
