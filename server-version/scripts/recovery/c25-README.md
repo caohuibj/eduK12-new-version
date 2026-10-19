@@ -1,12 +1,14 @@
-# C25 joint recovery preparation
+# C25 joint core qualification and recovery evidence
 
 ## Status and scope
 
-This is a prepared C22-over-C23 local synthetic qualification, not a release,
-browser, load, CPU or capacity result. Product candidate is integration
-`15cbdf0cdfbdbe54eceaf3e5c335d907311b9ec3`; subsequent commits here add only C25
-recovery tools/docs. Producer execution and runtime require their own reviewed,
-frozen inputs and authorization. No C23 acceptance whitelist is widened.
+The C22-over-C23 local synthetic **core** has an actual composed PASS at
+`0d586e4fbb06e863e9e74d86648a88416fd4eb30`; final independent evidence review passed within this core scope. This does not close all C25 release work. Product candidate remains
+integration `15cbdf0cdfbdbe54eceaf3e5c335d907311b9ec3`; subsequent commits add only
+C25 recovery tools/docs. Three run identities retain their real outcomes: the
+first two remain overall false, and missing-only continuation02 passes its
+explicit inherited/new contract. See the executed-results section below.
+No C23 acceptance whitelist is widened.
 
 Changed components → new descriptor, client verifier and migration/restore
 adapter. These reject a stale source, mismatching generated-client/schema pair,
@@ -55,8 +57,9 @@ field-order and remaining tokens remain exact. It verifies inline schema, DMMF,
 model/enum mappings, installed native engine, full dependency/client bytes,
 compiler, Node/Python identities and consumed Python helper closure before/after.
 This is **existing generated client current-byte consistency**, with no historical
-generation provenance claim. It performs no Prisma generation. It has not yet
-been executed for C25.
+generation provenance claim. It performed no Prisma generation. Its single
+C25 verification and matching backend/frontend producers passed independent
+review; exact receipt hashes are listed in the executed-results section.
 
 ## C22-only database adapter
 
@@ -143,7 +146,8 @@ The launcher and every DB audit/phase use the same absolute `sys.executable`;
 its actual path, resolved path, SHA-256 and version are frozen and rechecked.
 The launcher rechecks a coherent reviewed build+client+source snapshot immediately
 before and after binding, including expected HEAD and clean inputs, before clone.
-The prepared producer/launcher still await immutable independent review and execution approval.
+The frozen producers and each actual runtime entry received separate independent
+review and execution approval; this document does not authorize another run.
 Producer outputs must be new direct children of `c25-build-evidence`; runtime
 state must be a new direct child of the scratch root named `eduk12_c25_http_NN`.
 These restrictions, symlink rejection, real Git discovery and protected source/
@@ -645,6 +649,117 @@ The earlier 29 contracts were not replayed. No new descriptor, archive, database
 HTTP runtime or producer was executed during this preparation. The old A
 publication expiry does not enter its read-only compact feedback projection;
 A HTTP admission/report work is not repeated and its dates remain unchanged.
+
+## Executed core composition: continuation02 (2026-10-19 UTC)
+
+The approved missing-only run at clean
+`0d586e4fbb06e863e9e74d86648a88416fd4eb30` passed all five new phases and final
+preservation/cleanup. Final independent evidence review passed with no blocking findings. This is composed
+local synthetic core qualification, **not one fresh run with all phases passed**.
+The two original failed receipts and their missing observations remain unchanged.
+
+### Scope and exact reuse
+
+1. HTTP01 remains overall false. Inherit only its passed restricted-role C22
+   migration and immediate A whole FINAL/receipt/replay/drain preparation.
+   `074f17a8` fixed only the token fixture's expiry to published `p.expiresAt`.
+2. Continuation01 remains overall false. Inherit its passed replacement SJT
+   fixture/grant preparation, eight B/C FINALs and original-body replays,
+   genuine shared two-job drain, teacher CSV/ownership and recorded closed HTTP
+   subchecks (81 closed-matrix requests within 143 total). Its real catch-time
+   PG bound is retained; no `closedFinishedAt`, old closed compiled result,
+   old natural-boundary observation, open FINAL replay or scheduled PASS is invented.
+   `df01106a` fixed only the consumer's legal explicit-null context hash handling.
+3. Continuation02 newly executed old B/C current-open HTTP reads (23 requests),
+   A/B/C/D OPEN-only compiled observations, distinct E closed/open proof,
+   original rollback-only guards, full restore and final audit. No old FINAL,
+   migration, teacher export or checkpoint GET was repeated. Original four-case
+   OPEN-only evidence is not paired with E or with the absent old closed probe.
+
+The existing client receipt is
+`435ac0e5c1cbf4534f289f732643145f512b84e530c3f5efe344f7a82d7aed3e`;
+backend build `ffca85332844b7f9caeac3252119e1354c498e9de11e757c5763e525d2bf8d95`;
+frontend build `7064d220540d1faf8851cec0e6c8ba4151070a61163ed60bf8f5d895f0415f5a`.
+They remain under `c25-build-evidence/backend-01/` and `frontend-01/`, outside
+Git. Matching product/dependency/client/compiler/tool inventories and the
+original 72 Python helpers were rechecked; MJS-only harness changes did not
+trigger another emit or client verification. Existing Vite warnings remain.
+
+Source06 descriptor SHA
+`5531ee604cd1d37c9e5919337ddbce2d1d73caee25dc8ad29c26cb493f657ae9`
+binds current HEAD and the complete stopped HTTP03 manifest. The new 6,651-row
+recovery descriptor SHA
+`1378018fe89b119ae9c8036aca706794811d0aa6a7d52e08a80abe5299403c36`
+binds the 248,728,160-byte archive SHA
+`9ab879a4f7dd3667a3e73dea06659ef68105faa8cd881353171df169510943aa`.
+Actual full extraction/content/metadata comparison and fsync passed. All source
+xattrs were empty; 21,547 basic-ACL set and 45 default-ACL delete warnings were
+ENOTSUP, with exact restored modes/empty xattrs. Nonempty ACL recovery is not
+qualified. Source05 and both recovery points stay in `/tmp`, node-local temporary
+storage, not durable backups; old failure nondata bytes remain at original paths.
+
+### New E and actual compiled consumer observations
+
+A new authenticated student/enrollment and Cognitive-only scheduled publication
+used the formal APIs, one 120-trial FINAL, one real isolated original claim/drain,
+and one legal **empty encrypted draft envelope**. This does not add nonempty-draft
+coverage. PostgreSQL T0 was `11:07:32.075Z`, release `11:12:32.075Z`; the closed
+checks finished `11:07:35.805Z` and first observed opening was `11:12:32.165Z`,
+90 ms after release, with no clock/policy change. E made 24 HTTP requests including
+fixture preparation; requests are not independent test cases.
+
+Real DB rows changed parent IN_PROGRESS→COMPLETED and job
+PENDING/attemptCount=0/budgetHeld=true→READY/1/false. One accepted unit snapshot
+remained exact; queue pending returned 1→0, checkpoint revision 2→3 while saveCount
+stayed 1 and payload/hash/expiry cleared. Other locked-out jobs remained exact.
+
+Separate compiled consumer children observed their own actual production Prisma
+singleton and transparent result-decrypt wrappers. Their SQL is not claimed as
+API-internal SQL. Closed and open E identities, frozen inputs and result-cipher
+hashes matched. Compact context was one nonlocking SELECT with a joined job
+header, no result cipher projection and zero result decrypts in each window.
+Loaded-parent closed evaluation did no SQL/job lookup; open used one job-header
+query selecting only aggregateInputHash, attemptEpoch, contextHash, slotSetHash
+and status. Real unfiltered E history contained exactly one completed/returned
+row: closed 6 SQL / 0 job lookups / **0 result decrypts**; open 7 SQL / one
+findMany OR header query / **1 result decrypt**, providing the positive control.
+Other decrypt calls were zero in these history observations. This proves
+single-row projection/query shape, not multi-row batching, N+1 scaling or capacity.
+
+### Restore, protection and bounded cleanup
+
+Full source↔restored logical-row equality passed for **217 tables / 6,667 rows /
+21 checkpoints**, including E and original A/B/C/D restore cases. All historical
+layers, **6,529/16**, **6,582/17** and **6,651/20**, remained exact full-row multisets
+with no column/table exemptions. Historical feedback NULLs, exact guards/schema,
+formal restricted role and unchanged 73 physical-ordinal/three-parser restore
+normalizations passed. The API stopped immediately after E, before DB-only
+checks/dump; its independent 2,700-second lifetime did not expire and no restart
+occurred. All 16 owned service/phase/audit processes exited 0; final snapshot,
+source/input/old-evidence/recovery protection, writer/PG cleanup and lock release
+were verified.
+
+Locked entry workspace free was 9,239,420,928 B. Sampled minima were workspace
+9,023,393,792 B, MemAvailable 6,213,738,496 B and tmp free 3,743,817,728 B;
+maximum observed API RSS was 367,747,072 B. Original 8 GiB/2 GiB/512 MiB run floors
+were maintained. These are sampled run safeguards, not continuous extrema,
+resource savings, CPU/throughput comparisons or capacity measurements.
+
+Private evidence root is `eduk12_c25_continuation_02/` under the scratch root:
+
+| Evidence | File | SHA-256 |
+| --- | --- | --- |
+| Composed runtime PASS | `c25-missing-result.json` | `94949c13018705e3413f9cffa3aa810fc1d0720f173363f60cd16dffa96d76ba` |
+| New E paired consumers | `c25-missing-consumers-result.json` | `4ef911e2eec82f0f52bd1b2d79a0c83118e77f0a4da9023f7d28be75077dce48` |
+| Full restore | `c25-missing-restore-result.json` | `6a57f6ae2d261a58b93fde9d1561282df1c6095bad0e7e9b00a85ae1076d868d` |
+| Final preservation audit | `c25-missing-audit-final-result.json` | `46b2479d1996ccac4d682e2502ec03ff7b4f326af3644b6496c16089cafd3726` |
+| Final snapshot | `c25-missing-final-db-snapshot.json` | `2116f582580ab67d0c5f69330d73300b026a3eaeeacf94a47f268aa16b244e85` |
+
+Review index `/tmp/c25-missing-runtime-launch-01/review-index.json`, SHA
+`c125fa5978f8e9f2ee5bcc96e223a0bbf1ef6d9ac64b98e16673c72b58616360`, binds
+89 state files plus six launcher files, raw logs and exact phase references,
+original failures, final process exits, lock release and resources. Raw journals,
+SQL/credentials, manifests and archives remain private and are not committed.
 
 ## Remaining C25 release work
 
