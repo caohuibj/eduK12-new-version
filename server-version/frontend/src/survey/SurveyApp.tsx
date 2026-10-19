@@ -147,7 +147,8 @@ export default function SurveyApp(){
       {user&&<button className="btn-secondary" disabled={busy} onClick={logout}>退出</button>}
     </div></header>
     <main id={entryScreen?'survey-entry-content':undefined} tabIndex={entryScreen?-1:undefined}
-      className={entryScreen?'survey-entry-main':'max-w-4xl mx-auto px-4 py-8'}>
+      className={entryScreen?'survey-entry-main':screen==='work'&&!user?.mustChangePassword
+        ?'max-w-7xl mx-auto px-4 py-8':'max-w-4xl mx-auto px-4 py-8'}>
       {loading&&<p role="status">正在核对研究者会话…</p>}
       {error&&<p role="alert" className="p-4 border-l-4 border-red-600 bg-red-50">{error}</p>}
       {notice&&<p role="status" className="p-4 border-l-4 border-teal-600 bg-teal-50">{notice}</p>}
