@@ -65,7 +65,7 @@ export async function startObservedApi({directory,node,env,remainingMs,record,on
      assert.equal(receipt.groupQuiescent,true)
     }catch(error){failure??=error;signal('SIGKILL')}
    }
-   receipt.exit=exit;receipt.closeObserved=closed;receipt.closedMonotonicNs=process.hrtime.bigint().toString()
+   receipt.exit=exit;receipt.closeObserved=closed;receipt.cleanupFinishedMonotonicNs=process.hrtime.bigint().toString()
    if(receipt.finalProbeReceivedNs){receipt.finalProbeToCloseWallLowerNs=(BigInt(receipt.closedMonotonicNs)-BigInt(receipt.finalProbeReceivedNs)).toString();receipt.finalProbeToCloseWallUpperNs=(BigInt(receipt.closedMonotonicNs)-BigInt(receipt.finalProbeIssuedNs)).toString()}
    try{remaining()}catch(error){failure??=error}
    receipt.passed=!failure&&ready&&closed&&receipt.groupQuiescent
@@ -90,7 +90,7 @@ export async function startObservedApi({directory,node,env,remainingMs,record,on
   })
   for(const stream of [child.stdout,child.stderr])stream.on('data',bytes=>{try{logBytes+=bytes.length;assert.ok(logBytes<=1024*1024,'API log cap');fs.writeSync(log,bytes)}catch(error){fault(error)}})
   child.on('error',error=>bus.emit('error',error));child.once('disconnect',()=>bus.emit('disconnect'))
-  child.once('close',(code,signal)=>{closed=true;exit={code,signal};bus.emit('close',code,signal);closeResolve(exit);if(!stopPromise)fault(new Error('API closed before requested cleanup'))})
+  child.once('close',(code,signal)=>{receipt.closedMonotonicNs=process.hrtime.bigint().toString();closed=true;exit={code,signal};bus.emit('close',code,signal);closeResolve(exit);if(!stopPromise)fault(new Error('API closed before requested cleanup'))})
   channel=createProbeChannel(bus,{nonce,role:'api',identity,bindings:PINNED,remainingMs:remaining,record:value=>{record(value);receipt.probe.push(value)},onFault:fault})
   lifetimeTimer=setTimeout(()=>fault(new Error('API lifetime exceeded aggregate')),Math.max(1,Math.floor(remaining()-3000)))
   if(abortSignal){if(abortSignal.aborted)aborted();else abortSignal.addEventListener('abort',aborted,{once:true})}

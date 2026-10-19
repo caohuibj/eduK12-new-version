@@ -32,3 +32,12 @@ test('API TERM refusal escalates within cleanup budget; post-close SQL cannot be
 test('successful API leader exit with an owned live descendant remains false and cleans that group',{timeout:10000},async()=>{
  const r=await run('descendant');assert.ok(r.error);assert.equal(r.receipt.passed,false);assert.equal(r.receipt.exit.code,0);assert.equal(r.receipt.groupQuiescent,true);assert.ok(r.receipt.groupMembersAtClose.some(x=>!['Z','X','x'].includes(x.state)))
 })
+
+test('API exit-tail bounds end at the close observation before group cleanup finishes',{timeout:10000},async()=>{
+ const r=await run('success');assert.ifError(r.error);const saved=r.receipt
+ assert.ok(BigInt(saved.closedMonotonicNs)<BigInt(saved.cleanupFinishedMonotonicNs))
+ assert.equal(BigInt(saved.finalProbeToCloseWallLowerNs),BigInt(saved.closedMonotonicNs)-BigInt(saved.finalProbeReceivedNs))
+ assert.equal(BigInt(saved.finalProbeToCloseWallUpperNs),BigInt(saved.closedMonotonicNs)-BigInt(saved.finalProbeIssuedNs))
+ assert.notEqual(BigInt(saved.finalProbeToCloseWallLowerNs),BigInt(saved.cleanupFinishedMonotonicNs)-BigInt(saved.finalProbeReceivedNs))
+ assert.equal(saved.closeObserved,true);assert.equal(saved.groupQuiescent,true);assert.equal(saved.passed,true)
+})
