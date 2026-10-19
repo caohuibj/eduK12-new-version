@@ -1,18 +1,18 @@
 import { z } from 'zod'
 
 /** Training participant timing only. Authorization, content projection and
- * report generation remain separate. Not yet wired into publication/runtime. */
-const policySchema = z.discriminatedUnion('mode', [
+ * report generation remain separate. */
+export const trainingFeedbackPolicySchema = z.discriminatedUnion('mode', [
   z.object({ schemaVersion: z.literal(1), mode: z.literal('IMMEDIATE') }).strict(),
   z.object({ schemaVersion: z.literal(1), mode: z.literal('SCHEDULED'),
     releaseAt: z.string().datetime({ offset: true }),
   }).strict(),
 ])
-export type TrainingFeedbackPolicy = z.infer<typeof policySchema>
+export type TrainingFeedbackPolicy = z.infer<typeof trainingFeedbackPolicySchema>
 export function parseTrainingFeedbackPolicy(raw: unknown): TrainingFeedbackPolicy {
   // Absence preserves the existing complete-then-view contract.
   if (raw == null) return { schemaVersion: 1, mode: 'IMMEDIATE' }
-  const policy = policySchema.parse(raw)
+  const policy = trainingFeedbackPolicySchema.parse(raw)
   return policy.mode === 'SCHEDULED'
     ? { ...policy, releaseAt: new Date(policy.releaseAt).toISOString() }
     : policy

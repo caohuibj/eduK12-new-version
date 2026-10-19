@@ -1124,6 +1124,8 @@ enum CompositeAnalysisSnapshotGenerationReason {
 
 // 综合测评模板。发布后项目配置不可修改，历史测评通过子记录保存各自的结果快照。
 model CompositeAssessment {
+  trainingFeedbackPolicy Json? @map("training_feedback_policy")
+  trainingFeedbackPolicyHash String? @map("training_feedback_policy_hash")
   trainingPersistencePolicy Json? @map("training_persistence_policy")
   trainingPersistencePolicyHash String? @map("training_persistence_policy_hash")
   trainingFlowDraft Json? @map("training_flow_draft")
@@ -1274,6 +1276,8 @@ model CompositeFormSection {
 
 // 一次学生/匿名参与记录。recoveryTokenHash 只存哈希，原始恢复凭证只在创建时返回一次。
 model CompositeAssessmentAttempt {
+  trainingFeedbackSnapshot Json? @map("training_feedback_snapshot")
+  trainingFeedbackSnapshotHash String? @map("training_feedback_snapshot_hash")
   trainingPersistenceSnapshot Json? @map("training_persistence_snapshot")
   trainingPersistenceSnapshotHash String? @map("training_persistence_snapshot_hash")
   trainingCheckpoint TrainingAttemptCheckpoint?

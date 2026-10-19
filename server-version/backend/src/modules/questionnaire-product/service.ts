@@ -1,3 +1,4 @@
+import { parseTrainingFeedbackPolicy, trainingFeedbackPolicySchema } from '../assessment-policy/training-feedback-policy'
 import { parseTrainingPersistencePolicy } from '../composite/training-persistence.policy'
 import { compileWeightedVariants, weightedVariantConfigSchema } from '../assessment-core/weighted-variants'
 import { buildTrainingVariantUnion } from '../composite/training-variant-scope'
@@ -35,6 +36,7 @@ const owner = (a: Actor, row: { createdBy: string | null }) => {
 const retentionSettingSchema = z.object({ enabled: z.literal(true), ttlHours: z.number().int().min(1).max(48) }).strict().nullable()
 const persistencePolicySchema = z.object({ schemaVersion: z.literal(1), checkpoint: retentionSettingSchema.optional().default(null), localCognitive: retentionSettingSchema.optional().default(null) }).strict().nullable()
 const metadata = {
+  trainingFeedbackPolicy: trainingFeedbackPolicySchema.nullable().optional(),
   trainingPersistencePolicy: persistencePolicySchema.optional(),
   trainingTimingEnabled: z.boolean().optional(),
   name: z.string().trim().min(1, '请填写问卷名称').max(200, '问卷名称不能超过200字'), description: z.string().max(5000).nullable().optional(),
@@ -78,6 +80,31 @@ export async function validateTrainingPersistenceAuthoring(tx: Tx, row: any, raw
       throw compositeForbidden('草稿策略的课程编制权限无效')
   }
   return { trainingPersistencePolicy: policy as Prisma.InputJsonValue, trainingPersistencePolicyHash: canonicalHash(policy) }
+}
+/** New eligible Training drafts default to immediate feedback. Existing null
+ * publications are never inferred/backfilled on metadata edit or publish. */
+export async function validateTrainingFeedbackAuthoring(tx: Tx, row: any, raw: unknown, initializeDefault = false) {
+  const absent = { trainingFeedbackPolicy: Prisma.DbNull, trainingFeedbackPolicyHash: null }
+  if (raw == null && !initializeDefault) return absent
+  const ids: string[] = (row.questionnaireCourses ?? []).map((entry: any) => entry.courseId)
+  const eligibleScope = row.productKind === 'QUESTIONNAIRE' && row.questionnaireType === 'COURSE' && row.deliveryMode !== 'LEGACY' &&
+    !row.reportPackageKey && !row.analysisProtocolKey && ids.length > 0 && new Set(ids).size === ids.length &&
+    (!row.publicEnabled || ids.length === 1)
+  if (!eligibleScope) {
+    if (raw == null) return absent
+    throw compositeBadRequest('反馈开放策略仅支持明确绑定 Training 课程的普通问卷；公开投放须绑定唯一课程')
+  }
+  const facts = await tx.course.findMany({ where: { id: { in: ids } }, select: { id: true, courseType: true, isLibrary: true, creatorId: true } })
+  if (facts.length !== ids.length || facts.some(course => course.isLibrary || course.courseType !== 'TRAINING_COURSE')) {
+    if (raw == null) return absent
+    throw compositeBadRequest('反馈开放策略的 Training 课程来源无效')
+  }
+  const creator = row.createdBy ? await tx.user.findUnique({ where: { id: row.createdBy }, select: { role: true } }) : null
+  if (!creator || (creator.role !== 'ADMIN' && (creator.role !== 'TEACHER' || facts.some(course => course.creatorId !== row.createdBy))))
+    throw compositeForbidden('反馈开放策略的课程编制权限无效')
+  let policy
+  try { policy = parseTrainingFeedbackPolicy(raw) } catch { throw compositeBadRequest('反馈开放策略或预设开放时间无效') }
+  return { trainingFeedbackPolicy: policy as Prisma.InputJsonValue, trainingFeedbackPolicyHash: canonicalHash(policy) }
 }
 async function timingPolicy(tx:Tx, row:any, enabled:boolean) {
  if(!enabled)return Prisma.DbNull
@@ -160,6 +187,7 @@ export async function create(actor: Actor, raw: unknown) {
       productKind: 'QUESTIONNAIRE', questionnaireType: input.questionnaireType, createdBy: actor.userId,
       trainingTimingPolicy: await timingPolicy(tx,{productKind:'QUESTIONNAIRE',questionnaireType:input.questionnaireType,questionnaireCourses:input.courseIds.map(courseId=>({courseId})),publicEnabled:input.publicEnabled},input.trainingTimingEnabled===true),
       ...await validateTrainingPersistenceAuthoring(tx,{createdBy:actor.userId,productKind:'QUESTIONNAIRE',questionnaireType:input.questionnaireType,questionnaireCourses:input.courseIds.map(courseId=>({courseId})),publicEnabled:input.publicEnabled},input.trainingPersistencePolicy),
+      ...await validateTrainingFeedbackAuthoring(tx,{createdBy:actor.userId,productKind:'QUESTIONNAIRE',questionnaireType:input.questionnaireType,questionnaireCourses:input.courseIds.map(courseId=>({courseId})),publicEnabled:input.publicEnabled},input.trainingFeedbackPolicy,true),
       creationKey, creationHash, publicEnabled: input.publicEnabled, opensAt: date(input.opensAt), expiresAt: date(input.expiresAt),
       questionnaireCourses: { create: input.courseIds.map(courseId => ({ courseId })) },
     } })).id
@@ -205,6 +233,7 @@ export async function update(actor: Actor, id: string, raw: unknown) {
     await tx.compositeAssessment.update({ where: { id }, data: {
       trainingTimingPolicy: await timingPolicy(tx,{...row,questionnaireCourses:input.courseIds.map(courseId=>({courseId})),publicEnabled:input.publicEnabled},input.trainingTimingEnabled??Boolean(row.trainingTimingPolicy)),
       ...await validateTrainingPersistenceAuthoring(tx,{...row,questionnaireCourses:input.courseIds.map(courseId=>({courseId})),publicEnabled:input.publicEnabled},input.trainingPersistencePolicy === undefined ? row.trainingPersistencePolicy : input.trainingPersistencePolicy),
+      ...await validateTrainingFeedbackAuthoring(tx,{...row,questionnaireCourses:input.courseIds.map(courseId=>({courseId})),publicEnabled:input.publicEnabled},input.trainingFeedbackPolicy === undefined ? row.trainingFeedbackPolicy : input.trainingFeedbackPolicy),
       name: input.name, description: input.description ?? null, instruction: input.instruction ?? null,
       publicEnabled: input.publicEnabled, opensAt: date(input.opensAt), expiresAt: date(input.expiresAt),
     } })
@@ -321,6 +350,7 @@ export async function preflight(actor: Actor, id: string, raw: unknown) {
     for (const [key, label, validate] of [
       ['delivery', '课程、公开投放与时间', () => validateDelivery(tx, actor, row)],
       ['training-persistence', 'Training 草稿策略与课程来源', () => validateTrainingPersistenceAuthoring(tx, row, row.trainingPersistencePolicy)],
+      ['training-feedback', 'Training 反馈开放时间与课程来源', () => validateTrainingFeedbackAuthoring(tx, row, row.trainingFeedbackPolicy)],
       ['training-variants', 'Training 加权分组、完整覆盖与次数限制', () => validateTrainingVariants(tx, row)],
       ['training-flow', 'Training 条件路径、材料与结束规则', () => validateTrainingFlow(tx, row)],
       ['resources', '内容依赖与当前权限', () => validateResources(tx, actor, row, inspectedSituational)],
@@ -509,6 +539,7 @@ export async function copy(actor: Actor, id: string, raw: unknown, options: { al
       ...((composite?.trainingVariantDraft != null||(composite?.trainingFlowDraft as any)?.schemaVersion===2) ? { maxAttempts: composite!.maxAttempts } : {}),
       trainingTimingPolicy:await timingPolicy(tx,{productKind:'QUESTIONNAIRE',questionnaireType,questionnaireCourses:sourceCourses.map(courseId=>({courseId})),publicEnabled:false},Boolean(composite?.trainingTimingPolicy)),
       ...await validateTrainingPersistenceAuthoring(tx,{createdBy:actor.userId,productKind:'QUESTIONNAIRE',questionnaireType,questionnaireCourses:sourceCourses.map(courseId=>({courseId})),publicEnabled:false},composite?.trainingPersistencePolicy),
+      ...await validateTrainingFeedbackAuthoring(tx,{createdBy:actor.userId,productKind:'QUESTIONNAIRE',questionnaireType,questionnaireCourses:sourceCourses.map(courseId=>({courseId})),publicEnabled:false},composite?.trainingFeedbackPolicy,true),
       questionnaireCourses: { create: sourceCourses.map(courseId => ({ courseId })) },
     } })
     const copiedIds = new Map<string, string>((composite?.items ?? []).map(item => [item.id, randomUUID()]))
