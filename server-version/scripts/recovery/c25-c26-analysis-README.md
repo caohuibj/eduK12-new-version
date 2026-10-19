@@ -25,10 +25,10 @@ experiment. A remains the immutable `c41cabef` source/artifact. B's separate
   ten measured serial responses, and one measured simultaneous two-read pair.
   Each arm therefore has 20 formal serial responses and two pair windows;
   the complete run has 12 warm-ups plus 48 formal responses.
-* The complete response oracle reconstructs the unsigned manifest and SHA using
+* The complete response.data oracle reconstructs the unsigned manifest and SHA using
   frozen selector/sources/dictionary/actor/authority. It changes only the cutoff
   and its recomputed manifest hash for comparison. All analysis/quality/metadata
-  fields remain exact, including the small-N suppression contract. Historical
+  fields within data remain exact, including the small-N suppression contract. Historical
   A07 authority is explicitly pinned; current full baseline equality remains an
   independent prerequisite. Fixed-cutoff pure output is checked against both
   actual compiled artifacts, not two wrappers around B.
@@ -74,3 +74,20 @@ existing export. Its evidence was retained with that precise scope.
 No database, business API, new fixture, FINAL, export, or ABBA measurement was
 executed by this batch. PG coverage/lower bounds and observer overhead remain
 separate from API self metrics; no performance improvement is asserted.
+
+### Independent review correction
+
+The original bad-identity test could catch its own expected-rejection assertion.
+Only that actual compiled A/B pure contract is rechecked in prepare-05, requiring
+the three exact product error codes and status 409; an accepting callback must
+fail the test helper. The old raw and wrapper outcomes remain unchanged.
+
+For prepare-02/03/04 the then-untracked eight new files had retained pre-run
+copies matching the eventual Git blobs (with the documented later fixes), but
+were absent from the tracked-only before/after inventory. Do not claim historical
+post-run hashes for those new files. Prepare-05 explicitly binds all eight files
+before and after; it does not retroactively recreate the old measurements.
+
+The real HTTP bridge must separately retain and check HTTP status, code, message,
+and the exact envelope before handing data to this oracle. No HTTP acceptance
+is implied by these pure contracts.
