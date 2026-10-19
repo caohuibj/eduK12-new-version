@@ -21,7 +21,8 @@ describe('administrator one-time capability links',()=>{
       render(<SurveyResearchersAdmin/>)
       await screen.findByText('synthetic-researcher')
       fireEvent.change(screen.getByLabelText('当前管理员密码（敏感操作再次验证）'),{target:{value:'synthetic-password'}})
-      fireEvent.click(screen.getByRole('button',{name:label}))
+      if(kind==='INVITE')fireEvent.click(screen.getByRole('tab',{name:/邀请 签发/}))
+      fireEvent.click(screen.getByRole('button',{name:label==='密码重置邀请'?label+'：synthetic-researcher':label}))
       const link=`http://survey.localhost:5173/${path}#token=synthetic-token`
       expect(await screen.findByText(link)).toBeInTheDocument()
       fireEvent.click(screen.getByRole('button',{name:'复制链接'}))

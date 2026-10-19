@@ -1,0 +1,32 @@
+{
+  "base": "e2e4b40f869f6deb63a7ed621c398f23ddcff20d",
+  "files": {
+    "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.tsx": {
+      "bytes": 13624,
+      "sha256": "fd436b12d8b34fe5b76ecd09b5effb4be97756df91757f3de25cdb141366b91b"
+    },
+    "server-version/frontend/src/pages/admin/SurveyCatalogGrants.tsx": {
+      "bytes": 8848,
+      "sha256": "e281533f216e046a6533b543bcc5ea695f4904a5448c72d01604495e646159b5"
+    },
+    "server-version/frontend/src/pages/admin/survey-admin.css": {
+      "bytes": 3716,
+      "sha256": "ce737083a2b0236e2c964927fecef61dc9b11c45e842ec783ef0e1a2e4072a3a"
+    },
+    "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.workspace.test.tsx": {
+      "bytes": 12877,
+      "sha256": "6592c1a521f6d22b1bafd8d5a792f9b9015984f730c84d4b7c6f6600cbd9a797"
+    },
+    "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.links.test.tsx": {
+      "bytes": 2463,
+      "sha256": "2c2d814b2418e53df649c50959c3b90e9eadc85c43e67ff73876f4cbaeeea24d"
+    }
+  },
+  "platformApiFunctionUnchanged": true,
+  "backendAndAuthAndDependenciesUnchanged": true,
+  "existingComponentCases": 16,
+  "newInFlightCase": 1,
+  "reuseBoundary": "16 first cases; width prop then busy-new; final grant read empty guard and unavailable revoke status each targeted. Frozen types/lint pass. Earlier native normal views do not exercise those last two guards; frozen resource sample separately captured.",
+  "ciRun": false,
+  "newGrantReadCase": 1
+}
