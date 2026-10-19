@@ -65,26 +65,119 @@ def process_table():
   assert row['pid']==int(p.name);rows[row['pid']]=row
  return rows
 class OwnedGroups:
- def __init__(self,postgres_executable=None):self.groups={};self.events=[];self.identity_observations=[];self.member_pins={};self.empty_groups=set();self.root=None;self.mutex=threading.RLock();self.postgres_executable=str(Path(postgres_executable).resolve()) if postgres_executable else None
- def postgres_candidate(self,row):
-  # A short-lived backend may exit after the complete /proc stat scan. An
-  # absent exe alone proves nothing: bracket it with the same full identity.
-  observed_exe=None;missing_exe=None
-  try:observed_exe=str(Path('/proc',str(row['pid']),'exe').resolve(strict=True))
-  except FileNotFoundError as error:missing_exe=error
-  if observed_exe is not None:assert observed_exe==self.postgres_executable,'unproved PostgreSQL descendant executable'
-  try:after=proc(row['pid'])
-  except FileNotFoundError:
-   assert not Path('/proc',str(row['pid'])).exists(),'live candidate has unreadable stat'
-   after=None
-  if after is not None:
-   assert all(after[k]==row[k] for k in ['pid','startTicks','processGroupId','parentPid']),'PostgreSQL candidate identity changed during exe proof'
-  if after is None or after['state'] in ['Z','X','x']:
-   self.identity_observations.append({'kind':'PG_CANDIDATE_EXIT_DURING_IDENTITY_PROOF','before':dict(row),'after':after,'exeObserved':observed_exe,'exeVerifiedForActiveProcess':False,'disposition':'ABSENT' if after is None else 'TERMINAL','observedMonotonicNs':str(time.monotonic_ns()),'cpu':'NOT_OBSERVED'})
-   return None if after is None else {'role':'postgres_terminal_candidate','identity':after}
-  if missing_exe is not None:raise missing_exe
-  assert self.postgres_executable is not None and observed_exe==self.postgres_executable
-  return {'role':'postgres_child','identity':after}
+ def __init__(self,postgres_executable=None):
+  self.groups={};self.events=[];self.identity_observations=[];self.member_pins={};self.empty_groups=set();self.root=None;self.mutex=threading.RLock();self.postgres_executable=str(Path(postgres_executable).resolve()) if postgres_executable else None
+  self.postmaster=None;self.pg_lineage={};self.pg_transitions=[]
+ def bind_postmaster(self,child,row):
+  assert self.postmaster is None and isinstance(child,subprocess.Popen) and child.pid==row['pid'] and child.returncode is None
+  group=self.groups[row['pid']]
+  assert row['parentPid']==os.getpid() and group['role']=='postgres' and all(group[k]==row[k] for k in ['pid','startTicks','processGroupId','parentPid'])
+  self.postmaster=(child,dict(row))
+ def pg_identity(self,before,after,adoption=False,adoptions=None):
+  assert all(before[k]==after[k] for k in ['pid','startTicks']),'PG lineage PID identity reused'
+  if before['parentPid']!=after['parentPid']:
+   assert adoption and self.root is not None and after['parentPid']==self.root['pid'] and before['processGroupId']==after['processGroupId'],'PG lineage parent drift'
+   pin=self.pg_lineage.get(before['pid']);assert pin is not None,'new orphan has no prior PG lineage'
+   if not pin.get('adoption'):
+    parent_pin=self.pg_lineage.get(before['parentPid']);assert parent_pin is not None,'old parent has no proved PG lineage'
+    parent_identity=parent_pin['identity'];parent_after=None
+    try:parent_after=proc(before['parentPid'])
+    except FileNotFoundError:assert not Path('/proc',str(before['parentPid'])).exists(),'old PG parent stat unavailable'
+    if parent_after is not None:
+     assert all(parent_after[k]==parent_identity[k] for k in ['pid','startTicks','processGroupId']) and parent_after['state'] in ['Z','X','x'],'PG adoption lacks exact old-parent exit proof'
+    launcher=proc(self.root['pid']);assert all(launcher[k]==self.root[k] for k in ['pid','startTicks','processGroupId','parentPid']),'subreaper identity changed'
+    if adoptions is not None:adoptions.append({'before':dict(before),'after':dict(after),'oldParentIdentity':dict(parent_identity),'oldParentAfter':parent_after,'oldParentDisposition':'ABSENT' if parent_after is None else 'TERMINAL','subreaperIdentity':launcher})
+  if before['processGroupId']==after['processGroupId']:return False
+  assert self.postmaster is not None
+  master=self.postmaster[1];prior=self.pg_lineage.get(before['pid'],{})
+  assert not prior.get('setsidTransition') and before['pid']!=master['pid'] and before['parentPid']==after['parentPid']==master['pid'] and before['processGroupId']==master['processGroupId'] and after['processGroupId']==after['pid'],'unapproved PG group drift'
+  return True
+ def commit_pg_setsid(self,before,after):
+  if not self.pg_identity(before,after):return
+  pin=self.pg_lineage.get(before['pid']);assert pin is not None,'setsid requires a proved direct postmaster child'
+  # PostgreSQL 16.15 InitPostmasterChild, miscinit.c:142-149; installed
+  # binary SHA32f9f3c2501108b19cdcc763e5be16f0286ace185dd9535e9d63066eaae2c338.
+  event={'before':dict(before),'after':dict(after),'atMonotonicNs':str(time.monotonic_ns()),'source':'PostgreSQL16.15:InitPostmasterChild:setsid','sourceSha256':'556e72104ec6b03446e4c333c0c89f005b7138c59430763ea3a2e993339b0588'}
+  pin['identity']={**pin['identity'],'processGroupId':after['processGroupId']};pin['setsidTransition']=event;self.pg_transitions.append(event)
+  self.member_pins[after['pid']]=dict(after)
+  self.register(after,'postgres_terminal_candidate' if after['state'] in ['Z','X','x'] else 'postgres_child')
+ def postgres_chain(self,row,rows,adoptions=None):
+  # generic member_pins / a known PGID / adoption by our subreaper are not PG
+  # lineage. Only the held postmaster or a previously proved PG orphan anchors it.
+  assert self.postmaster is not None,'no held postmaster Popen'
+  child,master=self.postmaster
+  group=self.groups.get(master['pid'])
+  assert child.pid==master['pid'] and group is not None and group['role']=='postgres' and all(group[k]==master[k] for k in ['pid','startTicks','processGroupId','parentPid']),'postmaster binding changed'
+  chain=[];seen=set();current=row
+  while True:
+   assert current['pid'] not in seen,'cyclic PG parent chain';seen.add(current['pid']);chain.append(dict(current))
+   pin=self.pg_lineage.get(current['pid'])
+   if pin is not None:
+    original=pin['identity']
+    if pin.get('adoption'):assert self.root is not None and current['parentPid']==self.root['pid'],'adopted PG member changed parent again'
+    self.pg_identity(original,current,adoption=True,adoptions=adoptions)
+   if current['pid']==master['pid']:
+    assert child.returncode is None and all(current[k]==master[k] for k in ['pid','startTicks','processGroupId','parentPid']),'held postmaster identity changed'
+    return chain,'HELD_POSTMASTER'
+   if pin is not None and self.root is not None and current['parentPid']==self.root['pid']:
+    return chain,'PREVIOUSLY_PROVED_PG_SUBREAPER_ADOPTION'
+   parent=rows.get(current['parentPid']);assert parent is not None,'unproved PG parent chain'
+   assert self.root is None or parent['pid']!=self.root['pid'],'newly adopted process has no PG lineage'
+   current=parent
+ def postgres_candidate(self,row,rows,require_existing=False):
+  # Lifecycle ownership and executable observability are distinct. All PG
+  # members, including nonleaders, require the same bracketed ancestry proof.
+  observed_exe=None;after=None;chain=[];fresh_chain=[];ancestor_pairs=[];adoptions=[];anchor=None;error=None;exe_status='NOT_READ';disposition='REJECTED'
+  try:
+   if require_existing:assert row['pid'] in self.pg_lineage,'PG group member lacks dedicated lineage proof'
+   chain,anchor=self.postgres_chain(row,rows,adoptions)
+   try:observed_exe=str(Path('/proc',str(row['pid']),'exe').resolve(strict=True));exe_status='OBSERVED'
+   except FileNotFoundError:exe_status='NOT_OBSERVED_ENOENT'
+   except BaseException:
+    exe_status='READ_FAILED';raise
+   try:after=proc(row['pid'])
+   except FileNotFoundError:
+    assert not Path('/proc',str(row['pid'])).exists(),'live candidate has unreadable stat'
+   if after is not None:self.pg_identity(row,after,adoption=row['pid'] in self.pg_lineage,adoptions=adoptions)
+   # A proved adoption changes the current chain. Retain the exact old-parent
+   # exit proof rather than requiring a dead ancestor to remain in /proc.
+   adopted=after is not None and after['parentPid']!=row['parentPid']
+   if adopted:fresh_chain.append(adoptions[-1]['subreaperIdentity'])
+   else:
+    for ancestor in chain[1:]:
+     fresh=proc(ancestor['pid']);fresh_chain.append(fresh);ancestor_pairs.append((ancestor,fresh))
+     self.pg_identity(ancestor,fresh,adoption=ancestor['pid'] in self.pg_lineage,adoptions=adoptions)
+     if ancestor['parentPid']!=fresh['parentPid']:
+      fresh_chain.append(adoptions[-1]['subreaperIdentity']);break
+   if observed_exe is not None:assert observed_exe==self.postgres_executable,'unproved PostgreSQL descendant executable'
+   disposition='ABSENT' if after is None else ('TERMINAL' if after['state'] in ['Z','X','x'] else 'LIVE')
+   if after is None:return None
+   prior=self.pg_lineage.get(row['pid'])
+   self.pg_lineage[row['pid']]={**(prior or {}),'identity':dict(prior['identity'] if prior else row),'chain':chain,'anchor':anchor,'lastIdentity':dict(after),'exeStatus':exe_status,'exeObserved':observed_exe}
+   original=self.pg_lineage[row['pid']]['identity']
+   if original['processGroupId']!=after['processGroupId']:self.commit_pg_setsid(original,after)
+   for proof in adoptions:self.pg_lineage[proof['before']['pid']]['adoption']=proof
+   for ancestor,fresh in ancestor_pairs:
+    if ancestor['processGroupId']!=fresh['processGroupId']:self.commit_pg_setsid(ancestor,fresh);rows[fresh['pid']]=fresh
+   rows[row['pid']]=dict(after)
+   return {'role':'postgres_terminal_candidate' if disposition=='TERMINAL' else 'postgres_child','identity':after}
+  except BaseException as caught:
+   error=caught
+   # Even an exe permission failure must retain the available second frame.
+   if after is None:
+    try:after=proc(row['pid'])
+    except BaseException as diagnostic:after={'unavailableErrorType':type(diagnostic).__name__,'unavailableError':str(diagnostic)}
+   raise
+  finally:
+   event={'kind':'PG_LIFECYCLE_IDENTITY_PROOF','before':dict(row),'after':after,'lineage':chain,'lineageAfter':fresh_chain,'adoptions':adoptions,'anchor':anchor,'exeObserved':observed_exe,'exeStatus':exe_status,'exeVerifiedForActiveProcess':disposition=='LIVE' and exe_status=='OBSERVED','disposition':disposition,'observedMonotonicNs':str(time.monotonic_ns()),'cpu':'NOT_OBSERVED'}
+   if error is not None:event.update(errorType=type(error).__name__,error=str(error))
+   # Preserve every rejection and the first/changed accepted observation;
+   # repeated lifecycle polling is not an unbounded raw measurement journal.
+   previous=next((e for e in reversed(self.identity_observations) if e['before']['pid']==row['pid']),None)
+   def observation_key(value):
+    def identity(frame):return None if frame is None else tuple(frame.get(k) for k in ['pid','startTicks','processGroupId','parentPid'])
+    return (identity(value['before']),identity(value['after']),tuple(map(identity,value['lineage'])),tuple(map(identity,value['lineageAfter'])),value['anchor'],value['exeObserved'],value['exeStatus'],value['disposition'])
+   if error is not None or previous is None or observation_key(previous)!=observation_key(event):self.identity_observations.append(event)
  def register(self,row,role):
   assert row['pid']==row['processGroupId'] and row['pid']!=os.getpgrp(),'only a detached owned group'
   key=(row['pid'],row['startTicks'])
@@ -103,11 +196,30 @@ class OwnedGroups:
    added={pid for pid,row in rows.items() if row['parentPid'] in descendants}
    if added<=descendants:break
    descendants|=added
-  pg_family={pid for pid,row in self.groups.items() if row['role'] in ['postgres','postgres_child','postgres_terminal_candidate']}
-  while True:
-   added={pid for pid,row in rows.items() if row['parentPid'] in pg_family}
-   if added<=pg_family:break
-   pg_family|=added
+  pg_family=set()
+  if self.postmaster is not None:
+   _,master=self.postmaster
+   if master['pid'] in rows:
+    proof=self.postgres_candidate(rows[master['pid']],rows)
+    if proof is not None:rows[master['pid']]=proof['identity'];pg_family.add(master['pid'])
+    else:rows.pop(master['pid']);descendants.discard(master['pid'])
+   # A previously proved orphan may outlive the held postmaster. A newly
+   # adopted process is never an anchor merely because it has our PPID.
+   for pid in self.pg_lineage:
+    if pid in rows:pg_family.add(pid)
+   while True:
+    added={pid for pid,row in rows.items() if row['parentPid'] in pg_family}
+    if added<=pg_family:break
+    pg_family|=added
+  pending=pg_family-({self.postmaster[1]['pid']} if self.postmaster else set())
+  while pending:
+   ready=sorted(pid for pid in pending if rows[pid]['parentPid'] not in pending)
+   assert ready,'cyclic PG topology'
+   for pid in ready:
+    row=rows[pid];proof=self.postgres_candidate(row,rows);pending.remove(pid)
+    if proof is None:rows.pop(pid);descendants.discard(pid);continue
+    rows[pid]=proof['identity']
+    if proof['identity']['processGroupId']==pid and pid not in self.groups:self.register(proof['identity'],proof['role'])
   for pid in descendants-{root['pid']}:
    row=rows[pid]
    prior=self.member_pins.get(pid);assert prior is None or prior['startTicks']==row['startTicks'],'owned member PID reused'
@@ -118,17 +230,11 @@ class OwnedGroups:
     if pid in self.groups and self.groups[pid]['role']=='postgres_terminal_candidate':
      group=self.groups[pid];assert row['state'] in ['Z','X','x'] and row['processGroupId']==group['processGroupId'],'terminal PostgreSQL candidate became live or moved group'
      assert row['parentPid']==group['parentPid'] or row['parentPid']==root['pid'],'terminal PostgreSQL candidate parent drift'
-    if pid in pg_family and pid not in self.groups:
-     proof=self.postgres_candidate(row)
-     if proof is not None:
-      rows[pid]=proof['identity'];self.member_pins[pid]=dict(proof['identity']);self.register(proof['identity'],proof['role'])
-     else:rows.pop(pid)
-    elif pid not in self.groups:self.register(row,'descendant-before-registration')
+    if pid not in self.groups:self.register(row,'descendant-before-registration')
    elif row['processGroupId'] not in self.groups:raise AssertionError('unowned descendant process group')
-  # A terminal leader cannot hide an active same-PGID descendant until the
-  # final PG stop. Check every such member during each capture, before audit.
-  for group in self.groups.values():
-   if group['role']=='postgres_terminal_candidate':self.verified_members(group,rows)
+  # No member excluded from writer stops may rely on just a shared PGID.
+  for group in list(self.groups.values()):
+   if group['role'] in ['postgres','postgres_child','postgres_terminal_candidate']:self.verified_members(group,rows)
  def import_registry(self,file,driver):
   if not file.exists():return
   value=private_read(file);assert value['schemaVersion']==1 and value['parentPid']==driver['pid']
@@ -147,18 +253,14 @@ class OwnedGroups:
     pin=self.member_pins.get(row['pid'])
     assert pin is not None and all(pin[k]==row[k] for k in ['pid','startTicks','processGroupId']),'leaderless member has no exact owned identity'
     assert row['parentPid']==pin['parentPid'] or (self.root is not None and row['parentPid']==self.root['pid']),'leaderless member parent drift'
-  if group['role']=='postgres_terminal_candidate':
+  if group['role'] in ['postgres','postgres_child','postgres_terminal_candidate']:
    checked=[]
    for row in members:
-    pin=self.member_pins.get(row['pid'])
-    assert pin is not None and all(pin[k]==row[k] for k in ['pid','startTicks','processGroupId']),'unproved terminal-group member'
-    assert row['parentPid']==pin['parentPid'] or (self.root is not None and row['parentPid']==self.root['pid']),'terminal-group member parent drift'
-    if row['state'] not in ['Z','X','x']:
-     assert row['pid']!=group['pid'],'terminal group leader became live'
-     proof=self.postgres_candidate(row)
-     if proof is None:continue # This exact member was freshly proved absent.
-     row=proof['identity']
-    checked.append(row)
+    proof=self.postgres_candidate(row,rows,require_existing=True)
+    if proof is None:continue
+    row=proof['identity']
+    if group['role']=='postgres_terminal_candidate' and row['pid']==group['pid']:assert row['state'] in ['Z','X','x'],'terminal group leader became live'
+    if row['processGroupId']==group['pid']:checked.append(row)
    members=checked
   if not members:self.empty_groups.add(group['pid'])
   return leader,members
@@ -166,8 +268,10 @@ class OwnedGroups:
   with self.mutex:
    entries=list(self.groups.values());rows=process_table();failures=[]
    for row in reversed(entries):
-    if (row['role'] in ['postgres','postgres_child','postgres_terminal_candidate'] and not include_postgres) or (roles is not None and row['role'] not in roles):continue
     try:
+     if row['role'] in ['postgres','postgres_child','postgres_terminal_candidate'] and not include_postgres:
+      self.verified_members(row,rows);continue
+     if roles is not None and row['role'] not in roles:continue
      leader,members=self.verified_members(row,rows)
      if not members:continue
      if leader is not None:
@@ -194,8 +298,9 @@ class OwnedGroups:
  def members(self,include_postgres=False):
   with self.mutex:
    rows=process_table();result=[]
-   for group in self.groups.values():
-    if include_postgres or group['role'] not in ['postgres','postgres_child','postgres_terminal_candidate']:result.extend(self.verified_members(group,rows)[1])
+   for group in list(self.groups.values()):
+    verified=self.verified_members(group,rows)[1]
+    if include_postgres or group['role'] not in ['postgres','postgres_child','postgres_terminal_candidate']:result.extend(verified)
    return result
 
 def spawn_registered(owned,children,name,argv,**options):
@@ -204,7 +309,9 @@ def spawn_registered(owned,children,name,argv,**options):
  with owned.mutex:
   child=subprocess.Popen(argv,**options);children.append((name,child))
   identity=proc(child.pid);assert identity['parentPid']==os.getpid()
-  owned.register(identity,name);return child,identity
+  owned.register(identity,name)
+  if name=='postgres':owned.bind_postmaster(child,identity)
+  return child,identity
 
 def stop_failed_command(owned,child,identity,role,end):
  # Never signal the old numerical PGID directly after a guard/exit failure.
@@ -544,7 +651,7 @@ def main():
   result['watchdogClose']=finish_watchdog(done,watcher,budget,errors)
   try:sample();budget.remaining()
   except BaseException as error:errors.append({'stage':'final-resources','errorType':type(error).__name__})
-  result['signals']=owned.events;result['processIdentityObservations']=owned.identity_observations;result['processExits']={n:p.poll() for n,p in children};result['cleanupErrors']=errors;result['outerFailureTypes']=[type(e).__name__ for e in failure]
+  result['signals']=owned.events;result['processIdentityObservations']=owned.identity_observations;result['postgresLineage']=owned.pg_lineage;result['postgresSetsidTransitions']=owned.pg_transitions;result['processExits']={n:p.poll() for n,p in children};result['cleanupErrors']=errors;result['outerFailureTypes']=[type(e).__name__ for e in failure]
   result['passed']=not failure and not errors and result.get('driverExecuted') is True and result['finalSnapshotVerified'] is True and result.get('materials',{}).get('passed') is True and all(result.get('inputVerification',{}).get(k) is True for k in ['passed','inputsUnchanged','sourceUnchanged','recoveryEvidenceUnchanged']) and result.get('cleanupVerified') is True and result.get('postgresReadyVerified') is True and all(type(c)is int and (c==0 or (n.startswith('c25-c26-readiness-') and c==75)) for n,c in result['processExits'].items())
   for log in logs:log.flush();os.fsync(log.fileno());log.close()
   result['elapsedSeconds']=(budget.clock()-budget.started)/1e9

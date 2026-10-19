@@ -244,7 +244,7 @@ else:
 """
  leader=subprocess.Popen([sys.executable,'-B','-c',script,str(marker)],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
  try:
-  owned.register(proc(leader.pid),'postgres');end=time.monotonic()+3
+  owned.register(proc(leader.pid),'postgres');owned.bind_postmaster(leader,proc(leader.pid));end=time.monotonic()+3
   while not marker.exists():assert time.monotonic()<end;time.sleep(.005)
   child=json.loads(marker.read_text())['pid'];owned.capture_descendants(root)
   assert owned.groups[child]['role']=='postgres_child' and owned.members(False)==[]
@@ -406,7 +406,7 @@ with tempfile.TemporaryDirectory() as tmp:
  assert len(observed)==1 and result['passed'] is False and result['postWriteResourceFailure']=='AssertionError'
  assert result['lateFinalEvidence'] is False and private_read(file)==result and stat.S_IMODE(file.stat().st_mode)==0o600
 `))
-test('fresh PG candidate identity accepts real short exits but rejects live missing exe reuse permissions and group drift',()=>{
+test('fresh PG lifecycle identity records real short exits and rejects invalid ownership frames',()=>{
  const output=python(String.raw`
 from unittest import mock
 os.umask(0o077);enable_subreaper();root=proc(os.getpid());observations=[]
@@ -432,12 +432,12 @@ for disposition in ['ABSENT','TERMINAL']:
  leader=subprocess.Popen([sys.executable,'-B','-c',script],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True,start_new_session=True)
  child=None;owned=OwnedGroups(sys.executable);real_resolve=Path.resolve;seen=[]
  try:
-  owned.register(proc(leader.pid),'postgres');child=int(leader.stdout.readline());end=time.monotonic()+3
+  owned.register(proc(leader.pid),'postgres');owned.bind_postmaster(leader,proc(leader.pid));child=int(leader.stdout.readline());end=time.monotonic()+3
   while proc(child)['processGroupId']!=child:assert time.monotonic()<end;time.sleep(.001)
   before=proc(child);target=Path('/proc',str(child),'exe')
   def exit_before_exe(file,*args,**kwargs):
-   if file==target:
-    assert not seen;seen.append(True);os.kill(child,signal.SIGTERM)
+   if file==target and not seen:
+    seen.append(True);os.kill(child,signal.SIGTERM)
     until=time.monotonic()+3
     while proc(child)['state'] not in ['Z','X','x']:assert time.monotonic()<until;time.sleep(.001)
     if disposition=='ABSENT':
@@ -445,7 +445,7 @@ for disposition in ['ABSENT','TERMINAL']:
      assert not Path('/proc',str(child)).exists()
    return real_resolve(file,*args,**kwargs)
   with mock.patch.object(Path,'resolve',exit_before_exe):owned.capture_descendants(root)
-  assert len(owned.identity_observations)==1;event=owned.identity_observations[0]
+  events=[e for e in owned.identity_observations if e['before']['pid']==child];assert len(events)==1;event=events[0]
   assert event['disposition']==disposition and event['exeVerifiedForActiveProcess'] is False and event['exeObserved'] is None and event['cpu']=='NOT_OBSERVED'
   assert all(event['before'][k]==before[k] for k in ['pid','startTicks','processGroupId','parentPid'])
   if disposition=='ABSENT':assert child not in owned.groups and event['after'] is None
@@ -468,33 +468,7 @@ for disposition in ['ABSENT','TERMINAL']:
    except ProcessLookupError:pass
    try:os.waitpid(child,os.WNOHANG)
    except ChildProcessError:pass
-row={'pid':2147483000,'startTicks':'17','processGroupId':2147483000,'parentPid':os.getpid(),'state':'S'}
-rejections=[]
-faults=[('live-missing-exe',FileNotFoundError('missing'),dict(row)),('reused-pid',FileNotFoundError('missing'),{**row,'startTicks':'18'}),('moved-group',FileNotFoundError('missing'),{**row,'processGroupId':2147483001}),('moved-parent',FileNotFoundError('missing'),{**row,'parentPid':1}),('permission',PermissionError('denied'),dict(row)),('parse',FileNotFoundError('missing'),ValueError('bad stat')),('exe-proof-pid-reuse',str(Path(sys.executable).resolve()),{**row,'startTicks':'18'}),('wrong-executable','/wrong/executable',dict(row))]
-for name,exe,fresh in faults:
- owned=OwnedGroups(sys.executable)
- def resolve(*a,**k):
-  if isinstance(exe,Exception):raise exe
-  return Path(exe)
- def read(pid):
-  if isinstance(fresh,Exception):raise fresh
-  return fresh
- with mock.patch.object(Path,'resolve',resolve),mock.patch.dict(owned.postgres_candidate.__globals__,proc=read):
-  try:owned.postgres_candidate(row)
-  except (AssertionError,FileNotFoundError,PermissionError,ValueError):rejections.append(name)
-  else:raise AssertionError('invalid candidate accepted: '+name)
- assert owned.identity_observations==[]
-# A terminal leader never grants ownership to a live/unpinned group member.
-owned=OwnedGroups(sys.executable);owned.root=root;terminal={**row,'state':'Z'};owned.register(terminal,'postgres_terminal_candidate');owned.member_pins[row['pid']]=terminal
-for bad in [{**terminal,'state':'S'},{**terminal,'parentPid':1},{**terminal,'startTicks':'19'}]:
- try:owned.verified_members(owned.groups[row['pid']],{row['pid']:bad})
- except AssertionError:pass
- else:raise AssertionError('terminal identity drift accepted')
-foreign={**row,'pid':2147483001,'parentPid':1}
-try:owned.verified_members(owned.groups[row['pid']],{row['pid']:terminal,foreign['pid']:foreign})
-except AssertionError:pass
-else:raise AssertionError('live member hidden by terminal group leader')
-print(json.dumps({'actualExitObservations':observations,'strictRejectedFaults':rejections,'terminalGroupCannotHideLiveMember':True}))
+print(json.dumps({'actualExitObservations':observations}))
 `,{timeout:15000})
  console.log(output.trim())
 })
@@ -513,18 +487,254 @@ with mock.patch.dict(owned.signal.__globals__,process_table=lambda:{row['pid']:r
  kill.assert_called_once_with(row['pid'],signal.SIGKILL);child.wait.assert_called_once()
 print(json.dumps({'reusedGroupSignalDenied':True,'waitStillCalled':True,'exactOwnedSignalPermitted':True}))
 `))
-test('actual capture rejects live hidden members of a terminal PG group before any following audit',()=>python(String.raw`
+test('held postmaster lineage admits live exe ENOENT for every real member and rejects ownership counterexamples with frames',()=>{
+ const output=python(String.raw`
+import tempfile,copy
 from unittest import mock
-root=proc(os.getpid());terminal={'pid':2147483000,'startTicks':'17','processGroupId':2147483000,'parentPid':root['pid'],'state':'Z'}
-live={'pid':2147483001,'startTicks':'18','processGroupId':terminal['pid'],'parentPid':terminal['pid'],'state':'S'}
-for outside in [False,True]:
- owned=OwnedGroups(sys.executable);owned.root=root;owned.register(terminal,'postgres_terminal_candidate');owned.member_pins[terminal['pid']]=terminal
- child={**live,'parentPid':1} if outside else live
- rows={root['pid']:root,terminal['pid']:terminal,child['pid']:child};following=[]
- with mock.patch.dict(owned.capture_descendants.__globals__,process_table=lambda:rows,proc=lambda pid:rows[pid]),mock.patch.object(Path,'resolve',return_value=Path('/unproved/writer')):
-  try:owned.capture_descendants(root);following.append('audit')
+os.umask(0o077);enable_subreaper();root=proc(os.getpid());children=[]
+script="""import os,sys,signal,time,json
+pid=os.fork()
+if pid==0:
+ os.setsid();member=os.fork()
+ if member==0:
+  while True:time.sleep(.01)
+ with open(sys.argv[1]+'.tmp','x') as f:json.dump({'leader':os.getpid(),'member':member},f);f.flush();os.fsync(f.fileno())
+ os.rename(sys.argv[1]+'.tmp',sys.argv[1])
+ while True:time.sleep(.01)
+else:
+ def done(sig,frame):
+  os.killpg(pid,signal.SIGTERM);os.waitpid(pid,0);sys.exit(0)
+ signal.signal(signal.SIGINT,done)
+ while True:time.sleep(.01)
+"""
+with tempfile.TemporaryDirectory() as tmp:
+ marker=Path(tmp)/'members.json';owned=OwnedGroups(sys.executable)
+ master,identity=spawn_registered(owned,children,'postgres',[sys.executable,'-B','-c',script,str(marker)],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
+ try:
+  until=time.monotonic()+3
+  while not marker.exists():assert time.monotonic()<until;time.sleep(.002)
+  ids=json.loads(marker.read_text());leader,member=ids['leader'],ids['member'];real_resolve=Path.resolve;real_proc=proc
+  targets={Path('/proc',str(pid),'exe') for pid in [leader,member]}
+  def missing_exe(file,*args,**kwargs):
+   if file in targets:raise FileNotFoundError('synthetic exact exe ENOENT on real live identity')
+   return real_resolve(file,*args,**kwargs)
+  with mock.patch.object(Path,'resolve',missing_exe):
+   owned.capture_descendants(root);assert owned.members(False)==[]
+   rows=owned.members(True);assert {r['pid'] for r in rows}=={master.pid,leader,member}
+  assert owned.groups[leader]['role']=='postgres_child' and member not in owned.groups
+  assert all(pid in owned.pg_lineage for pid in [master.pid,leader,member])
+  events=[e for e in owned.identity_observations if e['before']['pid'] in [leader,member]]
+  assert len(events)==2 and all(e['disposition']=='LIVE' and e['exeStatus']=='NOT_OBSERVED_ENOENT' and not e['exeVerifiedForActiveProcess'] for e in events)
+  assert all(e['before']['startTicks']==e['after']['startTicks'] and e['lineage'][-1]['pid']==master.pid for e in events)
+  rejections=[];rejected_frames=[]
+  def one_fault(name):
+   check=OwnedGroups(sys.executable);check.register(identity,'postgres');check.bind_postmaster(master,identity);check.root=root
+   rows=process_table();candidate=rows[leader];calls=[]
+   if name=='newly-adopted':rows[leader]={**candidate,'parentPid':root['pid']};candidate=rows[leader]
+   if name=='unknown-parent':rows[leader]={**candidate,'parentPid':2147483000};candidate=rows[leader]
+   if name=='replaced-held-binding':check.groups[master.pid]={**check.groups[master.pid],'startTicks':'reused'}
+   def fresh(pid):
+    value=real_proc(pid)
+    if pid==leader and name=='pid-reuse':value={**value,'startTicks':'reused'}
+    if pid==leader and name=='group-drift':value={**value,'processGroupId':master.pid}
+    if pid==leader and name=='parent-drift':value={**value,'parentPid':1}
+    if pid==master.pid and name=='ancestor-reuse':value={**value,'startTicks':'reused'}
+    if pid==leader and name=='parse':raise ValueError('synthetic stat parse')
+    return value
+   def exe(file,*args,**kwargs):
+    if file==Path('/proc',str(leader),'exe'):
+     if name=='permission':raise PermissionError('synthetic exe permission')
+     if name=='wrong-executable':return Path('/unrelated/writer')
+     raise FileNotFoundError('synthetic missing exe')
+    return real_resolve(file,*args,**kwargs)
+   with mock.patch.object(Path,'resolve',exe),mock.patch.dict(check.postgres_candidate.__globals__,proc=fresh),mock.patch('os.killpg') as group_signal,mock.patch('os.pidfd_open') as pid_signal:
+    try:check.postgres_candidate(candidate,rows)
+    except (AssertionError,PermissionError,ValueError):rejections.append(name)
+    else:raise AssertionError('ownership counterexample admitted: '+name)
+    group_signal.assert_not_called();pid_signal.assert_not_called()
+   assert len(check.identity_observations)==1
+   event=check.identity_observations[0];assert event['disposition']=='REJECTED' and event['before']==candidate and event['after'] is not None and event['errorType']
+   rejected_frames.append({'case':name,'observation':event})
+  for name in ['newly-adopted','unknown-parent','replaced-held-binding','pid-reuse','group-drift','parent-drift','ancestor-reuse','permission','parse','wrong-executable']:one_fault(name)
+  # Known PGID never substitutes for a PG lineage proof, even for a nonleader.
+  foreign={**real_proc(member),'pid':2147483001,'parentPid':1,'startTicks':'foreign'};actual=process_table();actual[foreign['pid']]=foreign
+  with mock.patch.dict(owned.capture_descendants.__globals__,process_table=lambda:copy.deepcopy(actual)),mock.patch('os.killpg') as group_signal,mock.patch('os.pidfd_open') as pid_signal:
+   try:owned.capture_descendants(root)
+   except AssertionError as error:assert 'lineage proof' in str(error)
+   else:raise AssertionError('unknown member hidden behind PG role')
+   group_signal.assert_not_called();pid_signal.assert_not_called()
+  assert owned.identity_observations[-1]['disposition']=='REJECTED' and owned.identity_observations[-1]['before']==foreign
+  # Previously proved PG lineage survives exact subreaper adoption. Brand-new
+  # orphans above were rejected; the shared group still uses original pidfd rules.
+  master.kill();assert master.wait(timeout=2)==-signal.SIGKILL
+  owned.capture_descendants(root)
+  assert owned.pg_lineage[leader]['anchor']=='PREVIOUSLY_PROVED_PG_SUBREAPER_ADOPTION'
+  owned.signal(signal.SIGTERM,True,roles={'postgres_child'})
+  proof=reclaim_owned(owned,root,children,time.monotonic_ns()+3*10**9,True,grace_seconds=.05)
+  assert proof['passed'] and proof['members']==[] and proof['popenExits']=={'postgres':-signal.SIGKILL},json.dumps({'proof':proof,'observations':owned.identity_observations})
+  print(json.dumps({'realLiveMissingExeObservations':events,'rejectedFrames':rejected_frames,'unknownSameGroupMemberRejected':True,'previouslyProvedAdoptionAccepted':True,'reclaim':proof}))
+ finally:
+  if master.poll() is None:
+   try:os.killpg(master.pid,signal.SIGKILL)
+   except ProcessLookupError:pass
+  master.wait(timeout=2)
+  if marker.exists():
+   for pid in json.loads(marker.read_text()).values():
+    try:os.kill(pid,signal.SIGKILL)
+    except ProcessLookupError:pass
+    try:os.waitpid(pid,os.WNOHANG)
+    except ChildProcessError:pass
+`,{timeout:15000})
+ console.log(output.trim())
+})
+test('actual direct PG child setsid transition is accepted once with both frames and never signals the old group',()=>{
+ const output=python(String.raw`
+from unittest import mock
+os.umask(0o077);enable_subreaper();root=proc(os.getpid());records=[]
+script="""import os,sys,signal,time,json
+r,w=os.pipe();pid=os.fork()
+if pid==0:
+ os.close(w);print(json.dumps({'ready':os.getpid()}),flush=True);assert os.read(r,1)==b's';os.setsid();print(json.dumps({'setsid':os.getpid()}),flush=True)
+ while True:time.sleep(.01)
+else:
+ os.close(r)
+ def done(sig,frame):
+  os.kill(pid,signal.SIGTERM);os.waitpid(pid,0);sys.exit(0)
+ signal.signal(signal.SIGINT,done)
+ for line in sys.stdin:
+  assert line.strip()=='setsid';os.write(w,b's')
+"""
+for mode in ['between-captures','inside-bracket']:
+ owned=OwnedGroups(sys.executable);children=[]
+ master,master_identity=spawn_registered(owned,children,'postgres',[sys.executable,'-B','-c',script],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True,start_new_session=True)
+ try:
+  child=json.loads(master.stdout.readline())['ready'];before=proc(child);assert before['parentPid']==master.pid and before['processGroupId']==master.pid
+  owned.capture_descendants(root);assert child in owned.pg_lineage and child not in owned.groups
+  def transition():
+   master.stdin.write('setsid\n');master.stdin.flush();assert json.loads(master.stdout.readline())=={'setsid':child}
+  if mode=='between-captures':transition();owned.capture_descendants(root)
+  else:
+   real_resolve=Path.resolve;triggered=[]
+   def exe(file,*args,**kwargs):
+    if file==Path('/proc',str(child),'exe') and not triggered:triggered.append(True);transition()
+    return real_resolve(file,*args,**kwargs)
+   with mock.patch.object(Path,'resolve',exe):owned.capture_descendants(root)
+   assert triggered==[True]
+  after=proc(child);assert after['processGroupId']==child
+  assert len(owned.pg_transitions)==1;event=owned.pg_transitions[0]
+  assert event['before']['processGroupId']==master.pid and event['after']['processGroupId']==child
+  assert all(event['before'][k]==event['after'][k] for k in ['pid','startTicks','parentPid'])
+  assert owned.pg_lineage[child]['identity']['processGroupId']==child and owned.groups[child]['role']=='postgres_child'
+  assert [r['pid'] for r in owned.verified_members(owned.groups[master.pid],process_table())[1]]==[master.pid]
+  owned.capture_descendants(root);assert len(owned.pg_transitions)==1
+  for bad in [{**after,'processGroupId':master.pid},{**after,'processGroupId':2147483001},{**after,'parentPid':root['pid'],'processGroupId':master.pid},{**after,'startTicks':'reused'}]:
+   try:owned.pg_identity(after,bad)
+   except AssertionError:pass
+   else:raise AssertionError('invalid later PG transition accepted')
+  with mock.patch('os.killpg') as group_signal:
+   owned.signal(signal.SIGTERM,True,roles={'postgres_child'});group_signal.assert_called_once_with(child,signal.SIGTERM)
+  result=reclaim_owned(owned,root,children,time.monotonic_ns()+3*10**9,True,grace_seconds=1)
+  assert result['passed'] and result['popenExits']=={'postgres':0}
+  records.append({'mode':mode,'transition':event,'noOldGroupSignal':True,'reclaim':result})
+ finally:
+  if master.poll() is None:
+   try:os.killpg(master.pid,signal.SIGKILL)
+   except ProcessLookupError:pass
+  master.wait(timeout=2);master.stdin.close();master.stdout.close()
+  if 'child' in globals():
+   try:os.kill(child,signal.SIGKILL)
+   except ProcessLookupError:pass
+   try:os.waitpid(child,os.WNOHANG)
+   except ChildProcessError:pass
+print(json.dumps({'realSetsidContracts':records}))
+`,{timeout:15000})
+ console.log(output.trim())
+})
+test('proved PG orphan adoption during the exe bracket retains exact parent exit proof and refuses a live old parent',()=>{
+ const output=python(String.raw`
+from unittest import mock
+os.umask(0o077);enable_subreaper();root=proc(os.getpid());owned=OwnedGroups(sys.executable);children=[]
+script="""import os,sys,signal,time,json
+pid=os.fork()
+if pid==0:
+ os.setsid();member=os.fork()
+ if member==0:
+  while True:time.sleep(.01)
+ print(json.dumps({'parent':os.getpid(),'member':member}),flush=True)
+ while True:time.sleep(.01)
+else:
+ for line in sys.stdin:
+  if line.strip()=='reap':print(json.dumps({'status':os.waitpid(pid,0)[1]}),flush=True)
+  elif line.strip()=='exit':break
+"""
+master,identity=spawn_registered(owned,children,'postgres',[sys.executable,'-B','-c',script],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True,start_new_session=True)
+try:
+ ids=json.loads(master.stdout.readline());parent,member=ids['parent'],ids['member'];owned.capture_descendants(root)
+ before=proc(member);assert before['parentPid']==parent and before['processGroupId']==parent
+ try:owned.pg_identity(before,{**before,'parentPid':root['pid']},adoption=True,adoptions=[])
+ except AssertionError as error:assert 'old-parent exit proof' in str(error)
+ else:raise AssertionError('live old parent was called an adoption')
+ real_resolve=Path.resolve;triggered=[]
+ def exe(file,*args,**kwargs):
+  if file==Path('/proc',str(member),'exe') and not triggered:
+   triggered.append(True);os.kill(parent,signal.SIGTERM);master.stdin.write('reap\n');master.stdin.flush();assert os.WIFSIGNALED(json.loads(master.stdout.readline())['status'])
+   assert not Path('/proc',str(parent)).exists() and proc(member)['parentPid']==root['pid']
+  return real_resolve(file,*args,**kwargs)
+ with mock.patch.object(Path,'resolve',exe):owned.capture_descendants(root)
+ assert triggered==[True];event=owned.pg_lineage[member]['adoption']
+ assert event['before']['parentPid']==parent and event['after']['parentPid']==root['pid']
+ assert all(event['before'][k]==event['after'][k] for k in ['pid','startTicks','processGroupId'])
+ assert event['oldParentIdentity']['pid']==parent and event['oldParentAfter'] is None and event['oldParentDisposition']=='ABSENT'
+ assert event['subreaperIdentity']['pid']==root['pid']
+ assert any(e['adoptions'] and e['before']['pid']==member for e in owned.identity_observations)
+ for bad in [{**proc(member),'parentPid':parent},{**proc(member),'parentPid':1}]:
+  rows=process_table();rows[member]=bad
+  try:owned.postgres_candidate(bad,rows)
   except AssertionError:pass
-  else:raise AssertionError('capture hid a live writer behind terminal PG role')
- assert following==[]
-print(json.dumps({'wrongExecutableDescendantRejectedDuringCapture':True,'unpinnedOutsideMemberRejectedDuringCapture':True,'auditNotReached':True}))
-`))
+  else:raise AssertionError('adopted member changed to an unapproved parent')
+ # This member has no group leader now; the original pinned pidfd path remains.
+ owned.signal(signal.SIGTERM,True,roles={'postgres_child'})
+ master.stdin.write('exit\n');master.stdin.flush();assert master.wait(timeout=2)==0
+ proof=reclaim_owned(owned,root,children,time.monotonic_ns()+3*10**9,True,grace_seconds=.1)
+ assert proof['passed'] and proof['members']==[],json.dumps({'proof':proof,'observations':owned.identity_observations})
+ assert any(e['pid']==member and e['method']=='PINNED_LEADERLESS_MEMBER_PIDFD' for e in owned.events)
+ print(json.dumps({'controlledAdoption':event,'liveParentRejected':True,'laterParentDriftRejected':True,'reclaim':proof}))
+finally:
+ if master.poll() is None:
+  try:os.killpg(master.pid,signal.SIGKILL)
+  except ProcessLookupError:pass
+ master.wait(timeout=2);master.stdin.close();master.stdout.close()
+ for pid in [parent,member] if 'member' in globals() else []:
+  try:os.kill(pid,signal.SIGKILL)
+  except ProcessLookupError:pass
+  try:os.waitpid(pid,os.WNOHANG)
+  except ChildProcessError:pass
+`,{timeout:15000})
+ console.log(output.trim())
+})
+test('direct PG exclusion entries reject an unproved same-group member without signalling or extra table scans',()=>{
+ const output=python(String.raw`
+from unittest import mock
+import copy
+os.umask(0o077);root=proc(os.getpid());owned=OwnedGroups(sys.executable);children=[]
+master,identity=spawn_registered(owned,children,'postgres',[sys.executable,'-B','-c','import time; time.sleep(10)'],stdin=subprocess.DEVNULL,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
+try:
+ owned.capture_descendants(root);actual=process_table()
+ foreign={**identity,'pid':2147483001,'startTicks':'foreign','parentPid':1};actual[foreign['pid']]=foreign;results=[]
+ for entry in ['members','signal']:
+  with mock.patch.dict(owned.members.__globals__,process_table=mock.Mock(side_effect=lambda:copy.deepcopy(actual))),mock.patch('os.killpg') as group_signal,mock.patch('os.pidfd_open') as pid_signal:
+   scan=owned.members.__globals__['process_table']
+   try:
+    if entry=='members':owned.members(False)
+    else:owned.signal(signal.SIGTERM,False)
+   except AssertionError as error:assert 'lineage proof' in str(error)
+   else:raise AssertionError('excluded unproved PG member: '+entry)
+   assert scan.call_count==1;group_signal.assert_not_called();pid_signal.assert_not_called()
+  event=owned.identity_observations[-1];assert event['disposition']=='REJECTED' and event['before']==foreign and event['after']['unavailableErrorType']=='FileNotFoundError'
+  results.append({'entry':entry,'singleScan':True,'rejection':event})
+ print(json.dumps({'directExclusionContracts':results}))
+finally:
+ master.kill();assert master.wait(timeout=2)==-signal.SIGKILL
+`,{timeout:10000})
+ console.log(output.trim())
+})

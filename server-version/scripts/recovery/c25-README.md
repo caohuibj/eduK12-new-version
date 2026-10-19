@@ -1196,3 +1196,17 @@ workload/worker/journal/final-audit conjunctions, actual orphan exit ownership,
 PostgreSQL-family isolation and the actual archive/material export boundary.
 They do not connect to a database, start a business service, or establish A/B
 performance, browser or selected-video qualification.
+
+C26 outer PG lifecycle preparation after failed A03 separates ownership from
+executable observability. A held postmaster Popen and bracketed exact process
+identities/parent chains prove every PG leader and nonleader. Only exe ENOENT
+becomes `NOT_OBSERVED_ENOENT`; readable mismatches, permission/parse failures,
+unknown ancestry and identity reuse still fail with retained rejection frames.
+An orphan needs previously recorded PG lineage. The single direct-postmaster-child
+PGID transition from the postmaster group to its own PID follows PostgreSQL 16.15
+`InitPostmasterChild`/`setsid`; both frames are retained and later drift is rejected.
+Signals retain exact current ownership, pidfd and empty-group tombstone checks.
+These are lifecycle-only contracts. Independent SQL/socket/proc measurement
+requirements are unchanged; unavailable measurements are not zero or a product
+failure. A03 did pass SQL readiness, but its killed baseline produced no logical
+baseline/final audit. No fourth runtime or performance result is implied here.
