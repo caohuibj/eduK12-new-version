@@ -7,6 +7,7 @@ import {createHash} from 'node:crypto'
 import {spawnSync} from 'node:child_process'
 import {fileURLToPath} from 'node:url'
 import {ARCHIVE_PYTHON as inheritedArchivePython} from './c25-analysis-resume-archive.mjs'
+import {STAGED_ARCHIVE_PYTHON} from './c25-c26-archive-budget.mjs'
 export const pythonProgram=`R={'__name__':'inherited_recovery_library'}\nexec(compile(${JSON.stringify(inheritedArchivePython)},'c25-analysis-resume-archive.mjs','exec'),R)\n`+String.raw`
 import argparse, fcntl, json, os, re, shutil, signal, socket, stat, subprocess, sys, time, traceback
 from pathlib import Path
@@ -34,6 +35,7 @@ FINAL_RECEIPT_SHA='7605c14677befe44709d66be4177a3e28944a79d49a40aade716073cdf2c2
 HISTORICAL_ROOTS=(FAILED_A01,FROZEN_A01.parent,Path('/tmp/c25-source-09'),Path('/tmp/c25-source-issuance-09'),Path('/tmp/c25-c26-recovery-01'),Path('/tmp/c25-c26-archive-launch-01'),Path('/tmp/c25-c26-runtime-launch-01'),*R['HISTORICAL_ROOTS'],Path('/tmp/c25-source-08'),R['OUTPUT'],Path('/tmp/c25-analysis-resume-runtime-launch-01'),Path('/tmp/c25-analysis-resume-archive-launch-01'),FINAL)
 NAMES={**R['NAMES'],'archive':'c25-c26-data.tar.gz','descriptor':'c25-c26-recovery-descriptor.json'}
 ENV=R['ENV']
+${STAGED_ARCHIVE_PYTHON}
 def producer_binding(tools,head):
     old=A['producer_binding'](tools,head)
     code="import {createHash} from 'node:crypto';import {pythonProgram} from "+json.dumps(PRODUCER.as_uri())+";process.stdout.write(createHash('sha256').update(pythonProgram).digest('hex'))"
@@ -133,6 +135,19 @@ def verify_recovery_descriptor(descriptor_path,expected_sha,tools,failure_state,
     assert nondata_manifest(SOURCE)==frozen and inventory(PRIOR)==prior and inventory(CORE)==core and historical_recovery_manifest()==historical
     assert receipt['frozenFailedA01Manifest']==value['frozenFailedA01Manifest']
     assert receipt['passed'] is True and receipt['scope']==SCOPE and receipt['archive']==value['archive'] and receipt['producer']==value['producer']
+    budget=receipt['budget'];assert budget['schemaVersion']==2 and budget['bounds']==staged_bounds(data)
+    for phase,key in [('COMPRESS','compressionAdmission'),('EXTRACT','extractionAdmission')]:
+        admission=budget[key]
+        assert admission==staged_admission(budget['bounds'],admission['observedResources'],phase,admission['metadataAllocatedBytes'],admission['compressedAlreadyOccupiesFreeSpace'])
+    compressed=budget['extractionAdmission']['compressedAlreadyOccupiesFreeSpace'];current_compressed=compressed_allocation(OUTPUT/NAMES['archive'])
+    assert {k:v for k,v in compressed.items() if k!='path'}=={k:v for k,v in current_compressed.items() if k!='path'}
+    assert receipt['evidenceAllocationBeforeFinalReceipts']['capBytes']==METADATA_CAP and receipt['evidenceAllocationBeforeFinalReceipts']['failureReserveBytes']==FAILURE_EVIDENCE_RESERVE
+    log_names=['archive.log','gzip-integrity.log','roundtrip-extract.log','restored-controldata.log'];assert len(receipt['steps'])==len(log_names)
+    for name,step in zip(log_names,receipt['steps']):
+        log=file_binding(OUTPUT/name);assert step['exitCode']==0 and log['bytes']<=LOG_CAP and log['sha256']==step['logSha256']
+    assert {p.name for p in OUTPUT.iterdir()}==set(NAMES.values())|set(log_names)
+    metadata=[file_binding(p) for p in OUTPUT.iterdir() if p.name!=NAMES['archive']]
+    assert DIRECTORY_CHARGE+sum(rounded_file_charge(p['bytes']) for p in metadata)<=METADATA_CAP
     assert receipt['acceptedSnapshotBindings']==SNAPSHOTS and receipt['logicalCountsObservedDuringArchive'] is False and receipt['acceptedEvidence']==value['acceptedEvidence']
     for key in ['roundTripVerified','sourceUnchangedDuringArchive','nonDataEvidencePreserved','priorContinuationEvidencePreserved','coreContinuationEvidencePreserved','historicalRecoveryMaterialsPreserved','rawSourceRetained','restoreMaterialFsynced']:
         assert value[key] is True and receipt[key] is True
@@ -153,7 +168,7 @@ def main():
     assert file_binding(PRODUCER)['sha256']==args.expected_producer_sha256
     output=output_path(args.output,args.descriptor)
     with (tools/'.measurement.lock').open('rb') as lock:
-        fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB);guard=ResourceGuard();steps=[];started=time.monotonic();created=False
+        fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB);guard=ResourceGuard();steps=[];started=time.monotonic();created=False;writer=None
         result={'scope':SCOPE,'passed':False,'servicesStarted':False,'durableBackup':False,'rawSourceRetained':True,'acceptedSnapshotBindings':SNAPSHOTS,'logicalCountsObservedDuringArchive':False}
         def interrupted(signum,_frame):raise TimeoutError(guard.error or ('archive signal '+str(signum)))
         previous={sig:signal.signal(sig,interrupted) for sig in [signal.SIGALRM,signal.SIGTERM,signal.SIGINT,signal.SIGHUP]};signal.setitimer(signal.ITIMER_REAL,600)
@@ -165,20 +180,28 @@ def main():
             full,data=frozen_failure_manifest(SOURCE),data_manifests(SOURCE);assert data_projection(full)==data
             lineage=assert_frozen_a01(full)
             frozen=nondata_manifest(SOURCE);assert [r for r in full if not A['mutable_path'](r['path'])]==frozen
-            prior,core,historical=inventory(PRIOR),inventory(CORE),historical_recovery_manifest();budget=recovery_budget(data,guard.check())
+            prior,core,historical=inventory(PRIOR),inventory(CORE),historical_recovery_manifest();bounds=staged_bounds(data)
+            budget={'schemaVersion':2,'bounds':bounds,'compressionAdmission':staged_admission(bounds,guard.check(),'COMPRESS'),'extractionAdmission':None}
+            result['budget']=budget
             output.mkdir(mode=0o700);created=True;fsync_directory(output.parent)
-            for name,value in [('fullSourceManifest',full),('dataManifest',data),('frozenSourceManifest',frozen),('priorContinuationManifest',prior),('coreContinuationManifest',core),('historicalRecoveryManifest',historical)]:sync_json(output/NAMES[name],value)
-            sync_bytes(output/NAMES['restoreInstructions'],restore_instructions().encode())
+            writer=C26EvidenceWriter(output)
+            for name,value in [('fullSourceManifest',full),('dataManifest',data),('frozenSourceManifest',frozen),('priorContinuationManifest',prior),('coreContinuationManifest',core),('historicalRecoveryManifest',historical)]:writer.json(output/NAMES[name],value)
+            writer.bytes(output/NAMES['restoreInstructions'],restore_instructions().encode())
             partial=output/'archive.part';archive=output/NAMES['archive'];restore=output/'verification-restore'
             def run(argv,name,seconds):
-                step=bounded(argv,output/(name+'.log'),seconds,guard.check);steps.append(step);return step
+                try:step=bounded_archive_pipe(argv,output/(name+'.log'),seconds,guard.check,writer,started+600)
+                except BaseException as error:
+                    if hasattr(error,'archive_step'):steps.append(error.archive_step)
+                    raise
+                steps.append(step);return step
             run(['/usr/bin/tar','--format=pax','--acls','--xattrs','--xattrs-include=*','--numeric-owner','--atime-preserve=system','-I','/usr/bin/gzip -6 -n','-cf',partial,'-C',SOURCE,*DATA_DIRS],'archive',300)
             assert file_binding(partial)['bytes']<=A['ARCHIVE_CAP']
             fd=os.open(partial,os.O_RDONLY|os.O_NOFOLLOW)
             try:os.fsync(fd)
             finally:os.close(fd)
             compressed_sha=sha_file(partial);run(['/usr/bin/gzip','-t',partial],'gzip-integrity',60);archive_members(partial,data,guard.check)
-            restore.mkdir(mode=0o700);run(['/usr/bin/tar','--acls','--xattrs','--xattrs-include=*','--same-owner','--same-permissions','-xzf',partial,'-C',restore],'roundtrip-extract',180)
+            compressed_pin,budget['extractionAdmission']=admit_extraction(partial,bounds,writer,guard.check,lambda:restore.mkdir(mode=0o700),compressed_sha,result)
+            run(['/usr/bin/tar','--acls','--xattrs','--xattrs-include=*','--same-owner','--same-permissions','-xzf',partial,'-C',restore],'roundtrip-extract',180)
             fsync_tree(restore);assert data_manifests(restore)==data
             run([tools/'postgresql/bin/pg_controldata','-D',restore/'pgdata'],'restored-controldata',10)
             assert sha_file(output/'restored-controldata.log')==stopped['pgControldataSha256']
@@ -186,21 +209,22 @@ def main():
             assert inventory(PRIOR)==prior and inventory(CORE)==core and historical_recovery_manifest()==historical
             assert validate_current()==accepted and stopped_current(tools)==stopped
             source.validate_descriptor(args.descriptor,args.expected_descriptor_sha256,tools/'postgresql/bin/pg_controldata')
-            assert file_binding(args.descriptor)==http03 and producer_binding(tools,args.expected_head)==producer and sha_file(partial)==compressed_sha
+            assert file_binding(args.descriptor)==http03 and producer_binding(tools,args.expected_head)==producer and compressed_allocation(partial)==compressed_pin
             guard.check();assert restore.parent==output and restore.name=='verification-restore' and private_directory(output)==output
             shutil.rmtree(restore);fsync_directory(output);assert not os.path.lexists(archive);os.rename(partial,archive);fsync_directory(output)
             archive_binding=file_binding(archive)
             result.update(passed=True,frozenFailedA01Manifest=lineage,acceptedEvidence=accepted,roundTripVerified=True,sourceUnchangedDuringArchive=True,nonDataEvidencePreserved=True,priorContinuationEvidencePreserved=True,coreContinuationEvidencePreserved=True,historicalRecoveryMaterialsPreserved=True,restoreMaterialFsynced=True,temporaryVerificationCopyRemoved=True,archive=archive_binding,manifestSha256=sha_file(output/NAMES['dataManifest']),sourceEvidenceSha256=sha_file(output/NAMES['frozenSourceManifest']),coreEvidenceSha256=sha_file(output/NAMES['coreContinuationManifest']),symlinkCount=0,hardlinkGroups=[],producer=producer,budget=budget,steps=steps,elapsedSeconds=time.monotonic()-started,minimumObserved=guard.minimum,comparedMetadata=['path','type','mode','uid','gid','mtime_ns','size','SHA256','all xattrs and ACLs','zero links'])
-            sync_json(output/NAMES['archiveReceipt'],result);fsync_directory(output)
+            result['evidenceAllocationBeforeFinalReceipts']=writer.summary()
+            writer.json(output/NAMES['archiveReceipt'],result);fsync_directory(output)
             value={'schemaVersion':1,'scope':SCOPE,'sourceRoot':str(SOURCE),'allowedMutableRoots':list(DATA_DIRS),'head':args.expected_head,'frozenFailedA01Manifest':lineage,'producer':producer,'acceptedEvidence':accepted,'acceptedSnapshotBindings':SNAPSHOTS,'logicalCountsObservedDuringArchive':False,'http03Descriptor':http03,'stoppedEvidence':stopped,'archive':archive_binding,'files':{name:file_binding(output/NAMES[name]) for name in set(NAMES)-{'archive','descriptor'}},**{name:result[name] for name in ['roundTripVerified','sourceUnchangedDuringArchive','nonDataEvidencePreserved','priorContinuationEvidencePreserved','coreContinuationEvidencePreserved','historicalRecoveryMaterialsPreserved','rawSourceRetained','restoreMaterialFsynced','servicesStarted','durableBackup']}}
-            guard.check();sync_json(output/NAMES['descriptor'],value);fsync_directory(output)
+            guard.check();writer.json(output/NAMES['descriptor'],value);fsync_directory(output);guard.check();assert time.monotonic()-started<600
             print(json.dumps({'passed':True,'descriptorPath':str(output/NAMES['descriptor']),'descriptorSha256':sha_file(output/NAMES['descriptor']),'archiveSha256':archive_binding['sha256']}),flush=True)
         except BaseException as error:
             for sig in previous:signal.signal(sig,signal.SIG_IGN)
             signal.setitimer(signal.ITIMER_REAL,0);guard.stop()
             if created and os.path.lexists(output/NAMES['descriptor']):os.rename(output/NAMES['descriptor'],output/'descriptor-unpublished.json')
             result.update(passed=False,errorType=type(error).__name__,error=str(error),steps=steps,minimumObserved=guard.minimum,elapsedSeconds=time.monotonic()-started)
-            if created:sync_json(output/'archive-failure-private.json',result);sync_bytes(output/'archive-failure-private.log',traceback.format_exc().encode());fsync_directory(output)
+            if created:writer.json(output/'archive-failure-private.json',result,failure=True);writer.bytes(output/'archive-failure-private.log',traceback.format_exc().encode(),failure=True);fsync_directory(output)
             raise
         finally:
             for sig in previous:signal.signal(sig,signal.SIG_IGN)
