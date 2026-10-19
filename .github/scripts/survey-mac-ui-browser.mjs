@@ -113,9 +113,12 @@ async function openResearch(width=1440,{recovery=false}={}){
  const exportPanel=v.page.getByRole('heading',{name:'匿名科研数据导出',exact:true}).locator('..');
  await exportPanel.waitFor({state:'visible'});
  assert.equal(await exportPanel.count(),1,'one heading-identified export panel');
- assert.equal(await exportPanel.getByLabel('波次',{exact:true}).count(),1,'one export wave selector');
- await exportPanel.getByLabel('数据格式',{exact:true}).selectOption('COGNITIVE_TRIAL_LONG');
- await exportPanel.getByLabel('波次',{exact:true}).selectOption(waveId);
+ assert.equal(await exportPanel.getByLabel(/^波次/).count(),1,'one export wave selector');
+ assert.equal(await exportPanel.getByLabel(/^数据格式/).count(),1,'one export format selector');
+ await exportPanel.getByLabel(/^数据格式/).selectOption('COGNITIVE_TRIAL_LONG');
+ await exportPanel.getByLabel(/^波次/).selectOption(waveId);
+ assert.equal(await exportPanel.getByLabel(/^数据格式/).inputValue(),'COGNITIVE_TRIAL_LONG');
+ assert.equal(await exportPanel.getByLabel(/^波次/).inputValue(),waveId);
  return v;
 }
 async function openRecovery(){
@@ -152,7 +155,7 @@ try{
  docker('run','-d','--name',container,'-p','127.0.0.1:443:443','-v',tls+':/ci-tls:ro','-v',tls+'/nginx.conf:/etc/nginx/conf.d/default.conf:ro',tag);
  browser=await ({chromium,webkit}[engine]).launch({headless:true});
  if(engine==='chromium')for(const width of [390,768,1440]){
-  let v=await scene('public',width);await v.page.goto(survey+'/');await v.page.getByRole('heading',{name:'风过有迹，细微可察。'}).waitFor();
+  let v=await scene('public',width);await v.page.goto(survey+'/');await v.page.getByRole('heading',{level:1,name:/^风过有迹，\s*细微可察。$/}).waitFor();
   await v.page.keyboard.press('Tab');assert.equal(await v.page.evaluate(()=>document.activeElement.textContent),'跳至主要内容');
   assert.notEqual(await v.page.evaluate(()=>getComputedStyle(document.activeElement).outlineStyle),'none');await checkLayout(v.page,'public',width);
   for(const path of ['/login','/reset-password','/claim']){await v.page.goto(survey+path);await v.page.getByLabel('密码',{exact:false}).first().waitFor();await checkLayout(v.page,path.slice(1),width);}

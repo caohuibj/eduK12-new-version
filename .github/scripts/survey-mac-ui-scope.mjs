@@ -73,6 +73,7 @@ export function surveyMacPlan(entries,base,head,env=process.env,io={}) {
   const selection=io.selection??JSON.parse(readFileSync(new URL('./survey-mac-ui-test-selection.json',import.meta.url),'utf8'));
   const tests=b.affectedFrontendTests?.map(f=>f.file)??[];
   if(selection.schema!==1||tests.length!==21||new Set(tests).size!==21||JSON.stringify(selection.frontendTests)!==JSON.stringify(tests)||!selection.requiredRecoveryCases?.length) return refuse('test selection');
+  if(!selection.frontendTestBlobs||Object.keys(selection.frontendTestBlobs).length!==21||b.affectedFrontendTests.some(t=>selection.frontendTestBlobs[t.file]!==t.blob)) return refuse('test selection input blobs');
   if(b.files.filter(f=>f.category==='test').some(f=>!tests.includes(f.path.replace('server-version/frontend/','')))) return refuse('changed test missing');
   for(const test of b.affectedFrontendTests) if(!/^src\/.+\.test\.tsx?$/.test(test.file)||get(head,'server-version/frontend/'+test.file)!==test.blob) return refuse('affected test input '+test.file);
   return {schema:1,route:'survey-mac-ui',base,head,sourceHead:source,reviewedHead:reviewed,tree:get(head),productHead:b.productHead,
@@ -82,7 +83,7 @@ export function validSurveyMacPlan(p) {
   const b=JSON.parse(readFileSync(new URL('./survey-mac-ui-bindings.json',import.meta.url),'utf8'));
   const keys=['.github','server-version/scripts/release','server-version/frontend',...Object.keys(b.externalFixtures)];
   return Boolean(p?.schema===1&&p.route==='survey-mac-ui'&&[p.base,p.head,p.sourceHead,p.reviewedHead,p.tree,p.productHead,p.frontendTree].every(sha)
-    &&p.sourceHead===p.reviewedHead&&JSON.stringify(p.changed)==='["frontend"]'&&p.changes?.length===322
+    &&p.sourceHead===p.reviewedHead&&JSON.stringify(p.changed)==='["frontend"]'&&p.changes?.length===324
     &&p.base===b.base&&p.productHead===b.productHead&&p.frontendTree===b.frontendTree
     &&p.frontendTests?.length===21&&JSON.stringify(p.frontendTests)===JSON.stringify(b.affectedFrontendTests.map(f=>f.file))
     &&p.inputs&&Object.keys(p.inputs).length===keys.length&&keys.every(k=>sha(p.inputs[k]))

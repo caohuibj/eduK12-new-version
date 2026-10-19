@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "base": "6aeba71d6cad70725d5164598f8dc854d11c1c89",
-  "productHead": "6a0393636aa9e833550ecd7e257d5957661d9fb0",
-  "frontendTree": "e075e96ae57028fc3de9ce9d77fa2187e0791be8",
+  "productHead": "71b7d9ed1e7a2981123518e73626f00d41016031",
+  "frontendTree": "06fc1b70e5df37d8e5be3c80d459c99c459b30ec",
   "files": [
     {
       "path": "docs/survey-mac-s01-20261019.md",
@@ -2570,6 +2570,15 @@
       "after": "e3fe0a826b70466a15ce17a5a7266ed6d36aba36"
     },
     {
+      "path": "server-version/frontend/src/survey/ResearchCatalog.test.tsx",
+      "category": "test",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3e9f3d737b49d6489f5a9466e3b62dfaa76cd1c6",
+      "after": "82d8bd235af0c065160fe360e3bfdcb12e6cb601"
+    },
+    {
       "path": "server-version/frontend/src/survey/ResearchIssueList.tsx",
       "category": "application",
       "status": "A",
@@ -2714,6 +2723,15 @@
       "after": "a82fc4c8278029f877f5e95da8cab6552e997e80"
     },
     {
+      "path": "server-version/frontend/src/survey/SurveyWorkspace.lifecycle.test.tsx",
+      "category": "test",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "429da79213ce47870ce271639a21b0517052d4a6",
+      "after": "b796cef35e29c6e48b388ecf121a8566b4b900be"
+    },
+    {
       "path": "server-version/frontend/src/survey/SurveyWorkspace.requests.test.tsx",
       "category": "test",
       "status": "M",
@@ -2841,7 +2859,7 @@
     },
     {
       "file": "src/survey/ResearchCatalog.test.tsx",
-      "blob": "3e9f3d737b49d6489f5a9466e3b62dfaa76cd1c6",
+      "blob": "82d8bd235af0c065160fe360e3bfdcb12e6cb601",
       "directImports": [
         "src/pages/admin/SurveyCatalogGrants.tsx",
         "src/survey/SurveyBuilder.tsx"
@@ -2951,7 +2969,7 @@
     },
     {
       "file": "src/survey/SurveyWorkspace.lifecycle.test.tsx",
-      "blob": "429da79213ce47870ce271639a21b0517052d4a6",
+      "blob": "b796cef35e29c6e48b388ecf121a8566b4b900be",
       "directImports": [
         "src/survey/SurveyBuilder.tsx",
         "src/survey/SurveyAnalyticsWorkspace.tsx"
@@ -2964,5 +2982,6 @@
         "src/survey/SurveyApp.tsx"
       ]
     }
-  ]
+  ],
+  "previousProductHead": "6a0393636aa9e833550ecd7e257d5957661d9fb0"
 }

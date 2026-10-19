@@ -40,7 +40,7 @@ test('full frozen inventory closes protected inputs, checkout/source/tree and al
   };
   const io={bindings:b,selection,object,diff:()=>full};
   const plan=surveyMacPlan(full,b.base,head,env,io);assert.ok(validSurveyMacPlan(plan));
-  assert.equal(plan.changes.length,322);assert.equal(Object.keys(plan.inputs).length,5);
+  assert.equal(plan.changes.length,324);assert.equal(Object.keys(plan.inputs).length,5);
   for(const path of [...Object.keys(b.protected),...Object.keys(b.externalFixtures)]) {
     const changed=(ref,file)=>ref===head&&file===path?other:object(ref,file);
     assert.throws(()=>surveyMacPlan(full,b.base,head,env,{...io,object:changed}),/product changed|protected input/);
@@ -98,12 +98,23 @@ test('browser fixture binds the export wave to its real heading panel and exact 
   assert.match(workspace,/<h3[^>]*>匿名科研数据导出<\/h3>/);
   assert.match(browser,/const exportPanel=v\.page\.getByRole\('heading',\{name:'匿名科研数据导出',exact:true\}\)\.locator\('\.\.'\)/);
   assert.match(browser,/await exportPanel\.waitFor\(\{state:'visible'\}\);\n assert\.equal\(await exportPanel\.count\(\),1/);
-  assert.match(browser,/exportPanel\.getByLabel\('波次',\{exact:true\}\)\.count\(\),1/);
-  assert.match(browser,/await exportPanel\.getByLabel\('波次',\{exact:true\}\)\.selectOption\(waveId\)/);
+  assert.match(browser,/exportPanel\.getByLabel\(\/\^波次\/\)\.count\(\),1/);
+  assert.match(browser,/exportPanel\.getByLabel\(\/\^数据格式\/\)\.count\(\),1/);
+  assert.match(browser,/await exportPanel\.getByLabel\(\/\^波次\/\)\.selectOption\(waveId\)/);
+  assert.match(browser,/await exportPanel\.getByLabel\(\/\^数据格式\/\)\.inputValue\(\),'COGNITIVE_TRIAL_LONG'/);
+  assert.match(browser,/await exportPanel\.getByLabel\(\/\^波次\/\)\.inputValue\(\),waveId/);
   assert.doesNotMatch(browser,/v\.page\.getByLabel\('波次'/);
   assert.match(studio,/surveyApi<Project>\(path\)/);
   assert.match(browser,/if\(key==='GET '\+prefix\)\{emptyBody\(method,body\);return response\(project\);\}/);
   assert.match(browser,/const project=\{id,title:'合成研究',description:'合成测试，不含真实被试',collectionMode:'SINGLE_UNLINKED',status:'DRAFT',revision:7\}/);
+});
+test('browser public heading matches the complete level-one name with only its block-span whitespace',()=>{
+  const browser=readFileSync(new URL('./survey-mac-ui-browser.mjs',import.meta.url),'utf8');
+  const landing=readFileSync(new URL('../../server-version/frontend/src/survey/SurveyLanding.tsx',import.meta.url),'utf8');
+  const css=readFileSync(new URL('../../server-version/frontend/src/survey/survey-landing.css',import.meta.url),'utf8');
+  assert.ok(landing.includes('<h1><span>风过有迹，</span><span>细微可察。</span></h1>'));
+  assert.match(css,/\.survey-landing-copy h1 span,[\s\S]*?display: block/);
+  assert.ok(browser.includes("getByRole('heading',{level:1,name:/^风过有迹，\\s*细微可察。$/})"));
 });
 test('browser initialization has exact admin capability DTO and scopes a whole-second clock to recovery only',()=>{
   const browser=readFileSync(new URL('./survey-mac-ui-browser.mjs',import.meta.url),'utf8');
