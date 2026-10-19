@@ -228,7 +228,12 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
       if(artifact.id!==ticket.id||artifact.format!==ticket.format||typeof artifact.csv!=='string'
         ||!artifact.codebook||typeof artifact.codebook!=='object'||!artifact.manifest||typeof artifact.manifest!=='object')
         throw new Error('导出回执与当前批次不一致或内容不完整')
-    }catch(e){throw new Error(label+' 内容获取失败，尚未发起本次文件下载。'+(e instanceof Error?e.message:'请重试原批次。'))}
+    }catch(e){
+      const reason=e instanceof TypeError||e instanceof SyntaxError
+        ?'未能读取服务器文件内容，请检查连接后重试此文件。'
+        :e instanceof Error?e.message:'请重试原批次。'
+      throw new Error(label+' 内容获取失败，尚未发起本次文件下载。'+reason)
+    }
     const batchLabel=String(ticket.pageNumber??1).padStart(3,'0')
     const baseName='survey_'+projectId.slice(0,8)+'_'+artifact.format.toLowerCase()
       +'_batch'+batchLabel+(isCompactAttendance(ticket)
