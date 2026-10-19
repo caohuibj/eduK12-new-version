@@ -64,6 +64,12 @@ const CheckinSubmit: React.FC = () => {
   const submitIdempotencyKeyRef = useRef<{ key: string; fingerprint: string } | null>(null)
   const submitInFlightRef = useRef(false)
   const previewCloseRef = useRef<HTMLButtonElement | null>(null)
+  const feedbackRef = useRef<HTMLDivElement>(null)
+  const imageInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (feedback?.kind === 'error' && isTrainingHost()) feedbackRef.current?.focus()
+  }, [feedback])
 
   useEffect(() => {
     if (checkinId) {
@@ -241,13 +247,15 @@ const CheckinSubmit: React.FC = () => {
 
 
       {feedback ? (
-        <ProductStatus
-          kind={feedback.kind}
-          title={feedback.kind === 'success' ? '操作已完成' : '操作未完成'}
-          announce={feedback.kind === 'success' ? 'polite' : 'assertive'}
-        >
-          {feedback.message}
-        </ProductStatus>
+        <div ref={feedbackRef} tabIndex={feedback.kind === 'error' && isTrainingHost() ? -1 : undefined} className="focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-action">
+          <ProductStatus
+            kind={feedback.kind}
+            title={feedback.kind === 'success' ? '操作已完成' : '操作未完成'}
+            announce={feedback.kind === 'success' ? 'polite' : 'assertive'}
+          >
+            {feedback.message}
+          </ProductStatus>
+        </div>
       ) : null}
 
       {/* Checkin Info */}
@@ -290,23 +298,24 @@ const CheckinSubmit: React.FC = () => {
             </h4>
             <div className="space-y-2">
               {checkin.documents.map((doc, index) => (
-                <div
+                <button
                   key={index}
+                  type="button"
                   onClick={() => {
                     setSelectedDocument(doc)
                     setShowPdfViewer(true)
                   }}
-                  className="flex items-center justify-between p-2 bg-white rounded cursor-pointer hover:bg-gray-100 transition-colors"
+                  className="w-full text-left flex items-center justify-between p-2 bg-white rounded cursor-pointer hover:bg-gray-100 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
                 >
-                  <div className="flex items-center space-x-2">
-                    <FileText className="w-4 h-4 text-red-500" />
+                  <span className="flex items-center space-x-2">
+                    <FileText className="w-4 h-4 text-red-500" aria-hidden="true" />
                     <span className="text-sm text-gray-700">{doc.title}</span>
                     {doc.fileName && (
                       <span className="text-xs text-gray-500">({doc.fileName})</span>
                     )}
-                  </div>
+                  </span>
                   <span className="text-xs text-action">点击查看</span>
-                </div>
+                </button>
               ))}
             </div>
             <p className="text-xs text-gray-500 mt-2">
@@ -473,10 +482,11 @@ const CheckinSubmit: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Content */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="checkin-content" className="block text-sm font-medium text-gray-700 mb-2">
                 打卡内容
               </label>
               <textarea
+                id="checkin-content"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 className="input min-h-[120px]"
@@ -487,9 +497,9 @@ const CheckinSubmit: React.FC = () => {
 
             {/* Images */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <p className="block text-sm font-medium text-gray-700 mb-2">
                 上传图片
-              </label>
+              </p>
               <div className="student-submit-image-grid grid grid-cols-4 gap-4">
                 {images.map((image, index) => {
                   const imageUrl = normalizeImageUrl(imageUrlFor(image))
@@ -504,6 +514,7 @@ const CheckinSubmit: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => removeImage(index)}
+                      aria-label={`移除打卡图片 ${index + 1}`}
                       className="student-submit-image-remove absolute top-1 right-1 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600"
                     >
                       ×
@@ -512,26 +523,36 @@ const CheckinSubmit: React.FC = () => {
                   )
                 })}
                 {images.length < 9 && (
-                  <label className="student-submit-image-add aspect-square rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-action hover:bg-action/5 transition-colors">
-                    {uploading ? (
-                      <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
-                    ) : (
-                      <>
-                        <Image className="w-6 h-6 text-gray-400 mb-1" />
-                        <span className="text-xs text-gray-500">添加图片</span>
-                      </>
-                    )}
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => imageInputRef.current?.click()}
+                      disabled={uploading}
+                      aria-label="添加图片"
+                      aria-describedby="checkin-images-help"
+                      className="student-submit-image-add aspect-square rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-action hover:bg-action/5 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
+                    >
+                      {uploading ? (
+                        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" aria-hidden="true" />
+                      ) : (
+                        <>
+                          <Image className="w-6 h-6 text-gray-400 mb-1" aria-hidden="true" />
+                          <span className="text-xs text-gray-500">添加图片</span>
+                        </>
+                      )}
+                    </button>
                     <input
+                      ref={imageInputRef}
                       type="file"
                       accept="image/*"
                       onChange={handleImageUpload}
                       className="hidden"
                       disabled={uploading}
                     />
-                  </label>
+                  </>
                 )}
               </div>
-              <p className="text-xs text-gray-500 mt-2">最多上传 9 张图片</p>
+              <p id="checkin-images-help" className="text-xs text-gray-500 mt-2">最多上传 9 张图片</p>
             </div>
 
             <button
