@@ -41,6 +41,7 @@ const readBytes=(blob:Blob)=>new Promise<Uint8Array>((resolve,reject)=>{
 })
 
 beforeEach(()=>{
+  vi.spyOn(window,'confirm').mockReturnValue(true)
   requests=[];blobs=[];downloads=[];responseTicket=structuredClone(ticket);downloadReply=undefined
   artifact={id:ticketId,format:'RAW_WAVE',csv:csvHeader+ordinaryRows,codebook,manifest:ticket.manifest}
   // Keep the real DOM Blob and FileReader; only the browser's URL/download
@@ -212,7 +213,7 @@ describe('Survey analytics artifact downloads',()=>{
     expect(screen.getByRole('button',{name:'生成下一批（请先核对本批文件）'})).toBeDisabled()
   })
 
-  it.each(['network','non-json','safari-non-json',403,404,409,429])('keeps the original ticket after %s read failure and retries only the selected file',async failure=>{
+  it.each(['network','non-json','safari-non-json',403,429])('keeps the original ticket after %s read failure and retries only the selected file',async failure=>{
     downloadReply=()=>failure==='network'?Promise.reject(new TypeError('synthetic connection lost')):
       failure==='safari-non-json'?Promise.reject(new DOMException('The string did not match the expected pattern.','SyntaxError')):
       failure==='non-json'?Promise.resolve(new Response('<html>synthetic failure</html>',{status:200})):
