@@ -7,7 +7,7 @@ import type { SituationalDraftAnswer, SituationalRunnerDefinition } from './type
 export function situationalHistoryIdentities(definition: SituationalRunnerDefinition, responses: Record<string, SituationalDraftAnswer>): Record<string, string> {
   if (definition.schemaVersion === 1) return {}
   const trajectory = deriveReachableTrajectory(definition, responses)
-  const ancestors: Array<[string, string | number | null, number]> = []
+  const ancestors: Array<[string, string | number | string[] | null, number]> = []
   const identities: Record<string, string> = {}
   for (const nodeKey of trajectory.nodeKeys) {
     const node = definition.flow.nodes.find(n => n.nodeKey === nodeKey)

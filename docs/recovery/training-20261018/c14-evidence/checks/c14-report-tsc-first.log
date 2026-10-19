@@ -1,0 +1,12 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+src/modules/assessment-core/weighted-variants.ts(149,11): error TS18048: 'index' is possibly 'undefined'.
+src/modules/assessment-core/weighted-variants.ts(150,7): error TS2322: Type 'number | undefined' is not assignable to type 'number'.
+  Type 'undefined' is not assignable to type 'number'.
+src/modules/assessment-core/weighted-variants.ts(152,32): error TS2538: Type 'undefined' cannot be used as an index type.
+src/modules/assessment-core/weighted-variants.ts(192,3): error TS2322: Type '{ label: string; weight: number; variantKey: string; units: { type: "FORM_SECTION" | "ITEM"; id: string; }[]; selectedItemIds: string[]; selectedSectionIds: string[]; } | undefined' is not assignable to type '{ label: string; weight: number; variantKey: string; units: { type: "FORM_SECTION" | "ITEM"; id: string; }[]; selectedItemIds: string[]; selectedSectionIds: string[]; }'.
+  Type 'undefined' is not assignable to type '{ label: string; weight: number; variantKey: string; units: { type: "FORM_SECTION" | "ITEM"; id: string; }[]; selectedItemIds: string[]; selectedSectionIds: string[]; }'.
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+npm notice To update run: npm install -g npm@12.2.0
+npm notice

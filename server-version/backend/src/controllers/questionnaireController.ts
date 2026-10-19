@@ -2476,7 +2476,7 @@ export const questionnaireController = {
         await tx.questionnaireAssessment.update({
           where: { id: created.id },
           data: {
-            frozenActiveSlotSetEncrypted: await storeFrozenActiveSlotSet(frozenActiveSlotSet),
+            frozenActiveSlotSetEncrypted: await storeFrozenActiveSlotSet(frozenActiveSlotSet, tx),
             frozenActiveSlotSetHash: frozenActiveSlotSet.snapshotHash,
           },
         })

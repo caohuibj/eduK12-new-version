@@ -1,0 +1,179 @@
+{
+  "kind": "C19 development checkpoint02 evidence, limited not qualification",
+  "members": [
+    {
+      "name": "tmp-c19-flow-final-guards.log.gz",
+      "rawSha256": "68fd9c04b1faaf73530f021b584b609968fd47d00b22cc9496368a1154a90406",
+      "rawBytes": 260,
+      "gzipSha256": "8c29031cae69e415307511e45f6905351ce540aa41bbb3f96f7667d59690db80",
+      "gzipBytes": 216
+    },
+    {
+      "name": "tmp-c19-flow-final-inputs.sha256.gz",
+      "rawSha256": "b0696ceffc5ffb25d3d64442e13a92c649e05eb0e5765b44ba296c2a5fc7e50f",
+      "rawBytes": 991,
+      "gzipSha256": "88d2dc6dcd6de462ab4c60fa24af483edb8fc9ccb17aacc17baa9b84899eda38",
+      "gzipBytes": 510
+    },
+    {
+      "name": "tmp-c19-flow-final-new.log.gz",
+      "rawSha256": "f5db368304b6ba19e0c6bd0a7af1e0d6c46531f23488f99ac7a2dd30fa314437",
+      "rawBytes": 260,
+      "gzipSha256": "01067a2f171ad7f4869d3bafe49958b5ea28798bd642580ca6aced10ef0d41b5",
+      "gzipBytes": 214
+    },
+    {
+      "name": "tmp-c19-flow-final-related.log.gz",
+      "rawSha256": "83ebf7a24663435f6a49d30007b1540d7c77ea9284e2048857b6d7c155f8f125",
+      "rawBytes": 260,
+      "gzipSha256": "a26dd62485c4f91421138c2255ddea55b6e637c932e60dd02f5f6c05eb8746b1",
+      "gzipBytes": 216
+    },
+    {
+      "name": "5a77e8bdc1ae-c19-tsc-04.log.gz",
+      "rawSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytes": 0,
+      "gzipSha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+      "gzipBytes": 20
+    },
+    {
+      "name": "c19-frontend-final-result.sha256.gz",
+      "rawSha256": "52922716d192414756b0b6544e5b460ebc200ca5a417a58a5731defbd8aa6873",
+      "rawBytes": 1537,
+      "gzipSha256": "1d3e76342832816812fbdbdb0d1165e8c9072f992f7b35004d2784c2b41a8d3a",
+      "gzipBytes": 525
+    },
+    {
+      "name": "c19-frontend-final-source.sha256.gz",
+      "rawSha256": "643902b0e8b910f1d4d47a753e8f5dbbda4d5fbe3b0c78c40267d9b8b6e304bc",
+      "rawBytes": 1675,
+      "gzipSha256": "3e831ffb1f0923b370ecdc6905fc4fb60abd2a668e82ba383c1d4fcb7fc776e7",
+      "gzipBytes": 726
+    },
+    {
+      "name": "c19-frontend-input01.sha256.gz",
+      "rawSha256": "8e0845aa188b8bed4c12769db5942ab2e7bc9222c5dbaddd9c30d612bd12fc4f",
+      "rawBytes": 1963,
+      "gzipSha256": "15fd492d54fd30cad646de400bfd28d2b28d607940845543b6d539161850f3fe",
+      "gzipBytes": 990
+    },
+    {
+      "name": "c19-frontend-lint01-input.sha256.gz",
+      "rawSha256": "c1bfa180b4bc7212bd9f78e197ac4662a61bc02fa19f236d89a9433de83c8e59",
+      "rawBytes": 1470,
+      "gzipSha256": "502eb154db3a9e32a5efb5cb4c13dd154eb83e9c175bb5b6e2f401deb0e94463",
+      "gzipBytes": 746
+    },
+    {
+      "name": "c19-frontend-lint01.log.gz",
+      "rawSha256": "f5b460ee723bbfe837da3c8039dc0d71b2f36bdc6bf013c5e922c655c44650a1",
+      "rawBytes": 829,
+      "gzipSha256": "46f92248016bcc91fdf08c5950f70899edf34e9ce1794aa3585a50856cee0428",
+      "gzipBytes": 393
+    },
+    {
+      "name": "c19-frontend-result01.sha256.gz",
+      "rawSha256": "7bb48528bc4044aadedfc59102733cea0cb196d6744d7e6fb9e9aa9cbf30bb32",
+      "rawBytes": 303,
+      "gzipSha256": "d6438aa5851325c9c854db7d2c48bc3eabd0536c9f54de45cf5126ad6fddb192",
+      "gzipBytes": 192
+    },
+    {
+      "name": "c19-frontend-summary.json.gz",
+      "rawSha256": "02ca110cd95ff5dccff57b69244ea111db5fa0d1c74548817d5afa8d9d2d2c47",
+      "rawBytes": 1564,
+      "gzipSha256": "46d9e133a4b69e2221721e9b8a5edc842e82f6fe8d6bb70d7be6a2a7c7930122",
+      "gzipBytes": 720
+    },
+    {
+      "name": "c19-frontend-tests01.log.gz",
+      "rawSha256": "ffa7038e22583c3b206dd24fb6c27937fdbbe98e5d2567b6b114287284e203f3",
+      "rawBytes": 266,
+      "gzipSha256": "43b1e4f6c21aa52d19f3bf83e6a201c95bcb0339ed34aabdc033e7c219ada46e",
+      "gzipBytes": 217
+    },
+    {
+      "name": "c19-frontend-types01-input.sha256.gz",
+      "rawSha256": "99f802437a46d9baf6d9d1b5e4b3ea201954dd15aac3665c4974654e6d2b05c7",
+      "rawBytes": 100744,
+      "gzipSha256": "46b8a2e7cc74d7615f1edc21895da0535becb75a6dc2940839cdd2e73ebf5386",
+      "gzipBytes": 44196
+    },
+    {
+      "name": "c19-frontend-types01.log.gz",
+      "rawSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytes": 0,
+      "gzipSha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+      "gzipBytes": 20
+    },
+    {
+      "name": "c19-frontend-types02-input.sha256.gz",
+      "rawSha256": "97c273b591b39d2c2c64feae87642fdb31c76173ae178639d162ff3a62a58897",
+      "rawBytes": 100744,
+      "gzipSha256": "9f55209f5b22667f9a472be28dcd47a06ef276eaaaeaf9982c8df6437eefbfa5",
+      "gzipBytes": 44197
+    },
+    {
+      "name": "c19-frontend-types02.log.gz",
+      "rawSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytes": 0,
+      "gzipSha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+      "gzipBytes": 20
+    },
+    {
+      "name": "c19-path-proof-consumers01.log.gz",
+      "rawSha256": "31f02b0c3152e4e7d0b24682dbf3597fe8a3fb2766c121de4672438277973e65",
+      "rawBytes": 20295,
+      "gzipSha256": "f91e5c5bf5ffabd34c2b75af3043347b21740ea1084d58ba702b1439bfa40b2e",
+      "gzipBytes": 2179
+    },
+    {
+      "name": "c19-path-proof-consumers02.log.gz",
+      "rawSha256": "de2efb240b7ceee6148b71cd860dacc4303cb51364d181a1780be1d940dc7d09",
+      "rawBytes": 261,
+      "gzipSha256": "1eb8448595d71f67814e9f78c092bb729832c95aa7e6fa0a09c7693a410ee342",
+      "gzipBytes": 215
+    },
+    {
+      "name": "c19-path-proof-input01.sha256.gz",
+      "rawSha256": "25da8d05672287cf8ce2684e5de428c1d7ecd1bcaa51adcb7752da40405b1ff0",
+      "rawBytes": 725,
+      "gzipSha256": "d276ee4cc61341cc771891e974ba6d7da8ae2b28542f449619ac7cd2ed328c8d",
+      "gzipBytes": 410
+    },
+    {
+      "name": "c19-path-proof-input03.sha256.gz",
+      "rawSha256": "521d866aa1448610ec81d1ae431e219cba38f2ac090fdc8b8a9a337b2a0a364b",
+      "rawBytes": 589,
+      "gzipSha256": "1c7c9b10c989d60ceaed0e63f7ce79e2403b5eee845bc57a4b69f25793b9bb61",
+      "gzipBytes": 356
+    },
+    {
+      "name": "c19-path-proof-tests01.log.gz",
+      "rawSha256": "68146109bcc13e13b0b567d8dc44df2dbad0ffec5e6c77f29c1f05a6e205b516",
+      "rawBytes": 4379,
+      "gzipSha256": "54f30ea9b5640eb6454b2664620bd83f1228d1ec11d98788ffef68a6288cd79d",
+      "gzipBytes": 1060
+    },
+    {
+      "name": "c19-path-proof-tests02.log.gz",
+      "rawSha256": "ef11751e000669364edf4f6584771433c2fb522f85d3223d8fc9077de8cd4327",
+      "rawBytes": 261,
+      "gzipSha256": "ecdcb08712d7b9dd628c364de890329c814e0d6ee270a5c2c25af2a5f6c0f0e2",
+      "gzipBytes": 216
+    },
+    {
+      "name": "c19-path-proof-tests03.log.gz",
+      "rawSha256": "138945d55d41b0dcc0aa147bbbe0218721d74ccee1eb8841e387e3ba6e1f22a5",
+      "rawBytes": 261,
+      "gzipSha256": "bc174484fc79ce5a4c4e17b0644c0c753fdab3bf2ba9f66bbaa2dd842a61480d",
+      "gzipBytes": 216
+    }
+  ],
+  "note": "Earlier failed runs preserved. Consumer01 has 18 fixture failures; explicit nullable markers corrected then consumers02 46 passed. Selected runtime changed after tsc04; later build required. Frontend types02 appended report type only; do not count repeated test cases.",
+  "archive": {
+    "file": "checkpoint02-development.tar.gz",
+    "sha256": "e98f9d485cf2b54670f013a0e4bc6c8688c0da8ca74b60998552d3c8baba7b6e",
+    "bytes": 102398
+  }
+}

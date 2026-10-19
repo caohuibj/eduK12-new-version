@@ -1,0 +1,26 @@
+[
+  {
+    "file": "runtime01-c18-upgrade-result.json.gz",
+    "sourceSha256": "f30ee89d74cc88c2b318fe59d4092a947f882a50e5f45ba521c1e9fd48046fea",
+    "gzipSha256": "d5d443d7bda424b15ad8620ada97b64fecb0d2c5571b3dea9439a95b26ebd3e0",
+    "bytes": 563
+  },
+  {
+    "file": "runtime01-c18-upgrade.log.gz",
+    "sourceSha256": "4522eaa8cf5ceefd9f98898f1fe4bc30e38941e84b9674e1a902b69e7882f5b1",
+    "gzipSha256": "64ad76e518de5c70af796f54ebc74c8cda4cc522aa843a685e59eea5b29c2cc7",
+    "bytes": 555
+  },
+  {
+    "file": "metadata-diagnostic01-result.json.gz",
+    "sourceSha256": "68d0e003ce26d3a5d4e7d6310a98c967a5356061db76c3859ba12c8932c930b0",
+    "gzipSha256": "2dcb08297b1298a5d43db5b6dfc5876be9f66ddbb407ace2caedd408cdf74277",
+    "bytes": 1716
+  },
+  {
+    "file": "metadata-diagnostic01-column-differences.json.gz",
+    "sourceSha256": "8227ac1e9be46557539ed28e5b6888f1356c652a55c5115866f4252ad1c5469e",
+    "gzipSha256": "7bb805a409fa6f2db98fd8cb9871a4c190e0b472daec680a5701541920c63162",
+    "bytes": 12469
+  }
+]

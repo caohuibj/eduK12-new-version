@@ -1,0 +1,18 @@
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/eduk12_c09_timing_worktree/server-version/backend
+
+
+ Test Files  3 passed (3)
+      Tests  11 passed (11)
+   Start at  18:56:52
+   Duration  1.11s (transform 1.34s, setup 0ms, import 2.08s, tests 26ms, environment 0ms)
+
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/eduk12_c09_timing_worktree/server-version/frontend
+
+
+ Test Files  2 passed (2)
+      Tests  7 passed (7)
+   Start at  18:57:25
+   Duration  3.12s (transform 303ms, setup 233ms, import 478ms, tests 2.13s, environment 681ms)
+

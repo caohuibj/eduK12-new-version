@@ -1,0 +1,23 @@
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/backend
+
+ ❯ src/__tests__/questionnaire/training-variant-authoring.test.ts (17 tests | 1 failed | 16 skipped) 11ms
+     × remaps whole sections and global stable Form condition keys without replacing labels 9ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/questionnaire/training-variant-authoring.test.ts > weighted definition-only copying > remaps whole sections and global stable Form condition keys without replacing labels
+InstrumentFinalSubmitError: 表单定义无效：选择题至少需要两项有效选项
+ ❯ invalid src/modules/assessment-runtime/typed-form.ts:16:53
+
+ ❯ typedCompositeFormQuestion src/modules/assessment-runtime/typed-form.ts:25:88
+ ❯ prisma.$transaction.timeout src/modules/questionnaire-product/service.ts:480:42
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 16 skipped (17)
+   Start at  20:40:58
+   Duration  2.26s (transform 1.56s, setup 0ms, import 2.10s, tests 11ms, environment 0ms)
+

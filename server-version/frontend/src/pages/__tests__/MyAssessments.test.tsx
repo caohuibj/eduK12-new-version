@@ -57,3 +57,13 @@ describe('My Assessments', () => {
     expect(screen.queryByRole('button', { name: '开始测评' })).not.toBeInTheDocument()
   })
 })
+
+
+it('shows an unsatisfied course submission as saved with its report, not a launch', async () => {
+  mocks.get.mockResolvedValue({ code: 0, data: { list: [{ taskId: 'course:q', sourceType: 'COURSE', title: '课程问卷', state: 'SUBMITTED_NOT_SATISFIED', launchTarget: null, reportTarget: '/student/composite/attempts/a/report', resultAvailability: 'REPORT' }], pendingCount: 0, truncated: false } })
+  render(<MemoryRouter><MyAssessments /></MemoryRouter>)
+  expect(await screen.findByText('已交卷，任务未达成')).toBeInTheDocument()
+  expect(screen.getByRole('link', { name: '我的报告' })).toHaveAttribute('href', '/student/composite/attempts/a/report')
+  expect(screen.queryByRole('link', { name: '进入测评' })).not.toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: '开始测评' })).not.toBeInTheDocument()
+})

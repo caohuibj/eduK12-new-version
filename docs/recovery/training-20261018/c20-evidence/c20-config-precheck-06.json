@@ -1,0 +1,88 @@
+{
+  "passed": true,
+  "positiveConfigurationCount": 14,
+  "sources": {
+    "c20-materials-fixture.mjs": "72227469a12aa8c4ab311e12b7871b11fd937ad8b0eccba31bf0fe20e087803a",
+    "c20-materials-consumers.mjs": "359718e691705637676aaa658cfa0576f709097e5d5e8baa51bcafa25be10b28",
+    "c20-materials-consumer-cost.mjs": "4553b78e77817532493ee496ad7d58f233c0c75cc4d3db5b531c2be5a9b56376",
+    "c20-materials-cost.mjs": "a32fd5dff13524ca1d53d65f9f0bd0d474e0d57753ce24d245c2915189fdbf54",
+    "c20-materials-revocation.mjs": "e2f58ddcdfa6dfb234dbb9507ba9bd9f01d7df254b79d5220caaf97f4b6130ed"
+  },
+  "scope": "PURE_CONFIG_PREPARATION_ONLY_NOT_FUNCTIONAL_QUALIFICATION",
+  "positiveConfigurations": [
+    {
+      "label": "actual mainConfig",
+      "groups": 2,
+      "configurationSha256": "8fcac6fd6c56b6b892c5de93ae10edadc8d7a5bfa39469649e93951faa7bbc64"
+    },
+    {
+      "label": "actual helper publish",
+      "groups": 2,
+      "configurationSha256": "b734be1b5c70897c6fc50936bd53c9a7bcf0a3b3132165436e29e10a82a30fc1"
+    },
+    {
+      "label": "actual helper publish",
+      "groups": 2,
+      "configurationSha256": "4aac606a3d5a884dcba7b2f44dcf0fb506fb95d265e837690944270f9f03c498"
+    },
+    {
+      "label": "actual helper publish",
+      "groups": 2,
+      "configurationSha256": "3d806349ad72ffcf59f96eb8764fd0b8b60aaecb75b4ebb2fa5c3bdc41d6571a"
+    },
+    {
+      "label": "actual helper publish",
+      "groups": 2,
+      "configurationSha256": "a2cc6f4efd9f06641d2a6f3a8e9c9b577ccd1c54720a185203a7e19e457e9eda"
+    },
+    {
+      "label": "actual helper publish",
+      "groups": 2,
+      "configurationSha256": "5b0f005647bc6c38476a3c61cd3fbad009ebc8413454cbb99099f20780981bd3"
+    },
+    {
+      "label": "actual helper publish",
+      "groups": 2,
+      "configurationSha256": "0a3cf9ea1b4f9cfa70321737b331dee34c2f9d7788ddcc0d0624c622129f6302"
+    },
+    {
+      "label": "actual helper publish",
+      "groups": 2,
+      "configurationSha256": "7e5d842517843a5739524303ece57f2ff4a262ef5ca6831013da60e51074a3dc"
+    },
+    {
+      "label": "actual helper publish",
+      "groups": 2,
+      "configurationSha256": "b0bb6531b08e19797155c63f5dde83b41cc02f7cb6a1de9b6ea08b2566285b99"
+    },
+    {
+      "label": "c20-materials-consumers.mjs",
+      "groups": 2,
+      "configurationSha256": "593942e03c9f338574e91e3fc3a6ed68c2e3c825c30956e046a5b512e9047c63"
+    },
+    {
+      "label": "c20-materials-consumer-cost.mjs",
+      "groups": 2,
+      "configurationSha256": "bbde0d66beefa5361217e201e0465a867211d7fbf23421caf2aa31a42e290f9a"
+    },
+    {
+      "label": "actual revocation config",
+      "groups": 2,
+      "configurationSha256": "d9e732cf96d85b874cbfa037859268b6e4249c238751db770d9036f1b1f0a0e1"
+    },
+    {
+      "label": "actual 2-vs-8 cost 2",
+      "groups": 2,
+      "configurationSha256": "00d633dcf02c486e2c3bc4053a329318ca11c148af3a470cb6c0d97e6d56c76e"
+    },
+    {
+      "label": "actual 2-vs-8 cost 8",
+      "groups": 8,
+      "configurationSha256": "0dcb4dcabcbde3dad4c989f5d420f91dd2c75b27ebe0865c055e6cb7a5b9f36f"
+    }
+  ],
+  "negativeCases": [
+    "uppercase group key",
+    "one group"
+  ]
+}

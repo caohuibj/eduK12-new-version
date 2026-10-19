@@ -59,10 +59,15 @@ const questionnaireRow = (id: string, birthYearMonth: string, sexAtBirth?: strin
 
 const compositeRow = (id: string, birthYearMonth: string) => ({
   id,
+  trainingFlowSnapshotEncrypted: null, trainingFlowSnapshotHash: null,
+  trainingFlowPathEncrypted: null, trainingFlowPathHash: null,
+  trainingVariantAllocationEncrypted: null, trainingVariantAllocationHash: null,
   contextSnapshotEncrypted: null as string | null,
   contextSnapshotHash: null as string | null,
   contextFrozenAt: null as Date | null,
   compositeAssessment: {
+    trainingFlowDraft: null, trainingFlowFrozen: null, trainingFlowDigest: null,
+    trainingVariantDraft: null, trainingVariantFrozen: null, trainingVariantDigest: null,
     items: contextItems.map((item) => ({
       id: item.id,
       type: 'FORM',

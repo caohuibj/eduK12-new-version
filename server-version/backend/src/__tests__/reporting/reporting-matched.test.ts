@@ -159,3 +159,40 @@ describe('matched longitudinal reporting', () => {
     expect(() => selectMatchedMetricCases({ waves: [w1, w2], rule: metricRule })).toThrow()
   })
 })
+
+it('keeps the existing organizational wrapper serialized output byte-compatible after extracting the neutral kernel', () => {
+  const w1 = wave({ id: 'w1', ordinal: 1, resolved: Array.from({ length: 5 }, (_, i) => result(`a${i}`, `u${i}`, `m${i}`, i)) })
+  const w2 = wave({ id: 'w2', ordinal: 2, resolved: Array.from({ length: 5 }, (_, i) => result(`b${i}`, `u${i}`, `n${i}`, i + 2)) })
+  expect(JSON.stringify(buildMatchedLongitudinalProjection({ waves: [w2, w1], spec: spec(5), mode: 'PAIRWISE' }))).toBe(JSON.stringify({
+    schemaVersion: 1, kind: 'MATCHED_LONGITUDINAL', mode: 'PAIRWISE', state: 'present', waveIds: ['w1', 'w2'], matchedEligibleN: 5,
+    metrics: { score: { state: 'present', countKind: 'PAIRED_VALID', validCaseN: 5,
+      waveMeans: [{ waveId: 'w1', waveKey: 'W1', mean: 2 }, { waveId: 'w2', waveKey: 'W2', mean: 4 }],
+      comparisons: [{ fromWaveId: 'w1', toWaveId: 'w2', comparability: { schemaVersion: 1, metricId: 'score', level: 'EXACT',
+        allowedOperations: ['SIDE_BY_SIDE', 'DESCRIPTIVE_TREND', 'NUMERIC_DELTA'], evidenceRef: 'spec:same-protocol', evidenceHash: 'e'.repeat(64), limitations: [] }, delta: 2 }],
+    } }, evidence: { level: 'PILOT', limitations: [] },
+  }))
+})
+
+it('preserves the old organizational metric-resolution scope outside the matched population', () => {
+  const unmatched = result('outside', 'unmatched-user', 'outside-membership', 1)
+  unmatched.metrics.push({ ...unmatched.metrics[0] })
+  const w1 = wave({ id: 'w1', ordinal: 1, resolved: [unmatched, ...Array.from({ length: 5 }, (_, i) => result(`a${i}`, `u${i}`, `m${i}`, i))] })
+  const w2 = wave({ id: 'w2', ordinal: 2, resolved: Array.from({ length: 5 }, (_, i) => result(`b${i}`, `u${i}`, `n${i}`, i + 2)) })
+  expect(buildMatchedLongitudinalProjection({ waves: [w1, w2], spec: spec(5), mode: 'PAIRWISE' }).metrics?.score.validCaseN).toBe(5)
+})
+
+it('preserves organizational short-circuiting before malformed metrics in a later Wave', () => {
+  const earlyMissing = result('a-missing', 'u5', 'm5', null)
+  const laterDuplicate = result('b-duplicate', 'u5', 'n5', 7)
+  laterDuplicate.metrics.push({ ...laterDuplicate.metrics[0] })
+  const w1 = wave({ id: 'w1', ordinal: 1, resolved: [...Array.from({ length: 5 }, (_, i) => result(`a${i}`, `u${i}`, `m${i}`, i)), earlyMissing] })
+  const w2 = wave({ id: 'w2', ordinal: 2, resolved: [...Array.from({ length: 5 }, (_, i) => result(`b${i}`, `u${i}`, `n${i}`, i + 2)), laterDuplicate] })
+  expect(selectMatchedMetricCases({ waves: [w2, w1], rule: metricRule })).toMatchObject({ matchedEligibleN: 6, cases: expect.any(Array) })
+  expect(selectMatchedMetricCases({ waves: [w2, w1], rule: metricRule }).cases).toHaveLength(5)
+  expect(buildMatchedLongitudinalProjection({ waves: [w2, w1], spec: spec(5), mode: 'PAIRWISE' }).metrics?.score).toMatchObject({
+    state: 'present', validCaseN: 5, waveMeans: [{ mean: 2 }, { mean: 4 }], comparisons: [{ delta: 2 }],
+  })
+  // Once the first Wave is eligible, the duplicate later metric still rejects.
+  earlyMissing.metrics.push({ key: 'score', value: 5, resultQuality: 'interpretable', metricQuality: null })
+  expect(() => selectMatchedMetricCases({ waves: [w1, w2], rule: metricRule })).toThrow('ambiguous')
+})

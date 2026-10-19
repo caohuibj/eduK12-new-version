@@ -1,3 +1,4 @@
+import { validateSjtOnlineMetadata, type SjtOnlineMetadata } from './authoring/online'
 import { scoreSituationalModel, assertSituationalScorerAvailable } from './situation-model-resolver'
 import type { SituationDefinitionV1, DefinitionIssue } from './situation-definition'
 import type { SituationDefinitionV2 } from './situation-branching'
@@ -19,6 +20,8 @@ import {
   type SituationalGoldenCase,
 } from './situation-scoring'
 interface SituationPackageBase {
+  /** Explicit author protocol; absent on every legacy package. */
+  online?: SjtOnlineMetadata
   key: string
   instrumentVersion: string
   releaseStatus: 'DRAFT' | 'PUBLISHED' | 'RETIRED'
@@ -85,6 +88,14 @@ export const validateSituationPackage = (situationPackage: SituationPackage): Si
     forPublish: false,
   })
   const issues = [...identityIssues, ...validation.issues]
+  if (situationPackage.online) {
+    try {
+      if (situationPackage.definition.schemaVersion !== 2) throw new Error('Online SJT requires definition v2')
+      validateSjtOnlineMetadata(situationPackage.online, situationPackage.definition)
+    } catch (error) {
+      issues.push({ path: 'online', message: error instanceof Error ? error.message : 'Online SJT metadata mismatch', severity: 'error' })
+    }
+  }
   try { assertSituationalScorerAvailable(asLinearSituationDefinition(situationPackage.definition)) } catch (error) { issues.push({ path: 'scoring.model', message: String(error), severity: 'error' }) }
 
   // Product presentation contract: non-text stimuli require a textual fallback

@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "run": "HTTP05",
+  "passed": false,
+  "phase": "UNAUDITED_REVIEW_COMMIT_PROMISE_ASSERTION",
+  "error": "Missing expected rejection despite Prisma transaction failed to commit log",
+  "qualifiedChecks": [
+    "Original Redis queue + dist export consumer + authenticated status/download produce all four tools with exact long/wide/dictionary CSV and ZIP from one frozen sample; full status/task satisfaction preserved"
+  ],
+  "qualityRace": {
+    "actualPgWaiters": 2,
+    "lock": "courses row FOR UPDATE",
+    "concurrentRequests": 2
+  },
+  "exports": [
+    {
+      "layout": "long",
+      "format": "csv",
+      "bytes": 567818,
+      "sha256": "1c8caaeab0a283493f968fd700f6945983c872aac2bb76561eaa7d71ec144f54"
+    },
+    {
+      "layout": "wide",
+      "format": "csv",
+      "bytes": 392164,
+      "sha256": "a30d0e4a37fa2655d975ca0e538e779e820e7d08b8822c48fc3120e36f5269b2"
+    },
+    {
+      "layout": "dictionary",
+      "format": "csv",
+      "bytes": 5412,
+      "sha256": "8d05c5cfacc6927a28e1a83ce317c54a60e0d903cb8eba65c4f976b064da38db"
+    },
+    {
+      "layout": "long",
+      "format": "zip",
+      "bytes": 968440,
+      "sha256": "d9e5b81e5462fce5db16dd447649aa29964df0615a1c5f611cf302ecce3beda8"
+    }
+  ],
+  "requestCount": 23,
+  "sourceHead": "9b813b6c375801dbc37a8f8a2162024dce0b0df7",
+  "sourceInputsSha256": "3804a892c5acb85a3fd3b4c656639fe9282fc051e1931a77efb1d3ea6d8e397f",
+  "runtimeFingerprint": {
+    "schemaVersion": 1,
+    "nodeVersion": "v24.21.0",
+    "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+    "dist": {
+      "files": 5105,
+      "sha256": "11e91f3a0dd1b467fba824369a272b63fb13593db61131986ba91fb1ad2686da"
+    },
+    "files": {
+      "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+      "prisma/schema.prisma": "55271313c6a9bc1ac763111c3c6c25ab2417c0cce95d5a50e500e71e6d4a28ba",
+      "node_modules/.prisma/client/schema.prisma": "7ebcda72219cb93bb112ecffddc8655f72007fc490bc4c06b256d999b687bf77",
+      "node_modules/.prisma/client/index.js": "47ed6e52ffedd95a414bf7d762bb48857f08cfb4feb3f84bc875cf5e1caa96b7"
+    },
+    "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+  },
+  "processExits": {
+    "postgres": 0,
+    "redis": 0,
+    "api": 0,
+    "c16-http": 1
+  },
+  "invariants": {
+    "cleanupVerified": true,
+    "sourceUnchanged": true,
+    "resumeSourceUnchanged": true,
+    "inputsUnchanged": true
+  },
+  "privateEvidenceSha256": {
+    "c16-runtime-result.json": "e9208f50dc726d55b992458b742c658fb3a1ae21cbb09086b71d408df63de9e5",
+    "c16-http-result.json": "9cce4fcd7d4dc6c3c1a9ab659fe0fbf0b6bdecdbf8a077dbd01e0247527c36dc",
+    "c16-http.log": "9455ee4519254cea8ab3262532c55ba8655206f286f2c73b163980c612866dbe",
+    "c16-fixture-private.json": "71f379c8ae156390a288d9239347f1df474bf21d76188741b53e8b2627ed1029",
+    "current-source-inputs.json": "079260290f07c224e1410a23560f69c35c4371e5b44d37bc69a9e2ff8a4ac91b"
+  },
+  "diagnostic": {
+    "scope": "Actual Prisma and independent restricted psql on exact stopped HTTP05 isolated PG copy; original never started or written",
+    "observation": {
+      "passed": true,
+      "originalHttp05StoredRevision": 1,
+      "originalHttp05AuditRows": 1,
+      "originalReasonMatchesSuccessfulCAS": true,
+      "repeatPrismaPromiseResolved": true,
+      "repeatPrismaError": null,
+      "independentReadRole": "eduk12_runtime",
+      "beforeSha256": "c48bc07f835d4ad10afda5e5d404886665bc0b3a244225aae486aad1f582d2ec",
+      "afterSha256": "c48bc07f835d4ad10afda5e5d404886665bc0b3a244225aae486aad1f582d2ec",
+      "databaseMutationRolledBack": true
+    },
+    "processExit": 0,
+    "serviceExits": {
+      "postgres": 0,
+      "redis": 0
+    },
+    "privateEvidenceSha256": {
+      "commit.cjs": "a07785956289dafc21f5d037576b48d608d5b0358937daeea92bded697d93c80",
+      "commit.log": "ba9112be9f9f25cfad0aaa675922dd4d2d77be01d482da0d65b01701f81f5f43",
+      "commit-result.json": "f5117bcd201008070aca81982a9c1de9ed8110af10b407525dcba7edeb969f03",
+      "input-binding.json": "2291b0b2ba214d957dfb1950cc982c55857b5fae786dc7b710745e6550c3802b",
+      "commit-observation.json": "2c53aafcc16541930cb57f82bbe49702b2a8f1571a8aa8a5b7d9a81d99fc32a5",
+      "review-audit-before-private.json": "c48bc07f835d4ad10afda5e5d404886665bc0b3a244225aae486aad1f582d2ec",
+      "review-audit-after-private.json": "c48bc07f835d4ad10afda5e5d404886665bc0b3a244225aae486aad1f582d2ec"
+    }
+  },
+  "continuation": "Preserve qualified export bytes/column consistency and CAS. Restore existing pending durable intent/READY zip, start at failed mutation evidence; changed immediate-audit-fence quality write gets its own affected CAS; no numerical/export replay"
+}

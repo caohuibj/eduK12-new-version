@@ -1,0 +1,21 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: POST /composite-assessments/attempts/8f7802b7-9dea-403a-9f59-7cd3ef51cad5/form-sections/34f2e25b-0f0f-47f1-8a99-197aa40402f5/submit: {"code":-1,"message":"Required; Required; Required; Required; Required; Required; Required; Required; Required; Required; Required; Required; Required; Required","data":null}
+
+400 !== 200
+
+    at Object.request (file:///workspace/scratch/5a77e8bdc1ae/eduk12_c07_export_worktree/server-version/scripts/recovery/c07-export-smoke.mjs:25:10)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async create (file:///workspace/scratch/5a77e8bdc1ae/eduk12_c07_export_worktree/server-version/scripts/recovery/c07-export-smoke.mjs:55:2)
+    at async file:///workspace/scratch/5a77e8bdc1ae/eduk12_c07_export_worktree/server-version/scripts/recovery/c07-export-smoke.mjs:104:11 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 400,
+  expected: 200,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.21.0

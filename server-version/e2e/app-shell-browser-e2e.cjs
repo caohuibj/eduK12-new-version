@@ -138,11 +138,21 @@ async function main() {
       cases.push({ publicCredentialAndMissingLink: true, passed: true }); await context.close()
     }
     {
-      const { context, page } = await setup(browser, { cognitive: false })
-      await gotoRoute(page, `${base}/student/cognitive/history`)
+      const { context, page, state } = await setup(browser, { cognitive: false })
+      // C10 disables new entry while preserving authenticated historical deep links.
+      await gotoRoute(page, `${base}/student/cognitive`)
       await page.getByText('认知测评暂不可用', { exact: true }).waitFor()
       assert.equal(await (await openNav(page)).getByRole('link', { name: '认知测评', exact: true }).count(), 0)
-      cases.push({ disabledCapability: true, passed: true }); await context.close()
+      await page.screenshot({ path: path.join(output, 'disabled-cognitive-home.png'), fullPage: true })
+      await gotoRoute(page, `${base}/student/cognitive/history`)
+      await page.getByRole('heading', { name: '认知测评历史', exact: true }).waitFor()
+      await page.getByText('暂无已完成的认知测评', { exact: true }).waitFor()
+      assert(state.requests.some((req) => req.pathname === '/api/cognitive/history' && req.method === 'GET'))
+      assert.equal(await (await openNav(page)).getByRole('link', { name: '认知测评', exact: true }).count(), 0)
+      assert.equal(state.requests.some((req) => req.method !== 'GET'), false)
+      assert.deepEqual(state.errors, [])
+      await page.screenshot({ path: path.join(output, 'disabled-cognitive-history.png'), fullPage: true })
+      cases.push({ disabledCapability: true, historicalDeepLink: true, passed: true }); await context.close()
     }
     {
       const { context, page, state } = await setup(browser)

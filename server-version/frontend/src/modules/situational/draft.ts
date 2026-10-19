@@ -1,3 +1,4 @@
+import { onlineAnswerComplete } from './online'
 import { invalidateChangedSituationalHistory } from './history'
 import {
   createFinalDraftMeta,
@@ -39,7 +40,7 @@ export const sceneIsComplete = (
 ): boolean => {
   const scene = reachableSituationalScenes(definition, responses)[sceneIndex]
   return Boolean(scene && scene.channels.every((channel) => (
-    channel.required === false
+    channel.online ? onlineAnswerComplete(channel,responses[responseKey(scene.sceneKey, channel.channelKey)]) : channel.required === false
     || responses[responseKey(scene.sceneKey, channel.channelKey)] !== undefined
   )))
 }
@@ -49,7 +50,7 @@ export const firstMissingSceneIndex = (
   responses: Record<string, SituationalDraftAnswer>,
 ): number => reachableSituationalScenes(definition, responses).findIndex((scene) => (
   scene.channels.some((channel) => (
-    channel.required !== false
+    channel.online ? !onlineAnswerComplete(channel,responses[responseKey(scene.sceneKey, channel.channelKey)]) : channel.required !== false
     && responses[responseKey(scene.sceneKey, channel.channelKey)] === undefined
   ))
 ))
@@ -167,9 +168,10 @@ export const readSituationalDraft = async (
   answers.forEach((answer) => {
     if (!answer.value || typeof answer.value !== 'object') return
     const value = answer.value as Partial<SituationalDraftAnswer>
-    if (typeof value.responseValue !== 'string' && typeof value.responseValue !== 'number') return
+    if (typeof value.responseValue !== 'string' && typeof value.responseValue !== 'number' && !(Array.isArray(value.responseValue) && value.responseValue.every(v=>typeof v==='string'))) return
     result[answer.itemKey] = {
       responseValue: value.responseValue,
+      ...(value.status ? {status:value.status} : {}),
       ...(typeof value.responseTimeMs === 'number' ? { responseTimeMs: value.responseTimeMs } : {}),
       ...(typeof value.answeredAt === 'string' ? { answeredAt: value.answeredAt } : {}),
       ...(typeof value.responseRevision === 'number' ? { responseRevision: value.responseRevision } : {}),

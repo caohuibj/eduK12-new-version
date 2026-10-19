@@ -1,0 +1,87 @@
+{
+  "scope": "C19 real initial candidate and first Form FINAL/replay passed; next Scale admission failed. Central authorization projection six cases and tsc passed; exact test-only rename continuity recorded separately from original input=false.",
+  "members": [
+    {
+      "name": "eduk12_c19_http_04-c19-main-admission-result.json.gz",
+      "rawSha256": "275f1eac67789552d2f04cb96fba0a8bbce8d3f77e2242292031eba3fab12747",
+      "rawBytes": 10716,
+      "gzipSha256": "634e9ea811ff805b2cde3bf77dce12a08dff2898dc7a25dfddf992c95a17c6ed",
+      "gzipBytes": 2100
+    },
+    {
+      "name": "eduk12_c19_http_04-c19-runtime-result.json.gz",
+      "rawSha256": "2cb8fea2807b6d974a892b292ea38342e9e05781554c444ef7443dbf759f5dc6",
+      "rawBytes": 26569,
+      "gzipSha256": "2039d2b75a7a114ac5c3b888749bad6fdb2f100b652660e537b088df370a4e14",
+      "gzipBytes": 4672
+    },
+    {
+      "name": "eduk12_c19_http_04-frozen-inputs.json.gz",
+      "rawSha256": "082f7a10921fcaf3eb4f65570138f97a8303af397c70e4687e1ccc12b4869078",
+      "rawBytes": 351308,
+      "gzipSha256": "3a9d4d4320fd372a26cf776789aae46f073ec64c5a4b729e4d142c9206208406",
+      "gzipBytes": 84727
+    },
+    {
+      "name": "eduk12_c19_http_04-c19-main-admission.log.gz",
+      "rawSha256": "6873d92ee7a708361a7a063aeac28651cd2c8967cd190846fab4849948c76b36",
+      "rawBytes": 977,
+      "gzipSha256": "3633d1f9be5288970cab2c2dc4827908e5a115c742832a1670d2cd1e1a0ebd44",
+      "gzipBytes": 666
+    },
+    {
+      "name": "c19-build06-dist.json.gz",
+      "rawSha256": "61ceaa9efbb9a2c255cdc163fe9ee64da22e145c247622828c28d195c2c9f5db",
+      "rawBytes": 896817,
+      "gzipSha256": "eb0c041c656086071b525b02f4946e03e344cf3054e1f4dc8a2d81c7a2ba3e36",
+      "gzipBytes": 243833
+    },
+    {
+      "name": "c19-build06-input.json.gz",
+      "rawSha256": "e1f4454f655e31423c9dd65c1545f1162eae55f128f79cf6e2edc99eca07dada",
+      "rawBytes": 422014,
+      "gzipSha256": "e7175afd4ac55fd117b257ebd83a913ed02dabeb47f2544ad1e8e634a4e04ce6",
+      "gzipBytes": 127290
+    },
+    {
+      "name": "c19-build06-rename-continuity.json.gz",
+      "rawSha256": "eb8d91244d3859bd2e9e3d34124c60f272f83a009c4fdfbe03e70140a382c55d",
+      "rawBytes": 1155,
+      "gzipSha256": "8bec8f29929dc31dfa5f822b70add65a9cfad9695c6251482db94af80c797fbf",
+      "gzipBytes": 661
+    },
+    {
+      "name": "c19-build06-result.json.gz",
+      "rawSha256": "619064cc8f0d662440b6553847ba645d357d93feb61185cc18cde9309b9b8052",
+      "rawBytes": 1122,
+      "gzipSha256": "24317a0e6aa97057320fb183bf1dd785c8a2f75f62b05a0bd4671531463276ab",
+      "gzipBytes": 505
+    },
+    {
+      "name": "c19-build06-scale-authorization-tests.log.gz",
+      "rawSha256": "213683670fe9dcda192bcbd5cbdce624f6613dccc7734f46565f01e8b3cc91fe",
+      "rawBytes": 258,
+      "gzipSha256": "0e0325969eb56d37dca9f870049283dff612679c5f38f10b3795350220dc88b6",
+      "gzipBytes": 211
+    },
+    {
+      "name": "c19-build06-tsc.log.gz",
+      "rawSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytes": 0,
+      "gzipSha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+      "gzipBytes": 20
+    },
+    {
+      "name": "c19-build06-producer.py.gz",
+      "rawSha256": "f89967ac096701aa814fc099e71237ccd5debe8e5194ec052a6a107d7f38fb72",
+      "rawBytes": 2205,
+      "gzipSha256": "0b1c3fcd9f37d049c8cff1bced88aff4a1268ce370d6d1235545e8a328c36b64",
+      "gzipBytes": 1025
+    }
+  ],
+  "archive": {
+    "name": "checkpoint08-failed-state04.tar.gz",
+    "sha256": "0187630538430cd04771d279b2662125a12637d88f3feb4706bda058e5336c79",
+    "bytes": 466686
+  }
+}

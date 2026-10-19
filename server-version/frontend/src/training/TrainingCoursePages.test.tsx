@@ -39,6 +39,7 @@ beforeEach(() => {
     if (url === '/courses/course-1/training-assessments') return Promise.resolve({ code: 0, data: { list: [
       { key: 'questionnaire:q-1', id: 'q-1', name: '学习状态', kind: 'QUESTIONNAIRE', typeLabel: '课程问卷', unitCount: 2, unitLabel: '单元', manageHref: '/questionnaire-products/q-1' },
       { key: 'scale:s-1', id: 's-1', name: '积极应对量表', kind: 'SCALE', typeLabel: '课程量表', unitCount: 12, unitLabel: '道题目', manageHref: '/scales/s-1' },
+      { key: 'cognitive:c-1', id: 'c-1', name: '已发布认知历史', kind: 'COGNITIVE', typeLabel: '认知测评', unitCount: 1, unitLabel: '个任务', manageHref: '/cognitive-assignments/c-1' },
       { key: 'bundle:b-1', id: 'b-1', name: '学习综合测评包', kind: 'ASSESSMENT_BUNDLE', typeLabel: '固定测评包', unitCount: 3, unitLabel: '个测评单元', manageHref: '/bundle-products/b-1' },
     ] } })
     throw new Error('unexpected url ' + url)
@@ -112,8 +113,23 @@ describe('course-first training workspaces', () => {
     fireEvent.click(screen.getByRole('button', { name: '测评' }))
     expect(await screen.findByText('积极应对量表')).toBeInTheDocument()
     expect(screen.getByText('学习综合测评包')).toBeInTheDocument()
-    expect(screen.getAllByRole('link', { name: /管理测评/ }).map(link => link.getAttribute('href'))).toEqual(['/questionnaire-products/q-1', '/scales/s-1', '/bundle-products/b-1'])
+    expect(screen.getAllByRole('link', { name: /管理测评/ }).map(link => link.getAttribute('href'))).toEqual(['/questionnaire-products/q-1', '/scales/s-1', '/cognitive-assignments/c-1', '/bundle-products/b-1'])
     expect(get).toHaveBeenCalledWith('/courses/course-1/training-assessments')
+  })
+
+  it('loads authorized analysis sources only when the trainer opens its data-analysis tab', async () => {
+    const original = get.getMockImplementation()!
+    get.mockImplementation((url: string) => url === '/courses/course-1/training-analysis/sources'
+      ? Promise.resolve({ code: 0, data: { list: [], total: 0, canQuality: false, canExport: false } })
+      : original(url))
+    mount('/courses/course-1/detail', '/courses/:courseId/detail', TrainingTrainerCourse)
+    await screen.findByRole('heading', { name: course.title })
+    expect(get).not.toHaveBeenCalledWith('/courses/course-1/training-analysis/sources')
+    fireEvent.click(screen.getByRole('button', { name: '数据分析' }))
+    expect(await screen.findByText(/当前没有可分析的授权数值来源/)).toBeVisible()
+    expect(get).toHaveBeenCalledWith('/courses/course-1/training-analysis/sources')
+    fireEvent.click(screen.getByRole('button', { name: '作业' }))
+    expect(screen.getByRole('link', { name: /发布作业/ })).toHaveAttribute('href', '/assignments?create=true&courseId=course-1')
   })
 
   it('keeps course code operations in a low-frequency settings section with explicit confirmation', async () => {

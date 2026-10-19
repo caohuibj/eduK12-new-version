@@ -1,0 +1,1602 @@
+{
+  "passed": true,
+  "checks": [],
+  "phase": "all",
+  "sourceHead": "313fe6779b52dd8dce86e12e181ce37dc03fe94a",
+  "runtimeFingerprint": {
+    "schemaVersion": 1,
+    "nodeVersion": "v24.21.0",
+    "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+    "dist": {
+      "files": 4989,
+      "sha256": "10f0d1f94eb2404afd0f23b366146d32d3f80a9202990eac2e88d23a2ec894e5"
+    },
+    "files": {
+      "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+      "prisma/schema.prisma": "33e2a793329c331f3ee5813bc21811688f9aae1e70aaffc44d9341ad4a9fc6fb",
+      "node_modules/.prisma/client/schema.prisma": "3786095e6b9a5477273b36a1842ca7b144daa23aa33fccb0fb3da2c95a16d822",
+      "node_modules/.prisma/client/index.js": "e052f2456ab221af57ad9d4c8d2f34ff931fbceecf03b2a01f6b41b6ed9021f2"
+    },
+    "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+  },
+  "harnessSha256": "32f760668f4c3f24ad1c350b8ade9b1556195645c95840d9fdb9d7ef2a0cd1ce",
+  "http": {
+    "passed": true,
+    "requests": 217,
+    "checks": [
+      "GENERAL, LEGACY_COURSE and ambiguous anonymous course timing rejected",
+      "{\"whole\":false,\"anonymous\":false,\"enabled\":true,\"missing\":false} authoring/frozen source/FINAL/replay/missing/report/CSV/ZIP/revocation",
+      "{\"whole\":true,\"anonymous\":true,\"enabled\":true,\"missing\":false} authoring/frozen source/FINAL/replay/missing/report/CSV/ZIP/revocation",
+      "{\"whole\":true,\"anonymous\":false,\"enabled\":true,\"missing\":true} authoring/frozen source/FINAL/replay/missing/report/CSV/ZIP/revocation",
+      "{\"whole\":false,\"anonymous\":false,\"enabled\":false,\"missing\":true} authoring/frozen source/FINAL/replay/missing/report/CSV/ZIP/revocation"
+    ],
+    "observations": [
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 102,
+        "durationMs": 29
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 119,
+        "responseBytes": 289,
+        "durationMs": 106
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 102,
+        "durationMs": 2
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 119,
+        "responseBytes": 289,
+        "durationMs": 81
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 102,
+        "durationMs": 2
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 119,
+        "responseBytes": 289,
+        "durationMs": 80
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 92,
+        "responseBytes": 1688,
+        "durationMs": 14
+      },
+      {
+        "method": "PUT",
+        "status": 200,
+        "requestBytes": 1521,
+        "responseBytes": 2080,
+        "durationMs": 11
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 48,
+        "responseBytes": 2079,
+        "durationMs": 10
+      },
+      {
+        "method": "POST",
+        "status": 400,
+        "requestBytes": 146,
+        "responseBytes": 79,
+        "durationMs": 8
+      },
+      {
+        "method": "POST",
+        "status": 400,
+        "requestBytes": 183,
+        "responseBytes": 97,
+        "durationMs": 8
+      },
+      {
+        "method": "POST",
+        "status": 400,
+        "requestBytes": 282,
+        "responseBytes": 100,
+        "durationMs": 15
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 205,
+        "responseBytes": 1355,
+        "durationMs": 27
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 103,
+        "responseBytes": 1755,
+        "durationMs": 33
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 14,
+        "responseBytes": 495,
+        "durationMs": 16
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 14,
+        "responseBytes": 1781,
+        "durationMs": 34
+      },
+      {
+        "method": "POST",
+        "status": 403,
+        "requestBytes": 29,
+        "responseBytes": 66,
+        "durationMs": 7
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 2,
+        "responseBytes": 2328,
+        "durationMs": 48
+      },
+      {
+        "method": "POST",
+        "status": 400,
+        "requestBytes": 439,
+        "responseBytes": 105,
+        "durationMs": 11
+      },
+      {
+        "method": "POST",
+        "status": 400,
+        "requestBytes": 291,
+        "responseBytes": 72,
+        "durationMs": 5
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 435,
+        "responseBytes": 243,
+        "durationMs": 35
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 435,
+        "responseBytes": 245,
+        "durationMs": 10
+      },
+      {
+        "method": "POST",
+        "status": 409,
+        "requestBytes": 435,
+        "responseBytes": 103,
+        "durationMs": 8
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 380,
+        "durationMs": 7
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 398,
+        "durationMs": 8
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 1721,
+        "durationMs": 9
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 1721,
+        "durationMs": 9
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 35,
+        "responseBytes": 490,
+        "durationMs": 19
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 8
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 11
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 10
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 10
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 446,
+        "durationMs": 11
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 587,
+        "durationMs": 11
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 29,
+        "responseBytes": 1780,
+        "durationMs": 25
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 2197,
+        "durationMs": 9
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 35,
+        "responseBytes": 490,
+        "durationMs": 14
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 8
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 9
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 10
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 9
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 446,
+        "durationMs": 24
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 809,
+        "durationMs": 25
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 30,
+        "responseBytes": 1781,
+        "durationMs": 25
+      },
+      {
+        "method": "GET",
+        "status": 404,
+        "requestBytes": 0,
+        "responseBytes": 51,
+        "durationMs": 8
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 1721,
+        "durationMs": 9
+      },
+      {
+        "method": "POST",
+        "status": 409,
+        "requestBytes": 29,
+        "responseBytes": 87,
+        "durationMs": 6
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 29,
+        "responseBytes": 1780,
+        "durationMs": 22
+      },
+      {
+        "method": "GET",
+        "status": 404,
+        "requestBytes": 0,
+        "responseBytes": 51,
+        "durationMs": 7
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 35,
+        "responseBytes": 490,
+        "durationMs": 12
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 6
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 9
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 9
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 8
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 446,
+        "durationMs": 10
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 9497,
+        "durationMs": 8
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 30,
+        "responseBytes": 1781,
+        "durationMs": 23
+      },
+      {
+        "method": "GET",
+        "status": 404,
+        "requestBytes": 0,
+        "responseBytes": 51,
+        "durationMs": 6
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 1721,
+        "durationMs": 9
+      },
+      {
+        "method": "POST",
+        "status": 409,
+        "requestBytes": 29,
+        "responseBytes": 87,
+        "durationMs": 6
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 29,
+        "responseBytes": 1780,
+        "durationMs": 19
+      },
+      {
+        "method": "GET",
+        "status": 404,
+        "requestBytes": 0,
+        "responseBytes": 51,
+        "durationMs": 6
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 243,
+        "responseBytes": 1376,
+        "durationMs": 23
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 103,
+        "responseBytes": 1776,
+        "durationMs": 24
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 14,
+        "responseBytes": 495,
+        "durationMs": 13
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 14,
+        "responseBytes": 1802,
+        "durationMs": 28
+      },
+      {
+        "method": "POST",
+        "status": 403,
+        "requestBytes": 29,
+        "responseBytes": 66,
+        "durationMs": 5
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 52,
+        "responseBytes": 208,
+        "durationMs": 6
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 2,
+        "responseBytes": 2399,
+        "durationMs": 32
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 1363,
+        "durationMs": 12
+      },
+      {
+        "method": "POST",
+        "status": 400,
+        "requestBytes": 580,
+        "responseBytes": 105,
+        "durationMs": 6
+      },
+      {
+        "method": "POST",
+        "status": 400,
+        "requestBytes": 432,
+        "responseBytes": 72,
+        "durationMs": 2
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 576,
+        "responseBytes": 508,
+        "durationMs": 11
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 576,
+        "responseBytes": 507,
+        "durationMs": 4
+      },
+      {
+        "method": "POST",
+        "status": 409,
+        "requestBytes": 576,
+        "responseBytes": 99,
+        "durationMs": 3
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 451,
+        "durationMs": 4
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 451,
+        "durationMs": 5
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 469,
+        "durationMs": 6
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 1732,
+        "durationMs": 4
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 1732,
+        "durationMs": 7
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 35,
+        "responseBytes": 490,
+        "durationMs": 13
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 6
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 9
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 11
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 8
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 446,
+        "durationMs": 11
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 591,
+        "durationMs": 9
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 29,
+        "responseBytes": 1801,
+        "durationMs": 22
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 2208,
+        "durationMs": 9
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 35,
+        "responseBytes": 490,
+        "durationMs": 15
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 7
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 9
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 9
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 8
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 446,
+        "durationMs": 10
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 813,
+        "durationMs": 8
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 30,
+        "responseBytes": 1802,
+        "durationMs": 21
+      },
+      {
+        "method": "GET",
+        "status": 404,
+        "requestBytes": 0,
+        "responseBytes": 51,
+        "durationMs": 6
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 1732,
+        "durationMs": 7
+      },
+      {
+        "method": "POST",
+        "status": 409,
+        "requestBytes": 29,
+        "responseBytes": 87,
+        "durationMs": 6
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 29,
+        "responseBytes": 1801,
+        "durationMs": 21
+      },
+      {
+        "method": "GET",
+        "status": 404,
+        "requestBytes": 0,
+        "responseBytes": 51,
+        "durationMs": 6
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 35,
+        "responseBytes": 490,
+        "durationMs": 13
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 8
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 11
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 8
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 8
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 446,
+        "durationMs": 10
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 9505,
+        "durationMs": 8
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 30,
+        "responseBytes": 1802,
+        "durationMs": 21
+      },
+      {
+        "method": "GET",
+        "status": 404,
+        "requestBytes": 0,
+        "responseBytes": 51,
+        "durationMs": 6
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 1732,
+        "durationMs": 7
+      },
+      {
+        "method": "POST",
+        "status": 409,
+        "requestBytes": 29,
+        "responseBytes": 87,
+        "durationMs": 8
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 29,
+        "responseBytes": 1801,
+        "durationMs": 21
+      },
+      {
+        "method": "GET",
+        "status": 404,
+        "requestBytes": 0,
+        "responseBytes": 51,
+        "durationMs": 6
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 205,
+        "responseBytes": 1355,
+        "durationMs": 18
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 103,
+        "responseBytes": 1755,
+        "durationMs": 31
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 14,
+        "responseBytes": 495,
+        "durationMs": 11
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 14,
+        "responseBytes": 1781,
+        "durationMs": 26
+      },
+      {
+        "method": "POST",
+        "status": 403,
+        "requestBytes": 29,
+        "responseBytes": 66,
+        "durationMs": 6
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 2,
+        "responseBytes": 2328,
+        "durationMs": 28
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 1363,
+        "durationMs": 8
+      },
+      {
+        "method": "POST",
+        "status": 400,
+        "requestBytes": 580,
+        "responseBytes": 105,
+        "durationMs": 5
+      },
+      {
+        "method": "POST",
+        "status": 400,
+        "requestBytes": 432,
+        "responseBytes": 72,
+        "durationMs": 20
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 401,
+        "responseBytes": 508,
+        "durationMs": 9
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 401,
+        "responseBytes": 507,
+        "durationMs": 4
+      },
+      {
+        "method": "POST",
+        "status": 409,
+        "requestBytes": 401,
+        "responseBytes": 99,
+        "durationMs": 4
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 451,
+        "durationMs": 5
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 451,
+        "durationMs": 26
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 469,
+        "durationMs": 8
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 1721,
+        "durationMs": 6
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 1721,
+        "durationMs": 8
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 35,
+        "responseBytes": 490,
+        "durationMs": 12
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 6
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 9
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 9
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 12
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 446,
+        "durationMs": 11
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 587,
+        "durationMs": 10
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 29,
+        "responseBytes": 1780,
+        "durationMs": 23
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 2038,
+        "durationMs": 10
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 35,
+        "responseBytes": 490,
+        "durationMs": 13
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 8
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 10
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 9
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 9
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 446,
+        "durationMs": 11
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 796,
+        "durationMs": 10
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 30,
+        "responseBytes": 1781,
+        "durationMs": 26
+      },
+      {
+        "method": "GET",
+        "status": 404,
+        "requestBytes": 0,
+        "responseBytes": 51,
+        "durationMs": 7
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 1721,
+        "durationMs": 8
+      },
+      {
+        "method": "POST",
+        "status": 409,
+        "requestBytes": 29,
+        "responseBytes": 87,
+        "durationMs": 6
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 29,
+        "responseBytes": 1780,
+        "durationMs": 21
+      },
+      {
+        "method": "GET",
+        "status": 404,
+        "requestBytes": 0,
+        "responseBytes": 51,
+        "durationMs": 7
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 35,
+        "responseBytes": 490,
+        "durationMs": 12
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 9
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 9
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 9
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 9
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 446,
+        "durationMs": 10
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 9486,
+        "durationMs": 8
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 30,
+        "responseBytes": 1781,
+        "durationMs": 20
+      },
+      {
+        "method": "GET",
+        "status": 404,
+        "requestBytes": 0,
+        "responseBytes": 51,
+        "durationMs": 8
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 1721,
+        "durationMs": 7
+      },
+      {
+        "method": "POST",
+        "status": 409,
+        "requestBytes": 29,
+        "responseBytes": 87,
+        "durationMs": 8
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 29,
+        "responseBytes": 1780,
+        "durationMs": 28
+      },
+      {
+        "method": "GET",
+        "status": 404,
+        "requestBytes": 0,
+        "responseBytes": 51,
+        "durationMs": 10
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 206,
+        "responseBytes": 1113,
+        "durationMs": 22
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 103,
+        "responseBytes": 1513,
+        "durationMs": 21
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 14,
+        "responseBytes": 412,
+        "durationMs": 12
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 14,
+        "responseBytes": 1539,
+        "durationMs": 26
+      },
+      {
+        "method": "POST",
+        "status": 403,
+        "requestBytes": 29,
+        "responseBytes": 66,
+        "durationMs": 6
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 2,
+        "responseBytes": 1983,
+        "durationMs": 28
+      },
+      {
+        "method": "POST",
+        "status": 400,
+        "requestBytes": 435,
+        "responseBytes": 111,
+        "durationMs": 7
+      },
+      {
+        "method": "POST",
+        "status": 400,
+        "requestBytes": 291,
+        "responseBytes": 72,
+        "durationMs": 3
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 260,
+        "responseBytes": 243,
+        "durationMs": 18
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 260,
+        "responseBytes": 245,
+        "durationMs": 8
+      },
+      {
+        "method": "POST",
+        "status": 409,
+        "requestBytes": 260,
+        "responseBytes": 103,
+        "durationMs": 6
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 380,
+        "durationMs": 5
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 398,
+        "durationMs": 6
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 1721,
+        "durationMs": 5
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 1721,
+        "durationMs": 6
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 35,
+        "responseBytes": 490,
+        "durationMs": 12
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 8
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 19
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 10
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 9
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 446,
+        "durationMs": 11
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 587,
+        "durationMs": 8
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 29,
+        "responseBytes": 1538,
+        "durationMs": 24
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 1907,
+        "durationMs": 8
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 35,
+        "responseBytes": 490,
+        "durationMs": 13
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 6
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 10
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 9
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 9
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 446,
+        "durationMs": 9
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 808,
+        "durationMs": 8
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 30,
+        "responseBytes": 1539,
+        "durationMs": 23
+      },
+      {
+        "method": "GET",
+        "status": 404,
+        "requestBytes": 0,
+        "responseBytes": 51,
+        "durationMs": 6
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 1721,
+        "durationMs": 7
+      },
+      {
+        "method": "POST",
+        "status": 409,
+        "requestBytes": 29,
+        "responseBytes": 87,
+        "durationMs": 6
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 29,
+        "responseBytes": 1538,
+        "durationMs": 20
+      },
+      {
+        "method": "GET",
+        "status": 404,
+        "requestBytes": 0,
+        "responseBytes": 51,
+        "durationMs": 7
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 35,
+        "responseBytes": 490,
+        "durationMs": 11
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 6
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 11
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 9
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 437,
+        "durationMs": 9
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 446,
+        "durationMs": 12
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 9492,
+        "durationMs": 8
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 30,
+        "responseBytes": 1539,
+        "durationMs": 21
+      },
+      {
+        "method": "GET",
+        "status": 404,
+        "requestBytes": 0,
+        "responseBytes": 51,
+        "durationMs": 5
+      },
+      {
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 1721,
+        "durationMs": 5
+      },
+      {
+        "method": "POST",
+        "status": 409,
+        "requestBytes": 29,
+        "responseBytes": 87,
+        "durationMs": 6
+      },
+      {
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 29,
+        "responseBytes": 1538,
+        "durationMs": 20
+      },
+      {
+        "method": "GET",
+        "status": 404,
+        "requestBytes": 0,
+        "responseBytes": 51,
+        "durationMs": 9
+      }
+    ],
+    "storage": [
+      {
+        "mode": {
+          "whole": false,
+          "anonymous": false,
+          "enabled": true,
+          "missing": false
+        },
+        "policyBytes": 246,
+        "snapshotBytes": 327,
+        "timingCipherBytes": 776
+      },
+      {
+        "mode": {
+          "whole": true,
+          "anonymous": true,
+          "enabled": true,
+          "missing": false
+        },
+        "policyBytes": 246,
+        "snapshotBytes": 327,
+        "timingCipherBytes": 776
+      },
+      {
+        "mode": {
+          "whole": true,
+          "anonymous": false,
+          "enabled": true,
+          "missing": true
+        },
+        "policyBytes": 246,
+        "snapshotBytes": 327,
+        "timingCipherBytes": 458
+      },
+      {
+        "mode": {
+          "whole": false,
+          "anonymous": false,
+          "enabled": false,
+          "missing": true
+        },
+        "policyBytes": 4,
+        "snapshotBytes": 4,
+        "timingCipherBytes": 0
+      }
+    ]
+  },
+  "cleanupVerified": true
+}

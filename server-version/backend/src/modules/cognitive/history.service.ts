@@ -1,3 +1,6 @@
+import { resolveTrainingAttemptScope } from '../composite/training-variant-scope'
+import { loadSituationalExportSlotSets } from '../composite/situational-canonical-export'
+import { trainingVariantProvenance } from '../composite/training-variant-export'
 import { prisma } from '../../config/database'
 import type { Prisma } from '@prisma/client'
 import { logger } from '../../utils/logger'
@@ -38,7 +41,7 @@ export const listMyHistory = async (userId: string, pagination: PaginationParams
     orderBy: [{ finishedAt: 'desc' }, { createdAt: 'desc' }],
     select: {
       id: true,
-      assignmentId: true,
+      assignmentId: true, compositeItemId: true,
       testType: true,
       attemptNo: true,
       configVersion: true,
@@ -49,13 +52,19 @@ export const listMyHistory = async (userId: string, pagination: PaginationParams
       qualityFlagsEncrypted: true,
       resultSnapshotEncrypted: true,
       assignment: { select: { title: true } },
-      compositeAttempt: { select: { id: true, status: true, compositeAssessment: { select: { name: true } } } },
+      compositeAttempt: { select: { id: true, status: true, attemptEpoch: true, participantKey: true, runtimeGeneration: true, deliveryMode: true, trainingVariantAllocationEncrypted: true, trainingFlowSnapshotEncrypted:true,trainingFlowSnapshotHash:true,trainingFlowPathEncrypted:true,trainingFlowPathHash:true,trainingVariantAllocationHash:true, frozenActiveSlotSetEncrypted: true, frozenActiveSlotSetHash: true, compositeAssessment: { select: { id: true, name: true, publishedAt: true, trainingVariantDraft: true, trainingVariantFrozen: true, trainingFlowDraft:true,trainingFlowFrozen:true,trainingFlowDigest:true,trainingVariantDigest:true, items: true, formSections: {include: {items: true}} } } } },
     },
   })
 
+  const variantParents = new Map(sessions.flatMap(session => {const parent = session.compositeAttempt; return parent && (parent.trainingVariantAllocationEncrypted != null || parent.trainingVariantAllocationHash != null || parent.compositeAssessment.trainingVariantDraft != null || parent.compositeAssessment.trainingVariantFrozen != null || parent.compositeAssessment.trainingVariantDigest != null) ? [[parent.id, parent] as const] : []}))
+  const frozenSlotSets = await loadSituationalExportSlotSets([...variantParents.values()])
+  const variantScopes = new Map(await Promise.all([...variantParents.values()].map(async parent => [parent.id, await resolveTrainingAttemptScope(parent, parent.compositeAssessment, {frozenSlotSets})] as const)))
   const displayable: HistoryRow[] = []
   for (const session of sessions) {
+    const scope = session.compositeAttempt ? variantScopes.get(session.compositeAttempt.id) : undefined
+    if (scope && (!session.compositeItemId || !scope.itemIds.has(session.compositeItemId) || session.attemptNo !== session.compositeAttempt!.attemptEpoch)) continue
     const source = {
+      ...(scope ? {trainingVariant: trainingVariantProvenance(scope)} : {}),
       source: session.compositeAttempt ? 'composition' as const : 'standalone' as const,
       sourceName: session.compositeAttempt?.compositeAssessment.name ?? null,
       reportHref: `/student/cognitive/sessions/${session.id}/result`,

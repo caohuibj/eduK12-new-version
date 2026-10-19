@@ -1,3 +1,4 @@
+import { assertTrainingChildSelected } from '../composite/training-variant-child-scope'
 import { loadScaleAnswers } from './scale-workflow.service'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -43,6 +44,7 @@ export type FinalScaleSubmitInput = {
   attemptEpoch: number
   definitionHash: string
   contextSnapshotHash?: string | null
+  itemTimings?:Record<string,unknown>
   deviceInputProvenance?: DeviceInputProvenanceV1
   answers: FinalScaleAnswerInput[]
   userId?: string | null
@@ -249,6 +251,8 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput) => {
       } satisfies ScaleFinalSubmitInternalContext,
     }
   }
+  await assertTrainingChildSelected(child)
+  if(input.itemTimings!==undefined)throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT','旧版投放未启用计时',400)
   const assessment = await measureRequestPhase('final_submit_admission', () => prisma.assessment.findUnique({
     where: { id: input.assessmentId },
     include: {

@@ -1,0 +1,33 @@
+v24.21.0
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+https://registry.npmjs.org
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+always
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> frontend@0.0.0 test
+> vitest run --maxWorkers=2 --run src/pages/questionnaire/__tests__/TrainingVariantAuthoring.test.tsx src/pages/questionnaire/__tests__/trainingVariants.test.ts src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx
+
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/frontend
+
+
+ Test Files  3 passed (3)
+      Tests  57 passed (57)
+   Start at  20:42:30
+   Duration  3.27s (transform 534ms, setup 274ms, import 804ms, tests 3.75s, environment 852ms)
+
+FE-11 browser gate contract: PASS (6 session gates, 2 syntax-only gates)
+✔ the caller timeout reaches initial navigation and controls as well as login response (1.593034ms)
+✔ failed navigation stops before credentials or login requests (0.469863ms)
+✔ asset authorization guard counts protected API media but not built frontend chunks (0.225087ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 76.354632
+Product route inventory is stale; run npm run inventory:product-ui and review the changes.
+RESULT tests=0 types=0 auth=0 lint=0 inventory=1

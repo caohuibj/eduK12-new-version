@@ -1,0 +1,12 @@
+{
+  "scope": "STATIC_ONLY_NO_SERVICE",
+  "input": "server-version/scripts/recovery/c20-materials-http.py",
+  "sha256": "cb704a8584bd4305502eba3ee163e83540f6037b3fc8095465699958ae795634",
+  "checks": [
+    "0 accepts",
+    "1/2 retry only",
+    "3/4/-1 fatal",
+    "authenticated SELECT1 configured before snapshots"
+  ],
+  "passed": true
+}

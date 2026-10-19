@@ -21,7 +21,7 @@ const fixture = { attempt: {
   currentItem: { id: 'unit-1', type: 'SCALE', definitionHash: 'local-r3-definition', scaleAssessmentId: 'r3-browser-scale-attempt', scale: { id: 'scale-1', name: '本地三题量表', definition } },
 } }
 esbuild.buildSync({ entryPoints: [path.join(__dirname, 'qa-round3-browser-fixture.tsx')], outfile: path.join(output, 'fixture.js'),
-  bundle: true, jsx: 'automatic', nodePaths: [path.join(__dirname, '../frontend/node_modules')], define: { 'process.env.NODE_ENV': '"production"', 'import.meta.env.DEV': 'false' } })
+  bundle: true, jsx: 'automatic', nodePaths: [path.join(__dirname, '../frontend/node_modules')], define: require('./qa-round3-browser-build.cjs') })
 const html = '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><link rel="stylesheet" href="/fixture.css"><div id="root"></div><script id="fixture" type="application/json">' +
   JSON.stringify(fixture).replace(/</g, '\\u003c') + '</script><script src="/fixture.js"></script></html>'
 const server = http.createServer(async (req, res) => {
@@ -83,10 +83,10 @@ const server = http.createServer(async (req, res) => {
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve))
   const base = 'http://127.0.0.1:' + server.address().port
   const browser = await chromium.launch({ headless: true })
-  const evidence = { status: 'PASS', syntheticData: true, businessApiAccess: false, checks: [] }
+  const evidence = { status: 'PASS', syntheticData: true, businessApiAccess: false, checks: [], pageErrors: [] }
   try {
     const page = await browser.newPage({ acceptDownloads: true, viewport: { width: 1440, height: 900 } })
-    const errors = []
+    const errors = evidence.pageErrors
     page.on('pageerror', error => errors.push(String(error)))
     await page.goto(base + '/?mode=draft')
     await page.getByRole('button', { name: '选项 3', exact: true }).click()
@@ -187,5 +187,10 @@ const server = http.createServer(async (req, res) => {
     evidence.pageErrors = errors
     fs.writeFileSync(path.join(output, 'browser-proof.json'), JSON.stringify(evidence, null, 2) + '\n')
     console.log(JSON.stringify(evidence))
+  } catch (error) {
+    evidence.status = 'FAIL'
+    evidence.failure = String(error)
+    fs.writeFileSync(path.join(output, 'browser-proof.json'), JSON.stringify(evidence, null, 2) + '\n')
+    throw error
   } finally { await browser.close(); await new Promise(resolve => server.close(resolve)) }
 })().catch(error => { console.error(error); server.close(); process.exitCode = 1 })

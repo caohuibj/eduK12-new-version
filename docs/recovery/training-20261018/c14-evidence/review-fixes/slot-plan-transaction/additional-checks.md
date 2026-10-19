@@ -1,0 +1,1 @@
+Scope transaction forwarding: 02 log passes 1 targeted test, 20 skipped. 01 was an empty selection after the fixture edit command used an incorrect working-directory path; it qualifies no checks. Full backend TypeScript --noEmit exit 0. Exact Node24.21 under measurement lock. Dist is intentionally still the previous failing version for a bounded admission-only pool diagnostic.

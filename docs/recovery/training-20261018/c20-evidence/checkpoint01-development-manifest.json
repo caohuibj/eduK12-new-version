@@ -1,0 +1,79 @@
+{
+  "qualification": "DEVELOPMENT_ONLY_NOT_C20_GO",
+  "archiveSha256": "679e48d0dff30be5b8c9f8e002e5834c0030a940c2caa05d9f18fa1f23a56cc4",
+  "archiveBytes": 2586,
+  "uncompressedSha256": "1a3357fdc53c2b33a59bc4a1938c39394dd46f928516425f49b99d138792fc80",
+  "uncompressedBytes": 20480,
+  "members": [
+    {
+      "path": "c20-core-01.log",
+      "sha256": "b96163fb39d51b5081ec2df658338605bc71dce9804580a3fe3161af0630401a",
+      "bytes": 797
+    },
+    {
+      "path": "c20-core-02.log",
+      "sha256": "b0cc2dc4e463284f60a64e2a9061ce50e8b1a8224a14bd98d61aaa423bfdf01d",
+      "bytes": 263
+    },
+    {
+      "path": "c20-material-adapter01.log",
+      "sha256": "f869029b7526aeb0a670402a7a66e9520090ff340d7d59ac766859b069a23501",
+      "bytes": 260
+    },
+    {
+      "path": "c20-material-core01.log",
+      "sha256": "26e231749bae6d9de5d6232c49600c4965b04d6511925acad827e04804db5297",
+      "bytes": 260
+    },
+    {
+      "path": "c20-npm-backend-01.log",
+      "sha256": "837c3bc3481a915938ea201445d5365397e2f3141422c6a06f4cc6088117f29b",
+      "bytes": 1016
+    },
+    {
+      "path": "c20-prisma-01.log",
+      "sha256": "bb2db02df363c3625138e5aafa896aadb1127df51b759a55c4124f4e31322ecc",
+      "bytes": 801
+    },
+    {
+      "path": "c20-prisma-02.log",
+      "sha256": "3cbbe818382daa6894c9fea35b52a260e4434c82d5aa12ce91a05538fce0a759",
+      "bytes": 331
+    },
+    {
+      "path": "c20-tsc-01.log",
+      "sha256": "cc0b4d8cd3a86e36d94540bc8c4d79d39cd440060d12b9c73abbdfa5cdde2d42",
+      "bytes": 230
+    },
+    {
+      "path": "persistence/after-publication-guard.sha256",
+      "sha256": "58710832ac7573001c47d2817948fc6928794fac802a2fdc3c4eb97487b1f06e",
+      "bytes": 569
+    },
+    {
+      "path": "persistence/before-publication-guard.sha256",
+      "sha256": "1c83d38e266b05ecfc6b73d4ebf52d824348477df8a727dd39ce695dcbd7f9df",
+      "bytes": 569
+    },
+    {
+      "path": "persistence/initial-run-transcript.txt",
+      "sha256": "41b7b7986b8baaab82294736a8dedce913fe5b29a3e51ad2a3b36ceaed953cba",
+      "bytes": 543
+    },
+    {
+      "path": "persistence/initial-run-transcript.txt.sha256",
+      "sha256": "f833e9db37cc59a827e1327578d020e90753e9951da0687922f0c8e28a0e880a",
+      "bytes": 150
+    },
+    {
+      "path": "persistence/publication-retention.log",
+      "sha256": "63d00bf721080d6bd8e218e695260d28c1c41ccd846a101a1a0699f72d9db79e",
+      "bytes": 269
+    },
+    {
+      "path": "persistence/publication-retention.log.sha256",
+      "sha256": "04d1b2c430595e52aa5b8cda615abd721f30b73a70d9ecf74ba305519bb92274",
+      "bytes": 149
+    }
+  ]
+}

@@ -31,7 +31,8 @@ const { mockPrisma, packageMock, protocolMock, grantMock } = vi.hoisted(() => ({
 }))
 
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
-vi.mock('../../services/materialGrant', () => ({
+vi.mock('../../services/materialGrant', async (importOriginal) => ({
+  SCALE_USE_AUTHORIZATION_SELECT: (await importOriginal<typeof import('../../services/materialGrant')>()).SCALE_USE_AUTHORIZATION_SELECT,
   canUseReportPackage: grantMock,
   canUseScale: vi.fn().mockResolvedValue(true),
 }))
@@ -224,6 +225,12 @@ const frozenPackageComposite = (status: 'DRAFT' | 'PUBLISHED' = 'PUBLISHED') => 
   const snapshot = buildFrozenReportPackageSnapshot(packageDefinition, protocol, [item])
   return {
     id: 'composite-1',
+    trainingFlowDraft: null,
+    trainingFlowFrozen: null,
+    trainingFlowDigest: null,
+    trainingVariantDraft: null,
+    trainingVariantFrozen: null,
+    trainingVariantDigest: null,
     code: 'PKG-1',
     name: '固定包',
     description: null,
@@ -436,6 +443,12 @@ describe('ReportPackage composite boundary', () => {
 
     const historical = (await buildCompositeReport({
       id: 'attempt-scale-history',
+      trainingFlowSnapshotEncrypted: null,
+      trainingFlowSnapshotHash: null,
+      trainingFlowPathEncrypted: null,
+      trainingFlowPathHash: null,
+      trainingVariantAllocationEncrypted: null,
+      trainingVariantAllocationHash: null,
       anonymousCode: null,
       completedAt: new Date('2026-08-25T00:00:00Z'),
       totalTime: 10,
@@ -483,6 +496,12 @@ describe('ReportPackage composite boundary', () => {
     source.items[0].cognitiveAssignment.title = 'Changed live wrapper title'
     const report = (await buildCompositeReport({
       id: 'attempt-1',
+      trainingFlowSnapshotEncrypted: null,
+      trainingFlowSnapshotHash: null,
+      trainingFlowPathEncrypted: null,
+      trainingFlowPathHash: null,
+      trainingVariantAllocationEncrypted: null,
+      trainingVariantAllocationHash: null,
       anonymousCode: null,
       completedAt: null,
       totalTime: null,

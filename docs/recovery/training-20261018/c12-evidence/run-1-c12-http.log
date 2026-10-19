@@ -1,0 +1,33 @@
+PASS Online create/CAS/digest, independent review, immutable release; wrong and empty manual golden/self-review/nonowner rejected
+PASS Nonmember and cross-course admission rejected
+PASS Nonowner read and FINAL denied
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+undefined !== 2
+
+    at file:///workspace/scratch/5a77e8bdc1ae/eduk12_c12_20261018/server-version/scripts/recovery/c12-sjt-smoke.mjs:113:86 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: undefined,
+  expected: 2,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+undefined !== 2
+
+    at file:///workspace/scratch/5a77e8bdc1ae/eduk12_c12_20261018/server-version/scripts/recovery/c12-sjt-smoke.mjs:113:86 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: undefined,
+  expected: 2,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.21.0

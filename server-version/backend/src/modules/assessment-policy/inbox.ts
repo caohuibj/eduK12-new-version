@@ -1,3 +1,6 @@
+import { onlineSituationalCanonicalTaskSatisfaction } from '../situational/situational-task-satisfaction'
+import { parseCanonicalUnitResultEnvelope } from '../assessment-runtime/unit-result'
+import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { respondentCompletionFeedback } from './feedback'
 import { prisma } from '../../config/database'
 import { listStudentAssignments } from '../cognitive/assignment.service'
@@ -64,14 +67,15 @@ export async function listRespondentAssessments(userId: string, accountRole: Use
   })
   for (const task of course?.list ?? []) {
     if (task.kind !== 'QUESTIONNAIRE' && task.kind !== 'COMPOSITE') continue
+    const submitted = task.state === 'COMPLETED' || task.state === 'SUBMITTED_NOT_SATISFIED'
     list.push({
       taskId: `course:${task.kind}:${task.id}`, sourceType: 'COURSE', sourceId: task.id,
       title: task.title, state: task.state, deadline: task.deadline, resourceFamily: task.kind,
       resourceKey: task.id, resourceVersion: null, subject: { userId, role: 'STUDENT' },
       respondent: { userId, role: 'STUDENT' }, relationship: 'SELF', perspective: 'SELF_REPORT',
-      consentState: 'NOT_REQUIRED', launchTarget: task.state !== 'COMPLETED' ? task.href : null,
-      reportTarget: task.state === 'COMPLETED' ? task.href : null,
-      resultAvailability: task.state === 'COMPLETED' && task.href ? 'REPORT' : 'PENDING',
+      consentState: 'NOT_REQUIRED', launchTarget: !submitted ? task.href : null,
+      reportTarget: submitted ? task.href : null,
+      resultAvailability: submitted && task.href ? 'REPORT' : 'PENDING',
       organization: null, course: task.courses,
     })
   }
@@ -85,8 +89,19 @@ export async function listRespondentAssessments(userId: string, accountRole: Use
     resultAvailability: row.status === 'COMPLETED' ? 'REPORT' : 'PENDING', organization: null, course: [] })
   if (accountRole === 'STUDENT') {
     const situational = await prisma.situationalAttempt.findMany({ where: { userId, compositeAttemptId: null }, orderBy: { startedAt: 'desc' }, take: 100,
-      select: { id: true, instrumentKey: true, instrumentVersion: true, status: true } })
-    for (const row of situational) list.push({ taskId: 'situational:' + row.id, sourceType: 'SELF_SERVICE', sourceId: row.id, title: '情境测评', state: row.status,
+      select: { id: true, instrumentKey: true, instrumentVersion: true, status: true, scoringVersion: true } })
+    // Preserve the legacy metadata-only list. Fetch result blobs in one bounded
+    // batch only for completed online-protocol versions that carry qualification.
+    const onlineIds = situational.filter(row => row.status === 'COMPLETED' &&
+      ['sjt-online-v1-author-sum-1', 'sjt-online-v1-expert-mean-1'].includes(row.scoringVersion)).map(row => row.id)
+    const onlineResults = onlineIds.length ? await prisma.situationalAttempt.findMany({
+      where: { id: { in: onlineIds }, userId, compositeAttemptId: null, status: 'COMPLETED' },
+      select: { id: true, canonicalResultEncrypted: true },
+    }) : []
+    const onlineQualification = new Map(onlineResults.map(row => [row.id, row.canonicalResultEncrypted
+      ? onlineSituationalCanonicalTaskSatisfaction(parseCanonicalUnitResultEnvelope(decryptUnifiedRuntimePayload(row.canonicalResultEncrypted)).core)
+      : 'NOT_SATISFIED']))
+    for (const row of situational) list.push({ taskId: 'situational:' + row.id, sourceType: 'SELF_SERVICE', sourceId: row.id, title: '情境测评', state: row.status === 'COMPLETED' && onlineIds.includes(row.id) && onlineQualification.get(row.id) !== 'SATISFIED' ? 'SUBMITTED_NOT_SATISFIED' : row.status,
       deadline: null, resourceFamily: 'SITUATIONAL', resourceKey: row.instrumentKey, resourceVersion: row.instrumentVersion,
       subject: { userId, role: accountRole }, respondent: { userId, role: accountRole }, relationship: 'SELF', perspective: 'SELF_REPORT', consentState: 'NOT_REQUIRED',
       launchTarget: row.status === 'IN_PROGRESS' ? '/student/situational/' + encodeURIComponent(row.instrumentKey) : null,

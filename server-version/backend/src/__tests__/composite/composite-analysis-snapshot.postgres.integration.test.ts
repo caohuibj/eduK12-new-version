@@ -418,7 +418,7 @@ const createScaleAndFormCompletionFixture = async () => {
       type: 'FORM',
       position: 1,
       required: true,
-      formType: 'text',
+      formType: 'text_input',
       formLabel: 'PR8 background',
     },
   })

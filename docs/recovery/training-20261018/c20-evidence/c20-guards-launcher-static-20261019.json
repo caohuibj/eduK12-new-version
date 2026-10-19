@@ -1,0 +1,13 @@
+{
+  "scope": "STATIC_ONLY",
+  "inputs": {
+    "c20-materials-http.py": "9a6e5ad61ad27d7e60b4e6c082ef27d8644c4c0f402024a033365bb63a38605f",
+    "c20-materials-receipts.py": "ec36f0a3fd26d807d228f542c07e02a5bf9a171951ee4cf7f7b02ec4642c97f7",
+    "c20-materials-receipts-check.py": "141766bd58653e11805142057b93443ec81f54afc094a5f212400ef540107db7",
+    "c20-materials-guards-continuation.mjs": "509c29ec1b8b0cc77121f9f3680f4ebda90c3cdc7a3125260a796bc0aa89518f",
+    "c20-materials-README.md": "52510e439d370983741e566499928e038a7a2c5d3cc8cbf22220abecd2b0bb9e"
+  },
+  "exitCode": 0,
+  "stdout": "{\n  \"passed\": true,\n  \"scope\": \"STATIC_RECEIPT_VALIDATION_ONLY\",\n  \"checks\": [\n    \"legacy exact continuation and explicitly unknown reused upgrade\",\n    \"missing continuation marker rejected\",\n    \"frozen producer hash mismatch rejected\",\n    \"multiple new phases rejected\",\n    \"incorrect exact runtime receipt rejected\",\n    \"second import preserves actual legacy producer and receipt chain\",\n    \"mapped phase result mismatch rejected\",\n    \"explicit target permits later newly executed phases\",\n    \"wrong explicit continuation phase rejected\",\n    \"falsely reused continuation target rejected\",\n    \"missing predecessor receipt rejected\",\n    \"mismatched predecessor receipt rejected\",\n    \"mismatched failed phase receipt rejected\",\n    \"failed explicit continuation imports only previously accepted phases\",\n    \"failed continuation file hash mismatch rejected\",\n    \"functional checkpoint preserves false efficiency and excludes failed cost\",\n    \"functional checkpoint cannot claim overall pass\",\n    \"functional checkpoint failed-result pin mismatch rejected\",\n    \"storage tail preserves both failures and reuses accepted functional tail\",\n    \"storage tail wrong failure hash rejected\",\n    \"storage tail cannot relabel failed cost as accepted\",\n    \"guard continuation composes with both retained functional tails\"\n  ]\n}\n",
+  "stderr": ""
+}

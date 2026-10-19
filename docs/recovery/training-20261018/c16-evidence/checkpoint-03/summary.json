@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "phase": "V1_POLICY_METADATA_FIX_DYNAMIC_RETEST_PENDING",
+  "failedRuntimeSourceCommit": "596dae2f9b1e16c60c9e4c1539c0f431d4395518",
+  "http01": {
+    "upgradePassed": true,
+    "analysisPassed": false,
+    "failure": "First four-tool analysis returned404: V1 custom Scale policy could not resolve authoritative instrumentClass from narrow child projection. Actual-dist per-metric probe succeeded for Form/Cognitive/SJT; original facts unchanged.",
+    "cleanupVerified": true,
+    "sourceUnchanged": true,
+    "inputsUnchanged": true
+  },
+  "fix": "Pass verified frozen instrument key/version and already batched authoritative Scale class, after exact Scale ID checks. No extra SQL; unknown STANDARD/missing class and V2 restrictions stay fail-closed.",
+  "targetedTests": {
+    "passed": 6,
+    "skipped": 40
+  },
+  "limits": [
+    "HTTP01 does not qualify numeric analysis, exports, CAS or performance.",
+    "Next runtime reuses independently verified additive upgrade; original failed evidence retained privately."
+  ],
+  "files": [
+    {
+      "file": "c16-backend-tsc-v1-policy.log",
+      "bytes": 155,
+      "sha256": "5840235f5d1db6ab32686f9fc93f8c1433d98133742adb2e17cd119bf69a6026"
+    },
+    {
+      "file": "c16-source-v1-policy-metadata.log",
+      "bytes": 272,
+      "sha256": "cbb7649f565d93bed9e6027a63a3ff1b37eb43f5e79858cb19fbecd695b673c5"
+    },
+    {
+      "file": "http01-upgrade-result.json",
+      "bytes": 799,
+      "sha256": "7e3149697f5b87180806264e651f279d1218efa58864435b937e0c5c9c930878"
+    }
+  ]
+}

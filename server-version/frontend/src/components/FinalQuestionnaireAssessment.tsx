@@ -600,7 +600,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
                     disabled={draftLocked || requiresRestart}
                     position={sectionIndex + 1}
                     total={currentSection.items.length}
-                    onChange={(nextValue) => saveFormValue(item.id, nextValue)}
+                    onChange={(nextValue) => { if (nextValue === null || typeof nextValue === 'string' || Array.isArray(nextValue)) saveFormValue(item.id, nextValue) }}
                     onPrevious={() => void goToFormIndex(sectionIndex - 1)}
                     onNext={sectionIndex < currentSection.items.length - 1
                       ? () => void goToFormIndex(sectionIndex + 1)

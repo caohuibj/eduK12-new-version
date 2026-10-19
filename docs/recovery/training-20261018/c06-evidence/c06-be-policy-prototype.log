@@ -1,0 +1,18 @@
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/eduk12_c06_form_worktree/server-version/backend
+
+ ✓ src/__tests__/composite/form-v3-policy.test.ts > Training V3 section policy > distinguishes hidden, refusal, answered and shown missing in authoritative facts 11ms
+ ✓ src/__tests__/composite/form-v3-policy.test.ts > Training V3 section policy > freezes required refusal and hidden qualification independently 2ms
+ ✓ src/__tests__/composite/form-v3-policy.test.ts > Training V3 section policy > validates other text, exclusivity and unknown side fields 3ms
+ ✓ src/__tests__/composite/form-v3-policy.test.ts > Training V3 section policy > keeps matrix row refusal distinct and refuses unauthorized rows 2ms
+ ✓ src/__tests__/composite/form-v3-policy.test.ts > Training V3 section policy > rejects forward, dangling, cross-section and Likert condition sources 1ms
+ ✓ src/__tests__/composite/form-v3-policy.test.ts > Training V3 section policy > remaps references by exact keys without touching labels/options 1ms
+ ✓ src/__tests__/composite/form-v3-policy.test.ts > does not treat unknown qualifications as task satisfaction 0ms
+ ✓ src/__tests__/composite/form-v3-policy.test.ts > rejects prototype keys and side-channel text on legacy questions 1ms
+ ✓ src/__tests__/composite/form-v3-policy.test.ts > rejects prototype wire keys before record parsing can drop them 6ms
+
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+   Start at  17:49:52
+   Duration  1.91s (transform 1.24s, setup 0ms, import 1.75s, tests 28ms, environment 0ms)
+

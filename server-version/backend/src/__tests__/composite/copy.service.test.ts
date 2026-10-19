@@ -14,7 +14,7 @@ const { mockPrisma } = vi.hoisted(() => ({
     $queryRawUnsafe: vi.fn(),
     compositeAssessmentAccessToken: { findUnique: vi.fn(), create: vi.fn() },
     course: { findUnique: vi.fn() },
-    courseStudent: { findMany: vi.fn(), findUnique: vi.fn() },
+    courseStudent: { findFirst: vi.fn(), findMany: vi.fn(), findUnique: vi.fn() },
     cognitiveTestConfig: { findUnique: vi.fn() },
     cognitiveAssignment: { findFirst: vi.fn(), findMany: vi.fn(), create: vi.fn(), findUnique: vi.fn() },
     $transaction: vi.fn(),
@@ -269,10 +269,24 @@ describe('copyComposite', () => {
     mockPrisma.courseStudent.findUnique.mockResolvedValue({ status: 'ACTIVE' })
     mockPrisma.compositeAssessmentAttempt.create.mockResolvedValue({ id: 'attempt-1', anonymousCode: null })
     mockPrisma.compositeAssessmentAttempt.findUnique.mockResolvedValue({
+      trainingFlowSnapshotEncrypted: null,
+      trainingFlowSnapshotHash: null,
+      trainingFlowPathEncrypted: null,
+      trainingFlowPathHash: null,
+      trainingVariantAllocationEncrypted: null,
+      trainingVariantAllocationHash: null,
       id: 'attempt-1',
       userId: 'student-1',
       status: 'IN_PROGRESS',
-      compositeAssessment: { items: [] },
+      compositeAssessment: {
+        trainingFlowDraft: null,
+        trainingFlowFrozen: null,
+        trainingFlowDigest: null,
+        trainingVariantDraft: null,
+        trainingVariantFrozen: null,
+        trainingVariantDigest: null,
+        items: [],
+      },
       scaleAssessments: [],
       cognitiveSessions: [],
       formAnswers: [],
@@ -732,5 +746,72 @@ describe('library composites are not takeable', () => {
       compositeAssessment: libraryTemplate({ publicEnabled: true, items: [] }),
     })
     await expect(getPublicCompositeInfo('token')).rejects.toMatchObject({ statusCode: 400 })
+  })
+})
+
+describe('C06 student satisfaction projection', () => {
+  it.each([null, 'SATISFIED'])('preserves historical satisfaction %s independently of the latest report with one light batch', async (historical) => {
+    mockPrisma.courseStudent.findMany.mockResolvedValue([{ courseId: 'course-t' }])
+    mockPrisma.compositeAssessment.findMany.mockResolvedValue(Array.from({ length: 30 }, (_, i) => ({
+      id: `q${i}`, code: `Q${i}`, name: '问卷', opensAt: null, expiresAt: null, maxAttempts: 2,
+      course: teacherCourse, items: [], formSections: [],
+    })))
+    mockPrisma.compositeAssessmentAttempt.findMany.mockResolvedValue(Array.from({ length: 30 }, (_, i) => [
+      { id: `new${i}`, compositeAssessmentId: `q${i}`, status: 'COMPLETED', taskSatisfaction: 'NOT_SATISFIED', progress: 100 },
+      { id: `old${i}`, compositeAssessmentId: `q${i}`, status: 'COMPLETED', taskSatisfaction: historical, progress: 100 },
+    ]).flat())
+    const result = await listAvailableForStudent('student-1')
+    expect(result).toHaveLength(30)
+    expect(result[0]).toMatchObject({ latestCompletedAttempt: { id: 'new0', taskSatisfied: false }, latestSatisfiedAttempt: { id: 'old0' }, hasSatisfiedAttempt: true, attemptsUsed: 2, canContinue: false, canStartNewAttempt: false })
+    expect(mockPrisma.compositeAssessmentAttempt.findMany).toHaveBeenCalledTimes(1)
+    expect(mockPrisma.compositeAssessmentAttempt.findMany.mock.calls[0][0].select).toEqual({ id: true, compositeAssessmentId: true, status: true, taskSatisfaction: true, progress: true, completedAt: true, cognitiveSessions: { select: { status: true, frozenAdmissionSnapshotHash: true } } })
+  })
+  it.each(['NOT_SATISFIED', 'CORRUPT'])('never reopens a submitted %s attempt or grants additional attempts', async (taskSatisfaction) => {
+    mockPrisma.courseStudent.findMany.mockResolvedValue([{ courseId: 'course-t' }])
+    mockPrisma.compositeAssessment.findMany.mockResolvedValue([{ id: 'q', name: '问卷', opensAt: null, expiresAt: null, maxAttempts: 1, course: teacherCourse, items: [] }])
+    mockPrisma.compositeAssessmentAttempt.findMany.mockResolvedValue([{ id: 'submitted', compositeAssessmentId: 'q', status: 'COMPLETED', taskSatisfaction, progress: 100 }])
+    const [row] = await listAvailableForStudent('student-1')
+    expect(row).toMatchObject({ hasSatisfiedAttempt: false, latestSatisfiedAttempt: null, latestCompletedAttempt: { id: 'submitted' }, attemptsUsed: 1, canContinue: false, canStartNewAttempt: false })
+  })
+})
+
+// Counterfactual defense: real PostgreSQL forbids course_type mutation. This
+// verifies the timing-only admission gate never replaces original recovery auth.
+describe('Training timed start recovery boundary', () => {
+  const composite = () => libraryTemplate({productKind:'QUESTIONNAIRE',questionnaireType:'COURSE',courseId:null,course:null,items:[],questionnaireCourses:[{courseId:'course-t'}],trainingTimingPolicy:{schemaVersion:1},maxAttempts:1})
+  it('keeps original membership/library checks but does not re-gate existing timing by current type', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(composite())
+    mockPrisma.courseStudent.findFirst.mockResolvedValue({courseId:'course-t',status:'ACTIVE'})
+    mockPrisma.compositeAssessmentAttempt.findFirst.mockResolvedValue({id:'attempt-1'})
+    mockPrisma.compositeAssessmentAttempt.findUnique.mockResolvedValue({
+      trainingFlowSnapshotEncrypted: null,
+      trainingFlowSnapshotHash: null,
+      trainingFlowPathEncrypted: null,
+      trainingFlowPathHash: null,
+      trainingVariantAllocationEncrypted: null,
+      trainingVariantAllocationHash: null,
+      id: 'attempt-1', userId: 'student-1', status: 'IN_PROGRESS',
+      compositeAssessment: {
+        trainingFlowDraft: null,
+        trainingFlowFrozen: null,
+        trainingFlowDigest: null,
+        trainingVariantDraft: null,
+        trainingVariantFrozen: null,
+        trainingVariantDigest: null,
+        items: [],
+      },
+      scaleAssessments: [], cognitiveSessions: [], formAnswers: [],
+    })
+    await startUserAttempt('student-1','source-1')
+    expect(mockPrisma.courseStudent.findFirst.mock.calls[0][0].where).toMatchObject({studentId:'student-1',course:{isLibrary:false}})
+    expect(mockPrisma.courseStudent.findFirst.mock.calls[0][0].where.course).not.toHaveProperty('courseType')
+    expect(mockPrisma.compositeAssessmentAttempt.create).not.toHaveBeenCalled()
+  })
+  it('does not bypass original membership authorization for an existing attempt', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(composite())
+    mockPrisma.courseStudent.findFirst.mockResolvedValue(null)
+    mockPrisma.compositeAssessmentAttempt.findFirst.mockResolvedValue({id:'attempt-1'})
+    await expect(startUserAttempt('student-1','source-1')).rejects.toMatchObject({statusCode:403})
+    expect(mockPrisma.compositeAssessmentAttempt.findFirst).not.toHaveBeenCalled()
   })
 })

@@ -650,7 +650,7 @@ export const publicQuestionnaireController = {
           await tx.questionnaireAssessment.update({
             where: { id: assessment.id },
             data: {
-              frozenActiveSlotSetEncrypted: await storeFrozenActiveSlotSet(frozenActiveSlotSet),
+              frozenActiveSlotSetEncrypted: await storeFrozenActiveSlotSet(frozenActiveSlotSet, tx),
               frozenActiveSlotSetHash: frozenActiveSlotSet.snapshotHash,
             },
           })

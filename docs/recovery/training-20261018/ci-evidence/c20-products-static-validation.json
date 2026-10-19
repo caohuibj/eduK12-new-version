@@ -1,0 +1,45 @@
+{
+  "kind": "local-static-validation-record",
+  "officialCiQualification": false,
+  "sourceBase": "5f4077571961cfc61a844efcfc72fe748ad333a8",
+  "recordedAtUtc": "2026-10-19T00:40:22.807598+00:00",
+  "combinedSha256": "41034c6eaf556dab5b75c8733158c16335d3ac9c81eda5d5624f3f24679d67ea",
+  "inputs": {
+    ".github/workflows/ci-browser.yml": "937768dc0918be71cb65704b407ef7a3ef3820e5c090e3372b500be2cfc8c4a5",
+    "server-version/e2e/training-optional-https.py": "e285823d469230b55477272224a45d29971fc097360c8d55e4b60e3e3e8d91b7",
+    "server-version/e2e/training-materials-fixture.cjs": "b20ffd057239a510c39ba0d96d0fe36d73d417aebff8f0e291bc80676e8d9310",
+    "server-version/e2e/training-materials-browser.cjs": "9b5a703424169c3faa0ea063e9268a0a3d7681f154f22cf819f8a7d777bc2546",
+    "server-version/e2e/training-materials-restore.mjs": "47e51fbd97839c167721e4119634fc07bdbe0537929fd98b0981e2b525fbeb97",
+    ".github/scripts/ci-topology.test.mjs": "018e09dd24c93c1c49c8d9342e6198ac1478429a353d422190f1aead3a42ba95"
+  },
+  "topology": {
+    "command": "/workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/node_modules/node/bin/node --test .github/scripts/ci-topology.test.mjs",
+    "exitCode": 0,
+    "tests": 11,
+    "passed": 11,
+    "failed": 0,
+    "skipped": 0,
+    "durationMs": 418.149879
+  },
+  "syntax": {
+    "node": "Node24 --check passed for all three new JS files; changed fixture/browser rechecked after index fix, restore unchanged",
+    "python": "AST parse of training-optional-https.py passed",
+    "yaml": "ci-browser.yml parse passed",
+    "shell": "Extracted Training material lifecycle step bash -n passed",
+    "whitespace": "git diff --check passed"
+  },
+  "review": {
+    "scope": "Six-file read-only source review",
+    "status": "GO after standalone reservation-index coverage fix",
+    "runtimeQualification": false
+  },
+  "notExecuted": [
+    "dependency install",
+    "application service start",
+    "PostgreSQL fixture execution",
+    "browser/API acceptance",
+    "database restore",
+    "GitHub Actions"
+  ],
+  "note": "Actual lightweight check results and final source hashes only. No signature, cloud-to-CI evidence admission, or dynamic success is claimed."
+}

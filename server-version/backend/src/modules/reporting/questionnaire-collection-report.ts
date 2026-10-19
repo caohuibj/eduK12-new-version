@@ -5,7 +5,8 @@ import { readContextFormAnswers } from '../assessment-context'
 import { safeDecrypt } from '../../utils/encryption'
 import { isFormAnswerComplete } from '../../services/questionnaireFormAnswerState'
 import type { CanonicalUnitResultCoreV1 } from '../assessment-runtime/unit-result'
-import type { FormSectionCollectionFactsV1 } from '../assessment-runtime/form-facts'
+import { legacyFormValueProjection } from '../assessment-runtime/typed-form'
+import type { FormSectionCollectionFacts } from '../assessment-runtime/form-facts'
 import { createScaleProjectionContext } from '../scale/projection/context-factory'
 import type { ScaleProjectionContext } from '../scale/projection/types'
 
@@ -171,7 +172,7 @@ export const buildQuestionnaireCollectionReportFromUnifiedInput = (input: {
     totalTime: number | null
     core: CanonicalUnitResultCoreV1
   }>
-  formSections: Array<{ itemId: string; facts: FormSectionCollectionFactsV1 }>
+  formSections: Array<{ itemId: string; facts: FormSectionCollectionFacts }>
 }): any => {
   const unitReports = input.scales.map((scale) => {
     const quality = {
@@ -214,7 +215,7 @@ export const buildQuestionnaireCollectionReportFromUnifiedInput = (input: {
   const backgroundValues = input.formSections.flatMap((section) => section.facts.items.map((item) => buildFormBackgroundReport({
     itemId: item.key,
     label: item.label,
-    value: Array.isArray(item.value) ? item.value.join(', ') : item.value,
+    value: Array.isArray(item.value) ? item.value.join(', ') : legacyFormValueProjection(item.value),
   })))
   return {
     questionnaireName: input.questionnaireName || '问卷',

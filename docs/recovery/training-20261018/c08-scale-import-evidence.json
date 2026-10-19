@@ -1,0 +1,279 @@
+{
+  "passed": true,
+  "sourceHead": "1d9ef730244b8bdbb3a2498d5b5a1165c89c94b9",
+  "runtimeFingerprint": {
+    "schemaVersion": 1,
+    "nodeVersion": "v24.21.0",
+    "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+    "dist": {
+      "files": 4965,
+      "sha256": "85af4128d4e8e0b8c9c1a9546c5587dabc0cd65076d8b1d8c69fb008ad424981"
+    },
+    "files": {
+      "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+      "prisma/schema.prisma": "bd464898ee84cf4b6c79d70096a104ba5fad0d5d2d5440de1f96d6959ef9f1a3",
+      "node_modules/.prisma/client/schema.prisma": "f5b7d8a6385bfb86a1e09f2c4959bb7cc97ad998d9de9580d4634b6d635262bd",
+      "node_modules/.prisma/client/index.js": "de420595311664372a356826a958810ede2f32fdbbd75191e68746d1c1ed36d0"
+    },
+    "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+  },
+  "harnessSha256": "068e0e759a05a82c0964812e5a9871e983b6d4779be4935aac9e9ee22d47a9aa",
+  "http": {
+    "passed": true,
+    "requests": 29,
+    "checks": [
+      "owner-only import; use-grant, student and anonymous denied",
+      "changed original content/digest/revision and unknown science columns rejected without writes",
+      "exact appended definition, canonical scorer oracle 5+reverse(1)=10, compact audit and replay conflict",
+      "public validation/publication freezes imported definition",
+      "STANDARD cannot be imported or overridden"
+    ],
+    "observations": [
+      {
+        "route": "/auth/csrf",
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 102,
+        "durationMs": 27
+      },
+      {
+        "route": "/auth/training-login",
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 119,
+        "responseBytes": 289,
+        "durationMs": 104
+      },
+      {
+        "route": "/auth/csrf",
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 102,
+        "durationMs": 2
+      },
+      {
+        "route": "/auth/training-login",
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 119,
+        "responseBytes": 289,
+        "durationMs": 91
+      },
+      {
+        "route": "/auth/csrf",
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 102,
+        "durationMs": 2
+      },
+      {
+        "route": "/auth/training-login",
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 119,
+        "responseBytes": 289,
+        "durationMs": 78
+      },
+      {
+        "route": "/scales",
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 100,
+        "responseBytes": 1696,
+        "durationMs": 14
+      },
+      {
+        "route": "/scales/14f5847f-6696-4432-a7a7-a3e7b95ee254/definition",
+        "method": "PUT",
+        "status": 200,
+        "requestBytes": 1521,
+        "responseBytes": 2088,
+        "durationMs": 10
+      },
+      {
+        "route": "/scales/14f5847f-6696-4432-a7a7-a3e7b95ee254/import/preview",
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 161,
+        "responseBytes": 789,
+        "durationMs": 9
+      },
+      {
+        "route": "/scales/14f5847f-6696-4432-a7a7-a3e7b95ee254/import/preview",
+        "method": "POST",
+        "status": 403,
+        "requestBytes": 161,
+        "responseBytes": 93,
+        "durationMs": 6
+      },
+      {
+        "route": "/scales/14f5847f-6696-4432-a7a7-a3e7b95ee254/import/confirm",
+        "method": "POST",
+        "status": 403,
+        "requestBytes": 352,
+        "responseBytes": 93,
+        "durationMs": 8
+      },
+      {
+        "route": "/scales/14f5847f-6696-4432-a7a7-a3e7b95ee254/import/preview",
+        "method": "POST",
+        "status": 403,
+        "requestBytes": 161,
+        "responseBytes": 54,
+        "durationMs": 4
+      },
+      {
+        "route": "/auth/csrf",
+        "method": "GET",
+        "status": 200,
+        "requestBytes": 0,
+        "responseBytes": 102,
+        "durationMs": 1
+      },
+      {
+        "route": "/scales/14f5847f-6696-4432-a7a7-a3e7b95ee254/import/preview",
+        "method": "POST",
+        "status": 401,
+        "requestBytes": 161,
+        "responseBytes": 54,
+        "durationMs": 2
+      },
+      {
+        "route": "/scales/14f5847f-6696-4432-a7a7-a3e7b95ee254/import/confirm",
+        "method": "POST",
+        "status": 409,
+        "requestBytes": 354,
+        "responseBytes": 84,
+        "durationMs": 8
+      },
+      {
+        "route": "/scales/14f5847f-6696-4432-a7a7-a3e7b95ee254/import/confirm",
+        "method": "POST",
+        "status": 409,
+        "requestBytes": 352,
+        "responseBytes": 84,
+        "durationMs": 4
+      },
+      {
+        "route": "/scales/14f5847f-6696-4432-a7a7-a3e7b95ee254/import/confirm",
+        "method": "POST",
+        "status": 409,
+        "requestBytes": 352,
+        "responseBytes": 75,
+        "durationMs": 5
+      },
+      {
+        "route": "/scales/14f5847f-6696-4432-a7a7-a3e7b95ee254/import/preview",
+        "method": "POST",
+        "status": 400,
+        "requestBytes": 159,
+        "responseBytes": 133,
+        "durationMs": 5
+      },
+      {
+        "route": "/scales/14f5847f-6696-4432-a7a7-a3e7b95ee254/import/confirm",
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 352,
+        "responseBytes": 2325,
+        "durationMs": 9
+      },
+      {
+        "route": "/scales/14f5847f-6696-4432-a7a7-a3e7b95ee254/import/confirm",
+        "method": "POST",
+        "status": 409,
+        "requestBytes": 352,
+        "responseBytes": 75,
+        "durationMs": 4
+      },
+      {
+        "route": "/scales/14f5847f-6696-4432-a7a7-a3e7b95ee254/validate",
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 2,
+        "responseBytes": 253,
+        "durationMs": 4
+      },
+      {
+        "route": "/scales/14f5847f-6696-4432-a7a7-a3e7b95ee254/preview",
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 103,
+        "responseBytes": 1450,
+        "durationMs": 6
+      },
+      {
+        "route": "/scales/14f5847f-6696-4432-a7a7-a3e7b95ee254/publish",
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 48,
+        "responseBytes": 2314,
+        "durationMs": 9
+      },
+      {
+        "route": "/scales/14f5847f-6696-4432-a7a7-a3e7b95ee254/import/preview",
+        "method": "POST",
+        "status": 409,
+        "requestBytes": 161,
+        "responseBytes": 87,
+        "durationMs": 4
+      },
+      {
+        "route": "/scales/14f5847f-6696-4432-a7a7-a3e7b95ee254/import/confirm",
+        "method": "POST",
+        "status": 409,
+        "requestBytes": 352,
+        "responseBytes": 87,
+        "durationMs": 4
+      },
+      {
+        "route": "/scales/2176976c-f993-4333-ae91-6e82e34e8a63/import/preview",
+        "method": "POST",
+        "status": 409,
+        "requestBytes": 161,
+        "responseBytes": 93,
+        "durationMs": 4
+      },
+      {
+        "route": "/scales/2176976c-f993-4333-ae91-6e82e34e8a63/import/confirm",
+        "method": "POST",
+        "status": 409,
+        "requestBytes": 352,
+        "responseBytes": 93,
+        "durationMs": 4
+      },
+      {
+        "route": "/scales",
+        "method": "POST",
+        "status": 200,
+        "requestBytes": 78,
+        "responseBytes": 1696,
+        "durationMs": 6
+      },
+      {
+        "route": "/scales/75c58339-48a4-422e-a648-cd29ef96cb48/definition",
+        "method": "PUT",
+        "status": 200,
+        "requestBytes": 1521,
+        "responseBytes": 2088,
+        "durationMs": 6
+      }
+    ],
+    "storage": {
+      "sourceBytes": 96,
+      "definitionBytesBefore": 1459,
+      "definitionBytesAfter": 1686,
+      "auditMetadataBytes": 382,
+      "rawCsvStored": false
+    },
+    "queryCounts": {
+      "previewSql": 4,
+      "confirmSql": 6,
+      "scope": "direct native-draft service transactions; includes BEGIN/COMMIT, excludes HTTP auth and fixtures"
+    }
+  },
+  "cleanupVerified": true
+}

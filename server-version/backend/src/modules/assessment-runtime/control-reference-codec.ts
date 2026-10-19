@@ -28,7 +28,7 @@ const encode=(value:any):{kind:number;plain:Buffer}=>{
       return {kind:1,plain:Buffer.concat([hash(value.p),b,t,Buffer.from(JSON.stringify(extras))])}
     }
   }
-  if(value?.k==='WVP2'){
+  if(value?.k==='WVP2' && Array.isArray(value.u) && value.u.every((u:any)=>Array.isArray(u)&&u.length===2)){
     const binding=Buffer.from(JSON.stringify(value.b));if(binding.length>65535||!Array.isArray(value.u)||value.u.length>32)throw new Error('Whole control binding invalid')
     const n=Buffer.alloc(3);n.writeUInt16BE(binding.length);n[2]=value.u.length
     return {kind:3,plain:Buffer.concat([hash(value.p),n,binding,...value.u.map((u:any)=>{if(!Array.isArray(u)||u.length!==2)throw new Error('Whole unit control invalid');return Buffer.concat([id(u[0]),hash(u[1])])})])}

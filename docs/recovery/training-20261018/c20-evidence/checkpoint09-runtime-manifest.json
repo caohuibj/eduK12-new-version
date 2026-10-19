@@ -1,0 +1,23 @@
+{
+  "head": "b952a61bde24d3e266fb36916412a3ac18b435d0",
+  "qualification": "No new application phase executed; PG startup readiness failure; exact final DB snapshot unchanged from state07; original cost failures preserved; no C20 overall GO",
+  "members": {
+    "state08/c20-runtime-result.json": {
+      "size": 296452,
+      "sha256": "1c7a661157aff27ce31b2939f51bc4a23cda3457df337e31f10737d3d64fca39",
+      "gzipSize": 33810,
+      "gzipSha256": "b68a1fa9ef3cd4c00fb53dc790b8264e0089a95b2cc174f281b7913909692d9e"
+    },
+    "state08/frozen-inputs.json": {
+      "size": 359104,
+      "sha256": "f2f893e23d51dc8ed19820f8bb9ea9d4f2df1a9c90afe985c0d18a79272fc989",
+      "gzipSize": 86801,
+      "gzipSha256": "c84ae2595ec63550e4a025be8a1ce55a914dd74bb2cf712e1f002e1a21b83fe4"
+    }
+  },
+  "archive": {
+    "name": "checkpoint09-runtime-partial.tar.gz",
+    "size": 120569,
+    "sha256": "b8655a29ca1db7237489c3340cac6d12c9c496c5d611ae1ec9f181ecfa9b676f"
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "phase": "REVIEW_HARDENED_SOURCE_NOT_PG_QUALIFIED",
+  "previousLocalCheckpoint": "bfc96bebfdde642e54bd9d97136f5599ccc36871",
+  "node": "v24.21.0",
+  "nodeExecutable": "/workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/node_modules/node/bin/node",
+  "checks": "Incremental targeted tests only; counts in logs overlap and must not be summed as distinct coverage. Frontend summary identifies stdout-only earlier evidence.",
+  "limitations": [
+    "Real PG/production-dist HTTP/queue/quality races/SQL measurements not yet executed.",
+    "Source Form snapshot duplicate read/decrypt remains a bounded performance improvement opportunity.",
+    "No C25 browser/native/media or C26 capacity qualification."
+  ],
+  "files": [
+    {
+      "file": "c16-export-prepare-dedup.log",
+      "bytes": 1086,
+      "sha256": "5c1a4aad4daca5b1f589247a5fff49c2a0567137918c144284b459396579b3d3"
+    },
+    {
+      "file": "c16-frontend-artifact-hashes.txt",
+      "bytes": 307,
+      "sha256": "c048fc840750a220c6258e018a4bf62bed0d1d001767301f0ee221c37f1d6006"
+    },
+    {
+      "file": "c16-frontend-final-build.log",
+      "bytes": 18315,
+      "sha256": "5e765405969c4d6f695415592dcd2a2fa628752f910b2b64a57ed02727e53727"
+    },
+    {
+      "file": "c16-frontend-final-types.log",
+      "bytes": 55,
+      "sha256": "e15827127fe19552557abe9eb289552c619a20afde634220253491faa8a8c20f"
+    },
+    {
+      "file": "c16-frontend-verification-summary.json",
+      "bytes": 4619,
+      "sha256": "b18566bd5359646988464b4d02ab358b8d8faa4b822150a79dbe7855607f4587"
+    },
+    {
+      "file": "c16-frontend-not-calculable-test.log",
+      "bytes": 278,
+      "sha256": "1846abdb68cdbda42230d3f168184d610d16a00423ff0f4eee3c14d34d56e496"
+    },
+    {
+      "file": "c16-not-calculable-core-test.log",
+      "bytes": 271,
+      "sha256": "3c0f6883c78bebc63a4b5f232b5b5b675ed2f6982b2be9d721870519c6d9e24b"
+    },
+    {
+      "file": "c16-org-short-circuit-tests.log",
+      "bytes": 258,
+      "sha256": "866eabffd3eb2e9fd2080c4ae6d15c2b017ecba7a04697e47336402e39813e7d"
+    },
+    {
+      "file": "c16-quality-serializable-cas-final.log",
+      "bytes": 271,
+      "sha256": "89ce083b600a49581156c0d8c8ff58387f5cf7f5c06e63317f65299164b707a1"
+    },
+    {
+      "file": "c16-quality-unknown-error.log",
+      "bytes": 270,
+      "sha256": "d5fa3c8cd1fa4ecbe324747dc28f51febe15e49df6f6761d0a27d5bd31dcfd99"
+    },
+    {
+      "file": "c16-service-test-final.log",
+      "bytes": 259,
+      "sha256": "a28cd1ec286e10e173f899910b91ec46966b62d14204cbe146d3912d504b93ca"
+    },
+    {
+      "file": "c16-source-admission-review.log",
+      "bytes": 274,
+      "sha256": "0528cc033f63f6979df65b867c36b378cbc633943e42214c2711dd4fc3c54f62"
+    },
+    {
+      "file": "c16-source-bind-budget.log",
+      "bytes": 273,
+      "sha256": "1c304f601b8e9c0fcfc97c1bd1561ca72c1e703a7f325a2158cc8af6e1dd9f09"
+    },
+    {
+      "file": "c16-source-canonical-guards.log",
+      "bytes": 273,
+      "sha256": "f51c14c362fd10342c450dc676291fcf36e50537c75a28acd3278d95353ea9e0"
+    },
+    {
+      "file": "c16-source-terminal-semantics.log",
+      "bytes": 272,
+      "sha256": "3b9150f37258bdc877a597e11893465218568ec1817e4eac0a03bb4e84d49fa6"
+    },
+    {
+      "file": "c16-backend-tsc-fourth.log",
+      "bytes": 155,
+      "sha256": "f092d38cfda7dfd4978a6327154ee318dc2545dace047c638b4dc07974c17577"
+    }
+  ],
+  "backendTypeBuild": {
+    "exit": 0,
+    "originalBuildPrerequisites": "Unchanged prerequisites passed in checkpoint-01 build-first log; not repeated."
+  }
+}

@@ -1,0 +1,57 @@
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/eduk12_c06_form_worktree/server-version/frontend
+
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > FormPlayer > uses native radio semantics for single-choice fields 102ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > FormPlayer > uses native checkbox semantics and preserves array values for multiple-choice fields 30ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > FormPlayer > associates text fields and validation errors with the visible label 31ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > FormPlayer > keeps month input native and exposes the final-unit submit action 18ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > FormPlayer > preserves Chinese composition events without submitting or navigating 10ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > typed basic FormPlayer > keeps 0 numeric, clears to null and exposes frozen constraints 11ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > typed basic FormPlayer > renders DATE with typed restoration and disabled guards 4ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > typed basic FormPlayer > renders TIME with typed restoration and disabled guards 6ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > typed basic FormPlayer > renders LONG_TEXT with typed restoration and disabled guards 3ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > C05 structured typed adapters > renders Likert through shared choices and clears optional answers to null 37ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > C05 structured typed adapters > adapts matrix row keys without dropping another row 42ms
+ ✓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > exposes the active composition section to keyboard and screen-reader users 97ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > C05 structured typed adapters > adapts multiple matrix row arrays and enforces max selections in controls 32ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > C05 structured typed adapters > requires explicit ranking confirmation and returns a complete order 35ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > C05 structured typed adapters > keeps unconfirmed slider distinct from numeric zero 21ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > C05 structured typed adapters > retains numeric zero and an incomplete constant sum without filling blanks 13ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > C05 structured typed adapters > locks every LIKERT answer control inside the parent disabled fieldset 9ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > C05 structured typed adapters > locks every MATRIX answer control inside the parent disabled fieldset 6ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > C05 structured typed adapters > locks every MATRIX_MULTIPLE answer control inside the parent disabled fieldset 5ms
+ ✓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > prefills only an authorized course passed by the Training course route 45ms
+ ✓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > does not preselect an unlisted course from a tampered URL 26ms
+ ✓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > discards a previous questionnaire response after switching pages 45ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > C05 structured typed adapters > locks every RANK_ORDER answer control inside the parent disabled fieldset 4ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > C05 structured typed adapters > locks every SLIDER answer control inside the parent disabled fieldset 2ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > C05 structured typed adapters > locks every CONSTANT_SUM answer control inside the parent disabled fieldset 3ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > C06 policy controls > uses the shared exclusive toggle and records explicit refusal 16ms
+ ✓ src/components/questionnaire/__tests__/FormPlayer.test.tsx > C06 policy controls > edits selected other text through a separate typed side field 5ms
+ ✓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > offers publication for a saved draft while preserving the revision guard 78ms
+ ✓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > identifies and focuses an empty name without sending a request 28ms
+ ✓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > preserves API message objects and permits course-less drafts under the actual rule 67ms
+ ✓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > shows a field-level deadline requirement for public drafts 79ms
+ ✓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > rejects a deadline earlier than the opening time before saving 37ms
+ ✓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > blocks publication and hides stale checks after editing delivery settings 91ms
+ ✓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > rejects incomplete and invalid calendar dates before creating a public draft 66ms
+ ✓ src/modules/assessment-core/form/training-policy.test.ts > uses stable keys while clearing hidden DB IDs, row objects and other text 3ms
+ ✓ src/modules/assessment-core/form/training-policy.test.ts > clears unselected other text and conditions after explicit refusal 0ms
+ ✓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > authors an ordinary optional Form with the original revision and no context binding 136ms
+ ✓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C04 typed authoring > creates number using the public Form definition without a client itemKey 199ms
+ ✓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C04 typed authoring > creates long_text using the public Form definition without a client itemKey 119ms
+ ✓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C04 typed authoring > creates date using the public Form definition without a client itemKey 102ms
+ ✓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C04 typed authoring > creates time using the public Form definition without a client itemKey 119ms
+ ✓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C05 structured authoring > creates likert as one public FormQuestion 120ms
+ ✓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C05 structured authoring > creates matrix as one public FormQuestion 176ms
+ ✓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C05 structured authoring > creates matrix_multiple as one public FormQuestion 182ms
+ ✓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C05 structured authoring > creates rank_order as one public FormQuestion 120ms
+ ✓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C05 structured authoring > creates slider as one public FormQuestion 87ms
+ ✓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C05 structured authoring > creates constant_sum as one public FormQuestion 128ms
+ ✓ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > C05 incomplete single question stays editable > retains title, options and matrix rows when the server rejects adding an incomplete question 124ms
+
+ Test Files  3 passed (3)
+      Tests  48 passed (48)
+   Start at  17:44:11
+   Duration  3.25s (transform 431ms, setup 314ms, import 604ms, tests 2.73s, environment 970ms)
+

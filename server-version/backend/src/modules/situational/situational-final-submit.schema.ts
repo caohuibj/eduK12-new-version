@@ -1,3 +1,4 @@
+import { sjtOnlineResponseSchema } from './authoring/online'
 import { researchCaptureSchema, type SituationalResearchCapture } from './situation-scientific-contract'
 import { z } from 'zod'
 
@@ -22,7 +23,7 @@ export const situationalStartSchema = z.object({
  * score, contribution, quality, band or percentile field is rejected by the
  * strict response object and is never trusted by the server.
  */
-export const situationalFinalSubmitSchema = z.object({
+const finalIdentityShape = {
   submissionId: z.string().min(16).max(200),
   attemptEpoch: z.number().int().positive(),
   definitionHash: z.string().regex(/^[0-9a-f]{64}$/),
@@ -30,8 +31,18 @@ export const situationalFinalSubmitSchema = z.object({
   compiledRuntimeHash: z.string().regex(/^[0-9a-f]{64}$/).optional(),
   scoringVersion: z.string().min(1).optional(),
   researchCapture: researchCaptureSchema.optional(),
-  responses: z.array(responseSchema).min(1).max(1000),
+}
+
+export const situationalOnlineResponseSchema = sjtOnlineResponseSchema
+export type SituationalOnlineResponse = z.infer<typeof situationalOnlineResponseSchema>
+
+export const situationalLegacyFinalSubmitSchema = z.object({ ...finalIdentityShape, responses: z.array(responseSchema).min(1).max(1000) }).strict()
+export const situationalOnlineFinalSubmitSchema = z.object({
+  ...finalIdentityShape,
+  responseProtocol: z.literal('sjt-online-response-v1'),
+  responses: z.array(situationalOnlineResponseSchema).max(1000),
 }).strict()
+export const situationalFinalSubmitSchema = z.union([situationalLegacyFinalSubmitSchema, situationalOnlineFinalSubmitSchema])
 
 export type SituationalStartInput = z.infer<typeof situationalStartSchema>
 export type SituationalFinalSubmitInput = z.infer<typeof situationalFinalSubmitSchema>

@@ -1,0 +1,343 @@
+{
+  "passed": false,
+  "originalAggregatePassed": false,
+  "checks": [
+    "Stopped PostgreSQL 16 and existing assets byte-verified before clone startup; original summaries preserved unchanged",
+    "Existing restricted runtime role/schema verified; fresh Redis, original API/report/export consumers, no seed or migration"
+  ],
+  "phases": {
+    "variants": {
+      "passed": false,
+      "qualificationScope": "ADMISSION_ONLY",
+      "checks": [],
+      "requests": [
+        {
+          "route": "/auth/csrf",
+          "method": "GET",
+          "status": 200,
+          "bytes": 102
+        },
+        {
+          "route": "/auth/training-login",
+          "method": "POST",
+          "status": 200,
+          "bytes": 318
+        },
+        {
+          "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+          "method": "POST",
+          "status": 500,
+          "bytes": 57
+        },
+        {
+          "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+          "method": "POST",
+          "status": 500,
+          "bytes": 57
+        },
+        {
+          "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+          "method": "POST",
+          "status": 500,
+          "bytes": 57
+        },
+        {
+          "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+          "method": "POST",
+          "status": 500,
+          "bytes": 57
+        },
+        {
+          "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+          "method": "POST",
+          "status": 500,
+          "bytes": 57
+        },
+        {
+          "route": "/composite-assessments/a33ef06a-ab12-4331-a484-e222e48a2ca9/attempts",
+          "method": "POST",
+          "status": 500,
+          "bytes": 57
+        }
+      ],
+      "counts": [
+        {
+          "name": "Targeted six-start census and Cognitive quota consumption",
+          "before": {
+            "definitions": 1,
+            "parents": 1,
+            "forms": 1,
+            "formAnswers": 1,
+            "scales": 1,
+            "cognitive": 1,
+            "sjt": 1,
+            "rawScale": 0,
+            "rawCognitive": 1,
+            "rawSjt": 1,
+            "snapshots": 4,
+            "jobs": 1,
+            "tokens": [
+              {
+                "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+                "usedCount": 0
+              }
+            ]
+          },
+          "after": {
+            "definitions": 1,
+            "parents": 1,
+            "forms": 1,
+            "formAnswers": 1,
+            "scales": 1,
+            "cognitive": 1,
+            "sjt": 1,
+            "rawScale": 0,
+            "rawCognitive": 1,
+            "rawSjt": 1,
+            "snapshots": 4,
+            "jobs": 1,
+            "tokens": [
+              {
+                "id": "919a9cba-984f-4178-8fd8-0d13f43fadd9",
+                "usedCount": 0
+              }
+            ]
+          },
+          "quotaBefore": 0,
+          "quotaAfter": 0
+        }
+      ],
+      "races": [],
+      "allocations": [],
+      "completed": [],
+      "reusedEvidence": null,
+      "optimizedWholeEvidence": [],
+      "qualification": {
+        "browser": false,
+        "load": false,
+        "cpuOrLatency": false,
+        "sampling": "Natural production crypto draws; bounded at 16; both groups must be observed and every sampled attempt fully answered",
+        "mediaLimit": "Hidden SJT probes exercise cross-slot denial; no successful selected-video capability fixture or independent hidden-child HTTP selection-guard claim"
+      }
+    }
+  },
+  "sourceHead": "e90550c534cca1024011a55f8ea1ee82abed99b1",
+  "sourceRuntimeFingerprint": {
+    "schemaVersion": 1,
+    "nodeVersion": "v24.21.0",
+    "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+    "dist": {
+      "files": 5077,
+      "sha256": "bdb62c4e56cd7c9805223ad84d1acd1eb90cb081d145559ebe21be0ba0f7802e"
+    },
+    "files": {
+      "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+      "prisma/schema.prisma": "57e56f348583acd947c031cfcd3ff65ad091f5482bb65b767fa26fc4127a7318",
+      "node_modules/.prisma/client/schema.prisma": "dae38fb7ab4b5ca2ce9785f1b3ab89a282e6c2cac92bcf32c5f4fd65d86f1b14",
+      "node_modules/.prisma/client/index.js": "0704ca08d1a8c3a0df1bae43180e15a73844f701a729c6a684a747400f44277b"
+    },
+    "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+  },
+  "qualificationScope": "ADMISSION_ONLY",
+  "sourceQualificationScope": "REPORT_ONLY",
+  "originalSourceHead": "9aa8b7690c3970e60de6f5d5d3bf3f8403a8e689",
+  "originalRuntimeFingerprint": {
+    "schemaVersion": 1,
+    "nodeVersion": "v24.21.0",
+    "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+    "dist": {
+      "files": 5073,
+      "sha256": "d21bf9405cdfba0688bbeac91c8d1765f6cb36f325de48c1c6f251421ddc1b69"
+    },
+    "files": {
+      "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+      "prisma/schema.prisma": "57e56f348583acd947c031cfcd3ff65ad091f5482bb65b767fa26fc4127a7318",
+      "node_modules/.prisma/client/schema.prisma": "dae38fb7ab4b5ca2ce9785f1b3ab89a282e6c2cac92bcf32c5f4fd65d86f1b14",
+      "node_modules/.prisma/client/index.js": "0704ca08d1a8c3a0df1bae43180e15a73844f701a729c6a684a747400f44277b"
+    },
+    "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+  },
+  "sourceHarnessInputs": {
+    "scripts/recovery/c14-variants-resume.py": "4f92379cdcd95a7978a4253b32a8c96dd704ad7f45c73755cea772323387d423",
+    "scripts/recovery/c14-variants-smoke.mjs": "0c1f3ba6440db5f956f97c3a33f7b0ee941048c279f0fb9b89ee9b4b48c0b485",
+    "scripts/recovery/c14-training-fixture.mjs": "df0ce907f801ec6fa719ec326dc49a6bd05147331e176ac652ea87825217e603",
+    "scripts/recovery/c14-variants-restore.py": "6f8396ed29a70f34ac6ae516de9fb3dea3fb0c8eb37ad90c65a5ef1564786144",
+    "scripts/recovery/local-stack.py": "6e2be9037719977a502dbd5eb9a7aeac04e06b2d22f5cf41eb7e767f6b3eb79b",
+    "scripts/recovery/runtime-fingerprint.cjs": "d03a5fdafa8718657ae974e11b52f71f5a77623aac32e243eb729cc338791ce2",
+    "scripts/recovery/loopback-only.cjs": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d",
+    "e2e/questionnaire-products-fixture.ts": "f5a1f97986a60c937f6bc299d73f83cb10a448701f5dcc751c70077a11c7e1ac",
+    "backend/src/modules/situational/authoring/examples/online-hand-calculated.json": "a8e9eb897bd7705c785a86bc0de16d0bce7c7e28e90611542ac2e0c79ccf7e5a"
+  },
+  "sourceState": "/workspace/scratch/5a77e8bdc1ae/eduk12_c14_resume_report_01",
+  "evidenceScope": "Historical passed observations remain bound to the original runtime and feature flags and do not qualify the current runtime; existing accepted facts stay unchanged while only missing and affected continuation work is executed.",
+  "runtimeFlagChanges": {
+    "ASSESSMENT_COMPACT_FACTS_ENABLED": {
+      "sourcePresent": true,
+      "sourceValue": "true",
+      "sourceEffectiveEnabled": true,
+      "currentPresent": true,
+      "currentValue": "true",
+      "currentEffectiveEnabled": true
+    },
+    "ASSESSMENT_SHARED_CONTROL_ENABLED": {
+      "sourcePresent": true,
+      "sourceValue": "true",
+      "sourceEffectiveEnabled": true,
+      "currentPresent": true,
+      "currentValue": "true",
+      "currentEffectiveEnabled": true
+    },
+    "ASSESSMENT_REPORT_COMPACT_READ_ENABLED": {
+      "sourcePresent": true,
+      "sourceValue": "true",
+      "sourceEffectiveEnabled": true,
+      "currentPresent": true,
+      "currentValue": "true",
+      "currentEffectiveEnabled": true
+    },
+    "ASSESSMENT_REPORT_COMMITTED_CONTEXT_ENABLED": {
+      "sourcePresent": true,
+      "sourceValue": "true",
+      "sourceEffectiveEnabled": true,
+      "currentPresent": true,
+      "currentValue": "true",
+      "currentEffectiveEnabled": true
+    },
+    "ASSESSMENT_REPORT_CONTEXT_REUSE_ENABLED": {
+      "sourcePresent": true,
+      "sourceValue": "true",
+      "sourceEffectiveEnabled": true,
+      "currentPresent": true,
+      "currentValue": "true",
+      "currentEffectiveEnabled": true
+    },
+    "ASSESSMENT_SCALE_COLLECTION_BATCH_ENABLED": {
+      "sourcePresent": true,
+      "sourceValue": "true",
+      "sourceEffectiveEnabled": true,
+      "currentPresent": true,
+      "currentValue": "true",
+      "currentEffectiveEnabled": true
+    },
+    "ASSESSMENT_WHOLE_ATOMIC_RECEIPT_ENABLED": {
+      "sourcePresent": true,
+      "sourceValue": "false",
+      "sourceEffectiveEnabled": false,
+      "currentPresent": true,
+      "currentValue": "false",
+      "currentEffectiveEnabled": false
+    },
+    "ASSESSMENT_WHOLE_DURABLE_BACKLOG_ENABLED": {
+      "sourcePresent": true,
+      "sourceValue": "false",
+      "sourceEffectiveEnabled": false,
+      "currentPresent": true,
+      "currentValue": "false",
+      "currentEffectiveEnabled": false
+    },
+    "PERF_ISOLATED_TEST_MODE": {
+      "sourcePresent": false,
+      "sourceValue": null,
+      "sourceEffectiveEnabled": false,
+      "currentPresent": true,
+      "currentValue": "1",
+      "currentEffectiveEnabled": true
+    },
+    "ASSESSMENT_TIMELINE_ENABLED": {
+      "sourcePresent": false,
+      "sourceValue": null,
+      "sourceEffectiveEnabled": false,
+      "currentPresent": true,
+      "currentValue": "true",
+      "currentEffectiveEnabled": true
+    }
+  },
+  "runtimeConfigurationChanged": true,
+  "reusedEvidence": {
+    "checks": 10,
+    "requests": 99,
+    "allocations": 1,
+    "completed": 0,
+    "qualifiesCurrentRuntime": false,
+    "sourceChecks": [
+      "Real restricted runtime; independent owner-authored SJT releases/images and exact grants; group-exclusive four-tool synthetic resources",
+      "Owner revisioned config validation and immutable publication; one parent union, no per-group composite products",
+      "Candidate a Scale deployment DENY prevents every group draw for member/public",
+      "Candidate a decryptable invalid resolved Cognitive config prevents every group draw for member/public",
+      "Candidate b Scale deployment DENY prevents every group draw for member/public",
+      "Candidate b decryptable invalid resolved Cognitive config prevents every group draw for member/public",
+      "/composite-assessments FORM_SECTION: first durable FINAL ACK prevents restart before replay/state/report",
+      "/composite-assessments SCALE: first durable FINAL ACK prevents restart before replay/state/report",
+      "/composite-assessments COGNITIVE: first durable FINAL ACK prevents restart before replay/state/report",
+      "/composite-assessments SITUATIONAL: first durable FINAL ACK prevents restart before replay/state/report"
+    ]
+  },
+  "head": "f0d7c426bf9bf4e6414b95a210078fa813c92046",
+  "runtimeFingerprint": {
+    "schemaVersion": 1,
+    "nodeVersion": "v24.21.0",
+    "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+    "dist": {
+      "files": 5077,
+      "sha256": "bdb62c4e56cd7c9805223ad84d1acd1eb90cb081d145559ebe21be0ba0f7802e"
+    },
+    "files": {
+      "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+      "prisma/schema.prisma": "57e56f348583acd947c031cfcd3ff65ad091f5482bb65b767fa26fc4127a7318",
+      "node_modules/.prisma/client/schema.prisma": "dae38fb7ab4b5ca2ce9785f1b3ab89a282e6c2cac92bcf32c5f4fd65d86f1b14",
+      "node_modules/.prisma/client/index.js": "0704ca08d1a8c3a0df1bae43180e15a73844f701a729c6a684a747400f44277b"
+    },
+    "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+  },
+  "sourceInputsSha256": "39a6db2afc64db44b54f2bba15090473070a73f846ed49fe996c4e6b484a46f3",
+  "changedSourceFiles": [
+    "server-version/backend/src/__tests__/assessment-runtime/slot-plan-transaction.test.ts",
+    "server-version/backend/src/__tests__/composite/training-variant-scope.test.ts",
+    "server-version/backend/src/controllers/publicQuestionnaireController.ts",
+    "server-version/backend/src/controllers/questionnaireController.ts",
+    "server-version/backend/src/modules/assessment-runtime/shared-control-records.ts",
+    "server-version/backend/src/modules/assessment-runtime/slot-set.ts",
+    "server-version/backend/src/modules/composite/composite.service.ts",
+    "server-version/backend/src/modules/composite/training-variant-child-scope.ts",
+    "server-version/backend/src/modules/composite/training-variant-scope.ts",
+    "server-version/backend/src/services/assessmentContextService.ts",
+    "server-version/backend/src/services/questionnaire-form-section.service.ts",
+    "server-version/scripts/recovery/c14-admission-observer.mjs",
+    "server-version/scripts/recovery/c14-http-contract-audit.md",
+    "server-version/scripts/recovery/c14-variants-resume.py",
+    "server-version/scripts/recovery/c14-variants-smoke.mjs",
+    "server-version/scripts/recovery/c14-whole-shared-controls.mjs"
+  ],
+  "trackedSourceDiffSha256": "b502ed92c14471ab3cb3450c9eb68a15c9d328fcc42f80a8b1c90fbc2c8e7e7e",
+  "untrackedSourceInputs": [],
+  "sourceDiffSha256": "2fb30adbc6a253dca2b14f8471766e8df68502a8c7d670732015dd57461220bd",
+  "harnessInputs": {
+    "scripts/recovery/c14-variants-resume.py": "647c534f87c9c15f4c796924ba1335e445e3a2b1b9472d43ed56ad997b9832ab",
+    "scripts/recovery/c14-variants-smoke.mjs": "d89108d51affd5b499e6876f702318ca0e43478017cf568f20cfcf691454cf62",
+    "scripts/recovery/c14-training-fixture.mjs": "df0ce907f801ec6fa719ec326dc49a6bd05147331e176ac652ea87825217e603",
+    "scripts/recovery/c14-variants-restore.py": "6f8396ed29a70f34ac6ae516de9fb3dea3fb0c8eb37ad90c65a5ef1564786144",
+    "scripts/recovery/c14-whole-shared-controls.mjs": "759875ef7cbb3e193a41859751f40bd479c60379898e334dfb275e45c3a47418",
+    "scripts/recovery/c14-admission-observer.mjs": "7a838c69e9b97af19824c93323e3f68113fd672c5345254b16487738dd5d43c4",
+    "scripts/recovery/local-stack.py": "6e2be9037719977a502dbd5eb9a7aeac04e06b2d22f5cf41eb7e767f6b3eb79b",
+    "scripts/recovery/runtime-fingerprint.cjs": "d03a5fdafa8718657ae974e11b52f71f5a77623aac32e243eb729cc338791ce2",
+    "scripts/recovery/loopback-only.cjs": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d",
+    "e2e/questionnaire-products-fixture.ts": "f5a1f97986a60c937f6bc299d73f83cb10a448701f5dcc751c70077a11c7e1ac",
+    "backend/src/modules/situational/authoring/examples/online-hand-calculated.json": "a8e9eb897bd7705c785a86bc0de16d0bce7c7e28e90611542ac2e0c79ccf7e5a"
+  },
+  "candidateHead": "f0d7c426bf9bf4e6414b95a210078fa813c92046",
+  "sourceDiffBase": "Recorded source HEAD; historical uncommitted source bytes were not saved. Runtime fingerprints are independently recorded.",
+  "runtimeArtifactChanged": false,
+  "runtimeChanged": true,
+  "sourceManifestSha256": "b6a223b10532e9b4292c83ef6cbed2bd3d4c02c85ac81ca4edfffe0909a28b8d",
+  "sourceSummarySha256": {
+    "status.json": "38c914528c0f936e5a56485495fac21faa564cbbe4931f1f769d105f1df8312b",
+    "c14-runtime-result.json": "a59b3fd638e8b1462d87a5c5c37f58bc4f8a720c4cf3f970d6ccfe34430aa189",
+    "c14-http-result.json": "5bd68336de682cabdc9530a110b2e9a89d075b4bfb5318d199bd847c8b4fe2ef",
+    "c14-http.log": "c58a5de811ab6fa88fc0e086aa5a026ef074345a4dbca3368b2d3d124a4e0ed8"
+  },
+  "schemaBeforeSha256": "466568d408d68c772a3b8543c147f7a1d317e84fd0a39d2405959b01a63368f4",
+  "errorType": "RuntimeError",
+  "cleanupVerified": true,
+  "sourceUnchanged": true,
+  "inputsUnchanged": true
+}

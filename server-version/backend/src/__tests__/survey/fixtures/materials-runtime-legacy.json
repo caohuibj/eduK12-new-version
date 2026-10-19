@@ -1,0 +1,197 @@
+{
+  "oldBase": "c0cd98296915b7006d0f98495b75e18198647bd8",
+  "oldBlobs": {
+    "server-version/backend/src/modules/assessment-core/flow/training.ts": "3b1abaa90022de4d8daa174dcfeb42e1df3eed2d",
+    "server-version/backend/src/modules/survey/flow.runtime.ts": "5f52bd0d6acea6eae3f7e2d3eeaf5d7f13015a14"
+  },
+  "units": [
+    {
+      "instrumentKey": "first",
+      "kind": "FORM",
+      "required": true,
+      "definitionHash": "de5f2cbf4c10a0d146f2a671aac363e8640fefc469ad42ac25364f19e4bc194f",
+      "displayDefinition": {
+        "pages": [
+          {
+            "questions": [
+              {
+                "itemKey": "answer",
+                "type": "SINGLE",
+                "options": [
+                  {
+                    "optionKey": "yes"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "input": {
+    "schemaVersion": 1,
+    "blocks": [
+      {
+        "blockKey": "welcome",
+        "kind": "MATERIAL",
+        "title": "Welcome",
+        "body": "Only a display"
+      },
+      {
+        "blockKey": "first_block",
+        "kind": "INSTRUMENT",
+        "instrumentKey": "first"
+      }
+    ]
+  },
+  "config": {
+    "schemaVersion": 1,
+    "blocks": [
+      {
+        "blockKey": "welcome",
+        "kind": "MATERIAL",
+        "title": "Welcome",
+        "body": "Only a display"
+      },
+      {
+        "blockKey": "first_block",
+        "kind": "INSTRUMENT",
+        "instrumentKey": "first"
+      }
+    ],
+    "policy": {
+      "schemaVersion": 1,
+      "dependency": "ACCEPTED_ONLY",
+      "skippedDependency": "SKIP_WHOLE_CONDITION",
+      "completion": "VALID_MEASUREMENT_AND_ACCEPTED_REQUIRED_V1",
+      "material": "DISPLAY_ONLY",
+      "hiddenAnswer": "SKIP_WHOLE_CONDITION",
+      "refusedAnswer": "MISSING"
+    },
+    "unionDigest": "8190c0389e9cf574c78a2f7ff694b5d26ff9f9595d445d3ad495c057f36ab672",
+    "flowDigest": "40db39771cf1f0b467925db2f86a322adfff3b692f3526755a6ae87f7900db26"
+  },
+  "paths": [
+    {
+      "schemaVersion": 1,
+      "flowDigest": "40db39771cf1f0b467925db2f86a322adfff3b692f3526755a6ae87f7900db26",
+      "unionDigest": "8190c0389e9cf574c78a2f7ff694b5d26ff9f9595d445d3ad495c057f36ab672",
+      "reachedInstrumentKeys": [
+        "first"
+      ],
+      "acceptedInstrumentKeys": [],
+      "currentInstrumentKey": "first",
+      "materials": [
+        {
+          "blockKey": "welcome",
+          "kind": "MATERIAL",
+          "title": "Welcome",
+          "body": "Only a display"
+        }
+      ],
+      "shownBlocks": [
+        "welcome",
+        "first_block"
+      ],
+      "skipped": [],
+      "termination": "PENDING",
+      "endBlockKey": null,
+      "taskSatisfaction": "PENDING",
+      "acceptedFacts": [],
+      "pathDigest": "f958295253a63394005e60a619198381ea26efd4ce60c00a77e8f41b490de2cf"
+    },
+    {
+      "schemaVersion": 1,
+      "flowDigest": "40db39771cf1f0b467925db2f86a322adfff3b692f3526755a6ae87f7900db26",
+      "unionDigest": "8190c0389e9cf574c78a2f7ff694b5d26ff9f9595d445d3ad495c057f36ab672",
+      "reachedInstrumentKeys": [
+        "first"
+      ],
+      "acceptedInstrumentKeys": [
+        "first"
+      ],
+      "currentInstrumentKey": null,
+      "materials": [
+        {
+          "blockKey": "welcome",
+          "kind": "MATERIAL",
+          "title": "Welcome",
+          "body": "Only a display"
+        }
+      ],
+      "shownBlocks": [
+        "welcome",
+        "first_block"
+      ],
+      "skipped": [],
+      "termination": "COMPLETE",
+      "endBlockKey": null,
+      "taskSatisfaction": "SATISFIED",
+      "acceptedFacts": [
+        {
+          "instrumentKey": "first",
+          "acceptedHash": "fact-hash",
+          "requirementSatisfied": true,
+          "hasValidMeasurement": true
+        }
+      ],
+      "pathDigest": "a4baed11b1f67ba351f029f4818748065e4728b4c9edcd6268e58379ba351d84"
+    }
+  ],
+  "surveyInput": {
+    "schemaVersion": 1,
+    "blocks": [
+      {
+        "blockKey": "welcome",
+        "kind": "MATERIAL",
+        "title": "Welcome",
+        "body": "Only a display"
+      },
+      {
+        "blockKey": "first_block",
+        "kind": "INSTRUMENT",
+        "instrumentKey": "first"
+      }
+    ],
+    "experiment": {
+      "experimentKey": "materials",
+      "linkedPolicy": "RERANDOMIZE",
+      "groups": [
+        {
+          "groupKey": "a",
+          "weight": 1,
+          "materialTitle": "Title A",
+          "materialBody": "Body A"
+        },
+        {
+          "groupKey": "b",
+          "weight": 1,
+          "materialTitle": "Title B",
+          "materialBody": "Body B"
+        }
+      ]
+    }
+  },
+  "assignment": {
+    "schemaVersion": 1,
+    "flowDigest": "89acc806430d3f52c1accbc5468ca55d96e49ad4e8f909e92874e89584e6cba8",
+    "experimentKey": "materials",
+    "groupKey": "a",
+    "algorithm": "CRYPTO_RANDOM_INT_V1",
+    "assignedAt": "2026-10-18T00:00:00.000Z"
+  },
+  "result": {
+    "instrumentKey": "first",
+    "kind": "FORM",
+    "sourceDigest": "source",
+    "scoringDigest": "score",
+    "rawAnswers": {
+      "answer": "yes"
+    },
+    "missing": [],
+    "privateScoring": null
+  },
+  "executionString": "{\"trace\":{\"schemaVersion\":1,\"flowDigest\":\"89acc806430d3f52c1accbc5468ca55d96e49ad4e8f909e92874e89584e6cba8\",\"assignmentDigest\":\"7e287079d2894f1a80dab9dd26f443d21b1d0874686516a14fb11c4bd009acb9\",\"algorithm\":\"CRYPTO_RANDOM_INT_V1\",\"experimentKey\":\"materials\",\"groupKey\":\"a\",\"shownBlocks\":[\"assigned_material\",\"welcome\",\"first_block\"],\"skippedInstrumentKeys\":[],\"termination\":\"COMPLETE\",\"endBlockKey\":null,\"clientPresentation\":\"VERIFIED_SUBMISSION\"},\"units\":[{\"instrumentKey\":\"first\",\"kind\":\"FORM\",\"sourceDigest\":\"source\",\"scoringDigest\":\"score\",\"rawAnswers\":{\"answer\":\"yes\"},\"missing\":[],\"privateScoring\":null}],\"presentation\":[{\"blockKey\":\"assigned_material\",\"kind\":\"MATERIAL\",\"title\":\"Title A\",\"body\":\"Body A\"},{\"blockKey\":\"welcome\",\"kind\":\"MATERIAL\",\"title\":\"Welcome\",\"body\":\"Only a display\"},{\"blockKey\":\"first_block\",\"kind\":\"INSTRUMENT\",\"instrumentKey\":\"first\"}]}",
+  "projectionString": "{\"schemaVersion\":1,\"flowDigest\":\"89acc806430d3f52c1accbc5468ca55d96e49ad4e8f909e92874e89584e6cba8\",\"selectedMaterial\":{\"blockKey\":\"assigned_material\",\"title\":\"Title A\",\"body\":\"Body A\"},\"embeddedData\":[],\"blocks\":[{\"blockKey\":\"welcome\",\"kind\":\"MATERIAL\",\"title\":\"Welcome\",\"body\":\"Only a display\"},{\"blockKey\":\"first_block\",\"kind\":\"INSTRUMENT\",\"instrumentKey\":\"first\"}]}"
+}

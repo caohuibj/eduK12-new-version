@@ -1,3 +1,4 @@
+import { assertTrainingChildSelected, TRAINING_VARIANT_PARENT_MARKER_SELECT } from '../modules/composite/training-variant-child-scope'
 import { loadScaleAnswers } from '../modules/scale/scale-workflow.service'
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
@@ -937,12 +938,14 @@ export const scaleController = {
         const assessment = await tx.assessment.findUnique({
           where: { id: assessmentId },
           include: {
+            compositeAttempt: { select: TRAINING_VARIANT_PARENT_MARKER_SELECT },
             scale: { select: { id: true, code: true, name: true, instrumentVersion: true, instrumentClass: true, definition: true } },
             questionnaireAssessment: { select: { contextSnapshotEncrypted: true, contextSnapshotHash: true } },
           },
         })
         if (!assessment) return { kind: 'not-found' as const }
         if (assessment.userId !== userId) return { kind: 'forbidden' as const }
+        await assertTrainingChildSelected(assessment, { db: tx })
         if (assessment.status !== 'IN_PROGRESS') return { kind: 'ended' as const }
         const definition = scaleDefinitionFromRecord(assessment.scale)
         const answer = { itemCode, responseValue, responseTimeMs: responseTimeMs === undefined ? undefined : Number(responseTimeMs), answeredAt: new Date().toISOString() }
@@ -1011,12 +1014,14 @@ export const scaleController = {
         const assessment = await tx.assessment.findUnique({
           where: { id: assessmentId },
           include: {
+            compositeAttempt: { select: TRAINING_VARIANT_PARENT_MARKER_SELECT },
             scale: { select: { id: true, code: true, name: true, instrumentVersion: true, instrumentClass: true, definition: true } },
             questionnaireAssessment: { select: { contextSnapshotEncrypted: true, contextSnapshotHash: true } },
           },
         })
         if (!assessment) return { kind: 'not-found' as const }
         if (assessment.userId !== userId) return { kind: 'forbidden' as const }
+        await assertTrainingChildSelected(assessment, { db: tx })
         if (assessment.status !== 'IN_PROGRESS') return { kind: 'ended' as const }
 
         const definition = scaleDefinitionFromRecord(assessment.scale)
@@ -1098,6 +1103,7 @@ export const scaleController = {
         })
         if (!assessment) return { kind: 'not-found' as const }
         if (assessment.userId !== userId) return { kind: 'forbidden' as const }
+        await assertTrainingChildSelected(assessment, { db: tx })
         if (assessment.status === 'COMPLETED') {
           return { kind: 'completed' as const, assessment: (await loadScaleAssessmentForResponse(assessment, undefined, tx)) }
         }
@@ -1171,10 +1177,11 @@ export const scaleController = {
       const { assessmentId } = req.params
       const assessment = await prisma.assessment.findUnique({
         where: { id: assessmentId },
-        include: { scale: { select: { id: true, code: true, name: true, description: true, instrumentVersion: true, instrumentClass: true, definition: true } } },
+        include: { compositeAttempt: { select: TRAINING_VARIANT_PARENT_MARKER_SELECT }, scale: { select: { id: true, code: true, name: true, description: true, instrumentVersion: true, instrumentClass: true, definition: true } } },
       })
       if (!assessment) return notFound(res, '测评记录不存在')
       if (assessment.userId !== userId) return forbidden(res, '无权限查看此测评')
+      await assertTrainingChildSelected(assessment)
       if (assessment.status === 'COMPLETED' && await isCompositeParticipantFeedbackDeferred(assessment.compositeAttemptId)) {
         return forbidden(res, '完成整份测评后才能查看单项反馈')
       }

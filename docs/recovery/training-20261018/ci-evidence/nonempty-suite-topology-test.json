@@ -1,0 +1,19 @@
+{
+  "kind": "local-test-execution-record",
+  "officialCiQualification": false,
+  "sourceBase": "024469240df9feaf29fd7c97ef7e9b8f39905fbd",
+  "recordedAtUtc": "2026-10-19T00:32:20.303754+00:00",
+  "command": "/workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/node_modules/node/bin/node --test .github/scripts/ci-topology.test.mjs",
+  "exitCode": 0,
+  "tests": 10,
+  "passed": 10,
+  "failed": 0,
+  "skipped": 0,
+  "durationMs": 382.219031,
+  "inputs": {
+    "server-version/backend/scripts/assert-release-test-report.mjs": "cab7baa85182368563837437b54163e596d8be5fbeed225a5ebb3d7d0c3c1379",
+    ".github/scripts/ci-topology.test.mjs": "4f21c0da8873cfbd979c2fd6c11f6b0a89c7a075cd046020d6640d740529e86b"
+  },
+  "cases": "Mandatory suites with omitted or empty assertionResults, skipped or pending assertions fail; a nonempty passed assertion succeeds.",
+  "note": "Recorded from completed local tool output; no PostgreSQL/browser tests executed and no official CI admission claimed."
+}

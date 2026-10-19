@@ -1,0 +1,133 @@
+{
+  "kind": "local-targeted-evidence-not-ci-attestation",
+  "qualifiedSourceHead": "bcd11eab619d2047d5055197b7393ccf75296c72",
+  "qualifiedSourceTree": "deb812973774305178a341c02113cfa434a95a13",
+  "backendTree": "291db39cc0b80b12ccdd38a305b346f14dc3eade",
+  "logs": [
+    {
+      "path": "build-01.log",
+      "rawSha256": "09f1642aaefe7a10b854ef885ac045811b86f2335427b6178c4e88cfc9a82cc4",
+      "publishedSha256": "09f1642aaefe7a10b854ef885ac045811b86f2335427b6178c4e88cfc9a82cc4"
+    },
+    {
+      "path": "build-tests-05.log",
+      "rawSha256": "cb706605ebcb576a3b046f933549943f78be251580ead996b569932c08293ce0",
+      "publishedSha256": "2a2f50659e9da25022a794301c456047d712eb8180bb31acac4b08a6b93a9ad6"
+    },
+    {
+      "path": "build-tests-07.log",
+      "rawSha256": "8d40ea4666fe79a9ac00b8aa3377c93f373a4571b666ce7bfdffe296280d1018",
+      "publishedSha256": "556817dbb6c334b0825df24908b020a6b40f55d082efc7499d3e25d35d4fc381"
+    },
+    {
+      "path": "build-tests-08.log",
+      "rawSha256": "b31fe3d04c32a678d23f0d00ebbc9ae41237ff4ac6c731e2d01e229ab312d5ee",
+      "publishedSha256": "d3c7ba64c54f783c0674891fb6fe31481e44be4456e954ba74c085e40904de03"
+    },
+    {
+      "path": "http-01.log",
+      "rawSha256": "08b16c0ac8b67b73a7aa3e500a5387a30dadfbcb7fa228f71f13e8cfa8a74c88",
+      "publishedSha256": "14a1e30d02031d100cf1dd1b0aa3cb282e562d46dffb86cdfb1ac54d4de4b481"
+    },
+    {
+      "path": "http-02.log",
+      "rawSha256": "4f296689a31e8f3d6d38463420b86b8e67051b9aa45ed2223d960606a978f9c7",
+      "publishedSha256": "0a66363ca35daa693ff13d7091a149e22580fac6be669e77a1fcb83728832cde"
+    },
+    {
+      "path": "http-03.log",
+      "rawSha256": "ef851db7eb88764e5dcad40eb81432ae6d2c1b31017b82146be6bca8e6d611af",
+      "publishedSha256": "fe6477eacc03217a6d1a7d27b8dbe3627599b00f0e22077a169c306ff5e93529"
+    },
+    {
+      "path": "npm-ci.log",
+      "rawSha256": "671c4606acb8db8591722b8982943a74a0ead31e2af60b11333e82c7b3528dc5",
+      "publishedSha256": "671c4606acb8db8591722b8982943a74a0ead31e2af60b11333e82c7b3528dc5"
+    },
+    {
+      "path": "tests-01.log",
+      "rawSha256": "b78302a9fff3d47a62afd55a323f0ae8ed56c57f7c3e25d665ec530059e7bc02",
+      "publishedSha256": "b71c3cb75ab8612d841cba104ed9985efc242101e846711c7b936853b708e51a"
+    },
+    {
+      "path": "tests-02.log",
+      "rawSha256": "ce5ace21010c6e9e2d1488ec4ee5debf5fce0a823e3433bd6e1ea22600e32894",
+      "publishedSha256": "5d0f6942fc0c476e6334c077343edeb73b61f2cd21626b578059c317fbb2bfe7"
+    },
+    {
+      "path": "tests-03.log",
+      "rawSha256": "d7f5fff4e1ce9f009b0706e9c1f3db25ed301600080633895189fff05a646efa",
+      "publishedSha256": "26c29655396885d986b92017767b85815e12d9c9ea20ce560ac8b4be08f068e1"
+    },
+    {
+      "path": "tests-04.log",
+      "rawSha256": "213b09dd5ce3a7509731363659f000f33bc98c860eb01130b541b9546113ea16",
+      "publishedSha256": "9518e70dd1a97d15a2ba0cd84852cbde062d700c4889e548ba2b7b692ffa95f3"
+    },
+    {
+      "path": "tests-06.log",
+      "rawSha256": "174e7ada8026021268774c0e65fc67c0983a80b3dd645f3e248e804ecab78a2b",
+      "publishedSha256": "62c3dfd4e2bec949679fd190bc0b14828f2c0ea539ee99666dd9b7fa099fcc0c"
+    },
+    {
+      "path": "run01-c11-http.log",
+      "rawSha256": "348343506e1881c59aaa48b22db9738b95004668c5801e4abab6ad0fb9e18a54",
+      "publishedSha256": "704faa6c39f42c227c7755bf7664dc8feca791d95a2aee4ffd353ed0cd4bbbf2"
+    },
+    {
+      "path": "run02-c11-http.log",
+      "rawSha256": "00b00ab9e579dac5a56e9a97eb0a1b9a53c1c9e046a6ca104dfc0166b6f40cbe",
+      "publishedSha256": "5949f70c2214001cdcb21e2826b1cbc7cf5969bb06652b6045fce2335c4096bc"
+    },
+    {
+      "path": "run03-c11-http.log",
+      "rawSha256": "1b5356bb4586cf0b9a3f53165673365f47b512a1e056d528fce418455acb9092",
+      "publishedSha256": "1b5356bb4586cf0b9a3f53165673365f47b512a1e056d528fce418455acb9092"
+    },
+    {
+      "path": "run03-c11-mixed.log",
+      "rawSha256": "e9d4605ad2e7330db609fd387cb8ce1e9dc1618f95b9f737b4b04b5293e2fb5f",
+      "publishedSha256": "e9d4605ad2e7330db609fd387cb8ce1e9dc1618f95b9f737b4b04b5293e2fb5f"
+    }
+  ],
+  "http": {
+    "artifact": "http-03.json",
+    "passed": true,
+    "sjtRequests": 119,
+    "mixedRequests": 56,
+    "checkGroups": 13,
+    "cleanupVerified": true
+  },
+  "limitations": [
+    "No browser verification; C25 remains separate.",
+    "No production, PR or CI activity; no local CI attestation claim.",
+    "No performance conclusion; RSS and query/storage shape are diagnostics only.",
+    "No C12 controlled multiple choice or C13 full licensing/images implementation.",
+    "Retirement race uses the same real PostgreSQL row update under an explicitly held test transaction; HTTP retire separately verified.",
+    "Builtins and uploaded student anonymous paths exercised; C10 unchanged logic is not fully retested."
+  ],
+  "inputBinding": "The evidence-only commit following bcd11eab does not change application, test harness, dependency, schema, or generated dist inputs.",
+  "execution": {
+    "tools": "Node 24.21.0; PostgreSQL 16.15; Redis 7.4.11; fresh Prisma Client 5.22.0",
+    "serialization": "All builds, selected tests and PG/HTTP run under the same TOOLS/.measurement.lock, without nested locking.",
+    "backendBuild": "node --import tsx equivalents of every original package.json build prerequisite, then node node_modules/typescript/bin/tsc; unchanged manifest/onboarding prerequisites reused on targeted recompiles.",
+    "tests": "node node_modules/vitest/vitest.mjs run <explicit affected files in corresponding log> --maxWorkers=1; legacy Cognitive ON contract runs use COGNITIVE_MODULE_ENABLED=true at process launch.",
+    "http": "python3 server-version/scripts/recovery/c11-sjt-http.py --tools <verified tools> --state <fresh private synthetic state>; default --phase all",
+    "bind": "http-03 sourceHead, exact harnessInputs, dist/file/generated-client hashes checked before and after both phases; logs retained with raw and scrubbed file SHA-256."
+  },
+  "artifacts": [
+    {
+      "path": "http-01.json",
+      "sha256": "edd599535dfab7766b58316791b0b96ccd48c4c54a9140a5ef3032e26558cfcf"
+    },
+    {
+      "path": "http-02.json",
+      "sha256": "7277b21092af4e1b115d88454a8bb561508d76b80ccd67c5926e027606c9869f"
+    },
+    {
+      "path": "http-03.json",
+      "sha256": "551359a6642527c140d8deaefd0ae8ae287ccb3dadf3ff7bedd2af4cc565e0d4"
+    }
+  ],
+  "logPublication": "Workspace path prefix scrubbed and terminal blank lines normalized; original complete log digests retained."
+}

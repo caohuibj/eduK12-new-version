@@ -1,0 +1,17 @@
+{
+  "scope": "PRODUCER_SYNTAX_AND_INPUT_BINDING_ONLY",
+  "inputs": {
+    "c20-materials-http.py": "9a6e5ad61ad27d7e60b4e6c082ef27d8644c4c0f402024a033365bb63a38605f",
+    "c20-materials-receipts.py": "ec36f0a3fd26d807d228f542c07e02a5bf9a171951ee4cf7f7b02ec4642c97f7",
+    "c20-materials-receipts-check.py": "141766bd58653e11805142057b93443ec81f54afc094a5f212400ef540107db7",
+    "c20-materials-guards-continuation.mjs": "3ab89a1a0fde2a5aaf8d2f100f027887d91db90593b96dcc8c18dcbd27226ce8",
+    "c20-materials-README.md": "52510e439d370983741e566499928e038a7a2c5d3cc8cbf22220abecd2b0bb9e"
+  },
+  "exitCode": 0,
+  "stdout": "",
+  "stderr": "",
+  "unchangedReceiptTestEvidence": {
+    "path": "/workspace/scratch/5a77e8bdc1ae/c20-guards-launcher-static-20261019.json",
+    "sha256": "8309c6af9fe5dfb249944c80c550fbb33ab707a9024c254765dc5f414422d2d6"
+  }
+}

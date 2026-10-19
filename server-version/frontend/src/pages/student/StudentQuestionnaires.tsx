@@ -74,7 +74,7 @@ const StudentQuestionnaires: React.FC = () => {
         <ProductStatus kind="info" title="暂无可用的问卷">当有适用于你的已发布问卷后，会显示在这里。</ProductStatus>
       ) : (
         <div className="grid gap-4">
-          {collections.map(row => <DiscoveryCard key={row.id} to={row.href} title={row.name} description={row.description} notice={row.canContinue ? '继续当前问卷作答' : row.availability !== 'OPEN' ? '当前问卷尚未开放或已结束' : '各项测评独立反馈'} meta={<span>{row.estimatedModules} 个内容单元</span>} />)}
+          {collections.map(row => <DiscoveryCard key={row.id} to={row.href} title={row.name} description={row.description} notice={row.canContinue ? '继续当前问卷作答' : row.availability !== 'OPEN' ? '当前问卷尚未开放或已结束' : '各项测评独立反馈'} meta={<span>{row.estimatedModules == null ? '按作答路径逐步呈现' : `${row.estimatedModules} 个内容单元`}</span>} />)}
           {questionnaires.map((questionnaire) => (
             <DiscoveryCard
               key={questionnaire.id}

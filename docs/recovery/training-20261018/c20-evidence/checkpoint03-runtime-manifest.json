@@ -1,0 +1,58 @@
+{
+  "qualification": "state01 upgrade accepted/main failed; state02 exact continuation main accepted; remaining C20 phases not run",
+  "members": {
+    "eduk12_c20_http_01/c20-main-result.json": {
+      "sha256": "0446d1982381502a86566fc7d01d2ce637a2db2d2226756d320d2efc991162f8",
+      "size": 8180,
+      "gzipSha256": "7f5a3658fcc4bb4bb8d437a9fc349056250964e395800dfb77b37a27e0797114",
+      "gzipSize": 1123
+    },
+    "eduk12_c20_http_01/c20-upgrade-result.json": {
+      "sha256": "23ccbc2cbb8843d7c717f3f67298298cfaecbd27410307d147339d2914e547c2",
+      "size": 15427,
+      "gzipSha256": "190ea6a50fbeb2f6a51e5e3351ef52f35b69d3caa9ebb6d67d67f7a718b28f35",
+      "gzipSize": 2100
+    },
+    "eduk12_c20_http_01/c20-runtime-result.json": {
+      "sha256": "47edd8ee4516edce0f4752ee985a52ec0971077504c1f877562687bac05d6280",
+      "size": 21683,
+      "gzipSha256": "058ee7c65a4c5092f1c6f2b5031642ecb05a956bf4915bff1753acf87f757b10",
+      "gzipSize": 3853
+    },
+    "eduk12_c20_http_01/frozen-inputs.json": {
+      "sha256": "8ab47929f70190fc9a01f0ec8854dea84279d8814a7936b6830e6fc7462d000b",
+      "size": 355630,
+      "gzipSha256": "4d67658f1dbfa4afd1de224ac7a86b4c2107c2acd16b91e45ce2ac1d37d55f49",
+      "gzipSize": 85672
+    },
+    "eduk12_c20_http_02/c20-main-result.json": {
+      "sha256": "4c0dedda44141b0aab7b159ed5369df536dddd196ce0ffdb435415a7637f316b",
+      "size": 27013,
+      "gzipSha256": "d90e53960d3f7f25b89fedfff37013df63c697e8ff3bc9ca7dfd4c265dc311f9",
+      "gzipSize": 3966
+    },
+    "eduk12_c20_http_02/c20-upgrade-result.json": {
+      "sha256": "23ccbc2cbb8843d7c717f3f67298298cfaecbd27410307d147339d2914e547c2",
+      "size": 15427,
+      "gzipSha256": "190ea6a50fbeb2f6a51e5e3351ef52f35b69d3caa9ebb6d67d67f7a718b28f35",
+      "gzipSize": 2100
+    },
+    "eduk12_c20_http_02/c20-runtime-result.json": {
+      "sha256": "370ea04c56130cc9947df0008de81232b4da1ae5716c4c64f37f8759b139f935",
+      "size": 52220,
+      "gzipSha256": "77e71ca6b4d10789b20e1806eb46a7bf0c22cb794109fb1875c2473c4904bc25",
+      "gzipSize": 7881
+    },
+    "eduk12_c20_http_02/frozen-inputs.json": {
+      "sha256": "145e8be497f26191e726b4c7040125e6c3d75faac4d1e450ba4312d123f937a7",
+      "size": 355840,
+      "gzipSha256": "89e73c3dd8978a459526163f28b4124cfd1a3d84d5f4c34e44780a52cbbe9bf4",
+      "gzipSize": 85728
+    }
+  },
+  "archive": {
+    "name": "checkpoint03-runtime-partial.tar.gz",
+    "sha256": "5296bb59b8a1193146becc5de108bf15b3709d99325ae47715b554268f95041d",
+    "size": 190552
+  }
+}

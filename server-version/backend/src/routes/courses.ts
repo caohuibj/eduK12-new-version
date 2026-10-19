@@ -1,3 +1,5 @@
+import { trainingAnalysisController } from '../controllers/trainingAnalysisController'
+import { assessmentExportHttp } from '../services/assessmentExportHttp'
 import { boundedUpload, uploadPrincipalRateLimit } from '../middleware/uploadAdmission'
 import { Router } from 'express'
 import { prisma } from '../config/database'
@@ -84,6 +86,15 @@ router.get('/:id/assignments', authenticate, courseController.getAssignments)
 router.get('/:id/checkins', authenticate, courseController.getCheckins)
 router.get('/:id/questionnaires', authenticate, requireTeacher, courseQuestionnaires)
 router.get('/:id/training-assessments', authenticate, requireTeacher, courseTrainingAssessments)
+
+// Analysis has its own source-level authorization; course shares never grant raw data.
+router.get('/:id/training-analysis/sources', authenticate, requireTeacher, trainingAnalysisController.sources)
+router.post('/:id/training-analysis', authenticate, requireTeacher, trainingAnalysisController.analyze)
+router.post('/:id/training-analysis/quality/list', authenticate, requireTeacher, trainingAnalysisController.qualityList)
+router.post('/:id/training-analysis/quality', authenticate, requireTeacher, trainingAnalysisController.quality)
+router.post('/:id/training-analysis/exports', authenticate, requireTeacher, trainingAnalysisController.exports)
+router.get('/:id/training-analysis/export/artifacts/:artifactId/status', authenticate, requireTeacher, assessmentExportHttp('TRAINING_ANALYSIS', true))
+router.get('/:id/training-analysis/export/artifacts/:artifactId', authenticate, requireTeacher, assessmentExportHttp('TRAINING_ANALYSIS', false))
 
 // 学生管理
 router.get('/:id/students', authenticate, requireTeacher, courseController.getStudents)

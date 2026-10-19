@@ -1,3 +1,5 @@
+import { assertTrainingChildSelected } from '../composite/training-variant-child-scope'
+import { assertCognitiveNewAdmissionEnabled, isCognitiveNewAdmissionEnabled } from './product-eligibility'
 import { encryptCompactCognitivePayload } from './cognitive.security'
 import { sharedControlWritesEnabled } from '../assessment-runtime/shared-control-records'
 import { Prisma } from '@prisma/client'
@@ -305,6 +307,7 @@ const submitWithPrincipalImpl = async (input: FinalCognitiveSubmitInput) => {
       internalContext,
     }
   }
+  await assertTrainingChildSelected(child)
   const session = await measureRequestPhase('final_submit_admission', () => prisma.cognitiveSession.findUnique({
     where: { id: input.sessionId },
     select: {
@@ -330,6 +333,7 @@ const submitWithPrincipalImpl = async (input: FinalCognitiveSubmitInput) => {
   }))
   if (!session) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '认知测评记录不存在', 404)
   assertPrincipal(session, input)
+  if (session.status !== 'COMPLETED' && !isCognitiveNewAdmissionEnabled() && !session.frozenAdmissionSnapshotHash) assertCognitiveNewAdmissionEnabled()
   assertFinalOnly(session.deliveryMode)
   assertAttemptEpoch(session.attemptNo, input.attemptEpoch)
   assertFinalSubmitStatus(session.status, '认知测评')

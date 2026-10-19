@@ -21,12 +21,12 @@ export const resolveSituationalScientificMaturity = (
 
 export const resolveSituationalScientificContext = (pkg: import('./situation-package').SituationPackage) => {
   const declaration = getSituationalScientificDeclaration(pkg.key, pkg.instrumentVersion)
-  if (!declaration && !getSituationPackage(pkg.key,pkg.instrumentVersion) && pkg.definition.scoring.model?.modelKey==='AUTHOR_KEY_SUM') {
+  if (!declaration && !getSituationPackage(pkg.key,pkg.instrumentVersion) && (pkg.definition.scoring.model?.modelKey==='AUTHOR_KEY_SUM' || (!!pkg.online && pkg.definition.scoring.model?.modelKey==='EXPERT_KEY'))) {
     const executionRef=situationalExecutionRef(pkg)
     // Administrative release does not qualify as scientific validation.
     return {schemaVersion:1 as const,scientificMaturity:'PILOT' as const,governanceRevision:1,
-      scope:{language:'zh-CN',population:pkg.definition.respondentType==='teacher_self_report'?'教师试点参与者':'学生试点参与者',use:'低风险反思试点',claim:'作者暂定贡献和情境选择描述；未完成独立专家验证或实证校准'},
-      executionRef,evidenceDigest:canonicalHash({policy:'sjt-upload-pilot-v1',executionRef,source:pkg.definition.source,license:pkg.definition.license,limitations:pkg.definition.report.limitations})}
+      scope:{language:'zh-CN',population:pkg.definition.respondentType==='teacher_self_report'?'教师试点参与者':'学生试点参与者',use:'低风险反思试点',claim:pkg.online ? '作者提供的贡献或专家键及情境选择描述；未完成平台独立验证或实证校准' : '作者暂定贡献和情境选择描述；未完成独立专家验证或实证校准'},
+      executionRef,evidenceDigest:canonicalHash({policy:pkg.online ? 'sjt-online-pilot-v1' : 'sjt-upload-pilot-v1',executionRef,source:pkg.definition.source,license:pkg.definition.license,limitations:pkg.definition.report.limitations})}
   }
   if (!declaration) return undefined // explicit fixtures; historical legacy is never backfilled
   return {

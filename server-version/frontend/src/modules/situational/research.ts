@@ -5,7 +5,7 @@ export interface SituationalResearchEvent {
   type: 'NODE_EXPOSED' | 'RESPONSE_FIRST_COMMITTED' | 'RESPONSE_CHANGED' | 'PROBE_EXPOSED' | 'STAGE_CONFIRMED' | 'NODE_CONFIRMED' | 'RESPONSE_INVALIDATED'
   nodeKey: string
   channelKey?: string
-  responseValue?: string | number
+  responseValue?: string | number | string[]
   responseRevision?: number
   relativeTimeMs: number
   historyIdentity: string
@@ -18,7 +18,7 @@ export interface SituationalResearchCapture {
   events: SituationalResearchEvent[]
 }
 export const RESEARCH_EVENT_LIMIT = 4096
-export const researchEnabled = (data: SituationalAttemptResponse) => Boolean(data.instrument.assignment)
+export const researchEnabled = (data: SituationalAttemptResponse) => Boolean(!data.instrument.online && data.instrument.assignment)
 export const eventTime = (data: SituationalAttemptResponse, events: SituationalResearchEvent[]) => Math.max(events[events.length - 1]?.relativeTimeMs ?? 0, Date.now() - new Date(data.attempt.startedAt).getTime(), 0)
 export const researchCapture = (data: SituationalAttemptResponse, events: SituationalResearchEvent[]): SituationalResearchCapture | undefined => data.instrument.assignment ? {
   captureVersion: 'situational-capture-v1', definitionHash: data.attempt.definitionHash,

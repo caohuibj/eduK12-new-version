@@ -1,0 +1,16 @@
+# main 源码盘点与六段实现顺序
+
+证据版本固定为 `f6df9c5b21c5a0d50853d5e6e2d1bfd79389dcd0`。以下为静态源码核验，不能代替运行通过；“待核验”不等同于已证实缺陷。路径均相对仓库根。
+
+| 阶段 | main 已存在、优先复用的源码 | 实际差距或待核验边界 | 验收单元 |
+| --- | --- | --- | --- |
+| 1 Form 与普通界面 | `server-version/backend/src/modules/assessment-core/form/{definition,answers,runtime}.ts` 已包含全部高级类型、displayIf、拒答、other、互斥和 typed rawAnswers；Survey 的 builder 直接导入公共定义。公共前端 `server-version/frontend/src/modules/assessment-core/form/ProfessionalFormAnswer.tsx`；Training 已有 `training-*-refresh.css` 和品牌组件。 | 公共 Form schema 只接受 V1/V2，尚无本次显式 V3 合同；`controllers/questionnaireController.ts:1105`、`modules/composite/composite.schema.ts:71` 仍只接旧五类 Form。Prisma `QuestionnaireFormAnswer.value` 是字符串，状态只有 PENDING/ANSWERED/SKIPPED。不能直接把 Survey V2 的拒答行为当作新必答拒答策略，不能以字符串投影充当新 typed FINAL。需打通编制/冻结/FINAL/恢复/报告/导出、稳定键重映射和连续段边界。 | C03–C07、C24 |
+| 2 Scale | `modules/survey/builder.import.ts` 已有共享选项导入限制及 digest；`builder.service.ts` 有 revision/CAS 和审计；`builder.compiler.ts` 复用 `ScaleDefinitionV2`、`scoreScale`。`modules/survey/timing.definition.ts`、前端 `survey/survey-scale-timing.ts` 已有逐题浏览器时间；`services/exportProjectionPolicy.ts` 独立保护 rawAnswers。 | Survey 逐题 Scale 当前可要求计时，不能当作 Training 默认关闭的可选采集；Training 来源、导入授权/审计、独立 timing 导出 capability、队列/产物/下载重新鉴权仍需接入或验证，保持旧 responseTimeMs 与标准量表不变。 | C08–C09 |
+| 3 Cognitive/SJT | `modules/survey/cognitive.service.ts` 复用公共 authoritative scorer；`modules/situational/authoring/{service,template}.ts`、Survey SJT V2、`sjt-v2.compiler.ts` 与 `sjt-runtime.ts` 已有编制/多情境/多选结构。`catalog.sources.ts` 对已知不可用来源标记原因，对非预期错误重新抛出；Training 学员/培训者页面已有部分认知 flag 显示控制。 | 不重建第二套评分/报告 worker。需逐路核验总 flag 的新编制、目录、真实准入/session/job 与历史恢复；专业授权不能冒充数据权限。Training SJT 完整课程链、独立审核/golden、精确 release/hash/course/purpose/expiry、撤销/历史恢复、图片锁和改编许可需要针对性接通及验收。 | C10–C13 |
+| 4 问卷概率分卷 | Survey `flow.assignment.ts` 使用权重和 crypto randomInt，锁定 attempt、加密持久化 assignment；`flow.definition.ts` 与 `analytics.variant.ts` 保存 variant/概率来源，普通混合统计会拒绝私有分卷。 | 这些是 Survey 的 wave/attempt 适配，不能直接作为 Training questionnaire 的已完成能力；需保留一次分配、课程上下文、稳定 Form 键、异步 SJT 授权、刷新/重放、合法新 attempt 和私卷查询保护。 | C14–C15 |
+| 5 研究分析 | `modules/assessment-relational/{analysis,analysis-repository}.ts`、Survey `analytics.cohorts.ts` 已有配对及测量身份比对，重复 participant/wave measurement 明确拒绝；`sample-quality.service.ts` 明确不重写 FINAL，并以项目锁与导出串行。 | Training 冻结课程来源/成员身份、10/20/50 查询成本、质量/成员/授权版本指纹及下载复核、匿名研究同意和退出语义仍需核验。跨分卷必须任务级适配，不能取消 `rejectPooledVariants`。 | C16–C18 |
+| 6 新发布策略 | Survey `flow.{definition,runtime,assignment}.ts` 已有材料/END、实验组/KEEP_LINKED；`operations.definition.ts` 已拒绝概率分卷配额组合，checkpoint 显式 1–48h。`group-ip-policy.ts` 明确冻结启用日和最多48h。`checkpoint.service.ts` 有64KB、CAS、revision100上限和批量100清理。前端已有认知草稿保留与 Web Locks 保护。 | checkpoint 过期读取/保存/清理会删除整行，revision 随新行从零开始，尚不满足保留累计次数/身份的合同。新 Training 策略需额外冻结契约，不能照搬 Survey 更宽条件运算符。任务 SATISFIED 与交卷终态、所有题干/刺激读取出口、延迟反馈下载/缓存/导出、round 绑定/匿名 restart 配额、默认关闭 TTL/tombstone 等仍需贯穿验证。 | C19–C23 |
+
+最小顺序：先 C01/C02 固定可运行基线与合成 fixture；C03 先建 typed Form 事实链，再按 C04/C05 扩展编辑/控件，C06 绑定新显隐/拒答策略，C07 贯穿报告/导出。之后按上表依赖推进 Scale、Cognitive/SJT、概率分卷、研究、策略；普通 Training 样式限普通表面，认知刺激/计时不混入。最后 C25 组合回归/固定提交审查，C26 在真实四工具组合上测量与优化。
+
+Training 的长期课程、作业、打卡、匿名与多波次能力均为保留项，不能替换为 Survey 项目模型；后续 Survey 视觉批次和管理员权限重构不在本范围。每一项实现先列直接消费路径和缺失检查，不因已有目录名或旧摘要声称全链完成。

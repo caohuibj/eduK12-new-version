@@ -1,0 +1,69 @@
+{
+  "kind": "C14_SLOT_PLAN_TRANSACTION_LOCAL_EVIDENCE",
+  "createdAt": "2026-10-18T12:34:53.732603+00:00",
+  "gitHeadAtRecord": "c58f0c8282d72d93631952e8f28f20d6c7040ae1",
+  "nodeExecutable": "/workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/node_modules/node/bin/node",
+  "nodeVersion": "v24.21.0",
+  "nodeExecutableSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+  "measurementLock": "/workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/.measurement.lock",
+  "sourceAndInputs": [
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/shared-control-records.ts",
+      "sha256": "2078f70d3c5fe6d15ec62e66a1ce79b1eb290c3a04371bd3fea95390c022b562"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/slot-set.ts",
+      "sha256": "0bf5ebeae49cb4eb8a96be3b3d5bffb1881652176db4ad3154dbc3e8b08a0d0d"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/public-templates.ts",
+      "sha256": "304171fc512a89142d52ed684d4c6d86fe0e6c73920bcf402756c418328eebc5"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/control-reference-codec.ts",
+      "sha256": "e57e4e7366e800947bd06cc81851ef5d45b32abc7b50cf6abf450900ef7f7e38"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-runtime/compact-field-codec.ts",
+      "sha256": "61fede51c449e1f2a84a2bcc5485ec5fdd149cc72e70f5ecd0d0c2c24bfb24c7"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/assessment-runtime/slot-plan-transaction.test.ts",
+      "sha256": "62334282a0bc3b1d34a1580b0ddd7ffd4ea207e218139ac01620a7bda6edbfd1"
+    },
+    {
+      "path": "server-version/backend/package-lock.json",
+      "sha256": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6"
+    },
+    {
+      "path": "server-version/backend/vitest.config.ts",
+      "sha256": "26b98b70914617771d41657be8cdf6d7b6d7024c81d1c8a49aeae6a9220cf93b"
+    }
+  ],
+  "checks": [
+    {
+      "log": "c14-slot-plan-tx-test-01.log",
+      "command": "flock /workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/.measurement.lock /workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/node_modules/node/bin/node node_modules/vitest/vitest.mjs run src/__tests__/assessment-runtime/slot-plan-transaction.test.ts",
+      "startedAt": "2026-10-18T12:34:26Z",
+      "finishedAt": "2026-10-18T12:34:27Z",
+      "result": "passed",
+      "tests": 5,
+      "exitCode": 0,
+      "selectionReason": "Only new direct transaction propagation, visibility, rollback-cache isolation and unchanged default/legacy compatibility contracts.",
+      "coverage": [
+        "Shared slot append and read use supplied transaction only; no global connection borrow",
+        "Uncommitted transaction slot reads never populate process-wide slot cache",
+        "Rolled-back template unavailable to both default global and later transaction readers",
+        "Fresh operation reader sees supplied transaction rows and verifies template integrity",
+        "Frozen hash and epoch verification unchanged",
+        "Default committed global public store remains available",
+        "Inline legacy path requires no database reads or writes"
+      ]
+    }
+  ],
+  "limitations": [
+    "Local targeted unit evidence only; actual six-concurrent-start PostgreSQL reproduction and recovery remain parent-owned.",
+    "No pool size, timeout, lock ordering, frozen hash algorithm, received facts or unrelated callsite changed by this worker.",
+    "Parent owns central createAttempt db argument, pinned compilation, and HTTP/PG validation."
+  ]
+}

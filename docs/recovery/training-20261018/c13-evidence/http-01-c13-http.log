@@ -1,0 +1,40 @@
+prisma:error 
+Invalid `prisma.course.updateMany()` invocation:
+
+
+Error occurred during query execution:
+ConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "23514", message: "course product domain is immutable", severity: "ERROR", detail: None, column: None, hint: None }), transient: false })
+PrismaClientUnknownRequestError: 
+Invalid `prisma.course.updateMany()` invocation:
+
+
+Error occurred during query execution:
+ConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "23514", message: "course product domain is immutable", severity: "ERROR", detail: None, column: None, hint: None }), transient: false })
+    at $n.handleRequestError (/workspace/scratch/5a77e8bdc1ae/eduk12_c13_20261018/server-version/backend/node_modules/@prisma/client/runtime/library.js:121:7505)
+    at $n.handleAndLogRequestError (/workspace/scratch/5a77e8bdc1ae/eduk12_c13_20261018/server-version/backend/node_modules/@prisma/client/runtime/library.js:121:6623)
+    at $n.request (/workspace/scratch/5a77e8bdc1ae/eduk12_c13_20261018/server-version/backend/node_modules/@prisma/client/runtime/library.js:121:6307)
+    at async l (/workspace/scratch/5a77e8bdc1ae/eduk12_c13_20261018/server-version/backend/node_modules/@prisma/client/runtime/library.js:130:9633)
+    at async /workspace/scratch/5a77e8bdc1ae/eduk12_c13_20261018/server-version/backend/dist/config/database.js:43:20
+    at async file:///workspace/scratch/5a77e8bdc1ae/eduk12_c13_20261018/server-version/scripts/recovery/c13-sjt-smoke.mjs:117:2 {
+  clientVersion: '5.22.0'
+}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+PrismaClientUnknownRequestError: 
+Invalid `prisma.course.updateMany()` invocation:
+
+
+Error occurred during query execution:
+ConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "23514", message: "course product domain is immutable", severity: "ERROR", detail: None, column: None, hint: None }), transient: false })
+    at $n.handleRequestError (/workspace/scratch/5a77e8bdc1ae/eduk12_c13_20261018/server-version/backend/node_modules/@prisma/client/runtime/library.js:121:7505)
+    at $n.handleAndLogRequestError (/workspace/scratch/5a77e8bdc1ae/eduk12_c13_20261018/server-version/backend/node_modules/@prisma/client/runtime/library.js:121:6623)
+    at $n.request (/workspace/scratch/5a77e8bdc1ae/eduk12_c13_20261018/server-version/backend/node_modules/@prisma/client/runtime/library.js:121:6307)
+    at async l (/workspace/scratch/5a77e8bdc1ae/eduk12_c13_20261018/server-version/backend/node_modules/@prisma/client/runtime/library.js:130:9633)
+    at async /workspace/scratch/5a77e8bdc1ae/eduk12_c13_20261018/server-version/backend/dist/config/database.js:43:20
+    at async file:///workspace/scratch/5a77e8bdc1ae/eduk12_c13_20261018/server-version/scripts/recovery/c13-sjt-smoke.mjs:117:2 {
+  clientVersion: '5.22.0'
+}
+
+Node.js v24.21.0

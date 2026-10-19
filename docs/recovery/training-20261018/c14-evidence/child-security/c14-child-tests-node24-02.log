@@ -1,0 +1,33 @@
+v24.21.0
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/backend
+
+ ✓ src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > projects the selected group without mutating the publication union and reuses one parent read 8ms
+ ✓ src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > rejects unselected child form-b 3ms
+ ✓ src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > rejects unselected child scale-b 2ms
+ ✓ src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > rejects unselected child cognitive-b 2ms
+ ✓ src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > rejects unselected child sjt-b 2ms
+ ✓ src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > rejects unselected child unknown 1ms
+ ✓ src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > reloads narrow caller parents rather than treating missing metadata as a legacy allocation 2ms
+ ✓ src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > fails closed for tampered allocation before child access 2ms
+ ✓ src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > fails closed for tampered digest before child access 1ms
+ ✓ src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > fails closed for tampered slotset before child access 1ms
+ ✓ src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > fails closed for tampered union before child access 1ms
+ ✓ src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > preserves legacy null parent identity and standalone zero-read behavior 0ms
+ ✓ src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > rejects an unselected Form before creating or loading any section child 2ms
+ ✓ src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > rejects direct Form FINAL before section creation or admission writes 2ms
+ ✓ src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > rejects direct Cognitive IN_PROGRESS state and result before decoding 10ms
+ ✓ src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > rejects direct Cognitive COMPLETED state and result before decoding 3ms
+ ✓ src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > does not let a preexisting frozen Form admission bypass selected section membership 2ms
+ ✓ src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > checks selection before stored SCALE admission decoding 1ms
+ ✓ src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > checks selection before stored COGNITIVE admission decoding 1ms
+ ✓ src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > blocks authenticated Cognitive images and video before decoding or looking up media 2ms
+ ✓ src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > blocks recovery-owned Cognitive media before decoding or looking up media 1ms
+ ✓ src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > blocks direct and embedded SJT runtime before decoding its frozen content 2ms
+ ✓ src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > validates allocation even when context was already frozen 1ms
+
+ Test Files  1 passed (1)
+      Tests  23 passed (23)
+   Start at  20:44:32
+   Duration  3.73s (transform 2.67s, setup 0ms, import 3.54s, tests 55ms, environment 0ms)
+

@@ -1,0 +1,223 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+ RUN  v4.1.11 /workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/backend
+
+ ❯ src/__tests__/composite/training-variant-child-scope.test.ts (20 tests | 19 failed) 32ms
+     × projects the selected group without mutating the publication union and reuses one parent read 7ms
+     × rejects unselected child form-b 2ms
+     × rejects unselected child scale-b 1ms
+     × rejects unselected child cognitive-b 1ms
+     × rejects unselected child sjt-b 2ms
+     × rejects unselected child unknown 1ms
+     × reloads narrow caller parents rather than treating missing metadata as a legacy allocation 1ms
+     × fails closed for tampered allocation before child access 1ms
+     × fails closed for tampered digest before child access 1ms
+     × fails closed for tampered slotset before child access 1ms
+     × fails closed for tampered union before child access 1ms
+     × rejects an unselected Form before creating or loading any section child 1ms
+     × does not let a preexisting frozen Form admission bypass selected section membership 1ms
+     × checks selection before stored SCALE admission decoding 1ms
+     × checks selection before stored COGNITIVE admission decoding 1ms
+     × blocks authenticated Cognitive images and video before decoding or looking up media 6ms
+     × blocks recovery-owned Cognitive media before decoding or looking up media 1ms
+     × blocks direct and embedded SJT runtime before decoding its frozen content 1ms
+     × validates allocation even when context was already frozen 1ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 19 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > projects the selected group without mutating the publication union and reuses one parent read
+Error: Situational frozen slot runtime identity mismatch
+ ❯ src/modules/assessment-runtime/slot-set.ts:121:15
+    119|         || slot.runtimeIdentity.instrumentVersion !== slot.sourceDefin…
+    120|         || slot.runtimeIdentity.definitionHash !== slot.sourceDefiniti…
+    121|       ) throw new Error('Situational frozen slot runtime identity mism…
+       |               ^
+    122|     }
+    123|   })
+ ❯ assertFrozenSlotContents src/modules/assessment-runtime/slot-set.ts:112:16
+ ❯ Module.createFrozenActiveSlotSet src/modules/assessment-runtime/slot-set.ts:128:3
+ ❯ fixture src/__tests__/composite/training-variant-child-scope.test.ts:40:17
+ ❯ src/__tests__/composite/training-variant-child-scope.test.ts:53:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/19]⎯
+
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > rejects unselected child form-b
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > rejects unselected child scale-b
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > rejects unselected child cognitive-b
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > rejects unselected child sjt-b
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > rejects unselected child unknown
+Error: Situational frozen slot runtime identity mismatch
+ ❯ src/modules/assessment-runtime/slot-set.ts:121:15
+    119|         || slot.runtimeIdentity.instrumentVersion !== slot.sourceDefin…
+    120|         || slot.runtimeIdentity.definitionHash !== slot.sourceDefiniti…
+    121|       ) throw new Error('Situational frozen slot runtime identity mism…
+       |               ^
+    122|     }
+    123|   })
+ ❯ assertFrozenSlotContents src/modules/assessment-runtime/slot-set.ts:112:16
+ ❯ Module.createFrozenActiveSlotSet src/modules/assessment-runtime/slot-set.ts:128:3
+ ❯ fixture src/__tests__/composite/training-variant-child-scope.test.ts:40:17
+ ❯ src/__tests__/composite/training-variant-child-scope.test.ts:62:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/19]⎯
+
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > reloads narrow caller parents rather than treating missing metadata as a legacy allocation
+Error: Situational frozen slot runtime identity mismatch
+ ❯ src/modules/assessment-runtime/slot-set.ts:121:15
+    119|         || slot.runtimeIdentity.instrumentVersion !== slot.sourceDefin…
+    120|         || slot.runtimeIdentity.definitionHash !== slot.sourceDefiniti…
+    121|       ) throw new Error('Situational frozen slot runtime identity mism…
+       |               ^
+    122|     }
+    123|   })
+ ❯ assertFrozenSlotContents src/modules/assessment-runtime/slot-set.ts:112:16
+ ❯ Module.createFrozenActiveSlotSet src/modules/assessment-runtime/slot-set.ts:128:3
+ ❯ fixture src/__tests__/composite/training-variant-child-scope.test.ts:40:17
+ ❯ src/__tests__/composite/training-variant-child-scope.test.ts:67:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/19]⎯
+
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > fails closed for tampered allocation before child access
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > fails closed for tampered digest before child access
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > fails closed for tampered slotset before child access
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > fails closed for tampered union before child access
+Error: Situational frozen slot runtime identity mismatch
+ ❯ src/modules/assessment-runtime/slot-set.ts:121:15
+    119|         || slot.runtimeIdentity.instrumentVersion !== slot.sourceDefin…
+    120|         || slot.runtimeIdentity.definitionHash !== slot.sourceDefiniti…
+    121|       ) throw new Error('Situational frozen slot runtime identity mism…
+       |               ^
+    122|     }
+    123|   })
+ ❯ assertFrozenSlotContents src/modules/assessment-runtime/slot-set.ts:112:16
+ ❯ Module.createFrozenActiveSlotSet src/modules/assessment-runtime/slot-set.ts:128:3
+ ❯ fixture src/__tests__/composite/training-variant-child-scope.test.ts:40:17
+ ❯ src/__tests__/composite/training-variant-child-scope.test.ts:72:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/19]⎯
+
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > rejects an unselected Form before creating or loading any section child
+Error: Situational frozen slot runtime identity mismatch
+ ❯ src/modules/assessment-runtime/slot-set.ts:121:15
+    119|         || slot.runtimeIdentity.instrumentVersion !== slot.sourceDefin…
+    120|         || slot.runtimeIdentity.definitionHash !== slot.sourceDefiniti…
+    121|       ) throw new Error('Situational frozen slot runtime identity mism…
+       |               ^
+    122|     }
+    123|   })
+ ❯ assertFrozenSlotContents src/modules/assessment-runtime/slot-set.ts:112:16
+ ❯ Module.createFrozenActiveSlotSet src/modules/assessment-runtime/slot-set.ts:128:3
+ ❯ fixture src/__tests__/composite/training-variant-child-scope.test.ts:40:17
+ ❯ src/__tests__/composite/training-variant-child-scope.test.ts:87:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/19]⎯
+
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > does not let a preexisting frozen Form admission bypass selected section membership
+Error: Situational frozen slot runtime identity mismatch
+ ❯ src/modules/assessment-runtime/slot-set.ts:121:15
+    119|         || slot.runtimeIdentity.instrumentVersion !== slot.sourceDefin…
+    120|         || slot.runtimeIdentity.definitionHash !== slot.sourceDefiniti…
+    121|       ) throw new Error('Situational frozen slot runtime identity mism…
+       |               ^
+    122|     }
+    123|   })
+ ❯ assertFrozenSlotContents src/modules/assessment-runtime/slot-set.ts:112:16
+ ❯ Module.createFrozenActiveSlotSet src/modules/assessment-runtime/slot-set.ts:128:3
+ ❯ fixture src/__tests__/composite/training-variant-child-scope.test.ts:40:17
+ ❯ src/__tests__/composite/training-variant-child-scope.test.ts:92:59
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/19]⎯
+
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > checks selection before stored SCALE admission decoding
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > checks selection before stored COGNITIVE admission decoding
+Error: Situational frozen slot runtime identity mismatch
+ ❯ src/modules/assessment-runtime/slot-set.ts:121:15
+    119|         || slot.runtimeIdentity.instrumentVersion !== slot.sourceDefin…
+    120|         || slot.runtimeIdentity.definitionHash !== slot.sourceDefiniti…
+    121|       ) throw new Error('Situational frozen slot runtime identity mism…
+       |               ^
+    122|     }
+    123|   })
+ ❯ assertFrozenSlotContents src/modules/assessment-runtime/slot-set.ts:112:16
+ ❯ Module.createFrozenActiveSlotSet src/modules/assessment-runtime/slot-set.ts:128:3
+ ❯ fixture src/__tests__/composite/training-variant-child-scope.test.ts:40:17
+ ❯ src/__tests__/composite/training-variant-child-scope.test.ts:96:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/19]⎯
+
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > blocks authenticated Cognitive images and video before decoding or looking up media
+AssertionError: expected Error: Situational frozen slot runtime id… to match object { statusCode: 404 }
+
+- Expected
++ Received
+
+- {
+-   "statusCode": 404,
++ Error {
++   "message": "Situational frozen slot runtime identity mismatch",
+  }
+
+ ❯ src/__tests__/composite/training-variant-child-scope.test.ts:103:118
+    101|     mocks.parent.mockImplementation(async () => fixture())
+    102|     mocks.cognitive.mockResolvedValue({ userId: 'user', compositeAttem…
+    103|     await expect(serveCognitiveSessionImage({ userId: 'user', sessionI…
+       |                                                                                                                      ^
+    104|     await expect(issueCognitiveSessionVideoCapabilities({ userId: 'use…
+    105|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/19]⎯
+
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > blocks recovery-owned Cognitive media before decoding or looking up media
+Error: Situational frozen slot runtime identity mismatch
+ ❯ src/modules/assessment-runtime/slot-set.ts:121:15
+    119|         || slot.runtimeIdentity.instrumentVersion !== slot.sourceDefin…
+    120|         || slot.runtimeIdentity.definitionHash !== slot.sourceDefiniti…
+    121|       ) throw new Error('Situational frozen slot runtime identity mism…
+       |               ^
+    122|     }
+    123|   })
+ ❯ assertFrozenSlotContents src/modules/assessment-runtime/slot-set.ts:112:16
+ ❯ Module.createFrozenActiveSlotSet src/modules/assessment-runtime/slot-set.ts:128:3
+ ❯ fixture src/__tests__/composite/training-variant-child-scope.test.ts:40:17
+ ❯ src/__tests__/composite/training-variant-child-scope.test.ts:108:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/19]⎯
+
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > blocks direct and embedded SJT runtime before decoding its frozen content
+Error: Situational frozen slot runtime identity mismatch
+ ❯ src/modules/assessment-runtime/slot-set.ts:121:15
+    119|         || slot.runtimeIdentity.instrumentVersion !== slot.sourceDefin…
+    120|         || slot.runtimeIdentity.definitionHash !== slot.sourceDefiniti…
+    121|       ) throw new Error('Situational frozen slot runtime identity mism…
+       |               ^
+    122|     }
+    123|   })
+ ❯ assertFrozenSlotContents src/modules/assessment-runtime/slot-set.ts:112:16
+ ❯ Module.createFrozenActiveSlotSet src/modules/assessment-runtime/slot-set.ts:128:3
+ ❯ fixture src/__tests__/composite/training-variant-child-scope.test.ts:40:17
+ ❯ src/__tests__/composite/training-variant-child-scope.test.ts:113:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/19]⎯
+
+ FAIL  src/__tests__/composite/training-variant-child-scope.test.ts > C14 selected child scope enforcement > validates allocation even when context was already frozen
+Error: Situational frozen slot runtime identity mismatch
+ ❯ src/modules/assessment-runtime/slot-set.ts:121:15
+    119|         || slot.runtimeIdentity.instrumentVersion !== slot.sourceDefin…
+    120|         || slot.runtimeIdentity.definitionHash !== slot.sourceDefiniti…
+    121|       ) throw new Error('Situational frozen slot runtime identity mism…
+       |               ^
+    122|     }
+    123|   })
+ ❯ assertFrozenSlotContents src/modules/assessment-runtime/slot-set.ts:112:16
+ ❯ Module.createFrozenActiveSlotSet src/modules/assessment-runtime/slot-set.ts:128:3
+ ❯ fixture src/__tests__/composite/training-variant-child-scope.test.ts:40:17
+ ❯ src/__tests__/composite/training-variant-child-scope.test.ts:121:25
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/19]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  19 failed | 8 passed (27)
+   Start at  20:40:20
+   Duration  2.59s (transform 2.88s, setup 0ms, import 4.20s, tests 48ms, environment 0ms)
+

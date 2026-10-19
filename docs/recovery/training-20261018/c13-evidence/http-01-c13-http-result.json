@@ -1,0 +1,21 @@
+{
+  "passed": false,
+  "checks": [],
+  "requests": [
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 284
+    }
+  ],
+  "counts": [],
+  "races": [],
+  "receipts": []
+}

@@ -1,0 +1,497 @@
+{
+  "baseCommit": "37a30f033017b3ba5c8d7cd3189612e4cc9fadbb",
+  "core": {
+    "passed": true,
+    "baseHeadAtRun": "37a30f033017b3ba5c8d7cd3189612e4cc9fadbb",
+    "runtimeFingerprint": {
+      "schemaVersion": 1,
+      "nodeVersion": "v24.21.0",
+      "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+      "dist": {
+        "files": 4977,
+        "sha256": "4afcaf9bfe8b133d579aec644e1283d2dcca0ed696fde7f9670210c9868285b3"
+      },
+      "files": {
+        "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+        "prisma/schema.prisma": "bd464898ee84cf4b6c79d70096a104ba5fad0d5d2d5440de1f96d6959ef9f1a3",
+        "node_modules/.prisma/client/schema.prisma": "f5b7d8a6385bfb86a1e09f2c4959bb7cc97ad998d9de9580d4634b6d635262bd",
+        "node_modules/.prisma/client/index.js": "55731e69965d85440dac0b06044f366139e4b1a8abbd3af8e32d06771a4a0cbb"
+      },
+      "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+    },
+    "harnessSha256": "8c0deaeb68300f30e195f989fa098c231b2d4e227f9835054373fd63516450b7",
+    "checks": [
+      "ON: ordinary/public/standalone first delivery persists real admission; later child remains unadmitted shell",
+      "OFF: server capabilities, test/config catalog and questionnaire resources hide new cognitive offerings",
+      "OFF new authoring/start/restart rejected without parent/session/job/token-use/quota consumption",
+      "OFF true admitted sessions and public recovery remain readable without new admission records",
+      "OFF unadmitted shell cannot start via direct session read/FINAL; owner and epoch remain enforced",
+      "OFF: admitted FINAL and replay complete; shared report worker finishes; participant/teacher/standalone history remains readable",
+      "OFF completed standalone new start still denied with counts unchanged",
+      "OFF reaching unadmitted cognitive child pauses explicitly and preserves accepted preceding Form facts",
+      "REENABLED: original shell resumes without replacement, old facts retained, ordinary/public new admission works",
+      "Catalog configuration errors are visible and sanitized, never successful empty lists"
+    ],
+    "counts": [
+      {
+        "name": "OFF new authoring/start/restart rejected without parent/session/job/token-use/quota consumption",
+        "before": {
+          "parents": 3,
+          "sessions": 5,
+          "jobs": 0,
+          "cognitiveTokens": [
+            {
+              "usedCount": 1
+            }
+          ],
+          "compositeTokens": [
+            {
+              "usedCount": 1
+            }
+          ],
+          "courseQuotaUsed": 3
+        },
+        "after": {
+          "parents": 3,
+          "sessions": 5,
+          "jobs": 0,
+          "cognitiveTokens": [
+            {
+              "usedCount": 1
+            }
+          ],
+          "compositeTokens": [
+            {
+              "usedCount": 1
+            }
+          ],
+          "courseQuotaUsed": 3
+        },
+        "unchanged": true
+      },
+      {
+        "name": "OFF true admitted sessions and public recovery remain readable without new admission records",
+        "before": {
+          "parents": 3,
+          "sessions": 5,
+          "jobs": 0,
+          "cognitiveTokens": [
+            {
+              "usedCount": 1
+            }
+          ],
+          "compositeTokens": [
+            {
+              "usedCount": 1
+            }
+          ],
+          "courseQuotaUsed": 3
+        },
+        "after": {
+          "parents": 3,
+          "sessions": 5,
+          "jobs": 0,
+          "cognitiveTokens": [
+            {
+              "usedCount": 1
+            }
+          ],
+          "compositeTokens": [
+            {
+              "usedCount": 1
+            }
+          ],
+          "courseQuotaUsed": 3
+        },
+        "unchanged": true
+      },
+      {
+        "name": "OFF unadmitted shell cannot start via direct session read/FINAL; owner and epoch remain enforced",
+        "before": {
+          "parents": 3,
+          "sessions": 5,
+          "jobs": 0,
+          "cognitiveTokens": [
+            {
+              "usedCount": 1
+            }
+          ],
+          "compositeTokens": [
+            {
+              "usedCount": 1
+            }
+          ],
+          "courseQuotaUsed": 3
+        },
+        "after": {
+          "parents": 3,
+          "sessions": 5,
+          "jobs": 0,
+          "cognitiveTokens": [
+            {
+              "usedCount": 1
+            }
+          ],
+          "compositeTokens": [
+            {
+              "usedCount": 1
+            }
+          ],
+          "courseQuotaUsed": 3
+        },
+        "unchanged": true
+      },
+      {
+        "name": "OFF completed standalone new start still denied with counts unchanged",
+        "before": {
+          "parents": 3,
+          "sessions": 5,
+          "jobs": 1,
+          "cognitiveTokens": [
+            {
+              "usedCount": 1
+            }
+          ],
+          "compositeTokens": [
+            {
+              "usedCount": 1
+            }
+          ],
+          "courseQuotaUsed": 3
+        },
+        "after": {
+          "parents": 3,
+          "sessions": 5,
+          "jobs": 1,
+          "cognitiveTokens": [
+            {
+              "usedCount": 1
+            }
+          ],
+          "compositeTokens": [
+            {
+              "usedCount": 1
+            }
+          ],
+          "courseQuotaUsed": 3
+        },
+        "unchanged": true
+      }
+    ],
+    "httpRequestCount": 74,
+    "statusCounts": {
+      "200": 55,
+      "400": 15,
+      "403": 1,
+      "409": 3
+    },
+    "cleanup": {
+      "verified": true
+    }
+  },
+  "historySupplement": {
+    "passed": true,
+    "baseHeadAtRun": "37a30f033017b3ba5c8d7cd3189612e4cc9fadbb",
+    "runtimeFingerprint": {
+      "schemaVersion": 1,
+      "nodeVersion": "v24.21.0",
+      "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+      "dist": {
+        "files": 4977,
+        "sha256": "bcb8fb77df687800fea275dce3575ec9ebca7b85546c731fa88cb73bd4afd2ad"
+      },
+      "files": {
+        "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+        "prisma/schema.prisma": "bd464898ee84cf4b6c79d70096a104ba5fad0d5d2d5440de1f96d6959ef9f1a3",
+        "node_modules/.prisma/client/schema.prisma": "f5b7d8a6385bfb86a1e09f2c4959bb7cc97ad998d9de9580d4634b6d635262bd",
+        "node_modules/.prisma/client/index.js": "55731e69965d85440dac0b06044f366139e4b1a8abbd3af8e32d06771a4a0cbb"
+      },
+      "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+    },
+    "harnessSha256": "48efdd24684f814c0a8690802b59898ee4b0545c8512443e0c97a2a7f3b19953",
+    "checks": [
+      "OFF history feeds preserve existing owner records without admission, quota, job or token writes",
+      "OFF old ACTIVE shell is retained as paused and cannot activate from direct URL"
+    ],
+    "counts": [
+      {
+        "name": "OFF history feeds preserve existing owner records without admission, quota, job or token writes",
+        "before": {
+          "parents": 4,
+          "sessions": 7,
+          "jobs": 2,
+          "cognitiveTokens": [
+            {
+              "usedCount": 1
+            }
+          ],
+          "compositeTokens": [
+            {
+              "usedCount": 2
+            }
+          ],
+          "courseQuotaUsed": 4
+        },
+        "after": {
+          "parents": 4,
+          "sessions": 7,
+          "jobs": 2,
+          "cognitiveTokens": [
+            {
+              "usedCount": 1
+            }
+          ],
+          "compositeTokens": [
+            {
+              "usedCount": 2
+            }
+          ],
+          "courseQuotaUsed": 4
+        },
+        "unchanged": true
+      },
+      {
+        "name": "OFF old ACTIVE shell is retained as paused and cannot activate from direct URL",
+        "before": {
+          "parents": 4,
+          "sessions": 7,
+          "jobs": 2,
+          "cognitiveTokens": [
+            {
+              "usedCount": 1
+            }
+          ],
+          "compositeTokens": [
+            {
+              "usedCount": 2
+            }
+          ],
+          "courseQuotaUsed": 4
+        },
+        "after": {
+          "parents": 4,
+          "sessions": 7,
+          "jobs": 2,
+          "cognitiveTokens": [
+            {
+              "usedCount": 1
+            }
+          ],
+          "compositeTokens": [
+            {
+              "usedCount": 2
+            }
+          ],
+          "courseQuotaUsed": 4
+        },
+        "unchanged": true
+      }
+    ],
+    "httpRequestCount": 12,
+    "statusCounts": {
+      "200": 11,
+      "400": 1
+    },
+    "cleanup": [
+      {
+        "service": "report-worker",
+        "stopped": true
+      },
+      {
+        "service": "api",
+        "stopped": true
+      },
+      {
+        "service": "redis",
+        "stopped": true
+      },
+      {
+        "service": "postgres",
+        "stopped": true
+      }
+    ],
+    "testedHarnessArtifact": "c10-history-tested-01.mjs.txt"
+  },
+  "notes": [
+    "Core real HTTP ran before the additional history-feed/UI patches. Supplement ran the final backend dist against the same stopped synthetic DB without remigration or reseeding.",
+    "Core report worker uses the original ON stack; the supplemental API and worker both run OFF. No report worker implementation was changed.",
+    "All IDs, token values, credentials, full request routes and private runtime settings omitted.",
+    "No browser, production, C25 full regression, or C26 performance qualification claimed.",
+    "The first history supplement used the preserved c10-history-tested-01.mjs.txt (SHA 48efdd…). After that run only the synthetic shell fixture was changed to clear/restore both encrypted admission and hash, rather than hash alone. The quota supplement reran the current harness plus assignment-detail pause assertions on the new quota projection dist.",
+    "OFF-worker supplemental runs test history reads, not a new FINAL→worker execution; core admitted FINAL→report processing used an ON worker."
+  ],
+  "checkpointSourceSha256": {
+    "server-version/backend/src/__tests__/cognitive/assignment.service.test.ts": "8ba6c737838f33d85f061d13f1d40e7211f1f0c4a9dfe1ddd8482531aff062f4",
+    "server-version/backend/src/__tests__/cognitive/product-eligibility.test.ts": "dc3fa99a305720a6fc94c5f30ad46007af794dac25b592a909cc45d5e5963315",
+    "server-version/backend/src/index.ts": "07eaed337baccce0c5bf8dbeedf143ef6ba6042f6b4f49f40de5c01e07b5d4ad",
+    "server-version/backend/src/modules/cognitive/assignment.service.ts": "b85b0d658c118923c14e02b4c8db66e0d3be9d56658f5a0af3f53d27d4791b95",
+    "server-version/backend/src/modules/cognitive/cognitive-admission.service.ts": "f5402cac0aa85de90e7ddab9dee8a297f0a4b5c25f550a8ae3a01301a675a298",
+    "server-version/backend/src/modules/cognitive/cognitive.routes.ts": "3c98f64db8cdacc86f9bce1511bfb11c43b381db524784caf4f1f696d38fda31",
+    "server-version/backend/src/modules/cognitive/final-submit.service.ts": "62059d60a525f0c17b6f3932eaeaaf69cfa4b136c876d1afec94494c99f1c96c",
+    "server-version/backend/src/modules/cognitive/product-eligibility.ts": "c5bf291bc4a6b3cee1a532f004773cb5f96054f02f2a914bd40536fa552afc44",
+    "server-version/backend/src/modules/cognitive/public.service.ts": "cb5311efa98607f1844aab5b335543e1f1a578190589342295fd5341bfe7a0d1",
+    "server-version/backend/src/modules/cognitive/session.service.ts": "fe4e20375a658e810dd18dac3520890e2fe83f7d87e4bfe9359bb0ecc58386ad",
+    "server-version/backend/src/modules/composite/composite.service.ts": "f5814afb79bfcff149366c4da86543a0ecb3a6635e6edc332c29fcde7eeefa95",
+    "server-version/backend/src/modules/questionnaire-product/service.ts": "b7e8591b601642b6eb1543203c755cd7aeaaa215c960b2634620f93ec76d5285",
+    "server-version/frontend/src/App.tsx": "af47d7ac8670aa45cdcc5dea2f34d00e0fe44af550d0eba5a7ffa7c5130d8114",
+    "server-version/frontend/src/modules/cognitive/__tests__/PublicCognitiveAssignment.test.tsx": "122e76080393d62d7405c7fdaddfef608a6f930b91a186704e9bf5cd881ae4b7",
+    "server-version/frontend/src/modules/cognitive/pages/CognitiveAssignmentEntry.tsx": "a6a364a8fd05447d8448eb22cb5f1653b073f6994ae442e6876702a1af061c6a",
+    "server-version/frontend/src/modules/cognitive/pages/PublicCognitiveAssignment.tsx": "d9b1886d298fba92426c2d556324696ac7369292aa77f1e9cb7230554f163c53",
+    "server-version/frontend/src/modules/cognitive/types.ts": "64be381b12c903e62cf52fc00fb73c2856449026395936297f2914de2ebe2bfd",
+    "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx": "b504f0d4af150f231482d5b5445f99d1f33165cc74d0fed4d1ef27f61e7c8439",
+    "server-version/frontend/src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx": "15c2e47844270f5fda8c7e509eaef7b44dd7519694938f7eaaf38933b3359391",
+    "server-version/frontend/src/pages/student/StudentHome.tsx": "fc38495f50883d5f20069798bd4a9c95154724ed518ea6ee0483c8c8fbe04110",
+    "server-version/frontend/src/pages/teacher/CognitiveAssignmentEdit.tsx": "590208b8245239a124674d858b6e227b6f9a7b2c2aaad79f0754b2fb1ee54dde",
+    "server-version/frontend/src/pages/teacher/CognitiveAssignmentList.tsx": "fb40d6f01812635aa56c3b3859bd853df3a9c1405dba0cdcb6d79d6992a563af",
+    "server-version/frontend/src/pages/teacher/__tests__/CognitiveAssignmentEdit.data-loop.test.tsx": "0b7e33bc277a695fe35340e3238598327f9ffab47ad0b5da37bc90392ce7ea41",
+    "server-version/frontend/src/pages/teacher/__tests__/CognitiveAssignmentEdit.test.tsx": "c870af0edcdcb309df8233415c6f2587db5c50839da7c16019b7b1248c14d4bc",
+    "server-version/frontend/src/pages/teacher/__tests__/CognitiveAssignmentList.grants.test.tsx": "18445a219106535fbfa1d534d3eeb4c71b02f4ab8d6a4806fee92c37254d888b",
+    "server-version/frontend/src/training/TrainingCoursePages.test.tsx": "b195000440e8f9268450ef3ed62e5083217a75fc885ac0677b0da14ba18c3cd6",
+    "server-version/frontend/src/training/TrainingTrainerCourse.tsx": "6768a459c5aa539cb8e5338221d25c27f06e460510784b06665457b7b7ecfb17",
+    "server-version/frontend/src/training/courseAssessments.test.ts": "bcf393c1248c9b61ba9b752cd7365556007fc0e8e8261237f4ebb6d8af7abe6a",
+    "server-version/frontend/src/training/courseAssessments.ts": "41269d32e05faa0d5738be7ca25d9a937d57416428a9ff2bd30662a9a06b8d55",
+    "server-version/backend/src/__tests__/cognitive/c10-admission-switch.test.ts": "708b69881783ccbe846cecdb2a06bb336f79cc41713237e36167292cef371960",
+    "server-version/scripts/recovery/c10-cognitive-http.py": "3eb03613f455a1eac77a16a11323765134b5ac6ebfbaa46e9058ced89b6a027f",
+    "server-version/scripts/recovery/c10-cognitive-smoke.mjs": "8c0deaeb68300f30e195f989fa098c231b2d4e227f9835054373fd63516450b7",
+    "server-version/scripts/recovery/c10-history-http.py": "589c30949941d49a7e0e5ed77188dd4339b513cf944d74a7387fb9138af0259a",
+    "server-version/scripts/recovery/c10-history-smoke.mjs": "b415ce86da89e7a1922885c70368e85815b0efc4e004a37c71969925bfc323dd"
+  },
+  "testLogSha256": {
+    "assignment-tests3.log": "1bab11f8d5b624418bc487d45b46725a511cb918265b8ac5ee6ec55a6c071cb9",
+    "admission-tests.log": "e074e5dfa8e930c6cc1f5686e61708b62bf1e1d69092ada2b1500e6b40cd3eb7",
+    "tests1.log": "0474194c0c2aa42cb2da9caef9b5c2a1edcc7da4fc8adb95a1979216ea7a18dc",
+    "final-ui-tests.log": "4111634ad7e51639da8e149d0fc66121fd5f4f7c98f8649db0f8489dc3c09f72",
+    "edit-ui-tests.log": "00fc476a3cb94848cff25a758dd7a6d8259e8de75093678b44cf45e47d625925",
+    "history-build3.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "final-ui-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "quotaHistorySupplement": {
+    "passed": true,
+    "baseHeadAtRun": "96724f0a25b279a49dde492075d57670efe1f00a",
+    "runtimeFingerprint": {
+      "schemaVersion": 1,
+      "nodeVersion": "v24.21.0",
+      "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+      "dist": {
+        "files": 4977,
+        "sha256": "072f8743b2e62a2a87bb517fa7b557e9005f557b56c05063c053205ca4cc7121"
+      },
+      "files": {
+        "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+        "prisma/schema.prisma": "bd464898ee84cf4b6c79d70096a104ba5fad0d5d2d5440de1f96d6959ef9f1a3",
+        "node_modules/.prisma/client/schema.prisma": "f5b7d8a6385bfb86a1e09f2c4959bb7cc97ad998d9de9580d4634b6d635262bd",
+        "node_modules/.prisma/client/index.js": "55731e69965d85440dac0b06044f366139e4b1a8abbd3af8e32d06771a4a0cbb"
+      },
+      "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+    },
+    "harnessSha256": "552b7354e77344b83e5d2e899520e3bb16a6b788a8ce5300c33731a8fb8d761e",
+    "checks": [
+      "OFF history feeds preserve existing owner records without admission, quota, job or token writes",
+      "OFF old ACTIVE shell is retained as paused and cannot activate from direct URL"
+    ],
+    "counts": [
+      {
+        "name": "OFF history feeds preserve existing owner records without admission, quota, job or token writes",
+        "before": {
+          "parents": 4,
+          "sessions": 7,
+          "jobs": 2,
+          "cognitiveTokens": [
+            {
+              "usedCount": 1
+            }
+          ],
+          "compositeTokens": [
+            {
+              "usedCount": 2
+            }
+          ],
+          "courseQuotaUsed": 4
+        },
+        "after": {
+          "parents": 4,
+          "sessions": 7,
+          "jobs": 2,
+          "cognitiveTokens": [
+            {
+              "usedCount": 1
+            }
+          ],
+          "compositeTokens": [
+            {
+              "usedCount": 2
+            }
+          ],
+          "courseQuotaUsed": 4
+        },
+        "unchanged": true
+      },
+      {
+        "name": "OFF old ACTIVE shell is retained as paused and cannot activate from direct URL",
+        "before": {
+          "parents": 4,
+          "sessions": 7,
+          "jobs": 2,
+          "cognitiveTokens": [
+            {
+              "usedCount": 1
+            }
+          ],
+          "compositeTokens": [
+            {
+              "usedCount": 2
+            }
+          ],
+          "courseQuotaUsed": 4
+        },
+        "after": {
+          "parents": 4,
+          "sessions": 7,
+          "jobs": 2,
+          "cognitiveTokens": [
+            {
+              "usedCount": 1
+            }
+          ],
+          "compositeTokens": [
+            {
+              "usedCount": 2
+            }
+          ],
+          "courseQuotaUsed": 4
+        },
+        "unchanged": true
+      }
+    ],
+    "httpRequestCount": 13,
+    "statusCounts": {
+      "200": 12,
+      "400": 1
+    },
+    "cleanup": [
+      {
+        "service": "report-worker",
+        "stopped": true
+      },
+      {
+        "service": "api",
+        "stopped": true
+      },
+      {
+        "service": "redis",
+        "stopped": true
+      },
+      {
+        "service": "postgres",
+        "stopped": true
+      }
+    ]
+  },
+  "quotaFollowupSourceSha256": {
+    "server-version/backend/src/modules/cognitive/attempt-quota.ts": "edb1a1da3d54210b49ca9588a6a2b4d6aac05c8d2599f7e104a6ad2798f760fc",
+    "server-version/frontend/src/modules/cognitive/pages/CognitiveAssignmentEntry.tsx": "5453de4db50e116583b3f5c19d4e340435133ff5a7d4e6d9bcf6e35d8fcad154",
+    "server-version/scripts/recovery/c10-history-smoke.mjs": "552b7354e77344b83e5d2e899520e3bb16a6b788a8ce5300c33731a8fb8d761e",
+    "server-version/backend/src/__tests__/cognitive/c10-quota-switch.test.ts": "20f401c451def575222816c2982ecb094ab7f6bd06b5e96a9c37af23e9275978",
+    "server-version/frontend/src/modules/cognitive/__tests__/C10AssignmentEntry.test.tsx": "6c71b3ca12754b93be62b081ebedd99e8a5cf3fbfc2f32dd8d1a5603b588a885"
+  }
+}

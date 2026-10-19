@@ -90,6 +90,12 @@ const makeScaleResult = (input: {
 })
 
 const compositeRow = (overrides: Record<string, unknown> = {}) => ({
+  trainingFlowDraft: null,
+  trainingFlowFrozen: null,
+  trainingFlowDigest: null,
+  trainingVariantDraft: null,
+  trainingVariantFrozen: null,
+  trainingVariantDigest: null,
   id: 'composite-1',
   code: 'C-1',
   name: '综合测评 1',
@@ -110,6 +116,12 @@ const compositeRow = (overrides: Record<string, unknown> = {}) => ({
 })
 
 const attemptRow = (overrides: Record<string, unknown> = {}) => ({
+  trainingFlowSnapshotEncrypted: null,
+  trainingFlowSnapshotHash: null,
+  trainingFlowPathEncrypted: null,
+  trainingFlowPathHash: null,
+  trainingVariantAllocationEncrypted: null,
+  trainingVariantAllocationHash: null,
   id: 'attempt-1',
   status: 'COMPLETED',
   progress: 100,
@@ -125,6 +137,12 @@ const attemptRow = (overrides: Record<string, unknown> = {}) => ({
 })
 
 const completedAttemptForReport = (overrides: Record<string, unknown> = {}) => ({
+  trainingFlowSnapshotEncrypted: null,
+  trainingFlowSnapshotHash: null,
+  trainingFlowPathEncrypted: null,
+  trainingFlowPathHash: null,
+  trainingVariantAllocationEncrypted: null,
+  trainingVariantAllocationHash: null,
   id: 'attempt-1',
   compositeAssessmentId: 'composite-1',
   userId: 'student-1',
@@ -134,6 +152,12 @@ const completedAttemptForReport = (overrides: Record<string, unknown> = {}) => (
   completedAt: new Date('2026-08-20T01:05:00Z'),
   totalTime: 300000,
   compositeAssessment: {
+    trainingFlowDraft: null,
+    trainingFlowFrozen: null,
+    trainingFlowDigest: null,
+    trainingVariantDraft: null,
+    trainingVariantFrozen: null,
+    trainingVariantDigest: null,
     id: 'composite-1',
     name: '综合测评 1',
     items: [
@@ -198,7 +222,7 @@ describe('listComposites attemptCounts', () => {
     const list = await listComposites('teacher-a', TEACHER)
 
     expect(mockPrisma.compositeAssessmentAttempt.groupBy).toHaveBeenCalledWith({
-      by: ['compositeAssessmentId', 'status'],
+      by: ['compositeAssessmentId', 'status', 'taskSatisfaction'],
       where: {
         AND: [
           { compositeAssessmentId: { in: ['composite-1', 'composite-2'] } },
@@ -212,8 +236,8 @@ describe('listComposites attemptCounts', () => {
       },
       _count: { _all: true },
     })
-    expect(list[0].attemptCounts).toEqual({ started: 4, inProgress: 1, completed: 2, abandoned: 1 })
-    expect(list[1].attemptCounts).toEqual({ started: 0, inProgress: 0, completed: 0, abandoned: 0 })
+    expect(list[0].attemptCounts).toEqual({ started: 4, inProgress: 1, completed: 2, satisfied: 2, notSatisfied: 0, abandoned: 1 })
+    expect(list[1].attemptCounts).toEqual({ started: 0, inProgress: 0, completed: 0, satisfied: 0, notSatisfied: 0, abandoned: 0 })
     expect(list[0]).not.toHaveProperty('_count')
     expect(list[1]).not.toHaveProperty('_count')
   })
@@ -228,7 +252,7 @@ describe('getCompositeForTeacher attemptCounts', () => {
 
     const detail = await getCompositeForTeacher('teacher-a', TEACHER, 'composite-1')
 
-    expect(detail.attemptCounts).toEqual({ started: 3, inProgress: 0, completed: 3, abandoned: 0 })
+    expect(detail.attemptCounts).toEqual({ started: 3, inProgress: 0, completed: 3, satisfied: 3, notSatisfied: 0, abandoned: 0 })
     expect(detail).not.toHaveProperty('_count')
   })
 })
@@ -341,7 +365,7 @@ describe('getReportForTeacher', () => {
 
 describe('getExportContext ownership', () => {
   it('denies another teacher while allowing the owner and admin', async () => {
-    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(compositeRow())
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue({ ...compositeRow(), _count: { items: 0 } })
     await expect(getExportContext('teacher-b', TEACHER, 'composite-1')).rejects.toMatchObject({ statusCode: 403 })
     await expect(getExportContext('teacher-a', TEACHER, 'composite-1')).resolves.toMatchObject({ id: 'composite-1' })
     await expect(getExportContext('admin-1', ADMIN, 'composite-1')).resolves.toMatchObject({ id: 'composite-1' })
@@ -386,6 +410,12 @@ describe('composite cognitive single-task report', () => {
   it('hides the product index when quality is insufficient', async () => {
     const built = (await buildCompositeReport(completedAttemptForReport({
       compositeAssessment: {
+        trainingFlowDraft: null,
+        trainingFlowFrozen: null,
+        trainingFlowDigest: null,
+        trainingVariantDraft: null,
+        trainingVariantFrozen: null,
+        trainingVariantDigest: null,
         id: 'composite-1',
         name: '综合测评 1',
         items: [{
@@ -422,6 +452,12 @@ describe('composite cognitive single-task report', () => {
   it('renders frozen Chinese labels and the experience caveat', async () => {
     const built = (await buildCompositeReport(completedAttemptForReport({
       compositeAssessment: {
+        trainingFlowDraft: null,
+        trainingFlowFrozen: null,
+        trainingFlowDigest: null,
+        trainingVariantDraft: null,
+        trainingVariantFrozen: null,
+        trainingVariantDigest: null,
         id: 'composite-1',
         name: '综合测评 1',
         items: [{
@@ -482,6 +518,12 @@ describe('composite cognitive single-task report', () => {
     }
     const attempt = completedAttemptForReport({
       compositeAssessment: {
+        trainingFlowDraft: null,
+        trainingFlowFrozen: null,
+        trainingFlowDigest: null,
+        trainingVariantDraft: null,
+        trainingVariantFrozen: null,
+        trainingVariantDigest: null,
         id: 'composite-1',
         name: '综合测评 1',
         items: [{ id: 'item-cog', type: 'COGNITIVE', scale: null, cognitiveAssignment: assignment }],
@@ -528,6 +570,12 @@ describe('collection-only mixed unit reports', () => {
     const scale = { id: 'scale-a', code: 'adexi_v1', name: '量表 A', instrumentVersion: '2.0.0' }
     const internalComposite = (await buildCompositeReport(completedAttemptForReport({
       compositeAssessment: {
+        trainingFlowDraft: null,
+        trainingFlowFrozen: null,
+        trainingFlowDigest: null,
+        trainingVariantDraft: null,
+        trainingVariantFrozen: null,
+        trainingVariantDigest: null,
         id: 'composite-1',
         name: '综合测评 1',
         items: [{ id: 'item-scale-a', type: 'SCALE', scaleId: 'scale-a', scale, cognitiveAssignment: null }],
@@ -549,6 +597,12 @@ describe('collection-only mixed unit reports', () => {
   it('keeps two Scale and two Cognitive slots ordered with zero/null values intact', async () => {
     const built = (await buildCompositeReport(completedAttemptForReport({
       compositeAssessment: {
+        trainingFlowDraft: null,
+        trainingFlowFrozen: null,
+        trainingFlowDigest: null,
+        trainingVariantDraft: null,
+        trainingVariantFrozen: null,
+        trainingVariantDigest: null,
         id: 'composite-1',
         name: '混合容器',
         items: [
@@ -704,5 +758,27 @@ describe('buildCompositeReport decrypt degrade', () => {
     const scale = (await buildCompositeReport(attempt)).modules.find((item: { type: string }) => item.type === 'SCALE')
     expect(scale).toMatchObject({ decryptError: true })
     expect(scale).toHaveProperty('scores', [])
+  })
+})
+
+
+describe('C06 teacher submission and satisfaction counts', () => {
+  it('adds all completed buckets without replacing totals and fails closed for malformed satisfaction', async () => {
+    mockPrisma.compositeAssessment.findMany.mockResolvedValue([compositeRow()])
+    mockPrisma.compositeAssessmentAttempt.groupBy.mockResolvedValue([
+      ...[null, 'SATISFIED', 'NOT_SATISFIED', 'CORRUPT'].map(taskSatisfaction => ({ compositeAssessmentId: 'composite-1', status: 'COMPLETED', taskSatisfaction, _count: { _all: 2 } })),
+      { compositeAssessmentId: 'composite-1', status: 'IN_PROGRESS', taskSatisfaction: 'SATISFIED', _count: { _all: 1 } },
+    ])
+    const [row] = await listComposites('teacher-a', TEACHER)
+    expect(row.attemptCounts).toEqual({ started: 9, inProgress: 1, completed: 8, satisfied: 4, notSatisfied: 4, abandoned: 0 })
+    expect(mockPrisma.compositeAssessmentAttempt.groupBy).toHaveBeenCalledTimes(1)
+  })
+  it('projects anonymous submission qualification without exposing identity or credentials', async () => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(compositeRow())
+    mockPrisma.compositeAssessmentAttempt.findMany.mockResolvedValue([attemptRow({ taskSatisfaction: 'NOT_SATISFIED', anonymousCode: 'ANON-1', userId: null, user: null })])
+    const result = await listAttemptsForTeacher('teacher-a', TEACHER, 'composite-1', page)
+    expect(result.list[0]).toMatchObject({ status: 'COMPLETED', taskSatisfied: false, taskSatisfaction: 'NOT_SATISFIED', isAnonymous: true, nickname: null, username: null })
+    expect(mockPrisma.compositeAssessmentAttempt.findMany.mock.calls[0][0].select.taskSatisfaction).toBe(true)
+    expect(JSON.stringify(result)).not.toContain('recoveryTokenHash')
   })
 })

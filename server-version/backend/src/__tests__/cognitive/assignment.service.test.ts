@@ -33,12 +33,16 @@ import {
   publishAssignment,
   archiveAssignment,
   ensureTeacherPublishedAssignment,
+  prepareTeacherPublishedAssignment,
+  persistPreparedTeacherPublishedAssignment,
 } from '../../modules/cognitive/assignment.service'
 
 beforeAll(() => {
   process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
   process.env.DATA_PSEUDONYM_KEY = 'b'.repeat(64)
 })
+
+import { config as appConfig } from '../../config'
 
 const TEACHER = UserRole.TEACHER
 const ADMIN = UserRole.ADMIN
@@ -105,6 +109,7 @@ const baseInput = {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  appConfig.cognitiveModuleEnabled = true
   mockPrisma.$transaction.mockImplementation((run: any) => run(mockPrisma))
   mockPrisma.cognitiveSession.count.mockResolvedValue(0)
   mockPrisma.cognitiveSession.findFirst.mockResolvedValue(null)
@@ -116,7 +121,7 @@ beforeEach(() => {
 describe('listPublishedConfigs', () => {
   it('hides GRANT configs the teacher cannot instantiate', async () => {
     mockPrisma.cognitiveTestConfig.findMany.mockResolvedValue([
-      { id: 'open-1', accessPolicy: 'OPEN' },
+      { ...publishedV2Config, id: 'open-1', accessPolicy: 'OPEN' },
     ])
     await listPublishedConfigs('teacher-1', TEACHER)
     expect(mockPrisma.cognitiveTestConfig.findMany).toHaveBeenCalledWith(expect.objectContaining({
@@ -140,6 +145,7 @@ describe('listPublishedConfigs', () => {
 
   it('keeps a database-published config even when legacy v2 compatibility metadata is Draft', async () => {
     mockPrisma.cognitiveTestConfig.findMany.mockResolvedValue([{
+      ...config,
       id: 'fake-config',
       testType: 'fake',
       engineVersion: '1.0.0',
@@ -152,6 +158,7 @@ describe('listPublishedConfigs', () => {
 
   it('keeps a database-published config whose exact v2 definition is Published', async () => {
     mockPrisma.cognitiveTestConfig.findMany.mockResolvedValue([{
+      ...publishedV2Config,
       id: 'reaction-config',
       testType: 'reaction',
       engineVersion: '1.0.0',
@@ -581,5 +588,30 @@ describe('composite wrapper assignment class', () => {
     mockPrisma.compositeAssessmentItem.findFirst.mockResolvedValue({ id: 'package-item-1' })
     await expect(archiveAssignment('teacher-1', TEACHER, 'asg-1')).rejects.toMatchObject({ statusCode: 409 })
     expect(mockPrisma.cognitiveAssignment.updateMany).not.toHaveBeenCalled()
+  })
+})
+
+
+describe('variant candidate wrapper preparation', () => {
+  const input = {userId:'teacher-1',courseId:'course-1',configId:'config-1',title:'candidate',instruction:null}
+  beforeEach(() => {
+    mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue(publishedV2Config)
+    mockPrisma.cognitiveAssignment.findMany.mockResolvedValue([])
+    mockPrisma.course.findUnique.mockResolvedValue(course)
+  })
+  it('prepares a valid wrapper without creating it until selected', async () => {
+    const prepared=await prepareTeacherPublishedAssignment(mockPrisma as any,input)
+    expect(prepared.data).toMatchObject({courseId:'course-1',status:'PUBLISHED'})
+    expect(mockPrisma.cognitiveAssignment.create).not.toHaveBeenCalled()
+    await persistPreparedTeacherPublishedAssignment(mockPrisma as any,prepared)
+    expect(mockPrisma.cognitiveAssignment.create).toHaveBeenCalledTimes(1)
+  })
+  it('rejects partial source profile freezes before candidate selection', async () => {
+    await expect(prepareTeacherPublishedAssignment(mockPrisma as any,{...input,sourceFreeze:{profile:'standard'} as any})).rejects.toThrow(/冻结信息不完整/)
+    expect(mockPrisma.cognitiveAssignment.create).not.toHaveBeenCalled()
+  })
+  it('rejects corrupt source report ciphertext before candidate selection', async () => {
+    await expect(prepareTeacherPublishedAssignment(mockPrisma as any,{...input,sourceFreeze:{profile:'standard',profileDefinitionVersion:'1',resolvedConfigSnapshotEncrypted:'cipher',resolvedConfigHash:'a'.repeat(64),resolvedReportSnapshotEncrypted:'corrupt'}})).rejects.toThrow()
+    expect(mockPrisma.cognitiveAssignment.create).not.toHaveBeenCalled()
   })
 })

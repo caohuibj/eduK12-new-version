@@ -1,0 +1,9 @@
+{
+  "archive": "checkpoint04-evidence.tar.gz",
+  "sha256": "816640e93e9977ed1d5fccfb0bab3fbd8b521102e04dfb286d7c47e7d88346d2",
+  "bytes": 297268,
+  "manifestSha256": "df9bc7f393b5a88151fc242913a635adbf86a9c07332ddbb56a3f9f4fe0fb9d0",
+  "members": 13,
+  "memberHashAndSizeVerificationPassed": true,
+  "dumpPrivateSha256": "4cb0e419328dfb45ec72a9adc8e117a6afa5400ef89737361c5e6f47c18cb313"
+}

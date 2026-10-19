@@ -1,0 +1,25 @@
+{
+  "passed": false,
+  "checks": [],
+  "phase": "all",
+  "sourceHead": "82ffd9bdb070600e943354b92f2293ad1a6d092a",
+  "runtimeFingerprint": {
+    "schemaVersion": 1,
+    "nodeVersion": "v24.21.0",
+    "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+    "dist": {
+      "files": 4989,
+      "sha256": "994053715d81255d32683c9d28345bbd67171dc1ed5bdd341bb3cfd40749f3b3"
+    },
+    "files": {
+      "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+      "prisma/schema.prisma": "33e2a793329c331f3ee5813bc21811688f9aae1e70aaffc44d9341ad4a9fc6fb",
+      "node_modules/.prisma/client/schema.prisma": "3786095e6b9a5477273b36a1842ca7b144daa23aa33fccb0fb3da2c95a16d822",
+      "node_modules/.prisma/client/index.js": "e052f2456ab221af57ad9d4c8d2f34ff931fbceecf03b2a01f6b41b6ed9021f2"
+    },
+    "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+  },
+  "harnessSha256": "deffe02a010ba4d756bc6ba773851aa17c5ac6b1d7d1cb46cb9a8fbb2414347d",
+  "errorType": "CalledProcessError",
+  "cleanupVerified": true
+}

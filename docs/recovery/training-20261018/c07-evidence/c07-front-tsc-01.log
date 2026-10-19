@@ -1,0 +1,2 @@
+src/pages/teacher/CompositeAssessmentEdit.tsx(282,33): error TS7006: Parameter 'item' implicitly has an 'any' type.
+src/pages/teacher/CompositeAssessmentEdit.tsx(287,27): error TS7006: Parameter 'item' implicitly has an 'any' type.

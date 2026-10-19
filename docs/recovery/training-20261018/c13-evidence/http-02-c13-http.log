@@ -1,0 +1,42 @@
+PASS Real HTTP actors and restricted NOSUPERUSER/NOCREATEDB/NOCREATEROLE/NOBYPASSRLS runtime
+PASS Private <=2 MB image HTTP upload, owner proxy, MIME/size/rights/hash/foreign-use rejection, independent immutable release and retention
+PASS Grant wrong key rejected without attempt artifacts
+PASS Grant wrong version rejected without attempt artifacts
+PASS Grant wrong hash rejected without attempt artifacts
+PASS Grant wrong digest rejected without attempt artifacts
+PASS Grant wrong teacher rejected without attempt artifacts
+PASS Grant wrong course rejected without attempt artifacts
+PASS Grant wrong purpose rejected without attempt artifacts
+PASS Grant expired rejected without attempt artifacts
+PASS Controlled release cannot be granted to a non-Training course
+PASS Controlled release rejects GENERAL anonymous publishing
+PASS Controlled release rejects unbound COURSE publishing
+PASS Controlled release rejects multi-course publishing
+PASS Exact course grant rejects another course
+PASS Nonmember/other teacher/standalone admission rejected
+PASS Revocation rejects a new eligible student without parent/child/job/raw/canonical residue
+PASS Revocation rejects fresh anonymous admission in the authorized single-course delivery
+PASS Exact frozen grant receipt survives revocation for member and single-course anonymous users: resume/image/FINAL/report; both fresh admission paths denied
+PASS Original export queue csv: exact canonical identities/metrics, no raw responses, owner-only download
+PASS Original export queue zip: exact canonical identities/metrics, no raw responses, owner-only download
+PASS Expired grant denies fresh eligible admission without artifacts
+PASS Expiry preserves previously admitted image/FINAL/report recovery
+PASS Future grant cannot authorize publishing
+PASS Future grant cannot authorize new admission
+PASS ADAPT alone cannot authorize source distribution
+PASS ADAPT exact grant version mismatch cannot create a draft
+PASS ADAPT exact source hash mismatch cannot create a draft
+PASS ADAPT exact source version mismatch cannot create a draft
+PASS ADAPT exact course mismatch cannot create a draft
+PASS ADAPT exact grant id mismatch cannot create a draft
+PASS New adapted release requires its own DISTRIBUTE grant
+PASS ADAPT makes independent reviewed version with new manual golden; immutable original unchanged; revoked ADAPT blocks new/unpublished source-draft access
+PASS Real grant row lock: revoke-first commits before admission; zero attempt artifacts
+PASS Real grant→asset row locks: admission-first commits frozen attempt before revoke
+PASS Admission-first still rejects a later new student after revoke
+PASS Real publication race: revoke-first leaves original product DRAFT
+PASS Real publication race: publish-first commits then revoke denies later admission
+PASS Publish-first then revoked grant denies new admission
+PASS Teacher freezes while scope SHARE waits: committed account state rejects HTTP admission without artifacts
+PASS Expiry while waiting for real grant row lock rejects admission without artifacts
+PASS Legacy null-policy multi-course anonymous start/resume/FINAL/replay/report remains compatible without injected grant receipt

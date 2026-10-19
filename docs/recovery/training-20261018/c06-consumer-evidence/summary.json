@@ -1,0 +1,321 @@
+{
+  "scope": "C06 task satisfaction consumers, local phased checks only",
+  "businessSource": "f0c82f4eafdb7c084c356a3b07ba1de6f3b50039",
+  "businessTree": "b584feebdbbd3bc5f269cedfaa994627a78880c2",
+  "base": "8ac167cf6a494d8410743e2f14ef6448cb1daea4",
+  "helperOriginal": "00de27874512488e8b0359256223bc526be7e654",
+  "node": "24.21.0",
+  "prisma": "5.22.0",
+  "dependencyInstall": "independent npm ci using official registry offline cache; fresh prisma generate",
+  "uniqueCases": {
+    "backend": 98,
+    "frontend": 72
+  },
+  "phases": [
+    {
+      "log": "backend-tests.log.gz",
+      "result": "73 passed, 1 failed; 74 unique cases",
+      "resolution": "Expired active task must not receive newly broadened report CTA. Restored original window/action precedence; backend-retest passes the 1 failing case."
+    },
+    {
+      "log": "controller.log.gz",
+      "result": "20 passed; includes new enum filter"
+    },
+    {
+      "log": "inbox.log.gz",
+      "result": "4 passed"
+    },
+    {
+      "log": "history-final.log.gz",
+      "result": "4 passed, 35 skipped; same four C06 history cases rechecked after adding latest report qualification scalar"
+    },
+    {
+      "log": "frontend-tests.log.gz",
+      "result": "36 passed, 1 failed; 37 unique cases",
+      "resolution": "Public report test fixture lacked recovery credential; fixed fixture and only failed case rerun in frontend-retest."
+    },
+    {
+      "log": "extra-ui.log.gz",
+      "result": "10 passed"
+    },
+    {
+      "log": "runner-ui.log.gz",
+      "result": "1 failed, 7 skipped",
+      "resolution": "Test window.location retained public path; aligned with MemoryRouter route and existing fixture pattern. runner-ui-retest: 1 passed, 7 skipped."
+    },
+    {
+      "log": "report-final.log.gz",
+      "result": "3 passed, 14 skipped; existing partial + two V3 cases after guarding partial report header"
+    },
+    {
+      "log": "training-inbox.log.gz",
+      "result": "24 passed"
+    },
+    {
+      "log": "frontend-tsc.log.gz",
+      "result": "failed: legacy report union missing V3 field types",
+      "resolution": "Added optional legacy union fields; frontend-tsc2 and frontend-final-tsc passed"
+    },
+    {
+      "log": "backend-final-tsc.log.gz",
+      "result": "no compiler errors"
+    },
+    {
+      "log": "frontend-final-tsc.log.gz",
+      "result": "no compiler errors"
+    },
+    {
+      "log": "lint.log.gz",
+      "result": "0 errors, 3 pre-existing hook warnings"
+    },
+    {
+      "log": "extra-lint.log.gz",
+      "result": "0 errors, 4 pre-existing hook/unused-import warnings"
+    }
+  ],
+  "limitations": [
+    "Not one clean full-suite run; failures and narrowly scoped retries retained. Skipped cases do not count as passes.",
+    "Core runtime/facts/aggregate/authoring/report DTO integration remains with owner.",
+    "No real API/PG/Redis/browser/performance acceptance in this consumer checkpoint.",
+    "No production, push, PR or CI run."
+  ],
+  "files": [
+    {
+      "file": "backend-final-tsc.log.gz",
+      "uncompressedSha256": "7d61cb2e2deb776dfec4d6f54693f9edeed0af5c4da52f091c53c995d862fb65",
+      "compressedSha256": "549ead21e93c97e625dee672da3c2c1a0d28d075e1f95c1164ba0ffdd749a64e"
+    },
+    {
+      "file": "backend-install.log.gz",
+      "uncompressedSha256": "af7ea7167230c1a0eecb955d703066eda87493ed6eaabf162b160660e78b6c17",
+      "compressedSha256": "1523a41e7fc38ef15e7682ea41a2fa04447595d6e4076939ec7ea9746d854523"
+    },
+    {
+      "file": "backend-retest.log.gz",
+      "uncompressedSha256": "8227e1988fe63fd8930030d38c6a73b632c0ebc8b0ce85e5e5fc1ac0f656e623",
+      "compressedSha256": "96b4136972bf8424bdbbe6c0d62351d74696f66c45b09fe2abe71398030eab8a"
+    },
+    {
+      "file": "backend-tests.log.gz",
+      "uncompressedSha256": "513a4a22ff2873a4f7ec09b0d4ecb7a703d0ac2eb0fe1aaea5687b0796440a08",
+      "compressedSha256": "04048c15dd329cb45cad043693dca4d560c7d8c60f5f42661c01247858583c82"
+    },
+    {
+      "file": "backend-tsc.log.gz",
+      "uncompressedSha256": "7d61cb2e2deb776dfec4d6f54693f9edeed0af5c4da52f091c53c995d862fb65",
+      "compressedSha256": "549ead21e93c97e625dee672da3c2c1a0d28d075e1f95c1164ba0ffdd749a64e"
+    },
+    {
+      "file": "backend-tsc2.log.gz",
+      "uncompressedSha256": "7d61cb2e2deb776dfec4d6f54693f9edeed0af5c4da52f091c53c995d862fb65",
+      "compressedSha256": "549ead21e93c97e625dee672da3c2c1a0d28d075e1f95c1164ba0ffdd749a64e"
+    },
+    {
+      "file": "controller.log.gz",
+      "uncompressedSha256": "2c6f90f753ce14e9546916e7fbfea5252ab305db3e4906462307b1f72336c01d",
+      "compressedSha256": "45d6ad26169154c6cb0e7d25cdf2e97353268cc132481b27a264b6db3c2f122b"
+    },
+    {
+      "file": "extra-lint.log.gz",
+      "uncompressedSha256": "2263af3b7f2334f4e2abcedb15ed03a37c2cf3d837135cf6f8e53f46b1fb5fa4",
+      "compressedSha256": "2851c2736817480d5737aee282930cf2c35a519e2ac65719e176a96a2280b131"
+    },
+    {
+      "file": "extra-ui.log.gz",
+      "uncompressedSha256": "56a34d6527e530e800f46d137f0d741b164e3b81a8fb16f152b7779aa8f9527d",
+      "compressedSha256": "9405b1e2d9176d91116126fde79e3198c2e200811c03fa3e68284a1731ba88bd"
+    },
+    {
+      "file": "frontend-final-tsc.log.gz",
+      "uncompressedSha256": "7d61cb2e2deb776dfec4d6f54693f9edeed0af5c4da52f091c53c995d862fb65",
+      "compressedSha256": "549ead21e93c97e625dee672da3c2c1a0d28d075e1f95c1164ba0ffdd749a64e"
+    },
+    {
+      "file": "frontend-install.log.gz",
+      "uncompressedSha256": "02a4b14e186a406ed38c9801893090d28721b0c9f9ba0dd061dbe0f03d3e1848",
+      "compressedSha256": "093103ede5e6093e1d2b4d3b3fc44f344a789dcc9378024e220b291be4186125"
+    },
+    {
+      "file": "frontend-retest.log.gz",
+      "uncompressedSha256": "d0e937bc7ab63e599b4f726eef036e8509ef9f8471087901cc26fd30ac852d33",
+      "compressedSha256": "04a24111dd00910a2481d25aa2cc8ce89b0ff265e143df80cfcd2cadebab5d5b"
+    },
+    {
+      "file": "frontend-tests.log.gz",
+      "uncompressedSha256": "89b44f43b04c9197e57622b50d5766a1b6e9976219be6e582b6b10dcb0773bfe",
+      "compressedSha256": "402eecda87b9ca33502faa5a570e2f9557dab136202b37b8a06b3c86ae642d04"
+    },
+    {
+      "file": "frontend-tsc.log.gz",
+      "uncompressedSha256": "c87c8874b2ca040553e883fd9ecb0a2c7ec69a97a340446fe66598bc18889a37",
+      "compressedSha256": "5f49de63f04e2d852182b41c2466eb233789e62a383a9ac6bc0f07be7a2c5fa8"
+    },
+    {
+      "file": "frontend-tsc2.log.gz",
+      "uncompressedSha256": "7d61cb2e2deb776dfec4d6f54693f9edeed0af5c4da52f091c53c995d862fb65",
+      "compressedSha256": "549ead21e93c97e625dee672da3c2c1a0d28d075e1f95c1164ba0ffdd749a64e"
+    },
+    {
+      "file": "history-final.log.gz",
+      "uncompressedSha256": "5380f3bda5063d783b67016f5f40b263df6e90d9e8ef65bc95a25f1597e1a7c2",
+      "compressedSha256": "de96f373ea4635f8d0331ae5d655f2a6ad62c3590c8b0b3cd6331ac9fe43d9df"
+    },
+    {
+      "file": "inbox.log.gz",
+      "uncompressedSha256": "7234f65c49d1e4952397b613fa245dc79ca9a232bb8d1600b3ff4a64185f6aef",
+      "compressedSha256": "70f372cac9d9ed909bd2d541d4a7241b352501e82723808c50c8c2a553484e10"
+    },
+    {
+      "file": "lint.log.gz",
+      "uncompressedSha256": "0f927d1b87034faf35a5dbd790f248e8d57efd874e5f09488438e18fa4fecd0a",
+      "compressedSha256": "62d8ab8ab4828cf771fb340d8e6adc78203d35ffcd134d6bf7ba8bfa3aabca73"
+    },
+    {
+      "file": "prisma.log.gz",
+      "uncompressedSha256": "4a13c42d08c1472949736746fe470fc12ea1ebf93769ee87a46f7c8330749770",
+      "compressedSha256": "c0b297f2792fe5215af3f80497e43e3a7e7b2bf2423eecf7c24944ea5668d8f8"
+    },
+    {
+      "file": "report-final.log.gz",
+      "uncompressedSha256": "6dba0d9128d204cbb8dc499d044041c5cbf64cee6b684868191c4f2475270446",
+      "compressedSha256": "1a900c06f9954214c5e3152839f4c8cf37cdb269c1d06059af880e45613d1fa3"
+    },
+    {
+      "file": "runner-ui-retest.log.gz",
+      "uncompressedSha256": "3cdb3b87c8ae73d157773f6a2c0c67fc40765d3c0157807be99c3e67dc81343a",
+      "compressedSha256": "89f19b898bfcd699734a6fbf9d6dba51add91522475c3cb7b4d1687aad717b20"
+    },
+    {
+      "file": "runner-ui.log.gz",
+      "uncompressedSha256": "e2c9fa74d6d7e18d0e3d2b0e0da84502d379a74a84c3af105713a9d15945404d",
+      "compressedSha256": "9c6e715683195efc61b075f72d2acf3e1013480e222d50783e006b80fed1a57e"
+    },
+    {
+      "file": "training-inbox.log.gz",
+      "uncompressedSha256": "4d1e3f91a4eaf71f26fe389b5297765b532d62183f29ef8dbb68393e30c53e68",
+      "compressedSha256": "a8d4a7ed4541ce4c5ecd1df98fedc54dbc1f8176851f70be04f6cc996a6c0134"
+    }
+  ],
+  "sourceInputs": [
+    {
+      "path": "server-version/backend/src/__tests__/assessment-policy/inbox.test.ts",
+      "sha256": "8e430b6fcdd86e9028339175caa20352eca69925dea5b9f27c754c23e4957cf7"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/composite/copy.service.test.ts",
+      "sha256": "8fa4953ba8ef86d0818fdb237fea42096c7d4b4cee5fa825b8ec8c01b5ea43ac"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/composite/results.service.test.ts",
+      "sha256": "f599953f468cd463cc27ef6ac80cebafda0c727233718a80dec3f3c959c505b6"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/questionnaire/workbench-satisfaction.test.ts",
+      "sha256": "4537e35707673e21427f3d5f1f642ac14e2cd20a00782cacbf96e203459a5df9"
+    },
+    {
+      "path": "server-version/backend/src/__tests__/services/studentTasks.test.ts",
+      "sha256": "8d780b7b41b85174007e9487af4474c46db51484dd9b37261c781284f2de8e64"
+    },
+    {
+      "path": "server-version/backend/src/modules/assessment-policy/inbox.ts",
+      "sha256": "2625250d64d5cdf35cbddd12aa6c3332ab1b9bfa1d43e741253fadad5eb1cb94"
+    },
+    {
+      "path": "server-version/backend/src/modules/composite/composite.service.ts",
+      "sha256": "f6037c3a6899c1f4751ddd93f2d25bfe028e8f1595cb0dccc21073b4c3f9a45d"
+    },
+    {
+      "path": "server-version/backend/src/modules/questionnaire-product/workbench.ts",
+      "sha256": "5b5df56ea714175e4f6a2c0c62531e2e83a8b95396f8d7e106bfb7fa48c3c24c"
+    },
+    {
+      "path": "server-version/backend/src/services/studentTasks.ts",
+      "sha256": "cb0c1eaf9bc1069e0ef9f027730d429573bc81c0c7c80499520b1140a0152355"
+    },
+    {
+      "path": "server-version/frontend/src/components/student/StudentTasks.test.tsx",
+      "sha256": "01e4d6d8ba0cd6e89a4e4f3340298ade7ec09c0ff11074d222b4677cc3caf222"
+    },
+    {
+      "path": "server-version/frontend/src/components/student/StudentTasks.tsx",
+      "sha256": "d8c318b98c0943a6e00f903c175af2d94c8b7a24b14f4eec79411b152adda55a"
+    },
+    {
+      "path": "server-version/frontend/src/modules/composite/CompositeAssessmentPage.tsx",
+      "sha256": "0468b37559fdd38040849675722f45667ae773ee7df394ccba85ad5fe906c46b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/composite/CompositeReportPage.tsx",
+      "sha256": "6dc236c2788b463dc45cfd9139dd4c00a9555dfa0efa26847ca12710d4f81d6e"
+    },
+    {
+      "path": "server-version/frontend/src/modules/composite/__tests__/CompositeAssessmentPage.test.tsx",
+      "sha256": "d454f817d3676f38d8235f1b9124a817f37c94b4804fae37c79f00bc654c39a6"
+    },
+    {
+      "path": "server-version/frontend/src/modules/composite/__tests__/CompositeReportPage.test.tsx",
+      "sha256": "f188ef206fa93898e2e9fe3fb2f17d4a0942db5f7803d7a22c0a2d071912065b"
+    },
+    {
+      "path": "server-version/frontend/src/modules/composite/types.ts",
+      "sha256": "096818a06cd273caa5448584bc7e665abd676e05ea07b59d936c1d4c6be39995"
+    },
+    {
+      "path": "server-version/frontend/src/modules/reporting/types.ts",
+      "sha256": "12f1b576167de532f6c327d0a905ad47b3b7fbf15d842f7204087ec9bc2858ae"
+    },
+    {
+      "path": "server-version/frontend/src/pages/MyAssessments.tsx",
+      "sha256": "f630191dbe4a2e5df336f55d34dcd5306de4c993c03f37e8a6174ba2a9e6e8e0"
+    },
+    {
+      "path": "server-version/frontend/src/pages/__tests__/MyAssessments.test.tsx",
+      "sha256": "f3281f98f11e4f2e29594eea7f10b7a144f50a6b679b808ae8144f6e6346dc79"
+    },
+    {
+      "path": "server-version/frontend/src/pages/student/CourseDetail.tsx",
+      "sha256": "40e4c9b7a07e326e18d6795f2562a8e79483f70f9abf5e172ef1436395d2d50f"
+    },
+    {
+      "path": "server-version/frontend/src/pages/student/__tests__/CourseDetail.composite.test.tsx",
+      "sha256": "8162c3b2448fe718d7edf5ebd83f18644d2ebea1394d56ef302281be11aff97a"
+    },
+    {
+      "path": "server-version/frontend/src/pages/teacher/AssessmentWorkbench.tsx",
+      "sha256": "c9faa4c06f910c7febd0886f0ee49b928d5b7b28deb272bbbd80f4a72fd2ffe6"
+    },
+    {
+      "path": "server-version/frontend/src/pages/teacher/CompositeAssessmentEdit.tsx",
+      "sha256": "0cada9e887dcbb8dc830f0991de397b9e2c09aa30c5bdc1c44b9987c13b533ab"
+    },
+    {
+      "path": "server-version/frontend/src/pages/teacher/CompositeAssessmentList.tsx",
+      "sha256": "2a26712ea8bd78abee08b4f3e141d2d4a4730820a8b55e2ae10bc63786dabca3"
+    },
+    {
+      "path": "server-version/frontend/src/pages/teacher/CompositeAssessmentResults.tsx",
+      "sha256": "529cf59d69fa3762b3bcafd2898191eab2fb8f0b431cb7b633fbd4ba360a8949"
+    },
+    {
+      "path": "server-version/frontend/src/pages/teacher/__tests__/AssessmentWorkbench.satisfaction.test.tsx",
+      "sha256": "3568bb8bce2a56a4967ff4c5876e8223a0c81cf53277d449130d8ac09702c34d"
+    },
+    {
+      "path": "server-version/frontend/src/pages/teacher/__tests__/CompositeAssessmentResults.navigation.test.tsx",
+      "sha256": "2a6dde3ad3b7c1b724c716ea1d2fd5e1604fa989150c07610cf30bbe2ab0e8a4"
+    },
+    {
+      "path": "server-version/frontend/src/training/TrainingLearnerCourse.tsx",
+      "sha256": "b5cdcd3f0f0e5d5c87e851b0f137f9b4b835e2100c3b3e2048908beb76dba799"
+    },
+    {
+      "path": "server-version/frontend/src/training/courseAssessments.test.ts",
+      "sha256": "57028bb24355520402f4b625098a997f6f78ab2801d74b161354ed77e27992d2"
+    },
+    {
+      "path": "server-version/frontend/src/training/courseAssessments.ts",
+      "sha256": "c61d52029c7527e8c333f941fc97cb006652464ebbe430bfdbc65de8e8919d84"
+    }
+  ]
+}

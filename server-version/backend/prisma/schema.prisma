@@ -703,6 +703,7 @@ model Scale {
 
 // 测评记录表
 model Assessment {
+  timingEncrypted String? @map("timing_encrypted")
   resultFacts AssessmentResultFact[]
   id                        String                 @id @default(uuid())
   scaleId                   String                 @map("scale_id")
@@ -1123,6 +1124,14 @@ enum CompositeAnalysisSnapshotGenerationReason {
 
 // 综合测评模板。发布后项目配置不可修改，历史测评通过子记录保存各自的结果快照。
 model CompositeAssessment {
+  trainingFlowDraft Json? @map("training_flow_draft")
+  trainingFlowFrozen Json? @map("training_flow_frozen")
+  trainingFlowDigest String? @map("training_flow_digest")
+  trainingVariantDraft Json? @map("training_variant_draft")
+  trainingVariantFrozen Json? @map("training_variant_frozen")
+  trainingVariantDigest String? @map("training_variant_digest")
+  trainingTimingPolicy Json? @map("training_timing_policy")
+  timingExportEnabled Boolean @default(false) @map("timing_export_enabled")
   compositionTemplates AssessmentCompositionTemplate[]
   productKind         String @default("LEGACY_COMPOSITE") @map("product_kind")
   questionnaireType   QuestionnaireType? @map("questionnaire_type")
@@ -1217,6 +1226,8 @@ model CompositeAssessmentItem {
   formLabel             String?                     @map("form_label")
   formPlaceholder       String?                     @map("form_placeholder")
   formOptions           Json?                       @map("form_options")
+  formPolicy Json? @map("form_policy")
+  formDefinition        Json?                       @map("form_definition")
   contextKey            String?                     @map("context_key")
   formSectionId         String?                     @map("form_section_id")
   formSectionPosition   Int?                        @map("form_section_position")
@@ -1261,6 +1272,14 @@ model CompositeFormSection {
 
 // 一次学生/匿名参与记录。recoveryTokenHash 只存哈希，原始恢复凭证只在创建时返回一次。
 model CompositeAssessmentAttempt {
+  trainingFlowSnapshotEncrypted String? @map("training_flow_snapshot_encrypted")
+  trainingFlowSnapshotHash String? @map("training_flow_snapshot_hash")
+  trainingFlowPathEncrypted String? @map("training_flow_path_encrypted")
+  trainingFlowPathHash String? @map("training_flow_path_hash")
+  trainingVariantAllocationEncrypted String? @map("training_variant_allocation_encrypted")
+  trainingVariantAllocationHash String? @map("training_variant_allocation_hash")
+  trainingTimingSnapshot Json? @map("training_timing_snapshot")
+  taskSatisfaction String? @map("task_satisfaction")
   frozenControlBindings AssessmentFrozenBinding[]
   // Set atomically with the first durable report outbox event; survives disabling new admission.
   asyncReportEpoch Int? @map("async_report_epoch")
@@ -1376,6 +1395,7 @@ model CompositeFormAnswer {
 }
 
 model CompositeFormSectionAttempt {
+  taskSatisfaction String? @map("task_satisfaction")
   id                    String                           @id @default(uuid())
   attemptId             String                           @map("attempt_id")
   sectionId             String                           @map("section_id")
@@ -2444,6 +2464,8 @@ model SjtAuthorDraft {
   status        String   @default("DRAFT")
   contentDigest String   @map("content_digest")
   template      Json
+  authorizationPolicy String? @map("authorization_policy")
+  adaptationSource Json? @map("adaptation_source")
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
   audits        SjtAuthorAudit[]
@@ -2461,6 +2483,7 @@ model SjtAuthorAudit {
   action        String
   contentDigest String   @map("content_digest")
   template      Json?
+  authorizationPolicy String? @map("authorization_policy")
   note          String?
   createdAt     DateTime @default(now()) @map("created_at")
   @@index([draftId, createdAt])
@@ -2476,12 +2499,57 @@ model SjtAuthorRelease {
   contentDigest     String   @map("content_digest")
   definitionHash    String   @map("definition_hash")
   package           Json
+  authorizationPolicy String? @map("authorization_policy")
+  grants            SjtReleaseGrant[]
   authorId          String   @map("author_id")
   reviewerId        String   @map("reviewer_id")
   status            String   @default("PUBLISHED")
   createdAt         DateTime @default(now()) @map("created_at")
   @@unique([instrumentKey, instrumentVersion])
   @@map("sjt_author_releases")
+}
+
+// Exact, expiring permissions; DISTRIBUTE never implies access to authoring content.
+model SjtReleaseGrant {
+  id                String @id @default(uuid())
+  releaseId         String @map("release_id")
+  release           SjtAuthorRelease @relation(fields: [releaseId], references: [id], onDelete: Restrict)
+  instrumentKey     String @map("instrument_key")
+  instrumentVersion String @map("instrument_version")
+  definitionHash    String @map("definition_hash")
+  contentDigest     String @map("content_digest")
+  granteeTeacherId   String @map("grantee_teacher_id")
+  courseId          String @map("course_id")
+  purpose           String
+  permission        String
+  validFrom         DateTime @map("valid_from") @db.Timestamptz(6)
+  expiresAt         DateTime @map("expires_at") @db.Timestamptz(6)
+  status            String @default("ACTIVE")
+  version           Int @default(1)
+  grantorId         String @map("grantor_id")
+  note              String
+  revokedAt         DateTime? @map("revoked_at") @db.Timestamptz(6)
+  revokedBy         String? @map("revoked_by")
+  revokeNote        String? @map("revoke_note")
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  audits            SjtReleaseGrantAudit[]
+  @@index([granteeTeacherId, courseId, purpose, permission, status])
+  @@index([releaseId, status])
+  @@map("sjt_release_grants")
+}
+
+model SjtReleaseGrantAudit {
+  id        String @id @default(uuid())
+  grantId   String @map("grant_id")
+  grant     SjtReleaseGrant @relation(fields: [grantId], references: [id], onDelete: Restrict)
+  actorId   String @map("actor_id")
+  action    String
+  version   Int
+  snapshot  Json
+  note      String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@unique([grantId, version])
+  @@map("sjt_release_grant_audits")
 }
 
 /// 旧系统（ptool）导入簿记：仅迁移工具读写，运行时代码不使用。
@@ -3678,4 +3746,100 @@ model SurveyCognitiveResult {
   @@unique([attemptId,slotKey],map:"survey_cognitive_result_attempt_slot_uniq")
   @@index([projectId,waveId,attemptId],map:"survey_cognitive_result_scope_idx")
   @@map("survey_cognitive_results")
+}
+
+// Analysis eligibility is independent of the accepted FINAL and task status.
+model TrainingAnalysisQuality {
+  id           String   @id @default(uuid())
+  courseId     String   @map("course_id")
+  attemptId    String   @map("attempt_id")
+  attemptEpoch Int      @map("attempt_epoch")
+  sourceHash   String   @map("source_hash")
+  verdict      String
+  reason       String
+  reviewerId   String   @map("reviewer_id")
+  revision     Int      @default(1)
+  reviewedAt   DateTime @default(now()) @map("reviewed_at") @db.Timestamptz(6)
+
+  @@unique([courseId, attemptId, attemptEpoch, sourceHash], map: "training_analysis_quality_scope_key")
+  @@index([courseId, attemptId])
+  @@map("training_analysis_quality")
+}
+
+// Append-only decisions, including the previous verdict and revision.
+model TrainingAnalysisQualityAudit {
+  id           String   @id @default(uuid())
+  reviewId     String   @map("review_id")
+  courseId     String   @map("course_id")
+  attemptId    String   @map("attempt_id")
+  attemptEpoch Int      @map("attempt_epoch")
+  sourceHash   String   @map("source_hash")
+  verdict      String
+  previousVerdict String @map("previous_verdict")
+  reason       String
+  reviewerId   String   @map("reviewer_id")
+  revision     Int
+  reviewedAt   DateTime @default(now()) @map("reviewed_at") @db.Timestamptz(6)
+
+  @@unique([reviewId, revision])
+  @@index([courseId, attemptId])
+  @@map("training_analysis_quality_audit")
+}
+
+// C20 durable material-only assignment receipts. Existing attempt ciphertext is
+// the envelope carrier; historical attempts and flow hashes are not rewritten.
+model TrainingMaterialExperiment {
+  id            String @id @default(uuid())
+  ownerId       String @map("owner_id")
+  courseId      String @map("course_id")
+  experimentKey String @map("experiment_key")
+  groupKeysHash String @map("group_keys_hash")
+
+  @@unique([ownerId, courseId, experimentKey], map: "training_material_experiment_scope_key")
+  @@map("training_material_experiments")
+}
+
+model TrainingMaterialSubjectBinding {
+  id             String @id @default(uuid())
+  experimentId   String @map("experiment_id")
+  participantKey String @map("participant_key")
+  groupKey       String @map("group_key")
+  initialClaimId String @map("initial_claim_id")
+
+  @@unique([experimentId, participantKey], map: "training_material_binding_subject_key")
+  @@map("training_material_subject_bindings")
+}
+
+model TrainingMaterialQuotaBucket {
+  id             String @id @default(uuid())
+  compositeId    String @map("composite_id")
+  publicationKey String @map("publication_key")
+  configDigest   String @map("config_digest")
+  groupKey       String @map("group_key")
+  maxAssigned    Int @map("max_assigned")
+  assignedCount  Int @default(0) @map("assigned_count")
+
+  @@unique([compositeId, publicationKey, configDigest, groupKey], map: "training_material_quota_scope_key")
+  @@map("training_material_quota_buckets")
+}
+
+model TrainingMaterialAllocationClaim {
+  id                   String @id @default(uuid())
+  experimentId         String @map("experiment_id")
+  compositeId          String @map("composite_id")
+  publicationKey       String @map("publication_key")
+  configDigest         String @map("config_digest")
+  participantKey       String @map("participant_key")
+  groupKey             String @map("group_key")
+  algorithm            String
+  inheritedFromClaimId String? @map("inherited_from_claim_id")
+  initialAttemptId     String @unique(map: "training_material_claim_attempt_key") @map("initial_attempt_id")
+  materialDigest       String @map("material_digest")
+  reservationOrdinal   Int? @map("reservation_ordinal")
+  createdAt            DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@unique([compositeId, publicationKey, configDigest, groupKey, reservationOrdinal], map: "training_material_claim_reservation_key")
+  @@index([experimentId, participantKey], map: "training_material_claim_subject_idx")
+  @@index([compositeId, publicationKey, configDigest, groupKey], map: "training_material_claim_quota_idx")
+  @@map("training_material_allocation_claims")
 }

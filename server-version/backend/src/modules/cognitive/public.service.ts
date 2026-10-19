@@ -57,6 +57,7 @@ const validateAssignment = (assignment: any) => {
   if (assignment.opensAt && assignment.opensAt.getTime() > Date.now()) throw BAD_REQUEST('Cognitive assignment has not opened')
   if (assignment.dueAt && assignment.dueAt.getTime() < Date.now()) throw BAD_REQUEST('Cognitive assignment is past due')
   const config = assignment.config
+  assertCognitiveProductEligible(config.testType)
   const entry = requireCognitiveRegistryEntry(config.testType, config.engineVersion, config.scoringVersion)
   if (assignment.resolvedConfigSnapshotEncrypted) {
     const thawed = decryptCognitivePayload<unknown>(assignment.resolvedConfigSnapshotEncrypted)

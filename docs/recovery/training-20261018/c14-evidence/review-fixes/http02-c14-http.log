@@ -1,0 +1,28 @@
+AssertionError [ERR_ASSERTION]: POST /situational/authoring/releases/adf539cf-9e8a-4d66-9a49-30522e6e27d4/grants: 400 {"code":"SJT_REQUEST_INVALID","message":"请求字段无效"}
+    at Object.request (file:///workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/scripts/recovery/c14-variants-smoke.mjs:40:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async file:///workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/scripts/recovery/c14-variants-smoke.mjs:176:569 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: POST /situational/authoring/releases/adf539cf-9e8a-4d66-9a49-30522e6e27d4/grants: 400 {"code":"SJT_REQUEST_INVALID","message":"请求字段无效"}
+    at Object.request (file:///workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/scripts/recovery/c14-variants-smoke.mjs:40:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async file:///workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/scripts/recovery/c14-variants-smoke.mjs:176:569 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+
+Node.js v24.21.0

@@ -1088,7 +1088,7 @@ export const restartQuestionnaireAssessment = async (
         status: 'IN_PROGRESS',
         deliveryMode: 'FINAL_ONLY',
         runtimeGeneration: 'UNIFIED_V1',
-        frozenActiveSlotSetEncrypted: await storeFrozenActiveSlotSet(frozenActiveSlotSet),
+        frozenActiveSlotSetEncrypted: await storeFrozenActiveSlotSet(frozenActiveSlotSet, tx),
         frozenActiveSlotSetHash: frozenActiveSlotSet.snapshotHash,
         attemptEpoch: nextAttemptEpoch,
         progress: 0,

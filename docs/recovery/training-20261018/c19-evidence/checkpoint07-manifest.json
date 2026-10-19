@@ -1,0 +1,115 @@
+{
+  "scope": "C19 state03 failed first admission preserved; six actual-prepare mocked DB regression cases and affected tsc emitted with frozen inputs. Original failed command retained. No HTTP flow qualification.",
+  "members": [
+    {
+      "name": "eduk12_c19_http_03-c19-main-continuation-result.json.gz",
+      "rawSha256": "85130c16b9f095a92f92c5191df686def06e2c4d96050d157ec91d3ea316d676",
+      "rawBytes": 6195,
+      "gzipSha256": "e4a0d990f4c81c1e612af418636bed48da838523bef1acc5f7c20806f4e9c529",
+      "gzipBytes": 1274
+    },
+    {
+      "name": "eduk12_c19_http_03-c19-runtime-result.json.gz",
+      "rawSha256": "f9f6b5c98cff4d0c2b73443504ff564ddf4da6945960380ce6020c28c69f3df1",
+      "rawBytes": 26575,
+      "gzipSha256": "f7724d0da6b660da6d625f51276873622afa61f183db6cdb2385852670f85392",
+      "gzipBytes": 4676
+    },
+    {
+      "name": "eduk12_c19_http_03-frozen-inputs.json.gz",
+      "rawSha256": "4c2ecff866f5e1aff6aa93b4811638a55eeb2b9156e5d7663fed6b671278f199",
+      "rawBytes": 351090,
+      "gzipSha256": "da9a9a1b644a393a7cdc557a981c3edfe51f75c1f019b4a38e43476ff6c90ff4",
+      "gzipBytes": 84671
+    },
+    {
+      "name": "eduk12_c19_http_03-c19-main-continuation.log.gz",
+      "rawSha256": "01ca84f26f90c0c45a7bc2f6db77a3e79557dc87cc7b6f83541fa8541a417088",
+      "rawBytes": 972,
+      "gzipSha256": "274c1d970526d3d2c33fdc3e4c6694c964e35ec23b220df4a1f186a61663b5cd",
+      "gzipBytes": 653
+    },
+    {
+      "name": "c19-build04-assignment-tests.log.gz",
+      "rawSha256": "c640a0add52877281d4ed5d8b44c47738d07a19b8d5d0d2dbb1de3035648b2cc",
+      "rawBytes": 1138,
+      "gzipSha256": "9055b04d64405e6e431cfe6c47ea82d047fbcb63b039cbaf7ec29799869eb8ee",
+      "gzipBytes": 413
+    },
+    {
+      "name": "c19-build04-dist.json.gz",
+      "rawSha256": "6bd13e3efe14e2b04c470a843ea7487daf4eeb523913faf4ae8e4719360fe830",
+      "rawBytes": 896070,
+      "gzipSha256": "719c4e2f1aa6f3ce5468d8d8e6f6969a9c183e1f5710be19b88a74c197a2c5af",
+      "gzipBytes": 243641
+    },
+    {
+      "name": "c19-build04-input.json.gz",
+      "rawSha256": "dfa35572433519173f279844fe7e82d4bc75e049f9f098c503d0febd70df19df",
+      "rawBytes": 421828,
+      "gzipSha256": "09b32ce93764983202b3252a6065280bc664a1430fc9c9a38089cfa58bdef9b8",
+      "gzipBytes": 127234
+    },
+    {
+      "name": "c19-build04-result.json.gz",
+      "rawSha256": "1c7030fe5bdb90841623546760050c7fd1f37a317aa9f97730ddacd125d06963",
+      "rawBytes": 852,
+      "gzipSha256": "27104cb980cd2a5c60b85e17ddd089418e9383feadd5c7c5ed3fde35b619e874",
+      "gzipBytes": 491
+    },
+    {
+      "name": "c19-build05-assignment-tests.log.gz",
+      "rawSha256": "fa4c83a49c2104481a73ebf185b6d40bd8fafb582155c3bb33d70edc77e140d1",
+      "rawBytes": 258,
+      "gzipSha256": "a76d1b97ad77e2546bb82d563473bc02fc6c8259c191bd3d7c594cc850e832fc",
+      "gzipBytes": 211
+    },
+    {
+      "name": "c19-build05-dist.json.gz",
+      "rawSha256": "85208e07d98e8907f660f3617ead86006f743c0884ef26249583f3f62dbeebb1",
+      "rawBytes": 896817,
+      "gzipSha256": "db8382f696e7b321ca8ecb0dbf6213d4fa6ddad27ab988b27e9e3981d78ff447",
+      "gzipBytes": 243836
+    },
+    {
+      "name": "c19-build05-input.json.gz",
+      "rawSha256": "dfa35572433519173f279844fe7e82d4bc75e049f9f098c503d0febd70df19df",
+      "rawBytes": 421828,
+      "gzipSha256": "09b32ce93764983202b3252a6065280bc664a1430fc9c9a38089cfa58bdef9b8",
+      "gzipBytes": 127234
+    },
+    {
+      "name": "c19-build05-result.json.gz",
+      "rawSha256": "0d24268f8011d681c694fac971f0cd65d46f89865e6b5ff392e262f656085e44",
+      "rawBytes": 1116,
+      "gzipSha256": "67679e59c505d2685aeffd4afa3d09217693149ccb5ed90fc5f42e957e00698e",
+      "gzipBytes": 510
+    },
+    {
+      "name": "c19-build05-tsc.log.gz",
+      "rawSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rawBytes": 0,
+      "gzipSha256": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+      "gzipBytes": 20
+    },
+    {
+      "name": "c19-build04-producer.py.gz",
+      "rawSha256": "a91ff7ea4ab7a71c77e6ac83633a8b37c4b3023c2ced7fb8983f97d7dd086461",
+      "rawBytes": 2217,
+      "gzipSha256": "f7620757371e194e3f733561705c74dfc05a82eb4e25b5cabb487300933a269d",
+      "gzipBytes": 1034
+    },
+    {
+      "name": "c19-build05-producer.py.gz",
+      "rawSha256": "7d68812c1a84fb8c6dfcbbee12653c55c208663955534290f839baee0771ef90",
+      "rawBytes": 2200,
+      "gzipSha256": "a1590d80e4547de8f6e0baa674609190385212460208f44449ef4c48cfd97fb7",
+      "gzipBytes": 1028
+    }
+  ],
+  "archive": {
+    "name": "checkpoint07-failed-state03.tar.gz",
+    "sha256": "cf8a44cf06e79cf145490a811dbef78fe83a2394be85f5850f69bb2df27ed3e8",
+    "bytes": 838278
+  }
+}

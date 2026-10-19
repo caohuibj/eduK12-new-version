@@ -27,6 +27,7 @@ const suites = Array.isArray(report.testResults) ? report.testResults : []
 const byName = new Map(suites.map((suite) => [path.normalize(suite.name || ''), suite]))
 const missing = []
 const skipped = []
+const empty = []
 
 for (const required of requiredFiles) {
   const normalized = path.normalize(required)
@@ -35,15 +36,18 @@ for (const required of requiredFiles) {
     missing.push(required)
     continue
   }
-  const pending = (suite.assertionResults || []).filter((assertion) => assertion.status === 'skipped' || assertion.status === 'pending')
+  const assertions = Array.isArray(suite.assertionResults) ? suite.assertionResults : []
+  if (assertions.length === 0) empty.push(required)
+  const pending = assertions.filter((assertion) => assertion.status === 'skipped' || assertion.status === 'pending')
   if (pending.length > 0) skipped.push({ file: required, count: pending.length })
 }
 
 const result = {
-  ok: missing.length === 0 && skipped.length === 0,
+  ok: missing.length === 0 && skipped.length === 0 && empty.length === 0,
   requiredSuites: requiredFiles.length,
   missing,
   skipped,
+  empty,
   report: {
     totalTests: report.numTotalTests ?? null,
     passedTests: report.numPassedTests ?? null,

@@ -1,0 +1,2 @@
+src/modules/composite/training-variant-scope.ts(65,61): error TS7006: Parameter 's' implicitly has an 'any' type.
+src/modules/composite/training-variant-scope.ts(68,35): error TS7006: Parameter 's' implicitly has an 'any' type.

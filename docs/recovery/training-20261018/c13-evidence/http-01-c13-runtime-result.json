@@ -1,0 +1,34 @@
+{
+  "passed": false,
+  "harnessInputs": {
+    "scripts/recovery/c13-sjt-http.py": "6cb36e755ad276211dd4ff7d613313e19e834f3e3c5b87f42e0ae4a5125bb391",
+    "scripts/recovery/c13-sjt-smoke.mjs": "fd7b4dee3f8d12260d42a33088302aca23fa6b9c49ce81cb2d6c18a0151aceaa",
+    "scripts/recovery/c13-sjt-restore.py": "9375301c8d2075ae2b5ee1237a05fee2392b0f94d76322e770efdadde308acec",
+    "e2e/questionnaire-products-fixture.ts": "f5a1f97986a60c937f6bc299d73f83cb10a448701f5dcc751c70077a11c7e1ac",
+    "backend/src/modules/situational/authoring/examples/online-hand-calculated.json": "a8e9eb897bd7705c785a86bc0de16d0bce7c7e28e90611542ac2e0c79ccf7e5a",
+    "backend/src/modules/situational/instruments/sjt-assertiveness-golden/1.0.0/instrument.json": "e0ef7c315cf42db521ba9d9fc19b4a11408473f487c2bd0f2e9ad1811214f1fb",
+    "scripts/recovery/local-stack.py": "6e2be9037719977a502dbd5eb9a7aeac04e06b2d22f5cf41eb7e767f6b3eb79b",
+    "scripts/recovery/runtime-fingerprint.cjs": "d03a5fdafa8718657ae974e11b52f71f5a77623aac32e243eb729cc338791ce2",
+    "backend/src/__tests__/integration/sjt-image-retention.postgres.integration.test.ts": "e7c9c9a6b1b71a817ec9a3bb52f803e52b97ff2860fa66da597e5852c6bea0cd"
+  },
+  "sourceHead": "c995344db90ad89a398fc2c0cb0807ffcbc35908",
+  "runtimeFingerprint": {
+    "schemaVersion": 1,
+    "nodeVersion": "v24.21.0",
+    "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+    "dist": {
+      "files": 5049,
+      "sha256": "fae14194c64b2ad270a09e3b523b18f36e31e8cacb5d1b72f86fcc77f189b222"
+    },
+    "files": {
+      "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+      "prisma/schema.prisma": "e3c8b6fc37d31fbb15907a9bcd792b82b00132b966ce3ba87ecb8bcbce17797d",
+      "node_modules/.prisma/client/schema.prisma": "c5cf9c1fe0e678ace372a369a3efe9b327080fb3078f5bfda0a4b744e14c04fa",
+      "node_modules/.prisma/client/index.js": "0a64489bf61221c6115d4832878799dfa310d619bcc0962be1504c719cdbe90f"
+    },
+    "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+  },
+  "phases": {},
+  "errorType": "CalledProcessError",
+  "cleanupVerified": true
+}

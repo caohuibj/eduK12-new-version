@@ -1,0 +1,358 @@
+/** C14/C15 genuine isolated PG + HTTP qualification, not a browser or load claim.
+ * Only synthetic identities/course/resource definitions are seeded. Every product,
+ * configuration, publication, allocation, response, report and export uses HTTP.
+ * No production RNG injection or client group selector. Run through the wrapper.
+ */
+import assert from 'node:assert/strict'
+import fs from 'node:fs'
+import path from 'node:path'
+import {createRequire} from 'node:module'
+import {randomUUID, createHash} from 'node:crypto'
+import {fileURLToPath} from 'node:url'
+import {deflateSync} from 'node:zlib'
+import {observeConcurrentAdmission} from './c14-admission-observer.mjs'
+import {createTrainingCourseFixture} from './c14-training-fixture.mjs'
+import {verifyWholeSharedBeforeAck,verifyWholeSharedAfterReport} from './c14-whole-shared-controls.mjs'
+const backend=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../../backend')
+const require=createRequire(path.join(backend,'package.json'))
+const {prisma}=require(path.join(backend,'dist/config/database.js'))
+const {PrismaClient}=require('@prisma/client')
+const {decryptUnifiedRuntimePayload}=require(path.join(backend,'dist/modules/assessment-runtime/security.js'))
+const {parseCanonicalUnitResultEnvelope}=require(path.join(backend,'dist/modules/assessment-runtime/unit-result.js'))
+const {encryptCognitivePayload,decryptCognitivePayload}=require(path.join(backend,'dist/modules/cognitive/cognitive.security.js'))
+const {gonogoSequence}=require(path.join(backend,'dist/modules/cognitive/randomization.js'))
+const {createTrialEnvelope}=require(path.join(backend,'dist/modules/cognitive/v2/trial-envelope.js'))
+const {loadFrozenActiveSlotSet}=require(path.join(backend,'dist/modules/assessment-runtime/slot-set.js'))
+const state=process.argv[2],status=JSON.parse(fs.readFileSync(path.join(state,'status.json'))),fixture=JSON.parse(fs.readFileSync(path.join(state,'fixture-private.json')))
+assert.equal(new URL(status.apiUrl).hostname,'127.0.0.1');assert.equal(process.env.NODE_ENV,'test')
+assert.match(process.env.DATABASE_URL,/eduk12_runtime:.*@127\.0\.0\.1:\d+\/eduk12_recovery/)
+const reportOnly=process.env.C14_REPORT_ONLY==='1',admissionOnly=process.env.C14_ADMISSION_ONLY==='1'
+const checks=[],requests=[],counts=[],races=[],allocations=[],completed=[],gateClients=[],optimizedWholeEvidence=[]
+let passed=false,teacherId,studentId,syntheticPasswordHash,reusedEvidence=null
+const prefix='/composite-assessments',pub='/public/composite-assessments',products='/questionnaire-products',auth='/situational/authoring'
+const denied=[400,403,404,409,422],pause=ms=>new Promise(r=>setTimeout(r,ms)),sha=value=>createHash('sha256').update(value).digest('hex')
+const check=name=>{checks.push(name);console.log('PASS',name)}
+const expiry=()=>new Date(Date.now()+3600000).toISOString()
+function normalizeProduct(value){if(!value||value.revision===undefined||!Array.isArray(value.items)||!Array.isArray(value.formSections))return value;return {...value,items:value.items.map(item=>({...item,scaleId:item.scale?.id??item.scaleId,cognitiveAssignmentId:item.cognitiveAssignment?.id??item.cognitiveAssignmentId,situationalInstrumentKey:item.situational?.key??item.situationalInstrumentKey,situationalInstrumentVersion:item.situational?.version??item.situationalInstrumentVersion,formSectionId:value.formSections.find(section=>(section.items??[]).some(child=>child.id===item.id))?.id??item.formSectionId}))}}
+function client(){const cookies=new Map();return {recovery:null,async request(route,method='GET',body,expected=200,raw=false){
+ const multipart=body instanceof FormData,wire=body===undefined?undefined:multipart?body:JSON.stringify(body)
+ const response=await fetch(status.apiUrl+'/api'+route,{method,signal:AbortSignal.timeout(30000),headers:{...(!multipart?{'content-type':'application/json'}:{}),...(cookies.size?{cookie:[...cookies].map(([k,v])=>`${k}=${v}`).join('; ')}:{}),...(cookies.has('ptool_csrf')?{'x-csrf-token':cookies.get('ptool_csrf')}:{}),...(this.recovery?{'x-recovery-token':this.recovery}:{})},...(wire===undefined?{}:{body:wire})})
+ for(const c of response.headers.getSetCookie()){const pair=c.split(';',1)[0],i=pair.indexOf('=');cookies.set(pair.slice(0,i),pair.slice(i+1))}
+ const bytes=Buffer.from(await response.arrayBuffer()),safeRoute=route.replace(/(\/public\/composite-assessments\/)(?!attempts\/)[^/]+/,'$1[token]')
+ requests.push({route:safeRoute,method,status:response.status,bytes:bytes.length})
+ assert.ok((Array.isArray(expected)?expected:[expected]).includes(response.status),`${method} ${safeRoute}: ${response.status} ${bytes.toString().slice(0,700)}`)
+ if(raw)return bytes
+ const data=JSON.parse(bytes.toString());if(response.status!==200)return data
+ assert.equal(data.code,0,`${safeRoute}: ${data.message}`);return normalizeProduct(data.data)
+ },async login(who,role){await this.request('/auth/csrf');await this.request(role==='ADMIN'?'/auth/login':'/auth/training-login','POST',role==='ADMIN'?who:{...who,expectedRole:role})}}}
+const teacher=client(),admin=client(),student=client(),otherTeacher=client(),outsider=client()
+async function actor(role='STUDENT',member=true,c=client()){const id=randomUUID(),username='c14-'+id;await prisma.user.create({data:{id,username,passwordHash:syntheticPasswordHash,role,accountDomain:'TRAINING',teacherApproved:true,mustChangePassword:false}});if(member&&role==='STUDENT')await prisma.courseStudent.create({data:{courseId:fixture.courses[0].id,studentId:id,status:'ACTIVE'}});await c.login({username,password:fixture.student.password},role);return c}
+async function census(){return {definitions:await prisma.compositeAssessment.count(),parents:await prisma.compositeAssessmentAttempt.count(),forms:await prisma.compositeFormSectionAttempt.count(),formAnswers:await prisma.compositeFormAnswer.count(),scales:await prisma.assessment.count(),cognitive:await prisma.cognitiveSession.count(),sjt:await prisma.situationalAttempt.count(),rawScale:await prisma.assessmentResultFact.count(),rawCognitive:await prisma.cognitiveRawSubmission.count(),rawSjt:await prisma.situationalRawSubmission.count(),snapshots:await prisma.assessmentUnitSnapshot.count(),jobs:await prisma.compositeReportJob.count(),tokens:await prisma.compositeAssessmentAccessToken.findMany({orderBy:{id:'asc'},select:{id:true,usedCount:true}})}}
+async function noWrites(name,fn){const before=await census();await fn();const after=await census();assert.deepEqual(after,before,name);counts.push({name,before,after});check(name)}
+const onlineFixture=JSON.parse(fs.readFileSync(path.join(backend,'src/modules/situational/authoring/examples/online-hand-calculated.json')))
+function imageFor(key){
+ const crc32=buffer=>{let n=0xffffffff;for(const byte of buffer){n^=byte;for(let i=0;i<8;i++)n=(n>>>1)^((n&1)?0xedb88320:0)}return (n^0xffffffff)>>>0}
+ const chunk=(type,data)=>{const name=Buffer.from(type),size=Buffer.alloc(4),crc=Buffer.alloc(4);size.writeUInt32BE(data.length);crc.writeUInt32BE(crc32(Buffer.concat([name,data])));return Buffer.concat([size,name,data,crc])}
+ const header=Buffer.alloc(13);header.writeUInt32BE(1,0);header.writeUInt32BE(1,4);header[8]=8;header[9]=6
+ return Buffer.concat([Buffer.from('89504e470d0a1a0a','hex'),chunk('IHDR',header),chunk('IDAT',deflateSync(Buffer.from(key==='a'?[0,255,0,0,255]:[0,0,0,255,255]))),chunk('IEND',Buffer.alloc(0))])
+}
+const exact=r=>({instrumentKey:r.instrumentKey,instrumentVersion:r.instrumentVersion,definitionHash:r.definitionHash,contentDigest:r.contentDigest})
+async function release(label){const imageBytes=imageFor(label),form=new FormData();form.append('image',new Blob([imageBytes],{type:'image/png'}),'c14-synthetic.png');const {asset}=await teacher.request(auth+'/media/images','POST',form)
+ const template={...structuredClone(onlineFixture),instrumentKey:'c14-'+label+'-'+randomUUID()};template.display.scenes[0].image={asset,altText:'C14 '+label+' exclusive stimulus',rightsStatus:'self_authored',rightsNote:'Synthetic one-pixel qualification only'}
+ let d=await teacher.request(auth+'/online/drafts','POST',{template,authorizationPolicy:'COURSE_GRANT_V1'});const body={revision:d.revision,contentDigest:d.contentDigest};await teacher.request(`${auth}/drafts/${d.id}/request-review`,'POST',body);await admin.request(`${auth}/drafts/${d.id}/review`,'POST',{...body,approve:true,note:'C14 independent synthetic review'});d=await teacher.request(`${auth}/drafts/${d.id}`);return {...d,asset,imageBytes}
+}
+async function grant(release){return admin.request(`${auth}/releases/${release.id}/grants`,'POST',{...exact(release),granteeTeacherId:teacherId,courseId:fixture.courses[0].id,purpose:'TRAINING_COURSE',permission:'DISTRIBUTE',validFrom:new Date(Date.now()-60000).toISOString(),expiresAt:expiry(),note:'C14 synthetic exact candidate grant'})}
+const revoke=g=>admin.request(`${auth}/grants/${g.id}/revoke`,'POST',{version:g.version,note:'C14 candidate race'})
+const sources=[]
+async function product(name='C14 four-tool weighted variants',maxAttempts=3){let d=await teacher.request(products,'POST',{requestId:randomUUID(),name,questionnaireType:'COURSE',courseIds:[fixture.courses[0].id],publicEnabled:true,expiresAt:expiry()});const groups=[]
+ for(const [index,source] of sources.entries()){const before=new Set(d.items.map(i=>i.id));for(const item of [{type:'FORM',formType:'text_input',formLabel:'Exclusive '+source.key+' reflection',required:true},{type:'SCALE',scaleId:source.scaleId,required:true},{type:'COGNITIVE',cognitiveAssignmentId:source.assignmentId,required:true},{type:'SITUATIONAL',situationalInstrumentKey:source.d.release.instrumentKey,situationalInstrumentVersion:source.d.release.instrumentVersion,required:true}])d=await teacher.request(`${products}/${d.id}/items`,'POST',{revision:d.revision,item});const items=d.items.filter(i=>!before.has(i.id)),form=items.find(i=>i.type==='FORM');assert.ok(form.formSectionId);groups.push({variantKey:source.key,label:'Group '+source.key,weight:index?2:1,units:[{type:'FORM_SECTION',id:form.formSectionId},...items.filter(i=>i.type!=='FORM').map(i=>({type:'ITEM',id:i.id}))]})}
+ const config={schemaVersion:1,groups};return {draft:d,config,maxAttempts}
+}
+async function configureAndPublish(input,validation=false){let d=input.draft;const body={revision:d.revision,config:input.config,maxAttempts:input.maxAttempts}
+ if(validation){await otherTeacher.request(`${products}/${d.id}/training-variants`,'POST',body,[403,404]);await teacher.request(`${products}/${d.id}/training-variants`,'POST',{...body,revision:d.revision+1},409);for(const change of [c=>{c.groups[0].weight=0},c=>{c.groups[0].weight=1.5},c=>{c.groups[1].variantKey=c.groups[0].variantKey},c=>{c.groups[0].units[0]={type:'ITEM',id:d.items.find(i=>i.type==='FORM').id}},c=>{c.groups[0].units.reverse()},c=>{c.groups[0].units.push(c.groups[0].units[0])}]){const config=structuredClone(input.config);change(config);await teacher.request(`${products}/${d.id}/training-variants`,'POST',{...body,config},400)}assert.equal((await teacher.request(`${products}/${d.id}`)).revision,d.revision)}
+ d=await teacher.request(`${products}/${d.id}/training-variants`,'POST',body);assert.deepEqual(d.trainingVariantDraft,input.config);assert.equal(d.trainingVariantFrozen,null);assert.equal((await teacher.request(`${products}/${d.id}/preflight`,'POST',{revision:d.revision})).ok,true);d=await teacher.request(`${products}/${d.id}/publish`,'POST',{revision:d.revision});assert.equal(d.trainingVariantDigest,d.trainingVariantFrozen.configDigest);assert.match(d.trainingVariantDigest,/^[a-f0-9]{64}$/);if(validation)await teacher.request(`${products}/${d.id}/training-variants`,'POST',{revision:d.revision,config:input.config,maxAttempts:input.maxAttempts},409);return d
+}
+async function copyProduct(source,name){
+ let d=await teacher.request(`${products}/${source.id}/copy`,'POST',{requestId:randomUUID()})
+ assert.notEqual(d.id,source.id);assert.equal(d.trainingVariantFrozen,null);assert.equal(d.trainingVariantDigest,null)
+ const previousIds=new Set(source.items.map(i=>i.id));assert.ok(d.items.every(i=>!previousIds.has(i.id)));assert.ok(d.trainingVariantDraft.groups.every(g=>g.units.every(u=>u.type!=='ITEM'||!previousIds.has(u.id))))
+ // Copy deliberately clears delivery metadata. Enable each new publication via HTTP.
+ assert.equal(d.publicEnabled,false)
+ d=await teacher.request(`${products}/${d.id}`,'PUT',{revision:d.revision,name:'C14 '+name,courseIds:[fixture.courses[0].id],publicEnabled:true,expiresAt:expiry()})
+ return teacher.request(`${products}/${d.id}/publish`,'POST',{revision:d.revision})
+}
+function groupFor(product,allocation){const g=product.trainingVariantFrozen.groups.find(g=>g.variantKey===allocation.variantKey);assert.ok(g);return g}
+async function allocation(attempt,product){const row=await prisma.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:attempt.id}});assert.ok(row.trainingVariantAllocationEncrypted);const value=decryptUnifiedRuntimePayload(row.trainingVariantAllocationEncrypted),g=groupFor(product,value);assert.equal(value.attemptId,row.id);assert.equal(value.participantKey,row.participantKey);assert.equal(value.attemptEpoch,row.attemptEpoch);assert.equal(value.configDigest,product.trainingVariantDigest);assert.equal(value.allocationHash,row.trainingVariantAllocationHash);assert.deepEqual(value.selectedItemIds,g.selectedItemIds);assert.deepEqual(value.selectedSectionIds,g.selectedSectionIds);assert.ok(!row.trainingVariantAllocationEncrypted.includes('"variantKey"'));const slots=await loadFrozenActiveSlotSet(row.frozenActiveSlotSetEncrypted);assert.equal(slots.slots.length,g.units.length);assert.equal(slots.snapshotHash,row.frozenActiveSlotSetHash)
+ const [forms,scales,cognitive,sjt]=await Promise.all([prisma.compositeFormSectionAttempt.findMany({where:{attemptId:row.id}}),prisma.assessment.findMany({where:{compositeAttemptId:row.id}}),prisma.cognitiveSession.findMany({where:{compositeAttemptId:row.id}}),prisma.situationalAttempt.findMany({where:{compositeAttemptId:row.id}})]);assert.equal(forms.length,value.selectedSectionIds.length);for(const [type,children] of [['SCALE',scales],['COGNITIVE',cognitive],['SITUATIONAL',sjt]]){assert.equal(children.length,product.items.filter(item=>item.type===type&&value.selectedItemIds.includes(item.id)).length);assert.ok(children.every(child=>value.selectedItemIds.includes(child.compositeItemId)))}assert.deepEqual(forms.map(x=>x.sectionId),value.selectedSectionIds)
+ const evidence={attemptId:row.id,allocationHash:value.allocationHash,ciphertextSha256:sha(row.trainingVariantAllocationEncrypted),configDigest:value.configDigest,variantKey:value.variantKey,selectedItemIds:value.selectedItemIds,selectedSectionIds:value.selectedSectionIds};const known=allocations.find(x=>x.attemptId===row.id);if(known)assert.deepEqual(evidence,known);else allocations.push(evidence);return {row,value,evidence,forms,scales,cognitive,sjt}
+}
+async function assertStateOnlySelected(a,product,fact){const text=JSON.stringify(a);for(const item of product.items.filter(i=>!fact.value.selectedItemIds.includes(i.id)))assert.ok(!text.includes(item.id),'state leaked outside-group item identity');assert.ok(!text.includes('trainingVariantFrozen'));assert.ok(!text.includes('participantKey'));assert.ok(!text.includes('allocationEncrypted'));if(a.currentItem?.type==='FORM_SECTION')assert.ok(fact.value.selectedSectionIds.includes(a.currentItem.id));else if(a.currentItem)assert.ok(fact.value.selectedItemIds.includes(a.currentItem.id))}
+function cognitiveFinal(session,recovery){return {submissionId:randomUUID(),attemptEpoch:session.attemptEpoch,definitionHash:session.definitionHash,contextSnapshotHash:session.contextSnapshotHash,...(recovery?{recoveryToken:recovery}:{}),trials:gonogoSequence(session.randomSeed,session.config.totalTrials,session.config.nogoRatio).map((trialType,trialIndex)=>createTrialEnvelope({trialIndex,phase:'test',startedAtPerfMs:trialIndex*1500,endedAtPerfMs:trialIndex*1500+800,payload:{trialType,responded:trialType==='go',rtMs:trialType==='go'?300:null,interrupted:false}}))}}
+async function denyExternal(c,a,product,p=prefix){const fact=await allocation(a,product),hiddenItems=product.items.filter(i=>!fact.value.selectedItemIds.includes(i.id)),hiddenSection=product.formSections.find(s=>!fact.value.selectedSectionIds.includes(s.id));assert.equal(hiddenItems.length,4);assert.ok(hiddenSection);const hidden=type=>hiddenItems.find(i=>i.type===type),sjtId=fact.sjt[0].id,asset=sources.find(s=>s.d.release.instrumentKey===hidden('SITUATIONAL').situationalInstrumentKey).d.asset.assetId
+ await noWrites(`${p}: outside-group start/state/FINAL/image/video denied without children, allocations, raw, snapshots, jobs or token use`,async()=>{
+  await c.request(`${p}/attempts/${a.id}/form-sections/${hiddenSection.id}/submit`,'POST',{submissionId:randomUUID(),attemptEpoch:a.attemptEpoch,definitionHash:'0'.repeat(64),contextSnapshotHash:a.contextSnapshotHash,answers:[{formItemId:hidden('FORM').id,value:'must not persist'}]},denied)
+  await c.request(`${p}/attempts/${a.id}/items/${hidden('SCALE').id}/scale/submit`,'POST',{submissionId:randomUUID(),attemptEpoch:a.attemptEpoch,definitionHash:'0'.repeat(64),contextSnapshotHash:a.contextSnapshotHash,answers:[{itemCode:'mixed-scale-item-1',responseValue:'yes'}]},denied)
+  const sjtRoute=`${p}/attempts/${a.id}/items/${hidden('SITUATIONAL').id}/situational/${sjtId}`;await c.request(sjtRoute,'GET',undefined,denied);await c.request(sjtRoute+'/submit','POST',{submissionId:randomUUID(),attemptEpoch:a.attemptEpoch,definitionHash:fact.sjt[0].definitionHash,compiledRuntimeHash:fact.sjt[0].compiledRuntimeHash,scoringVersion:fact.sjt[0].scoringVersion,responseProtocol:'sjt-online-response-v1',responses:onlineFixture.goldenCases[0].responses},denied)
+  for(const route of [`${p}/attempts/${a.id}/form-sections/${hiddenSection.id}/assets/${asset}/content`,`${p}/attempts/${a.id}/items/${hidden('SCALE').id}/scale/assets/${asset}/content`,sjtRoute+`/assets/${asset}/content`,sjtRoute+'/scenes/sjt_q_first/video-sources'])await c.request(route,'GET',undefined,denied)
+  await c.request(`${p}/attempts/${a.id}/form-sections/${hiddenSection.id}/items/${hidden('FORM').id}/options/0/video-capability`,'POST',{},denied)
+  await c.request(`${p}/attempts/${a.id}/items/${hidden('SCALE').id}/scale/items/mixed-scale-item-1/video-capability`,'POST',{},denied)
+  if(p===prefix)await c.request('/cognitive/sessions','POST',{assignmentId:hidden('COGNITIVE').cognitiveAssignmentId},denied)
+ });await assertStateOnlySelected(await c.request(`${p}/attempts/${a.id}`),product,fact)
+}
+async function report(c,a,product,p,{retryFailed=false}={}){let retried=false;for(let i=0;i<240;i++){const status=await c.request(`${p}/attempts/${a.id}/report-status`);if(status.reportStatus?.state==='FAILED'){if(!retryFailed||retried)throw Error('Original report worker failed: '+status.reportStatus.errorCode);await c.request(`${p}/attempts/${a.id}/report-retry`,'POST',{});retried=true}if(status.reportStatus?.state==='READY'){const participant=await c.request(`${p}/attempts/${a.id}/report`),owner=await teacher.request(`${prefix}/${product.id}/attempts/${a.id}/report`),fact=await allocation(a,product);assert.deepEqual(await c.request(`${p}/attempts/${a.id}/report`),participant);for(const r of [participant,owner]){assert.equal(r.trainingVariant.allocationHash,fact.value.allocationHash);assert.equal(r.trainingVariant.variantKey,fact.value.variantKey);assert.equal(r.trainingVariant.configDigest,product.trainingVariantDigest);const expectedTypes=product.items.filter(item=>item.type!=='FORM'&&fact.value.selectedItemIds.includes(item.id)).map(item=>item.type).sort();assert.equal(r.unitReports.length,expectedTypes.length);assert.deepEqual(r.unitReports.map(u=>u.type).sort(),expectedTypes);const serialized=JSON.stringify(r);for(const hidden of product.items.filter(x=>!fact.value.selectedItemIds.includes(x.id)))assert.ok(!serialized.includes(hidden.id),'report leaked outside-group item');assert.ok(!serialized.includes('participantKey'));assert.ok(!serialized.includes('expertKey'))}return participant}await pause(250)}throw Error('C14 original report queue timeout')}
+async function finish(c,initial,product,p=prefix){let a=initial;const fact=await allocation(a,product),seen=[]
+ for(let guard=0;guard<4;guard++){await assertStateOnlySelected(a,product,fact);const unit=a.currentItem;assert.ok(unit,'active unit required');seen.push(unit.type);let route,body
+  if(unit.type==='FORM_SECTION'){route=`${p}/attempts/${a.id}/form-sections/${unit.id}/submit`;body={submissionId:randomUUID(),attemptEpoch:a.attemptEpoch,definitionHash:unit.definitionHash,contextSnapshotHash:a.contextSnapshotHash,answers:unit.answers.map(i=>({formItemId:i.formItemId,value:'C14 '+fact.value.variantKey+' persisted reflection'}))}}
+  else if(unit.type==='SCALE'){route=`${p}/attempts/${a.id}/items/${unit.id}/scale/submit`;body={submissionId:randomUUID(),attemptEpoch:a.attemptEpoch,definitionHash:unit.definitionHash,contextSnapshotHash:a.contextSnapshotHash,answers:[{itemCode:'mixed-scale-item-1',responseValue:'yes',responseTimeMs:17}]}}
+  else if(unit.type==='COGNITIVE'){const session=unit.cognitiveSession;assert.equal(session.config.totalTrials,120);route=(p===pub?'/public/cognitive':'/cognitive')+`/sessions/${session.sessionId}/submit`;body=cognitiveFinal(session,p===pub?c.recovery:undefined)}
+  else if(unit.type==='SITUATIONAL'){route=`${p}/attempts/${a.id}/items/${unit.id}/situational/${unit.situationalAttemptId}`;const runtime=await c.request(route);assert.equal(runtime.instrument.online.responseProtocol,'sjt-online-response-v1');assert.ok(!JSON.stringify(runtime.instrument.online).includes('contributions'));body={submissionId:randomUUID(),attemptEpoch:runtime.attempt.attemptEpoch,definitionHash:runtime.attempt.definitionHash,compiledRuntimeHash:runtime.attempt.compiledRuntimeHash,scoringVersion:runtime.attempt.scoringVersion,responseProtocol:'sjt-online-response-v1',responses:onlineFixture.goldenCases[0].responses};const source=sources.find(s=>s.d.release.instrumentKey===fact.sjt[0].instrumentKey),asset=source.d.asset;assert.deepEqual(await c.request(route+`/assets/${asset.assetId}/content`,'GET',undefined,200,true),source.d.imageBytes);route+='/submit'}
+  else throw Error('Unexpected unit '+unit.type)
+  await c.request(route,'POST',body);await noWrites(`${p} ${unit.type}: first durable FINAL ACK prevents restart before replay/state/report`,()=>c.request(`${p}/attempts/${a.id}/restart`,'POST',{},409));await allocation(a,product);assert.equal((await c.request(route,'POST',body)).replayed,true);a=await c.request(`${p}/attempts/${a.id}`);await allocation(a,product)
+ }
+ assert.deepEqual(seen,['FORM_SECTION','SCALE','COGNITIVE','SITUATIONAL']);return completeAccepted(c,a,product,p)
+}
+async function completeAccepted(c,initial,product,p=prefix,options={}){let a=initial;const fact=await allocation(a,product);const snapshots=await prisma.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:a.id,attemptEpoch:a.attemptEpoch}});assert.equal(snapshots.length,4);assert.deepEqual(snapshots.map(x=>x.unitType).sort(),['COGNITIVE','FORM_SECTION','SCALE','SITUATIONAL']);assert.ok(snapshots.every(x=>x.terminalState==='COMPLETED'));assert.equal(await prisma.cognitiveRawSubmission.count({where:{sessionId:fact.cognitive[0].id}}),1);const cognitiveRaw=await prisma.cognitiveRawSubmission.findFirstOrThrow({where:{sessionId:fact.cognitive[0].id}});assert.equal(cognitiveRaw.trialCount,120);assert.equal(decryptUnifiedRuntimePayload(cognitiveRaw.payloadEncrypted).trials.length,120);assert.equal(await prisma.situationalRawSubmission.count({where:{attemptId:fact.sjt[0].id}}),1);const sjt=parseCanonicalUnitResultEnvelope(decryptUnifiedRuntimePayload(snapshots.find(s=>s.unitType==='SITUATIONAL').canonicalResultEncrypted));assert.equal(sjt.core.metrics.find(m=>m.key==='cooperation').value,9);await report(c,a,product,p,options);a=await c.request(`${p}/attempts/${a.id}`);assert.equal(a.status,'COMPLETED');assert.equal(a.currentItem,null);const row=await prisma.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:a.id}});assert.equal(row.completedItems,4);assert.equal(row.progress,100);completed.push({...fact.evidence,productId:product.id,sjtResultHash:sjt.resultHash,cognitiveTrialCount:120});check(`${p} ${fact.value.variantKey}: ${options.continuation?'HTTP03 accepted facts retained; report-only continuation':'actual Form→Scale→120 Go/No-Go trials→SJT FINAL/replay'}, four canonical facts and original reports`);return a
+}
+function parseCsv(bytes){const text=bytes.toString('utf8').replace(/^\uFEFF/,''),rows=[];let row=[],cell='',quoted=false;for(let i=0;i<text.length;i++){const c=text[i];if(quoted){if(c==='"'&&text[i+1]==='"'){cell+='"';i++}else if(c==='"')quoted=false;else cell+=c}else if(c==='"')quoted=true;else if(c===','){row.push(cell);cell=''}else if(c==='\n'){row.push(cell.replace(/\r$/,''));rows.push(row);row=[];cell=''}else cell+=c}if(row.length||cell)rows.push([...row,cell]);assert.equal(quoted,false);return rows}
+function unzip(bytes){const files={};let offset=0;while(offset+30<bytes.length&&bytes.readUInt32LE(offset)===0x04034b50){assert.equal(bytes.readUInt16LE(offset+8),0);const length=bytes.readUInt32LE(offset+18),names=bytes.readUInt16LE(offset+26),extra=bytes.readUInt16LE(offset+28),start=offset+30+names+extra;files[bytes.subarray(offset+30,offset+30+names).toString()]=bytes.subarray(start,start+length);offset=start+length}return files}
+async function exportCheck(product,format){const expected=completed.filter(x=>x.productId===product.id),queued=await teacher.request(`${prefix}/${product.id}/export`,'POST',{detail:'full',format});assert.ok(queued.batchId);assert.equal(queued.artifacts.length,1);const url=queued.artifacts[0].downloadUrl.replace(/^\/api/,'');for(let i=0;i<120;i++){const s=await teacher.request(url+'/status');if(s.status==='READY')break;assert.notEqual(s.status,'FAILED');if(i===119)throw Error('C14 original export queue timeout');await pause(250)}const bytes=await teacher.request(url,'GET',undefined,200,true),files=format==='zip'?unzip(bytes):null,[columns,...rows]=parseCsv(files?.['data.csv']??bytes);assert.equal(rows.length,expected.length);assert.ok(columns.includes('V_allocation_hash'));const sorted=[...product.items].sort((a,b)=>a.position-b.position)
+ for(const evidence of expected){const cells=rows.find(row=>row[columns.indexOf('A_attempt_id')]===evidence.attemptId);assert.ok(cells);const row=Object.fromEntries(columns.map((key,i)=>[key,cells[i]]));assert.equal(row.V_variant_key,evidence.variantKey);assert.equal(row.V_allocation_hash,evidence.allocationHash);assert.equal(row.V_config_digest,product.trainingVariantDigest);assert.equal(row.V_algorithm,'WEIGHTED_RANDOM_INT_V1')
+  for(const [index,item] of sorted.entries()){const n=String(index+1).padStart(3,'0'),selected=evidence.selectedItemIds.includes(item.id);assert.equal(row[`V${n}_selection_state`],selected?'SELECTED':'NOT_SHOWN');if(!selected){const tag=item.type==='SCALE'?'S':item.type==='COGNITIVE'?'C':item.type==='SITUATIONAL'?'J':null;if(tag)for(const key of columns.filter(k=>k.startsWith(tag+n+'_')&&!/terminal_state|state$/.test(k)))assert.equal(row[key],'',`outside-group ${key} must be blank`);continue}if(item.type==='SCALE')assert.equal(Number(row[`S${n}_SCORE_total`]),1);if(item.type==='SITUATIONAL')assert.equal(row[`J${n}_result_hash`],evidence.sjtResultHash);if(item.type==='COGNITIVE'){assert.equal(row[`C${n}_test_type`],'gonogo');assert.ok(columns.some(k=>k.startsWith(`C${n}_T120_`)),'original full export must contain actual last cognitive trial')}}
+ }
+ if(files){const dict=JSON.parse(files['data_dictionary.json']);assert.deepEqual(dict.columns.map(c=>c.name),columns);assert.equal(dict.schemaVersion,sha(JSON.stringify(dict.columns)));assert.equal(dict.source.trainingVariantExport.pooling,'STRATIFIED_ONLY');assert.equal(dict.source.trainingVariantExport.version,'training-weighted-variant-export-v1');assert.equal(dict.source.trainingVariantExport.strata.reduce((sum,v)=>sum+v.recordCount,0),expected.length);for(const stratum of dict.source.trainingVariantExport.strata){assert.equal(stratum.configDigest,product.trainingVariantDigest);assert.equal(stratum.recordCount,expected.filter(e=>e.variantKey===stratum.variantKey).length)}}
+ await otherTeacher.request(url,'GET',undefined,404);check(`Original ${format.toUpperCase()} queue: exact allocations, stable union columns, explicit NOT_SHOWN, blank hidden values, actual cognitive trials and canonical SJT hash`)
+}
+// Real, separately connected PostgreSQL row gates. No runtime/answer writes.
+function tracked(promise){const t={settled:false,error:null,value:null};t.done=promise.then(v=>{t.settled=true;t.value=v},e=>{t.settled=true;t.error=e});t.result=async()=>{await t.done;if(t.error)throw t.error;return t.value};return t}
+async function observedLock(table,blocker,request,exclude=[]){const until=Date.now()+8000;while(Date.now()<until){if(request?.settled){if(request.error)throw request.error;throw Error(table+': HTTP settled before required real contention')}const rows=await prisma.$queryRawUnsafe(`SELECT pid, wait_event AS "waitEvent", pg_blocking_pids(pid) AS blockers FROM pg_stat_activity WHERE datname=current_database() AND usename=current_user AND wait_event_type='Lock' AND query LIKE $1 AND pid<>pg_backend_pid()`,'%'+table+'%'),blockers=Array.isArray(blocker)?blocker:[blocker],row=rows.find(r=>!exclude.includes(r.pid)&&r.blockers.some(b=>blockers.includes(b)));if(row){races.push({table,pid:row.pid,waitEvent:row.waitEvent,blockers:row.blockers});return row.pid}await pause(25)}throw Error('Real lock contention not observed: '+table)}
+async function withGate(table,id,fn){assert.ok(['composite_assessments','composite_assessment_attempts','composite_assessment_access_tokens','stored_assets','sjt_release_grants'].includes(table));const db=new PrismaClient({datasources:{db:{url:process.env.DATABASE_URL.replace(/connection_limit=\d+/,'connection_limit=1')}}});gateClients.push(db);let release,ready,failed;const released=new Promise(r=>release=r),locked=new Promise((r,j)=>{ready=r;failed=j});const running=db.$transaction(async tx=>{const [{pid}]=await tx.$queryRawUnsafe('SELECT pg_backend_pid()::int AS pid');await tx.$queryRawUnsafe(`SELECT id FROM ${table} WHERE id=$1 FOR UPDATE`,id);ready(pid);await released},{maxWait:10000,timeout:30000});running.catch(failed);try{return await fn(await locked,release)}finally{release();await running;await db.$disconnect()}}
+async function token(product,maxUses=1){const expiresAt=new Date(Math.min(Date.now()+1800000,Date.parse(product.expiresAt))).toISOString();assert.ok(Date.parse(expiresAt)>Date.now());return teacher.request(`${prefix}/${product.id}/public-tokens`,'POST',{expiresAt,maxUses})}
+const archive=p=>teacher.request(`${products}/${p.id}/archive`,'POST',{revision:p.revision})
+const disableToken=(p,t)=>teacher.request(`${prefix}/${p.id}/public-tokens/${t.id}`,'DELETE')
+
+async function candidateFailureChecks(product){
+ const c=await actor(),anonymous=client();await anonymous.request('/auth/csrf');const t=await token(product,8)
+ for(const group of product.trainingVariantFrozen.groups){
+  const scaleItem=product.items.find(item=>item.type==='SCALE'&&group.selectedItemIds.includes(item.id)),scale=await prisma.scale.findUniqueOrThrow({where:{id:scaleItem.scaleId}})
+  // Controlled corruption of fresh synthetic resource metadata, never responses.
+  // An unregistered STANDARD identity must fail the genuine deployment gate.
+  await prisma.scale.update({where:{id:scale.id},data:{instrumentClass:'STANDARD'}})
+  try {await noWrites(`Candidate ${group.variantKey} Scale deployment DENY prevents every group draw for member/public`,async()=>{for(let i=0;i<4;i++){await c.request(`${prefix}/${product.id}/attempts`,'POST',{},denied);await anonymous.request(`${pub}/${t.token}/start`,'POST',{},denied)}})}
+  finally {await prisma.scale.update({where:{id:scale.id},data:{instrumentClass:scale.instrumentClass}})}
+  const item=product.items.find(item=>item.type==='COGNITIVE'&&group.selectedItemIds.includes(item.id)),assignment=await prisma.cognitiveAssignment.findUniqueOrThrow({where:{id:item.cognitiveAssignmentId}})
+  assert.ok(assignment.resolvedConfigSnapshotEncrypted);const config=decryptCognitivePayload(assignment.resolvedConfigSnapshotEncrypted),invalid=encryptCognitivePayload({...config,totalTrials:-1})
+  await prisma.cognitiveAssignment.update({where:{id:assignment.id},data:{resolvedConfigSnapshotEncrypted:invalid}})
+  try {await noWrites(`Candidate ${group.variantKey} decryptable invalid resolved Cognitive config prevents every group draw for member/public`,async()=>{for(let i=0;i<4;i++){await c.request(`${prefix}/${product.id}/attempts`,'POST',{},denied);await anonymous.request(`${pub}/${t.token}/start`,'POST',{},denied)}})}
+  finally {await prisma.cognitiveAssignment.update({where:{id:assignment.id},data:{resolvedConfigSnapshotEncrypted:assignment.resolvedConfigSnapshotEncrypted}})}
+ }
+ assert.equal((await prisma.compositeAssessmentAccessToken.findUniqueOrThrow({where:{id:t.id}})).usedCount,0)
+ // Restored resources remain usable through the ordinary production start.
+ const started=await c.request(`${prefix}/${product.id}/attempts`,'POST',{});await allocation(started.attempt,product);await finish(c,started.attempt,product)
+ check('Both candidate groups independently fail closed before allocation when one resource breaks; restored union admits and completes normally')
+}
+async function withPausedReportWorker(fn){
+ const pid=status.pids['report-worker'];assert.ok(Number.isInteger(pid)&&pid>1)
+ assert.equal(fs.realpathSync(`/proc/${pid}/cwd`),backend)
+ assert.ok(fs.readFileSync(`/proc/${pid}/cmdline`,'utf8').split('\0').some(arg=>arg==='dist/workers/main.js'))
+ let paused=false
+ try {process.kill(pid,'SIGSTOP');paused=true;for(let i=0;i<100;i++){if(/^State:\s+T/m.test(fs.readFileSync(`/proc/${pid}/status`,'utf8')))break;if(i===99)throw Error('Private report worker did not enter stopped state');await pause(10)}return await fn()}
+ finally {if(paused){process.kill(pid,'SIGCONT');for(let i=0;i<100;i++){if(!/^State:\s+T/m.test(fs.readFileSync(`/proc/${pid}/status`,'utf8')))break;if(i===99)throw Error('Private report worker did not resume');await pause(10)}}}
+}
+function wholeBody(definition){return {submissionId:randomUUID(),attemptEpoch:definition.attemptEpoch,slotSetHash:definition.slotSetHash,contextSnapshotHash:definition.contextSnapshotHash,units:definition.units.map(unit=>({itemId:unit.itemId,definitionHash:unit.definitionHash,answers:unit.scale.definition.items.map(item=>({itemCode:item.itemCode,responseValue:item.options[0].value}))}))}}
+async function asyncWholeRestartCheck(){
+ let d=await teacher.request(products,'POST',{requestId:randomUUID(),name:'C14 async ACK before materialization',questionnaireType:'COURSE',courseIds:[fixture.courses[0].id],publicEnabled:true,expiresAt:expiry()})
+ for(const source of sources)d=await teacher.request(`${products}/${d.id}/items`,'POST',{revision:d.revision,item:{type:'SCALE',scaleId:source.scaleId,required:true}})
+ const config={schemaVersion:1,groups:d.items.map((item,index)=>({variantKey:index?'b':'a',label:index?'B':'A',weight:1,units:[{type:'ITEM',id:item.id}]}))}
+ d=await configureAndPublish({draft:d,config,maxAttempts:2});const c=await actor(),{attempt:a}=await c.request(`${prefix}/${d.id}/attempts`,'POST',{}),fact=await allocation(a,d),definition=await c.request(`${prefix}/attempts/${a.id}/whole/definition`)
+ const body=wholeBody(definition)
+ let optimized
+ await withPausedReportWorker(async()=>{
+  if(process.env.ASSESSMENT_SHARED_CONTROL_ENABLED==='true')optimized=await verifyWholeSharedBeforeAck({prisma,client:c,attempt:a,product:d,fact,definition,body,noWrites,check})
+  await c.request(`${prefix}/attempts/${a.id}/whole/submit`,'POST',body)
+  const job=await prisma.compositeReportJob.findUniqueOrThrow({where:{attemptId_attemptEpoch:{attemptId:a.id,attemptEpoch:a.attemptEpoch}}});assert.equal(job.wholeSubmissionId,body.submissionId);assert.ok(job.wholeAcceptedAt);assert.equal(await prisma.assessmentUnitSnapshot.count({where:{compositeAttemptId:a.id}}),0);assert.equal((await prisma.assessment.findUniqueOrThrow({where:{id:fact.scales[0].id}})).status,'IN_PROGRESS')
+  await noWrites('Durable async whole FINAL ACK with zero unit snapshots still forbids weighted restart',()=>c.request(`${prefix}/attempts/${a.id}/restart`,'POST',{},409));await allocation(a,d)
+ })
+ await report(c,a,d,prefix);assert.equal(await prisma.assessmentUnitSnapshot.count({where:{compositeAttemptId:a.id}}),1);check('Original worker resumed and materialized the previously ACKed selected Scale; frozen allocation unchanged')
+ if(optimized)optimizedWholeEvidence.push({...optimized,completed:await verifyWholeSharedAfterReport({prisma,attempt:a,product:d,fact,body,check,state,status})})
+ await wholeRestartRaces(d)
+}
+async function wholeRestartRaces(product){
+ for(const order of ['FINAL_FIRST','RESTART_FIRST']){
+  const c=await actor(),{attempt:old}=await c.request(`${prefix}/${product.id}/attempts`,'POST',{}),oldFact=await allocation(old,product)
+  const body=wholeBody(await c.request(`${prefix}/attempts/${old.id}/whole/definition`)),before=await census()
+  let successor
+  await withPausedReportWorker(async()=>{
+   await withGate('composite_assessment_attempts',old.id,async(pid,unlock)=>{
+    const submit=()=>c.request(`${prefix}/attempts/${old.id}/whole/submit`,'POST',body,order==='FINAL_FIRST'?200:409)
+    const restart=()=>c.request(`${prefix}/attempts/${old.id}/restart`,'POST',{},order==='RESTART_FIRST'?200:409)
+    const first=tracked(order==='FINAL_FIRST'?submit():restart())
+    const firstPid=await observedLock('composite_assessment_attempts',pid,first)
+    const second=tracked(order==='FINAL_FIRST'?restart():submit())
+    await observedLock('composite_assessment_attempts',[pid,firstPid],second,[firstPid])
+    unlock();const firstResult=await first.result();await second.result()
+    if(order==='RESTART_FIRST')successor=firstResult.attempt
+   })
+   await allocation(old,product)
+   const oldRow=await prisma.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:old.id}})
+   const job=await prisma.compositeReportJob.findUniqueOrThrow({where:{attemptId_attemptEpoch:{attemptId:old.id,attemptEpoch:old.attemptEpoch}}})
+   assert.equal(await prisma.assessmentUnitSnapshot.count({where:{compositeAttemptId:old.id}}),0)
+   const oldScale=await prisma.assessment.findUniqueOrThrow({where:{id:oldFact.scales[0].id}})
+   assert.equal(oldScale.status,'IN_PROGRESS');assert.equal(oldScale.submissionId,null)
+   if(order==='FINAL_FIRST'){
+    assert.equal(oldRow.status,'IN_PROGRESS');assert.equal(job.wholeSubmissionId,body.submissionId);assert.ok(job.wholeAcceptedAt)
+    assert.deepEqual(await census(),before,'Losing restart must create no parent/allocation/child/job')
+    assert.equal((await c.request(`${prefix}/attempts/${old.id}/whole/submit`,'POST',body)).replayed,true)
+   }else{
+    assert.equal(oldRow.status,'ABANDONED');assert.equal(job.wholeSubmissionId,null);assert.equal(job.wholePayloadHash,null);assert.equal(job.wholeAnswersEncrypted,null);assert.equal(job.wholeAcceptedAt,null)
+    const next=await allocation(successor,product);assert.notEqual(next.row.id,old.id);assert.notEqual(next.value.allocationHash,oldFact.value.allocationHash);assert.equal(next.row.attemptNo,2);assert.equal(next.row.attemptEpoch,old.attemptEpoch+1)
+    const expected={...before,parents:before.parents+1,scales:before.scales+1};assert.deepEqual(await census(),expected,'Only the legal restart may add one selected parent/Scale child; losing FINAL has no receipt/raw/snapshot/job')
+    await noWrites('Restart-first losing old FINAL stays stale with no receipt or allocation residue',()=>c.request(`${prefix}/attempts/${old.id}/whole/submit`,'POST',body,409))
+   }
+  })
+  if(order==='FINAL_FIRST')await report(c,old,product,prefix)
+  else{
+   const nextBody=wholeBody(await c.request(`${prefix}/attempts/${successor.id}/whole/definition`))
+   await c.request(`${prefix}/attempts/${successor.id}/whole/submit`,'POST',nextBody);await report(c,successor,product,prefix)
+  }
+  check(`Real ${order} parent-attempt lock race: winner retained, loser denied, no extra receipt/children/allocation; worker resumed`)
+ }
+}
+async function legacyNullRestartCheck(){
+ let d=await teacher.request(products,'POST',{requestId:randomUUID(),name:'C14 null-policy restart regression',questionnaireType:'COURSE',courseIds:[fixture.courses[0].id],publicEnabled:true,expiresAt:expiry()})
+ for(const item of [{type:'FORM',formType:'text_input',formLabel:'Legacy accepted first unit',required:true},{type:'SCALE',scaleId:sources[0].scaleId,required:true}])d=await teacher.request(`${products}/${d.id}/items`,'POST',{revision:d.revision,item})
+ d=await teacher.request(`${products}/${d.id}/publish`,'POST',{revision:d.revision});const t=await token(d,1),c=client();await c.request('/auth/csrf');const started=await c.request(`${pub}/${t.token}/start`,'POST',{});c.recovery=started.recoveryToken;const a=started.attempt,form=a.currentItem
+ await c.request(`${pub}/attempts/${a.id}/form-sections/${form.id}/submit`,'POST',{submissionId:randomUUID(),attemptEpoch:a.attemptEpoch,definitionHash:form.definitionHash,contextSnapshotHash:a.contextSnapshotHash,answers:form.answers.map(item=>({formItemId:item.formItemId,value:'Accepted legacy fact retained'}))})
+ const before=await prisma.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:a.id}}),restarted=await c.request(`${pub}/attempts/${a.id}/restart`,'POST',{}),after=await prisma.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:restarted.attempt.id}})
+ assert.equal(before.trainingVariantAllocationEncrypted,null);assert.equal(after.trainingVariantAllocationEncrypted,null);assert.notEqual(before.participantKey,after.participantKey);assert.notEqual(before.anonymousCode,after.anonymousCode);assert.notEqual(c.recovery,restarted.recoveryToken);assert.equal((await prisma.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:a.id}})).status,'ABANDONED');assert.equal(await prisma.assessmentUnitSnapshot.count({where:{compositeAttemptId:a.id}}),1);assert.equal((await prisma.compositeAssessmentAccessToken.findUniqueOrThrow({where:{id:t.id}})).usedCount,1)
+ check('Historical null-policy public partial-unit restart still creates a new credential/participant identity and preserves old accepted facts')
+}
+
+async function immutableAcceptedFacts(fact){
+ const records={
+  allocation:{encrypted:fact.row.trainingVariantAllocationEncrypted,hash:fact.row.trainingVariantAllocationHash,slotSet:fact.row.frozenActiveSlotSetEncrypted,slotHash:fact.row.frozenActiveSlotSetHash},
+  forms:await prisma.compositeFormAnswer.findMany({where:{attemptId:fact.row.id},orderBy:{id:'asc'}}),
+  scale:await prisma.assessment.findMany({where:{id:{in:fact.scales.map(x=>x.id)}},orderBy:{id:'asc'},select:{id:true,status:true,attemptEpoch:true,submissionId:true,submissionPayloadHash:true,submissionCompletedAt:true,answers:true,result:true,completedAt:true}}),
+  scaleResultFacts:await prisma.assessmentResultFact.findMany({where:{assessmentId:{in:fact.scales.map(x=>x.id)}},orderBy:{assessmentId:'asc'}}),
+  cognitive:await prisma.cognitiveRawSubmission.findMany({where:{sessionId:{in:fact.cognitive.map(x=>x.id)}},orderBy:{id:'asc'}}),
+  sjt:await prisma.situationalRawSubmission.findMany({where:{attemptId:{in:fact.sjt.map(x=>x.id)}},orderBy:{id:'asc'}}),
+  snapshots:await prisma.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:fact.row.id},orderBy:{id:'asc'}}),
+ }
+ return {sha256:sha(JSON.stringify(records,(_key,value)=>typeof value==='bigint'?String(value):value)),counts:Object.fromEntries(Object.entries(records).filter(([_key,value])=>Array.isArray(value)).map(([key,value])=>[key,value.length]))}
+}
+async function resumeHttp03(){
+ const checkpoint=JSON.parse(fs.readFileSync(path.join(state,'c14-resume-source-result.json'))),old=checkpoint.http
+ assert.equal(old.passed,false);assert.equal(old.checks.length,10);assert.equal(old.allocations.length,1);assert.equal(old.completed.length,0)
+ for(const group of ['a','b'])for(const fragment of ['Scale deployment DENY','decryptable invalid resolved Cognitive config'])assert.ok(old.checks.some(name=>name.includes(`Candidate ${group} ${fragment}`)))
+ for(const type of ['FORM_SECTION','SCALE','COGNITIVE','SITUATIONAL'])assert.ok(old.checks.some(name=>name.includes(`${type}: first durable FINAL ACK`)))
+ const row=await prisma.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:old.allocations[0].attemptId}})
+ assert.ok(row.userId);const definition=await prisma.compositeAssessment.findUniqueOrThrow({where:{id:row.compositeAssessmentId},include:{questionnaireCourses:true}})
+ teacherId=definition.createdBy;const owner=await prisma.user.findUniqueOrThrow({where:{id:teacherId}}),participant=await prisma.user.findUniqueOrThrow({where:{id:row.userId}})
+ assert.equal(owner.role,'TEACHER');assert.equal(participant.role,'STUDENT');assert.equal(definition.questionnaireCourses.length,1)
+ const course=await prisma.course.findUniqueOrThrow({where:{id:definition.questionnaireCourses[0].courseId}})
+ assert.equal(course.courseType,'TRAINING_COURSE');assert.equal(course.creatorId,teacherId);assert.equal(course.isLibrary,false)
+ fixture.courses[0]={id:course.id,title:course.title}
+ await teacher.login({username:owner.username,password:fixture.student.password},'TEACHER');if(!reportOnly){await actor('TEACHER',false,otherTeacher);await actor('STUDENT',false,outsider)}
+ const main=await teacher.request(`${products}/${definition.id}`)
+ assert.equal(main.status,'PUBLISHED');assert.equal(main.trainingVariantDigest,old.allocations[0].configDigest)
+ if(!reportOnly)for(const group of main.trainingVariantFrozen.groups){
+  const selected=type=>main.items.find(item=>item.type===type&&group.selectedItemIds.includes(item.id)),sjt=selected('SITUATIONAL')
+  const published=await prisma.sjtAuthorRelease.findUniqueOrThrow({where:{instrumentKey_instrumentVersion:{instrumentKey:sjt.situationalInstrumentKey,instrumentVersion:sjt.situationalInstrumentVersion}}})
+  const d=await teacher.request(`${auth}/drafts/${published.sourceDraftId}`),asset=d.template.display.scenes[0].image.asset,imageBytes=imageFor(group.variantKey)
+  assert.equal(sha(imageBytes),asset.contentHash);assert.equal(d.release.id,published.id)
+  const grants=await prisma.sjtReleaseGrant.findMany({where:{releaseId:published.id,granteeTeacherId:teacherId,courseId:course.id,purpose:'TRAINING_COURSE',permission:'DISTRIBUTE',status:'ACTIVE'}})
+  assert.equal(grants.length,1);assert.ok(grants[0].expiresAt>new Date())
+  sources.push({key:group.variantKey,scaleId:selected('SCALE').scaleId,assignmentId:selected('COGNITIVE').cognitiveAssignmentId,d:{...d,asset,imageBytes},grant:grants[0]})
+ }
+ allocations.push(...old.allocations)
+ const c=client();await c.login({username:participant.username,password:fixture.student.password},'STUDENT')
+ const a=await c.request(`${prefix}/attempts/${row.id}`),fact=await allocation(a,main),before=await immutableAcceptedFacts(fact)
+ assert.deepEqual(before.counts,{forms:1,scale:1,scaleResultFacts:old.counts.at(-1).after.rawScale,cognitive:1,sjt:1,snapshots:4})
+ reusedEvidence={...checkpoint.sourceMetadata,originalAggregatePassed:false,checks:old.checks,requestCount:old.requests.length,counts:old.counts,allocation:old.allocations[0],acceptedFacts:before,scope:'Historical HTTP03 checks retain their original source/fingerprint; only uncompleted report/state and later scenarios execute on this runtime'}
+ fs.writeFileSync(path.join(state,'c14-resume-checkpoint.json'),JSON.stringify({phase:'AFTER_HTTP03_FINALS_BEFORE_REPORT',productId:main.id,attemptId:a.id,acceptedFacts:before},null,2),{mode:0o600})
+ if(checkpoint.sourceMetadata.sourceMode==='REPORT_ONLY')assert.deepEqual(before,checkpoint.reportOnlyCheckpoint.acceptedFacts,'Chained clone must retain the already verified HTTP03 facts')
+ await completeAccepted(c,a,main,prefix,{retryFailed:checkpoint.sourceMetadata.sourceMode!=='REPORT_ONLY',continuation:true})
+ assert.deepEqual(await immutableAcceptedFacts(await allocation(a,main)),before,'Resume must not rewrite accepted raw/canonical/allocation facts')
+ check('HTTP03 checkpoint resumed read-only accepted facts plus original report queue; fixture, bad candidates and existing FINAL/replay inputs were not rerun')
+ return main
+}
+
+
+async function sixStarts(c,productId){
+ const outcomes=await observeConcurrentAdmission({prisma,status,state,requests:Array.from({length:6},()=>()=>c.request(`${prefix}/${productId}/attempts`,'POST',{}))})
+ const failure=outcomes.find(result=>result.status==='rejected');if(failure)throw failure.reason
+ return outcomes.map(result=>result.value)
+}
+async function admissionOnlyCheck(){
+ const source=JSON.parse(fs.readFileSync(path.join(state,'c14-resume-source-result.json')));assert.equal(source.sourceMetadata.sourceMode,'REPORT_ONLY')
+ const old=await prisma.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:source.http.allocations[0].attemptId}})
+ const product=await prisma.compositeAssessment.findUniqueOrThrow({where:{id:old.compositeAssessmentId},include:{items:{orderBy:{position:'asc'}},formSections:{include:{items:true}}}})
+ assert.equal(await prisma.compositeAssessmentAttempt.count({where:{compositeAssessmentId:product.id,userId:studentId}}),0)
+ const before=await census(),quotaBefore=await prisma.cognitiveSession.count({where:{userId:studentId}})
+ let results
+ try{results=await sixStarts(student,product.id)}finally{
+  const after=await census(),quotaAfter=await prisma.cognitiveSession.count({where:{userId:studentId}});counts.push({name:'Targeted six-start census and Cognitive quota consumption',before,after,quotaBefore,quotaAfter})
+  fs.writeFileSync(path.join(state,'c14-admission-census.json'),JSON.stringify({before,after,quotaBefore,quotaAfter},null,2),{mode:0o600})
+ }
+ const first=results[0].attempt;assert.ok(results.every(result=>result.attempt.id===first.id))
+ const fact=await allocation(first,product);assert.equal(fact.forms.length,1);assert.equal(fact.scales.length,1);assert.equal(fact.cognitive.length,1);assert.equal(fact.sjt.length,1)
+ const after=await census();assert.deepEqual(after,{...before,parents:before.parents+1,forms:before.forms+1,scales:before.scales+1,cognitive:before.cognitive+1,sjt:before.sjt+1});assert.equal(await prisma.cognitiveSession.count({where:{userId:studentId}}),quotaBefore+1)
+ check('ADMISSION_ONLY: six concurrent starts succeed with one private allocation, exactly four selected children, one Cognitive quota use, and real PG/pool/CPU diagnostic evidence; no answers or reports executed')
+}
+try {
+ const [role]=await prisma.$queryRawUnsafe('SELECT current_user AS name, rolsuper, rolcreatedb, rolcreaterole, rolbypassrls FROM pg_roles WHERE rolname=current_user');assert.equal(role.name,'eduk12_runtime');for(const key of ['rolsuper','rolcreatedb','rolcreaterole','rolbypassrls'])assert.equal(role[key],false)
+ if(!admissionOnly)await admin.login(fixture.admin,'ADMIN');await student.login(fixture.student,'STUDENT')
+ const fixtureStudent=await prisma.user.findUniqueOrThrow({where:{username:fixture.student.username}});studentId=fixtureStudent.id;syntheticPasswordHash=fixtureStudent.passwordHash;assert.equal(fixtureStudent.role,'STUDENT');assert.ok(['TRAINING','LEGACY'].includes(fixtureStudent.accountDomain))
+ if(admissionOnly)await admissionOnlyCheck()
+ else {
+ let main
+ if(fs.existsSync(path.join(state,'c14-resume-source-result.json')))main=await resumeHttp03()
+ else {
+ const sourceTeacher=await prisma.user.findUniqueOrThrow({where:{username:fixture.teacher.username}});assert.equal(sourceTeacher.role,'TEACHER')
+ // Grant DTOs require UUID identities. Keep the older fixture teacher/course intact.
+ teacherId=randomUUID();const teacherUsername='c14-owner-'+teacherId
+ await prisma.user.create({data:{id:teacherId,username:teacherUsername,passwordHash:syntheticPasswordHash,role:'TEACHER',accountDomain:'TRAINING',teacherApproved:true,mustChangePassword:false}})
+ await teacher.login({username:teacherUsername,password:fixture.student.password},'TEACHER');await actor('TEACHER',false,otherTeacher);await actor('STUDENT',false,outsider)
+ // Fresh synthetic scaffold only. No attempt/response/allocation rows are seeded.
+ const {course:trainingCourse}=await createTrainingCourseFixture({prisma,sourceCourseId:fixture.courses[0].id,sourceCreatorId:sourceTeacher.id,creatorId:teacherId});fixture.courses[0]={id:trainingCourse.id,title:trainingCourse.title}
+ const scaleSource=await prisma.scale.findUniqueOrThrow({where:{id:fixture.scaleId}}),assignmentSource=await prisma.cognitiveAssignment.findUniqueOrThrow({where:{id:fixture.assignmentId}})
+ for(const key of ['a','b']){const {id:scaleId,createdAt:scaleCreated,updatedAt:scaleUpdated,copySource,...scaleData}=scaleSource,{id:assignmentId,createdAt:assignmentCreated,updatedAt:assignmentUpdated,courseSnapshot,...assignmentData}=assignmentSource;const scale=await prisma.scale.create({data:{...scaleData,creatorId:teacherId,code:'C14-'+key+'-'+randomUUID(),name:'C14 '+key+' exclusive scale'}}),assignment=await prisma.cognitiveAssignment.create({data:{...assignmentData,createdBy:teacherId,courseId:trainingCourse.id,title:'C14 '+key+' exclusive cognitive',maxAttempts:100}}),d=await release(key),g=await grant(d.release);sources.push({key,scaleId:scale.id,assignmentId:assignment.id,d,grant:g})}
+ assert.notEqual(sources[0].d.asset.assetId,sources[1].d.asset.assetId);assert.notEqual(sources[0].d.asset.contentHash,sources[1].d.asset.contentHash)
+ check('Real restricted runtime; independent owner-authored SJT releases/images and exact grants; group-exclusive four-tool synthetic resources')
+ main=await configureAndPublish(await product(),true);assert.equal(await prisma.compositeAssessment.count({where:{copiedFromId:main.id}}),0);check('Owner revisioned config validation and immutable publication; one parent union, no per-group composite products')
+ await candidateFailureChecks(main)
+ }
+ if(reportOnly){assert.ok(reusedEvidence);check('REPORT_ONLY: original accepted four-tool facts unchanged and original report worker completed; remaining HTTP/optimized/restore scenarios not claimed')}
+ else {
+ const infoClient=client();await infoClient.request('/auth/csrf');const publicToken=await token(main,1),publicInfo=await infoClient.request(`${pub}/${publicToken.token}`);assert.equal(publicInfo.weightedVariants,true);assert.deepEqual(publicInfo.units,[]);assert.deepEqual(publicInfo.items,[]);assert.deepEqual(publicInfo.formSections,[])
+ await noWrites('Nonmember cannot allocate any group',()=>outsider.request(`${prefix}/${main.id}/attempts`,'POST',{},[403,404]))
+ // Genuine same-identity contention: no preselected group, no random stub.
+ const definitionsBeforeAdmission=await prisma.compositeAssessment.count();const concurrent=await sixStarts(student,main.id),first=concurrent[0].attempt;assert.ok(concurrent.every(x=>x.attempt.id===first.id));assert.equal(await prisma.compositeAssessmentAttempt.count({where:{compositeAssessmentId:main.id,userId:studentId}}),1);const firstFact=await allocation(first,main);await denyExternal(student,first,main);await noWrites('Same identity resume is read-only and does not redraw allocation',async()=>{for(let i=0;i<3;i++){const resumed=await student.request(`${prefix}/${main.id}/attempts`,'POST',{});assert.equal(resumed.attempt.id,first.id);await allocation(resumed.attempt,main)}});assert.equal(await prisma.compositeAssessment.count(),definitionsBeforeAdmission);check('Six concurrent starts persist exactly one parent allocation and only selected children')
+ await finish(student,first,main);const sampledKeys=new Set([firstFact.value.variantKey]);let sampleCount=1
+ while(sampledKeys.size<2&&sampleCount<16){const c=await actor(),{attempt:a}=await c.request(`${prefix}/${main.id}/attempts`,'POST',{}),fact=await allocation(a,main);if(!sampledKeys.has(fact.value.variantKey))await denyExternal(c,a,main);await finish(c,a,main);sampledKeys.add(fact.value.variantKey);sampleCount++}
+ assert.equal(sampledKeys.size,2,'Bounded actual draws did not reach both groups; cannot claim both-group HTTP coverage');check(`Both weighted groups actually drawn and all four tools answered in ${sampleCount} bounded natural samples; no distribution/load qualification`)
+ await noWrites('FINAL cannot restart or change its frozen allocation',()=>student.request(`${prefix}/attempts/${first.id}/restart`,'POST',{},409))
+ const second=(await student.request(`${prefix}/${main.id}/attempts`,'POST',{})).attempt,secondFact=await allocation(second,main);assert.notEqual(second.id,first.id);assert.notEqual(secondFact.value.allocationHash,firstFact.value.allocationHash);const third=(await student.request(`${prefix}/attempts/${second.id}/restart`,'POST',{})).attempt,thirdFact=await allocation(third,main);assert.notEqual(thirdFact.value.allocationHash,secondFact.value.allocationHash);assert.equal(thirdFact.row.attemptNo,3);assert.equal(thirdFact.row.attemptEpoch,2);assert.equal((await prisma.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:second.id}})).status,'ABANDONED');await noWrites('Restart-abandoned attempt consumes budget; no fourth allocation or child/job',()=>student.request(`${prefix}/attempts/${third.id}/restart`,'POST',{},409));await finish(student,third,main);await noWrites('Completed and abandoned attempts exhaust the same user budget',()=>student.request(`${prefix}/${main.id}/attempts`,'POST',{},409));check('Legal next attempt independently allocates, may retain same group; restart retires old facts and counts all statuses')
+ const anonymous=client();await anonymous.request('/auth/csrf');const anonymousStart=await anonymous.request(`${pub}/${publicToken.token}/start`,'POST',{});anonymous.recovery=anonymousStart.recoveryToken;const anonFirst=anonymousStart.attempt,anonFact=await allocation(anonFirst,main);await denyExternal(anonymous,anonFirst,main,pub);const anonResumes=await Promise.all(Array.from({length:4},()=>anonymous.request(`${pub}/${publicToken.token}/start`,'POST',{recoveryToken:anonymous.recovery})));assert.ok(anonResumes.every(x=>x.attempt.id===anonFirst.id));await allocation(anonFirst,main)
+ let previous=anonFirst
+ for(let i=2;i<=3;i++){const restarted=await anonymous.request(`${pub}/attempts/${previous.id}/restart`,'POST',{});assert.ok(restarted.recoveryToken);assert.notEqual(restarted.recoveryToken,anonymous.recovery);const oldCredential=anonymous.recovery;anonymous.recovery=restarted.recoveryToken;const next=await allocation(restarted.attempt,main);assert.equal(next.row.participantKey,anonFact.row.participantKey);assert.equal(next.row.anonymousCode,anonFact.row.anonymousCode);assert.equal(next.row.attemptNo,i);assert.equal((await prisma.compositeAssessmentAccessToken.findUniqueOrThrow({where:{id:publicToken.id}})).usedCount,1);const invalid=client();invalid.recovery=oldCredential;await invalid.request(`${pub}/attempts/${restarted.attempt.id}`,'GET',undefined,denied);previous=restarted.attempt}
+ await noWrites('Public same participantKey restart budget exhausted without token reconsumption',()=>anonymous.request(`${pub}/attempts/${previous.id}/restart`,'POST',{},409));await finish(anonymous,previous,main,pub);await noWrites('Public FINAL cannot restart; exhausted public token cannot allocate another identity',async()=>{await anonymous.request(`${pub}/attempts/${previous.id}/restart`,'POST',{},409);const stranger=client();await stranger.request('/auth/csrf');await stranger.request(`${pub}/${publicToken.token}/start`,'POST',{},denied)});check('Public resume keeps allocation; restart rotates recovery while keeping participantKey, budget and token usedCount=1')
+ assert.equal(await prisma.compositeAssessment.count(),definitionsBeforeAdmission);await exportCheck(main,'csv');await exportCheck(main,'zip');const analysis=await teacher.request(`${prefix}/${main.id}/variant-analysis`);await otherTeacher.request(`${prefix}/${main.id}/variant-analysis`,'GET',undefined,[403,404]);assert.equal(analysis.pooling,'STRATIFIED_ONLY');assert.equal(analysis.strata.length,2);assert.equal(analysis.strata.reduce((sum,s)=>sum+s.recordCount,0),await prisma.compositeAssessmentAttempt.count({where:{compositeAssessmentId:main.id}}));for(const stratum of analysis.strata){const expected=await prisma.compositeAssessmentAttempt.findMany({where:{compositeAssessmentId:main.id}}),matching=[];for(const row of expected)if(decryptUnifiedRuntimePayload(row.trainingVariantAllocationEncrypted).variantKey===stratum.variantKey)matching.push(row);assert.equal(stratum.completedCount,matching.filter(x=>x.status==='COMPLETED').length);assert.equal(stratum.abandonedCount,matching.filter(x=>x.status==='ABANDONED').length);assert.equal(stratum.configDigest,main.trainingVariantDigest)}check('Owner-only basic task counts are stratified by immutable publication/config/group, including abandoned attempts')
+ await asyncWholeRestartCheck();await legacyNullRestartCheck()
+ // Publication closure races, both lock orders; the accepted branch can resume.
+ const closeFirst=await copyProduct(main,'close-first'),closeClient=await actor();await noWrites('Real close-first parent lock rejects new allocation with no children/jobs',()=>withGate('composite_assessments',closeFirst.id,async(pid,unlock)=>{const close=tracked(archive(closeFirst)),closePid=await observedLock('composite_assessments',pid,close),start=tracked(closeClient.request(`${prefix}/${closeFirst.id}/attempts`,'POST',{},denied));await observedLock('composite_assessments',[pid,closePid],start,[closePid]);unlock();await close.result();await start.result()}))
+ const startFirst=await copyProduct(main,'start-first'),startClient=await actor();let accepted
+ await withGate('stored_assets',sources[0].d.asset.assetId,async(pid,unlock)=>{const start=tracked(startClient.request(`${prefix}/${startFirst.id}/attempts`,'POST',{})),startPid=await observedLock('stored_assets',pid,start),close=tracked(archive(startFirst));await observedLock('composite_assessments',startPid,close);unlock();accepted=(await start.result()).attempt;await close.result()});await allocation(accepted,startFirst);await allocation(await startClient.request(`${prefix}/attempts/${accepted.id}`),startFirst);check('Real admission-first locks freeze one selected allocation before close; accepted attempt resumes unchanged')
+ // Public token races also verify no extra usedCount after a losing admission.
+ const tokenProduct=await copyProduct(main,'token-races'),revoked=await token(tokenProduct,1),tokenClient=client();await tokenClient.request('/auth/csrf')
+ await noWrites('Real public revoke-first token lock rejects admission without token use/allocation/children/jobs',()=>withGate('composite_assessment_access_tokens',revoked.id,async(pid,unlock)=>{const rev=tracked(disableToken(tokenProduct,revoked)),revPid=await observedLock('composite_assessment_access_tokens',pid,rev),start=tracked(tokenClient.request(`${pub}/${revoked.token}/start`,'POST',{},denied));await observedLock('composite_assessment_access_tokens',[pid,revPid],start,[revPid]);unlock();await rev.result();await start.result()}))
+ const admittedToken=await token(tokenProduct,1);let admittedPublic
+ await withGate('stored_assets',sources[0].d.asset.assetId,async(pid,unlock)=>{const start=tracked(tokenClient.request(`${pub}/${admittedToken.token}/start`,'POST',{})),startPid=await observedLock('stored_assets',pid,start),rev=tracked(disableToken(tokenProduct,admittedToken));await observedLock('composite_assessment_access_tokens',startPid,rev);unlock();admittedPublic=await start.result();await rev.result()});tokenClient.recovery=admittedPublic.recoveryToken;await allocation(admittedPublic.attempt,tokenProduct);assert.equal((await prisma.compositeAssessmentAccessToken.findUniqueOrThrow({where:{id:admittedToken.id}})).usedCount,1);assert.equal((await tokenClient.request(`${pub}/${admittedToken.token}/start`,'POST',{recoveryToken:tokenClient.recovery})).attempt.id,admittedPublic.attempt.id);check('Real public admission-first freezes selected allocation before token revoke; token count once and accepted recovery unchanged')
+ // Candidate grants are validated across the union before any random draw.
+ const grantProduct=await copyProduct(main,'candidate-race'),grantClient=await actor();await noWrites('Real candidate-B revoke-first rejects whole union admission; no filtered redraw or partial children',()=>withGate('sjt_release_grants',sources[1].grant.id,async(pid,unlock)=>{const rev=tracked(revoke(sources[1].grant)),revPid=await observedLock('sjt_release_grants',pid,rev),start=tracked(grantClient.request(`${prefix}/${grantProduct.id}/attempts`,'POST',{},denied));await observedLock('sjt_release_grants',[pid,revPid],start,[revPid]);unlock();await rev.result();await start.result()}))
+ sources[1].grant=await grant(sources[1].d.release);let granted
+ await withGate('stored_assets',sources[0].d.asset.assetId,async(pid,unlock)=>{const start=tracked(grantClient.request(`${prefix}/${grantProduct.id}/attempts`,'POST',{})),startPid=await observedLock('stored_assets',pid,start),rev=tracked(revoke(sources[1].grant));await observedLock('sjt_release_grants',startPid,rev);unlock();granted=(await start.result()).attempt;await rev.result()});await allocation(granted,grantProduct);await allocation(await grantClient.request(`${prefix}/attempts/${granted.id}`),grantProduct);await noWrites('A revoked unselected candidate is not silently dropped on fresh union admission',async()=>{const c=await actor();await c.request(`${prefix}/${grantProduct.id}/attempts`,'POST',{},denied)});check('Candidate authorization uses actual grant→asset lock order before draw; accepted frozen allocation survives later revoke')
+ }
+ }
+ passed=true
+} catch(error) { console.error(error);throw error }
+finally {for(const db of gateClients)await db.$disconnect();await prisma.$disconnect();fs.writeFileSync(path.join(state,'c14-http-result.json'),JSON.stringify({passed,qualificationScope:admissionOnly?'ADMISSION_ONLY':reportOnly?'REPORT_ONLY':'FULL_CONTINUATION',checks,requests,counts,races,allocations,completed,reusedEvidence,optimizedWholeEvidence,qualification:{browser:false,load:false,cpuOrLatency:false,sampling:'Natural production crypto draws; bounded at 16; both groups must be observed and every sampled attempt fully answered',mediaLimit:'Hidden SJT probes exercise cross-slot denial; no successful selected-video capability fixture or independent hidden-child HTTP selection-guard claim'}},null,2))}

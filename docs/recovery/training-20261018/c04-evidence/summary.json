@@ -1,0 +1,143 @@
+{
+  "sourceCheckpoint": "c32678c78bbae194eb69ad9f7388deb4a6525067",
+  "sourceTree": "c7c8fcb97ea88e63320a48b6e9df5b9028061997",
+  "productionFilesSha256": {
+    "server-version/backend/src/modules/composite/composite.schema.ts": "22c95b22b8fb4db2a657562d4e68cdab532cce43faf268ff9025361083a0f864",
+    "server-version/backend/src/modules/composite/composite.service.ts": "c08cd4c738717cc8e0690bf22dcbf675ac7a9542b61f160f88444895c10ae43a",
+    "server-version/backend/src/modules/questionnaire-product/service.ts": "93f3dda684d097e9d696d80a9fea49ec2fecd66e3e9e80323651f30271113bd9",
+    "server-version/frontend/src/components/FinalCompositeAssessment.tsx": "01116a4ae64adee002be01f6d456472351dc69ba956ccf78ee0fec484b6cba18",
+    "server-version/frontend/src/components/FinalQuestionnaireAssessment.tsx": "5b379d0a0b2e38e8e1fe60ac23984508aa86da71dc21c3de048e8f4f432e6348",
+    "server-version/frontend/src/components/questionnaire/FormPlayer.tsx": "5614fe2250f66fc2c1371a1dd95151bac4f9b4f6ce91289a17eccc00a43df51f",
+    "server-version/frontend/src/modules/assessment-core/form/BasicFormAnswer.tsx": "0cb6c6398dbb30833e48f8abaccede9b2b18590d700371f79509118e0946fbf0",
+    "server-version/frontend/src/modules/assessment-core/form/BasicFormConstraints.tsx": "6354a6a6637994c0d30ecb06596ca426da2e71f91ea05c33824dfd46a8c9a1b9",
+    "server-version/frontend/src/modules/assessment-core/form/ProfessionalFormAnswer.tsx": "7f98860985ad8baec9f2ca40fd9354b8483413c7acd02cdab050981e50990fa6",
+    "server-version/frontend/src/modules/composite/api.ts": "b6c810d1d3d0fec6c51b16eb5b7930b39f92e9990fff6b32b15ae0331d5fff08",
+    "server-version/frontend/src/modules/composite/types.ts": "8398dc735cbf06b53389f6a3d38c86a7d7963c2ec30460bc325543af65ee5f87",
+    "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx": "7990a3729d97d7900f88084d248232174c2602cbbe8199cdb1e6adc446b4980e",
+    "server-version/frontend/src/survey/ResearchFormEditor.tsx": "3cdfea0f27de5ee47bac0f45481b8e1b688d3c55c76a3b10041e266e6ba90078",
+    "server-version/frontend/src/survey/ResearchPreview.tsx": "0352c389155f194653e215ebc8bb350d72e0db7d663395f36ac0bb4ba002bb36",
+    "server-version/frontend/src/survey/SurveyPublicApp.tsx": "e6a363b31d253d8cecca45658d0bf5d299834ee4688d6dbc56d9f0a9e8c9b99c"
+  },
+  "runtimeFingerprint": {
+    "schemaVersion": 1,
+    "nodeVersion": "v24.21.0",
+    "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+    "dist": {
+      "files": 4949,
+      "sha256": "5d9f43382bb7e2353b5b03576924d100db4206cbeae43517d145202d28509f8b"
+    },
+    "files": {
+      "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+      "prisma/schema.prisma": "f4024a069e078f2d03ce09a30a89c2311d454e1de6be32282d4cd2e29aec6f6f",
+      "node_modules/.prisma/client/schema.prisma": "881fa942b6757ebf3cf0f4b1c01274b240994e46b8c242b0320e813aeb46f10b",
+      "node_modules/.prisma/client/index.js": "276cfbd992ed391456cb9d8b5e3abe32008d51aacca4d550fc8878b87b5de30c"
+    },
+    "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+  },
+  "startupConsumerFingerprintEqual": true,
+  "tests": {
+    "backendUniquePassed": 61,
+    "frontendUniquePassed": 97,
+    "backendTsc": "passed",
+    "frontendAppTsc": "passed",
+    "frontendViteBuild": "passed",
+    "frontendChangedSourceLint": {
+      "errors": 0,
+      "existingWarnings": 1
+    }
+  },
+  "httpStages": [
+    {
+      "artifact": "http-full-attempt.json",
+      "requests": 129,
+      "wholeRunPassed": false,
+      "passedGroups": 4,
+      "remainingFailure": "whole-submit disabled in initial fixture environment; original 409 retained"
+    },
+    {
+      "artifact": "runtime-whole.json",
+      "requests": 46,
+      "wholeRunPassed": true,
+      "passedGroups": 2,
+      "configurationChange": "ASSESSMENT_WHOLE_SUBMIT_ENABLED=true; only missing whole and export checks executed"
+    },
+    {
+      "artifact": "runtime-auth.json",
+      "requests": 31,
+      "wholeRunPassed": true,
+      "passedGroups": 1,
+      "scope": "wrong credential and cross-attempt read/submit/report denied; existing accepted snapshot/report unchanged"
+    }
+  ],
+  "browser": {
+    "status": "blocked_before_page",
+    "firstFailure": "Chromium Unix socket() Operation not permitted",
+    "escalatedFailure": "bwrap: Can't create file /home/agent/.codex/sessions: Read-only file system",
+    "savedHarnessSandbox": true,
+    "sandboxTrueHarnessExecuted": false,
+    "screenshotsProduced": false
+  },
+  "cleanup": {
+    "fullAttempt": true,
+    "whole": true,
+    "auth": true,
+    "browser": true
+  },
+  "notClaimed": [
+    "browser UI or responsive/accessibility pass",
+    "full CI",
+    "deployment",
+    "C07 typed export",
+    "performance capacity or SQL-count benchmark"
+  ],
+  "rawArtifactsSha256": {
+    "backend-build.log.gz": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+    "frontend-build.log.gz": "53a4bf870a00cc70d9d6478ff2ad812b135eeabe2029f7d820575b9cfb4d426b",
+    "runtime-whole.json": "61c97f069acebf61afae57395564524a5c2df15d55b2906a3f89b462ec6c9046",
+    "first-revision-guard-c04-runtime-result.json": "fd2369ae48afd7e5e1944e36050493fe3855048b7d3ce84ac89dc4a4c8e79a16",
+    "frontend-build-manifest.json": "099371c0a8fa2700c836711b51c41df69c54e618b045c4305b1e7eb6c35620c1",
+    "runtime-auth.json": "f59b2c743dbc880e0fb89d78f9d0c6106f9e4fd8509c7029ce31eb102cac3b0f",
+    "tested-full-smoke.mjs": "a6b4993467e7e6328fac419786eb43ccf3cb19d8468030e84edfa411fb417402",
+    "authoring-tests.log.gz": "f56662c00bfb0cc4c3674a0d5b24fbda265999444050626fed926d9ee04b7698",
+    "frontend-tsc.log.gz": "8c6aa878f0fa55a3ed1b76b1a7c9849b4b5752a3c011859295591115e9ca8fde",
+    "direct-tests.log.gz": "ac09a4cfea3a2a851b050b53c619b7a0d81607ae6f982071f174aa34de7368b0",
+    "frontend-tsc2.log.gz": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+    "additem-tests.log.gz": "2681ba9c483aadddc84e43bc2ba6ccb3357736177e407ec24e71c869dc6c7a21",
+    "restoration-tests.log.gz": "42841aa91828dc60b17c18017c48c8e0223fe8adb5b77fef72fcbd823dcecd85",
+    "runtime-full-attempt.json": "4a79cfb50dfd933fdd16af76fe1d0a1316fe85a8612097e1646c128fa64d91d6",
+    "survey-tests.log.gz": "0902ecbf79d784bf868bc5e33f92d9fc937a6e93ed587ed4caac8d834b9f466c",
+    "backend-tests.log.gz": "78d56b3ff49ddf13df0b77c6e6fcc0c736a051fddd1421360356fef3b24ac807",
+    "first-revision-guard-c04-http-result.json": "603c93a78ce65cb41f06ce4d76e27fb5b76ac98af1c2a6ecb1290e23907699f8",
+    "frontend-final-tsc.log.gz": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+    "http-full-attempt.log.gz": "2981bf7bb6fe038a0fcf052a2894c25923575daf541f4c79e0651b6794c59117",
+    "tested-whole-smoke.mjs": "57e0ef327cb0388521b8488b9f0b65e2e77c6031b3c06d8e4bbd04cbdc6564a7",
+    "runtime-browser.json": "f6f59afdccda5bec0e78da591489378789df2b97161f4c8b1ebb674203674d8c",
+    "additem-rerun.log.gz": "54f6deed243800669789a748d925c105b6caf3f78897e99d34b03b3acb0a495b",
+    "lint.log.gz": "a19acb20af66c62f8f6d5166d7a9e793313a1fa1a9826d76d9c1f9d383954e8b",
+    "http-full-attempt.json": "6317c7c29e5520c21cc97b0f8cd0335a8463fb1c1e6d6825fadeb0932440dc56",
+    "backend-tsc.log.gz": "f61f27bd17de546264aa58f40f3aafaac7021e0ef69c17f6b1b4cd7664a037ec",
+    "http-auth.log.gz": "c60db7d56eed86add551822e40e415b164819d3606b2a927eaf1c756696cd487",
+    "http-whole.log.gz": "eb93a083f6030a766d56d85fe971fbe11d590038abb22678747f07081609c08d",
+    "frontend-tests.log.gz": "1dabd3012a6a8ed30a58ceac2ebb63db6fafa45826a298c726b25d75a47bbe35"
+  },
+  "rawLogSha256": {
+    "frontend-tests.log": "51d5c1f733f49144d72be06b77270a3d507e566285a4ed019183c7f6f56205be",
+    "http-auth.log": "f592b908e96934fa73ccd8ab5eb5be3afbd7c4ed6c4f2115d6162dd08694a0fc",
+    "direct-tests.log": "e2bc2147c5bfae5ad48d20be5a85ae1d7f9ff25626d026ed3b018fc3c8f41af0",
+    "additem-tests.log": "8bb9fda850f8924c1f4d5adf9569f015aa63b6ac1c01969c2b7308130e044135",
+    "frontend-final-tsc.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "frontend-tsc2.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "restoration-tests.log": "b7f5e99651a0d1086a9bc580d24a5b56ecbe2d2f44c898aa02fa703a17f0da40",
+    "backend-tsc.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "frontend-tsc.log": "876d341038eea7bcc4ee48f4e2dd2bed326907e561610bb64064a23ba6bc4d53",
+    "http-full-attempt.log": "ec992fb003ca766f1751f39a69c23aa9748ea6e111e894d365f5214bcb32114b",
+    "lint.log": "e93e5d454f9d8eb26a056bcd0518df33efea3c1e05b3bbed70eef8e31cdad796",
+    "authoring-tests.log": "272bdd551aa575c962ef638f94dea63c72e351b1cb0afd602fbcc75e83d7f090",
+    "backend-tests.log": "dc9ca7ed86742f184555d4d00430be23910f04bfc0d8a47fd4437af7351f0d78",
+    "backend-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "survey-tests.log": "7253178c87be4698a99161ea32536dae1f504d13b356f02bf13c3ef9668fc841",
+    "http-whole.log": "616d7b530f7da7edce67c54e5f6ef24c287b59eb14ddc946cc1cf39db511e5b4",
+    "additem-rerun.log": "84dc340702bbdc6b5c2053aa0aab912d2f1e89fa2548ffbc334e3661bd386e67",
+    "frontend-build.log": "7d5fe3ed1ae1bb184812a165db7556fc154fddf82ad2085d9c724db4e739a1e0"
+  }
+}

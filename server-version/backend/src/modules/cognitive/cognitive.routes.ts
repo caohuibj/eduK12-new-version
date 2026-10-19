@@ -1,3 +1,4 @@
+import { assertCognitiveNewAdmissionEnabled } from './product-eligibility'
 import { sharedControlRequestContext } from '../assessment-runtime/shared-control-records'
 import { assessmentExportHttp } from '../../services/assessmentExportHttp'
 import { runOrLegacyRespondentAccess } from '../assessment-run/runtimeAccess'
@@ -20,6 +21,9 @@ import { relationalRuntimeConsentAuthority } from '../assessment-relational/runt
  */
 const router = Router()
 router.use(sharedControlRequestContext)
+const newAuthoring: import('express').RequestHandler = (_req, _res, next) => {
+  try { assertCognitiveNewAdmissionEnabled(); next() } catch (error) { next(error) }
+}
 const respondentAttemptAccess = runOrLegacyRespondentAccess('COGNITIVE')
 const relationalCognitiveFinalConsentGuard = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -38,8 +42,8 @@ const relationalCognitiveFinalConsentGuard = async (req: Request, res: Response,
 router.get('/tests', authenticate, requireTeacher, cognitiveController.listTests)
 router.get('/tests/:testType', authenticate, requireTeacher, cognitiveController.getTest)
 router.get('/configs', authenticate, requireTeacher, cognitiveController.listConfigs)
-router.patch('/configs/:id/access-policy', authenticate, requireAdmin, cognitiveController.updateAccessPolicy)
-router.post('/configs/:id/publish', authenticate, requireAdmin, cognitiveReleaseController.publishConfig)
+router.patch('/configs/:id/access-policy', authenticate, requireAdmin, newAuthoring, cognitiveController.updateAccessPolicy)
+router.post('/configs/:id/publish', authenticate, requireAdmin, newAuthoring, cognitiveReleaseController.publishConfig)
 router.post('/configs/:id/retire', authenticate, requireAdmin, cognitiveReleaseController.retireConfig)
 
 // 我的认知测评（学生分发列表，必须在 /:id 之前）
@@ -47,16 +51,16 @@ router.get('/assignments/my', authenticate, cognitiveController.myAssignments)
 router.get('/history', authenticate, requireRole(UserRole.STUDENT), cognitiveController.myHistory)
 
 // 教师端 Assignment 管理
-router.post('/assignments', authenticate, requireTeacher, cognitiveController.createAssignment)
+router.post('/assignments', authenticate, requireTeacher, newAuthoring, cognitiveController.createAssignment)
 router.get('/assignments', authenticate, requireTeacher, cognitiveController.listAssignments)
 router.get('/assignments/:id', authenticate, cognitiveController.getAssignment)
-router.patch('/assignments/:id', authenticate, requireTeacher, cognitiveController.updateAssignment)
-router.post('/assignments/:id/publish', authenticate, requireTeacher, cognitiveController.publishAssignment)
+router.patch('/assignments/:id', authenticate, requireTeacher, newAuthoring, cognitiveController.updateAssignment)
+router.post('/assignments/:id/publish', authenticate, requireTeacher, newAuthoring, cognitiveController.publishAssignment)
 router.post('/assignments/:id/archive', authenticate, requireTeacher, cognitiveController.archiveAssignment)
 
 // 单个认知任务公开链接（参与者不要求登录，恢复凭证只存哈希）
 router.get('/assignments/:id/public-tokens', authenticate, requireTeacher, cognitiveController.listPublicTokens)
-router.post('/assignments/:id/public-tokens', authenticate, requireTeacher, cognitiveController.createPublicToken)
+router.post('/assignments/:id/public-tokens', authenticate, requireTeacher, newAuthoring, cognitiveController.createPublicToken)
 router.post('/assignments/:id/public-tokens/:tokenId/reveal', authenticate, requireTeacher, cognitiveController.revealPublicToken)
 router.delete('/assignments/:id/public-tokens/:tokenId', authenticate, requireTeacher, cognitiveController.disablePublicToken)
 

@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "phase": "WIP_SOURCE_CHECKPOINT_NOT_PG_QUALIFIED",
+  "base": "825170d223e23aac4093c7a1513b541b0a9b67a7",
+  "node": "v24.21.0",
+  "nodeExecutable": "/workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/node_modules/node/bin/node",
+  "passedReported": {
+    "coreCurrent": 23,
+    "organizationMatchedUnchanged": 6,
+    "sourceCurrent": 24,
+    "serviceBeforeCutoffOption": 11,
+    "queueExportNew": 31,
+    "queueLegacy": 28,
+    "uiReportedBeforeFinalLabel": 38
+  },
+  "limitations": [
+    "Full TypeScript final pass pending at checkpoint; earlier nullable/API timing failures preserved.",
+    "All original build prerequisites passed once, as recorded in build-first log; build as a whole failed TypeScript.",
+    "Queue tests results exist only in execution-tool stdout, not persisted raw logs; reported counts are not invented file evidence.",
+    "Frontend final bundle after NO_OBSERVATION label is pending; prior bundle and types passed but artifact is earlier.",
+    "Migration, restricted-role PostgreSQL/HTTP, original queue dynamic lifecycle, original accepted-row unchanged, and SQL10/20/50 qualification not yet run.",
+    "Harness four-tool two-wave synthetic addition still pending.",
+    "No browser, native/media or capacity qualification; no push, PR or CI."
+  ],
+  "files": [
+    {
+      "file": "c16-core-tests.log",
+      "bytes": 260,
+      "sha256": "bc10b784c9c44a831467cad976cb76b7e63ae7408e5b9833b4b7333d318b6b3b"
+    },
+    {
+      "file": "c16-core-tests-v2.log",
+      "bytes": 260,
+      "sha256": "3fd8c48812dbc34f6e9517f8e6c09a9964f6842391351eccda30c5a060c234f3"
+    },
+    {
+      "file": "c16-core-tests-v3.log",
+      "bytes": 259,
+      "sha256": "3e4435028a25dfa2f7b5960e632eec087f505465b179f5605dbff997a0e07546"
+    },
+    {
+      "file": "c16-core-tests-v4.log",
+      "bytes": 260,
+      "sha256": "74ab30a74edf35f2a10926cb8865c94add849aea2004eb053a9c06f5aad15930"
+    },
+    {
+      "file": "c16-service-test-first.log",
+      "bytes": 267,
+      "sha256": "dda5dd827b185a8d034f793cbd97564691b74cfddd48c3517c39966cacfd29d0"
+    },
+    {
+      "file": "c16-service-test-second.log",
+      "bytes": 259,
+      "sha256": "1f73ddbbeaf238fcedf0d256a7be58e441b5816ceec5ea37e58f8a4427f9b0e1"
+    },
+    {
+      "file": "c16-source-and-shared-readers.log",
+      "bytes": 4283,
+      "sha256": "c13ca0380494ccbb0c0d59717cfbd380c827ed7efa0a88c7a3a3e47dc982664e"
+    },
+    {
+      "file": "c16-source-final.log",
+      "bytes": 261,
+      "sha256": "aabdc18e98da786f60524fa333fcd70d29357e53968bd8410108f5f76e14ea7f"
+    },
+    {
+      "file": "c16-existing-batch-baseline-evidence.log",
+      "bytes": 2741,
+      "sha256": "c406260c41d5479306aac4e8d19e8dee673e0f1bcbb16021ea93d4646348c575"
+    },
+    {
+      "file": "c16-shared-readers-fixture-retest.log",
+      "bytes": 271,
+      "sha256": "123b80c72c94fc6a29bf22b95aba4b96c7e3681b3db659bd3109fe455898fb3b"
+    },
+    {
+      "file": "c16-tsc-first.log",
+      "bytes": 1833,
+      "sha256": "1e67f2385f6a32ead99f52247567aee478231ff2b172e1ebd0260db5f41e32c0"
+    },
+    {
+      "file": "c16-backend-build-first.log",
+      "bytes": 1081,
+      "sha256": "b3a6f1beeb4659d94bffb24a61fdc0cbbceecc15071c915d7320b7880b708b4b"
+    },
+    {
+      "file": "c16-backend-tsc-second.log",
+      "bytes": 645,
+      "sha256": "f6cd83eec93d22639d3e2664d86a3648e219ce013a2d46e5627f7ef20b5cfc6f"
+    }
+  ]
+}

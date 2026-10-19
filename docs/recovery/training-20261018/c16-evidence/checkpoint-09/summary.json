@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "phase": "LIMITED_FUNCTIONAL_DYNAMIC_COMPLETE_FINAL_REVIEW_PENDING",
+  "productionSource": "3f0444a593c21d11a18eacc41f3ab260790b98f4",
+  "http07HarnessSource": "a2dd31caf55ab6e94626b442106590a5c4a9535c",
+  "http07Passed": true,
+  "files": [
+    {
+      "file": "c16-http07-summary.json.gz",
+      "bytes": 7006,
+      "sha256": "29183b29c76ceab98bc8468f9e2769d1866bbb9b5629397276d2ad9435341435",
+      "uncompressedFile": "c16-http07-summary.json",
+      "uncompressedBytes": 16787,
+      "uncompressedSha256": "4ea1bd41577c0059fa48624bfa2d73b975317e94564dcf7aa56a1adbeb6c55e8"
+    }
+  ],
+  "scope": [
+    "Only explicitly qualified partial phases from HTTP03\u201306 are reused; their overall failures remain unchanged.",
+    "Original C14 rows exact; final 207-table nonempty restore and restricted role verified.",
+    "Final evidence review pending. Browser/native/media and full capacity are C25/C26."
+  ]
+}

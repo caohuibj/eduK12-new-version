@@ -1,0 +1,12 @@
+FE-11 browser gate contract: PASS (6 session gates, 2 syntax-only gates)
+✔ the caller timeout reaches initial navigation and controls as well as login response (1.593034ms)
+✔ failed navigation stops before credentials or login requests (0.469863ms)
+✔ asset authorization guard counts protected API media but not built frontend chunks (0.225087ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 76.354632

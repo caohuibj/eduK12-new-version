@@ -1,0 +1,12 @@
+PASS Online create/CAS/digest, independent review, immutable release; wrong and empty manual golden/self-review/nonowner rejected
+PASS Nonmember and cross-course admission rejected
+PASS Nonowner read and FINAL denied
+PASS Two scenes/three questions real multiselect SUM+MEAN, raw FINAL/replay, common scorer yields manual 9 and two independent scenes
+PASS Original export queue csv: exact canonical identities/metrics, no raw responses, owner-only download
+PASS Original export queue zip: exact canonical identities/metrics, no raw responses, owner-only download
+PASS New empty FINAL null score with independently correct persisted task qualification
+PASS New refused FINAL null score with independently correct persisted task qualification
+PASS New partial FINAL null score with independently correct persisted task qualification
+PASS Required blank rejected on explicit new protocol
+PASS Old empty FINAL and client-driven protocol upgrade rejected without raw writes
+PASS Standalone new empty FINAL projects unsatisfied inbox; record actual canonical and response bytes

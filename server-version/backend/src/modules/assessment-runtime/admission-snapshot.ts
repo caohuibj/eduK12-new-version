@@ -1,3 +1,4 @@
+import {trainingTimingSnapshotSchema,readTrainingTimingSnapshot,type TrainingTimingSnapshot} from './training-scale-timing'
 import { z } from 'zod'
 import { canonicalHash } from './canonical'
 import { decryptUnifiedRuntimePayload, encryptUnifiedRuntimePayload } from './security'
@@ -32,6 +33,7 @@ export interface FrozenUnitAdmissionV1 {
   schemaVersion: typeof FROZEN_UNIT_ADMISSION_SCHEMA_VERSION
   runtimeGeneration: 'UNIFIED_V1'
   frozenAt: string
+  trainingTiming?: TrainingTimingSnapshot
   attemptEpoch: number
   scale?: FrozenScaleAdmissionIdentityV1
   cognitive?: FrozenCognitiveAdmissionIdentityV1
@@ -75,6 +77,7 @@ const unsignedAdmission = (input: Omit<FrozenUnitAdmissionV1, 'snapshotHash'>) =
     contextValues: input.contextValues,
     governance: input.governance,
   }
+  if (input.trainingTiming) unsigned.trainingTiming = readTrainingTimingSnapshot(input.trainingTiming)
   if (input.scale) unsigned.scale = input.scale
   if (input.cognitive) unsigned.cognitive = input.cognitive
   if (input.formSection) unsigned.formSection = input.formSection
@@ -85,6 +88,7 @@ const frozenUnitAdmissionSchema = z.object({
   schemaVersion: z.literal(1),
   runtimeGeneration: z.literal('UNIFIED_V1'),
   frozenAt: z.string().datetime({ offset: true }),
+  trainingTiming: trainingTimingSnapshotSchema.optional(),
   attemptEpoch: z.number().int().positive(),
   scale: z.object({
     id: z.string().min(1),
@@ -134,6 +138,7 @@ const frozenUnitAdmissionSchema = z.object({
 })
 
 export const createFrozenUnitAdmission = (input: {
+  trainingTiming?: TrainingTimingSnapshot
   attemptEpoch: number
   scale?: FrozenUnitAdmissionV1['scale']
   cognitive?: FrozenUnitAdmissionV1['cognitive']
@@ -171,6 +176,7 @@ export const createFrozenUnitAdmission = (input: {
     runtimeGeneration: 'UNIFIED_V1',
     frozenAt: frozenAt.toISOString(),
     attemptEpoch: input.attemptEpoch,
+    ...(input.trainingTiming ? {trainingTiming: input.trainingTiming} : {}),
     scale,
     cognitive: input.cognitive,
     formSection: input.formSection,
@@ -197,6 +203,7 @@ export const hashFrozenUnitAdmission = (snapshot: FrozenUnitAdmissionV1): string
 
 export const parseFrozenUnitAdmission = (value: unknown): FrozenUnitAdmissionV1 => {
   const snapshot = frozenUnitAdmissionSchema.parse(value) as FrozenUnitAdmissionV1
+  if (snapshot.trainingTiming) { readTrainingTimingSnapshot(snapshot.trainingTiming); if(snapshot.trainingTiming.attemptEpoch!==snapshot.attemptEpoch||!snapshot.scale||snapshot.parent?.kind!=='composite') throw new Error('Invalid Training timing admission binding') }
   if (hashFrozenUnitAdmission(snapshot) !== snapshot.snapshotHash) {
     throw new Error('Frozen unit admission hash mismatch')
   }

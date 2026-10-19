@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "run": "HTTP04",
+  "passed": false,
+  "phase": "FIRST_EXPORT_REGISTRATION",
+  "httpStatus": 400,
+  "expectedStatus": 200,
+  "publicErrorCode": "TRAINING_ANALYSIS_FAILED",
+  "errorType": "AssertionError",
+  "qualifiedChecks": [
+    "Same publication alias rejected 409; full-case mode retains the same explicitly matched 50 participants",
+    "Removing one synthetic current enrollment retains all50 historical participants and100 frozen sources; SQL diagnostics show zero CourseStudent reads",
+    "Bounded quality list paginates 25 rows with exact 100-source manifest binding"
+  ],
+  "sqlQueryFamilies": {
+    "scope": "SUPPLEMENTAL_SAME_50_SOURCE_QUERY_FAMILIES_NOT_COLD_HOT_OR_NUMERIC_REQUALIFICATION",
+    "sqlEvents": 25,
+    "sqlDurationMs": 13,
+    "families": {
+      "BEGIN:TRANSACTION_OR_CONTROL": 1,
+      "SET:TRANSACTION_OR_CONTROL": 1,
+      "SELECT:courses+users": 1,
+      "SELECT:users": 1,
+      "SELECT:courses": 1,
+      "SELECT:relational_assessment_assignments": 1,
+      "SELECT:assessment_composition_templates+composite_assessment_attempts+composite_assessments+questionnaire_course_deliveries": 1,
+      "SELECT:composite_assessment_items": 2,
+      "SELECT:scales": 1,
+      "SELECT:cognitive_assignments": 1,
+      "SELECT:cognitive_test_configs": 1,
+      "SELECT:composite_form_sections": 1,
+      "SELECT:composite_assessment_attempts+composite_assessments": 2,
+      "SELECT:composite_assessment_attempts": 2,
+      "SELECT:assessment_run_executions+assessment_run_tracks+composite_assessment_attempts": 1,
+      "SELECT:assessments": 1,
+      "SELECT:assessment_unit_snapshots": 2,
+      "SELECT:assessment_result_facts": 1,
+      "SELECT:assessment_public_templates": 1,
+      "SELECT:training_analysis_quality": 1,
+      "COMMIT:TRANSACTION_OR_CONTROL": 1
+    },
+    "tableMentions": {
+      "courses": 2,
+      "users": 2,
+      "relational_assessment_assignments": 1,
+      "assessment_composition_templates": 1,
+      "composite_assessment_attempts": 6,
+      "composite_assessments": 3,
+      "questionnaire_course_deliveries": 1,
+      "composite_assessment_items": 2,
+      "scales": 1,
+      "cognitive_assignments": 1,
+      "cognitive_test_configs": 1,
+      "composite_form_sections": 1,
+      "assessment_run_executions": 1,
+      "assessment_run_tracks": 1,
+      "assessments": 1,
+      "assessment_unit_snapshots": 2,
+      "assessment_result_facts": 1,
+      "assessment_public_templates": 1,
+      "training_analysis_quality": 1
+    },
+    "elapsedMs": 371.946181,
+    "sourceHash": "12b085fdf18be9c8267b0e58a66795a72139e74f5707bdeeebc0419653e7219b",
+    "sourceCount": 100,
+    "observationCount": 400,
+    "parametersRecorded": false,
+    "rawSqlRecorded": false
+  },
+  "requestCount": 14,
+  "exportsQualified": false,
+  "sourceHead": "92b14b2f0830e10bcd3453cb698eb96e18478a24",
+  "sourceInputsSha256": "bc654a9436727099be86640cd73b54da80194b0782791490dfc1739d37869fed",
+  "runtimeFingerprint": {
+    "schemaVersion": 1,
+    "nodeVersion": "v24.21.0",
+    "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+    "dist": {
+      "files": 5105,
+      "sha256": "e6f1889a4f3f2d3c96f7df672e0bc19ed0353dad0968cc2ab8ec9d5c710038ab"
+    },
+    "files": {
+      "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+      "prisma/schema.prisma": "55271313c6a9bc1ac763111c3c6c25ab2417c0cce95d5a50e500e71e6d4a28ba",
+      "node_modules/.prisma/client/schema.prisma": "7ebcda72219cb93bb112ecffddc8655f72007fc490bc4c06b256d999b687bf77",
+      "node_modules/.prisma/client/index.js": "47ed6e52ffedd95a414bf7d762bb48857f08cfb4feb3f84bc875cf5e1caa96b7"
+    },
+    "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+  },
+  "processExits": {
+    "postgres": 0,
+    "redis": 0,
+    "api": 0,
+    "c16-http": 1
+  },
+  "invariants": {
+    "cleanupVerified": true,
+    "sourceUnchanged": true,
+    "resumeSourceUnchanged": true,
+    "inputsUnchanged": true
+  },
+  "privateEvidenceSha256": {
+    "c16-runtime-result.json": "72fc69402c8296c935916168c0941036c4d158507e213acff775d2d5cef565b9",
+    "c16-http-result.json": "56c1d8ce9a123be02690045b729fa8666bdcd80e8c71f18ad6cd92dcab045b3e",
+    "c16-http.log": "6ffc576901671d2f7ddf22d1d0f5426d8ba4090c00b3e08b4d433adde4697708",
+    "c16-fixture-private.json": "71f379c8ae156390a288d9239347f1df474bf21d76188741b53e8b2627ed1029",
+    "current-source-inputs.json": "61e8ea6119568a7abbea79042bf2f859a26bd38a2a5562b574d561522c83bc8f"
+  },
+  "diagnostic": {
+    "scope": "Actual dist92b14b2f analysis plus internal export-option safeParse on isolated stopped-HTTP03 PG copy, no job creation",
+    "issuePath": "manifest.actor.id",
+    "issueCode": "invalid_string",
+    "message": "Invalid uuid",
+    "finding": "Accepted existing database/auth teacher identity is non-UUID; internal manifest actor schema rejects it",
+    "processExit": 0,
+    "serviceExits": {
+      "postgres": 0,
+      "redis": 0
+    },
+    "privateEvidenceSha256": {
+      "export-schema.cjs": "4d3321a09b2bd3f2a1944619c84f9728fe96d44f606b852a827ef387967f07b8",
+      "export-schema.log": "82d74c1bf2e0e2e41bf2c9b73844ff6487243a6e38b853216d00582ae6e94f4d",
+      "export-schema-result.json": "05bb2f8320d65cd867e0dacce5175c8929ed1d79a3176611f83cf39edd79f5a1",
+      "input-binding.json": "417df076098ac6109df68e45b726fee8499e8031b0a3a1f7646685cc017e0002"
+    }
+  },
+  "continuation": "Resume exact stopped HTTP04 clone after quality pagination; preserve nested HTTP03/HTTP01 evidence and current SQL-family detail; no passed phase replay"
+}

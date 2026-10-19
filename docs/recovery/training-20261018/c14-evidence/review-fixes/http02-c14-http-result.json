@@ -1,0 +1,112 @@
+{
+  "passed": false,
+  "checks": [],
+  "requests": [
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 318
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 312
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 318
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 288
+    },
+    {
+      "route": "/auth/csrf",
+      "method": "GET",
+      "status": 200,
+      "bytes": 102
+    },
+    {
+      "route": "/auth/training-login",
+      "method": "POST",
+      "status": 200,
+      "bytes": 288
+    },
+    {
+      "route": "/situational/authoring/media/images",
+      "method": "POST",
+      "status": 200,
+      "bytes": 243
+    },
+    {
+      "route": "/situational/authoring/online/drafts",
+      "method": "POST",
+      "status": 200,
+      "bytes": 4937
+    },
+    {
+      "route": "/situational/authoring/drafts/643b6cc1-4545-4796-aec5-db23d52e1fef/request-review",
+      "method": "POST",
+      "status": 200,
+      "bytes": 4941
+    },
+    {
+      "route": "/situational/authoring/drafts/643b6cc1-4545-4796-aec5-db23d52e1fef/review",
+      "method": "POST",
+      "status": 200,
+      "bytes": 4941
+    },
+    {
+      "route": "/situational/authoring/drafts/643b6cc1-4545-4796-aec5-db23d52e1fef",
+      "method": "GET",
+      "status": 200,
+      "bytes": 15078
+    },
+    {
+      "route": "/situational/authoring/releases/adf539cf-9e8a-4d66-9a49-30522e6e27d4/grants",
+      "method": "POST",
+      "status": 400,
+      "bytes": 61
+    }
+  ],
+  "counts": [],
+  "races": [],
+  "allocations": [],
+  "completed": [],
+  "qualification": {
+    "browser": false,
+    "load": false,
+    "cpuOrLatency": false,
+    "sampling": "Natural production crypto draws; bounded at 16; both groups must be observed and every sampled attempt fully answered"
+  }
+}

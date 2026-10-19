@@ -1,0 +1,34 @@
+{
+  "members": [
+    {
+      "name": "receipt.json",
+      "size": 588,
+      "sha256": "c28a9c5ce4c909d7959fc43f04ae54fa5889b1a3fba2eb544cf07ddf4a4aebc7"
+    },
+    {
+      "name": "run01/test-source.cjs",
+      "size": 1620,
+      "sha256": "4d7996abad188ef78e473b159b74ea7577a712c92d3e82130ad33d938af3a8d2"
+    },
+    {
+      "name": "run01/tests.log",
+      "size": 6376,
+      "sha256": "df5b1beb403327d5674abe02928c0beb00482f0aea20e1e9f7793fc2b101c032"
+    },
+    {
+      "name": "run02/inputs.sha256",
+      "size": 457,
+      "sha256": "87a1ce9447258c69848f4eaa81220ba8f69f7b3b154e4d301c584261b3414543"
+    },
+    {
+      "name": "run02/tests.log",
+      "size": 320,
+      "sha256": "488127602bcfdf71f26ecc3393a97bcaec2b268b7780dcaf30ef69b5ed914a57"
+    }
+  ],
+  "archive": {
+    "name": "checkpoint15-qa-bootstrap.tar.gz",
+    "size": 2536,
+    "sha256": "f99480d8a219c2f39aad8dad50f8e316468b1da4b73c892a98adae120fc52705"
+  }
+}

@@ -1,0 +1,3 @@
+v24.21.0
+tsc -p tsconfig.app.json --noEmit
+exit_code=0

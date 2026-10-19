@@ -1,0 +1,100 @@
+[2026-10-18T12:31:17.962Z] [INFO] [Upload] Upload directories configured {
+  imagesDir: '/workspace/scratch/5a77e8bdc1ae/eduk12_c14_resume_full_01/uploads/images',
+  videosDir: '/workspace/scratch/5a77e8bdc1ae/eduk12_c14_resume_full_01/uploads/videos'
+}
+[2026-10-18T12:31:18.060Z] [INFO] [Server] Static files configured {
+  uploadDir: '/workspace/scratch/5a77e8bdc1ae/eduk12_c14_resume_full_01/uploads'
+}
+[2026-10-18T12:31:18.102Z] [INFO] Redis Adapter 已配置 - 支持 PM2 集群模式
+[2026-10-18T12:31:18.103Z] [INFO] Socket.IO 服务已初始化
+[2026-10-18T12:31:18.103Z] [INFO] 课堂命名空间: /classroom
+[2026-10-18T12:31:18.103Z] [INFO] Socket最大连接数限制已启用
+[2026-10-18T12:31:18.103Z] [INFO] 课堂 Socket.IO 事件处理器已初始化
+[2026-10-18T12:31:18.103Z] [INFO] 课堂 Socket.IO 事件处理器已初始化
+[2026-10-18T12:31:18.126Z] [INFO] [CacheService] Redis缓存服务初始化完成
+[2026-10-18T12:31:18.127Z] [INFO] Effective runtime resource config {
+  heapLimitMiB: 2240,
+  prismaConnectionLimit: '6',
+  prismaPoolTimeoutSeconds: '30',
+  admissionOverrides: '[REDACTED]',
+  videoConcurrency: 2,
+  imageConcurrency: 2,
+  exportConcurrency: 1,
+  imageTimeoutSeconds: 30,
+  videoTimeoutSeconds: 1800,
+  exportTimeoutSeconds: 1800,
+  workerShutdownTimeoutSeconds: 30,
+  videoLowPowerMode: true,
+  videoResolution: '480p',
+  videoPreset: 'veryfast',
+  videoCrf: 26,
+  videoBitrate: '800k',
+  videoAudioBitrate: '96k',
+  videoSmartCompression: true
+}
+[2026-10-18T12:31:18.127Z] [INFO] Background media/export workers are disabled for this process
+[2026-10-18T12:31:18.133Z] [INFO] 🚀 Server running on port 50069
+[2026-10-18T12:31:18.133Z] [INFO] 📁 Upload directory: /workspace/scratch/5a77e8bdc1ae/eduk12_c14_resume_full_01/uploads
+[2026-10-18T12:31:18.133Z] [INFO] 📁 Upload directory absolute: /workspace/scratch/5a77e8bdc1ae/eduk12_c14_resume_full_01/uploads
+[2026-10-18T12:31:18.133Z] [INFO] 🌐 Environment: test
+[2026-10-18T12:31:18.133Z] [INFO] 🔌 Socket.IO enabled
+prisma:error 
+Invalid `tx.compositeAssessmentAttempt.findFirst()` invocation in
+/workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/backend/dist/modules/composite/composite.service.js:2610:70
+
+  2607 // 所有登录学生的开始流程先锁住模板行，串行化“查询进行中记录/统计次数/创建记录”。
+  2608 // 复合唯一索引作为第二道防线，避免未来新增入口绕过该锁时产生相同序号。
+  2609 await tx.$queryRaw `SELECT "id" FROM "composite_assessments" WHERE "id" = ${compositeId} FOR UPDATE`;
+→ 2610 const existing = await tx.compositeAssessmentAttempt.findFirst(
+Transaction API error: Transaction not found. Transaction ID is invalid, refers to an old closed transaction Prisma doesn't have information about anymore, or was obtained before disconnecting.
+prisma:error 
+Invalid `db.compositeAssessmentAttempt.update()` invocation in
+/workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/backend/dist/modules/composite/composite.service.js:2554:45
+
+  2551         definitionHash: (0, attempt_runtime_1.formSectionIdentityHash)(compositeFormSectionRuntimeDefinition(section)),
+  2552     })),
+  2553 });
+→ 2554 await db.compositeAssessmentAttempt.update(
+Transaction API error: Transaction already closed: A query cannot be executed on an expired transaction. The timeout for this transaction was 5000 ms, however 5009 ms passed since the start of the transaction. Consider increasing the interactive transaction timeout or doing less work in the transaction.
+prisma:error 
+Invalid `tx.compositeAssessmentAttempt.findFirst()` invocation in
+/workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/backend/dist/modules/composite/composite.service.js:2619:68
+
+  2616 const used = await tx.compositeAssessmentAttempt.count({ where: { compositeAssessmentId: compositeId, userId } });
+  2617 if (used >= composite.maxAttempts)
+  2618     throw (0, composite_errors_1.compositeConflict)('已达到综合测评最大次数');
+→ 2619 const latest = await tx.compositeAssessmentAttempt.findFirst(
+Transaction API error: Transaction already closed: A query cannot be executed on an expired transaction. The timeout for this transaction was 5000 ms, however 5000 ms passed since the start of the transaction. Consider increasing the interactive transaction timeout or doing less work in the transaction.
+prisma:error 
+Invalid `tx.compositeAssessmentAttempt.findFirst()` invocation in
+/workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/backend/dist/modules/composite/composite.service.js:2610:70
+
+  2607 // 所有登录学生的开始流程先锁住模板行，串行化“查询进行中记录/统计次数/创建记录”。
+  2608 // 复合唯一索引作为第二道防线，避免未来新增入口绕过该锁时产生相同序号。
+  2609 await tx.$queryRaw `SELECT "id" FROM "composite_assessments" WHERE "id" = ${compositeId} FOR UPDATE`;
+→ 2610 const existing = await tx.compositeAssessmentAttempt.findFirst(
+Transaction API error: Transaction already closed: A query cannot be executed on an expired transaction. The timeout for this transaction was 5000 ms, however 5000 ms passed since the start of the transaction. Consider increasing the interactive transaction timeout or doing less work in the transaction.
+prisma:error 
+Invalid `tx.compositeAssessmentAttempt.findFirst()` invocation in
+/workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/backend/dist/modules/composite/composite.service.js:2610:70
+
+  2607 // 所有登录学生的开始流程先锁住模板行，串行化“查询进行中记录/统计次数/创建记录”。
+  2608 // 复合唯一索引作为第二道防线，避免未来新增入口绕过该锁时产生相同序号。
+  2609 await tx.$queryRaw `SELECT "id" FROM "composite_assessments" WHERE "id" = ${compositeId} FOR UPDATE`;
+→ 2610 const existing = await tx.compositeAssessmentAttempt.findFirst(
+Transaction API error: Transaction already closed: A query cannot be executed on an expired transaction. The timeout for this transaction was 5000 ms, however 5005 ms passed since the start of the transaction. Consider increasing the interactive transaction timeout or doing less work in the transaction.
+prisma:error 
+Invalid `tx.compositeAssessmentAttempt.findFirst()` invocation in
+/workspace/scratch/5a77e8bdc1ae/eduk12_c14_variants_20261018/server-version/backend/dist/modules/composite/composite.service.js:2610:70
+
+  2607 // 所有登录学生的开始流程先锁住模板行，串行化“查询进行中记录/统计次数/创建记录”。
+  2608 // 复合唯一索引作为第二道防线，避免未来新增入口绕过该锁时产生相同序号。
+  2609 await tx.$queryRaw `SELECT "id" FROM "composite_assessments" WHERE "id" = ${compositeId} FOR UPDATE`;
+→ 2610 const existing = await tx.compositeAssessmentAttempt.findFirst(
+Transaction API error: Transaction already closed: A query cannot be executed on an expired transaction. The timeout for this transaction was 5000 ms, however 5002 ms passed since the start of the transaction. Consider increasing the interactive transaction timeout or doing less work in the transaction.
+[2026-10-18T12:31:25.985Z] [INFO] SIGTERM signal received: closing HTTP server
+[2026-10-18T12:31:25.986Z] [INFO] HTTP server closed
+[2026-10-18T12:31:25.988Z] [INFO] Socket.IO 服务已关闭
+[2026-10-18T12:31:25.990Z] [WARN] [CacheService] Redis客户端已断开
+[2026-10-18T12:31:25.990Z] [INFO] [CacheService] Redis连接已关闭
+[2026-10-18T12:31:25.990Z] [INFO] 队列已关闭

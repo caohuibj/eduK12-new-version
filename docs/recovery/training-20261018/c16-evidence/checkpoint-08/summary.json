@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "phase": "QUALITY_AND_REVOCATION_BOUNDARIES_PASSED_REMAINING_SOURCE_RESTORE_PENDING",
+  "acceptedRuntimeSource": "3f0444a593c21d11a18eacc41f3ab260790b98f4",
+  "productionSourceChanged": false,
+  "qualifiedChecks": 8,
+  "limits": [
+    "HTTP06 retains passed=false: original C14 discovery used the wrong existing actor and correctly returned 404.",
+    "HTTP07 changes only recovery scripts: authentic original owner, isolated poison negative fixture and exact guard restore checks.",
+    "Original facts, missing/incomparable/poison/duplicate and final nonempty restore remain pending."
+  ],
+  "files": [
+    {
+      "file": "c16-http06-summary.json",
+      "bytes": 6809,
+      "sha256": "2600d6f1a00b2b732d58d9c675e24d613ba2022de5a7a9df846f1f6411664c05"
+    }
+  ]
+}

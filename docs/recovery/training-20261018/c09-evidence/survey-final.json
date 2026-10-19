@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "checks": [],
+  "phase": "survey-final",
+  "sourceHead": "badaeeabf53cfb550d6e2fa88844b9f97541faaa",
+  "runtimeFingerprint": {
+    "schemaVersion": 1,
+    "nodeVersion": "v24.21.0",
+    "nodeSha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+    "dist": {
+      "files": 4989,
+      "sha256": "dc47455ab3767e4c58984bce48a013f8fb863a2719ddfb2db2bf45eafe3d3e01"
+    },
+    "files": {
+      "package-lock.json": "c3df482fb21d89c9e9ce381e11a8874cc4ae6e506713507da879c9a0105f9ca6",
+      "prisma/schema.prisma": "33e2a793329c331f3ee5813bc21811688f9aae1e70aaffc44d9341ad4a9fc6fb",
+      "node_modules/.prisma/client/schema.prisma": "3786095e6b9a5477273b36a1842ca7b144daa23aa33fccb0fb3da2c95a16d822",
+      "node_modules/.prisma/client/index.js": "e052f2456ab221af57ad9d4c8d2f34ff931fbceecf03b2a01f6b41b6ed9021f2"
+    },
+    "preloadSha256": "9384031436f2906971fd5b9b4a1d03f87f2e5f27f325e8439e108fe841d5072d"
+  },
+  "harnessSha256": "8b73dbc4e6f80ad95130e3633bf64988bb3716e6e3ca385e0b0a1f5047bdee4c",
+  "testSha256": "849efe8e650f2fce04be8bcdf97dbcec66cd213d2c632206e914449effd57487",
+  "surveyFinal": {
+    "success": true,
+    "numTotalTests": 27,
+    "numPassedTests": 27,
+    "numFailedTests": 0,
+    "numPendingTests": 0
+  },
+  "cleanupVerified": true
+}

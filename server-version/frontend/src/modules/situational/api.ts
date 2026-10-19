@@ -13,11 +13,13 @@ export interface SituationalFinalSubmitPayload {
   instrumentVersion: string
   compiledRuntimeHash: string
   scoringVersion: string
+  responseProtocol?: 'sjt-online-response-v1'
   researchCapture?: SituationalResearchCapture
   responses: Array<{
     sceneKey: string
     channelKey: string
-    responseValue: string | number
+    status?: 'ANSWERED' | 'REFUSED' | 'BLANK'
+    responseValue?: string | number | string[]
     responseTimeMs?: number
     answeredAt?: string
     historyIdentity?: string

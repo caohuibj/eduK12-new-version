@@ -35,6 +35,13 @@ const handleError = (res: Response, err: unknown): Response => {
  * until Scale fields have passed the disclosure projector.
  */
 export const compositeExportController = {
+  async variantAnalysis(req: Request, res: Response) {
+    try {
+      if (!req.user) return unauthorized(res)
+      await service.getExportContext(req.user.userId, req.user.role, req.params.id)
+      return success(res, await compositeExportService.getTrainingVariantTaskAnalysis(req.params.id, {userId: req.user.userId, role: req.user.role}))
+    } catch (err) { return handleError(res, err) }
+  },
   async preview(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
@@ -58,6 +65,7 @@ export const compositeExportController = {
         fieldsAreSampled: true,
         fieldCount: data.fields.length,
         fields: data.fields,
+        ...(data.trainingVariantExport ? {trainingVariantExport: data.trainingVariantExport} : {}),
       })
     } catch (err) { return handleError(res, err) }
   },
@@ -66,7 +74,8 @@ export const compositeExportController = {
     try {
       if (!req.user) return unauthorized(res)
       const input = compositeExportRequestSchema.parse(req.body || {})
-      await service.getExportContext(req.user.userId, req.user.role, req.params.id)
+      const context = await service.getExportContext(req.user.userId, req.user.role, req.params.id)
+      if(input.format==='sav' && context._count.items>0) return error(res,'TYPED_FORM_SAV_NOT_SUPPORTED: typed Form 仅支持 CSV/ZIP 无损导出',-1,400)
       const anonymize = req.user.role === UserRole.ADMIN ? input.anonymize : true
       const binding = await resolveCompositeExportProjectionBinding(req.params.id, 'teacher')
       return success(res, await enqueueExportJob({ resourceType: 'COMPOSITE', resourceId: req.params.id,

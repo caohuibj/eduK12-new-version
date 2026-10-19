@@ -69,11 +69,31 @@ describe('course-scope measurement projection', () => {
     expect(result[0].href).toBe('/student/cognitive/assignments/cog-quota')
   })
 
-  it('does not fetch a disabled cognitive capability', async () => {
+  it('fetches historical records but hides unstarted cognitive tasks when disabled', async () => {
     const result = await loadCourseAssessments(course, false)
     expect(result.errors).toEqual([])
     expect(result.items.some(item => item.kind === 'cognitive')).toBe(false)
-    expect(myCognitive).not.toHaveBeenCalled()
+    expect(myCognitive).toHaveBeenCalledTimes(1)
+  })
+
+  it('OFF links stored current/history sessions directly without offering new starts', async () => {
+    myCognitive.mockResolvedValue({ code:0, data:[
+      { id:'active', courseId:course, title:'已准入', status:'PUBLISHED', continueHref:'/student/cognitive/sessions/accepted' },
+      { id:'done', courseId:course, title:'历史', status:'PUBLISHED', latestCompletedSessionId:'completed' },
+      { id:'new', courseId:course, title:'未开始', status:'PUBLISHED' },
+    ] })
+    const rows=(await loadCourseAssessments(course,false)).items.filter(item=>item.kind==='cognitive')
+    expect(rows.map(row=>row.href)).toEqual(['/student/cognitive/sessions/accepted','/student/cognitive/sessions/completed/result'])
+    expect(rows.map(row=>row.action)).toEqual(['继续测评','查看反馈'])
+  })
+
+  it('retains an unadmitted shell as paused without a runner or start link', () => {
+    const rows=projectCourseAssessments(course,[],[],[{ id:'shell',courseId:course,title:'等待恢复',status:'PUBLISHED',admissionPaused:true } as any],[{
+      ...composite('shell-composite',course),canContinue:false,canStartNewAttempt:false,admissionPaused:true,
+      attempt:{id:'shell-parent',status:'IN_PROGRESS',progress:0.5},
+    }],false)
+    expect(rows).toHaveLength(2)
+    expect(rows.every(row=>row.href===null && row.status==='暂不可用，重新开放后继续')).toBe(true)
   })
 
   it('does not turn a blocked assessment into an enabled start link', () => {
@@ -114,4 +134,22 @@ describe('course-scope measurement projection', () => {
     expect(result.errors[0]).toMatch(/课程量表读取失败/)
     expect(result.items.some(item => item.name === '仍可填写')).toBe(true)
   })
+})
+
+it.each([false, true])('preserves report and historical qualification in Training course cards: satisfied=%s', (hasSatisfiedAttempt) => {
+  const [row] = projectCourseAssessments(course, [], [], [], [{ ...composite('q', course),
+    canStartNewAttempt: false, hasSatisfiedAttempt,
+    attempt: { id: 'new', status: 'COMPLETED', progress: 100 },
+    latestCompletedAttempt: { id: 'new', status: 'COMPLETED', progress: 100, taskSatisfied: false },
+  }])
+  expect(row).toMatchObject({ status: hasSatisfiedAttempt ? '任务已达成' : '已交卷，任务未达成', href: '/student/composite/attempts/new/report', action: '查看反馈' })
+  expect(row.taskSatisfactionLabel).toBe(hasSatisfiedAttempt ? '本次未达成，历史达成仍保留' : '本次作答已保存并计入次数，可查看报告。')
+})
+
+it('uses the authorized retry allowance and never presents a submitted attempt as resumable', () => {
+  const [row] = projectCourseAssessments(course, [], [], [], [{ ...composite('q', course),
+    hasSatisfiedAttempt: false, canStartNewAttempt: true,
+    latestCompletedAttempt: { id: 'submitted', status: 'COMPLETED', progress: 100, taskSatisfied: false },
+  }])
+  expect(row).toMatchObject({ status: '已交卷，任务未达成', href: '/student/composite/q', action: '再次测评', reportHref: '/student/composite/attempts/submitted/report' })
 })

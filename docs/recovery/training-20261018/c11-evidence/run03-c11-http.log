@@ -1,0 +1,10 @@
+PASS Formal upload and separate-admin publication; admin self-review and nonowner access rejected
+PASS teacher_self_report rejected by course authoring without attempt writes
+PASS Nonmember and cross-course student admission rejected without parent/child/job writes
+PASS Nonowner embedded read/FINAL denied without writes
+PASS Member start/resume, frozen FINAL/replay, one raw and canonical fact, parent and teacher report
+PASS Original export queue csv: exact canonical identities/metrics, no raw responses, owner-only download
+PASS Original export queue zip: exact canonical identities/metrics, no raw responses, owner-only download
+PASS Uploaded student SJT anonymous FINAL/replay/public report and unchanged E=3 oracle
+PASS Real retirement lock blocks first embedded admission; rollback leaves no parent/child/job; admitted frozen attempt and completed report survive retirement
+PASS Builtin anonymous start/recovery/FINAL/replay/public report and missing-recovery denial remain valid

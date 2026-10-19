@@ -120,3 +120,16 @@ describe('student task aggregate', () => {
     expect(result.list[0]).toMatchObject({ id: 'new', courses: [{ id: 'c', title: '课程' }], state: 'PENDING', href: '/student/composite/new' })
   })
 })
+
+
+describe('C06 submitted versus task-satisfied', () => {
+  it.each([false, true])('keeps report links without reopening submission; historical satisfaction=%s', async (hasSatisfiedAttempt) => {
+    available.mockResolvedValue([{ id: 'q', name: '问卷', course: { id: 'c' }, opensAt: null, expiresAt: null,
+      availability: 'OPEN', canContinue: false, canStartNewAttempt: false, hasSatisfiedAttempt,
+      attempt: { id: 'new', status: 'COMPLETED', taskSatisfaction: 'NOT_SATISFIED' }, latestCompletedAttempt: { id: 'new' } }])
+    const result = await listStudentTasks('student', { page: 1, pageSize: 20 }, now)
+    expect(result.list[0]).toMatchObject({ state: hasSatisfiedAttempt ? 'COMPLETED' : 'SUBMITTED_NOT_SATISFIED', hasSatisfiedAttempt, canContinue: false, canStart: false, href: '/student/composite/attempts/new/report' })
+    expect(result.counts.ACTIONABLE).toBe(0)
+    expect(result.counts.SUBMITTED_NOT_SATISFIED).toBe(hasSatisfiedAttempt ? 0 : 1)
+  })
+})

@@ -1,3 +1,4 @@
+import { BasicFormAnswer } from './BasicFormAnswer'
 import type { ProfessionalAnswer, ProfessionalQuestion } from './types'
 
 /** Shared participant/editor renderer for the frozen V2 Form answer shapes.
@@ -13,14 +14,21 @@ export function ProfessionalFormAnswer({question:q,answers,onAnswer,prefix}:{
   onAnswer:(key:string,value:ProfessionalAnswer)=>void;prefix:string
 }){
   const current=answers[q.itemKey]
-  if(q.type==='DATE'||q.type==='TIME')return <div className="space-y-1">
-    <input className="input block w-full" type={q.type==='DATE'?'date':'time'}
-      aria-label={q.prompt} value={typeof current==='string'?current:''}
-      disabled={refused(current)}
-      onChange={e=>onAnswer(q.itemKey,e.target.value||null)}/>
-    {q.type==='TIME'&&<p className="text-xs text-slate-600">
-      时间解释时区：{q.timeZone==='UTC'?'UTC':'中国标准时间（UTC+08:00）'}；请填写 24 小时制。</p>}
-  </div>
+  if(q.type==='DATE'||q.type==='TIME')return <BasicFormAnswer question={{...q,type:q.type}} value={typeof current==='string'?current:null} disabled={refused(current)} onChange={value=>onAnswer(q.itemKey,value)}/>
+  if(q.type==='LIKERT'||q.type==='MATRIX'){
+    const rows=q.type==='MATRIX'?(q.rows??[]):[{rowKey:'',label:q.prompt}]
+    return <div className="space-y-3">{rows.map(row=>{
+      const key=q.type==='MATRIX'?q.itemKey+':'+row.rowKey:q.itemKey
+      return <fieldset key={key} className="rounded border p-3 space-y-2">
+        <legend className="font-medium text-sm">{row.label}</legend>
+        {q.options.map(o=><label key={o.optionKey} className="flex items-center gap-2 text-sm">
+          <input type="radio" name={prefix+'-'+key} value={o.optionKey}
+            checked={answers[key]===o.optionKey} disabled={refused(answers[key])}
+            onChange={()=>onAnswer(key,o.optionKey)}/>{o.label}
+        </label>)}
+      </fieldset>
+    })}</div>
+  }
   if(q.type==='RANK_ORDER'){
     const all=q.options.map(o=>o.optionKey)
     const order=Array.isArray(current)&&current.length===all.length&&

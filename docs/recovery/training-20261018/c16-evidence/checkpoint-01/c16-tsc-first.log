@@ -1,0 +1,18 @@
+src/modules/training-analysis/service.ts(77,90): error TS2339: Property 'dictionary' does not exist on type 'TrainingAnalysisTableV1'.
+src/modules/training-analysis/source.ts(65,52): error TS18047: 'principal' is possibly 'null'.
+src/modules/training-analysis/source.ts(149,9): error TS18047: 'report' is possibly 'null'.
+src/modules/training-analysis/source.ts(240,51): error TS18048: 'slot' is possibly 'undefined'.
+src/modules/training-analysis/source.ts(261,109): error TS18048: 'runtime' is possibly 'undefined'.
+src/modules/training-analysis/source.ts(261,151): error TS18048: 'runtime' is possibly 'undefined'.
+src/modules/training-analysis/source.ts(267,27): error TS18047: 'result' is possibly 'null'.
+src/modules/training-analysis/source.ts(268,43): error TS18048: 'storedMetric' is possibly 'undefined'.
+src/modules/training-analysis/source.ts(269,46): error TS18048: 'runtime' is possibly 'undefined'.
+src/modules/training-analysis/source.ts(269,161): error TS18048: 'runtime' is possibly 'undefined'.
+src/modules/training-analysis/source.ts(270,180): error TS18048: 'runtime' is possibly 'undefined'.
+src/modules/training-analysis/source.ts(273,48): error TS18048: 'storedMetric' is possibly 'undefined'.
+src/modules/training-analysis/source.ts(274,104): error TS18047: 'report' is possibly 'null'.
+src/modules/training-analysis/source.ts(278,88): error TS18048: 'storedMetric' is possibly 'undefined'.
+src/modules/training-analysis/source.ts(279,27): error TS18048: 'storedMetric' is possibly 'undefined'.
+src/modules/training-analysis/source.ts(279,49): error TS18048: 'storedMetric' is possibly 'undefined'.
+src/modules/training-analysis/source.ts(280,74): error TS18048: 'storedMetric' is possibly 'undefined'.
+src/modules/training-analysis/source.ts(280,128): error TS18048: 'storedMetric' is possibly 'undefined'.

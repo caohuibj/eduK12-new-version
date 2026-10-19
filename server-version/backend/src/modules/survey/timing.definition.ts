@@ -2,19 +2,9 @@ import {z} from 'zod'
 import type {ResearchFrozenPublication} from './publication.service'
 import type {ScaleDraft} from './builder.definition'
 
-/** Browser-observed foreground timings are descriptive research provenance,
- * never a server-verified attention measure or an input to a scorer. */
-export const surveyScaleTimingItemSchema=z.object({
-  schemaVersion:z.literal(1),
-  firstResponseMs:z.number().int().min(0).max(86400000).nullable(),
-  activeTimeMs:z.number().int().min(0).max(86400000),
-  changeCount:z.number().int().min(0).max(10000),
-  revisitCount:z.number().int().min(0).max(10000),
-  visits:z.number().int().min(0).max(10000),
-  interrupted:z.boolean(),
-  recoveredWithoutClock:z.boolean(),
-}).strict()
-export type SurveyScaleItemTimingV1=z.infer<typeof surveyScaleTimingItemSchema>
+export {scaleTimingItemSchema as surveyScaleTimingItemSchema} from '../assessment-core/scale/item-timing'
+import {scaleTimingItemSchema as surveyScaleTimingItemSchema,type ScaleItemTimingV1 as SurveyScaleItemTimingV1} from '../assessment-core/scale/item-timing'
+export type {ScaleItemTimingV1 as SurveyScaleItemTimingV1} from '../assessment-core/scale/item-timing'
 export type SurveyScaleTimings=Record<string,Record<string,SurveyScaleItemTimingV1>>
 export class SurveyScaleTimingError extends Error{
   constructor(readonly path:string,message:string){super(message)}

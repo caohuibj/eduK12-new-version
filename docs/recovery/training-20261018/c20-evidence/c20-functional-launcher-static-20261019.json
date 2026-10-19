@@ -1,0 +1,12 @@
+{
+  "scope": "STATIC_RECEIPT_VALIDATION_ONLY",
+  "inputs": {
+    "c20-materials-http.py": "8e030340469084b5e9edced397a9e17a4355d084945b8d8fb2f2def5008ed369",
+    "c20-materials-receipts.py": "2518bccc994c63647d117b13ceffde55d3a5bc05531cd6376bbfd6ebe0e811ab",
+    "c20-materials-receipts-check.py": "f839ff4041639364e2dc765bc79790a4e16d9720067acd89297794da583bf5b2",
+    "c20-materials-README.md": "f2aad4fdaa07191bdd12d33c35fb765e98a83eff42ab0d830ca51b87285e9ff9"
+  },
+  "exitCode": 0,
+  "stdout": "{\n  \"passed\": true,\n  \"scope\": \"STATIC_RECEIPT_VALIDATION_ONLY\",\n  \"checks\": [\n    \"legacy exact continuation and explicitly unknown reused upgrade\",\n    \"missing continuation marker rejected\",\n    \"frozen producer hash mismatch rejected\",\n    \"multiple new phases rejected\",\n    \"incorrect exact runtime receipt rejected\",\n    \"second import preserves actual legacy producer and receipt chain\",\n    \"mapped phase result mismatch rejected\",\n    \"explicit target permits later newly executed phases\",\n    \"wrong explicit continuation phase rejected\",\n    \"falsely reused continuation target rejected\",\n    \"missing predecessor receipt rejected\",\n    \"mismatched predecessor receipt rejected\",\n    \"mismatched failed phase receipt rejected\",\n    \"failed explicit continuation imports only previously accepted phases\",\n    \"failed continuation file hash mismatch rejected\",\n    \"functional checkpoint preserves false efficiency and excludes failed cost\",\n    \"functional checkpoint cannot claim overall pass\",\n    \"functional checkpoint failed-result pin mismatch rejected\"\n  ]\n}\n",
+  "stderr": ""
+}
