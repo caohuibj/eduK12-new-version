@@ -16,6 +16,7 @@ const stable=value=>JSON.stringify(value,(_key,v)=>v&&typeof v==='object'&&!Arra
 const digest=value=>sha(stable(value))
 const copy=value=>JSON.parse(JSON.stringify(value,(_key,v)=>typeof v==='bigint'?v.toString():v))
 const hash=value=>assert.match(value,/^[a-f0-9]{64}$/)
+const nullableHash=value=>{if(value!==null)hash(value)}
 const nonempty=value=>{assert.equal(typeof value,'string');assert.ok(value.length>0);return value}
 const resultFields=['resultSnapshotEncrypted','scoreEncrypted','qualityFlagsEncrypted']
 const headerFields=['aggregateInputHash','attemptEpoch','contextHash','slotSetHash','status']
@@ -70,7 +71,7 @@ export function immutableFixtureIdentity(f){
       attemptId:nonempty(c.attemptId),attemptEpoch:c.attemptEpoch,courseId:nonempty(c.courseId),
       accessTokenId:c.accessTokenId,roundId:c.roundId,contextSnapshotHash:c.contextSnapshotHash,
       children:copy(c.children),slotsSha256:digest(c.slots)}
-    assert.ok(Number.isSafeInteger(c.attemptEpoch)&&c.attemptEpoch>0);hash(c.contextSnapshotHash)
+    assert.ok(Number.isSafeInteger(c.attemptEpoch)&&c.attemptEpoch>0);nullableHash(c.contextSnapshotHash)
   }
   assert.equal(new Set(Object.values(cases).map(c=>c.attemptId)).size,4)
   assert.equal(cases.A.mode,'IMMEDIATE');assert.equal(cases.B.participant,'AUTHENTICATED')
@@ -93,7 +94,8 @@ function databaseCaseBinding(rows,identity){
     assert.equal(row.userId,['A','B'].includes(name)?identity.studentId:null)
     assert.equal(row.status,name==='D'?'IN_PROGRESS':'COMPLETED')
     const p=row.compositeAssessment
-    for(const field of ['trainingFeedbackSnapshotHash','trainingPersistenceSnapshotHash','frozenActiveSlotSetHash','contextSnapshotHash'])hash(row[field])
+    for(const field of ['trainingFeedbackSnapshotHash','trainingPersistenceSnapshotHash','frozenActiveSlotSetHash'])hash(row[field])
+    nullableHash(row.contextSnapshotHash)
     hash(p.trainingFeedbackPolicyHash);hash(p.trainingPersistencePolicyHash)
     assert.equal(digest(row.trainingFeedbackSnapshot),row.trainingFeedbackSnapshotHash)
     assert.equal(digest(row.trainingPersistenceSnapshot),row.trainingPersistenceSnapshotHash)
@@ -323,11 +325,21 @@ async function probe(state,mode,require,inputBinding,fixtureBytes,identity,statu
   console.log('PASS C25 '+mode+' real compiled consumer observations; single-row query-shape proof only')
 }
 
+let entryContext=null
 async function main(){
   process.umask(0o077)
   const [stateArg,flag,mode,...extra]=process.argv.slice(2)
   assert.equal(flag,'--mode');assert.ok(['closed','open','finalize'].includes(mode));assert.equal(extra.length,0)
   const state=path.resolve(nonempty(stateArg)),require=createRequire(path.join(backend,'package.json'))
+  assert.equal(path.dirname(state),path.dirname(repo),'Consumer evidence must be in its dedicated scratch state')
+  assert.match(path.basename(state),/^eduk12_c25_(?:http|continuation)_[0-9]{2}$/)
+  for(let current=state;;current=path.dirname(current)){
+    assert.equal(fs.lstatSync(current).isSymbolicLink(),false,'Consumer state alias is forbidden')
+    if(current===path.dirname(current))break
+  }
+  const stateInfo=fs.lstatSync(state)
+  assert.ok(stateInfo.isDirectory());assert.equal(stateInfo.mode&0o777,0o700);assert.equal(stateInfo.uid,process.getuid())
+  entryContext={state,mode}
   const inputBinding=currentInputs(state,require),fixtureBytes=readPrivate(state,'c25-fixture-private.json'),identity=immutableFixtureIdentity(JSON.parse(fixtureBytes))
   if(mode==='finalize'){
     const privateFiles=Object.fromEntries(['closed','open'].flatMap(phase=>['fixture','observations'].map(kind=>{
@@ -350,5 +362,9 @@ async function main(){
   await probe(state,mode,require,inputBinding,fixtureBytes,identity,status)
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url))await main().catch(error=>{
+  // Pre-probe failures must also retain their original stack privately. Never
+  // overwrite an earlier failure or expose raw fixture/SQL details on stdout.
+  try{if(entryContext)writePrivate(entryContext.state,`c25-consumer-${entryContext.mode}-entry-error-private.log`,Buffer.from(String(error.stack??error)))}
+  catch(journalError){console.error(JSON.stringify(publicFailure(journalError)))}
   console.error(JSON.stringify(publicFailure(error)));process.exitCode=1
 })

@@ -3,6 +3,9 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
+import path from 'node:path'
+import {fileURLToPath} from 'node:url'
+import {spawnSync} from 'node:child_process'
 import {createHash} from 'node:crypto'
 import {createRequire} from 'node:module'
 import {knownResultCiphertexts,isKnownResultCipher,observeResultDecrypt,assertConsumerPhaseBounds,
@@ -34,7 +37,7 @@ function dbRows(f){
     const feedback={attemptId:c.attemptId,attemptEpoch:1,roundId:c.roundId,policy:feedbackPolicy,policyHash:digest(feedbackPolicy)}
     const persistence={attemptId:c.attemptId,attemptEpoch:1,roundId:c.roundId,policy:persistencePolicy}
     return {id:c.attemptId,userId:['A','B'].includes(c.name)?'student':null,status:c.name==='D'?'IN_PROGRESS':'COMPLETED',attemptEpoch:1,asyncReportEpoch:c.name==='D'?null:1,
-      compositeAssessmentId:c.compositeId,deliveryCourseId:'course',accessTokenId:c.accessTokenId,contextSnapshotHash:h,frozenActiveSlotSetHash:h,aggregateInputHash:c.name==='D'?null:h,
+      compositeAssessmentId:c.compositeId,deliveryCourseId:'course',accessTokenId:c.accessTokenId,contextSnapshotHash:c.contextSnapshotHash,frozenActiveSlotSetHash:h,aggregateInputHash:c.name==='D'?null:h,
       trainingFeedbackSnapshot:feedback,trainingFeedbackSnapshotHash:digest(feedback),trainingPersistenceSnapshot:persistence,trainingPersistenceSnapshotHash:digest(persistence),
       compositeAssessment:{id:c.compositeId,publishedAt:t0,trainingFeedbackPolicy:feedbackPolicy,trainingFeedbackPolicyHash:digest(feedbackPolicy),trainingPersistencePolicy:persistencePolicy,trainingPersistencePolicyHash:digest(persistencePolicy)},
       scaleAssessments:[{id:c.children.scaleId}],cognitiveSessions:c.children.cognitiveSessionId?[{id:c.children.cognitiveSessionId}]:[],
@@ -43,7 +46,7 @@ function dbRows(f){
   })
 }
 function records(mode,f){
-  const rows=dbRows(f),parent=rows.find(r=>r.id==='B'),job={status:'READY',attemptEpoch:1,slotSetHash:h,contextHash:h,aggregateInputHash:h}
+  const rows=dbRows(f),parent=rows.find(r=>r.id==='B'),job={status:'READY',attemptEpoch:1,slotSetHash:h,contextHash:parent.contextSnapshotHash,aggregateInputHash:h}
   const known={id:'cognitive-B',userId:'student',status:'COMPLETED',compositeAttemptId:'B',resultSnapshotEncrypted:'exact-result-cipher',scoreEncrypted:null,qualityFlagsEncrypted:null}
   const event=(query,params='[]')=>({query,params,duration:1})
   const call=(model,action,args,result)=>({params:{model,action,args},result,error:null})
@@ -130,6 +133,51 @@ test('fixture identity excludes mutable progress and secrets but preserves all f
   assert.deepEqual(immutableFixtureIdentity(f),first);assert.ok(!JSON.stringify(first).includes('private-'));assert.ok(!JSON.stringify(first).includes('password'))
   f.cases.B.children.cognitiveSessionId='different';assert.notDeepEqual(immutableFixtureIdentity(f),first)
   delete f.cases.D;assert.throws(()=>immutableFixtureIdentity(f))
+})
+test('nullable context matches the real fixture contract and exact database binding without accepting missing or malformed values',()=>{
+  // Real A/B/C/D recorded explicit null. The prior all-hash fixture missed it.
+  for(const value of [null,h]){
+    const f=fixture();for(const c of Object.values(f.cases))c.contextSnapshotHash=value
+    const identity=immutableFixtureIdentity(f)
+    for(const mode of ['closed','open']){
+      const proof=analyzeConsumerRecords(mode,records(mode,f),identity)
+      for(const name of ['A','B','C','D'])assert.equal(proof.dbBinding[name].contextSnapshotHash,value)
+      const drift=records(mode,f);drift[1].value[1].contextSnapshotHash=value===null?h:null
+      assert.throws(()=>analyzeConsumerRecords(mode,drift,identity),'DB and fixture must retain exact null/string equality')
+      for(const bad of [undefined,'','x','g'.repeat(64),'a'.repeat(63)]){
+        const altered=records(mode,f);altered[1].value[1].contextSnapshotHash=bad
+        const expected=copy(identity);expected.cases.B.contextSnapshotHash=bad
+        assert.throws(()=>analyzeConsumerRecords(mode,altered,expected),'DB nullable hash guard remains strict even when both sides match')
+      }
+    }
+  }
+  for(const bad of [undefined,'','x','g'.repeat(64),'a'.repeat(63)]){
+    const f=fixture();f.cases.B.contextSnapshotHash=bad;assert.throws(()=>immutableFixtureIdentity(f))
+  }
+  const missing=fixture();delete missing.cases.B.contextSnapshotHash;assert.throws(()=>immutableFixtureIdentity(missing))
+})
+test('pre-probe CLI rejection retains a private original stack and redacts public output without loading products',()=>{
+  const directory=path.dirname(fileURLToPath(import.meta.url)),repo=path.resolve(directory,'../../..')
+  const state=path.join(path.dirname(repo),'eduk12_c25_continuation_99')
+  assert.equal(fs.existsSync(state),false,'Dedicated pure fault state must not already exist')
+  fs.mkdirSync(state,{mode:0o700})
+  try{
+    fs.writeFileSync(path.join(state,'frozen-inputs.json'),JSON.stringify({head:'0'.repeat(40)}),{mode:0o600,flag:'wx'})
+    const child=spawnSync(process.execPath,[path.join(directory,'c25-consumers.mjs'),state,'--mode','closed'],{encoding:'utf8',timeout:15000})
+    assert.equal(child.status,1);assert.equal(child.signal,null)
+    const file=path.join(state,'c25-consumer-closed-entry-error-private.log'),info=fs.lstatSync(file),raw=fs.readFileSync(file,'utf8')
+    assert.equal(info.mode&0o777,0o600);assert.equal(info.nlink,1)
+    assert.match(raw,/AssertionError/);assert.match(raw,/currentInputs/)
+    assert.doesNotMatch(child.stdout+child.stderr,/currentInputs|0000000000000000000000000000000000000000/)
+    assert.equal(fs.existsSync(path.join(state,'c25-consumer-closed-result.json')),false)
+    assert.deepEqual(fs.readdirSync(state).sort(),['c25-consumer-closed-entry-error-private.log','frozen-inputs.json'])
+  }finally{
+    // Only these three test-created paths are removed, never a runtime state.
+    for(const name of ['c25-consumer-closed-entry-error-private.log','frozen-inputs.json']){
+      const file=path.join(state,name);if(fs.existsSync(file))fs.unlinkSync(file)
+    }
+    fs.rmdirSync(state)
+  }
 })
 test('single-row observations expose actual counts and explicitly make no N+1, performance or capacity claim',()=>{
   const f=fixture(),identity=immutableFixtureIdentity(f)

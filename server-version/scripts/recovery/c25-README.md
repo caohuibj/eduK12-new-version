@@ -439,7 +439,8 @@ frontend receipt hashes. Data and private evidence still reject hardlinks. One
 new targeted fault accepts that exact topology and rejects data aliases and
 byte/inode/link-count drift; receipt `continuation-contract-03/receipt.json`,
 SHA `3aed1d8c16505056247e6684c30193bd329d90378553bbc1f87bd3d6f8e7b956`.
-Earlier successful checks were not replayed; no archive retry has occurred.
+Earlier successful checks were not replayed. The subsequently approved single
+archive retry is recorded below.
 
 After this fix is frozen and reviewed, the newly approved descriptor destination
 is `/tmp/c25-source-05`, using the unchanged issuer and validator with their full
@@ -474,6 +475,71 @@ unchanged:
 
 Pure fault tests are preparation evidence only; neither these commands nor this
 document authorize archive creation, database startup or qualification.
+
+### Executed continuation 01 and nullable-context correction
+
+At clean `77369f280e42032222d00524c8522c92dff5e22a`, the ordinary source05
+descriptor was issued under `/tmp/c25-source-05` with SHA
+`401d08907740da6574b316de26d72db8a78245c456e6375288e86eb1a32c25f7`.
+Its full HTTP03 manifests retain the prior exact bytes. The separately approved
+archive retry completed full extraction and bytes/metadata comparison in
+64.46 seconds. Recovery descriptor SHA
+`3c312d06aa1d967584ada480a35fd6eacb13a3a6ed4d520ae25fe3abf239ae3d`,
+archive receipt SHA
+`6b91c32683de736ed00cdd142b464c7a9c4c8d4785860916311a73bd3ab22c58`,
+and the 248,850,312-byte archive SHA
+`01971f7679d20c3da9cacb2a673f6629ba57160c5db6590ff766e438d38133f8`
+remain under `/tmp/c25-continuation-recovery-01`. All 21,546 source entries had
+empty xattrs and no extended ACLs. GNU tar reported basic/default ACL ENOTSUP on
+tmpfs; restored modes and empty xattr inventories matched exactly. This does not
+qualify restoration of nonempty ACLs. Original raw data was not removed, and
+these recovery materials remain node-local temporary storage.
+
+The authorized `eduk12_c25_continuation_01` then stopped **overall false**:
+receipt SHA `16293c2c79b377c36fe665e260d8f45c43941df89d003e7be993925905a50f08`.
+Upgrade and immediate A were inherited, not repeated. New formal SJT resource/
+grant preparation passed. B/C each accepted four typed FINALs and exact replays;
+the one original shared drain observed both jobs PENDING/attemptCount 0/
+budgetHeld true become READY/attemptCount 1/budgetHeld false, with COMPLETED
+parents, four accepted snapshots each, checkpoint revision 5→6, saveCount 1
+preserved, and payload/hash/expiry cleared. D saved without FINAL. The closed
+HTTP matrix ran, but the independent compiled consumer rejected its fixture
+before opening a database connection. Scheduled has **no overall PASS**, no
+`closedFinishedAt`, and no successful compiled closed observation. Its separate
+143-request journal and catch-time PostgreSQL observation at
+`2026-10-19T10:27:39.104Z` may support only the actually completed HTTP subchecks;
+neither natural opening nor the missing open/guards/consumer/restore work ran.
+
+Cleanup and final full-row audit passed. All original 6,529 rows/16 checkpoints
+and failed-run 6,582 rows/17 checkpoints survived without column exemptions.
+The new stopped final has 6,651 rows/20 checkpoints, snapshot SHA
+`cae493b8a6d6c62a34a9d181822d22cd927fa5c1081666cd8fb049cefa91d1cf`.
+API/Redis/PostgreSQL exited 0; the scheduled child exited 1. HTTP03, old failure
+nondata evidence, recovery archive and input bindings remained unchanged.
+Observed minimum workspace free was 9,014,710,272 bytes and MemAvailable was
+6,540,275,712 bytes; these are safety observations, not capacity results.
+
+The defect is consumer-only: real A/B/C/D all have an explicit null
+`contextSnapshotHash`, which the nullable product schema and FINAL contract
+permit. Fixture `retain` faithfully recorded it. The consumer incorrectly
+required a 64-hex string at both immutable fixture and database-row validation.
+Both now accept **explicit null or a 64-lowercase-hex hash**; missing/undefined,
+empty and malformed values still fail, and database↔fixture exact equality is
+unchanged. No hash is invented and no product/schema/helper/producer is changed.
+Pre-probe exceptions now retain a mode-0600 original stack in the validated
+private scratch state while public output remains redacted.
+
+Only two new no-service faults ran: nullable fixture plus closed/open DB-binding
+contract (including mismatches and malformed values), and actual CLI pre-probe
+failure journaling/redaction. Both passed in 0.304 seconds with full input copies
+and equal before/after closure; `/tmp/c25-consumer-null-contract-01/receipt.json`
+SHA `36782fc40b41902478944ced814ac421c7829121e21684743242b3e53e30313d`, raw log
+SHA `a3f6624967dc19bead73c2ef48422307809f9bbbda903d796236ce6ff8f17fff`.
+An earlier wrapper indentation error happened before lock/test execution; its
+original wrapper and honestly transcribed diagnostic are retained separately.
+The old 13 consumer tests were not replayed. Future missing-only runtime work
+needs its own reviewed receipt/adapter, protection of the new 6,651-row state,
+and separate authorization; old false receipts cannot be rewritten as passed.
 
 ## Remaining C25 release work
 
