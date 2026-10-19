@@ -157,3 +157,9 @@ checkpoint13-efficiency-after.tar.gz含24个脱敏成员，1404676B，SHA f3323c
 最终按文件producer去重为run01的11文件159项加run02的5文件85项，共16文件244项。不得将215+85相加。复用的completion/integration/composite-report/results与snapshot PG在本套件显式配置认知开关；其余纯扫描/marker、context freeze、Scale-only whole/batch、cohort隐私统计路径不依赖认知新准入开关。重试仅纠正相关业务开关；本地端口/密码及合成crypto fixture值保持隔离，不称全部环境与CI逐字相同。两run源码manifest前后相同、服务清理成功，无新生产构建或整套回归资格。
 
 checkpoint14-ci-fixture-fixes.tar.gz含18成员，533759B，SHA 5e07b3ebf70703be955a2371d2ae4fc908db10e6b9cd23cc11de609951d0beeb。保存原失败inventory、两轮测试结果/日志、输入patch/源码manifest、明确producer资格和runner；排除PG数据、口令与私有配置。独立源码review已完成，正式CI重验与PR合并由root执行；本定向通过不代表整套CI已经通过。
+
+### CI69 QA round3 bootstrap修正
+
+官方head b9d64763的QA round3在首次“选项3”定位超时。原bare esbuild仅替换DEV，新增CapabilitiesContext→cognitive/feature静态依赖生成import_meta2={}后读取env.VITE_COGNITIVE_MODULE_ENABLED，尚未render已抛异常。官方artifact的失败bundle保留；本地VM独立复现旧定义抛错，显式构建认知flag为"true"后得到true，符合此认知UI合成fixture及官方job。生产runtime capabilities和UI断言不变。
+
+共享harness define仍仅列三个精确键；完整实际fixture构建验证无未解析import.meta.env读取。两项定向模块/build检查通过，measurement lock内0.36秒；首本地检查因write:false的CSS构建漏outfile失败，旧日志及源保留，随后修测试输出路径，未改fixture产品行为。浏览器交互仍由正式CI执行，不以静态检查授browser GO。失败路径现在持久化status=FAIL和实际pageErrors，保留原throw/失败退出，便于区分bootstrap和定位器错误。checkpoint15保留两轮记录/绑定及前端源码与官方head一致证明。
