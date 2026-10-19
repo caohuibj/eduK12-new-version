@@ -8,7 +8,7 @@ import {MATERIAL_PYTHON as oldMaterials} from './c25-analysis-resume.mjs'
 export const MATERIAL_PROGRAM=oldMaterials.replaceAll('eduk12_c25_analysis_02/c25-analysis-resume-material-audit-result.json','eduk12_c26_a_04/c25-c26-material-audit-result.json').replaceAll('ARCHIVE_PYTHON','pythonProgram')
 export const RUN_PYTHON=String.raw`
 MATERIAL_PROGRAM=${JSON.stringify(MATERIAL_PROGRAM)}
-import argparse,ctypes,fcntl,hashlib,importlib.util,json,os,re,shutil,signal,socket,stat,subprocess,sys,threading,time,traceback
+import argparse,ctypes,errno,fcntl,hashlib,importlib.util,json,os,re,shutil,signal,socket,stat,subprocess,sys,threading,time,traceback
 from pathlib import Path
 from urllib.parse import urlparse
 sys.dont_write_bytecode=True
@@ -56,18 +56,53 @@ def proc(pid):
  raw=Path('/proc',str(pid),'stat').read_text();parts=raw[raw.rfind(') ')+2:].split()
  assert len(parts)>21
  return {'pid':int(raw.split(' ',1)[0]),'startTicks':parts[19],'processGroupId':int(parts[2]),'parentPid':int(parts[1]),'state':parts[0]}
+def proc_disappeared(error):return isinstance(error,OSError) and error.errno in (errno.ENOENT,errno.ESRCH)
+def proc_absent(pid):
+ try:Path('/proc',str(pid)).stat()
+ except OSError as error:
+  if not proc_disappeared(error):raise
+  return True
+ return False
+class ProcessTable(dict):pass
 def process_table():
- rows={}
+ rows=ProcessTable();rows.disappearances=[]
  for p in Path('/proc').iterdir():
   if not p.name.isdigit():continue
   try:row=proc(int(p.name))
-  except FileNotFoundError:continue # A vanished unrelated process is not an empty owned group.
+  except OSError as error:
+   if not proc_disappeared(error):raise
+   assert len(rows.disappearances)<128,'per-scan process disappearance evidence cap'
+   rows.disappearances.append({'pid':int(p.name),'path':str(p/'stat'),'operation':'READ_STAT_DURING_ENUMERATION','errno':error.errno,'atMonotonicNs':str(time.monotonic_ns())})
+   continue # No claim that an unreadable PID was unrelated or its group empty.
   assert row['pid']==int(p.name);rows[row['pid']]=row
  return rows
 class OwnedGroups:
  def __init__(self,postgres_executable=None):
   self.groups={};self.events=[];self.identity_observations=[];self.member_pins={};self.empty_groups=set();self.root=None;self.mutex=threading.RLock();self.postgres_executable=str(Path(postgres_executable).resolve()) if postgres_executable else None
-  self.postmaster=None;self.pg_lineage={};self.pg_transitions=[]
+  self.postmaster=None;self.pg_lineage={};self.pg_transitions=[];self.enumeration_observations=[]
+ def read_table(self):
+  rows=process_table()
+  for event in getattr(rows,'disappearances',[]):
+   pin=self.member_pins.get(event['pid']) or self.groups.get(event['pid'])
+   if pin is None and self.root is not None and event['pid']==self.root['pid']:pin=self.root
+   observation={**event,'ownedKnown':pin is not None,'expectedIdentity':dict(pin) if pin else None,'freshIdentity':None,'disposition':'ENUMERATION_ITEM_DISAPPEARED_IDENTITY_NOT_OBSERVED'}
+   assert len(self.enumeration_observations)<2048,'run disappearance evidence cap'
+   self.enumeration_observations.append(observation)
+   if pin is None:continue
+   try:
+    try:fresh=proc(event['pid'])
+    except OSError as error:
+     if not proc_disappeared(error):raise
+     observation['freshErrno']=error.errno
+     assert proc_absent(event['pid']),'known process stat missing without directory absence proof'
+     observation['disposition']='KNOWN_IDENTITY_DIRECTORY_ABSENT';continue
+    observation['freshIdentity']=dict(fresh)
+    assert fresh['pid']==pin['pid'] and fresh['startTicks']==pin['startTicks'],'known missing PID was reused'
+    # Reinsert, then preserve all original group/parent/PG-lineage checks.
+    rows[fresh['pid']]=fresh;observation['disposition']='KNOWN_IDENTITY_FRESH_REINSERTED'
+   except BaseException as error:
+    observation.update(disposition='REJECTED',errorType=type(error).__name__,error=str(error));raise
+  return rows
  def bind_postmaster(self,child,row):
   assert self.postmaster is None and isinstance(child,subprocess.Popen) and child.pid==row['pid'] and child.returncode is None
   group=self.groups[row['pid']]
@@ -80,13 +115,16 @@ class OwnedGroups:
    pin=self.pg_lineage.get(before['pid']);assert pin is not None,'new orphan has no prior PG lineage'
    if not pin.get('adoption'):
     parent_pin=self.pg_lineage.get(before['parentPid']);assert parent_pin is not None,'old parent has no proved PG lineage'
-    parent_identity=parent_pin['identity'];parent_after=None
+    parent_identity=parent_pin['identity'];parent_after=None;parent_read_error=None
     try:parent_after=proc(before['parentPid'])
-    except FileNotFoundError:assert not Path('/proc',str(before['parentPid'])).exists(),'old PG parent stat unavailable'
+    except OSError as error:
+     if not proc_disappeared(error):raise
+     parent_read_error={'pid':before['parentPid'],'path':str(Path('/proc',str(before['parentPid']),'stat')),'operation':'PROVED_OLD_PARENT_EXIT_STAT','errno':error.errno,'ownedKnown':True}
+     assert proc_absent(before['parentPid']),'old PG parent stat unavailable'
     if parent_after is not None:
      assert all(parent_after[k]==parent_identity[k] for k in ['pid','startTicks','processGroupId']) and parent_after['state'] in ['Z','X','x'],'PG adoption lacks exact old-parent exit proof'
     launcher=proc(self.root['pid']);assert all(launcher[k]==self.root[k] for k in ['pid','startTicks','processGroupId','parentPid']),'subreaper identity changed'
-    if adoptions is not None:adoptions.append({'before':dict(before),'after':dict(after),'oldParentIdentity':dict(parent_identity),'oldParentAfter':parent_after,'oldParentDisposition':'ABSENT' if parent_after is None else 'TERMINAL','subreaperIdentity':launcher})
+    if adoptions is not None:adoptions.append({'before':dict(before),'after':dict(after),'oldParentIdentity':dict(parent_identity),'oldParentAfter':parent_after,'oldParentReadError':parent_read_error,'oldParentDisposition':'ABSENT' if parent_after is None else 'TERMINAL','subreaperIdentity':launcher})
   if before['processGroupId']==after['processGroupId']:return False
   assert self.postmaster is not None
   master=self.postmaster[1];prior=self.pg_lineage.get(before['pid'],{})
@@ -127,7 +165,7 @@ class OwnedGroups:
  def postgres_candidate(self,row,rows,require_existing=False):
   # Lifecycle ownership and executable observability are distinct. All PG
   # members, including nonleaders, require the same bracketed ancestry proof.
-  observed_exe=None;after=None;chain=[];fresh_chain=[];ancestor_pairs=[];adoptions=[];anchor=None;error=None;exe_status='NOT_READ';disposition='REJECTED'
+  observed_exe=None;after=None;chain=[];fresh_chain=[];ancestor_pairs=[];adoptions=[];anchor=None;error=None;stat_read_error=None;exe_status='NOT_READ';disposition='REJECTED'
   try:
    if require_existing:assert row['pid'] in self.pg_lineage,'PG group member lacks dedicated lineage proof'
    chain,anchor=self.postgres_chain(row,rows,adoptions)
@@ -136,8 +174,10 @@ class OwnedGroups:
    except BaseException:
     exe_status='READ_FAILED';raise
    try:after=proc(row['pid'])
-   except FileNotFoundError:
-    assert not Path('/proc',str(row['pid'])).exists(),'live candidate has unreadable stat'
+   except OSError as stat_missing:
+    if not proc_disappeared(stat_missing):raise
+    stat_read_error={'pid':row['pid'],'path':str(Path('/proc',str(row['pid']),'stat')),'operation':'PG_CANDIDATE_SECOND_STAT','errno':stat_missing.errno,'ownedKnown':row['pid'] in self.pg_lineage}
+    assert proc_absent(row['pid']),'live candidate has unreadable stat'
    if after is not None:self.pg_identity(row,after,adoption=row['pid'] in self.pg_lineage,adoptions=adoptions)
    # A proved adoption changes the current chain. Retain the exact old-parent
    # exit proof rather than requiring a dead ancestor to remain in /proc.
@@ -169,7 +209,7 @@ class OwnedGroups:
     except BaseException as diagnostic:after={'unavailableErrorType':type(diagnostic).__name__,'unavailableError':str(diagnostic)}
    raise
   finally:
-   event={'kind':'PG_LIFECYCLE_IDENTITY_PROOF','before':dict(row),'after':after,'lineage':chain,'lineageAfter':fresh_chain,'adoptions':adoptions,'anchor':anchor,'exeObserved':observed_exe,'exeStatus':exe_status,'exeVerifiedForActiveProcess':disposition=='LIVE' and exe_status=='OBSERVED','disposition':disposition,'observedMonotonicNs':str(time.monotonic_ns()),'cpu':'NOT_OBSERVED'}
+   event={'kind':'PG_LIFECYCLE_IDENTITY_PROOF','before':dict(row),'after':after,'statReadFailure':stat_read_error,'lineage':chain,'lineageAfter':fresh_chain,'adoptions':adoptions,'anchor':anchor,'exeObserved':observed_exe,'exeStatus':exe_status,'exeVerifiedForActiveProcess':disposition=='LIVE' and exe_status=='OBSERVED','disposition':disposition,'observedMonotonicNs':str(time.monotonic_ns()),'cpu':'NOT_OBSERVED'}
    if error is not None:event.update(errorType=type(error).__name__,error=str(error))
    # Preserve every rejection and the first/changed accepted observation;
    # repeated lifecycle polling is not an unbounded raw measurement journal.
@@ -187,7 +227,7 @@ class OwnedGroups:
  def capture_descendants(self,root):
   with self.mutex:return self._capture_descendants(root)
  def _capture_descendants(self,root):
-  rows=process_table();current=rows.get(root['pid'])
+  rows=self.read_table();current=rows.get(root['pid'])
   assert current is not None and current['startTicks']==root['startTicks'],'launcher PID changed'
   if self.root is not None:assert self.root['pid']==root['pid'] and self.root['startTicks']==root['startTicks']
   self.root=dict(root)
@@ -266,7 +306,7 @@ class OwnedGroups:
   return leader,members
  def signal(self,name,include_postgres=False,roles=None):
   with self.mutex:
-   entries=list(self.groups.values());rows=process_table();failures=[]
+   entries=list(self.groups.values());rows=self.read_table();failures=[]
    for row in reversed(entries):
     try:
      if row['role'] in ['postgres','postgres_child','postgres_terminal_candidate'] and not include_postgres:
@@ -287,7 +327,11 @@ class OwnedGroups:
        except ProcessLookupError:continue
        try:
         try:current=proc(member['pid'])
-        except FileNotFoundError:continue
+        except OSError as error:
+         if not proc_disappeared(error):raise
+         assert proc_absent(member['pid']),'pidfd target stat unavailable without absence proof'
+         self.events.append({'pid':member['pid'],'path':str(Path('/proc',str(member['pid']),'stat')),'operation':'PIDFD_PRE_SIGNAL_STAT','errno':error.errno,'ownedKnown':True,'expectedIdentity':dict(member),'sent':False,'disposition':'DIRECTORY_ABSENT'})
+         continue
         assert all(current[k]==member[k] for k in ['pid','startTicks','processGroupId','parentPid']),'leaderless member changed before pidfd signal'
         try:signal.pidfd_send_signal(fd,name,None,0);sent=True
         except ProcessLookupError:sent=False
@@ -297,7 +341,7 @@ class OwnedGroups:
    if failures:raise failures[0] # Other safely owned groups were still attempted.
  def members(self,include_postgres=False):
   with self.mutex:
-   rows=process_table();result=[]
+   rows=self.read_table();result=[]
    for group in list(self.groups.values()):
     verified=self.verified_members(group,rows)[1]
     if include_postgres or group['role'] not in ['postgres','postgres_child','postgres_terminal_candidate']:result.extend(verified)
@@ -651,7 +695,7 @@ def main():
   result['watchdogClose']=finish_watchdog(done,watcher,budget,errors)
   try:sample();budget.remaining()
   except BaseException as error:errors.append({'stage':'final-resources','errorType':type(error).__name__})
-  result['signals']=owned.events;result['processIdentityObservations']=owned.identity_observations;result['postgresLineage']=owned.pg_lineage;result['postgresSetsidTransitions']=owned.pg_transitions;result['processExits']={n:p.poll() for n,p in children};result['cleanupErrors']=errors;result['outerFailureTypes']=[type(e).__name__ for e in failure]
+  result['signals']=owned.events;result['processIdentityObservations']=owned.identity_observations;result['processEnumerationObservations']=owned.enumeration_observations;result['postgresLineage']=owned.pg_lineage;result['postgresSetsidTransitions']=owned.pg_transitions;result['processExits']={n:p.poll() for n,p in children};result['cleanupErrors']=errors;result['outerFailureTypes']=[type(e).__name__ for e in failure]
   result['passed']=not failure and not errors and result.get('driverExecuted') is True and result['finalSnapshotVerified'] is True and result.get('materials',{}).get('passed') is True and all(result.get('inputVerification',{}).get(k) is True for k in ['passed','inputsUnchanged','sourceUnchanged','recoveryEvidenceUnchanged']) and result.get('cleanupVerified') is True and result.get('postgresReadyVerified') is True and all(type(c)is int and (c==0 or (n.startswith('c25-c26-readiness-') and c==75)) for n,c in result['processExits'].items())
   for log in logs:log.flush();os.fsync(log.fileno());log.close()
   result['elapsedSeconds']=(budget.clock()-budget.started)/1e9

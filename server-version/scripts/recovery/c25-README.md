@@ -1210,3 +1210,22 @@ These are lifecycle-only contracts. Independent SQL/socket/proc measurement
 requirements are unchanged; unavailable measurements are not zero or a product
 failure. A03 did pass SQL readiness, but its killed baseline produced no logical
 baseline/final audit. No fourth runtime or performance result is implied here.
+
+### C26 process-disappearance preparation after A04
+
+A04 reached SQL readiness but its baseline child was stopped after an outer
+`/proc/PID/stat` enumeration read raised ESRCH. The failing PID was not captured;
+no logical baseline or business workload was observed. Its false receipt and
+stopped physical evidence remain immutable.
+
+The two Python enumerators now classify only ENOENT/ESRCH at the per-PID stat
+boundary and retain bounded path/PID/operation/known-identity observations. A
+missing known item is re-read before it can contribute to group quiescence;
+reuse, a still-present unreadable directory, permissions, other I/O errors and
+parse failures reject. Direct owned readers remain strict. API RSS loss is
+explicitly NOT_OBSERVED while API lifecycle health remains independently
+required. Worker startup failure retains an unconditional actual close callback;
+missing stat alone never supplies successful close evidence. JS measurement
+sampling, its original single bounded snapshot retry, children-interface
+ENOENT-only fallback and FD snapshot-race semantics are unchanged. This is
+no-service tool preparation, with no new recovery point or A retry.

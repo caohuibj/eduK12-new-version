@@ -74,14 +74,41 @@ def archive_child_identity(pid):
     raw=Path('/proc',str(pid),'stat').read_text();parts=raw[raw.rfind(') ')+2:].split()
     return {'pid':int(raw.split(' ',1)[0]),'parentPid':int(parts[1]),'processGroupId':int(parts[2]),'startTicks':parts[19]}
 
-def archive_group_members(pgid):
-    rows=[]
+def archive_proc_disappeared(error):return isinstance(error,OSError) and error.errno in (errno.ENOENT,errno.ESRCH)
+def archive_process_row(pid):
+    raw=Path('/proc',str(pid),'stat').read_text();parts=raw[raw.rfind(') ')+2:].split()
+    assert len(parts)>21 and int(raw.split(' ',1)[0])==pid
+    return {'pid':pid,'state':parts[0],'parentPid':int(parts[1]),'processGroupId':int(parts[2]),'startTicks':parts[19]}
+def archive_group_members(pgid,known=None,observations=None):
+    known={} if known is None else known;observations=[] if observations is None else observations
+    rows=[];missing_count=0
     for entry in Path('/proc').iterdir():
         if not entry.name.isdigit():continue
-        try:
-            raw=(entry/'stat').read_text();parts=raw[raw.rfind(') ')+2:].split()
-        except FileNotFoundError:continue
-        if int(parts[2])==pgid:rows.append({'pid':int(entry.name),'state':parts[0],'parentPid':int(parts[1]),'processGroupId':pgid,'startTicks':parts[19]})
+        pid=int(entry.name)
+        try:row=archive_process_row(pid)
+        except OSError as error:
+            if not archive_proc_disappeared(error):raise
+            missing_count+=1;assert missing_count<=128 and len(observations)<2048,'archive disappearance evidence cap'
+            pin=known.get(pid);event={'pid':pid,'path':str(entry/'stat'),'operation':'ARCHIVE_GROUP_ENUMERATION_STAT','errno':error.errno,'ownedKnown':pin is not None,'expectedIdentity':dict(pin) if pin else None,'freshIdentity':None,'disposition':'ENUMERATION_ITEM_DISAPPEARED_IDENTITY_NOT_OBSERVED','atMonotonicNs':str(time.monotonic_ns())};observations.append(event)
+            if pin is None:continue
+            try:
+                try:row=archive_process_row(pid)
+                except OSError as fresh_error:
+                    if not archive_proc_disappeared(fresh_error):raise
+                    event['freshErrno']=fresh_error.errno
+                    try:entry.stat()
+                    except OSError as absent:
+                        if not archive_proc_disappeared(absent):raise
+                        event['disposition']='KNOWN_IDENTITY_DIRECTORY_ABSENT';continue
+                    raise AssertionError('known archive member stat missing without absence proof')
+                event['freshIdentity']=dict(row)
+                assert all(row[k]==pin[k] for k in ['pid','startTicks','processGroupId']),'archive member identity reused'
+                event['disposition']='KNOWN_IDENTITY_FRESH_REINSERTED'
+            except BaseException as rejected:
+                event.update(disposition='REJECTED',errorType=type(rejected).__name__,error=str(rejected));raise
+        if row['processGroupId']==pgid:
+            if pid in known:assert all(row[k]==known[pid][k] for k in ['pid','startTicks','processGroupId']),'archive group identity reused'
+            known[pid]=dict(row);rows.append(row)
     return rows
 
 def bounded_archive_pipe(argv,log_path,seconds,guard,writer,aggregate_end):
@@ -90,7 +117,7 @@ def bounded_archive_pipe(argv,log_path,seconds,guard,writer,aggregate_end):
     assert 0<seconds<=300
     started=time.monotonic();cutoff=min(aggregate_end,started+seconds)
     command=['/usr/bin/prlimit','--fsize='+str(A['ARCHIVE_CAP'])+':'+str(A['ARCHIVE_CAP']),'--',*map(str,argv)]
-    writer.claim(log_path,0);process=None;identity=None;poller=None;error=None;exit_info=None;ownership_lost=False;cleanup_errors=[];signal_sent=False;wait_owned=False
+    writer.claim(log_path,0);process=None;identity=None;poller=None;error=None;exit_info=None;ownership_lost=False;cleanup_errors=[];signal_sent=False;wait_owned=False;known_members={};enumeration_observations=[]
     assert signal.getsignal(signal.SIGCHLD)==signal.SIG_DFL,'waitable child ownership requires default SIGCHLD'
     signal.signal(signal.SIGCHLD,signal.SIG_DFL) # Reset inherited sigaction flags, including NOCLDWAIT.
     def check():
@@ -101,7 +128,7 @@ def bounded_archive_pipe(argv,log_path,seconds,guard,writer,aggregate_end):
     with Path(log_path).open('xb',buffering=0) as log:
         try:
             check();process=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,env=ENV,start_new_session=True)
-            identity=archive_child_identity(process.pid);exact_group()
+            identity=archive_child_identity(process.pid);known_members[process.pid]=dict(identity);exact_group()
             os.set_blocking(process.stdout.fileno(),False);poller=selectors.DefaultSelector();poller.register(process.stdout,selectors.EVENT_READ)
             eof=False
             while not eof or exit_info is None:
@@ -112,7 +139,7 @@ def bounded_archive_pipe(argv,log_path,seconds,guard,writer,aggregate_end):
                     else:writer.append(log_path,log,chunk)
                 exit_info=os.waitid(os.P_PID,process.pid,os.WEXITED|os.WNOHANG|os.WNOWAIT)
             exact_group();check()
-            assert all(row['state'] in ['Z','X','x'] for row in archive_group_members(process.pid)),'archive leader exit left active group members'
+            assert all(row['state'] in ['Z','X','x'] for row in archive_group_members(process.pid,known_members,enumeration_observations)),'archive leader exit left active group members'
             check();code=process.wait(timeout=min(5,max(.001,cutoff-time.monotonic())));wait_owned=True
             assert code==0,'archive child failed; private log retained'
             check()
@@ -129,7 +156,7 @@ def bounded_archive_pipe(argv,log_path,seconds,guard,writer,aggregate_end):
                         assert os.getpgid(process.pid)==process.pid
                         os.killpg(process.pid,signal.SIGKILL);signal_sent=True
                         until=min(aggregate_end,time.monotonic()+5)
-                        while any(row['state'] not in ['Z','X','x'] for row in archive_group_members(process.pid)):
+                        while any(row['state'] not in ['Z','X','x'] for row in archive_group_members(process.pid,known_members,enumeration_observations)):
                             assert time.monotonic()<until,'archive group kill did not reach quiescence'
                             time.sleep(.01)
                 except BaseException as cleanup:cleanup_errors.append(type(cleanup).__name__)
@@ -150,9 +177,9 @@ def bounded_archive_pipe(argv,log_path,seconds,guard,writer,aggregate_end):
         if error is None:error=cleanup
         else:cleanup_errors.append(type(cleanup).__name__)
     if error is not None:
-        error.archive_step={'argv':list(map(str,argv)),'passed':False,'seconds':time.monotonic()-started,'pid':process.pid if process else None,'identity':identity,'exitCode':process.returncode if process and wait_owned else None,'waitOwnershipVerified':wait_owned,'ownershipLost':ownership_lost,'groupKillSent':signal_sent,'cleanupErrors':cleanup_errors,'logSha256':log_sha,'logBytes':log_bytes,'errorType':type(error).__name__}
+        error.archive_step={'argv':list(map(str,argv)),'passed':False,'seconds':time.monotonic()-started,'pid':process.pid if process else None,'identity':identity,'exitCode':process.returncode if process and wait_owned else None,'waitOwnershipVerified':wait_owned,'ownershipLost':ownership_lost,'processEnumerationObservations':enumeration_observations,'groupKillSent':signal_sent,'cleanupErrors':cleanup_errors,'logSha256':log_sha,'logBytes':log_bytes,'errorType':type(error).__name__}
         raise error
-    return {'argv':list(map(str,argv)),'seconds':time.monotonic()-started,'exitCode':process.returncode,'logSha256':log_sha,'logBytes':log_bytes,'logCapBytes':LOG_CAP,'identity':identity,'leaderReapedAfterPipeDrain':True}
+    return {'argv':list(map(str,argv)),'seconds':time.monotonic()-started,'exitCode':process.returncode,'logSha256':log_sha,'logBytes':log_bytes,'logCapBytes':LOG_CAP,'identity':identity,'leaderReapedAfterPipeDrain':True,'processEnumerationObservations':enumeration_observations}
 
 def admit_extraction(partial,bounds,writer,guard,create_restore,expected_sha,evidence):
     pin=compressed_allocation(partial)

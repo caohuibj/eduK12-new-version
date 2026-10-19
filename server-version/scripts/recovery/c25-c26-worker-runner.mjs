@@ -12,7 +12,7 @@ import {createProbeChannel} from './c25-c26-probe-channel.mjs'
 import {workerPrivateDirectory,workerRead,workerWrite,workerSha} from './c25-c26-worker-runtime.mjs'
 const file=name=>fileURLToPath(new URL(name,import.meta.url)),require=createRequire(import.meta.url)
 const {PINNED}=require('./c25-c26-runtime-probe.cjs')
-export async function runObservedWorker({directory,kind,input,node,env,remainingMs,record,onFault,hooks,abortSignal},{spawnChild=spawn}={}){
+export async function runObservedWorker({directory,kind,input,node,env,remainingMs,record,onFault,hooks,abortSignal},{spawnChild=spawn,observeChild=observeResourceChild,readStartupIdentity=pid=>parseProcStat(fs.readFileSync(`/proc/${pid}/stat`,'utf8'))}={}){
  assert.ok(['report','export'].includes(kind));workerPrivateDirectory(directory)
  for(const fn of [remainingMs,record,onFault,hooks?.register,hooks?.loaded,hooks?.prepareClose,hooks?.retire])assert.equal(typeof fn,'function')
  assert.ok(!env.NODE_OPTIONS&&!env.C26_RUNTIME_PROBE_ENABLE,'worker caller may not preload/capture production modules')
@@ -26,6 +26,7 @@ export async function runObservedWorker({directory,kind,input,node,env,remaining
  const argv=['--require',file('loopback-only.cjs'),'--require',file('c25-c26-runtime-probe.cjs'),file('c25-c26-worker-child.mjs'),invocationFile]
  const childEnv={...env,DATABASE_URL:database.toString(),PERF_ISOLATED_TEST_MODE:'1',PERF_SQL_EVENT_COUNT:'1',C26_RUNTIME_PROBE_ENABLE:'1',C26_PROBE_NONCE:nonce,C26_PROBE_ROLE:kind,C26_WORKER_DEADLINE_NS:(process.hrtime.bigint()+BigInt(Math.floor(remaining()*1e6))).toString()}
  const controller=new AbortController(),receipt={schemaVersion:1,passed:false,kind,nonce,inputSha256,aggregateBudgetMs:aggregate,stages:[],probe:[],issuedMonotonicNs:process.hrtime.bigint().toString(),cpuTail:'TERMINAL_TO_ACK_EXIT_CPU_NOT_OBSERVED; REAL_WALL_INTERVAL_RETAINED'}
+ let closeResolve;const closePromise=new Promise(resolve=>closeResolve=resolve)
  let child,resources,channel,identity,failure=null,waiting=null,closed=false,resourceResult=null,resourceError=null,queue=[],lastSequence=0,logBytes=0
  const stop=error=>{failure??=error;controller.abort(failure);if(waiting){clearTimeout(waiting.timer);waiting.reject(failure);waiting=null}try{onFault(failure)}catch{}}
  const aborted=()=>stop(abortSignal.reason instanceof Error?abortSignal.reason:new Error('global worker abort'))
@@ -51,8 +52,9 @@ export async function runObservedWorker({directory,kind,input,node,env,remaining
  try{
   child=spawnChild(node,argv,{cwd:path.resolve(file('../../backend')),env:childEnv,detached:true,stdio:['ignore','pipe','pipe','ipc']})
   receipt.argv=child.spawnargs;receipt.pid=child.pid;child.once('error',stop)
+  child.once('close',(code,signal)=>{receipt.closeObservation={code,signal,observedMonotonicNs:process.hrtime.bigint().toString()};closed=true;closeResolve();if(waiting){const current=waiting;waiting=null;clearTimeout(current.timer);current.reject(new Error('worker closed before lifecycle completion'))}})
   // Attach the independent killer before callbacks or receipt writes can fail.
-  resources=observeResourceChild(child,{nonce,role,deadlineMs:Math.max(1,Math.floor(remaining())),killGraceMs,reapMs,abortSignal:controller.signal})
+  resources=observeChild(child,{nonce,role,deadlineMs:Math.max(1,Math.floor(remaining())),killGraceMs,reapMs,abortSignal:controller.signal})
   resources.then(value=>resourceResult=value,error=>{resourceError=error;stop(error)}).catch(()=>{})
   identity={...parseProcStat(fs.readFileSync(`/proc/${child.pid}/stat`,'utf8')),role,applicationName}
   assert.equal(identity.parentPid,process.pid);assert.equal(identity.processGroupId,child.pid);receipt.identity=identity
@@ -66,7 +68,6 @@ export async function runObservedWorker({directory,kind,input,node,env,remaining
     if(waiting){const current=waiting;waiting=null;clearTimeout(current.timer);current.resolve(value)}else{assert.ok(queue.length<4);queue.push(value)}
    }catch(error){stop(error)}
   })
-  child.once('close',()=>{closed=true;if(waiting){const current=waiting;waiting=null;clearTimeout(current.timer);current.reject(new Error('worker closed before lifecycle completion'))}})
   for(const stream of [child.stdout,child.stderr])stream.on('data',bytes=>{try{logBytes+=bytes.length;assert.ok(logBytes<=1024*1024,'worker log cap');fs.writeSync(log,bytes)}catch(error){stop(error)}})
   channel=createProbeChannel(child,{nonce,role:kind,identity,bindings:PINNED,remainingMs:remaining,record:value=>{record(value);receipt.probe.push(value)},onFault:stop})
   if(abortSignal){if(abortSignal.aborted)aborted();else abortSignal.addEventListener('abort',aborted,{once:true})}
@@ -89,7 +90,18 @@ export async function runObservedWorker({directory,kind,input,node,env,remaining
   if(failure)controller.abort(failure)
   if(resources){try{resourceResult=await resources}catch(error){resourceError=error;failure??=error}}
   else if(child?.pid){
-   try{const own=parseProcStat(fs.readFileSync(`/proc/${child.pid}/stat`,'utf8'));assert.equal(own.parentPid,process.pid);assert.equal(own.processGroupId,child.pid);process.kill(-child.pid,'SIGKILL');await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error('worker startup cleanup close deadline')),500);child.once('close',()=>{clearTimeout(timer);resolve()})})}catch(error){if(error.code!=='ENOENT')receipt.startupCleanupError={name:error.name,stack:String(error.stack??error)}}
+   try{
+    let own
+    try{own=readStartupIdentity(child.pid)}
+    catch(error){if(!['ENOENT','ESRCH'].includes(error.code))throw error;receipt.startupIdentityObservation={status:'NOT_OBSERVED',pid:child.pid,path:`/proc/${child.pid}/stat`,operation:'STARTUP_FAILURE_CLEANUP_STAT',errno:error.code,ownedKnown:true}}
+    if(own){assert.equal(own.pid,child.pid);assert.equal(own.parentPid,process.pid);assert.equal(own.processGroupId,child.pid);if(!closed){try{process.kill(-child.pid,'SIGKILL')}catch(error){if(error.code!=='ESRCH')throw error;receipt.startupSignalObservation={pid:child.pid,operation:'SIGNAL_VERIFIED_STARTUP_GROUP',errno:error.code,sent:false}}}}
+   }catch(error){receipt.startupCleanupError={name:error.name,stack:String(error.stack??error)}}
+   finally{
+    let timer
+    try{await Promise.race([closePromise,new Promise((_,reject)=>timer=setTimeout(()=>reject(new Error('worker startup cleanup close deadline')),Math.max(1,Math.min(500,aggregate-(performance.now()-(deadline-deadlineMs))))))])}
+    catch(error){receipt.startupCloseError={name:error.name,stack:String(error.stack??error)}}
+    finally{clearTimeout(timer);receipt.startupCloseObserved=closed;if(!closed)receipt.closeObservation=null}
+   }
   }
   receipt.resources=resourceResult;receipt.failedLifecycle=resourceError?.lifecycle??null
   if(failure){receipt.passed=false;receipt.error={name:failure.name,stack:String(failure.stack??failure)}}

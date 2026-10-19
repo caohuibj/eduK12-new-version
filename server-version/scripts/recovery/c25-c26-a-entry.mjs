@@ -24,6 +24,11 @@ export function driverDeadlineContract(invocation,now=()=>process.hrtime.bigint(
  const remaining=end=>()=>{const value=Number(end-now())/1e6;assert.ok(value>0&&value<=1200000,'absolute C26 deadline');return value}
  return {remainingMs:remaining(driver),workRemainingMs:remaining(work)}
 }
+export function apiRssObservation(pid,read=filename=>fs.readFileSync(filename,'utf8')){
+ assert.ok(Number.isSafeInteger(pid)&&pid>0);const filename=`/proc/${pid}/status`
+ try{const match=/^VmRSS:\s+(\d+) kB$/m.exec(read(filename));assert.ok(match,'API RSS status malformed');return {status:'OBSERVED',pid,path:filename,bytes:Number(match[1])*1024}}
+ catch(error){if(!['ENOENT','ESRCH'].includes(error.code))throw error;return {status:'NOT_OBSERVED',pid,path:filename,operation:'READ_API_STATUS',errno:error.code,ownedKnown:true,bytes:null}}
+}
 export async function main(){
  process.umask(0o077);assert.equal(process.version,'v24.21.0');assert.equal(process.argv.length,3);assert.equal(process.argv[2],STATE)
  assert.equal(fs.realpathSync(STATE),STATE);assert.equal(fs.statSync(STATE).mode&0o777,0o700)
@@ -48,7 +53,7 @@ export async function main(){
  const readResources=api=>{
   const stat=fs.statfsSync(ROOT),tmp=fs.statfsSync('/tmp'),memory=Number(/^MemAvailable:\s+(\d+) kB$/m.exec(fs.readFileSync('/proc/meminfo','utf8'))?.[1])*1024
   const value={diskBytes:stat.bavail*stat.bsize,tmpBytes:tmp.bavail*tmp.bsize,memoryBytes:memory}
-  if(api){try{value.apiRssBytes=Number(/^VmRSS:\s+(\d+) kB$/m.exec(fs.readFileSync(`/proc/${api.pid}/status`,'utf8'))?.[1])*1024}catch(error){if(error.code!=='ENOENT')throw error}}
+  if(api){const rss=apiRssObservation(api.pid);if(rss.status==='OBSERVED')value.apiRssBytes=rss.bytes;else record({stage:'API_RSS_NOT_OBSERVED',observation:rss})} // API lifecycle health is checked independently by the driver.
   return value
  }
  const read=name=>{
