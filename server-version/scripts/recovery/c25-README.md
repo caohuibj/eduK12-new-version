@@ -741,9 +741,11 @@ were verified.
 
 Locked entry workspace free was 9,239,420,928 B. Sampled minima were workspace
 9,023,393,792 B, MemAvailable 6,213,738,496 B and tmp free 3,743,817,728 B;
-maximum observed API RSS was 367,747,072 B. Original 8 GiB/2 GiB/512 MiB run floors
-were maintained. These are sampled run safeguards, not continuous extrema,
-resource savings, CPU/throughput comparisons or capacity measurements.
+maximum observed API RSS was 367,747,072 B. Workspace entry required 8 GiB plus a consumable 512 MiB reserve. During the
+run, the floors were workspace 8 GiB, MemAvailable 2 GiB and separate tmp free
+512 MiB; the entry reserve was not required to remain unused. These are sampled
+run safeguards, not continuous extrema, resource savings, CPU/throughput
+comparisons or capacity measurements.
 
 Private evidence root is `eduk12_c25_continuation_02/` under the scratch root:
 
