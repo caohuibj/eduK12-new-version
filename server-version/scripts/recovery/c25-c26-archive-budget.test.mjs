@@ -120,3 +120,30 @@ with tempfile.TemporaryDirectory() as tmp:
  for kind in ['overflow','deadline-descendant-pipe','waitid-denied','identity-denied','ECHILD-reaped']:run_fault(kind)
 print(json.dumps({'realPipeSteps':proofs,'servicesStarted':False,'archivesCreated':False}))
 `))
+
+test('archive watcher joins within the original deadline before successful publication',()=>python(String.raw`
+from unittest import mock
+import threading
+class Thread:
+ def __init__(self,mode,clock):self.mode=mode;self.clock=clock;self.timeouts=[]
+ def join(self,timeout):
+  self.timeouts.append(timeout)
+  if self.mode=='late':self.clock[0]=100.01
+ def is_alive(self):return self.mode=='unjoined'
+class Guard:
+ def __init__(self,mode,clock):self.finished=threading.Event();self.thread=Thread(mode,clock);self.checks=0
+ def check(self):self.checks+=1;return None
+proof=[]
+for mode in ['healthy','late','unjoined']:
+ clock=[99.5];guard=Guard(mode,clock);published=[]
+ with mock.patch('time.monotonic',side_effect=lambda:clock[0]):
+  try:
+   result=stop_archive_guard_before_publication(guard,100)
+   published.append(result)
+  except AssertionError:assert mode!='healthy'
+  else:assert mode=='healthy'
+ assert guard.finished.is_set() and guard.thread.timeouts==[.5]
+ assert bool(published)==(mode=='healthy')
+ proof.append({'mode':mode,'publicationAllowed':bool(published),'joinTimeout':guard.thread.timeouts,'resourceChecks':guard.checks})
+print(json.dumps({'originalAggregateDeadlineAndJoinGate':proof}))
+`))

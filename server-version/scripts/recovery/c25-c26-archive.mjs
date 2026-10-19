@@ -159,6 +159,7 @@ def verify_recovery_descriptor(descriptor_path,expected_sha,tools,failure_state,
     assert nondata_manifest(SOURCE)==frozen and inventory(PRIOR)==prior and inventory(CORE)==core and historical_recovery_manifest()==historical
     assert receipt['frozenFailedA02Manifest']==value['frozenFailedA02Manifest']
     assert receipt['passed'] is True and receipt['scope']==SCOPE and receipt['archive']==value['archive'] and receipt['producer']==value['producer']
+    assert receipt['watcherClose']['joined'] is True and receipt['watcherClose']['remainingAggregateSeconds']>0 and receipt['elapsedSeconds']<600
     budget=receipt['budget'];assert budget['schemaVersion']==2 and budget['bounds']==staged_bounds(data)
     for phase,key in [('COMPRESS','compressionAdmission'),('EXTRACT','extractionAdmission')]:
         admission=budget[key]
@@ -183,6 +184,17 @@ def verify_recovery_descriptor(descriptor_path,expected_sha,tools,failure_state,
     assert file_binding(target)==binding
     return value
 
+def stop_archive_guard_before_publication(guard,deadline):
+    started=time.monotonic();guard.finished.set()
+    remaining=deadline-started
+    assert remaining>0,'archive aggregate deadline before watcher close'
+    if guard.thread is not None:
+        guard.thread.join(timeout=min(2,remaining))
+        assert not guard.thread.is_alive(),'archive resource watcher failed to join'
+    guard.check()
+    finished=time.monotonic();assert finished<deadline,'archive watcher close exceeded aggregate deadline'
+    return {'joined':True,'elapsedSeconds':finished-started,'remainingAggregateSeconds':deadline-finished}
+
 def main():
     parser=argparse.ArgumentParser()
     for name in ['tools','output','descriptor']:parser.add_argument('--'+name,type=Path,required=True)
@@ -192,7 +204,7 @@ def main():
     assert file_binding(PRODUCER)['sha256']==args.expected_producer_sha256
     output=output_path(args.output,args.descriptor)
     with (tools/'.measurement.lock').open('rb') as lock:
-        fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB);guard=ResourceGuard();steps=[];started=time.monotonic();created=False;writer=None
+        fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB);guard=ResourceGuard();steps=[];started=time.monotonic();created=False;writer=None;watcher_joined=False
         result={'scope':SCOPE,'passed':False,'servicesStarted':False,'durableBackup':False,'rawSourceRetained':True,'acceptedSnapshotBindings':SNAPSHOTS,'logicalCountsObservedDuringArchive':False}
         def interrupted(signum,_frame):raise TimeoutError(guard.error or ('archive signal '+str(signum)))
         previous={sig:signal.signal(sig,interrupted) for sig in [signal.SIGALRM,signal.SIGTERM,signal.SIGINT,signal.SIGHUP]};signal.setitimer(signal.ITIMER_REAL,600)
@@ -237,6 +249,7 @@ def main():
             guard.check();assert restore.parent==output and restore.name=='verification-restore' and private_directory(output)==output
             shutil.rmtree(restore);fsync_directory(output);assert not os.path.lexists(archive);os.rename(partial,archive);fsync_directory(output)
             archive_binding=file_binding(archive)
+            result['watcherClose']=stop_archive_guard_before_publication(guard,started+600);watcher_joined=True
             result.update(passed=True,frozenFailedA02Manifest=lineage,acceptedEvidence=accepted,roundTripVerified=True,sourceUnchangedDuringArchive=True,nonDataEvidencePreserved=True,priorContinuationEvidencePreserved=True,coreContinuationEvidencePreserved=True,historicalRecoveryMaterialsPreserved=True,restoreMaterialFsynced=True,temporaryVerificationCopyRemoved=True,archive=archive_binding,manifestSha256=sha_file(output/NAMES['dataManifest']),sourceEvidenceSha256=sha_file(output/NAMES['frozenSourceManifest']),coreEvidenceSha256=sha_file(output/NAMES['coreContinuationManifest']),symlinkCount=0,hardlinkGroups=[],producer=producer,budget=budget,steps=steps,elapsedSeconds=time.monotonic()-started,minimumObserved=guard.minimum,comparedMetadata=['path','type','mode','uid','gid','mtime_ns','size','SHA256','all xattrs and ACLs','zero links'])
             result['evidenceAllocationBeforeFinalReceipts']=writer.summary()
             writer.json(output/NAMES['archiveReceipt'],result);fsync_directory(output)
@@ -252,7 +265,8 @@ def main():
             raise
         finally:
             for sig in previous:signal.signal(sig,signal.SIG_IGN)
-            signal.setitimer(signal.ITIMER_REAL,0);guard.stop()
+            signal.setitimer(signal.ITIMER_REAL,0)
+            if not watcher_joined:guard.stop()
             for sig,handler in previous.items():signal.signal(sig,handler)
             fcntl.flock(lock,fcntl.LOCK_UN)
 if __name__=='__main__':main()
