@@ -10,7 +10,7 @@ export function createRawHarness({state,apiUrl,remaining,read,write,check,record
  const stop=error=>{if(!failure){failure=error;gate.stop(error);try{onFault(error)}catch{}}return failure}
  const guarded=run=>{if(failure)throw failure;try{return run()}catch(error){throw stop(error)}}
  const h={state,result:{requests:measurements},remaining:()=>guarded(remaining),
-  read:name=>guarded(()=>read(name)),write:(name,value)=>guarded(()=>write(name,value)),check:label=>guarded(()=>check(label)),
+  read:name=>guarded(()=>read(name)),write:(name,value)=>guarded(()=>{remaining();return write(name,value)}),check:label=>guarded(()=>check(label)),
   client(){
    guarded(remaining);const clientId=++clientSequence
    const transport=createHttpTransport({apiUrl,remainingMs:h.remaining,record,gate,normalize,fetchImpl,now})

@@ -15,7 +15,7 @@ import {createC26Workload} from './c25-c26-workload.mjs'
 import {C26_LIMITS,READ_CATEGORIES,assertResources,assertWorkloadCounts} from './c25-c26-contract.mjs'
 
 const proc=pid=>parseProcStat(fs.readFileSync(`/proc/${pid}/stat`,'utf8'))
-const defaultRuntime=async()=>{const api=await import('./c20-materials-client.mjs');const {loadStoredCanonicalUnitResult}=api.require(path.join(api.backend,'dist/modules/assessment-runtime/compact-assessment-storage.js'));return {...api,loadStoredCanonicalUnitResult}}
+const defaultRuntime=async()=>{const api=await import('./c20-materials-client.mjs');const {loadStoredCanonicalUnitResult}=api.require(path.join(api.backend,'dist/modules/assessment-runtime/compact-assessment-storage.js'));assert.equal(api.prisma,api.require(path.join(api.backend,'dist/config/database.js')).prisma,'driver must guard the exact production singleton');return {...api,loadStoredCanonicalUnitResult}}
 const defaultWait=ms=>new Promise(resolve=>setTimeout(resolve,ms))
 const ownSample=()=>({monotonicNs:process.hrtime.bigint().toString(),cpu:process.cpuUsage(),memory:process.memoryUsage()})
 export function probeDelta(before,after){
@@ -38,16 +38,42 @@ export function measuredWorkerHooks(session,remaining){
  return {register:identity=>session.register(identity),loaded:async()=>{session.assertHealthy();remaining()},prepareClose:identity=>session.prepareClose(identity),retire:proof=>session.retire(proof)}
 }
 
-export async function runC26MeasuredA({directory,node,env,baseIdentities,connectionOptions,remainingMs,read,write,record,readResources,ownedRegistryChanged,loadIndependentScope},dependencies={}){
+const gatedClients=new WeakSet()
+/** Installed before the first driver query on the production singleton. All
+ * model/raw calls are gated, including reads; $disconnect remains cleanup-only.
+ * In-flight outcomes after stop are retained as uncertain and never retried. */
+export function installPrismaBusinessGate(prisma,{assertWork,record,stop}){
+ assert.equal(typeof prisma?.$use,'function');assert.ok(!gatedClients.has(prisma),'singleton gate installed twice')
+ let issued=0,pending=0,uncertain=0
+ const persist=value=>{try{const result=record(value);assert.ok(!result?.then,'business journal must be synchronous')}catch(error){throw stop(error)}}
+ prisma.$use(async(params,next)=>{
+  assertWork();const id=++issued,identity={id,model:params.model??null,action:params.action}
+  assert.equal(typeof identity.action,'string');persist({stage:'DRIVER_PRISMA_ISSUED',...identity});assertWork();pending++
+  try{
+   const result=await next(params)
+   try{assertWork()}catch(error){uncertain++;persist({stage:'DRIVER_PRISMA_RESOLVED_AFTER_STOP_UNCERTAIN',...identity});throw error}
+   persist({stage:'DRIVER_PRISMA_RESOLVED',...identity});assertWork();return result
+  }catch(error){persist({stage:'DRIVER_PRISMA_FAILED_OR_UNCERTAIN',...identity,errorType:error.name});throw stop(error)}
+  finally{pending--}
+ })
+ gatedClients.add(prisma)
+ return Object.freeze({snapshot:()=>({issued,pending,uncertain}),assertQuiescent(){assertWork();assert.equal(pending,0,'driver Prisma operation still in flight');return {issued,pending,uncertain}}})
+}
+
+export async function runC26MeasuredA({directory,node,env,baseIdentities,connectionOptions,remainingMs,workRemainingMs,read,write,record,readResources,ownedRegistryChanged,loadIndependentScope},dependencies={}){
  const {startSession=startPgObserverSession,startApi=startObservedApi,runWorker=runObservedWorker,makeWorkload=createC26Workload,loadRuntime=defaultRuntime,wait=defaultWait,clock=()=>performance.now(),readIdentity=proc,fetchImpl=fetch}=dependencies
- for(const fn of [remainingMs,read,write,record,readResources,ownedRegistryChanged,loadIndependentScope])assert.equal(typeof fn,'function')
+ for(const fn of [remainingMs,workRemainingMs,read,write,record,readResources,ownedRegistryChanged,loadIndependentScope])assert.equal(typeof fn,'function')
  assert.equal(fs.realpathSync(directory),directory);assert.equal(fs.statSync(directory).mode&0o777,0o700)
  assert.ok(!env.NODE_OPTIONS&&!env.C26_RUNTIME_PROBE_ENABLE);assert.equal(env.NODE_ENV,'test');assert.equal(env.BACKGROUND_WORKERS_ENABLED,'false')
  const initial=remainingMs();assert.ok(initial>60000&&initial<=C26_LIMITS.totalMs)
  const end=clock()+initial,abort=new AbortController(),windows=[],children=[],checks=[],scope={schemaVersion:1,phase:'A',passed:false,windows,children,checks,automaticB:false,automaticRetries:0,apiExitCpu:'NOT_OBSERVED_AFTER_FINAL_PROBE',gaps:'SETUP_AND_VALIDATION_GAPS_HAVE_DRIVER_PROCESS_BOUNDARIES; NO_PER_OPERATION_PG_ATTRIBUTION_OUTSIDE_WINDOWS'}
- let failure=null,session,api,runtime,h,active=null,setup=false,watchdog,resourcesTimer,cleaning=false
- const remain=()=>{const left=Math.min(remainingMs(),end-clock());assert.ok(left>0,'A driver shared deadline');if(failure&&!cleaning)throw failure;return left}
- const stop=error=>{failure??=error instanceof Error?error:new Error(String(error));if(!abort.signal.aborted)abort.abort(failure);return failure}
+ let failure=null,session,api,runtime,h,prismaGate,active=null,setup=false,watchdog,resourcesTimer,cleaning=false
+ const totalRemain=()=>{const left=Math.min(remainingMs(),end-clock());assert.ok(left>0,'A driver total deadline');return left}
+ const workRemain=()=>{if(failure)throw failure;const left=Math.min(workRemainingMs(),totalRemain()-C26_LIMITS.cleanupReserveMs);assert.ok(left>0,'A driver work deadline preserves 60s cleanup');return left}
+ const remain=()=>cleaning?totalRemain():workRemain()
+ const stop=error=>{failure??=error instanceof Error?error:new Error(String(error));h?.stop(failure);if(!abort.signal.aborted)abort.abort(failure);return failure}
+ const faultPromise=new Promise((_,reject)=>abort.signal.addEventListener('abort',()=>reject(failure),{once:true}));faultPromise.catch(()=>{})
+ scope.budget={driverRemainingAtEntryMs:initial,workRemainingAtEntryMs:workRemain(),cleanupReserveMs:C26_LIMITS.cleanupReserveMs,finalAuditReservation:'OWNED_BY_OUTER_WITHIN_ORIGINAL_1200S'}
  const safeRecord=value=>{try{const output=record(value);assert.ok(!output?.then,'journal must be synchronous');remain()}catch(error){throw stop(error)}}
  const registry=createOwnedPidRegistry(baseIdentities),applicationName=`c26:driver:${randomBytes(8).toString('hex')}`
  assert.ok(baseIdentities.every(p=>!['driver','observer','api','report_worker','export_worker'].includes(p.role)))
@@ -65,7 +91,7 @@ export async function runC26MeasuredA({directory,node,env,baseIdentities,connect
  const budget=()=>Math.max(1,Math.floor(Math.min(90000,remain())))
  const bounded=async(run,maxMs)=>{
   remain();const limit=Math.min(maxMs,remain()),until=clock()+limit;let timer
-  try{const result=await Promise.race([Promise.resolve().then(run),new Promise((_,reject)=>timer=setTimeout(()=>reject(stop(new Error('A operation aggregate deadline'))),limit))]);assert.ok(clock()<until,'A operation returned after deadline');remain();return result}finally{clearTimeout(timer)}
+  try{const result=await Promise.race([Promise.resolve().then(run),...(!cleaning?[faultPromise]:[]),new Promise((_,reject)=>timer=setTimeout(()=>reject(stop(new Error('A operation aggregate deadline'))),limit))]);assert.ok(clock()<until,'A operation returned after deadline');remain();return result}finally{clearTimeout(timer)}
  }
  const resources=()=>{try{const value=readResources(api?.identity);assertResources(value);scope.minimumResources??={...value};for(const [key,n]of Object.entries(value))scope.minimumResources[key]=Math.min(scope.minimumResources[key]??n,n);scope.lastResources=value;if(value.apiRssBytes!==undefined)scope.maxSampledApiRssBytes=Math.max(scope.maxSampledApiRssBytes??0,value.apiRssBytes);remain();if(!cleaning){api?.assertHealthy();session?.assertHealthy()}}catch(error){stop(error)}}
  const snapshot=async()=>({driver:ownSample(),api:api?await api.snapshot():null})
@@ -95,22 +121,23 @@ export async function runC26MeasuredA({directory,node,env,baseIdentities,connect
  })
  try{
   resources();if(failure)throw failure
-  watchdog=setTimeout(()=>stop(new Error('A driver outer work deadline')),Math.max(1,initial-10000));resourcesTimer=setInterval(resources,100)
-  session=await startSession({directory:createDir('pg-observer'),node,env:childEnv,registry:publishedRegistry,remainingMs:remain,record:safeRecord,onFault:stop,abortSignal:abort.signal})
+  watchdog=setTimeout(()=>stop(new Error('A driver outer work deadline')),Math.max(1,workRemain()));resourcesTimer=setInterval(resources,100)
+  session=await startSession({directory:createDir('pg-observer'),node,env:childEnv,registry:publishedRegistry,remainingMs:totalRemain,record:safeRecord,onFault:stop,abortSignal:abort.signal})
   scope.observerConnection=await session.connect(connectionOptions)
-  await measure({id:'api-startup',phase:'setup-services',requests:0},async()=>{api=await startApi({directory:createDir('api'),node,env:childEnv,remainingMs:remain,record:safeRecord,onFault:stop,abortSignal:abort.signal,register:identity=>session.register(identity)});return api.identity})
+  await measure({id:'api-startup',phase:'setup-services',requests:0},async()=>{api=await startApi({directory:createDir('api'),node,env:childEnv,remainingMs:totalRemain,record:safeRecord,onFault:stop,abortSignal:abort.signal,register:identity=>session.register(identity)});return api.identity})
   await measure({id:'idle-baseline',phase:'idle',requests:0},()=>wait(C26_LIMITS.idleMs))
   let independent
   await measure({id:'driver-setup',phase:'setup',requests:null},async()=>{
-   runtime=await loadRuntime()
+   runtime=await loadRuntime();workRemain()
+   prismaGate=installPrismaBusinessGate(runtime.prisma,{assertWork:workRemain,record,stop})
    h=createRawHarness({state:directory,apiUrl:`http://127.0.0.1:${env.PORT}`,remaining:remain,read,write,check:label=>checks.push(label),record:safeRecord,onFault:stop,normalize:runtime.normalizeProduct,fetchImpl})
    independent=await loadIndependentScope(h,runtime)
   })
   const workload=makeWorkload(h,{measure,reportChild:worker('report'),exportChild:worker('export'),independentReadScope:independent})
   await measure({id:'fixture-setup',phase:'setup',requests:null},async()=>{setup=true;try{return await workload.prepare()}finally{setup=false}})
   const phases=['startAndSaveCheckpoint','readCheckpoint','submitFour','drainOriginalReport','createOriginalExport','readRemaining','finish']
-  for(const phase of phases){const at=ownSample();safeRecord({stage:'DRIVER_PHASE_BEGIN',phase,at});const value=await workload[phase]();remain();safeRecord({stage:'DRIVER_PHASE_END',phase,at:ownSample()});if(phase==='finish')scope.workload=value}
-  h.assertQuiescent();assertWorkloadCounts(scope.workload.counts);scope.readSchedule=assertMeasuredReadSchedule(windows)
+  for(const phase of phases){const at=ownSample();safeRecord({stage:'DRIVER_PHASE_BEGIN',phase,at});const value=await bounded(()=>workload[phase](),remain());remain();safeRecord({stage:'DRIVER_PHASE_END',phase,at:ownSample()});if(phase==='finish')scope.workload=value}
+  h.assertQuiescent();scope.prismaBusiness=prismaGate.assertQuiescent();assertWorkloadCounts(scope.workload.counts);scope.readSchedule=assertMeasuredReadSchedule(windows)
   scope.tail=[]
   await measure({id:'tail-no-work',phase:'tail',requests:0},async()=>{for(const seconds of [30,60]){await wait(30000);scope.tail.push({seconds,at:await snapshot()})}})
   assert.equal(children.length,2);assert.deepEqual(children.map(c=>c.kind),['report','export']);assert.ok(windows.every(w=>w.passed))
@@ -126,7 +153,7 @@ export async function runC26MeasuredA({directory,node,env,baseIdentities,connect
   if(!failure&&api)await clean('api-stop',()=>api.stop())
   else if(api&&!scope.cleanup.some(x=>x.name.startsWith('api-stop')))await clean('api-stop-after-observer-failure',()=>api.stop())
   if(runtime){await clean('driver-queues',()=>runtime.closeQueues());await clean('driver-prisma',()=>runtime.prisma.$disconnect())}
-  scope.driverAfterCleanup=ownSample();resources();if(!failure){try{remain();assert.ok(scope.cleanup.every(x=>x.passed));scope.passed=true}catch(error){failure=error}}
+  scope.driverAfterCleanup=ownSample();scope.prismaBusiness=prismaGate?.snapshot()??null;resources();if(!failure){try{remain();assert.ok(scope.cleanup.every(x=>x.passed));assert.equal(scope.prismaBusiness?.pending,0);scope.passed=true}catch(error){failure=error}}
   if(failure){scope.passed=false;scope.error??={name:failure.name,stack:String(failure.stack??failure)}}
   scope.http=h?.result.requests??[]
   try{write('c25-c26-a-driver-result-private.json',scope);if(scope.passed)remain()}catch(error){failure??=error;scope.passed=false;scope.error??={name:error.name,stack:String(error.stack??error)};try{write('c25-c26-a-driver-result-private.json',scope)}catch{}}
