@@ -1,0 +1,93 @@
+{
+  "cases": [
+    {
+      "kind": "FORM",
+      "version": 1,
+      "bytes": 945,
+      "sha256": "b76a9fa23ac50979f3518e295eb1db76bc717378bc6dfd6e96fea3c7218bbc79",
+      "count": 7,
+      "types": [
+        "SINGLE",
+        "MULTIPLE",
+        "SHORT_TEXT",
+        "LONG_TEXT",
+        "NUMBER",
+        "LIKERT",
+        "MATRIX"
+      ],
+      "sourceLines": [
+        2,
+        3,
+        4,
+        5,
+        7,
+        8,
+        9
+      ],
+      "serverPreviewPassed": true,
+      "actualApplyParsed": true,
+      "previewDefinitionValidated": true,
+      "databaseWrites": false
+    },
+    {
+      "kind": "FORM",
+      "version": 2,
+      "bytes": 1567,
+      "sha256": "d170cd86c6f89b1c45ae0445cb474f3484b0a5bc07d68cccd0a2476bc37ef00c",
+      "count": 13,
+      "types": [
+        "SINGLE",
+        "MULTIPLE",
+        "SHORT_TEXT",
+        "LONG_TEXT",
+        "NUMBER",
+        "LIKERT",
+        "MATRIX",
+        "DATE",
+        "TIME",
+        "RANK_ORDER",
+        "SLIDER",
+        "CONSTANT_SUM",
+        "MATRIX_MULTIPLE"
+      ],
+      "sourceLines": [
+        2,
+        3,
+        4,
+        5,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "serverPreviewPassed": true,
+      "actualApplyParsed": true,
+      "previewDefinitionValidated": true,
+      "databaseWrites": false
+    },
+    {
+      "kind": "SCALE",
+      "version": 1,
+      "bytes": 319,
+      "sha256": "536be2124d05dba9452f10b9d9c54f37428e998fbe97b94380070086c0b9db69",
+      "count": 2,
+      "types": [
+        "LIKERT",
+        "LIKERT"
+      ],
+      "sourceLines": [
+        2,
+        3
+      ],
+      "serverPreviewPassed": true,
+      "actualApplyParsed": true,
+      "previewDefinitionValidated": true,
+      "databaseWrites": false
+    }
+  ]
+}
