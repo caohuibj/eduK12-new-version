@@ -3,9 +3,23 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import {policy,receiptRoute,publicFailure,publicRoute,publicPostgresFailure,persistenceMetadata,assertWithheld,assertWindow,assertTerminalBatch} from './c25-client.mjs'
-import {scaleAnswers} from './c25-fixture.mjs'
+import {scaleAnswers,startAnonymous} from './c25-fixture.mjs'
 const copy=value=>structuredClone(value)
 const t0='2026-10-19T08:00:00.000Z',releaseAt='2026-10-19T08:05:00.000Z'
+test('anonymous token expiry preserves publication upper bound after delay',async t=>{
+ let now=Date.parse(t0);t.mock.method(Date,'now',()=>now)
+ const publication={id:'synthetic-publication',expiresAt:'2026-10-19T09:00:00.000Z'},original=copy(publication)
+ for(const round of [false,true])for(const delay of [0,74480]){
+  now=Date.parse(t0)+delay;const calls=[],token={token:'synthetic-public-token'},attempt={id:'synthetic-attempt'}
+  const teacher={async request(route,method,body){calls.push({route,method,body});return token}}
+  const requests=[],client={recovery:null,async request(route,method,body){requests.push({route,method,body});return route==='/auth/csrf'?{}:{recoveryToken:'synthetic-recovery',attempt}}}
+  const result=await startAnonymous({client:()=>client},teacher,publication,{round})
+  assert.deepEqual(calls,[{route:'/composite-assessments/synthetic-publication/public-tokens',method:'POST',body:{expiresAt:publication.expiresAt,maxUses:0,...(round?{groupIpPolicy:{schemaVersion:1,timeZone:'UTC'}}:{})}}])
+  assert.deepEqual(requests,[{route:'/auth/csrf',method:undefined,body:undefined},{route:'/public/composite-assessments/synthetic-public-token/start',method:'POST',body:{}}])
+  assert.equal(client.recovery,'synthetic-recovery');assert.equal(result.attempt,attempt);assert.equal(result.token,token)
+  assert.deepEqual(publication,original)
+ }
+})
 function terminal(whole=false){
  const types=whole?['SCALE']:['FORM_SECTION','SCALE','COGNITIVE','SITUATIONAL'],n=whole?1:2,ids=whole?['A']:['B','C'],baseline={queue:{id:'reports',pending:7},otherJobs:[{id:'old',attemptId:'old',status:'PENDING',attemptCount:2}]}
  const checkpoint=id=>({attemptId:id,attemptEpoch:1,snapshotHash:'a'.repeat(64),definitionHash:'b'.repeat(64),roundId:id==='C'?'round':null,revision:5,successfulSaveCount:1,payloadEncrypted:'cipher',payloadHash:'c'.repeat(64),expiresAt:'2026-10-19T09:00:00Z',updatedAt:'before'})

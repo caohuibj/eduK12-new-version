@@ -64,7 +64,7 @@ export async function publish(teacher,p){
 }
 export async function startAuthenticated(student,p){const {attempt}=await student.request(`${prefix}/${p.id}/attempts`,'POST',{});return {client:student,attempt,base:prefix,token:null}}
 export async function startAnonymous(h,teacher,p,{round=false}={}){
- const token=await teacher.request(`${prefix}/${p.id}/public-tokens`,'POST',{expiresAt:expiry(),maxUses:0,...(round?{groupIpPolicy:{schemaVersion:1,timeZone:'UTC'}}:{})})
+ const token=await teacher.request(`${prefix}/${p.id}/public-tokens`,'POST',{expiresAt:p.expiresAt,maxUses:0,...(round?{groupIpPolicy:{schemaVersion:1,timeZone:'UTC'}}:{})})
  const client=h.client();await client.request('/auth/csrf');const first=await client.request(`${pub}/${token.token}/start`,'POST',{});client.recovery=first.recoveryToken;assert.ok(client.recovery)
  return {client,attempt:first.attempt,base:pub,token}
 }

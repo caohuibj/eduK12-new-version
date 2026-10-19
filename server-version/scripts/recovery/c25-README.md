@@ -233,6 +233,27 @@ connecting to a database, and refuses missing/tampered/cross-input evidence.
 
 ## Command sequence after the corresponding approval
 
+The first core attempt, `eduk12_c25_http_01`, remains **overall false**. Its
+upgrade and immediate/A preparation passed; scheduled stopped before its first
+completed check because the anonymous-token fixture recomputed `now + 1h`,
+74.480 seconds later than the already-published assessment expiry. The API
+correctly returned 400. Guards, consumer finalization and restore did not run.
+All services stopped cleanly; final audit retained all 6,529 original rows and
+16 historical checkpoints. Failed runtime receipt:
+`8f7f0697582519c4032a1726e71fb2bd3879c7f81afea54e36d76d6c07c50eff`.
+Read-only diagnosis index `c25-build-evidence/runtime-01-diagnosis/receipt.json`:
+`e0698268911302522543bb1cb78beaef79bd2266bc506e5475c9e17373138427`.
+
+The fixture now sends the exact published `p.expiresAt`. Only the new targeted
+test ran: it calls actual `startAnonymous` with mock transports for bound and
+unbound rounds, immediately and after a 74.480-second simulated delay, asserting
+the unchanged publication expiry and normal token/start flow. Raw evidence is
+`http-contract-03/`, receipt
+`1a1696e584c040403d0cd078eb9369b518d83d14c024361d54cf462d03c5a33b`.
+No product, Python helper, client or build changed; no runtime retry occurred.
+Any controlled continuation requires its own reviewed contract and explicit GO;
+the command examples below do not authorize overwriting or restarting HTTP01.
+
 Freeze every C25 helper first. Descriptor issuance is read-only to the accepted
 source; its output belongs in the verified dedicated evidence root. Issuance owns
 the measurement lock itself. Do not hold a second outer flock around it.
