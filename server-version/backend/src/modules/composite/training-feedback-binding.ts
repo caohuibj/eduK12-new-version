@@ -18,7 +18,6 @@ export const trainingFeedbackAttemptSelect = {
   trainingFeedbackSnapshot: true, trainingFeedbackSnapshotHash: true,
   frozenActiveSlotSetHash: true, contextSnapshotHash: true, aggregateInputHash: true,
   compositeAssessment: { select: trainingFeedbackParentSelect },
-  accessToken: { select: { trainingRoundId: true } },
 } as const
 
 const digest = z.string().regex(/^[0-9a-f]{64}$/)
@@ -31,8 +30,8 @@ const snapshotSchema = z.object({
   schemaVersion: z.literal(1), attemptId: z.string().min(1), attemptEpoch: z.number().int().positive().safe(),
   compositeId: z.string().min(1), courseId: z.string().min(1),
   publicationIdentity: publicationSchema, publicationHash: digest,
-  policy: trainingFeedbackPolicySchema, policyHash: digest, roundId: z.string().min(1).nullable(),
-}).strict()
+  policy: trainingFeedbackPolicySchema, policyHash: digest, accessTokenId: z.string().min(1).nullable(), roundId: z.string().min(1).nullable(),
+}).strict().refine(snapshot => snapshot.roundId === null || snapshot.accessTokenId !== null, 'Training round requires its frozen access token')
 export type TrainingFeedbackSnapshot = z.infer<typeof snapshotSchema>
 export type TrainingFeedbackBinding = Omit<TrainingFeedbackSnapshot, 'schemaVersion' | 'attemptId' | 'attemptEpoch' | 'publicationHash'>
 export type TrainingFeedbackAttempt = {
@@ -44,29 +43,29 @@ export type TrainingFeedbackAttempt = {
     trainingFlowDigest?: string | null; trainingVariantDigest?: string | null;
     trainingFeedbackPolicy?: unknown; trainingFeedbackPolicyHash?: string | null;
   } | null;
-  accessToken?: { trainingRoundId?: string | null } | null;
 }
 
 /** Pure admission binding. The caller holds the parent admission lock and has
  * checked the actual Training course, author, enrollment/public token and C21
  * round window using its existing reads. This rechecks frozen DTO identities. */
 export function prepareTrainingFeedbackBinding(input: {
-  composite: any; courseId: string;
+  composite: any; courseId: string; accessTokenId: string | null;
   round?: { id: string; compositeId: string; courseId: string; publicationIdentity: unknown; publicationHash: string } | null;
 }): TrainingFeedbackBinding | null {
-  const { composite, courseId, round } = input
+  const { composite, courseId, accessTokenId, round } = input
   if (composite.trainingFeedbackPolicy == null && composite.trainingFeedbackPolicyHash == null) return null
   try {
     if (composite.trainingFeedbackPolicy == null || composite.status !== 'PUBLISHED' || !composite.publishedAt ||
       composite.productKind !== 'QUESTIONNAIRE' || composite.questionnaireType !== 'COURSE' || composite.deliveryMode === 'LEGACY' ||
       composite.reportPackageKey || composite.analysisProtocolKey ||
       !(composite.questionnaireCourses ?? []).some((entry: { courseId: string }) => entry.courseId === courseId)) throw new Error('scope')
+    if ((accessTokenId !== null && (typeof accessTokenId !== 'string' || !accessTokenId)) || (round && accessTokenId === null)) throw new Error('token')
     const policy = parseTrainingFeedbackPolicy(composite.trainingFeedbackPolicy)
     if (canonicalHash(policy) !== composite.trainingFeedbackPolicyHash) throw new Error('policy hash')
     const publicationIdentity = publicationSchema.parse(trainingRoundPublicationIdentity(composite, courseId))
     if (round && (round.compositeId !== composite.id || round.courseId !== courseId ||
       round.publicationHash !== canonicalHash(publicationIdentity) || canonicalHash(round.publicationIdentity) !== round.publicationHash)) throw new Error('round')
-    return { compositeId: composite.id, courseId, publicationIdentity, policy, policyHash: composite.trainingFeedbackPolicyHash, roundId: round?.id ?? null }
+    return { compositeId: composite.id, courseId, publicationIdentity, policy, policyHash: composite.trainingFeedbackPolicyHash, accessTokenId, roundId: round?.id ?? null }
   } catch { throw compositeBadRequest('Training 反馈策略或发布绑定无效') }
 }
 
@@ -95,8 +94,7 @@ export function readTrainingFeedbackSnapshot(attempt: TrainingFeedbackAttempt): 
     canonicalHash(snapshot.publicationIdentity) !== snapshot.publicationHash ||
     canonicalHash(trainingRoundPublicationIdentity(parent, snapshot.courseId)) !== snapshot.publicationHash ||
     snapshot.publicationIdentity.compositeId !== snapshot.compositeId || snapshot.publicationIdentity.courseId !== snapshot.courseId ||
-    (attempt.accessTokenId != null && !attempt.accessToken) ||
-    snapshot.roundId !== (attempt.accessToken?.trainingRoundId ?? null)) throw new Error('Training feedback frozen identity mismatch')
+    snapshot.accessTokenId !== (attempt.accessTokenId ?? null)) throw new Error('Training feedback frozen identity mismatch')
   return snapshot
 }
 

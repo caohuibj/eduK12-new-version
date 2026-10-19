@@ -13,10 +13,10 @@ function fixture(policy: unknown = scheduled, roundId: string | null = null): Tr
   const parent = publication(policy)
   const identity = trainingRoundPublicationIdentity(parent, 'course')
   const round = roundId ? { id: roundId, compositeId: parent.id, courseId: 'course', publicationIdentity: identity, publicationHash: canonicalHash(identity) } : null
-  const binding = prepareTrainingFeedbackBinding({ composite: parent, courseId: 'course', round })!
+  const binding = prepareTrainingFeedbackBinding({ composite: parent, courseId: 'course', accessTokenId: roundId ? 'token' : null, round })!
   const snapshot = freezeTrainingFeedbackSnapshot({ ...binding, attemptId: 'attempt', attemptEpoch: 2 })
   return { id: 'attempt', attemptEpoch: 2, compositeAssessmentId: parent.id, status: 'COMPLETED', deliveryCourseId: 'course',
-    accessTokenId: roundId ? 'token' : null, accessToken: roundId ? { trainingRoundId: roundId } : null,
+    accessTokenId: roundId ? 'token' : null,
     asyncReportEpoch: null, compositeAssessment: parent,
     trainingFeedbackSnapshot: snapshot, trainingFeedbackSnapshotHash: canonicalHash(snapshot) }
 }
@@ -25,7 +25,7 @@ describe('Training feedback immutable binding and loaded-attempt evaluator', () 
   it('keeps historical absence on old whole-completed semantics even with no readiness metadata', () => {
     expect(evaluate({ status: 'COMPLETED' })).toEqual({ configured: false, allowed: true, state: 'AVAILABLE', releaseAt: null })
     for (const status of ['IN_PROGRESS', 'ABANDONED', undefined]) expect(evaluate({ status }).allowed).toBe(false)
-    expect(prepareTrainingFeedbackBinding({ composite: { trainingFeedbackPolicy: null }, courseId: 'none' })).toBeNull()
+    expect(prepareTrainingFeedbackBinding({ composite: { trainingFeedbackPolicy: null }, courseId: 'none', accessTokenId: null })).toBeNull()
   })
   it('binds exact attempt, epoch, publication, course, canonical policy and optional C21 round', () => {
     for (const roundId of [null, 'round']) {
@@ -72,11 +72,15 @@ describe('Training feedback immutable binding and loaded-attempt evaluator', () 
     const attempt = fixture(immediate)
     expect(evaluate({ ...attempt, compositeAssessment: { ...attempt.compositeAssessment, ...change } }).state).toBe('UNAVAILABLE')
   })
-  it('rejects round substitution and a token whose required relation was not loaded', () => {
+  it('binds frozen access-token identity without an extra mutable relation read', () => {
     const attempt = fixture(immediate, 'round')
-    for (const accessToken of [undefined, null, { trainingRoundId: 'other' }, { trainingRoundId: null }])
-      expect(evaluate({ ...attempt, accessToken }).state).toBe('UNAVAILABLE')
-    expect(evaluate({ ...fixture(immediate), accessTokenId: 'anonymous-token', accessToken: { trainingRoundId: null } }).allowed).toBe(true)
+    for (const accessTokenId of [undefined, null, 'other-token'])
+      expect(evaluate({ ...attempt, accessTokenId }).state).toBe('UNAVAILABLE')
+    expect(evaluate(attempt).allowed).toBe(true)
+    expect(evaluate({ ...fixture(immediate), accessTokenId: 'anonymous-token' }).state).toBe('UNAVAILABLE')
+    const parent = publication(immediate), identity = trainingRoundPublicationIdentity(parent, 'course')
+    expect(() => prepareTrainingFeedbackBinding({ composite: parent, courseId: 'course', accessTokenId: null,
+      round: { id: 'round', compositeId: parent.id, courseId: 'course', publicationIdentity: identity, publicationHash: canonicalHash(identity) } })).toThrow()
   })
   it('rejects unknown snapshot fields even when their hash is recomputed', () => {
     const attempt = fixture(immediate)
@@ -89,7 +93,8 @@ describe('Training feedback immutable binding and loaded-attempt evaluator', () 
     expect(evaluate({ ...attempt, compositeAssessment: parent }).allowed).toBe(true)
   })
   it('exposes a bounded joined-parent select with no response/content payloads', () => {
-    expect(trainingFeedbackAttemptSelect).toMatchObject({ accessTokenId: true, accessToken: { select: { trainingRoundId: true } }, asyncReportEpoch: true })
+    expect(trainingFeedbackAttemptSelect).toMatchObject({ accessTokenId: true, asyncReportEpoch: true })
+    expect(trainingFeedbackAttemptSelect).not.toHaveProperty('accessToken')
     expect(JSON.stringify(trainingFeedbackAttemptSelect)).not.toMatch(/Encrypted|answers|items|checkpoints/)
   })
   it('fails closed on an invalid authoritative clock for configured policies', () => {
@@ -100,13 +105,13 @@ describe('Training feedback immutable binding and loaded-attempt evaluator', () 
     { productKind: 'LEGACY_COMPOSITE' }, { questionnaireType: 'GENERAL' }, { deliveryMode: 'LEGACY' },
     { reportPackageKey: 'package' }, { analysisProtocolKey: 'analysis' }, { questionnaireCourses: [] },
   ])('rejects invalid admission publication %j', change => {
-    expect(() => prepareTrainingFeedbackBinding({ composite: { ...publication(), ...change }, courseId: 'course' })).toThrow()
+    expect(() => prepareTrainingFeedbackBinding({ composite: { ...publication(), ...change }, courseId: 'course', accessTokenId: null })).toThrow()
   })
   it('rejects a round from another immutable publication without changing old C21 identities', () => {
     const composite = publication()
     const identity = trainingRoundPublicationIdentity(composite, 'course')
     const round = { id: 'round', compositeId: composite.id, courseId: 'course', publicationIdentity: identity, publicationHash: canonicalHash(identity) }
     for (const change of [{ compositeId: 'other' }, { courseId: 'other' }, { publicationHash: '0'.repeat(64) }, { publicationIdentity: {} }])
-      expect(() => prepareTrainingFeedbackBinding({ composite, courseId: 'course', round: { ...round, ...change } })).toThrow()
+      expect(() => prepareTrainingFeedbackBinding({ composite, courseId: 'course', accessTokenId: 'token', round: { ...round, ...change } })).toThrow()
   })
 })

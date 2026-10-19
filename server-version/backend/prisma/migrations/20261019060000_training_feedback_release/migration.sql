@@ -52,6 +52,7 @@ BEGIN
     OR NEW.training_feedback_snapshot->>'attemptEpoch' IS DISTINCT FROM NEW.attempt_epoch::text
     OR NEW.training_feedback_snapshot->>'compositeId' IS DISTINCT FROM NEW.composite_assessment_id
     OR NEW.training_feedback_snapshot->>'courseId' IS DISTINCT FROM NEW.delivery_course_id
+    OR NEW.training_feedback_snapshot->>'accessTokenId' IS DISTINCT FROM NEW.access_token_id
     OR NEW.training_feedback_snapshot->>'roundId' IS DISTINCT FROM token_round
     OR NEW.training_feedback_snapshot->'policy' IS DISTINCT FROM p.training_feedback_policy
     OR NEW.training_feedback_snapshot->>'policyHash' IS DISTINCT FROM p.training_feedback_policy_hash
