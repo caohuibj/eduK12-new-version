@@ -218,27 +218,27 @@ test('retirement serializes a fresh query after an older in-flight snapshot',asy
 })
 
 test('prepare-close covers real disconnect before terminal/close without hiding live worker CPU',async()=>{
- const h=harness();await h.observer.begin();const prepared=h.observer.prepareOwnerClose({pid:40,startTicks:'400'});assert.equal(prepared.prepared,true)
+ const h=harness();await h.observer.begin();const prepared=await h.observer.prepareOwnerClose({pid:40,startTicks:'400'});assert.equal(prepared.prepared,true)
  h.frame.processes=h.frame.processes.filter(p=>p.pid!==104);h.frame.pgChildren=h.frame.pgChildren.filter(p=>p.pid!==104);h.frame.sockets=h.frame.sockets.filter(s=>s.ownerPid!==40);h.row.activity=h.row.activity.filter(p=>p.pid!==104)
  h.frame.processes.find(p=>p.pid===40).userTicks=8;h.setTime(100);h.fireInterval(100);h.fireInterval(250);await flush()
- assert.equal(h.stops.length,0);assert.equal(h.calls.length,2);assert.ok(h.events.some(e=>e.kind==='prepared_backend_close_verified'))
+ assert.equal(h.stops.length,0);assert.equal(h.calls.length,3);assert.ok(h.events.some(e=>e.kind==='prepared_backend_close_verified'))
  assert.ok(h.events.some(e=>e.kind==='proc'&&e.processes.some(p=>p.pid===40&&p.userTicks===8)))
  h.frame.processes=h.frame.processes.filter(p=>p.pid!==40);h.setTime(110);const result=await h.observer.retireOwner(retirementProof())
  assert.equal(result.status,'CLOSED_VERIFIED_BY_FRESH_PG_AND_PROC');assert.equal(result.terminalCpu.user,1200);assert.equal(result.closePreparationElapsedMs,110);assert.equal(result.backendTailIntervals[0].tailCpu,'NOT_OBSERVED');assert.equal(h.stops.length,0);assert.equal(h.observer.state().cost.retirementRefreshes,2);await h.observer.stop()
 })
 
 test('prepared close cannot silently omit worker terminal/close proof',async()=>{
- const h=harness();await h.observer.begin();h.observer.prepareOwnerClose({pid:40,startTicks:'400'});h.setTime(80000);h.fireTimeout(80000)
+ const h=harness();await h.observer.begin();await h.observer.prepareOwnerClose({pid:40,startTicks:'400'});h.setTime(80000);h.fireTimeout(80000)
  assert.match(h.observer.state().failure,/aggregate\/window deadline exhausted/);assert.equal(h.stops.length,1)
 })
 
 test('prepared close does not relax API disappearance',async()=>{
- const h=harness();await h.observer.begin();h.observer.prepareOwnerClose({pid:40,startTicks:'400'});h.frame.processes=h.frame.processes.filter(p=>p.pid!==20);h.setTime(100);h.fireInterval(100)
+ const h=harness();await h.observer.begin();await h.observer.prepareOwnerClose({pid:40,startTicks:'400'});h.frame.processes=h.frame.processes.filter(p=>p.pid!==20);h.setTime(100);h.fireInterval(100)
  assert.match(h.observer.state().failure,/owned process missing/);assert.equal(h.stops.length,1)
 })
 
 test('prepared owner may exit before the Node close callback without zero CPU or completion',async()=>{
- const h=harness();await h.observer.begin();h.observer.prepareOwnerClose({pid:40,startTicks:'400'});removeReportOwner(h);h.setTime(100);h.fireInterval(100);await flush()
+ const h=harness();await h.observer.begin();await h.observer.prepareOwnerClose({pid:40,startTicks:'400'});removeReportOwner(h);h.setTime(100);h.fireInterval(100);await flush()
  assert.equal(h.stops.length,0);assert.ok(h.events.some(e=>e.kind==='proc'&&e.missingOwnerIdentities.includes('40:400')&&!e.processes.some(p=>p.pid===40)))
  assert.ok(h.registry.entries().some(p=>p.pid===40),'owner stays registered pending actual close proof')
  h.setTime(120);const retirement=await h.observer.retireOwner(retirementProof());assert.equal(retirement.terminalCpu.user,1200);assert.equal(retirement.closePreparationElapsedMs,120)
@@ -246,11 +246,11 @@ test('prepared owner may exit before the Node close callback without zero CPU or
 })
 
 test('prepared missing-owner grace cannot accept PID reuse',async()=>{
- const h=harness();await h.observer.begin();h.observer.prepareOwnerClose({pid:40,startTicks:'400'});h.frame.processes.find(p=>p.pid===40).startTicks='401';h.setTime(100);h.fireInterval(100)
+ const h=harness();await h.observer.begin();await h.observer.prepareOwnerClose({pid:40,startTicks:'400'});h.frame.processes.find(p=>p.pid===40).startTicks='401';h.setTime(100);h.fireInterval(100)
  assert.match(h.observer.state().failure,/prepared owner PID reused/);assert.equal(h.stops.length,1)
 })
 
 test('prepared missing owner cannot complete the window without genuine close proof',async()=>{
- const h=harness();await h.observer.begin();h.observer.prepareOwnerClose({pid:40,startTicks:'400'});removeReportOwner(h);h.setTime(100);h.fireInterval(100);await flush()
+ const h=harness();await h.observer.begin();await h.observer.prepareOwnerClose({pid:40,startTicks:'400'});removeReportOwner(h);h.setTime(100);h.fireInterval(100);await flush()
  await assert.rejects(h.observer.operationEnd(),/await owner retirement refresh/);assert.equal(h.stops.length,1)
 })

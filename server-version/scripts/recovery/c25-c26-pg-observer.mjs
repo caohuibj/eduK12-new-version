@@ -7,12 +7,13 @@
  * verified in every response; this module does not SET/reset/install anything.
  * A changed PG child set queues one bounded serialized attribution refresh;
  * raw CPU/RSS stays in pending evidence until fresh SQL proves ownership.
- * Await waitForAttribution() before prepareOwnerClose when a refresh is pending.
+ * prepareOwnerClose is asynchronous: await its fresh attribution proof before
+ * sending any child cleanup/disconnect permission. It drains existing refreshes.
  * readProc() synchronously returns {processes, sockets, pgChildren}. Socket
  * evidence comes from the owner's /proc/PID/fd inode plus net/tcp{,6}, never
  * guessed application_name. pgChildren is the COMPLETE postmaster child list.
- * Before authorizing child prisma.$disconnect/cleanup, synchronously call
- * prepareOwnerClose({pid,startTicks}); only its already-attributed PG backends
+ * Before authorizing child prisma.$disconnect/cleanup, await
+ * prepareOwnerClose({pid,startTicks}); only its freshly-attributed PG backends
  * may disappear pending a bounded fresh query. The exact prepared worker is
  * sampled while live; its exit before Node's close callback is recorded as a
  * pending missing-owner observation, never zero CPU. PID reuse still stops. The
@@ -181,8 +182,8 @@ export function createPgObserver({query,readProc,registry,target,remainingMs,rec
  if(pgStatStatements.mode==='unsupported')assert.match(pgStatStatements.reason,/^[A-Z0-9_]{1,100}$/)
  target=Object.freeze({...target})
  const observerProcess=registry.entries().find(entry=>entry.role==='observer');assert.ok(observerProcess,'missing observer process identity')
- let phase='new',failure=null,started,lastNow=-Infinity,procTimer,pgTimer,deadlineTimer,inFlight=null,collectionPending=null,boundaryPending=false,retirementPending=null,closureRefresh=null,attributionPending=null,attributionRefresh=null,refreshTail=null,controller=null,previousStats=null,activity=null,frame=null,evidenceBytes=0,endAt=null,cpuBefore=null
- const snapshots={},cost={issued:0,completed:0,failed:0,queryElapsedMs:0,returnedRows:0,procSamples:0,pgSamples:0,boundaryCoveredPgTicks:0,retirementCoveredPgTicks:0,retirementRefreshes:0,attributionRefreshes:0,attributionCoveredPgTicks:0},bindings=new Map(),backendPids=new Map(),procCounters=new Map(),retirements=[],attributionResolutions=[]
+ let phase='new',failure=null,started,lastNow=-Infinity,procTimer,pgTimer,deadlineTimer,inFlight=null,collectionPending=null,currentCollection=null,boundaryPending=false,retirementPending=null,closureRefresh=null,attributionPending=null,attributionRefresh=null,refreshTail=null,controller=null,previousStats=null,activity=null,frame=null,evidenceBytes=0,endAt=null,cpuBefore=null
+ const snapshots={},cost={issued:0,completed:0,failed:0,queryElapsedMs:0,returnedRows:0,procSamples:0,pgSamples:0,boundaryCoveredPgTicks:0,retirementCoveredPgTicks:0,retirementRefreshes:0,attributionRefreshes:0,attributionCoveredPgTicks:0,closePreparationRefreshes:0},bindings=new Map(),backendPids=new Map(),procCounters=new Map(),retirements=[],attributionResolutions=[]
  const clock=()=>{const value=now();assert.ok(Number.isFinite(value)&&value>=lastNow,'observer clock went backwards');lastNow=value;return value}
  const clear=()=>{for(const timer of [procTimer,pgTimer])if(timer!==undefined)timers.clearInterval(timer);if(deadlineTimer!==undefined)timers.clearTimeout(deadlineTimer)}
  const fail=error=>{if(!failure){failure=error;phase='failed';clear();controller?.abort();try{onStop(error)}catch(stopError){failure=new AggregateError([error,stopError],'observer and stop callback failed')}}return failure}
@@ -265,7 +266,7 @@ export function createPgObserver({query,readProc,registry,target,remainingMs,rec
    const row=response.rows[0];validateIdentity(row,target,limit);cost.completed++;cost.returnedRows+=response.rows.length;return row
   }catch(error){cost.failed++;throw fail(error)}finally{timers.clearTimeout(watchdog);cost.queryElapsedMs+=clock()-begin;inFlight=null;controller=null}
  }
- const collect=async(boundary,{verifyRetirement=false,verifyClosureProgress=false,verifyAttribution=false}={})=>{
+ const collectNow=async(boundary,{verifyRetirement=false,verifyClosureProgress=false,verifyAttribution=false}={})=>{
   const row=await sql(boundary?'boundary':'activity');validateStats(row,previousStats);previousStats=clone(row)
   const next=readProc();if(activity&&!verifyAttribution)rememberPendingChildren(addedPgChildren(next).filter(child=>!row.activity.some(row=>row.pid===child.pid)))
   const observed=attributeCached(row.activity,next,{verifyRetirement,verifyClosureProgress,verifyAttribution})
@@ -275,9 +276,18 @@ export function createPgObserver({query,readProc,registry,target,remainingMs,rec
   const value={elapsedMs:clock()-started,...row,activity:observed,pendingPgChildIdentities:verifyAttribution?[]:(attributionPending?.children??[]).map(identity),retiringBackends:row.activity.filter(p=>retirementPending?.backends.some(candidate=>candidate.pid===p.pid)),walScope:'PHYSICAL_CLUSTER_INCLUDING_OBSERVER_AND_BACKGROUND'}
   emit({kind:boundary?'pg_boundary':'pg_activity',...value});return value
  }
+ // Track the complete SQL + proc + attribution collection, including direct
+ // boundaries. A refresh discovered by a 100ms tick waits for this whole unit.
+ const serializeCollection=task=>{
+  const before=currentCollection
+  const pending=Promise.resolve().then(async()=>{if(before)await before;healthy();return task()})
+  const tracked=pending.finally(()=>{if(currentCollection===tracked)currentCollection=null})
+  currentCollection=tracked;return tracked
+ }
+ const collect=(boundary,options)=>serializeCollection(()=>collectNow(boundary,options))
  const enqueueRefresh=task=>{
   const before=refreshTail
-  const job=Promise.resolve().then(async()=>{if(before)await before;if(collectionPending)await collectionPending;healthy();return task()})
+  const job=Promise.resolve().then(async()=>{if(before)await before;if(currentCollection)await currentCollection;healthy();return task()})
   refreshTail=job.catch(()=>{});return job
  }
  const drainRefreshes=async()=>{while(attributionRefresh||closureRefresh){const current=refreshTail;assert.ok(current,'missing refresh queue');await current;healthy()}}
@@ -314,29 +324,34 @@ export function createPgObserver({query,readProc,registry,target,remainingMs,rec
    return clone(snapshots.before)
   }),
   operationEnd:()=>guarded(async()=>{
-   healthy();assert.equal(phase,'running','operation end out of order');assert.ok(!retirementPending,'await owner retirement refresh before operation boundary')
+   healthy();assert.equal(phase,'running','operation end out of order');assert.ok(!boundaryPending&&!retirementPending,'await owner retirement refresh before operation boundary; preparation must also finish')
    phase='ending';boundaryPending=true;endAt=clock();if(collectionPending)await collectionPending;await drainRefreshes();healthy();snapshots.operationEnd=await collect(true);await drainRefreshes();phase='settling';boundaryPending=false;return clone(snapshots.operationEnd)
   }),
   settledEnd:()=>guarded(async()=>{
-   healthy();assert.equal(phase,'settling','settled end out of order');assert.ok(!retirementPending,'await owner retirement refresh before settled boundary');assert.ok(clock()-endAt>=1100,'stats settle shorter than 1100ms')
+   healthy();assert.equal(phase,'settling','settled end out of order');assert.ok(!boundaryPending&&!retirementPending,'await owner retirement refresh before settled boundary; preparation must also finish');assert.ok(clock()-endAt>=1100,'stats settle shorter than 1100ms')
    phase='finishing';boundaryPending=true;if(collectionPending)await collectionPending;await drainRefreshes();healthy();snapshots.settledEnd=await collect(true);await drainRefreshes()
    let statements={available:false,reason:pgStatStatements.reason}
-   if(pgStatStatements.mode==='required'){const row=await sql('statements');decimal(row.statements?.calls,'statement calls');decimal(row.statements?.returned_rows,'statement rows');assert.ok(Number.isFinite(row.statements.total_exec_time_ms)&&row.statements.total_exec_time_ms>=0,'required pg_stat_statements timing');statements={available:true,...row.statements}}
+   if(pgStatStatements.mode==='required'){const row=await serializeCollection(()=>sql('statements'));decimal(row.statements?.calls,'statement calls');decimal(row.statements?.returned_rows,'statement rows');assert.ok(Number.isFinite(row.statements.total_exec_time_ms)&&row.statements.total_exec_time_ms>=0,'required pg_stat_statements timing');statements={available:true,...row.statements}}
+   await drainRefreshes();healthy()
    const result={...clone(snapshots),statements,retirements:clone(retirements),attributionResolutions:clone(attributionResolutions),observerCost:costSnapshot(),intervals:OBSERVER_INTERVALS,statsSettleMs:clock()-endAt,limitations:['Database tuples are not SQL counts; query duration is not CPU.','WAL includes shared-cluster background and observer work.','Sampled /proc misses short peaks and exit tails; child terminal evidence remains required.','CPU below one tick is not proof of zero; no observer costs are subtracted.']}
    emit({kind:'observer_cost',...result.observerCost});phase='settled';boundaryPending=false;clear();return result
   }),
   waitForAttribution:()=>guarded(async()=>{healthy();await drainRefreshes();healthy();return {pending:false,refreshes:cost.attributionRefreshes}}),
-  prepareOwnerClose({pid,startTicks}){
-   try{
-    healthy();assert.ok(!attributionPending,'await waitForAttribution before prepare close');assert.ok(['running','settling'].includes(phase)&&!boundaryPending&&!retirementPending,'prepare close overlaps another boundary')
-    const owner=registry.entries().find(p=>p.pid===pid);assert.ok(owner&&identity(owner)===identity({pid,startTicks}),'unknown prepare-close owner')
-    assert.ok(['report_worker','export_worker'].includes(owner.role),'only report/export may prepare close')
-    const backends=(activity?.rows??[]).filter(p=>p.ownerIdentity===identity(owner))
-    const remaining=budget();retirementPending={ownerIdentity:identity(owner),backends:clone(backends),prepared:true,closedAt:new Map(),preparedAt:clock()}
-    emit({kind:'owner_close_prepared',ownerIdentity:identity(owner),backendIdentities:backends.map(identity),terminalProofRequired:true,remainingMs:remaining,budgetPolicy:'EXISTING_AGGREGATE_AND_WINDOW_DEADLINE_NOT_RESET'})
-    return {prepared:true,ownerIdentity:identity(owner),remainingMs:remaining}
-   }catch(error){throw fail(error)}
-  },
+  prepareOwnerClose:({pid,startTicks})=>guarded(async()=>{
+   healthy();assert.ok(['running','settling'].includes(phase)&&!boundaryPending&&!retirementPending,'prepare close overlaps another boundary')
+   const owner=registry.entries().find(p=>p.pid===pid);assert.ok(owner&&identity(owner)===identity({pid,startTicks}),'unknown prepare-close owner')
+   assert.ok(['report_worker','export_worker'].includes(owner.role),'only report/export may prepare close')
+   const preparingAt=clock();boundaryPending=true
+   if(collectionPending)await collectionPending;await drainRefreshes();healthy()
+   // A backend may have been born after the last 100ms proc sample. Always
+   // collect fresh SQL + proc before granting the child permission to close.
+   await collect(false);cost.closePreparationRefreshes++;await drainRefreshes();healthy()
+   assert.ok(registry.entries().some(p=>identity(p)===identity(owner)&&p.role===owner.role),'prepare-close owner binding changed')
+   const backends=activity.rows.filter(p=>p.ownerIdentity===identity(owner))
+   const remaining=budget();retirementPending={ownerIdentity:identity(owner),backends:clone(backends),prepared:true,closedAt:new Map(),preparedAt:clock()}
+   emit({kind:'owner_close_prepared',ownerIdentity:identity(owner),backendIdentities:backends.map(identity),terminalProofRequired:true,remainingMs:remaining,preparationElapsedMs:clock()-preparingAt,budgetPolicy:'EXISTING_AGGREGATE_AND_WINDOW_DEADLINE_NOT_RESET'})
+   boundaryPending=false;return {prepared:true,ownerIdentity:identity(owner),remainingMs:remaining}
+  }),
   retireOwner:proof=>guarded(async()=>{
    healthy();assert.ok(['running','settling'].includes(phase)&&!boundaryPending&&(!retirementPending||retirementPending.prepared&&retirementPending.ownerIdentity===identity(proof)),'retirement notification overlaps another boundary')
    const owner=registry.entries().find(p=>p.pid===proof.pid);assert.ok(owner&&identity(owner)===identity(proof),'unknown retirement owner')
@@ -350,7 +365,7 @@ export function createPgObserver({query,readProc,registry,target,remainingMs,rec
    const result={ownerIdentity:identity(owner),role:owner.role,backendIdentities:backends.map(identity),terminalCpu:clone(proof.terminalCpu),status:'CLOSED_VERIFIED_BY_FRESH_PG_AND_PROC',refreshElapsedMs:clock()-at,closePreparationElapsedMs:preparedAt===null?null:clock()-preparedAt,backendTailIntervals:backends.map(backend=>{const last=procCounters.get(identity(backend));assert.ok(last,'missing prior backend CPU sample');return {identity:identity(backend),lastObservedAtMs:last.observedElapsedMs,absenceVerifiedAtMs:closedAt.get(identity(backend)),lastUserTicks:last.userTicks,lastSystemTicks:last.systemTicks,tailCpu:'NOT_OBSERVED'}}),backendCpuExitTail:'NOT_OBSERVED; PRIOR_SAMPLES_PRESERVED; NEVER_IMPUTE_ZERO'}
    retirements.push(result);emit({kind:'owner_retirement_verified',...result});retirementPending=null;return clone(result)
   }),
-  async stop(){clear();controller?.abort();if(inFlight)await inFlight.catch(()=>{});if(collectionPending)await collectionPending;if(closureRefresh)await closureRefresh;if(attributionRefresh)await attributionRefresh;if(!failure)phase='closed';return {phase,failure:failure?.message??null,evidenceBytes}},
+  async stop(){clear();controller?.abort();if(inFlight)await inFlight.catch(()=>{});if(collectionPending)await collectionPending;if(currentCollection)await currentCollection.catch(()=>{});if(closureRefresh)await closureRefresh;if(attributionRefresh)await attributionRefresh;if(!failure)phase='closed';return {phase,failure:failure?.message??null,evidenceBytes}},
   state(){return {phase,failure:failure?.message??null,queryPending:inFlight!==null,attributionPending:attributionPending!==null,evidenceBytes,cost:{...cost}}},
  })
 }

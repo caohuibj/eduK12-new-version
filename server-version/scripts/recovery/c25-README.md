@@ -1020,3 +1020,19 @@ exact retiring backend identities are considered; missing CPU is recorded as
 unobserved, never zero-filled. The same window deadline remains in force and
 cannot finish while retirement is pending. The real child lifecycle handshake
 and process/socket adapter must consume this contract in the next reviewed batch.
+
+The C26 raw-harness bridge unwraps the real transport's `{value, measurement}`:
+fixture/driver consumers receive the DTO, while every measurement is retained
+separately. All clients share one operation/failure gate; each login performs the
+actual CSRF request followed by the role-appropriate login request, both visible
+to the setup ledger. A failed private DTO journal stops every client, even when
+the write response was already received. The no-service boundary test connects
+the actual transport, bridge and driver through injected fetch/database I/O.
+
+`prepareOwnerClose` is asynchronous. The caller must await a fresh, bounded
+SQL/process attribution before allowing a worker to disconnect; merely waiting
+for an already-pending refresh cannot cover a just-created backend. Every full
+collection, including periodic, boundary, prepare and retirement, shares the same
+serial lane. Added queries and refresh CPU remain observer costs within the
+original window, with no retry or reset. These are preparation contracts; the
+actual API/worker/coordinator integration and A measurement remain outstanding.

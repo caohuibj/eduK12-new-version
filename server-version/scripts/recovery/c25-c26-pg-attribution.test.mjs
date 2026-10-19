@@ -109,30 +109,30 @@ test('new-attribution SQL watchdog is bounded and a failed query is not retried'
 })
 
 test('two owned pool backends may close separately before genuine owner retirement',async()=>{
- const h=harness();addBackend(h,{ownerPid:40,app:'c26:report'});await h.observer.begin();h.observer.prepareOwnerClose({pid:40,startTicks:'400'})
+ const h=harness();addBackend(h,{ownerPid:40,app:'c26:report'});await h.observer.begin();await h.observer.prepareOwnerClose({pid:40,startTicks:'400'})
  removeBackend(h,104);h.setTime(100);h.fireInterval(100);await h.observer.waitForAttribution()
  const first=h.events.filter(e=>e.kind==='prepared_backend_close_verified').at(-1);assert.deepEqual(first.closedBackendIdentities,['104:1004']);assert.deepEqual(first.remainingBackendIdentities,['106:1006']);assert.equal(h.stops.length,0)
  removeBackend(h,106);h.setTime(200);h.fireInterval(100);await h.observer.waitForAttribution();assert.equal(h.observer.state().cost.retirementRefreshes,2)
  h.frame.processes=h.frame.processes.filter(p=>p.pid!==40);h.setTime(210);const result=await h.observer.retireOwner(proof())
- assert.equal(result.backendTailIntervals.find(p=>p.identity==='104:1004').absenceVerifiedAtMs,100);assert.equal(result.backendTailIntervals.find(p=>p.identity==='106:1006').absenceVerifiedAtMs,200);assert.equal(result.terminalCpu.user,1200);assert.equal(h.calls.length,4);assert.equal(h.stops.length,0);await h.observer.stop()
+ assert.equal(result.backendTailIntervals.find(p=>p.identity==='104:1004').absenceVerifiedAtMs,100);assert.equal(result.backendTailIntervals.find(p=>p.identity==='106:1006').absenceVerifiedAtMs,200);assert.equal(result.terminalCpu.user,1200);assert.equal(h.calls.length,5);assert.equal(h.stops.length,0);await h.observer.stop()
 })
 
 test('still-live member of a closing pool retains actual socket validation',async()=>{
- const h=harness();addBackend(h,{ownerPid:40,app:'c26:report'});await h.observer.begin();h.observer.prepareOwnerClose({pid:40,startTicks:'400'})
+ const h=harness();addBackend(h,{ownerPid:40,app:'c26:report'});await h.observer.begin();await h.observer.prepareOwnerClose({pid:40,startTicks:'400'})
  removeBackend(h,104);h.frame.sockets=h.frame.sockets.filter(p=>p.localPort!==40106);h.setTime(100);h.fireInterval(100)
  assert.match(h.observer.state().failure,/socket ownership/);assert.equal(h.stops.length,1)
 })
 
 test('final retirement still requires every previously attributed backend gone',async()=>{
- const h=harness();addBackend(h,{ownerPid:40,app:'c26:report'});await h.observer.begin();h.observer.prepareOwnerClose({pid:40,startTicks:'400'})
+ const h=harness();addBackend(h,{ownerPid:40,app:'c26:report'});await h.observer.begin();await h.observer.prepareOwnerClose({pid:40,startTicks:'400'})
  removeBackend(h,104);h.setTime(100);h.fireInterval(100);await h.observer.waitForAttribution();h.frame.processes=h.frame.processes.filter(p=>p.pid!==40)
  await assert.rejects(h.observer.retireOwner(proof()),/did not disappear/);assert.equal(h.stops.length,1)
 })
 
 test('new API attribution and partial worker close share the same serial refresh queue',async()=>{
- const h=harness();addBackend(h,{ownerPid:40,app:'c26:report'});await h.observer.begin();h.observer.prepareOwnerClose({pid:40,startTicks:'400'})
+ const h=harness();addBackend(h,{ownerPid:40,app:'c26:report'});await h.observer.begin();await h.observer.prepareOwnerClose({pid:40,startTicks:'400'})
  removeBackend(h,104);addBackend(h,{pid:107,startTicks:'1007',port:40107});h.setTime(100);h.fireInterval(100);await h.observer.waitForAttribution()
- assert.equal(h.calls.length,3);assert.equal(h.observer.state().cost.attributionRefreshes,1);assert.equal(h.observer.state().cost.retirementRefreshes,1);assert.equal(h.stops.length,0);await h.observer.stop()
+ assert.equal(h.calls.length,4);assert.equal(h.observer.state().cost.attributionRefreshes,1);assert.equal(h.observer.state().cost.retirementRefreshes,1);assert.equal(h.stops.length,0);await h.observer.stop()
 })
 
 test('a child born after the SQL snapshot but before proc reading gets one fresh attribution',async()=>{
