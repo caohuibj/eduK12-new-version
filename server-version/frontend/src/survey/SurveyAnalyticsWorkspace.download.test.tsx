@@ -189,6 +189,29 @@ describe('Survey analytics artifact downloads',()=>{
     expect(exportRequests()).toHaveLength(1)
   })
 
+  it('hands the exact signed cursor to the next batch only after three explicit file actions',async()=>{
+    render(<SurveyAnalyticsWorkspace projectId={projectId}/>)
+    fireEvent.click(await screen.findByRole('button',{name:'创建受控导出'}))
+    for(const label of ['CSV','Codebook','Manifest']){
+      fireEvent.click(await screen.findByRole('button',{name:'下载 '+label}))
+      await screen.findByRole('button',{name:'重新发起 '+label})
+    }
+    const readsBefore=requests.filter(r=>r.url.endsWith('/download')).length
+    responseTicket={...ticket,id:'next-export-3333',pageNumber:8,nextCursor:'next-signed-cursor'}
+    fireEvent.click(screen.getByRole('button',{name:'生成下一批（请先核对本批文件）'}))
+    await screen.findByText(/第 8 批有效 FINAL 已生成/)
+    expect(requests.filter(r=>r.method==='POST'&&r.url===base+'/exports').map(r=>r.body)).toEqual([
+      {format:'RAW_WAVE',waveId,includeFreeText:false},
+      {format:'RAW_WAVE',waveId,includeFreeText:false,cursor:'synthetic-next-page'},
+    ])
+    expect(requests.filter(r=>r.url.endsWith('/download'))).toHaveLength(readsBefore)
+    for(const label of ['CSV','Codebook','Manifest']){
+      expect(screen.getByRole('button',{name:'下载 '+label})).toBeEnabled()
+      expect(screen.getByText(label+'：尚未发起')).toBeInTheDocument()
+    }
+    expect(screen.getByRole('button',{name:'生成下一批（请先核对本批文件）'})).toBeDisabled()
+  })
+
   it.each(['network','non-json','safari-non-json',403,404,409,429])('keeps the original ticket after %s read failure and retries only the selected file',async failure=>{
     downloadReply=()=>failure==='network'?Promise.reject(new TypeError('synthetic connection lost')):
       failure==='safari-non-json'?Promise.reject(new DOMException('The string did not match the expected pattern.','SyntaxError')):
