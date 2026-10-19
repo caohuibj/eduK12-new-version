@@ -1,0 +1,39 @@
+{
+  "method": "TypeScript AST source-text comparison; evidence, not replacement for runtime tests",
+  "baseline": "6aeba71d6cad70725d5164598f8dc854d11c1c89",
+  "rows": [
+    {
+      "file": "SurveyPublicApp.tsx",
+      "currentSha256": "12f1a445a7b5bc10fe755343f2b6ef9b7fb72c69f54ed75572f10897c7e90b26",
+      "comparedFunctions": [
+        "firstFinalGeneral",
+        "readSingleResume",
+        "publicApi",
+        "nextPage",
+        "readCompletion",
+        "resumeSingle",
+        "start",
+        "canAdvanceFlow",
+        "advanceFlow",
+        "updateAnswer",
+        "recordTiming",
+        "timingFor",
+        "priorAnswersFor",
+        "renderSurveyTask",
+        "submit",
+        "saveCheckpoint"
+      ],
+      "changedFunctions": [],
+      "controlAttributes": 100,
+      "controlAttributesByteIdentical": true
+    },
+    {
+      "file": "SurveyTimedScale.tsx",
+      "currentSha256": "b4d110d60ffacd0aadb497c3e3a882cfd95d11b9cfbdf9071b43479075cf0fc3",
+      "comparedFunctions": [],
+      "changedFunctions": [],
+      "controlAttributes": 12,
+      "controlAttributesByteIdentical": true
+    }
+  ]
+}

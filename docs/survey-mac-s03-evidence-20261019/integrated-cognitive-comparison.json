@@ -1,0 +1,108 @@
+{
+  "method": "Mac IAB Chromium, actual unmodified 120-trial Go/No-Go runner, read-only DOM comparison; supplemental only, not native Safari/Chrome or hardware latency acceptance",
+  "beforeProductCommit": "6b19767ee5a536d3f8f17942cb55eebb7e5a08fb",
+  "after": "509130b4d7d0d157e472e6d227f6f3564450b619; final S03 CSS/guard plus merged main 6aeba71",
+  "viewport": [
+    1440,
+    900,
+    1
+  ],
+  "scroll": [
+    0,
+    121
+  ],
+  "states": [
+    "rgb(229, 231, 235)",
+    "rgb(34, 197, 94)",
+    "rgb(239, 68, 68)"
+  ],
+  "stimulusRect": [
+    648.5,
+    364.453125,
+    128,
+    128
+  ],
+  "nodesPerState": 17,
+  "computedPropertiesPerNode": 32,
+  "compared": [
+    "tag",
+    "id",
+    "class",
+    "rect",
+    "all listed computed styles",
+    "viewport",
+    "scroll"
+  ],
+  "differences": [],
+  "differenceCount": 0,
+  "protectedSourceFiles": 219,
+  "protectedSourceChanges": "See integrated-protected-source.json: 5 changes from merged main, byte-identical to main; no additional Survey changes to protected inputs",
+  "practice": "Initial formal-start gate correctly blocked 2/4 after a tool-call gap; normal retry with visible green Space responses reached 4/4, then formal start enabled",
+  "limits": "Separate synthetic instances, same browser/viewport/config. No physical display latency, clinical scores or complete device matrix claimed. Changes never enter stimulus ancestry.",
+  "main": "6aeba71d6cad70725d5164598f8dc854d11c1c89",
+  "baselineFile": "cognitive-baseline-before.json",
+  "baselineSha256": "98e0f9ac79cdc98660b73aaa325f7c7a492c63d4c4f811d870cc1dcde9d076fb",
+  "sampleSummary": [
+    {
+      "viewport": [
+        1440,
+        900,
+        1
+      ],
+      "scroll": [
+        0,
+        121
+      ],
+      "color": "rgb(229, 231, 235)",
+      "stimulusRect": [
+        648.5,
+        364.453125,
+        128,
+        128
+      ],
+      "nodes": 17,
+      "properties": 32
+    },
+    {
+      "viewport": [
+        1440,
+        900,
+        1
+      ],
+      "scroll": [
+        0,
+        121
+      ],
+      "color": "rgb(34, 197, 94)",
+      "stimulusRect": [
+        648.5,
+        364.453125,
+        128,
+        128
+      ],
+      "nodes": 17,
+      "properties": 32
+    },
+    {
+      "viewport": [
+        1440,
+        900,
+        1
+      ],
+      "scroll": [
+        0,
+        121
+      ],
+      "color": "rgb(239, 68, 68)",
+      "stimulusRect": [
+        648.5,
+        364.453125,
+        128,
+        128
+      ],
+      "nodes": 17,
+      "properties": 32
+    }
+  ],
+  "evidenceRepresentation": "Complete baseline values remain in baselineFile; final values were compared in the persistent browser tool and all matched. This file records the actual comparison result, not a second raw-value dump."
+}
