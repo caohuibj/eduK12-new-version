@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "base": "6aeba71d6cad70725d5164598f8dc854d11c1c89",
-  "productHead": "71b7d9ed1e7a2981123518e73626f00d41016031",
-  "frontendTree": "06fc1b70e5df37d8e5be3c80d459c99c459b30ec",
+  "productHead": "a7ee5d4e9f5ff4bf2f984f059578f50c182215f8",
+  "frontendTree": "932c59f074f1d429e5a5f367c1d198001f6594dd",
   "files": [
     {
       "path": "docs/survey-mac-s01-20261019.md",
@@ -2558,7 +2558,7 @@
       "oldMode": "000000",
       "newMode": "100644",
       "before": "0000000000000000000000000000000000000000",
-      "after": "b704659aac43bbbb210aca17a616a0a55e7822f4"
+      "after": "ca694a75d2ff16e87ac5e0c88f12acd27f1c3c53"
     },
     {
       "path": "server-version/frontend/src/survey/ResearchAuthoringGuide.tsx",
@@ -2576,7 +2576,7 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "3e9f3d737b49d6489f5a9466e3b62dfaa76cd1c6",
-      "after": "82d8bd235af0c065160fe360e3bfdcb12e6cb601"
+      "after": "aac2557ac7139d356b28bf6921e6c538020c84c1"
     },
     {
       "path": "server-version/frontend/src/survey/ResearchIssueList.tsx",
@@ -2729,7 +2729,7 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "429da79213ce47870ce271639a21b0517052d4a6",
-      "after": "b796cef35e29c6e48b388ecf121a8566b4b900be"
+      "after": "59e93e080e20d16b15c4c7aebb928000f9b88c65"
     },
     {
       "path": "server-version/frontend/src/survey/SurveyWorkspace.requests.test.tsx",
@@ -2859,7 +2859,7 @@
     },
     {
       "file": "src/survey/ResearchCatalog.test.tsx",
-      "blob": "82d8bd235af0c065160fe360e3bfdcb12e6cb601",
+      "blob": "aac2557ac7139d356b28bf6921e6c538020c84c1",
       "directImports": [
         "src/pages/admin/SurveyCatalogGrants.tsx",
         "src/survey/SurveyBuilder.tsx"
@@ -2969,7 +2969,7 @@
     },
     {
       "file": "src/survey/SurveyWorkspace.lifecycle.test.tsx",
-      "blob": "b796cef35e29c6e48b388ecf121a8566b4b900be",
+      "blob": "59e93e080e20d16b15c4c7aebb928000f9b88c65",
       "directImports": [
         "src/survey/SurveyBuilder.tsx",
         "src/survey/SurveyAnalyticsWorkspace.tsx"
@@ -2983,5 +2983,5 @@
       ]
     }
   ],
-  "previousProductHead": "6a0393636aa9e833550ecd7e257d5957661d9fb0"
+  "previousProductHead": "71b7d9ed1e7a2981123518e73626f00d41016031"
 }

@@ -40,7 +40,7 @@
     "src/pages/admin/SurveyCatalogGrants.test.tsx": "08f580929833ed183a6f7acbd7d612fadf33580c",
     "src/pages/admin/SurveyResearchersAdmin.links.test.tsx": "957862c9fdaf72eb9878ae50e09134814f4c7ec5",
     "src/pages/admin/SurveyResearchersAdmin.workspace.test.tsx": "894db70f0f9a154259c218c5a5c15f04d1f3895a",
-    "src/survey/ResearchCatalog.test.tsx": "82d8bd235af0c065160fe360e3bfdcb12e6cb601",
+    "src/survey/ResearchCatalog.test.tsx": "aac2557ac7139d356b28bf6921e6c538020c84c1",
     "src/survey/SurveyAnalyticsWorkspace.download.test.tsx": "33eea2985741fd15fa4d52a5b45f5c4a53a9b721",
     "src/survey/SurveyAnalyticsWorkspace.recovery.test.tsx": "4c72b6f83bf99705058e61722b25b6e17487aa08",
     "src/survey/SurveyApp.admin-entry.test.tsx": "0ee50ffa70d71b385fadb786a9ed8a53f83d5d5d",
@@ -55,7 +55,7 @@
     "src/survey/SurveyPublicApp.final.test.tsx": "5c82eb7719464edd571c55a4d9ac928f17abf587",
     "src/survey/SurveyPublicApp.group-ip.test.tsx": "5cf3fce83661b3f2506ecf84c26830d396872486",
     "src/survey/SurveyTimedScale.test.tsx": "ba0bdddec1ee219ed3935dfdaea6bda53980fd26",
-    "src/survey/SurveyWorkspace.lifecycle.test.tsx": "b796cef35e29c6e48b388ecf121a8566b4b900be",
+    "src/survey/SurveyWorkspace.lifecycle.test.tsx": "59e93e080e20d16b15c4c7aebb928000f9b88c65",
     "src/survey/SurveyWorkspace.requests.test.tsx": "353b8abc835835caad435bb225c652778ccc5c20"
   }
 }
