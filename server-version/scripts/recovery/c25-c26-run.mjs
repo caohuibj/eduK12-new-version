@@ -447,8 +447,9 @@ def validate_metric_coverage(value):
   pg=summary['pg'];assert pg['pgConnectionRoles']=='NOT_OBSERVED_BY_DESIGN' and pg['pgReadonlyStats']=='OBSERVED'
   assert pg['pgCluster']['status'] in ['SAMPLED_LOWER_BOUND','INCOMPLETE_SAMPLED_LOWER_BOUND','NOT_OBSERVED']
   assert isinstance(pg['comparisonEligible'],bool)
+  assert pg['comparisonScope']=='OBSERVED_INTERVALS_ONLY; REQUIRES_IDENTICAL_SAMPLING_CONTRACT_AND_COMPARABLE_COVERAGE_WINDOWS' and pg['completePgCpuOrGainComparison'] is False
   assert pg['activityIsolation']['status'] in ['OBSERVED_ACTIVITY_LABEL_CHECKS_PASSED','CONTAMINATED']
-  if pg['activityIsolation']['status']=='CONTAMINATED' or pg['pgCluster']['status']=='NOT_OBSERVED':assert pg['comparisonEligible'] is False
+  if pg['activityIsolation']['status']=='CONTAMINATED' or pg['pgCluster']['status']!='SAMPLED_LOWER_BOUND':assert pg['comparisonEligible'] is False
  assert [w['kind'] for w in coverage['workers']]==['report','export']
  assert all(w['initialAndFinalProbeObserved'] is True and w['terminalObserved'] is True and w['exitTail']=='NOT_OBSERVED' for w in coverage['workers'])
  return coverage

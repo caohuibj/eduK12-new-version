@@ -65,12 +65,11 @@ await runPgSessionChild({createIo:({registry,config,self})=>{
  const get=(kind,name)=>{const map=tree()[kind];if(!map.has(name))throw Object.assign(new Error(`fixture proc path absent: ${name}`),{code:'ENOENT'});return map.get(name)}
  const readText=name=>{
   if(fixture.mode==='cluster-rss-gap'&&/^\/proc\/9[0-9]{6}\/status$/.test(name))throw Object.assign(new Error('synthetic metric RSS absent'),{code:'ESRCH'})
-  if(fixture.mode.startsWith('async-fault-')&&!barrierUsed&&name==='/proc/net/unix'&&fs.existsSync(path.join(directory,'fault-arm'))){
-   barrierUsed=true;event({stage:'ASYNC_FAULT_BARRIER_ENTERED'});fs.writeFileSync(path.join(directory,'fault-entered'),'entered',{mode:0o600})
+  if(fixture.mode.startsWith('async-fault-')&&!barrierUsed&&name===`/proc/${postmaster().pid}/stat`&&fs.existsSync(path.join(directory,'fault-arm'))){
+   barrierUsed=true;event({stage:'ASYNC_FAULT_BARRIER_ENTERED',path:name,operation:'CLUSTER_POSTMASTER_STAT'});fs.writeFileSync(path.join(directory,'fault-entered'),'entered',{mode:0o600})
    const until=performance.now()+1000
    while(!fs.existsSync(path.join(directory,'fault-release'))){assert.ok(performance.now()<until,'fixture barrier deadline');Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),0,0,1)}
-   event({stage:'ASYNC_FAULT_BARRIER_RELEASED'});const inode=active().find(p=>p.owner.pid===self.pid).inode
-   return unixHeader+`0000000000000000: 00000003 00000000 00000000 0001 03 ${inode}\n`
+   event({stage:'ASYNC_FAULT_BARRIER_RELEASED',path:name,operation:'CLUSTER_POSTMASTER_STAT'});throw Object.assign(new Error('Synthetic cluster sampler guard failure'),{code:'C26_MEASUREMENT_GUARD'})
   }
   return get('texts',name)
  }

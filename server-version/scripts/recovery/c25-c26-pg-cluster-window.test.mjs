@@ -63,3 +63,14 @@ test('cluster activity isolation marks foreign DB or non-loopback contamination 
  const clean=harness();await clean.window.begin();const accepted=await finish(clean);assert.equal(accepted.metricCoverage.comparisonEligible,true);assert.equal(accepted.metricCoverage.activityIsolation.status,'OBSERVED_ACTIVITY_LABEL_CHECKS_PASSED');assert.equal(accepted.metricCoverage.activityIsolation.connectionOwnership,'NOT_PROVEN_BY_ACTIVITY_LABELS')
  for(const mutate of [h=>h.row.activity[1].datname='eduk12_recovery',h=>h.row.activity[1].client_addr='203.0.113.1',h=>h.row.activity[1].client_addr=null]){const h=harness();mutate(h);await h.window.begin();const result=await finish(h);assert.equal(result.metricCoverage.comparisonEligible,false);assert.equal(result.metricCoverage.activityIsolation.status,'CONTAMINATED');assert.ok(result.metricCoverage.activityIsolation.findings.length>=3);assert.equal(h.stops.length,0)}
 })
+
+
+test('cluster comparison eligibility never promotes incomplete sampled bounds into full PG CPU or gain',async()=>{
+ for(const mode of ['complete-observed-window','partial','birth','missing-tail','invalid-counter']){
+  const h=harness();await h.window.begin();
+  if(mode==='partial')h.observation='PARTIAL';if(mode==='birth')h.kids.push(12);if(mode==='missing-tail')h.kids=[];if(mode==='invalid-counter')h.cpuTicks=1;
+  const result=await finish(h),coverage=result.metricCoverage;
+  assert.equal(coverage.comparisonEligible,mode==='complete-observed-window');assert.equal(coverage.completePgCpuOrGainComparison,false);assert.equal(coverage.comparisonScope,'OBSERVED_INTERVALS_ONLY; REQUIRES_IDENTICAL_SAMPLING_CONTRACT_AND_COMPARABLE_COVERAGE_WINDOWS');assert.equal(h.stops.length,0);
+  if(mode==='partial')assert.equal(coverage.pgCluster.status,'INCOMPLETE_SAMPLED_LOWER_BOUND');if(mode==='invalid-counter')assert.equal(coverage.pgCluster.status,'NOT_OBSERVED');if(mode==='missing-tail')assert.ok(result.cluster.processes.some(p=>p.tailCoverage==='NOT_OBSERVED_AFTER_LAST_SAMPLE'));
+ }
+})

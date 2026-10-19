@@ -93,7 +93,7 @@ test('API and sequential report/export registration gates consumers; prepared dr
    const own=await h.add(role);await h.session.register(own.identity);h.connectOwner(own)
    const prepared=await h.session.prepareClose(own.identity);assert.equal(prepared.prepared,true)
    h.connectOwner(own,false);const proof=await own.close(),retired=await h.session.retire(proof)
-   assert.equal(retired.status,'CLOSED_VERIFIED_BY_FRESH_PG_AND_PROC');assert.equal(retired.terminalCpu.user,proof.terminalCpu.user);assert.match(retired.backendCpuExitTail,/NOT_OBSERVED/);assert.ok(!h.registry.entries().some(p=>p.pid===own.identity.pid))
+   assert.equal(retired.status,'CLOSED_VERIFIED_BY_NODE_TERMINAL_CLOSE_GROUP_QUIESCENCE');assert.equal(retired.terminalCpu.user,proof.terminalCpu.user);assert.match(retired.backendCpuExitTail,/NOT_OBSERVED/);assert.ok(!h.registry.entries().some(p=>p.pid===own.identity.pid))
   }
   await h.session.operationEnd();await delay(1120);const measured=await h.session.settledEnd();assert.equal(measured.retirements.length,2)
   const receipt=await h.session.close();assert.ok(proc(api.identity.pid),'API remains live until observer is reaped');await api.close();return receipt
@@ -151,21 +151,20 @@ async function asynchronousFault(h){
  const pending=h.session.operationEnd();fs.writeFileSync(path.join(h.directory,'fault-release'),'release',{mode:0o600})
  return pending
 }
-test('actual CLI asynchronous fault3 while RPC4 is pending preserves the original owned-socket failure and cleans up',{timeout:10000},async()=>{
+test('actual CLI asynchronous fault3 while RPC4 is pending preserves the original cluster sampler guard failure and cleans up',{timeout:10000},async()=>{
  const r=await run('async-fault-history',asynchronousFault)
- assert.match(r.error.message,/observer child Error: ambiguous owned socket inode across network tables/);assert.equal(r.faults.length,1);assert.equal(r.faults[0].message,r.error.message)
+ assert.match(r.error.message,/observer child Error: Synthetic cluster sampler guard failure/);assert.equal(r.faults.length,1);assert.equal(r.faults[0].message,r.error.message)
  const context=r.receipt.childFault;assert.equal(context.envelope.seq,3);assert.equal(context.envelope.op,'register');assert.deepEqual(context.pending,{seq:4,op:'operationEnd'});assert.deepEqual(context.issuedHistory.map(({seq,op})=>({seq,op})),[{seq:1,op:'connect'},{seq:2,op:'begin'},{seq:3,op:'register'},{seq:4,op:'operationEnd'}]);assert.ok(context.issuedHistory.every(x=>!('payload' in x)))
  const completed3=r.events.findIndex(x=>x.stage==='OBSERVER_RPC_COMPLETED'&&x.seq===3),issued4=r.events.findIndex(x=>x.stage==='OBSERVER_RPC_ISSUED'&&x.seq===4),fault=r.events.findIndex(x=>x.stage==='OBSERVER_CHILD_FAULT')
  assert.ok(completed3>=0&&issued4>completed3&&fault>issued4);assert.equal(r.events.some(x=>x.stage==='OBSERVER_RPC_COMPLETED'&&x.seq===4),false)
- const raw=rows(path.join(r.directory,'observer-child-raw-private.jsonl')),evidence=raw.find(x=>x.value?.socketAttribution)?.value??raw.find(x=>x.socketAttribution)
- assert.ok(evidence,'actual leaf must retain conflict candidates');assert.equal(evidence.socketAttribution.observation,'NOT_OBSERVED');assert.equal(evidence.socketAttribution.bracketVerified,true)
+ const raw=rows(path.join(r.directory,'observer-child-raw-private.jsonl')),evidence=raw.find(x=>x.kind==='observer_fault_proc_frame');assert.ok(evidence,'actual leaf must retain current sampler fault context');assert.match(evidence.error.message,/Synthetic cluster sampler guard failure/);assert.equal(evidence.frameScope,'LATEST_COMPLETE_FRAME_ONLY; FAILED_OR_CURRENT_WINDOW_READ_MAY_BE_UNAVAILABLE');assert.ok(r.fixtureEvents.some(x=>x.stage==='ASYNC_FAULT_BARRIER_ENTERED'&&x.operation==='CLUSTER_POSTMASTER_STAT'))
  assert.equal(r.receipt.passed,false);assert.equal(r.receipt.closeObserved,true);assert.equal(r.receipt.groupQuiescent,true);assert.deepEqual(liveGroup(r.receipt.identity.processGroupId),[])
  assert.ok(rows(path.join(r.directory,'observer-parent-raw-private.jsonl')).some(x=>x.stage==='OBSERVER_CHILD_FAULT'&&x.envelope.seq===3))
 })
 test('actual CLI fault history rejects unissued future and mismatched historical operation without losing raw error',{timeout:15000},async()=>{
  for(const mode of ['async-fault-future','async-fault-wrong-operation']){
   const r=await run(mode,asynchronousFault);assert.match(r.error.message,mode==='async-fault-future'?/unissued\/future RPC/:/issued RPC operation mismatch/)
-  assert.match(r.receipt.childFault.envelope.error.message,/ambiguous owned socket inode/);assert.deepEqual(r.receipt.childFault.pending,{seq:4,op:'operationEnd'});assert.equal(r.receipt.childFault.envelope.seq,mode==='async-fault-future'?5:2)
+  assert.match(r.receipt.childFault.envelope.error.message,/Synthetic cluster sampler guard failure/);assert.deepEqual(r.receipt.childFault.pending,{seq:4,op:'operationEnd'});assert.equal(r.receipt.childFault.envelope.seq,mode==='async-fault-future'?5:2)
   assert.equal(r.receipt.passed,false);assert.equal(r.receipt.closeObserved,true);assert.equal(r.receipt.groupQuiescent,true);assert.equal(r.faults.length,1);assert.deepEqual(liveGroup(r.receipt.identity.processGroupId),[])
  }
 })

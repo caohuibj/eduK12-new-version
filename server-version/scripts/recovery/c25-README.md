@@ -1323,3 +1323,12 @@ and cleanup assertions, fixed 1 parent/4 FINAL/36 reads, shared budgets, externa
 owned-process signal protections and full dual-database/material audits remain
 mandatory. This batch contains no new business run, source/carry issuance or
 performance result. A06 and all earlier failures retain their original scope.
+
+
+PG `comparisonEligible` is narrower than metric availability. It is false for
+incomplete/not-observed metrics, activity contamination, or observed identities
+missing window boundaries or intervening samples. A true value permits only
+observed-interval comparison after A/B sampling contracts and coverage windows
+are independently shown comparable. `completePgCpuOrGainComparison` is always
+false: differently incomplete lower bounds cannot establish overall PG savings.
+API and worker self-observed measurements retain their own independent scope.
