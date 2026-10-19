@@ -882,3 +882,73 @@ without replaying the accepted core or this supplement. The current scripts and
 CI routing do not already grant these new Training checks a pass. Native browser,
 selected-video, dynamic N=4/5 and C26 measurement remain unaccepted; C25 as a whole
 is not declared complete.
+
+
+## C26 preparation: observation contracts only
+
+This first C26 subset adds only `c25-c26-*` recovery tooling on the dedicated
+C19 supplement branch. It does not start API/PG/Redis, connect to a database,
+measure a business workload, issue a descriptor, or qualify A/B performance.
+The 72 original Python helpers and existing product/dist/client/dependency
+bytes are unchanged. Existing functional acceptance remains scoped above.
+
+The planned A workload is exact: one newly authorized parent, one native FINAL
+for each Form/Scale/Cognitive/SJT, one actual report job/drain invocation and
+one queued export/task. It is not four whole-assessment submissions. Afterwards,
+24 serial requests mean four individual read requests in each of six categories;
+six waves mean two concurrent individual reads per category (12 requests).
+The categories are checkpoint recovery read, report status, full report,
+Cognitive result-or-history, teacher analysis, and existing artifact download.
+The exact route and fixture identity must still be frozen before execution;
+setup/login/admission/native reads are separately counted, not hidden in those
+36 read requests. Concurrent SQL belongs to the complete wave, not either
+request. No automatic retries, extra FINALs or automatic B experiment are allowed.
+
+`runtimeMetricLines()` resets the production event-loop histogram, so it is
+not a read-only observation source. The test-only CommonJS preload instead
+calls the original `recordPrismaSqlEvent` first, preserving receiver, arguments,
+return value and thrown exception, then mirrors enabled finite nonnegative
+SQL-event counts/durations. IPC snapshots read that mirror plus process CPU and
+memory. No `/metrics`, metric reset, query text/parameters, inspector, GC,
+product patch or extra database call is involved. It observes this frozen
+Prisma event consumer only, not all database SQL. The original function remains
+responsible for production metrics.
+
+The preload pins the four actual compiled module hashes and requires installation
+before runtime/database consumers load. It checks require-cache/module/export
+identity, the actual database consumer's runtime child and Prisma registration
+identity, PID/startTicks, environment, nonce and sequence. A different module,
+captured/late reference, changed exports or incompatible ESM producer fails;
+it is not silently treated as supported. Requiring the cached preload retains
+the singleton; explicit duplicate install fails. Close is one-way and must follow
+quiescence; any later SQL event emits an observation fault, without changing the
+business return. A/B must use identical probe bytes/order/frequency. Mirror and
+snapshot body CPU/wall counters and IPC counts/bytes are separate overhead data;
+serialization/sampling/ACK/exit tails remain in total process cost and must not
+be silently subtracted.
+
+The service-free probe fixture loads the frozen production runtime and actual
+`database.js` query callback, replacing only Prisma construction/event-source I/O
+and denying socket connections. It checks real callback events, repeat snapshots
+without added SQL/reset, identity/late-load/close faults and exact exception
+forwarding. These synthetic event tests do not prove actual PG query counts.
+
+The process helper keys Linux observations by PID plus exact startTicks, references
+shared physical accounts once, and separates API, dynamic report/export workers,
+PG roles, Redis, driver and observer. Real synthetic Node children exercise
+start/final resource sampling, identity/nonce ACK and successful close, plus
+missing-tail/error/timeout rejection and owned process-group TERM/KILL/reap.
+A terminal sample includes process startup through the final sample; subsequent
+ACK/exit CPU is explicitly excluded. RSS is sampled and lifetime high-water data
+is labeled as such. Role references overlap and cannot be added together.
+Actual worker integration, periodic /proc and PG activity/WAL collection remain
+to be implemented and reviewed; these helpers do not establish capacity gains.
+
+The proposed aggregate A budget remains 1,200s including setup/audits, with 60s
+reserved for bounded cleanup, 30s idle and 60s tail, and child budgets at most
+90s. Entry requires disk 8GiB plus a consumable 512MiB buffer; runtime floors
+remain disk 8GiB, MemAvailable 2GiB and tmp 512MiB, API RSS strictly below 1GiB.
+Uncertain or failed writes retain issued intent and stop without resubmission.
+Preparation is capped at 2MiB new tools plus 8MiB private evidence. Targeted tests
+run under the exclusive measurement lock with a 90s aggregate command limit.
+No measurement database or future 1,200s run is authorized by this documentation.
