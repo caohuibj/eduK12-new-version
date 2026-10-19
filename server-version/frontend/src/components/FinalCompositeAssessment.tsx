@@ -540,20 +540,19 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
         activeSlotKeys={(state.units||state.items).filter(unit=>!unit.completed).map(unit=>unit.type==='FORM_SECTION'?`form-section:${'formSectionId' in unit ? unit.formSectionId || unit.id : unit.id}`:`${unit.type.toLowerCase()}:${unit.id}`)}
         getDrafts={async()=>{await flushLocalSaves();const stored=await finalDraftStore.listAnswers(draftKey);return [{slotKey:sectionId?`form-section:${sectionId}`:`scale:${item.id}`,answers:Object.fromEntries(stored.map(row=>[row.itemKey,row.value])),...(timingRef.current?{itemTimings:timingRef.current.snapshot()}: {})}]}}
         restore={async rows=>{
-          await flushLocalSaves();const currentMeta=await finalDraftStore.get(draftKey)
-          if(currentMeta?.status!=='DRAFT'||currentMeta.sealedSubmission)throw new Error('本机草稿已封存，不能替换。')
-          const row=rows.find(row=>row.slotKey===(sectionId?`form-section:${sectionId}`:`scale:${item.id}`))
-          if(!row)throw new Error('服务器没有当前未提交单元的草稿，本机内容保持不变。')
-          const old=await finalDraftStore.listAnswers(draftKey)
-          const nextForm=sectionId?sanitizeTrainingFormValues((item.formAnswers||item.answers||[]) as any[],row.answers as Record<string,FormValue>):{}
-          const values=sectionId?nextForm:row.answers
-          try{for(const [itemKey,value]of Object.entries(values))await finalDraftStore.putAnswer({draftKey,itemKey,value,updatedAt:Date.now()});await finalDraftStore.deleteAnswers(draftKey,old.filter(answer=>!Object.prototype.hasOwnProperty.call(values,answer.itemKey)).map(answer=>answer.itemKey))}
-          catch(cause){for(const answer of old)await finalDraftStore.putAnswer(answer);throw cause}
-          if(sectionId){formValuesRef.current=nextForm;setFormValues(nextForm);setSectionIndex(0)}else{
-            const nextScale=Object.fromEntries(Object.entries(values).map(([key,value])=>[key,typeof value==='object'&&value!==null&&'responseValue' in value?value.responseValue as ResponseValue:value as ResponseValue]))
-            setScaleValues(nextScale);setScaleIndex(0)
-            if(item.trainingTiming){timingRef.current=new SurveyScaleTimingTracker(row.itemTimings??{},nextScale);await finalDraftStore.setInstrumentMetadata(draftKey,{trainingScaleTiming:{snapshotHash:item.trainingTiming.snapshotHash,items:timingRef.current.snapshot()}})}
-          }
+          await flushLocalSaves()
+          const row = rows.find(row => row.slotKey === (sectionId ? `form-section:${sectionId}` : `scale:${item.id}`))
+          if (!row) throw new Error('服务器没有当前未提交单元的草稿，本机内容保持不变。')
+          const nextForm = sectionId ? sanitizeTrainingFormValues((item.formAnswers || item.answers || []) as any[], row.answers as Record<string, FormValue>) : {}
+          const values = sectionId ? nextForm : row.answers
+          const nextScale = sectionId ? {} : Object.fromEntries(Object.entries(values).map(([key, value]) => [key,
+            typeof value === 'object' && value !== null && 'responseValue' in value ? value.responseValue as ResponseValue : value as ResponseValue]))
+          const nextTiming = !sectionId && item.trainingTiming ? new SurveyScaleTimingTracker(row.itemTimings ?? {}, nextScale) : null
+          const timingMetadata = nextTiming ? { trainingScaleTiming: { snapshotHash: item.trainingTiming!.snapshotHash, items: nextTiming.snapshot() } } : undefined
+          await finalDraftStore.replaceAnswers(meta, Object.entries(values).map(([itemKey, value]) => ({ draftKey, itemKey, value, updatedAt: Date.now() })), timingMetadata)
+          // Do not publish recovered values or timer refs until durable commit.
+          if (sectionId) { formValuesRef.current = nextForm; setFormValues(nextForm); setSectionIndex(0) }
+          else { timingRef.current = nextTiming; setScaleValues(nextScale); setScaleIndex(0) }
         }}/>:null}
       {error ? <p role="alert" className="mb-4 text-sm text-red-600">{error}</p> : null}
       {requiresRestart && onRestart ? (

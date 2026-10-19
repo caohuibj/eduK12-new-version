@@ -352,8 +352,8 @@ const surveyExpiry = (meta: FinalDraftMeta, legacySurvey: boolean, now: number):
   return now - lastWriteAt > SURVEY_COGNITIVE_DRAFT_TTL_MS ? 'delete' : 'keep'
 }
 
-const prepareSituationalReplacement = (expected: FinalDraftMeta, answers: FinalDraftAnswer[]) => {
-  if (expected.instrument !== 'situational') throw new FinalDraftStorageError('只有情境草稿支持答案集合恢复')
+const prepareAnswerReplacement = (expected: FinalDraftMeta, answers: FinalDraftAnswer[], metadata?: Record<string, unknown>) => {
+  if (expected.instrument === 'cognitive') throw new FinalDraftStorageError('认知试次不支持答案集合恢复')
   const keys = new Set<string>()
   for (const answer of answers) {
     if (answer.draftKey !== expected.draftKey || !answer.itemKey || keys.has(answer.itemKey)) {
@@ -361,8 +361,19 @@ const prepareSituationalReplacement = (expected: FinalDraftMeta, answers: FinalD
     }
     keys.add(answer.itemKey)
   }
-  return answers.map(cloneValue)
+  // Clone every input before opening the mutation boundary. A clone failure
+  // must not leave new-only answer keys or half-updated timing metadata.
+  return { expected: cloneValue(expected), answers: answers.map(cloneValue), metadata: metadata === undefined ? undefined : cloneValue(metadata) }
 }
+
+const assertReplacementIdentity = (current: FinalDraftMeta, expected: FinalDraftMeta) => {
+  assertWritable(current)
+  if (!sameIdentity(current, expected) || current.submissionId !== expected.submissionId) throw new FinalDraftIdentityConflictError(current)
+}
+const replacementMeta = (current: FinalDraftMeta, metadata?: Record<string, unknown>): FinalDraftMeta => ({
+  ...current, updatedAt: Date.now(),
+  ...(metadata === undefined ? {} : { instrumentMetadata: { ...current.instrumentMetadata, ...metadata } }),
+})
 
 export interface FinalDraftStore {
   listTrainingCognitiveDrafts(after?: string | null): Promise<{ draftKeys: string[]; nextCursor: string | null }>
@@ -374,6 +385,9 @@ export interface FinalDraftStore {
   update(meta: FinalDraftMeta): Promise<FinalDraftMeta>
   setInstrumentMetadata(draftKey: string, metadata: Record<string, unknown>): Promise<FinalDraftMeta | null>
   putAnswer(answer: FinalDraftAnswer): Promise<void>
+  /** Replaces the complete answer set and optional timing metadata for one draft
+   * in a single commit. Whole questionnaires must include every unit in this key. */
+  replaceAnswers(expected: FinalDraftMeta, answers: FinalDraftAnswer[], metadata?: Record<string, unknown>): Promise<void>
   replaceSituationalAnswers(expected: FinalDraftMeta, answers: FinalDraftAnswer[]): Promise<void>
   listAnswers(draftKey: string): Promise<FinalDraftAnswer[]>
   deleteAnswers(draftKey: string, itemKeys: string[]): Promise<void>
@@ -492,15 +506,21 @@ class MemoryFinalDraftStore implements FinalDraftStore {
     if ((hasSurveyRetention(meta) || hasTrainingRetention(meta)) && (!previous || serialize(previous.value) !== serialize(answer.value))) this.metas.set(meta.draftKey, stampRetentionWrite(meta))
   }
 
+  async replaceAnswers(expected: FinalDraftMeta, answers: FinalDraftAnswer[], metadata?: Record<string, unknown>) {
+    const replacement = prepareAnswerReplacement(expected, answers, metadata)
+    const current = this.metas.get(replacement.expected.draftKey)
+    if (!current) throw new FinalDraftStorageError('本地测评草稿不存在')
+    assertReplacementIdentity(current, replacement.expected)
+    const next = replacementMeta(current, replacement.metadata)
+    // All validation/cloning precedes this synchronous, non-yielding commit.
+    for (const [key, answer] of this.answers) if (answer.draftKey === current.draftKey) this.answers.delete(key)
+    for (const answer of replacement.answers) this.answers.set(`${answer.draftKey}:${answer.itemKey}`, answer)
+    this.metas.set(current.draftKey, next)
+  }
+
   async replaceSituationalAnswers(expected: FinalDraftMeta, answers: FinalDraftAnswer[]) {
-    const replacement = prepareSituationalReplacement(expected, answers)
-    const meta = this.metas.get(expected.draftKey)
-    if (!meta) throw new FinalDraftStorageError('本地测评草稿不存在')
-    assertWritable(meta)
-    if (!sameIdentity(meta, expected)) throw new FinalDraftIdentityConflictError(meta)
-    // Prepare and validate everything before the synchronous mutation boundary.
-    for (const [key, answer] of this.answers) if (answer.draftKey === expected.draftKey) this.answers.delete(key)
-    for (const answer of replacement) this.answers.set(`${answer.draftKey}:${answer.itemKey}`, answer)
+    if (expected.instrument !== 'situational') throw new FinalDraftStorageError('只有情境草稿支持情境答案恢复')
+    await this.replaceAnswers(expected, answers)
   }
 
   async listAnswers(draftKey: string) {
@@ -793,19 +813,27 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
     })
   }
 
-  async replaceSituationalAnswers(expected: FinalDraftMeta, answers: FinalDraftAnswer[]) {
-    const replacement = prepareSituationalReplacement(expected, answers)
+  async replaceAnswers(expected: FinalDraftMeta, answers: FinalDraftAnswer[], metadata?: Record<string, unknown>) {
+    const replacement = prepareAnswerReplacement(expected, answers, metadata)
     await this.run<void>([META_STORE, ANSWER_STORE], 'readwrite', async transaction => {
-      const meta = await requestResult<FinalDraftMeta | undefined>(transaction.objectStore(META_STORE).get(expected.draftKey))
-      if (!meta) throw new FinalDraftStorageError('本地测评草稿不存在')
-      assertWritable(meta)
-      if (!sameIdentity(meta, expected)) throw new FinalDraftIdentityConflictError(meta)
+      const metaStore = transaction.objectStore(META_STORE)
+      const current = await requestResult<FinalDraftMeta | undefined>(metaStore.get(replacement.expected.draftKey))
+      if (!current) throw new FinalDraftStorageError('本地测评草稿不存在')
+      // Re-read the full frozen identity and seal inside the same write
+      // transaction, so another tab cannot seal a partially restored answer set.
+      assertReplacementIdentity(current, replacement.expected)
       const store = transaction.objectStore(ANSWER_STORE)
-      const keys = await requestResult<IDBValidKey[]>(store.index(DRAFT_INDEX).getAllKeys(expected.draftKey))
+      const keys = await requestResult<IDBValidKey[]>(store.index(DRAFT_INDEX).getAllKeys(current.draftKey))
       for (const key of keys) store.delete(key)
-      for (const answer of replacement) store.put(answer)
-      // run() resolves only on transaction commit; failure aborts every change.
+      for (const answer of replacement.answers) store.put(answer)
+      metaStore.put(replacementMeta(current, replacement.metadata))
+      // run() resolves only on transaction commit; failure aborts answers AND timing.
     })
+  }
+
+  async replaceSituationalAnswers(expected: FinalDraftMeta, answers: FinalDraftAnswer[]) {
+    if (expected.instrument !== 'situational') throw new FinalDraftStorageError('只有情境草稿支持情境答案恢复')
+    await this.replaceAnswers(expected, answers)
   }
 
   async listAnswers(draftKey: string) {
