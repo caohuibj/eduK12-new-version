@@ -1036,3 +1036,30 @@ collection, including periodic, boundary, prepare and retirement, shares the sam
 serial lane. Added queries and refresh CPU remain observer costs within the
 original window, with no retry or reset. These are preparation contracts; the
 actual API/worker/coordinator integration and A measurement remain outstanding.
+
+C26 worker preparation uses a separate fixed leaf CLI. Each child processes one
+original report claim/process or one queued composite export task, with no global
+processor import, queue mutation or retry. The report's other-job row-lock gate
+shares the child's exact application name and stays connected until the parent's
+fresh `prepareOwnerClose` proof permits all client disconnections. The export
+forwards the real Redis payload, job ID and retry metadata; its enqueue row has
+`recordCount=0`, while the completed single-parent export must have `recordCount=1`.
+Direct task invocation does not certify Bull scheduler completion.
+
+The parent installs the existing frozen production SQL probe before consumers,
+registers the actual PID/startTicks, and retains initial/final IPC samples. Its
+real CLI protocol is loaded → work → fresh PG close permission → disconnect →
+probe close → terminal resource ACK → process close/group quiescence → PG
+retirement. The aggregate child budget, including escalation/reaping, is at most
+90 seconds and cannot exceed the caller's current window. Startup, bookkeeping,
+module hashing and private receipts remain process overhead; probe mirror counts
+cover only the original frozen Prisma event consumer, not the separate lock-gate
+client or all database SQL. Terminal-to-close wall time is recorded, while CPU
+after the terminal sample through ACK/exit remains explicitly unobserved.
+
+The new worker tests execute actual Node leaf processes and the real frozen
+production metric consumer; only task/Prisma/Redis I/O is replaced at a named
+no-service boundary. They exercise report/export success, private exception
+retention, a hung task, an unreturned fresh-PG permission and journal failure.
+They are preparation evidence; actual services, socket/PG adapters and the final
+A coordinator still require their remaining wiring and independent review.

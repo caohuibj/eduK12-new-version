@@ -101,18 +101,19 @@ export function reportNodeResources(options){
 /** Attach immediately after detached fork/spawn with IPC. Owns this process group.
  * A failed sample/deadline sends TERM then KILL and awaits close. A hard reap
  * deadline fails explicitly with closeObserved=false, never a successful tail.
- * All deadlines including escalation are at most ten seconds. */
-export function observeResourceChild(child,{nonce,role,deadlineMs=5000,killGraceMs=250,reapMs=1000}){
+ * All deadlines including escalation are at most 90 seconds and must fit the
+ * caller's remaining aggregate window. ACK/exit CPU is not measured. */
+export function observeResourceChild(child,{nonce,role,deadlineMs=5000,killGraceMs=250,reapMs=1000,abortSignal}){
  nonceCheck(nonce);assert.ok(['report_worker','export_worker'].includes(role),'only report/export children allowed')
  for(const value of [deadlineMs,killGraceMs,reapMs])assert.ok(Number.isInteger(value)&&value>0)
- assert.ok(deadlineMs+killGraceMs+reapMs<=10000,'child aggregate budget exceeds ten seconds')
+ assert.ok(deadlineMs+killGraceMs+reapMs<=90000,'child aggregate budget exceeds 90 seconds')
  assert.ok(child&&Number.isSafeInteger(child.pid)&&child.pid>0&&child.connected,'live IPC child required')
- const owned=procIdentity(child.pid);assert.equal(owned.processGroupId,child.pid,'detached owned process group required')
+ const owned=procIdentity(child.pid);assert.equal(owned.parentPid,process.pid,'resource child must be a direct owned child');assert.equal(owned.processGroupId,child.pid,'detached owned process group required')
  return new Promise((resolve,reject)=>{
   let start,terminal,failure,done=false,killer,reaper,groupPoll,startAck=false,terminalAck=false
   const hardDeadline=performance.now()+deadlineMs+killGraceMs+reapMs
-  const lifecycle={pid:child.pid,processGroupId:owned.processGroupId,startTicks:owned.startTicks,nonce,role,closeObserved:false,code:null,signal:null,terminationSignals:[],groupQuiescent:false}
-  const finish=()=>{if(done)return;done=true;clearTimeout(timer);clearTimeout(killer);clearTimeout(reaper);clearTimeout(groupPoll);child.off('message',message);child.off('error',fail);child.off('close',closed);if(failure){failure.lifecycle={...lifecycle};reject(failure)}else resolve({start,terminal,lifecycle:{...lifecycle,startAck,terminalAck}})}
+  const lifecycle={pid:child.pid,processGroupId:owned.processGroupId,startTicks:owned.startTicks,nonce,role,closeObserved:false,code:null,signal:null,terminationSignals:[],groupQuiescent:false,issuedMonotonicNs:process.hrtime.bigint().toString(),aggregateBudgetMs:deadlineMs+killGraceMs+reapMs,terminalToCloseWallNs:null,terminalToCloseCpu:'NOT_OBSERVED'}
+  const finish=()=>{if(done)return;done=true;clearTimeout(timer);clearTimeout(killer);clearTimeout(reaper);clearTimeout(groupPoll);child.off('message',message);child.off('error',fail);child.off('close',closed);abortSignal?.removeEventListener('abort',aborted);if(failure){failure.lifecycle={...lifecycle};reject(failure)}else resolve({start,terminal,lifecycle:{...lifecycle,startAck,terminalAck}})}
   const signal=name=>{let sent=false;try{process.kill(-owned.processGroupId,name);sent=true}catch(error){if(error.code!=='ESRCH')failure??=error}lifecycle.terminationSignals.push({signal:name,sent})}
   const fail=error=>{
    if(done||failure)return
@@ -126,7 +127,7 @@ export function observeResourceChild(child,{nonce,role,deadlineMs=5000,killGrace
     const live=procIdentity(child.pid),phase=start?'terminal':'start'
     assert.equal(identityKey(live),identityKey(owned),'owned PID reused');assert.equal(live.processGroupId,owned.processGroupId,'process group changed')
     validateNodeResourceSample(sample,{nonce,role,pid:child.pid,startTicks:live.startTicks,phase,previous:start})
-    if(start)terminal=sample;else start=sample
+    if(start){terminal=sample;lifecycle.terminalReceivedMonotonicNs=process.hrtime.bigint().toString();assert.ok(BigInt(lifecycle.terminalReceivedMonotonicNs)>=BigInt(terminal.monotonicNs),'terminal sample is in the future')}else start=sample
     const ack={type:ACK,nonce,role,pid:child.pid,startTicks:live.startTicks,phase}
     child.send(ack,error=>{if(error)fail(error);else if(phase==='start')startAck=true;else terminalAck=true})
    }catch(error){fail(error)}
@@ -141,7 +142,8 @@ export function observeResourceChild(child,{nonce,role,deadlineMs=5000,killGrace
   }
   const liveMembers=members=>members.filter(member=>!['Z','X','x'].includes(member.state))
   const closed=(code,signalName)=>{
-   lifecycle.closeObserved=true;lifecycle.code=code;lifecycle.signal=signalName
+   lifecycle.closeObserved=true;lifecycle.code=code;lifecycle.signal=signalName;lifecycle.closedMonotonicNs=process.hrtime.bigint().toString()
+   if(terminal)lifecycle.terminalToCloseWallNs=(BigInt(lifecycle.closedMonotonicNs)-BigInt(terminal.monotonicNs)).toString()
    failure??=code!==0||signalName?new Error('resource child abnormal close'):!start||!terminal?new Error('missing start or terminal resource sample'):!startAck||!terminalAck?new Error('missing resource ACK'):null
    // Reaping the leader does not prove its owned session/process group is idle.
    clearTimeout(timer);clearTimeout(killer);clearTimeout(reaper)
@@ -166,7 +168,9 @@ export function observeResourceChild(child,{nonce,role,deadlineMs=5000,killGrace
    settle()
   }
   const timer=setTimeout(()=>fail(new Error('resource child deadline exceeded')),deadlineMs)
+  const aborted=()=>fail(abortSignal.reason instanceof Error?abortSignal.reason:new Error('resource coordinator aborted'))
   child.on('message',message);child.on('error',fail);child.once('close',closed)
+  if(abortSignal){if(abortSignal.aborted)aborted();else abortSignal.addEventListener('abort',aborted,{once:true})}
  })
 }
 
