@@ -1,3 +1,7 @@
+import {createSurveyReinterpretation,readSurveyReinterpretation} from './reinterpretation.service'
+import {ContentAuthorityError} from '../measurement-content/content-authority'
+import {SurveyBuilderError} from './builder.service'
+import {SurveyWaveError} from './waves.service'
 import {readSurveyStoredReport} from './report-results.service'
 import { Router,type Request,type Response,type NextFunction } from 'express'
 import { z } from 'zod'
@@ -28,7 +32,8 @@ const wrap=(fn:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Response,
   try{return success(res,await fn(req))}
   catch(e){
     if(e instanceof z.ZodError)return error(res,'请求参数不合法',-1,400)
-    if(e instanceof service.SurveyAnalyticsError)return error(res,e.message,-1,e.statusCode)
+    if(e instanceof service.SurveyAnalyticsError||e instanceof SurveyBuilderError||e instanceof SurveyWaveError)return error(res,e.message,-1,e.statusCode)
+    if(e instanceof ContentAuthorityError)return error(res,'没有此数据解释能力',-1,403)
     next(e)
   }
 }
@@ -127,4 +132,17 @@ surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/finals/:finalId/reports/:i
   assertRecentSurveyMfa(req)
   return readSurveyStoredReport(req.user!.userId,{projectId:id.parse(req.params.pid),waveId:id.parse(req.params.wid),
     finalId:id.parse(req.params.finalId),instrumentKey:key.parse(req.params.instrumentKey)})
+}))
+
+const reinterpretBody=z.object({requestId:id,grantId:id,instrumentKey:key,reportReleaseId:id.optional(),
+  references:z.array(z.object({releaseId:id,entryKey:z.string().regex(/^[a-f0-9]{64}$/),priority:z.number().int().safe()}).strict()).max(100)}).strict()
+surveyAnalyticsRouter.post('/:pid/analytics/waves/:wid/finals/:finalId/interpretations',wrap(async req=>{
+  assertRecentSurveyMfa(req)
+  return createSurveyReinterpretation(req.user!.userId,{...reinterpretBody.parse(req.body),projectId:id.parse(req.params.pid),
+    waveId:id.parse(req.params.wid),finalId:id.parse(req.params.finalId)})
+}))
+surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/finals/:finalId/interpretations/:artifactId',wrap(async req=>{
+  assertRecentSurveyMfa(req)
+  return readSurveyReinterpretation(req.user!.userId,{projectId:id.parse(req.params.pid),waveId:id.parse(req.params.wid),
+    finalId:id.parse(req.params.finalId),artifactId:id.parse(req.params.artifactId)})
 }))

@@ -10,7 +10,7 @@ const entry={scoreKey:'total',referenceKind:'descriptive_sample' as const,eviden
 const measurement=()=>({releaseId:'m',contentHash:digest,layer:'MEASUREMENT',family:'SCALE',scope,status:'PUBLISHED',content:{instrumentVersion:'1',scoringVersion:'1',measurementHash:digest}})
 const reference=()=>({releaseId:'r',contentHash:digest,layer:'REFERENCE',family:'SCALE',scope,status:'PUBLISHED',version:'1',content:{measurement:{releaseId:'m',contentHash:digest},entries:[{metricKey:'total',referenceKind:'descriptive_sample',definition:entry}]}})
 const report=()=>({releaseId:'p',contentHash:digest,layer:'REPORT',family:'SCALE',scope,status:'PUBLISHED',content:{measurements:[{releaseId:'m',contentHash:digest}],generatorVersion:'DECLARATIVE_REPORT_V1',template:{title:'shared text'}}})
-const binding=()=>({populationContext:{},units:[{instrumentKey:'scale',measurement:{releaseId:'m',contentHash:digest,measurementHash:digest},
+const binding=()=>({schemaVersion:1,projectId:'project',waveId:'wave',attemptId:'attempt',publicationId:'pub',definitionDigest:digest,populationContext:{},units:[{instrumentKey:'scale',measurement:{releaseId:'m',contentHash:digest,measurementHash:digest},
  references:[{metricKey:'total',referenceKind:'descriptive_sample',status:'SELECTED',releaseId:'r',contentHash:digest,entryKey:referenceEntryKey(entry)}],report:{releaseId:'p',contentHash:digest},reportAvailability:'AVAILABLE'}]})
 const input=()=>({projectId:'project',waveId:'wave',attemptId:'attempt',publicationId:'pub',definitionDigest:digest,
  selectedSnapshot:{units:[{instrumentKey:'scale',sourceDigest:'source',scoringDigest:'scoring',measurementRelease:{releaseId:'m',contentHash:digest,measurementHash:digest}}]},calculated:{units:[{instrumentKey:'scale',kind:'SCALE',sourceDigest:'source',scoringDigest:'scoring',measurement:{quality:{status:'interpretable'},metrics:[{key:'total',value:5,status:'OK'}]}}]}} as any)
@@ -100,7 +100,7 @@ function realComputed(kind:'SCALE'|'SJT'|'COGNITIVE',quality='interpretable'){
  const e={...entry,scoreKey:key,instrumentVersion:release.content.instrumentVersion,scoringVersion:release.content.scoringVersion}
  const r={...reference(),family:kind,content:{measurement:{releaseId:'m',contentHash:release.contentHash},entries:[{metricKey:key,referenceKind:'descriptive_sample',definition:e}]}}
  mocks.get.mockImplementation(async(_tx,id)=>id==='m'?release:r)
- mocks.decode.mockReturnValue({populationContext:{},units:[{instrumentKey:'tool',measurement:unit.measurementRelease,references:[{
+ mocks.decode.mockReturnValue({...binding(),populationContext:{},units:[{instrumentKey:'tool',measurement:unit.measurementRelease,references:[{
   metricKey:key,referenceKind:'descriptive_sample',status:'SELECTED',releaseId:'r',contentHash:r.contentHash,entryKey:referenceEntryKey(e)}]}]})
  return {projectId:'project',waveId:'wave',attemptId:'attempt',publicationId:'pub',definitionDigest:calculated.definitionDigest,selectedSnapshot:snapshot,calculated}
 }

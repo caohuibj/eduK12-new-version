@@ -43,3 +43,16 @@ legal root/child grants, FINAL/project/expiry/depth containment, wrong template
 capability, unsupported read/export capability, non-project scope and revoked
 parent rejection. The 12 authority Vitest contracts passed. This is SQL constraint
 and pure-contract evidence only, not HTTP, Prisma deployment or concurrent revoke.
+
+#### Explicit interpretation artifacts
+
+Migration `20261020043000_survey_interpretation_artifacts` and exact
+`survey-reinterpretation-database-contracts.sql` ran successfully on the same
+synthetic PG 16.15 single-user data directory. Seven rejected cases cover immutable
+update/delete, wrong/missing actual FINAL, missing actor, malformed request hash,
+and >2 MiB ciphertext. An ON CONFLICT retry retained the first artifact, and the
+original FINAL ciphertext remained unchanged. No production data or grants used.
+Prisma `validate` used a synthetic URL without connecting. Strict TypeScript ran
+with noEmit/declaration/declarationMap disabled to avoid declaration portability
+errors from the private symlinked Prisma client. Service plus real compute contracts
+23, actual router-handler contracts 4 passed; no network HTTP/concurrency claim.

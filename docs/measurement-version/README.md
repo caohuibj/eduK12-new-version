@@ -335,3 +335,41 @@ separate from measurementHash. Real compiler→compute cases cover Scale and bot
 SJT structures. This completes the backend controlled raw-feedback path; author
 UI configuration and participant-specific template/reference rendering remain
 separate, uncompleted scope. This is not a claim of all participant reports.
+
+### V08 explicit independent reinterpretation
+
+POST `.../analytics/waves/:wid/finals/:finalId/interpretations` accepts only a
+request UUID, exact capability grant, instrument key and explicit reference
+entry/priority/report IDs. Authentication and recent MFA are existing Survey
+middleware; owner/data access intersects `data.reinterpret` on this PROJECT and
+exact FINAL before loading and again inside the write transaction. The actual
+single-FINAL reader verifies source, frozen measurement pointer and stored score
+identity. Revision, current included FINAL and results hash are fenced again.
+Neither report publication rights nor an entry ADMIN supplies data access.
+
+A new interpretation reuses the existing ReferenceCore with saved scores, quality
+and the original frozen population context (currently empty). No scorer or raw
+answer reader runs. Measurement REVOKED blocks creation; normal retired/superseded
+measurement remains exact. Newly selected references/templates must be PUBLISHED,
+usable in the same private project and exactly compatible. Scope/version checks
+share one request-local release cache, with database locks. Missing demographic
+context remains unavailable. The artifact records the exact reference policy,
+selected bindings, personal numerical results and optional rendered report, not
+full shared norm/template definitions or repeated raw scores.
+
+`survey_interpretation_artifacts` stores an encrypted, hash-bound immutable
+sibling of the original FINAL. Its database trigger enforces actual FINAL/hash
+and rejects update/delete. The request UUID + request hash is idempotent; concurrent
+unique conflicts return the matching saved artifact, never overwrite. GET
+`.../interpretations/:artifactId` checks current owner/data scope and source fence,
+then reads the saved artifact without rerendering or checking latest releases.
+This is researcher-only and does not expand participant disclosure. Existing FINAL,
+START binding and default exports remain unchanged; INTERPRETATION_LONG currently
+exports FINAL interpretations only, not these separately identified artifacts.
+
+27 focused service/real-compute/router-handler contracts pass; strict no-emit
+TypeScript and Prisma schema validation pass. New migration and seven rejection
+contracts executed in isolated PG 16.15 single-user mode, plus immutable retry and
+unchanged original FINAL checks. Handler tests do not prove HTTP transport; actual
+concurrent retry/revoke and Prisma deployment await the authorized connected test
+environment. New-interpretation UI/root grant issuance are still pending.

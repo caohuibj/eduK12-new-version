@@ -14,6 +14,7 @@ model User {
   revokedContentCapabilityGrants ContentCapabilityGrant[] @relation("ContentCapabilityRevoker")
 
   surveyReportDrafts SurveyReportDraft[]
+  surveyInterpretationArtifacts SurveyInterpretationArtifact[]
   measurementReferenceCandidates MeasurementReferenceCandidate[]
   measurementReferenceReviews MeasurementReferenceReview[]
   compositionTemplates AssessmentCompositionTemplate[]
@@ -3068,6 +3069,7 @@ model SurveyWaveFinal {
   resultsCipher   String           @map("results_cipher")
   resultsHash     String           @map("results_hash")
   completedAt     DateTime         @default(now()) @map("completed_at") @db.Timestamptz(6)
+  interpretations SurveyInterpretationArtifact[]
   @@index([projectId,waveId,completedAt],map:"survey_finals_project_wave_time_idx")
   @@map("survey_wave_finals")
 }
@@ -4025,4 +4027,20 @@ model ContentCapabilityGrant {
   @@index([subjectId, product, scopeKind, scopeId, resourceKind], map: "content_capability_grants_subject_scope_idx")
   @@index([parentGrantId], map: "content_capability_grants_parent_idx")
   @@map("content_capability_grants")
+}
+
+// Independently requested immutable interpretation; FINAL facts remain canonical.
+model SurveyInterpretationArtifact {
+  id String @id
+  finalId String @map("final_id")
+  final SurveyWaveFinal @relation(fields:[finalId],references:[id],onDelete:Restrict)
+  createdBy String @map("created_by")
+  creator User @relation(fields:[createdBy],references:[id],onDelete:Restrict)
+  requestHash String @map("request_hash")
+  sourceFinalHash String @map("source_final_hash")
+  artifactCipher String @map("artifact_cipher")
+  artifactHash String @map("artifact_hash")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([finalId,createdAt,id],map:"survey_interpretation_artifacts_final_time_idx")
+  @@map("survey_interpretation_artifacts")
 }
