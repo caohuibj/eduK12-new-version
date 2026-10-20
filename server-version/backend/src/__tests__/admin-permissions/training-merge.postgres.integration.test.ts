@@ -24,11 +24,12 @@ suite('merged Training source, public-round and export authority',()=>{
       ids[name]=user.id
       if(entry)await db.adminEntryGrant.create({data:{id:randomUUID(),userId:user.id,entry,grantedBy:user.id}})
     }
-    courseId=(await db.course.create({data:{title:'合成 Training 权限衔接',courseCode:'merge-'+randomUUID(),creatorId:ids.owner,courseType:'TRAINING_COURSE'}})).id
+    courseId=(await db.course.create({data:{title:'合成 Training 权限衔接',courseCode:'merge-'+randomUUID(),creatorId:ids.owner,courseType:'TRAINING_COURSE',status:'PUBLISHED'}})).id
     const waves:TrainingAnalysisRequestV1['waves']=[]
     for(let index=0;index<2;index++){
       const task=await db.compositeAssessment.create({data:{name:'合成空样本波次',code:'merge-'+randomUUID(),createdBy:ids.owner,courseId,
         productKind:'QUESTIONNAIRE',questionnaireType:'COURSE',status:'PUBLISHED',publicEnabled:true,publishedAt}})
+      await db.questionnaireCourseDelivery.create({data:{compositeId:task.id,courseId}})
       const section=await db.compositeFormSection.create({data:{compositeAssessmentId:task.id,title:'合成数值',position:0}})
       const item=await db.compositeAssessmentItem.create({data:{compositeAssessmentId:task.id,type:'FORM',position:0,required:false,
         formSectionId:section.id,formSectionPosition:0,formType:'number',formLabel:'合成数值',
@@ -54,13 +55,27 @@ suite('merged Training source, public-round and export authority',()=>{
   it('preserves an approved teacher’s own-course access without an entry grant',async()=>{
     expect((await discover('owner','TEACHER')).list).toHaveLength(2)
   })
+  it('frozen feedback/persistence authoring uses the current entry role inside its own transaction',async()=>{
+    const {validateTrainingFeedbackAuthoring,validateTrainingPersistenceAuthoring}=await import('../../modules/questionnaire-product/service')
+    const row={productKind:'QUESTIONNAIRE',questionnaireType:'COURSE',questionnaireCourses:[{courseId}],publicEnabled:true}
+    const validate=(name:string)=>db.$transaction(async tx=>{
+      const input={...row,createdBy:ids[name]}
+      await validateTrainingFeedbackAuthoring(tx,input,{schemaVersion:1,mode:'IMMEDIATE'})
+      return validateTrainingPersistenceAuthoring(tx,input,{schemaVersion:1,checkpoint:{enabled:true,ttlHours:6},localCognitive:null})
+    })
+    for(const name of ['legacy','system','survey','outside','realm'])await expect(validate(name)).rejects.toMatchObject({statusCode:403})
+    expect(await validate('owner')).toHaveProperty('trainingPersistencePolicyHash')
+    expect(await validate('training')).toHaveProperty('trainingPersistencePolicyHash')
+  })
   it('builds and opens a real Training CSV through the original worker and one-row artifact resolver',async()=>{
     const analyzed=await service.analyzeTrainingCourse({actor:{id:ids.training,role:'ADMIN'},courseId,selector,expectedTokenVersion:0})
     intent={batchId:randomUUID(),generation:1,resourceType:'TRAINING_ANALYSIS',resourceId:courseId,createdBy:ids.training,
       createdAt:new Date(),artifactIds:[],options:{anonymize:true,creatorRole:'ADMIN',authorityTokenVersion:0,
         trainingAnalysis:{version:1,selector,manifest:analyzed.manifest,table:'long'}}}
     const prepared=await worker.prepareAssessmentExport(intent)
-    readyPath=await prepared.save('csv');paths.push(readyPath)
+    const temporaryPath=await prepared.save('csv')
+    readyPath=temporaryPath.replace(/\.tmp-[a-f0-9-]+$/,'')
+    await fs.rename(temporaryPath,readyPath);paths.push(readyPath)
     expect((await fs.stat(readyPath)).size).toBeGreaterThan(0)
     artifactId=(await db.exportArtifact.create({data:{resourceType:'TRAINING_ANALYSIS',resourceId:courseId,createdBy:ids.training,
       anonymized:true,storageKey:basename(readyPath),format:'csv',status:'READY',provenance:prepared.provenance,
@@ -91,7 +106,11 @@ suite('merged Training source, public-round and export authority',()=>{
       questionnaireCourses:[{courseId}]}
     const prepare=(name:string)=>db.$transaction(tx=>prepareTrainingPublicRound(tx,{...row,createdBy:ids[name]},ids[name],{groupIpPolicy:{schemaVersion:1,timeZone:'Asia/Shanghai'}},expiry))
     for(const name of ['legacy','system','survey','outside','realm'])await expect(prepare(name)).rejects.toMatchObject({statusCode:403})
-    expect(await prepare('owner')).toMatchObject({courseId,createdBy:ids.owner})
+    const round=await prepare('owner')
+    expect(round).toMatchObject({courseId,createdBy:ids.owner})
     expect(await prepare('training')).toMatchObject({courseId,createdBy:ids.training})
+    // The additive database guard also rejects direct writes with old broad
+    // roles, independently of the application predicate.
+    for(const name of ['legacy','system','survey'])await expect(db.trainingPublicRound.create({data:{...round!,id:randomUUID(),createdBy:ids[name]}})).rejects.toThrow(/course\/author mismatch/)
   })
 })

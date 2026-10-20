@@ -64,6 +64,21 @@ grant/revoke 与 tokenVersion 在一个事务中提交，无权限 TTL 缓存。
 
 本次正式 PR/官方 CI 尚未创建。父对话须独立 review 后续固定提交，协调实际差异对应的官方构建、产物扫描、SAST 和缺失项；不能把上述开发记录改写为 Actions success，或默认再跑一套已通过的相同输入测试。官方应用证据接纳范围仍受仓库现有规则约束，不新增密钥或更改保护规则。
 
-最终候选前显式整合届时最新 main；若 Training 先合并，处理共享 auth、课程凭据、类型、导出及运行角色策略的实际冲突，只复验变化消费者。父对话串行协调最终合并。无生产连接或部署。
+Training PR #316 已先合并。本分支已正常 merge main `c3f9a7e77447c706f4a83a93c7429a7bcb164e94`，合并提交 `b123be160142346447c2b6a86f87b3390ba9be00`，无文本冲突；恢复点 `08848778b44d3700bbfb821a0012659078f47190` 已推送。父对话串行协调最终 review、CI 和合并。无生产连接或部署。
 
-补充收尾：管理页显式查找、390px 与页面错误检查 3 项通过（只读合成会话）；新回退预检接受当时精确当前 HEAD，拒绝缺少安全下限的 main 候选。首次预检误填不存在的 SHA 并失败，随后改用 git 实际读取的完整 SHA，未将首轮错误算作成功。正式消费器 `assessment-export-worker.postgres.integration.test.ts` 的夹具已补显式 TRAINING grant 与版本参数，但依赖既有 fake Cognitive seed，本开发数据库未建立该 seed，因此该消费者未执行；不能计作已通过。
+补充收尾：管理页显式查找、390px 与页面错误检查 3 项通过（只读合成会话）；新回退预检接受当时精确当前 HEAD，拒绝缺少安全下限的 main 候选。首次预检误填不存在的 SHA 并失败，随后改用 git 实际读取的完整 SHA，未将首轮错误算作成功。
+
+## Training main 整合后的实际验证
+
+没有整文件选边。保留 Training 的完整来源 authority context、延迟统计计算、请求内不可变事实复用和按 ID 单次读取 artifact；新增有效 TRAINING grant 的投影、业务身份与 grant 版本指纹、任务权限版本过滤，均在现有来源授权查询中完成，不再另读同一 principal。普通教师继续按自己课程及批准状态授权。
+
+新 main 的公开采集、冻结草稿/反馈策略及数据库采集轮次触发器也有旧 ADMIN 判断。应用层改用当前入口投影/共用课程编制条件；新增 `20261020120000_training_entry_authority` 以 `CREATE OR REPLACE FUNCTION` 保留原轮次、发布身份、窗口和匿名研究约束，仅替换当前权限条件。未改已应用 Training 历史 migration 的校验值。撤销并重新授权会改变 tokenVersion/grantVersion，旧分析 manifest、任务及文件不会恢复可用，需重新生成。
+
+- `training-merge.postgres.integration.test.ts` 12 项通过：真实 PG 的 Student+Training、Teacher 所有权、系统/旧 ADMIN/其他入口/错误 realm 拒绝、冻结策略、CSV 生成/读取、撤权重授以及数据库触发器直接拒绝旧权限写入。
+- 原 `assessment-export-worker.postgres.integration.test.ts` 1 项实际执行通过，覆盖真实认知/综合测评后台 worker、生成文件、响应重放和冻结账号拒绝。隔离库补了仓库既有的最小 fake Cognitive 配置，未运行整套业务种子，也未共享父对话数据库。
+- 7 个受影响 Training 来源/发现/服务/导出 unit 文件分阶段通过；首次 185/187，两项旧夹具适配后其所在文件重跑通过，未重复未变化的 5 个文件。公开采集原合同及反馈/草稿/模板/准入等受影响测试通过；模板测试只改为在实际查询集合中定位定义锁，不再假定第一个 SQL 就是定义锁。
+- 前后端类型检查通过；A05 后续界面变化另记。A05 认证 HTTP/真实安全密钥签名合成 ceremony 共 14 项通过。
+- 三份管理员增量迁移重放、真实 dump/restore 及受限 runtime 演练通过：221 表、1 序列、181 精确迁移；授权状态 SHA-256 `eca122f91789368c3c734a90afddd0b95018f371e772a0004f5037e9c8615cf4` 前后相同；审计修改/清空/禁用触发器仍 3 项拒绝，9 个新表索引。该次快照 35 grants、79 audits、23 keys，253952 bytes，不代表生产容量。
+- 最新小规模测量：30 次 principal 均 1 SQL，P50/P95 `0.453/1.338 ms`；25 人和 8 人列表各 10 次均 3 SQL，P50 `6.762/4.837 ms`、P95 `40.108/8.314 ms`；进程 CPU user/system `164.3/30.0 ms`，RSS `147.3→165.2 MiB`。仍是单进程开发样本，无吞吐、长期内存或性能改善主张。测量首次误填隔离开关被脚本拒绝，使用正确开关后才执行并记录成功。
+
+新增身份界面验收作为独立 A05 commit，矩阵及真实结果见 [A05 管理窗口](a05-workspaces.md)。官方 CI 不复用 Training 一次性路由；仍待父对话独立 review 和协调正式接纳。

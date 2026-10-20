@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { Prisma, UserRole } from '@prisma/client'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 const { db, helpers } = vi.hoisted(() => ({ db: {
-  $transaction: vi.fn(), $queryRawUnsafe: vi.fn(),
+  $transaction: vi.fn(), $queryRaw: vi.fn(), $queryRawUnsafe: vi.fn(),
   compositeAssessment: { findUnique: vi.fn(), create: vi.fn(), update: vi.fn() },
   questionnaireCourseDelivery: { deleteMany: vi.fn(), createMany: vi.fn() },
   course: { findMany: vi.fn() }, user: { findUnique: vi.fn() },
@@ -25,7 +25,8 @@ beforeEach(() => {
   db.compositeAssessment.create.mockImplementation(({ data }: any) => { current = { ...current, ...data }; return Promise.resolve(current) })
   db.compositeAssessment.update.mockImplementation(({ data }: any) => { for (const [key, value] of Object.entries(data)) current[key] = value === Prisma.DbNull ? null : key === 'revision' ? current.revision + 1 : value; return Promise.resolve(current) })
   db.course.findMany.mockResolvedValue([{ id: 'course', courseType: 'TRAINING_COURSE', isLibrary: false, creatorId: actor.userId }])
-  db.user.findUnique.mockResolvedValue({ role: 'TEACHER' })
+  db.$queryRaw.mockResolvedValue([{userId:actor.userId,username:'teacher',role:'TEACHER',accountDomain:'TRAINING',
+    platformRole:'STANDARD',tokenVersion:0,isActive:true,isFrozen:false,expiresAt:null,mustChangePassword:false,teacherApproved:true,entryGrants:[]}])
   helpers.getCompositeForTeacher.mockImplementation(() => Promise.resolve(current))
 })
 describe('Training feedback authoring contract', () => {
@@ -89,9 +90,10 @@ describe('Training feedback authoring contract', () => {
   it('requires the actual author to own the Training course unless administrator', async () => {
     db.course.findMany.mockResolvedValue([{ id: 'course', courseType: 'TRAINING_COURSE', isLibrary: false, creatorId: 'other' }])
     await expect(validateTrainingFeedbackAuthoring(db as any, current, policy)).rejects.toMatchObject({ statusCode: 403 })
-    db.user.findUnique.mockResolvedValue({ role: 'ADMIN' })
+    db.$queryRaw.mockResolvedValue([{userId:actor.userId,role:'STUDENT',accountDomain:'TRAINING',isActive:true,isFrozen:false,expiresAt:null,
+      mustChangePassword:false,entryGrants:[{entry:'TRAINING',version:1}]}])
     expect((await validateTrainingFeedbackAuthoring(db as any, current, policy)).trainingFeedbackPolicyHash).toBe(canonicalHash(policy))
-    db.user.findUnique.mockResolvedValue(null)
+    db.$queryRaw.mockResolvedValue([])
     await expect(validateTrainingFeedbackAuthoring(db as any, current, policy)).rejects.toMatchObject({ statusCode: 403 })
   })
   it('allows a past preset because completion and generation still gate release', async () => {

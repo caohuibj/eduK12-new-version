@@ -27,7 +27,7 @@ try{
  mkdirSync(privateRoot,{recursive:true,mode:0o700});await owner.connect()
  const before=await fingerprint(owner)
  stage='additive-replay'
- for(const migration of ['20261020100000_admin_entry_authority','20261020110000_admin_security_keys']){
+ for(const migration of ['20261020100000_admin_entry_authority','20261020110000_admin_security_keys','20261020120000_training_entry_authority']){
   await owner.query('BEGIN')
   try{await owner.query(readFileSync(path.join(root,'prisma/migrations',migration,'migration.sql'),'utf8'));await owner.query('COMMIT')}
   catch(error){await owner.query('ROLLBACK');throw error}
