@@ -1,6 +1,6 @@
 // Disposable synthetic fixture. Never upload its private output or database.
 import {randomBytes,randomUUID} from 'node:crypto'
-import {writeFileSync,readFileSync} from 'node:fs'
+import {writeFileSync,readFileSync,mkdirSync,lstatSync,realpathSync} from 'node:fs'
 import {spawnSync} from 'node:child_process'
 import path from 'node:path'
 import {prisma} from '../src/config/database'
@@ -10,8 +10,15 @@ import {changeEntryGrant,type AdminEntry} from '../src/modules/admin-permissions
 void(async()=>{
   const out=process.env.ADMIN_PERMISSIONS_FIXTURE_FILE
   const db=new URL(process.env.DATABASE_URL!)
+  const privateRoot=process.env.GITHUB_ACTIONS==='true'&&process.env.RUNNER_TEMP
+    ?path.resolve(process.env.RUNNER_TEMP,'admin-permissions-private'):'/workspace/admin-permissions-private'
   if(process.env.ADMIN_PERMISSIONS_ISOLATED_TEST!=='1'||!db.pathname.startsWith('/eduk12_admin_permissions_')
-    ||!['localhost','127.0.0.1'].includes(db.hostname)||!out?.startsWith('/workspace/admin-permissions-private/'))throw new Error('Isolated fixture only')
+    ||!['localhost','127.0.0.1'].includes(db.hostname)||!out||path.dirname(path.resolve(out))!==privateRoot
+    ||(process.env.ADMIN_PERMISSIONS_PRIVATE_DIR&&path.resolve(process.env.ADMIN_PERMISSIONS_PRIVATE_DIR)!==privateRoot))throw new Error('Isolated fixture only')
+  mkdirSync(privateRoot,{recursive:true,mode:0o700})
+  const directory=lstatSync(privateRoot)
+  if(!directory.isDirectory()||directory.isSymbolicLink()||(directory.mode&0o077)||realpathSync(privateRoot)!==privateRoot)
+    throw new Error('Private fixture directory required')
   const prefix='admin-fixture-'+randomUUID().slice(0,8)
   const password=()=>randomBytes(24).toString('base64url')+'7a'
   const cli=(input:object,name:string)=>{

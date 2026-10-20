@@ -9,7 +9,10 @@ on:
       run_performance_tests:
         type: boolean
         default: true
-        description: 'False only for the reviewed Training functional-only integration; all functional checks remain mandatory'
+        description: 'False only for an independently verified functional-only integration; all functional checks remain mandatory'
+      admin_permissions_functional:
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -88,13 +91,24 @@ jobs:
         with:
           node-version: '24.21.0'
       - name: verify explicit Training scope before omitting performance
-        if: ${{ !inputs.run_performance_tests }}
+        if: ${{ !inputs.run_performance_tests && !inputs.admin_permissions_functional }}
         env:
           CI_EVENT: ${{ github.event_name }}
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
           CI_FORCE_FULL: ${{ vars.CI_FORCE_FULL }}
         working-directory: .
         run: node .github/scripts/training-functional.mjs verify-backend
+      - name: verify explicit administrator scope before its functional checks
+        if: inputs.admin_permissions_functional
+        env:
+          RUN_PERFORMANCE_TESTS: ${{ inputs.run_performance_tests }}
+          CI_EVENT: ${{ github.event_name }}
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          CI_FORCE_FULL: ${{ vars.CI_FORCE_FULL }}
+        working-directory: .
+        run: |
+          test "$RUN_PERFORMANCE_TESTS" = false
+          node .github/scripts/admin-permissions-functional.mjs verify-backend
       - name: verify runner capacity and clean application ports
         run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - name: configure runner-local npm cache
@@ -228,6 +242,85 @@ jobs:
       - name: functional aggregate must have exactly two passes and only the named performance nonexecution
         if: ${{ !inputs.run_performance_tests }}
         run: node "$GITHUB_WORKSPACE/.github/scripts/training-functional-report.mjs" /tmp/eduk12-backend-functional-vitest.json
+      - name: administrator real PostgreSQL, HTTP, ceremony and migration recovery contracts
+        if: inputs.admin_permissions_functional
+        timeout-minutes: 8
+        env:
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+          ADMIN_PERMISSIONS_ISOLATED_TEST: '1'
+          ADMIN_PERMISSIONS_PRIVATE_DIR: ${{ runner.temp }}/admin-permissions-private
+          DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/eduk12_admin_permissions_ci_backend?schema=public
+          REDIS_URL: redis://localhost:6379/8
+          PORT: '3100'
+          CORS_ORIGIN: http://localhost:5174
+          ADMIN_WEBAUTHN_RP_ID: localhost
+          ADMIN_WEBAUTHN_ORIGIN: http://localhost:5174
+          SURVEY_WORKSPACE_ENABLED: 'true'
+          HUITEACHER_WORKSPACE_ENABLED: 'true'
+          BACKGROUND_WORKERS_ENABLED: 'false'
+          UPLOAD_DIR: ${{ runner.temp }}/admin-permissions-private/uploads
+          EXPORT_DIR: ${{ runner.temp }}/admin-permissions-private/exports
+          ADMIN_USERNAME: ci-admin-permissions-reference
+          ADMIN_PASSWORD: ci-admin-permissions-reference-2026
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -p "$ADMIN_PERMISSIONS_PRIVATE_DIR" "$UPLOAD_DIR" "$EXPORT_DIR"
+          admin_api_pid=''
+          cleanup_admin() {
+            if [ -n "$admin_api_pid" ]; then kill -- -"$admin_api_pid" 2>/dev/null || true; fi
+            rm -rf -- "$ADMIN_PERMISSIONS_PRIVATE_DIR"
+          }
+          trap cleanup_admin EXIT
+          docker exec "$CI_POSTGRES_SERVICE_ID" createdb -U ptool eduk12_admin_permissions_ci_backend
+          npm run db:migrate:guarded
+          npm run db:seed
+          nohup setsid node dist/index.js > "$ADMIN_PERMISSIONS_PRIVATE_DIR/api.log" 2>&1 &
+          admin_api_pid=$!
+          ready=false
+          for attempt in $(seq 1 50); do
+            if curl --fail --silent --max-time 2 http://127.0.0.1:3100/ready >/dev/null; then ready=true; break; fi
+            if ! kill -0 "$admin_api_pid" 2>/dev/null; then break; fi
+            sleep 1
+          done
+          test "$ready" = true
+          files=(src/__tests__/admin-permissions/*.postgres.integration.test.ts)
+          test "${#files[@]}" -eq 10
+          npx vitest run "${files[@]}" --maxWorkers=1 --no-file-parallelism --reporter=default --reporter=json --outputFile="$ADMIN_PERMISSIONS_PRIVATE_DIR/vitest.json"
+          node scripts/assert-release-test-report.mjs "$ADMIN_PERMISSIONS_PRIVATE_DIR/vitest.json" "${files[@]}"
+          node scripts/admin-permissions-rehearsal.mjs
+          node scripts/admin-permissions-rollback-preflight.mjs "$(git rev-parse HEAD)" > "$ADMIN_PERMISSIONS_PRIVATE_DIR/rollback-current.json"
+          set +e
+          node scripts/admin-permissions-rollback-preflight.mjs "$CI_BASE_SHA" > "$ADMIN_PERMISSIONS_PRIVATE_DIR/rollback-old.json" 2>&1
+          denied=$?
+          set -e
+          test "$denied" -eq 1
+          node --input-type=module <<'NODE'
+          import {readFileSync,writeFileSync} from 'node:fs';
+          import assert from 'node:assert/strict';
+          const root=process.env.ADMIN_PERMISSIONS_PRIVATE_DIR;
+          const read=name=>JSON.parse(readFileSync(root+'/'+name,'utf8'));
+          const tests=read('vitest.json'),rehearsal=read('rehearsal-report.json');
+          assert.equal(tests.success,true);assert.equal(tests.numPendingTests,0);assert.equal(tests.numFailedTests,0);
+          assert.equal(rehearsal.result,'PASS');assert.equal(rehearsal.additiveReplayPreserved,true);
+          assert.equal(rehearsal.dumpRestorePreserved,true);assert.equal(rehearsal.restrictedRuntime,true);
+          assert.equal(read('rollback-current.json').result,'PASS');assert.equal(read('rollback-old.json').result,'DENIED');
+          writeFileSync(process.env.RUNNER_TEMP+'/admin-permissions-functional-summary.json',JSON.stringify({
+            result:'PASS',head:process.env.GITHUB_SHA,mode:'admin-permissions-functional-only',
+            tests:{total:tests.numTotalTests,passed:tests.numPassedTests,pending:0,failed:0},
+            additiveReplayPreserved:true,dumpRestorePreserved:true,restrictedRuntime:true,
+            codeRollback:{current:'PASS',oldBase:'DENIED'},rawDatabaseUploaded:false,productionAccess:false,
+          },null,2),{mode:0o600});
+          NODE
+      - name: upload administrator functional summary only
+        if: inputs.admin_permissions_functional && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: admin-permissions-functional-${{ github.sha }}
+          path: ${{ runner.temp }}/admin-permissions-functional-summary.json
+          if-no-files-found: error
+          retention-days: 7
       - name: upload vitest report artifact
         if: always()
         continue-on-error: true

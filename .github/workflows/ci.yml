@@ -86,6 +86,15 @@ env:
   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
 
 jobs:
+  known-admin-functional-manual-refusal:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 1
+    steps:
+      - name: reject full and probe dispatch on the functional-only administrator candidate
+        shell: node {0}
+        run: throw new Error('Administrator performance/load work is not authorized; use its reviewed functional-only PR route.');
+
   known-training-functional-manual-refusal:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020'
     runs-on: ubuntu-24.04
@@ -105,7 +114,7 @@ jobs:
         run: throw new Error('Known Survey Mac candidate has no manual full/probe qualification; await independent tools review and explicit PR/CI authorization.');
 
   probe-frontend-build:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && (github.event_name == 'workflow_dispatch' && contains(fromJSON('["frontend","browser","media","ui","ui-chromium","qa-ui"]'), inputs.step_probe)) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && contains(fromJSON('["frontend","browser","media","ui","ui-chromium","qa-ui"]'), inputs.step_probe)) }}
     uses: ./.github/workflows/ci-frontend-build.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -113,19 +122,19 @@ jobs:
       ui_runner_labels: '["ubuntu-24.04"]'
 
   probe-browser-build:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && (github.event_name == 'workflow_dispatch' && contains(fromJSON('["browser","media"]'), inputs.step_probe)) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && contains(fromJSON('["browser","media"]'), inputs.step_probe)) }}
     uses: ./.github/workflows/ci-backend-browser-build.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
 
   probe-backend:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'backend') }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'backend') }}
     uses: ./.github/workflows/ci-backend.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
 
   probe-backend-regression:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && (github.event_name == 'workflow_dispatch' && contains(fromJSON('["backend-regression","assessment-repair","reporting"]'), inputs.step_probe)) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && contains(fromJSON('["backend-regression","assessment-repair","reporting"]'), inputs.step_probe)) }}
     uses: ./.github/workflows/ci-backend-regression.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -133,14 +142,14 @@ jobs:
 
   probe-browser:
     needs: [probe-frontend-build, probe-browser-build]
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'browser') }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'browser') }}
     uses: ./.github/workflows/ci-browser.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
 
   probe-media:
     needs: [probe-frontend-build, probe-browser-build]
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'media') }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'media') }}
     uses: ./.github/workflows/ci-media.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -149,7 +158,7 @@ jobs:
 
   probe-ui-mac:
     needs: probe-frontend-build
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ui') }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ui') }}
     strategy:
       fail-fast: false
       matrix:
@@ -164,7 +173,7 @@ jobs:
 
   probe-qa-ui:
     needs: probe-frontend-build
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'qa-ui') }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'qa-ui') }}
     uses: ./.github/workflows/ci-ui.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
@@ -174,7 +183,7 @@ jobs:
 
   probe-ui-hosted:
     needs: probe-frontend-build
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ui-chromium') }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ui-chromium') }}
     strategy:
       fail-fast: false
       matrix:
@@ -188,42 +197,44 @@ jobs:
       qa_round3: true
 
   probe-maintenance:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'maintenance') }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'maintenance') }}
     uses: ./.github/workflows/ci-maintenance.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
 
   probe-ops:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ops') }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'ops') }}
     uses: ./.github/workflows/ops-prelaunch.yml
 
   probe-perf:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'perf') }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'perf') }}
     uses: ./.github/workflows/perf-phase0-smoke.yml
 
   probe-images:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'images') }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'images') }}
     uses: ./.github/workflows/ci-images.yml
     with:
       frontend_only: ${{ inputs.probe_frontend_only }}
 
   probe-cognitive:
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'cognitive') }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'cognitive') }}
     uses: ./.github/workflows/ci-cognitive-step.yml
 
   probe-frontend:
     needs: probe-frontend-build
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'frontend') }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'frontend') }}
     uses: ./.github/workflows/ci-frontend.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
 
   scope:
     name: classify changed content
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && (!inputs.complete_training && (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (!inputs.complete_training && (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 8
     outputs:
+      admin_permissions_functional_only: ${{ steps.scope.outputs.admin_permissions_functional_only }}
+      admin_permissions_functional_plan: ${{ steps.scope.outputs.admin_permissions_functional_plan }}
       training_functional_only: ${{ steps.scope.outputs.training_functional_only }}
       training_functional_plan: ${{ steps.scope.outputs.training_functional_plan }}
       run_performance_tests: ${{ steps.scope.outputs.run_performance_tests }}
@@ -342,6 +353,7 @@ jobs:
       - id: scope
         env:
           # This branch check can only refuse fallback; it never grants the mode.
+          CI_ADMIN_FUNCTIONAL_REQUIRED: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'admin-permissions/a01-a07-20261020' }}
           CI_TRAINING_FUNCTIONAL_REQUIRED: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'work/training-functional-final-20261020' }}
           CI_SURVEY_MAC_REQUIRED: ${{ (github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'survey/mac-visual-s01-20261019') || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') }}
           CI_SURVEY_MAC_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
@@ -361,7 +373,7 @@ jobs:
           python3 -B .github/scripts/survey-mac-ui-candidate.test.py
       - name: legacy routing contracts only for the legacy route
         if: steps.scope.outputs.application_route == 'legacy' && steps.scope.outputs.scenario != 'release-tooling' && steps.scope.outputs.scenario != 'documentation' && steps.scope.outputs.scenario != 'maintenance'
-        run: node --test .github/scripts/training-functional.test.mjs .github/scripts/training-functional-report.test.mjs .github/scripts/runner-preflight.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/ci-browser-plan.test.mjs .github/scripts/api-response.test.mjs .github/scripts/mac-ci-cleanup.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-image-plan.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs .github/scripts/dependency-routing.test.mjs
+        run: node --test .github/scripts/admin-permissions-functional.test.mjs .github/scripts/training-functional.test.mjs .github/scripts/training-functional-report.test.mjs .github/scripts/runner-preflight.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/browser-asset-filter.test.mjs .github/scripts/ci-timing-report.test.mjs .github/scripts/ci-browser-plan.test.mjs .github/scripts/api-response.test.mjs .github/scripts/mac-ci-cleanup.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-image-plan.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/maintenance-routing.test.mjs .github/scripts/dependency-routing.test.mjs
 
       - name: affected maintenance routing and merge contracts
         if: steps.scope.outputs.scenario == 'maintenance' && github.event_name == 'pull_request'
@@ -651,12 +663,13 @@ jobs:
 
   backend:
     needs: scope
-    name: ${{ needs.scope.outputs.training_functional_only == 'true' && 'backend (migrate + build + functional gate; performance not executed)' || 'backend (migrate + build + performance gate)' }}
+    name: ${{ (needs.scope.outputs.training_functional_only == 'true' || needs.scope.outputs.admin_permissions_functional_only == 'true') && 'backend (migrate + build + functional gate; performance not executed)' || 'backend (migrate + build + performance gate)' }}
     if: ${{ needs.scope.outputs.scenario != 'frontend-test' && (!cancelled() && ((needs.scope.outputs.scenario == 'dependencies' && github.event_name == 'pull_request') || (needs.scope.outputs.documentation != 'true' && needs.scope.outputs.maintenance != 'true' && needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling' }}
     uses: ./.github/workflows/ci-backend.yml
     with:
       runner_labels: '["ubuntu-24.04"]'
       run_performance_tests: ${{ needs.scope.outputs.run_performance_tests != 'false' }}
+      admin_permissions_functional: ${{ needs.scope.outputs.admin_permissions_functional_only == 'true' }}
 
   backend-regression:
     needs: scope
@@ -693,6 +706,7 @@ jobs:
     if: ${{ needs.scope.outputs.scenario != 'dependencies' && (!cancelled() && needs.scope.result == 'success' && needs.frontend-build.result == 'success' && ((needs.scope.outputs.frontend == 'true' && needs.backend-browser-build.result == 'success') || (needs.scope.outputs.content == 'false' && needs.scope.outputs.frontend == 'false' && needs.scope.outputs.presentation == 'false' && needs.backend.result == 'success')) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false))) && needs.scope.outputs.application_route == 'legacy' && needs.scope.outputs.scenario != 'release-tooling' }}
     uses: ./.github/workflows/ci-browser.yml
     with:
+      admin_permissions_functional: ${{ needs.scope.outputs.admin_permissions_functional_only == 'true' }}
       runner_labels: '["ubuntu-24.04"]'
 
   docker:
@@ -939,7 +953,7 @@ jobs:
   merge-gate:
     name: merge gate / ready PR
     needs: [scope, maintenance, documentation, content, visual, pr-light-backend, pr-light-frontend, backend, backend-browser-build, backend-regression, frontend-build, frontend, browser, docker, codeql, miniprogram, accept-media, accept-ui, accept-visual, accept-perf, accept-ops, scoped-release, homepage-copy, assessment-capacity, access-efficiency, backend-security-efficiency, shared-asset-storage, survey-candidate, reviewed-candidate, survey-mac-ui, release-tools, campus, teacher-home, survey-home, teacher-survey]
-    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && (always() && (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request')) }}
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (always() && (inputs.step_probe == '' || inputs.step_probe == 'none') && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && (vars.CI_FORCE_FULL == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request')) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 8
     env:

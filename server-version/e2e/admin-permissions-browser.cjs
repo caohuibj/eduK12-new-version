@@ -1,15 +1,23 @@
-/* Development verification only. Synthetic accounts, virtual CTAP2 keys and
- * loopback services; never claim this as physical hardware or official CI. */
+/* Synthetic accounts, virtual CTAP2 keys and loopback services. Official CI
+ * context is reported separately; virtual keys never prove physical hardware. */
 const fs=require('node:fs')
+const path=require('node:path')
 const assert=require('node:assert/strict')
 const {chromium}=require('../backend/node_modules/playwright-core')
 const fixturePath=process.env.ADMIN_PERMISSIONS_FIXTURE_FILE
-if(process.env.ADMIN_PERMISSIONS_ISOLATED_TEST!=='1'||!fixturePath?.startsWith('/workspace/admin-permissions-private/'))throw new Error('Private isolated fixture required')
+const privateRoot=process.env.GITHUB_ACTIONS==='true'&&process.env.RUNNER_TEMP
+  ?path.resolve(process.env.RUNNER_TEMP,'admin-permissions-private'):'/workspace/admin-permissions-private'
+if(process.env.ADMIN_PERMISSIONS_ISOLATED_TEST!=='1'||!fixturePath||path.dirname(path.resolve(fixturePath))!==privateRoot
+  ||(process.env.ADMIN_PERMISSIONS_PRIVATE_DIR&&path.resolve(process.env.ADMIN_PERMISSIONS_PRIVATE_DIR)!==privateRoot))throw new Error('Private isolated fixture required')
+const directory=fs.lstatSync(privateRoot),input=fs.lstatSync(fixturePath)
+if(!directory.isDirectory()||directory.isSymbolicLink()||(directory.mode&0o077)||fs.realpathSync(privateRoot)!==privateRoot
+  ||!input.isFile()||input.isSymbolicLink()||(input.mode&0o077))throw new Error('Private fixture permissions required')
 const fixture=JSON.parse(fs.readFileSync(fixturePath,'utf8'))
 const resumed=process.env.ADMIN_PERMISSIONS_BROWSER_PHASE==='remaining'
 const signedSessions=resumed?JSON.parse(fs.readFileSync(process.env.ADMIN_PERMISSIONS_BROWSER_SESSIONS,'utf8')):null
 const origin=process.env.ADMIN_PERMISSIONS_BROWSER_ORIGIN||'http://localhost:5174'
 if(!['http://localhost:5174','http://localhost:5175','http://localhost:5176','http://localhost:5177'].includes(origin))throw new Error('Loopback browser origin required')
+const officialCI=process.env.GITHUB_ACTIONS==='true'
 let browser,activePage,step='startup',checks=0
 const checkpoints={},browserErrors=[]
 const check=(condition,label)=>{assert.ok(condition,label);checks++}
@@ -45,7 +53,7 @@ async function register(name){
   step='login-'+name
   await login(page,account)
   checkpoints[name]={cookies:await context.cookies(),credentials:(await cdp.send('WebAuthn.getCredentials',{authenticatorId})).credentials}
-  fs.writeFileSync('/workspace/admin-permissions-private/a05-browser-checkpoint.json',JSON.stringify(checkpoints),{mode:0o600})
+  fs.writeFileSync(path.join(privateRoot,'a05-browser-checkpoint.json'),JSON.stringify(checkpoints),{mode:0o600})
   console.log(JSON.stringify({phase:'registered-and-logged-in',identity:name,checks}))
   return {context,page,cdp,authenticatorId}
 }
@@ -97,9 +105,9 @@ async function verifyWorkspaces(sessions){
     if(expected[name].includes('TRAINING'))check((await api(page,'/users/'+fixture.schoolUserId)).status===404,'Training cannot inspect SCHOOL account')
     await page.goto(origin+'/admin/entrances');await page.reload()
     await page.getByRole('heading',{name:'管理入口',exact:true}).waitFor();checks++
-    await page.screenshot({path:'/workspace/admin-permissions-private/a05-'+name+'.png',fullPage:true})
+    await page.screenshot({path:path.join(privateRoot,'a05-')+name+'.png',fullPage:true})
     report.push({identity:name,businessRole:me.body.data.businessRole,role:me.body.data.role,entries:expected[name],system:name==='system',deepLinks,statuses,scopeStatuses,courseRoster:roster,refresh:'PASS'})
-    fs.writeFileSync('/workspace/admin-permissions-private/a05-workspaces-partial.json',JSON.stringify({report,checks}),{mode:0o600})
+    fs.writeFileSync(path.join(privateRoot,'a05-workspaces-partial.json'),JSON.stringify({report,checks}),{mode:0o600})
     console.log(JSON.stringify({phase:'A05-identity',identity:name,result:'PASS',checks}))
   }
   step='A05-Survey-invitation-operation'
@@ -129,7 +137,7 @@ async function verifyWorkspaces(sessions){
     check(current.body.data.length===1&&current.body.data[0].product===product&&current.body.data[0].status==='SUSPENDED','real scoped product operation '+name)
     const wrong=product==='HUISCHOOL'?'HUITEACHER':'HUISCHOOL'
     check((await api(page,`/platform/education/organizations/${org}/products/${wrong}`,'PUT',{action:'SUSPEND',expectedRevision:1,currentPassword:fixture[name].password})).status===403,'cross-product mutation denied '+name)
-    await page.screenshot({path:'/workspace/admin-permissions-private/a05-'+name+'-content.png',fullPage:true})
+    await page.screenshot({path:path.join(privateRoot,'a05-')+name+'-content.png',fullPage:true})
     await page.setViewportSize({width:390,height:844})
     check(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'390px scoped product page '+name)
     await page.setViewportSize({width:1280,height:720})
@@ -168,8 +176,8 @@ async function verifyWorkspaces(sessions){
   await sessions.training.page.getByText('当前账户无法访问此页面',{exact:true}).waitFor();checks++
   report.push({identity:'revoked',oldSession:401,newSession:403,menu:'denied',deepLink:'denied',focusOtherTab:'PASS',refresh:'PASS'})
   check(pageErrors.length===0,'no browser page errors')
-  fs.writeFileSync('/workspace/admin-permissions-private/a05-workspaces-report.json',JSON.stringify({result:'PASS',checks,report,revokeToDenialMs,physicalKeyVerified:false,officialCI:false},null,2),{mode:0o600})
-  console.log(JSON.stringify({result:'PASS',phase:'A05-workspaces',checks,identities:report.length,pageErrors:pageErrors.length,physicalKeyVerified:false,officialCI:false,revokeToDenialMs}))
+  fs.writeFileSync(path.join(privateRoot,'a05-workspaces-report.json'),JSON.stringify({result:'PASS',checks,report,revokeToDenialMs,physicalKeyVerified:false,officialCI},null,2),{mode:0o600})
+  console.log(JSON.stringify({result:'PASS',phase:'A05-workspaces',checks,identities:report.length,pageErrors:pageErrors.length,physicalKeyVerified:false,officialCI,revokeToDenialMs}))
 }
 async function verifyBusinessOverlaps(sessions){
   const errors=[]
@@ -219,7 +227,7 @@ async function verifyBusinessOverlaps(sessions){
   check((await api(system,'/organizations/reporting-specs')).status===200,'system spec governance')
   check(await system.locator('main').getByRole('alert').count()===0,'system-only page has no Training admission dependency')
   check(errors.length===0,'no overlap browser page errors')
-  console.log(JSON.stringify({result:'PASS',phase:'P2-business-and-governance',checks,pageErrors:errors.length,physicalKeyVerified:false,officialCI:false}))
+  console.log(JSON.stringify({result:'PASS',phase:'P2-business-and-governance',checks,pageErrors:errors.length,physicalKeyVerified:false,officialCI}))
 }
 ;(async()=>{
   browser=await chromium.launch({executablePath:process.env.CHROMIUM_EXECUTABLE||'/usr/bin/chromium',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']})
@@ -230,7 +238,7 @@ async function verifyBusinessOverlaps(sessions){
     return
   }
   if(['workspaces','workspaces-resume'].includes(process.env.ADMIN_PERMISSIONS_BROWSER_PHASE)){
-    const prior=process.env.ADMIN_PERMISSIONS_BROWSER_PHASE==='workspaces-resume'?JSON.parse(fs.readFileSync('/workspace/admin-permissions-private/a05-browser-checkpoint.json','utf8')):null
+    const prior=process.env.ADMIN_PERMISSIONS_BROWSER_PHASE==='workspaces-resume'?JSON.parse(fs.readFileSync(path.join(privateRoot,'a05-browser-checkpoint.json'),'utf8')):null
     if(prior)Object.assign(checkpoints,prior)
     for(const name of ['system','training','survey','school','teacher','both','none','business']){
       if(!prior?.[name]){sessions[name]=await register(name);continue}
@@ -242,7 +250,7 @@ async function verifyBusinessOverlaps(sessions){
       const stepUp=page.getByRole('button',{name:'重新验证安全密钥',exact:true})
       if(name!=='none'&&name!=='business'){await stepUp.click();await page.getByText('安全密钥验证完成，五分钟内可执行敏感操作。',{exact:true}).waitFor()}
       checkpoints[name]={cookies:await context.cookies(),credentials:(await cdp.send('WebAuthn.getCredentials',{authenticatorId})).credentials}
-      fs.writeFileSync('/workspace/admin-permissions-private/a05-browser-checkpoint.json',JSON.stringify(checkpoints),{mode:0o600})
+      fs.writeFileSync(path.join(privateRoot,'a05-browser-checkpoint.json'),JSON.stringify(checkpoints),{mode:0o600})
       sessions[name]={context,page,cdp,authenticatorId}
     }
     await verifyWorkspaces(sessions)
@@ -305,9 +313,9 @@ async function verifyBusinessOverlaps(sessions){
   console.log(JSON.stringify({result:'PASS',checks,phase:resumed?'remaining-ui-and-http-revocation':'full',signedPresentationFixture:resumed,physicalKeyVerified:false,revokeToDenialMs,privateDataUploaded:false}))
 })().catch(async error=>{
   if(activePage&&/^A05-(identity|deep)/.test(step)){
-    await activePage.screenshot({path:'/workspace/admin-permissions-private/a05-failure.png',fullPage:true}).catch(()=>{})
+    await activePage.screenshot({path:path.join(privateRoot,'a05-failure.png'),fullPage:true}).catch(()=>{})
     console.error(JSON.stringify({url:activePage.url(),headings:await activePage.locator('h1').allTextContents().catch(()=>[])}))
   }
   console.error(JSON.stringify({result:'FAIL',step,checks,errorType:error.name,message:String(error.message).split('\n')[0]}));process.exitCode=1
-  fs.writeFileSync('/workspace/admin-permissions-private/a05-browser-errors.json',JSON.stringify(browserErrors),{mode:0o600})
+  fs.writeFileSync(path.join(privateRoot,'a05-browser-errors.json'),JSON.stringify(browserErrors),{mode:0o600})
 }).finally(()=>browser?.close())
