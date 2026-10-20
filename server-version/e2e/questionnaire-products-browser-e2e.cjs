@@ -2,6 +2,7 @@ const assert = require('node:assert/strict')
 const fs = require('node:fs')
 const { chromium } = require('../backend/node_modules/playwright-core')
 const { loginWithSession, sessionJsonFetch } = require('./helpers/session-auth.cjs')
+const { restoreSyntheticAdminSession } = require('./helpers/synthetic-admin-session.cjs')
 const fixture = JSON.parse(fs.readFileSync(process.env.QUESTIONNAIRE_PRODUCT_FIXTURE_FILE || '/tmp/huisurvey-q1-browser-fixture.json','utf8'))
 const baseUrl = process.env.QUESTIONNAIRE_PRODUCT_BASE_URL || 'http://127.0.0.1:5141'
 const output = process.env.QUESTIONNAIRE_PRODUCT_EVIDENCE || '/tmp/huisurvey-q1-browser'
@@ -64,7 +65,13 @@ async function main() {
   page.on('pageerror',e=>errors.push(e.message))
   const publicMode=process.env.QUESTIONNAIRE_PRODUCT_PUBLIC==='1'
   try {
-    await loginWithSession(page,{baseUrl,route:publicMode?'/admin/login':'/teacher/account-login',...(publicMode?fixture.admin:fixture.teacher),...(publicMode?{usernamePlaceholder:'请输入管理员账号',submitName:'管理员登录'}:{}),timeout:60000})
+    if (publicMode) {
+      // Public-delivery business coverage starts after strong authentication.
+      // The separate administrator gate retains real virtual CTAP2 ceremonies.
+      await restoreSyntheticAdminSession(page, { baseUrl, username: fixture.admin.username })
+    } else {
+      await loginWithSession(page,{baseUrl,route:'/teacher/account-login',...fixture.teacher,timeout:60000})
+    }
     if(process.env.QUESTIONNAIRE_PRODUCT_REPORT_ONLY==='1') {
       const previous=JSON.parse(fs.readFileSync(output+'/result.json','utf8'))
       const payload=ok(await sessionJsonFetch(page,'/questionnaire-products/'+previous.id+'/reports'))

@@ -23,6 +23,11 @@ const exactSources = new Set([
   'server-version/e2e/ops-export-worker-smoke.ts',
   'server-version/e2e/qa-round3-browser-e2e.cjs',
   'server-version/e2e/qa-round5-sjt-upload-browser-e2e.cjs',
+  'server-version/e2e/helpers/synthetic-admin-session.cjs',
+  'server-version/e2e/pr5-product-scenarios-fixture.ts',
+  'server-version/e2e/pr5-product-scenarios.ts',
+  'server-version/e2e/questionnaire-products-browser-e2e.cjs',
+  'server-version/e2e/questionnaire-products-fixture.ts',
   'server-version/miniprogram-v2/domains/account/service.js',
   'server-version/miniprogram-v2/tests/runtime.test.cjs',
 ]);
