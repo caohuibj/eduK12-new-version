@@ -324,7 +324,19 @@ const AssignmentListContent: React.FC = () => {
       if (response.code === 0) {
         setShowModal(false)
         resetForm()
-        fetchAssignments()
+        setKeyword('')
+        setSelectedTags([])
+        // A record deep link reads only that record. Leave it after creating
+        // so the teacher can see the new assignment in its course list.
+        if (searchParams.has('id') || requestedCourseId !== data.courseId) {
+          const next = new URLSearchParams(searchParams)
+          next.delete('id')
+          next.delete('create')
+          next.set('courseId', data.courseId)
+          setSearchParams(next, { replace: true })
+        } else {
+          void fetchAssignments()
+        }
       }
     } catch (error: any) {
       editorGuard.fail(String(error.message || '创建失败'))
