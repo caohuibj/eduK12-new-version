@@ -1,3 +1,4 @@
+import {SurveyPrivateReferenceStudio} from './SurveyPrivateReferenceStudio'
 import {SurveyStoredReportReader} from './SurveyStoredReportReader'
 import { useEffect,useRef,useState,type FormEvent } from 'react'
 
@@ -111,7 +112,7 @@ const downloadBlob=(filename:string,value:string,mime:string)=>{
   try{document.body.append(anchor);anchor.click()}
   finally{anchor.remove();window.setTimeout(()=>URL.revokeObjectURL(url),3000)}
 }
-export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
+export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;actorId?:string}){
   const [overview,setOverview]=useState<Overview|null>(null)
   const [baseline,setBaseline]=useState(''),[followup,setFollowup]=useState('')
   const [paired,setPaired]=useState<Matched|null>(null)
@@ -378,6 +379,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
     {message&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{message}</p>}
     <fieldset disabled={busy} className="min-w-0 border-0 p-0 space-y-4" aria-label="研究数据操作">
     <button className="btn-secondary" disabled={busy} onClick={()=>void execute(reload)}>刷新完成进度</button>
+    {overview&&waveId&&<SurveyPrivateReferenceStudio actorId={actorId} key={'reference:'+actorId+':'+projectId+':'+waveId} projectId={projectId} waveId={waveId} request={api}/>}
     {overview&&waveId&&<SurveyStoredReportReader key={projectId+':'+waveId} projectId={projectId} waveId={waveId} request={api}/>}
     {overview&&<><div className="overflow-x-auto" tabIndex={0} role="region" aria-label="研究波次完成统计"><table className="w-full text-sm border-collapse">
       <thead><tr className="bg-slate-100"><th className="p-2 text-left">波次</th><th className="p-2">状态</th>

@@ -515,3 +515,14 @@ The mapping stores result pointers and exclusion counts, never another sample or
 release package. 49 focused service/route/helper contracts, backend strict types
 and Prisma schema validation passed. The additive migration and real concurrent
 winner/rollback behavior remain for concentrated database acceptance.
+
+### Private descriptive reference researcher UI
+
+The actual single-wave analytics workspace now creates, reads, reviews and publishes
+private descriptive candidates with separate explicit analyze/review/publish grant
+IDs. Review requires a freshly read candidate hash. It renders aggregate statistics,
+evidence, limitations and exclusion counts, never individual membership. Recovery
+uses the exact original request-status protocol, same-actor/project/wave session
+storage and explicit uncertainty state. MISSING only enables identical retry;
+known pre-write refusals allow correction without discarding unknown outcomes.
+Thirteen component contracts passed; real browser/HTTP acceptance remains pending.
