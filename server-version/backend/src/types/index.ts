@@ -33,6 +33,7 @@ export interface AuthenticatedPrincipal {
   mustChangePassword: boolean
   entryGrants?: Array<{ entry: import('../modules/admin-permissions/service').AdminEntry; version: number }>
   businessRole?: UserRole
+  teacherApproved?: boolean
   adminVerifiedAt?: number
   adminSessionId?: string
 }

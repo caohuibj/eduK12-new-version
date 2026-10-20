@@ -5,6 +5,7 @@ import React, {
   useEffect,
   useRef,
   useCallback,
+  useMemo,
   type ReactNode,
 } from 'react'
 import { authApi, type LoginRequest } from '../api/auth'
@@ -16,6 +17,7 @@ import {
   type ReauthReturn,
 } from '../components/app-shell/access'
 import type { User } from '../types'
+import {userForAccountView,type AccountView} from '../admin/accountView'
 
 interface AuthContextType {
   user: User | null
@@ -301,6 +303,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       <React.Fragment key={identityGeneration}>{children}</React.Fragment>
     </AuthContext.Provider>
   )
+}
+
+export function AccountViewProvider({view,children}:{view:AccountView;children:ReactNode}){
+  const current=useAuth()
+  const user=useMemo(()=>userForAccountView(current.user,view),[current.user,view])
+  return <AuthContext.Provider value={{...current,user}}>{children}</AuthContext.Provider>
 }
 
 export const useAuth = () => {

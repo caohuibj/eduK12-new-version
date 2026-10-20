@@ -135,6 +135,16 @@ export async function listRegisteredResources(actor: Actor, page = 1) {
   return { list: list.slice(0, 100).map(row => ({ ...row, entry: checkedEntry(row) })), truncated: list.length > 100, nextPage: list.length > 100 ? page + 1 : null }
 }
 
+/** System governance needs source metadata, not Training content authority or
+ * participant data. Registration still checks the full independent policy. */
+export async function listRegistrationCandidates(actor:Actor,page=1){
+  admin(actor)
+  if(!Number.isSafeInteger(page)||page<1||page>100000)reportingFail('RESOURCE_PAGE_INVALID','资源页码无效',400)
+  const rows=await prisma.scale.findMany({where:{status:'PUBLISHED',instrumentClass:'CUSTOM_DESCRIPTIVE'},
+    select:{id:true,name:true,status:true,instrumentClass:true},orderBy:{id:'asc'},skip:(page-1)*100,take:101})
+  return {list:rows.slice(0,100),nextPage:rows.length>100?page+1:null}
+}
+
 export async function readPublishedRegisteredResource(actor: Actor, id: string) {
   admin(actor)
   const [row] = await prisma.$queryRaw<Row[]>`SELECT * FROM registered_assessment_resources WHERE id=${id} AND status='PUBLISHED'`

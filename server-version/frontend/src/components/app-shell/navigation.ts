@@ -46,7 +46,7 @@ export function navigationFor(role: Role | undefined, cognitive: boolean, relati
     { path: '/admin/training', label: '培训版管理', section: 'system' },
     { path: '/users', label: '用户管理', section: 'system' }, { path: '/teacher-codes', label: '教师码', section: 'system' },
     { path: '/admin/bundle-authoring', label: '固定包制作', section: 'system' },
-    { path: '/admin/reporting-content', label: '测量与报告方案', section: 'system' }, { path: '/admin/material-grants', label: '材料授权', section: 'system' }, { path: '/admin/instrument-authorizations', label: '测评授权', section: 'system' },
+    { path: '/admin/material-grants', label: '材料授权', section: 'system' }, { path: '/admin/instrument-authorizations', label: '测评授权', section: 'system' },
   )
   if (role !== 'PARENT') items.push({ path: role === 'STUDENT' ? '/student/profile' : '/profile', label: '账户设置', section: 'account' })
   if (!items.some(item => item.path === '/my-assessments')) items.unshift({ path: '/my-assessments', label: '我的测评', section: 'assessment' })

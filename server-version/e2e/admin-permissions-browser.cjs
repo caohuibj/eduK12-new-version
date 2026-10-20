@@ -9,16 +9,16 @@ const fixture=JSON.parse(fs.readFileSync(fixturePath,'utf8'))
 const resumed=process.env.ADMIN_PERMISSIONS_BROWSER_PHASE==='remaining'
 const signedSessions=resumed?JSON.parse(fs.readFileSync(process.env.ADMIN_PERMISSIONS_BROWSER_SESSIONS,'utf8')):null
 const origin=process.env.ADMIN_PERMISSIONS_BROWSER_ORIGIN||'http://localhost:5174'
-if(!['http://localhost:5174','http://localhost:5175'].includes(origin))throw new Error('Loopback browser origin required')
+if(!['http://localhost:5174','http://localhost:5175','http://localhost:5176','http://localhost:5177'].includes(origin))throw new Error('Loopback browser origin required')
 let browser,activePage,step='startup',checks=0
 const checkpoints={},browserErrors=[]
 const check=(condition,label)=>{assert.ok(condition,label);checks++}
-async function api(page,path,method='GET',body){return page.evaluate(async({path,method,body})=>{
+async function api(page,path,method='GET',body,view){return page.evaluate(async({path,method,body,view})=>{
   let csrf=document.cookie.split('; ').find(x=>x.startsWith('ptool_csrf='))?.split('=').slice(1).join('=')
   if(!csrf){const response=await fetch('/api/auth/csrf');csrf=(await response.json()).data.csrfToken}
-  const response=await fetch('/api'+path,{method,credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':decodeURIComponent(csrf)},...(body===undefined?{}:{body:JSON.stringify(body)})})
+  const response=await fetch('/api'+path,{method,credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':decodeURIComponent(csrf),...(view?{'X-EduK12-Account-View':view}:{})},...(body===undefined?{}:{body:JSON.stringify(body)})})
   return {status:response.status,body:await response.json()}
-},{path,method,body})}
+},{path,method,body,view})}
 async function login(page,account){
   await page.goto(origin+'/admin/login')
   await page.locator('#auth-username').fill(account.username)
@@ -171,13 +171,69 @@ async function verifyWorkspaces(sessions){
   fs.writeFileSync('/workspace/admin-permissions-private/a05-workspaces-report.json',JSON.stringify({result:'PASS',checks,report,revokeToDenialMs,physicalKeyVerified:false,officialCI:false},null,2),{mode:0o600})
   console.log(JSON.stringify({result:'PASS',phase:'A05-workspaces',checks,identities:report.length,pageErrors:pageErrors.length,physicalKeyVerified:false,officialCI:false,revokeToDenialMs}))
 }
+async function verifyBusinessOverlaps(sessions){
+  const errors=[]
+  for(const s of Object.values(sessions))s.page.on('pageerror',e=>errors.push(e.name))
+  for(const [name,label,path]of [['training','学员','/student'],['both','培训师','/dashboard']]){
+    const page=sessions[name].page;activePage=page;step='P2-business-workspace-'+name
+    await page.goto(origin+'/admin/entrances')
+    await page.locator('main').getByRole('link',{name:'前往'+label+'业务工作台',exact:true}).click()
+    await page.waitForURL(new RegExp(path+'\\?workspace=business'))
+    await page.getByText('Synthetic dual-role teaching course',{exact:true}).first().waitFor();checks++
+    check((await api(page,'/auth/me','GET',undefined,'BUSINESS')).body.data.role===(name==='training'?'STUDENT':'TEACHER'),'real business identity '+name)
+    check((await api(page,'/users','GET',undefined,'BUSINESS')).status===403,'business view does not borrow management role '+name)
+    if(name==='training'){
+      const tasks=await api(page,'/courses/my/tasks','GET',undefined,'BUSINESS')
+      check(tasks.status===200&&tasks.body.data.list.some(x=>x.id===fixture.studentAssignmentId),'owned student tasks')
+      check((await api(page,'/courses/my/tasks?courseId='+fixture.courseId,'GET',undefined,'BUSINESS')).body.data.list.length===0,'no foreign-course student tasks')
+      check((await api(page,'/courses/join','POST',{courseCode:fixture.joinCourseCode},'BUSINESS')).status===200,'student can join')
+      await page.goto(origin+'/student/situational')
+      check((await api(page,'/situational/history','GET',undefined,'BUSINESS')).status===200,'student participation history')
+    }else{
+      check((await api(page,`/courses/${fixture.teacherCourseId}/students`,'GET',undefined,'BUSINESS')).status===200,'teacher own roster')
+      check((await api(page,`/courses/${fixture.courseId}/students`,'GET',undefined,'BUSINESS')).status===403,'teacher foreign roster')
+      check((await api(page,`/courses/${fixture.teacherCourseId}/students/${fixture.supportStudentId}/reset-password`,'POST',{},'BUSINESS')).status===200,'teacher owned credential support')
+      check((await api(page,`/courses/${fixture.courseId}/students/${fixture.foreignStudentId}/reset-password`,'POST',{},'BUSINESS')).status===403,'teacher foreign credential support')
+      await page.goto(origin+'/teacher/situational')
+      check((await api(page,'/teacher/situational/history','GET',undefined,'BUSINESS')).status===200,'teacher-only participant history')
+    }
+    await page.getByRole('heading',{name:'情境化测评',exact:true}).waitFor();checks++
+    check(await page.getByText('当前账户无法访问此页面',{exact:true}).count()===0,'business deep link '+name)
+    await page.goto(origin+'/admin/training');await page.getByRole('heading',{name:'培训版管理',exact:true}).waitFor();checks++
+    check((await api(page,'/users','GET',undefined,'MANAGEMENT')).status===200,'management retained '+name)
+    check(await page.getByRole('link',{name:'报告方案与内容审核',exact:true}).count()===0,'Training does not show system governance '+name)
+    await page.goto(origin+'/admin/reporting-content');await page.getByText('当前账号没有此入口的管理权限',{exact:true}).waitFor();checks++
+    check((await api(page,'/organizations/measurement-resources')).status===403,'Training reporting API denied '+name)
+    console.log(JSON.stringify({phase:'P2-business',identity:name,result:'PASS',checks}))
+  }
+  step='P2-pure-admin-is-not-student'
+  const none=sessions.none.page
+  check((await api(none,'/courses/my/tasks')).status===403,'pure ADMIN is not a student')
+  check((await api(none,'/teacher/situational/history')).status===403,'pure ADMIN is not a teacher')
+  step='P2-system-reporting'
+  const system=sessions.system.page
+  await system.goto(origin+'/admin/reporting-content');await system.getByRole('heading',{name:'测量资源与报告方案',exact:true}).waitFor()
+  await system.getByRole('button',{name:'刷新准备状态',exact:true}).waitFor()
+  check((await api(system,'/organizations/measurement-resources/candidates')).status===200,'system metadata candidates')
+  check((await api(system,'/organizations/measurement-resources')).status===200,'system resource governance')
+  check((await api(system,'/organizations/reporting-specs')).status===200,'system spec governance')
+  check(await system.locator('main').getByRole('alert').count()===0,'system-only page has no Training admission dependency')
+  check(errors.length===0,'no overlap browser page errors')
+  console.log(JSON.stringify({result:'PASS',phase:'P2-business-and-governance',checks,pageErrors:errors.length,physicalKeyVerified:false,officialCI:false}))
+}
 ;(async()=>{
   browser=await chromium.launch({executablePath:process.env.CHROMIUM_EXECUTABLE||'/usr/bin/chromium',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']})
   const sessions={}
+  if(process.env.ADMIN_PERMISSIONS_BROWSER_PHASE==='business-overlaps'){
+    for(const name of ['system','training','both','none'])sessions[name]=await register(name)
+    await verifyBusinessOverlaps(sessions)
+    return
+  }
   if(['workspaces','workspaces-resume'].includes(process.env.ADMIN_PERMISSIONS_BROWSER_PHASE)){
     const prior=process.env.ADMIN_PERMISSIONS_BROWSER_PHASE==='workspaces-resume'?JSON.parse(fs.readFileSync('/workspace/admin-permissions-private/a05-browser-checkpoint.json','utf8')):null
+    if(prior)Object.assign(checkpoints,prior)
     for(const name of ['system','training','survey','school','teacher','both','none','business']){
-      if(!prior){sessions[name]=await register(name);continue}
+      if(!prior?.[name]){sessions[name]=await register(name);continue}
       const context=await browser.newContext(),page=await context.newPage(),cdp=await context.newCDPSession(page)
       await cdp.send('WebAuthn.enable')
       const {authenticatorId}=await cdp.send('WebAuthn.addVirtualAuthenticator',{options:{protocol:'ctap2',transport:'usb',hasResidentKey:false,hasUserVerification:true,isUserVerified:true,automaticPresenceSimulation:true}})
@@ -185,6 +241,8 @@ async function verifyWorkspaces(sessions){
       await context.addCookies(prior[name].cookies);await page.goto(origin+'/admin/entrances')
       const stepUp=page.getByRole('button',{name:'重新验证安全密钥',exact:true})
       if(name!=='none'&&name!=='business'){await stepUp.click();await page.getByText('安全密钥验证完成，五分钟内可执行敏感操作。',{exact:true}).waitFor()}
+      checkpoints[name]={cookies:await context.cookies(),credentials:(await cdp.send('WebAuthn.getCredentials',{authenticatorId})).credentials}
+      fs.writeFileSync('/workspace/admin-permissions-private/a05-browser-checkpoint.json',JSON.stringify(checkpoints),{mode:0o600})
       sessions[name]={context,page,cdp,authenticatorId}
     }
     await verifyWorkspaces(sessions)

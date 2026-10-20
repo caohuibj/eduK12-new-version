@@ -22,7 +22,7 @@ import { logger } from '../utils/logger'
 import { randomUUID } from 'node:crypto'
 import path from 'node:path'
 import { prepareAssessmentExport, revalidateAssessmentExport } from '../services/assessmentExportWorker'
-import { loadCurrentPrincipal } from '../modules/organization/principal'
+import { asBusinessPrincipal, loadCurrentPrincipal } from '../modules/organization/principal'
 import { inactiveAccountMessage } from '../utils/accountStatus'
 const PROJECTION_MARKER = '__projection_v1_'
 
@@ -63,7 +63,8 @@ export const runExportBatch = async (job: any) => {
     const generationPaths: string[] = []
     try {
       if (claim.resourceType === 'SCALE' || claim.resourceType === 'QUESTIONNAIRE') {
-        const actor = await loadCurrentPrincipal(claim.createdBy)
+        const current = await loadCurrentPrincipal(claim.createdBy)
+        const actor=current&&claim.options.creatorRole==='TEACHER'?asBusinessPrincipal(current):current
         if (!actor || inactiveAccountMessage(actor) || actor.mustChangePassword || !['ADMIN','TEACHER'].includes(actor.role)
           || actor.tokenVersion !== claim.options.authorityTokenVersion) throw new Error('Export authority revoked')
         const resource = claim.resourceType === 'SCALE'

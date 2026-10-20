@@ -1,6 +1,6 @@
 import { UserRole } from '@prisma/client'
 import { prisma } from '../config/database'
-import { loadCurrentPrincipal } from '../modules/organization/principal'
+import { asBusinessPrincipal, loadCurrentPrincipal } from '../modules/organization/principal'
 import { inactiveAccountMessage } from '../utils/accountStatus'
 import * as assignmentService from '../modules/cognitive/assignment.service'
 import { isCompositeWrapper } from '../modules/cognitive/assignment.access'
@@ -13,7 +13,8 @@ import { provenanceSchema } from './assessmentExportArtifact'
 import { exportIntentDateRange } from './exportIntentDateRange'
 import { trainingAnalysisExportOptionsSchema, trainingAnalysisProvenanceSchema, assertTrainingAnalysisExportIdentity, saveTrainingAnalysisExport } from '../modules/training-analysis/export'
 const authorizeCurrentExportPrincipal = async (claim: ClaimedExportBatch) => {
-  const principal = await loadCurrentPrincipal(claim.createdBy)
+  const current = await loadCurrentPrincipal(claim.createdBy)
+  const principal=current&&claim.options.creatorRole===UserRole.TEACHER?asBusinessPrincipal(current):current
   if (!principal || inactiveAccountMessage(principal) || principal.mustChangePassword || principal.role !== claim.options.creatorRole
     || claim.options.authorityTokenVersion !== principal.tokenVersion
     || (!claim.options.anonymize && principal.role !== UserRole.ADMIN)) throw new Error('Export authority revoked')

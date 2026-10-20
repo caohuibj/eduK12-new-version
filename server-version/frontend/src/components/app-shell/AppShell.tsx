@@ -6,7 +6,8 @@ import AssessmentTaskShortcut from '../AssessmentTaskShortcut'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, matchPath, useLocation, useNavigate } from 'react-router-dom'
 import { ChevronRight, LogOut, PanelLeft } from 'lucide-react'
-import { useAuth } from '../../contexts/AuthContext'
+import { AccountViewProvider,useAuth } from '../../contexts/AuthContext'
+import {accountView} from '../../admin/accountView'
 import { useCapabilities } from '../../contexts/CapabilitiesContext'
 import { OrganizationProvider, useOrganization } from '../../contexts/OrganizationContext'
 import OrganizationProductRoutes from '../../pages/organization/OrganizationProductRoutes'
@@ -51,7 +52,8 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const items=adminWorkspace?adminNavigation(user):training?trainingNavigation(user?.role):[...navigationFor(user?.role,cognitive,relational.status==='available'),...(user?organizationNavigation(displayOrganization?.organization.id,displayOrganization?.allowedActions,platformRole,directoryActions):[])]
   if(!adminWorkspace){
   items.push(...surveyGovernanceNavigation(Boolean(productOrigins()),user?.role,platformRole??user?.platformRole,user?.entryGrants))
-  if(user?.platformRole==='SYSTEM_ADMIN')items.push({path:'/admin/permissions',label:'系统治理与入口授权',section:'system'})
+  if(user?.platformRole==='SYSTEM_ADMIN')items.push({path:'/admin/permissions',label:'系统治理与入口授权',section:'system'},
+    {path:'/admin/reporting-content',label:'报告方案与内容审核',section:'system'})
   if(user&&(user.platformRole==='SYSTEM_ADMIN'||user.entryGrants?.length))items.push({path:'/admin/entrances',label:'管理入口',section:'system'})
   if(!training&&user?.role==='ADMIN'&&platformRole==='SYSTEM_ADMIN') items.push({path:'/admin/legacy-archive',label:'历史归档（只读）',section:'system'})
   if(hasAdminEntry(user,'HUISCHOOL')||hasAdminEntry(user,'HUITEACHER'))
@@ -90,16 +92,16 @@ function AppShellContent({ children }: { children: ReactNode }) {
   </div>
 }
 export default function AppShell({children}:{children:ReactNode}) {
-  const { pathname } = useLocation()
+  const { pathname,search } = useLocation()
   const training = isTrainingHost()
   // Direct deep links to the existing Organization/Relational product must
   // still be functional; only ordinary Training course navigation skips
   // irrelevant discovery. Host context changes presentation, not API authority.
   const requiresOrganization = /^\/(organizations(?:\/|$)|organization-tasks(?:\/|$)|my-assessments(?:\/|$)|organization-invitations(?:\/|$))/.test(pathname)
   const requiresRelational = /^\/(relational(?:\/|$)|parent(?:\/|$)|student\/parent-links(?:\/|$))/.test(pathname)
-  return <OrganizationProvider suspended={training && !requiresOrganization}>
+  return <AccountViewProvider view={accountView(pathname,search)}><OrganizationProvider suspended={training && !requiresOrganization}>
     <RelationalAvailabilityProvider suspended={training && !requiresRelational}>
       <AppShellContent>{children}</AppShellContent>
     </RelationalAvailabilityProvider>
-  </OrganizationProvider>
+  </OrganizationProvider></AccountViewProvider>
 }

@@ -41,6 +41,17 @@ void(async()=>{
   const campus=await prisma.course.create({data:{title:'Synthetic private campus scope',creatorId:schoolUser.id,
     courseCode:randomUUID(),courseType:'CAMPUS_ACTIVITY',organizationId:org.id,isRecruiting:false}})
   fixtures.organizationId=org.id;fixtures.courseId=course.id;fixtures.campusCourseId=campus.id;fixtures.schoolUserId=schoolUser.id
+  if(process.env.ADMIN_PERMISSIONS_FIXTURE_BUSINESS==='1'){
+    const owned=await prisma.course.create({data:{title:'Synthetic dual-role teaching course',creatorId:(fixtures.both as {id:string}).id,
+      courseCode:randomUUID(),courseType:'TRAINING_COURSE',status:'PUBLISHED'}})
+    const target=await prisma.user.create({data:{username:prefix+'-support-student',passwordHash:'unusable',role:'STUDENT',accountDomain:'TRAINING'}})
+    const foreign=await prisma.user.create({data:{username:prefix+'-foreign-student',passwordHash:'unusable',role:'STUDENT',accountDomain:'TRAINING'}})
+    await prisma.courseStudent.createMany({data:[{courseId:owned.id,studentId:(fixtures.training as {id:string}).id,status:'ACTIVE'},
+      {courseId:owned.id,studentId:target.id,status:'ACTIVE'},{courseId:course.id,studentId:foreign.id,status:'ACTIVE'}]})
+    const assignment=await prisma.assignment.create({data:{courseId:owned.id,title:'Synthetic own-course business task'}})
+    await prisma.course.update({where:{id:course.id},data:{status:'PUBLISHED'}})
+    Object.assign(fixtures,{teacherCourseId:owned.id,studentAssignmentId:assignment.id,supportStudentId:target.id,foreignStudentId:foreign.id,joinCourseCode:course.courseCode})
+  }
   writeFileSync(out,JSON.stringify(fixtures),{mode:0o600,flag:'wx'})
   console.log(JSON.stringify({fixtureCreated:true,accounts:8,entries:4,privateOutput:true}))
 })().catch(e=>{console.error(e instanceof Error?e.message:'Fixture failed');process.exitCode=1}).finally(()=>prisma.$disconnect())

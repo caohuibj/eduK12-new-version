@@ -20,6 +20,13 @@ export interface CurrentPrincipal {
   businessRole?: UserRole
 }
 
+/** Select an existing business identity; this can only remove the Training
+ * compatibility ADMIN projection, never manufacture a participant role. */
+export function asBusinessPrincipal<T extends {role:UserRole;businessRole?:UserRole;teacherApproved?:boolean}>(principal:T):T|null {
+  const role=principal.businessRole??principal.role
+  return role===UserRole.ADMIN||(role===UserRole.TEACHER&&principal.teacherApproved===false)?null:{...principal,role}
+}
+
 type PrincipalRow = Omit<CurrentPrincipal, 'userId'> & {
   userId?: string
   id?: string
@@ -69,5 +76,6 @@ export function toRequestPrincipal(principal: CurrentPrincipal) {
     mustChangePassword: principal.mustChangePassword,
     entryGrants: principal.entryGrants ?? [],
     businessRole: principal.businessRole ?? principal.role,
+    teacherApproved: principal.teacherApproved,
   }
 }

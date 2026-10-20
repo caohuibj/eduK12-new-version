@@ -78,7 +78,7 @@ Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx
 | /admin/education-products | EducationProductGovernance | Explicit admin entry: ['HUISCHOOL','HUITEACHER'] | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /admin/huischool | EducationProductGovernance | Explicit admin entry: ['HUISCHOOL'] | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /admin/huiteacher | EducationProductGovernance | Explicit admin entry: ['HUITEACHER'] | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
-| /admin/reporting-content | ReportingContent | ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-05 | FE-02 chrome; domain UI retained |
+| /admin/reporting-content | ReportingContent | SYSTEM_ADMIN; current security-key session | — | AppShell (outside guards) | standard | FE-02 + FE-05 | FE-02 chrome; domain UI retained |
 | /admin/legacy-archive | LegacyArchive | ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /admin/legacy-archive/:kind/:id | LegacyArchive | ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /admin/material-grants | MaterialGrants | ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |

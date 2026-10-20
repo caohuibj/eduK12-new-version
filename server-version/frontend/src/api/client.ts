@@ -1,6 +1,7 @@
 import axios, { type AxiosRequestConfig } from 'axios'
 import type { ApiResponse } from '../types'
 import { parseRetryAfterMs } from '../utils/normalizeApiError'
+import {accountView} from '../admin/accountView'
 
 export interface ApiClientError extends Error {
   /** HTTP status is preserved for callers that need retry classification. */
@@ -56,6 +57,7 @@ export const sessionFetch = async (input: RequestInfo | URL, init: RequestInit =
   const requestStartedAt = Date.now()
   const method = (init.method || 'GET').toUpperCase()
   const headers = new Headers(init.headers)
+  if(typeof window!=='undefined')headers.set('X-EduK12-Account-View',accountView())
   if (!['GET', 'HEAD', 'OPTIONS'].includes(method)) {
     const csrfToken = await ensureCsrfToken()
     if (csrfToken) headers.set('X-CSRF-Token', csrfToken)
@@ -138,6 +140,7 @@ const installSessionInterceptors = (client: typeof axiosClient, preserveAxiosErr
     async (config) => {
       ;(config as typeof config & { authRequestStartedAt?: number }).authRequestStartedAt = Date.now()
       const method = (config.method || 'get').toUpperCase()
+      if(typeof window!=='undefined')config.headers['X-EduK12-Account-View']=accountView()
       if (!['GET', 'HEAD', 'OPTIONS'].includes(method) && typeof window !== 'undefined') {
         const csrfToken = await ensureCsrfToken()
         if (csrfToken) {

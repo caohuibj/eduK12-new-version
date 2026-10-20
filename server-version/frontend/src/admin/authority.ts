@@ -8,6 +8,7 @@ export const businessRoleLabel = (user: User) => ({STUDENT:'学员',TEACHER:'培
 export function adminReturnTo(user: User, raw: string | null) {
   const target = internalReturnTo(raw), path = target?.split(/[?#]/)[0]
   if (path && ((path==='/admin/permissions' && user.platformRole==='SYSTEM_ADMIN')
+    || (path==='/admin/reporting-content' && user.platformRole==='SYSTEM_ADMIN')
     || (path==='/admin/survey-researchers' && hasAdminEntry(user,'SURVEY'))
     || (['/users','/admin/training'].includes(path) && hasAdminEntry(user,'TRAINING'))
     || (path==='/admin/huischool' && hasAdminEntry(user,'HUISCHOOL'))

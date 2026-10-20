@@ -69,8 +69,9 @@ async function authority(tx: Prisma.TransactionClient, actor: TrainingAnalysisAc
   // Grant mutations lock the same user row and increment token_version. A
   // single statement both projects the current entry role and locks the full
   // authority context; the caller cannot supply an already-verified shortcut.
-  const effectiveRole = Prisma.sql`CASE WHEN g.user_id IS NOT NULL THEN 'ADMIN'
-    WHEN u.role::text='ADMIN' THEN 'STUDENT' ELSE u.role::text END`
+  const effectiveRole = actor.role===UserRole.TEACHER?Prisma.sql`u.role::text`
+    :Prisma.sql`CASE WHEN g.user_id IS NOT NULL THEN 'ADMIN'
+      WHEN u.role::text='ADMIN' THEN 'STUDENT' ELSE u.role::text END`
   const rows = await tx.$queryRaw<Array<{id:string;role:UserRole;businessRole:UserRole;isActive:boolean;isFrozen:boolean;
     expiresAt:Date|null;teacherApproved:boolean;accountDomain:string;mustChangePassword:boolean;tokenVersion:number;
     trainingGrantVersion:number|null;courseId:string;creatorId:string;courseType:string;isLibrary:boolean}>>`

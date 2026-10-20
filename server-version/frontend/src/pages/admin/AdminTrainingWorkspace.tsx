@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { BookOpen, ClipboardCheck, KeyRound, ShieldCheck, Users } from 'lucide-react'
+import { BookOpen, KeyRound, ShieldCheck, Users } from 'lucide-react'
 import { PageHeader, ProductPage } from '../../components/product-ui'
 import './admin-training.css'
 
@@ -30,15 +30,6 @@ const work = [
     description: '按现有课程访问规则查阅课程和管理问题；普通培训师只管理自己的课程成员。',
     Icon: BookOpen,
     links: [{ to: '/courses', label: '课程管理与查询' }],
-  },
-  {
-    title: '内容审核与报告配置',
-    description: '测评包发布资格、报告方案和测评内容治理继续使用统一平台的审批与科学流程。',
-    Icon: ClipboardCheck,
-    links: [
-      { to: '/admin/bundle-authoring', label: '固定测评包制作与审批' },
-      { to: '/admin/reporting-content', label: '报告方案与内容审核' },
-    ],
   },
 ] as const
 
