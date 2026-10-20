@@ -9,7 +9,12 @@ import { embeddedSituationalApi, situationalApi } from '../api'
 import { appendResearchEvents, type SituationalResearchEvent } from '../research'
 import { situationalHistoryIdentities } from '../history'
 
-afterEach(() => vi.restoreAllMocks())
+const training = vi.hoisted(() => ({ enabled: false }))
+vi.mock('../../../training/context', async importOriginal => ({
+  ...await importOriginal<typeof import('../../../training/context')>(),
+  isTrainingHost: () => training.enabled,
+}))
+afterEach(() => { training.enabled = false; vi.restoreAllMocks() })
 
 vi.mock('../api', () => ({
   situationalApi: {
@@ -482,6 +487,132 @@ describe('Situational journal failure recovery', () => {
     fireEvent.click(screen.getByRole('button',{name:/提交测评/}))
     await waitFor(()=>expect(situationalApi.submit).toHaveBeenCalledTimes(1))
     expect(vi.mocked(situationalApi.submit).mock.calls[0]![1]).toMatchObject({responseProtocol:'sjt-online-response-v1',responses:[{sceneKey:'sjt_q_q',channelKey:'q',status:'ANSWERED',responseValue:['a','b']}]})
+  })
+
+})
+
+
+describe('Training SJT page confirmation and choice focus', () => {
+  beforeEach(async () => {
+    vi.resetAllMocks()
+    training.enabled = true
+    await finalDraftStore.delete('situational:ui-attempt')
+    vi.mocked(situationalApi.start).mockResolvedValue({ code: 0, message: 'ok', data: startData() })
+  })
+
+  it('focuses the next question only after saving, and never changes scene automatically', async () => {
+    renderRunner()
+    await screen.findByText('第一段文字情境')
+    expect(screen.getByText(/本页共 2 个问题，其中 1 道选择题/)).toBeInTheDocument()
+    fireEvent.click(screen.getByLabelText('选择 A'))
+    await waitFor(() => expect(screen.getByText('你有多确定？', { selector: 'legend' })).toHaveFocus())
+    expect(screen.getByText('第一段文字情境')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /确认本页/ })).toBeDisabled()
+    expect(screen.getByRole('button', { name: /情境 2/ })).toBeDisabled()
+    const saved = await finalDraftStore.listAnswers('situational:ui-attempt')
+    expect(saved.find(row => row.itemKey === 'S1:choice')?.value).toMatchObject({ responseValue: 'A' })
+  })
+
+  it('confirms a page once, prevents backtracking, restores its page and keeps final submit manual', async () => {
+    const view = renderRunner()
+    await screen.findByText('第一段文字情境')
+    fireEvent.click(screen.getByLabelText('选择 A'))
+    await waitFor(() => expect(screen.getByRole('slider')).not.toBeDisabled())
+    fireEvent.change(screen.getByRole('slider'), { target: { value: '80' } })
+    const next = screen.getByRole('button', { name: /确认本页/ })
+    await waitFor(() => expect(next).not.toBeDisabled())
+    fireEvent.doubleClick(next)
+    fireEvent.click(next)
+    fireEvent.click(next)
+    await screen.findByText('第二段文字情境')
+    expect(screen.getByRole('button', { name: /上一题/ })).toBeDisabled()
+    expect(screen.getByRole('button', { name: /情境 1/ })).toBeDisabled()
+    view.unmount()
+    renderRunner()
+    await screen.findByText('第二段文字情境')
+    expect(screen.queryByText('第一段文字情境')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByLabelText('第二个 A'))
+    await waitFor(() => expect(screen.getByRole('button', { name: '提交测评' })).not.toBeDisabled())
+    expect(screen.getByText('第二段文字情境')).toBeInTheDocument()
+    expect(situationalApi.submit).not.toHaveBeenCalled()
+  })
+
+  it('stays at the current question on answer storage failure', async () => {
+    renderRunner()
+    await screen.findByText('第一段文字情境')
+    vi.spyOn(finalDraftStore, 'putAnswer').mockRejectedValueOnce(new Error('test answer storage unavailable'))
+    fireEvent.click(screen.getByLabelText('选择 A'))
+    expect((await screen.findAllByText('test answer storage unavailable')).some(element => element.getAttribute('role') === 'alert')).toBe(true)
+    expect(screen.getByText('你有多确定？', { selector: 'legend' })).not.toHaveFocus()
+    expect(screen.getByRole('button', { name: /确认本页/ })).toBeDisabled()
+    expect(screen.getByText('第一段文字情境')).toBeInTheDocument()
+  })
+
+  it('does not turn the page when storing the confirmed page fails', async () => {
+    renderRunner()
+    await screen.findByText('第一段文字情境')
+    fireEvent.click(screen.getByLabelText('选择 A'))
+    await waitFor(() => expect(screen.getByRole('slider')).not.toBeDisabled())
+    fireEvent.change(screen.getByRole('slider'), { target: { value: '80' } })
+    await waitFor(() => expect(screen.getByRole('button', { name: /确认本页/ })).not.toBeDisabled())
+    vi.spyOn(finalDraftStore, 'setInstrumentMetadata').mockRejectedValueOnce(new Error('test page storage unavailable'))
+    fireEvent.click(screen.getByRole('button', { name: /确认本页/ }))
+    expect(await screen.findByText('test page storage unavailable')).toBeInTheDocument()
+    expect(screen.getByText('第一段文字情境')).toBeInTheDocument()
+    expect(screen.queryByText('第二段文字情境')).not.toBeInTheDocument()
+  })
+
+  it('does not disclose the next scientific stage when selecting a choice', async () => {
+    vi.mocked(situationalApi.start).mockResolvedValue({ code: 0, message: 'ok', data: stagedStartData() })
+    renderRunner()
+    await screen.findByText('第一段文字情境')
+    fireEvent.click(screen.getByLabelText('选择 A'))
+    await waitFor(() => expect(screen.getByRole('button', { name: '确认行动选择' })).not.toBeDisabled())
+    expect(screen.queryByRole('slider')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '确认行动选择' }))
+    expect(await screen.findByRole('slider')).toBeInTheDocument()
+    expect(screen.getByLabelText('选择 B')).toBeDisabled()
+  })
+
+  it('does not advance on restored answers or change legacy Survey navigation', async () => {
+    const source = startData()
+    await ensureSituationalDraft(source.attempt)
+    await finalDraftStore.putAnswer({ draftKey: 'situational:ui-attempt', itemKey: 'S1:choice', value: { responseValue: 'A' }, updatedAt: Date.now() })
+    const view = renderRunner()
+    await screen.findByText('第一段文字情境')
+    expect(screen.getByLabelText('选择 A')).toBeChecked()
+    expect(screen.getByText('你有多确定？', { selector: 'legend' })).not.toHaveFocus()
+    view.unmount()
+    training.enabled = false
+    renderRunner()
+    await screen.findByText('第一段文字情境')
+    expect(screen.queryByRole('button', { name: /确认本页/ })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '下一题' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /情境 2/ })).not.toBeDisabled()
+  })
+  it('handles online single choice within the page but keeps multiple choice manual', async () => {
+    const source = startData()
+    const channels = source.instrument.definition.scenes[0]!.channels
+    channels[0]!.online = true
+    channels.splice(1, 0, { channelKey: 'multi', responseType: 'MULTIPLE_CHOICE', online: true, prompt: '可选择多项', options: [{ optionKey: 'X', label: '多选 X' }, { optionKey: 'Y', label: '多选 Y' }] })
+    vi.mocked(situationalApi.start).mockResolvedValue({ code: 0, message: 'ok', data: source })
+    renderRunner()
+    await screen.findByText('第一段文字情境')
+    fireEvent.click(screen.getByLabelText('选择 A'))
+    await waitFor(() => expect(screen.getByText('可选择多项', { selector: 'legend' })).toHaveFocus())
+    fireEvent.click(screen.getByLabelText('多选 X'))
+    await waitFor(() => expect(screen.getByLabelText('多选 X')).toBeChecked())
+    expect(screen.getByText('你有多确定？', { selector: 'legend' })).not.toHaveFocus()
+    expect(screen.getByText('第一段文字情境')).toBeInTheDocument()
+  })
+
+  it('rejects incompatible saved navigation instead of reopening a locked earlier page', async () => {
+    const source = startData()
+    await ensureSituationalDraft(source.attempt)
+    await finalDraftStore.setInstrumentMetadata('situational:ui-attempt', { trainingSjtPage: { version: 1, visitedSceneKeys: ['S1', 'other-path'] } })
+    renderRunner()
+    expect(await screen.findByText('本机情境换页进度与当前路径不一致，请保留草稿并联系教师。')).toBeInTheDocument()
+    expect(screen.queryByLabelText('选择 A')).not.toBeInTheDocument()
   })
 
 })
