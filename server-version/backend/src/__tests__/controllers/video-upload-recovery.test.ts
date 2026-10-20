@@ -9,6 +9,7 @@ vi.mock('../../services/assetStorage', () => ({ storeAssetFromFile: mocks.store,
 vi.mock('../../services/videoRetry', () => ({ retryVideo: vi.fn(), VideoRetryError: class extends Error {} }))
 import { videoController } from '../../controllers/videoController'
 import { LOCAL_VIDEO_UPLOAD_SENTINEL, RemoteVideoAdmissionError } from '../../services/remoteVideoAdmission'
+import { createAttachmentSchema } from '../../utils/attachmentSchema'
 
 const request = () => ({ user: { userId: 'owner', role: 'TEACHER' }, body: { title: 'Lesson' }, file: { path: '/temp', originalname: 'lesson.mp4', size: 123, detectedMimeType: 'video/mp4' } } as unknown as Request)
 const response = () => ({ json: vi.fn(), status: vi.fn().mockReturnThis(), setHeader: vi.fn() } as unknown as Response)
@@ -26,11 +27,27 @@ describe('persisted video survives an enqueue failure', () => {
     mocks.stat.mockResolvedValue({ size: 123, isFile: () => true })
   })
   afterEach(() => { vi.useRealTimers() })
+  it.each(['queued', 'enqueue failed'])('returns a usable checkin attachment after upload: %s', async outcome => {
+    if (outcome === 'queued') mocks.queue.mockResolvedValue({ id: 'job' })
+    const res = response()
+    await videoController.upload(request(), res)
+    const body = vi.mocked(res.json).mock.calls[0][0]
+    expect(body.code).toBe(0)
+    expect(body.data).toEqual(expect.objectContaining({ originalAssetId: 'asset', originalUrl: '/signed' }))
+    // Match MediaSelector's upload mapping and the strict checkin input schema.
+    // A signed relative URL alone is not a durable attachment identity.
+    expect(createAttachmentSchema(false).safeParse({
+      type: 'library', id: body.data.id, title: body.data.title,
+      assetId: body.data.processedAssetId || body.data.originalAssetId,
+      url: body.data.url || body.data.originalUrl || '',
+    }).success).toBe(true)
+    expect(mocks.discard).not.toHaveBeenCalled()
+  })
   it('returns the retained video ID so the browser retries transcode instead of creating a duplicate', async () => {
     const res = { json: vi.fn(), status: vi.fn().mockReturnThis() } as unknown as Response
     const req = { user: { userId: 'owner', role: 'TEACHER' }, body: { title: 'Lesson' }, file: { path: '/temp', originalname: 'lesson.mp4', size: 123, detectedMimeType: 'video/mp4' } } as unknown as Request
     await videoController.upload(req, res)
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 0, data: { id: 'saved-video', title: 'Lesson', status: 'FAILED' } }))
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 0, data: { id: 'saved-video', title: 'Lesson', status: 'FAILED', originalAssetId: 'asset', originalUrl: '/signed' } }))
     expect(mocks.create).toHaveBeenCalledTimes(1)
     expect(mocks.update).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 'saved-video', status: 'PENDING', processingJobId: expect.stringMatching(/^video-upload-/), processingGeneration: 0 } }))
     expect(mocks.discard).not.toHaveBeenCalled()
@@ -40,7 +57,7 @@ describe('persisted video survives an enqueue failure', () => {
     mocks.find.mockResolvedValue({ status: 'COMPLETED' })
     const res = { json: vi.fn(), status: vi.fn().mockReturnThis() } as unknown as Response
     await videoController.upload({ user: { userId: 'owner', role: 'TEACHER' }, body: { title: 'Lesson' }, file: { path: '/temp', originalname: 'lesson.mp4', size: 123, detectedMimeType: 'video/mp4' } } as unknown as Request, res)
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 0, data: { id: 'saved-video', title: 'Lesson', status: 'COMPLETED' } }))
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 0, data: { id: 'saved-video', title: 'Lesson', status: 'COMPLETED', originalAssetId: 'asset', originalUrl: '/signed' } }))
   })
   it('reserves durable actual-size capacity before copying, linking and enqueueing the original', async () => {
     mocks.queue.mockResolvedValue({ id: 'job' })

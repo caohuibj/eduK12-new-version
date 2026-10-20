@@ -225,7 +225,11 @@ export const videoController = {
         }).catch(() => undefined)
         const retained = await prisma.video.findUnique({ where: { id: video.id }, select: { status: true } }).catch(() => null)
         logger.error('视频已保存，但转码入队失败', { videoId: video.id })
-        return success(res, { id: video.id, title: video.title, status: retained?.status ?? 'PENDING' }, '文件已保存，请查看处理状态；失败后可重新转码')
+        return success(res, {
+          id: video.id, title: video.title, status: retained?.status ?? 'PENDING',
+          originalAssetId: storedOriginalAsset.id,
+          originalUrl: signKnownAsset(storedOriginalAsset),
+        }, '文件已保存，请查看处理状态；失败后可重新转码')
       }
 
       logger.info(`视频已加入处理队列: ${video.id}`)
@@ -234,7 +238,9 @@ export const videoController = {
         id: video.id,
         title: video.title,
         status: 'PENDING',
-        originalUrl: signKnownAsset(originalAsset),
+        // MediaSelector needs the durable identity when attaching a fresh upload.
+        originalAssetId: storedOriginalAsset.id,
+        originalUrl: signKnownAsset(storedOriginalAsset),
         message: '视频上传成功，正在后台处理中...',
       }, '视频上传成功，转码处理中')
     } catch (err) {
