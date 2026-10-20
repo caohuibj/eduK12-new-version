@@ -476,3 +476,9 @@ route. Review views revalidate the same trusted source/facts as review and publi
 This is local descriptive sample evidence only, not formal norms or external norm
 uploads. 43 targeted candidate/route/reinterpretation contracts and strict backend
 types passed; real HTTP, browser UI and database contention remain pending.
+
+Private reference publication responses are also explicitly projected: only the
+release identity, hash, version, status, family and layer leave the handler. The
+shared release retains internal evidence, but its sample manifest and provenance
+are never returned by this operation. A populated-manifest response regression
+contract verifies this boundary (four route contracts passed).

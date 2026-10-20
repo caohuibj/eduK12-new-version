@@ -21,7 +21,7 @@ async function invoke(suffix='',body:unknown=create(),method='post'){
  await handler(req,res,()=>res.status(500))
  return {status:res.status.mock.calls[0]?.[0]??200,payload:res.json.mock.calls[0]?.[0],req}
 }
-beforeEach(()=>{vi.clearAllMocks();mocks.create.mockResolvedValue({candidateId:id,exclusionCounts:{missingValue:1},candidate:{candidateHash:'hash',measurement:{releaseId:id},definition:{entries:[]},evidence,sourceBinding:{projectId:id},sampleManifest:[{factId:'private-attempt'}]}});mocks.read.mockResolvedValue({candidateId:id});mocks.review.mockResolvedValue({reviewId:id});mocks.publish.mockResolvedValue({releaseId:id})})
+beforeEach(()=>{vi.clearAllMocks();mocks.create.mockResolvedValue({candidateId:id,exclusionCounts:{missingValue:1},candidate:{candidateHash:'hash',measurement:{releaseId:id},definition:{entries:[]},evidence,sourceBinding:{projectId:id},sampleManifest:[{factId:'private-attempt'}]}});mocks.read.mockResolvedValue({candidateId:id});mocks.review.mockResolvedValue({reviewId:id});mocks.publish.mockResolvedValue({releaseId:id,contentHash:'digest',version:'v1',status:'PUBLISHED',family:'SCALE',layer:'REFERENCE',content:{evidence:{sampleManifest:[{factId:'private-member',factVersion:'private-fact-version'}]}},provenance:{privateEvidence:'internal-only'}})})
 describe('private descriptive reference route handlers (no HTTP transport)',()=>{
  it('uses authenticated actor and path scope; strips all individual membership from create response',async()=>{
   const result=await invoke();expect(result.status).toBe(200)
@@ -35,7 +35,13 @@ describe('private descriptive reference route handlers (no HTTP transport)',()=>
   expect(mocks.read).toHaveBeenCalledWith('authenticated-user',{projectId:id,waveId:id,candidateId:id,grantId:id})
   expect((await invoke('/:candidateId/reviews',review())).status).toBe(200)
   expect(mocks.review).toHaveBeenCalledWith('authenticated-user',{...review(),projectId:id,waveId:id,candidateId:id})
-  expect((await invoke('/:candidateId/publish',publish())).status).toBe(200)
+  const published=await invoke('/:candidateId/publish',publish())
+  expect(published.status).toBe(200)
+  expect(published.payload.data).toEqual({releaseId:id,contentHash:'digest',version:'v1',status:'PUBLISHED',family:'SCALE',layer:'REFERENCE'})
+  expect(JSON.stringify(published.payload)).not.toContain('private-member')
+  expect(JSON.stringify(published.payload)).not.toContain('private-fact-version')
+  expect(published.payload.data).not.toHaveProperty('content')
+  expect(published.payload.data).not.toHaveProperty('provenance')
   expect(mocks.publish).toHaveBeenCalledWith('authenticated-user',{...publish(),projectId:id,waveId:id,candidateId:id})
   expect(mocks.mfa).toHaveBeenCalledTimes(3)
  })

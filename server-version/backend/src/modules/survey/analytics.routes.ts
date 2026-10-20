@@ -179,6 +179,8 @@ surveyAnalyticsRouter.post(candidatePath+'/:candidateId/reviews',wrap(async req=
 }))
 surveyAnalyticsRouter.post(candidatePath+'/:candidateId/publish',wrap(async req=>{
   assertRecentSurveyMfa(req)
-  return publishSurveyReferenceCandidate(req.user!.userId,{...referencePublishBody.parse(req.body),
+  const release=await publishSurveyReferenceCandidate(req.user!.userId,{...referencePublishBody.parse(req.body),
     projectId:id.parse(req.params.pid),waveId:id.parse(req.params.wid),candidateId:id.parse(req.params.candidateId)})
+  return {releaseId:release.releaseId,contentHash:release.contentHash,version:release.version,status:release.status,
+    family:release.family,layer:release.layer}
 }))
