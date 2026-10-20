@@ -24,7 +24,7 @@
     "fixtureRepair": {
       "path": "server-version/backend/scripts/measurement-browser-fixture.ts",
       "before": "c8357e27d566f68a8c1ad520d3ab17d6ce7af8d5",
-      "after": "4fd705b7bf2f3fe7b94f9419fff4e26fe6b6bdc2"
+      "after": "2d7b700704c41de6ff72bb6f20fe185a95b4e7b3"
     },
     "components": {
       "backend": {
@@ -48,5 +48,37 @@
         "receiptSha256": "99afeff8467df11bfb363d4eef282942abbe1557a1a0701b00307a66a70ff041"
       }
     }
+  },
+  "fixedAdminSource": {
+    "runId": "39400868129",
+    "attempt": "1",
+    "head": "2fced5c637a039700322efe297744fddbc85132a",
+    "jobId": 118555111929,
+    "artifactId": 12254318750,
+    "zipBytes": 847435,
+    "zipSha256": "5e165a799b262407c6e5c0e2982fba5197229af06d1bc2acb7bd95b94fdba79a",
+    "artifactName": "measurement-39400868129-2fced5c637a039700322efe297744fddbc85132a-browser-admin-attempt-1",
+    "resultPath": "_temp/measurement-browser-evidence/result.json",
+    "resultSha256": "0dadb6c1b5a63da21fc72131c2a2c1334d69ede1ea63d1e696785bdb266c27db",
+    "requiredChecks": [
+      "Real virtual CTAP2 registration",
+      "Registration does not create session",
+      "UI step-up creates fresh actual authenticator assertion",
+      "Expired grant form blocked before transmission",
+      "Real committed grant response-loss recovered via same UUID after reload",
+      "UI issued TRAINING reference grant",
+      "UI issued TRAINING reference-governance grant",
+      "UI revoke and fresh page metadata retain revoked state",
+      "No uncaught browser errors",
+      "No external browser requests"
+    ],
+    "unchangedTools": {
+      "server-version/e2e/measurement-version-browser.cjs": "fd0a09370114b358bbe929c674add25dda711007",
+      "server-version/e2e/measurement-version-journeys.cjs": "3f81de54bed5897091881c26d34eade9bf40ce92",
+      "server-version/e2e/measurement-browser-proxy.cjs": "8de447518b3e589af6bcd49f8ac4e515b158d187"
+    },
+    "fixtureBefore": "4fd705b7bf2f3fe7b94f9419fff4e26fe6b6bdc2",
+    "fixtureAdminSliceSha256": "80c6a08f4637d3c1707f11057cc99f08cb48312f15c0f13b72a05f2e1e2a4357",
+    "runtimeConfigurationSha256": "8b6e8ef6493a3646d3b00741e897d1e558d5d5831565b3d56edded38593efba7"
   }
 }

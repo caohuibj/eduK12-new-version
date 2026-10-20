@@ -163,10 +163,9 @@ def admit(component):
     return source, pin
 
 
-def download_fixed(component):
-    source, pin = admit(component)
+def download_zip(source, pin, archive_name):
     E.mkdir(exist_ok=True)
-    archive = E / (component + '-official.zip')
+    archive = E / archive_name
     class NoRedirect(urllib.request.HTTPRedirectHandler):
         def redirect_request(self, req, fp, code, msg, headers, newurl):
             return None
@@ -187,6 +186,12 @@ def download_fixed(component):
             assert total <= pin['zipBytes'], 'Oversized artifact'
             target.write(chunk)
     assert total == pin['zipBytes'] and sha(archive) == pin['zipSha256'], 'Official artifact bytes changed'
+    return archive
+
+
+def download_fixed(component):
+    source, pin = admit(component)
+    archive = download_zip(source, pin, component + '-official.zip')
     with zipfile.ZipFile(archive) as zipped:
         expected = {component + '-build.json', component + '-build.tar.gz'}
         assert set(zipped.namelist()) == expected, 'Unexpected artifact members'
@@ -195,6 +200,82 @@ def download_fixed(component):
                 while chunk := src.read(1024 * 1024): dst.write(chunk)
     archive.unlink()
     return source, pin
+
+
+def admin_fixture_slice(fixture):
+    # Exact reviewed repair only: journeys-only Survey prerequisite body and
+    # failure-only diagnostics. The separate whole-file before/after pin remains.
+    fixture = fixture.replace("let prerequisiteStage = 'fixture-entry'\n", '')
+    before, survey = fixture.split('async function surveyPrerequisites(runId: string) {', 1)
+    _, after = survey.split('async function finals() {', 1)
+    combined = before + 'async function finals() {' + after
+    success, failure = combined.split('})().catch((error: unknown) => {', 1)
+    _, cleanup = failure.split('}).finally(async () => {', 1)
+    return success + '}).finally(async () => {' + cleanup
+
+
+def admin_inputs():
+    binding = json.loads(BINDING.read_text())
+    pin = binding['fixedAdminSource']
+    fixed_inputs('backend'); fixed_inputs('frontend')
+    for file, blob in pin['unchangedTools'].items():
+        assert git('rev-parse', 'HEAD:' + file) == blob, 'Admin tool input changed: ' + file
+    fixture = (ROOT / binding['fixedBuildSource']['fixtureRepair']['path']).read_text()
+    admin_slice = admin_fixture_slice(fixture)
+    assert hashlib.sha256(admin_slice.encode()).hexdigest() == pin['fixtureAdminSliceSha256'], 'Admin fixture inputs changed'
+    workflow = (ROOT / '.github/workflows/ci-measurement-browser.yml').read_text()
+    runtime = workflow.split('      NODE_ENV: test', 1)[1].split('    steps:', 1)[0]
+    assert hashlib.sha256(runtime.encode()).hexdigest() == pin['runtimeConfigurationSha256'], 'Admin runtime inputs changed'
+    return binding, pin
+
+
+def validate_admin_result(result, pin):
+    assert result['head'] == pin['head'] and result['status'] == 'PASS'
+    assert result['selectedPhase'] == 'admin'
+    assert result['pageErrors'] == [] and result['blockedExternalRequests'] == []
+    assert len(result['checks']) == len(pin['requiredChecks'])
+    assert {row['name'] for row in result['checks']} == set(pin['requiredChecks'])
+    assert all(row['status'] == 'PASS' for row in result['checks'])
+
+
+def admit_admin():
+    plan = scope()
+    binding, pin = admin_inputs()
+    source = binding['fixedBuildSource']
+    run = api('/actions/runs/' + pin['runId'])
+    assert str(run['id']) == pin['runId'] and str(run['run_attempt']) == pin['attempt']
+    assert run['head_sha'] == pin['head'] and run['head_branch'] == source['branch']
+    assert run['event'] == 'push' and run['path'] == source['workflowPath'] and run['status'] == 'completed'
+    job = api('/actions/jobs/' + str(pin['jobId']))
+    assert str(job['run_id']) == pin['runId'] and str(job['run_attempt']) == pin['attempt']
+    assert job['head_sha'] == pin['head'] and job['conclusion'] == 'success'
+    assert job['name'] == 'missing measurement browser paths / admin'
+    artifact = api('/actions/artifacts/' + str(pin['artifactId']))
+    assert artifact['id'] == pin['artifactId'] and not artifact['expired']
+    assert artifact['name'] == pin['artifactName'] and artifact['size_in_bytes'] == pin['zipBytes']
+    assert artifact['digest'] == 'sha256:' + pin['zipSha256']
+    assert str(artifact['workflow_run']['id']) == pin['runId'] and artifact['workflow_run']['head_sha'] == pin['head']
+    archive = download_zip(source, pin, 'original-admin.zip')
+    with zipfile.ZipFile(archive) as zipped:
+        raw = zipped.read(pin['resultPath'])
+        assert hashlib.sha256(raw).hexdigest() == pin['resultSha256']
+        result = json.loads(raw)
+        validate_admin_result(result, pin)
+        original_scope = json.loads(zipped.read('eduK12-new-version/eduK12-new-version/measurement-browser-evidence/scope.json'))
+        assert original_scope['head'] == pin['head'] and original_scope['runId'] == pin['runId']
+        assert original_scope['attempt'] == pin['attempt']
+        for file, blob in pin['unchangedTools'].items():
+            assert original_scope['tools'][file] == blob, 'Original admin tool identity mismatch'
+        assert original_scope['tools'][source['fixtureRepair']['path']] == pin['fixtureBefore']
+        for component in ['backend', 'frontend']:
+            consumed = json.loads(zipped.read(f'eduK12-new-version/eduK12-new-version/measurement-browser-evidence/{component}-consumed.json'))
+            assert consumed['producerRunId'] == source['runId'] and consumed['producerHead'] == source['head']
+            assert consumed['producerAttempt'] == source['attempt'] and consumed['status'] == 'verified'
+            assert consumed['head'] == pin['head'] and consumed['runId'] == pin['runId'] and consumed['attempt'] == pin['attempt']
+            assert consumed['archiveSha256'] == source['components'][component]['archiveSha256']
+    archive.unlink()
+    write('admin-admitted.json', {**plan, 'originalAdmin': pin, 'status': 'original admin success admitted, not re-executed',
+          'checks': result['checks'], 'originalFailedJourneys': 'remains failed; only journeys executes now'})
 
 
 def restore(component):
@@ -253,11 +334,11 @@ def tls():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('action', choices=['scope', 'build', 'restore', 'tls', 'admit'])
+    parser.add_argument('action', choices=['scope', 'build', 'restore', 'tls', 'admit', 'admit-admin'])
     parser.add_argument('component', nargs='?', choices=['backend', 'frontend'])
     args = parser.parse_args()
-    if args.action in ['scope', 'tls']:
-        globals()[args.action]()
+    if args.action in ['scope', 'tls', 'admit-admin']:
+        globals()[args.action.replace('-', '_')]()
     else:
         assert args.component
         globals()[args.action](args.component)

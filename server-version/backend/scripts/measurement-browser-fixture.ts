@@ -46,6 +46,7 @@ const owner = new PrismaClient({ datasources: { db: { url: ownerUrl.href } } })
 let runtime: PrismaClient | undefined
 let closeQueues: (() => Promise<void>) | undefined
 let fixture: any
+let prerequisiteStage = 'fixture-entry'
 const save = () => {
   const temporary = fixturePath + '.tmp'
   writeFileSync(temporary, JSON.stringify(fixture, null, 2), { mode: 0o600 })
@@ -201,32 +202,44 @@ async function scientificFixtureGrant(kind: 'report' | 'reference' | 'data', cap
 }
 
 async function surveyPrerequisites(runId: string) {
+  prerequisiteStage = 'seed:survey:mfa-key'
   assert.match(process.env.SURVEY_MFA_ENCRYPTION_KEY || '', /^[a-f0-9]{64}$/i)
   const secret = randomBytes(20), iv = randomBytes(12), accountPassword = password()
   mask(secret.toString('base64')); mask(accountPassword)
   const cipher = createCipheriv('aes-256-gcm', Buffer.from(process.env.SURVEY_MFA_ENCRYPTION_KEY!, 'hex'), iv)
   const ciphertext = Buffer.concat([cipher.update(secret), cipher.final()])
   const secretCipher = [iv, cipher.getAuthTag(), ciphertext].map(value => value.toString('base64url')).join('.')
+  prerequisiteStage = 'seed:survey:password-helper'
   const { hashPassword } = await import('../src/utils/password')
+  prerequisiteStage = 'seed:survey:user-create'
   const user = await owner.user.create({ data: { username: `mb-${runId}-researcher`, passwordHash: await hashPassword(accountPassword),
     role: 'STUDENT', accountDomain: 'SURVEY' } })
+  prerequisiteStage = 'seed:survey:account-create'
   await owner.surveyAccount.create({ data: { userId: user.id, loginName: user.username, normalizedLogin: user.username } })
+  prerequisiteStage = 'seed:survey:researcher-grant-create'
   await owner.surveyResearcherGrant.create({ data: { userId: user.id, grantedBy: fixture.system.id, status: 'ACTIVE' } })
+  prerequisiteStage = 'seed:survey:mfa-credential-create'
   await owner.surveyMfaCredential.create({ data: { userId: user.id, enabled: true, secretCipher, enabledAt: new Date() } })
-  const project = await owner.surveyProject.create({ data: { ownerUserId: user.id, title: 'Synthetic measurement browser Survey',
+  prerequisiteStage = 'seed:survey:project-create'
+  const project = await owner.surveyProject.create({ data: { id: randomUUID(), ownerUserId: user.id, title: 'Synthetic measurement browser Survey',
     description: 'Fresh isolated UI fixture only; no real participant information.', collectionMode: 'SINGLE_UNLINKED' } })
+  prerequisiteStage = 'seed:survey:builder-import'
   const { createDraft, updateDraft, validateDraftForPreview } = await import('../src/modules/survey/builder.service')
+  prerequisiteStage = 'seed:survey:draft-create'
   let draft = await createDraft(user.id, project.id, { requestId: randomUUID(), kind: 'SCALE', instrumentKey: 'browser-scale', title: 'Synthetic Survey Scale' })
+  prerequisiteStage = 'seed:survey:draft-update'
   draft = await updateDraft(user.id, project.id, draft.id, { revision: draft.revision, title: draft.title,
     definition: { schemaVersion: 1, respondentType: 'participant_self_report', presentationMode: 'ONE_BY_ONE', aggregation: 'mean',
       responseOptions: [{ optionKey: 'low', label: 'Low', score: 1 }, { optionKey: 'high', label: 'High', score: 2 }],
       dimensions: [{ dimensionKey: 'effort', label: 'Synthetic effort', direction: 'descriptive' }],
       items: [{ itemKey: 'survey-item', prompt: 'Synthetic response', required: true, reverse: false, dimensionKeys: ['effort'] }] } })
+  prerequisiteStage = 'seed:survey:draft-validate'
   assert.equal((await validateDraftForPreview(user.id, project.id, draft.id)).ok, true)
   fixture.survey = { researcher: { id: user.id, username: user.username, password: accountPassword, totpSecretBase64: secret.toString('base64') },
     project: { id: project.id, title: project.title }, instruments: [{ id: draft.id, kind: 'SCALE', title: draft.title }] }
   // The browser must obtain its own actual password/TOTP session. No JWT,
   // mfaVerifiedAt claim or preauthenticated cookie is written to this fixture.
+  prerequisiteStage = 'seed:ready-checks'
 }
 
 async function finals() {
@@ -361,9 +374,11 @@ void (async () => {
 })().catch((error: unknown) => {
   // Do not print Prisma arguments, assertion values, tokens or error.message.
   // Source-only stack frames let the CI owner locate a failing prerequisite.
-  const sourceFrames = error instanceof Error ? (error.stack || '').split('\n')
-    .filter(line => /^\s+at /.test(line)).slice(0, 3).map(line => line.trim()) : []
-  const failure = { phase, name: error instanceof Error ? error.name : 'FixtureError', sourceFrames }
+  const frames = error instanceof Error ? (error.stack || '').split('\n')
+    .filter(line => /^\s+at /.test(line)).map(line => line.trim()) : []
+  const ownFrames = frames.filter(line => /\/(?:scripts\/measurement-browser-fixture\.ts|src\/)/.test(line))
+  const sourceFrames = (ownFrames.length ? ownFrames : frames).slice(0, 3)
+  const failure = { phase, prerequisiteStage, name: error instanceof Error ? error.name : 'FixtureError', sourceFrames }
   writeFileSync(path.join(privateRoot, 'fixture-error.json'), JSON.stringify(failure), { mode: 0o600 })
   console.error(JSON.stringify(failure))
   process.exitCode = 1

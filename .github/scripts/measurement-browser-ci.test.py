@@ -85,10 +85,44 @@ class FixedBuildAdmission(unittest.TestCase):
         self.assertNotIn('  build:', text)
         self.assertNotIn('npm ci', text)
         self.assertNotIn('ci.py build', text)
-        self.assertIn('needs: [scope, reuse, browser]', text)
+        self.assertIn('needs: [scope, reuse, admin, browser]', text)
         source, pin = module.fixed_inputs('frontend')
         self.assertEqual(source['runId'], '39399331312')
         self.assertEqual(module.git('rev-parse', 'HEAD:server-version/frontend'), pin['componentTree'])
+
+
+class FixedAdminAdmission(unittest.TestCase):
+    def test_exact_success_and_complete_admin_checks(self):
+        binding = json.loads(path.with_name('measurement-browser-bindings.json').read_text())
+        pin = binding['fixedAdminSource']
+        result = {'head': pin['head'], 'status': 'PASS', 'selectedPhase': 'admin', 'pageErrors': [], 'blockedExternalRequests': [],
+                  'checks': [{'name': name, 'status': 'PASS'} for name in pin['requiredChecks']]}
+        module.validate_admin_result(result, pin)
+        for changed in [{**result, 'status': 'FAIL'}, {**result, 'head': 'wrong'}, {**result, 'selectedPhase': 'journeys'},
+                        {**result, 'checks': result['checks'][:-1]}, {**result, 'checks': [result['checks'][0]] * 10}, {**result, 'pageErrors': ['error']}]:
+            with self.assertRaises(AssertionError): module.validate_admin_result(changed, pin)
+        with self.assertRaises(AssertionError):
+            module.validate_admin_result({**result, 'checks': [{**row, 'status': 'SKIPPED'} for row in result['checks']]}, pin)
+
+    def test_changed_admin_fixture_success_path_rejected(self):
+        original_read = Path.read_text
+        def altered(file, *args, **kwargs):
+            text = original_read(file, *args, **kwargs)
+            if file.name == 'measurement-browser-fixture.ts':
+                return text.replace("const phase = process.argv[2] || 'seed'", "const phase = 'grant'")
+            return text
+        with patch.object(Path, 'read_text', altered), self.assertRaises(AssertionError):
+            module.admin_inputs()
+
+    def test_admin_inputs_unchanged_and_only_journeys_executes(self):
+        module.admin_inputs()
+        with patch.object(module, 'fixed_inputs'), patch.object(module, 'git', return_value='changed'), self.assertRaises(AssertionError):
+            module.admin_inputs()
+        workflow = (path.parents[1] / 'workflows/ci-measurement-browser.yml').read_text()
+        self.assertIn('phase: [journeys]', workflow)
+        self.assertNotIn('phase: [admin, journeys]', workflow)
+        self.assertIn('ci.py admit-admin', workflow)
+        self.assertIn('needs: [scope, reuse, admin, browser]', workflow)
 
 
 if __name__ == '__main__':

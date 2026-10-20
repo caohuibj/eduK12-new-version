@@ -88,3 +88,23 @@ The user explicitly approved the temporary browser-profile test CA on 2026-10-20
 at 09:10 UTC for this bounded CI round and its scoped retries. This does not
 authorize system-wide trust, persistent access, production trust changes, or a
 future unrelated CI round. Private material is destroyed with each job.
+
+## Third round: retain successful administrator evidence
+
+Run `39400868129` attempt 1, head
+`2fced5c637a039700322efe297744fddbc85132a`, completed administrator browser job
+`118555111929` successfully. Its exact artifact `12254318750`, ZIP digest and
+result digest are fixed. Admission requires the original successful job and all
+ten actual administrator checks, no browser errors/external requests, and the
+original two consumed build identities. The run's failed journey setup is not
+rewritten as success.
+
+Only `journeys` executes in the repair round. Administrator admission runs no
+browser, database, fixture or authentication operation. Its browser/helper/proxy
+blobs and runtime configuration must stay identical. The fixture's exact
+`4fd705b7…` → `2d7b7007…` repair is limited to Survey prerequisites used only by
+journeys and safe failure diagnostics. The successful administrator code path,
+including shared setup and cleanup, is independently fingerprinted without those
+precise regions. The full new fixture blob remains explicitly pinned; this is
+not a generic permission to change arbitrary excluded code. Old success retains
+its original SHA/run/attempt and ten checks; current journeys get new evidence.
