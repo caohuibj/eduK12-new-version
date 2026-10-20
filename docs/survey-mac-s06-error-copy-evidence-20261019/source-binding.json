@@ -1,0 +1,14 @@
+{
+  "base": "f16e258",
+  "scope": "friendly Chinese message for browser TypeError/SyntaxError; structured server denial reasons remain",
+  "affectedCopyCases": 7,
+  "finalNetworkTypeErrorCase": 1,
+  "uniqueAdded": 0,
+  "finalTypes": "passed",
+  "finalLint": "passed",
+  "nativeCopyLiteral": "not rerun after this text-only follow-up; f16e258 native error placement and real network/retry evidence retained under original input",
+  "files": {
+    "SurveyAnalyticsWorkspace.tsx": "1454da53fddcac4e66d78cc650d4dfda84aab830b717700959d673f4e4687764",
+    "SurveyAnalyticsWorkspace.download.test.tsx": "1e388828ebb73970a89a1d6f74ef9a8954527d1dfb9abe7655f0a196b350864d"
+  }
+}

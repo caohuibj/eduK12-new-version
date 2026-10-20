@@ -6,6 +6,8 @@ import { SurveyBuilder } from './SurveyBuilder'
 import { createInstrumentLibrary } from './instrument-library'
 import { SurveyWaveStudio } from './SurveyWaveStudio'
 import { SurveyAnalyticsWorkspace } from './SurveyAnalyticsWorkspace'
+import { SurveyWorkspaceNav,type WorkspaceSection } from './SurveyWorkspaceNav'
+import './survey-workspace.css'
 import { SurveyBrand } from './SurveyBrand'
 import { SurveyLanding } from './SurveyLanding'
 import { SurveyFeaturePage } from './SurveyFeaturePage'
@@ -49,6 +51,7 @@ export default function SurveyApp(){
   const [error,setError]=useState(''),[notice,setNotice]=useState('')
   const [projects,setProjects]=useState<Project[]>([]),[selected,setSelected]=useState<Project|null>(null)
   const [projectPage,setProjectPage]=useState(1)
+  const [workspaceSection,setWorkspaceSection]=useState<WorkspaceSection>('settings')
   const [available,setAvailable]=useState<{analytics:boolean;publication:boolean}|null>(null)
   const selectedProjectId=selected?.id
   const instrumentLibrary=useMemo(()=>selectedProjectId?createInstrumentLibrary(selectedProjectId):undefined,[selectedProjectId])
@@ -119,7 +122,7 @@ export default function SurveyApp(){
     const p=await api<Project>('/projects','POST',{requestId:crypto.randomUUID(),title,description,collectionMode:mode})
     await loadProjects(1);choose(p);setNotice('研究草稿已创建')
   })}
-  const choose=(p:Project)=>{setSelected(p);setTitle(p.title);setDescription(p.description);setMode(p.collectionMode)}
+  const choose=(p:Project)=>{if(selected?.id!==p.id)setWorkspaceSection('settings');setSelected(p);setTitle(p.title);setDescription(p.description);setMode(p.collectionMode)}
   const save=(e:FormEvent)=>{e.preventDefault();if(!selected)return;void work(async()=>{
     const p=await api<Project>('/projects/'+selected.id,'PATCH',
       {revision:selected.revision,title,description,collectionMode:mode})
@@ -135,30 +138,43 @@ export default function SurveyApp(){
       type={type} autoComplete={type==='password'?'off':'on'} value={value} onChange={e=>change(e.target.value)}/></label>
   if(screen==='home')return <SurveyLanding signedIn={user!==null}/>
   if(screen==='feature'&&activeFeature)return <SurveyFeaturePage feature={activeFeature} signedIn={user!==null}/>
-  return <div className="min-h-screen bg-slate-50 text-slate-800">
-    <header className="border-b border-slate-200 bg-white"><div className="max-w-5xl mx-auto p-5 flex justify-between items-center">
+  // Entry styling deliberately stops before MFA, the workspace and all timed tasks.
+  const entryScreen=screen==='login'||screen==='claim'||screen==='reset'
+  return <div className={entryScreen?'survey-entry':'min-h-screen bg-slate-50 text-slate-800'}>
+    {entryScreen&&<a className="survey-skip-link" href="#survey-entry-content">跳至主要内容</a>}
+    <header className="border-b border-slate-200 bg-white"><div className={entryScreen?'survey-entry-header':'max-w-5xl mx-auto p-5 flex justify-between items-center'}>
       <SurveyBrand/>
       {user&&<button className="btn-secondary" disabled={busy} onClick={logout}>退出</button>}
     </div></header>
-    <main className="max-w-4xl mx-auto px-4 py-8">
+    <main id={entryScreen?'survey-entry-content':undefined} tabIndex={entryScreen?-1:undefined}
+      className={entryScreen?'survey-entry-main':screen==='work'&&!user?.mustChangePassword
+        ?'max-w-7xl mx-auto px-4 py-8':'max-w-4xl mx-auto px-4 py-8'}>
       {loading&&<p role="status">正在核对研究者会话…</p>}
       {error&&<p role="alert" className="p-4 border-l-4 border-red-600 bg-red-50">{error}</p>}
       {notice&&<p role="status" className="p-4 border-l-4 border-teal-600 bg-teal-50">{notice}</p>}
-      {!loading&&(screen==='claim'||screen==='reset')&&<section className="bg-white rounded-xl border p-6 my-4">
-        <h2 className="text-xl font-semibold">{screen==='claim'?'激活研究者身份':'恢复 Survey 密码'}</h2>
-        <form onSubmit={activate}>{field('一次性邀请凭证',invite,setInvite,'password')}
+      {!loading&&(screen==='claim'||screen==='reset')&&<section className="survey-entry-panel">
+        <a className="survey-back" href="/">返回首页</a>
+        <h1>{screen==='claim'?'激活研究者身份':'恢复 Survey 密码'}</h1>
+        <p className="survey-entry-intro">{screen==='claim'
+          ?'使用管理员提供的一次性邀请，设置独立研究账号，然后绑定验证器。'
+          :'使用管理员提供的密码恢复邀请设置新密码，再完成双因素验证。'}</p>
+        <form onSubmit={activate} aria-busy={busy}>{field('一次性邀请凭证',invite,setInvite,'password')}
           {screen==='claim'&&field('研究者登录名',username,setUsername)}
           {field('新密码（至少 8 位，字母与数字组合）',password,setPassword,'password')}
           <button className="btn-primary" disabled={busy}>确认并绑定验证器</button></form>
+        <p className="survey-entry-help">没有有效凭证，或凭证已失效？请联系为你开通账号的管理员。</p>
       </section>}
-      {!loading&&screen==='login'&&<section className="bg-white rounded-xl border p-6 my-4 max-w-xl mx-auto">
-        <a className="text-sm underline underline-offset-4" href="/">返回首页</a>
-        <h2 className="text-xl font-semibold">Researcher 登录</h2>
-        <p>研究者仅由系统管理员邀请开通，账户与培训和校园系统相互独立。</p>
-        {surveyAdminLoginUrl() ? <a className="text-sm underline" href={surveyAdminLoginUrl()!}>系统管理员入口：研究者与工具授权</a> : <p className="text-sm">当前地址未配置管理员入口。</p>}
-        <form onSubmit={login}>{field('研究者登录名',username,setUsername)}
+      {!loading&&screen==='login'&&<section className="survey-entry-panel">
+        <a className="survey-back" href="/">返回首页</a>
+        <h1>研究者登录</h1>
+        <p className="survey-entry-intro">研究者仅由系统管理员邀请开通，账户与培训和校园系统相互独立。</p>
+        <form onSubmit={login} aria-busy={busy}>{field('研究者登录名',username,setUsername)}
           {field('密码',password,setPassword,'password')}
           <button className="btn-primary" disabled={busy}>进入双因素验证</button></form>
+        <p className="survey-entry-help">登录后还需输入验证器动态码。需要激活账号或恢复密码，请使用管理员提供的一次性邀请。</p>
+        <div className="survey-entry-admin">{surveyAdminLoginUrl()
+          ?<a href={surveyAdminLoginUrl()!}>系统管理员入口：研究者与工具授权</a>
+          :<p>当前地址未配置管理员入口。</p>}</div>
       </section>}
       {!loading&&screen==='mfa'&&<section className="bg-white rounded-xl border p-6 my-4 max-w-xl mx-auto">
         <h2 className="text-xl font-semibold">{enrolled?'双因素验证':'绑定 TOTP 验证器'}</h2>
@@ -182,7 +198,7 @@ export default function SurveyApp(){
         <h2 className="font-semibold text-xl">首次登录 · 修改研究者密码</h2>
         <ProductPasswordChange product="survey" forced busy={busy} onChangePassword={changeAccountPassword}/>
       </section>}
-      {!loading&&user&&screen==='work'&&!user.mustChangePassword&&<><section className="bg-white rounded-xl border p-6 my-4">
+      {!loading&&user&&screen==='work'&&!user.mustChangePassword&&<div className="survey-workspace"><section className="bg-white rounded-xl border p-6 my-4">
         <h2 className="text-xl font-semibold">我的研究</h2><p className="text-sm text-slate-500">Researcher：{user.username}</p>
         <details className="border rounded-lg p-4 my-4"><summary>账号安全 · 修改密码</summary>
           <ProductPasswordChange product="survey" busy={busy} onChangePassword={changeAccountPassword}/>
@@ -203,7 +219,11 @@ export default function SurveyApp(){
             onClick={()=>void work(()=>loadProjects(projectPage+1))}>下一页</button>
         </div>
         {projects.length===0&&projectPage===1&&<p>尚无研究项目。可以先创建研究草稿。</p>}
-      </section><section className="bg-white rounded-xl border p-6 my-4">
+      </section>{selected&&<SurveyWorkspaceNav active={workspaceSection} onChange={setWorkspaceSection} title={selected.title}/>}
+      <section className="bg-white rounded-xl border p-6 my-4"
+        id="survey-workspace-settings" role={selected?'tabpanel':undefined}
+        aria-labelledby={selected?'survey-workspace-tab-settings':undefined}
+        hidden={!!selected&&workspaceSection!=='settings'}>
         <h2 className="text-xl font-semibold">{selected?'编辑研究草稿':'创建研究项目'}</h2>
         <form onSubmit={selected?save:createProject}>{field('研究名称',title,setTitle)}
           <label className="block my-3 text-sm">研究说明<textarea className="input block mt-1 w-full" rows={3} value={description} onChange={e=>setDescription(e.target.value)}/></label>
@@ -213,11 +233,13 @@ export default function SurveyApp(){
           <div className="flex flex-wrap gap-3 mt-4"><button className="btn-primary" disabled={busy||(selected!==null&&selected.status!=='DRAFT')}>{selected?'保存修改':'创建研究'}</button>
             {selected&&<button type="button" className="btn-secondary" onClick={()=>{setSelected(null);setTitle('');setDescription('')}}>新建其他项目</button>}</div>
         </form><p className="text-sm text-slate-500 mt-4">研究工具编辑、研究专用发布、匿名参与与科研分析可按功能开关使用；正式生产开通须完成独立部署验收。</p>
-      </section>{selected&&<><SurveyBuilder key={'builder-'+selected.id} projectId={selected.id} instrumentLibrary={instrumentLibrary}/><SurveyWaveStudio key={'waves-'+selected.id} projectId={selected.id} instrumentLibrary={instrumentLibrary} onProjectChanged={projectChanged}/>
+      </section>{selected&&<><div id="survey-workspace-tools" role="tabpanel" aria-labelledby="survey-workspace-tab-tools" hidden={workspaceSection!=='tools'}><SurveyBuilder key={'builder-'+selected.id} projectId={selected.id} instrumentLibrary={instrumentLibrary}/></div>
+        <div id="survey-workspace-publish" role="tabpanel" aria-labelledby="survey-workspace-tab-publish" hidden={workspaceSection!=='publish'}><SurveyWaveStudio key={'waves-'+selected.id} projectId={selected.id} instrumentLibrary={instrumentLibrary} onProjectChanged={projectChanged}/></div>
+        <div id="survey-workspace-data" role="tabpanel" aria-labelledby="survey-workspace-tab-data" hidden={workspaceSection!=='data'}>
           {available?.analytics
             ?<SurveyAnalyticsWorkspace key={'analysis-'+selected.id} projectId={selected.id}/>
             :<section className="rounded-xl border bg-white p-4" aria-label="研究数据状态">
               研究数据分析暂未在当前环境启用；项目和研究工具仍可使用。
-            </section>}</>}</>}
+            </section>}</div></>}</div>}
     </main></div>
 }

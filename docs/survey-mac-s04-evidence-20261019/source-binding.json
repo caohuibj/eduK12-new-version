@@ -1,0 +1,21 @@
+{
+  "head": "bf21cab75f62f969d7a81f6d2f305e92ea61e81f",
+  "base": "877bd0f",
+  "files": {
+    "server-version/frontend/src/survey/ResearchAuthoringGuide.tsx": "77289206757dab0c5f684cd50f1ebe966cd6120c8c1fe0996cb8f6337d62fb66",
+    "server-version/frontend/src/survey/ResearchIssueList.tsx": "dbb55dd0e4e96473d58ca5296abda11bb2332777a3b9c39b0c07abf102b1e1fd",
+    "server-version/frontend/src/survey/SurveyApp.tsx": "bddb01398c061352c3a3f5dee9dc508786b0cc6b49266add624633294f40413f",
+    "server-version/frontend/src/survey/SurveyAuthoringGuidance.test.tsx": "46ac96b4ccb781fced8538b0cd8a052701f58d64d0ebd2d32fecc76a14e639dc",
+    "server-version/frontend/src/survey/SurveyBuilder.tsx": "b54a4c1f31730c7df2dff3018b09446b35b41c7ad2615b748416314b304e933d",
+    "server-version/frontend/src/survey/SurveyWorkspace.requests.test.tsx": "7987c3163276744af7ab32edf5e893d91db8588d7e7a04d096f588e9a7c91909",
+    "server-version/frontend/src/survey/SurveyWorkspaceNav.tsx": "44694a879e6f823dbaf7735deca1346af29d18a41a1473b6b0cc5d409fe7386d",
+    "server-version/frontend/src/survey/authoring-import-template.ts": "5b3458db7086b2fb454d8450e491dd732c048b4b298b51b3e6d35a0b1ff38a41",
+    "server-version/frontend/src/survey/authoring-issue-location.ts": "8819164661ab93a11313d85d97d583e860712c3d126248abaae1039eede69bf9",
+    "server-version/frontend/src/survey/survey-workspace.css": "a149216fb51abc18e54c612122371973160e675f2522ae6beacaa2211ae2c127"
+  },
+  "backendTreeUnchanged": true,
+  "dependenciesUnchanged": true,
+  "participantRuntimeScoringAndSharedEditorsUnchanged": true,
+  "ciRun": false,
+  "prCreated": false
+}

@@ -1,0 +1,13 @@
+{
+  "base": "9289136da15bbf3ed44b3567e0d299060dd224b9",
+  "scope": "move the same file error near current export buttons; one live alert only",
+  "affectedCasesPassed": 7,
+  "unselected": 8,
+  "newCasesAdded": 0,
+  "types": "passed",
+  "lint": "passed",
+  "files": {
+    "SurveyAnalyticsWorkspace.tsx": "c754a1c12603197de248784ffce50210f2a37f27fc7916834d286426f57d1734",
+    "SurveyAnalyticsWorkspace.download.test.tsx": "55eacbc23f631e0635b014b7c8db67588a95e5632518f95cdae1ba739d5862a9"
+  }
+}

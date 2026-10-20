@@ -1,0 +1,31 @@
+{
+  "base": "e2e4b40f869f6deb63a7ed621c398f23ddcff20d",
+  "files": {
+    "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.tsx": {
+      "bytes": 13561,
+      "sha256": "c06aa9b1264a0ea9f66ae9db7b46a44cc4ff886219ebe7af22919a75580d2589"
+    },
+    "server-version/frontend/src/pages/admin/SurveyCatalogGrants.tsx": {
+      "bytes": 8840,
+      "sha256": "db62183c7a48789fc49ec9dc4e0e3e864a85645e0c9a0a0b131fd931261ed908"
+    },
+    "server-version/frontend/src/pages/admin/survey-admin.css": {
+      "bytes": 3716,
+      "sha256": "ce737083a2b0236e2c964927fecef61dc9b11c45e842ec783ef0e1a2e4072a3a"
+    },
+    "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.workspace.test.tsx": {
+      "bytes": 11864,
+      "sha256": "e9d9a6bfc02db3ec5587d510a914a5956fc23df2ec6135905d8b8813cb30e581"
+    },
+    "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.links.test.tsx": {
+      "bytes": 2463,
+      "sha256": "2c2d814b2418e53df649c50959c3b90e9eadc85c43e67ff73876f4cbaeeea24d"
+    }
+  },
+  "platformApiFunctionUnchanged": true,
+  "backendAndAuthAndDependenciesUnchanged": true,
+  "existingComponentCases": 16,
+  "newInFlightCase": 1,
+  "reuseBoundary": "components.json before local width=management prop and test-only pending fixture addition; busy-new and final types/lint after those changes. API/lifecycle assertions unchanged. Native visual proof uses final working source.",
+  "ciRun": false
+}

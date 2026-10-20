@@ -145,6 +145,23 @@ C21 同 IP 短窗口、C22 延迟反馈、C23 checkpoint/本地草稿、C24 Trai
 
 第一批新 6 项通过、6 未选，no-emit 294 sources/0 diagnostics；第二批初版新 19 项通过、5 未选，no-emit 421 sources/0 diagnostics。独立复核随后发现打卡晚到失败抢焦点 P2，新定向回归实际 4 failed/12 skipped，原 FAILED 记录保留。`4bfb0536` 以局部交互序号和各操作焦点 token 修复，只在无后续操作且焦点仍属于发起流程时移动；正文与预览仍可使用。修复后定向 8 passed/8 skipped，no-emit 416 sources/0 diagnostics，不把历史 19 项称为最终重验通过。单 worker、共享锁、Node 24.21.0，输入前后闭合，无 emit。结果仅为受影响 mock DOM/类型证据；原生截图、真实 picker/PDF 焦点、触控/对比度/换行仍待 C25。共享 MediaRenderer 图片键盘缺口及课程设置/分析操作失败焦点明确留后续，不把首批源码交付说成完整 C24 视觉验收。详见 [C24 原始证据与边界](../../release/training-c24-ui.md)。
 
+## C25：C22 + C23 核心联合补缺真实通过（2026-10-19 UTC）
+
+固定产品 `15cbdf0c`、最终运行 harness `0d586e4f`。三轮的实际 overall 为 false / false / PASS；最后是明确继承成功子检查的 missing-only 组合资格，最终独立运行证据复核通过，无阻塞。不是单次 fresh-all，也不代表完整 C25、CI 或发布完成。源码准备、原失败及完整索引见 [C25 recovery README](../../../server-version/scripts/recovery/c25-README.md)。
+
+- HTTP01 只完成正式 restricted-role C22 增量 migration 与 IMMEDIATE A whole FINAL/receipt/replay/drain；匿名 fixture 的 expiry 越过已发布截止，正确收到 400。原 false 不改，`074f17a8` 仅将 expiry 改为 API 返回的 `p.expiresAt`。
+- continuation01 实际完成新 SJT 正式资源/grant、B/C 八个 FINAL 与重放、两 job 原 claim/process 共用 drain、教师 CSV/越权和 143 请求中的 81 个闭期出口请求。consumer 把合法 null context hash 当异常，scheduled 保持 false；缺 `closedFinishedAt`、旧闭期 compiled、自然开放观察与开放后 FINAL 重放，保留真实 PG catch 时间。`df01106a` 仅修严格 nullable consumer 合同。
+- continuation02 新执行五阶段：旧 B/C 当前开放 HTTP（23 请求）、A/B/C/D OPEN-only compiled；独立新学生 E 的单 Cognitive FINAL/真实 drain/自然闭开与 paired compiled；原 guards；完整 restore；每阶段及最终三层全行 audit。旧 FINAL、迁移、教师导出和 checkpoint GET 不重做，旧四 case 不与 E 伪配闭开。
+- E 的真实 PG T0 为 11:07:32.075Z，release 为 11:12:32.075Z，闭期完成于 11:07:35.805Z，首次开放读 11:12:32.165Z。parent IN_PROGRESS→COMPLETED；job PENDING/0/held→READY/1/released；一份 snapshot 保持、queue 1→0；checkpoint revision 2→3、saveCount=1 保持且清密文/哈希/expiry。E 使用合法加密空 envelope，不冒领非空草稿检查。
+- 独立 compiled consumer 的真实 Prisma 观测：compact 单 SELECT、不锁、不选结果密文；loaded-parent 闭期零 SQL，开放仅一条五字段 job header。完整 user history 恰好 E 一行，闭期 6 SQL/0 header/0 结果解密，开放 7 SQL/1 header/1 结果解密正控。仅证明单行投影/query shape，不称 API 内部 SQL、多行批量或容量收益。
+- restore 为 217 表、6,667 行、21 checkpoints 全源/恢复逻辑行相等，完整保留三层 6,529/16、6,582/17、6,651/20 与历史 NULL、原四 case；正式 role、精确 schema/guards、73 ordinal/3 parser 原合同不放宽。API probe 后即停，16 个 owned 进程 exit 0，final/source/inputs/旧证据/恢复点/cleanup 全 true，锁已释放。
+- 双端一次 emit/current-client 原 receipt 按相同 product/dependency/client/compiler/工具和 72 Python 字节闭包复用，无再生成。当前客户端核验不声称历史生成溯源；Vite 原 warning 保留。source06 与 6,651-row 恢复档实际全实解/metadata 比对通过；`/tmp` 档为本节点临时恢复点，不是持久备份，空 xattr 的 ACL ENOTSUP 边界保留。
+- 锁下 entry free=9,239,420,928 B；采样最低 free=9,023,393,792 B、MemAvailable=6,213,738,496 B、tmp=3,743,817,728 B，API RSS 最高观测367,747,072 B。只证明既定运行保护线，非连续极值、CPU/内存下降或吞吐/容量结果。
+
+主 receipt `eduk12_c25_continuation_02/c25-missing-result.json` SHA-256 `94949c13018705e3413f9cffa3aa810fc1d0720f173363f60cd16dffa96d76ba`；完整 restore `6a57f6ae2d261a58b93fde9d1561282df1c6095bad0e7e9b00a85ae1076d868d`；final snapshot `2116f582580ab67d0c5f69330d73300b026a3eaeeacf94a47f268aa16b244e85`。复核索引 `/tmp/c25-missing-runtime-launch-01/review-index.json` SHA `c125fa5978f8e9f2ee5bcc96e223a0bbf1ef6d9ac64b98e16673c72b58616360` 绑定 89 state + 6 launch 原始文件；私有行、日志、凭据、数据库和归档不入 Git。
+
+仍待：C19 suppressed analysis 的实际断言、long CSV 已测值逐列核验、selected-video capability/hash/range 及真实播放；native IndexedDB/WebLocks 生命周期；C24 浏览器截图/焦点/picker/PDF/触控/对比度；C26 CPU/内存/持续负载/容量。核心联合结果不能替代这些缺项，也不授予生产操作权限。
+
 ## 已知测试环境约束
 
 - 固定 Node 24.21.0；不要以全局 Node 24.19 或未固定 npx 的记录代替目标资格。

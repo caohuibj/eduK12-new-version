@@ -1,0 +1,21 @@
+{
+  "comparison.json": {
+    "bytes": 2215,
+    "sha256": "d7785ac72ee10353b5d603929335ed73b88d6947d57fc4c47c513c73cd812ee2"
+  },
+  "requests.jsonl": {
+    "bytes": 3002,
+    "sha256": "4c8701e0af5b266f6a545d2eb15745cf9977e2a194cb989327d0ee2289c4f2ba"
+  },
+  "safari-first-and-retry-ax.json": {
+    "bytes": 18179,
+    "sha256": "5abc7c37cce83d1694c4efe12f8a6d9de2da0219586d5b36e8bde245aeecedd5"
+  },
+  "safari-original-final-retry-complete.png": {
+    "bytes": 307694,
+    "sha256": "73d6653275c802758883b7ec6bdee10ffe992fa58e0b5592d56cd84e1038440a"
+  },
+  "observerSourceSha256": "01fa967103ecf455599122461b2ad78cfc9565b72a9b0afa41e2dae9a44033b1",
+  "observerStopped": true,
+  "frontendRestoredDirect3197": true
+}

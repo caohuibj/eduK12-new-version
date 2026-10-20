@@ -1,0 +1,194 @@
+{
+  "chrome-cognitive-read-failure.jpg": {
+    "bytes": 544598,
+    "sha256": "6404d15da0a72911142de188acc74059d86d5a38bc2899508d7382be0fe4924b",
+    "width": 2880,
+    "height": 1592,
+    "codec": "JPEG",
+    "source": "original CUA bytes, no crop/convert"
+  },
+  "chrome-cognitive-three-files.jpg": {
+    "bytes": 546225,
+    "sha256": "aabc89ac327ab001205365543ac2be28cfffbbe7c4ff7bbd177d134c9ccc755c",
+    "width": 2880,
+    "height": 1592,
+    "codec": "JPEG",
+    "source": "original CUA bytes, no crop/convert"
+  },
+  "chrome-download-local-network-error-final.jpg": {
+    "bytes": 515435,
+    "sha256": "55b22bca24d424e5937b56826d72d8836318c504f8144f075493069e68451292",
+    "width": 2880,
+    "height": 1592,
+    "codec": "JPEG",
+    "source": "original CUA bytes, no crop/convert"
+  },
+  "chrome-download-network-retry-final.jpg": {
+    "bytes": 532580,
+    "sha256": "96ebc299b7b46c1f82410fe8d88de5f06b2de9f0aac9e0815618feea3c2bc628",
+    "width": 2880,
+    "height": 1592,
+    "codec": "JPEG",
+    "source": "original CUA bytes, no crop/convert"
+  },
+  "chrome-matrix-final.jpg": {
+    "bytes": 378581,
+    "sha256": "1938f8366f716029175bdeb7bbe5e0bc3e7fffb45111c4674be982ae25fa2c24",
+    "width": 2880,
+    "height": 1592,
+    "codec": "JPEG",
+    "source": "original CUA bytes, no crop/convert"
+  },
+  "chrome-raw-chinese-files.jpg": {
+    "bytes": 530811,
+    "sha256": "a9701297ff7bfb9e4fbc77d606c5ff0b4f17980830b0aefae8d89bad9dd0366c",
+    "width": 2880,
+    "height": 1592,
+    "codec": "JPEG",
+    "source": "original CUA bytes, no crop/convert"
+  },
+  "chrome-raw-csv-after-cancel-retry.jpg": {
+    "bytes": 559147,
+    "sha256": "970df21acc88820704829fdf0fbe06eb10121a33378d5b08b1a4f7e752bd1c50",
+    "width": 2880,
+    "height": 1592,
+    "codec": "JPEG",
+    "source": "original CUA bytes, no crop/convert"
+  },
+  "chrome-raw-three-files.jpg": {
+    "bytes": 580837,
+    "sha256": "5df683fb66d0b79d6e1f7c43ad8587f87da59743d2b93c745d3a496748d50336",
+    "width": 2880,
+    "height": 1592,
+    "codec": "JPEG",
+    "source": "original CUA bytes, no crop/convert"
+  },
+  "numbers-chrome-cognitive-loaded.jpg": {
+    "bytes": 861281,
+    "sha256": "faadb783fe1ba8686518b6945337745209bf2c81cc765436803f52e7c3ffb9d9",
+    "width": 2520,
+    "height": 1592,
+    "codec": "JPEG",
+    "source": "original CUA bytes, no crop/convert"
+  },
+  "numbers-chrome-cognitive.jpg": {
+    "bytes": 489804,
+    "sha256": "9a060c9ac36c7bff8b973b44703276ee82362a61c642041efbf02e1ee403841c",
+    "width": 2520,
+    "height": 1592,
+    "codec": "JPEG",
+    "source": "original CUA bytes, no crop/convert"
+  },
+  "numbers-chrome-raw.jpg": {
+    "bytes": 505218,
+    "sha256": "b5caa95dabc3c52c401911cfbd73c284be189529f291159694ee608a0521b3df",
+    "width": 2520,
+    "height": 1592,
+    "codec": "JPEG",
+    "source": "original CUA bytes, no crop/convert"
+  },
+  "numbers-safari-cognitive.jpg": {
+    "bytes": 876206,
+    "sha256": "c957fc6fd0c498fa33c559fc38755af5e2cd5838f32effbf0f519bb9cee2b508",
+    "width": 2520,
+    "height": 1592,
+    "codec": "JPEG",
+    "source": "original CUA bytes, no crop/convert"
+  },
+  "numbers-safari-raw.jpg": {
+    "bytes": 489260,
+    "sha256": "e4d1077d870f1cd0ce971c65ef7138d2e9f63933334955dde4a49a7b5202904b",
+    "width": 2520,
+    "height": 1592,
+    "codec": "JPEG",
+    "source": "original CUA bytes, no crop/convert"
+  },
+  "safari-cognitive-three-files.jpg": {
+    "bytes": 544754,
+    "sha256": "53b1b72db5a5475fce5e70aa6e661e054857027de05875c2b9ee7a29d4b86c10",
+    "width": 2880,
+    "height": 1592,
+    "codec": "JPEG",
+    "source": "original CUA bytes, no crop/convert"
+  },
+  "safari-download-local-network-error-final.jpg": {
+    "bytes": 517084,
+    "sha256": "974282b32fdb858504100feda67b1922459696528147eeedfa573e4bc8e79a60",
+    "width": 2880,
+    "height": 1592,
+    "codec": "JPEG",
+    "source": "original CUA bytes, no crop/convert"
+  },
+  "safari-download-network-retry-final.jpg": {
+    "bytes": 500888,
+    "sha256": "8e8db419892ae8945997f5082e0d1a7f7cb653146a4210de1520f00d86007535",
+    "width": 2880,
+    "height": 1592,
+    "codec": "JPEG",
+    "source": "original CUA bytes, no crop/convert"
+  },
+  "safari-matrix-final.jpg": {
+    "bytes": 347901,
+    "sha256": "a1b73d09abb7dfc306c6897a28858a7beb9e6815cc16709a81d165515258c0ac",
+    "width": 2880,
+    "height": 1592,
+    "codec": "JPEG",
+    "source": "original CUA bytes, no crop/convert"
+  },
+  "safari-raw-read-failure.jpg": {
+    "bytes": 503016,
+    "sha256": "7982738c25990a3ae4b8a01e00f8c2e88bc0d37ffaa23785db7f656d47e4cfab",
+    "width": 2880,
+    "height": 1592,
+    "codec": "JPEG",
+    "source": "original CUA bytes, no crop/convert"
+  },
+  "safari-raw-save-cancel-dialog.jpg": {
+    "bytes": 208678,
+    "sha256": "a08e3b850ecb32a03f90c2c97f78b13ce8bedc2409eccc0153aae9875fd3bdec",
+    "width": 1760,
+    "height": 1412,
+    "codec": "JPEG",
+    "source": "original CUA bytes, no crop/convert"
+  },
+  "safari-raw-three-files.jpg": {
+    "bytes": 503929,
+    "sha256": "f0e659cdd962a7478dc0160b3be01dd167512ac423475181993c1319e8032421",
+    "width": 2880,
+    "height": 1592,
+    "codec": "JPEG",
+    "source": "original CUA bytes, no crop/convert"
+  },
+  "numbers-chinese-content-final.jpg": {
+    "bytes": 742152,
+    "sha256": "037f3074c8940d1e59ec569d89215fc33535bd20b042a27f8ae7b89777a7150f",
+    "width": 2520,
+    "height": 1592,
+    "codec": "JPEG",
+    "source": "original CUA bytes, no crop/convert"
+  },
+  "safari-error-copy-gap-before-fix.jpg": {
+    "bytes": 516469,
+    "sha256": "9e7952b0f1ab03c34c92eb973ce6b69840a516b7f0524fe8d87d5ee3932f4bc5",
+    "width": 2880,
+    "height": 1592,
+    "codec": "JPEG",
+    "source": "original CUA bytes, no crop/convert"
+  },
+  "chrome-error-copy-final.jpg": {
+    "bytes": 516914,
+    "sha256": "1e7be5723ac7408c34b5909928e0d7b48ffa58bb22e5c1b7060dcaa87fbb027d",
+    "width": 2880,
+    "height": 1592,
+    "codec": "JPEG",
+    "source": "original CUA bytes, no crop/convert"
+  },
+  "safari-error-copy-fixed-final.jpg": {
+    "bytes": 522300,
+    "sha256": "4b77c1bdd3ab1af0cb2913ac6ae8df8a3657094099d433e9e1e83f9f2a19147a",
+    "width": 2880,
+    "height": 1592,
+    "codec": "JPEG",
+    "source": "original CUA bytes, no crop/convert"
+  }
+}

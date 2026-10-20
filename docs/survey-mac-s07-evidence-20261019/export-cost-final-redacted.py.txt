@@ -1,0 +1,73 @@
+"""Bounded localhost HTTP cost sample, not a native-browser timing benchmark."""
+from pathlib import Path
+from http.client import HTTPConnection
+from http.cookies import SimpleCookie
+import time,json,hashlib,hmac,struct,datetime,subprocess
+B=Path(__file__).resolve().parents[1];O=B/'evidence/s07-readonly';O.mkdir(exist_ok=True)
+project='871d81fa-58a5-4ccc-b92d-3ebcd5f1bf25';wave='7c79441f-308d-4c59-a844-8b18ab7cf3c8'
+cookies={};csrf='';connection=HTTPConnection('127.0.0.1',5197,timeout=20);authenticated=False;setup=[]
+apiPid=int((B/'runtime/backend.pid').read_text())
+assert '/survey-worktree/server-version/backend/src/index.ts' in subprocess.check_output(['ps','-p',str(apiPid),'-o','command='],text=True)
+def rss():return int(subprocess.check_output(['ps','-p',str(apiPid),'-o','rss='],text=True).strip())
+def request(path,method='GET',body=None):
+ headers={'Host':'survey.localhost:5197','Origin':'http://survey.localhost:5197','Accept-Encoding':'identity','Content-Type':'application/json'}
+ if cookies:headers['Cookie']='; '.join(k+'='+v for k,v in cookies.items())
+ if method!='GET':
+  assert csrf,'CSRF preparation required';headers['X-CSRF-Token']=csrf
+ raw=None if body is None else json.dumps(body,separators=(',',':')).encode()
+ t0=time.perf_counter_ns();connection.request(method,'/api/survey'+path,body=raw,headers=headers)
+ response=connection.getresponse();t1=time.perf_counter_ns();data=response.read();t2=time.perf_counter_ns()
+ for key,value in response.getheaders():
+  if key.lower()=='set-cookie':
+   jar=SimpleCookie();jar.load(value)
+   for name,morsel in jar.items():
+    if morsel['max-age']=='0':cookies.pop(name,None)
+    else:cookies[name]=morsel.value
+ metric={'method':method,'path':'/api/survey'+path,'httpStatus':response.status,'responseBodyBytes':len(data),
+  'responseBodySha256':hashlib.sha256(data).hexdigest(),'ttfbMs':round((t1-t0)/1e6,3),'totalMs':round((t2-t0)/1e6,3),
+  'contentType':response.getheader('Content-Type'),'contentEncoding':response.getheader('Content-Encoding') or 'identity',
+  'cacheControl':response.getheader('Cache-Control'),'contentLength':response.getheader('Content-Length')}
+ assert response.status==200,'HTTP '+str(response.status)+' at '+path.split('?')[0]
+ assert metric['contentEncoding']=='identity','Unexpected compression; do not mislabel decoded bytes'
+ result=json.loads(data);assert result.get('code')==0,'Application refused '+path.split('?')[0]
+ return result.get('data'),metric
+try:
+ data,m=request('/auth/csrf');csrf=data['csrfToken'];setup.append(m)
+ # Public, pre-existing local software-test account; never persist or print credentials/cookies.
+ data,m=request('/auth/login','POST',{'username':'s01_researcher','password':'<omitted public synthetic login password>'});setup.append(m)
+ assert data.get('enrolled') is True,'Do not enroll or change credentials'
+ digest=hmac.new(b'12345678901234567890',struct.pack('>Q',int(time.time()/30)),hashlib.sha1).digest();offset=digest[-1]&15
+ otp=str((struct.unpack('>I',digest[offset:offset+4])[0]&0x7fffffff)%1000000).zfill(6)
+ _,m=request('/auth/mfa/verify','POST',{'code':otp});setup.append(m);authenticated=True
+ me,m=request('/auth/me');setup.append(m);assert me['username']=='s01_researcher'
+ projects,m=request('/projects?page=1');setup.append(m)
+ found=[p for p in projects['list'] if p['id']==project];assert len(found)==1 and found[0]['title']=='S03 合成研究 · 外围界面检查'
+ overview,m=request('/projects/'+project+'/analytics/overview');setup.append(m)
+ waves=[w for w in overview['waves'] if w['id']==wave];assert len(waves)==1 and waves[0]['finalCompleted']==7
+ _,m=request('/auth/csrf');csrf=cookies.get('huisurvey_research_csrf',csrf);setup.append(m)
+ ticket,creation=request('/projects/'+project+'/exports','POST',{'format':'RAW_WAVE','waveId':wave,'includeFreeText':False})
+ assert ticket['manifest']['rowCount']==14 and ticket['manifest']['columnCount']==17
+ memory=[{'stage':'before-three-reads','apiPid':apiPid,'rssKiB':rss()}];reads=[];start=datetime.datetime.now(datetime.timezone.utc).isoformat();seriesStart=time.perf_counter_ns()
+ for part in ['CSV','Codebook','Manifest']:
+  artifact,m=request('/projects/'+project+'/exports/'+ticket['id']+'/download')
+  assert artifact['id']==ticket['id'] and artifact['format']=='RAW_WAVE'
+  assert artifact['manifest']==ticket['manifest']
+  assert artifact['csv'] and isinstance(artifact['codebook'],(list,dict))
+  m['selectedFile']=part;reads.append(m);memory.append({'stage':'after-'+part,'apiPid':apiPid,'rssKiB':rss()})
+ seriesMs=round((time.perf_counter_ns()-seriesStart)/1e6,3)
+ assert len(set((x['responseBodyBytes'],x['responseBodySha256']) for x in reads))==1
+ result={'measuredUtc':start,'head':'8b72b1cbe0f5ef90efd0eb440ff76b365df1c823','scope':'Same synthetic FORM wave after one final native chain: 7 FINAL, 14 rows x17, no free text; one new ticket, three sequential existing full Artifact GETs',
+  'execution':'Python HTTPConnection through unchanged Vite5197 proxy to API3197, same-origin Host/Origin, ordinary login+TOTP+CSRF, one kept-alive connection, Accept-Encoding identity; not native-browser wall-clock or production/TLS benchmark',
+  'byteDefinition':'Actual received HTTP response BODY octets, including JSON envelope and entire Artifact; no HTTP headers/framing/TLS, no browser Blob disk bytes',
+  'memory':{'definition':'macOS ps RSS KiB for task API listener process; sample between reads; not JS heap, peak memory or decrypt allocation','samples':memory,'deltaRssKiB':memory[-1]['rssKiB']-memory[0]['rssKiB'],'noCausalOrImprovementClaim':True},'setup':setup,'exportCreation':creation,'exportId':ticket['id'],'reads':reads,
+  'oneFile':{'requestSubset':[1],'getRequests':1,'responseBodyBytes':reads[0]['responseBodyBytes'],'totalMs':reads[0]['totalMs'],'notSeparateFourthRead':True},
+  'threeFiles':{'requestSubset':[1,2,3],'getRequests':3,'responseBodyBytes':sum(x['responseBodyBytes'] for x in reads),'sumRequestTotalMs':round(sum(x['totalMs'] for x in reads),3),'seriesElapsedMsIncludingRssSampling':seriesMs},
+  'byteRatioThreeOverOne':3,'safety':'No caching, authorization grants, permission changes, backend modification or automatic write retry. Existing per-read ownership/MFA/revision/hash/rate/audit path retained. No credential/header/answer payload retained.',
+  'limits':'Single small loopback sample; order/connection/cache/noise affect latency. Does not measure SQL statements, decrypt CPU duration, peak memory, disk persistence or browser permission behavior. A 3x body/request/audit count does not imply 3x wall time or zero additional queries.'}
+finally:
+ if authenticated:
+  _,logout=request('/auth/logout','POST',{});result['logout']={'httpStatus':logout['httpStatus'],'sessionRevoked':True}
+ connection.close()
+assert 'result' in globals()
+(O/'export-cost-final-measurement.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps({k:result[k] for k in ['exportId','oneFile','threeFiles','memory','byteRatioThreeOverOne','logout']},indent=2))

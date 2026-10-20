@@ -1,0 +1,20 @@
+import fs from 'node:fs'
+import {randomUUID,createHash} from 'node:crypto'
+import {authoringImportTemplate} from '../survey-worktree/server-version/frontend/src/survey/authoring-import-template'
+import {previewBulk,applyBulk} from '../survey-worktree/server-version/backend/src/modules/survey/builder.import'
+import {initialSurveyDefinition,validateSurveyDraft} from '../survey-worktree/server-version/backend/src/modules/survey/builder.definition'
+const cases=[]
+for(const [kind,version]of [['FORM',1],['FORM',2],['SCALE',1]] as const){
+ const definition:any=initialSurveyDefinition(kind);definition.schemaVersion=version
+ if(kind==='SCALE')definition.dimensions=[{dimensionKey:'study',label:'合成学习体验',direction:'descriptive'}]
+ const csv=authoringImportTemplate(kind,version),batch={batchId:randomUUID(),format:'CSV' as const,content:csv}
+ const preview=previewBulk(batch,kind,version)
+ if(!preview.ok)throw Error(JSON.stringify(preview.issues))
+ const imported=applyBulk(kind,definition,batch,preview.digest),validated=validateSurveyDraft(kind,imported,true)
+ if(validated.issues.length)throw Error(JSON.stringify(validated.issues))
+ cases.push({kind,version,bytes:Buffer.byteLength(csv),sha256:createHash('sha256').update(csv).digest('hex'),
+  count:preview.count,types:preview.items.map(x=>x.type),sourceLines:preview.items.map(x=>x.sourceLine),
+  serverPreviewPassed:true,actualApplyParsed:true,previewDefinitionValidated:true,databaseWrites:false})
+}
+fs.writeFileSync('../evidence/s04/templates-real-parser.json',JSON.stringify({cases},null,2)+'\n')
+console.log('Existing server parser -> apply -> preview definition validation: 3 complete templates passed; no database or score execution')

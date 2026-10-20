@@ -1,0 +1,22 @@
+{
+  "base": "1a28ee1c4e29e05b004d920016a24f67cc9800d5",
+  "files": {
+    "server-version/frontend/src/survey/SurveyBuilder.tsx": {
+      "bytes": 27653,
+      "sha256": "58c7141d71bb64fef5adad348e532a4771e11690aeca8668f9ae1ea63c65edf6"
+    },
+    "server-version/frontend/src/survey/ResearchPreview.tsx": {
+      "bytes": 14126,
+      "sha256": "44e3d9cc0636b9aca946b6a72d8f03a75cdb89b4531505f338503e8f7a26bcc0"
+    },
+    "server-version/frontend/src/survey/SurveyAuthoringGuidance.test.tsx": {
+      "bytes": 11985,
+      "sha256": "e90aa3834a12bc92fc6468b2bbea458eaf9a0aa3b4efc2b6ac9fc95a5ce6b2ad"
+    }
+  },
+  "backendChanged": false,
+  "scoringOrPermissionChanged": false,
+  "nativeBrowserValidation": false,
+  "fullSuiteRun": false,
+  "templatesRerun": false
+}

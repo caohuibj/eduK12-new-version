@@ -1,0 +1,6 @@
+
+/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/src/survey/SurveyAnalyticsWorkspace.tsx
+  197:5  warning  React Hook useEffect has missing dependencies: 'loadQuality' and 'reload'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+✖ 1 problem (0 errors, 1 warning)
+

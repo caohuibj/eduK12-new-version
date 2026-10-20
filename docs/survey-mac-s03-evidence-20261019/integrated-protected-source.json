@@ -1,0 +1,38 @@
+{
+  "baseline": "6b19767ee5a536d3f8f17942cb55eebb7e5a08fb",
+  "main": "6aeba71d6cad70725d5164598f8dc854d11c1c89",
+  "head": "509130b4d7d0d157e472e6d227f6f3564450b619",
+  "frozenFiles": 219,
+  "changed": [
+    {
+      "path": "server-version/frontend/src/modules/cognitive/__tests__/PublicCognitiveAssignment.test.tsx",
+      "beforeSha256": "f7e9bd021049c08d33ebfc0ed2c8d8281765fa5e72bab776c71f29bcc16c3413",
+      "currentSha256": "122e76080393d62d7405c7fdaddfef608a6f930b91a186704e9bf5cd881ae4b7",
+      "identicalToMergedMain": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/pages/CognitiveAssignmentEntry.tsx",
+      "beforeSha256": "0063974949023a80b4e07c7615d66f711d05d4a077a71d559302afb173c99450",
+      "currentSha256": "5453de4db50e116583b3f5c19d4e340435133ff5a7d4e6d9bcf6e35d8fcad154",
+      "identicalToMergedMain": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/pages/PublicCognitiveAssignment.tsx",
+      "beforeSha256": "1705c95bfc0bbf87e1710a95687ae8af50b6a34b8d7dac753f163c14e64dc436",
+      "currentSha256": "d9b1886d298fba92426c2d556324696ac7369292aa77f1e9cb7230554f163c53",
+      "identicalToMergedMain": true
+    },
+    {
+      "path": "server-version/frontend/src/modules/cognitive/types.ts",
+      "beforeSha256": "f719689641cd90d30393f20ff2e29af159b1d331da17a7711af90f1ede855b4b",
+      "currentSha256": "64be381b12c903e62cf52fc00fb73c2856449026395936297f2914de2ebe2bfd",
+      "identicalToMergedMain": true
+    },
+    {
+      "path": "server-version/frontend/src/survey/survey-scale-timing.ts",
+      "beforeSha256": "87035cc7155f890ed794a4b4020eeef9200e44692bd418a8d9694986a311f19d",
+      "currentSha256": "b60b5fe8d5281c69e454239dec2769bf79e7e1efb37204e98137e255c3aee79a",
+      "identicalToMergedMain": true
+    }
+  ]
+}

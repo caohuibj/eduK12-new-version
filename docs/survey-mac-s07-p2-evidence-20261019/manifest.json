@@ -1,0 +1,74 @@
+{
+  "lint-final.log": {
+    "bytes": 786,
+    "sha256": "5c2977d44a95d9d2141996c59882e01638a5724c6828df08053f02f844754738"
+  },
+  "lint-final.receipt.json": {
+    "bytes": 538,
+    "sha256": "d1f41cf8740c402fa457f884620b28262199ea80dd09ae0a86e14307ccc561f8"
+  },
+  "lint-first.log": {
+    "bytes": 358,
+    "sha256": "ca93f77677bfd8316e82a74611b495bf04a1bc87c5765b69ed1dc4d5b0803243"
+  },
+  "lint-qualified.log": {
+    "bytes": 337,
+    "sha256": "4ae53ce5a3a2cd1cc5ee0b3a01af28bc0f3f54f1b31d187efee28daf42314f3c"
+  },
+  "lint-qualified.receipt.json": {
+    "bytes": 939,
+    "sha256": "59f085781f34304ca19d1239557ce72980feea4379dc205226d2756bac616368"
+  },
+  "recovery-final.log": {
+    "bytes": 1047,
+    "sha256": "ea2ad36258223794b60c56e66ac7cd9bc9bbb587657a5649cd04d8c5c4b9904c"
+  },
+  "recovery-final.receipt.json": {
+    "bytes": 687,
+    "sha256": "de9e8b9068071f6c94d669b4c88b75f050e68bd6108bacf129611278ca5d8690"
+  },
+  "recovery-first-run.log": {
+    "bytes": 275,
+    "sha256": "e39e1e5ac7475cd5e29a9cd9445748c51c7dddbc9540f4706efd04c77e30ac6d"
+  },
+  "source-binding.json": {
+    "bytes": 1694,
+    "sha256": "ccc6fa68a9f28b7ac01e253ee347a6e23acdfad8eade37316093b7c9fce9c210"
+  },
+  "tests-final.json": {
+    "bytes": 13526,
+    "sha256": "aa466207c05aea0c950f2dca4339a878c29c7afddf6d3fd8d9a3998fd93448ea"
+  },
+  "tests-qualified.json": {
+    "bytes": 13520,
+    "sha256": "567d73905186a8ffbba565cb9d94c4356cbf3f4e00ce3d5223065123dfbadfb5"
+  },
+  "tests-qualified.log": {
+    "bytes": 1132,
+    "sha256": "4035240c1e66cc0a624632ca75687fb7e3e3bbd0aafb3a67428d3548ce820984"
+  },
+  "tests-qualified.receipt.json": {
+    "bytes": 1089,
+    "sha256": "7c9abec5f37cf0cd35261d7fd4e13bd54f0d1ab4e867149161989d0d530dad17"
+  },
+  "types-final.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "types-final.receipt.json": {
+    "bytes": 419,
+    "sha256": "fd1d2dc420ac0c7ad5c2a3d8b24d7f72ec5cb0d7c4c943e384884e84c0bc64f5"
+  },
+  "types-first.log": {
+    "bytes": 2535,
+    "sha256": "9858fb287db6ecb7a5bb842044ce41a74a2140c0b842a5bc16ca4a5c5d9cfad7"
+  },
+  "types-qualified.log": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "types-qualified.receipt.json": {
+    "bytes": 820,
+    "sha256": "978b667c41a3b94cb62ff2cdf7fa79d58e38f548ed2385ceb09f49585c6f148e"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "baseHead": "a2915a8",
+  "files": {
+    "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.tsx": {
+      "bytes": 37438,
+      "sha256": "2a3e3ebc052d0de38d963b3bd1b35d22bc0703cabc619d425c57f3ec5c65c832"
+    },
+    "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.download.test.tsx": {
+      "bytes": 17655,
+      "sha256": "6a6ba52959c389d72e2323bbabfd79dc1cc8370b6635fccfcedc5ecc50e067b6"
+    }
+  },
+  "commands": [
+    [
+      "vitest",
+      "run",
+      "src/survey/SurveyAnalyticsWorkspace.download.test.tsx",
+      "-t",
+      "hands the exact signed cursor",
+      "--maxWorkers=1",
+      "--reporter=verbose",
+      "--reporter=json"
+    ],
+    [
+      "tsc",
+      "-p",
+      "tsconfig.app.json",
+      "--noEmit"
+    ],
+    [
+      "eslint",
+      "src/survey/SurveyAnalyticsWorkspace.download.test.tsx"
+    ]
+  ],
+  "qualification": "Only one new cursor-handoff component case run; product source unchanged since6db06f6. Not native pagination or CI."
+}

@@ -1,0 +1,39 @@
+{
+  "reports": {
+    "red.json": {
+      "numPassedTests": 1,
+      "numFailedTests": 2,
+      "numPendingTests": 3,
+      "success": false
+    },
+    "fixed.json": {
+      "numPassedTests": 3,
+      "numFailedTests": 0,
+      "numPendingTests": 3,
+      "success": true
+    },
+    "form-final.json": {
+      "numPassedTests": 2,
+      "numFailedTests": 0,
+      "numPendingTests": 4,
+      "success": true
+    },
+    "imports-final.json": {
+      "numPassedTests": 5,
+      "numFailedTests": 0,
+      "numPendingTests": 5,
+      "success": true
+    },
+    "imports.json": {
+      "numPassedTests": 5,
+      "numFailedTests": 0,
+      "numPendingTests": 5,
+      "success": true
+    }
+  },
+  "uniqueFrontendCasesPassed": 8,
+  "realBackendFailureSourceCasesPassed": 4,
+  "finalTypes": "passed",
+  "changedFilesLint": "passed",
+  "notFullSuite": true
+}

@@ -1,0 +1,38 @@
+import fs from 'node:fs'
+import {randomBytes,createHash} from 'node:crypto'
+import {prisma} from '../survey-worktree/server-version/backend/src/config/database'
+import {sourceCatalog} from '../survey-worktree/server-version/backend/src/modules/survey/catalog.service'
+import {getCatalogSourceSnapshot} from '../survey-worktree/server-version/backend/src/modules/survey/catalog.sources'
+import {compileResearchScale} from '../survey-worktree/server-version/backend/src/modules/survey/builder.compiler'
+import {hashScaleDefinition} from '../survey-worktree/server-version/backend/src/modules/scale/scale-definition'
+import {canonicalHash} from '../survey-worktree/server-version/backend/src/modules/assessment-runtime/canonical'
+const invitationId='555f60be-c899-47b9-951b-c5cc10935701',grantId='b5f7196d-1856-4355-a780-58d4c07aaf01'
+async function main(){
+ const url=new URL(process.env.DATABASE_URL||'')
+ if(process.env.NODE_ENV!=='test'||url.hostname!=='127.0.0.1'||url.port!=='5557'||url.pathname!=='/survey_s01_test'||url.username!=='survey_s01_runtime')throw Error('Task-only runtime required')
+ const actors=await prisma.user.findMany({where:{username:{in:['s01_admin','s01_researcher']}},select:{id:true,username:true,role:true,platformRole:true,accountDomain:true,passwordHash:true,tokenVersion:true}})
+ const admin=actors.find(x=>x.username==='s01_admin'),researcher=actors.find(x=>x.username==='s01_researcher')
+ if(actors.length!==2||admin?.platformRole!=='SYSTEM_ADMIN'||researcher?.accountDomain!=='SURVEY')throw Error('Exact synthetic actors required')
+ const sourceId='4ba07883-8709-4d26-91b2-e57da20f7f07'
+ const definition=compileResearchScale('S07 合成来源 · 仅显示校验',{schemaVersion:1,respondentType:'participant_self_report',responseOptions:[{optionKey:'no',label:'否',score:0},{optionKey:'yes',label:'是',score:1}],dimensions:[{dimensionKey:'display',label:'合成描述',direction:'descriptive'}],aggregation:'sum',items:[{itemKey:'display_only',prompt:'这是公开的软件界面测试内容。',required:true,reverse:false,dimensionKeys:['display']}]})
+ if(!await prisma.scale.findUnique({where:{id:sourceId}}))await prisma.scale.create({data:{id:sourceId,code:'S07_DISPLAY_SYNTHETIC_ONLY',name:'S07 合成来源 · 仅显示校验',status:'PUBLISHED',instrumentVersion:definition.instrumentVersion,definition:definition as any,definitionHash:hashScaleDefinition(definition),creatorId:admin.id,itemCount:1,dimensionCount:1}})
+ const page=await sourceCatalog(admin.id,{kind:'SCALE',page:1})
+ const source=page.list.find(s=>s.ref.sourceId===sourceId&&s.available)
+ if(!source)throw Error('Single self-authored software-test source rejected; no inactive metadata inserted')
+ const snapshot=await getCatalogSourceSnapshot({actorUserId:admin.id,ref:source.ref})
+ const before=await prisma.$queryRaw<any[]>`SELECT count(*)::int AS active FROM survey_tool_grants WHERE user_id=${researcher.id} AND status='ACTIVE'`
+ const tokenHash=createHash('sha256').update(randomBytes(32)).digest('hex')
+ await prisma.$transaction(async tx=>{
+  await tx.$executeRaw`INSERT INTO survey_invitations(id,kind,token_hash,created_by,expires_at) VALUES(${invitationId},'INVITE',${tokenHash},${admin.id},statement_timestamp()-interval '1 day') ON CONFLICT(id) DO NOTHING`
+  await tx.$executeRaw`INSERT INTO survey_tool_grants(id,user_id,status,snapshot,snapshot_digest,created_by,revoked_at) VALUES(${grantId},${researcher.id},'REVOKED',${JSON.stringify(snapshot)}::jsonb,${canonicalHash(snapshot)},${admin.id},statement_timestamp()) ON CONFLICT(id) DO NOTHING`
+ })
+ const after=await prisma.$queryRaw<any[]>`SELECT count(*)::int AS active FROM survey_tool_grants WHERE user_id=${researcher.id} AND status='ACTIVE'`
+ const actorsAfter=await prisma.user.findMany({where:{username:{in:['s01_admin','s01_researcher']}},select:{id:true,username:true,role:true,platformRole:true,accountDomain:true,passwordHash:true,tokenVersion:true}})
+ if(canonicalHash(actors)!==canonicalHash(actorsAfter)||canonicalHash(before)!==canonicalHash(after))throw Error('Protected actors or active grants changed')
+ const rows=await prisma.$queryRaw<any[]>`SELECT id,status FROM survey_tool_grants WHERE id=${grantId}`
+ if(rows[0]?.status!=='REVOKED')throw Error('Inactive fixture required')
+ const result={scope:'One self-authored one-item synthetic catalog source plus two inactive metadata fixtures only; no active capability issued, no grant/revoke/invitation API flow claimed',invitation:{id:invitationId,status:'EXPIRED',tokenRetained:false},toolGrant:{id:grantId,status:'REVOKED',source:source.ref,title:source.title,snapshotDigest:canonicalHash(snapshot)},activeGrantCountBefore:before[0].active,activeGrantCountAfter:after[0].active,protectedActorRowsUnchanged:true,sourceCatalog:{kind:'SCALE',page:1,rows:page.list.length,hasMore:page.hasMore,terminalReason:page.terminalReason}}
+ fs.writeFileSync(new URL('../evidence/s07-readonly/inactive-admin-fixture.json',import.meta.url),JSON.stringify(result,null,2)+'\n')
+ console.log(JSON.stringify(result))
+}
+main().catch(e=>{console.error(e instanceof Error?e.message:'Fixture failed');process.exitCode=1}).finally(()=>prisma.$disconnect())

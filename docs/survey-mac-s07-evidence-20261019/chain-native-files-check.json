@@ -1,0 +1,18 @@
+{
+  "exactKnownDownloadsOnly": true,
+  "files": {
+    "survey_871d81fa_raw_wave_batch001_5301178b.csv": {
+      "bytes": 4387,
+      "sha256": "b5aeb02713b60c58a2a18b3143b55d842193eaf9d895bb12fa65560f0ad820cc",
+      "dataRows": 14,
+      "columns": 17,
+      "utf8SingleBom": true,
+      "crlf": true
+    },
+    "survey_871d81fa_raw_wave_batch001_5301178b_manifest.json": {
+      "bytes": 2215,
+      "sha256": "7d7a2632b7d020a836919bfeae63e7a6b74b923b22369f67336dec1d99621ba7",
+      "manifestCountsMatch": true
+    }
+  }
+}

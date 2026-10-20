@@ -1,0 +1,45 @@
+{
+  "checkedAtUTC": "2026-10-19T01:01:54.627330+00:00",
+  "http": [
+    {
+      "port": 3190,
+      "path": "/health",
+      "errorType": "URLError",
+      "error": "<urlopen error [Errno 1] Operation not permitted>"
+    },
+    {
+      "port": 3190,
+      "path": "/ready",
+      "errorType": "URLError",
+      "error": "<urlopen error [Errno 1] Operation not permitted>"
+    },
+    {
+      "port": 5190,
+      "path": "/",
+      "errorType": "URLError",
+      "error": "<urlopen error [Errno 1] Operation not permitted>"
+    },
+    {
+      "port": 3197,
+      "path": "/ready",
+      "errorType": "URLError",
+      "error": "<urlopen error [Errno 1] Operation not permitted>"
+    },
+    {
+      "port": 5197,
+      "path": "/",
+      "errorType": "URLError",
+      "error": "<urlopen error [Errno 1] Operation not permitted>"
+    }
+  ],
+  "old_pg": {
+    "exit": 2,
+    "stdout": "127.0.0.1:5549 - no response",
+    "stderr": ""
+  },
+  "old_redis": {
+    "exit": 1,
+    "stdout": "",
+    "stderr": "Could not connect to Redis at 127.0.0.1:6389: Operation not permitted"
+  }
+}

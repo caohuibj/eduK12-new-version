@@ -1,0 +1,24 @@
+{
+  "task": {
+    "source": {
+      "exit": 0,
+      "sha256": "72e8fe6193b8334ea495fe0c78ff4996cd8317466e87f244c824c28685c6eb21"
+    },
+    "generated": {
+      "exit": 0,
+      "sha256": "72e8fe6193b8334ea495fe0c78ff4996cd8317466e87f244c824c28685c6eb21"
+    },
+    "formattedBytesEqual": true
+  },
+  "old": {
+    "source": {
+      "exit": 0,
+      "sha256": "c39251f82a75b5ab2a43c387d363988681fc3bc8abe5f966ef726e417edccb0a"
+    },
+    "generated": {
+      "exit": 0,
+      "sha256": "c39251f82a75b5ab2a43c387d363988681fc3bc8abe5f966ef726e417edccb0a"
+    },
+    "formattedBytesEqual": true
+  }
+}

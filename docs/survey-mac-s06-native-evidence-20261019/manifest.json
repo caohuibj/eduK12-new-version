@@ -1,0 +1,82 @@
+{
+  "S06-readonly-preparation.md": {
+    "bytes": 12231,
+    "sha256": "90d648ab2618e3420dcf3b54c618a2688990c8330863e1dc52426866cb5e53f3"
+  },
+  "S06-readonly-source-binding.json": {
+    "bytes": 1851,
+    "sha256": "3f15464a9474f328d4b7af58bfc628e830f949257890babdee3ca01d292f76a0"
+  },
+  "backend-network-scenario.jsonl": {
+    "bytes": 1173,
+    "sha256": "5b6556f8adbcebac2e9d15f1bf89a445ef56919a117a67a375c68c8b960d4c20"
+  },
+  "capture-integrity.json": {
+    "bytes": 7821,
+    "sha256": "faa77d1a83d350dff22ee1dd79cc55302ae49953189d3e3392e35a8831fdb198"
+  },
+  "checks-summary.json": {
+    "bytes": 1786,
+    "sha256": "aeca08123ad16fc16d520a1fbc756691491d0365efc0899651e2a96911814ed2"
+  },
+  "cleanup-receipt.json": {
+    "bytes": 567,
+    "sha256": "b0483764c66576e56c89a66330041fe5e90dd2e11d5e39d3484f64f07eaa09a4"
+  },
+  "cognitive-fixture-history.log": {
+    "bytes": 955,
+    "sha256": "6a9861047fc1445f29a9a55c272a444c673a0b8b41a7aba61f88bbd430a82b50"
+  },
+  "cognitive-fixture-initial-failure.log": {
+    "bytes": 57,
+    "sha256": "897886fa2d58241f257031f6fb6124214b653119ef8f5274e3a52cf83bab6b81"
+  },
+  "cognitive-fixture.json": {
+    "bytes": 913,
+    "sha256": "defca0b91345eddc977eae0d846dd099b542681fad4867c4f9db9319446dbeb6"
+  },
+  "data-inventory.json": {
+    "bytes": 1447,
+    "sha256": "71f81287dab0b3f6b4f2f32fccc780571dd096ceb7dc67d3806767b49ce8f93a"
+  },
+  "export-audit.json": {
+    "bytes": 3352,
+    "sha256": "f6dddadc8ace7f3b6d3d297cde8d845dfd7983a91fcd8a588dff9f432f437dcb"
+  },
+  "final-source-binding.json": {
+    "bytes": 1813,
+    "sha256": "f2547c9c0604b4b8c3c05c92bec14c9e80d466f1e3a955f39fe9a887edd81c51"
+  },
+  "native-files-final-check.json": {
+    "bytes": 7986,
+    "sha256": "7664ab526f493dc2d6c7a16dc6f55b1e2b2d6620d809b7f12532e4dbf0957189"
+  },
+  "native-observations.json": {
+    "bytes": 509874,
+    "sha256": "8a9d4cfe46d4adced3c7c74d1a4c063c144197d3562b5a137d4a240ab308cae1"
+  },
+  "s06-backend-control.py.txt": {
+    "bytes": 1318,
+    "sha256": "ec380ece1c4181b1905f988dbf242c01a6811c24fa4760053e99e66d59e9792c"
+  },
+  "s06-cognitive-fixture.ts.txt": {
+    "bytes": 4318,
+    "sha256": "887465025ba1f8d741b077db470f6ffbb999e0033acf375c148753fd9161af9d"
+  },
+  "s06-data-inventory.py.txt": {
+    "bytes": 1869,
+    "sha256": "77e975067bb0d8bafaf848c67f615a063cdeb33c838c7c597a7fb621b08cbdfa"
+  },
+  "s06-evidence-collector.py.txt": {
+    "bytes": 2847,
+    "sha256": "bd9baace16e336e570d661bed1a941ca2eb80f5eedb20c82e714a8df0fd7b68f"
+  },
+  "s06-export-audit.py.txt": {
+    "bytes": 1920,
+    "sha256": "14159201476580b1d9350958d88eec361cfb75b1085bd25754b0522dd9b9fbcf"
+  },
+  "screenshots.json": {
+    "bytes": 6227,
+    "sha256": "416c2f068300ea6479a85323d9a8babe8b1b80cf8bd5d1a23c17ef0831301101"
+  }
+}

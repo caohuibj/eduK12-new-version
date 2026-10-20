@@ -1,0 +1,663 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "f6df9c5b21c5a0d50853d5e6e2d1bfd79389dcd0",
+  "status": "review_plan_with_explicit_coverage_gaps",
+  "pages": [
+    {
+      "id": "P01",
+      "page": "公开首页",
+      "route": "/",
+      "states": [
+        "anonymous",
+        "signed_in_cta",
+        "keyboard_focus",
+        "390",
+        "768",
+        "1440",
+        "200_percent"
+      ],
+      "current_f6df9c5_evidence": "Chrome匿名390/768截图；Safari桌面截图；其余待补",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [],
+      "batch": [
+        "S02"
+      ]
+    },
+    {
+      "id": "P02",
+      "page": "research-projects",
+      "route": "/features/research-projects",
+      "states": [
+        "anonymous",
+        "signed_in",
+        "back_link",
+        "focus",
+        "responsive",
+        "200_percent"
+      ],
+      "current_f6df9c5_evidence": "当前源代码核对，未逐页截图",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [
+        "V02"
+      ],
+      "batch": [
+        "S02"
+      ]
+    },
+    {
+      "id": "P03",
+      "page": "research-tools",
+      "route": "/features/research-tools",
+      "states": [
+        "anonymous",
+        "signed_in",
+        "back_link",
+        "focus",
+        "responsive",
+        "200_percent"
+      ],
+      "current_f6df9c5_evidence": "当前源代码核对，未逐页截图",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [
+        "V02"
+      ],
+      "batch": [
+        "S02"
+      ]
+    },
+    {
+      "id": "P04",
+      "page": "research-participation",
+      "route": "/features/research-participation",
+      "states": [
+        "anonymous",
+        "signed_in",
+        "back_link",
+        "focus",
+        "responsive",
+        "200_percent"
+      ],
+      "current_f6df9c5_evidence": "当前源代码核对，未逐页截图",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [
+        "V02"
+      ],
+      "batch": [
+        "S02"
+      ]
+    },
+    {
+      "id": "P05",
+      "page": "research-data",
+      "route": "/features/research-data",
+      "states": [
+        "anonymous",
+        "signed_in",
+        "back_link",
+        "focus",
+        "responsive",
+        "200_percent"
+      ],
+      "current_f6df9c5_evidence": "当前源代码核对，未逐页截图",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [
+        "V02"
+      ],
+      "batch": [
+        "S02"
+      ]
+    },
+    {
+      "id": "P06",
+      "page": "登录",
+      "route": "/login",
+      "states": [
+        "empty",
+        "invalid",
+        "busy",
+        "error",
+        "local_admin_link"
+      ],
+      "current_f6df9c5_evidence": "Chrome390截图；合成密码登录成功；Chrome/Safari F01当前链接观察",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [
+        "F01",
+        "F03"
+      ],
+      "batch": [
+        "S02",
+        "S05"
+      ]
+    },
+    {
+      "id": "P07",
+      "page": "MFA",
+      "route": "/login (state)",
+      "states": [
+        "verify",
+        "invalid_otp",
+        "recovery_code",
+        "enroll",
+        "busy",
+        "error"
+      ],
+      "current_f6df9c5_evidence": "Chrome公开合成向量正常验证成功；不保存密钥/恢复码截图；其余待补",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [],
+      "batch": [
+        "S02"
+      ]
+    },
+    {
+      "id": "P08",
+      "page": "邀请激活",
+      "route": "/claim",
+      "states": [
+        "no_token",
+        "valid_token",
+        "expired",
+        "used",
+        "busy",
+        "error"
+      ],
+      "current_f6df9c5_evidence": "待补",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [],
+      "batch": [
+        "S02",
+        "S05"
+      ]
+    },
+    {
+      "id": "P09",
+      "page": "密码恢复",
+      "route": "/reset-password",
+      "states": [
+        "no_token",
+        "valid_token",
+        "expired",
+        "used",
+        "busy",
+        "error"
+      ],
+      "current_f6df9c5_evidence": "待补",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [],
+      "batch": [
+        "S02",
+        "S05"
+      ]
+    },
+    {
+      "id": "P10",
+      "page": "首次改密/账户安全",
+      "route": "/workspace (state)",
+      "states": [
+        "forced_change",
+        "optional_change",
+        "invalid",
+        "busy",
+        "success",
+        "error"
+      ],
+      "current_f6df9c5_evidence": "待补",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [],
+      "batch": [
+        "S02"
+      ]
+    },
+    {
+      "id": "P11",
+      "page": "参与入口与同意",
+      "route": "/r/:publicId",
+      "states": [
+        "invalid_link",
+        "closed",
+        "paused",
+        "consent_unchecked",
+        "consent_checked",
+        "linked_notice"
+      ],
+      "current_f6df9c5_evidence": "待补；本轮无参与FINAL",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [],
+      "batch": [
+        "S03"
+      ]
+    },
+    {
+      "id": "P12",
+      "page": "参与恢复",
+      "route": "/r/:publicId (state)",
+      "states": [
+        "available",
+        "success",
+        "expired",
+        "conflict",
+        "wrong_credential",
+        "submitted_receipt"
+      ],
+      "current_f6df9c5_evidence": "待补",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [],
+      "batch": [
+        "S03"
+      ]
+    },
+    {
+      "id": "P13",
+      "page": "Form外围",
+      "route": "/r/:publicId (state)",
+      "states": [
+        "13_types",
+        "required_missing",
+        "error_focus",
+        "pagination",
+        "retained_answer",
+        "matrix_name"
+      ],
+      "current_f6df9c5_evidence": "Chrome研究者预览矩阵重新复现；正式参与待补",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [
+        "F04",
+        "V07"
+      ],
+      "batch": [
+        "S03",
+        "S06"
+      ]
+    },
+    {
+      "id": "P14",
+      "page": "Scale外围",
+      "route": "/r/:publicId (state)",
+      "states": [
+        "all_at_once",
+        "one_by_one",
+        "back",
+        "missing",
+        "retained_answer"
+      ],
+      "current_f6df9c5_evidence": "合成草稿当前编译通过；原生作答待补",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [
+        "V02"
+      ],
+      "batch": [
+        "S03"
+      ]
+    },
+    {
+      "id": "P15",
+      "page": "SJT外围",
+      "route": "/r/:publicId (state)",
+      "states": [
+        "scenes",
+        "required",
+        "refusal",
+        "descriptive_feedback"
+      ],
+      "current_f6df9c5_evidence": "合成草稿当前编译通过；原生作答待补",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [
+        "V03"
+      ],
+      "batch": [
+        "S03"
+      ]
+    },
+    {
+      "id": "P16",
+      "page": "认知外围",
+      "route": "/r/:publicId (state)",
+      "states": [
+        "device_check",
+        "instructions",
+        "practice_status",
+        "recovery_notice",
+        "sealed_retry"
+      ],
+      "current_f6df9c5_evidence": "草稿当前编译通过；本轮不启动刺激或计时；外围原生待补",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [
+        "V04"
+      ],
+      "batch": [
+        "S03"
+      ]
+    },
+    {
+      "id": "P17",
+      "page": "正式提交",
+      "route": "/r/:publicId (state)",
+      "states": [
+        "unfinished_tools",
+        "busy",
+        "reject",
+        "sealed",
+        "retry",
+        "server_receipt"
+      ],
+      "current_f6df9c5_evidence": "待补；原必答/恢复/重复提交约束须保留",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [
+        "V04"
+      ],
+      "batch": [
+        "S03"
+      ]
+    },
+    {
+      "id": "P18",
+      "page": "完成反馈",
+      "route": "/r/:publicId (state)",
+      "states": [
+        "completed",
+        "friendly_quality",
+        "not_diagnostic",
+        "withdraw",
+        "200_percent"
+      ],
+      "current_f6df9c5_evidence": "待补；旧limited认知质量不记本轮通过",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [
+        "V03"
+      ],
+      "batch": [
+        "S03"
+      ]
+    },
+    {
+      "id": "P19",
+      "page": "研究列表",
+      "route": "/workspace; /login after sign-in",
+      "states": [
+        "empty",
+        "populated",
+        "page",
+        "archive_terminal"
+      ],
+      "current_f6df9c5_evidence": "Chrome1440合成列表截图；两个项目含保留的首轮夹具草稿",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [
+        "V01"
+      ],
+      "batch": [
+        "S04"
+      ]
+    },
+    {
+      "id": "P20",
+      "page": "研究设置",
+      "route": "selected project",
+      "states": [
+        "create",
+        "edit",
+        "dirty",
+        "saving",
+        "saved",
+        "revision_conflict"
+      ],
+      "current_f6df9c5_evidence": "Chrome390/1020/1440选中研究截图；并非所有错误状态",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [
+        "V01",
+        "V02"
+      ],
+      "batch": [
+        "S04"
+      ]
+    },
+    {
+      "id": "P21",
+      "page": "工具目录/来源",
+      "route": "selected project / Builder",
+      "states": [
+        "four_kinds",
+        "page",
+        "granted",
+        "read_only",
+        "revoked"
+      ],
+      "current_f6df9c5_evidence": "四类当前草稿编译成功；工具目录截图；来源生命周期待补",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [
+        "V01",
+        "V05"
+      ],
+      "batch": [
+        "S04"
+      ]
+    },
+    {
+      "id": "P22",
+      "page": "工具编制/试答",
+      "route": "selected instrument",
+      "states": [
+        "dirty",
+        "save",
+        "validate",
+        "preview",
+        "invalid_field",
+        "matrix_name"
+      ],
+      "current_f6df9c5_evidence": "Chrome Form编译成功及矩阵4无名radio；PNG截到数据区上部",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [
+        "F04",
+        "V07"
+      ],
+      "batch": [
+        "S04",
+        "S06"
+      ]
+    },
+    {
+      "id": "P23",
+      "page": "批量导入",
+      "route": "Builder import area",
+      "states": [
+        "13_type_table",
+        "full_csv",
+        "parse",
+        "unknown_raw_type",
+        "quoted_newline",
+        "apply",
+        "focus_error"
+      ],
+      "current_f6df9c5_evidence": "当前说明源码冻结；可解析完整模板在S04实现前验证",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [
+        "V06",
+        "V07"
+      ],
+      "batch": [
+        "S04"
+      ]
+    },
+    {
+      "id": "P24",
+      "page": "波次发布",
+      "route": "Wave Studio",
+      "states": [
+        "draft",
+        "preflight",
+        "frozen",
+        "open",
+        "display_copy_qr",
+        "paused",
+        "rotate",
+        "hard_stop"
+      ],
+      "current_f6df9c5_evidence": "空波次区域截图；环境open/rotate合约通过；原生发布/复制待补",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [
+        "F05",
+        "V01"
+      ],
+      "batch": [
+        "S04",
+        "S05"
+      ]
+    },
+    {
+      "id": "P25",
+      "page": "研究数据",
+      "route": "Analytics Workspace",
+      "states": [
+        "empty",
+        "loaded",
+        "filter",
+        "page",
+        "quality_review",
+        "error",
+        "retry"
+      ],
+      "current_f6df9c5_evidence": "当前空数据区域截图；其余待补",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [
+        "V01",
+        "V02"
+      ],
+      "batch": [
+        "S04"
+      ]
+    },
+    {
+      "id": "P26",
+      "page": "生成与下载",
+      "route": "Analytics exports",
+      "states": [
+        "recent_mfa",
+        "generated",
+        "three_actions",
+        "denied",
+        "cancel",
+        "network_failure",
+        "retry"
+      ],
+      "current_f6df9c5_evidence": "源码仍连续3Blob；本轮未下载；Safari/Chrome分别待补",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [
+        "F06"
+      ],
+      "batch": [
+        "S06"
+      ]
+    },
+    {
+      "id": "P27",
+      "page": "管理员登录/导航",
+      "route": "/admin/login; training.localhost",
+      "states": [
+        "correct_role",
+        "wrong_role",
+        "menu",
+        "deep_link",
+        "return_target"
+      ],
+      "current_f6df9c5_evidence": "当前API/页面/导航合约通过；原生管理员登录与菜单待补",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [
+        "F01",
+        "F02",
+        "F03"
+      ],
+      "batch": [
+        "S05"
+      ]
+    },
+    {
+      "id": "P28",
+      "page": "研究者管理",
+      "route": "/admin/survey-researchers",
+      "states": [
+        "object_selected",
+        "active",
+        "disabled",
+        "lost_permission",
+        "error"
+      ],
+      "current_f6df9c5_evidence": "当前源文件冻结；原生截图待补",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [
+        "V05"
+      ],
+      "batch": [
+        "S05"
+      ]
+    },
+    {
+      "id": "P29",
+      "page": "邀请管理",
+      "route": "/admin/survey-researchers (section)",
+      "states": [
+        "create",
+        "one_time_link",
+        "claimed",
+        "revoked",
+        "password_reset",
+        "return"
+      ],
+      "current_f6df9c5_evidence": "当前源文件冻结；原生截图待补",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [
+        "V05",
+        "F01"
+      ],
+      "batch": [
+        "S05"
+      ]
+    },
+    {
+      "id": "P30",
+      "page": "工具授权",
+      "route": "/admin/survey-researchers (section)",
+      "states": [
+        "researcher",
+        "type",
+        "published_version",
+        "grant",
+        "revoke",
+        "page",
+        "return"
+      ],
+      "current_f6df9c5_evidence": "当前源文件冻结；原生截图待补",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [
+        "V05"
+      ],
+      "batch": [
+        "S05"
+      ]
+    },
+    {
+      "id": "P31",
+      "page": "原生文件核对",
+      "route": "Safari / Chrome / Numbers",
+      "states": [
+        "RAW_WAVE",
+        "COGNITIVE_TRIAL_LONG",
+        "permission",
+        "cancel",
+        "failure",
+        "retry",
+        "counts",
+        "hash",
+        "rows_columns",
+        "encoding",
+        "Numbers"
+      ],
+      "current_f6df9c5_evidence": "本轮未执行；分浏览器独立记录，不以历史或Playwright WebKit代替",
+      "historical_0c41_evidence": "Notion仅作历史；不等同本轮复验",
+      "feedback": [
+        "F06"
+      ],
+      "batch": [
+        "S06",
+        "S07"
+      ]
+    }
+  ]
+}

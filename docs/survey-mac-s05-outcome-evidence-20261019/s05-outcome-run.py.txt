@@ -1,0 +1,12 @@
+from pathlib import Path
+import runpy,sys
+mode=sys.argv[1];sys.argv=['runtime.py','helper']
+x=runpy.run_path(str(Path(__file__).with_name('runtime.py')),run_name='helper')
+n=x['NODE'];r=x['ROOT'];b=x['BASE'];out=b/'evidence/s05-outcome';out.mkdir(exist_ok=True)
+if mode=='targeted':x['call']([n,r/'frontend/node_modules/vitest/vitest.mjs','run','src/pages/admin/SurveyResearchersAdmin.workspace.test.tsx','-t','invitation outcome unconfirmed|possibly committed qualification|rejected operation|acknowledged creation','--maxWorkers=1','--reporter=json','--outputFile='+str(out/'targeted.json')],cwd=r/'frontend',name='s05-outcome-targeted')
+if mode=='non-json-final':x['call']([n,r/'frontend/node_modules/vitest/vitest.mjs','run','src/pages/admin/SurveyResearchersAdmin.workspace.test.tsx','-t','unconfirmed after non-json','--maxWorkers=1','--reporter=json','--outputFile='+str(out/'non-json-final.json')],cwd=r/'frontend',name='s05-outcome-non-json-final')
+if mode=='types-final':x['call']([n,r/'frontend/node_modules/typescript/bin/tsc','-p','tsconfig.app.json','--noEmit'],cwd=r/'frontend',name='s05-outcome-types-final')
+if mode=='lint-test-final':x['call']([n,r/'frontend/node_modules/eslint/bin/eslint.js','src/pages/admin/SurveyResearchersAdmin.workspace.test.tsx'],cwd=r/'frontend',name='s05-outcome-lint-test-final')
+if mode=='links':x['call']([n,r/'frontend/node_modules/vitest/vitest.mjs','run','src/pages/admin/SurveyResearchersAdmin.links.test.tsx','--maxWorkers=1','--reporter=json','--outputFile='+str(out/'links.json')],cwd=r/'frontend',name='s05-outcome-links')
+if mode=='types':x['call']([n,r/'frontend/node_modules/typescript/bin/tsc','-p','tsconfig.app.json','--noEmit'],cwd=r/'frontend',name='s05-outcome-types')
+if mode=='lint':x['call']([n,r/'frontend/node_modules/eslint/bin/eslint.js','src/pages/admin/SurveyResearchersAdmin.tsx','src/pages/admin/SurveyResearchersAdmin.workspace.test.tsx'],cwd=r/'frontend',name='s05-outcome-lint')

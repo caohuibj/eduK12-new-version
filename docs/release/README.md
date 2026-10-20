@@ -14,6 +14,22 @@
 - 时间预算 → 约 5 分钟报告当前等待阶段；frontend 证据接纳上限 5 分钟，各消费项上限 15 分钟。缺失来源证据直接阻断已知候选，不恢复无关全量验收；其他未知差异仍按通用保守规则处理。新 artifacts 仅保留当前 run/head/action/attempt 的 JSON 和截图，不上传私有数据、数据库或重复镜像。
 - 合并后 → main push 对本次固定 before base 取三份固定源 SHA 并核 tree 后分类，不重跑此 PR 的契约、接纳或探针。上线仍单独受当次授权及版本/就绪/短流程/回退门禁约束；本轮 CI 不授予生产部署权限。
 
+## Survey Mac 界面候选的精确路线（待独立工具 review 与真实 Actions 资格）
+
+业务源码保持 `6a0393636aa9e833550ecd7e257d5957661d9fb0`；首轮 CI 的 3 个旧测试定位失败修复已固定为测试消费者提交 `71b7d9ed1e7a2981123518e73626f00d41016031`，作为当前 productHead。base 固定为 `6aeba71d6cad70725d5164598f8dc854d11c1c89`，含两份测试修复的完整前端 tree 为 `06fc1b70e5df37d8e5be3c80d459c99c459b30ec`。`survey-mac-ui-bindings.json` 逐一绑定全部 312 项产品/测试/证据差异，另只允许本路线的 8 个新增及 4 个修改工具/说明路径。未知路径、漏项、删除、重命名、执行位、链接、任意产品 blob 或受保护输入变化均拒绝。279 份文档/原始日志只核对 Git blob，不执行其中命令或 `.py.txt`，不把它们作为正式 CI 成功证明。
+
+最终工具 HEAD 必须由父任务独立 review 后，由维护者配置仓库变量 `SURVEY_MAC_UI_REVIEWED_HEAD` 为该完整 SHA；当前实现不自动设置变量，不把 manifest 中的自述当作 review。PR source 必须等于独立批准 HEAD，实际 checkout/merge tree 必须等于该 source tree；整个 `.github`、release policy、完整 frontend 和两个仓库外层 JSON fixture 均重新绑定。manifest 不嵌入自己的最终 commit/hash 作为信任根。已知 `survey/mac-visual-s01-20261019` 分支缺审批或不匹配时 scope 明确失败，不回退 legacy/full。其他路线保持原路由。base 更新（包括 Training 合并）必须先协调并重新冻结受影响共享输入，不能静默接纳。
+
+修改组件 → Survey 界面/导出恢复及 CI 工具；检查故障 → 错误计划、缺失/跳过单测、未编译类型、前端交互与可访问性、漏洞产物。主要位置 → 独立 review 后的 Actions：scope 拒绝/互斥/汇总契约、变化 TS lint、真实 app/cognitive types、固定 21 个前端直接消费者模块（13 个有差异的测试和 8 个未改动消费者，原 21 项不删减）及指定非空 P2 用例、依赖 audit、一次生产前端 compile 与同缓存 runtime、该 runtime 的 HIGH/CRITICAL 扫描、同产物 Chromium 布局/焦点/WCAG 和 WebKit 导出恢复、JS/TS/Python CodeQL。类型、测试、lint、audit、scan 和两个浏览器消费者可单独重试，消费当前 run 精确 digest/ID 的 builder/runtime；消费者不重新构建。约 5 分钟仍未完成时定位实际等待项，各作业有独立时间上限，不启动未修改后端/DB/附件/媒体/平台整验。
+
+本路线未增加签名 purpose、密钥或本地应用资格接纳；没有对旧 Mac 日志补签。本机只运行受影响控制面和工具契约；实际应用资格在 review 后由 Actions 生成，不以静态检查冒充通过。浏览器严格合成 method/path/DTO，未知 API、JS 错误、溢出或 WCAG 违反失败；恢复覆盖数字及日期 Retry-After、非 JSON、过期票据、明确 MFA 后操作、原入站 cursor/filter、revision 拒绝、新水位确认、重复点击和卸载竞争。浏览器 DTO 用例不代表后端权限/计分重新验收；WebKit 不代表原生 Safari，Mac 原生证据与未测项单独 review。
+
+正式 `merge gate / ready PR` 必需 `scope`、`survey-mac-ui`、`codeql`，并重新计算整个计划；内部所有选中作业必须实际 success。draft、缺项、失败、取消、跳过或空测试报告不能 ready。只有固定 before base 且 merge tree 精确匹配独立 review HEAD 的 main push 才只分类，不复跑 PR 资格，也不部署。新增路线本身不授权创建 PR、运行 CI、合并或生产操作；父任务 review 完成前保持待审。
+
+本路线手动入口显式拒绝：精确 `refs/heads/survey/mac-visual-s01-20261019` 上的任何 workflow_dispatch（full 或 step_probe）只运行一分钟内的拒绝作业；15 个 probe、scope 和 merge-gate 的 job.if 直接排除这个事件/分支组合，重作业不启动。其他分支保留原手动条件。content-scope CLI 也在分类前拒绝该组合。正式 PR scope 包含 survey-mac-ui-scope、content-scope、content-workflows、ci-topology、maintenance-routing、dependency-routing 六份 Node 控制测试和 candidate Python 拒绝测试，不启动旧应用。
+
+独审 pin 是父任务实际审阅后由获授权维护者设置的外部记录，不是代码能证明的独审结果。父任务须先审阅最终完整工具 SHA 并单独授权启动，维护者才在 Settings → Secrets and variables → Actions → Variables 设置 `SURVEY_MAC_UI_REVIEWED_HEAD` 为该 SHA。不得由 workflow、PR input 或 manifest 自动把自身 SHA 写入。GitHub 文档要求个人仓库 collaborator／组织仓库 write access；细粒度 API 凭据须有该仓库 Variables(write)，本工作流未请求该权限，也不配置变量。变量自身不证明审阅人或报告，维护者更改它仍属信任边界；任何后续源码变化都需新的精确独审。参见 [GitHub 变量设置](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-variables#creating-configuration-variables-for-a-repository) 和 [变量 API 权限](https://docs.github.com/en/rest/actions/variables#create-a-repository-variable)。
+
 ## 规则位置与每次开工方式
 
 仓库本文件是完整规则的唯一维护来源，根 `AGENTS.md` 是开发/代理入口，`.github/PULL_REQUEST_TEMPLATE.md` 只记录本次适用项。本机 `~/.codex/AGENTS.md` 的 Huisurvey 专用段落和服务器 `/opt/eduk12-new/deploy/AGENTS.md` 仅作指引，指向同一仓库规则，不独立维护另一套发布标准。源码和文档均按实际 Git 版本读取；服务器安装版本不可静默改写为另一版本。

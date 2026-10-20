@@ -1,0 +1,27 @@
+
+ RUN  v4.1.11 /Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend
+
+ ↓ src/survey/SurveyAnalyticsWorkspace.download.test.tsx > Survey analytics artifact downloads > labels and downloads ATTENDANCE_COMPACT_V1 as a separate attendance relation
+ ↓ src/survey/SurveyAnalyticsWorkspace.download.test.tsx > Survey analytics artifact downloads > labels and downloads ATTENDANCE_COMPACT_V2 as a separate attendance relation
+ ↓ src/survey/SurveyAnalyticsWorkspace.download.test.tsx > Survey analytics artifact downloads > renders server units, version identity, quality and full/early completion counts
+ ↓ src/survey/SurveyAnalyticsWorkspace.download.test.tsx > Survey analytics artifact downloads > uses the bounded cognitive trial export with mandatory wave and no free-text disclosure
+ ↓ src/survey/SurveyAnalyticsWorkspace.download.test.tsx > Survey analytics artifact downloads > preserves native CSV and JSON downloads with includeFreeText=false
+ ↓ src/survey/SurveyAnalyticsWorkspace.download.test.tsx > Survey analytics artifact downloads > preserves native CSV and JSON downloads with includeFreeText=true
+ ✓ src/survey/SurveyAnalyticsWorkspace.download.test.tsx > Survey analytics artifact downloads > hands the exact signed cursor to the next batch only after three explicit file actions 431ms
+ ↓ src/survey/SurveyAnalyticsWorkspace.download.test.tsx > Survey analytics artifact downloads > keeps the original ticket after network read failure and retries only the selected file
+ ↓ src/survey/SurveyAnalyticsWorkspace.download.test.tsx > Survey analytics artifact downloads > keeps the original ticket after non-json read failure and retries only the selected file
+ ↓ src/survey/SurveyAnalyticsWorkspace.download.test.tsx > Survey analytics artifact downloads > keeps the original ticket after safari-non-json read failure and retries only the selected file
+ ↓ src/survey/SurveyAnalyticsWorkspace.download.test.tsx > Survey analytics artifact downloads > keeps the original ticket after 403 read failure and retries only the selected file
+ ↓ src/survey/SurveyAnalyticsWorkspace.download.test.tsx > Survey analytics artifact downloads > keeps the original ticket after 404 read failure and retries only the selected file
+ ↓ src/survey/SurveyAnalyticsWorkspace.download.test.tsx > Survey analytics artifact downloads > keeps the original ticket after 409 read failure and retries only the selected file
+ ↓ src/survey/SurveyAnalyticsWorkspace.download.test.tsx > Survey analytics artifact downloads > keeps the original ticket after 429 read failure and retries only the selected file
+ ↓ src/survey/SurveyAnalyticsWorkspace.download.test.tsx > Survey analytics artifact downloads > does not launch a file from a mismatched export receipt
+ ↓ src/survey/SurveyAnalyticsWorkspace.download.test.tsx > Survey analytics artifact downloads > clears per-file launch status when creating a different format without automatically fetching files
+ ↓ src/survey/SurveyAnalyticsWorkspace.download.test.tsx > Survey analytics artifact downloads > cleans a failed browser launch and allows an explicit original-file retry without false saved status
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 16 skipped (17)
+   Start at  18:35:16
+   Duration  5.15s (transform 275ms, setup 318ms, import 192ms, tests 433ms, environment 996ms)
+
+JSON report written to /Users/Qiang/Documents/Codex/2026-10-19/task/evidence/s07-final/cursor-handoff.json

@@ -1,0 +1,57 @@
+{
+  "method": "Mac IAB Chromium; actual SurveyCognitiveUnit and fixed gonogo frame runner; DOM observations supplement native browser evidence, not hardware timing validation",
+  "beforeProductCommit": "6b19767ee5a536d3f8f17942cb55eebb7e5a08fb",
+  "after": "Current S03 working tree, 2 TSX files and one scoped CSS file",
+  "viewport": [
+    1440,
+    900,
+    1
+  ],
+  "scroll": [
+    0,
+    121
+  ],
+  "states": [
+    "rgb(229, 231, 235)",
+    "rgb(34, 197, 94)",
+    "rgb(239, 68, 68)"
+  ],
+  "stimulusRect": [
+    648.5,
+    364.453125,
+    128,
+    128
+  ],
+  "nodesPerState": 17,
+  "computedPropertiesPerNode": 32,
+  "compared": [
+    "tag",
+    "id",
+    "class",
+    "rect",
+    "all listed computed styles",
+    "viewport",
+    "scroll"
+  ],
+  "differences": [],
+  "differenceCount": 0,
+  "protectedSourceFiles": 178,
+  "protectedSourceChanges": [],
+  "practice": "4/4 on each before/after instance, original practice gate and real keyboard input events; no config/state forcing",
+  "discardedAttempt": {
+    "beforeViewport": [
+      1440,
+      900,
+      1
+    ],
+    "afterViewport": [
+      1280,
+      720,
+      2
+    ],
+    "differences": 105,
+    "reason": "New IAB tab did not inherit explicit viewport. Excluded; viewport explicitly reset and re-observed before comparison."
+  },
+  "limits": "Separate synthetic instances, same browser/viewport/config. No physical display latency, clinical scores or complete device matrix claimed. Changes never enter stimulus ancestry.",
+  "scopeNote": "This zero-difference DOM capture precedes the final ordinary-label CSS refinement and main integration. It is historical candidate evidence; final merged inputs require a new targeted comparison."
+}

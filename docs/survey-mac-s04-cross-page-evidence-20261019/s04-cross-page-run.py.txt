@@ -1,0 +1,8 @@
+from pathlib import Path
+import runpy,sys
+mode=sys.argv[1];sys.argv=['runtime.py','helper']
+x=runpy.run_path(str(Path(__file__).with_name('runtime.py')),run_name='helper')
+n=x['NODE'];r=x['ROOT'];b=x['BASE'];out=b/'evidence/s04-cross-page';out.mkdir(exist_ok=True)
+if mode=='targeted':x['call']([n,r/'frontend/node_modules/vitest/vitest.mjs','run','src/survey/SurveyAuthoringGuidance.test.tsx','src/survey/SurveyBuilder.test.tsx','-t','simultaneous trial errors|trial answers|precise Form question|literal REFUSED|preview of a form','--maxWorkers=1','--reporter=json','--outputFile='+str(out/'targeted.json')],cwd=r/'frontend',name='s04-cross-page-targeted')
+if mode=='types':x['call']([n,r/'frontend/node_modules/typescript/bin/tsc','-p','tsconfig.app.json','--noEmit'],cwd=r/'frontend',name='s04-cross-page-types')
+if mode=='lint':x['call']([n,r/'frontend/node_modules/eslint/bin/eslint.js','src/survey/ResearchPreview.tsx','src/survey/SurveyBuilder.tsx','src/survey/SurveyAuthoringGuidance.test.tsx'],cwd=r/'frontend',name='s04-cross-page-lint')

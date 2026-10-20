@@ -1,0 +1,74 @@
+{
+  "docs/survey-mac-s04-review-20261019.md": {
+    "bytes": 7963,
+    "sha256": "377d5b3a45843a3740af8a266a6892c576c65ecb69f88e8457387f2279e58f67"
+  },
+  "docs/survey-mac-s05-outcome-review-fix-20261019.md": {
+    "bytes": 3963,
+    "sha256": "b4fb3e5a387ced7693fbddade9f767428390aaa3b2c8fd14cfd7a35c01583644"
+  },
+  "docs/survey-mac-s04-safari-followup-20261019.md": {
+    "bytes": 2856,
+    "sha256": "e38428d202554ec5f69e17f66764cb3a541723ee60851d055d8334d6170f5968"
+  },
+  "docs/survey-mac-s02-followup-20261019.md": {
+    "bytes": 3565,
+    "sha256": "3d84cb53f6909b299ad0a0c2fb2ca886da3b8c2774833cb3df44cde4347560d5"
+  },
+  "docs/survey-mac-s03-20261019.md": {
+    "bytes": 11024,
+    "sha256": "895bfc2f6007e6d7a5eaed09f478939f1b5b26a42c9140079e9bff417778bbd4"
+  },
+  "docs/survey-mac-s06-local-error-review-20261019.md": {
+    "bytes": 1246,
+    "sha256": "7eda6ead86832ac27a6c571c626fd4f3606dfa3853fa25c791eeb0fd60d00765"
+  },
+  "docs/survey-mac-s06-safari-error-review-20261019.md": {
+    "bytes": 1273,
+    "sha256": "ec021d63828b75e9e306680ba42a058224a2de6ec70593c18c43e0db80dad374"
+  },
+  "docs/survey-mac-s06-matrix-review-20261019.md": {
+    "bytes": 1538,
+    "sha256": "5d7705aedef9a35514783fee3e5b17a7a5995a07655420a8a4188e9563a57dbb"
+  },
+  "docs/survey-mac-s04-cross-page-review-fix-20261019.md": {
+    "bytes": 2227,
+    "sha256": "4bb745ffe680019370add13dec950e35f41fa3ac5082d3d954a57655efd475fb"
+  },
+  "docs/survey-mac-s03-native-20261019.md": {
+    "bytes": 6809,
+    "sha256": "b2957b673edd72ae29f756774ae4f4e89b43ba0ad990b516d76e2cac8417e71a"
+  },
+  "docs/survey-mac-s06-error-copy-review-20261019.md": {
+    "bytes": 1183,
+    "sha256": "7109c1c497f3de25c7e3c69af7c76238c7fc12b49c31219666c9f6f0e26d565e"
+  },
+  "docs/survey-mac-s04-location-review-fix-20261019.md": {
+    "bytes": 4609,
+    "sha256": "f6e2b1543305b3cf9113b79b00aac5198a7d8a54d1bf3876d2dd68d640853272"
+  },
+  "docs/survey-mac-s01-20261019.md": {
+    "bytes": 15216,
+    "sha256": "7821f176000a865d59e5176f50ae65c03abede3f691e113e2dd208ed1ff866d5"
+  },
+  "docs/survey-mac-s06-download-review-20261019.md": {
+    "bytes": 3143,
+    "sha256": "e3edb5ede59c2c2bc1b915c8aa043585b584300cb4b037da69deedeb8d7bf02c"
+  },
+  "docs/survey-mac-s03-review-followup-20261019.md": {
+    "bytes": 6630,
+    "sha256": "1a959657a848ccd019a9a81f80ede9dd63bbc6f5d70cd030b34417e769e9692b"
+  },
+  "docs/survey-mac-s06-review-20261019.md": {
+    "bytes": 8673,
+    "sha256": "0af37e30b7fd3881f175151143ee6bb9a50ff96d93f8d2ee50cdae66f6e3c004"
+  },
+  "docs/survey-mac-s05-review-20261019.md": {
+    "bytes": 8006,
+    "sha256": "53689a13098198437470229f4655d18ac42c5e74f6f2041e8c7c61e6db9ff1ec"
+  },
+  "docs/survey-mac-s02-20261019.md": {
+    "bytes": 8052,
+    "sha256": "e32d2c38597feb0acd3af3d18069ab5604a43c0727b16bd0c5362ee0f24e3564"
+  }
+}

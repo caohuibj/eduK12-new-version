@@ -1,0 +1,49 @@
+{
+  "sourceHead": "509130b4d7d0d157e472e6d227f6f3564450b619",
+  "main": "6aeba71d6cad70725d5164598f8dc854d11c1c89",
+  "environment": "Mac IAB Chromium; real loopback API + isolated synthetic PostgreSQL; supplemental, not native Chrome/Safari acceptance",
+  "form": {
+    "blankSubmit": "Rejected by existing service: answers.form.matrix.r1：必答题目未完成",
+    "selections": [
+      "课堂参与:first option",
+      "学习信心:second option"
+    ],
+    "text": "S03 merged-main synthetic text only; no personal information.",
+    "refreshAndExplicitResume": "Both matrix selections and exact text restored",
+    "final": "Server-confirmed COMPLETED receipt shown",
+    "refreshAfterFinal": "Existing completed receipt restored; no formal-submit button",
+    "layout": {
+      "viewport": [
+        390,
+        900,
+        1
+      ],
+      "documentWidth": 375,
+      "overflow": false,
+      "textFont": "16px",
+      "textRectXWidth": [
+        50,
+        275
+      ]
+    }
+  },
+  "nativeBrowserStatus": "Blocked by repeated Mac lock; no S03 after PNG. Pending manual unlock request remains unanswered. No lock/security settings changed.",
+  "testSummary": {
+    "initial": {
+      "uniqueCases": 67,
+      "passed": 63,
+      "failed": 4,
+      "evidence": "integrated-targeted-tests.json"
+    },
+    "focusedDiagnostic": {
+      "selected": 4,
+      "passed": 4,
+      "skipped": 31,
+      "changedSourceOrTimeout": false,
+      "evidence": "integrated-final-diagnostic.json"
+    },
+    "interpretation": "67 unique cases have passing evidence across initial and focused runs; not one clean 67/67 run. Initial failures retained, default-timeout-like durations while typecheck ran concurrently; exact cause unproven. No broad rerun.",
+    "typecheck": "exit 0",
+    "targetedLint": "exit 0"
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "chrome-native-question-focus.png": {
+    "bytes": 428225,
+    "sha256": "1745d05c9441ace29ca21c5adfa7f6aa9f585ccfcbf4080ef682f96af299f405",
+    "actualCodec": "JPEG",
+    "dimensions": [
+      2880,
+      1592
+    ],
+    "evidenceStatus": "retained",
+    "note": "Unmodified native capture bytes; older .png labels may contain JPEG codec."
+  },
+  "chrome-native-workspace-200-window.png": {
+    "bytes": 456103,
+    "sha256": "228ef0695594225ee95abe642f5e9f992d91f3af1597a1072841ac8d0d7b2e48",
+    "actualCodec": "JPEG",
+    "dimensions": [
+      2880,
+      1592
+    ],
+    "evidenceStatus": "retained",
+    "note": "Unmodified native capture bytes; older .png labels may contain JPEG codec."
+  },
+  "chrome-native-workspace-200.png": {
+    "bytes": 10968,
+    "sha256": "5b1048f478cc2afe4e3b2c88774d583e4f754eeea3001d91b5d11ea59cec4ab5",
+    "actualCodec": "JPEG",
+    "dimensions": [
+      524,
+      96
+    ],
+    "evidenceStatus": "failed-popup-composite; excluded from pass evidence",
+    "note": "Unmodified native capture bytes; older .png labels may contain JPEG codec."
+  },
+  "chrome-native-workspace-390.jpg": {
+    "bytes": 336845,
+    "sha256": "a65225d01d8e38ab32a83658e33b3a3fcbb77c7101640b35a4bba1b4a8869c3f",
+    "actualCodec": "JPEG",
+    "dimensions": [
+      2880,
+      1592
+    ],
+    "evidenceStatus": "retained",
+    "note": "Unmodified native capture bytes; older .png labels may contain JPEG codec."
+  },
+  "chrome-native-workspace-768.jpg": {
+    "bytes": 366754,
+    "sha256": "e80a01500888c9e6350c53027ff45a6b20544b725ee9b89b0b0ff5aa8250be20",
+    "actualCodec": "JPEG",
+    "dimensions": [
+      2880,
+      1592
+    ],
+    "evidenceStatus": "retained",
+    "note": "Unmodified native capture bytes; older .png labels may contain JPEG codec."
+  },
+  "chrome-native-workspace-desktop.png": {
+    "bytes": 368106,
+    "sha256": "fa96838f6d61d82eabb4f1189155446a83c9f5f2fe3eea164610987f8abde0a2",
+    "actualCodec": "JPEG",
+    "dimensions": [
+      2880,
+      1592
+    ],
+    "evidenceStatus": "retained",
+    "note": "Unmodified native capture bytes; older .png labels may contain JPEG codec."
+  },
+  "chrome-question-location-desktop.png": {
+    "bytes": 205719,
+    "sha256": "5614e6e4fc41a27cdee85df4768772cbfabd25421f713fb69765232435dd9494",
+    "actualCodec": "PNG",
+    "dimensions": [
+      2122,
+      1419
+    ],
+    "evidenceStatus": "retained",
+    "note": "DevTools viewport capture loses prior native focus; not focus proof"
+  }
+}

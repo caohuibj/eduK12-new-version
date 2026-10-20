@@ -1,0 +1,19 @@
+"""Read-only metadata of this task's synthetic export tickets; no artifact decryption."""
+from pathlib import Path
+from urllib.parse import urlparse,unquote
+import json,os,subprocess
+b=Path(__file__).resolve().parents[1];cfg=json.loads((b/'runtime/private/environment.json').read_text());u=urlparse(cfg['DATABASE_URL_RUNTIME'])
+assert cfg['NODE_ENV']=='test' and (u.hostname,u.port,u.path,u.username)==('127.0.0.1',5557,'/survey_s01_test','survey_s01_runtime')
+sql="""BEGIN READ ONLY;
+SELECT coalesce(json_agg(x),'[]'::json) FROM (
+SELECT t.id,t.format,t.status,t.created_at,t.expires_at,
+(SELECT count(*) FROM survey_events e WHERE e.project_id=t.project_id AND e.actor_user_id=t.actor_user_id AND e.action='RESEARCH_EXPORT_CREATED' AND e.metadata->>'exportId'=t.id) AS created_audit_count,
+(SELECT count(*) FROM survey_events e WHERE e.project_id=t.project_id AND e.actor_user_id=t.actor_user_id AND e.action='RESEARCH_EXPORT_DOWNLOADED' AND e.metadata->>'exportId'=t.id) AS read_audit_count
+FROM survey_export_tickets t JOIN users u ON u.id=t.actor_user_id
+WHERE t.project_id='871d81fa-58a5-4ccc-b92d-3ebcd5f1bf25' AND u.username='s01_researcher' AND t.created_at>='2026-10-19T07:25:00Z'
+ORDER BY t.created_at) x;
+COMMIT;"""
+p=subprocess.run(['/opt/homebrew/opt/postgresql@16/bin/psql','-X','-h','127.0.0.1','-p','5557','-U',u.username,'-d','survey_s01_test','-Atq','-v','ON_ERROR_STOP=1'],input=sql,text=True,capture_output=True,env=dict(os.environ,PGPASSWORD=unquote(u.password)))
+assert p.returncode==0,'Read-only export metadata query failed'
+result={'readOnly':True,'syntheticOnly':True,'note':'read audit confirms authorized artifact retrieval, never browser file persistence; failed reads do not create this success audit','tickets':json.loads(p.stdout)}
+(b/'evidence/s06/export-audit.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n');print(json.dumps(result,ensure_ascii=False,indent=2))

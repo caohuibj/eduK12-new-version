@@ -1,0 +1,22 @@
+failed to load config from /Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/vitest.config.ts
+
+⎯⎯⎯⎯⎯⎯⎯ Startup Error ⎯⎯⎯⎯⎯⎯⎯⎯
+Error: EPERM: operation not permitted, open '/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/.vite-temp/vitest.config.ts.timestamp-1792371157080-dde25768142f8.mjs'
+    at async open (node:internal/fs/promises:1345:25)
+    at async Object.writeFile (node:internal/fs/promises:1965:14)
+    at async loadConfigFromBundledFile (file:///Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49588:5)
+    at async bundleAndLoadConfigFile (file:///Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49433:22)
+    at async loadConfigFromFile (file:///Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49396:44)
+    at async resolveConfig (file:///Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:48891:24)
+    at async _createServer (file:///Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:38478:66)
+    at async createViteServer (file:///Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:8902:17)
+    at async createVitest (file:///Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:14288:18)
+    at async prepareVitest (file:///Users/Qiang/huitraining-unified-local/server-version/frontend/node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:14655:14) {
+  errno: -1,
+  code: 'EPERM',
+  syscall: 'open',
+  path: '/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/node_modules/.vite-temp/vitest.config.ts.timestamp-1792371157080-dde25768142f8.mjs'
+}
+
+
+

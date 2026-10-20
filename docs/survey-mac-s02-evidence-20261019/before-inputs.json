@@ -1,0 +1,39 @@
+{
+  "checkedAtUTC": "2026-10-19T01:19:50.577845+00:00",
+  "baselineCommit": "8ca617efd3c94da4ae1309dba9004dee70887324",
+  "productBase": "f6df9c5b21c5a0d50853d5e6e2d1bfd79389dcd0",
+  "dependencyLinks": 53,
+  "externalLinks": [],
+  "files": [
+    {
+      "file": "SurveyApp.tsx",
+      "bytes": 17026,
+      "sha256": "417993bf763eb1b0f0d5f8311dda965d5cc97be9d06555e1b2da704b0222ed23"
+    },
+    {
+      "file": "SurveyLanding.tsx",
+      "bytes": 2307,
+      "sha256": "30033b1debae883ab87be86860cee09bab0026b1aa4c54ecc6cd4e3a1ba53aa3"
+    },
+    {
+      "file": "SurveyFeaturePage.tsx",
+      "bytes": 1084,
+      "sha256": "cdc48c7450585a44b1a25dedb6ca57ac7e3e87042ab7bce6852571b5ba0d8f5f"
+    },
+    {
+      "file": "SurveyBrand.tsx",
+      "bytes": 350,
+      "sha256": "6474a1a42427ed3a68ddcbb431f4a6bfe6e321ceb77e8ef81e93a95381ef4c55"
+    },
+    {
+      "file": "survey-features.ts",
+      "bytes": 2684,
+      "sha256": "6a336610017fab6af30a3ddf2d5a2168a2d4929925151927ab30371265dad6e6"
+    },
+    {
+      "file": "survey-landing.css",
+      "bytes": 7900,
+      "sha256": "2e3829d0fd379a4f5a24613b8282432a8f7dbb278d0d6168af945e38f1ada1d9"
+    }
+  ]
+}

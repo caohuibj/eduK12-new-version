@@ -1,0 +1,7 @@
+
+/Users/Qiang/Documents/Codex/2026-10-19/task/survey-worktree/server-version/frontend/src/survey/SurveyAnalyticsWorkspace.tsx
+  194:28  warning  The ref value 'exportEpoch.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'exportEpoch.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+  195:5   warning  React Hook useEffect has missing dependencies: 'loadQuality' and 'reload'. Either include them or remove the dependency array                                                                                                                                          react-hooks/exhaustive-deps
+
+✖ 2 problems (0 errors, 2 warnings)
+

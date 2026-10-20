@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "sourceHead": "7d4f1b0db3969c585c2bcda5dbc819103b1f824d",
+  "provenance": "Filtered native accessibility snapshots after CUA kernel reset; prior functional steps retained in tool transcript, not recreated as raw records.",
+  "events": [
+    {
+      "label": "Safari FORM after completed reload restore",
+      "state": "Window: \"Huisurvey · 研究参与\", App: Safari.\n\t\t\t\t\t\t12 text 已恢复本标签页暂存的未提交答案。请复核后再提交。\n\t\t\t\t\t\t\t21 text 未提交答案仅在当前浏览器标签页暂存，至多两小时； 关闭标签、使用其他设备或清理浏览器数据后无法恢复。公共电脑建议完成后立即退出。\n\t\t\t\t\t\t\t\t\t\t\t\t36 radio button (disabled) 1\n\t\t\t\t\t\t\t\t\t\t\t\t38 radio button (disabled) 0\n\t\t\t\t\t\t\t\t\t\t\t\t42 radio button (disabled) 0\n\t\t\t\t\t\t\t\t\t\t\t\t44 radio button (disabled) 1\n\t\t\t\t\t\t\t\t\t\t48 text 合成界面检查：课堂参与与学习信心。\nThe focused UI element is 11 container"
+    },
+    {
+      "label": "Safari SJT blank rejection",
+      "state": "\t\t\t\t\t\t12 text answers.q1：必答 SJT 问题尚未完成\n\t\t\t\t\t\t\t\t\t\t\t33 radio button 比较符合, Value: 0\n\t\t\t\t\t\t\t\t\t\t\t36 radio button 不太符合, Value: 0\n\t\t\t\t\t\t\t\t\t\t\t39 checkbox 我选择不回答这一题（REFUSED）, Value: 0"
+    },
+    {
+      "label": "Safari SJT restored answer",
+      "state": "Window: \"Huisurvey · 研究参与\", App: Safari.\n\t\t\t\t\t\t12 text 已恢复本标签页暂存的未提交答案。请复核后再提交。\n\t\t\t\t\t\t\t21 text 未提交答案仅在当前浏览器标签页暂存，至多两小时； 关闭标签、使用其他设备或清理浏览器数据后无法恢复。公共电脑建议完成后立即退出。\n\t\t\t\t\t\t\t\t\t\t\t33 radio button 比较符合, Value: 1\n\t\t\t\t\t\t\t\t\t\t\t36 radio button 不太符合, Value: 0\n\t\t\t\t\t\t\t\t44 text 请检查所有必答题、矩阵每一行及全部页面。只有服务器确认整轮提交后，才会显示完成回执。\n\t\t\t\t\t\t\t\t45 text 工具完成、临时暂存与整轮正式提交分别确认；这份提示不代替提交时的完整检查。\nThe focused UI element is 11 container"
+    },
+    {
+      "label": "Safari SJT completed receipt",
+      "state": "Window: \"Huisurvey · 研究参与\", App: Safari.\n\t\t\t\t\t\t12 text 提交成功。以下为本次提交时确认的完成回执。\n\t\t\t\t\t\t17 heading 本轮研究已提交, Value: 2\n\t\t\t\t\t\t\t18 text 本轮研究已提交\n\t\t\t\t\t\t19 text 整轮正式回答已由服务器确认保存\n\t\t\t\t\t\t22 text 完成时间：2026/10/19 13:40:24\nThe focused UI element is 11 container"
+    },
+    {
+      "label": "Safari SJT restored completed receipt verified",
+      "state": "Window: \"Huisurvey · 研究参与\", App: Safari.\n\t\t\t\t\t\t12 text 提交成功。系统不会提供未经验证的诊断或常模等级。\n\t\t\t\t\t\t17 heading 本轮研究已提交, Value: 2\n\t\t\t\t\t\t\t18 text 本轮研究已提交\n\t\t\t\t\t\t19 text 整轮正式回答已由服务器确认保存\n\t\t\t\t\t\t22 text 完成时间：2026/10/19 13:40:24\nThe focused UI element is 11 container"
+    },
+    {
+      "label": "Safari FORM sealed unconfirmed before explicit original retry",
+      "state": "Window: \"Huisurvey · 研究参与\", App: Safari.\n\t\t\t\t\t\t12 text 已恢复本标签页暂存的未提交答案。请复核后再提交。\n\t\t\t\t\t\t\t21 text 未提交答案仅在当前浏览器标签页暂存，至多两小时； 关闭标签、使用其他设备或清理浏览器数据后无法恢复。公共电脑建议完成后立即退出。\n\t\t\t\t\t\t\t\t\t\t\t\t36 radio button (disabled) 1\n\t\t\t\t\t\t\t\t\t\t\t\t38 radio button (disabled) 0\n\t\t\t\t\t\t\t\t\t\t\t\t42 radio button (disabled) 0\n\t\t\t\t\t\t\t\t\t\t\t\t44 radio button (disabled) 1\n\t\t\t\t\t\t\t\t\t\t48 text 合成界面检查：课堂参与与学习信心。\nThe focused UI element is 11 container"
+    },
+    {
+      "label": "Safari FORM original sealed retry result",
+      "state": "Window: \"Huisurvey · 研究参与\", App: Safari.\n\t\t\t\t\t\t12 text 提交成功。系统不会提供未经验证的诊断或常模等级。\n\t\t\t\t\t\t17 heading 本轮研究已提交, Value: 2\n\t\t\t\t\t\t\t18 text 本轮研究已提交\n\t\t\t\t\t\t19 text 整轮正式回答已由服务器确认保存\n\t\t\t\t\t\t22 text 完成时间：2026/10/19 13:41:35\nThe focused UI element is 11 container"
+    },
+    {
+      "label": "Chrome FORM final before receipt reload",
+      "state": "Window: \"Huisurvey · 研究参与\", App: Google Chrome.\n\t\t\t\t\t\t\t141 text 提交成功。以下为本次提交时确认的完成回执。\n\t\t\t\t\t\t\t\t147 heading 本轮研究已提交, Value: 2\n\t\t\t\t\t\t\t\t\t148 text 本轮研究已提交\n\t\t\t\t\t\t\t\t149 text 整轮正式回答已由服务器确认保存 合成测试已完成；这里只确认软件数据提交，不构成心理诊断或真实研究结论。 本研究反馈仅作一般说明，不提供未经验证的常模、诊断或个体能力等级。 完成时间： 2026/10/19 13:29:15\nThe focused UI element is 135 HTML content Huisurvey · 研究参与, URL: survey.localhost:5197/r/e747807b-07c7-4f15-b018-d8f1e77fab8b"
+    },
+    {
+      "label": "Chrome FORM completed restored",
+      "state": "Window: \"Huisurvey · 研究参与\", App: Google Chrome.\n\t\t\t\t\t\t\t149 text 提交成功。系统不会提供未经验证的诊断或常模等级。\n\t\t\t\t\t\t\t\t155 heading 本轮研究已提交, Value: 2\n\t\t\t\t\t\t\t\t\t156 text 本轮研究已提交\n\t\t\t\t\t\t\t\t157 text 整轮正式回答已由服务器确认保存 合成测试已完成；这里只确认软件数据提交，不构成心理诊断或真实研究结论。 本研究反馈仅作一般说明，不提供未经验证的常模、诊断或个体能力等级。 完成时间： 2026/10/19 13:29:15\nThe focused UI element is 143 HTML content Huisurvey · 研究参与, URL: survey.localhost:5197/r/e747807b-07c7-4f15-b018-d8f1e77fab8b"
+    },
+    {
+      "label": "Safari FORM completed restored",
+      "state": "Window: \"Huisurvey · 研究参与\", App: Safari.\n\t\t\t\t\t\t12 text 提交成功。系统不会提供未经验证的诊断或常模等级。\n\t\t\t\t\t\t17 heading 本轮研究已提交, Value: 2\n\t\t\t\t\t\t\t18 text 本轮研究已提交\n\t\t\t\t\t\t19 text 整轮正式回答已由服务器确认保存\n\t\t\t\t\t\t22 text 完成时间：2026/10/19 13:41:35\nThe focused UI element is 11 container"
+    },
+    {
+      "label": "Chrome SJT completed restored current",
+      "state": "Window: \"Huisurvey · 研究参与\", App: Google Chrome.\n\t\t\t\t\t\t\t24 text 提交成功。系统不会提供未经验证的诊断或常模等级。\n\t\t\t\t\t\t\t\t30 heading 本轮研究已提交, Value: 2\n\t\t\t\t\t\t\t\t\t31 text 本轮研究已提交\n\t\t\t\t\t\t\t\t32 text 整轮正式回答已由服务器确认保存 合成测试已完成；这里只确认软件数据提交，不构成心理诊断或真实研究结论。 本研究反馈仅作一般说明，不提供未经验证的常模、诊断或个体能力等级。 完成时间： 2026/10/19 13:22:43\nThe focused UI element is 18 HTML content Huisurvey · 研究参与, URL: survey.localhost:5197/r/e747807b-07c7-4f15-b018-d8f1e77fab8b"
+    },
+    {
+      "label": "Safari SCALE completed restored current",
+      "state": "Window: \"Huisurvey · 研究参与\", App: Safari.\n\t\t\t\t\t\t12 text 提交成功。系统不会提供未经验证的诊断或常模等级。\n\t\t\t\t\t\t17 heading 本轮研究已提交, Value: 2\n\t\t\t\t\t\t\t18 text 本轮研究已提交\n\t\t\t\t\t\t19 text 整轮正式回答已由服务器确认保存\n\t\t\t\t\t\t22 text 完成时间：2026/10/19 13:34:35\nThe focused UI element is 11 container"
+    },
+    {
+      "label": "Chrome SCALE completed restored current",
+      "state": "Window: \"Huisurvey · 研究参与\", App: Google Chrome.\n\t\t\t\t\t\t\t24 text 提交成功。系统不会提供未经验证的诊断或常模等级。\n\t\t\t\t\t\t\t\t30 heading 本轮研究已提交, Value: 2\n\t\t\t\t\t\t\t\t\t31 text 本轮研究已提交\n\t\t\t\t\t\t\t\t32 text 整轮正式回答已由服务器确认保存 合成测试已完成；这里只确认软件数据提交，不构成心理诊断或真实研究结论。 本研究反馈仅作一般说明，不提供未经验证的常模、诊断或个体能力等级。 完成时间： 2026/10/19 13:34:33\nThe focused UI element is 64 container"
+    }
+  ]
+}

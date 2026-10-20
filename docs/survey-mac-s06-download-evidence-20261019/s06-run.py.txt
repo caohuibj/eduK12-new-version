@@ -1,0 +1,13 @@
+from pathlib import Path
+import runpy,sys
+mode=sys.argv[1];sys.argv=['runtime.py','helper']
+x=runpy.run_path(str(Path(__file__).with_name('runtime.py')),run_name='helper')
+n=x['NODE'];r=x['ROOT'];b=x['BASE'];out=b/'evidence/s06';out.mkdir(exist_ok=True)
+if mode=='matrix':x['call']([n,r/'frontend/node_modules/vitest/vitest.mjs','run','src/survey/SurveyMatrixNames.test.tsx','--maxWorkers=1','--reporter=json','--outputFile='+str(out/'matrix.json')],cwd=r/'frontend',name='s06-matrix')
+if mode=='matrix-existing':x['call']([n,r/'frontend/node_modules/vitest/vitest.mjs','run','src/survey/SurveyBuilder.test.tsx','-t','refusal','--maxWorkers=1','--reporter=json','--outputFile='+str(out/'matrix-existing.json')],cwd=r/'frontend',name='s06-matrix-existing')
+if mode=='matrix-lint':x['call']([n,r/'frontend/node_modules/eslint/bin/eslint.js','src/survey/ResearchPreview.tsx','src/survey/SurveyPublicApp.tsx','src/survey/SurveyMatrixNames.test.tsx','src/survey/SurveyBuilder.test.tsx'],cwd=r/'frontend',name='s06-matrix-lint')
+if mode=='downloads':x['call']([n,r/'frontend/node_modules/vitest/vitest.mjs','run','src/survey/SurveyAnalyticsWorkspace.download.test.tsx','--maxWorkers=1','--reporter=json','--outputFile='+str(out/'downloads.json')],cwd=r/'frontend',name='s06-downloads')
+if mode=='download-reset':x['call']([n,r/'frontend/node_modules/vitest/vitest.mjs','run','src/survey/SurveyAnalyticsWorkspace.download.test.tsx','-t','creating a different format','--maxWorkers=1','--reporter=json','--outputFile='+str(out/'download-reset.json')],cwd=r/'frontend',name='s06-download-reset')
+if mode=='download-final-lint':x['call']([n,r/'frontend/node_modules/eslint/bin/eslint.js','src/survey/SurveyAnalyticsWorkspace.download.test.tsx'],cwd=r/'frontend',name='s06-download-final-lint')
+if mode=='types':x['call']([n,r/'frontend/node_modules/typescript/bin/tsc','-p','tsconfig.app.json','--noEmit'],cwd=r/'frontend',name='s06-types')
+if mode=='lint':x['call']([n,r/'frontend/node_modules/eslint/bin/eslint.js','src/survey/ResearchPreview.tsx','src/survey/SurveyPublicApp.tsx','src/survey/SurveyMatrixNames.test.tsx','src/survey/SurveyAnalyticsWorkspace.tsx','src/survey/SurveyAnalyticsWorkspace.download.test.tsx'],cwd=r/'frontend',name='s06-lint')

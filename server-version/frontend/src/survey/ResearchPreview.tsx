@@ -11,23 +11,25 @@ const refusal=():Refusal=>({_surveyRefusal:true})
 const isRefusal=(value:Answer|undefined):value is Refusal=>
   !!value&&typeof value==='object'&&!Array.isArray(value)&&'_surveyRefusal' in value
     &&value._surveyRefusal===true
-export function ResearchPreview({draft,onSimulate,onValidateForm,errorPath,initialAnswers,onAnswersChange,hideSimulation=false}:{draft:ResearchDraft;
+export type PreviewFocusRequest={itemKey:string;sequence:number}
+export function ResearchPreview({draft,onSimulate,onValidateForm,errorPath,focusRequest,initialAnswers,onAnswersChange,hideSimulation=false}:{draft:ResearchDraft;
   onSimulate:(answers:Record<string,unknown>)=>void;
   onValidateForm?:(answers:Record<string,Answer>)=>void;
-  errorPath?:string;initialAnswers?:Record<string,Answer>;onAnswersChange?:(answers:Record<string,Answer>)=>void;hideSimulation?:boolean}){
+  errorPath?:string;focusRequest?:PreviewFocusRequest|null;initialAnswers?:Record<string,Answer>;onAnswersChange?:(answers:Record<string,Answer>)=>void;hideSimulation?:boolean}){
   const [answers,setAnswers]=useState<Record<string,Answer>>(initialAnswers??{})
   const [pageIndex,setPageIndex]=useState(0)
   const [scaleIndex,setScaleIndex]=useState(0)
+  const previewRoot=useRef<HTMLElement>(null),focusedRequest=useRef<PreviewFocusRequest|null>(null)
   const answerListener=useRef(onAnswersChange);answerListener.current=onAnswersChange
   useEffect(()=>{answerListener.current?.(answers)},[answers])
   useEffect(()=>{setAnswers(initialAnswers??{});setPageIndex(0);setScaleIndex(0)},[draft.id,draft.revision])
   useEffect(()=>{
-    if(draft.kind!=='FORM'||!errorPath)return
+    if(draft.kind!=='FORM'||focusRequest||!errorPath)return
     const key=errorPath.match(/^answers\.([a-z][a-z0-9_-]*)/i)?.[1]
     if(!key)return
     const index=(draft.definition as FormDraft).pages.findIndex(p=>p.questions.some(q=>q.itemKey===key))
     if(index>=0)setPageIndex(index)
-  },[draft,errorPath])
+  },[draft,errorPath,focusRequest])
   const choose=(key:string,value:Answer)=>setAnswers(old=>{
     const next={...old,[key]:value}
     if(draft.kind==='FORM'){
@@ -46,6 +48,22 @@ export function ResearchPreview({draft,onSimulate,onValidateForm,errorPath,initi
     :[]
   const currentIndex=Math.min(pageIndex,Math.max(0,formPages.length-1))
   const currentPage=formPages[currentIndex]
+  const requestedPage=focusRequest?formPages.findIndex(page=>page.questions.some(q=>q.itemKey===focusRequest.itemKey)):-1
+  useEffect(()=>{
+    if(requestedPage>=0)setPageIndex(requestedPage)
+  },[focusRequest,requestedPage])
+  useEffect(()=>{
+    if(!focusRequest||requestedPage<0||requestedPage!==currentIndex||focusedRequest.current===focusRequest)return
+    // Page state commits before looking up the requested control. Do not remount
+    // the preview or touch answers, and do not repeat a request after typing/nav.
+    const frame=window.requestAnimationFrame(()=>{
+      const target=document.getElementById('survey-preview-'+focusRequest.itemKey)
+      if(!target||!previewRoot.current?.contains(target))return
+      target.classList.add('survey-authoring-target');target.focus();target.scrollIntoView?.({block:'center'})
+      focusedRequest.current=focusRequest
+    })
+    return ()=>window.cancelAnimationFrame(frame)
+  },[focusRequest,requestedPage,currentIndex])
   const simulate=()=>{
     if(draft.kind==='SJT'){onSimulate(answers);return}
     // Score simulation is only offered for SCALE / SJT, not Form refusal answers.
@@ -84,10 +102,11 @@ export function ResearchPreview({draft,onSimulate,onValidateForm,errorPath,initi
         <thead><tr><th scope="col">题目行</th>{q.options.map(o=><th scope="col" key={o.optionKey}>{o.label}</th>)}{q.allowRefusal&&<th scope="col">不愿回答</th>}</tr></thead>
         <tbody>{q.rows.map(row=><tr key={row.rowKey}><th scope="row" className="text-left">{row.label}</th>
           {q.options.map(o=><td className="text-center" key={o.optionKey}><input type="radio"
+            aria-label={q.prompt+' · '+row.label+' · '+o.label}
             name={q.itemKey+':'+row.rowKey} checked={answers[q.itemKey+':'+row.rowKey]===o.optionKey}
             onChange={()=>choose(q.itemKey+':'+row.rowKey,o.optionKey)}/></td>)}
           {q.allowRefusal&&<td className="text-center"><input type="radio"
-            aria-label={'不愿回答：'+row.label} name={q.itemKey+':'+row.rowKey}
+            aria-label={q.prompt+' · '+row.label+' · 不愿回答'} name={q.itemKey+':'+row.rowKey}
             checked={isRefusal(answers[q.itemKey+':'+row.rowKey])}
             onChange={()=>choose(q.itemKey+':'+row.rowKey,refusal())}/></td>}</tr>)}</tbody></table></div>}
       {['SHORT_TEXT','LONG_TEXT'].includes(q.type)&&<BasicFormAnswer question={{...q,prompt:q.prompt||'文本回答'}} rows={q.type==='SHORT_TEXT'?1:4} value={typeof answers[q.itemKey]==='string'?answers[q.itemKey] as string:null} disabled={isRefusal(answers[q.itemKey])} onChange={value=>choose(q.itemKey,value)}/>}
@@ -100,7 +119,7 @@ export function ResearchPreview({draft,onSimulate,onValidateForm,errorPath,initi
       {q.type==='NUMBER'&&<BasicFormAnswer question={{...q,prompt:q.prompt||'数值回答'}} className="input block" value={typeof answers[q.itemKey]==='number'?answers[q.itemKey] as number:null} disabled={isRefusal(answers[q.itemKey])} onChange={value=>choose(q.itemKey,value)}/>}
     </fieldset>
   }
-  return <section className="border rounded-xl p-4 bg-slate-50 space-y-3" aria-label="研究工具试答预览">
+  return <section ref={previewRoot} className="border rounded-xl p-4 bg-slate-50 space-y-3" aria-label="研究工具试答预览">
     <div><h3 className="text-lg font-semibold">模拟作答（不保存正式数据）</h3>
       <p className="text-xs text-slate-600">预览仅用于检查内容、条件与研究计分，绝不产生正式研究被试或 FINAL。</p></div>
     {draft.kind==='FORM'&&<div>

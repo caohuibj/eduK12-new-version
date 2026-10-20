@@ -1,0 +1,11 @@
+{
+  "originalLocalOnly": {
+    "bytes": 6274,
+    "sha256": "1dedfcb4cb5f521156a5c4c549fca1348bf91ffa740d828bdb83444a747f297a"
+  },
+  "sharedRedacted": {
+    "bytes": 6284,
+    "sha256": "3c2f6c6dae52e59f1087e4ea65e927d48b1256af2a3c7d32a5bc67125f07513d"
+  },
+  "redaction": "Only public synthetic password literal replaced; original request loops, metrics and scopes retained. Shared text is review source, not a ready-to-run credential-bearing script."
+}

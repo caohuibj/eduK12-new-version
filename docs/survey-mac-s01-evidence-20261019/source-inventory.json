@@ -1,0 +1,32 @@
+[
+  {
+    "path": "server-version/frontend/src/survey/SurveyApp.tsx",
+    "gitBlob": "b3b6134d7b57466df0e7cbba6666b2f99f41a009",
+    "lines": 223
+  },
+  {
+    "path": "server-version/frontend/src/survey/SurveyPublicApp.tsx",
+    "gitBlob": "4b69b96557c884f309170f03417688fd62274865",
+    "lines": 1021
+  },
+  {
+    "path": "server-version/frontend/src/survey/SurveyBuilder.tsx",
+    "gitBlob": "751034cdc4282ec65f3dbc7a34907ebbefd1305b",
+    "lines": 337
+  },
+  {
+    "path": "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.tsx",
+    "gitBlob": "37351a5c5fca2d03e22c43b1ce677ab30403b534",
+    "lines": 502
+  },
+  {
+    "path": "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.tsx",
+    "gitBlob": "cb7f8acbbec7ec6ff2cce79c669710fdc2736f9e",
+    "lines": 118
+  },
+  {
+    "path": "server-version/frontend/src/survey/survey-landing.css",
+    "gitBlob": "c0109c7ed2d570452369bf3a5cb0f7775e56726e",
+    "lines": 239
+  }
+]

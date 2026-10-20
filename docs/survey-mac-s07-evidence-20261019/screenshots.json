@@ -1,0 +1,236 @@
+{
+  "safari-download-768-error-focus.jpg": {
+    "bytes": 288713,
+    "sha256": "718dffc48e7676e31b4e95394aba2b79b99cb6074b53df8b57cb4c45dca0d67f",
+    "width": 2880,
+    "height": 1592,
+    "originalJPEG": true,
+    "accepted": false,
+    "limitation": "Viewport shown but focus was account-security summary; not download-card/focus pass."
+  },
+  "safari-download-768-visible-error-keyboard.jpg": {
+    "bytes": 356009,
+    "sha256": "87f72aa070645c58496a51f9bdde51876c46f67e0d987c0a56529f8ade1d632f",
+    "width": 2880,
+    "height": 1592,
+    "originalJPEG": true,
+    "accepted": true,
+    "limitation": "Native screenshot, scope per S07 report; image pixels do not determine CSS viewport."
+  },
+  "safari-download-390-error.jpg": {
+    "bytes": 270978,
+    "sha256": "f4442c702e1b281ba18c41fea5afaad89075fe299b01a2eca783aadb11fe0c05",
+    "width": 2880,
+    "height": 1592,
+    "originalJPEG": true,
+    "accepted": true,
+    "limitation": "Native screenshot, scope per S07 report; image pixels do not determine CSS viewport."
+  },
+  "safari-download-desktop-200-error.jpg": {
+    "bytes": 523180,
+    "sha256": "f0e608e011a5f32c5f0f87557f377fd7346b95366e2eb44f84f5c8c411af80e1",
+    "width": 2880,
+    "height": 1592,
+    "originalJPEG": true,
+    "accepted": false,
+    "limitation": "First 200 selection was canceled by Escape; later menu showed100; excluded from200 pass."
+  },
+  "safari-download-200-menu-confirmed.jpg": {
+    "bytes": 628191,
+    "sha256": "537bf80c019334ca289c99e973ae2d6e69a75393b605dd31998dea8b4bcc3a97",
+    "width": 2880,
+    "height": 1592,
+    "originalJPEG": true,
+    "accepted": true,
+    "limitation": "Native screenshot, scope per S07 report; image pixels do not determine CSS viewport."
+  },
+  "safari-download-desktop-200-applied-error.jpg": {
+    "bytes": 431354,
+    "sha256": "c4b8bca22c3bc3d899f4e9a6bafdf7b63741acc6866c87fd3baf1d0d34f377c0",
+    "width": 2880,
+    "height": 1592,
+    "originalJPEG": true,
+    "accepted": true,
+    "limitation": "Native screenshot, scope per S07 report; image pixels do not determine CSS viewport."
+  },
+  "chrome-download-390-error.jpg": {
+    "bytes": 283881,
+    "sha256": "42bac39035f926012c17da41dd59d8fe40859b9c11ef290b0c341dd73482cbea",
+    "width": 2880,
+    "height": 1592,
+    "originalJPEG": true,
+    "accepted": false,
+    "limitation": "Width actually1 after unsupported stepper value assignment; excluded."
+  },
+  "chrome-download-390-applied-error.jpg": {
+    "bytes": 402934,
+    "sha256": "58e6e3756259e90e38ff0c3c901a5387f633789b7e73641313b6eb0dc12207e2",
+    "width": 2880,
+    "height": 1592,
+    "originalJPEG": true,
+    "accepted": false,
+    "limitation": "Not accepted: subsequent width drift demonstrated input had not been frozen; use verified replacement."
+  },
+  "chrome-download-768-applied-error.jpg": {
+    "bytes": 505005,
+    "sha256": "7ab50e37f40065db054cca1f197b3f3a8b7e243498fced680ee08cb3a9aa0b39",
+    "width": 2880,
+    "height": 1592,
+    "originalJPEG": true,
+    "accepted": false,
+    "limitation": "Width actually2041; excluded."
+  },
+  "chrome-download-390-width-confirmed.jpg": {
+    "bytes": 305224,
+    "sha256": "7d1eea06a78278f72186b7b743b0cb51bbbfbc12d7b2e0f6b1967e10837accfb",
+    "width": 2880,
+    "height": 1592,
+    "originalJPEG": true,
+    "accepted": false,
+    "limitation": "Width actually90; excluded."
+  },
+  "chrome-download-390-verified.jpg": {
+    "bytes": 403605,
+    "sha256": "38dc52344aecc29cce028bd61d7ad7fda3fc215bc04388dab8b29481d780411e",
+    "width": 2880,
+    "height": 1592,
+    "originalJPEG": true,
+    "accepted": true,
+    "limitation": "Native screenshot, scope per S07 report; image pixels do not determine CSS viewport."
+  },
+  "chrome-download-768-verified.jpg": {
+    "bytes": 474534,
+    "sha256": "769a1e71f3a5eca87f04709588a298fe48808e478693ff567ddcb979f8f58441",
+    "width": 2880,
+    "height": 1592,
+    "originalJPEG": true,
+    "accepted": true,
+    "limitation": "Native screenshot, scope per S07 report; image pixels do not determine CSS viewport."
+  },
+  "chrome-download-768-keyboard.jpg": {
+    "bytes": 464213,
+    "sha256": "83552984ecdecd0718eacbb1e03160f6d02f0a3dac4242784f04d5c9e5ab7cbc",
+    "width": 2880,
+    "height": 1592,
+    "originalJPEG": true,
+    "accepted": false,
+    "limitation": "Focus was overview container; excluded from keyboard pass."
+  },
+  "chrome-download-768-keyboard-verified.jpg": {
+    "bytes": 474434,
+    "sha256": "4e948e64251dd2523c12ccabdfcad076bc91fefccd5470fe27dd787556333331",
+    "width": 2880,
+    "height": 1592,
+    "originalJPEG": true,
+    "accepted": true,
+    "limitation": "Native screenshot, scope per S07 report; image pixels do not determine CSS viewport."
+  },
+  "chrome-download-desktop-200-error.jpg": {
+    "bytes": 454498,
+    "sha256": "9a621ec5f958e0e0ea5fdc244b928a3365974845484ec9ba77240c31fead7930",
+    "width": 2880,
+    "height": 1592,
+    "originalJPEG": true,
+    "accepted": true,
+    "limitation": "Native screenshot, scope per S07 report; image pixels do not determine CSS viewport."
+  },
+  "safari-chain-admin-active-researcher.jpg": {
+    "bytes": 409375,
+    "sha256": "2a648da7bb57cee5cedad1017c085a89d8c2d60bb2c231db386e9456e108790b",
+    "width": 2880,
+    "height": 1592,
+    "originalJPEG": true,
+    "accepted": true,
+    "limitation": "Native screenshot, scope per S07 report; image pixels do not determine CSS viewport."
+  },
+  "safari-admin-nonempty-expired-invitation.jpg": {
+    "bytes": 418603,
+    "sha256": "bf61acf6206956f071e800f27836459cefaa8180ad6889d8d7bb4e78d174f3dc",
+    "width": 2880,
+    "height": 1592,
+    "originalJPEG": true,
+    "accepted": true,
+    "limitation": "Native screenshot, scope per S07 report; image pixels do not determine CSS viewport."
+  },
+  "safari-admin-exact-version-revoked.jpg": {
+    "bytes": 416217,
+    "sha256": "ee25008edfef4196878772692e3da3216fff209db1d1ae12fe3b940e2cb84bec",
+    "width": 2880,
+    "height": 1592,
+    "originalJPEG": true,
+    "accepted": true,
+    "limitation": "Native screenshot, scope per S07 report; image pixels do not determine CSS viewport."
+  },
+  "safari-admin-exact-version-visible.jpg": {
+    "bytes": 319592,
+    "sha256": "649cd56e3e01e2d4c008d88b4862e970d150b2037ba2f88e5a8afd877ca49c70",
+    "width": 2880,
+    "height": 1592,
+    "originalJPEG": true,
+    "accepted": true,
+    "limitation": "Native screenshot, scope per S07 report; image pixels do not determine CSS viewport."
+  },
+  "safari-chain-researcher-existing-project.jpg": {
+    "bytes": 401940,
+    "sha256": "a65336fe4b9020e581dbdad428e20c1951e747d86626be1c488e4e18fcd5f220",
+    "width": 2880,
+    "height": 1592,
+    "originalJPEG": true,
+    "accepted": true,
+    "limitation": "Native screenshot, scope per S07 report; image pixels do not determine CSS viewport."
+  },
+  "safari-chain-form-synthetic-answers.jpg": {
+    "bytes": 318943,
+    "sha256": "a58402fc1ecf117446552aff97510f71327dffa7f76a0a9d109c7131b035b99b",
+    "width": 2880,
+    "height": 1592,
+    "originalJPEG": true,
+    "accepted": false,
+    "limitation": "Intermediate text input state; final single text confirmed separately before submission."
+  },
+  "safari-chain-form-final-answers.jpg": {
+    "bytes": 319278,
+    "sha256": "44eac273f305a5672fab995a8777c80288e85d8ba2820303a78ed6f61383f7bb",
+    "width": 2880,
+    "height": 1592,
+    "originalJPEG": true,
+    "accepted": true,
+    "limitation": "Native screenshot, scope per S07 report; image pixels do not determine CSS viewport."
+  },
+  "safari-chain-first-final-completed.jpg": {
+    "bytes": 317168,
+    "sha256": "61e98700fec1c65ed0d2246fd33db98abf28ac7a8e312923fda919fc28bde99b",
+    "width": 2880,
+    "height": 1592,
+    "originalJPEG": true,
+    "accepted": true,
+    "limitation": "Native screenshot, scope per S07 report; image pixels do not determine CSS viewport."
+  },
+  "safari-chain-current-export-two-files-started.jpg": {
+    "bytes": 508235,
+    "sha256": "05f007917ffed80c4d40be36794a90ca1263bcfdb1ce89b181412094f4d5448b",
+    "width": 2880,
+    "height": 1592,
+    "originalJPEG": true,
+    "accepted": true,
+    "limitation": "Native screenshot, scope per S07 report; image pixels do not determine CSS viewport."
+  },
+  "chrome-admin-nonempty-expired-invitation.jpg": {
+    "bytes": 449115,
+    "sha256": "72f2180deaf9d6f26d8d9e38af617b17b774ee500d8e236b785a9646027c5e94",
+    "width": 2880,
+    "height": 1592,
+    "originalJPEG": true,
+    "accepted": true,
+    "limitation": "Native screenshot, scope per S07 report; image pixels do not determine CSS viewport."
+  },
+  "chrome-admin-exact-version-visible.jpg": {
+    "bytes": 338355,
+    "sha256": "4fd0511a9a1585c2602a0fa2b5958a796f0a2c004592ca53406a703ef4d075eb",
+    "width": 2880,
+    "height": 1592,
+    "originalJPEG": true,
+    "accepted": true,
+    "limitation": "Native screenshot, scope per S07 report; image pixels do not determine CSS viewport."
+  }
+}

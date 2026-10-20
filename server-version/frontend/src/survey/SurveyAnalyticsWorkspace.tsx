@@ -1,4 +1,4 @@
-import { useEffect,useState,type FormEvent } from 'react'
+import { useEffect,useRef,useState,type FormEvent } from 'react'
 
 type ApiResult<T>={code:number|string;message:string;data:T|null}
 type WaveSummary={id:string;ordinal:number;title:string;status:string;
@@ -37,10 +37,34 @@ type ExportFormat='RAW_WAVE'|'RAW_LONG'|'RAW_WIDE'|'SCORE_LONG'|'SCORE_WIDE'|'CO
 type Ticket={id:string;status:'READY';format:ExportFormat;expiresAt:string;
   nextCursor:string|null;pageNumber:number|null;
   manifest:{rowCount:number;columnCount:number;
+    sourceCutOff?:string;sourceProjectRevision?:number;
     batch?:{phase?:'VERIFIED_FINAL'|'NON_FINAL_PARTICIPATION';representation?:string}}}
+type ExportSelection={format:ExportFormat;waveId?:string;includeFreeText?:boolean;
+  completedFrom?:string;completedBefore?:string}
+type ExportRequest={selection:ExportSelection;cursor?:string}
+type PreviousFiles={ticketId:string;page:number;parts:string[]}
+class SurveyApiError extends Error {
+  constructor(message:string,readonly status:number,readonly retryUntil:number|null){
+    super(message+(status===429&&retryUntil===null
+      ?' 服务器未提供可用的 Retry-After；请稍后手动重试，不会自动重复请求。':''))
+  }
+}
+function retryDeadline(value:string|null):number|null{
+  if(value===null||!value.trim())return null
+  const time=/^\d+$/.test(value.trim())?Date.now()+Number(value)*1000:Date.parse(value)
+  return Number.isFinite(time)?Math.max(Date.now(),time):null
+}
+const sameFrozenPage=(before:Ticket,after:Ticket)=>
+  before.pageNumber===after.pageNumber&&before.format===after.format
+  &&before.manifest.sourceCutOff===after.manifest.sourceCutOff
+  &&before.manifest.sourceProjectRevision===after.manifest.sourceProjectRevision
+  &&before.manifest.batch?.phase===after.manifest.batch?.phase
+  &&before.manifest.batch?.representation===after.manifest.batch?.representation
 const isCompactAttendance=(ticket:Ticket)=>['ATTENDANCE_COMPACT_V1','ATTENDANCE_COMPACT_V2']
   .includes(ticket.manifest.batch?.representation??'')
 type Artifact={id:string;format:ExportFormat;csv:string;codebook:unknown;manifest:unknown}
+type DownloadPart='csv'|'codebook'|'manifest'
+const downloadParts:[DownloadPart,string][]=[['csv','CSV'],['codebook','Codebook'],['manifest','Manifest']]
 const kindOptions:Record<ExportFormat,string>={
   RAW_WAVE:'单波次逐题原始数据',
   RAW_LONG:'全部波次逐题 Long',
@@ -66,9 +90,15 @@ async function api<T>(endpoint:string,method='GET',body?:unknown):Promise<T>{
     method,credentials:'same-origin',headers,
     ...(body===undefined?{}:{body:JSON.stringify(body)}),
   })
-  const result=await response.json() as ApiResult<T>
+  const retryUntil=retryDeadline(response.headers?.get('Retry-After')??null)
+  let result:ApiResult<T>
+  try{result=await response.json() as ApiResult<T>}
+  catch(e){
+    if(!response.ok)throw new SurveyApiError('服务器请求未完成（HTTP '+response.status+'）',response.status,retryUntil)
+    throw e
+  }
   if(!response.ok||result.code!==0||result.data===null)
-    throw new Error(result.message||'操作失败')
+    throw new SurveyApiError(result.message||'操作失败',response.status,retryUntil)
   return result.data
 }
 const downloadBlob=(filename:string,value:string,mime:string)=>{
@@ -76,8 +106,8 @@ const downloadBlob=(filename:string,value:string,mime:string)=>{
   const url=URL.createObjectURL(blob)
   const anchor=document.createElement('a')
   anchor.href=url;anchor.download=filename
-  document.body.append(anchor);anchor.click();anchor.remove()
-  window.setTimeout(()=>URL.revokeObjectURL(url),3000)
+  try{document.body.append(anchor);anchor.click()}
+  finally{anchor.remove();window.setTimeout(()=>URL.revokeObjectURL(url),3000)}
 }
 export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
   const [overview,setOverview]=useState<Overview|null>(null)
@@ -92,11 +122,23 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
   const [groupItem,setGroupItem]=useState(''),[groupScore,setGroupScore]=useState('')
   const [groupResult,setGroupResult]=useState<GroupResult|null>(null)
   const [format,setFormat]=useState<ExportFormat>('RAW_WAVE'),[waveId,setWaveId]=useState('')
-  const [exportWaveId,setExportWaveId]=useState(''),[batchDownloaded,setBatchDownloaded]=useState(false)
+  const [exportWaveId,setExportWaveId]=useState('')
+  const [downloadsStarted,setDownloadsStarted]=useState<Partial<Record<DownloadPart,boolean>>>({})
+  const [downloadIssue,setDownloadIssue]=useState<string|null>(null)
   const [completedFrom,setCompletedFrom]=useState(''),[completedBefore,setCompletedBefore]=useState('')
   const [otp,setOtp]=useState(''),[busy,setBusy]=useState(false)
   const [includeFreeText,setIncludeFreeText]=useState(false),[message,setMessage]=useState('')
   const [error,setError]=useState(''),[ticket,setTicket]=useState<Ticket|null>(null)
+  const [exportRequest,setExportRequest]=useState<ExportRequest|null>(null)
+  const [previousFiles,setPreviousFiles]=useState<PreviousFiles|null>(null)
+  const [retryUntil,setRetryUntil]=useState(0),[clock,setClock]=useState(Date.now)
+  const [ticketUnavailable,setTicketUnavailable]=useState(false)
+  const [continuationStopped,setContinuationStopped]=useState(false)
+  const operationInFlight=useRef(false),exportEpoch=useRef(0)
+  const mounted=useRef(true)
+  const currentProject=useRef(projectId),currentTicket=useRef<string|null>(null)
+  currentProject.current=projectId
+  const previousFilesRef=useRef<PreviousFiles|null>(null)
   const [qualityRows,setQualityRows]=useState<QualityRow[]>([])
   const [qualityPage,setQualityPage]=useState(1)
   const [qualityReason,setQualityReason]=useState('')
@@ -104,13 +146,37 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
     attemptId:string;page:number;list:QualityAudit[]
   }|null>(null)
   const base='/projects/'+projectId
+  const rememberFiles=()=>{
+    if(!ticket)return
+    const parts=downloadParts.filter(([part])=>downloadsStarted[part]).map(([,label])=>label)
+    if(parts.length){
+      const previous={ticketId:ticket.id,page:ticket.pageNumber??1,parts}
+      previousFilesRef.current=previous;setPreviousFiles(previous)
+    }
+  }
+  const invalidateExport=()=>{
+    exportEpoch.current++;currentTicket.current=null
+    rememberFiles();setTicket(null);setExportRequest(null);setDownloadsStarted({})
+    setDownloadIssue(null);setTicketUnavailable(false);setContinuationStopped(false)
+    // A new selection/ticket does not replenish the researcher's rate budget.
+  }
+  const ticketId=ticket?.id
+  useEffect(()=>{
+    if(!ticketId&&!retryUntil)return
+    const timer=window.setInterval(()=>setClock(Date.now()),1000)
+    return()=>window.clearInterval(timer)
+  },[ticketId,retryUntil])
+  const waiting=retryUntil>clock
+  const ticketExpired=!!ticket&&Date.parse(ticket.expiresAt)<=clock
+  const needsRecovery=ticketExpired||ticketUnavailable
   const changeWave=(id:string)=>{
-    setWaveId(id);setTicket(null);setBatchDownloaded(false)
+    setWaveId(id);invalidateExport()
     setItemStats(null);setPairedScore(null);setGroupResult(null);setGroupItem('');setGroupScore('')
     setBoundedVariables([]);setBoundedItemKey('');setBoundedItem(null)
   }
   const reload=async()=>{
     const res=await api<Overview>(base+'/analytics/overview')
+    if(currentProject.current!==projectId)return
     setOverview(res)
     const ordered=res.waves
     changeWave(ordered[0]?.id??'')
@@ -118,14 +184,23 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
     if(ordered[1])setFollowup(ordered[1].id)
   }
   useEffect(()=>{
-    setOverview(null);setError('');setTicket(null);setPaired(null)
+    mounted.current=true
+    setOverview(null);setError('');setPaired(null)
+    exportEpoch.current++;currentTicket.current=null
+    setTicket(null);setExportRequest(null);setDownloadsStarted({});setDownloadIssue(null)
+    setTicketUnavailable(false);setContinuationStopped(false)
+    previousFilesRef.current=null;setPreviousFiles(null)
     setQualityRows([]);setQualityPage(1)
     void Promise.all([reload(),loadQuality(1)])
-      .catch(e=>setError(e instanceof Error?e.message:'研究分析尚不可用'))
+      .catch(e=>{if(currentProject.current===projectId)setError(e instanceof Error?e.message:'研究分析尚不可用')})
+    return()=>{mounted.current=false;currentTicket.current=null}
   },[projectId])
-  const execute=async(fn:()=>Promise<void>)=>{
-    setBusy(true);setError('');setMessage('')
-    try{await fn()}catch(e){setError(e instanceof Error?e.message:'请求未完成')}finally{setBusy(false)}
+  const execute=async(fn:()=>Promise<void>,isCurrent=()=>true)=>{
+    if(operationInFlight.current)return
+    operationInFlight.current=true
+    setBusy(true);setError('');setMessage('');setDownloadIssue(null)
+    try{await fn()}catch(e){if(isCurrent())setError(e instanceof Error?e.message:'请求未完成')}
+    finally{operationInFlight.current=false;setBusy(false)}
   }
   const loadQuality=async(page=qualityPage)=>{
     const data=await api<{list:QualityRow[]}>(base+'/analytics/quality/attempts?page='+page)
@@ -145,7 +220,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
       await api(base+'/analytics/quality/attempts/'+row.attemptId,'POST',{
         revision:row.revision,verdict,reason:qualityReason.trim(),
       })
-      setQualityReason('');setTicket(null);setBatchDownloaded(false)
+      setQualityReason('');invalidateExport()
       await Promise.all([reload(),loadQuality(qualityPage)])
       setMessage('样本质量决定已记录审计，旧的未下载导出已失效。')
     })
@@ -199,40 +274,105 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
     await api('/auth/mfa/step-up','POST',{code:otp.trim()})
     setOtp('');setMessage('已完成最新 TOTP 二次认证；敏感导出仅在接下来的五分钟内有效。')
   })}
-  const createExport=(cursor?:string)=>void execute(async()=>{
-    const result=await api<Ticket>(base+'/exports','POST',{
-      format,...(['RAW_WAVE','COGNITIVE_TRIAL_LONG'].includes(format)?{waveId}:
-        (['RAW_LONG','SCORE_LONG'].includes(format)&&exportWaveId?{waveId:exportWaveId}:{})),
-      ...(format.startsWith('RAW')?{includeFreeText}:{}),
-      ...(['RAW_WAVE','COGNITIVE_TRIAL_LONG'].includes(format)?{
-        ...(completedFrom?{completedFrom:new Date(completedFrom).toISOString()}:{}),
-        ...(completedBefore?{completedBefore:new Date(completedBefore).toISOString()}:{}),
-      }:{}),
-      ...(cursor?{cursor}:{}),
-    })
-    setTicket(result);setBatchDownloaded(false)
-    setMessage(isCompactAttendance(result)
-      ?'已生成紧凑参与状态表；每人每波次一行。按研究编号及波次关联 FINAL CSV，切勿直接拼接两种 CSV。'
-      :'第 '+(result.pageNumber||1)+' 批有效 FINAL 已生成；逐批下载并保留 Manifest。')
-  })
-  const download=()=>{if(!ticket)return;void execute(async()=>{
-    const artifact=await api<Artifact>(base+'/exports/'+ticket.id+'/download')
+  const exportFailure=(e:unknown,kind:'read'|'create'|'continuation')=>{
+    if(!(e instanceof SurveyApiError))return
+    if(e.status===429){setRetryUntil(e.retryUntil??0);setClock(Date.now())}
+    if(kind==='read'&&(e.status===404||e.status===410))setTicketUnavailable(true)
+    if(e.status===409||(kind==='continuation'&&e.status===400))setContinuationStopped(true)
+  }
+  const createExport=(mode:'new'|'next'|'recover'|'restart'='new')=>{
+    if(operationInFlight.current||retryUntil>Date.now())return
+    const recovering=mode==='recover',continuing=mode==='next'||recovering
+    if(continuing&&(!ticket||!exportRequest||continuationStopped))return
+    const cursor=recovering?exportRequest?.cursor:mode==='next'?ticket?.nextCursor:undefined
+    if(continuing&&!cursor)return
+    if(!continuing&&(ticket||previousFilesRef.current)&&!window.confirm(
+      '将从首批开始新的完整导出，并采用新水位。旧的部分文件不能与新导出混作同一批；旧磁盘文件不会删除。确认重新开始？'))return
+    const epoch=exportEpoch.current,project=projectId
+    const isCurrent=()=>mounted.current&&currentProject.current===project&&exportEpoch.current===epoch
+    void execute(async()=>{
+      try{
+        const selection:ExportSelection=continuing?{...exportRequest!.selection}:{
+          format,...(['RAW_WAVE','COGNITIVE_TRIAL_LONG'].includes(format)?{waveId}:
+            (['RAW_LONG','SCORE_LONG'].includes(format)&&exportWaveId?{waveId:exportWaveId}:{})),
+          ...(format.startsWith('RAW')?{includeFreeText}:{}),
+          ...(['RAW_WAVE','COGNITIVE_TRIAL_LONG'].includes(format)?{
+            ...(completedFrom?{completedFrom:new Date(completedFrom).toISOString()}:{}),
+            ...(completedBefore?{completedBefore:new Date(completedBefore).toISOString()}:{}),
+          }:{}),
+        }
+        const result=await api<Ticket>(base+'/exports','POST',{
+          ...selection,...(cursor?{cursor}:{}),
+        })
+        if(!isCurrent())return
+        if(recovering&&!sameFrozenPage(ticket!,result))
+          throw new SurveyApiError('重建回执与原批次页号或冻结来源不一致，已停止此分页导出。',409,null)
+        rememberFiles()
+        exportEpoch.current++;currentTicket.current=result.id
+        setTicket(result);setExportRequest({selection,...(cursor?{cursor}:{})})
+        setDownloadsStarted({});setTicketUnavailable(false);setContinuationStopped(false);setClock(Date.now())
+        setMessage(recovering
+          ?'已重新生成当前第 '+(result.pageNumber||1)+' 批。新票据的三个文件均需分别发起；Manifest generatedAt 会变化，不保证与旧文件逐字相同。请使用同一新票据的三件文件。'
+          :isCompactAttendance(result)
+            ?'已生成紧凑参与状态表；每人每波次一行。按研究编号及波次关联 FINAL CSV，切勿直接拼接两种 CSV。'
+            :'第 '+(result.pageNumber||1)+' 批有效 FINAL 已生成；逐批下载并保留 Manifest。')
+      }catch(e){
+        if(!isCurrent())return
+        exportFailure(e,continuing?'continuation':'create')
+        const issue=e instanceof TypeError||e instanceof SyntaxError
+          ||(e instanceof DOMException&&e.name==='SyntaxError')
+          ?'生成结果未确认；没有自动重复生成。原批次位置已保留，请先核对状态，再明确选择操作。'
+          :e instanceof Error?e.message:'生成结果未确认；没有自动重新生成，请先核对当前批次。'
+        setDownloadIssue(issue)
+        throw new Error(issue)
+      }
+    },isCurrent)
+  }
+  const download=(part:DownloadPart)=>{
+    if(!ticket||retryUntil>Date.now()||needsRecovery||continuationStopped)return
+    if(Date.parse(ticket.expiresAt)<=Date.now()){setClock(Date.now());return}
+    const epoch=exportEpoch.current,project=projectId,id=ticket.id
+    const isCurrent=()=>mounted.current&&currentProject.current===project&&exportEpoch.current===epoch&&currentTicket.current===id
+    void execute(async()=>{
+    try{
+    const label=downloadParts.find(([key])=>key===part)![1]
+    let artifact:Artifact
+    try{
+      artifact=await api<Artifact>(base+'/exports/'+ticket.id+'/download')
+      if(artifact.id!==ticket.id||artifact.format!==ticket.format||typeof artifact.csv!=='string'
+        ||!artifact.codebook||typeof artifact.codebook!=='object'||!artifact.manifest||typeof artifact.manifest!=='object')
+        throw new Error('导出回执与当前批次不一致或内容不完整')
+    }catch(e){
+      if(!isCurrent())return
+      exportFailure(e,'read')
+      const reason=e instanceof TypeError||e instanceof SyntaxError
+        ||(e instanceof DOMException&&e.name==='SyntaxError')
+        ?'未能读取服务器文件内容，请检查连接后重试此文件。'
+        :e instanceof Error?e.message:'请重试原批次。'
+      throw new Error(label+' 内容获取失败，尚未发起本次文件下载。'+reason)
+    }
+    if(!isCurrent())return
     const batchLabel=String(ticket.pageNumber??1).padStart(3,'0')
     const baseName='survey_'+projectId.slice(0,8)+'_'+artifact.format.toLowerCase()
       +'_batch'+batchLabel+(isCompactAttendance(ticket)
         ?'_attendance':'')+'_'+ticket.id.slice(0,8)
-    downloadBlob(baseName+'.csv','\uFEFF'+artifact.csv,'text/csv;charset=utf-8')
-    downloadBlob(baseName+'_codebook.json',JSON.stringify(artifact.codebook,null,2),'application/json;charset=utf-8')
-    downloadBlob(baseName+'_manifest.json',JSON.stringify(artifact.manifest,null,2),'application/json;charset=utf-8')
-    setBatchDownloaded(true)
-    setMessage(isCompactAttendance(ticket)
-      ?'已下载参与状态 CSV 和 Manifest；按状态表 research_code / wave_id 对应 FINAL 的 research_code_or_attempt / wave_id 关联，不能直接拼接行。'
-      :'已下载当前批次 CSV、变量编码字典和 Manifest，请保管敏感数据。')
-  })}
+    const filename=baseName+(part==='csv'?'.csv':'_'+part+'.json')
+    try{
+      downloadBlob(filename,part==='csv'?'\uFEFF'+artifact.csv:
+        JSON.stringify(part==='codebook'?artifact.codebook:artifact.manifest,null,2),
+      part==='csv'?'text/csv;charset=utf-8':'application/json;charset=utf-8')
+    }catch{throw new Error(label+' 下载发起结果未确认，请先核对浏览器下载列表，再重试此文件。')}
+    setDownloadsStarted(previous=>({...previous,[part]:true}))
+    setMessage('已发起 '+filename+' 下载。请在浏览器下载列表核对是否保存；网页无法确认文件已落盘。若被取消或拦截，请重试此文件。')
+    }catch(e){
+      if(!isCurrent())return
+      setDownloadIssue(e instanceof Error?e.message:'文件下载结果未确认，请核对浏览器下载列表。');throw e
+    }
+  },isCurrent)}
   return <section className="border rounded-xl bg-white p-4 sm:p-6 my-5 space-y-4" aria-label="研究数据">
     <header><h2 className="text-xl font-semibold">研究数据 · Wave Analytics</h2>
       <p className="text-sm text-slate-600">完成与配对统计只来源于可核对的加密 Survey FINAL；研究编号数不等于经过实名验证的自然人数。</p></header>
-    {error&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{error}</p>}
+    {error&&(!downloadIssue||!ticket)&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{error}</p>}
     {message&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{message}</p>}
     <fieldset disabled={busy} className="min-w-0 border-0 p-0 space-y-4" aria-label="研究数据操作">
     <button className="btn-secondary" disabled={busy} onClick={()=>void execute(reload)}>刷新完成进度</button>
@@ -448,7 +588,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
         </form>
         <div className="flex flex-wrap gap-3 items-end">
           <label className="text-sm">数据格式
-            <select className="input block" value={format} onChange={e=>{setFormat(e.target.value as ExportFormat);setTicket(null)}}>
+            <select className="input block" value={format} onChange={e=>{setFormat(e.target.value as ExportFormat);invalidateExport()}}>
               {Object.entries(kindOptions).filter(([kind])=>
                 overview.collectionMode==='LINKED_WAVES'||!kind.includes('WIDE'))
                 .map(([kind,label])=><option key={kind} value={kind}>{label}</option>)}
@@ -456,7 +596,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
           {['RAW_LONG','SCORE_LONG'].includes(format)&&
              <label className="text-sm">大样本可选单波次分批导出
                <select className="input block" value={exportWaveId}
-                 onChange={e=>{setExportWaveId(e.target.value);setTicket(null)}}>
+                 onChange={e=>{setExportWaveId(e.target.value);invalidateExport()}}>
                  <option value="">全部波次（≤250 FINAL）</option>
                  {overview.waves.map(w=><option key={w.id} value={w.id}>T{w.ordinal} {w.title}</option>)}
                </select>
@@ -467,31 +607,60 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
             </select></label>}
           {['RAW_WAVE','COGNITIVE_TRIAL_LONG'].includes(format)&&<div className="grid gap-2 text-sm">
             <label>完成时间起点（含）<input type="datetime-local" className="input block w-full"
-              value={completedFrom} onChange={e=>{setCompletedFrom(e.target.value);setTicket(null)}}/></label>
+              value={completedFrom} onChange={e=>{setCompletedFrom(e.target.value);invalidateExport()}}/></label>
             <label>完成时间终点（不含）<input type="datetime-local" className="input block w-full"
-              value={completedBefore} onChange={e=>{setCompletedBefore(e.target.value);setTicket(null)}}/></label>
+              value={completedBefore} onChange={e=>{setCompletedBefore(e.target.value);invalidateExport()}}/></label>
             <p className="text-xs">留空表示不限制。按完成时间分段；未 FINAL 的记录可能重复出现，合并时请按研究编号和状态去重。</p>
           </div>}
-          <button type="button" className="btn-primary" disabled={busy||['RAW_WAVE','COGNITIVE_TRIAL_LONG'].includes(format)&&!waveId}
+          <button type="button" className="btn-primary" disabled={busy||waiting||['RAW_WAVE','COGNITIVE_TRIAL_LONG'].includes(format)&&!waveId}
             onClick={()=>createExport()}>创建受控导出</button>
         </div>
+        {retryUntil>0&&<p role="status" className="text-sm text-amber-800">
+          {waiting?'服务器要求等待至 '+new Date(retryUntil).toLocaleString('zh-CN')
+            +'（剩余 '+Math.ceil((retryUntil-clock)/1000)+' 秒）；请勿重复请求。'
+            :'服务器指定的等待时间已到；请手动继续，仍须通过服务端限流与二次认证。'}
+          不会自动下载或重新生成；新建票据也不会重置读取限额。
+        </p>}
+        {previousFiles&&<p className="text-xs text-slate-600">
+          旧票据 {previousFiles.ticketId}（第 {previousFiles.page} 批）的 {previousFiles.parts.join('、')} 曾发起，未确认保存。
+          旧磁盘文件不会删除；不能将旧的部分文件与新票据三件混作同一批。
+        </p>}
         {format==='COGNITIVE_TRIAL_LONG'&&<p className="text-sm text-amber-800">认知试次按行与字节预算分批导出，只包含已被整轮 FINAL 引用的子结果；含协议、epoch、测量签名与研究授权范围内的复现信息。请保留每批 Codebook 与 Manifest，不将不同版本、输入设备的结果直接合并。</p>}
         {format.startsWith('RAW')&&<label className="flex gap-2 text-sm items-start rounded-lg border border-amber-200 bg-amber-50 p-3">
           <input type="checkbox" checked={includeFreeText}
-            onChange={e=>{setIncludeFreeText(e.target.checked);setTicket(null)}}/>
+            onChange={e=>{setIncludeFreeText(e.target.checked);invalidateExport()}}/>
           包含自由文本原始回答（可能含姓名、班级或间接身份线索）。默认不导出，需要确认本项目知情同意覆盖该用途，并妥善控制保存与共享。
         </label>}
-        {ticket&&<div className="border rounded-lg p-3 space-y-2">
+        {ticket&&<div role="region" aria-label="当前导出批次" className="border rounded-lg p-3 space-y-2">
           <p className="text-sm">导出 {ticket.format} · 第 {ticket.pageNumber||1} 批 · {ticket.manifest.rowCount} 行 ·
             {ticket.manifest.columnCount} 列</p>
           <p className="text-xs">到期：{new Date(ticket.expiresAt).toLocaleString('zh-CN')}</p>
           {isCompactAttendance(ticket)&&
             <p className="text-xs text-amber-800">本批为独立参与状态表，不是逐题答案；请保留 Manifest 的关联说明。</p>}
-          <button type="button" className="btn-secondary" disabled={busy} onClick={download}>
-            下载当前批次 CSV、Codebook 与 Manifest</button>
+          <p className="text-xs">本批提供 3 个独立文件：CSV、变量编码字典 Codebook、Manifest。逐个点击下载；浏览器可能要求许可或选择保存位置。</p>
+          {downloadIssue&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{downloadIssue}</p>}
+          {(needsRecovery||continuationStopped)&&<div className="space-y-2 text-sm">
+            <p>{continuationStopped
+              ?'原分页凭证或冻结来源已被拒绝，已停止此导出链；不会自动换新水位。'
+              :'当前票据已到期或不可用，请勿继续读取旧票据。'}</p>
+            {exportRequest?.cursor&&!continuationStopped
+              ?<><p>可在原入站游标仍有效时，按冻结筛选重新生成当前页；服务端仍检查权限、五分钟二次认证、原修订与样本范围。游标超过一小时或来源变化会被拒绝。</p>
+                <button type="button" className="btn-secondary" disabled={busy||waiting}
+                  onClick={()=>createExport('recover')}>重新生成当前第 {ticket.pageNumber||1} 批</button></>
+              :<p>当前没有可用的同水位恢复凭证。首批原本没有入站游标，无法保证重建原快照；必须明确选择新的完整导出。</p>}
+            <p>重新开始将采用新水位；旧的部分文件不能与新导出混作同一批，操作前需要确认。</p>
+            <button type="button" className="btn-secondary" disabled={busy||waiting}
+              onClick={()=>createExport('restart')}>重新开始完整导出（新水位）</button>
+          </div>}
+          <div className="flex flex-wrap gap-2">{downloadParts.map(([part,label])=><div key={part}>
+            <button type="button" className="btn-secondary" disabled={busy||waiting||needsRecovery||continuationStopped} onClick={()=>download(part)}>
+              {downloadsStarted[part]?'重新发起 ':'下载 '}{label}</button>
+            <p className="text-xs">{label}：{downloadsStarted[part]?'已发起，请核对保存':'尚未发起'}</p>
+          </div>)}</div>
           {ticket.nextCursor&&<button className="btn-secondary" type="button"
-            disabled={busy||!batchDownloaded} onClick={()=>createExport(ticket.nextCursor!)}>
-            当前批次已下载，生成下一批</button>}
+            disabled={busy||waiting||continuationStopped||!downloadParts.every(([part])=>downloadsStarted[part])} onClick={()=>createExport('next')}>
+            生成下一批（请先核对本批文件）</button>}
+          {ticket.nextCursor&&<p className="text-xs">三个文件均发起后可继续。发起不等于保存成功；继续前请自行核对本批文件，取消或失败时先重试相应文件。</p>}
           {ticket.nextCursor&&<p className="text-xs">分批数据以同一时间水位和研究修订版本固定样本范围；
             FINAL 页可合并，独立参与状态页按研究编号与波次关联；不要将两类 CSV 直接拼接。</p>}
         </div>}

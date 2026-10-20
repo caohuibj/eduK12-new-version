@@ -1,0 +1,252 @@
+{
+  "files": {
+    "chrome": {
+      "survey_871d81fa_cognitive_trial_long_batch001_6635a858 (1).csv": {
+        "bytes": 121169,
+        "sha256": "28750d671508f17baee83e54bb8694c2f3966d082da9390961e267d07caf21f5",
+        "dataRows": 120,
+        "columns": 42,
+        "rowWidths": [
+          42
+        ],
+        "singleUtf8Bom": true,
+        "crlf": true,
+        "chineseCells": 0
+      },
+      "survey_871d81fa_cognitive_trial_long_batch001_6635a858.csv": {
+        "bytes": 121169,
+        "sha256": "28750d671508f17baee83e54bb8694c2f3966d082da9390961e267d07caf21f5",
+        "dataRows": 120,
+        "columns": 42,
+        "rowWidths": [
+          42
+        ],
+        "singleUtf8Bom": true,
+        "crlf": true,
+        "chineseCells": 0
+      },
+      "survey_871d81fa_cognitive_trial_long_batch001_6635a858_codebook.json": {
+        "bytes": 4303,
+        "sha256": "0062a56989ca3609ddf1a7050b58e46da1183cae3effcb9bac438ad14f551776",
+        "jsonType": "list"
+      },
+      "survey_871d81fa_cognitive_trial_long_batch001_6635a858_manifest.json": {
+        "bytes": 3009,
+        "sha256": "be2f794c0fdfab2dbaacffac78533460fa0205882b7143cd9661bcefddd8bbe7",
+        "jsonType": "dict",
+        "manifestCounts": {
+          "format": "COGNITIVE_TRIAL_LONG",
+          "rowCount": 120,
+          "columnCount": 42,
+          "formulaGuard": "EXCEL_APOSTROPHE_PREFIX",
+          "includeFreeText": null
+        }
+      },
+      "survey_871d81fa_raw_wave_batch001_08feb9d2.csv": {
+        "bytes": 3805,
+        "sha256": "d8f17ba8ae8422a5d48ddcbacb95a44c5fde0707af53d6c67ffaeca584b29e1f",
+        "dataRows": 12,
+        "columns": 17,
+        "rowWidths": [
+          17
+        ],
+        "singleUtf8Bom": true,
+        "crlf": true,
+        "chineseCells": 0
+      },
+      "survey_871d81fa_raw_wave_batch001_08feb9d2_codebook.json": {
+        "bytes": 1512,
+        "sha256": "5c70af5107609eb2c76f80632a74a3dfe0478e3a351d25ef0dc48dbfbb2e0a42",
+        "jsonType": "list"
+      },
+      "survey_871d81fa_raw_wave_batch001_08feb9d2_manifest.json": {
+        "bytes": 2215,
+        "sha256": "9efe6c9a75865e5bc09b1fc55dfd1ca0e3b0a56953f08aab092ef54d5c0d4dfe",
+        "jsonType": "dict",
+        "manifestCounts": {
+          "format": "WAVE",
+          "rowCount": 12,
+          "columnCount": 17,
+          "formulaGuard": "EXCEL_APOSTROPHE_PREFIX",
+          "includeFreeText": null
+        }
+      },
+      "survey_871d81fa_raw_wave_batch001_4168baca.csv": {
+        "bytes": 5819,
+        "sha256": "457c4bf2108a881c66d48b05e82774ad1fb23d20b8b1492cade5c818a6c8ec1b",
+        "dataRows": 18,
+        "columns": 17,
+        "rowWidths": [
+          17
+        ],
+        "singleUtf8Bom": true,
+        "crlf": true,
+        "chineseCells": 5
+      },
+      "survey_871d81fa_raw_wave_batch001_4168baca_codebook.json": {
+        "bytes": 2099,
+        "sha256": "8b73be7939943637061957c1ed47615c827772ef389f6cdbfaeb19f996335fc5",
+        "jsonType": "list"
+      },
+      "survey_871d81fa_raw_wave_batch001_4168baca_manifest.json": {
+        "bytes": 2214,
+        "sha256": "7f4b28cd3ae8bbce1ee97a676fd87d1e1f1e8ebb8af634b227207c355ab40cfd",
+        "jsonType": "dict",
+        "manifestCounts": {
+          "format": "WAVE",
+          "rowCount": 18,
+          "columnCount": 17,
+          "formulaGuard": "EXCEL_APOSTROPHE_PREFIX",
+          "includeFreeText": null
+        }
+      },
+      "survey_871d81fa_raw_wave_batch001_e86f80e9.csv": {
+        "bytes": 3805,
+        "sha256": "d8f17ba8ae8422a5d48ddcbacb95a44c5fde0707af53d6c67ffaeca584b29e1f",
+        "dataRows": 12,
+        "columns": 17,
+        "rowWidths": [
+          17
+        ],
+        "singleUtf8Bom": true,
+        "crlf": true,
+        "chineseCells": 0
+      }
+    },
+    "safari": {
+      "survey_871d81fa_cognitive_trial_long_batch001_02ba0e6a.csv": {
+        "bytes": 121169,
+        "sha256": "28750d671508f17baee83e54bb8694c2f3966d082da9390961e267d07caf21f5",
+        "dataRows": 120,
+        "columns": 42,
+        "rowWidths": [
+          42
+        ],
+        "singleUtf8Bom": true,
+        "crlf": true,
+        "chineseCells": 0
+      },
+      "survey_871d81fa_cognitive_trial_long_batch001_02ba0e6a_codebook.json": {
+        "bytes": 4303,
+        "sha256": "0062a56989ca3609ddf1a7050b58e46da1183cae3effcb9bac438ad14f551776",
+        "jsonType": "list"
+      },
+      "survey_871d81fa_cognitive_trial_long_batch001_02ba0e6a_manifest.json": {
+        "bytes": 3009,
+        "sha256": "b31d1c2059c0b6c232e6170dcc764b50943d64767dde18c8cdb6b4223e84b3e0",
+        "jsonType": "dict",
+        "manifestCounts": {
+          "format": "COGNITIVE_TRIAL_LONG",
+          "rowCount": 120,
+          "columnCount": 42,
+          "formulaGuard": "EXCEL_APOSTROPHE_PREFIX",
+          "includeFreeText": null
+        }
+      },
+      "survey_871d81fa_cognitive_trial_long_batch001_02ba0e6a_retry.csv": {
+        "bytes": 121169,
+        "sha256": "28750d671508f17baee83e54bb8694c2f3966d082da9390961e267d07caf21f5",
+        "dataRows": 120,
+        "columns": 42,
+        "rowWidths": [
+          42
+        ],
+        "singleUtf8Bom": true,
+        "crlf": true,
+        "chineseCells": 0
+      },
+      "survey_871d81fa_raw_wave_batch001_caa0e093.csv": {
+        "bytes": 3805,
+        "sha256": "d8f17ba8ae8422a5d48ddcbacb95a44c5fde0707af53d6c67ffaeca584b29e1f",
+        "dataRows": 12,
+        "columns": 17,
+        "rowWidths": [
+          17
+        ],
+        "singleUtf8Bom": true,
+        "crlf": true,
+        "chineseCells": 0
+      },
+      "survey_871d81fa_raw_wave_batch001_f9fcb1f2.csv": {
+        "bytes": 3805,
+        "sha256": "d8f17ba8ae8422a5d48ddcbacb95a44c5fde0707af53d6c67ffaeca584b29e1f",
+        "dataRows": 12,
+        "columns": 17,
+        "rowWidths": [
+          17
+        ],
+        "singleUtf8Bom": true,
+        "crlf": true,
+        "chineseCells": 0
+      },
+      "survey_871d81fa_raw_wave_batch001_f9fcb1f2_codebook.json": {
+        "bytes": 1512,
+        "sha256": "5c70af5107609eb2c76f80632a74a3dfe0478e3a351d25ef0dc48dbfbb2e0a42",
+        "jsonType": "list"
+      },
+      "survey_871d81fa_raw_wave_batch001_f9fcb1f2_manifest.json": {
+        "bytes": 2215,
+        "sha256": "d870ec7d0fc6c9591c486966f538d21922f0d9189f80de64daf43d0c522ed5df",
+        "jsonType": "dict",
+        "manifestCounts": {
+          "format": "WAVE",
+          "rowCount": 12,
+          "columnCount": 17,
+          "formulaGuard": "EXCEL_APOSTROPHE_PREFIX",
+          "includeFreeText": null
+        }
+      },
+      "survey_871d81fa_raw_wave_batch001_f9fcb1f2_retry.csv": {
+        "bytes": 3805,
+        "sha256": "d8f17ba8ae8422a5d48ddcbacb95a44c5fde0707af53d6c67ffaeca584b29e1f",
+        "dataRows": 12,
+        "columns": 17,
+        "rowWidths": [
+          17
+        ],
+        "singleUtf8Bom": true,
+        "crlf": true,
+        "chineseCells": 0
+      }
+    }
+  },
+  "primaryTriples": [
+    {
+      "browser": "chrome",
+      "csv": "survey_871d81fa_cognitive_trial_long_batch001_6635a858.csv",
+      "manifestMatched": true,
+      "dataRows": 120,
+      "columns": 42
+    },
+    {
+      "browser": "chrome",
+      "csv": "survey_871d81fa_raw_wave_batch001_08feb9d2.csv",
+      "manifestMatched": true,
+      "dataRows": 12,
+      "columns": 17
+    },
+    {
+      "browser": "chrome",
+      "csv": "survey_871d81fa_raw_wave_batch001_4168baca.csv",
+      "manifestMatched": true,
+      "dataRows": 18,
+      "columns": 17
+    },
+    {
+      "browser": "safari",
+      "csv": "survey_871d81fa_cognitive_trial_long_batch001_02ba0e6a.csv",
+      "manifestMatched": true,
+      "dataRows": 120,
+      "columns": 42
+    },
+    {
+      "browser": "safari",
+      "csv": "survey_871d81fa_raw_wave_batch001_f9fcb1f2.csv",
+      "manifestMatched": true,
+      "dataRows": 12,
+      "columns": 17
+    }
+  ],
+  "crossBrowserPrimaryCsvBytesEqual": true,
+  "scope": "all researcher output is from this task synthetic project; retry and final-only CSV files counted separately"
+}
