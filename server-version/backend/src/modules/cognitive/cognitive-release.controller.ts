@@ -15,7 +15,7 @@ export const cognitiveReleaseController = {
   async publishConfig(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
-      const data = await publishCognitiveConfig(req.params.id)
+      const data = await publishCognitiveConfig(req.params.id, req.user.userId)
       return success(res, data, '认知测验配置已发布')
     } catch (err) {
       return handleReleaseError(res, err)
@@ -25,7 +25,7 @@ export const cognitiveReleaseController = {
   async retireConfig(req: Request, res: Response) {
     try {
       if (!req.user) return unauthorized(res)
-      const data = await retireCognitiveConfig(req.params.id)
+      const data = await retireCognitiveConfig(req.params.id, req.user.userId)
       return success(res, data, '认知测验配置已退役')
     } catch (err) {
       return handleReleaseError(res, err)

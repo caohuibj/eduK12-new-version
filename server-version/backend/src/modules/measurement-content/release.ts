@@ -10,7 +10,7 @@ const digest = z.string().regex(/^[a-f0-9]{64}$/)
 export const contentScope = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('PRIVATE'), ownerId: text, product: z.enum(['TRAINING', 'SURVEY']), resourceId: text }).strict(),
   z.object({ kind: z.literal('SHARED'), ownerId: text, product: z.enum(['TRAINING', 'SURVEY', 'SCHOOL', 'TEACHER']), resourceId: text }).strict(),
-  z.object({ kind: z.literal('PLATFORM'), ownerId: text }).strict(),
+  z.object({ kind: z.literal('PLATFORM'), ownerId: text.optional() }).strict(),
 ])
 export const assetReference = z.object({ assetId: text, sha256: digest, mediaType: text }).strict()
 export const exactRelease = z.object({ releaseId: z.string().uuid(), contentHash: digest }).strict()

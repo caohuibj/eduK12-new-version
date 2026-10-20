@@ -9,7 +9,7 @@ import { publishCognitiveConfig } from '../modules/cognitive/release.service'
 
 const main = async () => {
   const args = process.argv.slice(2)
-  if (args.some((arg) => arg.startsWith('--') && !['--input', '--apply'].includes(arg))) {
+  if (args.some((arg) => arg.startsWith('--') && !['--input', '--apply', '--actor'].includes(arg))) {
     throw new Error('Unknown flag')
   }
   const inputIndex = args.indexOf('--input')
@@ -22,10 +22,13 @@ const main = async () => {
   )
 
   if (args.includes('--apply')) {
+    const actorIndex = args.indexOf('--actor')
+    const actorId = actorIndex >= 0 ? args[actorIndex + 1] : undefined
+    if (!actorId || actorId.startsWith('--')) throw new Error('Apply requires --actor <existing-system-admin-user-id>')
     console.log(JSON.stringify(await applyCognitiveConfigBatchPublication(
       prisma,
       input,
-      publishCognitiveConfig,
+      configId => publishCognitiveConfig(configId, actorId),
     ), null, 2))
     return
   }

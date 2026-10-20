@@ -1713,6 +1713,8 @@ enum CognitiveSessionStatus {
 
 // 认知测试配置（任务定义）。config 为任务参数（非参与者原始行为数据），按明文 Json 存储。
 model CognitiveTestConfig {
+  measurementReleaseId String? @map("measurement_release_id")
+  measurementRelease MeasurementContentRelease? @relation(fields:[measurementReleaseId],references:[id],onDelete:Restrict,onUpdate:NoAction,map:"cognitive_config_measurement_release_fkey")
   id             String                      @id @default(uuid())
   testType       String                      @map("test_type")
   configVersion  String                      @map("config_version")
@@ -2505,6 +2507,8 @@ model SjtAuthorAudit {
 }
 
 model SjtAuthorRelease {
+  measurementReleaseId String? @map("measurement_release_id")
+  measurementRelease MeasurementContentRelease? @relation(fields:[measurementReleaseId],references:[id],onDelete:Restrict,onUpdate:NoAction,map:"sjt_author_measurement_release_fkey")
   id                String   @id @default(uuid())
   instrumentKey     String   @map("instrument_key")
   instrumentVersion String   @map("instrument_version")
@@ -3911,6 +3915,8 @@ model MeasurementContentRelease {
   source          MeasurementContentRelease? @relation("ContentSource",fields:[sourceReleaseId],references:[id],onDelete:Restrict,onUpdate:NoAction)
   adaptations     MeasurementContentRelease[] @relation("ContentSource")
   scales          Scale[]
+  cognitiveConfigs CognitiveTestConfig[]
+  sjtReleases     SjtAuthorRelease[]
   publishedBy     String @map("published_by")
   publishedAt     DateTime @default(now()) @map("published_at") @db.Timestamptz(6)
   status          String @default("PUBLISHED")

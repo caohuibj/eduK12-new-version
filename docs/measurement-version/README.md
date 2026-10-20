@@ -153,3 +153,13 @@ Training 自编发布、Standard onboarding 发布及 Survey Wave 中的 Scale �
 修正 V02 review：参考/报告修正文案的内部发布用途区分 NEW_ADMINISTRATION 与 HISTORICAL_INTERPRETATION。后者可引用 SUPERSEDED/RETIRED 测量，仍拒 REVOKED；该参数不由前端直接控制，未来新投放仍要检查测量可用性。新增状态负例与 Scale 投影/跨项目同名/无参考/不支持参数合同，总计 11 个相关用例通过。新核心/适配器 strict TypeScript 与 Prisma schema validate 通过。实际发布接入点的扩展类型检查发现共享依赖中的旧 Prisma client 缺现有 Training 字段，且定向编译未加载 Request 全局扩展；本改动另发现的 Survey 返回类型 narrowing 已修正。未将该扩展检查标为通过，最终须使用本分支私有生成 client 集中验收。未执行数据库迁移、完整应用/浏览器回归或 CI。
 
 V03 独审修复：Survey 的有效 presentationMode（省略时与现有 UI 一致为 ALL_AT_ONCE）进入 measurement canonical 投影；ONE_BY_ONE 与 ALL_AT_ONCE 即便题目/计分相同也不能同 hash。Training ScaleDefinition 没有独立可编辑 presentationMode，保持 RUNNER_DEFAULT 及既有 display.randomizeItems 不支持硬阻；后续投放协议仍由 V08 冻结。目录导入使用 sourceProvenance.source.sourceVersion，draftRevision 只表示私有编辑/发布序列，缺来源版本拒绝而不猜测。两项新负例单独通过。
+
+## V04 实施记录
+
+现有 Cognitive 注册 runner/configSchema/FINAL trial budget 与现有 SJT V1/V2/scorer 已接三层测量适配器。Cognitive 配置 publish 及 retire、Survey Cognitive/SJT Wave 冻结、SJT author release 发布分别在原业务事务中持久化精确 release；新增当前 config/author release 指针，Survey 继续保存逐 unit 的 release/hash。没有新增认知范式、SJT 编辑器、上传脚本或新计分器。
+
+Cognitive 内容投影冻结实际配置、协议、输入/时序/随机策略、质量约束、指标、支持 profile 参数和 FINAL 上界，剔除 report 配置；不认识的参数/runner 拒绝。SJT 评分矩阵/专家 key 保留在测量层，report/referencePolicy 剔除；线上原始响应协议/题面显式冻结，先验证既有 online 元数据，再去除旧全定义摘要和版权/作者备注。Survey 目录 SJT 保留来源 instrumentVersion，私有 edit revision 单独作为 release 版本。
+
+Cognitive 原发布入口此前没有 actor 参数；现在 controller 使用已验证请求身份，CLI apply 必须显式提供真实既存 `--actor` 并在事务中校验当前系统管理员。无 actor 拒绝，不补造身份；V05 将按管理员最终接口映射内容能力。现有生命周期测试已同步，真实 PG 测试使用独立合成 publisher，不把普通教师自动升权。
+
+验证：新增 4 项 Cognitive/SJT 合同通过；受影响 release service 的 7 项单元通过；本分支 Prisma schema validate 通过。首轮新 fixture 缺 SJT 必需第二题及认知测试开关，修正测试输入后通过，未放宽产品校验。私有 Prisma client 已从本分支 schema 成功生成（独立 dependency overlay，仅复制约 8 MB client，其他官方依赖只读软链，生成物约几十 MB），没有覆盖共享依赖。加载真实 Request 扩展后，V02–V04 新核心与实际发布接入点定向 strict TypeScript 检查通过，解决此前旧生成 client 导致的检查阻塞。真实 PostgreSQL 迁移/事务/恢复和浏览器回归尚未执行，留集中验收；schema validate 和 mock 单元不替代这些证据。独立报告/参考、投放消费和旧结果回读仍须 V06–V09 完成，不将本单元登记为整个闭环上线。

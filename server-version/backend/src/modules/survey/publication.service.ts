@@ -1,3 +1,7 @@
+import { cognitiveMeasurementRelease } from '../measurement-content/cognitive'
+import { sjtMeasurementRelease } from '../measurement-content/sjt'
+import { publishContentRelease } from '../measurement-content/repository'
+import { parseFrozenSurveyCognitive } from './cognitive.definition'
 import { publishScaleMeasurement, surveyScaleReleaseContext } from '../measurement-content/scale'
 import {catalogSnapshotsForDrafts,compileCatalogUnit} from './catalog.service'
 import type {SourceAnswerMapping} from './catalog.sources'
@@ -145,15 +149,31 @@ export async function freezeResearchWaveDraft(input:{
       return draft!.catalogGrantId?compileCatalogUnit(draft!,sources.get(draft!.catalogGrantId)!):compileFrozenResearchUnit(draft!)
     })
     for (const unit of units) {
-      if (unit.kind !== 'SCALE') continue
-      const release = await publishScaleMeasurement(tx, {
+      if (unit.kind === 'FORM') continue
+      const scope = { kind: 'PRIVATE' as const, ownerId: input.actorUserId, product: 'SURVEY' as const, resourceId: input.projectId }
+      let release
+      if (unit.kind === 'COGNITIVE') {
+        const frozen = parseFrozenSurveyCognitive(unit.compiledDefinition)
+        const snapshot = frozen.sessionSnapshot
+        release = await publishContentRelease(tx, cognitiveMeasurementRelease({
+          localId: unit.draftId, version: String(unit.draftRevision), scope,
+          testType: snapshot.testType, configVersion: snapshot.configVersion,
+          engineVersion: snapshot.engineVersion, scoringVersion: snapshot.scoringVersion, config: snapshot.config,
+          protocolContext: { timingPolicy: frozen.timingPolicy, devicePolicy: frozen.devicePolicy, restartLimit: frozen.restartLimit },
+        }), input.actorUserId)
+      } else if (unit.kind === 'SJT') {
+        release = await publishContentRelease(tx, sjtMeasurementRelease({
+          localId: unit.draftId, version: String(unit.draftRevision), instrumentVersion: surveyScaleReleaseContext(unit).instrumentVersion,
+          definition: unit.compiledDefinition, displayProtocol: unit.displayDefinition, scope, provenance: unit.sourceProvenance ?? {},
+        }), input.actorUserId)
+      } else release = await publishScaleMeasurement(tx, {
         localId: unit.draftId, version: String(unit.draftRevision),
         ...surveyScaleReleaseContext(unit), definition: unit.compiledDefinition,
         instrumentClass: unit.sourceProvenance ? 'STANDARD' : 'CUSTOM_DESCRIPTIVE',
         provenance: unit.sourceProvenance ?? {},
         scope: { kind: 'PRIVATE', ownerId: input.actorUserId, product: 'SURVEY', resourceId: input.projectId },
       }, input.actorUserId)
-      if (release.layer !== 'MEASUREMENT') stop('研究量表发布身份不匹配')
+      if (release.layer !== 'MEASUREMENT') throw new Error('研究测量发布身份不匹配')
       unit.measurementRelease = { releaseId: release.releaseId, contentHash: release.contentHash,
         measurementHash: release.content.measurementHash }
     }
