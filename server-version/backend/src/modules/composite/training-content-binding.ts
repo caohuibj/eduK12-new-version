@@ -30,7 +30,7 @@ function fail(code:string):never { throw new TrainingContentError('CONTENT_TRAIN
  * source access/license/material gates before calling. Existing material grants
  * authorize attachment; their revocation does not invalidate an attached draft. */
 export async function prepareTrainingContentSnapshot(db:Prisma.TransactionClient,composite:{id:string;items:any[]},
-  resolvedSituational:Map<string,ResolvedSituationalRelease>){
+  resolvedSituational:Map<string,ResolvedSituationalRelease>,purpose:'NEW_ADMINISTRATION'|'HISTORICAL_INTERPRETATION'='NEW_ADMINISTRATION'){
   if(!composite.id||!Array.isArray(composite.items)||composite.items.length>1000)fail('SNAPSHOT_INVALID')
   const items=composite.items.filter(item=>item.type!=='FORM')
   if(items.some(item=>!['SCALE','COGNITIVE','SITUATIONAL'].includes(item.type))||new Set(items.map(item=>item.id)).size!==items.length)fail('SOURCE_INVALID')
@@ -71,7 +71,7 @@ export async function prepareTrainingContentSnapshot(db:Prisma.TransactionClient
     if(!row?.measurement_release_id)fail('RELEASE_REQUIRED')
     if(item.type==='SCALE'&&row.owner_id!==item.scale.creatorId)fail('SOURCE_MISMATCH')
     const release=await read(row.measurement_release_id)
-    if(release.layer!=='MEASUREMENT'||release.status!=='PUBLISHED')fail('RELEASE_NOT_PUBLISHED')
+    if(release.layer!=='MEASUREMENT'||release.status==='REVOKED'||purpose==='NEW_ADMINISTRATION'&&release.status!=='PUBLISHED')fail('RELEASE_NOT_PUBLISHED')
     const source:Unit['source']={kind:row.kind,id:row.id,ownerId:row.owner_id??item.cognitiveAssignment?.createdBy,
       ...(item.type==='COGNITIVE'?{assignmentId:item.cognitiveAssignment.id}:{}),
       ...(identity?{instrumentKey:identity.instrumentKey,instrumentVersion:identity.instrumentVersion}:{})}
@@ -84,7 +84,7 @@ export async function prepareTrainingContentSnapshot(db:Prisma.TransactionClient
       contentHash:release.contentHash,measurementHash:release.content.measurementHash}})
   }
   const snapshot=trainingContentSnapshotSchema.parse({schemaVersion:1,compositeId:composite.id,units})
-  return {snapshot,snapshotHash:canonicalHash(snapshot)}
+  return {snapshot,snapshotHash:canonicalHash(snapshot),releases}
 }
 function projectActualMeasurement(item:any,release:Stored,resolvedSituational:Map<string,ResolvedSituationalRelease>):ReleaseInput{
   let expected:ReleaseInput

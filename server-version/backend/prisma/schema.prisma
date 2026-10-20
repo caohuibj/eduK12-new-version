@@ -9,6 +9,7 @@ datasource db {
 }
 
 model User {
+  trainingReportDrafts TrainingReportDraft[]
   surveyReferenceRequests SurveyReferenceRequest[]
   contentCapabilityGrants       ContentCapabilityGrant[] @relation("ContentCapabilitySubject")
   issuedContentCapabilityGrants ContentCapabilityGrant[] @relation("ContentCapabilityIssuer")
@@ -316,6 +317,7 @@ model TeacherCode {
 }
 
 model Course {
+  trainingReportDrafts TrainingReportDraft[]
   questionnaireDeliveries QuestionnaireCourseDelivery[]
   id                   String                @id @default(uuid())
   title                String
@@ -1185,6 +1187,7 @@ enum CompositeAnalysisSnapshotGenerationReason {
 
 // 综合测评模板。发布后项目配置不可修改，历史测评通过子记录保存各自的结果快照。
 model CompositeAssessment {
+  trainingReportDrafts TrainingReportDraft[]
   trainingContentSnapshot Json? @map("training_content_snapshot")
   trainingContentSnapshotHash String? @map("training_content_snapshot_hash")
   trainingFeedbackPolicy Json? @map("training_feedback_policy")
@@ -3969,6 +3972,7 @@ model TrainingAttemptCheckpoint {
 
 // Three independently versioned content layers; no personal answer data.
 model MeasurementContentRelease {
+  trainingReportDrafts TrainingReportDraft[]
   surveyReportDrafts SurveyReportDraft[]
   referenceCandidates MeasurementReferenceCandidate[]
   id              String @id
@@ -4123,4 +4127,26 @@ model SurveyReferenceRequest {
   exclusionCounts Json? @map("exclusion_counts")
   createdAt DateTime @default(dbgenerated("clock_timestamp()")) @map("created_at") @db.Timestamptz(6)
   @@map("survey_reference_requests")
+}
+
+model TrainingReportDraft {
+ id String @id
+ courseId String @map("course_id")
+ course Course @relation(fields:[courseId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ compositeId String @map("composite_id")
+ composite CompositeAssessment @relation(fields:[compositeId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ ownerId String @map("owner_id")
+ owner User @relation(fields:[ownerId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ reportKey String @map("report_key")
+ version String
+ revision Int @default(0)
+ payload Json
+ createInputHash String @map("create_input_hash")
+ state String @default("DRAFT")
+ publishedReleaseId String? @map("published_release_id")
+ publishedRelease MeasurementContentRelease? @relation(fields:[publishedReleaseId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+ updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+ @@unique([compositeId,reportKey,version],map:"training_report_drafts_composite_id_report_key_version_key")
+ @@map("training_report_drafts")
 }

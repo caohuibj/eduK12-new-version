@@ -1,3 +1,4 @@
+import {trainingContentReportsRouter} from './content-report.routes'
 import { Router, type Request, type Response, type NextFunction } from 'express'
 import { authenticate, requireTeacher, requireRole } from '../../middleware/auth'
 import { UserRole } from '../../types'
@@ -16,6 +17,7 @@ const handle = (fn: (req: Request) => Promise<unknown>) => async (req: Request, 
 const pagination = z.object({ page: z.coerce.number().int().min(1).default(1), pageSize: z.coerce.number().int().min(1).max(100).default(25) })
 router.get('/available', authenticate, requireRole(UserRole.STUDENT), handle(req => service.available(req.user!.userId)))
 router.use(authenticate, requireTeacher)
+router.use('/:id/content-reports/courses/:courseId',trainingContentReportsRouter)
 router.get('/templates', handle(req => workbench.templates(req.user!, req.query)))
 router.post('/templates', handle(req => workbench.saveTemplate(req.user!, req.body)))
 router.post('/templates/:templateId/instantiate', handle(req => workbench.instantiateTemplate(req.user!, req.params.templateId, req.body)))

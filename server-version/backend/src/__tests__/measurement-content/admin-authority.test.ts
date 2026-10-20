@@ -10,7 +10,7 @@ const input=()=>({requestId:grantId,expectedVersion:0,reason:'Approved project w
  scope:{product:'SURVEY',scopeKind:'PROJECT',scopeId:project,resourceKind:'reference',resourceKeys:[resource]},
  capabilities:['reference.analyze','reference.review','reference.publish'],delegableCapabilities:['reference.analyze'],remainingDelegationDepth:1,
  validFrom:'2026-10-20T04:00:00Z',expiresAt:'2026-10-21T05:00:00Z'}})
-const user=(id:string)=>({id,token_version:3,platform_role:id===actor?'SYSTEM_ADMIN':'STANDARD',account_domain:id===actor?'TRAINING':'SURVEY',is_active:true,is_frozen:false,must_change_password:false,expires_at:null as Date|null})
+const user=(id:string)=>({id,token_version:3,platform_role:id===actor?'SYSTEM_ADMIN':'STANDARD',account_domain:id===actor?'TRAINING':'SURVEY',role:'TEACHER',teacher_approved:true,is_active:true,is_frozen:false,must_change_password:false,expires_at:null as Date|null})
 const row=()=>({id:grantId,subject_id:target,issuer_id:actor,parent_grant_id:null as string|null,product:'SURVEY',scope_kind:'PROJECT',scope_id:project,resource_kind:'reference',resource_keys:[resource],capabilities:input().grant.capabilities,delegable_capabilities:['reference.analyze'],remaining_delegation_depth:1,valid_from:new Date(input().grant.validFrom),expires_at:new Date(input().grant.expiresAt),ancestry:[grantId],version:1,revoked_at:null as Date|null,revoked_by:null as string|null,revoke_reason:null as string|null})
 let users:ReturnType<typeof user>[],existing:ReturnType<typeof row>,inserted:boolean,qualified:boolean,resources:string[],owned:boolean
 const sql=(query:any)=>query.strings.join(' ')
@@ -21,6 +21,9 @@ beforeEach(()=>{
  mocks.query.mockImplementation(async query=>{
   const text=sql(query)
   if(text.includes('clock_timestamp() AS now'))return [{now:new Date()}]
+  if(text.includes('FROM courses'))return owned?[{id:project}]:[]
+  if(text.includes('FROM composite_assessments'))return resources.map(id=>({id,course_id:project,product_kind:'LEGACY_COMPOSITE',questionnaire_type:null}))
+  if(text.includes('FROM questionnaire_course_deliveries'))return []
   if(text.includes('FROM survey_projects'))return owned?[{id:project}]:[]
   if(text.includes('FROM users'))return users
   if(text.includes('FROM survey_researcher_grants'))return qualified?[{id:target}]:[]
@@ -113,5 +116,45 @@ describe('bounded content governance metadata',()=>{
   existing=row();const session=proof(),run=mocks.query.getMockImplementation()!
   mocks.query.mockImplementation(async query=>{const result=await run(query);if(sql(query).includes('FROM content_capability_grants'))vi.setSystemTime(new Date(now.getTime()+301000));return result})
   await expect(readAdminContentGrant(actor,session,grantId)).rejects.toMatchObject({statusCode:403})
+ })
+})
+
+const trainingInput=()=>{const body=input();body.grant.scope={...body.grant.scope,product:'TRAINING',scopeKind:'COURSE',resourceKind:'report'};body.grant.capabilities=['report.edit','report.publish'];body.grant.delegableCapabilities=['report.edit'];return body}
+describe('exact Training course report root grants',()=>{
+ it('accepts a current approved course-owner teacher and audits Training',async()=>{
+  users[1].account_domain='TRAINING'
+  await expect(issueAdminContentRoot(actor,proof(),trainingInput())).resolves.toMatchObject({changed:true})
+  const queries=mocks.query.mock.calls.map(([q])=>sql(q))
+  expect(queries[0]).toContain("course_type='TRAINING_COURSE' AND NOT is_library")
+  expect(queries.some(q=>q.includes('survey_researcher_grants'))).toBe(false)
+  expect(queries.find(q=>q.includes('FROM composite_assessments'))).toContain('created_by=')
+  expect(mocks.audit).toHaveBeenCalledWith({data:expect.objectContaining({entry:'TRAINING',targetUserId:target})})
+ })
+ it('accepts exact questionnaire delivery membership, not unrelated composites',async()=>{
+  users[1].account_domain='LEGACY';const run=mocks.query.getMockImplementation()!
+  mocks.query.mockImplementation(async query=>sql(query).includes('FROM composite_assessments')?[{id:resource,course_id:null,product_kind:'QUESTIONNAIRE',questionnaire_type:'COURSE'}]:sql(query).includes('FROM questionnaire_course_deliveries')?[{composite_id:resource}]:run(query))
+  await expect(issueAdminContentRoot(actor,proof(),trainingInput())).resolves.toMatchObject({changed:true})
+  mocks.query.mockImplementation(async query=>sql(query).includes('FROM composite_assessments')?[{id:resource,course_id:id(90)}]:run(query))
+  await expect(issueAdminContentRoot(actor,proof(),trainingInput())).rejects.toMatchObject({statusCode:403})
+ })
+ it('does not infer scientific rights from admin identity, unapproved teacher or wrong domain',async()=>{
+  for(const patch of [{role:'ADMIN'},{teacher_approved:false},{account_domain:'SCHOOL'},{account_domain:'SURVEY'},{is_active:false},{is_frozen:true},{expires_at:now}]){
+   users[1]={...user(target),account_domain:'TRAINING',...patch}
+   await expect(issueAdminContentRoot(actor,proof(),trainingInput())).rejects.toMatchObject({statusCode:403})
+  }
+  users[1]={...user(target),account_domain:'TRAINING'};owned=false
+  await expect(issueAdminContentRoot(actor,proof(),trainingInput())).rejects.toMatchObject({statusCode:403})
+  expect(mocks.audit).not.toHaveBeenCalled()
+ })
+ it('rejects unrelated Training capability or non-course scopes',()=>{
+  for(const scope of [{...trainingInput().grant.scope,scopeKind:'PLATFORM'},{...trainingInput().grant.scope,resourceKind:'reference'}])
+   expect(()=>adminContentRootRequestSchema.parse({...trainingInput(),grant:{...trainingInput().grant,scope}})).toThrow()
+  expect(()=>adminContentRootRequestSchema.parse({...trainingInput(),grant:{...trainingInput().grant,capabilities:['data.reinterpret']}})).toThrow()
+ })
+ it('reads/revokes Training grants with current system proof and Training audit',async()=>{
+  existing={...row(),product:'TRAINING',scope_kind:'COURSE',resource_kind:'report',capabilities:['report.edit'],delegable_capabilities:[]}
+  expect(await readAdminContentGrant(actor,proof(),grantId)).toMatchObject({scope:{product:'TRAINING',scopeKind:'COURSE'}})
+  await revokeAdminContentGrant(actor,proof(),grantId,{expectedVersion:1,reason:'Withdraw report rights'})
+  expect(mocks.audit).toHaveBeenCalledWith({data:expect.objectContaining({entry:'TRAINING',action:'CONTENT_GRANT_REVOKED'})})
  })
 })

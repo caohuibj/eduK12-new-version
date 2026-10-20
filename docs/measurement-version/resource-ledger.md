@@ -81,3 +81,13 @@ Storage formula amendment: explicit reinterpretation adds one `I_i = encrypted(p
 - Unit: V08; V09 must explicitly publish static SJT and selected Cog profiles.
 - Acceptance/result: source/runtime/scope/lifecycle/variant identities; SQL/HTTP/concurrency pending.
 - Regression watch: retain raw/trials/shared codec; no default-profile substitution, fabricated static SJT identity, answer-key DTO, or retirement reselection.
+
+### R29 — Training course report authoring
+
+- Chain/object: current course/principal/composite/grant checks, report drafts and shared release.
+- Evidence: content-report.service.ts, admin-authority.service.ts, migration 20261020133000.
+- Effective flags: existing Training authenticated teacher routing; no new deployment switch.
+- Measured/estimated: 53 targeted backend contracts and strict backend types; no byte/latency claim.
+- Risk: synthetic preview reads no answers; measurements reuse the exact source validation cache, no duplicate release load per item. Draft payload exists once per author revision, publication shared once; per-answer template copying remains prohibited.
+- Unit/acceptance: V05/V07; fixed course/report capability and immutable scope/version, request recovery.
+- Result/guard: source, mock service and route contracts only; actual migrations, browser and lock expiry races await V10. Root role never supplies implicit report capability.

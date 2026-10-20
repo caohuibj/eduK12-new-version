@@ -561,3 +561,9 @@ Composite 发布以真实已挂载 Scale、Cognitive effective profile、已解�
 素材挂载许可撤销保留既有合同：仅拦新挂载，已挂 DRAFT 可发布；源许可硬撤回及 measurement REVOKED 是独立门禁。科学 analyze/review/publish 等仍须当前精确能力。
 
 本节点仅测量发布/START。静态 SJT 缺源指针、Cog effective profile 与 config release 不同暂明确拒绝；V09 必须提供真实 registry/compiler/许可驱动转换或显式发布，拒绝不是完成。Training reference/report 选择、FINAL/报告及 COURSE 科学能力未完成。新增 SQL 待集中真实迁移/并发验证。
+
+## V05/V07 Training course report consumer
+
+系统根授权增加固定 TRAINING/COURSE/report.edit、report.publish，目标必须为当前真实教师、获准非库 Training 课程作者及精确所属 composite。管理角色不代替业务教师身份。签发/撤销仍复用统一系统强认证、审计、版本 CAS、实时父授权；管理 UI 保留未知请求原 UUID。
+
+真实 questionnaire-products 路由接报告草稿/list/get/revision-CAS edit/synthetic preview/private publish；每次受当前 course-owner、teacher eligibility、精确 capability 交集保护。创建原请求 hash 独立保存，编辑后创建重试不换身份。报告绑定实际挂载测量，复用请求内已验证 release cache；固定历史解释用途允许正常退休测量，REVOKED 拒绝。报告私有 scope 为本人/composite，与平台目录批准分离。首批只 teacher/researcher 受众、空资产列表；不额外披露被试报告、不读取样本预览。模板与已发布内容 immutable；SQL/HTTP/真实并发仍待集中验收。

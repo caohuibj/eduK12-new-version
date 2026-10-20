@@ -13,23 +13,25 @@ const wireGrant=contentGrantInputSchema.innerType().extend({
 }).pipe(contentGrantInputSchema).superRefine((grant,ctx)=>{
   if(!supported(grant)||!uuid.safeParse(grant.subjectId).success||!uuid.safeParse(grant.scope.scopeId).success||
     grant.scope.resourceKeys.some(key=>!uuid.safeParse(key).success))
-    ctx.addIssue({code:'custom',message:'Only exact Survey project reference or FINAL reinterpretation grants are supported'})
+    ctx.addIssue({code:'custom',message:'Only exact Survey project reference/data or Training course report grants are supported'})
 })
 export const adminContentRootRequestSchema=z.object({requestId:uuid,expectedVersion:z.literal(0),reason,grant:wireGrant}).strict()
 export const adminContentRevokeRequestSchema=z.object({expectedVersion:z.number().int().positive(),reason}).strict()
 const options={isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:5000}
 const deny=(message='内容授权范围或当前身份无效'):never=>{throw new AdminPermissionError(403,message)}
 function supported(grant:Pick<ContentGrantInput,'scope'|'capabilities'>){
+  if(grant.scope.product==='TRAINING')return grant.scope.scopeKind==='COURSE'&&grant.scope.resourceKind==='report'&&
+    grant.capabilities.every(capability=>['report.edit','report.publish'].includes(capability))
   return grant.scope.product==='SURVEY'&&grant.scope.scopeKind==='PROJECT'&&
     (grant.scope.resourceKind==='reference'&&grant.capabilities.every(c=>['reference.analyze','reference.review','reference.publish'].includes(c))||
      grant.scope.resourceKind==='data'&&grant.capabilities.length===1&&grant.capabilities[0]==='data.reinterpret')
 }
-type UserRow={id:string;token_version:number;platform_role:string;account_domain:string;is_active:boolean;is_frozen:boolean;must_change_password:boolean;expires_at:Date|null}
+type UserRow={id:string;token_version:number;platform_role:string;account_domain:string;role:string;teacher_approved:boolean;is_active:boolean;is_frozen:boolean;must_change_password:boolean;expires_at:Date|null}
 function assertProof(proof:AdminSessionProof){if(!validAdminProof(proof,ADMIN_STEP_UP_SECONDS))deny('内容授权变更需要最近的安全密钥验证')}
 async function lockActor(tx:Prisma.TransactionClient,actorId:string,proof:AdminSessionProof,targetId?:string){
   // SHARE is intentional: consumers hold User SHARE alongside grant SHARE.
   // Never hold User UPDATE while waiting for a grant held by those consumers.
-  const users=await tx.$queryRaw<UserRow[]>(Prisma.sql`SELECT id,token_version,platform_role::text,account_domain,
+  const users=await tx.$queryRaw<UserRow[]>(Prisma.sql`SELECT id,token_version,platform_role::text,account_domain,role::text,teacher_approved,
     is_active,is_frozen,must_change_password,expires_at FROM users
     WHERE id IN (${Prisma.join([...new Set([actorId,...(targetId?[targetId]:[])])].sort())}) ORDER BY id FOR SHARE`)
   const [clock]=await tx.$queryRaw<Array<{now:Date}>>(Prisma.sql`SELECT clock_timestamp() AS now`)
@@ -58,18 +60,37 @@ export async function issueAdminContentRoot(actorId:string,proof:AdminSessionPro
   const input=adminContentRootRequestSchema.parse(raw),grant=input.grant,scope=grant.scope
   assertProof(proof)
   return prisma.$transaction(async tx=>{
-    // Match business writer ordering: Project → Users → grants/resources.
-    const projects=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM survey_projects
+    // Match consumers: Project/Course → Users → composites/deliveries → grants/resources.
+    const projects=scope.product==='TRAINING'
+      ?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM courses
+        WHERE id=${scope.scopeId} AND creator_id=${grant.subjectId} AND course_type='TRAINING_COURSE' AND NOT is_library FOR SHARE`)
+      :await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM survey_projects
       WHERE id=${scope.scopeId} AND owner_user_id=${grant.subjectId} FOR SHARE`)
     if(projects.length!==1)deny()
     const {users}=await lockActor(tx,actorId,proof,grant.subjectId)
     const target=users.find(user=>user.id===grant.subjectId)
-    if(!target||target.account_domain!=='SURVEY'||!target.is_active||target.is_frozen||target.must_change_password)deny()
+    if(!target||!target.is_active||target.is_frozen||target.must_change_password)deny()
+    if(scope.product==='TRAINING'){
+      if(!['TRAINING','LEGACY'].includes(target!.account_domain)||target!.role!=='TEACHER'||target!.teacher_approved!==true)deny()
+    }else{
+    if(target!.account_domain!=='SURVEY')deny()
     const qualified=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT g.user_id AS id
       FROM survey_researcher_grants g JOIN survey_mfa_credentials m ON m.user_id=g.user_id
       WHERE g.user_id=${grant.subjectId} AND g.status='ACTIVE' AND m.enabled FOR SHARE OF g,m`)
     if(qualified.length!==1)deny()
-    const resources=scope.resourceKind==='reference'
+    }
+    let trainingResources:Array<{id:string}>=[]
+    if(scope.product==='TRAINING'){
+      const composites=await tx.$queryRaw<Array<{id:string;course_id:string|null;product_kind:string;questionnaire_type:string|null}>>(Prisma.sql`SELECT id,course_id,product_kind,questionnaire_type::text FROM composite_assessments
+        WHERE id IN (${Prisma.join(scope.resourceKeys)}) AND created_by=${grant.subjectId} ORDER BY id FOR SHARE`)
+      const deliveries=await tx.$queryRaw<Array<{composite_id:string}>>(Prisma.sql`SELECT composite_id FROM questionnaire_course_deliveries
+        WHERE course_id=${scope.scopeId} AND composite_id IN (${Prisma.join(scope.resourceKeys)}) ORDER BY composite_id FOR SHARE`)
+      const linked=new Set(deliveries.map(row=>row.composite_id))
+      trainingResources=composites.filter(row=>row.product_kind==='QUESTIONNAIRE'
+        ?row.questionnaire_type==='COURSE'&&linked.has(row.id):row.course_id===scope.scopeId)
+    }
+    const resources=scope.product==='TRAINING'?trainingResources
+      :scope.resourceKind==='reference'
       ?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM measurement_content_releases
         WHERE id IN (${Prisma.join(scope.resourceKeys)}) AND layer='MEASUREMENT'
           AND scope->>'kind'='PRIVATE' AND scope->>'product'='SURVEY'
@@ -98,7 +119,7 @@ export async function issueAdminContentRoot(actorId:string,proof:AdminSessionPro
     }
     await recheckAfterWait(tx,proof,users)
     await tx.adminAuthorizationAudit.create({data:{id:input.requestId,actorUserId:actorId,targetUserId:grant.subjectId,
-      entry:'SURVEY',action:'CONTENT_ROOT_GRANTED',version:1,reason:input.reason}})
+      entry:scope.product as 'SURVEY'|'TRAINING',action:'CONTENT_ROOT_GRANTED',version:1,reason:input.reason}})
     return {grantId:input.requestId,version:1,changed:true}
   },options)
 }
@@ -122,7 +143,7 @@ export async function revokeAdminContentGrant(actorId:string,proof:AdminSessionP
       WHERE id=${grantId} AND version=${input.expectedVersion} AND revoked_at IS NULL`)
     if(count!==1)throw new AdminPermissionError(409,'授权版本已变化')
     await tx.adminAuthorizationAudit.create({data:{id:randomUUID(),actorUserId:actorId,targetUserId:grant.subject_id,
-      entry:'SURVEY',action:'CONTENT_GRANT_REVOKED',version:input.expectedVersion+1,reason:JSON.stringify({grantId,reason:input.reason})}})
+      entry:grant.product as 'SURVEY'|'TRAINING',action:'CONTENT_GRANT_REVOKED',version:input.expectedVersion+1,reason:JSON.stringify({grantId,reason:input.reason})}})
     return {grantId,version:input.expectedVersion+1,changed:true}
   },options)
 }

@@ -46,6 +46,13 @@ describe('Training compact measurement publication and START binding',()=>{
   }
   mocks.release.mockResolvedValueOnce({...storedScale(),status:'SUPERSEDED'});await expect(prepare()).rejects.toThrow('CONTENT_TRAINING_RELEASE_NOT_PUBLISHED')
  })
+ it('permits historical report authoring for retired content without allowing new administration',async()=>{
+  mocks.release.mockResolvedValue({...storedScale(),status:'RETIRED'})
+  await expect(prepareTrainingContentSnapshot(db as never,composite(),empty,'HISTORICAL_INTERPRETATION')).resolves.toHaveProperty('snapshot')
+  await expect(prepare()).rejects.toThrow('CONTENT_TRAINING_RELEASE_NOT_PUBLISHED')
+  mocks.release.mockResolvedValue({...storedScale(),status:'REVOKED'})
+  await expect(prepareTrainingContentSnapshot(db as never,composite(),empty,'HISTORICAL_INTERPRETATION')).rejects.toThrow('CONTENT_TRAINING_RELEASE_NOT_PUBLISHED')
+ })
  it('rebuilds actual measurement and rejects a pointer to a different scoring definition',async()=>{
   const value=composite();value.items[0].scale.definition.scoring.itemRules[0].transform={type:'reverse'}
   await expect(prepare(value)).rejects.toThrow('CONTENT_TRAINING_SOURCE_MISMATCH')
