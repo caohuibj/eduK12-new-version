@@ -64,6 +64,26 @@ beforeEach(() => {
   sessionStorage.clear()
 })
 
+describe('Training assessment presentation boundary', () => {
+  it.each([
+    '/student/scales/scale-1', '/student/questionnaires/questionnaire-1',
+    '/student/composite/attempts/attempt-1', '/student/cognitive/sessions/session-1',
+    '/student/composite/situational/attempt-1', '/student/scales/result/result-1',
+  ])('uses Training presentation on %s while preserving the existing content', path => {
+    presentation.training = true
+    const view = render(<MemoryRouter initialEntries={[path]}><AppShell><button>既有作答操作</button><div data-cognitive-task-root>既有刺激</div></AppShell></MemoryRouter>)
+    expect(view.container.querySelector('.hui-training.training-assessment-visual')).not.toBeNull()
+    expect(view.container.querySelector('.hui-brand')).toHaveTextContent('Huitraining')
+    expect(screen.getByRole('button', { name: '既有作答操作' })).toBeEnabled()
+    expect(view.container.querySelector('[data-cognitive-task-root]')).toHaveTextContent('既有刺激')
+  })
+  it('keeps the Survey runner brand and presentation unchanged', () => {
+    const view = render(<MemoryRouter initialEntries={['/student/composite/attempts/a']}><AppShell><p>Survey 作答内容</p></AppShell></MemoryRouter>)
+    expect(view.container.querySelector('.training-assessment-visual')).toBeNull()
+    expect(view.container.querySelector('.hui-brand')).toHaveTextContent('Huisurvey')
+  })
+})
+
 describe('Training teacher visual boundary', () => {
   it.each([
     ['/dashboard', 'courses'],
