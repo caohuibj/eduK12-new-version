@@ -4,7 +4,7 @@ vi.mock('../../config/database',()=>({prisma:{$transaction:mocks.transaction}}))
 vi.mock('../../modules/survey/analytics.source',()=>({loadSurveySource:mocks.source}))
 vi.mock('../../modules/survey/builder.service',()=>({authorizedProject:mocks.auth,SurveyBuilderError:class extends Error{statusCode=403}}))
 vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:mocks.get}))
-import {readSurveyStoredReport} from '../../modules/survey/report-results.service'
+import {readSurveyStoredReport,listSurveyStoredReports} from '../../modules/survey/report-results.service'
 const hash='a'.repeat(64),scope={kind:'PRIVATE',ownerId:'owner',product:'SURVEY',resourceId:'project'}
 const pointer={releaseId:'m',contentHash:hash,measurementHash:hash}
 const template={schemaVersion:1,title:'Frozen report',blocks:[{type:'TEXT',text:'Saved statement'},{type:'METRIC',metricKey:'total',display:'RAW'},{type:'REFERENCE_BAND',metricKey:'total',referenceKind:'criterion_threshold',bandKey:'high',text:'Frozen band text'}],limitations:[]}
@@ -63,5 +63,21 @@ describe('researcher reads a report from saved FINAL interpretation',()=>{
   const result=await readSurveyStoredReport('owner',input)
   expect(result.report.blocks).toContainEqual(expect.objectContaining({type:'METRIC',value:null,status:'INVALID'}))
   expect(result.report.blocks.some((block:any)=>block.type==='REFERENCE_BAND')).toBe(false)
+ })
+})
+
+describe('bounded saved report pointer index',()=>{
+ it('uses one verified source projection and never fetches per-row releases or templates',async()=>{
+  const s=source() as any;s.interpretations[0]={...s.interpretations[0],finalId:'final',projectId:'project',waveId:'wave',sourceVerified:true,researchCode:'R1',completedAt:'2026-10-20T00:00:00Z'}
+  s.nextFinalCursor={id:'next',completedAt:'2026-10-20T00:00:00Z'};mocks.source.mockResolvedValue(s)
+  const result=await listSurveyStoredReports('owner',{projectId:'project',waveId:'wave',afterId:'before'})
+  expect(result).toMatchObject({nextAfterId:'next',list:[{finalId:'final',attemptCode:'R1',reports:[{instrumentKey:'scale',status:'READY',reportRelease:{releaseId:'p'}}]}]})
+  expect(mocks.source).toHaveBeenCalledWith(expect.objectContaining({maxFinals:25,pageMode:true,stableIdCursor:true,selectScore:false,selectRaw:false,includeInterpretation:true,afterFinal:{id:'before',completedAt:new Date(0)}}))
+  expect(mocks.get).not.toHaveBeenCalled();expect(mocks.transaction).not.toHaveBeenCalled()
+  expect(JSON.stringify(result)).not.toMatch(/Frozen report|Frozen band text|scores/)
+ })
+ it('refuses incomplete or foreign reader identities',async()=>{
+  await expect(listSurveyStoredReports('owner',{projectId:'project',waveId:'wave'})).rejects.toMatchObject({statusCode:409})
+  mocks.source.mockResolvedValue({...source(),interpretations:[]});await expect(listSurveyStoredReports('owner',{projectId:'project',waveId:'wave'})).rejects.toMatchObject({statusCode:409})
  })
 })

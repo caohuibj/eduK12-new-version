@@ -2,7 +2,7 @@ import {createSurveyReinterpretation,readSurveyReinterpretation} from './reinter
 import {ContentAuthorityError} from '../measurement-content/content-authority'
 import {SurveyBuilderError} from './builder.service'
 import {SurveyWaveError} from './waves.service'
-import {readSurveyStoredReport} from './report-results.service'
+import {readSurveyStoredReport,listSurveyStoredReports} from './report-results.service'
 import { Router,type Request,type Response,type NextFunction } from 'express'
 import { z } from 'zod'
 import { surveyAnalyticsItemRequestSchema } from './analytics.request'
@@ -145,4 +145,10 @@ surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/finals/:finalId/interpreta
   assertRecentSurveyMfa(req)
   return readSurveyReinterpretation(req.user!.userId,{projectId:id.parse(req.params.pid),waveId:id.parse(req.params.wid),
     finalId:id.parse(req.params.finalId),artifactId:id.parse(req.params.artifactId)})
+}))
+
+surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/reports',wrap(async req=>{
+  assertRecentSurveyMfa(req)
+  const query=z.object({afterId:id.optional()}).strict().parse(req.query)
+  return listSurveyStoredReports(req.user!.userId,{projectId:id.parse(req.params.pid),waveId:id.parse(req.params.wid),...query})
 }))

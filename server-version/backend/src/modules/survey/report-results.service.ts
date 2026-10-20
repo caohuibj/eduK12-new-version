@@ -1,3 +1,4 @@
+import {surveyAttemptCode} from './analytics.export-format'
 import {Prisma} from '@prisma/client'
 import {prisma} from '../../config/database'
 import {canonicalHash} from '../assessment-runtime/canonical'
@@ -66,4 +67,21 @@ export async function readSurveyStoredReport(actorId:string,input:{projectId:str
       interpretationSemantics:'SAVED_AT_FINAL_NO_RECALCULATION' as const,lifecycleNotices,
       report:renderDeclaredReport(report.content.template,metrics,references)}
   },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:5000})
+}
+
+/** Bounded pointer-only browser index. The existing reader supplies current
+ * scope and both source fences; no per-row release/template fetches. */
+export async function listSurveyStoredReports(actorId:string,input:{projectId:string;waveId:string;afterId?:string}){
+  const source=await loadSurveySource({actorUserId:actorId,projectId:input.projectId,waveIds:[input.waveId],
+    maxFinals:25,pageMode:true,stableIdCursor:true,selectRaw:false,selectScore:false,includeInterpretation:true,includeAttendance:false,
+    ...(input.afterId?{afterFinal:{id:input.afterId,completedAt:new Date(0)}}:{})})
+  const list=(source.interpretations??[]).map(saved=>{
+    if(!saved.finalId||!saved.sourceVerified||saved.projectId!==input.projectId||saved.waveId!==input.waveId)fail(409,'报告列表来源不完整')
+    return {finalId:saved.finalId,attemptCode:saved.researchCode??surveyAttemptCode(saved.attemptId),completedAt:saved.completedAt,
+      reports:(saved.binding?.units??[]).map(unit=>({instrumentKey:unit.instrumentKey,measurementRelease:unit.measurement,
+        reportRelease:unit.report??null,status:saved.interpretation?.units.find(item=>item.instrumentKey===unit.instrumentKey)?.report.status??'NOT_RECORDED'}))}
+  })
+  if(list.length!==source.completeAttempts)fail(409,'报告列表来源不完整')
+  return {list,nextAfterId:source.nextFinalCursor?.id??null,sourceRevision:source.sourceRevision,
+    semantics:'SAVED_FINAL_REPORT_POINTERS' as const}
 }

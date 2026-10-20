@@ -408,3 +408,24 @@ This remains controlled raw feedback, not participant reference/template reports
 Author UI 35, frozen-read 7, participant UI 50 and backend feedback 18 targeted
 contracts pass. These are component/service contracts, not live browser/HTTP or
 concurrent lock evidence. Final type validation will be combined with main alignment.
+
+### V08 researcher report selection and view
+
+The analytics workspace now offers an on-demand, bounded single-wave FINAL report
+list and exact FINAL/instrument view. The list reuses the verified source reader
+with raw/score projection disabled and returns pointers/status only; no per-row
+release or template lookup. Click-time reading retains current owner/recent-MFA,
+source fences and precise saved interpretation semantics. Rendering uses escaped
+text, numeric metric/chart tables and explicit reference-kind results. Assets
+without separately authorized URLs show alt text and do not load. Permission
+failure or project/wave navigation clears the previous view; late responses are
+ignored. This UI reads saved FINAL reports; independent reinterpretation creation
+and artifact export UI remain pending.
+
+14 focused backend reader/report/export contracts and 20 actual report/download
+component contracts passed. After merging actual main f41dca3f, both frontend and
+backend strict no-emit checks passed. The private Prisma client was regenerated;
+the missing official WebAuthn dependency was installed from an exact 25-entry
+subset of main's lockfile and all installed versions/integrities compared equal.
+This isolated dependency addition consumes 8.7 MiB; source lockfiles unchanged.
+No browser transport, connected PostgreSQL or final CI claim is made here.

@@ -915,7 +915,7 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
           const binding=decodeSurveyAttemptContentBinding({projectId:input.projectId,waveId:wave.id,attemptId:attempt.id,
             publicationId:publication.id,definitionDigest:final.definitionDigest,selectedSnapshot:assignedSurveySnapshot(snapshot,assigned),
             contentBindingCipher:receipt!.cipher,contentBindingHash:receipt!.hash})
-          interpretations.push({...meta,sourceVerified:true,binding,unitExecution:result.units.map(unit=>({instrumentKey:unit.instrumentKey,notExecuted:unit.notExecuted===true})),interpretation:checkedStoredSurveyInterpretation(result.interpretation,binding)})
+          interpretations.push({...meta,finalId:final.id,sourceVerified:true,binding,unitExecution:result.units.map(unit=>({instrumentKey:unit.instrumentKey,notExecuted:unit.notExecuted===true})),interpretation:checkedStoredSurveyInterpretation(result.interpretation,binding)})
         }catch{invalid('研究已存解释或冻结绑定无法验证')}
       }
       const cognitiveUnits=result.units.filter(unit=>unit.kind==='COGNITIVE'&&!unit.notExecuted)
