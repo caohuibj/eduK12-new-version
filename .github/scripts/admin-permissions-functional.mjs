@@ -19,6 +19,10 @@ const exactSources = new Set([
     'scripts/admin-permissions-rollback-preflight.mjs','scripts/runtime-table-policy.json'].map(path => 'server-version/backend/'+path),
   'server-version/docs/frontend-convergence/routes.md','server-version/e2e/admin-permissions-browser.cjs',
   'server-version/frontend/scripts/product-route-inventory.mjs',
+  'docs/miniprogram-v2/web-feature-inventory.json',
+  'server-version/e2e/ops-export-worker-smoke.ts',
+  'server-version/e2e/qa-round3-browser-e2e.cjs',
+  'server-version/e2e/qa-round5-sjt-upload-browser-e2e.cjs',
 ]);
 const sourcePath = path => canonical(path) && (exactSources.has(path)
   || /^server-version\/(backend|frontend)\/src\/.+\.(ts|tsx|css)$/.test(path)

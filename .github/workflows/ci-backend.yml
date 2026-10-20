@@ -290,9 +290,9 @@ jobs:
           npx vitest run "${files[@]}" --maxWorkers=1 --no-file-parallelism --reporter=default --reporter=json --outputFile="$ADMIN_PERMISSIONS_PRIVATE_DIR/vitest.json"
           node scripts/assert-release-test-report.mjs "$ADMIN_PERMISSIONS_PRIVATE_DIR/vitest.json" "${files[@]}"
           node scripts/admin-permissions-rehearsal.mjs
-          node scripts/admin-permissions-rollback-preflight.mjs "$(git rev-parse HEAD)" > "$ADMIN_PERMISSIONS_PRIVATE_DIR/rollback-current.json"
+          (cd "$GITHUB_WORKSPACE" && node server-version/backend/scripts/admin-permissions-rollback-preflight.mjs "$(git rev-parse HEAD)") > "$ADMIN_PERMISSIONS_PRIVATE_DIR/rollback-current.json"
           set +e
-          node scripts/admin-permissions-rollback-preflight.mjs "$CI_BASE_SHA" > "$ADMIN_PERMISSIONS_PRIVATE_DIR/rollback-old.json" 2>&1
+          (cd "$GITHUB_WORKSPACE" && node server-version/backend/scripts/admin-permissions-rollback-preflight.mjs "$CI_BASE_SHA") > "$ADMIN_PERMISSIONS_PRIVATE_DIR/rollback-old.json" 2>&1
           denied=$?
           set -e
           test "$denied" -eq 1

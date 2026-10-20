@@ -35,7 +35,7 @@ function needsFor(){
 
 test('administrator integration declares its own exact main base, complete reviewed source paths and only two omissions',()=>{
   assert.equal(config.base,'c3f9a7e77447c706f4a83a93c7429a7bcb164e94');
-  assert.equal(config.mode,'admin-permissions-functional-only');assert.equal(config.sourcePaths.length,127);
+  assert.equal(config.mode,'admin-permissions-functional-only');assert.equal(config.sourcePaths.length,131);
   assert.deepEqual(ADMIN_FUNCTIONAL_OMISSIONS,['aggregate-report-200-completion','perf-phase0-smoke']);
   assert.equal(validAdminFunctionalPlan(plan()),true);
   assert.equal(plan().mode,ADMIN_FUNCTIONAL_MODE);
@@ -105,6 +105,7 @@ test('administrator CI runs its actual isolated PG/API and both real virtual-key
   assert.match(backend,/test "\$\{#files\[@\]\}" -eq 10/);
   assert.match(backend,/assert-release-test-report\.mjs.*vitest\.json.*files\[@\]/);
   assert.match(backend,/admin-permissions-rehearsal\.mjs/);
+  assert.match(backend,/\(cd "\$GITHUB_WORKSPACE" && node server-version\/backend\/scripts\/admin-permissions-rollback-preflight\.mjs/);
   assert.match(backend,/assert\.equal\(tests\.numPendingTests,0\)/);
   assert.match(browser,/if: inputs\.admin_permissions_functional && matrix\.group == 'security'/);
   assert.match(browser,/eduk12_admin_permissions_ci_browser/);
