@@ -31,8 +31,8 @@ V01 不改生产代码、数据库、账号或发布规则；只运行文档差�
 | data.read / export / reinterpret | 当前个人/项目/课程范围、事实及解释工件 | 当前获准数据读取、分别导出、显式新解释 | 内容编制、全学校答卷、自动批量重解释 |
 | delegate | 上游可委派操作、资源、入口/组织/项目、期限 | 给下级交集范围 | 横向入口、扩大期限或来源权利 |
 
-上表名称是本 PR 的业务操作标签，V05 必须映射到管理员 PR 最终能力接口，而不是直接增加账户角色/grant/MFA。businessRole 与管理 grant 正交；入口管理资格不得隐含该入口业务身份。后端对象范围为权威，菜单/深链/API 一致；仅隐藏按钮不算授权。
-管理员 PR 当前不在本基点，不能当作已经合并。先实施 V01–V04 的内容核心，V05 对齐最终 main 后接入；不为等待接口而另造并行授权。
+上表是本 PR 永久内容域的细粒度能力；V05 在既有 User 上实现精确资源授权，管理员 PR 提供 principal、入口资格与近期强认证基座，不提供这些科学/内容能力。不得另建账户角色或 MFA。businessRole 与管理 grant 正交；入口管理资格不得隐含该入口业务身份。后端对象范围为权威，菜单/深链/API 一致；仅隐藏按钮不算授权。
+管理员 PR 当前不在本基点，不能当作已经合并。内容能力核心与现有受控私有报告服务可先实施；系统签发授权入口需对齐最终 main 的近期强认证后开放。
 
 ## 3. 四入口编制与消费映射
 
@@ -108,7 +108,7 @@ FINAL 以既有 submissionId/payloadHash/epoch 原子接收：正常成功路径
 | Assessment/AssessmentResultFact、CognitiveSession/RawSubmission、SurveyWaveFinal、SurveyCognitiveSession/Result | 原始事实及 epoch/submission/hash/加密不变；新增精确 release 引用及解释工件 | 从旧结果缺失信息编造身份、重新计分后覆盖 |
 | AssessmentRuntimeArtifact/PublicTemplate/FrozenBinding、CompositeReportJob | 共享不可变内容与持久任务；绑定和个人事实分开，保留原始 receipt 恢复关系 | 每个结果复制整包，新增三套队列，长期双写 |
 | ExportBatch/ExportArtifact、SurveyExportTicket；`training-analysis/export.ts`、`survey/analytics.raw-export.ts` | 默认 raw、独立解释，冻结 manifest/schema/checksum；保留现有权限/下载恢复合同 | 只存 cutoff、复用同 exportId 返回最新文件 |
-| InstrumentAuthorization、ScaleDeploymentPolicy、Survey 与 Teacher 来源 grant/许可 | 上游来源许可保留；V05 消费管理员最终接口，逐对象映射 | 复制授予体系，复制内容解除许可或改变 businessRole |
+| InstrumentAuthorization、ScaleDeploymentPolicy、Survey 与 Teacher 来源 grant/许可 | 上游来源许可保留；V05 内容域能力与现有来源许可逐对象取交集 | 复制授予体系，复制内容解除许可或改变 businessRole |
 
 迁移记录最少包含源类型/ID/原 hashScheme/hash、目标 release/事实/工件 ID、关系完整性、处理结果、不可映射原因、对象计数、恢复点。不能无损映射的对象单列，保留冻结工件或请求决定；不以宽松 adapter 永久掩盖。
 切换前检查所有仍有消费者的 Training/Survey/School/Teacher 调用方；新链路验收后一次切换、移除无消费者旧代码。真实旧数据删除名单另行确认。清理代码不授权清理记录。
@@ -121,7 +121,7 @@ FINAL 以既有 submissionId/payloadHash/epoch 原子接收：正常成功路径
 | V02 | 三层不可变发布模型、状态、共享资产引用/目录投影 | 同版本不同内容拒绝、三层独立 hash 与历史状态合同 |
 | V03 | Scale 共用定义/导入/私有发布；依赖 V02 | 无 norm 发布、来源只读不可复制解锁、两编制入口 |
 | V04 | 既有 Cognitive 受控参数/刺激及现有 SJT 三层适配；依赖 V02 | runner 不存在阻断、配置/专家评分 key 冻结、原施测/提交/回读 |
-| V05 | 管理员最终能力接口/范围/有限委派 | 最新 main 对齐后真实权限负例；不另建身份体系 |
+| V05 | 同 User 内容域能力/精确范围/一层委派 | 内容域负例先验证；最终 main 对齐系统强认证签发入口 |
 | V06 | 内部授权候选、复核发布、逐指标选择及撤回 | 正式 norm 独立复核、冲突/缺字段降级、普通替代 |
 | V07 | 报告草稿/预览/独立发布/显式新解释 | report-only 不变测量/参考、原报告保留、幂等请求 |
 | V08 | 投放冻结、START、FINAL、raw/interpretation 导出，覆盖已有 SJT 结果版本 | 单次 scorer、旧事实不漂移、固定 manifest 与 checksum |
@@ -140,7 +140,7 @@ FINAL 以既有 submissionId/payloadHash/epoch 原子接收：正常成功路径
 
 ## V02 实施记录
 
-新增 `measurement-content/release.ts` 与 repository：统一的三层精确身份、独立内容投影、不可变版本冲突、确定生命周期、来源/指标引用检查及有界目录投影。现有草稿工作区、scorer、runner 不变；本单元没有公开未授权 API。新增单一共享 release 表及 append-only 状态事件表，数据库 trigger 保护已发布内容/来源，未执行实际迁移。V03/V04 家族适配器仍须用既有 schema/runner/资产授权验证内容；V05 接入管理员能力；V07 完成报告语义门禁。通用信封结构校验不是科学发布资格。
+新增 `measurement-content/release.ts` 与 repository：统一的三层精确身份、独立内容投影、不可变版本冲突、确定生命周期、来源/指标引用检查及有界目录投影。现有草稿工作区、scorer、runner 不变；本单元没有公开未授权 API。新增单一共享 release 表及 append-only 状态事件表，数据库 trigger 保护已发布内容/来源，未执行实际迁移。V03/V04 家族适配器仍须用既有 schema/runner/资产授权验证内容；V05 增补内容域能力并对齐管理员身份基座；V07 完成报告语义门禁。通用信封结构校验不是科学发布资格。
 
 轻量检查：6 个新纯合同用例通过；新模块 strict TypeScript 检查通过；Prisma schema validate 通过。复用相邻官方依赖目录只读符号链接，未安装/复制大依赖。真实 PostgreSQL 迁移/并发/恢复与最终应用回归留 V10 集中执行，不能以本次 schema validate 代替。七轴表述已按既有 `server-version/docs/scale-library/catalog-version-semantics.md` 修正。
 
@@ -160,7 +160,7 @@ V03 独审修复：Survey 的有效 presentationMode（省略时与现有 UI 一
 
 Cognitive 内容投影冻结实际配置、协议、输入/时序/随机策略、质量约束、指标、支持 profile 参数和 FINAL 上界，剔除 report 配置；不认识的参数/runner 拒绝。SJT 评分矩阵/专家 key 保留在测量层，report/referencePolicy 剔除；线上原始响应协议/题面显式冻结，先验证既有 online 元数据，再去除旧全定义摘要和版权/作者备注。Survey 目录 SJT 保留来源 instrumentVersion，私有 edit revision 单独作为 release 版本。
 
-Cognitive 原发布入口此前没有 actor 参数；现在 controller 使用已验证请求身份，CLI apply 必须显式提供真实既存 `--actor` 并在事务中校验当前系统管理员。无 actor 拒绝，不补造身份；V05 将按管理员最终接口映射内容能力。现有生命周期测试已同步，真实 PG 测试使用独立合成 publisher，不把普通教师自动升权。
+Cognitive 原发布入口此前没有 actor 参数；现在 controller 使用已验证请求身份，CLI apply 必须显式提供真实既存 `--actor` 并在事务中校验当前系统管理员。无 actor 拒绝，不补造身份；V05 将由本 PR 内容域能力取代宽泛管理资格，系统强认证对齐管理员最终接口。现有生命周期测试已同步，真实 PG 测试使用独立合成 publisher，不把普通教师自动升权。
 
 验证：新增 4 项 Cognitive/SJT 合同通过；受影响 release service 的 7 项单元通过；本分支 Prisma schema validate 通过。首轮新 fixture 缺 SJT 必需第二题及认知测试开关，修正测试输入后通过，未放宽产品校验。私有 Prisma client 已从本分支 schema 成功生成（独立 dependency overlay，仅复制约 8 MB client，其他官方依赖只读软链，生成物约几十 MB），没有覆盖共享依赖。加载真实 Request 扩展后，V02–V04 新核心与实际发布接入点定向 strict TypeScript 检查通过，解决此前旧生成 client 导致的检查阻塞。真实 PostgreSQL 迁移/事务/恢复和浏览器回归尚未执行，留集中验收；schema validate 和 mock 单元不替代这些证据。独立报告/参考、投放消费和旧结果回读仍须 V06–V09 完成，不将本单元登记为整个闭环上线。
 
@@ -188,9 +188,18 @@ V06/V08 冻结匹配内部准备：新增有界 EXACT_POPULATION_PRIORITY_V1 选
 
 真实 reader 只读盘点见 [reader-interface-audit.md](reader-interface-audit.md)。
 
-- [ ] 管理员最终接口恢复/合并后，认证 actor 的 capability 与现有 Training resource scope / Survey project owner scope 取交集；底层 facts reader 不独立授予访问。
+- [ ] 本 PR 内容域 capability 与现有 Training resource scope / Survey project owner scope 取交集；系统签发入口待管理员 principal / 近期强认证对齐；底层 facts reader 不独立授予访问。
 - [ ] 从真实 publication/runtime release 绑定补入 source 投影，拒绝客户端自报 measurementReleaseId；历史没有无损映射时单列，不编造同一测量身份。
 - [ ] Survey 人口组仅使用明确映射的真实冻结字段；现阶段不从题名推断、不自动映射、不新增人口资料采集。缺字段只匹配真正适用的已批准无约束参考。
 - [ ] Training 复用已校验 frozen context、sourceResultHash、epoch/slot 与现有有界 facts batch；保留关系测评可见范围及组织资源隔离。
 - [ ] 候选实际 membership reader 保留 Survey 计算前后 sourceRevision/count/撤回 fence，发布事务重核当前资格；不要把这些具有 TOCTOU 风险的检查当作冗余删除。
 - [ ] 原报告按原冻结工件读取，不重跑当前选择器；选择器任一候选 REVOKED 导致整 metric/referenceKind slot 降级的保守策略须在接入中显式保留。
+
+## V05 内容授权与 V07 私有报告服务接入
+
+- `ContentCapabilityGrant` 复用现有 User，能力限定 measurement/reference/report/catalog/material 操作及精确 product/scope/resourceKeys。根授权最多委派一层；子级不能扩范围、能力或期限，不能再委派。每次授权一次有界祖先查询加共享锁，取得锁后读取数据库时钟；撤权 CAS 与保护写入同锁协议，父撤权无需复制更新所有子行。授权元数据不进 measurementHash。系统根授权签发与紧急撤销 HTTP 仍待 PR317 真实近期强认证接口接入；本次未暴露临时系统授权路由。
+- Survey `/api/survey/projects/:pid/report-drafts` 提供创建、分页列表、读取、CAS 编辑、合成预览与发布；`/measurements` 仅列本项目已有原生私有测量身份和指标。用户来自 authenticateSurvey，事务复用既有项目 owner、有效 Survey researcher grant、账户与 MFA enabled 校验。MFA enabled 不等于近期强认证；此私有作者流程不授予系统管理或正式 norm 权。
+- 草稿精确绑定现有 measurement release；当前只允许本项目原生内容。目录使用许可不自动允许改编报告。静态图片沿现有项目资产所有权、冻结哈希/MIME、体积和权利声明验证；发布后保留引用。作者自用报告无需平台上架审批，发布只记录作者与 publicationNote，不伪造平台审核。
+- 已发布草稿不可变；修改应创建新的 reportKey/version，旧版本不覆盖。报告模板共享存储一次，声明式渲染器只消费已给定事实/参考结果，不计分、不重算阈值、不执行 HTML/脚本。无效/非有限指标不生成参考解释；同指标相同 band 名按 referenceKind 精确区分。
+- 预览明确标为 synthetic，只有服务端固定的可解释/无参考/无效情境，不读取真实样本。报告编制可用于已结束或归档项目的历史解释，不能重开采集；正常 superseded/retired 测量允许修正文案，REVOKED 拒绝。用途由服务端确定，前端没有 historical 绕过参数；后续新施测绑定仍单独检查测量可用性。
+- 当前是实际受控后端服务，不代表四入口 UI、真实答卷报告生成、显式新解释持久化、wave/report 绑定或 V08 START/FINAL 已完成。已有测量来自 Wave 发布；独立编制与投放选择的完整 UI/顺序仍在 V07/V08 清单内。V06 正式参考仍必须细粒度内容能力与真实数据范围同时满足，项目 owner 不自动成为分析者/复核者。

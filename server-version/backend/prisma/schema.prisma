@@ -9,6 +9,11 @@ datasource db {
 }
 
 model User {
+  contentCapabilityGrants       ContentCapabilityGrant[] @relation("ContentCapabilitySubject")
+  issuedContentCapabilityGrants ContentCapabilityGrant[] @relation("ContentCapabilityIssuer")
+  revokedContentCapabilityGrants ContentCapabilityGrant[] @relation("ContentCapabilityRevoker")
+
+  surveyReportDrafts SurveyReportDraft[]
   measurementReferenceCandidates MeasurementReferenceCandidate[]
   measurementReferenceReviews MeasurementReferenceReview[]
   compositionTemplates AssessmentCompositionTemplate[]
@@ -2830,6 +2835,7 @@ model SurveyMfaRecoveryCode {
   @@map("survey_mfa_recovery_codes")
 }
 model SurveyProject {
+  reportDrafts SurveyReportDraft[]
   instruments    SurveyInstrumentDraft[]
   waves          SurveyWave[]
   publications   SurveyPublication[]
@@ -3902,6 +3908,7 @@ model TrainingAttemptCheckpoint {
 
 // Three independently versioned content layers; no personal answer data.
 model MeasurementContentRelease {
+  surveyReportDrafts SurveyReportDraft[]
   referenceCandidates MeasurementReferenceCandidate[]
   id              String @id
   layer           String
@@ -3965,4 +3972,55 @@ model MeasurementReferenceReview {
   reviewedAt DateTime @default(now()) @map("reviewed_at") @db.Timestamptz(6)
   @@index([candidateId,reviewedAt],map:"measurement_reference_review_candidate_idx")
   @@map("measurement_reference_reviews")
+}
+
+model SurveyReportDraft {
+  id String @id
+  projectId String @map("project_id")
+  project SurveyProject @relation(fields:[projectId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  ownerId String @map("owner_id")
+  owner User @relation(fields:[ownerId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  reportKey String @map("report_key")
+  version String
+  revision Int @default(0)
+  payload Json
+  state String @default("DRAFT")
+  publishedReleaseId String? @map("published_release_id")
+  publishedRelease MeasurementContentRelease? @relation(fields:[publishedReleaseId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  @@unique([projectId,reportKey,version],map:"survey_report_drafts_project_id_report_key_version_key")
+  @@map("survey_report_drafts")
+}
+
+model ContentCapabilityGrant {
+  id                       String   @id
+  subjectId                String   @map("subject_id")
+  issuerId                 String   @map("issuer_id")
+  parentGrantId            String?  @map("parent_grant_id")
+  product                  String
+  scopeKind                String   @map("scope_kind")
+  scopeId                  String   @map("scope_id")
+  resourceKind             String   @map("resource_kind")
+  resourceKeys             String[] @map("resource_keys")
+  capabilities             String[]
+  delegableCapabilities    String[] @map("delegable_capabilities")
+  remainingDelegationDepth Int      @map("remaining_delegation_depth")
+  validFrom                DateTime @map("valid_from") @db.Timestamp(3)
+  expiresAt                DateTime @map("expires_at") @db.Timestamp(3)
+  ancestry                 String[]
+  version                  Int      @default(1)
+  createdAt                DateTime @default(now()) @map("created_at") @db.Timestamp(3)
+  revokedAt                DateTime? @map("revoked_at") @db.Timestamp(3)
+  revokedBy                String?  @map("revoked_by")
+  revokeReason             String?  @map("revoke_reason")
+  subject                  User     @relation("ContentCapabilitySubject", fields: [subjectId], references: [id], onDelete: Restrict)
+  issuer                   User     @relation("ContentCapabilityIssuer", fields: [issuerId], references: [id], onDelete: Restrict)
+  revoker                  User?    @relation("ContentCapabilityRevoker", fields: [revokedBy], references: [id], onDelete: Restrict)
+  parent                   ContentCapabilityGrant? @relation("ContentCapabilityDelegation", fields: [parentGrantId], references: [id], onDelete: Restrict)
+  children                 ContentCapabilityGrant[] @relation("ContentCapabilityDelegation")
+
+  @@index([subjectId, product, scopeKind, scopeId, resourceKind], map: "content_capability_grants_subject_scope_idx")
+  @@index([parentGrantId], map: "content_capability_grants_parent_idx")
+  @@map("content_capability_grants")
 }

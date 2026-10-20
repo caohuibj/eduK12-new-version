@@ -24,7 +24,7 @@ const publicRow=(row:any)=>({
   status:row.status,createdAt:row.createdAt,updatedAt:row.updatedAt,
 })
 
-async function authorizedProject(tx:Tx,userId:string,projectId:string,write:boolean){
+export async function authorizedProject(tx:Tx,userId:string,projectId:string,write:boolean){
   const rows=await tx.$queryRaw<Array<{id:string;status:string}>>`
     SELECT p.id,p.status FROM "survey_projects" p
     JOIN "users" u ON u.id=p.owner_user_id

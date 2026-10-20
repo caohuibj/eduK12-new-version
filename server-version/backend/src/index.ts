@@ -11,6 +11,7 @@ import { surveyOriginGuard, platformSurveyOriginGuard } from './modules/survey/o
 import { validateSurveyStartupConfig } from './modules/survey/startup.config'
 import { surveyAuthRouter } from './modules/survey/auth.routes'
 import { surveyProjectsRouter } from './modules/survey/projects.routes'
+import { surveyReportDraftsRouter } from './modules/survey/report-drafts.routes'
 import { surveyBuilderRouter } from './modules/survey/builder.routes'
 import { surveyMediaRouter } from './modules/survey/media.routes'
 import { surveyWavesRouter } from './modules/survey/waves.routes'
@@ -288,6 +289,7 @@ validateSurveyStartupConfig()
 app.use('/api/survey', surveyFeatureGuard, surveyOriginGuard)
 app.use('/api/survey/auth', surveyAuthRouter)
 app.use('/api/survey/projects', surveyBuilderRouter)
+app.use('/api/survey/projects', surveyReportDraftsRouter)
 app.use('/api/survey/projects', surveyMediaRouter)
 app.use('/api/survey/projects', surveyWavesRouter)
 app.use('/api/survey/projects', surveyAnalyticsRouter)

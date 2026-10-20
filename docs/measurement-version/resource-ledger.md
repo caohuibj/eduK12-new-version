@@ -29,3 +29,6 @@
 物理容量规划再分别加入 `indexBytes + WALRetentionBytes + temporaryPeakBytes + cacheBytes + backupRetentionBytes`。备份和缓存不能与主数据库重复声称“每答新增正文”。共享资产若存对象库，应分列数据库与对象库容量。
 
 当前不填虚构每份 bytes。V10 或独立压力线提供代表性合成测量后，应记录每变量的测量口径（逻辑/物理、压缩前后、样本尺寸、报告类型、索引与保留期限）、均值/分位/峰值及来源。每答开销不得用共享定义完整尺寸乘 N；显式新解释可增加独立结果，但不复制原始答案或共享定义。
+
+| R12 | 内容权限祖先验证 | content-authority.repository.ts 单次有界 ancestry 查询，根＋一层委派；取得共享锁后读时钟 | 无系统授权 HTTP；没有新生产 flag | 8 项早期纯/mock 合同，SQL约束证据另录；非并发实测 | 不逐层递归 N+1；父撤销不批量复制子行；不以缓存绕当前撤权 | V05 | 同 User、scope/期限/委派上限、当前祖先撤权 | 接入中 | 长任务须执行前后授权/source fence；不得用 entry ADMIN 代科学权 |
+| R13 | 私有报告编制/合成预览 | survey/report-drafts.service.ts；report-renderer.ts | authenticateSurvey＋现有 owner/grant/MFA enabled；无默认flag变更 | 定向服务/渲染测试；非真实答卷容量 | 草稿与共享 REPORT release 有独立编制/发布语义；预览不读取样本，不每答复制模板/资产 | V07 | CAS、不可变发布、精确测量/资产、合成标识 | 服务已接，UI/实际解释待接 | MFA enabled 不是 recent strong-auth；原始事实不能被新解释覆盖 |

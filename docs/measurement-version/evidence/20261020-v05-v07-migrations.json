@@ -1,0 +1,12 @@
+[
+  {
+    "migration": "20261020030000_content_capability_authority",
+    "sha256": "b3f52733ead3f8a1dd4b7851f1b69ec78486997c9a391cae634a8cdd2364a4c1",
+    "passed": true
+  },
+  {
+    "migration": "20261020031000_survey_private_report_drafts",
+    "sha256": "92396fcc0b72c61f66d0b4c7c3c40b52a89a943475852acbe2bd8a164d18cd19",
+    "passed": true
+  }
+]
