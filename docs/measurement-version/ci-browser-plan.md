@@ -1,6 +1,6 @@
 # Measurement: bounded browser qualification
 
-Current execution is the sixth-round route below: build only the changed frontend,
+Current execution is the seventh-round route below: build only the changed frontend,
 reuse the original backend, run journeys, and retain the separately identified
 original administrator success. Earlier round sections record history and do not
 override this current route.
@@ -161,3 +161,20 @@ a separate current product inventory and exact patch describe the new source.
 The unchanged 390/1440 browser assertions verify the actual new output. No broad
 frontend unit/type rerun, backend compilation, or full CI is added. If a browser
 job alone fails, re-run that failed job against the same new frontend artifact.
+
+## Seventh round: Survey measurement identifier wrapping
+
+Run `39423880245` compiled the sixth-round frontend once and passed 32 journey
+assertions before a later Survey report panel overflowed at 390px. Its frontend
+build remains genuine successful evidence, but is not reused as the new product
+output after this additional source change. The current exact patch adds only
+`overflowWrap: anywhere` to SurveyReportStudio's measurement-identity paragraph;
+no field, protocol, assertion, or clipping behavior changes.
+
+The existing frontend-only producer compiles this affected source once. Backend
+and administrator evidence retain their original identities. The Survey report
+panel is separate from the administrator route; the new exact before/after blob
+joins the prior scoped layout patch, and reversing all three exact paths must
+still reconstruct the original complete frontend input fingerprint. Existing
+390/1440 checks remain unchanged. This round adds no broad type/unit suite and
+does not claim the previous incomplete journey fully passed.

@@ -179,7 +179,7 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
           <span>第 {page} 页</span><button type="button" className="btn-secondary" disabled={busy||list.length<25} onClick={()=>void run(()=>loadList(page+1))}>下一页</button></div>
       </nav>
       {selected&&<div className="space-y-4 min-w-0"><h3 className="font-semibold">{selected.report_key} · {selected.version} · 修订 {selected.revision}</h3>
-        <p>测量：{measurement?.key||selected.payload.measurementReleaseId} {measurement?.version||''}</p>
+        <p style={{overflowWrap:'anywhere'}}>测量：{measurement?.key||selected.payload.measurementReleaseId} {measurement?.version||''}</p>
         {selected.state==='PUBLISHED'&&<p>已发布版本只读。修改内容请明确复制为新版本。</p>}
         <fieldset disabled={busy||readOnly||!!pendingCreate} className="space-y-3 min-w-0"><legend>报告内容</legend>
           <label className="block">报告标题<input className="input block w-full" value={selected.payload.template.title||''} onChange={e=>change({...selected.payload,template:{...selected.payload.template,title:e.target.value||undefined}})}/></label>

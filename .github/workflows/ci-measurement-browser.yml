@@ -57,7 +57,7 @@ jobs:
           retention-days: 3
           if-no-files-found: error
   frontend:
-    name: build changed formal-reference frontend once
+    name: build changed measurement frontend once
     needs: scope
     runs-on: ubuntu-24.04
     timeout-minutes: 25
@@ -259,5 +259,5 @@ jobs:
           assert set(results) == {'scope', 'reuse', 'frontend', 'admin', 'browser'}
           assert all(row['result'] == 'success' for row in results.values()), results
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as output:
-            output.write("Bounded journeys succeeded using this run's rebuilt scoped frontend and the original verified backend. Administrator checks retain original-run success under the reviewed disjoint FormalReferenceStudio repair; they were not replayed on the new frontend bundle. Local checks remain reference-only. No full-platform, merge, image-security, deployment or scientific-norm qualification is claimed.\n")
+            output.write("Bounded journeys succeeded using this run's rebuilt scoped frontend and the original verified backend. Administrator checks retain original-run success under the reviewed disjoint FormalReferenceStudio and SurveyReportStudio wrapping repairs; they were not replayed on the new frontend bundle. Local checks remain reference-only. No full-platform, merge, image-security, deployment or scientific-norm qualification is claimed.\n")
           PY

@@ -112,10 +112,15 @@
         "before": null,
         "after": "38d33c0e0fba68c4aff7456f973a803241c1c91f",
         "mode": "100644"
+      },
+      "server-version/frontend/src/survey/SurveyReportStudio.tsx": {
+        "before": "6a181626762fa4dd258fe19461d1c39660786618",
+        "after": "723f2ad545d041dd27562313aefafce353f90171",
+        "mode": "100644"
       }
     },
-    "stableSourceInventorySha256": "465af0896e4fa25d95965a3e44db46bbe8fe67fe363b3aa119c574cd08d320e4",
-    "stableFrontendInventorySha256": "bec94fb31c5d8473af6c44f4999f96703dc8983edf107a63e0969a70ed783fa3",
-    "reason": "Independently reviewed FormalReferenceStudio-only class and scoped CSS fix for actual 390px overflow; not used by administrator surface. New frontend build required; old admin proof retains old frontend identity."
+    "stableSourceInventorySha256": "87327ec1540b60b97ccb698e8531c4bcec2bb451a81d00b86ecfa37d64339637",
+    "stableFrontendInventorySha256": "885629b9b7563beb373c865e74fd5f0f5fcad2fc81afb0df20bd0259af41aef0",
+    "reason": "Independently reviewed FormalReferenceStudio scoped control-width repair and SurveyReportStudio measurement-paragraph wrapping for actual 390px overflow; neither surface is used by the administrator route. New frontend build required; old admin proof retains old frontend identity."
   }
 }
