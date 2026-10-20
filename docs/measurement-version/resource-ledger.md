@@ -41,3 +41,5 @@
 | R17 | 独立存储线最终单份结果 | 父协调提供产品0efc283、文档38a75df66ac91b5f1e3161305d9310edf6e60ead，docs/performance/20261020-training-final-single.md | 同独立线三共享flags场景；未改本分支默认 | 独立实测record60715 B，core39850/facts1680/binding560 B；首次wrapper6401/runtime5080/templates7144 B另列 | 既有Cog report writer与共享codec；不新造压缩器 | V08–V09，待PR318吸收 | trial/完整report/canonical/CSV科学一致为独立证据 | 本主线待合并接入 | 不能据CPU .95s/SQL610宣称稳态提速；首次成本不重复计入每份 |
 
 | R18 | Survey prepare 三层选择 | content-selection.ts、publication.service.ts | 现有 authenticateSurvey/owner/MFA + SURVEY_PUBLICATION_ENABLED；仅自身项目PRIVATE | 20目标合同、strict tsc；无容量/并发实测 | publication只存release/entry指针、策略版本和优先级，不复制共享模板/常模；同request release锁验证cache | V08 | 精确测量/范围/状态、缺省不选latest、锁后expiry | freeze已接，START/FINAL待接 | 请求cache不得跨请求；历史回读不可重跑选择器 |
+
+| R19 | START per-attempt binding | content-binding.service.ts、admission.service.ts；新增双列单次迁移 | 现有真实START范围；空populationContext，无新采集字段 | 18定向合同；单用户PG六拒绝+合法更新，目录69MiB/空闲8.4GiB | 只存选中指针/理由，不复制候选集合或模板；同request验证cache；无flow也绑定 | V08 | 新写一次、恢复不重选、双null旧不回填、层级撤回语义 | START已接，FINAL另单元 | 完整release加载/最大内存未实测；不能把single-user当并发验收 |

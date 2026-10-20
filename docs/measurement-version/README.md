@@ -268,3 +268,11 @@ Survey 项目授权把原有 owner/账户/grant/MFA 的 FOR SHARE 行集合放�
 Wave freeze 原有单条项目查询同时锁定 project、User、researcher grant 和 MFA 行，MATERIALIZED 锁后投影 clock_timestamp，再检查 expiry，避免锁等待期间失效的资格继续冻结。没有追加第二套授权查询；保持 Project→Wave 的既有锁顺序。
 
 验证：内容选择、精确 release admission、参考选择器三个目标文件共 20 项通过，strict TypeScript 通过。包含缺省不隐选、精确指针、请求内复用、跨项目/owner/测量拒绝、全部非 PUBLISHED 状态拒绝，以及模拟锁后过期。仍非真实锁等待/HTTP 验证。
+
+### V08 START 一次绑定
+
+两条实际 START 路径在已确定 flow 分组后，为新 Attempt 一次保存独立加密 contentBindingCipher/hash；无 flow 的普通问卷同样覆盖。绑定包含真实 publication/digest、选中测量指针、参考选中 entry 或 unavailable 理由、报告指针与 START 时撤回状态。人口上下文为空：目前没有可明确映射的已冻结人口字段，带条件参考不能猜测匹配。每份不复制候选全集、模板或常模数组。
+
+恢复只校验原绑定身份及冻结选择成员，不重新运行 selector，不换 latest。旧双 null 不回填新身份；纯 FORM/旧无 measurementRelease 发布不编造绑定。已冻结投放的测量 SUPERSEDED/RETIRED 可保原版启动，REVOKED 测量拒新 START；参考遵已冻结 selector 的降级规则，report 撤回记录不可新生成但不阻采集。后续 FINAL 仍需按层核当前状态；历史事实保留。
+
+新增单次 SQL migration 20261020040000_survey_attempt_content_binding，约束双字段成对、SHA 格式和写入后不可变；不修改任何旧迁移。18 个 START/binding 定向测试通过。隔离 PG16.15 single-user 已应用该新迁移，六个约束拒绝及合法首次绑定/完成状态更新通过；不是 Prisma deploy 或真实并发。私有 Prisma client 使用本主线独立 output 生成，不改共享 client。

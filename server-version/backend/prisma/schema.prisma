@@ -2974,6 +2974,8 @@ model SurveyWaveAttempt {
   sessionHash    String?       @map("session_hash")
   runtimeAttemptId String?     @unique @map("runtime_attempt_id")
   flowAssignmentCipher String?  @map("flow_assignment_cipher")
+  contentBindingCipher String? @map("content_binding_cipher")
+  contentBindingHash String? @map("content_binding_hash")
   status         String        @default("STARTED")
   startedAt      DateTime      @default(now()) @map("started_at") @db.Timestamptz(6)
   completedAt    DateTime?     @map("completed_at") @db.Timestamptz(6)

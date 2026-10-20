@@ -1,0 +1,12 @@
+[
+  {
+    "file": "prisma/migrations/20261020040000_survey_attempt_content_binding/migration.sql",
+    "sha256": "fa20b9a360a53747c3b3c4f6cc706b68176737b506e4add9ef7883d73e40e434",
+    "passed": true
+  },
+  {
+    "file": "src/__tests__/measurement-content/survey-content-binding-database-contracts.sql",
+    "sha256": "63d4ae0299b53c072a814f992357487761be1707fdd72cdcb222e7bd48c3620d",
+    "passed": true
+  }
+]

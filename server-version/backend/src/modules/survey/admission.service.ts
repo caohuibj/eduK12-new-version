@@ -9,6 +9,7 @@ import {
 import { SurveyWaveError } from './waves.service'
 import type { ResearchFrozenPublication } from './publication.service'
 import { allocateResearchFlowOnAdmission } from './flow.assignment'
+import {bindSurveyAttemptContent} from './content-binding.service'
 import { canonicalHash } from '../assessment-runtime/canonical'
 
 type Tx=Prisma.TransactionClient
@@ -195,7 +196,10 @@ export async function startLinkedWave(input:{
     const previous=await tx.surveyWaveAttempt.findFirst({where:{
       projectId:project.id,waveId:wave.id,participantId:identity.participantId,
     }})
-    if(previous)return {attemptId:previous.id,waveId:wave.id,status:previous.status,recovered:true}
+    if(previous){
+      await bindSurveyAttemptContent(tx,{projectId:project.id,waveId:wave.id,attemptId:previous.id,publicationId:wave.publicationId!,newAttempt:false})
+      return {attemptId:previous.id,waveId:wave.id,status:previous.status,recovered:true}
+    }
     if(!hasQuota(wave))blocked('本波次参与名额已用尽')
     await claimQuota(tx,wave.id,wave.startsCount)
     const row=await tx.surveyWaveAttempt.create({data:{
@@ -212,6 +216,7 @@ export async function startLinkedWave(input:{
       attemptId:row.id,participantId:identity.participantId,
       researchCode:input.researchCode,accessCredential:input.accessCredential,
     })
+    await bindSurveyAttemptContent(tx,{projectId:project.id,waveId:wave.id,attemptId:row.id,publicationId:wave.publicationId!,newAttempt:true})
     return {attemptId:row.id,waveId:wave.id,status:'STARTED',recovered:false}
   })
 }
@@ -240,6 +245,7 @@ export async function startSingleUnlinkedWave(input:{
       publicationId:wave.publicationId!,projectId:project.id,waveId:wave.id,
       attemptId:row.id,participantId:null,accessCredential:proof.accessCredential,
     })
+    await bindSurveyAttemptContent(tx,{projectId:project.id,waveId:wave.id,attemptId:row.id,publicationId:wave.publicationId!,newAttempt:true})
     return {attemptId:row.id,waveId:wave.id,status:'STARTED',
       accessCredential:proof.accessCredential}
   })
