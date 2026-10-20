@@ -60,6 +60,37 @@ export interface ResearchFrozenPublication {
 }
 const stop=(message:string):never=>{throw new SurveyWaveError(409,message)}
 
+/** Shared by explicit content publication and Wave freeze; identical revision identity. */
+export async function publishSurveyMeasurementUnit(tx:Prisma.TransactionClient,unit:ResearchFrozenUnit,actorId:string,projectId:string){
+  if(unit.kind==='FORM')throw new SurveyWaveError(400,'普通表单不生成测量版本')
+  const scope = { kind: 'PRIVATE' as const, ownerId: actorId, product: 'SURVEY' as const, resourceId: projectId }
+  let release
+  if (unit.kind === 'COGNITIVE') {
+    const frozen = parseFrozenSurveyCognitive(unit.compiledDefinition)
+    const snapshot = frozen.sessionSnapshot
+    release = await publishContentRelease(tx, cognitiveMeasurementRelease({
+      localId: unit.draftId, version: String(unit.draftRevision), scope,
+      testType: snapshot.testType, configVersion: snapshot.configVersion,
+      engineVersion: snapshot.engineVersion, scoringVersion: snapshot.scoringVersion, config: snapshot.config,
+      protocolContext: { timingPolicy: frozen.timingPolicy, devicePolicy: frozen.devicePolicy, restartLimit: frozen.restartLimit },
+    }), actorId)
+  } else if (unit.kind === 'SJT') {
+    release = await publishContentRelease(tx, sjtMeasurementRelease({
+      localId: unit.draftId, version: String(unit.draftRevision), instrumentVersion: surveyScaleReleaseContext(unit).instrumentVersion,
+      definition: unit.compiledDefinition, displayProtocol: unit.displayDefinition, scope, provenance: unit.sourceProvenance ?? {},
+    }), actorId)
+  } else release = await publishScaleMeasurement(tx, {
+    localId: unit.draftId, version: String(unit.draftRevision),
+    ...surveyScaleReleaseContext(unit), definition: unit.compiledDefinition,
+    instrumentClass: unit.sourceProvenance ? 'STANDARD' : 'CUSTOM_DESCRIPTIVE',
+    provenance: unit.sourceProvenance ?? {},
+    scope: { kind: 'PRIVATE', ownerId: actorId, product: 'SURVEY', resourceId: projectId },
+  }, actorId)
+  if (release.layer !== 'MEASUREMENT') throw new Error('研究测量发布身份不匹配')
+  if(release.status!=='PUBLISHED')throw new SurveyWaveError(409,'该测量版本已停止用于新施测，请发布新版本')
+  return release
+}
+
 export function compileFrozenResearchUnit(draft:{
   id:string;instrumentKey:string;kind:string;title:string;revision:number;definition:unknown
 }):ResearchFrozenUnit {
@@ -150,30 +181,7 @@ export async function freezeResearchWaveDraft(input:{
     })
     for (const unit of units) {
       if (unit.kind === 'FORM') continue
-      const scope = { kind: 'PRIVATE' as const, ownerId: input.actorUserId, product: 'SURVEY' as const, resourceId: input.projectId }
-      let release
-      if (unit.kind === 'COGNITIVE') {
-        const frozen = parseFrozenSurveyCognitive(unit.compiledDefinition)
-        const snapshot = frozen.sessionSnapshot
-        release = await publishContentRelease(tx, cognitiveMeasurementRelease({
-          localId: unit.draftId, version: String(unit.draftRevision), scope,
-          testType: snapshot.testType, configVersion: snapshot.configVersion,
-          engineVersion: snapshot.engineVersion, scoringVersion: snapshot.scoringVersion, config: snapshot.config,
-          protocolContext: { timingPolicy: frozen.timingPolicy, devicePolicy: frozen.devicePolicy, restartLimit: frozen.restartLimit },
-        }), input.actorUserId)
-      } else if (unit.kind === 'SJT') {
-        release = await publishContentRelease(tx, sjtMeasurementRelease({
-          localId: unit.draftId, version: String(unit.draftRevision), instrumentVersion: surveyScaleReleaseContext(unit).instrumentVersion,
-          definition: unit.compiledDefinition, displayProtocol: unit.displayDefinition, scope, provenance: unit.sourceProvenance ?? {},
-        }), input.actorUserId)
-      } else release = await publishScaleMeasurement(tx, {
-        localId: unit.draftId, version: String(unit.draftRevision),
-        ...surveyScaleReleaseContext(unit), definition: unit.compiledDefinition,
-        instrumentClass: unit.sourceProvenance ? 'STANDARD' : 'CUSTOM_DESCRIPTIVE',
-        provenance: unit.sourceProvenance ?? {},
-        scope: { kind: 'PRIVATE', ownerId: input.actorUserId, product: 'SURVEY', resourceId: input.projectId },
-      }, input.actorUserId)
-      if (release.layer !== 'MEASUREMENT') throw new Error('研究测量发布身份不匹配')
+      const release=await publishSurveyMeasurementUnit(tx,unit,input.actorUserId,input.projectId)
       unit.measurementRelease = { releaseId: release.releaseId, contentHash: release.contentHash,
         measurementHash: release.content.measurementHash }
     }

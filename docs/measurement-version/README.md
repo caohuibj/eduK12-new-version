@@ -209,3 +209,9 @@ V06/V08 冻结匹配内部准备：新增有界 EXACT_POPULATION_PRIORITY_V1 选
 Survey 项目授权把原有 owner/账户/grant/MFA 的 FOR SHARE 行集合放入 MATERIALIZED CTE，外层取 clock_timestamp 后再核账户 expiry，避免锁等待跨过到期时间仍获准；不新增一轮账户查询。模拟锁后时刻的合同已验证，真实双连接等待/撤销仍待获准连接环境。
 
 私有 reportKey 上限 168 字符，与服务端 `report:`＋scope SHA＋分隔符的 72 字符前缀共同满足 release key 的 240 字符合同。模板指标/资产未知绑定使用专用错误类型返回受控 400；未知服务故障继续进入原 500 处理。
+
+### 原生测量可先发布，再编制报告
+
+新增 `POST /api/survey/projects/:pid/instruments/:iid/measurement-release`，只接受精确 `revision`。沿真实项目 owner/grant/MFA 和草稿共享锁检查 revision/status，复用现有 Scale/Cognitive/SJT 编译器、发布适配器与项目图片许可；普通 FORM 和目录来源草稿不走该原生作者入口。返回只含 release 身份、hash、版本与指标键，不含题目评分 key 或可执行定义。相同草稿 revision 重试复用不可变 release，资产引用同事务保留，停止可用的旧 revision 不能被重试重新激活。
+
+此步解除“先投放才能编报告”的依赖；Wave 的既有发布调用暂共享相同适配函数。V08 仍需把 Wave 改为仅冻结显式选择的精确已发布测量/参考策略候选/report，并清除该隐式发布路径。该切换尚未在本步骤声称完成。

@@ -32,3 +32,5 @@
 
 | R12 | 内容权限祖先验证 | content-authority.repository.ts 单次有界 ancestry 查询，根＋一层委派；取得共享锁后读时钟 | 无系统授权 HTTP；没有新生产 flag | 8 项早期纯/mock 合同，SQL约束证据另录；非并发实测 | 不逐层递归 N+1；父撤销不批量复制子行；不以缓存绕当前撤权 | V05 | 同 User、scope/期限/委派上限、当前祖先撤权 | 接入中 | 长任务须执行前后授权/source fence；不得用 entry ADMIN 代科学权 |
 | R13 | 私有报告编制/合成预览 | survey/report-drafts.service.ts；report-renderer.ts | authenticateSurvey＋现有 owner/grant/MFA enabled；无默认flag变更 | 定向服务/渲染测试；非真实答卷容量 | 草稿与共享 REPORT release 有独立编制/发布语义；预览不读取样本，不每答复制模板/资产 | V07 | CAS、不可变发布、精确测量/资产、合成标识 | 服务已接，UI/实际解释待接 | MFA enabled 不是 recent strong-auth；原始事实不能被新解释覆盖 |
+
+| R14 | 独立存储诊断供 V08 复用 | 父协调提供固定 fa34852c8692b12b237b6e2556bee175eadb602a，docs/performance/20261020-training-storage-profile.md | COMPACT_FACTS/SHARED_CONTROL/SHARED_RUNTIME=true；仅该隔离场景 | 独立线实测，本主线未重复压测：selected records 318661→102831 B；个人 core56786＋facts1680＋binding560 B；首次 shared artifact5080/template7144/assignment31581 B 独立列 | 复用 PR302 artifact/codec/事实读写，首次共享成本不能按每答重复计算 | V08–V09 | 四工具、120trial逐项、report/CSV/权限为独立线证据 | 待版本绑定接入验证 | 不据此宣称默认生产flags或所有场景收益；约5KiB SJT暂不拆；保留原始trials |
