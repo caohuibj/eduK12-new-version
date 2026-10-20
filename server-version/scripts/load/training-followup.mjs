@@ -7,8 +7,9 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { createRequire } from 'node:module'
 import { randomUUID, randomBytes, createHash } from 'node:crypto'
+import { runBurstPhase } from './training-burst-followup.mjs'
 const [mode, state] = process.argv.slice(2)
-assert.ok(['seed', 'prepare', 'single', 'verify', 'export', 'verify-export'].includes(mode))
+assert.ok(['seed', 'prepare', 'single', 'verify', 'export', 'verify-export', 'prepare-load', 'load', 'verify-load', 'schedule-check'].includes(mode))
 assert.equal(process.env.PERF_ISOLATED_TEST_MODE, '1')
 assert.equal(new URL(process.env.DATABASE_URL).pathname, '/training_followup_20261020')
 const native = process.env.TRAINING_EXECUTION_PROFILE === 'NATIVE_ISOLATED'
@@ -28,50 +29,58 @@ const prefix = '/composite-assessments', products = '/questionnaire-products'
 const result = { mode, startedAt: new Date().toISOString(), requests: [], milestones: [], passed: false }
 const normalize = value => !value?.items ? value : { ...value, items: value.items.map(item => ({ ...item,
   scaleId: item.scale?.id ?? item.scaleId, cognitiveAssignmentId: item.cognitiveAssignment?.id ?? item.cognitiveAssignmentId })) }
-function client(saved = {}) {
+function client(saved = {}, recorder = result, controls = {}) {
   const cookies = new Map(Object.entries(saved))
   return {
     cookies: () => Object.fromEntries(cookies),
     async request(route, method = 'GET', body, expected = 200, raw = false) {
       const started = performance.now()
-      let response
-      try {
-        response = await fetch(apiOrigin + '/api' + route, { method, signal: AbortSignal.timeout(30_000),
-          headers: { 'content-type': 'application/json', ...(cookies.size ? { cookie: [...cookies].map(([k,v]) => `${k}=${v}`).join('; ') } : {}),
-            ...(cookies.has('ptool_csrf') ? { 'x-csrf-token': cookies.get('ptool_csrf') } : {}) },
-          ...(body === undefined ? {} : { body: JSON.stringify(body) }) })
-      } catch (error) {
-        result.requests.push({ route, method, elapsedMs: performance.now() - started, outcome: 'UNKNOWN', error: error.name })
-        throw new Error(`Uncertain ${method} ${route}; inspect state before any retry`)
+      controls.guard?.(method)
+      const requestAtMs = controls.relativeNow?.()
+      controls.onStart?.(requestAtMs)
+      controls.inFlight?.(1)
+      try { return await perform() } finally { controls.inFlight?.(-1) }
+      async function perform() {
+        let response
+        try {
+          response = await fetch(apiOrigin + '/api' + route, { method, signal: AbortSignal.timeout(Math.max(1, Math.ceil(Math.min(30_000, controls.remainingMs?.() ?? 30_000)))),
+            headers: { 'content-type': 'application/json', ...(cookies.size ? { cookie: [...cookies].map(([k,v]) => `${k}=${v}`).join('; ') } : {}),
+              ...(cookies.has('ptool_csrf') ? { 'x-csrf-token': cookies.get('ptool_csrf') } : {}) },
+            ...(body === undefined ? {} : { body: JSON.stringify(body) }) })
+        } catch (error) {
+          recorder.requests.push({ route, method, elapsedMs: performance.now() - started, startAtMs: requestAtMs, atMs: controls.relativeNow?.(), outcome: 'UNKNOWN', error: error.name })
+          throw new Error(`Uncertain ${method} ${route}; inspect state before any retry`)
+        }
+        for (const cookie of response.headers.getSetCookie()) {
+          const pair = cookie.split(';', 1)[0], i = pair.indexOf('='); cookies.set(pair.slice(0, i), pair.slice(i + 1))
+        }
+        let bytes
+        try { bytes = Buffer.from(await response.arrayBuffer()) }
+        catch (error) {
+          recorder.requests.push({ route, method, status: response.status, elapsedMs: performance.now() - started, startAtMs: requestAtMs, atMs: controls.relativeNow?.(), outcome: 'UNKNOWN_RESPONSE_BODY', error: error.name })
+          throw new Error(`Uncertain response body for ${method} ${route}; inspect state before any retry`)
+        }
+        const requestRecord = { route, method, status: response.status, elapsedMs: performance.now() - started, bytes: bytes.length, startAtMs: requestAtMs, atMs: controls.relativeNow?.() }
+        recorder.requests.push(requestRecord)
+        const expectedCodes = Array.isArray(expected) ? expected : [expected]
+        if (!expectedCodes.includes(response.status)) {
+          requestRecord.errorBody = bytes.toString().slice(0, 500)
+          if (recorder === result) write('private/last-http-error.json', { route, method, status: response.status, body: bytes.toString() })
+          throw new Error(`${method} ${route}: HTTP ${response.status}; private error retained`)
+        }
+        if (raw) return bytes
+        let envelope
+        try {
+          envelope = JSON.parse(bytes.toString())
+          assert.ok(envelope && typeof envelope === 'object' && typeof envelope.code === 'number')
+        } catch {
+          requestRecord.outcome = 'UNKNOWN_RESPONSE_ENVELOPE'
+          throw new Error(`Uncertain response envelope for ${method} ${route}; inspect state before any retry`)
+        }
+        if (response.status !== 200) return envelope
+        assert.equal(envelope.code, 0, `${route}: API code ${envelope.code}`)
+        return normalize(envelope.data)
       }
-      for (const cookie of response.headers.getSetCookie()) {
-        const pair = cookie.split(';', 1)[0], i = pair.indexOf('='); cookies.set(pair.slice(0, i), pair.slice(i + 1))
-      }
-      let bytes
-      try { bytes = Buffer.from(await response.arrayBuffer()) }
-      catch (error) {
-        result.requests.push({ route, method, status: response.status, elapsedMs: performance.now() - started, outcome: 'UNKNOWN_RESPONSE_BODY', error: error.name })
-        throw new Error(`Uncertain response body for ${method} ${route}; inspect state before any retry`)
-      }
-      const requestRecord = { route, method, status: response.status, elapsedMs: performance.now() - started, bytes: bytes.length }
-      result.requests.push(requestRecord)
-      const expectedCodes = Array.isArray(expected) ? expected : [expected]
-      if (!expectedCodes.includes(response.status)) {
-        write('private/last-http-error.json', { route, method, status: response.status, body: bytes.toString() })
-        throw new Error(`${method} ${route}: HTTP ${response.status}; private error retained`)
-      }
-      if (raw) return bytes
-      let envelope
-      try {
-        envelope = JSON.parse(bytes.toString())
-        assert.ok(envelope && typeof envelope === 'object' && typeof envelope.code === 'number')
-      } catch {
-        requestRecord.outcome = 'UNKNOWN_RESPONSE_ENVELOPE'
-        throw new Error(`Uncertain response envelope for ${method} ${route}; inspect state before any retry`)
-      }
-      if (response.status !== 200) return envelope
-      assert.equal(envelope.code, 0, `${route}: API code ${envelope.code}`)
-      return normalize(envelope.data)
     },
     async login(user) {
       await this.request('/auth/csrf')
@@ -243,6 +252,8 @@ try {
     fixture.single.status = 'COMPLETED_REPORT_READ'; fixture.cookies.student = student.cookies(); write('private/fixture.json', fixture)
     result.totalThroughReportMs = performance.now() - started
     result.attemptId = attempt.id
+  } else if (['prepare-load', 'load', 'verify-load', 'schedule-check'].includes(mode)) {
+    await runBurstPhase({ mode, state, backend, require, db, read, write, sha, client, result })
   } else if (mode === 'verify') {
     const fixture = read('private/fixture.json'), accepted = await counts(fixture.single.attemptId)
     assert.equal(accepted.parent.status, 'COMPLETED'); assert.equal(accepted.parent.asyncReportEpoch, null)
