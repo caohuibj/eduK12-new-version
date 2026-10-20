@@ -278,3 +278,13 @@ Wave freeze 原有单条项目查询同时锁定 project、User、researcher gra
 新增单次 SQL migration 20261020040000_survey_attempt_content_binding，约束双字段成对、SHA 格式和写入后不可变；不修改任何旧迁移。18 个 START/binding 定向测试通过。隔离 PG16.15 single-user 已应用该新迁移，六个约束拒绝及合法首次绑定/完成状态更新通过；不是 Prisma deploy 或真实并发。私有 Prisma client 使用本主线独立 output 生成，不改共享 client。
 
 首次 LINKED enrollment 也在 createLinkedResearchIdentity 原事务内创建 STARTED Attempt，现已在 flow 分配后调用同一 newAttempt:true 绑定。绑定失败直接抛出事务，不能返回未绑定的新研究身份；participant/quota/consent 与 binding 同事务。服务端全部三个 Attempt create 路径已盘点。新增实际 enrollment 服务三项合同，总 START/binding 21 项通过；模拟事务失败传播不代表真实数据库回滚/并发测试。
+
+### V08 FINAL 固定解释结果
+
+实际 submitResearchFinal 在已有 FINAL 幂等分支之后，仅对本次已计算出的 MeasurementResult 运行 Reference Core 解释；不再次调用 scorer，不重选 START reference。先校验原 Attempt binding 与本次分组/冻结测量身份，再锁核所选 release 当前状态。普通 superseded/retired 保原版本，测量撤回禁止新解释，参考撤回标记不可用，report 撤回禁止新模板生成；这些状态不覆盖或删除原始答案/计分事实。
+
+同一加密 FINAL 中新增紧凑 interpretation：bindingHash、工具/指标/参考种类、未选/不可用/撤回/可解释状态，以及个人 z/t/percentile/meanDifference/bandKey。共享来源文本、常模数组、模板正文不复制。缺失质量证据或非 interpretable 不做参考解释；不可计算/非有限输出明确 unavailable。旧无绑定 FINAL 不回填解释。重复提交直接读取原 receipt，不再运行解释器。
+
+REPORT 的 READY 仅表示该精确模板可用、生成器版本已冻结，并非被试披露许可或已经持久化完整渲染文本。当前 GENERAL 被试响应白名单不增加解释或模板；真实报告读取与显式新解释仍需独立受控入口。默认 raw/facts 导出不包含 interpretation，7B 专用 opt-in 正在单独接入。
+
+验证：解释核心、既有计算、实际 FINAL commit/replay 合同三个目标文件共 60 项通过，定向 strict TypeScript 通过。服务测试确认解释随同一 resultsCipher 写入且 receipt 不泄露，重复 FINAL 不重新解释；数据库/加密边界使用 mock，不是完整 HTTP/PG 并发验证。

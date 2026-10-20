@@ -1,3 +1,4 @@
+import {interpretSurveyFinal} from './final-interpretation.service'
 import { verifySurveyCognitiveReferences,loadSurveyCognitiveResults,assertSurveyCognitiveLockedAnswers } from './cognitive.results'
 import type { SurveyCognitiveReference } from './cognitive.definition'
 import { cognitiveParentUnit,cognitiveParticipantFeedback } from './measurement.result'
@@ -171,6 +172,9 @@ export async function submitResearchFinal(input:FinalInput){
       invalid('认知结果引用集合与最终可达路径不一致')
     if(calculated.definitionDigest!==publication.definitionDigest)
       blocked('所提交作答与冻结内容不一致')
+    const interpretation=await interpretSurveyFinal(tx,{projectId:known.projectId,waveId:wave.id,attemptId:attempt.id,
+      publicationId:publication.id,definitionDigest:publication.definitionDigest,selectedSnapshot:assignedSurveySnapshot(snapshot,assignment),calculated})
+    if(interpretation)calculated.interpretation=interpretation
     const resultsHash=canonicalHash(JSON.parse(JSON.stringify(calculated)))
     const resultsCipher=encryptUnifiedRuntimePayload(calculated)
     const receipt=await tx.surveyWaveFinal.create({data:{
