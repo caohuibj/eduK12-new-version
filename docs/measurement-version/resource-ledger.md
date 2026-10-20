@@ -91,3 +91,13 @@ Storage formula amendment: explicit reinterpretation adds one `I_i = encrypted(p
 - Risk: synthetic preview reads no answers; measurements reuse the exact source validation cache, no duplicate release load per item. Draft payload exists once per author revision, publication shared once; per-answer template copying remains prohibited.
 - Unit/acceptance: V05/V07; fixed course/report capability and immutable scope/version, request recovery.
 - Result/guard: source, mock service and route contracts only; actual migrations, browser and lock expiry races await V10. Root role never supplies implicit report capability.
+
+### R30 — Cognitive effective-profile publication
+
+- Chain/object: explicit revision-CAS compilation, private assignment release and source pointer.
+- Evidence: assignment-measurement-release.ts, questionnaire-product/service.ts, migration 20261020134000.
+- Effective flags: existing installed runner/readiness, Training author/resource gates unchanged; no new runner.
+- Measured/estimated: 34 focused adapter/service contracts and backend types; no byte/performance claims.
+- Risk/unit: V09; shared scientific release once, assignment pointer only. Actual profile hash verified; config fallback cannot replace a different profile. Report-only settings excluded from scientific version.
+- Acceptance/result: same-config multiple-profile identities, original freeze preservation, CAS and final expiry checks verified in mocks; migration/concurrency/HTTP pending.
+- Regression watch: no duplicate runtime copy into answers, source-owner fabrication, automatic historical backfill or default-config substitution.

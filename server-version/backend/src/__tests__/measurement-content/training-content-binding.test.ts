@@ -90,7 +90,7 @@ describe('Training compact measurement publication and START binding',()=>{
   const effective={...SURVEY_GONOGO_CONFIG,stimulusMs:900}
   const value={id:'composite',items:[{id:'cog',type:'COGNITIVE',cognitiveAssignment:{id:'assignment',createdBy:'source-owner',
    config:{...base,id:'config'},resolvedConfigSnapshotEncrypted:'encrypted',resolvedConfigHash:hashResolvedConfig(effective)}}]}
-  db.$queryRaw.mockResolvedValue([{kind:'COGNITIVE_CONFIG',id:'config',owner_id:null,measurement_release_id:rid}]);mocks.decrypt.mockReturnValue(effective)
+  db.$queryRaw.mockResolvedValue([{kind:'COGNITIVE_CONFIG',id:'config',assignment_id:'assignment',owner_id:'source-owner',measurement_release_id:rid}]);mocks.decrypt.mockReturnValue(effective)
   mocks.release.mockResolvedValue({...prepareRelease(cognitiveMeasurementRelease(base)),releaseId:rid,status:'PUBLISHED'})
   await expect(prepare(value)).rejects.toThrow('CONTENT_TRAINING_SOURCE_MISMATCH')
   mocks.release.mockResolvedValue({...prepareRelease(cognitiveMeasurementRelease({...base,config:effective})),releaseId:rid,status:'PUBLISHED'})
@@ -118,4 +118,22 @@ describe('Training compact measurement publication and START binding',()=>{
   await expect(start(publication,value,resolved)).resolves.toHaveProperty('binding')
   await expect(start(publication,value,empty)).rejects.toThrow('CONTENT_TRAINING_SJT_SOURCE_INVALID')
  })
+})
+
+it('keeps two effective profile assignment pointers distinct for the same config',async()=>{
+ const base={localId:'gonogo',version:'1',testType:'gonogo',configVersion:'1.1.0',engineVersion:'1.0.0',scoringVersion:'1.0.0',config:SURVEY_GONOGO_CONFIG}
+ const effective={...SURVEY_GONOGO_CONFIG,stimulusMs:900},second='22222222-2222-4222-8222-222222222222'
+ const value={id:'composite',items:[{id:'first',type:'COGNITIVE',cognitiveAssignment:{id:'a1',createdBy:'teacher',config:{...base,id:'config'},resolvedConfigSnapshotEncrypted:null,resolvedConfigHash:null}},
+  {id:'second',type:'COGNITIVE',cognitiveAssignment:{id:'a2',createdBy:'teacher',config:{...base,id:'config'},resolvedConfigSnapshotEncrypted:'profile',resolvedConfigHash:hashResolvedConfig(effective)}}]}
+ db.$queryRaw.mockResolvedValue([{kind:'COGNITIVE_CONFIG',id:'config',assignment_id:'a1',owner_id:'teacher',measurement_release_id:rid},
+  {kind:'COGNITIVE_CONFIG',id:'config',assignment_id:'a2',owner_id:'teacher',measurement_release_id:second}])
+ mocks.decrypt.mockReturnValue(effective)
+ mocks.release.mockImplementation(async(_db,id)=>({...prepareRelease(cognitiveMeasurementRelease({...base,config:id===rid?SURVEY_GONOGO_CONFIG:effective,
+  scope:{kind:'PRIVATE',product:'TRAINING',ownerId:'teacher',resourceId:id===rid?'a1':'a2'}})),releaseId:id,status:'PUBLISHED'}))
+ const result=await prepare(value)
+ expect(result.snapshot.units.map(unit=>unit.measurement.releaseId)).toEqual([rid,second])
+ expect(result.snapshot.units.map(unit=>unit.source.assignmentId)).toEqual(['a1','a2'])
+ const query=db.$queryRaw.mock.calls[0][0].strings.join(' ')
+ expect(query).toContain('COALESCE(a.measurement_release_id,c.measurement_release_id)');expect(query).toContain('FOR SHARE OF a,c')
+ await expect(start(result,value)).resolves.toHaveProperty('binding')
 })

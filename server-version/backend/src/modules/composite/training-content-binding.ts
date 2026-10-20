@@ -22,7 +22,7 @@ export const trainingContentSnapshotSchema=z.object({schemaVersion:z.literal(1),
 export type TrainingContentSnapshot=z.infer<typeof trainingContentSnapshotSchema>
 type Unit=TrainingContentSnapshot['units'][number]
 type Stored=NonNullable<Awaited<ReturnType<typeof getContentRelease>>>
-type SourceRow={kind:Unit['source']['kind'];id:string;owner_id:string|null;measurement_release_id:string|null;instrument_key:string|null;instrument_version:string|null}
+type SourceRow={kind:Unit['source']['kind'];id:string;assignment_id:string|null;owner_id:string|null;measurement_release_id:string|null;instrument_key:string|null;instrument_version:string|null}
 class TrainingContentError extends ContentReleaseError { readonly statusCode=409 }
 function fail(code:string):never { throw new TrainingContentError('CONTENT_TRAINING_'+code) }
 
@@ -36,26 +36,30 @@ export async function prepareTrainingContentSnapshot(db:Prisma.TransactionClient
   if(items.some(item=>!['SCALE','COGNITIVE','SITUATIONAL'].includes(item.type))||new Set(items.map(item=>item.id)).size!==items.length)fail('SOURCE_INVALID')
   const scaleIds=[...new Set<string>(items.filter(item=>item.type==='SCALE').map(item=>item.scale?.id))]
   const configIds=[...new Set<string>(items.filter(item=>item.type==='COGNITIVE').map(item=>item.cognitiveAssignment?.config?.id))]
+  const assignmentIds=[...new Set<string>(items.filter(item=>item.type==='COGNITIVE').map(item=>item.cognitiveAssignment?.id))]
   const sjt=items.filter(item=>item.type==='SITUATIONAL').map(item=>({instrumentKey:item.situationalInstrumentKey,instrumentVersion:item.situationalInstrumentVersion}))
   // The existing resolver prioritizes installed package keys over author rows.
   // Do not invent an author-release identity for a static registry package.
   const staticSjtKeys=new Set(sjt.length?listSituationPackages().map(pkg=>pkg.key):[])
   if(sjt.some(identity=>staticSjtKeys.has(identity.instrumentKey)))fail('RELEASE_REQUIRED')
-  if([...scaleIds,...configIds].some(id=>typeof id!=='string'||!id)||sjt.some(identity=>!identity.instrumentKey||!identity.instrumentVersion))fail('SOURCE_INVALID')
+  if([...scaleIds,...configIds,...assignmentIds].some(id=>typeof id!=='string'||!id)||sjt.some(identity=>!identity.instrumentKey||!identity.instrumentVersion))fail('SOURCE_INVALID')
   // One bounded source-pointer query. CTEs lock the actual source rows before
   // release locks; no client pointer or default registry selection is consulted.
   const rows=items.length?await db.$queryRaw<SourceRow[]>(Prisma.sql`
     WITH scale_sources AS (SELECT id,creator_id,measurement_release_id FROM scales
       WHERE id IN (${Prisma.join(scaleIds.length?scaleIds:[''])}) ORDER BY id FOR SHARE),
-    cognitive_sources AS (SELECT id,measurement_release_id FROM cognitive_test_configs
-      WHERE id IN (${Prisma.join(configIds.length?configIds:[''])}) ORDER BY id FOR SHARE),
+    cognitive_sources AS (SELECT c.id,a.id AS assignment_id,a.created_by,
+        COALESCE(a.measurement_release_id,c.measurement_release_id) AS measurement_release_id
+      FROM cognitive_assignments a JOIN cognitive_test_configs c ON c.id=a.config_id
+      WHERE a.id IN (${Prisma.join(assignmentIds.length?assignmentIds:[''])})
+        AND c.id IN (${Prisma.join(configIds.length?configIds:[''])}) ORDER BY a.id,c.id FOR SHARE OF a,c),
     sjt_sources AS (SELECT id,author_id,measurement_release_id,instrument_key,instrument_version FROM sjt_author_releases
       WHERE ${sjt.length?Prisma.join(sjt.map(identity=>Prisma.sql`(instrument_key=${identity.instrumentKey} AND instrument_version=${identity.instrumentVersion})`),' OR '):Prisma.sql`FALSE`}
       ORDER BY id FOR SHARE)
-    SELECT 'SCALE' AS kind,id,creator_id AS owner_id,measurement_release_id,NULL::text AS instrument_key,NULL::text AS instrument_version FROM scale_sources
-    UNION ALL SELECT 'COGNITIVE_CONFIG',id,NULL::text,measurement_release_id,NULL::text,NULL::text FROM cognitive_sources
-    UNION ALL SELECT 'SJT_AUTHOR_RELEASE',id,author_id,measurement_release_id,instrument_key,instrument_version FROM sjt_sources`):[]
-  const bySource=new Map(rows.map(row=>[`${row.kind}:${row.id}`,row]))
+    SELECT 'SCALE' AS kind,id,creator_id AS owner_id,measurement_release_id,NULL::text AS instrument_key,NULL::text AS instrument_version,NULL::text AS assignment_id FROM scale_sources
+    UNION ALL SELECT 'COGNITIVE_CONFIG',id,created_by,measurement_release_id,NULL::text,NULL::text,assignment_id FROM cognitive_sources
+    UNION ALL SELECT 'SJT_AUTHOR_RELEASE',id,author_id,measurement_release_id,instrument_key,instrument_version,NULL::text FROM sjt_sources`):[]
+  const bySource=new Map(rows.map(row=>[`${row.kind}:${row.id}${row.kind==='COGNITIVE_CONFIG'?':'+row.assignment_id:''}`,row]))
   const bySjt=new Map(rows.filter(row=>row.kind==='SJT_AUTHOR_RELEASE').map(row=>[situationalReleaseKey({instrumentKey:row.instrument_key!,instrumentVersion:row.instrument_version!}),row]))
   const releases=new Map<string,Stored>()
   const read=async(id:string)=>{
@@ -67,9 +71,10 @@ export async function prepareTrainingContentSnapshot(db:Prisma.TransactionClient
   for(const item of items){
     const identity=item.type==='SITUATIONAL'?{instrumentKey:item.situationalInstrumentKey,instrumentVersion:item.situationalInstrumentVersion}:null
     const row=item.type==='SCALE'?bySource.get(`SCALE:${item.scale.id}`):item.type==='COGNITIVE'
-      ?bySource.get(`COGNITIVE_CONFIG:${item.cognitiveAssignment.config.id}`):bySjt.get(situationalReleaseKey(identity!))
+      ?bySource.get(`COGNITIVE_CONFIG:${item.cognitiveAssignment.config.id}:${item.cognitiveAssignment.id}`):bySjt.get(situationalReleaseKey(identity!))
     if(!row?.measurement_release_id)fail('RELEASE_REQUIRED')
     if(item.type==='SCALE'&&row.owner_id!==item.scale.creatorId)fail('SOURCE_MISMATCH')
+    if(item.type==='COGNITIVE'&&row.owner_id!==item.cognitiveAssignment.createdBy)fail('SOURCE_MISMATCH')
     const release=await read(row.measurement_release_id)
     if(release.layer!=='MEASUREMENT'||release.status==='REVOKED'||purpose==='NEW_ADMINISTRATION'&&release.status!=='PUBLISHED')fail('RELEASE_NOT_PUBLISHED')
     const source:Unit['source']={kind:row.kind,id:row.id,ownerId:row.owner_id??item.cognitiveAssignment?.createdBy,

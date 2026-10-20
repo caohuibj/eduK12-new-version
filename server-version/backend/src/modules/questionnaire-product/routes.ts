@@ -37,6 +37,7 @@ router.post('/:id/reorder', handle(req => service.reorder(req.user!, req.params.
 router.post('/:id/training-variants', handle(req => service.updateTrainingVariants(req.user!, req.params.id, req.body)))
 router.post('/:id/training-flow', handle(req => service.updateTrainingFlow(req.user!, req.params.id, req.body)))
 router.post('/:id/timing-export-policy', handle(req => service.updateTimingExport(req.user!, req.params.id, req.body)))
+router.post('/:id/measurement-instances/publish', handle(req => service.publishMeasurementInstances(req.user!, req.params.id, req.body)))
 router.post('/:id/publish', handle(req => service.publish(req.user!, req.params.id, req.body)))
 router.post('/:id/preflight', handle(req => service.preflight(req.user!, req.params.id, req.body)))
 router.post('/:id/archive', handle(req => service.archive(req.user!, req.params.id, req.body)))

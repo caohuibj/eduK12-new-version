@@ -569,3 +569,9 @@ Composite 发布以真实已挂载 Scale、Cognitive effective profile、已解�
 真实 questionnaire-products 路由接报告草稿/list/get/revision-CAS edit/synthetic preview/private publish；每次受当前 course-owner、teacher eligibility、精确 capability 交集保护。创建原请求 hash 独立保存，编辑后创建重试不换身份。报告绑定实际挂载测量，复用请求内已验证 release cache；固定历史解释用途允许正常退休测量，REVOKED 拒绝。报告私有 scope 为本人/composite，与平台目录批准分离。首批只 teacher/researcher 受众、空资产列表；不额外披露被试报告、不读取样本预览。模板与已发布内容 immutable；SQL/HTTP/真实并发仍待集中验收。
 
 Training 报告编制 UI 已挂真实 QuestionnaireProductEdit，课程只能选已保存关联与 Training 课程目录的交集。复用声明式报告编辑器，使用 Training session/CSRF，显式 report grant；仅 teacher/researcher、空资产。未知创建请求按 actor/composite/course/grant 保存原 UUID 与输入，busy/pending 不可离开，dirty 明确确认，父组合操作与报告编辑互斥。已通过组件/页面定向测试及前端类型检查；真实浏览器/HTTP 尚未验收。此 UI 不代表 Training FINAL/report selection 已完成。
+
+## V09 controlled Cognitive instance publication
+
+新增 assignment 私有 measurement pointer，明确引用本人已获准的实际 effective profile。显式 draft-revision 操作 `/questionnaire-products/:id/measurement-instances/publish` 与正式 Composite publish 复用原冻结/复制路径；不新建投放或 START。真实业务教师、本人草稿及 Training 课程所有权检查，不把入口 ADMIN 投影作为作者资格；源锁等待后再核账号期限。已冻结实例不覆盖，精确重试复用；同 config 的两个 profile 按 assignment 分别绑定，报告字段不改变 measurementHash/派生测量版本。数据库 pointer/source tuple 不可变，旧 NULL 不自动回填。
+
+本操作仅解决现有允许 Cognitive 参数/配置实例的精确发布，不提供新 runner、任意脚本、School/Teacher 新编辑器；静态 SJT 和旧 Scale 转换仍待完成。34 项真实 adapter 与 service-mock 合同、backend 类型/私有 Prisma schema 检查通过；新增 SQL 未实跑。

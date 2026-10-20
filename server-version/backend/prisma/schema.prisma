@@ -1805,6 +1805,8 @@ model CognitiveTestConfig {
 
 // 认知测评分发（课程作业）。courseId 可空 + SetNull，保留 courseSnapshot 以抵御课程删除。
 model CognitiveAssignment {
+  measurementReleaseId String? @map("measurement_release_id")
+  measurementRelease MeasurementContentRelease? @relation(fields:[measurementReleaseId],references:[id],onDelete:Restrict,onUpdate:NoAction)
   id                              String                    @id @default(uuid())
   courseId                        String?                   @map("course_id")
   courseSnapshot                  Json?                     @map("course_snapshot")
@@ -3972,6 +3974,7 @@ model TrainingAttemptCheckpoint {
 
 // Three independently versioned content layers; no personal answer data.
 model MeasurementContentRelease {
+  cognitiveAssignments CognitiveAssignment[]
   trainingReportDrafts TrainingReportDraft[]
   surveyReportDrafts SurveyReportDraft[]
   referenceCandidates MeasurementReferenceCandidate[]
