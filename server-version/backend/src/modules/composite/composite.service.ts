@@ -4,7 +4,7 @@ import { freezeTrainingPersistenceSnapshot, readTrainingPersistencePolicy, train
 import { trainingRoundPublicationIdentity, prepareTrainingPublicRound, assertTrainingTokenRound, publicRoundMetadata, trainingRoundSelect, type TrainingRoundInput } from './training-public-round'
 import { allocateTrainingMaterial, materialRestartClaim } from './training-material-allocation'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { resolveTrainingFlowScope, trainingFlowMarkerState, trainingFlowProvenance, hasTrainingFlowDefinitionMarkers } from './training-flow-scope'
+import { resolveTrainingFlowScopeForMaterialization, trainingFlowMarkerState, trainingFlowProvenance, hasTrainingFlowDefinitionMarkers } from './training-flow-scope'
 import { buildTrainingFlowUnits } from './training-flow-definition'
 import { freezeTrainingFlowAssignment } from './training-flow-assignment-snapshot'
 import { compileTrainingFlow, trainingFlowUnitKey, trainingFlowItemKey } from '../assessment-core/flow/training'
@@ -2568,7 +2568,8 @@ const ensureTrainingFlowCurrentChildInTransaction = async (tx:Prisma.Transaction
   if(!parent)throw compositeNotFound('作答不存在')
   if(context.userId?parent.userId!==context.userId:!(context.recoveryTokenHash&&parent.userId===null&&parent.recoveryTokenHash===context.recoveryTokenHash))throw compositeForbidden('无权限查看此作答')
   const composite=await loadComposite(parent.compositeAssessmentId,true,tx)
-  const flow=await resolveTrainingFlowScope({...parent,compositeAssessment:composite},composite,{db:tx})
+  const verified=await resolveTrainingFlowScopeForMaterialization({...parent,compositeAssessment:composite},composite,{db:tx})
+  const flow=verified?.scope
   if(!flow||parent.status!=='IN_PROGRESS'||!flow.path.currentInstrumentKey)return
   const key=flow.path.currentInstrumentKey
   const section=composite.formSections.find((s:any)=>trainingFlowUnitKey(s.id)===key)
@@ -2580,8 +2581,7 @@ const ensureTrainingFlowCurrentChildInTransaction = async (tx:Prisma.Transaction
   if(!item)throw compositeForbidden('当前流程工具不存在')
   const existing=item.type==='SCALE'?await tx.assessment.findFirst({where:{compositeAttemptId:attemptId,compositeItemId:item.id}}):item.type==='COGNITIVE'?await tx.cognitiveSession.findFirst({where:{compositeAttemptId:attemptId,compositeItemId:item.id}}):await tx.situationalAttempt.findFirst({where:{compositeAttemptId:attemptId,compositeItemId:item.id}})
   if(existing)return
-  const candidate=decryptUnifiedRuntimePayload<any>(parent.trainingFlowSnapshotEncrypted!)
-  if(canonicalHash(candidate)!==parent.trainingFlowSnapshotHash)throw compositeForbidden('候选运行时摘要不匹配')
+  const candidate=verified!.candidate
   const prepared:PreparedVariantRuntimes={scales:new Map(),cognitive:new Map(),assignments:new Map(),references:new Map()}
   const releases=new Map<string,ResolvedSituationalRelease>()
   if(item.type==='SCALE'){
