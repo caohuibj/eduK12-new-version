@@ -1,4 +1,4 @@
-import { UserRole } from '@prisma/client'
+import { UserRole, type Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import type { AdminEntry } from '../admin-permissions/service'
 
@@ -25,8 +25,8 @@ type PrincipalRow = Omit<CurrentPrincipal, 'userId'> & {
   id?: string
 }
 
-export async function loadCurrentPrincipal(userId: string): Promise<CurrentPrincipal | null> {
-  const rows = await prisma.$queryRaw<PrincipalRow[]>`
+export async function loadCurrentPrincipal(userId: string, db: Pick<Prisma.TransactionClient, '$queryRaw'> = prisma): Promise<CurrentPrincipal | null> {
+  const rows = await db.$queryRaw<PrincipalRow[]>`
     SELECT
       "id" AS "userId",
       "username",

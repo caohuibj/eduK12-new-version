@@ -19,6 +19,11 @@ const authorizeCurrentExportPrincipal = async (claim: ClaimedExportBatch) => {
     || (!claim.options.anonymize && principal.role !== UserRole.ADMIN)) throw new Error('Export authority revoked')
   return principal
 }
+const trainingAuthorityVersion = (claim: ClaimedExportBatch): number => {
+  const version = claim.options.authorityTokenVersion
+  if (typeof version !== 'number' || !Number.isInteger(version) || version < 0) throw new Error('Export authority revoked')
+  return version
+}
 
 export const revalidateAssessmentExport = async (claim: ClaimedExportBatch, ids?: string[]) => {
   if (claim.resourceType === 'TRAINING_ANALYSIS') {
@@ -26,7 +31,7 @@ export const revalidateAssessmentExport = async (claim: ClaimedExportBatch, ids?
     assertTrainingAnalysisExportIdentity(options, { courseId: claim.resourceId, createdBy: claim.createdBy, creatorRole: claim.options.creatorRole })
     if (!claim.options.anonymize) throw new Error('Training analysis export must be anonymized')
     const { revalidateTrainingAnalysisManifest } = await import('../modules/training-analysis/service')
-    await revalidateTrainingAnalysisManifest({ id: claim.createdBy, role: options.manifest.actor.role }, options.manifest)
+    await revalidateTrainingAnalysisManifest({ id: claim.createdBy, role: options.manifest.actor.role }, options.manifest, trainingAuthorityVersion(claim))
     return { userId: claim.createdBy, role: options.manifest.actor.role }
   }
   const principal = await authorizeCurrentExportPrincipal(claim)
@@ -56,7 +61,8 @@ export const prepareAssessmentExport = async (claim: ClaimedExportBatch) => {
     // its single source load. The worker still revalidates after serialization.
     const { analyzeTrainingCourse } = await import('../modules/training-analysis/service')
     const result = await analyzeTrainingCourse({ actor: { id: actor.userId, role: actor.role as 'ADMIN' | 'TEACHER' },
-      courseId: claim.resourceId, selector: trainingAnalysis.selector, expectedManifest: trainingAnalysis.manifest })
+      courseId: claim.resourceId, selector: trainingAnalysis.selector, expectedManifest: trainingAnalysis.manifest,
+      expectedTokenVersion: trainingAuthorityVersion(claim) })
     // The exact manifest survives prepare, retries, serialization, publication,
     // and download. A cutoff alone cannot freeze the authorized sample.
     if (result.manifest.manifestHash !== trainingAnalysis.manifest.manifestHash) throw new Error('Training analysis manifest changed')
