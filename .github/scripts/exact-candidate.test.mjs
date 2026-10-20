@@ -289,12 +289,20 @@ test('optional legacy step plans remain parseable before false route conditions 
   assert.match(main,/if: steps.scope.outputs.application_route == 'homepage-copy' && github.event_name == 'pull_request'/);
 });
 
-test('schema diagnosis cannot replace required runtime qualification',()=>{
+test('restored route requires real runtime qualification and cannot select diagnosis instead',()=>{
   const workflow=readFileSync(new URL('../workflows/ci-exact-candidate.yml',import.meta.url),'utf8');
   const runtime=workflow.split('\n  runtime:\n')[1].split('\n  ready:\n')[0];
-  assert.match(runtime,/if: false/);
-  assert.match(workflow,/schema-diagnostic.py --plan exact-candidate-plan.json/);
+  assert.doesNotMatch(runtime,/if: false/);
+  assert.doesNotMatch(workflow,/schema-diagnostic:/);
+  assert.match(runtime,/exact-candidate-runtime.py --plan exact-candidate-plan.json --phase all/);
   assert.match(workflow,/needs: \[admission, browser, runtime\]/);
   assert.match(workflow,/row.result,'success'/);
-  assert.doesNotMatch(workflow,/needs: \[admission, browser, schema-diagnostic\]/);
+});
+
+test('restored runtime result requires original three-phase admission without execution claims',()=>{
+  const workflow=readFileSync(new URL('../workflows/ci-exact-candidate.yml',import.meta.url),'utf8');
+  assert.match(workflow,/details.kind,'admitted-prior-official-success'/);
+  assert.match(workflow,/details.ciExecuted,false/);
+  assert.match(workflow,/details.original.consumerRunId,'39442752356'/);
+  assert.match(workflow,/details.original.head,'16625dbd4cfd938e16f7c0adb5e14a01c0ebd22c'/);
 });

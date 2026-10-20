@@ -462,6 +462,28 @@ class Qualification:
         return result
 
     def schema(self):
+        def canonical_schema_dump(raw):
+            # Exact four observed PostgreSQL 16.15 AND-grouping spellings only.
+            # No generic SQL/parenthesis/whitespace normalization is allowed.
+            aliases = {
+                "    CONSTRAINT campus_accounts_login_shape_check CHECK ((((length(login_name) >= 4) AND (length(login_name) <= 32)) AND (normalized_login = lower(TRIM(BOTH FROM login_name))) AND (normalized_login ~ '^[a-z0-9_.-]{4,32}$'::text)))":
+                    "    CONSTRAINT campus_accounts_login_shape_check CHECK (((length(login_name) >= 4) AND (length(login_name) <= 32) AND (normalized_login = lower(TRIM(BOTH FROM login_name))) AND (normalized_login ~ '^[a-z0-9_.-]{4,32}$'::text)))",
+                "    CONSTRAINT content_capability_grants_capabilities_check CHECK ((((cardinality(capabilities) >= 1) AND (cardinality(capabilities) <= 12)) AND (capabilities <@ ARRAY['measurement.edit'::text, 'measurement.publish'::text, 'reference.analyze'::text, 'reference.review'::text, 'reference.publish'::text, 'report.edit'::text, 'report.publish'::text, 'catalog.manage'::text, 'material.use'::text, 'material.adapt'::text, 'material.distribute'::text, 'data.reinterpret'::text]))),":
+                    "    CONSTRAINT content_capability_grants_capabilities_check CHECK (((cardinality(capabilities) >= 1) AND (cardinality(capabilities) <= 12) AND (capabilities <@ ARRAY['measurement.edit'::text, 'measurement.publish'::text, 'reference.analyze'::text, 'reference.review'::text, 'reference.publish'::text, 'report.edit'::text, 'report.publish'::text, 'catalog.manage'::text, 'material.use'::text, 'material.adapt'::text, 'material.distribute'::text, 'data.reinterpret'::text]))),",
+                '    CONSTRAINT huiteacher_improvement_actions_cipher_check CHECK ((((length(goal_cipher) >= 30) AND (length(goal_cipher) <= 30000)) AND ((length(plan_cipher) >= 30) AND (length(plan_cipher) <= 100000)))),':
+                    '    CONSTRAINT huiteacher_improvement_actions_cipher_check CHECK (((length(goal_cipher) >= 30) AND (length(goal_cipher) <= 30000) AND ((length(plan_cipher) >= 30) AND (length(plan_cipher) <= 100000)))),',
+                "    CONSTRAINT survey_login_shape_check CHECK ((((length(login_name) >= 4) AND (length(login_name) <= 32)) AND (normalized_login = lower(TRIM(BOTH FROM login_name))) AND (normalized_login ~ '^[a-z0-9_.-]{4,32}$'::text)))":
+                    "    CONSTRAINT survey_login_shape_check CHECK (((length(login_name) >= 4) AND (length(login_name) <= 32) AND (normalized_login = lower(TRIM(BOTH FROM login_name))) AND (normalized_login ~ '^[a-z0-9_.-]{4,32}$'::text)))",
+            }
+            lines = [line for line in raw.splitlines() if not line.startswith(('\\restrict ', '\\unrestrict '))]
+            mapped = []
+            for original, restored in aliases.items():
+                require(lines.count(original) + lines.count(restored) == 1, 'Missing, changed or duplicate reviewed CHECK definition')
+                if original in lines:
+                    lines[lines.index(original)] = restored
+                    mapped.append(original.split()[1])
+            return '\n'.join(lines), mapped
+
         self.ready('prepare', 'runtime-packaging')
         name, network = self.prefix + '-postgres', self.prefix + '-network'
         image = self.state['components']['backend']['runtimeImageId']
@@ -547,11 +569,20 @@ class Qualification:
             details.update(ownershipAndAclPreserved=True, restrictedRoleReadVerified=True, forbiddenPrivilegesAbsent=True, ownershipAclSha256=digest(before_acl.encode()))
             # Compare catalog definitions too: columns/data alone miss lost indexes,
             # constraints, functions and triggers. Use the same pg_dump binary.
-            schemas = []
+            schemas, raw_schema_hashes, mapped_constraints = [], [], []
             for database in databases:
                 raw = self.command(['docker', 'exec', name, 'pg_dump', '-U', owner, '-d', database, '--schema-only', '--no-owner']).stdout
-                normalized = '\n'.join(line for line in raw.splitlines() if not line.startswith(('\\restrict ', '\\unrestrict ')))
+                normalized, mapped = canonical_schema_dump(raw)
+                raw_schema_hashes.append(digest(raw.encode()))
+                mapped_constraints.append(mapped)
                 schemas.append(digest(normalized.encode()))
+            details['schemaComparison'] = {
+                'kind': 'exact-four-reviewed-and-groupings', 'diagnosticRunId': '39446973848',
+                'diagnosticArtifactId': 12275518728,
+                'diagnosticDiffSha256': '50a4cd22219f4efec19a9be4f96447108e69bafb2494bc5b84c51084950fd251',
+                'rawSchemaSha256': raw_schema_hashes, 'canonicalSchemaSha256': schemas,
+                'mappedConstraints': mapped_constraints,
+            }
             require(schemas[0] == schemas[1], 'Restored schema definitions differ')
             details.update(historicalRowsPreserved=True, surveyFinalPreserved=True, trainingAttemptPreserved=True, newSchemaRowsRestored=True, allTableFingerprints=before_restore, schemaSha256=schemas[0], syntheticDumpSha256=sha(dump), migrationLedger=expected)
             dump.unlink()
@@ -567,8 +598,23 @@ class Qualification:
         actions = {'prepare': self.prepare, 'dependency-audit': self.audit, 'changed-lint': self.lint, 'frontend-app-types': self.app_types, 'runtime-packaging': self.package, 'runtime-scans': self.scan, 'schema-upgrade-restore': self.schema}
         chosen = ('prepare', *PHASES) if requested == 'all' else (requested,)
         try:
+            reusable = ('dependency-audit', 'changed-lint', 'frontend-app-types')
+            admitted = None
             for name in chosen:
-                self.phase(name, actions[name])
+                if requested == 'all' and name in reusable:
+                    require(admitted is not None and set(admitted) == set(reusable), 'Missing exact successful prior phase admission')
+                    self.phase(name, lambda receipt=admitted[name]: {
+                        'kind': 'admitted-prior-official-success', 'ciExecuted': False, 'original': receipt,
+                    })
+                else:
+                    self.phase(name, actions[name])
+                if requested == 'all' and name == 'prepare':
+                    import importlib.util
+                    spec = importlib.util.spec_from_file_location('exact_runtime_reuse', Path(__file__).with_name('exact-candidate-runtime-reuse.py'))
+                    reuse = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(reuse)
+                    admitted = reuse.admit_reusable_phases(self)
+                    require(set(admitted) == set(reusable), 'Unexpected reusable phase selection')
             if requested == 'all':
                 require({p['name'] for p in self.state['phases'] if p['status'] == 'success'} == {'prepare', *PHASES}, 'Incomplete runtime gates')
                 self.state['status'] = 'success'

@@ -1,4 +1,5 @@
 """Control-plane contracts only. No Docker, services, builds or application tests."""
+import ast
 import copy
 import hashlib
 import importlib.util
@@ -8,8 +9,9 @@ from pathlib import Path
 import subprocess
 import tarfile
 import tempfile
+from types import SimpleNamespace
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 PATH = Path(__file__).with_name('exact-candidate-runtime.py')
 SPEC = importlib.util.spec_from_file_location('exact_runtime', PATH)
@@ -247,6 +249,98 @@ class FailureReceiptContracts(unittest.TestCase):
             q = self.instance(folder)
             with patch.dict(M.os.environ, {'CI': 'true', 'GITHUB_ACTIONS': 'false'}), self.assertRaises(ValueError):
                 q.execute('runtime-packaging')
+
+    def test_exact_three_successful_phases_are_admitted_without_execution(self):
+        with tempfile.TemporaryDirectory() as folder:
+            q = self.instance(folder)
+            q.plan = {'head': q.identity['head']}
+            original = {name: {'name': name, 'status': 'success', 'consumerRunId': 'original-run', 'head': 'f' * 40}
+                        for name in ('dependency-audit', 'changed-lint', 'frontend-app-types')}
+            for method in ('audit', 'lint', 'app_types'):
+                setattr(q, method, Mock(side_effect=AssertionError('Successful phase was replayed')))
+            for method in ('prepare', 'package', 'scan', 'schema'):
+                setattr(q, method, Mock(return_value={'actualMissingPhase': True}))
+            reuse = SimpleNamespace(admit_reusable_phases=Mock(return_value=original))
+            spec = SimpleNamespace(loader=SimpleNamespace(exec_module=lambda module: None))
+            env = {'CI': 'true', 'GITHUB_ACTIONS': 'true', 'GITHUB_SHA': q.plan['head'], 'GITHUB_REPOSITORY': 'caohuibj/eduK12-new-version'}
+            with patch.dict(M.os.environ, env), patch.object(M, 'validate_plan'), \
+                 patch('importlib.util.spec_from_file_location', return_value=spec), \
+                 patch('importlib.util.module_from_spec', return_value=reuse):
+                q.execute('all')
+            for method in ('audit', 'lint', 'app_types'):
+                getattr(q, method).assert_not_called()
+            reuse.admit_reusable_phases.assert_called_once_with(q)
+            for row in q.state['phases']:
+                if row['name'] in original:
+                    self.assertEqual(row['details'], {'kind': 'admitted-prior-official-success', 'ciExecuted': False, 'original': original[row['name']]})
+            self.assertEqual(q.state['status'], 'success')
+
+    def test_extra_or_missing_reused_phase_fails_closed_before_any_replay(self):
+        for names in (('dependency-audit',), ('dependency-audit', 'changed-lint', 'frontend-app-types', 'runtime-scans')):
+            with self.subTest(names=names), tempfile.TemporaryDirectory() as folder:
+                q = self.instance(folder)
+                q.plan = {'head': q.identity['head']}
+                q.prepare = Mock(return_value={})
+                q.audit = Mock(side_effect=AssertionError('Replayed audit'))
+                reuse = SimpleNamespace(admit_reusable_phases=lambda q: dict.fromkeys(names, {}))
+                spec = SimpleNamespace(loader=SimpleNamespace(exec_module=lambda module: None))
+                env = {'CI': 'true', 'GITHUB_ACTIONS': 'true', 'GITHUB_SHA': q.plan['head'], 'GITHUB_REPOSITORY': 'caohuibj/eduK12-new-version'}
+                with patch.dict(M.os.environ, env), patch.object(M, 'validate_plan'), \
+                     patch('importlib.util.spec_from_file_location', return_value=spec), \
+                     patch('importlib.util.module_from_spec', return_value=reuse), self.assertRaises(ValueError):
+                    q.execute('all')
+                q.audit.assert_not_called()
+                self.assertNotEqual(q.state['status'], 'success')
+
+
+class SchemaDumpSpellingContracts(unittest.TestCase):
+    def setUp(self):
+        # Execute the actual pure nested comparator, not a second implementation.
+        module = ast.parse(PATH.read_text())
+        qualification = next(n for n in module.body if isinstance(n, ast.ClassDef) and n.name == 'Qualification')
+        schema = next(n for n in qualification.body if isinstance(n, ast.FunctionDef) and n.name == 'schema')
+        helper = next(n for n in schema.body if isinstance(n, ast.FunctionDef) and n.name == 'canonical_schema_dump')
+        aliases = next(n for n in helper.body if isinstance(n, ast.Assign) and n.targets[0].id == 'aliases')
+        self.aliases = ast.literal_eval(aliases.value)
+        namespace = {'require': M.require}
+        exec(compile(ast.Module(body=[helper], type_ignores=[]), str(PATH), 'exec'), namespace)
+        self.canonicalize = namespace['canonical_schema_dump']
+        self.original = '\n'.join(self.aliases) + '\nGRANT SELECT ON example TO restricted_reader;'
+        self.restored = '\n'.join(self.aliases.values()) + '\nGRANT SELECT ON example TO restricted_reader;'
+
+    def test_exact_four_observed_and_groupings_canonicalize_only_to_recorded_spelling(self):
+        self.assertEqual(len(self.aliases), 4)
+        original, mapped = self.canonicalize(self.original)
+        restored, unchanged = self.canonicalize(self.restored)
+        self.assertEqual(original, restored)
+        self.assertEqual(len(mapped), 4)
+        self.assertEqual(unchanged, [])
+        self.assertIn('AND ((length(plan_cipher) >= 30) AND (length(plan_cipher) <= 100000))', restored)
+
+    def test_changed_bound_operator_function_column_literal_or_constraint_fails_closed(self):
+        for before, after in (('<= 32', '<= 33'), (' AND ', ' OR '), ('length(login_name)', 'cardinality(login_name)'),
+                              ('normalized_login =', 'login_name ='), ("'measurement.edit'", "'measurement.delete'"),
+                              ('campus_accounts_login_shape_check', 'unknown_check')):
+            with self.subTest(change=(before, after)), self.assertRaises(ValueError):
+                self.canonicalize(self.original.replace(before, after, 1))
+
+    def test_missing_duplicate_or_mixed_duplicate_reviewed_constraint_fails_closed(self):
+        first = next(iter(self.aliases))
+        for altered in (self.original.replace(first + '\n', ''), self.original + '\n' + first,
+                        self.original + '\n' + self.aliases[first]):
+            with self.subTest(altered=altered), self.assertRaises(ValueError):
+                self.canonicalize(altered)
+
+    def test_acl_other_ddl_comments_order_and_unreviewed_parentheses_are_preserved(self):
+        baseline, _ = self.canonicalize(self.original)
+        for altered in (self.original.replace('GRANT SELECT', 'GRANT ALL'),
+                        self.original + '\nCREATE INDEX lost_idx ON example(id);',
+                        self.original + '\n-- changed comment',
+                        '\n'.join(reversed(self.original.splitlines())),
+                        self.original + '\nCHECK ((a AND b) AND c);'):
+            with self.subTest(altered=altered):
+                current, _ = self.canonicalize(altered)
+                self.assertNotEqual(current, baseline)
 
 
 class FrozenPlanContracts(unittest.TestCase):

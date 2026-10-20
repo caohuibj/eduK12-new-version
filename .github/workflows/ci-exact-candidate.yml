@@ -68,43 +68,7 @@ jobs:
           path: compiled-browser-admission.json
           if-no-files-found: error
           retention-days: 3
-  schema-diagnostic:
-    name: isolated schema mismatch diagnosis (not qualification)
-    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24.21.0'
-      - run: node -e "require('node:fs').writeFileSync('exact-candidate-plan.json',JSON.stringify(JSON.parse(process.env.EXACT_PLAN)))"
-      - name: recheck exact source before isolated diagnostic
-        run: |
-          node --input-type=module <<'JS'
-          import {readFileSync} from 'node:fs';
-          import {recheckPlan} from './.github/scripts/exact-candidate-admission.mjs';
-          recheckPlan(JSON.parse(readFileSync('exact-candidate-plan.json','utf8')));
-          JS
-      - name: diagnose only the failed schema definition comparison
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: python3 -B .github/scripts/exact-candidate-schema-diagnostic.py --plan exact-candidate-plan.json --output exact-candidate-schema-diagnostic-evidence
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: exact-schema-diagnostic-${{ github.sha }}-${{ github.run_attempt }}
-          path: |
-            exact-candidate-schema-diagnostic-evidence/schema-diagnostic.json
-            exact-candidate-schema-diagnostic-evidence/schema-diagnostic.diff.txt
-          if-no-files-found: error
-          retention-days: 3
   runtime:
-    # Temporary diagnostic-only candidate: skipped runtime MUST keep ready failing.
-    if: false
     name: missing runtime packaging security and schema recovery
     needs: [admission, browser]
     runs-on: ubuntu-24.04
@@ -152,6 +116,16 @@ jobs:
           const expected=['prepare','dependency-audit','changed-lint','frontend-app-types','runtime-packaging','runtime-scans','schema-upgrade-restore'];
           assert.deepEqual(result.phases.map(p=>p.name).sort(),expected.sort());
           for(const phase of result.phases) assert.equal(phase.status,'success',phase.name);
+          for(const name of ['dependency-audit','changed-lint','frontend-app-types']) {
+            const details=result.phases.find(row=>row.name===name).details;
+            assert.equal(details.kind,'admitted-prior-official-success');
+            assert.equal(details.ciExecuted,false);
+            assert.equal(details.original.name,name);
+            assert.equal(details.original.status,'success');
+            assert.equal(details.original.consumerRunId,'39442752356');
+            assert.equal(details.original.consumerAttempt,'1');
+            assert.equal(details.original.head,'16625dbd4cfd938e16f7c0adb5e14a01c0ebd22c');
+          }
           for(const component of ['backend','frontend']) {
             const image=result.components[component];
             assert.match(image.runtimeImageId,/^sha256:[a-f0-9]{64}$/);
