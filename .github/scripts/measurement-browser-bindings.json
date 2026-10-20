@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "branch": "refs/heads/ci/measurement-browser-20261020",
+  "sourceReference": "6b8f533326d55c65d49232943f5033e007545722",
+  "productInventorySha256": "eb5a7c88d1befccd91be4258906365b90ed3c417fc105ecfb01c00a9be5203a1",
+  "addedTools": [
+    ".github/scripts/measurement-browser-ci.py",
+    ".github/scripts/measurement-browser-ci.test.py",
+    ".github/scripts/measurement-browser-bindings.json",
+    ".github/workflows/ci-measurement-browser.yml",
+    "docs/measurement-version/ci-browser-plan.md",
+    "server-version/backend/scripts/measurement-browser-fixture.ts",
+    "server-version/e2e/measurement-version-browser.cjs",
+    "server-version/e2e/measurement-browser-proxy.cjs",
+    "server-version/e2e/measurement-version-journeys.cjs"
+  ]
+}
