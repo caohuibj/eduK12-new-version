@@ -6,7 +6,7 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { assertContentAuthority } from '../measurement-content/content-authority.repository'
 import { getContentRelease } from '../measurement-content/repository'
 import { ContentReleaseError } from '../measurement-content/release'
-import { prepareReferenceCandidate, surveyReferenceSourceBindingSchema, referenceEntryKey, type SurveyReferenceSourceBinding, type AuthorizedReferenceFact, type ReferenceCandidate } from '../measurement-content/reference-candidate'
+import { prepareReferenceCandidate, referenceConsentBodyHash, surveyReferenceSourceBindingSchema, referenceEntryKey, type SurveyReferenceSourceBinding, type AuthorizedReferenceFact, type ReferenceCandidate } from '../measurement-content/reference-candidate'
 import { storeReferenceCandidate, storeReferenceReview, publishReviewedReferenceCandidate } from '../measurement-content/reference-candidate.repository'
 import { authorizedProject } from './builder.service'
 import { loadSurveySource, type SurveySourceProjection } from './analytics.source'
@@ -152,7 +152,7 @@ export async function createSurveyReferenceCandidate(actorId:string,raw:unknown)
     const replay=await recoverReferenceRequest(tx,actorId,input,{operation:'CREATE',inputHash})
     if(replay)return {candidateId:replay.row.candidate_id,candidate:replay.candidate,exclusionCounts:replay.row.exclusion_counts!}
     await assertContentAuthority(tx,authority)
-    await sourceFence(tx,candidate.sourceBinding!,candidate.measurement)
+    await sourceFence(tx,surveyReferenceSourceBindingSchema.parse(candidate.sourceBinding),candidate.measurement)
     const result=await storeReferenceCandidate(tx,candidate,authorizedFacts)
     await storeReferenceRequest(tx,{request_id:input.requestId,actor_id:actorId,project_id:input.projectId,wave_id:input.waveId,
       operation:'CREATE',input_hash:inputHash,candidate_id:result.candidateId,review_id:null,exclusion_counts:exclusionCounts})
@@ -168,7 +168,10 @@ async function readCandidate(tx:Prisma.TransactionClient,id:string){
   const rows=await tx.$queryRaw<Array<{payload:ReferenceCandidate}>>(Prisma.sql`
     SELECT payload FROM measurement_reference_candidates WHERE id=${id} FOR SHARE`)
   if(!rows[0])fail('REFERENCE_CANDIDATE_NOT_FOUND')
-  const candidate=rows[0].payload,source=surveyReferenceSourceBindingSchema.safeParse(candidate.sourceBinding)
+  return checkedSurveyCandidate(rows[0].payload)
+}
+function checkedSurveyCandidate(candidate:ReferenceCandidate){
+  const source=surveyReferenceSourceBindingSchema.safeParse(candidate.sourceBinding)
   if(!source.success||candidate.scope.kind!=='PRIVATE'||candidate.scope.product!=='SURVEY'
     ||candidate.scope.resourceId!==source.data.projectId||candidate.evidence.source!=='INTERNAL_OBSERVED'
     ||candidate.evidence.softwareVersion!=='SURVEY_DESCRIPTIVE_V1'||candidate.definition.entries.length!==1
@@ -177,6 +180,57 @@ async function readCandidate(tx:Prisma.TransactionClient,id:string){
   const {candidateHash,...payload}=candidate
   if(canonicalHash(payload)!==candidateHash)fail('REFERENCE_REVIEW_STALE')
   return {candidate,source:source.data}
+}
+
+/** Server-only aggregate submission recheck. A formal reviewer never acquires
+ * project/sample access. The immutable trusted producer already verified the
+ * encrypted FINALs and metric hashes; project revision is the common fence for
+ * withdrawal, quality and material changes. Hold those source locks to commit.
+ * No source values or membership are returned outside the service transaction.
+ */
+export async function verifySurveyReferenceCandidate(tx:Prisma.TransactionClient,candidate:ReferenceCandidate,analyzeGrantId:string){
+  const {source}=checkedSurveyCandidate(candidate)
+  await authorizeCandidate(tx,candidate.analyzerId,analyzeGrantId,'reference.analyze',candidate,source)
+  const facts=new Map<string,AuthorizedReferenceFact>(candidate.sampleManifest.map(member=>[member.factId,{
+    factVersion:member.factVersion,measurementReleaseId:member.measurementReleaseId,
+    metricKeys:member.metricKeys,eligibleEntryKeys:member.entryKeys,
+  }]))
+  const {schemaVersion:_schema,candidateHash,...payload}=candidate
+  if(prepareReferenceCandidate(payload,facts).candidateHash!==candidateHash)fail('REFERENCE_REVIEW_STALE')
+  // Account/grant expiry is evaluated after any source-lock wait.
+  await authorizeCandidate(tx,candidate.analyzerId,analyzeGrantId,'reference.analyze',candidate,source,false)
+  return {facts}
+}
+
+/** Terminal submission authority check only. Source/consent/measurement fences
+ * are already held by the caller; no statistics or sample values are reread. */
+export async function assertSurveyReferenceSubmissionAuthority(tx:Prisma.TransactionClient,candidate:ReferenceCandidate,grantId:string){
+  const {source}=checkedSurveyCandidate(candidate)
+  if(candidate.scope.kind!=='PRIVATE'||candidate.scope.ownerId!==candidate.analyzerId)fail('REFERENCE_SURVEY_CANDIDATE_REQUIRED')
+  await authorizedProject(tx,candidate.analyzerId,source.projectId,false)
+  return assertContentAuthority(tx,{actorId:candidate.analyzerId,grantId,capability:'reference.analyze',
+    scope:{product:'SURVEY',scopeKind:'PROJECT',scopeId:source.projectId,resourceKind:'reference',resourceKeys:[candidate.measurement.releaseId]}})
+}
+
+/** Accepted scope evidence, not newly invented consent. A human reviewer must
+ * assess whether the exact recorded research consent permits the proposed use. */
+export async function surveyReferenceConsentEvidence(tx:Prisma.TransactionClient,candidate:ReferenceCandidate){
+  const {source}=checkedSurveyCandidate(candidate)
+  const [row]=await tx.$queryRaw<Array<{consent_text:string;consent_version:number;linkage_notice_confirmed:boolean;
+    snapshot:{consentDigest:string;consentVersion:number;purpose:string;measurementNotice?:unknown}}>>(Prisma.sql`
+    SELECT wave.consent_text,wave.consent_version,wave.linkage_notice_confirmed,publication.compiled_snapshot AS snapshot
+    FROM survey_waves wave JOIN survey_publications publication ON publication.id=wave.publication_id AND publication.project_id=wave.project_id
+    WHERE wave.id=${source.waveId} AND wave.project_id=${source.projectId} FOR SHARE OF wave,publication`)
+  if(!row||row.snapshot.purpose!=='RESEARCH_ONLY'||row.snapshot.consentVersion!==row.consent_version
+    ||canonicalHash({text:row.consent_text,version:row.consent_version,linkedConfirmed:row.linkage_notice_confirmed,
+      ...(row.snapshot.measurementNotice?{measurementNotice:row.snapshot.measurementNotice}:{})})!==row.snapshot.consentDigest)
+    fail('REFERENCE_CONSENT_EVIDENCE_UNAVAILABLE')
+  const [coverage]=await tx.$queryRaw<Array<{count:bigint}>>(Prisma.sql`SELECT COUNT(DISTINCT attempt_id) AS count FROM survey_consents
+    WHERE project_id=${source.projectId} AND wave_id=${source.waveId} AND accepted=TRUE AND consent_version=${row.consent_version}
+      AND attempt_id IN (${Prisma.join(candidate.sampleManifest.map(member=>member.factId))})`)
+  if(!coverage||Number(coverage.count)!==candidate.sampleManifest.length)fail('REFERENCE_CONSENT_EVIDENCE_UNAVAILABLE')
+  return [{version:String(row.consent_version),scopeHash:row.snapshot.consentDigest,purpose:row.consent_text,body:row.consent_text,bodyHash:referenceConsentBodyHash(row.consent_text),
+    dataCategories:[candidate.definition.instrumentType.toUpperCase()]}]
 }
 
 async function authorizeCandidate(tx:Prisma.TransactionClient,actorId:string,grantId:string,
@@ -281,7 +335,7 @@ async function recoverReferenceRequest(tx:Prisma.TransactionClient,actorId:strin
   assertReferenceRequestIdentity(row,actorId,input,expected)
   const {candidate,source}=await readCandidate(tx,row.candidate_id)
   if(source.projectId!==input.projectId||source.waveId!==input.waveId)fail('REFERENCE_REQUEST_SCOPE_MISMATCH')
-  await authorizeCandidate(tx,actorId,input.grantId,row.operation==='CREATE'?'reference.analyze':'reference.review',candidate,source,false)
+  await authorizeCandidate(tx,actorId,input.grantId,row.operation==='CREATE'?'reference.analyze':'reference.review',candidate,source,row.operation==='CREATE')
   return {row,candidate}
 }
 

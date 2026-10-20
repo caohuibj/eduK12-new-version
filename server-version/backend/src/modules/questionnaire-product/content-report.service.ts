@@ -10,6 +10,8 @@ import {reportTemplateSchema} from '../measurement-content/report-template'
 import {DECLARATIVE_REPORT_GENERATOR,renderDeclaredReport,type ReportReferenceFact} from '../measurement-content/report-renderer'
 import {prepareTrainingContentSnapshot} from '../composite/training-content-binding'
 import {resolveCompositeSituationalItems,compositeSjtGrantScope} from '../composite/composite.service'
+import {trainingCognitiveMetricKeys} from '../composite/training-metric-disclosure'
+import {readFrozenReport} from '../cognitive/profile-freeze'
 
 const text=z.string().trim().min(1).max(240),id=z.string().uuid()
 export const trainingReportPayload=z.object({measurementReleaseId:id,metricKeys:z.array(text).min(1).max(100),
@@ -68,15 +70,31 @@ async function measurements(tx:Prisma.TransactionClient,context:TrainingReportCo
   if(!composite||composite.createdBy!==context.actorId)denied()
   const resolved=await resolveCompositeSituationalItems(composite.items,tx,true,compositeSjtGrantScope(composite))
   const {snapshot,releases}=await prepareTrainingContentSnapshot(tx,composite,resolved,'HISTORICAL_INTERPRETATION')
-  return {units:snapshot.units,releases}
+  // Authoring is synthetic, not data access. Still do not advertise cognitive
+  // metrics that this teacher's frozen assignment can never disclose. All
+  // final report reads independently recheck the accepted child policy.
+  const metricKeys=new Map<string,Set<string>>()
+  for(const unit of snapshot.units){
+    const release=releases.get(unit.measurement.releaseId)
+    if(!release||release.layer!=='MEASUREMENT')continue
+    let keys=new Set(release.content.metrics.map(metric=>metric.metricKey))
+    if(unit.family==='COGNITIVE'){
+      const item=composite.items.find(item=>item.id===unit.itemId)
+      const allowed=trainingCognitiveMetricKeys(readFrozenReport(item?.cognitiveAssignment?.resolvedReportSnapshotEncrypted))
+      keys=new Set([...keys].filter(key=>allowed.has(key)))
+    }
+    const prior=metricKeys.get(release.releaseId)
+    metricKeys.set(release.releaseId,prior?new Set([...prior].filter(key=>keys.has(key))):keys)
+  }
+  return {units:snapshot.units,releases,metricKeys}
 }
 async function releaseInput(tx:Prisma.TransactionClient,context:TrainingReportContext,key:string,version:string,payload:Payload){
-  const {units,releases}=await measurements(tx,context),pointer=units.find(unit=>unit.measurement.releaseId===payload.measurementReleaseId)?.measurement
+  const {units,releases,metricKeys}=await measurements(tx,context),pointer=units.find(unit=>unit.measurement.releaseId===payload.measurementReleaseId)?.measurement
   if(!pointer)fail(404,'测量版本不属于此课程测评的实际挂载来源')
   const measurement=releases.get(pointer.releaseId)
   if(!measurement||measurement.layer!=='MEASUREMENT'||measurement.status==='REVOKED'||measurement.contentHash!==pointer.contentHash
     ||measurement.content.measurementHash!==pointer.measurementHash)throw new ContentReleaseError('CONTENT_TRAINING_SOURCE_MISMATCH')
-  const metrics=new Set(measurement.content.metrics.map(metric=>metric.metricKey))
+  const metrics=metricKeys.get(measurement.releaseId)??new Set<string>()
   if(payload.metricKeys.some(key=>!metrics.has(key))||new Set(payload.metricKeys).size!==payload.metricKeys.length)fail(400,'报告指标必须属于所选测量且不能重复')
   const scope={kind:'PRIVATE' as const,product:'TRAINING' as const,ownerId:context.actorId,resourceId:context.compositeId}
   const release=prepareRelease({layer:'REPORT',family:measurement.family,key:`report:${canonicalHash(scope)}:${key}`,version,scope,
@@ -87,11 +105,12 @@ async function releaseInput(tx:Prisma.TransactionClient,context:TrainingReportCo
 }
 export async function listTrainingReportMeasurements(context:TrainingReportContext){
   return prisma.$transaction(async tx=>{await authorize(tx,context,'report.edit')
-    const {units,releases}=await measurements(tx,context),ids=[...new Set(units.map(unit=>unit.measurement.releaseId))]
+    const {units,releases,metricKeys}=await measurements(tx,context),ids=[...new Set(units.map(unit=>unit.measurement.releaseId))]
     const result=[]
     for(const releaseId of ids){const release=releases.get(releaseId)
       if(!release||release.layer!=='MEASUREMENT'||release.status==='REVOKED')throw new ContentReleaseError('CONTENT_TRAINING_RELEASE_REQUIRED')
-      result.push({id:release.releaseId,family:release.family,key:release.key,version:release.version,status:release.status,contentHash:release.contentHash,metrics:release.content.metrics})}
+      result.push({id:release.releaseId,family:release.family,key:release.key,version:release.version,status:release.status,contentHash:release.contentHash,
+        metrics:release.content.metrics.filter(metric=>metricKeys.get(releaseId)?.has(metric.metricKey))})}
     await authority(tx,context,'report.edit')
     return result
   },options)
@@ -162,7 +181,9 @@ export async function publishTrainingReportDraft(context:TrainingReportContext,d
     release.provenance={...release.provenance,draftId,draftRevision:row.revision,publicationNote:input.publicationNote}
     await tx.$executeRaw(Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${canonicalHash([release.family,release.layer,release.key,release.version])}))`)
     await authority(tx,context,'report.publish')
-    const published=await publishContentRelease(tx,release,context.actorId,'HISTORICAL_INTERPRETATION')
+    // The repository accepts strict source input, not derived identity metadata.
+    const {hashScheme:_hashScheme,contentHash:_contentHash,...sourceInput}=release
+    const published=await publishContentRelease(tx,sourceInput,context.actorId,'HISTORICAL_INTERPRETATION')
     const changed=await tx.$executeRaw(Prisma.sql`UPDATE training_report_drafts SET state='PUBLISHED',published_release_id=${published.releaseId},updated_at=clock_timestamp()
       WHERE id=${draftId} AND revision=${input.revision} AND state='DRAFT'`)
     if(changed!==1)fail(409,'报告草稿已变化')

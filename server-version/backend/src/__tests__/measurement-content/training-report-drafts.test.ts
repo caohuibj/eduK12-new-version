@@ -8,6 +8,8 @@ vi.mock('../../modules/composite/composite.service',()=>({resolveCompositeSituat
 import {createTrainingReportDraft,createTrainingReportInput,editTrainingReportDraft,getTrainingReportDraft,listTrainingReportDrafts,listTrainingReportMeasurements,previewTrainingReportDraft,publishTrainingReportDraft} from '../../modules/questionnaire-product/content-report.service'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {ContentAuthorityError} from '../../modules/measurement-content/content-authority'
+import {prepareRelease} from '../../modules/measurement-content/release'
+import {encryptCognitivePayload} from '../../modules/cognitive/cognitive.security'
 const measurementId='11111111-1111-4111-8111-111111111111',draftId='22222222-2222-4222-8222-222222222222',releaseId='33333333-3333-4333-8333-333333333333'
 const context={actorId:'teacher',courseId:'course',compositeId:'composite',grantId:'44444444-4444-4444-8444-444444444444'}
 const payload=()=>({measurementReleaseId:measurementId,metricKeys:['effort'],audience:'teacher',language:'zh-CN',template:{blocks:[{type:'METRIC',metricKey:'effort',display:'RAW'}],limitations:[]}})
@@ -83,11 +85,64 @@ describe('Training private report drafts',()=>{
   await expect(createTrainingReportDraft(context,{...input(),payload:{...payload(),template:{blocks:[{type:'ASSET',assetId:'not-authorized',alt:'image'}]}}})).rejects.toThrow('REPORT_TEMPLATE_ASSET_UNKNOWN')
   for(const extra of [{audience:'student'},{assets:[{assetId:'forbidden'}]},{actorId:'other'}])await expect(createTrainingReportDraft(context,{...input(),payload:{...payload(),...extra}})).rejects.toThrow()
  })
+ it('does not advertise or preview frozen research-only/nonstandard cognitive metrics through an editing grant',async()=>{
+  vi.stubEnv('DATA_ENCRYPTION_KEY','b'.repeat(64))
+  try{
+   const definitions:any={effort:{valueType:'number',role:'primary',availableProfiles:['standard','research']},
+    process:{valueType:'integer',role:'quality',availableProfiles:['standard','research']},
+    blockSlopeRt:{valueType:'number',role:'research_only',availableProfiles:['research']},
+    delayed:{valueType:'number',role:'primary',availableProfiles:['research']},
+    productIndex:{valueType:'number',role:'primary',availableProfiles:['standard','research']}}
+   const cognitive={...measurement(),family:'COGNITIVE',content:{...measurement().content,
+    metrics:Object.keys(definitions).map(metricKey=>({metricKey,unit:'points',direction:'descriptive'}))}}
+   mocks.tx.compositeAssessment.findUnique.mockResolvedValue({id:'composite',createdBy:'teacher',items:[{id:'item',
+    cognitiveAssignment:{resolvedReportSnapshotEncrypted:encryptCognitivePayload({profile:'research',metricDefinitions:definitions})}}]})
+   mocks.snapshot.mockResolvedValue({snapshot:{units:[{itemId:'item',family:'COGNITIVE',measurement:{releaseId:measurementId,
+    contentHash:cognitive.contentHash,measurementHash:cognitive.content.measurementHash}}]},releases:new Map([[measurementId,cognitive]])})
+   expect((await listTrainingReportMeasurements(context))[0].metrics.map(metric=>metric.metricKey)).toEqual(['effort','process'])
+   for(const metricKey of ['blockSlopeRt','delayed','productIndex']){
+    const forbidden={...payload(),audience:'researcher',metricKeys:[metricKey],template:{blocks:[{type:'METRIC',metricKey,display:'RAW'}],limitations:[]}}
+    await expect(createTrainingReportDraft(context,{...input(),payload:forbidden})).rejects.toMatchObject({statusCode:400})
+    row.payload=forbidden
+    await expect(previewTrainingReportDraft(context,draftId,'INTERPRETABLE')).rejects.toMatchObject({statusCode:400})
+   }
+  }finally{vi.unstubAllEnvs()}
+ })
  it('publishes using only report.publish and returns whitelisted release identity',async()=>{
   const result=await publishTrainingReportDraft(context,draftId,{revision:0,publicationNote:'Approved wording'})
   expect(result).toEqual({draftId,releaseId,contentHash:'c'.repeat(64),version:'1',status:'PUBLISHED',idempotent:false})
   expect(mocks.authority.mock.calls.every(call=>call[1].capability==='report.publish')).toBe(true)
   expect(mocks.publish).toHaveBeenCalledWith(mocks.tx,expect.objectContaining({layer:'REPORT',scope:{kind:'PRIVATE',product:'TRAINING',ownerId:'teacher',resourceId:'composite'},assetRefs:[]}), 'teacher','HISTORICAL_INTERPRETATION')
+ })
+ it('crosses the real strict publication repository without derived hash metadata',async()=>{
+  const real=await vi.importActual<typeof import('../../modules/measurement-content/repository')>('../../modules/measurement-content/repository')
+  const prepared=prepareRelease({family:'SCALE',layer:'MEASUREMENT',key:'fixture',version:'1',scope:{kind:'PLATFORM'},
+   provenance:{},assetRefs:[],sourceReleaseId:null,content:{projectionVersion:1,instrumentVersion:'1',measurementHash:'b'.repeat(64),
+    measurementHashScheme:'fixture',scoringVersion:'1',runnerKey:'scale',runnerVersion:'2',locale:'zh-CN',localizationVersion:'1',
+    metrics:[{metricKey:'effort',unit:'points',direction:'descriptive'}],executable:{fixture:true}}})
+  const source={...prepared,releaseId:measurementId,status:'PUBLISHED'}
+  mocks.snapshot.mockResolvedValue({snapshot:{units:[{measurement:{releaseId:measurementId,contentHash:prepared.contentHash,measurementHash:'b'.repeat(64)}}]},releases:new Map([[measurementId,source]])})
+  const previous=mocks.tx.$queryRaw.getMockImplementation()!
+  mocks.tx.$queryRaw.mockImplementation(async query=>{
+   const sql=query.strings.join(' ')
+   if(sql.includes('FROM measurement_content_releases')&&sql.includes('WHERE family='))return []
+   if(sql.includes('FROM measurement_content_releases')&&sql.includes('WHERE id='))return [{
+    id:measurementId,layer:prepared.layer,family:prepared.family,content_key:prepared.key,version:prepared.version,
+    hash_scheme:prepared.hashScheme,content_hash:prepared.contentHash,content:prepared.content,scope:prepared.scope,
+    provenance:{},asset_refs:[],source_release_id:null,published_by:'teacher',published_at:new Date(),status:'PUBLISHED'}]
+   if(sql.includes('INSERT INTO measurement_content_releases')){
+    const [id,layer,family,key,version,scheme,hash,content,scope,provenance,assets,sourceId,publisher]=query.values
+    return [{id,layer,family,content_key:key,version,hash_scheme:scheme,content_hash:hash,content:JSON.parse(content),
+     scope:JSON.parse(scope),provenance:JSON.parse(provenance),asset_refs:JSON.parse(assets),source_release_id:sourceId,
+     published_by:publisher,published_at:new Date(),status:'PUBLISHED'}]
+   }
+   return previous(query)
+  })
+  mocks.publish.mockImplementation(real.publishContentRelease)
+  const result=await publishTrainingReportDraft(context,draftId,{revision:0,publicationNote:'Approved wording'})
+  expect(result).toMatchObject({status:'PUBLISHED',idempotent:false})
+  expect(mocks.publish.mock.calls[0][1]).not.toHaveProperty('hashScheme')
+  expect(mocks.publish.mock.calls[0][1]).not.toHaveProperty('contentHash')
  })
  it('replays publication without re-reading mutable source and refuses changed note',async()=>{
   row.state='PUBLISHED';row.published_release_id=releaseId

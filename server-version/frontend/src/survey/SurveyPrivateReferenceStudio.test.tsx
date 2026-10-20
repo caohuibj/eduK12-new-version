@@ -66,3 +66,21 @@ it.each(['/request-status','-evil','/'+id(4)+'/reviews/extra','/'+id(4)+'/publis
  sessionStorage.setItem('survey-reference-pending:'+id(9)+':'+id(1)+':'+id(2),JSON.stringify({actorId:id(9),pending:{operation:'CREATE',path:base+suffix,body:{}}}))
  mount();expect(screen.getByText(/无法恢复本账号/)).toBeInTheDocument();expect(screen.getByRole('button',{name:'创建描述性候选'})).toBeDisabled();expect(request).not.toHaveBeenCalled()
 })
+it('restores only formal source identity, never cached aggregate or new-submit authority',async()=>{
+ request.mockResolvedValue(candidate);const first=mount();fill();fireEvent.click(screen.getByRole('button',{name:'创建描述性候选'}));await screen.findByText('候选聚合结果')
+ const raw=sessionStorage.getItem('survey-reference-formal-source:'+id(9)+':'+id(1)+':'+id(2))!
+ expect(raw).not.toMatch(/sampleManifest|DO_NOT_RENDER_SAMPLE|statistics|sampleSize|method/)
+ expect(JSON.parse(raw).source).toEqual({candidateId:id(4),candidateHash:candidate.candidateHash,analyzeGrantId:id(3)})
+ first.unmount();mount();expect(screen.getByText(/已恢复正式来源身份/)).toBeInTheDocument()
+ expect(screen.getByRole('button',{name:'提交给独立正式审核'})).toBeDisabled()
+ expect(screen.queryByText('候选聚合结果')).not.toBeInTheDocument();expect(request).toHaveBeenCalledOnce()
+})
+it('restores a formal unknown request for identical retry even while new submission is disabled',async()=>{
+ sessionStorage.setItem('survey-reference-formal-source:'+id(9)+':'+id(1)+':'+id(2),JSON.stringify({actorId:id(9),projectId:id(1),waveId:id(2),source:{candidateId:id(4),candidateHash:candidate.candidateHash,analyzeGrantId:id(3)}}))
+ const operation={operation:'SUBMIT',body:{sourceCandidateId:id(4),sourceCandidateHash:candidate.candidateHash,analyzeGrantId:id(3),statement:'Saved evidence'}}
+ sessionStorage.setItem('formal-reference:'+id(9)+':SURVEY:'+id(4)+':'+candidate.candidateHash,JSON.stringify({actorId:id(9),scope:id(4)+':'+candidate.candidateHash,product:'SURVEY',request:operation,hadUnknownOutcome:true}))
+ request.mockRejectedValue(new Error('still unavailable'));mount()
+ expect(screen.getByRole('button',{name:'提交给独立正式审核'})).toBeDisabled()
+ fireEvent.click(screen.getByRole('button',{name:'原样重试并核对'}));await screen.findByText(/still unavailable/)
+ expect(request).toHaveBeenCalledWith('/reference-governance/submissions','POST',operation.body)
+})

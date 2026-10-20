@@ -2,7 +2,8 @@ import { resolveParticipantPresentation, type CognitiveParticipantPresentationV1
 import { buildCognitiveV2TaskDefinition } from './v2/registry'
 import type { TaskDefinition } from './v2/types'
 import { createHash } from 'crypto'
-import { decryptCognitivePayload, encryptCognitivePayload } from './cognitive.security'
+import { decryptCognitivePayload, encryptCognitivePayload, encryptCompactCognitivePayload } from './cognitive.security'
+import { compactAssessmentStorageEnabled } from '../assessment-runtime/compact-field-codec'
 import { measureRequestPhase, measureRequestPhaseSync } from '../../services/runtimeObservability'
 import { BAD_REQUEST } from './cognitive.errors'
 import type {
@@ -123,7 +124,9 @@ export const freezeAssignmentProfile = <TConfig, TTrial>(input: {
     resolvedConfig,
     resolvedConfigHash: hashResolvedConfig(resolvedConfig),
     resolvedConfigSnapshotEncrypted: encryptCognitivePayload(resolvedConfig),
-    resolvedReportSnapshotEncrypted: encryptCognitivePayload(resolvedReport),
+    resolvedReportSnapshotEncrypted: compactAssessmentStorageEnabled()
+      ? encryptCompactCognitivePayload(resolvedReport)
+      : encryptCognitivePayload(resolvedReport),
   }
 }
 

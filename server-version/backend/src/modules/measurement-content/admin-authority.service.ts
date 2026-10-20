@@ -1,3 +1,4 @@
+import {validateStaticSjtRegistryMappings} from '../situational/static-measurement-release'
 import {randomUUID} from 'node:crypto'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
@@ -11,17 +12,28 @@ const wireGrant=contentGrantInputSchema.innerType().extend({
   validFrom:z.string().datetime().transform(value=>new Date(value)),
   expiresAt:z.string().datetime().transform(value=>new Date(value)),
 }).pipe(contentGrantInputSchema).superRefine((grant,ctx)=>{
-  if(!supported(grant)||!uuid.safeParse(grant.subjectId).success||!uuid.safeParse(grant.scope.scopeId).success||
+  if(!supported(grant)||!uuid.safeParse(grant.subjectId).success||(!platformSjt(grant)&&!platformReference(grant)&&!uuid.safeParse(grant.scope.scopeId).success)||
     grant.scope.resourceKeys.some(key=>!uuid.safeParse(key).success))
-    ctx.addIssue({code:'custom',message:'Only exact Survey project reference/data or Training course report grants are supported'})
+    ctx.addIssue({code:'custom',message:'Only exact Survey project, Training course, formal reference governance or installed situational measurement grants are supported'})
 })
 export const adminContentRootRequestSchema=z.object({requestId:uuid,expectedVersion:z.literal(0),reason,grant:wireGrant}).strict()
 export const adminContentRevokeRequestSchema=z.object({expectedVersion:z.number().int().positive(),reason}).strict()
 const options={isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:5000}
 const deny=(message='内容授权范围或当前身份无效'):never=>{throw new AdminPermissionError(403,message)}
+function platformSjt(grant:Pick<ContentGrantInput,'scope'|'capabilities'>){
+  return grant.scope.product==='TRAINING'&&grant.scope.scopeKind==='PLATFORM'&&grant.scope.scopeId==='situational-registry'
+    &&grant.scope.resourceKind==='measurement'&&grant.capabilities.length===1&&grant.capabilities[0]==='measurement.publish'
+}
+function platformReference(grant:Pick<ContentGrantInput,'scope'|'capabilities'>){
+  return grant.scope.product==='TRAINING'&&grant.scope.scopeKind==='PLATFORM'&&grant.scope.scopeId==='reference-governance'
+    &&grant.scope.resourceKind==='reference'&&grant.capabilities.every(capability=>['reference.review','reference.publish'].includes(capability))
+}
 function supported(grant:Pick<ContentGrantInput,'scope'|'capabilities'>){
-  if(grant.scope.product==='TRAINING')return grant.scope.scopeKind==='COURSE'&&grant.scope.resourceKind==='report'&&
-    grant.capabilities.every(capability=>['report.edit','report.publish'].includes(capability))
+  if(platformSjt(grant)||platformReference(grant))return true
+  if(grant.scope.product==='TRAINING')return grant.scope.scopeKind==='COURSE'&&(
+    grant.scope.resourceKind==='report'&&grant.capabilities.every(capability=>['report.edit','report.publish'].includes(capability))||
+    grant.scope.resourceKind==='reference'&&grant.capabilities.every(capability=>['reference.analyze','reference.review','reference.publish'].includes(capability))||
+    grant.scope.resourceKind==='data'&&grant.capabilities.length===1&&grant.capabilities[0]==='data.reinterpret')
   return grant.scope.product==='SURVEY'&&grant.scope.scopeKind==='PROJECT'&&
     (grant.scope.resourceKind==='reference'&&grant.capabilities.every(c=>['reference.analyze','reference.review','reference.publish'].includes(c))||
      grant.scope.resourceKind==='data'&&grant.capabilities.length===1&&grant.capabilities[0]==='data.reinterpret')
@@ -57,11 +69,19 @@ function storedInput(row:GrantRow):ContentGrantInput{return contentGrantInputSch
 const comparable=(grant:ContentGrantInput)=>({...grant,validFrom:grant.validFrom.toISOString(),expiresAt:grant.expiresAt.toISOString()})
 /** Root issuance only. No administrator/owner identity implicitly acquires rights. */
 export async function issueAdminContentRoot(actorId:string,proof:AdminSessionProof,raw:unknown){
-  const input=adminContentRootRequestSchema.parse(raw),grant=input.grant,scope=grant.scope
+  const input=adminContentRootRequestSchema.parse(raw),grant=input.grant,scope=grant.scope,isPlatformSjt=platformSjt(grant),isPlatformReference=platformReference(grant)
   assertProof(proof)
   return prisma.$transaction(async tx=>{
     // Match consumers: Project/Course → Users → composites/deliveries → grants/resources.
-    const projects=scope.product==='TRAINING'
+    // Static registry publishing shares source → mapping → Users → grant order
+    // with its publisher. The initial read only orders locks, never authorizes.
+    let registryResources:Array<{id:string}>=[]
+    if(isPlatformSjt){
+      const mappings=await validateStaticSjtRegistryMappings(tx,scope.resourceKeys)
+      if(mappings.length!==scope.resourceKeys.length||mappings.some(row=>!scope.resourceKeys.includes(row.id)))deny()
+      registryResources=mappings
+    }
+    const projects=isPlatformSjt||isPlatformReference?[{id:scope.scopeId}]:scope.product==='TRAINING'
       ?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM courses
         WHERE id=${scope.scopeId} AND creator_id=${grant.subjectId} AND course_type='TRAINING_COURSE' AND NOT is_library FOR SHARE`)
       :await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM survey_projects
@@ -71,7 +91,7 @@ export async function issueAdminContentRoot(actorId:string,proof:AdminSessionPro
     const target=users.find(user=>user.id===grant.subjectId)
     if(!target||!target.is_active||target.is_frozen||target.must_change_password)deny()
     if(scope.product==='TRAINING'){
-      if(!['TRAINING','LEGACY'].includes(target!.account_domain)||target!.role!=='TEACHER'||target!.teacher_approved!==true)deny()
+      if(!['TRAINING','LEGACY'].includes(target!.account_domain)||(isPlatformSjt?target!.platform_role!=='SYSTEM_ADMIN':target!.role!=='TEACHER'||target!.teacher_approved!==true))deny()
     }else{
     if(target!.account_domain!=='SURVEY')deny()
     const qualified=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT g.user_id AS id
@@ -80,16 +100,36 @@ export async function issueAdminContentRoot(actorId:string,proof:AdminSessionPro
     if(qualified.length!==1)deny()
     }
     let trainingResources:Array<{id:string}>=[]
-    if(scope.product==='TRAINING'){
+    if(scope.product==='TRAINING'&&!isPlatformSjt&&!isPlatformReference){
+      // Initial headers order locks only; the locked FINAL query below remains
+      // authoritative and must match these actual parent composites.
+      const attemptParents=scope.resourceKind==='data'?await tx.$queryRaw<Array<{id:string;composite_assessment_id:string}>>(Prisma.sql`
+        SELECT id,composite_assessment_id FROM composite_assessment_attempts WHERE id IN (${Prisma.join(scope.resourceKeys)})`):[]
+      const compositeIds=scope.resourceKind==='data'?[...new Set(attemptParents.map(row=>row.composite_assessment_id))]:scope.resourceKeys
+      if(!compositeIds.length)deny()
       const composites=await tx.$queryRaw<Array<{id:string;course_id:string|null;product_kind:string;questionnaire_type:string|null}>>(Prisma.sql`SELECT id,course_id,product_kind,questionnaire_type::text FROM composite_assessments
-        WHERE id IN (${Prisma.join(scope.resourceKeys)}) AND created_by=${grant.subjectId} ORDER BY id FOR SHARE`)
+        WHERE id IN (${Prisma.join(compositeIds)}) AND created_by=${grant.subjectId} ORDER BY id FOR SHARE`)
       const deliveries=await tx.$queryRaw<Array<{composite_id:string}>>(Prisma.sql`SELECT composite_id FROM questionnaire_course_deliveries
-        WHERE course_id=${scope.scopeId} AND composite_id IN (${Prisma.join(scope.resourceKeys)}) ORDER BY composite_id FOR SHARE`)
+        WHERE course_id=${scope.scopeId} AND composite_id IN (${Prisma.join(compositeIds)}) ORDER BY composite_id FOR SHARE`)
       const linked=new Set(deliveries.map(row=>row.composite_id))
-      trainingResources=composites.filter(row=>row.product_kind==='QUESTIONNAIRE'
-        ?row.questionnaire_type==='COURSE'&&linked.has(row.id):row.course_id===scope.scopeId)
+      const authorizedParents=composites.filter(row=>row.product_kind==='QUESTIONNAIRE'
+        ?row.questionnaire_type==='COURSE'&&linked.has(row.id):row.product_kind==='LEGACY_COMPOSITE'&&row.course_id===scope.scopeId)
+      if(scope.resourceKind==='data'){
+        const parentIds=new Set(authorizedParents.map(row=>row.id))
+        const attempts=await tx.$queryRaw<Array<{id:string;composite_assessment_id:string}>>(Prisma.sql`
+          SELECT id,composite_assessment_id FROM composite_assessment_attempts WHERE id IN (${Prisma.join(scope.resourceKeys)})
+            AND delivery_course_id=${scope.scopeId} AND status='COMPLETED' AND delivery_mode='FINAL_ONLY' AND runtime_generation='UNIFIED_V1'
+            AND training_content_binding IS NOT NULL AND training_content_binding_hash IS NOT NULL
+            AND training_content_interpretation_encrypted IS NOT NULL AND training_content_interpretation_hash IS NOT NULL
+            AND aggregate_input_hash IS NOT NULL ORDER BY id FOR SHARE`)
+        trainingResources=attempts.filter(row=>parentIds.has(row.composite_assessment_id)
+          &&attemptParents.some(prior=>prior.id===row.id&&prior.composite_assessment_id===row.composite_assessment_id))
+      }else trainingResources=authorizedParents
     }
-    const resources=scope.product==='TRAINING'?trainingResources
+    const resources=isPlatformSjt?registryResources:isPlatformReference
+      ?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM measurement_content_releases
+        WHERE id IN (${Prisma.join(scope.resourceKeys)}) AND layer='MEASUREMENT' AND status<>'REVOKED' ORDER BY id FOR SHARE`)
+      :scope.product==='TRAINING'?trainingResources
       :scope.resourceKind==='reference'
       ?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM measurement_content_releases
         WHERE id IN (${Prisma.join(scope.resourceKeys)}) AND layer='MEASUREMENT'
@@ -161,3 +201,6 @@ export async function readAdminContentGrant(actorId:string,proof:AdminSessionPro
       ...comparable(grant),revokedAt:row.revoked_at?.toISOString()??null}
   },options)
 }
+
+/** Internal consumer reuse: call after the exact source/mapping locks. */
+export {lockActor as lockCurrentContentSystemActor,recheckAfterWait as recheckContentSystemActorAfterWait}

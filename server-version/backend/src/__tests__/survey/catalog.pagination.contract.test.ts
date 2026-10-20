@@ -37,7 +37,7 @@ describe('bounded source catalog pagination',()=>{
     const result=await sourceCatalog('admin',{kind:'SCALE',page})
     expect(result).toMatchObject({page,pageSize:25,hasMore,terminalReason})
     expect(result.list).toHaveLength(count)
-    expect(result.list.every(row=>row.available)).toBe(true)
+    expect(result.list.every(row=>!row.available&&row.unsupportedReason==='SOURCE_SCALE_EXPLICIT_CONVERSION_REQUIRED')).toBe(true)
     expect(result.list.map(row=>row.ref.sourceId)).toEqual(Array.from({length:count},(_,i)=>'source-'+String((page-1)*25+i+1).padStart(4,'0')))
     expect(db.$queryRaw).toHaveBeenCalledTimes(1) // Current administrator authority remains mandatory.
     expect(db.scale.findMany).toHaveBeenCalledExactlyOnceWith({where:{status:'PUBLISHED'},orderBy:{id:'asc'},skip:(page-1)*25,take:26})

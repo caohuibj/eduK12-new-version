@@ -12,6 +12,8 @@ import { CanonicalJsonError, canonicalHash } from '../../modules/assessment-runt
 import { decryptUnifiedRuntimePayload, encryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/security'
 import { prepareTeacherPublishedAssignment, persistPreparedTeacherPublishedAssignment } from '../../modules/cognitive/assignment.service'
 import { freezeTrainingFlowAssignment } from '../../modules/composite/training-flow-assignment-snapshot'
+import { getCognitiveRegistryEntry } from '../../modules/cognitive/cognitive.registry'
+import { freezeAssignmentProfile, freezeDataForWrite } from '../../modules/cognitive/profile-freeze'
 
 const input = {
   userId: 'flow-teacher', courseId: 'flow-course', configId: 'reaction-config',
@@ -51,6 +53,21 @@ beforeEach(() => {
 afterEach(() => { appConfig.cognitiveModuleEnabled = cognitiveEnabled; vi.unstubAllEnvs() })
 
 describe('C19 private prepared-assignment candidate snapshot', () => {
+  it.each(['false', 'true'])('copies an existing source freeze without transcoding, source compact=%s', async compact => {
+    vi.stubEnv('ASSESSMENT_COMPACT_FACTS_ENABLED', compact)
+    const sourceFreeze = freezeDataForWrite(freezeAssignmentProfile({
+      entry: getCognitiveRegistryEntry('reaction', '1.0.0', '1.1.0')!,
+      baseConfig: publishedConfig.config, profile: 'standard',
+    }))
+    vi.stubEnv('ASSESSMENT_COMPACT_FACTS_ENABLED', compact === 'true' ? 'false' : 'true')
+    const prepared = await prepareTeacherPublishedAssignment(db as any, { ...input, sourceFreeze })
+    expect(prepared.data).toMatchObject(sourceFreeze)
+    const snapshot = freezeTrainingFlowAssignment(prepared)
+    expect(snapshot.data).toMatchObject(sourceFreeze)
+    await persistPreparedTeacherPublishedAssignment(db as any, snapshot)
+    expect(db.cognitiveAssignment.create).toHaveBeenCalledExactlyOnceWith({ data: snapshot.data })
+  })
+
   it.each(['false', 'true'])('freezes actual new-wrapper preparation and preserves deferred persistence, compact=%s', async compact => {
     vi.stubEnv('ASSESSMENT_COMPACT_FACTS_ENABLED', compact)
     const prepared = await prepareTeacherPublishedAssignment(db as any, input)

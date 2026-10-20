@@ -101,3 +101,13 @@ Storage formula amendment: explicit reinterpretation adds one `I_i = encrypted(p
 - Risk/unit: V09; shared scientific release once, assignment pointer only. Actual profile hash verified; config fallback cannot replace a different profile. Report-only settings excluded from scientific version.
 - Acceptance/result: same-config multiple-profile identities, original freeze preservation, CAS and final expiry checks verified in mocks; migration/concurrency/HTTP pending.
 - Regression watch: no duplicate runtime copy into answers, source-owner fabrication, automatic historical backfill or default-config substitution.
+
+### R31 — Training FINAL receipt and report read
+
+- Chain/object: immutable publication report pointer, per-attempt interpretation receipt, authorized report projection.
+- Evidence: training-report-selection.ts, training-content-final.ts, training-content-report.ts, unified-aggregate-finalizer.service.ts; migration 20261020135000.
+- Effective flags: existing unified Training finalizer/report feature flags; no new deployment switch. Compact codecs are reused as installed; no claim that historical flag combinations have been measured.
+- Measured/estimated: directed service/canonical-codec contracts only; bytes, peak release load and latency remain unmeasured.
+- Risk/unit: V08. Shared template/release once; each answer stores binding pointers + receipt statuses/result hashes, no metric/template/norm copies. Required facts reuse FINAL verification; accepted optional facts one bounded batch. Single report verifies selected canonical facts once; list/batch returns status index without template N+1.
+- Acceptance/result: precise source/epoch/hash, participant isolation, revoked-template no-new-render, legacy null and immutable final semantics under targeted tests. Real SQL/HTTP/concurrency pending.
+- Regression watch: no rescore or latest selection on read, no raw/trial removal, no default export interpretation, no source inference for old attempts; existing compact shared artifacts remain authoritative.

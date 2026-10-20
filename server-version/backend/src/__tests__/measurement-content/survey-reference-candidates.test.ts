@@ -298,16 +298,28 @@ describe('exact reference request recovery',()=>{
     vi.clearAllMocks()
     mocks.findRequest.mockResolvedValue(row)
     mocks.tx.$queryRaw.mockImplementation(async query=>query.strings.join(' ').includes('measurement_reference_candidates')
-      ?[{payload:result.candidate}]:[{measurement:binding,source_revision:99}])
+      ?[{payload:result.candidate}]:[{measurement:binding,source_revision:7}])
     mocks.load.mockRejectedValue(new Error('REPLAY_MUST_NOT_READ_SAMPLES'))
     return {result,row}
   }
-  it('returns the immutable create result after response loss despite newer source revision',async()=>{
+  it('returns the immutable create result after response loss only while source fences remain current',async()=>{
     const {result}=await completed()
     expect(await createSurveyReferenceCandidate('actor',input())).toEqual(result)
     expect(mocks.load).not.toHaveBeenCalled();expect(mocks.store).not.toHaveBeenCalled()
-    expect(mocks.tx.surveyWaveFinal.count).not.toHaveBeenCalled()
+    expect(mocks.tx.surveyWaveFinal.count).toHaveBeenCalledTimes(1)
     expect(mocks.authority).toHaveBeenCalledWith(mocks.tx,expect.objectContaining({capability:'reference.analyze'}))
+  })
+  it.each(['POST','STATUS'])('refuses %s aggregate recovery after a source/withdrawal revision change',async mode=>{
+    const {result}=await completed()
+    mocks.tx.$queryRaw.mockImplementation(async query=>query.strings.join(' ').includes('measurement_reference_candidates')
+      ?[{payload:result.candidate}]:[{measurement:binding,source_revision:99}])
+    await expect(mode==='POST'?createSurveyReferenceCandidate('actor',input()):readSurveyReferenceRequest('actor','CREATE',input())).rejects.toThrow('REFERENCE_SURVEY_SOURCE_CHANGED')
+    expect(mocks.load).not.toHaveBeenCalled();expect(mocks.store).not.toHaveBeenCalled();expect(mocks.storeRequest).not.toHaveBeenCalled()
+  })
+  it('refuses aggregate recovery when frozen eligible FINAL membership changes',async()=>{
+    await completed();mocks.tx.surveyWaveFinal.count.mockResolvedValueOnce(1)
+    await expect(readSurveyReferenceRequest('actor','CREATE',input())).rejects.toThrow('REFERENCE_SURVEY_SOURCE_CHANGED')
+    expect(mocks.load).not.toHaveBeenCalled();expect(mocks.store).not.toHaveBeenCalled()
   })
   it('rejects same UUID with changed evidence or actor/scope',async()=>{
     await completed()
@@ -344,7 +356,7 @@ describe('exact reference request recovery',()=>{
     expect(await createSurveyReferenceCandidate('actor',input())).toEqual(result)
     expect(mocks.lockRequest).toHaveBeenCalledExactlyOnceWith(mocks.tx,requestId)
     expect(mocks.store).not.toHaveBeenCalled();expect(mocks.storeRequest).not.toHaveBeenCalled()
-    expect(mocks.tx.surveyWaveFinal.count).not.toHaveBeenCalled()
+    expect(mocks.tx.surveyWaveFinal.count).toHaveBeenCalledTimes(1)
   })
   it('review retries return the same review ID and bind decision, statement and candidate hash',async()=>{
     const {result}=await completed()

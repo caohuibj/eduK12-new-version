@@ -1,3 +1,4 @@
+import {freezeTrainingReferenceBinding} from '../modules/composite/training-reference-binding'
 import { loadTrainingChildParent } from '../modules/composite/training-variant-child-scope'
 import { resolveTrainingAttemptScope } from '../modules/composite/training-variant-scope'
 import { Prisma } from '@prisma/client'
@@ -170,6 +171,7 @@ export const freezeCompositeAttemptContext = async (
     try {
       const context = decryptAssessmentContext(attempt.contextSnapshotEncrypted)
       if (!assessmentContextHashMatches(context, attempt.contextSnapshotHash)) throw new Error('context hash mismatch')
+      await freezeTrainingReferenceBinding(db,attempt,{context,hash:attempt.contextSnapshotHash})
       return { context, hash: attempt.contextSnapshotHash, alreadyFrozen: true }
     } catch {
       throw new AssessmentContextServiceError('人口学上下文无法读取，请联系管理员', 500)
@@ -193,12 +195,16 @@ export const freezeCompositeAttemptContext = async (
     where: { id: attemptId, contextSnapshotEncrypted: null, contextSnapshotHash: null },
     data: { contextSnapshotEncrypted: encryptAssessmentContext(context), contextSnapshotHash: hash, contextFrozenAt: frozenAt },
   })
-  if (updated.count === 1) return { context, hash, alreadyFrozen: false }
+  if (updated.count === 1) {
+    await freezeTrainingReferenceBinding(db,attempt,{context,hash})
+    return { context, hash, alreadyFrozen: false }
+  }
   const current = await db.compositeAssessmentAttempt.findUnique({ where: { id: attemptId } })
   if (!current?.contextSnapshotEncrypted || !current.contextSnapshotHash) throw new AssessmentContextServiceError('人口学上下文冻结失败，请重试', 409)
   try {
     const context = decryptAssessmentContext(current.contextSnapshotEncrypted)
     if (!assessmentContextHashMatches(context, current.contextSnapshotHash)) throw new Error('context hash mismatch')
+    await freezeTrainingReferenceBinding(db,{...current,compositeAssessment:attempt.compositeAssessment},{context,hash:current.contextSnapshotHash})
     return { context, hash: current.contextSnapshotHash, alreadyFrozen: true }
   } catch {
     throw new AssessmentContextServiceError('人口学上下文无法读取，请联系管理员', 500)

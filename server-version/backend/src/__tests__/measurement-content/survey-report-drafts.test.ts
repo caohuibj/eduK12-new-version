@@ -19,6 +19,7 @@ import {
   createSurveyReportInput, createSurveyReportDraft, editSurveyReportDraft, getSurveyReportDraft,
   listSurveyReportDrafts, listSurveyReportMeasurements, previewSurveyReportDraft, publishSurveyReportDraft,
 } from '../../modules/survey/report-drafts.service'
+import { releaseInputSchema } from '../../modules/measurement-content/release'
 
 const measurementId = '11111111-1111-4111-8111-111111111111'
 const draftId = '22222222-2222-4222-8222-222222222222'
@@ -124,6 +125,9 @@ describe('Survey private report transaction service', () => {
     expect(mocks.tx.$queryRaw.mock.calls[0][0].sql).toContain('FOR UPDATE')
     expect(mocks.publish).toHaveBeenCalledExactlyOnceWith(mocks.tx,expect.objectContaining({layer:'REPORT',
       scope:measurement().scope,provenance:expect.objectContaining({draftId,draftRevision:0,publicationNote:publishInput.publicationNote})}),'owner','HISTORICAL_INTERPRETATION')
+    expect(() => releaseInputSchema.parse(mocks.publish.mock.calls[0][1])).not.toThrow()
+    expect(mocks.publish.mock.calls[0][1]).not.toHaveProperty('hashScheme')
+    expect(mocks.publish.mock.calls[0][1]).not.toHaveProperty('contentHash')
     expect(mocks.retain).toHaveBeenCalledExactlyOnceWith({owner:{entityType:'MeasurementReportRelease',entityId:publishedId,field:'media'},
       references:[{assetId:asset.assetId,contentHash:asset.sha256,mimeType:asset.mediaType}],db:mocks.tx})
     expect(mocks.tx.$executeRaw.mock.calls[0][0].sql).toContain("SET state='PUBLISHED'")

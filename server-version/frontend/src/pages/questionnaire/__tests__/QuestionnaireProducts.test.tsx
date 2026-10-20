@@ -82,7 +82,7 @@ describe('questionnaire draft feedback', () => {
     api.post.mockRejectedValue(new Error('response lost'))
     mount('saved');fireEvent.click(await screen.findByRole('button',{name:'发布当前认知配置版本'}));await screen.findByRole('button',{name:'重试原修订请求'})
     const key='training-cognitive-publication:'+JSON.stringify(['teacher-1','saved'])
-    expect(JSON.parse(sessionStorage.getItem(key)!)).toEqual({actorId:'teacher-1',id:'saved',revision:7,itemIds:['cog']})
+    expect(JSON.parse(sessionStorage.getItem(key)!)).toEqual({actorId:'teacher-1',id:'saved',revision:7,itemIds:['cog'],hadUnknownOutcome:true})
     cleanup();current={...row,revision:8};mount('saved');await screen.findByRole('button',{name:'重试原修订请求'})
     expect(screen.queryByRole('button',{name:'已核对全部原认知项，结束恢复'})).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button',{name:'重试原修订请求'}));await waitFor(()=>expect(api.post).toHaveBeenCalledTimes(2))
@@ -126,6 +126,24 @@ describe('questionnaire draft feedback', () => {
     expect(sessionStorage.getItem('training-cognitive-publication:'+JSON.stringify(['teacher-1','old']))).toBeNull()
     expect(screen.getByRole('button',{name:'重试原修订请求'})).toBeInTheDocument()
     expect(screen.queryByText('当前认知配置版本已发布。组合测评仍为草稿，尚未启动投放。')).not.toBeInTheDocument()
+  })
+
+  it.each([400,403,409])('unlocks a first definitive %s publication rejection for correction',async(status)=>{
+    const row={id:'saved',name:'认知草稿',status:'DRAFT',revision:7,questionnaireType:'COURSE',questionnaireCourses:[],items:[{id:'cog',type:'COGNITIVE',position:0,cognitiveAssignment:{title:'认知任务'}}],formSections:[],publicEnabled:false}
+    api.get.mockImplementation(async path=>({code:0,data:path.endsWith('/resources')?{scales:[],cognitive:[],situational:[],courses:[]}:row}))
+    api.post.mockRejectedValue(Object.assign(new Error('definitive rejection'),{status}));mount('saved')
+    fireEvent.click(await screen.findByRole('button',{name:'发布当前认知配置版本'}));await screen.findByRole('alert')
+    expect(screen.getByLabelText('测评名称')).toBeEnabled();expect(screen.queryByRole('button',{name:'重试原修订请求'})).not.toBeInTheDocument()
+    expect(sessionStorage.getItem('training-cognitive-publication:'+JSON.stringify(['teacher-1','saved']))).toBeNull()
+  })
+  it('preserves an earlier unknown outcome when its original-revision retry gets 403',async()=>{
+    const row={id:'saved',name:'认知草稿',status:'DRAFT',revision:7,questionnaireType:'COURSE',questionnaireCourses:[],items:[{id:'cog',type:'COGNITIVE',position:0,cognitiveAssignment:{title:'认知任务'}}],formSections:[],publicEnabled:false}
+    api.get.mockImplementation(async path=>({code:0,data:path.endsWith('/resources')?{scales:[],cognitive:[],situational:[],courses:[]}:row}))
+    api.post.mockRejectedValueOnce(new Error('response lost')).mockRejectedValueOnce(Object.assign(new Error('permission changed'),{status:403}));mount('saved')
+    fireEvent.click(await screen.findByRole('button',{name:'发布当前认知配置版本'}));await screen.findByRole('button',{name:'重试原修订请求'});await waitFor(()=>expect(screen.getByRole('button',{name:'重试原修订请求'})).toBeEnabled());fireEvent.click(screen.getByRole('button',{name:'重试原修订请求'}));await waitFor(()=>expect(api.post).toHaveBeenCalledTimes(2));await waitFor(()=>expect(screen.getByRole('button',{name:'重试原修订请求'})).toBeEnabled())
+    expect(screen.getByLabelText('测评名称')).toBeDisabled();expect(screen.getByRole('button',{name:'重试原修订请求'})).toBeInTheDocument()
+    expect(JSON.parse(sessionStorage.getItem('training-cognitive-publication:'+JSON.stringify(['teacher-1','saved']))!).hadUnknownOutcome).toBe(true)
+    expect(api.post.mock.calls.map(call=>call[1])).toEqual([{revision:7},{revision:7}])
   })
 
   it('exposes the active composition section to keyboard and screen-reader users', async () => {

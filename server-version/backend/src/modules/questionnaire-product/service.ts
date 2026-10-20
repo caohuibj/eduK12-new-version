@@ -1,3 +1,6 @@
+import {attachTrainingReferenceSelection,listTrainingReferenceChoices,trainingReferenceSelectionSchema} from '../composite/training-reference-selection'
+import { assertCurrentTrainingContentOwner, attachTrainingReportSelection, trainingReportSelectionSchema } from '../composite/training-report-selection'
+import { prepareTrainingContentSnapshot } from '../composite/training-content-binding'
 import {publishAssignmentMeasurementRelease} from '../cognitive/assignment-measurement-release'
 import { parseTrainingFeedbackPolicy, trainingFeedbackPolicySchema } from '../assessment-policy/training-feedback-policy'
 import { parseTrainingPersistencePolicy } from '../composite/training-persistence.policy'
@@ -171,7 +174,17 @@ export async function detail(actor: Actor, id: string) {
   const row = await prisma.compositeAssessment.findUnique({ where: { id } })
   if (!row || row.productKind !== 'QUESTIONNAIRE') throw compositeNotFound('新版问卷不存在')
   owner(actor, row)
-  return { ...await getCompositeForTeacher(actor.userId, actor.role, id), supportedChannels: ['WEB'], reportMode: 'COLLECTION_ONLY' }
+  let reportSelection:unknown=undefined,referenceSelection:unknown=undefined
+  if(row.createdBy===actor.userId){
+    reportSelection=null;referenceSelection=null
+    if((row as any).trainingReportSelectionDraft!=null||(row as any).trainingReferenceSelectionDraft!=null){const selections=await prisma.$transaction(async tx=>{
+      const current=await tx.compositeAssessment.findUnique({where:{id},include:{questionnaireCourses:true}})
+      if(!current)throw compositeNotFound('新版问卷不存在')
+      await assertCurrentTrainingContentOwner(tx,actor,current)
+      return {report:current.trainingReportSelectionDraft,reference:current.trainingReferenceSelectionDraft}
+    });reportSelection=selections.report;referenceSelection=selections.reference}
+  }
+  return { ...await getCompositeForTeacher(actor.userId, actor.role, id), trainingReportSelectionDraft:reportSelection, trainingReferenceSelectionDraft:referenceSelection, supportedChannels: ['WEB'], reportMode: 'COLLECTION_ONLY' }
 }
 export async function create(actor: Actor, raw: unknown) {
   author(actor)
@@ -389,23 +402,7 @@ export async function preflight(actor: Actor, id: string, raw: unknown) {
 
 async function prepareOwnedCognitiveMeasurements(tx:Tx,actor:Actor,row:any) {
   if(!row.items.some((item:any)=>item.type==='COGNITIVE'))return
-  // Selecting an installed, already authorized profile may publish this owned
-  // execution instance; it confers no platform config or new runner authoring.
-  const [principal]=await tx.$queryRaw<Array<{role:string;account_domain:string;teacher_approved:boolean;is_active:boolean;is_frozen:boolean;must_change_password:boolean;expires_at:Date|null}>>(Prisma.sql`
-    SELECT role::text,account_domain,teacher_approved,is_active,is_frozen,must_change_password,expires_at
-    FROM users WHERE id=${actor.userId} FOR SHARE`)
-  const courseIds:string[]=(row.questionnaireCourses??[]).map((entry:any)=>entry.courseId)
-  if(row.questionnaireType==='COURSE') {
-    if(!courseIds.length)throw compositeForbidden('测量实例须属于真实 Training 课程')
-    const currentCourses=await tx.$queryRaw<Array<{id:string;creator_id:string;course_type:string;is_library:boolean}>>(Prisma.sql`
-      SELECT id,creator_id,course_type,is_library FROM courses WHERE id IN (${Prisma.join(courseIds)}) ORDER BY id FOR SHARE`)
-    if(currentCourses.length!==new Set(courseIds).size||currentCourses.some(course=>course.creator_id!==actor.userId||course.course_type!=='TRAINING_COURSE'||course.is_library))
-      throw compositeForbidden('测量实例须属于本人 Training 课程')
-  }
-  const [clock]=await tx.$queryRaw<Array<{now:Date}>>(Prisma.sql`SELECT clock_timestamp() AS now`)
-  if(!principal||row.createdBy!==actor.userId||principal.role!=='TEACHER'||!principal.teacher_approved
-    ||!['TRAINING','LEGACY'].includes(principal.account_domain)||!principal.is_active||principal.is_frozen||principal.must_change_password
-    ||!clock||principal.expires_at&&principal.expires_at<=clock.now)throw compositeForbidden('测量实例发布需要当前真实作者资格')
+  const expiry=await assertCurrentTrainingContentOwner(tx,actor,row)
     for (const item of row.items) {
       const copiedBinding = copiedCognitiveBinding(item, row)
       if (item.type === 'COGNITIVE' && !copiedBinding) {
@@ -427,12 +424,52 @@ async function prepareOwnedCognitiveMeasurements(tx:Tx,actor:Actor,row:any) {
         await publishAssignmentMeasurementRelease(tx,actor.userId,item.cognitiveAssignment.id)
       }
     }
-  return principal.expires_at
+  return expiry
  }
 async function recheckMeasurementPublisherExpiry(tx:Tx,expiresAt:Date|null|undefined) {
   if(!expiresAt)return
   const [clock]=await tx.$queryRaw<Array<{now:Date}>>(Prisma.sql`SELECT clock_timestamp() AS now`)
   if(!clock||expiresAt<=clock.now)throw compositeForbidden('测量实例作者账号已到期')
+}
+
+export async function contentReferenceChoices(actor:Actor,id:string) {
+  return prisma.$transaction(async tx=>{
+    const row=await tx.compositeAssessment.findUnique({where:{id},include:{questionnaireCourses:true,items:{include:{scale:true,cognitiveAssignment:{include:{config:true}}}}}})
+    if(!row||row.productKind!=='QUESTIONNAIRE')throw compositeNotFound('新版问卷不存在')
+    const expiry=await assertCurrentTrainingContentOwner(tx,actor,row)
+    const situational=await validateResources(tx,actor,row)
+    const prepared=await prepareTrainingContentSnapshot(tx,row,situational)
+    const result=await listTrainingReferenceChoices(tx,{...prepared,ownerId:actor.userId})
+    await recheckMeasurementPublisherExpiry(tx,expiry)
+    return result
+  },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:10000})
+}
+export async function updateContentReferenceSelection(actor:Actor,id:string,raw:unknown) {
+  const input=z.object({revision:z.number().int().nonnegative(),selection:trainingReferenceSelectionSchema.nullable()}).strict().parse(raw)
+  return mutate(actor,id,input.revision,async(tx,row)=>{
+    const expiry=await assertCurrentTrainingContentOwner(tx,actor,row)
+    const situational=await validateResources(tx,actor,row)
+    if(input.selection!=null){
+      const prepared=await prepareTrainingContentSnapshot(tx,row,situational)
+      await attachTrainingReferenceSelection(tx,{...prepared,ownerId:actor.userId,selection:input.selection})
+    }
+    await recheckMeasurementPublisherExpiry(tx,expiry)
+    await tx.compositeAssessment.update({where:{id},data:{trainingReferenceSelectionDraft:input.selection??Prisma.DbNull}})
+  })
+}
+
+export async function updateContentReportSelection(actor:Actor,id:string,raw:unknown) {
+  const input=z.object({revision:z.number().int().nonnegative(),selection:trainingReportSelectionSchema.nullable()}).strict().parse(raw)
+  return mutate(actor,id,input.revision,async(tx,row)=>{
+    const expiry=await assertCurrentTrainingContentOwner(tx,actor,row)
+    const situational=await validateResources(tx,actor,row)
+    if(input.selection!=null){
+      const prepared=await prepareTrainingContentSnapshot(tx,row,situational)
+      await attachTrainingReportSelection(tx,{...prepared,ownerId:actor.userId,selection:input.selection})
+    }
+    await recheckMeasurementPublisherExpiry(tx,expiry)
+    await tx.compositeAssessment.update({where:{id},data:{trainingReportSelectionDraft:input.selection??Prisma.DbNull}})
+  })
 }
 
 /** Explicit draft-revision operation; does not publish or start a deployment. */

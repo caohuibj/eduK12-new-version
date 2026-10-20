@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import apiClient from '../api/client'
 import ModalSurface from '../components/shared-ui/ModalSurface'
 import type { Course } from '../types'
+import FormalReferenceStudio from './FormalReferenceStudio'
 
 const PAGE_SIZE = 100
 
@@ -112,6 +113,7 @@ export default function TrainingTrainerHome() {
         </button>}
       </div>}
     </section>
+    {user?.id&&<FormalReferenceStudio key={user.id+':formal-governance'} actorId={user.id}/>}
     <p className="training-bottom-line">教与学，都是一次彼此成就。</p>
     {createOpen && <ModalSurface open={createOpen} onClose={() => { if (!creating) setCreateOpen(false) }} initialFocusRef={titleRef} className="training-dialog-backdrop">
       <section role="dialog" aria-modal="true" aria-labelledby="training-create-title" className="training-dialog" tabIndex={-1}>

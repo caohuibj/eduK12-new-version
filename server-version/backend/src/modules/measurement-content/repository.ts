@@ -28,6 +28,23 @@ export async function getContentRelease(db: Db, releaseId: string, lockForPublic
   }
   return value
 }
+/** Bounded projection preload; uses exactly the same persisted hash checks as
+ * single-release reads. A missing ID remains absent, never synthesized. */
+export async function getContentReleaseBatch(db: Db, ids: string[], lockForPublication = false): Promise<Map<string, StoredRelease>> {
+  const unique = [...new Set(ids)]
+  if (unique.length > 1000) throw new ContentReleaseError('CONTENT_RELEASE_BATCH_LIMIT')
+  if (!unique.length) return new Map()
+  const rows = await db.$queryRaw<Row[]>(Prisma.sql`SELECT * FROM measurement_content_releases WHERE id IN (${Prisma.join(unique)})
+    ORDER BY id ${lockForPublication ? Prisma.sql`FOR SHARE` : Prisma.empty}`)
+  if (new Set(rows.map(row => row.id)).size !== rows.length || rows.some(row => !unique.includes(row.id)))
+    throw new ContentReleaseError('CONTENT_RELEASE_BATCH_INVALID')
+  return new Map(rows.map(row => {
+    const value = decode(row)
+    if (prepareRelease(valueForInput(value)).contentHash !== row.content_hash || value.hashScheme !== 'MEASUREMENT_CONTENT_CANONICAL_V1')
+      throw new ContentReleaseError('CONTENT_RELEASE_HASH_MISMATCH')
+    return [value.releaseId, value]
+  }))
+}
 /** Admission/freezing resolves an existing exact identity and holds its state
  * lock through the caller's transaction. It never publishes a missing version. */
 export async function requirePublishedContentRelease(db:Db,raw:unknown):Promise<StoredRelease>{

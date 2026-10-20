@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import {TrainingReferenceStudio,type TrainingReferenceReady} from './TrainingReferenceStudio'
+import FormalReferenceStudio,{FormalReferenceSubmission} from './FormalReferenceStudio'
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { sessionFetch } from '../api/client'
 import {
   trainingAnalysisApi,
@@ -61,7 +63,13 @@ function QualityEditor({ row, disabled, onSave }: { row: TrainingAnalysisQuality
 
 /** Course-scoped discovery is the only picker authority. No raw observations,
  * unscoped workbench data or client-side cohort/statistical reconstruction. */
-export default function TrainingCourseAnalysis({ courseId }: { courseId: string }) {
+export default function TrainingCourseAnalysis({ courseId,actorId }: { courseId: string;actorId?:string }) {
+  const [referenceLocked,setReferenceLocked]=useState(false)
+  const referenceRisk=useCallback((locked:boolean)=>setReferenceLocked(locked),[])
+  const [formalSubmissionLocked,setFormalSubmissionLocked]=useState(false),[formalGovernanceLocked,setFormalGovernanceLocked]=useState(false)
+  const submissionRisk=useCallback((locked:boolean)=>setFormalSubmissionLocked(locked),[]),governanceRisk=useCallback((locked:boolean)=>setFormalGovernanceLocked(locked),[])
+  const [referenceReady,setReferenceReady]=useState<TrainingReferenceReady|null>(null)
+  const scientificLocked=referenceLocked||formalSubmissionLocked||formalGovernanceLocked
   const [sources, setSources] = useState<TrainingAnalysisSource[]>([])
   const [permissions, setPermissions] = useState({ canQuality: false, canExport: false })
   const [loading, setLoading] = useState(true)
@@ -85,7 +93,7 @@ export default function TrainingCourseAnalysis({ courseId }: { courseId: string 
     operation.current = false
     setBusy(false); setPermissions({ canQuality: false, canExport: false }); setSources([]); setLoading(true); setSourceError(''); setSnapshot(null); setQuality(null)
     setWaves([newWave(1), newWave(2)]); nextWaveId.current = 3
-    setNotice(''); setOperationError('')
+    setNotice(''); setOperationError(''); setReferenceReady(null)
     void trainingAnalysisApi.sources(courseId).then(data => {
       if (epoch.current === requestEpoch) {
         setSources(data.list); setPermissions({ canQuality: data.canQuality === true, canExport: data.canExport === true })
@@ -94,11 +102,11 @@ export default function TrainingCourseAnalysis({ courseId }: { courseId: string 
       if (epoch.current === requestEpoch) setSourceError(explainError(error))
     }).finally(() => { if (epoch.current === requestEpoch) setLoading(false) })
     return () => { epoch.current = requestEpoch + 1 }
-  }, [courseId, refresh])
+  }, [actorId, courseId, refresh])
 
   function invalidate() { setSnapshot(null); setQuality(null); setNotice(''); setOperationError('') }
   function updateWave(id: number, patch: Partial<WaveDraft>) {
-    if (operation.current) return
+    if (scientificLocked || operation.current) return
     setWaves(previous => previous.map(wave => wave.id === id ? { ...wave, ...patch } : wave)); invalidate()
   }
   const tasks = Array.from(new Map(sources.map(source => [source.taskId, source.taskName])).entries())
@@ -107,7 +115,7 @@ export default function TrainingCourseAnalysis({ courseId }: { courseId: string 
 
   async function analyze(event: FormEvent) {
     event.preventDefault()
-    if (operation.current || !validWaves) return
+    if (scientificLocked || operation.current || !validWaves) return
     const selector: TrainingAnalysisSelector = { schemaVersion: 1, courseId, mode, waves: waves.map(wave => {
       const source = sources.find(candidate => sourceKey(candidate) === wave.sourceKey)!
       return { waveKey: wave.waveKey.trim(), taskId: source.taskId, publication: source.publication, configDigest: source.configDigest,
@@ -124,7 +132,7 @@ export default function TrainingCourseAnalysis({ courseId }: { courseId: string 
   }
 
   async function saveQuality(row: TrainingAnalysisQualityRow, verdict: 'INCLUDE' | 'EXCLUDE', reason: string) {
-    if (operation.current || !snapshot || !permissions.canQuality) return
+    if (scientificLocked || operation.current || !snapshot || !permissions.canQuality) return
     operation.current = true; setBusy(true); setOperationError(''); setNotice('正在保存质量判断并更新分析…')
     const requestEpoch = epoch.current
     const { selector } = snapshot
@@ -143,7 +151,7 @@ export default function TrainingCourseAnalysis({ courseId }: { courseId: string 
   }
 
   async function changeQualityPage(page: number) {
-    if (operation.current || !snapshot) return
+    if (scientificLocked || operation.current || !snapshot) return
     operation.current = true; setBusy(true); setOperationError('')
     const requestEpoch = epoch.current
     try {
@@ -158,7 +166,7 @@ export default function TrainingCourseAnalysis({ courseId }: { courseId: string 
   }
 
   async function exportData() {
-    if (operation.current || !snapshot || !permissions.canExport) return
+    if (scientificLocked || operation.current || !snapshot || !permissions.canExport) return
     operation.current = true; setBusy(true); setOperationError(''); setNotice('正在提交导出任务…')
     const requestEpoch = epoch.current
     const { selector, result: { manifest } } = snapshot
@@ -191,7 +199,7 @@ export default function TrainingCourseAnalysis({ courseId }: { courseId: string 
     <h2>课程数据分析</h2>
     <p>为基线与随访选择明确的任务、发布版本、分组和数值指标。仅使用服务器返回的当前课程授权来源。</p>
     <p className="training-science-note">课程共享、模板使用权不自动授予结果或原始数据权限。质量判断只改变分析纳入范围，不改写原始得分或任务完成状态。</p>
-    <button type="button" disabled={busy || loading} onClick={() => setRefresh(value => value + 1)}>刷新分析来源</button>
+    <button type="button" disabled={scientificLocked || busy || loading} onClick={() => setRefresh(value => value + 1)}>刷新分析来源</button>
     {loading ? <p role="status">正在核对本课程分析权限与来源…</p>
       : sourceError ? <p role="alert">{sourceError}</p>
         : sources.length === 0 ? <p className="training-empty-small">当前没有可分析的授权数值来源。已发布课程任务不一定具备分析所需的数据与权限。</p>
@@ -200,34 +208,42 @@ export default function TrainingCourseAnalysis({ courseId }: { courseId: string 
               const versions = Array.from(new Map(sources.filter(source => source.taskId === wave.taskId).map(source => [versionKey(source), source])).entries())
               const variants = sources.filter(source => source.taskId === wave.taskId && versionKey(source) === wave.version)
               const source = variants.find(candidate => sourceKey(candidate) === wave.sourceKey)
-              return <fieldset key={wave.id} disabled={busy} className="training-analysis-wave">
+              return <fieldset key={wave.id} disabled={scientificLocked || busy} className="training-analysis-wave">
                 <legend>{index === 0 ? '基线' : `随访 ${index}`}来源</legend>
                 <label>波次标识<input value={wave.waveKey} maxLength={64} aria-label={`波次 ${index + 1} 标识`} onChange={event => updateWave(wave.id, { waveKey: event.target.value })} required /></label>
                 <label>任务<select aria-label={`波次 ${index + 1} 任务`} value={wave.taskId} onChange={event => updateWave(wave.id, { taskId: event.target.value, version: '', sourceKey: '', metricKeys: [] })} required>
                   <option value="">选择当前课程任务</option>{tasks.map(([id, name]) => <option key={id} value={id}>{name}</option>)}
                 </select></label>
-                <label>发布版本与配置<select aria-label={`波次 ${index + 1} 发布版本`} value={wave.version} disabled={busy || !wave.taskId} onChange={event => updateWave(wave.id, { version: event.target.value, sourceKey: '', metricKeys: [] })} required>
+                <label>发布版本与配置<select aria-label={`波次 ${index + 1} 发布版本`} value={wave.version} disabled={scientificLocked || busy || !wave.taskId} onChange={event => updateWave(wave.id, { version: event.target.value, sourceKey: '', metricKeys: [] })} required>
                   <option value="">选择冻结版本</option>{versions.map(([key, item]) => <option key={key} value={key}>{item.publication} · {item.configDigest || '无分组配置'}</option>)}
                 </select></label>
-                <label>分组<select aria-label={`波次 ${index + 1} 分组`} value={wave.sourceKey} disabled={busy || !wave.version} onChange={event => updateWave(wave.id, { sourceKey: event.target.value, metricKeys: [] })} required>
+                <label>分组<select aria-label={`波次 ${index + 1} 分组`} value={wave.sourceKey} disabled={scientificLocked || busy || !wave.version} onChange={event => updateWave(wave.id, { sourceKey: event.target.value, metricKeys: [] })} required>
                   <option value="">选择分组</option>{variants.map(item => <option key={sourceKey(item)} value={sourceKey(item)}>{item.materialGroupKey ? `实验材料组 · ${item.materialGroupKey}` : item.variantKey || '未分组'}</option>)}
                 </select></label>
                 {source && <fieldset className="training-analysis-metrics"><legend>数值指标</legend>{source.metrics.length === 0 ? <p>这个来源没有可分析的数值指标。</p> : source.metrics.map(metric => <label key={metricKey(metric)}>
-                  <input type="checkbox" checked={wave.metricKeys.includes(metricKey(metric))} disabled={busy || (!wave.metricKeys.includes(metricKey(metric)) && wave.metricKeys.length >= 64)} onChange={event => updateWave(wave.id, { metricKeys: event.target.checked ? [...wave.metricKeys, metricKey(metric)] : wave.metricKeys.filter(key => key !== metricKey(metric)) })} />
+                  <input type="checkbox" checked={wave.metricKeys.includes(metricKey(metric))} disabled={scientificLocked || busy || (!wave.metricKeys.includes(metricKey(metric)) && wave.metricKeys.length >= 64)} onChange={event => updateWave(wave.id, { metricKeys: event.target.checked ? [...wave.metricKeys, metricKey(metric)] : wave.metricKeys.filter(key => key !== metricKey(metric)) })} />
                   {metric.label || metric.metricKey} <small>（{metric.itemId}）</small>
                 </label>)}</fieldset>}
                 {waves.length > 2 && <button type="button" onClick={() => { setWaves(previous => previous.filter(item => item.id !== wave.id)); invalidate() }}>移除此波次</button>}
               </fieldset>
             })}</div>
             <div className="training-analysis-controls">
-              <button type="button" disabled={busy || mode !== 'FULL_CASE' || waves.length >= 8} onClick={() => { setWaves(previous => [...previous, newWave(nextWaveId.current++)]); invalidate() }}>添加随访波次</button>
-              <label>匹配方式<select value={mode} disabled={busy} onChange={event => { setMode(event.target.value as TrainingAnalysisMode); invalidate() }}>
+              <button type="button" disabled={scientificLocked || busy || mode !== 'FULL_CASE' || waves.length >= 8} onClick={() => { setWaves(previous => [...previous, newWave(nextWaveId.current++)]); invalidate() }}>添加随访波次</button>
+              <label>匹配方式<select value={mode} disabled={scientificLocked || busy} onChange={event => { setMode(event.target.value as TrainingAnalysisMode); invalidate() }}>
                 <option value="PAIRWISE">逐对匹配（PAIRWISE）</option><option value="FULL_CASE">全波次完整个案（FULL_CASE）</option>
               </select></label>
-              <button type="submit" className="training-action" disabled={busy || !validWaves}>{busy ? '处理中…' : '生成课程分析'}</button>
+              <button type="submit" className="training-action" disabled={scientificLocked || busy || !validWaves}>{busy ? '处理中…' : '生成课程分析'}</button>
             </div>
             <p>逐对匹配需要两个波次；全波次完整个案支持 2–8 个波次。波次标识须唯一。每波最多 64 个指标。缺失、排除与不可比较记录不填零；同一身份的多条候选记录不会自动取最新一条。</p>
           </form>}
+    {actorId&&!loading&&<>
+      <TrainingReferenceStudio key={actorId+':'+courseId} actorId={actorId} courseId={courseId} sources={sources}
+        disabled={busy||Boolean(sourceError)||formalSubmissionLocked||formalGovernanceLocked} onRiskChange={referenceRisk} onCandidateReady={setReferenceReady}/>
+      {referenceReady&&<FormalReferenceSubmission key={actorId+':'+referenceReady.candidate.candidateId} actorId={actorId} product="TRAINING"
+        candidateId={referenceReady.candidate.candidateId} candidateHash={referenceReady.candidate.candidateHash} analyzeGrantId={referenceReady.analyzeGrantId}
+        disabled={!referenceReady.verified||busy||referenceLocked||formalGovernanceLocked} onRiskChange={submissionRisk}/>}
+    </>}
+    {actorId&&<FormalReferenceStudio key={actorId+':formal-governance'} actorId={actorId} disabled={busy||referenceLocked||formalSubmissionLocked} onRiskChange={governanceRisk}/>}
     {operationError && <p role="alert">{operationError}</p>}
     {notice && <p role="status">{notice}</p>}
     {snapshot && <>
@@ -269,17 +285,17 @@ export default function TrainingCourseAnalysis({ courseId }: { courseId: string 
         <h3>导出当前分析数据</h3>
         <p>导出固定使用本次选择和分析清单，经现有导出队列生成；下载时再次核对权限与来源。</p>
         <div className="training-analysis-controls">
-          <label>数据布局<select disabled={busy} value={layout} onChange={event => setLayout(event.target.value as typeof layout)}><option value="long">长表</option><option value="wide">宽表</option><option value="dictionary">字段字典</option></select></label>
-          <label>文件格式<select disabled={busy} value={format} onChange={event => setFormat(event.target.value as typeof format)}><option value="csv">CSV</option><option value="zip">ZIP</option></select></label>
-          <button type="button" disabled={busy} onClick={() => void exportData()}>导出当前分析</button>
+          <label>数据布局<select disabled={scientificLocked || busy} value={layout} onChange={event => setLayout(event.target.value as typeof layout)}><option value="long">长表</option><option value="wide">宽表</option><option value="dictionary">字段字典</option></select></label>
+          <label>文件格式<select disabled={scientificLocked || busy} value={format} onChange={event => setFormat(event.target.value as typeof format)}><option value="csv">CSV</option><option value="zip">ZIP</option></select></label>
+          <button type="button" disabled={scientificLocked || busy} onClick={() => void exportData()}>导出当前分析</button>
         </div>
       </section>}
       {permissions.canQuality && quality && <section aria-label="分析质量判断" className="training-analysis-quality">
         <h3>分析质量判断</h3><p>纳入或排除必须填写依据，并核对作答轮次、来源哈希与当前修订。此处不修改原始得分、提交状态或任务完成判定。</p>
-        {quality.list.length === 0 ? <p>当前没有可管理的质量记录。</p> : quality.list.map(row => <QualityEditor key={`${row.attemptId}:${row.attemptEpoch}:${row.revision}`} row={row} disabled={busy} onSave={(item, verdict, reason) => void saveQuality(item, verdict, reason)} />)}
+        {quality.list.length === 0 ? <p>当前没有可管理的质量记录。</p> : quality.list.map(row => <QualityEditor key={`${row.attemptId}:${row.attemptEpoch}:${row.revision}`} row={row} disabled={scientificLocked || busy} onSave={(item, verdict, reason) => void saveQuality(item, verdict, reason)} />)}
         <div className="training-analysis-controls"><span>第 {quality.page} 页 · 共 {quality.total} 条</span>
-          <button type="button" disabled={busy || quality.page <= 1} onClick={() => void changeQualityPage(quality.page - 1)}>上一页质量记录</button>
-          <button type="button" disabled={busy || quality.page * quality.pageSize >= quality.total} onClick={() => void changeQualityPage(quality.page + 1)}>下一页质量记录</button>
+          <button type="button" disabled={scientificLocked || busy || quality.page <= 1} onClick={() => void changeQualityPage(quality.page - 1)}>上一页质量记录</button>
+          <button type="button" disabled={scientificLocked || busy || quality.page * quality.pageSize >= quality.total} onClick={() => void changeQualityPage(quality.page + 1)}>下一页质量记录</button>
         </div>
       </section>}
     </>}

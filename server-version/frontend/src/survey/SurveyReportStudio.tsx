@@ -88,7 +88,7 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
   },[base,reportApi])
   const loadNative=useCallback(async(nextPage:number)=>{
     const result=await reportApi<{list:NativeInstrument[]}>('/projects/'+encodeURIComponent(projectId)+'/instruments?page='+nextPage)
-    const native=result.list.filter(row=>row.kind!=='FORM'&&row.status!=='ARCHIVED'&&!row.catalogGrantId&&!row.readOnly)
+    const native=result.list.filter(row=>row.kind!=='FORM'&&row.status!=='ARCHIVED'&&((!row.catalogGrantId&&!row.readOnly)||(row.kind==='SCALE'&&!!row.catalogGrantId)))
     setNativeInstruments(native);setNativeCount(result.list.length);setNativePage(nextPage);setNativeId(native[0]?.id||'')
   },[projectId,reportApi])
   const load=useCallback(()=>run(async()=>{
@@ -98,7 +98,7 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
   }),[base,loadList,loadNative,run,nativePublishing,reportApi])
   useEffect(()=>{if(active&&!initialRequested.current){initialRequested.current=true;void load()}},[active,load]) // Project-keyed workspace retains edits while switching tabs.
   const publishMeasurement=()=>void run(async()=>{
-    const source=nativeInstruments.find(row=>row.id===nativeId);if(!source)throw new Error('请选择本项目原生测量草稿')
+    const source=nativeInstruments.find(row=>row.id===nativeId);if(!source)throw new Error('请选择本项目可发布的测量')
     const result=await reportApi<{releaseId:string}>('/projects/'+encodeURIComponent(projectId)+'/instruments/'+encodeURIComponent(source.id)+'/measurement-release','POST',{revision:source.revision})
     setNotice('测量版本已发布，可用于编制报告；未开启被试采集。')
     const choices=await reportApi<Measurement[]>(base+'/measurements');setMeasurements(choices);setMeasurementId(result.releaseId)
@@ -155,19 +155,19 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
     <fieldset disabled={busy||!!pendingCreate} className="border rounded p-3 space-y-3"><legend>创建报告草稿</legend>
       <label className="block">测量发布版本<select className="input block w-full" value={measurementId} onChange={e=>setMeasurementId(e.target.value)}>
         <option value="">请选择</option>{measurements.map(m=><option key={m.id} value={m.id}>{m.key} · {m.version} · {m.family} · {m.status}</option>)}</select></label>
-      {!measurements.length&&<p>暂无本项目获准的测量发布版本。{nativePublishing?'可在下方显式发布原生草稿；目录原版来源不在此改写。':'请先在测量编制入口完成发布并核对内容授权。'}</p>}
+      {!measurements.length&&<p>暂无本项目获准的测量发布版本。{nativePublishing?'可在下方显式发布自编测量或获准的只读量表；目录原版内容不会改写。':'请先在测量编制入口完成发布并核对内容授权。'}</p>}
       <label>报告系列标识<input className="input block" maxLength={168} value={reportKey} onChange={e=>setReportKey(e.target.value)}/></label>
       <label>报告版本<input className="input block" maxLength={240} value={version} onChange={e=>setVersion(e.target.value)}/></label>
       <button type="button" className="btn-primary" disabled={!measurementId||!reportKey.trim()||!version.trim()} onClick={startCreate}>创建报告草稿</button>
     </fieldset>
-    {nativePublishing&&<button type="button" className="btn-secondary" disabled={busy} onClick={()=>{if(showNative)setShowNative(false);else void run(async()=>{await loadNative(1);setShowNative(true)})}}>{showNative?'收起原生测量发布':'发布或更新原生测量'}</button>}
-    {nativePublishing&&showNative&&<fieldset disabled={busy||!measurementWritable||!!pendingCreate} className="border rounded p-3 space-y-2"><legend>发布本项目原生测量</legend>
+    {nativePublishing&&<button type="button" className="btn-secondary" disabled={busy} onClick={()=>{if(showNative)setShowNative(false);else void run(async()=>{await loadNative(1);setShowNative(true)})}}>{showNative?'收起测量发布':'发布或更新测量版本'}</button>}
+    {nativePublishing&&showNative&&<fieldset disabled={busy||!measurementWritable||!!pendingCreate} className="border rounded p-3 space-y-2"><legend>发布本项目测量版本</legend>
       {!measurementWritable&&<p>项目采集已关闭或归档，不能发布新的测量；仍可修订历史报告。</p>}
-      <p>仅发布测量内容版本，不创建波次或启动真实采集。Form 与目录原版来源不进入本列表。</p>
-      <label>原生测量草稿<select className="input block w-full" value={nativeId} onChange={e=>setNativeId(e.target.value)}><option value="">请选择</option>{nativeInstruments.map(row=><option key={row.id} value={row.id}>{row.title} · {row.kind} · 修订 {row.revision}</option>)}</select></label>
+      <p>仅发布测量版本，不创建波次或启动真实采集。授权只读量表保持原版内容，发布前仍须核验来源版本及当前许可；其他目录工具和 Form 不在此发布。</p>
+      <label>可发布测量<select className="input block w-full" value={nativeId} onChange={e=>setNativeId(e.target.value)}><option value="">请选择</option>{nativeInstruments.map(row=><option key={row.id} value={row.id}>{row.title} · {row.kind} · 修订 {row.revision}{row.catalogGrantId?' · 授权只读原版':''}</option>)}</select></label>
       <button type="button" className="btn-primary" disabled={!nativeId} onClick={publishMeasurement}>发布所选测量版本</button>
       <div className="flex gap-2"><button type="button" className="btn-secondary" disabled={nativePage<=1} onClick={()=>void run(()=>loadNative(nativePage-1))}>上一页测量草稿</button><span>草稿第 {nativePage} 页</span><button type="button" className="btn-secondary" disabled={nativeCount<25} onClick={()=>void run(()=>loadNative(nativePage+1))}>下一页测量草稿</button></div>
-      {!nativeInstruments.length&&<p>此页暂无可发布的原生测量草稿，请先在研究工具中编制。</p>}
+      {!nativeInstruments.length&&<p>此页暂无可发布测量，请先编制研究工具或导入获准的只读量表。</p>}
     </fieldset>}
     {pendingCreate&&<div role="status"><p>本次创建尚未确认。重试会沿用同一请求与内容。</p>
       <button type="button" className="btn-secondary" disabled={busy} onClick={startCreate}>重试本次创建</button>

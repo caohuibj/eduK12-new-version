@@ -2,7 +2,9 @@ import {describe,it,expect,vi,beforeEach} from 'vitest'
 const mocks=vi.hoisted(()=>({get:vi.fn(),decode:vi.fn()}))
 vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:mocks.get}))
 vi.mock('../../modules/survey/content-binding.service',()=>({decodeSurveyAttemptContentBinding:mocks.decode}))
-import {interpretSurveyFinal} from '../../modules/survey/final-interpretation.service'
+import {interpretSurveyFinal,interpretSurveyContentBinding} from '../../modules/survey/final-interpretation.service'
+import {interpretContentBinding} from '../../modules/measurement-content/final-interpretation'
+import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {referenceEntryKey} from '../../modules/measurement-content/reference-candidate'
 const digest='a'.repeat(64),scope={kind:'PRIVATE',ownerId:'owner',product:'SURVEY',resourceId:'project'}
 const entry={scoreKey:'total',referenceKind:'descriptive_sample' as const,evidenceLevel:'local_pilot' as const,provenanceType:'local_observed' as const,
@@ -119,5 +121,27 @@ describe('real compiler and compute outputs reach interpretation',()=>{
  it('rejects a result from another frozen scorer source instead of assigning the selected release identity',async()=>{
   const i=realComputed('SCALE');i.calculated.units[0].scoringDigest='other'
   await expect(interpretSurveyFinal(tx() as never,i)).rejects.toMatchObject({statusCode:409})
+ })
+})
+
+
+describe('neutral interpretation core and Survey scope boundary',()=>{
+ it('preserves the complete original receipt hash and identical numeric output with neutral input',async()=>{
+  const original=binding()
+  const facts={notExecuted:false,quality:'interpretable',metrics:[{key:'total',value:5,status:'OK'}]}
+  const readRelease=vi.fn(async(id:string)=>id==='m'?measurement():id==='r'?reference():report())
+  const shared=await interpretContentBinding({binding:{units:original.units,populationContext:{} } as any,
+    contentBindingHash:canonicalHash(original),readRelease:readRelease as any,readFacts:()=>facts})
+  const survey=await interpretSurveyContentBinding(tx() as never,{binding:original as any,ownerId:'owner',readFacts:()=>facts})
+  expect(shared).toEqual(survey)
+  expect(shared.contentBindingHash).toBe(canonicalHash(original))
+  expect(shared.contentBindingHash).not.toBe(canonicalHash({units:original.units,populationContext:{}}))
+  expect(readRelease.mock.calls.map(call=>call[0])).toEqual(['m','r','p'])
+ })
+ it.each([{...scope,product:'TRAINING'},{...scope,ownerId:'other'},{...scope,kind:'PLATFORM'}])('keeps Survey scope enforcement on prelocked cached releases: %o',async(badScope)=>{
+  const releases=new Map([['m',{...measurement(),scope:badScope}]])
+  await expect(interpretSurveyContentBinding(tx() as never,{binding:binding() as any,ownerId:'owner',releases:releases as any,
+    readFacts:()=>({notExecuted:false,quality:'interpretable',metrics:[]})})).rejects.toMatchObject({statusCode:409})
+  expect(mocks.get).not.toHaveBeenCalled()
  })
 })

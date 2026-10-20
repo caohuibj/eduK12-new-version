@@ -1,6 +1,7 @@
 import {beforeEach,afterEach,describe,it,expect,vi} from 'vitest'
 import {issueAdminContentRoot,revokeAdminContentGrant,readAdminContentGrant,adminContentRootRequestSchema} from '../../modules/measurement-content/admin-authority.service'
-const mocks=vi.hoisted(()=>({transaction:vi.fn(),query:vi.fn(),execute:vi.fn(),audit:vi.fn(),auditRead:vi.fn()}))
+const mocks=vi.hoisted(()=>({transaction:vi.fn(),query:vi.fn(),execute:vi.fn(),audit:vi.fn(),auditRead:vi.fn(),registry:vi.fn()}))
+vi.mock('../../modules/situational/static-measurement-release',()=>({validateStaticSjtRegistryMappings:mocks.registry}))
 vi.mock('../../config/database',()=>({prisma:{$transaction:mocks.transaction}}))
 const id=(n:number)=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0')
 const actor=id(1),target=id(2),project=id(3),resource=id(4),grantId=id(5)
@@ -17,6 +18,7 @@ const sql=(query:any)=>query.strings.join(' ')
 beforeEach(()=>{
  vi.useFakeTimers();vi.setSystemTime(now);vi.clearAllMocks();users=[user(actor),user(target)];existing=row();inserted=true;qualified=true;resources=[resource];owned=true
  mocks.transaction.mockImplementation(async(fn:any)=>fn({$queryRaw:mocks.query,$executeRaw:mocks.execute,adminAuthorizationAudit:{create:mocks.audit,findUnique:mocks.auditRead}}))
+ mocks.registry.mockResolvedValue([{id:resource,instrument_key:'sjt-installed',instrument_version:'1.0.0',content_digest:'a'.repeat(64)}])
  mocks.auditRead.mockResolvedValue({actorUserId:actor,reason:input().reason,action:'CONTENT_ROOT_GRANTED'});mocks.execute.mockResolvedValue(1)
  mocks.query.mockImplementation(async query=>{
   const text=sql(query)
@@ -156,5 +158,96 @@ describe('exact Training course report root grants',()=>{
   expect(await readAdminContentGrant(actor,proof(),grantId)).toMatchObject({scope:{product:'TRAINING',scopeKind:'COURSE'}})
   await revokeAdminContentGrant(actor,proof(),grantId,{expectedVersion:1,reason:'Withdraw report rights'})
   expect(mocks.audit).toHaveBeenCalledWith({data:expect.objectContaining({entry:'TRAINING',action:'CONTENT_GRANT_REVOKED'})})
+ })
+})
+
+const platformInput=()=>{const body=input();body.grant.scope={product:'TRAINING',scopeKind:'PLATFORM',scopeId:'situational-registry',resourceKind:'measurement',resourceKeys:[resource]};body.grant.capabilities=['measurement.publish'];body.grant.delegableCapabilities=[];body.grant.remainingDelegationDepth=0;return body}
+function platformTarget(){users[1]={...user(target),platform_role:'SYSTEM_ADMIN',account_domain:'TRAINING',role:'ADMIN',teacher_approved:false}}
+function platformRow(){existing={...existing,product:'TRAINING',scope_kind:'PLATFORM',scope_id:'situational-registry',resource_kind:'measurement',capabilities:['measurement.publish'],delegable_capabilities:[],remaining_delegation_depth:0}}
+describe('exact installed SJT platform measurement root grants',()=>{
+ it('locks verified installed sources before Users and writes only the explicit publication capability',async()=>{
+  platformTarget();await expect(issueAdminContentRoot(actor,proof(),platformInput())).resolves.toMatchObject({changed:true})
+  expect(mocks.registry).toHaveBeenCalledExactlyOnceWith(expect.anything(),[resource])
+  expect(mocks.registry.mock.invocationCallOrder[0]).toBeLessThan(mocks.query.mock.invocationCallOrder[0])
+  const queries=mocks.query.mock.calls.map(([q])=>sql(q));expect(queries[0]).toContain('FROM users')
+  expect(queries.some(q=>/FROM (courses|survey_projects|composite_assessments)/.test(q))).toBe(false)
+  expect(mocks.audit).toHaveBeenCalledWith({data:expect.objectContaining({entry:'TRAINING',action:'CONTENT_ROOT_GRANTED',targetUserId:target})})
+ })
+ it('rejects wildcard/other platform scopes, other capabilities and non-UUID resource selectors',()=>{
+  const body=platformInput()
+  for(const grant of [{...body.grant,scope:{...body.grant.scope,scopeId:'other-registry'}},{...body.grant,scope:{...body.grant.scope,resourceKind:'report'}},
+   {...body.grant,capabilities:['measurement.publish','report.publish']},{...body.grant,scope:{...body.grant.scope,resourceKeys:['sjt-installed@1.0.0']}},
+   {...body.grant,scope:{...body.grant.scope,product:'SURVEY'}}])expect(()=>adminContentRootRequestSchema.parse({...body,grant})).toThrow()
+ })
+ it.each([{platform_role:'STANDARD'},{account_domain:'SURVEY'},{is_active:false},{is_frozen:true},{must_change_password:true},{expires_at:now}])('requires current target SYSTEM_ADMIN independent of business role %j',async patch=>{
+  platformTarget();Object.assign(users[1],patch)
+  await expect(issueAdminContentRoot(actor,proof(),platformInput())).rejects.toMatchObject({statusCode:403})
+  expect(mocks.audit).not.toHaveBeenCalled()
+ })
+ it('requires exact installed source validation, not UUID existence alone',async()=>{
+  platformTarget();mocks.registry.mockRejectedValueOnce(new Error('CONTENT_STATIC_SJT_SOURCE_MISMATCH'))
+  await expect(issueAdminContentRoot(actor,proof(),platformInput())).rejects.toThrow('SOURCE_MISMATCH')
+  expect(mocks.query).not.toHaveBeenCalled();expect(mocks.audit).not.toHaveBeenCalled()
+  mocks.registry.mockResolvedValueOnce([])
+  await expect(issueAdminContentRoot(actor,proof(),platformInput())).rejects.toMatchObject({statusCode:403})
+ })
+ it('retains root request idempotency, immutable body matching, metadata read and CAS revoke',async()=>{
+  platformTarget();platformRow();inserted=false
+  await expect(issueAdminContentRoot(actor,proof(),platformInput())).resolves.toMatchObject({changed:false})
+  const changed=platformInput();changed.reason='different reason'
+  await expect(issueAdminContentRoot(actor,proof(),changed)).rejects.toMatchObject({statusCode:409})
+  expect(await readAdminContentGrant(actor,proof(),grantId)).toMatchObject({scope:platformInput().grant.scope,capabilities:['measurement.publish']})
+  await expect(revokeAdminContentGrant(actor,proof(),grantId,{expectedVersion:1,reason:'Stop static publishing'})).resolves.toMatchObject({version:2,changed:true})
+ })
+ it('rechecks target expiration after mapping waits before grant insertion',async()=>{
+  platformTarget();users[1].expires_at=new Date(now.getTime()+1000)
+  mocks.registry.mockImplementationOnce(async()=>{vi.setSystemTime(new Date(now.getTime()+2000));return [{id:resource}]})
+  await expect(issueAdminContentRoot(actor,proof(),platformInput())).rejects.toMatchObject({statusCode:403})
+  expect(mocks.query.mock.calls.some(([q])=>sql(q).includes('INSERT INTO'))).toBe(false)
+ })
+})
+
+describe('exact Training scientific roots and formal governance',()=>{
+ const training=(kind='reference')=>{const value=input();value.grant.scope={product:'TRAINING',scopeKind:'COURSE',scopeId:project,resourceKind:kind,resourceKeys:[resource]}
+  if(kind==='data'){value.grant.capabilities=['data.reinterpret'];value.grant.delegableCapabilities=[];value.grant.remainingDelegationDepth=0}return value}
+ const formal=()=>{const value=training();value.grant.scope.scopeKind='PLATFORM';value.grant.scope.scopeId='reference-governance';
+  value.grant.capabilities=['reference.review','reference.publish'];value.grant.delegableCapabilities=[];value.grant.remainingDelegationDepth=0;return value}
+ it('issues COURSE reference over real owned composite only; no implicit cross-entry science',async()=>{
+  users[1].account_domain='TRAINING';await issueAdminContentRoot(actor,proof(),training())
+  const queries=mocks.query.mock.calls.map(([q])=>sql(q))
+  expect(queries[0]).toContain('FROM courses');expect(queries.some(q=>q.includes('FROM composite_assessments'))).toBe(true)
+  expect(queries.some(q=>q.includes('FROM measurement_content_releases'))).toBe(false)
+  owned=false;await expect(issueAdminContentRoot(actor,proof(),training())).rejects.toMatchObject({statusCode:403})
+ })
+ it('issues formal aggregate review/publish only through exact explicit scope and current qualified business teacher',async()=>{
+  users[1].account_domain='TRAINING';owned=false;await issueAdminContentRoot(actor,proof(),formal())
+  const queries=mocks.query.mock.calls.map(([q])=>sql(q))
+  expect(queries.some(q=>q.includes('FROM courses')||q.includes('FROM composite_assessments'))).toBe(false)
+  expect(queries.find(q=>q.includes('FROM measurement_content_releases'))).toContain("status<>'REVOKED'")
+  const body=formal();body.grant.capabilities=['reference.analyze'];expect(()=>adminContentRootRequestSchema.parse(body)).toThrow()
+  users[1].role='ADMIN';users[1].platform_role='SYSTEM_ADMIN'
+  await expect(issueAdminContentRoot(actor,proof(),formal())).rejects.toMatchObject({statusCode:403})
+ })
+ it('requires exact completed Training FINAL under course and parent author for data.reinterpret',async()=>{
+  users[1].account_domain='TRAINING';const base=mocks.query.getMockImplementation()!
+  mocks.query.mockImplementation(async q=>sql(q).includes('FROM composite_assessment_attempts')?[{id:resource,composite_assessment_id:resource}]:base(q))
+  await issueAdminContentRoot(actor,proof(),training('data'))
+  const queries=mocks.query.mock.calls.map(([q])=>sql(q)),locked=queries.find(q=>q.includes('FROM composite_assessment_attempts')&&q.includes('FOR SHARE'))!
+  for(const required of ["status='COMPLETED'","delivery_mode='FINAL_ONLY'","runtime_generation='UNIFIED_V1'",'delivery_course_id=',
+   'training_content_binding IS NOT NULL','training_content_interpretation_encrypted IS NOT NULL','aggregate_input_hash IS NOT NULL'])expect(locked).toContain(required)
+  expect(queries.findIndex(q=>q.includes('FROM composite_assessments'))).toBeLessThan(queries.findIndex(q=>q===locked))
+ })
+ it('refuses data attempts moved after pre-read, missing approved parents or ineligible principals',async()=>{
+  users[1].account_domain='TRAINING';const base=mocks.query.getMockImplementation()!
+  mocks.query.mockImplementation(async q=>sql(q).includes('FROM composite_assessment_attempts')?[{id:resource,composite_assessment_id:sql(q).includes('FOR SHARE')?id(90):resource}]:base(q))
+  await expect(issueAdminContentRoot(actor,proof(),training('data'))).rejects.toMatchObject({statusCode:403})
+  expect(mocks.audit).not.toHaveBeenCalled()
+ })
+ it('rejects broad or mismatched capabilities, resource IDs, and cross-product data scope at parse time',()=>{
+  for(const grant of [{...formal().grant,scope:{...formal().grant.scope,scopeId:'*'}},
+   {...formal().grant,scope:{...formal().grant.scope,resourceKeys:['*']}},
+   {...training('data').grant,capabilities:['data.reinterpret','reference.review']},
+   {...training('data').grant,scope:{...training('data').grant.scope,product:'SURVEY'}}])
+   expect(()=>adminContentRootRequestSchema.parse({...input(),grant})).toThrow()
  })
 })

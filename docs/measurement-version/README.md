@@ -1,6 +1,7 @@
 # 测量内容三层版本：V01 实施合同
 
-状态：V01 范围及合同已冻结；后续单元尚未实现，不代表功能上线。
+最新验收状态（2026-10-20 08:23 UTC）：本轮冻结范围内可执行的本地验收已收口，详见[状态与证据索引](evidence/20261020-local-acceptance-status.md)及[连接验收记录](evidence/20261020-connected-acceptance.md)。真实浏览器、管理员强认证签发、正式 CI、合并与生产未完成。
+下文及[阶段矩阵](acceptance-matrix.md)保留各实施时点的范围/历史待验记录；具体已补齐项以上述精确输入证据为准，不代表所有功能或产品上线。
 依据：[用户确认的 v1.1](https://docs.google.com/document/d/1fLJ3bn6r5zscpUSaPYuQrbf3UW0RaIvCE3nmKmcVUfU/edit)，2026-10-20，第 12 节 1A–6A、7B，第 14 节 V01–V10。
 范围补充：用户在 V01 开发期间明确本批包括既有情境测验（SJT）的版本功能升级，V04/V08 据此收敛；不扩编制器。
 实际远端 main 基点：`c3f9a7e77447c706f4a83a93c7429a7bcb164e94`。独立工作分支：`work/measurement-version-v1-20261020`。Training 候选 `8ce879e5` 与 main 等内容不代表同一历史；本分支从实际 main 创建。
@@ -575,3 +576,11 @@ Training 报告编制 UI 已挂真实 QuestionnaireProductEdit，课程只能选
 新增 assignment 私有 measurement pointer，明确引用本人已获准的实际 effective profile。显式 draft-revision 操作 `/questionnaire-products/:id/measurement-instances/publish` 与正式 Composite publish 复用原冻结/复制路径；不新建投放或 START。真实业务教师、本人草稿及 Training 课程所有权检查，不把入口 ADMIN 投影作为作者资格；源锁等待后再核账号期限。已冻结实例不覆盖，精确重试复用；同 config 的两个 profile 按 assignment 分别绑定，报告字段不改变 measurementHash/派生测量版本。数据库 pointer/source tuple 不可变，旧 NULL 不自动回填。
 
 本操作仅解决现有允许 Cognitive 参数/配置实例的精确发布，不提供新 runner、任意脚本、School/Teacher 新编辑器；静态 SJT 和旧 Scale 转换仍待完成。34 项真实 adapter 与 service-mock 合同、backend 类型/私有 Prisma schema 检查通过；新增 SQL 未实跑。
+
+## V08 Training report selection, FINAL receipt and authorized read
+
+本人 Training 草稿可用 revision CAS 显式选择本 composite 私有已发布报告；保存与正式发布均核真实教师/课程所有权、精确测量兼容与 source scope。选择不授予报告编制权限。发布冻结 report pointer/hash，START 保留指针；report REVOKED 不阻断 raw 提交。所有 participant DTO 仍不披露私有选择。
+
+真实 aggregate FINAL 在同一次完成 CAS 事务中保存加密解释 receipt，复用已验证 canonical payload，不重评分。普通组合补读已接受 optional 单项，FLOW 只用实际执行单项；未执行保 unavailable。receipt 仅含状态、来源 resultHash 与 binding/aggregate 身份，不复制 metrics、模板或参考数组。旧 null/null 不补历史身份，终态重试不重解释。
+
+现有授权 teacher/researcher 单份报告读按 receipt 精确指针读取共享模板，并以一次有界 canonical snapshot batch 验证保存事实；不运行 scorer/参考选择器。READY 是 FINAL 时的模板资格，当前 REVOKED 拒新渲染并返回状态，正常退休仍按冻结身份读取。批量报告只附轻量状态索引，避免逐行加载模板与事实。participant 反馈不新增模板披露。Training reference producer、正式 norm、静态 SJT 转换及旧 Scale 一次切换仍未完成。本节点新增 SQL/真实 HTTP/并发待 V10；定向服务/codec 测试不替代这些验收。

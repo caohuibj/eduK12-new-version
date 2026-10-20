@@ -4,6 +4,7 @@ import express from 'express'
 import {beforeAll,afterAll,describe,expect,it} from 'vitest'
 import {createCustomScaleDefinition,hashScaleDefinition} from '../../modules/scale/scale-definition'
 import {registerDescriptiveResource,transitionDescriptiveResource} from '../../modules/assessment-run/registeredResources'
+import {publishRegisteredScaleFixture} from '../integration/registered-resource-fixture'
 const suite=process.env.ADMIN_PERMISSIONS_ISOLATED_TEST==='1'?describe:describe.skip
 suite('Teacher license HTTP entry authority preserves independent release policy',()=>{
   let db:typeof import('../../config/database')['prisma'],server:Server,base:string
@@ -27,6 +28,7 @@ suite('Teacher license HTTP entry authority preserves independent release policy
     d.report.interpretations=[{scoreKey:'support',headline:'支持资源的体验',source:{type:'score_only'},
       summary:'这三道题反映你最近填写问卷时对工作支持的主观感受。它们不能代表所有的工作经历，也不能判断你是否是一位优秀教师。请结合最近的工作情境理解这些结果，回想一次与同事协作或者寻求帮助的经历，记录哪些支持起到了作用，哪些需求仍需要明确。再次测量前，可以观察工作条件和资源是否发生变化。',bands:[],guidance:[{category:'reflection',text:'回想一次获得支持的情境。'},{category:'strategy',text:'记录一个现实可行的协作需求。'}]}]
     const scale=await db.scale.create({data:{code:'teacher_license_'+randomUUID(),name:'合成教师量表',status:'PUBLISHED',creatorId:author.id,instrumentClass:'CUSTOM_DESCRIPTIVE',definition:d,definitionHash:hashScaleDefinition(d)}})
+    await publishRegisteredScaleFixture(db,scale.id)
     const resource=await registerDescriptiveResource({userId:author.id,platformRole:'SYSTEM_ADMIN'},scale.id,'TEACHER_INDIVIDUAL')
     await transitionDescriptiveResource({userId:reviewer.id,platformRole:'SYSTEM_ADMIN'},resource.id,'review')
     await transitionDescriptiveResource({userId:author.id,platformRole:'SYSTEM_ADMIN'},resource.id,'publish');resourceId=resource.id

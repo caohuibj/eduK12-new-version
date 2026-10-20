@@ -6,13 +6,14 @@ const mocks=vi.hoisted(()=>{
   compositeAssessment:{findUnique:vi.fn(),update:vi.fn()},compositeAssessmentItem:{update:vi.fn()},
   cognitiveAssignment:{create:vi.fn()},assessmentCompositionTemplate:{findUnique:vi.fn()},course:{findMany:vi.fn()},
   questionnaireCourseDelivery:{create:vi.fn(),createMany:vi.fn()},compositeAssessmentAttempt:{create:vi.fn()}},
-  writer:vi.fn(),detail:vi.fn(),validItem:vi.fn(),resolve:vi.fn(),publishComposite:vi.fn(),lockAssets:vi.fn()}
+  snapshot:vi.fn(),writer:vi.fn(),detail:vi.fn(),validItem:vi.fn(),resolve:vi.fn(),publishComposite:vi.fn(),lockAssets:vi.fn()}
 })
+vi.mock('../../modules/composite/training-content-binding',async importOriginal=>({...await importOriginal<typeof import('../../modules/composite/training-content-binding')>(),prepareTrainingContentSnapshot:mocks.snapshot}))
 vi.mock('../../config/database',()=>({prisma:mocks.db}))
 vi.mock('../../modules/cognitive/assignment-measurement-release',()=>({publishAssignmentMeasurementRelease:mocks.writer}))
 vi.mock('../../modules/composite/composite.service',()=>({getCompositeForTeacher:mocks.detail,assertValidItem:mocks.validItem,
  resolveCompositeSituationalItems:mocks.resolve,compositeSjtGrantScope:(row:unknown)=>row,publishComposite:mocks.publishComposite,lockCompositeAssetReferences:mocks.lockAssets}))
-import {publishMeasurementInstances,publish} from '../../modules/questionnaire-product/service'
+import {publishMeasurementInstances,publish,updateContentReportSelection,updateContentReferenceSelection,contentReferenceChoices} from '../../modules/questionnaire-product/service'
 const actor={userId:'teacher',role:UserRole.TEACHER}
 const source=()=>({id:'source-assignment',configId:'config',createdBy:'teacher',courseId:'course',title:'Installed Go/NoGo',instruction:'Run instruction',
  status:'PUBLISHED',listedStandalone:true,required:true,profile:'research',profileDefinitionVersion:'1',resolvedConfigSnapshotEncrypted:'frozen-research-config',
@@ -100,5 +101,78 @@ describe('explicit questionnaire measurement-instance service (mock DB and relea
   mocks.writer.mockRejectedValueOnce(Object.assign(new Error('CONTENT_ASSIGNMENT_SOURCE_INVALID'),{statusCode:409}))
   await expect(publishMeasurementInstances(actor,current.id,{revision:3})).rejects.toThrow('CONTENT_ASSIGNMENT_SOURCE_INVALID')
   expect(mocks.db.compositeAssessment.update).not.toHaveBeenCalled()
+ })
+})
+
+describe('questionnaire report selection mutation boundary',()=>{
+ it('clears selection through locked revision mutation without publishing an instance',async()=>{
+  current.trainingReportSelectionDraft={schemaVersion:1,units:[]}
+  await updateContentReportSelection(actor,current.id,{revision:3,selection:null})
+  expect(mocks.db.$queryRawUnsafe).toHaveBeenCalledWith(expect.stringContaining('FOR UPDATE'),'questionnaire')
+  expect(mocks.db.compositeAssessment.update).toHaveBeenCalledWith({where:{id:current.id},data:{trainingReportSelectionDraft:expect.anything()}})
+  expect(current.revision).toBe(4);expect(mocks.writer).not.toHaveBeenCalled()
+ })
+ it('rejects stale revision and true business ADMIN before changing selection',async()=>{
+  await expect(updateContentReportSelection(actor,current.id,{revision:2,selection:null})).rejects.toThrow()
+  expect(mocks.db.compositeAssessment.update).not.toHaveBeenCalled()
+  principal.role='ADMIN'
+  await expect(updateContentReportSelection({...actor,role:UserRole.ADMIN},current.id,{revision:3,selection:null})).rejects.toThrow()
+  expect(mocks.db.compositeAssessment.update).not.toHaveBeenCalled()
+ })
+ it('does not allow entry ADMIN to select reports for another owner',async()=>{
+  current.createdBy='other'
+  await expect(updateContentReportSelection({...actor,role:UserRole.ADMIN},current.id,{revision:3,selection:null})).rejects.toThrow()
+  expect(mocks.db.compositeAssessment.update).not.toHaveBeenCalled()
+ })
+})
+
+it('persists an explicit selection after actual-source preparation, then returns the owner draft DTO',async()=>{
+ const selection={schemaVersion:1,units:[]}
+ mocks.snapshot.mockResolvedValue({snapshot:{schemaVersion:1,compositeId:current.id,units:[]},releases:new Map()})
+ mocks.db.compositeAssessment.update.mockImplementation(async({data})=>{
+  if(data.revision?.increment)current.revision+=data.revision.increment
+  if(data.trainingReportSelectionDraft)current.trainingReportSelectionDraft=data.trainingReportSelectionDraft
+  return current
+ })
+ const result=await updateContentReportSelection(actor,current.id,{revision:3,selection})
+ expect(mocks.snapshot).toHaveBeenCalledExactlyOnceWith(mocks.db,current,new Map())
+ expect(mocks.db.compositeAssessment.update).toHaveBeenCalledWith({where:{id:current.id},data:{trainingReportSelectionDraft:selection}})
+ expect(result.trainingReportSelectionDraft).toEqual(selection);expect(current.revision).toBe(4)
+})
+
+describe('questionnaire reference selection mutation and discovery boundary',()=>{
+ it('uses explicit locked revision CAS and preserves exact selection in owner detail',async()=>{
+  const selection={schemaVersion:1,units:[]}
+  mocks.snapshot.mockResolvedValue({snapshot:{schemaVersion:1,compositeId:current.id,units:[]},releases:new Map()})
+  mocks.db.compositeAssessment.update.mockImplementation(async({data})=>{
+   if(data.revision?.increment)current.revision+=data.revision.increment
+   if(data.trainingReferenceSelectionDraft)current.trainingReferenceSelectionDraft=data.trainingReferenceSelectionDraft
+   return current
+  })
+  const result=await updateContentReferenceSelection(actor,current.id,{revision:3,selection})
+  expect(mocks.db.$queryRawUnsafe).toHaveBeenCalledWith(expect.stringContaining('FOR UPDATE'),'questionnaire')
+  expect(mocks.snapshot).toHaveBeenCalledExactlyOnceWith(mocks.db,current,new Map())
+  expect(result.trainingReferenceSelectionDraft).toEqual(selection);expect(current.revision).toBe(4)
+  expect(mocks.writer).not.toHaveBeenCalled();expect(mocks.publishComposite).not.toHaveBeenCalled()
+  await expect(updateContentReferenceSelection(actor,current.id,{revision:3,selection})).rejects.toMatchObject({statusCode:409})
+ })
+ it.each([{revision:2},{status:'PUBLISHED'},{createdBy:'another'}])('rejects stale/non-draft/nonowner before reference lookup %j',async change=>{
+  Object.assign(current,change)
+  await expect(updateContentReferenceSelection(actor,current.id,{revision:3,selection:null})).rejects.toThrow()
+  expect(mocks.db.compositeAssessment.update).not.toHaveBeenCalled();expect(mocks.snapshot).not.toHaveBeenCalled()
+ })
+ it('discovery intersects real teacher ownership and exact licensed measurement preparation without requiring report authoring',async()=>{
+  mocks.snapshot.mockResolvedValue({snapshot:{schemaVersion:1,compositeId:current.id,units:[]},releases:new Map()})
+  expect(await contentReferenceChoices(actor,current.id)).toEqual({schemaVersion:1,units:[]})
+  expect(mocks.snapshot).toHaveBeenCalledExactlyOnceWith(mocks.db,current,new Map());expect(mocks.db.compositeAssessment.update).not.toHaveBeenCalled()
+  current.createdBy='foreign';await expect(contentReferenceChoices({...actor,role:UserRole.ADMIN},current.id)).rejects.toMatchObject({statusCode:403})
+  expect(mocks.snapshot).toHaveBeenCalledTimes(1)
+ })
+ it('clears explicitly and rejects client scoring/context/hash fields before any transaction',async()=>{
+  await updateContentReferenceSelection(actor,current.id,{revision:3,selection:null})
+  expect(mocks.db.compositeAssessment.update).toHaveBeenCalledWith({where:{id:current.id},data:{trainingReferenceSelectionDraft:expect.anything()}})
+  mocks.db.$transaction.mockClear()
+  await expect(updateContentReferenceSelection(actor,current.id,{revision:4,selection:null,populationContext:{gradeLevel:'1'}})).rejects.toThrow()
+  expect(mocks.db.$transaction).not.toHaveBeenCalled()
  })
 })

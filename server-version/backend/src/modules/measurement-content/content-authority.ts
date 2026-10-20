@@ -15,8 +15,10 @@ export const contentAuthorityScopeSchema = z.object({
   scopeId: identifier,
   resourceKind: z.enum(['measurement', 'reference', 'report', 'catalog', 'material', 'data']),
   resourceKeys: z.array(identifier).min(1).max(128).refine(unique),
-}).strict().refine(scope => scope.resourceKind !== 'data' || scope.scopeKind === 'PROJECT', {
-  message: 'Data reinterpretation requires exact project scope',
+}).strict().refine(scope => scope.resourceKind !== 'data' ||
+  scope.product === 'SURVEY' && scope.scopeKind === 'PROJECT' ||
+  scope.product === 'TRAINING' && scope.scopeKind === 'COURSE', {
+  message: 'Data reinterpretation requires exact Survey project or Training course scope',
 })
 export const contentGrantInputSchema = z.object({
   subjectId: identifier,

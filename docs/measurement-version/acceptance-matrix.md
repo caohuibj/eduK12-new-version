@@ -1,6 +1,10 @@
 # Three-layer upgrade: current acceptance boundaries
 
-Updated 2026-10-20. A working implementation or mock contract is not final acceptance.
+Updated 2026-10-20 06:54 UTC against committed source through 97d47c0b. A working implementation or mock contract is not final acceptance.
+This is the historical implementation-stage matrix. For connected checks completed
+after that timestamp, see the [local acceptance status](evidence/20261020-local-acceptance-status.md)
+and its exact-input evidence. Browser, administrator WebAuthn issuance, CI, merge
+and production remain uncompleted; unimplemented scope below is not implied complete.
 All routes remain subject to their existing effective product flags. Production
 flags have not been changed by this work.
 
@@ -19,7 +23,7 @@ flags have not been changed by this work.
 | V08 participant feedback | Explicit Scale/SJT raw metric allowlist, default GENERAL, existing timing/credential/withdrawal policy; existing Cog feedback preserved | Frozen author allowlist, valid saved quality | Real browser acceptance. Participant reference/template interpretation is not implemented or implied |
 | V08 explicit new interpretation | Independent immutable encrypted artifact POST/GET; exact source FINAL and idempotent UUID; old FINAL unchanged | Current data.reinterpret over the exact FINAL plus actual project data access | Researcher creation/recovery and explicit authorized artifact JSON export implemented; real API/browser acceptance pending |
 | 7B export | Raw/facts default unchanged; opt-in saved FINAL interpretation CSV, independent download UI/tickets | Recent MFA/current owner/source revision/watermark | Actual HTTP/browser recovery; independent new-interpretation JSON export is an explicit separate action |
-| Training/other entries | Actual Composite publication/new START measurement pointers and effective runtime validation; original codecs retained | Existing attached material-use contract and independent lifecycle; scientific consumers require current capabilities | Static SJT/effective Cog conversion, reference/report selection, FINAL/report and remaining COURSE capability alignment incomplete; actual private report authoring/root scopes implemented |
+| Training measurement and reports | Explicit effective Cognitive instance publication; Composite publication/new START measurement pointers; revision-CAS report selection, atomic FINAL interpretation receipt and authorized staff report rendering/UI | Existing attached material-use contract and independent lifecycle; actual course-private report authoring/root scopes; scientific consumers require current capabilities | Static SJT and old Scale conversion, Training reference production/selection, explicit reinterpretation/7B artifact export and four-entry consumption audit remain incomplete. Participant reference/template interpretation is not implied by staff report support; connected API/browser evidence is still pending |
 | V09 | Migration inventory and incremental immutable schemas recorded | No real data deleted; old double-null facts retain legacy identity | One-time cutover and redundant-path cleanup incomplete; no invented old release pointers |
 | V10 | Focused pure/service/component tests, private client/types, isolated single-user SQL evidence | Synthetic data only | Recheck allowed normal PG startup; Prisma deploy, HTTP/browser, real lock races, independent final review and one official CI/merge still required |
 

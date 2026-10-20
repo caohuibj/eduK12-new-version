@@ -1,3 +1,4 @@
+import {createHash} from 'node:crypto'
 import { z } from 'zod'
 import { canonicalHash, canonicalJsonString } from '../assessment-runtime/canonical'
 import { validateReferenceSetDefinition, type AssessmentReferenceSetDefinition } from '../assessment-reference/reference'
@@ -41,9 +42,52 @@ export const surveyReferenceSourceBindingSchema=z.object({
   cutOff:z.string().max(64).refine(value=>Number.isFinite(Date.parse(value))),
 }).strict()
 export type SurveyReferenceSourceBinding=z.infer<typeof surveyReferenceSourceBindingSchema>
+export const trainingReferenceSourceBindingSchema=z.object({
+  kind:z.literal('TRAINING_VERIFIED_SOURCE_V1'),courseId:z.string().uuid(),compositeId:z.string().uuid(),
+  selector:z.object({itemId:z.string().uuid(),scoreKey:z.string().trim().min(1).max(200),publication:z.string().datetime(),
+    configDigest:z.string().regex(/^[a-f0-9]{64}$/).nullable(),variantKey:z.string().trim().min(1).max(200).nullable(),
+    materialGroupKey:z.string().trim().min(1).max(200).optional()}).strict(),
+  cutOff:z.string().datetime(),sourceHash:z.string().regex(/^[a-f0-9]{64}$/),
+  sourceIds:z.array(z.object({attemptId:z.string().uuid(),attemptEpoch:z.number().int().positive()}).strict()).min(1).max(250),
+}).strict()
+export type TrainingReferenceSourceBinding=z.infer<typeof trainingReferenceSourceBindingSchema>
+const matchValues=z.array(z.string().trim().min(1).max(240)).min(1).max(50).refine(values=>new Set(values).size===values.length)
+export const formalReferencePopulationMatchSchema=z.object({
+  minAgeMonthsInclusive:z.number().int().nonnegative().max(2400).optional(),
+  maxAgeMonthsExclusive:z.number().int().positive().max(2401).optional(),
+  sexAtBirth:z.array(z.enum(['female','male','intersex'])).min(1).max(3).optional(),
+  gradeLevels:matchValues.optional(),primaryLanguages:matchValues.optional(),countriesOrRegions:matchValues.optional(),
+}).strict().refine(match=>Object.values(match).some(value=>value!==undefined),'Explicit population constraints are required')
+  .refine(match=>match.minAgeMonthsInclusive===undefined||match.maxAgeMonthsExclusive===undefined
+    ||match.minAgeMonthsInclusive<match.maxAgeMonthsExclusive,'Invalid population age bounds')
+export const formalReferencePromotionSchema=z.object({
+  kind:z.literal('FORMAL_CROSS_ENTRY_SUBMISSION_V1'),
+  sourceCandidateId:z.string().uuid(),sourceCandidateHash:z.string().regex(/^[a-f0-9]{64}$/),
+  analyzeGrantId:z.string().uuid(),
+  statement:z.string().trim().min(1).max(4000),
+  populationDescription:z.string().trim().min(1).max(4000),
+  applicability:z.string().trim().min(1).max(4000),
+  sampleAdequacy:z.string().trim().min(1).max(4000),
+  uncertainty:z.string().trim().min(1).max(4000),
+  consentUseAssessment:z.string().trim().min(1).max(4000),
+  targetPopulation:z.discriminatedUnion('kind',[
+    z.object({kind:z.literal('SUPPORTED_MATCH'),match:formalReferencePopulationMatchSchema,basis:z.string().trim().min(1).max(4000)}).strict(),
+    z.object({kind:z.literal('GENERAL_POPULATION'),basis:z.string().trim().min(1).max(4000)}).strict(),
+  ]),
+}).strict()
+export type FormalReferencePromotion=z.infer<typeof formalReferencePromotionSchema>
+export const referenceConsentBodyHash=(body:string)=>createHash('sha256').update(body,'utf8').digest('hex')
+export const formalConsentEvidenceSchema=z.array(z.object({
+  version:z.string().min(1).max(240),scopeHash:z.string().regex(/^[a-f0-9]{64}$/),
+  body:z.string().min(1).max(20000),bodyHash:z.string().regex(/^[a-f0-9]{64}$/),
+  purpose:z.string().min(1).max(20000),dataCategories:z.array(z.string().min(1).max(240)).max(16),
+}).strict().refine(value=>referenceConsentBodyHash(value.body)===value.bodyHash,{message:'Accepted consent body hash mismatch'})).min(1).max(250)
+export type FormalConsentEvidence=z.infer<typeof formalConsentEvidenceSchema>
 export interface ReferenceCandidate {
   schemaVersion: 1
-  sourceBinding?:SurveyReferenceSourceBinding
+  sourceBinding?:SurveyReferenceSourceBinding|TrainingReferenceSourceBinding
+  formalPromotion?:FormalReferencePromotion
+  formalConsentEvidence?:FormalConsentEvidence
   analyzerId: string
   measurement: { releaseId: string; contentHash: string; instrumentVersion: string; scoringVersion: string; measurementHash: string }
   scope: ReleaseInput['scope']
@@ -61,7 +105,18 @@ const fail=(code:string):never=>{throw new ContentReleaseError(code)}
  */
 export function prepareReferenceCandidate(input:Omit<ReferenceCandidate,'schemaVersion'|'candidateHash'>,
   authorizedFacts:ReadonlyMap<string,AuthorizedReferenceFact>):ReferenceCandidate{
-  if(input.sourceBinding!==undefined){
+  if(input.formalPromotion!==undefined){
+    const promotion=formalReferencePromotionSchema.safeParse(input.formalPromotion)
+    if(!promotion.success||!formalConsentEvidenceSchema.safeParse(input.formalConsentEvidence).success||input.sourceBinding!==undefined||input.scope.kind!=='PLATFORM'
+      ||input.definition.entries.length!==1||input.definition.entries.some(entry=>entry.referenceKind!=='normative_distribution'))
+      fail('REFERENCE_FORMAL_PROMOTION_INVALID')
+  }
+  if(input.sourceBinding?.kind==='TRAINING_VERIFIED_SOURCE_V1'){
+    const source=trainingReferenceSourceBindingSchema.safeParse(input.sourceBinding)
+    if(!source.success||source.data.cutOff!==input.evidence.cutoff||input.scope.kind!=='PRIVATE'||input.scope.product!=='TRAINING'
+      ||input.scope.resourceId!==source.data.compositeId||input.definition.entries.some(entry=>entry.scoreKey!==source.data.selector.scoreKey)
+      ||new Set(source.data.sourceIds.map(row=>row.attemptId)).size!==source.data.sourceIds.length)fail('REFERENCE_SOURCE_BINDING_INVALID')
+  }else if(input.sourceBinding!==undefined){
     const source=surveyReferenceSourceBindingSchema.safeParse(input.sourceBinding)
     if(!source.success||source.data.cutOff!==input.evidence.cutoff
       ||input.scope.kind!=='PRIVATE'||input.scope.product!=='SURVEY'||input.scope.resourceId!==source.data.projectId
@@ -128,5 +183,8 @@ export function referenceCandidateRelease(candidate:ReferenceCandidate,review:Re
     scope:candidate.scope,sourceReleaseId:null,provenance:{candidateHash:candidate.candidateHash,analyzerId:candidate.analyzerId,review},assetRefs:[],
     content:{projectionVersion:1,measurement:{releaseId:candidate.measurement.releaseId,contentHash:candidate.measurement.contentHash},
       entries:candidate.definition.entries.map(e=>({metricKey:e.scoreKey,referenceKind:e.referenceKind,definition:JSON.parse(JSON.stringify(e))})),
-      evidence:{...candidate.evidence,sampleManifest:candidate.sampleManifest,candidateHash:candidate.candidateHash}}}
+      evidence:{...candidate.evidence,sampleManifestHash:canonicalHash(candidate.sampleManifest),
+        sampleCount:candidate.sampleManifest.length,candidateHash:candidate.candidateHash,
+        ...(candidate.formalConsentEvidence?{consentScopeHashes:candidate.formalConsentEvidence.map(scope=>scope.scopeHash),
+          consentBodyHashes:candidate.formalConsentEvidence.map(scope=>scope.bodyHash)}:{})}}}
 }

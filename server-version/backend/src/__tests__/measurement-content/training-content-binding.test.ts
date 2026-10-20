@@ -1,5 +1,6 @@
 import {beforeEach,describe,expect,it,vi} from 'vitest'
-const mocks=vi.hoisted(()=>({release:vi.fn(),decrypt:vi.fn()}))
+const mocks=vi.hoisted(()=>({release:vi.fn(),decrypt:vi.fn(),staticRead:vi.fn()}))
+vi.mock('../../modules/situational/static-measurement-release',()=>({readStaticSjtMeasurementForStart:mocks.staticRead}))
 vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:mocks.release}))
 vi.mock('../../modules/scale/scale-workflow.service',()=>({frozenDatabaseScaleDefinition:(scale:any)=>scale.definition}))
 vi.mock('../../modules/cognitive/cognitive.security',()=>({decryptCognitivePayload:mocks.decrypt,encryptCognitivePayload:vi.fn()}))
@@ -25,7 +26,7 @@ const storedScale=()=>({...prepareRelease(scaleMeasurementRelease({localId:'loca
 const row={kind:'SCALE',id:'scale',owner_id:'source-owner',measurement_release_id:rid,instrument_key:null,instrument_version:null}
 const db={$queryRaw:vi.fn()}
 const empty=new Map<string,ResolvedSituationalRelease>()
-beforeEach(()=>{vi.resetAllMocks();db.$queryRaw.mockResolvedValue([row]);mocks.release.mockResolvedValue(storedScale())})
+beforeEach(()=>{vi.resetAllMocks();db.$queryRaw.mockResolvedValue([row]);mocks.release.mockResolvedValue(storedScale());mocks.staticRead.mockRejectedValue(new Error('CONTENT_STATIC_SJT_MAPPING_MISSING'))})
 const prepare=(value:any=composite(),resolved=empty)=>prepareTrainingContentSnapshot(db as never,value,resolved)
 const start=(publication:any,value:any=composite(),resolved=empty)=>prepareTrainingContentAttemptBinding(db as never,{compositeId:'composite',attemptId:'attempt',epoch:2,
  snapshot:publication.snapshot,snapshotHash:publication.snapshotHash,composite:value,resolvedSituational:resolved})
@@ -101,7 +102,7 @@ describe('Training compact measurement publication and START binding',()=>{
  })
  it('never substitutes an author row for a static SJT registry package',async()=>{
   const pkg=listSituationPackages()[0];expect(pkg).toBeDefined()
-  await expect(prepare({id:'composite',items:[{id:'static',type:'SITUATIONAL',situationalInstrumentKey:pkg.key,situationalInstrumentVersion:pkg.instrumentVersion}]})).rejects.toThrow('CONTENT_TRAINING_RELEASE_REQUIRED')
+  await expect(prepare({id:'composite',items:[{id:'static',type:'SITUATIONAL',situationalInstrumentKey:pkg.key,situationalInstrumentVersion:pkg.instrumentVersion}]})).rejects.toThrow('CONTENT_STATIC_SJT_MAPPING_MISSING')
   expect(db.$queryRaw).not.toHaveBeenCalled();expect(mocks.release).not.toHaveBeenCalled()
  })
  it('requires an exact SJT author pointer and compares the resolved package instead of guessing a static ID',async()=>{
@@ -137,3 +138,36 @@ it('keeps two effective profile assignment pointers distinct for the same config
  expect(query).toContain('COALESCE(a.measurement_release_id,c.measurement_release_id)');expect(query).toContain('FOR SHARE OF a,c')
  await expect(start(result,value)).resolves.toHaveProperty('binding')
 })
+it('START preserves the frozen private report even when revoked, with one read per release',async()=>{
+ const publication=await prepare(),reportId='33333333-3333-4333-8333-333333333333'
+ const measurement=storedScale(),metricKey=(measurement.content as any).metrics[0].metricKey
+ const report={...prepareRelease({layer:'REPORT',family:'SCALE',key:'report',version:'1',scope:{kind:'PRIVATE',product:'TRAINING',ownerId:composite().createdBy,resourceId:'composite'},assetRefs:[],sourceReleaseId:null,
+ content:{projectionVersion:1,measurements:[{releaseId:rid,contentHash:measurement.contentHash}],metricKeys:[metricKey],audience:'teacher',language:'zh-CN',generatorVersion:'declarative-report-v1',template:{blocks:[{type:'METRIC',metricKey,display:'RAW'}],limitations:[]}}}),releaseId:reportId,status:'REVOKED'}
+ publication.snapshot.units[0].report={releaseId:reportId,contentHash:report.contentHash}
+ publication.snapshotHash=canonicalHash(publication.snapshot)
+ mocks.release.mockClear();mocks.release.mockImplementation(async(_db,id)=>id===rid?measurement:report)
+ const bound=await start(publication)
+ expect(bound!.binding.units[0].report).toEqual(publication.snapshot.units[0].report)
+ expect(mocks.release).toHaveBeenCalledTimes(2)
+ mocks.release.mockImplementation(async(_db,id)=>id===rid?measurement:{...report,scope:{...report.scope,ownerId:'other'}})
+ await expect(start(publication)).rejects.toThrow('REPORT_SELECTION_INVALID')
+})
+
+ it('binds a real static mapping without a fabricated owner, and START preserves its exact current licensed pointer',async()=>{
+  const pkg=listSituationPackages().find(p=>p.key==='sjt-assertiveness-golden')!,mappingId='44444444-4444-4444-8444-444444444444'
+  const value={id:'composite',items:[{id:'static',type:'SITUATIONAL',situationalInstrumentKey:pkg.key,situationalInstrumentVersion:pkg.instrumentVersion}]}
+  const identity={instrumentKey:pkg.key,instrumentVersion:pkg.instrumentVersion}
+  const resolved=new Map([[situationalReleaseKey(identity),{situationPackage:pkg} as ResolvedSituationalRelease]])
+  const release={...prepareRelease(sjtMeasurementRelease({localId:pkg.key,version:'registry-v1',instrumentVersion:pkg.instrumentVersion,definition:pkg.definition,scope:{kind:'PLATFORM'},
+   provenance:{sourceKind:'STATIC_SJT_REGISTRY',mappingId,contentDigest:'a'.repeat(64),...identity}})),releaseId:rid,status:'PUBLISHED'}
+  const mapping={id:mappingId,instrument_key:pkg.key,instrument_version:pkg.instrumentVersion}
+  mocks.staticRead.mockResolvedValue({mapping,release});db.$queryRaw.mockResolvedValue([])
+  const publication=await prepare(value,resolved)
+  expect(publication.snapshot.units[0].source).toEqual({kind:'STATIC_SJT_REGISTRY',id:mappingId,...identity})
+  expect(mocks.staticRead).toHaveBeenCalledWith(db,identity,'PUBLISH')
+  await expect(start(publication,value,resolved)).resolves.toHaveProperty('binding')
+  mocks.staticRead.mockResolvedValue({mapping:{...mapping,id:'other'},release})
+  await expect(start(publication,value,resolved)).rejects.toThrow('SOURCE_MISMATCH')
+  mocks.staticRead.mockResolvedValue({mapping,release:{...release,provenance:{...release.provenance,mappingId:'other'}}})
+  await expect(start(publication,value,resolved)).rejects.toThrow('SCOPE_DENIED')
+ })

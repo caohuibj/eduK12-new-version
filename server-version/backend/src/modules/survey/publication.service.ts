@@ -7,7 +7,7 @@ import { publishContentRelease,requirePublishedContentRelease } from '../measure
 import { parseFrozenSurveyCognitive } from './cognitive.definition'
 import { scaleMeasurementRelease, surveyScaleReleaseContext } from '../measurement-content/scale'
 import {catalogSnapshotsForDrafts,compileCatalogUnit} from './catalog.service'
-import type {SourceAnswerMapping} from './catalog.sources'
+import {recheckCatalogScaleSourceExpiry,type SourceAnswerMapping} from './catalog.sources'
 import { SURVEY_COGNITIVE_NOTICE } from './measurement.notice'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
@@ -79,7 +79,9 @@ export function surveyMeasurementReleaseInput(unit:ResearchFrozenUnit,actorId:st
   if(unit.kind==='SJT')return sjtMeasurementRelease({localId:unit.draftId,version:String(unit.draftRevision),
     instrumentVersion:surveyScaleReleaseContext(unit).instrumentVersion,definition:unit.compiledDefinition,
     displayProtocol:unit.displayDefinition,scope,provenance:unit.sourceProvenance??{}})
-  return scaleMeasurementRelease({localId:unit.draftId,version:String(unit.draftRevision),
+  const source=unit.sourceProvenance?.sourceMeasurementRelease as {releaseId?:string}|undefined
+  if(unit.sourceProvenance&&!source?.releaseId)throw new SurveyWaveError(409,'目录量表须先由来源管理者完成显式版本转换，再重新授权导入')
+  return scaleMeasurementRelease({localId:unit.draftId,version:String(unit.draftRevision),sourceReleaseId:source?.releaseId??null,
     ...surveyScaleReleaseContext(unit),definition:unit.compiledDefinition,
     instrumentClass:unit.sourceProvenance?'STANDARD':'CUSTOM_DESCRIPTIVE',provenance:unit.sourceProvenance??{},scope})
 }
@@ -194,9 +196,9 @@ export async function freezeResearchWaveDraft(input:{
     const feedbackMetrics=new Map<string,string[]>()
     for (const unit of units) {
       if (unit.kind === 'FORM') continue
-      // Native authors explicitly publish before Wave freezing. Existing
-      // licensed catalog import migration remains a separate V09 transition.
-      const release=unit.sourceProvenance
+      // Scale catalog imports now use the same explicit publication action as
+      // native drafts. Other catalog families retain their separate migration.
+      const release=unit.sourceProvenance&&unit.kind!=='SCALE'
         ?await publishSurveyMeasurementUnit(tx,unit,input.actorUserId,input.projectId)
         :await resolveSurveyMeasurementUnit(tx,unit,input.actorUserId,input.projectId)
       feedbackMetrics.set(unit.draftId,release.content.metrics.map(metric=>metric.metricKey))
@@ -344,6 +346,7 @@ export async function freezeResearchWaveDraft(input:{
       metadata:{waveId:input.waveId,publicationId,definitionDigest:digest,
         runtimeReady:true,sourceVersions:units.map(x=>[x.instrumentKey,x.draftRevision])},
     }})
+    await recheckCatalogScaleSourceExpiry(tx,sources.values())
     return {publicationId,version:version+1,digest,waveId:input.waveId,runtimeReady:true}
   })
 }

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { createMemoryRouter, Link, RouterProvider } from 'react-router-dom'
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
@@ -31,6 +32,24 @@ function mount(actor='actor'){
 }
 async function open(course?:string){if(course)fireEvent.change(screen.getByLabelText('已保存的投放课程'),{target:{value:course}});fireEvent.change(screen.getByLabelText('报告内容授权 ID'),{target:{value:grant}});fireEvent.click(screen.getByRole('button',{name:'打开课程报告'}));await screen.findByRole('button',{name:'report · 1 · 草稿'})}
 describe('Training private report real editor',()=>{
+ it.each(['actor','product'])('discards old editor state and authority when the %s changes',async(kind)=>{
+  fixture();const risk=vi.fn();let change!:(value:string)=>void
+  function Workspace(){
+   const [identity,setIdentity]=useState('initial');change=setIdentity
+   return <TrainingReportStudio actorId={kind==='actor'?identity:'actor'} compositeId={kind==='product'&&identity!=='initial'?'another':'composite'} courses={[{id:'course',title:'已保存课程'}]} onLeaveRiskChange={risk}/>
+  }
+  const router=createMemoryRouter([{path:'/edit',element:<Workspace/>}],{initialEntries:['/edit']})
+  render(<RouterProvider router={router}/>);await open()
+  fireEvent.click(screen.getByRole('button',{name:'report · 1 · 草稿'}));await screen.findByLabelText('报告标题')
+  fireEvent.change(screen.getByLabelText('报告标题'),{target:{value:'旧范围未保存'}})
+  expect(risk).toHaveBeenLastCalledWith({dirty:true,pending:false,busy:false})
+  act(()=>change('another'))
+  expect(screen.queryByLabelText('报告标题')).not.toBeInTheDocument()
+  expect(screen.getByLabelText('报告内容授权 ID')).toHaveValue('')
+  expect(screen.getByLabelText('已保存的投放课程')).toBeEnabled()
+  expect(risk).toHaveBeenLastCalledWith({dirty:false,pending:false,busy:false})
+ })
+
  it('keeps the editor mounted while a request is busy',async()=>{
   let resolve!: (value:unknown)=>void
   http.send.mockImplementation(()=>new Promise(value=>{resolve=value}))
@@ -42,7 +61,7 @@ describe('Training private report real editor',()=>{
  })
  it('uses Training transport and exact saved course scope; native publish and participant audiences are absent; dirty navigation stays mounted',async()=>{
   fixture();const router=mount();await open()
-  expect(screen.queryByRole('button',{name:'发布或更新原生测量'})).not.toBeInTheDocument()
+  expect(screen.queryByRole('button',{name:'发布或更新测量版本'})).not.toBeInTheDocument()
   fireEvent.click(screen.getByRole('button',{name:'report · 1 · 草稿'}));await screen.findByLabelText('报告标题')
   expect(screen.queryByRole('option',{name:'学生'})).not.toBeInTheDocument();expect(screen.queryByRole('option',{name:'家长'})).not.toBeInTheDocument()
   fireEvent.change(screen.getByLabelText('报告标题'),{target:{value:'未保存'}})

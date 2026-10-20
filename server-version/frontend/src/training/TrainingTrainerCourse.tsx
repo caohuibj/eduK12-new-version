@@ -158,7 +158,7 @@ export default function TrainingTrainerCourse() {
                       </article>
                     })}</div>}
             </section>}
-            {section === 'analysis' && <TrainingCourseAnalysis key={course.id} courseId={course.id} />}
+            {section === 'analysis' && <TrainingCourseAnalysis key={course.id} courseId={course.id} actorId={user?.id} />}
 </div><aside className="training-course-sidebar"><section className="training-side-panel"><h2>课程管理</h2>              <div className="training-trainer-shortcuts">
                 <Link to={'/courses/' + encoded + '/students'}>管理学员 <ArrowRight size={15} aria-hidden="true" /></Link>
                 <Link to={'/assessment-workbench?courseId=' + encoded}>查看培训结果 <ArrowRight size={15} aria-hidden="true" /></Link>

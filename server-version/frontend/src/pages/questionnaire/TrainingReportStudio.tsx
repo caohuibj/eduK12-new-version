@@ -10,7 +10,11 @@ function ReportNavigationGuard({risk}:{risk:ReportLeaveRisk}){
 }
 export type TrainingReportCourse={id:string;title:string}
 /** Courses come only from the saved product's actual delivery associations. */
-export function TrainingReportStudio({actorId,compositeId,courses,onLeaveRiskChange,disabled=false}:{actorId:string;compositeId:string;courses:TrainingReportCourse[];disabled?:boolean;onLeaveRiskChange?:(risk:ReportLeaveRisk)=>void}){
+type Props={actorId:string;compositeId:string;courses:TrainingReportCourse[];disabled?:boolean;onLeaveRiskChange?:(risk:ReportLeaveRisk)=>void}
+export function TrainingReportStudio(props:Props){
+  return <TrainingReportWorkspace key={JSON.stringify([props.actorId,props.compositeId])} {...props}/>
+}
+function TrainingReportWorkspace({actorId,compositeId,courses,onLeaveRiskChange,disabled=false}:Props){
   const [courseId,setCourseId]=useState(courses[0]?.id??''),[grantId,setGrantId]=useState('')
   const [scope,setScope]=useState<{actorId:string;compositeId:string;courseId:string;grantId:string}|null>(null)
   const [risk,setRisk]=useState<ReportLeaveRisk>({dirty:false,pending:false,busy:false})
@@ -26,7 +30,7 @@ export function TrainingReportStudio({actorId,compositeId,courses,onLeaveRiskCha
   },[scope,actorId,compositeId,courses])
   const locked=risk.dirty||risk.pending||risk.busy
   return <section className="my-5 rounded border p-4" aria-label="Training 私有报告工作台"><fieldset disabled={disabled}><legend className="sr-only">课程报告编辑</legend>
-    {scope&&<ReportNavigationGuard risk={risk}/>}<h2 className="text-xl font-semibold">课程私有报告工作台</h2>
+    {scope&&locked&&<ReportNavigationGuard risk={risk}/>}<h2 className="text-xl font-semibold">课程私有报告工作台</h2>
     <p>使用当前账号的报告内容授权。发布报告不会修改历史分数；报告面向教师或研究者。</p>
     <fieldset disabled={locked}><label>已保存的投放课程<select className="input" value={courseId} onChange={event=>setCourseId(event.target.value)}>{courses.map(course=><option key={course.id} value={course.id}>{course.title}</option>)}</select></label>
       <label>报告内容授权 ID<input className="input" value={grantId} onChange={event=>setGrantId(event.target.value.trim())}/></label>

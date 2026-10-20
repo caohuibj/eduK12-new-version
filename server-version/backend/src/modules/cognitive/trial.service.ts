@@ -1,3 +1,4 @@
+import {assertTrainingPrivateReferenceAdmissionCurrent} from '../composite/training-private-reference-use'
 import { assertTrainingChildSelected } from '../composite/training-variant-child-scope'
 import { prisma } from '../../config/database'
 import { encryptCognitivePayload, hashTrialPayload } from './cognitive.security'
@@ -178,6 +179,7 @@ const appendTrialsWithPrincipal = async (
     } else {
       persisted = existing.map(({ id, trialIndex, createdAt }) => ({ id, trialIndex, createdAt }))
     }
+    await assertTrainingPrivateReferenceAdmissionCurrent(tx)
     const persistedByIndex = new Map(persisted.map((trial) => [trial.trialIndex, trial]))
     return inputs.map((input) => {
       const trial = persistedByIndex.get(input.trialIndex)

@@ -1,6 +1,7 @@
 import {beforeEach,describe,it,expect,vi} from 'vitest'
-const mocks=vi.hoisted(()=>({issue:vi.fn(),revoke:vi.fn(),read:vi.fn(),authenticate:vi.fn((_req:any,_res:any,next:any)=>next()),
+const mocks=vi.hoisted(()=>({issue:vi.fn(),revoke:vi.fn(),read:vi.fn(),prepareStatic:vi.fn(),publishStatic:vi.fn(),authenticate:vi.fn((_req:any,_res:any,next:any)=>next()),
  system:vi.fn((_req:any,_res:any,next:any)=>next()),recent:vi.fn((_req:any,_res:any,next:any)=>next()),limit:vi.fn((_req:any,_res:any,next:any)=>next())}))
+vi.mock('../../modules/situational/static-measurement-admin.service',()=>({prepareAdminStaticSjtMapping:mocks.prepareStatic,publishAdminStaticSjtMeasurement:mocks.publishStatic}))
 vi.mock('../../modules/measurement-content/admin-authority.service',()=>({issueAdminContentRoot:mocks.issue,revokeAdminContentGrant:mocks.revoke,readAdminContentGrant:mocks.read}))
 vi.mock('../../middleware/auth',()=>({authenticate:mocks.authenticate}))
 vi.mock('../../modules/admin-permissions/guards',()=>({requireSystemAdmin:mocks.system,requireRecentAdminKey:mocks.recent}))
@@ -58,4 +59,13 @@ it('protects exact metadata read with existing system and recent-key boundaries'
  expect(mocks.system).toHaveBeenCalled();expect(mocks.recent).toHaveBeenCalled()
  mocks.system.mockImplementationOnce((_req,res)=>res.status(403).json({message:'system required'}))
  expect((await invoke('/content-grants/:id')).status).toBe(403);expect(mocks.read).toHaveBeenCalledTimes(1)
+})
+
+it.each([['/static-sjt/prepare','prepareStatic'],['/static-sjt/publish','publishStatic']] as const)('protects %s with existing strong session, origin and exact body',async(path,name)=>{
+ mocks[name].mockResolvedValue({mappingId:grantId})
+ expect((await invoke(path)).status).toBe(200)
+ expect(mocks[name]).toHaveBeenCalledWith(principal.userId,principal,{requestId:grantId})
+ expect(mocks.recent.mock.invocationCallOrder[0]).toBeLessThan(mocks[name].mock.invocationCallOrder[0])
+ expect((await invoke(path,'https://other.example.test')).status).toBe(403)
+ expect(mocks[name]).toHaveBeenCalledTimes(1)
 })

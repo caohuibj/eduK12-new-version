@@ -24,9 +24,13 @@ function fixture({published=false,emptyMeasurements=false,extraBlocks=false,crea
     if(path==='/api/survey/projects/project1/instruments?page=1')return response({list:[
       {id:'native',title:'自编量表',kind:'SCALE',status:'DRAFT',revision:4},
       {id:'form',title:'表单不可选',kind:'FORM',status:'DRAFT',revision:1},
-      {id:'catalog',title:'目录不可选',kind:'SCALE',status:'DRAFT',revision:1,catalogGrantId:'grant'},
+      {id:'catalog',title:'目录量表',kind:'SCALE',status:'DRAFT',revision:1,catalogGrantId:'grant',readOnly:true},
+      {id:'catalog-cog',title:'目录认知不可选',kind:'COGNITIVE',status:'DRAFT',revision:1,catalogGrantId:'grant-cog',readOnly:true},
+      {id:'catalog-sjt',title:'目录情境不可选',kind:'SITUATIONAL',status:'DRAFT',revision:1,catalogGrantId:'grant-sjt',readOnly:true},
+      {id:'readonly-no-grant',title:'无授权只读不可选',kind:'SCALE',status:'DRAFT',revision:1,readOnly:true},
+      {id:'archived-catalog',title:'已归档不可选',kind:'SCALE',status:'ARCHIVED',revision:1,catalogGrantId:'grant-old',readOnly:true},
     ]})
-    if(path==='/api/survey/projects/project1/instruments/native/measurement-release'&&method==='POST'){
+    if(['/api/survey/projects/project1/instruments/native/measurement-release','/api/survey/projects/project1/instruments/catalog/measurement-release'].includes(path)&&method==='POST'){
       writes.push({path,body});measures=[measure];return response({releaseId:'measure1'})
     }
     if(path===base&&method==='POST'){
@@ -135,14 +139,26 @@ describe('project private report studio',()=>{
     expect(f.writes).toHaveLength(2);expect(f.writes[1]).toEqual(f.writes[0])
     expect(f.drafts.size).toBe(2)
   })
-  it('offers only native non-Form drafts when no measurement exists and publishes selected revision explicitly',async()=>{
+  it('offers native tools and licensed read-only catalog Scale without silently publishing either',async()=>{
     const f=fixture({emptyMeasurements:true});render(<SurveyReportStudio projectId="project1"/>)
     await screen.findByRole('option',{name:'自编量表 · SCALE · 修订 4'})
-    expect(screen.queryByRole('option',{name:/表单不可选|目录不可选/})).not.toBeInTheDocument()
+    expect(screen.queryByRole('option',{name:/表单不可选|目录认知不可选|目录情境不可选|无授权只读不可选|已归档不可选/})).not.toBeInTheDocument()
+    expect(screen.getByRole('option',{name:'目录量表 · SCALE · 修订 1 · 授权只读原版'})).toBeInTheDocument()
     expect(f.writes).toHaveLength(0)
     fireEvent.click(screen.getByRole('button',{name:'发布所选测量版本'}))
     await screen.findByRole('option',{name:/project-scale/})
     expect(f.writes).toEqual([{path:'/api/survey/projects/project1/instruments/native/measurement-release',body:{revision:4}}])
+    expect(screen.getByLabelText('测量发布版本')).toHaveValue('measure1')
+  })
+  it('publishes a catalog Scale by exact draft revision without changing or copying its content',async()=>{
+    const f=fixture({emptyMeasurements:true});render(<SurveyReportStudio projectId="project1"/>)
+    await screen.findByRole('option',{name:'目录量表 · SCALE · 修订 1 · 授权只读原版'})
+    fireEvent.change(screen.getByLabelText('可发布测量'),{target:{value:'catalog'}})
+    expect(f.writes).toHaveLength(0)
+    fireEvent.click(screen.getByRole('button',{name:'发布所选测量版本'}))
+    await screen.findByText('测量版本已发布，可用于编制报告；未开启被试采集。')
+    expect(f.writes).toEqual([{path:'/api/survey/projects/project1/instruments/catalog/measurement-release',body:{revision:1}}])
+    expect(f.fetcher.mock.calls.some(([,init])=>init?.method==='PATCH')).toBe(false)
     expect(screen.getByLabelText('测量发布版本')).toHaveValue('measure1')
   })
   it.each(['CLOSED','ARCHIVED'])('allows historical report corrections for %s without reopening measurement publication',async projectStatus=>{
@@ -150,7 +166,7 @@ describe('project private report studio',()=>{
     expect(screen.getByLabelText('报告标题')).toBeEnabled()
     fireEvent.change(screen.getByLabelText('发布说明'),{target:{value:'历史文案修正'}})
     expect(screen.getByRole('button',{name:'发布报告版本'})).toBeEnabled()
-    fireEvent.click(screen.getByRole('button',{name:'发布或更新原生测量'}))
+    fireEvent.click(screen.getByRole('button',{name:'发布或更新测量版本'}))
     await screen.findByText('项目采集已关闭或归档，不能发布新的测量；仍可修订历史报告。')
     expect(screen.getByRole('button',{name:'发布所选测量版本'})).toBeDisabled()
     fireEvent.click(screen.getByRole('button',{name:'发布报告版本'}))
@@ -160,7 +176,7 @@ describe('project private report studio',()=>{
   it('loads native drafts on demand even when a measurement release already exists',async()=>{
     const f=fixture();render(<SurveyReportStudio projectId="project1"/>);await openDraft()
     expect(f.fetcher.mock.calls.some(([url])=>String(url).includes('/instruments'))).toBe(false)
-    fireEvent.click(screen.getByRole('button',{name:'发布或更新原生测量'}))
+    fireEvent.click(screen.getByRole('button',{name:'发布或更新测量版本'}))
     await screen.findByRole('option',{name:'自编量表 · SCALE · 修订 4'})
     fireEvent.click(screen.getByRole('button',{name:'发布所选测量版本'}))
     await screen.findByText('测量版本已发布，可用于编制报告；未开启被试采集。')

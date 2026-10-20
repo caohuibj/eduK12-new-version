@@ -1187,6 +1187,8 @@ enum CompositeAnalysisSnapshotGenerationReason {
 
 // 综合测评模板。发布后项目配置不可修改，历史测评通过子记录保存各自的结果快照。
 model CompositeAssessment {
+  trainingReportSelectionDraft Json? @map("training_report_selection_draft")
+  trainingReferenceSelectionDraft Json? @map("training_reference_selection_draft")
   trainingReportDrafts TrainingReportDraft[]
   trainingContentSnapshot Json? @map("training_content_snapshot")
   trainingContentSnapshotHash String? @map("training_content_snapshot_hash")
@@ -1342,8 +1344,12 @@ model CompositeFormSection {
 
 // 一次学生/匿名参与记录。recoveryTokenHash 只存哈希，原始恢复凭证只在创建时返回一次。
 model CompositeAssessmentAttempt {
+  trainingContentInterpretationEncrypted String? @map("training_content_interpretation_encrypted")
+  trainingContentInterpretationHash String? @map("training_content_interpretation_hash")
   trainingContentBinding Json? @map("training_content_binding")
   trainingContentBindingHash String? @map("training_content_binding_hash")
+  trainingReferenceBinding Json? @map("training_reference_binding")
+  trainingReferenceBindingHash String? @map("training_reference_binding_hash")
   trainingFeedbackSnapshot Json? @map("training_feedback_snapshot")
   trainingFeedbackSnapshotHash String? @map("training_feedback_snapshot_hash")
   trainingPersistenceSnapshot Json? @map("training_persistence_snapshot")
@@ -4036,6 +4042,8 @@ model MeasurementReferenceReview {
   candidate MeasurementReferenceCandidate @relation(fields:[candidateId],references:[id],onDelete:Restrict,onUpdate:NoAction)
   candidateHash String @map("candidate_hash")
   reviewerId String @map("reviewer_id")
+  reviewerGrantId String? @map("reviewer_grant_id")
+  reviewerGrantVersion Int? @map("reviewer_grant_version")
   reviewer User @relation(fields:[reviewerId],references:[id],onDelete:Restrict,onUpdate:NoAction)
   decision String
   statement String
@@ -4152,4 +4160,40 @@ model TrainingReportDraft {
  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
  @@unique([compositeId,reportKey,version],map:"training_report_drafts_composite_id_report_key_version_key")
  @@map("training_report_drafts")
+}
+
+
+// Exact installed static source identity; no fabricated author/owner account.
+model StaticSjtMeasurementMapping {
+  deployment Json?
+  deploymentHash String? @map("deployment_hash")
+  id String @id @default(uuid())
+  instrumentKey String @map("instrument_key")
+  instrumentVersion String @map("instrument_version")
+  contentDigest String @map("content_digest")
+  measurementReleaseId String? @map("measurement_release_id")
+  @@unique([instrumentKey,instrumentVersion])
+  @@map("static_sjt_measurement_mappings")
+}
+
+// Explicit siblings of one FINAL unit, never replacement facts. Foreign keys and
+// immutable source/predecessor guards are defined by the additive SQL migration.
+model TrainingInterpretationArtifact {
+  id String @id
+  courseId String @map("course_id")
+  compositeId String @map("composite_id")
+  attemptId String @map("attempt_id")
+  attemptEpoch Int @map("attempt_epoch")
+  itemId String @map("item_id")
+  createdBy String @map("created_by")
+  requestHash String @map("request_hash")
+  sourceAggregateHash String @map("source_aggregate_hash")
+  sourceBindingHash String @map("source_binding_hash")
+  sourceReceiptHash String @map("source_receipt_hash")
+  previousArtifactId String? @map("previous_artifact_id")
+  artifactCipher String @map("artifact_cipher")
+  artifactHash String @map("artifact_hash")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([attemptId,createdAt,id],map:"training_interpretation_artifacts_attempt_time_idx")
+  @@map("training_interpretation_artifacts")
 }

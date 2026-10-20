@@ -25,7 +25,7 @@ export type TrainingFlowScopeOptions={db?:any;snapshotRows?:any[];frozenSlots?:A
 /** Only after parent ownership authorization. No global authorization cache. All
  * accepted facts are fetched in one batch and exact immutable source bindings
  * are checked before any compact canonical body is expanded. */
-export async function resolveTrainingFlowScope(attempt:any, composite:any=attempt.compositeAssessment, options:TrainingFlowScopeOptions={}) {
+async function resolveTrainingFlowScopeAndCandidate(attempt:any, composite:any=attempt.compositeAssessment, options:TrainingFlowScopeOptions={}) {
   const mode=trainingFlowMarkerState(attempt,composite)
   if(mode==='LEGACY')return null
   if(mode==='UNKNOWN')throw compositeForbidden('流程来源标志未完整加载')
@@ -120,9 +120,19 @@ export async function resolveTrainingFlowScope(attempt:any, composite:any=attemp
   const evidence={schemaVersion:config.schemaVersion,...(materialAssignment?{assignmentHash:materialAssignment.assignmentHash}:{}),compositeId:composite.id,publishedAt:new Date(composite.publishedAt).toISOString(),attemptId:attempt.id,attemptEpoch:attempt.attemptEpoch,configDigest:config.flowDigest,slotSetHash:frozenSlots.snapshotHash,contextSnapshotHash:attempt.contextSnapshotHash??null,snapshotHeadersDigest,path}
   const pathHash=canonicalHash(evidence)
   if(!options.allowAdvance&&attempt.trainingFlowPathHash!=null&&attempt.trainingFlowPathHash!==pathHash)fail()
-  return {config,materialAssignment,path,pathHash,evidence,itemIds,sectionIds,reachedSlotKeys,executedSlotKeys,skippedSlotKeys,terminal,snapshots,frozenSlots,
+  const scope={config,materialAssignment,path,pathHash,evidence,itemIds,sectionIds,reachedSlotKeys,executedSlotKeys,skippedSlotKeys,terminal,snapshots,frozenSlots,
     aggregatePathPolicy:{kind:'TRAINING_FLOW_V1' as const,terminal,reachedSlotKeys:[...reachedSlotKeys],executedSlotKeys:[...executedSlotKeys]}}
+  return {scope,candidate:snapshot}
 }
+
+export async function resolveTrainingFlowScope(attempt:any, composite:any=attempt.compositeAssessment, options:TrainingFlowScopeOptions={}) {
+  return (await resolveTrainingFlowScopeAndCandidate(attempt,composite,options))?.scope??null
+}
+
+/** Internal child materializer only: consume immediately under the same parent
+ * lock. Candidate identity/hash/epoch/publication were checked above. No cache,
+ * caller-supplied proof, or candidate field on the ordinary scope/DTO path. */
+export const resolveTrainingFlowScopeForMaterialization=resolveTrainingFlowScopeAndCandidate
 
 /** Safe report provenance; never exposes future candidate identities or conditions. */
 export const trainingFlowProvenance=(flow:NonNullable<Awaited<ReturnType<typeof resolveTrainingFlowScope>>>)=>({schemaVersion:1,...(flow.materialAssignment?{materialAssignment:{assignmentHash:flow.materialAssignment.assignmentHash,configDigest:flow.materialAssignment.configDigest,groupKey:flow.materialAssignment.groupKey,materialDigest:flow.materialAssignment.materialDigest}}:{}),configDigest:flow.config.flowDigest,pathHash:flow.pathHash,termination:flow.path.termination,taskSatisfaction:flow.path.taskSatisfaction,executedUnitCount:flow.executedSlotKeys.size,skippedUnitCount:flow.skippedSlotKeys.size})

@@ -118,7 +118,9 @@ export async function publishSurveyReportDraft(actorId:string,projectId:string,i
     if(row.state==='PUBLISHED')return {draftId:id,releaseId:row.published_release_id,idempotent:true}
     const payload=surveyReportPayload.parse(row.payload),{release}=await releaseInput(tx,actorId,projectId,row.report_key,row.version,payload)
     release.provenance={...release.provenance,draftId:id,draftRevision:row.revision,publicationNote:input.publicationNote}
-    const published=await publishContentRelease(tx,release,actorId,'HISTORICAL_INTERPRETATION')
+    // The repository accepts strict source input, not derived identity metadata.
+    const {hashScheme:_hashScheme,contentHash:_contentHash,...sourceInput}=release
+    const published=await publishContentRelease(tx,sourceInput,actorId,'HISTORICAL_INTERPRETATION')
     await retainAssessmentAssetReferences({owner:{entityType:'MeasurementReportRelease',entityId:published.releaseId,field:'media'},references:payload.assets.map(a=>({assetId:a.assetId,contentHash:a.sha256,mimeType:a.mediaType})),db:tx})
     await tx.$executeRaw(Prisma.sql`UPDATE survey_report_drafts SET state='PUBLISHED',published_release_id=${published.releaseId},updated_at=now() WHERE id=${id} AND revision=${input.revision} AND state='DRAFT'`)
     await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:actorId,projectId,action:'PRIVATE_REPORT_PUBLISHED',metadata:{draftId:id,releaseId:published.releaseId,revision:row.revision}}})
