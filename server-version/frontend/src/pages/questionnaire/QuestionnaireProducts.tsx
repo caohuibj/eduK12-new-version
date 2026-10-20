@@ -247,6 +247,9 @@ export function QuestionnaireProductEdit() {
   const reportRiskChanged = React.useCallback((risk: {dirty:boolean;pending:boolean;busy:boolean}) => { reportRisk.current = risk;setReportBlocked(risk.dirty||risk.pending||risk.busy) }, [])
   const [measurementNotice,setMeasurementNotice]=useState('')
   const measurementRecoveryKey='training-cognitive-publication:'+JSON.stringify([user?.id??'',id])
+  const measurementScope=useRef({key:measurementRecoveryKey,epoch:0})
+  if(measurementScope.current.key!==measurementRecoveryKey)measurementScope.current={key:measurementRecoveryKey,epoch:measurementScope.current.epoch+1}
+  useEffect(()=>()=>{measurementScope.current.epoch++},[])
   const [measurementUnknown,setMeasurementUnknown]=useState<PendingCognitivePublication|null>(()=>readPendingCognitivePublication(measurementRecoveryKey,user?.id??'',id))
   useEffect(()=>{setMeasurementUnknown(readPendingCognitivePublication(measurementRecoveryKey,user?.id??'',id));setMeasurementNotice('')},[measurementRecoveryKey,user?.id,id])
   const pendingMeasurement=measurementUnknown?.actorId===user?.id&&measurementUnknown?.id===id?measurementUnknown:null
@@ -255,6 +258,7 @@ export function QuestionnaireProductEdit() {
     setMeasurementUnknown(pending)
   }
   const actionInFlight = useRef(false)
+  useEffect(()=>{actionInFlight.current=false;setBusy(false)},[measurementRecoveryKey])
   const [preflight, setPreflight] = useState<{ revision: number; ok: boolean; checks: Array<{ key: string; label: string; status: string; message: string; targetId?: string }> } | null>(null)
   const [nameError, setNameError] = useState('')
   const [expiryError, setExpiryError] = useState('')
@@ -318,7 +322,9 @@ export function QuestionnaireProductEdit() {
     if (id !== 'new') void request('/' + id).then(row => { if (active) hydrate(row) }).catch(e => { if (active) setError(message(e)) })
     return () => { active = false }
   }, [id, preselectedScaleId, preselectedCourseId, user?.id])
-  const action = async (fn: () => Promise<void>) => {
+  const action = async (fn: () => Promise<void>, measurementRecovery = false) => {
+    if(pendingMeasurement&&!measurementRecovery){setError('请先恢复或明确结束原认知发布请求，再修改组合测评。');return}
+    const scopeEpoch=measurementScope.current.epoch
     if (reportRisk.current.dirty || reportRisk.current.pending || reportRisk.current.busy) { setError('请先保存报告修改或核对未确认的报告请求，再修改组合测评。'); return }
     if (actionInFlight.current) return
     actionInFlight.current = true
@@ -327,19 +333,29 @@ export function QuestionnaireProductEdit() {
     try {
       await fn()
     } catch (e) {
-      setError(message(e))
+      if(measurementScope.current.epoch===scopeEpoch)setError(message(e))
     } finally {
-      actionInFlight.current = false
-      setBusy(false)
+      if(measurementScope.current.epoch===scopeEpoch){actionInFlight.current = false;setBusy(false)}
     }
   }
   const publishCognitiveMeasurement=(pending:PendingCognitivePublication)=>void action(async()=>{
     if(pending.actorId!==user?.id||pending.id!==id)throw new Error('认知发布请求所属账号或组合已变化')
+    const scopeEpoch=measurementScope.current.epoch,originalKey=measurementRecoveryKey
     rememberMeasurement(pending);setMeasurementNotice('')
     const row=await request('/'+pending.id+'/measurement-instances/publish',{revision:pending.revision})
-    hydrate(row);setPreflight(null);rememberMeasurement(null)
+    // A late receipt may clear only its own exact persisted request, never the new workspace.
+    const saved=readPendingCognitivePublication(originalKey,pending.actorId,pending.id)
+    if(saved&&JSON.stringify(saved)===JSON.stringify(pending))sessionStorage.removeItem(originalKey)
+    if(measurementScope.current.epoch!==scopeEpoch||measurementScope.current.key!==originalKey)return
+    hydrate(row);setPreflight(null);setMeasurementUnknown(null)
     setMeasurementNotice('当前认知配置版本已发布。组合测评仍为草稿，尚未启动投放。')
-  })
+  },true)
+  const refreshCognitivePublication=()=>void action(async()=>{
+    const scopeEpoch=measurementScope.current.epoch,key=measurementRecoveryKey
+    const row=await request('/'+id)
+    if(measurementScope.current.epoch!==scopeEpoch||measurementScope.current.key!==key)return
+    hydrate(row);setPreflight(null);setMeasurementNotice('已重新读取当前草稿。请核对认知配置及发布记录；原请求仍保持未确认。')
+  },true)
   const persistencePolicy = () => ({schemaVersion:1,checkpoint:checkpointEnabled?{enabled:true,ttlHours:checkpointHours}:null,localCognitive:localCognitiveEnabled?{enabled:true,ttlHours:localCognitiveHours}:null})
   const feedbackPolicy = (): TrainingFeedbackPolicy => feedbackMode === 'SCHEDULED'
     ? { schemaVersion: 1, mode: 'SCHEDULED', releaseAt: parseLocalDateTime(feedbackReleaseAt)?.toISOString() ?? feedbackReleaseAt }
@@ -720,7 +736,8 @@ export function QuestionnaireProductEdit() {
         {measurementNotice && <p role="status">{measurementNotice}</p>}
         {pendingMeasurement && <div role="status"><p>修订 {pendingMeasurement.revision} 的发布结果尚未确认。重试始终使用原修订，不会自动改用当前修订或重复创建实例。重新读取不代表原请求已成功。</p>
           <ProductButton disabled={busy || dirty || reportBlocked} onClick={() => publishCognitiveMeasurement(pendingMeasurement)}>重试原修订请求</ProductButton>
-          <ProductButton disabled={busy || dirty || reportBlocked} onClick={() => void action(async () => { hydrate(await request('/' + id));setPreflight(null);setMeasurementNotice('已重新读取当前草稿。请核对认知配置及发布记录；原请求仍保持未确认。') })}>重新读取当前草稿</ProductButton>
+          <ProductButton disabled={busy || dirty || reportBlocked} onClick={refreshCognitivePublication}>重新读取当前草稿</ProductButton>
+          {detail.revision>pendingMeasurement.revision && <div><p>服务器当前修订已超过原修订，原请求已不能再提交。你可以结束此恢复；这不表示原发布成功，重新发布必须另行确认当前配置。</p><ProductButton disabled={busy || dirty || reportBlocked} onClick={()=>{rememberMeasurement(null);setMeasurementNotice('已结束失效修订的恢复，未确认原发布成功，也未重新发布。')}}>结束已失效修订恢复（不确认成功）</ProductButton></div>}
           {detail.revision>pendingMeasurement.revision && pendingMeasurement.itemIds.every(itemId=>detail.items?.some((item:any)=>item.id===itemId&&item.type==='COGNITIVE'&&typeof item.cognitiveAssignment?.measurementReleaseId==='string'&&item.cognitiveAssignment.measurementReleaseId)) && <div><p>当前修订已推进，原请求中的全部认知项均有测量版本指针。此状态不单独证明原请求成功；请明确核对后结束恢复。</p>
             <ProductButton disabled={busy || dirty || reportBlocked} onClick={()=>{rememberMeasurement(null);setMeasurementNotice('已按你的确认结束原请求恢复，未再次发布。')}}>已核对全部原认知项，结束恢复</ProductButton></div>}
         </div>}
@@ -732,7 +749,7 @@ export function QuestionnaireProductEdit() {
                 {draft && <ProductButton variant="secondary" disabled={busy || dirty} onClick={() => void action(async () => setPreflight(await request('/' + id + '/preflight', { revision: detail.revision })))}>发布前自检</ProductButton>}
                 {draft && (
                   <ProductButton
-                    disabled={busy || dirty}
+                    disabled={busy || dirty || !!pendingMeasurement}
                     variant="primary"
                     onClick={() => void publish()}
                   >
@@ -762,7 +779,7 @@ export function QuestionnaireProductEdit() {
       {id !== 'new' && !detail ? (
         <p role="status">正在加载问卷…</p>
       ) : (
-        <>
+        <fieldset disabled={!!pendingMeasurement} aria-label="组合测评编辑">
           <fieldset
             id="questionnaire-basic"
             disabled={busy || !draft}
@@ -1162,7 +1179,7 @@ export function QuestionnaireProductEdit() {
               )}
             </>
           )}
-        </>
+        </fieldset>
       )}
     </ProductPage>
   )

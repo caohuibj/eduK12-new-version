@@ -94,6 +94,40 @@ describe('questionnaire draft feedback', () => {
     expect(sessionStorage.getItem(key)).toBeNull();expect(api.post).toHaveBeenCalledTimes(2)
   })
 
+  it('blocks edits while the original publication is pending and safely ends an obsolete revision without claiming success', async () => {
+    const row = { id:'saved', name:'认知草稿', status:'DRAFT', revision:7, questionnaireType:'COURSE', questionnaireCourses:[], items:[{id:'cog',type:'COGNITIVE',position:0,cognitiveAssignment:{title:'认知任务'}}], formSections:[], publicEnabled:false }
+    let current:any=row
+    api.get.mockImplementation(async path=>({code:0,data:path.endsWith('/resources')?{scales:[],cognitive:[],situational:[],courses:[]}:current}))
+    api.post.mockRejectedValue(new Error('response lost'));mount('saved')
+    fireEvent.click(await screen.findByRole('button',{name:'发布当前认知配置版本'}));await screen.findByRole('button',{name:'重试原修订请求'})
+    expect(screen.getByLabelText('测评名称')).toBeDisabled()
+    expect(screen.getByRole('button',{name:'发布组合测评'})).toBeDisabled()
+    for(const button of screen.queryAllByRole('button',{name:/移除/}))expect(button).toBeDisabled()
+    fireEvent.click(screen.getByRole('button',{name:'发布前自检'}));await screen.findByText('请先恢复或明确结束原认知发布请求，再修改组合测评。')
+    expect(api.post).toHaveBeenCalledOnce()
+    current={...row,revision:8,items:[]};fireEvent.click(screen.getByRole('button',{name:'重新读取当前草稿'}))
+    fireEvent.click(await screen.findByRole('button',{name:'结束已失效修订恢复（不确认成功）'}))
+    expect(sessionStorage.getItem('training-cognitive-publication:'+JSON.stringify(['teacher-1','saved']))).toBeNull()
+    expect(api.post).toHaveBeenCalledOnce();expect(screen.queryByText('当前认知配置版本已发布。组合测评仍为草稿，尚未启动投放。')).not.toBeInTheDocument()
+    expect(screen.getByLabelText('测评名称')).toBeEnabled()
+  })
+  it('keeps a late publication response in its original composite scope after navigation', async () => {
+    const row=(id:string)=>({id,name:id==='old'?'旧组合':'新组合',status:'DRAFT',revision:7,questionnaireType:'COURSE',questionnaireCourses:[],items:[{id:'cog',type:'COGNITIVE',position:0,cognitiveAssignment:{title:'认知任务'}}],formSections:[],publicEnabled:false})
+    api.get.mockImplementation(async path=>({code:0,data:path.endsWith('/resources')?{scales:[],cognitive:[],situational:[],courses:[]}:row(path.endsWith('/old')?'old':'new-scope')}))
+    let finish!: (value:unknown)=>void;api.post.mockImplementation(()=>new Promise(resolve=>{finish=resolve}))
+    const newKey='training-cognitive-publication:'+JSON.stringify(['teacher-1','new-scope'])
+    const newPending={actorId:'teacher-1',id:'new-scope',revision:6,itemIds:['cog']};sessionStorage.setItem(newKey,JSON.stringify(newPending))
+    render(<MemoryRouter initialEntries={['/questionnaire-products/old']}><Link to="/questionnaire-products/new-scope">切换组合</Link><Routes><Route path="/questionnaire-products/:id" element={<QuestionnaireProductEdit/>}/></Routes></MemoryRouter>)
+    fireEvent.click(await screen.findByRole('button',{name:'发布当前认知配置版本'}));await waitFor(()=>expect(api.post).toHaveBeenCalledOnce())
+    fireEvent.click(screen.getByRole('link',{name:'切换组合'}));await screen.findByDisplayValue('新组合')
+    await act(async()=>finish({code:0,data:{...row('old'),revision:8}}))
+    expect(screen.getByLabelText('测评名称')).toHaveValue('新组合')
+    expect(JSON.parse(sessionStorage.getItem(newKey)!)).toEqual(newPending)
+    expect(sessionStorage.getItem('training-cognitive-publication:'+JSON.stringify(['teacher-1','old']))).toBeNull()
+    expect(screen.getByRole('button',{name:'重试原修订请求'})).toBeInTheDocument()
+    expect(screen.queryByText('当前认知配置版本已发布。组合测评仍为草稿，尚未启动投放。')).not.toBeInTheDocument()
+  })
+
   it('exposes the active composition section to keyboard and screen-reader users', async () => {
     mount()
     const steps = screen.getByRole('navigation', { name: '编制步骤' })
