@@ -1,9 +1,10 @@
+import {SurveyReinterpretationStudio} from './SurveyReinterpretationStudio'
 import {useEffect,useRef,useState} from 'react'
 type Pointer={releaseId:string;contentHash:string}
 type List={list:{finalId:string;attemptCode:string;completedAt:string;reports:{instrumentKey:string;measurementRelease:Pointer;reportRelease:Pointer|null;status:string}[]}[];nextAfterId:string|null}
-type Rendered={title:string|null;blocks:unknown[];limitations:string[];disclaimer:string|null}
+export type DeclaredReport={title:string|null;blocks:unknown[];limitations:string[];disclaimer:string|null}
 type View={accessAudience:'researcher';intendedAudience:string;sourceFinalHash:string;contentBindingHash:string;reportRelease:Pointer;
-  interpretationSemantics:string;lifecycleNotices:{layer:string;releaseId:string;status:string}[];report:Rendered}
+  interpretationSemantics:string;lifecycleNotices:{layer:string;releaseId:string;status:string}[];report:DeclaredReport}
 const text=(value:unknown)=>typeof value==='string'?value:''
 const record=(value:unknown):Record<string,unknown>=>value&&typeof value==='object'&&!Array.isArray(value)?value as Record<string,unknown>:{}
 const valueText=(value:unknown)=>typeof value==='number'&&Number.isFinite(value)?String(value):'不可用'
@@ -19,14 +20,20 @@ function Block({value}:{value:unknown}){
   if(block.type==='ASSET')return <p>附件：{text(block.alt)}（未取得独立附件访问链接，不加载资源）</p>
   return null
 }
+export function SurveyDeclaredReport({report}:{report:DeclaredReport}){return <>
+  <h4 className="font-semibold">{report.title??'版本报告'}</h4>
+  {report.blocks.map((block,index)=><Block key={index} value={block}/>)}
+  {report.limitations.map((line,index)=><p key={index}>{line}</p>)}<p>{report.disclaimer}</p>
+</>}
 /** Data-only report view: React text escaping, no HTML/script or guessed asset URL. */
-export function SurveyStoredReportReader({projectId,waveId,request}:{projectId:string;waveId:string;request:<T>(path:string)=>Promise<T>}){
+export function SurveyStoredReportReader({actorId,projectId,waveId,request}:{actorId?:string;projectId:string;waveId:string;request:<T>(path:string,method?:string,body?:unknown)=>Promise<T>}){
   const [list,setList]=useState<List|null>(null),[view,setView]=useState<View|null>(null),[busy,setBusy]=useState(false),[error,setError]=useState('')
+  const [selected,setSelected]=useState<{finalId:string;instrumentKey:string}|null>(null)
   const epoch=useRef(0)
-  useEffect(()=>{epoch.current++;setList(null);setView(null);setError('');setBusy(false);return()=>{epoch.current++}},[projectId,waveId])
+  useEffect(()=>{epoch.current++;setSelected(null);setList(null);setView(null);setError('');setBusy(false);return()=>{epoch.current++}},[projectId,waveId])
   const base='/projects/'+encodeURIComponent(projectId)+'/analytics/waves/'+encodeURIComponent(waveId)
   const run=async(work:()=>Promise<void>)=>{const current=++epoch.current;setBusy(true);setError('');setView(null)
-    try{await work()}catch(e){if(current===epoch.current){setList(null);setView(null);setError(e instanceof Error?e.message:'报告读取失败')}}
+    try{await work()}catch(e){if(current===epoch.current){setSelected(null);setList(null);setView(null);setError(e instanceof Error?e.message:'报告读取失败')}}
     finally{if(current===epoch.current)setBusy(false)}}
   const load=(afterId?:string)=>void run(async()=>{
     const current=epoch.current
@@ -49,10 +56,13 @@ export function SurveyStoredReportReader({projectId,waveId,request}:{projectId:s
         {row.reports.map(report=><div key={report.instrumentKey} className="space-x-2"><span>{report.instrumentKey} · {report.status}</span>
           {report.reportRelease&&<span className="text-xs">报告版本 {report.reportRelease.releaseId}</span>}
           <button type="button" className="btn-secondary" disabled={busy||report.status!=='READY'||!report.reportRelease}
-            onClick={()=>read(row.finalId,report.instrumentKey)}>查看 {report.instrumentKey} 报告</button></div>)}
+            onClick={()=>read(row.finalId,report.instrumentKey)}>查看 {report.instrumentKey} 报告</button>
+          {actorId&&<button type="button" className="btn-secondary" disabled={busy} onClick={()=>setSelected({finalId:row.finalId,instrumentKey:report.instrumentKey})}>为 {report.instrumentKey} 创建新解释</button>}</div>)}
       </article>)}
       <button type="button" className="btn-secondary" disabled={busy||!list.nextAfterId} onClick={()=>load(list.nextAfterId!)}>下一页报告记录</button>
     </div>}
+    {selected&&actorId&&<SurveyReinterpretationStudio key={actorId+':'+projectId+':'+waveId+':'+selected.finalId+':'+selected.instrumentKey}
+      actorId={actorId} projectId={projectId} waveId={waveId} {...selected} request={request}/>}
     {view&&<article aria-label="精确 FINAL 报告" className="border rounded p-3 space-y-3">
       <h4 className="font-semibold">{view.report.title??'版本报告'}</h4>
       <p className="text-xs">研究者访问 · 模板受众 {view.intendedAudience} · 报告版本 {view.reportRelease.releaseId}</p>

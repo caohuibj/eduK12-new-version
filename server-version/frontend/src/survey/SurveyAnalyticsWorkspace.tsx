@@ -380,7 +380,7 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
     <fieldset disabled={busy} className="min-w-0 border-0 p-0 space-y-4" aria-label="研究数据操作">
     <button className="btn-secondary" disabled={busy} onClick={()=>void execute(reload)}>刷新完成进度</button>
     {overview&&waveId&&<SurveyPrivateReferenceStudio actorId={actorId} key={'reference:'+actorId+':'+projectId+':'+waveId} projectId={projectId} waveId={waveId} request={api}/>}
-    {overview&&waveId&&<SurveyStoredReportReader key={projectId+':'+waveId} projectId={projectId} waveId={waveId} request={api}/>}
+    {overview&&waveId&&<SurveyStoredReportReader actorId={actorId} key={projectId+':'+waveId} projectId={projectId} waveId={waveId} request={api}/>}
     {overview&&<><div className="overflow-x-auto" tabIndex={0} role="region" aria-label="研究波次完成统计"><table className="w-full text-sm border-collapse">
       <thead><tr className="bg-slate-100"><th className="p-2 text-left">波次</th><th className="p-2">状态</th>
         <th className="p-2">已启动</th><th className="p-2">完成 FINAL</th>

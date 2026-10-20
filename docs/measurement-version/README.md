@@ -526,3 +526,24 @@ uses the exact original request-status protocol, same-actor/project/wave session
 storage and explicit uncertainty state. MISSING only enables identical retry;
 known pre-write refusals allow correction without discarding unknown outcomes.
 Thirteen component contracts passed; real browser/HTTP acceptance remains pending.
+
+### Explicit new interpretation UI and separate artifact export
+
+An exact FINAL/instrument from the report index can now open independent
+reinterpretation authoring: explicit data.reinterpret grant, report release and/or
+reference entry identities. It sends no actor, scores or inferred demographic
+fields. An uncertain request retains its same UUID/body under the actual actor,
+project, wave and FINAL in session storage; exact saved-artifact reading recovers a
+lost success. Known first refusals are distinguished from prior transport
+uncertainty and step-up. A successful operation requires an explicit new-authoring
+action before another interpretation can be created.
+
+The separate “interpretation JSON” button performs a fresh currently authorized
+artifact GET before making a browser download. It is not part of any default raw
+export, stores no server export copy and does not rerun selection/rendering. It
+exports the saved immutable artifact, including its exact identities and statuses.
+Rendering reuses safe declarative report nodes, with no unauthorized asset URLs.
+Leaving a FINAL drops late responses, including export responses. 27 focused
+reinterpretation/report/default-download component contracts and frontend strict
+types passed. Real browser download/session recovery and network/API acceptance
+remain for V10; these are not claimed by component mocks.
