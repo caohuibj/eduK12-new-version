@@ -90,8 +90,8 @@
       },
       "server-version/e2e/measurement-version-journeys.cjs": {
         "before": "3f81de54bed5897091881c26d34eade9bf40ce92",
-        "after": "fcc0cc3e38bed519264398cccc80779e8df51ae3",
-        "reason": "Independently reviewed failure-only callback barriers and journeys-only loopback fault injection; original admin assertions and product unchanged. New admin failure paths are not claimed tested."
+        "after": "820480c6fea073d4a51854906cf2a87ed55d7c40",
+        "reason": "Independently reviewed failure-only callback barriers and journeys-only loopback fault injection; original admin assertions and product unchanged. New admin failure paths are not claimed tested. Diagnostic-only snapshot and bounded geometry are recorded before the unchanged journey overflow assertion; admin imported locators remain identical."
       }
     },
     "adminRunnerSuccessSha256": "1ae187bc47d82446fb1bd3e58bde433fe69cb2c8ed90f7e93a36569240e8d60d",

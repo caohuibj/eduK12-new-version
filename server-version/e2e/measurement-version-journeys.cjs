@@ -41,8 +41,20 @@ async function layout(page, output, name, check) {
   for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: 960 })
     await page.evaluate(() => document.fonts.ready)
-    check(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), name + ': no overflow at ' + width)
+    const geometry = await page.evaluate(() => ({
+      viewport: innerWidth, documentWidth: document.documentElement.scrollWidth,
+      // No text, values, IDs, attributes, HTML, URLs or session data.
+      overflowing: [...document.querySelectorAll('body *')].map(element => {
+        const rect = element.getBoundingClientRect(), style = getComputedStyle(element)
+        return { tag: element.tagName, left: Math.round(rect.left), right: Math.round(rect.right),
+          width: Math.round(rect.width), minWidth: style.minWidth, overflowWrap: style.overflowWrap,
+          whiteSpace: style.whiteSpace }
+      }).filter(rect => rect.right > innerWidth + 1 || rect.left < -1).slice(0, 40),
+    }))
+    // Capture the actual failing page before its isolated context is closed.
     await page.screenshot({ path: path.join(output, name + '-' + width + '.png'), fullPage: true })
+    fs.writeFileSync(path.join(output, name + '-' + width + '-geometry.json'), JSON.stringify(geometry, null, 2))
+    check(geometry.documentWidth <= geometry.viewport + 1, name + ': no overflow at ' + width)
   }
 }
 async function authorReport(page, studio, base, { title, audience, check }) {
