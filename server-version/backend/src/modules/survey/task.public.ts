@@ -96,7 +96,8 @@ export async function getOwnResearchTask(input:{
     ?await readSurveyCognitiveProgressFromVerifiedAttempt(input,own):null
   return {attemptId:own.attemptId,waveId:own.waveId,status:own.status,
     ...(cognitiveProgress??{}),
-    definitionDigest:own.definitionDigest,reportMode:'GENERAL_ONLY',units,
+    definitionDigest:own.definitionDigest,reportMode:selected.units.some(unit=>
+      (unit.kind==='SCALE'||unit.kind==='SJT')&&unit.participantFeedback?.mode==='DESCRIPTIVE')?'DESCRIPTIVE':'GENERAL_ONLY',units,
     ...(own.compiledSnapshot.checkpointPolicy?{
       checkpointPolicy:{enabled:true,ttlHours:own.compiledSnapshot.checkpointPolicy.ttlHours},
     }:{}),

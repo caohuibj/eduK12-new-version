@@ -63,6 +63,6 @@ export function rawParticipantFeedback(unit:ResearchFrozenUnit,result:FrozenUnit
       ?[{key,label:key,value:score.value,unit:null,status:'OK' as const}]:[]
   })
   if(!metrics.length)return null
-  return {pending:false as const,instrumentKey:unit.instrumentKey,title:unit.title,
+  return {feedbackKind:'RAW_METRICS' as const,pending:false as const,instrumentKey:unit.instrumentKey,title:unit.title,
     measurementReleaseId:unit.measurementRelease.releaseId,metrics,quality:'interpretable' as const}
 }

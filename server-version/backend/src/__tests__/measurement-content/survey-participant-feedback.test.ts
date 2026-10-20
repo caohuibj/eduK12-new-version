@@ -46,7 +46,7 @@ describe('explicit frozen participant raw metric policy',()=>{
   expect(()=>freezeSurveyParticipantFeedback([unit()],[{instrumentId:draftId,feedback:{...policy(),metricKeys:['unknown']}}],new Map([[draftId,['safe']]]))).toThrow()
  })
  it.each(['SCALE','SJT'] as const)('projects only explicitly allowed stored %s values, with no private/template/reference data',kind=>{
-  expect(rawParticipantFeedback(unit(kind),stored(kind),true)).toEqual({pending:false,instrumentKey:'instrument',title:'Title',measurementReleaseId:'measurement',metrics:[{key:'safe',label:'safe',value:7,unit:null,status:'OK'}],quality:'interpretable'})
+  expect(rawParticipantFeedback(unit(kind),stored(kind),true)).toEqual({feedbackKind:'RAW_METRICS',pending:false,instrumentKey:'instrument',title:'Title',measurementReleaseId:'measurement',metrics:[{key:'safe',label:'safe',value:7,unit:null,status:'OK'}],quality:'interpretable'})
  })
  it('denies unknown policy keys, wrong source identity, missing quality and noninterpretable/noncalculated/nonfinite values',()=>{
   expect(()=>rawParticipantFeedback({...unit(),participantFeedback:{...policy(),metricKeys:['unknown']}},stored(),true)).toThrow()
@@ -133,4 +133,19 @@ describe('actual compiler → verified FINAL computation → participant project
    expect(rawParticipantFeedback(frozen,changed,true)).toBeNull()
   }
  })
+})
+
+
+import {getOwnResearchTask} from '../../modules/survey/task.public'
+it('signals explicit raw feedback in the actual task DTO without disclosing policy keys or measurement release',async()=>{
+ activeUnit=compileFrozenResearchUnit({id:draftId,instrumentKey:'scale',kind:'SCALE',title:'Scale',revision:1,definition:realScale})
+ const original=await getOwnResearchTask(proof)
+ expect(original.reportMode).toBe('GENERAL_ONLY')
+ activeUnit.participantFeedback={...policy(),metricKeys:['total']}
+ activeUnit.measurementRelease={releaseId:'private-release',contentHash:'hash',measurementHash:'hash'}
+ const task=await getOwnResearchTask(proof)
+ expect(task.reportMode).toBe('DESCRIPTIVE')
+ expect(JSON.stringify(task)).not.toMatch(/participantFeedback|metricKeys|private-release|scoringDigest|compiledDefinition/)
+ activeUnit.participantFeedback={...policy(),mode:'GENERAL',metricKeys:[]}
+ expect((await getOwnResearchTask(proof)).reportMode).toBe('GENERAL_ONLY')
 })

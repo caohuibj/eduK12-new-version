@@ -390,3 +390,21 @@ one matching execution record and renders a report only when its result is READY
 skipped units remain NOT_EXECUTED / report UNAVAILABLE with no rendered report.
 Two real Flow→compute→encrypted reader→reinterpretation tests cover skipped and
 executed controls; database/authorization/release lookup boundaries are mocked.
+
+### V08 author/participant raw-feedback UI closure
+
+Wave Studio provides explicit, default-off Scale/SJT metric checkboxes and the
+existing feedback timing. These are prepare-time selections, not saved draft
+settings; navigation, tool revisions and removing tools clear them visibly.
+Frozen display is read from the actual digest-verified publication in the owner
+getWave path, never inferred from edited drafts. That inherited owner helper now
+checks account expiry with the database clock after identity locks.
+
+Participant task DTO exposes only DESCRIPTIVE availability, not private allowlist
+or scoring keys. A successful first FINAL follows that mode to the authorized
+`/general` reader. RAW_METRICS is an explicit response kind: missing units are not
+guessed as milliseconds, while existing Cognitive percent/ms formatting remains.
+This remains controlled raw feedback, not participant reference/template reports.
+Author UI 35, frozen-read 7, participant UI 50 and backend feedback 18 targeted
+contracts pass. These are component/service contracts, not live browser/HTTP or
+concurrent lock evidence. Final type validation will be combined with main alignment.
