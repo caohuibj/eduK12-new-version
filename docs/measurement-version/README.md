@@ -490,3 +490,11 @@ is denied. Reading the exact resulting grant (including a revoked version) permi
 an explicitly confirmed archive/end of that request. Expired end times are rejected
 before sending. Twelve component contracts passed, including lost-success metadata
 recovery, same-UUID retry, known rejection and revoked-request resolution.
+
+Root request recovery now persists hadUnknownOutcome separately from pending
+state. A pre-write step-up/401 refusal does not mark an unknown write; a later
+explicit rejection can therefore unlock editing. Any prior uncertain transport
+retains the UUID after subsequent refusals. In-flight storage is pessimistically
+marked unknown; old records without this marker are also treated as unknown.
+Fourteen component contracts cover both step-up → rejection and step-up → unknown
+transport → rejection paths.

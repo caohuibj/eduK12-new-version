@@ -108,3 +108,14 @@ it('a later explicit denial cannot erase an earlier unknown result',async()=>{
  expect(mocks.post.mock.calls[1][1]).toEqual(first);expect(screen.getByLabelText('项目 UUID')).toBeDisabled()
  expect(JSON.parse(sessionStorage.getItem('admin-content-pending:'+id(9))!).request.requestId).toBe(first.requestId)
 })
+
+it.each([false,true])('step-up then denial retains only requests with unknown transport history: %s',async unknown=>{
+ mocks.post.mockRejectedValueOnce({status:403,message:'内容授权变更需要最近的安全密钥验证'})
+ if(unknown)mocks.post.mockRejectedValueOnce(new Error('response lost'))
+ mocks.post.mockRejectedValueOnce({status:403,message:'内容授权范围或当前身份无效'})
+ render(<AdminContentPermissions actorId={id(9)}/>);fill();fireEvent.click(screen.getByLabelText('reference.review'))
+ fireEvent.click(screen.getByRole('button',{name:'确认签发内容授权'}));await screen.findByRole('alert')
+ if(unknown){fireEvent.click(screen.getByRole('button',{name:'重试同一签发请求'}));await waitFor(()=>expect(mocks.post).toHaveBeenCalledTimes(2));await waitFor(()=>expect(screen.getByRole('button',{name:'重试同一签发请求'})).not.toBeDisabled())}
+ fireEvent.click(screen.getByRole('button',{name:'重试同一签发请求'}));await waitFor(()=>expect(mocks.post).toHaveBeenCalledTimes(unknown?3:2))
+ await waitFor(()=>{if(unknown)expect(screen.getByLabelText('项目 UUID')).toBeDisabled();else expect(screen.getByLabelText('项目 UUID')).not.toBeDisabled()})
+})

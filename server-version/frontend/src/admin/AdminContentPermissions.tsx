@@ -8,18 +8,19 @@ type Metadata=Grant&{grantId:string;version:number;parentGrantId:string|null;iss
 function restore(actorId:string){
   try{
     const raw=sessionStorage.getItem('admin-content-pending:'+actorId)
-    if(!raw)return {request:null,error:''}
+    if(!raw)return {request:null,error:'',hadUnknown:false}
     const stored=JSON.parse(raw)
     if(stored.actorId!==actorId||!uuid.test(stored.request?.requestId)||stored.request?.expectedVersion!==0||
       !Array.isArray(stored.request?.grant?.capabilities)||!Array.isArray(stored.request?.grant?.scope?.resourceKeys)||
       typeof stored.request?.grant?.subjectId!=='string'||typeof stored.request?.reason!=='string')
       return {request:null,error:'保存的请求无法恢复，请先按原授权编号核对；不要重复签发。'}
-    return {request:stored.request as Request,error:''}
+    return {request:stored.request as Request,error:'',hadUnknown:stored.hadUnknownOutcome!==false}
   }catch{return {request:null,error:'无法读取当前管理员的待核对请求，请先核对此前授权记录。'}}
 }
 export default function AdminContentPermissions({actorId}:{actorId:string}){
   const [restored]=useState(()=>restore(actorId))
   const [storageError,setStorageError]=useState(restored.error)
+  const [hadUnknown,setHadUnknown]=useState(restored.hadUnknown??true)
   const [subject,setSubject]=useState(''),[project,setProject]=useState(''),[resources,setResources]=useState('')
   const [kind,setKind]=useState<'reference'|'data'>('reference'),[caps,setCaps]=useState<string[]>([]),[delegate,setDelegate]=useState(false)
   const [from,setFrom]=useState(''),[until,setUntil]=useState(''),[reason,setReason]=useState('')
@@ -31,8 +32,8 @@ export default function AdminContentPermissions({actorId}:{actorId:string}){
     window.addEventListener('beforeunload',protect)
     return ()=>window.removeEventListener('beforeunload',protect)
   },[pending])
-  function retain(request:Request){
-    try{sessionStorage.setItem('admin-content-pending:'+actorId,JSON.stringify({actorId,request}));setStorageError('')}
+  function retain(request:Request,unknown=hadUnknown){
+    try{sessionStorage.setItem('admin-content-pending:'+actorId,JSON.stringify({actorId,request,hadUnknownOutcome:unknown}));setStorageError('')}
     catch{setStorageError('浏览器无法保存待核对请求。请勿离开或刷新此页；当前请求仍可重试，离开前必须保存请求编号并核对。')}
   }
   async function issue(){
@@ -46,16 +47,20 @@ export default function AdminContentPermissions({actorId}:{actorId:string}){
       request={requestId:crypto.randomUUID(),expectedVersion:0,reason:reason.trim(),grant:{subjectId:subject.trim(),scope:{product:'SURVEY',scopeKind:'PROJECT',scopeId:project.trim(),resourceKind:kind,resourceKeys:keys},capabilities:selected,delegableCapabilities:delegate?selected:[],remainingDelegationDepth:delegate?1:0,validFrom:new Date(from).toISOString(),expiresAt:new Date(until).toISOString()}}
     }
     if(!window.confirm(`确认向 ${request.grant.subjectId} 签发 ${request.grant.capabilities.join('、')}？项目 ${request.grant.scope.scopeId}，精确资源 ${request.grant.scope.resourceKeys.length} 项，到期 ${request.grant.expiresAt}。${request.grant.remainingDelegationDepth?'允许一层受限委派。':'不允许委派。'}`))return
-    retain(request);setPending(request);setLookup(request.requestId);setRow(null);setBusy(true)
+    retain(request,true);setPending(request);setLookup(request.requestId);setRow(null);setBusy(true)
     try{const result=await api.post<{grantId:string;version:number}>('/admin/permissions/content-grants',request);setLookup(result.data!.grantId);setRow(null);setNotice(`已确认授权 ${result.data!.grantId}，版本 ${result.data!.version}。可读取核对后撤销。`);setPending(null);setIssued(true);try{sessionStorage.removeItem('admin-content-pending:'+actorId);setStorageError('')}catch{setStorageError('签发已成功，但浏览器未能清理已完成请求；恢复后请按原编号核对，勿重复编制。')}}
     catch(e){
       const failure=e as ApiClientError,message=typeof failure?.message==='string'?failure.message:'请求未完成'
-      // Only a first, explicit validation/authorization rejection proves this
-      // request was not committed. A denial after an unknown attempt proves nothing.
-      if(!pending&&(failure.status===400||failure.status===403)&&!/安全密钥|重新登录|会话/.test(message)){
+      // Track unknown outcomes separately from a pending step-up request.
+      // A denial after an unknown attempt cannot prove no prior commit.
+      if(!hadUnknown&&(failure.status===400||failure.status===403)&&!/安全密钥|重新登录|会话/.test(message)){
         try{sessionStorage.removeItem('admin-content-pending:'+actorId);setPending(null);setError(message+'；本次请求明确未执行，可修改后重新签发。')}
         catch{setError(message+'；无法清理保存请求，请保留编号核对。')}
-      }else setError(message+'；请求编号及内容已保留，可重新验证安全密钥后重试，或读取同编号元数据核对并结束请求。')
+      }else {
+        const unknown=hadUnknown||![400,401,403,409,429].includes(failure.status??0)
+        setHadUnknown(unknown);retain(request!,unknown)
+        setError(message+'；请求编号及内容已保留，可重新验证安全密钥后重试，或读取同编号元数据核对并结束请求。')
+      }
     }
     finally{setBusy(false)}
   }
@@ -90,7 +95,7 @@ export default function AdminContentPermissions({actorId}:{actorId:string}){
     </fieldset>
     {pending&&<p>待核对请求编号：{pending.requestId}。内容已锁定；请先重试或读取该编号核对，不要重复签发。{storageError?'当前保存状态异常，请勿离页。':'请求按当前管理员保存在本标签页，重进后可继续核对。'}</p>}
     <button className="btn-primary" disabled={busy||issued||Boolean(restored.error)} onClick={()=>void issue()}>{pending?'重试同一签发请求':'确认签发内容授权'}</button>
-    {issued&&<button className="btn-secondary" disabled={busy} onClick={()=>{setIssued(false);setSubject('');setProject('');setResources('');setCaps([]);setDelegate(false);setFrom('');setUntil('');setReason('')}}>编制另一份授权</button>}
+    {issued&&<button className="btn-secondary" disabled={busy} onClick={()=>{setIssued(false);setHadUnknown(false);setSubject('');setProject('');setResources('');setCaps([]);setDelegate(false);setFrom('');setUntil('');setReason('')}}>编制另一份授权</button>}
     <h3>读取与撤销</h3><label>授权 UUID<input value={lookup} disabled={busy} onChange={e=>{setLookup(e.target.value);setRow(null)}}/></label><button className="btn-secondary" disabled={busy} onClick={()=>void read()}>读取授权元数据</button>
     {row&&<div><p>授权 {row.grantId} · 版本 {row.version} · {row.revokedAt?'已撤销':'未撤销（实际使用仍检查期限与祖先）'}</p><p>目标 {row.subjectId} · 项目 {row.scope.scopeId} · {row.scope.resourceKind}</p><p>能力：{row.capabilities.join('、')}；可委派：{row.delegableCapabilities.join('、')||'无'}</p><p>期限：{row.validFrom} 至 {row.expiresAt}</p><p>父授权：{row.parentGrantId||'根授权'}；资源：{row.scope.resourceKeys.join('、')}</p>
       {pending&&row.grantId===pending.requestId&&<button className="btn-secondary" disabled={busy} onClick={finishVerified}>按已读记录结束待核对请求</button>}
