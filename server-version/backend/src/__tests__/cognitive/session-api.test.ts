@@ -32,6 +32,7 @@ const makeReq = (overrides: any = {}) => ({
 
 const makeRes = () => {
   const res: any = { statusCode: 0, body: null }
+  res.setHeader = vi.fn(() => res)
   res.status = vi.fn((code: number) => {
     res.statusCode = code
     return res
@@ -77,6 +78,7 @@ describe('cognitive session API', () => {
     ;(sessionService.getSession as any).mockRejectedValue({ statusCode: 404, message: 'CognitiveSession not found' })
     await cognitiveController.getSession(req, res)
     expect(res.statusCode).toBe(404)
+    expect(res.setHeader).toHaveBeenCalledWith('Cache-Control', 'no-store')
   })
 
   it('returns code:0 with runner payload on create', async () => {

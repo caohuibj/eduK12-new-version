@@ -1,7 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 const mocks=vi.hoisted(()=>({findUnique:vi.fn(),selected:vi.fn(),decrypt:vi.fn()}))
 vi.mock('../../config/database',()=>({prisma:{situationalAttempt:{findUnique:mocks.findUnique}}}))
-vi.mock('../../modules/composite/training-variant-child-scope',()=>({assertTrainingChildSelected:mocks.selected,TRAINING_VARIANT_PARENT_MARKER_SELECT:{}}))
+vi.mock('../../modules/composite/training-variant-child-scope',async()=>({
+ ...await vi.importActual('../../modules/composite/training-variant-markers'),
+ assertTrainingChildSelected:mocks.selected,
+}))
 vi.mock('../../modules/assessment-runtime/situational-runtime-snapshot',async()=>({...await vi.importActual('../../modules/assessment-runtime/situational-runtime-snapshot'),decryptFrozenSituationalRuntimeSnapshot:mocks.decrypt}))
 import { loadEmbeddedSituationalAttemptRuntime } from '../../modules/situational/situational-runtime.service'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
