@@ -1,5 +1,5 @@
 import {useEffect,useState} from 'react'
-import api from '../api/client'
+import api,{type ApiClientError} from '../api/client'
 const referenceCapabilities=['reference.analyze','reference.review','reference.publish'] as const
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 type Grant={subjectId:string;scope:{product:'SURVEY';scopeKind:'PROJECT';scopeId:string;resourceKind:'reference'|'data';resourceKeys:string[]};capabilities:string[];delegableCapabilities:string[];remainingDelegationDepth:number;validFrom:string;expiresAt:string}
@@ -40,7 +40,7 @@ export default function AdminContentPermissions({actorId}:{actorId:string}){
     let request=pending
     if(!request){
       const keys=resources.split(/[\s,]+/).filter(Boolean),selected=kind==='data'?['data.reinterpret']:caps
-      if(!uuid.test(subject.trim())||!uuid.test(project.trim())||!keys.length||keys.length>128||keys.some(key=>!uuid.test(key))||new Set(keys).size!==keys.length||!selected.length||!reason.trim()||!from||!until||!Number.isFinite(Date.parse(from))||!Number.isFinite(Date.parse(until))||Date.parse(until)<=Date.parse(from)){
+      if(!uuid.test(subject.trim())||!uuid.test(project.trim())||!keys.length||keys.length>128||keys.some(key=>!uuid.test(key))||new Set(keys).size!==keys.length||!selected.length||!reason.trim()||!from||!until||!Number.isFinite(Date.parse(from))||!Number.isFinite(Date.parse(until))||Date.parse(until)<=Date.parse(from)||Date.parse(until)<=Date.now()){
         setError('请填写有效 UUID、至少一项能力、有效期限和原因；资源最多 128 项且不得重复。');return
       }
       request={requestId:crypto.randomUUID(),expectedVersion:0,reason:reason.trim(),grant:{subjectId:subject.trim(),scope:{product:'SURVEY',scopeKind:'PROJECT',scopeId:project.trim(),resourceKind:kind,resourceKeys:keys},capabilities:selected,delegableCapabilities:delegate?selected:[],remainingDelegationDepth:delegate?1:0,validFrom:new Date(from).toISOString(),expiresAt:new Date(until).toISOString()}}
@@ -48,11 +48,27 @@ export default function AdminContentPermissions({actorId}:{actorId:string}){
     if(!window.confirm(`确认向 ${request.grant.subjectId} 签发 ${request.grant.capabilities.join('、')}？项目 ${request.grant.scope.scopeId}，精确资源 ${request.grant.scope.resourceKeys.length} 项，到期 ${request.grant.expiresAt}。${request.grant.remainingDelegationDepth?'允许一层受限委派。':'不允许委派。'}`))return
     retain(request);setPending(request);setLookup(request.requestId);setRow(null);setBusy(true)
     try{const result=await api.post<{grantId:string;version:number}>('/admin/permissions/content-grants',request);setLookup(result.data!.grantId);setRow(null);setNotice(`已确认授权 ${result.data!.grantId}，版本 ${result.data!.version}。可读取核对后撤销。`);setPending(null);setIssued(true);try{sessionStorage.removeItem('admin-content-pending:'+actorId);setStorageError('')}catch{setStorageError('签发已成功，但浏览器未能清理已完成请求；恢复后请按原编号核对，勿重复编制。')}}
-    catch(e){setError((e instanceof Error?e.message:'请求未完成')+'；请求编号及内容已保留，重新验证安全密钥后可用同一请求重试。')}
+    catch(e){
+      const failure=e as ApiClientError,message=typeof failure?.message==='string'?failure.message:'请求未完成'
+      // Only a first, explicit validation/authorization rejection proves this
+      // request was not committed. A denial after an unknown attempt proves nothing.
+      if(!pending&&(failure.status===400||failure.status===403)&&!/安全密钥|重新登录|会话/.test(message)){
+        try{sessionStorage.removeItem('admin-content-pending:'+actorId);setPending(null);setError(message+'；本次请求明确未执行，可修改后重新签发。')}
+        catch{setError(message+'；无法清理保存请求，请保留编号核对。')}
+      }else setError(message+'；请求编号及内容已保留，可重新验证安全密钥后重试，或读取同编号元数据核对并结束请求。')
+    }
     finally{setBusy(false)}
   }
   async function read(){setRow(null);setError('');if(!uuid.test(lookup.trim())){setError('请填写有效授权 UUID');return}setBusy(true)
     try{const result=await api.get<Metadata>('/admin/permissions/content-grants/'+lookup.trim());setRow(result.data!)}catch(e){setError(e instanceof Error?e.message:'读取未完成')}finally{setBusy(false)}}
+  function finishVerified(){
+    if(!pending||!row||row.grantId!==pending.requestId)return
+    if(!window.confirm(`已读取实际授权 ${row.grantId}，版本 ${row.version}，${row.revokedAt?'已撤销':'未撤销'}。确认归档此请求并结束重试？`))return
+    try{
+      sessionStorage.setItem('admin-content-last-verified:'+actorId,JSON.stringify({requestId:pending.requestId,grantId:row.grantId,version:row.version,revokedAt:row.revokedAt}))
+      sessionStorage.removeItem('admin-content-pending:'+actorId);setPending(null);setIssued(true);setStorageError('');setError('');setNotice('已按真实授权元数据结束请求。需要新授权时请显式编制另一份。')
+    }catch{setStorageError('无法归档当前请求，仍保留原编号，请勿重复签发。')}
+  }
   async function revoke(){if(!row||!revokeReason.trim())return
     if(!window.confirm(`确认撤销授权 ${row.grantId}（版本 ${row.version}）？其后代授权将同时失效。`))return
     setBusy(true);setError('');try{await api.post('/admin/permissions/content-grants/'+row.grantId+'/revoke',{expectedVersion:row.version,reason:revokeReason.trim()});setRow(null);setNotice('撤销已确认，请重新读取当前状态。')}
@@ -77,6 +93,7 @@ export default function AdminContentPermissions({actorId}:{actorId:string}){
     {issued&&<button className="btn-secondary" disabled={busy} onClick={()=>{setIssued(false);setSubject('');setProject('');setResources('');setCaps([]);setDelegate(false);setFrom('');setUntil('');setReason('')}}>编制另一份授权</button>}
     <h3>读取与撤销</h3><label>授权 UUID<input value={lookup} disabled={busy} onChange={e=>{setLookup(e.target.value);setRow(null)}}/></label><button className="btn-secondary" disabled={busy} onClick={()=>void read()}>读取授权元数据</button>
     {row&&<div><p>授权 {row.grantId} · 版本 {row.version} · {row.revokedAt?'已撤销':'未撤销（实际使用仍检查期限与祖先）'}</p><p>目标 {row.subjectId} · 项目 {row.scope.scopeId} · {row.scope.resourceKind}</p><p>能力：{row.capabilities.join('、')}；可委派：{row.delegableCapabilities.join('、')||'无'}</p><p>期限：{row.validFrom} 至 {row.expiresAt}</p><p>父授权：{row.parentGrantId||'根授权'}；资源：{row.scope.resourceKeys.join('、')}</p>
+      {pending&&row.grantId===pending.requestId&&<button className="btn-secondary" disabled={busy} onClick={finishVerified}>按已读记录结束待核对请求</button>}
       <label>撤销原因<input value={revokeReason} maxLength={500} onChange={e=>setRevokeReason(e.target.value)}/></label><button className="btn-secondary" disabled={busy||Boolean(row.revokedAt)||!revokeReason.trim()} onClick={()=>void revoke()}>确认撤销已读授权</button></div>}
     {storageError&&<p role="alert">{storageError}</p>}{error&&<p role="alert">{error}</p>}{notice&&<p role="status">{notice}</p>}
   </section>

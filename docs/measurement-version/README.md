@@ -482,3 +482,11 @@ release identity, hash, version, status, family and layer leave the handler. The
 shared release retains internal evidence, but its sample manifest and provenance
 are never returned by this operation. A populated-manifest response regression
 contract verifies this boundary (four route contracts passed).
+
+Root-management recovery distinguishes a first explicit non-session 400/403
+rejection from uncertain transport and step-up failures. The former permits
+editing; a previously uncertain UUID remains unchanged even if a later attempt
+is denied. Reading the exact resulting grant (including a revoked version) permits
+an explicitly confirmed archive/end of that request. Expired end times are rejected
+before sending. Twelve component contracts passed, including lost-success metadata
+recovery, same-UUID retry, known rejection and revoked-request resolution.
