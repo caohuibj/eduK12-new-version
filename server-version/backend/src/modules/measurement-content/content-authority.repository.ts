@@ -6,8 +6,9 @@ import {
   type ContentAuthorityScope, type ContentCapability, type ContentGrant, type ContentGrantInput,
 } from './content-authority'
 
-/* INTERNAL ONLY. No root issuer or HTTP endpoint until the final admin strong-auth
- * integration. The caller must use an authenticated User, current entry eligibility,
+/* Internal business authorization primitives. Root issuance is restricted by
+ * admin-authority.service and the unified strong-auth management route.
+ * The caller must use an authenticated User, current entry eligibility,
  * object/data access and source-license checks in the same business transaction.
  * Content capabilities grant none of those rights. Never accept actorId from a body.
  * Use READ COMMITTED transactions; locks are held through the protected write.

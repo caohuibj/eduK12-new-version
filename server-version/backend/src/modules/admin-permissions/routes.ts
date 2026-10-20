@@ -1,3 +1,4 @@
+import {issueAdminContentRoot,revokeAdminContentGrant,readAdminContentGrant} from '../measurement-content/admin-authority.service'
 import { Router, type Request, type Response, type NextFunction } from 'express'
 import { z } from 'zod'
 import { prisma } from '../../config/database'
@@ -89,3 +90,13 @@ adminPermissionsRouter.get('/audit', handle(req => {
   return prisma.adminAuthorizationAudit.findMany({ where: { targetUserId: input.targetUserId }, take: 25, skip: (input.page - 1) * 25,
     orderBy: [{ createdAt: 'desc' }, { id: 'desc' }] })
 }))
+
+// Fixed first-wave content domains only. Uses the existing management session,
+// origin and rate boundaries; the transaction rechecks strong authentication.
+adminPermissionsRouter.post('/content-grants',requireRecentAdminKey,handle(req=>
+  issueAdminContentRoot(req.user!.userId,req.user!,req.body)))
+adminPermissionsRouter.post('/content-grants/:id/revoke',requireRecentAdminKey,handle(req=>
+  revokeAdminContentGrant(req.user!.userId,req.user!,z.string().uuid().parse(req.params.id),req.body)))
+
+adminPermissionsRouter.get('/content-grants/:id',requireRecentAdminKey,handle(req=>
+  readAdminContentGrant(req.user!.userId,req.user!,z.string().uuid().parse(req.params.id))))

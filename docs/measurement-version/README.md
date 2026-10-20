@@ -429,3 +429,17 @@ the missing official WebAuthn dependency was installed from an exact 25-entry
 subset of main's lockfile and all installed versions/integrities compared equal.
 This isolated dependency addition consumes 8.7 MiB; source lockfiles unchanged.
 No browser transport, connected PostgreSQL or final CI claim is made here.
+
+### V05 actual system root issuer (2026-10-20)
+
+The merged unified management route now signs and revokes fixed SURVEY PROJECT
+content grants after the existing recent security-key proof. Reference capabilities
+are limited to exact private measurement releases; data.reinterpret is limited to
+actual FINAL IDs in the target owner's project. User, researcher eligibility, MFA,
+resource membership and expiry are checked under transaction locks. Request UUID
+replay, withdrawal version CAS and existing authorization audit are retained.
+No entry administrator or owner gains these capabilities automatically.
+
+25 focused service/route/authority contracts passed; merged backend strict types
+passed. No real grants were issued. Connected HTTP/database contention, management
+UI, Training/catalog consumers and formal-norm production access remain pending.
