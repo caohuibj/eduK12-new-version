@@ -50,14 +50,22 @@ function client(saved = {}) {
         result.requests.push({ route, method, status: response.status, elapsedMs: performance.now() - started, outcome: 'UNKNOWN_RESPONSE_BODY', error: error.name })
         throw new Error(`Uncertain response body for ${method} ${route}; inspect state before any retry`)
       }
-      result.requests.push({ route, method, status: response.status, elapsedMs: performance.now() - started, bytes: bytes.length })
+      const requestRecord = { route, method, status: response.status, elapsedMs: performance.now() - started, bytes: bytes.length }
+      result.requests.push(requestRecord)
       const expectedCodes = Array.isArray(expected) ? expected : [expected]
       if (!expectedCodes.includes(response.status)) {
         write('private/last-http-error.json', { route, method, status: response.status, body: bytes.toString() })
         throw new Error(`${method} ${route}: HTTP ${response.status}; private error retained`)
       }
       if (raw) return bytes
-      const envelope = JSON.parse(bytes.toString())
+      let envelope
+      try {
+        envelope = JSON.parse(bytes.toString())
+        assert.ok(envelope && typeof envelope === 'object' && typeof envelope.code === 'number')
+      } catch {
+        requestRecord.outcome = 'UNKNOWN_RESPONSE_ENVELOPE'
+        throw new Error(`Uncertain response envelope for ${method} ${route}; inspect state before any retry`)
+      }
       if (response.status !== 200) return envelope
       assert.equal(envelope.code, 0, `${route}: API code ${envelope.code}`)
       return normalize(envelope.data)
