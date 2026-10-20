@@ -39,7 +39,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        component: [backend, frontend]
+        component: [backend]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -53,6 +53,35 @@ jobs:
         if: always()
         with:
           name: measurement-${{ github.run_id }}-${{ github.sha }}-${{ matrix.component }}-admission-attempt-${{ github.run_attempt }}
+          path: measurement-browser-evidence/*.json
+          retention-days: 3
+          if-no-files-found: error
+  frontend:
+    name: build changed formal-reference frontend once
+    needs: scope
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: compile only the changed frontend production assets
+        run: python3 -B .github/scripts/measurement-browser-ci.py build frontend
+      - uses: actions/upload-artifact@v4
+        with:
+          name: measurement-${{ github.run_id }}-${{ github.sha }}-frontend-build
+          path: |
+            measurement-browser-evidence/frontend-build.json
+            measurement-browser-evidence/frontend-build.tar.gz
+          retention-days: 3
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: measurement-${{ github.run_id }}-${{ github.sha }}-frontend-producer-attempt-${{ github.run_attempt }}
           path: measurement-browser-evidence/*.json
           retention-days: 3
           if-no-files-found: error
@@ -77,7 +106,7 @@ jobs:
           if-no-files-found: error
   browser:
     name: missing measurement browser paths / ${{ matrix.phase }}
-    needs: reuse
+    needs: [reuse, frontend]
     strategy:
       fail-fast: false
       matrix:
@@ -130,7 +159,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-      - name: authenticate and restore fixed original compiled outputs without rebuild
+      - uses: actions/download-artifact@v4
+        with:
+          name: measurement-${{ github.run_id }}-${{ github.sha }}-frontend-build
+          path: measurement-browser-evidence
+      - name: restore original backend and exact newly built frontend without consumer rebuild
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -212,7 +245,7 @@ jobs:
           if-no-files-found: error
   result:
     name: bounded browser result (not merge readiness)
-    needs: [scope, reuse, admin, browser]
+    needs: [scope, reuse, frontend, admin, browser]
     if: always()
     runs-on: ubuntu-24.04
     timeout-minutes: 5
@@ -223,8 +256,8 @@ jobs:
           python3 - <<'PY'
           import json, os
           results = json.loads(os.environ['RESULTS'])
-          assert set(results) == {'scope', 'reuse', 'admin', 'browser'}
+          assert set(results) == {'scope', 'reuse', 'frontend', 'admin', 'browser'}
           assert all(row['result'] == 'success' for row in results.values()), results
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as output:
-            output.write('Bounded measurement browser qualification succeeded on the exact compiled candidate. Local checks are reference-only, not replayed or formally admitted. No full-platform, merge, image-security, deployment or scientific-norm qualification is claimed.\n')
+            output.write("Bounded journeys succeeded using this run's rebuilt scoped frontend and the original verified backend. Administrator checks retain original-run success under the reviewed disjoint FormalReferenceStudio repair; they were not replayed on the new frontend bundle. Local checks remain reference-only. No full-platform, merge, image-security, deployment or scientific-norm qualification is claimed.\n")
           PY

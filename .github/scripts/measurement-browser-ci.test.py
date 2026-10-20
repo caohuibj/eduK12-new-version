@@ -33,7 +33,7 @@ class ArtifactContract(unittest.TestCase):
 
     def test_current_frozen_inventory_and_flags(self):
         binding = json.loads(path.with_name('measurement-browser-bindings.json').read_text())
-        self.assertEqual(module.inventory('HEAD', binding['addedTools']), binding['productInventorySha256'])
+        module.validate_frontend_patch(binding)
         flags = {key: os.environ.get(key) for key in ['VITE_COGNITIVE_MODULE_ENABLED', 'TZ']}
         self.verify({**self.receipt, 'buildFlags': flags})
         with self.assertRaises(AssertionError):
@@ -80,15 +80,14 @@ class FixedBuildAdmission(unittest.TestCase):
         with patch.object(module, 'git', return_value=source['fixtureRepair']['after']), patch.object(module, 'production_inputs', return_value='changed'), self.assertRaises(AssertionError):
             module.fixed_inputs('backend')
 
-    def test_workflow_has_no_rebuild_fallback(self):
+    def test_workflow_only_builds_changed_frontend(self):
         text = (path.parents[1] / 'workflows/ci-measurement-browser.yml').read_text()
-        self.assertNotIn('  build:', text)
-        self.assertNotIn('npm ci', text)
-        self.assertNotIn('ci.py build', text)
-        self.assertIn('needs: [scope, reuse, admin, browser]', text)
-        source, pin = module.fixed_inputs('frontend')
-        self.assertEqual(source['runId'], '39399331312')
-        self.assertEqual(module.git('rev-parse', 'HEAD:server-version/frontend'), pin['componentTree'])
+        self.assertIn('component: [backend]', text)
+        self.assertIn('ci.py build frontend', text)
+        self.assertNotIn('ci.py build backend', text)
+        self.assertIn('needs: [scope, reuse, frontend, admin, browser]', text)
+        with self.assertRaises(AssertionError): module.fixed_inputs('frontend')
+
 
 
 class FixedAdminAdmission(unittest.TestCase):
@@ -122,7 +121,7 @@ class FixedAdminAdmission(unittest.TestCase):
         self.assertIn('phase: [journeys]', workflow)
         self.assertNotIn('phase: [admin, journeys]', workflow)
         self.assertIn('ci.py admit-admin', workflow)
-        self.assertIn('needs: [scope, reuse, admin, browser]', workflow)
+        self.assertIn('needs: [scope, reuse, frontend, admin, browser]', workflow)
 
 
 class AdminFailureOverlay(unittest.TestCase):
@@ -144,6 +143,26 @@ class AdminFailureOverlay(unittest.TestCase):
             return text
         with patch.object(Path, 'read_text', altered), self.assertRaises(AssertionError):
             module.admin_inputs()
+
+
+class ScopedFrontendRepair(unittest.TestCase):
+    def test_exact_patch_and_current_admin_boundaries(self):
+        binding = json.loads(path.with_name('measurement-browser-bindings.json').read_text())
+        module.validate_frontend_patch(binding)
+        module.admin_inputs()
+        file = 'server-version/frontend/src/training/FormalReferenceStudio.tsx'
+        for field in ['before', 'after']:
+            changed = json.loads(json.dumps(binding))
+            changed['frontendLayoutRepair']['files'][file][field] = '0' * 40
+            with self.assertRaises(AssertionError): module.validate_frontend_patch(changed)
+
+    def test_old_frontend_receipt_cannot_be_current_build(self):
+        plan = {'head': 'new-head', 'runId': 'new-run', 'productInventorySha256': 'baseline'}
+        receipt = {**plan, 'head': 'old-head', 'status': 'success', 'component': 'frontend',
+                   'buildFlags': {key: os.environ.get(key) for key in ['VITE_COGNITIVE_MODULE_ENABLED', 'TZ']},
+                   'componentTree': 'new-tree', 'lockfileSha256': 'lock', 'archiveSha256': 'archive'}
+        with self.assertRaises(AssertionError):
+            module.validate_receipt(receipt, 'frontend', plan, 'archive', 'new-tree', 'lock')
 
 
 if __name__ == '__main__':

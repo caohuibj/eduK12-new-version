@@ -1,4 +1,5 @@
 import {useEffect,useRef,useState} from 'react'
+import './formal-reference-studio.css'
 import {
   formalReferenceApi,type FormalReferenceCandidate,type FormalReferenceGrant,type FormalReferenceOperation,
   type FormalReferenceResult,type FormalReferenceSubmissionBody,type SurveyReferenceRequest,
@@ -114,7 +115,7 @@ export function FormalReferenceSubmission({actorId,product,candidateId,candidate
       targetPopulation:mode==='SUPPORTED_MATCH'?{kind:mode,match:{minAgeMonthsInclusive:min,maxAgeMonthsExclusive:max},basis}:{kind:mode,basis}}
     if(window.confirm('仅提交现有聚合候选给独立审核，允许服务端在本次提交范围内复核当前来源。此操作不扩大被试同意，也不自动发布常模。'))state.start({operation:'SUBMIT',body})
   }
-  return <section aria-label="提交正式参考候选" className="training-analysis-quality"><h3>提交正式跨入口候选</h3>
+  return <section aria-label="提交正式参考候选" className="training-analysis-quality training-formal-reference"><h3>提交正式跨入口候选</h3>
     <p>来源候选 {candidateId}。不会上传常模表或个人样本；实际同意须完整覆盖样本。提交不是科学批准，也不会替换旧结果。</p>
     <fieldset disabled={locked}><legend>用途与独立复核材料</legend>
       {Object.entries(labels).map(([key,label])=><label key={key}>{label}<textarea maxLength={4000} value={fields[key as keyof typeof labels]}
@@ -165,7 +166,7 @@ export default function FormalReferenceStudio({actorId,disabled=false,onRiskChan
         reviewId,localKey:localKey.trim(),version:version.trim()}})
   }
   if(!grants.length&&!state.pending&&!state.result)return grantError?<p role="status">{grantError}<button type="button" onClick={()=>setRefresh(value=>value+1)}>刷新正式治理能力</button></p>:null
-  return <section aria-label="正式参考独立审核与发布" className="training-analysis-quality"><h3>正式参考独立审核与发布</h3>
+  return <section aria-label="正式参考独立审核与发布" className="training-analysis-quality training-formal-reference"><h3>正式参考独立审核与发布</h3>
     <p>只显示当前账号实际获授的精确平台能力。计算者不能自审；管理身份、教师身份或来源分析权都不能替代科学审核能力。</p>
     <fieldset disabled={locked}><legend>读取精确聚合候选</legend>
       <label>正式候选 UUID<input value={candidateId} onChange={event=>{setCandidateId(event.target.value);setCandidate(null);setReviewId('')}}/></label>

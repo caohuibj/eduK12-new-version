@@ -1,5 +1,10 @@
 # Measurement: bounded browser qualification
 
+Current execution is the sixth-round route below: build only the changed frontend,
+reuse the original backend, run journeys, and retain the separately identified
+original administrator success. Earlier round sections record history and do not
+override this current route.
+
 This push-only lane is restricted to `ci/measurement-browser-20261020`.
 It does not edit main/PR routing, replace a merge gate, grant release/image
 qualification, deploy, or access production. The fixed complete product inventory
@@ -132,3 +137,27 @@ imported locator helpers are additionally byte-bound. The new failure-only
 barriers are covered by new helper contracts/current journey execution, not
 retroactively claimed as exercised administrator failure scenarios. Original
 production build pins and fixture identity remain unchanged.
+
+## Sixth round: actual narrow layout defect requires new frontend output
+
+The captured FormalReferenceStudio 390px page overflowed to 602px. The reviewed
+repair changes only its CSS import/two section classes and a new component-scoped
+stylesheet. Native fieldset/select minimum widths are constrained without hiding
+content; text may wrap. No administrator route renders this component or its
+scoped class. This product input change invalidates old frontend output for new
+journey verification, even though previous checks passed.
+
+Only the frontend receives one new production build. Its current run/head/tree,
+flags and full current product inventory are recorded. The browser consumes that
+exact same-run frontend artifact and the unchanged original backend artifact.
+Missing new frontend evidence fails; it never falls back to the old frontend.
+The original admin success retains its original frontend identity, not the new
+build. Admission is bounded by the exact reviewed disjoint component patch;
+reversing its before/after blobs must reconstruct the original full frontend
+input fingerprint. All other source files and admin inputs stay frozen.
+
+The original baseline product inventory remains labeled as baseline provenance;
+a separate current product inventory and exact patch describe the new source.
+The unchanged 390/1440 browser assertions verify the actual new output. No broad
+frontend unit/type rerun, backend compilation, or full CI is added. If a browser
+job alone fails, re-run that failed job against the same new frontend artifact.

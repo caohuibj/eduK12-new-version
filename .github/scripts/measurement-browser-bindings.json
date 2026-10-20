@@ -100,5 +100,22 @@
       "server-version/e2e/helpers/measurement-response-loss.cjs": "713afdb39ede0a0ee17d99cf59103302f851ea09",
       "server-version/e2e/helpers/measurement-response-loss.test.cjs": "63d13177b2ccfbac02a91780a4e52228a291a1a7"
     }
+  },
+  "frontendLayoutRepair": {
+    "files": {
+      "server-version/frontend/src/training/FormalReferenceStudio.tsx": {
+        "before": "5ee030c596bed7119aa302ce22b470db87e9e383",
+        "after": "66426c76d96d22879b4ef3ec9a552c2ebeb3dd79",
+        "mode": "100644"
+      },
+      "server-version/frontend/src/training/formal-reference-studio.css": {
+        "before": null,
+        "after": "38d33c0e0fba68c4aff7456f973a803241c1c91f",
+        "mode": "100644"
+      }
+    },
+    "stableSourceInventorySha256": "465af0896e4fa25d95965a3e44db46bbe8fe67fe363b3aa119c574cd08d320e4",
+    "stableFrontendInventorySha256": "bec94fb31c5d8473af6c44f4999f96703dc8983edf107a63e0969a70ed783fa3",
+    "reason": "Independently reviewed FormalReferenceStudio-only class and scoped CSS fix for actual 390px overflow; not used by administrator surface. New frontend build required; old admin proof retains old frontend identity."
   }
 }

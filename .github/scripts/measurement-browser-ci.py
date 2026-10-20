@@ -35,10 +35,30 @@ def write(name, data):
     (E / name).write_text(json.dumps(data, indent=2) + '\n')
 
 
+def validate_frontend_patch(binding):
+    patch = binding['frontendLayoutRepair']
+    for file, identity in patch['files'].items():
+        assert git('ls-tree', 'HEAD', '--', file) == f"{identity['mode']} blob {identity['after']}\t{file}", 'Unreviewed product repair: ' + file
+    assert inventory('HEAD', binding['addedTools'] + list(patch['files'])) == patch['stableSourceInventorySha256'], 'Other frozen source changed'
+    assert production_inputs('frontend', list(patch['files'])) == patch['stableFrontendInventorySha256'], 'Other frontend inputs changed'
+    rows = subprocess.check_output(['git', 'ls-tree', '-r', '-z', 'HEAD', '--', 'server-version/frontend'], cwd=ROOT).split(b'\0')
+    original = []
+    for row in rows:
+        if not row: continue
+        metadata, name = row.split(b'\t', 1)
+        repair = patch['files'].get(name.decode())
+        if repair:
+            if repair['before'] is None: continue
+            row = f"100644 blob {repair['before']}\t{name.decode()}".encode()
+        original.append(row)
+    assert hashlib.sha256(b'\0'.join(original)).hexdigest() == binding['fixedBuildSource']['components']['frontend']['productionInputSha256'], 'Original frontend identity not reconstructed by exact patch'
+
+
+
 def scope():
     binding = json.loads(BINDING.read_text())
     head = git('rev-parse', 'HEAD')
-    assert inventory('HEAD', binding['addedTools']) == binding['productInventorySha256'], 'Frozen source inventory changed'
+    validate_frontend_patch(binding)
     for path in binding['addedTools']:
         entry = git('ls-tree', 'HEAD', '--', path)
         assert entry.startswith('100644 blob '), 'Missing or non-regular tool: ' + path
@@ -48,6 +68,9 @@ def scope():
     subprocess.run(['git', 'diff', '--exit-code', 'HEAD', '--'], cwd=ROOT, check=True)
     plan = {'head': head, 'runId': os.environ['GITHUB_RUN_ID'], 'attempt': os.environ['GITHUB_RUN_ATTEMPT'],
             'sourceReference': binding['sourceReference'], 'productInventorySha256': binding['productInventorySha256'],
+            'currentProductInventorySha256': inventory('HEAD', binding['addedTools']),
+            'productInventoryMeaning': 'Original baseline identity retained; current source bound by current inventory and exact repair',
+            'frontendLayoutRepair': binding['frontendLayoutRepair'],
             'tools': {p: git('rev-parse', 'HEAD:' + p) for p in binding['addedTools']},
             'localEvidence': {'status': 'reference-only / not executed or formally admitted by this workflow',
                               'path': 'docs/measurement-version/evidence/20261020-local-acceptance-status.md'},
@@ -61,6 +84,7 @@ def execute(args, cwd, timeout=1200):
 
 
 def build(component):
+    assert component == 'frontend', 'Only changed frontend may build in this repair round'
     plan = scope()
     folder = ROOT / 'server-version' / component
     report = {**plan, 'component': component, 'status': 'running', 'phases': [],
@@ -119,11 +143,13 @@ def validate_receipt(receipt, component, plan, archive_hash, tree, lock_hash):
 
 
 def production_inputs(component, excluded):
+    excluded = {excluded} if isinstance(excluded, str) else set(excluded)
     rows = subprocess.check_output(['git', 'ls-tree', '-r', '-z', 'HEAD', '--', 'server-version/' + component], cwd=ROOT).split(b'\0')
-    return hashlib.sha256(b'\0'.join(row for row in rows if row and row.split(b'\t', 1)[1].decode() != excluded)).hexdigest()
+    return hashlib.sha256(b'\0'.join(row for row in rows if row and row.split(b'\t', 1)[1].decode() not in excluded)).hexdigest()
 
 
 def fixed_inputs(component):
+    assert component == 'backend', 'Changed frontend must use a new current-run build, never the old artifact'
     source = json.loads(BINDING.read_text())['fixedBuildSource']
     pin = source['components'][component]
     fixture = source['fixtureRepair']
@@ -240,7 +266,7 @@ def admin_locator_slice(text):
 def admin_inputs():
     binding = json.loads(BINDING.read_text())
     pin = binding['fixedAdminSource']
-    fixed_inputs('backend'); fixed_inputs('frontend')
+    fixed_inputs('backend'); validate_frontend_patch(binding)
     for file, blob in pin['unchangedTools'].items():
         repair = pin.get('reviewedTestToolRepairs', {}).get(file)
         if repair:
@@ -316,15 +342,22 @@ def admit_admin():
 
 def restore(component):
     plan = scope()
-    source, pin = download_fixed(component)
     folder = ROOT / 'server-version' / component
+    if component == 'backend':
+        source, pin = download_fixed(component)
     archive = E / (component + '-build.tar.gz')
-    assert sha(archive) == pin['archiveSha256']
     receipt = json.loads((E / (component + '-build.json')).read_text())
-    validate_receipt(receipt, component, {**plan, 'head': source['head'], 'runId': source['runId']}, sha(archive), pin['componentTree'], sha(folder / 'package-lock.json'))
-    assert receipt['attempt'] == source['attempt'] and sha(E / (component + '-build.json')) == pin['receiptSha256']
-    assert receipt['tools'][source['fixtureRepair']['path']] == source['fixtureRepair']['before'], 'Original fixture identity mismatch'
-    # Only the pinned original successful producer outputs are accepted. Retain modes and internal npm
+    if component == 'backend':
+        assert sha(archive) == pin['archiveSha256']
+        validate_receipt(receipt, component, {**plan, 'head': source['head'], 'runId': source['runId']}, sha(archive), pin['componentTree'], sha(folder / 'package-lock.json'))
+        assert receipt['attempt'] == source['attempt'] and sha(E / (component + '-build.json')) == pin['receiptSha256']
+        assert receipt['tools'][source['fixtureRepair']['path']] == source['fixtureRepair']['before'], 'Original fixture identity mismatch'
+    else:
+        validate_receipt(receipt, component, plan, sha(archive), git('rev-parse', 'HEAD:server-version/frontend'), sha(folder / 'package-lock.json'))
+        assert receipt['currentProductInventorySha256'] == plan['currentProductInventorySha256']
+        assert receipt['frontendLayoutRepair'] == plan['frontendLayoutRepair']
+        assert int(receipt['attempt']) <= int(plan['attempt']), 'No future build attempt'
+    # Backend retains original provenance; frontend is exact current-run build. Retain modes and internal npm
     # symlinks; reject absolute/traversal member names before extracting.
     with tarfile.open(archive) as tar:
         for member in tar.getmembers():
