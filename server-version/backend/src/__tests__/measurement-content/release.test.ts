@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { assertReleaseReadable, assertReleaseTransition, prepareRelease } from '../../modules/measurement-content/release'
+import { assertMeasurementDependency, assertReleaseReadable, assertReleaseTransition, prepareRelease } from '../../modules/measurement-content/release'
 const hash = 'a'.repeat(64)
 const measurement = () => ({
   family:'SCALE',layer:'MEASUREMENT',key:'private:owner:test',version:'1.0',
@@ -47,4 +47,12 @@ describe('three-layer release core',()=>{
     expect(()=>assertReleaseReadable('REVOKED','REINTERPRETATION')).toThrow('CONTENT_REVOKED')
     expect(()=>assertReleaseTransition('REVOKED','PUBLISHED')).toThrow('CONTENT_LIFECYCLE_INVALID')
   })
+})
+
+it('permits explicit historical correction publication without reopening old measurement delivery',()=>{
+  for(const status of ['SUPERSEDED','RETIRED'] as const){
+    expect(()=>assertMeasurementDependency(status,'HISTORICAL_INTERPRETATION')).not.toThrow()
+    expect(()=>assertMeasurementDependency(status,'NEW_ADMINISTRATION')).toThrow('CONTENT_NOT_SELECTABLE')
+  }
+  expect(()=>assertMeasurementDependency('REVOKED','HISTORICAL_INTERPRETATION')).toThrow('CONTENT_REVOKED')
 })

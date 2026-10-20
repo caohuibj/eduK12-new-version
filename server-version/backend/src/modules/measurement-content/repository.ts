@@ -1,19 +1,20 @@
 import { randomUUID } from 'node:crypto'
 import { Prisma, type PrismaClient } from '@prisma/client'
 import { canonicalHash, canonicalJsonString } from '../assessment-runtime/canonical'
-import { assertReleaseTransition, ContentReleaseError, prepareRelease, type PreparedRelease, type ReleaseStatus } from './release'
+import { assertMeasurementDependency, assertReleaseTransition, ContentReleaseError, prepareRelease, type PreparedRelease, type ReleaseStatus } from './release'
 
 type Db = Prisma.TransactionClient
 export type StoredRelease = PreparedRelease & { releaseId: string; status: ReleaseStatus; publishedBy: string; publishedAt: Date }
 type Row = {
   id: string; layer: PreparedRelease['layer']; family: PreparedRelease['family']; content_key: string; version: string;
   hash_scheme: PreparedRelease['hashScheme']; content_hash: string; content: PreparedRelease['content'];
+  provenance: Record<string, unknown>;
   scope: PreparedRelease['scope']; asset_refs: PreparedRelease['assetRefs']; source_release_id: string | null;
   published_by: string; published_at: Date; status: ReleaseStatus;
 }
 const decode = (r: Row): StoredRelease => ({
   ...prepareRelease({ layer: r.layer, family: r.family, key: r.content_key, version: r.version, content: r.content,
-    scope: r.scope, assetRefs: r.asset_refs, sourceReleaseId: r.source_release_id }),
+    scope: r.scope, provenance: r.provenance, assetRefs: r.asset_refs, sourceReleaseId: r.source_release_id }),
   hashScheme: r.hash_scheme, contentHash: r.content_hash, releaseId: r.id, status: r.status,
   publishedBy: r.published_by, publishedAt: r.published_at,
 })
@@ -27,16 +28,16 @@ export async function getContentRelease(db: Db, releaseId: string, lockForPublic
   }
   return value
 }
-const valueForInput = (r: PreparedRelease) => ({ layer:r.layer,family:r.family,key:r.key,version:r.version,content:r.content,scope:r.scope,assetRefs:r.assetRefs,sourceReleaseId:r.sourceReleaseId })
+const valueForInput = (r: PreparedRelease) => ({ layer:r.layer,family:r.family,key:r.key,version:r.version,content:r.content,scope:r.scope,provenance:r.provenance,assetRefs:r.assetRefs,sourceReleaseId:r.sourceReleaseId })
 
-async function checkReferences(db: Db, input: PreparedRelease): Promise<void> {
+async function checkReferences(db: Db, input: PreparedRelease, purpose: 'NEW_ADMINISTRATION' | 'HISTORICAL_INTERPRETATION'): Promise<void> {
   const refs = input.layer === 'MEASUREMENT' ? [] : input.layer === 'REFERENCE' ? [input.content.measurement] : input.content.measurements
   for (const ref of refs) {
     const target = await getContentRelease(db, ref.releaseId, true)
     if (!target || target.layer !== 'MEASUREMENT' || target.family !== input.family || target.contentHash !== ref.contentHash) {
       throw new ContentReleaseError('CONTENT_MEASUREMENT_REFERENCE_MISMATCH')
     }
-    if (target.status !== 'PUBLISHED') throw new ContentReleaseError('CONTENT_MEASUREMENT_NOT_SELECTABLE')
+    assertMeasurementDependency(target.status, purpose)
     const keys = new Set(target.content.metrics.map(m => m.metricKey))
     const requested = input.layer === 'REFERENCE' ? input.content.entries.map(e => e.metricKey) : input.layer === 'REPORT' ? input.content.metricKeys : []
     if (requested.some(key => !keys.has(key))) throw new ContentReleaseError('CONTENT_UNKNOWN_METRIC')
@@ -51,7 +52,7 @@ async function checkReferences(db: Db, input: PreparedRelease): Promise<void> {
  * validate definitions and current capability/resource/source rights in their transaction.
  * V05 binds those checks to the existing admin system. No anonymous route exposes this.
  */
-export async function publishContentRelease(db: Db, raw: unknown, actorId: string): Promise<StoredRelease> {
+export async function publishContentRelease(db: Db, raw: unknown, actorId: string, purpose: 'NEW_ADMINISTRATION' | 'HISTORICAL_INTERPRETATION' = 'NEW_ADMINISTRATION'): Promise<StoredRelease> {
   if (!actorId.trim()) throw new ContentReleaseError('CONTENT_ACTOR_REQUIRED')
   const input = prepareRelease(raw)
   const lockKey = canonicalHash([input.family,input.layer,input.key,input.version])
@@ -64,12 +65,12 @@ export async function publishContentRelease(db: Db, raw: unknown, actorId: strin
     // Retrying publish does not reactivate a retired/revoked identity.
     return prior
   }
-  await checkReferences(db, input)
+  await checkReferences(db, input, purpose)
   const id = randomUUID()
   const rows = await db.$queryRaw<Row[]>(Prisma.sql`INSERT INTO measurement_content_releases
-    (id,layer,family,content_key,version,hash_scheme,content_hash,content,scope,asset_refs,source_release_id,published_by)
+    (id,layer,family,content_key,version,hash_scheme,content_hash,content,scope,provenance,asset_refs,source_release_id,published_by)
     VALUES (${id},${input.layer},${input.family},${input.key},${input.version},${input.hashScheme},${input.contentHash},
-      ${canonicalJsonString(input.content)}::jsonb,${canonicalJsonString(input.scope)}::jsonb,
+      ${canonicalJsonString(input.content)}::jsonb,${canonicalJsonString(input.scope)}::jsonb,${canonicalJsonString(input.provenance)}::jsonb,
       ${canonicalJsonString(input.assetRefs)}::jsonb,${input.sourceReleaseId},${actorId}) RETURNING *`)
   return decode(rows[0])
 }

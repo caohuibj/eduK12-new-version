@@ -1,3 +1,4 @@
+import { publishScaleMeasurement } from '../measurement-content/scale'
 import {catalogSnapshotsForDrafts,compileCatalogUnit} from './catalog.service'
 import type {SourceAnswerMapping} from './catalog.sources'
 import { SURVEY_COGNITIVE_NOTICE } from './measurement.notice'
@@ -23,6 +24,7 @@ import { freezeGroupIpPolicy,resolveGroupIpOpenWindow,type FrozenGroupIpPolicy }
  * publication. The Survey FINAL admission adapter is separate from legacy catalog.
  */
 export interface ResearchFrozenUnit {
+  measurementRelease?: { releaseId: string; contentHash: string; measurementHash: string }
   sourceProvenance?:Record<string,unknown>
   sourceAnswerMapping?:SourceAnswerMapping
   draftId:string
@@ -142,6 +144,19 @@ export async function freezeResearchWaveDraft(input:{
       if(!draft)stop('研究工具来源已发生变化')
       return draft!.catalogGrantId?compileCatalogUnit(draft!,sources.get(draft!.catalogGrantId)!):compileFrozenResearchUnit(draft!)
     })
+    for (const unit of units) {
+      if (unit.kind !== 'SCALE') continue
+      const release = await publishScaleMeasurement(tx, {
+        localId: unit.draftId, version: String(unit.draftRevision),
+        instrumentVersion: String(unit.draftRevision), definition: unit.compiledDefinition,
+        instrumentClass: unit.sourceProvenance ? 'STANDARD' : 'CUSTOM_DESCRIPTIVE',
+        provenance: unit.sourceProvenance ?? {},
+        scope: { kind: 'PRIVATE', ownerId: input.actorUserId, product: 'SURVEY', resourceId: input.projectId },
+      }, input.actorUserId)
+      if (release.layer !== 'MEASUREMENT') stop('研究量表发布身份不匹配')
+      unit.measurementRelease = { releaseId: release.releaseId, contentHash: release.contentHash,
+        measurementHash: release.content.measurementHash }
+    }
     // Initial bounded research safety limit, not a measured capacity claim.
     if(units.filter(unit=>unit.kind==='COGNITIVE').length>4)
       stop('一个波次最多包含 4 个受控认知任务（480 个正式试次）')

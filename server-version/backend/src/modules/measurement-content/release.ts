@@ -14,7 +14,7 @@ export const contentScope = z.discriminatedUnion('kind', [
 ])
 export const assetReference = z.object({ assetId: text, sha256: digest, mediaType: text }).strict()
 export const exactRelease = z.object({ releaseId: z.string().uuid(), contentHash: digest }).strict()
-const metric = z.object({ metricKey: text, unit: text, direction: z.enum(['higher', 'lower', 'descriptive']) }).strict()
+const metric = z.object({ metricKey: text, unit: text, direction: text }).strict()
 // Family adapters validate the executable definition with the existing authoritative
 // schema/scorer/runner before calling this core. This is not a script interpreter.
 export const measurementContent = z.object({
@@ -55,6 +55,7 @@ const common = {
   family: releaseFamily, key: text, version: text, scope: contentScope,
   assetRefs: z.array(assetReference).max(1000),
   sourceReleaseId: z.string().uuid().nullable(),
+  provenance: z.record(z.unknown()).default({}),
 }
 export const releaseInputSchema = z.discriminatedUnion('layer', [
   z.object({ ...common, layer: z.literal('MEASUREMENT'), content: measurementContent }).strict(),
@@ -102,4 +103,9 @@ export function assertReleaseReadable(status: ReleaseStatus, purpose: 'NEW_BINDI
   if (purpose === 'REINTERPRETATION' && status === 'REVOKED') throw new ContentReleaseError('CONTENT_REVOKED')
   // HISTORY preserves the original artifact plus a separate revocation notice.
   // This does not authorize access to personal facts; caller checks current access.
+}
+
+/** Publishing a correction for frozen historical facts must not reopen delivery. */
+export function assertMeasurementDependency(status: ReleaseStatus, purpose: 'NEW_ADMINISTRATION' | 'HISTORICAL_INTERPRETATION'): void {
+  assertReleaseReadable(status, purpose === 'NEW_ADMINISTRATION' ? 'NEW_BINDING' : 'REINTERPRETATION')
 }

@@ -1,3 +1,5 @@
+import { publishScaleMeasurement } from '../modules/measurement-content/scale'
+import { Prisma } from '@prisma/client'
 import { z } from 'zod'
 import { assertScaleCopyPublishSource, ScaleCopyError } from '../modules/scale/scale-copy.service'
 import type { Request, Response } from 'express'
@@ -62,8 +64,15 @@ export const scaleImageController = {
             ...definitionSummary(definition),
           },
         })
+        const release = await publishScaleMeasurement(tx, {
+          localId: scale.id, version: scale.updatedAt.toISOString(),
+          instrumentVersion: scale.instrumentVersion, definition, instrumentClass: 'CUSTOM_DESCRIPTIVE',
+          provenance: scale.copySource ? { copySource: scale.copySource } : {},
+          scope: { kind: 'PRIVATE', ownerId: scale.creatorId, product: 'TRAINING', resourceId: scale.id },
+        }, userId!)
+        await tx.$executeRaw(Prisma.sql`UPDATE scales SET measurement_release_id=${release.releaseId} WHERE id=${scale.id}`)
         if (scale.copySource != null) await tx.assetReference.deleteMany({ where: { entityType: 'ScaleCopyDraft', entityId: id } })
-        return published
+        return { ...published, measurementReleaseId: release.releaseId }
       })
       return success(res, updated, '量表发布成功')
     } catch (cause) {

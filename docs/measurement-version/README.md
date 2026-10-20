@@ -143,3 +143,11 @@ FINAL 以既有 submissionId/payloadHash/epoch 原子接收：正常成功路径
 新增 `measurement-content/release.ts` 与 repository：统一的三层精确身份、独立内容投影、不可变版本冲突、确定生命周期、来源/指标引用检查及有界目录投影。现有草稿工作区、scorer、runner 不变；本单元没有公开未授权 API。新增单一共享 release 表及 append-only 状态事件表，数据库 trigger 保护已发布内容/来源，未执行实际迁移。V03/V04 家族适配器仍须用既有 schema/runner/资产授权验证内容；V05 接入管理员能力；V07 完成报告语义门禁。通用信封结构校验不是科学发布资格。
 
 轻量检查：6 个新纯合同用例通过；新模块 strict TypeScript 检查通过；Prisma schema validate 通过。复用相邻官方依赖目录只读符号链接，未安装/复制大依赖。真实 PostgreSQL 迁移/并发/恢复与最终应用回归留 V10 集中执行，不能以本次 schema validate 代替。七轴表述已按既有 `server-version/docs/scale-library/catalog-version-semantics.md` 修正。
+
+## V03 实施记录
+
+Training 自编发布、Standard onboarding 发布及 Survey Wave 中的 Scale 编译产物已接同一 `measurement-content/scale.ts` 校验/投影/持久化事务。保留现有导入及编制 UI、`assertScaleCopyPublishSource`、只读目录来源和原媒体保留流程；不改 School/Teacher 菜单。私有发布无需目录批准或常模，导入与手工编制都通过同一已支持 ScaleDefinitionV2/runner 就绪检查。私有 key 由可信 scope 与稳定 draft/scale ID 派生，owner/project 不进入科学指纹。
+
+新增 Scale 当前 release 指针和 Survey frozen unit 的精确 release/hash；旧运行字段暂时保留至 V08/V09 完成一次性切换，不宣称已移除双轨。新测量投影显式排除 report/reference/source/license，保留完整题目/响应/计分/质量/媒体协议；旧 definitionHash 不被改造为新身份。copySource/目录来源证据冻结到独立 provenance，不成为第二份当前授权。报告及参考独立发布/数值规则仍属 V06/V07，不在本单元声称完成。
+
+修正 V02 review：参考/报告修正文案的内部发布用途区分 NEW_ADMINISTRATION 与 HISTORICAL_INTERPRETATION。后者可引用 SUPERSEDED/RETIRED 测量，仍拒 REVOKED；该参数不由前端直接控制，未来新投放仍要检查测量可用性。新增状态负例与 Scale 投影/跨项目同名/无参考/不支持参数合同，总计 11 个相关用例通过。新核心/适配器 strict TypeScript 与 Prisma schema validate 通过。实际发布接入点的扩展类型检查发现共享依赖中的旧 Prisma client 缺现有 Training 字段，且定向编译未加载 Request 全局扩展；本改动另发现的 Survey 返回类型 narrowing 已修正。未将该扩展检查标为通过，最终须使用本分支私有生成 client 集中验收。未执行数据库迁移、完整应用/浏览器回归或 CI。
