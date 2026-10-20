@@ -19,6 +19,7 @@ export const authApi = {
   login: async (data: LoginRequest, entrance?: LoginEntrance) => {
     const response = await apiClient.post<LoginData | {adminKeyRequired:true;options:Record<string,unknown>}>(entrance !== 'admin' && isTrainingHost() ? '/auth/training-login' : '/auth/login', data)
     if(response.data && 'adminKeyRequired' in response.data) {
+      if(entrance!=='admin')throw new Error('该账号具有管理资格，请前往独立管理员入口并使用安全密钥登录。')
       const assertion=await assertSecurityKey(response.data.options)
       return apiClient.post<LoginData>('/admin/security/authentication/verify',{response:assertion})
     }

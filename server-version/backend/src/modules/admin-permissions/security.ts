@@ -85,7 +85,7 @@ async function issueAdminSession(req: Request, res: Response, userId: string, ex
     userId, username: principal.username, role: principal.role, tokenVersion: principal.tokenVersion,
     mustChangePassword: principal.mustChangePassword, adminVerifiedAt: now, adminSessionId: sessionId }))
   const user = await prisma.user.findUniqueOrThrow({ where: { id: userId }, select: { nickname: true, avatarUrl: true } })
-  return { user: { id: userId, username: principal.username, role: principal.role, platformRole: principal.platformRole,
+  return { user: { id: userId, username: principal.username, role: principal.role, businessRole: principal.businessRole, platformRole: principal.platformRole,
     entryGrants: principal.entryGrants ?? [], mustChangePassword: principal.mustChangePassword, ...user } }
 }
 

@@ -72,6 +72,8 @@ export function activeNavigation(items: NavigationItem[], pathname: string): Nav
     .sort((a, b) => b.path.length - a.path.length)[0]?.item
 }
 const staffTitles: Array<[string, string]> = [
+  ['/admin/permissions','系统治理与入口授权'],['/admin/entrances','管理入口'],
+  ['/admin/huischool','校园心理健康产品治理'],['/admin/huiteacher','教师发展与学校改进治理'],
   ['/admin/training', '培训版管理'],
   ['/admin/survey-researchers', 'Survey 研究者与工具授权'],
   ['/assessment-workbench', '测评结果工作台'], ['/assessment-templates', '测评模板库'], ['/assessment-management', '对象与操作记录'],

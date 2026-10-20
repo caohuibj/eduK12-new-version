@@ -81,6 +81,7 @@ suite('real HTTP middleware, routes and current PostgreSQL authority',()=>{
     for(const endpoint of ['/auth/me','/users/me']){
       const response=await call('training',endpoint)
       expect(response.status).toBe(200);expect(response.body.data.role).toBe('ADMIN')
+      expect(response.body.data.businessRole).toBe('TEACHER')
       expect(response.body.data.entryGrants).toEqual([{entry:'TRAINING',version:1}])
     }
   })

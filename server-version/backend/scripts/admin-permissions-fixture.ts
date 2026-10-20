@@ -28,7 +28,7 @@ void(async()=>{
   const definitions:Record<string,AdminEntry[]>={training:['TRAINING'],survey:['SURVEY'],school:['HUISCHOOL'],teacher:['HUITEACHER'],both:['TRAINING','SURVEY'],none:[],business:[]}
   for(const [name,entries]of Object.entries(definitions)){
     const secret=password()
-    const u=await prisma.user.create({data:{username:prefix+'-'+name,passwordHash:await hashPassword(secret),role:name==='none'?'ADMIN':'TEACHER',accountDomain:'TRAINING',platformRole:'STANDARD'}})
+    const u=await prisma.user.create({data:{username:prefix+'-'+name,passwordHash:await hashPassword(secret),role:name==='none'?'ADMIN':['training','school'].includes(name)?'STUDENT':'TEACHER',accountDomain:'TRAINING',platformRole:'STANDARD'}})
     for(const entry of entries)await changeEntryGrant({actorUserId:system.userId,actorSession:{tokenVersion:0,adminVerifiedAt:Math.floor(Date.now()/1000),adminSessionId:randomUUID()},
       targetUserId:u.id,entry,active:true,expectedVersion:0,reason:'synthetic browser entry fixture'})
     const ticket=entries.length?cli({action:'ISSUE_ENROLLMENT',username:u.username,reason:'synthetic browser enrollment'},name):null
@@ -37,7 +37,10 @@ void(async()=>{
   const org=await prisma.organization.create({data:{id:randomUUID(),name:'Synthetic admin permissions school',createdByUserId:system.userId,productDomain:'SCHOOL'}})
   for(const product of ['HUISCHOOL','HUITEACHER'])await prisma.educationProductEntitlement.create({data:{organizationId:org.id,product,status:'ACTIVE',grantedByUserId:system.userId}})
   const course=await prisma.course.create({data:{title:'Synthetic ownership boundary',creatorId:(fixtures.business as {id:string}).id,courseCode:randomUUID()}})
-  fixtures.organizationId=org.id;fixtures.courseId=course.id
+  const schoolUser=await prisma.user.create({data:{username:prefix+'-school-realm',passwordHash:'unusable',role:'TEACHER',accountDomain:'SCHOOL'}})
+  const campus=await prisma.course.create({data:{title:'Synthetic private campus scope',creatorId:schoolUser.id,
+    courseCode:randomUUID(),courseType:'CAMPUS_ACTIVITY',organizationId:org.id,isRecruiting:false}})
+  fixtures.organizationId=org.id;fixtures.courseId=course.id;fixtures.campusCourseId=campus.id;fixtures.schoolUserId=schoolUser.id
   writeFileSync(out,JSON.stringify(fixtures),{mode:0o600,flag:'wx'})
   console.log(JSON.stringify({fixtureCreated:true,accounts:8,entries:4,privateOutput:true}))
 })().catch(e=>{console.error(e instanceof Error?e.message:'Fixture failed');process.exitCode=1}).finally(()=>prisma.$disconnect())

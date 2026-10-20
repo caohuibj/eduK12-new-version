@@ -10,7 +10,7 @@ const organizationSource = fs.readFileSync(path.join(frontend, 'src/pages/organi
 const organizationAst = ts.createSourceFile('OrganizationProductRoutes.tsx', organizationSource, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
 const output = path.resolve(frontend, '../docs/frontend-convergence/routes.md')
 const routes = []
-const guards = new Set(['ProtectedRoute', 'ParentProtectedRoute', 'StudentProtectedRoute', 'RelationalProtectedRoute', 'LegacyRelationalTasksRoute', 'ScaleLibraryRoute', 'OptionalStudentRoute', 'EntryRoute', 'PublicRoute'])
+const guards = new Set(['AdminAccess','ProtectedRoute', 'ParentProtectedRoute', 'StudentProtectedRoute', 'RelationalProtectedRoute', 'LegacyRelationalTasksRoute', 'ScaleLibraryRoute', 'OptionalStudentRoute', 'EntryRoute', 'PublicRoute'])
 function visit(node) {
   if (ts.isJsxSelfClosingElement(node) && node.tagName.getText(ast) === 'Route') {
     const attrs = node.attributes.properties
@@ -37,6 +37,8 @@ function visit(node) {
     if (tags.includes('CognitiveCapabilityRoute')) cognitive = true
     const page = tags.find((t) => !guards.has(t) && t !== 'CognitiveCapabilityRoute') || '—'
     const access = uiLab ? 'Visual QA / local development only'
+      : guard === 'AdminAccess' ? (/<AdminAccess\s+system(?:\s|>)/.test(element.getText(ast)) ? 'SYSTEM_ADMIN; current security-key session'
+        : element.getText(ast).match(/\bentries=\{([^}]+)\}/)?.[1] ? 'Explicit admin entry: '+element.getText(ast).match(/\bentries=\{([^}]+)\}/)[1] : 'Authenticated; current authority overview')
       : guard === 'ProtectedRoute' ? (element.getText(ast).includes("['ADMIN']") ? 'ADMIN' : element.getText(ast).includes("['TEACHER']") ? 'TEACHER' : 'TEACHER / ADMIN')
       : guard === 'ParentProtectedRoute' ? 'PARENT'
       : guard === 'StudentProtectedRoute' ? 'STUDENT'

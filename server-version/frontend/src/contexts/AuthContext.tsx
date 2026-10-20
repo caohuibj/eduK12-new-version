@@ -97,6 +97,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
             ...nextUser,
             role: current.role,
             platformRole: current.platformRole,
+            businessRole: current.businessRole,
+            entryGrants: current.entryGrants,
           }
         : null,
     )

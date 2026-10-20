@@ -563,6 +563,8 @@ function AppRoutes() {
             element={<AdminAccess entries={['HUISCHOOL','HUITEACHER']}>
               <EducationProductGovernance/>
             </AdminAccess>}/>
+          <Route path="/admin/huischool" element={<AdminAccess entries={['HUISCHOOL']}><EducationProductGovernance key="HUISCHOOL" product="HUISCHOOL"/></AdminAccess>}/>
+          <Route path="/admin/huiteacher" element={<AdminAccess entries={['HUITEACHER']}><EducationProductGovernance key="HUITEACHER" product="HUITEACHER"/></AdminAccess>}/>
           <Route path="/admin/reporting-content" element={<ProtectedRoute roles={['ADMIN']}><ReportingContent /></ProtectedRoute>} />
           <Route path="/admin/legacy-archive" element={<ProtectedRoute roles={['ADMIN']}><LegacyArchive /></ProtectedRoute>} />
           <Route path="/admin/legacy-archive/:kind/:id" element={<ProtectedRoute roles={['ADMIN']}><LegacyArchive /></ProtectedRoute>} />

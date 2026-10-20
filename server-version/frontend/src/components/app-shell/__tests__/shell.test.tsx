@@ -208,24 +208,25 @@ it('hides creation without server permission and legacy archive for a standard p
   expect(screen.queryByRole('link', { name: '组织概览' })).not.toBeInTheDocument()
 })
 
-it('requires explicit directory creation permission even for SYSTEM_ADMIN', () => {
+it('requires explicit directory creation permission even for SYSTEM_ADMIN', async () => {
   auth.user = { ...student, role: 'ADMIN' }
   organization.platformRole = 'SYSTEM_ADMIN'
-  const view = render(<MemoryRouter initialEntries={['/users']}><AppShell><p>用户管理内容</p></AppShell></MemoryRouter>)
+  const view = render(<MemoryRouter initialEntries={['/dashboard']}><AppShell><p>业务工作台内容</p></AppShell></MemoryRouter>)
   expect(screen.queryByRole('link', { name: '创建组织' })).not.toBeInTheDocument()
   organization.allowedActions = ['CREATE_ORGANIZATION']
-  view.rerender(<MemoryRouter initialEntries={['/users']}><AppShell><p>用户管理内容</p></AppShell></MemoryRouter>)
+  view.rerender(<MemoryRouter initialEntries={['/dashboard']}><AppShell><p>业务工作台内容</p></AppShell></MemoryRouter>)
+  await userEvent.click(screen.getByRole('button',{name:'系统管理'}))
   expect(screen.getByRole('link', { name: '创建组织' })).toHaveAttribute('href', '/organizations/new')
 })
 
 it.each([
-  ['ADMIN', 'SYSTEM_ADMIN', true], ['ADMIN', 'STANDARD', false],
-  ['TEACHER', 'SYSTEM_ADMIN', false], ['STUDENT', 'SYSTEM_ADMIN', false],
-] as const)('shows the local Survey menu only for both roles (%s/%s)', (role, platformRole, visible) => {
-  auth.user = { id: 'synthetic', username: 'synthetic', role, platformRole } as User
+  ['ADMIN', 'SYSTEM_ADMIN', false], ['ADMIN', 'STANDARD', false],
+  ['TEACHER', 'STANDARD', true], ['STUDENT', 'STANDARD', true],
+] as const)('shows Survey management only with an explicit entry grant (%s/%s)', (role, platformRole, visible) => {
+  auth.user = { id: 'synthetic', username: 'synthetic', role, platformRole,entryGrants:visible?[{entry:'SURVEY',version:1}]:[] } as User
   organization.platformRole = platformRole
-  render(<MemoryRouter initialEntries={['/users']}><AppShell><p>content</p></AppShell></MemoryRouter>)
-  const links = screen.queryAllByRole('link', { name: 'Survey 研究者与工具授权' })
+  render(<MemoryRouter initialEntries={['/admin/entrances']}><AppShell><p>content</p></AppShell></MemoryRouter>)
+  const links = screen.queryAllByRole('link', { name: 'Survey 研究管理' })
   expect(links.length > 0).toBe(visible)
   for (const link of links) expect(link).toHaveAttribute('href', '/admin/survey-researchers')
 })

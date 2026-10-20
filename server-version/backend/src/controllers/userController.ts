@@ -321,7 +321,7 @@ export const userController = {
         return notFound(res, '用户不存在')
       }
 
-      return success(res, { ...user, role: req.user!.role, platformRole: req.user!.platformRole, entryGrants: req.user!.entryGrants ?? [] })
+      return success(res, { ...user, role: req.user!.role, businessRole: req.user!.businessRole, platformRole: req.user!.platformRole, entryGrants: req.user!.entryGrants ?? [] })
     } catch (err) {
       logger.error('获取用户信息错误', err)
       return error(res, Messages.COMMON.FAILED)
