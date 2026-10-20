@@ -1,3 +1,4 @@
+import * as interpretationService from '../../modules/survey/final-interpretation.service'
 import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import * as canonical from '../../modules/assessment-runtime/canonical'
@@ -363,5 +364,25 @@ describe('parent FINAL narrow preflight source fence',()=>{
     known.definitionDigest=current.wave.publication.definitionDigest=canonicalHash(current.wave.publication.compiledSnapshot)
     await expect(submitResearchFinal(input())).rejects.toMatchObject({statusCode:403})
     expect(mocks.final).not.toHaveBeenCalled();expect(mocks.createFinal).not.toHaveBeenCalled()
+  })
+})
+
+
+describe('Survey FINAL interpretation commit boundary',()=>{
+  it('stores interpretation inside the same encrypted FINAL without disclosing it in receipt',async()=>{
+    known.status=current.status='STARTED';mocks.final.mockResolvedValue(null)
+    const stored={schemaVersion:1 as const,contentBindingHash:'a'.repeat(64),units:[]}
+    const interpret=vi.spyOn(interpretationService,'interpretSurveyFinal').mockResolvedValue(stored)
+    const result=await submitResearchFinal(input())
+    expect(interpret).toHaveBeenCalledTimes(1)
+    expect(interpret.mock.calls[0][1].calculated.units[0].rawAnswers).toEqual({choice:'yes'})
+    expect(mocks.encrypt.mock.calls[0][0].interpretation).toEqual(stored)
+    expect(mocks.createFinal).toHaveBeenCalledTimes(1)
+    expect(result).not.toHaveProperty('interpretation')
+  })
+  it('does not recompute interpretation during idempotent replay',async()=>{
+    const interpret=vi.spyOn(interpretationService,'interpretSurveyFinal')
+    await expect(submitResearchFinal(input())).resolves.toMatchObject({idempotent:true})
+    expect(interpret).not.toHaveBeenCalled();expect(mocks.createFinal).not.toHaveBeenCalled()
   })
 })

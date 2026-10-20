@@ -1,3 +1,4 @@
+import {bindSurveyAttemptContent} from './content-binding.service'
 import { createHash, randomBytes, randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -104,6 +105,8 @@ export async function createLinkedResearchIdentity(input:{
       publicationId:wave.publicationId!,projectId:input.projectId,waveId:input.waveId,
       attemptId,participantId,researchCode,accessCredential:secret,
     })
+    await bindSurveyAttemptContent(tx,{projectId:input.projectId,waveId:input.waveId,attemptId,
+      publicationId:wave.publicationId!,newAttempt:true})
   })
   return {researchCode,accessCredential:secret,attemptId}
 }

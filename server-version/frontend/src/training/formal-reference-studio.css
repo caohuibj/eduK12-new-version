@@ -1,0 +1,8 @@
+/* Formal governance also renders directly on the trainer dashboard, outside
+   the course-analysis layout. Keep native select option widths from setting
+   the fieldset's min-content width, without clipping evidence or controls. */
+.training-formal-reference { min-width:0; overflow-wrap:anywhere; }
+.training-formal-reference fieldset { min-width:0; }
+.training-formal-reference label { display:flex; flex-direction:column; min-width:0; }
+.training-formal-reference :is(input:not([type=checkbox]),select,textarea) { box-sizing:border-box; width:100%; min-width:0; max-width:100%; }
+.training-formal-reference input[type=checkbox] { align-self:flex-start; }

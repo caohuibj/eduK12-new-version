@@ -1,5 +1,13 @@
+import {freezeSurveyParticipantFeedback,type SurveyRawFeedback,type SurveyParticipantFeedbackSelection} from './participant-feedback'
+import {freezeSurveyContentSelections,type SurveyContentSelection,type FrozenSurveyContentSelection} from './content-selection'
+import {ContentReleaseError} from '../measurement-content/release'
+import { cognitiveMeasurementRelease } from '../measurement-content/cognitive'
+import { sjtMeasurementRelease } from '../measurement-content/sjt'
+import { publishContentRelease,requirePublishedContentRelease } from '../measurement-content/repository'
+import { parseFrozenSurveyCognitive } from './cognitive.definition'
+import { scaleMeasurementRelease, surveyScaleReleaseContext } from '../measurement-content/scale'
 import {catalogSnapshotsForDrafts,compileCatalogUnit} from './catalog.service'
-import type {SourceAnswerMapping} from './catalog.sources'
+import {recheckCatalogScaleSourceExpiry,type SourceAnswerMapping} from './catalog.sources'
 import { SURVEY_COGNITIVE_NOTICE } from './measurement.notice'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
@@ -23,6 +31,9 @@ import { freezeGroupIpPolicy,resolveGroupIpOpenWindow,type FrozenGroupIpPolicy }
  * publication. The Survey FINAL admission adapter is separate from legacy catalog.
  */
 export interface ResearchFrozenUnit {
+  participantFeedback?:SurveyRawFeedback
+  contentSelection?:FrozenSurveyContentSelection
+  measurementRelease?: { releaseId: string; contentHash: string; measurementHash: string }
   sourceProvenance?:Record<string,unknown>
   sourceAnswerMapping?:SourceAnswerMapping
   draftId:string
@@ -53,6 +64,44 @@ export interface ResearchFrozenPublication {
   runtimeStatus:'SURVEY_FINAL_V1'
 }
 const stop=(message:string):never=>{throw new SurveyWaveError(409,message)}
+
+/** Both paths derive identical identity from the existing compiler and adapters. */
+export function surveyMeasurementReleaseInput(unit:ResearchFrozenUnit,actorId:string,projectId:string){
+  if(unit.kind==='FORM')throw new SurveyWaveError(400,'普通表单不生成测量版本')
+  const scope={kind:'PRIVATE' as const,ownerId:actorId,product:'SURVEY' as const,resourceId:projectId}
+  if(unit.kind==='COGNITIVE'){
+    const frozen=parseFrozenSurveyCognitive(unit.compiledDefinition),snapshot=frozen.sessionSnapshot
+    return cognitiveMeasurementRelease({localId:unit.draftId,version:String(unit.draftRevision),scope,
+      testType:snapshot.testType,configVersion:snapshot.configVersion,engineVersion:snapshot.engineVersion,
+      scoringVersion:snapshot.scoringVersion,config:snapshot.config,
+      protocolContext:{timingPolicy:frozen.timingPolicy,devicePolicy:frozen.devicePolicy,restartLimit:frozen.restartLimit}})
+  }
+  if(unit.kind==='SJT')return sjtMeasurementRelease({localId:unit.draftId,version:String(unit.draftRevision),
+    instrumentVersion:surveyScaleReleaseContext(unit).instrumentVersion,definition:unit.compiledDefinition,
+    displayProtocol:unit.displayDefinition,scope,provenance:unit.sourceProvenance??{}})
+  const source=unit.sourceProvenance?.sourceMeasurementRelease as {releaseId?:string}|undefined
+  if(unit.sourceProvenance&&!source?.releaseId)throw new SurveyWaveError(409,'目录量表须先由来源管理者完成显式版本转换，再重新授权导入')
+  return scaleMeasurementRelease({localId:unit.draftId,version:String(unit.draftRevision),sourceReleaseId:source?.releaseId??null,
+    ...surveyScaleReleaseContext(unit),definition:unit.compiledDefinition,
+    instrumentClass:unit.sourceProvenance?'STANDARD':'CUSTOM_DESCRIPTIVE',provenance:unit.sourceProvenance??{},scope})
+}
+export async function publishSurveyMeasurementUnit(tx:Prisma.TransactionClient,unit:ResearchFrozenUnit,actorId:string,projectId:string){
+  const release=await publishContentRelease(tx,surveyMeasurementReleaseInput(unit,actorId,projectId),actorId)
+  if(release.layer!=='MEASUREMENT')throw new Error('研究测量发布身份不匹配')
+  if(release.status!=='PUBLISHED')throw new SurveyWaveError(409,'该测量版本已停止用于新施测，请发布新版本')
+  return release
+}
+export async function resolveSurveyMeasurementUnit(tx:Prisma.TransactionClient,unit:ResearchFrozenUnit,actorId:string,projectId:string){
+  try{
+    const release=await requirePublishedContentRelease(tx,surveyMeasurementReleaseInput(unit,actorId,projectId))
+    if(release.layer!=='MEASUREMENT')throw new Error('研究测量发布身份不匹配')
+    return release
+  }catch(error){
+    if(error instanceof ContentReleaseError)throw new SurveyWaveError(409,
+      error.code==='CONTENT_RELEASE_NOT_PUBLISHED'?'请先显式发布当前修订的测量版本，再冻结波次':'测量发布版本已变化或不可用于新施测，请刷新核对')
+    throw error
+  }
+}
 
 export function compileFrozenResearchUnit(draft:{
   id:string;instrumentKey:string;kind:string;title:string;revision:number;definition:unknown
@@ -88,12 +137,13 @@ export function compileFrozenResearchUnit(draft:{
  * authenticated action and remains fail-closed behind SURVEY_PUBLICATION_ENABLED.
  */
 export async function freezeResearchWaveDraft(input:{
-  actorUserId:string;projectId:string;waveId:string;revision:number
+  actorUserId:string;projectId:string;waveId:string;revision:number;contentSelections?:SurveyContentSelection[];participantFeedback?:SurveyParticipantFeedbackSelection[]
 }):Promise<{publicationId:string;version:number;digest:string;waveId:string;runtimeReady:true}> {
   return prisma.$transaction(async tx=>{
     // Lock project first so concurrent freezes share one exact publication sequence.
-    const locked=await tx.$queryRaw<Array<{id:string;status:string;collectionMode:string}>>`
-      SELECT p.id,p.status,p.collection_mode AS "collectionMode"
+    const locked=await tx.$queryRaw<Array<{id:string;status:string;collectionMode:string;expires_at:Date|null;checked_at:Date}>>`
+      WITH locked AS MATERIALIZED (
+      SELECT p.id,p.status,p.collection_mode AS "collectionMode",u.expires_at
       FROM "survey_projects" p
       JOIN "users" u ON u.id=p.owner_user_id
       JOIN "survey_researcher_grants" g ON g.user_id=u.id
@@ -102,10 +152,11 @@ export async function freezeResearchWaveDraft(input:{
         AND u.account_domain='SURVEY' AND u.is_active AND NOT u.is_frozen
         AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp())
         AND g.status='ACTIVE' AND m.enabled=TRUE
-      FOR UPDATE OF p
+      FOR UPDATE OF p FOR SHARE OF u,g,m
+      ) SELECT locked.*,clock_timestamp() AS checked_at FROM locked
     `
     const project=locked[0]
-    if(!project)stop('该研究不属于当前研究者')
+    if(!project||(project.expires_at&&project.expires_at<=project.checked_at))stop('该研究不属于当前研究者')
     if(!['DRAFT','ACTIVE'].includes(project.status))stop('项目状态不允许冻结新的研究内容')
     const lockedWave=await tx.$queryRaw<Array<{id:string}>>`
       SELECT "id" FROM "survey_waves"
@@ -142,6 +193,20 @@ export async function freezeResearchWaveDraft(input:{
       if(!draft)stop('研究工具来源已发生变化')
       return draft!.catalogGrantId?compileCatalogUnit(draft!,sources.get(draft!.catalogGrantId)!):compileFrozenResearchUnit(draft!)
     })
+    const feedbackMetrics=new Map<string,string[]>()
+    for (const unit of units) {
+      if (unit.kind === 'FORM') continue
+      // Scale catalog imports now use the same explicit publication action as
+      // native drafts. Other catalog families retain their separate migration.
+      const release=unit.sourceProvenance&&unit.kind!=='SCALE'
+        ?await publishSurveyMeasurementUnit(tx,unit,input.actorUserId,input.projectId)
+        :await resolveSurveyMeasurementUnit(tx,unit,input.actorUserId,input.projectId)
+      feedbackMetrics.set(unit.draftId,release.content.metrics.map(metric=>metric.metricKey))
+      unit.measurementRelease = { releaseId: release.releaseId, contentHash: release.contentHash,
+        measurementHash: release.content.measurementHash }
+    }
+    freezeSurveyParticipantFeedback(units,input.participantFeedback??[],feedbackMetrics)
+    await freezeSurveyContentSelections(tx,input.actorUserId,input.projectId,units,input.contentSelections??[])
     // Initial bounded research safety limit, not a measured capacity claim.
     if(units.filter(unit=>unit.kind==='COGNITIVE').length>4)
       stop('一个波次最多包含 4 个受控认知任务（480 个正式试次）')
@@ -281,6 +346,7 @@ export async function freezeResearchWaveDraft(input:{
       metadata:{waveId:input.waveId,publicationId,definitionDigest:digest,
         runtimeReady:true,sourceVersions:units.map(x=>[x.instrumentKey,x.draftRevision])},
     }})
+    await recheckCatalogScaleSourceExpiry(tx,sources.values())
     return {publicationId,version:version+1,digest,waveId:input.waveId,runtimeReady:true}
   })
 }

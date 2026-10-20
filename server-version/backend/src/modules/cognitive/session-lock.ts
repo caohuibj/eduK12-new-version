@@ -114,6 +114,8 @@ export const lockSession = async (
         'id', parent.id,
         'trainingVariantAllocationEncrypted', parent.training_variant_allocation_encrypted,
         'trainingVariantAllocationHash', parent.training_variant_allocation_hash,
+        'trainingContentBindingHash', parent.training_content_binding_hash,
+        'trainingReferenceBindingHash', parent.training_reference_binding_hash,
         'compositeAssessment', jsonb_build_object(
           'trainingVariantDraft', definition.training_variant_draft,
           'trainingVariantFrozen', definition.training_variant_frozen,

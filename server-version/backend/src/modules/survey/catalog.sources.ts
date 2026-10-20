@@ -3,6 +3,10 @@ import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
 import { isAssessmentOperationallyPaused } from '../assessment-governance/operational-hold'
+import { lockInstrumentSourceIdentity } from '../assessment-authorization/source-identity-lock'
+import { readPublishedScaleMeasurementSource } from '../scale/measurement-source'
+import {getContentReleaseBatch,type StoredRelease} from '../measurement-content/repository'
+import { ContentReleaseError } from '../measurement-content/release'
 import { getScalePackage } from '../scale/scale-package.registry'
 import { hashScaleDefinition, validateScaleDefinition, type ScaleDefinitionV2 } from '../scale/scale-definition'
 import { getScaleCustomScorerKeys } from '../scale/scale-scoring'
@@ -159,11 +163,20 @@ export async function getCatalogSourceSnapshot(input:{actorUserId:string;ref:Cat
 /** The normal legacy UPDATE retirement path conflicts with these transaction-held locks. */
 async function lockCatalogSourceRows(refs:CatalogSourceRef[],db:Database):Promise<void>{
   const ids=(kind:SurveyKind)=>[...new Set(refs.filter(r=>r.kind===kind&&!(kind==='SJT'&&r.sourceId.startsWith('registry:'))&&!(kind==='FORM'&&r.sourceId.startsWith('questionnaire:'))).map(r=>r.sourceId))].sort()
+  // Source advisory locks must precede Scale row locks. A queued license writer
+  // would otherwise invert the explicit converter's source -> Scale order.
+  const scaleIds=ids('SCALE')
+  const before=scaleIds.length?await db.$queryRaw<Array<{id:string;code:string;instrument_version:string;instrument_class:string}>>(Prisma.sql`SELECT id,code,instrument_version,instrument_class::text FROM scales WHERE id IN (${Prisma.join(scaleIds)}) ORDER BY id`):[]
+  for(const row of [...before].filter(row=>row.instrument_class==='STANDARD').sort((a,b)=>a.code.localeCompare(b.code)||a.instrument_version.localeCompare(b.instrument_version)))
+    await lockInstrumentSourceIdentity(db as Prisma.TransactionClient,{instrumentKey:row.code,instrumentVersion:row.instrument_version},'READ')
   for(const kind of ['SCALE','SJT','COGNITIVE','FORM'] as const){
     const sourceIds=ids(kind);if(!sourceIds.length)continue
     const table=kind==='SCALE'?Prisma.sql`"scales"`:kind==='SJT'?Prisma.sql`"sjt_author_releases"`:
       kind==='COGNITIVE'?Prisma.sql`"cognitive_test_configs"`:Prisma.sql`"huiteacher_form_instruments"`
-    await db.$queryRaw(Prisma.sql`SELECT "id" FROM ${table} WHERE "id" IN (${Prisma.join(sourceIds)}) ORDER BY "id" FOR SHARE`)
+    if(kind==='SCALE'){
+      const locked=await db.$queryRaw<typeof before>(Prisma.sql`SELECT id,code,instrument_version,instrument_class::text FROM scales WHERE id IN (${Prisma.join(sourceIds)}) ORDER BY id FOR SHARE`)
+      if(canonicalHash(locked)!==canonicalHash(before))fail('SOURCE_SCALE_IDENTITY_CHANGED')
+    }else await db.$queryRaw(Prisma.sql`SELECT "id" FROM ${table} WHERE "id" IN (${Prisma.join(sourceIds)}) ORDER BY "id" FOR SHARE`)
   }
   const sectionIds=[...new Set(refs.filter(r=>r.kind==='FORM'&&r.sourceId.startsWith('questionnaire:')).map(r=>r.sourceId.slice(14)))].sort()
   if(sectionIds.length){
@@ -173,7 +186,7 @@ async function lockCatalogSourceRows(refs:CatalogSourceRef[],db:Database):Promis
   }
 
 }
-async function readCatalogSourceSnapshot(input:{actorUserId:string;ref:CatalogSourceRef},db:Database,verifiedFormScope:boolean):Promise<CatalogSourceSnapshot>{
+async function readCatalogSourceSnapshot(input:{actorUserId:string;ref:CatalogSourceRef},db:Database,verifiedFormScope:boolean,scaleAuthorityDb:Database=db,scaleReleases?:ReadonlyMap<string,StoredRelease>):Promise<CatalogSourceSnapshot>{
   const {ref}=input
   if(ref.kind==='SCALE'){
     const row=await db.scale.findFirst({where:{id:ref.sourceId,instrumentVersion:ref.sourceVersion,status:'PUBLISHED'}})
@@ -182,9 +195,13 @@ async function readCatalogSourceSnapshot(input:{actorUserId:string;ref:CatalogSo
     const pkg=getScalePackage(row!.code,ref.sourceVersion)
     if(row!.instrumentClass==='STANDARD'&&(!pkg||pkg.releaseStatus!=='PUBLISHED'))fail('SOURCE_REGISTERED_SCALE_UNAVAILABLE')
     const definition=(row!.instrumentClass==='STANDARD'?pkg!.definition:row!.definition) as ScaleDefinitionV2
-    if(!definition||row!.definitionHash!==hashScaleDefinition(definition))fail('SOURCE_SCALE_DEFINITION_HASH_MISMATCH')
+    if(!definition||row!.definitionHash!=null&&row!.definitionHash!==hashScaleDefinition(definition))fail('SOURCE_SCALE_DEFINITION_HASH_MISMATCH')
+    let admitted:Awaited<ReturnType<typeof readPublishedScaleMeasurementSource>>
+    try{admitted=await readPublishedScaleMeasurementSource(scaleAuthorityDb as Prisma.TransactionClient,row!,scaleReleases)}
+    catch(error){if(error instanceof ContentReleaseError)fail(error.code.replace('CONTENT_SCALE_SOURCE_','SOURCE_SCALE_'));throw error}
     const result=adaptCatalogScale(ref,row!.name,definition)
-    return {...result,provenance:{...result.provenance,code:row!.code,instrumentClass:row!.instrumentClass}}
+    return {...result,provenance:{...result.provenance,code:row!.code,instrumentClass:row!.instrumentClass,
+      sourceMeasurementRelease:{releaseId:admitted.release.releaseId,contentHash:admitted.release.contentHash},sourceRights:admitted.rights}}
   }
   if(ref.kind==='SJT'){
     let pkg:SituationPackage|undefined
@@ -227,9 +244,11 @@ export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyK
   if(page>CATALOG_MAX_PAGE)throw new CatalogSourceError('SOURCE_CATALOG_PAGE_LIMIT_EXCEEDED',400)
   const offset=(page-1)*limit,take=limit+1,refs:Array<{ref:CatalogSourceRef;title:string}>=[]
   let cached:Database=db
+  let scaleReleases:Map<string,StoredRelease>|undefined
   if(kind==='SCALE'){
     const rows=await db.scale.findMany({where:{status:'PUBLISHED'},orderBy:{id:'asc'},skip:offset,take})
     for(const row of rows)refs.push({ref:{kind,sourceId:row.id,sourceVersion:row.instrumentVersion},title:row.name})
+    scaleReleases=await getContentReleaseBatch(db,rows.slice(0,limit).flatMap(row=>row.measurementReleaseId?[row.measurementReleaseId]:[]))
     cached={scale:{findFirst:async({where}:any)=>rows.find(r=>r.id===where.id&&r.instrumentVersion===where.instrumentVersion)??null}} as unknown as Database
   }else if(kind==='SJT'){
     const builtins=listSituationPackages().filter(p=>p.releaseStatus==='PUBLISHED').sort((a,b)=>a.key.localeCompare(b.key,'en')||a.instrumentVersion.localeCompare(b.instrumentVersion,'en'))
@@ -253,7 +272,7 @@ export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyK
   }else fail('SOURCE_KIND_UNSUPPORTED')
   const list:CatalogSourceRow[]=[]
   for(const item of refs.slice(0,limit)){try{
-    const result=await readCatalogSourceSnapshot({actorUserId:input.actorUserId,ref:item.ref},cached,true)
+    const result=await readCatalogSourceSnapshot({actorUserId:input.actorUserId,ref:item.ref},cached,true,db,scaleReleases)
     list.push({...item,available:true,unsupportedReason:null,definitionDigest:result.definitionDigest})
   }catch(e){
     if(!(e instanceof CatalogSourceError)&&!(e instanceof Error&&e.name==='SurveyDraftError'))throw e
@@ -281,6 +300,7 @@ export async function assertCatalogSourcesCurrent(entries:Array<{snapshot:Catalo
     forms.length?db.huiteacherFormInstrument.findMany({where:{status:'PUBLISHED',OR:forms.map(r=>({id:r.sourceId,organizationId:r.organizationId??'',revision:Number(r.sourceVersion)}))},take:30}):[],
     questionnaireForms.length?db.questionnaireFormSection.findMany({where:{id:{in:questionnaireForms.map(r=>r.sourceId.slice(14))},questionnaire:{status:'PUBLISHED'}},include:questionnaireFormInclude,take:30}):[],
   ])
+  const scaleReleases=await getContentReleaseBatch(db,scaleRows.flatMap(row=>row.measurementReleaseId?[row.measurementReleaseId]:[]),true)
   const verifiedScopes=new Set<string>()
   for(const entry of entries)if(entry.snapshot.ref.kind==='FORM'&&!entry.snapshot.ref.sourceId.startsWith('questionnaire:')){
     const key=JSON.stringify([entry.actorUserId,entry.snapshot.ref.organizationId])
@@ -294,9 +314,27 @@ export async function assertCatalogSourcesCurrent(entries:Array<{snapshot:Catalo
     cognitiveTestConfig:{findFirst:async({where}:any)=>cognitiveRows.find(r=>r.id===where.id&&r.configVersion===where.configVersion)??null},
     huiteacherFormInstrument:{findFirst:async({where}:any)=>formRows.find(r=>r.id===where.id&&r.organizationId===where.organizationId&&r.revision===where.revision)??null},
   } as unknown as Database
+  const verified=new Map<string,CatalogSourceSnapshot>()
   for(const entry of entries){
-    const current=await readCatalogSourceSnapshot({actorUserId:entry.actorUserId,ref:entry.snapshot.ref},cached,true)
+    const key=canonicalHash({ref:entry.snapshot.ref,actorUserId:entry.actorUserId})
+    let current=verified.get(key)
+    if(!current){current=await readCatalogSourceSnapshot({actorUserId:entry.actorUserId,ref:entry.snapshot.ref},cached,true,db,scaleReleases);verified.set(key,current)}
     // Whole immutable adapter identity includes original scorer, presentation, typed mapping and provenance.
     if(canonicalHash(current)!==canonicalHash(entry.snapshot))fail('SOURCE_SNAPSHOT_CHANGED')
+  }
+}
+
+/** Current grants/sources were already verified and SHARE-locked by this caller.
+ * Only elapsed time can change now. Reuse the verified snapshot after later
+ * publication/asset waits instead of rereading/compiling entire packages. */
+export async function recheckCatalogScaleSourceExpiry(db:Prisma.TransactionClient,snapshots:Iterable<CatalogSourceSnapshot>){
+  const managed=[...snapshots].filter(snapshot=>snapshot.ref.kind==='SCALE'&&snapshot.provenance.instrumentClass==='STANDARD')
+  if(!managed.length)return
+  const [clock]=await db.$queryRaw<Array<{now:Date}>>(Prisma.sql`SELECT clock_timestamp() AS now`)
+  if(!clock)fail('SOURCE_SCALE_CLOCK_UNAVAILABLE')
+  for(const snapshot of managed){
+    const rights=snapshot.provenance.sourceRights as {validFrom?:string;validTo?:string}|undefined
+    const from=Date.parse(rights?.validFrom??''),to=Date.parse(rights?.validTo??'')
+    if(!Number.isFinite(from)||!Number.isFinite(to)||clock.now.getTime()<from||clock.now.getTime()>=to)fail('SOURCE_SCALE_LICENSE_EXPIRED')
   }
 }

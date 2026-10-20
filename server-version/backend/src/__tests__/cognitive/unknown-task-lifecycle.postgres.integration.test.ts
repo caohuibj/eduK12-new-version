@@ -33,6 +33,7 @@ suite(
   () => {
     let prisma: (typeof import('../../config/database'))['prisma'],
       userId: string,
+      publisherId: string,
       configId: string,
       courseId: string,
       assignmentId: string
@@ -47,6 +48,11 @@ suite(
         },
       })
       userId = user.id
+      const publisher = await prisma.user.create({ data: {
+        username: 'onboarding-publisher-' + randomUUID(), passwordHash: 'fixture',
+        role: 'ADMIN', platformRole: 'SYSTEM_ADMIN', isActive: true,
+      } })
+      publisherId = publisher.id
       const course = await prisma.course.create({
         data: {
           title: 'Unknown onboarding',
@@ -85,6 +91,7 @@ suite(
       if (configId)
         await prisma.cognitiveTestConfig.deleteMany({ where: { id: configId } })
       if (userId) await prisma.user.deleteMany({ where: { id: userId } })
+      if (publisherId) await prisma.user.deleteMany({ where: { id: publisherId } })
       await prisma?.$disconnect()
     })
     it.each(['UNIFIED_V1', 'legacy'])(
@@ -116,7 +123,7 @@ suite(
         await expect(
           createAssignment(userId, 'TEACHER', input),
         ).rejects.toThrow('PUBLISHED')
-        expect((await publishCognitiveConfig(configId)).status).toBe(
+        expect((await publishCognitiveConfig(configId, publisherId)).status).toBe(
           'PUBLISHED',
         )
         const assignment = await createAssignment(userId, 'TEACHER', input)

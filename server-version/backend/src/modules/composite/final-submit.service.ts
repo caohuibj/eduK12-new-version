@@ -1,3 +1,4 @@
+import {assertTrainingPrivateReferenceAdmissionCurrent} from './training-private-reference-use'
 import { assertTrainingFormFinalPrincipal, assertTrainingSectionSelected, TRAINING_VARIANT_DEFINITION_MARKER_SELECT, TRAINING_VARIANT_PARENT_MARKER_SELECT } from './training-variant-child-scope'
 import { Prisma } from '@prisma/client'
 import { normalizeTypedCompositeFormAnswer, normalizeTypedCompositeSection, validateTypedCompositeSectionDefinition, legacyFormValueProjection, type TypedFormValue } from '../assessment-runtime/typed-form'
@@ -639,6 +640,7 @@ const submitCompositeFormSectionFinalImpl = async (input: SectionSubmitInput) =>
         throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', error instanceof Error ? error.message : '人口学上下文无效', 409)
       }
     }
+    await assertTrainingPrivateReferenceAdmissionCurrent(tx)
     return {
       replayed: false,
       sectionAttemptId: sectionAttempt.id,

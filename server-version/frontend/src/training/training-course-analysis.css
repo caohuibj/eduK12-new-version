@@ -8,10 +8,10 @@
 .training-analysis-wave,.training-analysis-quality-row { min-width:0; border:1px solid var(--training-border,#dce3d8); border-radius:6px; padding:14px; }
 .training-course-analysis legend { padding:0 4px; font-weight:600; }
 .training-course-analysis label { display:flex; flex-direction:column; gap:6px; font-size:14px; margin-bottom:12px; min-width:0; }
-.training-course-analysis :is(input:not([type=checkbox]),select) { width:100%; min-height:44px; padding:8px; border:1px solid var(--training-border,#dce3d8); border-radius:4px; color:var(--training-ink,#1f403b); background:var(--training-surface,#fffdf9); }
+.training-course-analysis :is(input:not([type=checkbox]),select,textarea) { width:100%; min-height:44px; padding:8px; border:1px solid var(--training-border,#dce3d8); border-radius:4px; color:var(--training-ink,#1f403b); background:var(--training-surface,#fffdf9); }
 .training-course-analysis button { min-height:44px; padding:8px 12px; border:1px solid var(--training-border,#dce3d8); border-radius:4px; }
 .training-course-analysis button:disabled { cursor:not-allowed; opacity:.6; }
-.training-course-analysis :is(button,input,select):focus-visible { outline:3px solid var(--training-bamboo,#1f4d3b); outline-offset:3px; }
+.training-course-analysis :is(button,input,select,textarea):focus-visible { outline:3px solid var(--training-bamboo,#1f4d3b); outline-offset:3px; }
 .training-analysis-metrics { border:0; padding:8px 0; min-width:0; }
 .training-analysis-metrics label { flex-direction:row; align-items:flex-start; gap:8px; }
 .training-analysis-metrics input { width:18px; height:18px; flex:none; margin-top:2px; }
@@ -31,3 +31,6 @@
 .training-course-analysis [role=alert] { border-left:3px solid #a33e2b; padding-left:12px; }
 .hui-training.hui-app--standard.training-workspace-shell .training-trainer-course .training-section-switch { flex-wrap:wrap; padding-right:142px; column-gap:20px; row-gap:0; }
 .hui-training.hui-app--standard.training-workspace-shell .training-trainer-course .training-section-switch button { white-space:nowrap; }
+
+.training-reference-studio fieldset { min-width:0; margin:16px 0; padding:14px; border:1px solid var(--training-border,#dce3d8); border-radius:6px; }
+.training-reference-studio textarea { min-height:88px; resize:vertical; }

@@ -65,13 +65,21 @@ function fixture(options:{attendance?:boolean;variant?:boolean}={}){
     completedAt:new Date('2026-10-17T00:10:00.000Z'),resultsHash:canonicalHash(result),resultsCipher:encryptUnifiedRuntimePayload(result),
     submissionId:'unused-submission-id',payloadHash:'unused-payload-hash',attempt,wave}
   const state={hasFinal:!options.attendance,allow:true,sourceRevision:1,reads:0,
+    expiresAt:null as Date|null,afterLockNow:new Date(cutOff),
     finalCipherBytes:0n,frozenBytes:0n,assignmentBytes:0n,beforeRead:(_read:number)=>{},events:[] as string[]}
   const publications=[publication],waves=[wave],attempts=[attempt]
   const tx={
     $queryRaw:vi.fn(async(parts:TemplateStringsArray|{strings:string[]})=>{
       const sql=surveyFixtureSql(parts)
-      if(sql.includes('FROM "survey_projects"'))return state.allow
+      if(sql.includes('FROM "survey_projects"')){
+        if(state.expiresAt){
+          expect(sql).toContain('WITH authorized AS MATERIALIZED')
+          expect(sql.indexOf('expires_at>clock_timestamp()')).toBeGreaterThan(sql.indexOf('FOR SHARE OF p,u,g,m'))
+          expect(sql).not.toContain('expires_at>statement_timestamp()')
+        }
+        return state.allow&&(!state.expiresAt||state.expiresAt>state.afterLockNow)
         ?[{collectionMode:'LINKED_WAVES',sourceRevision:state.sourceRevision,sourceCutOff:new Date(cutOff)}]:[]
+      }
       if(sql.includes('"finalCipherBytes"')){state.events.push('source-budget');return [{finalCipherBytes:state.finalCipherBytes,frozenBytes:state.frozenBytes}]}
       if(sql.includes('flow_assignment_cipher')){state.events.push('assignment-budget');return [{bytes:state.assignmentBytes}]}
       throw new Error('Unexpected source SQL: '+sql)
@@ -169,6 +177,15 @@ describe('Survey exact source material and independent read budgets',()=>{
     const sql=surveyFixtureSql(f.tx.$queryRaw.mock.calls[0][0])
     for(const guard of ['p.owner_user_id=','u.account_domain=','u.is_active','NOT u.is_frozen','u.expires_at',"g.status='ACTIVE'",'m.enabled','FOR SHARE OF p,u,g,m'])
       expect(sql).toContain(guard)
+  })
+
+  it.each([1,2])('rejects expiry crossed while acquiring source fence %s',async phase=>{
+    const f=fixture()
+    f.state.expiresAt=new Date('2026-10-17T00:21:00Z')
+    f.state.beforeRead=read=>{if(read===phase)f.state.afterLockNow=new Date('2026-10-17T00:21:01Z')}
+    await expect(loadSurveySource(owner)).rejects.toMatchObject({statusCode:404})
+    expect(f.state.reads).toBe(phase)
+    expect(materialReads(f)).toHaveLength(phase-1)
   })
 
   it.each(['revision','publication','finalCipher','finalHash','wavePublication','waveProject','attemptProject','attemptWave','attemptStatus','exclusion','quality','participantStatus','participantCode','assignment'] as const)

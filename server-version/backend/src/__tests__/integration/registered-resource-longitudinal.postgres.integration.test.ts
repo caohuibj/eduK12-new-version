@@ -1,4 +1,6 @@
 import { independentReviewer } from './independent-reviewer'
+import { publishRegisteredScaleFixture } from './registered-resource-fixture'
+import { decodeTrainingFinalReceipt } from '../../modules/composite/training-content-final'
 import { randomUUID } from 'node:crypto'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { PrismaClient, UserRole } from '@prisma/client'
@@ -46,6 +48,7 @@ suite('registered descriptive content → real two-wave canonical reports', () =
     definition.report.interpretations=[{scoreKey:'total',headline:'偏好描述',source:{type:'score_only'},summary:'三题回答合计。',bands:[],guidance:[]}]
     const definitionHash = hashScaleDefinition(definition)
     const scale = await db.scale.create({data:{code:'r3resource_' + suffix.replaceAll('-',''),name:'原创偏好',status:'PUBLISHED',creatorId:admin.id,instrumentClass:'CUSTOM_DESCRIPTIVE',definition,definitionHash}})
+    const measurement = await publishRegisteredScaleFixture(db, scale.id)
     let resource = await registerDescriptiveResource(actor,scale.id)
     expect((await registerDescriptiveResource(actor,scale.id)).id).toBe(resource.id)
     await expect(updateComposite(admin.id, UserRole.ADMIN, resource.composite_id, {name:'replace'})).rejects.toMatchObject({statusCode:403})
@@ -63,6 +66,11 @@ suite('registered descriptive content → real two-wave canonical reports', () =
     expect((await db.$queryRaw<Array<{status:string;reviewed_by_user_id:string}>>`SELECT status,reviewed_by_user_id FROM registered_assessment_resources WHERE id=${oldId}`)[0]).toEqual({status:'REVIEWED',reviewed_by_user_id:admin.id})
     await transitionDescriptiveResource(await independentReviewer(actor),resource.id,'review')
     await transitionDescriptiveResource(actor,resource.id,'publish')
+    const frozen = await db.compositeAssessment.findUniqueOrThrow({ where: { id: resource.composite_id } })
+    expect(frozen.trainingContentSnapshot).toMatchObject({ units: [{
+      measurement: { releaseId: measurement.releaseId },
+      referencePolicy: { choices: [] },
+    }] })
     expect(await listReleasedRegisteredResources(teacher.id, UserRole.TEACHER)).toEqual([])
     const ref = {family:'SCALE' as const,key:resource.resource_key,version:resource.resource_version}
     await expect(assertRegisteredResourceUse(ref, teacher.id)).rejects.toMatchObject({code:'RESOURCE_USE_FORBIDDEN'})
@@ -94,6 +102,10 @@ suite('registered descriptive content → real two-wave canonical reports', () =
         definitionHash:frozen.legacyDefinitionHash,userId:student.id,compositeAttemptId:attemptId,
         answers:values.map((value,index)=>({itemCode:'Q'+(index+1),responseValue:'option_'+value}))})
       await finalizeCompositeAttemptIfReady(attemptId)
+      const final = await db.compositeAssessmentAttempt.findUniqueOrThrow({ where: { id: attemptId } })
+      expect(final.trainingContentBindingHash).toBeTruthy()
+      expect(decodeTrainingFinalReceipt(final)?.interpretation.units[0])
+        .toMatchObject({ references: [], report: { status: 'NOT_SELECTED' } })
       expect((await db.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:attemptId}})).status).toBe('COMPLETED')
       const summary = await readRespondentRunSummary(student.id,execution.id)
       expect(summary).toMatchObject({state:'READY',metrics:{total:wave===1?9:11}})

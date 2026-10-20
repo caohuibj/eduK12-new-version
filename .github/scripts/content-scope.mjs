@@ -1,3 +1,4 @@
+import {exactCandidatePlan,exactCandidateOutputs} from './exact-candidate-scope.mjs';
 import {trainingFunctionalPlan} from './training-functional.mjs';
 import {adminFunctionalPlan} from './admin-permissions-functional.mjs';
 import {surveyMacPlan,rejectSurveyManual} from './survey-mac-ui-scope.mjs';
@@ -225,6 +226,14 @@ export function runnerPlan({ profile = 'hosted', scenario = 'platform' } = {}) {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const event = process.env.CI_EVENT;
   const base = process.env.CI_BASE_SHA;
+  const exact = exactCandidatePlan(base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+  if(exact) {
+    const output=exactCandidateOutputs(exact);
+    console.log(JSON.stringify(output));
+    if(process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT,
+      Object.entries(output).map(([key,value])=>`${key}=${value}\n`).join(''));
+    process.exit(0);
+  }
   rejectSurveyManual();
   // Admission is also checked in job.if before checkout.
   if (event === 'pull_request' && process.env.CI_PR_REPOSITORY !== process.env.GITHUB_REPOSITORY)

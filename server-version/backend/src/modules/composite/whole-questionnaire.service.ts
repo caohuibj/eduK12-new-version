@@ -56,13 +56,16 @@ const wholeParentSelect = {
 } as const
 // Worker-only superset: a single read supplies frozen admission, aggregate
 // metadata and collection rendering. Both paths include frozen variant binding.
-const wholeReportParentSelect = {
+export const wholeReportParentSelect = {
   ...wholeParentSelect, anonymousCode: true, totalTime: true, startedAt: true,
+  compositeAssessmentId:true,trainingContentBinding:true,trainingContentBindingHash:true,
+  trainingReferenceBinding:true,trainingReferenceBindingHash:true,
+  trainingContentInterpretationEncrypted:true,trainingContentInterpretationHash:true,
   formSectionAttempts: {select:{sectionId:true,attemptEpoch:true,status:true,taskSatisfaction:true}},
   completedItems: true, compiledBundleRuntimeHash: true,
   formAnswers: { select: { itemId: true, value: true } },
   compositeAssessment: { select: {
-    id: true, name: true, productKind: true, reportPackageKey: true, analysisProtocolKey: true,
+    id: true, name: true, createdBy:true, productKind: true, reportPackageKey: true, analysisProtocolKey: true,
     publishedAt: true, trainingVariantDraft: true, trainingVariantFrozen: true, trainingFlowDraft:true,trainingFlowFrozen:true,trainingFlowDigest:true,trainingVariantDigest:true,
     reportPackageVersion: true, reportPackageProfile: true, reportPackageSnapshotEncrypted: true,
     items: { orderBy: { position: 'asc' }, include: {

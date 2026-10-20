@@ -1,0 +1,263 @@
+name: Measurement bounded browser qualification
+on:
+  push:
+    branches: [ci/measurement-browser-20261020]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: measurement-browser-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  CI: 'true'
+  TZ: UTC
+  VITE_COGNITIVE_MODULE_ENABLED: 'true'
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+jobs:
+  scope:
+    name: exact source and bounded scope
+    if: github.event_name == 'push' && github.ref == 'refs/heads/ci/measurement-browser-20261020'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: python3 -B .github/scripts/measurement-browser-ci.py scope
+      - uses: actions/upload-artifact@v4
+        with:
+          name: measurement-${{ github.run_id }}-${{ github.sha }}-scope-attempt-${{ github.run_attempt }}
+          path: measurement-browser-evidence/scope.json
+          retention-days: 3
+          if-no-files-found: error
+  reuse:
+    name: verify original successful build / ${{ matrix.component }}
+    needs: scope
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [backend]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: admit only the fixed original successful build
+        env:
+          COMPONENT: ${{ matrix.component }}
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B .github/scripts/measurement-browser-ci.py admit "$COMPONENT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: measurement-${{ github.run_id }}-${{ github.sha }}-${{ matrix.component }}-admission-attempt-${{ github.run_attempt }}
+          path: measurement-browser-evidence/*.json
+          retention-days: 3
+          if-no-files-found: error
+  frontend:
+    name: build changed measurement frontend once
+    needs: scope
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: compile only the changed frontend production assets
+        run: python3 -B .github/scripts/measurement-browser-ci.py build frontend
+      - uses: actions/upload-artifact@v4
+        with:
+          name: measurement-${{ github.run_id }}-${{ github.sha }}-frontend-build
+          path: |
+            measurement-browser-evidence/frontend-build.json
+            measurement-browser-evidence/frontend-build.tar.gz
+          retention-days: 3
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: measurement-${{ github.run_id }}-${{ github.sha }}-frontend-producer-attempt-${{ github.run_attempt }}
+          path: measurement-browser-evidence/*.json
+          retention-days: 3
+          if-no-files-found: error
+  admin:
+    name: admit exact original admin browser success
+    needs: scope
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: verify unchanged admin inputs and exact successful official report
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B .github/scripts/measurement-browser-ci.py admit-admin
+      - uses: actions/upload-artifact@v4
+        with:
+          name: measurement-${{ github.run_id }}-${{ github.sha }}-admin-admitted-attempt-${{ github.run_attempt }}
+          path: measurement-browser-evidence/admin-admitted.json
+          retention-days: 3
+          if-no-files-found: error
+  browser:
+    name: missing measurement browser paths / ${{ matrix.phase }}
+    needs: [reuse, frontend]
+    strategy:
+      fail-fast: false
+      matrix:
+        phase: [journeys]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      NODE_ENV: test
+      MEASUREMENT_BROWSER_PHASE: ${{ matrix.phase }}
+      PORT: '3000'
+      DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      MEASUREMENT_BROWSER_OWNER_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      REDIS_URL: redis://localhost:6379
+      SOCKET_REDIS_REQUIRED: 'true'
+      COOKIE_SECURE: 'false'
+      CORS_ORIGIN: http://localhost:5174
+      ADMIN_WEBAUTHN_RP_ID: localhost
+      ADMIN_WEBAUTHN_ORIGIN: http://localhost:5174
+      COGNITIVE_MODULE_ENABLED: 'true'
+      SURVEY_WORKSPACE_ENABLED: 'true'
+      SURVEY_PUBLICATION_ENABLED: 'true'
+      SURVEY_ANALYTICS_ENABLED: 'true'
+      BACKGROUND_WORKERS_ENABLED: 'false'
+      TRUST_PROXY_HOPS: '1'
+      LOG_LEVEL: warn
+      ASSET_MIGRATION_COMPLETE: 'false'
+      MEASUREMENT_BROWSER_ISOLATED: '1'
+      # User approved 2026-10-20 09:10 UTC for this bounded CI round only.
+      # Disposable browser-profile trust, including scoped retries; never system trust.
+      MEASUREMENT_BROWSER_EPHEMERAL_CA_APPROVED: 'true'
+      MEASUREMENT_BROWSER_ORIGIN: http://localhost:5174
+      E2E_BACKEND_URL: http://127.0.0.1:3000
+    services:
+      postgres:
+        image: postgres:16.15-bookworm
+        env:
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: ptool123
+          POSTGRES_DB: ptool
+        ports: ['5432:5432']
+        options: --health-cmd "pg_isready -U ptool -d ptool" --health-interval 5s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7.4.11-bookworm
+        ports: ['6379:6379']
+        options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - uses: actions/download-artifact@v4
+        with:
+          name: measurement-${{ github.run_id }}-${{ github.sha }}-frontend-build
+          path: measurement-browser-evidence
+      - name: restore original backend and exact newly built frontend without consumer rebuild
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 -B .github/scripts/measurement-browser-ci.py restore backend
+          python3 -B .github/scripts/measurement-browser-ci.py restore frontend
+      - name: install official Chromium and runtime libraries
+        run: |
+          bash server-version/scripts/ci-install-canvas-deps.sh
+          node server-version/backend/node_modules/playwright-core/cli.js install --with-deps chromium
+          sudo apt-get install -y --no-install-recommends libnss3-tools
+      - name: prepare run-private paths and fresh synthetic encryption keys
+        run: |
+          python3 - <<'PY'
+          import os, secrets
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP'])
+          private = root / 'measurement-browser-private'
+          private.mkdir(mode=0o700)
+          evidence = root / 'measurement-browser-evidence'
+          evidence.mkdir()
+          values = {
+            'MEASUREMENT_BROWSER_FIXTURE_DIR': str(private),
+            'MEASUREMENT_BROWSER_FIXTURE_FILE': str(private / 'fixture.json'),
+            'MEASUREMENT_BROWSER_OUTPUT': str(evidence),
+            'UPLOAD_DIR': str(private / 'uploads'),
+            'CREDENTIAL_HANDOFF_DIR': str(private / 'credentials'),
+          }
+          for key in ['JWT_SECRET', 'DATA_ENCRYPTION_KEY', 'DATA_PSEUDONYM_KEY', 'ASSET_SIGNING_SECRET', 'SURVEY_MFA_ENCRYPTION_KEY']:
+            values[key] = secrets.token_hex(32)
+            print('::add-mask::' + values[key])
+          with open(os.environ['GITHUB_ENV'], 'a') as output:
+            for key, value in values.items(): output.write(f'{key}={value}\n')
+          PY
+      - name: prepare explicitly approved private-profile-only test CA
+        run: python3 -B .github/scripts/measurement-browser-ci.py tls
+      - name: initialize empty isolated schema (fixture setup, not DB regression)
+        working-directory: server-version/backend
+        run: |
+          node scripts/pr24-migration-preflight.mjs
+          node_modules/.bin/prisma migrate deploy
+      - name: create bounded synthetic browser fixture and restricted runtime identity
+        working-directory: server-version/backend
+        run: node --import tsx scripts/measurement-browser-fixture.ts
+      - name: serve compiled backend and production frontend
+        run: |
+          set -euo pipefail
+          mkdir -p "$UPLOAD_DIR" "$CREDENTIAL_HANDOFF_DIR"
+          (cd server-version/backend; nohup setsid node dist/index.js > "$RUNNER_TEMP/measurement-backend.log" 2>&1 & echo $! > "$RUNNER_TEMP/measurement-backend.pid")
+          nohup setsid npm --prefix server-version/frontend run preview -- --host localhost --port 5174 --strictPort > "$RUNNER_TEMP/measurement-frontend.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/measurement-frontend.pid"
+          nohup setsid node server-version/e2e/measurement-browser-proxy.cjs > "$RUNNER_TEMP/measurement-proxy.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/measurement-proxy.pid"
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent --max-time 2 http://127.0.0.1:3000/ready >/dev/null && curl --fail --silent --max-time 2 http://localhost:5174/ >/dev/null && curl --noproxy '*' --fail --silent --max-time 2 --cacert "$MEASUREMENT_BROWSER_TLS_CA" --resolve training.eduk12.top:3189:127.0.0.1 https://training.eduk12.top:3189/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          echo '::error::Compiled service readiness failed; private logs retained on runner only.'
+          exit 1
+      - name: real browser authorization, recovery and download checks
+        run: node server-version/e2e/measurement-version-browser.cjs
+      - name: stop only this job's processes and erase private synthetic credentials
+        if: always()
+        run: |
+          for component in backend frontend proxy; do
+            file="$RUNNER_TEMP/measurement-$component.pid"
+            if [ -f "$file" ]; then kill -- -"$(cat "$file")" 2>/dev/null || true; fi
+          done
+          rm -rf "$RUNNER_TEMP/measurement-browser-private"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: measurement-${{ github.run_id }}-${{ github.sha }}-browser-${{ matrix.phase }}-attempt-${{ github.run_attempt }}
+          path: |
+            measurement-browser-evidence/*-consumed.json
+            measurement-browser-evidence/*-admission.json
+            measurement-browser-evidence/scope.json
+            ${{ runner.temp }}/measurement-browser-evidence/
+          retention-days: 3
+          if-no-files-found: error
+  result:
+    name: bounded browser result (not merge readiness)
+    needs: [scope, reuse, frontend, admin, browser]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          results = json.loads(os.environ['RESULTS'])
+          assert set(results) == {'scope', 'reuse', 'frontend', 'admin', 'browser'}
+          assert all(row['result'] == 'success' for row in results.values()), results
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as output:
+            output.write("Bounded journeys succeeded using this run's rebuilt scoped frontend and the original verified backend. Administrator checks retain original-run success under the reviewed disjoint FormalReferenceStudio and SurveyReportStudio wrapping repairs; they were not replayed on the new frontend bundle. Local checks remain reference-only. No full-platform, merge, image-security, deployment or scientific-norm qualification is claimed.\n")
+          PY

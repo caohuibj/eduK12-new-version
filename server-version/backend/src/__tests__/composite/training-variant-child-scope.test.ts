@@ -48,7 +48,7 @@ const fixture = () => {
       ...(['SCALE', 'COGNITIVE', 'SITUATIONAL'] as const).map(type => ({ slotKey: `${type.toLowerCase()}:${type === 'SITUATIONAL' ? 'sjt' : type.toLowerCase()}-a`, unitType: type, required: true,
         sourceDefinitionIdentity: { key: `${type === 'SITUATIONAL' ? 'sjt' : type.toLowerCase()}-a`, version: '1.0.0', hash: 'a'.repeat(64) }, sourceBinding: {},
         ...(type === 'SITUATIONAL' ? { runtimeIdentity: { instrumentKey: 'sjt-a', instrumentVersion: '1.0.0', definitionHash: 'a'.repeat(64), compiledRuntimeHash: 'b'.repeat(64), scorerKey: 'sjt', scoringVersion: '1.0.0', runtimeGeneration: 'UNIFIED_V1' as const, deliveryMode: 'FINAL_ONLY' as const, frozenAt: '2026-10-18T08:00:00.000Z' } } : {}) }))] })
-  return { id: 'attempt', userId: 'user', recoveryTokenHash: null, participantKey: 'participant', attemptEpoch: 1, status: 'IN_PROGRESS', runtimeGeneration: 'UNIFIED_V1', deliveryMode: 'FINAL_ONLY',
+  return { id: 'attempt', trainingContentBindingHash:null,trainingReferenceBindingHash:null,userId: 'user', recoveryTokenHash: null, participantKey: 'participant', attemptEpoch: 1, status: 'IN_PROGRESS', runtimeGeneration: 'UNIFIED_V1', deliveryMode: 'FINAL_ONLY',
     compositeAssessment: composite, trainingFlowSnapshotEncrypted: null, trainingFlowSnapshotHash: null, trainingFlowPathEncrypted: null, trainingFlowPathHash: null, trainingVariantAllocationEncrypted: encryptUnifiedRuntimePayload(allocation), trainingVariantAllocationHash: allocation.allocationHash,
     frozenActiveSlotSetEncrypted: encryptFrozenActiveSlotSet(slots), frozenActiveSlotSetHash: slots.snapshotHash }
 }
@@ -84,13 +84,13 @@ describe('C14 selected child scope enforcement', () => {
   })
   it('preserves legacy null parent identity and standalone zero-read behavior', async () => {
     expect(await assertTrainingChildSelected({ compositeAttemptId: null })).toBeUndefined()
-    const parent: any = { id: 'legacy', trainingFlowSnapshotEncrypted: null, trainingFlowSnapshotHash: null, trainingFlowPathEncrypted: null, trainingFlowPathHash: null, trainingVariantAllocationEncrypted: null, trainingVariantAllocationHash: null,
+    const parent: any = { id: 'legacy', trainingContentBindingHash:null,trainingReferenceBindingHash:null,trainingFlowSnapshotEncrypted: null, trainingFlowSnapshotHash: null, trainingFlowPathEncrypted: null, trainingFlowPathHash: null, trainingVariantAllocationEncrypted: null, trainingVariantAllocationHash: null,
       compositeAssessment: { trainingFlowDraft: null, trainingFlowFrozen: null, trainingFlowDigest: null, trainingVariantDraft: null, trainingVariantFrozen: null, trainingVariantDigest: null, items: [{ id: 'legacy-item' }], formSections: [] } }
     expect(await assertTrainingChildSelected({ compositeAttemptId: 'legacy', compositeItemId: 'legacy-item' }, { parent })).toBe(parent)
     expect(mocks.parent).not.toHaveBeenCalled()
   })
   it('keeps explicit-null child and section guards at zero additional queries or union bytes', async () => {
-    const marker: any = { id: 'legacy', trainingFlowSnapshotEncrypted: null, trainingFlowSnapshotHash: null, trainingFlowPathEncrypted: null, trainingFlowPathHash: null, trainingVariantAllocationEncrypted: null, trainingVariantAllocationHash: null,
+    const marker: any = { id: 'legacy', trainingContentBindingHash:null,trainingReferenceBindingHash:null,trainingFlowSnapshotEncrypted: null, trainingFlowSnapshotHash: null, trainingFlowPathEncrypted: null, trainingFlowPathHash: null, trainingVariantAllocationEncrypted: null, trainingVariantAllocationHash: null,
       compositeAssessment: { trainingFlowDraft: null, trainingFlowFrozen: null, trainingFlowDigest: null, trainingVariantDraft: null, trainingVariantFrozen: null, trainingVariantDigest: null } }
     const legacyUnion = { ...fixture(), ...marker, compositeAssessment: { ...fixture().compositeAssessment, ...marker.compositeAssessment } }
     for (const type of ['scale', 'cognitive', 'sjt']) {
@@ -136,7 +136,7 @@ describe('C14 selected child scope enforcement', () => {
     expect(mocks.parent).toHaveBeenCalledTimes(1)
   })
   it('checks only narrow metadata when a legacy caller has not selected any variant fields', async () => {
-    const marker = { id: 'legacy', trainingFlowSnapshotEncrypted: null, trainingFlowSnapshotHash: null, trainingFlowPathEncrypted: null, trainingFlowPathHash: null, trainingVariantAllocationEncrypted: null, trainingVariantAllocationHash: null,
+    const marker = { id: 'legacy', trainingContentBindingHash:null,trainingReferenceBindingHash:null,trainingFlowSnapshotEncrypted: null, trainingFlowSnapshotHash: null, trainingFlowPathEncrypted: null, trainingFlowPathHash: null, trainingVariantAllocationEncrypted: null, trainingVariantAllocationHash: null,
       compositeAssessment: { trainingFlowDraft: null, trainingFlowFrozen: null, trainingFlowDigest: null, trainingVariantDraft: null, trainingVariantFrozen: null, trainingVariantDigest: null } }
     mocks.parent.mockResolvedValue(marker)
     await assertTrainingChildSelected({ compositeAttemptId: 'legacy', compositeItemId: 'old-item' })
@@ -145,7 +145,7 @@ describe('C14 selected child scope enforcement', () => {
     expect(mocks.parent.mock.calls[0][0].select.compositeAssessment.select).not.toHaveProperty('items')
   })
   it.each(['FORM', 'SCALE', 'COGNITIVE'])('keeps legacy %s stored-admission decoding free of added parent queries', async type => {
-    const parent = { id: 'legacy', trainingFlowSnapshotEncrypted: null, trainingFlowSnapshotHash: null, trainingFlowPathEncrypted: null, trainingFlowPathHash: null, trainingVariantAllocationEncrypted: null, trainingVariantAllocationHash: null,
+    const parent = { id: 'legacy', trainingContentBindingHash:null,trainingReferenceBindingHash:null,trainingFlowSnapshotEncrypted: null, trainingFlowSnapshotHash: null, trainingFlowPathEncrypted: null, trainingFlowPathHash: null, trainingVariantAllocationEncrypted: null, trainingVariantAllocationHash: null,
       compositeAssessment: { trainingFlowDraft: null, trainingFlowFrozen: null, trainingFlowDigest: null, trainingVariantDraft: null, trainingVariantFrozen: null, trainingVariantDigest: null } }
     const child: any = { id: 'legacy-child', compositeAttemptId: 'legacy', compositeItemId: 'old-item', compositeAttempt: parent,
       attemptEpoch: 1, frozenAdmissionSnapshotEncrypted: 'corrupt-snapshot', frozenAdmissionSnapshotHash: 'x' }
@@ -156,7 +156,7 @@ describe('C14 selected child scope enforcement', () => {
     expect(mocks.parent).not.toHaveBeenCalled()
   })
   it('carries null markers through the existing Cognitive row lock without an additional parent read', async () => {
-    const marker = { id: 'legacy', trainingFlowSnapshotEncrypted: null, trainingFlowSnapshotHash: null, trainingFlowPathEncrypted: null, trainingFlowPathHash: null, trainingVariantAllocationEncrypted: null, trainingVariantAllocationHash: null,
+    const marker = { id: 'legacy', trainingContentBindingHash:null,trainingReferenceBindingHash:null,trainingFlowSnapshotEncrypted: null, trainingFlowSnapshotHash: null, trainingFlowPathEncrypted: null, trainingFlowPathHash: null, trainingVariantAllocationEncrypted: null, trainingVariantAllocationHash: null,
       compositeAssessment: { trainingFlowDraft: null, trainingFlowFrozen: null, trainingFlowDigest: null, trainingVariantDraft: null, trainingVariantFrozen: null, trainingVariantDigest: null } }
     const tx: any = { $queryRaw: vi.fn().mockResolvedValue([{ id: 'child', composite_attempt_id: 'legacy', composite_item_id: 'cognitive-a', training_variant_parent: marker }]) }
     const child = await lockSession(tx, 'child')

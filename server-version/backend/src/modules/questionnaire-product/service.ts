@@ -1,3 +1,7 @@
+import {attachTrainingReferenceSelection,listTrainingReferenceChoices,trainingReferenceSelectionSchema} from '../composite/training-reference-selection'
+import { assertCurrentTrainingContentOwner, attachTrainingReportSelection, trainingReportSelectionSchema } from '../composite/training-report-selection'
+import { prepareTrainingContentSnapshot } from '../composite/training-content-binding'
+import {publishAssignmentMeasurementRelease} from '../cognitive/assignment-measurement-release'
 import { parseTrainingFeedbackPolicy, trainingFeedbackPolicySchema } from '../assessment-policy/training-feedback-policy'
 import { parseTrainingPersistencePolicy } from '../composite/training-persistence.policy'
 import { compileWeightedVariants, weightedVariantConfigSchema } from '../assessment-core/weighted-variants'
@@ -170,7 +174,17 @@ export async function detail(actor: Actor, id: string) {
   const row = await prisma.compositeAssessment.findUnique({ where: { id } })
   if (!row || row.productKind !== 'QUESTIONNAIRE') throw compositeNotFound('新版问卷不存在')
   owner(actor, row)
-  return { ...await getCompositeForTeacher(actor.userId, actor.role, id), supportedChannels: ['WEB'], reportMode: 'COLLECTION_ONLY' }
+  let reportSelection:unknown=undefined,referenceSelection:unknown=undefined
+  if(row.createdBy===actor.userId){
+    reportSelection=null;referenceSelection=null
+    if((row as any).trainingReportSelectionDraft!=null||(row as any).trainingReferenceSelectionDraft!=null){const selections=await prisma.$transaction(async tx=>{
+      const current=await tx.compositeAssessment.findUnique({where:{id},include:{questionnaireCourses:true}})
+      if(!current)throw compositeNotFound('新版问卷不存在')
+      await assertCurrentTrainingContentOwner(tx,actor,current)
+      return {report:current.trainingReportSelectionDraft,reference:current.trainingReferenceSelectionDraft}
+    });reportSelection=selections.report;referenceSelection=selections.reference}
+  }
+  return { ...await getCompositeForTeacher(actor.userId, actor.role, id), trainingReportSelectionDraft:reportSelection, trainingReferenceSelectionDraft:referenceSelection, supportedChannels: ['WEB'], reportMode: 'COLLECTION_ONLY' }
 }
 export async function create(actor: Actor, raw: unknown) {
   author(actor)
@@ -386,13 +400,9 @@ export async function preflight(actor: Actor, id: string, raw: unknown) {
   }, { timeout: 30000 })
 }
 
-export async function publish(actor: Actor, id: string, raw: unknown) {
-  return mutate(actor, id, revisionSchema.parse(raw).revision, async (tx, row) => {
-    if (await tx.assessmentCompositionTemplate.findUnique({ where: { definitionId: id } })) throw compositeConflict('组合模板需要先复制为新草稿，再绑定课程或公开投放')
-    if(row.trainingVariantDraft!=null)await validateTrainingVariants(tx,row)
-    await validateDelivery(tx, actor, row)
-    const situational = await validateResources(tx, actor, row)
-    await lockCompositeAssetReferences(tx, row.items, row.formSections, situational)
+async function prepareOwnedCognitiveMeasurements(tx:Tx,actor:Actor,row:any) {
+  if(!row.items.some((item:any)=>item.type==='COGNITIVE'))return
+  const expiry=await assertCurrentTrainingContentOwner(tx,actor,row)
     for (const item of row.items) {
       const copiedBinding = copiedCognitiveBinding(item, row)
       if (item.type === 'COGNITIVE' && !copiedBinding) {
@@ -409,8 +419,76 @@ export async function publish(actor: Actor, id: string, raw: unknown) {
           quotaSourceAssignmentId: source.createdBy === actor.userId ? source.quotaSourceAssignmentId ?? source.id : null, maxAttempts: source.maxAttempts,
         } })
         await tx.compositeAssessmentItem.update({ where: { id: item.id }, data: { cognitiveAssignmentId: binding.id } })
+        await publishAssignmentMeasurementRelease(tx,actor.userId,binding.id)
+      } else if (item.type==='COGNITIVE') {
+        await publishAssignmentMeasurementRelease(tx,actor.userId,item.cognitiveAssignment.id)
       }
     }
+  return expiry
+ }
+async function recheckMeasurementPublisherExpiry(tx:Tx,expiresAt:Date|null|undefined) {
+  if(!expiresAt)return
+  const [clock]=await tx.$queryRaw<Array<{now:Date}>>(Prisma.sql`SELECT clock_timestamp() AS now`)
+  if(!clock||expiresAt<=clock.now)throw compositeForbidden('测量实例作者账号已到期')
+}
+
+export async function contentReferenceChoices(actor:Actor,id:string) {
+  return prisma.$transaction(async tx=>{
+    const row=await tx.compositeAssessment.findUnique({where:{id},include:{questionnaireCourses:true,items:{include:{scale:true,cognitiveAssignment:{include:{config:true}}}}}})
+    if(!row||row.productKind!=='QUESTIONNAIRE')throw compositeNotFound('新版问卷不存在')
+    const expiry=await assertCurrentTrainingContentOwner(tx,actor,row)
+    const situational=await validateResources(tx,actor,row)
+    const prepared=await prepareTrainingContentSnapshot(tx,row,situational)
+    const result=await listTrainingReferenceChoices(tx,{...prepared,ownerId:actor.userId})
+    await recheckMeasurementPublisherExpiry(tx,expiry)
+    return result
+  },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:10000})
+}
+export async function updateContentReferenceSelection(actor:Actor,id:string,raw:unknown) {
+  const input=z.object({revision:z.number().int().nonnegative(),selection:trainingReferenceSelectionSchema.nullable()}).strict().parse(raw)
+  return mutate(actor,id,input.revision,async(tx,row)=>{
+    const expiry=await assertCurrentTrainingContentOwner(tx,actor,row)
+    const situational=await validateResources(tx,actor,row)
+    if(input.selection!=null){
+      const prepared=await prepareTrainingContentSnapshot(tx,row,situational)
+      await attachTrainingReferenceSelection(tx,{...prepared,ownerId:actor.userId,selection:input.selection})
+    }
+    await recheckMeasurementPublisherExpiry(tx,expiry)
+    await tx.compositeAssessment.update({where:{id},data:{trainingReferenceSelectionDraft:input.selection??Prisma.DbNull}})
+  })
+}
+
+export async function updateContentReportSelection(actor:Actor,id:string,raw:unknown) {
+  const input=z.object({revision:z.number().int().nonnegative(),selection:trainingReportSelectionSchema.nullable()}).strict().parse(raw)
+  return mutate(actor,id,input.revision,async(tx,row)=>{
+    const expiry=await assertCurrentTrainingContentOwner(tx,actor,row)
+    const situational=await validateResources(tx,actor,row)
+    if(input.selection!=null){
+      const prepared=await prepareTrainingContentSnapshot(tx,row,situational)
+      await attachTrainingReportSelection(tx,{...prepared,ownerId:actor.userId,selection:input.selection})
+    }
+    await recheckMeasurementPublisherExpiry(tx,expiry)
+    await tx.compositeAssessment.update({where:{id},data:{trainingReportSelectionDraft:input.selection??Prisma.DbNull}})
+  })
+}
+
+/** Explicit draft-revision operation; does not publish or start a deployment. */
+export async function publishMeasurementInstances(actor:Actor,id:string,raw:unknown) {
+  return mutate(actor,id,revisionSchema.parse(raw).revision,async(tx,row)=>{
+    await validateResources(tx,actor,row)
+    const expiry=await prepareOwnedCognitiveMeasurements(tx,actor,row)
+    await recheckMeasurementPublisherExpiry(tx,expiry)
+  })
+}
+
+export async function publish(actor: Actor, id: string, raw: unknown) {
+  return mutate(actor, id, revisionSchema.parse(raw).revision, async (tx, row) => {
+    if (await tx.assessmentCompositionTemplate.findUnique({ where: { definitionId: id } })) throw compositeConflict('组合模板需要先复制为新草稿，再绑定课程或公开投放')
+    if(row.trainingVariantDraft!=null)await validateTrainingVariants(tx,row)
+    await validateDelivery(tx, actor, row)
+    const situational = await validateResources(tx, actor, row)
+    await lockCompositeAssetReferences(tx, row.items, row.formSections, situational)
+    const measurementPublisherExpiry=await prepareOwnedCognitiveMeasurements(tx,actor,row)
     for (const section of row.formSections) {
       const definition = mapCompositeSection(section)
       const mediaOwner = publishedFormMediaOwner('COMPOSITE', id, compositeFormSectionDefinitionHash(definition))
@@ -419,6 +497,7 @@ export async function publish(actor: Actor, id: string, raw: unknown) {
     }
     if(row.trainingTimingPolicy){readTrainingTimingPolicy(row.trainingTimingPolicy);await tx.compositeAssessment.update({where:{id},data:{trainingTimingPolicy:await timingPolicy(tx,row,true)}})}
     await publishComposite(actor.userId, actor.role, id, tx, situational)
+    await recheckMeasurementPublisherExpiry(tx,measurementPublisherExpiry)
   })
 }
 export async function archive(actor: Actor, id: string, raw: unknown) {

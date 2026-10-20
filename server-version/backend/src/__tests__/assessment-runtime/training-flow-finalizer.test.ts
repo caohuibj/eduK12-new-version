@@ -1,9 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 const mocks = vi.hoisted(() => ({
+  release:vi.fn(),
   global: { $transaction: vi.fn(), compositeAssessmentAttempt: { findUnique: vi.fn() }, assessmentUnitSnapshot: { findMany: vi.fn() } },
   tx: { $queryRaw: vi.fn(), compositeAssessmentAttempt: { findUnique: vi.fn(), update:vi.fn(), updateMany: vi.fn() },
     assessmentUnitSnapshot: { findMany: vi.fn(), create: vi.fn() }, compositeReportJob: { update: vi.fn() } },
 }))
+vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:mocks.release}))
 vi.mock('../../config/database', () => ({ prisma: mocks.global }))
 import { compileTrainingFlow, trainingFlowUnitKey, trainingFlowItemKey } from '../../modules/assessment-core/flow/training'
 import { buildTrainingFlowUnits } from '../../modules/composite/training-flow-definition'
@@ -23,7 +25,7 @@ beforeEach(() => {
   mocks.tx.$queryRaw.mockResolvedValue([{ id: 'parent' }])
   mocks.tx.compositeAssessmentAttempt.updateMany.mockResolvedValue({ count: 1 })
 })
-async function fixture(options: { termination?: 'SCREEN_OUT' | 'COMPLETE_EARLY'; refused?: boolean; answer?:'yes'|'no'; sjt?: 'valid' | 'invalid' | 'empty' | 'refused' } = {}) {
+async function fixture(options: { skippedSjt?:boolean; termination?: 'SCREEN_OUT' | 'COMPLETE_EARLY'; refused?: boolean; answer?:'yes'|'no'; sjt?: 'valid' | 'invalid' | 'empty' | 'refused' } = {}) {
   const items: any[] = [0, 1].map(index => ({ id: `item-${index}`, type: 'FORM', position: index * 2,
     formSectionId: `section-${index}`, formSectionPosition: 0, formType: 'single_choice', formLabel: `Question ${index}`,
     required: true, formOptions: [{ value: 'yes', label: 'Yes' }, { value: 'no', label: 'No' }],
@@ -39,9 +41,10 @@ async function fixture(options: { termination?: 'SCREEN_OUT' | 'COMPLETE_EARLY';
     trainingFlowDraft: null, items, formSections: sections }
   const config = compileTrainingFlow({ schemaVersion: 1, blocks: [
     { blockKey: 'first', kind: 'INSTRUMENT', instrumentKey: trainingFlowUnitKey('section-0') },
-    ...(options.sjt ? [{ blockKey: 'sjt_block', kind: 'INSTRUMENT', instrumentKey: trainingFlowItemKey('sjt') }] : []),
+    ...(options.sjt&&!options.skippedSjt ? [{ blockKey: 'sjt_block', kind: 'INSTRUMENT', instrumentKey: trainingFlowItemKey('sjt') }] : []),
     { blockKey: 'finish', kind: 'END', termination: options.termination ?? 'COMPLETE_EARLY',
       when: { op: options.refused ? 'IS_MISSING' : 'EQUALS', field: { source: 'ANSWER', instrumentKey: trainingFlowUnitKey('section-0'), itemKey: 'item_0' }, ...(options.refused ? {} : { value: 'yes' }) } },
+    ...(options.sjt&&options.skippedSjt ? [{ blockKey: 'sjt_block', kind: 'INSTRUMENT', instrumentKey: trainingFlowItemKey('sjt') }] : []),
     { blockKey: 'future', kind: 'INSTRUMENT', instrumentKey: trainingFlowUnitKey('section-1') },
   ] }, buildTrainingFlowUnits(composite))
   composite.trainingFlowFrozen = config; composite.trainingFlowDigest = config.flowDigest
@@ -69,7 +72,7 @@ async function fixture(options: { termination?: 'SCREEN_OUT' | 'COMPLETE_EARLY';
     terminalState: 'COMPLETED', payloadKind: 'COLLECTION_FACTS', sourceType: 'COMPOSITE_FORM_SECTION', sourceAttemptId: 'section-attempt', sourceSubmissionId: 'submission',
     sourceDefinitionHash: candidateSlots[0].sourceDefinitionIdentity.hash, compiledRuntimeHash: null, completedAt: new Date('2026-10-18T00:01:00Z'),
     canonicalResultEncrypted: null, collectionFactsEncrypted: encryptUnifiedRuntimePayload(facts) }]
-  if (options.sjt) {
+  if (options.sjt&&!options.skippedSjt) {
     const core: any = { schemaVersion: 1, unitType: 'SITUATIONAL', instrumentKey: 'test-sjt', instrumentVersion: '1', sourceDefinitionHash: hash,
       compilerVersion: '1', compiledRuntimeHash: hash, scorerKey: 'sjt', scorerVersion: '1', contextHash: null,
       quality: { status: options.sjt === 'invalid' ? 'invalid' : 'interpretable', flags: options.sjt === 'refused' ? ['sjt_online_response_v1', 'sjt_online_task_not_satisfied'] : [] },
@@ -211,4 +214,66 @@ describe('public flow discovery markers',()=>{
   const legacy={trainingFlowDraft:null,trainingFlowFrozen:null,trainingFlowDigest:null}
   it('retains only the explicit all-null legacy candidate projection',()=>expect(hasTrainingFlowDefinitionMarkers(legacy)).toBe(false))
   it.each(['trainingFlowDraft','trainingFlowFrozen','trainingFlowDigest'])('hides candidates for partial %s',key=>{expect(hasTrainingFlowDefinitionMarkers({...legacy,[key]:{}})).toBe(true);expect(hasTrainingFlowDefinitionMarkers({...legacy,[key]:undefined})).toBe(true)})
+})
+
+// Real aggregate verification and real receipt generation; only durable I/O is mocked.
+const measurementReleaseId='11111111-1111-4111-8111-111111111111',reportReleaseId='22222222-2222-4222-8222-222222222222'
+function bindContent(parent:any){
+ const hash='a'.repeat(64)
+ parent.compositeAssessmentId='composite';parent.compositeAssessment.createdBy='owner'
+ parent.trainingContentBinding={schemaVersion:1,compositeId:'composite',attemptId:parent.id,epoch:1,publicationHash:hash,
+  units:[{itemId:'sjt',family:'SJT',source:{kind:'SJT_AUTHOR_RELEASE',id:'source',ownerId:'owner',instrumentKey:'test-sjt',instrumentVersion:'1'},
+   measurement:{releaseId:measurementReleaseId,contentHash:hash,measurementHash:hash},report:{releaseId:reportReleaseId,contentHash:hash}}]}
+ parent.trainingContentBindingHash=canonicalHash(parent.trainingContentBinding)
+ mocks.release.mockImplementation(async(_tx,id)=>id===measurementReleaseId?{releaseId:id,contentHash:hash,layer:'MEASUREMENT',family:'SJT',status:'PUBLISHED',
+  scope:{kind:'PRIVATE',product:'TRAINING',ownerId:'owner',resourceId:'source'},content:{measurementHash:hash}}:
+ {releaseId:id,contentHash:hash,layer:'REPORT',family:'SJT',status:'PUBLISHED',scope:{kind:'PRIVATE',product:'TRAINING',ownerId:'owner',resourceId:'composite'},
+  content:{generatorVersion:'DECLARATIVE_REPORT_V1',measurements:[{releaseId:measurementReleaseId,contentHash:hash}]}})
+ mocks.tx.compositeAssessmentAttempt.updateMany.mockImplementation(async({data})=>{Object.assign(parent,data);return {count:1}})
+}
+describe('FLOW aggregate to real Training content FINAL receipt',()=>{
+ it('persists verified canonical source hashes with completion and leaves repeat FINAL unchanged',async()=>{
+  const f=await fixture({sjt:'valid'});bindContent(f.parent)
+  const before=JSON.stringify(f.rows),canonical:any=decryptUnifiedRuntimePayload(f.rows.find(row=>row.unitType==='SITUATIONAL')!.canonicalResultEncrypted)
+  await finalizeCompositeAttemptUnifiedIfReady(f.parent.id,f.parent)
+  const receipt:any=decryptUnifiedRuntimePayload(f.parent.trainingContentInterpretationEncrypted)
+  expect(receipt.sources).toEqual([{itemId:'sjt',resultHash:canonical.resultHash}])
+  expect(receipt.aggregateInputHash).toBe(f.parent.aggregateInputHash)
+  expect(receipt.contentBindingHash).toBe(f.parent.trainingContentBindingHash)
+  expect(receipt.interpretation.units[0]).toMatchObject({instrumentKey:'sjt',report:{status:'READY'}})
+  expect(canonicalHash(receipt)).toBe(f.parent.trainingContentInterpretationHash)
+  expect(mocks.tx.compositeAssessmentAttempt.updateMany.mock.invocationCallOrder[0]).toBeLessThan(mocks.release.mock.invocationCallOrder[0])
+  expect(mocks.release.mock.calls.every(call=>call[0]===mocks.tx&&call[2]===true)).toBe(true)
+  expect(JSON.stringify(f.rows)).toBe(before)
+  const stored=f.parent.trainingContentInterpretationEncrypted,writes=mocks.tx.compositeAssessmentAttempt.update.mock.calls.length,reads=mocks.release.mock.calls.length
+  await finalizeCompositeAttemptUnifiedIfReady(f.parent.id,f.parent)
+  expect(f.parent.trainingContentInterpretationEncrypted).toBe(stored)
+  expect(mocks.tx.compositeAssessmentAttempt.update).toHaveBeenCalledTimes(writes)
+  expect(mocks.release).toHaveBeenCalledTimes(reads)
+ })
+ it('keeps an unexecuted candidate explicit NOT_EXECUTED with no report or fabricated source fact',async()=>{
+  const f=await fixture({sjt:'valid',skippedSjt:true});bindContent(f.parent)
+  await finalizeCompositeAttemptUnifiedIfReady(f.parent.id,f.parent)
+  const receipt:any=decryptUnifiedRuntimePayload(f.parent.trainingContentInterpretationEncrypted)
+  expect(receipt.sources).toEqual([])
+  expect(receipt.interpretation.units[0]).toMatchObject({instrumentKey:'sjt',reason:'NOT_EXECUTED',report:{status:'UNAVAILABLE'}})
+  expect(f.rows).toHaveLength(1);expect(mocks.tx.assessmentUnitSnapshot.create).not.toHaveBeenCalled()
+ })
+ it('does not add receipt writes or release reads for old null bindings',async()=>{
+  const f=await fixture({sjt:'valid'});f.parent.trainingContentBinding=null;f.parent.trainingContentBindingHash=null
+  await finalizeCompositeAttemptUnifiedIfReady(f.parent.id,f.parent)
+  expect(mocks.release).not.toHaveBeenCalled()
+  expect(mocks.tx.compositeAssessmentAttempt.update.mock.calls.filter(([args])=>'trainingContentInterpretationEncrypted' in args.data)).toHaveLength(0)
+ })
+ it('propagates receipt persistence failure out of the existing transaction',async()=>{
+  const f=await fixture({sjt:'valid'});bindContent(f.parent)
+  const failure=new Error('receipt persistence failed')
+  mocks.tx.compositeAssessmentAttempt.update.mockImplementation(async({data})=>{
+   if('trainingContentInterpretationEncrypted' in data)throw failure
+   Object.assign(f.parent,data);return f.parent
+  })
+  await expect(finalizeCompositeAttemptUnifiedIfReady(f.parent.id,f.parent)).rejects.toThrow('receipt persistence failed')
+  expect(mocks.release).toHaveBeenCalled();expect(mocks.tx.compositeAssessmentAttempt.updateMany).toHaveBeenCalledTimes(1)
+  // The mock transaction cannot prove PostgreSQL rollback; this asserts propagation only.
+ })
 })

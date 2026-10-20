@@ -25,6 +25,7 @@ const wave=(id='w1',ordinal=1)=>({id,projectId:'p1',title:'波次 '+ordinal,ordi
 function fixture({many=false,empty=false,waveCount=1}={}){
   const drafts=new Map((empty?[]:Array.from({length:many?26:1},(_,i)=>draft('tool'+(i+1),'工具'+(i+1)))).map(item=>[item.id,item]))
   const projects=['p1','p2'].map(id=>({id,title:'研究 '+id,description:'',collectionMode:'SINGLE_UNLINKED',status:'DRAFT',revision:1}))
+  const reports=new Map<string,any>([['report1',{id:'report1',project_id:'p1',owner_id:'researcher',report_key:'feedback',version:'1',revision:0,state:'DRAFT',published_release_id:null,payload:{measurementReleaseId:'measurement1',metricKeys:['score'],audience:'researcher',language:'zh-CN',template:{title:'报告初始标题',blocks:[{type:'TEXT',text:'原文'}],limitations:[]},assets:[]}}]])
   const waits=new Map<string,Promise<Response>[]>()
   const fetcher=vi.fn(async(input:RequestInfo|URL,init?:RequestInit)=>{
     const url=String(input),method=init?.method??'GET'
@@ -40,6 +41,13 @@ function fixture({many=false,empty=false,waveCount=1}={}){
     if(path==='')return response(projects.find(project=>project.id===id))
     if(path==='/catalog?page=1')return response({list:[{id:'grant1',title:'授权原版',kind:'FORM',status:'ACTIVE',sourceRef:{kind:'FORM',sourceId:'form',sourceVersion:1}}]})
     if(path==='/assets')return response({assets:[]})
+    if(path==='/report-drafts/measurements')return response([{id:'measurement1',family:'SCALE',key:'private-scale',version:'1',status:'PUBLISHED',contentHash:'a'.repeat(64),metrics:[{metricKey:'score',unit:'points'}]}])
+    if(path==='/report-drafts?page=1')return response([...reports.values()].filter(row=>row.project_id===id).map(row=>({id:row.id,reportKey:row.report_key,version:row.version,revision:row.revision,state:row.state,publishedReleaseId:row.published_release_id})))
+    if(path==='/report-drafts'&&method==='POST'){
+      const input=JSON.parse(String(init?.body)),row={id:input.requestId,project_id:id,owner_id:'researcher',report_key:input.reportKey,version:input.version,payload:input.payload,revision:0,state:'DRAFT',published_release_id:null}
+      reports.set(row.id,row);return response(row)
+    }
+    if(path.match(/^\/report-drafts\/[^/]+$/)&&method==='GET')return response(reports.get(path.split('/')[2]))
     if(path.startsWith('/waves?page='))return response({list:Array.from({length:Number(path.split('=')[1])===1?waveCount:1},(_,i)=>wave('w'+(i+1),i+1))})
     if(path.startsWith('/instruments?page=')){
       const page=Number(path.split('=')[1])
@@ -366,6 +374,14 @@ describe('shared Survey workspace instruments requests',()=>{
 describe('S04 workspace section navigation',()=>{
   it('retains unsaved settings, tool and wave edits across sections without any new request',async()=>{
     const api=fixture();await openWorkspace()
+    // First opening loads this independent resource once; later section changes
+    // still retain every editor without issuing redundant requests.
+    fireEvent.click(screen.getByRole('tab',{name:'私有报告'}))
+    await screen.findByRole('option',{name:/private-scale/})
+    await waitFor(()=>expect(screen.getByRole('button',{name:'刷新报告与测量列表'})).toBeEnabled())
+    expect(api.count(base+'/report-drafts/measurements')).toBe(1)
+    expect(api.count(base+'/report-drafts?page=1')).toBe(1)
+    fireEvent.click(screen.getByRole('tab',{name:'发布与采集'}))
     fireEvent.change(studio().getByLabelText('波次标题'),{target:{value:'未保存的采集计划'}})
     fireEvent.click(screen.getByRole('tab',{name:'研究设置'}))
     fireEvent.change(screen.getByLabelText('研究名称'),{target:{value:'未保存的研究名称'}})
@@ -385,11 +401,60 @@ describe('S04 workspace section navigation',()=>{
     expect(builder().getByRole('button',{name:'保存草稿'})).toBeEnabled()
     const tools=screen.getByRole('tab',{name:'研究工具'});tools.focus()
     fireEvent.keyDown(tools,{key:'ArrowRight'})
+    expect(screen.getByRole('tab',{name:'私有报告'})).toHaveFocus()
+    expect(screen.getByRole('tab',{name:'私有报告'})).toHaveAttribute('aria-selected','true')
+    fireEvent.keyDown(screen.getByRole('tab',{name:'私有报告'}),{key:'ArrowRight'})
     expect(screen.getByRole('tab',{name:'发布与采集'})).toHaveFocus()
     expect(screen.getByRole('tab',{name:'发布与采集'})).toHaveAttribute('aria-selected','true')
     fireEvent.keyDown(screen.getByRole('tab',{name:'发布与采集'}),{key:'End'})
     expect(screen.getByRole('tab',{name:'研究数据'})).toHaveFocus()
     expect(screen.getByRole('region',{name:'研究数据状态'})).toBeVisible()
     expect(api.fetcher.mock.calls).toHaveLength(requests)
+  })
+})
+
+describe('Private report cross-project leave protection',()=>{
+  it('keeps unsaved edits on cancellation and leaves only after confirmation',async()=>{
+    fixture();await openWorkspace()
+    fireEvent.click(screen.getByRole('tab',{name:'私有报告'}))
+    fireEvent.click(await screen.findByRole('button',{name:'feedback · 1 · 草稿'}))
+    fireEvent.change(await screen.findByLabelText('报告标题'),{target:{value:'不能静默丢失的报告'}})
+    const confirm=vi.spyOn(window,'confirm').mockReturnValue(false)
+    fireEvent.click(screen.getAllByRole('button',{name:'查看/编辑'})[1])
+    expect(screen.getByLabelText('报告标题')).toHaveValue('不能静默丢失的报告')
+    fireEvent.click(screen.getByRole('tab',{name:'研究设置'}))
+    fireEvent.click(screen.getByRole('button',{name:'新建其他项目'}))
+    expect(screen.getByRole('tab',{name:'私有报告'})).toBeInTheDocument()
+    expect(confirm).toHaveBeenCalledTimes(2)
+    confirm.mockReturnValue(true)
+    fireEvent.click(screen.getAllByRole('button',{name:'查看/编辑'})[1])
+    expect(screen.getByLabelText('研究名称')).toHaveValue('研究 p2')
+    expect(screen.queryByLabelText('报告标题')).toBeNull()
+    confirm.mockRestore()
+  })
+  it('blocks leaving with uncertain create outcome and retries the original request',async()=>{
+    const api=fixture();await openWorkspace()
+    fireEvent.click(screen.getByRole('tab',{name:'私有报告'}))
+    await screen.findByRole('option',{name:/private-scale/})
+    await waitFor(()=>expect(screen.getByRole('button',{name:'刷新报告与测量列表'})).toBeEnabled())
+    fireEvent.change(screen.getByLabelText('报告系列标识'),{target:{value:'new-report'}})
+    const create=api.defer(base+'/report-drafts','POST')
+    fireEvent.click(screen.getByRole('button',{name:'创建报告草稿'}))
+    await waitFor(()=>expect(api.count(base+'/report-drafts','POST')).toBe(1))
+    fireEvent.click(screen.getAllByRole('button',{name:'查看/编辑'})[1])
+    expect(screen.getByRole('tab',{name:'私有报告'})).toHaveAttribute('aria-selected','true')
+    await act(async()=>create.resolve(response(null,false)))
+    await screen.findByRole('button',{name:'重试本次创建'})
+    fireEvent.click(screen.getAllByRole('button',{name:'查看/编辑'})[1])
+    expect(screen.getByRole('button',{name:'重试本次创建'})).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('tab',{name:'研究设置'}))
+    fireEvent.click(screen.getByRole('button',{name:'新建其他项目'}))
+    expect(screen.getByRole('tab',{name:'私有报告'})).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('tab',{name:'私有报告'}))
+    fireEvent.click(screen.getByRole('button',{name:'重试本次创建'}))
+    await screen.findByLabelText('报告标题')
+    const calls=api.fetcher.mock.calls.filter(([url,init])=>url===base+'/report-drafts'&&init?.method==='POST')
+    expect(calls).toHaveLength(2)
+    expect(JSON.parse(String(calls[0][1]?.body))).toEqual(JSON.parse(String(calls[1][1]?.body)))
   })
 })

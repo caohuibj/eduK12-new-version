@@ -1,3 +1,5 @@
+import { sjtMeasurementRelease } from '../../measurement-content/sjt'
+import { publishContentRelease } from '../../measurement-content/repository'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../../config/database'
 import { canonicalHash } from '../../assessment-runtime/canonical'
@@ -244,6 +246,13 @@ export async function reviewSjtDraft(
           },
         })
         await retainSjtAuthorReleaseMedia(tx, draft.ownerId, release.id, c.template, mediaOptions)
+        const contentRelease = await publishContentRelease(tx, sjtMeasurementRelease({
+          localId: pkg.key, version: pkg.instrumentVersion, instrumentVersion: pkg.instrumentVersion,
+          definition: pkg.definition, onlineProtocol: pkg.online,
+          scope: { kind: 'PLATFORM', ownerId: draft.ownerId },
+          provenance: { authorReleaseId: release.id, adaptationSource: draft.adaptationSource ?? null },
+        }), actor.userId)
+        await tx.$executeRaw`UPDATE sjt_author_releases SET measurement_release_id=${contentRelease.releaseId} WHERE id=${release.id}`
       }
       await tx.sjtAuthorDraft.update({
         where: { id },

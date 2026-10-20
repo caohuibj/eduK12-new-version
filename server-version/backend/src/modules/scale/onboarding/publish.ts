@@ -1,3 +1,4 @@
+import { publishScaleMeasurement } from '../../measurement-content/scale'
 import { randomUUID } from 'node:crypto'
 import { Prisma, type PrismaClient } from '@prisma/client'
 import { z } from 'zod'
@@ -70,7 +71,14 @@ export const publishStandardScale = async (db: PrismaClient, value: Input & { ex
     const source = getScaleInstrumentSource(input.instrumentKey, input.instrumentVersion)!
     await retainScaleAssessmentImages({ owner: publishedScaleMediaOwner(plan.proof.scaleId, plan.proof.definitionHash), definition: source.executable!.definition, db: tx as never })
     const scale = await tx.scale.update({ where: { id: plan.proof.scaleId }, data: { status: 'PUBLISHED', visibility: input.visibility } })
+    const release = await publishScaleMeasurement(tx, {
+      localId: input.instrumentKey, version: [input.instrumentVersion, source.executable!.definition.scoring.scoringVersion, source.localization?.localizationVersion ?? 'unversioned'].join(':'),
+      instrumentVersion: input.instrumentVersion, definition: source.executable!.definition, instrumentClass: 'STANDARD',
+      provenance: { sourceIdentity: source.identity },
+      scope: { kind: 'PLATFORM', ownerId: scale.creatorId },
+    }, input.actorUserId)
+    await tx.$executeRaw(Prisma.sql`UPDATE scales SET measurement_release_id=${release.releaseId} WHERE id=${scale.id}`)
     await tx.$executeRaw(Prisma.sql`INSERT INTO "scale_publication_audits" ("id", "scale_id", "actor_user_id", "proof_hash", "proof") VALUES (${randomUUID()}::uuid, ${scale.id}, ${input.actorUserId}, ${plan.proofHash}, CAST(${JSON.stringify(plan.proof)} AS jsonb))`)
-    return { scaleId: scale.id, status: scale.status, visibility: scale.visibility, proofHash: plan.proofHash }
+    return { scaleId: scale.id, status: scale.status, visibility: scale.visibility, proofHash: plan.proofHash, measurementReleaseId: release.releaseId }
   })
 }

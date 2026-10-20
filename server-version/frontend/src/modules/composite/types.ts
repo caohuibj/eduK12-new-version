@@ -351,7 +351,16 @@ export interface TrainingFlowReportSummary {
   skippedUnitCount: number
 }
 
+export interface TrainingContentReport {
+  itemId:string
+  status:'READY'|'REVOKED'|'NOT_SELECTED'|'UNAVAILABLE'
+  reportRelease:{releaseId:string;contentHash:string}|null
+  lifecycleNotices:Array<{layer:string;releaseId:string;status:string}>
+  rendered:{generatorVersion:string;title:string|null;blocks:unknown[];limitations:string[];disclaimer:string|null}|null
+}
+
 export interface CompositeReport {
+  contentReports?: TrainingContentReport[]
   trainingFlow?: TrainingFlowReportSummary
   taskSatisfaction?: string | null
   taskSatisfied?: boolean

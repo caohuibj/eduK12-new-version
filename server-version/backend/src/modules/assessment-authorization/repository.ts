@@ -1,3 +1,4 @@
+import {lockInstrumentSourceIdentity,lockAuthorizationSource} from './source-identity-lock'
 /**
  * Durable Prisma AuthorizationRepository.
  * Maps domain authorizationId ↔ DB authorizationKey; version-row id is separate.
@@ -187,6 +188,7 @@ export class PrismaAuthorizationRepository {
       recordHash: hashInstrumentAuthorizationRecord(record),
     }
     await this.prisma.$transaction(async (tx) => {
+      await lockInstrumentSourceIdentity(tx,input,'WRITE')
       await tx.instrumentAuthorization.create({
         data: domainToCreateData(record, versionRowId),
       })
@@ -202,6 +204,7 @@ export class PrismaAuthorizationRepository {
     now?: string
   }): Promise<{ record: InstrumentAuthorizationRecordV1; audit: InstrumentAuthorizationAuditEventV1 }> {
     return this.prisma.$transaction(async (tx) => {
+      await lockAuthorizationSource(tx,input.authorizationId)
       const currentRow = await tx.instrumentAuthorization.findFirst({
         where: { authorizationKey: input.authorizationId },
         orderBy: { version: 'desc' },
@@ -240,6 +243,7 @@ export class PrismaAuthorizationRepository {
     now?: string
   }): Promise<{ record: InstrumentAuthorizationRecordV1; audit: InstrumentAuthorizationAuditEventV1 }> {
     return this.prisma.$transaction(async (tx) => {
+      await lockAuthorizationSource(tx,input.authorizationId)
       const currentRow = await tx.instrumentAuthorization.findFirst({
         where: { authorizationKey: input.authorizationId },
         orderBy: { version: 'desc' },
@@ -274,6 +278,7 @@ export class PrismaAuthorizationRepository {
     lineage: InstrumentAuthorizationRecordV1[]
   }> {
     return this.prisma.$transaction(async (tx) => {
+      await lockAuthorizationSource(tx,input.authorizationId)
       const rows = await tx.instrumentAuthorization.findMany({
         where: { authorizationKey: input.authorizationId },
         orderBy: { version: 'desc' },
@@ -343,6 +348,7 @@ export class PrismaAuthorizationRepository {
     now?: string
   }): Promise<{ record: InstrumentAuthorizationRecordV1; audit: InstrumentAuthorizationAuditEventV1; mintedNewVersion: boolean }> {
     return this.prisma.$transaction(async (tx) => {
+      await lockAuthorizationSource(tx,input.authorizationId)
       const currentRow = await tx.instrumentAuthorization.findFirst({
         where: { authorizationKey: input.authorizationId },
         orderBy: { version: 'desc' },

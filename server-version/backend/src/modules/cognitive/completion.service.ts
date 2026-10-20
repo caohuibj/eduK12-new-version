@@ -1,3 +1,4 @@
+import {assertTrainingPrivateReferenceAdmissionCurrent} from '../composite/training-private-reference-use'
 import { assertTrainingChildSelected } from '../composite/training-variant-child-scope'
 import { prisma } from '../../config/database'
 import {
@@ -278,7 +279,9 @@ const completeSessionWithPrincipal = async (userId: string | null, sessionId: st
 
     const storedConfig = await loadCognitiveSessionConfig(session.configSnapshotEncrypted,tx)
     if (storedConfig.snapshot) {
-      return completeV2Session(tx, session, storedConfig.snapshot)
+      const completed = await completeV2Session(tx, session, storedConfig.snapshot)
+      await assertTrainingPrivateReferenceAdmissionCurrent(tx)
+      return completed
     }
 
     // 用 frozen version 查 Registry，缺失 = 服务端配置错误，绝不静默换最新 scorer。

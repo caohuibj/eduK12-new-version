@@ -1,7 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+vi.hoisted(() => { process.env.COGNITIVE_MODULE_ENABLED = 'true' })
 
 const { mockPrisma, mockEvaluateReadiness, mockGetDefinition } = vi.hoisted(() => ({
   mockPrisma: {
+    $transaction: vi.fn(), $executeRaw: vi.fn(), $queryRaw: vi.fn(),
+    user: { findUnique: vi.fn() },
     cognitiveTestConfig: {
       findUnique: vi.fn(),
       updateMany: vi.fn(),
@@ -18,6 +21,9 @@ vi.mock('../../modules/cognitive/library/product-readiness', () => ({
 vi.mock('../../modules/cognitive/v2/registry', () => ({
   getCognitiveV2TaskDefinition: mockGetDefinition,
 }))
+
+vi.mock('../../modules/measurement-content/cognitive', () => ({ cognitiveMeasurementRelease: vi.fn(() => ({})) }))
+vi.mock('../../modules/measurement-content/repository', () => ({ publishContentRelease: vi.fn(async () => ({ releaseId: 'content-1' })), transitionContentRelease: vi.fn() }))
 
 import {
   publishCognitiveConfig,
@@ -41,6 +47,9 @@ const draftConfig = {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockPrisma.$transaction.mockImplementation(async (fn: (tx: unknown) => unknown) => fn(mockPrisma))
+  mockPrisma.user.findUnique.mockResolvedValue({ id: 'admin-1', platformRole: 'SYSTEM_ADMIN', isActive: true, isFrozen: false, expiresAt: null })
+  mockPrisma.$queryRaw.mockResolvedValue([{ measurement_release_id: 'content-1' }])
   mockGetDefinition.mockReturnValue({ testType: 'reaction' })
   mockEvaluateReadiness.mockReturnValue({ ready: true, blockers: [] })
 })
@@ -53,7 +62,7 @@ describe('Cognitive release service', () => {
       .mockResolvedValueOnce(published)
     mockPrisma.cognitiveTestConfig.updateMany.mockResolvedValue({ count: 1 })
 
-    await expect(publishCognitiveConfig('config-1')).resolves.toMatchObject({ status: 'PUBLISHED' })
+    await expect(publishCognitiveConfig('config-1', 'admin-1')).resolves.toMatchObject({ status: 'PUBLISHED' })
     expect(mockEvaluateReadiness).toHaveBeenCalledWith(expect.anything(), draftConfig.config)
     expect(mockPrisma.cognitiveTestConfig.updateMany).toHaveBeenCalledWith({
       where: { id: 'config-1', status: 'DRAFT', updatedAt },
@@ -68,7 +77,7 @@ describe('Cognitive release service', () => {
       blockers: [{ stage: 'DEFINITION', code: 'NOT_READY', message: 'fixture blocker' }],
     })
 
-    await expect(publishCognitiveConfig('config-1')).rejects.toMatchObject({
+    await expect(publishCognitiveConfig('config-1', 'admin-1')).rejects.toMatchObject({
       statusCode: 400,
       message: expect.stringContaining('NOT_READY'),
     })
@@ -79,7 +88,7 @@ describe('Cognitive release service', () => {
     mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue(draftConfig)
     mockPrisma.cognitiveTestConfig.updateMany.mockResolvedValue({ count: 0 })
 
-    await expect(publishCognitiveConfig('config-1')).rejects.toMatchObject({ statusCode: 409 })
+    await expect(publishCognitiveConfig('config-1', 'admin-1')).rejects.toMatchObject({ statusCode: 409 })
     expect(mockPrisma.cognitiveTestConfig.updateMany).toHaveBeenCalledWith(expect.objectContaining({
       where: { id: 'config-1', status: 'DRAFT', updatedAt },
     }))
@@ -88,7 +97,7 @@ describe('Cognitive release service', () => {
   it('rejects publishing from a non-DRAFT lifecycle state before readiness', async () => {
     mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue({ ...draftConfig, status: 'PUBLISHED' })
 
-    await expect(publishCognitiveConfig('config-1')).rejects.toMatchObject({ statusCode: 400 })
+    await expect(publishCognitiveConfig('config-1', 'admin-1')).rejects.toMatchObject({ statusCode: 400 })
     expect(mockEvaluateReadiness).not.toHaveBeenCalled()
     expect(mockPrisma.cognitiveTestConfig.updateMany).not.toHaveBeenCalled()
   })
@@ -101,10 +110,22 @@ describe('Cognitive release service', () => {
       .mockResolvedValueOnce(retired)
     mockPrisma.cognitiveTestConfig.updateMany.mockResolvedValue({ count: 1 })
 
-    await expect(retireCognitiveConfig('config-1')).resolves.toMatchObject({ status: 'RETIRED' })
+    await expect(retireCognitiveConfig('config-1', 'admin-1')).resolves.toMatchObject({ status: 'RETIRED' })
     expect(mockPrisma.cognitiveTestConfig.updateMany).toHaveBeenCalledWith({
       where: { id: 'config-1', status: 'PUBLISHED', updatedAt },
       data: { status: 'RETIRED' },
     })
   })
+})
+
+it('does not invent an actor when a legacy caller omits identity', async () => {
+  mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue(draftConfig)
+  await expect(publishCognitiveConfig('config-1')).rejects.toThrow('verified publication actor')
+  expect(mockPrisma.$transaction).not.toHaveBeenCalled()
+})
+it('denies an inactive or non-system actor before publication writes', async () => {
+  mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue(draftConfig)
+  mockPrisma.user.findUnique.mockResolvedValue({ id:'teacher-1', platformRole:'USER', isActive:true })
+  await expect(publishCognitiveConfig('config-1','teacher-1')).rejects.toThrow('system administrator')
+  expect(mockPrisma.cognitiveTestConfig.updateMany).not.toHaveBeenCalled()
 })
