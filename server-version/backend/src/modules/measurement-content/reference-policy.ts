@@ -30,11 +30,14 @@ export type SelectedReferenceSlot={metricKey:string;referenceKind:ReferenceKind}
  * Normal supersession remains valid inside an already frozen candidate set.
  */
 export function selectFrozenReferencePolicy(policy:FrozenReferencePolicy,releases:readonly VerifiedReferenceForSelection[],context:ReferenceContext):SelectedReferenceSlot[]{
+  if(policy.choices.length>1000||releases.length>1000)throw new ContentReleaseError('REFERENCE_POLICY_BOUND_EXCEEDED')
   if(policy.policyVersion!=='EXACT_POPULATION_PRIORITY_V1')throw new ContentReleaseError('REFERENCE_POLICY_UNSUPPORTED')
   const index=new Map<string,{release:VerifiedReferenceForSelection;entries:Map<string,AssessmentReferenceEntry>}>()
   for(const release of releases){
     if(index.has(release.releaseId))throw new ContentReleaseError('REFERENCE_RELEASE_DUPLICATE')
-    index.set(release.releaseId,{release,entries:new Map(release.entries.map(e=>[referenceEntryKey(e),e]))})
+    const entries=new Map(release.entries.map(e=>[referenceEntryKey(e),e]))
+    if(entries.size!==release.entries.length)throw new ContentReleaseError('REFERENCE_ENTRY_DUPLICATE')
+    index.set(release.releaseId,{release,entries})
   }
   const slots=new Map<string,Array<{choice:FrozenReferenceChoice;status:ReleaseStatus;match:ReturnType<typeof matchReferencePopulation>}>>()
   const seen=new Set<string>()
