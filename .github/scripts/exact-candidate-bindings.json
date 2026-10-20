@@ -366,9 +366,9 @@
     "training-mac": {
       "enabled": true,
       "base": "9e1b302e1e255050b15ab150905bc69cee1b3c1b",
-      "sourceReference": "bde1aa5f2f8e1415e37c79e9f2eef47d071a078d",
-      "productInventorySha256": "f1fff20097f07644807d3c3b2e15010d3f691455aa51be3013ec2f72457d2636",
-      "diffSha256": "83db2c9b41d520c39e7679b4536fc99ed2c317d3792b659a761e90f90ffba231",
+      "sourceReference": "f8383e84ee0c84e588f6348ed46b45e6af55ea01",
+      "productInventorySha256": "4988cd1cf07c8a84f4be538627c0e5f7f1366ab35d114782553f13dda2e92df4",
+      "diffSha256": "fef70b9660f9404829ef71cbf2dc11263fed0ea41b64a4dc16ae5a30a48ea477",
       "situationalCatalogBoundary": {
         "disposition": "not-executed-unaffected-catalog",
         "reviewed": true,
@@ -640,7 +640,20 @@
           }
         ],
         "sourceReviewSha256": "97d94ebcdaf029fa67d29dc77b49955730ae9916f1ac04710ddb48fb952175cb",
-        "rationale": "All checker/catalog consumed inputs and the exhaustive instrument catalog tree are unchanged from the frozen main base. The three changed service consumers are outside this checker; their types, publication authority/races and actual consumers remain subject to mandatory exact qualification. No checker execution or scientific review is claimed."
+        "rationale": "All other checker/catalog consumed inputs and the complete instrument tree are unchanged. The exact two dependency files are separately reviewed below; sourceReviewSha256 identifies the original boundary review, not a claim that current locks are unchanged. The three changed consumer services are not checker consumers. No checker execution PASS is claimed.",
+        "reviewedDependencyDelta": [
+          {
+            "path": "server-version/backend/package.json",
+            "before": "ebe2f4233e00784fafc2f866e6c1f212ff31385e",
+            "after": "e17cb797e0e3182eaaf643bea1767d24067daa10"
+          },
+          {
+            "path": "server-version/backend/package-lock.json",
+            "before": "9e55fdb8bc4a29baf93fe815cd1585090364cd0b",
+            "after": "d32fb42875033a1774dd83262a3b95e3fb6ca5d8"
+          }
+        ],
+        "dependencyDeltaRationale": "Exact follow-redirects security patch only. Catalog source and all instruments unchanged; checker does not use Node Axios redirect implementation for these PILOT entries. Fresh dependency audit remains mandatory."
       }
     }
   }

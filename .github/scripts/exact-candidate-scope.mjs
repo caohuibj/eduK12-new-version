@@ -131,7 +131,10 @@ export function validExactPlan(p) {
 
 // The standalone catalog workflow must classify the same frozen candidate, not
 // start an unrelated all-instrument installation on either PR/review event.
-export function verifyUnchangedCatalogInputs(inputs,baseRows,headRows) {
+export const MAC_CATALOG_DEPENDENCY_DELTA = [{"path":"server-version/backend/package.json","before":"ebe2f4233e00784fafc2f866e6c1f212ff31385e","after":"e17cb797e0e3182eaaf643bea1767d24067daa10"},{"path":"server-version/backend/package-lock.json","before":"9e55fdb8bc4a29baf93fe815cd1585090364cd0b","after":"d32fb42875033a1774dd83262a3b95e3fb6ca5d8"}];
+export function verifyUnchangedCatalogInputs(inputs,baseRows,headRows,dependencyDelta=[]) {
+  if(dependencyDelta.length && JSON.stringify(dependencyDelta)!==JSON.stringify(MAC_CATALOG_DEPENDENCY_DELTA))
+    throw Error('Unreviewed catalog dependency delta');
   if(!Array.isArray(inputs)||!inputs.length||new Set(inputs.map(r=>r.path)).size!==inputs.length)
     throw Error('Missing reviewed Situational checker input boundary');
   const catalog=rows=>rows.filter(r=>r.path.startsWith('server-version/backend/src/modules/situational/instruments/'));
@@ -140,7 +143,7 @@ export function verifyUnchangedCatalogInputs(inputs,baseRows,headRows) {
   const before=new Map(baseRows.map(r=>[r.path,r])),after=new Map(headRows.map(r=>[r.path,r]));
   for(const r of inputs) if(r.mode!=='100644'||!fullSha(r.blob)
     ||before.get(r.path)?.blob!==r.blob||before.get(r.path)?.mode!==r.mode
-    ||after.get(r.path)?.blob!==r.blob||after.get(r.path)?.mode!==r.mode)
+    ||after.get(r.path)?.blob!==(dependencyDelta.find(d=>d.path===r.path&&d.before===r.blob)?.after||r.blob)||after.get(r.path)?.mode!==r.mode)
     throw Error('Situational catalog/checker consumed input changed');
 }
 export function situationalPublicationBoundary(base,head,env=process.env) {
@@ -153,7 +156,7 @@ export function situationalPublicationBoundary(base,head,env=process.env) {
   const proof=bindings.candidates[plan.candidate].situationalCatalogBoundary;
   if(proof?.disposition!=='not-executed-unaffected-catalog'||proof.reviewed!==true)
     throw Error('Missing exact reviewed catalog relevance decision');
-  verifyUnchangedCatalogInputs(proof.inputs,inventory(base),inventory(head));
+  verifyUnchangedCatalogInputs(proof.inputs,inventory(base),inventory(head),plan.candidate==='training-mac'?(proof.reviewedDependencyDelta||[]):[]);
   return {schema:1,candidate:plan.candidate,head:plan.head,base:plan.base,
     disposition:proof.disposition,checkerExecuted:false,
     affectedConsumerQualification:'required main exact-candidate and SAST gates; not granted here'};

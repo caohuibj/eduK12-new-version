@@ -9,7 +9,7 @@ import {recheckPlan} from './exact-candidate-admission.mjs';
 
 // This is an independently reviewed, bounded historical-local exception, not
 // retrospective CI execution, signed execution, or missing-case PASS.
-export const REVIEWED_MAC_ATTESTATION_SHA256 = 'e09878016940f13ecd944e0d84707e32a30b1a5808d3d8a6391fa7fe90f4ed71';
+export const REVIEWED_MAC_ATTESTATION_SHA256 = '15b32102e521c28a4ae03257fd95db52f38adf593f4a9c6ed1b98929ca1b03fb';
 export function productDelta(base,head) {
   const before=new Map(inventory(base).filter(r=>!TOOLS.includes(r.path)).map(r=>[r.path,r]));
   const after=new Map(inventory(head).filter(r=>!TOOLS.includes(r.path)).map(r=>[r.path,r]));
@@ -67,6 +67,10 @@ export function verifyCompleteRuntime(result,plan) {
   assert.deepEqual(result.phases.map(p=>p.name).sort(),[...required].sort());
   for(const phase of result.phases) assert.equal(phase.status,'success',phase.name);
 }
+export function unqualifiedPackaged(result) {
+  return result.phases.some(p=>p.name==='runtime-packaging'&&p.status==='success')
+    &&!result.phases.some(p=>p.name==='runtime-scans'&&p.status==='success');
+}
 async function fileHash(path) {
   const h=createHash('sha256');for await(const chunk of createReadStream(path))h.update(chunk);return h.digest('hex');
 }
@@ -82,7 +86,7 @@ async function verifyImages(result,dir) {
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href) {
   try {
     let [mode,planPath,out]=process.argv.slice(2);
-    if(!['runtime','retain-compiles','retain-images'].includes(mode)) {out=planPath;planPath=mode;mode='historical';}
+    if(!['runtime','retain-compiles','retain-images','retain-packaged'].includes(mode)) {out=planPath;planPath=mode;mode='historical';}
     assert.ok(planPath&&out);
     const planBytes=readFileSync(planPath),plan=JSON.parse(planBytes);recheckPlan(plan);
     if(mode==='historical') {
@@ -97,6 +101,18 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href) {
       const result=JSON.parse(readFileSync(resultPath));
       verifyRuntimeIdentity(result,plan,planBytes,readFileSync(new URL('./training-mac-inputs.json',import.meta.url)));
       if(mode==='runtime') {verifyCompleteRuntime(result,plan);await verifyImages(result,out);}
+      if(mode==='retain-packaged') {
+        if(unqualifiedPackaged(result)) {
+          for(const component of ['backend','frontend']) {
+            const image=result.components[component];assert.match(image.runtimeImageId,/^sha256:[a-f0-9]{64}$/);
+            assert.equal(await fileHash(join(out,component+'-runtime.tar.gz')),image.runtimeArchiveSha256);
+          }
+          writeFileSync(join(out,'unqualified-images.json'),JSON.stringify({qualified:false,
+            reason:'Packaging bytes retained for diagnosis; scan/recovery qualification is not granted',
+            originalStatus:result.status,head:result.head,sourceHead:result.sourceHead,tree:result.tree,components:result.components},null,2)+'\n');
+          appendFileSync(process.env.GITHUB_OUTPUT,'eligible=true\n');
+        }
+      }
       if(mode==='retain-images') {
         if(['runtime-packaging','runtime-scans'].every(name=>result.phases.some(p=>p.name===name&&p.status==='success'))) {
           await verifyImages(result,out);appendFileSync(process.env.GITHUB_OUTPUT,'eligible=true\n');

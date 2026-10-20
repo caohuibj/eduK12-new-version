@@ -11,19 +11,18 @@ M = importlib.util.module_from_spec(spec); spec.loader.exec_module(M)
 
 
 class Contract(unittest.TestCase):
-    def test_exact_current_consumed_module(self):
-        source = (ROOT / 'training-mac-runtime.py').read_text()
-        self.assertEqual(M.consumed_hash(source), M.CONSUMED_SHA256)
-        self.assertNotEqual(M.consumed_hash(source + '\nUNREVIEWED = True\n'), M.CONSUMED_SHA256)
-        self.assertNotEqual(M.consumed_hash(source.replace('def prepare(self):', 'def changed_prepare(self):')), M.CONSUMED_SHA256)
+    def test_exact_current_security_module(self):
+        source = (ROOT / 'training-mac-runtime.py').read_bytes()
+        self.assertEqual(M.hashlib.sha256(source).hexdigest(), M.REVIEWED_SECURITY_RUNTIME_SHA256)
+        self.assertNotEqual(M.hashlib.sha256(source + b'\nUNREVIEWED = True\n').hexdigest(), M.REVIEWED_SECURITY_RUNTIME_SHA256)
 
-    def test_only_browser_input_can_change(self):
-        value = json.loads((ROOT / 'training-mac-inputs.json').read_text())
-        self.assertEqual(M.input_hash(json.dumps(value)), M.INPUTS_SHA256)
-        value['macRuntime']['browserScriptBlob'] = 'different-browser'
-        self.assertEqual(M.input_hash(json.dumps(value)), M.INPUTS_SHA256)
-        value['macRuntime']['changedLintFiles'].append('unreviewed.ts')
-        self.assertNotEqual(M.input_hash(json.dumps(value)), M.INPUTS_SHA256)
+    def test_security_inputs_require_exact_bytes_not_generic_lock_exemption(self):
+        raw = (ROOT / 'training-mac-inputs.json').read_bytes()
+        self.assertEqual(M.hashlib.sha256(raw).hexdigest(), M.REVIEWED_SECURITY_INPUTS_SHA256)
+        value = json.loads(raw)
+        self.assertNotEqual(M.input_hash(raw), M.INPUTS_SHA256)
+        value['macRuntime']['dependencyPatch']['toVersion'] = '1.16.2'
+        self.assertNotEqual(M.hashlib.sha256(json.dumps(value).encode()).hexdigest(), M.REVIEWED_SECURITY_INPUTS_SHA256)
 
     def test_artifact_refuses_expiry_and_cross_run(self):
         p = M.ARTIFACTS['backend']

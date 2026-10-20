@@ -37,6 +37,10 @@ def validate_artifact(artifact, pin):
     require(str(artifact['workflow_run']['id']) == PIN['runId'] and artifact['workflow_run']['head_sha'] == PIN['sourceHead'], 'Wrong artifact producer')
 
 
+REVIEWED_SECURITY_RUNTIME_SHA256 = 'a2b332ed5b769904b2e4e04b5c3d8a90c3fcb4ef5b44ae3c3bbb0b58b2b227ec'
+REVIEWED_SECURITY_INPUTS_SHA256 = 'c64a32df55e1ea338a23dbe00d754167fd0f0e717a97046ce1a7c99bfaa79ca7'
+
+
 def validate_records(run, job, raw, inputs, source):
     p = PIN
     require(str(run['id']) == p['runId'] and run['run_attempt'] == p['attempt'], 'Wrong prior run')
@@ -46,7 +50,12 @@ def validate_records(run, job, raw, inputs, source):
     require(job['id'] == p['jobId'] and str(job['run_id']) == p['runId'] and job['run_attempt'] == p['attempt'] and job['head_sha'] == p['sourceHead'], 'Wrong prior job')
     require(job['name'] == p['jobName'] and job['status'] == 'completed' and job['conclusion'] == 'failure', 'Original failed job must remain failed')
     require(hashlib.sha256(raw).hexdigest() == p['resultSha256'], 'Original raw result changed')
-    require(input_hash(inputs) == INPUTS_SHA256 and consumed_hash(source) == CONSUMED_SHA256, 'Successful consumed input or helper drift')
+    original_binding = input_hash(inputs) == INPUTS_SHA256 and consumed_hash(source) == CONSUMED_SHA256
+    # Exact reviewed package-only security delta; never assert old locks unchanged.
+    security_binding = (REVIEWED_SECURITY_RUNTIME_SHA256 is not None and REVIEWED_SECURITY_INPUTS_SHA256 is not None
+        and hashlib.sha256(source.encode()).hexdigest() == REVIEWED_SECURITY_RUNTIME_SHA256
+        and hashlib.sha256(inputs).hexdigest() == REVIEWED_SECURITY_INPUTS_SHA256)
+    require(original_binding or security_binding, 'Successful consumed input or helper drift')
     result = json.loads(raw)
     require(result['candidate'] == 'training-mac' and result['status'] == 'failure', 'Original failure missing')
     for key in ('head', 'sourceHead', 'tree', 'planSha256', 'inputsSha256'): require(result[key] == p[key], 'Original result binding changed')
@@ -140,4 +149,66 @@ def admit_prior_browser_case(q):
     # Preserve the original screenshot as original evidence, not a new capture.
     folder = q.out / 'browser'; folder.mkdir(exist_ok=True)
     (folder / 'original-course-shell-1440.png').write_bytes(zip_member(target, 'course-shell-1440.png', 4 * 1024 * 1024))
+    return result
+
+
+COMPLETE_BROWSER_PIN = {'repository': 'caohuibj/eduK12-new-version', 'runId': '39514166141', 'attempt': 1,
+    'sourceHead': '4d141e3de629bc2b9fefb1cbbd7992df34bca18e', 'head': 'd699549fc7deda5ab66349e3aeb552cba7a62ce8',
+    'tree': 'fe7a18265ef003378e2547253223064ae2e041cb', 'jobId': 118942332712,
+    'reportSha256': '1562b1f636a1ca5d6a06eb6153db28aa97141cf9027613add7c185eaa82bc1d6',
+    'resultSha256': '849a13c41dee4ec112fd15b747b70148c404831df5b7d866ac641aa25dddaeec'}
+COMPLETE_BROWSER_ARTIFACTS = {
+    'browser': {'artifactId': 12306716955, 'artifactName': 'training-mac-browser-d699549fc7deda5ab66349e3aeb552cba7a62ce8-1', 'zipBytes': 1172664, 'zipSha256': 'cca5f6027b77888f645f039a9a4627fdcb77d964314dfc403a149bb9413b9dba'},
+    'results': {'artifactId': 12306149829, 'artifactName': 'training-mac-results-d699549fc7deda5ab66349e3aeb552cba7a62ce8-1', 'zipBytes': 29417, 'zipSha256': '3df5453628ef1f617a70951c2bcd4072f9bdb769b33167391c8a9fdb26aaef48'}}
+
+
+def validate_complete_browser(run, job, artifacts, raw, report_raw):
+    p = COMPLETE_BROWSER_PIN
+    require(str(run['id']) == p['runId'] and run['run_attempt'] == 1 and run['head_sha'] == p['sourceHead'], 'Wrong completed browser run')
+    require(run['head_branch'] == 'work/training-mac-ui-final-20261020' and run['event'] == 'pull_request' and run['path'] == '.github/workflows/ci.yml', 'Wrong completed browser workflow')
+    require(all(run[k]['full_name'] == p['repository'] for k in ('repository', 'head_repository')), 'Wrong completed browser repository')
+    require(job['id'] == p['jobId'] and str(job['run_id']) == p['runId'] and job['run_attempt'] == 1 and job['head_sha'] == p['sourceHead'], 'Wrong completed browser job')
+    require(job['name'] == PIN['jobName'] and job['status'] == 'completed' and job['conclusion'] == 'failure', 'Original scan-failed job changed')
+    for key, pin in COMPLETE_BROWSER_ARTIFACTS.items():
+        a = artifacts[key]
+        require(a['id'] == pin['artifactId'] and a['name'] == pin['artifactName'] and a['expired'] is False, 'Completed browser artifact unavailable')
+        require(a['size_in_bytes'] == pin['zipBytes'] and a['digest'] == 'sha256:' + pin['zipSha256'], 'Completed browser artifact changed')
+        require(str(a['workflow_run']['id']) == p['runId'] and a['workflow_run']['head_sha'] == p['sourceHead'], 'Completed browser artifact producer changed')
+    require(hashlib.sha256(raw).hexdigest() == p['resultSha256'] and hashlib.sha256(report_raw).hexdigest() == p['reportSha256'], 'Original browser result bytes changed')
+    result = json.loads(raw); report = json.loads(report_raw)
+    require(result['status'] == 'failure' and report['status'] == 'PASS' and report['errors'] == [], 'Original outcomes changed')
+    for key in ('head', 'sourceHead', 'tree'): require(result[key] == p[key], 'Original browser result identity changed')
+    require(result['consumerRunId'] == p['runId'] and result['consumerAttempt'] == '1', 'Original browser attempt changed')
+    rows = {r['name']:r for r in result['phases']}
+    require(rows['runtime-scans']['status'] == 'failure' and 'schema-upgrade-restore' not in rows and 'scoped-pg-http' not in rows, 'Original missing/failed gates changed')
+    row = rows['compiled-browser']; require(row['status'] == 'success' and row['details']['resultSha256'] == p['reportSha256'], 'Browser was not successful')
+    for key in ('head', 'sourceHead', 'tree', 'consumerRunId', 'consumerAttempt'): require(row[key] == result[key], 'Browser phase identity changed')
+    names = [f'{name}-{width}' for width in (1440,390) for name in ('course-shell','analysis-reference','pending-publication')]
+    require([r['name'] for r in report['checks']] == names and all(r['status'] == 'PASS' for r in report['checks']), 'Missing original browser case')
+    require(row['details']['checks'] == report['checks'] and report['dist'] == {'sha256':'2b37eac6fdd8c8dd836b79c2f80e59abe4f90444f11a4baa9c2abbafc2202886','files':415}, 'Original browser inputs changed')
+    require(row['details']['frontendCompiledArchiveSha256'] == ARTIFACTS['frontend']['archiveSha256'], 'Original compiled browser bytes changed')
+    return {'kind':'admitted-prior-official-success', 'ciExecuted':False, 'original':row, 'checks':report['checks']}
+
+
+def admit_prior_browser_success(q):
+    q.ready('frontend-compile')
+    require(hashlib.sha256(Path(__file__).with_name('training-mac-browser.mjs').read_bytes()).hexdigest() == REVIEWED_BROWSER_SHA256, 'Browser script changed')
+    require(q.state['components']['frontend']['compiledArchiveSha256'] == ARTIFACTS['frontend']['archiveSha256'], 'Browser compiled input changed')
+    p = COMPLETE_BROWSER_PIN
+    run = q.api('/actions/runs/' + p['runId'] + '/attempts/1'); job = q.api('/actions/jobs/' + str(p['jobId']))
+    artifacts = {}; files = {}
+    for key, pin in COMPLETE_BROWSER_ARTIFACTS.items():
+        artifacts[key] = q.api('/actions/artifacts/' + str(pin['artifactId']))
+        target = q.private / ('completed-browser-' + key + '.zip')
+        q.download({**pin, 'repository':p['repository']}, target)
+        require(target.stat().st_size == pin['zipBytes'] and hashlib.sha256(target.read_bytes()).hexdigest() == pin['zipSha256'], 'Completed browser ZIP changed')
+        files[key] = target
+    raw = zip_member(files['results'], 'training-mac-evidence/runtime-result.json', 1024*1024)
+    report_raw = zip_member(files['browser'], 'browser-result.json', 1024*1024)
+    result = validate_complete_browser(run, job, artifacts, raw, report_raw)
+    expected = ['browser-result.json','original-course-shell-1440.png','analysis-reference-1440.png','pending-publication-1440.png','course-shell-390.png','analysis-reference-390.png','pending-publication-390.png']
+    folder = q.out / 'browser'; folder.mkdir(exist_ok=True)
+    with zipfile.ZipFile(files['browser']) as z:
+        require(sorted(z.namelist()) == sorted(expected), 'Unexpected retained browser evidence')
+    for name in expected: (folder / name).write_bytes(zip_member(files['browser'], name, 4*1024*1024))
     return result

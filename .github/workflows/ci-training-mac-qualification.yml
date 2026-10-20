@@ -91,6 +91,23 @@ jobs:
             training-mac-evidence/frontend-compile.json
           if-no-files-found: error
           retention-days: 3
+      - name: verify packaged bytes for unqualified failure diagnosis
+        id: packaged
+        if: always()
+        run: node .github/scripts/training-mac-admission.mjs retain-packaged exact-candidate-plan.json training-mac-evidence
+      - name: retain packaged images without granting qualification
+        if: always() && steps.packaged.outputs.eligible == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: training-mac-unqualified-images-${{ github.sha }}-${{ github.run_attempt }}
+          path: |
+            training-mac-evidence/backend-runtime.tar.gz
+            training-mac-evidence/frontend-runtime.tar.gz
+            training-mac-evidence/runtime-result.json
+            training-mac-evidence/runtime-packaging.json
+            training-mac-evidence/unqualified-images.json
+          if-no-files-found: error
+          retention-days: 3
       - name: verify successfully scanned runtime archives despite later failure
         id: images
         if: always()

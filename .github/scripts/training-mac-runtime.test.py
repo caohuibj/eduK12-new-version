@@ -56,10 +56,10 @@ class MacContracts(unittest.TestCase):
             for c in M.R.COMPONENTS:
                 if target == 'HEAD:server-version/' + c: return inputs['components'][c]['sourceTree']
             return 'd' * 40
-        with patch.object(M.R, 'git', side_effect=git), patch.object(M.R, 'input_inventory', side_effect=lambda c, _: inputs['components'][c]['productionInputSha256']), patch.object(M.R, 'sha', side_effect=lambda p: inputs['components'][p.parent.name]['lockfileSha256']), patch.object(M.R, 'migration_inputs', return_value=(['20261021000000_training_catalog_discovery'], True)), patch.object(M.subprocess, 'run'):
+        with patch.object(M, 'validate_dependency_patch', return_value=inputs['macRuntime']['dependencyPatch']), patch.object(M.R, 'git', side_effect=git), patch.object(M.R, 'input_inventory', side_effect=lambda c, _: inputs['components'][c]['productionInputSha256']), patch.object(M.R, 'sha', side_effect=lambda p: inputs['components'][p.parent.name]['lockfileSha256']), patch.object(M.R, 'migration_inputs', return_value=(['20261021000000_training_catalog_discovery'], True)), patch.object(M.subprocess, 'run'):
             M.validate_plan(plan, inputs)
             for component in M.R.COMPONENTS:
-                for path in ('package.json', 'package-lock.json', 'Dockerfile'):
+                for path in ('Dockerfile',):
                     self.assertIn(plan['base'] + ':server-version/' + component + '/' + path, seen_refs)
                 self.assertFalse(any(ref.startswith(inputs['macRuntime']['dependencySources'][component]['head'] + ':') for ref in seen_refs))
             changes = [dict(plan, candidate='measurement'), dict(plan, head='f' * 40), dict(plan, required=[]),
@@ -231,7 +231,7 @@ class MacContracts(unittest.TestCase):
             for member in members: tar.add(source / member, arcname=member)
             if unsafe:
                 bad = source / 'unexpected.txt'; bad.write_text('reject'); tar.add(bad, arcname='node_modules/unapproved.txt')
-        details = {'sourceTree': self.q.inputs['components'][component]['sourceTree'], 'requiredFiles': required,
+        details = {'sourceTree': self.q.inputs['macRuntime']['dependencyPatch']['originalComponents'][component]['sourceTree'], 'requiredFiles': required,
                    'archiveSha256': M.R.sha(archive), 'archivePath': component + '-compiled.tar.gz', 'archiveMembers': members}
         if component == 'backend': details['generatedSchemaSha256'] = M.R.sha(source / 'node_modules/.prisma/client/schema.prisma')
         return {'name': component + '-compile', 'status': 'success', 'head': 'original-head', 'details': details}, archive
@@ -259,61 +259,71 @@ class MacContracts(unittest.TestCase):
         original['details']['generatedSchemaSha256'] = '0' * 64
         with self.assertRaises(ValueError): self.q.restore_compilation('backend', original, archive)
 
-    def test_browser_installs_signed_official_cjk_font_and_records_identity(self):
-        self.q.state['components']['frontend']['compiledArchiveSha256'] = 'archive'
-        output = self.q.out / 'browser'; output.mkdir()
-        (output / 'browser-result.json').write_text(json.dumps({'schema': 1, 'status': 'PASS',
-            'kind': 'compiled-ui-synthetic-api-integration', 'errors': [], 'checks': [{'name': n, 'status': 'PASS'} for n in CHECKS]}))
-        self.q.inputs['macRuntime']['browserExpectedAssertions'] = CHECKS
-        calls = []
-        def command(args, **kwargs):
-            calls.append(args)
-            if args[:2] == ['fc-match', '--format=%{file}']: return SimpleNamespace(stdout='/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc')
-            if args[:2] == ['fc-match', '--format=%{family}']: return SimpleNamespace(stdout='Noto Sans CJK SC')
-            if args[:2] == ['dpkg-query', '-S']: return SimpleNamespace(stdout='fonts-noto-cjk: font')
-            if args[:2] == ['dpkg-query', '-W']: return SimpleNamespace(stdout='1:official-test-version')
-            return SimpleNamespace(stdout='')
-        self.q.command = command
-        reuse = SimpleNamespace(admit_prior_browser_case=Mock(return_value={'control': 'original-case'}))
-        spec = SimpleNamespace(loader=SimpleNamespace(exec_module=Mock()))
-        with patch.object(M.R, 'git', return_value=self.q.inputs['macRuntime']['browserScriptBlob']), patch.object(M.Path, 'is_file', return_value=True), patch.object(M.R, 'sha', return_value='verified-font-hash'), patch.object(M.importlib.util, 'spec_from_file_location', return_value=spec), patch.object(M.importlib.util, 'module_from_spec', return_value=reuse):
-            result = self.q.browser()
-        self.assertEqual(result['cjkFont']['family'], 'Noto Sans CJK SC')
-        self.assertEqual(result['cjkFont']['fileSha256'], 'verified-font-hash')
-        source = (self.q.private / 'font-official-sources.list').read_text()
-        self.assertIn('signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg', source)
-        self.assertIn('https://archive.ubuntu.com/ubuntu noble ', source)
-        self.assertIn('https://security.ubuntu.com/ubuntu noble-security ', source)
-        self.assertFalse(any('trusted=yes' in arg or 'allow-unauthenticated' in arg for call in calls for arg in call))
-        self.assertEqual(sum('fonts-noto-cjk' in call and 'install' in call for call in calls), 1)
+    def test_exact_security_source_transform_and_no_other_manifest_drift(self):
+        self.assertEqual(M.validate_dependency_patch(INPUTS)['toVersion'], '1.16.1')
+        for key, value in [('fromVersion', '0.0.0'), ('tarball', 'https://example.invalid/patch.tgz'), ('reviewedSourceFiles', [])]:
+            changed = copy.deepcopy(INPUTS); changed['macRuntime']['dependencyPatch'][key] = value
+            with self.subTest(key=key), self.assertRaises(ValueError): M.validate_dependency_patch(changed)
+        read = M.Path.read_text
+        def drift(path, *args, **kwargs):
+            raw = read(path, *args, **kwargs)
+            if path == M.ROOT / 'server-version/backend/package.json':
+                obj = json.loads(raw); obj['scripts']['unreviewed'] = 'not allowed'; return json.dumps(obj)
+            return raw
+        with patch.object(M.Path, 'read_text', drift), self.assertRaises(ValueError): M.validate_dependency_patch(INPUTS)
 
-    def test_browser_passes_only_verified_prior_case_wrapper_to_runner(self):
-        wrapper = {'schema': 1, 'kind': 'verified-original-official-case', 'originalStatus': 'FAIL',
-                   'runId': '39512542094', 'check': {'name': 'course-shell-1440', 'status': 'PASS'}}
-        reuse = SimpleNamespace(admit_prior_browser_case=Mock(return_value=wrapper))
+    def test_source_locked_dependency_overlay_changes_only_exact_package_and_hidden_entry(self):
+        import base64
+        import io
+        package = {'name': 'follow-redirects', 'version': '1.16.1', 'main': 'index.js', 'scripts': {'test': 'never executed'}}
+        contents = {name: b'control fixture' for name in ('LICENSE', 'README.md', 'debug.js', 'http.js', 'https.js', 'index.js')}
+        contents['package.json'] = json.dumps(package).encode()
+        stream = io.BytesIO()
+        with M.R.tarfile.open(fileobj=stream, mode='w:gz') as tar:
+            for name, content in contents.items():
+                item = M.R.tarfile.TarInfo('package/' + name); item.size = len(content); item.mode = 0o644; tar.addfile(item, io.BytesIO(content))
+        raw = stream.getvalue()
+        p = self.q.inputs['macRuntime']['dependencyPatch']
+        p.update(tarBytes=len(raw), tarSha256=M.R.digest(raw), integrity='sha512-' + base64.b64encode(M.R.hashlib.sha512(raw).digest()).decode(),
+                 files=[{'path': name, 'sha256': M.R.digest(content), 'bytes': len(content)} for name, content in contents.items()])
+        for component in M.R.COMPONENTS:
+            context = self.q.private / component
+            target = context / 'node_modules/follow-redirects'; target.mkdir(parents=True)
+            (target / 'package.json').write_text(json.dumps({'name': 'follow-redirects', 'version': '1.16.0'}))
+            (context / 'node_modules/untouched.txt').write_text('retain exact dependency')
+            (context / 'node_modules/.package-lock.json').write_text(json.dumps({'packages': {'node_modules/follow-redirects': {'version': '1.16.0'}, 'node_modules/other': {'version': 'unchanged'}}}))
+            (context / 'package-lock.json').write_text(json.dumps({'packages': {'node_modules/follow-redirects': {'version': '1.16.1', 'integrity': p['integrity'], 'resolved': p['tarball']}}}))
+        response = Mock(); response.__enter__ = Mock(return_value=response); response.__exit__ = Mock(return_value=False)
+        response.geturl.return_value = p['tarball']; response.read.return_value = raw
+        self.q.command = Mock(side_effect=AssertionError('No install/build command allowed'))
+        with patch.object(M.R.urllib.request, 'urlopen', return_value=response): result = self.q.apply_dependency_patch()
+        self.assertFalse(result['installScriptsExecuted']); self.assertFalse(result['otherDependenciesChanged'])
+        for component in M.R.COMPONENTS:
+            context = self.q.private / component
+            self.assertEqual((context / 'node_modules/untouched.txt').read_text(), 'retain exact dependency')
+            self.assertEqual(json.loads((context / 'node_modules/follow-redirects/package.json').read_text())['version'], '1.16.1')
+            hidden = json.loads((context / 'node_modules/.package-lock.json').read_text())
+            self.assertEqual(hidden['packages']['node_modules/other'], {'version': 'unchanged'})
+            self.assertEqual(hidden['packages']['node_modules/follow-redirects']['integrity'], p['integrity'])
+        self.q.command.assert_not_called()
+        response.read.return_value = raw + b'corrupt'
+        with patch.object(M.R.urllib.request, 'urlopen', return_value=response), self.assertRaises(ValueError): self.q.apply_dependency_patch()
+
+    def test_security_repair_runs_fresh_both_lock_audit_instead_of_old_admission(self):
+        with patch.object(M.R.Qualification, 'audit', return_value={'backend': 'fresh', 'frontend': 'fresh'}) as audit:
+            self.assertEqual(self.q.audit(), {'backend': 'fresh', 'frontend': 'fresh'})
+        audit.assert_called_once_with()
+
+    def test_complete_browser_is_mandatory_original_success_without_process_replay(self):
+        original = {'kind': 'admitted-prior-official-success', 'ciExecuted': False, 'original': {'name': 'compiled-browser', 'status': 'success'}}
+        module = SimpleNamespace(admit_prior_browser_success=Mock(return_value=original))
         spec = SimpleNamespace(loader=SimpleNamespace(exec_module=Mock()))
-        self.q.state['components']['frontend']['compiledArchiveSha256'] = 'original-compiled-hash'
-        self.q.inputs['macRuntime']['browserExpectedAssertions'] = CHECKS
-        output = self.q.out / 'browser'; output.mkdir()
-        (output / 'browser-result.json').write_text(json.dumps({'schema': 1, 'status': 'PASS',
-            'kind': 'compiled-ui-synthetic-api-integration', 'errors': [], 'checks': [{'name': n, 'status': 'PASS'} for n in CHECKS]}))
-        calls = []
-        def command(args, **kwargs):
-            calls.append(args)
-            result = ''
-            if args[:2] == ['fc-match', '--format=%{file}']: result = '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc'
-            if args[:2] == ['fc-match', '--format=%{family}']: result = 'Noto Sans CJK SC'
-            if args[:2] == ['dpkg-query', '-S']: result = 'fonts-noto-cjk: font'
-            return SimpleNamespace(stdout=result)
-        self.q.command = command
-        with patch.object(M.R, 'git', return_value=self.q.inputs['macRuntime']['browserScriptBlob']), patch.object(M.Path, 'is_file', return_value=True), patch.object(M.R, 'sha', return_value='verified-hash'), patch.object(M.importlib.util, 'spec_from_file_location', return_value=spec), patch.object(M.importlib.util, 'module_from_spec', return_value=reuse):
-            self.q.browser()
-        reuse.admit_prior_browser_case.assert_called_once_with(self.q)
-        prior = self.q.private / 'prior-browser-case.json'
-        self.assertEqual(json.loads(prior.read_text()), wrapper)
-        browser = next(call for call in calls if '.github/scripts/training-mac-browser.mjs' in call)
-        self.assertEqual(browser[-2:], ['--prior-browser-result', str(prior)])
-        self.assertEqual(len([call for call in calls if '.github/scripts/training-mac-browser.mjs' in call]), 1)
+        self.q.command = Mock(side_effect=AssertionError('No browser/font process replay'))
+        with patch.object(M.importlib.util, 'spec_from_file_location', return_value=spec), patch.object(M.importlib.util, 'module_from_spec', return_value=module):
+            self.assertIs(self.q.browser(), original)
+            module.admit_prior_browser_success.side_effect = ValueError('Missing official proof')
+            with self.assertRaises(ValueError): self.q.browser()
+        self.q.command.assert_not_called()
 
     def test_repair_executes_missing_phases_but_never_successful_compiles_types_lint(self):
         self.q.state['phases'] = []

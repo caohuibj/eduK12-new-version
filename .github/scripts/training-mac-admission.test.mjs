@@ -64,3 +64,11 @@ test('new Mac job cannot replace or bypass Measurement result aggregation',()=>{
  assert.match(workflow,/retain-compiles/);assert.match(workflow,/retain-images/);
  assert.doesNotMatch(workflow,/Library|download_url|npm run test|npm run build/);
 });
+
+test('packaged diagnostic retention never grants scanned qualification',async()=>{
+  const {unqualifiedPackaged}=await import('./training-mac-admission.mjs');
+  assert.equal(unqualifiedPackaged({phases:[]}),false);
+  assert.equal(unqualifiedPackaged({phases:[{name:'runtime-packaging',status:'failure'}]}),false);
+  assert.equal(unqualifiedPackaged({phases:[{name:'runtime-packaging',status:'success'},{name:'runtime-scans',status:'failure'}]}),true);
+  assert.equal(unqualifiedPackaged({phases:[{name:'runtime-packaging',status:'success'},{name:'runtime-scans',status:'success'}]}),false);
+});

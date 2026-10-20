@@ -467,3 +467,13 @@ CJK 字体。后续固定原 run/job、ZIP/receipt/TAR 摘要及成功阶段完�
 桌面 course-shell 由固定官方 ZIP/report 和相同 compiled dist 接纳，保留原截图、
 原报告 FAIL 与失败 analysis 记录；当前只做进入分析页所需导航，不重跑其断言。
 手机 course-shell 及其他未通过场景仍须真实执行，缺失 proof 不跳过任何 case。
+
+第三轮 run `39514166141` 浏览器全部通过（五项新执行、一项原通过接纳），
+但 backend 镜像扫描真实发现 follow-redirects 1.16.0 的两项 HIGH 漏洞。
+仅将 backend override 与前后端两个锁记录更新到官方 1.16.1，核对 npm
+完整性及七个包文件；不改扫描级别、不隐藏原失败。补丁只改变 Node 重定向
+实现，不含类型/编译器依赖；Axios 浏览器映射排除该实现，后端唯一直接
+消费者已设置 maxRedirects:0。原编译/类型/lint/UI 证据按该精确源码影响
+审阅保留原身份，不声称旧锁仍相同。两个当前锁审计、实际新镜像扫描及
+未执行 PG/新 schema 恢复必须成功。已装配但扫描未通过的镜像可独立保留
+为 qualified=false 诊断产物；该产物不能授予扫描、恢复或合并资格。

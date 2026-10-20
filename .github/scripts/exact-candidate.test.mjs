@@ -306,3 +306,13 @@ test('restored runtime result requires original three-phase admission without ex
   assert.match(workflow,/details.original.consumerRunId,'39442752356'/);
   assert.match(workflow,/details.original.head,'16625dbd4cfd938e16f7c0adb5e14a01c0ebd22c'/);
 });
+
+test('Mac catalog accepts only exact reviewed follow-redirects dependency pairs',async()=>{
+  const {MAC_CATALOG_DEPENDENCY_DELTA:pairs}=await import('./exact-candidate-scope.mjs');
+  const inputs=pairs.map(r=>({path:r.path,blob:r.before,mode:'100644'}));
+  const after=pairs.map(r=>({path:r.path,blob:r.after,mode:'100644'}));
+  verifyUnchangedCatalogInputs(inputs,inputs,after,pairs);
+  assert.throws(()=>verifyUnchangedCatalogInputs(inputs,inputs,after));
+  assert.throws(()=>verifyUnchangedCatalogInputs(inputs,inputs,after,[{...pairs[0],after:'1'.repeat(40)},pairs[1]]));
+  assert.throws(()=>verifyUnchangedCatalogInputs(inputs,inputs,[{...after[0],blob:'1'.repeat(40)},after[1]],pairs));
+});

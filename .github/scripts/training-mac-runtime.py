@@ -31,6 +31,43 @@ INSERT INTO cognitive_assignments(id,config_id,title,created_by,updated_at)
 """
 
 
+def validate_dependency_patch(inputs):
+    patch = inputs['macRuntime']['dependencyPatch']
+    R.require((patch['name'], patch['fromVersion'], patch['toVersion']) == ('follow-redirects', '1.16.0', '1.16.1'), 'Unexpected dependency repair')
+    R.require(patch['tarball'] == 'https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.16.1.tgz' and
+              patch['integrity'] == 'sha512-FNvFGzoMLWmE6Yj9spb/zjd7yiNCHiAW9/Tg9CXrQ8wuu32HtlJOwWO11OJafl5FfY3DxTdQ0vj42zU1kvv5jg==' and
+              patch['tarSha256'] == '6e075d999dc5ff568916954508397b11a537b18bde615986d7bd8b3d3fa1799f' and patch['tarBytes'] == 10076, 'Unreviewed official package bytes')
+    paths = ['server-version/backend/package.json', 'server-version/backend/package-lock.json', 'server-version/frontend/package-lock.json']
+    R.require(sorted(patch['reviewedSourceFiles']) == sorted(paths), 'Unexpected dependency source boundary')
+    for component in R.COMPONENTS:
+        previous = patch['originalComponents'][component]
+        current_tree = R.git('rev-parse', 'HEAD:server-version/' + component)
+        changed = R.git('diff', '--name-only', previous['sourceTree'], current_tree).splitlines()
+        expected_paths = ['package-lock.json', 'package.json'] if component == 'backend' else ['package-lock.json']
+        R.require(sorted(changed) == sorted(expected_paths), 'Changed source outside exact package repair')
+        old = {}
+        current = {}
+        for path in ('package.json', 'package-lock.json'):
+            R.require(R.git('ls-tree', previous['sourceTree'], '--', path).startswith('100644 blob ') and
+                      R.git('ls-tree', current_tree, '--', path).startswith('100644 blob '), 'Nonregular dependency source')
+            raw = subprocess.check_output(['git', 'show', previous['sourceTree'] + ':' + path], cwd=ROOT)
+            old[path] = json.loads(raw)
+            current[path] = json.loads((ROOT / 'server-version' / component / path).read_text())
+            if path == 'package-lock.json':
+                R.require(R.digest(raw) == previous['lockfileSha256'] == inputs['macRuntime']['dependencySources'][component]['lockfileSha256'], 'Original lock identity changed')
+        lock = copy.deepcopy(old['package-lock.json'])
+        entry = lock['packages']['node_modules/follow-redirects']
+        R.require(entry['version'] == '1.16.0', 'Wrong original package')
+        entry.update(version='1.16.1', resolved=patch['tarball'], integrity=patch['integrity'])
+        R.require(current['package-lock.json'] == lock, 'Unreviewed dependency lock delta')
+        package = copy.deepcopy(old['package.json'])
+        if component == 'backend':
+            R.require(package['overrides']['follow-redirects'] == '1.16.0', 'Wrong original override')
+            package['overrides']['follow-redirects'] = '1.16.1'
+        R.require(current['package.json'] == package, 'Unreviewed package manifest delta')
+    return patch
+
+
 def validate_plan(plan, inputs):
     R.require(plan.get('schema') == 1 and plan.get('route') == 'exact-candidate' and plan.get('candidate') == 'training-mac', 'Wrong Mac plan')
     for key in ('head', 'sourceHead', 'tree', 'base'):
@@ -41,16 +78,16 @@ def validate_plan(plan, inputs):
     R.require(plan['base'] == inputs['runtime']['base'] == '9e1b302e1e255050b15ab150905bc69cee1b3c1b', 'Wrong main baseline')
     R.require(inputs['macRuntime']['requiredRuntimePhases'] == list(PHASES), 'Missing mandatory phase')
     R.require(set(PHASES) - {'prepare'} <= set(plan['required']), 'Incomplete required plan')
+    validate_dependency_patch(inputs)
     original = json.loads(R.INPUTS.read_text())['components']
     R.require(inputs['macRuntime']['dependencySources'] == original, 'Changed official dependency producers')
     for component in R.COMPONENTS:
         pin = inputs['components'][component]
         R.require(pin['sourceTree'] == R.git('rev-parse', 'HEAD:server-version/' + component), 'Changed current component')
         R.require(R.input_inventory(component, pin['excludedNonProductionPaths']) == pin['productionInputSha256'], 'Changed current inputs')
-        R.require(R.sha(ROOT / 'server-version' / component / 'package-lock.json') == pin['lockfileSha256'] == original[component]['lockfileSha256'], 'Dependency lock changed')
-        # These six baseline blobs were verified equal to the original component
-        # trees. The frozen main ancestor is available without off-branch commits.
-        for path in ('package.json', 'package-lock.json', 'Dockerfile'):
+        R.require(R.sha(ROOT / 'server-version' / component / 'package-lock.json') == pin['lockfileSha256'], 'Dependency lock changed')
+        # Package/lock delta is checked structurally above; runtime recipe stays exact.
+        for path in ('Dockerfile',):
             R.require(R.git('rev-parse', 'HEAD:server-version/' + component + '/' + path) == R.git('rev-parse', plan['base'] + ':server-version/' + component + '/' + path), 'Dependency/runtime recipe changed')
     added, old = R.migration_inputs(plan['base'])
     R.require(old and added == inputs['runtime']['newMigrations'] == ['20261021000000_training_catalog_discovery'], 'Unexpected migration delta')
@@ -147,7 +184,8 @@ class MacQualification(R.Qualification):
             raw = subprocess.check_output(['git', 'show', 'HEAD:' + path], cwd=ROOT)
             R.require(R.digest(raw) == expected['sha256'], 'Changed external fixture bytes')
             (self.private / Path(path).name).write_bytes(raw)
-        return {'officialDependenciesVerified': True, 'originalDistConsumed': False, 'dependencyInstallExecuted': False}
+        patched = self.apply_dependency_patch()
+        return {'officialDependenciesVerified': True, 'originalDistConsumed': False, 'dependencyInstallCommandExecuted': False, 'sourceLockedPackageOverlayApplied': True, 'dependencyPatch': patched}
 
     def compile_component(self, component):
         self.ready('prepare')
@@ -177,51 +215,61 @@ class MacQualification(R.Qualification):
         super().app_types()
         return proof
 
-    def audit(self):
-        self.ready('prepare')
+    def apply_dependency_patch(self):
+        import base64
+        import io
+        patch = self.inputs['macRuntime']['dependencyPatch']
+        request = R.urllib.request.Request(patch['tarball'])
+        with R.urllib.request.urlopen(request, timeout=60) as response:
+            R.require(response.geturl() == patch['tarball'], 'Unexpected npm tarball redirect')
+            raw = response.read(patch['tarBytes'] + 1)
+        R.require(len(raw) == patch['tarBytes'] and R.digest(raw) == patch['tarSha256'] and
+                  'sha512-' + base64.b64encode(R.hashlib.sha512(raw).digest()).decode() == patch['integrity'], 'Official dependency archive mismatch')
+        files = {row['path']: row for row in patch['files']}
+        R.require(len(files) == len(patch['files']) == 7 and set(files) == {'LICENSE', 'README.md', 'debug.js', 'http.js', 'https.js', 'index.js', 'package.json'}, 'Unexpected package inventory')
+        contents = {}
+        with R.tarfile.open(fileobj=io.BytesIO(raw), mode='r:gz') as tar:
+            members = tar.getmembers()
+            R.require(len(members) == 7 and {m.name for m in members} == {'package/' + p for p in files}, 'Unexpected npm archive paths')
+            for member in members:
+                name = member.name.removeprefix('package/')
+                R.require(member.isfile() and member.size == files[name]['bytes'] and not member.mode & 0o6000, 'Unsafe npm archive member')
+                data = tar.extractfile(member).read()
+                R.require(R.digest(data) == files[name]['sha256'], 'Changed package file')
+                contents[name] = data
+        package = json.loads(contents['package.json'])
+        R.require(package['name'] == patch['name'] and package['version'] == patch['toVersion'] and not package.get('dependencies') and not package.get('types') and
+                  not set(package.get('scripts', {})).intersection({'preinstall', 'install', 'postinstall', 'prepare'}), 'Unexpected executable package install contract')
         for component in R.COMPONENTS:
-            R.require(self.inputs['components'][component]['lockfileSha256'] == self.dependency_pins[component]['lockfileSha256'], 'Cannot reuse changed dependency audit')
-        spec = importlib.util.spec_from_file_location('original_phase_reuse', Path(__file__).with_name('exact-candidate-runtime-reuse.py'))
-        module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
-        row = module.admit_reusable_phases(self)['dependency-audit']
-        return {'kind': 'admitted-prior-official-success', 'ciExecuted': False, 'original': row,
-                'scope': 'unchanged exact dependency locks/packages only; no old lint/type/source qualification'}
+            context = self.private / component
+            target = context / 'node_modules/follow-redirects'
+            R.require(target.is_dir() and not target.is_symlink() and json.loads((target / 'package.json').read_text())['version'] == patch['fromVersion'], 'Wrong base installed dependency')
+            lock = json.loads((context / 'package-lock.json').read_text())['packages']['node_modules/follow-redirects']
+            R.require(lock['version'] == patch['toVersion'] and lock['integrity'] == patch['integrity'] and lock['resolved'] == patch['tarball'], 'Patch differs from source lock')
+            shutil.rmtree(target); target.mkdir()
+            for name, data in contents.items(): (target / name).write_bytes(data)
+            hidden = context / 'node_modules/.package-lock.json'
+            if hidden.exists():
+                metadata = json.loads(hidden.read_text())
+                entry = metadata['packages']['node_modules/follow-redirects']
+                R.require(entry['version'] == patch['fromVersion'], 'Unexpected hidden lock dependency')
+                entry.update(version=patch['toVersion'], resolved=patch['tarball'], integrity=patch['integrity'])
+                hidden.write_text(json.dumps(metadata, indent=2) + '\n')
+        result = {'name': patch['name'], 'fromVersion': patch['fromVersion'], 'toVersion': patch['toVersion'],
+                  'tarSha256': patch['tarSha256'], 'integrity': patch['integrity'], 'files': patch['files'],
+                  'components': list(R.COMPONENTS), 'installScriptsExecuted': False, 'otherDependenciesChanged': False}
+        self.state['dependencyPatch'] = result
+        return result
+
+    def audit(self):
+        # Both source locks contain the changed package. Old audit is not inherited.
+        return super().audit()
 
     def browser(self):
         self.ready('frontend-compile')
-        pin = self.inputs['macRuntime']
-        script = '.github/scripts/training-mac-browser.mjs'
-        R.require(pin['browserScriptBlob'] == R.git('rev-parse', 'HEAD:' + script), 'Unreviewed browser fixture')
-        # Only the failed browser environment gains CJK glyph support. Use a
-        # per-command signed official Ubuntu source list, not runner mirrors.
-        sources = self.private / 'font-official-sources.list'
-        sources.write_text('deb [signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg] https://archive.ubuntu.com/ubuntu noble main universe\n'
-                           'deb [signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg] https://archive.ubuntu.com/ubuntu noble-updates main universe\n'
-                           'deb [signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg] https://security.ubuntu.com/ubuntu noble-security main universe\n')
-        apt = ['sudo', 'apt-get', '-o', 'Dir::Etc::sourcelist=' + str(sources), '-o', 'Dir::Etc::sourceparts=-', '-o', 'APT::Update::Error-Mode=any']
-        self.command([*apt, 'update'], timeout=180)
-        self.command([*apt, 'install', '-y', '--no-install-recommends', 'fonts-noto-cjk'], timeout=180)
-        font = Path(self.command(['fc-match', '--format=%{file}', 'Noto Sans CJK SC']).stdout.strip()).resolve()
-        family = self.command(['fc-match', '--format=%{family}', 'Noto Sans CJK SC']).stdout.strip()
-        R.require(font.is_file() and font.is_relative_to('/usr/share/fonts') and 'Noto Sans CJK SC' in family, 'CJK font unavailable')
-        owner = self.command(['dpkg-query', '-S', str(font)]).stdout.strip()
-        R.require(owner.startswith('fonts-noto-cjk:'), 'Unexpected CJK font package')
-        font_receipt = {'package': 'fonts-noto-cjk', 'version': self.command(['dpkg-query', '-W', '-f=${Version}', 'fonts-noto-cjk']).stdout.strip(),
-                        'family': family, 'fileSha256': R.sha(font), 'source': 'signed official Ubuntu noble archives'}
-        browsers = self.private / 'browsers'
-        module = self.private / 'backend/node_modules/playwright-core'
-        self.command(['env', 'PLAYWRIGHT_BROWSERS_PATH=' + str(browsers), 'node', str(module / 'cli.js'), 'install', 'chromium'], timeout=600)
-        output = self.out / 'browser'
-        spec = importlib.util.spec_from_file_location('mac_prior_browser', Path(__file__).with_name('training-mac-runtime-reuse.py'))
-        reuse_module = importlib.util.module_from_spec(spec); spec.loader.exec_module(reuse_module)
-        prior = self.private / 'prior-browser-case.json'
-        prior.write_text(json.dumps(reuse_module.admit_prior_browser_case(self), sort_keys=True) + '\n')
-        self.command(['env', 'PLAYWRIGHT_BROWSERS_PATH=' + str(browsers), 'node', script,
-                      '--frontend-dir', str(self.private / 'frontend/dist'), '--playwright-module', str(module), '--output', str(output),
-                      '--prior-browser-result', str(prior)], timeout=180)
-        report = json.loads((output / 'browser-result.json').read_text())
-        checks = require_browser_report(report, pin['browserExpectedAssertions'])
-        return {'resultSha256': R.sha(output / 'browser-result.json'), 'checks': checks, 'cjkFont': font_receipt, 'frontendCompiledArchiveSha256': self.state['components']['frontend']['compiledArchiveSha256']}
+        spec = importlib.util.spec_from_file_location('mac_completed_browser', Path(__file__).with_name('training-mac-runtime-reuse.py'))
+        module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+        return module.admit_prior_browser_success(self)
 
     def failure_receipt(self, error):
         details = {'errorType': type(error).__name__, 'phase': next((p['name'] for p in reversed(self.state['phases']) if p['status'] in ('running', 'failure')), 'initialization')}
@@ -358,7 +406,7 @@ class MacQualification(R.Qualification):
         R.require(archive.is_relative_to(self.private) and archive.is_file() and R.sha(archive) == details['archiveSha256'], 'Changed retained compilation bytes')
         members = ['dist', 'node_modules/.prisma/client'] if component == 'backend' else ['dist']
         R.require(details['archiveMembers'] == members and details['archivePath'] == component + '-compiled.tar.gz', 'Changed compiler archive contract')
-        R.require(details['sourceTree'] == self.inputs['components'][component]['sourceTree'], 'Changed compiled source')
+        R.require(details['sourceTree'] == self.inputs['macRuntime']['dependencyPatch']['originalComponents'][component]['sourceTree'], 'Changed compiled source')
         with R.tarfile.open(archive) as tar:
             names = [str(R.PurePosixPath(m.name)) for m in tar.getmembers()]
             R.require(all(any(name == root or name.startswith(root + '/') for root in members) for name in names), 'Unexpected compiler archive member')

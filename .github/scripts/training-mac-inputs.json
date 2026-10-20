@@ -8,12 +8,12 @@
       "zipSha256": "1b63bd5f180fd34dd5d8c203269e054bbd614a8c058df619ffadf11e8c9a0e97",
       "archiveSha256": "68eab0cc18f679331898914caf2c44cc1a64af88c33f677940032419874fe0b2",
       "componentTree": "8804b7ff3d5d02555bfa5a338702bd23702d6561",
-      "productionInputSha256": "1873e5bb5c9853e66910fe95b8f1022e26bda558e28997a4d75d0622ccdfe8cf",
+      "productionInputSha256": "bb1a034fbdc6ea8131868e172e06fe8e0b9fa2a432dc5b6de227b00bd0ed1120",
       "receiptSha256": "55d7f4e9d65f261c270da0e171a705033eea272668f7351bb60fce9d3711ad1b",
       "head": "da713c522be4fd3309e4dcf327bfb71384c784fe",
       "runId": "39399331312",
       "attempt": "1",
-      "lockfileSha256": "0261d2047bbaab484ae6088526037120a5e058472047b6b964c959d3ff065d9d",
+      "lockfileSha256": "6afb2ad9d3439fba2198a0088a19783135054a9e856537a541ef3a123c29552f",
       "buildFlags": {
         "VITE_COGNITIVE_MODULE_ENABLED": "true",
         "TZ": "UTC"
@@ -34,7 +34,7 @@
       "branch": "ci/measurement-browser-20261020",
       "jobName": "production compile once / backend",
       "artifactName": "measurement-39399331312-da713c522be4fd3309e4dcf327bfb71384c784fe-backend-build",
-      "sourceTree": "c82d6ef9a61236e5b99e88f35b9cc0e6e5bf930e",
+      "sourceTree": "0875c8db8691e2d034f1d8d1611febb060a94756",
       "excludedNonProductionPaths": []
     },
     "frontend": {
@@ -46,7 +46,7 @@
       "runId": "39425861081",
       "attempt": "1",
       "componentTree": "a4fa70dfd71450f7840708377a4815c073bfbc9b",
-      "lockfileSha256": "5288a377ebdd829533561cf2383cd2bcd20e15bd12e6d15762b36a05f7bec1ca",
+      "lockfileSha256": "de1dcdda3c42b0d929b44a7f553401ff55cf9af7e66b98550ac681c3b615ac3a",
       "archiveSha256": "a7d629206aefc034fd0698e931122da400f889712c6697e2484daf538b9dbf80",
       "buildFlags": {
         "VITE_COGNITIVE_MODULE_ENABLED": "true",
@@ -61,8 +61,8 @@
       "jobName": "build changed measurement frontend once",
       "artifactName": "measurement-39425861081-4286a59b649c37662cdbc0e7ca4e41103ad4e4f2-frontend-build",
       "receiptSha256": "d467a7312ae1daa2672b5a1ff635c9561408b65116a3cad5cbabd0a3551430b4",
-      "sourceTree": "6fe522474014fc06948fbd4e5fb0b36c6ba581c0",
-      "productionInputSha256": "4ea252203ada3e369aa74935e8baae73dc047c032857d7efc4b62577ddab061a",
+      "sourceTree": "b3fd7ccfdb3e5bc28fc88acd136d0418184df74d",
+      "productionInputSha256": "9972d013181318ec3dde4b84229f6308e51501e07018f8ea11b634d0dc09e058",
       "excludedNonProductionPaths": []
     }
   },
@@ -83,8 +83,8 @@
       "src/training/TrainingTrainerCourse.tsx",
       "src/training/TrainingCourseAnalysis.integration.test.tsx"
     ],
-    "sourceOverlay": "Current exact reviewed source; original official archives supply dependencies only. Compile each current component once and retain official outputs.",
-    "claim": "Bounded integrated Mac qualification: historical outcomes remain original; one backend changed-input compile and one official frontend delivery build; only missing affected type/lint/PG/browser and actual image/recovery gates execute. No unrelated full suite or deployment.",
+    "sourceOverlay": "Current exact source plus verified official follow-redirects 1.16.1 package matching both current locks. Restore original successful compiled outputs; no compiler execution.",
+    "claim": "Exact source-reviewed dependency security repair. Original compile/type/lint/browser successes retain their original identities. Fresh both-lock audits, patched runtime assembly/scans and missing isolated PG/schema recovery remain required; no application-check replay or deployment.",
     "frontendExternalInputs": {
       "server-version/cognitive-randomization-golden-v1.json": {
         "gitBlob": "5b3cb7c11138044ad6a85626e74004bea2a3e62a",
@@ -221,6 +221,123 @@
       "course-shell-390",
       "analysis-reference-390",
       "pending-publication-390"
-    ]
+    ],
+    "dependencyPatch": {
+      "name": "follow-redirects",
+      "fromVersion": "1.16.0",
+      "toVersion": "1.16.1",
+      "tarball": "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.16.1.tgz",
+      "integrity": "sha512-FNvFGzoMLWmE6Yj9spb/zjd7yiNCHiAW9/Tg9CXrQ8wuu32HtlJOwWO11OJafl5FfY3DxTdQ0vj42zU1kvv5jg==",
+      "tarSha256": "6e075d999dc5ff568916954508397b11a537b18bde615986d7bd8b3d3fa1799f",
+      "tarBytes": 10076,
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "bfa8a54bb952ccda79f0f1889721d108f5b605babbb2b8a3705ffb52f4132eb7",
+          "bytes": 1136
+        },
+        {
+          "path": "debug.js",
+          "sha256": "8dbf7e71a9292be180e3469a6b7a164171d3c39dec79e5dbc4aa1c9f09509faf",
+          "bytes": 315
+        },
+        {
+          "path": "http.js",
+          "sha256": "754c0078c57625db7b55b4c3fb30ff5c207fc49284a5022742e81d0c595403c5",
+          "bytes": 37
+        },
+        {
+          "path": "https.js",
+          "sha256": "7a28e323ffd91094e083a8954fe027839c06d948603d7f2719ed17c446885272",
+          "bytes": 38
+        },
+        {
+          "path": "index.js",
+          "sha256": "656e169cc2e8043ec00b7d912f3ff523a01026a3fd38e04516b37fb39be94f14",
+          "bytes": 21539
+        },
+        {
+          "path": "package.json",
+          "sha256": "3b63e57223c63eff7b1c9ecdcd6615af8c6fcbaa9d436e949f02acf2b6dbe588",
+          "bytes": 1289
+        },
+        {
+          "path": "README.md",
+          "sha256": "190b2c4cce3593592f9661d1bff3ab398317e195425ef3f23758d1f52c42f6af",
+          "bytes": 6605
+        }
+      ],
+      "originalComponents": {
+        "backend": {
+          "jobId": 118549912875,
+          "artifactId": 12254021820,
+          "zipBytes": 111466192,
+          "zipSha256": "1b63bd5f180fd34dd5d8c203269e054bbd614a8c058df619ffadf11e8c9a0e97",
+          "archiveSha256": "68eab0cc18f679331898914caf2c44cc1a64af88c33f677940032419874fe0b2",
+          "componentTree": "8804b7ff3d5d02555bfa5a338702bd23702d6561",
+          "productionInputSha256": "1873e5bb5c9853e66910fe95b8f1022e26bda558e28997a4d75d0622ccdfe8cf",
+          "receiptSha256": "55d7f4e9d65f261c270da0e171a705033eea272668f7351bb60fce9d3711ad1b",
+          "head": "da713c522be4fd3309e4dcf327bfb71384c784fe",
+          "runId": "39399331312",
+          "attempt": "1",
+          "lockfileSha256": "0261d2047bbaab484ae6088526037120a5e058472047b6b964c959d3ff065d9d",
+          "buildFlags": {
+            "VITE_COGNITIVE_MODULE_ENABLED": "true",
+            "TZ": "UTC"
+          },
+          "requiredFiles": {
+            "dist/index.js": "0ad259adc0c7648e992abde10a29f24e316d790548c4e62973f9f16653ac8047",
+            "assets/sjt-upload-v1.xlsx": "3ddecbb4857fa88edbe9139c2bcd3dadddd778458b536156a0998edef0a1123e",
+            "assets/sjt-upload-example-v1.xlsx": "fc460834806a5827e23f5a246ee13e6d24cf58880608bea248fcc7bfbe6ca19c",
+            "dist/modules/cognitive/generated/catalog.js": "afaa96795f2057fb28654b2b1a077f524eb7ea3b2796d1c0fac2d8b06000163b",
+            "dist/modules/cognitive/generated/execution.js": "82ab84654ef3ee3fdc4812869873ca22df070ddd5c460029957cc4fe813a8adc",
+            "dist/modules/cognitive/generated/presentation.js": "02394ad54c01fbcf037999b320e4c06bf9e315e6858d7744aac1aa6a5ac93eb6",
+            "dist/modules/cognitive/generated/scientific.js": "ba2cc93c945f4ae195d87f7b5c18dba1c355b29cca365f6acc27cdcdfd13e007",
+            "dist/modules/cognitive/generated/seeds.js": "44db9ff4c955976d67d4fb2726c6ff02df2fa17bd26f22896e0e48ed1f05adcd",
+            "src/modules/cognitive/generated/identities.json": "4297b93ac8237f7fbf94a56fd5cce086c589602b8bc0dcf801731a18ac2c2d34"
+          },
+          "repository": "caohuibj/eduK12-new-version",
+          "workflowPath": ".github/workflows/ci-measurement-browser.yml",
+          "branch": "ci/measurement-browser-20261020",
+          "jobName": "production compile once / backend",
+          "artifactName": "measurement-39399331312-da713c522be4fd3309e4dcf327bfb71384c784fe-backend-build",
+          "sourceTree": "c82d6ef9a61236e5b99e88f35b9cc0e6e5bf930e",
+          "excludedNonProductionPaths": []
+        },
+        "frontend": {
+          "jobId": 118638223116,
+          "artifactId": 12265672275,
+          "zipBytes": 129060477,
+          "zipSha256": "b232da6c941e31390052800656fd91c370fabbced6ec41a812ce3f71c1969593",
+          "head": "4286a59b649c37662cdbc0e7ca4e41103ad4e4f2",
+          "runId": "39425861081",
+          "attempt": "1",
+          "componentTree": "a4fa70dfd71450f7840708377a4815c073bfbc9b",
+          "lockfileSha256": "5288a377ebdd829533561cf2383cd2bcd20e15bd12e6d15762b36a05f7bec1ca",
+          "archiveSha256": "a7d629206aefc034fd0698e931122da400f889712c6697e2484daf538b9dbf80",
+          "buildFlags": {
+            "VITE_COGNITIVE_MODULE_ENABLED": "true",
+            "TZ": "UTC"
+          },
+          "requiredFiles": {
+            "dist/index.html": "9d56abf17367cc08e25ae7261067eb9940a0dcaf75f98cbd91d64ac820df0dbb"
+          },
+          "repository": "caohuibj/eduK12-new-version",
+          "workflowPath": ".github/workflows/ci-measurement-browser.yml",
+          "branch": "ci/measurement-browser-20261020",
+          "jobName": "build changed measurement frontend once",
+          "artifactName": "measurement-39425861081-4286a59b649c37662cdbc0e7ca4e41103ad4e4f2-frontend-build",
+          "receiptSha256": "d467a7312ae1daa2672b5a1ff635c9561408b65116a3cad5cbabd0a3551430b4",
+          "sourceTree": "6fe522474014fc06948fbd4e5fb0b36c6ba581c0",
+          "productionInputSha256": "4ea252203ada3e369aa74935e8baae73dc047c032857d7efc4b62577ddab061a",
+          "excludedNonProductionPaths": []
+        }
+      },
+      "reviewedSourceFiles": [
+        "server-version/backend/package.json",
+        "server-version/backend/package-lock.json",
+        "server-version/frontend/package-lock.json"
+      ]
+    }
   }
 }
