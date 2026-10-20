@@ -382,16 +382,19 @@ async function readSurveyDictionaryMaterial(input:SurveyDictionaryInput){
     const [project]=await tx.$queryRaw<Array<{
       collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';sourceRevision:number
     }>>`
-      SELECT p.collection_mode AS "collectionMode", p.revision AS "sourceRevision"
+      WITH authorized AS MATERIALIZED (
+      SELECT p.collection_mode AS "collectionMode", p.revision AS "sourceRevision", u.expires_at
       FROM "survey_projects" p
       JOIN "users" u ON u.id=p.owner_user_id
       JOIN "survey_researcher_grants" g ON g.user_id=u.id
       JOIN "survey_mfa_credentials" m ON m.user_id=u.id
       WHERE p.id=${input.projectId} AND p.owner_user_id=${input.actorUserId}
         AND u.account_domain='SURVEY' AND u.is_active AND NOT u.is_frozen
-        AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp())
         AND g.status='ACTIVE' AND m.enabled
       FOR SHARE OF p,u,g,m
+      )
+      SELECT "collectionMode", "sourceRevision" FROM authorized
+      WHERE expires_at IS NULL OR expires_at>clock_timestamp()
     `
     if(!project)denied()
     const wave=await tx.surveyWave.findFirst({
@@ -482,17 +485,20 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
   const max=Math.min(500,Math.max(1,input.maxFinals??250))
   return prisma.$transaction(async tx=>{
     const [project]=await tx.$queryRaw<Array<{collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';sourceCutOff:Date;sourceRevision:number}>>`
+      WITH authorized AS MATERIALIZED (
       SELECT p.collection_mode AS "collectionMode", p.revision AS "sourceRevision",
-        transaction_timestamp() AS "sourceCutOff"
+        transaction_timestamp() AS "sourceCutOff", u.expires_at
       FROM "survey_projects" p
       JOIN "users" u ON u.id=p.owner_user_id
       JOIN "survey_researcher_grants" g ON g.user_id=u.id
       JOIN "survey_mfa_credentials" m ON m.user_id=u.id
       WHERE p.id=${input.projectId} AND p.owner_user_id=${input.actorUserId}
         AND u.account_domain='SURVEY' AND u.is_active AND NOT u.is_frozen
-        AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp())
         AND g.status='ACTIVE' AND m.enabled
       FOR SHARE OF p,u,g,m
+      )
+      SELECT "collectionMode", "sourceRevision", "sourceCutOff" FROM authorized
+      WHERE expires_at IS NULL OR expires_at>clock_timestamp()
     `
     if(!project)denied()
     if(input.expectedSourceRevision!==undefined

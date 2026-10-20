@@ -165,7 +165,8 @@ describe('Publication-only Survey item dictionary',()=>{
       expect(sql).toContain('p.owner_user_id=')
       expect(sql).toContain("u.account_domain='SURVEY'")
       expect(sql).toContain('u.is_active AND NOT u.is_frozen')
-      expect(sql).toContain('u.expires_at>statement_timestamp()')
+      expect(sql).toContain('WITH authorized AS MATERIALIZED')
+      expect(sql).toContain('expires_at>clock_timestamp()')
       expect(sql).toContain("g.status='ACTIVE' AND m.enabled")
       expect(sql).toContain('FOR SHARE OF p,u,g,m')
     }

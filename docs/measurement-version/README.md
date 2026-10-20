@@ -443,3 +443,12 @@ No entry administrator or owner gains these capabilities automatically.
 25 focused service/route/authority contracts passed; merged backend strict types
 passed. No real grants were issued. Connected HTTP/database contention, management
 UI, Training/catalog consumers and formal-norm production access remain pending.
+
+### Source authorization after lock waits
+
+Both source-material fences now evaluate account expiry with clock_timestamp()
+after the materialized owner/account/researcher/MFA SHARE locks. The publication
+item-dictionary reader uses the same lock-then-clock rule. No additional source
+read was added. 53 focused source/dictionary contracts passed, including simulated
+expiry while either fence waits; real two-connection lock/expiry tests remain in
+V10. The report index is live bounded browsing, not a frozen pagination snapshot.
