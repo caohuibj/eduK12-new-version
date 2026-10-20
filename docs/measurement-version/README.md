@@ -250,3 +250,11 @@ Survey 项目授权把原有 owner/账户/grant/MFA 的 FOR SHARE 行集合放�
 目录来源仍走原有授权导入路径，待 V09 集中迁移切换；本次不增加目录改编权限。reference 候选集合/report 选择、START 人口匹配、FINAL 一次计分/结果解释、四入口与旧记录迁移仍待后续，不能把本项称为完整 V08。
 
 验证：发布/编制 16 项加新锁定解析 7 项定向合同通过，strict TypeScript 通过。该锁状态合同为 mock/静态验证，真实多连接生命周期竞态未在本环境验证。
+
+### 私有描述性候选的真实复核与发布
+
+内部 review/publish 服务从数据库读取不可变候选和可信 sourceBinding，再沿当前项目 owner 范围分别要求 reference.review/reference.publish。先短事务验证当前身份、能力、测量身份及来源 fence，事务外使用存储的 cutoff/revision/count 重读相同来源，重建质量纳入集合与 factVersion；末短事务重新检查候选 hash、权限和来源后写入。发布必须读取数据库中的匹配 APPROVED review；客户端不能提供 reviewer、approval 或用途。用途固定 HISTORICAL_INTERPRETATION，REVOKED 测量拒绝。
+
+此路径只支持原生 Survey 私有 descriptive_sample/local_pilot。作者自用复核仍需独立 review 能力，不自动取得正式 norm 复核资格；正式跨入口 norm 的分析者与复核者必须为不同 User。未新增 HTTP、根授权签发或正式 norm 工作台。create/review/publish 共享同一质量与事实投影，未重计分。
+
+验证：服务、候选与 repository 三个目标文件共 51 项通过，定向 strict TypeScript、diff 检查通过。包含数据库 review 仓库实际逻辑的假 review ID、REJECTED、陈旧 hash 等负例，但数据库访问仍为 mock，不代表真实 HTTP、锁等待或并发验证。
