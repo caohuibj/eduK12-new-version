@@ -283,10 +283,10 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
   }
 
   const saveScale = async (itemCode: string, value: ResponseValue) => {
-    if (!draftKey || checkpointBusy || submitting || exiting || draftLocked) return
+    if (!draftKey || checkpointBusy || submitting || exiting || draftLocked) return false
     timingRef.current?.answer(itemCode,scaleValues[itemCode],value)
     setScaleValues((previous) => ({ ...previous, [itemCode]: value }))
-    await scheduleLocalSave(`scale:${itemCode}`, async () => {
+    return scheduleLocalSave(`scale:${itemCode}`, async () => {
       await finalDraftStore.putAnswer({ draftKey, itemKey: itemCode, value: { responseValue: value }, updatedAt: Date.now() })
       if(item?.trainingTiming&&timingRef.current)await finalDraftStore.setInstrumentMetadata(draftKey,{trainingScaleTiming:{snapshotHash:item.trainingTiming.snapshotHash,items:timingRef.current.snapshot()}})
     })
@@ -673,6 +673,8 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
                 >
                   {(() => { const player=(<ScalePlayer
                     key={question.itemCode}
+                    autoAdvance={isTrainingHost() && !campusMode && !publicMode}
+                    scopeKey={draftKey || item.id}
                     item={question}
                     value={scaleValues[question.itemCode]}
                     navigationDisabled={exiting}

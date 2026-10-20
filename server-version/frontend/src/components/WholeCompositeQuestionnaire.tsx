@@ -1,3 +1,4 @@
+import { isTrainingHost } from '../training/context'
 import { TrainingCheckpointPanel } from '../modules/composite/TrainingCheckpointPanel'
 import {TrainingTimingBoundary,restoreTrainingTiming} from '../modules/scale/TrainingTimingBoundary'
 import {SurveyScaleTimingTracker,sealObservedScaleTimings} from '../modules/scale/item-timing'
@@ -148,7 +149,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
   }, [state, api, draftKey, loadRound])
 
   const saveAnswer = async (value: string | number) => {
-    if (!current || locked || busy || submitting.current) return
+    if (!current || locked || busy || submitting.current) return false
     const key = wholeAnswerKey(current.unit.itemId, current.question.itemCode), previous = answers[key]
     timingRef.current[current.unit.itemId]?.answer(current.question.itemCode,previous?.responseValue,value)
     const now = Date.now(), answer: Answer = { responseValue: value,
@@ -156,7 +157,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
       changeCount: (previous?.changeCount ?? 0) + (previous && previous.responseValue !== value ? 1 : 0) }
     questionStart.current = now
     setAnswers(prior => ({ ...prior, [key]: answer }))
-    await schedule(key, async () => {await finalDraftStore.putAnswer({ draftKey, itemKey: key, value: answer, updatedAt: now });if(Object.keys(timingRef.current).length)await finalDraftStore.setInstrumentMetadata(draftKey,{wholeScaleTiming:timingMetadata()})})
+    return schedule(key, async () => {await finalDraftStore.putAnswer({ draftKey, itemKey: key, value: answer, updatedAt: now });if(Object.keys(timingRef.current).length)await finalDraftStore.setInstrumentMetadata(draftKey,{wholeScaleTiming:timingMetadata()})})
   }
   const saveAndExit = async () => {
     if (submitting.current || busy || checkpointBusy) return
@@ -275,7 +276,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
           <p className="mb-4 text-sm text-slate-600">整卷第 {index + 1} / {questions.length} 题</p>
           <AssessmentImageGate items={assessmentImageItems((current.question as { images?: unknown }).images)} loadAsset={loadImage} disabled={busy}>
             <ScaleFormVideoGate presentation={scaleItemVideoPresentation(current.question)} loadSources={() => requestAssessmentVideoCapabilities(`${unitPath}/items/${encodeURIComponent(current.question.itemCode)}/video-capability`, publicMode ? { headers: { 'X-Recovery-Token': recoveryToken || '' } } : undefined)}>
-              {(()=>{const player=(<ScalePlayer item={current.question} value={answers[wholeAnswerKey(current.unit.itemId, current.question.itemCode)]?.responseValue}
+              {(()=>{const player=(<ScalePlayer scopeKey={`${draftKey}:${current.unit.itemId}`} autoAdvance={isTrainingHost() && !publicMode} item={current.question} value={answers[wholeAnswerKey(current.unit.itemId, current.question.itemCode)]?.responseValue}
                 answerDisabled={locked || busy} navigationDisabled={busy} submitDisabled={busy || meta?.status === 'CONFLICT'}
                 position={index + 1} total={questions.length} onChange={saveAnswer} onPrevious={() => setIndex(prior => Math.max(0, prior - 1))}
                 onNext={index + 1 < questions.length ? () => setIndex(prior => prior + 1) : undefined}

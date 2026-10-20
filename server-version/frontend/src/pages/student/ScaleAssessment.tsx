@@ -1,3 +1,5 @@
+import { isTrainingHost } from '../../training/context'
+import { useScaleAutoAdvance } from '../../hooks/useScaleAutoAdvance'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import apiClient, { sessionFetch } from '../../api/client'
@@ -310,10 +312,10 @@ const ScaleAssessment: React.FC = () => {
   }, [navigate, registerScalePersistence, scaleId, contextInput])
 
   const handleSelectAnswer = async (value: ResponseValue) => {
-    if (!scale || !assessment || savingAnswerRef.current || submitting || submissionLocked) return
+    if (!scale || !assessment || savingAnswerRef.current || submitting || submissionLocked) return false
     const items = scale.definition.items
     const item = items[currentIndex]
-    if (!item) return
+    if (!item) return false
     const responseTimeMs = elapsedScaleResponseTimeMs(itemStartTimeRef.current, readScaleTimingNow())
     try {
       await runSave(async () => {
@@ -342,10 +344,12 @@ const ScaleAssessment: React.FC = () => {
         setAnswers((previous) => ({ ...previous, [item.itemCode]: value }))
         setCompletionNotice(null)
       })
+      return true
     } catch (err) {
       const normalized = normalizeApiError(err)
       setCompletionNotice(normalized.message)
       console.error('提交答案失败', err)
+      return false
     }
   }
 
@@ -482,6 +486,16 @@ const ScaleAssessment: React.FC = () => {
     }
   }
 
+  const autoItem = scale?.definition.items[currentIndex]
+  const autoSelection = useScaleAutoAdvance({
+    questionKey: `${assessment?.id ?? ''}:${autoItem?.itemCode ?? ''}`,
+    enabled: isTrainingHost() && autoItem?.type === 'single',
+    disabled: savingAnswer || submitting || submissionLocked,
+    hasNext: Boolean(scale && currentIndex < scale.definition.items.length - 1),
+    onSave: handleSelectAnswer,
+    onNext: () => setCurrentIndex(index => Math.min((scale?.definition.items.length ?? 1) - 1, index + 1)),
+  })
+
   if (loading) {
     return (
       <ProductPage width="assessment">
@@ -552,7 +566,7 @@ const ScaleAssessment: React.FC = () => {
   const requiredViewing = videoPresentation && !submissionLocked
     ? { draftKey, slotKey: scaleVideoSlotKey(currentItem.itemCode) }
     : undefined
-  const answerControlsDisabled = savingAnswer || submitting || submissionLocked
+  const answerControlsDisabled = savingAnswer || submitting || submissionLocked || autoSelection.busy
 
   const saveStatus = savingAnswer
     ? ({ state: 'saving', message: '正在保存本题到本机…' } as const)
@@ -589,17 +603,17 @@ const ScaleAssessment: React.FC = () => {
 
   const actions = (
     <ActionBar className="justify-between">
-      <ProductButton onClick={() => setCurrentIndex((index) => Math.max(0, index - 1))} disabled={currentIndex === 0 || savingAnswer || submitting}>
+      <ProductButton onClick={() => setCurrentIndex((index) => Math.max(0, index - 1))} disabled={currentIndex === 0 || savingAnswer || submitting || autoSelection.busy}>
         <ChevronLeft className="h-5 w-5" aria-hidden="true" />
         上一题
       </ProductButton>
       {currentIndex === items.length - 1 ? (
-        <ProductButton variant="primary" onClick={() => void handleComplete()} disabled={submitting || savingAnswer || requiresRestart}>
+        <ProductButton variant="primary" onClick={() => void handleComplete()} disabled={submitting || savingAnswer || requiresRestart || autoSelection.busy}>
           <CheckCircle className="h-5 w-5" aria-hidden="true" />
           {submitting ? '提交中…' : submissionLocked ? '重新核对提交' : '完成测评'}
         </ProductButton>
       ) : (
-        <ProductButton variant="primary" onClick={() => setCurrentIndex((index) => Math.min(items.length - 1, index + 1))} disabled={savingAnswer || submitting}>
+        <ProductButton variant="primary" onClick={() => setCurrentIndex((index) => Math.min(items.length - 1, index + 1))} disabled={savingAnswer || submitting || autoSelection.busy}>
           下一题
           <ChevronRight className="h-5 w-5" aria-hidden="true" />
         </ProductButton>
@@ -619,7 +633,7 @@ const ScaleAssessment: React.FC = () => {
               key={item.itemCode}
               type="button"
               onClick={() => setCurrentIndex(index)}
-              disabled={savingAnswer || submitting}
+              disabled={savingAnswer || submitting || autoSelection.busy}
               aria-current={current ? 'step' : undefined}
               aria-label={`第 ${index + 1} 题${answered ? '，已作答' : '，未作答'}`}
               className={`min-h-11 min-w-11 rounded-lg border px-3 text-sm font-semibold focus-visible:outline focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-blue-700 disabled:cursor-wait disabled:opacity-60 ${current ? 'border-blue-700 bg-blue-700 text-white' : answered ? 'border-emerald-300 bg-emerald-50 text-emerald-800' : 'border-slate-300 bg-white text-slate-700'}`}
@@ -664,10 +678,10 @@ const ScaleAssessment: React.FC = () => {
         <section className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6" aria-labelledby={`scale-question-${currentItem.itemCode}`}>
           <div className="mb-5">
             <p className="text-sm font-medium text-slate-500">第 {currentIndex + 1} 题 / 共 {items.length} 题</p>
-            <h2 id={`scale-question-${currentItem.itemCode}`} className="mt-2 text-lg font-semibold leading-relaxed text-slate-900">{currentItem.content}</h2>
+            <h2 ref={autoSelection.headingRef} tabIndex={isTrainingHost() ? -1 : undefined} id={`scale-question-${currentItem.itemCode}`} className="mt-2 text-lg font-semibold leading-relaxed text-slate-900">{currentItem.content}</h2>
           </div>
 
-          <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={savingAnswer || submitting} ariaLabel={`${currentItem.content} 视觉内容`}>
+          <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={savingAnswer || submitting || autoSelection.busy} ariaLabel={`${currentItem.content} 视觉内容`}>
             <ScaleFormVideoGate
               presentation={videoPresentation}
               loadSources={() => loadAssessmentVideo(currentItem.itemCode)}
@@ -687,7 +701,10 @@ const ScaleAssessment: React.FC = () => {
                         type="radio"
                         name={`scale-${assessment.id}-${currentItem.itemCode}`}
                         checked={checked}
-                        onChange={() => void handleSelectAnswer(option.value)}
+                        onChange={() => void autoSelection.select(option.value)}
+                        onClick={event => {
+                          if (isTrainingHost() && currentItem.type === 'single' && checked && event.detail < 2) void autoSelection.select(option.value)
+                        }}
                         disabled={answerControlsDisabled}
                         className="mt-1 h-5 w-5 shrink-0 accent-blue-700"
                       />
