@@ -274,7 +274,9 @@ class MacContracts(unittest.TestCase):
             if args[:2] == ['dpkg-query', '-W']: return SimpleNamespace(stdout='1:official-test-version')
             return SimpleNamespace(stdout='')
         self.q.command = command
-        with patch.object(M.R, 'git', return_value=self.q.inputs['macRuntime']['browserScriptBlob']), patch.object(M.Path, 'is_file', return_value=True), patch.object(M.R, 'sha', return_value='verified-font-hash'):
+        reuse = SimpleNamespace(admit_prior_browser_case=Mock(return_value={'control': 'original-case'}))
+        spec = SimpleNamespace(loader=SimpleNamespace(exec_module=Mock()))
+        with patch.object(M.R, 'git', return_value=self.q.inputs['macRuntime']['browserScriptBlob']), patch.object(M.Path, 'is_file', return_value=True), patch.object(M.R, 'sha', return_value='verified-font-hash'), patch.object(M.importlib.util, 'spec_from_file_location', return_value=spec), patch.object(M.importlib.util, 'module_from_spec', return_value=reuse):
             result = self.q.browser()
         self.assertEqual(result['cjkFont']['family'], 'Noto Sans CJK SC')
         self.assertEqual(result['cjkFont']['fileSha256'], 'verified-font-hash')
@@ -284,6 +286,34 @@ class MacContracts(unittest.TestCase):
         self.assertIn('https://security.ubuntu.com/ubuntu noble-security ', source)
         self.assertFalse(any('trusted=yes' in arg or 'allow-unauthenticated' in arg for call in calls for arg in call))
         self.assertEqual(sum('fonts-noto-cjk' in call and 'install' in call for call in calls), 1)
+
+    def test_browser_passes_only_verified_prior_case_wrapper_to_runner(self):
+        wrapper = {'schema': 1, 'kind': 'verified-original-official-case', 'originalStatus': 'FAIL',
+                   'runId': '39512542094', 'check': {'name': 'course-shell-1440', 'status': 'PASS'}}
+        reuse = SimpleNamespace(admit_prior_browser_case=Mock(return_value=wrapper))
+        spec = SimpleNamespace(loader=SimpleNamespace(exec_module=Mock()))
+        self.q.state['components']['frontend']['compiledArchiveSha256'] = 'original-compiled-hash'
+        self.q.inputs['macRuntime']['browserExpectedAssertions'] = CHECKS
+        output = self.q.out / 'browser'; output.mkdir()
+        (output / 'browser-result.json').write_text(json.dumps({'schema': 1, 'status': 'PASS',
+            'kind': 'compiled-ui-synthetic-api-integration', 'errors': [], 'checks': [{'name': n, 'status': 'PASS'} for n in CHECKS]}))
+        calls = []
+        def command(args, **kwargs):
+            calls.append(args)
+            result = ''
+            if args[:2] == ['fc-match', '--format=%{file}']: result = '/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc'
+            if args[:2] == ['fc-match', '--format=%{family}']: result = 'Noto Sans CJK SC'
+            if args[:2] == ['dpkg-query', '-S']: result = 'fonts-noto-cjk: font'
+            return SimpleNamespace(stdout=result)
+        self.q.command = command
+        with patch.object(M.R, 'git', return_value=self.q.inputs['macRuntime']['browserScriptBlob']), patch.object(M.Path, 'is_file', return_value=True), patch.object(M.R, 'sha', return_value='verified-hash'), patch.object(M.importlib.util, 'spec_from_file_location', return_value=spec), patch.object(M.importlib.util, 'module_from_spec', return_value=reuse):
+            self.q.browser()
+        reuse.admit_prior_browser_case.assert_called_once_with(self.q)
+        prior = self.q.private / 'prior-browser-case.json'
+        self.assertEqual(json.loads(prior.read_text()), wrapper)
+        browser = next(call for call in calls if '.github/scripts/training-mac-browser.mjs' in call)
+        self.assertEqual(browser[-2:], ['--prior-browser-result', str(prior)])
+        self.assertEqual(len([call for call in calls if '.github/scripts/training-mac-browser.mjs' in call]), 1)
 
     def test_repair_executes_missing_phases_but_never_successful_compiles_types_lint(self):
         self.q.state['phases'] = []

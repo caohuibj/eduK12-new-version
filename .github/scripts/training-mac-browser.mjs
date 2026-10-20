@@ -23,7 +23,8 @@ export function fixture(method,pathname){
     '/api/checkins':{list:[],total:0,page:1,pageSize:20},
     [`/api/courses/${COURSE}/training-assessments`]:{list:[{id:PRODUCT,key:'QUESTIONNAIRE:'+PRODUCT,kind:'QUESTIONNAIRE',name:product.name,status:'DRAFT',tags:[],typeLabel:'课程问卷',unitCount:1,unitLabel:'个测评单元',manageHref:'/questionnaire-products/'+PRODUCT}],total:1,page:1,pageSize:20},
     [`/api/courses/${COURSE}/training-analysis/sources`]:{list:[{taskId:PRODUCT,taskName:'合成发布测评',publication:'2026-10-01T00:00:00.000Z',configDigest:'a'.repeat(64),variantKey:null,metrics:[{itemId:ITEM,metricKey:'score',label:'合成得分'}]}],total:1,canQuality:false,canExport:false},
-    '/api/training/reference-governance/capabilities':[],
+    // Synthetic review-only capability projection, not real authorization proof.
+    '/api/training/reference-governance/capabilities':[{grantId:'55555555-5555-4555-8555-555555555555',measurementReleaseIds:['66666666-6666-4666-8666-666666666666'],capabilities:['reference.review']}],
     '/api/questionnaire-products/resources':{scales:[],cognitive:[],situational:[],courses:[course]},
     [`/api/questionnaire-products/${PRODUCT}`]:product,
     [`/api/composite-assessments/${PRODUCT}/public-tokens`]:{list:[]},
@@ -47,6 +48,15 @@ export function requireComplete(result){
   assert(result.checks.every(row=>row.status==='PASS'));
   assert.deepEqual(result.errors,[]);
 }
+export function admitPriorCourse(prior,dist){
+  assert.equal(prior.schema,1);assert.equal(prior.kind,'verified-original-official-case');
+  const pins={runId:'39512542094',attempt:1,sourceHead:'4e3e5d2d092ae42cc2f871ebbd9a9c81d18152b2',head:'9dd8f8f5d8951225b76a4df21862f571017e3221',tree:'4d53ec70df40781ddfe5a7359dca748820b25623',reportSha256:'4437c85e6d1b3830c0bf821340cd736d45fb3e09d3a5303f8c1c3e7a4a4b8920',originalStatus:'FAIL'};
+  for(const [key,value] of Object.entries(pins))assert.equal(prior[key],value,'PRIOR_IDENTITY');
+  assert.deepEqual(prior.dist,{sha256:'2b37eac6fdd8c8dd836b79c2f80e59abe4f90444f11a4baa9c2abbafc2202886',files:415});
+  assert.deepEqual(prior.dist,dist,'PRIOR_DIST');
+  assert.deepEqual(prior.check,{name:'course-shell-1440',status:'PASS',geometry:{viewport:1440,document:1440},screenshot:'course-shell-1440.png'});
+  return {...prior.check,screenshot:'original-course-shell-1440.png',kind:'admitted-prior-official-success',ciExecuted:false,original:{...pins,dist:prior.dist,check:prior.check}};
+}
 async function distIdentity(root){
   const hash=createHash('sha256');let count=0;
   async function visit(relative=''){
@@ -58,7 +68,7 @@ async function distIdentity(root){
   }
   await visit();assert(count>1,'EMPTY_DIST');return {sha256:hash.digest('hex'),files:count};
 }
-export async function run({frontendDir,playwrightModule,output}){
+export async function run({frontendDir,playwrightModule,output,priorBrowserResult}){
   const root=await realpath(frontendDir);await readFile(path.join(root,'index.html'));
   await mkdir(output,{recursive:true});
   const result={schema:1,kind:'compiled-ui-synthetic-api-integration',status:'FAIL',backendE2E:false,authenticationVerified:false,transport:'all browser requests fulfilled locally before network; no TLS qualification',dist:await distIdentity(root),checks:[],errors:[],apiReads:{}};
@@ -66,6 +76,7 @@ export async function run({frontendDir,playwrightModule,output}){
   let browser,lastPage;let active='setup';
   const record=code=>{result.errors.push({check:active,code});};
   try{
+    const priorCourse=priorBrowserResult?admitPriorCourse(JSON.parse(await readFile(priorBrowserResult,'utf8')),result.dist):null;
     browser=await chromium.launch({headless:true});
     for(const width of [1440,390]){
       const context=await browser.newContext({viewport:{width,height:1000},serviceWorkers:'block',locale:'zh-CN',timezoneId:'UTC'});
@@ -102,6 +113,11 @@ export async function run({frontendDir,playwrightModule,output}){
         result.checks.push({name,status:'PASS',geometry,screenshot:`${name}.png`});
       }
       active=`course-shell-${width}`;
+      if(width===1440&&priorCourse){
+        // Only navigation needed to reach the failed analysis target; no old assertions or screenshot replay.
+        await page.goto(ORIGIN+`/courses/${COURSE}/detail?section=assessments`,{waitUntil:'networkidle'});
+        result.checks.push(priorCourse);
+      }else{
       await page.goto(ORIGIN+`/courses/${COURSE}/detail`,{waitUntil:'networkidle'});
       await page.getByRole('heading',{name:course.title,exact:true}).waitFor();
       assert.equal(await page.locator('main#hui-main').count(),1);
@@ -110,6 +126,7 @@ export async function run({frontendDir,playwrightModule,output}){
       assert.equal(new URL(page.url()).searchParams.get('section'),'assessments');
       await page.getByRole('link',{name:'继续编制',exact:true}).waitFor();
       await shot(active);
+      }
       active=`analysis-reference-${width}`;
       await page.getByRole('button',{name:'信息统计',exact:true}).click();
       await page.getByRole('region',{name:'课程描述性参考工作台'}).waitFor();
@@ -152,5 +169,5 @@ export async function run({frontendDir,playwrightModule,output}){
 if(process.argv[1]&&import.meta.url===pathToFileURL(path.resolve(process.argv[1])).href){
   const args=process.argv.slice(2),get=flag=>args[args.indexOf(flag)+1];
   assert(args.includes('--frontend-dir')&&args.includes('--playwright-module')&&args.includes('--output'),'MISSING_ARGUMENT');
-  await run({frontendDir:get('--frontend-dir'),playwrightModule:get('--playwright-module'),output:get('--output')}).catch(()=>{console.error('COMPILED_UI_SETUP_FAILED');process.exitCode=1;});
+  await run({frontendDir:get('--frontend-dir'),playwrightModule:get('--playwright-module'),output:get('--output'),priorBrowserResult:args.includes('--prior-browser-result')?get('--prior-browser-result'):undefined}).catch(()=>{console.error('COMPILED_UI_SETUP_FAILED');process.exitCode=1;});
 }

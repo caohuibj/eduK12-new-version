@@ -38,6 +38,13 @@ class Contract(unittest.TestCase):
         source = (ROOT / 'training-mac-runtime-reuse.py').read_text()
         self.assertIn("q.download({**pin, 'repository': 'caohuibj/eduK12-new-version'}, target)", source)
 
+    def test_browser_case_is_unarmed_or_wrong_source_fail_closed(self):
+        with self.assertRaisesRegex(ValueError, 'Unreviewed browser'):
+            M.validate_browser_case({}, {}, {}, b'{}', b'unreviewed')
+        self.assertEqual(M.BROWSER_PIN['runId'], '39512542094')
+        self.assertEqual(M.BROWSER_PIN['jobId'], 118936926887)
+        self.assertNotIn('compiled-browser', M.PHASES)
+
     def test_exact_four_selected_checks(self):
         self.assertEqual(M.PHASES, ('backend-compile', 'frontend-compile', 'frontend-app-types', 'changed-lint'))
         self.assertNotIn('compiled-browser', M.PHASES)

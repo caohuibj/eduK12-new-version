@@ -212,8 +212,13 @@ class MacQualification(R.Qualification):
         module = self.private / 'backend/node_modules/playwright-core'
         self.command(['env', 'PLAYWRIGHT_BROWSERS_PATH=' + str(browsers), 'node', str(module / 'cli.js'), 'install', 'chromium'], timeout=600)
         output = self.out / 'browser'
+        spec = importlib.util.spec_from_file_location('mac_prior_browser', Path(__file__).with_name('training-mac-runtime-reuse.py'))
+        reuse_module = importlib.util.module_from_spec(spec); spec.loader.exec_module(reuse_module)
+        prior = self.private / 'prior-browser-case.json'
+        prior.write_text(json.dumps(reuse_module.admit_prior_browser_case(self), sort_keys=True) + '\n')
         self.command(['env', 'PLAYWRIGHT_BROWSERS_PATH=' + str(browsers), 'node', script,
-                      '--frontend-dir', str(self.private / 'frontend/dist'), '--playwright-module', str(module), '--output', str(output)], timeout=180)
+                      '--frontend-dir', str(self.private / 'frontend/dist'), '--playwright-module', str(module), '--output', str(output),
+                      '--prior-browser-result', str(prior)], timeout=180)
         report = json.loads((output / 'browser-result.json').read_text())
         checks = require_browser_report(report, pin['browserExpectedAssertions'])
         return {'resultSha256': R.sha(output / 'browser-result.json'), 'checks': checks, 'cjkFont': font_receipt, 'frontendCompiledArchiveSha256': self.state['components']['frontend']['compiledArchiveSha256']}

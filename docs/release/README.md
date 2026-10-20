@@ -461,3 +461,9 @@ CJK 字体。后续固定原 run/job、ZIP/receipt/TAR 摘要及成功阶段完�
 接纳这四项原成功并恢复原编译字节，不重新执行编译、类型或 lint。只继续
 失败浏览器与尚未执行的隔离 PG、镜像装配/扫描和新 schema 恢复；缺失或
 输入漂移直接停止，不回退为重新运行全部阶段。
+
+第二轮 run `39512542094` 的桌面 course-shell 已通过，随后 analysis-reference
+因合成 governance grants 为空而失败。仅补齐该分析场景需要的只读审核 grant。
+桌面 course-shell 由固定官方 ZIP/report 和相同 compiled dist 接纳，保留原截图、
+原报告 FAIL 与失败 analysis 记录；当前只做进入分析页所需导航，不重跑其断言。
+手机 course-shell 及其他未通过场景仍须真实执行，缺失 proof 不跳过任何 case。
