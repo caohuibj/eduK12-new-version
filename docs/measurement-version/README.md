@@ -382,3 +382,11 @@ and optional FINAL completion-time window, uses existing signed pagination and
 three-file download/recovery, and never includes free text even if RAW previously
 selected it. UI explains saved-at-FINAL semantics, legacy absence and no current
 reference reselection. 33 actual download/recovery component contracts passed.
+
+Explicit reinterpretation execution fix: the verified reader now carries each
+unit's actual saved `notExecuted` terminal evidence. Placeholder NOT_SHOWN score
+rows cannot count as evidence of administration. New interpretation requires
+one matching execution record and renders a report only when its result is READY;
+skipped units remain NOT_EXECUTED / report UNAVAILABLE with no rendered report.
+Two real Flow→compute→encrypted reader→reinterpretation tests cover skipped and
+executed controls; database/authorization/release lookup boundaries are mocked.

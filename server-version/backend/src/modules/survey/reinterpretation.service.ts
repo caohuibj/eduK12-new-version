@@ -121,13 +121,15 @@ export async function createSurveyReinterpretation(actorId:string,raw:unknown){
       ||score.sourceFinalHash!==saved!.sourceFinalHash||score.projectId!==input.projectId||score.waveId!==input.waveId
       ||score.measurement.scoringDigest!==versions[0].scoringDigest||!measurement.content.metrics.some(metric=>metric.metricKey===score.measurement.scoreKey)))
       fail('FINAL 指标来源不一致')
-    const facts:SurveyInterpretationFacts={notExecuted:!scores.length,quality:scores.length&&scores.every(score=>score.quality?.status==='interpretable')?'interpretable':undefined,
+    const execution=saved!.unitExecution?.filter(unit=>unit.instrumentKey===input.instrumentKey)??[]
+    if(execution.length!==1)fail('FINAL 缺少可核验的施测终态')
+    const facts:SurveyInterpretationFacts={notExecuted:execution[0].notExecuted,quality:scores.length&&scores.every(score=>score.quality?.status==='interpretable')?'interpretable':undefined,
       metrics:scores.map(score=>({key:score.measurement.scoreKey,value:score.value,status:score.status===(measurement.family==='COGNITIVE'?'OK':'calculated')
         &&score.missingReason===null&&score.value!==null&&Number.isFinite(score.value)?'OK':'UNAVAILABLE'}))}
     // Reuse verified releases in this request; no second database load/context.
     const interpretation=await interpretSurveyContentBinding(tx,{binding,ownerId:actorId,readFacts:()=>facts,releases:cache})
     const personal=interpretation.units[0]
-    const report=template?renderDeclaredReport(template.content.template,
+    const report=template&&personal.report.status==='READY'?renderDeclaredReport(template.content.template,
       scores.filter(score=>template!.content.metricKeys.includes(score.measurement.scoreKey)).map(score=>({metricKey:score.measurement.scoreKey,value:score.value,
         unit:measurement.content.metrics.find(metric=>metric.metricKey===score.measurement.scoreKey)!.unit,
         status:score.quality?.status==='interpretable'&&facts.metrics.find(metric=>metric.key===score.measurement.scoreKey)?.status==='OK'?'INTERPRETABLE':score.quality?.status==='invalid'?'INVALID':'UNAVAILABLE'})),

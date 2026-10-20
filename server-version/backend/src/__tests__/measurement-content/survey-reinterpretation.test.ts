@@ -16,7 +16,7 @@ const measurement=()=>({releaseId:'m',contentHash:hash,status:'PUBLISHED',scope,
 const reference=()=>({releaseId:ids.reference,contentHash:hash,status:'PUBLISHED',scope,layer:'REFERENCE',family:'SCALE',version:'2',content:{measurement:{releaseId:'m',contentHash:hash},entries:[{metricKey:'total',referenceKind:'descriptive_sample',definition:entry}]}})
 const report=()=>({releaseId:ids.report,contentHash:hash,status:'PUBLISHED',scope,layer:'REPORT',family:'SCALE',content:{generatorVersion:'DECLARATIVE_REPORT_V1',measurements:[{releaseId:'m',contentHash:hash}],metricKeys:['total'],template:{schemaVersion:1,title:'New wording',blocks:[{type:'METRIC',metricKey:'total',display:'RAW'}],limitations:[]}}})
 const binding=()=>({schemaVersion:1,projectId:ids.project,waveId:ids.wave,attemptId:'attempt',publicationId:'pub',definitionDigest:hash,populationContext:{},units:[{instrumentKey:'scale',measurement:{releaseId:'m',contentHash:hash,measurementHash:hash},references:[]}]})
-const source=()=>({projectId:ids.project,sourceRevision:5,completeAttempts:1,sourceVersions:[{waveId:ids.wave,instrumentKey:'scale',scoringDigest:'scoring',measurementRelease:binding().units[0].measurement}],interpretations:[{attemptId:'attempt',sourceFinalHash:hash,binding:binding(),interpretation:null}],scores:[{projectId:ids.project,waveId:ids.wave,attemptId:'attempt',sourceFinalHash:hash,sourceVerified:true,measurement:{instrumentKey:'scale',scoreKey:'total',scoringDigest:'scoring'},value:5,status:'calculated',missingReason:null,quality:{status:'interpretable'}}]})
+const source=()=>({projectId:ids.project,sourceRevision:5,completeAttempts:1,sourceVersions:[{waveId:ids.wave,instrumentKey:'scale',scoringDigest:'scoring',measurementRelease:binding().units[0].measurement}],interpretations:[{attemptId:'attempt',sourceFinalHash:hash,binding:binding(),unitExecution:[{instrumentKey:'scale',notExecuted:false}],interpretation:null}],scores:[{projectId:ids.project,waveId:ids.wave,attemptId:'attempt',sourceFinalHash:hash,sourceVerified:true,measurement:{instrumentKey:'scale',scoreKey:'total',scoringDigest:'scoring'},value:5,status:'calculated',missingReason:null,quality:{status:'interpretable'}}]})
 const input=()=>({requestId:ids.request,projectId:ids.project,waveId:ids.wave,finalId:ids.final,grantId:ids.grant,instrumentKey:'scale',reportReleaseId:ids.report,references:[{releaseId:ids.reference,entryKey:referenceEntryKey(entry as never),priority:0}]})
 let stored:any
 beforeEach(()=>{
@@ -73,6 +73,17 @@ describe('explicit reinterpretation uses actual scoped saved FINAL facts',()=>{
   const result=await createSurveyReinterpretation('owner',input())
   expect(result.artifact.interpretation.units[0].references[0]).toMatchObject({status:'UNAVAILABLE',reason:'QUALITY_UNAVAILABLE'})
   expect(result.artifact.report?.blocks).toContainEqual(expect.objectContaining({value:null,status:'INVALID'}))
+ })
+ it('does not render a skipped instrument despite nonempty NOT_SHOWN placeholder scores',async()=>{
+  const s=source();s.interpretations[0].unitExecution[0].notExecuted=true;s.scores[0].value=null as any;s.scores[0].missingReason='NOT_SHOWN' as any
+  mocks.source.mockResolvedValue(s)
+  const result=await createSurveyReinterpretation('owner',input())
+  expect(result.artifact.interpretation.units[0]).toMatchObject({status:'UNAVAILABLE',reason:'NOT_EXECUTED',report:{status:'UNAVAILABLE'}})
+  expect(result.artifact.report).toBeNull()
+ })
+ it('rejects missing execution evidence rather than inferring execution from scores',async()=>{
+  const s=source();delete (s.interpretations[0] as any).unitExecution;mocks.source.mockResolvedValue(s)
+  await expect(createSurveyReinterpretation('owner',input())).rejects.toMatchObject({statusCode:409})
  })
  it('rejects body-provided scores, population, actor and duplicate reference choices',async()=>{
   for(const extra of [{scores:[5]},{populationContext:{age:12}},{actorId:'owner'}])await expect(createSurveyReinterpretation('owner',{...input(),...extra})).rejects.toThrow()

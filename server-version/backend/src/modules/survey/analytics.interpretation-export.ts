@@ -14,6 +14,8 @@ const interpretationSchema=z.object({schemaVersion:z.literal(1),contentBindingHa
 }).strict()).max(30)}).strict()
 export interface SurveyStoredInterpretationObservation {
   projectId:string;waveId:string;waveOrdinal:number;attemptId:string;researchCode:string|null;sourceFinalHash:string;completedAt:string;
+  /** Ephemeral execution evidence from the verified FINAL, not inferred from placeholder scores. */
+  unitExecution?:Array<{instrumentKey:string;notExecuted:boolean}>
   sourceVerified:true;binding:SurveyAttemptContentBinding|null;interpretation:z.infer<typeof interpretationSchema>|null
 }
 /** No computation or selection: validate the saved personal interpretation against its immutable receipt. */
