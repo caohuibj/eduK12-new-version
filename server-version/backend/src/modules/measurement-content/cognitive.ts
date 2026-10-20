@@ -2,7 +2,6 @@ import { canonicalHash, canonicalJsonString } from '../assessment-runtime/canoni
 import { getCognitiveV2TaskDefinition } from '../cognitive/v2/registry'
 import { evaluateCognitiveProductReadiness } from '../cognitive/library/product-readiness'
 import { resolveCognitiveFinalMaxTrials } from '../cognitive/v2/final-submission-budget'
-import { assertCognitiveProductEligible } from '../cognitive/product-eligibility'
 import { ContentReleaseError, type ReleaseInput } from './release'
 
 export interface CognitiveReleaseSource {
@@ -16,7 +15,9 @@ const withoutReport=(value:unknown):Record<string,unknown>=>{
 }
 /** Only installed registry implementations and their existing parameter schemas. */
 export function cognitiveMeasurementRelease(input:CognitiveReleaseSource):ReleaseInput{
-  assertCognitiveProductEligible(input.testType)
+  // Entry services own admission flags; Survey must not inherit Training's gate.
+  // Registered framework fixtures are never scientific publication content.
+  if(input.testType==='fake')throw new ContentReleaseError('CONTENT_COGNITIVE_FIXTURE_FORBIDDEN')
   const d=getCognitiveV2TaskDefinition(input.testType,input.engineVersion,input.scoringVersion)
   if(!d)throw new ContentReleaseError('CONTENT_COGNITIVE_RUNNER_MISSING')
   canonicalJsonString(input.config)

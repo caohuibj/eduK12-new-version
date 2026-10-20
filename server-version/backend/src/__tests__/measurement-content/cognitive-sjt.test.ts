@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
-vi.hoisted(() => { process.env.COGNITIVE_MODULE_ENABLED = 'true' })
+vi.hoisted(() => { process.env.COGNITIVE_MODULE_ENABLED = 'false' })
+import { assertCognitiveProductEligible, isCognitiveNewAdmissionEnabled } from '../../modules/cognitive/product-eligibility'
 import { cognitiveMeasurementRelease } from '../../modules/measurement-content/cognitive'
 import { sjtMeasurementRelease } from '../../modules/measurement-content/sjt'
 import { prepareRelease } from '../../modules/measurement-content/release'
@@ -17,6 +18,12 @@ const sjt=()=>compileResearchSjt('test',{
 }).package.definition
 const sjtInput=()=>({localId:'discussion',version:'1',instrumentVersion:'1',definition:sjt(),scope})
 describe('existing Cognitive and SJT version adapters',()=>{
+  it('allows shared Survey compilation while the Training admission flag is disabled',()=>{
+    expect(isCognitiveNewAdmissionEnabled()).toBe(false)
+    expect(()=>assertCognitiveProductEligible('gonogo')).toThrow()
+    expect(prepareRelease(cognitiveMeasurementRelease(cognition())).family).toBe('COGNITIVE')
+    expect(()=>cognitiveMeasurementRelease({...cognition(),testType:'fake'})).toThrow('CONTENT_COGNITIVE_FIXTURE_FORBIDDEN')
+  })
   it('freezes supported timing configuration separately from report settings',()=>{
     const original=cognition(),base=prepareRelease(cognitiveMeasurementRelease(original))
     const reportOnly={...original,config:{...original.config,report:{...original.config.report,reportVersion:'2.0.0'}}}
