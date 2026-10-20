@@ -439,6 +439,12 @@ const matchesContext = (population: ReferencePopulation, context: ReferenceConte
     && (population.countryOrRegion == null || population.countryOrRegion === context.countryOrRegion)
 }
 
+/** Shared population predicate for frozen policy selection and scoped sample readers. */
+export function matchReferencePopulation(population:ReferencePopulation,context:ReferenceContext):'MATCH'|'MISSING_CONTEXT'|'NO_MATCH'{
+  if(missingPopulationContext(population,context))return 'MISSING_CONTEXT'
+  return matchesContext(population,context)?'MATCH':'NO_MATCH'
+}
+
 const criterionBandFor = (value: number, thresholds: ReferenceThreshold[]): ResolvedScaleReference['criterionBand'] => {
   const threshold = thresholds.find((candidate) => (
     (candidate.minInclusive === undefined || value >= candidate.minInclusive) &&

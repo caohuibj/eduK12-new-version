@@ -179,3 +179,5 @@ V06 后续内部准备：经验治理去掉固定总 N/每段 N 门槛，允许�
 内部合同独审修正：候选现按稳定 entryKey（指标/参考种类/人口条件/测量评分版本）冻结实际成员，可信 scoped reader 需提供每事实的真实 measurementReleaseId、metricKeys、eligibleEntryKeys；输入自报字段必须一致。互斥年龄组各 50 的总批 100 复现已覆盖：正确 50/50 通过，错误整批 100/100 与跨组伪造拒绝。实际测量三项身份由候选 repository 的一次可信 release 读取校验。报告 REFERENCE_BAND 增加 referenceKind，避免同指标 norm/criterion 同名 high 混淆，模板不固定具体 norm 版本。相关 9 项纯合同通过，strict TypeScript 通过；均为尚未暴露 API 的阶段合同修复，不表示既有用户已受影响。
 
 V06 内部审核发布助手从数据库读取指定 candidate/review，不接受客户端 approval JSON；重新验证当前 scoped reader 的样本资格后构造 scope 派生 key，再交共享发布事务。真实服务仍必须从 authenticated actor 与当前授权派生 actor/authorizedFacts，不能将请求 body 直接传入这些信任参数。新增 repository 合同验证实际 scoring identity 不符拒绝、失权拒绝及数据库 REJECTED 不发布。entryKey 现每 entry 只 canonical/hash 一次，样本循环复用 key；调用次数合同覆盖，未扩算法或做性能实验。相关 8 项纯/mock 合同通过，真实数据库验收仍待集中运行。
+
+V06/V08 冻结匹配内部准备：新增有界 EXACT_POPULATION_PRIORITY_V1 选择器，只接受已冻结的精确 release/hash/entry 集合及显式 priority，复用 ReferenceCore 人口匹配。相同 metric/referenceKind 的同优先级多匹配降为 AMBIGUOUS；缺人口字段只可回退到集合中真正适用的条目，不按“总体”名字猜测。已冻结集合正常 SUPERSEDED 仍可选；REVOKED slot 降级、RETIRED 不新增选择。结果仅保存精确引用及不可用原因，不复制参考统计、扫描样本、取 latest 或调用 scorer。3 项匹配合同及定向 strict TypeScript 通过。实际投放/Wave 冻结写入与 START 调用仍待 V05 接口稳定后的服务接入，不能将此纯函数当作完成的 V08。
