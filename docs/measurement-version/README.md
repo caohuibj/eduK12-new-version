@@ -547,3 +547,9 @@ Leaving a FINAL drops late responses, including export responses. 27 focused
 reinterpretation/report/default-download component contracts and frontend strict
 types passed. Real browser download/session recovery and network/API acceptance
 remain for V10; these are not claimed by component mocks.
+
+New-interpretation recovery keeps viewing an older artifact independent from a
+pending create request. Only the matching pending artifact can finish that request;
+reading another artifact cannot disable its same-UUID retry. Eight focused
+component contracts include unknown A → successful old B read → A 404 → identical
+A retry, preserving A's body throughout.

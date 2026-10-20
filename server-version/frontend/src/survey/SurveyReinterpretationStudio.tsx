@@ -18,7 +18,7 @@ export function SurveyReinterpretationStudio({actorId,projectId,waveId,finalId,i
  useEffect(()=>{if(!pending)return;const guard=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue=''};window.addEventListener('beforeunload',guard);return()=>window.removeEventListener('beforeunload',guard)},[pending])
  const base=`/projects/${encodeURIComponent(projectId)}/analytics/waves/${encodeURIComponent(waveId)}/finals/${encodeURIComponent(finalId)}/interpretations`
  const retain=(body:Body,unknown:boolean)=>{sessionStorage.setItem(cacheKey,JSON.stringify({body,hadUnknown:unknown}));setPending(body);setArtifactId(body.requestId)}
- const accept=(value:Artifact)=>{if(value.finalId!==finalId||value.accessAudience!=='researcher'||value.semantics!=='EXPLICIT_IMMUTABLE_INTERPRETATION')throw Error('工件身份不匹配');setArtifact(value);setArtifactId(value.artifactId);setIssued(true)
+ const accept=(value:Artifact)=>{if(value.finalId!==finalId||value.accessAudience!=='researcher'||value.semantics!=='EXPLICIT_IMMUTABLE_INTERPRETATION')throw Error('工件身份不匹配');setArtifact(value);setArtifactId(value.artifactId);if(!pending||pending.requestId===value.artifactId)setIssued(true)
    if(pending?.requestId===value.artifactId){sessionStorage.removeItem(cacheKey);setPending(null);setStorageError('')}}
  async function create(){
   setError('');let body=pending

@@ -55,4 +55,15 @@ describe('explicit immutable interpretation UI',()=>{
   fireEvent.click(screen.getByText('独立导出解释 JSON'));view.unmount();resolve(result());await Promise.resolve();expect(create).not.toHaveBeenCalled()
  })
 
+ it('viewing older artifact B never completes uncertain request A or disables its original retry',async()=>{
+  const request=vi.fn().mockRejectedValueOnce(new Error('A response lost'))
+  render(<SurveyReinterpretationStudio {...props} request={request}/>);fill();fireEvent.click(screen.getByText('确认创建独立解释'));await screen.findByText(/原请求编号已保存/)
+  const body=request.mock.calls[0][2]
+  request.mockResolvedValueOnce(result(gid));fireEvent.change(screen.getByLabelText('已保存解释工件 UUID'),{target:{value:gid}});fireEvent.click(screen.getByText('读取精确解释工件'));await screen.findByText('Saved report')
+  expect(screen.getByText('人工重试同一解释请求')).not.toBeDisabled();expect(screen.getByText(/待核对请求/)).toHaveTextContent(body.requestId)
+  request.mockRejectedValueOnce(Object.assign(new Error('A not available'),{status:404}));fireEvent.change(screen.getByLabelText('已保存解释工件 UUID'),{target:{value:body.requestId}});fireEvent.click(screen.getByText('读取精确解释工件'));await screen.findByText('A not available')
+  request.mockResolvedValueOnce(result(body.requestId));fireEvent.click(screen.getByText('人工重试同一解释请求'));await screen.findByText('Saved report')
+  expect(request.mock.calls[3][2]).toEqual(body);expect(screen.queryByText(/待核对请求/)).toBeNull()
+ })
+
 })
