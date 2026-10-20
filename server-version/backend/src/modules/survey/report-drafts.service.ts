@@ -17,7 +17,7 @@ export const surveyReportPayload=z.object({
   template:reportTemplateSchema,
   assets:z.array(assetReference.extend({rightsStatus:z.enum(['self_authored','authorized']),rightsNote:z.string().trim().min(1).max(2000)}).strict()).max(30).default([]),
 }).strict()
-export const createSurveyReportInput=z.object({requestId:z.string().uuid(),reportKey:text,version:text,payload:surveyReportPayload}).strict()
+export const createSurveyReportInput=z.object({requestId:z.string().uuid(),reportKey:z.string().trim().min(1).max(168),version:text,payload:surveyReportPayload}).strict()
 export const editSurveyReportInput=z.object({revision:z.number().int().nonnegative(),payload:surveyReportPayload}).strict()
 export const publishSurveyReportInput=z.object({revision:z.number().int().nonnegative(),publicationNote:z.string().trim().min(3).max(4000)}).strict()
 type Payload=z.infer<typeof surveyReportPayload>

@@ -25,8 +25,9 @@ const publicRow=(row:any)=>({
 })
 
 export async function authorizedProject(tx:Tx,userId:string,projectId:string,write:boolean){
-  const rows=await tx.$queryRaw<Array<{id:string;status:string}>>`
-    SELECT p.id,p.status FROM "survey_projects" p
+  const rows=await tx.$queryRaw<Array<{id:string;status:string;expires_at:Date|null;checked_at:Date}>>`
+    WITH locked AS MATERIALIZED (
+    SELECT p.id,p.status,u.expires_at FROM "survey_projects" p
     JOIN "users" u ON u.id=p.owner_user_id
     JOIN "survey_researcher_grants" g ON g.user_id=u.id
     JOIN "survey_mfa_credentials" m ON m.user_id=u.id
@@ -35,9 +36,10 @@ export async function authorizedProject(tx:Tx,userId:string,projectId:string,wri
       AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp())
       AND g.status='ACTIVE' AND m.enabled=TRUE
     LIMIT 1 FOR SHARE OF p,u,g,m
+    ) SELECT locked.*,clock_timestamp() AS checked_at FROM locked
   `
   const project=rows[0]
-  if(!project)fail(404,'研究项目不存在')
+  if(!project||(project.expires_at&&project.expires_at<=project.checked_at))fail(404,'研究项目不存在')
   if(write&&!['DRAFT','ACTIVE'].includes(project.status))
     fail(409,'仅可为草稿或采集中项目编制新的研究工具')
   return project

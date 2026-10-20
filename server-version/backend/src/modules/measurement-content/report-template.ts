@@ -22,11 +22,15 @@ export const reportTemplateSchema=z.object({
 }).strict().refine(t=>Boolean(t.title)||t.blocks.length>0,'Report requires display content')
 export type ReportTemplate=z.infer<typeof reportTemplateSchema>
 
+export class ReportTemplateBindingError extends Error {
+  constructor(readonly code:'REPORT_TEMPLATE_METRIC_UNKNOWN'|'REPORT_TEMPLATE_ASSET_UNKNOWN'){super(code);this.name='ReportTemplateBindingError'}
+}
+
 export function validateReportTemplateBindings(template:ReportTemplate,metricKeys:readonly string[],assetIds:readonly string[]):void{
   const metrics=new Set(metricKeys),assets=new Set(assetIds)
   for(const block of template.blocks){
     const keys=block.type==='METRIC'||block.type==='REFERENCE_BAND'?[block.metricKey]:block.type==='CHART'?block.metricKeys:[]
-    if(keys.some(key=>!metrics.has(key)))throw new Error('REPORT_TEMPLATE_METRIC_UNKNOWN')
-    if(block.type==='ASSET'&&!assets.has(block.assetId))throw new Error('REPORT_TEMPLATE_ASSET_UNKNOWN')
+    if(keys.some(key=>!metrics.has(key)))throw new ReportTemplateBindingError('REPORT_TEMPLATE_METRIC_UNKNOWN')
+    if(block.type==='ASSET'&&!assets.has(block.assetId))throw new ReportTemplateBindingError('REPORT_TEMPLATE_ASSET_UNKNOWN')
   }
 }

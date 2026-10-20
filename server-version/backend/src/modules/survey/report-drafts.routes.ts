@@ -1,3 +1,4 @@
+import {ReportTemplateBindingError} from '../measurement-content/report-template'
 import {Router,type Request,type Response,type NextFunction} from 'express'
 import {z} from 'zod'
 import {authenticateSurvey} from '../../middleware/auth'
@@ -12,6 +13,7 @@ const handle=(run:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Respon
   try{res.setHeader('Cache-Control','no-store');return success(res,await run(req))}
   catch(e){if(e instanceof z.ZodError)return error(res,'报告输入不符合受控内容结构',-1,400)
     if(e instanceof SurveyBuilderError)return error(res,e.message,-1,e.statusCode)
+    if(e instanceof ReportTemplateBindingError)return error(res,e.code,-1,400)
     if(e instanceof ContentReleaseError)return error(res,e.code,-1,409)
     next(e)}
 }

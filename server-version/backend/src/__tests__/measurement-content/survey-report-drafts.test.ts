@@ -16,7 +16,7 @@ vi.mock('../../modules/measurement-content/repository', () => ({ getContentRelea
 vi.mock('../../modules/assessment-media/assessment-asset', () => ({ retainAssessmentAssetReferences: mocks.retain }))
 vi.mock('../../modules/survey/media.references', () => ({ surveyMimeTypes: ['image/png'], surveyMaxImageBytes: 2 * 1024 * 1024 }))
 import {
-  createSurveyReportDraft, editSurveyReportDraft, getSurveyReportDraft,
+  createSurveyReportInput, createSurveyReportDraft, editSurveyReportDraft, getSurveyReportDraft,
   listSurveyReportDrafts, listSurveyReportMeasurements, previewSurveyReportDraft, publishSurveyReportDraft,
 } from '../../modules/survey/report-drafts.service'
 
@@ -81,6 +81,10 @@ describe('Survey private report transaction service', () => {
     await expect(createSurveyReportDraft('owner','project1',createInput())).rejects.toThrow()
     expect(mocks.tx.$executeRaw).not.toHaveBeenCalled()
     expect(mocks.tx.$queryRaw).not.toHaveBeenCalled()
+  })
+  it('bounds local report keys to the 168 characters left by the server namespace',()=>{
+    expect(()=>createSurveyReportInput.parse({...createInput(),reportKey:'a'.repeat(168)})).not.toThrow()
+    expect(()=>createSurveyReportInput.parse({...createInput(),reportKey:'a'.repeat(169)})).toThrow()
   })
   it('synthetic preview reads only the authorized draft and precise measurement, never a sample reader', async () => {
     const result = await previewSurveyReportDraft('owner','project1',draftId,'INTERPRETABLE')
