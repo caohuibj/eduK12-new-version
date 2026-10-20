@@ -1,6 +1,6 @@
 # Training 隔离测试启动记录（2026-10-20）
 
-状态：`ENVIRONMENT_READY_LOAD_NOT_STARTED`。仅已启动云端环境、实读远端 main、读取仓库规则、建立独立工作树并核查资源及源码配置。尚未构建、启动应用、准备账号、发起单份或并发负载；没有性能结果。
+最新状态：`BUILD_BLOCKED_TLS_TRUST`。父对话已批准构建、部署和单份，尚未批准300份负载。PostgreSQL/Redis已独立启动且healthy，受限运行角色已创建；backend构建在npm下载阶段遇到代理CA信任问题，尚无应用镜像、迁移、fixture或单份结果。下文原始启动记录的建议200/1配置已被父对话否决，最新配置与待决项见文末续记。
 
 ## 冻结基线和边界
 
@@ -65,3 +65,16 @@
 本轮未获优化授权；只冻结当前main基线和事实。父对话分析后给出具体修复范围，才成批实施独立PR并按同一流程复测；不混入管理员权限或三层内容版本分支，不部署生产。
 
 当前唯一待决：父对话确认上述显式报告配置、容器资源/数据预算和截止条件。尚无自动审批拒绝、未知写请求或报告工具审批事件。
+
+## 父对话确认后的实际准备进展
+
+- 父对话批准构建8GiB预算、数据/WAL/导出/日志2GiB预算、4GiB磁盘停止线。构建监督每秒检查，cgroup剩余内存低于2GiB停止；业务阶段各容器内存≥90%停止后续新发。未触发资源停止。
+- 最新main再次实读仍为`c3f9a7e77447c706f4a83a93c7429a7bcb164e94`。配置以实际Compose默认600/2/50ms、异步false、whole=false为准，**不执行前文提出的200/1覆盖**。
+- 静态证据：`whole-questionnaire.service.ts:98–109`拒绝条件流程和含Cognitive/SJT的whole；`report-outbox.service.ts:117–142`在新作答异步未启用时只维护流程proof，不登记报告任务；`composite.service.ts:4383–4413,4477–4483`由末次FINAL或授权state GET同步finalize；`5507–5515,5803–5813`报告GET同步投影。因新数据库无enrolled job，本阶段不启动无作用的报告worker。后续若测异步，确切所需开关是`ASSESSMENT_REPORT_ASYNC_ENABLED=true`及合成课程`ASSESSMENT_REPORT_ASYNC_COURSE_IDS`，不需要whole开关，须由父对话另行冻结profile。
+- 私有Compose已展开；只有资源命名、synthetic secrets/DB/local目录、loopback端口和诊断覆盖。`evidence/config-planned.json`不含秘密。实际PG限额1CPU/1GiB，Redis0.25CPU/256MiB，无host端口，均healthy；镜像ID和实际限制在`evidence/actual-containers-pre-api.json`。API与worker尚未创建。
+- 构建attempt1仅因`/home/agent/.docker/buildx`只读失败，已改用本任务DOCKER_CONFIG；attempt2官方Debian直连80端口拒绝，已传入节点既有代理；attempt3官方apt成功，在`npm ci`因`SELF_SIGNED_CERT_IN_CHAIN`失败，未关闭TLS。各attempt独立保留日志/summary，不覆盖失败。attempt3结束时累计构建磁盘增量约4.21GiB，当前值和临时层回收可有差异；没有业务CPU/存储数据。
+- main push run `39351564444`无artifact；PR316 run `39350381656`仅找到backend-dist，没有可直接加载的runtime/builder/ops镜像。不把dist当作合格运行镜像，也未下载或执行旧版本。
+- 构建待父对话确认的具体方案已生成：仅私有Dockerfile的npm RUN增加BuildKit secret mount，`NODE_EXTRA_CA_CERTS`指向**节点当前已用**的`/usr/local/share/ca-certificates/environment-proxy-ca.crt`。仍用官方registry、锁文件integrity及TLS验证；不改仓库Dockerfile、不改系统信任、不把CA写进runtime。精确diff为`evidence/build-proxy-ca-proposal.diff`，CA指纹和动作状态为`evidence/build-blocker.json`。该方案尚未执行。
+- 单份驱动`server-version/scripts/load/training-followup.mjs`已准备并通过Node语法检查；仅脚手架，未动态验证。它新建合成来源、真实API编制/发布和四工具FINAL，不复制旧库、直接写accepted结果或调用内部report/export处理器；业务请求间不抓metrics或扫表。
+- 导出另有明确profile待决：当前POST export实际enqueue Redis，默认`HEAVY_PROCESSING_ENABLED=false`会让任务保持PENDING。若父对话批准，可仅在单份测评/报告计时完成且隔离节点idle后，以`HEAVY_PROCESSING_ENABLED=true`及`HEAVY_MAINTENANCE_IDLE_CONFIRMED=true`启动标准worker处理单次真实导出；视频仍false。未获确认前不启动、不改走内部函数。
+- 当前阻塞是环境TLS构建信任处理待父对话确认，导出消费者profile也待确认；没有自动审批拒绝、未知业务写入或报告工具审批事件。300份负载保持未启动。
