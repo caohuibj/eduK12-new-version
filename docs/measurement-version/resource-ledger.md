@@ -45,3 +45,5 @@
 | R19 | START per-attempt binding | content-binding.service.ts、admission.service.ts；新增双列单次迁移 | 现有真实START范围；空populationContext，无新采集字段 | 18定向合同；单用户PG六拒绝+合法更新，目录69MiB/空闲8.4GiB | 只存选中指针/理由，不复制候选集合或模板；同request验证cache；无flow也绑定 | V08 | 新写一次、恢复不重选、双null旧不回填、层级撤回语义 | START已接，FINAL另单元 | 完整release加载/最大内存未实测；不能把single-user当并发验收 |
 
 | R20 | FINAL固定数值解释 | final-interpretation.service.ts、submitResearchFinal；Reference Core | 已有FINAL入口与权限；binding存在才解释；无新flag | 60目标合同/strict tsc，非容量/并发 | scorer只原路径一次；每答只存个人数值+状态和bindingHash，模板/来源/常模包共享；幂等重放不解释 | V08 | 原选择成员/身份、层级撤回、finite/质量、receipt白名单 | FINAL解释已接；报告读取/显式新解释另接 | 历史读取不可重新select/resolve；READY不等于被试披露权 |
+
+| R21 | 7B独立解释导出 | analytics.interpretation-export.ts、analytics.source/export服务 | INTERPRETATION_LONG显式opt-in；近期MFA/当前owner；不变生产flags | 37目标合同、strict tsc；非容量实测 | 默认格式不读binding；新格式批量receipt读有8MiB预算/前后fence，复用2MiB加密ticket与10分钟保留 | V08/7B | 不重算、不复制模板/manifest；cursor精确；撤权/源变化拒绝 | 实际API已接，UI另接 | FINAL状态≠当前release状态；不削弱下载再次授权或来源fence |

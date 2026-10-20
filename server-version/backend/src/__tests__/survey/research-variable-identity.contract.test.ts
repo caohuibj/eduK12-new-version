@@ -75,6 +75,46 @@ describe('Frozen Survey raw variable identity',()=>{
     await expect(loadSurveySource({...owner,includeWideSchema:true})).rejects.toMatchObject({statusCode:404})
   })
 
+  it('reads interpretation binding columns only on explicit opt-in and keeps legacy FINAL explicit',async()=>{
+    const f=fixture([formUnit('form',[question('ordinary')])],{form:{ordinary:1}})
+    const original=f.tx.$queryRaw.getMockImplementation()!
+    f.tx.$queryRaw.mockImplementation(async parts=>surveyFixtureSql(parts).includes('content_binding_cipher AS cipher')
+      ?[{id:'synthetic-attempt',cipher:null,hash:null}] as never:original(parts))
+    const ordinary=await loadSurveySource({...owner,selectRaw:false,selectScore:false})
+    expect(ordinary.interpretations).toBeUndefined()
+    expect(f.tx.$queryRaw.mock.calls.some(([q])=>surveyFixtureSql(q).includes('content_binding'))).toBe(false)
+    const interpreted=await loadSurveySource({...owner,selectRaw:false,selectScore:false,includeInterpretation:true})
+    expect(interpreted.interpretations).toEqual([expect.objectContaining({sourceVerified:true,binding:null,interpretation:null,attemptId:'synthetic-attempt'})])
+    expect(f.tx.$queryRaw.mock.calls.filter(([q])=>surveyFixtureSql(q).includes('content_binding_cipher AS cipher'))).toHaveLength(2)
+    let reads=0
+    f.tx.$queryRaw.mockImplementation(async parts=>surveyFixtureSql(parts).includes('content_binding_cipher AS cipher')
+      ?[{id:'synthetic-attempt',cipher:null,hash:++reads===1?null:'f'.repeat(64)}] as never:original(parts))
+    await expect(loadSurveySource({...owner,selectRaw:false,selectScore:false,includeInterpretation:true})).rejects.toMatchObject({statusCode:409})
+  })
+  it('projects saved interpretation from verified FINAL ciphertext and the matching exact Attempt binding',async()=>{
+    const definition:ScaleDraft={schemaVersion:1,respondentType:'participant_self_report',aggregation:'sum',
+      responseOptions:[{optionKey:'a',label:'A',score:1},{optionKey:'b',label:'B',score:3}],
+      dimensions:[{dimensionKey:'total',label:'Total',direction:'descriptive'}],
+      items:[{itemKey:'item',prompt:'Item',required:true,reverse:false,dimensionKeys:['total']}]}
+    const unit=compileFrozenResearchUnit({id:'scale',instrumentKey:'scale',kind:'SCALE',title:'Scale',revision:1,definition})
+    unit.measurementRelease={releaseId:'11111111-1111-4111-8111-111111111111',contentHash:'a'.repeat(64),measurementHash:'b'.repeat(64)}
+    const f=fixture([unit],{scale:{item:'b'}})
+    const binding={schemaVersion:1,projectId:owner.projectId,waveId:owner.waveIds[0],attemptId:'synthetic-attempt',publicationId:f.final.publicationId,
+      definitionDigest:f.final.definitionDigest,populationContext:{},units:[{instrumentKey:'scale',measurement:unit.measurementRelease,references:[]}]}
+    f.result.interpretation={schemaVersion:1,contentBindingHash:canonicalHash(binding),units:[{instrumentKey:'scale',status:'INTERPRETED',references:[],report:{status:'NOT_SELECTED'}}]}
+    f.final.resultsHash=canonicalHash(f.result);f.final.resultsCipher=encryptUnifiedRuntimePayload(f.result)
+    const bindingCipher=encryptUnifiedRuntimePayload(binding)
+    const original=f.tx.$queryRaw.getMockImplementation()!
+    f.tx.$queryRaw.mockImplementation(async parts=>surveyFixtureSql(parts).includes('content_binding_cipher AS cipher')
+      ?[{id:'synthetic-attempt',cipher:bindingCipher,hash:canonicalHash(binding)}] as never:original(parts))
+    const observed=await loadSurveySource({...owner,selectRaw:false,selectScore:false,includeInterpretation:true})
+    expect(observed.interpretations![0].interpretation).toEqual(f.result.interpretation)
+    expect(observed.interpretations![0].binding).toEqual(binding)
+    expect(observed.raw).toEqual([]);expect(observed.scores).toEqual([])
+    expect(JSON.stringify(observed.interpretations)).not.toMatch(/privateScoring|responseOptions|compiledDefinition/)
+    f.result.interpretation.contentBindingHash='f'.repeat(64);f.final.resultsHash=canonicalHash(f.result);f.final.resultsCipher=encryptUnifiedRuntimePayload(f.result)
+    await expect(loadSurveySource({...owner,selectRaw:false,selectScore:false,includeInterpretation:true})).rejects.toMatchObject({statusCode:409})
+  })
   it('exports valid hyphen and underscore item keys without collision',async()=>{
     const unit=formUnit('form',[question('q-a'),question('q_a')])
     fixture([unit],{form:{'q-a':1,q_a:2}})

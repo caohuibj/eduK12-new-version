@@ -1,3 +1,5 @@
+import {decodeSurveyAttemptContentBinding} from './content-binding.service'
+import {checkedStoredSurveyInterpretation,type SurveyStoredInterpretationObservation} from './analytics.interpretation-export'
 import {frozenVariantConfiguration,type SurveyVariantAudit,type SurveyVariantConfiguration} from './analytics.variant'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -5,7 +7,7 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import type { ResearchFrozenPublication, ResearchFrozenUnit } from './publication.service'
 import type { SurveyComputedFinal, FrozenUnitResult, AnswerPrimitive } from './final.compute'
-import {prepareSurveyFlowAssignmentValidator,type SurveyFlowAssignment } from './flow.assignment'
+import {assignedSurveySnapshot,prepareSurveyFlowAssignmentValidator,type SurveyFlowAssignment } from './flow.assignment'
 import type { FrozenScoreObservation, MissingReason } from './analytics.cohorts'
 import type { FormDraft, ScaleDraft, AnySjtDraft } from './builder.definition'
 import {surveySjtQuestionEntries} from './sjt-structure'
@@ -85,6 +87,7 @@ export interface SurveySourceProjection {
   raw:ResearchRawObservation[]
   codebook:ResearchRawCodebook[]
   attendance:({researchCode:string;waveId:string;status:string}&SurveyVariantAudit)[]
+  interpretations?:SurveyStoredInterpretationObservation[]
   cognitiveTrials?:CognitiveTrialObservation[]
   cognitivePage?:{finalId:string;sourceFinalHash:string;offset:number;nextOffset:number|null;estimatedBytes:number}
 }
@@ -435,6 +438,7 @@ type SurveySourceInput = {
    * study against the 25k intermediate-row cap. No public raw API shortcut. */
   selectRaw?:false|{instrumentKey:string;itemKey:string}
   selectScore?:false|{instrumentKey:string;scoreKey:string}
+  includeInterpretation?:boolean
   /** Paired score aggregation does not need longitudinal attendance matrices. */
   includeAttendance?:boolean
   afterFinal?:{id:string;completedAt:Date}
@@ -588,13 +592,15 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
     if(ids.length||publicationIds.length){
       // Independent scalar subqueries avoid a FINAL × Publication join and
       // retain the original separate limits in one database round trip.
-      const [bytes]=await tx.$queryRaw<Array<{finalCipherBytes:bigint;frozenBytes:bigint}>>(Prisma.sql`
+      const [bytes]=await tx.$queryRaw<Array<{finalCipherBytes:bigint;frozenBytes:bigint;bindingBytes?:bigint}>>(Prisma.sql`
         SELECT ${ids.length?Prisma.sql`(SELECT COALESCE(SUM(octet_length(results_cipher)),0)::bigint
           FROM survey_wave_finals WHERE id IN (${Prisma.join(ids)}))`:Prisma.sql`0::bigint`} AS "finalCipherBytes",
           ${publicationIds.length?Prisma.sql`(SELECT COALESCE(SUM(octet_length(compiled_snapshot::text)),0)::bigint
           FROM survey_publications WHERE id IN (${Prisma.join(publicationIds)}))`:Prisma.sql`0::bigint`} AS "frozenBytes"
+          ${input.includeInterpretation&&ids.length?Prisma.sql`,(SELECT COALESCE(SUM(octet_length(a.content_binding_cipher)),0)::bigint
+            FROM survey_wave_attempts a JOIN survey_wave_finals f ON f.attempt_id=a.id WHERE f.id IN (${Prisma.join(ids)})) AS "bindingBytes"`:Prisma.empty}
       `)
-      if((bytes?.finalCipherBytes??0n)>BigInt(8*1024*1024)||(bytes?.frozenBytes??0n)>BigInt(8*1024*1024))
+      if((bytes?.finalCipherBytes??0n)>BigInt(8*1024*1024)||(bytes?.frozenBytes??0n)>BigInt(8*1024*1024)||(bytes?.bindingBytes??0n)>BigInt(8*1024*1024))
         throw new SurveyAnalyticsError(413,'冻结材料与加密答案超过单次内存预算，请缩小波次')
     }
     // Stage 2: fetch bounded bytes, and load each frozen Publication only
@@ -608,6 +614,9 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
           participant:{select:{status:true,researchCode:true}}}},
         wave:{select:{id:true,projectId:true,ordinal:true,publicationId:true}}},
     }):[]
+    const interpretationBindings=input.includeInterpretation&&finals.length?await tx.$queryRaw<Array<{id:string;cipher:string|null;hash:string|null}>>(Prisma.sql`
+      SELECT id,content_binding_cipher AS cipher,content_binding_hash AS hash FROM survey_wave_attempts
+      WHERE project_id=${input.projectId} AND id IN (${Prisma.join(finals.map(final=>final.attempt.id))}) ORDER BY id`):[]
     const publications=publicationIds.length?await tx.surveyPublication.findMany({
       where:{id:{in:publicationIds}}, orderBy: { id: 'asc' },
     }):[]
@@ -693,7 +702,7 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
           attempt: { id: final.attempt.id, projectId: final.attempt.projectId, waveId: final.attempt.waveId,
             startedAt: final.attempt.startedAt, flowAssignmentCipher: final.attempt.flowAssignmentCipher,
             participant: final.attempt.participant ? { status: final.attempt.participant.status, researchCode: final.attempt.participant.researchCode } : null } })),
-        publications,
+        publications,...(input.includeInterpretation?{interpretationBindings}:{}),
         attendanceRows, attendanceSlice, attendanceWaves, attendanceAssignments, sourceFinalCount, sourceAttendanceCount }))),
       compute: async (): Promise<SurveySourceProjection> => {
     // Validate each immutable Publication once per RepeatableRead snapshot.
@@ -835,6 +844,8 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
         status: row.sampleReview?.verdict === 'EXCLUDED' ? 'QUALITY_EXCLUDED' : row.status,...attendanceAudit(row) }))
       nextAttendanceCursor = attendanceSlice.length > pageSize ? selected.at(-1)!.id : null
     }
+    const interpretations:SurveyStoredInterpretationObservation[]=[]
+    const bindingByAttempt=new Map(interpretationBindings.map(row=>[row.id,row]))
     const prepareFinal=async(final:(typeof finals)[number])=>{
       await new Promise<void>(resolve => setImmediate(resolve))
       const wave=final.wave,attempt=final.attempt
@@ -889,6 +900,17 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
         attemptId:attempt.id,researchCode:attempt.participant?.researchCode??null,
         attemptStartedAt:attempt.startedAt.toISOString(),
         completedAt:final.completedAt.toISOString(),sourceFinalHash:final.resultsHash,
+      }
+      if(input.includeInterpretation){
+        const receipt=bindingByAttempt.get(attempt.id)
+        if(!receipt)invalid('研究解释绑定来源缺失')
+        const assigned=attempt.flowAssignmentCipher?decryptUnifiedRuntimePayload<SurveyFlowAssignment>(attempt.flowAssignmentCipher):null
+        try{
+          const binding=decodeSurveyAttemptContentBinding({projectId:input.projectId,waveId:wave.id,attemptId:attempt.id,
+            publicationId:publication.id,definitionDigest:final.definitionDigest,selectedSnapshot:assignedSurveySnapshot(snapshot,assigned),
+            contentBindingCipher:receipt!.cipher,contentBindingHash:receipt!.hash})
+          interpretations.push({...meta,sourceVerified:true,binding,interpretation:checkedStoredSurveyInterpretation(result.interpretation,binding)})
+        }catch{invalid('研究已存解释或冻结绑定无法验证')}
       }
       const cognitiveUnits=result.units.filter(unit=>unit.kind==='COGNITIVE'&&!unit.notExecuted)
       if(cognitiveUnits.some(unit=>!unit.childReference))invalid('研究 FINAL 缺少认知子结果引用')
@@ -1031,6 +1053,7 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
       sourceAttendanceCount,nextAttendanceCursor,
       fullCompletionAttempts,earlyCompletionAttempts,
       scores,scoreColumns,raw,codebook:[...codebook.values()],attendance,
+      ...(input.includeInterpretation?{interpretations}:{}),
       ...(input.cognitiveTrials?{cognitiveTrials:cognitiveTrials??[],cognitivePage}:{})}
       },
     }

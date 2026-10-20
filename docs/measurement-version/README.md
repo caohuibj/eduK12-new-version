@@ -290,3 +290,13 @@ REPORT 的 READY 仅表示该精确模板可用、生成器版本已冻结，并
 验证：解释核心、既有计算、实际 FINAL commit/replay 合同三个目标文件共 60 项通过，定向 strict TypeScript 通过。服务测试确认解释随同一 resultsCipher 写入且 receipt 不泄露，重复 FINAL 不重新解释；数据库/加密边界使用 mock，不是完整 HTTP/PG 并发验证。
 
 FINAL 解释补齐实际 Scale/SJT v1 存储结构：它们只有 privateScoring，解释时用既有 projectStoredMeasurement 做一次请求内投影，直接保留 scorer 已给出的质量状态；不把重复 metrics 写回 FINAL。先核 result 与冻结 unit 的 sourceDigest/scoringDigest 一致，不把新 release 身份套给错版结果。真实 compiler→verified compute→interpret 覆盖 Scale/SJT，以及 Cognitive 的真实 parent projection→verified compute（子结果为合成已存 fixture）；limited/invalid Cognitive 仍明确 unavailable。该定向文件 14 项通过，非真实认知试次或 HTTP 测试。
+
+### 7B 独立解释导出
+
+既有导出 API 新增明确选择的 INTERPRETATION_LONG，必须单波次，拒绝自由文本选项。默认六种 raw/score/trial 格式保持原字段与行为，不额外读取 binding 或夹带解释。新格式通过 includeInterpretation 才批量读 Attempt binding 列，受内存预算与来源前后签名保护；校验已存 FINAL hash、bindingHash/成员与解释 schema，不调用 scorer、reference selector 或 Reference Core。
+
+导出长表仅包含现有匿名 attempt 编码/研究编号、来源身份、精确 measurement/reference entry/report 指针及已保存解释状态/个人数值。无旧解释的 FINAL 明确 LEGACY_NOT_RECORDED，不补算；manifest 标明状态是 FINAL 时保存的解释状态，不宣称 release 的当前状态。共享模板、常模数组、candidate manifest 不导出。
+
+复用现有单波次 V4 keyset/cutoff/revision/count、自适应分页、2 MiB 工件预算、五分钟近期 MFA、十分钟加密 ticket、审计、下载再授权及清理；解释分页不进入 attendance 阶段，cursor 不能混用格式。guardedOwner 原授权单 SQL 改为锁集合后 clock_timestamp 过滤到期账户。
+
+验证：formatter/真实 reader 投影/既有 ticket 服务共 37 个定向合同、strict TypeScript 与 diff 检查通过。包含默认六格式不启用解释、真实加密 FINAL/binding 读取、错误 hash/来源变化拒绝、旧数据不补算。数据库访问使用 mock，未声称真实 HTTP/并发或全链验收。

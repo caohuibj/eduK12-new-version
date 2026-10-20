@@ -135,3 +135,55 @@ describe('Cognitive trial export uses existing MFA, ticket and revocation bounda
     expect(db.tx.surveyEvent.create).toHaveBeenCalledTimes(2)
   })
 })
+
+describe('Independent stored interpretation export uses the existing ticket lifecycle',()=>{
+  const interpretationSource=()=>({...source(0,null,firstFinal,false),interpretations:[{
+    projectId,waveId,waveOrdinal:1,attemptId:'attempt',researchCode:null,sourceFinalHash:sourceHash,
+    completedAt:'2026-10-20T00:00:00Z',sourceVerified:true as const,binding:null,interpretation:null,
+  }]})
+  it.each(['RAW_WAVE','RAW_LONG','RAW_WIDE','SCORE_LONG','SCORE_WIDE','COGNITIVE_TRIAL_LONG'] as const)('leaves %s on its default source and CSV contract',async format=>{
+    database();vi.mocked(loadSurveySource).mockResolvedValue({...source(0,null,firstFinal,false),collectionMode:'LINKED_WAVES'})
+    const created=await createSurveyExport(req,{projectId,waveId,format})
+    expect(vi.mocked(loadSurveySource).mock.calls.at(-1)![0]).not.toHaveProperty('includeInterpretation')
+    const downloaded=await downloadSurveyExport(req,{projectId,exportId:created.id})
+    expect(downloaded.csv).not.toContain('interpretation_status')
+  })
+  it('denies stale MFA and revoked owner without issuing an interpretation ticket',async()=>{
+    const db=database();vi.mocked(loadSurveySource).mockResolvedValue(interpretationSource())
+    vi.mocked(verifyToken).mockReturnValueOnce({userId:'owner',tokenVersion:7,accountDomain:'SURVEY',mfaVerifiedAt:0} as never)
+    await expect(createSurveyExport(req,{projectId,waveId,format:'INTERPRETATION_LONG'})).rejects.toMatchObject({statusCode:403})
+    expect(loadSurveySource).not.toHaveBeenCalled()
+    db.state.owner=false
+    await expect(createSurveyExport(req,{projectId,waveId,format:'INTERPRETATION_LONG'})).rejects.toMatchObject({statusCode:404})
+    expect(db.tx.surveyExportTicket.create).not.toHaveBeenCalled()
+  })
+  it('requires explicit single-wave opt-in and forbids free-text options before a source read',async()=>{
+    database();vi.mocked(loadSurveySource).mockClear()
+    await expect(createSurveyExport(req,{projectId,format:'INTERPRETATION_LONG'})).rejects.toMatchObject({statusCode:400})
+    await expect(createSurveyExport(req,{projectId,waveId,format:'INTERPRETATION_LONG',includeFreeText:false})).rejects.toMatchObject({statusCode:400})
+    expect(loadSurveySource).not.toHaveBeenCalled()
+  })
+  it('creates and downloads an encrypted legacy-explicit artifact with no raw/score or binding exposure',async()=>{
+    const db=database();vi.mocked(loadSurveySource).mockResolvedValue(interpretationSource())
+    const created=await createSurveyExport(req,{projectId,waveId,format:'INTERPRETATION_LONG'})
+    expect(loadSurveySource).toHaveBeenCalledWith(expect.objectContaining({selectRaw:false,selectScore:false,includeInterpretation:true,
+      includeWideSchema:false,includeAttendance:false,pageMode:true}))
+    const downloaded=await downloadSurveyExport(req,{projectId,exportId:created.id})
+    expect(downloaded.csv).toContain('LEGACY_NOT_RECORDED');expect(downloaded.csv).not.toContain('"attempt"')
+    expect((downloaded.manifest as any).legacyFinalCount).toBe(1)
+    expect((downloaded.manifest as any).interpretationSemantics).toBe('SAVED_AT_FINAL_NOT_CURRENT_RELEASE_STATUS')
+    expect(db.tx.$queryRaw.mock.calls[0][0].join(' ')).toContain('clock_timestamp()')
+    db.state.revision++
+    await expect(downloadSurveyExport(req,{projectId,exportId:created.id})).rejects.toMatchObject({statusCode:409})
+  })
+  it('uses signed FINAL-only cursor and pins the same count/revision/cutoff across pages',async()=>{
+    database();const first=interpretationSource();first.nextFinalCursor={id:firstFinal,completedAt:'2026-10-20T00:00:00Z'}
+    vi.mocked(loadSurveySource).mockResolvedValueOnce(first).mockResolvedValueOnce(interpretationSource())
+    const created=await createSurveyExport(req,{projectId,waveId,format:'INTERPRETATION_LONG'})
+    expect(decodeSurveyExportCursor(created.nextCursor!,projectId,'INTERPRETATION_LONG',waveId)).toMatchObject({v:4,phase:'FINALS',attendanceCount:0,freeTextIncluded:false})
+    await createSurveyExport(req,{projectId,waveId,format:'INTERPRETATION_LONG',cursor:created.nextCursor!})
+    expect(loadSurveySource).toHaveBeenLastCalledWith(expect.objectContaining({expectedFinalCount:first.sourceFinalCount,
+      expectedSourceRevision:first.sourceRevision,snapshotCutOff:new Date(first.cutOff),afterFinal:{id:firstFinal,completedAt:new Date('2026-10-20T00:00:00Z')}}))
+    expect(()=>decodeSurveyExportCursor(created.nextCursor!,projectId,'SCORE_LONG',waveId)).toThrow()
+  })
+})
