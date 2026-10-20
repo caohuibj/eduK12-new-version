@@ -276,3 +276,5 @@ Wave freeze 原有单条项目查询同时锁定 project、User、researcher gra
 恢复只校验原绑定身份及冻结选择成员，不重新运行 selector，不换 latest。旧双 null 不回填新身份；纯 FORM/旧无 measurementRelease 发布不编造绑定。已冻结投放的测量 SUPERSEDED/RETIRED 可保原版启动，REVOKED 测量拒新 START；参考遵已冻结 selector 的降级规则，report 撤回记录不可新生成但不阻采集。后续 FINAL 仍需按层核当前状态；历史事实保留。
 
 新增单次 SQL migration 20261020040000_survey_attempt_content_binding，约束双字段成对、SHA 格式和写入后不可变；不修改任何旧迁移。18 个 START/binding 定向测试通过。隔离 PG16.15 single-user 已应用该新迁移，六个约束拒绝及合法首次绑定/完成状态更新通过；不是 Prisma deploy 或真实并发。私有 Prisma client 使用本主线独立 output 生成，不改共享 client。
+
+首次 LINKED enrollment 也在 createLinkedResearchIdentity 原事务内创建 STARTED Attempt，现已在 flow 分配后调用同一 newAttempt:true 绑定。绑定失败直接抛出事务，不能返回未绑定的新研究身份；participant/quota/consent 与 binding 同事务。服务端全部三个 Attempt create 路径已盘点。新增实际 enrollment 服务三项合同，总 START/binding 21 项通过；模拟事务失败传播不代表真实数据库回滚/并发测试。
