@@ -1,8 +1,8 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
 import { createHash } from 'node:crypto'
 
-const mock=vi.hoisted(()=>({find:vi.fn(),compare:vi.fn(),state:vi.fn(),consume:vi.fn(),gate:vi.fn()}))
-vi.mock('../../config/database',()=>({prisma:{user:{findUnique:mock.find}}}))
+const mock=vi.hoisted(()=>({find:vi.fn(),authority:vi.fn(),compare:vi.fn(),state:vi.fn(),consume:vi.fn(),gate:vi.fn()}))
+vi.mock('../../config/database',()=>({prisma:{user:{findUnique:mock.find},$queryRaw:mock.authority}}))
 vi.mock('../../utils/password',()=>({comparePassword:mock.compare,hashPassword:vi.fn()}))
 vi.mock('../../middleware/loginRateLimit',()=>({withLoginPasswordVerification:mock.gate}))
 vi.mock('../../services/cacheService',()=>({cacheService:{getRateLimitState:mock.state,consumeRateLimit:mock.consume}}))
@@ -13,7 +13,8 @@ const actor='server-admin-id',password='synthetic-password',key='auth:survey:adm
 describe('Survey current admin password failure budget',()=>{
  beforeEach(()=>{
   vi.stubEnv('NODE_ENV','production');vi.clearAllMocks()
-  mock.find.mockResolvedValue({isActive:true,isFrozen:false,platformRole:'SYSTEM_ADMIN',passwordHash:'synthetic-hash'})
+  mock.find.mockResolvedValue({isActive:true,isFrozen:false,accountDomain:'TRAINING',platformRole:'STANDARD',passwordHash:'synthetic-hash'})
+  mock.authority.mockResolvedValue([{id:actor}])
   mock.compare.mockResolvedValue(true);mock.state.mockResolvedValue({count:0,retryAfterSeconds:0})
   mock.consume.mockResolvedValue({allowed:true,remaining:14,retryAfterSeconds:900})
   mock.gate.mockImplementation(async(operation:()=>Promise<unknown>)=>operation())
@@ -38,8 +39,9 @@ describe('Survey current admin password failure budget',()=>{
   mock.compare.mockResolvedValue(false);mock.consume.mockResolvedValue({allowed:false,remaining:0,retryAfterSeconds:251})
   await expect(authorizeAdmin(actor,password)).rejects.toMatchObject({statusCode:429,retryAfterSeconds:251})
  })
- it.each([null,{isActive:false,platformRole:'SYSTEM_ADMIN'},{isActive:true,isFrozen:true,platformRole:'SYSTEM_ADMIN'},{isActive:true,isFrozen:false,platformRole:'STANDARD'}])('rejects current non-administrators before budget/password lookup (%j)',async(row)=>{
+ it.each([null,{isActive:false,platformRole:'SYSTEM_ADMIN'},{isActive:true,isFrozen:true,platformRole:'SYSTEM_ADMIN'},{isActive:true,isFrozen:false,accountDomain:'TRAINING',platformRole:'SYSTEM_ADMIN'}])('rejects accounts without usable explicit Survey authority before budget/password lookup (%j)',async(row)=>{
   mock.find.mockResolvedValue(row)
+  mock.authority.mockResolvedValue([])
   await expect(authorizeAdmin(actor,password)).rejects.toMatchObject({statusCode:403})
   expect(mock.state).not.toHaveBeenCalled();expect(mock.compare).not.toHaveBeenCalled();expect(mock.consume).not.toHaveBeenCalled()
  })

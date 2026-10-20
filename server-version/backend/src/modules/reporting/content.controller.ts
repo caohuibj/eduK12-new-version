@@ -2,7 +2,7 @@ import type { Request, Response } from 'express'
 import { z } from 'zod'
 import { prisma } from '../../config/database'
 import { instrumentError, unauthorized } from '../../utils/response'
-import { listRegisteredResources, readPublishedRegisteredResource, registerDescriptiveResource, transitionDescriptiveResource } from '../assessment-run/registeredResources'
+import { listRegistrationCandidates,listRegisteredResources, readPublishedRegisteredResource, registerDescriptiveResource, transitionDescriptiveResource } from '../assessment-run/registeredResources'
 import { createPlatformReportingSpec, listPlatformReportingSpecs } from './spec'
 import { ReportingError, reportingFail, type ReportingAnalysisSpecDefinitionV1 } from './types'
 
@@ -37,6 +37,7 @@ export function descriptiveReportingDefinition(entry: { applicability: { resourc
 }
 
 export const reportingContentController = {
+  listCandidates:handle(req=>listRegistrationCandidates(actor(req),z.coerce.number().int().min(1).default(1).parse(req.query.page))),
   listResources: handle(req => listRegisteredResources(actor(req), z.coerce.number().int().min(1).max(100000).default(1).parse(req.query.page))),
   registerResource: handle(req => { const input = z.object({ scaleId: z.string().uuid(), mode: z.enum(['INDIVIDUAL','GROUP','TEACHER_INDIVIDUAL']).default('INDIVIDUAL') }).strict().parse(req.body); return registerDescriptiveResource(actor(req), input.scaleId, input.mode) }),
   transitionResource: handle(req => transitionDescriptiveResource(actor(req), req.params.resourceId, z.enum(['review', 'publish', 'retire']).parse(req.params.action))),

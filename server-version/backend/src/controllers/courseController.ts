@@ -17,6 +17,7 @@ import {
 import { attachAssetReference, discardUnreferencedAsset, getSignedAssetUrl, getSignedAssetUrls, signKnownAsset, storeAsset } from '../services/assetStorage'
 import { resetPasswordForPlatformAdmin } from './platformAccountController'
 import { resetPasswordForCourseTeacher } from './courseStudentPasswordController'
+import { courseCredentialProtectedIds } from '../services/courseStudentPasswordResetService'
 import { CourseNotJoinableError, courseJoinabilityMessage, isCourseJoinable } from '../utils/courseEnrollment'
 
 const createCourseSchema = z.object({
@@ -511,7 +512,7 @@ export const courseController = {
   async join(req: Request, res: Response) {
     try {
       const userId = req.user?.userId
-      const userRole = req.user?.role
+      const userRole = req.user?.businessRole??req.user?.role
       const { courseCode } = req.body
 
       if (userRole !== UserRole.STUDENT) return forbidden(res, '只有学员可以报名课程')
@@ -759,6 +760,7 @@ export const courseController = {
         }
       })
 
+      const credentialProtected=await courseCredentialProtectedIds(students.map(s=>s.student.id))
       return success(res, {
         list: students.map(s => ({
           id: s.student.id,
@@ -767,6 +769,7 @@ export const courseController = {
           avatarUrl: s.student.avatarUrl,
           isFrozen: s.student.isFrozen,
           enrollmentStatus: s.status,
+          credentialManagementProtected:credentialProtected.has(s.student.id),
           joinedAt: s.joinedAt,
         })),
         total: students.length,
@@ -780,7 +783,8 @@ export const courseController = {
   // Resetting credentials is a narrowly granted course support action for
   // the current owner only. The existing SYSTEM_ADMIN alias stays unchanged.
   async resetStudentPassword(req: Request, res: Response) {
-    if (req.user?.role === UserRole.TEACHER) {
+    if ((req.user?.businessRole??req.user?.role) === UserRole.TEACHER) {
+      req.user={...req.user!,role:UserRole.TEACHER}
       return resetPasswordForCourseTeacher(req, res)
     }
     try {
@@ -876,6 +880,7 @@ export const courseController = {
         }
       })
 
+      const credentialProtected=await courseCredentialProtectedIds(courseStudents.map(cs=>cs.student.id))
       // 按课程ID分组
       const groupedByCourse: Record<string, any[]> = {}
       allowedCourseIds.forEach(id => {
@@ -891,6 +896,7 @@ export const courseController = {
             avatarUrl: cs.student.avatarUrl,
             isFrozen: cs.student.isFrozen,
             enrollmentStatus: cs.status,
+            credentialManagementProtected:credentialProtected.has(cs.student.id),
             joinedAt: cs.joinedAt,
           })
         }

@@ -37,6 +37,7 @@ const server = http.createServer(async (req, res) => {
   let data = {}
   if (url.pathname === '/api/auth/csrf') data = { csrfToken: 'local-synthetic-csrf-only' }
   else if (url.pathname === '/api/auth/me') data = { id: actorId, username: actorId, role: 'ADMIN', platformRole: 'SYSTEM_ADMIN', isActive: true, mustChangePassword: false }
+  else if (url.pathname === '/api/organizations/measurement-resources/candidates') data = { list: [{ id: 'original-1', name: '本地原创量表', status: 'PUBLISHED', instrumentClass: 'CUSTOM_DESCRIPTIVE' }], nextPage: null }
   else if (url.pathname === '/api/organizations/measurement-resources') {
     if (req.method === 'POST') {
       const input = JSON.parse(raw); assert.equal(input.scaleId, 'original-1'); assert.equal(input.mode, 'INDIVIDUAL')

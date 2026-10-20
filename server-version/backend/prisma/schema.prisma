@@ -109,6 +109,56 @@ model User {
 // ==================== Organization / Reporting V2.1 identity authority ====================
 // PostgreSQL-only partial/expression indexes, CHECK constraints, and the
 // append-only audit trigger remain authoritative in the handwritten migrations.
+model AdminSecurityKey {
+  id        String @id
+  userId    String @map("user_id")
+  publicKey Bytes @map("public_key")
+  counter   BigInt @default(0)
+  transports String[] @default([])
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([userId], map: "admin_security_keys_user_idx")
+  @@map("admin_security_keys")
+}
+
+model AdminSecurityChallenge {
+  idHash         String @id @map("id_hash")
+  userId         String @map("user_id")
+  purpose        String
+  challenge      String
+  tokenVersion   Int @map("token_version")
+  sessionId      String? @map("session_id")
+  enrollmentHash String? @map("enrollment_hash")
+  expiresAt      DateTime @map("expires_at") @db.Timestamptz(6)
+  @@index([expiresAt], map: "admin_security_challenges_expiry_idx")
+  @@map("admin_security_challenges")
+}
+
+model AdminEntryGrant {
+  id        String @id
+  userId    String @map("user_id")
+  entry     String
+  version   Int @default(1)
+  grantedBy String @map("granted_by")
+  grantedAt DateTime @default(now()) @map("granted_at") @db.Timestamptz(6)
+  revokedBy String? @map("revoked_by")
+  revokedAt DateTime? @map("revoked_at") @db.Timestamptz(6)
+  @@unique([userId, entry], map: "admin_entry_grants_user_entry_key")
+  @@map("admin_entry_grants")
+}
+
+model AdminAuthorizationAudit {
+  id           String @id
+  actorUserId  String? @map("actor_user_id")
+  targetUserId String @map("target_user_id")
+  entry        String?
+  action       String
+  version      Int?
+  reason       String
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([targetUserId, createdAt(sort: Desc)], map: "admin_authorization_audits_target_idx")
+  @@map("admin_authorization_audits")
+}
+
 model Organization {
   homeroomDeliveryEnabled Boolean @default(true) @map("homeroom_delivery_enabled")
   productDomain String @default("LEGACY") @map("product_domain")

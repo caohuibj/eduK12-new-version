@@ -46,6 +46,7 @@ const authHeaders = (user: TestUser, csrf = `csrf-${suffix}`): Record<string, st
     username: user.username,
     role: user.role,
     tokenVersion: user.tokenVersion,
+    adminVerifiedAt: Math.floor(Date.now()/1000), adminSessionId: randomUUID(),
   }))}; ${CSRF_COOKIE_NAME}=${encodeURIComponent(csrf)}`,
   [CSRF_HEADER_NAME]: csrf,
   'content-type': 'application/json',

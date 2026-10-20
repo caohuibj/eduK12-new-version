@@ -33,6 +33,20 @@ export class CoursePasswordResetError extends Error {
 const denied = (message = '只能为本人课程中已报名的学员重置密码') =>
   new CoursePasswordResetError('COURSE_PASSWORD_RESET_FORBIDDEN', message, 403)
 
+/** Roster hint only. One batched lookup; the mutation still locks the target. */
+export async function courseCredentialProtectedIds(userIds:string[]):Promise<Set<string>>{
+  const ids=[...new Set(userIds)]
+  if(!ids.length)return new Set()
+  const rows=await prisma.$queryRaw<Array<{id:string}>>`
+    SELECT u."id" FROM "users" u WHERE u."id" IN (${Prisma.join(ids)}) AND (
+      u."role"<>'STUDENT' OR u."platform_role"<>'STANDARD' OR u."account_domain" NOT IN ('LEGACY','TRAINING')
+      OR EXISTS (SELECT 1 FROM "admin_entry_grants" g WHERE g."user_id"=u."id" AND g."revoked_at" IS NULL)
+      OR EXISTS (SELECT 1 FROM "organization_memberships" m WHERE m."user_id"=u."id" AND m."org_role"='ORG_ADMIN'
+        AND m."valid_from"<=statement_timestamp() AND (m."valid_until" IS NULL OR m."valid_until">statement_timestamp())))
+  `
+  return new Set(rows.map(row=>row.id))
+}
+
 /**
  * Lightweight admission before generating or hashing a new secret.
  * The write transaction rechecks every fact with row locks. Never treat
@@ -55,7 +69,7 @@ export async function assertTeacherCourseResetPreflight(input: {
           status: { in: ['ACTIVE', 'APPROVED'] },
           student: {
             role: UserRole.STUDENT,
-            accountDomain: { not: 'SCHOOL' },
+            accountDomain: { in: ['LEGACY','TRAINING'] },
             platformRole: PlatformRole.STANDARD,
             isActive: true,
             isFrozen: false,
@@ -67,6 +81,8 @@ export async function assertTeacherCourseResetPreflight(input: {
     select: { id: true },
   })
   if (!course) throw denied()
+  if((await courseCredentialProtectedIds([input.studentId])).has(input.studentId))
+    throw denied('该学员具有组织或入口管理权限，请由系统管理员处理密码重置')
 }
 
 /**
@@ -95,7 +111,7 @@ export async function resetEnrolledStudentPassword(input: {
         SELECT "id" FROM "users"
         WHERE "id" = ${input.actorUserId}
           AND "role" = 'TEACHER'
-          AND "account_domain" <> 'SCHOOL'
+          AND "account_domain" IN ('LEGACY','TRAINING')
           AND "teacher_approved" = TRUE
           AND "is_active" = TRUE
           AND "is_frozen" = FALSE
@@ -139,7 +155,7 @@ export async function resetEnrolledStudentPassword(input: {
       if (
         !target
         || target.role !== UserRole.STUDENT
-        || target.accountDomain === 'SCHOOL'
+        || !['LEGACY','TRAINING'].includes(target.accountDomain)
         || target.platformRole !== PlatformRole.STANDARD
         || !target.isActive
         || target.isFrozen
@@ -155,11 +171,14 @@ export async function resetEnrolledStudentPassword(input: {
           WHERE "user_id" = ${target.id}
             AND "org_role" = 'ORG_ADMIN'
             AND "valid_from" <= statement_timestamp()
-            AND "valid_until" IS NULL
+            AND ("valid_until" IS NULL OR "valid_until">statement_timestamp())
+        ) OR EXISTS (
+          SELECT 1 FROM "admin_entry_grants"
+          WHERE "user_id"=${target.id} AND "revoked_at" IS NULL
         ) AS "protected"
       `
       if (privilegedMembership[0]?.protected) {
-        throw denied('该学员具有组织管理权限，请由平台管理员处理密码重置')
+        throw denied('该学员具有组织或入口管理权限，请由系统管理员处理密码重置')
       }
 
       // Preserve every Organization's last usable admin, even when that

@@ -9,6 +9,7 @@ import { parseStoredCanonicalUnitResult } from '../backend/src/modules/assessmen
 const { chromium } = require('../backend/node_modules/playwright-core')
 const { assertApiSuccess } = require('./helpers/api-response.cjs')
 const { loginWithSession, sessionJsonFetch } = require('./helpers/session-auth.cjs')
+const { restoreSyntheticAdminSession } = require('./helpers/synthetic-admin-session.cjs')
 const fixture = JSON.parse(readFileSync(process.env.PR5_SCENARIOS_FIXTURE || '/tmp/eduk12-pr5-scenarios.json', 'utf8'))
 const base = process.env.PR5_SCENARIOS_BASE_URL || 'http://127.0.0.1:5173'
 const output = process.env.PR5_SCENARIOS_OUTPUT || '/tmp/eduk12-pr5-scenarios-evidence'
@@ -33,7 +34,11 @@ async function pageFor(name, mobile = false) {
   const user = fixture.users[name]
   const context = await browser.newContext({ viewport: mobile ? { width: 390, height: 844 } : { width: 1440, height: 1000 } })
   const page = await context.newPage()
-  if (user.role === 'PARENT') {
+  if (user.management) {
+    // This suite verifies organization business rules, not administrator login.
+    // Real virtual CTAP2 remains mandatory in admin-permissions-browser.cjs.
+    await restoreSyntheticAdminSession(page, { baseUrl: base, username: user.username })
+  } else if (user.role === 'PARENT') {
     await page.goto(`${base}/parent/login`)
     assert.equal((await ok(page, '/capabilities')).parentPortal, true, 'Isolated parent scenario requires PARENT_PORTAL_ENABLED=true')
     await page.getByLabel('用户名', { exact: true }).fill(user.username)
@@ -42,8 +47,7 @@ async function pageFor(name, mobile = false) {
     await page.getByRole('button', { name: '登录', exact: true }).click()
     assert.equal((await response).status(), 200)
   } else {
-    await loginWithSession(page, { baseUrl: base, route: user.role === 'ADMIN' ? '/admin/login' : user.role === 'TEACHER' ? '/teacher/account-login' : '/student/login', ...user,
-      submitName: user.role === 'ADMIN' ? '管理员登录' : '登录', usernamePlaceholder: user.role === 'ADMIN' ? '请输入管理员账号' : '请输入用户名' })
+    await loginWithSession(page, { baseUrl: base, route: user.role === 'TEACHER' ? '/teacher/account-login' : '/student/login', ...user })
   }
   sessions.set(name, page)
   return page
@@ -367,7 +371,10 @@ async function consultation({ platform, owner, groupSpec }) {
   for (const name of ['client0', 'client1', 'client2']) await complete(name, clientSelf)
   await group(owner, clientSelf, groupSpec)
   const observer = await run(owner, org, 'counselor-client', { kind: 'MEMBERSHIP_IDS', membershipIds: [members.client0] })
-  await complete('counselor0', observer) // legacy ADMIN must enter only its exact owned runtime.
+  const counselorManagement = await api(await pageFor('counselor0'), '/auth/me')
+  assert.equal(counselorManagement.body.data.role, 'ADMIN', 'explicit Training administrator respondent fixture')
+  assert.equal(counselorManagement.body.data.businessRole, 'TEACHER', 'administrator grant preserves the independent business identity')
+  await complete('counselor0', observer) // Management authority never replaces exact owned runtime checks.
   const protectedRun = await run(owner, org, 'client-counselor', { kind: 'MEMBERSHIP_IDS', membershipIds: [members.counselor0] })
   for (const name of ['client0', 'client1', 'client2']) await complete(name, protectedRun)
   const protectedSpec = await spec(platform, 'PROTECTED_FEEDBACK', 'client-counselor')
@@ -414,7 +421,7 @@ async function consultation({ platform, owner, groupSpec }) {
   const mobile = await pageFor('client0'); await mobile.goto(`${base}/organization-tasks`); await mobile.getByRole('heading', { name: '我的测评' }).waitFor()
   await mobile.keyboard.press('Tab')
   assert.equal(await mobile.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1), true)
-  record('consultation: Client SELF, both professional directions, exact ADMIN respondent, ended relation START denial, Counselor M1/M2 matched and repeated, mobile keyboard')
+  record('consultation: Client SELF, both professional directions, exact Training administrator respondent, ended relation START denial, Counselor M1/M2 matched and repeated, mobile keyboard')
 }
 async function legacyCourse() {
   const ref = entryFor('legacy-experience').applicability

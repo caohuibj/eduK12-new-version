@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
-import { assertCurrentSystemAdmin } from '../../services/accountAuthorityService'
+import { assertEntryAdmin, AdminPermissionError } from '../admin-permissions/service'
 import { appendAudit } from './service'
 import type { EducationProduct } from './educationProductAccess'
 
@@ -32,7 +32,7 @@ export async function setEducationProductEntitlement(input:{
   action:ProductAction;expectedRevision?:number;initialSchoolAdminMembershipId?:string
 }){
   return prisma.$transaction(async tx=>{
-    await assertCurrentSystemAdmin(tx,input.actorUserId)
+    await assertEntryAdmin(tx,input.actorUserId,input.product)
     const school=await currentSchool(tx,input.organizationId)
     if(school.status!=='ACTIVE'&&input.action==='ACTIVATE')
       refuse('EDUCATION_SCHOOL_SUSPENDED','学校处于停用状态')
@@ -122,10 +122,11 @@ export async function setEducationProductEntitlement(input:{
   })
 }
 export async function readEducationProductEntitlements(actorUserId:string,organizationId:string){
-  await assertCurrentSystemAdmin(prisma,actorUserId)
+  const grants=await prisma.adminEntryGrant.findMany({where:{userId:actorUserId,revokedAt:null,entry:{in:['HUISCHOOL','HUITEACHER']}}})
+  if(!grants.length)throw new AdminPermissionError(403,'缺少教育入口管理授权')
   const o=await prisma.organization.findFirst({where:{id:organizationId,productDomain:'SCHOOL'},select:{id:true}})
   if(!o)refuse('EDUCATION_SCHOOL_NOT_FOUND','学校不存在',404)
-  return prisma.educationProductEntitlement.findMany({where:{organizationId},
+  return prisma.educationProductEntitlement.findMany({where:{organizationId,product:{in:grants.map(g=>g.entry)}},
     select:{product:true,status:true,revision:true,grantedAt:true,suspendedAt:true},
     orderBy:{product:'asc'}})
 }
@@ -135,7 +136,7 @@ export async function readEducationProductEntitlements(actorUserId:string,organi
  * Only the existing LEGACY/TRAINING SYSTEM_ADMIN can call it.
  */
 export async function listEducationTeacherAdmins(actorUserId:string,organizationId:string){
-  await assertCurrentSystemAdmin(prisma,actorUserId)
+  await assertEntryAdmin(prisma,actorUserId,'HUITEACHER')
   const school=await prisma.organization.findFirst({
     where:{id:organizationId,productDomain:'SCHOOL'},
     select:{id:true},
@@ -167,7 +168,7 @@ export async function grantEducationProductAdmin(input:{
   actorUserId:string;organizationId:string;membershipId:string
 }){
   return prisma.$transaction(async tx=>{
-    await assertCurrentSystemAdmin(tx,input.actorUserId)
+    await assertEntryAdmin(tx,input.actorUserId,'HUITEACHER')
     const school=await currentSchool(tx,input.organizationId)
     if(school.status!=='ACTIVE')refuse('EDUCATION_SCHOOL_SUSPENDED')
     const e=await tx.educationProductEntitlement.findUnique({
@@ -207,7 +208,7 @@ export async function revokeEducationProductAdmin(input:{
   actorUserId:string;organizationId:string;grantId:string
 }){
   return prisma.$transaction(async tx=>{
-    await assertCurrentSystemAdmin(tx,input.actorUserId)
+    await assertEntryAdmin(tx,input.actorUserId,'HUITEACHER')
     await currentSchool(tx,input.organizationId)
     const target=await tx.educationProductRoleGrant.findFirst({where:{
       id:input.grantId,organizationId:input.organizationId,

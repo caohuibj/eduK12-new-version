@@ -28,7 +28,7 @@ export const tables = () => ({
 export const claim = () => ({ batchId: '60000000-0000-4000-8000-000000000001', generation: 1,
   resourceType: 'TRAINING_ANALYSIS' as const, resourceId: courseId, createdBy: actor.id,
   createdAt: new Date('2026-10-18T01:00:00.000Z'), artifactIds: ['artifact-id'],
-  options: { anonymize: true, creatorRole: actor.role, trainingAnalysis: exportOptions() } })
+  options: { anonymize: true, authorityTokenVersion: 1, creatorRole: actor.role, trainingAnalysis: exportOptions() } })
 export const currentPrincipal = () => ({ userId: actor.id, role: actor.role, username: 'teacher',
   accountDomain: 'TRAINING' as const, platformRole: 'STANDARD' as const, tokenVersion: 1,
   isActive: true, isFrozen: false, expiresAt: null, teacherApproved: true, mustChangePassword: false })

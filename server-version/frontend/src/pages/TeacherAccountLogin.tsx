@@ -41,6 +41,7 @@ const TeacherAccountLogin: React.FC = () => {
       {error && (
         <div role="alert" id="auth-error" className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
           {error}
+          {error.includes('管理员入口')&&<p><Link to={authLink('/admin/login')}>使用管理员入口</Link></p>}
         </div>
       )}
 

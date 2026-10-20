@@ -34,15 +34,16 @@ export async function discoverTrainingCourseSources(actor:TrainingAnalysisActor,
   },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead})
 }
 
-export async function analyzeTrainingCourse(input:{actor:TrainingAnalysisActor;courseId:string;selector:unknown;expectedManifest?:TrainingAnalysisManifestV1;sourceCutoff?:string;includeTables?:boolean}) {
+export async function analyzeTrainingCourse(input:{actor:TrainingAnalysisActor;courseId:string;selector:unknown;expectedManifest?:TrainingAnalysisManifestV1;expectedTokenVersion?:number;sourceCutoff?:string;includeTables?:boolean}) {
   const selector=parseTrainingAnalysisSelector(input.selector,input.courseId)
   const expected=input.expectedManifest ? assertTrainingManifest(input.expectedManifest) : undefined
   if(expected && (expected.actor.id!==input.actor.id || expected.actor.role!==input.actor.role
     || expected.courseId!==input.courseId || expected.definitionHash!==canonicalHash(selector))) stale()
   const frozen=await prisma.$transaction(async tx=>{
     const sourceCutoff=expected?.sourceCutoff??input.sourceCutoff??new Date().toISOString()
+    const version=input.expectedTokenVersion===undefined?{}:{expectedTokenVersion:input.expectedTokenVersion}
     const loaded=await loadTrainingAnalysisSources(tx,{userId:input.actor.id,role:input.actor.role},selector,
-      expected ? {authorityLock:'SHARE',fixedManifest:{attempts:expected.sources,...(expected.schemaVersion===2?{researchSources:expected.researchSources}:{})},sourceCutoff} : {authorityLock:'SHARE',sourceCutoff})
+      expected ? {authorityLock:'SHARE',...version,fixedManifest:{attempts:expected.sources,...(expected.schemaVersion===2?{researchSources:expected.researchSources}:{})},sourceCutoff} : {authorityLock:'SHARE',...version,sourceCutoff})
     const sources=sortedSources(loaded.manifest.attempts)
     const {quality,qualityHash}=await readQuality(tx,input.courseId,sources)
     return {loaded,sources,sourceCutoff,quality,qualityHash}
@@ -74,9 +75,10 @@ export async function analyzeTrainingCourse(input:{actor:TrainingAnalysisActor;c
   return {manifest,get analysis(){return cachedAnalysis??(cachedAnalysis=buildTrainingAnalysis(selector,source))},get tables(){return cachedTables??(cachedTables=buildTrainingAnalysisTables(selector,source))},quality:frozen.quality}
 }
 
-export async function revalidateTrainingAnalysisManifest(actor:TrainingAnalysisActor,manifest:TrainingAnalysisManifestV1):Promise<void> {
+export async function revalidateTrainingAnalysisManifest(actor:TrainingAnalysisActor,manifest:TrainingAnalysisManifestV1,expectedTokenVersion?:number):Promise<void> {
   const expected=assertTrainingManifest(manifest)
-  await analyzeTrainingCourse({actor,courseId:expected.courseId,selector:expected.selector,expectedManifest:expected})
+  await analyzeTrainingCourse({actor,courseId:expected.courseId,selector:expected.selector,expectedManifest:expected,
+    ...(expectedTokenVersion===undefined?{}:{expectedTokenVersion})})
 }
 
 export async function setTrainingAnalysisQuality(input:{actor:TrainingAnalysisActor;courseId:string;selector:unknown;

@@ -32,7 +32,7 @@ describe('Training original export worker frozen manifest lifecycle', () => {
     expect(mocks.principal).not.toHaveBeenCalled()
     expect(mocks.analyze).toHaveBeenCalledOnce()
     expect(mocks.revalidate).not.toHaveBeenCalled()
-    expect(mocks.analyze).toHaveBeenCalledWith({ actor, courseId, selector: intent.options.trainingAnalysis.selector, expectedManifest: intent.options.trainingAnalysis.manifest })
+    expect(mocks.analyze).toHaveBeenCalledWith({ actor, courseId, selector: intent.options.trainingAnalysis.selector, expectedManifest: intent.options.trainingAnalysis.manifest, expectedTokenVersion: 1 })
     expect(prepared.provenance).toMatchObject({ version: 2, trainingAnalysis: intent.options.trainingAnalysis })
     await prepared.save('csv')
     expect(mocks.save).toHaveBeenCalledWith(expect.objectContaining({ options: intent.options.trainingAnalysis, tables: tables(), batchId: intent.batchId, generation: 1 }))
@@ -53,6 +53,14 @@ describe('Training original export worker frozen manifest lifecycle', () => {
     await expect(prepareAssessmentExport({ ...claim(), options: { anonymize: true, creatorRole: actor.role } })).rejects.toThrow()
     await expect(revalidateAssessmentExport({ ...claim(), options: { anonymize: true, creatorRole: actor.role } })).rejects.toThrow()
     expect(mocks.analyze).toHaveBeenCalledOnce()
+  })
+  it('refuses an unversioned legacy intent before reading sources and binds post-generation checks to the same version', async () => {
+    const legacy = claim(); delete (legacy.options as {authorityTokenVersion?:number}).authorityTokenVersion
+    await expect(prepareAssessmentExport(legacy)).rejects.toThrow('Export authority revoked')
+    await expect(revalidateAssessmentExport(legacy)).rejects.toThrow('Export authority revoked')
+    expect(mocks.analyze).not.toHaveBeenCalled(); expect(mocks.revalidate).not.toHaveBeenCalled()
+    await revalidateAssessmentExport(claim())
+    expect(mocks.revalidate).toHaveBeenCalledWith(actor, claim().options.trainingAnalysis.manifest, 1)
   })
   it('publishes through the existing generation fence only after post-generation revalidation', async () => {
     const result = await runExportBatch(job)

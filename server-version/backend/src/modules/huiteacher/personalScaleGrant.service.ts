@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
-import { assertCurrentSystemAdmin } from '../../services/accountAuthorityService'
+import { assertEntryAdmin } from '../admin-permissions/service'
 import { releasedTeacherScaleEntry } from './scaleLicense.service'
 
 export class TeacherPersonalGrantError extends Error {
@@ -20,7 +20,7 @@ export async function changeTeacherPersonalGrant(input:{
   action:'GRANT'|'REVOKE';expectedRevision?:number
 }){
   return prisma.$transaction(async tx=>{
-    await assertCurrentSystemAdmin(tx,input.actorUserId)
+    await assertEntryAdmin(tx,input.actorUserId,'HUITEACHER')
     const [user]=await tx.$queryRaw<Array<{id:string}>>`
       SELECT "id" FROM "users" WHERE "id"=${input.teacherUserId}
         AND "account_domain"='SCHOOL' AND "role" IN ('TEACHER','ADMIN')

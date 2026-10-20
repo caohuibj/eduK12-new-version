@@ -2,7 +2,7 @@ import {randomUUID} from 'node:crypto'
 import {Prisma} from '@prisma/client'
 import {prisma} from '../../config/database'
 import {canonicalHash} from '../assessment-runtime/canonical'
-import {assertCurrentSystemAdmin} from '../../services/accountAuthorityService'
+import {assertEntryAdmin} from '../admin-permissions/service'
 import {SurveyGovernanceError} from './governance.service'
 import {getCatalogSourceSnapshot,listCatalogSources,assertCatalogSourcesCurrent,type CatalogSourceRef} from './catalog.sources'
 import type {ResearchFrozenUnit} from './publication.service'
@@ -15,7 +15,7 @@ const view=(r:Grant)=>({id:r.id,title:r.snapshot.title,kind:r.snapshot.ref.kind,
   sourceRef:r.snapshot.ref,sourceProvenance:{...r.snapshot.provenance,originalSource:r.snapshot.provenance.source??null,source:r.snapshot.ref,
     definitionDigest:r.snapshot.definitionDigest,adapterVersion:r.snapshot.adapterVersion},createdAt:r.createdAt,revokedAt:r.revokedAt})
 export async function sourceCatalog(actorUserId:string,input:{kind?:CatalogSourceRef['kind'];organizationId?:string;page:number}){
-  await assertCurrentSystemAdmin(prisma,actorUserId)
+  await assertEntryAdmin(prisma,actorUserId,'SURVEY')
   const result=await listCatalogSources({actorUserId,...input},prisma)
   return {...result,pageSize:25}
 }
@@ -29,7 +29,7 @@ async function target(tx:Tx,id:string){
 }
 export async function grantCatalogSource(actorUserId:string,userId:string,ref:CatalogSourceRef){
   return prisma.$transaction(async tx=>{
-    await assertCurrentSystemAdmin(tx,actorUserId);await target(tx,userId)
+    await assertEntryAdmin(tx,actorUserId,'SURVEY');await target(tx,userId)
     const snapshot=await getCatalogSourceSnapshot({actorUserId,ref},tx)
     const snapshotDigest=canonicalHash(snapshot)
     const rows=await tx.$queryRaw<Grant[]>`INSERT INTO survey_tool_grants
@@ -43,7 +43,7 @@ export async function grantCatalogSource(actorUserId:string,userId:string,ref:Ca
   })
 }
 export async function listToolGrants(actorUserId:string,userId:string,page=1){
-  await assertCurrentSystemAdmin(prisma,actorUserId)
+  await assertEntryAdmin(prisma,actorUserId,'SURVEY')
   const rows=await prisma.$queryRaw<Grant[]>`SELECT id,created_by AS "createdBy",user_id AS "userId",status,jsonb_build_object('title',snapshot->'title','ref',snapshot->'ref','provenance',jsonb_build_object('license',snapshot#>'{provenance,license}','reuseAuthority',snapshot#>'{provenance,reuseAuthority}'),
       'definitionDigest',snapshot->'definitionDigest','adapterVersion',snapshot->'adapterVersion') AS snapshot,snapshot_digest AS "snapshotDigest",
     created_at AS "createdAt",revoked_at AS "revokedAt" FROM survey_tool_grants WHERE user_id=${userId}
@@ -52,7 +52,7 @@ export async function listToolGrants(actorUserId:string,userId:string,page=1){
 }
 export async function revokeToolGrant(actorUserId:string,id:string){
   return prisma.$transaction(async tx=>{
-    await assertCurrentSystemAdmin(tx,actorUserId)
+    await assertEntryAdmin(tx,actorUserId,'SURVEY')
     const rows=await tx.$queryRaw<{userId:string}[]>`UPDATE survey_tool_grants SET status='REVOKED',revoked_at=statement_timestamp()
       WHERE id=${id} AND status='ACTIVE' RETURNING user_id AS "userId"`
     if(!rows.length)fail(404,'授权不存在或已撤销')

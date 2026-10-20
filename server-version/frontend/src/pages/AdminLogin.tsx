@@ -4,11 +4,13 @@ import LoginRecoveryNotice from '../components/app-shell/LoginRecoveryNotice'
 import AuthShell from '../components/auth/AuthShell'
 import React, { useState } from 'react'
 import { Loader2 } from 'lucide-react'
-import { useLoginReturn } from '../components/app-shell/useLoginReturn'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { adminReturnTo } from '../admin/authority'
 import { useAuth } from '../contexts/AuthContext'
 
 const AdminLogin: React.FC = () => {
-  const completeLogin = useLoginReturn('/users')
+  const navigate = useNavigate()
+  const location = useLocation()
   const { login } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -23,8 +25,8 @@ const AdminLogin: React.FC = () => {
     setError('')
 
     try {
-      await login(formData.username, formData.password, undefined, 'admin')
-      completeLogin()
+      const user = await login(formData.username, formData.password, undefined, 'admin')
+      if(user) navigate(adminReturnTo(user,new URLSearchParams(location.search).get('returnTo')),{replace:true})
     } catch (err: any) {
       setError(err.message || '登录失败')
     } finally {
@@ -33,10 +35,10 @@ const AdminLogin: React.FC = () => {
   }
 
   return (
-    <AuthShell tone="admin" title="管理员登录" description="平台管理、账户与内容配置">
+    <AuthShell tone="admin" title="管理员登录" description="密码与安全密钥验证，按入口授权管理">
       <div className="hui-auth-note mt-0 mb-5">
         <strong>管理员身份</strong>
-        <div>用于平台管理、教师审核及内容授权。具体组织和数据访问范围以当前授予的权限为准。</div>
+        <div>管理账号需要密码与支持用户验证的安全密钥。每个入口分别授权，具体数据范围以当前权限为准。</div>
       </div>
 
       <LoginRecoveryNotice />

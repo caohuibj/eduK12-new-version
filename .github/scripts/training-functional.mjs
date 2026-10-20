@@ -36,33 +36,41 @@ const regularChange = entry => entry.newMode === '100644'
 // An explicit, reviewed configuration addition activates this single integration.
 // Branch names, labels and arbitrary environment booleans cannot grant it.
 // The base has no marker; after merge, ordinary subsequent PRs keep the defaults.
-export function validateTrainingFunctional(entries, config, { base, head, event, forceFull = false }) {
-  const marker = entries.find(entry => entry.file === TRAINING_FUNCTIONAL_CONFIG);
+export function validateFunctionalScope(entries, config, { base, head, event, forceFull = false }, profile) {
+  const { markerPath, baseSha, mode, label, tools, sourcePath: acceptsSource, required, omissions } = profile;
+  const marker = entries.find(entry => entry.file === markerPath);
   if (!marker) return null;
   if (marker.status !== 'A' || !regularChange(marker))
-    throw new Error('Training functional configuration must be a new regular file in this integration');
+    throw new Error(`${label} functional configuration must be a new regular file in this integration`);
   if (!['pull_request', 'push'].includes(event) || forceFull)
-    throw new Error('Training functional qualification does not admit manual or forced performance execution');
-  if (base !== TRAINING_FUNCTIONAL_BASE || !sha(head) || config?.schema !== 1
-      || config.mode !== 'training-functional-only' || config.base !== base
+    throw new Error(`${label} functional qualification does not admit manual or forced performance execution`);
+  if (base !== baseSha || !sha(head) || config?.schema !== 1
+      || config.mode !== mode || config.base !== base
       || typeof config.reason !== 'string' || !config.reason.trim()
       || !Array.isArray(config.sourcePaths) || !config.sourcePaths.length
-      || config.sourcePaths.some(path => !sourcePath(path))
+      || config.sourcePaths.some(path => !acceptsSource(path))
       || new Set(config.sourcePaths).size !== config.sourcePaths.length)
-    throw new Error('Invalid or moved Training functional scope declaration');
-  const allowed = new Set([...TRAINING_FUNCTIONAL_TOOLS, ...config.sourcePaths]);
+    throw new Error(`Invalid or moved ${label} functional scope declaration`);
+  const allowed = new Set([...tools, ...config.sourcePaths]);
   if (!entries.length || new Set(entries.map(entry => entry.file)).size !== entries.length
       || entries.some(entry => !regularChange(entry) || !allowed.has(entry.file)))
-    throw new Error('Unknown path, deletion or file-mode change in Training functional integration');
-  for (const required of [
+    throw new Error(`Unknown path, deletion or file-mode change in ${label} functional integration`);
+  for (const path of required) if (!entries.some(entry => entry.file === path))
+    throw new Error(`${label} functional integration is missing its application scope`);
+  return { schema: 1, mode, base, head,
+    changedPaths: entries.map(entry => entry.file).sort(),
+    omittedPerformance: [...omissions] };
+}
+
+export function validateTrainingFunctional(entries, config, context) {
+  return validateFunctionalScope(entries, config, context, {
+    markerPath: TRAINING_FUNCTIONAL_CONFIG, baseSha: TRAINING_FUNCTIONAL_BASE,
+    mode: 'training-functional-only', label: 'Training', tools: TRAINING_FUNCTIONAL_TOOLS, sourcePath,
+    omissions: TRAINING_FUNCTIONAL_OMISSIONS, required: [
     'server-version/backend/src/modules/composite/training-checkpoint.service.ts',
     'server-version/frontend/src/services/persistence/finalDraftStore.ts',
     'server-version/backend/prisma/schema.prisma',
-  ]) if (!entries.some(entry => entry.file === required))
-    throw new Error('Training functional integration is missing its application scope');
-  return { schema: 1, mode: 'training-functional-only', base, head,
-    changedPaths: entries.map(entry => entry.file).sort(),
-    omittedPerformance: [...TRAINING_FUNCTIONAL_OMISSIONS] };
+  ] });
 }
 
 export function trainingFunctionalPlan(entries, base, head, options = {}) {

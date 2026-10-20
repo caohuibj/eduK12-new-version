@@ -9,7 +9,7 @@ import { courseId, actor, exportOptions } from './export-fixtures'
 import { trainingManifestHash } from '../../modules/training-analysis/manifest'
 
 const request = () => ({ resourceType: 'TRAINING_ANALYSIS' as const, resourceId: courseId,
-  createdBy: actor.id, anonymized: true, format: 'zip', recordCount: 2, requestKey: randomUUID(),
+  createdBy: actor.id, authorityTokenVersion: 1, anonymized: true, format: 'zip', recordCount: 2, requestKey: randomUUID(),
   options: { anonymize: true, creatorRole: actor.role, trainingAnalysis: exportOptions() } })
 
 describe('Training analysis durable original ExportBatch intent', () => {

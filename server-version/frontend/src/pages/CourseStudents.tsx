@@ -18,6 +18,7 @@ interface Student {
   isFrozen: boolean
   joinedAt: string
   enrollmentStatus?: 'ACTIVE' | 'APPROVED' | 'PENDING'
+  credentialManagementProtected?:boolean
 }
 
 const CourseStudents: React.FC = () => {
@@ -268,7 +269,8 @@ const CourseStudents: React.FC = () => {
                         >
                           {student.isFrozen ? <Unlock className="h-4 w-4" aria-hidden="true" /> : <Lock className="h-4 w-4" aria-hidden="true" />}
                         </button>}
-                        {canResetCoursePassword && !student.isFrozen && student.enrollmentStatus !== 'PENDING' && <button
+                        {user?.role==='TEACHER'&&student.credentialManagementProtected&&<span className="text-sm text-gray-600">凭据由系统管理员管理</span>}
+                        {canResetCoursePassword && (canManageGlobalAccount||!student.credentialManagementProtected) && !student.isFrozen && student.enrollmentStatus !== 'PENDING' && <button
                           type="button"
                           onClick={() => handleResetPassword(student)}
                           disabled={processingId === student.id}

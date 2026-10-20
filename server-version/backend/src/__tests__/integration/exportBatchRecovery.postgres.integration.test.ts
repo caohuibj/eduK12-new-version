@@ -40,6 +40,7 @@ const fixture = async () => {
       nickname: 'Export batch test',
     },
   })
+  await prisma.adminEntryGrant.create({data:{id:randomUUID(),userId:user.id,entry:'TRAINING',grantedBy:user.id}})
   const scale = await prisma.scale.create({
     data: {
       code: `EXPORT-BATCH-${suffix}`,
@@ -62,6 +63,7 @@ const fixture = async () => {
 const request = async (userId: string, scaleId: string, requestKey: string, format: 'csv' | 'sav' = 'csv') => {
   const result = await enqueueExportJob({
     resourceType: 'SCALE',
+    authorityTokenVersion: 0,
     resourceId: scaleId,
     createdBy: userId,
     anonymized: true,
@@ -88,6 +90,7 @@ suite('durable export batches (real PostgreSQL)', () => {
       await prisma.exportBatch.deleteMany({ where: { id: { in: createdBatchIds } } })
     }
     if (createdScaleIds.length) await prisma.scale.deleteMany({ where: { id: { in: createdScaleIds } } })
+    if (createdUserIds.length) await prisma.adminEntryGrant.deleteMany({where:{userId:{in:createdUserIds}}})
     if (createdUserIds.length) await prisma.user.deleteMany({ where: { id: { in: createdUserIds } } })
     await prisma.$disconnect()
   })

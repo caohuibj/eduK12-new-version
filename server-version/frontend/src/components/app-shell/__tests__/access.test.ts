@@ -76,8 +76,8 @@ describe('role navigation', () => {
   })
 })
 
-it('discovers Survey governance only in Training for existing system admins', () => {
-  expect(surveyGovernanceNavigation(true, 'ADMIN', 'SYSTEM_ADMIN')[0]?.path).toBe('/admin/survey-researchers')
+it('discovers Survey governance only with an explicit Survey entry grant', () => {
+  expect(surveyGovernanceNavigation(true, 'ADMIN', 'STANDARD', [{entry:'SURVEY'}])[0]?.path).toBe('/admin/survey-researchers')
   expect(surveyGovernanceNavigation(false, 'ADMIN', 'SYSTEM_ADMIN')).toEqual([])
   expect(surveyGovernanceNavigation(true, 'TEACHER', 'SYSTEM_ADMIN')).toEqual([])
   expect(surveyGovernanceNavigation(true, 'ADMIN', null)).toEqual([])

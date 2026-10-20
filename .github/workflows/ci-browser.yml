@@ -9,6 +9,9 @@ on:
       groups:
         type: string
         default: '["foundation","products","security"]'
+      admin_permissions_functional:
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -88,6 +91,16 @@ jobs:
         env:
           CI_BROWSER_GROUPS: ${{ inputs.groups }}
         run: node "$GITHUB_WORKSPACE/.github/scripts/ci-browser-plan.mjs"
+      - name: verify explicit administrator browser scope
+        if: inputs.admin_permissions_functional && matrix.group == 'security'
+        working-directory: .
+        env:
+          CI_EVENT: ${{ github.event_name }}
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          CI_FORCE_FULL: ${{ vars.CI_FORCE_FULL }}
+        run: |
+          git fetch --no-tags origin "$CI_BASE_SHA"
+          node .github/scripts/admin-permissions-functional.mjs verify-browser
       - name: clear previous browser evidence
         run: |
           rm -rf /tmp/eduk12-situational-bundle-e2e /tmp/eduk12-situational-bundle-backend.log /tmp/eduk12-situational-bundle-frontend.log /tmp/eduk12-situational-bundle-backend.pid /tmp/eduk12-situational-bundle-frontend.pid /tmp/eduk12-pr5-scenarios-evidence /tmp/eduk12-pr5-release-rehearsal /tmp/eduk12-pr5-scenario-backend.log /tmp/eduk12-bundle-products-e2e /tmp/eduk12-bundle-products-backend.log /tmp/eduk12-questionnaire-public-e2e /tmp/reporting-v22-evidence
@@ -448,6 +461,140 @@ jobs:
           fi
           ffmpeg -version >/dev/null
           node e2e/production-csp-browser.cjs
+      - name: administrator virtual CTAP2, business identity and entry revocation browser acceptance
+        if: inputs.admin_permissions_functional && matrix.group == 'security'
+        timeout-minutes: 8
+        env:
+          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+          ADMIN_PERMISSIONS_ISOLATED_TEST: '1'
+          ADMIN_PERMISSIONS_PRIVATE_DIR: ${{ runner.temp }}/admin-permissions-private
+          ADMIN_PERMISSIONS_FIXTURE_FILE: ${{ runner.temp }}/admin-permissions-private/browser-fixture.json
+          ADMIN_PERMISSIONS_FIXTURE_BUSINESS: '1'
+          ADMIN_PERMISSIONS_BROWSER_ORIGIN: http://localhost:5174
+          DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/eduk12_admin_permissions_ci_browser?schema=public
+          REDIS_URL: redis://localhost:6379/8
+          PORT: '3100'
+          E2E_BACKEND_URL: http://127.0.0.1:3100
+          CORS_ORIGIN: http://localhost:5174
+          ADMIN_WEBAUTHN_RP_ID: localhost
+          ADMIN_WEBAUTHN_ORIGIN: http://localhost:5174
+          SURVEY_WORKSPACE_ENABLED: 'true'
+          HUITEACHER_WORKSPACE_ENABLED: 'true'
+          BACKGROUND_WORKERS_ENABLED: 'false'
+          UPLOAD_DIR: ${{ runner.temp }}/admin-permissions-private/uploads
+          EXPORT_DIR: ${{ runner.temp }}/admin-permissions-private/exports
+          ADMIN_USERNAME: ci-admin-permissions-reference
+          ADMIN_PASSWORD: ci-admin-permissions-reference-2026
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -p "$ADMIN_PERMISSIONS_PRIVATE_DIR" "$UPLOAD_DIR" "$EXPORT_DIR"
+          admin_api_pid=''
+          admin_preview_pid=''
+          export ADMIN_BROWSER_STAGE='migration'
+          cleanup_admin_browser() {
+            admin_browser_status=$?
+            if [ "$admin_browser_status" -ne 0 ]; then
+              ADMIN_BROWSER_EXIT_STATUS="$admin_browser_status" node --input-type=module <<'NODE'
+          import {readFileSync,writeFileSync} from 'node:fs';
+          const root=process.env.ADMIN_PERMISSIONS_PRIVATE_DIR;
+          const failures=['business.log','workspaces.log'].flatMap(file=>{
+            try{return readFileSync(root+'/'+file,'utf8').split('\n').flatMap(line=>{
+              try{const row=JSON.parse(line);return row.result==='FAIL'?[row]:[];}catch{return [];}
+            });}catch{return [];}
+          }).map(row=>({
+            step:typeof row.step==='string'&&/^[A-Za-z0-9-]{1,100}$/.test(row.step)?row.step:'unknown',
+            checks:Number.isSafeInteger(row.checks)?row.checks:0,
+            errorType:['AssertionError','TimeoutError','Error','TypeError'].includes(row.errorType)?row.errorType:'Error',
+          }));
+          const summary={result:'FAIL',head:process.env.GITHUB_SHA,mode:'admin-permissions-functional-only',
+            stage:process.env.ADMIN_BROWSER_STAGE,exitStatus:Number(process.env.ADMIN_BROWSER_EXIT_STATUS),failures,
+            physicalHardwareVerified:false,rawCredentialsUploaded:false,productionAccess:false};
+          writeFileSync(process.env.RUNNER_TEMP+'/admin-permissions-browser-summary.json',JSON.stringify(summary,null,2),{mode:0o600});
+          console.error(JSON.stringify(summary));
+          NODE
+            fi
+            if [ -n "$admin_preview_pid" ]; then kill -- -"$admin_preview_pid" 2>/dev/null || true; fi
+            if [ -n "$admin_api_pid" ]; then kill -- -"$admin_api_pid" 2>/dev/null || true; fi
+            rm -rf -- "$ADMIN_PERMISSIONS_PRIVATE_DIR"
+          }
+          trap cleanup_admin_browser EXIT
+          docker exec "$CI_POSTGRES_SERVICE_ID" createdb -U ptool eduk12_admin_permissions_ci_browser
+          npm --prefix backend run db:migrate:guarded
+          npm --prefix backend run db:seed
+          export ADMIN_BROWSER_STAGE='fixture'
+          (cd backend && npx tsx scripts/admin-permissions-fixture.ts)
+          export CHROMIUM_EXECUTABLE="$(node -e "process.stdout.write(require('./backend/node_modules/playwright-core').chromium.executablePath())")"
+          nohup setsid node backend/dist/index.js > "$ADMIN_PERMISSIONS_PRIVATE_DIR/api.log" 2>&1 &
+          admin_api_pid=$!
+          nohup setsid npm --prefix frontend run preview -- --host localhost --port 5174 --strictPort > "$ADMIN_PERMISSIONS_PRIVATE_DIR/preview.log" 2>&1 &
+          admin_preview_pid=$!
+          export ADMIN_BROWSER_STAGE='readiness'
+          ready=false
+          for attempt in $(seq 1 50); do
+            if curl --fail --silent --max-time 2 http://127.0.0.1:3100/ready >/dev/null && curl --fail --silent --max-time 2 http://localhost:5174/ >/dev/null; then ready=true; break; fi
+            if ! kill -0 "$admin_api_pid" 2>/dev/null || ! kill -0 "$admin_preview_pid" 2>/dev/null; then break; fi
+            sleep 1
+          done
+          test "$ready" = true
+          export ADMIN_BROWSER_STAGE='business'
+          ADMIN_PERMISSIONS_EXPECT_PRODUCTION_ORIGIN=1 ADMIN_PERMISSIONS_BROWSER_PHASE=business-overlaps node e2e/admin-permissions-browser.cjs > "$ADMIN_PERMISSIONS_PRIVATE_DIR/business.log" 2>&1
+          # Production closes unsupported localhost Survey origins. Preserve that
+          # assertion above, then use the same-source test build for the complete
+          # loopback matrix. Never relax product origins or replace real CTAP2.
+          export ADMIN_BROWSER_STAGE='loopback-build'
+          NODE_ENV=test npm --prefix frontend run build -- --outDir "$ADMIN_PERMISSIONS_PRIVATE_DIR/frontend-loopback" > "$ADMIN_PERMISSIONS_PRIVATE_DIR/build.log" 2>&1
+          export ADMIN_BROWSER_STAGE='loopback-preview'
+          kill -- -"$admin_preview_pid"
+          wait "$admin_preview_pid" 2>/dev/null || true
+          for attempt in $(seq 1 30); do
+            if ! curl --fail --silent --max-time 2 http://localhost:5174/ >/dev/null; then break; fi
+            sleep 1
+          done
+          if curl --fail --silent --max-time 2 http://localhost:5174/ >/dev/null; then exit 1; fi
+          nohup setsid npm --prefix frontend run preview -- --host localhost --port 5174 --strictPort --outDir "$ADMIN_PERMISSIONS_PRIVATE_DIR/frontend-loopback" > "$ADMIN_PERMISSIONS_PRIVATE_DIR/preview.log" 2>&1 &
+          admin_preview_pid=$!
+          ready=false
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --max-time 2 http://localhost:5174/ >/dev/null; then ready=true; break; fi
+            if ! kill -0 "$admin_preview_pid" 2>/dev/null; then break; fi
+            sleep 1
+          done
+          test "$ready" = true
+          export ADMIN_BROWSER_STAGE='workspaces'
+          ADMIN_PERMISSIONS_BROWSER_PHASE=workspaces-resume node e2e/admin-permissions-browser.cjs > "$ADMIN_PERMISSIONS_PRIVATE_DIR/workspaces.log" 2>&1
+          export ADMIN_BROWSER_STAGE='summary'
+          node --input-type=module <<'NODE'
+          import {readFileSync,writeFileSync} from 'node:fs';
+          import assert from 'node:assert/strict';
+          const root=process.env.ADMIN_PERMISSIONS_PRIVATE_DIR;
+          const result=(file,phase,checks)=>{
+            const rows=readFileSync(root+'/'+file,'utf8').split('\n').flatMap(line=>{
+              try{return [JSON.parse(line)];}catch{return [];}
+            }).filter(row=>row.phase===phase&&row.result==='PASS');
+            assert.equal(rows.length,1);assert.equal(rows[0].checks,checks);assert.equal(rows[0].pageErrors,0);
+            assert.equal(rows[0].physicalKeyVerified,false);assert.equal(rows[0].officialCI,true);
+            return rows[0];
+          };
+          const business=result('business.log','P2-business-and-governance',42);
+          const productionOrigin=result('business.log','production-origin-closure',4);
+          const workspaces=result('workspaces.log','A05-workspaces',198);
+          assert.equal(workspaces.identities,9);
+          writeFileSync(process.env.RUNNER_TEMP+'/admin-permissions-browser-summary.json',JSON.stringify({
+            result:'PASS',head:process.env.GITHUB_SHA,mode:'admin-permissions-functional-only',
+            business,productionOrigin,workspaces,
+            frontend:{business:'official-production-artifact',workspaces:'same-source-loopback-test-build'},
+            physicalHardwareVerified:false,rawCredentialsUploaded:false,productionAccess:false,
+          },null,2),{mode:0o600});
+          NODE
+      - name: upload administrator browser summary only
+        if: inputs.admin_permissions_functional && matrix.group == 'security' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: admin-permissions-browser-${{ github.sha }}
+          path: ${{ runner.temp }}/admin-permissions-browser-summary.json
+          if-no-files-found: error
+          retention-days: 7
       - name: upload seeded browser evidence
         if: always()
         continue-on-error: true

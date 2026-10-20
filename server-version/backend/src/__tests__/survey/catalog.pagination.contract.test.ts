@@ -65,7 +65,7 @@ describe('bounded source catalog pagination',()=>{
   })
   it('still refuses unauthorized source catalog reads before pagination',async()=>{
     db.$queryRaw.mockResolvedValue([])
-    await expect(sourceCatalog('not-admin',{kind:'SCALE',page:40})).rejects.toMatchObject({code:'SYSTEM_ADMIN_REQUIRED',statusCode:403})
+    await expect(sourceCatalog('not-admin',{kind:'SCALE',page:40})).rejects.toMatchObject({message:'缺少当前入口管理授权',statusCode:403})
     expect(db.scale.findMany).not.toHaveBeenCalled()
   })
 })

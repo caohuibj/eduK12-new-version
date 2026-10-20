@@ -58,6 +58,7 @@ const authHeaders = (user: TestUser, csrf = `csrf-${suffix}`): Record<string, st
     username: user.username,
     role: user.role,
     tokenVersion: user.tokenVersion,
+    adminVerifiedAt: Math.floor(Date.now()/1000), adminSessionId: randomUUID(),
   })
   return {
     cookie: `${AUTH_COOKIE_NAME}=${encodeURIComponent(token)}; ${CSRF_COOKIE_NAME}=${encodeURIComponent(csrf)}`,

@@ -17,6 +17,7 @@ import {compileTrainingFlow, trainingFlowItemKey} from '../../modules/assessment
 import {buildTrainingFlowUnits} from '../../modules/composite/training-flow-definition'
 import {resolveTrainingFlowScope} from '../../modules/composite/training-flow-scope'
 import {createCanonicalUnitResultEnvelope, projectScaleCanonicalUnitResult} from '../../modules/assessment-runtime/unit-result'
+import {sourceAuthorityRow} from './source-authority-fixture'
 
 const actor = {userId: 'teacher', role: 'TEACHER' as const}, publication = '2026-10-18T00:00:00.000Z'
 beforeEach(() => {vi.clearAllMocks(); vi.stubEnv('DATA_ENCRYPTION_KEY', 'c'.repeat(64)); vi.stubEnv('ASSESSMENT_SHARED_CONTROL_ENABLED', 'false')})
@@ -44,12 +45,14 @@ function fixture(r: VersionedFrozenScaleRuntimeSnapshot = runtime(), instrumentC
   for (const field of ['result', 'answers', 'rawAnswersEncrypted']) Object.defineProperty(child, field, {get: () => {throw new Error(`Discovery read ${field}`)}})
   const rows = [child], artifacts = new Map<string, SharedScaleArtifactRecord>()
   const db: any = {
+    authorityRow: sourceAuthorityRow(),
     user: {findFirst: vi.fn(async () => ({id: actor.userId, role: actor.role, expiresAt: null}))},
     course: {findFirst: vi.fn(async () => ({id: 'course', creatorId: actor.userId}))},
     relationalAssessmentAssignment: {findMany: vi.fn(async () => [])}, compositeAssessment: {findMany: vi.fn(async () => [task])},
     assessment: {findMany: vi.fn(async () => rows)}, assessmentUnitSnapshot: {findMany: vi.fn(async () => [])},
     $queryRaw: vi.fn(async (parts: TemplateStringsArray) => {
       const sql = parts.join('')
+      if (sql.includes('FROM courses c JOIN users')) return db.authorityRow ? [db.authorityRow] : []
       if (sql.includes('assessment_run_executions')) return []
       if (sql.includes('assessment_runtime_artifacts')) return [...artifacts.values()]
       throw new Error(`Unexpected discovery SQL: ${sql}`)
@@ -109,7 +112,7 @@ describe('Training Scale source discovery uses frozen runtime dictionaries', () 
     expect(query.take).toBe(6001); expect(query.where.compositeAttempt.is).toMatchObject({deliveryCourseId: 'course', compositeAssessmentId: {in: ['task']}, AND: [{OR: [{assignmentRef: null}, {assignmentRef: {in: []}}]}]})
     expect(query.select).not.toHaveProperty('result'); expect(query.select).not.toHaveProperty('answers')
     expect(query.select.compositeAttempt.select).not.toHaveProperty('contextSnapshotEncrypted')
-    expect(f.db.assessmentUnitSnapshot.findMany).not.toHaveBeenCalled(); expect(f.db.$queryRaw).toHaveBeenCalledTimes(1); expect(globalRead).not.toHaveBeenCalled()
+    expect(f.db.assessmentUnitSnapshot.findMany).not.toHaveBeenCalled(); expect(f.db.$queryRaw).toHaveBeenCalledTimes(2); expect(globalRead).not.toHaveBeenCalled()
   })
   it.each([1, 2] as const)('batch-loads shared V%s artifacts once and deduplicates exact reference/inline ciphertext reads', async v => {
     const f = fixture(runtime({v})); f.child.runtimeSnapshotEncrypted = await f.share()
@@ -140,10 +143,9 @@ describe('Training Scale source discovery uses frozen runtime dictionaries', () 
   })
   it.each(['actor', 'course', 'task', 'governed'])('does not read Scale children after %s authority exclusion', async mode => {
     const f = fixture()
-    if (mode === 'actor') f.db.user.findFirst.mockResolvedValue(null)
-    if (mode === 'course') f.db.course.findFirst.mockResolvedValue(null)
+    if (mode === 'actor' || mode === 'course') f.db.authorityRow = null
     if (mode === 'task') f.db.compositeAssessment.findMany.mockResolvedValue([])
-    if (mode === 'governed') f.db.$queryRaw.mockResolvedValue([{id: 'task'}])
+    if (mode === 'governed') f.db.$queryRaw.mockImplementation(async (parts:TemplateStringsArray)=>parts.join('').includes('FROM courses c JOIN users')?[f.db.authorityRow]:[{id:'task'}])
     if (mode === 'actor' || mode === 'course') await expect(listTrainingAnalysisSources(f.db, actor, 'course')).rejects.toMatchObject({statusCode: 404})
     else expect((await listTrainingAnalysisSources(f.db, actor, 'course')).list).toEqual([])
     expect(f.db.assessment.findMany).not.toHaveBeenCalled()
@@ -168,7 +170,8 @@ describe('Training Scale source discovery uses frozen runtime dictionaries', () 
     const f = fixture(); f.child.runtimeSnapshotEncrypted = await f.share()
     if (mode === 'missing') f.artifacts.clear()
     if (mode === 'corrupt') [...f.artifacts.values()][0].payloadEncrypted = 'POISON'
-    if (mode === 'duplicate') f.db.$queryRaw.mockImplementation(async (parts: TemplateStringsArray) => parts.join('').includes('assessment_runtime_artifacts') ? [...f.artifacts.values(), ...f.artifacts.values()] : [])
+    if (mode === 'duplicate') f.db.$queryRaw.mockImplementation(async (parts: TemplateStringsArray) => parts.join('').includes('assessment_runtime_artifacts') ? [...f.artifacts.values(), ...f.artifacts.values()]
+      : parts.join('').includes('FROM courses c JOIN users') ? [f.db.authorityRow] : [])
     if (mode === 'wrong-reference-hash') f.child.runtimeSnapshotEncrypted = security.encryptUnifiedRuntimePayload({...security.decryptUnifiedRuntimePayload<any>(f.child.runtimeSnapshotEncrypted), snapshotHash: '0'.repeat(64)})
     await expect(listTrainingAnalysisSources(f.db, actor, 'course')).rejects.toMatchObject({statusCode: 409})
   })
