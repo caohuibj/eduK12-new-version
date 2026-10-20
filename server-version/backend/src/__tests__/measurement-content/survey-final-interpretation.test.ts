@@ -13,7 +13,7 @@ const report=()=>({releaseId:'p',contentHash:digest,layer:'REPORT',family:'SCALE
 const binding=()=>({populationContext:{},units:[{instrumentKey:'scale',measurement:{releaseId:'m',contentHash:digest,measurementHash:digest},
  references:[{metricKey:'total',referenceKind:'descriptive_sample',status:'SELECTED',releaseId:'r',contentHash:digest,entryKey:referenceEntryKey(entry)}],report:{releaseId:'p',contentHash:digest},reportAvailability:'AVAILABLE'}]})
 const input=()=>({projectId:'project',waveId:'wave',attemptId:'attempt',publicationId:'pub',definitionDigest:digest,
- selectedSnapshot:{units:[{measurementRelease:{releaseId:'m',contentHash:digest,measurementHash:digest}}]},calculated:{units:[{instrumentKey:'scale',kind:'SCALE',measurement:{quality:{status:'interpretable'},metrics:[{key:'total',value:5,status:'OK'}]}}]}} as any)
+ selectedSnapshot:{units:[{instrumentKey:'scale',sourceDigest:'source',scoringDigest:'scoring',measurementRelease:{releaseId:'m',contentHash:digest,measurementHash:digest}}]},calculated:{units:[{instrumentKey:'scale',kind:'SCALE',sourceDigest:'source',scoringDigest:'scoring',measurement:{quality:{status:'interpretable'},metrics:[{key:'total',value:5,status:'OK'}]}}]}} as any)
 const tx=()=>({$queryRaw:vi.fn().mockResolvedValue([{cipher:'encrypted',hash:digest,owner_id:'owner'}])})
 beforeEach(()=>{vi.clearAllMocks();mocks.decode.mockReturnValue(binding());mocks.get.mockImplementation(async(_tx,id)=>id==='m'?measurement():id==='r'?reference():report())})
 describe('FINAL consumes fixed raw-score facts and START choices',()=>{
@@ -61,5 +61,63 @@ describe('FINAL consumes fixed raw-score facts and START choices',()=>{
  it('leaves double-null legacy and FORM-only data without invented interpretation',async()=>{
   mocks.decode.mockReturnValue(null);expect(await interpretSurveyFinal(tx() as never,input())).toBeUndefined()
   const i=input();i.selectedSnapshot.units=[{kind:'FORM'}];const db=tx();expect(await interpretSurveyFinal(db as never,i)).toBeUndefined();expect(db.$queryRaw).not.toHaveBeenCalled()
+ })
+})
+
+
+import {compileFrozenResearchUnit,surveyMeasurementReleaseInput,type ResearchFrozenPublication} from '../../modules/survey/publication.service'
+import {verifySurveyFinalPublication} from '../../modules/survey/final.compute'
+import {canonicalHash} from '../../modules/assessment-runtime/canonical'
+import {prepareRelease} from '../../modules/measurement-content/release'
+import {cognitiveParentUnit} from '../../modules/survey/measurement.result'
+import {parseFrozenSurveyCognitive} from '../../modules/survey/cognitive.definition'
+
+const scaleDefinition={schemaVersion:1,respondentType:'participant_self_report',aggregation:'sum',responseOptions:[
+ {optionKey:'yes',label:'Yes',score:3},{optionKey:'no',label:'No',score:0}],dimensions:[{dimensionKey:'total',label:'Total',direction:'descriptive'}],
+ items:[{itemKey:'one',prompt:'Question',required:true,reverse:false,dimensionKeys:['total']}]}
+const sjtDefinition={schemaVersion:1,respondentType:'student_self_report',scenarioKey:'classroom',title:'Scene',stimulus:'Discuss with classmates.',
+ author:'Researcher',sourceNote:'Local authored',licenseStatus:'self_authored',redistribution:'allowed',metrics:[{metricKey:'effort',label:'Effort',direction:'descriptive'}],
+ questions:[{questionKey:'first',prompt:'What first?',options:[{optionKey:'try',label:'Try',contributions:{effort:2}},{optionKey:'wait',label:'Wait',contributions:{effort:0}}]},
+ {questionKey:'second',prompt:'What next?',options:[{optionKey:'talk',label:'Talk',contributions:{effort:2}},{optionKey:'leave',label:'Leave',contributions:{effort:0}}]}]}
+function realComputed(kind:'SCALE'|'SJT'|'COGNITIVE',quality='interpretable'){
+ const unit=compileFrozenResearchUnit({id:'draft',instrumentKey:'tool',kind,title:'Test',revision:1,definition:kind==='SCALE'?scaleDefinition:kind==='SJT'?sjtDefinition:
+  {schemaVersion:1,templateKey:'gonogo-software-frame-v1',feedback:{mode:'GENERAL'}}})
+ const release={...prepareRelease(surveyMeasurementReleaseInput(unit,'owner','project')),releaseId:'m',status:'PUBLISHED'}
+ if(release.layer!=='MEASUREMENT')throw new Error('measurement required')
+ unit.measurementRelease={releaseId:'m',contentHash:release.contentHash,measurementHash:release.content.measurementHash}
+ const snapshot={schemaVersion:1,purpose:'RESEARCH_ONLY',projectId:'project',waveId:'wave',collectionMode:'SINGLE_UNLINKED',consentVersion:1,
+  linkageNoticeConfirmed:false,consentDigest:'consent',runtimeStatus:'SURVEY_FINAL_V1',units:[unit]} as ResearchFrozenPublication
+ let children
+ if(kind==='COGNITIVE'){
+  const frozen=parseFrozenSurveyCognitive(unit.compiledDefinition)
+  const parent=cognitiveParentUnit(unit,{reference:{slotKey:'tool',epoch:1,resultId:'result',resultHash:digest,measurementDigest:frozen.measurementDigest},
+   result:{engineVersion:'1.0.0',scoringVersion:release.content.scoringVersion,protocolSignature:digest,
+    metrics:{hitRate:.9,goMedianRtMs:320},quality:{state:quality,flags:{}}}} as any)
+  children=new Map([['tool',parent]])
+ }
+ const calculated=verifySurveyFinalPublication(snapshot,canonicalHash(snapshot))!.compute({tool:kind==='SCALE'?{one:'yes'}:kind==='SJT'?{first:'try',second:'talk'}:{}},null,[], 'FINAL',undefined,children)
+ const key=kind==='SCALE'?'total':kind==='SJT'?'effort':'hitRate'
+ const e={...entry,scoreKey:key,instrumentVersion:release.content.instrumentVersion,scoringVersion:release.content.scoringVersion}
+ const r={...reference(),family:kind,content:{measurement:{releaseId:'m',contentHash:release.contentHash},entries:[{metricKey:key,referenceKind:'descriptive_sample',definition:e}]}}
+ mocks.get.mockImplementation(async(_tx,id)=>id==='m'?release:r)
+ mocks.decode.mockReturnValue({populationContext:{},units:[{instrumentKey:'tool',measurement:unit.measurementRelease,references:[{
+  metricKey:key,referenceKind:'descriptive_sample',status:'SELECTED',releaseId:'r',contentHash:r.contentHash,entryKey:referenceEntryKey(e)}]}]})
+ return {projectId:'project',waveId:'wave',attemptId:'attempt',publicationId:'pub',definitionDigest:calculated.definitionDigest,selectedSnapshot:snapshot,calculated}
+}
+describe('real compiler and compute outputs reach interpretation',()=>{
+ it.each(['SCALE','SJT','COGNITIVE'] as const)('interprets actual %s stored-score structure without rescoring',async kind=>{
+  const i=realComputed(kind),before=JSON.stringify(i.calculated)
+  if(kind!=='COGNITIVE')expect(i.calculated.units[0].measurement).toBeUndefined()
+  const interpreted=await interpretSurveyFinal(tx() as never,i)
+  expect(interpreted!.units[0].references[0].status).toBe('AVAILABLE')
+  expect(JSON.stringify(i.calculated)).toBe(before)
+ })
+ it.each(['limited','invalid'])('preserves actual cognitive %s quality through compute',async quality=>{
+  const result=await interpretSurveyFinal(tx() as never,realComputed('COGNITIVE',quality))
+  expect(result!.units[0].references[0]).toMatchObject({status:'UNAVAILABLE',reason:'QUALITY_UNAVAILABLE'})
+ })
+ it('rejects a result from another frozen scorer source instead of assigning the selected release identity',async()=>{
+  const i=realComputed('SCALE');i.calculated.units[0].scoringDigest='other'
+  await expect(interpretSurveyFinal(tx() as never,i)).rejects.toMatchObject({statusCode:409})
  })
 })

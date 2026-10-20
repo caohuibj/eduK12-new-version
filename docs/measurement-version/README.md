@@ -288,3 +288,5 @@ Wave freeze 原有单条项目查询同时锁定 project、User、researcher gra
 REPORT 的 READY 仅表示该精确模板可用、生成器版本已冻结，并非被试披露许可或已经持久化完整渲染文本。当前 GENERAL 被试响应白名单不增加解释或模板；真实报告读取与显式新解释仍需独立受控入口。默认 raw/facts 导出不包含 interpretation，7B 专用 opt-in 正在单独接入。
 
 验证：解释核心、既有计算、实际 FINAL commit/replay 合同三个目标文件共 60 项通过，定向 strict TypeScript 通过。服务测试确认解释随同一 resultsCipher 写入且 receipt 不泄露，重复 FINAL 不重新解释；数据库/加密边界使用 mock，不是完整 HTTP/PG 并发验证。
+
+FINAL 解释补齐实际 Scale/SJT v1 存储结构：它们只有 privateScoring，解释时用既有 projectStoredMeasurement 做一次请求内投影，直接保留 scorer 已给出的质量状态；不把重复 metrics 写回 FINAL。先核 result 与冻结 unit 的 sourceDigest/scoringDigest 一致，不把新 release 身份套给错版结果。真实 compiler→verified compute→interpret 覆盖 Scale/SJT，以及 Cognitive 的真实 parent projection→verified compute（子结果为合成已存 fixture）；limited/invalid Cognitive 仍明确 unavailable。该定向文件 14 项通过，非真实认知试次或 HTTP 测试。

@@ -1,3 +1,4 @@
+import {projectStoredMeasurement} from '../assessment-runtime/measurement-result'
 import {Prisma} from '@prisma/client'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {resolveAssessmentReference,type AssessmentReferenceEntry,type ReferenceKind} from '../assessment-reference/reference'
@@ -46,12 +47,20 @@ export async function interpretSurveyFinal(tx:Prisma.TransactionClient,input:{pr
   const units:SurveyFinalInterpretation['units']=[]
   for(const unit of binding.units){
     const result=input.calculated.units.find(r=>r.instrumentKey===unit.instrumentKey)
+    const frozen=input.selectedSnapshot.units.find(r=>r.instrumentKey===unit.instrumentKey)
+    if(!result||!frozen||result.sourceDigest!==frozen.sourceDigest||result.scoringDigest!==frozen.scoringDigest)fail()
     const measurement=await read(unit.measurement.releaseId,unit.measurement.contentHash)
     if(!result||measurement.layer!=='MEASUREMENT'||measurement.family!==result.kind
       ||measurement.content.measurementHash!==unit.measurement.measurementHash)fail()
     if(measurement.layer!=='MEASUREMENT')return fail()
+    // Scale and SJT v1 retain authoritative privateScoring rather than a
+    // duplicated measurement field. Project that stored output once in memory.
+    const facts=result!.measurement??(result!.privateScoring?projectStoredMeasurement({
+      identity:{schemaVersion:1,kind:measurement.family,sourceDigest:result!.sourceDigest,scoringDigest:result!.scoringDigest,
+        engineVersion:measurement.content.runnerVersion,scoringVersion:measurement.content.scoringVersion,protocolDigest:null},
+      storedResult:result!.privateScoring,metricUnits:Object.fromEntries(measurement.content.metrics.map(m=>[m.metricKey,m.unit]))}):undefined)
     const reason=measurement.status==='REVOKED'?'MEASUREMENT_REVOKED':result!.notExecuted?'NOT_EXECUTED':
-      result!.measurement?.quality.status!=='interpretable'?'QUALITY_UNAVAILABLE':undefined
+      facts?.quality.status!=='interpretable'?'QUALITY_UNAVAILABLE':undefined
     const references:SurveyReferenceInterpretation[]=[]
     for(const slot of unit.references){
       if(reason){references.push({metricKey:slot.metricKey,referenceKind:slot.referenceKind,status:reason==='MEASUREMENT_REVOKED'?'REVOKED':'UNAVAILABLE',reason});continue}
@@ -63,7 +72,7 @@ export async function interpretSurveyFinal(tx:Prisma.TransactionClient,input:{pr
       const matching=release.content.entries.filter(e=>referenceEntryKey(e.definition as unknown as AssessmentReferenceEntry)===slot.entryKey)
       if(matching.length!==1||matching[0].metricKey!==slot.metricKey||matching[0].referenceKind!==slot.referenceKind)fail()
       if(release.status==='REVOKED'){references.push({metricKey:slot.metricKey,referenceKind:slot.referenceKind,status:'REVOKED',reason:'REFERENCE_REVOKED'});continue}
-      const metric=result!.measurement!.metrics.find(m=>m.key===slot.metricKey)
+      const metric=facts!.metrics.find(m=>m.key===slot.metricKey)
       const entry=matching[0].definition as unknown as AssessmentReferenceEntry
       const resolved=resolveAssessmentReference({instrumentType:measurement.family==='SCALE'?'scale':measurement.family==='SJT'?'sjt':'cognitive',
         instrumentKey:unit.instrumentKey,instrumentVersion:measurement.content.instrumentVersion,scoringVersion:measurement.content.scoringVersion,
