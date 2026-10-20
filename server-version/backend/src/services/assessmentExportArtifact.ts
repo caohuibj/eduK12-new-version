@@ -1,14 +1,12 @@
 import { randomUUID } from 'node:crypto'
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
-import { UserRole } from '@prisma/client'
+import { UserRole, type ExportArtifact } from '@prisma/client'
 import { z } from 'zod'
 import { prisma } from '../config/database'
 import { validateStorageKey, type ExportActor } from './exportArtifactService'
 import { EXPORT_RETENTION_HOURS, EXPORT_MAX_RECORDS } from './exportStorage'
 import { trainingAnalysisProvenanceSchema, assertTrainingAnalysisExportIdentity } from '../modules/training-analysis/export'
-import { loadCurrentPrincipal } from '../modules/organization/principal'
-import { inactiveAccountMessage } from '../utils/accountStatus'
 
 export const provenanceSchema = z.object({
   version: z.literal(1),
@@ -57,14 +55,28 @@ export async function registerAssessmentExport(input: {
 /** Filenames locate registered metadata; they never confer authority. Unbound
  * pre-migration exports fail closed. The caller must also perform its existing
  * live assignment/Composite authority check before invoking this resolver. */
-export async function resolveAssessmentExport(input: {
+type ResolveAssessmentExportInput = {
   resourceType: ResourceType | 'TRAINING_ANALYSIS'; resourceId: string; actor: ExportActor;
   fileName: string; projectionFingerprint?: string; metadataOnly?: boolean;
-}): Promise<string | null> {
+}
+export async function resolveAssessmentExport(input: ResolveAssessmentExportInput): Promise<string | null> {
   if (path.basename(input.fileName) !== input.fileName) return null
   const artifact = await prisma.exportArtifact.findFirst({ where: {
     resourceType: input.resourceType, resourceId: input.resourceId, storageKey: input.fileName,
   } })
+  return validateAssessmentExport(input, artifact)
+}
+
+/** The HTTP id and its response metadata now refer to the same verified row. */
+export async function resolveAssessmentExportById(input: Omit<ResolveAssessmentExportInput, 'fileName'> & {artifactId:string}) {
+  const artifact = await prisma.exportArtifact.findUnique({where:{id:input.artifactId}})
+  if (!artifact) return null
+  const filePath = await validateAssessmentExport({...input,fileName:artifact.storageKey}, artifact)
+  return filePath ? {artifact,filePath} : null
+}
+
+async function validateAssessmentExport(input: ResolveAssessmentExportInput, artifact: ExportArtifact | null): Promise<string | null> {
+  if (path.basename(input.fileName) !== input.fileName) return null
   if (!artifact || (!input.metadataOnly && artifact.status !== 'READY')
     || !Number.isFinite(artifact.expiresAt.getTime()) || artifact.expiresAt.getTime() <= Date.now()
     || artifact.resourceType !== input.resourceType || artifact.resourceId !== input.resourceId
@@ -76,11 +88,8 @@ export async function resolveAssessmentExport(input: {
     try {
       assertTrainingAnalysisExportIdentity(parsed.data.trainingAnalysis, { courseId: input.resourceId,
         createdBy: input.actor.userId, creatorRole: input.actor.role })
-      const principal = await loadCurrentPrincipal(input.actor.userId)
-      if (!principal || inactiveAccountMessage(principal) || principal.mustChangePassword
-        || principal.role !== input.actor.role) return null
       const { revalidateTrainingAnalysisManifest } = await import('../modules/training-analysis/service')
-      await revalidateTrainingAnalysisManifest({ id: principal.userId, role: parsed.data.creatorRole }, parsed.data.trainingAnalysis.manifest)
+      await revalidateTrainingAnalysisManifest({ id: input.actor.userId, role: parsed.data.creatorRole }, parsed.data.trainingAnalysis.manifest)
       if (input.metadataOnly) return artifact.storageKey
       const filePath = validateStorageKey(artifact.storageKey)
       if ((artifact.format !== 'csv' && artifact.format !== 'zip') || path.extname(filePath) !== `.${artifact.format}`) return null

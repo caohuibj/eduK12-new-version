@@ -5,6 +5,7 @@ import apiClient from '../api/client'
 import { useAuth } from '../contexts/AuthContext'
 import { runApi, type AssignedRunTask } from '../api/runs'
 import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../components/product-ui'
+import { isTrainingHost } from '../training/context'
 
 export interface InboxTask {
   taskId: string; sourceId: string; sourceType: string; title: string; state: string; deadline: string | null
@@ -19,6 +20,7 @@ interface CatalogCard { title: string; launchTarget: string; journey: { resource
 
 export default function MyAssessments() {
   const navigate = useNavigate()
+  const training = isTrainingHost()
   const {user}=useAuth()
   const [catalog, setCatalog] = useState<CatalogCard[]>([])
   const [catalogError, setCatalogError] = useState(false)
@@ -67,7 +69,7 @@ export default function MyAssessments() {
   const groups = new Map<string, InboxTask[]>()
   for (const task of inbox?.list ?? []) { const key = `${task.sourceType}:${task.sourceId}`; groups.set(key, [...(groups.get(key) ?? []), task]) }
   return <ProductPage>
-    <PageHeader title="我的测评" description={`待完成测评：${inbox?.pendingCount ?? '…'}。开始、继续作答和查看自己的报告。`} actions={<ProductButton disabled={busy !== null} onClick={() => { setError(null); void load().catch(err => setError(String(err.message || err))) }}>刷新任务</ProductButton>} />
+    <PageHeader title="我的测评" description={`待完成测评：${inbox?.pendingCount ?? '…'}。${training ? '开始、继续作答，查看测评状态与可用反馈。' : '开始、继续作答和查看自己的报告。'}`} actions={<ProductButton disabled={busy !== null} onClick={() => { setError(null); void load().catch(err => setError(String(err.message || err))) }}>刷新任务</ProductButton>} />
     {error && <ProductStatus kind="error" title="操作未完成">{error}</ProductStatus>}
     {!inbox && !error && <p role="status">正在加载测评…</p>}
     {user?.role !== 'PARENT' && <p className="mb-4"><Link to="/scale-library">选择适合自己的测评</Link></p>}
@@ -83,10 +85,10 @@ export default function MyAssessments() {
           {task.runTask && !['COMPLETED', 'EXPIRED', 'REVOKED', 'CANCELLED'].includes(task.state) && <ProductButton disabled={busy !== null} onClick={() => void start(task)}>{task.state === 'STARTED' || task.runTask.claimState ? '继续作答' : '开始测评'}</ProductButton>}
           {task.launchTarget && <Link to={task.launchTarget}>{task.state === 'IN_PROGRESS' ? '继续作答' : '进入测评'}</Link>}
           {task.summaryTarget && <ProductButton disabled={busy !== null} onClick={() => void readSummary(task)}>查看本次反馈</ProductButton>}
-          {task.reportTarget && <Link to={task.reportTarget}>我的报告</Link>}
+          {task.reportTarget && <Link to={task.reportTarget}>{training && task.sourceType === 'COURSE' ? '查看测评状态/报告' : '我的报告'}</Link>}
         </div>
         {summaries[task.taskId]?.metrics && <div className="space-y-1">{Object.values(summaries[task.taskId].metrics!).map((value,index) => <p key={index}>指标 {index+1}：{value ?? '暂无可用结果'}</p>)}</div>}
-        {task.state === 'SUBMITTED_NOT_SATISFIED' && <p role="status">本次作答已保存并计入次数，可查看本次报告。</p>}
+        {task.state === 'SUBMITTED_NOT_SATISFIED' && <p role="status">{training && task.sourceType === 'COURSE' ? '本次作答已保存并计入次数，可查看测评状态与反馈开放情况。' : '本次作答已保存并计入次数，可查看本次报告。'}</p>}
         {task.state === 'COMPLETED' && <div role="status" className="space-y-1 rounded-lg bg-slate-50 p-3"><p className="font-medium">{task.feedback?.title ?? '你已完成本次测评'}</p><p>{task.feedback?.message ?? '本次作答已保存。可提供的反馈按本测评的说明展示。'}</p></div>}
       </article>)}
     </section>)}</div>

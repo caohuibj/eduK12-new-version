@@ -1,3 +1,5 @@
+import { TrainingCheckpointPanel } from '../../composite/TrainingCheckpointPanel'
+import { situationalCheckpointAnswers, situationalCheckpointUnsupported } from '../training-checkpoint-adapter'
 import { OnlineAnswerField } from '../OnlineAnswerField'
 import { withOnlineRunner, onlineResponses } from '../online'
 import { situationalBasePath } from '../paths'
@@ -142,6 +144,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
   const [currentIndex, setCurrentIndex] = useState(0)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [checkpointBusy, setCheckpointBusy] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [submissionLocked, setSubmissionLocked] = useState(false)
   const [notice, setNotice] = useState<string | null>(null)
@@ -372,7 +375,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
     responseValue: string | number | string[],
     status?: 'ANSWERED' | 'REFUSED' | 'BLANK',
   ): Promise<void> => {
-    if (!data || submitting || submissionLocked) return Promise.resolve()
+    if (!data || checkpointBusy || submitting || submissionLocked) return Promise.resolve()
     const currentData = data
     const key = responseKey(scene.sceneKey, channel.channelKey)
     const answeredAt = new Date().toISOString()
@@ -489,7 +492,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
   }
 
   const submit = async () => {
-    if (!data || !client || submitting || submittingRef.current || saving || pendingSavesRef.current > 0 || mediaBusy) {
+    if (!data || !client || checkpointBusy || submitting || submittingRef.current || saving || pendingSavesRef.current > 0 || mediaBusy) {
       if (pendingSavesRef.current > 0) setNotice('正在保存最新作答，保存完成后再提交。')
       return
     }
@@ -628,7 +631,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
       <button
         type="button"
         onClick={() => setCurrentIndex((index) => Math.max(0, index - 1))}
-        disabled={currentIndex === 0 || saving || submitting}
+        disabled={checkpointBusy || currentIndex === 0 || saving || submitting}
         className="inline-flex min-h-11 items-center justify-center gap-1 rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
       >
         <ChevronLeft className="h-4 w-4" />上一题
@@ -638,7 +641,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
           <button
             type="button"
             onClick={() => setCurrentIndex((index) => Math.min(scenes.length - 1, index + 1))}
-            disabled={saving || submitting || mediaBusy || !currentSceneComplete}
+            disabled={checkpointBusy || saving || submitting || mediaBusy || !currentSceneComplete}
             className="inline-flex min-h-11 items-center justify-center gap-1 rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             下一题<ChevronRight className="h-4 w-4" />
@@ -647,7 +650,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
         <button
           type="button"
           onClick={() => void submit()}
-          disabled={saving || submitting || mediaBusy}
+          disabled={checkpointBusy || saving || submitting || mediaBusy}
           className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <Send className="h-4 w-4" />{submitting ? '提交中…' : submissionLocked ? '重新核对提交' : '提交测评'}
@@ -665,7 +668,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
             key={`${scene.sceneKey}:${index}`}
             type="button"
             onClick={() => setCurrentIndex(index)}
-            disabled={saving || submitting || (Boolean(responseStage) && index > currentIndex)}
+            disabled={checkpointBusy || saving || submitting || (Boolean(responseStage) && index > currentIndex)}
             aria-label={`情境 ${index + 1}${sceneIsComplete(data.instrument.definition, index, responses) ? '，已完成' : '，未完成'}`}
             aria-current={currentIndex === index ? 'step' : undefined}
             className={`min-h-11 min-w-11 rounded-lg px-3 text-sm font-medium transition ${currentIndex === index ? 'bg-indigo-600 text-white' : sceneIsComplete(data.instrument.definition, index, responses) ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
@@ -690,6 +693,19 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
       actions={actions}
       navigation={navigation}
     >
+      {!campus && embedded && data.trainingPersistence?.checkpoint ? situationalCheckpointUnsupported(data)
+        ? <p role="status" className="mb-4 rounded border p-3">此情境任务依赖本机研究阶段记录或视频观看凭据，暂不支持服务器答案草稿恢复。请在原浏览器继续；不会生成或代替这些记录。</p>
+        : <TrainingCheckpointPanel policy={data.trainingPersistence} definitionHash={data.checkpointDefinitionHash} publicMode={publicMode} recoveryToken={recoveryToken} disabled={saving||submitting||submissionLocked} onBusy={setCheckpointBusy} activeSlotKeys={[`situational:${compositeItemId}`]} preserveOtherDrafts
+          getDrafts={async()=>{await saveQueueRef.current;return [{slotKey:`situational:${compositeItemId}`,answers:situationalCheckpointAnswers(data,responsesRef.current)}]}}
+          restore={async rows=>{
+            await saveQueueRef.current;const key=situationalDraftKey(data.attempt.id),meta=await finalDraftStore.get(key)
+            if(meta?.status!=='DRAFT'||meta.sealedSubmission)throw new Error('本机情境作答已封存，不能替换。')
+            const row=rows.find(row=>row.slotKey===`situational:${compositeItemId}`)
+            if(!row)throw new Error('服务器没有当前情境单元草稿，本机内容保持不变。')
+            const next=situationalCheckpointAnswers(data,row.answers)
+            await finalDraftStore.replaceSituationalAnswers(meta,Object.entries(next).map(([itemKey,value])=>({draftKey:key,itemKey,value,updatedAt:Date.now()})))
+            responsesRef.current=next;setResponses(next);setContinuousInputs({});setCurrentIndex(0);setRecoveryState({state:'resumed',message:'已恢复服务器情境答案草稿，尚未正式交卷。'})
+          }}/> : null}
       {notice ? <div role="alert" className="mb-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">{notice}</div> : null}
 
       <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100 sm:p-8" aria-labelledby="situational-scene-content-title">
@@ -706,7 +722,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
             const answer = responseValueFor(responses, currentScene, channel)
             const fieldName = responseKey(currentScene.sceneKey, channel.channelKey)
             return (
-              <fieldset key={fieldName} className="space-y-3" disabled={submitting || mediaBusy || submissionLocked || (channel.online && saving) || Boolean(currentFlowNode?.responseStages?.some(stage => stage.channelKeys.includes(channel.channelKey) && stage.stageKey !== responseStage?.stageKey))}>
+              <fieldset key={fieldName} className="space-y-3" disabled={checkpointBusy || submitting || mediaBusy || submissionLocked || (channel.online && saving) || Boolean(currentFlowNode?.responseStages?.some(stage => stage.channelKeys.includes(channel.channelKey) && stage.stageKey !== responseStage?.stageKey))}>
                 <legend className="text-base font-semibold text-gray-900">{channel.prompt}{channel.required === false ? <span className="ml-2 text-sm font-normal text-gray-500">（可选）</span> : null}</legend>
                 {channel.online && <OnlineAnswerField channel={channel} answer={answer} name={fieldName} onChange={(value,status)=>void persistAnswer(currentScene,channel,value,status)}/>}
                 {!channel.online && channel.responseType === 'SINGLE_CHOICE' && (channel.options ?? []).map((option) => (
@@ -727,7 +743,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
             )
           })}
         </div>
-        {responseStage ? <button type="button" onClick={() => void confirmStage()} disabled={saving || submitting || mediaBusy || submissionLocked} className="mt-6 min-h-11 rounded-lg bg-indigo-600 px-5 py-2 text-white disabled:opacity-50">{responseStage.kind === 'CHOICE' ? '确认行动选择' : '确认本阶段作答'}</button> : null}
+        {responseStage ? <button type="button" onClick={() => void confirmStage()} disabled={checkpointBusy || saving || submitting || mediaBusy || submissionLocked} className="mt-6 min-h-11 rounded-lg bg-indigo-600 px-5 py-2 text-white disabled:opacity-50">{responseStage.kind === 'CHOICE' ? '确认行动选择' : '确认本阶段作答'}</button> : null}
       </section>
     </AssessmentShell>
   )

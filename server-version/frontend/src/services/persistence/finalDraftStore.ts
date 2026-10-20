@@ -35,6 +35,7 @@ export type RejectedFormSubmission = {
 }
 
 const reopenRejectedForm = (meta: FinalDraftMeta, rejection: RejectedFormSubmission): FinalDraftMeta => {
+  assertNotExpired(meta)
   if (rejection.code !== 'FORM_ANSWER_INVALID'
     || !['questionnaire-form-section', 'composite-form-section'].includes(meta.instrument)
     || !['SUBMITTING', 'RETRY_PENDING'].includes(meta.status)
@@ -44,6 +45,28 @@ const reopenRejectedForm = (meta: FinalDraftMeta, rejection: RejectedFormSubmiss
   }
   return { ...meta, status: 'DRAFT', submissionId: rejection.nextSubmissionId, sealedSubmission: undefined,
     errorCode: null, errorMessage: null, updatedAt: Date.now() }
+}
+
+/** Populated only from a verified Training runner response, never browser history.
+ * Local storage is crash/replay protection, not a server anti-tampering boundary. */
+export interface TrainingDraftRetention {
+  schemaVersion: 1
+  attemptId: string
+  attemptEpoch: number
+  sessionId: string
+  sessionEpoch: number
+  snapshotHash: string
+  ttlHours: number
+  lastWriteAt: number
+  expiredAt?: number
+}
+
+export const trainingCognitiveDraftKey = (binding: Pick<TrainingDraftRetention, 'attemptId' | 'attemptEpoch' | 'sessionId' | 'sessionEpoch'>) =>
+  `training:cognitive:${JSON.stringify([binding.attemptId, binding.attemptEpoch, binding.sessionId, binding.sessionEpoch])}`
+
+export class FinalDraftExpiredError extends Error {
+  readonly code = 'FINAL_DRAFT_EXPIRED'
+  constructor() { super('本地草稿已过期，请取得服务器授权的新 attempt 后再开始'); this.name = 'FinalDraftExpiredError' }
 }
 
 export interface FinalDraftMeta {
@@ -64,6 +87,7 @@ export interface FinalDraftMeta {
   updatedAt: number
   /** Survey-only, local retention clock. Never sent as part of the FINAL. */
   surveyRetention?: { schemaVersion: 1; lastWriteAt: number }
+  trainingRetention?: TrainingDraftRetention
   submittedAt?: number | null
   errorCode?: string | null
   errorMessage?: string | null
@@ -230,13 +254,20 @@ const sameIdentity = (left: FinalDraftMeta, right: FinalDraftMeta) => (
   && left.contextSnapshotHash === right.contextSnapshotHash
   && left.instrument === right.instrument
   && left.deliveryMode === right.deliveryMode
+  && serialize(trainingIdentity(left.trainingRetention)) === serialize(trainingIdentity(right.trainingRetention))
 )
 
+const assertNotExpired = (meta: FinalDraftMeta) => {
+  if (meta.trainingRetention?.expiredAt !== undefined) throw new FinalDraftExpiredError()
+}
+
 const assertWritable = (meta: FinalDraftMeta) => {
+  assertNotExpired(meta)
   if (meta.status !== 'DRAFT' || meta.sealedSubmission) throw new FinalDraftNotWritableError(meta.status)
 }
 
 const assertStatusTransition = (meta: FinalDraftMeta, nextStatus: FinalDraftStatus) => {
+  assertNotExpired(meta)
   if (nextStatus === 'DRAFT' && meta.sealedSubmission) throw new FinalDraftNotWritableError(meta.status)
   // SUBMITTING without a seal is retained only as a compatibility representation
   // for pre-FE-03A clients. New submission paths enter SUBMITTING exclusively via
@@ -252,6 +283,38 @@ const assertStatusTransition = (meta: FinalDraftMeta, nextStatus: FinalDraftStat
 const sortedAnswers = (answers: FinalDraftAnswer[]) => answers.sort((a, b) => a.itemKey.localeCompare(b.itemKey))
 const sortedTrials = (trials: FinalDraftTrial[]) => trials.sort((a, b) => a.trialIndex - b.trialIndex)
 
+const trainingIdentity = (binding?: TrainingDraftRetention) => binding
+  ? { ...binding, lastWriteAt: undefined, expiredAt: undefined } : undefined
+const hasTrainingRetention = (meta: FinalDraftMeta) => {
+  const b = meta.trainingRetention
+  return !!b && b.schemaVersion === 1 && meta.instrument === 'cognitive'
+    && meta.surveyRetention === undefined && meta.deliveryMode === 'final_only'
+    && typeof b.attemptId === 'string' && b.attemptId.length > 0
+    && typeof b.sessionId === 'string' && b.sessionId.length > 0
+    && typeof b.snapshotHash === 'string' && b.snapshotHash.length > 0
+    && Number.isSafeInteger(b.attemptEpoch) && b.attemptEpoch >= 1
+    && Number.isSafeInteger(b.sessionEpoch) && b.sessionEpoch >= 1
+    && Number.isInteger(b.ttlHours) && b.ttlHours >= 1 && b.ttlHours <= 48
+    && meta.attemptId === b.sessionId && meta.attemptEpoch === b.sessionEpoch
+    && meta.draftKey === trainingCognitiveDraftKey(b)
+}
+const trainingExpired = (meta: FinalDraftMeta, now: number) => {
+  if (!hasTrainingRetention(meta) || meta.status !== 'DRAFT' || meta.sealedSubmission) return false
+  const b = meta.trainingRetention!
+  return b.expiredAt === undefined && Number.isFinite(now) && now > 0
+    && Number.isFinite(b.lastWriteAt) && b.lastWriteAt > 0 && b.lastWriteAt <= now
+    && now - b.lastWriteAt > b.ttlHours * 3600000
+}
+const trainingTombstone = (meta: FinalDraftMeta, now: number): FinalDraftMeta => ({
+  draftKey: meta.draftKey, instrument: meta.instrument, attemptId: meta.attemptId,
+  attemptEpoch: meta.attemptEpoch, definitionHash: meta.definitionHash,
+  instrumentKey: meta.instrumentKey, instrumentVersion: meta.instrumentVersion,
+  compiledRuntimeHash: meta.compiledRuntimeHash, contextSnapshotHash: meta.contextSnapshotHash,
+  deliveryMode: meta.deliveryMode, submissionId: meta.submissionId,
+  status: 'DRAFT', createdAt: meta.createdAt, updatedAt: now,
+  trainingRetention: { ...meta.trainingRetention!, expiredAt: now },
+})
+
 export const SURVEY_COGNITIVE_DRAFT_TTL_MS = 7 * 24 * 60 * 60 * 1000
 const SURVEY_SCAN_LIMIT = 100
 export type SurveyCognitiveDraftPage = { sessionIds: string[]; nextCursor: string | null }
@@ -261,20 +324,22 @@ const isCognitiveDraft = (meta: FinalDraftMeta) => meta.instrument === 'cognitiv
   && meta.draftKey === `cognitive:${meta.attemptId}`
 const hasSurveyRetention = (meta: FinalDraftMeta) => isCognitiveDraft(meta)
   && meta.surveyRetention?.schemaVersion === 1
-const stampSurveyWrite = (meta: FinalDraftMeta): FinalDraftMeta => hasSurveyRetention(meta)
+const stampRetentionWrite = (meta: FinalDraftMeta): FinalDraftMeta => hasTrainingRetention(meta)
+  && meta.status === 'DRAFT' && !meta.sealedSubmission && meta.trainingRetention!.expiredAt === undefined
+  ? { ...meta, trainingRetention: { ...meta.trainingRetention!, lastWriteAt: Date.now() } } : hasSurveyRetention(meta)
   && meta.status === 'DRAFT' && !meta.sealedSubmission
   ? { ...meta, surveyRetention: { schemaVersion: 1, lastWriteAt: Date.now() } } : meta
 const withExistingRetention = (next: FinalDraftMeta, existing?: FinalDraftMeta) => existing
-  ? { ...next, surveyRetention: existing.surveyRetention } : next
+  ? { ...next, surveyRetention: existing.surveyRetention, trainingRetention: existing.trainingRetention } : next
 const sameDraftContent = (left: FinalDraftMeta, right: FinalDraftMeta) => {
-  const content = (meta: FinalDraftMeta) => ({ ...meta, updatedAt: undefined, surveyRetention: undefined })
+  const content = (meta: FinalDraftMeta) => ({ ...meta, updatedAt: undefined, surveyRetention: undefined, trainingRetention: trainingIdentity(meta.trainingRetention) })
   return serialize(content(left)) === serialize(content(right))
 }
-const stampChangedSurveyWrite = (current: FinalDraftMeta | undefined, next: FinalDraftMeta) => {
+const stampChangedRetentionWrite = (current: FinalDraftMeta | undefined, next: FinalDraftMeta) => {
   // Never serialize other products or a potentially large immutable FINAL just
   // to maintain Survey's small, writable-draft clock.
-  if (!hasSurveyRetention(next) || next.status !== 'DRAFT' || next.sealedSubmission) return next
-  return current && sameDraftContent(current, next) ? next : stampSurveyWrite(next)
+  if ((!hasSurveyRetention(next) && !hasTrainingRetention(next)) || next.status !== 'DRAFT' || next.sealedSubmission) return next
+  return current && sameDraftContent(current, next) ? next : stampRetentionWrite(next)
 }
 // Only explicit Survey ownership may migrate a legacy record. Its old meta/trial
 // timestamps predate this write-clock contract, so never infer its age from them.
@@ -287,7 +352,32 @@ const surveyExpiry = (meta: FinalDraftMeta, legacySurvey: boolean, now: number):
   return now - lastWriteAt > SURVEY_COGNITIVE_DRAFT_TTL_MS ? 'delete' : 'keep'
 }
 
+const prepareAnswerReplacement = (expected: FinalDraftMeta, answers: FinalDraftAnswer[], metadata?: Record<string, unknown>) => {
+  if (expected.instrument === 'cognitive') throw new FinalDraftStorageError('认知试次不支持答案集合恢复')
+  const keys = new Set<string>()
+  for (const answer of answers) {
+    if (answer.draftKey !== expected.draftKey || !answer.itemKey || keys.has(answer.itemKey)) {
+      throw new FinalDraftStorageError('恢复答案的草稿身份或题目键无效')
+    }
+    keys.add(answer.itemKey)
+  }
+  // Clone every input before opening the mutation boundary. A clone failure
+  // must not leave new-only answer keys or half-updated timing metadata.
+  return { expected: cloneValue(expected), answers: answers.map(cloneValue), metadata: metadata === undefined ? undefined : cloneValue(metadata) }
+}
+
+const assertReplacementIdentity = (current: FinalDraftMeta, expected: FinalDraftMeta) => {
+  assertWritable(current)
+  if (!sameIdentity(current, expected) || current.submissionId !== expected.submissionId) throw new FinalDraftIdentityConflictError(current)
+}
+const replacementMeta = (current: FinalDraftMeta, metadata?: Record<string, unknown>): FinalDraftMeta => ({
+  ...current, updatedAt: Date.now(),
+  ...(metadata === undefined ? {} : { instrumentMetadata: { ...current.instrumentMetadata, ...metadata } }),
+})
+
 export interface FinalDraftStore {
+  listTrainingCognitiveDrafts(after?: string | null): Promise<{ draftKeys: string[]; nextCursor: string | null }>
+  expireTrainingCognitiveDraft(draftKey: string, now: number): Promise<boolean>
   listSurveyCognitiveDrafts(legacySessionIds: string[], after?: string | null): Promise<SurveyCognitiveDraftPage>
   expireSurveyCognitiveDraft(sessionId: string, legacySurvey: boolean, now: number): Promise<boolean>
   get(draftKey: string): Promise<FinalDraftMeta | null>
@@ -295,6 +385,10 @@ export interface FinalDraftStore {
   update(meta: FinalDraftMeta): Promise<FinalDraftMeta>
   setInstrumentMetadata(draftKey: string, metadata: Record<string, unknown>): Promise<FinalDraftMeta | null>
   putAnswer(answer: FinalDraftAnswer): Promise<void>
+  /** Replaces the complete answer set and optional timing metadata for one draft
+   * in a single commit. Whole questionnaires must include every unit in this key. */
+  replaceAnswers(expected: FinalDraftMeta, answers: FinalDraftAnswer[], metadata?: Record<string, unknown>): Promise<void>
+  replaceSituationalAnswers(expected: FinalDraftMeta, answers: FinalDraftAnswer[]): Promise<void>
   listAnswers(draftKey: string): Promise<FinalDraftAnswer[]>
   deleteAnswers(draftKey: string, itemKeys: string[]): Promise<void>
   putTrial(trial: FinalDraftTrial): Promise<void>
@@ -311,7 +405,26 @@ class MemoryFinalDraftStore implements FinalDraftStore {
   private readonly answers = new Map<string, FinalDraftAnswer>()
   private readonly trials = new Map<string, FinalDraftTrial>()
 
-  async get(draftKey: string) { return this.metas.get(draftKey) ?? null }
+  async get(draftKey: string) {
+    const meta = this.metas.get(draftKey)
+    return meta?.trainingRetention ? cloneValue(meta) : meta ?? null
+  }
+
+  async listTrainingCognitiveDrafts(after?: string | null) {
+    const page = [...this.metas.values()].filter(meta => meta.draftKey.startsWith('training:cognitive:') && (!after || meta.draftKey > after))
+      .sort((a, b) => a.draftKey < b.draftKey ? -1 : a.draftKey > b.draftKey ? 1 : 0).slice(0, 100)
+    return { draftKeys: page.filter(meta => hasTrainingRetention(meta) && meta.trainingRetention!.expiredAt === undefined).map(meta => meta.draftKey),
+      nextCursor: page.length === 100 ? page[99].draftKey : null }
+  }
+
+  async expireTrainingCognitiveDraft(draftKey: string, now: number) {
+    const meta = this.metas.get(draftKey)
+    if (!meta || !trainingExpired(meta, now)) return false
+    for (const [key, answer] of this.answers) if (answer.draftKey === draftKey) this.answers.delete(key)
+    for (const [key, trial] of this.trials) if (trial.draftKey === draftKey) this.trials.delete(key)
+    this.metas.set(draftKey, trainingTombstone(meta, now))
+    return true
+  }
 
   async listSurveyCognitiveDrafts(legacySessionIds: string[], after?: string | null) {
     const legacy = new Set(legacySessionIds)
@@ -343,28 +456,30 @@ class MemoryFinalDraftStore implements FinalDraftStore {
 
   async ensure(meta: FinalDraftMeta) {
     const existing = this.metas.get(meta.draftKey)
+    if (existing) assertNotExpired(existing)
     if (existing && !sameIdentity(existing, meta)) throw new FinalDraftIdentityConflictError(existing)
     if (existing) {
       if (hasSurveyRetention(meta) && existing.surveyRetention === undefined && existing.status === 'DRAFT' && !existing.sealedSubmission) {
-        const migrated = stampSurveyWrite({ ...existing, surveyRetention: meta.surveyRetention })
+        const migrated = stampRetentionWrite({ ...existing, surveyRetention: meta.surveyRetention })
         this.metas.set(meta.draftKey, migrated)
         return migrated
       }
-      return existing
+      return existing.trainingRetention ? cloneValue(existing) : existing
     }
-    const next = stampSurveyWrite(cloneValue(meta))
+    const next = stampRetentionWrite(cloneValue(meta))
     this.metas.set(meta.draftKey, next)
-    return next
+    return next.trainingRetention ? cloneValue(next) : next
   }
 
   async update(meta: FinalDraftMeta) {
     const existing = this.metas.get(meta.draftKey)
+    if (existing) assertNotExpired(existing)
     if (existing && !sameIdentity(existing, meta)) throw new FinalDraftIdentityConflictError(existing)
     if (existing) assertWritable(existing)
     const candidate = withExistingRetention(cloneValue(meta), existing)
-    const next = stampChangedSurveyWrite(existing, candidate)
+    const next = stampChangedRetentionWrite(existing, candidate)
     this.metas.set(meta.draftKey, next)
-    return next
+    return next.trainingRetention ? cloneValue(next) : next
   }
 
   async setInstrumentMetadata(draftKey: string, metadata: Record<string, unknown>) {
@@ -376,9 +491,9 @@ class MemoryFinalDraftStore implements FinalDraftStore {
       instrumentMetadata: { ...(current.instrumentMetadata ?? {}), ...cloneValue(metadata) },
       updatedAt: Date.now(),
     }
-    const written = stampChangedSurveyWrite(current, next)
+    const written = stampChangedRetentionWrite(current, next)
     this.metas.set(draftKey, written)
-    return written
+    return written.trainingRetention ? cloneValue(written) : written
   }
 
   async putAnswer(answer: FinalDraftAnswer) {
@@ -388,7 +503,24 @@ class MemoryFinalDraftStore implements FinalDraftStore {
     const key = `${answer.draftKey}:${answer.itemKey}`
     const previous = this.answers.get(key)
     this.answers.set(key, cloneValue(answer))
-    if (hasSurveyRetention(meta) && (!previous || serialize(previous.value) !== serialize(answer.value))) this.metas.set(meta.draftKey, stampSurveyWrite(meta))
+    if ((hasSurveyRetention(meta) || hasTrainingRetention(meta)) && (!previous || serialize(previous.value) !== serialize(answer.value))) this.metas.set(meta.draftKey, stampRetentionWrite(meta))
+  }
+
+  async replaceAnswers(expected: FinalDraftMeta, answers: FinalDraftAnswer[], metadata?: Record<string, unknown>) {
+    const replacement = prepareAnswerReplacement(expected, answers, metadata)
+    const current = this.metas.get(replacement.expected.draftKey)
+    if (!current) throw new FinalDraftStorageError('本地测评草稿不存在')
+    assertReplacementIdentity(current, replacement.expected)
+    const next = replacementMeta(current, replacement.metadata)
+    // All validation/cloning precedes this synchronous, non-yielding commit.
+    for (const [key, answer] of this.answers) if (answer.draftKey === current.draftKey) this.answers.delete(key)
+    for (const answer of replacement.answers) this.answers.set(`${answer.draftKey}:${answer.itemKey}`, answer)
+    this.metas.set(current.draftKey, next)
+  }
+
+  async replaceSituationalAnswers(expected: FinalDraftMeta, answers: FinalDraftAnswer[]) {
+    if (expected.instrument !== 'situational') throw new FinalDraftStorageError('只有情境草稿支持情境答案恢复')
+    await this.replaceAnswers(expected, answers)
   }
 
   async listAnswers(draftKey: string) {
@@ -401,7 +533,7 @@ class MemoryFinalDraftStore implements FinalDraftStore {
     assertWritable(meta)
     let changed = false
     for (const itemKey of new Set(itemKeys)) changed = this.answers.delete(`${draftKey}:${itemKey}`) || changed
-    if (changed) this.metas.set(draftKey, stampSurveyWrite(meta))
+    if (changed) this.metas.set(draftKey, stampRetentionWrite(meta))
   }
 
   async putTrial(trial: FinalDraftTrial) {
@@ -413,7 +545,7 @@ class MemoryFinalDraftStore implements FinalDraftStore {
     if (existing && serialize(existing.payload) !== serialize(trial.payload)) throw new FinalDraftTrialConflictError(trial.trialIndex)
     if (!existing) {
       this.trials.set(key, cloneValue(trial))
-      this.metas.set(meta.draftKey, stampSurveyWrite(meta))
+      this.metas.set(meta.draftKey, stampRetentionWrite(meta))
     }
   }
 
@@ -426,9 +558,9 @@ class MemoryFinalDraftStore implements FinalDraftStore {
     if (!current) return null
     assertStatusTransition(current, status)
     const next = { ...current, status, updatedAt: Date.now(), errorCode: error?.code ?? null, errorMessage: error?.message ?? null }
-    const written = stampChangedSurveyWrite(current, next)
+    const written = stampChangedRetentionWrite(current, next)
     this.metas.set(draftKey, written)
-    return written
+    return written.trainingRetention ? cloneValue(written) : written
   }
 
   async snapshot(draftKey: string) {
@@ -444,6 +576,7 @@ class MemoryFinalDraftStore implements FinalDraftStore {
   async sealForSubmission<T>(draftKey: string, buildPayload: (snapshot: FinalDraftSnapshot) => T) {
     const current = this.metas.get(draftKey)
     if (!current) return null
+    assertNotExpired(current)
     if (current.sealedSubmission) {
       return { meta: cloneValue(current), payload: cloneValue(current.sealedSubmission.payload as T) }
     }
@@ -468,6 +601,7 @@ class MemoryFinalDraftStore implements FinalDraftStore {
   }
 
   async delete(draftKey: string) {
+    if (this.metas.get(draftKey)?.trainingRetention?.expiredAt !== undefined) return
     this.metas.delete(draftKey)
     for (const key of [...this.answers.keys()]) if (key.startsWith(`${draftKey}:`)) this.answers.delete(key)
     for (const key of [...this.trials.keys()]) if (key.startsWith(`${draftKey}:`)) this.trials.delete(key)
@@ -497,12 +631,14 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
         await done
         return result
       } catch (error) {
+        try { transaction.abort() } catch { /* Already completed/aborted. */ }
         await done.catch(() => undefined)
         throw error
       }
     } catch (error) {
       if (
-        error instanceof FinalDraftIdentityConflictError
+        error instanceof FinalDraftExpiredError
+        || error instanceof FinalDraftIdentityConflictError
         || error instanceof FinalDraftTrialConflictError
         || error instanceof FinalDraftNotWritableError
         || error instanceof FinalDraftPendingWithoutSealError
@@ -517,6 +653,49 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
     return this.run<FinalDraftMeta | null>([META_STORE], 'readonly', async (transaction) => (
       (await requestResult<FinalDraftMeta | undefined>(transaction.objectStore(META_STORE).get(draftKey))) ?? null
     ))
+  }
+
+  async listTrainingCognitiveDrafts(after?: string | null) {
+    return this.run<{ draftKeys: string[]; nextCursor: string | null }>([META_STORE], 'readonly', transaction => new Promise((resolve, reject) => {
+      const prefix = 'training:cognitive:'
+      const lower = after?.startsWith(prefix) ? after : prefix
+      const request = transaction.objectStore(META_STORE).openCursor(IDBKeyRange.bound(lower, `${prefix}\uffff`, lower !== prefix, false))
+      const draftKeys: string[] = []
+      let visited = 0
+      request.onerror = () => reject(request.error)
+      request.onsuccess = () => {
+        const cursor = request.result
+        if (!cursor) { resolve({ draftKeys, nextCursor: null }); return }
+        const meta = cursor.value as FinalDraftMeta
+        if (hasTrainingRetention(meta) && meta.trainingRetention!.expiredAt === undefined) draftKeys.push(meta.draftKey)
+        if (++visited >= 100) { resolve({ draftKeys, nextCursor: String(cursor.key) }); return }
+        cursor.continue()
+      }
+    }))
+  }
+
+  async expireTrainingCognitiveDraft(draftKey: string, now: number) {
+    return this.run<boolean>([META_STORE, ANSWER_STORE, TRIAL_STORE], 'readwrite', async transaction => {
+      const store = transaction.objectStore(META_STORE)
+      const meta = await requestResult<FinalDraftMeta | undefined>(store.get(draftKey))
+      if (!meta || !trainingExpired(meta, now)) return false
+      // Same transaction scope as writes and sealing; discovery is never authoritative.
+      // Key cursors avoid materializing answer/trial payloads during cleanup.
+      for (const name of [ANSWER_STORE, TRIAL_STORE]) {
+        await new Promise<void>((resolve, reject) => {
+          const request = transaction.objectStore(name).index(DRAFT_INDEX).openKeyCursor(IDBKeyRange.only(draftKey))
+          request.onerror = () => reject(request.error)
+          request.onsuccess = () => {
+            const cursor = request.result
+            if (!cursor) { resolve(); return }
+            transaction.objectStore(name).delete(cursor.primaryKey)
+            cursor.continue()
+          }
+        })
+      }
+      store.put(trainingTombstone(meta, now))
+      return true
+    })
   }
 
   async listSurveyCognitiveDrafts(legacySessionIds: string[], after?: string | null) {
@@ -574,16 +753,17 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
     return this.run<FinalDraftMeta>([META_STORE], 'readwrite', async (transaction) => {
       const store = transaction.objectStore(META_STORE)
       const existing = await requestResult<FinalDraftMeta | undefined>(store.get(meta.draftKey))
+      if (existing) assertNotExpired(existing)
       if (existing && !sameIdentity(existing, meta)) throw new FinalDraftIdentityConflictError(existing)
       if (existing) {
         if (hasSurveyRetention(meta) && existing.surveyRetention === undefined && existing.status === 'DRAFT' && !existing.sealedSubmission) {
-          const migrated = stampSurveyWrite({ ...existing, surveyRetention: meta.surveyRetention })
+          const migrated = stampRetentionWrite({ ...existing, surveyRetention: meta.surveyRetention })
           store.put(migrated)
           return migrated
         }
         return existing
       }
-      const next = stampSurveyWrite(cloneValue(meta))
+      const next = stampRetentionWrite(cloneValue(meta))
       store.put(next)
       return next
     })
@@ -593,10 +773,11 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
     return this.run<FinalDraftMeta>([META_STORE], 'readwrite', async (transaction) => {
       const store = transaction.objectStore(META_STORE)
       const existing = await requestResult<FinalDraftMeta | undefined>(store.get(meta.draftKey))
+      if (existing) assertNotExpired(existing)
       if (existing && !sameIdentity(existing, meta)) throw new FinalDraftIdentityConflictError(existing)
       if (existing) assertWritable(existing)
       const candidate = withExistingRetention(cloneValue(meta), existing)
-      const next = stampChangedSurveyWrite(existing, candidate)
+      const next = stampChangedRetentionWrite(existing, candidate)
       store.put(next)
       return next
     })
@@ -613,7 +794,7 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
         instrumentMetadata: { ...(current.instrumentMetadata ?? {}), ...cloneValue(metadata) },
         updatedAt: Date.now(),
       }
-      const written = stampChangedSurveyWrite(current, next)
+      const written = stampChangedRetentionWrite(current, next)
       store.put(written)
       return written
     })
@@ -625,11 +806,34 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
       if (!meta) throw new FinalDraftStorageError('本地测评草稿不存在')
       assertWritable(meta)
       const store = transaction.objectStore(ANSWER_STORE)
-      const previous = hasSurveyRetention(meta)
+      const previous = (hasSurveyRetention(meta) || hasTrainingRetention(meta))
         ? await requestResult<FinalDraftAnswer | undefined>(store.get([answer.draftKey, answer.itemKey])) : undefined
       store.put(cloneValue(answer))
-      if (hasSurveyRetention(meta) && (!previous || serialize(previous.value) !== serialize(answer.value))) transaction.objectStore(META_STORE).put(stampSurveyWrite(meta))
+      if ((hasSurveyRetention(meta) || hasTrainingRetention(meta)) && (!previous || serialize(previous.value) !== serialize(answer.value))) transaction.objectStore(META_STORE).put(stampRetentionWrite(meta))
     })
+  }
+
+  async replaceAnswers(expected: FinalDraftMeta, answers: FinalDraftAnswer[], metadata?: Record<string, unknown>) {
+    const replacement = prepareAnswerReplacement(expected, answers, metadata)
+    await this.run<void>([META_STORE, ANSWER_STORE], 'readwrite', async transaction => {
+      const metaStore = transaction.objectStore(META_STORE)
+      const current = await requestResult<FinalDraftMeta | undefined>(metaStore.get(replacement.expected.draftKey))
+      if (!current) throw new FinalDraftStorageError('本地测评草稿不存在')
+      // Re-read the full frozen identity and seal inside the same write
+      // transaction, so another tab cannot seal a partially restored answer set.
+      assertReplacementIdentity(current, replacement.expected)
+      const store = transaction.objectStore(ANSWER_STORE)
+      const keys = await requestResult<IDBValidKey[]>(store.index(DRAFT_INDEX).getAllKeys(current.draftKey))
+      for (const key of keys) store.delete(key)
+      for (const answer of replacement.answers) store.put(answer)
+      metaStore.put(replacementMeta(current, replacement.metadata))
+      // run() resolves only on transaction commit; failure aborts answers AND timing.
+    })
+  }
+
+  async replaceSituationalAnswers(expected: FinalDraftMeta, answers: FinalDraftAnswer[]) {
+    if (expected.instrument !== 'situational') throw new FinalDraftStorageError('只有情境草稿支持情境答案恢复')
+    await this.replaceAnswers(expected, answers)
   }
 
   async listAnswers(draftKey: string) {
@@ -639,7 +843,6 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
   }
 
   async deleteAnswers(draftKey: string, itemKeys: string[]) {
-    if (itemKeys.length === 0) return
     await this.run<void>([META_STORE, ANSWER_STORE], 'readwrite', async (transaction) => {
       const meta = await requestResult<FinalDraftMeta | undefined>(transaction.objectStore(META_STORE).get(draftKey))
       if (!meta) throw new FinalDraftStorageError('本地测评草稿不存在')
@@ -648,10 +851,10 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
       let changed = false
       for (const itemKey of new Set(itemKeys)) {
         const key = [draftKey, itemKey]
-        if (!hasSurveyRetention(meta)) store.delete(key)
+        if (!hasSurveyRetention(meta) && !hasTrainingRetention(meta)) store.delete(key)
         else if (await requestResult<FinalDraftAnswer | undefined>(store.get(key))) { store.delete(key); changed = true }
       }
-      if (changed) transaction.objectStore(META_STORE).put(stampSurveyWrite(meta))
+      if (changed) transaction.objectStore(META_STORE).put(stampRetentionWrite(meta))
     })
   }
 
@@ -666,7 +869,7 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
       if (existing && serialize(existing.payload) !== serialize(trial.payload)) throw new FinalDraftTrialConflictError(trial.trialIndex)
       if (!existing) {
         store.put(cloneValue(trial))
-        if (hasSurveyRetention(meta)) transaction.objectStore(META_STORE).put(stampSurveyWrite(meta))
+        if (hasSurveyRetention(meta) || hasTrainingRetention(meta)) transaction.objectStore(META_STORE).put(stampRetentionWrite(meta))
       }
     })
   }
@@ -684,7 +887,7 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
       if (!current) return null
       assertStatusTransition(current, status)
       const next = { ...current, status, updatedAt: Date.now(), errorCode: error?.code ?? null, errorMessage: error?.message ?? null }
-      const written = stampChangedSurveyWrite(current, next)
+      const written = stampChangedRetentionWrite(current, next)
       store.put(written)
       return written
     })
@@ -705,6 +908,7 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
       const metaStore = transaction.objectStore(META_STORE)
       const current = await requestResult<FinalDraftMeta | undefined>(metaStore.get(draftKey))
       if (!current) return null
+      assertNotExpired(current)
       if (current.sealedSubmission) {
         return { meta: current, payload: cloneValue(current.sealedSubmission.payload as T) }
       }
@@ -728,6 +932,8 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
 
   async delete(draftKey: string) {
     await this.run<void>([META_STORE, ANSWER_STORE, TRIAL_STORE], 'readwrite', async (transaction) => {
+      const meta = await requestResult<FinalDraftMeta | undefined>(transaction.objectStore(META_STORE).get(draftKey))
+      if (meta?.trainingRetention?.expiredAt !== undefined) return
       transaction.objectStore(META_STORE).delete(draftKey)
       for (const answer of await requestResult<FinalDraftAnswer[]>(transaction.objectStore(ANSWER_STORE).index(DRAFT_INDEX).getAll(draftKey))) {
         transaction.objectStore(ANSWER_STORE).delete([answer.draftKey, answer.itemKey])

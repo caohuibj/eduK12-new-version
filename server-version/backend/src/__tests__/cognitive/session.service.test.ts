@@ -31,6 +31,7 @@ vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 import {
   createSession,
   getSession,
+  getPublicSession,
   restartSession,
 } from '../../modules/cognitive/session.service'
 import { decryptCognitivePayload, encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
@@ -387,4 +388,45 @@ describe('restartSession', () => {
     mockPrisma.cognitiveSession.findUnique.mockResolvedValue(sessionRow({ status: 'COMPLETED' }))
     await expect(restartSession('student-1', 'session-1')).rejects.toMatchObject({ statusCode: 400 })
   })
+})
+
+describe('C23 single admission decode', () => {
+  it('uses delivery admission directly for an active unified session', async () => {
+    const admission = await import('../../modules/cognitive/cognitive-admission.service')
+    const stored = vi.spyOn(admission, 'loadStoredCognitiveAdmission').mockResolvedValue({ attemptEpoch: 4 } as any)
+    const ensure = vi.spyOn(admission, 'ensureCognitiveAdmissionAtDelivery').mockResolvedValue({ attemptEpoch: 4 } as any)
+    try {
+      mockPrisma.cognitiveSession.findUnique.mockResolvedValue(sessionRow({ runtimeGeneration: 'UNIFIED_V1', frozenAdmissionSnapshotEncrypted: 'fixture', frozenAdmissionSnapshotHash: 'known' }))
+      const result = await getSession('student-1', 'session-1')
+      expect(result.sessionEpoch).toBe(4)
+      expect(ensure).toHaveBeenCalledTimes(1)
+      expect(stored).not.toHaveBeenCalled()
+    } finally { stored.mockRestore(); ensure.mockRestore() }
+  })
+  it('loads terminal admission once without activating it again', async () => {
+    const admission = await import('../../modules/cognitive/cognitive-admission.service')
+    const stored = vi.spyOn(admission, 'loadStoredCognitiveAdmission').mockResolvedValue({ attemptEpoch: 4 } as any)
+    const ensure = vi.spyOn(admission, 'ensureCognitiveAdmissionAtDelivery').mockResolvedValue({ attemptEpoch: 4 } as any)
+    try {
+      mockPrisma.cognitiveSession.findUnique.mockResolvedValue(sessionRow({ status: 'COMPLETED', runtimeGeneration: 'UNIFIED_V1', frozenAdmissionSnapshotEncrypted: 'fixture', frozenAdmissionSnapshotHash: 'known' }))
+      const result = await getSession('student-1', 'session-1')
+      expect(result.sessionEpoch).toBe(4)
+      expect(stored).toHaveBeenCalledTimes(1)
+      expect(ensure).not.toHaveBeenCalled()
+    } finally { stored.mockRestore(); ensure.mockRestore() }
+  })
+})
+
+describe('completed session config reuse',()=>{
+ it.each(['owner','public'])('decodes the same frozen config once for %s payload and result selection',async kind=>{
+  const crypto=await import('../../modules/cognitive/cognitive.security')
+  const read=vi.spyOn(crypto,'decryptCognitivePayload')
+  try {
+    const row=sessionRow({status:'COMPLETED',...(kind==='public'?{userId:null,recoveryTokenHash:'token'}:{})})
+    mockPrisma.cognitiveSession.findUnique.mockResolvedValue(row)
+    const result=kind==='public'?await getPublicSession('token','session-1'):await getSession('student-1','session-1')
+    expect(read.mock.calls.filter(([cipher])=>cipher===row.configSnapshotEncrypted)).toHaveLength(1)
+    expect(result).not.toHaveProperty('storedConfig');expect(result).not.toHaveProperty('snapshot')
+  }finally{read.mockRestore()}
+ })
 })

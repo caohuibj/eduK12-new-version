@@ -250,6 +250,9 @@ export interface CanonicalSituationalResult {
 }
 
 export interface SituationalAttemptResponse {
+  trainingPersistence?: import('../composite/training-checkpoint').TrainingPersistence
+  checkpointDefinitionHash?: string
+
   feedbackDeferred?: boolean
   attemptId: string
   attempt: SituationalAttempt

@@ -9,7 +9,7 @@ import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {createPublicTemplateStore, type PublicTemplateRow} from '../../modules/assessment-runtime/public-templates'
 import {prepareCompactScaleFacts, decodeScaleFacts, isScaleReportFactsView} from '../../modules/assessment-runtime/compact-scale-facts'
 import {preloadCompositeReportFacts} from '../../modules/composite/composite-report-read-batch'
-import {makeCanonicalFactsReference} from '../../modules/assessment-runtime/compact-assessment-storage'
+import {makeCanonicalFactsReference, createStoredScaleFactsReader, preloadStoredScaleResults, resolveStoredScaleResult, loadStoredCanonicalUnitResults} from '../../modules/assessment-runtime/compact-assessment-storage'
 import {createFrozenActiveSlotSet, encryptFrozenActiveSlotSet} from '../../modules/assessment-runtime/slot-set'
 import {mapCompositeSection} from '../../modules/assessment-runtime/form-section-definition'
 import {encryptUnifiedRuntimePayload} from '../../modules/assessment-runtime/security'
@@ -212,7 +212,7 @@ describe('authorized Training numeric source adapter', () => {
     const after = await loadTrainingAnalysisSources(f.db, actor, f.selector)
     expect(after.sourceFingerprint).toBe(before.sourceFingerprint)
     expect(after.manifest.attempts[0].sourceHash).toBe(before.manifest.attempts[0].sourceHash)
-    expect(f.db.$queryRaw.mock.calls.filter(([parts]: any) => parts.join('').includes('assessment_result_facts'))).toHaveLength(2)
+    expect(f.db.$queryRaw.mock.calls.filter(([parts]: any) => parts.join('').includes('assessment_result_facts'))).toHaveLength(1)
     expect(globalRead).not.toHaveBeenCalled()
   })
   it.each(['child', 'epoch', 'slot', 'unit', 'missing-item', 'legacy-submission'])('rejects a canonical reference with the wrong %s before referenced facts are read', async mode => {
@@ -484,4 +484,77 @@ it('material arms retain hand-calculated means 4 versus 5 instead of a pooled 4.
   expect(valuesB.reduce((sum, value) => sum + value, 0) / valuesB.length).toBe(5)
   expect(a.sourceFingerprint).not.toBe(b.sourceFingerprint)
   expect(f.db).not.toHaveProperty('trainingMaterialAllocationClaim')
+})
+
+describe('single locked Training authority',()=>{
+ const locked=()=>({id:'teacher',role:'TEACHER',isActive:true,isFrozen:false,expiresAt:null,teacherApproved:true,accountDomain:'TRAINING',mustChangePassword:false,tokenVersion:0,
+  courseId:'course',creatorId:'teacher',courseType:'TRAINING_COURSE',isLibrary:false})
+ it.each(['SHARE','UPDATE'] as const)('reuses actual locked principal/course fields in %s and preserves the authority fingerprint',async authorityLock=>{
+  const before=fixture(),expected=await loadTrainingAnalysisSources(before.db,actor,request())
+  const f=fixture();f.db.$queryRaw.mockImplementation(async(parts:TemplateStringsArray)=>parts.join('').includes('FROM courses c JOIN users')?[locked()]:[])
+  const actual=await loadTrainingAnalysisSources(f.db,actor,request(),{authorityLock})
+  expect(actual.authorityHash).toBe(expected.authorityHash)
+  expect(f.db.user.findFirst).not.toHaveBeenCalled();expect(f.db.course.findFirst).not.toHaveBeenCalled()
+  const calls=f.db.$queryRaw.mock.calls.filter(([parts]:any)=>parts.join('').includes('FROM courses c JOIN users'))
+  expect(calls).toHaveLength(1)
+  expect(calls[0][0].join('')).toContain('u.account_domain')
+  expect(calls[0].some((arg:any)=>arg?.sql?.includes(authorityLock==='UPDATE'?'FOR UPDATE OF c FOR SHARE OF u':'FOR SHARE OF c,u'))).toBe(true)
+  expect(f.db.relationalAssessmentAssignment.findMany).toHaveBeenCalledOnce()
+ })
+ it.each(['mustChangePassword','teacherApproved'])('still denies the additional %s policy before task/fact reads',async field=>{
+  const f=fixture();f.db.$queryRaw.mockResolvedValue([{...locked(),[field]:field==='mustChangePassword'}])
+  await expect(loadTrainingAnalysisSources(f.db,actor,request(),{authorityLock:'SHARE'})).rejects.toMatchObject({statusCode:404})
+  expect(f.db.compositeAssessment.findMany).not.toHaveBeenCalled()
+ })
+ it('preserves the service lock denial code, while direct loaders still verify independently',async()=>{
+  const f=fixture();f.db.$queryRaw.mockResolvedValue([])
+  await expect(loadTrainingAnalysisSources(f.db,actor,request(),{authorityLock:'SHARE'})).rejects.toMatchObject({statusCode:404,code:'TRAINING_ANALYSIS_NOT_FOUND'})
+  expect(f.db.user.findFirst).not.toHaveBeenCalled()
+  await loadTrainingAnalysisSources(f.db,actor,request())
+  expect(f.db.user.findFirst).toHaveBeenCalledOnce();expect(f.db.course.findFirst).toHaveBeenCalledOnce()
+ })
+})
+
+describe('request-local immutable facts reader',()=>{
+ it('reuses one row query and decoded body for report then canonical, without marking it committed',async()=>{
+  const f=await compactScaleFixture(),codec=await import('../../modules/assessment-runtime/compact-scale-facts')
+  const decode=vi.spyOn(codec,'decodeScaleFacts')
+  try{
+   const reader=await preloadStoredScaleResults([f.child],f.db)
+   const result=await resolveStoredScaleResult(f.child.result,{record:f.child,db:f.db,reader})
+   const cipher=makeCanonicalFactsReference({assessmentId:f.child.id,attemptEpoch:1,submissionId:f.child.submissionId,payloadHash:f.child.submissionPayloadHash},f.envelope.resultHash)
+   const [canonical]=await loadStoredCanonicalUnitResults([cipher],f.db,[],reader)
+   expect(result.scores).toEqual(f.result.scores);expect(canonical).toEqual(f.envelope)
+   expect(decode.mock.calls.filter(([value])=>value===f.fact.factsEncrypted)).toHaveLength(1)
+   expect(f.db.$queryRaw.mock.calls.filter(([parts]:any)=>parts.join('').includes('assessment_result_facts'))).toHaveLength(1)
+   const {readCommittedScaleFacts}=await import('../../modules/assessment-runtime/scale-fact-records')
+   expect(readCommittedScaleFacts(f.child)).toBeNull()
+  }finally{decode.mockRestore()}
+ })
+ it.each(['child-epoch','child-submission','child-payload','child-result','row-cipher','row-source','row-canonical'])('rejects changed %s instead of reusing decoded facts',async mode=>{
+  const f=await compactScaleFixture(),reader=await preloadStoredScaleResults([f.child],f.db)
+  if(mode==='child-epoch')f.child.attemptEpoch++
+  if(mode==='child-submission')f.child.submissionId='changed'
+  if(mode==='child-payload')f.child.submissionPayloadHash='0'.repeat(64)
+  if(mode==='child-result')(f.child.result as any).e++
+  if(mode==='row-cipher')f.fact.factsEncrypted+='changed'
+  if(mode==='row-source')f.fact.sourceResultHash='0'.repeat(64)
+  if(mode==='row-canonical')f.fact.canonicalResultHash='0'.repeat(64)
+  expect(()=>reader.read(f.child,f.db)).toThrow('identity changed')
+ })
+ it('rejects a different child object or transaction, with no cross-request cache',async()=>{
+  const f=await compactScaleFixture(),reader=await createStoredScaleFactsReader([f.child],f.db)
+  expect(()=>reader.read({...f.child},f.db)).toThrow('identity changed')
+  expect(()=>reader.read(f.child,{...f.db})).toThrow('identity changed')
+  expect(()=>reader.find(f.child.id,1,{...f.db})).toThrow('transaction changed')
+ })
+ it('retains per-scale binding error timing after ordinary preload',async()=>{
+  const f=await compactScaleFixture(),codec=await import('../../modules/assessment-runtime/compact-scale-facts')
+  const body=decodeScaleFacts(f.fact.factsEncrypted)!
+  const decode=vi.spyOn(codec,'decodeScaleFacts').mockImplementation(value=>value===f.fact.factsEncrypted?{...body,binding:{...body.binding,submissionId:'wrong'}}:null)
+  try{
+   const reader=await preloadStoredScaleResults([f.child],f.db)
+   await expect(resolveStoredScaleResult(f.child.result,{record:f.child,db:f.db,reader})).rejects.toThrow()
+  }finally{decode.mockRestore()}
+ })
 })

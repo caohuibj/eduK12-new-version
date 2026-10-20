@@ -52,7 +52,8 @@ import {
 import { isUnitSubmitAdmissionBusyError } from '../services/unitSubmitAdmission'
 import { deviceInputProvenanceV1Schema } from '../modules/scale/device-input-provenance'
 import { isRelationalCohortOnlyCompositeAttempt, projectRelationalUnitFinalResponse } from '../modules/assessment-relational/result-authority'
-import { isCompositeParticipantFeedbackDeferred } from '../modules/assessment-policy/participant-feedback'
+import { isLoadedCompositeParticipantFeedbackDeferred } from '../modules/assessment-policy/participant-feedback'
+import { trainingFeedbackAttemptSelect, trainingFeedbackParentSelect } from '../modules/composite/training-feedback-binding'
 import { copyScaleToDraft, scaleCopyEligibility, ScaleCopyError, syncCopiedScaleDraftMedia } from '../modules/scale/scale-copy.service'
 
 // ==================== Validation Schemas ====================
@@ -785,6 +786,7 @@ export const scaleController = {
   // ==================== Scale Assessment v2 workflow ====================
 
   async submitFinalAssessment(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try {
       const input = finalScaleSubmitSchema.safeParse(req.body)
       if (!input.success) return error(res, input.error.errors[0].message)
@@ -1172,18 +1174,20 @@ export const scaleController = {
   },
 
   async getAssessmentV2(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try {
       const userId = req.user?.userId
       const { assessmentId } = req.params
       const assessment = await prisma.assessment.findUnique({
         where: { id: assessmentId },
-        include: { compositeAttempt: { select: TRAINING_VARIANT_PARENT_MARKER_SELECT }, scale: { select: { id: true, code: true, name: true, description: true, instrumentVersion: true, instrumentClass: true, definition: true } } },
+        include: { compositeAttempt: { select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, ...trainingFeedbackAttemptSelect,
+          compositeAssessment: { select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT.compositeAssessment.select, ...trainingFeedbackParentSelect } } } }, scale: { select: { id: true, code: true, name: true, description: true, instrumentVersion: true, instrumentClass: true, definition: true } } },
       })
       if (!assessment) return notFound(res, '测评记录不存在')
       if (assessment.userId !== userId) return forbidden(res, '无权限查看此测评')
       await assertTrainingChildSelected(assessment)
-      if (assessment.status === 'COMPLETED' && await isCompositeParticipantFeedbackDeferred(assessment.compositeAttemptId)) {
-        return forbidden(res, '完成整份测评后才能查看单项反馈')
+      if (assessment.status === 'COMPLETED' && assessment.compositeAttemptId && await isLoadedCompositeParticipantFeedbackDeferred(assessment.compositeAttempt)) {
+        return forbidden(res, '单项反馈尚未向学员开放，请查看整份测评报告状态')
       }
       if (
         assessment.status === 'COMPLETED'

@@ -215,6 +215,8 @@
     "training_material_experiments": "RUNTIME_RW",
     "training_material_subject_bindings": "RUNTIME_RW",
     "training_material_quota_buckets": "RUNTIME_RW",
-    "training_material_allocation_claims": "RUNTIME_RW"
+    "training_material_allocation_claims": "RUNTIME_RW",
+    "training_public_rounds": "RUNTIME_RW",
+    "training_attempt_checkpoints": "RUNTIME_RW"
   }
 }

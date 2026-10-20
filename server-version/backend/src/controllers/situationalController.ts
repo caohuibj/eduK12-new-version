@@ -93,6 +93,7 @@ export const situationalController = {
   },
 
   async resume(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try {
       const data = await resumeSituationalAttempt(req.params.attemptId, req.user!.userId)
       return success(res, await projectSjtReleaseStatus(data), data.attempt.status === 'COMPLETED' ? '情境化测评已完成' : '继续情境化测评')
@@ -102,6 +103,7 @@ export const situationalController = {
   },
 
   async result(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try {
       const data = await getSituationalAttemptResult(req.params.attemptId, req.user!.userId)
       return success(res, await projectSjtReleaseStatus(data))
@@ -125,6 +127,7 @@ export const situationalController = {
   },
 
   async submitFinal(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try {
       const parsed = situationalFinalSubmitSchema.safeParse(req.body)
       if (!parsed.success) return error(res, firstZodMessage(parsed.error))

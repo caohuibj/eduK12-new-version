@@ -1,3 +1,4 @@
+import type { PublicDeliveryCreateInput } from '../../api/publicDelivery'
 import type { WholeReceiptLookup } from './receipt-recovery'
 import type { CompositeReportStatus, WholeQuestionnaireDefinition, WholeQuestionnaireInput, WholeQuestionnaireReceipt } from './types'
 import apiClient, { sessionFetch } from '../../api/client'
@@ -99,7 +100,7 @@ export const compositeApi = {
   reorderItems: (id: string, items: Array<{ id: string; position: number }>) => apiClient.post(`/composite-assessments/${id}/items/reorder`, { items }),
   publish: (id: string) => apiClient.post<any>(`/composite-assessments/${id}/publish`, {}),
   listTokens: (id: string) => apiClient.get<{ list: CompositePublicAccessToken[] }>(`/composite-assessments/${id}/public-tokens`),
-  createToken: (id: string, input: { expiresAt: string; maxUses: number }) => apiClient.post<any>(`/composite-assessments/${id}/public-tokens`, input),
+  createToken: (id: string, input: PublicDeliveryCreateInput) => apiClient.post<any>(`/composite-assessments/${id}/public-tokens`, input),
   revealToken: (id: string, tokenId: string) => apiClient.post<any>(`/composite-assessments/${id}/public-tokens/${tokenId}/reveal`, {}),
   disableToken: (id: string, tokenId: string) => apiClient.delete(`/composite-assessments/${id}/public-tokens/${tokenId}`),
   exportData: (id: string, input: { detail: 'summary' | 'full'; format: 'csv' | 'sav' | 'zip' }, requestKey?: string) => apiClient.post<any>(`/composite-assessments/${id}/export`, input, { headers: { 'X-Export-Request-Key': requestKey } }),
