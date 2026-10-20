@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+export interface ReportLeaveRisk {dirty:boolean;pending:boolean;busy:boolean}
 type ReferenceKind='normative_distribution'|'criterion_threshold'|'descriptive_sample'|'theoretical_range'
 type Block={type:'TEXT';text:string}|{type:'METRIC';metricKey:string;label?:string;display:'RAW'|'REFERENCE_RESULT'}
   |{type:'REFERENCE_BAND';metricKey:string;referenceKind:ReferenceKind;bandKey:string;text:string;guidance:string[]}
@@ -49,7 +50,7 @@ function PreviewBlock({value}:{value:unknown}){
   return null
 }
 
-export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true}:{projectId:string;projectStatus?:string;active?:boolean}){
+export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,onLeaveRiskChange}:{projectId:string;projectStatus?:string;active?:boolean;onLeaveRiskChange?:(risk:ReportLeaveRisk)=>void}){
   const base='/projects/'+encodeURIComponent(projectId)+'/report-drafts'
   const [measurements,setMeasurements]=useState<Measurement[]>([]),[list,setList]=useState<Summary[]>([])
   const [nativeInstruments,setNativeInstruments]=useState<NativeInstrument[]>([]),[nativeId,setNativeId]=useState(''),[nativePage,setNativePage]=useState(1),[nativeCount,setNativeCount]=useState(0),[showNative,setShowNative]=useState(false)
@@ -59,6 +60,14 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true}
   const [scenario,setScenario]=useState<Scenario>('INTERPRETABLE'),[preview,setPreview]=useState<Preview|null>(null)
   const [busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[listError,setListError]=useState('')
   const [pendingCreate,setPendingCreate]=useState<Create|null>(null)
+  useEffect(()=>{onLeaveRiskChange?.({dirty,pending:!!pendingCreate,busy})},[dirty,pendingCreate,busy,onLeaveRiskChange])
+  useEffect(()=>()=>onLeaveRiskChange?.({dirty:false,pending:false,busy:false}),[onLeaveRiskChange])
+  useEffect(()=>{
+    if(!dirty&&!pendingCreate&&!busy)return
+    const protect=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue=''}
+    window.addEventListener('beforeunload',protect)
+    return ()=>window.removeEventListener('beforeunload',protect)
+  },[dirty,pendingCreate,busy])
   const initialRequested=useRef(false)
   // Report corrections remain available after collection closes; the server checks current ownership.
   const measurementWritable=['DRAFT','ACTIVE'].includes(projectStatus),readOnly=selected?.state==='PUBLISHED'
