@@ -17,7 +17,7 @@ export async function courseCatalogPage(courseId: string, actor: {userId:string;
     WHERE s.status='PUBLISHED' AND s.visibility IN ('PUBLIC','COURSE') AND EXISTS(SELECT 1 FROM course_scales d WHERE d.scale_id=s.id AND d.course_id=$1)
     UNION ALL
     SELECT a.id,a.title,left(a.instruction,240),a.tags,a.created_at,'COGNITIVE',a.created_by,a.status::text FROM cognitive_assignments a WHERE a.course_id=$1 AND a.status='PUBLISHED' AND a.listed_standalone=true`
-  const filter='LOWER(name) LIKE $5 AND ($6::timestamp IS NULL OR created >= $6::timestamp) AND ($7::timestamp IS NULL OR created < $7::timestamp) AND tags @> $8::text[]'
+  const filter='LOWER(name) LIKE $5 AND ($6::timestamp IS NULL OR created >= $6::timestamp) AND ($7::timestamp IS NULL OR created < $7::timestamp) AND (cardinality($8::text[])=0 OR tags @> $8::text[])'
   const values=[courseId,actor.userId,actor.role==='ADMIN',(raw as any)?.includeManaged==='true',sqlLike(f.search),f.from??null,f.to??null,f.tags]
   const [rows,counts]=await prisma.$transaction([
     prisma.$queryRawUnsafe<any[]>(`SELECT * FROM (${union}) q WHERE ${filter} ORDER BY created DESC,id DESC,kind LIMIT $9 OFFSET $10`,...values,f.pageSize,(f.page-1)*f.pageSize),
@@ -25,6 +25,6 @@ export async function courseCatalogPage(courseId: string, actor: {userId:string;
   ])
   const labels:Record<string,string>={LEGACY_QUESTIONNAIRE:'课程问卷',QUESTIONNAIRE:'课程问卷',LEGACY_COMPOSITE:'组合测评',ASSESSMENT_BUNDLE:'固定测评包',SCALE:'课程量表',COGNITIVE:'认知测评'}
   const paths:Record<string,string>={LEGACY_QUESTIONNAIRE:'/questionnaires/',QUESTIONNAIRE:'/questionnaire-products/',LEGACY_COMPOSITE:'/composite-assessments/',ASSESSMENT_BUNDLE:'/bundle-products/',SCALE:'/scales/',COGNITIVE:'/cognitive-assignments/'}
-  return {list:rows.map(row=>({id:row.id,key:row.kind+':'+row.id,kind:row.kind,name:row.name,description:row.description,status:row.status,tags:row.tags,created:row.created,typeLabel:labels[row.kind],unitCount:null,unitLabel:null,
+  return {list:rows.map(row=>({id:row.id,key:row.kind+':'+row.id,kind:row.kind,name:row.name,description:row.description,status:row.status,tags:row.tags??[],created:row.created,typeLabel:labels[row.kind],unitCount:null,unitLabel:null,
     manageHref:actor.role==='ADMIN'||row.owner===actor.userId?paths[row.kind]+encodeURIComponent(row.id):null})),total:Number(counts[0].total),page:f.page,pageSize:f.pageSize}
 }

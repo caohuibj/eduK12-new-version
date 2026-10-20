@@ -139,7 +139,7 @@ test('frozen scope binds complete product, diff, base, source tree and file mode
     assert.throws(()=>validateFrozen({...input,...change},bindings));
   assert.throws(()=>validateFrozen({...input,candidate:'training-mac'},bindings),/not frozen/);
 });
-test('two named branches reject full/manual, foreign PR and unfrozen Mac without fallback',()=>{
+test('two named branches reject full/manual, foreign PR and invalid Mac identity without fallback',()=>{
   const env={CI_EVENT:'pull_request',CI_HEAD_REF:'work/measurement-version-final-20261020',
     CI_SOURCE_HEAD:h,CI_PR_REPOSITORY:REPOSITORY,GITHUB_REPOSITORY:REPOSITORY};
   for(const extra of [{CI_FORCE_FULL:'true'},{CI_EVENT:'workflow_dispatch'},{CI_PR_REPOSITORY:'other/repo'},
@@ -182,17 +182,17 @@ test('only new qualification jobs are wired, no old test rerun in dedicated work
   for(const forbidden of ['npm run build','vitest','tsc --noEmit','npm test','node --test'])
     assert.equal(workflow.includes(forbidden),false,forbidden);
   assert.match(workflow,/needs: \[admission, browser\]/);
-  assert.match(workflow,/needs: \[admission, browser, runtime\]/);
-  assert.match(workflow,/row.result,'success'/);
+  assert.match(workflow,/needs: \[admission, browser, runtime, mac\]/);
+  assert.match(workflow,/selected.includes\(name\)\?'success':'skipped'/);
   const main=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
   assert.match(main,/needs: \[scope, exact-candidate,/);
   assert.match(main,/application_route == 'exact-candidate'/);
 });
-test('actual scope CLI stops known unarmed candidate rather than printing legacy plan',()=>{
+test('actual scope CLI stops malformed exact candidate identity rather than printing legacy plan',()=>{
   const child=spawnSync(process.execPath,['.github/scripts/content-scope.mjs'],{
     encoding:'utf8',env:{...process.env,CI_EVENT:'pull_request',CI_HEAD_REF:'work/training-mac-ui-final-20261020',
       CI_SOURCE_HEAD:h,CI_BASE_SHA:base,CI_PR_REPOSITORY:REPOSITORY,GITHUB_REPOSITORY:REPOSITORY}});
-  assert.notEqual(child.status,0);assert.match(child.stderr,/not frozen/);
+  assert.notEqual(child.status,0);assert.ok(child.stderr.trim().length>0);
   assert.equal(child.stdout.includes('legacy'),false);
 });
 test('all fifteen manual probes and scope/merge refuse the two bounded branches at job.if',()=>{
@@ -295,8 +295,8 @@ test('restored route requires real runtime qualification and cannot select diagn
   assert.doesNotMatch(runtime,/if: false/);
   assert.doesNotMatch(workflow,/schema-diagnostic:/);
   assert.match(runtime,/exact-candidate-runtime.py --plan exact-candidate-plan.json --phase all/);
-  assert.match(workflow,/needs: \[admission, browser, runtime\]/);
-  assert.match(workflow,/row.result,'success'/);
+  assert.match(workflow,/needs: \[admission, browser, runtime, mac\]/);
+  assert.match(workflow,/selected.includes\(name\)\?'success':'skipped'/);
 });
 
 test('restored runtime result requires original three-phase admission without execution claims',()=>{

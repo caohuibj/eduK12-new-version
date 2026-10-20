@@ -1,7 +1,9 @@
 import { z } from 'zod'
 
 const numeric = (max: number, fallback: number) => z.union([z.number(), z.string().regex(/^\d+$/).transform(Number)]).pipe(z.number().int().min(1).max(max)).default(fallback)
-const date = z.string().datetime({ offset: true }).optional()
+// PostgreSQL catalog columns are UTC timestamp without time zone. Normalize accepted
+// offsets before passing parameters to SQL, matching metadataWhere's Date semantics.
+const date = z.string().datetime({ offset: true }).refine(value => Number.isFinite(Date.parse(value)), '日期无效').transform(value => new Date(value).toISOString()).optional()
 export const catalogFilterSchema = z.object({
   search: z.string().trim().max(200).default(''),
   tags: z.string().max(209).default('').transform(value => [...new Set(value.split(/[,，]/).map(v => v.trim()).filter(Boolean))]).pipe(z.array(z.string().max(20)).max(10)),

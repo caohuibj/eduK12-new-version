@@ -23,7 +23,7 @@ env:
 jobs:
   admission:
     name: reviewed historical and fresh local evidence (no test replay)
-    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && fromJSON(inputs.plan).candidate == 'measurement'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
@@ -46,7 +46,7 @@ jobs:
           retention-days: 3
   browser:
     name: fixed original successful compiled browser evidence
-    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && fromJSON(inputs.plan).candidate == 'measurement'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
@@ -189,9 +189,15 @@ jobs:
             exact-candidate-runtime-evidence/frontend-scan.json
           if-no-files-found: error
           retention-days: 3
+  mac:
+    name: integrated Mac candidate qualification
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && fromJSON(inputs.plan).candidate == 'training-mac'
+    uses: ./.github/workflows/ci-training-mac-qualification.yml
+    with:
+      plan: ${{ inputs.plan }}
   ready:
     name: exact selected qualification result
-    needs: [admission, browser, runtime]
+    needs: [admission, browser, runtime, mac]
     if: always()
     runs-on: ubuntu-24.04
     timeout-minutes: 1
@@ -202,6 +208,8 @@ jobs:
           node <<'JS'
           const assert=require('node:assert/strict');
           const results=JSON.parse(process.env.RESULTS);
-          assert.deepEqual(Object.keys(results).sort(),['admission','browser','runtime']);
-          for(const [name,row] of Object.entries(results)) assert.equal(row.result,'success',name);
+          const plan=JSON.parse(process.env.EXACT_PLAN);
+          assert.deepEqual(Object.keys(results).sort(),['admission','browser','mac','runtime']);
+          const selected=plan.candidate==='training-mac'?['mac']:['admission','browser','runtime'];
+          for(const [name,row] of Object.entries(results)) assert.equal(row.result,selected.includes(name)?'success':'skipped',name);
           JS

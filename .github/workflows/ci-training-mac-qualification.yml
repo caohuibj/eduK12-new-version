@@ -1,0 +1,112 @@
+name: Frozen integrated Training Mac qualification
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+  actions: read
+env:
+  CI: 'true'
+  TZ: UTC
+  VITE_COGNITIVE_MODULE_ENABLED: 'true'
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+  CI_EVENT: ${{ github.event_name }}
+  CI_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+  CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+  CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+  EXACT_PLAN: ${{ inputs.plan }}
+jobs:
+  qualification:
+    name: fixed Mac inputs and missing affected qualification
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: materialize exact reviewed plan
+        run: node -e "require('node:fs').writeFileSync('exact-candidate-plan.json',JSON.stringify(JSON.parse(process.env.EXACT_PLAN)))"
+      - name: admit bounded historical record without relabeling failed or unknown invocations
+        run: node .github/scripts/training-mac-admission.mjs exact-candidate-plan.json training-mac-history.json
+      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        with:
+          version: v0.70.0
+          cache: false
+      - name: current delivery builds and only missing affected checks
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B .github/scripts/training-mac-runtime.py --plan exact-candidate-plan.json --output training-mac-evidence
+      - name: require all exact phases and same-image archive bytes
+        run: node .github/scripts/training-mac-admission.mjs runtime exact-candidate-plan.json training-mac-evidence
+      - name: retain original outcome receipts even after a later failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: training-mac-results-${{ github.sha }}-${{ github.run_attempt }}
+          path: |
+            training-mac-history.json
+            training-mac-evidence/*.json
+          if-no-files-found: error
+          retention-days: 3
+      - name: retain only synthetic compiled UI evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: training-mac-browser-${{ github.sha }}-${{ github.run_attempt }}
+          path: |
+            training-mac-evidence/browser/browser-result.json
+            training-mac-evidence/browser/*.png
+          if-no-files-found: ignore
+          retention-days: 3
+      - name: verify successful compilation archives for independent retention
+        id: compiled
+        if: always()
+        run: node .github/scripts/training-mac-admission.mjs retain-compiles exact-candidate-plan.json training-mac-evidence
+      - name: retain successful backend compilation, not whole qualification
+        if: always() && steps.compiled.outputs.backend == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: training-mac-backend-compiled-${{ github.sha }}-${{ github.run_attempt }}
+          path: |
+            training-mac-evidence/backend-compiled.tar.gz
+            training-mac-evidence/backend-compile.json
+          if-no-files-found: error
+          retention-days: 3
+      - name: retain successful frontend compilation, not whole qualification
+        if: always() && steps.compiled.outputs.frontend == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: training-mac-frontend-compiled-${{ github.sha }}-${{ github.run_attempt }}
+          path: |
+            training-mac-evidence/frontend-compiled.tar.gz
+            training-mac-evidence/frontend-compile.json
+          if-no-files-found: error
+          retention-days: 3
+      - name: verify successfully scanned runtime archives despite later failure
+        id: images
+        if: always()
+        run: node .github/scripts/training-mac-admission.mjs retain-images exact-candidate-plan.json training-mac-evidence
+      - name: retain the exact scanned images
+        if: always() && steps.images.outputs.eligible == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: training-mac-runtime-images-${{ github.sha }}-${{ github.run_attempt }}
+          path: |
+            training-mac-evidence/backend-runtime.tar.gz
+            training-mac-evidence/frontend-runtime.tar.gz
+            training-mac-evidence/runtime-result.json
+            training-mac-evidence/runtime-packaging.json
+            training-mac-evidence/runtime-scans.json
+            training-mac-evidence/backend-scan.json
+            training-mac-evidence/frontend-scan.json
+          if-no-files-found: error
+          retention-days: 3

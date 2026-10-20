@@ -9,10 +9,23 @@ export const BRANCHES = Object.freeze({
 });
 export const REQUIRED = Object.freeze(['historical-local','compiled-browser','runtime-packaging',
   'runtime-scans','dependency-audit','changed-lint','frontend-app-types','schema-upgrade-restore','sast']);
+export const MAC_REQUIRED = Object.freeze(['historical-local','backend-compile','frontend-compile',
+  'frontend-app-types','changed-lint','compiled-browser','scoped-pg-http','runtime-packaging',
+  'runtime-scans','dependency-audit','schema-upgrade-restore','sast']);
+export const requiredFor = candidate => candidate === 'training-mac' ? MAC_REQUIRED : REQUIRED;
 // Exact paths, not a directory exemption. All remain subject to independent
 // review of the final candidate; the product fingerprint excludes only these.
 export const TOOLS = Object.freeze([
   '.github/scripts/exact-candidate-scope.mjs',
+  '.github/scripts/training-mac-admission.mjs',
+  '.github/scripts/training-mac-admission.test.mjs',
+  '.github/scripts/training-mac-attestation.json',
+  '.github/scripts/training-mac-inputs.json',
+  '.github/scripts/training-mac-runtime.py',
+  '.github/scripts/training-mac-runtime.test.py',
+  '.github/scripts/training-mac-browser.mjs',
+  '.github/scripts/training-mac-browser.test.mjs',
+  '.github/workflows/ci-training-mac-qualification.yml',
   '.github/scripts/exact-candidate-admission.mjs',
   '.github/scripts/exact-candidate.test.mjs',
   '.github/scripts/exact-candidate-bindings.json',
@@ -86,13 +99,14 @@ export function exactCandidatePlan(base,head,env=process.env) {
   const frozen=validateFrozen({candidate,base,head,sourceHead,tree,
     sourceTree:git('rev-parse',sourceHead+'^{tree}'),rows:inventory(head),
     diffHash:changedFingerprint(base,head)},bindings);
-  const runtimePath=new URL('./exact-candidate-runtime-inputs.json',import.meta.url);
+  const runtimePath=new URL(candidate==='training-mac'?'./training-mac-inputs.json':'./exact-candidate-runtime-inputs.json',import.meta.url);
   let runtimeInputs=null;
   try { runtimeInputs=JSON.parse(readFileSync(runtimePath,'utf8')); }
   catch(e) { if(e.code!=='ENOENT') throw e; }
   return {schema:1,route:'exact-candidate',candidate,base,head,sourceHead,tree,postMerge,
     productInventorySha256:frozen.productInventorySha256,diffSha256:frozen.diffSha256,
-    required:[...REQUIRED],components:runtimeInputs?.components??null,runtime:runtimeInputs?.runtime??null};
+    required:[...requiredFor(candidate)],components:runtimeInputs?.components??null,runtime:runtimeInputs?.runtime??null,
+    ...(candidate==='training-mac'?{macRuntime:runtimeInputs?.macRuntime??null}: {})};
 }
 export function exactCandidateOutputs(plan) {
   const output={application_route:'exact-candidate',scenario:'exact-candidate',
@@ -110,7 +124,7 @@ export function validExactPlan(p) {
     &&[p.base,p.head,p.sourceHead,p.tree].every(fullSha)
     &&/^[a-f0-9]{64}$/.test(p.productInventorySha256||'')
     &&/^[a-f0-9]{64}$/.test(p.diffSha256||'')
-    &&JSON.stringify(p.required)===JSON.stringify(REQUIRED);
+    &&JSON.stringify(p.required)===JSON.stringify(requiredFor(p.candidate));
 }
 
 // The standalone catalog workflow must classify the same frozen candidate, not

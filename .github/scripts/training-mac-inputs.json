@@ -1,0 +1,226 @@
+{
+  "schema": 1,
+  "components": {
+    "backend": {
+      "jobId": 118549912875,
+      "artifactId": 12254021820,
+      "zipBytes": 111466192,
+      "zipSha256": "1b63bd5f180fd34dd5d8c203269e054bbd614a8c058df619ffadf11e8c9a0e97",
+      "archiveSha256": "68eab0cc18f679331898914caf2c44cc1a64af88c33f677940032419874fe0b2",
+      "componentTree": "8804b7ff3d5d02555bfa5a338702bd23702d6561",
+      "productionInputSha256": "1873e5bb5c9853e66910fe95b8f1022e26bda558e28997a4d75d0622ccdfe8cf",
+      "receiptSha256": "55d7f4e9d65f261c270da0e171a705033eea272668f7351bb60fce9d3711ad1b",
+      "head": "da713c522be4fd3309e4dcf327bfb71384c784fe",
+      "runId": "39399331312",
+      "attempt": "1",
+      "lockfileSha256": "0261d2047bbaab484ae6088526037120a5e058472047b6b964c959d3ff065d9d",
+      "buildFlags": {
+        "VITE_COGNITIVE_MODULE_ENABLED": "true",
+        "TZ": "UTC"
+      },
+      "requiredFiles": {
+        "dist/index.js": "0ad259adc0c7648e992abde10a29f24e316d790548c4e62973f9f16653ac8047",
+        "assets/sjt-upload-v1.xlsx": "3ddecbb4857fa88edbe9139c2bcd3dadddd778458b536156a0998edef0a1123e",
+        "assets/sjt-upload-example-v1.xlsx": "fc460834806a5827e23f5a246ee13e6d24cf58880608bea248fcc7bfbe6ca19c",
+        "dist/modules/cognitive/generated/catalog.js": "afaa96795f2057fb28654b2b1a077f524eb7ea3b2796d1c0fac2d8b06000163b",
+        "dist/modules/cognitive/generated/execution.js": "82ab84654ef3ee3fdc4812869873ca22df070ddd5c460029957cc4fe813a8adc",
+        "dist/modules/cognitive/generated/presentation.js": "02394ad54c01fbcf037999b320e4c06bf9e315e6858d7744aac1aa6a5ac93eb6",
+        "dist/modules/cognitive/generated/scientific.js": "ba2cc93c945f4ae195d87f7b5c18dba1c355b29cca365f6acc27cdcdfd13e007",
+        "dist/modules/cognitive/generated/seeds.js": "44db9ff4c955976d67d4fb2726c6ff02df2fa17bd26f22896e0e48ed1f05adcd",
+        "src/modules/cognitive/generated/identities.json": "4297b93ac8237f7fbf94a56fd5cce086c589602b8bc0dcf801731a18ac2c2d34"
+      },
+      "repository": "caohuibj/eduK12-new-version",
+      "workflowPath": ".github/workflows/ci-measurement-browser.yml",
+      "branch": "ci/measurement-browser-20261020",
+      "jobName": "production compile once / backend",
+      "artifactName": "measurement-39399331312-da713c522be4fd3309e4dcf327bfb71384c784fe-backend-build",
+      "sourceTree": "c82d6ef9a61236e5b99e88f35b9cc0e6e5bf930e",
+      "excludedNonProductionPaths": []
+    },
+    "frontend": {
+      "jobId": 118638223116,
+      "artifactId": 12265672275,
+      "zipBytes": 129060477,
+      "zipSha256": "b232da6c941e31390052800656fd91c370fabbced6ec41a812ce3f71c1969593",
+      "head": "4286a59b649c37662cdbc0e7ca4e41103ad4e4f2",
+      "runId": "39425861081",
+      "attempt": "1",
+      "componentTree": "a4fa70dfd71450f7840708377a4815c073bfbc9b",
+      "lockfileSha256": "5288a377ebdd829533561cf2383cd2bcd20e15bd12e6d15762b36a05f7bec1ca",
+      "archiveSha256": "a7d629206aefc034fd0698e931122da400f889712c6697e2484daf538b9dbf80",
+      "buildFlags": {
+        "VITE_COGNITIVE_MODULE_ENABLED": "true",
+        "TZ": "UTC"
+      },
+      "requiredFiles": {
+        "dist/index.html": "9d56abf17367cc08e25ae7261067eb9940a0dcaf75f98cbd91d64ac820df0dbb"
+      },
+      "repository": "caohuibj/eduK12-new-version",
+      "workflowPath": ".github/workflows/ci-measurement-browser.yml",
+      "branch": "ci/measurement-browser-20261020",
+      "jobName": "build changed measurement frontend once",
+      "artifactName": "measurement-39425861081-4286a59b649c37662cdbc0e7ca4e41103ad4e4f2-frontend-build",
+      "receiptSha256": "d467a7312ae1daa2672b5a1ff635c9561408b65116a3cad5cbabd0a3551430b4",
+      "sourceTree": "6fe522474014fc06948fbd4e5fb0b36c6ba581c0",
+      "productionInputSha256": "4ea252203ada3e369aa74935e8baae73dc047c032857d7efc4b62577ddab061a",
+      "excludedNonProductionPaths": []
+    }
+  },
+  "runtime": {
+    "base": "9e1b302e1e255050b15ab150905bc69cee1b3c1b",
+    "nodeImage": "node:24.21.0-bookworm-slim",
+    "nginxImage": "nginx:1.31.6-alpine3.24-slim",
+    "postgresImage": "postgres:16.15-bookworm",
+    "newMigrations": [
+      "20261021000000_training_catalog_discovery"
+    ],
+    "changedFrontendFiles": [
+      "src/components/app-shell/AppShell.tsx",
+      "src/modules/composite/CompositeReportPage.tsx",
+      "src/pages/questionnaire/QuestionnaireProducts.tsx",
+      "src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx",
+      "src/training/TrainingCourseAnalysis.tsx",
+      "src/training/TrainingTrainerCourse.tsx",
+      "src/training/TrainingCourseAnalysis.integration.test.tsx"
+    ],
+    "sourceOverlay": "Current exact reviewed source; original official archives supply dependencies only. Compile each current component once and retain official outputs.",
+    "claim": "Bounded integrated Mac qualification: historical outcomes remain original; one backend changed-input compile and one official frontend delivery build; only missing affected type/lint/PG/browser and actual image/recovery gates execute. No unrelated full suite or deployment.",
+    "frontendExternalInputs": {
+      "server-version/cognitive-randomization-golden-v1.json": {
+        "gitBlob": "5b3cb7c11138044ad6a85626e74004bea2a3e62a",
+        "sha256": "8187a90193eafee847446274c27fe3891386ad15efabf6f5b0f94e90fa5299ba"
+      }
+    }
+  },
+  "macRuntime": {
+    "dependencySources": {
+      "backend": {
+        "jobId": 118549912875,
+        "artifactId": 12254021820,
+        "zipBytes": 111466192,
+        "zipSha256": "1b63bd5f180fd34dd5d8c203269e054bbd614a8c058df619ffadf11e8c9a0e97",
+        "archiveSha256": "68eab0cc18f679331898914caf2c44cc1a64af88c33f677940032419874fe0b2",
+        "componentTree": "8804b7ff3d5d02555bfa5a338702bd23702d6561",
+        "productionInputSha256": "a1bba1b32276d872a6e3ebd56a0cf3eebf84c4f9c71ccaea7e789a8447429cbd",
+        "receiptSha256": "55d7f4e9d65f261c270da0e171a705033eea272668f7351bb60fce9d3711ad1b",
+        "head": "da713c522be4fd3309e4dcf327bfb71384c784fe",
+        "runId": "39399331312",
+        "attempt": "1",
+        "lockfileSha256": "0261d2047bbaab484ae6088526037120a5e058472047b6b964c959d3ff065d9d",
+        "buildFlags": {
+          "VITE_COGNITIVE_MODULE_ENABLED": "true",
+          "TZ": "UTC"
+        },
+        "requiredFiles": {
+          "dist/index.js": "0ad259adc0c7648e992abde10a29f24e316d790548c4e62973f9f16653ac8047",
+          "assets/sjt-upload-v1.xlsx": "3ddecbb4857fa88edbe9139c2bcd3dadddd778458b536156a0998edef0a1123e",
+          "assets/sjt-upload-example-v1.xlsx": "fc460834806a5827e23f5a246ee13e6d24cf58880608bea248fcc7bfbe6ca19c",
+          "dist/modules/cognitive/generated/catalog.js": "afaa96795f2057fb28654b2b1a077f524eb7ea3b2796d1c0fac2d8b06000163b",
+          "dist/modules/cognitive/generated/execution.js": "82ab84654ef3ee3fdc4812869873ca22df070ddd5c460029957cc4fe813a8adc",
+          "dist/modules/cognitive/generated/presentation.js": "02394ad54c01fbcf037999b320e4c06bf9e315e6858d7744aac1aa6a5ac93eb6",
+          "dist/modules/cognitive/generated/scientific.js": "ba2cc93c945f4ae195d87f7b5c18dba1c355b29cca365f6acc27cdcdfd13e007",
+          "dist/modules/cognitive/generated/seeds.js": "44db9ff4c955976d67d4fb2726c6ff02df2fa17bd26f22896e0e48ed1f05adcd",
+          "src/modules/cognitive/generated/identities.json": "4297b93ac8237f7fbf94a56fd5cce086c589602b8bc0dcf801731a18ac2c2d34"
+        },
+        "repository": "caohuibj/eduK12-new-version",
+        "workflowPath": ".github/workflows/ci-measurement-browser.yml",
+        "branch": "ci/measurement-browser-20261020",
+        "jobName": "production compile once / backend",
+        "artifactName": "measurement-39399331312-da713c522be4fd3309e4dcf327bfb71384c784fe-backend-build",
+        "sourceTree": "1fd85660d7b0de7c0cfd3b3ad2c491f493bdcf5c",
+        "excludedNonProductionPaths": [
+          "server-version/backend/scripts/measurement-browser-fixture.ts"
+        ]
+      },
+      "frontend": {
+        "jobId": 118638223116,
+        "artifactId": 12265672275,
+        "zipBytes": 129060477,
+        "zipSha256": "b232da6c941e31390052800656fd91c370fabbced6ec41a812ce3f71c1969593",
+        "head": "4286a59b649c37662cdbc0e7ca4e41103ad4e4f2",
+        "runId": "39425861081",
+        "attempt": "1",
+        "componentTree": "a4fa70dfd71450f7840708377a4815c073bfbc9b",
+        "lockfileSha256": "5288a377ebdd829533561cf2383cd2bcd20e15bd12e6d15762b36a05f7bec1ca",
+        "archiveSha256": "a7d629206aefc034fd0698e931122da400f889712c6697e2484daf538b9dbf80",
+        "buildFlags": {
+          "VITE_COGNITIVE_MODULE_ENABLED": "true",
+          "TZ": "UTC"
+        },
+        "requiredFiles": {
+          "dist/index.html": "9d56abf17367cc08e25ae7261067eb9940a0dcaf75f98cbd91d64ac820df0dbb"
+        },
+        "repository": "caohuibj/eduK12-new-version",
+        "workflowPath": ".github/workflows/ci-measurement-browser.yml",
+        "branch": "ci/measurement-browser-20261020",
+        "jobName": "build changed measurement frontend once",
+        "artifactName": "measurement-39425861081-4286a59b649c37662cdbc0e7ca4e41103ad4e4f2-frontend-build",
+        "receiptSha256": "d467a7312ae1daa2672b5a1ff635c9561408b65116a3cad5cbabd0a3551430b4",
+        "sourceTree": "a4fa70dfd71450f7840708377a4815c073bfbc9b",
+        "productionInputSha256": "53370643b8aa370e337561d7491ead82dab64557f2714b95b9fc5da9a73bce8f",
+        "excludedNonProductionPaths": []
+      }
+    },
+    "requiredRuntimePhases": [
+      "prepare",
+      "backend-compile",
+      "frontend-compile",
+      "frontend-app-types",
+      "changed-lint",
+      "dependency-audit",
+      "compiled-browser",
+      "scoped-pg-http",
+      "runtime-packaging",
+      "runtime-scans",
+      "schema-upgrade-restore"
+    ],
+    "compileReasons": {
+      "backend": "Three corrected catalog source inputs invalidate old backend dist. Direct compiler only, no unchanged build prerequisites.",
+      "frontend": "One official Linux delivery build because retained private local output has no safe supported external-to-Actions artifact channel. No old frontend test replay."
+    },
+    "lintAdmission": {
+      "kind": "historical-observed-lint-with-limited-selection",
+      "originalExitCode": 0,
+      "receiptSha256": "0beeecbc6273e54d31b446e5ffc8322c7807db9eca119e8dc465f34796ef087f",
+      "logSha256": "2c1d9503ce0794ce07ecff44712b866f1f0a474e5f341cdf8027ad2b022bffb6",
+      "limitations": [
+        "Original exact eight-file argv unrecoverable; not represented as complete current lint. Fresh lint runs the seven independently selected overlap/final-addition files."
+      ]
+    },
+    "browserCommand": [
+      "node",
+      ".github/scripts/training-mac-browser.mjs"
+    ],
+    "browserScriptBlob": "0775f54d19ec96913e9927f586171944ce8f9736",
+    "browserExpectedAssertions": [
+      "course-shell-1440",
+      "analysis-reference-1440",
+      "pending-publication-1440",
+      "course-shell-390",
+      "analysis-reference-390",
+      "pending-publication-390"
+    ],
+    "changedLintFiles": [
+      "src/components/app-shell/AppShell.tsx",
+      "src/modules/composite/CompositeReportPage.tsx",
+      "src/pages/questionnaire/QuestionnaireProducts.tsx",
+      "src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx",
+      "src/training/TrainingCourseAnalysis.tsx",
+      "src/training/TrainingTrainerCourse.tsx",
+      "src/training/TrainingCourseAnalysis.integration.test.tsx"
+    ],
+    "integrationFiles": [
+      "src/__tests__/controllers/trainingCatalog.boundaries.postgres.test.ts",
+      "src/__tests__/integration/training-mac-export.postgres.integration.test.ts"
+    ],
+    "expectedIntegrationAssertions": 4,
+    "browserAssertions": [
+      "course-shell-1440",
+      "analysis-reference-1440",
+      "pending-publication-1440",
+      "course-shell-390",
+      "analysis-reference-390",
+      "pending-publication-390"
+    ]
+  }
+}
