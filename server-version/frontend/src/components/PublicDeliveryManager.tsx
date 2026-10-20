@@ -2,9 +2,10 @@ import { AnonymousStudyManager } from './AnonymousStudyManager'
 import LocalDateTimeInput, { parseLocalDateTime } from './LocalDateTimeInput'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { PublicDeliveryValidationError, publicDeliveryAdapter, publicLinkStatus, type PublicDeliveryFamily, type PublicDeliveryLink } from '../api/publicDelivery'
+import { TrainingPublicDelivery } from './TrainingPublicDelivery'
 
-export function PublicDeliveryManager({ family, resourceId, canCreate = true, maximumExpiry, groupIpEligible = false }: {
-  family: PublicDeliveryFamily; resourceId: string; canCreate?: boolean; maximumExpiry?: string | null; groupIpEligible?: boolean
+export function PublicDeliveryManager({ family, resourceId, canCreate = true, maximumExpiry, groupIpEligible = false, guided = false }: {
+  family: PublicDeliveryFamily; resourceId: string; canCreate?: boolean; maximumExpiry?: string | null; groupIpEligible?: boolean; guided?: boolean
 }) {
   const adapter = useMemo(()=>publicDeliveryAdapter(family,resourceId),[family,resourceId])
   const [groupIpEnabled,setGroupIpEnabled]=useState(false)
@@ -63,6 +64,12 @@ export function PublicDeliveryManager({ family, resourceId, canCreate = true, ma
     await navigator.clipboard.writeText(url)
     if(current===generation.current)setNotice('链接已复制')
   })
+  if(guided)return <TrainingPublicDelivery key={family+':'+resourceId} links={links} busy={busy} error={error} notice={notice} canCreate={canCreate}
+    maximumExpiry={maximumExpiry} expiresAt={expiresAt} maxUses={maxUses} groupIpEligible={family==='COMPOSITE'&&groupIpEligible} groupIpEnabled={groupIpEnabled} groupTimeZone={groupTimeZone}
+    onExpiry={setExpiry} onMaxUses={setMaxUses} onGroupIp={setGroupIpEnabled} onTimeZone={setGroupTimeZone} onCreate={()=>void create()}
+    onRefresh={()=>void act(async()=>{const current=generation.current;const rows=await adapter.listLinks();if(current===generation.current)setLinks(rows)})}
+    onCopy={link=>void copy(link)} onDisable={link=>void disable(link)} publicEntry={adapter.getPublicEntry}
+    research={family==='COMPOSITE'?<AnonymousStudyManager compositeId={resourceId} links={links} canCreate={canCreate} maximumExpiry={maximumExpiry} onLinkCreated={async()=>{const current=generation.current;const rows=await adapter.listLinks();if(current===generation.current)setLinks(rows)}}/>:undefined}/>
   return <section className="card p-6 space-y-4" aria-label="匿名作答链接管理">
     <h2 className="font-semibold">公开匿名链接</h2>
     <p className="text-sm text-gray-600">参与者无需登录，按内容权限查看当次个人反馈。发布者可统计参与和完成情况、导出授权数据。{family==='COMPOSITE' && '普通链接用于单次访客；匿名研究请使用波次卡片的“复制研究入口”，参与者可选择保存研究内身份并查看本人多波次历史报告。'}</p>

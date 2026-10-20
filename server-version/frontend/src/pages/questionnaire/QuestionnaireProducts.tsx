@@ -20,7 +20,7 @@ import { useStaffFeedback } from '../../components/staff-ui/useStaffFeedback'
 import LocalDateTimeInput, { localDateTimeValue, parseLocalDateTime } from '../../components/LocalDateTimeInput'
 import './questionnaire-products.css'
 import './questionnaire-training-editor.css'
-import { ArrowLeft, ArrowRight, BookOpen, Brain, Check, ClipboardList, Layers, ListChecks, Route, Save, Clock3, HardDrive, ShieldCheck, Shuffle } from 'lucide-react'
+import { ArrowLeft, ArrowRight, BookOpen, Brain, Check, ClipboardList, Layers, ListChecks, Route, Save, Clock3, HardDrive, ShieldCheck, Shuffle, Link as LinkIcon } from 'lucide-react'
 import { TrainingVariantEditor } from './TrainingVariantEditor'
 import { TrainingFlowEditor, trainingFlowEditorId } from './TrainingFlowEditor'
 import { formatTrainingFlow, isMaterialFlowText, trainingFlowRequest, parseTrainingFlow, type TrainingFlowConfig } from './trainingFlow'
@@ -411,7 +411,7 @@ export function QuestionnaireProductEdit() {
     setExpiryError(invalidExpiry)
     if (opensAt && !parseLocalDateTime(opensAt)) { setError('开始时间无效，请按年-月-日 时:分填写'); focusEditorField('questionnaire-product-opens', 'questionnaire-delivery'); return }
     if (invalidName || invalidExpiry) {
-      focusEditorField(invalidName ? 'questionnaire-product-name' : 'questionnaire-product-expiry', invalidName ? 'questionnaire-basic' : 'questionnaire-delivery')
+      focusEditorField(invalidName ? 'questionnaire-product-name' : 'questionnaire-product-expiry', invalidName ? 'questionnaire-basic' : trainingDesign && id !== 'new' && publicEnabled ? 'questionnaire-publish' : 'questionnaire-delivery')
       return
     }
     if (variantsDirty && trainingVariantDraft) {
@@ -735,15 +735,15 @@ export function QuestionnaireProductEdit() {
                 ))}
               </fieldset>
             )}
-            <label className={trainingDesign ? 'qt-public-choice' : 'block'}>
+            {trainingDesign && detail ? <div className="qt-anonymous-entry"><div><LinkIcon size={18} aria-hidden="true"/><h3>匿名链接作答</h3><span>{publicEnabled ? '已启用' : '未启用'}</span></div><p>让参与者免登录进入测评。启用、截止时间与分享链接统一在匿名设置中管理。</p><a href="#questionnaire-publish" onClick={event=>{event.preventDefault();goToAnonymousSettings()}}>设置匿名链接 <ArrowRight size={14} aria-hidden="true"/></a></div> : (<label className={trainingDesign ? 'qt-public-choice' : 'block'}>
               <input
                 type="checkbox"
                 checked={publicEnabled}
                 aria-label="允许通过公开链接作答"
                 onChange={(e) => setPublic(e.target.checked)}
               />{' '}
-              {trainingDesign ? <span>允许通过公开链接作答<small>需要把链接分享给课程外的作答者时开启；公开链接须设置截止时间。</small></span> : '允许通过公开链接作答'}
-            </label>
+              {trainingDesign ? <span>允许通过公开链接作答<small>参与者无需账号登录。发布测评后，再生成并复制匿名链接；请先设置截止时间。</small></span> : '允许通过公开链接作答'}
+            </label>)}
             {!trainingDesign && persistenceSettings}
             {!trainingDesign && feedbackSettings}
             </div><div className="questionnaire-delivery-window">{trainingDesign && <div className="qt-delivery-section-heading"><h3>02 · 何时开放作答</h3><p>设定学员可以进入测评的时间范围。</p></div>}<div className="questionnaire-date-grid"><label className="block">
@@ -756,7 +756,7 @@ export function QuestionnaireProductEdit() {
             </label>
             <label className="block">
               截止时间
-              {!draft && !expiresAt ? <p className="questionnaire-window-summary">不设截止时间</p> : <LocalDateTimeInput picker className="input w-full"
+              {trainingDesign && detail && publicEnabled ? <div className="qt-anonymous-cutoff"><p>{expiresAt ? localDate(expiresAt).replace('T',' ') : '尚未设置'}</p><a href="#questionnaire-publish" onClick={event=>{event.preventDefault();goToAnonymousSettings()}}>{draft ? '前往匿名设置调整' : '查看匿名设置'}</a></div> : !draft && !expiresAt ? <p className="questionnaire-window-summary">不设截止时间</p> : <LocalDateTimeInput picker className="input w-full"
                 id="questionnaire-product-expiry"
                 aria-invalid={Boolean(expiryError)}
                 aria-describedby={
@@ -771,12 +771,12 @@ export function QuestionnaireProductEdit() {
             </label>
             </div>
             <p className="text-sm text-gray-600">按设备时区（{Intl.DateTimeFormat().resolvedOptions().timeZone}）设置。开始时间留空即发布后开放；公开链接需设置截止时间。</p>
-            {expiryError && (
+            {expiryError && !(trainingDesign && detail && publicEnabled) && (
               <p id="questionnaire-product-expiry-error" role="alert">
                 {expiryError}
               </p>
             )}
-    {draft && <div className="flex flex-wrap gap-3"><ProductButton onClick={()=>setOpens(new Date().toISOString())}>设为现在开放</ProductButton><ProductButton onClick={()=>{setExpiry(new Date(Date.now()+7*86400000).toISOString());setExpiryError('')}}>设为七天后截止</ProductButton></div>}
+    {draft && <div className="flex flex-wrap gap-3"><ProductButton onClick={()=>setOpens(new Date().toISOString())}>设为现在开放</ProductButton>{!(trainingDesign && detail && publicEnabled) && <ProductButton onClick={()=>{setExpiry(new Date(Date.now()+7*86400000).toISOString());setExpiryError('')}}>设为七天后截止</ProductButton>}</div>}
     </div>{trainingDesign && feedbackSettings}</div>
     {detail && draft && !trainingDesign && <div className="questionnaire-delivery-footer"><p role="status">{dirty ? '设置有未保存的修改' : '设置已保存'}</p><ProductButton variant={dirty ? 'primary' : 'secondary'} disabled={busy || !dirty} onClick={() => void save()}>保存投放设置</ProductButton><a href="#questionnaire-publish">前往正式发布 ↑</a></div>}
   </fieldset>
@@ -1141,6 +1141,19 @@ export function QuestionnaireProductEdit() {
               />}
   </>
 
+  const publicDeliverySettings = detail?.publicEnabled && detail.status === 'PUBLISHED' && id && (
+                <PublicDeliveryManager
+                  key={id}
+                  guided={trainingDesign}
+                  family="COMPOSITE"
+                  resourceId={id}
+                  maximumExpiry={detail.expiresAt}
+                  groupIpEligible={detail.productKind === 'QUESTIONNAIRE' && detail.questionnaireType === 'COURSE' &&
+                    detail.questionnaireCourses?.length === 1 && catalog.courses.some((course: {id: string; courseType?: string; isLibrary?: boolean}) =>
+                      course.id === detail.questionnaireCourses[0].courseId && course.courseType === 'TRAINING_COURSE' && !course.isLibrary)}
+                />
+              )
+
   const managementActions = detail && <>
               <div className="flex flex-wrap gap-4 my-5">
                 <ProductButton
@@ -1196,17 +1209,7 @@ export function QuestionnaireProductEdit() {
                   </ProductButton>
                 )}
               </div>
-              {detail.publicEnabled && detail.status === 'PUBLISHED' && id && (
-                <PublicDeliveryManager
-                  key={id}
-                  family="COMPOSITE"
-                  resourceId={id}
-                  maximumExpiry={detail.expiresAt}
-                  groupIpEligible={detail.productKind === 'QUESTIONNAIRE' && detail.questionnaireType === 'COURSE' &&
-                    detail.questionnaireCourses?.length === 1 && catalog.courses.some((course: {id: string; courseType?: string; isLibrary?: boolean}) =>
-                      course.id === detail.questionnaireCourses[0].courseId && course.courseType === 'TRAINING_COURSE' && !course.isLibrary)}
-                />
-              )}
+              {!trainingDesign && publicDeliverySettings}
   </>
 
   const timingDisclosure = trainingDesign ? detail && <DeliveryOptionCard icon={ShieldCheck} title="教师查看与导出计时" description="单独决定有权限的教师能否在报告或导出文件中看到计时。" enabled={Boolean(detail.timingExportEnabled)} badge={detail.timingExportEnabled ? '已允许' : '未允许'}>
@@ -1235,6 +1238,7 @@ export function QuestionnaireProductEdit() {
                   </ProductButton>
                 )}
         </div></div>
+              {trainingDesign && <details className="qt-rule-details"><summary>自检与正式发布有什么区别？</summary><p>自检只检查当前设置，不会发布测评或生成链接。正式发布会再次检查内容与权限，通过后固定测评内容和相关投放策略；匿名链接在发布后单独生成。</p></details>}
               {preflight && !dirty && preflight.revision === detail.revision && <section aria-label="发布自检结果" className="questionnaire-preflight-results my-4 rounded border p-4">
                 <h2 className="font-semibold">{preflight.ok ? '当前草稿自检通过' : '发布前请处理以下问题'}</h2>
                 <ul className="mt-2 space-y-2">{preflight.checks.map(check => <li key={check.key}><strong>{check.label}：{check.status === 'passed' ? '通过' : '需要处理'}</strong>{check.message !== '通过' && <p>{check.message}</p>}{check.targetId&&<ProductButton onClick={()=>{setEditingUnit(check.targetId!);if (trainingDesign) goToStep('questionnaire-content');requestAnimationFrame(() => document.getElementById('questionnaire-unit-'+check.targetId)?.scrollIntoView({block:'center'}))}}>配置对应单元</ProductButton>}{check.status!=='passed'&&<a href={check.key==='delivery'?'#questionnaire-delivery':'#questionnaire-content'}>定位并修复{check.key==='delivery'?'投放设置':'内容单元'}</a>}</li>)}</ul>
@@ -1254,6 +1258,18 @@ export function QuestionnaireProductEdit() {
     navigate(`${location.pathname}${location.search}#${key}`, { replace: true })
     requestAnimationFrame(() => document.querySelector('.qt-steps')?.scrollIntoView({ block: 'start', behavior: 'smooth' }))
   }
+  const goToAnonymousSettings = () => {
+    goToStep('questionnaire-publish')
+    requestAnimationFrame(() => { const heading=document.getElementById('questionnaire-anonymous-settings'); heading?.focus(); heading?.scrollIntoView({block:'start',behavior:'smooth'}) })
+  }
+  const anonymousSettings = detail && <section className="qt-anonymous-settings" aria-label="匿名链接整体设置">
+    <header><span className="qt-anonymous-icon"><LinkIcon size={21} aria-hidden="true"/></span><div><h3 id="questionnaire-anonymous-settings" tabIndex={-1}>匿名链接设置</h3><p>从是否启用到复制分享，在这里统一完成。</p></div><span className="qt-anonymous-badge">{publicEnabled ? '已启用' : '未启用'}</span></header>
+    <label className="qt-public-choice"><input type="checkbox" checked={publicEnabled} disabled={busy||!draft} aria-label="允许通过公开链接作答" onChange={event=>setPublic(event.target.checked)}/><span>允许通过公开链接作答<small>参与者无需账号登录；个人反馈和教师报告仍按测评权限开放。</small></span></label>
+    {publicEnabled && <div className="qt-anonymous-expiry"><label htmlFor={draft ? 'questionnaire-product-expiry' : undefined}>测评截止时间{draft ? '（必填）' : ''}</label>{draft ? <><LocalDateTimeInput picker id="questionnaire-product-expiry" aria-label="截止时间" aria-invalid={Boolean(expiryError)} aria-describedby={expiryError ? 'questionnaire-product-expiry-error' : 'qt-anonymous-expiry-help'} value={localDate(expiresAt)} disabled={busy} onChange={event=>{setExpiry(event.target.value);setExpiryError('')}}/><ProductButton disabled={busy} onClick={()=>{setExpiry(new Date(Date.now()+7*86400000).toISOString());setExpiryError('')}}>设为七天后截止</ProductButton></> : <strong>{expiresAt ? localDate(expiresAt).replace('T',' ') : '尚未设置'}</strong>}<p id="qt-anonymous-expiry-help">按设备时区 {Intl.DateTimeFormat().resolvedOptions().timeZone} 设置；稍后生成的链接有效期不能晚于此时间。{draft ? '该截止时间也适用于当前测评的其他投放。' : '此项已随测评发布固定。'}</p>{expiryError && <p id="questionnaire-product-expiry-error" role="alert">{expiryError}</p>}</div>}
+    {draft && publicEnabled && <div className="qt-publish-link-guide"><div><h3>匿名分享，接下来只需三步</h3><ol><li><strong>1. 发布测评</strong><span>先保存并核对当前内容与投放设置。</span></li><li><strong>2. 生成匿名链接</strong><span>发布后设置链接有效期，其他功能按需展开。</span></li><li><strong>3. 复制并分享</strong><span>参与者无需账号登录，即可从链接进入。</span></li></ol><details className="qt-rule-details"><summary>发布后还能修改什么？</summary><p>测评内容与相关投放策略发布后固定；匿名链接在发布后单独生成、复制和停用，需要更改内容时请复制为新草稿。</p></details></div></div>}
+    {!publicEnabled && <p className="qt-anonymous-off">{draft ? '不启用时，继续使用课程中的原有作答入口。需要免登录分享时，再打开此项。' : '当前测评未启用匿名链接。如需启用，请复制为新草稿后设置。'}</p>}
+    {publicDeliverySettings}
+  </section>
   const reportSummary = detail && !detail.trainingFeedbackPolicy && !feedbackChanged && !feedbackDefaultsOnBinding
     ? '沿用原有反馈方式' : feedbackMode === 'SCHEDULED' ? '预设时间开放' : '完成并生成后可见'
   const savedPreflight = Boolean(preflight?.ok && !dirty && preflight.revision === detail?.revision)
@@ -1306,7 +1322,8 @@ export function QuestionnaireProductEdit() {
             {detail && <section className="qt-panel" hidden={stepIndex !== 3} aria-label="检查与发布步骤">
               <header className="qt-panel-heading"><small>STEP 04 / 04</small><h2>检查与发布</h2><p>核对内容、课程与反馈设置，确认后再发布。</p></header>
               <div className="qt-panel-body"><dl className="qt-review-facts"><div><dt>测评名称</dt><dd>{name}</dd></div><div><dt>内容单元</dt><dd>{units.length} 个</dd></div><div><dt>投放范围</dt><dd>{kind === 'GENERAL' ? '通用公开问卷' : courseIds.map(courseId => catalog.courses.find((course:any) => course.id === courseId)?.title || '已绑定课程').join('、') || '尚未选择'}</dd></div><div><dt>学员报告</dt><dd>{reportSummary}{feedbackMode === 'SCHEDULED' && reportSummary === '预设时间开放' ? ` ${localDate(feedbackReleaseAt)}` : ''}</dd></div></dl>
-                {publishPanel}<details className="qt-advanced"><summary>草稿与结果管理</summary><div className="qt-advanced-body">{managementActions}</div></details>
+                {!draft && publishPanel}
+                {anonymousSettings}{draft && publishPanel}<details className="qt-advanced"><summary>草稿与结果管理</summary><div className="qt-advanced-body">{managementActions}</div></details>
               </div>
             </section>}
           </div>

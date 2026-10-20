@@ -143,3 +143,38 @@
 }
 .hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-feedback-placeholder{order:2;border:1px dashed var(--qt-line);padding:19px 20px;border-radius:9px;color:var(--qt-muted)}
 .hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-feedback-placeholder p{font-size:12px;margin-top:6px}
+
+/* Publication explains when ordinary anonymous sharing becomes available. */
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-publish-link-guide{display:flex;align-items:flex-start;gap:13px;margin:22px 0;padding:19px;border:1px solid #d7e2cb;border-radius:9px;background:#f5f9ef;color:#3e603d;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-publish-link-guide>svg{flex-shrink:0;margin-top:2px;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-publish-link-guide>div{flex:1;min-width:0;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-publish-link-guide h3{margin:0;font-size:14px;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-publish-link-guide ol{display:grid;gap:13px;margin:16px 0;padding:0;list-style:none;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-publish-link-guide li strong{display:block;font-size:12px;font-weight:550;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-publish-link-guide li span{display:block;margin-top:4px;font-size:11px;color:#5f7455;}
+
+/* One place for anonymous delivery; the delivery step links here. */
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-entry{padding:17px;border:1px dashed #cbd9c0;border-radius:9px;background:#f9fcf4;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-entry>div{display:flex;align-items:center;gap:8px;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-entry h3{font-size:13px;font-weight:550;margin:0;flex:1;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-entry>div>span{font-size:10px;color:#566d49;padding:2px 7px;border-radius:4px;background:#eaf1e0;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-entry p{font-size:11px;color:#617657;margin:9px 0;line-height:1.9;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor :is(.qt-anonymous-entry,.qt-anonymous-cutoff) a{display:inline-flex;align-items:center;gap:6px;min-height:40px;color:#3c643e;font-size:12px;font-weight:550;text-decoration:none;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-cutoff p{margin-top:10px;font-size:13px;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-settings{margin:23px 0;padding:19px;border:1px solid #d9e4d0;border-radius:10px;background:#fff;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-settings>header{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-settings>header>div{flex:1;min-width:0;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-settings>header h3{font-family:var(--training-serif);font-size:19px;font-weight:600;scroll-margin-top:20px;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-settings>header p{margin-top:4px;color:#617258;font-size:11px;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-icon{display:grid;place-items:center;flex-shrink:0;width:39px;height:39px;border-radius:10px;background:#eef4e6;color:#4f7447;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-badge{font-size:10px;padding:3px 8px;border-radius:4px;background:#edf3e6;color:#58714c;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-settings .qt-public-choice{font-size:12px;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-expiry{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:18px;padding:16px;border:1px solid #dfe7d8;border-radius:8px;background:#fafcf7;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-expiry>label{width:100%;font-size:12px;font-weight:550;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-expiry>input{flex:1;min-width:180px;margin:0;min-height:44px;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-expiry>.hui-button{font-size:11px;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-expiry>p{width:100%;font-size:11px;line-height:1.9;color:#5f7354;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-expiry>strong{font-size:14px;font-weight:500;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-off{margin-top:13px;font-size:12px;color:#62755a;}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-settings .training-public-delivery{padding-top:21px;border-top:1px solid #e0e8d8;}
+@media(max-width:640px){.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-settings{padding:15px}.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-expiry{padding:13px}.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-expiry>input{flex-basis:100%}}

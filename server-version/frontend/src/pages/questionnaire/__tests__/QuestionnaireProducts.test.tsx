@@ -11,7 +11,7 @@ const api = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), put: vi.fn() }))
 vi.mock('../../../api/client', () => ({ default: api }))
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'teacher-1', role: 'TEACHER' } }) }))
 vi.mock('../../../components/PublicDeliveryManager', () => ({
-  PublicDeliveryManager: () => null,
+  PublicDeliveryManager: () => <section aria-label="匿名作答链接管理">合成匿名链接面板</section>,
 }))
 import { QuestionnaireProductEdit } from '../QuestionnaireProducts'
 function mount(id = 'new', search = '') {
@@ -788,4 +788,55 @@ describe('Training automatic Form stages', () => {
     expect(api.post.mock.calls[1][1].item.formDefinition.otherOptionKey).toBeUndefined()
     expect(api.post.mock.calls[1][1].item.formDefinition.exclusiveOptionKeys).toEqual([])
   })
+})
+
+
+describe('guided anonymous publication', () => {
+ const source = { id: 'guided-public', name: '匿名课程测评', status: 'DRAFT', revision: 7, productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', publicEnabled: true, expiresAt: '2099-01-01T00:00:00Z', questionnaireCourses: [{ courseId: 'course' }], items: [{ id: 'item', type: 'SCALE', position: 0, scale: { name: '量表' } }], formSections: [] }
+ const setup = (status: string, overrides: Record<string, unknown> = {}) => {
+  api.post.mockClear()
+  api.put.mockClear()
+  trainingPresentation.enabled = true
+  api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? { scales: [], cognitive: [], situational: [], courses: [{ id: 'course', title: '合成课程', courseType: 'TRAINING_COURSE' }] } : { ...source, status, ...overrides } }))
+ }
+ it('explains the three steps before publishing without generating a public credential', async () => {
+  setup('DRAFT')
+  mount('guided-public', '#questionnaire-publish')
+  expect(await screen.findByRole('heading', { name: '匿名分享，接下来只需三步' })).toBeInTheDocument()
+  expect(screen.getByText('2. 生成匿名链接')).toBeInTheDocument()
+  expect(screen.queryByRole('region', { name: '匿名作答链接管理' })).not.toBeInTheDocument()
+  expect(api.post).not.toHaveBeenCalled()
+ })
+ it('shows links directly after publication, outside the collapsed management actions', async () => {
+  setup('PUBLISHED')
+  mount('guided-public', '#questionnaire-publish')
+  expect(await screen.findByRole('region', { name: '匿名作答链接管理' })).toBeVisible()
+  expect(screen.getByRole('region', { name: '匿名作答链接管理' }).closest('details')).toBeNull()
+ })
+ it('opens one anonymous settings area from delivery and preserves changes through saving', async () => {
+  const original = Element.prototype.scrollIntoView
+  Object.defineProperty(Element.prototype, 'scrollIntoView', { configurable: true, value: vi.fn() })
+  try {
+   setup('DRAFT', { publicEnabled: false, expiresAt: null })
+   api.put.mockImplementation(async (_path, body) => ({ code: 0, data: { ...source, ...body, revision: 8 } }))
+   mount('guided-public', '#questionnaire-delivery')
+   fireEvent.click(await screen.findByRole('link', { name: '设置匿名链接' }))
+   await waitFor(() => expect(screen.getByRole('region', { name: '匿名链接整体设置' })).toBeVisible())
+   fireEvent.click(screen.getByRole('checkbox', { name: '允许通过公开链接作答' }))
+   fireEvent.click(screen.getByRole('button', { name: '保存全部修改' }))
+   const expiry = screen.getByLabelText('截止时间')
+   await waitFor(() => expect(expiry).toHaveFocus())
+   expect(expiry).toBeVisible()
+   expect(api.put).not.toHaveBeenCalled()
+   fireEvent.change(expiry, { target: { value: '2099-01-01T12:00' } })
+   fireEvent.click(screen.getByRole('link', { name: /投放设置/ }))
+   expect(screen.queryByRole('checkbox', { name: '允许通过公开链接作答' })).not.toBeInTheDocument()
+   fireEvent.click(screen.getByRole('link', { name: '设置匿名链接' }))
+   expect(expiry).toHaveValue('2099-01-01T12:00')
+   fireEvent.click(screen.getByRole('button', { name: '保存全部修改' }))
+   await waitFor(() => expect(api.put).toHaveBeenCalledWith('/questionnaire-products/guided-public', expect.objectContaining({ revision: 7, publicEnabled: true })))
+   expect(api.put.mock.calls[0]![1].expiresAt).toBe(new Date('2099-01-01T12:00').toISOString())
+  } finally { if (original) Object.defineProperty(Element.prototype, 'scrollIntoView', { configurable: true, value: original }); else Reflect.deleteProperty(Element.prototype, 'scrollIntoView') }
+ })
+
 })
