@@ -1,7 +1,7 @@
 import { assertCompositeCourseScope } from '../modules/composite/composite-course-scope'
 import { UserRole } from '@prisma/client'
 import { prisma } from '../config/database'
-import { loadCurrentPrincipal } from '../modules/organization/principal'
+import { asBusinessPrincipal, loadCurrentPrincipal } from '../modules/organization/principal'
 import { inactiveAccountMessage } from '../utils/accountStatus'
 import * as assignmentService from '../modules/cognitive/assignment.service'
 import { isCompositeWrapper } from '../modules/cognitive/assignment.access'
@@ -14,10 +14,17 @@ import { provenanceSchema } from './assessmentExportArtifact'
 import { exportIntentDateRange } from './exportIntentDateRange'
 import { trainingAnalysisExportOptionsSchema, trainingAnalysisProvenanceSchema, assertTrainingAnalysisExportIdentity, saveTrainingAnalysisExport } from '../modules/training-analysis/export'
 const authorizeCurrentExportPrincipal = async (claim: ClaimedExportBatch) => {
-  const principal = await loadCurrentPrincipal(claim.createdBy)
+  const current = await loadCurrentPrincipal(claim.createdBy)
+  const principal=current&&claim.options.creatorRole===UserRole.TEACHER?asBusinessPrincipal(current):current
   if (!principal || inactiveAccountMessage(principal) || principal.mustChangePassword || principal.role !== claim.options.creatorRole
+    || claim.options.authorityTokenVersion !== principal.tokenVersion
     || (!claim.options.anonymize && principal.role !== UserRole.ADMIN)) throw new Error('Export authority revoked')
   return principal
+}
+const trainingAuthorityVersion = (claim: ClaimedExportBatch): number => {
+  const version = claim.options.authorityTokenVersion
+  if (typeof version !== 'number' || !Number.isInteger(version) || version < 0) throw new Error('Export authority revoked')
+  return version
 }
 
 export const revalidateAssessmentExport = async (claim: ClaimedExportBatch, ids?: string[]) => {
@@ -26,7 +33,7 @@ export const revalidateAssessmentExport = async (claim: ClaimedExportBatch, ids?
     assertTrainingAnalysisExportIdentity(options, { courseId: claim.resourceId, createdBy: claim.createdBy, creatorRole: claim.options.creatorRole })
     if (!claim.options.anonymize) throw new Error('Training analysis export must be anonymized')
     const { revalidateTrainingAnalysisManifest } = await import('../modules/training-analysis/service')
-    await revalidateTrainingAnalysisManifest({ id: claim.createdBy, role: options.manifest.actor.role }, options.manifest)
+    await revalidateTrainingAnalysisManifest({ id: claim.createdBy, role: options.manifest.actor.role }, options.manifest, trainingAuthorityVersion(claim))
     return { userId: claim.createdBy, role: options.manifest.actor.role }
   }
   const principal = await authorizeCurrentExportPrincipal(claim)
@@ -60,7 +67,8 @@ export const prepareAssessmentExport = async (claim: ClaimedExportBatch) => {
     // its single source load. The worker still revalidates after serialization.
     const { analyzeTrainingCourse } = await import('../modules/training-analysis/service')
     const result = await analyzeTrainingCourse({ actor: { id: actor.userId, role: actor.role as 'ADMIN' | 'TEACHER' },
-      courseId: claim.resourceId, selector: trainingAnalysis.selector, expectedManifest: trainingAnalysis.manifest })
+      courseId: claim.resourceId, selector: trainingAnalysis.selector, expectedManifest: trainingAnalysis.manifest,
+      expectedTokenVersion: trainingAuthorityVersion(claim) })
     // The exact manifest survives prepare, retries, serialization, publication,
     // and download. A cutoff alone cannot freeze the authorized sample.
     if (result.manifest.manifestHash !== trainingAnalysis.manifest.manifestHash) throw new Error('Training analysis manifest changed')

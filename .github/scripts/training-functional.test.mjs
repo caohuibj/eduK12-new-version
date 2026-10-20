@@ -7,6 +7,8 @@ import { join, delimiter } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validateTrainingFunctional, validTrainingFunctionalPlan, TRAINING_FUNCTIONAL_BASE,
   TRAINING_FUNCTIONAL_CONFIG, TRAINING_FUNCTIONAL_TOOLS, TRAINING_FUNCTIONAL_OMISSIONS } from './training-functional.mjs';
+import { validateTrainingFollowup, TRAINING_FOLLOWUP_CONFIG, TRAINING_FOLLOWUP_BASE,
+  TRAINING_FOLLOWUP_MODE, TRAINING_FOLLOWUP_SOURCES, TRAINING_FOLLOWUP_TOOLS } from './training-functional.mjs';
 import { requiredChecks, failedChecks } from './merge-gate.mjs';
 import { mediaPlan } from './ci-media-plan.mjs';
 
@@ -15,6 +17,10 @@ const context = { base: TRAINING_FUNCTIONAL_BASE, head: 'a'.repeat(40), event: '
 const added = file => ({ file, status: 'A', oldMode: '000000', newMode: '100644' });
 const entries = () => [...TRAINING_FUNCTIONAL_TOOLS, ...config.sourcePaths].map(added);
 const plan = () => validateTrainingFunctional(entries(), config, context);
+const followupConfig = JSON.parse(readFileSync(new URL('../config/training-followup-functional-ci.json', import.meta.url), 'utf8'));
+const followupContext = { ...context, base: TRAINING_FOLLOWUP_BASE };
+const followupEntries = () => [...TRAINING_FOLLOWUP_TOOLS, ...TRAINING_FOLLOWUP_SOURCES].map(added);
+const followupPlan = () => validateTrainingFollowup(followupEntries(), followupConfig, followupContext);
 const workflow = name => readFileSync(new URL(`../workflows/${name}.yml`, import.meta.url), 'utf8');
 const job = (source, name) => source.split(`\n  ${name}:\n`)[1]?.split(/\n  [a-z][a-z0-9-]*:/)[0] || '';
 const acceptance = ['media2','media7','situational_video','situational_branching','video_core','app_shell','canonical_visual','perf_smoke','ops'];
@@ -116,6 +122,70 @@ test('ordinary platform defaults still require performance and no forged omissio
   ]) { const n = needsFor(); mutate(n); assert.ok(failedChecks(n, false).includes('scope')); }
 });
 
+test('followup freezes the actual administrator main and the complete 18-source / 8-tool diff', () => {
+  assert.equal(followupConfig.base, 'f41dca3f347b253b500de600c75855ffcd275491');
+  assert.equal(TRAINING_FOLLOWUP_SOURCES.length, 18); assert.equal(TRAINING_FOLLOWUP_TOOLS.length, 8);
+  assert.deepEqual([...followupConfig.sourcePaths].sort(), TRAINING_FOLLOWUP_SOURCES);
+  const p = followupPlan(); assert.equal(validTrainingFunctionalPlan(p), true);
+  assert.equal(p.mode, TRAINING_FOLLOWUP_MODE); assert.equal(p.changedPaths.length, 26);
+  assert.deepEqual(p.omittedPerformance, ['aggregate-report-200-completion', 'perf-phase0-smoke']);
+  assert.equal(validateTrainingFollowup([], followupConfig, { ...followupContext, branch:'perf/training-load-followup-20261020' }), null);
+});
+
+test('followup rejects unknown, missing, malformed, moved, mixed-marker or changed-mode scope', () => {
+  for (const entry of followupEntries().filter(e => e.file !== TRAINING_FOLLOWUP_CONFIG))
+    assert.throws(() => validateTrainingFollowup(followupEntries().filter(e => e.file !== entry.file), followupConfig, followupContext));
+  for (const change of [
+    list => list.push(added('server-version/backend/src/new-optimization.ts')),
+    list => list.push(added(TRAINING_FUNCTIONAL_CONFIG)),
+    list => list.push({ ...list[0] }),
+    ...['D','R100'].map(status => list => { list[1].status=status; }),
+    ...['100755','120000'].map(newMode => list => { list[1].newMode=newMode; }),
+    list => { list[0].status='M'; list[0].oldMode='100644'; },
+  ]) { const list=followupEntries(); change(list); assert.throws(() => validateTrainingFollowup(list, followupConfig, followupContext)); }
+  for (const options of [{base:'b'.repeat(40)}, {head:'HEAD'}, {event:'workflow_dispatch'}, {event:'pull_request_target'}, {forceFull:true}])
+    assert.throws(() => validateTrainingFollowup(followupEntries(),followupConfig,{...followupContext,...options}));
+  for (const change of [{mode:'training-functional-only'}, {sourcePaths:followupConfig.sourcePaths.slice(1)},
+    {sourcePaths:[...followupConfig.sourcePaths,'server-version/backend/src/new-optimization.ts']}])
+    assert.throws(() => validateTrainingFollowup(followupEntries(),{...followupConfig,...change},followupContext));
+  for (const change of [{base:TRAINING_FUNCTIONAL_BASE}, {changedPaths:followupPlan().changedPaths.slice(1)},
+    {omittedPerformance:['all-security']}]) assert.equal(validTrainingFunctionalPlan({...followupPlan(),...change}),false);
+});
+
+test('followup still requires every ordinary functional gate and exact performance nonexecution', () => {
+  const needs=needsFor(); needs.scope.outputs.training_functional_plan=JSON.stringify(followupPlan());
+  assert.deepEqual(requiredChecks(needs,false).sort(),[...functionalChecks].sort());
+  assert.deepEqual(failedChecks(needs,false),[]);
+  for (const name of functionalChecks) for (const state of ['failure','cancelled','skipped',undefined]) {
+    const changed=structuredClone(needs); changed[name]={result:state}; assert.ok(failedChecks(changed,false).length>0,name+' '+state);
+  }
+  for (const mutate of [n=>{n.scope.outputs.run_performance_tests='true';},n=>{n.scope.outputs.perf_smoke='true';},
+    n=>{n['accept-perf'].result='success';},n=>{n.scope.outputs.training_functional_plan='null';},
+    ...['ops','app_shell','codeql','ui_required','frontend_build','visual_hosted'].map(k=>n=>{n.scope.outputs[k]='false';})]) {
+    const changed=structuredClone(needs); mutate(changed); assert.ok(failedChecks(changed,false).includes('scope'));
+  }
+});
+
+test('followup passes an exact profile input and adds admin acceptance without dropping ordinary browser work', () => {
+  const ci=workflow('ci'),backend=workflow('ci-backend'),browser=workflow('ci-browser');
+  for(const name of ['scope','probe-backend','probe-perf','probe-browser','merge-gate'])
+    assert.match(job(ci,name),/!\(github\.event_name == 'workflow_dispatch' && github\.ref == 'refs\/heads\/perf\/training-load-followup-20261020'\)/,name);
+  assert.match(job(ci,'scope'),/CI_TRAINING_FUNCTIONAL_REQUIRED:.*perf\/training-load-followup-20261020/);
+  for(const name of ['backend','browser'])assert.match(job(ci,name),/training_followup_functional:.*fromJSON\(needs\.scope\.outputs\.training_functional_plan\)\.mode == 'training-followup-functional-only'/);
+  assert.match(backend,/if: inputs\.admin_permissions_functional \|\| inputs\.training_followup_functional/);
+  assert.match(backend,/training-functional\.mjs" verify-followup/);
+  assert.match(backend,/test "\$denied" -eq 1/);
+  assert.match(backend,/assert\.equal\(read\('rollback-old\.json'\)\.result,'DENIED'\)/);
+  assert.doesNotMatch(backend,/CI_EXPECTED_BASE_ROLLBACK/);
+  assert.match(browser,/if: \(inputs\.admin_permissions_functional \|\| inputs\.training_followup_functional\) && matrix\.group == 'security'/);
+  assert.match(browser,/training-functional\.mjs verify-followup/);
+  // Followup is additive: only the original admin-only input narrows these
+  // existing tasks; the new input must not be used to suppress any step.
+  for(const line of browser.split('\n').filter(line=>line.trim().startsWith('if:')))
+    assert.doesNotMatch(line,/!.*inputs\.training_followup_functional|inputs\.training_followup_functional.*==\s*false/);
+  assert.match(readFileSync(new URL('./merge-gate.mjs',import.meta.url),'utf8'),/\[TRAINING_FUNCTIONAL_BASE,TRAINING_FOLLOWUP_BASE\]\.includes\(process\.env\.CI_BASE_SHA\)/);
+});
+
 test('backend switch defaults true and the two functional aggregate assertions remain mandatory', () => {
   const backend = workflow('ci-backend');
   assert.match(backend, /run_performance_tests:\n\s+type: boolean\n\s+default: true/);
@@ -184,12 +254,12 @@ else throw new Error('Unexpected Git command: ' + JSON.stringify(args));
       `:${entry.oldMode} ${entry.newMode} ${'0'.repeat(40)} ${'b'.repeat(40)} ${entry.status}\0${entry.file}\0`).join('');
     const fixture = { base: context.base, head: context.head, configPath: TRAINING_FUNCTIONAL_CONFIG, config, raw: raw(entries()) };
     writeFileSync(fixtureFile, JSON.stringify(fixture));
-    const execute = () => spawnSync(process.execPath,
-      [fileURLToPath(new URL('./training-functional.mjs', import.meta.url)), 'verify-backend'], {
+    const execute = (command = 'verify-backend') => spawnSync(process.execPath,
+      [fileURLToPath(new URL('./training-functional.mjs', import.meta.url)), command], {
         cwd: directory, encoding: 'utf8', timeout: 10000,
         env: { ...process.env, PATH: directory + delimiter + process.env.PATH,
           TRAINING_CLI_GIT_FIXTURE: fixtureFile, CI_EVENT: 'pull_request',
-          CI_BASE_SHA: context.base, CI_FORCE_FULL: 'false' },
+          CI_BASE_SHA: fixture.base, CI_FORCE_FULL: 'false' },
       });
     const valid = execute();
     assert.ifError(valid.error);
@@ -205,5 +275,13 @@ else throw new Error('Unexpected Git command: ' + JSON.stringify(args));
     assert.equal(invalid.status, 1, invalid.stderr);
     assert.equal(invalid.stdout, '');
     assert.match(invalid.stderr, /Unknown path, deletion or file-mode change/);
+    Object.assign(fixture,{base:followupContext.base,configPath:TRAINING_FOLLOWUP_CONFIG,
+      config:followupConfig,raw:raw(followupEntries())});
+    writeFileSync(fixtureFile,JSON.stringify(fixture));
+    const current=execute('verify-followup'); assert.ifError(current.error); assert.equal(current.status,0,current.stderr);
+    assert.deepEqual(JSON.parse(current.stdout),{mode:TRAINING_FOLLOWUP_MODE,base:followupContext.base,
+      head:context.head,omittedPerformance:TRAINING_FUNCTIONAL_OMISSIONS});
+    fixture.base='b'.repeat(40);writeFileSync(fixtureFile,JSON.stringify(fixture));
+    const moved=execute('verify-followup');assert.equal(moved.status,1);assert.equal(moved.stdout,'');
   } finally { rmSync(directory, { recursive: true, force: true }); }
 });

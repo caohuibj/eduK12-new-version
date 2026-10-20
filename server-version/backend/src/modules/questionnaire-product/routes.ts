@@ -1,4 +1,7 @@
 import { updateCatalogTags } from '../training-catalog/tags'
+import {trainingReinterpretationsRouter} from './reinterpretation.routes'
+import {trainingReferencesRouter} from '../training-analysis/reference.routes'
+import {trainingContentReportsRouter} from './content-report.routes'
 import { Router, type Request, type Response, type NextFunction } from 'express'
 import { authenticate, requireTeacher, requireRole } from '../../middleware/auth'
 import { UserRole } from '../../types'
@@ -17,6 +20,9 @@ const handle = (fn: (req: Request) => Promise<unknown>) => async (req: Request, 
 const pagination = z.object({ page: z.coerce.number().int().min(1).max(500).default(1), pageSize: z.coerce.number().int().min(1).max(50).default(25) })
 router.get('/available', authenticate, requireRole(UserRole.STUDENT), handle(req => service.available(req.user!.userId)))
 router.use(authenticate, requireTeacher)
+router.use('/:id/courses/:courseId/attempts/:attemptId/interpretations',trainingReinterpretationsRouter)
+router.use('/:id/content-reports/courses/:courseId',trainingContentReportsRouter)
+router.use('/:id/reference-candidates/courses/:courseId',trainingReferencesRouter)
 router.get('/templates', handle(req => workbench.templates(req.user!, req.query)))
 router.post('/templates', handle(req => workbench.saveTemplate(req.user!, req.body)))
 router.post('/templates/:templateId/instantiate', handle(req => workbench.instantiateTemplate(req.user!, req.params.templateId, req.body)))
@@ -37,6 +43,10 @@ router.post('/:id/reorder', handle(req => service.reorder(req.user!, req.params.
 router.post('/:id/training-variants', handle(req => service.updateTrainingVariants(req.user!, req.params.id, req.body)))
 router.post('/:id/training-flow', handle(req => service.updateTrainingFlow(req.user!, req.params.id, req.body)))
 router.post('/:id/timing-export-policy', handle(req => service.updateTimingExport(req.user!, req.params.id, req.body)))
+router.get('/:id/content-reference-choices', handle(req => service.contentReferenceChoices(req.user!, req.params.id)))
+router.post('/:id/content-reference-selection', handle(req => service.updateContentReferenceSelection(req.user!, req.params.id, req.body)))
+router.post('/:id/content-report-selection', handle(req => service.updateContentReportSelection(req.user!, req.params.id, req.body)))
+router.post('/:id/measurement-instances/publish', handle(req => service.publishMeasurementInstances(req.user!, req.params.id, req.body)))
 router.post('/:id/publish', handle(req => service.publish(req.user!, req.params.id, req.body)))
 router.post('/:id/preflight', handle(req => service.preflight(req.user!, req.params.id, req.body)))
 router.post('/:id/archive', handle(req => service.archive(req.user!, req.params.id, req.body)))

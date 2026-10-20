@@ -9,6 +9,16 @@ datasource db {
 }
 
 model User {
+  trainingReportDrafts TrainingReportDraft[]
+  surveyReferenceRequests SurveyReferenceRequest[]
+  contentCapabilityGrants       ContentCapabilityGrant[] @relation("ContentCapabilitySubject")
+  issuedContentCapabilityGrants ContentCapabilityGrant[] @relation("ContentCapabilityIssuer")
+  revokedContentCapabilityGrants ContentCapabilityGrant[] @relation("ContentCapabilityRevoker")
+
+  surveyReportDrafts SurveyReportDraft[]
+  surveyInterpretationArtifacts SurveyInterpretationArtifact[]
+  measurementReferenceCandidates MeasurementReferenceCandidate[]
+  measurementReferenceReviews MeasurementReferenceReview[]
   compositionTemplates AssessmentCompositionTemplate[]
   assessmentManagementEvents AssessmentManagementEvent[]
   scalePublicationAudits ScalePublicationAudit[]
@@ -109,6 +119,56 @@ model User {
 // ==================== Organization / Reporting V2.1 identity authority ====================
 // PostgreSQL-only partial/expression indexes, CHECK constraints, and the
 // append-only audit trigger remain authoritative in the handwritten migrations.
+model AdminSecurityKey {
+  id        String @id
+  userId    String @map("user_id")
+  publicKey Bytes @map("public_key")
+  counter   BigInt @default(0)
+  transports String[] @default([])
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([userId], map: "admin_security_keys_user_idx")
+  @@map("admin_security_keys")
+}
+
+model AdminSecurityChallenge {
+  idHash         String @id @map("id_hash")
+  userId         String @map("user_id")
+  purpose        String
+  challenge      String
+  tokenVersion   Int @map("token_version")
+  sessionId      String? @map("session_id")
+  enrollmentHash String? @map("enrollment_hash")
+  expiresAt      DateTime @map("expires_at") @db.Timestamptz(6)
+  @@index([expiresAt], map: "admin_security_challenges_expiry_idx")
+  @@map("admin_security_challenges")
+}
+
+model AdminEntryGrant {
+  id        String @id
+  userId    String @map("user_id")
+  entry     String
+  version   Int @default(1)
+  grantedBy String @map("granted_by")
+  grantedAt DateTime @default(now()) @map("granted_at") @db.Timestamptz(6)
+  revokedBy String? @map("revoked_by")
+  revokedAt DateTime? @map("revoked_at") @db.Timestamptz(6)
+  @@unique([userId, entry], map: "admin_entry_grants_user_entry_key")
+  @@map("admin_entry_grants")
+}
+
+model AdminAuthorizationAudit {
+  id           String @id
+  actorUserId  String? @map("actor_user_id")
+  targetUserId String @map("target_user_id")
+  entry        String?
+  action       String
+  version      Int?
+  reason       String
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([targetUserId, createdAt(sort: Desc)], map: "admin_authorization_audits_target_idx")
+  @@map("admin_authorization_audits")
+}
+
 model Organization {
   homeroomDeliveryEnabled Boolean @default(true) @map("homeroom_delivery_enabled")
   productDomain String @default("LEGACY") @map("product_domain")
@@ -257,6 +317,7 @@ model TeacherCode {
 }
 
 model Course {
+  trainingReportDrafts TrainingReportDraft[]
   questionnaireDeliveries QuestionnaireCourseDelivery[]
   id                   String                @id @default(uuid())
   title                String
@@ -670,6 +731,8 @@ model MaterialGrant {
 
 // 量表表
 model Scale {
+  measurementReleaseId String? @map("measurement_release_id")
+  measurementRelease MeasurementContentRelease? @relation(fields:[measurementReleaseId],references:[id],onDelete:Restrict,onUpdate:NoAction,map:"scales_measurement_release_fkey")
   publicationAudits ScalePublicationAudit[]
   id                String               @id @default(uuid())
   code              String               @unique // 量表编码
@@ -1134,6 +1197,11 @@ enum CompositeAnalysisSnapshotGenerationReason {
 // 综合测评模板。发布后项目配置不可修改，历史测评通过子记录保存各自的结果快照。
 model CompositeAssessment {
   tags String[] @default([])
+  trainingReportSelectionDraft Json? @map("training_report_selection_draft")
+  trainingReferenceSelectionDraft Json? @map("training_reference_selection_draft")
+  trainingReportDrafts TrainingReportDraft[]
+  trainingContentSnapshot Json? @map("training_content_snapshot")
+  trainingContentSnapshotHash String? @map("training_content_snapshot_hash")
   trainingFeedbackPolicy Json? @map("training_feedback_policy")
   trainingFeedbackPolicyHash String? @map("training_feedback_policy_hash")
   trainingPersistencePolicy Json? @map("training_persistence_policy")
@@ -1288,6 +1356,12 @@ model CompositeFormSection {
 
 // 一次学生/匿名参与记录。recoveryTokenHash 只存哈希，原始恢复凭证只在创建时返回一次。
 model CompositeAssessmentAttempt {
+  trainingContentInterpretationEncrypted String? @map("training_content_interpretation_encrypted")
+  trainingContentInterpretationHash String? @map("training_content_interpretation_hash")
+  trainingContentBinding Json? @map("training_content_binding")
+  trainingContentBindingHash String? @map("training_content_binding_hash")
+  trainingReferenceBinding Json? @map("training_reference_binding")
+  trainingReferenceBindingHash String? @map("training_reference_binding_hash")
   trainingFeedbackSnapshot Json? @map("training_feedback_snapshot")
   trainingFeedbackSnapshotHash String? @map("training_feedback_snapshot_hash")
   trainingPersistenceSnapshot Json? @map("training_persistence_snapshot")
@@ -1723,6 +1797,8 @@ enum CognitiveSessionStatus {
 
 // 认知测试配置（任务定义）。config 为任务参数（非参与者原始行为数据），按明文 Json 存储。
 model CognitiveTestConfig {
+  measurementReleaseId String? @map("measurement_release_id")
+  measurementRelease MeasurementContentRelease? @relation(fields:[measurementReleaseId],references:[id],onDelete:Restrict,onUpdate:NoAction,map:"cognitive_config_measurement_release_fkey")
   id             String                      @id @default(uuid())
   testType       String                      @map("test_type")
   configVersion  String                      @map("config_version")
@@ -1748,6 +1824,8 @@ model CognitiveTestConfig {
 // 认知测评分发（课程作业）。courseId 可空 + SetNull，保留 courseSnapshot 以抵御课程删除。
 model CognitiveAssignment {
   tags String[] @default([])
+  measurementReleaseId String? @map("measurement_release_id")
+  measurementRelease MeasurementContentRelease? @relation(fields:[measurementReleaseId],references:[id],onDelete:Restrict,onUpdate:NoAction)
   id                              String                    @id @default(uuid())
   courseId                        String?                   @map("course_id")
   courseSnapshot                  Json?                     @map("course_snapshot")
@@ -2518,6 +2596,8 @@ model SjtAuthorAudit {
 }
 
 model SjtAuthorRelease {
+  measurementReleaseId String? @map("measurement_release_id")
+  measurementRelease MeasurementContentRelease? @relation(fields:[measurementReleaseId],references:[id],onDelete:Restrict,onUpdate:NoAction,map:"sjt_author_measurement_release_fkey")
   id                String   @id @default(uuid())
   instrumentKey     String   @map("instrument_key")
   instrumentVersion String   @map("instrument_version")
@@ -2837,6 +2917,8 @@ model SurveyMfaRecoveryCode {
   @@map("survey_mfa_recovery_codes")
 }
 model SurveyProject {
+  referenceRequests SurveyReferenceRequest[]
+  reportDrafts SurveyReportDraft[]
   instruments    SurveyInstrumentDraft[]
   waves          SurveyWave[]
   publications   SurveyPublication[]
@@ -2912,6 +2994,7 @@ model SurveyPublication {
   @@map("survey_publications")
 }
 model SurveyWave {
+  referenceRequests SurveyReferenceRequest[]
   id              String        @id
   projectId       String        @map("project_id")
   project         SurveyProject @relation(fields:[projectId],references:[id],onDelete:Restrict)
@@ -2975,6 +3058,8 @@ model SurveyWaveAttempt {
   sessionHash    String?       @map("session_hash")
   runtimeAttemptId String?     @unique @map("runtime_attempt_id")
   flowAssignmentCipher String?  @map("flow_assignment_cipher")
+  contentBindingCipher String? @map("content_binding_cipher")
+  contentBindingHash String? @map("content_binding_hash")
   status         String        @default("STARTED")
   startedAt      DateTime      @default(now()) @map("started_at") @db.Timestamptz(6)
   completedAt    DateTime?     @map("completed_at") @db.Timestamptz(6)
@@ -3067,6 +3152,7 @@ model SurveyWaveFinal {
   resultsCipher   String           @map("results_cipher")
   resultsHash     String           @map("results_hash")
   completedAt     DateTime         @default(now()) @map("completed_at") @db.Timestamptz(6)
+  interpretations SurveyInterpretationArtifact[]
   @@index([projectId,waveId,completedAt],map:"survey_finals_project_wave_time_idx")
   @@map("survey_wave_finals")
 }
@@ -3905,4 +3991,224 @@ model TrainingAttemptCheckpoint {
   updatedAt DateTime @updatedAt @map("updated_at")
   attempt CompositeAssessmentAttempt @relation(fields:[attemptId],references:[id],onDelete:Restrict)
   @@map("training_attempt_checkpoints")
+}
+
+// Three independently versioned content layers; no personal answer data.
+model MeasurementContentRelease {
+  cognitiveAssignments CognitiveAssignment[]
+  trainingReportDrafts TrainingReportDraft[]
+  surveyReportDrafts SurveyReportDraft[]
+  referenceCandidates MeasurementReferenceCandidate[]
+  id              String @id
+  layer           String
+  family          String
+  key             String @map("content_key")
+  version         String
+  hashScheme      String @map("hash_scheme")
+  contentHash     String @map("content_hash")
+  content         Json
+  scope           Json
+  provenance      Json @default("{}")
+  assetRefs       Json @map("asset_refs")
+  sourceReleaseId String? @map("source_release_id")
+  source          MeasurementContentRelease? @relation("ContentSource",fields:[sourceReleaseId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  adaptations     MeasurementContentRelease[] @relation("ContentSource")
+  scales          Scale[]
+  cognitiveConfigs CognitiveTestConfig[]
+  sjtReleases     SjtAuthorRelease[]
+  publishedBy     String @map("published_by")
+  publishedAt     DateTime @default(now()) @map("published_at") @db.Timestamptz(6)
+  status          String @default("PUBLISHED")
+  events          MeasurementContentReleaseEvent[]
+  @@unique([family,layer,key,version],map:"measurement_content_release_identity_key")
+  @@index([family,layer,status],map:"measurement_content_catalog_idx")
+  @@map("measurement_content_releases")
+}
+model MeasurementContentReleaseEvent {
+  id         String @id
+  releaseId  String @map("release_id")
+  release    MeasurementContentRelease @relation(fields:[releaseId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  fromStatus String @map("from_status")
+  toStatus   String @map("to_status")
+  actorId    String @map("actor_id")
+  reason     String
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([releaseId,createdAt],map:"measurement_content_events_release_idx")
+  @@map("measurement_content_release_events")
+}
+
+model MeasurementReferenceCandidate {
+  surveyRequests SurveyReferenceRequest[]
+  id String @id
+  candidateHash String @unique @map("candidate_hash")
+  measurementReleaseId String @map("measurement_release_id")
+  measurementRelease MeasurementContentRelease @relation(fields:[measurementReleaseId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  analyzerId String @map("analyzer_id")
+  analyzer User @relation(fields:[analyzerId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  payload Json
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  reviews MeasurementReferenceReview[]
+  @@map("measurement_reference_candidates")
+}
+model MeasurementReferenceReview {
+  surveyRequests SurveyReferenceRequest[]
+  id String @id
+  candidateId String @map("candidate_id")
+  candidate MeasurementReferenceCandidate @relation(fields:[candidateId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  candidateHash String @map("candidate_hash")
+  reviewerId String @map("reviewer_id")
+  reviewerGrantId String? @map("reviewer_grant_id")
+  reviewerGrantVersion Int? @map("reviewer_grant_version")
+  reviewer User @relation(fields:[reviewerId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  decision String
+  statement String
+  reviewedAt DateTime @default(now()) @map("reviewed_at") @db.Timestamptz(6)
+  @@index([candidateId,reviewedAt],map:"measurement_reference_review_candidate_idx")
+  @@map("measurement_reference_reviews")
+}
+
+model SurveyReportDraft {
+  id String @id
+  projectId String @map("project_id")
+  project SurveyProject @relation(fields:[projectId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  ownerId String @map("owner_id")
+  owner User @relation(fields:[ownerId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  reportKey String @map("report_key")
+  version String
+  revision Int @default(0)
+  payload Json
+  state String @default("DRAFT")
+  publishedReleaseId String? @map("published_release_id")
+  publishedRelease MeasurementContentRelease? @relation(fields:[publishedReleaseId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  @@unique([projectId,reportKey,version],map:"survey_report_drafts_project_id_report_key_version_key")
+  @@map("survey_report_drafts")
+}
+
+model ContentCapabilityGrant {
+  id                       String   @id
+  subjectId                String   @map("subject_id")
+  issuerId                 String   @map("issuer_id")
+  parentGrantId            String?  @map("parent_grant_id")
+  product                  String
+  scopeKind                String   @map("scope_kind")
+  scopeId                  String   @map("scope_id")
+  resourceKind             String   @map("resource_kind")
+  resourceKeys             String[] @map("resource_keys")
+  capabilities             String[]
+  delegableCapabilities    String[] @map("delegable_capabilities")
+  remainingDelegationDepth Int      @map("remaining_delegation_depth")
+  validFrom                DateTime @map("valid_from") @db.Timestamp(3)
+  expiresAt                DateTime @map("expires_at") @db.Timestamp(3)
+  ancestry                 String[]
+  version                  Int      @default(1)
+  createdAt                DateTime @default(now()) @map("created_at") @db.Timestamp(3)
+  revokedAt                DateTime? @map("revoked_at") @db.Timestamp(3)
+  revokedBy                String?  @map("revoked_by")
+  revokeReason             String?  @map("revoke_reason")
+  subject                  User     @relation("ContentCapabilitySubject", fields: [subjectId], references: [id], onDelete: Restrict)
+  issuer                   User     @relation("ContentCapabilityIssuer", fields: [issuerId], references: [id], onDelete: Restrict)
+  revoker                  User?    @relation("ContentCapabilityRevoker", fields: [revokedBy], references: [id], onDelete: Restrict)
+  parent                   ContentCapabilityGrant? @relation("ContentCapabilityDelegation", fields: [parentGrantId], references: [id], onDelete: Restrict)
+  children                 ContentCapabilityGrant[] @relation("ContentCapabilityDelegation")
+
+  @@index([subjectId, product, scopeKind, scopeId, resourceKind], map: "content_capability_grants_subject_scope_idx")
+  @@index([parentGrantId], map: "content_capability_grants_parent_idx")
+  @@map("content_capability_grants")
+}
+
+// Independently requested immutable interpretation; FINAL facts remain canonical.
+model SurveyInterpretationArtifact {
+  id String @id
+  finalId String @map("final_id")
+  final SurveyWaveFinal @relation(fields:[finalId],references:[id],onDelete:Restrict)
+  createdBy String @map("created_by")
+  creator User @relation(fields:[createdBy],references:[id],onDelete:Restrict)
+  requestHash String @map("request_hash")
+  sourceFinalHash String @map("source_final_hash")
+  artifactCipher String @map("artifact_cipher")
+  artifactHash String @map("artifact_hash")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([finalId,createdAt,id],map:"survey_interpretation_artifacts_final_time_idx")
+  @@map("survey_interpretation_artifacts")
+}
+
+// Immutable operation-to-result pointers. CHECK constraints and immutability
+// trigger are defined in the additive survey_reference_requests migration.
+model SurveyReferenceRequest {
+  requestId String @id @map("request_id") @db.Uuid
+  actorId String @map("actor_id")
+  actor User @relation(fields:[actorId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  projectId String @map("project_id")
+  project SurveyProject @relation(fields:[projectId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  waveId String @map("wave_id")
+  wave SurveyWave @relation(fields:[waveId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  operation String
+  inputHash String @map("input_hash")
+  candidateId String @map("candidate_id")
+  candidate MeasurementReferenceCandidate @relation(fields:[candidateId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  reviewId String? @map("review_id")
+  review MeasurementReferenceReview? @relation(fields:[reviewId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  exclusionCounts Json? @map("exclusion_counts")
+  createdAt DateTime @default(dbgenerated("clock_timestamp()")) @map("created_at") @db.Timestamptz(6)
+  @@map("survey_reference_requests")
+}
+
+model TrainingReportDraft {
+ id String @id
+ courseId String @map("course_id")
+ course Course @relation(fields:[courseId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ compositeId String @map("composite_id")
+ composite CompositeAssessment @relation(fields:[compositeId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ ownerId String @map("owner_id")
+ owner User @relation(fields:[ownerId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ reportKey String @map("report_key")
+ version String
+ revision Int @default(0)
+ payload Json
+ createInputHash String @map("create_input_hash")
+ state String @default("DRAFT")
+ publishedReleaseId String? @map("published_release_id")
+ publishedRelease MeasurementContentRelease? @relation(fields:[publishedReleaseId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+ updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+ @@unique([compositeId,reportKey,version],map:"training_report_drafts_composite_id_report_key_version_key")
+ @@map("training_report_drafts")
+}
+
+
+// Exact installed static source identity; no fabricated author/owner account.
+model StaticSjtMeasurementMapping {
+  deployment Json?
+  deploymentHash String? @map("deployment_hash")
+  id String @id @default(uuid())
+  instrumentKey String @map("instrument_key")
+  instrumentVersion String @map("instrument_version")
+  contentDigest String @map("content_digest")
+  measurementReleaseId String? @map("measurement_release_id")
+  @@unique([instrumentKey,instrumentVersion])
+  @@map("static_sjt_measurement_mappings")
+}
+
+// Explicit siblings of one FINAL unit, never replacement facts. Foreign keys and
+// immutable source/predecessor guards are defined by the additive SQL migration.
+model TrainingInterpretationArtifact {
+  id String @id
+  courseId String @map("course_id")
+  compositeId String @map("composite_id")
+  attemptId String @map("attempt_id")
+  attemptEpoch Int @map("attempt_epoch")
+  itemId String @map("item_id")
+  createdBy String @map("created_by")
+  requestHash String @map("request_hash")
+  sourceAggregateHash String @map("source_aggregate_hash")
+  sourceBindingHash String @map("source_binding_hash")
+  sourceReceiptHash String @map("source_receipt_hash")
+  previousArtifactId String? @map("previous_artifact_id")
+  artifactCipher String @map("artifact_cipher")
+  artifactHash String @map("artifact_hash")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([attemptId,createdAt,id],map:"training_interpretation_artifacts_attempt_time_idx")
+  @@map("training_interpretation_artifacts")
 }

@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
-  findUnique: vi.fn(), comparePassword: vi.fn(), generateToken: vi.fn(), setSessionCookie: vi.fn(),
+  findUnique: vi.fn(), principal: vi.fn(), comparePassword: vi.fn(), generateToken: vi.fn(), setSessionCookie: vi.fn(),
   recordLoginFailure: vi.fn(), clearLoginFailures: vi.fn(), withLoginPasswordVerification: vi.fn(),
 }))
-vi.mock('../../config/database', () => ({ prisma: { user: { findUnique: mocks.findUnique } } }))
+vi.mock('../../config/database', () => ({ prisma: { user: { findUnique: mocks.findUnique }, $queryRaw: mocks.principal } }))
 vi.mock('../../utils/password', () => ({
   comparePassword: mocks.comparePassword, hashPassword: vi.fn(), isValidPassword: vi.fn(), PASSWORD_MIN_LENGTH: 8, PASSWORD_MAX_LENGTH: 128,
 }))
@@ -30,6 +30,10 @@ const response = () => {
 beforeEach(() => {
   vi.resetAllMocks()
   mocks.findUnique.mockResolvedValue(user)
+  mocks.principal.mockImplementation(async () => {
+    const current = await mocks.findUnique.mock.results.at(-1)?.value
+    return current ? [{ ...current, platformRole: 'STANDARD', entryGrants: [] }] : []
+  })
   mocks.comparePassword.mockResolvedValue(true)
   mocks.withLoginPasswordVerification.mockImplementation((operation: () => unknown) => operation())
   mocks.recordLoginFailure.mockResolvedValue({ accountIpAllowed: true, accountGlobalAllowed: true, retryAfterSeconds: 1 })

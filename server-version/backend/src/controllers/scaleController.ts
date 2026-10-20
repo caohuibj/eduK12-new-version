@@ -1198,6 +1198,7 @@ export const scaleController = {
       return success(res, (await loadScaleAssessmentForResponse(assessment)))
     } catch (err) {
       logger.error('获取 v2 量表结果错误', err)
+      if (isFinalScaleSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
       return error(res, '获取测评结果失败')
     }
   },
@@ -1469,7 +1470,7 @@ export const scaleController = {
       if (countDateFilter) countWhere.completedAt = countDateFilter
       const recordCount = await prisma.assessment.count({ where: countWhere })
 
-      const queued = await enqueueExportJob({
+      const queued = await enqueueExportJob({ authorityTokenVersion: req.user!.tokenVersion,
         resourceType: 'SCALE',
         resourceId: scaleId,
         createdBy: userId!,

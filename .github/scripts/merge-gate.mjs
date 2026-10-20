@@ -1,4 +1,6 @@
-import {trainingFunctionalPlan,validTrainingFunctionalPlan,TRAINING_FUNCTIONAL_BASE} from './training-functional.mjs';
+import {validExactPlan,exactCandidatePlan,exactCandidateOutputs} from './exact-candidate-scope.mjs';
+import {trainingFunctionalPlan,validTrainingFunctionalPlan,TRAINING_FUNCTIONAL_BASE,TRAINING_FOLLOWUP_BASE,TRAINING_FOLLOWUP_MODE} from './training-functional.mjs';
+import {adminFunctionalPlan,validAdminFunctionalPlan,ADMIN_FUNCTIONAL_BASE} from './admin-permissions-functional.mjs';
 import {validSurveyMacPlan,recheckSurveyMac} from './survey-mac-ui-scope.mjs';
 import {validReviewedCandidatePlan} from './reviewed-candidate-scope.mjs';
 import { pathToFileURL } from 'node:url';
@@ -35,6 +37,7 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if(scope.application_route==='exact-candidate') return ['scope','exact-candidate','codeql'];
   if (scope.application_route === 'survey-mac-ui') return ['scope','survey-mac-ui','codeql'];
   if (scope.application_route === 'reviewed-candidate') return ['scope','reviewed-candidate','codeql'];
   if (scope.application_route === 'survey-candidate') return ['scope','survey-candidate','codeql'];
@@ -86,15 +89,38 @@ export function requiredChecks(needs, draft) {
 export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if(scope.application_route==='exact-candidate') {
+    let p;try {p=JSON.parse(scope.exact_candidate_plan);}catch{}
+    if(draft||!validExactPlan(p)||p.postMerge!==false) failed.push('scope');
+    else {
+      const expected=exactCandidateOutputs(p);
+      if(Object.entries(expected).some(([k,v])=>scope[k]!==String(v))) failed.push('scope');
+    }
+    return [...new Set(failed)];
+  }
   const trainingFunctional = scope.training_functional_only === 'true';
+  const adminFunctional = scope.admin_permissions_functional_only === 'true';
   let trainingPlan; try { trainingPlan = JSON.parse(scope.training_functional_plan || 'null'); } catch { failed.push('scope'); }
+  let adminPlan; try { adminPlan = JSON.parse(scope.admin_permissions_functional_plan || 'null'); } catch { failed.push('scope'); }
+  if (trainingFunctional && adminFunctional) failed.push('scope');
   if (trainingFunctional) {
     if (draft || !validTrainingFunctionalPlan(trainingPlan) || scope.application_route !== 'legacy'
         || scope.scenario !== 'platform' || scope.run_performance_tests !== 'false'
-        || scope.perf_smoke !== 'false' || needs['accept-perf']?.result !== 'skipped') failed.push('scope');
+        || scope.perf_smoke !== 'false' || needs['accept-perf']?.result !== 'skipped'
+        || (trainingPlan?.mode === TRAINING_FOLLOWUP_MODE
+          && ['codeql','frontend_build','ui_required','visual_hosted',...Object.keys(acceptanceJobs).filter(key=>key!=='perf_smoke')]
+            .some(key=>scope[key]!=='true'))) failed.push('scope');
   } else if ((scope.training_functional_only !== undefined && scope.training_functional_only !== 'false')
-      || (scope.run_performance_tests !== undefined && scope.run_performance_tests !== 'true')
+      || (!adminFunctional && scope.run_performance_tests !== undefined && scope.run_performance_tests !== 'true')
       || trainingPlan !== null) failed.push('scope');
+  if (adminFunctional) {
+    if (draft || !validAdminFunctionalPlan(adminPlan) || scope.application_route !== 'legacy'
+        || scope.scenario !== 'platform' || scope.run_performance_tests !== 'false'
+        || scope.perf_smoke !== 'false' || needs['accept-perf']?.result !== 'skipped'
+        || ['codeql','frontend_build','ui_required','visual_hosted',...Object.keys(acceptanceJobs).filter(key=>key!=='perf_smoke')]
+          .some(key=>scope[key]!=='true')) failed.push('scope');
+  } else if ((scope.admin_permissions_functional_only !== undefined && scope.admin_permissions_functional_only !== 'false')
+      || adminPlan !== null) failed.push('scope');
   if (scope.application_route === 'survey-mac-ui') {
     let p; try { p=JSON.parse(scope.survey_mac_ui_plan); } catch {}
     if(draft||!validSurveyMacPlan(p)||scope.scenario!=='survey-mac-ui'||scope.codeql!=='true'
@@ -240,7 +266,7 @@ export function failedChecks(needs, draft) {
     || scope.visual_hosted !== String(hostedVisual)
     || scope.media_selection !== JSON.stringify(selected)
     || scope.media_groups !== JSON.stringify(selected.length ? mediaPlan(selected) : [])
-    || (scope.scenario === 'platform' && Object.keys(acceptanceJobs).some(key=>scope[key] !== (trainingFunctional && key === 'perf_smoke' ? 'false' : 'true')));
+    || (scope.scenario === 'platform' && Object.keys(acceptanceJobs).some(key=>scope[key] !== ((trainingFunctional || adminFunctional) && key === 'perf_smoke' ? 'false' : 'true')));
   if (scope.scenario === 'release-tooling' && Object.keys(acceptanceJobs).some(key=>scope[key] !== 'false')) failed.push('scope');
   if (scope.scenario === 'frontend-test' && (scope.codeql !== 'false'
     || Object.keys(acceptanceJobs).some(key => scope[key] !== 'false')))
@@ -252,7 +278,26 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const needs = readNeeds();
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
-  if (needs.scope?.outputs?.training_functional_only === 'true' || process.env.CI_BASE_SHA === TRAINING_FUNCTIONAL_BASE) {
+  if(needs.scope?.outputs?.application_route==='exact-candidate') {
+    const {execFileSync}=await import('node:child_process');
+    const p=JSON.parse(needs.scope.outputs.exact_candidate_plan);
+    const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+    if(p.head!==head || JSON.stringify(exactCandidatePlan(p.base,head))!==JSON.stringify(p))
+      failed.push('recomputed-exact-candidate-plan');
+  }
+  if (needs.scope?.outputs?.admin_permissions_functional_only === 'true' || process.env.CI_BASE_SHA === ADMIN_FUNCTIONAL_BASE) {
+    try {
+      const { changedEntries } = await import('./content-scope.mjs');
+      const { execFileSync } = await import('node:child_process');
+      const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),base=process.env.CI_BASE_SHA;
+      const actual=adminFunctionalPlan(changedEntries(base,head),base,head);
+      const emitted=JSON.parse(needs.scope.outputs.admin_permissions_functional_plan || 'null');
+      if (JSON.stringify(actual)!==JSON.stringify(emitted)
+          || (actual!==null)!==(needs.scope.outputs.admin_permissions_functional_only==='true'))
+        failed.push('recomputed-admin-functional-plan');
+    } catch { failed.push('recomputed-admin-functional-plan'); }
+  }
+  if (needs.scope?.outputs?.training_functional_only === 'true' || [TRAINING_FUNCTIONAL_BASE,TRAINING_FOLLOWUP_BASE].includes(process.env.CI_BASE_SHA)) {
     try {
       const { changedEntries } = await import('./content-scope.mjs');
       const { execFileSync } = await import('node:child_process');

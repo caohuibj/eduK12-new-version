@@ -11,6 +11,7 @@ import {createCanonicalUnitResultEnvelope, type CanonicalUnitResultCoreV1} from 
 import {compileTrainingFlow, trainingFlowItemKey} from '../../modules/assessment-core/flow/training'
 import {buildTrainingFlowUnits} from '../../modules/composite/training-flow-definition'
 import {resolveTrainingFlowScope} from '../../modules/composite/training-flow-scope'
+import {sourceAuthorityRow} from './source-authority-fixture'
 
 const actor = {userId: 'teacher', role: 'TEACHER' as const}, publication = '2026-10-18T00:00:00.000Z'
 beforeEach(() => {vi.clearAllMocks(); vi.stubEnv('DATA_ENCRYPTION_KEY', 'd'.repeat(64)); vi.stubEnv('ASSESSMENT_SHARED_CONTROL_ENABLED', 'false')})
@@ -34,7 +35,11 @@ async function fixture(count = 2) {
     course: {findFirst: vi.fn(async () => ({id: 'course', creatorId: actor.userId}))}, relationalAssessmentAssignment: {findMany: vi.fn(async () => [])},
     compositeAssessment: {findMany: vi.fn(async () => [task])}, assessment: {findMany: vi.fn(async () => {throw new Error('SJT discovery read Scale children')})},
     assessmentUnitSnapshot: {findMany: vi.fn(async (query: any) => query.include ? discovery : accepted)},
-    $queryRaw: vi.fn(async (parts: TemplateStringsArray) => {if (parts.join('').includes('assessment_run_executions')) return []; throw new Error('Unexpected SJT discovery SQL')}),
+    $queryRaw: vi.fn(async (parts: TemplateStringsArray) => {
+      if (parts.join('').includes('FROM courses c JOIN users')) return [sourceAuthorityRow()]
+      if (parts.join('').includes('assessment_run_executions')) return []
+      throw new Error('Unexpected SJT discovery SQL')
+    }),
   }
   for (let n = 0; n < count; n++) {
     const parent: any = {id: `parent-${n}`, compositeAssessmentId: task.id, deliveryCourseId: 'course', participantKey: `participant-${n}`, assignmentRef: null,
@@ -127,7 +132,7 @@ describe('SJT flow source discovery batches authenticated parent scopes', () => 
     expect(f.db.assessmentUnitSnapshot.findMany).toHaveBeenCalledTimes(mode === 'discovery' ? 1 : 2)
   })
   it('does not run discovery or flow queries after course authorization is denied', async () => {
-    const f = await fixture(); f.db.course.findFirst.mockResolvedValue(null)
+    const f = await fixture(); f.db.$queryRaw.mockResolvedValue([])
     await expect(listTrainingAnalysisSources(f.db, actor, 'course')).rejects.toMatchObject({statusCode: 404})
     expect(f.db.assessmentUnitSnapshot.findMany).not.toHaveBeenCalled()
   })

@@ -23,7 +23,8 @@ async function main(): Promise<void> {
       data: {
         username: `ops-export-${suffix}`,
         passwordHash: 'test-only',
-        role: UserRole.ADMIN,
+        role: UserRole.TEACHER,
+        teacherApproved: true,
         nickname: 'Ops export worker smoke',
       },
     })
@@ -59,7 +60,8 @@ async function main(): Promise<void> {
       createdBy: user.id,
       anonymized: true,
       format: 'csv',
-      options: { anonymize: true, minProgress: 100 },
+      options: { anonymize: true, minProgress: 100, creatorRole: 'TEACHER' },
+      authorityTokenVersion: user.tokenVersion,
       recordCount: 0,
       requestKey: `ops-export-${randomUUID()}`,
     })

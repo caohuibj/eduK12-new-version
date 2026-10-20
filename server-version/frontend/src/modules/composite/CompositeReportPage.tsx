@@ -1,4 +1,6 @@
 import { internalReturnTo } from '../../components/app-shell/access'
+import { TrainingReinterpretationStudio } from './TrainingReinterpretationStudio'
+import { TrainingContentReports } from './TrainingContentReports'
 import { TrainingTimingReport } from './TrainingTimingReport'
 import { ReadonlyFormAnswer } from '../assessment-core/form/ReadonlyFormAnswer'
 import { isTrainingHost } from '../../training/context'
@@ -375,6 +377,8 @@ const CompositeReportPage: React.FC = () => {
           </nav>
         </ReportSection>
       )}
+      {staffMode && !publicMode && !partial && report.reportState !== 'PARTIAL' && <TrainingContentReports reports={report.contentReports} audience={adminMode ? 'researcher' : 'teacher'} />}
+      {staffMode && !adminMode && !publicMode && !partial && report.reportState !== 'PARTIAL' && user?.id && id && attemptId && Boolean(report.contentReports?.length) && <TrainingReinterpretationStudio key={user.id+':'+id+':'+attemptId} actorId={user.id} compositeId={id} attemptId={attemptId} itemIds={report.contentReports!.map(row=>row.itemId)}/>}
       {unitReports.map((module, index) => (
         <ReportSection
           key={module.itemId}

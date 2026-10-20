@@ -1,0 +1,456 @@
+{
+  "asOf": "2026-10-20T08:22:00Z",
+  "stateDirectory": "measurement-v10-connected-20261020-0717",
+  "scope": "Local isolated synthetic PostgreSQL / restricted Prisma / real HTTP. Not CI, production, performance, browser or admin issuance.",
+  "baseSource": "23e3b3cb4caa64a84f525cf9ba92ccd3797c1863",
+  "incrementalSource": "c1174758b108fac1dab136a414f6b4fb7b3bc570",
+  "currentOverlays": [
+    {
+      "baseHead": "c1174758b108fac1dab136a414f6b4fb7b3bc570",
+      "commit": "703cfb542fb4bba0aa6627abfe58b2b97d155bbb",
+      "files": {
+        "src/modules/assessment-runtime/unified-form-section-final-submit.service.ts": "b61eb8992b5bef1374452ba2b75e00c79a05521caa140d95008f959528fe0c8b",
+        "src/modules/composite/training-reference-admission.ts": "a49c25d2c9c996b078d856bd459bd71433cd41b7981e8278562a4e9e7fc1e542",
+        "src/modules/composite/training-variant-child-scope.ts": "1465ffd79c2b7adc1256fa466dfc6c0a1bb13458868faa261b3a06e3e4f6e822",
+        "src/modules/composite/training-variant-markers.ts": "387825424aaa8c085d1938e8a1e73d8b9b6c76e983d4877c5f39ea5fe43ac07c",
+        "src/modules/composite/composite.service.ts": "e14bfe5b0e260291eb04eb7108a60b9dd5d90f75deb483277f3475306bb5f9e0",
+        "src/modules/cognitive/session-lock.ts": "51697863a4122b9a7b2615f4446e0ae14c2e3ff38872afdfbf3ed99e48bf423e"
+      }
+    },
+    {
+      "baseHead": "c1174758b108fac1dab136a414f6b4fb7b3bc570",
+      "commit": "a274b6c4598b63fa4664d5f02d7a9990374bf890",
+      "files": {
+        "src/controllers/scaleController.ts": "dd1adaf034f361b6641f00184e1c59df8a863d0a7d097577ee93ca017330bb82"
+      }
+    },
+    {
+      "baseHead": "c1174758b108fac1dab136a414f6b4fb7b3bc570",
+      "commit": "a3653e309eb490dd8857f74c92a78de02cf3fec7",
+      "files": {
+        "src/modules/composite/training-metric-disclosure.ts": "9ebc9671dab21f1847c10060daa733f83ff04b81779a12cfc1558831f68a3e68"
+      }
+    },
+    {
+      "baseHead": "c1174758b108fac1dab136a414f6b4fb7b3bc570",
+      "commit": "b94adefcdffc0f9788f82b0e27c3384be0cbd185",
+      "files": {
+        "src/modules/assessment-run/startExecution.ts": "990ffa8431d8719f2391fb897b8fa02349286bc5b4b591e58031d6506c771ec8",
+        "src/modules/assessment-runtime/unified-form-section-final-submit.service.ts": "48e3aa416d6cccf2a460a2f9b5fe6cca5aa360e0ac0a01d57dfc6a69fd3feab8",
+        "src/modules/cognitive/completion.service.ts": "b499b1f901dcf5956de7aea92d4c2a4dba0bd89e83be595d42f422fbc1085dc5",
+        "src/modules/cognitive/trial.service.ts": "7edb571d689f8cac383ac70b44b28c77ae055be3b66700b21e21f7c02239b09b",
+        "src/modules/composite/composite.service.ts": "a0fb5e86ffb5c693847c5e60aa7f243097b18d3ad9fd4f53e1170ff19cc2d93f",
+        "src/modules/composite/final-submit.service.ts": "550069e6bfbff0540876c674217598874954bdc9714f6a4b4fb8d534c26b0f01",
+        "src/modules/composite/training-private-reference-use.ts": "65c67b70afcc9ca765b80b09f971b550cdf4e82f4d84b5e399425a32b31e6ec7",
+        "src/modules/composite/training-reference-selection.ts": "718d374ce3cdedfb36fe53f7b50256ec652c1d38b95f58aa8e578af8a94858c9"
+      }
+    }
+  ],
+  "files": {
+    "inputs.json": "2e27ba9e7ebfb3af4e9cea72ccdfe6999b24d7b37a9940f0ca36457508f5e55c",
+    "status.json": "99030f4f8806dcaa91611952ae6a825ecde33eb3df74983507d768dd317cd3f2",
+    "connected-results.json": "86f393467e1cc8d9fb02a301bc5c6a3ffb481fb5c88172a725010489834572ea",
+    "candidate-inputs.json": "bd4b1645cce346a021b2f979ce8fb98c6c12c279c64f2c0dcc15092a69fab88b",
+    "candidate-upgrade-result.json": "347d794366edb7a1f25626c54a1c591f3a48547a75d30086b68ea0f72d301628",
+    "candidate-patches.json": "9d07f671f22997176b38752fa22ac971e591aa33140eb4df2d0cab6a5efbd38e",
+    "source-patches.json": "898b0c99e70399ed324dba4b10f8d002da05806697851e4cbb353bd5cbea2032",
+    "training-seed-result.json": "fec9b8948540e4994782c4a686927f76802f807314ed36584d683c769c9c6956",
+    "training-author-result.json": "4de57ebf5fecd6bceff388ba5c482761631ef32971b8d7e06fd6ba8f1330b0f7",
+    "training-final-0-result.json": "cd1bdb75e0943f4eca8e0ea12324094fbbc2b3d90772c3a5c40048e6bda2c9bd",
+    "training-final-1-result.json": "7309ca8dacc19fa0c06a805380433132432bb76dbdbd1d900eeb427ac26806cf",
+    "training-final-2-result.json": "ec145d0bdc599b347e493529379fcaad87e9da2b143076f9f301ce5e07a89b5d",
+    "training-final-3-result.json": "a23532a2b267cdf2fe14057bc50ba32d1118c72f270edea14715bbc1ee36993b",
+    "training-final-4-result.json": "78065973a4850942a51528214f178eb4310fd143084419aacaf1df42d1f3d8c2",
+    "training-reference-result.json": "2c3370f3c34063f1a9bf993b724d555786dbf952461f6b8e7d8a0c6612b6d150",
+    "training-reinterpret-result.json": "ccf8140cc255eccf4d89c2d38022dceeb74d8db3fce48b906777b28790116e37",
+    "training-reference_context-before-replay-wire-fix.json": "9db9da9fb0382af6377423b5466335ae09fa1660bdf43a5ed57ee77cf858abf8",
+    "training-reference_context-before-identity-location-fix.json": "280f5f802eecad4cd5f22526d07fb73b9bbd2f1c96095b37374dcab40b851e05",
+    "training-reference_context-result.json": "4e0aed5dc923cd0682f93b58dea6aaf21740fa52106caa3ef178e7786663746d",
+    "training-cognitive_sjt-result.json": "67bf3eca962889aa95828c1944503f3c326fad8d70d7696718987de2c42a2baa",
+    "training-reference-ready-result.json": "bcad4c573a6719bab66803cfb0c0ed053aae5190e2e26a383a116c5d765dc082",
+    "training-reference-ready-before-controller-fix.json": "7178dada9f49a9cf72f65107dbd92446272bf1ede4476cb7e389c28a90633462",
+    "training-cognitive_disclosure-result.json": "3dbddf666d764bb2bc83b5e7712c397db6504ad850c949deb198d47ec6f146cc",
+    "backend-final-repair-types-inputs.json": "4002e9ee74e79a3af404489d1752b20840e81677c3e4b6de07268e49b0f775f5",
+    "backend-final-repair-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "backend-final-repair-types.exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "resume-status.json": "070038b5e43a655dec0727166d72507d757432cb4ffbc134c61e19a5d2b50584"
+  },
+  "tasks": [
+    {
+      "evidenceFile": "task-97a252b1-9cec-4382-8dd2-6d87d9bea5c0.result.json",
+      "evidenceSha256": "d5cb9c4860c02df019c8338a33d7628b33120548d255577e04165a468cae8ba6",
+      "id": "97a252b1-9cec-4382-8dd2-6d87d9bea5c0",
+      "phase": "seed",
+      "index": 0,
+      "scriptSha256": "fce79e540b3d8a6a144e6144e7b2636eb63c4e4467a9c9d35c87c629339ad158",
+      "exitCode": 0,
+      "completedAt": 1792481159.0805979
+    },
+    {
+      "evidenceFile": "task-c51a48b3-fce0-4788-aecd-1bd277193450.result.json",
+      "evidenceSha256": "5362da0bb9630b61bb5d630ddcca69138512a94d249e56de67206cf878317dad",
+      "id": "c51a48b3-fce0-4788-aecd-1bd277193450",
+      "phase": "author",
+      "index": 0,
+      "scriptSha256": "5b79cf5ea89199c21e268b97471c84b70a1fe14a44ca8b8d11719975700d7232",
+      "exitCode": 0,
+      "completedAt": 1792481490.200425
+    },
+    {
+      "evidenceFile": "task-dac1a516-e02a-443e-bcb3-bd77b042536d.result.json",
+      "evidenceSha256": "4a18a5e43ae839f8722132281a859962f4457d78ee14ca373c76029529f54452",
+      "id": "dac1a516-e02a-443e-bcb3-bd77b042536d",
+      "phase": "final",
+      "index": 0,
+      "scriptSha256": "2bcdf404bbe29f650a9e55893a80cf0dd5d0e546173149f855fa230bd844af8f",
+      "exitCode": 0,
+      "completedAt": 1792481667.0280855
+    },
+    {
+      "evidenceFile": "task-99f53bf0-c920-4f4e-9700-2d3aad3cefd1.result.json",
+      "evidenceSha256": "cac431dc4e56954f0ec3cb466d0ce2479c9ec93a28e495cf7c4caab674c3e96d",
+      "id": "99f53bf0-c920-4f4e-9700-2d3aad3cefd1",
+      "phase": "final",
+      "index": 1,
+      "scriptSha256": "2bcdf404bbe29f650a9e55893a80cf0dd5d0e546173149f855fa230bd844af8f",
+      "exitCode": 0,
+      "completedAt": 1792481711.769087
+    },
+    {
+      "evidenceFile": "task-26dfa768-bb85-4a89-8d90-1caa3c269b1f.result.json",
+      "evidenceSha256": "7157e07a7763e0ccd1b7c3d81213bdedb1f9aaec90bcea60936899bff1a8301a",
+      "id": "26dfa768-bb85-4a89-8d90-1caa3c269b1f",
+      "phase": "final",
+      "index": 2,
+      "scriptSha256": "2bcdf404bbe29f650a9e55893a80cf0dd5d0e546173149f855fa230bd844af8f",
+      "exitCode": 0,
+      "completedAt": 1792481706.717146
+    },
+    {
+      "evidenceFile": "task-de543446-375a-4347-a70f-eb980caf14bf.result.json",
+      "evidenceSha256": "ffb7742eebf54f5721cefa480ff43d7336260786d0ae565f905d9287bca3775e",
+      "id": "de543446-375a-4347-a70f-eb980caf14bf",
+      "phase": "final",
+      "index": 3,
+      "scriptSha256": "2bcdf404bbe29f650a9e55893a80cf0dd5d0e546173149f855fa230bd844af8f",
+      "exitCode": 0,
+      "completedAt": 1792481713.438442
+    },
+    {
+      "evidenceFile": "task-2fb7dbee-f9a6-434c-9468-e12f516ab32e.result.json",
+      "evidenceSha256": "5439aec2fc90745c0f6ab7b805b1a7768db18ffb87cf77a16b85cb9bfa413188",
+      "id": "2fb7dbee-f9a6-434c-9468-e12f516ab32e",
+      "phase": "final",
+      "index": 4,
+      "scriptSha256": "2bcdf404bbe29f650a9e55893a80cf0dd5d0e546173149f855fa230bd844af8f",
+      "exitCode": 0,
+      "completedAt": 1792481709.9987833
+    },
+    {
+      "evidenceFile": "task-f4437df5-cb47-4bfd-a0b7-5866db6bc13b.result.json",
+      "evidenceSha256": "d0424f88955e91c66cc74fca5437027fbd3d6336c97327085bcb644fc03b93ef",
+      "id": "f4437df5-cb47-4bfd-a0b7-5866db6bc13b",
+      "phase": "reference",
+      "index": 0,
+      "scriptSha256": "2bcdf404bbe29f650a9e55893a80cf0dd5d0e546173149f855fa230bd844af8f",
+      "exitCode": 0,
+      "completedAt": 1792481761.9641414
+    },
+    {
+      "evidenceFile": "task-b2895587-e813-4b20-983b-129b112d44f2.result.json",
+      "evidenceSha256": "60771529da61dce2bd8f0cc560745da2ba4e3c123fcb7f4ccf914dc831743dae",
+      "id": "b2895587-e813-4b20-983b-129b112d44f2",
+      "phase": "reinterpret",
+      "index": 0,
+      "scriptSha256": "2bcdf404bbe29f650a9e55893a80cf0dd5d0e546173149f855fa230bd844af8f",
+      "exitCode": 0,
+      "completedAt": 1792481761.2971795
+    },
+    {
+      "evidenceFile": "task-5f562559-2699-4419-bbe0-b71bfae1100c.result.json",
+      "evidenceSha256": "beb58779c65bcaacd2bd889d1c72bd293537be91d438872215f8f208175a2ea6",
+      "id": "5f562559-2699-4419-bbe0-b71bfae1100c",
+      "kind": "vitest",
+      "phase": null,
+      "index": 0,
+      "test": "src/__tests__/integration/registered-resource-longitudinal.postgres.integration.test.ts",
+      "testCommit": "c1174758b108fac1dab136a414f6b4fb7b3bc570",
+      "executionCounts": {
+        "numTotalTests": 1,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "scriptSha256": "c16e3fb134ae85efa0879d752e482c49252654d0ce7496565b745d772f57e48e",
+      "exitCode": 0,
+      "completedAt": 1792482596.1925693
+    },
+    {
+      "evidenceFile": "task-b68a606b-47be-4e80-bd90-4d1a3815fe51.result.json",
+      "evidenceSha256": "9afa440d5086e3d566e6c5d7ef979e5add722564b20bf14df5d007ced7d756c5",
+      "id": "b68a606b-47be-4e80-bd90-4d1a3815fe51",
+      "kind": "vitest",
+      "phase": null,
+      "index": 0,
+      "test": "src/__tests__/integration/huiteacherPersonalScale.postgres.integration.test.ts",
+      "testCommit": "1f06ccab93215dd30cc357fbf35942054a81c90a",
+      "executionCounts": {
+        "numTotalTests": 1,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "scriptSha256": "2a503b043b8f134e25c8b049b0c3d124aaa6327aba4a65d8e55ea44c49f1a910",
+      "exitCode": 0,
+      "completedAt": 1792482923.3603659
+    },
+    {
+      "evidenceFile": "task-ab5e4a82-8d86-45b1-bd27-5a6e693d7d61.result.json",
+      "evidenceSha256": "f36182a75c85f86c455ea5ad6810660ed2cbd20d242e2903ea84a5782fef80a2",
+      "id": "ab5e4a82-8d86-45b1-bd27-5a6e693d7d61",
+      "kind": "http",
+      "phase": "reference_context",
+      "index": 0,
+      "test": null,
+      "testCommit": null,
+      "executionCounts": null,
+      "scriptSha256": "313f3aa4988d1b60e8133804628a93d415eac11a8b5ffb968873209c5df5881a",
+      "exitCode": 1,
+      "completedAt": 1792482936.6642623
+    },
+    {
+      "evidenceFile": "task-fb8ff34f-27de-4b5d-a18c-46ec3601cf58.result.json",
+      "evidenceSha256": "e70d76a2fe7a9eb5e26540e3cbc9b7d028fed188e49de5ce7430c6d74abab3a1",
+      "id": "fb8ff34f-27de-4b5d-a18c-46ec3601cf58",
+      "kind": "http",
+      "phase": "reference_context",
+      "index": 0,
+      "test": null,
+      "testCommit": null,
+      "executionCounts": null,
+      "scriptSha256": "8af99bb756c607e12ffbef40bb1c5339719951e6ee8275fde16df20029bc54ea",
+      "exitCode": 1,
+      "completedAt": 1792483039.3187306
+    },
+    {
+      "evidenceFile": "task-ad6eae31-ebd7-4ace-b986-73c8ac3a867c.result.json",
+      "evidenceSha256": "70a41a27be010b9a5a0c606a4a77c88c4a7d28d16aa12c871adde8b0fedb0d8e",
+      "id": "ad6eae31-ebd7-4ace-b986-73c8ac3a867c",
+      "kind": "http",
+      "phase": "reference_context",
+      "index": 0,
+      "test": null,
+      "testCommit": null,
+      "testNamePattern": null,
+      "scriptCommit": "2b72ad0fdafd6f3ac062e9103be38121a8949bc1",
+      "executionCounts": null,
+      "scriptSha256": "d7fb44644f617db118947978f2e759771fb6145b9f5f35f44888c03c462fe754",
+      "exitCode": 0,
+      "completedAt": 1792483365.367102
+    },
+    {
+      "evidenceFile": "task-aecf767a-b443-454c-82d0-7ec84d454abd.result.json",
+      "evidenceSha256": "6ad8e5cb561f3cc5dd67dac11b6906df8943df4c932f836f34b9127d7547f697",
+      "id": "aecf767a-b443-454c-82d0-7ec84d454abd",
+      "kind": "vitest",
+      "phase": null,
+      "index": 0,
+      "test": "src/__tests__/measurement-content/source-authority-races.postgres.integration.test.ts",
+      "testCommit": "d9d60b0cdc2316fcd7de921c501395adb996f013",
+      "executionCounts": null,
+      "scriptSha256": "f9fafa2fbe43f807a8442f98843c94266e00b624d15c78ade5fea19869cef763",
+      "exitCode": 1,
+      "completedAt": 1792482994.6151707
+    },
+    {
+      "evidenceFile": "task-8c590d7a-c3a7-4065-8205-786e1551b04c.result.json",
+      "evidenceSha256": "2df5126a7e1b78481fc5570cf8d87ca10295d300e7365f00a308746b802abf8e",
+      "id": "8c590d7a-c3a7-4065-8205-786e1551b04c",
+      "kind": "vitest",
+      "phase": null,
+      "index": 0,
+      "test": "src/__tests__/measurement-content/source-authority-races.postgres.integration.test.ts",
+      "testCommit": "f76932ec37b6a405b223a21e947de799d6197895",
+      "testNamePattern": "three clients:|static SJT actual Composite",
+      "scriptCommit": null,
+      "executionCounts": {
+        "numTotalTests": 7,
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 5
+      },
+      "scriptSha256": "877651c01b3eee4fafcc4de397005f8f83f2f24de78a61bcc084204743bab90e",
+      "exitCode": 0,
+      "completedAt": 1792483760.4035037
+    },
+    {
+      "evidenceFile": "task-785bc74e-7b4a-4604-9e11-ecebea486e76.result.json",
+      "evidenceSha256": "6baecb986476a7a4057b716965dd6edd0a1f49c9ea99546577cc15b4cd0f597f",
+      "id": "785bc74e-7b4a-4604-9e11-ecebea486e76",
+      "kind": "vitest",
+      "phase": null,
+      "index": 0,
+      "test": "src/__tests__/measurement-content/formal-reference-connected.postgres.integration.test.ts",
+      "testCommit": "835c76f13b5cbe8dc08437c81688075e762c3ecc",
+      "testNamePattern": null,
+      "scriptCommit": null,
+      "executionCounts": {
+        "numTotalTests": 5,
+        "numPassedTests": 5,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "scriptSha256": "ad682622c30669090de3586d93eb3f2cec1e1a95689c74585abb134b428b5d3c",
+      "exitCode": 0,
+      "completedAt": 1792483457.425254
+    },
+    {
+      "evidenceFile": "task-4e398d25-bd7f-4071-bc2d-9b20eaf0a84b.result.json",
+      "evidenceSha256": "9468e4b442f4dc050db658dc60de0ba1d126cb711a0d3c03aadba37e0b1467b6",
+      "id": "4e398d25-bd7f-4071-bc2d-9b20eaf0a84b",
+      "kind": "http",
+      "phase": "cognitive_sjt",
+      "index": 0,
+      "test": null,
+      "testCommit": null,
+      "testNamePattern": null,
+      "scriptCommit": "ffb27c66d42ba81c4016c455fa1e829995da2557",
+      "executionCounts": null,
+      "scriptSha256": "c038f0fb88efff7415436c23de673b199e4304f277a5cd4be2a96b92b30ef3d5",
+      "exitCode": 1,
+      "completedAt": 1792483379.1637363
+    },
+    {
+      "evidenceFile": "task-4f2f0dfa-eb67-42c5-b7dd-bdac2699d186.result.json",
+      "evidenceSha256": "97c95be554bb14d89af773bb21aac4ec22936b3daa1abb299f46a6081fb549d5",
+      "id": "4f2f0dfa-eb67-42c5-b7dd-bdac2699d186",
+      "kind": "http",
+      "phase": "cognitive_sjt",
+      "index": 0,
+      "test": null,
+      "testCommit": null,
+      "testNamePattern": null,
+      "scriptCommit": "76bcfdf971a13c7789624ce829e5b9a53f022a41",
+      "executionCounts": null,
+      "scriptSha256": "78b0735808680c4e7c4d397a1ad9a0a0c91783eec9787aa49aa1fffdbaa6a9df",
+      "exitCode": 1,
+      "completedAt": 1792483529.1551008
+    },
+    {
+      "evidenceFile": "task-f7ab11aa-ed2b-45cb-8865-ef610810f481.result.json",
+      "evidenceSha256": "28949fea07196e142ef5a9d2e66dd9dc54dfe751d64d7004b808ac989d724d70",
+      "id": "f7ab11aa-ed2b-45cb-8865-ef610810f481",
+      "kind": "http",
+      "phase": "cognitive_sjt",
+      "index": 0,
+      "test": null,
+      "testCommit": null,
+      "testNamePattern": null,
+      "scriptCommit": "d5acc9e44c1b5b30423af224361bef0665217cf1",
+      "executionCounts": null,
+      "scriptSha256": "a531560a5300c0c98a6c064d7df0b0b91d634106ed0ea05b0f2b5790867b2108",
+      "exitCode": 1,
+      "completedAt": 1792483688.5236576
+    },
+    {
+      "evidenceFile": "task-6e197800-d82c-430d-83cc-f4288a185b3b.result.json",
+      "evidenceSha256": "98dfd8d0964487608f784d5e391e98e867a4a9ed57211413a3c2a0efa0f78757",
+      "id": "6e197800-d82c-430d-83cc-f4288a185b3b",
+      "kind": "http",
+      "phase": "cognitive_sjt",
+      "index": 0,
+      "test": null,
+      "testCommit": null,
+      "testNamePattern": null,
+      "scriptCommit": "80b4d83b6498d7aaeb891f85145ddb0db5ce534a",
+      "executionCounts": null,
+      "scriptSha256": "8371c96164ff9abb27fd5424143e503950bd458370dff748fc79accfcdd7861d",
+      "exitCode": 0,
+      "completedAt": 1792483995.066019
+    },
+    {
+      "evidenceFile": "task-07a54573-7e2a-48f4-8206-d600d0c0aae1.result.json",
+      "evidenceSha256": "dc786b8fa82fd004d9ac7d7f4f4b9d51f6473add02cb5ffbf1041302780d3f4f",
+      "id": "07a54573-7e2a-48f4-8206-d600d0c0aae1",
+      "kind": "http",
+      "phase": "reference_ready",
+      "index": 0,
+      "test": null,
+      "testCommit": null,
+      "testNamePattern": null,
+      "scriptCommit": "62e2918d5b620c56109ea94e6198b36ed1b57f6f",
+      "executionCounts": null,
+      "scriptSha256": "d198ef2974002fb859a35a2e34c4a4bdb7bc29a8de815461dc6eda6760940e7b",
+      "exitCode": 1,
+      "completedAt": 1792484062.7637146
+    },
+    {
+      "evidenceFile": "task-62d2898a-9a56-4b25-bf52-fae845351a4c.result.json",
+      "evidenceSha256": "17ad20d514838aa54b84370b0ffd2beb38615d3f4491eaf8308b49565f6e8267",
+      "id": "62d2898a-9a56-4b25-bf52-fae845351a4c",
+      "kind": "http",
+      "phase": "reference_ready",
+      "index": 0,
+      "test": null,
+      "testCommit": null,
+      "testNamePattern": null,
+      "scriptCommit": "62e2918d5b620c56109ea94e6198b36ed1b57f6f",
+      "executionCounts": null,
+      "scriptSha256": "d198ef2974002fb859a35a2e34c4a4bdb7bc29a8de815461dc6eda6760940e7b",
+      "exitCode": 0,
+      "completedAt": 1792484479.4912074
+    },
+    {
+      "evidenceFile": "task-0dccd404-c468-4e1c-9519-8f3b52168207.result.json",
+      "evidenceSha256": "f110cf13ad108b79536a85d3c590bd75e111964151a23bac506e56e7dc0c5c80",
+      "id": "0dccd404-c468-4e1c-9519-8f3b52168207",
+      "kind": "vitest",
+      "phase": null,
+      "index": 0,
+      "test": "src/__tests__/measurement-content/private-reference-expiry.postgres.integration.test.ts",
+      "testCommit": "b94adefcdffc0f9788f82b0e27c3384be0cbd185",
+      "testNamePattern": null,
+      "scriptCommit": null,
+      "executionCounts": {
+        "numTotalTests": 1,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "scriptSha256": "b524537a98724cadcdfb5d87dd39a83ddd8683e1561cd9097a703bc2531d6117",
+      "exitCode": 0,
+      "completedAt": 1792484499.7706144
+    },
+    {
+      "evidenceFile": "task-b4e50ffb-373e-4af9-b5b1-6da0099dd73e.result.json",
+      "evidenceSha256": "0cb09e08829ecb41ec05572a360518e0ea4653a3ae9e48c6972dfd04b0e3cce4",
+      "id": "b4e50ffb-373e-4af9-b5b1-6da0099dd73e",
+      "kind": "http",
+      "phase": "cognitive_disclosure",
+      "index": 0,
+      "test": null,
+      "testCommit": null,
+      "testNamePattern": null,
+      "scriptCommit": "09e7a2c7f9b5ede68022d3b7a0581024f0dee320",
+      "executionCounts": null,
+      "scriptSha256": "216eb3c579f7b95ab548a2901361faa80c0d603b66f46565d18f646bdc7cf8b9",
+      "exitCode": 0,
+      "completedAt": 1792484526.9008257
+    }
+  ],
+  "pending": [
+    "Real browser interactions postponed by user; never counted as passed"
+  ],
+  "localConnectedStatus": "PASS affected DB/HTTP/type checks; excluded admin/WebAuthn positive, browser, CI, performance and production",
+  "finalBackendTypes": {
+    "exitCode": 0,
+    "diagnosticBytes": 0,
+    "inputs": "backend-final-repair-types-inputs.json"
+  },
+  "cleanup": {
+    "verified": true,
+    "stoppedAt": 1792484559.8776176,
+    "supervisorSha256": "ce631372df43e45b0f67095843bb66d7cb66b2d3246ac2e8b267b4da45c1c76f",
+    "clusterPreserved": true
+  }
+}

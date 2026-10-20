@@ -17,10 +17,10 @@ const input=()=>({expectedRevision:0,attemptEpoch:1,envelope:{schemaVersion:1 as
 let row:any,attempt:any,course:any
 beforeEach(()=>{
  row=null;course={courseType:'TRAINING_COURSE',status:'PUBLISHED',isLibrary:false,endedAt:null}
- attempt={id:'attempt',compositeAssessmentId:'parent',deliveryCourseId:'course',userId:'user',recoveryTokenHash:null,attemptEpoch:1,status:'IN_PROGRESS',deliveryMode:'FINAL_ONLY',runtimeGeneration:'UNIFIED_V1',trainingPersistenceSnapshot:snapshot,trainingPersistenceSnapshotHash:snapshotHash,frozenActiveSlotSetHash:definitionHash,compositeAssessment:publication,accessToken:null}
+ attempt={id:'attempt',compositeAssessmentId:'parent',deliveryCourseId:'course',userId:'user',recoveryTokenHash:null,attemptEpoch:1,status:'IN_PROGRESS',deliveryMode:'FINAL_ONLY',runtimeGeneration:'UNIFIED_V1',trainingPersistenceSnapshot:snapshot,trainingPersistenceSnapshotHash:snapshotHash,frozenActiveSlotSetHash:definitionHash,frozenActiveSlotSetEncrypted:'slot-cipher',compositeAssessment:publication,accessToken:null}
  const update=(data:any)=>{row={...row,...data,revision:typeof data.revision==='object'?row.revision+data.revision.increment:data.revision??row.revision};return row}
  mocks.tx={$executeRawUnsafe:vi.fn(),$queryRaw:vi.fn().mockResolvedValue([]),
-  compositeAssessmentAttempt:{findUnique:vi.fn().mockImplementation(()=>attempt),findUniqueOrThrow:vi.fn().mockResolvedValue({frozenActiveSlotSetEncrypted:'slot-cipher'})},
+  compositeAssessmentAttempt:{findUnique:vi.fn().mockImplementation(({select})=>Object.fromEntries(Object.keys(select).map(key=>[key,attempt[key]]))),findUniqueOrThrow:vi.fn(()=>{throw new Error('Unexpected separate slot carrier read')})},
   course:{findUnique:vi.fn().mockImplementation(()=>course)},
   assessmentUnitSnapshot:{findMany:vi.fn().mockResolvedValue([])},
   trainingAttemptCheckpoint:{findUnique:vi.fn().mockImplementation(()=>row),create:vi.fn().mockImplementation(({data})=>row={successfulSaveCount:0,...data}),update:vi.fn().mockImplementation(({data})=>update(data)),updateMany:vi.fn().mockImplementation(({data})=>{if(row?.payloadEncrypted){update(data);return {count:1}}return {count:0}})},
@@ -41,6 +41,31 @@ describe('Training checkpoint service contracts (mock transaction; PG races sepa
   attempt.userId=null;attempt.recoveryTokenHash='credential';row=null
   await saveTrainingCheckpoint('attempt',{recoveryTokenHash:'credential'},input())
   expect(row.roundId).toBeNull()
+ })
+ it('SAVE loads its carrier once in the locked parent projection, with no separate query',async()=>{
+  await saveTrainingCheckpoint('attempt',{userId:'user'},input())
+  const reads=mocks.tx.compositeAssessmentAttempt.findUnique.mock.calls
+  expect(reads).toHaveLength(2)
+  expect(reads[0][0].select).not.toHaveProperty('frozenActiveSlotSetEncrypted')
+  expect(reads[1][0].select.frozenActiveSlotSetEncrypted).toBe(true)
+  expect(mocks.tx.compositeAssessmentAttempt.findUniqueOrThrow).not.toHaveBeenCalled()
+  expect(mocks.slots).toHaveBeenCalledExactlyOnceWith('slot-cipher')
+ })
+ it('GET and CLEAR retain compact projections and never load the slot carrier',async()=>{
+  await readTrainingCheckpoint('attempt',{userId:'user'})
+  await clearTrainingCheckpoint('attempt',{userId:'user'},{expectedRevision:0,attemptEpoch:1})
+  for(const [args] of mocks.tx.compositeAssessmentAttempt.findUnique.mock.calls)expect(args.select).not.toHaveProperty('frozenActiveSlotSetEncrypted')
+  expect(mocks.tx.compositeAssessmentAttempt.findUniqueOrThrow).not.toHaveBeenCalled()
+  expect(mocks.slots).not.toHaveBeenCalled()
+ })
+ it.each(['missing carrier','slot hash','slot epoch','envelope hash'] as const)('keeps the %s SAVE boundary',async boundary=>{
+  const data=input()
+  if(boundary==='missing carrier')attempt.frozenActiveSlotSetEncrypted=null
+  if(boundary==='slot hash')mocks.slots.mockResolvedValue({snapshotHash:'wrong',attemptEpoch:1,slots:[]})
+  if(boundary==='slot epoch')mocks.slots.mockResolvedValue({snapshotHash:definitionHash,attemptEpoch:2,slots:[]})
+  if(boundary==='envelope hash')data.envelope.definitionHash='b'.repeat(64)
+  await expect(saveTrainingCheckpoint('attempt',{userId:'user'},data)).rejects.toMatchObject({statusCode:409})
+  expect(mocks.tx.trainingAttemptCheckpoint.create).not.toHaveBeenCalled()
  })
  it('rejects cross-owner and stale epoch before decrypting definitions',async()=>{
   await expect(saveTrainingCheckpoint('attempt',{userId:'other'},input())).rejects.toMatchObject({statusCode:403})

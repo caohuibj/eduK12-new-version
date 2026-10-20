@@ -36,6 +36,9 @@ export type TrainingObservationReason =
  * response token or demographic attribute as a stable participant identity. */
 export interface TrainingNumericObservationV1 {
   researchCategory?: string
+  /** Canonical scientific quality, never supplied by analysis callers. */
+  measurementQuality?: string
+  metricQuality?: string
   participantKey: string
   participantKind: 'USER' | 'STUDY_LOCAL'
   waveKey: string

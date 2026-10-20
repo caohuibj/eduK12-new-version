@@ -118,7 +118,7 @@ export default function TrainingTrainerCourse() {
             {section === 'assessments' && <TrainingCourseAssessments key={course.id} course={course} actorId={user?.id||''}
               rows={assessments.rows} loading={assessments.loading} error={assessments.error} onRetry={retry} filtered={filtered}/>}
             {section !== 'analysis' && section !== 'management' && <CatalogPagination selection={catalog.selection} onApply={catalog.apply} total={collectionTotal} loading={section==='assignments'?assignments.loading:section==='checkins'?checkins.loading:assessments.loading} label={section==='assignments'?'作业':section==='checkins'?'打卡':'测评'}/>}
-            {section === 'analysis' && <TrainingCourseAnalysis key={course.id} courseId={course.id} />}
+            {section === 'analysis' && <TrainingCourseAnalysis key={course.id} courseId={course.id} actorId={user?.id} />}
 
             {section === 'management' && <section className="training-course-management" aria-label="课程管理设置"><header><h2>课程管理</h2><p>管理学员、查看课程说明，或调整报名与课程状态。</p></header><div className="training-management-panels"><section className="training-side-panel"><h3>学员与测评</h3><div className="training-trainer-shortcuts"><Link to={'/courses/'+encoded+'/students'}>管理学员 <ArrowRight size={15} aria-hidden="true"/></Link><button type="button" onClick={()=>setSection('assessments')}>测评与结果 <ArrowRight size={15} aria-hidden="true"/></button></div></section><section className="training-side-panel"><h3>课程说明与设置</h3><p>{course.description||'管理本课程的作业、打卡与测评。'}</p><TrainingCourseSettings course={course} onUpdated={retry}/></section></div></section>}
             </div></div>

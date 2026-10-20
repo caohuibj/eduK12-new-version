@@ -279,3 +279,34 @@ describe('Survey analytics artifact downloads',()=>{
     expect(screen.getByRole('status')).toHaveTextContent('网页无法确认文件已落盘')
   })
 })
+
+
+describe('explicit saved interpretation export',()=>{
+  it('keeps RAW_WAVE default, omits even a previously checked free-text option, and preserves the signed page selection',async()=>{
+    render(<SurveyAnalyticsWorkspace projectId={projectId}/>)
+    await screen.findByRole('button',{name:'创建受控导出'})
+    expect(screen.getByLabelText('数据格式')).toHaveValue('RAW_WAVE')
+    fireEvent.click(screen.getByRole('checkbox',{name:/包含自由文本原始回答/}))
+    fireEvent.change(screen.getByLabelText('数据格式'),{target:{value:'INTERPRETATION_LONG'}})
+    expect(screen.getByRole('option',{name:'已保存解释（独立导出）'})).toBeInTheDocument()
+    expect(screen.queryByRole('checkbox',{name:/包含自由文本原始回答/})).not.toBeInTheDocument()
+    expect(screen.getByText(/不按当前版本重算或重新选择参考/)).toHaveTextContent('LEGACY_NOT_RECORDED')
+    fireEvent.change(screen.getByLabelText('完成时间起点（含）'),{target:{value:'2026-10-01T10:00'}})
+    fireEvent.change(screen.getByLabelText('完成时间终点（不含）'),{target:{value:'2026-10-02T10:00'}})
+    responseTicket={...ticket,format:'INTERPRETATION_LONG'}
+    artifact={...artifact,format:'INTERPRETATION_LONG'}
+    fireEvent.click(screen.getByRole('button',{name:'创建受控导出'}))
+    await screen.findByRole('region',{name:'当前导出批次'})
+    const expected={format:'INTERPRETATION_LONG',waveId,completedFrom:new Date('2026-10-01T10:00').toISOString(),completedBefore:new Date('2026-10-02T10:00').toISOString()}
+    expect(requests.filter(r=>r.url===base+'/exports').map(r=>r.body)).toEqual([expected])
+    expect(screen.getByRole('button',{name:'生成下一批（请先核对本批文件）'})).toBeDisabled()
+    for(const label of ['CSV','Codebook','Manifest']){
+      fireEvent.click(screen.getByRole('button',{name:'下载 '+label}))
+      await screen.findByRole('button',{name:'重新发起 '+label})
+    }
+    responseTicket={...responseTicket,id:'next-export-3333',pageNumber:8}
+    fireEvent.click(screen.getByRole('button',{name:'生成下一批（请先核对本批文件）'}))
+    await screen.findByText(/第 8 批有效 FINAL 已生成/)
+    expect(requests.filter(r=>r.url===base+'/exports').map(r=>r.body)).toEqual([expected,{...expected,cursor:'synthetic-next-page'}])
+  })
+})

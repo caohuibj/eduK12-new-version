@@ -1,3 +1,7 @@
+import {publishSurveyMeasurementDraft} from './measurement-publication.service'
+import {ContentReleaseError} from '../measurement-content/release'
+import {SurveyMediaError} from './media.references'
+import {SurveyWaveError} from './waves.service'
 import {SurveyGovernanceError} from './governance.service'
 import {CatalogSourceError} from './catalog.sources'
 import { Router, type Request, type Response, type NextFunction } from 'express'
@@ -35,6 +39,8 @@ const handle=(action:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Res
     if(e instanceof BulkImportError)return res.status(400).json({code:'SURVEY_IMPORT_INVALID',
       message:'批量导入包含错误',data:{issues:e.issues}})
     if(e instanceof SurveyGovernanceError||e instanceof CatalogSourceError)return error(res,e.message,-1,e.statusCode)
+    if(e instanceof ContentReleaseError)return error(res,e.code,-1,409)
+    if(e instanceof SurveyMediaError||e instanceof SurveyWaveError)return error(res,e.message,-1,e.statusCode)
     if(e instanceof service.SurveyBuilderError)return error(res,e.message,-1,e.statusCode)
     next(e)
   }
@@ -83,3 +89,6 @@ surveyBuilderRouter.get('/:pid/catalog',handle(req=>service.listResearcherCatalo
   z.coerce.number().int().min(1).max(1000).default(1).parse(req.query.page))))
 surveyBuilderRouter.post('/:pid/catalog/:gid/import',handle(req=>service.importCatalogDraft(req.user!.userId,
   id.parse(req.params.pid),id.parse(req.params.gid),copy.parse(req.body))))
+
+surveyBuilderRouter.post('/:pid/instruments/:iid/measurement-release',handle(req=>
+  publishSurveyMeasurementDraft(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.iid),archive.parse(req.body).revision)))

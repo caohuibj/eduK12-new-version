@@ -3,7 +3,7 @@ import {SurveyAnalyticsError} from './analytics.read'
 const fail=():never=>{throw new SurveyAnalyticsError(400,'研究导出分页凭证无效或已过期')}
 export interface SurveyExportCursor {
   /** V1 timestamp, V2 stable UUID, V3 separate expanded attendance, V4 compact attendance and adaptive FINAL pages. */
-  v:1|2|3|4|5;projectId:string;waveId:string;format:'RAW_WAVE'|'RAW_LONG'|'SCORE_LONG'|'COGNITIVE_TRIAL_LONG'
+  v:1|2|3|4|5;projectId:string;waveId:string;format:'INTERPRETATION_LONG'|'RAW_WAVE'|'RAW_LONG'|'SCORE_LONG'|'COGNITIVE_TRIAL_LONG'
   phase?:'FINALS'|'ATTENDANCE'
   attendanceCount?:number
   /** Signed upper bound for FINALs on the following page; V4 only. */
@@ -46,6 +46,7 @@ export function decodeSurveyExportCursor(raw:string,projectId:string,
       ||!Number.isSafeInteger(token.sourceRevision)||token.sourceRevision<0
       ||!Number.isSafeInteger(token.finalCount)||token.finalCount<0
       ||!Number.isSafeInteger(token.page)||token.page<1||token.page>(token.v>=4?500:token.v===3?200:100)
+      ||(token.format==='INTERPRETATION_LONG'&&(token.v!==4||token.phase!=='FINALS'||token.attendanceCount!==0||token.freeTextIncluded!==false))
       ||(token.v===5&&(token.format!=='COGNITIVE_TRIAL_LONG'||token.phase!=='FINALS'
         ||token.pageLimit!==1||token.attendanceCount!==0||token.freeTextIncluded!==false||token.afterAttemptId!==undefined
         ||(token.trial!==undefined&&(!/^[a-f0-9-]{36}$/i.test(token.trial.finalId)

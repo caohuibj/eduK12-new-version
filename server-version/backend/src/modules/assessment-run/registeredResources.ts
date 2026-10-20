@@ -10,6 +10,7 @@ import { hashScaleDefinition, validateScaleDefinition, type ScaleDefinitionV2 } 
 import { reportingFail } from '../reporting/types'
 import { assertTeacherScaleRunUse } from '../huiteacher/scaleLicense.service'
 import { teacherPilotContentIssues } from '../huiteacher/teacherPilotContent'
+import { prepareRegisteredResourceContentSnapshot } from './registeredResourceContent'
 
 type Actor = { userId: string; platformRole: string }
 type Row = { id: string; resource_key: string; resource_version: string; scale_id: string; definition_hash: string; composite_id: string; entry: RelationalProductEntryV1; entry_hash: string; status: string; created_by_user_id: string; reviewed_by_user_id: string | null }
@@ -84,7 +85,17 @@ export async function registerDescriptiveResource(actor: Actor, scaleId: string,
       // gate. Registration creates a fresh version without rewriting old audit.
       const needsIndependentVersion = prior.status === 'REVIEWED'
         && (!prior.reviewed_by_user_id || [prior.created_by_user_id, scale.creatorId].includes(prior.reviewed_by_user_id))
-      if (!needsIndependentVersion) return prior
+      const target = await tx.compositeAssessment.findUnique({
+        where: { id: prior.composite_id },
+        select: { trainingContentSnapshot: true, trainingContentSnapshotHash: true },
+      })
+      if (!target || (target.trainingContentSnapshot == null) !== (target.trainingContentSnapshotHash == null)) {
+        return reportingFail('RESOURCE_INTEGRITY', '注册资源的冻结状态不完整', 409)
+      }
+      // Explicit re-registration may replace a legacy published delivery with
+      // a new version, but must not retrofit its old target or any old attempts.
+      const needsContentVersion = target.trainingContentSnapshot == null && target.trainingContentSnapshotHash == null
+      if (!needsIndependentVersion && !needsContentVersion) return prior
     }
     const versions = await tx.$queryRaw<Array<{ n: number }>>`SELECT COUNT(*)::int AS n FROM registered_assessment_resources WHERE resource_key=${key}`
     const version = `1.0.${versions[0].n + 1}`
@@ -92,6 +103,11 @@ export async function registerDescriptiveResource(actor: Actor, scaleId: string,
       code: `org-resource-${randomUUID()}`, name: scale.name, instruction: scale.instruction,
       createdBy: actor.userId, productKind: 'ORGANIZATION_RESOURCE', publicEnabled: false,
       items: { create: { type: 'SCALE', position: 0, required: true, scaleId } },
+    } })
+    const content = await prepareRegisteredResourceContentSnapshot(tx, { compositeId: target.id, scale, purpose: 'REGISTER' })
+    await tx.compositeAssessment.update({ where: { id: target.id }, data: {
+      trainingContentSnapshot: content.snapshot as Prisma.InputJsonValue,
+      trainingContentSnapshotHash: content.snapshotHash,
     } })
     const entry = descriptiveResourceEntry({ scaleId, name: scale.name, definition, definitionHash: hash, compositeId: target.id, version, mode })
     const rows = await tx.$queryRaw<Row[]>`INSERT INTO registered_assessment_resources
@@ -116,8 +132,16 @@ export async function transitionDescriptiveResource(actor: Actor, id: string, ac
       if (scale.definitionHash !== row.definition_hash) reportingFail('RESOURCE_INTEGRITY', '量表已变化，请重新注册当前版本', 409)
       if (action === 'review' && [row.created_by_user_id, scale.creatorId].includes(actor.userId)) reportingFail('RESOURCE_INDEPENDENT_REVIEW_REQUIRED', '资源注册者和量表作者不能自审，请交由另一位平台管理员审核', 403)
       if (action === 'publish' && (!row.reviewed_by_user_id || [row.created_by_user_id, scale.creatorId].includes(row.reviewed_by_user_id))) reportingFail('RESOURCE_INDEPENDENT_REVIEW_REQUIRED', '发布需要独立审核记录，请重新登记新版本并独立审核', 409)
+      await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${row.composite_id} FOR UPDATE`
+      const content = await prepareRegisteredResourceContentSnapshot(tx, { compositeId: row.composite_id, scale, purpose: 'PUBLISH' })
+      if (action === 'publish') {
+        await tx.compositeAssessment.update({ where: { id: row.composite_id }, data: {
+          status: 'PUBLISHED', publishedAt: new Date(),
+          trainingContentSnapshot: content.snapshot as Prisma.InputJsonValue,
+          trainingContentSnapshotHash: content.snapshotHash,
+        } })
+      }
     }
-    if (action === 'publish') await tx.compositeAssessment.update({ where: { id: row.composite_id }, data: { status: 'PUBLISHED', publishedAt: new Date() } })
     const status = { review: 'REVIEWED', publish: 'PUBLISHED', retire: 'RETIRED' }[action]
     const column = { review: 'reviewed', publish: 'published', retire: 'retired' }[action]
     const rows = await tx.$queryRaw<Row[]>(Prisma.sql`UPDATE registered_assessment_resources SET status=${status},
@@ -133,6 +157,16 @@ export async function listRegisteredResources(actor: Actor, page = 1) {
   if (!Number.isSafeInteger(page) || page < 1 || page > 100000) reportingFail('RESOURCE_PAGE_INVALID', '资源页码无效', 400)
   const list = await prisma.$queryRaw<Row[]>`SELECT * FROM registered_assessment_resources ORDER BY created_at DESC,id LIMIT 101 OFFSET ${(page - 1) * 100}`
   return { list: list.slice(0, 100).map(row => ({ ...row, entry: checkedEntry(row) })), truncated: list.length > 100, nextPage: list.length > 100 ? page + 1 : null }
+}
+
+/** System governance needs source metadata, not Training content authority or
+ * participant data. Registration still checks the full independent policy. */
+export async function listRegistrationCandidates(actor:Actor,page=1){
+  admin(actor)
+  if(!Number.isSafeInteger(page)||page<1||page>100000)reportingFail('RESOURCE_PAGE_INVALID','资源页码无效',400)
+  const rows=await prisma.scale.findMany({where:{status:'PUBLISHED',instrumentClass:'CUSTOM_DESCRIPTIVE'},
+    select:{id:true,name:true,status:true,instrumentClass:true},orderBy:{id:'asc'},skip:(page-1)*100,take:101})
+  return {list:rows.slice(0,100),nextPage:rows.length>100?page+1:null}
 }
 
 export async function readPublishedRegisteredResource(actor: Actor, id: string) {

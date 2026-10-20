@@ -2,7 +2,7 @@ import { PrismaClient, UserRole } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 import { isValidPassword } from '../../src/utils/password'
 
-/** Create the initial administrator without ever logging its password. */
+/** Legacy fixture identity only. System authority uses the operator-only CLI. */
 export async function seedAdmin(prisma: PrismaClient): Promise<string> {
   const existingAdmin = await prisma.user.findFirst({ where: { role: UserRole.ADMIN } })
   if (existingAdmin) {
@@ -27,20 +27,12 @@ export async function seedAdmin(prisma: PrismaClient): Promise<string> {
       username: adminUsername,
       passwordHash: await bcrypt.hash(adminPassword, 10),
       role: UserRole.ADMIN,
-      nickname: '系统管理员',
+      platformRole: 'STANDARD',
+      nickname: '待授权管理账号',
     },
   })
 
-  // Fresh installations do not pass through the historical ADMIN backfill, so
-  // bootstrap the initial account explicitly. The column/type are introduced
-  // by the C01 migration before production seeding runs.
-  await prisma.$executeRaw`
-    UPDATE "users"
-    SET "platform_role" = 'SYSTEM_ADMIN'::"PlatformRole"
-    WHERE "id" = ${admin.id}
-  `
-
-  console.log('默认管理员账号创建成功:')
+  console.log('旧版管理身份已创建；无系统或入口管理权限，需受控授权:')
   console.log(`  用户名: ${admin.username}`)
   console.log('  密码: 已从受保护的部署环境读取（不会写入日志）')
   return admin.id

@@ -4,6 +4,8 @@ import { TrainingQuestionnaireList } from './TrainingQuestionnaireList'
 import { DeliveryOptionCard } from './DeliveryOptionCard'
 import { FormChoiceEditor } from './FormChoiceEditor'
 import { choiceError, emptyChoices, filledChoices, type ChoiceDraft } from './formChoices'
+import { TrainingContentSelection } from './TrainingContentSelection'
+import { TrainingReportStudio } from './TrainingReportStudio'
 import { TypedFormExportActions } from '../../modules/composite/TypedFormExportActions'
 import { StructuredFormConstraints } from '../../modules/assessment-core/form/StructuredFormConstraints'
 import { BasicFormConstraints } from '../../modules/assessment-core/form/BasicFormConstraints'
@@ -186,6 +188,10 @@ export function QuestionnaireProductList() {
   )
 }
 
+type PendingCognitivePublication={actorId:string;id:string;revision:number;itemIds:string[];hadUnknownOutcome:boolean}
+function readPendingCognitivePublication(key:string,actorId:string,id:string):PendingCognitivePublication|null{
+  try{const value=JSON.parse(sessionStorage.getItem(key)||'null');return value&&value.actorId===actorId&&value.id===id&&Number.isSafeInteger(value.revision)&&value.revision>=0&&Array.isArray(value.itemIds)&&value.itemIds.length>0&&value.itemIds.every((item:unknown)=>typeof item==='string')?{...value,hadUnknownOutcome:value.hadUnknownOutcome!==false}:null}catch{return null}
+}
 export function QuestionnaireProductEdit() {
   const trainingDesign = isTrainingHost()
   const cognitiveEnabled = useCognitiveEnabled()
@@ -296,7 +302,28 @@ export function QuestionnaireProductEdit() {
   const [required, setRequired] = useState(true)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const selectionRisk = useRef({dirty:false,pending:false,busy:false})
+  const [selectionState,setSelectionState]=useState(selectionRisk.current)
+  const selectionBlocked=selectionState.dirty||selectionState.pending||selectionState.busy
+  const selectionRiskChanged = React.useCallback((risk: {dirty:boolean;pending:boolean;busy:boolean}) => { selectionRisk.current=risk;setSelectionState(risk) }, [])
+  const reportRisk = useRef({dirty:false,pending:false,busy:false})
+  const [reportState,setReportState]=useState(reportRisk.current)
+  const reportBlocked=reportState.dirty||reportState.pending||reportState.busy
+  const reportRiskChanged = React.useCallback((risk: {dirty:boolean;pending:boolean;busy:boolean}) => { reportRisk.current = risk;setReportState(risk) }, [])
+  const [measurementNotice,setMeasurementNotice]=useState('')
+  const measurementRecoveryKey='training-cognitive-publication:'+JSON.stringify([user?.id??'',id])
+  const measurementScope=useRef({key:measurementRecoveryKey,epoch:0})
+  if(measurementScope.current.key!==measurementRecoveryKey)measurementScope.current={key:measurementRecoveryKey,epoch:measurementScope.current.epoch+1}
+  useEffect(()=>()=>{measurementScope.current.epoch++},[])
+  const [measurementUnknown,setMeasurementUnknown]=useState<PendingCognitivePublication|null>(()=>readPendingCognitivePublication(measurementRecoveryKey,user?.id??'',id))
+  useEffect(()=>{setMeasurementUnknown(readPendingCognitivePublication(measurementRecoveryKey,user?.id??'',id));setMeasurementNotice('')},[measurementRecoveryKey,user?.id,id])
+  const pendingMeasurement=measurementUnknown?.actorId===user?.id&&measurementUnknown?.id===id?measurementUnknown:null
+  const rememberMeasurement=(pending:PendingCognitivePublication|null)=>{
+    if(pending)sessionStorage.setItem(measurementRecoveryKey,JSON.stringify(pending));else sessionStorage.removeItem(measurementRecoveryKey)
+    setMeasurementUnknown(pending)
+  }
   const actionInFlight = useRef(false)
+  useEffect(()=>{actionInFlight.current=false;setBusy(false)},[measurementRecoveryKey])
   const [preflight, setPreflight] = useState<{ revision: number; ok: boolean; checks: Array<{ key: string; label: string; status: string; message: string; targetId?: string }> } | null>(null)
   const [nameError, setNameError] = useState('')
   const [expiryError, setExpiryError] = useState('')
@@ -360,7 +387,11 @@ export function QuestionnaireProductEdit() {
     if (id !== 'new') void request('/' + id).then(row => { if (active) hydrate(row) }).catch(e => { if (active) setError(message(e)) })
     return () => { active = false }
   }, [id, preselectedScaleId, preselectedCourseId, user?.id])
-  const action = async (fn: () => Promise<void>) => {
+  const action = async (fn: () => Promise<void>, measurementRecovery = false) => {
+    if(pendingMeasurement&&!measurementRecovery){setError('请先恢复或明确结束原认知发布请求，再修改组合测评。');return}
+    const scopeEpoch=measurementScope.current.epoch
+    if (selectionRisk.current.busy || (!measurementRecovery && (selectionRisk.current.dirty || selectionRisk.current.pending))) { setError('请先保存报告／参考选择或核对未确认请求，再修改组合测评。'); return }
+    if (reportRisk.current.dirty || reportRisk.current.pending || reportRisk.current.busy) { setError('请先保存报告修改或核对未确认的报告请求，再修改组合测评。'); return }
     if (actionInFlight.current) return
     actionInFlight.current = true
     setBusy(true)
@@ -368,12 +399,41 @@ export function QuestionnaireProductEdit() {
     try {
       await fn()
     } catch (e) {
-      setError(message(e))
+      if(measurementScope.current.epoch===scopeEpoch)setError(message(e))
     } finally {
-      actionInFlight.current = false
-      setBusy(false)
+      if(measurementScope.current.epoch===scopeEpoch){actionInFlight.current = false;setBusy(false)}
     }
   }
+  const publishCognitiveMeasurement=(pending:PendingCognitivePublication)=>void action(async()=>{
+    if(pending.actorId!==user?.id||pending.id!==id)throw new Error('认知发布请求所属账号或组合已变化')
+    const scopeEpoch=measurementScope.current.epoch,originalKey=measurementRecoveryKey
+    // Persist uncertainty before transmission, including crashes/reloads during the request.
+    const inFlight={...pending,hadUnknownOutcome:true}
+    rememberMeasurement(inFlight);setMeasurementNotice('')
+    let row:any
+    try{row=await request('/'+pending.id+'/measurement-instances/publish',{revision:pending.revision})}
+    catch(error){
+      const status=(error as {status?:number})?.status
+      if(!pending.hadUnknownOutcome&&status!==undefined&&[400,403,409].includes(status)){
+        const saved=readPendingCognitivePublication(originalKey,pending.actorId,pending.id)
+        if(saved&&JSON.stringify(saved)===JSON.stringify(inFlight))sessionStorage.removeItem(originalKey)
+        if(measurementScope.current.epoch===scopeEpoch&&measurementScope.current.key===originalKey)setMeasurementUnknown(null)
+      }
+      throw error
+    }
+    // A late receipt may clear only its own exact persisted request, never the new workspace.
+    const saved=readPendingCognitivePublication(originalKey,pending.actorId,pending.id)
+    if(saved&&JSON.stringify(saved)===JSON.stringify(inFlight))sessionStorage.removeItem(originalKey)
+    if(measurementScope.current.epoch!==scopeEpoch||measurementScope.current.key!==originalKey)return
+    hydrate(row);setPreflight(null);setMeasurementUnknown(null)
+    setMeasurementNotice('当前认知配置版本已发布。组合测评仍为草稿，尚未启动投放。')
+  },true)
+  const refreshCognitivePublication=()=>void action(async()=>{
+    const scopeEpoch=measurementScope.current.epoch,key=measurementRecoveryKey
+    const row=await request('/'+id)
+    if(measurementScope.current.epoch!==scopeEpoch||measurementScope.current.key!==key)return
+    hydrate(row);setPreflight(null);setMeasurementNotice('已重新读取当前草稿。请核对认知配置及发布记录；原请求仍保持未确认。')
+  },true)
   const persistencePolicy = () => ({schemaVersion:1,checkpoint:checkpointEnabled?{enabled:true,ttlHours:checkpointHours}:null,localCognitive:localCognitiveEnabled?{enabled:true,ttlHours:localCognitiveHours}:null})
   const feedbackPolicy = (): TrainingFeedbackPolicy => feedbackMode === 'SCHEDULED'
     ? { schemaVersion: 1, mode: 'SCHEDULED', releaseAt: parseLocalDateTime(feedbackReleaseAt)?.toISOString() ?? feedbackReleaseAt }
@@ -794,6 +854,24 @@ export function QuestionnaireProductEdit() {
     </div>{trainingDesign && feedbackSettings}</div>
     {detail && draft && !trainingDesign && <div className="questionnaire-delivery-footer"><p role="status">{dirty ? '设置有未保存的修改' : '设置已保存'}</p><ProductButton variant={dirty ? 'primary' : 'secondary'} disabled={busy || !dirty} onClick={() => void save()}>保存投放设置</ProductButton><a href="#questionnaire-publish">前往正式发布 ↑</a></div>}
   </fieldset>
+  const authoringLocked=!!pendingMeasurement||selectionBlocked||reportBlocked
+  const scientificTools=<>
+      {detail && ((draft && cognitiveEnabled && detail.items?.some((item: any) => item.type === 'COGNITIVE')) || pendingMeasurement) && <section className="my-4 rounded border p-4" aria-label="认知测量版本发布">
+        <h2 className="font-semibold">固定当前认知配置</h2>
+        <p>仅将当前草稿中允许调整的受控认知参数冻结为精确私有测量版本。不转换量表或静态情境判断，不发布组合投放，也不启动作答。</p>
+        <ProductButton disabled={busy || dirty || reportBlocked || selectionBlocked || !!pendingMeasurement || !draft || !cognitiveEnabled} onClick={() => publishCognitiveMeasurement({actorId:user!.id,id,revision:detail.revision,hadUnknownOutcome:false,itemIds:detail.items.filter((item:any)=>item.type==='COGNITIVE').map((item:any)=>item.id)})}>发布当前认知配置版本</ProductButton>
+        {measurementNotice && <p role="status">{measurementNotice}</p>}
+        {pendingMeasurement && <div role="status"><p>修订 {pendingMeasurement.revision} 的发布结果尚未确认。重试始终使用原修订，不会自动改用当前修订或重复创建实例。重新读取不代表原请求已成功。</p>
+          <ProductButton disabled={busy || dirty || reportBlocked || selectionState.busy} onClick={() => publishCognitiveMeasurement(pendingMeasurement)}>重试原修订请求</ProductButton>
+          <ProductButton disabled={busy || dirty || reportBlocked || selectionState.busy} onClick={refreshCognitivePublication}>重新读取当前草稿</ProductButton>
+          {detail.revision>pendingMeasurement.revision && <div><p>服务器当前修订已超过原修订，原请求已不能再提交。你可以结束此恢复；这不表示原发布成功，重新发布必须另行确认当前配置。</p><ProductButton disabled={busy || dirty || reportBlocked || selectionState.busy} onClick={()=>{rememberMeasurement(null);setMeasurementNotice('已结束失效修订的恢复，未确认原发布成功，也未重新发布。')}}>结束已失效修订恢复（不确认成功）</ProductButton></div>}
+          {detail.revision>pendingMeasurement.revision && pendingMeasurement.itemIds.every(itemId=>detail.items?.some((item:any)=>item.id===itemId&&item.type==='COGNITIVE'&&typeof item.cognitiveAssignment?.measurementReleaseId==='string'&&item.cognitiveAssignment.measurementReleaseId)) && <div><p>当前修订已推进，原请求中的全部认知项均有测量版本指针。此状态不单独证明原请求成功；请明确核对后结束恢复。</p>
+            <ProductButton disabled={busy || dirty || reportBlocked || selectionState.busy} onClick={()=>{rememberMeasurement(null);setMeasurementNotice('已按你的确认结束原请求恢复，未再次发布。')}}>已核对全部原认知项，结束恢复</ProductButton></div>}
+        </div>}
+      </section>}
+{detail && user?.id && draft && detail.questionnaireType === 'COURSE' && (detail.questionnaireCourses || []).some((link: any) => catalog.courses.some((course: any) => course.id === link.courseId && course.courseType === 'TRAINING_COURSE' && !course.isLibrary)) && <TrainingContentSelection key={JSON.stringify([user.id,detail.id])} actorId={user.id} detail={detail} disabled={busy||dirty||reportBlocked||!!pendingMeasurement} recoveryDisabled={busy||dirty||reportState.busy} onSaved={hydrate} onRiskChange={selectionRiskChanged}/>}
+      {detail && user?.id && detail.questionnaireType === 'COURSE' && (detail.questionnaireCourses || []).some((link: any) => catalog.courses.some((course: any) => course.id === link.courseId && course.courseType === 'TRAINING_COURSE' && !course.isLibrary)) && <TrainingReportStudio disabled={busy || dirty || selectionBlocked || !!pendingMeasurement} onLeaveRiskChange={reportRiskChanged} actorId={user.id} compositeId={detail.id} courses={(detail.questionnaireCourses || []).flatMap((link: any) => { const course = catalog.courses.find((row: any) => row.id === link.courseId && row.courseType === 'TRAINING_COURSE' && !row.isLibrary); return course ? [{id:course.id,title:course.title}] : [] })}/>}
+  </>
   const formRules = <>
                       {formType!=='year_month'&&!contextKey ? <label className="block"><input type="checkbox" checked={policyEnabled} onChange={e=>{setPolicyEnabled(e.target.checked);if(!e.target.checked)setFormConstraints(previous=>({...previous,allowRefusal:undefined,displayIf:undefined,otherOptionKey:undefined,otherMaxLength:undefined,exclusiveOptionKeys:undefined}))}}/>{trainingDesign ? '启用条件显示、拒答等规则' : '启用新表单策略（V3）'}</label>:null}
                       {policyEnabled && <fieldset className="space-y-3 rounded border p-3"><legend>{trainingDesign ? '本题规则' : '本次新发布的表单策略'}</legend>
@@ -812,13 +890,13 @@ export function QuestionnaireProductEdit() {
   const addContentControls = <>
               {draft && (
                 <fieldset
-                  disabled={busy || dirty}
+                  disabled={busy || dirty || authoringLocked}
                   className="space-y-3 border rounded p-4"
                 >
                   <legend>添加内容</legend>{trainingDesign && <div className="qt-type-tabs" role="group" aria-label="内容类型">{([
       ['SCALE','量表',BookOpen], ...(cognitiveEnabled ? [['COGNITIVE','认知测验',Brain] as const] : []),
       ['SITUATIONAL','情境判断',Route], ['FORM','自定义表单',ClipboardList],
-    ] as Array<[string,string,typeof BookOpen]>).map(([value,label,Icon]) => <button type="button" key={String(value)} disabled={busy || dirty} aria-pressed={type === value} onClick={() => { setType(String(value)); setSelected('') }}><Icon size={18} />{String(label)}</button>)}</div>}
+    ] as Array<[string,string,typeof BookOpen]>).map(([value,label,Icon]) => <button type="button" key={String(value)} disabled={busy || dirty || authoringLocked} aria-pressed={type === value} onClick={() => { setType(String(value)); setSelected('') }}><Icon size={18} />{String(label)}</button>)}</div>}
                   <label hidden={trainingDesign}>
                     测评类型
                     <select
@@ -1021,7 +1099,7 @@ export function QuestionnaireProductEdit() {
                         </ProductButton>
                         {v.type !== 'FORM_SECTION' && (
                           <ProductButton
-                            disabled={busy || dirty}
+                            disabled={busy || dirty || authoringLocked}
                             onClick={() =>
                               void action(async () =>
                                 hydrate(
@@ -1048,7 +1126,7 @@ export function QuestionnaireProductEdit() {
                           <span>{item.formLabel || item.label} · {item.required === false ? '选填' : '必填'}</span>
                           {draft && (
                             <ProductButton
-                              disabled={busy || dirty}
+                              disabled={busy || dirty || authoringLocked}
                               className="ml-3"
                               onClick={() =>
                                 void action(async () =>
@@ -1070,7 +1148,7 @@ export function QuestionnaireProductEdit() {
                           )}
                         </div>
                       ))}
-                    {draft && v.type === 'FORM_SECTION' && !v.items.length && <ProductButton disabled={busy || dirty} onClick={() => void action(async () => hydrate(await request('/' + id + '/form-sections/' + v.id + '/remove', { revision: detail.revision })))}>移除空区段</ProductButton>}
+                    {draft && v.type === 'FORM_SECTION' && !v.items.length && <ProductButton disabled={busy || dirty || authoringLocked} onClick={() => void action(async () => hydrate(await request('/' + id + '/form-sections/' + v.id + '/remove', { revision: detail.revision })))}>移除空区段</ProductButton>}
 {v.type !== 'FORM_SECTION' && <p>该测评使用已授权定义。必答与来源由当前版本固定；移动或移除请使用左侧内容列表。</p>}</section>)}
   </>
   const basicSettings = <>
@@ -1119,7 +1197,7 @@ export function QuestionnaireProductEdit() {
                 onChange={(e) => setInstruction(e.target.value)}
               />
             </label>
-            {draft && <ProductButton variant={id === 'new' || dirty ? 'primary' : 'secondary'} disabled={busy || (id !== 'new' && !dirty)} onClick={() => void save()}>
+            {draft && <ProductButton variant={id === 'new' || dirty ? 'primary' : 'secondary'} disabled={authoringLocked || busy || (id !== 'new' && !dirty)} onClick={() => void save()}>
               {id === 'new' ? '创建草稿' : '保存设置'}
             </ProductButton>}
           </fieldset>
@@ -1192,7 +1270,7 @@ export function QuestionnaireProductEdit() {
                 {detail.items?.some((item:{form?:{formDefinition?:unknown}})=>item.form?.formDefinition!=null) && <TypedFormExportActions key={id} assessmentId={id} />}
                 {detail.status === 'PUBLISHED' && (
                   <ProductButton variant="danger"
-                    disabled={busy || dirty}
+                    disabled={busy || dirty || authoringLocked}
                     onClick={() =>
                       void action(async () =>
                         hydrate(
@@ -1227,12 +1305,12 @@ export function QuestionnaireProductEdit() {
   </>
 
   const timingDisclosure = trainingDesign ? detail && <DeliveryOptionCard icon={ShieldCheck} title="教师查看与导出计时" description="单独决定有权限的教师能否在报告或导出文件中看到计时。" enabled={Boolean(detail.timingExportEnabled)} badge={detail.timingExportEnabled ? '已允许' : '未允许'}>
-    <label className="qt-toggle-line"><input type="checkbox" disabled={busy || dirty} checked={Boolean(detail.timingExportEnabled)} onChange={e => { const enabled = e.target.checked; void action(async () => { hydrate(await request('/' + id + '/timing-export-policy', { revision: detail.revision, enabled })) }) }} />允许教师查看及导出计时</label>
+    <label className="qt-toggle-line"><input type="checkbox" disabled={busy || dirty || authoringLocked} checked={Boolean(detail.timingExportEnabled)} onChange={e => { const enabled = e.target.checked; void action(async () => { hydrate(await request('/' + id + '/timing-export-policy', { revision: detail.revision, enabled })) }) }} />允许教师查看及导出计时</label>
     <p className="qt-option-help">仅开启上方“时间记录”不会自动开放查看权限。学员反馈中不显示计时。</p>
     {dirty && <p className="qt-inline-notice">请先保存其他修改，再调整这项权限。</p>}
     <details className="qt-rule-details"><summary>权限如何生效？</summary><p>此项调整会立即保存，独立于原始回答权限。摘要报告也可导出计时；撤销后，旧计时产物不可再下载。默认关闭。</p></details>
   </DeliveryOptionCard> : <>
-      {detail&&<section aria-label="计时披露权限"><label><input type="checkbox" disabled={busy||dirty} checked={Boolean(detail.timingExportEnabled)} onChange={e=>{const enabled=e.target.checked;void action(async()=>{hydrate(await request('/'+id+'/timing-export-policy',{revision:detail.revision,enabled}))})}}/>允许有权限的教师报告与 CSV/ZIP 导出计时</label><p>默认关闭，独立于原始回答权限；摘要也可导出计时，撤销后旧计时产物不可下载。学员反馈不显示计时。</p></section>}
+      {detail&&<section aria-label="计时披露权限"><label><input type="checkbox" disabled={busy||dirty||authoringLocked} checked={Boolean(detail.timingExportEnabled)} onChange={e=>{const enabled=e.target.checked;void action(async()=>{hydrate(await request('/'+id+'/timing-export-policy',{revision:detail.revision,enabled}))})}}/>允许有权限的教师报告与 CSV/ZIP 导出计时</label><p>默认关闭，独立于原始回答权限；摘要也可导出计时，撤销后旧计时产物不可下载。学员反馈不显示计时。</p></section>}
   </>
 
   const publishPanel = <>
@@ -1241,10 +1319,10 @@ export function QuestionnaireProductEdit() {
         <div className="questionnaire-publish-summary"><div><h2>草稿 · 尚未发布</h2><p>{dirty ? '设置有未保存的修改，请先保存设置。' : '确认内容与投放设置后，可自检或正式发布。'}</p></div>
         <div className="flex flex-wrap gap-3">
                 {dirty && !trainingDesign && <ProductButton variant="primary" disabled={busy} onClick={() => void save()}>保存全部设置</ProductButton>}
-                {draft && <ProductButton variant="secondary" disabled={busy || dirty} onClick={() => void action(async () => setPreflight(await request('/' + id + '/preflight', { revision: detail.revision })))}>发布前自检</ProductButton>}
+                {draft && <ProductButton variant="secondary" disabled={busy || dirty || authoringLocked} onClick={() => void action(async () => setPreflight(await request('/' + id + '/preflight', { revision: detail.revision })))}>发布前自检</ProductButton>}
                 {draft && (
                   <ProductButton
-                    disabled={busy || dirty}
+                    disabled={busy || dirty || authoringLocked}
                     variant="primary"
                     onClick={() => void publish()}
                   >
@@ -1296,8 +1374,10 @@ export function QuestionnaireProductEdit() {
       <Link className="qt-breadcrumb" to="/questionnaires">组合测评 <span>/</span> {draft ? '编制草稿' : '查看测评'}</Link>
       <PageHeader title={id === 'new' ? '创建组合测评' : draft ? '编制组合测评' : '查看组合测评'}
         description="从内容编排到发布，按步骤完成一份课程测评。"
-        actions={<><span className="qt-draft-status">{busy ? '正在处理…' : dirty ? '有未保存的修改' : labels[detail?.status] || '新建草稿'}</span>{draft && <ProductButton variant="primary" disabled={busy || (id !== 'new' && !dirty)} onClick={() => void save()}><Save size={16} />{id === 'new' ? '创建草稿' : '保存全部设置'}</ProductButton>}</>} />
+        actions={<><span className="qt-draft-status">{busy ? '正在处理…' : dirty ? '有未保存的修改' : labels[detail?.status] || '新建草稿'}</span>{draft && <ProductButton variant="primary" disabled={authoringLocked || busy || (id !== 'new' && !dirty)} onClick={() => void save()}><Save size={16} />{id === 'new' ? '创建草稿' : '保存全部设置'}</ProductButton>}</>} />
       {feedback}
+      {scientificTools}
+      {pendingMeasurement&&<p role="status">请先恢复或明确结束原认知发布请求，再修改组合测评。</p>}
       <nav aria-label="编制步骤" className="qt-steps">
         {editorSteps.map(([key,label,hint], index) => <a key={key} href={'#'+key}
           aria-current={activeStep === key ? 'step' : undefined} aria-disabled={id === 'new' && (index === 1 || index === 3) ? true : undefined}
@@ -1307,7 +1387,7 @@ export function QuestionnaireProductEdit() {
         </a>)}
       </nav>
       {error && <div role="alert" className="qt-error">{error}<ProductButton onClick={() => void action(reload)}>刷新问卷</ProductButton></div>}
-      {id !== 'new' && !detail ? <p role="status">正在加载问卷…</p> : <>
+      {id !== 'new' && !detail ? <p role="status">正在加载问卷…</p> : <fieldset disabled={authoringLocked} aria-label="组合测评编辑" style={{border:0,padding:0,margin:0,minWidth:0}}>
         <div className="qt-workspace">
           <div className="qt-main">
             <section className="qt-panel" hidden={stepIndex !== 0} aria-label="基本信息步骤">
@@ -1344,7 +1424,7 @@ export function QuestionnaireProductEdit() {
           <aside className="qt-sidebar" aria-label="编制概览"><div className="qt-summary"><small>当前测评</small><h2>{name.trim() || '未命名测评'}</h2><p>{kind === 'COURSE' ? '课程问卷' : '通用公开问卷'} · 单项报告合集</p><dl><div><dt>内容单元</dt><dd>{units.length} 个</dd></div><div><dt>投放课程</dt><dd>{courseIds.map(courseId => catalog.courses.find((course:any) => course.id === courseId)?.title || '已绑定课程').join('、') || '尚未选择'}</dd></div><div><dt>开放时间</dt><dd>{opensAt ? localDate(opensAt).replace('T',' ') : '发布后立即开放'}</dd></div><div><dt>报告开放</dt><dd>{reportSummary}</dd></div></dl><div className="qt-ready-title"><h3>{draft ? '发布准备' : '当前状态'}</h3><span>{draft ? `${readyItems.filter(([,ready]) => ready).length} / 4` : labels[detail?.status]}</span></div>{draft && <><progress aria-label="发布准备完成度" value={readyItems.filter(([,ready]) => ready).length} max={4} /><ul>{readyItems.map(([label,ready]) => <li key={label} className={ready ? 'is-ready' : ''}><span>{ready ? <Check size={12} /> : '·'}</span>{label}</li>)}</ul></>}</div><div className="qt-help"><ListChecks size={17} /><h3>{['先把测评介绍清楚','先确定内容，再安排投放','先设置必需项，再查看可选项','发布前再核对一次'][stepIndex]}</h3><p>{['名称便于课程成员识别，指导语会展示给学员。','可添加不同类型的单元，再按学员作答顺序排列。','课程、开放时间和报告反馈是主流程，高级策略按需启用。','正式发布会再次校验权限；发布后内容和相关策略冻结。'][stepIndex]}</p></div></aside>
         </div>
         <footer className="qt-footer"><ProductButton disabled={busy || stepIndex === 0} onClick={() => goToStep(id === 'new' ? 'questionnaire-basic' : editorSteps[stepIndex-1][0])}><ArrowLeft size={16} />上一步</ProductButton><span role="status">{busy ? '正在处理，请稍候…' : id === 'new' ? '先创建草稿，再添加测评内容。' : dirty ? '有未保存的修改，请先保存。' : '设置已同步'}</span><div>{draft && id !== 'new' && <ProductButton disabled={busy || !dirty} onClick={() => void save()}>保存全部修改</ProductButton>}{stepIndex < 3 && <ProductButton variant="primary" disabled={busy} onClick={() => id === 'new' ? void save() : goToStep(editorSteps[stepIndex+1][0])}>{id === 'new' ? '创建草稿，继续编排' : `下一步：${editorSteps[stepIndex+1][1]}`}<ArrowRight size={16} /></ProductButton>}</div></footer>
-      </>}
+      </fieldset>}
     </ProductPage>
   )
   return (
@@ -1355,6 +1435,8 @@ export function QuestionnaireProductEdit() {
       />
       <Link to="/questionnaires">返回组合测评列表</Link>
       {feedback}
+      {scientificTools}
+      {pendingMeasurement&&<p role="status">请先恢复或明确结束原认知发布请求，再修改组合测评。</p>}
       {timingDisclosure}
       {id === 'new' && <p className="questionnaire-publish-hint" role="status">先创建草稿，再添加测评内容、设置投放范围，最后正式发布。</p>}
       {publishPanel}
@@ -1374,7 +1456,7 @@ export function QuestionnaireProductEdit() {
       {id !== 'new' && !detail ? (
         <p role="status">正在加载问卷…</p>
       ) : (
-        <>
+        <fieldset disabled={authoringLocked} aria-label="组合测评编辑">
       {basicSettings}
           {id === 'new' && deliverySettings}
           {detail && (
@@ -1390,7 +1472,7 @@ export function QuestionnaireProductEdit() {
       {managementActions}
             </>
           )}
-        </>
+        </fieldset>
       )}
     </ProductPage>
   )

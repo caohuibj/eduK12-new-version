@@ -37,7 +37,7 @@ describe('bounded source catalog pagination',()=>{
     const result=await sourceCatalog('admin',{kind:'SCALE',page})
     expect(result).toMatchObject({page,pageSize:25,hasMore,terminalReason})
     expect(result.list).toHaveLength(count)
-    expect(result.list.every(row=>row.available)).toBe(true)
+    expect(result.list.every(row=>!row.available&&row.unsupportedReason==='SOURCE_SCALE_EXPLICIT_CONVERSION_REQUIRED')).toBe(true)
     expect(result.list.map(row=>row.ref.sourceId)).toEqual(Array.from({length:count},(_,i)=>'source-'+String((page-1)*25+i+1).padStart(4,'0')))
     expect(db.$queryRaw).toHaveBeenCalledTimes(1) // Current administrator authority remains mandatory.
     expect(db.scale.findMany).toHaveBeenCalledExactlyOnceWith({where:{status:'PUBLISHED'},orderBy:{id:'asc'},skip:(page-1)*25,take:26})
@@ -65,7 +65,7 @@ describe('bounded source catalog pagination',()=>{
   })
   it('still refuses unauthorized source catalog reads before pagination',async()=>{
     db.$queryRaw.mockResolvedValue([])
-    await expect(sourceCatalog('not-admin',{kind:'SCALE',page:40})).rejects.toMatchObject({code:'SYSTEM_ADMIN_REQUIRED',statusCode:403})
+    await expect(sourceCatalog('not-admin',{kind:'SCALE',page:40})).rejects.toMatchObject({message:'缺少当前入口管理授权',statusCode:403})
     expect(db.scale.findMany).not.toHaveBeenCalled()
   })
 })

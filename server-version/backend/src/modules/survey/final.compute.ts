@@ -1,3 +1,4 @@
+import type {SurveyFinalInterpretation} from './final-interpretation.service'
 import { normalizeSurveySjtAnswers,scoreResearchSjtAnswers,SurveySjtAnswerError } from './sjt-runtime'
 import type { SurveyCognitiveReference } from './cognitive.definition'
 import { projectStoredMeasurement,type MeasurementResultV1 } from '../assessment-runtime/measurement-result'
@@ -36,6 +37,7 @@ export interface FrozenUnitResult {
   notExecuted?:true
 }
 export interface SurveyComputedFinal {
+  interpretation?:SurveyFinalInterpretation
   schemaVersion:1
   definitionDigest:string
   units:FrozenUnitResult[]

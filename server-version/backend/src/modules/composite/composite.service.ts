@@ -1,11 +1,16 @@
 import { assertCompositeCourseScope } from './composite-course-scope'
+import {assertTrainingPrivateReferenceAdmissionCurrent} from './training-private-reference-use'
+import {attachTrainingReferenceSelection} from './training-reference-selection'
+import {freezeTrainingReferenceBinding} from './training-reference-binding'
+import {assertCurrentTrainingContentOwner,attachTrainingReportSelection} from './training-report-selection'
+import {prepareTrainingContentSnapshot,prepareTrainingContentAttemptBinding} from './training-content-binding'
 import { evaluateTrainingFeedbackForAttempt, prepareTrainingFeedbackBinding, freezeTrainingFeedbackSnapshot, trainingFeedbackAttemptSelect, trainingFeedbackParentSelect, type TrainingFeedbackBinding } from './training-feedback-binding'
 import { isLoadedCompositeParticipantFeedbackDeferred, trainingFeedbackReportReady } from '../assessment-policy/participant-feedback'
 import { freezeTrainingPersistenceSnapshot, readTrainingPersistencePolicy, trainingPersistenceMetadata } from './training-persistence.policy'
 import { trainingRoundPublicationIdentity, prepareTrainingPublicRound, assertTrainingTokenRound, publicRoundMetadata, trainingRoundSelect, type TrainingRoundInput } from './training-public-round'
 import { allocateTrainingMaterial, materialRestartClaim } from './training-material-allocation'
 import { canonicalHash } from '../assessment-runtime/canonical'
-import { resolveTrainingFlowScope, trainingFlowMarkerState, trainingFlowProvenance, hasTrainingFlowDefinitionMarkers } from './training-flow-scope'
+import { resolveTrainingFlowScopeForMaterialization, trainingFlowMarkerState, trainingFlowProvenance, hasTrainingFlowDefinitionMarkers } from './training-flow-scope'
 import { buildTrainingFlowUnits } from './training-flow-definition'
 import { freezeTrainingFlowAssignment } from './training-flow-assignment-snapshot'
 import { compileTrainingFlow, trainingFlowUnitKey, trainingFlowItemKey } from '../assessment-core/flow/training'
@@ -26,6 +31,8 @@ import { scaleAssessmentMediaReferences } from '../scale/scale-image-retention'
 import { compositeFormSectionMediaReferences } from '../assessment-runtime/form-image.adapter'
 import type { SjtCourseGrantScope } from '../situational/authoring/grants'
 import {withTrainingTimingReport} from './training-timing-report'
+import {readTrainingContentReports} from './training-content-report'
+import {decodeTrainingFinalReceipt} from './training-content-final'
 import {freezeTrainingTimingSnapshot,readTrainingTimingPolicy} from '../assessment-runtime/training-scale-timing'
 import { typedFormPresentation } from '../reporting/typed-form-presentation'
 import { sharedControlWritesEnabled } from '../assessment-runtime/shared-control-records'
@@ -50,6 +57,7 @@ import { decryptFrozenSituationalRuntimeSnapshot } from '../assessment-runtime/s
 import { randomBytes, randomUUID } from 'crypto'
 import { nanoid } from 'nanoid'
 import { Prisma, UserRole } from '@prisma/client'
+import { trainingCreatorAuthoritySql } from '../admin-permissions/training-authority'
 import { prisma } from '../../config/database'
 const defaultPrisma = prisma
 import { config } from '../../config'
@@ -211,6 +219,10 @@ const reportPackageSummary = (row: {
 
 const withoutAnalysisProtocolCipher = <T extends Record<string, unknown>>(row: T) => {
   const {
+    trainingReportSelectionDraft: _ignoredTrainingReportSelection,
+    trainingReferenceSelectionDraft: _ignoredTrainingReferenceSelection,
+    trainingContentSnapshot: _ignoredTrainingContent,
+    trainingContentSnapshotHash: _ignoredTrainingContentHash,
     analysisProtocolSnapshotEncrypted: _ignoredProtocol,
     reportPackageSnapshotEncrypted: _ignoredPackage,
     analysisProtocolKey: _ignoredProtocolKey,
@@ -2096,7 +2108,21 @@ export const prepareCompositePublication = async (userId: string, role: UserRole
     const frozen = compileWeightedVariants(composite.trainingVariantDraft, buildTrainingVariantUnion(composite))
     variantFields = { trainingVariantFrozen: frozen as any, trainingVariantDigest: frozen.configDigest }
   } else if (composite.trainingVariantFrozen != null || composite.trainingVariantDigest != null) throw compositeBadRequest('概率分卷草稿与冻结配置不一致')
-  return { analysisProtocolSnapshotEncrypted, reportPackageSnapshotEncrypted, ...variantFields, ...flowFields, ...persistenceFields, ...feedbackFields }
+  let content = composite.items.some((item:any)=>item.type!=='FORM')
+    ? await prepareTrainingContentSnapshot(prisma as Prisma.TransactionClient,composite,situationalReleases) : null
+  if(composite.trainingReportSelectionDraft!=null||composite.trainingReferenceSelectionDraft!=null){
+    if(!content||!composite.createdBy)throw compositeBadRequest('报告选择缺少测量来源')
+    const expiry=await assertCurrentTrainingContentOwner(prisma as Prisma.TransactionClient,{userId},composite)
+    content={...content,...await attachTrainingReportSelection(prisma as Prisma.TransactionClient,{...content,ownerId:composite.createdBy,selection:composite.trainingReportSelectionDraft})}
+    content={...content,...await attachTrainingReferenceSelection(prisma as Prisma.TransactionClient,{...content,ownerId:composite.createdBy,selection:composite.trainingReferenceSelectionDraft})}
+    if(expiry){
+      const [clock]=await (prisma as Prisma.TransactionClient).$queryRaw<Array<{now:Date}>>(Prisma.sql`SELECT clock_timestamp() AS now`)
+      if(!clock||expiry<=clock.now)throw compositeForbidden('报告选择作者账号已到期')
+    }
+  }
+  await content?.recheckSourceLicenses()
+  return { analysisProtocolSnapshotEncrypted, reportPackageSnapshotEncrypted, ...variantFields, ...flowFields, ...persistenceFields, ...feedbackFields,
+    ...(content?{trainingContentSnapshot:content.snapshot as Prisma.InputJsonValue,trainingContentSnapshotHash:content.snapshotHash}:{}) }
 }
 
 const publishCompositeInTransaction = async (userId: string, role: UserRole, id: string, db: Db, resolvedSituational?: Map<string, ResolvedSituationalRelease>) => {
@@ -2572,7 +2598,8 @@ const ensureTrainingFlowCurrentChildInTransaction = async (tx:Prisma.Transaction
   if(!parent)throw compositeNotFound('作答不存在')
   if(context.userId?parent.userId!==context.userId:!(context.recoveryTokenHash&&parent.userId===null&&parent.recoveryTokenHash===context.recoveryTokenHash))throw compositeForbidden('无权限查看此作答')
   const composite=await loadComposite(parent.compositeAssessmentId,true,tx)
-  const flow=await resolveTrainingFlowScope({...parent,compositeAssessment:composite},composite,{db:tx})
+  const verified=await resolveTrainingFlowScopeForMaterialization({...parent,compositeAssessment:composite},composite,{db:tx})
+  const flow=verified?.scope
   if(!flow||parent.status!=='IN_PROGRESS'||!flow.path.currentInstrumentKey)return
   const key=flow.path.currentInstrumentKey
   const section=composite.formSections.find((s:any)=>trainingFlowUnitKey(s.id)===key)
@@ -2584,8 +2611,7 @@ const ensureTrainingFlowCurrentChildInTransaction = async (tx:Prisma.Transaction
   if(!item)throw compositeForbidden('当前流程工具不存在')
   const existing=item.type==='SCALE'?await tx.assessment.findFirst({where:{compositeAttemptId:attemptId,compositeItemId:item.id}}):item.type==='COGNITIVE'?await tx.cognitiveSession.findFirst({where:{compositeAttemptId:attemptId,compositeItemId:item.id}}):await tx.situationalAttempt.findFirst({where:{compositeAttemptId:attemptId,compositeItemId:item.id}})
   if(existing)return
-  const candidate=decryptUnifiedRuntimePayload<any>(parent.trainingFlowSnapshotEncrypted!)
-  if(canonicalHash(candidate)!==parent.trainingFlowSnapshotHash)throw compositeForbidden('候选运行时摘要不匹配')
+  const candidate=verified!.candidate
   const prepared:PreparedVariantRuntimes={scales:new Map(),cognitive:new Map(),assignments:new Map(),references:new Map()}
   const releases=new Map<string,ResolvedSituationalRelease>()
   if(item.type==='SCALE'){
@@ -2636,6 +2662,12 @@ const createAttempt = async (
   restartMaterialClaimId?: string,
 ) => {
   assertSupportedComposite(composite)
+  if (!['QUESTIONNAIRE','ASSESSMENT_BUNDLE'].includes(composite.productKind)) {
+    const current=await db.compositeAssessment.findUnique({where:{id:composite.id},
+      select:{status:true,trainingContentSnapshot:true,trainingContentSnapshotHash:true}})
+    if(!current||current.status!=='PUBLISHED')throw compositeForbidden('测评已停止接收新作答')
+    composite={...composite,trainingContentSnapshot:current.trainingContentSnapshot,trainingContentSnapshotHash:current.trainingContentSnapshotHash}
+  }
   let feedbackBinding: TrainingFeedbackBinding | null = null
   let persistenceBinding: { publicationIdentity: Record<string, unknown>; courseId: string; roundId: string | null; cutoffs: Array<Date | null> } | null = null
   if(composite.items.some((item:any)=>item.formPolicy!=null) && (composite.productKind!=='QUESTIONNAIRE' || composite.deliveryMode==='LEGACY' || relationalIdentity || composite.reportPackageKey || composite.analysisProtocolKey)) throw compositeBadRequest('Form V3 只支持普通问卷的统一 FINAL 运行时')
@@ -2645,12 +2677,14 @@ const createAttempt = async (
     const current = await db.compositeAssessment.findUnique({ where: { id: composite.id },
       select: { status: true, publicEnabled: true, opensAt: true, expiresAt: true,
         trainingPersistencePolicy: true, trainingPersistencePolicyHash: true,
+        trainingContentSnapshot:true,trainingContentSnapshotHash:true,
         trainingFeedbackPolicy: true, trainingFeedbackPolicyHash: true } })
     if (!current || current.status !== 'PUBLISHED' || (!userId && !current.publicEnabled)) throw compositeForbidden('问卷已停止接收新作答')
     if (current.opensAt && current.opensAt.getTime() > Date.now()) throw compositeBadRequest('问卷尚未开始')
     if (current.expiresAt && current.expiresAt.getTime() <= Date.now()) throw compositeBadRequest('问卷已过期')
     // Read the publication-owned policy under the same admission lock as status.
-    composite = { ...composite, trainingPersistencePolicy: current.trainingPersistencePolicy,
+    composite = { ...composite, trainingContentSnapshot:current.trainingContentSnapshot,trainingContentSnapshotHash:current.trainingContentSnapshotHash,
+      trainingPersistencePolicy: current.trainingPersistencePolicy,
       trainingPersistencePolicyHash: current.trainingPersistencePolicyHash,
       trainingFeedbackPolicy: current.trainingFeedbackPolicy, trainingFeedbackPolicyHash: current.trainingFeedbackPolicyHash }
     const persistence = readTrainingPersistencePolicy(current.trainingPersistencePolicy)
@@ -2679,7 +2713,7 @@ const createAttempt = async (
       const facts = await (db as Prisma.TransactionClient).$queryRaw<Array<{ id: string; endedAt: Date | null }>>`SELECT c.id,c.ended_at AS "endedAt"
         FROM courses c JOIN users u ON u.id=${current.createdBy}
         WHERE c.id=${courseId} AND c.course_type='TRAINING_COURSE' AND NOT c.is_library AND c.status::text='PUBLISHED'
-        AND (u.role::text='ADMIN' OR (u.role::text='TEACHER' AND c.creator_id=u.id)) FOR SHARE OF c,u`
+        AND ${trainingCreatorAuthoritySql} FOR SHARE OF c,u`
       if (facts.length !== 1 || (facts[0].endedAt && new Date(facts[0].endedAt).getTime() <= Date.now()))
         throw compositeForbidden('Training 课程已关闭或投放权限无效')
       const publicationIdentity = trainingRoundPublicationIdentity(current, courseId)
@@ -2823,6 +2857,13 @@ const createAttempt = async (
   }
 
   const newAttemptId = randomUUID()
+  // Validate the whole frozen candidate set before any random draw. Execution
+  // sources must match the frozen release; never choose the latest pointer here.
+  const contentCandidate=await prepareTrainingContentAttemptBinding(db as Prisma.TransactionClient,{
+    compositeId:composite.id,attemptId:newAttemptId,epoch:attemptEpoch,
+    snapshot:composite.trainingContentSnapshot,snapshotHash:composite.trainingContentSnapshotHash,
+    composite,resolvedSituational:situationalReleases,
+  })
   let variantAllocation: ReturnType<typeof createWeightedVariantAllocation> | null = null
   if (variantEnabled) {
     const frozen = parseCompiledWeightedVariants(composite.trainingVariantFrozen)
@@ -2851,9 +2892,14 @@ const createAttempt = async (
     attemptId: newAttemptId, attemptEpoch, compositeId: composite.id, ...persistenceBinding,
   }) : null
   const trainingFeedbackSnapshot = feedbackBinding ? freezeTrainingFeedbackSnapshot({ ...feedbackBinding, attemptId: newAttemptId, attemptEpoch }) : null
+  const selectedContentItems=new Set<string>(composite.items.map((item:any)=>item.id))
+  const trainingContentBinding=contentCandidate?{...contentCandidate.binding,
+    units:contentCandidate.binding.units.filter(unit=>selectedContentItems.has(unit.itemId))}:null
   const attempt = await db.compositeAssessmentAttempt.create({
     data: {
       id: newAttemptId,
+      ...(trainingContentBinding?{trainingContentBinding:trainingContentBinding as Prisma.InputJsonValue,
+        trainingContentBindingHash:canonicalHash(trainingContentBinding)}:{}),
       ...(trainingFeedbackSnapshot ? { trainingFeedbackSnapshot: trainingFeedbackSnapshot as Prisma.InputJsonValue,
         trainingFeedbackSnapshotHash: canonicalHash(trainingFeedbackSnapshot) } : {}),
       ...(trainingPersistenceSnapshot ? { trainingPersistenceSnapshot: trainingPersistenceSnapshot as Prisma.InputJsonValue,
@@ -2884,6 +2930,14 @@ const createAttempt = async (
       progress,
     },
   })
+  // With no demographic section there are no participant fields to collect.
+  // Freeze the explicit policy with the truthful empty context before creating
+  // or exposing any measurement child. Context-bearing tasks bind atomically
+  // when their context section is submitted, before the next runner is delivered.
+  if(trainingContentBinding&&!formSections.some((section:any)=>section.contextSection||section.items?.some((item:any)=>item.contextKey))
+    &&!composite.items.some((item:any)=>item.type==='FORM'&&item.contextKey)){
+    await freezeTrainingReferenceBinding(db as Prisma.TransactionClient,{...attempt,compositeAssessment:composite})
+  }
   if (finalOnly && formSections.length > 0 && !flowEnabled) {
     await db.compositeFormSectionAttempt.createMany({
       data: formSections.map((section: any) => ({
@@ -2920,6 +2974,8 @@ const createAttempt = async (
     await ensureTrainingFlowCurrentChildInTransaction(db as Prisma.TransactionClient,attempt.id,userId?{userId}:{recoveryTokenHash:credential!.hash})
     await db.$executeRawUnsafe('SET CONSTRAINTS training_material_claim_scope, training_material_quota_claim_scope, training_material_binding_scope, training_material_claim_attempt_fk, training_material_binding_initial_claim_fk IMMEDIATE')
   }
+  await contentCandidate?.recheckSourceLicenses()
+  await assertTrainingPrivateReferenceAdmissionCurrent(db as Prisma.TransactionClient)
   return attempt
 }
 
@@ -3242,6 +3298,7 @@ export const startPublicAttempt = async (tokenValue: string, recoveryToken?: str
     if (claimed.count !== 1) throw compositeConflict('公开链接已达到最大参与次数')
     const admitted = await createAttempt(tx, roundCourseId?{...composite,deliveryCourseId:roundCourseId}:composite, null, token.id, credential)
     if (study) await study.afterAdmission(tx, admitted.id)
+    await assertTrainingPrivateReferenceAdmissionCurrent(tx as Prisma.TransactionClient)
     return admitted
   })
   return { attempt: await getAttemptState(attempt.id, { recoveryTokenHash: credential.hash }), recoveryToken: credential.token }
@@ -3447,6 +3504,7 @@ export const freezeContext = async (attemptId: string, context: { userId?: strin
     if (!current) throw compositeNotFound('综合测评记录不存在')
     if (current.status !== 'IN_PROGRESS') throw compositeConflict('综合测评已结束，不能冻结人口学上下文')
     const frozen = await freezeCompositeAttemptContext(tx, attemptId)
+    await assertTrainingPrivateReferenceAdmissionCurrent(tx as Prisma.TransactionClient)
     return { status: 'frozen' as const, frozenAt: frozen.context.frozenAt }
   })
 }
@@ -3569,6 +3627,7 @@ const unifiedCompositeProgressSnapshot = (
 // re-reads the same composite attempt row for routing, projection, or
 // admission.
 const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
+  trainingContentBindingHash:true,trainingReferenceBindingHash:true,
   ...trainingFeedbackAttemptSelect,
   participantKey:true, trainingVariantAllocationEncrypted:true, trainingFlowSnapshotEncrypted:true,trainingFlowSnapshotHash:true,trainingFlowPathEncrypted:true,trainingFlowPathHash:true,trainingVariantAllocationHash:true,
   taskSatisfaction: true,
@@ -4866,6 +4925,7 @@ export const saveScaleAnswer = async (
         progress: Math.round((answers.length / Math.max(definition.items.length, 1)) * 100),
       },
     })
+    await assertTrainingPrivateReferenceAdmissionCurrent(tx as Prisma.TransactionClient)
   })
   return { saved: true }
 }
@@ -4919,7 +4979,9 @@ export const completeScale = async (attemptId: string, itemId: string, context: 
         totalTime: completedAt.getTime() - assessment.startedAt.getTime(),
       },
     })
-    return { didComplete: true, shouldFinalize: await markCompositeItemCompleted(tx, attemptId, true) }
+    const shouldFinalize = await markCompositeItemCompleted(tx, attemptId, true)
+    await assertTrainingPrivateReferenceAdmissionCurrent(tx as Prisma.TransactionClient)
+    return { didComplete: true, shouldFinalize }
   })
   if (result.shouldFinalize) await finalizeCompositeAttemptIfReady(attempt.id)
   return { completed: true, finalized: result.shouldFinalize }
@@ -5231,6 +5293,25 @@ const readPackageSnapshotForReport = async (attempt: any, snapshotId?: string) =
   return { packageSnapshot, snapshot }
 }
 
+const trainingContentReportSelect = {
+  compositeAssessmentId:true,trainingContentBinding:true,trainingContentBindingHash:true,
+  trainingReferenceBinding:true,trainingReferenceBindingHash:true,contextSnapshotEncrypted:true,contextSnapshotHash:true,
+  trainingContentInterpretationEncrypted:true,trainingContentInterpretationHash:true,
+} as const
+
+// Called only after the existing exact attempt visibility check. Participant
+// feedback remains its existing independently governed projection.
+const withTrainingContentReports = async (report:any,parent:any,audience:CompositeReportAudience,metadataOnly=false) => {
+  if(audience==='participant'||parent.trainingContentInterpretationEncrypted==null)return report
+  if(metadataOnly){
+    const receipt=decodeTrainingFinalReceipt(parent)
+    return {...report,contentReportIndex:receipt?.interpretation.units.map(unit=>({itemId:unit.instrumentKey,status:unit.report.status}))??[]}
+  }
+  const contentReports=await prisma.$transaction(tx=>readTrainingContentReports(tx,{parent,audience}),
+    {isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:5000})
+  return {...report,contentReports}
+}
+
 const projectHttpReport = async (
   attempt: any,
   audience: CompositeReportAudience,
@@ -5244,7 +5325,7 @@ const projectHttpReport = async (
       attempt.id, audience === 'researcher' ? 'admin' : audience === 'teacher' ? 'teacher' : 'student', snapshotId) }
   }
   const packageContext = await readPackageSnapshotForReport(attempt, snapshotId)
-  if (!packageContext) return withTrainingTimingReport(projectCompositeCollectionReport(report, audience),attempt,audience,readBatch?{attemptEpoch:attempt.attemptEpoch,children:attempt.scaleAssessments}:undefined)
+  if (!packageContext) return withTrainingContentReports(await withTrainingTimingReport(projectCompositeCollectionReport(report, audience),attempt,audience,readBatch?{attemptEpoch:attempt.attemptEpoch,children:attempt.scaleAssessments}:undefined),attempt,audience,Boolean(readBatch))
   return projectCompositeReport({
     report,
     packageSnapshot: packageContext.packageSnapshot,
@@ -5284,8 +5365,8 @@ const packageAnalysisExportContextFor = async (
 }
 
 const reportReadHeaderSelect = {
-  ...REPORT_PARENT_SELECT, ...trainingFeedbackAttemptSelect, compositeAssessmentId: true, userId: true, recoveryTokenHash: true,trainingTimingSnapshot:true,trainingVariantAllocationEncrypted:true,trainingFlowSnapshotEncrypted:true,trainingFlowSnapshotHash:true,trainingFlowPathEncrypted:true,trainingFlowPathHash:true,trainingVariantAllocationHash:true,
-  compositeAssessment: { select: { ...trainingFeedbackParentSelect, id: true, productKind: true,timingExportEnabled:true,revision:true,trainingVariantFrozen:true,trainingVariantDraft:true,trainingFlowDraft:true,trainingFlowFrozen:true,trainingFlowDigest:true,trainingVariantDigest:true, items: { select: { type: true } } } },
+  ...REPORT_PARENT_SELECT, ...trainingContentReportSelect, ...trainingFeedbackAttemptSelect, compositeAssessmentId: true, userId: true, recoveryTokenHash: true,trainingTimingSnapshot:true,trainingVariantAllocationEncrypted:true,trainingFlowSnapshotEncrypted:true,trainingFlowSnapshotHash:true,trainingFlowPathEncrypted:true,trainingFlowPathHash:true,trainingVariantAllocationHash:true,
+  compositeAssessment: { select: { ...trainingFeedbackParentSelect, id: true,createdBy:true, productKind: true,timingExportEnabled:true,revision:true,trainingVariantFrozen:true,trainingVariantDraft:true,trainingFlowDraft:true,trainingFlowFrozen:true,trainingFlowDigest:true,trainingVariantDigest:true, items: { select: { type: true } } } },
 } as const
 
 const loadReportReadHeader = async (attemptId: string) => {
@@ -5389,7 +5470,7 @@ const materializedReportForHeader = async (parent: any, audience: CompositeRepor
   if(scope)assertTrainingVariantReportScope(report,scope)
   // HTTP projection is applied to the CURRENT audience on every read. No
   // participant/teacher projection or authorization decision is globally cached.
-  return withTrainingTimingReport(projectCompositeCollectionReport({...report,taskSatisfaction:parent.taskSatisfaction??null,taskSatisfied:isTaskSatisfied(parent)}, audience),parent,audience,batchReads?{attemptEpoch:parent.attemptEpoch,children:parent.scaleAssessments}:undefined)
+  return withTrainingContentReports(await withTrainingTimingReport(projectCompositeCollectionReport({...report,taskSatisfaction:parent.taskSatisfaction??null,taskSatisfied:isTaskSatisfied(parent)}, audience),parent,audience,batchReads?{attemptEpoch:parent.attemptEpoch,children:parent.scaleAssessments}:undefined),parent,audience,Boolean(batchReads))
 }
 
 
@@ -5401,9 +5482,9 @@ const loadCollectionReportAttempt = async (attemptId: string) => {
   const attempt = await prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId },
     select: {
-      ...REPORT_PARENT_SELECT, frozenActiveSlotSetEncrypted:true, anonymousCode: true, totalTime: true, participantKey:true, trainingVariantAllocationEncrypted:true, trainingFlowSnapshotEncrypted:true,trainingFlowSnapshotHash:true,trainingFlowPathEncrypted:true,trainingFlowPathHash:true,trainingVariantAllocationHash:true,
+      ...REPORT_PARENT_SELECT, ...trainingContentReportSelect, frozenActiveSlotSetEncrypted:true, anonymousCode: true, totalTime: true, participantKey:true, trainingVariantAllocationEncrypted:true, trainingFlowSnapshotEncrypted:true,trainingFlowSnapshotHash:true,trainingFlowPathEncrypted:true,trainingFlowPathHash:true,trainingVariantAllocationHash:true,
       compositeAssessment: { select: {
-        id: true, name: true, productKind: true, reportPackageKey: true, analysisProtocolKey: true,
+        id: true, name: true, createdBy:true, productKind: true, reportPackageKey: true, analysisProtocolKey: true,
         publishedAt:true,trainingVariantDraft:true,trainingVariantFrozen:true,trainingFlowDraft:true,trainingFlowFrozen:true,trainingFlowDigest:true,trainingVariantDigest:true,formSections:{include:{items:true}},
         reportPackageSnapshotEncrypted: true,
         items: { orderBy: { position: 'asc' }, include: {

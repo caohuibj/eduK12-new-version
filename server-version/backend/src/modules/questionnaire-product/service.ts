@@ -1,4 +1,8 @@
 import { parseCatalogFilters, sqlLike } from '../training-catalog/filters'
+import {attachTrainingReferenceSelection,listTrainingReferenceChoices,trainingReferenceSelectionSchema} from '../composite/training-reference-selection'
+import { assertCurrentTrainingContentOwner, attachTrainingReportSelection, trainingReportSelectionSchema } from '../composite/training-report-selection'
+import { prepareTrainingContentSnapshot } from '../composite/training-content-binding'
+import {publishAssignmentMeasurementRelease} from '../cognitive/assignment-measurement-release'
 import { parseTrainingFeedbackPolicy, trainingFeedbackPolicySchema } from '../assessment-policy/training-feedback-policy'
 import { parseTrainingPersistencePolicy } from '../composite/training-persistence.policy'
 import { compileWeightedVariants, weightedVariantConfigSchema } from '../assessment-core/weighted-variants'
@@ -13,6 +17,8 @@ import { assertCognitiveCatalogConfiguration } from '../cognitive/assignment.ser
 import { Prisma, UserRole } from '@prisma/client'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
+import { loadCurrentPrincipal } from '../organization/principal'
+import { inactiveAccountMessage } from '../../utils/accountStatus'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { lockCompositeAssetReferences, compositeSjtGrantScope, inspectCompositeSituationalItems, resolveCompositeSituationalItems, assertValidItem, getCompositeForTeacher, publishComposite, prepareCompositePublication, listAvailableForStudent } from '../composite/composite.service'
 import { compositeBadRequest, compositeConflict, compositeForbidden, compositeNotFound } from '../composite/composite.errors'
@@ -66,6 +72,12 @@ async function courses(tx: Tx, actor: Actor, ids: string[], type: string) {
   const rows = await tx.course.findMany({ where: { id: { in: ids } } })
   if (rows.length !== ids.length || rows.some(r => r.isLibrary || (actor.role !== 'ADMIN' && r.creatorId !== actor.userId))) throw compositeForbidden('只能投放到有管理权限的非库课程')
 }
+async function assertTrainingPolicyCreator(tx: Tx, row: {createdBy?:string|null}, facts: Array<{creatorId:string}>, label:string) {
+  const creator=row.createdBy?await loadCurrentPrincipal(row.createdBy,tx):null
+  if(!creator || !['LEGACY','TRAINING'].includes(creator.accountDomain) || inactiveAccountMessage(creator) || creator.mustChangePassword
+    || (creator.role!=='ADMIN' && (creator.role!=='TEACHER' || !creator.teacherApproved || facts.some(course=>course.creatorId!==creator.userId))))
+    throw compositeForbidden(label+'的课程编制权限无效')
+}
 export async function validateTrainingPersistenceAuthoring(tx: Tx, row: any, raw: unknown) {
   const policy = parseTrainingPersistencePolicy(raw)
   if (!policy) return { trainingPersistencePolicy: Prisma.DbNull, trainingPersistencePolicyHash: null }
@@ -76,9 +88,7 @@ export async function validateTrainingPersistenceAuthoring(tx: Tx, row: any, raw
     if (!ids.length || (row.publicEnabled && ids.length !== 1)) throw compositeBadRequest('公开草稿策略必须明确绑定唯一 Training 课程')
     const facts = await tx.course.findMany({ where: { id: { in: ids } }, select: { id: true, courseType: true, isLibrary: true, creatorId: true } })
     if (facts.length !== ids.length || facts.some(course => course.isLibrary || course.courseType !== 'TRAINING_COURSE')) throw compositeBadRequest('草稿策略的 Training 课程来源无效')
-    const creator = row.createdBy ? await tx.user.findUnique({ where: { id: row.createdBy }, select: { role: true } }) : null
-    if (!creator || (creator.role !== 'ADMIN' && (creator.role !== 'TEACHER' || facts.some(course => course.creatorId !== row.createdBy))))
-      throw compositeForbidden('草稿策略的课程编制权限无效')
+    await assertTrainingPolicyCreator(tx,row,facts,'草稿策略')
   }
   return { trainingPersistencePolicy: policy as Prisma.InputJsonValue, trainingPersistencePolicyHash: canonicalHash(policy) }
 }
@@ -100,9 +110,7 @@ export async function validateTrainingFeedbackAuthoring(tx: Tx, row: any, raw: u
     if (raw == null) return absent
     throw compositeBadRequest('反馈开放策略的 Training 课程来源无效')
   }
-  const creator = row.createdBy ? await tx.user.findUnique({ where: { id: row.createdBy }, select: { role: true } }) : null
-  if (!creator || (creator.role !== 'ADMIN' && (creator.role !== 'TEACHER' || facts.some(course => course.creatorId !== row.createdBy))))
-    throw compositeForbidden('反馈开放策略的课程编制权限无效')
+  await assertTrainingPolicyCreator(tx,row,facts,'反馈开放策略')
   let policy
   try { policy = parseTrainingFeedbackPolicy(raw) } catch { throw compositeBadRequest('反馈开放策略或预设开放时间无效') }
   return { trainingFeedbackPolicy: policy as Prisma.InputJsonValue, trainingFeedbackPolicyHash: canonicalHash(policy) }
@@ -167,7 +175,17 @@ export async function detail(actor: Actor, id: string) {
   const row = await prisma.compositeAssessment.findUnique({ where: { id } })
   if (!row || row.productKind !== 'QUESTIONNAIRE') throw compositeNotFound('新版问卷不存在')
   owner(actor, row)
-  return { ...await getCompositeForTeacher(actor.userId, actor.role, id), supportedChannels: ['WEB'], reportMode: 'COLLECTION_ONLY' }
+  let reportSelection:unknown=undefined,referenceSelection:unknown=undefined
+  if(row.createdBy===actor.userId){
+    reportSelection=null;referenceSelection=null
+    if((row as any).trainingReportSelectionDraft!=null||(row as any).trainingReferenceSelectionDraft!=null){const selections=await prisma.$transaction(async tx=>{
+      const current=await tx.compositeAssessment.findUnique({where:{id},include:{questionnaireCourses:true}})
+      if(!current)throw compositeNotFound('新版问卷不存在')
+      await assertCurrentTrainingContentOwner(tx,actor,current)
+      return {report:current.trainingReportSelectionDraft,reference:current.trainingReferenceSelectionDraft}
+    });reportSelection=selections.report;referenceSelection=selections.reference}
+  }
+  return { ...await getCompositeForTeacher(actor.userId, actor.role, id), trainingReportSelectionDraft:reportSelection, trainingReferenceSelectionDraft:referenceSelection, supportedChannels: ['WEB'], reportMode: 'COLLECTION_ONLY' }
 }
 export async function create(actor: Actor, raw: unknown) {
   author(actor)
@@ -383,13 +401,9 @@ export async function preflight(actor: Actor, id: string, raw: unknown) {
   }, { timeout: 30000 })
 }
 
-export async function publish(actor: Actor, id: string, raw: unknown) {
-  return mutate(actor, id, revisionSchema.parse(raw).revision, async (tx, row) => {
-    if (await tx.assessmentCompositionTemplate.findUnique({ where: { definitionId: id } })) throw compositeConflict('组合模板需要先复制为新草稿，再绑定课程或公开投放')
-    if(row.trainingVariantDraft!=null)await validateTrainingVariants(tx,row)
-    await validateDelivery(tx, actor, row)
-    const situational = await validateResources(tx, actor, row)
-    await lockCompositeAssetReferences(tx, row.items, row.formSections, situational)
+async function prepareOwnedCognitiveMeasurements(tx:Tx,actor:Actor,row:any) {
+  if(!row.items.some((item:any)=>item.type==='COGNITIVE'))return
+  const expiry=await assertCurrentTrainingContentOwner(tx,actor,row)
     for (const item of row.items) {
       const copiedBinding = copiedCognitiveBinding(item, row)
       if (item.type === 'COGNITIVE' && !copiedBinding) {
@@ -406,8 +420,76 @@ export async function publish(actor: Actor, id: string, raw: unknown) {
           quotaSourceAssignmentId: source.createdBy === actor.userId ? source.quotaSourceAssignmentId ?? source.id : null, maxAttempts: source.maxAttempts,
         } })
         await tx.compositeAssessmentItem.update({ where: { id: item.id }, data: { cognitiveAssignmentId: binding.id } })
+        await publishAssignmentMeasurementRelease(tx,actor.userId,binding.id)
+      } else if (item.type==='COGNITIVE') {
+        await publishAssignmentMeasurementRelease(tx,actor.userId,item.cognitiveAssignment.id)
       }
     }
+  return expiry
+ }
+async function recheckMeasurementPublisherExpiry(tx:Tx,expiresAt:Date|null|undefined) {
+  if(!expiresAt)return
+  const [clock]=await tx.$queryRaw<Array<{now:Date}>>(Prisma.sql`SELECT clock_timestamp() AS now`)
+  if(!clock||expiresAt<=clock.now)throw compositeForbidden('测量实例作者账号已到期')
+}
+
+export async function contentReferenceChoices(actor:Actor,id:string) {
+  return prisma.$transaction(async tx=>{
+    const row=await tx.compositeAssessment.findUnique({where:{id},include:{questionnaireCourses:true,items:{include:{scale:true,cognitiveAssignment:{include:{config:true}}}}}})
+    if(!row||row.productKind!=='QUESTIONNAIRE')throw compositeNotFound('新版问卷不存在')
+    const expiry=await assertCurrentTrainingContentOwner(tx,actor,row)
+    const situational=await validateResources(tx,actor,row)
+    const prepared=await prepareTrainingContentSnapshot(tx,row,situational)
+    const result=await listTrainingReferenceChoices(tx,{...prepared,ownerId:actor.userId})
+    await recheckMeasurementPublisherExpiry(tx,expiry)
+    return result
+  },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:10000})
+}
+export async function updateContentReferenceSelection(actor:Actor,id:string,raw:unknown) {
+  const input=z.object({revision:z.number().int().nonnegative(),selection:trainingReferenceSelectionSchema.nullable()}).strict().parse(raw)
+  return mutate(actor,id,input.revision,async(tx,row)=>{
+    const expiry=await assertCurrentTrainingContentOwner(tx,actor,row)
+    const situational=await validateResources(tx,actor,row)
+    if(input.selection!=null){
+      const prepared=await prepareTrainingContentSnapshot(tx,row,situational)
+      await attachTrainingReferenceSelection(tx,{...prepared,ownerId:actor.userId,selection:input.selection})
+    }
+    await recheckMeasurementPublisherExpiry(tx,expiry)
+    await tx.compositeAssessment.update({where:{id},data:{trainingReferenceSelectionDraft:input.selection??Prisma.DbNull}})
+  })
+}
+
+export async function updateContentReportSelection(actor:Actor,id:string,raw:unknown) {
+  const input=z.object({revision:z.number().int().nonnegative(),selection:trainingReportSelectionSchema.nullable()}).strict().parse(raw)
+  return mutate(actor,id,input.revision,async(tx,row)=>{
+    const expiry=await assertCurrentTrainingContentOwner(tx,actor,row)
+    const situational=await validateResources(tx,actor,row)
+    if(input.selection!=null){
+      const prepared=await prepareTrainingContentSnapshot(tx,row,situational)
+      await attachTrainingReportSelection(tx,{...prepared,ownerId:actor.userId,selection:input.selection})
+    }
+    await recheckMeasurementPublisherExpiry(tx,expiry)
+    await tx.compositeAssessment.update({where:{id},data:{trainingReportSelectionDraft:input.selection??Prisma.DbNull}})
+  })
+}
+
+/** Explicit draft-revision operation; does not publish or start a deployment. */
+export async function publishMeasurementInstances(actor:Actor,id:string,raw:unknown) {
+  return mutate(actor,id,revisionSchema.parse(raw).revision,async(tx,row)=>{
+    await validateResources(tx,actor,row)
+    const expiry=await prepareOwnedCognitiveMeasurements(tx,actor,row)
+    await recheckMeasurementPublisherExpiry(tx,expiry)
+  })
+}
+
+export async function publish(actor: Actor, id: string, raw: unknown) {
+  return mutate(actor, id, revisionSchema.parse(raw).revision, async (tx, row) => {
+    if (await tx.assessmentCompositionTemplate.findUnique({ where: { definitionId: id } })) throw compositeConflict('组合模板需要先复制为新草稿，再绑定课程或公开投放')
+    if(row.trainingVariantDraft!=null)await validateTrainingVariants(tx,row)
+    await validateDelivery(tx, actor, row)
+    const situational = await validateResources(tx, actor, row)
+    await lockCompositeAssetReferences(tx, row.items, row.formSections, situational)
+    const measurementPublisherExpiry=await prepareOwnedCognitiveMeasurements(tx,actor,row)
     for (const section of row.formSections) {
       const definition = mapCompositeSection(section)
       const mediaOwner = publishedFormMediaOwner('COMPOSITE', id, compositeFormSectionDefinitionHash(definition))
@@ -416,6 +498,7 @@ export async function publish(actor: Actor, id: string, raw: unknown) {
     }
     if(row.trainingTimingPolicy){readTrainingTimingPolicy(row.trainingTimingPolicy);await tx.compositeAssessment.update({where:{id},data:{trainingTimingPolicy:await timingPolicy(tx,row,true)}})}
     await publishComposite(actor.userId, actor.role, id, tx, situational)
+    await recheckMeasurementPublisherExpiry(tx,measurementPublisherExpiry)
   })
 }
 export async function archive(actor: Actor, id: string, raw: unknown) {

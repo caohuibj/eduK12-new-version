@@ -87,7 +87,10 @@ beforeEach(() => {
   db.questionnaire.findUnique.mockResolvedValue(null)
   db.course.findMany.mockImplementation(async ({ where }: any) => where.id.in.map((id: string) => ({ ...course, id,
     courseType: id === 'school' ? 'SCHOOL_COURSE' : 'TRAINING_COURSE', creatorId: id === 'foreign' ? 'other' : actor.userId })))
-  db.user.findUnique.mockResolvedValue({ role: 'TEACHER' })
+  db.$queryRaw.mockImplementation(async (parts:TemplateStringsArray)=>parts.join('').includes('FROM "users"')
+    ? [{userId:actor.userId,username:'teacher',role:'TEACHER',accountDomain:'TRAINING',platformRole:'STANDARD',tokenVersion:0,
+      isActive:true,isFrozen:false,expiresAt:null,mustChangePassword:false,teacherApproved:true,entryGrants:[]}]
+    : [])
   db.questionnaireCourseDelivery.deleteMany.mockImplementation(async ({ where }: any) => { definitions.get(where.compositeId).questionnaireCourses = []; return { count: 1 } })
   db.questionnaireCourseDelivery.createMany.mockImplementation(async ({ data }: any) => {
     for (const entry of data) definitions.get(entry.compositeId).questionnaireCourses.push({ courseId: entry.courseId })
@@ -123,7 +126,7 @@ describe('Training delivery policies in reusable private templates', () => {
       questionnaireCourses: [], _count: { attempts: 0, accessTokens: 0 } })
     expect(source()).toEqual(original)
     expect(db.$queryRaw).toHaveBeenCalledWith(expect.anything(), prototype.id)
-    expect(db.$queryRaw.mock.calls[0][0].join('')).toContain('FOR UPDATE')
+    expect(db.$queryRaw.mock.calls.some(([parts]:any)=>parts.join('').includes('FOR UPDATE'))).toBe(true)
     expect(db.compositeAssessment.update.mock.calls[0][0].data).toEqual({ name: input.name, courseId: null, publicEnabled: false,
       opensAt: null, expiresAt: null, trainingFeedbackPolicy: Prisma.DbNull, trainingFeedbackPolicyHash: null,
       trainingPersistencePolicy: Prisma.DbNull, trainingPersistencePolicyHash: null, trainingTimingPolicy: Prisma.DbNull })

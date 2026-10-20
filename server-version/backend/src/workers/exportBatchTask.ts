@@ -22,6 +22,8 @@ import { logger } from '../utils/logger'
 import { randomUUID } from 'node:crypto'
 import path from 'node:path'
 import { prepareAssessmentExport, revalidateAssessmentExport } from '../services/assessmentExportWorker'
+import { asBusinessPrincipal, loadCurrentPrincipal } from '../modules/organization/principal'
+import { inactiveAccountMessage } from '../utils/accountStatus'
 const PROJECTION_MARKER = '__projection_v1_'
 
 const generationStorageKey = (storageKey: string, generation: number): string => {
@@ -60,6 +62,17 @@ export const runExportBatch = async (job: any) => {
     const temporaryPaths: string[] = []
     const generationPaths: string[] = []
     try {
+      if (claim.resourceType === 'SCALE' || claim.resourceType === 'QUESTIONNAIRE') {
+        const current = await loadCurrentPrincipal(claim.createdBy)
+        const actor=current&&claim.options.creatorRole==='TEACHER'?asBusinessPrincipal(current):current
+        if (!actor || inactiveAccountMessage(actor) || actor.mustChangePassword || !['ADMIN','TEACHER'].includes(actor.role)
+          || actor.tokenVersion !== claim.options.authorityTokenVersion) throw new Error('Export authority revoked')
+        const resource = claim.resourceType === 'SCALE'
+          ? await prisma.scale.findUnique({ where: { id: claim.resourceId }, select: { creatorId: true } })
+          : await prisma.questionnaire.findUnique({ where: { id: claim.resourceId }, select: { creatorId: true } })
+        if (!resource || (actor.role !== 'ADMIN' && (resource.creatorId !== actor.userId || !claim.options.anonymize)))
+          throw new Error('Export resource authority revoked')
+      }
       const assessment = claim.resourceType === 'COGNITIVE' || claim.resourceType === 'COMPOSITE' || claim.resourceType === 'TRAINING_ANALYSIS'
         ? await prepareAssessmentExport(claim) : null
       const data = assessment?.data ?? (claim.resourceType === 'SCALE'

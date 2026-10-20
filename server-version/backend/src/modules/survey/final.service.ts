@@ -1,3 +1,5 @@
+import {rawParticipantFeedback} from './participant-feedback'
+import {interpretSurveyFinal} from './final-interpretation.service'
 import { verifySurveyCognitiveReferences,loadSurveyCognitiveResults,assertSurveyCognitiveLockedAnswers } from './cognitive.results'
 import type { SurveyCognitiveReference } from './cognitive.definition'
 import { cognitiveParentUnit,cognitiveParticipantFeedback } from './measurement.result'
@@ -171,6 +173,9 @@ export async function submitResearchFinal(input:FinalInput){
       invalid('认知结果引用集合与最终可达路径不一致')
     if(calculated.definitionDigest!==publication.definitionDigest)
       blocked('所提交作答与冻结内容不一致')
+    const interpretation=await interpretSurveyFinal(tx,{projectId:known.projectId,waveId:wave.id,attemptId:attempt.id,
+      publicationId:publication.id,definitionDigest:publication.definitionDigest,selectedSnapshot:assignedSurveySnapshot(snapshot,assignment),calculated})
+    if(interpretation)calculated.interpretation=interpretation
     const resultsHash=canonicalHash(JSON.parse(JSON.stringify(calculated)))
     const resultsCipher=encryptUnifiedRuntimePayload(calculated)
     const receipt=await tx.surveyWaveFinal.create({data:{
@@ -198,7 +203,7 @@ export async function readGeneralForOwnAttempt(input:{
   publicId:string;attemptId:string;researchCode?:string;accessCredential:string
 }){
   const valid=await verifiedSurveyAttempt(input)
-  const hasFeedback=valid.compiledSnapshot.units.some(unit=>unit.kind==='COGNITIVE')
+  const hasFeedback=valid.compiledSnapshot.units.some(unit=>unit.kind==='COGNITIVE'||unit.participantFeedback?.mode==='DESCRIPTIVE')
   if(hasFeedback)return prisma.$transaction(async tx=>{
     // Serialize disclosure with current withdrawal/credential/window governance.
     await tx.$queryRaw`SELECT id FROM survey_projects WHERE id=${valid.projectId} FOR SHARE`
@@ -230,10 +235,11 @@ export async function readGeneralForOwnAttempt(input:{
     const collectionClosed=attempt.wave.hardStopAt!==null||
       (collectionEnd!==null&&collectionEnd<=new Date())
     const measurements=[];let pending=false
-    for(const unit of valid.compiledSnapshot.units.filter(unit=>unit.kind==='COGNITIVE')){
+    for(const unit of valid.compiledSnapshot.units.filter(unit=>unit.kind==='COGNITIVE'||unit.participantFeedback?.mode==='DESCRIPTIVE')){
       const stored=result.units.find(candidate=>candidate.instrumentKey===unit.instrumentKey)
       if(!stored)blocked('研究反馈工具来源缺失')
-      const feedback=cognitiveParticipantFeedback(unit,stored,collectionClosed)
+      const feedback=unit.kind==='COGNITIVE'?cognitiveParticipantFeedback(unit,stored,collectionClosed):
+        rawParticipantFeedback(unit,stored,collectionClosed)
       if(feedback?.pending)pending=true
       else if(feedback)measurements.push(feedback)
     }

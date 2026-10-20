@@ -1,5 +1,7 @@
 import { cleanupExpiredTrainingCheckpoints } from './modules/composite/training-checkpoint.service'
 import { organizationInvitationsRouter } from './modules/organization/invitations'
+import { adminPermissionsRouter, adminSecurityRouter } from './modules/admin-permissions/routes'
+import {formalReferenceRouter,surveyFormalReferenceRouter} from './modules/measurement-content/formal-reference.routes'
 import { parentAccountsRouter, platformUsersRouter } from './modules/parent-portal/accounts.routes'
 import { parentToolPolicyRouter } from './modules/parent-portal/tool-policy.routes'
 import { classroomRuntimeRouter } from './modules/mobile/classroom.routes'
@@ -11,6 +13,7 @@ import { surveyOriginGuard, platformSurveyOriginGuard } from './modules/survey/o
 import { validateSurveyStartupConfig } from './modules/survey/startup.config'
 import { surveyAuthRouter } from './modules/survey/auth.routes'
 import { surveyProjectsRouter } from './modules/survey/projects.routes'
+import { surveyReportDraftsRouter } from './modules/survey/report-drafts.routes'
 import { surveyBuilderRouter } from './modules/survey/builder.routes'
 import { surveyMediaRouter } from './modules/survey/media.routes'
 import { surveyWavesRouter } from './modules/survey/waves.routes'
@@ -280,14 +283,19 @@ app.use('/api/capabilities', capabilitiesRoutes)
 // API 路由
 app.use('/api/admin/legacy-archive', legacyArchiveRoutes)
 app.use('/api/auth', authRoutes)
+app.use('/api/admin/security', adminSecurityRouter)
+app.use('/api/admin/permissions', adminPermissionsRouter)
+app.use('/api/training/reference-governance',formalReferenceRouter)
 const surveyFeatureGuard: express.RequestHandler = (_req,res,next) => {
   if (process.env.SURVEY_WORKSPACE_ENABLED !== 'true') return res.status(404).json({code:-1,message:'Survey 尚未启用',data:null})
   next()
 }
 validateSurveyStartupConfig()
 app.use('/api/survey', surveyFeatureGuard, surveyOriginGuard)
+app.use('/api/survey/reference-governance',surveyFormalReferenceRouter)
 app.use('/api/survey/auth', surveyAuthRouter)
 app.use('/api/survey/projects', surveyBuilderRouter)
+app.use('/api/survey/projects', surveyReportDraftsRouter)
 app.use('/api/survey/projects', surveyMediaRouter)
 app.use('/api/survey/projects', surveyWavesRouter)
 app.use('/api/survey/projects', surveyAnalyticsRouter)

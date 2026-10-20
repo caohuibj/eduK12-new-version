@@ -431,6 +431,11 @@
     min-width:0;
     flex:1;
   }
+  .hui-app--staff .hui-account > span:first-child{
+    flex-basis:100%;
+    min-width:0;
+    overflow-wrap:anywhere;
+  }
   .hui-app--staff .hui-organization-switch span{
     display:none;
   }

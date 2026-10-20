@@ -41,7 +41,11 @@ type Unit={kind:'FORM'|'SCALE'|'SJT'|'COGNITIVE';instrumentKey:string;title:stri
   scenes?:{sceneKey:string;title:string;stimulus:string;image?:SurveyPublicImage;questions:SjtPublicQuestion[]}[];
   questions?:SjtPublicQuestion[]}
 type Task={attemptId:string;waveId:string;status:string;definitionDigest:string;units:Unit[];reportMode:'GENERAL_ONLY'|'DESCRIPTIVE';cognitiveSessions?:SurveyCognitiveSessionInfo[];lockedPriorAnswers?:Record<string,Record<string,Answer>>;flow?:PublicFlow;checkpointPolicy?:{enabled:true;ttlHours:number}}
-type General={kind:'GENERAL_ONLY'|'DESCRIPTIVE';text:string;disclaimer:string;completedAt:string;pending?:boolean;measurements?:{instrumentKey:string;title:string;measurementDigest:string;maturity:'PILOT';quality:string;metrics:{key:string;label:string;value:number|null;unit:'ratio'|'ms';status:string}[]}[]}
+type ParticipantFeedbackBase={instrumentKey:string;title:string;quality:string}
+type ParticipantFeedback=ParticipantFeedbackBase&(
+  {feedbackKind:'RAW_METRICS';measurementReleaseId:string;metrics:{key:string;label:string;value:number|null;unit:null;status:string}[]}
+  |{feedbackKind?:undefined;measurementDigest:string;maturity:'PILOT';metrics:{key:string;label:string;value:number|null;unit:'ratio'|'ms';status:string}[]})
+type General={kind:'GENERAL_ONLY'|'DESCRIPTIVE';text:string;disclaimer:string;completedAt:string;pending?:boolean;measurements?:ParticipantFeedback[]}
 type FinalResponse={status:string;attemptId?:string;receiptId?:string;completedAt?:string;
   idempotent?:boolean;generalReceipt?:unknown}
 // Only the first, unambiguous committed FINAL may supply this submission-time
@@ -736,7 +740,7 @@ export default function SurveyPublicApp(){
     }
     markCompleted(attemptId,proof)
     const receipt=firstRequest?firstFinalGeneral(final,attemptId):null
-    if(receipt&&!task.units.some(u=>u.kind==='COGNITIVE'&&u.feedback?.mode==='DESCRIPTIVE')){
+    if(receipt&&task.reportMode!=='DESCRIPTIVE'&&!task.units.some(u=>u.kind==='COGNITIVE'&&u.feedback?.mode==='DESCRIPTIVE')){
       // In-memory display only. Refresh/reopen and explicit reads reauthorize.
       setGeneral(receipt)
       setNotice('提交成功。以下为本次提交时确认的完成回执。')
@@ -1018,8 +1022,8 @@ export default function SurveyPublicApp(){
           {general.pending&&<p role="status">本轮已经提交；部分反馈将在统一收集结束后开放。</p>}
           {general.measurements?.map(measurement=><article key={measurement.instrumentKey} className="space-y-2">
             <h4 className="font-medium">{measurement.title}</h4>
-            <p className="text-xs">试点测量 · 质量状态：{measurement.quality}。仅反映本次条件下的表现。</p>
-            {measurement.metrics.map(metric=><p key={metric.key}>{metric.label}：{metric.value===null?'不可计算':metric.unit==='ratio'?(metric.value*100).toFixed(1)+'%':metric.value+' ms'}（{metric.status}）</p>)}
+            <p className="text-xs">{measurement.feedbackKind==='RAW_METRICS'?'受控原始指标':'试点测量'} · 质量状态：{measurement.quality}。仅反映本次条件下的表现。</p>
+            {measurement.metrics.map(metric=><p key={metric.key}>{metric.label}：{metric.value===null?'不可计算':measurement.feedbackKind==='RAW_METRICS'?String(metric.value):metric.unit==='ratio'?(metric.value*100).toFixed(1)+'%':metric.unit==='ms'?metric.value+' ms':String(metric.value)}（{metric.status}）</p>)}
           </article>)}
         </section>}
         <p className="text-xs">完成时间：{new Date(general.completedAt).toLocaleString('zh-CN')}</p>

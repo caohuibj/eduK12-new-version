@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-const m = vi.hoisted(() => ({ user: vi.fn(), course: vi.fn(), teacher: vi.fn(), compare: vi.fn(), token: vi.fn(), cookie: vi.fn(), failure: vi.fn(), clear: vi.fn(), rate: vi.fn() }))
-vi.mock('../../config/database', () => ({ prisma: { user: { findUnique: m.user }, course: { findUnique: m.course }, teacherCode: { findUnique: m.teacher } } }))
+const m = vi.hoisted(() => ({ user: vi.fn(), principal: vi.fn(), course: vi.fn(), teacher: vi.fn(), compare: vi.fn(), token: vi.fn(), cookie: vi.fn(), failure: vi.fn(), clear: vi.fn(), rate: vi.fn() }))
+vi.mock('../../config/database', () => ({ prisma: { user: { findUnique: m.user }, $queryRaw: m.principal, course: { findUnique: m.course }, teacherCode: { findUnique: m.teacher } } }))
 vi.mock('../../utils/password', () => ({ comparePassword: m.compare, hashPassword: vi.fn(), isValidPassword: vi.fn(), PASSWORD_MIN_LENGTH: 8, PASSWORD_MAX_LENGTH: 128 }))
 vi.mock('../../utils/jwt', () => ({ generateToken: m.token }))
 vi.mock('../../utils/authCookies', () => ({ setSessionCookie: m.cookie, clearSessionCookie: vi.fn() }))
@@ -17,6 +17,10 @@ const response = () => {
 }
 beforeEach(() => {
   vi.resetAllMocks(); m.user.mockResolvedValue(account); m.compare.mockResolvedValue(true)
+  m.principal.mockImplementation(async () => {
+    const current = await m.user.mock.results.at(-1)?.value
+    return current ? [{ ...current, platformRole: 'STANDARD', entryGrants: [] }] : []
+  })
   m.failure.mockResolvedValue({ accountIpAllowed: true, accountGlobalAllowed: true, retryAfterSeconds: 1 })
   m.token.mockReturnValue('session'); m.course.mockResolvedValue(null); m.teacher.mockResolvedValue(null)
 })

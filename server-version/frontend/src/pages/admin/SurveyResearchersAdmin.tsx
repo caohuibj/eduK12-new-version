@@ -2,6 +2,7 @@ import { productOrigins, surveyInvitationUrl } from '../../products/origins'
 import { useEffect, useState } from 'react'
 import { SurveyCatalogGrants } from './SurveyCatalogGrants'
 import { ProductPage } from '../../components/product-ui'
+import AdminStepUp from '../../admin/AdminStepUp'
 import './survey-admin.css'
 type Envelope<T>={code:number|string;message:string;data:T}
 type Researcher={id:string;username:string;status:string;createdAt:string}
@@ -105,7 +106,7 @@ export default function SurveyResearchersAdmin(){
   const cancelled=(context:string)=>{setError('');setNotice('已取消'+context+'，未提交变更。')}
   const copyLink=async()=>{try{await navigator.clipboard.writeText(link);setError('');setNotice(linkContext+'链接已复制到剪贴板。')}
     catch{setError('未能写入剪贴板，请手动选择复制此链接。')}}
-  return <ProductPage width="management"><div className="survey-admin">
+  return <ProductPage width="management"><AdminStepUp/><div className="survey-admin">
     <header className="survey-admin-header"><div><p className="survey-admin-kicker">HUISURVEY · 系统管理</p>
       <h1>研究者与工具授权</h1><p>管理研究者资格、一次性邀请与工具的精确授权版本，不自动授予科研原始答案访问权。</p></div>
       {origins&&<a className="survey-admin-return" href={origins.survey+'/'}>返回 Survey 入口</a>}

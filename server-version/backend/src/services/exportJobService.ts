@@ -14,6 +14,7 @@ export type ExportJobResourceType = 'SCALE' | 'QUESTIONNAIRE' | 'COGNITIVE' | 'C
 
 export type ExportJobOptions = {
   courseId?: string
+  authorityTokenVersion?: number
   creatorRole?: 'ADMIN' | 'TEACHER'
   trainingAnalysis?: TrainingAnalysisExportOptions
   projectionFingerprint?: string
@@ -69,6 +70,7 @@ const pendingStorageKey = (resourceType: string, resourceId: string, batchId: st
   `${resourceType.toLowerCase()}_${resourceId.substring(0, 8)}_${batchId}.${format}`
 
 const normalizeOptions = (options: ExportJobOptions): ExportJobOptions => ({
+  ...(options.authorityTokenVersion !== undefined ? { authorityTokenVersion: options.authorityTokenVersion } : {}),
   anonymize: Boolean(options.anonymize),
   ...(options.courseId ? { courseId: options.courseId } : {}),
   ...(options.trainingAnalysis ? { trainingAnalysis: trainingAnalysisExportOptionsSchema.parse(options.trainingAnalysis) } : {}),
@@ -144,11 +146,13 @@ export const enqueueExportJob = async (params: {
   format: unknown
   options: ExportJobOptions
   recordCount: number
+  authorityTokenVersion: number
   requestKey?: string
 }): Promise<ExportBatchResponse> => {
   assertExportLimits({ records: params.recordCount })
   const formats = formatsForRequest(params.resourceType, params.format)
-  const options = normalizeOptions(params.options)
+  if (!Number.isInteger(params.authorityTokenVersion) || params.authorityTokenVersion < 0) throw Object.assign(new Error('Missing export authority version'), { statusCode: 403 })
+  const options = normalizeOptions({ ...params.options, authorityTokenVersion: params.authorityTokenVersion })
   if (params.resourceType === 'TRAINING_ANALYSIS') {
     const trainingAnalysis = trainingAnalysisExportOptionsSchema.parse(options.trainingAnalysis)
     assertTrainingAnalysisExportIdentity(trainingAnalysis, { courseId: params.resourceId, createdBy: params.createdBy, creatorRole: options.creatorRole })
@@ -327,6 +331,15 @@ export const publishExportBatch = async (params: {
   recordCount?: number
   storageKeys: Array<{ artifactId: string; storageKey: string; provenance?: Prisma.InputJsonValue }>
 }): Promise<boolean> => prisma.$transaction(async (tx) => {
+  // Serialize final publication with account/grant revocation, including jobs
+  // that were already generating when the authority was removed.
+  const [authority] = await tx.$queryRaw<Array<{ id: string }>>`
+    SELECT u."id" FROM "export_batches" b JOIN "users" u ON u."id"=b."created_by"
+    WHERE b."id"=${params.batchId} AND u."is_active" AND NOT u."is_frozen"
+      AND NOT u."must_change_password" AND (u."expires_at" IS NULL OR u."expires_at">statement_timestamp())
+      AND b."options"->>'authorityTokenVersion'=u."token_version"::text FOR SHARE OF u
+  `
+  if (!authority) return false
   // Fence the generation first. The row lock is retained until the artifact
   // metadata updates commit, so a stale worker cannot publish any READY row.
   const fenced = await tx.exportBatch.updateMany({

@@ -4,6 +4,10 @@
     "_legacy_import_batches": "OPERATOR_ONLY",
     "_legacy_import_id_map": "OPERATOR_ONLY",
     "_prisma_migrations": "MIGRATION_LEDGER",
+    "admin_authorization_audits": "RUNTIME_RW",
+    "admin_entry_grants": "RUNTIME_RW",
+    "admin_security_challenges": "RUNTIME_RW",
+    "admin_security_keys": "RUNTIME_RW",
     "anonymous_studies": "RUNTIME_RW",
     "anonymous_study_attempts": "RUNTIME_RW",
     "anonymous_study_participants": "RUNTIME_RW",
@@ -217,6 +221,18 @@
     "training_material_quota_buckets": "RUNTIME_RW",
     "training_material_allocation_claims": "RUNTIME_RW",
     "training_public_rounds": "RUNTIME_RW",
-    "training_attempt_checkpoints": "RUNTIME_RW"
+    "training_attempt_checkpoints": "RUNTIME_RW",
+    "content_capability_grants": "RUNTIME_RW",
+    "measurement_content_release_events": "RUNTIME_RW",
+    "measurement_content_releases": "RUNTIME_RW",
+    "measurement_reference_candidates": "RUNTIME_RW",
+    "measurement_reference_reviews": "RUNTIME_RW",
+    "static_sjt_measurement_mappings": "RUNTIME_RW",
+    "survey_interpretation_artifacts": "RUNTIME_RW",
+    "survey_reference_requests": "RUNTIME_RW",
+    "survey_report_drafts": "RUNTIME_RW",
+    "training_reference_requests": "RUNTIME_RW",
+    "training_report_drafts": "RUNTIME_RW",
+    "training_interpretation_artifacts": "RUNTIME_RW"
   }
 }

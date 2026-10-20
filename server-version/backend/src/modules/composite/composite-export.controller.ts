@@ -80,7 +80,7 @@ export const compositeExportController = {
       if (input.courseId) await assertCompositeCourseScope(req.user.userId, req.user.role, req.params.id, input.courseId)
       const anonymize = input.courseId ? true : req.user.role === UserRole.ADMIN ? input.anonymize : true
       const binding = await resolveCompositeExportProjectionBinding(req.params.id, 'teacher')
-      return success(res, await enqueueExportJob({ resourceType: 'COMPOSITE', resourceId: req.params.id,
+      return success(res, await enqueueExportJob({ authorityTokenVersion: req.user!.tokenVersion, resourceType: 'COMPOSITE', resourceId: req.params.id,
         createdBy: req.user.userId, anonymized: anonymize, format: input.format, recordCount: 0,
         requestKey: req.get('X-Export-Request-Key'), options: { detail: input.detail, anonymize, ...(input.courseId ? { courseId: input.courseId } : {}), dateRange: input.dateRange,
           creatorRole: req.user.role as 'ADMIN' | 'TEACHER', projectionFingerprint: binding.fingerprint } }), '导出已排队')

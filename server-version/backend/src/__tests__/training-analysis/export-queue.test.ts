@@ -9,7 +9,7 @@ import { courseId, actor, exportOptions } from './export-fixtures'
 import { trainingManifestHash } from '../../modules/training-analysis/manifest'
 
 const request = () => ({ resourceType: 'TRAINING_ANALYSIS' as const, resourceId: courseId,
-  createdBy: actor.id, anonymized: true, format: 'zip', recordCount: 2, requestKey: randomUUID(),
+  createdBy: actor.id, authorityTokenVersion: 1, anonymized: true, format: 'zip', recordCount: 2, requestKey: randomUUID(),
   options: { anonymize: true, creatorRole: actor.role, trainingAnalysis: exportOptions() } })
 
 describe('Training analysis durable original ExportBatch intent', () => {
@@ -74,7 +74,7 @@ describe('Training analysis durable original ExportBatch intent', () => {
     expect(exportArtifactUrl('TRAINING_ANALYSIS', courseId, 'artifact')).toBe(`/api/courses/${courseId}/training-analysis/export/artifacts/artifact`)
   })
   it('keeps a Composite course scope in the intent and artifact and prevents replay under another course',async()=>{
-    const input={resourceType:'COMPOSITE' as const,resourceId:'assessment',createdBy:actor.id,anonymized:true,format:'csv',recordCount:0,requestKey:randomUUID(),options:{anonymize:true,creatorRole:actor.role,projectionFingerprint:'current',detail:'summary' as const,courseId}}
+    const input={resourceType:'COMPOSITE' as const,resourceId:'assessment',createdBy:actor.id,authorityTokenVersion:1,anonymized:true,format:'csv',recordCount:0,requestKey:randomUUID(),options:{anonymize:true,creatorRole:actor.role,projectionFingerprint:'current',detail:'summary' as const,courseId}}
     await enqueueExportJob(input)
     expect(batches[0].options.courseId).toBe(courseId)
     expect(artifacts[0].provenance.courseId).toBe(courseId)

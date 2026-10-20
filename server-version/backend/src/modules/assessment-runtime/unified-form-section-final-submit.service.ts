@@ -1,4 +1,6 @@
+import {assertTrainingPrivateReferenceAdmissionCurrent} from '../composite/training-private-reference-use'
 import { assertTrainingSectionSelected, loadTrainingChildParent, assertTrainingFormFinalPrincipal, lockTrainingFlowFinalAdmission } from '../composite/training-variant-child-scope'
+import {freezeTrainingReferenceBinding} from '../composite/training-reference-binding'
 import { createHash } from 'node:crypto'
 import type { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -361,7 +363,7 @@ export const submitUnifiedCompositeFormSectionFinal = async (
     await persistCompositeFormSection(tx, input.attemptId, currentSection.id, normalized.normalized.map((entry: any) => ({ itemId: entry.item.id, value: entry.storedValue })))
     let contextSnapshotHash = admission.contextSnapshotHash
     if (context) {
-      await tx.compositeAssessmentAttempt.updateMany({
+      const contextUpdated = await tx.compositeAssessmentAttempt.updateMany({
         where: {
           id: input.attemptId,
           status: 'IN_PROGRESS',
@@ -372,6 +374,18 @@ export const submitUnifiedCompositeFormSectionFinal = async (
         },
         data: { contextSnapshotEncrypted: context.encrypted, contextSnapshotHash: context.hash, contextFrozenAt: new Date() },
       })
+      if(contextUpdated.count!==1)throw new InstrumentFinalSubmitError('STALE_ATTEMPT','综合测评上下文已变化，请重试',409)
+      // UNIFIED_V1 owns its context write rather than calling the legacy context
+      // service. Freeze references here, under that same parent write lock and
+      // transaction, before section completion can expose any measurement runner.
+      const referenceParent=await tx.compositeAssessmentAttempt.findUnique({where:{id:input.attemptId},select:{
+        id:true,attemptEpoch:true,compositeAssessmentId:true,trainingContentBinding:true,trainingContentBindingHash:true,
+        trainingReferenceBinding:true,trainingReferenceBindingHash:true,contextSnapshotEncrypted:true,contextSnapshotHash:true,
+        compositeAssessment:{select:{createdBy:true}},
+      }})
+      if(!referenceParent||referenceParent.attemptEpoch!==input.attemptEpoch||referenceParent.contextSnapshotHash!==context.hash)
+        throw new InstrumentFinalSubmitError('STALE_ATTEMPT','综合测评上下文身份不匹配',409)
+      await freezeTrainingReferenceBinding(tx,referenceParent)
       contextSnapshotHash = context.hash
     }
     const completedAt = new Date()
@@ -407,6 +421,7 @@ export const submitUnifiedCompositeFormSectionFinal = async (
       collectionFactsEncrypted: factsEncrypted,
       completedAt,
     })
+    await assertTrainingPrivateReferenceAdmissionCurrent(tx)
     return { replayed: false, sectionAttemptId: currentSection.id, contextSnapshotHash, payloadHash }
   }))
   return { submissionId, sectionId: input.sectionId, ...committed, parent: null }

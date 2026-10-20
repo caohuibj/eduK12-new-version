@@ -63,7 +63,10 @@ suite('Mini runtime against actual parent HTTP and database contracts',()=>{
  afterAll(async()=>{config.parentPortalEnabled=previousFlag;if(server){server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()))}await cacheService.close();await prisma.$disconnect()})
  it.each([UserRole.STUDENT,UserRole.PARENT,UserRole.TEACHER,UserRole.ADMIN])('%s logs in through real Cookie/CSRF and current DB discovery, then clears local session',async role=>{
   const user=await account(role),c=client();await c.runtime.session.login({username:user.username,password})
-  expect(c.runtime.session.get().activeRole).toBe(role);expect(c.runtime.session.get().capabilities.canReadChildren).toBe(role===UserRole.PARENT)
+  expect(c.runtime.session.get().activeRole).toBe(role===UserRole.ADMIN?UserRole.STUDENT:role)
+  expect(c.runtime.session.get().user.businessRole).toBe(role)
+  expect(c.runtime.session.get().user.entryGrants).toEqual([])
+  expect(c.runtime.session.get().capabilities.canReadChildren).toBe(role===UserRole.PARENT)
   expect(c.calls.some(o=>o.url.endsWith('/auth/login')&&o.header['X-CSRF-Token'])).toBe(true)
   if(role===UserRole.TEACHER||role===UserRole.ADMIN)await expect(c.runtime.api.get('/parents/me/children')).rejects.toMatchObject({kind:'notFound'})
   await c.runtime.session.logout();expect(c.runtime.session.get().user).toBe(null);expect(c.stored.size).toBe(0)

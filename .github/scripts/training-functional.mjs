@@ -3,6 +3,26 @@ import { pathToFileURL } from 'node:url';
 
 export const TRAINING_FUNCTIONAL_CONFIG = '.github/config/training-functional-ci.json';
 export const TRAINING_FUNCTIONAL_BASE = '167478dda6d30df212cb141494c75dd106f04d45';
+export const TRAINING_FOLLOWUP_CONFIG = '.github/config/training-followup-functional-ci.json';
+export const TRAINING_FOLLOWUP_BASE = 'f41dca3f347b253b500de600c75855ffcd275491';
+export const TRAINING_FOLLOWUP_MODE = 'training-followup-functional-only';
+export const TRAINING_FOLLOWUP_SOURCES = [
+  ...['training-burst-baseline','training-final-single','training-load-startup','training-main-alignment',
+    'training-single-baseline','training-storage-optional-profile','training-storage-profile','training-two-reuse-patch']
+    .map(name => `docs/performance/20261020-${name}.md`),
+  'server-version/backend/src/__tests__/cognitive/frozen-report-storage.test.ts',
+  ...['training-checkpoint.contract','training-flow-assignment-snapshot','training-flow-materialization-reuse']
+    .map(name => `server-version/backend/src/__tests__/composite/${name}.test.ts`),
+  'server-version/backend/src/modules/cognitive/profile-freeze.ts',
+  ...['composite.service','training-checkpoint.service','training-flow-scope']
+    .map(name => `server-version/backend/src/modules/composite/${name}.ts`),
+  ...['training-burst-followup','training-followup'].map(name => `server-version/scripts/load/${name}.mjs`),
+].sort();
+export const TRAINING_FOLLOWUP_TOOLS = [TRAINING_FOLLOWUP_CONFIG,
+  '.github/scripts/training-functional.mjs', '.github/scripts/training-functional.test.mjs',
+  '.github/scripts/admin-permissions-functional.test.mjs',
+  '.github/scripts/merge-gate.mjs', '.github/workflows/ci.yml',
+  '.github/workflows/ci-backend.yml', '.github/workflows/ci-browser.yml'];
 export const TRAINING_FUNCTIONAL_OMISSIONS = ['aggregate-report-200-completion', 'perf-phase0-smoke'];
 export const TRAINING_FUNCTIONAL_TOOLS = [
   TRAINING_FUNCTIONAL_CONFIG,
@@ -36,60 +56,85 @@ const regularChange = entry => entry.newMode === '100644'
 // An explicit, reviewed configuration addition activates this single integration.
 // Branch names, labels and arbitrary environment booleans cannot grant it.
 // The base has no marker; after merge, ordinary subsequent PRs keep the defaults.
-export function validateTrainingFunctional(entries, config, { base, head, event, forceFull = false }) {
-  const marker = entries.find(entry => entry.file === TRAINING_FUNCTIONAL_CONFIG);
+export function validateFunctionalScope(entries, config, { base, head, event, forceFull = false }, profile) {
+  const { markerPath, baseSha, mode, label, tools, sourcePath: acceptsSource, required, omissions } = profile;
+  const marker = entries.find(entry => entry.file === markerPath);
   if (!marker) return null;
   if (marker.status !== 'A' || !regularChange(marker))
-    throw new Error('Training functional configuration must be a new regular file in this integration');
+    throw new Error(`${label} functional configuration must be a new regular file in this integration`);
   if (!['pull_request', 'push'].includes(event) || forceFull)
-    throw new Error('Training functional qualification does not admit manual or forced performance execution');
-  if (base !== TRAINING_FUNCTIONAL_BASE || !sha(head) || config?.schema !== 1
-      || config.mode !== 'training-functional-only' || config.base !== base
+    throw new Error(`${label} functional qualification does not admit manual or forced performance execution`);
+  if (base !== baseSha || !sha(head) || config?.schema !== 1
+      || config.mode !== mode || config.base !== base
       || typeof config.reason !== 'string' || !config.reason.trim()
       || !Array.isArray(config.sourcePaths) || !config.sourcePaths.length
-      || config.sourcePaths.some(path => !sourcePath(path))
+      || config.sourcePaths.some(path => !acceptsSource(path))
       || new Set(config.sourcePaths).size !== config.sourcePaths.length)
-    throw new Error('Invalid or moved Training functional scope declaration');
-  const allowed = new Set([...TRAINING_FUNCTIONAL_TOOLS, ...config.sourcePaths]);
+    throw new Error(`Invalid or moved ${label} functional scope declaration`);
+  const allowed = new Set([...tools, ...config.sourcePaths]);
   if (!entries.length || new Set(entries.map(entry => entry.file)).size !== entries.length
       || entries.some(entry => !regularChange(entry) || !allowed.has(entry.file)))
-    throw new Error('Unknown path, deletion or file-mode change in Training functional integration');
-  for (const required of [
+    throw new Error(`Unknown path, deletion or file-mode change in ${label} functional integration`);
+  for (const path of required) if (!entries.some(entry => entry.file === path))
+    throw new Error(`${label} functional integration is missing its application scope`);
+  return { schema: 1, mode, base, head,
+    changedPaths: entries.map(entry => entry.file).sort(),
+    omittedPerformance: [...omissions] };
+}
+
+export function validateTrainingFunctional(entries, config, context) {
+  return validateFunctionalScope(entries, config, context, {
+    markerPath: TRAINING_FUNCTIONAL_CONFIG, baseSha: TRAINING_FUNCTIONAL_BASE,
+    mode: 'training-functional-only', label: 'Training', tools: TRAINING_FUNCTIONAL_TOOLS, sourcePath,
+    omissions: TRAINING_FUNCTIONAL_OMISSIONS, required: [
     'server-version/backend/src/modules/composite/training-checkpoint.service.ts',
     'server-version/frontend/src/services/persistence/finalDraftStore.ts',
     'server-version/backend/prisma/schema.prisma',
-  ]) if (!entries.some(entry => entry.file === required))
-    throw new Error('Training functional integration is missing its application scope');
-  return { schema: 1, mode: 'training-functional-only', base, head,
-    changedPaths: entries.map(entry => entry.file).sort(),
-    omittedPerformance: [...TRAINING_FUNCTIONAL_OMISSIONS] };
+  ] });
+}
+
+export function validateTrainingFollowup(entries, config, context) {
+  const plan = validateFunctionalScope(entries, config, context, {
+    markerPath: TRAINING_FOLLOWUP_CONFIG, baseSha: TRAINING_FOLLOWUP_BASE,
+    mode: TRAINING_FOLLOWUP_MODE, label: 'Training followup', tools: TRAINING_FOLLOWUP_TOOLS,
+    sourcePath: path => TRAINING_FOLLOWUP_SOURCES.includes(path),
+    required: [...TRAINING_FOLLOWUP_SOURCES, ...TRAINING_FOLLOWUP_TOOLS], omissions: TRAINING_FUNCTIONAL_OMISSIONS,
+  });
+  if (plan && JSON.stringify([...config.sourcePaths].sort()) !== JSON.stringify(TRAINING_FOLLOWUP_SOURCES))
+    throw new Error('Training followup declaration must match its complete frozen source diff');
+  return plan;
 }
 
 export function trainingFunctionalPlan(entries, base, head, options = {}) {
-  if (!entries.some(entry => entry.file === TRAINING_FUNCTIONAL_CONFIG)) return null;
+  const followup = entries.some(entry => entry.file === TRAINING_FOLLOWUP_CONFIG);
+  if (!followup && !entries.some(entry => entry.file === TRAINING_FUNCTIONAL_CONFIG)) return null;
   if (!sha(base) || !sha(head)) throw new Error('Exact Git base/head required for Training scope');
-  const config = JSON.parse(execFileSync('git', ['show', `${head}:${TRAINING_FUNCTIONAL_CONFIG}`], { encoding: 'utf8' }));
-  return validateTrainingFunctional(entries, config, { base, head,
+  const config = JSON.parse(execFileSync('git', ['show', `${head}:${followup ? TRAINING_FOLLOWUP_CONFIG : TRAINING_FUNCTIONAL_CONFIG}`], { encoding: 'utf8' }));
+  return (followup ? validateTrainingFollowup : validateTrainingFunctional)(entries, config, { base, head,
     event: options.event ?? process.env.CI_EVENT,
     forceFull: options.forceFull ?? process.env.CI_FORCE_FULL === 'true' });
 }
 
 export function validTrainingFunctionalPlan(plan) {
-  return plan?.schema === 1 && plan.mode === 'training-functional-only'
-    && plan.base === TRAINING_FUNCTIONAL_BASE && sha(plan.head)
-    && Array.isArray(plan.changedPaths) && plan.changedPaths.includes(TRAINING_FUNCTIONAL_CONFIG)
+  const followup = plan?.mode === TRAINING_FOLLOWUP_MODE;
+  return plan?.schema === 1 && (followup || plan.mode === 'training-functional-only')
+    && plan.base === (followup ? TRAINING_FOLLOWUP_BASE : TRAINING_FUNCTIONAL_BASE) && sha(plan.head)
+    && Array.isArray(plan.changedPaths) && plan.changedPaths.includes(followup ? TRAINING_FOLLOWUP_CONFIG : TRAINING_FUNCTIONAL_CONFIG)
+    && (!followup || JSON.stringify([...plan.changedPaths].sort()) === JSON.stringify([...TRAINING_FOLLOWUP_SOURCES, ...TRAINING_FOLLOWUP_TOOLS].sort()))
     && plan.changedPaths.every(canonical)
     && new Set(plan.changedPaths).size === plan.changedPaths.length
     && JSON.stringify(plan.omittedPerformance) === JSON.stringify(TRAINING_FUNCTIONAL_OMISSIONS);
 }
 
 async function main() {
-  if (process.argv[2] !== 'verify-backend') throw new Error('Expected verify-backend');
+  if (!['verify-backend', 'verify-followup'].includes(process.argv[2])) throw new Error('Expected verify-backend or verify-followup');
   const { changedEntries } = await import('./content-scope.mjs');
   const head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
   const base = process.env.CI_BASE_SHA;
   const plan = trainingFunctionalPlan(changedEntries(base, head), base, head);
   if (!plan) throw new Error('Disabling backend performance requires the explicit Training functional scope');
+  if (process.argv[2] === 'verify-followup' && plan.mode !== TRAINING_FOLLOWUP_MODE)
+    throw new Error('Training followup checks require their exact current-main scope');
   console.log(JSON.stringify({ mode: plan.mode, base, head, omittedPerformance: plan.omittedPerformance }));
 }
 

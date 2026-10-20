@@ -1,0 +1,20 @@
+[
+  {
+    "file": "prisma/migrations/20261020041000_survey_interpretation_exports/migration.sql",
+    "passIndex": 1,
+    "sha256": "7d885d1edd09a537c0bd3bd20c9d5ff2abf6cc92358411b03755658fef206803",
+    "passed": true
+  },
+  {
+    "file": "prisma/migrations/20261020041000_survey_interpretation_exports/migration.sql",
+    "passIndex": 2,
+    "sha256": "7d885d1edd09a537c0bd3bd20c9d5ff2abf6cc92358411b03755658fef206803",
+    "passed": true
+  },
+  {
+    "file": "src/__tests__/measurement-content/survey-interpretation-export-database-contracts.sql",
+    "passIndex": 3,
+    "sha256": "5b780442755569eafbf10400afdf2be9e01e6b743dcc305024888a791f9ea578",
+    "passed": true
+  }
+]
