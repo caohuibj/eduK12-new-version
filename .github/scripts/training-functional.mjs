@@ -14,11 +14,14 @@ export const TRAINING_FUNCTIONAL_TOOLS = [
   '.github/scripts/merge-gate.mjs',
   '.github/workflows/ci.yml',
   '.github/workflows/ci-backend.yml',
+  '.github/workflows/ci-browser.yml',
 ];
 const sha = value => typeof value === 'string' && /^[a-f0-9]{40}$/.test(value);
 const canonical = value => typeof value === 'string' && !/[\\\x00-\x1f\x7f]/.test(value)
   && !value.split('/').some(part => !part || part === '.' || part === '..');
 const sourcePath = path => canonical(path) && (
+  path === 'server-version/e2e/training-draft-transactions-browser.cjs'
+  ||
   /^server-version\/(backend|frontend)\/src\/.+\.(ts|tsx|css)$/.test(path)
   || path === 'server-version/backend/prisma/schema.prisma'
   || /^server-version\/backend\/prisma\/migrations\/202610190[456]0000_training_(public_rounds|persistence|feedback_release)\/migration\.sql$/.test(path)
@@ -80,7 +83,7 @@ export function validTrainingFunctionalPlan(plan) {
     && JSON.stringify(plan.omittedPerformance) === JSON.stringify(TRAINING_FUNCTIONAL_OMISSIONS);
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+async function main() {
   if (process.argv[2] !== 'verify-backend') throw new Error('Expected verify-backend');
   const { changedEntries } = await import('./content-scope.mjs');
   const head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
@@ -88,4 +91,13 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const plan = trainingFunctionalPlan(changedEntries(base, head), base, head);
   if (!plan) throw new Error('Disabling backend performance requires the explicit Training functional scope');
   console.log(JSON.stringify({ mode: plan.mode, base, head, omittedPerformance: plan.omittedPerformance }));
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  // Do not await main at module scope: content-scope imports this module too.
+  // Finish initializing our exports before its dynamic import can evaluate.
+  main().catch(error => {
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exitCode = 1;
+  });
 }

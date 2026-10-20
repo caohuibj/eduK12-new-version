@@ -242,6 +242,10 @@ jobs:
       - name: run seeded browser acceptance
         if: matrix.group == 'foundation'
         run: node e2e/situational-bundle-browser-e2e.cjs
+      - name: Training native IndexedDB transaction contracts
+        if: matrix.group == 'foundation'
+        timeout-minutes: 2
+        run: node e2e/training-draft-transactions-browser.cjs
       - name: run FE-11 storage fault acceptance
         if: matrix.group == 'foundation'
         run: node e2e/fe-11-storage-fault-browser-e2e.cjs

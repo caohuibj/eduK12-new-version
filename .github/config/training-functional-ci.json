@@ -83,6 +83,7 @@
     "server-version/backend/src/services/assessmentExportArtifact.ts",
     "server-version/backend/src/services/assessmentExportHttp.ts",
     "server-version/backend/src/services/assessmentExportWorker.ts",
+    "server-version/e2e/training-draft-transactions-browser.cjs",
     "server-version/frontend/src/api/__tests__/publicDelivery.group-ip.test.ts",
     "server-version/frontend/src/api/__tests__/publicDelivery.test.ts",
     "server-version/frontend/src/api/publicDelivery.ts",

@@ -1,6 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { tmpdir } from 'node:os';
+import { join, delimiter } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { validateTrainingFunctional, validTrainingFunctionalPlan, TRAINING_FUNCTIONAL_BASE,
   TRAINING_FUNCTIONAL_CONFIG, TRAINING_FUNCTIONAL_TOOLS, TRAINING_FUNCTIONAL_OMISSIONS } from './training-functional.mjs';
 import { requiredChecks, failedChecks } from './merge-gate.mjs';
@@ -138,4 +142,68 @@ test('workflow exposes the explicit plan, retains normal routes and refuses manu
   const gate = readFileSync(new URL('./merge-gate.mjs', import.meta.url), 'utf8');
   assert.match(gate, /trainingFunctionalPlan\(changedEntries\(base, head\), base, head\)/);
   assert.match(gate, /recomputed-training-functional-plan/);
+});
+
+
+test('all three jsdom transaction gaps are required in native Chromium without memory fallback', () => {
+  const browser = workflow('ci-browser');
+  assert.match(browser, /name: Training native IndexedDB transaction contracts\n\s+if: matrix.group == 'foundation'\n\s+timeout-minutes: 2\n\s+run: node e2e\/training-draft-transactions-browser\.cjs/);
+  const native = readFileSync(new URL('../../server-version/e2e/training-draft-transactions-browser.cjs', import.meta.url), 'utf8');
+  const original = readFileSync(new URL('../../server-version/frontend/src/services/persistence/__tests__/answerReplacement.test.ts', import.meta.url), 'utf8');
+  for (const name of [
+    'rolls back old-only deletion, shared updates, new-only insertion, and timing on a late abort',
+    'rolls back answer requests if the final metadata write throws',
+    'resolves only after the transaction completion event',
+  ]) { assert.ok(original.includes(name)); assert.ok(native.includes(name)); }
+  assert.match(native, /store\.constructor\.name !== 'IndexedDbFinalDraftStore'/);
+  assert.match(native, /assert\.equal\(actual\.newRowSucceeded, true\)/);
+  assert.match(native, /assert\.equal\(actual\.committedWhenResolved, true\)/);
+  assert.match(native, /assert\.deepEqual\(actual\.answers, actual\.old\)/);
+  assert.match(native, /assert\.deepEqual\(actual\.metadata, actual\.oldMetadata\)/);
+  assert.match(native, /assert\.equal\(result\.checks\.length, 3\)/);
+});
+
+
+test('real Node verify-backend CLI finishes initialization and rejects an illegal scope', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'training-functional-cli-'));
+  try {
+    // Only Git I/O is a deterministic fixture. The real CLI and its complete
+    // module graph execute in a fresh Node process, so a cyclic top-level await
+    // cannot be hidden by the imports already initialized in this test process.
+    const fixtureFile = join(directory, 'git-fixture.json');
+    writeFileSync(join(directory, 'git'), `#!/usr/bin/env node
+const fs = require('node:fs');
+const fixture = JSON.parse(fs.readFileSync(process.env.TRAINING_CLI_GIT_FIXTURE, 'utf8'));
+const args = process.argv.slice(2);
+if (JSON.stringify(args) === JSON.stringify(['rev-parse', 'HEAD'])) process.stdout.write(fixture.head + String.fromCharCode(10));
+else if (JSON.stringify(args) === JSON.stringify(['diff', '--no-ext-diff', '--no-textconv', '--no-renames', '--raw', '--abbrev=40', '-z', fixture.base, fixture.head, '--'])) process.stdout.write(fixture.raw);
+else if (JSON.stringify(args) === JSON.stringify(['show', fixture.head + ':' + fixture.configPath])) process.stdout.write(JSON.stringify(fixture.config));
+else throw new Error('Unexpected Git command: ' + JSON.stringify(args));
+`, { mode: 0o755 });
+    const raw = changes => changes.map(entry =>
+      `:${entry.oldMode} ${entry.newMode} ${'0'.repeat(40)} ${'b'.repeat(40)} ${entry.status}\0${entry.file}\0`).join('');
+    const fixture = { base: context.base, head: context.head, configPath: TRAINING_FUNCTIONAL_CONFIG, config, raw: raw(entries()) };
+    writeFileSync(fixtureFile, JSON.stringify(fixture));
+    const execute = () => spawnSync(process.execPath,
+      [fileURLToPath(new URL('./training-functional.mjs', import.meta.url)), 'verify-backend'], {
+        cwd: directory, encoding: 'utf8', timeout: 10000,
+        env: { ...process.env, PATH: directory + delimiter + process.env.PATH,
+          TRAINING_CLI_GIT_FIXTURE: fixtureFile, CI_EVENT: 'pull_request',
+          CI_BASE_SHA: context.base, CI_FORCE_FULL: 'false' },
+      });
+    const valid = execute();
+    assert.ifError(valid.error);
+    assert.equal(valid.signal, null);
+    assert.equal(valid.status, 0, valid.stderr);
+    assert.deepEqual(JSON.parse(valid.stdout), { mode: 'training-functional-only',
+      base: context.base, head: context.head, omittedPerformance: TRAINING_FUNCTIONAL_OMISSIONS });
+    fixture.raw = raw([...entries(), added('server-version/backend/src/unreviewed.ts')]);
+    writeFileSync(fixtureFile, JSON.stringify(fixture));
+    const invalid = execute();
+    assert.ifError(invalid.error);
+    assert.equal(invalid.signal, null);
+    assert.equal(invalid.status, 1, invalid.stderr);
+    assert.equal(invalid.stdout, '');
+    assert.match(invalid.stderr, /Unknown path, deletion or file-mode change/);
+  } finally { rmSync(directory, { recursive: true, force: true }); }
 });
