@@ -150,7 +150,8 @@ const buildImporters = (legacy: LegacyClient, args: Args, batchId: string | null
           username: String(row.username),
           passwordHash: String(row.password_hash),
           role: role as 'STUDENT' | 'TEACHER' | 'ADMIN',
-          platformRole: (role === 'ADMIN' ? 'SYSTEM_ADMIN' : 'STANDARD') as 'SYSTEM_ADMIN' | 'STANDARD',
+          // Import approval acknowledges legacy data, never system authority.
+          platformRole: 'STANDARD' as const,
           nickname: (row.nickname as string | null) ?? null,
           avatarUrl: (row.avatar_url as string | null) ?? null,
           phone: (row.phone as string | null) ?? null,
@@ -171,7 +172,7 @@ const buildImporters = (legacy: LegacyClient, args: Args, batchId: string | null
           await track('user', data.id, data.id)
         }
       }
-      ctx.note(`platformRole: ${rows.filter((row) => row.role === 'ADMIN').map((row) => `${String(row.username)}→SYSTEM_ADMIN`).join(', ') || '(no admins)'}; all legacy teachers teacherApproved=true`)
+      ctx.note('All imported accounts use platformRole=STANDARD; legacy ADMIN requires separate explicit entry grants; all legacy teachers teacherApproved=true')
       ctx.tally('users', rows.length, rows.length)
     }],
 
