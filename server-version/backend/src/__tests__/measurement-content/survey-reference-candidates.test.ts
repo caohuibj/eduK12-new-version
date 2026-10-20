@@ -10,7 +10,7 @@ vi.mock('../../modules/measurement-content/content-authority.repository',()=>({a
 vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:mocks.release,publishContentRelease:mocks.publish}))
 vi.mock('../../modules/survey/analytics.source',()=>({loadSurveySource:mocks.load}))
 vi.mock('../../modules/measurement-content/reference-candidate.repository',async importOriginal=>({...await importOriginal<object>(),storeReferenceCandidate:mocks.store}))
-import {createSurveyReferenceCandidate,reviewSurveyReferenceCandidate,publishSurveyReferenceCandidate} from '../../modules/survey/reference-candidates.service'
+import {createSurveyReferenceCandidate,reviewSurveyReferenceCandidate,publishSurveyReferenceCandidate,readSurveyReferenceCandidate} from '../../modules/survey/reference-candidates.service'
 const pid='11111111-1111-4111-8111-111111111111',wid='22222222-2222-4222-8222-222222222222'
 const mid='33333333-3333-4333-8333-333333333333',gid='44444444-4444-4444-8444-444444444444'
 const binding={releaseId:mid,contentHash:'a'.repeat(64),measurementHash:'b'.repeat(64)}
@@ -185,8 +185,20 @@ describe('private Survey reference review and publish current-fact fences',()=>{
     })
     mocks.publish.mockResolvedValue({releaseId:'published'})
   })
-  const reviewInput=()=>({candidateId:cid,grantId:gid,decision:'APPROVED',statement:'Reviewed observed sample'})
-  const publishInput=()=>({candidateId:cid,reviewId:rid,grantId:gid,localKey:'local',version:'1'})
+  const reviewInput=()=>({projectId:pid,waveId:wid,candidateId:cid,grantId:gid,decision:'APPROVED',statement:'Reviewed observed sample'})
+  const publishInput=()=>({projectId:pid,waveId:wid,candidateId:cid,reviewId:rid,grantId:gid,localKey:'local',version:'1'})
+  it('rejects candidate path project or wave substitution before source read',async()=>{
+    await expect(reviewSurveyReferenceCandidate('actor',{...reviewInput(),projectId:wid})).rejects.toThrow('REFERENCE_SURVEY_CANDIDATE_REQUIRED')
+    await expect(publishSurveyReferenceCandidate('actor',{...publishInput(),waveId:pid})).rejects.toThrow('REFERENCE_SURVEY_CANDIDATE_REQUIRED')
+    expect(mocks.load).not.toHaveBeenCalled()
+  })
+  it('review view rechecks source and excludes individual membership identifiers',async()=>{
+    const result=await readSurveyReferenceCandidate('actor',{projectId:pid,waveId:wid,candidateId:cid,grantId:gid})
+    expect(result.sampleSize).toBe(2)
+    expect(result).not.toHaveProperty('sampleManifest')
+    expect(JSON.stringify(result)).not.toContain('attempt0')
+    expect(mocks.authority).toHaveBeenCalledWith(mocks.tx,expect.objectContaining({capability:'reference.review'}))
+  })
   it('reviews stored candidate with trusted actor, fresh review capability and exactly pinned reader',async()=>{
     const result=await reviewSurveyReferenceCandidate('actor',reviewInput())
     expect(result.reviewId).toMatch(/^[0-9a-f-]{36}$/)

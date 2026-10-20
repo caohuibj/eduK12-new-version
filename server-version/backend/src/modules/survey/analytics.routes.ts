@@ -1,3 +1,6 @@
+import {createSurveyReferenceCandidate,readSurveyReferenceCandidate,reviewSurveyReferenceCandidate,publishSurveyReferenceCandidate,
+  referenceCandidateView,surveyReferenceCreateSchema,surveyReferenceReviewSchema,surveyReferencePublishSchema} from './reference-candidates.service'
+import {ContentReleaseError} from '../measurement-content/release'
 import {createSurveyReinterpretation,readSurveyReinterpretation} from './reinterpretation.service'
 import {ContentAuthorityError} from '../measurement-content/content-authority'
 import {SurveyBuilderError} from './builder.service'
@@ -33,7 +36,8 @@ const wrap=(fn:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Response,
   catch(e){
     if(e instanceof z.ZodError)return error(res,'请求参数不合法',-1,400)
     if(e instanceof service.SurveyAnalyticsError||e instanceof SurveyBuilderError||e instanceof SurveyWaveError)return error(res,e.message,-1,e.statusCode)
-    if(e instanceof ContentAuthorityError)return error(res,'没有此数据解释能力',-1,403)
+    if(e instanceof ContentAuthorityError)return error(res,'没有此内容或数据解释能力',-1,403)
+    if(e instanceof ContentReleaseError)return error(res,e.code,-1,409)
     next(e)
   }
 }
@@ -151,4 +155,30 @@ surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/reports',wrap(async req=>{
   assertRecentSurveyMfa(req)
   const query=z.object({afterId:id.optional()}).strict().parse(req.query)
   return listSurveyStoredReports(req.user!.userId,{projectId:id.parse(req.params.pid),waveId:id.parse(req.params.wid),...query})
+}))
+
+const candidatePath='/:pid/analytics/waves/:wid/reference-candidates'
+const referenceCreateBody=surveyReferenceCreateSchema.omit({projectId:true,waveId:true})
+const referenceReviewBody=surveyReferenceReviewSchema.omit({projectId:true,waveId:true,candidateId:true})
+const referencePublishBody=surveyReferencePublishSchema.omit({projectId:true,waveId:true,candidateId:true})
+surveyAnalyticsRouter.post(candidatePath,wrap(async req=>{
+  assertRecentSurveyMfa(req)
+  const result=await createSurveyReferenceCandidate(req.user!.userId,{...referenceCreateBody.parse(req.body),
+    projectId:id.parse(req.params.pid),waveId:id.parse(req.params.wid)})
+  return {candidateId:result.candidateId,...referenceCandidateView(result.candidate),exclusionCounts:result.exclusionCounts}
+}))
+surveyAnalyticsRouter.get(candidatePath+'/:candidateId',wrap(async req=>{
+  assertRecentSurveyMfa(req)
+  return readSurveyReferenceCandidate(req.user!.userId,{...z.object({grantId:id}).strict().parse(req.query),
+    projectId:id.parse(req.params.pid),waveId:id.parse(req.params.wid),candidateId:id.parse(req.params.candidateId)})
+}))
+surveyAnalyticsRouter.post(candidatePath+'/:candidateId/reviews',wrap(async req=>{
+  assertRecentSurveyMfa(req)
+  return reviewSurveyReferenceCandidate(req.user!.userId,{...referenceReviewBody.parse(req.body),
+    projectId:id.parse(req.params.pid),waveId:id.parse(req.params.wid),candidateId:id.parse(req.params.candidateId)})
+}))
+surveyAnalyticsRouter.post(candidatePath+'/:candidateId/publish',wrap(async req=>{
+  assertRecentSurveyMfa(req)
+  return publishSurveyReferenceCandidate(req.user!.userId,{...referencePublishBody.parse(req.body),
+    projectId:id.parse(req.params.pid),waveId:id.parse(req.params.wid),candidateId:id.parse(req.params.candidateId)})
 }))

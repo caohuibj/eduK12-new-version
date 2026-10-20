@@ -463,3 +463,16 @@ actor cannot restore it. Corrupt/unavailable storage is reported and pending
 requests register a beforeunload warning. Eight actual component contracts passed;
 real browser transport/storage behavior remains for V10. The current feature and
 acceptance boundaries are tracked in acceptance-matrix.md.
+
+### Private descriptive reference HTTP handlers
+
+The Survey analytics router exposes create, exact candidate review-view, review,
+and publish operations using its existing authentication/feature gate and recent
+MFA. Fine reference capabilities remain mandatory in the actual services. Candidate
+path project/wave IDs must match the stored source binding before reading facts.
+Returned views contain aggregate definition/evidence, source binding, sample size
+and create-time exclusion counts; individual manifest membership never leaves the
+route. Review views revalidate the same trusted source/facts as review and publish.
+This is local descriptive sample evidence only, not formal norms or external norm
+uploads. 43 targeted candidate/route/reinterpretation contracts and strict backend
+types passed; real HTTP, browser UI and database contention remain pending.

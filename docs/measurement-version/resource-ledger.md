@@ -59,3 +59,14 @@ Storage formula amendment: explicit reinterpretation adds one `I_i = encrypted(p
 | R25 | Explicit interpretation skipped-unit guard | Actual FINAL `unitExecution` reader projection, `reinterpretation.service.ts` | Same authorized opt-in as R24 | Two real compute/reader/interpreter contracts, no runtime byte benchmark | Reuses saved terminal fact; avoids generating unusable report prose from placeholder score rows | V08 correction | Flow skipped produces nonempty NOT_SHOWN scores but report remains UNAVAILABLE/null; executed control renders score 3 | Both pass; missing terminal evidence fails closed | Never infer execution from score count; no repeated scoring; current source/auth fences unchanged |
 
 | R26 | Researcher report pointer list → exact FINAL view | `report-results.service.ts`, `SurveyStoredReportReader.tsx` | Existing analytics gate/recent MFA/current owner; explicit load/click | Source + component contracts, no timing/memory benchmark | At most 25 verified FINALs per page; metadata-only response, no per-row template/release lookup; exact report read on demand | V08 | No raw answers in list; source identity/fences; navigation/permission clear and escaped nodes | 14 backend + 20 frontend targeted; merged strict types pass | Reader still decrypts bounded verified FINAL source; no full-release memory measurement or public asset URL guessing |
+
+### R27 — Root management and private reference views
+
+- Chain/object: exact content-grant metadata read; private reference candidate view.
+- Source evidence: admin-authority.service exact UUID metadata; reference-candidates.service verified aggregate projection; analytics.routes strips sampleManifest.
+- Effective flags: existing SURVEY_ANALYTICS_ENABLED gate remains required for reference routes; no deployment flag changed. Management uses existing system/strong-auth route.
+- Measured vs estimated: targeted contracts and strict types passed; no latency/heap/byte measurement claimed.
+- Risk: metadata reads never load sample/report payload; reference preview reuses the bounded authoritative source workflow and does not expose individual manifest IDs. It deliberately pays a fresh source fence for current safety, rather than caching authorization.
+- Unit: V05/V06. Acceptance: actual system/scope/expiry proof checks; max 250 candidate FINALs; path scope matches stored candidate; no client facts/approval object.
+- Result: implementation and focused contracts pass; connected API/browser/concurrency pending.
+- Regression watch: no general resource browsing, N+1 release reads, automatic formal norm promotion, or giant per-answer definition/manifest copies.

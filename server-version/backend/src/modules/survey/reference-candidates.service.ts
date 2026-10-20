@@ -14,7 +14,7 @@ import { SurveyAnalyticsError } from './analytics.errors'
 
 const text=z.string().trim().min(1).max(4000)
 const selector=z.string().trim().min(1).max(240)
-const requestSchema=z.object({
+export const surveyReferenceCreateSchema=z.object({
   projectId:z.string().uuid(),waveId:z.string().uuid(),grantId:z.string().uuid(),
   instrumentKey:selector,scoreKey:selector,referenceVersion:selector,
   evidence:z.object({methodRationale:text,inclusionRule:text,missingness:text,repeatResponses:text,
@@ -22,7 +22,7 @@ const requestSchema=z.object({
 }).strict()
 function fail(code:string):never{throw new ContentReleaseError(code)}
 
-async function readBinding(tx:Prisma.TransactionClient,input:Pick<z.infer<typeof requestSchema>,'projectId'|'waveId'|'instrumentKey'>){
+async function readBinding(tx:Prisma.TransactionClient,input:Pick<z.infer<typeof surveyReferenceCreateSchema>,'projectId'|'waveId'|'instrumentKey'>){
     const bindings=await tx.$queryRaw<Array<{measurement:{releaseId:string;contentHash:string;measurementHash:string}|null;source_revision:number}>>(Prisma.sql`
       SELECT unit->'measurementRelease' AS measurement, project.revision AS source_revision
       FROM survey_waves wave JOIN survey_projects project ON project.id=wave.project_id
@@ -68,8 +68,8 @@ async function sourceFence(tx:Prisma.TransactionClient,source:SurveyReferenceSou
   if(count!==source.sourceFinalCount)fail('REFERENCE_SURVEY_SOURCE_CHANGED')
 }
 
-/** Internal creation only: no route, root-grant issuer, external norm JSON or data
- * access grant. actorId must come from authenticated Survey identity. Two short
+/** Private descriptive creation; never accept external norm JSON or data
+ * access grants from the request. actorId must come from authenticated Survey identity. Two short
  * transactions bracket the existing bounded reader (no nested pool reservation).
  * sample-quality and both withdrawal services lock project FOR UPDATE first;
  * the final shared lock and revision check serialize the candidate write with them.
@@ -77,7 +77,7 @@ async function sourceFence(tx:Prisma.TransactionClient,source:SurveyReferenceSou
  * freezes included facts, rather than claiming a census of uncommitted FINALs.
  */
 export async function createSurveyReferenceCandidate(actorId:string,raw:unknown){
-  const input=requestSchema.parse(raw)
+  const input=surveyReferenceCreateSchema.parse(raw)
   const {binding,sourceRevision,authority,measurement}=await prisma.$transaction(async tx=>{
     await authorizedProject(tx,actorId,input.projectId,false)
     // Obtain only the persisted binding before accessing samples. The reader
@@ -148,9 +148,9 @@ export async function createSurveyReferenceCandidate(actorId:string,raw:unknown)
   },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:5000})
 }
 
-const candidateActionSchema=z.object({candidateId:z.string().uuid(),grantId:z.string().uuid()}).strict()
-const reviewSchema=candidateActionSchema.extend({decision:z.enum(['APPROVED','REJECTED']),statement:text}).strict()
-const publishSchema=candidateActionSchema.extend({reviewId:z.string().uuid(),localKey:z.string().trim().min(1).max(165),version:selector}).strict()
+export const surveyReferenceActionSchema=z.object({projectId:z.string().uuid(),waveId:z.string().uuid(),candidateId:z.string().uuid(),grantId:z.string().uuid()}).strict()
+export const surveyReferenceReviewSchema=surveyReferenceActionSchema.extend({decision:z.enum(['APPROVED','REJECTED']),statement:text}).strict()
+export const surveyReferencePublishSchema=surveyReferenceActionSchema.extend({reviewId:z.string().uuid(),localKey:z.string().trim().min(1).max(165),version:selector}).strict()
 
 async function readCandidate(tx:Prisma.TransactionClient,id:string){
   const rows=await tx.$queryRaw<Array<{payload:ReferenceCandidate}>>(Prisma.sql`
@@ -184,10 +184,11 @@ async function authorizeCandidate(tx:Prisma.TransactionClient,actorId:string,gra
   return measurement.family
 }
 
-async function withVerifiedCandidate<T>(actorId:string,input:z.infer<typeof candidateActionSchema>,capability:'reference.review'|'reference.publish',
+async function withVerifiedCandidate<T>(actorId:string,input:z.infer<typeof surveyReferenceActionSchema>,capability:'reference.review'|'reference.publish',
   write:(tx:Prisma.TransactionClient,candidate:ReferenceCandidate,facts:Map<string,AuthorizedReferenceFact>)=>Promise<T>){
   const initial=await prisma.$transaction(async tx=>{
     const saved=await readCandidate(tx,input.candidateId)
+    if(saved.source.projectId!==input.projectId||saved.source.waveId!==input.waveId)fail('REFERENCE_SURVEY_CANDIDATE_REQUIRED')
     const family=await authorizeCandidate(tx,actorId,input.grantId,capability,saved.candidate,saved.source)
     return {...saved,family}
   },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
@@ -215,15 +216,28 @@ async function withVerifiedCandidate<T>(actorId:string,input:z.infer<typeof cand
 
 /** Private descriptive review only. Same-user review still requires its own current review capability. */
 export async function reviewSurveyReferenceCandidate(actorId:string,raw:unknown){
-  const input=reviewSchema.parse(raw)
+  const input=surveyReferenceReviewSchema.parse(raw)
   return withVerifiedCandidate(actorId,input,'reference.review',async(tx,candidate)=>({reviewId:await storeReferenceReview(tx,input.candidateId,{
     candidateHash:candidate.candidateHash,reviewerId:actorId,decision:input.decision,statement:input.statement,reviewedAt:new Date().toISOString(),
   })}))
 }
 /** Existing immutable candidate/review records are revalidated; caller cannot supply an approval or purpose. */
 export async function publishSurveyReferenceCandidate(actorId:string,raw:unknown){
-  const input=publishSchema.parse(raw)
+  const input=surveyReferencePublishSchema.parse(raw)
   return withVerifiedCandidate(actorId,input,'reference.publish',(tx,_candidate,facts)=>publishReviewedReferenceCandidate(tx,{
     candidateId:input.candidateId,reviewId:input.reviewId,localKey:input.localKey,version:input.version,actorId,purpose:'HISTORICAL_INTERPRETATION',
   },facts))
+}
+
+/** Review view uses the same current capability/source verification; no sample IDs leave this DTO. */
+export function referenceCandidateView(candidate:ReferenceCandidate){
+  return {candidateHash:candidate.candidateHash,measurement:candidate.measurement,
+    definition:candidate.definition,evidence:candidate.evidence,sampleSize:candidate.sampleManifest.length,
+    sourceBinding:candidate.sourceBinding}
+}
+export async function readSurveyReferenceCandidate(actorId:string,raw:unknown){
+  const input=surveyReferenceActionSchema.parse(raw)
+  return withVerifiedCandidate(actorId,input,'reference.review',async(_tx,candidate)=>({
+    candidateId:input.candidateId,...referenceCandidateView(candidate),
+  }))
 }
