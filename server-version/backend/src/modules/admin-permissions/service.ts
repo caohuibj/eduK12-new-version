@@ -66,4 +66,3 @@ export async function changeEntryGrant(input: {
     return { entry: input.entry, active: input.active, version: nextVersion, changed: true }
   })
 }
-
